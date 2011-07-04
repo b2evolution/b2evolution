@@ -970,8 +970,36 @@ function set_user_isubscription( $user_ID, $item_ID, $value, $type )
 }
 
 
+/**
+ * Get user prefered name for notification emails salutation
+ * 
+ * @param string nickname
+ * @param string firstname
+ * @param string login
+ * @return prefered salutation name
+ */
+function get_prefered_name( $nickname, $firstname, $login )
+{
+	if( empty( $nickname ) )
+	{
+		if( empty( $firstname ) )
+		{
+			return $login;
+		}
+		else
+		{
+			return $firstname;
+		}
+	}
+	return $nickname;
+}
+
+
 /*
  * $Log$
+ * Revision 1.36  2011/07/04 12:26:54  efy-asimo
+ * Notification emails content - fix
+ *
  * Revision 1.35  2011/06/14 13:33:55  efy-asimo
  * in-skin register
  *

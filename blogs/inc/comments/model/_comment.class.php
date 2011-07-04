@@ -1626,7 +1626,7 @@ class Comment extends DataObject
 	 */
 	function send_email_notifications( $only_moderators = false, $except_moderators = false )
 	{
-		global $DB, $admin_url, $debug, $Debuglog, $htsrv_url;//, $UserSettings;
+		global $DB, $admin_url, $baseurl, $debug, $Debuglog, $htsrv_url;
 
 		if( $only_moderators && $except_moderators )
 		{ // at least one of them must be false
@@ -1640,7 +1640,7 @@ class Comment extends DataObject
 
 		if( $only_moderators || $except_moderators )
 		{ // get moderators
-			$sql = 'SELECT DISTINCT user_email, user_locale, user_ID
+			$sql = 'SELECT DISTINCT user_email, user_locale, user_ID, user_login, user_nickname, user_firstname
 						FROM T_coll_user_perms INNER JOIN T_users ON bloguser_user_ID = user_ID
 						WHERE bloguser_blog_ID = '.$edited_Blog->ID.
 						' AND bloguser_perm_draft_cmts <> 0 AND bloguser_perm_publ_cmts <> 0
@@ -1652,11 +1652,13 @@ class Comment extends DataObject
 		{ // Preprocess moderator list:
 			foreach( $moderators_to_notify as $moderator )
 			{
-				$notify_users[$moderator->user_ID] = build_notify_data( $moderator->user_email, $moderator->user_locale, $moderator->user_unsubscribe_key, 'moderator' );
+				$name = get_prefered_name( $moderator->user_nickname, $moderator->user_firstname, $moderator->user_login );
+				$notify_users[$moderator->user_ID] = build_notify_data( $moderator->user_email, $moderator->user_locale, $moderator->user_unsubscribe_key, 'moderator', $name, $moderator->user_login );
 			}
 			if( $owner_User->get( 'notify_moderation' ) && is_email( $owner_User->get( 'email' ) ) )
 			{ // add blog owner
-				$notify_users[$owner_User->ID] = build_notify_data( $owner_User->get( 'email' ), $owner_User->get( 'locale' ), $owner_User->get( 'unsubscribe_key' ), 'moderator' );
+				$name = get_prefered_name( $owner_User->get( 'nickname' ), $owner_User->get( 'firstname' ), $owner_User->get( 'login' ) );
+				$notify_users[$owner_User->ID] = build_notify_data( $owner_User->get( 'email' ), $owner_User->get( 'locale' ), $owner_User->get( 'unsubscribe_key' ), 'moderator', $name, $owner_User->get( 'login' ) );
 			}
 		}
 		else
@@ -1687,14 +1689,15 @@ class Comment extends DataObject
 								&& $creator_User->login == $this->author_User->login) ) // comment is from same user as post
 						&& ! ( in_array( $creator_User->get( 'email' ), $moderators ) ) ) // creator user is not a moderator (moderators already got an email)
 				{	// Creator is not commenting on his own post...
-					$notify_users[$creator_User->ID] = build_notify_data( $creator_User->get( 'email' ), $creator_User->get( 'locale' ), $creator_User->get( 'unsubscribe_key' ), 'creator' );
+					$name = get_prefered_name( $creator_User->get( 'nickname' ), $creator_User->get( 'firstname' ), $creator_User->get( 'login' ) );
+					$notify_users[$creator_User->ID] = build_notify_data( $creator_User->get( 'email' ), $creator_User->get( 'locale' ), $creator_User->get( 'unsubscribe_key' ), 'creator', $name, $creator_User->get( 'login' ) );
 				}
 			}
 
 			// Get list of users who want to be notified about the this post comments
 			if( $edited_Blog->get_setting( 'allow_item_subscriptions' ) )
 			{ // item subscriptions is allowed
-				$sql = 'SELECT DISTINCT user_email, user_locale, user_ID, user_unsubscribe_key
+				$sql = 'SELECT DISTINCT user_email, user_locale, user_ID, user_unsubscribe_key, user_login, user_nickname, user_firstname
 									FROM T_items__subscriptions INNER JOIN T_users ON isub_user_ID = user_ID
 								 WHERE isub_item_ID = '.$edited_Item->ID.'
 								   AND isub_comments <> 0
@@ -1704,14 +1707,15 @@ class Comment extends DataObject
 				// Preprocess list:
 				foreach( $notify_list as $notification )
 				{
-					$notify_users[$notification->user_ID] = build_notify_data( $notification->user_email, $notification->user_locale, $notification->user_unsubscribe_key, 'item_subscription' );
+					$name = get_prefered_name( $notification->user_nickname, $notification->user_firstname, $notification->user_login );
+					$notify_users[$notification->user_ID] = build_notify_data( $notification->user_email, $notification->user_locale, $notification->user_unsubscribe_key, 'item_subscription', $name, $notification->user_login );
 				}
 			}
 
 			// Get list of users who want to be notfied about this blog comments
 			if( $edited_Blog->get_setting( 'allow_subscriptions' ) )
 			{ // blog subscription is allowed
-				$sql = 'SELECT DISTINCT user_email, user_locale, user_ID, user_unsubscribe_key
+				$sql = 'SELECT DISTINCT user_email, user_locale, user_ID, user_unsubscribe_key, user_login, user_nickname, user_firstname
 								FROM T_subscriptions INNER JOIN T_users ON sub_user_ID = user_ID
 							 WHERE sub_coll_ID = '.$edited_Blog->ID.'
 							   AND sub_comments <> 0
@@ -1721,7 +1725,8 @@ class Comment extends DataObject
 				// Preprocess list:
 				foreach( $notify_list as $notification )
 				{
-					$notify_users[$notification->user_ID] = build_notify_data( $notification->user_email, $notification->user_locale, $notification->user_unsubscribe_key, 'blog_subscription' );
+					$name = get_prefered_name( $notification->user_nickname, $notification->user_firstname, $notification->user_login );
+					$notify_users[$notification->user_ID] = build_notify_data( $notification->user_email, $notification->user_locale, $notification->user_unsubscribe_key, 'blog_subscription', $name, $notification->user_login );
 				}
 			}
 		}
@@ -1765,6 +1770,7 @@ class Comment extends DataObject
 			$notify_type = $notify_data[ 'type' ];
 
 			locale_temp_switch($notify_locale);
+			$notify_salutation = sprintf( T_( 'Hello %s !' ), $notify_data[ 'prefered_name' ] )."\n\n";
 
 			switch( $this->type )
 			{
@@ -1812,7 +1818,7 @@ class Comment extends DataObject
 					}
 			}
 
-			$notify_message =
+			$notify_message = $notify_salutation.
 				T_('Comment').': '.str_replace('&amp;', '&', $this->get_permanent_url())."\n"
 				// TODO: fp> We MAY want to force a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 				.$notify_message;
@@ -1827,8 +1833,11 @@ class Comment extends DataObject
 
 			if( $notify_type == 'moderator' )
 			{ // moderation email
+				if( $this->status == 'draft' )
+				{
 				$secret_value = '&secret='.$this->secret;
 				$notify_message .= T_('Quick moderation').': '.$htsrv_url.'comment_review.php?cmt_ID='.$this->ID.$secret_value."\n\n";
+				}
 				$notify_message .= T_('Edit comment').': '.$admin_url.'?ctrl=comments&action=edit&comment_ID='.$this->ID."\n\n";
 			}
 			else if( $notify_type == 'blog_subscription' )
@@ -1853,6 +1862,11 @@ class Comment extends DataObject
 			{
 				debug_die( 'Unknown user subscription type' );
 			}
+
+			$footer = sprintf( T_( 'This message was automatically generated by b2evolution running on %s.' ), $baseurl )
+				."\n".T_( 'Please do not reply to this email.' )
+				."\n".sprintf( T_( 'Your login is: %s' ), $notify_data[ 'login' ] );
+			$notify_message .= "\n\n\n".$footer;
 
 			if( $debug )
 			{
@@ -2019,6 +2033,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.83  2011/07/04 12:26:54  efy-asimo
+ * Notification emails content - fix
+ *
  * Revision 1.82  2011/05/19 17:47:07  efy-asimo
  * register for updates on a specific blog post
  *
