@@ -1258,7 +1258,7 @@ class Hit
 		{
 			$ie = $search_engine_params[$ref_host][3];
 		}
-		elseif( !empty($search_engine_params[$url][3]) )
+		elseif( isset($url) && !empty($search_engine_params[$url][3]) )
 		{
 			$ie = $search_engine_params[$url][3];
 		}
@@ -1296,7 +1296,7 @@ class Hit
 		{
 			$serp_param = $search_engine_params[$ref_host][4];
 		}
-		elseif( !empty($search_engine_params[$url][4]) )
+		elseif( isset($url) && !empty($search_engine_params[$url][4]) )
 		{
 			$serp_param = $search_engine_params[$url][4];
 		}
@@ -1443,6 +1443,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.63  2011/07/05 13:11:22  sam2kb
+ * Fix undefined variable "url"
+ *
  * Revision 1.62  2011/06/27 00:49:48  sam2kb
  * Fixed encoding detection
  *
