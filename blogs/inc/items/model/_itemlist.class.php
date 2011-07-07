@@ -596,6 +596,8 @@ class ItemList2 extends ItemListLight
 
 		$order_by = implode( ', ', $orderbyorder_array );
 
+		// Special case for RAND:
+		$order_by = str_replace( $this->Cache->dbprefix.'RAND ', 'RAND() ', $order_by );
 
 		$next_Query->order_by( $order_by );
 
@@ -693,6 +695,11 @@ class ItemList2 extends ItemListLight
 				$next_Query->WHERE_and( $and_clause );
 				break;
 
+			case 'RAND':
+				// Random order. Don't show current item again.
+				$next_Query->WHERE_and( $this->Cache->dbprefix.'ID <> '.$current_Item->ID );
+				break;
+
 			default:
 				echo 'WARNING: unhandled sorting: '.htmlspecialchars( $orderby_array[0] );
 		}
@@ -730,6 +737,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.40  2011/07/07 05:36:16  efy-asimo
+ * Fix posts random order
+ *
  * Revision 1.39  2011/03/02 09:45:59  efy-asimo
  * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
  *
