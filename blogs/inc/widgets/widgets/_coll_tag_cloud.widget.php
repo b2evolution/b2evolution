@@ -165,7 +165,8 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 		global $Blog;
 
-		$blog_ids = sanitize_id_list($this->disp_params['blog_ids'], true);
+		// Get a list of quoted blog IDs
+		$blog_ids = sanitize_id_list($this->disp_params['blog_ids'], false, true);
 
 		if( empty($Blog) && empty($blog_ids) )
 		{	// Nothing to display
@@ -309,6 +310,9 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.33  2011/07/12 23:13:11  sam2kb
+ * minor
+ *
  * Revision 1.32  2011/07/12 22:10:35  sam2kb
  * Option to display tags from several blogs
  *
