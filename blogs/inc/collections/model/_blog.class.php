@@ -641,8 +641,11 @@ class Blog extends DataObject
 			if( param( 'aggregate_coll_IDs', 'string', NULL ) !== NULL )
 			{ // Aggregate list: (can be '*')
 				$aggregate_coll_IDs = get_param( 'aggregate_coll_IDs' );
-				// Sanitize the string
-				$aggregate_coll_IDs = implode( ',', array_filter( array_map( 'trim', explode( ',', $aggregate_coll_IDs ) ) ) );
+
+				if( $aggregate_coll_IDs != '*' )
+				{	// Sanitize the string
+					$aggregate_coll_IDs = sanitize_id_list($aggregate_coll_IDs);
+				}
 
 				// fp> TODO: check perms on each aggregated blog (if changed)
 				// fp> TODO: better interface
@@ -2372,6 +2375,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.136  2011/07/12 23:47:31  sam2kb
+ * Sanitize input ID list
+ *
  * Revision 1.135  2011/06/29 13:14:01  efy-asimo
  * Use ajax to display comment and contact forms
  *
