@@ -4155,8 +4155,35 @@ function set_max_execution_time( $seconds )
 }
 
 
+/**
+ * Sanitize a comma-separated list of numbers (IDs)
+ *
+ * @param string
+ * @param bool Quote each element (for use in SQL queries)
+ * @return string
+ */
+function sanitize_id_list( $str, $quote = false )
+{
+	// Explode and trim
+	$array = array_map( 'trim', explode(',', $str) );
+
+	// Convert to integer and remove all empty values
+	$array = array_filter( array_map('intval', $array) );
+
+	if( $quote )
+	{	// Quote each element and return a string
+		global $DB;
+		return $DB->quote($array);
+	}
+	return implode(',', $array);
+}
+
+
 /*
  * $Log$
+ * Revision 1.255  2011/07/12 22:13:34  sam2kb
+ * New function "sanitize_id_list"
+ *
  * Revision 1.254  2011/06/15 06:29:44  sam2kb
  * Relocate "set_max_execution_time" function
  *
