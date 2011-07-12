@@ -103,6 +103,11 @@ class coll_tag_cloud_Widget extends ComponentWidget
 					'defaultvalue' => T_('Tag cloud'),
 					'maxlength' => 100,
 				),
+			'blog_ids' => array(
+					'type' => 'text',
+					'label' => T_('Include blogs'),
+					'note' => T_('A comma-separated list of Blog IDs.'),
+				),
 			'max_tags' => array(
 					'type' => 'integer',
 					'label' => T_('Max # of tags'),
@@ -132,7 +137,7 @@ class coll_tag_cloud_Widget extends ComponentWidget
 					'label' => T_('Ordering'),
 					'options' => array( 'ASC'  => T_('Ascending'), 'RAND' => T_('Random') ),
 					'defaultvalue' => 'ASC',
-					'note' => T_( 'How to sort the tag cloud.' ),
+					'note' => T_('How to sort the tag cloud.'),
 				),
 			'filter_list' => array(
 					'type' => 'textarea',
@@ -160,22 +165,33 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 		global $Blog;
 
-		if( empty($Blog) )
+		$blog_ids = sanitize_id_list($this->disp_params['blog_ids'], true);
+
+		if( empty($Blog) && empty($blog_ids) )
 		{	// Nothing to display
 			return;
 		}
 
 		global $DB, $localtimenow;
 
+		$BlogCache = & get_BlogCache();
+
 // fp> verrry dirty and params; TODO: clean up
 // dh> oddly, this appears to not get cached by the query cache. Have experimented a bit, but not found the reason.
 //     It worked locally somehow, but not live.
 //     This takes up to ~50% (but more likely 15%) off the total SQL time. With the query being cached, it would be far better.
-		// get list of relevant blogs
-		$where_cats = trim($Blog->get_sql_where_aggregate_coll_IDs('cat_blog_ID'));
+
+		if( !empty($blog_ids) )
+		{
+			$where_cats = 'cat_blog_ID IN ('.$blog_ids.')';
+		}
+		else
+		{	// get list of relevant blogs
+			$where_cats = trim($Blog->get_sql_where_aggregate_coll_IDs('cat_blog_ID'));
+		}
 
 		// build query, only joining categories, if not using all.
-		$sql = "SELECT LOWER(tag_name) AS tag_name, post_datestart, COUNT(DISTINCT itag_itm_ID) AS tag_count
+		$sql = "SELECT LOWER(tag_name) AS tag_name, post_datestart, COUNT(DISTINCT itag_itm_ID) AS tag_count, cat_blog_ID
 			  FROM T_items__tag INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID";
 		if( $where_cats != '1' )
 		{ // we have to join the cats
@@ -247,7 +263,8 @@ class coll_tag_cloud_Widget extends ComponentWidget
 				: format_to_output($row->tag_name, 'htmlbody');
 			$size = floor( $row->tag_count * $size_span / $count_span + $min_size );
 
-			echo $Blog->get_tag_link( $row->tag_name, $tag_name_disp, array(
+			$l_Blog = $BlogCache->get_by_id( $row->cat_blog_ID );
+			echo $l_Blog->get_tag_link( $row->tag_name, $tag_name_disp, array(
 				'style' => 'font-size:'.$size.'pt;',
 				'title' => sprintf( T_('%d posts'), $row->tag_count ) ) ); // TODO: dh> improve title, along "Display items tagged as «%s»"
 			$count++;
@@ -292,6 +309,9 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.32  2011/07/12 22:10:35  sam2kb
+ * Option to display tags from several blogs
+ *
  * Revision 1.31  2010/04/22 19:41:01  blueyed
  * doc
  *
