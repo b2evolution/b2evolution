@@ -243,9 +243,9 @@ class coll_item_list_Widget extends ComponentWidget
 			load_class( 'items/model/_itemlistlight.class.php', 'ItemListLight' );
 			$ItemList = new ItemListLight( $listBlog, $timestamp_min, $timestamp_max, $limit, 'ItemCacheLight', $this->code.'_' );
 		}
-/* TODO: trim is not enough, convert each ID to a number for security
-		$cat_array = array_filter( array_map( 'trim', explode( ',', $this->disp_params[ 'cat_IDs' ] ) ) );
-*/
+
+		//$cat_array = sanitize_id_list($this->disp_params['cat_IDs'], true);
+
 		// Filter list:
 		$filters = array(
 //				'cat_array' => $cat_array, // Restrict to selected categories
@@ -444,6 +444,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.32  2011/07/12 23:15:34  sam2kb
+ * Sanitize input ID list
+ *
  * Revision 1.31  2011/05/31 14:20:27  efy-asimo
  * paged nav on ?disp=postidx
  *
