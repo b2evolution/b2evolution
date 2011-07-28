@@ -45,7 +45,7 @@ $params = array_merge( array(
 		'before_more_link'    => '<p class="bMore">',
 		'after_more_link'     => '</p>',
 		'more_link_text'      => '#',
-		'more_link_to'        => '234', // 'single' becomes permalink + "#more55" where 55 is item ID
+		'more_link_to'        => 'single', // 'single' becomes permalink + "#more55" where 55 is item ID
 		'anchor_text'         => '<p class="bMore">...</p>', // text to display as the more anchor (once the more link has been clicked, '#' defaults to "Follow up:")
 		'excerpt_before_text' => '<div class="excerpt">',
 		'excerpt_after_text'  => '</div>',
@@ -247,6 +247,9 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.37  2011/07/28 02:55:07  sam2kb
+ * minor
+ *
  * Revision 1.36  2011/07/28 02:53:00  sam2kb
  * Added "link_to" param to more link
  *
