@@ -1425,6 +1425,7 @@ class Item extends ItemLight
 				'after'       => '</p>',
 				'link_text'   => '#',		// text to display as the more link
 				'anchor_text' => '#',		// text to display as the more anchor (once the more link has been clicked, # defaults to "Follow up:")
+				'link_to'     => 'single',	// target URL for more link
 				'disppage'    => '#',		// page number to display specific page, # for url parameter
 				'format'      => 'htmlbody',
 			), $params );
@@ -1446,14 +1447,18 @@ class Item extends ItemLight
 				// Dummy in order to keep previous translation in the loop:
 				$dummy = T_('Read more');
 			}
+			if( $params['link_to'] == 'single' )
+			{
+				$params['link_to'] = $this->get_permanent_url().'#more'.$this->ID;
+			}
 
 			return format_to_output( $params['before']
-						.'<a href="'.$this->get_permanent_url().'#more'.$this->ID.'">'
+						.'<a href="'.$params['link_to'].'">'
 						.$params['link_text'].'</a>'
 						.$params['after'], $params['format'] );
 		}
 		elseif( ! $this->hidden_teaser($params) )
-		{	// We are in mode mode and we're not hiding the teaser:
+		{	// We are in more mode and we're not hiding the teaser:
 			// (if we're hiding the teaser we display this as a normal page ie: no anchor)
 			if( $params['anchor_text'] == '#' )
 			{ // TRANS: this is the default text displayed once the more link has been activated
@@ -4592,6 +4597,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.227  2011/07/28 02:53:40  sam2kb
+ * Added "link_to" param to more link
+ *
  * Revision 1.226  2011/07/04 12:26:54  efy-asimo
  * Notification emails content - fix
  *

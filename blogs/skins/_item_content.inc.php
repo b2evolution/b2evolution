@@ -45,7 +45,8 @@ $params = array_merge( array(
 		'before_more_link'    => '<p class="bMore">',
 		'after_more_link'     => '</p>',
 		'more_link_text'      => '#',
-		'anchor_text'         => '<p class="bMore">...</p>',		// text to display as the more anchor (once the more link has been clicked, '#' defaults to "Follow up:")
+		'more_link_to'        => '234', // 'single' becomes permalink + "#more55" where 55 is item ID
+		'anchor_text'         => '<p class="bMore">...</p>', // text to display as the more anchor (once the more link has been clicked, '#' defaults to "Follow up:")
 		'excerpt_before_text' => '<div class="excerpt">',
 		'excerpt_after_text'  => '</div>',
 		'excerpt_before_more' => ' <span class="excerpt_more">',
@@ -189,6 +190,7 @@ switch( $content_mode )
 						'after'       => $params['after_more_link'],
 						'link_text'   => $params['more_link_text'],
 						'anchor_text' => $params['anchor_text'],
+						'link_to'     => $params['more_link_to'],
 					) );
 				if( ! empty($params['image_size']) && $more && $Item->has_content_parts($params) /* only if not displayed all images already */ )
 				{
@@ -245,6 +247,9 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.36  2011/07/28 02:53:00  sam2kb
+ * Added "link_to" param to more link
+ *
  * Revision 1.35  2011/06/09 00:11:48  sam2kb
  * Added missing params to $Item->images
  *
