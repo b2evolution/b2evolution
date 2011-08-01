@@ -212,6 +212,11 @@ function antispam_poll_abuse()
 	load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
 	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port);
 	$client->debug = $debug;
+	
+	if( function_exists('mb_internal_encoding') )
+	{	// Fixes warning on cron "Converting from  to : not supported..."
+		$client->request_charset_encoding = $GLOBALS['xmlrpc_internalencoding'] = mb_internal_encoding();
+	}
 
 	// Get datetime from last update, because we only want newer stuff...
 	$last_update = $Settings->get( 'antispam_last_update' );
@@ -458,6 +463,9 @@ function echo_affected_comments( $affected_comments, $status, $keyword, $noperms
 
 /*
  * $Log$
+ * Revision 1.18  2011/08/01 04:31:14  sam2kb
+ * Fixed warning on cron "Converting from  to : not supported..."
+ *
  * Revision 1.17  2011/02/15 06:13:49  sam2kb
  * strlen replaced with evo_strlen to support utf-8 logins and domain names
  *
