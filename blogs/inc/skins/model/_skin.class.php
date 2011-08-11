@@ -663,11 +663,113 @@ class Skin extends DataObject
 	}
 
 
+	function get_template( $name )
+	{
+		switch( $name )
+		{
+			case 'Results':
+				// Results list:
+				return array(
+					'page_url' => '', // All generated links will refer to the current page
+					'before' => '<div class="results">',
+					'header_start' => '<div class="results_nav">',
+						'header_text' => '<strong>'.T_('Pages').'</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$',
+						'header_text_single' => '',
+					'header_end' => '</div>',
+					'list_start' => '<table class="grouped" cellspacing="0">'."\n\n",
+						'head_start' => "<thead>\n",
+							'head_title' => '<tr><th colspan="$nb_cols$" class="title"><span style="float:right">$global_icons$</span>$title$</th>'
+							                ."\n</tr>\n",
+							'filters_start' => '<tr class="filters"><td colspan="$nb_cols$">',
+							'filters_end' => '</td></tr>',
+							'line_start_head' => '<tr>',  // TODO: fusionner avec colhead_start_first; mettre a jour admin_UI_general; utiliser colspan="$headspan$"
+							'colhead_start' => '<th $class_attrib$>',
+							'colhead_start_first' => '<th class="firstcol $class$">',
+							'colhead_start_last' => '<th class="lastcol $class$">',
+							'colhead_end' => "</th>\n",
+							'sort_asc_off' => '<img src="../admin/img/grey_arrow_up.gif" alt="A" title="'.T_('Ascending order')
+							                    .'" height="12" width="11" />',
+							'sort_asc_on' => '<img src="../admin/img/black_arrow_up.gif" alt="A" title="'.T_('Ascending order')
+							                    .'" height="12" width="11" />',
+							'sort_desc_off' => '<img src="../admin/img/grey_arrow_down.gif" alt="D" title="'.T_('Descending order')
+							                    .'" height="12" width="11" />',
+							'sort_desc_on' => '<img src="../admin/img/black_arrow_down.gif" alt="D" title="'.T_('Descending order')
+							                    .'" height="12" width="11" />',
+							'basic_sort_off' => '',
+							'basic_sort_asc' => get_icon( 'ascending' ),
+							'basic_sort_desc' => get_icon( 'descending' ),
+						'head_end' => "</thead>\n\n",
+						'tfoot_start' => "<tfoot>\n",
+						'tfoot_end' => "</tfoot>\n\n",
+						'body_start' => "<tbody>\n",
+							'line_start' => '<tr class="even">'."\n",
+							'line_start_odd' => '<tr class="odd">'."\n",
+							'line_start_last' => '<tr class="even lastline">'."\n",
+							'line_start_odd_last' => '<tr class="odd lastline">'."\n",
+								'col_start' => '<td $class_attrib$>',
+								'col_start_first' => '<td class="firstcol $class$">',
+								'col_start_last' => '<td class="lastcol $class$">',
+								'col_end' => "</td>\n",
+							'line_end' => "</tr>\n\n",
+							'grp_line_start' => '<tr class="group">'."\n",
+							'grp_line_start_odd' => '<tr class="odd">'."\n",
+							'grp_line_start_last' => '<tr class="lastline">'."\n",
+							'grp_line_start_odd_last' => '<tr class="odd lastline">'."\n",
+										'grp_col_start' => '<td $class_attrib$ $colspan_attrib$>',
+										'grp_col_start_first' => '<td class="firstcol $class$" $colspan_attrib$>',
+										'grp_col_start_last' => '<td class="lastcol $class$" $colspan_attrib$>',
+								'grp_col_end' => "</td>\n",
+							'grp_line_end' => "</tr>\n\n",
+						'body_end' => "</tbody>\n\n",
+						'total_line_start' => '<tr class="total">'."\n",
+							'total_col_start' => '<td $class_attrib$>',
+							'total_col_start_first' => '<td class="firstcol $class$">',
+							'total_col_start_last' => '<td class="lastcol $class$">',
+							'total_col_end' => "</td>\n",
+						'total_line_end' => "</tr>\n\n",
+					'list_end' => "</table>\n\n",
+					'footer_start' => '<div class="results_nav">',
+					'footer_text' => '<strong>'.T_('Pages').'</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$'
+					                  /* T_('Page $scroll_list$ out of $total_pages$   $prev$ | $next$<br />'. */
+					                  /* '<strong>$total_pages$ Pages</strong> : $prev$ $list$ $next$' */
+					                  /* .' <br />$first$  $list_prev$  $list$  $list_next$  $last$ :: $prev$ | $next$') */,
+					'footer_text_single' => '',
+					'footer_text_no_limit' => '', // Text if theres no LIMIT and therefor only one page anyway
+						'prev_text' => T_('Previous'),
+						'next_text' => T_('Next'),
+						'no_prev_text' => '',
+						'no_next_text' => '',
+						'list_prev_text' => T_('...'),
+						'list_next_text' => T_('...'),
+						'list_span' => 11,
+						'scroll_list_range' => 5,
+					'footer_end' => "</div>\n\n",
+					'no_results_start' => '<table class="grouped" cellspacing="0">'."\n\n"
+								                .'<tr><th class="title"><span style="float:right">$global_icons$</span>'
+								                .'$title$</th></tr>'."\n",
+					'no_results_end'   => '<tr class="lastline"><td class="firstcol lastcol">$no_results$</td></tr>'
+								                .'</table>'."\n\n",
+				'after' => '</div>',
+				'sort_type' => 'basic'
+				);
+
+			case 'messages':
+				return array(
+					'show_only_date' => true,
+					'show_columns' => 'login',
+				);
+		}
+
+		return array();
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.29  2011/08/11 09:05:09  efy-asimo
+ * Messaging in front office
+ *
  * Revision 1.28  2010/02/08 17:54:38  efy-yury
  * copyright 2009 -> 2010
  *

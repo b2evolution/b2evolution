@@ -24,10 +24,19 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher;
 global $current_User;
 global $unread_messages_count;
 global $read_unread_recipients;
+global $DB;
+
+if( !isset( $display_params ) )
+{ // init display_params
+	$display_params = array();
+}
+// set default values
+$display_params = array_merge( array(
+	'show_only_date' => 0,
+	), $display_params );
 
 // Select read/unread users for each thread
 
@@ -163,7 +172,7 @@ function filter_recipients( & $Form )
 $Results->filter_area = array(
 	'callback' => 'filter_recipients',
 	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=threads' ),
+		'all' => array( T_('All'), get_messaging_url( 'threads' ) ),
 		)
 	);
 
@@ -174,21 +183,32 @@ $Results->cols[] = array(
 					'td' => '%get_avatar_imgtags( #thrd_recipients# )%',
 					);
 
+$messages_url = get_messaging_url( 'messages' );
 $Results->cols[] = array(
 					'th' => T_('Subject'),
 					'th_class' => 'thread_subject',
 					'td_class' => 'thread_subject',
-					'td' => '¤conditional( #thrd_msg_ID#>0, \'<strong><a href="'.$dispatcher
-							.'?ctrl=messages&amp;thrd_ID=$thrd_ID$" title="'.
-							T_('Show messages...').'">$thrd_title$</a></strong>\', \'<a href="'
-							.$dispatcher.'?ctrl=messages&amp;thrd_ID=$thrd_ID$" title="'.T_('Show messages...').'">$thrd_title$</a>\' )¤',
+					'td' => '¤conditional( #thrd_msg_ID#>0, \'<strong><a href="'.$messages_url.'&amp;thrd_ID=$thrd_ID$" title="'
+							.T_('Show messages...').'">$thrd_title$</a></strong>\', \'<a href="'
+							.$messages_url.'&amp;thrd_ID=$thrd_ID$" title="'.T_('Show messages...').'">$thrd_title$</a>\' )¤',
 					);
 
+function convert_date( $date, $show_only_date )
+{
+	if( $show_only_date )
+	{
+		return mysql2localedate( $date );
+	}
+
+	return mysql2localedatetime( $date );
+}
+
+$show_only_date = $display_params[ 'show_only_date' ];
 $Results->cols[] = array(
 					'th' => T_('Last message'),
 					'th_class' => 'shrinkwrap',
 					'td_class' => 'shrinkwrap',
-					'td' => '¤conditional( #thrd_msg_ID#>0, \'<span style="color:red">%mysql2localedatetime(#thrd_unread_since#)%</span>\', \'<span style="color:green">%mysql2localedatetime(#thrd_datemodified#)%</span>\')¤' );
+					'td' => '¤conditional( #thrd_msg_ID#>0, \'<span style="color:red">%convert_date(#thrd_unread_since#,'.$show_only_date.')%</span>\', \'<span style="color:green">%convert_date(#thrd_datemodified#,'.$show_only_date.')%</span>\')¤' );
 
 function get_read_by( $thread_ID )
 {
@@ -204,6 +224,19 @@ $Results->cols[] = array(
 					'td' => '%get_read_by( #thrd_ID# )%',
 					);
 
+function delete_action( $thread_ID )
+{
+	global $htsrv_url, $Blog;
+	if( is_admin_page() )
+	{
+		return action_icon( T_( 'Delete'), 'delete', regenerate_url( 'action', 'thrd_ID='.$thread_ID.'&action=delete&'.url_crumb( 'thread' ) ) );
+	}
+	else
+	{
+		$redirect_to = $Blog->gen_baseurl().'?disp=threads';
+		return action_icon( T_( 'Delete'), 'delete', $htsrv_url.'messaging.php?thrd_ID='.$thread_ID.'&action=delete&redirect_to='.$redirect_to.'&'.url_crumb( 'thread' ) );
+	}
+}
 
 if( $current_User->check_perm( 'perm_messaging', 'delete' ) )
 {	// We have permission to modify:
@@ -211,16 +244,28 @@ if( $current_User->check_perm( 'perm_messaging', 'delete' ) )
 							'th' => T_('Actions'),
 							'th_class' => 'shrinkwrap',
 							'td_class' => 'shrinkwrap',
-							'td' => '@action_icon("delete")@',
+							'td' => '%delete_action(  #thrd_ID#  )%',
 						);
 }
 
-$Results->global_icon( T_('Create a new conversation...'), 'new', regenerate_url( 'action', 'action=new'), T_('Compose new').' &raquo;', 3, 4  );
+if( is_admin_page() )
+{
+	$newmsg_url = regenerate_url( 'action', 'action=new' );
+}
+else
+{
+	$newmsg_url = regenerate_url( 'disp', 'disp=threads&action=new' );
+}
 
-$Results->display();
+$Results->global_icon( T_('Create a new conversation...'), 'new', $newmsg_url, T_('Compose new').' &raquo;', 3, 4  );
+
+$Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.26  2011/08/11 09:05:09  efy-asimo
+ * Messaging in front office
+ *
  * Revision 1.25  2010/01/30 18:55:32  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

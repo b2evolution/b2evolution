@@ -36,7 +36,7 @@ load_class( 'messaging/model/_message.class.php', 'Message' );
 global $current_User;
 
 // Set options path:
-$AdminUI->set_path( 'messaging', 'messages' );
+$AdminUI->set_path( 'messaging', 'threads' );
 
 // Get action parameter from request:
 param_action();
@@ -53,7 +53,7 @@ if( param( 'thrd_ID', 'integer', '', true) )
 }
 
 // Check minimum permission:
-$current_User->check_perm( 'perm_messaging', 'write', true, $thrd_ID );
+$current_User->check_perm( 'perm_messaging', 'reply', true );
 
 if( param( 'msg_ID', 'integer', '', true) )
 {// Load message from cache:
@@ -67,52 +67,26 @@ if( param( 'msg_ID', 'integer', '', true) )
 }
 
 // Preload users to show theirs avatars
-
 load_messaging_thread_recipients( $thrd_ID );
 
 switch( $action )
 {
 	case 'create': // Record new message
-		
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'message' );
-		
-		// Insert new message:
-		$edited_Message = new Message();
-		$edited_Message->thread_ID = $thrd_ID;
 
-		// Check permission:
-		$current_User->check_perm( 'perm_messaging', 'write', true );
-
-		// Load data from request
-		if( $edited_Message->load_from_Request() )
-		{	// We could load data from form without errors:
-
-			if( $current_User->check_perm( 'perm_messaging', 'reply' ) )
-			{
-				$non_blocked_contacts = $edited_Thread->load_contacts();
-				if( empty( $non_blocked_contacts ) )
-				{
-					param_error( '', T_( 'You don\'t have permission to reply here.' ) );
-				}
-			}
-
-			if( ! param_errors_detected() )
-			{
-				// Insert in DB:
-				$edited_Message->dbinsert_message();
-				$Messages->add( T_('New message created.'), 'success' );
-
-				// Redirect so that a reload doesn't write to the DB twice:
-				header_redirect( '?ctrl=messages&thrd_ID='.$thrd_ID, 303 ); // Will EXIT
-				// We have EXITed already at this point!!
-			}
+		$non_blocked_contacts = $edited_Thread->load_contacts();
+		if( create_new_message( $thrd_ID, !empty( $non_blocked_contacts ) ) )
+		{
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=messages&thrd_ID='.$thrd_ID, 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 		}
 		break;
 
 	case 'delete':
 		// Delete message:
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'message' );
 
@@ -187,6 +161,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2011/08/11 09:05:09  efy-asimo
+ * Messaging in front office
+ *
  * Revision 1.17  2010/01/30 18:55:32  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

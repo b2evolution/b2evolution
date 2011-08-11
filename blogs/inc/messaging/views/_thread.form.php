@@ -34,14 +34,32 @@ global $DB, $action;
 
 $creating = is_create_action( $action );
 
-$Form = new Form( NULL, 'thread_checkchanges', 'post', 'compact' );
+if( !isset( $params ) )
+{
+	$params = array();
+}
+$params = array_merge( array(
+	'form_class' => 'fform',
+	'form_title' => T_('New thread'),
+	'form_action' => NULL,
+	'form_name' => 'thread_checkchanges',
+	'form_layout' => 'compact',
+	'redirect_to' => regenerate_url( 'action', '', '', '&' ),
+	'cols' => 80,
+	), $params );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+$Form = new Form( $params['form_action'], $params['form_name'], 'post', $params['form_layout'] );
 
-$Form->begin_form( 'fform', T_('New thread') );
+if( is_admin_page() )
+{
+	$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+}
+
+$Form->begin_form( $params['form_class'], $params['form_title'] );
 
 	$Form->add_crumb( 'thread' );
 	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',msg_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
+	$Form->hidden( 'redirect_to', $params[ 'redirect_to' ] );
 
 $recent_recipients = $DB->get_var('SELECT GROUP_CONCAT(DISTINCT user_login SEPARATOR \', \')
 									FROM (SELECT u.user_login
@@ -54,11 +72,11 @@ $recent_recipients = $DB->get_var('SELECT GROUP_CONCAT(DISTINCT user_login SEPAR
 
 $user_login = param( 'user_login', 'string', '');
 
-$Form->text_input( 'thrd_recipients', empty( $user_login ) ? $edited_Thread->recipients : $user_login, 70, T_('Recipients'), T_('Enter comma or space separated logins').'<br />'.get_avatar_imgtags( $recent_recipients ), array( 'maxlength'=> 255, 'required'=>true ) );
+$Form->text_input( 'thrd_recipients', empty( $user_login ) ? $edited_Thread->recipients : $user_login, $params['cols'], T_('Recipients'), T_('Enter comma or space separated logins').'<br />'.get_avatar_imgtags( $recent_recipients ), array( 'maxlength'=> 255, 'required'=>true ) );
 
-$Form->text_input( 'thrd_title', $edited_Thread->title, 70, T_('Subject'), '', array( 'maxlength'=> 255, 'required'=>true ) );
+$Form->text_input( 'thrd_title', $edited_Thread->title, $params['cols'], T_('Subject'), '', array( 'maxlength'=> 255, 'required'=>true ) );
 
-$Form->textarea_input( 'msg_text', $edited_Message->text, 10, T_('Message'), array( 'cols'=>80 ) );
+$Form->textarea_input( 'msg_text', $edited_Message->text, 10, T_('Message'), array( 'cols'=>$params['cols'] ) );
 
 $Form->radio( 'thrdtype', param( 'thrdtype', 'string', 'discussion' ), array(
 								array( 'discussion', T_( 'Group discussion' ) ),
@@ -70,6 +88,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 
 /*
  * $Log$
+ * Revision 1.15  2011/08/11 09:05:09  efy-asimo
+ * Messaging in front office
+ *
  * Revision 1.14  2010/01/30 18:55:32  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

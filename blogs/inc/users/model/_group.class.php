@@ -641,12 +641,15 @@ class Group extends DataObject
 	 */
 	function check_messaging_perm()
 	{
-		return $this->check_perm( 'perm_messaging', 'write' ) && ( $this->check_perm( 'admin', 'restricted' ) );
+		return $this->check_perm( 'perm_messaging', 'reply' ) && ( $this->check_perm( 'admin', 'restricted' ) );
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.44  2011/08/11 09:05:09  efy-asimo
+ * Messaging in front office
+ *
  * Revision 1.43  2011/05/12 10:27:34  efy-asimo
  * Add admin normal access master restriction to user and stats permission check
  *

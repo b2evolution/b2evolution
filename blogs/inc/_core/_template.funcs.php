@@ -304,6 +304,8 @@ function request_title( $params = array() )
 			'search_text'         => T_('Search'),
 			'sitemap_text'        => T_('Site Map'),
 			'msgform_text'        => T_('Send a Message'),
+			'messages_text'       => T_('Messages'),
+			'contacts_text'       => T_('Contacts'),
 			'login_text'          => T_('Login'),
 			'req_validatemail'    => T_('Email validation'),
 			'register_text'       => T_('Register'),
@@ -409,6 +411,17 @@ function request_title( $params = array() )
 		case 'msgform':
 			// We are requesting the message form:
 			$r[] = $params['msgform_text'];
+			break;
+
+		case 'threads':
+		case 'messages':
+			// We are requesting the message form:
+			$r[] = $params['messages_text'];
+			break;
+
+		case 'contacts':
+			// We are requesting the message form:
+			$r[] = $params['contacts_text'];
 			break;
 
 		case 'login':
@@ -1269,6 +1282,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.85  2011/08/11 09:05:09  efy-asimo
+ * Messaging in front office
+ *
  * Revision 1.84  2011/06/29 13:14:01  efy-asimo
  * Use ajax to display comment and contact forms
  *

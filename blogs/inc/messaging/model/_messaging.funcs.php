@@ -103,16 +103,45 @@ function check_blocked_contacts( $recipients_list )
 
 	$SQL->SELECT( 'u.user_login' );
 
-	$SQL->FROM( 'T_users u
-					LEFT OUTER JOIN T_messaging__contact mcu
-						ON u.user_ID = mcu.mct_from_user_ID
-    					AND mcu.mct_to_user_ID = '.$current_User->ID.'
-    					AND mcu.mct_blocked = 0' );
+	if( $current_User->check_perm( 'perm_messaging', 'write', false ) )
+	{ // get blocked contacts for user with write permission
+		$sub_SQL = new SQL();
 
-	$SQL->WHERE( 'u.user_ID <> '.$current_User->ID );
-	$SQL->WHERE_and( 'mcu.mct_from_user_ID IS NULL' );
+		// Select users blocked by current_User
+		$sub_SQL->SELECT( 'mct_to_user_ID as user_ID' );
+		$sub_SQL->FROM( 'T_messaging__contact' );
+		$sub_SQL->WHERE( 'mct_from_user_ID = '.$current_User->ID );
+		$sub_SQL->WHERE_and( 'mct_blocked = 1' );
+
+		// Union the two query result
+		$sub_query = '( '.$sub_SQL->get().' UNION DISTINCT ';
+
+		// Select users who has blocked current_User
+		$sub_SQL->SELECT( 'mct_from_user_ID as user_ID' );
+		$sub_SQL->WHERE( 'mct_to_user_ID = '.$current_User->ID );
+		$sub_SQL->WHERE_and( 'mct_blocked = 1' );
+
+		$sub_query .= $sub_SQL->get().' )';
+
+		// Select users from sub query result
+		$SQL->FROM( 'T_users u' );
+		$SQL->WHERE( 'u.user_ID IN '.$sub_query );
+	}
+	else
+	{ // get every user, except non blocked contacts, for users with only reply permission
+		// asimo> !!! This will select users who has blocked current user, but users blocked by current User won't be selected.
+		$SQL->FROM( 'T_users u
+						LEFT OUTER JOIN T_messaging__contact mcu
+							ON u.user_ID = mcu.mct_from_user_ID
+	    					AND mcu.mct_to_user_ID = '.$current_User->ID.'
+	    					AND mcu.mct_blocked = 0' );
+
+		$SQL->WHERE( 'u.user_ID <> '.$current_User->ID );
+		$SQL->WHERE_and( 'mcu.mct_from_user_ID IS NULL' );
+	}
+
+	// check if recipient list contains blocked contacts, if yes return them
 	$SQL->WHERE_and( 'u.user_ID IN ('.implode( ',', $recipients_list ).')' );
-
 	$SQL->ORDER_BY( 'u.user_login' );
 
 	$blocked_contacts = array();
@@ -123,6 +152,26 @@ function check_blocked_contacts( $recipients_list )
 
 	return $blocked_contacts;
 }
+
+
+/**
+ * Block or unblock contact
+ * 
+ * @param integer contact user id
+ * @param boolean true to block | false to unblock
+ */
+function set_contact_blocked( $user_ID, $blocked )
+{
+	global $current_User, $DB;
+
+	$sql = 'UPDATE T_messaging__contact
+				SET mct_blocked = '.$blocked.'
+					WHERE mct_from_user_ID = '.$current_User->ID.'
+					AND mct_to_user_ID = '.$user_ID;
+
+	$DB->query( $sql );
+}
+
 
 /**
  * Send a private message to a user
@@ -171,8 +220,154 @@ function send_private_message( $recipient, $subject, $text )
 	return $edited_Message->dbinsert_discussion();
 }
 
+
+/**
+ * Create new messaging thread from request
+ *
+ * @return boolean true on success
+ */
+function create_new_thread()
+{
+	global $current_User, $Messages, $edited_Thread, $edited_Message;
+
+	// Insert new thread:
+	$edited_Thread = new Thread();
+	$edited_Message = new Message();
+	$edited_Message->Thread = & $edited_Thread;
+
+	// Check permission:
+	$current_User->check_perm( 'perm_messaging', 'reply', true );
+
+	param( 'thrd_recipients', 'string' );
+
+	// Load data from request
+	if( $edited_Message->load_from_Request() )
+	{	// We could load data from form without errors:
+
+		if( ! $current_User->check_perm( 'perm_messaging', 'delete' ) )
+		{ // Current user doesn't have delete permission, so needs to check if the contacts from recipients list are blocked or not.
+			$blocked_contacts = check_blocked_contacts( $edited_Thread->recipients_list );
+			if( !empty( $blocked_contacts ) )
+			{ // There is at least one blocked recipient ( it is blocked or not a contact yet )
+				param_error( 'thrd_recipients', T_( 'You don\'t have permission to initiate conversations with the following users: ' ). implode( ', ', $blocked_contacts ) );
+			}
+		}
+
+		if( ! param_errors_detected() )
+		{
+			// Insert in DB:
+			if( param( 'thrdtype', 'string', 'discussion' ) == 'discussion' )
+			{
+				$edited_Message->dbinsert_discussion();
+			}
+			else
+			{
+				$edited_Message->dbinsert_individual();
+			}
+
+			$Messages->add( T_('New thread created.'), 'success' );
+
+			return true;
+		}
+	}
+	return false;
+}
+
+
+/**
+ * Create a new message from request in the given thread
+ * 
+ * @param integer thread ID
+ * @param boolean is user able to reply or not, because every contact is blocked
+ * @return boolean true on success
+ */
+function create_new_message( $thrd_ID, $has_non_blocked_contacts )
+{
+	global $current_User, $Messages;
+
+	// Insert new message:
+	$edited_Message = new Message();
+	$edited_Message->thread_ID = $thrd_ID;
+
+	// Check permission:
+	$current_User->check_perm( 'perm_messaging', 'reply', true );
+
+	// Load data from request
+	if( $edited_Message->load_from_Request() )
+	{	// We could load data from form without errors:
+
+		if( !$current_User->check_perm( 'perm_messaging', 'delete' ) )
+		{ // Current user doesn't have delete permission, so needs to check if the contacts from recipients list are all blocked or not.
+			if( !$has_non_blocked_contacts )
+			{ // all recipient are blocked
+				param_error( '', T_( 'You don\'t have permission to reply here.' ) );
+			}
+		}
+
+		if( ! param_errors_detected() )
+		{
+			// Insert in DB:
+			$edited_Message->dbinsert_message();
+			$Messages->add( T_('New message created.'), 'success' );
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+/**
+ * Get messaging menu urls
+ * 
+ * @param string specific sub entry url, possible values: 'threads', 'contacts', 'messages'
+ */
+function get_messaging_url( $disp = 'threads' )
+{
+	global $admin_url, $is_admin_page, $Blog;
+	if( $is_admin_page || empty( $Blog ) )
+	{
+		return $admin_url.'?ctrl='.$disp;
+	}
+	return url_add_param( $Blog->gen_blogurl(), 'disp='.$disp );
+}
+
+
+/**
+ * Get messaging menu sub entries
+ * 
+ * @param boolean true to get admin interface messaging sub menu entries, false to get front office messaging sub menu entries
+ * @param integer owner user ID
+ * @return array user sub entries
+ */
+function get_messaging_sub_entries( $is_admin )
+{
+	global $Blog;
+
+	if( $is_admin )
+	{
+		$url = '?ctrl=';
+	}
+	else
+	{
+		$url = $Blog->gen_blogurl().'?disp=';
+	}
+
+	return array( 'threads' => array(
+						'text' => T_('Messages'),
+						'href' => $url.'threads' ),
+					'contacts' => array(
+						'text' => T_('Contacts'),
+						'href' => $url.'contacts' ),
+	);
+}
+
 /*
  * $Log$
+ * Revision 1.13  2011/08/11 09:05:09  efy-asimo
+ * Messaging in front office
+ *
  * Revision 1.12  2011/02/10 23:07:21  fplanque
  * minor/doc
  *

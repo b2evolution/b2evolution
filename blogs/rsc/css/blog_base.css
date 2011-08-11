@@ -213,9 +213,8 @@ div.tabs {
 	line-height:normal;
 	position: relative;
 	top: 2px;
-	margin: 0 14px 0;
+	margin: 0 14px 30px;
 	list-style: none;
-	padding-bottom: 18px;
 }
 
 div.tabs div.option,
@@ -239,8 +238,17 @@ div.tabs div.option a:hover {
 	font-weight: bold;
 	vertical-align: top;
 }
+
 /* Ajax form */
 div.section_requires_javascript p.ajax-loader {
 	text-align: center;
 	margin-top: 1em;
+}
+
+/* Results */
+div.results {
+	margin: 0;
+	width: 100%;
+	float: left;
+	overflow: auto;
 }

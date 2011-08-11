@@ -163,9 +163,9 @@ class messaging_Module extends Module
 				'options'  => array(
 						// format: array( radio_button_value, radio_button_label, radio_button_note )
 						array( 'none', T_( 'No Access' ), '' ),
-						array( 'reply', T_( 'Reply to people you have messaged with in the past' ), '' ),
-						array( 'write', T_( 'Create threads, view any thread you\'re involved in & reply' ), '' ),
-						array( 'delete', T_( 'Create threads, view and delete any thread you\'re involved in & reply' ) )  ) ) );
+						array( 'reply', T_( 'Read & Send messages to people in contacts list only (except for blocked contacts)' ), '' ),
+						array( 'write', T_( 'Read & Send messages to anyone (except for blocked contacts)' ), '' ),
+						array( 'delete', T_( 'Read, Send & Delete any messages (including for blocked contacts)' ), '' )  ) ) );
 		// We can return as many permissions as we want.
 		// In other words, one module can return many pluggable permissions.
 		return $permissions;
@@ -213,27 +213,22 @@ class messaging_Module extends Module
 		switch ( $permvalue )
 		{
 			case 'delete':
-				// same as write but you can also delete threads you're involved in
+				// Read, Send & Delete any messages (able to send messages even for blocked contacts)
 				if( $permlevel == 'delete' )
 				{ // User can ask for delete perm...
 					$perm = true;
 					break;
 				}
-			// efy-maxim> This is right location for 'reply' permission, because
-			// efy-maxim> user with 'reply' permission has 'write' permission, but he has not 'delete' permission.
-			// efy-maxim> But user with 'delete' or 'write' permission has no reply repmission.
-			// efy-maxim> Note: 'reply' permission means only restriction of 'write' permission.
-			case 'reply':
-				//  reply to people you have messaged with in the past
-				if( $permlevel == 'reply' && $permvalue != 'delete')
+			case 'write':
+				// Read & Send messages to anyone (except for blocked contacts)
+				if( $permlevel == 'write' )
 				{
 					$perm = true;
 					break;
 				}
-			// ... or for any lower priority perm... (no break)
-			case 'write':
-				//  you create threads, view any thread you're involved in & reply
-				if( $permlevel == 'write' )
+			case 'reply':
+				//  Read & Send messages to people in contacts list only (except for blocked contacts)
+				if( $permlevel == 'reply' )
 				{
 					$perm = true;
 					break;
@@ -262,11 +257,11 @@ class messaging_Module extends Module
 
 		$entries = array();
 
-		if( $current_User->check_perm( 'perm_messaging', 'write' ) )
+		if( $current_User->check_perm( 'perm_messaging', 'reply' ) )
 		{
 			$entries['messaging'] = array(
 				'text' => T_('Messages'),
-				'href' => $admin_url.'?ctrl=threads',
+				'href' => get_messaging_url(),
 				'style' => 'padding: 3px 1ex;',
 			);
 
@@ -317,21 +312,14 @@ class messaging_Module extends Module
 			return;
 		}
 
-		if( $current_User->check_perm( 'perm_messaging', 'write' ) )
+		if( $current_User->check_perm( 'perm_messaging', 'reply' ) )
 		{	// Permission to view messaging:
 			$AdminUI->add_menu_entries( NULL, array(
 						'messaging' => array(
 						'text' => T_('Messaging'),
 						'title' => T_('Messaging'),
 						'href' => $dispatcher.'?ctrl=threads',
-						'entries' => array(
-								'messages' => array(
-									'text' => T_('Messages'),
-									'href' => '?ctrl=threads' ),
-								'contacts' => array(
-									'text' => T_('Contacts'),
-									'href' => '?ctrl=contacts' ),
-							)
+						'entries' => get_messaging_sub_entries( true )
 					),
 				) );
 		}
@@ -342,6 +330,9 @@ $messaging_Module = new messaging_Module();
 
 /*
  * $Log$
+ * Revision 1.21  2011/08/11 09:05:09  efy-asimo
+ * Messaging in front office
+ *
  * Revision 1.20  2011/02/15 15:37:00  efy-asimo
  * Change access to admin permission
  *

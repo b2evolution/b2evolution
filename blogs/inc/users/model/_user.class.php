@@ -1506,7 +1506,12 @@ class User extends DataObject
 			}
 			if( $this->accepts_pm() && $current_User->accepts_pm() && ( $this->ID != $current_User->ID ) )
 			{ // both user has permission to send or receive private message and not the same user
-				return 'PM';
+				// check if contact status is blocked between this user and current_User
+				$blocked_contact = check_blocked_contacts( array( $this->ID ) );
+				if( empty( $blocked_contact ) )
+				{
+					return 'PM';
+				}
 			}
 			if( $this->accepts_email() )
 			{ // this user allows email => send email
@@ -2360,6 +2365,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.101  2011/08/11 09:05:09  efy-asimo
+ * Messaging in front office
+ *
  * Revision 1.100  2011/05/19 17:47:07  efy-asimo
  * register for updates on a specific blog post
  *

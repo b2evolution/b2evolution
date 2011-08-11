@@ -24,11 +24,40 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher, $action, $current_User, $edited_Thread;
+global $dispatcher, $action, $current_User;
+
+// in front office there is no function call, $edited_Thread is available
+if( !isset( $edited_Thread ) )
+{ // $edited thread is global in back office, but we are inside of disp_view function call
+	global $edited_Thread;
+
+	if( !isset( $edited_Thread ) )
+	{
+		debug_die( "Missing thread!");
+	}
+}
 
 global $read_by_list;
 
 $creating = is_create_action( $action );
+
+if( !isset( $display_params ) )
+{
+	$display_params = array();
+}
+
+if( !isset( $params ) )
+{
+	$params = array();
+}
+$params = array_merge( array(
+	'form_class' => 'fform',
+	'form_action' => NULL,
+	'form_name' => 'messages_checkchanges',
+	'form_layout' => 'compact',
+	'redirect_to' => regenerate_url( 'action', '', '', '&' ),
+	'cols' => 80
+	), $params );
 
 // Update message statuses
 
@@ -150,7 +179,10 @@ $Results->Cache = & get_MessageCache();
 
 $Results->title = $edited_Thread->title;
 
-$Results->global_icon( T_('Cancel!'), 'close', '?ctrl=threads' );
+if( is_admin_page() )
+{
+	$Results->global_icon( T_('Cancel!'), 'close', '?ctrl=threads' );
+}
 
 /**
  * Callback to add filters on top of the result set
@@ -165,7 +197,7 @@ function filter_messages( & $Form )
 $Results->filter_area = array(
 	'callback' => 'filter_messages',
 	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=messages&thrd_ID='.$edited_Thread->ID ),
+		'all' => array( T_('All'), get_messaging_url( 'messages' ).'&thrd_ID='.$edited_Thread->ID ),
 		)
 	);
 
@@ -182,7 +214,7 @@ $Results->filter_area = array(
  */
 function user_avatar( $user_ID, $user_avatar_file_ID )
 {
-	global $current_User;
+	global $current_User, $admin_url;
 
 	if( ! $GLOBALS['Settings']->get('allow_avatars') ) 
 		return '';
@@ -196,7 +228,7 @@ function user_avatar( $user_ID, $user_avatar_file_ID )
 
 	if( $current_User->check_perm( 'users', 'view' ) )
 	{
-		return '<a href="?ctrl=user&amp;user_tab=profile&amp;user_ID='.$user_ID.'">'.$File->get_thumb_imgtag( 'crop-80x80' ).'</a>';
+		return '<a href="'.$admin_url.'?ctrl=user&amp;user_tab=profile&amp;user_ID='.$user_ID.'">'.$File->get_thumb_imgtag( 'crop-80x80' ).'</a>';
 	}
 	else
 	{
@@ -273,6 +305,22 @@ $Results->cols[] = array(
 					'td' => '%get_read_by( #msg_ID# )%',
 					);
 
+function delete_action( $thrd_ID, $msg_ID )
+{
+	global $htsrv_url, $Blog;
+	if( is_admin_page() )
+	{
+		return action_icon( T_( 'Delete'), 'delete', regenerate_url( 'action', 'thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete&'.url_crumb( 'message' ) ) );
+	}
+	else
+	{
+		$redirect_to = $Blog->gen_baseurl().'?disp=messages&thrd_ID='.$thrd_ID;
+		$action_url = $htsrv_url.'messaging.php?disp=messages&thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete';
+		$action_url = url_add_param( $action_url, 'redirect_to='.rawurlencode( $redirect_to ), '&' );
+		return action_icon( T_( 'Delete'), 'delete', $action_url.'&'.url_crumb( 'message' ) );
+	}
+}
+
 if( $current_User->check_perm( 'perm_messaging', 'delete' ) )
 {
 	// We have permission to modify:
@@ -282,27 +330,33 @@ if( $current_User->check_perm( 'perm_messaging', 'delete' ) )
 							'th_class' => 'shrinkwrap',
 							'td_class' => 'shrinkwrap',
 							// Do not display the icon if the message cannot be deleted
-							'td' => $Results->total_rows == 1 ? '' : '@action_icon("delete")@',
+							'td' => $Results->total_rows == 1 ? '' : '%delete_action( #msg_thread_ID#, #msg_ID#)%',
 						);
 }
 
-$Results->display();
+$Results->display( $display_params );
 
-$Form = new Form( NULL, 'messages_checkchanges', 'post', 'compact' );
+echo '<div class="fieldset clear"></div>';
 
-$Form->begin_form( 'fform', '' );
+$Form = new Form( $params[ 'form_action' ], $params[ 'form_name' ], 'post', $params[ 'form_layout' ] );
+
+$Form->begin_form( $params['form_class'], '' );
 
 	$Form->add_crumb( 'message' );
 	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',msg_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
+	$Form->hidden( 'redirect_to', $params[ 'redirect_to' ] );
 
 	$Form->info_field(T_('Reply to'), get_avatar_imgtags( $recipients ), array('required'=>true));
 
-	$Form->textarea('msg_text', '', 10, '', '', 80, '', true);
+	$Form->textarea('msg_text', '', 10, '', '', $params[ 'cols' ], '', true);
 
 $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'SaveButton' ),
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.32  2011/08/11 09:05:09  efy-asimo
+ * Messaging in front office
+ *
  * Revision 1.31  2011/05/11 07:11:51  efy-asimo
  * User settings update
  *

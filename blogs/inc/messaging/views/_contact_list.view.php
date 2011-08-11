@@ -29,8 +29,19 @@ global $current_User, $Settings;
 global $unread_messages_count;
 global $read_unread_recipients;
 
-// Create SELECT query
+if( !isset( $display_params ) )
+{
+	$display_params = array();
+}
+$display_params = array_merge( array(
+	'show_only_date' => 0,
+	'show_columns' => 'login,nickname,name',
+	), $display_params );
 
+// show following optional colums
+$show_columns = explode( ',', $display_params['show_columns'] );
+
+// Create SELECT query
 $select_SQL = new SQL();
 $select_SQL->SELECT( 	'mc.mct_to_user_ID, mc.mct_blocked, mc.mct_last_contact_datetime,
 						u.user_login AS mct_to_user_login, u.user_nickname AS mct_to_user_nickname,
@@ -85,7 +96,7 @@ function filter_contacts( & $Form )
 $Results->filter_area = array(
 	'callback' => 'filter_contacts',
 	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=contacts' ),
+		'all' => array( T_('All'), get_messaging_url( 'contacts' ) ),
 		)
 	);
 
@@ -116,7 +127,8 @@ if( $Settings->get('allow_avatars') )
 						);
 }
 
-
+if( in_array( 'login', $show_columns ) )
+{
 $Results->cols[] = array(
 					'th' => T_('Login'),
 					'order' => 'mct_to_user_login',
@@ -124,7 +136,10 @@ $Results->cols[] = array(
 					'td_class' => 'shrinkwrap',
 					'td' => '<strong>$mct_to_user_login$</strong>',
 					);
+}
 
+if( in_array( 'nickname', $show_columns ) )
+{
 $Results->cols[] = array(
 					'th' => T_('Nickname'),
 					'order' => 'mct_to_user_nickname',
@@ -132,12 +147,16 @@ $Results->cols[] = array(
 					'td_class' => 'shrinkwrap',
 					'td' => '$mct_to_user_nickname$',
 					);
+}
 
+if( in_array( 'name', $show_columns ) )
+{
 $Results->cols[] = array(
 					'th' => T_('Name'),
 					'order' => 'mct_to_user_name',
 					'td' => '$mct_to_user_name$',
 					);
+}
 
 
 /**
@@ -155,13 +174,6 @@ function user_mailto( $email )
 	return '';
 }
 
-$Results->cols[] = array(
-					'th' => T_('Email'),
-					'th_class' => 'shrinkwrap',
-					'td_class' => 'shrinkwrap',
-					'td' => '%user_mailto( #mct_to_user_email# )%',
-					);
-
 /**
  * Get user private message
  *
@@ -173,23 +185,27 @@ function user_pm ( $block, $user_login )
 {
 	if( $block == 0 )
 	{
-		return action_icon( T_('Private Message').': '.$user_login, 'comments', '?ctrl=threads&action=new&user_login='.$user_login );
+		return action_icon( T_('Private Message').': '.$user_login, 'comments', get_messaging_url( 'threads' ).'&action=new&user_login='.$user_login );
 	}
 	return '';
 }
 
-$Results->cols[] = array(
-	'th' => /* TRANS: abbreviation for "Private Message" */ T_('PM'),
-	'th_class' => 'shrinkwrap',
-	'td_class' => 'shrinkwrap',
-	'td' => '%user_pm( #mct_blocked#, #mct_to_user_login# )%',
-);
+function last_contact( $date, $show_only_date )
+{
+	//global $show_only_date;
+	if( $show_only_date )
+	{
+		return mysql2localedate( $date );
+	}
+
+	return mysql2localedatetime( $date );
+}
 
 $Results->cols[] = array(
 	'th' => /* TRANS: time related */ T_('Last contact'),
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'shrinkwrap',
-	'td' => '%mysql2localedatetime(#mct_last_contact_datetime#)%'
+	'td' => '%last_contact(#mct_last_contact_datetime#, '.$display_params[ 'show_only_date' ].')%'
 );
 
 /**
@@ -201,30 +217,41 @@ $Results->cols[] = array(
  */
 function contact_block( $block, $user_ID )
 {
-	global $admin_url;
+	global $htsrv_url;
+
+	// set action url
+	$action_url = get_messaging_url( 'contacts' );
+	if( !is_admin_page() )
+	{ // in front office the action will be processed by messaging.php
+		$action_url = $htsrv_url.'messaging.php?disp=contacts&redirect_to='.$action_url;
+	}
 
 	if( $block == 0 )
 	{
-		return action_icon( T_('Block contact'), 'file_allowed', $admin_url.'?ctrl=contacts&action=block&user_ID='.$user_ID.'&amp;'.url_crumb('contact') );
+		return action_icon( T_('Block contact'), 'file_allowed', $action_url.'&action=block&user_ID='.$user_ID.'&amp;'.url_crumb('contact') );
 	}
 	else
 	{
-		return action_icon( T_('Unblock contact'), 'file_not_allowed', $admin_url.'?ctrl=contacts&action=unblock&user_ID='.$user_ID.'&amp;'.url_crumb('contact') );
+		return action_icon( T_('Unblock contact'), 'file_not_allowed', $action_url.'&action=unblock&user_ID='.$user_ID.'&amp;'.url_crumb('contact') );
 	}
 }
 
-
 $Results->cols[] = array(
-					'th' => T_('Block / Unblock'),
-					'order' => 'mct_blocked',
+					'th' => T_('Actions'),
 					'th_class' => 'shrinkwrap',
 					'td_class' => 'shrinkwrap',
-					'td' => '%contact_block( #mct_blocked#, #mct_to_user_ID# )%' );
+					'td' => '%user_pm( #mct_blocked#, #mct_to_user_login# )%'.
+							'%user_mailto( #mct_to_user_email# )%'.
+							'%contact_block( #mct_blocked#, #mct_to_user_ID# )%'
+					);
 
-$Results->display();
+$Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.12  2011/08/11 09:05:09  efy-asimo
+ * Messaging in front office
+ *
  * Revision 1.11  2010/11/03 19:44:15  sam2kb
  * Increased modularity - files_Module
  * Todo:

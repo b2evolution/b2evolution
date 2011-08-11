@@ -30,7 +30,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $DB, $current_User;
 
 // Check minimum permission:
-$current_User->check_perm( 'perm_messaging', 'write', true );
+$current_User->check_perm( 'perm_messaging', 'reply', true );
 
 // Set options path:
 $AdminUI->set_path( 'messaging', 'contacts' );
@@ -42,6 +42,7 @@ param_action();
 
 load_messaging_threads_recipients( $current_User->ID );
 
+$mct_blocked = NULL;
 switch( $action )
 {
 	case 'block': // Block selected contact
@@ -59,15 +60,7 @@ switch( $action )
 
 if( isset( $mct_blocked ) )
 {
-	// Check permission:
-	$current_User->check_perm( 'perm_messaging', 'write', true );
-
-	$sql = 'UPDATE T_messaging__contact
-				SET mct_blocked = '.$mct_blocked.'
-					WHERE mct_from_user_ID = '.$current_User->ID.'
-					AND mct_to_user_ID = '.param( 'user_ID', 'integer' );
-
-	$DB->query( $sql );
+	set_contact_blocked( param( 'user_ID', 'integer' ), $mct_blocked );
 
 	// Redirect so that a reload doesn't write to the DB twice:
 	header_redirect( '?ctrl=contacts', 303 ); // Will EXIT
@@ -107,6 +100,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2011/08/11 09:05:09  efy-asimo
+ * Messaging in front office
+ *
  * Revision 1.6  2010/01/15 16:57:37  efy-yury
  * update messaging: crumbs
  *

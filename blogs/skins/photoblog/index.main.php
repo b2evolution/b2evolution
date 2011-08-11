@@ -176,6 +176,7 @@ skin_include( '_html_header.inc.php' );
 		// copying the matching php file into your skin directory.
 		// ------------------------- END OF MAIN CONTENT TEMPLATE ---------------------------
 	?>
+	<div class="bPost"></div>
 
 </div>
 

@@ -353,6 +353,8 @@ function skin_init( $disp )
 
 		case 'msgform':
 			require_js( 'communication.js' ); // auto requires jQuery
+		case 'messages':
+		case 'contacts':
 			$seo_page_type = 'Contact form';
 			if( $Blog->get_setting( $disp.'_noindex' ) )
 			{	// We prefer robots not to index these pages:
@@ -463,6 +465,9 @@ function skin_include( $template_name, $params = array() )
 				'disp_register'       => '_register.disp.php',
 				'disp_mediaidx'       => '_mediaidx.disp.php',
 				'disp_msgform'        => '_msgform.disp.php',
+				'disp_threads'        => '_threads.disp.php',
+				'disp_contacts'       => '_threads.disp.php',
+				'disp_messages'       => '_messages.disp.php',
 				'disp_page'           => '_page.disp.php',
 				'disp_postidx'        => '_postidx.disp.php',
 				'disp_posts'          => '_posts.disp.php',
@@ -915,6 +920,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.92  2011/08/11 09:05:09  efy-asimo
+ * Messaging in front office
+ *
  * Revision 1.91  2011/06/29 13:14:01  efy-asimo
  * Use ajax to display comment and contact forms
  *

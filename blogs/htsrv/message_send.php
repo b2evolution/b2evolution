@@ -1,6 +1,7 @@
 <?php
 /**
- * This file sends an email to the user!
+ * This file sends an email or a private message to the user! 
+ * It's used to handle the contact form send message action. Even visitors are able to send emails.
  *
  * It's the form action for {@link _msgform.disp.php}.
  *
@@ -332,6 +333,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.73  2011/08/11 09:05:08  efy-asimo
+ * Messaging in front office
+ *
  * Revision 1.72  2010/11/25 15:16:34  efy-asimo
  * refactor $Messages
  *

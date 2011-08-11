@@ -12,10 +12,10 @@ load_class( 'messaging/model/_message.class.php', 'Message' );
 global $current_User;
 
 // Check minimum permission:
-$current_User->check_perm( 'perm_messaging', 'write', true );
+$current_User->check_perm( 'perm_messaging', 'reply', true );
 
 // Set options path:
-$AdminUI->set_path( 'messaging', 'messages' );
+$AdminUI->set_path( 'messaging', 'threads' );
 
 // Get action parameter from request:
 param_action();
@@ -31,27 +31,12 @@ if( param( 'thrd_ID', 'integer', '', true) )
 	}
 }
 
-if( param( 'msg_ID', 'integer', '', true) )
-{// Load message from cache:
-	$MessageCache = & get_MessageCache();
-	if( ($edited_Message = & $MessageCache->get_by_ID( $msg_ID, false )) === false )
-	{	unset( $edited_Message );
-		forget_param( 'msg_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Message') ), 'error' );
-		$action = 'nil';
-	}
-}
-
 // Preload users to show theirs avatars
-
 load_messaging_threads_recipients( $current_User->ID );
 
 switch( $action )
 {
 	case 'new':
-		// Check permission:
-		$current_User->check_perm( 'perm_messaging', 'write', true );
-
 		if( ! isset($edited_Message) )
 		{	// We don't have a model to use, start with blank object:
 			$edited_Thread = new Thread();
@@ -70,55 +55,18 @@ switch( $action )
 	case 'create': // Record new thread
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'thread' );
-		
-		// Insert new thread:
+
+		if( create_new_thread() )
+		{ // new thread has been created successful
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=threads', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+
+		// Couldn't create the new Thread, reset variables to create another. 
 		$edited_Thread = new Thread();
 		$edited_Message = new Message();
 		$edited_Message->Thread = & $edited_Thread;
-
-		// Check permission:
-		$current_User->check_perm( 'perm_messaging', 'write', true );
-
-		param( 'thrd_recipients', 'string' );
-
-		// Load data from request
-		if( $edited_Message->load_from_Request() )
-		{	// We could load data from form without errors:
-
-			if( $current_User->check_perm( 'perm_messaging', 'reply' ) )
-			{
-				$blocked_contacts = check_blocked_contacts( $edited_Thread->recipients_list );
-				if( !empty( $blocked_contacts ) )
-				{
-					param_error( 'thrd_recipients', T_( 'You don\'t have permission to initiate conversations with the following users: ' ). implode( ', ', $blocked_contacts ) );
-				}
-			}
-
-			if( ! param_errors_detected() )
-			{
-				// Insert in DB:
-				if( param( 'thrdtype', 'string', 'discussion' ) == 'discussion' )
-				{
-					$edited_Message->dbinsert_discussion();
-				}
-				else
-				{
-					$edited_Message->dbinsert_individual();
-				}
-
-				$Messages->add( T_('New thread created.'), 'success' );
-
-				// What next?
-				switch( $action )
-				{
-					case 'create':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=threads', 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-				}
-			}
-		}
 		break;
 
 	case 'delete':
@@ -207,6 +155,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2011/08/11 09:05:09  efy-asimo
+ * Messaging in front office
+ *
  * Revision 1.16  2010/01/30 18:55:32  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

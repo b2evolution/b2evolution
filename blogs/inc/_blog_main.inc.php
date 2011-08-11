@@ -600,6 +600,9 @@ if( !empty( $skin ) )
 					'single'         => 'single.main.php',
 					'sitemap'        => 'sitemap.main.php',
 					'subs'           => 'subs.main.php',
+					'threads'        => 'threads.main.php',
+					'messages'       => 'messages.main.php',
+					'contacts'       => 'contacts.main.php',
 					// All others will default to index.main.php
 				);
 
@@ -608,6 +611,11 @@ if( !empty( $skin ) )
 				if( file_exists( $disp_handler = $ads_current_skin_path.$disp_handlers[$disp] ) )
 				{	// The skin has a customized page handler for this display:
 					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (custom to this skin)', 'skins' );
+					require $disp_handler;
+				}
+				elseif( file_exists( $disp_handler = $skins_path.$disp_handlers[$disp] ) )
+				{	// Skins have a general page handler for this display:
+					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (for CSS include -- added in v 4.1)', 'skins' );
 					require $disp_handler;
 				}
 				elseif( $disp_handlers[$disp] == 'posts.main.php' && file_exists( $disp_handler = $ads_current_skin_path.'items.main.php' ) )
@@ -660,6 +668,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.171  2011/08/11 09:05:09  efy-asimo
+ * Messaging in front office
+ *
  * Revision 1.170  2011/02/10 23:07:21  fplanque
  * minor/doc
  *
