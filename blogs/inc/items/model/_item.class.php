@@ -1326,7 +1326,7 @@ class Item extends ItemLight
 			), $params );
 
 
-		global $Hit, $preview, $Debuglog;
+		global $Hit, $preview, $Debuglog, $Settings;
 
 		if( $preview )
 		{
@@ -1337,7 +1337,7 @@ class Item extends ItemLight
 		/*
 		 * Check if we want to increment view count, see {@link Hit::is_new_view()}
 		 */
-		if( ! $Hit->is_new_view() )
+		if( ( $Settings->get( 'smart_hit_count' ) ) && ( ! $Hit->is_new_view() ) )
 		{	// This is a reload
 			// echo 'RELOAD';
 			return false;
@@ -4597,6 +4597,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.228  2011/08/12 08:29:00  efy-asimo
+ * Post view count - fix, and crazy view counting option
+ *
  * Revision 1.227  2011/07/28 02:53:40  sam2kb
  * Added "link_to" param to more link
  *

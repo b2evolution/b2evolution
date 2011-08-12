@@ -95,6 +95,7 @@ class GeneralSettings extends AbstractSettings
 		'regexp_filename' => '^[a-zA-Z0-9\-_. ]+$', // TODO: accept (spaces and) special chars / do full testing on this
 		'regexp_dirname' => '^[a-zA-Z0-9\-_]+$', // TODO: accept spaces and special chars / do full testing on this
 		'reloadpage_timeout' => '300',
+		'smart_hit_count' => '0',
 		'time_difference' => '0',
 		'timeout_sessions' => '604800',     // seconds (604800 == 7 days)
 		'upload_enabled' => '1',
@@ -237,6 +238,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.36  2011/08/12 08:29:00  efy-asimo
+ * Post view count - fix, and crazy view counting option
+ *
  * Revision 1.35  2011/06/14 13:33:55  efy-asimo
  * in-skin register
  *

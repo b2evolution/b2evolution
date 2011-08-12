@@ -86,6 +86,8 @@ $Form->begin_fieldset( T_('Timeouts') );
 	// $Form->text_input( 'reloadpage_timeout', (int)$Settings->get('reloadpage_timeout'), 5,
 	// T_('Reload-page timeout'), T_('Time (in seconds) that must pass before a request to the same URI from the same IP and useragent is considered as a new hit.'), array( 'maxlength'=>5, 'required'=>true ) );
 
+	$Form->checkbox_input( 'smart_hit_count', $Settings->get( 'smart_hit_count' ), T_( 'Smart counting' ), array( 'note' => T_( 'Check this to count post views only once per session and ignore reloads' ) ) );
+
 $Form->end_fieldset();
 
 // --------------------------------------------
@@ -112,6 +114,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.24  2011/08/12 08:29:00  efy-asimo
+ * Post view count - fix, and crazy view counting option
+ *
  * Revision 1.23  2011/03/15 09:34:05  efy-asimo
  * have checkboxes for enabling caching in new blogs
  * refactorize cache create/enable/disable

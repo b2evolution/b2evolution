@@ -1030,13 +1030,14 @@ class Hit
 		{
 			global $current_User;
 			global $DB, $Debuglog, $Settings, $ReqURI, $localtimenow;
+			global $Session;
 
 			// Restrict to current user if logged in:
 			if( ! empty($current_User->ID) )
 			{ // select by user ID: one user counts really just once. May be even faster than the anonymous query below..!?
 				$sql = "
-					SELECT SQL_NO_CACHE hit_ID FROM T_hitlog INNER JOIN T_sessions ON hit_sess_ID = sess_ID
-					 WHERE sess_user_ID = ".$current_User->ID."
+					SELECT SQL_NO_CACHE hit_ID FROM T_hitlog 
+					 WHERE hit_sess_ID = ".$Session->ID."
 						 AND hit_uri = '".$DB->escape( substr($ReqURI, 0, 250) )."'
 					 LIMIT 1";
 			}
@@ -1443,6 +1444,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.64  2011/08/12 08:29:00  efy-asimo
+ * Post view count - fix, and crazy view counting option
+ *
  * Revision 1.63  2011/07/05 13:11:22  sam2kb
  * Fix undefined variable "url"
  *

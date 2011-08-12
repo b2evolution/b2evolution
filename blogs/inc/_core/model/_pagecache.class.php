@@ -319,15 +319,6 @@ class PageCache
 
 			$Timer->resume( 'Cache file processing' );
 
-			// Check that the format of the file if OK.
-			$sep = trim($lines[2]);
-			unset($lines[2]);
-			if( $sep != '' )
-			{
-				$Debuglog->add( 'Cached file format not recognized, aborting retrieve.', 'pagecache' );
-				return false;
-			}
-
 			// Retrieved cached URL:
 			$retrieved_url = trim($lines[0]);
 			unset($lines[0]);
@@ -347,6 +338,39 @@ class PageCache
 				return false;
 			}
 
+			$i = 1;
+			$optional_headers = array();
+			// Go through optional header lines
+			// Otional headers are separated from the file header with an empty line.
+			while( $optional_header_line = trim($lines[++$i]) )
+			{
+				// All optional header name value must be separated with ':'
+				if( strpos( $optional_header_line, ':' ) === false )
+				{
+					$Debuglog->add( 'Cached file format not recognized, aborting retrieve.', 'pagecache' );
+					return false;
+				}
+				list( $header_name, $header_value ) = explode( ":", $optional_header_line );
+				// Optional header name and value must not be empty
+				$header_name = trim( $header_name );
+				$header_value = trim( $header_value );
+				if( empty( $header_name ) || empty( $header_value ) )
+				{
+					$Debuglog->add( 'Cached file format not recognized, aborting retrieve.', 'pagecache' );
+					return false;
+				}
+				$optional_headers[$header_name] = $header_value;
+				unset($lines[$i]);
+			}
+			// unset the empty line
+			unset($lines[$i]);
+
+			// count views
+			if( isset( $optional_headers[ 'item_IDs_on_this_page' ] ) )
+			{
+				global $shutdown_count_item_views;
+				$shutdown_count_item_views = explode( ',', $optional_headers[ 'item_IDs_on_this_page' ] );
+			}
 
 			// Check if the request has an If-Modified-Since date
 			if( array_key_exists( 'HTTP_IF_MODIFIED_SINCE', $_SERVER) )
@@ -366,13 +390,16 @@ class PageCache
 				}
 			}
 
+			// Page was modified, revert $shutdown_count_item_views set
+			$shutdown_count_item_views = array();
+
 			// ============== Ready to send cached version of the page =================
 
 			// Send no cache header including last modified date:
 			header_nocache( $retrieved_ts );
 
 			// Go through headers that were saved in the cache:
-			$i = 2;
+			// $i was already set
 			while( $headerline = trim($lines[++$i]) )
 			{
 				header( $headerline );
@@ -483,6 +510,10 @@ class PageCache
 			// Put the time of the page generation into the file (btw this is the time of when we started this script)
 			global $servertimenow;
 			$file_head .= $servertimenow."\n";
+
+			// set optional header line for item view count
+			global $shutdown_count_item_views;
+			$file_head .= 'item_IDs_on_this_page:'.implode( ',', $shutdown_count_item_views )."\n";
 
  			$file_head .= "\n";
 
@@ -636,6 +667,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.30  2011/08/12 08:29:00  efy-asimo
+ * Post view count - fix, and crazy view counting option
+ *
  * Revision 1.29  2011/06/26 17:30:56  sam2kb
  * Added global param $pagecache_max_age
  *

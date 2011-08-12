@@ -80,6 +80,9 @@ switch( $action )
 		}
 		$Settings->set( 'reloadpage_timeout', $reloadpage_timeout );
 
+		// Smart hit count
+		$Settings->set( 'smart_hit_count', param( 'smart_hit_count', 'integer', 0 ) );
+
 		$new_cache_status = param( 'general_cache_enabled', 'integer', 0 );
 		if( ! $Messages->has_errors() )
 		{
@@ -134,6 +137,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.26  2011/08/12 08:29:00  efy-asimo
+ * Post view count - fix, and crazy view counting option
+ *
  * Revision 1.25  2011/03/15 09:34:05  efy-asimo
  * have checkboxes for enabling caching in new blogs
  * refactorize cache create/enable/disable

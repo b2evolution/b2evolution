@@ -2965,6 +2965,11 @@ function upgrade_b2evo_tables()
 					MODIFY COLUMN isub_attend tinyint(1) NOT NULL default 0' );
 	task_end();
 
+	task_begin( 'Upgrading settings table... ');
+	$DB->query( 'INSERT INTO T_settings (set_name, set_value)
+					VALUES ( "smart_hit_count", 1 )' );
+	task_end();
+
 	/*
 	 * ADD UPGRADES HERE.
 	 *
@@ -3162,6 +3167,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.397  2011/08/12 08:29:00  efy-asimo
+ * Post view count - fix, and crazy view counting option
+ *
  * Revision 1.396  2011/06/26 17:55:58  sam2kb
  * Search engine stats refactoring
  * All related params moved to /inc/sessions/model/_search_engines.php
