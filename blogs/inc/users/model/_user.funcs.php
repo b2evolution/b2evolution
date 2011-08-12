@@ -352,7 +352,8 @@ function get_user_logout_url()
 	}
 	else
 	{	// Return to current blog page:
-		$redirect_to = url_rel_to_same_host(regenerate_url('','','','&'), $htsrv_url_sensitive);
+		// Ignore disp and action params, after user has logged out.
+		$redirect_to = url_rel_to_same_host( regenerate_url( 'disp,action','','','&' ), $htsrv_url_sensitive );
 	}
 
 	return $htsrv_url_sensitive.'login.php?action=logout&amp;redirect_to='.rawurlencode($redirect_to);
@@ -997,6 +998,9 @@ function get_prefered_name( $nickname, $firstname, $login )
 
 /*
  * $Log$
+ * Revision 1.37  2011/08/12 05:00:22  efy-asimo
+ * Fix disp=... issues after logout
+ *
  * Revision 1.36  2011/07/04 12:26:54  efy-asimo
  * Notification emails content - fix
  *
