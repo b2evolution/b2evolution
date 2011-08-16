@@ -745,10 +745,8 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 				$r .= '<td class="selector catsel_extra"><input type="checkbox" name="post_extracats[]" class="checkbox" title="'
 							.T_('Select as an additional category').'" value="'.$cat_ID.'"';
 				// if( ($cat_ID == $edited_Item->main_cat_ID) || (in_array( $cat_ID, $post_extracats )) )  <--- We don't want to precheck the default cat because it will stay checked if we change the default main. On edit, the checkbox will always be in the array.
-				if( (in_array( $cat_ID, $post_extracats ))
-					|| ( count( $post_extracats ) == 0 && in_array( $cat_ID, $edited_Item->extra_cat_IDs )
-					&& ! param( 'new_maincat', 'boolean', false ) && ! param( 'new_extracat', 'boolean', false ) ) )
-				{ // This category was selected or if wasn't select any category but this is the default
+				if( in_array( $cat_ID, $post_extracats ) )
+				{ // This category was selected
 					$r .= ' checked="checked"';
 				}
 				$r .= ' id="sel_extracat_'.$cat_ID.'"';
@@ -1969,6 +1967,9 @@ function collapsible_legend_tag( $legend, $id, $display = true )
 
 /*
  * $Log$
+ * Revision 1.127  2011/08/16 06:02:52  efy-asimo
+ * Remove extra category check by default
+ *
  * Revision 1.126  2011/06/15 20:30:38  sam2kb
  * Change message type to "note"
  * See http://forums.b2evolution.net/viewtopic.php?t=22334
