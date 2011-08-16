@@ -489,7 +489,7 @@ function statuses_where_clause( $show_statuses = '', $dbprefix = 'post_', $req_b
  * @param Item
  * @param Blog
  */
-function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
+function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog, $iframe_name = NULL )
 {
 	global $admin_url, $dispatcher;
 	global $current_User;
@@ -508,7 +508,7 @@ function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 		$Form->hidden( 'is_attachments', 'false' );
 
 		echo '<table cellspacing="0" cellpadding="0"><tr><td>';
-   	$Form->submit( array( 'actionArray[create_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & start attaching files'), 'SaveEditButton' ) );
+		$Form->submit( array( 'actionArray[create_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & start attaching files'), 'SaveEditButton' ) );
 		echo '</td></tr></table>';
 
 		$Form->end_fieldset();
@@ -516,7 +516,10 @@ function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 	else
 	{ // Editing post
 
-		$iframe_name = 'attach_'.generate_random_key( 16 );
+		if( $iframe_name == NULL )
+		{
+			$iframe_name = 'attach_'.generate_random_key( 16 );
+		}
 
 		$fieldset_title .= ' - <a href="'.$admin_url.'?ctrl=items&amp;action=edit_links&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;item_ID='.$edited_Item->ID
 					.'" target="'.$iframe_name.'">'.get_icon( 'refresh', 'imgtag' ).' '.T_('Refresh').'</a>';
@@ -1168,7 +1171,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item )
  *
  * This is a part of the process that makes it smoother to "Save & start attaching files".
  */
-function echo_attaching_files_button_js()
+function echo_attaching_files_button_js( & $iframe_name )
 {
 	global $dispatcher;
 	global $edited_Item;
@@ -1967,6 +1970,9 @@ function collapsible_legend_tag( $legend, $id, $display = true )
 
 /*
  * $Log$
+ * Revision 1.128  2011/08/16 07:02:25  efy-asimo
+ * Fix attaching files issue on new post create
+ *
  * Revision 1.127  2011/08/16 06:02:52  efy-asimo
  * Remove extra category check by default
  *

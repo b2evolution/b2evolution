@@ -66,6 +66,7 @@ $Form->labelend = "</strong>\n";
 
 // ================================ START OF EDIT FORM ================================
 
+$iframe_name = NULL;
 $params = array();
 if( !empty( $bozo_start_modified ) )
 {
@@ -85,7 +86,7 @@ $Form->begin_form( '', '', $params );
 		// Here we add js code for attaching file popup window: (Yury)
 		if( !empty( $edited_Item->ID ) && ( $Session->get('create_edit_attachment') === true ) )
 		{	// item also created => we have $edited_Item->ID for popup window
-			echo_attaching_files_button_js();
+			echo_attaching_files_button_js( $iframe_name );
 			// clear session variable
 			$Session->delete('create_edit_attachment');
 		}
@@ -194,7 +195,7 @@ $Form->begin_form( '', '', $params );
 	// ####################### ATTACHMENTS/LINKS #########################
 	if( isset($GLOBALS['files_Module']) )
 	{
-		attachment_iframe( $Form, $creating, $edited_Item, $Blog );
+		attachment_iframe( $Form, $creating, $edited_Item, $Blog, $iframe_name );
 	}
 	// ############################ ADVANCED #############################
 
@@ -456,6 +457,9 @@ echo_onchange_newcat();
 
 /*
  * $Log$
+ * Revision 1.76  2011/08/16 07:02:25  efy-asimo
+ * Fix attaching files issue on new post create
+ *
  * Revision 1.75  2011/05/25 14:59:34  efy-asimo
  * Post attending
  *
