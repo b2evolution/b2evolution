@@ -4133,10 +4133,9 @@ class Item extends ItemLight
 
 			$body = sprintf( $cache_by_locale[$notify_locale]['salutation'], $additional_data[$notify_email]['salutation'] )
 				."\n\n".$cache_by_locale[$notify_locale]['message']
-				."\n\n\n".sprintf( $cache_by_locale[$notify_locale]['footer'], $additional_data[$notify_email]['login'] );
+				."\n".sprintf( $cache_by_locale[$notify_locale]['footer'], $additional_data[$notify_email]['login'] );
 
-			send_mail( $notify_email, NULL, $cache_by_locale[$notify_locale]['subject'], $body,
-									$this->creator_User->get('email'), $this->creator_User->get('preferredname') );
+			send_mail( $notify_email, NULL, $cache_by_locale[$notify_locale]['subject'], $body );
 		}
 
 		if( $display ) echo '<p>', T_('Done.'), "</p>\n</div>\n";
@@ -4597,6 +4596,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.229  2011/08/18 11:41:51  efy-asimo
+ * Send all emails from noreply and email contents review
+ *
  * Revision 1.228  2011/08/12 08:29:00  efy-asimo
  * Post view count - fix, and crazy view counting option
  *

@@ -275,6 +275,12 @@ if( $allow_msgform == 'email' )
 		exit(0);
 	}
 
+	// show sender name
+	$message_header = $sender_name." has sent you this message:\n\n";
+
+	// show sender email address
+	$message_footer = sprintf( T_( 'By replying to this message, your email will go directly to %s' ), $sender_address )."\n\n".$message_footer;
+
 	if( !empty( $Blog ) )
 	{
 		$message = $message
@@ -292,7 +298,7 @@ if( $allow_msgform == 'email' )
 	}
 
 	 // Send mail
-	$success_message = send_mail( $recipient_address, $recipient_name, $subject, $message, $sender_address, $sender_name );
+	$success_message = send_mail( $recipient_address, $recipient_name, $subject, $message, $notify_from, NULL, array( 'Reply-To' => $sender_address ) );
 }
 else
 { // Send private message
@@ -333,6 +339,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.74  2011/08/18 11:41:51  efy-asimo
+ * Send all emails from noreply and email contents review
+ *
  * Revision 1.73  2011/08/11 09:05:08  efy-asimo
  * Messaging in front office
  *

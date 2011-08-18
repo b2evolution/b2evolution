@@ -120,7 +120,7 @@ switch( $action )
 					.'&login='.rawurlencode( $ForgetfulUser->login )
 					.'&reqID='.$request_id
 					.'&sessID='.$Session->ID  // used to detect cookie problems
-				."\n\n"
+				."\n\n-- \n"
 				.T_('Please note:')
 				.' '.T_('For security reasons the link is only valid for your current session (by means of your session cookie).')
 				."\n\n"
@@ -438,6 +438,9 @@ exit(0);
 
 /*
  * $Log$
+ * Revision 1.115  2011/08/18 11:41:51  efy-asimo
+ * Send all emails from noreply and email contents review
+ *
  * Revision 1.114  2011/06/14 13:33:55  efy-asimo
  * in-skin register
  *

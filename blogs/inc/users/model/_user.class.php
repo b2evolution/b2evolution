@@ -1779,7 +1779,7 @@ class User extends DataObject
 			.$htsrv_url_sensitive.'login.php?action=validatemail'
 				.'&reqID='.$request_id
 				.'&sessID='.$Session->ID  // used to detect cookie problems
-			."\n\n"
+			."\n\n-- \n"
 			.T_('Please note:')
 			.' '.T_('For security reasons the link is only valid for your current session (by means of your session cookie).');
 
@@ -2365,6 +2365,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.102  2011/08/18 11:41:51  efy-asimo
+ * Send all emails from noreply and email contents review
+ *
  * Revision 1.101  2011/08/11 09:05:09  efy-asimo
  * Messaging in front office
  *
