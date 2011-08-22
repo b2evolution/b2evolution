@@ -192,6 +192,7 @@ class ItemList2 extends ItemListLight
 			NULL AS post_notifications_ctsk_ID,
 			".bpost_count_words( $content )." AS post_wordcount,
 			".$DB->quote($post_comment_status)." AS post_comment_status,
+			0 AS post_attend_status,
 			'".$DB->escape( implode( '.', $renderers ) )."' AS post_renderers,
 			".$DB->quote($item_assigned_user_ID)." AS post_assigned_user_ID,
 			".$DB->quote($item_typ_ID)." AS post_ptyp_ID,
@@ -737,6 +738,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.41  2011/08/22 05:24:01  efy-asimo
+ * Item preview bug - fix
+ *
  * Revision 1.40  2011/07/07 05:36:16  efy-asimo
  * Fix posts random order
  *

@@ -777,7 +777,7 @@ class Item extends ItemLight
 			case 'registered':
 				return is_logged_in();
 			case 'member':
-				return (is_logged_in() && $current_User->check_perm( 'blog_ismember', 'view', false, $item_Blog->ID ) );
+				return (is_logged_in() && $current_User->check_perm( 'blog_ismember', 'view', false, $this->get_blog_ID() ) );
 			default:
 				debug_die( 'Invalid blog '.$settings_name.' settings!' );
 		}
@@ -4596,6 +4596,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.230  2011/08/22 05:24:00  efy-asimo
+ * Item preview bug - fix
+ *
  * Revision 1.229  2011/08/18 11:41:51  efy-asimo
  * Send all emails from noreply and email contents review
  *
