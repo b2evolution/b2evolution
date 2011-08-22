@@ -1057,6 +1057,7 @@ class User extends DataObject
 			case 'blog_intro':
 			case 'blog_podcast':
 			case 'blog_sidebar':
+			case 'blog_edit_ts':
 				// Blog permission to edit its properties...
 				if( $this->check_perm_blogowner( $perm_target_ID ) )
 				{	// Owner can do *almost* anything:
@@ -1064,7 +1065,6 @@ class User extends DataObject
 					break;
 				}
 				/* continue */
-			case 'blog_edit_ts':				
 			case 'blog_admin': // This is what the owner does not have access to!
 
 				// Group may grant VIEW access, FULL access:
@@ -2365,6 +2365,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.103  2011/08/22 14:38:39  efy-asimo
+ * Add edit_ts permission to blog owners
+ *
  * Revision 1.102  2011/08/18 11:41:51  efy-asimo
  * Send all emails from noreply and email contents review
  *
