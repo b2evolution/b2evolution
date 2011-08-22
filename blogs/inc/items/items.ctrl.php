@@ -1179,6 +1179,8 @@ if( !empty($tab) )
 require_css( 'ui.datepicker.css' );
 // Load the appropriate blog navigation styles (including calendar, comment forms...):
 require_css( $rsc_url.'css/blog_base.css' );
+// Load jquery ui css for tag autocomplete
+require_css( $rsc_url.'css/jquery/smoothness/jquery-ui.css' );
 require_js( 'communication.js' ); // auto requires jQuery
 
 // Load the appropriate ITEM/POST styles depending on the blog's skin:
@@ -1390,6 +1392,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.110  2011/08/22 06:47:21  efy-asimo
+ * Tag autocomplete bug - fix
+ *
  * Revision 1.109  2011/02/25 22:04:09  fplanque
  * minor / UI cleanup
  *
