@@ -40,8 +40,12 @@
             	    <li>Comments can now optionally be paged in the front end (@sam2kb)</li>
 					<li>Display comment excerpts in feeds. Comment feeds can now be disabled per blog (@sam2kb).</li>
             	    <li>Default avatars can be configured do different graphic styles: b2evo default, Gravatar, Identicon, Monsterid or Wavatar (@sam2kb)</li>
-          	    </ul>
-            	</li>
+            	    <li>Feature to elevate an interesting comment into a post were you can elaborate. Look for the &quot;Elevate into a post&quot; link at the top right of the comment edit form. (@evofactory)</li>
+            	    <li>It is now possible for users to subscribe to comment replies / get notified when new comments are posted on a specific post. (@evofactory)</li>
+            	    <li>It is now possible to attach images and other types of files to comments. File types that can be uploaded by anonymous users are configurable (only GIF, JPG and PNG by default). (@evofactory)</li>
+					<li>It is now possible to configure comment feeds (full comments, excerpts only or disabled) (@sam2kb)</li>
+          	      </ul>
+				</li>
             	<li>User management:
             	  <ul>
             	    <li>Gender property for users (@evofactory)</li>
@@ -73,9 +77,20 @@
                   <li>Search engines definitions moved to /inc/sessions/model/_search_engines.php</li>
                 </ul>
               </li>
+           	  <li>Installer:
+           	    <ul>
+           	      <li>The installer will now create default scheduled jobs for: pruning the stats (hit log &amp; session log), pruning the page cache &amp; updating the antispam blacklist. (@evofactory)</li>
+       	        </ul>
+           	  </li>
               <li>Autocompletion when adding tags to a post (@blueyed)</li>
-           	  <li>Basic antispam plugin: remove repetitive characters and trim whitespace (@sam2kb)</li>
-			  <li>Tag cloud widget: display tags from several blogs (@sam2kb)</li>
+              <li>Antispam:
+                <ul>
+                  <li>AJAX comment &amp; contact forms are now loaded in Javascript/AJAX by default (go to Blog Settings &gt; Advanced Settings &gt; Caching to control this). This makes it harder for spam bots to post spam (that goes into the moderation queue anyways). (@evofactory)</li>
+                  <li>Basic antispam plugin: remove repetitive characters and trim whitespace (@sam2kb)</li>
+                  <li>Super fast comment moderation with one click delete (and ability to recover in case of mistake by opening the recycle bin) (@evofactory)</li>
+                </ul>
+              </li>
+              <li>Page cache repair tool. (@evofactory)</li>
               <li>Bugfixes (@sam2kb, @blueyed)</li>
             </ul>
 <h2>4.0.2-beta</h2>
@@ -190,7 +205,7 @@
                 </li>
 			    <li><strong>Users &amp; Groups:</strong>
 				<ul>
-					<li>Users may now create new blogs for themselves (depending on group permission) (@evofactory)</li>
+					<li>Users may now create new blogs for themselves (depending on group permission -  Go to Users &gt; Select a group &gt; Blogging permissions) (@evofactory)</li>
 					<li>Admin/users now have better control on whether or not they can have multiple concurrent sessions. (@evofactory)</li>
 					<li>Option to have different session timeouts for different users (@evofactory)</li>
 					<li>Option to have nicknames used as IDs set by the admin, not the user. (@evofactory)</li>

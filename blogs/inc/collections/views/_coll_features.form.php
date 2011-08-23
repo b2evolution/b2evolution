@@ -178,7 +178,14 @@ $Form->begin_fieldset( T_('RSS/Atom feeds') );
 												array( 'excerpt', T_('Post excerpts') ),
 												array( 'normal', T_('Standard post contents (stopping at "&lt;!-- more -->")') ),
 												array( 'full', T_('Full post contents (including after "&lt;!-- more -->")') ),
-											), T_('Feed contents'), true, T_('How much content do you want to make available in feeds?') );
+											), T_('Post feed contents'), true, T_('How much content do you want to make available in post feeds?') );
+
+	$Form->radio( 'comment_feed_content', $edited_Blog->get_setting('comment_feed_content'),
+								array(  array( 'none', T_('No feeds') ),
+										array( 'excerpt', T_('Comment excerpts') ),
+										array( 'normal', T_('Standard comment contents') ),
+									), T_('Comment feed contents'), true, T_('How much content do you want to make available in comment feeds?') );
+
 	$Form->text( 'posts_per_feed', $edited_Blog->get_setting('posts_per_feed'), 4, T_('Posts in feeds'),  T_('How many of the latest posts do you want to include in RSS & Atom feeds?'), 4 );
 
 	if( isset($GLOBALS['files_Module']) )
@@ -187,11 +194,6 @@ $Form->begin_fieldset( T_('RSS/Atom feeds') );
 		$params['force_keys_as_values'] = true;
 		$Form->select_input_array( 'image_size', $edited_Blog->get_setting('image_size') , get_available_thumb_sizes(), T_('Image size'), '', $params );
 	}
-	$Form->radio( 'comment_feed_content', $edited_Blog->get_setting('comment_feed_content'),
-								array(  array( 'none', T_('No feeds') ),
-										array( 'excerpt', T_('Comment excerpts') ),
-										array( 'normal', T_('Standard comment contents') ),
-									), T_('Comment feed contents'), true, T_('How much content do you want to make available in comment feeds?') );
 $Form->end_fieldset();
 
 
@@ -228,7 +230,7 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Subscriptions') );
 	$Form->checkbox( 'allow_subscriptions', $edited_Blog->get_setting( 'allow_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new post and/or comment.') );
-	$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), '', T_( 'Allow users to subscribe and receive email notifications for a specific post comments.' ) );
+	$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), '', T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
 	// TODO: checkbox 'Enable RSS/Atom feeds'
 	// TODO2: which feeds (skins)?
 $Form->end_fieldset();
@@ -275,6 +277,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.43  2011/08/23 21:42:24  fplanque
+ * doc
+ *
  * Revision 1.42  2011/05/25 14:59:33  efy-asimo
  * Post attending
  *
