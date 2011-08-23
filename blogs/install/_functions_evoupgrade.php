@@ -2926,49 +2926,55 @@ function upgrade_b2evo_tables()
 		set_upgrade_checkpoint( '10100' );
 	}
 
-	task_begin( 'Creating table for a specific blog post subscriptions...' );
-	$DB->query( "CREATE TABLE T_items__subscriptions (
-					isub_item_ID	int(11) unsigned NOT NULL,
-					isub_user_ID	int(11) unsigned NOT NULL,
-					isub_comments	tinyint(1) NOT NULL,
-					isub_attend		tinyint(1) NOT NULL,
-					PRIMARY KEY (isub_item_ID, isub_user_ID )
-				) ENGINE = innodb" );
-	task_end();
+	if( $old_db_version < 10100 )
+	{	// 4.1b
+		task_begin( 'Creating table for a specific blog post subscriptions...' );
+		$DB->query( "CREATE TABLE T_items__subscriptions (
+						isub_item_ID	int(11) unsigned NOT NULL,
+						isub_user_ID	int(11) unsigned NOT NULL,
+						isub_comments	tinyint(1) NOT NULL,
+						isub_attend		tinyint(1) NOT NULL,
+						PRIMARY KEY (isub_item_ID, isub_user_ID )
+					) ENGINE = innodb" );
+		task_end();
 
-	task_begin( 'Upgrading comments table, add subsription fields...' );
-	db_add_col( 'T_comments', 'comment_notif_status', 'ENUM("noreq","todo","started","finished") NOT NULL DEFAULT "noreq" AFTER comment_secret' );
-	db_add_col( 'T_comments', 'comment_notif_ctsk_ID', 'INT(10) unsigned NULL DEFAULT NULL AFTER comment_notif_status' );
-	task_end();
+		task_begin( 'Upgrading comments table, add subsription fields...' );
+		db_add_col( 'T_comments', 'comment_notif_status', 'ENUM("noreq","todo","started","finished") NOT NULL DEFAULT "noreq" AFTER comment_secret' );
+		db_add_col( 'T_comments', 'comment_notif_ctsk_ID', 'INT(10) unsigned NULL DEFAULT NULL AFTER comment_notif_status' );
+		task_end();
 
-	task_begin( 'Upgrading users table...' );
-	db_add_col( 'T_users', 'user_notify_moderation', 'tinyint(1) NOT NULL default 0 AFTER user_notify' );
-	db_add_col( 'T_users', 'user_unsubscribe_key', 'varchar(32) NOT NULL default "" AFTER user_notify_moderation' );
-	// Set users unsubscribe key
-	$sql = 'SELECT user_ID FROM T_users WHERE user_unsubscribe_key = ""';
-	$rows = $DB->get_results( $sql, OBJECT, 'Get users without unsubscribe link' );
-	foreach( $rows as $row )
-	{
-		$DB->query( 'UPDATE T_users
-						SET user_unsubscribe_key = "'.generate_random_key().'"
-						WHERE user_ID = '.$row->user_ID );
+		task_begin( 'Upgrading users table...' );
+		db_add_col( 'T_users', 'user_notify_moderation', 'tinyint(1) NOT NULL default 0 AFTER user_notify' );
+		db_add_col( 'T_users', 'user_unsubscribe_key', 'varchar(32) NOT NULL default "" AFTER user_notify_moderation' );
+		// Set users unsubscribe key
+		$sql = 'SELECT user_ID FROM T_users WHERE user_unsubscribe_key = ""';
+		$rows = $DB->get_results( $sql, OBJECT, 'Get users without unsubscribe link' );
+		foreach( $rows as $row )
+		{
+			$DB->query( 'UPDATE T_users
+							SET user_unsubscribe_key = "'.generate_random_key().'"
+							WHERE user_ID = '.$row->user_ID );
+		}
+		task_end();
+
+		task_begin( 'Upgrading items table, add attend status...' );
+		db_add_col( 'T_items__item', 'post_attend_status', 'tinyint(1) NOT NULL default 0 AFTER post_comment_status' );
+		task_end();
+
+		task_begin( 'Upgrading specific blog post subscriptions...' );
+		$DB->query( 'ALTER TABLE T_items__subscriptions
+						MODIFY COLUMN isub_comments tinyint(1) NOT NULL default 0,
+						MODIFY COLUMN isub_attend tinyint(1) NOT NULL default 0' );
+		task_end();
+
+		task_begin( 'Upgrading settings table... ');
+		$DB->query( 'INSERT INTO T_settings (set_name, set_value)
+						VALUES ( "smart_hit_count", 1 )' );
+		task_end();
+
+		set_upgrade_checkpoint( '10200' );
 	}
-	task_end();
 
-	task_begin( 'Upgrading items table, add attend status...' );
-	db_add_col( 'T_items__item', 'post_attend_status', 'tinyint(1) NOT NULL default 0 AFTER post_comment_status' );
-	task_end();
-
-	task_begin( 'Upgrading specific blog post subscriptions...' );
-	$DB->query( 'ALTER TABLE T_items__subscriptions
-					MODIFY COLUMN isub_comments tinyint(1) NOT NULL default 0,
-					MODIFY COLUMN isub_attend tinyint(1) NOT NULL default 0' );
-	task_end();
-
-	task_begin( 'Upgrading settings table... ');
-	$DB->query( 'INSERT INTO T_settings (set_name, set_value)
-					VALUES ( "smart_hit_count", 1 )' );
-	task_end();
 
 	/*
 	 * ADD UPGRADES HERE.
@@ -3167,6 +3173,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.398  2011/08/23 18:34:28  fplanque
+ * fix
+ *
  * Revision 1.397  2011/08/12 08:29:00  efy-asimo
  * Post view count - fix, and crazy view counting option
  *
