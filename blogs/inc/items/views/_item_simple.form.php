@@ -113,6 +113,7 @@ $Form->begin_form( '', '', $params );
 	$Form->hidden( 'renderers_displayed', 1 );
 	$Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
 	$Form->hidden( 'item_featured', $edited_Item->featured );
+	$Form->hidden( 'item_hideteaser', $edited_Item->hideteaser );
 	$Form->hidden( 'item_order', $edited_Item->order );
 
 	$creator_User = $edited_Item->get_creator_User();
@@ -286,6 +287,9 @@ echo_autocomplete_tags();
 
 /*
  * $Log$
+ * Revision 1.45  2011/08/24 12:16:43  efy-james
+ * Add checkbox for hide teaser
+ *
  * Revision 1.44  2011/08/16 07:02:25  efy-asimo
  * Fix attaching files issue on new post create
  *

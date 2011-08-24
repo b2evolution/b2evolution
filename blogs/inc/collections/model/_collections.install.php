@@ -155,6 +155,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_renderers              TEXT NOT NULL,
 			post_priority               int(11) unsigned null COMMENT 'Task priority in workflow',
 			post_featured               tinyint(1) NOT NULL DEFAULT 0,
+			post_hideteaser             tinyint(1) NOT NULL DEFAULT 0,
 			post_order                  DOUBLE NULL,
 			post_double1                DOUBLE NULL COMMENT 'Custom double value 1',
 			post_double2                DOUBLE NULL COMMENT 'Custom double value 2',

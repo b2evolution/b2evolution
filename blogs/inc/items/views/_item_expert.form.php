@@ -339,6 +339,10 @@ $Form->begin_form( '', '', $params );
 	$Form->begin_fieldset( T_('Properties'), array( 'id' => 'itemform_extra' ) );
 
 	$Form->checkbox_basic_input( 'item_featured', $edited_Item->featured, '<strong>'.T_('Featured post').'</strong>' );
+	echo "<br/>";
+
+	$Form->checkbox_basic_input( 'item_hideteaser', $edited_Item->hideteaser, '<strong>'.T_('Hide teaser when displaying -- More --').'</strong>' );
+	echo "<br/>";
 
 	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{ // ------------------------------------ TIME STAMP -------------------------------------
@@ -457,6 +461,9 @@ echo_onchange_newcat();
 
 /*
  * $Log$
+ * Revision 1.77  2011/08/24 12:16:43  efy-james
+ * Add checkbox for hide teaser
+ *
  * Revision 1.76  2011/08/16 07:02:25  efy-asimo
  * Fix attaching files issue on new post create
  *

@@ -105,6 +105,7 @@ $Form->begin_form( '', '', $params );
 	}
 	$Form->hidden( 'trackback_url', $trackback_url );
 	$Form->hidden( 'item_featured', $edited_Item->featured );
+	$Form->hidden( 'item_hideteaser', $edited_Item->hideteaser );
 	$Form->hidden( 'item_order', $edited_Item->order );
 	// CUSTOM FIELDS double
 	for( $i = 1 ; $i <= 5; $i++ )
@@ -225,6 +226,9 @@ echo_onchange_newcat();
 
 /*
  * $Log$
+ * Revision 1.14  2011/08/24 12:16:43  efy-james
+ * Add checkbox for hide teaser
+ *
  * Revision 1.13  2011/03/02 09:45:59  efy-asimo
  * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
  *

@@ -2972,6 +2972,10 @@ function upgrade_b2evo_tables()
 						VALUES ( "smart_hit_count", 1 )' );
 		task_end();
 
+		task_begin( 'Upgrading item table for hide teaser...' );
+		$DB->query( 'UPDATE T_items__item SET T_hideteaser = 1 WHERE T_content LIKE "%<!--noteaser-->%"' );
+		task_end();
+
 		set_upgrade_checkpoint( '10200' );
 	}
 
@@ -3173,6 +3177,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.399  2011/08/24 12:16:43  efy-james
+ * Add checkbox for hide teaser
+ *
  * Revision 1.398  2011/08/23 18:34:28  fplanque
  * fix
  *

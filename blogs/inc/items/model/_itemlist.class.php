@@ -214,7 +214,8 @@ class ItemList2 extends ItemListLight
 		}
 
 		$this->sql .= $DB->quote(param( 'item_order', 'double', NULL )).' AS post_order'.",\n"
-								.$DB->quote(param( 'item_featured', 'integer', NULL )).' AS post_featured'."\n";
+								.$DB->quote(param( 'item_featured', 'integer', NULL )).' AS post_featured,'."\n"
+								.$DB->quote(param( 'item_hideteaser', 'integer', NULL )).' AS post_hideteaser'."\n";
 		$this->total_rows = 1;
 		$this->total_pages = 1;
 		$this->page = 1;
@@ -738,6 +739,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.42  2011/08/24 12:16:43  efy-james
+ * Add checkbox for hide teaser
+ *
  * Revision 1.41  2011/08/22 05:24:01  efy-asimo
  * Item preview bug - fix
  *

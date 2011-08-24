@@ -1253,9 +1253,11 @@ function create_demo_contents()
 	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('Extended post with no teaser'), T_('<p>This is an extended post with no teaser. This means that you won\'t see this teaser any more when you click the "more" link.</p>
 
-<!--more--><!--noteaser-->
+<!--more-->
 
 <p>This is the extended text. You only see it when you have clicked the "more" link.</p>'), $now, $cat_bg );
+	$edited_Item->set( 'hideteaser', 1 );
+	$edited_Item->dbsave();
 
 
 	// Insert a post:
@@ -1357,6 +1359,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.307  2011/08/24 12:16:43  efy-james
+ * Add checkbox for hide teaser
+ *
  * Revision 1.306  2011/05/02 23:31:11  fplanque
  * minor
  *
