@@ -220,15 +220,6 @@ class quicktags_plugin extends Plugin
 		if( !$simple )
 		{ ?>
 		b2evoButtons[b2evoButtons.length] = new b2evoButton(
-				'b2evo_noteaser'
-				,'!NT', ''
-				,'<!-'+'-noteaser-'+'->',''
-				,'t'
-				,'<?php echo T_('no teaser [Alt-T]') ?>'
-				,-1
-			);
-
-		b2evoButtons[b2evoButtons.length] = new b2evoButton(
 				'b2evo_next'
 				,'!NP', ''
 				,'<!-'+'-nextpage-'+'->',''
@@ -421,6 +412,9 @@ class quicktags_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.37  2011/08/24 14:29:49  efy-james
+ * Add checkbox for no teaser
+ *
  * Revision 1.36  2010/02/08 17:55:47  efy-yury
  * copyright 2009 -> 2010
  *
