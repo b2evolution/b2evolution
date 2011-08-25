@@ -110,8 +110,8 @@ $schema_queries = array(
 			user_idmode varchar(20) NOT NULL DEFAULT 'login',
 			user_allow_msgform TINYINT NOT NULL DEFAULT '2',
 			user_notify tinyint(1) NOT NULL default 0,
-			user_notify_moderation tinyint(1) NOT NULL default 0,
-			user_unsubscribe_key varchar(32) NOT NULL default '',
+			user_notify_moderation tinyint(1) NOT NULL default 0 COMMENT 'Notify me by email whenever a comment is awaiting moderation on one of my blogs',
+			user_unsubscribe_key varchar(32) NOT NULL default '' COMMENT 'A specific key, it is used when a user wants to unsubscribe from a post comments without signing in',
 			user_showonline tinyint(1) NOT NULL default 1,
 			user_gender char(1) NULL,
 			user_grp_ID int(4) NOT NULL default 1,
@@ -285,6 +285,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.57  2011/08/25 07:31:14  efy-asimo
+ * DB documentation
+ *
  * Revision 1.56  2011/05/19 17:47:07  efy-asimo
  * register for updates on a specific blog post
  *

@@ -2884,7 +2884,7 @@ function upgrade_b2evo_tables()
 						MODIFY COLUMN link_itm_ID int(11) unsigned NULL,
 						MODIFY COLUMN link_creator_user_ID int(11) unsigned NULL,
 						MODIFY COLUMN link_lastedit_user_ID int(11) unsigned NULL,
-						ADD COLUMN link_cmt_ID int(11) unsigned NULL AFTER link_itm_ID,
+						ADD COLUMN link_cmt_ID int(11) unsigned NULL COMMENT "Used for linking files to comments (comment attachments)" AFTER link_itm_ID,
 						ADD INDEX link_cmt_ID ( link_cmt_ID )' );
 		task_end();
 
@@ -2932,10 +2932,10 @@ function upgrade_b2evo_tables()
 	{	// 4.1b
 		task_begin( 'Creating table for a specific blog post subscriptions...' );
 		$DB->query( "CREATE TABLE T_items__subscriptions (
-						isub_item_ID	int(11) unsigned NOT NULL,
-						isub_user_ID	int(11) unsigned NOT NULL,
-						isub_comments	tinyint(1) NOT NULL,
-						isub_attend		tinyint(1) NOT NULL,
+						isub_item_ID  int(11) unsigned NOT NULL,
+						isub_user_ID  int(11) unsigned NOT NULL,
+						isub_comments tinyint(1) NOT NULL default 0 COMMENT 'The user wants to receive notifications for new comments on this post',
+						isub_attend   tinyint(1) NOT NULL default 0 COMMENT 'The user is attending (or not) this post',
 						PRIMARY KEY (isub_item_ID, isub_user_ID )
 					) ENGINE = innodb" );
 		task_end();
@@ -2946,8 +2946,8 @@ function upgrade_b2evo_tables()
 		task_end();
 
 		task_begin( 'Upgrading users table...' );
-		db_add_col( 'T_users', 'user_notify_moderation', 'tinyint(1) NOT NULL default 0 AFTER user_notify' );
-		db_add_col( 'T_users', 'user_unsubscribe_key', 'varchar(32) NOT NULL default "" AFTER user_notify_moderation' );
+		db_add_col( 'T_users', 'user_notify_moderation', 'tinyint(1) NOT NULL default 0 COMMENT "Notify me by email whenever a comment is awaiting moderation on one of my blogs" AFTER user_notify' );
+		db_add_col( 'T_users', 'user_unsubscribe_key', 'varchar(32) NOT NULL default "" COMMENT "A specific key, it is used when a user wants to unsubscribe from a post comments without signing in" AFTER user_notify_moderation' );
 		// Set users unsubscribe key
 		$sql = 'SELECT user_ID FROM T_users WHERE user_unsubscribe_key = ""';
 		$rows = $DB->get_results( $sql, OBJECT, 'Get users without unsubscribe link' );
@@ -2960,13 +2960,7 @@ function upgrade_b2evo_tables()
 		task_end();
 
 		task_begin( 'Upgrading items table, add attend status...' );
-		db_add_col( 'T_items__item', 'post_attend_status', 'tinyint(1) NOT NULL default 0 AFTER post_comment_status' );
-		task_end();
-
-		task_begin( 'Upgrading specific blog post subscriptions...' );
-		$DB->query( 'ALTER TABLE T_items__subscriptions
-						MODIFY COLUMN isub_comments tinyint(1) NOT NULL default 0,
-						MODIFY COLUMN isub_attend tinyint(1) NOT NULL default 0' );
+		db_add_col( 'T_items__item', 'post_attend_status', 'tinyint(1) NOT NULL default 0 COMMENT "Post author decision about allow users to attend this event" AFTER post_comment_status' );
 		task_end();
 
 		task_begin( 'Upgrading settings table... ');
@@ -3187,6 +3181,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.401  2011/08/25 07:31:14  efy-asimo
+ * DB documentation
+ *
  * Revision 1.400  2011/08/25 01:02:09  fplanque
  * doc/minor
  *

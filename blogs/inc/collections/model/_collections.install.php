@@ -151,7 +151,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_views                  INT(11) UNSIGNED NOT NULL DEFAULT 0,
 			post_wordcount              int(11) default NULL,
 			post_comment_status         ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
-			post_attend_status          tinyint(1) NOT NULL DEFAULT 0,
+			post_attend_status          tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Post author decision about allow users to attend this event',
 			post_commentsexpire         DATETIME DEFAULT NULL,
 			post_renderers              TEXT NOT NULL,
 			post_priority               int(11) unsigned null COMMENT 'Task priority in workflow',
@@ -210,8 +210,8 @@ $schema_queries = array_merge( $schema_queries, array(
 			comment_spam_karma    TINYINT NULL,
 			comment_allow_msgform TINYINT NOT NULL DEFAULT 0,
 			comment_secret        varchar(32) NULL default NULL,
-			comment_notif_status  ENUM('noreq','todo','started','finished') NOT NULL DEFAULT 'noreq',
-			comment_notif_ctsk_ID INT(10) unsigned NULL DEFAULT NULL,
+			comment_notif_status  ENUM('noreq','todo','started','finished') NOT NULL DEFAULT 'noreq' COMMENT 'Have notifications been sent for this comment? How far are we in the process?',
+			comment_notif_ctsk_ID INT(10) unsigned NULL DEFAULT NULL COMMENT 'When notifications for this comment are sent through a schedule job, what is the job ID?',
 			PRIMARY KEY comment_ID (comment_ID),
 			KEY comment_post_ID (comment_post_ID),
 			KEY comment_date (comment_date),
@@ -276,12 +276,12 @@ $schema_queries = array_merge( $schema_queries, array(
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_items__subscriptions' => array(
-		'Creating table for a specific blog post subscriptions',
+		'Creating table for subscriptions to individual blog posts',
 		"CREATE TABLE T_items__subscriptions (
 			isub_item_ID    int(11) unsigned NOT NULL,
 			isub_user_ID    int(11) unsigned NOT NULL,
-			isub_comments   tinyint(1) NOT NULL DEFAULT 0,
-			isub_attend     tinyint(1) NOT NULL DEFAULT 0,
+			isub_comments   tinyint(1) NOT NULL DEFAULT 0 COMMENT 'The user wants to receive notifications for new comments',
+			isub_attend     tinyint(1) NOT NULL DEFAULT 0 COMMENT 'The user is attending (or not) this post',
 			PRIMARY KEY (isub_item_ID, isub_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -356,7 +356,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			link_creator_user_ID  int(11) unsigned  NULL,
 			link_lastedit_user_ID int(11) unsigned  NULL,
 			link_itm_ID           int(11) unsigned  NULL,
-			link_cmt_ID           int(11) unsigned  NULL,
+			link_cmt_ID           int(11) unsigned  NULL COMMENT 'Used for linking files to comments (comment attachments)',
 			link_dest_itm_ID      int(11) unsigned  NULL,
 			link_file_ID          int(11) unsigned  NULL,
 			link_ltype_ID         int(11) unsigned  NOT NULL default 1,
@@ -375,6 +375,9 @@ $schema_queries = array_merge( $schema_queries, array(
 
 /*
  * $Log$
+ * Revision 1.32  2011/08/25 07:31:14  efy-asimo
+ * DB documentation
+ *
  * Revision 1.31  2011/08/25 02:54:12  efy-james
  * Add checkbox for no teaser
  *
