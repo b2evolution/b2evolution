@@ -300,7 +300,9 @@ switch( $action )
 		break;
 
 	case 'delete':
-			// We need to ask for confirmation:
+			$AdminUI->disp_payload_begin();
+
+		// We need to ask for confirmation:
 			$fullname = $edited_User->dget( 'fullname' );
 			if ( ! empty( $fullname ) )
 			{
@@ -315,6 +317,7 @@ switch( $action )
 
 			// Display user identity form:
 			$AdminUI->disp_view( 'users/views/_user_identity.form.php' );
+			$AdminUI->disp_payload_end();
 			break;
 
 	case 'promote':
@@ -332,6 +335,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.52  2011/08/25 06:00:32  efy-james
+ * Modification on delete user page
+ *
  * Revision 1.51  2010/11/25 15:16:35  efy-asimo
  * refactor $Messages
  *
