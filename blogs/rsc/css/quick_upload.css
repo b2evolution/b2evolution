@@ -15,6 +15,7 @@
     width: 0px;
     height: 12px;
     background-image: url(../img/bar_selected24.png);
+    background-position: center;
 }
 
 #upload_separator {
