@@ -2975,9 +2975,11 @@ function upgrade_b2evo_tables()
 	if( $old_db_version < 10300 )
 	{	// 4.2
 		task_begin( 'Upgrading item table for hide teaser...' );
+		$DB->query( 'ALTER TABLE T_items__item
+						ADD COLUMN post_hideteaser tinyint(1) NOT NULL DEFAULT 0 AFTER post_featured');
 		$DB->query( 'UPDATE T_items__item 
-										SET T_hideteaser = 1 
-									WHERE T_content LIKE "%<!--noteaser-->%"' );
+										SET post_hideteaser = 1
+									WHERE post_content LIKE "%<!--noteaser-->%"' );
 
 		task_end();
 		set_upgrade_checkpoint( '10300' );
@@ -3181,6 +3183,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.402  2011/08/25 13:20:23  efy-james
+ * Add checkbox for no teaser
+ *
  * Revision 1.401  2011/08/25 07:31:14  efy-asimo
  * DB documentation
  *
