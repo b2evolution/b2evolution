@@ -150,6 +150,7 @@ class Item extends ItemLight
 	 * @var string
 	 */
 	var $comment_status;
+
 	/**
 	 * Attend status
 	 * @var boolean
@@ -4585,6 +4586,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.232  2011/08/25 01:02:10  fplanque
+ * doc/minor
+ *
  * Revision 1.231  2011/08/24 12:16:43  efy-james
  * Add checkbox for hide teaser
  *

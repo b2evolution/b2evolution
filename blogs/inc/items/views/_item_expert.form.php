@@ -341,7 +341,7 @@ $Form->begin_form( '', '', $params );
 	$Form->checkbox_basic_input( 'item_featured', $edited_Item->featured, '<strong>'.T_('Featured post').'</strong>' );
 	echo "<br/>";
 
-	$Form->checkbox_basic_input( 'item_hideteaser', $edited_Item->hideteaser, '<strong>'.T_('Hide teaser when displaying -- More --').'</strong>' );
+	$Form->checkbox_basic_input( 'item_hideteaser', $edited_Item->hideteaser, '<strong>'.T_('Hide teaser when displaying -- more --').'</strong>' );
 	echo "<br/>";
 
 	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
@@ -461,6 +461,9 @@ echo_onchange_newcat();
 
 /*
  * $Log$
+ * Revision 1.78  2011/08/25 01:02:10  fplanque
+ * doc/minor
+ *
  * Revision 1.77  2011/08/24 12:16:43  efy-james
  * Add checkbox for hide teaser
  *

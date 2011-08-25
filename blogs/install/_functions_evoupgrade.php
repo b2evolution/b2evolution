@@ -13,6 +13,8 @@
  * }}
  *
  * @package install
+ *
+ * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -2926,7 +2928,7 @@ function upgrade_b2evo_tables()
 		set_upgrade_checkpoint( '10100' );
 	}
 
-	if( $old_db_version < 10100 )
+	if( $old_db_version < 10200 )
 	{	// 4.1b
 		task_begin( 'Creating table for a specific blog post subscriptions...' );
 		$DB->query( "CREATE TABLE T_items__subscriptions (
@@ -2972,11 +2974,19 @@ function upgrade_b2evo_tables()
 						VALUES ( "smart_hit_count", 1 )' );
 		task_end();
 
-		task_begin( 'Upgrading item table for hide teaser...' );
-		$DB->query( 'UPDATE T_items__item SET T_hideteaser = 1 WHERE T_content LIKE "%<!--noteaser-->%"' );
-		task_end();
-
 		set_upgrade_checkpoint( '10200' );
+	}
+
+
+	if( $old_db_version < 10300 )
+	{	// 4.2
+		task_begin( 'Upgrading item table for hide teaser...' );
+		$DB->query( 'UPDATE T_items__item 
+										SET T_hideteaser = 1 
+									WHERE T_content LIKE "%<!--noteaser-->%"' );
+
+		task_end();
+		set_upgrade_checkpoint( '10300' );
 	}
 
 
@@ -3177,6 +3187,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.400  2011/08/25 01:02:09  fplanque
+ * doc/minor
+ *
  * Revision 1.399  2011/08/24 12:16:43  efy-james
  * Add checkbox for hide teaser
  *

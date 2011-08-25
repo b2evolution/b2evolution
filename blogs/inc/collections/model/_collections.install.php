@@ -6,7 +6,7 @@
  *
  * @package evocore
  *
- * @version _collections.install.php,v 1.3 2009/08/30 12:31:44 tblue246 Exp
+ * @version $Id$
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -373,7 +373,10 @@ $schema_queries = array_merge( $schema_queries, array(
 ) );
 
 /*
- * _collections.install.php,v
+ * $Log$
+ * Revision 1.30  2011/08/25 01:02:10  fplanque
+ * doc/minor
+ *
  * Revision 1.24  2011/03/03 12:47:29  efy-asimo
  * comments attachments
  *
