@@ -3168,7 +3168,8 @@ function get_base_domain( $url )
 	}
 	$base_domain = convert_charset(idna_decode($match[0]), $evo_charset, 'UTF-8');
 
-	if( substr_count($base_domain, '.') > 1 )
+	// fp>sam2kb: why do we need this?
+	// if( substr_count($base_domain, '.') > 1 )
 	{	// Remove any www*. prefix:
 		$base_domain = preg_replace( '~^www.*?\.~i', '', $base_domain );
 	}
@@ -4182,6 +4183,9 @@ function sanitize_id_list( $str, $return_array = false, $quote = false )
 
 /*
  * $Log$
+ * Revision 1.257  2011/08/25 22:38:57  fplanque
+ * minor/doc
+ *
  * Revision 1.256  2011/07/12 23:16:36  sam2kb
  * sanitize_id_list() returns array if requested
  *

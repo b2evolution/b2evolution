@@ -73,7 +73,10 @@ function headers_content_mightcache( $type = 'text/html', $max_age = '#', $chars
 	header_content_type( $type, $charset );
 
 	if( empty($max_age) || $is_admin_page || is_logged_in() || $Messages->count() )
-	{	// Don't cache if no max_age given + NEVER EVER allow admin pages to cache + NEVER EVER allow logged in data to be cached:
+	{	// Don't cache if no max_age given 
+		// + NEVER EVER allow admin pages to cache 
+		// + NEVER EVER allow logged in data to be cached
+		// + NEVER EVER allow transactional Messages to be cached!:
 		header_nocache();
 		return;
 	}
@@ -310,10 +313,10 @@ function request_title( $params = array() )
 			'req_validatemail'    => T_('Email validation'),
 			'register_text'       => T_('Register'),
 			'register_complete'   => T_('Registration complete'),
-			'register_validation' => T_('Email validation'),
+			'register_validation' => T_('Account email validation'),
 			'profile_text'        => T_('User Profile'),
 			'avatar_text'         => T_('User Avatar'),
-			'pwdchange_text'      => T_('Password'),
+			'pwdchange_text'      => T_('Password change'),
 			'userprefs_text'      => T_('User preferences'),
 			'user_text'           => T_('User'),
 			'subs_text'           => T_('Subscriptions'),
@@ -1180,7 +1183,8 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 
 /**
- * Display a form through an ajax call
+ * Display a form (like comment or contact form) through an ajax call
+ *
  * @param array params
  */
 function display_ajax_form( $params )
@@ -1282,6 +1286,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.86  2011/08/25 22:38:57  fplanque
+ * minor/doc
+ *
  * Revision 1.85  2011/08/11 09:05:09  efy-asimo
  * Messaging in front office
  *
