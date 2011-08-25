@@ -38,7 +38,8 @@ $params = array_merge( array(
 /*
  * Comment form:
  */
-if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_error'], $params['after_comment_error'] ) )
+$section_title = $params['form_title_start'].$params['form_title_text'].$params['form_title_end'];
+if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_error'], $params['after_comment_error'], '#', '#', $section_title ) )
 { // We want to display the comments form and the item can be commented on:
 
 	echo $params['before_comment_form'];
@@ -263,6 +264,9 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 
 /*
  * $Log$
+ * Revision 1.23  2011/08/25 05:40:57  efy-asimo
+ * Allow comments for "Members only" - display disabled comment form
+ *
  * Revision 1.22  2011/06/29 13:14:01  efy-asimo
  * Use ajax to display comment and contact forms
  *

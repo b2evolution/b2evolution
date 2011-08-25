@@ -452,8 +452,67 @@ function build_notify_data( $notify_email, $notify_locale, $notify_key, $notify_
 }
 
 
+/**
+ * Display disabled comment form
+ * 
+ * @param string Blog allow comments settings value
+ * @param string Item url, where this comment form should be displayed
+ */
+function echo_disabled_comments( $allow_comments_value, $item_url )
+{
+	global $Settings;
+
+	switch( $allow_comments_value )
+	{
+		case 'member':
+			$disabled_text = T_( 'You must be a member of this blog to comment.' );
+			break;
+		case 'registered':
+			$disabled_text = T_( 'You must be logged in to leave a comment.' );
+			break;
+		default:
+			// case any or never, in this case comment form is already displayed, or comments are not allowed at all.
+			return;
+	}
+
+	$is_logged_in = is_logged_in();
+	$login_link = ( $is_logged_in ) ? '' : '<a href="'.get_login_url( $item_url ).'">'.T_( 'Log in now!' ).'</a>';
+
+	$register_link = '';
+	if( ( !$is_logged_in ) && ( $Settings->get( 'newusers_canregister' ) ) )
+	{
+		$register_link = get_user_register_link( '', '', T_( 'register now!' ), '', false, $item_url );
+		$register_link = '<p>'.sprintf(  T_( 'If you have no account yet, you can %s (It only takes a few seconds)' ), $register_link ).'</p>';
+	}
+
+	// disabled comment form
+	echo '<form class="bComment">';
+	if( $is_logged_in )
+	{
+		echo '<p>'.$disabled_text.'</p>';
+	}
+	else
+	{ // not logged in, add login and register links
+		echo '<p>'.$disabled_text.' '.$login_link.'</p>';
+		echo $register_link;
+	}
+	echo '<fieldset>';
+	echo '<div class="label"><label for="p">'.T_( 'Comment text:' ).'</label></div>';
+	echo '<div class="input">';
+	echo '<textarea id="p" class="bComment form_text_areainput" rows="5" name="p" cols="40" disabled="true">'.$disabled_text.'</textarea>';
+	echo '</div>';
+	echo '</fieldset>';
+	// margin at the bottom of the form
+	echo '<div style="margin-top:10px"></div>';
+	echo '</form>';
+}
+
+
 /*
  * $Log$
+ * Revision 1.30  2011/08/25 05:40:57  efy-asimo
+ * Allow comments for "Members only" - display disabled comment form
+ *
  * Revision 1.29  2011/07/04 12:26:54  efy-asimo
  * Notification emails content - fix
  *

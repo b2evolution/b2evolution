@@ -707,7 +707,7 @@ class Item extends ItemLight
 	 * @param string error message for closed comments posts, '#' for default
 	 * @return boolean true if user can post, false if s/he cannot
 	 */
-	function can_comment( $before_error = '<p><em>', $after_error = '</em></p>', $non_published_msg = '#', $closed_msg = '#' )
+	function can_comment( $before_error = '<p><em>', $after_error = '</em></p>', $non_published_msg = '#', $closed_msg = '#', $section_title = '' )
 	{
 		$display = ( ! is_null($before_error) );
 
@@ -751,6 +751,15 @@ class Item extends ItemLight
 			}
 
 			return true; // OK, user can comment!
+		}
+
+		if( $display )
+		{
+			echo $section_title;
+			// set item_url for redirect after login, if login required
+			$item_url = $this->get_permanent_url();
+			// display disabled comment form
+			echo_disabled_comments( $this->Blog->get_setting( 'allow_comments' ), $item_url );
 		}
 
 		// Current user not allowed to comment in this blog
@@ -4586,6 +4595,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.233  2011/08/25 05:40:57  efy-asimo
+ * Allow comments for "Members only" - display disabled comment form
+ *
  * Revision 1.232  2011/08/25 01:02:10  fplanque
  * doc/minor
  *
