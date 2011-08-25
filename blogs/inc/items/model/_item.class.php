@@ -2486,7 +2486,7 @@ class Item extends ItemLight
 
 		if( ! is_logged_in() ) return false;
 
-		if( ! $current_User->check_perm( 'blog_del_post', 'any', false, $this->get_blog_ID() ) )
+		if( ! $current_User->check_perm( 'blog_del_post', 'edit', false, $this->get_blog_ID() ) )
 		{ // User has right to delete this post
 			return false;
 		}
@@ -4595,6 +4595,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.234  2011/08/25 05:44:40  efy-asimo
+ * Fix item delete link permission check
+ *
  * Revision 1.233  2011/08/25 05:40:57  efy-asimo
  * Allow comments for "Members only" - display disabled comment form
  *
