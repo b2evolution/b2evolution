@@ -154,45 +154,15 @@ $group_msg_perm = $GroupCache->get_option_array( 'check_messaging_perm' );
 
 	// Add more fields when click on the link
 	function add_more_fields(){
-		j = jQuery("#add_more_fields").parent().parent().siblings().length;
+		var j = jQuery("#add_more_fields").parent().parent().siblings().length;
 		for( i = j + 1; i < j + 4; i++ ){
-			jQuery("#add_more_fields").parent().parent().before('<fieldset  id="ffield_new_uf_val_' + i + '" >\
-				<div class="label"><select name="new_uf_type_' + i + '"><option value="">Add field...</option><optgroup label="Instant Messaging">\
-				<option value="10000">MSN/Live IM</option>\
-				<option value="10100">Yahoo IM</option>\
-				<option value="10200">AOL AIM</option>\
-				<option value="10300">ICQ ID</option>\
-				<option value="40000">Skype</option>\
-				</optgroup><optgroup label="Phone">\
-				<option value="50000">Main phone</option>\
-				<option value="50100">Cell phone</option>\
-				<option value="50200">Office phone</option>\
-				<option value="50300">Home phone</option>\
-				<option value="60000">Office FAX</option>\
-				<option value="60100">Home FAX</option>\
-				</optgroup><optgroup label="Web">\
-				<option value="100000">Website</option>\
-				<option value="100100">Blog</option>\
-				<option value="110000">Linkedin</option>\
-				<option value="120000">Twitter</option>\
-				<option value="130100">Facebook</option>\
-				<option value="130200">Myspace</option>\
-				<option value="140000">Flickr</option>\
-				<option value="150000">YouTube</option>\
-				<option value="160000">Digg</option>\
-				<option value="160100">StumbleUpon</option>\
-				</optgroup><optgroup label="Organization">\
-				<option value="200000">Role</option>\
-				<option value="200100">Organization</option>\
-				<option value="200200">Division</option>\
-				<option value="211000">VAT ID</option>\
-				</optgroup><optgroup label="Address">\
-				<option value="300000">Main address</option>\
-				<option value="300300">Home address</option></optgroup></select>:</div>\
-				<div class="input"><input maxlength="255" value="" size="30" type="text" class="form_text_input" name="new_uf_val_' + i + '" id="new_uf_val_' + i + '" />\
-				</div></fieldset>');
+			var strHtml = jQuery("#add_more_fields").parent().parent().prev().html();
+			strHtml = strHtml.replace(/new_uf_type_\d+/, "new_uf_type_" + i).replace(/new_uf_val_\d+/g, "new_uf_val_" + i);
+			strHtml = '<fieldset id="ffield_new_uf_val_' + i + '">' + strHtml + '</fieldset>';
+			jQuery("#add_more_fields").parent().parent().before(strHtml);
 		}
 	}
+	
 </script>
 <?php
 
@@ -604,6 +574,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.26  2011/08/25 10:52:04  efy-james
+ * Add extra addional fields on user
+ *
  * Revision 1.25  2011/08/25 09:53:32  efy-james
  * Add extra addional fields on user
  *
