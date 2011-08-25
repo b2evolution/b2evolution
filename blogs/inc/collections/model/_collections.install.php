@@ -116,6 +116,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			KEY cat_order (cat_order)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
+	// Add post_hideteaser field for adding checkbox for hide teaser
 	'T_items__item' => array(
 		'Creating table for Posts',
 		"CREATE TABLE T_items__item (
@@ -374,6 +375,9 @@ $schema_queries = array_merge( $schema_queries, array(
 
 /*
  * $Log$
+ * Revision 1.31  2011/08/25 02:54:12  efy-james
+ * Add checkbox for no teaser
+ *
  * Revision 1.30  2011/08/25 01:02:10  fplanque
  * doc/minor
  *
