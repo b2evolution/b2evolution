@@ -29,7 +29,7 @@ function fadeInStatus( id, status )
 			fadeIn(id, '#656565');
 			break;
 		case 'deleted':
-			fadeIn(id, '#EE0000');
+			fadeIn(id, '#fcc');
 			break;
 	};
 }
@@ -37,7 +37,7 @@ function fadeInStatus( id, status )
 function delete_comment_url( comment_id )
 {
 	var divid = 'commenturl_' + comment_id;
-	fadeIn(divid, '#EE0000');
+	fadeIn(divid, '#fcc');
 
 	$.ajax({
 		type: 'POST',
@@ -70,7 +70,7 @@ function setCommentStatus( id, status, redirect_to )
 	type: 'POST',
 	url: '<?php echo $htsrv_url; ?>async.php',
 	data:
-		{ 'blogid': <?php echo '\''.$Blog->ID.'\''; ?>, 
+		{ 'blogid': <?php echo '\''.$Blog->ID.'\''; ?>,
 			'commentid': id,
 			'status': status,
 			'action': 'set_comment_status',
@@ -102,7 +102,7 @@ function deleteComment( commentIds )
 		var divid = 'c' + commentIds[id];
 		if( $('#'+divid) != null )
 		{
-			fadeIn(divid, '#EE0000');
+			fadeIn(divid, '#fcc');
 			modifieds[divid] = 'deleted';
 		}
 	}
@@ -177,7 +177,7 @@ function ban_url( authorurl )
 	$.ajax({
 		type: 'POST',
 		url: '<?php echo $admin_url; ?>',
-		data: 'ctrl=antispam&action=ban&display_mode=js&mode=iframe&request=checkban&keyword=' + authorurl + 
+		data: 'ctrl=antispam&action=ban&display_mode=js&mode=iframe&request=checkban&keyword=' + authorurl +
 			  '&' + <?php echo '\''.url_crumb('antispam').'\''; ?>,
 		success: function(result)
 		{
@@ -210,7 +210,7 @@ function refreshAfterBan( deleted_ids )
 	for( var i=0;i<comment_ids.length; ++i )
 	{
 		var divid = 'c' + comment_ids[i];
-		fadeIn(divid, '#EE0000');
+		fadeIn(divid, '#fcc');
 	}
 	var item_id = get_itemid();
 	refresh_item_comments( item_id );
@@ -288,5 +288,5 @@ function refresh_item_comments( item_id, currentpage )
 
 </script>
 <?php
-//end 
+//end
 ?>

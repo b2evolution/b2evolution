@@ -118,7 +118,7 @@ if( $blog )
 							fadeIn(id, '#656565');
 							break;
 						case 'deleted':
-							fadeIn(id, '#EE0000');
+							fadeIn(id, '#fcc');
 							break;
 					};
 				}
@@ -169,7 +169,7 @@ if( $blog )
 			function deleteComment(id)
 			{
 				var divid = 'comment_' + id;
-				fadeIn(divid, '#EE0000');
+				fadeIn(divid, '#fcc');
 
 				modifieds[divid] = 'deleted';
 
@@ -211,7 +211,7 @@ if( $blog )
 			function delete_comment_url(id)
 			{
 				var divid = 'commenturl_' + id;
-				fadeIn(divid, '#EE0000');
+				fadeIn(divid, '#fcc');
 
 				$.ajax({
 					type: 'POST',
@@ -295,7 +295,7 @@ if( $blog )
 				for( var i=0;i<comment_ids.length; ++i )
 				{
 					var divid = 'comment_' + comment_ids[i];
-					fadeIn(divid, '#EE0000');
+					fadeIn(divid, '#fcc');
 				}
 
 				$.ajax({
@@ -723,6 +723,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.79  2011/08/25 21:37:23  fplanque
+ * styles
+ *
  * Revision 1.78  2011/05/23 02:20:07  sam2kb
  * Option to display excerpts in comment feeds, or disable feeds completely
  *

@@ -101,10 +101,10 @@ img.rightmargin {
 	margin-bottom:.2ex;
 }
 
+/* Comment recycling */
 #recycle_bin {
 	float: right;
 }
-
 .ui-effects-transfer {
-	border: 2px solid black;
+	border: 2px solid red;
 }
