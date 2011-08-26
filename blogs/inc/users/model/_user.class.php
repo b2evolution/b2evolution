@@ -323,6 +323,26 @@ class User extends DataObject
 				$this->userfield_update( $userfield_ID, $uf_val );
 			}
 
+			// Duplicate fields:  
+			if ($this->ID == 0) {
+				$user_id = param( 'orig_user_ID', 'string', "" );
+				if ($user_id <> "") {
+						$userfield_IDs = $DB->get_results( '
+									SELECT uf_ID, uf_ufdf_ID
+										FROM T_users__fields
+									 WHERE uf_user_ID = '.$user_id );
+						foreach( $userfield_IDs as $userfield_ID )
+						{
+							$uf_val = param( 'uf_'.$userfield_ID->uf_ID, 'string', '' );
+							$uf_type = $userfield_ID->uf_ufdf_ID;
+							if( !empty($uf_val) )
+							{
+								$this->userfield_add( $uf_type, $uf_val );
+							}
+						}
+				}
+			}
+
 			// NEW fields:
 			$new_fields_num = param( 'new_fields_num', 'integer', 0 );
 			$new_fields_num = ( $new_fields_num > 0 ) ? $new_fields_num : 3 ;
@@ -2367,6 +2387,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.105  2011/08/26 08:34:37  efy-james
+ * Duplicate additional fields when duplicating user
+ *
  * Revision 1.104  2011/08/26 04:06:30  efy-james
  * Add extra addional fields on user
  *

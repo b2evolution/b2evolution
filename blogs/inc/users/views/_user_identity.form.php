@@ -442,14 +442,22 @@ $Form->begin_fieldset( T_('Experimental') );
 // This totally needs to move into User object
 global $DB;
 
+// Get original user id for duplicate
+if ($edited_User->ID == 0) {
+	$user_id = param( 'user_ID', 'string', "" );
+	if ($user_id == "" || $user_id == 0 )
+		$user_id = param( 'orig_user_ID', 'string', "" );
+} else
+	$user_id = $edited_User->ID;
+
 // Get existing userfields:
 $userfields = $DB->get_results( '
 	SELECT uf_ID, ufdf_ID, ufdf_type, ufdf_name, uf_varchar
 		FROM T_users__fields LEFT JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID
-	 WHERE uf_user_ID = '.$edited_User->ID.'
+	 WHERE uf_user_ID = '.$user_id.'
 	 ORDER BY uf_ID' );
 
-foreach( $userfields as $userfield )
+ foreach( $userfields as $userfield )
 {
 	switch( $userfield->ufdf_ID )
 	{
@@ -529,6 +537,7 @@ for( $i=1; $i<=3; $i++ )
 
 $Form->info( '', '<a id="add_more_fields" href="javascript:add_more_fields()">+ add more fields</a>' );
 $Form->hidden( 'new_fields_num', '3' );
+$Form->hidden( 'orig_user_ID', $user_id );
 
 $Form->end_fieldset();
 
@@ -576,6 +585,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.28  2011/08/26 08:34:37  efy-james
+ * Duplicate additional fields when duplicating user
+ *
  * Revision 1.27  2011/08/26 04:06:30  efy-james
  * Add extra addional fields on user
  *
