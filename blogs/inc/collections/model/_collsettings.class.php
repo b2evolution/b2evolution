@@ -71,6 +71,7 @@ class CollectionSettings extends AbstractSettings
 		// Comment settings:
 			'new_feedback_status' => 'draft',  	// 'draft', 'published' or 'deprecated'
 			'allow_comments' => 'any',
+			'allow_view_comments' => 'any',
 			'disable_comments_bypost' => '1',
 			'allow_anon_url' => '0',
 			'allow_attachments' => 'registered',
@@ -190,6 +191,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.60  2011/08/26 07:40:13  efy-asimo
+ * Setting to show comment to "Members only"
+ *
  * Revision 1.59  2011/06/29 13:14:01  efy-asimo
  * Use ajax to display comment and contact forms
  *

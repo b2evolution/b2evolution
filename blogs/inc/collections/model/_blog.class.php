@@ -490,6 +490,7 @@ class Blog extends DataObject
 		if( param( 'allow_comments', 'string', NULL ) !== NULL )
 		{ // Feedback options:
 			$this->set_setting( 'allow_comments', param( 'allow_comments', 'string', 'any' ) );
+			$this->set_setting( 'allow_view_comments', param( 'allow_view_comments', 'string', 'any' ) );
 			$this->set_setting( 'new_feedback_status', param( 'new_feedback_status', 'string', 'draft' ) );
 			$this->set_setting( 'disable_comments_bypost', param( 'disable_comments_bypost', 'string', '0' ) );
 			$this->set_setting( 'allow_anon_url', param( 'allow_anon_url', 'string', '0' ) );
@@ -2375,6 +2376,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.137  2011/08/26 07:40:13  efy-asimo
+ * Setting to show comment to "Members only"
+ *
  * Revision 1.136  2011/07/12 23:47:31  sam2kb
  * Sanitize input ID list
  *

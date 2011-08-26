@@ -682,19 +682,84 @@ class Item extends ItemLight
 	 * Check if user can see comments on this post, which he cannot if they
 	 * are disabled for the Item or never allowed for the blog.
 	 *
+	 * @param boolean should be true when needs to display why user can't see comments
 	 * @return boolean
 	 */
-	function can_see_comments()
+	function can_see_comments( $display = false )
 	{
+		global $Settings;
+
 		$this->load_Blog();
 		if( ( $this->Blog->get_setting( 'disable_comments_bypost' ) && ( $this->comment_status == 'disabled' ) )
-				|| $this->is_intro() // Intros: no comments
-		    || ( $this->get_Blog() && $this->Blog->get_setting( 'allow_comments' ) == 'never' ) )
+				|| $this->is_intro() ) // Intros: no comments
 		{ // Comments are disabled on this post
 			return false;
 		}
 
-		return true; // OK, user can see comments
+		if( $this->check_blog_settings( 'allow_view_comments' ) )
+		{ // User is allowed to see comments
+			return true;
+		}
+
+		if( !$display )
+		{
+			return false;
+		}
+
+		$number_of_comments = $this->get_number_of_comments( 'published' );
+
+		// Set display text
+		switch( $this->Blog->get_setting( 'allow_view_comments' ) )
+		{
+			case 'registered':
+				if( $number_of_comments == 0 )
+				{
+					$display_text = T_( 'You must be logged in to see the comments.' );
+				}
+				elseif ( $number_of_comments == 1 )
+				{
+					$display_text = T_( 'There is one comment on this post but you must be logged in to see the comments.' );
+				}
+				else
+				{
+					$display_text = sprintf( T_( 'There are %s comments on this post but you must be logged in to see the comments.' ), $number_of_comments );
+				}
+				break;
+			case 'member':
+				if( $number_of_comments == 0 )
+				{
+					$display_text = T_( 'You must be a member of this blog to see the comments.' );
+				}
+				elseif ( $number_of_comments == 1 )
+				{
+					$display_text = T_( 'There is one comment on this post but you must be a member of this blog to see the comments.' );
+				}
+				else
+				{
+					$display_text = sprintf( T_( 'There are %s comments on this post but you must be a member of this blog to see the comments.' ), $number_of_comments );
+				}
+				break;
+			default:
+				// any is already handled, moderators shouldn't get any message
+				return false;
+		}
+
+		if( is_logged_in() )
+		{
+			echo $display_text;
+			return false;
+		}
+
+		// User is not logged in, needs to display login link
+		$login_link = '<a href="'.get_login_url( regenerate_url() ).'">'.T_( 'Log in now!' ).'</a>';
+		echo '<p>'.$display_text.' '.$login_link.'</p>';
+		if( $Settings->get( 'newusers_canregister' ) )
+		{ // needs to display register link
+			$register_link = get_user_register_link( '', '', T_( 'register now!' ), '', false, regenerate_url() );
+			echo '<p>'.sprintf(  T_( 'If you have no account yet, you can %s (It only takes a few seconds)' ), $register_link ).'</p>';
+		}
+
+		return false; 
 	}
 
 
@@ -753,7 +818,7 @@ class Item extends ItemLight
 			return true; // OK, user can comment!
 		}
 
-		if( $display )
+		if( ( $this->Blog->get_setting( 'allow_comments' ) != 'never' ) && $display )
 		{
 			echo $section_title;
 			// set item_url for redirect after login, if login required
@@ -791,6 +856,8 @@ class Item extends ItemLight
 				return is_logged_in();
 			case 'member':
 				return (is_logged_in() && $current_User->check_perm( 'blog_ismember', 'view', false, $this->get_blog_ID() ) );
+			case 'moderator':
+				return (is_logged_in() && $current_User->check_perm( 'blog_comments', 'edit', false, $this->get_blog_ID() ) );
 			default:
 				debug_die( 'Invalid blog '.$settings_name.' settings!' );
 		}
@@ -4590,11 +4657,33 @@ class Item extends ItemLight
 				 WHERE isub_item_ID = '.$this->ID.' AND isub_attend <> 0';
 		return $DB->get_results( $sql, OBJECT, 'Find item attendants' );
 	}
+
+
+	/**
+	 * Get the number of comments on this item
+	 * 
+	 * @param string the status of counted comments
+	 * @retrun integer the number of comments
+	 */
+	function get_number_of_comments( $status = NULL )
+	{
+		global $DB;
+		$sql = 'SELECT count( comment_ID )
+					FROM T_comments WHERE comment_post_ID = '.$this->ID;
+		if( $status != NULL )
+		{
+			$sql .= ' AND comment_status = "'.$status.'"';
+		}
+		return $DB->get_var( $sql );
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.235  2011/08/26 07:40:13  efy-asimo
+ * Setting to show comment to "Members only"
+ *
  * Revision 1.234  2011/08/25 05:44:40  efy-asimo
  * Fix item delete link permission check
  *

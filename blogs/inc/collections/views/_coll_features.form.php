@@ -85,6 +85,13 @@ $Form->begin_fieldset( T_('Post options').get_manual_link('blog_features_setting
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Feedback options') );
+	$Form->radio( 'allow_view_comments', $edited_Blog->get_setting( 'allow_view_comments' ),
+						array(  array( 'any', T_('Any user'), T_('Including anonymous users') ),
+								array( 'registered', T_('Registered users only') ),
+								array( 'member', T_('Members only'),  T_( 'Users have to be members of this blog' ) ),
+								array( 'moderator', T_('Moderators & Admins only') ),
+					), T_('Comment viewing by'), true );
+
 	$Form->radio( 'allow_comments', $edited_Blog->get_setting( 'allow_comments' ),
 						array(  array( 'any', T_('Any user'), T_('Including anonymous users'),
 										'', 'onclick="show_hide_feedback_details(this);"'),
@@ -94,7 +101,7 @@ $Form->begin_fieldset( T_('Feedback options') );
 										'', 'onclick="show_hide_feedback_details(this);"'),
 								array( 'never', T_('Not allowed'), '',
 										'', 'onclick="show_hide_feedback_details(this);"'),
-					), T_('Comments from'), true );
+					), T_('Comment posting by'), true );
 
 	echo '<div class="feedback_details_container">';
 
@@ -277,6 +284,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.44  2011/08/26 07:40:13  efy-asimo
+ * Setting to show comment to "Members only"
+ *
  * Revision 1.43  2011/08/23 21:42:24  fplanque
  * doc
  *

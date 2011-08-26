@@ -62,7 +62,7 @@ $type_list = array();
 $disp_title = array();
 if(  $disp_comments )
 {	// We requested to display comments
-	if( $Item->can_see_comments() )
+	if( $Item->can_see_comments( true ) )
 	{ // User can see a comments
 		$type_list[] = 'comment';
 		$disp_title[] = T_("Comments");
@@ -168,6 +168,7 @@ while( $Comment = & $CommentList->get_next() )
 	<!-- ========== END of a COMMENT/TB/PB ========== -->
 	<?php
 }
+}
 
 if( $disp_comment_form )
 {	// We want to display the comments form:
@@ -188,9 +189,5 @@ if( $disp_comment_form )
 			skin_include( '_item_comment_form.inc.php', $params );
 			}
 	}
-}
-?>
-
-<?php
 }
 ?>

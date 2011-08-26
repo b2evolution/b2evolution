@@ -89,176 +89,175 @@ if( ( $attending == 'always' ) || ( ( $attending == 'enable_bypost' ) && $Item->
 }
 // -------------------- END OF ATTENDING ---------------------
 
-if( ! $Item->can_see_comments() )
-{	// Comments are disabled for this post
-	return;
-}
+// Check if user is allowed to see comments, display corresponding message if not allowed
+if( $Item->can_see_comments( true ) )
+{ // user is allowed to see comments
+	if( empty($c) )
+	{	// Comments not requested
+		$params['disp_comments'] = false;					// DO NOT Display the comments if not requested
+		$params['disp_comment_form'] = false;			// DO NOT Display the comments form if not requested
+	}
 
-if( empty($c) )
-{	// Comments not requested
-	$params['disp_comments'] = false;					// DO NOT Display the comments if not requested
-	$params['disp_comment_form'] = false;			// DO NOT Display the comments form if not requested
-}
+	if( empty($tb) || !$Blog->get( 'allowtrackbacks' ) )
+	{	// Trackback not requested or not allowed
+		$params['disp_trackbacks'] = false;				// DO NOT Display the trackbacks if not requested
+		$params['disp_trackback_url'] = false;		// DO NOT Display the trackback URL if not requested
+	}
 
-if( empty($tb) || !$Blog->get( 'allowtrackbacks' ) )
-{	// Trackback not requested or not allowed
-	$params['disp_trackbacks'] = false;				// DO NOT Display the trackbacks if not requested
-	$params['disp_trackback_url'] = false;		// DO NOT Display the trackback URL if not requested
-}
+	if( empty($pb) )
+	{	// Pingback not requested
+		$params['disp_pingbacks'] = false;				// DO NOT Display the pingbacks if not requested
+	}
 
-if( empty($pb) )
-{	// Pingback not requested
-	$params['disp_pingbacks'] = false;				// DO NOT Display the pingbacks if not requested
-}
+	if( ! ($params['disp_comments'] || $params['disp_comment_form'] || $params['disp_trackbacks'] || $params['disp_trackback_url'] || $params['disp_pingbacks'] ) )
+	{	// Nothing more to do....
+		return false;
+	}
 
-if( ! ($params['disp_comments'] || $params['disp_comment_form'] || $params['disp_trackbacks'] || $params['disp_trackback_url'] || $params['disp_pingbacks'] ) )
-{	// Nothing more to do....
-	return false;
-}
+	echo '<a id="feedbacks"></a>';
 
-echo '<a id="feedbacks"></a>';
+	$type_list = array();
+	$disp_title = array();
 
-$type_list = array();
-$disp_title = array();
+	if( $params['disp_comments'] )
+	{	// We requested to display comments
+		if( $Item->can_see_comments() )
+		{ // User can see a comments
+			$type_list[] = 'comment';
+			if( $title = $Item->get_feedback_title( 'comments' ) )
+			{
+				$disp_title[] = $title;
+			}
+		}
+		else
+		{ // Use cannot see comments
+			$params['disp_comments'] = false;
+		}
+		echo '<a id="comments"></a>';
+	}
 
-if( $params['disp_comments'] )
-{	// We requested to display comments
-	if( $Item->can_see_comments() )
-	{ // User can see a comments
-		$type_list[] = 'comment';
-		if( $title = $Item->get_feedback_title( 'comments' ) )
+	if( $params['disp_trackbacks'] )
+	{
+		$type_list[] = 'trackback';
+		if( $title = $Item->get_feedback_title( 'trackbacks' ) )
 		{
 			$disp_title[] = $title;
 		}
+		echo '<a id="trackbacks"></a>';
 	}
-	else
-	{ // Use cannot see comments
-		$params['disp_comments'] = false;
-	}
-	echo '<a id="comments"></a>';
-}
 
-if( $params['disp_trackbacks'] )
-{
-	$type_list[] = 'trackback';
-	if( $title = $Item->get_feedback_title( 'trackbacks' ) )
+	if( $params['disp_pingbacks'] )
 	{
-		$disp_title[] = $title;
-	}
-	echo '<a id="trackbacks"></a>';
-}
-
-if( $params['disp_pingbacks'] )
-{
-	$type_list[] = 'pingback';
-	if( $title = $Item->get_feedback_title( 'pingbacks' ) )
-	{
-		$disp_title[] = $title;
-	}
-	echo '<a id="pingbacks"></a>';
-}
-
-if( $params['disp_trackback_url'] )
-{ // We want to display the trackback URL:
-
-	echo $params['before_section_title'];
-	echo T_('Trackback address for this post');
-	echo $params['after_section_title'];
-
-	/*
-	 * Trigger plugin event, which could display a captcha form, before generating a whitelisted URL:
-	 */
-	if( ! $Plugins->trigger_event_first_true( 'DisplayTrackbackAddr', array('Item' => & $Item, 'template' => '<code>%url%</code>') ) )
-	{ // No plugin displayed a payload, so we just display the default:
-		echo '<p class="trackback_url"><a href="'.$Item->get_trackback_url().'">'.T_('Trackback URL (right click and copy shortcut/link location)').'</a></p>';
-	}
-}
-
-
-if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks']  )
-{
-	if( empty($disp_title) )
-	{	// No title yet
-		if( $title = $Item->get_feedback_title( 'feedbacks', '', T_('Feedback awaiting moderation'), T_('Feedback awaiting moderation'), 'draft' ) )
-		{ // We have some feedback awaiting moderation: we'll want to show that in the title
+		$type_list[] = 'pingback';
+		if( $title = $Item->get_feedback_title( 'pingbacks' ) )
+		{
 			$disp_title[] = $title;
+		}
+		echo '<a id="pingbacks"></a>';
+	}
+
+	if( $params['disp_trackback_url'] )
+	{ // We want to display the trackback URL:
+
+		echo $params['before_section_title'];
+		echo T_('Trackback address for this post');
+		echo $params['after_section_title'];
+
+		/*
+		 * Trigger plugin event, which could display a captcha form, before generating a whitelisted URL:
+		 */
+		if( ! $Plugins->trigger_event_first_true( 'DisplayTrackbackAddr', array('Item' => & $Item, 'template' => '<code>%url%</code>') ) )
+		{ // No plugin displayed a payload, so we just display the default:
+			echo '<p class="trackback_url"><a href="'.$Item->get_trackback_url().'">'.T_('Trackback URL (right click and copy shortcut/link location)').'</a></p>';
 		}
 	}
 
-	if( empty($disp_title) )
-	{	// Still no title
-		$disp_title[] = T_('No feedback yet');
-	}
 
-	echo $params['before_section_title'];
-	echo implode( ', ', $disp_title);
-	echo $params['after_section_title'];
+	if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks']  )
+	{
+		if( empty($disp_title) )
+		{	// No title yet
+			if( $title = $Item->get_feedback_title( 'feedbacks', '', T_('Feedback awaiting moderation'), T_('Feedback awaiting moderation'), 'draft' ) )
+			{ // We have some feedback awaiting moderation: we'll want to show that in the title
+				$disp_title[] = $title;
+			}
+		}
 
-	$CommentList = new CommentList2( $Blog, $Blog->get_setting('comments_per_page'), 'CommentCache', 'c_' );
+		if( empty($disp_title) )
+		{	// Still no title
+			$disp_title[] = T_('No feedback yet');
+		}
 
-	// Filter list:
-	$CommentList->set_default_filters( array(
-			'types' => $type_list,
-			'statuses' => array ( 'published' ),
-			'post_ID' => $Item->ID,
-			'order' => $Blog->get_setting( 'comments_orderdir' ),
-		) );
+		echo $params['before_section_title'];
+		echo implode( ', ', $disp_title);
+		echo $params['after_section_title'];
 
-	$CommentList->load_from_Request();
+		$CommentList = new CommentList2( $Blog, $Blog->get_setting('comments_per_page'), 'CommentCache', 'c_' );
 
-	// Get ready for display (runs the query):
-	$CommentList->display_init();
-
-	// Set redir=no in order to open comment pages
-	memorize_param( 'redir', 'string', '', 'no' );
-
-	if( $Blog->get_setting( 'paged_comments' ) )
-	{ // Prev/Next page navigation
-		$CommentList->page_links( array(
-				'page_url' => url_add_tail( $Item->get_permanent_url(), '#comments' ),
+		// Filter list:
+		$CommentList->set_default_filters( array(
+				'types' => $type_list,
+				'statuses' => array ( 'published' ),
+				'post_ID' => $Item->ID,
+				'order' => $Blog->get_setting( 'comments_orderdir' ),
 			) );
+
+		$CommentList->load_from_Request();
+
+		// Get ready for display (runs the query):
+		$CommentList->display_init();
+
+		// Set redir=no in order to open comment pages
+		memorize_param( 'redir', 'string', '', 'no' );
+
+		if( $Blog->get_setting( 'paged_comments' ) )
+		{ // Prev/Next page navigation
+			$CommentList->page_links( array(
+					'page_url' => url_add_tail( $Item->get_permanent_url(), '#comments' ),
+				) );
+		}
+
+
+		echo $params['comment_list_start'];
+		/**
+		 * @var Comment
+		 */
+		while( $Comment = & $CommentList->get_next() )
+		{	// Loop through comments:
+
+			// ------------------ COMMENT INCLUDED HERE ------------------
+			skin_include( $params['comment_template'], array(
+					'Comment'         => & $Comment,
+				  'comment_start'   => $params['comment_start'],
+				  'comment_end'     => $params['comment_end'],
+					'link_to'		      => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
+				) );
+			// Note: You can customize the default item feedback by copying the generic
+			// /skins/_item_comment.inc.php file into the current skin folder.
+			// ---------------------- END OF COMMENT ---------------------
+
+		}	// End of comment list loop.
+		echo $params['comment_list_end'];
+
+
+		if( $Blog->get_setting( 'paged_comments' ) )
+		{ // Prev/Next page navigation
+			$CommentList->page_links( array(
+					'page_url' => url_add_tail( $Item->get_permanent_url(), '#comments' ),
+				) );
+		}
+
+		// Restore "redir" param
+		forget_param('redir');
+
+		// Display count of comments to be moderated:
+		$Item->feedback_moderation( 'feedbacks', '<div class="moderation_msg"><p>', '</p></div>', '',
+				T_('This post has 1 feedback awaiting moderation... %s'),
+				T_('This post has %d feedbacks awaiting moderation... %s') );
+	
+		// Display link for comments feed:
+		$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>' );
 	}
-
-
-	echo $params['comment_list_start'];
-	/**
-	 * @var Comment
-	 */
-	while( $Comment = & $CommentList->get_next() )
-	{	// Loop through comments:
-
-		// ------------------ COMMENT INCLUDED HERE ------------------
-		skin_include( $params['comment_template'], array(
-				'Comment'         => & $Comment,
-			  'comment_start'   => $params['comment_start'],
-			  'comment_end'     => $params['comment_end'],
-				'link_to'		      => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
-			) );
-		// Note: You can customize the default item feedback by copying the generic
-		// /skins/_item_comment.inc.php file into the current skin folder.
-		// ---------------------- END OF COMMENT ---------------------
-
-	}	// End of comment list loop.
-	echo $params['comment_list_end'];
-
-
-	if( $Blog->get_setting( 'paged_comments' ) )
-	{ // Prev/Next page navigation
-		$CommentList->page_links( array(
-				'page_url' => url_add_tail( $Item->get_permanent_url(), '#comments' ),
-			) );
-	}
-
-	// Restore "redir" param
-	forget_param('redir');
-
-	// Display count of comments to be moderated:
-	$Item->feedback_moderation( 'feedbacks', '<div class="moderation_msg"><p>', '</p></div>', '',
-			T_('This post has 1 feedback awaiting moderation... %s'),
-			T_('This post has %d feedbacks awaiting moderation... %s') );
-
-	// Display link for comments feed:
-	$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>' );
 }
 
 // ----------- Register for item's comment notification -----------
@@ -322,6 +321,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.35  2011/08/26 07:40:13  efy-asimo
+ * Setting to show comment to "Members only"
+ *
  * Revision 1.34  2011/06/29 13:14:01  efy-asimo
  * Use ajax to display comment and contact forms
  *
