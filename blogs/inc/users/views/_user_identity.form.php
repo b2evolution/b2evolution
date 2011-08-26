@@ -154,13 +154,14 @@ $group_msg_perm = $GroupCache->get_option_array( 'check_messaging_perm' );
 
 	// Add more fields when click on the link
 	function add_more_fields(){
-		var j = jQuery("#add_more_fields").parent().parent().siblings().length;
+		var j = jQuery("#add_more_fields").parent().parent().siblings("fieldset[id^=ffield_new_uf_val]").length;
 		for( i = j + 1; i < j + 4; i++ ){
 			var strHtml = jQuery("#add_more_fields").parent().parent().prev().html();
 			strHtml = strHtml.replace(/new_uf_type_\d+/, "new_uf_type_" + i).replace(/new_uf_val_\d+/g, "new_uf_val_" + i);
 			strHtml = '<fieldset id="ffield_new_uf_val_' + i + '">' + strHtml + '</fieldset>';
 			jQuery("#add_more_fields").parent().parent().before(strHtml);
 		}
+		jQuery("input[name=new_fields_num]").val(j+3);
 	}
 	
 </script>
@@ -527,6 +528,7 @@ for( $i=1; $i<=3; $i++ )
 }
 
 $Form->info( '', '<a id="add_more_fields" href="javascript:add_more_fields()">+ add more fields</a>' );
+$Form->hidden( 'new_fields_num', '3' );
 
 $Form->end_fieldset();
 
@@ -574,6 +576,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.27  2011/08/26 04:06:30  efy-james
+ * Add extra addional fields on user
+ *
  * Revision 1.26  2011/08/25 10:52:04  efy-james
  * Add extra addional fields on user
  *

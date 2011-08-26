@@ -324,7 +324,9 @@ class User extends DataObject
 			}
 
 			// NEW fields:
-			for( $i=1; $i<=3; $i++ )
+			$new_fields_num = param( 'new_fields_num', 'integer', 0 );
+			$new_fields_num = ( $new_fields_num > 0 ) ? $new_fields_num : 3 ;
+			for( $i=1; $i<=$new_fields_num; $i++ )
 			{	// new fields:
 				$new_uf_type = param( 'new_uf_type_'.$i, 'integer', '' );
 				$new_uf_val = param( 'new_uf_val_'.$i, 'string', '' );
@@ -2365,6 +2367,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.104  2011/08/26 04:06:30  efy-james
+ * Add extra addional fields on user
+ *
  * Revision 1.103  2011/08/22 14:38:39  efy-asimo
  * Add edit_ts permission to blog owners
  *
