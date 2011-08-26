@@ -1319,15 +1319,15 @@ function create_demo_contents()
 			( $blog_a_ID, ".$Group_Admins->ID.", 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ),
 			( $blog_a_ID, ".$Group_Privileged->ID.", 1, 'published,deprecated,protected,private,draft', 1, 0, 1, 1, 1, 0, 0, 1, 1, 1 ),
 			( $blog_a_ID, ".$Group_Bloggers->ID.", 1, 'published,deprecated,protected,private,draft', 0, 0, 0, 0, 0, 0, 0, 1, 1, 0 ),
-			( $blog_a_ID, ".$Group_Users->ID.", 1, '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ),
+			( $blog_a_ID, ".$Group_Users->ID.", 0, '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ),
 			( $blog_b_ID, ".$Group_Admins->ID.", 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ),
 			( $blog_b_ID, ".$Group_Privileged->ID.", 1, 'published,deprecated,protected,private,draft', 1, 0, 1, 1, 1, 0, 0, 1, 1, 1 ),
 			( $blog_b_ID, ".$Group_Bloggers->ID.", 1, 'published,deprecated,protected,private,draft', 0, 0, 0, 0, 0, 0, 0, 1, 1, 0 ),
-			( $blog_b_ID, ".$Group_Users->ID.", 1, '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ),
+			( $blog_b_ID, ".$Group_Users->ID.", 0, '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ),
 			( $blog_linkblog_ID, ".$Group_Admins->ID.", 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ),
 			( $blog_linkblog_ID, ".$Group_Privileged->ID.", 1, 'published,deprecated,protected,private,draft', 1, 0, 1, 1, 1, 0, 0, 1, 1, 1 ),
 			( $blog_linkblog_ID, ".$Group_Bloggers->ID.", 1, 'published,deprecated,protected,private,draft', 0, 0, 0, 0, 0, 0, 0, 1, 1, 0 ),
-			( $blog_linkblog_ID, ".$Group_Users->ID.", 1, '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 )";
+			( $blog_linkblog_ID, ".$Group_Users->ID.", 0, '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 )";
 	$DB->query( $query );
 	echo "OK.<br />\n";
 
@@ -1359,6 +1359,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.308  2011/08/26 08:00:24  efy-asimo
+ * Change basic users default membership on install
+ *
  * Revision 1.307  2011/08/24 12:16:43  efy-james
  * Add checkbox for hide teaser
  *
