@@ -94,6 +94,8 @@ $Form->text_input( 'login', $login, 16,  T_('Login'), '', array( 'maxlength'=>20
 
 	$Form->buttons_input( array( array('name'=>'submit', 'value'=>T_('Register!'), 'class'=>'ActionInput') ) );
 
+	echo '<div class="center notes">'.T_('Your IP address ('.$Hit->IP.') and the current time are being logged.').'</div>';
+
 $Form->end_fieldset();
 $Form->end_form(); // display hidden fields etc
 ?>
@@ -107,6 +109,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.18  2011/08/26 03:01:54  efy-james
+ * Add IP on login form
+ *
  * Revision 1.17  2011/06/14 13:33:56  efy-asimo
  * in-skin register
  *

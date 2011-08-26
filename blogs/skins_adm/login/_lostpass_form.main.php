@@ -55,6 +55,8 @@ $Form->begin_form( 'fform' );
 
 	$Form->buttons_input( array(array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Send me an email now!'), 'class' => 'ActionButton' )) );
 
+	echo '<div class="center notes">'.T_('Your IP address ('.$Hit->IP.') and the current time are being logged.').'</div>';
+
 	$Form->end_fieldset();;
 
 $Form->end_form();
@@ -63,6 +65,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.8  2011/08/26 03:01:54  efy-james
+ * Add IP on login form
+ *
  * Revision 1.7  2010/02/08 17:56:56  efy-yury
  * copyright 2009 -> 2010
  *

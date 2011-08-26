@@ -141,6 +141,8 @@ $Form->begin_form( 'fform' );
 
 	$Form->buttons_input($submit_buttons);
 
+	echo '<div class="center notes">'.T_('Your IP address ('.$Hit->IP.') and the current time are being logged.').'</div>'; 
+
 	$Form->end_fieldset();
 
 	// Passthrough REQUEST data (when login is required after having POSTed something)
@@ -226,6 +228,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.22  2011/08/26 03:01:54  efy-james
+ * Add IP on login form
+ *
  * Revision 1.21  2010/05/15 22:19:22  blueyed
  * login form: bypass all params (not being used in the form). Also, use REQUEST instead of POST.
  *
