@@ -105,6 +105,9 @@ if( $action == 'register' )
 	$submit_button = array( array( 'name'=>'register', 'value'=>T_('Register!'), 'class'=>'search' ) );
 
 	$Form->buttons_input($submit_button);
+
+	$Form->info("", "", T_('Your IP address ('.$Hit->IP.') and the current time are being logged.'));
+
 }
 elseif( $action == "reg_complete" )
 { // display register complete info ( email validation not required )
@@ -135,6 +138,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.3  2011/08/29 09:32:22  efy-james
+ * Add ip on login form
+ *
  * Revision 1.2  2011/06/14 20:56:57  sam2kb
  * Hide the form if user registration is disabled
  *

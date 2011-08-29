@@ -141,7 +141,7 @@ $Form->begin_form( 'fform' );
 
 	$Form->buttons_input($submit_buttons);
 
-	echo '<div class="center notes">'.T_('Your IP address ('.$Hit->IP.') and the current time are being logged.').'</div>'; 
+	$Form->info("", "", T_('Your IP address ('.$Hit->IP.') and the current time are being logged.'));
 
 	$Form->end_fieldset();
 
@@ -228,6 +228,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.23  2011/08/29 09:32:22  efy-james
+ * Add ip on login form
+ *
  * Revision 1.22  2011/08/26 03:01:54  efy-james
  * Add IP on login form
  *

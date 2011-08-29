@@ -73,6 +73,9 @@ if( $action != 'req_validatemail' )
 
 	$Form->buttons_input($submit_button);
 
+	//echo '<div class="center notes">'.T_('Your IP address ('.$Hit->IP.') and the current time are being logged.').'</div>';
+	$Form->info("", "", T_('Your IP address ('.$Hit->IP.') and the current time are being logged.'));
+
 	$links = array();
 
 	// link to standard login screen
@@ -139,6 +142,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.8  2011/08/29 09:32:22  efy-james
+ * Add ip on login form
+ *
  * Revision 1.7  2011/06/14 20:20:44  sam2kb
  * Display message if a user is already logged in
  *
