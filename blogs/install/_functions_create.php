@@ -1319,15 +1319,12 @@ function create_demo_contents()
 			( $blog_a_ID, ".$Group_Admins->ID.", 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ),
 			( $blog_a_ID, ".$Group_Privileged->ID.", 1, 'published,deprecated,protected,private,draft', 1, 0, 1, 1, 1, 0, 0, 1, 1, 1 ),
 			( $blog_a_ID, ".$Group_Bloggers->ID.", 1, 'published,deprecated,protected,private,draft', 0, 0, 0, 0, 0, 0, 0, 1, 1, 0 ),
-			( $blog_a_ID, ".$Group_Users->ID.", 0, '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ),
 			( $blog_b_ID, ".$Group_Admins->ID.", 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ),
 			( $blog_b_ID, ".$Group_Privileged->ID.", 1, 'published,deprecated,protected,private,draft', 1, 0, 1, 1, 1, 0, 0, 1, 1, 1 ),
 			( $blog_b_ID, ".$Group_Bloggers->ID.", 1, 'published,deprecated,protected,private,draft', 0, 0, 0, 0, 0, 0, 0, 1, 1, 0 ),
-			( $blog_b_ID, ".$Group_Users->ID.", 0, '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ),
 			( $blog_linkblog_ID, ".$Group_Admins->ID.", 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ),
 			( $blog_linkblog_ID, ".$Group_Privileged->ID.", 1, 'published,deprecated,protected,private,draft', 1, 0, 1, 1, 1, 0, 0, 1, 1, 1 ),
-			( $blog_linkblog_ID, ".$Group_Bloggers->ID.", 1, 'published,deprecated,protected,private,draft', 0, 0, 0, 0, 0, 0, 0, 1, 1, 0 ),
-			( $blog_linkblog_ID, ".$Group_Users->ID.", 0, '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 )";
+			( $blog_linkblog_ID, ".$Group_Bloggers->ID.", 1, 'published,deprecated,protected,private,draft', 0, 0, 0, 0, 0, 0, 0, 1, 1, 0 )";
 	$DB->query( $query );
 	echo "OK.<br />\n";
 
@@ -1359,6 +1356,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.310  2011/08/29 12:40:17  efy-asimo
+ * Change basic users default membership on install - fix
+ *
  * Revision 1.309  2011/08/29 08:51:14  efy-james
  * Default / mandatory additional fields
  *
