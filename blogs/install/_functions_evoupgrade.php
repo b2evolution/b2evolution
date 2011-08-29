@@ -2935,22 +2935,24 @@ function upgrade_b2evo_tables()
 						isub_item_ID  int(11) unsigned NOT NULL,
 						isub_user_ID  int(11) unsigned NOT NULL,
 						isub_comments tinyint(1) NOT NULL default 0 COMMENT 'The user wants to receive notifications for new comments on this post',
-						isub_attend   tinyint(1) NOT NULL default 0 COMMENT 'The user is attending (or not) this post',
+						isub_attend   tinyint(1) NOT NULL default 0 COMMENT 'The user is attending (or not) this event',
 						PRIMARY KEY (isub_item_ID, isub_user_ID )
 					) ENGINE = innodb" );
 		task_end();
 
 		task_begin( 'Upgrading comments table, add subsription fields...' );
-		db_add_col( 'T_comments', 'comment_notif_status', 'ENUM("noreq","todo","started","finished") NOT NULL DEFAULT "noreq" AFTER comment_secret' );
-		db_add_col( 'T_comments', 'comment_notif_ctsk_ID', 'INT(10) unsigned NULL DEFAULT NULL AFTER comment_notif_status' );
+		db_add_col( 'T_comments', 'comment_notif_status', 'ENUM("noreq","todo","started","finished") NOT NULL DEFAULT "noreq" COMMENT "Have notifications been sent for this comment? How far are we in the process?" AFTER comment_secret' );
+		db_add_col( 'T_comments', 'comment_notif_ctsk_ID', 'INT(10) unsigned NULL DEFAULT NULL COMMENT "When notifications for this comment are sent through a schedule job, what is the job ID?" AFTER comment_notif_status' );
 		task_end();
 
 		task_begin( 'Upgrading users table...' );
 		db_add_col( 'T_users', 'user_notify_moderation', 'tinyint(1) NOT NULL default 0 COMMENT "Notify me by email whenever a comment is awaiting moderation on one of my blogs" AFTER user_notify' );
 		db_add_col( 'T_users', 'user_unsubscribe_key', 'varchar(32) NOT NULL default "" COMMENT "A specific key, it is used when a user wants to unsubscribe from a post comments without signing in" AFTER user_notify_moderation' );
-		// Set users unsubscribe key
-		$sql = 'SELECT user_ID FROM T_users WHERE user_unsubscribe_key = ""';
-		$rows = $DB->get_results( $sql, OBJECT, 'Get users without unsubscribe link' );
+		// Set unsubscribe keys for existing users with no unsubscribe key
+		$sql = 'SELECT user_ID
+							FROM T_users
+						 WHERE user_unsubscribe_key = ""';
+		$rows = $DB->get_results( $sql, OBJECT, 'Get users with no unsubscribe key' );
 		foreach( $rows as $row )
 		{
 			$DB->query( 'UPDATE T_users
@@ -2960,7 +2962,7 @@ function upgrade_b2evo_tables()
 		task_end();
 
 		task_begin( 'Upgrading items table, add attend status...' );
-		db_add_col( 'T_items__item', 'post_attend_status', 'tinyint(1) NOT NULL default 0 COMMENT "Post author decision about allow users to attend this event" AFTER post_comment_status' );
+		db_add_col( 'T_items__item', 'post_attend_status', 'tinyint(1) NOT NULL default 0 COMMENT "Post owner\'s decision about allowing users to attend this event" AFTER post_comment_status' );
 		task_end();
 
 		task_begin( 'Upgrading settings table... ');
@@ -3192,6 +3194,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.404  2011/08/29 11:55:23  efy-asimo
+ * DB documentation
+ *
  * Revision 1.403  2011/08/29 08:51:14  efy-james
  * Default / mandatory additional fields
  *
