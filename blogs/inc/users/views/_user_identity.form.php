@@ -157,9 +157,11 @@ $group_msg_perm = $GroupCache->get_option_array( 'check_messaging_perm' );
 		var j = jQuery("#add_more_fields").parent().parent().siblings("fieldset[id^=ffield_new_uf_val]").length;
 		for( i = j + 1; i < j + 4; i++ ){
 			var strHtml = jQuery("#add_more_fields").parent().parent().prev().html();
-			strHtml = strHtml.replace(/new_uf_type_\d+/, "new_uf_type_" + i).replace(/new_uf_val_\d+/g, "new_uf_val_" + i);
+			strHtml = strHtml.replace(/new_uf_type_\d+/, "new_uf_type_" + i).replace(/new_uf_val_\d+/g, "new_uf_val_" + i)
+				.replace(/selected=\"selected\"/, "");
 			strHtml = '<fieldset id="ffield_new_uf_val_' + i + '">' + strHtml + '</fieldset>';
 			jQuery("#add_more_fields").parent().parent().before(strHtml);
+			jQuery("#new_uf_val_" + i).val("");
 		}
 		jQuery("input[name=new_fields_num]").val(j+3);
 	}
@@ -447,6 +449,8 @@ if ($edited_User->ID == 0) {
 	$user_id = param( 'user_ID', 'string', "" );
 	if ($user_id == "" || $user_id == 0 )
 		$user_id = param( 'orig_user_ID', 'string', "" );
+	if ($user_id == "" || $user_id == 0 )
+		$user_id = $edited_User->ID;
 } else
 	$user_id = $edited_User->ID;
 
@@ -493,6 +497,56 @@ $userfields = $DB->get_results( '
 
 	// Display existing field:
 	$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, 50, $userfield->ufdf_name, $field_note, array( 'maxlength' => 255 ) );
+}
+
+// Get recommended userfields:
+$userfields = $DB->get_results( '
+	SELECT '. $user_id .' as uf_ID, ufdf_ID, ufdf_type, ufdf_name, "" as uf_varchar
+	from T_users__fielddefs
+	where ufdf_required = "recommend" and ufdf_ID not in
+		( select uf_ufdf_ID
+			from T_users__fields
+			where uf_user_ID = '. $user_id .'
+		) order by ufdf_ID' );
+
+$i = 0;
+ foreach( $userfields as $userfield )
+{
+	$i++;
+	switch( $userfield->ufdf_ID )
+	{
+		case 10200:
+			$field_note = '<a href="aim:goim?screenname='.$userfield->uf_varchar.'&amp;message=Hello">'.get_icon( 'play', 'imgtag', array('title'=>T_('Instant Message to user')) ).'</a>';
+			break;
+
+		case 10300:
+			$field_note = '<a href="http://wwp.icq.com/scripts/search.dll?to='.$userfield->uf_varchar.'" target="_blank">'.get_icon( 'play', 'imgtag', array('title'=>T_('Search on ICQ.com')) ).'</a>';
+			break;
+
+		default:
+			if( $userfield->ufdf_ID >= 100000 && $userfield->ufdf_ID < 200000 )
+			{
+				$url = $userfield->uf_varchar;
+				if( !preg_match('#://#', $url) )
+				{
+					$url = 'http://'.$url;
+				}
+				$field_note = '<a href="'.$url.'" target="_blank">'.get_icon( 'play', 'imgtag', array('title'=>T_('Visit the site')) ).'</a>';
+			}
+			else
+			{
+				$field_note = '';
+			}
+	}
+
+	$uf_val = param( 'uf_rec_'.$i, 'string', NULL );
+	if( is_null( $uf_val ) )
+	{	// No value submitted yet, get DB val:
+		$uf_val = $userfield->uf_varchar;
+	}
+
+	// Display existing field:
+	$Form->text_input( 'uf_rec_'.$i, $uf_val, 50, $userfield->ufdf_name, $field_note, array( 'maxlength' => 255 ) );
 }
 
 // Get list of possible field types:
@@ -585,6 +639,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.29  2011/08/29 08:51:14  efy-james
+ * Default / mandatory additional fields
+ *
  * Revision 1.28  2011/08/26 08:34:37  efy-james
  * Duplicate additional fields when duplicating user
  *

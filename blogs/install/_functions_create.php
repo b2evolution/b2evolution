@@ -121,34 +121,34 @@ function create_default_data()
 	echo 'Creating user field definitions... ';
 	// fp> Anyone, please add anything you can think of. It's better to start with a large list that update it progressively.
 	$DB->query( "
-    INSERT INTO T_users__fielddefs (ufdf_ID, ufdf_type, ufdf_name)
-		 VALUES ( 10000, 'email',    'MSN/Live IM'),
-						( 10100, 'word',     'Yahoo IM'),
-						( 10200, 'word',     'AOL AIM'),
-						( 10300, 'number',   'ICQ ID'),
-						( 40000, 'phone',    'Skype'),
-						( 50000, 'phone',    'Main phone'),
-						( 50100, 'phone',    'Cell phone'),
-						( 50200, 'phone',    'Office phone'),
-						( 50300, 'phone',    'Home phone'),
-						( 60000, 'phone',    'Office FAX'),
-						( 60100, 'phone',    'Home FAX'),
-						(100000, 'url',      'Website'),
-						(100100, 'url',      'Blog'),
-						(110000, 'url',      'Linkedin'),
-						(120000, 'url',      'Twitter'),
-						(130100, 'url',      'Facebook'),
-						(130200, 'url',      'Myspace'),
-						(140000, 'url',      'Flickr'),
-						(150000, 'url',      'YouTube'),
-						(160000, 'url',      'Digg'),
-						(160100, 'url',      'StumbleUpon'),
-						(200000, 'text',     'Role'),
-						(200100, 'text',     'Organization'),
-						(200200, 'text',     'Division'),
-						(211000, 'text',     'VAT ID'),
-						(300000, 'text',     'Main address'),
-						(300300, 'text',     'Home address');" );
+    INSERT INTO T_users__fielddefs (ufdf_ID, ufdf_type, ufdf_name, ufdf_required)
+		 VALUES ( 10000, 'email',    'MSN/Live IM', 'optional'),
+						( 10100, 'word',     'Yahoo IM', 'optional'),
+						( 10200, 'word',     'AOL AIM', 'optional'),
+						( 10300, 'number',   'ICQ ID', 'optional'),
+						( 40000, 'phone',    'Skype', 'optional'),
+						( 50000, 'phone',    'Main phone', 'optional'),
+						( 50100, 'phone',    'Cell phone', 'optional'),
+						( 50200, 'phone',    'Office phone', 'optional'),
+						( 50300, 'phone',    'Home phone', 'optional'),
+						( 60000, 'phone',    'Office FAX', 'optional'),
+						( 60100, 'phone',    'Home FAX', 'optional'),
+						(100000, 'url',      'Website', 'recommend'),
+						(100100, 'url',      'Blog', 'optional'),
+						(110000, 'url',      'Linkedin', 'optional'),
+						(120000, 'url',      'Twitter', 'recommend'),
+						(130100, 'url',      'Facebook', 'recommend'),
+						(130200, 'url',      'Myspace', 'optional'),
+						(140000, 'url',      'Flickr', 'optional'),
+						(150000, 'url',      'YouTube', 'optional'),
+						(160000, 'url',      'Digg', 'optional'),
+						(160100, 'url',      'StumbleUpon', 'optional'),
+						(200000, 'text',     'Role', 'optional'),
+						(200100, 'text',     'Organization', 'optional'),
+						(200200, 'text',     'Division', 'optional'),
+						(211000, 'text',     'VAT ID', 'optional'),
+						(300000, 'text',     'Main address', 'optional'),
+						(300300, 'text',     'Home address', 'optional');" );
 	echo "OK.<br />\n";
 
 
@@ -1359,6 +1359,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.309  2011/08/29 08:51:14  efy-james
+ * Default / mandatory additional fields
+ *
  * Revision 1.308  2011/08/26 08:00:24  efy-asimo
  * Change basic users default membership on install
  *

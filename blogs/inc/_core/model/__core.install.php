@@ -130,6 +130,7 @@ $schema_queries = array(
 			ufdf_ID int(10) unsigned NOT NULL,
 			ufdf_type char(8) NOT NULL,
 			ufdf_name varchar(255) NOT NULL,
+		  ufdf_required enum('hidden','optional','recommend','require') NOT NULL default 'optional',
 			PRIMARY KEY (ufdf_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -140,7 +141,7 @@ $schema_queries = array(
 		  uf_user_ID int(10) unsigned NOT NULL,
 		  uf_ufdf_ID int(10) unsigned NOT NULL,
 		  uf_varchar varchar(255) NOT NULL,
-		  PRIMARY KEY (uf_ID)
+			PRIMARY KEY (uf_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_locales' => array(
@@ -285,6 +286,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.58  2011/08/29 08:51:14  efy-james
+ * Default / mandatory additional fields
+ *
  * Revision 1.57  2011/08/25 07:31:14  efy-asimo
  * DB documentation
  *

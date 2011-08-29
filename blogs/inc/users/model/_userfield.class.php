@@ -42,6 +42,7 @@ class Userfield extends DataObject
 {
 	var $type = '';
 	var $name = '';
+	var $required = '';
 
 	/**
 	 * Constructor
@@ -65,6 +66,7 @@ class Userfield extends DataObject
 			$this->ID            = $db_row->ufdf_ID;
 			$this->type          = $db_row->ufdf_type;
 			$this->name          = $db_row->ufdf_name;
+			$this->required      = $db_row->ufdf_required;
 		}
 		else
 		{	// Create a new user field:
@@ -89,6 +91,15 @@ class Userfield extends DataObject
 		 );
 	}
 
+		function get_requireds()
+	{
+		return array(
+			array( 'value' => 'hidden', 'label' => T_('Hidden') ),
+			array( 'value' => 'optional', 'label' => T_('Optional') ),
+			array( 'value' => 'recommend', 'label' => T_('Recommended') ),
+			array( 'value' => 'required', 'label' => T_('Required') ),
+		 );
+	}
 
 	/**
 	 * Load data from Request form fields.
@@ -112,6 +123,10 @@ class Userfield extends DataObject
 		param_string_not_empty( 'ufdf_name', T_('Please enter a name.') );
 		$this->set_from_Request( 'name' );
 
+		// Required
+		param_string_not_empty( 'ufdf_required', T_('Please select Hidden, Optional, Recommended or Required.') );
+		$this->set_from_Request( 'required' );
+
 		return ! param_errors_detected();
 	}
 
@@ -130,6 +145,7 @@ class Userfield extends DataObject
 		{
 			case 'type':
 			case 'name':
+			case 'required':
 			default:
 				$this->set_param( $parname, 'string', $parvalue );
 		}

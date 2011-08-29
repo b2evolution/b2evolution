@@ -47,7 +47,7 @@ $SQL->FROM( 'T_users__fielddefs' );
 if( !empty($s) )
 {	// We want to filter on search keyword:
 	// Note: we use CONCAT_WS (Concat With Separator) because CONCAT returns NULL if any arg is NULL
-	$SQL->WHERE_and( 'CONCAT_WS( " ", ufdf_name ) LIKE "%'.$DB->escape($s).'%"' );
+	$SQL->WHERE_and( 'CONCAT_WS( " ", ufdf_name, ufdf_required ) LIKE "%'.$DB->escape($s).'%"' );
 }
 
 if( !empty( $s_type ) )
@@ -112,6 +112,12 @@ $Results->cols[] = array(
 		'td' => '$ufdf_name$',
 	);
 
+$Results->cols[] = array(
+		'th' => T_('Required?'),
+		'order' => 'ufdf_required',
+		'td' => '$ufdf_required$',
+	);
+
 if( $current_User->check_perm( 'users', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
@@ -136,6 +142,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.13  2011/08/29 08:51:14  efy-james
+ * Default / mandatory additional fields
+ *
  * Revision 1.12  2010/05/07 08:07:14  efy-asimo
  * Permissions check update (User tab, Global Settings tab) - bugfix
  *

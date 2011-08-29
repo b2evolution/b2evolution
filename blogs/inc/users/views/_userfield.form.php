@@ -66,6 +66,12 @@ $Form->begin_form( 'fform', $creating ?  T_('New user field') : T_('User field')
 		T_('Type'), '', array( 'required'=>true ) );
 
 	$Form->text_input( 'ufdf_name', $edited_Userfield->name, 50, T_('Name'), '', array( 'maxlength'=> 255, 'required'=>true ) );
+	if ($edited_Userfield->required)
+		$Form->radio_input( 'ufdf_required', $edited_Userfield->required, $edited_Userfield->get_requireds(),
+		T_('Required?'), array( 'required'=>true ) );
+	else
+		$Form->radio_input( 'ufdf_required', 'optional', $edited_Userfield->get_requireds(),
+		T_('Required?'), array( 'required'=>true ) );
 
 if( $creating )
 {
@@ -82,6 +88,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.8  2011/08/29 08:51:14  efy-james
+ * Default / mandatory additional fields
+ *
  * Revision 1.7  2010/01/03 17:45:21  fplanque
  * crumbs & stuff
  *

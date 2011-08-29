@@ -323,6 +323,26 @@ class User extends DataObject
 				$this->userfield_update( $userfield_ID, $uf_val );
 			}
 
+			// Recommend fields
+			$userfields = $DB->get_results( '
+				SELECT ufdf_ID
+				from T_users__fielddefs
+				where ufdf_required = "recommend" and ufdf_ID not in
+					( select uf_ufdf_ID
+						from T_users__fields
+						where uf_user_ID = '. $this->ID .'
+					) order by ufdf_ID' );
+			$i = 1;
+			foreach( $userfields as $userfield )
+			{
+				$uf_val = param( 'uf_rec_'.$i++, 'string', '' );
+				$uf_type = $userfield->ufdf_ID;
+				if( !empty($uf_val) )
+				{
+					$this->userfield_add( $uf_type, $uf_val );
+				}
+			}
+
 			// Duplicate fields:  
 			if ($this->ID == 0) {
 				$user_id = param( 'orig_user_ID', 'string', "" );
@@ -2149,14 +2169,14 @@ class User extends DataObject
 		global $DB;
 
 		if( !isset($this->userfield_defs) )
-		{
+		{	
 			$userfield_defs = $DB->get_results( '
-				SELECT ufdf_ID, ufdf_type, ufdf_name
+				SELECT ufdf_ID, ufdf_type, ufdf_name, ufdf_required
 					FROM T_users__fielddefs' );
 
 			foreach( $userfield_defs as $userfield_def )
 			{
-				$this->userfield_defs[$userfield_def->ufdf_ID] = array( $userfield_def->ufdf_type, $userfield_def->ufdf_name );
+				$this->userfield_defs[$userfield_def->ufdf_ID] = array( $userfield_def->ufdf_type, $userfield_def->ufdf_name, $userfield_def->ufdf_required ); //jamesz
 			}
 		}
 	}
@@ -2387,6 +2407,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.106  2011/08/29 08:51:14  efy-james
+ * Default / mandatory additional fields
+ *
  * Revision 1.105  2011/08/26 08:34:37  efy-james
  * Duplicate additional fields when duplicating user
  *

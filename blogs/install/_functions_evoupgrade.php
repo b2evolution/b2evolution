@@ -2982,6 +2982,15 @@ function upgrade_b2evo_tables()
 									WHERE post_content LIKE "%<!--noteaser-->%"' );
 
 		task_end();
+
+		task_begin( 'Upgrading user fields def table for required field...' );
+		$DB->query( 'ALTER TABLE T_users__fielddefs
+						ADD COLUMN ufdf_required enum("hidden","optional","recommend","require") NOT NULL default "optional"');
+		$DB->query( 'UPDATE T_users__fielddefs
+										SET ufdf_required = "recommend"
+									WHERE ufdf_name in ("Website", "Twitter", "Facebook") ' );
+		task_end();
+		
 		set_upgrade_checkpoint( '10300' );
 	}
 
@@ -3183,6 +3192,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.403  2011/08/29 08:51:14  efy-james
+ * Default / mandatory additional fields
+ *
  * Revision 1.402  2011/08/25 13:20:23  efy-james
  * Add checkbox for no teaser
  *
