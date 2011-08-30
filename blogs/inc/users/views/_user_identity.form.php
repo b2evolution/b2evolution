@@ -161,11 +161,118 @@ $group_msg_perm = $GroupCache->get_option_array( 'check_messaging_perm' );
 				.replace(/selected=\"selected\"/, "");
 			strHtml = '<fieldset id="ffield_new_uf_val_' + i + '">' + strHtml + '</fieldset>';
 			jQuery("#add_more_fields").parent().parent().before(strHtml);
-			jQuery("#new_uf_val_" + i).val("");
+			area2input(jQuery("#new_uf_val_" + i));
+			jQuery("#new_uf_val_" + i).val("").next().text("");
 		}
 		jQuery("input[name=new_fields_num]").val(j+3);
+		inputhint();
 	}
-	
+
+
+	// Switch from input to textarea
+	function input2area(el) {
+		if (el) {
+			strHtml = '<textarea cols="25" rows="3" name="' + el.attr("name") + '" id="' + el.attr("id")
+				+ '" >' + el.val().replace(/\|/g, "\n") + '</textarea>';
+			el.replaceWith(strHtml);
+		}
+	}
+
+	// Switch from textarea to input
+	function area2input(el) {
+		if (el) {
+			strHtml = '<input type="text" class="form_text_input" size="30" maxlength="255" name="'
+				+ el.attr("name") + '" id="' + el.attr("id") + '" value="' + el.val().replace(/\n/g, "|") + '"></textarea>';
+			el.replaceWith(strHtml);
+		}
+	}
+
+	// Switch between input and textarea automatically
+	function inputhint() {
+		$('select[name*="type"]').change(function(e){
+			var group = $(this).children("optgroup").children('option[value='+$(this).val()+']').parent().attr("label");
+			switch(group) {
+				case '<?php echo T_("Instant Messaging") ?>' :
+					{
+						$(this).parent().next().children("span").text("Please enter an instant messaging account name.");
+						area2input($(this).parent().next().children("textarea"));
+						break;
+					}
+				case '<?php echo T_("Phone") ?>' :
+					{
+						$(this).parent().next().children("span").text("Please enter a phone number.");
+						area2input($(this).parent().next().children("textarea"));
+						break;
+					}
+				case '<?php echo T_("Web") ?>' :
+					{
+						$(this).parent().next().children("span").text("Please enter a web page address like http://www.abc.com/");
+						area2input($(this).parent().next().children("textarea"));
+						break;
+					}
+				case '<?php echo T_("Organization") ?>' :
+					{
+						$(this).parent().next().children("span").text(" ");
+						area2input($(this).parent().next().children("textarea"));
+						break;
+					}
+				case '<?php echo T_("Address") ?>' :
+					{
+						$(this).parent().next().children("span").text("Please enter a postal address.");
+						input2area($(this).parent().next().children("input"));
+						break;
+					}
+				default :
+					$(this).parent().next().children("span").text(" ");
+					area2input($(this).parent().next().children("textarea"));
+			}
+		});
+	}
+
+	jQuery(function(){
+		// Initialize the new fields
+		$('select[name*="type"]').each(function(){
+			var group = $(this).children("optgroup").children('option[value='+$(this).val()+']').parent().attr("label");
+			switch(group) {
+				case '<?php echo T_("Instant Messaging") ?>' :
+					{
+						$(this).parent().next().children("span").text("Please enter an instant messaging account name.");
+						break;
+					}
+				case '<?php echo T_("Phone") ?>' :
+					{
+						$(this).parent().next().children("span").text("Please enter a phone number.");
+						break;
+					}
+				case '<?php echo T_("Web") ?>' :
+					{
+						$(this).parent().next().children("span").text("Please enter a web page address like http://www.abc.com/");
+						break;
+					}
+				case '<?php echo T_("Organization") ?>' :
+					{
+						$(this).parent().next().children("span").text(" ");
+						break;
+					}
+				case '<?php echo T_("Address") ?>' :
+					{
+						$(this).parent().next().children("span").text("Please enter a postal address.");
+						input2area($(this).parent().next().children("input"));
+						break;
+					}
+			}
+		});
+
+		inputhint();
+
+		$('#user_checkchanges').submit(function(){
+			$("textarea").each(function(){
+				area2input($(this));
+			});
+		});
+	});
+
+
 </script>
 <?php
 
@@ -586,7 +693,7 @@ for( $i=1; $i<=3; $i++ )
 	}
 	$label .= '</optgroup></select>';
 
-	$Form->text_input( 'new_uf_val_'.$i, param( 'new_uf_val_'.$i, 'string', '' ), 30, $label, '', array('maxlength' => 255, 'clickable_label'=>false) );
+	$Form->text_input( 'new_uf_val_'.$i, param( 'new_uf_val_'.$i, 'string', '' ), 30, $label, ' ', array('maxlength' => 255, 'clickable_label'=>false) );
 }
 
 $Form->info( '', '<a id="add_more_fields" href="javascript:add_more_fields()">+ add more fields</a>' );
@@ -639,6 +746,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.30  2011/08/30 06:45:34  efy-james
+ * User field type intelligence
+ *
  * Revision 1.29  2011/08/29 08:51:14  efy-james
  * Default / mandatory additional fields
  *

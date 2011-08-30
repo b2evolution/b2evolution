@@ -369,7 +369,8 @@ class User extends DataObject
 			for( $i=1; $i<=$new_fields_num; $i++ )
 			{	// new fields:
 				$new_uf_type = param( 'new_uf_type_'.$i, 'integer', '' );
-				$new_uf_val = param( 'new_uf_val_'.$i, 'string', '' );
+				$new_uf_val = param( 'new_uf_val_'.$i, 'text', '' );
+				$new_uf_val = preg_replace( "~(\n)~", "|", $new_uf_val );
 				if( empty($new_uf_type) && empty($new_uf_val) )
 				{
 					continue;
@@ -2407,6 +2408,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.107  2011/08/30 06:45:34  efy-james
+ * User field type intelligence
+ *
  * Revision 1.106  2011/08/29 08:51:14  efy-james
  * Default / mandatory additional fields
  *
