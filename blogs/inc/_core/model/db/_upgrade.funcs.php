@@ -256,12 +256,13 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 
 		$flds = array();
 		$in_parens = 0;
+		$in_quote = false;
 		$buffer = '';
 		for( $i = 0; $i < strlen($qryline); $i++ )
 		{
 			$c = $qryline[$i];
 
-			if( $c == ',' && ! $in_parens )
+			if( ( $c == ',' ) && ( ! $in_parens ) && ( ! $in_quote ) )
 			{ // split here:
 				$flds[] = trim($buffer);
 				$buffer = '';
@@ -275,6 +276,12 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 			elseif( $c == ')' )
 			{
 				$in_parens--;
+			}
+
+			if( ( ! $in_parens ) && ( $c == "'" ) && ( $qryline[$i - 1] != '\\' ) )
+			{ // Text between quotation marks outside from parentheses, must be in a field COMMENT
+				// Commas in field comments are not separating two fields, so don't split there.
+				$in_quote = ! $in_quote;
 			}
 
 			$buffer .= $c;
@@ -1267,6 +1274,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.19  2011/08/30 06:41:56  efy-asimo
+ * Fix ALTER requests on automatic update when there is a COMMENT
+ *
  * Revision 1.18  2010/05/15 22:18:20  blueyed
  * db_delta: add failing test_field_collate_changes test. COLLATE attribute for e.g. VARCHAR gets not looked at.
  *
