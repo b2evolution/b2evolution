@@ -811,7 +811,7 @@ function do_install_htaccess( $upgrade = false )
 	$info = array();
 	if( ! $remote_page = fetch_remote_page( $baseurl.'install/test/', $info ) )
 	{
-		return $info[error];
+		return $info['error'];
 	}
 	if( substr( $remote_page, 0, 16 ) != 'Test successful.' )
 	{
@@ -846,6 +846,9 @@ function get_antispam_query()
 
 /*
  * $Log$
+ * Revision 1.100  2011/08/31 21:42:10  sam2kb
+ * minor
+ *
  * Revision 1.99  2011/01/02 02:20:25  sam2kb
  * typo: explicitely => explicitly
  *
