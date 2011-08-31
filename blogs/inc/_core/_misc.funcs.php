@@ -3990,7 +3990,6 @@ function & get_IconLegend()
  */
 function get_active_opcode_cache()
 {
-
 	if( function_exists('apc_cache_info') && ini_get('apc.enabled') ) # disabled for CLI (see apc.enable_cli), however: just use this setting and do not call the function.
 	{
 		// fp>blueyed? why did you remove the following 2 lines? your comment above is not clear.
@@ -4005,6 +4004,15 @@ function get_active_opcode_cache()
 	if( ini_get('xcache.size') > 0 )
 	{
 		return 'xcache';
+	}
+
+	if( ini_get('eaccelerator.enable') )
+	{
+		$eac_info = eaccelerator_info();
+		if( $eac_info['cache'] )
+		{
+			return 'eAccelerator';
+		}
 	}
 
 	return 'none';
@@ -4188,6 +4196,9 @@ function sanitize_id_list( $str, $return_array = false, $quote = false )
 
 /*
  * $Log$
+ * Revision 1.259  2011/08/31 23:51:19  sam2kb
+ * Added eAccelerator to get_active_opcode_cache
+ *
  * Revision 1.258  2011/08/26 03:15:52  sam2kb
  * minor/doc
  *
