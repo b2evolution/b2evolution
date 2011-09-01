@@ -1381,6 +1381,10 @@ function process_upload( $root, $path, $create_path_dirs = false, $check_perms =
 			$uploadedFiles[] = $newFile;
 		}
 	}
+	else
+	{ // there wasn't any file upload
+		return NULL;
+	}
 
 	return array( 'uploadedFiles' => $uploadedFiles, 'failedFiles' => $failedFiles, 'renamedFiles' => $renamedFiles, 'renamedMessages' => $renamedMessages );
 }
@@ -1491,6 +1495,9 @@ function remove_orphan_files( $file_ids = NULL, $older_then = NULL )
 
 /*
  * $Log$
+ * Revision 1.57  2011/09/01 07:31:33  efy-asimo
+ * Fix notices when sending a comment through the backoffice
+ *
  * Revision 1.56  2011/04/28 14:07:58  efy-asimo
  * multiple file upload
  *
