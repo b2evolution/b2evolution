@@ -731,6 +731,10 @@ div.bCommentdeprecated div.CommentActionsArea {
 	border-bottom: 1px solid #000;
 }
 
+div.bCommenttrash {
+	background-color: #fcc;
+}
+
 .bPostredirected {
 	border: 1px solid #639;
 	background-color: #dcf;
