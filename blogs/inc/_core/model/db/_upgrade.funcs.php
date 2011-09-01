@@ -407,33 +407,40 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 
 			if( preg_match( '~ \b UNIQUE (?:\s+ KEY)? \b ~ix ', $parse, $match ) )
 			{ // This has an "inline" UNIQUE index:
-				$indices[] = array(
-						'name' => $fieldname_lowered,
-						'is_PK' => false,
-						'create_definition' => NULL, // "inline"
-						'col_names' => array($fieldname_lowered),
-						'keyword' => NULL,
-						#'type' => $match[3], // "USING [type_name]"
-					);
+				if( ! is_in_quote( $parse, ' '.$match[0] ) )
+				{ // isn't between quotation marks, so it must be a primary key.
+					$indices[] = array(
+							'name' => $fieldname_lowered,
+							'is_PK' => false,
+							'create_definition' => NULL, // "inline"
+							'col_names' => array($fieldname_lowered),
+							'keyword' => NULL,
+							#'type' => $match[3], // "USING [type_name]"
+						);
 
-				unset( $obsolete_indices[strtoupper($fieldname_lowered)] );
-				$parse = str_replace( $match[0], '', $parse );
-				$fields_with_keys[] = $fieldname_lowered;
+					unset( $obsolete_indices[strtoupper($fieldname_lowered)] );
+					$parse = str_replace( $match[0], '', $parse );
+					$fields_with_keys[] = $fieldname_lowered;
+				}
 			}
 
 			if( preg_match( '~ \b (PRIMARY\s+)? KEY \b ~ix', $parse, $match ) )
 			{ // inline PK:
-				$indices[] = array(
-						'name' => 'PRIMARY',
-						'is_PK' => true,
-						'create_definition' => NULL, // "inline"
-						'col_names' => array($fieldname_lowered),
-						'keyword' => NULL,
-						#'type' => $match[3], // "USING [type_name]"
-					);
-				$fields_with_keys[] = $fieldname_lowered;
-				$primary_key_fields = array($fieldname_lowered);
-				unset( $obsolete_indices['PRIMARY'] );
+				// Check if this key is between quotation marks
+				if( ! is_in_quote( $parse, ' '.$match[0] ) )
+				{ // it isn't between quotation marks, so it must be a primary key.
+					$indices[] = array(
+							'name' => 'PRIMARY',
+							'is_PK' => true,
+							'create_definition' => NULL, // "inline"
+							'col_names' => array($fieldname_lowered),
+							'keyword' => NULL,
+							#'type' => $match[3], // "USING [type_name]"
+						);
+					$fields_with_keys[] = $fieldname_lowered;
+					$primary_key_fields = array($fieldname_lowered);
+					unset( $obsolete_indices['PRIMARY'] );
+				}
 			}
 		}
 		$fields_with_keys = array_unique($fields_with_keys);
@@ -546,7 +553,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 
 
 		// Fetch the table column structure from the database
-		$tablefields = $DB->get_results( 'DESCRIBE '.$table );
+		$tablefields = $DB->get_results( 'SHOW FULL COLUMNS FROM '.$table );
 
 
 		// If "drop_column" is not excluded we have to check if all existing cols would get dropped,
@@ -741,10 +748,14 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 			$has_inline_primary_key = false;
 			if( preg_match( '~^(.*) \b (?: (UNIQUE) (?:\s+ (?:INDEX|KEY))? | (?:PRIMARY \s+)? KEY ) \b (.*)$~ix', $field_to_parse, $match ) )
 			{ // fields got added to primary_key_fields and fields_with_keys before
-				$field_to_parse = $match[1].$match[3];
-				if( empty($match[2]) )
-				{
-					$has_inline_primary_key = true; // we need to DROP the PK if this column definition does not match
+				// Check if this key is between quotation marks
+				if( ! has_open_quote( $match[1] ) )
+				{ // is not between quotation marks, so it must be a key.
+					$field_to_parse = $match[1].$match[3];
+					if( empty($match[2]) )
+					{
+						$has_inline_primary_key = true; // we need to DROP the PK if this column definition does not match
+					}
 				}
 			}
 
@@ -849,6 +860,26 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 					$change_null = $want_null;
 				}
 			}
+
+
+			// COMMENT ( check if there is difference in field comment )
+			if( preg_match( '~^(.*?) \s COMMENT \s+ (?: (?: (["\']) (.*?) \2 ) ) (\s .*)?$~ix', $field_to_parse, $match ) )
+			{
+				if( isset($match[4]) && $match[4] !== '' )
+				{
+					$want_comment = $match[4];
+				}
+				else
+				{
+					$want_comment = $match[3];
+				}
+
+				$want_comment = stripslashes( $want_comment );
+				$type_matches = $tablefield->Comment == $want_comment;
+
+				$field_to_parse = $match[1].( isset($match[5]) ? $match[5] : '' );
+			}
+
 
 			// TODO: "COLLATE" and other attribute handling should happen here, based on $field_to_parse
 
@@ -1272,8 +1303,52 @@ function install_make_db_schema_current( $display = true )
 }
 
 
+/**
+ * Check if needle is between quotation mark in the subject
+ * 
+ * @param string subject
+ * @param string needle
+ * @return boolean true if is between quotation mark, false otherwise
+ */
+function is_in_quote( $subject, $needle )
+{
+	$length = strpos( $subject, $needle );
+	if( $length === false )
+	{ // needle is not in the subject
+		return false;
+	}
+
+	$quote_count = substr_count( $subject, "'", 0, $length );
+	if( $quote_count > 0 )
+	{
+		$quote_count = $quote_count - substr_count( $subject, "\'", 0, $length );
+	}
+	return ( $quote_count % 2 );
+}
+
+
+/**
+ * Check if this subject has not closed ' character
+ * 
+ * @param $subject
+ * @return boolean true if has not closed ' character, false otherwise
+ */
+function has_open_quote( $subject )
+{
+	$quote_count = substr_count( $subject, "'" );
+	if( $quote_count > 0 )
+	{
+		$quote_count = $quote_count - substr_count( $subject, "\'" );
+	}
+	return ( $quote_count % 2 );
+}
+
+
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.20  2011/09/01 06:45:49  efy-asimo
+ * Auto upgrade DB - Check differences between fields COMMENT
+ *
  * Revision 1.19  2011/08/30 06:41:56  efy-asimo
  * Fix ALTER requests on automatic update when there is a COMMENT
  *
