@@ -732,7 +732,23 @@ div.bCommentdeprecated div.CommentActionsArea {
 }
 
 div.bCommenttrash {
+	border: 1px solid #f66;
 	background-color: #fcc;
+}
+div.bCommenttrash > div.bSmallHead /* Direct child only */
+{
+	background-color: #faa;
+	border-bottom: 1px solid #f66;
+}
+div.bCommenttrash div.CommentActionsArea {
+	border: none;
+	border-top: 1px solid #f66;
+	background-color: #faa;
+}
+div.bCommenttrash span.bStatus,
+.status_trash {
+	color: #f66;
+	background-color: #faa;
 }
 
 .bPostredirected {
