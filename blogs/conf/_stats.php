@@ -83,7 +83,6 @@ $blackList = array(
 );
 
 
-
 /**
  * UserAgent identifiers for logging/statistics
  *

@@ -41,7 +41,7 @@ class facebook_plugin extends Plugin
 	{
 		$this->name = T_( 'Facebook Like Widget' );
 		$this->short_desc = T_('This skin tag displays a Facebook Like button.');
-		$this->long_desc = T_('Shows how many users like the corresponding content.');
+		$this->long_desc = T_('Shows how many users like the current page.');
 	}
 
 	/**
@@ -64,7 +64,10 @@ class facebook_plugin extends Plugin
 		$current_url = url_absolute( regenerate_url( '', '', '', '&' ), $baseurlroot );
 
 		echo $params['block_start'];
-		echo '<iframe src="http://www.facebook.com/plugins/like.php?href='.urlencode($current_url).'&amp;layout=standard&amp;show_faces=true&amp;width=450&amp;action=like&amp;font=arial&amp;colorscheme=light&amp;height=80" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:450px; height:80px;" allowTransparency="true"></iframe>';
+		echo '<iframe src="http://www.facebook.com/plugins/like.php?href='.urlencode($current_url)
+					.'&amp;layout=standard&amp;show_faces=true&amp;width=190&amp;action=like&amp;font=arial&amp;colorscheme=light&amp;height=66" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:190px; height:66px;" 
+					allowTransparency="true"></iframe>';
 		echo $params['block_end'];
 
 		return true;
@@ -74,6 +77,9 @@ class facebook_plugin extends Plugin
 
 /**
  * $Log$
+ * Revision 1.2  2011/09/04 20:59:40  fplanque
+ * cleanup
+ *
  * Revision 1.1  2010/09/03 07:45:27  efy-asimo
  * Facebook like button
  *

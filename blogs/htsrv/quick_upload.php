@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements files quick upload
+ * This file implements the AJAX concurrent file uploader
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -194,6 +194,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.6  2011/09/04 20:59:40  fplanque
+ * cleanup
+ *
  * Revision 1.5  2011/05/06 07:04:45  efy-asimo
  * multiupload ui update
  *

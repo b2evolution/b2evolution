@@ -221,7 +221,7 @@ $instance_name = 'b2evo'; // MUST BE A SINGLE WORD! NO SPACES!!
  *
  * @global string Default: $instance_name.'@'.$basehost;
  */
-$notify_from = 'noreply@'.preg_replace( '/^www\./i', '', $basehost );
+$notify_from = $instance_name.'-noreply@'.preg_replace( '/^www\./i', '', $basehost );
 
 
 // ** DB options **
