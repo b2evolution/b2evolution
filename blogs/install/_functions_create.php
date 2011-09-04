@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}
  * Parts of this file are copyright (c)2005 by Jason EDGECOMBE
  *
@@ -1356,6 +1356,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.311  2011/09/04 22:13:23  fplanque
+ * copyright 2011
+ *
  * Revision 1.310  2011/08/29 12:40:17  efy-asimo
  * Change basic users default membership on install - fix
  *

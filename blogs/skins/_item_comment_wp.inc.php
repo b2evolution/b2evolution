@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -102,6 +102,9 @@ $Comment = & $params['Comment'];
 
 /*
  * $Log$
+ * Revision 1.6  2011/09/04 22:13:24  fplanque
+ * copyright 2011
+ *
  * Revision 1.5  2010/02/08 17:56:12  efy-yury
  * copyright 2009 -> 2010
  *

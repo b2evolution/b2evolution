@@ -23,7 +23,7 @@
  * @author Stephan Knauss
  * @author tblue246: Tilman Blumenbach
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  * This file built upon code from original b2 - http://cafelog.com/
  *
  * @todo check different encodings. only tested with iso-8859-1
@@ -725,6 +725,9 @@ if( $test > 0 )
 
 /*
  * $Log$
+ * Revision 1.50  2011/09/04 22:13:12  fplanque
+ * copyright 2011
+ *
  * Revision 1.49  2011/04/01 15:41:50  sam2kb
  * Load Item class
  *

@@ -2,7 +2,7 @@
 /**
  * This is the install file for the collections module
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  *
@@ -375,6 +375,9 @@ $schema_queries = array_merge( $schema_queries, array(
 
 /*
  * $Log$
+ * Revision 1.34  2011/09/04 22:13:14  fplanque
+ * copyright 2011
+ *
  * Revision 1.33  2011/09/04 21:32:16  fplanque
  * minor MFB 4-1
  *

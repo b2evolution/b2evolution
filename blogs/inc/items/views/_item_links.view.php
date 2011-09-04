@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -250,6 +250,9 @@ $Results->display( $AdminUI->get_template( 'compact_results' ) );
 
 /*
  * $Log$
+ * Revision 1.20  2011/09/04 22:13:17  fplanque
+ * copyright 2011
+ *
  * Revision 1.19  2011/01/18 16:23:03  efy-asimo
  * add shared_root perm and refactor file perms - part1
  *

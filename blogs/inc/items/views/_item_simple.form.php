@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -287,6 +287,9 @@ echo_autocomplete_tags();
 
 /*
  * $Log$
+ * Revision 1.46  2011/09/04 22:13:17  fplanque
+ * copyright 2011
+ *
  * Revision 1.45  2011/08/24 12:16:43  efy-james
  * Add checkbox for hide teaser
  *

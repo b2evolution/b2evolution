@@ -15,13 +15,13 @@ $app_shortname = 'b2evo';
  * Note: This has to be compatible with {@link http://us2.php.net/en/version-compare}.
  * @global string
  */
-$app_version = '4.1.0-beta';
+$app_version = '4.2.0-beta';
 
 /**
  * Release date (ISO)
  * @global string
  */
-$app_date = '2011-08-25';
+$app_date = '2011-09-04';
 
 /**
  * This is used to check if the database is up to date.
@@ -45,7 +45,7 @@ $app_footer_text = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolu
 
 $copyright_text ='<span class="nobr">&copy;2001-2002 by Michel V &amp; others</span>
 		&ndash;
-		<span class="nobr">&copy;2003-2010 by <a href="http://fplanque.net/">Fran&ccedil;ois</a> <a href="http://fplanque.com/">Planque</a> &amp; <a href="http://b2evolution.net/dev/authors.html">others</a>.</span>';
+		<span class="nobr">&copy;2003-2011 by <a href="http://fplanque.net/">Fran&ccedil;ois</a> <a href="http://fplanque.com/">Planque</a> &amp; <a href="http://b2evolution.net/dev/authors.html">others</a>.</span>';
 
 /**
  * Modules to load

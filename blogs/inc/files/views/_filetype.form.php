@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -116,6 +116,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.9  2011/09/04 22:13:16  fplanque
+ * copyright 2011
+ *
  * Revision 1.8  2011/03/10 14:54:18  efy-asimo
  * Allow file types modification & add m4v file type
  *

@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -291,6 +291,9 @@ require $adminskins_path.'login/_reg_form.main.php';
 
 /*
  * $Log$
+ * Revision 1.111  2011/09/04 22:13:13  fplanque
+ * copyright 2011
+ *
  * Revision 1.110  2011/06/14 13:33:55  efy-asimo
  * in-skin register
  *

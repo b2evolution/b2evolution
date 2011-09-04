@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -270,6 +270,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.12  2011/09/04 22:13:18  fplanque
+ * copyright 2011
+ *
  * Revision 1.11  2011/05/23 03:15:52  sam2kb
  * minor
  *

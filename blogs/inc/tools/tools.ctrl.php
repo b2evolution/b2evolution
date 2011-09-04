@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  * @author blueyed: Daniel HAHLER
@@ -503,6 +503,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.43  2011/09/04 22:13:21  fplanque
+ * copyright 2011
+ *
  * Revision 1.42  2011/09/04 21:32:17  fplanque
  * minor MFB 4-1
  *

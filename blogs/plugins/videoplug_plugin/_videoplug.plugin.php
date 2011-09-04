@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -179,6 +179,9 @@ class videoplug_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.25  2011/09/04 22:13:23  fplanque
+ * copyright 2011
+ *
  * Revision 1.24  2010/05/02 16:10:40  fplanque
  * minor
  *

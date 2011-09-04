@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -40,6 +40,9 @@ echo '<div class="clear"></div>';
 
 /*
  * $Log$
+ * Revision 1.9  2011/09/04 22:13:20  fplanque
+ * copyright 2011
+ *
  * Revision 1.8  2010/06/01 02:44:44  sam2kb
  * New hooks added: GetCollectionKinds and InitCollectionKinds.
  * Use them to define new and override existing presets for new blogs.

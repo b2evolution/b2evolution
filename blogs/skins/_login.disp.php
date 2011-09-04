@@ -4,7 +4,7 @@
  *
  * This file is not meant to be called directly.
  * 
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evocore
  *
@@ -142,6 +142,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.9  2011/09/04 22:13:24  fplanque
+ * copyright 2011
+ *
  * Revision 1.8  2011/08/29 09:32:22  efy-james
  * Add ip on login form
  *

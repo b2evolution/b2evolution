@@ -5,7 +5,7 @@
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal Open Source relicensing agreement:
  * }}
@@ -289,6 +289,9 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 /*
  * $Log$
+ * Revision 1.43  2011/09/04 22:13:15  fplanque
+ * copyright 2011
+ *
  * Revision 1.42  2011/03/15 09:34:05  efy-asimo
  * have checkboxes for enabling caching in new blogs
  * refactorize cache create/enable/disable

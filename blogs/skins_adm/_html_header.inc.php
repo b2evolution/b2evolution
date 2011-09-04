@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -279,6 +279,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.37  2011/09/04 22:13:25  fplanque
+ * copyright 2011
+ *
  * Revision 1.36  2010/10/22 15:09:57  efy-asimo
  * Remove autoloading datepciker css, instead load before every usage, also remove jquery-ui.css load
  *

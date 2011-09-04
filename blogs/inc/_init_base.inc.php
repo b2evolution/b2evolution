@@ -8,7 +8,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -280,6 +280,9 @@ $Timer->pause( '_init_base' );
 
 /*
  * $Log$
+ * Revision 1.6  2011/09/04 22:13:13  fplanque
+ * copyright 2011
+ *
  * Revision 1.5  2011/02/14 14:13:24  efy-asimo
  * Comments trash status
  *

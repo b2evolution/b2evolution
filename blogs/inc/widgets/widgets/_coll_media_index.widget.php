@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -301,6 +301,9 @@ class coll_media_index_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.25  2011/09/04 22:13:21  fplanque
+ * copyright 2011
+ *
  * Revision 1.24  2011/01/10 05:08:55  sam2kb
  * Don't display widget title if no images found
  *

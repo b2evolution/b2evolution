@@ -9,7 +9,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -224,6 +224,9 @@ require $inc_path.$ctrl_mappings[$ctrl];
 
 /*
  * $Log$
+ * Revision 1.39  2011/09/04 22:13:12  fplanque
+ * copyright 2011
+ *
  * Revision 1.38  2011/02/15 15:36:59  efy-asimo
  * Change access to admin permission
  *

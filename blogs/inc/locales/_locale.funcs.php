@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -1133,6 +1133,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.48  2011/09/04 22:13:18  fplanque
+ * copyright 2011
+ *
  * Revision 1.47  2011/03/02 00:52:01  fplanque
  * added @author tag
  *

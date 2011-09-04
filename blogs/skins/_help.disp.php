@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -27,6 +27,9 @@ echo '<p><a href="http://manual.b2evolution.net/Content_issues">'.T_('What to do
 
 /*
  * $Log$
+ * Revision 1.3  2011/09/04 22:13:24  fplanque
+ * copyright 2011
+ *
  * Revision 1.2  2010/02/08 17:56:10  efy-yury
  * copyright 2009 -> 2010
  *

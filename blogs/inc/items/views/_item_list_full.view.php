@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -473,6 +473,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.51  2011/09/04 22:13:17  fplanque
+ * copyright 2011
+ *
  * Revision 1.50  2011/03/02 09:45:59  efy-asimo
  * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
  *

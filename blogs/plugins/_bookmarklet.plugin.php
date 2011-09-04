@@ -4,7 +4,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -105,6 +105,9 @@ class bookmarklet_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.25  2011/09/04 22:13:23  fplanque
+ * copyright 2011
+ *
  * Revision 1.24  2010/02/08 17:55:47  efy-yury
  * copyright 2009 -> 2010
  *

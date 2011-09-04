@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -52,6 +52,9 @@ class CommentCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.3  2011/09/04 22:13:15  fplanque
+ * copyright 2011
+ *
  * Revision 1.2  2010/07/26 06:52:16  efy-asimo
  * MFB v-4-0
  *

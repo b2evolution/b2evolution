@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -497,6 +497,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.18  2011/09/04 22:13:14  fplanque
+ * copyright 2011
+ *
  * Revision 1.17  2011/01/06 14:31:47  efy-asimo
  * advanced blog permissions:
  *  - add blog_edit_ts permission

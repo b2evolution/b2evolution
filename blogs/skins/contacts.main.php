@@ -4,7 +4,7 @@
  * 
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * 
@@ -26,6 +26,9 @@ require $ads_current_skin_path.'index.main.php';
 
 /*
  * $Log$
+ * Revision 1.2  2011/09/04 22:13:24  fplanque
+ * copyright 2011
+ *
  * Revision 1.1  2011/08/11 09:05:10  efy-asimo
  * Messaging in front office
  *

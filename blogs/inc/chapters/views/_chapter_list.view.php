@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -270,6 +270,9 @@ echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categori
 $Session->delete( 'fadeout_array');
 /*
  * $Log$
+ * Revision 1.31  2011/09/04 22:13:13  fplanque
+ * copyright 2011
+ *
  * Revision 1.30  2011/01/02 02:25:33  sam2kb
  * Fixed http://forums.b2evolution.net/viewtopic.php?t=21653
  *

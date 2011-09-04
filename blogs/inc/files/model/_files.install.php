@@ -2,7 +2,7 @@
 /**
  * This is the install file for the files module
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  *
@@ -52,6 +52,9 @@ $schema_queries['T_filetypes'] = array(
 
 /*
  * $Log$
+ * Revision 1.7  2011/09/04 22:13:15  fplanque
+ * copyright 2011
+ *
  * Revision 1.6  2011/03/10 14:54:18  efy-asimo
  * Allow file types modification & add m4v file type
  *

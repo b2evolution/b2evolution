@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -99,7 +99,7 @@ class Module
 			global $current_User;
 			$Group = & $current_User->get_Group();
 		}
-		
+
 		$GroupSettings = & $Group->get_GroupSettings();
 
 		if( array_key_exists( $permname, $GroupSettings->permission_modules ) )
@@ -130,6 +130,9 @@ class Module
 
 /*
  * $Log$
+ * Revision 1.6  2011/09/04 22:13:13  fplanque
+ * copyright 2011
+ *
  * Revision 1.5  2010/05/02 19:50:51  fplanque
  * no message
  *

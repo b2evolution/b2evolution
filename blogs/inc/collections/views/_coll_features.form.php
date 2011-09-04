@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -284,6 +284,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.45  2011/09/04 22:13:14  fplanque
+ * copyright 2011
+ *
  * Revision 1.44  2011/08/26 07:40:13  efy-asimo
  * Setting to show comment to "Members only"
  *

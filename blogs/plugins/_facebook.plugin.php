@@ -4,7 +4,7 @@
  * 
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  * 
  * @package plugins
  * 
@@ -77,6 +77,9 @@ class facebook_plugin extends Plugin
 
 /**
  * $Log$
+ * Revision 1.3  2011/09/04 22:13:23  fplanque
+ * copyright 2011
+ *
  * Revision 1.2  2011/09/04 20:59:40  fplanque
  * cleanup
  *

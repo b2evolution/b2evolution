@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}.
  * Parts of this file are copyright (c)2005 by The University of North Carolina at Charlotte as
@@ -463,6 +463,9 @@ function echo_affected_comments( $affected_comments, $status, $keyword, $noperms
 
 /*
  * $Log$
+ * Revision 1.19  2011/09/04 22:13:13  fplanque
+ * copyright 2011
+ *
  * Revision 1.18  2011/08/01 04:31:14  sam2kb
  * Fixed warning on cron "Converting from  to : not supported..."
  *

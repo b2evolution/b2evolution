@@ -2,7 +2,7 @@
 /**
  * This is the init file for the files module
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -379,6 +379,9 @@ $files_Module = new files_Module();
 
 /*
  * $Log$
+ * Revision 1.15  2011/09/04 22:13:15  fplanque
+ * copyright 2011
+ *
  * Revision 1.14  2011/04/05 12:41:39  efy-asimo
  * file perms check and file delete - fix
  *

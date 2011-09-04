@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -92,6 +92,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.14  2011/09/04 22:13:13  fplanque
+ * copyright 2011
+ *
  * Revision 1.13  2010/09/16 14:35:23  efy-asimo
  * don't show 'move to another blog' icon on create new category page
  *

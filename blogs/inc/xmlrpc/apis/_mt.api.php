@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  *
  * @author tor
  * @author tblue246 (Tilman BLUMENBACH)
@@ -319,6 +319,9 @@ $xmlrpc_procs['mt.publishPost'] = array(
 
 /*
  * $Log$
+ * Revision 1.15  2011/09/04 22:13:23  fplanque
+ * copyright 2011
+ *
  * Revision 1.14  2010/02/28 13:42:07  efy-yury
  * move APIs permissions check in xmlrpcs_login func
  *

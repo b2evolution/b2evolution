@@ -8,7 +8,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -1543,6 +1543,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.46  2011/09/04 22:13:17  fplanque
+ * copyright 2011
+ *
  * Revision 1.45  2010/12/18 13:48:38  sam2kb
  * Don't display page links if requested page is out of range
  *

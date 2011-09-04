@@ -8,7 +8,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -339,6 +339,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.75  2011/09/04 22:13:13  fplanque
+ * copyright 2011
+ *
  * Revision 1.74  2011/08/18 11:41:51  efy-asimo
  * Send all emails from noreply and email contents review
  *

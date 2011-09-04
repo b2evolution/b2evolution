@@ -2,7 +2,7 @@
 /**
  * This is the init file for the collections module
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -757,6 +757,9 @@ $collections_Module = new collections_Module();
 
 /*
  * $Log$
+ * Revision 1.25  2011/09/04 22:13:13  fplanque
+ * copyright 2011
+ *
  * Revision 1.24  2011/05/19 17:47:07  efy-asimo
  * register for updates on a specific blog post
  *

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -345,6 +345,9 @@ class autolinks_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.31  2011/09/04 22:13:23  fplanque
+ * copyright 2011
+ *
  * Revision 1.30  2010/10/14 12:23:30  efy-asimo
  * autolinks plugin save previous word - fix
  *
