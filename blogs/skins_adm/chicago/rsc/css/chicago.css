@@ -671,7 +671,7 @@ div.bCommentpublished span.bStatus,
 }
 
 .bPostdraft,
-div.bCommentdraft {
+div.block_item div.bCommentdraft {
 	border: 1px solid #fc3;
 	background-color: #ffb;
 }
@@ -701,7 +701,7 @@ div.bCommentdraft div.CommentActionsArea {
 }
 
 .bPostdeprecated,
-div.bCommentdeprecated {
+div.block_item div.bCommentdeprecated {
 	border: 1px solid #000;
 	background-color: #eee;
 	color: #888;
@@ -731,7 +731,7 @@ div.bCommentdeprecated div.CommentActionsArea {
 	border-bottom: 1px solid #000;
 }
 
-div.bCommenttrash {
+div.block_item div.bCommenttrash {
 	border: 1px solid #f66;
 	background-color: #fcc;
 }
@@ -747,7 +747,7 @@ div.bCommenttrash div.CommentActionsArea {
 }
 div.bCommenttrash span.bStatus,
 .status_trash {
-	color: #f66;
+	color: #f00;
 	background-color: #faa;
 }
 

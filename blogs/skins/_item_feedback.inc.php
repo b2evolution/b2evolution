@@ -250,10 +250,12 @@ if( $Item->can_see_comments( true ) )
 		// Restore "redir" param
 		forget_param('redir');
 
+		// _______________________________________________________________
 		// Display count of comments to be moderated:
 		$Item->feedback_moderation( 'feedbacks', '<div class="moderation_msg"><p>', '</p></div>', '',
 				T_('This post has 1 feedback awaiting moderation... %s'),
 				T_('This post has %d feedbacks awaiting moderation... %s') );
+		// _______________________________________________________________
 	
 		// Display link for comments feed:
 		$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>' );
@@ -321,6 +323,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.36  2011/09/04 20:17:55  fplanque
+ * cleanup
+ *
  * Revision 1.35  2011/08/26 07:40:13  efy-asimo
  * Setting to show comment to "Members only"
  *

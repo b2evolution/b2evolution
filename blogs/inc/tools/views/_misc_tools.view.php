@@ -67,10 +67,15 @@ if( $current_User->check_perm('options', 'edit') )
 	echo '<ul>';
 	echo '<li><a href="'.regenerate_url('action', 'action=find_broken_posts&amp;'.url_crumb('tools')).'">'.T_('Find all broken posts that have no matching category').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=find_broken_slugs&amp;'.url_crumb('tools')).'">'.T_('Find all broken slugs that have no matching target post').'</a></li>';
+// fp>asimo : is this a DB maintenance tool or a FILE maintenance tool?
 	echo '<li><a href="'.regenerate_url('action', 'action=delete_orphan_comment_uploads&amp;'.url_crumb('tools')).'">'.T_('Find and delete orphan comment uploads').'</a></li>';
 	echo '</ul>';
 	$block_item_Widget->disp_template_raw( 'block_end' );
 
+// fp>sam2kb : I really think this should go to the antispam screen instead
+// sam2kb>fp : I'll add a menu3 type tabs to antispam controller and these tools there
+// So the tabs/links will be Blacklist | Settings | Tools ?
+// fp>sam2kb : yes that sounds good. And if you can completely move antispam settings out of Global settings, it will be perfect. Thanks.
 	$block_item_Widget->title = T_('Antispam Tools');
 	$block_item_Widget->disp_template_replaced( 'block_start' );
 	echo '<ul>';
@@ -113,6 +118,9 @@ $block_item_Widget->disp_template_raw( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.9  2011/09/04 20:17:54  fplanque
+ * cleanup
+ *
  * Revision 1.8  2011/06/14 06:05:18  sam2kb
  * Check and remove all comments and hits mathing antispam blacklist
  *

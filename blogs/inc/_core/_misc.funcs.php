@@ -3168,16 +3168,8 @@ function get_base_domain( $url )
 	}
 	$base_domain = convert_charset(idna_decode($match[0]), $evo_charset, 'UTF-8');
 
-	// fp>sam2kb: why do we need this?
-	// sam2kb> the regexp below successfully matches "wwwhatever.com" stipping the whole domain out
-	// I added a simple check to see if the hostname has at least 2 dots which usually means that it's a subdomain
-	// another way is to stip strictly "www" with ~^www\.~i
-	// To be honest I don't see why we should strip the "www" part in the first place
-
-	// if( substr_count($base_domain, '.') > 1 )
-	{	// Remove any www*. prefix:
-		$base_domain = preg_replace( '~^www.*?\.~i', '', $base_domain );
-	}
+	// Remove any www. prefix:
+	$base_domain = preg_replace( '~^www\.~i', '', $base_domain );
 
 	//echo '<br>'.$base_domain.'</p>';
 
@@ -4196,6 +4188,9 @@ function sanitize_id_list( $str, $return_array = false, $quote = false )
 
 /*
  * $Log$
+ * Revision 1.260  2011/09/04 20:17:54  fplanque
+ * cleanup
+ *
  * Revision 1.259  2011/08/31 23:51:19  sam2kb
  * Added eAccelerator to get_active_opcode_cache
  *

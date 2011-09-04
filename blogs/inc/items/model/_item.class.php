@@ -549,7 +549,7 @@ class Item extends ItemLight
 			$this->set_from_Request( 'datedeadline', 'item_deadline', true );
 		}
 
-		// Allow comments status for this item (only if comments are allowed in this blog, and disable_comments_bypost is enabled):
+		// Save status of "Allow comments for this item" (only if comments are allowed in this blog, and disable_comments_bypost is enabled):
 		$this->load_Blog();
 		if( ( $this->Blog->get_setting( 'allow_comments' ) != 'never' ) && ( $this->Blog->get_setting( 'disable_comments_bypost' ) ) )
 		{
@@ -682,7 +682,7 @@ class Item extends ItemLight
 	 * Check if user can see comments on this post, which he cannot if they
 	 * are disabled for the Item or never allowed for the blog.
 	 *
-	 * @param boolean should be true when needs to display why user can't see comments
+	 * @param boolean true will display why user can't see comments
 	 * @return boolean
 	 */
 	function can_see_comments( $display = false )
@@ -1212,6 +1212,23 @@ class Item extends ItemLight
 		}
 
 		return $this->content_pages[$format][$page-1];
+	}
+
+
+	/**
+	 * This is like a teaser with no HTML and a cropping.
+	 *
+	 * Note: Excerpt and Teaser are TWO DIFFERENT THINGS.
+	 *
+	 * @param int Max length of excerpt
+	 * @return string
+	 */
+	function get_content_excerpt( $crop_at = 200 )
+	{
+		// Get teaser for page 1:
+		$output = $this->get_content_teaser( 1, false, 'text' );
+
+		return excerpt( $output, crop_at );
 	}
 
 
@@ -4663,7 +4680,7 @@ class Item extends ItemLight
 		$sql = 'SELECT DISTINCT T_users.*
 					FROM T_items__subscriptions INNER JOIN T_users ON isub_user_ID = user_ID
 				 WHERE isub_item_ID = '.$this->ID.' AND isub_attend <> 0';
-		return $DB->get_results( $sql, OBJECT, 'Find item attendants' );
+		return $DB->get_results( $sql, OBJECT, 'Find item attendees' );
 	}
 
 
@@ -4689,6 +4706,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.237  2011/09/04 20:17:54  fplanque
+ * cleanup
+ *
  * Revision 1.236  2011/09/04 02:30:21  fplanque
  * colorbox integration (MIT license)
  *

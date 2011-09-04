@@ -49,18 +49,18 @@ $Form->begin_form( 'fform' );
 	$Form->hidden( 'blog', $Blog->ID );
 
 	$change_skin_link = '<span class="floatright">&nbsp;'.action_icon( T_('Select another skin...'), 'edit', regenerate_url( 'action', 'ctrl=coll_settings&amp;skinpage=selection' ), T_('Use a different skin').' &raquo;', 3, 4 ).'</span>';
-	$load_default_settings = ' <span class="floatright">'.action_icon( T_('Load default skin settings'), 'reload', regenerate_url( 'action', 'ctrl=skins&amp;skin_ID='.$edited_Skin->ID.'&amp;blog='.$Blog->ID.'&amp;action=reset&amp;'.url_crumb('skin') ), ' '.T_('Load default settings').' &raquo;', 3, 4 ).'&nbsp;</span>';
+	$load_default_settings = ' <span class="floatright">'.action_icon( T_('Reset params'), 'reload', regenerate_url( 'action', 'ctrl=skins&amp;skin_ID='.$edited_Skin->ID.'&amp;blog='.$Blog->ID.'&amp;action=reset&amp;'.url_crumb('skin') ), ' '.T_('Reset params'), 3, 4 ).'&nbsp;</span>';
 
 	$Form->begin_fieldset( T_('Current skin').get_manual_link('blog_skin_settings').' '.$change_skin_link.' '.$load_default_settings );
 
 		Skin::disp_skinshot( $edited_Skin->folder, $edited_Skin->name );
 
-		$skin_name = $edited_Skin->name;
+		$Form->info( T_('Skin name'), $edited_Skin->name );
+
 		if( isset($edited_Skin->version) )
 		{
-			$skin_name .= ' v'.$edited_Skin->version;
+				$Form->info( T_('Skin version'), $edited_Skin->version );
 		}
-		$Form->info( T_('Skin name'), $skin_name );
 
 		$Form->info( T_('Skin type'), $edited_Skin->type );
 
@@ -104,6 +104,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.11  2011/09/04 20:17:54  fplanque
+ * cleanup
+ *
  * Revision 1.10  2011/06/06 21:22:31  sam2kb
  * New action: load default skin settings
  *

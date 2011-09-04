@@ -256,9 +256,14 @@ if( $Item->can_see_comments( true ) )
 				T_('This post has 1 feedback awaiting moderation... %s'),
 				T_('This post has %d feedbacks awaiting moderation... %s') );
 
+		// _______________________________________________________________
+
 		// Display link for comments feed:
 		$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>' );
 	}
+
+		// _______________________________________________________________
+
 }
 
 // ------------------ COMMENT FORM INCLUDED HERE ------------------

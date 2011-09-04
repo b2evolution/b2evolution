@@ -497,7 +497,7 @@ if( $blog )
 					'restrict_to_image_position' => 'teaser',	// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
 				) );
 
-			echo '<div class="small">'.excerpt( $Item->get_content_teaser( 1, false ), 150 ).'</div>';
+			echo '<div class="small">'.$Item->get_content_excerpt( 150 ).'</div>';
 
 			echo '<div style="clear:left;">'.get_icon('pixel').'</div>'; // IE crap
 			echo '</div>';
@@ -723,6 +723,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.80  2011/09/04 20:17:54  fplanque
+ * cleanup
+ *
  * Revision 1.79  2011/08/25 21:37:23  fplanque
  * styles
  *
