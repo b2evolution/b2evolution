@@ -87,12 +87,18 @@ class evopress_Skin extends Skin
 		require_css( 'item_base.css', false, NULL, NULL, '' );	// Do not include v= for now or else that css will be loaded twice due to @import
 		require_css( 'item.css', true );
 		require_css( 'style.css', true );
+
+		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
+		require_js_helper( 'colorbox' );
 	}
 
 }
 
 /*
  * $Log$
+ * Revision 1.5  2011/09/04 02:30:21  fplanque
+ * colorbox integration (MIT license)
+ *
  * Revision 1.4  2010/01/22 12:19:46  efy-eugene
  * Adding left/right switch to evopress
  *

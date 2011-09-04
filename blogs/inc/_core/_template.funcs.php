@@ -73,8 +73,8 @@ function headers_content_mightcache( $type = 'text/html', $max_age = '#', $chars
 	header_content_type( $type, $charset );
 
 	if( empty($max_age) || $is_admin_page || is_logged_in() || $Messages->count() )
-	{	// Don't cache if no max_age given 
-		// + NEVER EVER allow admin pages to cache 
+	{	// Don't cache if no max_age given
+		// + NEVER EVER allow admin pages to cache
 		// + NEVER EVER allow logged in data to be cached
 		// + NEVER EVER allow transactional Messages to be cached!:
 		header_nocache();
@@ -596,8 +596,7 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
  *
  * @todo dh>merge with require_css()
  * @param string alias, url or filename (relative to rsc/js) for javascript file
- * @param boolean Is the file's path relative to the base path/url?
- *                Use false if file is in $rsc_url/js/
+ * @param boolean Is the file's path relative to the base path/url? -- Use false if file is in $rsc_url/js/
  */
 function require_js( $js_file, $relative_to_base = false )
 {
@@ -664,8 +663,7 @@ function require_js( $js_file, $relative_to_base = false )
  *
  * @todo dh>merge with require_js()
  * @param string alias, url or filename (relative to rsc/css) for CSS file
- * @param boolean|string Is the file's path relative to the base path/url?
- *                Use true to not add any prefix ("$rsc_url/css/").
+ * @param boolean|string Is the file's path relative to the base path/url? -- Use true to not add any prefix ("$rsc_url/css/").
  * @param string title.  The title for the link tag
  * @param string media.  ie, 'print'
  */
@@ -719,8 +717,10 @@ function require_css( $css_file, $relative_to_base = false, $title = NULL, $medi
 
 /**
  * Memorize that a specific js helper will be required by the current page.
+ * This allows to require JS + SS + do init.
+ *
  * All requested helpers will be included in the page head only once (when headlines is called)
- * All requested helpers will add their required translation strings and any other settings
+ * Requested helpers should add their required translation strings and any other settings
  *
  * @param string helper, name of the required helper
  */
@@ -729,37 +729,53 @@ function require_js_helper( $helper = '' )
 	static $helpers;
 
 	if( empty( $helpers ) || !in_array( $helper, $helpers ) )
-	{ // add the helper
+	{ // Helper not already added, add the helper:
+
 		switch( $helper )
 		{
-			case 'helper' : // main helper object required
+			case 'helper' :
+				// main helper object required
 				global $debug;
 				require_js( '#jquery#' ); // dependency
 				require_js( 'helper.js' );
 				add_js_headline('jQuery(document).ready(function()
-		{
-			b2evoHelper.Init({
-				debug:'.( $debug ? 'true' : 'false' ).'
-			});
-		});');
+				{
+					b2evoHelper.Init({
+						debug:'.( $debug ? 'true' : 'false' ).'
+					});
+				});');
 				break;
 
-			case 'communications' : // communications object required
+			case 'communications' :
+				// communications object required
 				require_js_helper('helper'); // dependency
 
 				global $dispatcher;
 				require_js( 'communication.js' );
 				add_js_headline('jQuery(document).ready(function()
-		{
-			b2evoCommunications.Init({
-				dispatcher:"'.$dispatcher.'"
-			});
-		});' );
+				{
+					b2evoCommunications.Init({
+						dispatcher:"'.$dispatcher.'"
+					});
+				});' );
 				// add translation strings
 				T_('Update cancelled', NULL, array( 'for_helper' => true ) );
 				T_('Update paused', NULL, array( 'for_helper' => true ) );
 				T_('Changes pending', NULL, array( 'for_helper' => true ) );
 				T_('Saving changes', NULL, array( 'for_helper' => true ) );
+				break;
+
+			case 'colorbox':
+				// Colorbox: a lightweight Lightbox alternative -- allows zooming on images and slideshows in groups of images
+				// Added by fplanque - (MIT License) - http://colorpowered.com/colorbox/
+				require_js( '#jqueryUI#' );
+				require_js( 'colorbox/jquery.colorbox-min.js' );
+				require_css( 'colorbox/colorbox.css' );
+				add_js_headline('jQuery(document).ready(function()
+						{
+							$("a[rel^=\'lightbox\']").colorbox({maxWidth:"95%", maxHeight:"90%", slideshow:true, slideshowAuto:false });
+						});' );
+				// TODO: translation strings
 				break;
 		}
 		// add to list of loaded helpers
@@ -1216,13 +1232,13 @@ function display_ajax_form( $params )
 				{ // Always use "." for floats.
 					return floatval( str_replace( ",", ".", strval( $a ) ) );
 				}
-	
+
 				if( is_string( $a ) )
 				{
 					$jsonReplaces = array( array( "\\", "/", "\n", "\t", "\r", "\b", "\f", '"' ), array( '\\\\', '\\/', '\\n', '\\t', '\\r', '\\b', '\\f', '\"' ) );
 					return '"'.str_replace( $jsonReplaces[0], $jsonReplaces[1], $a ).'"';
 				}
-	
+
 				return $a;
 			}
 			$isList = true;
@@ -1286,6 +1302,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.87  2011/09/04 02:30:20  fplanque
+ * colorbox integration (MIT license)
+ *
  * Revision 1.86  2011/08/25 22:38:57  fplanque
  * minor/doc
  *

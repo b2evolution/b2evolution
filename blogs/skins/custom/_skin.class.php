@@ -74,7 +74,7 @@ class custom_Skin extends Skin
 					'options' => array( 'left' => $this->T_('Left'), 'right' => $this->T_('Right') ),
 					'type' => 'select',
 				),
-				
+
 			), parent::get_param_definitions( $params )	);
 
 		return $r;
@@ -116,12 +116,17 @@ class custom_Skin extends Skin
 			add_headline( $custom_css );
 		}
 
+		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
+		require_js_helper( 'colorbox' );
 	}
 
 }
 
 /*
  * $Log$
+ * Revision 1.8  2011/09/04 02:30:20  fplanque
+ * colorbox integration (MIT license)
+ *
  * Revision 1.7  2010/01/19 19:38:41  fplanque
  * minor
  *

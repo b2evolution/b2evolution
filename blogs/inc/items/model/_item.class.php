@@ -759,7 +759,7 @@ class Item extends ItemLight
 			echo '<p>'.sprintf(  T_( 'If you have no account yet, you can %s (It only takes a few seconds)' ), $register_link ).'</p>';
 		}
 
-		return false; 
+		return false;
 	}
 
 
@@ -1946,11 +1946,19 @@ class Item extends ItemLight
 
 			$link_to = $params['image_link_to']; // Can be 'orginal' (image) or 'single' (this post)
 			if( $link_to == 'single' )
-			{
+			{	// We're linking to the post (displayed on a single post page):
 				$link_to = $this->get_permanent_url( $link_to );
+				$link_title = $this->title;
+				$link_rel = '';
+			}
+			else
+			{	// We're linking to the original image, let lighbox (or clone) quick in:
+				$link_title = '#title#';	// This title will be used by lightbox (colorbox for instance)
+				$link_rel = 'lightbox[p'.$this->ID.']';	// Make one "gallery" per post.
 			}
 			// Generate the IMG tag with all the alt, title and desc if available
-			$r .= $File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'], $link_to );
+			$r .= $File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'],
+					$params['after_image'], $params['image_size'], $link_to, $link_title, $link_rel );
 		}
 
 		if( !empty($r) )
@@ -4636,8 +4644,8 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get this item attendes (list of users that have isub_attend = 1)
-	 *
+	 * Get this item attendees (list of users that have isub_attend = 1)
+	 * 
 	 * @return mixed NULL if item doesn't allow attending or array with specific user fields
 	 */
 	function get_attendants()
@@ -4661,7 +4669,7 @@ class Item extends ItemLight
 
 	/**
 	 * Get the number of comments on this item
-	 * 
+	 *
 	 * @param string the status of counted comments
 	 * @retrun integer the number of comments
 	 */
@@ -4681,6 +4689,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.236  2011/09/04 02:30:21  fplanque
+ * colorbox integration (MIT license)
+ *
  * Revision 1.235  2011/08/26 07:40:13  efy-asimo
  * Setting to show comment to "Members only"
  *

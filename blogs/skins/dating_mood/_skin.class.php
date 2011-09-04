@@ -91,6 +91,8 @@ class dating_mood_Skin extends Skin
 			add_headline( $custom_css );
 		}
 
+		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
+		require_js_helper( 'colorbox' );
 	}
 
 	/**
@@ -105,6 +107,9 @@ class dating_mood_Skin extends Skin
 
 /*
  * $Log$
+ * Revision 1.2  2011/09/04 02:30:21  fplanque
+ * colorbox integration (MIT license)
+ *
  * Revision 1.1  2010/12/06 20:36:49  fplanque
  * adding skin
  *

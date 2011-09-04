@@ -9,7 +9,7 @@
  * to handle the request (based on $disp).
  *
  * @package evoskins
- * @subpackage zeke
+ * @subpackage evocamp
  *
  * @version $Id$
  */

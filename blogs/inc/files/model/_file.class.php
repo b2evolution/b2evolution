@@ -1007,13 +1007,18 @@ class File extends DataObject
 	 * @param string
 	 * @param string
 	 * @param string
+	 * @param string
+	 * @param string
+	 * @param string rel attribute of link, usefull for jQuery libraries selecting on rel='...', e-g: lighbox
 	 */
 	function get_tag( $before_image = '<div class="image_block">',
 	                  $before_image_legend = '<div class="image_legend">', // can be NULL
 	                  $after_image_legend = '</div>',
 	                  $after_image = '</div>',
 	                  $size_name = 'original',
-	                  $image_link_to = 'original' )
+	                  $image_link_to = 'original',
+	                  $image_link_title = '',	// can be text or #title# or #desc#
+	                  $image_link_rel = '' )
 	{
 		if( $this->is_dir() )
 		{	// We can't reference a directory
@@ -1034,7 +1039,22 @@ class File extends DataObject
 			}
 			if( !empty( $image_link_to ) )
 			{
-				$img = '<a href="'.$image_link_to.'">'.$img.'</a>';
+				$a = '<a href="'.$image_link_to.'"';
+
+				if( $image_link_title == '#title#' )
+					$image_link_title = $this->title;
+				elseif( $image_link_title == '#desc#' )
+					$image_link_title = $this->desc;
+
+				if( !empty($image_link_title) )
+				{
+					$a .= ' title="'.htmlspecialchars($image_link_title).'"';
+				}
+				if( !empty($image_link_rel) )
+				{
+					$a .= ' rel="'.htmlspecialchars($image_link_rel).'"';
+				}
+				$img = $a.'>'.$img.'</a>';
 			}
 			$r .= $img;
 
@@ -2115,6 +2135,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.93  2011/09/04 02:30:20  fplanque
+ * colorbox integration (MIT license)
+ *
  * Revision 1.92  2011/03/10 14:54:18  efy-asimo
  * Allow file types modification & add m4v file type
  *

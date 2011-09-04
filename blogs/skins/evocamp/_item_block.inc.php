@@ -10,6 +10,7 @@
  * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package evoskins
+ * @subpackage evocamp
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -107,6 +108,9 @@ locale_restore_previous();	// Restore previous locale (Blog locale)
 
 /*
  * $Log$
+ * Revision 1.4  2011/09/04 02:30:20  fplanque
+ * colorbox integration (MIT license)
+ *
  * Revision 1.3  2010/02/08 17:56:22  efy-yury
  * copyright 2009 -> 2010
  *
