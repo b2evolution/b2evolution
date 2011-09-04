@@ -1947,29 +1947,11 @@ function echo_pages( $item_ID, $currentpage, $comments_number )
 }
 
 
-/**
- * Display collapsible <legend> tag
- * 
- * @param string legend text
- * @param string ID used in toggle_clickopen function
- * @param boolean false to return the output or true to display it
- */
-function collapsible_legend_tag( $legend, $id, $display = true )
-{
-	global $rsc_url;
-
-	$r = '<legend style="cursor:pointer" title="'.T_('Click to expand').'" onclick="toggle_clickopen(\''.$id.'\')">
-				<img src="'.$rsc_url.'icons/expand.gif" align="bottom" id="clickimg_'.$id.'" /> '.$legend.'</legend>
-			<div id="clickdiv_'.$id.'" style="display:none">';
-
-	if( $display ) echo $r;
-
-	return $r;
-}
-
-
 /*
  * $Log$
+ * Revision 1.129  2011/09/04 20:29:10  fplanque
+ * Rollback. Collapsible filter blocks are ok if: 1) the order stays the same and 2) any block that doesn't use the default params displays open when arriving on the page.
+ *
  * Revision 1.128  2011/08/16 07:02:25  efy-asimo
  * Fix attaching files issue on new post create
  *
@@ -1979,9 +1961,6 @@ function collapsible_legend_tag( $legend, $id, $display = true )
  * Revision 1.126  2011/06/15 20:30:38  sam2kb
  * Change message type to "note"
  * See http://forums.b2evolution.net/viewtopic.php?t=22334
- *
- * Revision 1.125  2011/03/01 15:10:23  sam2kb
- * Collapsible filter blocks
  *
  * Revision 1.124  2011/02/10 23:07:21  fplanque
  * minor/doc
