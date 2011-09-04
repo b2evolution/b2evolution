@@ -300,25 +300,25 @@ switch( $action )
 		break;
 
 	case 'delete':
-			$AdminUI->disp_payload_begin();
+		$AdminUI->disp_payload_begin();
 
 		// We need to ask for confirmation:
-			$fullname = $edited_User->dget( 'fullname' );
-			if ( ! empty( $fullname ) )
-			{
-				$msg = sprintf( T_('Delete user &laquo;%s&raquo; [%s]?'), $fullname, $edited_User->dget( 'login' ) );
-			}
-			else
-			{
-				$msg = sprintf( T_('Delete user &laquo;%s&raquo;?'), $edited_User->dget( 'login' ) );
-			}
+		$fullname = $edited_User->dget( 'fullname' );
+		if ( ! empty( $fullname ) )
+		{
+			$msg = sprintf( T_('Delete user &laquo;%s&raquo; [%s]?'), $fullname, $edited_User->dget( 'login' ) );
+		}
+		else
+		{
+			$msg = sprintf( T_('Delete user &laquo;%s&raquo;?'), $edited_User->dget( 'login' ) );
+		}
 
-			$edited_User->confirm_delete( $msg, 'user', $action, get_memorized( 'action' ) );
+		$edited_User->confirm_delete( $msg, 'user', $action, get_memorized( 'action' ) );
 
-			// Display user identity form:
-			$AdminUI->disp_view( 'users/views/_user_identity.form.php' );
-			$AdminUI->disp_payload_end();
-			break;
+		// Display user identity form:
+		$AdminUI->disp_view( 'users/views/_user_identity.form.php' );
+		$AdminUI->disp_payload_end();
+		break;
 
 	case 'promote':
 	default:
@@ -335,6 +335,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.53  2011/09/04 21:32:17  fplanque
+ * minor MFB 4-1
+ *
  * Revision 1.52  2011/08/25 06:00:32  efy-james
  * Modification on delete user page
  *

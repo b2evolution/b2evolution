@@ -110,7 +110,7 @@ $pagenow = $pagenow[0];
 */
 // find precisely the first occurrence of something.php in PHP_SELF, extract that and ignore any extra path.
 if( ! preg_match( '#/([A-Za-z0-9_\-.]+\.php[0-9]?)#i', $_SERVER['PHP_SELF'], $matches ) &&
-	! preg_match( '#/([A-Za-z0-9_\-.]+\.php[0-9]?)#i', $ReqURI, $matches ) )
+	  ! preg_match( '#/([A-Za-z0-9_\-.]+\.php[0-9]?)#i', $ReqURI, $matches ) )
 {
 	debug_die('Can\'t identify current .php script name in PHP_SELF.');
 }
@@ -234,6 +234,9 @@ $Timer->pause( '_init_hit' );
 
 /*
  * $Log$
+ * Revision 1.10  2011/09/04 21:32:17  fplanque
+ * minor MFB 4-1
+ *
  * Revision 1.9  2011/03/01 18:29:47  sam2kb
  * Better pagenow handling
  * Fixes this http://forums.b2evolution.net//viewtopic.php?t=21671

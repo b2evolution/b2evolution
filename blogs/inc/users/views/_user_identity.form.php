@@ -153,7 +153,8 @@ $group_msg_perm = $GroupCache->get_option_array( 'check_messaging_perm' );
 	}
 
 	// Add more fields when click on the link
-	function add_more_fields(){
+	function add_more_fields()
+	{
 		var j = jQuery("#add_more_fields").parent().parent().siblings("fieldset[id^=ffield_new_uf_val]").length;
 		for( i = j + 1; i < j + 4; i++ ){
 			var strHtml = jQuery("#add_more_fields").parent().parent().prev().html();
@@ -170,7 +171,8 @@ $group_msg_perm = $GroupCache->get_option_array( 'check_messaging_perm' );
 
 
 	// Switch from input to textarea
-	function input2area(el) {
+	function input2area(el) 
+	{
 		if (el) {
 			strHtml = '<textarea cols="25" rows="3" name="' + el.attr("name") + '" id="' + el.attr("id")
 				+ '" >' + el.val().replace(/\|/g, "\n") + '</textarea>';
@@ -179,7 +181,8 @@ $group_msg_perm = $GroupCache->get_option_array( 'check_messaging_perm' );
 	}
 
 	// Switch from textarea to input
-	function area2input(el) {
+	function area2input(el) 
+	{
 		if (el) {
 			strHtml = '<input type="text" class="form_text_input" size="30" maxlength="255" name="'
 				+ el.attr("name") + '" id="' + el.attr("id") + '" value="' + el.val().replace(/\n/g, "|") + '"></textarea>';
@@ -188,7 +191,8 @@ $group_msg_perm = $GroupCache->get_option_array( 'check_messaging_perm' );
 	}
 
 	// Switch between input and textarea automatically
-	function inputhint() {
+	function inputhint() 
+	{
 		$('select[name*="type"]').change(function(e){
 			var group = $(this).children("optgroup").children('option[value='+$(this).val()+']').parent().attr("label");
 			switch(group) {
@@ -229,7 +233,8 @@ $group_msg_perm = $GroupCache->get_option_array( 'check_messaging_perm' );
 		});
 	}
 
-	jQuery(function(){
+	jQuery(function()
+	{
 		// Initialize the new fields
 		$('select[name*="type"]').each(function(){
 			var group = $(this).children("optgroup").children('option[value='+$(this).val()+']').parent().attr("label");
@@ -617,7 +622,7 @@ $userfields = $DB->get_results( '
 		) order by ufdf_ID' );
 
 $i = 0;
- foreach( $userfields as $userfield )
+foreach( $userfields as $userfield )
 {
 	$i++;
 	switch( $userfield->ufdf_ID )
@@ -746,6 +751,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.31  2011/09/04 21:32:17  fplanque
+ * minor MFB 4-1
+ *
  * Revision 1.30  2011/08/30 06:45:34  efy-james
  * User field type intelligence
  *

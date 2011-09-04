@@ -341,7 +341,7 @@ class PageCache
 			$i = 1;
 			$optional_headers = array();
 			// Go through optional header lines
-			// Otional headers are separated from the file header with an empty line.
+			// Optional headers are separated from the file header with an empty line.
 			while( $optional_header_line = trim($lines[++$i]) )
 			{
 				// All optional header name value must be separated with ':'
@@ -365,7 +365,7 @@ class PageCache
 			// unset the empty line
 			unset($lines[$i]);
 
-			// count views
+			// count item views happening on this page:
 			if( isset( $optional_headers[ 'item_IDs_on_this_page' ] ) )
 			{
 				global $shutdown_count_item_views;
@@ -379,7 +379,7 @@ class PageCache
 				if( $retrieved_ts <= $if_modified_since )
 				{	// Cached version is equal to (or older than) $if_modified since; contents not modified, send 304!
 
-					// fp> IMPORTANT: thsi will not prevent you from logging out but it can prevent you from seeing you're logged out.
+					// fp> IMPORTANT: this will not prevent you from logging out but it can prevent you from seeing you're logged out.
 					// It may tell you that the version with the evobar was not modified so your browser will show the evobar again
 					// TODO: investigate ETag & Vary Headers.
 					// Vary on cookie, does that work?
@@ -667,6 +667,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.31  2011/09/04 21:32:18  fplanque
+ * minor MFB 4-1
+ *
  * Revision 1.30  2011/08/12 08:29:00  efy-asimo
  * Post view count - fix, and crazy view counting option
  *

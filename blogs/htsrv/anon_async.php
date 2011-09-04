@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the handler for asynchronous 'AJAX' calls.
+ * This is the handler for ANONYMOUS (non logged in) asynchronous 'AJAX' calls.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -93,6 +93,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.3  2011/09/04 21:32:17  fplanque
+ * minor MFB 4-1
+ *
  * Revision 1.2  2011/07/01 12:18:44  efy-asimo
  * Use ajax to display comment and contact forms - fix basic and glossyblue skins
  *

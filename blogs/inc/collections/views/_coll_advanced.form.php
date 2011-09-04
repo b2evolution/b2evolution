@@ -47,7 +47,7 @@ $Form->hidden( 'tab', 'advanced' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
 
-$Form->begin_fieldset( T_('Multiple authors') );
+$Form->begin_fieldset( T_('Multiple authors').get_manual_link('multiple_author_settings') );
 	$Form->checkbox( 'advanced_perms', $edited_Blog->get( 'advanced_perms' ), T_('Use advanced perms'), T_('This will turn on the advanced User and Group permissions tabs for this blog.') );
 	$Form->checkbox( 'blog_use_workflow', $edited_Blog->get_setting( 'use_workflow' ), T_('Use workflow'), T_('This will notably turn on the Tracker tab in the Posts view.') );
 $Form->end_fieldset();
@@ -108,22 +108,22 @@ $Form->end_fieldset();
 if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 {	// Permission to edit advanced admin settings
 
-	$Form->begin_fieldset( T_('Aggregation').' ['.T_('Admin').']' );
+	$Form->begin_fieldset( T_('Aggregation').' ['.T_('Admin').']'.get_manual_link('collection_aggregation_settings') );
 		$Form->text( 'aggregate_coll_IDs', $edited_Blog->get_setting( 'aggregate_coll_IDs' ), 30, T_('Blogs to aggregate'), T_('List blog IDs separated by , or use * for all blogs'), 255 );
 	$Form->end_fieldset();
 
 
-	$Form->begin_fieldset( T_('Caching').' ['.T_('Admin').']' );
+	$Form->begin_fieldset( T_('Caching').' ['.T_('Admin').']'.get_manual_link('collection_cache_settings') );
 		$Form->checkbox_input( 'ajax_form_enabled', $edited_Blog->get_setting('ajax_form_enabled'), T_('Enable AJAX forms'), array( 'note'=>T_('Comment and contacts forms will be fetched by javascript') ) );
 		$Form->checkbox_input( 'cache_enabled', $edited_Blog->get_setting('cache_enabled'), T_('Enable page cache'), array( 'note'=>T_('Cache rendered blog pages') ) );
 		$Form->checkbox_input( 'cache_enabled_widgets', $edited_Blog->get_setting('cache_enabled_widgets'), T_('Enable widget cache'), array( 'note'=>T_('Cache rendered widgets') ) );
 	$Form->end_fieldset();
 
-	$Form->begin_fieldset( T_('Login').' ['.T_('Admin').']' );
+	$Form->begin_fieldset( T_('Login').' ['.T_('Admin').']'.get_manual_link('collection_login_settings') );
 		$Form->checkbox_input( 'in_skin_login', $edited_Blog->get_setting( 'in_skin_login' ), T_( 'In-skin login' ), array( 'note' => T_( 'Use in-skin login form every time it\'s possible' ) ) );
 	$Form->end_fieldset();
 
-	$Form->begin_fieldset( '['. T_('Deprecated'). '] '.T_('Static file generation').' ['.T_('Admin').']' );
+	$Form->begin_fieldset( '['. T_('Deprecated'). '] '.T_('Static file generation').' ['.T_('Admin').']'.get_manual_link('static_file_generation') );
 		$Form->text_input( 'source_file', $edited_Blog->get_setting( 'source_file' ), 25, T_('Source file'),
 												T_('.php (stub) file used to generate the static homepage.'),
 												array( 'input_prefix' => "<code>$basepath</code>", 'maxlength' => 255 ) );
@@ -137,7 +137,7 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	$Form->end_fieldset();
 
 
-	$Form->begin_fieldset( T_('Media directory location').' ['.T_('Admin').']' );
+	$Form->begin_fieldset( T_('Media directory location').' ['.T_('Admin').']'.get_manual_link('media_directory_location') );
 	global $media_path;
 	$Form->radio( 'blog_media_location', $edited_Blog->get( 'media_location' ),
 			array(
@@ -182,7 +182,7 @@ $Form->begin_fieldset( T_('Meta data').get_manual_link('blog_meta_data') );
 		T_('Additional info. Appears in the backoffice.'), 50, 'large' );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Software credits') );
+$Form->begin_fieldset( T_('Software credits').get_manual_link('software_credits') );
 	$max_credits = $edited_Blog->get_setting( 'max_footer_credits' );
 	$note = T_('You get the b2evolution software for <strong>free</strong>. We do appreciate you giving us credit. <strong>Thank you for your support!</strong>');
 	if( $max_credits < 1 )
@@ -198,6 +198,7 @@ $Form->end_form( array(
 	array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
 ?>
+
 <script type="text/javascript">
 	jQuery( '#ajax_form_enabled' ).click( function()
 	{
@@ -218,6 +219,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.34  2011/09/04 21:32:18  fplanque
+ * minor MFB 4-1
+ *
  * Revision 1.33  2011/06/29 13:14:01  efy-asimo
  * Use ajax to display comment and contact forms
  *

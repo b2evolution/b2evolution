@@ -91,7 +91,7 @@ class Userfield extends DataObject
 		 );
 	}
 
-		function get_requireds()
+	function get_requireds()
 	{
 		return array(
 			array( 'value' => 'hidden', 'label' => T_('Hidden') ),

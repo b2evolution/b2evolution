@@ -212,9 +212,12 @@ else
 		require '_contact_msg.form.php';
 	}
 }
-	
+
 /*
  * $Log$
+ * Revision 1.24  2011/09/04 21:32:17  fplanque
+ * minor MFB 4-1
+ *
  * Revision 1.23  2011/06/29 13:14:01  efy-asimo
  * Use ajax to display comment and contact forms
  *

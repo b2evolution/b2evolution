@@ -240,10 +240,11 @@ class twitter_plugin extends Plugin
 				$oauth_contact = $this->get_coll_setting( 'twitter_contact', $Blog );
 			}
 		}
-		else if ( $target_type == 'user' )
+		elseif ( $target_type == 'user' )
 		{ // UserSettings
 			// get setting from db
-			if( empty( $this->UserSettings ) ) {
+			if( empty( $this->UserSettings ) ) 
+			{
 				return NULL;
 			}
 			$oauth_token = $this->UserSettings->get( 'twitter_token', $target_id );
@@ -569,6 +570,9 @@ class twitter_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.32  2011/09/04 21:32:17  fplanque
+ * minor MFB 4-1
+ *
  * Revision 1.31  2011/05/28 02:34:44  sam2kb
  * minor
  *

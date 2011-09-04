@@ -78,7 +78,7 @@ switch( $action )
 		{
 			param_error( 'reloadpage_timeout', sprintf( T_( 'Reload-page timeout must be between %d and %d seconds.' ), 0, 99999 ) );
 		}
-		$Settings->set( 'reloadpage_timeout', $reloadpage_timeout );
+		$Settings->set( 'reloadpage_timeout', $reloadpage_timeout ); 
 
 		// Smart hit count
 		$Settings->set( 'smart_hit_count', param( 'smart_hit_count', 'integer', 0 ) );
@@ -137,6 +137,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.27  2011/09/04 21:32:18  fplanque
+ * minor MFB 4-1
+ *
  * Revision 1.26  2011/08/12 08:29:00  efy-asimo
  * Post view count - fix, and crazy view counting option
  *

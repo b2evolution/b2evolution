@@ -377,6 +377,7 @@ if( empty($tab) )
 			break;
 
 		case 'find_spam_comments':
+			// Check and remove all comments and hits matching antispam blacklist:
 			$keywords = $DB->get_col('SELECT aspm_string FROM T_antispam');
 			$keywords = array_chunk( $keywords, 100 );
 			$rows_affected = 0;
@@ -502,6 +503,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.42  2011/09/04 21:32:17  fplanque
+ * minor MFB 4-1
+ *
  * Revision 1.41  2011/06/15 07:38:13  sam2kb
  * Refactor spam comments and hits removal actions
  *

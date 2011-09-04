@@ -2942,7 +2942,7 @@ function upgrade_b2evo_tables()
 
 		task_begin( 'Upgrading comments table, add subsription fields...' );
 		db_add_col( 'T_comments', 'comment_notif_status', 'ENUM("noreq","todo","started","finished") NOT NULL DEFAULT "noreq" COMMENT "Have notifications been sent for this comment? How far are we in the process?" AFTER comment_secret' );
-		db_add_col( 'T_comments', 'comment_notif_ctsk_ID', 'INT(10) unsigned NULL DEFAULT NULL COMMENT "When notifications for this comment are sent through a schedule job, what is the job ID?" AFTER comment_notif_status' );
+		db_add_col( 'T_comments', 'comment_notif_ctsk_ID', 'INT(10) unsigned NULL DEFAULT NULL COMMENT "When notifications for this comment are sent through a scheduled job, what is the job ID?" AFTER comment_notif_status' );
 		task_end();
 
 		task_begin( 'Upgrading users table...' );
@@ -3194,6 +3194,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.405  2011/09/04 21:32:16  fplanque
+ * minor MFB 4-1
+ *
  * Revision 1.404  2011/08/29 11:55:23  efy-asimo
  * DB documentation
  *

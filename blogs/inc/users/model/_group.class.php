@@ -344,7 +344,7 @@ class Group extends DataObject
 					$perm = false;
 					break;
 				}
-				// don't break, perm_files and perm_messaging are pluggable permissions
+				// no break, perm_files and perm_messaging are pluggable permissions
 
 			default:
 
@@ -647,6 +647,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.45  2011/09/04 21:32:16  fplanque
+ * minor MFB 4-1
+ *
  * Revision 1.44  2011/08/11 09:05:09  efy-asimo
  * Messaging in front office
  *

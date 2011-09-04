@@ -399,7 +399,7 @@ $Debuglog->add( 'redirect_to: '.$redirect_to );
  * Display in-skin login if it's supported
  */
 if( $inskin && use_in_skin_login() )
-{ // in-skin display
+{ // in-skin display:
 	$BlogCache = & get_BlogCache();
 	$Blog = $BlogCache->get_by_ID( $blog, false, false );
 	if( ! empty( $Blog ) )
@@ -438,6 +438,9 @@ exit(0);
 
 /*
  * $Log$
+ * Revision 1.116  2011/09/04 21:32:17  fplanque
+ * minor MFB 4-1
+ *
  * Revision 1.115  2011/08/18 11:41:51  efy-asimo
  * Send all emails from noreply and email contents review
  *

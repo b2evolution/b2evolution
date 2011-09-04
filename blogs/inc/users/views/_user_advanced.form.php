@@ -6,7 +6,6 @@
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
  * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
- * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -21,18 +20,12 @@
  * The Evo Factory grants Francois PLANQUE the right to license
  * The Evo Factory's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- *
- * Daniel HAHLER grants Francois PLANQUE the right to license
- * Daniel HAHLER's contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package admin
  *
- * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois PLANQUE
- * @author blueyed: Daniel HAHLER
- * @author efy_asimo: Attila SIMO
+ * @author efy-asimo: Attila SIMO
  *
  * @version $Id$
  */
@@ -245,6 +238,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.3  2011/09/04 21:32:17  fplanque
+ * minor MFB 4-1
+ *
  * Revision 1.2  2011/05/11 07:11:52  efy-asimo
  * User settings update
  *

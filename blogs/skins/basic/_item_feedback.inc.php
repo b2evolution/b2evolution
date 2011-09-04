@@ -105,7 +105,7 @@ if( $disp_trackback_url )
 ?>
 
 <?php
-if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
+if( $disp_comments || $disp_trackbacks || $disp_pingbacks )
 {
 	if( $disp_comments )
 ?>
@@ -187,7 +187,7 @@ if( $disp_comment_form )
 		else
 		{
 			skin_include( '_item_comment_form.inc.php', $params );
-			}
+		}
 	}
 }
 ?>

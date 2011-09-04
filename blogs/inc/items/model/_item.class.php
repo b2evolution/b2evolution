@@ -4665,7 +4665,7 @@ class Item extends ItemLight
 	 * 
 	 * @return mixed NULL if item doesn't allow attending or array with specific user fields
 	 */
-	function get_attendants()
+	function get_attendees()
 	{
 		global $DB;
 
@@ -4706,6 +4706,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.238  2011/09/04 21:32:18  fplanque
+ * minor MFB 4-1
+ *
  * Revision 1.237  2011/09/04 20:17:54  fplanque
  * cleanup
  *

@@ -117,12 +117,12 @@ class Comment extends DataObject
 	 */
 	var $secret;
 	/**
-	 * Have post processing notifications been handled?
+	 * Have post processing notifications been handled for this comment?
 	 * @var string
 	 */
 	var $notif_status;
 	/**
-	 * Which cron task is responsible for handling notifications?
+	 * Which cron task is responsible for handling notifications for this comment?
 	 * @var integer
 	 */
 	var $notif_ctsk_ID;
@@ -1540,6 +1540,7 @@ class Comment extends DataObject
 
 	/**
 	 * Handle comment email notifications
+	 *
 	 * Should be called only when a new comment was posted or when a comment status was changed to published
 	 */
 	function handle_notifications( $just_posted = false )
@@ -1552,7 +1553,7 @@ class Comment extends DataObject
 		}
 
 		if( $this->status != 'published' )
-		{ // don't send notificaitons about not published comments
+		{ // don't send notificaitons about non published comments
 			return;
 		}
 
@@ -1619,7 +1620,7 @@ class Comment extends DataObject
 	 * @todo dh> "Beautify" like {@link Item::send_email_notifications()} ? fp > sure
 	 * @todo Should include "visibility status" in the mail to the Item's Author
 	 * 
-	 * efy-asimo> moderatation and subscription notificatinos have been separated
+	 * efy-asimo> moderatation and subscription notifications have been separated
 	 * 
 	 * @param boolean true if send only moderation email, false otherwise
 	 * @param boolean true if send for everyone else but not for moterators, because a moderation email was sent for them
@@ -1831,8 +1832,8 @@ class Comment extends DataObject
 			{ // moderation email
 				if( $this->status == 'draft' )
 				{
-				$secret_value = '&secret='.$this->secret;
-				$notify_message .= T_('Quick moderation').': '.$htsrv_url.'comment_review.php?cmt_ID='.$this->ID.$secret_value."\n\n";
+					$secret_value = '&secret='.$this->secret;
+					$notify_message .= T_('Quick moderation').': '.$htsrv_url.'comment_review.php?cmt_ID='.$this->ID.$secret_value."\n\n";
 				}
 				$notify_message .= T_('Edit comment').': '.$admin_url.'?ctrl=comments&action=edit&comment_ID='.$this->ID."\n\n";
 			}
@@ -1970,8 +1971,10 @@ class Comment extends DataObject
 			$old_ID = $this->ID;
 
 			// Select comment attachment ids
-			$result = $DB->get_col( 'SELECT link_file_ID FROM T_links
-										WHERE link_cmt_ID = '.$this->ID );
+			$result = $DB->get_col( '
+				SELECT link_file_ID 
+					FROM T_links
+				 WHERE link_cmt_ID = '.$this->ID );
 
 			if( $r = parent::dbdelete() )
 			{
@@ -2029,6 +2032,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.85  2011/09/04 21:32:17  fplanque
+ * minor MFB 4-1
+ *
  * Revision 1.84  2011/08/18 11:41:51  efy-asimo
  * Send all emails from noreply and email contents review
  *

@@ -196,7 +196,7 @@ if( $Comment->ID == 0 )
  * ----------------------------
  */
 // TODO: dh> this should only send published feedback probably and should also use "outbound_notifications_mode"
-// asimo> this handle moderators and general users as well and use "outbound_notifications_mode" in case of general users
+// asimo> this handles moderators and general users as well and use "outbound_notifications_mode" in case of general users
 // Moderators will get emails about every new trackback
 // Subscribed user will only get emails about new published trackback
 $Comment->handle_notifications( true );
@@ -213,6 +213,9 @@ trackback_response( 0, 'ok' );
 
 /*
  * $Log$
+ * Revision 1.76  2011/09/04 21:32:17  fplanque
+ * minor MFB 4-1
+ *
  * Revision 1.75  2011/05/19 17:47:07  efy-asimo
  * register for updates on a specific blog post
  *

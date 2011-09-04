@@ -398,7 +398,7 @@ function add_ban_icons( $content )
  * Get opentrash link
  *
  * @param boolean check permission or not. Should be false only if it was already checked.
- * @param boolean show "Open recycle bin" link even if doesn't exists comment with 'trash' status
+ * @param boolean show "Open recycle bin" link even if there is no comment with 'trash' status
  * @return Open recycle bin link if user has the corresponding 'blogs' - 'editall' permission, empty string otherwise
  */
 function get_opentrash_link( $check_perm = true, $force_show = false )
@@ -407,12 +407,12 @@ function get_opentrash_link( $check_perm = true, $force_show = false )
 
 	$show_recycle_bin = ( !$check_perm || $current_User->check_perm( 'blogs', 'editall' ) );
 	if( $show_recycle_bin && ( !$force_show ) )
-	{ // get trash comments number
-		$query = 'SELECT count( comment_ID )
-					FROM T_blogs LEFT OUTER JOIN T_categories ON blog_ID = cat_blog_ID
-						LEFT OUTER JOIN T_items__item ON cat_ID = post_main_cat_ID
-						LEFT OUTER JOIN T_comments ON post_ID = comment_post_ID
-					WHERE comment_status = "trash"';
+	{ // get number of trash comments:
+		$query = 'SELECT COUNT( comment_ID )
+								FROM T_blogs LEFT OUTER JOIN T_categories ON blog_ID = cat_blog_ID
+											LEFT OUTER JOIN T_items__item ON cat_ID = post_main_cat_ID
+											LEFT OUTER JOIN T_comments ON post_ID = comment_post_ID
+							 WHERE comment_status = "trash"';
 		if( isset( $blog ) )
 		{
 			$query .= ' AND blog_ID='.$blog;
@@ -510,6 +510,9 @@ function echo_disabled_comments( $allow_comments_value, $item_url )
 
 /*
  * $Log$
+ * Revision 1.31  2011/09/04 21:32:17  fplanque
+ * minor MFB 4-1
+ *
  * Revision 1.30  2011/08/25 05:40:57  efy-asimo
  * Allow comments for "Members only" - display disabled comment form
  *

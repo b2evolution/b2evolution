@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the template that displays a post attendants
+ * This is the template that displays a post attendees
  *
  * This file is not meant to be called directly.
  *
@@ -36,21 +36,21 @@ $is_attendant = false;
  */
 $Item = & $params['Item'];
 
-$attendants = $Item->get_attendants();
+$attendees = $Item->get_attendees();
 $blog_url = $Blog->gen_blogurl();
 
 echo $params['attending_start'];
 
-if( empty( $attendants ) )
-{ // no attendants
-	echo T_( 'No attendants yet' );
+if( empty( $attendees ) )
+{ // no attendees
+	echo T_( 'No attendees yet' );
 }
 else
 {
 	$disp_count = 0;
 	$line_start_displayed = false;
 	echo $params['attend_list_start'];
-	foreach( $attendants as $attendant )
+	foreach( $attendees as $attendant )
 	{
 		if( ( $disp_count % 3 ) == 0 )
 		{
@@ -101,6 +101,9 @@ echo $params['attending_end'];
 
 /*
  * $Log$
+ * Revision 1.3  2011/09/04 21:32:17  fplanque
+ * minor MFB 4-1
+ *
  * Revision 1.2  2011/05/30 13:35:30  efy-asimo
  * Use table to display item attendants
  *

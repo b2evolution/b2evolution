@@ -2170,7 +2170,7 @@ class User extends DataObject
 		global $DB;
 
 		if( !isset($this->userfield_defs) )
-		{	
+		{
 			$userfield_defs = $DB->get_results( '
 				SELECT ufdf_ID, ufdf_type, ufdf_name, ufdf_required
 					FROM T_users__fielddefs' );
@@ -2408,6 +2408,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.108  2011/09/04 21:32:16  fplanque
+ * minor MFB 4-1
+ *
  * Revision 1.107  2011/08/30 06:45:34  efy-james
  * User field type intelligence
  *

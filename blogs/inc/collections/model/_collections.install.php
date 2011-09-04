@@ -80,7 +80,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_coll_settings (
 			cset_coll_ID INT(11) UNSIGNED NOT NULL,
 			cset_name    VARCHAR( 50 ) NOT NULL,
-			cset_value   VARCHAR( 10000 ) NULL,
+			cset_value   VARCHAR( 10000 ) NULL COMMENT 'The AdSense plugin wants to store very long snippets of HTML',
 			PRIMARY KEY ( cset_coll_ID, cset_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -151,7 +151,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_views                  INT(11) UNSIGNED NOT NULL DEFAULT 0,
 			post_wordcount              int(11) default NULL,
 			post_comment_status         ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
-			post_attend_status          tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Post author decision about allow users to attend this event',
+			post_attend_status          tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Post owner\'s decision about allowing users to attend this event',
 			post_commentsexpire         DATETIME DEFAULT NULL,
 			post_renderers              TEXT NOT NULL,
 			post_priority               int(11) unsigned null COMMENT 'Task priority in workflow',
@@ -281,7 +281,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			isub_item_ID    int(11) unsigned NOT NULL,
 			isub_user_ID    int(11) unsigned NOT NULL,
 			isub_comments   tinyint(1) NOT NULL DEFAULT 0 COMMENT 'The user wants to receive notifications for new comments',
-			isub_attend     tinyint(1) NOT NULL DEFAULT 0 COMMENT 'The user is attending (or not) this post',
+			isub_attend     tinyint(1) NOT NULL DEFAULT 0 COMMENT 'The user is attending (or not) this event',
 			PRIMARY KEY (isub_item_ID, isub_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -375,6 +375,9 @@ $schema_queries = array_merge( $schema_queries, array(
 
 /*
  * $Log$
+ * Revision 1.33  2011/09/04 21:32:16  fplanque
+ * minor MFB 4-1
+ *
  * Revision 1.32  2011/08/25 07:31:14  efy-asimo
  * DB documentation
  *

@@ -52,7 +52,7 @@ if( ! $commented_Item->can_comment( NULL ) )
 $comment = param( 'p', 'html' );
 
 param( 'comment_autobr', 'integer', ($comments_use_autobr == 'always') ? 1 : 0 );
-$commented_Item->load_Blog(); // Make sure Blog is loaded (will be needed wether logged in or not)
+$commented_Item->load_Blog(); // Make sure Blog is loaded (will be needed whether logged in or not)
 
 if( is_logged_in() )
 {
@@ -478,6 +478,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.150  2011/09/04 21:32:17  fplanque
+ * minor MFB 4-1
+ *
  * Revision 1.149  2011/05/19 17:47:07  efy-asimo
  * register for updates on a specific blog post
  *
