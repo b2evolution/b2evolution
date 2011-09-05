@@ -633,7 +633,7 @@ class PageCache
 		{
 			if( $first_error == '' )
 			{
-				$first_error = sprintf( T_('Can not access directory: %s).'), $path );;
+				$first_error = sprintf( T_('Can not access directory: %s.'), $path );;
 			}
 		}
 	}
@@ -667,6 +667,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.33  2011/09/05 21:36:43  sam2kb
+ * minor
+ *
  * Revision 1.32  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *
