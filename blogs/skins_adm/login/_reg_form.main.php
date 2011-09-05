@@ -94,7 +94,7 @@ $Form->text_input( 'login', $login, 16,  T_('Login'), '', array( 'maxlength'=>20
 
 	$Form->buttons_input( array( array('name'=>'submit', 'value'=>T_('Register!'), 'class'=>'ActionInput') ) );
 
-	$Form->info("", "", T_('Your IP address ('.$Hit->IP.') and the current time are being logged.'));
+	$Form->info( '', '', sprintf( T_('Your IP address (%s) and the current time are being logged.'), $Hit->IP ) );
 
 $Form->end_fieldset();
 $Form->end_form(); // display hidden fields etc
@@ -109,6 +109,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.21  2011/09/05 18:10:54  sam2kb
+ * No break in tranlsated text
+ *
  * Revision 1.20  2011/09/04 22:13:25  fplanque
  * copyright 2011
  *

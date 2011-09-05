@@ -141,7 +141,7 @@ $Form->begin_form( 'fform' );
 
 	$Form->buttons_input($submit_buttons);
 
-	$Form->info("", "", T_('Your IP address ('.$Hit->IP.') and the current time are being logged.'));
+	$Form->info( '', '', sprintf( T_('Your IP address (%s) and the current time are being logged.'), $Hit->IP ) );
 
 	$Form->end_fieldset();
 
@@ -228,6 +228,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.25  2011/09/05 18:10:54  sam2kb
+ * No break in tranlsated text
+ *
  * Revision 1.24  2011/09/04 22:13:25  fplanque
  * copyright 2011
  *

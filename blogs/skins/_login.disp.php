@@ -73,8 +73,8 @@ if( $action != 'req_validatemail' )
 
 	$Form->buttons_input($submit_button);
 
-	//echo '<div class="center notes">'.T_('Your IP address ('.$Hit->IP.') and the current time are being logged.').'</div>';
-	$Form->info("", "", T_('Your IP address ('.$Hit->IP.') and the current time are being logged.'));
+	//echo '<div class="center notes">'.sprintf( T_('Your IP address (%s) and the current time are being logged.'), $Hit->IP ).'</div>';
+	$Form->info( '', '', sprintf( T_('Your IP address (%s) and the current time are being logged.'), $Hit->IP ) );
 
 	$links = array();
 
@@ -142,6 +142,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.10  2011/09/05 18:11:43  sam2kb
+ * No break in tranlsated text
+ *
  * Revision 1.9  2011/09/04 22:13:24  fplanque
  * copyright 2011
  *

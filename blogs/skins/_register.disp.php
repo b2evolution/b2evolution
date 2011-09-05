@@ -106,7 +106,7 @@ if( $action == 'register' )
 
 	$Form->buttons_input($submit_button);
 
-	$Form->info("", "", T_('Your IP address ('.$Hit->IP.') and the current time are being logged.'));
+	$Form->info( '', '', sprintf( T_('Your IP address (%s) and the current time are being logged.'), $Hit->IP ) );
 
 }
 elseif( $action == "reg_complete" )
@@ -136,6 +136,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.6  2011/09/05 18:11:43  sam2kb
+ * No break in tranlsated text
+ *
  * Revision 1.5  2011/09/05 18:04:50  sam2kb
  * Never break tranlsated text
  *
