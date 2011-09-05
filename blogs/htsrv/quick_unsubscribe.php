@@ -16,10 +16,10 @@ param( 'post_ID', 'integer', 0 );
 $UserCache = & get_UserCache();
 $edited_User = $UserCache->get_by_ID( $user_ID, false, false );
 
-// User must exists
+// User not found
 if( empty( $edited_User ) )
 {
-	echo T_( 'This user doesn\'t exists on database!' );
+	echo T_( 'Invalid user!' );
 	exit;
 }
 
@@ -68,6 +68,9 @@ exit;
 
 /*
  * $Log$
+ * Revision 1.2  2011/09/05 15:54:33  sam2kb
+ * minor
+ *
  * Revision 1.1  2011/05/19 17:47:07  efy-asimo
  * register for updates on a specific blog post
  *
