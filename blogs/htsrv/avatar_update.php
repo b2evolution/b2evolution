@@ -55,7 +55,7 @@ if( !empty( $update_avatar ) )
 { // update to an existing avatar image
 	$current_User->set( 'avatar_file_ID', $update_avatar, true );
 	$current_User->dbupdate();
-	$Messages->add( T_( 'Avatar has been changed successful' ), 'success' );
+	$Messages->add( T_( 'Avatar has been changed' ), 'success' );
 }
 elseif ( !empty( $remove_avatar ) )
 { // remove user avatar
@@ -81,7 +81,7 @@ else
 			{ // set uploaded image as avatar
 				$current_User->set( 'avatar_file_ID', $File->ID, true );
 				$current_User->dbupdate();
-				$Messages->add( T_('Avatar has been set successfull.'), 'success' );
+				$Messages->add( T_('Avatar has been set.'), 'success' );
 			}
 			else
 			{ // uploaded file is not an image, delete the file
@@ -106,6 +106,9 @@ header_redirect();
 
 /**
  * $Log$
+ * Revision 1.3  2011/09/05 15:28:39  sam2kb
+ * minor
+ *
  * Revision 1.2  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *
