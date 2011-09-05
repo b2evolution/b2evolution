@@ -172,7 +172,7 @@ switch( $action )
 
 	case 'create':
 		// Insert new element...:
-			
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'element' );
 
@@ -195,7 +195,7 @@ switch( $action )
 				$action = 'list';
 				// We want to highlight the edited object on next list display:
 				$Session->set( 'fadeout_array', array($edited_GenericCategory->ID) );
- 			
+
 				// Redirect so that a reload doesn't write to the DB twice:
 				header_redirect( '?ctrl=chapters&blog='.$blog, 303 ); // Will EXIT
 				// We have EXITed already at this point!!
@@ -206,10 +206,10 @@ switch( $action )
 
 	case 'update':
 		// Make sure we got an ID:
-				
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'element' );
-		
+
 		param( $GenericCategoryCache->dbIDname, 'integer', true );
 
 		if( ! $permission_to_edit )
@@ -227,10 +227,10 @@ switch( $action )
 			}
 			// Add the ID of the updated element to the result fadeout
 			$result_fadeout[$edited_GenericCategory->dbIDname][] = $edited_GenericCategory->ID;
-			
+
 			// We want to highlight the edited object on next list display:
  			$Session->set( 'fadeout_array', array($edited_GenericCategory->ID));
-			
+
 			$action = 'list';
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=chapters&blog='.$blog, 303 ); // Will EXIT
@@ -244,10 +244,10 @@ switch( $action )
 		break;
 
 
-	case 'update_move':	
+	case 'update_move':
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'element' );
-		
+
 		// EXTENSION
  		if( ! $Settings->get('allow_moving_chapters') )
  		{
@@ -298,10 +298,10 @@ switch( $action )
 
 	case 'delete':
 		// Delete entry:
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'element' );
-		
+
 		param( $GenericCategoryCache->dbIDname, 'integer', true );
 
 		if( ! $permission_to_edit )
@@ -339,7 +339,7 @@ switch( $action )
 	case 'make_default':
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'element' );
-		
+
 		if( ! $permission_to_edit )
 		{
 			debug_die( 'No permission to edit' );
@@ -474,6 +474,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.24  2011/09/05 15:12:22  sam2kb
+ * minor
+ *
  * Revision 1.23  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *
