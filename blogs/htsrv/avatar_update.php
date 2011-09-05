@@ -55,7 +55,7 @@ if( !empty( $update_avatar ) )
 { // update to an existing avatar image
 	$current_User->set( 'avatar_file_ID', $update_avatar, true );
 	$current_User->dbupdate();
-	$Messages->add( T_( 'Avatar has been changed' ), 'success' );
+	$Messages->add( T_( 'Avatar has been changed.' ), 'success' );
 }
 elseif ( !empty( $remove_avatar ) )
 { // remove user avatar
@@ -106,6 +106,9 @@ header_redirect();
 
 /**
  * $Log$
+ * Revision 1.4  2011/09/05 23:00:24  fplanque
+ * minor/doc/cleanup/i18n
+ *
  * Revision 1.3  2011/09/05 15:28:39  sam2kb
  * minor
  *

@@ -19,14 +19,14 @@ $edited_User = $UserCache->get_by_ID( $user_ID, false, false );
 // User not found
 if( empty( $edited_User ) )
 {
-	echo T_( 'Invalid user!' );
+	echo T_( 'The user you are trying to unsubscribe does not seem to exist. You may already have deleted your account.' );
 	exit;
 }
 
 // Security check
 if( $key != md5( $user_ID.$edited_User->get( 'unsubscribe_key' ) ) )
 {
-	echo T_( 'Invalid unsubscribe link1!' );
+	echo 'Invalid unsubscribe link!';
 	exit;
 }
 
@@ -36,7 +36,7 @@ switch( $type )
 		// unsubscribe from blog
 		if( $coll_ID == 0 )
 		{
-			echo T_( 'Invalid unsubscribe link!' );
+			echo 'Invalid unsubscribe link!';
 			exit;
 		}
 
@@ -48,7 +48,7 @@ switch( $type )
 		// unsubscribe from a specific post
 		if( $post_ID == 0 )
 		{
-			echo T_( 'Invalid unsubscribe link!' );
+			echo 'Invalid unsubscribe link!';
 			exit;
 		}
 
@@ -63,11 +63,14 @@ switch( $type )
 		break;
 }
 
-echo( T_( 'You have successfuly unsubscribed!' ) );
+echo( T_( 'You have successfuly unsubscribed.' ) );
 exit;
 
 /*
  * $Log$
+ * Revision 1.3  2011/09/05 23:00:24  fplanque
+ * minor/doc/cleanup/i18n
+ *
  * Revision 1.2  2011/09/05 15:54:33  sam2kb
  * minor
  *

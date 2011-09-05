@@ -65,8 +65,8 @@ if( $action == 'reg_complete' )
 }
 elseif( $action == 'reg_validation' )
 {
-	echo '<p>'.sprintf( T_( 'An email has just been sent to %s . Please check your email and click on the validation link you will find on that email.' ), '<b>'.$email.'</b>' ).'</p>';
-	echo '<p>'.sprintf( T_( 'If you have not received the email in the next few minutes, please check your spam folder. The email was sent from %s and has the title %s' ), $notify_from,
+	echo '<p>'.sprintf( T_( 'An email has just been sent to %s . Please check your email and click on the validation link you will find in that email.' ), '<b>'.$email.'</b>' ).'</p>';
+	echo '<p>'.sprintf( T_( 'If you have not received the email in the next few minutes, please check your spam folder. The email was sent from %s and has the title &laquo;%s&raquo;' ), $notify_from,
 					'<b>'.sprintf( T_('Validate your email address for "%s"'), $login ).'</b>' ).'</p>';
 	echo '<p>'.T_( 'If you still can\'t find the email or if you would like to use a different email address' ).','.
 					'<a href="'.$redirect_to.'">'.T_( 'click here to try again' ).'.</a></p>';
@@ -78,6 +78,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.11  2011/09/05 23:00:24  fplanque
+ * minor/doc/cleanup/i18n
+ *
  * Revision 1.10  2011/09/05 18:02:56  sam2kb
  * Never break tranlsated text
  *

@@ -189,11 +189,14 @@ if( $upload )
 	exit();
 }
 
-echo '<span class="error">'.T_( 'Invalid upload param' ).'</span>';
+echo '<span class="error">Invalid upload param</span>';
 exit();
 
 /*
  * $Log$
+ * Revision 1.9  2011/09/05 23:00:24  fplanque
+ * minor/doc/cleanup/i18n
+ *
  * Revision 1.8  2011/09/05 20:59:35  sam2kb
  * minor
  *

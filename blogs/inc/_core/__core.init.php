@@ -79,7 +79,7 @@ $db_config['aliases'] = array(
  * @global array
  */
 $ctrl_mappings = array(
-		'antispam'     => 'antispam/antispam_list.ctrl.php',
+		'antispam'     => 'antispam/antispam.ctrl.php',
 		'crontab'      => 'cron/cronjobs.ctrl.php',
 		'countries'    => 'regional/countries.ctrl.php',
 		'currencies'   => 'regional/currencies.ctrl.php',
@@ -87,7 +87,6 @@ $ctrl_mappings = array(
 		'locales'      => 'locales/locales.ctrl.php',
 		'plugins'      => 'plugins/plugins.ctrl.php',
 		'settings'     => 'settings/settings.ctrl.php',
-		'set_antispam' => 'antispam/antispam_settings.ctrl.php',
 		'stats'        => 'sessions/stats.ctrl.php',
 		'system'       => 'tools/system.ctrl.php',
 		'user'         => 'users/user.ctrl.php',
@@ -932,9 +931,6 @@ class _core_Module extends Module
 								'features' => array(
 									'text' => T_('Features'),
 									'href' => '?ctrl=features' ),
-								'antispam' => array(
-									'text' => T_('Antispam'),
-									'href' => '?ctrl=set_antispam'),
 								'regional' => array(
 									'text' => T_('Regional'),
 									'href' => '?ctrl=locales'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ) ),
@@ -1032,6 +1028,24 @@ class _core_Module extends Module
 				$tools_entries['tools']['entries']['antispam'] = array(
 									'text' => T_('Antispam'),
 									'href' => '?ctrl=antispam' );
+
+				if( $perm_options )
+				{	// If we have access to options, then we add a submenu:
+					$tools_entries['tools']['entries']['antispam']['entries']['blacklist'] = array(
+											'text' => T_('Blacklist'),
+											'href' => '?ctrl=antispam' );
+
+					$tools_entries['tools']['entries']['antispam']['entries']['settings'] = array(
+											'text' => T_('Settings'),
+											'href' => '?ctrl=antispam&amp;tab3=settings' );
+
+					if( $current_User->check_perm( 'options', 'edit' ) )
+					{
+						$tools_entries['tools']['entries']['antispam']['entries']['tools'] = array(
+												'text' => T_('Tools'),
+												'href' => '?ctrl=antispam&amp;tab3=tools' );
+					}
+				}
 			}
 			if( $perm_slugs )
 			{	// Permission to view slugs:
@@ -1053,6 +1067,12 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.76  2011/09/05 23:00:25  fplanque
+ * minor/doc/cleanup/i18n
+ *
+ * Revision 1.75  2011/09/05 14:17:25  sam2kb
+ * Refactor antispam controller
+ *
  * Revision 1.74  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

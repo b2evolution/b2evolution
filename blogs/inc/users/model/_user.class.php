@@ -2325,7 +2325,7 @@ class User extends DataObject
 		$this->set( 'avatar_file_ID', $file_ID, true );
 		$this->dbupdate();
 
-		$Messages->add( T_('Avatar has been changed'), 'success' );
+		$Messages->add( T_('Avatar has been changed.'), 'success' );
 		return true;
 	}
 
@@ -2386,7 +2386,7 @@ class User extends DataObject
 			{ // set uploaded image as avatar
 				$this->set( 'avatar_file_ID', $File->ID, true );
 				$this->dbupdate();
-				$Messages->add( T_('Avatar has been changed'), 'success' );
+				$Messages->add( T_('Avatar has been changed.'), 'success' );
 				return true;
 			}
 			else
@@ -2408,6 +2408,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.111  2011/09/05 23:00:25  fplanque
+ * minor/doc/cleanup/i18n
+ *
  * Revision 1.110  2011/09/05 21:07:15  sam2kb
  * minor
  *
