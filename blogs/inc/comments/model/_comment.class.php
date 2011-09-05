@@ -1851,7 +1851,7 @@ class Comment extends DataObject
 			}
 			else if( $notify_type == 'creator' )
 			{ // user is the creator of the post
-				$notify_message .= T_( 'This is your post. You are receiving notifications when anyone comments on your posts. ' )."\n";
+				$notify_message .= T_( 'This is your post. You are receiving notifications when anyone comments on your posts.' )."\n";
 				$notify_message .= T_( 'If you don\'t want to receive any more notifications on your posts, click here' ).': '
 									.$htsrv_url.'quick_unsubscribe.php?type=creator&user_ID='.$notify_user_ID.'&key='.md5( $notify_user_ID.$notify_key )."\n\n";
 			}
@@ -2032,6 +2032,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.87  2011/09/05 21:00:56  sam2kb
+ * minor
+ *
  * Revision 1.86  2011/09/04 22:13:15  fplanque
  * copyright 2011
  *
