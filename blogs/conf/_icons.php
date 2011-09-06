@@ -539,6 +539,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.74  2011/09/06 18:33:52  sam2kb
+ * minor/removed weird character
+ *
  * Revision 1.73  2011/03/10 14:54:18  efy-asimo
  * Allow file types modification & add m4v file type
  *
@@ -552,7 +555,7 @@ function get_icon_info($name)
  * Remove File manager rename file
  *
  * Revision 1.69  2008/03/31 21:13:47  fplanque
- * Reverted übergeekyness
+ * Reverted bergeekyness
  *
  * Revision 1.67  2008/02/14 02:19:50  fplanque
  * cleaned up stats
