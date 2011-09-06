@@ -103,7 +103,7 @@ if( ( $current_User->check_perm( 'users', 'all' ) ) || ( $current_User->ID == $e
 
 		// Upload
 		$info_content = '<input name="uploadfile[]" type="file" size="10" />';
-		$info_content .= '<input class="ActionButton" type="submit" value="&gt; '.T_('Upload!').'" />';
+		$info_content .= '<input class="ActionButton" type="submit" value="&gt; './* TRANS: action */ T_('Upload!').'" />';
 		$Form->info( T_('Upload a new profile picture'), $info_content );
 
 		// Previously uploaded avatars
@@ -164,6 +164,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.16  2011/09/06 20:50:55  sam2kb
+ * i18n update
+ *
  * Revision 1.15  2011/09/06 00:54:38  fplanque
  * i18n update
  *
