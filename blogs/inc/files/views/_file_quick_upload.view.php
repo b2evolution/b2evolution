@@ -77,7 +77,7 @@ echo '<tbody>';
 
 		var url = <?php echo '"'.$quick_upload_url.'&root_and_path='.$root_and_path.'&'.url_crumb( 'file' ).'"'; ?>;
 		var uploading_text = <?php echo '"'.T_( 'Uploading' ).'"'; ?>;
-		var incompatible_browser = <?php echo '"'.T_( 'Your browser does not support XMLHttpRequest technology!.Please use standard upload!' ).'"'; ?>;
+		var incompatible_browser = <?php echo '"'.T_( 'Your browser does not support XMLHttpRequest technology! Please use standard upload!' ).'"'; ?>;
 		var maxsize = <?php echo $Settings->get( 'upload_maxkb' )*1024; ?>;
 		var size_error = <?php echo '"<span class=\"result_error\">'.T_('The file is too large: %1 but the maximum allowed is %2.').'</span>"'; ?>;
 		var ok_text =  <?php echo '"'.T_( 'OK' ).'"'; ?>;
@@ -103,6 +103,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.4  2011/09/06 20:23:54  sam2kb
+ * MFB
+ *
  * Revision 1.3  2011/09/04 22:13:16  fplanque
  * copyright 2011
  *
