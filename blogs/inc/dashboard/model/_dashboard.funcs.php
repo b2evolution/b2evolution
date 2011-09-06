@@ -53,10 +53,11 @@ function b2evonet_get_updates( $force_short_delay = false )
 		$attempt_every = 3600*4; // 4 hours
 	}
 
-	/* DEBUG: */
-	#$update_every = 10;
-	#$attempt_every = 5;
-
+	if( $debug == 2 )
+	{
+		$update_every = 10;
+		$attempt_every = 5;
+	}
 
 	// Note: do not put $baseurl in here since it would cause too frequently updates, when you have the same install with different $baseurls.
 	//           Everytime this method gets called on another baseurl, there's a new check for updates!
@@ -289,6 +290,9 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 /*
  * $Log$
+ * Revision 1.44  2011/09/06 23:36:02  fplanque
+ * minor
+ *
  * Revision 1.43  2011/09/04 22:13:15  fplanque
  * copyright 2011
  *
