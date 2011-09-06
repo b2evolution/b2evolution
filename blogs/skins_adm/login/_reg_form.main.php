@@ -112,6 +112,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.24  2011/09/06 20:48:54  sam2kb
+ * No new line at end of file
+ *
  * Revision 1.23  2011/09/06 16:25:18  efy-james
  * Require special chars in password
  *

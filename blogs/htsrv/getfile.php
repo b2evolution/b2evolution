@@ -243,6 +243,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.57  2011/09/06 20:48:54  sam2kb
+ * No new line at end of file
+ *
  * Revision 1.56  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

@@ -168,6 +168,9 @@ echo '<p>[<a href="'.$cron_url.'cron_exec.php" onclick="return pop_up_window( \'
 
 /*
  * $Log$
+ * Revision 1.10  2011/09/06 20:48:54  sam2kb
+ * No new line at end of file
+ *
  * Revision 1.9  2011/09/04 22:13:15  fplanque
  * copyright 2011
  *

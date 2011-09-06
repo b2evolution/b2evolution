@@ -139,6 +139,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.10  2011/09/06 20:48:54  sam2kb
+ * No new line at end of file
+ *
  * Revision 1.9  2011/09/06 16:25:18  efy-james
  * Require special chars in password
  *
