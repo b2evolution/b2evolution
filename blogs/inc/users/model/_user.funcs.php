@@ -955,7 +955,7 @@ function get_user_isubscription( $user_ID, $item_ID )
  * @param integer item ID
  * @param integer value 0 for unsubscribe and 1 for subscribe
  * @param string item subscription type ( isub_comments, isub_attend )
- * @return boolean true is new value was successfuly set, false otherwise
+ * @return boolean true is new value was successfully set, false otherwise
  */
 function set_user_isubscription( $user_ID, $item_ID, $value, $type )
 {
@@ -1002,6 +1002,9 @@ function get_prefered_name( $nickname, $firstname, $login )
 
 /*
  * $Log$
+ * Revision 1.41  2011/09/06 17:13:53  sam2kb
+ * minor/typo
+ *
  * Revision 1.40  2011/09/06 16:25:18  efy-james
  * Require special chars in password
  *

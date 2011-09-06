@@ -118,7 +118,7 @@ class GenericCategoryCache extends GenericCache
 		global $Debuglog;
 
 		if( parent::add( $Obj ) )
-		{	// Successfuly added
+		{	// Successfully added
 
 			if( !empty($this->subset_property) )
 			{	// Also add to subset cache:
@@ -434,6 +434,9 @@ class GenericCategoryCache extends GenericCache
 
 /*
  * $Log$
+ * Revision 1.12  2011/09/06 17:14:43  sam2kb
+ * minor/typo
+ *
  * Revision 1.11  2011/09/04 22:13:17  fplanque
  * copyright 2011
  *

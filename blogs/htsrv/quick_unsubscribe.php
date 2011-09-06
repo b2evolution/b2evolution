@@ -63,11 +63,14 @@ switch( $type )
 		break;
 }
 
-echo( T_( 'You have successfuly unsubscribed.' ) );
+echo( T_( 'You have successfully unsubscribed.' ) );
 exit;
 
 /*
  * $Log$
+ * Revision 1.4  2011/09/06 17:13:06  sam2kb
+ * minor/typo
+ *
  * Revision 1.3  2011/09/05 23:00:24  fplanque
  * minor/doc/cleanup/i18n
  *
