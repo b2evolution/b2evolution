@@ -153,10 +153,10 @@ $Form->begin_fieldset( T_('Feedback options') );
 	global $default_avatar;
 	$Form->radio( 'default_gravatar', $edited_Blog->get_setting('default_gravatar'),
 						array(	array( 'b2evo', T_('Default image'), $default_avatar ),
-								array ('', T_('Gravatar') ),
-								array ('identicon', T_('Identicon') ),
-								array ('monsterid', T_('Monsterid') ),
-								array ('wavatar', T_('Wavatar') ),
+								array ('', 'Gravatar' ),
+								array ('identicon', 'Identicon' ),
+								array ('monsterid', 'Monsterid' ),
+								array ('wavatar', 'Wavatar' ),
 						), T_('Default gravatars'), true, T_('Gravatar users can choose to set up a unique icon for themselves, and if they don\'t, they will be assigned a default image.') );
 
 	echo '</div>';
@@ -284,6 +284,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.46  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.45  2011/09/04 22:13:14  fplanque
  * copyright 2011
  *

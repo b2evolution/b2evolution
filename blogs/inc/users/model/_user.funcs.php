@@ -896,7 +896,7 @@ function get_user_sub_entries( $is_admin, $user_ID )
 		if( $Settings->get('allow_avatars') )
 		{
 			$users_sub_entries['avatar'] = array(
-							'text' => T_('Avatar'),
+							'text' => T_('Profile picture'),
 							'href' => $base_url.$ctrl_param.'avatar'.$user_param );
 		}
 
@@ -950,7 +950,7 @@ function get_user_isubscription( $user_ID, $item_ID )
  * @param integer user ID
  * @param integer item ID
  * @param integer value 0 for unsubscribe and 1 for subscribe
- * @param string item subscriotion type ( isub_comments, isub_attend )
+ * @param string item subscription type ( isub_comments, isub_attend )
  * @return boolean true is new value was successfuly set, false otherwise
  */
 function set_user_isubscription( $user_ID, $item_ID, $value, $type )
@@ -998,6 +998,9 @@ function get_prefered_name( $nickname, $firstname, $login )
 
 /*
  * $Log$
+ * Revision 1.39  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.38  2011/09/04 22:13:21  fplanque
  * copyright 2011
  *

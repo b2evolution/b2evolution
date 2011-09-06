@@ -1228,7 +1228,7 @@ class Item extends ItemLight
 		// Get teaser for page 1:
 		$output = $this->get_content_teaser( 1, false, 'text' );
 
-		return excerpt( $output, crop_at );
+		return excerpt( $output, $crop_at );
 	}
 
 
@@ -4706,6 +4706,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.240  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.239  2011/09/04 22:13:17  fplanque
  * copyright 2011
  *

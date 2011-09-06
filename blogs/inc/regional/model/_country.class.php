@@ -83,7 +83,7 @@ class Country extends DataObject
 
 		// Code
 		param( 'ctry_code', 'string' );
-		param_check_regexp( 'ctry_code', '#^[A-Za-z]{2}$#', T_('Country code must be 2 letters parameter.') );
+		param_check_regexp( 'ctry_code', '#^[A-Za-z]{2}$#', T_('Country code must be 2 letters.') );
 		$this->set_from_Request( 'code', 'ctry_code' );
 
 		// Currency Id
@@ -145,6 +145,9 @@ class Country extends DataObject
 
 /*
  * $Log$
+ * Revision 1.17  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.16  2009/09/29 03:14:22  fplanque
  * doc
  *

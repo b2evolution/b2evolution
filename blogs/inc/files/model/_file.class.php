@@ -236,7 +236,7 @@ class File extends DataObject
 
 		$this->delete_restrictions = array(
 				array( 'table'=>'T_links', 'fk'=>'link_file_ID', 'msg'=>T_('%d linked items') ),
-				array( 'table'=>'T_users', 'fk'=>'user_avatar_file_ID', 'msg'=>T_('%d linked users (avatars)') ),
+				array( 'table'=>'T_users', 'fk'=>'user_avatar_file_ID', 'msg'=>T_('%d linked users (profile pictures)') ),
 			);
 
 		// Memorize filepath:
@@ -2135,6 +2135,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.95  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.94  2011/09/04 22:13:15  fplanque
  * copyright 2011
  *

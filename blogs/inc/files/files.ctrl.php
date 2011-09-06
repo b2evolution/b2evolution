@@ -1143,7 +1143,7 @@ switch( $action )
 		// Save to DB:
  		$edited_User->dbupdate();
 
-		$Messages->add( T_('User avatar modified.'), 'success' );
+		$Messages->add( T_('Your profile picture has been changed.'), 'success' );
 
 		// REDIRECT / EXIT
 		header_redirect( $admin_url.'?ctrl=user&user_tab=avatar&user_ID='.$edited_User->ID );
@@ -1776,6 +1776,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.79  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.78  2011/09/04 22:13:15  fplanque
  * copyright 2011
  *

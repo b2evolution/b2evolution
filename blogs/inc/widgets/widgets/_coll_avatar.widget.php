@@ -53,7 +53,7 @@ class coll_avatar_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Avatar');
+		return T_('Profile picture (Avatar)');
 	}
 
 
@@ -62,7 +62,7 @@ class coll_avatar_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display the avatar of the blog owner.');
+		return T_('Display the profile picture of the blog owner.');
 	}
 
 
@@ -150,6 +150,9 @@ class coll_avatar_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.11  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.10  2011/09/04 22:13:21  fplanque
  * copyright 2011
  *

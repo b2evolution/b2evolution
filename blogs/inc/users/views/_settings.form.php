@@ -23,7 +23,7 @@ $Form->begin_form( 'fform', '' );
 
 $Form->begin_fieldset( T_('User latitude') );
 
-	$Form->checkbox_input( 'allow_avatars', $Settings->get( 'allow_avatars', true ), T_('Allow avatars'), array( 'note'=>T_('Allow users to upload avatars.') ) );
+	$Form->checkbox_input( 'allow_avatars', $Settings->get( 'allow_avatars', true ), T_('Allow profile pictures'), array( 'note'=>T_('Allow users to upload profile pictures.') ) );
 
 	$Form->radio( 'uset_nickname_editing', $Settings->get( 'nickname_editing' ), array(
 					array( 'edited-user', T_('Can be edited by user') ),
@@ -52,6 +52,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.11  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.10  2010/11/03 19:44:15  sam2kb
  * Increased modularity - files_Module
  * Todo:

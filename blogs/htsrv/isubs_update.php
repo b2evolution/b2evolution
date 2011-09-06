@@ -72,7 +72,7 @@ if( ( $isub_type == 'isub_comments' ) && ( ! is_email( $current_User->get( 'emai
 
 if( ( $notify < 0 ) || ( $notify > 1 ) )
 { // Invalid notify param. It should be 0 for unsubscribe and 1 for subscribe.
-	$Messages->add( T_( 'Invalid params!' ), 'error' );
+	$Messages->add( 'Invalid params!', 'error' );
 }
 
 if( $Messages->has_errors() )
@@ -84,17 +84,17 @@ if( set_user_isubscription( $current_User->ID, $item_ID, $notify, $isub_type ) )
 { // user subscription was set
 	if( $notify == 0 )
 	{
-		$Messages->add( T_( 'You have successfuly unsubscribed.' ), 'success' );
+		$Messages->add( T_( 'You have successfully unsubscribed.' ), 'success' );
 	}
 	else
 	{
 		if( $isub_type == 'isub_attend' )
 		{
-			$Messages->add( T_( 'You have successfuly subscribed to attend this event.' ), 'success' );
+			$Messages->add( T_( 'You have successfully subscribed to attend this event.' ), 'success' );
 		}
 		else
 		{
-			$Messages->add( T_( 'You have successfuly subscribed for notifications.' ), 'success' );
+		$Messages->add( T_( 'You have successfully subscribed to notifications.' ), 'success' );
 		}
 	}
 }
@@ -106,7 +106,7 @@ else
 	}
 	else
 	{
-		$Messages->add( T_( 'Could not subscribe for notifications.' ), 'error' );
+	$Messages->add( T_( 'Could not subscribe to notifications.' ), 'error' );
 	}
 }
 
@@ -114,6 +114,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.4  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.3  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

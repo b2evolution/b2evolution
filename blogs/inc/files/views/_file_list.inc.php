@@ -114,7 +114,7 @@ $Form->begin_form();
 		}
 		else
 		{
-			$col_title = /* TRANS: short for (file)Type */ T_(' T ');
+			$col_title = /* TRANS: short for (file)Type */ T_('T ');		// Not to be confused with T for Tuesday
 		}
 		echo $fm_Filelist->get_sort_link( 'type', $col_title );
 		echo '</th>';
@@ -301,7 +301,7 @@ $Form->begin_form();
 				{	// Offer option to link the file to an Item (or anything else):
 					if( $lFile->is_image() )
 					{
-						echo action_icon( T_('Use this as an avatar image!'), 'link',
+						echo action_icon( T_('Use this as my profile picture!'), 'link',
 									regenerate_url( 'fm_selected', 'action=link_user&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
 									NULL, NULL, NULL, array() );
 						echo ' ';
@@ -690,6 +690,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.48  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.47  2011/09/04 22:13:16  fplanque
  * copyright 2011
  *

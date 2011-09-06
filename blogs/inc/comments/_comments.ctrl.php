@@ -331,7 +331,7 @@ switch( $action )
 		if( $result )
 		{
 			$DB->commit();
-			$Messages->add( T_('Recycle bin content was succesfully deleted.'), 'success' );
+			$Messages->add( T_('Recycle bin contents were successfully deleted.'), 'success' );
 		}
 		else
 		{
@@ -345,7 +345,7 @@ switch( $action )
 		/*
 		 * Trash comments:
 		 */
-		$AdminUI->title = $AdminUI->title_titlearea = T_('Trash comments');
+		$AdminUI->title = $AdminUI->title_titlearea = T_('Comment recycle bins');
 		break;
 
 	case 'elevate':
@@ -507,6 +507,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.46  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.45  2011/09/04 22:13:15  fplanque
  * copyright 2011
  *

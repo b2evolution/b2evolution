@@ -2318,14 +2318,14 @@ class User extends DataObject
 
 		if( $file_ID == NULL )
 		{
-			$Messages->add( T_('Could not change the avatar!'), 'error' );
+			$Messages->add( T_('Your profile picture could not be changed!'), 'error' );
 			return 'edit';
 		}
 
 		$this->set( 'avatar_file_ID', $file_ID, true );
 		$this->dbupdate();
 
-		$Messages->add( T_('Avatar has been changed.'), 'success' );
+		$Messages->add( T_('Your profile picture has been changed.'), 'success' );
 		return true;
 	}
 
@@ -2348,7 +2348,7 @@ class User extends DataObject
 		$this->set( 'avatar_file_ID', NULL, true );
 		$this->dbupdate();
 
-		$Messages->add( T_('Avatar has been removed.'), 'success' );
+		$Messages->add( T_('Your profile picture has been removed.'), 'success' );
 		return true;
 	}
 
@@ -2386,12 +2386,12 @@ class User extends DataObject
 			{ // set uploaded image as avatar
 				$this->set( 'avatar_file_ID', $File->ID, true );
 				$this->dbupdate();
-				$Messages->add( T_('Avatar has been changed.'), 'success' );
+				$Messages->add( T_('Your profile picture has been changed.'), 'success' );
 				return true;
 			}
 			else
 			{ // uploaded file is not an image, delete the file
-				$Messages->add( T_( 'You can only set an image file to avatar!' ) );
+				$Messages->add( T_( 'The file you uploaded does not seem to be an image.' ) );
 				$File->unlink();
 			}
 		}
@@ -2408,6 +2408,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.112  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.111  2011/09/05 23:00:25  fplanque
  * minor/doc/cleanup/i18n
  *

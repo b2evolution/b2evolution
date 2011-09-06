@@ -33,7 +33,7 @@ if( !$user_profile_only )
 $is_admin = is_admin_page();
 if( $is_admin )
 {
-	$form_title = sprintf( T_('Edit avatar for user %s'), $edited_User->dget('fullname').' &laquo;'.$edited_User->dget('login').'&raquo;' );
+	$form_title = sprintf( T_('Edit profile picture for user %s'), $edited_User->dget('fullname').' &laquo;'.$edited_User->dget('login').'&raquo;' );
 	$form_class = 'fform';
 	$ctrl_param = '?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$edited_User->ID;
 }
@@ -63,7 +63,7 @@ $Form->begin_form( $form_class, $form_title );
 
 	/***************  Avatar  **************/
 
-$Form->begin_fieldset( $is_admin ? T_('Avatar') : '', array( 'class'=>'fieldset clear' ) );
+$Form->begin_fieldset( $is_admin ? T_('Profile picture') : '', array( 'class'=>'fieldset clear' ) );
 
 global $admin_url;
 $avatar_tag = $edited_User->get_avatar_imgtag();
@@ -71,15 +71,15 @@ if( empty( $avatar_tag ) )
 {
 	if( ( $current_User->ID == $edited_User->ID ) )
 	{
-		$avatar_tag = T_( 'You currently don\'t have an avatar.' );
+		$avatar_tag = T_( 'You currently have no profile picture.' );
 	}
 	else
 	{
-		$avatar_tag = T_( 'This user currently doesn\'t have an avatar.' );
+		$avatar_tag = T_( 'This user currently has no profile picture.' );
 	}
 }
 
-$Form->info( T_( 'Current avatar' ), $avatar_tag );
+$Form->info( T_( 'Current profile picture' ), $avatar_tag );
 
 // fp> TODO: a javascript REFRAME feature would ne neat here: selecting a square area of the img and saving it as a new avatar image
 
@@ -104,7 +104,7 @@ if( ( $current_User->check_perm( 'users', 'all' ) ) || ( $current_User->ID == $e
 		// Upload
 		$info_content = '<input name="uploadfile[]" type="file" size="10" />';
 		$info_content .= '<input class="ActionButton" type="submit" value="&gt; '.T_('Upload!').'" />';
-		$Form->info( T_('Upload a new avatar'), $info_content );
+		$Form->info( T_('Upload a new profile picture'), $info_content );
 
 		// Previously uploaded avatars
 		if( is_dir( $ads_list_path ) )
@@ -126,7 +126,7 @@ if( ( $current_User->check_perm( 'users', 'all' ) ) || ( $current_User->ID == $e
 						$info_content .= '</div>';
 					}
 				}
-				$Form->info( T_('Select a previously uploaded avatar'), $info_content );
+				$Form->info( T_('Select a previously uploaded profile picture'), $info_content );
 			}
 		}
 	}
@@ -137,11 +137,11 @@ if( ( $current_User->check_perm( 'users', 'all' ) ) || ( $current_User->ID == $e
 		$more_content = '<div><a href="'.$ctrl_param.'&amp;action=remove_avatar&amp;'.url_crumb('user').'">';
 		if( $edited_User->ID == $current_User->ID )
 		{
-			$more_content .= T_( 'Remove your current avatar' );
+			$more_content .= T_( 'Remove your current profile picture' );
 		}
 		else
 		{
-			$more_content .= T_( 'Remove this user current avatar' );
+			$more_content .= T_( 'Remove this user\'s current profile picture' );
 		}
 		$more_content .= '</a></div>';
 	}
@@ -149,7 +149,7 @@ if( ( $current_User->check_perm( 'users', 'all' ) ) || ( $current_User->ID == $e
 	if( $current_User->check_perm( 'files', 'view' ) )
 	{
 		$more_content .= '<div><a href="'.$admin_url.'?ctrl=files&amp;user_ID='.$edited_User->ID.'">';
-		$more_content .= T_( 'Use the file manager to assign a new avatar' ).'</a></div>';
+		$more_content .= T_( 'Use the file manager to assign a new profile picture' ).'</a></div>';
 	}
 
 	if( ! empty( $more_content ) )
@@ -164,6 +164,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.15  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.14  2011/05/11 07:11:52  efy-asimo
  * User settings update
  *

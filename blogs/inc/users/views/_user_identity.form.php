@@ -432,7 +432,7 @@ else
 
 	if( $Settings->get('allow_avatars') )
 	{
-		$Form->info( T_('Avatar'), $edited_User->get_avatar_imgtag() );
+		$Form->info( T_('Profile picture'), $edited_User->get_avatar_imgtag() );
 	}
 
 	$Form->info( T_('Login'), $edited_User->get('login') );
@@ -751,6 +751,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.33  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.32  2011/09/04 22:13:21  fplanque
  * copyright 2011
  *

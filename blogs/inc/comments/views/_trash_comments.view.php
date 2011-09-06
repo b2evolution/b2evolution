@@ -36,7 +36,7 @@ $SQL->GROUP_BY( 'blog_ID' );
 // Create result set:
 $Results = new Results( $SQL->get() );
 
-$Results->title = T_('Trash comments').' ('.$Results->total_rows.')';
+$Results->title = T_('Comment recycle bins').' ('.$Results->total_rows.')';
 
 $Results->cols[] = array(
 			'th' => T_('Blog ID'),
@@ -53,7 +53,7 @@ $Results->cols[] = array(
 		);
 
 $Results->cols[] = array(
-			'th' => T_('Trash comments number'),
+			'th' => T_('Comments in recycle bin'),
 			'th_class' => 'shrinkwrap',
 			'order' => 'comments_number',
 			'td' => '$comments_number$',
@@ -77,6 +77,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.5  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.4  2011/09/04 22:13:15  fplanque
  * copyright 2011
  *

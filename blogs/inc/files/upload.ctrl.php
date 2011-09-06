@@ -304,7 +304,7 @@ if( $uploadfile_url )
 			else
 			{
 				$failedFiles[$k] = sprintf(
-					T_('Could not retrieve file. Error: %s (status %s). Used method: %s.'),
+					'Could not retrieve file. Error: %s (status %s). Used method: %s.',
 					$info['error'],
 					isset($info['status']) ? $info['status'] : '-',
 					isset($info['used_method']) ? $info['used_method'] : '-');
@@ -481,6 +481,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.48  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.47  2011/09/04 22:13:15  fplanque
  * copyright 2011
  *

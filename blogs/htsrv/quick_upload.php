@@ -45,7 +45,7 @@ if( strpos( $root_and_path, '::' ) )
 
 if( $upload_path === false )
 {
-	echo '<span class="result_error">'.T_( 'Bad request. Unknown upload location!' ).'</span>';
+	echo '<span class="result_error">Bad request. Unknown upload location!</span>'; // NO TRANS!!
 	exit();
 }
 
@@ -185,7 +185,7 @@ if( $upload )
 	}
 
 	// Could not find upload information
-	echo '<span class="result_error">'.T_( 'Bad request. Missing header information.' ).'</span>';
+	echo '<span class="result_error">Bad request. Missing header information.</span>'; // NO TRANS
 	exit();
 }
 
@@ -194,6 +194,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.10  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.9  2011/09/05 23:00:24  fplanque
  * minor/doc/cleanup/i18n
  *

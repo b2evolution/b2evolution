@@ -723,7 +723,7 @@ class _core_Module extends Module
 			if( $perm_spam )
 			{
 				$entries['tools']['entries']['antispam'] = array(
-						'text' => T_('Antispam blacklist').'&hellip;',
+						'text' => T_('Antispam').'&hellip;',
 						'href' => $admin_url.'?ctrl=antispam',
 					);
 			}
@@ -794,7 +794,7 @@ class _core_Module extends Module
 								'href' => get_user_profile_url(),
 							),
 						'avatar' => array(
-								'text' => T_('Change your avatar').'&hellip;',
+								'text' => T_('Change your profile picture').'&hellip;',
 								'href' => get_user_avatar_url(),
 							),
 						'pwdchange' => array(
@@ -1067,6 +1067,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.77  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.76  2011/09/05 23:00:25  fplanque
  * minor/doc/cleanup/i18n
  *

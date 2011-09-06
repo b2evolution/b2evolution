@@ -231,7 +231,7 @@ class twitter_plugin extends Plugin
 			// get setting from db
 			$Blog = $BlogCache->get_by_ID( $target_id, false, false );
 			if( empty( $Blog ) ) {
-				return '<p>'.T_( 'Could not initialize' ).'</p>';
+				return '<p>Could not initialize</p>';
 			}
 			$oauth_token = $this->get_coll_setting( 'twitter_token', $Blog );
 			if( !empty( $oauth_token ) )
@@ -389,7 +389,7 @@ class twitter_plugin extends Plugin
 		//if (isset($_REQUEST['oauth_token']) && $Session->get( 'oauth_token' ) !== $_REQUEST['oauth_token']) {
 		if( ( !empty( $req_token ) && ( $oauth_token !== $req_token ) ) || empty( $target_type ) || empty( $target_id ) )
 		{
-			$Messages->add( T_( 'Error occured during twitter plugin initialization. Pleas try again.' ), 'error' );
+			$Messages->add( T_( 'An error occurred during twitter plugin initialization. Please try again.' ), 'error' );
 			/* Remove no longer needed request tokens */
 			$Session->delete( 'oauth_token' );
 			$Session->delete( 'oauth_token_secret' );
@@ -402,11 +402,11 @@ class twitter_plugin extends Plugin
 			$denied = param( 'denied', 'string', '' );
 			if( empty( $denied ) )
 			{
-				$Messages->add( T_( 'Error occured during verifying twitter plugin initialization. Pleas try again.' ), 'error' );
+				$Messages->add( T_( 'Twitter did not answer. Twitter may be overloaded. Please try again.' ), 'error' );
 			}
 			else
 			{ // user didn't allow the connection
-				$Messages->add( T_( 'Twitter plugin connection denied.' ), 'error' );
+				$Messages->add( T_( 'Twitter denied the connection.' ), 'error' );
 			}
 			header_redirect( $redirect_to ); // !!!! Where to redirect
 		}
@@ -444,7 +444,7 @@ class twitter_plugin extends Plugin
 		$Session->delete( 'oauth_token_secret' );
 		$Session->dbsave();
 
-		$Messages->add( T_( 'Twitter plugin was initialized successful!' ), 'success' );
+		$Messages->add( T_( 'Twitter plugin was initialized successfully!' ), 'success' );
 		header_redirect( $redirect_to );
 	}
 
@@ -501,7 +501,7 @@ class twitter_plugin extends Plugin
 			debug_die( 'Target type has incorrect value!' );
 		}
 
-		$Messages->add( T_('Twitter account have been unlinked'), 'success' );
+		$Messages->add( T_('Your twitter account has been unlinked.'), 'success' );
 		header_redirect( $redirect_to );
 		// We have EXITed already at this point!!
 	}
@@ -570,6 +570,9 @@ class twitter_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.33  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.32  2011/09/04 21:32:17  fplanque
  * minor MFB 4-1
  *

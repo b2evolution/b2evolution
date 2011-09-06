@@ -86,7 +86,7 @@ $Form->begin_form( '' );
 		if( in_array( "trash", $show_statuses ) ) 
 			echo 'checked="checked" ';
 		echo '/>';
-		echo '	<label for="sh_trash">'.T_('Trash').' <span class="notes">('.T_('Deleted!').')</span></label><br />';
+		echo '	<label for="sh_trash">'.T_('Recycled').' <span class="notes">('.T_('Deleted!').')</span></label><br />';
 	}
 	?>
 
@@ -199,6 +199,9 @@ echo $template['block_end'];
 
 /*
  * $Log$
+ * Revision 1.11  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.10  2011/09/04 22:13:15  fplanque
  * copyright 2011
  *

@@ -315,7 +315,7 @@ function request_title( $params = array() )
 			'register_complete'   => T_('Registration complete'),
 			'register_validation' => T_('Account email validation'),
 			'profile_text'        => T_('User Profile'),
-			'avatar_text'         => T_('User Avatar'),
+			'avatar_text'         => T_('Profile picture'),
 			'pwdchange_text'      => T_('Password change'),
 			'userprefs_text'      => T_('User preferences'),
 			'user_text'           => T_('User'),
@@ -1302,6 +1302,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.89  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.88  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

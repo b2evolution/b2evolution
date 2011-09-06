@@ -103,7 +103,7 @@ if( !isset( $current_User ) || !$current_User->check_perm( 'options', 'edit', tr
 $do_real_posting = (!$Settings->get( 'eblog_test_mode' ) && $test != 2);
 if( ! $do_real_posting )
 {
-	echo_message( T_('You configured test mode in the settings or set $test to 2. Nothing will be posted to the database/mediastore nor will your inbox be altered.'), WARNING, 0 );
+	echo_message( 'You configured test mode in the settings or set $test to 2. Nothing will be posted to the database/mediastore nor will your inbox be altered.', WARNING, 0 );
 }
 
 if( $test > 0 )
@@ -257,7 +257,7 @@ function processHeader( &$header )
 	// of the form '20 Mar 2002 20:32:37'
 	if(!preg_match('#^(.{3}, )?(\d{2}) (.{3}) (\d{4}) (\d{2}):(\d{2}):(\d{2})#', $ddate, $match))
 	{
-		echo_message(T_('Could not parse date header!'), ERROR, 0);
+		echo_message( 'Could not parse date header!', ERROR, 0);
 		//pre_dump($ddate);
 		return false;
 	}
@@ -283,7 +283,7 @@ function processHeader( &$header )
 
 	if( ! isset( $dmonths[$match[3]] ) )
 	{
-		echo_message( T_( 'Invalid month name in message date string.' ), ERROR, 0 );
+		echo_message( 'Invalid month name in message date string.', ERROR, 0 );
 		return false;
 	}
 	$ddate_m = $dmonths[$match[3]];
@@ -501,7 +501,7 @@ for ( $index = 1; $index <= $imap_obj->Nmsgs; $index++ )
 
 	if( !$mimeParser->Decode( $MIMEparameters, $decodedMIME ) )
 	{
-		echo_message( sprintf(T_('MIME message decoding error: %s at position %d.'), $mimeParser->error, $mimeParser->error_position), ERROR, 0 );
+		echo_message( sprintf( 'MIME message decoding error: %s at position %d.', $mimeParser->error, $mimeParser->error_position), ERROR, 0 );
 		rmdir_r( $tmpDirMIME );
 		unlink( $tmpMIME );
 		continue;
@@ -511,7 +511,7 @@ for ( $index = 1; $index <= $imap_obj->Nmsgs; $index++ )
 		echo_message( '&#x2714; MIME message decoding successful.', INFO, 3 );
 		if( ! $mimeParser->Analyze( $decodedMIME[0], $parsedMIME ) )
 		{
-			echo_message( sprintf(T_('MIME message analyse error: %s'), $mimeParser->error), ERROR, 0 );
+			echo_message( sprintf( 'MIME message analyse error: %s', $mimeParser->error), ERROR, 0 );
 			// var_dump($parsedMIME);
 			rmdir_r( $tmpDirMIME );
 			unlink( $tmpMIME );
@@ -725,6 +725,9 @@ if( $test > 0 )
 
 /*
  * $Log$
+ * Revision 1.51  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.50  2011/09/04 22:13:12  fplanque
  * copyright 2011
  *

@@ -55,7 +55,7 @@ if( !empty( $update_avatar ) )
 { // update to an existing avatar image
 	$current_User->set( 'avatar_file_ID', $update_avatar, true );
 	$current_User->dbupdate();
-	$Messages->add( T_( 'Avatar has been changed.' ), 'success' );
+	$Messages->add( T_( 'Your profile picture has been changed.' ), 'success' );
 }
 elseif ( !empty( $remove_avatar ) )
 { // remove user avatar
@@ -81,11 +81,11 @@ else
 			{ // set uploaded image as avatar
 				$current_User->set( 'avatar_file_ID', $File->ID, true );
 				$current_User->dbupdate();
-				$Messages->add( T_('Avatar has been set.'), 'success' );
+				$Messages->add( T_('Your profile picture has been set.'), 'success' );
 			}
 			else
 			{ // uploaded file is not an image, delete the file
-				$Messages->add( T_( 'You can only set an image file to avatar!' ) );
+				$Messages->add( T_( 'The file you uploaded does not seem to be an image.' ) );
 				$File->unlink();
 			}
 		}
@@ -106,6 +106,9 @@ header_redirect();
 
 /**
  * $Log$
+ * Revision 1.5  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.4  2011/09/05 23:00:24  fplanque
  * minor/doc/cleanup/i18n
  *

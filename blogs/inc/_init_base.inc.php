@@ -252,7 +252,7 @@ $post_statuses = array (
 	'protected' => NT_('Protected'),
 	'private' => NT_('Private'),
 	'draft' => NT_('Draft'),
-	'trash' => NT_('Trash'),
+	'trash' => NT_('Recycled'),
 );
 
 
@@ -280,6 +280,9 @@ $Timer->pause( '_init_base' );
 
 /*
  * $Log$
+ * Revision 1.7  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.6  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

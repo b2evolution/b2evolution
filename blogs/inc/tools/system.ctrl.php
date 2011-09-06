@@ -320,20 +320,20 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 
 // User ID:
 list( $uid, $uname, $running_as ) = system_check_process_user();
-init_system_check( T_( 'PHP running as USER:' ), $running_as );
+init_system_check( 'PHP running as USER:', $running_as );
 disp_system_check( 'note' );
 
 
 // Group ID:
 list( $gid, $gname, $running_as ) = system_check_process_group();
-init_system_check( T_( 'PHP running as GROUP:' ), $running_as );
+init_system_check( 'PHP running as GROUP:', $running_as );
 disp_system_check( 'note' );
 
 
 // PHP version
 $phpinfo_url = '?ctrl=tools&amp;action=view_phpinfo&amp;'.url_crumb('tools');
 $phpinfo_link = action_icon( T_('View PHP info'), 'info', $phpinfo_url, '', 5, '', array( 'target'=>'_blank', 'onclick'=>'return pop_up_window( \''.$phpinfo_url.'\', \'phpinfo\', 650 )' ) );
-init_system_check( T_( 'PHP version' ), PHP_VERSION.' '.$phpinfo_link );
+init_system_check( 'PHP version', PHP_VERSION.' '.$phpinfo_link );
 
 if( version_compare( PHP_VERSION, '4.1', '<' ) )
 {
@@ -464,7 +464,7 @@ else
 
 
 // mbstring extension
-init_system_check( T_( 'PHP mbstring extension' ), extension_loaded('mbstring') ?  T_('Loaded') : T_('Not loaded') );
+init_system_check( 'PHP mbstring extension', extension_loaded('mbstring') ?  T_('Loaded') : T_('Not loaded') );
 if( ! extension_loaded('mbstring' ) )
 {
 	disp_system_check( 'warning', T_('b2evolution will not be able to convert character sets and special characters/languages may not be displayed correctly. Enable the mbstring extension in your php.ini file or ask your hosting provider about it.') );
@@ -476,7 +476,7 @@ else
 
 
 // XML extension
-init_system_check( T_( 'PHP XML extension' ), extension_loaded('xml') ?  T_('Loaded') : T_('Not loaded') );
+init_system_check( 'PHP XML extension', extension_loaded('xml') ?  T_('Loaded') : T_('Not loaded') );
 if( ! extension_loaded('xml' ) )
 {
 	disp_system_check( 'warning', T_('The XML extension is not loaded.') ); // fp> This message only repeats the exact same info that is already displayed. Not helpful.
@@ -491,10 +491,10 @@ else
 
 // IMAP extension
 $imap_loaded = extension_loaded( 'imap' );
-init_system_check( T_( 'PHP IMAP extension' ), $imap_loaded ? T_( 'Loaded' ) : T_( 'Not loaded' ) );
+init_system_check( 'PHP IMAP extension', $imap_loaded ? T_( 'Loaded' ) : T_( 'Not loaded' ) );
 if ( ! $imap_loaded )
 {
-	disp_system_check( 'warning', T_( 'You will not be able to use the Blog  by email feature of b2evolution. Enable the IMAP extension in your php.ini file or ask your hosting provider about it.' ) );
+	disp_system_check( 'warning', T_( 'You will not be able to use the Blog by email feature of b2evolution. Enable the IMAP extension in your php.ini file or ask your hosting provider about it.' ) );
 }
 else
 {
@@ -503,7 +503,7 @@ else
 
 // APC extension
 $opcode_cache = get_active_opcode_cache();
-init_system_check( T_( 'PHP opcode cache' ), $opcode_cache );
+init_system_check( 'PHP opcode cache', $opcode_cache );
 if( $opcode_cache == 'none' )
 {
 	disp_system_check( 'warning', T_( 'Using an opcode cache allows all your PHP scripts to run faster by caching a "compiled" (opcode) version of the scripts instead of recompiling everything at every page load. Several opcode caches are available. We recommend APC.' ) );
@@ -542,7 +542,7 @@ else
 
 	// JPG:
 	// Tblue> Note: "JPG Support" was renamed to "JPEG Support" in PHP 5.3.
-	init_system_check( T_( 'GD JPG Support' ), ( ! empty($gd_info['JPG Support']) || ! empty($gd_info['JPEG Support']) ) ? T_('Read/Write') : T_('No') );
+	init_system_check( 'GD JPG Support', ( ! empty($gd_info['JPG Support']) || ! empty($gd_info['JPEG Support']) ) ? T_('Read/Write') : T_('No') );
 	if( empty($gd_info['JPG Support']) && empty($gd_info['JPEG Support']) )
 	{
 		disp_system_check( 'warning', T_('You will not be able to automatically generate thumbnails for JPG images.') );
@@ -553,7 +553,7 @@ else
 	}
 
 	// PNG:
-	init_system_check( T_( 'GD PNG Support' ), !empty($gd_info['PNG Support']) ? T_('Read/Write') : T_('No') );
+	init_system_check( 'GD PNG Support', !empty($gd_info['PNG Support']) ? T_('Read/Write') : T_('No') );
 	if( empty($gd_info['PNG Support']) )
 	{
 		disp_system_check( 'warning', T_('You will not be able to automatically generate thumbnails for PNG images.') );
@@ -576,7 +576,7 @@ else
 	{
 		$gif_support = T_('No');
 	}
-	init_system_check( T_( 'GD GIF Support' ), $gif_support );
+	init_system_check( 'GD GIF Support', $gif_support );
 	if( $gif_support == T_('No') )
 	{
 		disp_system_check( 'warning', T_('You will not be able to automatically generate thumbnails for GIF images.') );
@@ -591,7 +591,7 @@ else
 	}
 
 	// FreeType:
-	init_system_check( T_( 'GD FreeType Support' ), !empty($gd_info['FreeType Support']) ?  T_('Yes') : T_('No') );
+	init_system_check( 'GD FreeType Support', !empty($gd_info['FreeType Support']) ?  T_('Yes') : T_('No') );
 	if( empty($gd_info['FreeType Support']) )
 	{
 		disp_system_check( 'warning', T_('You will not be able to write text to images using TrueType fonts.') );
@@ -628,7 +628,13 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.36  2011/09/04 22:13:21  fplanque
+ * Revision 1.37  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
+ * Revision 1.35.2.2  2011/09/06 00:42:51  fplanque
+ * i18n update
+ *
+ * Revision 1.35.2.1  2011/09/04 22:13:52  fplanque
  * copyright 2011
  *
  * Revision 1.35  2011/03/15 09:34:06  efy-asimo

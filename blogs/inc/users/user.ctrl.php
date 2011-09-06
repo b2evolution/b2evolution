@@ -348,7 +348,7 @@ switch( $user_tab )
 	case 'avatar':
 		if( isset($GLOBALS['files_Module']) )
 		{
-			$AdminUI->breadcrumbpath_add( T_('Avatar'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+			$AdminUI->breadcrumbpath_add( T_('Profile picture'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 		}
 		break;
 	case 'pwdchange':
@@ -433,6 +433,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.30  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.29  2011/05/11 07:11:51  efy-asimo
  * User settings update
  *

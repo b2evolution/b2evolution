@@ -71,7 +71,7 @@ global $blog;
 
 if( isset( $edited_User ) )
 {	// Display a help notice for setting a new avatar:
-	printf( '<div>'.T_( 'Click on a link %s icon below to select the image to use as an avatar.' )
+	printf( '<div>'.T_( 'Click on a link %s icon below to select the image to use as your profile picture.' )
 				   .'</div>', get_icon( 'link', 'imgtag', array( 'class'=>'top' ) ) );
 }
 ?>
@@ -402,6 +402,9 @@ if( isset( $edited_User ) )
 
 /*
  * $Log$
+ * Revision 1.22  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.21  2011/09/04 22:13:16  fplanque
  * copyright 2011
  *

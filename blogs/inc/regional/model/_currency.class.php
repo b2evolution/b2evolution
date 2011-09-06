@@ -86,7 +86,7 @@ class Currency extends DataObject
 
 		// Code
 		param( 'curr_code', 'string' );
-		param_check_regexp( 'curr_code', '#^[A-Za-z]{3}$#', T_('Currency code must be 3 letters parameter.') );
+		param_check_regexp( 'curr_code', '#^[A-Za-z]{3}$#', T_('Currency code must be 3 letters.') );
 		$this->set_from_Request( 'code', 'curr_code', true  );
 
 		return ! param_errors_detected();
@@ -178,6 +178,9 @@ class Currency extends DataObject
 
 /*
  * $Log$
+ * Revision 1.16  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.15  2010/04/07 08:26:11  efy-asimo
  * Allow multiple slugs per post - update & fix
  *

@@ -212,7 +212,7 @@ if( $Settings->get('allow_avatars') )
 		return '<a href="?ctrl=user&amp;user_tab=profile&amp;user_ID='.$user_ID.'">'.$File->get_thumb_imgtag( 'crop-48x48' ).'</a>';
 	}
 	$Results->cols[] = array(
-							'th' => T_('Avatar'),
+							'th' => T_('Picture'),
 							'th_class' => 'shrinkwrap',
 							'td_class' => 'shrinkwrap center',
 							'td' => '%user_avatar( #user_ID#, #user_avatar_file_ID# )%',
@@ -389,6 +389,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.33  2011/09/06 00:54:38  fplanque
+ * i18n update
+ *
  * Revision 1.32  2011/09/04 22:13:21  fplanque
  * copyright 2011
  *

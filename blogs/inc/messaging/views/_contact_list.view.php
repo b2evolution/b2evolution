@@ -120,7 +120,7 @@ if( $Settings->get('allow_avatars') )
 		return '';
 	}
 	$Results->cols[] = array(
-						'th' => T_('Avatar'),
+						'th' => T_('Picture'),
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'shrinkwrap',
 						'td' => '%user_avatar( #mct_to_user_ID# )%',
@@ -249,6 +249,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.13  2011/09/06 00:54:39  fplanque
+ * i18n update
+ *
  * Revision 1.12  2011/08/11 09:05:09  efy-asimo
  * Messaging in front office
  *
