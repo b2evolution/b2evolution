@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2011-09-06 04:53+0200\n"
-"PO-Revision-Date: 2011-09-06 13:48-0500\n"
+"PO-Revision-Date: 2011-09-06 19:11-0500\n"
 "Last-Translator: Alex (sam2kb)\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -958,7 +958,7 @@ msgstr "Ваш email адрес был подтвержден."
 
 #: ../../../htsrv/login.php:277
 msgid "You have to be logged in to request an account validation link."
-msgstr "Вы должны войти, чтобы запросить ссылку подтверждения аккаунта."
+msgstr "Вы должны авторизоваться, чтобы запросить ссылку подтверждения аккаунта."
 
 #: ../../../htsrv/login.php:307
 #: ../../../htsrv/profile_update.php:186
@@ -988,7 +988,7 @@ msgstr "В вашем профиле не указан email адрес, поэ�
 #: ../../../htsrv/login.php:344
 #, php-format
 msgid "WARNING: you are trying to log in on <strong>%s</strong> but we expect you to log in on <strong>%s</strong>. If this is due to an automatic redirect, this will prevent you from successfully loging in. You must either fix your webserver configuration, or your %s configuration in order for these two URLs to match."
-msgstr "ВНИМАНИЕ: вы пытаетесь войти через <strong>%s</strong>, но предполагалось что вы войдете через <strong>%s</strong>. Если это связано с автоматической переадресацией, вы не сможете войти. Вы должны либо изменить настройки сервера либо %s так, чтобы эти два URL совпадали."
+msgstr "ВНИМАНИЕ: вы пытаетесь войти через <strong>%s</strong>, но согласно настройкам вы должны входить через <strong>%s</strong>. Если это связано с автоматической переадресацией, вы не сможете войти. Вы должны либо изменить настройки сервера либо %s так, чтобы эти два адреса совпадали."
 
 #: ../../../htsrv/login.php:383
 #, php-format
@@ -2859,11 +2859,11 @@ msgstr "Ошибочный логин / пароль."
 
 #: ../../../inc/_init_login.inc.php:232
 msgid "You must log in!"
-msgstr "Вы должны войти!"
+msgstr "Вы должны авторизоваться!"
 
 #: ../../../inc/_init_login.inc.php:250
 msgid "You must validate your email address before you can continue as a logged in user."
-msgstr "Вы должны подтвердить свой email адрес перед тем как сможете войти."
+msgstr "Вы должны подтвердить свой email адрес перед тем как сможете авторизоваться."
 
 #: ../../../inc/antispam/antispam.ctrl.php:90
 #, php-format
@@ -13918,7 +13918,7 @@ msgstr "У вас нет доступа к выбранной директори
 #: ../../../inc/users/model/_user.funcs.php:105
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:225
 msgid "Log in"
-msgstr "Войти"
+msgstr "Авторизоваться"
 
 #: ../../../inc/users/model/_user.funcs.php:106
 msgid "Log in if you have an account..."
@@ -15789,7 +15789,7 @@ msgstr "Инструменты"
 
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:65
 msgid "Login link"
-msgstr "Войти"
+msgstr "Ссылка на страницу авторизации"
 
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:67
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:74
@@ -15803,7 +15803,7 @@ msgstr "Текст ссылки для показа"
 #. TRANS: with tailing space = action to log in
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:69
 msgid "Login "
-msgstr "Войти "
+msgstr "Аавторизоваться"
 
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:72
 msgid "Logout link"
@@ -16396,7 +16396,7 @@ msgstr "Установка завершена!"
 #: ../../../install/_functions_install.php:196
 #, php-format
 msgid "Now you can <a %s>log in</a> with the following credentials:"
-msgstr "Теперь вы можете <a %s>войти</a> используя эти данные:"
+msgstr "Теперь вы можете <a %s>авторизоваться</a> используя эти данные:"
 
 #: ../../../install/_functions_install.php:204
 msgid "Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew."
@@ -16678,7 +16678,7 @@ msgstr "Проверка файлов..."
 #: ../../../install/index.php:641
 #, php-format
 msgid "Now you can <a %s>log in</a> with your usual %s username and password."
-msgstr "Теперь вы можете <a %s>войти</a> с вашим обычным %s именем пользователя и паролем."
+msgstr "Теперь вы можете <a %s>авторизоваться</a> с вашим обычным %s именем пользователя и паролем."
 
 #: ../../../install/index.php:655
 msgid "Deleting b2evolution tables from the datatase..."
@@ -18028,7 +18028,7 @@ msgstr "Забыли пароль ?"
 #: ../../../skins/_login.disp.php:72
 #: ../../../skins_adm/login/_login_form.main.php:134
 msgid "Log in!"
-msgstr "Войти!"
+msgstr "Авторизоваться!"
 
 #: ../../../skins/_login.disp.php:77
 #: ../../../skins/_register.disp.php:109
@@ -18544,7 +18544,7 @@ msgstr "Форма входа"
 
 #: ../../../skins_adm/login/_login_form.main.php:114
 msgid "You will have to accept cookies in order to log in."
-msgstr "Ваш браузер должен принимать cookie, чтобы войти."
+msgstr "Ваш браузер должен принимать cookie, чтобы авторизоваться."
 
 #: ../../../skins_adm/login/_login_form.main.php:139
 msgid "Log into backoffice!"
