@@ -62,6 +62,8 @@ switch ( $action )
 
 		param( 'js_passwd_hashing', 'integer', 0 );
 
+		param( 'passwd_special', 'integer', 0 );
+
 		param( 'registration_require_country', 'integer', 0 );
 
 		param( 'registration_ask_locale', 'integer', 0 );
@@ -82,6 +84,8 @@ switch ( $action )
 									 array( 'user_minpwdlen', $user_minpwdlen),
 
 									 array( 'js_passwd_hashing', $js_passwd_hashing),
+
+									 array( 'passwd_special', $passwd_special),
 
 									 array( 'registration_require_country', $registration_require_country),
 
@@ -130,6 +134,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2011/09/06 16:25:18  efy-james
+ * Require special chars in password
+ *
  * Revision 1.12  2011/06/14 13:33:56  efy-asimo
  * in-skin register
  *

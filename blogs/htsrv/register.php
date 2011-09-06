@@ -90,8 +90,8 @@ switch( $action )
 		/*
 		 * Do the registration:
 		 */
-		param( 'pass1', 'string', '' );
-		param( 'pass2', 'string', '' );
+		param( 'pass1', 'raw', '' );
+		param( 'pass2', 'raw', '' );
 
 		// Call plugin event to allow catching input in general and validating own things from DisplayRegisterFormFieldset event
 		$Plugins->trigger_event( 'RegisterFormSent', array(
@@ -291,6 +291,9 @@ require $adminskins_path.'login/_reg_form.main.php';
 
 /*
  * $Log$
+ * Revision 1.112  2011/09/06 16:25:17  efy-james
+ * Require special chars in password
+ *
  * Revision 1.111  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

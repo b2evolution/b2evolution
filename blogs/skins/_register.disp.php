@@ -65,7 +65,10 @@ if( $action == 'register' )
 	$Form->text_input( 'login', $login, 16, T_('Login'), '', array( 'maxlength' => 20, 'class' => 'input_text' ) );
 	$Form->end_field();
 
-	$pwd_note1 = '';
+	if ( $Settings->get('passwd_special'))
+		$pwd_note1 = T_('Use at least one special character that is not a letter nor a digit.');
+	else
+		$pwd_note1 = '';
 	$pwd_note2 = sprintf( T_('Minimum %d characters, please.'), $Settings->get('user_minpwdlen') );
 	$Form->begin_field();
 	$Form->password_input( 'pass1', '', 16, T_('Password'), array( 'note'=>$pwd_note1, 'maxlength' => 70, 'class' => 'input_text' ) );
@@ -136,6 +139,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.9  2011/09/06 16:25:18  efy-james
+ * Require special chars in password
+ *
  * Revision 1.8  2011/09/06 03:25:41  fplanque
  * i18n update
  *

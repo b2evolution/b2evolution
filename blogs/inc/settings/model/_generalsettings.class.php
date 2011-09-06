@@ -104,6 +104,7 @@ class GeneralSettings extends AbstractSettings
 
 		'user_minpwdlen' => '5',
 		'js_passwd_hashing' => '1',					// Use JS password hashing by default
+		'passwd_special' => '0',					// Not require special character check by default
 
 		'webhelp_enabled' => '1',
 
@@ -238,6 +239,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.38  2011/09/06 16:25:17  efy-james
+ * Require special chars in password
+ *
  * Revision 1.37  2011/09/04 22:13:20  fplanque
  * copyright 2011
  *

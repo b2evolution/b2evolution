@@ -61,7 +61,10 @@ $Form->text_input( 'login', $login, 16,  T_('Login'), '', array( 'maxlength'=>20
 		<div class="input">
 		<input type="password" name="pass1" id="pass1" size="16" maxlength="50" value="" class="input_text field_required" />
 		<input type="password" name="pass2" id="pass2" size="16" maxlength="50" value="" class="input_text field_required" />
-		<span class="notes"><?php printf( T_('Minimum %d characters, please.'), $Settings->get('user_minpwdlen') ) ?></span>
+		<span class="notes"><?php
+			if ( $Settings->get('passwd_special') ) echo T_('Use at least one special character that is not a letter nor a digit. ');
+			printf( T_('Minimum %d characters, please.'), $Settings->get('user_minpwdlen') )
+		?></span>
 		</div>
 	</fieldset>
 
@@ -109,6 +112,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.23  2011/09/06 16:25:18  efy-james
+ * Require special chars in password
+ *
  * Revision 1.22  2011/09/06 03:25:41  fplanque
  * i18n update
  *
