@@ -548,6 +548,7 @@ class CommentList2 extends DataObjectList2
 	 */
 	function get_filter_titles( $ignore = array(), $params = array() )
 	{
+		global $post_statuses;
 		$title_array = array();
 
 		if( empty ($this->filters) )
@@ -555,9 +556,14 @@ class CommentList2 extends DataObjectList2
 			$this->set_filters( $this->default_filters );
 		}
 
-		if( isset( $this->filters['statuses'] ) && count($this->filters['statuses']) < 3 )
+		if( isset( $this->filters['statuses'] ) )
 		{
-			$title_array['statuses'] = T_('Visibility').': '.implode( ', ', $this->filters['statuses'] );
+			$visibility_array = array();
+			foreach( $this->filters['statuses'] as $status )
+			{
+				$visibility_array[] = T_( $post_statuses[ $status ] );
+			}
+			$title_array['statuses'] = T_('Visibility').': '.implode( ', ', $visibility_array );
 		}
 
 		if( !empty($this->filters['keywords']) )
@@ -743,6 +749,9 @@ class CommentList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.36  2011/09/06 05:42:46  efy-asimo
+ * Comment list visibility display - fix
+ *
  * Revision 1.35  2011/09/04 22:13:15  fplanque
  * copyright 2011
  *
