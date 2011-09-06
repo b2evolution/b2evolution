@@ -97,7 +97,7 @@ class Userfield extends DataObject
 			array( 'value' => 'hidden', 'label' => T_('Hidden') ),
 			array( 'value' => 'optional', 'label' => T_('Optional') ),
 			array( 'value' => 'recommend', 'label' => T_('Recommended') ),
-			array( 'value' => 'required', 'label' => T_('Required') ),
+			array( 'value' => 'require', 'label' => T_('Required') ),
 		 );
 	}
 
