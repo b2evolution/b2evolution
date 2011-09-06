@@ -114,7 +114,7 @@ function display_perm( $perm )
 }
 
 $Results->cols[] = array(
-						'th' => T_('Upload'),
+						'th' => /* noun */ T_('Upload'),
 						'order' => 'ftyp_allowed',
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'shrinkwrap',
@@ -151,6 +151,9 @@ $Session->delete( 'fadeout_id');
 
 /*
  * $Log$
+ * Revision 1.15  2011/09/06 20:28:37  sam2kb
+ * i18n update
+ *
  * Revision 1.14  2011/09/04 22:13:16  fplanque
  * copyright 2011
  *

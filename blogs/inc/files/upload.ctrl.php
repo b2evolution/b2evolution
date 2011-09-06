@@ -454,7 +454,7 @@ if( !isset($Blog) || $fm_FileRoot->type != 'collection' || $fm_FileRoot->in_type
 			(isset($Blog) && $fm_FileRoot->type == 'collection') ? sprintf( T_('You are ready to post files from %s into %s...'),
 			$fm_FileRoot->name, $Blog->get('shortname') ) : '' );
 }
-$AdminUI->breadcrumbpath_add( T_('Upload'), '?ctrl=upload&amp;blog=$blog$&amp;root='.$fm_FileRoot->ID );
+$AdminUI->breadcrumbpath_add( /* TRANS: noun */ T_('Upload'), '?ctrl=upload&amp;blog=$blog$&amp;root='.$fm_FileRoot->ID );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -481,6 +481,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.49  2011/09/06 20:28:37  sam2kb
+ * i18n update
+ *
  * Revision 1.48  2011/09/06 00:54:38  fplanque
  * i18n update
  *
