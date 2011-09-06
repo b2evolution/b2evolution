@@ -422,9 +422,9 @@ if( $action != 'view' )
 	if( $Settings->get( 'registration_require_gender' ) != 'hidden' )
 	{
 		$Form->radio( 'edited_user_gender', $edited_User->get('gender'), array(
-					array( 'M', T_('Male') ),
-					array( 'F', T_('Female') ),
-				), T_('Gender') );
+					array( 'M', T_('A man') ),
+					array( 'F', T_('A woman') ),
+				), T_('I am') );
 	}
 }
 else
@@ -751,6 +751,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.34  2011/09/06 03:25:41  fplanque
+ * i18n update
+ *
  * Revision 1.33  2011/09/06 00:54:38  fplanque
  * i18n update
  *

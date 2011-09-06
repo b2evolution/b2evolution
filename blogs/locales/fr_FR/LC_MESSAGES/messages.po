@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 2.5\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2011-09-06 02:28+0200\n"
-"PO-Revision-Date: 2011-09-06 02:40+0100\n"
+"POT-Creation-Date: 2011-09-06 04:53+0200\n"
+"PO-Revision-Date: 2011-09-06 04:54+0100\n"
 "Last-Translator: Francois Planque <http://fplanque.com>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -1695,7 +1695,7 @@ msgstr "Groupes & Utilisateurs"
 
 #: ../../../inc/_core/__core.init.php:982
 msgid "User settings"
-msgstr "Réglages utilisateur"
+msgstr "Réglages utilisateurs"
 
 #: ../../../inc/_core/__core.init.php:986
 #: ../../../inc/users/settings.ctrl.php:61
@@ -5316,14 +5316,13 @@ msgstr "Av."
 msgid "Permission to edit advanced/administrative blog properties"
 msgstr "Permission de modifier les propriétés avancées/administratives de ce blog"
 
+#. TRANS: verb
 #: ../../../inc/collections/views/_coll_group_perm.form.php:352
 #: ../../../inc/collections/views/_coll_user_perm.form.php:363
 #: ../../../inc/files/model/_file.funcs.php:980
-#: ../../../inc/files/upload.ctrl.php:457
 #: ../../../inc/files/views/_file_browse.view.php:86
-#: ../../../inc/files/views/_filetype_list.view.php:117
-msgid "Upload"
-msgstr "Uploader"
+msgid "Upload "
+msgstr "Charger"
 
 #: ../../../inc/collections/views/_coll_group_perm.form.php:356
 #: ../../../inc/collections/views/_coll_user_perm.form.php:367
@@ -7776,11 +7775,18 @@ msgstr "ou"
 msgid "Insert the following code snippet into your post"
 msgstr "Insérez le morceau de code suivant dans votre article"
 
+#. TRANS: noun
+#: ../../../inc/files/upload.ctrl.php:457
+#: ../../../inc/files/views/_filetype_list.view.php:117
+msgid "Upload"
+msgstr "Charger"
+
 #: ../../../inc/files/views/_file_browse.view.php:74
 #, php-format
 msgid "Click on a link %s icon below to select the image to use as your profile picture."
 msgstr "Cliquez sur une icône de lien %s ci-dessous pour choisir l'image à utiliser comme photo de profil."
 
+#. TRANS: verb
 #: ../../../inc/files/views/_file_browse.view.php:86
 msgid "Upload..."
 msgstr "Uploader..."
@@ -11503,7 +11509,9 @@ msgstr "Sauver (et vérifier)"
 #: ../../../inc/regional/views/_country.form.php:51
 #: ../../../inc/users/views/_user_identity.form.php:316
 #: ../../../inc/users/views/_user_list.view.php:251
+#: ../../../skins/_register.disp.php:83
 #: ../../../skins/_user.disp.php:97
+#: ../../../skins_adm/login/_reg_form.main.php:76
 msgid "Country"
 msgstr "Pays"
 
@@ -11597,7 +11605,7 @@ msgstr "%d utilisateurs liés"
 
 #: ../../../inc/regional/model/_country.class.php:86
 msgid "Country code must be 2 letters."
-msgstr ""
+msgstr "Le code pays doit faire 2 caractères."
 
 #: ../../../inc/regional/model/_currency.class.php:58
 #, php-format
@@ -11606,7 +11614,7 @@ msgstr "%d pays liées"
 
 #: ../../../inc/regional/model/_currency.class.php:89
 msgid "Currency code must be 3 letters."
-msgstr ""
+msgstr "Le code devise doit faire 3 caractères."
 
 #: ../../../inc/regional/views/_country.form.php:48
 #: ../../../inc/regional/views/_country_list.view.php:199
@@ -13879,18 +13887,12 @@ msgid "Send email to user"
 msgstr "Envoyer un email à l'utilisateur"
 
 #: ../../../inc/users/model/_user.class.php:1960
-#: ../../../inc/users/views/_user_identity.form.php:298
 #: ../../../inc/users/views/_user_identity.form.php:324
-#: ../../../skins/_register.disp.php:90
-#: ../../../skins_adm/login/_reg_form.main.php:83
 msgid "Male"
 msgstr "Homme"
 
 #: ../../../inc/users/model/_user.class.php:1963
-#: ../../../inc/users/views/_user_identity.form.php:299
 #: ../../../inc/users/views/_user_identity.form.php:324
-#: ../../../skins/_register.disp.php:91
-#: ../../../skins_adm/login/_reg_form.main.php:84
 msgid "Female"
 msgstr "Femme"
 
@@ -13983,11 +13985,11 @@ msgstr "Veuillez entrer un identifiant."
 
 #: ../../../inc/users/model/_user.funcs.php:655
 msgid "Please select country."
-msgstr ""
+msgstr "Merci de sélectionner un pays."
 
 #: ../../../inc/users/model/_user.funcs.php:661
 msgid "Please select gender."
-msgstr "Merci de choisir un sexe."
+msgstr "Si c'est pas indiscret...?"
 
 #: ../../../inc/users/model/_user.funcs.php:698
 msgid "The password must be different from your login."
@@ -14386,12 +14388,9 @@ msgid "Required"
 msgstr "Requis"
 
 #: ../../../inc/users/views/_registration.form.php:102
-#: ../../../inc/users/views/_user_identity.form.php:300
 #: ../../../inc/users/views/_user_identity.form.php:324
 #: ../../../inc/users/views/_user_list.view.php:243
-#: ../../../skins/_register.disp.php:92
 #: ../../../skins/_user.disp.php:106
-#: ../../../skins_adm/login/_reg_form.main.php:85
 msgid "Gender"
 msgstr "Sexe"
 
@@ -14534,11 +14533,12 @@ msgstr "Cet utilisateur n'a actuellement pas de photo de profil"
 
 #: ../../../inc/users/views/_user_avatar.form.php:82
 msgid "Current profile picture"
-msgstr "Photo de profile actuelle"
+msgstr "Photo de profil actuelle"
 
+#. TRANS: action
 #: ../../../inc/users/views/_user_avatar.form.php:106
 msgid "Upload!"
-msgstr "Uploader!"
+msgstr "Envoyer!"
 
 #: ../../../inc/users/views/_user_avatar.form.php:107
 msgid "Upload a new profile picture"
@@ -14655,6 +14655,24 @@ msgstr "Cochez ceci pour apparaitre comme connecté lorsque vous visitez le site.
 #: ../../../inc/users/views/_user_identity.form.php:317
 msgid "Show online"
 msgstr "Montrer en ligne"
+
+#: ../../../inc/users/views/_user_identity.form.php:298
+#: ../../../skins/_register.disp.php:90
+#: ../../../skins_adm/login/_reg_form.main.php:83
+msgid "A man"
+msgstr "Un homme"
+
+#: ../../../inc/users/views/_user_identity.form.php:299
+#: ../../../skins/_register.disp.php:91
+#: ../../../skins_adm/login/_reg_form.main.php:84
+msgid "A woman"
+msgstr "Une femme"
+
+#: ../../../inc/users/views/_user_identity.form.php:300
+#: ../../../skins/_register.disp.php:92
+#: ../../../skins_adm/login/_reg_form.main.php:85
+msgid "I am"
+msgstr "Je suis"
 
 #: ../../../inc/users/views/_user_identity.form.php:338
 #: ../../../inc/users/views/_user_password.form.php:98
@@ -17949,12 +17967,12 @@ msgid "Remember me"
 msgstr "Se rappeler de moi"
 
 #: ../../../skins/_item_comment_form.inc.php:226
-msgid "Name, email &amp; website"
-msgstr "Nom, e-mail &amp; site Web"
+msgid "For my next comment on this site"
+msgstr "Pour mon prochain commentaire sur ce site"
 
 #: ../../../skins/_item_comment_form.inc.php:231
-msgid "Allow users to contact you through a message form (your email will <strong>not</strong> be revealed."
-msgstr "Autoriser les utilisateurs à vous contacter par un formulaire de message (votre adresse email ne sera <strong>not</strong> révélée.)"
+msgid "Allow users to contact me through a message form -- Your email will <strong>not</strong> be revealed!"
+msgstr "Autoriser les utilisateurs à me contacter par un formulaire de message -- Votre adresse email ne sera <strong>pas</strong> révélée."
 
 #: ../../../skins/_item_comment_wp.inc.php:48
 msgid "PREVIEW Comment by"
@@ -18035,7 +18053,7 @@ msgstr "Se connecter!"
 #: ../../../skins_adm/login/_reg_form.main.php:97
 #, php-format
 msgid "Your IP address (%s) and the current time are being logged."
-msgstr ""
+msgstr "Votre adresse IP (%s) et l'heure courante sont enregistrés."
 
 #: ../../../skins/_login.disp.php:82
 msgid "Standard login form"
@@ -18126,18 +18144,18 @@ msgstr "Un email vient d'être envoyé a %s. Merci de consulter votre boîte email 
 #: ../../../skins/_register.disp.php:128
 #: ../../../skins_adm/login/_reg_complete.main.php:69
 #, php-format
-msgid "If you have not received the email in the next few minutes, please check your spam folder. The email was sent from %s and has the title &laquo;%s&raquo;"
-msgstr ""
+msgid "If you have not received the email in the next few minutes, please check your spam folder. The email was sent from %s and has the title &laquo;%s&raquo;."
+msgstr "Si vous n'avez pas reçu l'email dans les quelques minutes à venir, merci de vérifier votre courrier indésirable. L'email a été envoyé par %s avec le titre &laquo;%s&raquo;."
 
 #: ../../../skins/_register.disp.php:130
 #: ../../../skins_adm/login/_reg_complete.main.php:71
-msgid "If you still can't find the email or if you would like to use a different email address"
-msgstr ""
+msgid "If you still can't find the email or if you would like to try with a different email address,"
+msgstr "Si vous ne trouvez toujours pas l'email ou si vous voulez essayer avec une autre adresse email,"
 
 #: ../../../skins/_register.disp.php:131
 #: ../../../skins_adm/login/_reg_complete.main.php:72
 msgid "click here to try again"
-msgstr ""
+msgstr "cliquez ici pour un nouvel essai"
 
 #. TRANS: First %s: Commentator's name, second %s: post title
 #: ../../../skins/_rss2/comments.main.php:87
@@ -18619,6 +18637,9 @@ msgstr "Ce gabarit de démo affiche un résumé des derniers articles dans tous les
 #: ../../../summary.php:161
 msgid "More posts..."
 msgstr "Plus d'articles..."
+
+#~ msgid "Name, email &amp; website"
+#~ msgstr "Nom, e-mail..."
 
 #~ msgid "Invalid params!"
 #~ msgstr "Paramètres invalides!"

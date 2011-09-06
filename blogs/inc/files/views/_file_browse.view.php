@@ -83,7 +83,7 @@ if( isset( $edited_User ) )
 
 	if( $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
 	{
-		$Widget->global_icon( T_('Upload...'), '', regenerate_url( 'ctrl', 'ctrl=upload' ), T_('Upload').' &raquo;', 1, 5 );
+		$Widget->global_icon( /* TRANS: verb */ T_('Upload...'), '', regenerate_url( 'ctrl', 'ctrl=upload' ), /* TRANS: verb */ T_('Upload ').' &raquo;', 1, 5 );
 	}
 
 	if( !empty($edited_Item) )
@@ -402,6 +402,9 @@ if( isset( $edited_User ) )
 
 /*
  * $Log$
+ * Revision 1.23  2011/09/06 03:25:41  fplanque
+ * i18n update
+ *
  * Revision 1.22  2011/09/06 00:54:38  fplanque
  * i18n update
  *

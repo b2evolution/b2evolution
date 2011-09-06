@@ -223,12 +223,12 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 	{ // User is not logged in:
 		$comment_options[] = '<label><input type="checkbox" class="checkbox" name="comment_cookies" tabindex="7"'
 													.( $comment_cookies ? ' checked="checked"' : '' ).' value="1" /> '.T_('Remember me').'</label>'
-													.' <span class="note">('.T_('Name, email &amp; website').')</span>';
+													.' <span class="note">('.T_('For my next comment on this site').')</span>';
 		// TODO: If we got info from cookies, Add a link called "Forget me now!" (without posting a comment).
 
 		$comment_options[] = '<label><input type="checkbox" class="checkbox" name="comment_allow_msgform" tabindex="8"'
 													.( $comment_allow_msgform ? ' checked="checked"' : '' ).' value="1" /> '.T_('Allow message form').'</label>'
-													.' <span class="note">('.T_('Allow users to contact you through a message form (your email will <strong>not</strong> be revealed.').')</span>';
+													.' <span class="note">('.T_('Allow users to contact me through a message form -- Your email will <strong>not</strong> be revealed!').')</span>';
 		// TODO: If we have an email in a cookie, Add links called "Add a contact icon to all my previous comments" and "Remove contact icon from all my previous comments".
 	}
 
@@ -257,13 +257,16 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 
 	<?php
 	$Form->end_form();
-	
+
 	echo $params['after_comment_form'];
 }
 
 
 /*
  * $Log$
+ * Revision 1.25  2011/09/06 03:25:41  fplanque
+ * i18n update
+ *
  * Revision 1.24  2011/09/04 22:13:24  fplanque
  * copyright 2011
  *

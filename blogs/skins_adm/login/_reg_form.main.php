@@ -73,16 +73,16 @@ $Form->text_input( 'login', $login, 16,  T_('Login'), '', array( 'maxlength'=>20
 	if( $registration_require_country )
 	{
 		$CountryCache = & get_CountryCache();
-		$Form->select_input_object( 'country', $country, $CountryCache, 'Country', array('allow_none'=>true, 'required'=>true) );
+		$Form->select_input_object( 'country', $country, $CountryCache, T_('Country'), array('allow_none'=>true, 'required'=>true) );
 	}
 
 	$registration_require_gender = $Settings->get( 'registration_require_gender' );
 	if( $registration_require_gender == 'required' )
 	{
 		$Form->radio_input( 'gender', false, array(
-					array( 'value' => 'M', 'label' => T_('Male') ),
-					array( 'value' => 'F', 'label' => T_('Female') ),
-				), T_('Gender'), array( 'required' => true ) );
+					array( 'value' => 'M', 'label' => T_('A man') ),
+					array( 'value' => 'F', 'label' => T_('A woman') ),
+				), T_('I am'), array( 'required' => true ) );
 	}
 
 	if( $Settings->get( 'registration_ask_locale' ) )
@@ -109,6 +109,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.22  2011/09/06 03:25:41  fplanque
+ * i18n update
+ *
  * Revision 1.21  2011/09/05 18:10:54  sam2kb
  * No break in tranlsated text
  *

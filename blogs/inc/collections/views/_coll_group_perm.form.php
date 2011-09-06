@@ -349,7 +349,7 @@ $Results->cols[] = array(
 // Media Directory:
 $Results->cols[] = array(
 						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Media directory'),
-						'th' => T_('Upload'),
+						'th' => /* TRANS: verb */ T_('Upload '),
 						'th_class' => 'checkright',
 						'order' => 'bloggroup_perm_media_upload',
 						'default_dir' => 'D',
@@ -497,6 +497,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.19  2011/09/06 03:25:41  fplanque
+ * i18n update
+ *
  * Revision 1.18  2011/09/04 22:13:14  fplanque
  * copyright 2011
  *

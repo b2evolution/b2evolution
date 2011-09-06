@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2011-09-06 02:28+0200\n"
+"POT-Creation-Date: 2011-09-06 04:53+0200\n"
 "PO-Revision-Date: 2011-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5210,13 +5210,12 @@ msgstr ""
 msgid "Permission to edit advanced/administrative blog properties"
 msgstr ""
 
+#. TRANS: verb
 #: ../../../inc/collections/views/_coll_group_perm.form.php:352
 #: ../../../inc/collections/views/_coll_user_perm.form.php:363
 #: ../../../inc/files/model/_file.funcs.php:980
-#: ../../../inc/files/upload.ctrl.php:457
 #: ../../../inc/files/views/_file_browse.view.php:86
-#: ../../../inc/files/views/_filetype_list.view.php:117
-msgid "Upload"
+msgid "Upload "
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_group_perm.form.php:356
@@ -7664,11 +7663,18 @@ msgstr ""
 msgid "Insert the following code snippet into your post"
 msgstr ""
 
+#. TRANS: noun
+#: ../../../inc/files/upload.ctrl.php:457
+#: ../../../inc/files/views/_filetype_list.view.php:117
+msgid "Upload"
+msgstr ""
+
 #: ../../../inc/files/views/_file_browse.view.php:74
 #, php-format
 msgid "Click on a link %s icon below to select the image to use as your profile picture."
 msgstr ""
 
+#. TRANS: verb
 #: ../../../inc/files/views/_file_browse.view.php:86
 msgid "Upload..."
 msgstr ""
@@ -11375,7 +11381,8 @@ msgstr ""
 #: ../../../inc/regional/views/_country.form.php:51
 #: ../../../inc/users/views/_user_identity.form.php:316
 #: ../../../inc/users/views/_user_list.view.php:251
-#: ../../../skins/_user.disp.php:97
+#: ../../../skins/_register.disp.php:83 ../../../skins/_user.disp.php:97
+#: ../../../skins_adm/login/_reg_form.main.php:76
 msgid "Country"
 msgstr ""
 
@@ -13748,18 +13755,12 @@ msgid "Send email to user"
 msgstr ""
 
 #: ../../../inc/users/model/_user.class.php:1960
-#: ../../../inc/users/views/_user_identity.form.php:298
 #: ../../../inc/users/views/_user_identity.form.php:324
-#: ../../../skins/_register.disp.php:90
-#: ../../../skins_adm/login/_reg_form.main.php:83
 msgid "Male"
 msgstr ""
 
 #: ../../../inc/users/model/_user.class.php:1963
-#: ../../../inc/users/views/_user_identity.form.php:299
 #: ../../../inc/users/views/_user_identity.form.php:324
-#: ../../../skins/_register.disp.php:91
-#: ../../../skins_adm/login/_reg_form.main.php:84
 msgid "Female"
 msgstr ""
 
@@ -14250,11 +14251,9 @@ msgid "Required"
 msgstr ""
 
 #: ../../../inc/users/views/_registration.form.php:102
-#: ../../../inc/users/views/_user_identity.form.php:300
 #: ../../../inc/users/views/_user_identity.form.php:324
 #: ../../../inc/users/views/_user_list.view.php:243
-#: ../../../skins/_register.disp.php:92 ../../../skins/_user.disp.php:106
-#: ../../../skins_adm/login/_reg_form.main.php:85
+#: ../../../skins/_user.disp.php:106
 msgid "Gender"
 msgstr ""
 
@@ -14399,6 +14398,7 @@ msgstr ""
 msgid "Current profile picture"
 msgstr ""
 
+#. TRANS: action
 #: ../../../inc/users/views/_user_avatar.form.php:106
 msgid "Upload!"
 msgstr ""
@@ -14516,6 +14516,24 @@ msgstr ""
 #: ../../../inc/users/views/_user_identity.form.php:293
 #: ../../../inc/users/views/_user_identity.form.php:317
 msgid "Show online"
+msgstr ""
+
+#: ../../../inc/users/views/_user_identity.form.php:298
+#: ../../../skins/_register.disp.php:90
+#: ../../../skins_adm/login/_reg_form.main.php:83
+msgid "A man"
+msgstr ""
+
+#: ../../../inc/users/views/_user_identity.form.php:299
+#: ../../../skins/_register.disp.php:91
+#: ../../../skins_adm/login/_reg_form.main.php:84
+msgid "A woman"
+msgstr ""
+
+#: ../../../inc/users/views/_user_identity.form.php:300
+#: ../../../skins/_register.disp.php:92
+#: ../../../skins_adm/login/_reg_form.main.php:85
+msgid "I am"
 msgstr ""
 
 #: ../../../inc/users/views/_user_identity.form.php:338
@@ -17679,11 +17697,11 @@ msgid "Remember me"
 msgstr ""
 
 #: ../../../skins/_item_comment_form.inc.php:226
-msgid "Name, email &amp; website"
+msgid "For my next comment on this site"
 msgstr ""
 
 #: ../../../skins/_item_comment_form.inc.php:231
-msgid "Allow users to contact you through a message form (your email will <strong>not</strong> be revealed."
+msgid "Allow users to contact me through a message form -- Your email will <strong>not</strong> be revealed!"
 msgstr ""
 
 #: ../../../skins/_item_comment_wp.inc.php:48
@@ -17851,12 +17869,12 @@ msgstr ""
 #: ../../../skins/_register.disp.php:128
 #: ../../../skins_adm/login/_reg_complete.main.php:69
 #, php-format
-msgid "If you have not received the email in the next few minutes, please check your spam folder. The email was sent from %s and has the title &laquo;%s&raquo;"
+msgid "If you have not received the email in the next few minutes, please check your spam folder. The email was sent from %s and has the title &laquo;%s&raquo;."
 msgstr ""
 
 #: ../../../skins/_register.disp.php:130
 #: ../../../skins_adm/login/_reg_complete.main.php:71
-msgid "If you still can't find the email or if you would like to use a different email address"
+msgid "If you still can't find the email or if you would like to try with a different email address,"
 msgstr ""
 
 #: ../../../skins/_register.disp.php:131

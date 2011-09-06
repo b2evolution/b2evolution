@@ -977,7 +977,7 @@ function file_controller_build_tabs()
 				'files',
 				array(
 						'upload' => array(
-							'text' => T_('Upload'),
+							'text' => /* TRANS: verb */ T_('Upload '),
 							'href' => regenerate_url( 'ctrl', 'ctrl=upload' ) ),
 					)
 			);
@@ -1495,6 +1495,9 @@ function remove_orphan_files( $file_ids = NULL, $older_then = NULL )
 
 /*
  * $Log$
+ * Revision 1.59  2011/09/06 03:25:41  fplanque
+ * i18n update
+ *
  * Revision 1.58  2011/09/04 22:13:15  fplanque
  * copyright 2011
  *

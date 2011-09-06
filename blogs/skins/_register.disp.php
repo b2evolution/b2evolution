@@ -3,7 +3,7 @@
  * This file implements the register form
  *
  * This file is not meant to be called directly.
- * 
+ *
  * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evocore
@@ -80,16 +80,16 @@ if( $action == 'register' )
 	if( $registration_require_country )
 	{ // country required
 		$CountryCache = & get_CountryCache();
-		$Form->select_input_object( 'country', $country, $CountryCache, 'Country', array('allow_none'=>true, 'required'=>true) );
+		$Form->select_input_object( 'country', $country, $CountryCache, T_('Country'), array('allow_none'=>true, 'required'=>true) );
 	}
 
 	$registration_require_gender = $Settings->get( 'registration_require_gender' );
 	if( $registration_require_gender == 'required' )
 	{ // gender required
 		$Form->radio_input( 'gender', $gender, array(
-					array( 'value' => 'M', 'label' => T_('Male') ),
-					array( 'value' => 'F', 'label' => T_('Female') ),
-				), T_('Gender'), array( 'required' => true ) );
+					array( 'value' => 'M', 'label' => T_('A man') ),
+					array( 'value' => 'F', 'label' => T_('A woman') ),
+				), T_('I am'), array( 'required' => true ) );
 	}
 
 	if( $Settings->get( 'registration_ask_locale' ) )
@@ -125,9 +125,9 @@ elseif( $action == "reg_complete" )
 elseif( $action == "reg_validation" )
 { // display "validation email sent" info ( email validation required )
 	echo '<p>'.sprintf( T_( 'An email has just been sent to %s . Please check your email and click on the validation link you will find in that email.' ), '<b>'.$email.'</b>' ).'</p>';
-	echo '<p>'.sprintf( T_( 'If you have not received the email in the next few minutes, please check your spam folder. The email was sent from %s and has the title &laquo;%s&raquo;' ), $notify_from,
+	echo '<p>'.sprintf( T_( 'If you have not received the email in the next few minutes, please check your spam folder. The email was sent from %s and has the title &laquo;%s&raquo;.' ), $notify_from,
 					'<b>'.sprintf( T_('Validate your email address for "%s"'), $login ).'</b>' ).'</p>';
-	echo '<p>'.T_( 'If you still can\'t find the email or if you would like to use a different email address' ).','.
+	echo '<p>'.T_( 'If you still can\'t find the email or if you would like to try with a different email address,' ).' '.
 					'<a href="'.$Blog->gen_baseurl().'">'.T_( 'click here to try again' ).'.</a></p>';
 }
 
@@ -136,6 +136,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.8  2011/09/06 03:25:41  fplanque
+ * i18n update
+ *
  * Revision 1.7  2011/09/05 23:00:24  fplanque
  * minor/doc/cleanup/i18n
  *
