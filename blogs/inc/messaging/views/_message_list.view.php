@@ -288,7 +288,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Message'),
 		'td_class' => 'left top',
-		'td' => '¤conditional( empty(#msg_text#), \''.$edited_Thread->title.'\', \'%nl2br(#msg_text#)%\')¤',
+		'td' => '~conditional( empty(#msg_text#), \''.$edited_Thread->title.'\', \'%nl2br(#msg_text#)%\')~',
 	);
 
 function get_read_by( $message_ID )
@@ -354,6 +354,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.33  2011/09/07 00:28:26  sam2kb
+ * Replace non-ASCII character in regular expressions with ~
+ *
  * Revision 1.32  2011/08/11 09:05:09  efy-asimo
  * Messaging in front office
  *

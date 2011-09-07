@@ -244,7 +244,7 @@ class Skin extends DataObject
 			$rf_main_subpath = $this->folder.'/'.$file;
 			$af_main_path = $skins_path.$rf_main_subpath;
 
-			if( !is_file( $af_main_path ) || ! preg_match( '¤\.php$¤', $file ) )
+			if( !is_file( $af_main_path ) || ! preg_match( '~\.php$~', $file ) )
 			{ // Not a php template file, go to next:
 				continue;
 			}
@@ -767,6 +767,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.31  2011/09/07 00:28:26  sam2kb
+ * Replace non-ASCII character in regular expressions with ~
+ *
  * Revision 1.30  2011/09/04 22:13:20  fplanque
  * copyright 2011
  *

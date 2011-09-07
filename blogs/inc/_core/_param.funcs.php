@@ -187,7 +187,7 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 				// echo $var, '=', $GLOBALS[$var], '<br />';
 				$GLOBALS[$var] = trim( strip_tags($GLOBALS[$var]) );
 				// Make sure the string is a single line
-				$GLOBALS[$var] = preg_replace( '¤\r|\n¤', '', $GLOBALS[$var] );
+				$GLOBALS[$var] = preg_replace( '~\r|\n~', '', $GLOBALS[$var] );
 
 				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as string', 'params' );
 				break;
@@ -1951,7 +1951,7 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $Us
 
 		// CHECK JAVASCRIPT:
 		if( ! $allow_javascript
-			&& ( preg_match( '¤( < \s* //? \s* (script|noscript) )¤xi', $check, $matches )
+			&& ( preg_match( '~( < \s* //? \s* (script|noscript) )~xi', $check, $matches )
 				|| preg_match( '#\s((on[a-z]+)\s*=)#i', $check, $matches )
 				// action=, background=, cite=, classid=, codebase=, data=, href=, longdesc=, profile=, src=, usemap=
 				|| preg_match( '#=["\'\s]*((javascript|vbscript|about):)#i', $check, $matches ) ) )
@@ -1962,7 +1962,7 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $Us
 
 		// CHECK IFRAMES:
 		if( ! $allow_iframes
-			&& preg_match( '¤( < \s* //? \s* (frame|iframe) )¤xi', $check, $matches) )
+			&& preg_match( '~( < \s* //? \s* (frame|iframe) )~xi', $check, $matches) )
 		{
 			$Messages->add( T_('Illegal frame markup found: ').htmlspecialchars($matches[1]), 'error' );
 			$error = true;
@@ -1970,7 +1970,7 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $Us
 
 		// CHECK OBJECTS:
 		if( ! $allow_objects
-			&& preg_match( '¤( < \s* //? \s* (applet|object|param|embed) )¤xi', $check, $matches) )
+			&& preg_match( '~( < \s* //? \s* (applet|object|param|embed) )~xi', $check, $matches) )
 		{
 			$Messages->add( T_('Illegal object markup found: ').htmlspecialchars($matches[1]), 'error' );
 			$error = true;
@@ -2122,6 +2122,9 @@ function isset_param( $var )
 
 /*
  * $Log$
+ * Revision 1.70  2011/09/07 00:28:26  sam2kb
+ * Replace non-ASCII character in regular expressions with ~
+ *
  * Revision 1.69  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

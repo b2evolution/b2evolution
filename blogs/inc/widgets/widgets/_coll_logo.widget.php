@@ -96,7 +96,7 @@ class coll_logo_Widget extends ComponentWidget
 					'label' => T_('Image filename'),
 					'note' => T_('The image/logo file must be uploaded to the root of the Blog\'s media dir'),
 					'defaultvalue' => 'logo.png',
-					'valid_pattern' => array( 'pattern'=>'¤^[a-z0-9_\-][a-z0-9_.\-]*$¤i',
+					'valid_pattern' => array( 'pattern'=>'~^[a-z0-9_\-][a-z0-9_.\-]*$~i',
 																		'error'=>T_('Invalid filename.') ),
 				),
 			), parent::get_param_definitions( $params )	);
@@ -134,6 +134,9 @@ class coll_logo_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.12  2011/09/07 00:28:26  sam2kb
+ * Replace non-ASCII character in regular expressions with ~
+ *
  * Revision 1.11  2011/09/04 22:13:21  fplanque
  * copyright 2011
  *

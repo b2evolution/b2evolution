@@ -125,7 +125,7 @@ class adsense_plugin extends Plugin
 	{
 		$content = & $params['content'];
 
-		$content = preg_replace( '¤\[(adsense:)\]¤', '<!-- [$1] -->', $content );
+		$content = preg_replace( '~\[(adsense:)\]~', '<!-- [$1] -->', $content );
 
 		return true;
 	}
@@ -140,7 +140,7 @@ class adsense_plugin extends Plugin
 	{
 		$content = & $params['content'];
 
-		$content = preg_replace( '¤<!-- \[(adsense:)\] -->¤', '[$1]', $content );
+		$content = preg_replace( '~<!-- \[(adsense:)\] -->~', '[$1]', $content );
 
 		return true;
 	}
@@ -178,7 +178,7 @@ class adsense_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		$content = preg_replace_callback( '¤<!-- \[adsense:\] -->¤', array( $this, 'DisplayItem_callback' ), $content );
+		$content = preg_replace_callback( '~<!-- \[adsense:\] -->~', array( $this, 'DisplayItem_callback' ), $content );
 
 		return true;
 	}
@@ -216,7 +216,7 @@ class adsense_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		$content = preg_replace( '¤\[adsense:\]¤', '', $content );
+		$content = preg_replace( '~\[adsense:\]~', '', $content );
 
 		return true;
 	}
@@ -246,6 +246,9 @@ class adsense_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.11  2011/09/07 00:28:26  sam2kb
+ * Replace non-ASCII character in regular expressions with ~
+ *
  * Revision 1.10  2011/09/04 22:13:23  fplanque
  * copyright 2011
  *

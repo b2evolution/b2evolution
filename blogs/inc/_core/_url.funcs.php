@@ -58,7 +58,7 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 	// Validate URL structure
 	if( $url[0] == '$' )
 	{	// This is a 'special replace code' URL (used in footers)
- 		if( ! preg_match( '¤\$([a-z_]+)\$¤', $url ) )
+ 		if( ! preg_match( '~\$([a-z_]+)\$~', $url ) )
 		{
 			return T_('Invalid URL $code$ format');
 		}
@@ -101,7 +101,7 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 					: T_('URI scheme not allowed.');
 			}
 
-			if( ! preg_match( '¤^(clsid):([a-fA-F0-9\-]+)$¤', $url, $match) )
+			if( ! preg_match( '~^(clsid):([a-fA-F0-9\-]+)$~', $url, $match) )
 			{
 				return T_('Invalid class ID format');
 			}
@@ -118,7 +118,7 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 					: T_('URI scheme not allowed.');
 			}
 
-			preg_match( '¤^(javascript):¤', $url, $match );
+			preg_match( '~^(javascript):~', $url, $match );
 		}
 		else
 		{
@@ -824,6 +824,9 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.55  2011/09/07 00:28:26  sam2kb
+ * Replace non-ASCII character in regular expressions with ~
+ *
  * Revision 1.54  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

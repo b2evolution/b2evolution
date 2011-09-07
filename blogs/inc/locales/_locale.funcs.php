@@ -1089,7 +1089,7 @@ function locales_load_available_defs()
 		// Go through files in locale folder:
 		foreach( $locale_def_files as $locale_def_file )
 		{	// Check if it's a definition file:
-			if( preg_match( '¤[a-z0-9\-]\.locale\.php$¤i', $locale_def_file ) )
+			if( preg_match( '~[a-z0-9\-]\.locale\.php$~i', $locale_def_file ) )
 			{	// We found a definition file:
 				// pre_dump( $locale_def_file );
 				include $ad_locale_folder.'/'.$locale_def_file;
@@ -1133,6 +1133,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.49  2011/09/07 00:28:26  sam2kb
+ * Replace non-ASCII character in regular expressions with ~
+ *
  * Revision 1.48  2011/09/04 22:13:18  fplanque
  * copyright 2011
  *

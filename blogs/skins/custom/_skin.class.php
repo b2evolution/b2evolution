@@ -51,14 +51,14 @@ class custom_Skin extends Skin
 					'label' => T_('Header Background Color'),
 					'note' => T_('E-g: #ff0000 for red'),
 					'defaultvalue' => '#78a',
-					'valid_pattern' => array( 'pattern'=>'¤^(#([a-f0-9]{3}){1,2})?$¤i',
+					'valid_pattern' => array( 'pattern'=>'~^(#([a-f0-9]{3}){1,2})?$~i',
 																		'error'=>T_('Invalid color code.') ),
 				),
 				'menu_bg_color' => array(
 					'label' => T_('Menu Background Color'),
 					'note' => T_('E-g: #ff0000 for red'),
 					'defaultvalue' => '#ddd',
-					'valid_pattern' => array( 'pattern'=>'¤^(#([a-f0-9]{3}){1,2})?$¤i',
+					'valid_pattern' => array( 'pattern'=>'~^(#([a-f0-9]{3}){1,2})?$~i',
 																		'error'=>T_('Invalid color code.') ),
 				),
 				'display_post_time' => array(
@@ -124,6 +124,9 @@ class custom_Skin extends Skin
 
 /*
  * $Log$
+ * Revision 1.9  2011/09/07 00:28:26  sam2kb
+ * Replace non-ASCII character in regular expressions with ~
+ *
  * Revision 1.8  2011/09/04 02:30:20  fplanque
  * colorbox integration (MIT license)
  *

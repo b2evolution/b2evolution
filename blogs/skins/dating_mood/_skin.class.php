@@ -51,7 +51,7 @@ class dating_mood_Skin extends Skin
 					'label' => T_('Background Color'),
 					'note' => T_('E-g: #000000 for black'),
 					'defaultvalue' => '#000',
-					'valid_pattern' => array( 'pattern'=>'¤^(#([a-f0-9]{3}){1,2})?$¤i',
+					'valid_pattern' => array( 'pattern'=>'~^(#([a-f0-9]{3}){1,2})?$~i',
 																		'error'=>T_('Invalid color code.') ),
 				),
 
@@ -107,6 +107,9 @@ class dating_mood_Skin extends Skin
 
 /*
  * $Log$
+ * Revision 1.3  2011/09/07 00:28:27  sam2kb
+ * Replace non-ASCII character in regular expressions with ~
+ *
  * Revision 1.2  2011/09/04 02:30:21  fplanque
  * colorbox integration (MIT license)
  *

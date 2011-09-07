@@ -188,7 +188,7 @@ function skin_init( $disp )
 					}
 
 					global $cat, $catsel;
-					if( empty( $catsel ) && preg_match( '¤[0-9]+¤', $cat ) )
+					if( empty( $catsel ) && preg_match( '~[0-9]+~', $cat ) )
 					{	// We are on a single cat page:
 						// NOTE: we must have selected EXACTLY ONE CATEGORY through the cat parameter
 						// BUT: - this can resolved to including children
@@ -920,6 +920,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.94  2011/09/07 00:28:26  sam2kb
+ * Replace non-ASCII character in regular expressions with ~
+ *
  * Revision 1.93  2011/09/04 22:13:20  fplanque
  * copyright 2011
  *

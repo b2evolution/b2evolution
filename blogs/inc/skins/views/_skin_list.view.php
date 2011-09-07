@@ -60,7 +60,7 @@ $Results->cols[] = array(
 						'order' => 'nb_blogs',
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'center',
-						'td' => '¤conditional( (#nb_blogs# > 0), #nb_blogs#, \'&nbsp;\' )¤',
+						'td' => '~conditional( (#nb_blogs# > 0), #nb_blogs#, \'&nbsp;\' )~',
 					);
 
 $Results->cols[] = array(
@@ -79,10 +79,10 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=edit\')%' )
 	                    .action_icon( TS_('Reload containers!'), 'reload',
 	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=reload&amp;'.url_crumb('skin').'\')%' )
-											.'¤conditional( #nb_blogs# < 1, \''
+											.'~conditional( #nb_blogs# < 1, \''
 											.action_icon( TS_('Uninstall this skin!'), 'delete',
 	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=delete&amp;'.url_crumb('skin').'\')%' ).'\', \''
-	                        .get_icon( 'delete', 'noimg' ).'\' )¤',
+	                        .get_icon( 'delete', 'noimg' ).'\' )~',
 						);
 
   $Results->global_icon( T_('Install new skin...'), 'new', regenerate_url( 'action,blog', 'action=new'), T_('Install new'), 3, 4  );
@@ -97,6 +97,9 @@ $Results->display( NULL, 'session' );
 
 /*
  * $Log$
+ * Revision 1.13  2011/09/07 00:28:26  sam2kb
+ * Replace non-ASCII character in regular expressions with ~
+ *
  * Revision 1.12  2011/09/04 22:13:20  fplanque
  * copyright 2011
  *

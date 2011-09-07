@@ -87,7 +87,7 @@ if( $Blog->get_setting( 'aggregate_coll_IDs' ) )
 			'th' => T_('Blog'),
 			'th_class' => 'nowrap',
 			'td_class' => 'nowrap',
-			'td' => '@load_Blog()@<a href="¤regenerate_url( \'blog,results_order\', \'blog=@blog_ID@\' )¤">@Blog->dget(\'shortname\')@</a>',
+			'td' => '@load_Blog()@<a href="~regenerate_url( \'blog,results_order\', \'blog=@blog_ID@\' )~">@Blog->dget(\'shortname\')@</a>',
 		);
 }
 
@@ -308,6 +308,9 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.31  2011/09/07 00:28:26  sam2kb
+ * Replace non-ASCII character in regular expressions with ~
+ *
  * Revision 1.30  2011/09/04 22:13:17  fplanque
  * copyright 2011
  *

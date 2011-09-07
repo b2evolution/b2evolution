@@ -122,9 +122,9 @@ if( $resolve_extra_path )
 	$Debuglog->add( 'blog_baseuri: "'.$blog_baseuri.'"', 'params' );
 
 	// Remove trailer:
-	$blog_baseuri_regexp = preg_replace( '¤(\.php[0-9]?)?/?$¤', '', $blog_baseuri );
+	$blog_baseuri_regexp = preg_replace( '~(\.php[0-9]?)?/?$~', '', $blog_baseuri );
 	// Read possibilities in order to get a broad match:
-	$blog_baseuri_regexp = '¤^'.preg_quote( $blog_baseuri_regexp ).'(\.php[0-9]?)?/(.+)$¤';
+	$blog_baseuri_regexp = '~^'.preg_quote( $blog_baseuri_regexp ).'(\.php[0-9]?)?/(.+)$~';
 	// pre_dump( '', 'blog_baseuri_regexp: "', $blog_baseuri_regexp );
 
 	if( preg_match( $blog_baseuri_regexp, $ReqPath, $matches ) )
@@ -668,6 +668,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.173  2011/09/07 00:28:26  sam2kb
+ * Replace non-ASCII character in regular expressions with ~
+ *
  * Revision 1.172  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

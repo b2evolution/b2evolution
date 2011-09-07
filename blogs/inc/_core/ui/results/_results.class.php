@@ -1375,7 +1375,7 @@ class Results extends Table
 	 * - #var#
 	 * - {row}
 	 * - %func()%
-	 * - ¤func()¤
+	 * - ~func()~
 	 */
 	function parse_col_content( $content )
 	{
@@ -1396,9 +1396,12 @@ class Results extends Table
 		// Make callback for Object method substitution:
 		$content = preg_replace( '#@ (.+?) @#ix', "'.\$this->current_Obj->$1.'", $content );
 		// Sometimes we need embedded function call, so we provide a second sign:
+		$content = preg_replace( '#~ (.+?) ~#ix', "'.$1.'", $content );
+
+		// @deprecated by ~func()~. Left here for backward compatibility only, to be removed in future versions.
 		$content = preg_replace( '#¤ (.+?) ¤#ix', "'.$1.'", $content );
 
-		// Make callback function move_icons for oderable lists // dh> what does it do?
+		// Make callback function move_icons for orderable lists // dh> what does it do?
 		$content = str_replace( '{move}', "'.\$this->move_icons().'", $content );
 
 		$content = str_replace( '{CUR_IDX}', $this->current_idx, $content );
@@ -1836,6 +1839,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.37  2011/09/07 00:28:26  sam2kb
+ * Replace non-ASCII character in regular expressions with ~
+ *
  * Revision 1.36  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

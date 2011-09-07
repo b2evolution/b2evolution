@@ -2565,7 +2565,7 @@ function mail_encode_header_string( $header_str, $mode = 'Q' )
 	}
 	*/
 
-	if( preg_match( '¤[^a-z0-9!*+\-/ ]¤i', $header_str ) )
+	if( preg_match( '~[^a-z0-9!*+\-/ ]~i', $header_str ) )
 	{	// If the string actually needs some encoding
 		if( $mode == 'Q' )
 		{	// Quoted printable is best for reading with old/text terminal mail reading/debugging stuff:
@@ -4188,6 +4188,9 @@ function sanitize_id_list( $str, $return_array = false, $quote = false )
 
 /*
  * $Log$
+ * Revision 1.262  2011/09/07 00:28:26  sam2kb
+ * Replace non-ASCII character in regular expressions with ~
+ *
  * Revision 1.261  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

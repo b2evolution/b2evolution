@@ -159,7 +159,7 @@ $Results->ID_col = 'grp_ID';
  */
 $Results->grp_cols[] = array(
 						'td_colspan' => 0,  // nb_cols
-						'td' => '¤conditional( #bloggroup_ismember#, \''.TS_('Members').'\', \''.TS_('Non members').'\' )¤',
+						'td' => '~conditional( #bloggroup_ismember#, \''.TS_('Members').'\', \''.TS_('Non members').'\' )~',
 					);
 
 
@@ -497,6 +497,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.20  2011/09/07 00:28:26  sam2kb
+ * Replace non-ASCII character in regular expressions with ~
+ *
  * Revision 1.19  2011/09/06 03:25:41  fplanque
  * i18n update
  *

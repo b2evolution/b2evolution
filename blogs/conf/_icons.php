@@ -35,7 +35,7 @@ function get_icon_info($name)
 
 		case 'dropdown': return array(
 			'file' => 'icons/dropdown.gif',
-			'alt'  => '¤',
+			'alt'  => '&darr;',
 			'size' => array( 11, 8 ),
 		);
 		case 'switch-to-admin': return array(
@@ -539,6 +539,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.76  2011/09/07 00:28:26  sam2kb
+ * Replace non-ASCII character in regular expressions with ~
+ *
  * Revision 1.75  2011/09/06 18:38:39  sam2kb
  * minor
  *

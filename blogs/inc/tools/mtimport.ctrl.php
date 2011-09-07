@@ -985,14 +985,14 @@ param( 'import_mode', 'string', 'normal' );
 				{
 					$old_content = $post_content;
 					// convert tags to lowercase
-					$post_content = stripslashes( preg_replace( "¤(</?)(\w+)([^>]*>)¤e", "'\\1'.strtolower('\\2').'\\3'", $post_content ) );
+					$post_content = stripslashes( preg_replace( "~(</?)(\w+)([^>]*>)~e", "'\\1'.strtolower('\\2').'\\3'", $post_content ) );
 
 					// close br, hr and img tags
-					$post_content = preg_replace( array('¤<(br)>¤', '¤<(hr\s?.*?)>¤', '¤<(img\s.*?)>¤'), '<\\1 />', $post_content );
+					$post_content = preg_replace( array('~<(br)>~', '~<(hr\s?.*?)>~', '~<(img\s.*?)>~'), '<\\1 />', $post_content );
 
 
 					// add quotes for href tags that don't have them
-					$post_content = preg_replace( '¤href=([^"\'][^\s>"\']+)["\']?¤', 'href="$1"', $post_content );
+					$post_content = preg_replace( '~href=([^"\'][^\s>"\']+)["\']?~', 'href="$1"', $post_content );
 
 					if( $post_content != $old_content )
 					{
@@ -1670,6 +1670,9 @@ function tidypostdata( $string )
 
 /*
  * $Log$
+ * Revision 1.23  2011/09/07 00:28:26  sam2kb
+ * Replace non-ASCII character in regular expressions with ~
+ *
  * Revision 1.22  2011/09/04 22:13:20  fplanque
  * copyright 2011
  *

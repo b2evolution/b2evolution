@@ -75,16 +75,16 @@ class am_xml_highlighter
 	{
 		// highlight all < ?xml - ? >, CDATA and comment blocks
 		$block = preg_replace( array(
-						'¤(&lt;\!--(.*?)--&gt;)¤',
-						'¤(&lt;\!\[CDATA\[([\s\S]*?)]]&gt;)¤',
-						'¤(&lt;\?(.*?)\?&gt;)¤' ),
+						'~(&lt;\!--(.*?)--&gt;)~',
+						'~(&lt;\!\[CDATA\[([\s\S]*?)]]&gt;)~',
+						'~(&lt;\?(.*?)\?&gt;)~' ),
 					array(
 						'<span class="amc_comment">&lt;!&#8722;&#8722;$2&#8722;&#8722;&gt;</span>',
 						'<span class="amc_comment">$1</span>',
 						'<span class="amc_keyword">$1</span>' ),
 						 $block );
 		// highlight remaining tags, attributes and strings
-		$block = callback_on_non_matching_blocks(  $block, '¤<span([\s\S]+?)</span>¤', array( $this, 'highlight_xml_tags' ) );
+		$block = callback_on_non_matching_blocks(  $block, '~<span([\s\S]+?)</span>~', array( $this, 'highlight_xml_tags' ) );
 
 
 		return $this->parent->tidy_code_output( '<span class="amc_default">'.$block.'</span>' );
@@ -99,7 +99,7 @@ class am_xml_highlighter
 	 */
 	function highlight_xml_tags( $block )
 	{
-		$block = preg_replace_callback( '¤(&lt;(.*?)&gt;)¤', array( $this, 'highlight_xml' ), $block );
+		$block = preg_replace_callback( '~(&lt;(.*?)&gt;)~', array( $this, 'highlight_xml' ), $block );
 		return '<span class="amc_default">'.$block.'</span>';
 	}
 
@@ -129,6 +129,9 @@ class am_xml_highlighter
 
 /*
  * $Log$
+ * Revision 1.12  2011/09/07 00:28:26  sam2kb
+ * Replace non-ASCII character in regular expressions with ~
+ *
  * Revision 1.11  2011/09/04 22:13:23  fplanque
  * copyright 2011
  *

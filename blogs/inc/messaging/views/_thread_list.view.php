@@ -188,9 +188,9 @@ $Results->cols[] = array(
 					'th' => T_('Subject'),
 					'th_class' => 'thread_subject',
 					'td_class' => 'thread_subject',
-					'td' => '¤conditional( #thrd_msg_ID#>0, \'<strong><a href="'.$messages_url.'&amp;thrd_ID=$thrd_ID$" title="'
+					'td' => '~conditional( #thrd_msg_ID#>0, \'<strong><a href="'.$messages_url.'&amp;thrd_ID=$thrd_ID$" title="'
 							.T_('Show messages...').'">$thrd_title$</a></strong>\', \'<a href="'
-							.$messages_url.'&amp;thrd_ID=$thrd_ID$" title="'.T_('Show messages...').'">$thrd_title$</a>\' )¤',
+							.$messages_url.'&amp;thrd_ID=$thrd_ID$" title="'.T_('Show messages...').'">$thrd_title$</a>\' )~',
 					);
 
 function convert_date( $date, $show_only_date )
@@ -208,7 +208,7 @@ $Results->cols[] = array(
 					'th' => T_('Last message'),
 					'th_class' => 'shrinkwrap',
 					'td_class' => 'shrinkwrap',
-					'td' => '¤conditional( #thrd_msg_ID#>0, \'<span style="color:red">%convert_date(#thrd_unread_since#,'.$show_only_date.')%</span>\', \'<span style="color:green">%convert_date(#thrd_datemodified#,'.$show_only_date.')%</span>\')¤' );
+					'td' => '~conditional( #thrd_msg_ID#>0, \'<span style="color:red">%convert_date(#thrd_unread_since#,'.$show_only_date.')%</span>\', \'<span style="color:green">%convert_date(#thrd_datemodified#,'.$show_only_date.')%</span>\')~' );
 
 function get_read_by( $thread_ID )
 {
@@ -263,6 +263,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.27  2011/09/07 00:28:26  sam2kb
+ * Replace non-ASCII character in regular expressions with ~
+ *
  * Revision 1.26  2011/08/11 09:05:09  efy-asimo
  * Messaging in front office
  *

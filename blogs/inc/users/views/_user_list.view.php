@@ -154,7 +154,7 @@ $Results->grp_cols[] = array(
 						'td_class' => 'firstcol'.($current_User->check_perm( 'users', 'edit', false ) ? '' : ' lastcol' ),
 						'td_colspan' => -1,  // nb_colds - 1
 						'td' => '<a href="?ctrl=groups&amp;grp_ID=$grp_ID$">$grp_name$</a>'
-										.'¤conditional( (#grp_ID# == '.$Settings->get('newusers_grp_ID').'), \' <span class="notes">('.T_('default group for new users').')</span>\' )¤',
+										.'~conditional( (#grp_ID# == '.$Settings->get('newusers_grp_ID').'), \' <span class="notes">('.T_('default group for new users').')</span>\' )~',
 					);
 
 function grp_actions( & $row )
@@ -288,8 +288,8 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 						'th' => T_('URL'),
 						'td_class' => 'shrinkwrap',
-						'td' => '¤conditional( (#user_url# != \'http://\') && (#user_url# != \'\'), \'<a href="$user_url$" title="Website: $user_url$">'
-								.get_icon( 'www', 'imgtag', array( 'class' => 'middle', 'title' => 'Website: $user_url$' ) ).'</a>\', \'&nbsp;\' )¤',
+						'td' => '~conditional( (#user_url# != \'http://\') && (#user_url# != \'\'), \'<a href="$user_url$" title="Website: $user_url$">'
+								.get_icon( 'www', 'imgtag', array( 'class' => 'middle', 'title' => 'Website: $user_url$' ) ).'</a>\', \'&nbsp;\' )~',
 					);
 
 if( isset($collections_Module) )
@@ -299,7 +299,7 @@ if( isset($collections_Module) )
 							'order' => 'nb_blogs',
 							'th_class' => 'shrinkwrap',
 							'td_class' => 'center',
-							'td' => '¤conditional( (#nb_blogs# > 0), #nb_blogs#, \'&nbsp;\' )¤',
+							'td' => '~conditional( (#nb_blogs# > 0), #nb_blogs#, \'&nbsp;\' )~',
 						);
 }
 
@@ -375,10 +375,10 @@ else
 						'td_class' => 'shrinkwrap',
 						'td' => action_icon( T_('Edit this user...'), 'edit', '%regenerate_url( \'ctrl,action\', \'ctrl=user&amp;user_ID=$user_ID$&amp;user_tab=profile\' )%' )
 										.action_icon( T_('Duplicate this user...'), 'copy', '%regenerate_url( \'ctrl,action\', \'ctrl=user&amp;action=new&amp;user_ID=$user_ID$&amp;user_tab=profile\' )%' )
-										.'¤conditional( (#user_ID# != 1) && (#nb_blogs# < 1) && (#user_ID# != '.$current_User->ID.'), \''
+										.'~conditional( (#user_ID# != 1) && (#nb_blogs# < 1) && (#user_ID# != '.$current_User->ID.'), \''
 											.action_icon( T_('Delete this user!'), 'delete',
 												'%regenerate_url( \'action\', \'action=delete&amp;user_ID=$user_ID$&amp;'.url_crumb('user').'\' )%' ).'\', \''
-	                    .get_icon( 'delete', 'noimg' ).'\' )¤'
+	                    .get_icon( 'delete', 'noimg' ).'\' )~'
 					);
 }
 
@@ -389,6 +389,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.34  2011/09/07 00:28:26  sam2kb
+ * Replace non-ASCII character in regular expressions with ~
+ *
  * Revision 1.33  2011/09/06 00:54:38  fplanque
  * i18n update
  *

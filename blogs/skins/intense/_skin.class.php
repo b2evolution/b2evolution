@@ -49,7 +49,7 @@ class intense_Skin extends Skin
 					'label' => T_('Header Image'),
 					'note' => T_('0 for random header image; 1,2,3,4 for custom header image.'),
 					'defaultvalue' => 0,
-					'valid_pattern' => array( 'pattern'=>'¤^([0-4]{1})?$¤',
+					'valid_pattern' => array( 'pattern'=>'~^([0-4]{1})?$~',
 																		'error'=>T_('Invalid Header Image.') ),
 				)
 			), parent::get_param_definitions( $params )	);

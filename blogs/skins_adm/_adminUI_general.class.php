@@ -445,7 +445,7 @@ class AdminUI_general extends Menu
 		{
 			global $Messages;
 
-			$mode = preg_replace( '¤[^a-z]¤', '', $mode );	// sanitize
+			$mode = preg_replace( '~[^a-z]~', '', $mode );	// sanitize
 			echo '<div id="'.$mode.'_wrapper">';
 
 			if( $display_messages )
@@ -1404,6 +1404,9 @@ class AdminUI_general extends Menu
 
 /*
  * $Log$
+ * Revision 1.115  2011/09/07 00:28:27  sam2kb
+ * Replace non-ASCII character in regular expressions with ~
+ *
  * Revision 1.114  2011/09/04 22:13:25  fplanque
  * copyright 2011
  *

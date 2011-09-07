@@ -79,8 +79,8 @@ class am_css_highlighter
 
 		$block = preg_replace(
 					array(
-						'¤(/\*(.+?)\*/)¤s', // highlight comments
-						'¤(@import([^;]+?);)¤i', // highlight includes
+						'~(/\*(.+?)\*/)~s', // highlight comments
+						'~(@import([^;]+?);)~i', // highlight includes
 					),
 					array(
 						'<span class="amc_comment">$1</span>',
@@ -88,7 +88,7 @@ class am_css_highlighter
 					),
 						 $block );
 		// highlight remaining css
-		$block = callback_on_non_matching_blocks(  $block, '¤<span([\s\S]+?)</span>¤', array( $this, 'highlight_css' ) );
+		$block = callback_on_non_matching_blocks(  $block, '~<span([\s\S]+?)</span>~', array( $this, 'highlight_css' ) );
 
 		return $this->parent->tidy_code_output( '<span class="amc_default">'.$block.'</span>' );
 	}
@@ -104,7 +104,7 @@ class am_css_highlighter
 	{
 		// highlight all tag/class names and id's
 		$block = callback_on_non_matching_blocks( $block, '#\{.+?}#s', array( $this, 'highlight_names' ) );
-		$block = callback_on_non_matching_blocks(  $block, '¤<span([\s\S]+?)</span>¤', array( $this, 'highlight_rest' ) );
+		$block = callback_on_non_matching_blocks(  $block, '~<span([\s\S]+?)</span>~', array( $this, 'highlight_rest' ) );
 		return '<span class="amc_default">'.$block.'</span>';
 	}
 
@@ -131,7 +131,7 @@ class am_css_highlighter
 	{
 		$block = preg_replace( array(
 						'#\.([\w:]+)#', // highlight classes
-						'¤#([\w:]+)¤', // highlight ID's
+						'~#([\w:]+)~', // highlight ID's
 					),
 					array(
 						'<span class="amc_class">.$1</span>',
@@ -166,6 +166,9 @@ class am_css_highlighter
 
 /*
  * $Log$
+ * Revision 1.8  2011/09/07 00:28:26  sam2kb
+ * Replace non-ASCII character in regular expressions with ~
+ *
  * Revision 1.7  2011/09/04 22:13:23  fplanque
  * copyright 2011
  *

@@ -696,7 +696,7 @@ class DB
 		}
 		else
 		{
-			$this->version = preg_replace( '¤-.*¤', '', $this->version_long );
+			$this->version = preg_replace( '~-.*~', '', $this->version_long );
 		}
 		$this->restore_error_state();
 
@@ -1697,6 +1697,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.54  2011/09/07 00:28:26  sam2kb
+ * Replace non-ASCII character in regular expressions with ~
+ *
  * Revision 1.53  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *
