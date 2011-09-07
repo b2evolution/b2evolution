@@ -745,7 +745,7 @@ function create_default_jobs( $is_upgrade = false )
 		$poll_antispam_ctrl => $poll_antispam );
 
 	if( $is_upgrade )
-	{ // Check if this jobs already exists, and don't create another
+	{ // Check if these jobs already exist, and don't create another
 		$sql = 'SELECT count(ctsk_ID) as job_number, ctsk_controller
 					FROM T_cron__task LEFT JOIN T_cron__log ON ctsk_ID = clog_ctsk_ID
 						WHERE clog_status IS NULL AND
@@ -774,7 +774,7 @@ function create_default_jobs( $is_upgrade = false )
 }
 
 /**
- * Create a new a blog
+ * Create a new blog
  * This funtion has to handle all needed DB dependencies!
  *
  * @todo move this to Blog object (only half done here)
@@ -825,9 +825,9 @@ function create_demo_contents()
 	global $default_locale;
 	global $Plugins;
 
-  /**
-   * @var FileRootCache
-   */
+	/**
+	 * @var FileRootCache
+	 */
 	global $FileRootCache;
 
 	load_class( 'collections/model/_blog.class.php', 'Blog' );
@@ -940,26 +940,26 @@ function create_demo_contents()
 	echo 'Creating sample categories... ';
 
 	// Create categories for blog A
-	$cat_ann_a = cat_create( 'Welcome', 'NULL', $blog_a_ID );
-	$cat_news = cat_create( 'News', 'NULL', $blog_a_ID );
-	$cat_bg = cat_create( 'Background', 'NULL', $blog_a_ID );
-	$cat_fun = cat_create( 'Fun', 'NULL', $blog_a_ID );
-	$cat_life = cat_create( 'In real life', $cat_fun, $blog_a_ID );
-	$cat_web = cat_create( 'On the web', $cat_fun, $blog_a_ID );
-	$cat_sports = cat_create( 'Sports', $cat_life, $blog_a_ID );
-	$cat_movies = cat_create( 'Movies', $cat_life, $blog_a_ID );
-	$cat_music = cat_create( 'Music', $cat_life, $blog_a_ID );
+	$cat_ann_a = cat_create( T_('Welcome'), 'NULL', $blog_a_ID );
+	$cat_news = cat_create( T_('News'), 'NULL', $blog_a_ID );
+	$cat_bg = cat_create( T_('Background'), 'NULL', $blog_a_ID );
+	$cat_fun = cat_create( T_('Fun'), 'NULL', $blog_a_ID );
+	$cat_life = cat_create( T_('In real life'), $cat_fun, $blog_a_ID );
+	$cat_web = cat_create( T_('On the web'), $cat_fun, $blog_a_ID );
+	$cat_sports = cat_create( T_('Sports'), $cat_life, $blog_a_ID );
+	$cat_movies = cat_create( T_('Movies'), $cat_life, $blog_a_ID );
+	$cat_music = cat_create( T_('Music'), $cat_life, $blog_a_ID );
 
 	// Create categories for blog B
-	$cat_ann_b = cat_create( 'Announcements', 'NULL', $blog_b_ID );
-	$cat_b2evo = cat_create( 'b2evolution Tips', 'NULL', $blog_b_ID );
+	$cat_ann_b = cat_create( T_('Announcements'), 'NULL', $blog_b_ID );
+	$cat_b2evo = cat_create( T_('b2evolution Tips'), 'NULL', $blog_b_ID );
 
 	// Create categories for linkblog
 	$cat_linkblog_b2evo = cat_create( 'b2evolution', 'NULL', $blog_linkblog_ID );
-	$cat_linkblog_contrib = cat_create( 'contributors', 'NULL', $blog_linkblog_ID );
+	$cat_linkblog_contrib = cat_create( T_('Contributors'), 'NULL', $blog_linkblog_ID );
 
 	// Create categories for photoblog
-	$cat_photo_album = cat_create( 'Monument Valley', 'NULL', $blog_photoblog_ID );
+	$cat_photo_album = cat_create( T_('Monument Valley'), 'NULL', $blog_photoblog_ID );
 
 	echo "OK.<br />\n";
 
@@ -982,9 +982,9 @@ function create_demo_contents()
 
 
 	// PHOTOBLOG:
-  /**
-   * @var FileRootCache
-   */
+	/**
+	 * @var FileRootCache
+	 */
 	// $FileRootCache = & get_FileRootCache();
 	// $FileRoot = & $FileRootCache->get_by_type_and_ID( 'collection', $blog_photoblog_ID, true );
 
@@ -1037,32 +1037,32 @@ function create_demo_contents()
 	$timestamp++;
 	$now = date('Y-m-d H:i:s',$timestamp + 59);
 	$edited_Item = new Item();
-	$edited_Item->insert( 1, 'Danny', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 'http://personman.com/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Danny', '', $now, $cat_linkblog_contrib, array(), 'published', 'en-US', '', 'http://personman.com/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
-	$edited_Item->insert( 1, 'Daniel', '', $now, $cat_linkblog_contrib, array(), 'published',	'de-DE', '', 'http://daniel.hahler.de/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Daniel', '', $now, $cat_linkblog_contrib, array(), 'published', 'de-DE', '', 'http://daniel.hahler.de/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
-	$edited_Item->insert( 1, 'Francois', '', $now, $cat_linkblog_contrib, array(), 'published',	 'fr-FR', '', 'http://fplanque.com/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Francois', '', $now, $cat_linkblog_contrib, array(), 'published', 'fr-FR', '', 'http://fplanque.com/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
-	$edited_Item->insert( 1, 'Tilman', '', $now, $cat_linkblog_contrib, array(), 'published',	 'de-DE', '', 'http://ax86.net/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Tilman', '', $now, $cat_linkblog_contrib, array(), 'published', 'de-DE', '', 'http://ax86.net/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
-	$edited_Item->insert( 1, 'Blog news', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-US', '', 'http://b2evolution.net/news.php', 'disabled', array() );
+	$edited_Item->insert( 1, 'Blog news', '', $now, $cat_linkblog_b2evo, array(), 'published', 'en-US', '', 'http://b2evolution.net/news.php', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
-	$edited_Item->insert( 1, 'Web hosting', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-US', '', 'http://b2evolution.net/web-hosting/blog/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Web hosting', '', $now, $cat_linkblog_b2evo, array(), 'published', 'en-US', '', 'http://b2evolution.net/web-hosting/blog/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -1072,7 +1072,7 @@ function create_demo_contents()
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
-	$edited_Item->insert( 1, 'Support', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-US', '', 'http://forums.b2evolution.net/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Support', '', $now, $cat_linkblog_b2evo, array(), 'published', 'en-US', '', 'http://forums.b2evolution.net/', 'disabled', array() );
 
 
 
@@ -1349,13 +1349,16 @@ function create_demo_contents()
 	load_funcs( 'tools/model/_system.funcs.php' );
 	if( !system_init_caches() )
 	{
-		echo "<strong>The /cache folder could not be created/written to. b2evolution will still work but without caching, which will make it operate slower than optimal.</strong><br />\n";
+		echo "<strong>".T_('The /cache folder could not be created/written to. b2evolution will still work but without caching, which will make it operate slower than optimal.')."</strong><br />\n";
 	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.312  2011/09/07 05:16:49  sam2kb
+ * i18n update
+ *
  * Revision 1.311  2011/09/04 22:13:23  fplanque
  * copyright 2011
  *
