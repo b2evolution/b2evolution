@@ -173,10 +173,14 @@ if( $use_l10n )
 			}
 		}
 
-		if( isset( $trans[ $messages ][ $string ] ) )
+		// sam2kb> b2evolution creates _global.php files with "\n" line breaks, and we must normalize newlines
+		// in supplied string before trying to translate it. Otherwise strings won't match.
+		$search_string = str_replace( array("\r\n", "\r"), "\n", $string );
+
+		if( isset( $trans[ $messages ][ $search_string ] ) )
 		{ // If the string has been translated:
 			//$Debuglog->add( 'String ['.$string.'] found', 'locale' );
-			$r = $trans[ $messages ][ $string ];
+			$r = $trans[ $messages ][ $search_string ];
 			if( isset($trans[$messages]['__meta__']['charset']) )
 			{ // new format: charset in meta data:
 				$messages_charset = $trans[$messages]['__meta__']['charset'];
@@ -1133,6 +1137,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.50  2011/09/07 07:22:00  sam2kb
+ * Normalize line breaks in supplied string before trying to translate it
+ *
  * Revision 1.49  2011/09/07 00:28:26  sam2kb
  * Replace non-ASCII character in regular expressions with ~
  *
