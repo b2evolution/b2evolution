@@ -135,7 +135,7 @@ $Form->begin_form( 'fform' );
 
 	$Form->begin_fieldset();
 
-	$Form->text_input( 'login', $login, 18, T_('Login'), T_('Type your username, <b>not</b> your email address.'), array( 'maxlength' => 20, 'class' => 'input_text' ) );
+	$Form->text_input( 'login', $login, 16, T_('Login'), T_('Type your username, <b>not</b> your email address.'), array( 'maxlength' => 20, 'class' => 'input_text' ) );
 
 	$pwd_note = '<a href="'.$htsrv_url_sensitive.'login.php?action=lostpassword&amp;redirect_to='
 		.rawurlencode( url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
@@ -145,7 +145,7 @@ $Form->begin_form( 'fform' );
 	}
 	$pwd_note .= '">'.T_('Lost password ?').'</a>';
 
-	$Form->password_input( 'pwd', '', 18, T_('Password'), array( 'note'=>$pwd_note, 'maxlength' => 70, 'class' => 'input_text' ) );
+	$Form->password_input( 'pwd', '', 16, T_('Password'), array( 'note'=>$pwd_note, 'maxlength' => 70, 'class' => 'input_text' ) );
 
 
 
@@ -153,7 +153,7 @@ $Form->begin_form( 'fform' );
 	$Plugins->trigger_event( 'DisplayLoginFormFieldset', array( 'Form' => & $Form ) );
 
 	// Submit button(s):
-	$submit_buttons = array( array( 'name'=>'login_action[login]', 'value'=>T_('Log in!'), 'class'=>'search', 'style'=>'font-size:200%' ) );
+	$submit_buttons = array( array( 'name'=>'login_action[login]', 'value'=>T_('Log in!'), 'class'=>'search', 'style'=>'font-size: 120%' ) );
 	if( strpos( $redirect_to, $admin_url ) !== 0
 		&& strpos( $ReqHost.$redirect_to, $admin_url ) !== 0 // if $redirect_to is relative
 		&& ! is_admin_page() )
@@ -231,6 +231,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.27  2011/09/07 23:34:09  fplanque
+ * i18n update
+ *
  * Revision 1.26  2011/09/07 22:44:41  fplanque
  * UI cleanup
  *

@@ -91,7 +91,7 @@ if( $action != 'req_validatemail' )
 	$Plugins->trigger_event( 'DisplayLoginFormFieldset', array( 'Form' => & $Form ) );
 
 	// Submit button:
-	$submit_button = array( array( 'name'=>'login_action[login]', 'value'=>T_('Log in!'), 'class'=>'search', 'style'=>'font-size:200%' ) );
+	$submit_button = array( array( 'name'=>'login_action[login]', 'value'=>T_('Log in!'), 'class'=>'search', 'style'=>'font-size: 120%' ) );
 
 	$Form->buttons_input($submit_button);
 
@@ -143,6 +143,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.12  2011/09/07 23:34:09  fplanque
+ * i18n update
+ *
  * Revision 1.11  2011/09/07 22:44:41  fplanque
  * UI cleanup
  *

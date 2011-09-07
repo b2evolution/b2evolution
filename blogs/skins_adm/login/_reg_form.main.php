@@ -82,7 +82,7 @@ $Form->begin_fieldset();
 
 	$Plugins->trigger_event( 'DisplayRegisterFormFieldset', array( 'Form' => & $Form ) );
 
-	$Form->buttons_input( array( array('name'=>'submit', 'value'=>T_('Register my account now!'), 'class'=>'ActionInput', 'style'=>'font-size: 200%' ) ) );
+	$Form->buttons_input( array( array('name'=>'submit', 'value'=>T_('Register my account now!'), 'class'=>'ActionInput', 'style'=>'font-size: 120%' ) ) );
 
 	$Form->info( '', '', sprintf( T_('Your IP address (%s) and the current time are being logged.'), $Hit->IP ) );
 
@@ -99,6 +99,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.26  2011/09/07 23:34:09  fplanque
+ * i18n update
+ *
  * Revision 1.25  2011/09/07 22:44:41  fplanque
  * UI cleanup
  *

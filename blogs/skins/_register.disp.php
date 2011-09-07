@@ -100,7 +100,7 @@ if( $action == 'register' )
 	$Form->end_fieldset();
 
 	// Submit button:
-	$submit_button = array( array( 'name'=>'register', 'value'=>T_('Register my account now!'), 'class'=>'search', 'style'=>'font-size: 200%' ) );
+	$submit_button = array( array( 'name'=>'register', 'value'=>T_('Register my account now!'), 'class'=>'search', 'style'=>'font-size: 120%' ) );
 
 	$Form->buttons_input($submit_button);
 
@@ -147,6 +147,9 @@ elseif( $action == "reg_validation" )
 
 /*
  * $Log$
+ * Revision 1.12  2011/09/07 23:34:09  fplanque
+ * i18n update
+ *
  * Revision 1.11  2011/09/07 22:44:41  fplanque
  * UI cleanup
  *

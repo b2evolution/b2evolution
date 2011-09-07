@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2011-09-06 04:53+0200\n"
+"POT-Creation-Date: 2011-09-08 00:49+0200\n"
 "PO-Revision-Date: 2011-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,7 +25,7 @@ msgstr ""
 #: ../../../inc/settings/views/_features.form.php:196
 #: ../../../inc/widgets/widgets/_coll_category_list.widget.php:95
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:216
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:186
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:189
 #: ../../../multiblogs.php:199 ../../../skins/_sitemap.disp.php:58
 #: ../../../skins/asevo/_item_block.inc.php:66
 #: ../../../skins/basic/index.main.php:152
@@ -100,11 +100,11 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-#: ../../../conf/_application.php:41
+#: ../../../conf/_application.php:39
 msgid "visit b2evolution's website"
 msgstr ""
 
-#: ../../../conf/_application.php:44
+#: ../../../conf/_application.php:42
 msgid "GPL License"
 msgstr ""
 
@@ -175,7 +175,7 @@ msgstr ""
 #: ../../../inc/files/views/_file_delete.form.php:72
 #: ../../../inc/files/views/_file_list.inc.php:444
 #: ../../../inc/items/items.ctrl.php:1112
-#: ../../../inc/users/model/_user.funcs.php:848
+#: ../../../inc/users/model/_user.funcs.php:859
 #: ../../../inc/users/views/_user_coll_list.view.php:44
 msgid "Delete"
 msgstr ""
@@ -242,11 +242,11 @@ msgstr ""
 #: ../../../inc/users/views/_user_list.view.php:266
 #: ../../../skins/_contact_msg.form.php:42
 #: ../../../skins/_item_comment_form.inc.php:168
-#: ../../../skins/_login.disp.php:132 ../../../skins/_register.disp.php:76
-#: ../../../skins/_register.disp.php:119 ../../../skins/_subs.disp.php:60
+#: ../../../skins/_login.disp.php:133 ../../../skins/_register.disp.php:74
+#: ../../../skins/_register.disp.php:124 ../../../skins/_subs.disp.php:60
 #: ../../../skins/basic/_item_comment_form.inc.php:60
 #: ../../../skins_adm/login/_reg_complete.main.php:58
-#: ../../../skins_adm/login/_reg_form.main.php:69
+#: ../../../skins_adm/login/_reg_form.main.php:59
 #: ../../../skins_adm/login/_validate_form.main.php:57
 msgid "Email"
 msgstr ""
@@ -789,14 +789,14 @@ msgid "Posted comment"
 msgstr ""
 
 #: ../../../htsrv/comment_review.php:184
-#: ../../../inc/dashboard/model/_dashboard.funcs.php:253
+#: ../../../inc/dashboard/model/_dashboard.funcs.php:254
 #: ../../../inc/items/model/_item.funcs.php:1803
 msgid "No Spam Karma"
 msgstr ""
 
 #: ../../../htsrv/comment_review.php:184
 #: ../../../inc/comments/views/_comment.form.php:288
-#: ../../../inc/dashboard/model/_dashboard.funcs.php:253
+#: ../../../inc/dashboard/model/_dashboard.funcs.php:254
 #: ../../../inc/items/model/_item.funcs.php:1803
 msgid "Spam Karma"
 msgstr ""
@@ -816,6 +816,7 @@ msgid "Your email address is invalid. Please set your email address first."
 msgstr ""
 
 #: ../../../htsrv/isubs_update.php:83
+#: ../../../htsrv/quick_unsubscribe.php:66
 msgid "You have successfully unsubscribed."
 msgstr ""
 
@@ -1056,10 +1057,6 @@ msgstr ""
 msgid "The user you are trying to unsubscribe does not seem to exist. You may already have deleted your account."
 msgstr ""
 
-#: ../../../htsrv/quick_unsubscribe.php:66
-msgid "You have successfuly unsubscribed."
-msgstr ""
-
 #: ../../../htsrv/quick_upload.php:54
 msgid "You don't have permission to upload on this file root."
 msgstr ""
@@ -1124,7 +1121,7 @@ msgid "Your profile & subscriptions have been updated."
 msgstr ""
 
 #: ../../../htsrv/trackback.php:121
-#: ../../../inc/users/model/_user.funcs.php:669
+#: ../../../inc/users/model/_user.funcs.php:680
 msgid "Supplied URL is invalid: "
 msgstr ""
 
@@ -1480,7 +1477,7 @@ msgid "Slugs"
 msgstr ""
 
 #: ../../../inc/_core/__core.init.php:793
-#: ../../../inc/users/model/_user.funcs.php:453
+#: ../../../inc/users/model/_user.funcs.php:464
 msgid "Edit your profile"
 msgstr ""
 
@@ -1509,7 +1506,7 @@ msgstr ""
 
 #: ../../../inc/_core/__core.init.php:855
 #: ../../../inc/_core/__core.init.php:892
-#: ../../../inc/users/model/_user.funcs.php:311
+#: ../../../inc/users/model/_user.funcs.php:322
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:76
 #: ../../../skins_adm/_access_denied.main.php:23
 #: ../../../skins_adm/_adminUI_general.class.php:1316
@@ -1531,7 +1528,7 @@ msgid "Blog"
 msgstr ""
 
 #: ../../../inc/_core/__core.init.php:874
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:251
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:274
 #: ../../../skins_adm/login/_reg_disabled.main.php:40
 msgid "Home"
 msgstr ""
@@ -1547,7 +1544,7 @@ msgstr ""
 #: ../../../inc/collections/views/_coll_urls.form.php:106
 #: ../../../inc/collections/views/_coll_user_perm.form.php:460
 #: ../../../inc/sessions/views/_stats_browserhits.view.php:161
-#: ../../../inc/users/model/_user.funcs.php:400
+#: ../../../inc/users/model/_user.funcs.php:411
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:97
 #: ../../../install/index.php:168
 msgid "Admin"
@@ -1807,7 +1804,7 @@ msgid "The decimal value is invalid."
 msgstr ""
 
 #: ../../../inc/_core/_param.funcs.php:561
-#: ../../../inc/users/model/_user.funcs.php:648
+#: ../../../inc/users/model/_user.funcs.php:659
 msgid "The email address is invalid."
 msgstr ""
 
@@ -1842,17 +1839,17 @@ msgstr ""
 
 #: ../../../inc/_core/_param.funcs.php:1153
 #: ../../../inc/_core/_param.funcs.php:1158
-#: ../../../inc/users/model/_user.funcs.php:684
+#: ../../../inc/users/model/_user.funcs.php:695
 msgid "Please enter your password twice."
 msgstr ""
 
 #: ../../../inc/_core/_param.funcs.php:1165
-#: ../../../inc/users/model/_user.funcs.php:690
+#: ../../../inc/users/model/_user.funcs.php:701
 msgid "You typed two different passwords."
 msgstr ""
 
 #: ../../../inc/_core/_param.funcs.php:1171
-#: ../../../inc/users/model/_user.funcs.php:694
+#: ../../../inc/users/model/_user.funcs.php:705
 #, php-format
 msgid "The minimum password length is %d characters."
 msgstr ""
@@ -1936,7 +1933,7 @@ msgstr ""
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:194
 #: ../../../inc/widgets/widgets/_coll_search_form.widget.php:89
 #: ../../../inc/widgets/widgets/_coll_search_form.widget.php:150
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:176
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:179
 msgid "Search"
 msgstr ""
 
@@ -1962,10 +1959,10 @@ msgstr ""
 #: ../../../inc/users/views/_user_identity.form.php:311
 #: ../../../inc/users/views/_user_list.view.php:223
 #: ../../../install/_functions_install.php:200
-#: ../../../skins/_login.disp.php:53 ../../../skins/_register.disp.php:65
-#: ../../../skins/_register.disp.php:118 ../../../skins/_subs.disp.php:58
+#: ../../../skins/_login.disp.php:75 ../../../skins/_register.disp.php:65
+#: ../../../skins/_register.disp.php:123 ../../../skins/_subs.disp.php:58
 #: ../../../skins/_user.disp.php:60
-#: ../../../skins_adm/login/_login_form.main.php:116
+#: ../../../skins_adm/login/_login_form.main.php:138
 #: ../../../skins_adm/login/_lostpass_form.main.php:54
 #: ../../../skins_adm/login/_reg_complete.main.php:57
 #: ../../../skins_adm/login/_reg_form.main.php:54
@@ -1978,6 +1975,8 @@ msgid "Email validation"
 msgstr ""
 
 #: ../../../inc/_core/_template.funcs.php:312
+#: ../../../inc/users/model/_user.funcs.php:225
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:236
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:104
 msgid "Register"
 msgstr ""
@@ -1996,10 +1995,11 @@ msgid "User Profile"
 msgstr ""
 
 #: ../../../inc/_core/_template.funcs.php:316
-#: ../../../inc/users/model/_user.funcs.php:898
+#: ../../../inc/users/model/_user.funcs.php:909
 #: ../../../inc/users/user.ctrl.php:351
 #: ../../../inc/users/views/_user_avatar.form.php:66
 #: ../../../inc/users/views/_user_identity.form.php:308
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:248
 msgid "Profile picture"
 msgstr ""
 
@@ -2158,7 +2158,7 @@ msgstr ""
 
 #: ../../../inc/_core/model/_pagecache.class.php:634
 #, php-format
-msgid "Can not access directory: %s)."
+msgid "Can not access directory: %s."
 msgstr ""
 
 #: ../../../inc/_core/model/dataobjects/_dataobject.class.php:455
@@ -3065,7 +3065,7 @@ msgstr ""
 #: ../../../inc/users/views/_user_identity.form.php:405
 #: ../../../inc/users/views/_user_identity.form.php:415
 #: ../../../inc/users/views/_user_list.view.php:289
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:146
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:149
 #: ../../../plugins/_quicktags.plugin.php:387
 #: ../../../plugins/_quicktags.plugin.php:402
 msgid "URL"
@@ -3140,7 +3140,7 @@ msgstr ""
 #: ../../../inc/collections/views/_coll_advanced.form.php:173
 #: ../../../inc/collections/views/_coll_group_perm.form.php:136
 #: ../../../inc/collections/views/_coll_user_perm.form.php:141
-#: ../../../inc/comments/model/_commentlist.class.php:565
+#: ../../../inc/comments/model/_commentlist.class.php:571
 #: ../../../inc/sessions/_sessions.init.php:232
 #: ../../../inc/users/views/_user_list.view.php:130
 msgid "Keywords"
@@ -3516,7 +3516,7 @@ msgstr ""
 #: ../../../inc/sessions/views/_goal.form.php:38
 #: ../../../inc/skins/views/_skin.form.php:39
 #: ../../../inc/slugs/views/_slug.form.php:33
-#: ../../../inc/users/model/_user.funcs.php:854
+#: ../../../inc/users/model/_user.funcs.php:865
 #: ../../../inc/users/views/_group.form.php:140
 #: ../../../inc/users/views/_user_coll_list.view.php:46
 #: ../../../inc/users/views/_userfield.form.php:48
@@ -3804,7 +3804,7 @@ msgstr ""
 #: ../../../inc/files/views/_file_settings.form.php:244
 #: ../../../inc/plugins/views/_plugin_settings.form.php:113
 #: ../../../inc/plugins/views/_plugin_settings.form.php:127
-#: ../../../inc/users/model/_user.funcs.php:916
+#: ../../../inc/users/model/_user.funcs.php:927
 #: ../../../inc/users/user.ctrl.php:361
 msgid "Advanced"
 msgstr ""
@@ -4078,7 +4078,7 @@ msgid "Blog Folder URL"
 msgstr ""
 
 #: ../../../inc/collections/model/_blog.class.php:620
-#: ../../../inc/collections/model/_blog.class.php:682
+#: ../../../inc/collections/model/_blog.class.php:685
 msgid "You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!"
 msgstr ""
 
@@ -4086,100 +4086,100 @@ msgstr ""
 msgid "You must provide a relative URL (without <code>http://</code> or <code>https://</code>)!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:651
+#: ../../../inc/collections/model/_blog.class.php:654
 msgid "Invalid aggregate blog ID list!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:677
-#: ../../../inc/collections/model/_blog.class.php:681
-#: ../../../inc/collections/model/_blog.class.php:689
-#: ../../../inc/collections/model/_blog.class.php:698
-#: ../../../inc/collections/model/_blog.class.php:705
-#: ../../../inc/collections/model/_blog.class.php:713
+#: ../../../inc/collections/model/_blog.class.php:680
+#: ../../../inc/collections/model/_blog.class.php:684
+#: ../../../inc/collections/model/_blog.class.php:692
+#: ../../../inc/collections/model/_blog.class.php:701
+#: ../../../inc/collections/model/_blog.class.php:708
+#: ../../../inc/collections/model/_blog.class.php:716
 msgid "Media dir location"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:677
+#: ../../../inc/collections/model/_blog.class.php:680
 msgid "You must provide the full path of the media directory."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:698
+#: ../../../inc/collections/model/_blog.class.php:701
 msgid "You must provide the media subdirectory."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:705
+#: ../../../inc/collections/model/_blog.class.php:708
 #, php-format
 msgid "Invalid subdirectory &laquo;%s&raquo;."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1457
+#: ../../../inc/collections/model/_blog.class.php:1460
 #, php-format
 msgid "The blog's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1466
+#: ../../../inc/collections/model/_blog.class.php:1469
 #, php-format
 msgid "The blog's media directory &laquo;%s&raquo; could not be created."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1480
+#: ../../../inc/collections/model/_blog.class.php:1483
 #, php-format
 msgid "The blog's media directory &laquo;%s&raquo; has been created with permissions %s."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1877
+#: ../../../inc/collections/model/_blog.class.php:1880
 msgid "The new blog has been created."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1886
+#: ../../../inc/collections/model/_blog.class.php:1889
 #, php-format
 msgid "The new blog has been associated with the stub file &laquo;%s&raquo;."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1890
+#: ../../../inc/collections/model/_blog.class.php:1893
 #, php-format
 msgid "No stub file named &laquo;%s&raquo; was found. You must create it for the blog to function properly with the current settings."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1913
+#: ../../../inc/collections/model/_blog.class.php:1916
 msgid "Uncategorized"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1917
+#: ../../../inc/collections/model/_blog.class.php:1920
 msgid "A default category has been created for this blog."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1923
+#: ../../../inc/collections/model/_blog.class.php:1926
 msgid "Default widgets have been set-up for this blog."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:2032
+#: ../../../inc/collections/model/_blog.class.php:2035
 msgid "Deleted post-categories"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:2039
+#: ../../../inc/collections/model/_blog.class.php:2042
 msgid "Deleted comments on blog's posts"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:2047
+#: ../../../inc/collections/model/_blog.class.php:2050
 msgid "Deleted blog's posts"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:2056
+#: ../../../inc/collections/model/_blog.class.php:2059
 msgid "Deleted blog's categories"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:2069
+#: ../../../inc/collections/model/_blog.class.php:2072
 #, php-format
 msgid "ERROR! Could not delete! You will have to delete the file [%s] by hand."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:2073
+#: ../../../inc/collections/model/_blog.class.php:2076
 #, php-format
 msgid "Could not delete static file [%s]"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:2078
+#: ../../../inc/collections/model/_blog.class.php:2081
 msgid "Deleted blog's static file"
 msgstr ""
 
@@ -5344,8 +5344,8 @@ msgstr ""
 #: ../../../inc/locales/_locale_settings.form.php:86
 #: ../../../inc/locales/_locale_settings.form.php:282
 #: ../../../inc/users/views/_user_coll_list.view.php:98
-#: ../../../skins/_register.disp.php:98 ../../../skins/_user.disp.php:122
-#: ../../../skins_adm/login/_reg_form.main.php:90
+#: ../../../skins/_register.disp.php:96 ../../../skins/_user.disp.php:122
+#: ../../../skins_adm/login/_reg_form.main.php:80
 msgid "Locale"
 msgstr ""
 
@@ -5920,7 +5920,7 @@ msgstr ""
 #: ../../../inc/comments/_comments.ctrl.php:379
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:230
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:38
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:206
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:209
 #: ../../../skins/photoblog/_body_footer.inc.php:37
 msgid "Latest comments"
 msgstr ""
@@ -6231,7 +6231,7 @@ msgstr ""
 msgid "Comment text:"
 msgstr ""
 
-#: ../../../inc/comments/model/_commentlist.class.php:560
+#: ../../../inc/comments/model/_commentlist.class.php:566
 #: ../../../inc/comments/views/_comment.form.php:265
 #: ../../../inc/comments/views/_comment_list_table.view.php:219
 #: ../../../inc/items/model/_item.funcs.php:1789
@@ -6245,7 +6245,7 @@ msgstr ""
 msgid "Visibility"
 msgstr ""
 
-#: ../../../inc/comments/model/_commentlist.class.php:602
+#: ../../../inc/comments/model/_commentlist.class.php:608
 msgid "No comment yet..."
 msgstr ""
 
@@ -6899,16 +6899,16 @@ msgstr ""
 msgid "View default page"
 msgstr ""
 
-#: ../../../inc/dashboard/model/_dashboard.funcs.php:91
+#: ../../../inc/dashboard/model/_dashboard.funcs.php:92
 #, php-format
 msgid "Getting updates from %s."
 msgstr ""
 
-#: ../../../inc/dashboard/model/_dashboard.funcs.php:181
+#: ../../../inc/dashboard/model/_dashboard.funcs.php:182
 msgid "Invalid updates received"
 msgstr ""
 
-#: ../../../inc/dashboard/model/_dashboard.funcs.php:238
+#: ../../../inc/dashboard/model/_dashboard.funcs.php:239
 msgid "in response to"
 msgstr ""
 
@@ -7368,8 +7368,8 @@ msgstr ""
 #: ../../../inc/sessions/views/_stats_summary.view.php:131
 #: ../../../inc/tools/model/_system.funcs.php:321
 #: ../../../inc/tools/model/_system.funcs.php:351
-#: ../../../inc/widgets/model/_widget.class.php:169
-#: ../../../inc/widgets/model/_widget.class.php:225
+#: ../../../inc/widgets/model/_widget.class.php:174
+#: ../../../inc/widgets/model/_widget.class.php:230
 msgid "Unknown"
 msgstr ""
 
@@ -8248,7 +8248,7 @@ msgid "Uploading"
 msgstr ""
 
 #: ../../../inc/files/views/_file_quick_upload.view.php:80
-msgid "Your browser does not support XMLHttpRequest technology!.Please use standard upload!"
+msgid "Your browser does not support XMLHttpRequest technology! Please use standard upload!"
 msgstr ""
 
 #: ../../../inc/files/views/_file_quick_upload.view.php:82
@@ -9723,7 +9723,7 @@ msgstr ""
 
 #: ../../../inc/items/views/_item_list_sidebar.view.php:251
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:209
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:181
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:184
 #: ../../../plugins/_archives.plugin.php:318
 #: ../../../skins/basic/index.main.php:248
 msgid "Archives"
@@ -11253,7 +11253,7 @@ msgstr ""
 
 #: ../../../inc/plugins/views/_plugin_list.view.php:141
 #: ../../../inc/plugins/views/_plugin_list_available.view.php:54
-#: ../../../inc/widgets/model/_widget.class.php:194
+#: ../../../inc/widgets/model/_widget.class.php:199
 msgid "Plugin"
 msgstr ""
 
@@ -11381,8 +11381,8 @@ msgstr ""
 #: ../../../inc/regional/views/_country.form.php:51
 #: ../../../inc/users/views/_user_identity.form.php:316
 #: ../../../inc/users/views/_user_list.view.php:251
-#: ../../../skins/_register.disp.php:83 ../../../skins/_user.disp.php:97
-#: ../../../skins_adm/login/_reg_form.main.php:76
+#: ../../../skins/_register.disp.php:81 ../../../skins/_user.disp.php:97
+#: ../../../skins_adm/login/_reg_form.main.php:66
 msgid "Country"
 msgstr ""
 
@@ -12383,13 +12383,13 @@ msgid "User name for authenticating to your mail server."
 msgstr ""
 
 #: ../../../inc/settings/views/_features.form.php:103
-#: ../../../inc/users/model/_user.funcs.php:905
+#: ../../../inc/users/model/_user.funcs.php:916
 #: ../../../inc/users/views/_user_identity.form.php:337
 #: ../../../inc/users/views/_user_password.form.php:97
 #: ../../../install/_functions_install.php:201
-#: ../../../skins/_login.disp.php:65 ../../../skins/_register.disp.php:71
-#: ../../../skins_adm/login/_login_form.main.php:126
-#: ../../../skins_adm/login/_reg_form.main.php:60
+#: ../../../skins/_login.disp.php:87 ../../../skins/_register.disp.php:69
+#: ../../../skins_adm/login/_login_form.main.php:148
+#: ../../../skins_adm/login/_reg_form.main.php:56
 msgid "Password"
 msgstr ""
 
@@ -12940,7 +12940,7 @@ msgstr ""
 #: ../../../inc/slugs/views/_slug_list.view.php:75
 #: ../../../inc/tools/views/_broken_posts.view.php:34
 #: ../../../inc/tools/views/_broken_slugs.view.php:52
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:139
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:142
 msgid "Item ID"
 msgstr ""
 
@@ -13694,17 +13694,17 @@ msgid "Please enter a value."
 msgstr ""
 
 #: ../../../inc/users/model/_user.class.php:350
-#: ../../../inc/users/model/_user.funcs.php:644
-msgid "Please enter an e-mail address."
+#: ../../../inc/users/model/_user.funcs.php:655
+msgid "Please enter your e-mail address."
 msgstr ""
 
 #: ../../../inc/users/model/_user.class.php:389
-#: ../../../inc/users/model/_user.funcs.php:627
+#: ../../../inc/users/model/_user.funcs.php:638
 msgid "Please enter a nickname (can be the same as your login)."
 msgstr ""
 
 #: ../../../inc/users/model/_user.class.php:417
-#: ../../../inc/users/model/_user.funcs.php:635
+#: ../../../inc/users/model/_user.funcs.php:646
 msgid "The ICQ UIN can only be a number, no letters allowed."
 msgstr ""
 
@@ -13744,7 +13744,7 @@ msgid "Link to validate your %s account:"
 msgstr ""
 
 #: ../../../inc/users/model/_user.class.php:1781
-#: ../../../skins/_register.disp.php:129
+#: ../../../skins/_register.disp.php:138
 #: ../../../skins_adm/login/_reg_complete.main.php:70
 #, php-format
 msgid "Validate your email address for \"%s\""
@@ -13807,7 +13807,7 @@ msgid "You don't have permission to selected user file root."
 msgstr ""
 
 #: ../../../inc/users/model/_user.funcs.php:105
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:225
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:228
 msgid "Log in"
 msgstr ""
 
@@ -13815,81 +13815,78 @@ msgstr ""
 msgid "Log in if you have an account..."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:230
-msgid "Register..."
+#: ../../../inc/users/model/_user.funcs.php:226
+msgid "Register for a new account..."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:231
-msgid "Register to open an account..."
-msgstr ""
-
-#: ../../../inc/users/model/_user.funcs.php:312
+#: ../../../inc/users/model/_user.funcs.php:323
 msgid "Logout from your account"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:401
+#: ../../../inc/users/model/_user.funcs.php:412
 msgid "Go to the back-office..."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:447
-#: ../../../inc/users/model/_user.funcs.php:892
+#: ../../../inc/users/model/_user.funcs.php:458
+#: ../../../inc/users/model/_user.funcs.php:903
 #: ../../../inc/users/user.ctrl.php:346
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:242
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:83
 msgid "Profile"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:540
+#: ../../../inc/users/model/_user.funcs.php:551
 msgid "Subscribe"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:541
+#: ../../../inc/users/model/_user.funcs.php:552
 msgid "Subscribe to email notifications"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:621
+#: ../../../inc/users/model/_user.funcs.php:632
 msgid "Please enter a login."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:655
+#: ../../../inc/users/model/_user.funcs.php:666
 msgid "Please select country."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:661
+#: ../../../inc/users/model/_user.funcs.php:672
 msgid "Please select gender."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:698
+#: ../../../inc/users/model/_user.funcs.php:709
 msgid "The password must be different from your login."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:702
+#: ../../../inc/users/model/_user.funcs.php:713
 msgid "The password must be different from your nickname."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:848
+#: ../../../inc/users/model/_user.funcs.php:859
 #: ../../../inc/users/views/_user_coll_list.view.php:44
 #: ../../../inc/users/views/_user_list.view.php:379
 msgid "Delete this user!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:852
+#: ../../../inc/users/model/_user.funcs.php:863
 #: ../../../inc/users/views/_user_coll_list.view.php:45
 msgid "Compose message"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:854
+#: ../../../inc/users/model/_user.funcs.php:865
 #: ../../../inc/users/views/_user_coll_list.view.php:46
 msgid "Close user profile!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:910
+#: ../../../inc/users/model/_user.funcs.php:921
 #: ../../../inc/users/user.ctrl.php:358
 #: ../../../inc/users/views/_user_advanced.form.php:114
 #: ../../../inc/users/views/_user_preferences.form.php:106
 msgid "Preferences"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:920
+#: ../../../inc/users/model/_user.funcs.php:931
 #: ../../../inc/users/user.ctrl.php:364
 #: ../../../inc/users/views/_user_coll_list.view.php:57
 msgid "Personal blogs"
@@ -14519,20 +14516,20 @@ msgid "Show online"
 msgstr ""
 
 #: ../../../inc/users/views/_user_identity.form.php:298
-#: ../../../skins/_register.disp.php:90
-#: ../../../skins_adm/login/_reg_form.main.php:83
+#: ../../../skins/_register.disp.php:88
+#: ../../../skins_adm/login/_reg_form.main.php:73
 msgid "A man"
 msgstr ""
 
 #: ../../../inc/users/views/_user_identity.form.php:299
-#: ../../../skins/_register.disp.php:91
-#: ../../../skins_adm/login/_reg_form.main.php:84
+#: ../../../skins/_register.disp.php:89
+#: ../../../skins_adm/login/_reg_form.main.php:74
 msgid "A woman"
 msgstr ""
 
 #: ../../../inc/users/views/_user_identity.form.php:300
-#: ../../../skins/_register.disp.php:92
-#: ../../../skins_adm/login/_reg_form.main.php:85
+#: ../../../skins/_register.disp.php:90
+#: ../../../skins_adm/login/_reg_form.main.php:75
 msgid "I am"
 msgstr ""
 
@@ -14761,25 +14758,33 @@ msgstr ""
 msgid "Create a new user field..."
 msgstr ""
 
-#: ../../../inc/widgets/model/_widget.class.php:166
-#: ../../../inc/widgets/model/_widget.class.php:222
+#: ../../../inc/widgets/model/_widget.class.php:171
+#: ../../../inc/widgets/model/_widget.class.php:227
 msgid "Inactive / Uninstalled plugin"
 msgstr ""
 
-#: ../../../inc/widgets/model/_widget.class.php:239
+#: ../../../inc/widgets/model/_widget.class.php:245
 msgid "CSS Class"
 msgstr ""
 
-#: ../../../inc/widgets/model/_widget.class.php:241
+#: ../../../inc/widgets/model/_widget.class.php:247
 msgid "Replaces $wi_class$ in your skins containers."
 msgstr ""
 
-#: ../../../inc/widgets/model/_widget.class.php:244
+#: ../../../inc/widgets/model/_widget.class.php:250
 msgid "DOM ID"
 msgstr ""
 
-#: ../../../inc/widgets/model/_widget.class.php:246
+#: ../../../inc/widgets/model/_widget.class.php:252
 msgid "Replaces $wi_ID$ in your skins containers."
+msgstr ""
+
+#: ../../../inc/widgets/model/_widget.class.php:255
+msgid "Allow caching"
+msgstr ""
+
+#: ../../../inc/widgets/model/_widget.class.php:256
+msgid "Uncheck to prevent this widget from ever being cached in the block cache. (The whole page may still be cached.) This is only needed when a widget is poorly handling caching and cache keys."
 msgstr ""
 
 #: ../../../inc/widgets/views/_widget.form.php:32
@@ -15176,24 +15181,24 @@ msgstr ""
 
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:201
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:35
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:191
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:194
 msgid "Post index"
 msgstr ""
 
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:223
 #: ../../../inc/widgets/widgets/_coll_media_index.widget.php:125
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:36
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:196
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:199
 msgid "Photo index"
 msgstr ""
 
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:237
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:211
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:214
 msgid "Owner details"
 msgstr ""
 
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:244
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:219
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:222
 #: ../../../skins/_body_footer.inc.php:23 ../../../skins/_user.disp.php:66
 #: ../../../skins/_user.disp.php:75 ../../../skins/_user.disp.php:79
 #: ../../../skins/_user.disp.php:84
@@ -15218,7 +15223,7 @@ msgid "Contact"
 msgstr ""
 
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:251
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:201
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:204
 msgid "Site map"
 msgstr ""
 
@@ -15623,48 +15628,60 @@ msgid "Log in form"
 msgstr ""
 
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:43
-msgid "Any item (post, page, etc...)"
+msgid "Registration form"
 msgstr ""
 
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:44
+msgid "Profile form"
+msgstr ""
+
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:45
+msgid "Profile picture editing"
+msgstr ""
+
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:46
+msgid "Any item (post, page, etc...)"
+msgstr ""
+
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:47
 msgid "Any URL"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:75
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:78
 msgid "Menu link"
 msgstr ""
 
 #. TRANS: %s is the link type, e. g. "Blog home" or "Log in form"
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:96
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:99
 #, php-format
 msgid "%s link"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:108
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:111
 msgid "Display a configurable menu entry/link"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:124
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:127
 msgid "Link Type"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:125
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:128
 msgid "What do you want to link to?"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:131
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:134
 msgid "Link text"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:132
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:135
 msgid "Text to use for the link (leave empty for default)."
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:140
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:143
 msgid "ID of post, page, etc. for \"Item\" type links."
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:147
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:150
 msgid "Destination URL for \"URL\" type links."
 msgstr ""
 
@@ -15795,6 +15812,59 @@ msgstr ""
 msgid "This blog shows photos..."
 msgstr ""
 
+#: ../../../install/_functions_create.php:943
+msgid "Welcome"
+msgstr ""
+
+#: ../../../install/_functions_create.php:944
+msgid "News"
+msgstr ""
+
+#: ../../../install/_functions_create.php:945
+msgid "Background"
+msgstr ""
+
+#: ../../../install/_functions_create.php:946
+msgid "Fun"
+msgstr ""
+
+#: ../../../install/_functions_create.php:947
+msgid "In real life"
+msgstr ""
+
+#: ../../../install/_functions_create.php:948
+msgid "On the web"
+msgstr ""
+
+#: ../../../install/_functions_create.php:949
+msgid "Sports"
+msgstr ""
+
+#: ../../../install/_functions_create.php:950
+msgid "Movies"
+msgstr ""
+
+#: ../../../install/_functions_create.php:951
+msgid "Music"
+msgstr ""
+
+#: ../../../install/_functions_create.php:954
+msgid "Announcements"
+msgstr ""
+
+#: ../../../install/_functions_create.php:955
+msgid "b2evolution Tips"
+msgstr ""
+
+#: ../../../install/_functions_create.php:959
+msgid "Contributors"
+msgstr ""
+
+#: ../../../install/_functions_create.php:962
+#: ../../../install/_functions_create.php:1026
+msgid "Monument Valley"
+msgstr ""
+
 #: ../../../install/_functions_create.php:972
 msgid ""
 "<p>This is the first post.</p>\n"
@@ -15831,10 +15901,6 @@ msgstr ""
 
 #: ../../../install/_functions_create.php:1018
 msgid "Road to Monument Valley"
-msgstr ""
-
-#: ../../../install/_functions_create.php:1026
-msgid "Monument Valley"
 msgstr ""
 
 #: ../../../install/_functions_create.php:1026
@@ -16062,6 +16128,10 @@ msgstr ""
 msgid "Hi, this is a comment.<br />To delete a comment, just log in, and view the posts' comments, there you will have the option to edit or delete them."
 msgstr ""
 
+#: ../../../install/_functions_create.php:1350
+msgid "The /cache folder could not be created/written to. b2evolution will still work but without caching, which will make it operate slower than optimal."
+msgstr ""
+
 #: ../../../install/_functions_evoupgrade.php:258
 msgid "Checking DB schema version..."
 msgstr ""
@@ -16196,6 +16266,14 @@ msgstr ""
 #: ../../../install/_functions_install.php:770
 #, php-format
 msgid "Everything should still work, but for optimization you should follow <a %s>these instructions</a>."
+msgstr ""
+
+#: ../../../install/_functions_install.php:791
+msgid "Already installed."
+msgstr ""
+
+#: ../../../install/_functions_install.php:794
+msgid "You already have a file named .htaccess in your your base url folder."
 msgstr ""
 
 #: ../../../install/index.php:111
@@ -17765,49 +17843,52 @@ msgstr ""
 msgid "You are already logged in"
 msgstr ""
 
-#: ../../../skins/_login.disp.php:62
-#: ../../../skins_adm/login/_login_form.main.php:124
-#: ../../../skins_adm/login/_lostpass_form.main.php:34
-#: ../../../skins_adm/login/_lostpass_form.main.php:46
-msgid "Lost password ?"
-msgstr ""
-
-#: ../../../skins/_login.disp.php:72
-#: ../../../skins_adm/login/_login_form.main.php:134
-msgid "Log in!"
-msgstr ""
-
-#: ../../../skins/_login.disp.php:77 ../../../skins/_register.disp.php:109
-#: ../../../skins_adm/login/_reg_form.main.php:97
-#, php-format
-msgid "Your IP address (%s) and the current time are being logged."
-msgstr ""
-
-#: ../../../skins/_login.disp.php:82
-msgid "Standard login form"
-msgstr ""
-
-#: ../../../skins/_login.disp.php:99
-#: ../../../skins_adm/login/_login_form.main.php:212
+#: ../../../skins/_login.disp.php:52
+#: ../../../skins_adm/login/_login_form.main.php:89
 msgid "Abort login!"
 msgstr ""
 
-#: ../../../skins/_login.disp.php:127
+#: ../../../skins/_login.disp.php:75
+#: ../../../skins_adm/login/_login_form.main.php:138
+msgid "Type your username, <b>not</b> your email address."
+msgstr ""
+
+#: ../../../skins/_login.disp.php:84
+#: ../../../skins_adm/login/_login_form.main.php:146
+#: ../../../skins_adm/login/_lostpass_form.main.php:34
+msgid "Lost password ?"
+msgstr ""
+
+#: ../../../skins/_login.disp.php:94
+#: ../../../skins_adm/login/_login_form.main.php:156
+msgid "Log in!"
+msgstr ""
+
+#: ../../../skins/_login.disp.php:101
+#: ../../../skins_adm/login/_login_form.main.php:223
+msgid "No account yet? Register here"
+msgstr ""
+
+#: ../../../skins/_login.disp.php:106
+msgid "Use standard login form instead"
+msgstr ""
+
+#: ../../../skins/_login.disp.php:128
 #: ../../../skins_adm/login/_validate_form.main.php:52
 msgid "Please confirm your email address below."
 msgstr ""
 
-#: ../../../skins/_login.disp.php:128
+#: ../../../skins/_login.disp.php:129
 #: ../../../skins_adm/login/_validate_form.main.php:53
 msgid "An email will be sent to this address immediately."
 msgstr ""
 
-#: ../../../skins/_login.disp.php:129
+#: ../../../skins/_login.disp.php:130
 #: ../../../skins_adm/login/_validate_form.main.php:54
 msgid "As soon as you receive the email, click on the link therein to activate your account."
 msgstr ""
 
-#: ../../../skins/_login.disp.php:136
+#: ../../../skins/_login.disp.php:137
 msgid "Send me an email now"
 msgstr ""
 
@@ -17838,46 +17919,60 @@ msgstr ""
 msgid "User registration is currently not allowed."
 msgstr ""
 
-#: ../../../skins/_register.disp.php:69
-#: ../../../skins_adm/login/_reg_form.main.php:64
-#, php-format
-msgid "Minimum %d characters, please."
+#: ../../../skins/_register.disp.php:65
+#: ../../../skins_adm/login/_reg_form.main.php:54
+msgid "Choose a username."
 msgstr ""
 
-#: ../../../skins/_register.disp.php:98
-#: ../../../skins_adm/login/_reg_form.main.php:90
+#: ../../../skins/_register.disp.php:69
+#: ../../../skins_adm/login/_reg_form.main.php:56
+msgid "Choose a password."
+msgstr ""
+
+#: ../../../skins/_register.disp.php:70
+#: ../../../skins_adm/login/_reg_form.main.php:57
+msgid "Please type your password again."
+msgstr ""
+
+#: ../../../skins/_register.disp.php:96
+#: ../../../skins_adm/login/_reg_form.main.php:80
 msgid "Preferred language"
 msgstr ""
 
-#: ../../../skins/_register.disp.php:105
-#: ../../../skins_adm/login/_reg_form.main.php:95
-msgid "Register!"
+#: ../../../skins/_register.disp.php:103
+#: ../../../skins_adm/login/_reg_form.main.php:85
+msgid "Register my account now!"
 msgstr ""
 
-#: ../../../skins/_register.disp.php:122
+#: ../../../skins/_register.disp.php:110
+#: ../../../skins_adm/login/_reg_form.main.php:94
+msgid "Already have an account... ?"
+msgstr ""
+
+#: ../../../skins/_register.disp.php:127
 #: ../../../skins_adm/login/_login_form.main.php:40
 #: ../../../skins_adm/login/_reg_complete.main.php:63
 msgid "Continue"
 msgstr ""
 
-#: ../../../skins/_register.disp.php:127
+#: ../../../skins/_register.disp.php:136
 #: ../../../skins_adm/login/_reg_complete.main.php:68
 #, php-format
 msgid "An email has just been sent to %s . Please check your email and click on the validation link you will find in that email."
 msgstr ""
 
-#: ../../../skins/_register.disp.php:128
+#: ../../../skins/_register.disp.php:137
 #: ../../../skins_adm/login/_reg_complete.main.php:69
 #, php-format
 msgid "If you have not received the email in the next few minutes, please check your spam folder. The email was sent from %s and has the title &laquo;%s&raquo;."
 msgstr ""
 
-#: ../../../skins/_register.disp.php:130
+#: ../../../skins/_register.disp.php:139
 #: ../../../skins_adm/login/_reg_complete.main.php:71
 msgid "If you still can't find the email or if you would like to try with a different email address,"
 msgstr ""
 
-#: ../../../skins/_register.disp.php:131
+#: ../../../skins/_register.disp.php:140
 #: ../../../skins_adm/login/_reg_complete.main.php:72
 msgid "click here to try again"
 msgstr ""
@@ -18272,7 +18367,7 @@ msgstr ""
 msgid "Admin skin settings for this user cannot be edited because this user is using a different admin skin (%s)"
 msgstr ""
 
-#: ../../../skins_adm/login/_html_footer.inc.php:40
+#: ../../../skins_adm/login/_html_footer.inc.php:52
 msgid "Credits"
 msgstr ""
 
@@ -18282,23 +18377,18 @@ msgid "Note: You are already logged in as %s!"
 msgstr ""
 
 #: ../../../skins_adm/login/_login_form.main.php:49
-msgid "Login form"
+msgid "Log in to your account"
 msgstr ""
 
-#: ../../../skins_adm/login/_login_form.main.php:114
-msgid "You will have to accept cookies in order to log in."
-msgstr ""
-
-#: ../../../skins_adm/login/_login_form.main.php:139
+#: ../../../skins_adm/login/_login_form.main.php:161
 msgid "Log into backoffice!"
 msgstr ""
 
-#: ../../../skins_adm/login/_login_form.main.php:144
-#: ../../../skins_adm/login/_lostpass_form.main.php:58
-msgid "Your IP address ("
+#: ../../../skins_adm/login/_login_form.main.php:166
+msgid "You will have to accept cookies in order to log in."
 msgstr ""
 
-#: ../../../skins_adm/login/_login_form.main.php:176
+#: ../../../skins_adm/login/_login_form.main.php:200
 msgid "Please wait..."
 msgstr ""
 
@@ -18314,6 +18404,10 @@ msgstr ""
 msgid "As soon as you receive the email, click on the link therein to change your password."
 msgstr ""
 
+#: ../../../skins_adm/login/_lostpass_form.main.php:54
+msgid "Note: your login is NOT your email address."
+msgstr ""
+
 #. TRANS: Text for submit button to request an activation link by email
 #: ../../../skins_adm/login/_lostpass_form.main.php:56
 #: ../../../skins_adm/login/_validate_form.main.php:62
@@ -18325,15 +18419,7 @@ msgid "Registration Currently Disabled"
 msgstr ""
 
 #: ../../../skins_adm/login/_reg_form.main.php:38
-msgid "Register form"
-msgstr ""
-
-#: ../../../skins_adm/login/_reg_form.main.php:60
-msgid "(twice)"
-msgstr ""
-
-#: ../../../skins_adm/login/_reg_form.main.php:104
-msgid "Log into existing account..."
+msgid "New account creation"
 msgstr ""
 
 #: ../../../skins_adm/login/_validate_form.main.php:36
