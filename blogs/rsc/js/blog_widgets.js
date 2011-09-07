@@ -35,7 +35,7 @@ var reorder_widgets_queue;
  * @internal integer reorder_delay
  * time, in milliseconds, to buffer requests for
  */
-var reorder_delay = 0;
+var reorder_delay = 200;
 
 /**
  * @internal integer reorder_delay_remaining
