@@ -83,6 +83,49 @@ class Module
 	}
 
 	/**
+	 * Displays the module collection feature settings
+	 * 
+	 * @param array 
+	 * 		array['Form'] - where to display;
+	 * 		array['edited_Blog'] - which blog properties should be displayed;
+	 */
+	function display_collection_features( $params )
+	{
+	}
+
+	/**
+	 * Update the module collection feature settings
+	 * 
+	 * @param array
+	 * 		array['edited_Blog'] - which blog properties should be updated;
+	 */
+	function update_collection_features( $params )
+	{
+	}
+
+	/**
+	 * Displays the module item settings
+	 * 
+	 * @param array 
+	 * 		array['Form'] - where to display;
+	 * 		array['Blog'] - which blog item is it;
+	 * 		array['edited_Item'] - which item is it;
+	 */
+	function display_item_settings( $params )
+	{
+	}
+
+	/**
+	 * Update the module collection feature settings
+	 * 
+	 * @param array
+	 * 		array['edited_Item'] - which item setting should be updated;
+	 */
+	function update_item_settings( $params )
+	{
+	}
+
+	/**
 	 * Check module permission
 	 *
 	 * @param string Permission name
@@ -130,6 +173,9 @@ class Module
 
 /*
  * $Log$
+ * Revision 1.7  2011/09/07 07:29:38  efy-asimo
+ * module class improvements
+ *
  * Revision 1.6  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

@@ -64,14 +64,21 @@ load_funcs('files/model/_file.funcs.php');
 /**
  * Call a method for all modules in a row
  */
-function modules_call_method( $method_name )
+function modules_call_method( $method_name, $params = NULL )
 {
 	global $modules;
 
 	foreach( $modules as $module )
 	{
 		$Module = & $GLOBALS[$module.'_Module'];
-		$Module->{$method_name}();
+		if( $params == NULL )
+		{
+			$Module->{$method_name}();
+		}
+		else
+		{
+			$Module->{$method_name}( $params );
+		}
 	}
 }
 
@@ -4254,6 +4261,9 @@ if ( !function_exists( 'json_encode' ) )
 
 /*
  * $Log$
+ * Revision 1.264  2011/09/07 07:29:38  efy-asimo
+ * module class improvements
+ *
  * Revision 1.263  2011/09/07 05:15:47  sam2kb
  * Create json_encode function if it does not exist ( PHP < 5.2.0 )
  *
