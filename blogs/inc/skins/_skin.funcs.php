@@ -111,6 +111,7 @@ function skin_init( $disp )
 		case 'single':
 		case 'page':
 			require_js( 'communication.js' ); // auto requires jQuery
+
 			if( $disp == 'single' )
 			{
 				$seo_page_type = 'Single post page';
@@ -163,6 +164,8 @@ function skin_init( $disp )
 			break;
 
 		case 'posts':
+			require_js( 'communication.js' ); // auto requires jQuery
+
 			// Get list of active filters:
 			$active_filters = $MainList->get_active_filters();
 
@@ -920,6 +923,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.95  2011/09/07 04:56:23  sam2kb
+ * Add missing communication.js to "posts" disp type
+ *
  * Revision 1.94  2011/09/07 00:28:26  sam2kb
  * Replace non-ASCII character in regular expressions with ~
  *
