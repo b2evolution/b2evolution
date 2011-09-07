@@ -788,10 +788,10 @@ function do_install_htaccess( $upgrade = false )
 	{
 		if( $upgrade )
 		{
-			echo 'Already installed.';
+			echo T_('Already installed.');
 			return ''; // all is well :)
 		}
-		return 'You already have a file named .htaccess in your your base url folder.';
+		return T_('You already have a file named .htaccess in your your base url folder.');
 	}
 
 	// Make sure we have a sample file to start with:
@@ -846,6 +846,9 @@ function get_antispam_query()
 
 /*
  * $Log$
+ * Revision 1.102  2011/09/07 07:29:09  sam2kb
+ * i18n update
+ *
  * Revision 1.101  2011/09/04 22:13:23  fplanque
  * copyright 2011
  *
