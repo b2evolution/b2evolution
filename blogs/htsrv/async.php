@@ -337,10 +337,6 @@ switch( $action )
 		// To be used for Tag autocompletion
 		$Session->assert_received_crumb( 'item' ); // via item forms
 
-		if( ! function_exists('json_encode') )
-		{ // PHP 5.2 - to lazy to hunt for some backport. TODO: add backport of json_encode, e.g. into this file.
-			exit(1);
-		}
 		$term = param('term', 'string');
 
 		echo json_encode( $DB->get_col('
@@ -385,6 +381,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.68  2011/09/07 05:15:47  sam2kb
+ * Create json_encode function if it does not exist ( PHP < 5.2.0 )
+ *
  * Revision 1.67  2011/09/04 22:13:12  fplanque
  * copyright 2011
  *

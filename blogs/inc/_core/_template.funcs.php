@@ -1209,66 +1209,7 @@ function display_ajax_form( $params )
 
 	echo '<div class="section_requires_javascript">';
 
-	// needs json_encode function to create json type params
-	if ( !function_exists( 'json_encode' ) )
-	{// json_encode function does not exists
-		function json_encode( $a = false )
-		{
-			if( is_null( $a ) )
-			{
-				return 'null';
-			}
-			if( $a === false )
-			{
-				return 'false';
-			}
-			if( $a === true )
-			{
-				return 'true';
-			}
-			if( is_scalar( $a ) )
-			{
-				if( is_float( $a ) )
-				{ // Always use "." for floats.
-					return floatval( str_replace( ",", ".", strval( $a ) ) );
-				}
-
-				if( is_string( $a ) )
-				{
-					$jsonReplaces = array( array( "\\", "/", "\n", "\t", "\r", "\b", "\f", '"' ), array( '\\\\', '\\/', '\\n', '\\t', '\\r', '\\b', '\\f', '\"' ) );
-					return '"'.str_replace( $jsonReplaces[0], $jsonReplaces[1], $a ).'"';
-				}
-
-				return $a;
-			}
-			$isList = true;
-			for( $i = 0, reset($a); $i < count($a); $i++, next($a) )
-			{
-				if( key($a) !== $i )
-				{
-					$isList = false;
-					break;
-				}
-			}
-			$result = array();
-			if( $isList )
-			{
-				foreach( $a as $v )
-				{
-					$result[] = json_encode($v);
-				}
-				return '['.join( ',', $result ).']';
-			}
-			else
-			{
-				foreach( $a as $k => $v )
-				{
-					$result[] = json_encode($k).':'.json_encode($v);
-				}
-				return '{'.join( ',', $result ).'}';
-			}
-		}
-	}
+	// Needs json_encode function to create json type params
 	$json_params = json_encode( $params );
 	$ajax_loader = "<p class='ajax-loader'><img src='".$rsc_url."img/ajax-loader2.gif' /><br />".T_( 'Form is loading...' )."</p>";
 	?>
@@ -1302,6 +1243,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.90  2011/09/07 05:15:47  sam2kb
+ * Create json_encode function if it does not exist ( PHP < 5.2.0 )
+ *
  * Revision 1.89  2011/09/06 00:54:38  fplanque
  * i18n update
  *
