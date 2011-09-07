@@ -29,6 +29,18 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 </div>
 
+<?php
+	// Please help us promote b2evolution and leave this logo on your blog:
+	powered_by( array(
+			'block_start' => '<div class="center" style="margin:1em">',
+			'block_end'   => '</div>',
+			// Check /rsc/img/ for other possible images -- Don't forget to change or remove width & height too
+			'img_url'     => '$rsc$img/powered-by-b2evolution-120t.gif',
+			'img_width'   => 120,
+			'img_height'  => 32,
+		) );
+?>
+
 <p class="footer"><?php echo $app_footer_text; ?></p>
 <p class="footer"><?php echo $copyright_text; ?></p>
 <p class="footer">
@@ -51,7 +63,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <?php
 /*
  * $Log$
- * Revision 1.7  2011/09/04 22:13:25  fplanque
+ * Revision 1.8  2011/09/07 22:44:41  fplanque
+ * UI cleanup
+ *
+ * Revision 1.6.6.1  2011/09/04 22:13:57  fplanque
  * copyright 2011
  *
  * Revision 1.6  2010/02/08 17:56:49  efy-yury

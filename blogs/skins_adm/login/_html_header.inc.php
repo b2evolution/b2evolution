@@ -31,7 +31,7 @@ headers_content_mightcache( 'text/html', 0 );		// NEVER cache the login pages!
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-	<title><?php echo $page_title.' &ndash; '.$app_shortname ?></title>
+	<title><?php echo $page_title ?></title>
 	<meta name="ROBOTS" content="NOINDEX" />
 	<meta name="viewport" content="width = 600" />
 	<link href="<?php echo $rsc_url ?>css/login.css" rel="stylesheet" type="text/css" />
@@ -42,16 +42,12 @@ headers_content_mightcache( 'text/html', 0 );		// NEVER cache the login pages!
 
 <div class="loginblock">
 
-<div style="float:left">
-	<h1 class="logintitle"><?php echo $app_banner; ?></h1>
-</div>
-
 <?php if( isset($page_icon) ) { ?>
-<img src="<?php echo $rsc_url.'icons/'.$page_icon ?>" width="24" height="24" style="float:right;" alt="" />
+<img src="<?php echo $rsc_url.'icons/'.$page_icon ?>" width="24" height="24" style="float:left; margin-right:4px" alt="" />
 <?php } ?>
-<div style="float:right">
+
 <h2 class="logintitle"><?php echo $page_title ?></h2>
-</div>
+
 
 <div class="clear"></div>
 
@@ -69,7 +65,10 @@ else
 
 /*
  * $Log$
- * Revision 1.15  2011/09/04 22:13:25  fplanque
+ * Revision 1.16  2011/09/07 22:44:41  fplanque
+ * UI cleanup
+ *
+ * Revision 1.14.2.1  2011/09/04 22:13:57  fplanque
  * copyright 2011
  *
  * Revision 1.14  2011/06/14 13:33:56  efy-asimo

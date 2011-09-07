@@ -46,7 +46,7 @@ if( $Session->has_User() )
 /**
  * Include page header (also displays Messages):
  */
-$page_title = T_('Login form');
+$page_title = T_('Log in to your account');
 $page_icon = 'icon_login.gif';
 
 /*
@@ -76,6 +76,30 @@ if( $transmit_hashed_password )
  * Login header
  */
 require dirname(__FILE__).'/_html_header.inc.php';
+
+$links = array();
+
+if( empty($login_required)
+	&& $action != 'req_validatemail'
+	&& strpos($redirect_to, $admin_url) !== 0
+	&& strpos($ReqHost.$redirect_to, $admin_url ) !== 0 )
+{ // No login required, allow to pass through
+	// TODO: dh> validate redirect_to param?!
+	$links[] = '<a href="'.htmlspecialchars(url_rel_to_same_host($redirect_to, $ReqHost)).'">'
+	./* Gets displayed as link to the location on the login form if no login is required */ T_('Abort login!').'</a>';
+}
+
+if( is_logged_in() )
+{ // if we arrive here, but are logged in, provide an option to logout (e.g. during the email
+	// validation procedure)
+	$links[] = get_user_logout_link();
+}
+
+if( count($links) )
+{
+	echo '<div style="float:right; margin: 0 0 1em">'.implode( $links, ' &middot; ' ).'</div>
+	<div class="clear"></div>';
+}
 
 
 // The login form has to point back to itself, in case $htsrv_url_sensitive is a "https" link and $redirect_to is not!
@@ -109,11 +133,9 @@ $Form->begin_form( 'fform' );
 		$Form->hidden( 'pwd_hashed', '' ); // gets filled by JS
 	}
 
-	$Form->begin_fieldset('', array('style'=>'border:none')); // TODO: use a class like "noborder" instead?!
+	$Form->begin_fieldset();
 
-	echo '<div class="center notes">'.T_('You will have to accept cookies in order to log in.').'</div>';
-
-	$Form->text_input( 'login', $login, 16, T_('Login'), '', array( 'maxlength' => 20, 'class' => 'input_text' ) );
+	$Form->text_input( 'login', $login, 18, T_('Login'), T_('Type your username, <b>not</b> your email address.'), array( 'maxlength' => 20, 'class' => 'input_text' ) );
 
 	$pwd_note = '<a href="'.$htsrv_url_sensitive.'login.php?action=lostpassword&amp;redirect_to='
 		.rawurlencode( url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
@@ -123,7 +145,7 @@ $Form->begin_form( 'fform' );
 	}
 	$pwd_note .= '">'.T_('Lost password ?').'</a>';
 
-	$Form->password_input( 'pwd', '', 16, T_('Password'), array( 'note'=>$pwd_note, 'maxlength' => 70, 'class' => 'input_text' ) );
+	$Form->password_input( 'pwd', '', 18, T_('Password'), array( 'note'=>$pwd_note, 'maxlength' => 70, 'class' => 'input_text' ) );
 
 
 
@@ -131,7 +153,7 @@ $Form->begin_form( 'fform' );
 	$Plugins->trigger_event( 'DisplayLoginFormFieldset', array( 'Form' => & $Form ) );
 
 	// Submit button(s):
-	$submit_buttons = array( array( 'name'=>'login_action[login]', 'value'=>T_('Log in!'), 'class'=>'search' ) );
+	$submit_buttons = array( array( 'name'=>'login_action[login]', 'value'=>T_('Log in!'), 'class'=>'search', 'style'=>'font-size:200%' ) );
 	if( strpos( $redirect_to, $admin_url ) !== 0
 		&& strpos( $ReqHost.$redirect_to, $admin_url ) !== 0 // if $redirect_to is relative
 		&& ! is_admin_page() )
@@ -140,6 +162,8 @@ $Form->begin_form( 'fform' );
 	}
 
 	$Form->buttons_input($submit_buttons);
+
+	echo '<div class="center notes" style="margin: 1em 0">'.T_('You will have to accept cookies in order to log in.').'</div>';
 
 	$Form->info( '', '', sprintf( T_('Your IP address (%s) and the current time are being logged.'), $Hit->IP ) );
 
@@ -196,28 +220,7 @@ $Form->end_form();
 
 <div class="login_actions" style="text-align:right">
 	<?php
-	$links = array();
-	if( $link = get_user_register_link( '', '', '', '#', true /*disp_when_logged_in*/, $redirect_to ) )
-	{
-		$links[] = $link;
-	}
-
-	if( empty($login_required)
-		&& $action != 'req_validatemail'
-		&& strpos($redirect_to, $admin_url) !== 0
-		&& strpos($ReqHost.$redirect_to, $admin_url ) !== 0 )
-	{ // No login required, allow to pass through
-		// TODO: dh> validate redirect_to param?!
-		$links[] = '<a href="'.htmlspecialchars(url_rel_to_same_host($redirect_to, $ReqHost)).'">'
-		./* Gets displayed as link to the location on the login form if no login is required */ T_('Abort login!').'</a>';
-	}
-
-	if( is_logged_in() )
-	{ // if we arrive here, but are logged in, provide an option to logout (e.g. during the email
-	  // validation procedure)
-		$links[] = get_user_logout_link();
-	}
-	echo implode( ' &middot; ', $links );
+	echo get_user_register_link( '', '', T_('No account yet? Register here').' &raquo;', '#', true /*disp_when_logged_in*/, $redirect_to );
 	?>
 </div>
 
@@ -228,11 +231,17 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
- * Revision 1.25  2011/09/05 18:10:54  sam2kb
- * No break in tranlsated text
+ * Revision 1.26  2011/09/07 22:44:41  fplanque
+ * UI cleanup
  *
- * Revision 1.24  2011/09/04 22:13:25  fplanque
+ * Revision 1.21.6.3  2011/09/06 21:08:18  sam2kb
+ * MFH
+ *
+ * Revision 1.21.6.2  2011/09/04 22:13:57  fplanque
  * copyright 2011
+ *
+ * Revision 1.21.6.1  2011/09/04 21:31:48  fplanque
+ * minor MFH
  *
  * Revision 1.23  2011/08/29 09:32:22  efy-james
  * Add ip on login form

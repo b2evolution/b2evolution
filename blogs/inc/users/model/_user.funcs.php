@@ -222,8 +222,8 @@ function get_user_register_link( $before = '', $after = '', $link_text = '', $li
 		return false;
 	}
 
-	if( $link_text == '' ) $link_text = T_('Register...');
-	if( $link_title == '#' ) $link_title = T_('Register to open an account...');
+	if( $link_text == '' ) $link_text = T_('Register').' &raquo;';
+	if( $link_title == '#' ) $link_title = T_('Register for a new account...');
 
 	$r = $before;
 	$r .= '<a href="'.$register_url.'" title="'.$link_title.'">';
@@ -653,7 +653,7 @@ function profile_check_params( $params, $User = NULL )
 	{
 		if( empty($params['email'][0]) )
 		{
-			param_error( $params['email'][1], T_('Please enter an e-mail address.') );
+			param_error( $params['email'][1], T_('Please enter your e-mail address.') );
 		}
 		elseif( !is_email($params['email'][0]) )
 		{
@@ -1013,6 +1013,9 @@ function get_prefered_name( $nickname, $firstname, $login )
 
 /*
  * $Log$
+ * Revision 1.43  2011/09/07 22:44:40  fplanque
+ * UI cleanup
+ *
  * Revision 1.42  2011/09/07 18:25:12  fplanque
  * widget & blockcache fixes
  *

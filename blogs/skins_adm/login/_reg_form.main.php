@@ -35,7 +35,7 @@ load_class( 'regional/model/_country.class.php', 'Country' );
 /**
  * Include page header:
  */
-$page_title = T_('Register form');
+$page_title = T_('New account creation');
 $page_icon = 'icon_register.gif';
 require dirname(__FILE__).'/_html_header.inc.php';
 
@@ -51,25 +51,12 @@ $Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sens
 
 $Form->begin_fieldset();
 
-$Form->text_input( 'login', $login, 16,  T_('Login'), '', array( 'maxlength'=>20, 'class'=>'input_text', 'required'=>true ) );
+	$Form->text_input( 'login', $login, 22, T_('Login'), T_('Choose a username.'), array( 'maxlength' => 20, 'class' => 'input_text', 'required' => true ) );
 
-// TODO: dh> display param errors with pass1 and pass2..
-?>
+	$Form->password_input( 'pass1', '', 18, T_('Password'), array( 'note'=>T_('Choose a password.'), 'maxlength' => 70, 'class' => 'input_text', 'required'=>true ) );
+	$Form->password_input( 'pass2', '', 18, '', array( 'note'=>T_('Please type your password again.'), 'maxlength' => 70, 'class' => 'input_text', 'required'=>true ) );
 
-	<fieldset>
-		<div class="label"><label for="pass1"><?php echo T_('Password') ?><br /><?php echo T_('(twice)').'<br />' ?></label></div>
-		<div class="input">
-		<input type="password" name="pass1" id="pass1" size="16" maxlength="50" value="" class="input_text field_required" />
-		<input type="password" name="pass2" id="pass2" size="16" maxlength="50" value="" class="input_text field_required" />
-		<span class="notes"><?php
-			if ( $Settings->get('passwd_special') ) echo T_('Use at least one special character that is not a letter nor a digit. ');
-			printf( T_('Minimum %d characters, please.'), $Settings->get('user_minpwdlen') )
-		?></span>
-		</div>
-	</fieldset>
-
-	<?php
-	$Form->text_input( 'email', $email, 16, T_('Email'), '', array( 'maxlength'=>255, 'class'=>'input_text', 'required'=>true ) );
+	$Form->text_input( 'email', $email, 50, T_('Email'), '', array( 'maxlength'=>255, 'class'=>'input_text', 'required'=>true ) );
 
 	$registration_require_country = (bool)$Settings->get('registration_require_country');
 
@@ -95,7 +82,7 @@ $Form->text_input( 'login', $login, 16,  T_('Login'), '', array( 'maxlength'=>20
 
 	$Plugins->trigger_event( 'DisplayRegisterFormFieldset', array( 'Form' => & $Form ) );
 
-	$Form->buttons_input( array( array('name'=>'submit', 'value'=>T_('Register!'), 'class'=>'ActionInput') ) );
+	$Form->buttons_input( array( array('name'=>'submit', 'value'=>T_('Register my account now!'), 'class'=>'ActionInput', 'style'=>'font-size: 200%' ) ) );
 
 	$Form->info( '', '', sprintf( T_('Your IP address (%s) and the current time are being logged.'), $Hit->IP ) );
 
@@ -103,8 +90,8 @@ $Form->end_fieldset();
 $Form->end_form(); // display hidden fields etc
 ?>
 
-<div style="text-align:right">
-	<a href="<?php echo $htsrv_url_sensitive.'login.php?redirect_to='.rawurlencode(url_rel_to_same_host($redirect_to, $htsrv_url_sensitive)) ?>"><?php echo T_('Log into existing account...') ?></a>
+<div style="margin-top: 1em">
+	<a href="<?php echo $htsrv_url_sensitive.'login.php?redirect_to='.rawurlencode(url_rel_to_same_host($redirect_to, $htsrv_url_sensitive)) ?>">&laquo; <?php echo T_('Already have an account... ?') ?></a>
 </div>
 
 <?php
@@ -112,6 +99,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.25  2011/09/07 22:44:41  fplanque
+ * UI cleanup
+ *
  * Revision 1.24  2011/09/06 20:48:54  sam2kb
  * No new line at end of file
  *

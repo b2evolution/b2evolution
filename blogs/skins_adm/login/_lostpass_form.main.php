@@ -43,7 +43,7 @@ $Form->begin_form( 'fform' );
 	$Form->hidden( 'action', 'retrievepassword' );
 	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
 
-	$Form->begin_fieldset( T_('Lost password ?') );
+	$Form->begin_fieldset();
 
 	echo '<ol>';
 	echo '<li>'.T_('Please enter your login below. Do <strong>NOT</strong> enter your e-mail address!').'</li>';
@@ -51,7 +51,7 @@ $Form->begin_form( 'fform' );
 	echo '<li>'.T_('As soon as you receive the email, click on the link therein to change your password.').'</li>';
 	echo '</ol>';
 
-	$Form->text( 'login', $login, 16, T_('Login'), '', 20, 'input_text' );
+	$Form->text( 'login', $login, 16, T_('Login'), T_('Note: your login is NOT your email address.'), 20, 'input_text' );
 
 	$Form->buttons_input( array(array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Send me an email now!'), 'class' => 'ActionButton' )) );
 
@@ -65,6 +65,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.12  2011/09/07 22:44:41  fplanque
+ * UI cleanup
+ *
  * Revision 1.11  2011/09/05 18:10:54  sam2kb
  * No break in tranlsated text
  *

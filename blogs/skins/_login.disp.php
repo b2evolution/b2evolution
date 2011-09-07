@@ -3,7 +3,7 @@
  * This file implements the login form
  *
  * This file is not meant to be called directly.
- * 
+ *
  * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evocore
@@ -28,7 +28,7 @@ if( is_logged_in() && ( $action != 'req_validatemail' ) )
 	return;
 }
 
-if( $action == 'req_login' ) 
+if( $action == 'req_login' )
 {
 	$login_required = true;
 }
@@ -42,6 +42,28 @@ if( !isset( $redirect_to ) )
 
 if( $action != 'req_validatemail' )
 {
+	if( empty($login_required)
+		&& $action != 'req_validatemail'
+		&& strpos($redirect_to, $admin_url) !== 0
+		&& strpos($ReqHost.$redirect_to, $admin_url ) !== 0 )
+	{ // No login required, allow to pass through
+		// TODO: dh> validate redirect_to param?!
+		$links[] = '<a href="'.htmlspecialchars(url_rel_to_same_host($redirect_to, $ReqHost)).'">'
+		./* Gets displayed as link to the location on the login form if no login is required */ T_('Abort login!').'</a>';
+	}
+
+	if( is_logged_in() )
+	{ // if we arrive here, but are logged in, provide an option to logout (e.g. during the email
+		// validation procedure)
+		$links[] = get_user_logout_link();
+	}
+
+	if( count($links) )
+	{
+		echo '<div style="float:right; margin: 0 1em">'.implode( $links, ' &middot; ' ).'</div>
+		<div class="clear"></div>';
+	}
+
 	$Form = new Form( '', 'login_form', 'post' );
 
 	$Form->begin_form( 'bComment' );
@@ -50,7 +72,7 @@ if( $action != 'req_validatemail' )
 	$Form->hidden( 'inskin', true );
 
 	$Form->begin_field();
-	$Form->text_input( 'login', $login, 16, T_('Login'), '', array( 'maxlength' => 20, 'class' => 'input_text' ) );
+	$Form->text_input( 'login', $login, 18, T_('Login'), T_('Type your username, <b>not</b> your email address.'), array( 'maxlength' => 20, 'class' => 'input_text' ) );
 	$Form->end_field();
 
 	$pwd_note = '<a href="'.$htsrv_url_sensitive.'login.php?action=lostpassword&amp;redirect_to='
@@ -62,48 +84,27 @@ if( $action != 'req_validatemail' )
 	$pwd_note .= '">'.T_('Lost password ?').'</a>';
 
 	$Form->begin_field();
-	$Form->password_input( 'pwd', '', 16, T_('Password'), array( 'note'=>$pwd_note, 'maxlength' => 70, 'class' => 'input_text' ) );
+	$Form->password_input( 'pwd', '', 18, T_('Password'), array( 'note'=>$pwd_note, 'maxlength' => 70, 'class' => 'input_text' ) );
 	$Form->end_field();
 
 	// Allow a plugin to add fields/payload
 	$Plugins->trigger_event( 'DisplayLoginFormFieldset', array( 'Form' => & $Form ) );
 
 	// Submit button:
-	$submit_button = array( array( 'name'=>'login_action[login]', 'value'=>T_('Log in!'), 'class'=>'search' ) );
+	$submit_button = array( array( 'name'=>'login_action[login]', 'value'=>T_('Log in!'), 'class'=>'search', 'style'=>'font-size:200%' ) );
 
 	$Form->buttons_input($submit_button);
 
-	//echo '<div class="center notes">'.sprintf( T_('Your IP address (%s) and the current time are being logged.'), $Hit->IP ).'</div>';
-	$Form->info( '', '', sprintf( T_('Your IP address (%s) and the current time are being logged.'), $Hit->IP ) );
+	// $Form->info( '', '', sprintf( T_('Your IP address (%s) and the current time are being logged.'), $Hit->IP ) );
 
-	$links = array();
-
-	// link to standard login screen
-	$link = '<a href="'.$htsrv_url.'login.php?redirect_to='.$redirect_to.'">'.T_( 'Standard login form').' &raquo;</a>';
-	$links[] = $link;
-
-	if( $link = get_user_register_link( '', '', '', '#', true /*disp_when_logged_in*/ ) )
-	{ // registration is allowed, add register link
-		$links[] = $link;
-	}
-
-	$Form->begin_fieldset();
-	echo '<div class="login_actions" style="text-align:right">';
-
-	if( empty($login_required)
-		&& $action != 'req_validatemail'
-		&& strpos($redirect_to, $admin_url) !== 0
-		&& strpos($ReqHost.$redirect_to, $admin_url ) !== 0 )
-	{ // No login required, allow to pass through
-		$links[] = '<a href="'.htmlspecialchars(url_rel_to_same_host($redirect_to, $ReqHost)).'">'
-		./* Gets displayed as link to the location on the login form if no login is required */ T_('Abort login!').'</a>';
-	}
-
-	echo implode( ' &middot; ', $links );
+	echo '<div class="login_actions" style="text-align:right; margin: 1em 0 1ex">';
+	echo get_user_register_link( '<strong>', '</strong>', T_('No account yet? Register here').' &raquo;', '#', true /*disp_when_logged_in*/, $redirect_to );
 	echo '</div>';
-	$Form->end_fieldset();
 
 	$Form->end_form();
+
+	echo '<div class="notes" style="margin: 1em"><a href="'.$htsrv_url.'login.php?redirect_to='.$redirect_to.'">'.T_( 'Use standard login form instead').' &raquo;</a></div>
+	<div class="clear"></div>';
 }
 else
 {
@@ -136,12 +137,15 @@ else
 	$submit_button = array( array( 'name'=>'submit', 'value'=>T_('Send me an email now'), 'class'=>'submit' ) );
 
 	$Form->buttons_input($submit_button);
-	$Form->end_form();	
+	$Form->end_form();
 }
 
 
 /*
  * $Log$
+ * Revision 1.11  2011/09/07 22:44:41  fplanque
+ * UI cleanup
+ *
  * Revision 1.10  2011/09/05 18:11:43  sam2kb
  * No break in tranlsated text
  *

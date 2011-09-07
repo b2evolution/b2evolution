@@ -36,8 +36,6 @@ $new_db_version = 10300;
 /**
  * Is displayed on the login screen:
  */
-$app_banner = '<a href="http://b2evolution.net/"><img src="'.$rsc_url.'img/b2evolution8.png" width="221" height="65" alt="b2evolution" /></a>';
-
 $app_footer_text = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolution's website")
 		.'"><strong>b2evolution '.$app_version.'</strong></a>
 		&ndash;

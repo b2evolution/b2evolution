@@ -49,7 +49,7 @@ $Form->begin_form( 'fform', $creating ?  T_('New goal') : T_('Goal') );
 	$Form->text_input( 'goal_redir_url', $edited_Goal->redir_url, 60, T_('Redirection URL'), '', array( 'maxlength'=> 255, 'class'=>'large' ) );
 
 	$Form->text_input( 'goal_default_value', $edited_Goal->default_value, 15, T_('Default value'), '' );
-	
+
 if( $creating )
 {
 	$Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'SaveButton' ),
@@ -66,8 +66,8 @@ else
 
 /*
  * $Log$
- * Revision 1.12  2011/09/07 12:00:20  lxndral
- * internal searches update
+ * Revision 1.13  2011/09/07 22:44:40  fplanque
+ * UI cleanup
  *
  * Revision 1.11  2011/09/04 22:13:18  fplanque
  * copyright 2011

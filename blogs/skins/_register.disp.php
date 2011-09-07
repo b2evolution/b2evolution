@@ -55,28 +55,23 @@ if( empty( $action ) )
 $Form->hidden( 'inskin', true );
 $Form->hidden( 'blog', $Blog->ID );
 
-$Form->begin_form( 'bComment' );
-
 if( $action == 'register' )
 { // disp register form
+	$Form->begin_form( 'bComment' );
+
 	$Form->hidden( 'action', 'register' );
 
 	$Form->begin_field();
-	$Form->text_input( 'login', $login, 16, T_('Login'), '', array( 'maxlength' => 20, 'class' => 'input_text' ) );
-	$Form->end_field();
-
-	if ( $Settings->get('passwd_special'))
-		$pwd_note1 = T_('Use at least one special character that is not a letter nor a digit.');
-	else
-		$pwd_note1 = '';
-	$pwd_note2 = sprintf( T_('Minimum %d characters, please.'), $Settings->get('user_minpwdlen') );
-	$Form->begin_field();
-	$Form->password_input( 'pass1', '', 16, T_('Password'), array( 'note'=>$pwd_note1, 'maxlength' => 70, 'class' => 'input_text' ) );
-	$Form->password_input( 'pass2', '', 16, '', array( 'note'=>$pwd_note2, 'maxlength' => 70, 'class' => 'input_text' ) );
+	$Form->text_input( 'login', $login, 22, T_('Login'), T_('Choose a username.'), array( 'maxlength' => 20, 'class' => 'input_text', 'required' => true ) );
 	$Form->end_field();
 
 	$Form->begin_field();
-	$Form->text_input( 'email', $email, 32, T_('Email'), '', array( 'maxlength'=>255, 'class'=>'input_text', 'required'=>true ) );
+	$Form->password_input( 'pass1', '', 18, T_('Password'), array( 'note'=>T_('Choose a password.'), 'maxlength' => 70, 'class' => 'input_text', 'required'=>true ) );
+	$Form->password_input( 'pass2', '', 18, '', array( 'note'=>T_('Please type your password again.'), 'maxlength' => 70, 'class' => 'input_text', 'required'=>true ) );
+	$Form->end_field();
+
+	$Form->begin_field();
+	$Form->text_input( 'email', $email, 50, T_('Email'), '', array( 'maxlength'=>255, 'class'=>'input_text', 'required'=>true ) );
 
 	$registration_require_country = (bool)$Settings->get('registration_require_country');
 
@@ -105,15 +100,22 @@ if( $action == 'register' )
 	$Form->end_fieldset();
 
 	// Submit button:
-	$submit_button = array( array( 'name'=>'register', 'value'=>T_('Register!'), 'class'=>'search' ) );
+	$submit_button = array( array( 'name'=>'register', 'value'=>T_('Register my account now!'), 'class'=>'search', 'style'=>'font-size: 200%' ) );
 
 	$Form->buttons_input($submit_button);
 
 	$Form->info( '', '', sprintf( T_('Your IP address (%s) and the current time are being logged.'), $Hit->IP ) );
 
+	echo '<div class="login_actions" style="margin: 1em 0 1ex">';
+	echo '<strong><a href="'.get_login_url($redirect_to).'">&laquo; '.T_('Already have an account... ?').'</a></strong>';
+	echo '</div>';
+
+	$Form->end_form();
 }
 elseif( $action == "reg_complete" )
 { // display register complete info ( email validation not required )
+	$Form->begin_form( 'bComment' );
+
 	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
 	$Form->hidden( 'inskin', 1 );
 
@@ -124,21 +126,30 @@ elseif( $action == "reg_complete" )
 
 	echo '<p class="center"><a href="'.$Blog->gen_baseurl().'">'.T_('Continue').' &raquo;</a> ';
 	echo '</p>';
+
+	$Form->end_form();
 }
 elseif( $action == "reg_validation" )
 { // display "validation email sent" info ( email validation required )
+	$Form->begin_form( 'bComment' );
+
 	echo '<p>'.sprintf( T_( 'An email has just been sent to %s . Please check your email and click on the validation link you will find in that email.' ), '<b>'.$email.'</b>' ).'</p>';
 	echo '<p>'.sprintf( T_( 'If you have not received the email in the next few minutes, please check your spam folder. The email was sent from %s and has the title &laquo;%s&raquo;.' ), $notify_from,
 					'<b>'.sprintf( T_('Validate your email address for "%s"'), $login ).'</b>' ).'</p>';
 	echo '<p>'.T_( 'If you still can\'t find the email or if you would like to try with a different email address,' ).' '.
 					'<a href="'.$Blog->gen_baseurl().'">'.T_( 'click here to try again' ).'.</a></p>';
+
+	$Form->end_form();
 }
 
-$Form->end_form();
+
 
 
 /*
  * $Log$
+ * Revision 1.11  2011/09/07 22:44:41  fplanque
+ * UI cleanup
+ *
  * Revision 1.10  2011/09/06 20:48:54  sam2kb
  * No new line at end of file
  *

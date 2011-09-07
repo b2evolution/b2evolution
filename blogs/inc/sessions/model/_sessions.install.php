@@ -123,7 +123,7 @@ $schema_queries['T_track__goal'] = array(
 		  goal_key varchar(32) default NULL,
 		  goal_redir_url varchar(255) default NULL,
 		  goal_default_value double default NULL,
- 		  PRIMARY KEY (goal_ID),
+		  PRIMARY KEY (goal_ID),
 		  UNIQUE KEY goal_key (goal_key)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
 
@@ -146,15 +146,15 @@ $schema_queries['T_logs__internal_searches'] = array('Creating internal searches
   `isrch_keywords` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`isrch_ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;");
+// fp>al : CHARSET is not right!
 		
 /*
  * $Log$
+ * Revision 1.18  2011/09/07 22:44:41  fplanque
+ * UI cleanup
+ *
  * Revision 1.17  2011/09/07 12:00:20  lxndral
  * internal searches update
- *
- * Revision 1.17  2011/09/05 22:35:55  Alexander
- * Added internal searches table script
- * copyright 2009 -> 2010
  *
  * Revision 1.16  2011/09/04 22:13:18  fplanque
  * copyright 2011

@@ -390,7 +390,7 @@ class User extends DataObject
 			}
 
 			param( 'edited_user_email', 'string', true );
-			param_check_not_empty( 'edited_user_email', T_('Please enter an e-mail address.') );
+			param_check_not_empty( 'edited_user_email', T_('Please enter your e-mail address.') );
 			param_check_email( 'edited_user_email', true );
 			$this->set_from_Request('email', 'edited_user_email', true);
 
@@ -1026,7 +1026,7 @@ class User extends DataObject
 		}
 
 		$pluggable_perms = array( 'admin', 'spamblacklist', 'slugs', 'templates', 'options', 'files' );
-		if( in_array( $permname, $pluggable_perms ) ) 
+		if( in_array( $permname, $pluggable_perms ) )
 		{
 			$permname = 'perm_'.$permname;
 		}
@@ -2302,7 +2302,7 @@ class User extends DataObject
 
 	/**
 	 * Update user avatar file
-	 * 
+	 *
 	 * @param integer the new avatar file ID
 	 * @return mixed true on success, allowed action otherwise
 	 */
@@ -2332,7 +2332,7 @@ class User extends DataObject
 
 	/**
 	 * Remove user avatar
-	 * 
+	 *
 	 * @return mixed true on success, false otherwise
 	 */
 	function remove_avatar()
@@ -2355,7 +2355,7 @@ class User extends DataObject
 
 	/**
 	 * Update user avatar file to the currently uploaded file
-	 * 
+	 *
 	 * @return mixed true on success, allowed action otherwise.
 	 */
 	function update_avatar_from_upload()
@@ -2408,6 +2408,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.113  2011/09/07 22:44:40  fplanque
+ * UI cleanup
+ *
  * Revision 1.112  2011/09/06 00:54:38  fplanque
  * i18n update
  *
