@@ -285,7 +285,7 @@ class AdminUI extends AdminUI_general
 																.'<table class="grouped" cellspacing="0">'."\n",
 					'no_results_end'   => '<tr class="lastline"><td class="firstcol lastcol">$no_results$</td></tr>'
 								                .'</table>'."\n\n",
-				'after' => '</div>',
+				'after' => '</div><div class="clear"></div>',
 				'sort_type' => 'basic'
 				);
 
@@ -467,6 +467,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.38  2011/09/07 07:15:23  sam2kb
+ * Make sure results block is not floating
+ *
  * Revision 1.37  2011/09/04 22:13:25  fplanque
  * copyright 2011
  *
