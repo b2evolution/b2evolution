@@ -123,7 +123,7 @@ $schema_queries['T_track__goal'] = array(
 		  goal_key varchar(32) default NULL,
 		  goal_redir_url varchar(255) default NULL,
 		  goal_default_value double default NULL,
-		  PRIMARY KEY (goal_ID),
+ 		  PRIMARY KEY (goal_ID),
 		  UNIQUE KEY goal_key (goal_key)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
 
@@ -139,15 +139,29 @@ $schema_queries['T_track__goalhit'] = array(
 		  KEY ghit_hit_ID (ghit_hit_ID)
    ) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
 
-
+$schema_queries['T_logs__internal_searches'] = array('Creating internal searches table',"CREATE TABLE `evo_logs__internal_searches` (
+  `isrch_ID` bigint(20) NOT NULL auto_increment,
+  `isrch_coll_ID` bigint(20) NOT NULL default '0',
+  `isrch_session_ID` bigint(20) NOT NULL default '0',
+  `isrch_keywords` varchar(255) NOT NULL default '',
+  PRIMARY KEY  (`isrch_ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;");
+		
 /*
  * $Log$
+ * Revision 1.17  2011/09/07 12:00:20  lxndral
+ * internal searches update
+ *
+ * Revision 1.17  2011/09/05 22:35:55  Alexander
+ * Added internal searches table script
+ * copyright 2009 -> 2010
+ *
  * Revision 1.16  2011/09/04 22:13:18  fplanque
  * copyright 2011
  *
  * Revision 1.15  2010/02/08 17:53:55  efy-yury
  * copyright 2009 -> 2010
- *
+ * 
  * Revision 1.14  2009/12/08 22:38:13  fplanque
  * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
  *

@@ -37,7 +37,7 @@ if( !empty($final) )
 if( !empty($s) )
 {	// We want to filter on search keyword:
 	// Note: we use CONCAT_WS (Concat With Separator) because CONCAT returns NULL if any arg is NULL
-	$SQL->WHERE_and( 'CONCAT_WS( " ", goal_name, goal_key, goal_redir_url ) LIKE "%'.$DB->escape($s).'%"' );
+	$SQL->WHERE_and( 'CONCAT_WS( " ", goal_name, goal_key, goal_redir_url , goal_test_field ) LIKE "%'.$DB->escape($s).'%"' );
 }
 
 // Create result set:
@@ -99,6 +99,12 @@ $Results->cols[] = array(
 		'td_class' => 'right',
 		'td' => '$goal_default_value$',
 	);
+$Results->cols[] = array(
+		'th' => T_('Test field'),
+		'order' => 'goal_test_field',
+		'td_class' => 'right',
+		'td' => '$goal_test_field$',
+	);
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
@@ -119,6 +125,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.12  2011/09/07 12:00:20  lxndral
+ * internal searches update
+ *
  * Revision 1.11  2011/09/04 22:13:18  fplanque
  * copyright 2011
  *

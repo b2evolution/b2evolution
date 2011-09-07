@@ -38,6 +38,7 @@
  * @author mfollett: Matt Follett.
  *
  * @version $Id$
+ * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1356,6 +1357,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.313  2011/09/07 12:00:20  lxndral
+ * internal searches update
+ *
  * Revision 1.312  2011/09/07 05:16:49  sam2kb
  * i18n update
  *

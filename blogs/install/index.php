@@ -736,7 +736,7 @@ block_close();
 	<div class="menu_bottom"><!-- InstanceBeginEditable name="MenuBottom" -->
 			<?php echo T_('Online resources') ?>: <a href="http://b2evolution.net/" target="_blank"><?php echo T_('Official website') ?></a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank"><?php echo T_('Find a host') ?></a> &bull; <a href="http://manual.b2evolution.net/" target="_blank"><?php echo T_('Manual') ?></a> &bull; <a href="http://forums.b2evolution.net/" target="_blank"><?php echo T_('Forums') ?></a>
 		<!-- InstanceEndEditable --></div>
-	
+
 	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->Copyright &copy; 2003-2011 by Fran&ccedil;ois Planque &amp; others &middot; <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a>
 		<!-- InstanceEndEditable --></div>
 		
@@ -760,6 +760,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.200  2011/09/07 12:00:21  lxndral
+ * internal searches update
+ *
  * Revision 1.199  2011/09/04 22:13:23  fplanque
  * copyright 2011
  *

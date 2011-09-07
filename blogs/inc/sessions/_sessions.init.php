@@ -42,6 +42,7 @@ $db_config['aliases']['T_track__keyphrase'] = $tableprefix.'track__keyphrase';
 $db_config['aliases']['T_sessions'] = $tableprefix.'sessions';
 $db_config['aliases']['T_track__goal'] = $tableprefix.'track__goal';
 $db_config['aliases']['T_track__goalhit'] = $tableprefix.'track__goalhit';
+$db_config['aliases']['T_logs__internal_searches'] = $tableprefix.'logs__internal_searches';
 
 
 /**
@@ -60,6 +61,7 @@ $db_config['aliases']['T_track__goalhit'] = $tableprefix.'track__goalhit';
  */
 $ctrl_mappings['stats'] = 'sessions/stats.ctrl.php';
 $ctrl_mappings['goals'] = 'sessions/goals.ctrl.php';
+$ctrl_mappings['internalsearches'] = 'sessions/internal_searches.ctrl.php';
 
 
 /**
@@ -77,6 +79,23 @@ function & get_GoalCache()
 	}
 
 	return $GoalCache;
+}
+
+/**
+ * Get the Internal Searches Cache
+ *
+ * @return InternalSearchesCache
+ */
+function & get_InternalSearchesCache()
+{
+	global $InternalSearchesCache;
+
+	if( ! isset( $InternalSearchesCache ) )
+	{	// Cache doesn't exist yet:
+		$InternalSearchesCache = new DataObjectCache( 'InternalSearches', false, 'T_logs__internal_searches', 'isrch_', 'isrch_ID', 'isrch_sessionID', 'isrch_keywords' ); // COPY (FUNC)
+	}
+
+	return $InternalSearchesCache;
 }
 
 
@@ -234,6 +253,9 @@ class sessions_Module extends Module
 										'topengines' => array(
 											'text' => T_('Top engines'),
 											'href' => $dispatcher.'?ctrl=stats&amp;tab=refsearches&amp;tab3=topengines&amp;blog='.$blog ),
+										'intsearches' => array(
+											'text' => T_('Internal searches'),
+											'href' => $dispatcher.'?ctrl=stats&amp;tab=refsearches&amp;tab3=intsearches&amp;blog='.$blog ),
 										),
 									 ),
 								'referers' => array(
@@ -354,6 +376,9 @@ $sessions_Module = new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.32  2011/09/07 12:00:18  lxndral
+ * internal searches update
+ *
  * Revision 1.31  2011/09/04 22:13:18  fplanque
  * copyright 2011
  *

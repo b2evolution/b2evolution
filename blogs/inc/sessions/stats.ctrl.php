@@ -27,6 +27,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 load_class('sessions/model/_hitlist.class.php', 'Hitlist' );
+load_class('sessions/model/_internal_searches.class.php', 'Internalsearches' );
 load_funcs('sessions/model/_hitlog.funcs.php');
 
 /**
@@ -37,6 +38,7 @@ global $current_User;
 global $dispatcher;
 
 global $collections_Module;
+param_action();
 
 // Do we have permission to view all stats (aggregated stats) ?
 $perm_view_all = $current_User->check_perm( 'stats', 'view' );
@@ -52,6 +54,157 @@ if( $tab == 'sessions' && (!$perm_view_all || $blog != 0) )
 $tab3 = param( 'tab3', 'string', '', true );
 
 param( 'action', 'string' );
+if (($tab=="refsearches") &&($tab3=="intsearches")) {
+	
+
+	if( param( 'isrch_ID', 'integer', '', true) )
+	{// Load file type:
+		$ISCache = & get_InternalSearchesCache();
+		if( ($edited_intsearch = & $ISCache->get_by_ID( $isrch_ID, false )) === false )
+		{	// We could not find the goal to edit:
+			unset( $edited_intsearch );
+			forget_param( 'isrch_ID' );
+			$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('InternalSearch') ), 'error' );
+			$action = 'nil';
+		}
+	}
+	
+	switch( $action )
+	{
+	
+		case 'new':
+		case 'copy':
+			// Check permission:
+			$sessions_Module->check_perm( 'edit' );
+			if( ! isset($edited_intsearch) )
+			{	// We don't have a model to use, start with blank object:
+				$edited_intsearch = new InternalSearches();
+			}
+			else
+			{	// Duplicate object in order no to mess with the cache:
+				$edited_intsearch = duplicate( $edited_intsearch ); // PHP4/5 abstraction
+				$edited_intsearch->ID = 0;
+			}
+			break;
+	
+		case 'edit':
+			// Edit file type form...:
+	
+			// Check permission:
+			$sessions_Module->check_perm( 'edit' );
+	
+			// Make sure we got an ftyp_ID:
+			param( 'isrch_ID', 'integer', true );
+	 		break;
+	
+		case 'create': // Record new goal
+		case 'create_new': // Record goal and create new
+		case 'create_copy': // Record goal and create similar
+			// Insert new file type...:
+			$edited_intsearch = new InternalSearches();
+	
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'internalsearches' );
+	
+			// Check permission:
+			$sessions_Module->check_perm( 'edit' );
+	
+			// load data from request
+			if( $edited_intsearch->load_from_Request() )
+			{	// We could load data from form without errors:
+	
+				// Insert in DB:
+				$DB->begin();
+				$edited_intsearch->dbinsert();
+				$Messages->add( T_('New internal search created.'), 'success' );
+				$DB->commit();
+	
+				if( empty($q) )
+				{	// What next?
+					switch( $action )
+					{
+						case 'create_copy':
+							// Redirect so that a reload doesn't write to the DB twice:
+							header_redirect( '?ctrl=stats&tab=refsearches&tab3=intsearches&action=new&isrch_ID='.$edited_intsearch->ID, 303 ); // Will EXIT
+							// We have EXITed already at this point!!
+							break;
+						case 'create_new':
+							// Redirect so that a reload doesn't write to the DB twice:
+							header_redirect( '?ctrl=stats&action=new&tab=refsearches&tab3=intsearches', 303 ); // Will EXIT
+							// We have EXITed already at this point!!
+							break;
+						case 'create':
+							// Redirect so that a reload doesn't write to the DB twice:
+							header_redirect( '?ctrl=stats&tab=refsearches&tab3=intsearches', 303 ); // Will EXIT
+							// We have EXITed already at this point!!
+							break;
+					}
+				}
+			}
+			break;
+	
+		case 'update':
+			// Edit file type form...:
+	
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'internalsearches' );
+	
+			// Check permission:
+			$sessions_Module->check_perm( 'edit' );
+	
+			// Make sure we got an ftyp_ID:
+			param( 'isrch_ID', 'integer', true );
+	
+			// load data from request
+			if( $edited_intsearch->load_from_Request() )
+			{	// We could load data from form without errors:
+	
+				// Update in DB:
+				$DB->begin();
+				$edited_intsearch->dbupdate();
+				$Messages->add( T_('Internal search updated.'), 'success' );
+				$DB->commit();
+	
+				if( empty($q) )
+				{
+					$action = 'list';
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=stats&tab=refsearches&tab3=intsearches', 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+				}
+			}
+	
+	
+			break;
+	
+		case 'delete':
+			// Delete file type:
+	
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'internalsearches' );
+	
+			// Check permission:
+			$sessions_Module->check_perm( 'edit' );
+	
+			// Make sure we got an ftyp_ID:
+			param( 'isrch_ID', 'integer', true );
+			
+				
+				$msg = sprintf( T_('Internal search &laquo;%s&raquo; deleted.'), $edited_intsearch->dget('name') );
+				//print_r($edited_intsearch);
+				$edited_intsearch->dbdelete( true );
+				unset( $edited_intsearch );
+				forget_param( 'isrch_ID' );
+				$Messages->add( $msg, 'success' );
+				// Redirect so that a reload doesn't write to the DB twice:
+				header_redirect( '?ctrl=stats&tab=refsearches&tab3=intsearches', 303 ); // Will EXIT
+				// We have EXITed already at this point!!
+			break;
+	
+	}
+		
+	
+} else {
 
 if( $blog == 0 )
 {
@@ -122,7 +275,7 @@ switch( $action )
 		// We have EXITed already at this point!!
 		break;
 }
-
+}
 if( $tab != 'sessions' )
 { // no need to show blogs list while displaying sessions
 
@@ -204,6 +357,9 @@ switch( $tab )
 			case 'topengines':
 				$AdminUI->breadcrumbpath_add( T_('Top search engines'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab.'&amp;tab3='.$tab3 );
 				break;
+			case 'intsearches':
+				$AdminUI->breadcrumbpath_add( T_('Internal searches'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab.'&amp;tab3='.$tab3 );
+				break;
 		}
 		break;
 
@@ -274,6 +430,52 @@ $AdminUI->disp_payload_begin();
 
 flush();
 
+if (($tab=="refsearches") &&($tab3=="intsearches")) 
+{
+	
+switch( $action )
+{
+	case 'nil':
+		// Do nothing
+		break;
+
+
+	case 'delete':
+		// We need to ask for confirmation:
+		$edited_Goal->confirm_delete(
+				sprintf( T_('Delete internal search item &laquo;%s&raquo;?'), $edited_intsearch->dget('keywords') ),
+				'internalsearch', $action, get_memorized( 'action' ) );
+		/* no break */
+	case 'new':
+	case 'copy':
+	case 'create':	// we return in this state after a validation error
+	case 'create_new':	// we return in this state after a validation error
+	case 'create_copy':	// we return in this state after a validation error
+	case 'edit':
+	case 'update':	// we return in this state after a validation error
+		$AdminUI->disp_view( 'sessions/views/_internal_search.form.php' );
+		break;
+
+
+	default:
+		// No specific request, list all file types:
+		switch( $tab3 )
+		{
+			case 'intsearches':
+				// Cleanup context:
+				forget_param( 'isrch_ID' );
+				// Display goals list:
+				$AdminUI->disp_view( 'sessions/views/_stats_internal_searches.view.php' );
+				break;
+
+		}
+
+}
+
+} 
+else 
+{
+	
 switch( $AdminUI->get_path(1) )
 {
 	case 'summary':
@@ -323,6 +525,9 @@ switch( $AdminUI->get_path(1) )
 			case 'topengines':
 				$AdminUI->disp_view( 'sessions/views/_stats_search_engines.view.php' );
 				break;
+			case 'intsearches':
+				$AdminUI->disp_view( 'sessions/views/_stats_internal_searches.view.php' );
+				break;
 		}
 		break;
 
@@ -359,6 +564,7 @@ switch( $AdminUI->get_path(1) )
 		break;
 
 }
+}
 
 // End payload block:
 $AdminUI->disp_payload_end();
@@ -368,6 +574,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.27  2011/09/07 12:00:20  lxndral
+ * internal searches update
+ *
  * Revision 1.26  2011/09/04 22:13:18  fplanque
  * copyright 2011
  *

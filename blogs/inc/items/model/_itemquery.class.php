@@ -696,7 +696,7 @@ class ItemQuery extends SQL
 	function where_keywords( $keywords, $phrase, $exact )
 	{
 		global $DB;
-
+		
 		$this->keywords = $keywords;
 		$this->phrase = $phrase;
 		$this->exact = $exact;
@@ -705,7 +705,18 @@ class ItemQuery extends SQL
 		{
 			return;
 		}
-
+		load_class('sessions/model/_internal_searches.class.php', 'Internalsearches' );
+		global $blog;
+		$sess = new Session();
+		
+		$DB->begin();
+		$internal_searches = new InternalSearches();
+		$internal_searches->set("coll_ID" , $blog);
+		$internal_searches->set("session_ID" , $sess->ID);
+		$internal_searches->set("keywords" , $keywords);
+		$internal_searches->dbinsert();
+		$DB->commit();
+		
 		$search = '';
 
 		if( $exact )
@@ -754,6 +765,12 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.24  2011/09/07 12:00:16  lxndral
+ * internal searches update
+ *
+ * Revision 1.24  2011/09/05 23:27:21  Alexander
+ * added internal search item insertion
+ *
  * Revision 1.23  2011/09/04 22:13:17  fplanque
  * copyright 2011
  *

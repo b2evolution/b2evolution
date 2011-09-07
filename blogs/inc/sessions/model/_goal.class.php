@@ -116,7 +116,7 @@ class Goal extends DataObject
 
 		// Redir URL:
 		$this->set_string_from_param( 'redir_url' );
-
+		
 		// Default value:
 		param( 'goal_default_value', 'string' );
 		param_check_decimal( 'goal_default_value', T_('Default value must be a number.') );
@@ -148,7 +148,7 @@ class Goal extends DataObject
 		{
 			case 'default_value':
 				return $this->set_param( $parname, 'number', $parvalue, true );
-
+				
 			case 'redir_url':
 				return $this->set_param( $parname, 'string', $parvalue, true );
 
@@ -174,6 +174,9 @@ class Goal extends DataObject
 
 /*
  * $Log$
+ * Revision 1.10  2011/09/07 12:00:20  lxndral
+ * internal searches update
+ *
  * Revision 1.9  2009/09/20 20:07:19  blueyed
  *  - DataObject::dbexists quotes always
  *  - phpdoc fixes
