@@ -182,7 +182,6 @@ margin-bottom: 10px;
 a {
 color: #996600;
 text-decoration: none;
-font-size: bold;
 }
 
 a:hover {
@@ -430,7 +429,7 @@ font: 1.1em 'Courier New', Courier, Fixed;
 }
 
 hr {
-display: block:
+display: block;
 clear:both;
 }
 
@@ -505,12 +504,10 @@ padding:0;
 
 .entry table {
 margin-bottom:15px;
-padding:auto;
-border:auto;
 }
 
 .entry tr, .entry td, .entry th {
-margin:auto; padding:auto; border:auto;
+margin:auto;
 }
 
 .entry td, .entry th {
