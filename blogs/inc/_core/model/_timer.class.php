@@ -122,9 +122,10 @@ class Timer
 	{
 		global $Debuglog;
 		$since_resume = $this->get_current_microtime() - $this->_times[$category]['resumed'];
-		if( $log ) 
+		if( $log )
 		{
 			$this->indent--;
+			if( $this->indent < 0 ) $this->indent = 0;
 			$Debuglog->add( str_repeat('&nbsp;', $this->indent*4).$category.' paused at '.$this->get_duration( $category, 3 ).' (<strong>+'.number_format($since_resume, 4).'</strong>)', 'timer' );
 		}
 		if( $this->get_state($category) != 'running' )
@@ -158,7 +159,7 @@ class Timer
 
 		$this->_times[$category]['state'] = 'running';
 
-		if( $log ) 
+		if( $log )
 		{
 			$Debuglog->add( str_repeat('&nbsp;', $this->indent*4).$category.' resumed at '.$this->get_duration( $category, 3 ), 'timer' );
 			$this->indent++;
@@ -289,6 +290,9 @@ class Timer_noop
 
 /*
  * $Log$
+ * Revision 1.13  2011/09/07 18:25:11  fplanque
+ * widget & blockcache fixes
+ *
  * Revision 1.12  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

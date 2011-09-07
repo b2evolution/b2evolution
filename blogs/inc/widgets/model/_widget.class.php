@@ -78,6 +78,11 @@ class ComponentWidget extends DataObject
 	 */
 	var $Plugin;
 
+	/**
+	* @var BlockCache
+	*/
+	var $BlockCache;
+
 
 	/**
 	 * Constructor
@@ -230,6 +235,7 @@ class ComponentWidget extends DataObject
 	 * Get definitions for editable params.
 	 *
 	 * @see Plugin::GetDefaultSettings()
+	 *
 	 * @param array Local params like 'for_editing' => true
 	 */
 	function get_param_definitions( $params )
@@ -244,6 +250,12 @@ class ComponentWidget extends DataObject
 					'label' => '<span class="dimmed">'.T_( 'DOM ID' ).'</span>',
 					'size' => 20,
 					'note' => T_( 'Replaces $wi_ID$ in your skins containers.'),
+				),
+				'allow_blockcache' => array(
+					'label' => T_( 'Allow caching' ),
+					'note' => T_( 'Uncheck to prevent this widget from ever being cached in the block cache. (The whole page may still be cached.) This is only needed when a widget is poorly handling caching and cache keys.' ),
+					'type' => 'checkbox',
+					'defaultvalue' => true,
 				),
 			);
 
@@ -337,7 +349,7 @@ class ComponentWidget extends DataObject
 	 */
 	function init_display( $params )
 	{
-		global $admin_url;
+		global $admin_url, $debug;
 
 		if( !is_null($this->disp_params) )
 		{ // Params have been initialized before...
@@ -407,12 +419,6 @@ class ComponentWidget extends DataObject
 					'limit' => 100,
 				), $widget_defaults, $params, $this->param_array );
 
-		if( false )
-		{	// DEBUG:
-			$params['block_start'] = '<div class="debug_widget"><div class="debug_widget_name"><span class="debug_container_action"><a href="'
-						.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>'.$this->get_name().'</div><div class="$wi_class$">';
-			$params['block_end'] = '</div></div>';
-		}
 
 		// Customize params to the current widget:
 		// add additional css classes if required
@@ -462,28 +468,32 @@ class ComponentWidget extends DataObject
 	/**
 	 * Wraps display in a cacheable block.
 	 *
-	 * @todo dh> I think Widgets need to provide caching, e.g.
-	 *           by returning something in cache_keys (so
-	 *           ComponentWidget::get_cache_keys() should return
-	 *           an empty list or false by default).
-	 * fp> I don't understand what you mean.
-	 * dh> Caching should get triggered accordingly to if a Widget/Plugin returns something in get_cache_keys. And the default should be false (=> no caching).
-	 *
-	 * @todo dh> The same mechanism should get used for SkinTag plugin handling, too - shouldn't it?
-	 *           It would be great to have some documentation about this, e.g. on the wiki.
-	 *
 	 * @param array MUST contain at least the basic display params
 	 * @param array of extra keys to be used for cache keying
 	 */
 	function display_with_cache( $params, $keys = array() )
 	{
-		global $Blog, $Timer;
+		global $Blog, $Timer, $debug, $admin_url;
 
 		$this->init_display( $params );
 
-		if( ! $Blog->get_setting('cache_enabled_widgets') )
-		{	// We do NOT want caching for this collection
+		if( ! $Blog->get_setting('cache_enabled_widgets')
+			|| ! $this->disp_params['allow_blockcache'] )
+		{	// NO CACHING - We do NOT want caching for this collection or for this specific widget:
+
+			if( $debug == 2 )
+			{	// DEBUG:
+				echo '<div class="debug_widget"><div class="debug_widget_name" title="'.
+							( $Blog->get_setting('cache_enabled_widgets') ? 'Widget params have BlockCache turned off' : 'Collection params have BlockCache turned off' ).'"><span class="debug_container_action"><a href="'
+							.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>CACHE OFF: '.$this->get_name().'</div><div class="$wi_class$">'."\n";
+			}
+
 			$this->display( $params );
+
+			if( $debug == 2 )
+			{	// DEBUG:
+				echo "</div></div>\n";
+			}
 		}
 		else
 		{	// Instantiate BlockCache:
@@ -491,21 +501,51 @@ class ComponentWidget extends DataObject
 			// Extend cache keys:
 			$keys += $this->get_cache_keys();
 
-			// TODO: dh> I think disp_params (after being processed in init_display) should get considered for the cache key, too.
-
 			$this->BlockCache = new BlockCache( 'widget', $keys );
 
-			if( ! $this->BlockCache->check() )
+			$content = $this->BlockCache->check();
+
+			$Timer->pause( 'BlockCache' );
+
+			if( $content !== false )
+			{ // cache hit, let's display:
+
+				if( $debug == 2 )
+				{	// DEBUG:
+					echo '<div class="debug_widget widget_in_cache"><div class="debug_widget_name" title="'.$this->BlockCache->serialized_keys.'"><span class="debug_container_action"><a href="'
+								.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>FROM CACHE: '.$this->get_name().'</div><div class="$wi_class$">'."\n";
+				}
+
+				echo $content;
+
+				if( $debug == 2 )
+				{	// DEBUG:
+					echo "</div></div>\n";
+				}
+
+			}
+			else
 			{	// Cache miss, we have to generate:
-				$Timer->pause( 'BlockCache' );
+
+				if( $debug == 2 )
+				{	// DEBUG:
+					echo '<div class="debug_widget widget_not_in_cache"><div class="debug_widget_name" title="'.$this->BlockCache->serialized_keys.'"><span class="debug_container_action"><a href="'
+								.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>NOT IN CACHE: '.$this->get_name().'</div><div class="$wi_class$">'."\n";
+				}
+
+				$this->BlockCache->start_collect();
 
 				$this->display( $params );
 
 				// Save collected cached data if needed:
 				$this->BlockCache->end_collect();
-			}
 
-			$Timer->pause( 'BlockCache' );
+				if( $debug == 2 )
+				{	// DEBUG:
+					echo "</div></div>\n";
+				}
+
+			}
 		}
 	}
 
@@ -529,7 +569,7 @@ class ComponentWidget extends DataObject
 	/**
 	 * Note: a container can prevent display of titles with 'block_display_title'
 	 * This is useful for the lists in the headers
-	 * fp> I'm not sur if this param should be overridable by widgets themselves (priority problem)
+	 * fp> I'm not sure if this param should be overridable by widgets themselves (priority problem)
 	 * Maybe an "auto" setting.
 	 *
 	 * @access protected
@@ -709,7 +749,10 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
- * Revision 1.80  2011/09/04 22:13:21  fplanque
+ * Revision 1.81  2011/09/07 18:25:11  fplanque
+ * widget & blockcache fixes
+ *
+ * Revision 1.79.4.1  2011/09/04 22:13:53  fplanque
  * copyright 2011
  *
  * Revision 1.79  2011/01/10 04:45:20  sam2kb

@@ -215,6 +215,26 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
  */
 function get_user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#', $disp_when_logged_in = false, $redirect = null )
 {
+	$register_url = get_user_register_url( $redirect, $disp_when_logged_in );
+
+	if( !$register_url )
+	{
+		return false;
+	}
+
+	if( $link_text == '' ) $link_text = T_('Register...');
+	if( $link_title == '#' ) $link_title = T_('Register to open an account...');
+
+	$r = $before;
+	$r .= '<a href="'.$register_url.'" title="'.$link_title.'">';
+	$r .= $link_text;
+	$r .= '</a>';
+	$r .= $after;
+	return $r;
+}
+
+function get_user_register_url( $redirect = NULL, $disp_when_logged_in = false )
+{
 	global $htsrv_url_sensitive, $Settings, $edited_Blog, $generating_static;
 
 	if( is_logged_in() && ! $disp_when_logged_in )
@@ -226,9 +246,6 @@ function get_user_register_link( $before = '', $after = '', $link_text = '', $li
 	{ // We won't let him register
 		return false;
 	}
-
-	if( $link_text == '' ) $link_text = T_('Register...');
-	if( $link_title == '#' ) $link_title = T_('Register to open an account...');
 
 	if( ! isset($redirect) )
 	{
@@ -273,14 +290,8 @@ function get_user_register_link( $before = '', $after = '', $link_text = '', $li
 		}
 	}
 
-	$r = $before;
-	$r .= '<a href="'.$register_url.'" title="'.$link_title.'">';
-	$r .= $link_text;
-	$r .= '</a>';
-	$r .= $after;
-	return $r;
+	return $register_url;
 }
-
 
 /**
  * Template tag: Output a link to logout
@@ -500,8 +511,8 @@ function get_user_preferences_url()
 
 
 /**
- * Get URL to a specific user settinga tab (profile, avatar, pwdchange, userprefs)
- * 
+ * Get URL to a specific user settings tab (profile, avatar, pwdchange, userprefs)
+ *
  * @param string user tab
  */
 function get_user_settings_url( $user_tab )
@@ -838,7 +849,7 @@ function seconds_to_fields( $duration )
 
 /**
  * Display user edit forms action icons
- * 
+ *
  * @param Form where to display
  * @param User edited user
  * @param String the action string, 'view' or 'edit'
@@ -862,7 +873,7 @@ function echo_user_actions( $Form, $edited_User, $action )
 
 /**
  * Get user menu sub entries
- * 
+ *
  * @param boolean true to get admin interface user sub menu entries, false to get front office user sub menu entries
  * @param integer edited user ID
  * @return array user sub entries
@@ -913,7 +924,7 @@ function get_user_sub_entries( $is_admin, $user_ID )
 
 		$users_sub_entries['userprefs'] = array(
 							'text' => T_('Preferences'),
-	 						'href' => $base_url.$ctrl_param.'userprefs'.$user_param );								
+	 						'href' => $base_url.$ctrl_param.'userprefs'.$user_param );
 
 		if( $is_admin )
 		{ // show this only in backoffice
@@ -933,7 +944,7 @@ function get_user_sub_entries( $is_admin, $user_ID )
 
 /**
  * Get if user is subscribed to get emails, when a new comment is published on this item.
- * 
+ *
  * @param integer user ID
  * @param integer item ID
  * @return boolean true if user is subscribed and false otherwise
@@ -950,7 +961,7 @@ function get_user_isubscription( $user_ID, $item_ID )
 
 /**
  * Set user item subscription
- * 
+ *
  * @param integer user ID
  * @param integer item ID
  * @param integer value 0 for unsubscribe and 1 for subscribe
@@ -977,7 +988,7 @@ function set_user_isubscription( $user_ID, $item_ID, $value, $type )
 
 /**
  * Get user prefered name for notification emails salutation
- * 
+ *
  * @param string nickname
  * @param string firstname
  * @param string login
@@ -1002,6 +1013,9 @@ function get_prefered_name( $nickname, $firstname, $login )
 
 /*
  * $Log$
+ * Revision 1.42  2011/09/07 18:25:12  fplanque
+ * widget & blockcache fixes
+ *
  * Revision 1.41  2011/09/06 17:13:53  sam2kb
  * minor/typo
  *

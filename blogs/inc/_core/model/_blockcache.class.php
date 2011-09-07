@@ -133,19 +133,13 @@ class BlockCache
 			}
 		}
 
-		if( !$missing_date && $this->retrieve( $most_recent_invalidation_ts, $most_recent_invaliating_key ) )
+		if( !$missing_date && ($content = $this->retrieve( $most_recent_invalidation_ts, $most_recent_invaliating_key )) !== false )
 		{ // cache was not invalidated yet and we could retrieve:
-			return true;
+			return $content;
 		}
 
-		$this->is_collecting = true;
-
-		$Debuglog->add( 'Collecting: '.$this->serialized_keys, 'blockcache' );
-
-		ob_start( array( & $this, 'output_handler'), $this->output_chunk_size );
-
+		// Caller should call BlockCache->start_collect() right after this
 		return false;
-
 	}
 
 
@@ -195,10 +189,7 @@ class BlockCache
 
 		$Debuglog->add( 'Retrieved: '.$this->serialized_keys, 'blockcache' );
 
-		// SEND CONTENT!
-		echo $content;
-
-		return true;
+		return $content;
 	}
 
 
@@ -209,6 +200,19 @@ class BlockCache
 	{
 		$this->cached_page_content .= $buffer;
 		return $buffer;
+	}
+
+
+	function start_collect()
+	{
+		global $Debuglog;
+
+		$this->is_collecting = true;
+
+		$Debuglog->add( 'Collecting: '.$this->serialized_keys, 'blockcache' );
+
+		ob_start( array( & $this, 'output_handler'), $this->output_chunk_size );
+
 	}
 
 
@@ -289,6 +293,9 @@ class BlockCache
 
 /*
  * $Log$
+ * Revision 1.19  2011/09/07 18:25:11  fplanque
+ * widget & blockcache fixes
+ *
  * Revision 1.18  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

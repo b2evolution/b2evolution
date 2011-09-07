@@ -162,11 +162,33 @@ class user_tools_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_end'];
 	}
+
+
+	/**
+	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 *
+	 * @return array of keys this widget depends on
+	 */
+	function get_cache_keys()
+	{
+		global $Blog, $current_User;
+
+		return array(
+				'wi_ID'   => $this->ID,					// Have the widget settings changed ?
+				'set_coll_ID' => $Blog->ID,			// Have the settings of the blog changed ? (ex: new owner, new skin)
+				'loggedin' => (is_logged_in() ? 1 : 0),
+				// fp> note: if things get tough in the future, use a per User caching scheme:
+				// 'user_ID' => (is_logged_in() ? $current_User->ID : 0), // Has the current User changed?
+			);
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.13  2011/09/07 18:25:11  fplanque
+ * widget & blockcache fixes
+ *
  * Revision 1.12  2011/09/04 22:13:21  fplanque
  * copyright 2011
  *

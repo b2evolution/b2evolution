@@ -622,18 +622,32 @@ span.debug_container_action {
 }
 
 div.debug_widget {
-	border: 1px solid #00f800;
+	border: 1px solid #0000f8;
 	margin: 0;
 	padding: 0;
+}
+div.widget_in_cache {
+	border: 1px solid #00f800;
+}
+div.widget_not_in_cache {
+	border: 1px solid #f80000;
 }
 div.debug_widget_name {
 	margin: 0;
 	padding: 0;
-	background-color: #efe;
-	color: #00f800;
+	background-color: #eef;
+	color: #0000f8;
 	font-size: 7pt;
 	text-align: left;
 	font-weight: normal;
+}
+div.widget_in_cache div.debug_widget_name {
+	background-color: #efe;
+	color: #00f800;
+}
+div.widget_not_in_cache div.debug_widget_name {
+	background-color: #fee;
+	color: #f80000;
 }
 
 

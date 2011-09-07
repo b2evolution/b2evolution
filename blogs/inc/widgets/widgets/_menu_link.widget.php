@@ -40,6 +40,9 @@ $menu_link_widget_link_types = array(
 		'ownercontact' => T_('Blog owner contact form'),
 		'search' => T_('Search page'),
 		'login' => T_('Log in form'),
+		'register' => T_('Registration form'),
+		'profile' => T_('Profile form'),
+		'avatar' => T_('Profile picture editing'),
 		'item' => T_('Any item (post, page, etc...)'),
 		'url' => T_('Any URL'),
 	);
@@ -225,6 +228,26 @@ class menu_link_Widget extends ComponentWidget
 				$text = T_('Log in');
 				break;
 
+			case 'register':
+				if( ! $url = get_user_register_url() )
+				{
+					return false;
+				}
+				$text = T_('Register');
+				break;
+
+			case 'profile':
+				if( ! is_logged_in() ) return false;
+				$url = get_user_profile_url();
+				$text = T_('Profile');
+				break;
+
+			case 'avatar':
+				if( ! is_logged_in() ) return false;
+				$url = get_user_avatar_url();
+				$text = T_('Profile picture');
+				break;
+
 			case 'item':
 				$ItemCache = & get_ItemCache();
 				/**
@@ -251,7 +274,7 @@ class menu_link_Widget extends ComponentWidget
 				$text = T_('Home');
 		}
 
-
+		// Override default link text?
 		if( !empty($this->param_array['link_text']) )
 		{	// We have a custom link text:
 			$text = $this->param_array['link_text'];
@@ -269,11 +292,43 @@ class menu_link_Widget extends ComponentWidget
 
 		return true;
 	}
+
+
+	/**
+	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 *
+	 * @return array of keys this widget depends on
+	 */
+	function get_cache_keys()
+	{
+		global $Blog, $current_User;
+
+		$keys = array(
+				'wi_ID'   => $this->ID,					// Have the widget settings changed ?
+				'set_coll_ID' => $Blog->ID			// Have the settings of the blog changed ? (ex: new owner, new skin)
+			);
+
+		switch( $this->disp_params['link_type'] )
+		{
+			case 'login':
+			case 'register':
+			case 'profile':
+			case 'avatar':
+				// This link also depends on whether or not someone is logged in:
+				$keys['loggedin'] = (is_logged_in() ? 1 : 0);
+
+		}
+
+		return $keys;
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.21  2011/09/07 18:25:11  fplanque
+ * widget & blockcache fixes
+ *
  * Revision 1.20  2011/09/04 22:13:21  fplanque
  * copyright 2011
  *
