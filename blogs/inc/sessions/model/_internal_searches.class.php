@@ -29,7 +29,7 @@ class InternalSearches extends DataObject
 	 * @var int
 	 */
 	var $coll_ID = '';
-	var $session_ID = '';
+	var $hit_ID = '';
 
 	/**
 	 * Constructor
@@ -45,7 +45,7 @@ class InternalSearches extends DataObject
 		{
 			$this->ID            = $db_row->isrch_ID;
 			$this->coll_ID       = $db_row->isrch_coll_ID;
-			$this->session_ID    = $db_row->isrch_session_ID;
+			$this->hit_ID    = $db_row->isrch_hit_ID;
 			$this->keywords      = $db_row->isrch_keywords;
 			
 		}
@@ -102,8 +102,8 @@ class InternalSearches extends DataObject
 		// Coll ID
 		$this->set_string_from_param( 'coll_ID', true );
 
-		// Session ID
-		$this->set_string_from_param( 'session_ID', true );
+		// Hit ID
+		$this->set_string_from_param( 'hit_ID', true );
 
 		// Keywords :
 		$this->set_string_from_param( 'keywords' );
@@ -135,7 +135,7 @@ class InternalSearches extends DataObject
 			case 'coll_ID':
 				return $this->set_param( $parname, 'number', $parvalue, true );
 				
-			case 'session_ID':
+			case 'hit_ID':
 				return $this->set_param( $parname, 'number', $parvalue, true );
 
 			case 'keywords':
@@ -150,6 +150,9 @@ class InternalSearches extends DataObject
 
 /*
  * $Log$
+ * Revision 1.2  2011/09/08 11:04:04  lxndral
+ * fix for internal searches
+ *
  * Revision 1.1  2011/09/07 12:00:20  lxndral
  * internal searches update
  *

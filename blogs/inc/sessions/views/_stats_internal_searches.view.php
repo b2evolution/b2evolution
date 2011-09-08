@@ -29,9 +29,10 @@ $SQL->SELECT( '*' );
 $SQL->FROM( 'T_logs__internal_searches' );
 if( !empty($internalsearches_keywords) ) // TODO: allow combine
 { // We want to filter on the goal name:
-	$SQL->WHERE_and( 'isrch_keywords LIKE %'.$DB->quote($internalsearches_keywords.'%') );
+	$SQL->WHERE_and( 'isrch_keywords LIKE '.$DB->quote('%'.$internalsearches_keywords.'%') );
 }
-$SQL->FROM_add( 'JOIN T_sessions ON isrch_session_ID = sess_ID' );
+$SQL->FROM_add( 'JOIN T_hitlog ON isrch_hit_ID = hit_ID' );
+$SQL->FROM_add( 'JOIN T_sessions ON hit_sess_ID = sess_ID' );
 $SQL->FROM_add( 'JOIN T_blogs ON isrch_coll_ID = blog_ID' );
 $Results = new Results( $SQL->get(), 'internalsearches_', '-A' );
 
@@ -75,8 +76,13 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 		'th' => T_('Session'),
-		'order' => 'isrch_session_ID',
-		'td' => '$sess_key$',
+		'order' => 'sess_ID',
+		'td' => '<a href="admin.php?ctrl=stats&tab=sessions&tab3=hits&blog=0&sess_ID=$sess_ID$">$sess_ID$</a>',
+ 	);
+$Results->cols[] = array(
+		'th' => T_('Hit date'),
+		'order' => 'hit_datetime',
+		'td' => '$hit_datetime$',
  	);
 
 
@@ -95,10 +101,9 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 							'th' => T_('Actions'),
 							'th_class' => 'shrinkwrap',
 							'td_class' => 'shrinkwrap',
-							'td' => '@action_icon("edit")@@action_icon("copy")@@action_icon("delete")@',
+							'td' => '@action_icon("delete")@',
 						);
 
-  $Results->global_icon( T_('Create a internal search...'), 'new', regenerate_url( 'action', 'action=new' ), T_('New internal search').' &raquo;', 3, 4  );
 }
 
 
@@ -107,6 +112,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.2  2011/09/08 11:04:04  lxndral
+ * fix for internal searches
+ *
  * Revision 1.1  2011/09/07 12:00:20  lxndral
  * internal searches update
  *
