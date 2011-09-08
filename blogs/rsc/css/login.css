@@ -42,7 +42,6 @@ input.input_text {
 	background-color: #eee;
 	padding: 1px;
 	vertical-align: middle;
-	width: 97%;
 	margin: 1px;
 	margin-left: 0;
 	margin-right: 0;
@@ -66,13 +65,14 @@ a:hover {
 div.loginblock {
 	border: 1px solid #CCCCCC;
 	padding: 2ex;
-	margin: 3ex auto;
+	margin: 5em auto;
 	width: 40em;
 	clear: both;
 }
 div.loginblock fieldset {
 	margin: 0;
 	padding: 1ex 0;
+	border: none;
 }
 div.loginblock legend {
 	margin: 0 1ex;
