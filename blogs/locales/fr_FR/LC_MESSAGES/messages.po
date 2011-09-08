@@ -1,16 +1,16 @@
 # b2evolution - French language file
-# Copyright (C) 2003 François PLANQUE
+# Copyright (C) 2003-2011 François Planque
 # This file is distributed under the same license as the b2evolution package.
-# François PLANQUE <http://fplanque.net/>, 2003
+# François PLANQUE <http://fplanque.net/>, 2003-2011
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 2.5\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2011-09-08 00:49+0200\n"
-"PO-Revision-Date: 2011-09-08 01:25+0100\n"
+"POT-Creation-Date: 2011-09-09 01:43+0200\n"
+"PO-Revision-Date: 2011-09-09 01:48+0100\n"
 "Last-Translator: Francois Planque <http://fplanque.com>\n"
-"Language-Team: François PLANQUE <http://fplanque.net/>\n"
+"Language-Team: François Planque <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -187,7 +187,7 @@ msgstr "Suppr"
 #: ../../../inc/files/views/_file_delete.form.php:72
 #: ../../../inc/files/views/_file_list.inc.php:444
 #: ../../../inc/items/items.ctrl.php:1112
-#: ../../../inc/users/model/_user.funcs.php:859
+#: ../../../inc/users/model/_user.funcs.php:865
 #: ../../../inc/users/views/_user_coll_list.view.php:44
 msgid "Delete"
 msgstr "Supprimer"
@@ -257,12 +257,12 @@ msgstr "Info"
 #: ../../../skins/_contact_msg.form.php:42
 #: ../../../skins/_item_comment_form.inc.php:168
 #: ../../../skins/_login.disp.php:133
-#: ../../../skins/_register.disp.php:74
-#: ../../../skins/_register.disp.php:124
+#: ../../../skins/_register.disp.php:77
+#: ../../../skins/_register.disp.php:128
 #: ../../../skins/_subs.disp.php:60
 #: ../../../skins/basic/_item_comment_form.inc.php:60
 #: ../../../skins_adm/login/_reg_complete.main.php:58
-#: ../../../skins_adm/login/_reg_form.main.php:59
+#: ../../../skins_adm/login/_reg_form.main.php:60
 #: ../../../skins_adm/login/_validate_form.main.php:57
 msgid "Email"
 msgstr "Email"
@@ -586,7 +586,7 @@ msgstr ""
 
 #: ../../../cron/getmail.php:682
 msgid "Cannot post, please correct these errors:"
-msgstr "Impossible d'enregistrer; veuillez corriger les erreurs suivantes:"
+msgstr "Impossible de poster; merci de corriger les erreurs suivantes:"
 
 #: ../../../default.php:81
 msgid "Default page"
@@ -745,7 +745,7 @@ msgstr "Erreurs lors du traitement de votre commentaire"
 
 #: ../../../htsrv/comment_post.php:334
 msgid "Cannot post comment, please correct these errors:"
-msgstr "Impossible d'enregistrer ce commentaire; veuillez corriger les erreurs suivantes:"
+msgstr "Impossible de poster ce commentaire; merci de corriger les erreurs suivantes:"
 
 #: ../../../htsrv/comment_post.php:335
 msgid "Back to comment editing"
@@ -1149,7 +1149,7 @@ msgstr ""
 
 #: ../../../htsrv/quick_upload.php:183
 msgid "The file could not be saved!"
-msgstr "Le  fichier n'a pas pu être enregistré!"
+msgstr "Le fichier n'a pas pu être enregistré!"
 
 #: ../../../htsrv/register.php:139
 #, php-format
@@ -1178,7 +1178,7 @@ msgid "Your profile & subscriptions have been updated."
 msgstr "Votre profil & vos abonnements ont été mis à jour."
 
 #: ../../../htsrv/trackback.php:121
-#: ../../../inc/users/model/_user.funcs.php:680
+#: ../../../inc/users/model/_user.funcs.php:686
 msgid "Supplied URL is invalid: "
 msgstr "L'URL fournie est invalide:"
 
@@ -1540,7 +1540,7 @@ msgid "Slugs"
 msgstr "Slugs"
 
 #: ../../../inc/_core/__core.init.php:793
-#: ../../../inc/users/model/_user.funcs.php:464
+#: ../../../inc/users/model/_user.funcs.php:470
 msgid "Edit your profile"
 msgstr "Edition de votre profil"
 
@@ -1569,7 +1569,7 @@ msgstr "Habillage admin"
 
 #: ../../../inc/_core/__core.init.php:855
 #: ../../../inc/_core/__core.init.php:892
-#: ../../../inc/users/model/_user.funcs.php:322
+#: ../../../inc/users/model/_user.funcs.php:328
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:76
 #: ../../../skins_adm/_access_denied.main.php:23
 #: ../../../skins_adm/_adminUI_general.class.php:1316
@@ -1591,7 +1591,7 @@ msgid "Blog"
 msgstr "Blog"
 
 #: ../../../inc/_core/__core.init.php:874
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:274
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:289
 #: ../../../skins_adm/login/_reg_disabled.main.php:40
 msgid "Home"
 msgstr "Page d'accueil"
@@ -1607,7 +1607,7 @@ msgstr "Page d'accueil"
 #: ../../../inc/collections/views/_coll_urls.form.php:106
 #: ../../../inc/collections/views/_coll_user_perm.form.php:460
 #: ../../../inc/sessions/views/_stats_browserhits.view.php:161
-#: ../../../inc/users/model/_user.funcs.php:411
+#: ../../../inc/users/model/_user.funcs.php:417
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:97
 #: ../../../install/index.php:168
 msgid "Admin"
@@ -1870,7 +1870,7 @@ msgid "The decimal value is invalid."
 msgstr "La valeur décimale est invalide."
 
 #: ../../../inc/_core/_param.funcs.php:561
-#: ../../../inc/users/model/_user.funcs.php:659
+#: ../../../inc/users/model/_user.funcs.php:665
 msgid "The email address is invalid."
 msgstr "L'adresse email est invalide."
 
@@ -1905,17 +1905,17 @@ msgstr "Merci d'entrer un numéro de téléphone tel que, par exemple: %s"
 
 #: ../../../inc/_core/_param.funcs.php:1153
 #: ../../../inc/_core/_param.funcs.php:1158
-#: ../../../inc/users/model/_user.funcs.php:695
+#: ../../../inc/users/model/_user.funcs.php:701
 msgid "Please enter your password twice."
 msgstr "Merci d'entrer votre mot de passe deux fois."
 
 #: ../../../inc/_core/_param.funcs.php:1165
-#: ../../../inc/users/model/_user.funcs.php:701
+#: ../../../inc/users/model/_user.funcs.php:707
 msgid "You typed two different passwords."
 msgstr "Vous avez tapé deux mots de passe différents."
 
 #: ../../../inc/_core/_param.funcs.php:1171
-#: ../../../inc/users/model/_user.funcs.php:705
+#: ../../../inc/users/model/_user.funcs.php:711
 #, php-format
 msgid "The minimum password length is %d characters."
 msgstr "Les mots de passe doivent contenir au minimum %d caractères."
@@ -2025,15 +2025,14 @@ msgstr "Envoyer un Message"
 #: ../../../inc/users/views/_user_identity.form.php:311
 #: ../../../inc/users/views/_user_list.view.php:223
 #: ../../../install/_functions_install.php:200
-#: ../../../skins/_login.disp.php:75
-#: ../../../skins/_register.disp.php:65
-#: ../../../skins/_register.disp.php:123
+#: ../../../skins/_register.disp.php:68
+#: ../../../skins/_register.disp.php:127
 #: ../../../skins/_subs.disp.php:58
 #: ../../../skins/_user.disp.php:60
 #: ../../../skins_adm/login/_login_form.main.php:138
 #: ../../../skins_adm/login/_lostpass_form.main.php:54
 #: ../../../skins_adm/login/_reg_complete.main.php:57
-#: ../../../skins_adm/login/_reg_form.main.php:54
+#: ../../../skins_adm/login/_reg_form.main.php:55
 msgid "Login"
 msgstr "Identifiant "
 
@@ -2043,8 +2042,8 @@ msgid "Email validation"
 msgstr "Validation email"
 
 #: ../../../inc/_core/_template.funcs.php:312
-#: ../../../inc/users/model/_user.funcs.php:225
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:236
+#: ../../../inc/users/model/_user.funcs.php:226
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:251
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:104
 msgid "Register"
 msgstr "S'inscrire"
@@ -2063,11 +2062,11 @@ msgid "User Profile"
 msgstr "Profil Utilisateur"
 
 #: ../../../inc/_core/_template.funcs.php:316
-#: ../../../inc/users/model/_user.funcs.php:909
+#: ../../../inc/users/model/_user.funcs.php:915
 #: ../../../inc/users/user.ctrl.php:351
 #: ../../../inc/users/views/_user_avatar.form.php:66
 #: ../../../inc/users/views/_user_identity.form.php:308
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:248
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:263
 msgid "Profile picture"
 msgstr "Photo de profil"
 
@@ -3612,7 +3611,7 @@ msgstr "Supprimer l'élément &laquo;%s&raquo;?"
 #: ../../../inc/sessions/views/_goal.form.php:38
 #: ../../../inc/skins/views/_skin.form.php:39
 #: ../../../inc/slugs/views/_slug.form.php:33
-#: ../../../inc/users/model/_user.funcs.php:865
+#: ../../../inc/users/model/_user.funcs.php:871
 #: ../../../inc/users/views/_group.form.php:140
 #: ../../../inc/users/views/_user_coll_list.view.php:46
 #: ../../../inc/users/views/_userfield.form.php:48
@@ -3900,7 +3899,7 @@ msgstr "SEO"
 #: ../../../inc/files/views/_file_settings.form.php:244
 #: ../../../inc/plugins/views/_plugin_settings.form.php:113
 #: ../../../inc/plugins/views/_plugin_settings.form.php:127
-#: ../../../inc/users/model/_user.funcs.php:927
+#: ../../../inc/users/model/_user.funcs.php:933
 #: ../../../inc/users/user.ctrl.php:361
 msgid "Advanced"
 msgstr "Options avancées"
@@ -4591,7 +4590,7 @@ msgstr "Nombre maximum de crédits en bas de page"
 #: ../../../inc/users/views/_user_identity.form.php:525
 #: ../../../inc/users/views/_user_preferences.form.php:203
 msgid "Save !"
-msgstr "Enregistrer!"
+msgstr "Save !"
 
 #: ../../../inc/collections/views/_coll_features.form.php:63
 msgid "Post options"
@@ -5450,9 +5449,9 @@ msgstr "Fichier Statique"
 #: ../../../inc/locales/_locale_settings.form.php:86
 #: ../../../inc/locales/_locale_settings.form.php:282
 #: ../../../inc/users/views/_user_coll_list.view.php:98
-#: ../../../skins/_register.disp.php:96
+#: ../../../skins/_register.disp.php:99
 #: ../../../skins/_user.disp.php:122
-#: ../../../skins_adm/login/_reg_form.main.php:80
+#: ../../../skins_adm/login/_reg_form.main.php:81
 msgid "Locale"
 msgstr "Locale"
 
@@ -11509,9 +11508,9 @@ msgstr "Sauver (et vérifier)"
 #: ../../../inc/regional/views/_country.form.php:51
 #: ../../../inc/users/views/_user_identity.form.php:316
 #: ../../../inc/users/views/_user_list.view.php:251
-#: ../../../skins/_register.disp.php:81
+#: ../../../skins/_register.disp.php:84
 #: ../../../skins/_user.disp.php:97
-#: ../../../skins_adm/login/_reg_form.main.php:66
+#: ../../../skins_adm/login/_reg_form.main.php:67
 msgid "Country"
 msgstr "Pays"
 
@@ -12512,14 +12511,14 @@ msgid "User name for authenticating to your mail server."
 msgstr "Nom d'utilisateur pour l'authentification sur le serveur email."
 
 #: ../../../inc/settings/views/_features.form.php:103
-#: ../../../inc/users/model/_user.funcs.php:916
+#: ../../../inc/users/model/_user.funcs.php:922
 #: ../../../inc/users/views/_user_identity.form.php:337
 #: ../../../inc/users/views/_user_password.form.php:97
 #: ../../../install/_functions_install.php:201
 #: ../../../skins/_login.disp.php:87
-#: ../../../skins/_register.disp.php:69
+#: ../../../skins/_register.disp.php:72
 #: ../../../skins_adm/login/_login_form.main.php:148
-#: ../../../skins_adm/login/_reg_form.main.php:56
+#: ../../../skins_adm/login/_reg_form.main.php:57
 msgid "Password"
 msgstr "Mot de passe"
 
@@ -13826,17 +13825,17 @@ msgid "Please enter a value."
 msgstr "Merci d'entrer une valeur."
 
 #: ../../../inc/users/model/_user.class.php:350
-#: ../../../inc/users/model/_user.funcs.php:655
+#: ../../../inc/users/model/_user.funcs.php:661
 msgid "Please enter your e-mail address."
 msgstr "Merci d'entrer votre adresse email."
 
 #: ../../../inc/users/model/_user.class.php:389
-#: ../../../inc/users/model/_user.funcs.php:638
+#: ../../../inc/users/model/_user.funcs.php:644
 msgid "Please enter a nickname (can be the same as your login)."
 msgstr "Merci d'entrer un pseudo (peut être identique à votre identifiant)."
 
 #: ../../../inc/users/model/_user.class.php:417
-#: ../../../inc/users/model/_user.funcs.php:646
+#: ../../../inc/users/model/_user.funcs.php:652
 msgid "The ICQ UIN can only be a number, no letters allowed."
 msgstr "Le numéro ICQ doit être composé uniquement de chiffres; les lettres ne sont pas autorisées."
 
@@ -13876,7 +13875,7 @@ msgid "Link to validate your %s account:"
 msgstr "Lien pour valider votre compte %s:"
 
 #: ../../../inc/users/model/_user.class.php:1781
-#: ../../../skins/_register.disp.php:138
+#: ../../../skins/_register.disp.php:142
 #: ../../../skins_adm/login/_reg_complete.main.php:70
 #, php-format
 msgid "Validate your email address for \"%s\""
@@ -13940,7 +13939,8 @@ msgid "You don't have permission to selected user file root."
 msgstr "Vous n'avez la permission d'accéder à la racine de fichiers sélectionnée."
 
 #: ../../../inc/users/model/_user.funcs.php:105
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:228
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:235
+#: ../../../skins/_login.disp.php:75
 msgid "Log in"
 msgstr "Se connecter"
 
@@ -13948,78 +13948,78 @@ msgstr "Se connecter"
 msgid "Log in if you have an account..."
 msgstr "Connectez vous si vous avez un compte..."
 
-#: ../../../inc/users/model/_user.funcs.php:226
+#: ../../../inc/users/model/_user.funcs.php:227
 msgid "Register for a new account..."
-msgstr "Enregistrez vous..."
+msgstr "Inscrivez vous..."
 
-#: ../../../inc/users/model/_user.funcs.php:323
+#: ../../../inc/users/model/_user.funcs.php:329
 msgid "Logout from your account"
 msgstr "Déconnexion de votre compte"
 
-#: ../../../inc/users/model/_user.funcs.php:412
+#: ../../../inc/users/model/_user.funcs.php:418
 msgid "Go to the back-office..."
 msgstr "Atteindre l'interface d'administration..."
 
-#: ../../../inc/users/model/_user.funcs.php:458
-#: ../../../inc/users/model/_user.funcs.php:903
+#: ../../../inc/users/model/_user.funcs.php:464
+#: ../../../inc/users/model/_user.funcs.php:909
 #: ../../../inc/users/user.ctrl.php:346
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:242
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:257
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:83
 msgid "Profile"
 msgstr "Profil"
 
-#: ../../../inc/users/model/_user.funcs.php:551
+#: ../../../inc/users/model/_user.funcs.php:557
 msgid "Subscribe"
 msgstr "S'abonner"
 
-#: ../../../inc/users/model/_user.funcs.php:552
+#: ../../../inc/users/model/_user.funcs.php:558
 msgid "Subscribe to email notifications"
 msgstr "S'abonner aux notifications par email"
 
-#: ../../../inc/users/model/_user.funcs.php:632
+#: ../../../inc/users/model/_user.funcs.php:638
 msgid "Please enter a login."
 msgstr "Merci d'entrer un identifiant."
 
-#: ../../../inc/users/model/_user.funcs.php:666
+#: ../../../inc/users/model/_user.funcs.php:672
 msgid "Please select country."
 msgstr "Merci de sélectionner un pays."
 
-#: ../../../inc/users/model/_user.funcs.php:672
+#: ../../../inc/users/model/_user.funcs.php:678
 msgid "Please select gender."
 msgstr "Si c'est pas indiscret...?"
 
-#: ../../../inc/users/model/_user.funcs.php:709
+#: ../../../inc/users/model/_user.funcs.php:715
 msgid "The password must be different from your login."
 msgstr "Le mot de passe doit être différent de votre identifiant."
 
-#: ../../../inc/users/model/_user.funcs.php:713
+#: ../../../inc/users/model/_user.funcs.php:719
 msgid "The password must be different from your nickname."
 msgstr "Le mot de passe doit être différent de votre pseudo."
 
-#: ../../../inc/users/model/_user.funcs.php:859
+#: ../../../inc/users/model/_user.funcs.php:865
 #: ../../../inc/users/views/_user_coll_list.view.php:44
 #: ../../../inc/users/views/_user_list.view.php:379
 msgid "Delete this user!"
 msgstr "Supprimer cet utilisateur!"
 
-#: ../../../inc/users/model/_user.funcs.php:863
+#: ../../../inc/users/model/_user.funcs.php:869
 #: ../../../inc/users/views/_user_coll_list.view.php:45
 msgid "Compose message"
 msgstr "Nouveau message"
 
-#: ../../../inc/users/model/_user.funcs.php:865
+#: ../../../inc/users/model/_user.funcs.php:871
 #: ../../../inc/users/views/_user_coll_list.view.php:46
 msgid "Close user profile!"
 msgstr "Fermer le profil utilisateur!"
 
-#: ../../../inc/users/model/_user.funcs.php:921
+#: ../../../inc/users/model/_user.funcs.php:927
 #: ../../../inc/users/user.ctrl.php:358
 #: ../../../inc/users/views/_user_advanced.form.php:114
 #: ../../../inc/users/views/_user_preferences.form.php:106
 msgid "Preferences"
 msgstr "Préférences"
 
-#: ../../../inc/users/model/_user.funcs.php:931
+#: ../../../inc/users/model/_user.funcs.php:937
 #: ../../../inc/users/user.ctrl.php:364
 #: ../../../inc/users/views/_user_coll_list.view.php:57
 msgid "Personal blogs"
@@ -14654,20 +14654,20 @@ msgid "Show online"
 msgstr "Montrer en ligne"
 
 #: ../../../inc/users/views/_user_identity.form.php:298
-#: ../../../skins/_register.disp.php:88
-#: ../../../skins_adm/login/_reg_form.main.php:73
+#: ../../../skins/_register.disp.php:91
+#: ../../../skins_adm/login/_reg_form.main.php:74
 msgid "A man"
 msgstr "Un homme"
 
 #: ../../../inc/users/views/_user_identity.form.php:299
-#: ../../../skins/_register.disp.php:89
-#: ../../../skins_adm/login/_reg_form.main.php:74
+#: ../../../skins/_register.disp.php:92
+#: ../../../skins_adm/login/_reg_form.main.php:75
 msgid "A woman"
 msgstr "Une femme"
 
 #: ../../../inc/users/views/_user_identity.form.php:300
-#: ../../../skins/_register.disp.php:90
-#: ../../../skins_adm/login/_reg_form.main.php:75
+#: ../../../skins/_register.disp.php:93
+#: ../../../skins_adm/login/_reg_form.main.php:76
 msgid "I am"
 msgstr "Je suis"
 
@@ -15066,7 +15066,7 @@ msgstr ""
 
 #: ../../../inc/widgets/widgets/_coll_avatar.widget.php:56
 msgid "Profile picture (Avatar)"
-msgstr "Photo de profil (Avatarà"
+msgstr "Photo de profil (Avatar)"
 
 #: ../../../inc/widgets/widgets/_coll_avatar.widget.php:65
 msgid "Display the profile picture of the blog owner."
@@ -15770,7 +15770,7 @@ msgstr "Formulaire de connexion"
 
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:43
 msgid "Registration form"
-msgstr "Formulaire d'enregistrement"
+msgstr "Formulaire d'inscription"
 
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:44
 msgid "Profile form"
@@ -17451,7 +17451,7 @@ msgstr "Ce skin tag affiche la liste des personnes connectées."
 
 #: ../../../plugins/_whosonline.plugin.php:64
 msgid "All logged in users and guest users who have requested a page in the last 5 minutes are listed."
-msgstr "Tous les utilisateurs enregistrés et les invités qui ont demandé une page dans les 5 dernières minutes sont listés."
+msgstr "Tous les utilisateurs identifiés et les invités qui ont demandé une page dans les 5 dernières minutes sont listés."
 
 #: ../../../plugins/_whosonline.plugin.php:78
 msgid "Contact icons"
@@ -18138,7 +18138,7 @@ msgstr "Se connecter!"
 #: ../../../skins/_login.disp.php:101
 #: ../../../skins_adm/login/_login_form.main.php:223
 msgid "No account yet? Register here"
-msgstr "Pas encore de compte? Enregistrez vous ici"
+msgstr "Pas encore de compte? Inscrivez-vous ici"
 
 #: ../../../skins/_login.disp.php:106
 msgid "Use standard login form instead"
@@ -18193,60 +18193,65 @@ msgstr "Re:"
 msgid "User registration is currently not allowed."
 msgstr "L'inscription de nouveaux utilisateurs n'est pas autorisée actuellement."
 
-#: ../../../skins/_register.disp.php:65
-#: ../../../skins_adm/login/_reg_form.main.php:54
+#: ../../../skins/_register.disp.php:68
+#: ../../../skins_adm/login/_reg_form.main.php:55
 msgid "Choose a username."
 msgstr "Choisissez un nom d'utilisateur."
 
-#: ../../../skins/_register.disp.php:69
-#: ../../../skins_adm/login/_reg_form.main.php:56
+#: ../../../skins/_register.disp.php:72
+#: ../../../skins_adm/login/_reg_form.main.php:57
 msgid "Choose a password."
 msgstr "Choisissez un mot de passe."
 
-#: ../../../skins/_register.disp.php:70
-#: ../../../skins_adm/login/_reg_form.main.php:57
+#: ../../../skins/_register.disp.php:73
+#: ../../../skins_adm/login/_reg_form.main.php:58
 msgid "Please type your password again."
 msgstr "Merci de retaper votre mot de passe."
 
-#: ../../../skins/_register.disp.php:96
-#: ../../../skins_adm/login/_reg_form.main.php:80
+#: ../../../skins/_register.disp.php:77
+#: ../../../skins_adm/login/_reg_form.main.php:60
+msgid "We respect your privacy. Your email will remain strictly confidential."
+msgstr "Nous respectons votre vie privée. Votre email restera strictement confidentiel."
+
+#: ../../../skins/_register.disp.php:99
+#: ../../../skins_adm/login/_reg_form.main.php:81
 msgid "Preferred language"
 msgstr "Langue préférrée"
 
-#: ../../../skins/_register.disp.php:103
-#: ../../../skins_adm/login/_reg_form.main.php:85
+#: ../../../skins/_register.disp.php:106
+#: ../../../skins_adm/login/_reg_form.main.php:86
 msgid "Register my account now!"
-msgstr "Enregistrer mon compte maintenant!"
+msgstr "Créer mon compte maintenant!"
 
-#: ../../../skins/_register.disp.php:110
-#: ../../../skins_adm/login/_reg_form.main.php:94
+#: ../../../skins/_register.disp.php:113
+#: ../../../skins_adm/login/_reg_form.main.php:95
 msgid "Already have an account... ?"
 msgstr "Vous avez déjà un compte... ?"
 
-#: ../../../skins/_register.disp.php:127
+#: ../../../skins/_register.disp.php:131
 #: ../../../skins_adm/login/_login_form.main.php:40
 #: ../../../skins_adm/login/_reg_complete.main.php:63
 msgid "Continue"
 msgstr "Continuer"
 
-#: ../../../skins/_register.disp.php:136
+#: ../../../skins/_register.disp.php:140
 #: ../../../skins_adm/login/_reg_complete.main.php:68
 #, php-format
 msgid "An email has just been sent to %s . Please check your email and click on the validation link you will find in that email."
 msgstr "Un email vient d'être envoyé a %s. Merci de consulter votre boîte email et de cliquer sur le lien que vous trouverez dans cet email."
 
-#: ../../../skins/_register.disp.php:137
+#: ../../../skins/_register.disp.php:141
 #: ../../../skins_adm/login/_reg_complete.main.php:69
 #, php-format
 msgid "If you have not received the email in the next few minutes, please check your spam folder. The email was sent from %s and has the title &laquo;%s&raquo;."
 msgstr "Si vous n'avez pas reçu l'email dans les quelques minutes à venir, merci de vérifier votre courrier indésirable. L'email a été envoyé par %s avec le titre &laquo;%s&raquo;."
 
-#: ../../../skins/_register.disp.php:139
+#: ../../../skins/_register.disp.php:143
 #: ../../../skins_adm/login/_reg_complete.main.php:71
 msgid "If you still can't find the email or if you would like to try with a different email address,"
 msgstr "Si vous ne trouvez toujours pas l'email ou si vous voulez essayer avec une autre adresse email,"
 
-#: ../../../skins/_register.disp.php:140
+#: ../../../skins/_register.disp.php:144
 #: ../../../skins_adm/login/_reg_complete.main.php:72
 msgid "click here to try again"
 msgstr "cliquez ici pour un nouvel essai"
@@ -18672,7 +18677,7 @@ msgstr "Entrez votre identifiant ci-dessous. <strong>NE PAS</strong> saisir votr
 
 #: ../../../skins_adm/login/_lostpass_form.main.php:50
 msgid "An email will be sent to your registered email address immediately."
-msgstr "Un email va être envoyé à votre adresse email enregistrée immédiatement."
+msgstr "Un email va être envoyé immédiatement à votre adresse email enregistrée."
 
 #: ../../../skins_adm/login/_lostpass_form.main.php:51
 msgid "As soon as you receive the email, click on the link therein to change your password."

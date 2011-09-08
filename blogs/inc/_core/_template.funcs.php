@@ -309,7 +309,7 @@ function request_title( $params = array() )
 			'msgform_text'        => T_('Send a Message'),
 			'messages_text'       => T_('Messages'),
 			'contacts_text'       => T_('Contacts'),
-			'login_text'          => T_('Login'),
+			'login_text'          => /* TRANS: trailing space = verb */ T_('Login '),
 			'req_validatemail'    => T_('Email validation'),
 			'register_text'       => T_('Register'),
 			'register_complete'   => T_('Registration complete'),
@@ -1243,6 +1243,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.91  2011/09/08 23:57:59  fplanque
+ * minor
+ *
  * Revision 1.90  2011/09/07 05:15:47  sam2kb
  * Create json_encode function if it does not exist ( PHP < 5.2.0 )
  *
