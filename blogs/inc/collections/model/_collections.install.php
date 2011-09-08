@@ -151,7 +151,6 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_views                  INT(11) UNSIGNED NOT NULL DEFAULT 0,
 			post_wordcount              int(11) default NULL,
 			post_comment_status         ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
-			post_attend_status          tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Post owner\'s decision about allowing users to attend this event',
 			post_commentsexpire         DATETIME DEFAULT NULL,
 			post_renderers              TEXT NOT NULL,
 			post_priority               int(11) unsigned null COMMENT 'Task priority in workflow',
@@ -212,6 +211,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			comment_secret        varchar(32) NULL default NULL,
 			comment_notif_status  ENUM('noreq','todo','started','finished') NOT NULL DEFAULT 'noreq' COMMENT 'Have notifications been sent for this comment? How far are we in the process?',
 			comment_notif_ctsk_ID INT(10) unsigned NULL DEFAULT NULL COMMENT 'When notifications for this comment are sent through a schedule job, what is the job ID?',
+			comment_in_reply_to_cmt_ID INT(10) unsigned NOT NULL default '0',
 			PRIMARY KEY comment_ID (comment_ID),
 			KEY comment_post_ID (comment_post_ID),
 			KEY comment_date (comment_date),
@@ -281,8 +281,16 @@ $schema_queries = array_merge( $schema_queries, array(
 			isub_item_ID    int(11) unsigned NOT NULL,
 			isub_user_ID    int(11) unsigned NOT NULL,
 			isub_comments   tinyint(1) NOT NULL DEFAULT 0 COMMENT 'The user wants to receive notifications for new comments',
-			isub_attend     tinyint(1) NOT NULL DEFAULT 0 COMMENT 'The user is attending (or not) this event',
 			PRIMARY KEY (isub_item_ID, isub_user_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_items__item_settings' => array(
+		'Creating item settings table',
+		"CREATE TABLE T_items__item_settings (
+			iset_item_ID  int(11) unsigned NOT NULL,
+			iset_name     varchar( 50 ) NOT NULL,
+			iset_value    varchar( 50 ) NULL,
+			PRIMARY KEY ( iset_item_ID, iset_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_subscriptions' => array(
@@ -375,6 +383,12 @@ $schema_queries = array_merge( $schema_queries, array(
 
 /*
  * $Log$
+ * Revision 1.36  2011/09/08 17:58:08  lxndral
+ * Comments task fix (table sql fix)
+ *
+ * Revision 1.35  2011/09/08 05:22:40  efy-asimo
+ * Remove item attending and add item settings
+ *
  * Revision 1.34  2011/09/04 22:13:14  fplanque
  * copyright 2011
  *
