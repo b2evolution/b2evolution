@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2011-09-06 04:53+0200\n"
-"PO-Revision-Date: 2011-09-06 19:11-0500\n"
+"POT-Creation-Date: 2011-09-08 00:49+0200\n"
+"PO-Revision-Date: 2011-09-07 20:28-0500\n"
 "Last-Translator: Alex (sam2kb)\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -30,7 +30,7 @@ msgstr ""
 #: ../../../inc/settings/views/_features.form.php:196
 #: ../../../inc/widgets/widgets/_coll_category_list.widget.php:95
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:216
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:186
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:189
 #: ../../../multiblogs.php:199
 #: ../../../skins/_sitemap.disp.php:58
 #: ../../../skins/asevo/_item_block.inc.php:66
@@ -109,11 +109,11 @@ msgstr "Предыдущие"
 msgid "Next"
 msgstr "Следующие"
 
-#: ../../../conf/_application.php:41
+#: ../../../conf/_application.php:39
 msgid "visit b2evolution's website"
 msgstr "посетите сайт b2evolution"
 
-#: ../../../conf/_application.php:44
+#: ../../../conf/_application.php:42
 msgid "GPL License"
 msgstr "Лицензия GPL"
 
@@ -188,7 +188,7 @@ msgstr "Удалить"
 #: ../../../inc/files/views/_file_delete.form.php:72
 #: ../../../inc/files/views/_file_list.inc.php:444
 #: ../../../inc/items/items.ctrl.php:1112
-#: ../../../inc/users/model/_user.funcs.php:848
+#: ../../../inc/users/model/_user.funcs.php:859
 #: ../../../inc/users/views/_user_coll_list.view.php:44
 msgid "Delete"
 msgstr "Удалить"
@@ -257,13 +257,13 @@ msgstr "Информация"
 #: ../../../inc/users/views/_user_list.view.php:266
 #: ../../../skins/_contact_msg.form.php:42
 #: ../../../skins/_item_comment_form.inc.php:168
-#: ../../../skins/_login.disp.php:132
-#: ../../../skins/_register.disp.php:76
-#: ../../../skins/_register.disp.php:119
+#: ../../../skins/_login.disp.php:133
+#: ../../../skins/_register.disp.php:74
+#: ../../../skins/_register.disp.php:124
 #: ../../../skins/_subs.disp.php:60
 #: ../../../skins/basic/_item_comment_form.inc.php:60
 #: ../../../skins_adm/login/_reg_complete.main.php:58
-#: ../../../skins_adm/login/_reg_form.main.php:69
+#: ../../../skins_adm/login/_reg_form.main.php:59
 #: ../../../skins_adm/login/_validate_form.main.php:57
 msgid "Email"
 msgstr "Email"
@@ -823,14 +823,14 @@ msgid "Posted comment"
 msgstr "Опубликованный комментарий"
 
 #: ../../../htsrv/comment_review.php:184
-#: ../../../inc/dashboard/model/_dashboard.funcs.php:253
+#: ../../../inc/dashboard/model/_dashboard.funcs.php:254
 #: ../../../inc/items/model/_item.funcs.php:1803
 msgid "No Spam Karma"
 msgstr "Нет Spam Karma"
 
 #: ../../../htsrv/comment_review.php:184
 #: ../../../inc/comments/views/_comment.form.php:288
-#: ../../../inc/dashboard/model/_dashboard.funcs.php:253
+#: ../../../inc/dashboard/model/_dashboard.funcs.php:254
 #: ../../../inc/items/model/_item.funcs.php:1803
 msgid "Spam Karma"
 msgstr "Спам карма"
@@ -850,6 +850,7 @@ msgid "Your email address is invalid. Please set your email address first."
 msgstr "Неверный email адрес. Пожалуйста обновите свой email адрес."
 
 #: ../../../htsrv/isubs_update.php:83
+#: ../../../htsrv/quick_unsubscribe.php:66
 msgid "You have successfully unsubscribed."
 msgstr "Ваша подписка успешно удалена."
 
@@ -1111,10 +1112,6 @@ msgstr "Ваш профиль был изменен."
 msgid "The user you are trying to unsubscribe does not seem to exist. You may already have deleted your account."
 msgstr "Пользователь, подписку которого вы пытаетесь удалить, не существует. Возможно аккаунт уже был удален."
 
-#: ../../../htsrv/quick_unsubscribe.php:66
-msgid "You have successfuly unsubscribed."
-msgstr "Ваша подписка успешно удалена."
-
 #: ../../../htsrv/quick_upload.php:54
 msgid "You don't have permission to upload on this file root."
 msgstr "У вас нет разрешений на загрузку в эту директорию."
@@ -1180,7 +1177,7 @@ msgid "Your profile & subscriptions have been updated."
 msgstr "Ваш профиль и подписки были обновлены."
 
 #: ../../../htsrv/trackback.php:121
-#: ../../../inc/users/model/_user.funcs.php:669
+#: ../../../inc/users/model/_user.funcs.php:680
 msgid "Supplied URL is invalid: "
 msgstr "Отправленный URL недопустим:"
 
@@ -1542,7 +1539,7 @@ msgid "Slugs"
 msgstr "Короткие ссылки"
 
 #: ../../../inc/_core/__core.init.php:793
-#: ../../../inc/users/model/_user.funcs.php:453
+#: ../../../inc/users/model/_user.funcs.php:464
 msgid "Edit your profile"
 msgstr "Изменить ваш профиль"
 
@@ -1571,7 +1568,7 @@ msgstr "Тема панели управления"
 
 #: ../../../inc/_core/__core.init.php:855
 #: ../../../inc/_core/__core.init.php:892
-#: ../../../inc/users/model/_user.funcs.php:311
+#: ../../../inc/users/model/_user.funcs.php:322
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:76
 #: ../../../skins_adm/_access_denied.main.php:23
 #: ../../../skins_adm/_adminUI_general.class.php:1316
@@ -1593,7 +1590,7 @@ msgid "Blog"
 msgstr "Блог"
 
 #: ../../../inc/_core/__core.init.php:874
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:251
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:274
 #: ../../../skins_adm/login/_reg_disabled.main.php:40
 msgid "Home"
 msgstr "В начало"
@@ -1609,7 +1606,7 @@ msgstr "В начало"
 #: ../../../inc/collections/views/_coll_urls.form.php:106
 #: ../../../inc/collections/views/_coll_user_perm.form.php:460
 #: ../../../inc/sessions/views/_stats_browserhits.view.php:161
-#: ../../../inc/users/model/_user.funcs.php:400
+#: ../../../inc/users/model/_user.funcs.php:411
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:97
 #: ../../../install/index.php:168
 msgid "Admin"
@@ -1871,7 +1868,7 @@ msgid "The decimal value is invalid."
 msgstr "Недопустимое десятичное значение."
 
 #: ../../../inc/_core/_param.funcs.php:561
-#: ../../../inc/users/model/_user.funcs.php:648
+#: ../../../inc/users/model/_user.funcs.php:659
 msgid "The email address is invalid."
 msgstr "Email адрес недопустим."
 
@@ -1906,17 +1903,17 @@ msgstr "Пожалуйста введите правильный телефон�
 
 #: ../../../inc/_core/_param.funcs.php:1153
 #: ../../../inc/_core/_param.funcs.php:1158
-#: ../../../inc/users/model/_user.funcs.php:684
+#: ../../../inc/users/model/_user.funcs.php:695
 msgid "Please enter your password twice."
 msgstr "Введите ваш пароль дважды."
 
 #: ../../../inc/_core/_param.funcs.php:1165
-#: ../../../inc/users/model/_user.funcs.php:690
+#: ../../../inc/users/model/_user.funcs.php:701
 msgid "You typed two different passwords."
 msgstr "Вы ввели два различных пароля."
 
 #: ../../../inc/_core/_param.funcs.php:1171
-#: ../../../inc/users/model/_user.funcs.php:694
+#: ../../../inc/users/model/_user.funcs.php:705
 #, php-format
 msgid "The minimum password length is %d characters."
 msgstr "Минимальная длина пароля %d символов."
@@ -2000,7 +1997,7 @@ msgstr "Список записей"
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:194
 #: ../../../inc/widgets/widgets/_coll_search_form.widget.php:89
 #: ../../../inc/widgets/widgets/_coll_search_form.widget.php:150
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:176
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:179
 msgid "Search"
 msgstr "Поиск"
 
@@ -2026,12 +2023,12 @@ msgstr "Отправить сообщение"
 #: ../../../inc/users/views/_user_identity.form.php:311
 #: ../../../inc/users/views/_user_list.view.php:223
 #: ../../../install/_functions_install.php:200
-#: ../../../skins/_login.disp.php:53
+#: ../../../skins/_login.disp.php:75
 #: ../../../skins/_register.disp.php:65
-#: ../../../skins/_register.disp.php:118
+#: ../../../skins/_register.disp.php:123
 #: ../../../skins/_subs.disp.php:58
 #: ../../../skins/_user.disp.php:60
-#: ../../../skins_adm/login/_login_form.main.php:116
+#: ../../../skins_adm/login/_login_form.main.php:138
 #: ../../../skins_adm/login/_lostpass_form.main.php:54
 #: ../../../skins_adm/login/_reg_complete.main.php:57
 #: ../../../skins_adm/login/_reg_form.main.php:54
@@ -2044,6 +2041,8 @@ msgid "Email validation"
 msgstr "Подтверждение Email адреса"
 
 #: ../../../inc/_core/_template.funcs.php:312
+#: ../../../inc/users/model/_user.funcs.php:225
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:236
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:104
 msgid "Register"
 msgstr "Регистрация"
@@ -2062,10 +2061,11 @@ msgid "User Profile"
 msgstr "Профиль пользователя"
 
 #: ../../../inc/_core/_template.funcs.php:316
-#: ../../../inc/users/model/_user.funcs.php:898
+#: ../../../inc/users/model/_user.funcs.php:909
 #: ../../../inc/users/user.ctrl.php:351
 #: ../../../inc/users/views/_user_avatar.form.php:66
 #: ../../../inc/users/views/_user_identity.form.php:308
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:248
 msgid "Profile picture"
 msgstr "Фото пользователя"
 
@@ -2225,8 +2225,8 @@ msgstr "Некоторые файлы невозможно удалить (сп�
 
 #: ../../../inc/_core/model/_pagecache.class.php:634
 #, php-format
-msgid "Can not access directory: %s)."
-msgstr "Не удалось получить доступ к директории: %s"
+msgid "Can not access directory: %s."
+msgstr "Не удалось получить доступ к директории: %s."
 
 #: ../../../inc/_core/model/dataobjects/_dataobject.class.php:455
 msgid "The following relations prevent deletion:"
@@ -3151,7 +3151,7 @@ msgstr "Ник"
 #: ../../../inc/users/views/_user_identity.form.php:405
 #: ../../../inc/users/views/_user_identity.form.php:415
 #: ../../../inc/users/views/_user_list.view.php:289
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:146
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:149
 #: ../../../plugins/_quicktags.plugin.php:387
 #: ../../../plugins/_quicktags.plugin.php:402
 msgid "URL"
@@ -3226,7 +3226,7 @@ msgstr "Список запрещенных ключевых слов"
 #: ../../../inc/collections/views/_coll_advanced.form.php:173
 #: ../../../inc/collections/views/_coll_group_perm.form.php:136
 #: ../../../inc/collections/views/_coll_user_perm.form.php:141
-#: ../../../inc/comments/model/_commentlist.class.php:565
+#: ../../../inc/comments/model/_commentlist.class.php:571
 #: ../../../inc/sessions/_sessions.init.php:232
 #: ../../../inc/users/views/_user_list.view.php:130
 msgid "Keywords"
@@ -3603,7 +3603,7 @@ msgstr "Удалить элемент &laquo;%s&raquo; ?"
 #: ../../../inc/sessions/views/_goal.form.php:38
 #: ../../../inc/skins/views/_skin.form.php:39
 #: ../../../inc/slugs/views/_slug.form.php:33
-#: ../../../inc/users/model/_user.funcs.php:854
+#: ../../../inc/users/model/_user.funcs.php:865
 #: ../../../inc/users/views/_group.form.php:140
 #: ../../../inc/users/views/_user_coll_list.view.php:46
 #: ../../../inc/users/views/_userfield.form.php:48
@@ -3891,7 +3891,7 @@ msgstr "SEO"
 #: ../../../inc/files/views/_file_settings.form.php:244
 #: ../../../inc/plugins/views/_plugin_settings.form.php:113
 #: ../../../inc/plugins/views/_plugin_settings.form.php:127
-#: ../../../inc/users/model/_user.funcs.php:916
+#: ../../../inc/users/model/_user.funcs.php:927
 #: ../../../inc/users/user.ctrl.php:361
 msgid "Advanced"
 msgstr "Дополнительно"
@@ -4165,7 +4165,7 @@ msgid "Blog Folder URL"
 msgstr "URL папки блога"
 
 #: ../../../inc/collections/model/_blog.class.php:620
-#: ../../../inc/collections/model/_blog.class.php:682
+#: ../../../inc/collections/model/_blog.class.php:685
 msgid "You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!"
 msgstr "Вы должны указать абсолютный URL (начинающийся с <code>http://</code> или <code>https://</code>)!"
 
@@ -4173,100 +4173,100 @@ msgstr "Вы должны указать абсолютный URL (начина�
 msgid "You must provide a relative URL (without <code>http://</code> or <code>https://</code>)!"
 msgstr "Вы должны указать относительный URL (без <code>http://</code> или <code>https://</code>)!"
 
-#: ../../../inc/collections/model/_blog.class.php:651
+#: ../../../inc/collections/model/_blog.class.php:654
 msgid "Invalid aggregate blog ID list!"
 msgstr "Недопустимый ID списка блогов сборки!"
 
-#: ../../../inc/collections/model/_blog.class.php:677
-#: ../../../inc/collections/model/_blog.class.php:681
-#: ../../../inc/collections/model/_blog.class.php:689
-#: ../../../inc/collections/model/_blog.class.php:698
-#: ../../../inc/collections/model/_blog.class.php:705
-#: ../../../inc/collections/model/_blog.class.php:713
+#: ../../../inc/collections/model/_blog.class.php:680
+#: ../../../inc/collections/model/_blog.class.php:684
+#: ../../../inc/collections/model/_blog.class.php:692
+#: ../../../inc/collections/model/_blog.class.php:701
+#: ../../../inc/collections/model/_blog.class.php:708
+#: ../../../inc/collections/model/_blog.class.php:716
 msgid "Media dir location"
 msgstr "Расположение папки медиа"
 
-#: ../../../inc/collections/model/_blog.class.php:677
+#: ../../../inc/collections/model/_blog.class.php:680
 msgid "You must provide the full path of the media directory."
 msgstr "Вы должны указать полный путь к медиа папке."
 
-#: ../../../inc/collections/model/_blog.class.php:698
+#: ../../../inc/collections/model/_blog.class.php:701
 msgid "You must provide the media subdirectory."
 msgstr "Вы должны указать подкаталог в медиа папке."
 
-#: ../../../inc/collections/model/_blog.class.php:705
+#: ../../../inc/collections/model/_blog.class.php:708
 #, php-format
 msgid "Invalid subdirectory &laquo;%s&raquo;."
 msgstr "Недопустимый подкаталог &laquo;%s&raquo;."
 
-#: ../../../inc/collections/model/_blog.class.php:1457
+#: ../../../inc/collections/model/_blog.class.php:1460
 #, php-format
 msgid "The blog's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."
 msgstr "Медиа папка блога &laquo;%s&raquo; не может быть создана, потому что родительская папка не доступна для записи или не существует."
 
-#: ../../../inc/collections/model/_blog.class.php:1466
+#: ../../../inc/collections/model/_blog.class.php:1469
 #, php-format
 msgid "The blog's media directory &laquo;%s&raquo; could not be created."
 msgstr "Медиа папка блога &laquo;%s&raquo; не может быть создана."
 
-#: ../../../inc/collections/model/_blog.class.php:1480
+#: ../../../inc/collections/model/_blog.class.php:1483
 #, php-format
 msgid "The blog's media directory &laquo;%s&raquo; has been created with permissions %s."
 msgstr "Медиа папка блога &laquo;%s&raquo; создана с разрешениями %s."
 
-#: ../../../inc/collections/model/_blog.class.php:1877
+#: ../../../inc/collections/model/_blog.class.php:1880
 msgid "The new blog has been created."
 msgstr "Создан новый блог."
 
-#: ../../../inc/collections/model/_blog.class.php:1886
+#: ../../../inc/collections/model/_blog.class.php:1889
 #, php-format
 msgid "The new blog has been associated with the stub file &laquo;%s&raquo;."
 msgstr "Новый блог был ассоциирован с файлом-заглушкой &laquo;%s&raquo;."
 
-#: ../../../inc/collections/model/_blog.class.php:1890
+#: ../../../inc/collections/model/_blog.class.php:1893
 #, php-format
 msgid "No stub file named &laquo;%s&raquo; was found. You must create it for the blog to function properly with the current settings."
 msgstr "Заглушка &laquo;%s&raquo; не найдена. Для того чтобы использовать блог с текущими настройками ссылок, вам необходимо создать эту заглушку. Вы также можете изменить адрес блога если не хотите создавать файл."
 
-#: ../../../inc/collections/model/_blog.class.php:1913
+#: ../../../inc/collections/model/_blog.class.php:1916
 msgid "Uncategorized"
 msgstr "Без рубрики"
 
-#: ../../../inc/collections/model/_blog.class.php:1917
+#: ../../../inc/collections/model/_blog.class.php:1920
 msgid "A default category has been created for this blog."
 msgstr "Создана стандартная рубрика блога."
 
-#: ../../../inc/collections/model/_blog.class.php:1923
+#: ../../../inc/collections/model/_blog.class.php:1926
 msgid "Default widgets have been set-up for this blog."
 msgstr "Установлены стандартные виджеты блога."
 
-#: ../../../inc/collections/model/_blog.class.php:2032
+#: ../../../inc/collections/model/_blog.class.php:2035
 msgid "Deleted post-categories"
 msgstr "Удаленны рубрики записей"
 
-#: ../../../inc/collections/model/_blog.class.php:2039
+#: ../../../inc/collections/model/_blog.class.php:2042
 msgid "Deleted comments on blog's posts"
 msgstr "Удалены комментарии записей блога"
 
-#: ../../../inc/collections/model/_blog.class.php:2047
+#: ../../../inc/collections/model/_blog.class.php:2050
 msgid "Deleted blog's posts"
 msgstr "Удалены записи блога"
 
-#: ../../../inc/collections/model/_blog.class.php:2056
+#: ../../../inc/collections/model/_blog.class.php:2059
 msgid "Deleted blog's categories"
 msgstr "Удалены рубрики блога"
 
-#: ../../../inc/collections/model/_blog.class.php:2069
+#: ../../../inc/collections/model/_blog.class.php:2072
 #, php-format
 msgid "ERROR! Could not delete! You will have to delete the file [%s] by hand."
 msgstr "ОШИБКА! Невозможно удалить! Вы должны удалить файл [%s] вручную."
 
-#: ../../../inc/collections/model/_blog.class.php:2073
+#: ../../../inc/collections/model/_blog.class.php:2076
 #, php-format
 msgid "Could not delete static file [%s]"
 msgstr "Невозможно удалить статичный файл [%s]"
 
-#: ../../../inc/collections/model/_blog.class.php:2078
+#: ../../../inc/collections/model/_blog.class.php:2081
 msgid "Deleted blog's static file"
 msgstr "Удален статичный файл блога"
 
@@ -5431,9 +5431,9 @@ msgstr "Статичный файл"
 #: ../../../inc/locales/_locale_settings.form.php:86
 #: ../../../inc/locales/_locale_settings.form.php:282
 #: ../../../inc/users/views/_user_coll_list.view.php:98
-#: ../../../skins/_register.disp.php:98
+#: ../../../skins/_register.disp.php:96
 #: ../../../skins/_user.disp.php:122
-#: ../../../skins_adm/login/_reg_form.main.php:90
+#: ../../../skins_adm/login/_reg_form.main.php:80
 msgid "Locale"
 msgstr "Локаль"
 
@@ -6008,7 +6008,7 @@ msgstr "Не удалось создать новую запись!"
 #: ../../../inc/comments/_comments.ctrl.php:379
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:230
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:38
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:206
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:209
 #: ../../../skins/photoblog/_body_footer.inc.php:37
 msgid "Latest comments"
 msgstr "Последние комментарии"
@@ -6323,7 +6323,7 @@ msgstr "Если у вас еще нет аккаунта, вы можете %s 
 msgid "Comment text:"
 msgstr "Текст комментария:"
 
-#: ../../../inc/comments/model/_commentlist.class.php:560
+#: ../../../inc/comments/model/_commentlist.class.php:566
 #: ../../../inc/comments/views/_comment.form.php:265
 #: ../../../inc/comments/views/_comment_list_table.view.php:219
 #: ../../../inc/items/model/_item.funcs.php:1789
@@ -6337,7 +6337,7 @@ msgstr "Текст комментария:"
 msgid "Visibility"
 msgstr "Видимость"
 
-#: ../../../inc/comments/model/_commentlist.class.php:602
+#: ../../../inc/comments/model/_commentlist.class.php:608
 msgid "No comment yet..."
 msgstr "Нет комментариев..."
 
@@ -6991,16 +6991,16 @@ msgstr "Проверить систему и безопасность"
 msgid "View default page"
 msgstr "Страница по умолчанию"
 
-#: ../../../inc/dashboard/model/_dashboard.funcs.php:91
+#: ../../../inc/dashboard/model/_dashboard.funcs.php:92
 #, php-format
 msgid "Getting updates from %s."
 msgstr "Получение обновлений с %s."
 
-#: ../../../inc/dashboard/model/_dashboard.funcs.php:181
+#: ../../../inc/dashboard/model/_dashboard.funcs.php:182
 msgid "Invalid updates received"
 msgstr "Получены неверные обновления"
 
-#: ../../../inc/dashboard/model/_dashboard.funcs.php:238
+#: ../../../inc/dashboard/model/_dashboard.funcs.php:239
 msgid "in response to"
 msgstr "в ответ на "
 
@@ -7460,8 +7460,8 @@ msgstr "Папка"
 #: ../../../inc/sessions/views/_stats_summary.view.php:131
 #: ../../../inc/tools/model/_system.funcs.php:321
 #: ../../../inc/tools/model/_system.funcs.php:351
-#: ../../../inc/widgets/model/_widget.class.php:169
-#: ../../../inc/widgets/model/_widget.class.php:225
+#: ../../../inc/widgets/model/_widget.class.php:174
+#: ../../../inc/widgets/model/_widget.class.php:230
 msgid "Unknown"
 msgstr "Неизвестный"
 
@@ -8340,7 +8340,7 @@ msgid "Uploading"
 msgstr "Загружаем..."
 
 #: ../../../inc/files/views/_file_quick_upload.view.php:80
-msgid "Your browser does not support XMLHttpRequest technology!.Please use standard upload!"
+msgid "Your browser does not support XMLHttpRequest technology! Please use standard upload!"
 msgstr "Ваш браузер не поддерживает метод XMLHttpRequest! Используйте стандартную форму загрузки!"
 
 #: ../../../inc/files/views/_file_quick_upload.view.php:82
@@ -9819,7 +9819,7 @@ msgstr "Статусы"
 
 #: ../../../inc/items/views/_item_list_sidebar.view.php:251
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:209
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:181
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:184
 #: ../../../plugins/_archives.plugin.php:318
 #: ../../../skins/basic/index.main.php:248
 msgid "Archives"
@@ -11356,7 +11356,7 @@ msgstr "Вкл"
 
 #: ../../../inc/plugins/views/_plugin_list.view.php:141
 #: ../../../inc/plugins/views/_plugin_list_available.view.php:54
-#: ../../../inc/widgets/model/_widget.class.php:194
+#: ../../../inc/widgets/model/_widget.class.php:199
 msgid "Plugin"
 msgstr "Плагин"
 
@@ -11484,9 +11484,9 @@ msgstr "Сохранить (и просмотреть)"
 #: ../../../inc/regional/views/_country.form.php:51
 #: ../../../inc/users/views/_user_identity.form.php:316
 #: ../../../inc/users/views/_user_list.view.php:251
-#: ../../../skins/_register.disp.php:83
+#: ../../../skins/_register.disp.php:81
 #: ../../../skins/_user.disp.php:97
-#: ../../../skins_adm/login/_reg_form.main.php:76
+#: ../../../skins_adm/login/_reg_form.main.php:66
 msgid "Country"
 msgstr "Страна"
 
@@ -12487,14 +12487,14 @@ msgid "User name for authenticating to your mail server."
 msgstr "Имя пользователя для аутентификации на вашем почтовом сервере."
 
 #: ../../../inc/settings/views/_features.form.php:103
-#: ../../../inc/users/model/_user.funcs.php:905
+#: ../../../inc/users/model/_user.funcs.php:916
 #: ../../../inc/users/views/_user_identity.form.php:337
 #: ../../../inc/users/views/_user_password.form.php:97
 #: ../../../install/_functions_install.php:201
-#: ../../../skins/_login.disp.php:65
-#: ../../../skins/_register.disp.php:71
-#: ../../../skins_adm/login/_login_form.main.php:126
-#: ../../../skins_adm/login/_reg_form.main.php:60
+#: ../../../skins/_login.disp.php:87
+#: ../../../skins/_register.disp.php:69
+#: ../../../skins_adm/login/_login_form.main.php:148
+#: ../../../skins_adm/login/_reg_form.main.php:56
 msgid "Password"
 msgstr "Пароль"
 
@@ -13045,7 +13045,7 @@ msgstr "Значение должно быть цифровым."
 #: ../../../inc/slugs/views/_slug_list.view.php:75
 #: ../../../inc/tools/views/_broken_posts.view.php:34
 #: ../../../inc/tools/views/_broken_slugs.view.php:52
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:139
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:142
 msgid "Item ID"
 msgstr "ID записи"
 
@@ -13101,7 +13101,7 @@ msgstr "Глобальный кэш"
 #: ../../../inc/tools/model/_system.funcs.php:163
 #, php-format
 msgid "%s cache"
-msgstr ""
+msgstr "Кэш %s"
 
 #: ../../../inc/tools/model/_system.funcs.php:200
 msgid "Cache folder error"
@@ -13802,17 +13802,17 @@ msgid "Please enter a value."
 msgstr "Пожалуйста, введите значение."
 
 #: ../../../inc/users/model/_user.class.php:350
-#: ../../../inc/users/model/_user.funcs.php:644
-msgid "Please enter an e-mail address."
-msgstr "Пожалуйста, введите еmail адрес."
+#: ../../../inc/users/model/_user.funcs.php:655
+msgid "Please enter your e-mail address."
+msgstr "Пожалуйста введите e-mail адрес."
 
 #: ../../../inc/users/model/_user.class.php:389
-#: ../../../inc/users/model/_user.funcs.php:627
+#: ../../../inc/users/model/_user.funcs.php:638
 msgid "Please enter a nickname (can be the same as your login)."
 msgstr "Пожалуйста, введите ник (можно использовать ваш логин)."
 
 #: ../../../inc/users/model/_user.class.php:417
-#: ../../../inc/users/model/_user.funcs.php:635
+#: ../../../inc/users/model/_user.funcs.php:646
 msgid "The ICQ UIN can only be a number, no letters allowed."
 msgstr "ICQ UIN должен быть цифровой, буквы не допускаются."
 
@@ -13852,7 +13852,7 @@ msgid "Link to validate your %s account:"
 msgstr "Ссылка для подтверждения вашего %s аккаунта:"
 
 #: ../../../inc/users/model/_user.class.php:1781
-#: ../../../skins/_register.disp.php:129
+#: ../../../skins/_register.disp.php:138
 #: ../../../skins_adm/login/_reg_complete.main.php:70
 #, php-format
 msgid "Validate your email address for \"%s\""
@@ -13891,7 +13891,7 @@ msgstr "Пароль изменен."
 #: ../../../inc/users/model/_user.class.php:2216
 #, php-format
 msgid "You cannot choose the new login \"%s\" (cannot rename user fileroot)"
-msgstr "Вы не можете изменить свой логин \"%s\"\ (неудалось переименовать папку пользователя)"
+msgstr "Вы не можете изменить свой логин \"%s\" (неудалось переименовать папку пользователя)"
 
 #: ../../../inc/users/model/_user.class.php:2223
 msgid "Profile has been updated."
@@ -13916,7 +13916,7 @@ msgid "You don't have permission to selected user file root."
 msgstr "У вас нет доступа к выбранной директории пользователя."
 
 #: ../../../inc/users/model/_user.funcs.php:105
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:225
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:228
 msgid "Log in"
 msgstr "Авторизоваться"
 
@@ -13924,81 +13924,78 @@ msgstr "Авторизоваться"
 msgid "Log in if you have an account..."
 msgstr "Войдите, если у вас уже есть аккаунт..."
 
-#: ../../../inc/users/model/_user.funcs.php:230
-msgid "Register..."
-msgstr "Регистрация..."
+#: ../../../inc/users/model/_user.funcs.php:226
+msgid "Register for a new account..."
+msgstr "Зарегистрироватся в системе..."
 
-#: ../../../inc/users/model/_user.funcs.php:231
-msgid "Register to open an account..."
-msgstr "Зарегистрируйтесь для открытия аккаунта..."
-
-#: ../../../inc/users/model/_user.funcs.php:312
+#: ../../../inc/users/model/_user.funcs.php:323
 msgid "Logout from your account"
 msgstr "Выйти из вашего аккаунта"
 
-#: ../../../inc/users/model/_user.funcs.php:401
+#: ../../../inc/users/model/_user.funcs.php:412
 msgid "Go to the back-office..."
 msgstr "Панель управления"
 
-#: ../../../inc/users/model/_user.funcs.php:447
-#: ../../../inc/users/model/_user.funcs.php:892
+#: ../../../inc/users/model/_user.funcs.php:458
+#: ../../../inc/users/model/_user.funcs.php:903
 #: ../../../inc/users/user.ctrl.php:346
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:242
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:83
 msgid "Profile"
 msgstr "Профиль"
 
-#: ../../../inc/users/model/_user.funcs.php:540
+#: ../../../inc/users/model/_user.funcs.php:551
 msgid "Subscribe"
 msgstr "Подписка"
 
-#: ../../../inc/users/model/_user.funcs.php:541
+#: ../../../inc/users/model/_user.funcs.php:552
 msgid "Subscribe to email notifications"
 msgstr "Подписаться на email уведомления"
 
-#: ../../../inc/users/model/_user.funcs.php:621
+#: ../../../inc/users/model/_user.funcs.php:632
 msgid "Please enter a login."
 msgstr "Пожалуйста, введите логин."
 
-#: ../../../inc/users/model/_user.funcs.php:655
+#: ../../../inc/users/model/_user.funcs.php:666
 msgid "Please select country."
 msgstr "Пожалуйста, выберите страну."
 
-#: ../../../inc/users/model/_user.funcs.php:661
+#: ../../../inc/users/model/_user.funcs.php:672
 msgid "Please select gender."
 msgstr "Пожалуйста, выберите ваш пол."
 
-#: ../../../inc/users/model/_user.funcs.php:698
+#: ../../../inc/users/model/_user.funcs.php:709
 msgid "The password must be different from your login."
 msgstr "Пароль не должен совпадать с логином."
 
-#: ../../../inc/users/model/_user.funcs.php:702
+#: ../../../inc/users/model/_user.funcs.php:713
 msgid "The password must be different from your nickname."
 msgstr "Пароль не должен совпадать с вашем ником."
 
-#: ../../../inc/users/model/_user.funcs.php:848
+#: ../../../inc/users/model/_user.funcs.php:859
 #: ../../../inc/users/views/_user_coll_list.view.php:44
 #: ../../../inc/users/views/_user_list.view.php:379
 msgid "Delete this user!"
 msgstr "Удалить этого пользователя!"
 
-#: ../../../inc/users/model/_user.funcs.php:852
+#: ../../../inc/users/model/_user.funcs.php:863
 #: ../../../inc/users/views/_user_coll_list.view.php:45
 msgid "Compose message"
 msgstr "Написать сообщение"
 
-#: ../../../inc/users/model/_user.funcs.php:854
+#: ../../../inc/users/model/_user.funcs.php:865
 #: ../../../inc/users/views/_user_coll_list.view.php:46
 msgid "Close user profile!"
 msgstr "Закрыть профиль пользователя!"
 
-#: ../../../inc/users/model/_user.funcs.php:910
+#: ../../../inc/users/model/_user.funcs.php:921
 #: ../../../inc/users/user.ctrl.php:358
 #: ../../../inc/users/views/_user_advanced.form.php:114
 #: ../../../inc/users/views/_user_preferences.form.php:106
 msgid "Preferences"
 msgstr "Настройка"
 
-#: ../../../inc/users/model/_user.funcs.php:920
+#: ../../../inc/users/model/_user.funcs.php:931
 #: ../../../inc/users/user.ctrl.php:364
 #: ../../../inc/users/views/_user_coll_list.view.php:57
 msgid "Personal blogs"
@@ -14632,20 +14629,20 @@ msgid "Show online"
 msgstr "Показать онлайн"
 
 #: ../../../inc/users/views/_user_identity.form.php:298
-#: ../../../skins/_register.disp.php:90
-#: ../../../skins_adm/login/_reg_form.main.php:83
+#: ../../../skins/_register.disp.php:88
+#: ../../../skins_adm/login/_reg_form.main.php:73
 msgid "A man"
 msgstr "Мужчина"
 
 #: ../../../inc/users/views/_user_identity.form.php:299
-#: ../../../skins/_register.disp.php:91
-#: ../../../skins_adm/login/_reg_form.main.php:84
+#: ../../../skins/_register.disp.php:89
+#: ../../../skins_adm/login/_reg_form.main.php:74
 msgid "A woman"
 msgstr "Женщина"
 
 #: ../../../inc/users/views/_user_identity.form.php:300
-#: ../../../skins/_register.disp.php:92
-#: ../../../skins_adm/login/_reg_form.main.php:85
+#: ../../../skins/_register.disp.php:90
+#: ../../../skins_adm/login/_reg_form.main.php:75
 msgid "I am"
 msgstr "Я"
 
@@ -14874,26 +14871,34 @@ msgstr "Удалить этот параметр!"
 msgid "Create a new user field..."
 msgstr "Создать новый параметр пользователя..."
 
-#: ../../../inc/widgets/model/_widget.class.php:166
-#: ../../../inc/widgets/model/_widget.class.php:222
+#: ../../../inc/widgets/model/_widget.class.php:171
+#: ../../../inc/widgets/model/_widget.class.php:227
 msgid "Inactive / Uninstalled plugin"
 msgstr "Неактивный / Недоступный плагин"
 
-#: ../../../inc/widgets/model/_widget.class.php:239
+#: ../../../inc/widgets/model/_widget.class.php:245
 msgid "CSS Class"
 msgstr "CSS класс"
 
-#: ../../../inc/widgets/model/_widget.class.php:241
+#: ../../../inc/widgets/model/_widget.class.php:247
 msgid "Replaces $wi_class$ in your skins containers."
 msgstr "Заменяет $wi_class$ в контейнерах вашей темы."
 
-#: ../../../inc/widgets/model/_widget.class.php:244
+#: ../../../inc/widgets/model/_widget.class.php:250
 msgid "DOM ID"
 msgstr "DOM ID"
 
-#: ../../../inc/widgets/model/_widget.class.php:246
+#: ../../../inc/widgets/model/_widget.class.php:252
 msgid "Replaces $wi_ID$ in your skins containers."
 msgstr "Заменяет $wi_ID$ в контейнерах вашей темы."
+
+#: ../../../inc/widgets/model/_widget.class.php:255
+msgid "Allow caching"
+msgstr "Включить кэширование"
+
+#: ../../../inc/widgets/model/_widget.class.php:256
+msgid "Uncheck to prevent this widget from ever being cached in the block cache. (The whole page may still be cached.) This is only needed when a widget is poorly handling caching and cache keys."
+msgstr "Снимите галочку чтобы запретить кэширование кода этого виджета. (Страница все еще может быть кэширована целиком.) Это необходимо только в том случае, когда виджет не способен правильно использовать кэш и ключи кэша."
 
 #: ../../../inc/widgets/views/_widget.form.php:32
 #, php-format
@@ -15289,24 +15294,24 @@ msgstr "Последние"
 
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:201
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:35
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:191
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:194
 msgid "Post index"
 msgstr "Список записей"
 
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:223
 #: ../../../inc/widgets/widgets/_coll_media_index.widget.php:125
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:36
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:196
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:199
 msgid "Photo index"
 msgstr "Миниатюры изображений"
 
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:237
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:211
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:214
 msgid "Owner details"
 msgstr "Информация о владельце"
 
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:244
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:219
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:222
 #: ../../../skins/_body_footer.inc.php:23
 #: ../../../skins/_user.disp.php:66
 #: ../../../skins/_user.disp.php:75
@@ -15333,7 +15338,7 @@ msgid "Contact"
 msgstr "Контакты"
 
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:251
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:201
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:204
 msgid "Site map"
 msgstr "Карта сайта"
 
@@ -15738,48 +15743,60 @@ msgid "Log in form"
 msgstr "Форма входа"
 
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:43
+msgid "Registration form"
+msgstr "Регистрационная форма"
+
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:44
+msgid "Profile form"
+msgstr "Профиль пользователя"
+
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:45
+msgid "Profile picture editing"
+msgstr "Редактирование фото пользователя"
+
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:46
 msgid "Any item (post, page, etc...)"
 msgstr "Любая запись (post, page, podcast и т.д.)"
 
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:44
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:47
 msgid "Any URL"
 msgstr "Любой URL"
 
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:75
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:78
 msgid "Menu link"
 msgstr "Ссылка меню"
 
 #. TRANS: %s is the link type, e. g. "Blog home" or "Log in form"
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:96
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:99
 #, php-format
 msgid "%s link"
 msgstr "Ссылка %s"
 
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:108
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:111
 msgid "Display a configurable menu entry/link"
 msgstr "Показать настраиваемое меню записей / ссылок"
 
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:124
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:127
 msgid "Link Type"
 msgstr "Тип ссылки"
 
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:125
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:128
 msgid "What do you want to link to?"
 msgstr "Какую ссылку вы хотите добавить?"
 
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:131
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:134
 msgid "Link text"
 msgstr "Текст ссылки"
 
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:132
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:135
 msgid "Text to use for the link (leave empty for default)."
 msgstr "Текст ссылки (оставьте пустым для стандартного текста)."
 
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:140
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:143
 msgid "ID of post, page, etc. for \"Item\" type links."
 msgstr "ID страницы, поста и т.д. для ссылок типа \"Любая запись\"."
 
-#: ../../../inc/widgets/widgets/_menu_link.widget.php:147
+#: ../../../inc/widgets/widgets/_menu_link.widget.php:150
 msgid "Destination URL for \"URL\" type links."
 msgstr "Целевой URL для ссылок типа \"Любой URL\""
 
@@ -15910,6 +15927,59 @@ msgstr "Фотоблог, оптимизированный для публика
 msgid "This blog shows photos..."
 msgstr "Этот блог показывает фотографии..."
 
+#: ../../../install/_functions_create.php:943
+msgid "Welcome"
+msgstr "Добро пожаловать"
+
+#: ../../../install/_functions_create.php:944
+msgid "News"
+msgstr "Новости"
+
+#: ../../../install/_functions_create.php:945
+msgid "Background"
+msgstr "Информация"
+
+#: ../../../install/_functions_create.php:946
+msgid "Fun"
+msgstr "Развлечения"
+
+#: ../../../install/_functions_create.php:947
+msgid "In real life"
+msgstr "В реальной жизни"
+
+#: ../../../install/_functions_create.php:948
+msgid "On the web"
+msgstr "В сети"
+
+#: ../../../install/_functions_create.php:949
+msgid "Sports"
+msgstr "Спорт"
+
+#: ../../../install/_functions_create.php:950
+msgid "Movies"
+msgstr "Фильмы"
+
+#: ../../../install/_functions_create.php:951
+msgid "Music"
+msgstr "Разное"
+
+#: ../../../install/_functions_create.php:954
+msgid "Announcements"
+msgstr "Объявления"
+
+#: ../../../install/_functions_create.php:955
+msgid "b2evolution Tips"
+msgstr "Советы по b2evolution"
+
+#: ../../../install/_functions_create.php:959
+msgid "Contributors"
+msgstr "Авторы"
+
+#: ../../../install/_functions_create.php:962
+#: ../../../install/_functions_create.php:1026
+msgid "Monument Valley"
+msgstr "Monument Valley"
+
 #: ../../../install/_functions_create.php:972
 msgid ""
 "<p>This is the first post.</p>\n"
@@ -15953,10 +16023,6 @@ msgstr "Монументы"
 #: ../../../install/_functions_create.php:1018
 msgid "Road to Monument Valley"
 msgstr "Дорога к Monument Valley"
-
-#: ../../../install/_functions_create.php:1026
-msgid "Monument Valley"
-msgstr "Monument Valley"
 
 #: ../../../install/_functions_create.php:1026
 msgid "This is a short photo album demo. Use the arrows to navigate between photos. Click on \"Index\" to see a thumbnail index."
@@ -16271,6 +16337,10 @@ msgstr "Добро пожаловать в b2evolution!"
 msgid "Hi, this is a comment.<br />To delete a comment, just log in, and view the posts' comments, there you will have the option to edit or delete them."
 msgstr "Привет. Это комментарий.<br /> Для удаления комментария, войдите, и просмотрите комментарии к записям, там вы сможете отредактировать их или удалить."
 
+#: ../../../install/_functions_create.php:1350
+msgid "The /cache folder could not be created/written to. b2evolution will still work but without caching, which will make it operate slower than optimal."
+msgstr "Директория /cache не может быть создана или не доступна для записи. b2evolution будет работать без использования кэша, медленнее чем обчно."
+
 #: ../../../install/_functions_evoupgrade.php:258
 msgid "Checking DB schema version..."
 msgstr "Проверка версии базы данных..."
@@ -16383,11 +16453,11 @@ msgstr "Создание таблиц b2evolution..."
 
 #: ../../../install/_functions_install.php:163
 msgid "Creating minimum default data..."
-msgstr "Создание минимальных данных по умолчанию..."
+msgstr "Запись необходимых исходных значений..."
 
 #: ../../../install/_functions_install.php:171
 msgid "Installing sample contents..."
-msgstr "Установка тестового содержимого..."
+msgstr "Запись демонстрационных данных..."
 
 #: ../../../install/_functions_install.php:193
 msgid "Installation successful!"
@@ -16406,6 +16476,14 @@ msgstr "Запомните этот пароль! Это <em>случайный<
 #, php-format
 msgid "Everything should still work, but for optimization you should follow <a %s>these instructions</a>."
 msgstr "Все должно работать, но в целях оптимизации системы, вам следует выполнить <a %s>эти инструкции</a>."
+
+#: ../../../install/_functions_install.php:791
+msgid "Already installed."
+msgstr "Уже установлен."
+
+#: ../../../install/_functions_install.php:794
+msgid "You already have a file named .htaccess in your your base url folder."
+msgstr "У вас уже есть файл .htaccess в корневой директории сайта."
 
 #: ../../../install/index.php:111
 msgid "Upgrade from a previous version"
@@ -18018,50 +18096,52 @@ msgstr "Уведомлять меня о новых комментариях н�
 msgid "You are already logged in"
 msgstr "Вы уже авторизованы"
 
-#: ../../../skins/_login.disp.php:62
-#: ../../../skins_adm/login/_login_form.main.php:124
-#: ../../../skins_adm/login/_lostpass_form.main.php:34
-#: ../../../skins_adm/login/_lostpass_form.main.php:46
-msgid "Lost password ?"
-msgstr "Забыли пароль ?"
-
-#: ../../../skins/_login.disp.php:72
-#: ../../../skins_adm/login/_login_form.main.php:134
-msgid "Log in!"
-msgstr "Авторизоваться!"
-
-#: ../../../skins/_login.disp.php:77
-#: ../../../skins/_register.disp.php:109
-#: ../../../skins_adm/login/_reg_form.main.php:97
-#, php-format
-msgid "Your IP address (%s) and the current time are being logged."
-msgstr "Ваш IP адрес (%s) и текущее время были сохранены."
-
-#: ../../../skins/_login.disp.php:82
-msgid "Standard login form"
-msgstr "Форма входа"
-
-#: ../../../skins/_login.disp.php:99
-#: ../../../skins_adm/login/_login_form.main.php:212
+#: ../../../skins/_login.disp.php:52
+#: ../../../skins_adm/login/_login_form.main.php:89
 msgid "Abort login!"
 msgstr "Прервать вход!"
 
-#: ../../../skins/_login.disp.php:127
+#: ../../../skins/_login.disp.php:75
+#: ../../../skins_adm/login/_login_form.main.php:138
+msgid "Type your username, <b>not</b> your email address."
+msgstr "Введите имя пользователя, <b>не</b> email адрес."
+
+#: ../../../skins/_login.disp.php:84
+#: ../../../skins_adm/login/_login_form.main.php:146
+#: ../../../skins_adm/login/_lostpass_form.main.php:34
+msgid "Lost password ?"
+msgstr "Забыли пароль ?"
+
+#: ../../../skins/_login.disp.php:94
+#: ../../../skins_adm/login/_login_form.main.php:156
+msgid "Log in!"
+msgstr "Авторизоваться!"
+
+#: ../../../skins/_login.disp.php:101
+#: ../../../skins_adm/login/_login_form.main.php:223
+msgid "No account yet? Register here"
+msgstr "Еще нет аккаунта? Зарегистрируйтесь"
+
+#: ../../../skins/_login.disp.php:106
+msgid "Use standard login form instead"
+msgstr "Перейти к обычной форме авторизации"
+
+#: ../../../skins/_login.disp.php:128
 #: ../../../skins_adm/login/_validate_form.main.php:52
 msgid "Please confirm your email address below."
 msgstr "Пожалуйста, подтвердите ваш email адрес ниже."
 
-#: ../../../skins/_login.disp.php:128
+#: ../../../skins/_login.disp.php:129
 #: ../../../skins_adm/login/_validate_form.main.php:53
 msgid "An email will be sent to this address immediately."
 msgstr "Письмо будет отправлено на этот адрес немедленно."
 
-#: ../../../skins/_login.disp.php:129
+#: ../../../skins/_login.disp.php:130
 #: ../../../skins_adm/login/_validate_form.main.php:54
 msgid "As soon as you receive the email, click on the link therein to activate your account."
 msgstr "Как только вы получите письмо, пройдите по ссылке для активации вашего аккаунта."
 
-#: ../../../skins/_login.disp.php:136
+#: ../../../skins/_login.disp.php:137
 msgid "Send me an email now"
 msgstr "Отправить мне письмо сейчас"
 
@@ -18095,46 +18175,60 @@ msgstr "Ответ:"
 msgid "User registration is currently not allowed."
 msgstr "Регистрация пользователей в настоящее время запрещена."
 
-#: ../../../skins/_register.disp.php:69
-#: ../../../skins_adm/login/_reg_form.main.php:64
-#, php-format
-msgid "Minimum %d characters, please."
-msgstr "Минимум %d символов, пожалуйста."
+#: ../../../skins/_register.disp.php:65
+#: ../../../skins_adm/login/_reg_form.main.php:54
+msgid "Choose a username."
+msgstr "Выберите имя пользователя."
 
-#: ../../../skins/_register.disp.php:98
-#: ../../../skins_adm/login/_reg_form.main.php:90
+#: ../../../skins/_register.disp.php:69
+#: ../../../skins_adm/login/_reg_form.main.php:56
+msgid "Choose a password."
+msgstr "Выберите пароль."
+
+#: ../../../skins/_register.disp.php:70
+#: ../../../skins_adm/login/_reg_form.main.php:57
+msgid "Please type your password again."
+msgstr "Пожалуйста введите ваш пароль дважды."
+
+#: ../../../skins/_register.disp.php:96
+#: ../../../skins_adm/login/_reg_form.main.php:80
 msgid "Preferred language"
 msgstr "Предпочитаемый язык"
 
-#: ../../../skins/_register.disp.php:105
-#: ../../../skins_adm/login/_reg_form.main.php:95
-msgid "Register!"
-msgstr "Зарегистрироваться!"
+#: ../../../skins/_register.disp.php:103
+#: ../../../skins_adm/login/_reg_form.main.php:85
+msgid "Register my account now!"
+msgstr "Зарегистрироваться сейчас!"
 
-#: ../../../skins/_register.disp.php:122
+#: ../../../skins/_register.disp.php:110
+#: ../../../skins_adm/login/_reg_form.main.php:94
+msgid "Already have an account... ?"
+msgstr "Уже зарегистрированы... ?"
+
+#: ../../../skins/_register.disp.php:127
 #: ../../../skins_adm/login/_login_form.main.php:40
 #: ../../../skins_adm/login/_reg_complete.main.php:63
 msgid "Continue"
 msgstr "Продолжить"
 
-#: ../../../skins/_register.disp.php:127
+#: ../../../skins/_register.disp.php:136
 #: ../../../skins_adm/login/_reg_complete.main.php:68
 #, php-format
 msgid "An email has just been sent to %s . Please check your email and click on the validation link you will find in that email."
 msgstr "На ваш адрес %s было отправлено письмо. Пожалуйста, нажмите на ссылку в нем для подтверждения вашего аккаунта."
 
-#: ../../../skins/_register.disp.php:128
+#: ../../../skins/_register.disp.php:137
 #: ../../../skins_adm/login/_reg_complete.main.php:69
 #, php-format
 msgid "If you have not received the email in the next few minutes, please check your spam folder. The email was sent from %s and has the title &laquo;%s&raquo;."
-msgstr ""
+msgstr "Если по прошествии нескольких минут вы все еще не получили письмо, пожалуйста проверьте папку для спама. Письмо было отправлено от %s с заголовком &laquo;%s&raquo;."
 
-#: ../../../skins/_register.disp.php:130
+#: ../../../skins/_register.disp.php:139
 #: ../../../skins_adm/login/_reg_complete.main.php:71
 msgid "If you still can't find the email or if you would like to try with a different email address,"
 msgstr "Если вы не смогли найти письмо или же хотите изменить email адрес,"
 
-#: ../../../skins/_register.disp.php:131
+#: ../../../skins/_register.disp.php:140
 #: ../../../skins_adm/login/_reg_complete.main.php:72
 msgid "click here to try again"
 msgstr "отправить еще раз"
@@ -18529,7 +18623,7 @@ msgstr "Настройки темы Chicago"
 msgid "Admin skin settings for this user cannot be edited because this user is using a different admin skin (%s)"
 msgstr "Не удалось изменить настройки панели управления т.к. используется не совместимая тема (%s)"
 
-#: ../../../skins_adm/login/_html_footer.inc.php:40
+#: ../../../skins_adm/login/_html_footer.inc.php:52
 msgid "Credits"
 msgstr "Разработчики"
 
@@ -18539,23 +18633,18 @@ msgid "Note: You are already logged in as %s!"
 msgstr "Примечание: Вы уже вошли как %s!"
 
 #: ../../../skins_adm/login/_login_form.main.php:49
-msgid "Login form"
-msgstr "Форма входа"
+msgid "Log in to your account"
+msgstr "Форма авторизации"
 
-#: ../../../skins_adm/login/_login_form.main.php:114
-msgid "You will have to accept cookies in order to log in."
-msgstr "Ваш браузер должен принимать cookie, чтобы авторизоваться."
-
-#: ../../../skins_adm/login/_login_form.main.php:139
+#: ../../../skins_adm/login/_login_form.main.php:161
 msgid "Log into backoffice!"
 msgstr "Войти в панель управления!"
 
-#: ../../../skins_adm/login/_login_form.main.php:144
-#: ../../../skins_adm/login/_lostpass_form.main.php:58
-msgid "Your IP address ("
-msgstr ""
+#: ../../../skins_adm/login/_login_form.main.php:166
+msgid "You will have to accept cookies in order to log in."
+msgstr "Ваш браузер должен принимать cookie, чтобы авторизоваться."
 
-#: ../../../skins_adm/login/_login_form.main.php:176
+#: ../../../skins_adm/login/_login_form.main.php:200
 msgid "Please wait..."
 msgstr "Пожалуйста, подождите..."
 
@@ -18571,6 +18660,10 @@ msgstr "Письмо будет отправлено на ваш зарегис�
 msgid "As soon as you receive the email, click on the link therein to change your password."
 msgstr "Как только вы получите письмо, пройдите по ссылке для изменения вашего пароля."
 
+#: ../../../skins_adm/login/_lostpass_form.main.php:54
+msgid "Note: your login is NOT your email address."
+msgstr "Обратите внимание: логин - это НЕ email адрес."
+
 #. TRANS: Text for submit button to request an activation link by email
 #: ../../../skins_adm/login/_lostpass_form.main.php:56
 #: ../../../skins_adm/login/_validate_form.main.php:62
@@ -18582,16 +18675,8 @@ msgid "Registration Currently Disabled"
 msgstr "Регистрация в настоящее время запрещена"
 
 #: ../../../skins_adm/login/_reg_form.main.php:38
-msgid "Register form"
-msgstr "Форма регистрации"
-
-#: ../../../skins_adm/login/_reg_form.main.php:60
-msgid "(twice)"
-msgstr "(дважды)"
-
-#: ../../../skins_adm/login/_reg_form.main.php:104
-msgid "Log into existing account..."
-msgstr "Войти в существующий аккаунт..."
+msgid "New account creation"
+msgstr "Регистрация нового пользователя"
 
 #: ../../../skins_adm/login/_validate_form.main.php:36
 #: ../../../skins_adm/login/_validate_form.main.php:49
@@ -18619,6 +18704,37 @@ msgstr "Этот демонстрационный шаблон показыва�
 #: ../../../summary.php:161
 msgid "More posts..."
 msgstr "Больше записей..."
+
+#~ msgid "You have successfuly unsubscribed."
+#~ msgstr "Ваша подписка успешно удалена."
+
+#~ msgid "Register..."
+#~ msgstr "Регистрация..."
+
+#~ msgid "Your IP address (%s) and the current time are being logged."
+#~ msgstr "Ваш IP адрес (%s) и текущее время были сохранены."
+
+#~ msgid "Minimum %d characters, please."
+#~ msgstr "Минимум %d символов, пожалуйста."
+
+#~ msgid "Register!"
+#~ msgstr "Зарегистрироваться!"
+
+#~ msgid "Login form"
+#~ msgstr "Форма входа"
+
+#, fuzzy
+#~ msgid "Your IP address ("
+#~ msgstr "Ваш e-mail адрес:"
+
+#~ msgid "Register form"
+#~ msgstr "Форма регистрации"
+
+#~ msgid "(twice)"
+#~ msgstr "(дважды)"
+
+#~ msgid "Log into existing account..."
+#~ msgstr "Войти в существующий аккаунт..."
 
 #~ msgid ""
 #~ "You configured test mode in the settings or set $test to 2. Nothing will "
@@ -18948,9 +19064,6 @@ msgstr "Больше записей..."
 #~ msgid "users"
 #~ msgstr "пользователей"
 
-#~ msgid "already handled"
-#~ msgstr "уже есть"
-
 #~ msgid "Edit screen"
 #~ msgstr "Страница редактирования"
 
@@ -19016,9 +19129,6 @@ msgstr "Больше записей..."
 
 #~ msgid "Skin settings"
 #~ msgstr "Настройки темы"
-
-#~ msgid "You already have a file named .htaccess at your base url."
-#~ msgstr "У вас уже есть файл именем .htaccess в корне блога."
 
 #~ msgid "Can not find file "
 #~ msgstr "Не удалось найти файл "
@@ -19146,9 +19256,6 @@ msgstr "Больше записей..."
 
 #~ msgid "Create new user profile"
 #~ msgstr "Создание нового пользователя"
-
-#~ msgid "Profile for:"
-#~ msgstr "Профиль для:"
 
 #~ msgid "No user specified."
 #~ msgstr "Не выбран пользователь."
