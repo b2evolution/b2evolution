@@ -515,7 +515,7 @@ $Form->begin_form();
 				// User must have access to admin permission
 				// fp> TODO: use current as default but let user choose into which blog he wants to post
 				$field_options['make_post'] = T_('Make one post (including all images)');
-				$field_options['make_posts'] = T_('Make multiple posts (1 per image)');
+				$field_options['make_posts_pre'] = T_('Make multiple posts (1 per image)');
 			}
 
 			if( $mode == 'upload' )
@@ -690,6 +690,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.49  2011/09/08 22:13:48  lxndral
+ * pick category when creating posts from images
+ *
  * Revision 1.48  2011/09/06 00:54:38  fplanque
  * i18n update
  *

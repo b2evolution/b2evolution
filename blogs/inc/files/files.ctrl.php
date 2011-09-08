@@ -838,7 +838,9 @@ switch( $action )
 		}
 		break;
 
-
+	case 'make_posts_pre':
+		// form for edit several posts
+	break;
 	case 'make_post':
 	case 'make_posts':
 		// TODO: We don't need the Filelist, move UP!
@@ -937,19 +939,37 @@ switch( $action )
 
 			case 'make_posts':
 				// MULTIPLE POST (1 per image):
+				$fileNum =0;
+				//print_r($_POST);
+				$cat_Array=param("category","array");
+				$title_Array=param("post_title","array");
 				while( $l_File = & $selected_Filelist->get_next() )
 				{
 					// Create a post:
 					$edited_Item = new Item();
 					$edited_Item->set( 'status', $item_status );
-					$edited_Item->set( 'main_cat_ID', $Blog->get_default_cat_ID() );
-
+					
+					
+					// replacing category if selected at preview screen 
+					if (isset($cat_Array[$fileNum])) {
+						$edited_Item->set( 'main_cat_ID', $cat_Array[$fileNum] );
+					} else {
+						$edited_Item->set( 'main_cat_ID', $Blog->get_default_cat_ID() );
+					}
+					
 					$title = $l_File->get('title');
 					if( empty($title) )
 					{
 						$title = $l_File->get('name');
 					}
+					
 					$edited_Item->set( 'title', $title );
+					
+					// replacing category if selected at preview screen 
+					if (isset($title_Array[$fileNum])) {
+						//echo 
+						$edited_Item->set( 'title', $title_Array[$fileNum] );
+					}
 
 					$DB->begin();
 
@@ -973,6 +993,7 @@ switch( $action )
 					$DB->commit();
 
 					$Messages->add( sprintf( T_('&laquo;%s&raquo; has been posted.'), $l_File->dget('name') ), 'success' );
+					$fileNum++;
 				}
 
 				// Note: we redirect without restoring filter. This should allow to see the new files.
@@ -1383,8 +1404,8 @@ switch( $fm_mode )
 		      Something like $fm_Filelist->get_names_realtive_to( $a_File, $b_File, $root_type, $root_ID, $rel_path )
 		      that returns an array containing the name of $a_File and $b_File relative to the Root path given as
 		      param 3, 4, 5.
-		      This would allow to say "Copied «users/admin/test_me.jpg» to «test_me.jpg»." rather than just
-		      "Copied «test_me.jpg» to «test_me.jpg».".
+		      This would allow to say "Copied ï¿½users/admin/test_me.jpgï¿½ to ï¿½test_me.jpgï¿½." rather than just
+		      "Copied ï¿½test_me.jpgï¿½ to ï¿½test_me.jpgï¿½.".
 			// fp>> I don't really understand this (probably missing a verb) but I do think that extending the Fileman object is not the right direction to go on the long term
 			// blueyed>> Tried to make it clearer. If it wasn't a Filemanager method, it has to be a function or
 			//   a method of the File class. IMHO it should be a method of the (to be killed) Filemanager object.
@@ -1740,8 +1761,23 @@ if( !empty($action ) && $action != 'list' && $action != 'nil' )
 			}
 	}
 }
+switch( $action )
+{
+	case 'make_posts_pre':
+		// Make posts with selected images:
 
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'file' );
 
+		if( ! $selected_Filelist->count() )
+		{
+			$Messages->add( T_('Nothing selected.'), 'error' );
+			$action = 'list';
+			break;
+		}	
+		$AdminUI->disp_view( 'files/views/_file_create_posts.form.php' );
+	break;
+}
 /*
  * Diplay mode payload:
  */
@@ -1776,6 +1812,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.80  2011/09/08 22:13:48  lxndral
+ * pick category when creating posts from images
+ *
  * Revision 1.79  2011/09/06 00:54:38  fplanque
  * i18n update
  *
