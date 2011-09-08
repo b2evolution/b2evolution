@@ -19,7 +19,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class evopress_Skin extends Skin
 {
-  /**
+	/**
+	 * colorbox enable
+	 */ 
+  	var $colorbox=true;
+  	
+  	/**
 	 * Get default name for the skin.
 	 * Note: the admin can customize it.
 	 */
@@ -60,6 +65,16 @@ class evopress_Skin extends Skin
 					'options' => array( 'left' => $this->T_('Left'), 'right' => $this->T_('Right') ),
 					'type' => 'select',
 				),
+				'colorbox' => array(
+					'label' => T_('Colorbox enabled'),
+					'note' => T_('Check if colorbox enabled'),
+					'defaultvalue' => true,
+					'type'	=>	'checkbox',
+					'valid_pattern' => array( 'pattern'=>'~^([0-4]{1})?$~',
+																		'error'=>T_('Invalid colorbox value.') ),
+					'for_editing'	=>	true,
+				),				
+				
 			), parent::get_param_definitions( $params )	);
 
 		return $r;
@@ -89,13 +104,19 @@ class evopress_Skin extends Skin
 		require_css( 'style.css', true );
 
 		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
-		require_js_helper( 'colorbox' );
+		if ($this->colorbox) 
+		{
+			require_js_helper( 'colorbox' );
+		}
 	}
 
 }
 
 /*
  * $Log$
+ * Revision 1.6  2011/09/08 13:42:37  lxndral
+ * Add _skins.class.php to all skins  (Easy task)
+ *
  * Revision 1.5  2011/09/04 02:30:21  fplanque
  * colorbox integration (MIT license)
  *

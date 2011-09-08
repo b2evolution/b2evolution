@@ -245,8 +245,23 @@ $AdminUI->disp_payload_end();
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
+// if php less than 5.1 => need declare function
+if ( !function_exists( 'property_exists' ) ) {
+    function property_exists( $class, $property ) {
+        if ( is_object( $class ) ) {
+            $vars = get_object_vars( $class );
+        } else {
+            $vars = get_class_vars( $class );
+        }
+        return array_key_exists( $property, $vars );
+    }
+} 
+
 /*
  * $Log$
+ * Revision 1.19  2011/09/08 13:42:36  lxndral
+ * Add _skins.class.php to all skins  (Easy task)
+ *
  * Revision 1.18  2011/09/04 22:13:20  fplanque
  * copyright 2011
  *

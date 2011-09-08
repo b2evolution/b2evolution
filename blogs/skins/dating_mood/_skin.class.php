@@ -19,6 +19,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class dating_mood_Skin extends Skin
 {
+	/**
+	 * colorbox enable
+	 */ 
+  	var $colorbox=true;
   /**
 	 * Get default name for the skin.
 	 * Note: the admin can customize it.
@@ -37,7 +41,6 @@ class dating_mood_Skin extends Skin
 		return 'normal';
 	}
 
-
 	/**
    * Get definitions for editable params
    *
@@ -54,7 +57,16 @@ class dating_mood_Skin extends Skin
 					'valid_pattern' => array( 'pattern'=>'~^(#([a-f0-9]{3}){1,2})?$~i',
 																		'error'=>T_('Invalid color code.') ),
 				),
-
+				'colorbox' => array(
+					'label' => T_('Colorbox enabled'),
+					'note' => T_('Check if colorbox enabled'),
+					'defaultvalue' => true,
+					'type'	=>	'checkbox',
+					'valid_pattern' => array( 'pattern'=>'~^([0-4]{1})?$~',
+																		'error'=>T_('Invalid colorbox value.') ),
+					'for_editing'	=>	true,
+				)
+				
 			), parent::get_param_definitions( $params )	);
 
 		return $r;
@@ -92,7 +104,10 @@ class dating_mood_Skin extends Skin
 		}
 
 		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
-		require_js_helper( 'colorbox' );
+		if ($this->colorbox) 
+		{
+			require_js_helper( 'colorbox' );
+		}
 	}
 
 	/**
@@ -107,6 +122,9 @@ class dating_mood_Skin extends Skin
 
 /*
  * $Log$
+ * Revision 1.4  2011/09/08 13:42:37  lxndral
+ * Add _skins.class.php to all skins  (Easy task)
+ *
  * Revision 1.3  2011/09/07 00:28:27  sam2kb
  * Replace non-ASCII character in regular expressions with ~
  *

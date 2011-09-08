@@ -20,6 +20,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 class intense_Skin extends Skin
 {
 	/**
+	 * colorbox enable
+	 */ 
+  	var $colorbox=true;
+  	
+  	/**
 	 * Get default name for the skin.
 	 * Note: the admin can customize it.
 	 */
@@ -51,7 +56,17 @@ class intense_Skin extends Skin
 					'defaultvalue' => 0,
 					'valid_pattern' => array( 'pattern'=>'~^([0-4]{1})?$~',
 																		'error'=>T_('Invalid Header Image.') ),
-				)
+				),
+				'colorbox' => array(
+					'label' => T_('Colorbox enabled'),
+					'note' => T_('Check if colorbox enabled'),
+					'defaultvalue' => true,
+					'type'	=>	'checkbox',
+					'valid_pattern' => array( 'pattern'=>'~^([0-4]{1})?$~',
+																		'error'=>T_('Invalid colorbox value.') ),
+					'for_editing'	=>	true,
+				),
+				
 			), parent::get_param_definitions( $params )	);
 
 		return $r;
@@ -66,6 +81,10 @@ class intense_Skin extends Skin
 	{
 		// call parent:
 		parent::display_init();
+		if ($this->colorbox) 
+		{
+			require_js_helper( 'colorbox' );
+		}
 	}
 }
 

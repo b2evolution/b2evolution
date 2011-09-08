@@ -6,7 +6,7 @@
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
  * @package skins
- * @subpackage evocamp
+ * @subpackage pixelgreen
  *
  * @version $Id$
  */
@@ -17,19 +17,19 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * ATTENTION: if you make a new skin you have to change the class name below accordingly
  */
-class evocamp_Skin extends Skin
+class pixelgreen_Skin extends Skin
 {
 	/**
 	 * colorbox enable
 	 */ 
   	var $colorbox=true;
-  /**
+  	/**
 	 * Get default name for the skin.
 	 * Note: the admin can customize it.
 	 */
 	function get_default_name()
 	{
-		return 'evoCamp';
+		return 'pixelgreen';
 	}
 
 
@@ -42,6 +42,7 @@ class evocamp_Skin extends Skin
 	}
 
 
+
 	/**
 	 * Get ready for displaying the skin.
 	 *
@@ -52,13 +53,14 @@ class evocamp_Skin extends Skin
 		// call parent:
 		parent::display_init();
 
+
 		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
+
 		if ($this->colorbox) 
 		{
 			require_js_helper( 'colorbox' );
 		}
 	}
-	
 	/**
 	 * Get definitions for editable params
 	 *
@@ -81,16 +83,7 @@ class evocamp_Skin extends Skin
 
 		return $r;
 	}
-
+	
 }
 
-/*
- * $Log$
- * Revision 1.2  2011/09/08 13:42:37  lxndral
- * Add _skins.class.php to all skins  (Easy task)
- *
- * Revision 1.1  2011/09/04 02:30:20  fplanque
- * colorbox integration (MIT license)
- *
- */
 ?>
