@@ -42,6 +42,7 @@ $login = param( 'login', 'string', '' );
 $email = param( 'email', 'string', '' );
 $country = param( 'country', 'string', NULL );
 $gender = param( 'gender', 'string', false );
+$source = param( 'source', 'string', '' );
 $redirect_to = param( 'redirect_to', 'string', '' );
 
 $Form = new Form( $htsrv_url.'register.php', 'login_form', 'post' );
@@ -60,6 +61,8 @@ if( $action == 'register' )
 	$Form->begin_form( 'bComment' );
 
 	$Form->hidden( 'action', 'register' );
+	$Form->hidden( 'source', $source );
+	// fp>asimo: why is there no hidden redirect_to here?
 
 	$Form->begin_field();
 	$Form->text_input( 'login', $login, 22, T_('Login'), T_('Choose a username.'), array( 'maxlength' => 20, 'class' => 'input_text', 'required' => true ) );
@@ -71,7 +74,7 @@ if( $action == 'register' )
 	$Form->end_field();
 
 	$Form->begin_field();
-	$Form->text_input( 'email', $email, 50, T_('Email'), '', array( 'maxlength'=>255, 'class'=>'input_text', 'required'=>true ) );
+	$Form->text_input( 'email', $email, 50, T_('Email'), T_('We respect your privacy. Your email will remain strictly confidential.'), array( 'maxlength'=>255, 'class'=>'input_text', 'required'=>true ) );
 
 	$registration_require_country = (bool)$Settings->get('registration_require_country');
 
@@ -113,7 +116,8 @@ if( $action == 'register' )
 	$Form->end_form();
 }
 elseif( $action == "reg_complete" )
-{ // display register complete info ( email validation not required )
+{	// -----------------------------------------------------------------------------------------------------------------
+	// display register complete info ( email validation not required )
 	$Form->begin_form( 'bComment' );
 
 	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
@@ -147,6 +151,9 @@ elseif( $action == "reg_validation" )
 
 /*
  * $Log$
+ * Revision 1.13  2011/09/08 23:29:27  fplanque
+ * More blockcache/widget fixes around login/register links.
+ *
  * Revision 1.12  2011/09/07 23:34:09  fplanque
  * i18n update
  *

@@ -432,7 +432,7 @@ function get_opentrash_link( $check_perm = true, $force_show = false )
 
 /**
  * Creates an array for the notification email
- * 
+ *
  * @param string user email
  * @param string user locale
  * @param string user unsubscribe key
@@ -441,7 +441,7 @@ function get_opentrash_link( $check_perm = true, $force_show = false )
  */
 function build_notify_data( $notify_email, $notify_locale, $notify_key, $notify_type, $prefered_name, $login )
 {
-	return array( 
+	return array(
 		'email' => $notify_email,
 		'locale' => $notify_locale,
 		'key' => $notify_key,
@@ -454,7 +454,7 @@ function build_notify_data( $notify_email, $notify_locale, $notify_key, $notify_
 
 /**
  * Display disabled comment form
- * 
+ *
  * @param string Blog allow comments settings value
  * @param string Item url, where this comment form should be displayed
  */
@@ -481,7 +481,7 @@ function echo_disabled_comments( $allow_comments_value, $item_url )
 	$register_link = '';
 	if( ( !$is_logged_in ) && ( $Settings->get( 'newusers_canregister' ) ) )
 	{
-		$register_link = get_user_register_link( '', '', T_( 'register now!' ), '', false, $item_url );
+		$register_link = get_user_register_link( '', '', T_( 'register now!' ), '', false, $item_url, 'reg to post comment' );
 		$register_link = '<p>'.sprintf(  T_( 'If you have no account yet, you can %s (It only takes a few seconds)' ), $register_link ).'</p>';
 	}
 
@@ -510,6 +510,9 @@ function echo_disabled_comments( $allow_comments_value, $item_url )
 
 /*
  * $Log$
+ * Revision 1.33  2011/09/08 23:29:27  fplanque
+ * More blockcache/widget fixes around login/register links.
+ *
  * Revision 1.32  2011/09/04 22:13:15  fplanque
  * copyright 2011
  *

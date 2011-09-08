@@ -198,9 +198,9 @@ function use_in_skin_login()
  * @param string
  * @param boolean Display the link, if the user is already logged in? (this is used by the login form)
  */
-function user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#', $disp_when_logged_in = false )
+function user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#', $disp_when_logged_in = false, $default_source_string = '' )
 {
-	echo get_user_register_link( $before, $after, $link_text, $link_title, $disp_when_logged_in );
+	echo get_user_register_link( $before, $after, $link_text, $link_title, $disp_when_logged_in, $default_source_string );
 }
 
 
@@ -213,9 +213,10 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
  * @param string Where to redirect
  * @return string
  */
-function get_user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#', $disp_when_logged_in = false, $redirect = null )
+function get_user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#',
+		$disp_when_logged_in = false, $redirect = null, $default_source_string = '' )
 {
-	$register_url = get_user_register_url( $redirect, $disp_when_logged_in );
+	$register_url = get_user_register_url( $redirect, $default_source_string, $disp_when_logged_in );
 
 	if( !$register_url )
 	{
@@ -233,7 +234,7 @@ function get_user_register_link( $before = '', $after = '', $link_text = '', $li
 	return $r;
 }
 
-function get_user_register_url( $redirect = NULL, $disp_when_logged_in = false )
+function get_user_register_url( $redirect = NULL, $default_source_string = '', $disp_when_logged_in = false )
 {
 	global $htsrv_url_sensitive, $Settings, $edited_Blog, $generating_static;
 
@@ -247,6 +248,32 @@ function get_user_register_url( $redirect = NULL, $disp_when_logged_in = false )
 		return false;
 	}
 
+	if( use_in_skin_login() )
+	{
+		global $blog;
+
+		$BlogCache = & get_BlogCache();
+		$Blog = $BlogCache->get_by_ID( $blog );
+
+		$register_url = $Blog->get( 'url' ).'?disp=register';
+	}
+	else
+	{
+		$register_url = $htsrv_url_sensitive.'register.php';
+	}
+
+	// Source=
+	$source = param( 'source', 'string', '' );
+	if( empty($source) )
+	{
+		$source = $default_source_string;
+	}
+	if( ! empty($source) )
+	{
+		$register_url = url_add_param( $register_url, 'source='.rawurlencode($source), '&' );
+	}
+
+	// Redirect_to=
 	if( ! isset($redirect) )
 	{
 		if( !isset($generating_static) )
@@ -265,33 +292,12 @@ function get_user_register_url( $redirect = NULL, $disp_when_logged_in = false )
 
 	if( ! empty($redirect) )
 	{
-		$redirect = 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $htsrv_url_sensitive ) );
-	}
-
-	if( use_in_skin_login() )
-	{
-		global $blog;
-
-		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog );
-
-		$register_url = $Blog->get( 'url' ).'?disp=register';
-		if( !empty( $redirect ) )
-		{
-			$register_url .= '&'.$redirect;
-		}
-	}
-	else
-	{
-		$register_url = $htsrv_url_sensitive.'register.php';
-		if( !empty( $redirect ) )
-		{
-			$register_url .= '?'.$redirect;
-		}
+		$register_url = url_add_param( $register_url, 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $htsrv_url_sensitive ) ), '&' );
 	}
 
 	return $register_url;
 }
+
 
 /**
  * Template tag: Output a link to logout
@@ -1007,6 +1013,9 @@ function get_prefered_name( $nickname, $firstname, $login )
 
 /*
  * $Log$
+ * Revision 1.46  2011/09/08 23:29:27  fplanque
+ * More blockcache/widget fixes around login/register links.
+ *
  * Revision 1.45  2011/09/08 11:16:42  lxndral
  * BUG: the "user tools" widget never hides the logout link even if no text is provided
  *

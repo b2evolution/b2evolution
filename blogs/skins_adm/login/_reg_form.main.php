@@ -46,6 +46,7 @@ $Form->begin_form( 'fform' );
 
 $Form->add_crumb( 'regform' );
 $Form->hidden( 'action', 'register' );
+$source = param( 'source', 'string', '' );
 $Form->hidden( 'source', $source );
 $Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
 
@@ -56,7 +57,7 @@ $Form->begin_fieldset();
 	$Form->password_input( 'pass1', '', 18, T_('Password'), array( 'note'=>T_('Choose a password.'), 'maxlength' => 70, 'class' => 'input_text', 'required'=>true ) );
 	$Form->password_input( 'pass2', '', 18, '', array( 'note'=>T_('Please type your password again.'), 'maxlength' => 70, 'class' => 'input_text', 'required'=>true ) );
 
-	$Form->text_input( 'email', $email, 50, T_('Email'), '', array( 'maxlength'=>255, 'class'=>'input_text', 'required'=>true ) );
+	$Form->text_input( 'email', $email, 55, T_('Email'), T_('We respect your privacy. Your email will remain strictly confidential.'), array( 'maxlength'=>255, 'class'=>'input_text', 'required'=>true ) );
 
 	$registration_require_country = (bool)$Settings->get('registration_require_country');
 
@@ -99,6 +100,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.27  2011/09/08 23:29:27  fplanque
+ * More blockcache/widget fixes around login/register links.
+ *
  * Revision 1.26  2011/09/07 23:34:09  fplanque
  * i18n update
  *

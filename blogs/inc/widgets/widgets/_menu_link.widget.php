@@ -225,14 +225,29 @@ class menu_link_Widget extends ComponentWidget
 			case 'login':
 				if( is_logged_in() ) return false;
 				$url = get_login_url();
+				if( isset($this->BlockCache) )
+				{	// Do NOT cache because some of these links are using a redirect_to param, which makes it page dependent.
+					// so this will be cached by the PageCache; there is no added benefit to cache it in the BlockCache
+					// (which could have been shared between several pages):
+					$this->BlockCache->abort_collect();
+				}
+
 				$text = T_('Log in');
 				break;
 
 			case 'register':
-				if( ! $url = get_user_register_url() )
+				if( ! $url = get_user_register_url( NULL, 'menu link' ) )
 				{
 					return false;
 				}
+				if( isset($this->BlockCache) )
+				{	// Do NOT cache because some of these links are using a redirect_to param, which makes it page dependent.
+					// Note: also beware of the source param.
+					// so this will be cached by the PageCache; there is no added benefit to cache it in the BlockCache
+					// (which could have been shared between several pages):
+					$this->BlockCache->abort_collect();
+				}
+
 				$text = T_('Register');
 				break;
 
@@ -310,9 +325,9 @@ class menu_link_Widget extends ComponentWidget
 
 		switch( $this->disp_params['link_type'] )
 		{
-			case 'login':
-			case 'register':
-			case 'profile':
+			case 'login':  		/* This one will probably abort caching by itself anyways */
+			case 'register':	/* This one will probably abort caching by itself anyways */
+			case 'profile':		// This can be cached
 			case 'avatar':
 				// This link also depends on whether or not someone is logged in:
 				$keys['loggedin'] = (is_logged_in() ? 1 : 0);
@@ -326,6 +341,9 @@ class menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.22  2011/09/08 23:29:27  fplanque
+ * More blockcache/widget fixes around login/register links.
+ *
  * Revision 1.21  2011/09/07 18:25:11  fplanque
  * widget & blockcache fixes
  *

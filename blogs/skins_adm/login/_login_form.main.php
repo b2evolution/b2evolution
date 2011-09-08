@@ -220,7 +220,7 @@ $Form->end_form();
 
 <div class="login_actions" style="text-align:right">
 	<?php
-	echo get_user_register_link( '', '', T_('No account yet? Register here').' &raquo;', '#', true /*disp_when_logged_in*/, $redirect_to );
+	echo get_user_register_link( '', '', T_('No account yet? Register here').' &raquo;', '#', true /*disp_when_logged_in*/, $redirect_to, 'login form' );
 	?>
 </div>
 
@@ -231,6 +231,10 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.28  2011/09/08 23:29:27  fplanque
+ * More blockcache/widget fixes around login/register links.
+ *
+
  * Revision 1.27  2011/09/07 23:34:09  fplanque
  * i18n update
  *

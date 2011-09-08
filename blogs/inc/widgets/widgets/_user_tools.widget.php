@@ -153,11 +153,20 @@ class user_tools_Widget extends ComponentWidget
 
 		echo $this->disp_params['list_start'];
 		user_login_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_login_link' ] );
-		user_register_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_register_link' ] );
+		user_register_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_register_link' ], '#', false, 'user tools widget' );
 		user_admin_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_admin_link' ] );
 		user_profile_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_profile_link' ] );
 		user_subs_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_subs_link' ] );
 		user_logout_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_logout_link' ] );
+
+		if( isset($this->BlockCache) )
+		{	// Do NOT cache because some of these links are using a redirect_to param, which makes it page dependent.
+			// Note: also beware of the source param.
+			// so this will be cached by the PageCache; there is no added benefit to cache it in the BlockCache
+			// (which could have been shared between several pages):
+			$this->BlockCache->abort_collect();
+		}
+
 		echo $this->disp_params['list_end'];
 
 		echo $this->disp_params['block_end'];
@@ -186,6 +195,9 @@ class user_tools_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.14  2011/09/08 23:29:27  fplanque
+ * More blockcache/widget fixes around login/register links.
+ *
  * Revision 1.13  2011/09/07 18:25:11  fplanque
  * widget & blockcache fixes
  *
