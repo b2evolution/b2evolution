@@ -126,6 +126,12 @@ class Comment extends DataObject
 	 * @var integer
 	 */
 	var $notif_ctsk_ID;
+	
+	/**
+	 * Is comment is reply to some other comment ?
+	 * @var integer
+	 */
+	var $in_reply_to_cmt_ID;
 
 	/**
 	 * Constructor
@@ -146,6 +152,7 @@ class Comment extends DataObject
 			$this->featured = 0;
 			$this->nofollow = 1;
 			$this->notif_status = 'noreq';
+			$this->in_reply_to_cmt_ID = 0;
 		}
 		else
 		{
@@ -176,6 +183,7 @@ class Comment extends DataObject
 			$this->secret = $db_row->comment_secret;
 			$this->notif_status = $db_row->comment_notif_status;
 			$this->notif_ctsk_ID = $db_row->comment_notif_ctsk_ID;
+			$this->in_reply_to_cmt_ID = $db_row->comment_in_reply_to_cmt_ID;
 		}
 	}
 
@@ -2032,6 +2040,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.88  2011/09/08 13:55:50  lxndral
+ * Add an 'in reply to' DB field at least
+ *
  * Revision 1.87  2011/09/05 21:00:56  sam2kb
  * minor
  *
