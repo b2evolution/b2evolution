@@ -314,7 +314,7 @@ function get_user_logout_link( $before = '', $after = '', $link_text = '', $link
 {
 	global $current_User;
 
-	if( ! is_logged_in() )
+	if( ! is_logged_in() || $link_text=='' )
 	{
 		return false;
 	}
@@ -965,10 +965,9 @@ function get_user_isubscription( $user_ID, $item_ID )
  * @param integer user ID
  * @param integer item ID
  * @param integer value 0 for unsubscribe and 1 for subscribe
- * @param string item subscription type ( isub_comments, isub_attend )
  * @return boolean true is new value was successfully set, false otherwise
  */
-function set_user_isubscription( $user_ID, $item_ID, $value, $type )
+function set_user_isubscription( $user_ID, $item_ID, $value )
 {
 	global $DB;
 	if( ( $value < 0 ) || ( $value > 1 ) )
@@ -976,12 +975,7 @@ function set_user_isubscription( $user_ID, $item_ID, $value, $type )
 		return false;
 	}
 
-	if( ( $type != 'isub_comments' ) && ( $type != 'isub_attend' ) )
-	{ // Invalid type. It should be 'isub_comments' or 'isub_attend'.
-		return false;
-	}
-
-	return $DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, '.$type.' )
+	return $DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
 								VALUES ( '.$item_ID.', '.$user_ID.', '.$value.' )' );
 }
 
@@ -1013,6 +1007,14 @@ function get_prefered_name( $nickname, $firstname, $login )
 
 /*
  * $Log$
+ * Revision 1.45  2011/09/08 11:16:42  lxndral
+ * BUG: the "user tools" widget never hides the logout link even if no text is provided
+ *
+ * fix
+ *
+ * Revision 1.44  2011/09/08 05:22:40  efy-asimo
+ * Remove item attending and add item settings
+ *
  * Revision 1.43  2011/09/07 22:44:40  fplanque
  * UI cleanup
  *
