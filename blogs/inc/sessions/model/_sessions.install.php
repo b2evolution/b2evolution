@@ -142,7 +142,7 @@ $schema_queries['T_track__goalhit'] = array(
 $schema_queries['T_logs__internal_searches'] = array('Creating internal searches table',"CREATE TABLE `evo_logs__internal_searches` (
   `isrch_ID` bigint(20) NOT NULL auto_increment,
   `isrch_coll_ID` bigint(20) NOT NULL default '0',
-  `isrch_session_ID` bigint(20) NOT NULL default '0',
+  `isrch_hit_ID` bigint(20) NOT NULL default '0',
   `isrch_keywords` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`isrch_ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;");
@@ -150,6 +150,9 @@ $schema_queries['T_logs__internal_searches'] = array('Creating internal searches
 		
 /*
  * $Log$
+ * Revision 1.19  2011/09/08 11:06:02  lxndral
+ * fix for sessions install script (internal searches)
+ *
  * Revision 1.18  2011/09/07 22:44:41  fplanque
  * UI cleanup
  *
