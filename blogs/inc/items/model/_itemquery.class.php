@@ -708,11 +708,13 @@ class ItemQuery extends SQL
 		load_class('sessions/model/_internal_searches.class.php', 'Internalsearches' );
 		global $blog;
 		$sess = new Session();
-		
+		$hit_row=$DB->get_row( "SELECT MAX( hit_ID ) + 1  as hit_ID FROM  T_hitlog" );
+		//global $hit;
+		//print_r($sess);
 		$DB->begin();
 		$internal_searches = new InternalSearches();
 		$internal_searches->set("coll_ID" , $blog);
-		$internal_searches->set("session_ID" , $sess->ID);
+		$internal_searches->set("hit_ID" , $hit_row->hit_ID);
 		$internal_searches->set("keywords" , $keywords);
 		$internal_searches->dbinsert();
 		$DB->commit();
@@ -765,6 +767,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.25  2011/09/08 22:05:12  lxndral
+ * fix for hitlog task
+ *
  * Revision 1.24  2011/09/07 12:00:16  lxndral
  * internal searches update
  *
