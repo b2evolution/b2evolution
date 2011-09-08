@@ -986,13 +986,13 @@ function file_controller_build_tabs()
 			array('files', 'upload'),
 			array(
 					'quick' => array(
-						'text' => T_('Quick'),
+						'text' => /* TRANS: Quick upload method */ T_('Quick '),
 						'href' => '?ctrl=upload&amp;tab3=quick' ),
 					'standard' => array(
-						'text' => T_('Standard'),
+						'text' => /* TRANS: Standard upload method */ T_('Standard '),
 						'href' => '?ctrl=upload&amp;tab3=standard' ),
 					'advanced' => array(
-						'text' => T_('Advanced'),
+						'text' => /* TRANS: Advanced upload method */ T_('Advanced '),
 						'href' => '?ctrl=upload&amp;tab3=advanced' ),
 				)
 			);
@@ -1495,6 +1495,9 @@ function remove_orphan_files( $file_ids = NULL, $older_then = NULL )
 
 /*
  * $Log$
+ * Revision 1.60  2011/09/08 01:04:25  sam2kb
+ * minor/translation hint
+ *
  * Revision 1.59  2011/09/06 03:25:41  fplanque
  * i18n update
  *
