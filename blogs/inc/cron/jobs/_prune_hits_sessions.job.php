@@ -17,8 +17,12 @@ if( $Settings->get( 'auto_prune_stats_mode' ) != 'cron' )
 }
 
 load_class( 'sessions/model/_hitlist.class.php', 'Hitlist' );
+load_class( 'sessions/model/_internal_searches.class.php', 'Internalsearches' );
 
-$result_message = Hitlist::dbprune(); // will prune once per day, according to Settings
+// Prunning internal searches
+$result_message = Internalsearches::dbprune(); // will prune once per day, according to Settings
+
+$result_message .= Hitlist::dbprune(); // will prune once per day, according to Settings
 
 if( empty($result_message) )
 {
@@ -29,6 +33,9 @@ return 100;
 
 /*
  * $Log$
+ * Revision 1.4  2011/09/08 17:59:59  lxndral
+ * Prune for internal searches
+ *
  * Revision 1.3  2009/09/14 12:53:16  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

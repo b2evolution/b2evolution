@@ -143,6 +143,48 @@ class InternalSearches extends DataObject
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
 	}
+	/**
+	 * Auto pruning of old stats.
+	 *
+	 * It uses a general setting to store the day of the last prune, avoiding multiple prunes per day.
+	 **
+	 * NOTE: do not call this directly, but only in conjuction with auto_prune_stats_mode.
+	 *
+	 * @static
+	 * @return string Empty, if ok.
+	 */
+	function dbprune()
+	{
+		/**
+		 * @var DB
+		 */
+		global $DB;
+		global $Debuglog, $Settings, $localtimenow;
+		global $Plugins;
+
+		// Prune when $localtime is a NEW day (which will be the 1st request after midnight):
+		$last_prune = $Settings->get( 'auto_prune_stats_done' );
+		if( $last_prune >= date('Y-m-d', $localtimenow) && $last_prune <= date('Y-m-d', $localtimenow+86400) )
+		{ // Already pruned today (and not more than one day in the future -- which typically never happens)
+			return T_('Pruning has already been done today');
+		}
+
+		$time_prune_before = ($localtimenow - ($Settings->get('auto_prune_stats') * 86400)); // 1 day = 86400 seconds
+
+		$ids = $DB->get_results( "
+			SELECT hit_ID FROM T_hitlog
+			WHERE hit_datetime < '".date('Y-m-d', $time_prune_before)."'", 'Getting hit ids for prune' );
+		$rows_affected=0;
+		foreach ($ids as $item) {
+			$rows_affected+=$DB->query( "DELETE FROM T_logs__internal_searches WHERE isrch_hit_ID=". $item->hit_ID );
+		}
+		$Debuglog->add( 'InternalSearches::dbprune(): autopruned '.$rows_affected.' rows from T_logs__internal_searches.', 'request' );
+
+		// Optimizing tables
+		$DB->query('OPTIMIZE TABLE T_logs__internal_searches');
+
+		return ''; /* ok */
+	}
 
 
 }
@@ -150,6 +192,9 @@ class InternalSearches extends DataObject
 
 /*
  * $Log$
+ * Revision 1.3  2011/09/08 17:59:59  lxndral
+ * Prune for internal searches
+ *
  * Revision 1.2  2011/09/08 11:04:04  lxndral
  * fix for internal searches
  *
