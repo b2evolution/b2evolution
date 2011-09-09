@@ -362,6 +362,7 @@ switch( $tab )
 			case 'topengines':
 				$AdminUI->breadcrumbpath_add( T_('Top search engines'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab.'&amp;tab3='.$tab3 );
 				break;
+				
 			case 'intsearches':
 				$AdminUI->breadcrumbpath_add( T_('Internal searches'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab.'&amp;tab3='.$tab3 );
 				break;
@@ -435,47 +436,47 @@ $AdminUI->disp_payload_begin();
 
 flush();
 
-if (($tab=="refsearches") &&($tab3=="intsearches")) 
+if( ($tab=="refsearches") && ($tab3=="intsearches") ) 
 {
 	
-switch( $action )
-{
-	case 'nil':
-		// Do nothing
-		break;
+	switch( $action )
+	{
+		case 'nil':
+			// Do nothing
+			break;
 
 
-	case 'delete':
-		// We need to ask for confirmation:
-		$edited_Goal->confirm_delete(
-				sprintf( T_('Delete internal search item &laquo;%s&raquo;?'), $edited_intsearch->dget('keywords') ),
-				'internalsearch', $action, get_memorized( 'action' ) );
-		/* no break */
-	case 'new':
-	case 'copy':
-	case 'create':	// we return in this state after a validation error
-	case 'create_new':	// we return in this state after a validation error
-	case 'create_copy':	// we return in this state after a validation error
-	case 'edit':
-	case 'update':	// we return in this state after a validation error
-		$AdminUI->disp_view( 'sessions/views/_internal_search.form.php' );
-		break;
+		case 'delete':
+			// We need to ask for confirmation:
+			$edited_Goal->confirm_delete(
+					sprintf( T_('Delete internal search item &laquo;%s&raquo;?'), $edited_intsearch->dget('keywords') ),
+					'internalsearch', $action, get_memorized( 'action' ) );
+			/* no break */
+		case 'new':
+		case 'copy':
+		case 'create':	// we return in this state after a validation error
+		case 'create_new':	// we return in this state after a validation error
+		case 'create_copy':	// we return in this state after a validation error
+		case 'edit':
+		case 'update':	// we return in this state after a validation error
+			$AdminUI->disp_view( 'sessions/views/_internal_search.form.php' );
+			break;
 
 
-	default:
-		// No specific request, list all file types:
-		switch( $tab3 )
-		{
-			case 'intsearches':
-				// Cleanup context:
-				forget_param( 'isrch_ID' );
-				// Display goals list:
-				$AdminUI->disp_view( 'sessions/views/_stats_internal_searches.view.php' );
-				break;
+		default:
+			// No specific request, list all file types:
+			switch( $tab3 )
+			{
+				case 'intsearches':
+					// Cleanup context:
+					forget_param( 'isrch_ID' );
+					// Display goals list:
+					$AdminUI->disp_view( 'sessions/views/_stats_internal_searches.view.php' );
+					break;
 
-		}
+			}
 
-}
+	}
 
 } 
 else 
@@ -530,6 +531,7 @@ switch( $AdminUI->get_path(1) )
 			case 'topengines':
 				$AdminUI->disp_view( 'sessions/views/_stats_search_engines.view.php' );
 				break;
+				
 			case 'intsearches':
 				$AdminUI->disp_view( 'sessions/views/_stats_internal_searches.view.php' );
 				break;
@@ -579,6 +581,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.29  2011/09/09 21:48:51  fplanque
+ * indenting cleanp
+ *
  * Revision 1.28  2011/09/09 21:45:57  fplanque
  * doc
  *
