@@ -698,6 +698,8 @@ class Results extends Table
 		// Make sure we're not requesting a page out of range:
 		if( $this->page > $this->total_pages )
 		{
+			// sam2kb> Isn't it better to display "Page not found" error instead?
+			// Current implementation is bad for SEO bacause it can potentially display an unlimited number of duplicate pages
 			$this->page = $this->total_pages;
 		}
 	}
@@ -1839,6 +1841,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.38  2011/09/09 19:46:22  sam2kb
+ * doc
+ *
  * Revision 1.37  2011/09/07 00:28:26  sam2kb
  * Replace non-ASCII character in regular expressions with ~
  *
