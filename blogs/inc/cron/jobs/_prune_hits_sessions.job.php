@@ -20,6 +20,7 @@ load_class( 'sessions/model/_hitlist.class.php', 'Hitlist' );
 load_class( 'sessions/model/_internal_searches.class.php', 'Internalsearches' );
 
 // Prunning internal searches
+// fp>al: move this to HitList::dbprune() thta function should prune everything that is related all together (it already does Hits & Sessions)
 $result_message = Internalsearches::dbprune(); // will prune once per day, according to Settings
 
 $result_message .= Hitlist::dbprune(); // will prune once per day, according to Settings
@@ -33,6 +34,9 @@ return 100;
 
 /*
  * $Log$
+ * Revision 1.5  2011/09/09 21:53:55  fplanque
+ * doc
+ *
  * Revision 1.4  2011/09/08 17:59:59  lxndral
  * Prune for internal searches
  *

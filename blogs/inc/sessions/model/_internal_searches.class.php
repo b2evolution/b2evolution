@@ -45,7 +45,7 @@ class InternalSearches extends DataObject
 		{
 			$this->ID            = $db_row->isrch_ID;
 			$this->coll_ID       = $db_row->isrch_coll_ID;
-			$this->hit_ID    = $db_row->isrch_hit_ID;
+			$this->hit_ID        = $db_row->isrch_hit_ID;
 			$this->keywords      = $db_row->isrch_keywords;
 			
 		}
@@ -143,12 +143,16 @@ class InternalSearches extends DataObject
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
 	}
+
+
 	/**
 	 * Auto pruning of old stats.
 	 *
 	 * It uses a general setting to store the day of the last prune, avoiding multiple prunes per day.
-	 **
+	 *
 	 * NOTE: do not call this directly, but only in conjuction with auto_prune_stats_mode.
+	 *
+	 * @todo fp>al: move this to HitList::dbprune() thta function should prune everything that is related all together (it already does Hits & Sessions)
 	 *
 	 * @static
 	 * @return string Empty, if ok.
@@ -192,6 +196,9 @@ class InternalSearches extends DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2011/09/09 21:53:55  fplanque
+ * doc
+ *
  * Revision 1.3  2011/09/08 17:59:59  lxndral
  * Prune for internal searches
  *
