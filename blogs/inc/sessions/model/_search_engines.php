@@ -626,7 +626,7 @@ $search_engine_params = array(
 	'search.nifty.com'			=> array('Nifty', 'q', 'websearch/search?q={k}'),
 
 	// Nigma
-	'nigma.ru'					=> array('Nigma', 's', 'index.php?s={k}', '', 'startpos'),
+	'nigma.ru'					=> array('Nigma.ru', 's', 'index.php?s={k}', '', 'startpos'),
 
 	// Onet
 	'szukaj.onet.pl'			=> array('Onet.pl', 'qt', 'query.html?qt={k}'),
@@ -803,6 +803,9 @@ $search_engine_params = array(
 
 	// Web.nl
 	'www.web.nl'				=> array('Web.nl', 'zoekwoord'),
+
+	// Webalta.ru
+	'webalta.ru'				=> array('Webalta.ru', 'q', 'search?q={k}'),
 
 	// Weborama
 	'www.weborama.fr'			=> array('weborama', 'QUERY'),
