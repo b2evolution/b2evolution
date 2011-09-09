@@ -175,6 +175,10 @@ if( $use_l10n )
 
 		// sam2kb> b2evolution creates _global.php files with "\n" line breaks, and we must normalize newlines
 		// in supplied string before trying to translate it. Otherwise strings won't match.
+		// fp> TODO: this is not really satisfying in the long term. We need our own
+		// parser that will extract T_() TS_() NT_() etc string and create a normalized potfile.
+		// Actually it sgould create several potfiles. One for general use, one for admin, one for install, etc.
+		// That way translators can concentrate on the most essential stuff first.
 		$search_string = str_replace( array("\r\n", "\r"), "\n", $string );
 
 		if( isset( $trans[ $messages ][ $search_string ] ) )
@@ -1137,6 +1141,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.51  2011/09/09 21:45:57  fplanque
+ * doc
+ *
  * Revision 1.50  2011/09/07 07:22:00  sam2kb
  * Normalize line breaks in supplied string before trying to translate it
  *

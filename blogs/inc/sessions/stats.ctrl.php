@@ -54,11 +54,11 @@ if( $tab == 'sessions' && (!$perm_view_all || $blog != 0) )
 $tab3 = param( 'tab3', 'string', '', true );
 
 param( 'action', 'string' );
-if (($tab=="refsearches") &&($tab3=="intsearches")) {
-	
+if( ($tab=="refsearches") && ($tab3=="intsearches")) 
+{
 
 	if( param( 'isrch_ID', 'integer', '', true) )
-	{// Load file type:
+	{ // Load file type:  fp>al: please checl all your comments so they match the code
 		$ISCache = & get_InternalSearchesCache();
 		if( ($edited_intsearch = & $ISCache->get_by_ID( $isrch_ID, false )) === false )
 		{	// We could not find the goal to edit:
@@ -74,6 +74,7 @@ if (($tab=="refsearches") &&($tab3=="intsearches")) {
 	
 		case 'new':
 		case 'copy':
+// fp>al: do we use these?
 			// Check permission:
 			$sessions_Module->check_perm( 'edit' );
 			if( ! isset($edited_intsearch) )
@@ -88,6 +89,7 @@ if (($tab=="refsearches") &&($tab3=="intsearches")) {
 			break;
 	
 		case 'edit':
+// fp>al: do we use this?
 			// Edit file type form...:
 	
 			// Check permission:
@@ -144,6 +146,7 @@ if (($tab=="refsearches") &&($tab3=="intsearches")) {
 			break;
 	
 		case 'update':
+// fp>al: do we use this?
 			// Edit file type form...:
 	
 			// Check that this action request is not a CSRF hacked request:
@@ -204,7 +207,9 @@ if (($tab=="refsearches") &&($tab3=="intsearches")) {
 	}
 		
 	
-} else {
+}
+else
+{
 
 if( $blog == 0 )
 {
@@ -574,6 +579,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.28  2011/09/09 21:45:57  fplanque
+ * doc
+ *
  * Revision 1.27  2011/09/07 12:00:20  lxndral
  * internal searches update
  *

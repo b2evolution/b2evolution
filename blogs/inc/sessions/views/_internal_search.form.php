@@ -2,6 +2,8 @@
 /**
  * This file implements the Internal search item form.
  *
+ * fp>al: this is not used, right? So it should be removed from CVS.
+ *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  *
@@ -65,6 +67,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.2  2011/09/09 21:45:57  fplanque
+ * doc
+ *
  * Revision 1.1  2011/09/07 12:00:20  lxndral
  * internal searches update
  *
