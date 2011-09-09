@@ -415,7 +415,7 @@ if( $action != 'view' )
 	$Form->select( 'edited_user_idmode', $edited_User->get( 'idmode' ), array( &$edited_User, 'callback_optionsForIdMode' ), T_('Identity shown') );
 
 	$CountryCache = & get_CountryCache();
-	$Form->select_input_object( 'edited_user_ctry_ID', $edited_User->ctry_ID, $CountryCache, 'Country', array( 'required' => !$has_full_access, 'allow_none' => $has_full_access ) );
+	$Form->select_input_object( 'edited_user_ctry_ID', $edited_User->ctry_ID, $CountryCache, T_('Country'), array( 'required' => !$has_full_access, 'allow_none' => $has_full_access ) );
 
 	$Form->checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show online'), T_('Check this to be displayed as online when visiting the site.') );
 
@@ -751,6 +751,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.35  2011/09/09 06:34:16  sam2kb
+ * minor
+ *
  * Revision 1.34  2011/09/06 03:25:41  fplanque
  * i18n update
  *
