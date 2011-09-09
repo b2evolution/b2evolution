@@ -60,6 +60,8 @@ class pluralism_Skin extends Skin
 	/**
 	 * Get definitions for editable params
 	 *
+	 * fp>alev : please put the functions in the ***same*** order in all skins. Use evopress as a reference.
+	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param local params like 'for_editing' => true
 	 */
