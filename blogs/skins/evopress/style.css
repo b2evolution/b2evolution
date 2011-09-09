@@ -438,13 +438,38 @@ table.bCalendarTable th {
 font-size: 100%;
 }
 
-input.SearchField {
-width: 182px;
-padding: 2px;
+.widget_core_coll_search_form div.compact_search_form input.SearchField {
+	width: 106px;
+	background:url(img/search_i_bg.png) no-repeat left top;
+	border:0px;
+	height:23px;
+	padding:0px 10px 0px 25px;
+	float:left;
+	margin:0px 4px 15px 0px;
+	font:bold 12px Arial, Helvetica, sans-serif;
+	color:#535353;
 }
+.widget_core_coll_search_form div.compact_search_form input:hover.SearchField {
+	background:url(img/search_i_bg.png) no-repeat 0px -24px;
+}
+
+.compact_search_form{padding:10px 0px 0px 0px;}
+
+.widget_core_coll_search_form div.compact_search_form input.search_submit{
+	width:42px;
+	height:24px;
+	background:url(img/submit_btn.png) no-repeat left top;
+	border:0px;
+	font-size:0px;
+	padding:0px;
+	float:left;
+	cursor:pointer;
+}
+.widget_core_coll_search_form div.compact_search_form input:hover.search_submit{
+	background:url(img/submit_btn.png) no-repeat 0px -24px;
+}
+
 /* End Sidebar */
-
-
 
 
 
