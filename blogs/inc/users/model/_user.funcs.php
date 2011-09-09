@@ -197,10 +197,11 @@ function use_in_skin_login()
  * @param string
  * @param string
  * @param boolean Display the link, if the user is already logged in? (this is used by the login form)
+ * @param string
  */
 function user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#', $disp_when_logged_in = false, $default_source_string = '' )
 {
-	echo get_user_register_link( $before, $after, $link_text, $link_title, $disp_when_logged_in, $default_source_string );
+	echo get_user_register_link( $before, $after, $link_text, $link_title, $disp_when_logged_in, NULL, $default_source_string );
 }
 
 
@@ -1013,6 +1014,9 @@ function get_prefered_name( $nickname, $firstname, $login )
 
 /*
  * $Log$
+ * Revision 1.47  2011/09/09 00:25:15  fplanque
+ * fix
+ *
  * Revision 1.46  2011/09/08 23:29:27  fplanque
  * More blockcache/widget fixes around login/register links.
  *
