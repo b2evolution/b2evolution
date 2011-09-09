@@ -1042,7 +1042,7 @@ function create_demo_contents()
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
-	$edited_Item->insert( 1, 'Alex', '', $now, $cat_linkblog_contrib, array(), 'published', 'de-DE', '', 'http://b2evo.sonorth.com/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Alex', '', $now, $cat_linkblog_contrib, array(), 'published', 'ru-RU', '', 'http://b2evo.sonorth.com/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -1352,6 +1352,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.315  2011/09/09 23:42:21  sam2kb
+ * minor/locale fix
+ *
  * Revision 1.314  2011/09/09 22:32:18  fplanque
  * doc
  *
