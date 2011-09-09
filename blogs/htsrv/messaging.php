@@ -1,7 +1,8 @@
 <?php
 /**
- * This file process threads, messages and contacts actions sent out from front office Messages.
- * Logged in users required to process these actions.
+ * This file processes threads, messages and contacts actions sent out from front office Messages.
+ * 
+ * User must be logged to process these actions.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -150,6 +151,9 @@ header_redirect( $redirect_to ); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.3  2011/09/09 22:10:54  fplanque
+ * doc
+ *
  * Revision 1.2  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

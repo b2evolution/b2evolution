@@ -128,7 +128,10 @@ class Comment extends DataObject
 	var $notif_ctsk_ID;
 	
 	/**
-	 * Is comment is reply to some other comment ?
+	 * Is this comment a reply to another comment ?
+	 *
+	 * This can be used by plugins to display threaded comments.
+	 *
 	 * @var integer
 	 */
 	var $in_reply_to_cmt_ID;
@@ -2040,8 +2043,11 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.89  2011/09/09 22:10:54  fplanque
+ * doc
+ *
  * Revision 1.88  2011/09/08 13:55:50  lxndral
- * Add an 'in reply to' DB field at least
+ * Add an 'in reply to' DB field 
  *
  * Revision 1.87  2011/09/05 21:00:56  sam2kb
  * minor
