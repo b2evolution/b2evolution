@@ -58,10 +58,10 @@ if( ($tab=="refsearches") && ($tab3=="intsearches"))
 {
 
 	if( param( 'isrch_ID', 'integer', '', true) )
-	{ // Load file type:  fp>al: please checl all your comments so they match the code
+	{ 
 		$ISCache = & get_InternalSearchesCache();
 		if( ($edited_intsearch = & $ISCache->get_by_ID( $isrch_ID, false )) === false )
-		{	// We could not find the goal to edit:
+		{	// We could not find the internal search to edit:
 			unset( $edited_intsearch );
 			forget_param( 'isrch_ID' );
 			$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('InternalSearch') ), 'error' );
@@ -72,114 +72,6 @@ if( ($tab=="refsearches") && ($tab3=="intsearches"))
 	switch( $action )
 	{
 	
-		case 'new':
-		case 'copy':
-// fp>al: do we use these?
-			// Check permission:
-			$sessions_Module->check_perm( 'edit' );
-			if( ! isset($edited_intsearch) )
-			{	// We don't have a model to use, start with blank object:
-				$edited_intsearch = new InternalSearches();
-			}
-			else
-			{	// Duplicate object in order no to mess with the cache:
-				$edited_intsearch = duplicate( $edited_intsearch ); // PHP4/5 abstraction
-				$edited_intsearch->ID = 0;
-			}
-			break;
-	
-		case 'edit':
-// fp>al: do we use this?
-			// Edit file type form...:
-	
-			// Check permission:
-			$sessions_Module->check_perm( 'edit' );
-	
-			// Make sure we got an ftyp_ID:
-			param( 'isrch_ID', 'integer', true );
-	 		break;
-	
-		case 'create': // Record new goal
-		case 'create_new': // Record goal and create new
-		case 'create_copy': // Record goal and create similar
-			// Insert new file type...:
-			$edited_intsearch = new InternalSearches();
-	
-			// Check that this action request is not a CSRF hacked request:
-			$Session->assert_received_crumb( 'internalsearches' );
-	
-			// Check permission:
-			$sessions_Module->check_perm( 'edit' );
-	
-			// load data from request
-			if( $edited_intsearch->load_from_Request() )
-			{	// We could load data from form without errors:
-	
-				// Insert in DB:
-				$DB->begin();
-				$edited_intsearch->dbinsert();
-				$Messages->add( T_('New internal search created.'), 'success' );
-				$DB->commit();
-	
-				if( empty($q) )
-				{	// What next?
-					switch( $action )
-					{
-						case 'create_copy':
-							// Redirect so that a reload doesn't write to the DB twice:
-							header_redirect( '?ctrl=stats&tab=refsearches&tab3=intsearches&action=new&isrch_ID='.$edited_intsearch->ID, 303 ); // Will EXIT
-							// We have EXITed already at this point!!
-							break;
-						case 'create_new':
-							// Redirect so that a reload doesn't write to the DB twice:
-							header_redirect( '?ctrl=stats&action=new&tab=refsearches&tab3=intsearches', 303 ); // Will EXIT
-							// We have EXITed already at this point!!
-							break;
-						case 'create':
-							// Redirect so that a reload doesn't write to the DB twice:
-							header_redirect( '?ctrl=stats&tab=refsearches&tab3=intsearches', 303 ); // Will EXIT
-							// We have EXITed already at this point!!
-							break;
-					}
-				}
-			}
-			break;
-	
-		case 'update':
-// fp>al: do we use this?
-			// Edit file type form...:
-	
-			// Check that this action request is not a CSRF hacked request:
-			$Session->assert_received_crumb( 'internalsearches' );
-	
-			// Check permission:
-			$sessions_Module->check_perm( 'edit' );
-	
-			// Make sure we got an ftyp_ID:
-			param( 'isrch_ID', 'integer', true );
-	
-			// load data from request
-			if( $edited_intsearch->load_from_Request() )
-			{	// We could load data from form without errors:
-	
-				// Update in DB:
-				$DB->begin();
-				$edited_intsearch->dbupdate();
-				$Messages->add( T_('Internal search updated.'), 'success' );
-				$DB->commit();
-	
-				if( empty($q) )
-				{
-					$action = 'list';
-					// Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( '?ctrl=stats&tab=refsearches&tab3=intsearches', 303 ); // Will EXIT
-					// We have EXITed already at this point!!
-				}
-			}
-	
-	
-			break;
-	
 		case 'delete':
 			// Delete file type:
 	
@@ -189,12 +81,11 @@ if( ($tab=="refsearches") && ($tab3=="intsearches"))
 			// Check permission:
 			$sessions_Module->check_perm( 'edit' );
 	
-			// Make sure we got an ftyp_ID:
+			// Make sure we got an isrch_ID:
 			param( 'isrch_ID', 'integer', true );
 			
 				
 				$msg = sprintf( T_('Internal search &laquo;%s&raquo; deleted.'), $edited_intsearch->dget('name') );
-				//print_r($edited_intsearch);
 				$edited_intsearch->dbdelete( true );
 				unset( $edited_intsearch );
 				forget_param( 'isrch_ID' );
@@ -581,6 +472,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.30  2011/09/09 23:05:08  lxndral
+ * Search for "fp>al" in code to find my comments and please make requested changed
+ *
  * Revision 1.29  2011/09/09 21:48:51  fplanque
  * indenting cleanp
  *

@@ -145,11 +145,14 @@ $schema_queries['T_logs__internal_searches'] = array('Creating internal searches
   `isrch_hit_ID` bigint(20) NOT NULL default '0',
   `isrch_keywords` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`isrch_ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;");
-// fp>al : CHARSET is not right!
+) ENGINE=MyISAM DEFAULT CHARSET= = $db_storage_charset");
+
 		
 /*
  * $Log$
+ * Revision 1.20  2011/09/09 23:05:08  lxndral
+ * Search for "fp>al" in code to find my comments and please make requested changed
+ *
  * Revision 1.19  2011/09/08 11:06:02  lxndral
  * fix for sessions install script (internal searches)
  *

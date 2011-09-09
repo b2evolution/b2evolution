@@ -31,10 +31,9 @@ if( !empty($internalsearches_keywords) ) // TODO: allow combine
 { // We want to filter on the goal name:
 	$SQL->WHERE_and( 'isrch_keywords LIKE '.$DB->quote('%'.$internalsearches_keywords.'%') );
 }
-// fp>al: never use just JOIN; always add INNER , LEFT or RIGHT before JOIN
-$SQL->FROM_add( 'JOIN T_hitlog ON isrch_hit_ID = hit_ID' );
-$SQL->FROM_add( 'JOIN T_sessions ON hit_sess_ID = sess_ID' );
-$SQL->FROM_add( 'JOIN T_blogs ON isrch_coll_ID = blog_ID' );
+$SQL->FROM_add( 'INNER JOIN T_hitlog ON isrch_hit_ID = hit_ID' );
+$SQL->FROM_add( 'INNER JOIN T_sessions ON hit_sess_ID = sess_ID' );
+$SQL->FROM_add( 'INNER JOIN T_blogs ON isrch_coll_ID = blog_ID' );
 $Results = new Results( $SQL->get(), 'internalsearches_', '-A' );
 
 $Results->Cache = & get_InternalSearchesCache();
@@ -78,8 +77,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Session'),
 		'order' => 'sess_ID',
-// fp>al: & is wrong. The correct syntax is: &amp;
-		'td' => '<a href="admin.php?ctrl=stats&tab=sessions&tab3=hits&blog=0&sess_ID=$sess_ID$">$sess_ID$</a>',
+		'td' => '<a href="admin.php?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0&amp;sess_ID=$sess_ID$">$sess_ID$</a>',
  	);
 $Results->cols[] = array(
 		'th' => T_('Hit date'),
@@ -114,6 +112,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.4  2011/09/09 23:05:08  lxndral
+ * Search for "fp>al" in code to find my comments and please make requested changed
+ *
  * Revision 1.3  2011/09/09 21:45:57  fplanque
  * doc
  *

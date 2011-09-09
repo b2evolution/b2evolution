@@ -30,7 +30,7 @@ class watermark_plugin extends Plugin
 	var $number_of_installs = 1;
 
 	// fp>alex: please init vars properly
-	var $fonts_dir;
+	var $fonts_dir = "";
 
 	/**
 	 * Init

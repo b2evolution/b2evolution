@@ -19,10 +19,6 @@ if( $Settings->get( 'auto_prune_stats_mode' ) != 'cron' )
 load_class( 'sessions/model/_hitlist.class.php', 'Hitlist' );
 load_class( 'sessions/model/_internal_searches.class.php', 'Internalsearches' );
 
-// Prunning internal searches
-// fp>al: move this to HitList::dbprune() thta function should prune everything that is related all together (it already does Hits & Sessions)
-$result_message = Internalsearches::dbprune(); // will prune once per day, according to Settings
-
 $result_message .= Hitlist::dbprune(); // will prune once per day, according to Settings
 
 if( empty($result_message) )
@@ -34,6 +30,9 @@ return 100;
 
 /*
  * $Log$
+ * Revision 1.6  2011/09/09 23:05:08  lxndral
+ * Search for "fp>al" in code to find my comments and please make requested changed
+ *
  * Revision 1.5  2011/09/09 21:53:55  fplanque
  * doc
  *
