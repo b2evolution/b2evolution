@@ -74,6 +74,13 @@ class custom_Skin extends Skin
 					'options' => array( 'left' => $this->T_('Left'), 'right' => $this->T_('Right') ),
 					'type' => 'select',
 				),
+				'colorbox' => array(
+					'label' => T_('Colorbox enabled'),
+					'note' => T_('Check if colorbox enabled'),
+					'defaultvalue' => true,
+					'type'	=>	'checkbox',
+					'for_editing'	=>	true,
+				)
 
 			), parent::get_param_definitions( $params )	);
 
@@ -117,13 +124,18 @@ class custom_Skin extends Skin
 		}
 
 		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
-		require_js_helper( 'colorbox' );
+		if ($this->get_setting("colorbox")) {
+			require_js_helper( 'colorbox' );
+		}
 	}
 
 }
 
 /*
  * $Log$
+ * Revision 1.10  2011/09/09 23:26:47  lxndral
+ * Add _skins.class.php to all skins  (Easy task)
+ *
  * Revision 1.9  2011/09/07 00:28:26  sam2kb
  * Replace non-ASCII character in regular expressions with ~
  *

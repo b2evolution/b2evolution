@@ -19,10 +19,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class vastitude_Skin extends Skin
 {
-	/**
-	 * colorbox enable
-	 */ 
-  	var $colorbox=true;
   	
   /**
 	 * Get default name for the skin.
@@ -56,7 +52,7 @@ class vastitude_Skin extends Skin
 
 
 		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
-		if ($this->colorbox) 
+		if ($this->get_setting("colorbox")) 
 		{
 			require_js_helper( 'colorbox' );
 		}
@@ -76,8 +72,6 @@ class vastitude_Skin extends Skin
 					'note' => T_('Check if colorbox enabled'),
 					'defaultvalue' => true,
 					'type'	=>	'checkbox',
-					'valid_pattern' => array( 'pattern'=>'~^([0-4]{1})?$~',
-																		'error'=>T_('Invalid colorbox value.') ),
 					'for_editing'	=>	true,
 				)
 			), parent::get_param_definitions( $params )	);
