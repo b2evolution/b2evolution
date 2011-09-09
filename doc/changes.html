@@ -32,69 +32,87 @@
 
 			<h1>4.x series</h1>
 			<p>Skins and plugins from v2 &amp; v3 are compatible with v4 and should run without problems.</p>
-			<h2>4.1.0-beta</h2>
+			<h2>4.2.0-beta</h2>
 			  <ul>
-            	<li>Comments:
-            	  <ul>
-            	    <li>Comments can now be deleted with a single click... but they remain in the &quot;Recycle bin&quot; so they can be recovered if needed. (@evofactory)</li>
-            	    <li>Comments can now optionally be paged in the front end (@sam2kb)</li>
-					<li>Display comment excerpts in feeds. Comment feeds can now be disabled per blog (@sam2kb).</li>
-            	    <li>Default avatars can be configured do different graphic styles: b2evo default, Gravatar, Identicon, Monsterid or Wavatar (@sam2kb)</li>
-            	    <li>Feature to elevate an interesting comment into a post were you can elaborate. Look for the &quot;Elevate into a post&quot; link at the top right of the comment edit form. (@evofactory)</li>
-            	    <li>It is now possible for users to subscribe to comment replies / get notified when new comments are posted on a specific post. (@evofactory)</li>
-            	    <li>It is now possible to attach images and other types of files to comments. File types that can be uploaded by anonymous users are configurable (only GIF, JPG and PNG by default). (@evofactory)</li>
-					<li>It is now possible to configure comment feeds (full comments, excerpts only or disabled) (@sam2kb)</li>
+            	<li>...
           	      </ul>
 				</li>
-            	<li>User management:
+
+			<h2>4.1.0-beta</h2>
+			  <ul>
+            	<li><strong>Comments &amp; Antispam:</strong>
+                  <ul>
+   	    <li>Comments can now be deleted with a single click... no more javascript confirmation... no more wasting time when slaughtering spam. Of course we though of the occasional mistake: deleted comments now remain in the &quot;Recycle bin&quot; so they can be recovered with just another click... until, of course, you empty the recycle bin.(@evofactory)</li>
+            	    <li>Comment paging in the front end. Optional. # of comments per page is configurable. (@sam2kb)</li>
+					<li>Comment feeds configuration. Comment feeds can now be disabled per blog. It's also possible to just include a small excerpt for every comment. (@sam2kb).</li>
+            	    <li>Default commenter avatars can now be configured to different graphic styles: b2evo default, Gravatar, Identicon, Monsterid or Wavatar (@sam2kb)</li>
+            	    <li>Feature to elevate an interesting comment into a post were you can elaborate on what the commenter said. Look for the &quot;Elevate into a post&quot; link at the top right of the comment edit form. The comment is quoted in the new post and the original comment is deprecated. (@evofactory)</li>
+            	    <li>It is now possible for users to subscribe to comment replies / get notified by email when new comments are posted on a specific post. (@evofactory)</li>
+            	    <li>Comment attachments. It is now possible to attach images and other types of files to comments. This feature can be disabled or restricted to logged in users. The file types that can be uploaded by anonymous users are configurable (only GIF, JPG and PNG by default). (@evofactory)</li>
+          	      </ul>
+                  <ul>
+                    <li>The comment &amp; contact forms are now loaded in Javascript/AJAX by default (go to Blog Settings &gt; Advanced Settings &gt; Caching to control this). This makes it harder for spam bots to post spam (If they still do, it goes into the moderation queue anyways). (@evofactory)</li>
+                    <li>Tool to delete all comments &amp; hits matching the blacklist. (@sam2kb)</li>
+                  </ul>
+            	</li>
+            	<li><strong>Blog skin design &amp; features:</strong>
             	  <ul>
-            	    <li>Gender property for users (@evofactory)</li>
-            	    <li>Show Gender &amp; Country in user list (@evofactory)</li>
-            	    <li>Show confirmed status in user list (@sam2kb)</li>
+            	    <li>Colorbox (jQuery Lightbox alternative) integration: clicking on images attached to posts will now automatically open a zoom window. When multiple images are attached to a post it's possible to start a slideshow. (@francoisplanque)</li>
+            	    <li>Slightly redesigned login &amp; registration forms. A little less clutter and a little more help text. (@evofactory).</li>
+            	    <li>Nicer search form design on the evopress skin. (@evofactory) </li>
+            	    <li>Users can now edit their user profile in the front office without going to the admin. (@evofactory)</li>
+            	    <li>It is now possible to display login and registration forms inside of the skin in order to keep visual consistency when users log in. Turn this on in Blog settings &gt; Advanced. (@evofactory)</li>
+          	    </ul>
+          	  </li>
+            	<li><strong>User management:</strong>
+            	  <ul>
+            	    <li>It is now possible to ask users for their gender. (@evofactory)</li>
+            	    <li>Showing Gender &amp; Country in user list. (@evofactory)</li>
+            	    <li>Showing confirmed status in user list. (@sam2kb)</li>
             	    <li>Registration form accepts a source param. ?source=... that will be attached to the new user profile (30 characters max). Can be used for tracking newsletter or ad returns. (@evofactory)</li>
             	    <li>Specific user groups can be given permission to access the shared file root or not. (@evofactory)</li>
-                    <li>View personal blogs in user profile (backoffice) (@sam2kb)</li>
-                    <li>Full support of non-ASCII usernames/logins (@sam2kb)</li>
-                    <li>Ability to upload an avatar directly into the User form without going through Files Management (@evofactory)</li>
-          	      </ul>
+            	    <li>Tab to view the list of blogs belonging to a user in the user profile (backoffice only) (@sam2kb)</li>
+            	    <li>Full support of non-ASCII usernames/logins (@sam2kb)</li>
+            	    <li>Users can now upload an avatar/profile picture directly into the User form without going through Files Management (@evofactory)</li>
+          	    </ul>
           	  </li>
-           	  <li>User permissions on blogs:
-           	    <ul>
-           	      <li>Advanced user permissions screen has been refactored       	          </li>
-           	      <li>Editing timestamps is now a specific permission and no longer a &quot;level based&quot; permission.</li>
-           	      <li>There are now separate permissions for editing comments depending on their status  (published, deprecated, draft).</li>
-       	        </ul>
-       	      </li>
-           	  <li>Blogs:
-           	    <ul>
-           	      <li>Added possibility to define new blog types in a plugin so that users can create blogs with preconfigured settings for specific tasks. Install the test plugin for a demo implementation of this. (@sam2kb)</li>
-       	        </ul>
-           	  </li>
-           	  <li>Statistics:
-                <ul>
-                  <li>Improved search engine detection algorithms (@sam2kb)</li>
-                  <li>Better handling of regional character sets and &quot;serp ranks&quot;</li>
-                  <li>Search engines definitions moved to /inc/sessions/model/_search_engines.php</li>
-                </ul>
-              </li>
-           	  <li>Installer:
-           	    <ul>
-           	      <li>The installer will now create default scheduled jobs for: pruning the stats (hit log &amp; session log), pruning the page cache &amp; updating the antispam blacklist. (@evofactory)</li>
+            	<li><strong>User permissions on blogs:</strong>
+  <ul>
+    <li>The advanced user permissions screen has been refactored.</li>
+    <li>Editing timestamps is now a specific permission and no longer a &quot;level based&quot; permission.</li>
+    <li>There are now separate permissions for editing comments depending on their status  (published, deprecated, draft).</li>
+    </ul>
+          	  </li>
+           	  <li><strong>Plugins:</strong>
+<ul>
+       	        <li>Added possibility to define new blog types in a plugin so that users can create blogs with preconfigured settings for specific tasks. Install the test plugin for a demo implementation of this. (@sam2kb)</li>
+       	        <li>Basic antispam plugin: remove repetitive characters and trim whitespace (@sam2kb)</li>
        	        </ul>
            	  </li>
-              <li>Autocompletion when adding tags to a post (@blueyed)</li>
-              <li>Antispam:
-                <ul>
-                  <li>AJAX comment &amp; contact forms are now loaded in Javascript/AJAX by default (go to Blog Settings &gt; Advanced Settings &gt; Caching to control this). This makes it harder for spam bots to post spam (that goes into the moderation queue anyways). (@evofactory)</li>
-                  <li>Basic antispam plugin: remove repetitive characters and trim whitespace (@sam2kb)</li>
-                  <li>Super fast comment moderation with one click delete (and ability to recover in case of mistake by opening the recycle bin) (@evofactory)</li>
-				  <li>Tool to delete all comments &amp; hits matching the blacklist (@sam2kb)</li>
+           	  <li><strong>Statistics:</strong>
+<ul>
+            <li>Improved search engine detection algorithms (@sam2kb)</li>
+                  <li>Better handling of regional character sets and &quot;serp ranks&quot;.</li>
+                  <li>Search engines definitions moved to /inc/sessions/model/_search_engines.php.</li>
                 </ul>
               </li>
-			  <li>Colorbox (jQuery Lightbox alternative) integration: clicking on images attached to posts will now automatically open a zoom window. When multiple images are attached to a post it's possible to start a slideshow. (@francoisplanque)</li>
-			  <li>Enhanced Block Caching for widgets with better cache keys and ability to manually turn off Block Cacheing for any widget. (@francoisplanque)</li>
-              <li>Page cache repair tool. (@evofactory)</li>
-              <li>Bugfixes (@sam2kb, @blueyed)</li>
+           	  <li><strong>Installer:</strong>
+<ul>
+       	        <li>The installer will now create default scheduled jobs for: pruning the stats (hit log &amp; session log), pruning the page cache &amp; updating the antispam blacklist. (@evofactory)</li>
+       	        </ul>
+           	  </li>
+              <li><strong>Backoffice:</strong>
+                <ul>
+                  <li>Autocompletion when adding tags to a post (@blueyed)</li>
+                  <li>Page cache repair tool. (@evofactory)</li>
+                </ul>
+              </li>
+              <li><strong>Performance</strong>:</li>
+              <ul>
+                <li>Enhanced Block Caching for widgets with better cache keys and ability to manually turn off Block Caching for any widget. (@francoisplanque)</li>
+                <li>Enhanced Page Caching with auto repair of the directory structure if needed. Page caching is now turned on by default. (@evofactory)</li>
+              </ul>
+              <li><strong>Bugfixes</strong> (@sam2kb, @blueyed, @francoisplanque, @evofactory)</li>
             </ul>
 	<h2>4.0.2-beta</h2>
             <ul>
