@@ -66,10 +66,11 @@ class evopress_Skin extends Skin
 					'type' => 'select',
 				),
 				'colorbox' => array(
-					'label' => T_('Colorbox enabled'),
-					'note' => T_('Check if colorbox enabled'),
+					'label' => T_('Colorbox Image Zoom'),
+					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
 					'defaultvalue' => true,
 					'type'	=>	'checkbox',
+// fp>alev : what is that??					
 					'valid_pattern' => array( 'pattern'=>'~^([0-4]{1})?$~',
 																		'error'=>T_('Invalid colorbox value.') ),
 					'for_editing'	=>	true,
@@ -104,8 +105,8 @@ class evopress_Skin extends Skin
 		require_css( 'style.css', true );
 
 		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
-		if ($this->colorbox) 
-		{
+		if( $this->colorbox ) 
+		{	// fp>alev this is not working! The test is wrong.
 			require_js_helper( 'colorbox' );
 		}
 	}
@@ -114,6 +115,9 @@ class evopress_Skin extends Skin
 
 /*
  * $Log$
+ * Revision 1.7  2011/09/09 22:44:23  fplanque
+ * no message
+ *
  * Revision 1.6  2011/09/08 13:42:37  lxndral
  * Add _skins.class.php to all skins  (Easy task)
  *
