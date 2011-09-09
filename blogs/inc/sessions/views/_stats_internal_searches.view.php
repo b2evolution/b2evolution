@@ -31,6 +31,7 @@ if( !empty($internalsearches_keywords) ) // TODO: allow combine
 { // We want to filter on the goal name:
 	$SQL->WHERE_and( 'isrch_keywords LIKE '.$DB->quote('%'.$internalsearches_keywords.'%') );
 }
+$SQL->WHERE_and( 'blog_id = '.$DB->quote( $blog ) );
 $SQL->FROM_add( 'INNER JOIN T_hitlog ON isrch_hit_ID = hit_ID' );
 $SQL->FROM_add( 'INNER JOIN T_sessions ON hit_sess_ID = sess_ID' );
 $SQL->FROM_add( 'INNER JOIN T_blogs ON isrch_coll_ID = blog_ID' );
@@ -77,12 +78,13 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Session'),
 		'order' => 'sess_ID',
+		'td_class' => 'right',
 		'td' => '<a href="admin.php?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0&amp;sess_ID=$sess_ID$">$sess_ID$</a>',
  	);
 $Results->cols[] = array(
 		'th' => T_('Hit date'),
 		'order' => 'hit_datetime',
-		'td' => '$hit_datetime$',
+		'td' => '%mysql2localedatetime_spans( #hit_datetime#, "M-d" )%',
  	);
 
 
@@ -112,6 +114,10 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.5  2011/09/09 23:42:26  lxndral
+ * Internal search log (see email)
+ * changes for displaying
+ *
  * Revision 1.4  2011/09/09 23:05:08  lxndral
  * Search for "fp>al" in code to find my comments and please make requested changed
  *
