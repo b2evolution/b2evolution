@@ -197,7 +197,7 @@ function use_in_skin_login()
  * @param string
  * @param string
  * @param boolean Display the link, if the user is already logged in? (this is used by the login form)
- * @param string
+ * @param string used for source tracking if $source is not already set
  */
 function user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#', $disp_when_logged_in = false, $default_source_string = '' )
 {
@@ -212,7 +212,7 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
  * @param string
  * @param boolean Display the link, if the user is already logged in? (this is used by the login form)
  * @param string Where to redirect
- * @return string
+ * @return string used for source tracking
  */
 function get_user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#',
 		$disp_when_logged_in = false, $redirect = null, $default_source_string = '' )
@@ -321,7 +321,7 @@ function get_user_logout_link( $before = '', $after = '', $link_text = '', $link
 {
 	global $current_User;
 
-	if( ! is_logged_in() || $link_text=='' )
+	if( ! is_logged_in() )
 	{
 		return false;
 	}
@@ -1014,6 +1014,9 @@ function get_prefered_name( $nickname, $firstname, $login )
 
 /*
  * $Log$
+ * Revision 1.48  2011/09/09 22:31:48  fplanque
+ * rollback
+ *
  * Revision 1.47  2011/09/09 00:25:15  fplanque
  * fix
  *
