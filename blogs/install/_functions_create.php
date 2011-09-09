@@ -38,7 +38,6 @@
  * @author mfollett: Matt Follett.
  *
  * @version $Id$
- * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1038,22 +1037,18 @@ function create_demo_contents()
 	$timestamp++;
 	$now = date('Y-m-d H:i:s',$timestamp + 59);
 	$edited_Item = new Item();
-	$edited_Item->insert( 1, 'Danny', '', $now, $cat_linkblog_contrib, array(), 'published', 'en-US', '', 'http://personman.com/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Evo Factory', '', $now, $cat_linkblog_contrib, array(), 'published', 'en-US', '', 'http://evofactory.com/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
-	$edited_Item->insert( 1, 'Daniel', '', $now, $cat_linkblog_contrib, array(), 'published', 'de-DE', '', 'http://daniel.hahler.de/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Alex', '', $now, $cat_linkblog_contrib, array(), 'published', 'de-DE', '', 'http://b2evo.sonorth.com/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
 	$edited_Item->insert( 1, 'Francois', '', $now, $cat_linkblog_contrib, array(), 'published', 'fr-FR', '', 'http://fplanque.com/', 'disabled', array() );
 
-	// Insert a post into linkblog:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = new Item();
-	$edited_Item->insert( 1, 'Tilman', '', $now, $cat_linkblog_contrib, array(), 'published', 'de-DE', '', 'http://ax86.net/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -1357,6 +1352,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.314  2011/09/09 22:32:18  fplanque
+ * doc
+ *
  * Revision 1.313  2011/09/07 12:00:20  lxndral
  * internal searches update
  *
