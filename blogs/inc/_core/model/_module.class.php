@@ -83,7 +83,7 @@ class Module
 	}
 
 	/**
-	 * Displays the module collection feature settings
+	 * Displays the module's collection feature settings
 	 * 
 	 * @param array 
 	 * 		array['Form'] - where to display;
@@ -94,7 +94,7 @@ class Module
 	}
 
 	/**
-	 * Update the module collection feature settings
+	 * Updates the module's collection feature settings
 	 * 
 	 * @param array
 	 * 		array['edited_Blog'] - which blog properties should be updated;
@@ -104,7 +104,7 @@ class Module
 	}
 
 	/**
-	 * Displays the module item settings
+	 * Displays the module's item settings
 	 * 
 	 * @param array 
 	 * 		array['Form'] - where to display;
@@ -116,7 +116,7 @@ class Module
 	}
 
 	/**
-	 * Update the module collection feature settings
+	 * Updates the module's collection feature settings
 	 * 
 	 * @param array
 	 * 		array['edited_Item'] - which item setting should be updated;
@@ -173,6 +173,9 @@ class Module
 
 /*
  * $Log$
+ * Revision 1.8  2011/09/09 22:01:05  fplanque
+ * doc
+ *
  * Revision 1.7  2011/09/07 07:29:38  efy-asimo
  * module class improvements
  *

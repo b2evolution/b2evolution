@@ -203,6 +203,9 @@ class BlockCache
 	}
 
 
+	/**
+	 * This should be called right after ::check() in order to start collecting a new block for the cache.
+	 */
 	function start_collect()
 	{
 		global $Debuglog;
@@ -293,6 +296,9 @@ class BlockCache
 
 /*
  * $Log$
+ * Revision 1.20  2011/09/09 22:01:05  fplanque
+ * doc
+ *
  * Revision 1.19  2011/09/07 18:25:11  fplanque
  * widget & blockcache fixes
  *
