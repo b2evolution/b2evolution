@@ -75,13 +75,11 @@ class custom_Skin extends Skin
 					'type' => 'select',
 				),
 				'colorbox' => array(
-					'label' => T_('Colorbox enabled'),
-					'note' => T_('Check if colorbox enabled'),
-					'defaultvalue' => true,
+					'label' => T_('Colorbox Image Zoom'),
+					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
+					'defaultvalue' => 1,
 					'type'	=>	'checkbox',
-					'for_editing'	=>	true,
-				)
-
+				),							
 			), parent::get_param_definitions( $params )	);
 
 		return $r;
@@ -124,7 +122,8 @@ class custom_Skin extends Skin
 		}
 
 		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
-		if ($this->get_setting("colorbox")) {
+		if($this->get_setting("colorbox")) 
+		{
 			require_js_helper( 'colorbox' );
 		}
 	}
@@ -133,6 +132,9 @@ class custom_Skin extends Skin
 
 /*
  * $Log$
+ * Revision 1.11  2011/09/10 21:18:33  fplanque
+ * cleanup
+ *
  * Revision 1.10  2011/09/09 23:26:47  lxndral
  * Add _skins.class.php to all skins  (Easy task)
  *

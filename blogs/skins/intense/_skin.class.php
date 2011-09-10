@@ -19,8 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class intense_Skin extends Skin
 {
-  	
-  	/**
+	/**
 	 * Get default name for the skin.
 	 * Note: the admin can customize it.
 	 */
@@ -54,13 +53,11 @@ class intense_Skin extends Skin
 																		'error'=>T_('Invalid Header Image.') ),
 				),
 				'colorbox' => array(
-					'label' => T_('Colorbox enabled'),
-					'note' => T_('Check if colorbox enabled'),
+					'label' => T_('Colorbox Image Zoom'),
+					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
 					'defaultvalue' => true,
 					'type'	=>	'checkbox',
-					'for_editing'	=>	true,
-				),
-				
+				),							
 			), parent::get_param_definitions( $params )	);
 
 		return $r;
@@ -75,7 +72,7 @@ class intense_Skin extends Skin
 	{
 		// call parent:
 		parent::display_init();
-		if ($this->get_setting("colorbox")) 
+		if($this->get_setting("colorbox")) 
 		{
 			require_js_helper( 'colorbox' );
 		}

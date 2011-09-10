@@ -19,8 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class evopress_Skin extends Skin
 {
- 	
-  	/**
+  /**
 	 * Get default name for the skin.
 	 * Note: the admin can customize it.
 	 */
@@ -64,11 +63,9 @@ class evopress_Skin extends Skin
 				'colorbox' => array(
 					'label' => T_('Colorbox Image Zoom'),
 					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
-					'defaultvalue' => true,
+					'defaultvalue' => 1,
 					'type'	=>	'checkbox',
-					'for_editing'	=>	true,
-				),				
-				
+				),							
 			), parent::get_param_definitions( $params )	);
 
 		return $r;
@@ -98,8 +95,8 @@ class evopress_Skin extends Skin
 		require_css( 'style.css', true );
 
 		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
-		if ($this->get_setting("colorbox")) 
-		{	// fp>alev this is not working! The test is wrong.
+		if( $this->get_setting("colorbox") ) 
+		{
 			require_js_helper( 'colorbox' );
 		}
 	}
@@ -108,13 +105,10 @@ class evopress_Skin extends Skin
 
 /*
  * $Log$
+ * Revision 1.9  2011/09/10 21:18:33  fplanque
+ * cleanup
+ *
  * Revision 1.8  2011/09/09 23:26:47  lxndral
- * Add _skins.class.php to all skins  (Easy task)
- *
- * Revision 1.7  2011/09/09 22:44:23  fplanque
- * no message
- *
- * Revision 1.6  2011/09/08 13:42:37  lxndral
  * Add _skins.class.php to all skins  (Easy task)
  *
  * Revision 1.5  2011/09/04 02:30:21  fplanque
