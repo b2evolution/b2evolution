@@ -39,16 +39,6 @@ $params = array_merge( array(
 		'comment_end'          => '</div>',
 		'preview_start'        => '<div class="bComment" id="comment_preview">',
 		'preview_end'          => '</div>',
-		'attend_template'      => '_item_attend.inc.php',  // The template used for displaying post attending
-		'attending_start'      => '<div class="bComment">',
-		'attending_end'        => '</div>',
-		'attend_list_start'    => '<table width="100%"><tbody align="center">',
-		'attend_list_end'      => '</tbody></table>',
-		'attend_line_start'    => '<tr>',
-		'attend_line_end'      => '</tr>',
-		'attend_start'         => '<td>',
-		'attend_end'           => '</td>',
-		'attend_user_field'    => 'login',	// 'login' or 'nickname' ( and everything what can be a param of User->disp() function )
 		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
 		'link_to'		           => 'userurl>userpage',		    // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		'form_title_start'     => '<h3>',
@@ -59,33 +49,10 @@ $params = array_merge( array(
 global $c, $tb, $pb, $redir;
 
 // ----------------- ATTENDING INCLUDED HERE -----------------
-$Item->load_Blog();
-$item_Blog = $Item->get_Blog();
-$attending = $item_Blog->get_setting( 'allow_attending' );
-
-if( ! is_logged_in() )
-{ // don't show attending if user is not logged in
-	$attending = 'never';
-}
-
-if( ( $attending == 'always' ) || ( ( $attending == 'enable_bypost' ) && $Item->get( 'attend_status' ) ) )
+if( isset( $GLOBALS['events_Module'] ) )
 {
-	echo $params['before_section_title'];
-	echo T_( 'Attending this event' );
-	echo $params['after_section_title'];
-
-	skin_include( $params['attend_template'], array(
-				'Item'              => & $Item,
-				'attending_start'   => $params['attending_start'],
-				'attending_end'     => $params['attending_end'],
-				'attend_list_start' => $params['attend_list_start'],
-				'attend_list_end'   => $params['attend_list_end'],
-				'attend_line_start' => $params['attend_line_start'],
-				'attend_line_end'   => $params['attend_line_end'],
-				'attend_start'      => $params['attend_start'],
-				'attend_end'        => $params['attend_end'],
-				'attend_user_field' => $params['attend_user_field'],
-			) );
+	// fp>asimo: can you make a call to all modules here? Sth like "display_before_comments" ?
+	display_attendees( $params );
 }
 // -------------------- END OF ATTENDING ---------------------
 
@@ -323,6 +290,12 @@ else
 
 /*
  * $Log$
+ * Revision 1.39  2011/09/10 00:57:23  fplanque
+ * doc
+ *
+ * Revision 1.38  2011/09/08 05:22:40  efy-asimo
+ * Remove item attending and add item settings
+ *
  * Revision 1.37  2011/09/04 22:13:24  fplanque
  * copyright 2011
  *

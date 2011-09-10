@@ -62,12 +62,12 @@ if( $demo_mode && ($current_User->ID == 1 || $current_User->login == 'demouser')
 $isub_type = 'isub_comments';
 if( $type == 'attend' )
 {
+	if( !isset( $GLOBALS[ 'events_Module' ] ) )
+	{
+		// fp>asimo: can we move the whole thing to attending_update.php instead?
+		bad_request_die( 'Event attending is not supported!' );
+	}
 	$isub_type = 'isub_attend';
-}
-
-if( ( $isub_type == 'isub_comments' ) && ( ! is_email( $current_User->get( 'email' ) ) ) )
-{ // user doesn't have a valid email address
-	$Messages->add( T_( 'Your email address is invalid. Please set your email address first.' ), 'error' );
 }
 
 if( ( $notify < 0 ) || ( $notify > 1 ) )
@@ -75,45 +75,77 @@ if( ( $notify < 0 ) || ( $notify > 1 ) )
 	$Messages->add( 'Invalid params!', 'error' );
 }
 
-if( $Messages->has_errors() )
-{ // errors detected
-	header_redirect();
-}
+switch( $isub_type )
+{
+	case 'isub_comments':
+		if( ! is_email( $current_User->get( 'email' ) ) )
+		{ // user doesn't have a valid email address
+			$Messages->add( T_( 'Your email address is invalid. Please set your email address first.' ), 'error' );
+		}
 
-if( set_user_isubscription( $current_User->ID, $item_ID, $notify, $isub_type ) )
-{ // user subscription was set
-	if( $notify == 0 )
-	{
-		$Messages->add( T_( 'You have successfully unsubscribed.' ), 'success' );
-	}
-	else
-	{
-		if( $isub_type == 'isub_attend' )
+		if( $Messages->has_errors() )
+		{ // errors detected
+			header_redirect();
+			// already exited here
+		}
+
+		if( set_user_isubscription( $current_User->ID, $item_ID, $notify ) )
 		{
-			$Messages->add( T_( 'You have successfully subscribed to attend this event.' ), 'success' );
+			if( $notify == 0 )
+			{
+				$Messages->add( T_( 'You have successfully unsubscribed.' ), 'success' );
+			}
+			else
+			{
+				$Messages->add( T_( 'You have successfully subscribed to notifications.' ), 'success' );
+			}
 		}
 		else
 		{
-		$Messages->add( T_( 'You have successfully subscribed to notifications.' ), 'success' );
+			$Messages->add( T_( 'Could not subscribe to notifications.' ), 'error' );
 		}
-	}
-}
-else
-{ // couldn't update the database
-	if( $isub_type == 'isub_attend' )
-	{
-		$Messages->add( T_( 'Could not subscribe to attend this event.' ), 'error' );
-	}
-	else
-	{
-	$Messages->add( T_( 'Could not subscribe to notifications.' ), 'error' );
-	}
+		break;
+
+	case 'isub_attend':
+		// Events are supported
+
+		if( $Messages->has_errors() )
+		{ // errors detected
+			header_redirect();
+			// already exited here
+		}
+
+		if( set_user_attendant( $current_User->ID, $item_ID, $notify ) )
+		{
+			if( $notify == 0 )
+			{
+				$Messages->add( T_( 'You have successfully unsubscribed.' ), 'success' );
+			}
+			else
+			{
+				$Messages->add( T_( 'You have successfully subscribed to attend this event.' ), 'success' );
+			}
+		}
+		else
+		{
+			$Messages->add( T_( 'Could not subscribe to attend this event.' ), 'error' );
+		}
+		break;
+
+	default:
+		bad_request_die( 'Invalid subsription type' );
 }
 
 header_redirect();
 
 /*
  * $Log$
+ * Revision 1.6  2011/09/10 00:57:23  fplanque
+ * doc
+ *
+ * Revision 1.5  2011/09/08 05:22:40  efy-asimo
+ * Remove item attending and add item settings
+ *
  * Revision 1.4  2011/09/06 00:54:38  fplanque
  * i18n update
  *

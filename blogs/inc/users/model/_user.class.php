@@ -323,15 +323,16 @@ class User extends DataObject
 				$this->userfield_update( $userfield_ID, $uf_val );
 			}
 
-			// Recommend fields
+			// Recommend fields:
 			$userfields = $DB->get_results( '
 				SELECT ufdf_ID
-				from T_users__fielddefs
-				where ufdf_required = "recommend" and ufdf_ID not in
-					( select uf_ufdf_ID
-						from T_users__fields
-						where uf_user_ID = '. $this->ID .'
-					) order by ufdf_ID' );
+					FROM T_users__fielddefs
+				 WHERE ufdf_required = "recommend" AND ufdf_ID NOT IN
+								( SELECT uf_ufdf_ID
+										FROM T_users__fields
+									 WHERE uf_user_ID = '. $this->ID .'
+								) 
+			ORDER BY ufdf_ID' );
 			$i = 1;
 			foreach( $userfields as $userfield )
 			{
@@ -344,22 +345,24 @@ class User extends DataObject
 			}
 
 			// Duplicate fields:  
-			if ($this->ID == 0) {
+			if ($this->ID == 0) 
+			{
 				$user_id = param( 'orig_user_ID', 'string', "" );
-				if ($user_id <> "") {
-						$userfield_IDs = $DB->get_results( '
-									SELECT uf_ID, uf_ufdf_ID
-										FROM T_users__fields
-									 WHERE uf_user_ID = '.$user_id );
-						foreach( $userfield_IDs as $userfield_ID )
+				if ($user_id <> "") 
+				{
+					$userfield_IDs = $DB->get_results( '
+								SELECT uf_ID, uf_ufdf_ID
+									FROM T_users__fields
+								 WHERE uf_user_ID = '.$user_id );
+					foreach( $userfield_IDs as $userfield_ID )
+					{
+						$uf_val = param( 'uf_'.$userfield_ID->uf_ID, 'string', '' );
+						$uf_type = $userfield_ID->uf_ufdf_ID;
+						if( !empty($uf_val) )
 						{
-							$uf_val = param( 'uf_'.$userfield_ID->uf_ID, 'string', '' );
-							$uf_type = $userfield_ID->uf_ufdf_ID;
-							if( !empty($uf_val) )
-							{
-								$this->userfield_add( $uf_type, $uf_val );
-							}
+							$this->userfield_add( $uf_type, $uf_val );
 						}
+					}
 				}
 			}
 
@@ -2408,6 +2411,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.114  2011/09/10 00:57:23  fplanque
+ * doc
+ *
  * Revision 1.113  2011/09/07 22:44:40  fplanque
  * UI cleanup
  *

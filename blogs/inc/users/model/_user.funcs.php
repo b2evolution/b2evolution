@@ -710,7 +710,7 @@ function profile_check_params( $params, $User = NULL )
 			}
 			elseif( $Settings->get('passwd_special') && !preg_match('~[\x20-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]~', $params['pass1'][0] )  )
 			{
-				param_error( $params['pass1'][1], T_('There\'s no special character.') );
+				param_error( $params['pass1'][1], T_('Your password should contain at least one special character (like & ! $ * - _ + etc.)') );
 			}
 			elseif( evo_strlen($params['pass1'][0]) < $Settings->get('user_minpwdlen') )
 			{
@@ -1014,6 +1014,9 @@ function get_prefered_name( $nickname, $firstname, $login )
 
 /*
  * $Log$
+ * Revision 1.49  2011/09/10 00:57:23  fplanque
+ * doc
+ *
  * Revision 1.48  2011/09/09 22:31:48  fplanque
  * rollback
  *

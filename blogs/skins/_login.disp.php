@@ -95,7 +95,8 @@ if( $action != 'req_validatemail' )
 
 	$Form->buttons_input($submit_button);
 
-	// $Form->info( '', '', sprintf( T_('Your IP address (%s) and the current time are being logged.'), $Hit->IP ) );
+	//echo '<div class="center notes">'.sprintf( T_('Your IP address (%s) and the current time are being logged.'), $Hit->IP ).'</div>';
+	$Form->info( '', '', sprintf( T_('Your IP address (%s) and the current time are being logged.'), $Hit->IP ) );
 
 	echo '<div class="login_actions" style="text-align:right; margin: 1em 0 1ex">';
 	echo get_user_register_link( '<strong>', '</strong>', T_('No account yet? Register here').' &raquo;', '#', true /*disp_when_logged_in*/, $redirect_to, 'inskin login' );
@@ -143,6 +144,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.14  2011/09/10 00:57:23  fplanque
+ * doc
+ *
  * Revision 1.13  2011/09/08 23:29:27  fplanque
  * More blockcache/widget fixes around login/register links.
  *

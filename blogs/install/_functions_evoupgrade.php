@@ -2935,7 +2935,6 @@ function upgrade_b2evo_tables()
 						isub_item_ID  int(11) unsigned NOT NULL,
 						isub_user_ID  int(11) unsigned NOT NULL,
 						isub_comments tinyint(1) NOT NULL default 0 COMMENT 'The user wants to receive notifications for new comments on this post',
-						isub_attend   tinyint(1) NOT NULL default 0 COMMENT 'The user is attending (or not) this event',
 						PRIMARY KEY (isub_item_ID, isub_user_ID )
 					) ENGINE = innodb" );
 		task_end();
@@ -2961,10 +2960,6 @@ function upgrade_b2evo_tables()
 		}
 		task_end();
 
-		task_begin( 'Upgrading items table, add attend status...' );
-		db_add_col( 'T_items__item', 'post_attend_status', 'tinyint(1) NOT NULL default 0 COMMENT "Post owner\'s decision about allowing users to attend this event" AFTER post_comment_status' );
-		task_end();
-
 		task_begin( 'Upgrading settings table... ');
 		$DB->query( 'INSERT INTO T_settings (set_name, set_value)
 						VALUES ( "smart_hit_count", 1 )' );
@@ -2987,16 +2982,25 @@ function upgrade_b2evo_tables()
 
 		task_begin( 'Upgrading user fields def table for required field...' );
 		$DB->query( 'ALTER TABLE T_users__fielddefs
-						ADD COLUMN ufdf_required enum("hidden","optional","recommend","require") NOT NULL default "optional"');
+									ADD COLUMN ufdf_required enum("hidden","optional","recommend","require") NOT NULL default "optional"');
 		$DB->query( 'UPDATE T_users__fielddefs
 										SET ufdf_required = "recommend"
 									WHERE ufdf_name in ("Website", "Twitter", "Facebook") ' );
 		task_end();
+
+		task_begin( 'Creating table for a specific post settings...' );
+		$DB->query( "CREATE TABLE T_items__item_settings (
+						iset_item_ID  int(10) unsigned NOT NULL,
+						iset_name     varchar( 50 ) NOT NULL,
+						iset_value    varchar( 2000 ) NULL,
+						PRIMARY KEY ( iset_item_ID, iset_name )
+					) ENGINE = innodb" );
+		task_end();
 		
 		set_upgrade_checkpoint( '10300' );
 	}
-
-
+	
+	
 	/*
 	 * ADD UPGRADES HERE.
 	 *
@@ -3194,6 +3198,12 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.408  2011/09/10 00:57:23  fplanque
+ * doc
+ *
+ * Revision 1.407  2011/09/08 05:22:40  efy-asimo
+ * Remove item attending and add item settings
+ *
  * Revision 1.406  2011/09/04 22:13:23  fplanque
  * copyright 2011
  *

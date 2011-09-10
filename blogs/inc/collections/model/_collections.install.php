@@ -287,9 +287,9 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_items__item_settings' => array(
 		'Creating item settings table',
 		"CREATE TABLE T_items__item_settings (
-			iset_item_ID  int(11) unsigned NOT NULL,
+			iset_item_ID  int(10) unsigned NOT NULL,
 			iset_name     varchar( 50 ) NOT NULL,
-			iset_value    varchar( 50 ) NULL,
+			iset_value    varchar( 2000 ) NULL,
 			PRIMARY KEY ( iset_item_ID, iset_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -383,6 +383,9 @@ $schema_queries = array_merge( $schema_queries, array(
 
 /*
  * $Log$
+ * Revision 1.37  2011/09/10 00:57:23  fplanque
+ * doc
+ *
  * Revision 1.36  2011/09/08 17:58:08  lxndral
  * Comments task fix (table sql fix)
  *
