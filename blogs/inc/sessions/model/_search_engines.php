@@ -555,7 +555,7 @@ $search_engine_params = array(
 	'www.maailm.com'			=> array('maailm.com', 'tekst'),
 
 	// Mail.ru
-	'go.mail.ru'				=> array('Mailru', 'q', 'search?q={k}', 'windows-1251', 'sf'),
+	'go.mail.ru'				=> array('Mailru', 'q', 'search?q={k}', array('utf-8','windows-1251'), 'sf'),
 
 	// Mamma
 	'www.mamma.com'				=> array('Mamma', 'query', 'result.php?q={k}'),
