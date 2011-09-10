@@ -63,17 +63,7 @@ $Form->begin_form( 'fform' );
 		}
 
 		$Form->info( T_('Skin type'), $edited_Skin->type );
-		if (property_exists($edited_Skin,"colorbox")) {
-			if ($edited_Skin->colorbox==1) 
-			{
-				$Form->info( T_('Colorbox'), "Enabled" );
-			}
-			else 
-			{
-				$Form->info( T_('Colorbox'), "Disabled" );
-			}
-		}
-		
+
 		if( $skin_containers = $edited_Skin->get_containers() )
 		{
 			$container_ul = '<ul><li>'.implode( '</li><li>', $skin_containers ).'</li></ul>';
@@ -114,8 +104,8 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
- * Revision 1.13  2011/09/08 13:42:37  lxndral
- * Add _skins.class.php to all skins  (Easy task)
+ * Revision 1.14  2011/09/10 22:03:21  fplanque
+ * rollback - not needed
  *
  * Revision 1.12  2011/09/04 22:13:20  fplanque
  * copyright 2011
