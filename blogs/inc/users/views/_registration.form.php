@@ -85,7 +85,7 @@ $Form->begin_fieldset( T_('Security options') );
 
 	$Form->checkbox_input( 'js_passwd_hashing', (bool)$Settings->get('js_passwd_hashing'), T_('Login password hashing'), array( 'note'=>T_('Check to enable the login form to hash the password with Javascript before transmitting it. This provides extra security on non-SSL connections.')) );
 
-	$Form->checkbox_input( 'passwd_special', (bool)$Settings->get('passwd_special'), T_('Require at least 1 special character'), array( 'note'=>T_('Check to require at least 1 special character (not a letter nor a digit).')) );
+	$Form->checkbox_input( 'passwd_special', (bool)$Settings->get('passwd_special'), T_('Require specials characters'), array( 'note'=>T_('Check to require at least 1 special character (not a letter nor a digit).')) );
 
 $Form->end_fieldset();
 
@@ -115,6 +115,9 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.14  2011/09/10 22:48:41  fplanque
+ * doc
+ *
  * Revision 1.13  2011/09/06 16:25:18  efy-james
  * Require special chars in password
  *

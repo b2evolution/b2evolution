@@ -246,6 +246,7 @@ $AdminUI->disp_payload_end();
 $AdminUI->disp_global_footer();
 
 // if php less than 5.1 => need declare function
+// fp>alev this is not a right place for this
 if ( !function_exists( 'property_exists' ) ) {
     function property_exists( $class, $property ) {
         if ( is_object( $class ) ) {
@@ -259,6 +260,9 @@ if ( !function_exists( 'property_exists' ) ) {
 
 /*
  * $Log$
+ * Revision 1.20  2011/09/10 22:48:41  fplanque
+ * doc
+ *
  * Revision 1.19  2011/09/08 13:42:36  lxndral
  * Add _skins.class.php to all skins  (Easy task)
  *

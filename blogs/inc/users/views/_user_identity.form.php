@@ -557,14 +557,18 @@ $Form->begin_fieldset( T_('Experimental') );
 global $DB;
 
 // Get original user id for duplicate
-if ($edited_User->ID == 0) {
+if ($edited_User->ID == 0) 
+{
 	$user_id = param( 'user_ID', 'string', "" );
 	if ($user_id == "" || $user_id == 0 )
 		$user_id = param( 'orig_user_ID', 'string', "" );
 	if ($user_id == "" || $user_id == 0 )
 		$user_id = $edited_User->ID;
-} else
+}
+else
+{
 	$user_id = $edited_User->ID;
+}
 
 // Get existing userfields:
 $userfields = $DB->get_results( '
@@ -573,7 +577,7 @@ $userfields = $DB->get_results( '
 	 WHERE uf_user_ID = '.$user_id.'
 	 ORDER BY uf_ID' );
 
- foreach( $userfields as $userfield )
+foreach( $userfields as $userfield )
 {
 	switch( $userfield->ufdf_ID )
 	{
@@ -751,6 +755,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.36  2011/09/10 22:48:41  fplanque
+ * doc
+ *
  * Revision 1.35  2011/09/09 06:34:16  sam2kb
  * minor
  *

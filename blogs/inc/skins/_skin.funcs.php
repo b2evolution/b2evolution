@@ -110,6 +110,7 @@ function skin_init( $disp )
 		// CONTENT PAGES:
 		case 'single':
 		case 'page':
+// fp>asimo fp>alex : is this for javascript forms?
 			require_js( 'communication.js' ); // auto requires jQuery
 
 			if( $disp == 'single' )
@@ -164,6 +165,7 @@ function skin_init( $disp )
 			break;
 
 		case 'posts':
+// fp>sam2kb: why do we need this here?  for javascript forms?
 			require_js( 'communication.js' ); // auto requires jQuery
 
 			// Get list of active filters:
@@ -923,6 +925,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.96  2011/09/10 22:48:41  fplanque
+ * doc
+ *
  * Revision 1.95  2011/09/07 04:56:23  sam2kb
  * Add missing communication.js to "posts" disp type
  *
