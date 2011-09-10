@@ -43,6 +43,9 @@ require_once $inc_path.'_main.inc.php';
 
 
 param( 'plugin_ID', 'integer', true );
+// fp> it is probably unnecessary complexity to handle a method here
+// instead of calling handle_htsrv_action() all the time
+// and letting the plugin deal with its methods internally.
 param( 'method', 'string', '' );
 param( 'params', 'string', null ); // serialized
 
@@ -90,6 +93,9 @@ if( $plugin_ID )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.16  2011/09/10 02:09:08  fplanque
+ * doc
+ *
  * Revision 1.15  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

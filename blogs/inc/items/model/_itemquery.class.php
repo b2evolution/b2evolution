@@ -705,9 +705,19 @@ class ItemQuery extends SQL
 		{
 			return;
 		}
+
+// fp>alev: this is a very wrong place to put this code.
+// the right place is probably the place where we detect or set disp=search
+// or the place where we detect that a param "s" has been passed.
 		load_class('sessions/model/_internal_searches.class.php', 'Internalsearches' );
 		global $blog;
+// fp>alev: why create a Session here!!??
 		$sess = new Session();
+// fp>alev: there is ***NO WAY*** we can afford to 
+// 1) do an extra DB request that is unnecessary
+// 2) be super approximative about the hit we target! 10 other requests could come in here before this hit actually gets saved.
+// The correct way to do this is when we detect "s", we save the internal search string in the Hit object
+// And WHEN the Hit object is saved, it also saves the internal search.
 		$hit_row=$DB->get_row( "SELECT MAX( hit_ID ) + 1  as hit_ID FROM  T_hitlog" );
 		//global $hit;
 		//print_r($sess);
@@ -767,6 +777,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.26  2011/09/10 02:09:09  fplanque
+ * doc
+ *
  * Revision 1.25  2011/09/08 22:05:12  lxndral
  * fix for hitlog task
  *

@@ -700,6 +700,7 @@ class Results extends Table
 		{
 			// sam2kb> Isn't it better to display "Page not found" error instead?
 			// Current implementation is bad for SEO bacause it can potentially display an unlimited number of duplicate pages
+			// fp> on what public (not admin) url dow e have this problem for example?
 			$this->page = $this->total_pages;
 		}
 	}
@@ -1841,6 +1842,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.39  2011/09/10 02:09:09  fplanque
+ * doc
+ *
  * Revision 1.38  2011/09/09 19:46:22  sam2kb
  * doc
  *

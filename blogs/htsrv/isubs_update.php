@@ -64,7 +64,9 @@ if( $type == 'attend' )
 {
 	if( !isset( $GLOBALS[ 'events_Module' ] ) )
 	{
-		// fp>asimo: can we move the whole thing to attending_update.php instead?
+		// fp>asimo: can we move the whole thing to htsrv/action.php instead?
+		// action.php would expect a param called module and then it would call the 
+		// approriate module with the method handle_htsrv_action()
 		bad_request_die( 'Event attending is not supported!' );
 	}
 	$isub_type = 'isub_attend';
@@ -140,6 +142,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.7  2011/09/10 02:09:08  fplanque
+ * doc
+ *
  * Revision 1.6  2011/09/10 00:57:23  fplanque
  * doc
  *
