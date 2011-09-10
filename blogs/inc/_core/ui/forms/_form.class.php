@@ -473,16 +473,7 @@ class Form extends Widget
 	{
 		if( !isset($field_params['class']) )
 		{
-			$field_params['class'] = ' fieldset';
-		}
-		else
-		{
-			$field_params['class'] = ' '.$field_params['class'];
-		}
-
-		if( !isset($field_params['id']) )
-		{
-			$field_params['id'] = '';
+			$field_params['class'] = 'fieldset';
 		}
 
 		switch( $this->layout )
@@ -510,7 +501,10 @@ class Form extends Widget
 				// $r = '<fieldset'.get_field_attribs_as_string($field_params).'>'."\n";
 
 				$r = str_replace( '$fieldset_title$', $title, $r );
-				$r = str_replace( '$id$', $field_params['id'], $r );
+				if( isset($field_params['id']) )
+				{
+					$r = str_replace( '$id$', $field_params['id'], $r );
+				}
 				$r = str_replace( '$class$', $field_params['class'], $r );
 
 				if( empty($legend_params) )
@@ -3067,6 +3061,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.91  2011/09/10 19:41:53  fplanque
+ * fixing http://forums.b2evolution.net/viewtopic.php?t=22443
+ *
  * Revision 1.90  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *
