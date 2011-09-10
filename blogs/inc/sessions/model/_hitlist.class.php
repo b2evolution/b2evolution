@@ -122,7 +122,7 @@ class Hitlist
 		global $Debuglog, $Settings, $localtimenow;
 		global $Plugins;
 
-		// Prunne for internal searches
+		// Prune for internal searches
 		// Prune when $localtime is a NEW day (which will be the 1st request after midnight):
 		$last_prune = $Settings->get( 'auto_prune_stats_done' );
 		if( $last_prune >= date('Y-m-d', $localtimenow) && $last_prune <= date('Y-m-d', $localtimenow+86400) )
@@ -132,6 +132,7 @@ class Hitlist
 
 		$time_prune_before = ($localtimenow - ($Settings->get('auto_prune_stats') * 86400)); // 1 day = 86400 seconds
 
+// fp>alev : put this after pruning hitlog and DELETE all searches that are NOT IN loghit any longer
 		$ids = $DB->get_results( "
 			SELECT hit_ID FROM T_hitlog
 			WHERE hit_datetime < '".date('Y-m-d', $time_prune_before)."'", 'Getting hit ids for prune' );
@@ -193,6 +194,9 @@ class Hitlist
 
 /*
  * $Log$
+ * Revision 1.25  2011/09/10 22:03:45  fplanque
+ * doc
+ *
  * Revision 1.24  2011/09/09 23:05:08  lxndral
  * Search for "fp>al" in code to find my comments and please make requested changed
  *

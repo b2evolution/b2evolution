@@ -706,9 +706,11 @@ class Results extends Table
 				- display error
 				- redirect to last page
 				- display last page (this is what current version does)
-
 				"paged" param: http://b2evolution.net/news/releases/?paged=99
 				"page" param: http://b2evolution.net/news/2011/09/09/b2evolution-4-1-0-release?page=99
+				fp> ok, the current implementation only has merit when the result list is not controlled by a plublic URL param.
+				Otherwise the only 2 options should be 404 and 301.
+				Also, teh detection code should probably NOT be here.
 			*/
 			$this->page = $this->total_pages;
 		}
@@ -1851,6 +1853,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.41  2011/09/10 22:03:45  fplanque
+ * doc
+ *
  * Revision 1.40  2011/09/10 13:22:22  sam2kb
  * doc
  *
