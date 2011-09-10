@@ -698,9 +698,18 @@ class Results extends Table
 		// Make sure we're not requesting a page out of range:
 		if( $this->page > $this->total_pages )
 		{
-			// sam2kb> Isn't it better to display "Page not found" error instead?
-			// Current implementation is bad for SEO bacause it can potentially display an unlimited number of duplicate pages
-			// fp> on what public (not admin) url dow e have this problem for example?
+			/*
+				sam2kb> Isn't it better to display "Page not found" error instead?
+				Current implementation is bad for SEO bacause it can potentially display an unlimited number of duplicate pages
+				fp> on what public (not admin) url do we have this problem for example?
+				sam2kb>fp Ideally there must be a list of options in Blog settings > SEO
+				- display error
+				- redirect to last page
+				- display last page (this is what current version does)
+
+				"paged" param: http://b2evolution.net/news/releases/?paged=99
+				"page" param: http://b2evolution.net/news/2011/09/09/b2evolution-4-1-0-release?page=99
+			*/
 			$this->page = $this->total_pages;
 		}
 	}
@@ -1842,6 +1851,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.40  2011/09/10 13:22:22  sam2kb
+ * doc
+ *
  * Revision 1.39  2011/09/10 02:09:09  fplanque
  * doc
  *
