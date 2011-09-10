@@ -145,11 +145,13 @@ $schema_queries['T_logs__internal_searches'] = array('Creating internal searches
   `isrch_hit_ID` bigint(20) NOT NULL default '0',
   `isrch_keywords` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`isrch_ID`)
-) ENGINE=MyISAM DEFAULT CHARSET= = $db_storage_charset");
+) ENGINE=MyISAM DEFAULT CHARSET = $db_storage_charset");
 
-		
 /*
  * $Log$
+ * Revision 1.21  2011/09/10 21:37:53  fplanque
+ * minor
+ *
  * Revision 1.20  2011/09/09 23:05:08  lxndral
  * Search for "fp>al" in code to find my comments and please make requested changed
  *
