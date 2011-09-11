@@ -27,7 +27,7 @@
  * @author evofactory-test
  * @author fplanque: Francois Planque.
  *
- * @version _userfields.view.php,v 1.9 2010/01/03 13:10:57 fplanque Exp
+ * @version  $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -142,6 +142,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.15  2011/09/11 00:04:45  fplanque
+ * doc
+ *
  * Revision 1.14  2011/09/10 22:48:41  fplanque
  * doc
  *
