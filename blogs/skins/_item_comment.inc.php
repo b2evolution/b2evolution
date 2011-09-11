@@ -15,10 +15,19 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // Default params:
 $params = array_merge( array(
-    'comment_start'  => '<div class="bComment">',
-    'comment_end'    => '</div>',
-		'link_to'		     => 'userurl>userpage',		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
-    'Comment'        => NULL, // This object MUST be passed as a param!
+		'comment_start'        => '<div class="bComment">',
+		'comment_end'          => '</div>',
+		'link_to'              => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
+		'link_text'            => 'preferredname',
+		'comment_nofollow'     => true,
+		'trackback_nofollow'   => true,
+		'pingback_nofollow'    => true,
+		'before_image'         => '<div class="image_block">',
+		'before_image_legend'  => '<div class="image_legend">',
+		'after_image_legend'   => '</div>',
+		'after_image'          => '</div>',
+		'image_size'           => 'fit-400x320',
+		'Comment'              => NULL, // This object MUST be passed as a param!
 	), $params );
 
 /**
@@ -46,8 +55,8 @@ $Comment = & $params['Comment'];
 					$Comment->permanent_link( array(
 							'before'    => '',
 							'after'     => ' '.T_('from:').' ',
-							'text' 			=> T_('Comment'),
-							'nofollow'	=> true,
+							'text'      => T_('Comment'),
+							'nofollow'	=> $params['comment_nofollow'],
 						) );
 				}
 				$Comment->author2( array(
@@ -56,8 +65,8 @@ $Comment = & $params['Comment'];
 						'before_user'  => '',
 						'after_user'   => '#',
 						'format'       => 'htmlbody',
-						'link_to'		   => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
-						'link_text'    => 'preferredname',
+						'link_to'      => $params['link_to'],
+						'link_text'    => $params['link_text'],
 					) );
 
 				$Comment->msgform_link( $Blog->get('msgformurl') );
@@ -68,8 +77,8 @@ $Comment = & $params['Comment'];
 				$Comment->permanent_link( array(
 						'before'    => '',
 						'after'     => ' '.T_('from:').' ',
-						'text' 			=> T_('Trackback'),
-						'nofollow'	=> true,
+						'text'      => T_('Trackback'),
+						'nofollow'	=> $params['trackback_nofollow'],
 					) );
 				$Comment->author( '', '#', '', '#', 'htmlbody', true );
 				break;
@@ -78,8 +87,8 @@ $Comment = & $params['Comment'];
 				$Comment->permanent_link( array(
 						'before'    => '',
 						'after'     => ' '.T_('from:').' ',
-						'text' 			=> T_('Pingback'),
-						'nofollow'	=> true,
+						'text'      => T_('Pingback'),
+						'nofollow'	=> $params['pingback_nofollow'],
 					) );
 				$Comment->author( '', '#', '', '#', 'htmlbody', true );
 				break;
@@ -90,7 +99,7 @@ $Comment = & $params['Comment'];
 	<div class="bCommentText">
 		<?php
 			$Comment->avatar();
-			$Comment->content();
+			$Comment->content( 'htmlbody', false, true, $params );
 		?>
 	</div>
 	<div class="bCommentSmallPrint">
@@ -109,6 +118,9 @@ $Comment = & $params['Comment'];
 
 /*
  * $Log$
+ * Revision 1.11  2011/09/11 03:31:17  sam2kb
+ * Added some comment params
+ *
  * Revision 1.10  2011/09/04 22:13:24  fplanque
  * copyright 2011
  *
