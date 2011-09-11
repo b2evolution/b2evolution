@@ -141,6 +141,7 @@ function system_get_result( $check_dir_code, $before_msg = '' )
 {
 	$status = ( $check_dir_code == 0 ) ? 'ok' : 'error';
 	$system_results = array(
+	// fp> note: you can add statuses but not change existing ones.
 		0 => T_( 'OK' ),
 		1 => T_( 'Unknown directory' ),
 		2 => T_( 'The directory doesn\'t exist.' ),
@@ -475,6 +476,9 @@ function system_check_gd_version()
 
 /*
  * $Log$
+ * Revision 1.13  2011/09/11 19:45:28  fplanque
+ * no message
+ *
  * Revision 1.12  2011/09/11 19:41:26  fplanque
  * Added some system stats.
  *

@@ -38,7 +38,7 @@ function b2evonet_get_updates( $force_short_delay = false )
 		$allow_evo_stats = true; // allow (non-anonymous) stats
 	}
 	if( $allow_evo_stats === false )
-	{ // Get outta here as fast as you can, EdB style:
+	{ // Get outta here:
 		return NULL;
 	}
 
@@ -298,6 +298,9 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 /*
  * $Log$
+ * Revision 1.47  2011/09/11 19:45:28  fplanque
+ * no message
+ *
  * Revision 1.46  2011/09/11 19:41:26  fplanque
  * Added some system stats.
  *
