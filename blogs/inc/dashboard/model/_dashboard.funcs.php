@@ -42,7 +42,12 @@ function b2evonet_get_updates( $force_short_delay = false )
 		return NULL;
 	}
 
-	if( $force_short_delay )
+	if( $debug == 2 )
+	{
+		$update_every = 8;
+		$attempt_every = 3;
+	}
+	elseif( $force_short_delay )
 	{
 		$update_every = 180; // 3 minutes
 		$attempt_every = 60; // 1 minute
@@ -51,12 +56,6 @@ function b2evonet_get_updates( $force_short_delay = false )
 	{
 		$update_every = 3600*12; // 12 hours
 		$attempt_every = 3600*4; // 4 hours
-	}
-
-	if( $debug == 2 )
-	{
-		$update_every = 10;
-		$attempt_every = 5;
 	}
 
 	// Note: do not put $baseurl in here since it would cause too frequently updates, when you have the same install with different $baseurls.
@@ -113,7 +112,7 @@ function b2evonet_get_updates( $force_short_delay = false )
 	$message = new xmlrpcmsg(
 								'b2evo.getupdates',                           // Function to be called
 								array(
-									new xmlrpcval( ( $allow_evo_stats == 'anonymous' /* this might even get EdB to send you stats ;) */ ? md5( $baseurl ) : $baseurl ), 'string'),					// Unique identifier part 1
+									new xmlrpcval( ( $allow_evo_stats === 'anonymous' ? md5( $baseurl ) : $baseurl ), 'string'),	// Unique identifier part 1
 									new xmlrpcval( $instance_name, 'string'),		// Unique identifier part 2
 									new xmlrpcval( $app_name, 'string'),		    // Version number
 									new xmlrpcval( $app_version, 'string'),	  	// Version number
@@ -123,9 +122,10 @@ function b2evonet_get_updates( $force_short_delay = false )
 											'last_update' => new xmlrpcval( $servertime_last_update, 'string' ),
 											'db_version' => new xmlrpcval( $DB->get_version(), 'string'),	// If a version >95% we make it the new default.
 											'db_utf8' => new xmlrpcval( system_check_db_utf8() ? 1 : 0, 'int' ),	// if support >95%, we'll make it the default
-											'evo_charset' => new xmlrpcval( $evo_charset, 'string' ),
-											'php_version' => new xmlrpcval( PHP_VERSION, 'string' ),
+											'evo_charset' => new xmlrpcval( $evo_charset, 'string' ),			// Do people actually use UTF8?
+											'php_version' => new xmlrpcval( PHP_VERSION, 'string' ),			// Target minimum version: PHP 5.2
 											'php_xml' => new xmlrpcval( extension_loaded('xml') ? 1 : 0, 'int' ),
+											'php_imap' => new xmlrpcval( extension_loaded('imap') ? 1 : 0, 'int' ),	// Does it make sense to rely on IMAP to handle undelivered emails (for user registrations/antispam)
 											'php_mbstring' => new xmlrpcval( extension_loaded('mbstring') ? 1 : 0, 'int' ),
 											'php_memory' => new xmlrpcval( system_check_memory_limit(), 'int'), // how much room does b2evo have to move on a typical server?
 											'php_upload_max' => new xmlrpcval( system_check_upload_max_filesize(), 'int' ),
@@ -140,10 +140,12 @@ function b2evonet_get_updates( $force_short_delay = false )
 											'php_reg_globals' => new xmlrpcval( ini_get('register_globals') ? 1 : 0, 'int' ), // if <5% we may actually refuse to run future version on this
 											'php_opcode_cache' => new xmlrpcval( get_active_opcode_cache(), 'string' ), // How many use one? Which is the most popular?
 											'gd_version' => new xmlrpcval( system_check_gd_version(), 'string' ),
+											// TODO: add missing system stats
 										), 'struct' ),
 								)
 							);
 
+							pre_dump($message);
 	$result = $client->send($message);
 
 	if( $ret = xmlrpc_logresult( $result, $Messages, false ) )
@@ -290,6 +292,9 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 /*
  * $Log$
+ * Revision 1.45  2011/09/11 16:12:25  fplanque
+ * added imap availability stat
+ *
  * Revision 1.44  2011/09/06 23:36:02  fplanque
  * minor
  *
