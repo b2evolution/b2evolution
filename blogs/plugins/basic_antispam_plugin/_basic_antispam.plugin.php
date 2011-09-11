@@ -295,7 +295,11 @@ class basic_antispam_plugin extends Plugin
 
 	function remove_repetition( $str = '' )
 	{
-		return @preg_replace( '~(.)\\1{3,}~iu', '$1$1$1', $str );
+		if( ($newstring = @preg_replace( '~(.)\\1{3,}~u', '$1$1$1', $str )) === NULL )
+		{	// Some error occured, just return the original string
+			$newstring = $str;
+		}
+		return $newstring;
 	}
 
 
@@ -622,6 +626,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.45  2011/09/11 22:23:48  sam2kb
+ * Fix for http://forums.b2evolution.net/viewtopic.php?t=21936
+ *
  * Revision 1.44  2011/09/04 22:13:23  fplanque
  * copyright 2011
  *
