@@ -89,41 +89,41 @@ $change_ini = '<p>'.T_('If possible, change this setting to <code>%s</code> in y
 
 echo '<h2>'.T_('About this system').'</h2>';
 
+// Get system stats to display:
+$system_stats = get_system_stats();
 
-	// Note: hopefully, the update swill have been downloaded in the shutdown function of a previous page (including the login screen)
-	// However if we have outdated info, we will load updates here.
-	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
-	// Let's clear any remaining messages that should already have been displayed before...
-	$Messages->clear();
+// Note: hopefully, the update swill have been downloaded in the shutdown function of a previous page (including the login screen)
+// However if we have outdated info, we will load updates here.
+load_funcs( 'dashboard/model/_dashboard.funcs.php' );
+// Let's clear any remaining messages that should already have been displayed before...
+$Messages->clear();
 
-	if( b2evonet_get_updates( true ) !== NULL )
-	{	// Updates are allowed, display them:
+if( b2evonet_get_updates( true ) !== NULL )
+{	// Updates are allowed, display them:
 
-		// Display info & error messages
-		echo $Messages->display( NULL, NULL, false, 'action_messages' );
+	// Display info & error messages
+	echo $Messages->display( NULL, NULL, false, 'action_messages' );
 
-		/**
-		 * @var AbstractSettings
-		 */
-		global $global_Cache;
-		$version_status_msg = $global_Cache->get( 'version_status_msg' );
-		if( !empty($version_status_msg) )
-		{	// We have managed to get updates (right now or in the past):
-			$msg = '<p>'.$version_status_msg.'</p>';
-			$extra_msg = $global_Cache->get( 'extra_msg' );
-			if( !empty($extra_msg) )
-			{
-				$msg .= '<p>'.$extra_msg.'</p>';
-			}
+	/**
+	 * @var AbstractSettings
+	 */
+	global $global_Cache;
+	$version_status_msg = $global_Cache->get( 'version_status_msg' );
+	if( !empty($version_status_msg) )
+	{	// We have managed to get updates (right now or in the past):
+		$msg = '<p>'.$version_status_msg.'</p>';
+		$extra_msg = $global_Cache->get( 'extra_msg' );
+		if( !empty($extra_msg) )
+		{
+			$msg .= '<p>'.$extra_msg.'</p>';
 		}
+	}
 
-	}
-	else
-	{
-		$msg = '';
-		//$msg = '<p>Updates from b2evolution.net are disabled!</p>';
-		//$msg .= '<p>You will <b>NOT</b> be alerted if you are running an insecure configuration.</p>';
-	}
+}
+else
+{
+	$msg = '';
+}
 
 
 $block_item_Widget = new Widget( 'block_item' );
@@ -175,7 +175,7 @@ else
 }
 
 // Media folder writable?
-list( $mediadir_status, $mediadir_msg ) = system_get_result( system_check_dir('media') );
+list( $mediadir_status, $mediadir_msg ) = system_get_result( $system_stats['mediadir_status'] );
 $mediadir_long = '';
 if( $mediadir_status == 'error' )
 {
@@ -186,22 +186,9 @@ init_system_check( T_( 'Media directory' ), $mediadir_msg.' - '.$media_path );
 disp_system_check( $mediadir_status, $mediadir_long );
 
 
-// Cache folder writable?
-list( $cachedir_status, $cachedir_msg ) = system_get_result( system_check_dir('cache') );
-$cachedir_long = '';
-if( $cachedir_status == 'error' )
-{
-	$cachedir_long = '<p>'.T_('You will not be able to use page cache.')."</p>\n"
-	.'<p>'.T_('Your host requires that you set special file permissions on your cache directory.').get_manual_link('cache_file_permission_errors')."</p>\n";
-}
-init_system_check( T_( 'Cache directory' ), $cachedir_msg.' - '.$cache_path );
-disp_system_check( $cachedir_status, $cachedir_long );
-
-
 // /install/ folder deleted?
-$install_removed = system_check_install_removed();
-init_system_check( T_( 'Install folder' ), $install_removed ?  T_('Deleted') : T_('Not deleted').' - '.$basepath.$install_subdir );
-if( ! $install_removed )
+init_system_check( T_( 'Install folder' ), $system_stats['install_removed'] ?  T_('Deleted') : T_('Not deleted').' - '.$basepath.$install_subdir );
+if( ! $system_stats['install_removed'] )
 {
 	disp_system_check( 'warning', T_('For maximum security, it is recommended that you delete your /blogs/install/ folder once you are done with install or upgrade.') );
 
@@ -223,6 +210,11 @@ else
 	disp_system_check( 'ok' );
 }
 
+init_system_check( 'Internal b2evo charset' , $system_stats['evo_charset'] );
+disp_system_check( 'note' );
+
+init_system_check( 'Blog count' , $system_stats['evo_blog_count'] );
+disp_system_check( 'note' );
 
 $block_item_Widget->disp_template_raw( 'block_end' );
 
@@ -232,16 +224,32 @@ $block_item_Widget->disp_template_raw( 'block_end' );
  */
 $block_item_Widget->title = T_( 'Caching' );
 $block_item_Widget->disp_template_replaced( 'block_start' );
-// General cache is enabled
-init_system_check( T_( 'General caching' ), $Settings->get( 'general_cache_enabled' ) ? T_( 'Enabled' ) : T_( 'Disabled' ) );
+
+// Cache folder writable?
+list( $cachedir_status, $cachedir_msg ) = system_get_result( $system_stats['cachedir_status'] );
+$cachedir_long = '';
+if( $cachedir_status == 'error' )
+{
+	$cachedir_long = '<p>'.T_('You will not be able to use page cache.')."</p>\n"
+	.'<p>'.T_('Your host requires that you set special file permissions on your cache directory.').get_manual_link('cache_file_permission_errors')."</p>\n";
+}
+init_system_check( T_( 'Cache directory' ), $cachedir_msg.' - '.$cache_path );
+disp_system_check( $cachedir_status, $cachedir_long );
+
+// cache folder size
+init_system_check( 'Cache folder size', bytesreadable($system_stats['cachedir_size']) );
 disp_system_check( 'note' );
+
 if( $cachedir_status != 'error' )
 { // 'cache/ directory exists and, it is writable
+
+	// General cache is enabled
+	init_system_check( T_( 'General caching' ), $system_stats['general_pagecache_enabled'] ? 'Enabled' : 'Disabled' );
+	disp_system_check( 'note' );
+
+	// how many blogs have enabled caches
 	$error_messages = system_check_caches( false );
-	$blogs = system_get_blogs( false );
-	$cache_enabled_blogs = system_get_blogs( true );
-	$enabled_message = count( $cache_enabled_blogs ).'/'.count( $blogs ).' '.T_( 'Enabled' );
-	// how many blogs cache is enabled
+	$enabled_message = $system_stats['blog_pagecaches_enabled'].' enabled /'.$system_stats['evo_blog_count'].' blogs';
 	init_system_check( T_( 'Blog\'s cache setting' ), $enabled_message );
 	disp_system_check( 'note' );
 	if( count( $error_messages ) > 0 )
@@ -250,9 +258,7 @@ if( $cachedir_status != 'error' )
 		disp_system_check( 'error' );
 	}
 }
-// cache folder size
-init_system_check( T_( 'Cache size' ), bytesreadable( get_dirsize_recursive( $cache_path ) ) );
-disp_system_check( 'note' );
+
 $block_item_Widget->disp_template_raw( 'block_end' );
 
 
@@ -277,17 +283,16 @@ $block_item_Widget->disp_template_raw( 'block_end' );
 /*
  * MySQL Version
  */
-$block_item_Widget->title = T_('MySQL');
+$block_item_Widget->title = 'MySQL';
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
 // Version:
-$mysql_version = $DB->get_version();
 init_system_check( T_( 'MySQL version' ), $DB->version_long );
-if( version_compare( $mysql_version, '4.0' ) < 0 )
+if( version_compare( $system_stats['db_version'], '4.0' ) < 0 )
 {
 	disp_system_check( 'error', T_('This version is too old. The minimum recommended MySQL version is 4.1.') );
 }
-elseif( version_compare( $mysql_version, '4.1' ) < 0 )
+elseif( version_compare( $system_stats['db_version'], '4.1' ) < 0 )
 {
 	disp_system_check( 'warning', T_('This version is not guaranteed to work. The minimum recommended MySQL version is 4.1.') );
 }
@@ -297,9 +302,8 @@ else
 }
 
 // UTF8 support?
-$ok = system_check_db_utf8();
-init_system_check( T_( 'MySQL UTF-8 support' ), $ok ?  T_('Yes') : T_('No') );
-if( ! $ok )
+init_system_check( 'MySQL UTF-8 support', $system_stats['db_utf8'] ?  T_('Yes') : T_('No') );
+if( ! $system_stats['db_utf8'] )
 {
 	disp_system_check( 'warning', T_('UTF-8 is not supported by your MySQL server.') ); // fp> TODO: explain why this is bad. Better yet: try to detect if we really need it, base don other conf variables.
 }
@@ -314,7 +318,7 @@ $block_item_Widget->disp_template_raw( 'block_end' );
 /**
  * PHP
  */
-$block_item_Widget->title = T_('PHP');
+$block_item_Widget->title = 'PHP';
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
 
@@ -333,13 +337,13 @@ disp_system_check( 'note' );
 // PHP version
 $phpinfo_url = '?ctrl=tools&amp;action=view_phpinfo&amp;'.url_crumb('tools');
 $phpinfo_link = action_icon( T_('View PHP info'), 'info', $phpinfo_url, '', 5, '', array( 'target'=>'_blank', 'onclick'=>'return pop_up_window( \''.$phpinfo_url.'\', \'phpinfo\', 650 )' ) );
-init_system_check( 'PHP version', PHP_VERSION.' '.$phpinfo_link );
+init_system_check( 'PHP version', $system_stats['php_version'].' '.$phpinfo_link );
 
-if( version_compare( PHP_VERSION, '4.1', '<' ) )
+if( version_compare( $system_stats['php_version'], '4.1', '<' ) )
 {
 	disp_system_check( 'error', T_('This version is too old. b2evolution will not run correctly. You must ask your host to upgrade PHP before you can run b2evolution.') );
 }
-elseif( version_compare( PHP_VERSION, '4.3', '<' ) )
+elseif( version_compare( $system_stats['php_version'], '4.3', '<' ) )
 {
 	disp_system_check( 'warning', T_('This version is old. b2evolution may run but some features may fail. You should ask your host to upgrade PHP before running b2evolution.') );
 }
@@ -349,8 +353,8 @@ else
 }
 
 // register_globals?
-init_system_check( 'PHP register_globals', ini_get('register_globals') ?  T_('On') : T_('Off') );
-if( ini_get('register_globals' ) )
+init_system_check( 'PHP register_globals', $system_stats['php_reg_globals'] ?  T_('On') : T_('Off') );
+if( $system_stats['php_reg_globals'] )
 {
 	disp_system_check( 'warning', $facilitate_exploits.' '.sprintf( $change_ini, 'register_globals = Off' )  );
 }
@@ -360,11 +364,11 @@ else
 }
 
 
-// allow_url_include? (since 5.2, supercedes allow_url_fopen for require()/include()
+// allow_url_include? (since 5.2, supercedes allow_url_fopen for require()/include())
 if( version_compare(PHP_VERSION, '5.2', '>=') )
 {
-	init_system_check( 'PHP allow_url_include', ini_get('allow_url_include') ?  T_('On') : T_('Off') );
-	if( ini_get('allow_url_include' ) )
+	init_system_check( 'PHP allow_url_include', $system_stats['php_allow_url_include'] ?  T_('On') : T_('Off') );
+	if( $system_stats['php_allow_url_include'] )
 	{
 		disp_system_check( 'warning', $facilitate_exploits.' '.sprintf( $change_ini, 'allow_url_include = Off' )  );
 	}
@@ -373,25 +377,25 @@ if( version_compare(PHP_VERSION, '5.2', '>=') )
 		disp_system_check( 'ok' );
 	}
 }
-
-
-/*
- * allow_url_fopen
- * Note: this allows including of remote files (PHP 4 only) as well as opening remote files with fopen() (all versions of PHP)
- * Both have potential for exploits. (The first is easier to exploit than the second).
- * dh> Should we check for curl etc then also and warn the user until there's no method for us anymore to open remote files?
- * fp> Yes
- */
-init_system_check( 'PHP allow_url_fopen', ini_get('allow_url_fopen') ?  T_('On') : T_('Off') );
-if( ini_get('allow_url_fopen' ) )
-{
-	disp_system_check( 'warning', $facilitate_exploits.' '.sprintf( $change_ini, 'allow_url_fopen = Off' )  );
-}
 else
 {
-	disp_system_check( 'ok' );
+	/*
+	 * allow_url_fopen
+	 * Note: this allows including of remote files (PHP 4 only) as well as opening remote files with fopen() (all versions of PHP)
+	 * Both have potential for exploits. (The first is easier to exploit than the second).
+	 * dh> Should we check for curl etc then also and warn the user until there's no method for us anymore to open remote files?
+	 * fp> Yes
+	 */
+	init_system_check( 'PHP allow_url_fopen', $system_stats['php_allow_url_fopen'] ?  T_('On') : T_('Off') );
+	if( $system_stats['php_allow_url_fopen'] )
+	{
+		disp_system_check( 'warning', $facilitate_exploits.' '.sprintf( $change_ini, 'allow_url_fopen = Off' )  );
+	}
+	else
+	{
+		disp_system_check( 'ok' );
+	}
 }
-
 
 // Magic quotes:
 if( !strcasecmp( ini_get('magic_quotes_sybase'), 'on' ) )
@@ -628,6 +632,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.38  2011/09/11 19:41:27  fplanque
+ * Added some system stats.
+ *
  * Revision 1.37  2011/09/06 00:54:38  fplanque
  * i18n update
  *

@@ -20,6 +20,65 @@
 
 
 /**
+ * Collect system stats for display on the "About this system" page
+ *
+ * @return array
+ */
+function get_system_stats()
+{
+	global $evo_charset, $DB, $Settings, $cache_path;
+
+	static $system_stats = array();
+
+	if( !empty($system_stats) )
+	{
+		return $system_stats;
+	}
+
+	// b2evo config choices:
+	$system_stats['mediadir_status'] = system_check_dir('media'); // If error, then the host is potentially borked
+	$system_stats['install_removed'] = system_check_install_removed();
+	$system_stats['evo_charset'] = $evo_charset;
+	$system_stats['evo_blog_count'] = count( system_get_blog_IDs( false ) );
+
+	// Caching:
+	$system_stats['cachedir_status'] = system_check_dir('cache'); // If error, then the host is potentially borked
+	$system_stats['cachedir_size'] = get_dirsize_recursive( $cache_path );
+	$system_stats['general_pagecache_enabled'] = $Settings->get( 'general_cache_enabled' );
+	$system_stats['blog_pagecaches_enabled'] = count( system_get_blog_IDs( true ) );
+
+	// Database:
+	$system_stats['db_version'] = $DB->get_version();	// MySQL version
+	$system_stats['db_utf8'] = system_check_db_utf8();
+
+	// PHP:
+	list( $uid, $uname ) = system_check_process_user();
+	$system_stats['php_uid'] = $uid;
+	$system_stats['php_uname'] = $uname;	// Potential unsecure hosts will use names like 'nobody', 'www-data'
+	list( $gid, $gname ) = system_check_process_group();
+	$system_stats['php_gid'] = $gid;
+	$system_stats['php_gname'] = $gname;	// Potential unsecure hosts will use names like 'nobody', 'www-data'
+	$system_stats['php_version'] = PHP_VERSION;
+	$system_stats['php_reg_globals'] = ini_get('register_globals');
+	$system_stats['php_allow_url_include'] = ini_get('allow_url_include');
+	$system_stats['php_allow_url_fopen'] = ini_get('allow_url_fopen');
+	// TODO php_magic quotes
+	$system_stats['php_upload_max'] = system_check_upload_max_filesize();
+	$system_stats['php_post_max'] = system_check_post_max_size();
+	$system_stats['php_memory'] = system_check_memory_limit(); // how much room does b2evo have to move?
+	$system_stats['php_mbstring'] = extension_loaded('mbstring');
+	$system_stats['php_xml'] = extension_loaded('xml');
+	$system_stats['php_imap'] = extension_loaded('imap');
+	$system_stats['php_opcode_cache'] = get_active_opcode_cache();
+
+	// GD:
+	$system_stats['gd_version'] = system_check_gd_version();
+
+	return $system_stats;
+}
+
+
+/**
  * Check if a directory is ready for operation, i-e writable by PHP.
  *
  * @return integer result code, 0 means 'ok'
@@ -74,7 +133,7 @@ function system_check_dir( $directory = 'media', $relative_path = NULL )
 
 /**
  * Get corresponding status and message for the system_check_dir code.
- * 
+ *
  * @param integer system_check_dir result code
  * @param string before message
  */
@@ -83,7 +142,7 @@ function system_get_result( $check_dir_code, $before_msg = '' )
 	$status = ( $check_dir_code == 0 ) ? 'ok' : 'error';
 	$system_results = array(
 		0 => T_( 'OK' ),
-		1 => T_( 'Unknown directory' ), 
+		1 => T_( 'Unknown directory' ),
 		2 => T_( 'The directory doesn\'t exist.' ),
 		3 => T_( 'The directory is not readable.' ),
 		4 => T_( 'The directory is not writable.' ),
@@ -94,7 +153,7 @@ function system_get_result( $check_dir_code, $before_msg = '' )
 
 /**
  * Create cache/ and  /cache/plugins/ folders
- * 
+ *
  * @return boolean false if cache/ folder not exists or has limited editing permission, true otherwise
  */
 function system_create_cache_folder()
@@ -116,19 +175,20 @@ function system_create_cache_folder()
 
 /**
  * Get blog ids
- * 
+ *
  * @param boolean true to get only those blogs where cache is enabled
  * @return array blog ids
  */
-function system_get_blogs( $only_cache_enabled )
+function system_get_blog_IDs( $only_cache_enabled )
 {
 	global $DB;
 	$query = 'SELECT blog_ID FROM T_blogs';
 	if( $only_cache_enabled )
 	{
-		$query .= ' INNER JOIN T_coll_settings ON ( blog_ID = cset_coll_ID
-								AND cset_name = "cache_enabled"
-								AND cset_value = "1" )';
+		$query .= ' INNER JOIN T_coll_settings ON
+										( blog_ID = cset_coll_ID
+									AND cset_name = "cache_enabled"
+									AND cset_value = "1" )';
 	}
 	return $DB->get_col( $query );
 }
@@ -136,7 +196,7 @@ function system_get_blogs( $only_cache_enabled )
 
 /**
  * Check if the given blog cache directory is ready for operation
- * 
+ *
  * @param mixed blog ID, or NULL to check the general cache
  * @param boolean true if function should try to repair the corresponding cache folder, false otherwise
  * @return mixed false if the corresponding setting is disabled, or array( status, message ).
@@ -212,7 +272,7 @@ function system_check_caches( $repair = true )
 		}
 	}
 
-	$cache_enabled_blogs = system_get_blogs( true ); 
+	$cache_enabled_blogs = system_get_blog_IDs( true );
 	$BlogCache = & get_BlogCache();
 	foreach( $cache_enabled_blogs as $blog_ID )
 	{ // blog's cache folder should exists
@@ -246,7 +306,7 @@ function system_init_caches()
 
 	$Settings->set( 'newblog_cache_enabled', true );
 	set_cache_enabled( 'general_cache_enabled', true );
-	$existing_blogs = system_get_blogs( false );
+	$existing_blogs = system_get_blog_IDs( false );
 	foreach( $existing_blogs as $blog_ID )
 	{
 		set_cache_enabled( 'cache_enabled', true, $blog_ID );
@@ -415,6 +475,9 @@ function system_check_gd_version()
 
 /*
  * $Log$
+ * Revision 1.12  2011/09/11 19:41:26  fplanque
+ * Added some system stats.
+ *
  * Revision 1.11  2011/09/04 22:13:21  fplanque
  * copyright 2011
  *

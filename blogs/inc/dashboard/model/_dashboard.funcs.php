@@ -103,10 +103,9 @@ function b2evonet_get_updates( $force_short_delay = false )
 
 	// Run system checks:
 	load_funcs( 'tools/model/_system.funcs.php' );
-	list( $mediadir_status ) =  system_get_result( system_check_dir('media') );
-	list( $installdir_status ) = system_check_install_removed();
-	list( $uid, $uname ) = system_check_process_user();
-	list( $gid, $gname ) = system_check_process_group();
+
+	// Get system stats to display:
+	$system_stats = get_system_stats();
 
 	// Construct XML-RPC message:
 	$message = new xmlrpcmsg(
@@ -120,32 +119,39 @@ function b2evonet_get_updates( $force_short_delay = false )
 									new xmlrpcval( array(
 											'this_update' => new xmlrpcval( $servertimenow, 'string' ),
 											'last_update' => new xmlrpcval( $servertime_last_update, 'string' ),
-											'db_version' => new xmlrpcval( $DB->get_version(), 'string'),	// If a version >95% we make it the new default.
-											'db_utf8' => new xmlrpcval( system_check_db_utf8() ? 1 : 0, 'int' ),	// if support >95%, we'll make it the default
-											'evo_charset' => new xmlrpcval( $evo_charset, 'string' ),			// Do people actually use UTF8?
-											'php_version' => new xmlrpcval( PHP_VERSION, 'string' ),			// Target minimum version: PHP 5.2
-											'php_xml' => new xmlrpcval( extension_loaded('xml') ? 1 : 0, 'int' ),
-											'php_imap' => new xmlrpcval( extension_loaded('imap') ? 1 : 0, 'int' ),	// Does it make sense to rely on IMAP to handle undelivered emails (for user registrations/antispam)
-											'php_mbstring' => new xmlrpcval( extension_loaded('mbstring') ? 1 : 0, 'int' ),
-											'php_memory' => new xmlrpcval( system_check_memory_limit(), 'int'), // how much room does b2evo have to move on a typical server?
-											'php_upload_max' => new xmlrpcval( system_check_upload_max_filesize(), 'int' ),
-											'php_post_max' => new xmlrpcval( system_check_post_max_size(), 'int' ),
-											'mediadir_status' => new xmlrpcval( $mediadir_status, 'string' ), // If error, then the host is potentially borked
-											'install_removed' => new xmlrpcval( ($installdir_status == 'ok') ? 1 : 0, 'int' ), // How many people do go through this extra measure?
+											'mediadir_status' => new xmlrpcval( $system_stats['mediadir_status'], 'int' ), // If error, then the host is potentially borked
+											'install_removed' => new xmlrpcval( ($system_stats['install_removed'] == 'ok') ? 1 : 0, 'int' ), // How many people do go through this extra measure?
+											'evo_charset' => new xmlrpcval( $system_stats['evo_charset'], 'string' ),			// Do people actually use UTF8?
+											'evo_blog_count' => new xmlrpcval( $system_stats['evo_blog_count'], 'int'),   // How many users do use multiblogging?
+											'cachedir_status' => new xmlrpcval( $system_stats['cachedir_status'], 'int'),
+                      'cachedir_size' => new xmlrpcval( $system_stats['cachedir_size'], 'int'),
+                      'general_pagecache_enabled' => new xmlrpcval( $system_stats['general_pagecache_enabled'] ? 1 : 0, 'int' ),
+                      'blog_pagecaches_enabled' => new xmlrpcval( $system_stats['blog_pagecaches_enabled'], 'int' ),
+											'db_version' => new xmlrpcval( $system_stats['db_version'], 'string'),	// If a version >95% we make it the new default.
+											'db_utf8' => new xmlrpcval( $system_stats['db_utf8'] ? 1 : 0, 'int' ),	// if support >95%, we'll make it the default
 											// How many "low security" hosts still active?; we'd like to standardize security best practices... on suphp?
-											'php_uid' => new xmlrpcval( $uid, 'int' ),
-											'php_uname' => new xmlrpcval( $uname, 'string' ),	// Potential unsecure hosts will use names like 'nobody', 'www-data'
-											'php_gid' => new xmlrpcval( $gid, 'int' ),
-											'php_gname' => new xmlrpcval( $gname, 'string' ),	// Potential unsecure hosts will use names like 'nobody', 'www-data'
-											'php_reg_globals' => new xmlrpcval( ini_get('register_globals') ? 1 : 0, 'int' ), // if <5% we may actually refuse to run future version on this
-											'php_opcode_cache' => new xmlrpcval( get_active_opcode_cache(), 'string' ), // How many use one? Which is the most popular?
-											'gd_version' => new xmlrpcval( system_check_gd_version(), 'string' ),
+											'php_uid' => new xmlrpcval( $system_stats['php_uid'], 'int' ),
+											'php_uname' => new xmlrpcval( $system_stats['php_uname'], 'string' ),	// Potential unsecure hosts will use names like 'nobody', 'www-data'
+											'php_gid' => new xmlrpcval( $system_stats['php_gid'], 'int' ),
+											'php_gname' => new xmlrpcval( $system_stats['php_gname'], 'string' ),	// Potential unsecure hosts will use names like 'nobody', 'www-data'
+											'php_version' => new xmlrpcval( $system_stats['php_version'], 'string' ),			// Target minimum version: PHP 5.2
+											'php_reg_globals' => new xmlrpcval( $system_stats['php_reg_globals'] ? 1 : 0, 'int' ), // if <5% we may actually refuse to run future version on this
+											'php_allow_url_include' => new xmlrpcval( $system_stats['php_allow_url_include'] ? 1 : 0, 'int' ),
+											'php_allow_url_fopen' => new xmlrpcval( $system_stats['php_allow_url_fopen'] ? 1 : 0, 'int' ),
+											// TODO php_magic quotes
+											'php_upload_max' => new xmlrpcval( $system_stats['php_upload_max'], 'int' ),
+											'php_post_max' => new xmlrpcval( $system_stats['php_post_max'], 'int' ),
+											'php_memory' => new xmlrpcval( $system_stats['php_memory'], 'int'), // how much room does b2evo have to move on a typical server?
+											'php_mbstring' => new xmlrpcval( $system_stats['php_mbstring'] ? 1 : 0, 'int' ),
+											'php_xml' => new xmlrpcval( $system_stats['php_xml'] ? 1 : 0, 'int' ),
+											'php_imap' => new xmlrpcval( $system_stats['php_imap'] ? 1 : 0, 'int' ),	// Does it make sense to rely on IMAP to handle undelivered emails (for user registrations/antispam)
+											'php_opcode_cache' => new xmlrpcval( $system_stats['php_opcode_cache'], 'string' ), // How many use one? Which is the most popular?
+											'gd_version' => new xmlrpcval( $system_stats['gd_version'], 'string' ),
 											// TODO: add missing system stats
 										), 'struct' ),
 								)
 							);
 
-							pre_dump($message);
 	$result = $client->send($message);
 
 	if( $ret = xmlrpc_logresult( $result, $Messages, false ) )
@@ -292,6 +298,9 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 /*
  * $Log$
+ * Revision 1.46  2011/09/11 19:41:26  fplanque
+ * Added some system stats.
+ *
  * Revision 1.45  2011/09/11 16:12:25  fplanque
  * added imap availability stat
  *
