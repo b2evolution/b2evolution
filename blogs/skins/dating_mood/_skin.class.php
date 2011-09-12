@@ -55,12 +55,12 @@ class dating_mood_Skin extends Skin
 																		'error'=>T_('Invalid color code.') ),
 				),
 				'colorbox' => array(
-					'label' => T_('Colorbox enabled'),
-					'note' => T_('Check if colorbox enabled'),
-					'defaultvalue' => true,
+					'label' => T_('Colorbox Image Zoom'),
+					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
+					'defaultvalue' => 1,
 					'type'	=>	'checkbox',
 					'for_editing'	=>	true,
-				)
+				),				
 				
 			), parent::get_param_definitions( $params )	);
 
@@ -117,6 +117,9 @@ class dating_mood_Skin extends Skin
 
 /*
  * $Log$
+ * Revision 1.6  2011/09/12 16:43:36  lxndral
+ * skins colorbox fix
+ *
  * Revision 1.5  2011/09/09 23:26:47  lxndral
  * Add _skins.class.php to all skins  (Easy task)
  *

@@ -55,8 +55,9 @@ class intense_Skin extends Skin
 				'colorbox' => array(
 					'label' => T_('Colorbox Image Zoom'),
 					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
-					'defaultvalue' => true,
+					'defaultvalue' => 1,
 					'type'	=>	'checkbox',
+					'for_editing'	=>	true,
 				),							
 			), parent::get_param_definitions( $params )	);
 

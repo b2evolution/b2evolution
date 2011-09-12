@@ -56,7 +56,6 @@ class pluralism_Skin extends Skin
 	/**
 	 * Get definitions for editable params
 	 *
-	 * fp>alev : please put the functions in the ***same*** order in all skins. Use evopress as a reference.
 	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param local params like 'for_editing' => true
@@ -65,12 +64,12 @@ class pluralism_Skin extends Skin
 	{
 		$r = array_merge( array(
 				'colorbox' => array(
-					'label' => T_('Colorbox enabled'),
-					'note' => T_('Check if colorbox enabled'),
-					'defaultvalue' => true,
+					'label' => T_('Colorbox Image Zoom'),
+					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
+					'defaultvalue' => 1,
 					'type'	=>	'checkbox',
 					'for_editing'	=>	true,
-				)
+				),				
 			), parent::get_param_definitions( $params )	);
 
 		return $r;

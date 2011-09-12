@@ -245,21 +245,11 @@ $AdminUI->disp_payload_end();
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-// if php less than 5.1 => need declare function
-// fp>alev this is not a right place for this
-if ( !function_exists( 'property_exists' ) ) {
-    function property_exists( $class, $property ) {
-        if ( is_object( $class ) ) {
-            $vars = get_object_vars( $class );
-        } else {
-            $vars = get_class_vars( $class );
-        }
-        return array_key_exists( $property, $vars );
-    }
-} 
-
 /*
  * $Log$
+ * Revision 1.21  2011/09/12 16:43:35  lxndral
+ * skins colorbox fix
+ *
  * Revision 1.20  2011/09/10 22:48:41  fplanque
  * doc
  *

@@ -65,6 +65,7 @@ class evopress_Skin extends Skin
 					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
 					'defaultvalue' => 1,
 					'type'	=>	'checkbox',
+					'for_editing'	=>	true,
 				),							
 			), parent::get_param_definitions( $params )	);
 
@@ -105,6 +106,9 @@ class evopress_Skin extends Skin
 
 /*
  * $Log$
+ * Revision 1.10  2011/09/12 16:43:36  lxndral
+ * skins colorbox fix
+ *
  * Revision 1.9  2011/09/10 21:18:33  fplanque
  * cleanup
  *

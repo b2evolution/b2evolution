@@ -67,14 +67,12 @@ class asevo_Skin extends Skin
 	{
 		$r = array_merge( array(
 				'colorbox' => array(
-					'label' => T_('Colorbox enabled'),
-					'note' => T_('Check if colorbox enabled'),
-					'defaultvalue' => true,
+					'label' => T_('Colorbox Image Zoom'),
+					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
+					'defaultvalue' => 1,
 					'type'	=>	'checkbox',
-					'valid_pattern' => array( 'pattern'=>'~^([0-4]{1})?$~',
-																		'error'=>T_('Invalid colorbox value.') ),
 					'for_editing'	=>	true,
-				)
+				),				
 			), parent::get_param_definitions( $params )	);
 
 		return $r;
