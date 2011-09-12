@@ -70,7 +70,7 @@ $Form->begin_fieldset();
 	$registration_require_gender = $Settings->get( 'registration_require_gender' );
 	if( $registration_require_gender == 'required' )
 	{
-		$Form->radio_input( 'gender', false, array(
+		$Form->radio_input( 'gender', $gender, array(
 					array( 'value' => 'M', 'label' => T_('A man') ),
 					array( 'value' => 'F', 'label' => T_('A woman') ),
 				), T_('I am'), array( 'required' => true ) );
@@ -100,6 +100,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.28  2011/09/12 08:05:18  efy-asimo
+ * Remember to gender
+ *
  * Revision 1.27  2011/09/08 23:29:27  fplanque
  * More blockcache/widget fixes around login/register links.
  *
