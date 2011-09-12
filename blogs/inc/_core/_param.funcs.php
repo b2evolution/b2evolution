@@ -1784,6 +1784,34 @@ function param_check_html( $var, $err_msg = '#', $field_err_msg = '#', $autobr =
 
 
 /**
+ * @param string param name
+ * @param boolean required
+ * @return booelan true if OK
+ */
+function param_check_gender( $var, $required = false )
+{
+	if( empty( $GLOBALS[$var] ) )
+	{ // empty is OK if not required:
+		if( $required )
+		{
+			param_error( $var, T_( 'Please select gender!' ) );
+			return false;
+		}
+		return true;
+	}
+
+	$gender_value = $GLOBALS[$var];
+	if( ( $gender_value != 'M' ) && ( $gender_value != 'F' ) )
+	{
+		param_error( $var, T_( 'Gender value is invalid' ).':'.$gender_value );
+		return false;
+	}
+
+	return true;
+}
+
+
+/**
  * DEPRECATED Stub for plugin compatibility:
  */
 function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NULL )
@@ -2122,6 +2150,9 @@ function isset_param( $var )
 
 /*
  * $Log$
+ * Revision 1.71  2011/09/12 07:50:57  efy-asimo
+ * User gender validation
+ *
  * Revision 1.70  2011/09/07 00:28:26  sam2kb
  * Replace non-ASCII character in regular expressions with ~
  *

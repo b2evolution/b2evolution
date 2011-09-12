@@ -675,9 +675,16 @@ function profile_check_params( $params, $User = NULL )
 	}
 
 	// Checking gender
-	if( isset($params['gender']) && empty($params['gender'][0]) )
+	if( isset($params['gender']) )
 	{
-		param_error( 'gender', T_('Please select gender.') );
+		if( empty($params['gender'][0]) )
+		{
+			param_error( 'gender', T_('Please select gender.') );
+		}
+		elseif( ( $params['gender'][0] != 'M' ) && ( $params['gender'][0] != 'F' ) )
+		{
+			param_error( 'gender', T_('Gender value is invalid').':'.$params['gender'][0] );
+		}
 	}
 
 	// Checking URL:
@@ -1039,6 +1046,9 @@ function get_editform_title( $edited_User, $tab_title )
 
 /*
  * $Log$
+ * Revision 1.52  2011/09/12 07:50:57  efy-asimo
+ * User gender validation
+ *
  * Revision 1.51  2011/09/12 06:41:06  efy-asimo
  * Change user edit forms titles
  *

@@ -436,7 +436,10 @@ class User extends DataObject
 			$this->set_from_Request('ctry_ID', 'edited_user_ctry_ID', true);
 
 			param( 'edited_user_gender', 'string', '' );
-			$this->set_from_Request('gender', 'edited_user_gender', true);
+			if( param_check_gender( 'edited_user_gender', $Settings->get( 'registration_require_gender' ) == 'required' ) )
+			{
+				$this->set_from_Request('gender', 'edited_user_gender', true);
+			}
 
 			param( 'edited_user_url', 'string', true );
 			param_check_url( 'edited_user_url', 'commenting' );
@@ -2454,6 +2457,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.116  2011/09/12 07:50:57  efy-asimo
+ * User gender validation
+ *
  * Revision 1.115  2011/09/12 05:28:46  efy-asimo
  * User profile form refactoring
  *
