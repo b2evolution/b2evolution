@@ -70,56 +70,8 @@ global $user_profile_only;
  */
 global $form_action;
 
-$GroupCache = & get_GroupCache();
-$group_msg_perm = $GroupCache->get_option_array( 'check_messaging_perm' );
-
-// User Groups dropdown list handler
-// Depending on the group it may be impossible for a user to access private messages
 ?>
 <script type="text/javascript">
-	function user_group_changed()
-	{
-		var val = jQuery( '#edited_user_grp_ID' ).val();
-		if( val == null )
-		{ // there is no groups drop down list
-			return;
-		}
-
-		var perms = [];
-		var msgform = 0;
-
-		<?php
-		foreach( $group_msg_perm as $key => $value )
-		{ // set groups permissions
-			echo 'perms['.$key.'] = '.($value ? 'true' : 'false').';';
-		}
-		echo 'msgform = '.$edited_User->get( 'allow_msgform' );
-		?>
-
-		if( perms[val] )
-		{ // private messages are allowed in selected group - enable option
-			if( $( '.checkbox[name=PM]' ).attr('disabled') )
-			{
-				$( '.checkbox[name=PM]' ).removeAttr('disabled');
-				$( '#label_for_PM_1' ).removeAttr('disabled');
-				if( msgform % 2 == 1 )
-				{ // if user allows PM check PM box
-					$( '.checkbox[name=PM]' ).attr('checked', true );
-				}
-			}
-		}
-		else
-		{ // private messages are not allowed in selected group - disable option
-			if( ! $( '.checkbox[name=PM]' ).attr('disabled') )
-			{
-				// uncheck PM box, because it is not a valid option
-				$( '.checkbox[name=PM]' ).attr('checked', false );
-				$( '.checkbox[name=PM]' ).attr('disabled','disabled');
-				$( '#label_for_PM_1' ).attr('disabled','disabled');
-			}
-		}
-	}
-
 	// Identity shown dropdown list handler
 	// init variables
 	var idmodes = [];
@@ -281,8 +233,8 @@ $group_msg_perm = $GroupCache->get_option_array( 'check_messaging_perm' );
 </script>
 <?php
 
-// Begin payload block:
-//$this->disp_payload_begin();
+$has_full_access = $current_User->check_perm( 'users', 'edit' );
+$new_user_creating = ( $edited_User->ID == 0 );
 
 $Form = new Form( $form_action, 'user_checkchanges' );
 
@@ -294,7 +246,7 @@ if( !$user_profile_only )
 $is_admin = is_admin_page();
 if( $is_admin )
 {
-	if( $edited_User->ID == 0 )
+	if( $new_user_creating )
 	{
 		$form_title = T_('Edit user profile');
 	}
@@ -319,77 +271,26 @@ else
 
 	$Form->hidden( 'user_ID', $edited_User->ID );
 
-	/***************  User permissions  **************/
+if( $new_user_creating )
+{
+	$current_User->check_perm( 'users', 'edit', true );
+	$edited_User->get_Group();
 
-$Form->begin_fieldset( T_('User permissions').get_manual_link('user_permissions'), array( 'class'=>'fieldset clear' ) );
+	$Form->begin_fieldset( T_( 'New user' ), array( 'class' => 'fieldset clear' ) );
 
-$edited_User->get_Group();
-
-$has_full_access = $current_User->check_perm( 'users', 'edit' );
-
-if( $edited_User->ID != 1 && $has_full_access )
-{	// This is not Admin and we're not restricted: we're allowed to change the user group:
-	$chosengroup = ( $edited_User->Group === NULL ) ? $Settings->get('newusers_grp_ID') : $edited_User->Group->ID;
+	$chosengroup = ( $edited_User->Group === NULL ) ? $Settings->get( 'newusers_grp_ID' ) : $edited_User->Group->ID;
 	$GroupCache = & get_GroupCache();
-	$Form->select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, T_('User group'), '', false, '', 'get_option_list', 'user_group_changed()' );
-}
-else
-{
-	echo '<input type="hidden" name="edited_user_grp_ID" value="'.$edited_User->Group->ID.'" />';
-	$Form->info( T_('User group'), $edited_User->Group->dget('name') );
-}
+	$Form->select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, T_( 'User group' ) );
 
-$field_note = '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://manual.b2evolution.net/User_levels"' );
-if( $action != 'view' && $has_full_access )
-{
+	$field_note = '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://manual.b2evolution.net/User_levels"' );
 	$Form->text_input( 'edited_user_level', $edited_User->get('level'), 2, T_('User level'), $field_note, array( 'required' => true ) );
-}
-else
-{
-	$Form->info_field( T_('User level'), $edited_User->get('level'), array( 'note' => $field_note ) );
-}
 
-$Form->end_fieldset();
-
-	/***************  Email communications  **************/
-
-$Form->begin_fieldset( T_('Email communications') );
-
-$email_fieldnote = '<a href="mailto:'.$edited_User->get('email').'">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
-
-if( $action != 'view' )
-{ // We can edit the values:
-
+	$email_fieldnote = '<a href="mailto:'.$edited_User->get('email').'">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
 	$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email'), $email_fieldnote, array( 'maxlength' => 100, 'required' => true ) );
-	if( $has_full_access )
-	{ // user has "edit users" perms:
-		$Form->checkbox( 'edited_user_validated', $edited_User->get('validated'), T_('Validated email'), T_('Has this email address been validated (through confirmation email)?') );
-	}
-	else
-	{ // info only:
-		$Form->info( T_('Validated email'), ( $edited_User->get('validated') ? T_('yes') : T_('no') ), T_('Has this email address been validated (through confirmation email)?') );
-	}
-	$messaging_options = array(
-		array( 'PM', 1, T_( 'Allow others to send me private messages' ), ( $edited_User->get( 'allow_msgform' ) % 2 == 1 ) ),
-		array( 'email', 2, T_( 'Allow others to send me emails through a message form (email address will never be displayed)' ),  $edited_User->get( 'allow_msgform' ) > 1 ) );
-	$Form->checklist( $messaging_options, 'edited_user_msgform', T_('Message form') );
-	$notify_options = array(
-		array( 'edited_user_notify', 1, T_( 'Notify me by email whenever a comment is published on one of <strong>my</strong> posts.' ), $edited_User->get( 'notify' ) ),
-		array( 'edited_user_notify_moderation', 2, T_( 'Notify me by email whenever a comment is awaiting moderation on one of <strong>my</strong> blogs.' ), $edited_User->get( 'notify_moderation' ) ) );
-	$Form->checklist( $notify_options, 'edited_user_notification', T_( 'Notifications' ) );
+	$Form->checkbox( 'edited_user_validated', $edited_User->get('validated'), T_('Validated email'), T_('Has this email address been validated (through confirmation email)?') );
 
+	$Form->end_fieldset();
 }
-else
-{ // display only
-
-	$Form->info( T_('Email'), $edited_User->get('email'), $email_fieldnote );
-	$Form->info( T_('Validated email'), ( $edited_User->get('validated') ? T_('yes') : T_('no') ), T_('Has this email address been validated (through confirmation email)?') );
-	$Form->info( T_('Message form'), ($edited_User->get('allow_msgform') ? T_('yes') : T_('no')) );
-	$Form->info( T_('Notifications'), ($edited_User->get('notify') ? T_('yes') : T_('no')) );
-
-  }
-
-$Form->end_fieldset();
 
 	/***************  Identity  **************/
 
@@ -417,8 +318,6 @@ if( $action != 'view' )
 	$CountryCache = & get_CountryCache();
 	$Form->select_input_object( 'edited_user_ctry_ID', $edited_User->ctry_ID, $CountryCache, T_('Country'), array( 'required' => !$has_full_access, 'allow_none' => $has_full_access ) );
 
-	$Form->checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show online'), T_('Check this to be displayed as online when visiting the site.') );
-
 	if( $Settings->get( 'registration_require_gender' ) != 'hidden' )
 	{
 		$Form->radio( 'edited_user_gender', $edited_User->get('gender'), array(
@@ -441,7 +340,6 @@ else
 	$Form->info( T_('Nickname'), $edited_User->get('nickname') );
 	$Form->info( T_('Identity shown'), $edited_User->get('preferredname') );
 	$Form->info( T_('Country'), $edited_User->get_country_name() );
-	$Form->info( T_('Show online'), ($edited_User->get('showonline')) ? T_('yes') : T_('no') );
 
 	if( $Settings->get( 'registration_require_gender' ) != 'hidden' )
 	{
@@ -485,20 +383,9 @@ if( empty( $edited_User->ID ) && $action != 'view' )
 
 	/***************  Additional info  **************/
 
-
 $Form->begin_fieldset( T_('Additional info') );
 
-if( $edited_User->ID != 0 )
-{ // We're NOT creating a new user:
-	$Form->info_field( T_('ID'), $edited_User->ID );
-
-	$Form->info_field( T_('Posts'), $edited_User->get_num_posts() );
-
-	$Form->info_field( T_('Created on'), $edited_User->dget('datecreated') );
-	$Form->info_field( T_('From IP'), $edited_User->dget('ip') );
-	$Form->info_field( T_('From Domain'), $edited_User->dget('domain') );
-	$Form->info_field( T_('With Browser'), $edited_User->dget('browser') );
-}
+$Form->info_field( T_('Created on'), $edited_User->dget('datecreated') );
 
 if( ($url = $edited_User->get('url')) != '' )
 {
@@ -525,7 +412,7 @@ else
 if( $action != 'view' )
 { // We can edit the values:
 
-	if( $has_full_access )
+	if( $new_user_creating )
 	{
 		$Form->text_input( 'edited_user_source', $edited_User->source, 30, T_('Source'), '', array( 'maxlength' => 30 ) );
 	}
@@ -732,9 +619,6 @@ $Form->end_form();
 
 ?>
 <script type="text/javascript">
-	// call the users group dropdown list handler
-	user_group_changed();
-
 	// handle firstname and lastname change in the Identity shown dropdown list
 	jQuery( '#edited_user_firstname' ).change( function()
 	{
@@ -755,6 +639,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.37  2011/09/12 05:28:47  efy-asimo
+ * User profile form refactoring
+ *
  * Revision 1.36  2011/09/10 22:48:41  fplanque
  * doc
  *

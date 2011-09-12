@@ -939,6 +939,13 @@ function get_user_sub_entries( $is_admin, $user_ID )
 								'text' => T_('Advanced'),
 								'href' => '?ctrl=user&amp;user_tab=advanced'.$user_param );
 
+			if( $current_User->group_ID == 1 )
+			{ // Only admin users can see the 'Admin' tab
+				$users_sub_entries['admin'] = array(
+									'text' => T_('Admin'),
+									'href' => '?ctrl=user&amp;user_tab=admin'.$user_param );
+			}
+
 			$users_sub_entries['blogs'] = array(
 								'text' => T_('Personal blogs'),
 		 						'href' => '?ctrl=user&amp;user_tab=blogs'.$user_param );
@@ -1014,6 +1021,9 @@ function get_prefered_name( $nickname, $firstname, $login )
 
 /*
  * $Log$
+ * Revision 1.50  2011/09/12 05:28:46  efy-asimo
+ * User profile form refactoring
+ *
  * Revision 1.49  2011/09/10 00:57:23  fplanque
  * doc
  *

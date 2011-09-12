@@ -103,6 +103,13 @@ class User extends DataObject
 	var $_num_posts;
 
 	/**
+	 * Number of comments by this user. Use get_num_comments() to access this (lazy filled).
+	 * @var integer
+	 * @access protected
+	 */
+	var $_num_comments;
+
+	/**
 	 * The ID of the (primary, currently only) group of the user.
 	 * @var integer
 	 */
@@ -266,30 +273,42 @@ class User extends DataObject
 		global $DB, $Settings, $UserSettings, $GroupCache, $Messages;
 		global $current_User;
 
+		$is_new_user = ( $this->ID == 0 );
 		$edited_user_login = param( 'edited_user_login', 'string' );
 		param_check_not_empty( 'edited_user_login', T_( 'You must provide a login!' ) );
 		// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
 		$this->set_from_Request( 'login', 'edited_user_login', true, 'evo_strtolower' );
 
-		// ******* Identity form ******* //
-
 		$is_identity_form = param( 'identity_form', 'boolean', false );
+		$is_admin_form = param( 'admin_form', 'boolean', false );
 
-		if( $is_identity_form )
-		{
-			if( $current_User->check_perm( 'users', 'edit' ) )
-			{// changing level/group is allowed (not in profile mode)
-
+		// ******* Admin form or new user create ******* //
+		if( $is_admin_form || ( $is_identity_form && $is_new_user && $current_User->check_perm( 'users', 'edit', true ) ) )
+		{ // level/group and email options are displayed on identity form only when creating a new user.
+			if( $this->ID != 1 )
+			{ // the admin user group can't be changed
 				param_integer_range( 'edited_user_level', 0, 10, T_('User level must be between %d and %d.') );
 				$this->set_from_Request( 'level', 'edited_user_level', true );
-
-				param( 'edited_user_validated', 'integer', 0 );
-				$this->set_from_Request( 'validated', 'edited_user_validated', true );
 
 				$edited_user_Group = $GroupCache->get_by_ID( param( 'edited_user_grp_ID', 'integer' ) );
 				$this->set_Group( $edited_user_Group );
 			}
 
+			param( 'edited_user_source', 'string', true );
+			$this->set_from_Request('source', 'edited_user_source', true);
+
+			param( 'edited_user_email', 'string', true );
+			param_check_not_empty( 'edited_user_email', T_('Please enter your e-mail address.') );
+			param_check_email( 'edited_user_email', true );
+			$this->set_from_Request('email', 'edited_user_email', true);
+
+			param( 'edited_user_validated', 'integer', 0 );
+			$this->set_from_Request( 'validated', 'edited_user_validated', true );
+		}
+
+		// ******* Identity form ******* //
+		if( $is_identity_form )
+		{
 			// check if new login already exists for another user_ID
 			$query = '
 				SELECT user_ID
@@ -345,7 +364,7 @@ class User extends DataObject
 			}
 
 			// Duplicate fields:  
-			if ($this->ID == 0) 
+			if( $is_new_user )
 			{
 				$user_id = param( 'orig_user_ID', 'string', "" );
 				if ($user_id <> "") 
@@ -392,6 +411,74 @@ class User extends DataObject
 				$this->userfield_add( $new_uf_type, $new_uf_val );
 			}
 
+			param( 'edited_user_firstname', 'string', true );
+			$this->set_from_Request('firstname', 'edited_user_firstname', true);
+
+			param( 'edited_user_lastname', 'string', true );
+			$this->set_from_Request('lastname', 'edited_user_lastname', true);
+
+			if( $Settings->get( 'nickname_editing' ) == 'hidden' )
+			{
+				$this->set_from_Request('nickname', 'edited_user_login', true);
+			}
+			else
+			{
+				param( 'edited_user_nickname', 'string', true );
+				param_check_not_empty( 'edited_user_nickname', T_('Please enter a nickname (can be the same as your login).') );
+				$this->set_from_Request('nickname', 'edited_user_nickname', true);
+			}
+
+			param( 'edited_user_idmode', 'string', true );
+			$this->set_from_Request('idmode', 'edited_user_idmode', true);
+
+			param( 'edited_user_ctry_ID', 'integer', true );
+			param_check_number( 'edited_user_ctry_ID', 'Please select a country', !$current_User->check_perm( 'users', 'edit' ) );
+			$this->set_from_Request('ctry_ID', 'edited_user_ctry_ID', true);
+
+			param( 'edited_user_gender', 'string', '' );
+			$this->set_from_Request('gender', 'edited_user_gender', true);
+
+			param( 'edited_user_url', 'string', true );
+			param_check_url( 'edited_user_url', 'commenting' );
+			$this->set_from_Request('url', 'edited_user_url', true);
+
+			param( 'edited_user_icq', 'string', true );
+			param_check_number( 'edited_user_icq', T_('The ICQ UIN can only be a number, no letters allowed.') );
+			$this->set_from_Request('icq', 'edited_user_icq', true);
+
+			param( 'edited_user_aim', 'string', true );
+			$this->set_from_Request('aim', 'edited_user_aim', true);
+
+			param( 'edited_user_msn', 'string', true );
+			param_check_email( 'edited_user_msn', false );
+			$this->set_from_Request('msn', 'edited_user_msn', true);
+
+			param( 'edited_user_yim', 'string', true );
+			$this->set_from_Request('yim', 'edited_user_yim', true);
+		}
+
+		// ******* Password form ******* //
+
+		$is_password_form = param( 'password_form', 'boolean', false );
+
+		if( $is_password_form || ( $is_identity_form && $is_new_user ) )
+		{
+			param( 'edited_user_pass1', 'string', true );
+			$edited_user_pass2 = param( 'edited_user_pass2', 'string', true );
+
+			if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') ) )
+			{ 	// We can set password
+				$this->set( 'pass', md5( $edited_user_pass2 ) );
+			}
+		}
+
+		// ******* Preferences form ******* //
+
+		$is_preferences_form = param( 'preferences_form', 'boolean', false );
+
+		if( $is_preferences_form )
+		{
+			// Email communication
 			param( 'edited_user_email', 'string', true );
 			param_check_not_empty( 'edited_user_email', T_('Please enter your e-mail address.') );
 			param_check_email( 'edited_user_email', true );
@@ -419,82 +506,7 @@ class User extends DataObject
 			param( 'edited_user_notify_moderation', 'integer', 0 );
 			$this->set_from_Request('notify_moderation', 'edited_user_notify_moderation', true);
 
-			param( 'edited_user_firstname', 'string', true );
-			$this->set_from_Request('firstname', 'edited_user_firstname', true);
-
-			param( 'edited_user_lastname', 'string', true );
-			$this->set_from_Request('lastname', 'edited_user_lastname', true);
-
-			if( $Settings->get( 'nickname_editing' ) == 'hidden' )
-			{
-				$this->set_from_Request('nickname', 'edited_user_login', true);
-			}
-			else
-			{
-				param( 'edited_user_nickname', 'string', true );
-				param_check_not_empty( 'edited_user_nickname', T_('Please enter a nickname (can be the same as your login).') );
-				$this->set_from_Request('nickname', 'edited_user_nickname', true);
-			}
-
-			param( 'edited_user_idmode', 'string', true );
-			$this->set_from_Request('idmode', 'edited_user_idmode', true);
-
-			param( 'edited_user_ctry_ID', 'integer', true );
-			param_check_number( 'edited_user_ctry_ID', 'Please select a country', !$current_User->check_perm( 'users', 'edit' ) );
-			$this->set_from_Request('ctry_ID', 'edited_user_ctry_ID', true);
-
-			param( 'edited_user_showonline', 'integer', 0 );
-			$this->set_from_Request('showonline', 'edited_user_showonline', true);
-
-			param( 'edited_user_gender', 'string', '' );
-			$this->set_from_Request('gender', 'edited_user_gender', true);
-
-			if( $is_identity_form && $current_User->check_perm( 'users', 'edit' ) )
-			{
-				param( 'edited_user_source', 'string', true );
-				$this->set_from_Request('source', 'edited_user_source', true);
-			}
-
-			param( 'edited_user_url', 'string', true );
-			param_check_url( 'edited_user_url', 'commenting' );
-			$this->set_from_Request('url', 'edited_user_url', true);
-
-			param( 'edited_user_icq', 'string', true );
-			param_check_number( 'edited_user_icq', T_('The ICQ UIN can only be a number, no letters allowed.') );
-			$this->set_from_Request('icq', 'edited_user_icq', true);
-
-			param( 'edited_user_aim', 'string', true );
-			$this->set_from_Request('aim', 'edited_user_aim', true);
-
-			param( 'edited_user_msn', 'string', true );
-			param_check_email( 'edited_user_msn', false );
-			$this->set_from_Request('msn', 'edited_user_msn', true);
-
-			param( 'edited_user_yim', 'string', true );
-			$this->set_from_Request('yim', 'edited_user_yim', true);
-		}
-
-		// ******* Password form ******* //
-
-		$is_password_form = param( 'password_form', 'boolean', false );
-
-		if( $is_password_form || ( $is_identity_form && $this->ID == 0 ) )
-		{
-			param( 'edited_user_pass1', 'string', true );
-			$edited_user_pass2 = param( 'edited_user_pass2', 'string', true );
-
-			if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') ) )
-			{ 	// We can set password
-				$this->set( 'pass', md5( $edited_user_pass2 ) );
-			}
-		}
-
-		// ******* Preferences form ******* //
-
-		$is_preferences_form = param( 'preferences_form', 'boolean', false );
-
-		if( $is_preferences_form )
-		{
+			// Other preferences
 			param( 'edited_user_locale', 'string', true );
 			$this->set_from_Request('locale', 'edited_user_locale', true);
 
@@ -512,8 +524,12 @@ class User extends DataObject
 						break;
 				}
 			}
+
+			param( 'edited_user_showonline', 'integer', 0 );
+			$this->set_from_Request('showonline', 'edited_user_showonline', true);
 		}
 
+		// ******* Advanced form ******* //
 		$is_advanced_form = param( 'advanced_form', 'boolean', false );
 
 		if( $is_advanced_form )
@@ -543,7 +559,7 @@ class User extends DataObject
 			}
 		}
 
-		if( $is_preferences_form || ( $is_identity_form && $this->ID == 0 ) )
+		if( $is_preferences_form || ( $is_identity_form && $is_new_user ) )
 		{	// Multiple session
 			$multiple_sessions = $Settings->get( 'multiple_sessions' );
 			if( ( $multiple_sessions != 'adminset_default_no' && $multiple_sessions != 'adminset_default_yes' ) || $current_User->check_perm( 'users', 'edit' ) )
@@ -573,6 +589,9 @@ class User extends DataObject
 
 			case 'num_posts':
 				return $this->get_num_posts();
+
+			case 'num_comments':
+				return $this->get_num_comments();
 
 			default:
 			// All other params:
@@ -732,6 +751,30 @@ class User extends DataObject
 		}
 
 		return $this->_num_posts;
+	}
+
+
+	/**
+	 * Get the number of comments for the user.
+	 *
+	 * @return integer
+	 */
+	function get_num_comments()
+	{
+		global $DB;
+		global $collections_Module;
+
+		if( isset( $collections_Module ) )
+		{
+			if( is_null( $this->_num_comments ) )
+			{
+				$this->_num_comments = $DB->get_var( 'SELECT count(*)
+															FROM T_comments
+															WHERE comment_author_ID = '.$this->ID );
+			}
+		}
+
+		return $this->_num_comments;
 	}
 
 
@@ -2411,6 +2454,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.115  2011/09/12 05:28:46  efy-asimo
+ * User profile form refactoring
+ *
  * Revision 1.114  2011/09/10 00:57:23  fplanque
  * doc
  *

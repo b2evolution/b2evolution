@@ -101,9 +101,37 @@ $Form->begin_form( $form_class, $form_title );
 	$Form->hidden( 'user_ID', $edited_User->ID );
 	$Form->hidden( 'edited_user_login', $edited_User->login );
 
+$Form->begin_fieldset( T_('Email communications') );
+
+$email_fieldnote = '<a href="mailto:'.$edited_User->get('email').'">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
+
+if( $action != 'view' )
+{ // We can edit the values:
+	$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email'), $email_fieldnote, array( 'maxlength' => 100, 'required' => true ) );
+
+	$edited_User->get_Group();
+	$pm_disabled = ( ! $edited_User->Group->check_messaging_perm() );
+	$messaging_options = array(
+		array( 'PM', 1, T_( 'Allow others to send me private messages' ), ( ( $edited_User->get( 'allow_msgform' ) % 2 == 1 ) && ( !$pm_disabled ) ), $pm_disabled ),
+		array( 'email', 2, T_( 'Allow others to send me emails through a message form (email address will never be displayed)' ),  $edited_User->get( 'allow_msgform' ) > 1 ) );
+	$Form->checklist( $messaging_options, 'edited_user_msgform', T_('Message form') );
+	$notify_options = array(
+		array( 'edited_user_notify', 1, T_( 'Notify me by email whenever a comment is published on one of <strong>my</strong> posts.' ), $edited_User->get( 'notify' ) ),
+		array( 'edited_user_notify_moderation', 2, T_( 'Notify me by email whenever a comment is awaiting moderation on one of <strong>my</strong> blogs.' ), $edited_User->get( 'notify_moderation' ) ) );
+	$Form->checklist( $notify_options, 'edited_user_notification', T_( 'Notifications' ) );
+}
+else
+{ // display only
+	$Form->info( T_('Email'), $edited_User->get('email'), $email_fieldnote );
+	$Form->info( T_('Message form'), ($edited_User->get('allow_msgform') ? T_('yes') : T_('no')) );
+	$Form->info( T_('Notifications'), ($edited_User->get('notify') ? T_('yes') : T_('no')) );
+}
+
+$Form->end_fieldset();
+
 	/***************  Preferences  **************/
 
-$Form->begin_fieldset( $is_admin ? T_('Preferences').get_manual_link('user_preferences') : '', array( 'class'=>'fieldset clear' ) );
+$Form->begin_fieldset( $is_admin ? T_('Other preferences').get_manual_link('user_preferences') : '', array( 'class'=>'fieldset clear' ) );
 
 if( $action != 'view' )
 { // We can edit the values:
@@ -187,10 +215,13 @@ if( $action != 'view' )
 	{
 		$Form->info( T_('Session timeout'), $timeout_sessions_selected );
 	}
+
+	$Form->checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show online'), T_('Check this to be displayed as online when visiting the site.') );
 }
 else
 { // display only
 	$Form->info( T_('Preferred locale'), $edited_User->get('locale'), T_('Preferred locale for admin interface, notifications, etc.') );
+	$Form->info( T_('Show online'), ($edited_User->get('showonline')) ? T_('yes') : T_('no') );
 }
 
 $Form->end_fieldset();
@@ -217,6 +248,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.20  2011/09/12 05:28:47  efy-asimo
+ * User profile form refactoring
+ *
  * Revision 1.19  2011/09/04 22:13:21  fplanque
  * copyright 2011
  *

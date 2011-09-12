@@ -360,6 +360,9 @@ switch( $user_tab )
 	case 'advanced':
 		$AdminUI->breadcrumbpath_add( T_('Advanced'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 		break;
+	case 'admin':
+		$AdminUI->breadcrumbpath_add( T_('Admin'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+		break;
 	case 'blogs':
 		$AdminUI->breadcrumbpath_add( T_('Personal blogs'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 		break;
@@ -418,6 +421,10 @@ switch( $action )
 				// Display user advanced form:
 				$AdminUI->disp_view( 'users/views/_user_advanced.form.php' );
 				break;
+			case 'admin':
+				// Display user admin form:
+				$AdminUI->disp_view( 'users/views/_user_admin.form.php' );
+				break;
 			case 'blogs':
 				// Display user blog list:
 				$AdminUI->disp_view( 'users/views/_user_coll_list.view.php' );
@@ -433,6 +440,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.31  2011/09/12 05:28:47  efy-asimo
+ * User profile form refactoring
+ *
  * Revision 1.30  2011/09/06 00:54:38  fplanque
  * i18n update
  *
