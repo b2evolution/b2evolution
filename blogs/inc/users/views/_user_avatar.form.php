@@ -33,7 +33,7 @@ if( !$user_profile_only )
 $is_admin = is_admin_page();
 if( $is_admin )
 {
-	$form_title = sprintf( T_('Edit profile picture for user %s'), $edited_User->dget('fullname').' &laquo;'.$edited_User->dget('login').'&raquo;' );
+	$form_title = get_editform_title( $edited_User, T_( 'Edit profile picture' ) );
 	$form_class = 'fform';
 	$ctrl_param = '?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$edited_User->ID;
 }
@@ -164,6 +164,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.17  2011/09/12 06:41:06  efy-asimo
+ * Change user edit forms titles
+ *
  * Revision 1.16  2011/09/06 20:50:55  sam2kb
  * i18n update
  *

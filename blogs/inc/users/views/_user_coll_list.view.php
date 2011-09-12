@@ -47,7 +47,7 @@ if( !$user_profile_only )
 	echo '</span>';
 }
 
-echo '<h2>'.sprintf( T_('View personal blogs for user %s'), $edited_User->dget('fullname').' &laquo;'.$edited_User->dget('login').'&raquo;' ).'</h2>';
+echo '<h2>'.get_editform_title( $edited_User, T_( 'View personal blogs' ) ).'</h2>';
 
 $SQL = 'SELECT * FROM T_blogs WHERE blog_owner_user_ID = '.$DB->quote($edited_User->ID);
 
@@ -133,6 +133,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.6  2011/09/12 06:41:06  efy-asimo
+ * Change user edit forms titles
+ *
  * Revision 1.5  2011/09/04 22:13:21  fplanque
  * copyright 2011
  *

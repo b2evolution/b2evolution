@@ -46,7 +46,7 @@ $this->disp_payload_begin();
 
 $Form = new Form( NULL, 'user_checkchanges' );
 
-$Form->begin_form( 'fform', sprintf( T_('Edit admin preferences for user %s'), $edited_User->dget('fullname').' &laquo;'.$edited_User->dget('login').'&raquo;' ) );
+$Form->begin_form( 'fform', get_editform_title( $edited_User, T_( 'Edit admin preferences' ) ) );
 
 $Form->add_crumb( 'user' );
 $Form->hidden_ctrl();
@@ -111,6 +111,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.2  2011/09/12 06:41:06  efy-asimo
+ * Change user edit forms titles
+ *
  * Revision 1.1  2011/09/12 05:28:47  efy-asimo
  * User profile form refactoring
  *

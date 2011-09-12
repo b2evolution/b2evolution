@@ -1019,8 +1019,29 @@ function get_prefered_name( $nickname, $firstname, $login )
 }
 
 
+/**
+ * Get user edit forms title
+ * 
+ * @param object edited User
+ * @param string tab short title
+ * @return string tab full title
+ */
+function get_editform_title( $edited_User, $tab_title )
+{
+	$form_title = sprintf( '%s &ndash; %s', $edited_User->dget('fullname').' &laquo;'.$edited_User->dget('login').'&raquo;', $tab_title );
+	if( $edited_User->has_avatar() )
+	{
+		$form_title = $edited_User->get_avatar_imgtag( 'crop-48x48' ).' '.$form_title;
+	}
+	return $form_title;
+}
+
+
 /*
  * $Log$
+ * Revision 1.51  2011/09/12 06:41:06  efy-asimo
+ * Change user edit forms titles
+ *
  * Revision 1.50  2011/09/12 05:28:46  efy-asimo
  * User profile form refactoring
  *

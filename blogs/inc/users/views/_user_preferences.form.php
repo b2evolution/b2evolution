@@ -82,7 +82,7 @@ if( !$user_profile_only )
 $is_admin = is_admin_page();
 if( $is_admin )
 {
-	$form_title = sprintf( T_('Edit preferences for user %s'), $edited_User->dget('fullname').' &laquo;'.$edited_User->dget('login').'&raquo;' );
+	$form_title = get_editform_title( $edited_User, T_( 'Edit preferences' ) );
 	$form_class = 'fform';
 }
 else
@@ -248,6 +248,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.21  2011/09/12 06:41:06  efy-asimo
+ * Change user edit forms titles
+ *
  * Revision 1.20  2011/09/12 05:28:47  efy-asimo
  * User profile form refactoring
  *

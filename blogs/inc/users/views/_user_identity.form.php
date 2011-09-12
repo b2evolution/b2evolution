@@ -252,7 +252,7 @@ if( $is_admin )
 	}
 	else
 	{
-		$form_title = sprintf( T_('Edit profile for user %s'), $edited_User->dget('fullname').' &laquo;'.$edited_User->dget('login').'&raquo;' );
+		$form_title = get_editform_title( $edited_User, T_( 'Edit profile' ) );
 	}
 	$form_class = 'fform';
 }
@@ -639,6 +639,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.38  2011/09/12 06:41:06  efy-asimo
+ * Change user edit forms titles
+ *
  * Revision 1.37  2011/09/12 05:28:47  efy-asimo
  * User profile form refactoring
  *
