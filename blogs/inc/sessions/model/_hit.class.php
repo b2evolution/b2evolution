@@ -727,8 +727,16 @@ class Hit
 		{
 			$DB->commit();
 		}
+		$hit_ID = $DB->insert_id;
 
-		$this->ID = $DB->insert_id;
+		load_class('sessions/model/_internal_searches.class.php', 'Internalsearches' );
+		$internal_searches = new InternalSearches();
+		$internal_searches->set("coll_ID" , $blog_ID);
+		$internal_searches->set("hit_ID" , $hit_ID);
+		$internal_searches->set("keywords" , get_param("s") );
+		$internal_searches->dbinsert();
+		
+		$this->ID = $hit_ID;
 	}
 
 
@@ -1444,6 +1452,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.66  2011/09/12 16:44:33  lxndral
+ * internal searches fix
+ *
  * Revision 1.65  2011/09/04 22:13:18  fplanque
  * copyright 2011
  *

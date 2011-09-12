@@ -29,9 +29,11 @@ $SQL->SELECT( '*' );
 $SQL->FROM( 'T_logs__internal_searches' );
 if( !empty($internalsearches_keywords) ) // TODO: allow combine
 { // We want to filter on the goal name:
-	$SQL->WHERE_and( 'isrch_keywords LIKE '.$DB->quote('%'.$internalsearches_keywords.'%') );
+	$SQL->WHERE_and( 'isrch_keywords LIKE '.$DB->quote($internalsearches_keywords.'%') );
 }
+if ( !empty($internalsearches_keywords) ) {
 $SQL->WHERE_and( 'blog_id = '.$DB->quote( $blog ) );
+}
 $SQL->FROM_add( 'INNER JOIN T_hitlog ON isrch_hit_ID = hit_ID' );
 $SQL->FROM_add( 'INNER JOIN T_sessions ON hit_sess_ID = sess_ID' );
 $SQL->FROM_add( 'INNER JOIN T_blogs ON isrch_coll_ID = blog_ID' );
@@ -114,6 +116,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.6  2011/09/12 16:44:33  lxndral
+ * internal searches fix
+ *
  * Revision 1.5  2011/09/09 23:42:26  lxndral
  * Internal search log (see email)
  * changes for displaying

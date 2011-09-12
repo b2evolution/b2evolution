@@ -4258,9 +4258,30 @@ if ( !function_exists( 'json_encode' ) )
 	}
 }
 
+if ( !function_exists( 'property_exists' ) ) {
+		/**
+		 * Create property_exists function if it does not exist ( PHP < 5.1 )
+		 * @param object
+		 * @param string
+		 *
+		 * @return bool
+		 */
+    function property_exists( $class, $property ) {
+        if ( is_object( $class ) ) {
+            $vars = get_object_vars( $class );
+        } else {
+            $vars = get_class_vars( $class );
+        }
+        return array_key_exists( $property, $vars );
+    }
+} 
+
 
 /*
  * $Log$
+ * Revision 1.265  2011/09/12 16:44:33  lxndral
+ * internal searches fix
+ *
  * Revision 1.264  2011/09/07 07:29:38  efy-asimo
  * module class improvements
  *
@@ -4998,7 +5019,7 @@ if ( !function_exists( 'json_encode' ) )
  * uncool feature about limiting credits
  *
  * Revision 1.29  2008/03/31 21:13:47  fplanque
- * Reverted übergeekyness
+ * Reverted ubergeekyness
  *
  * Revision 1.28  2008/03/30 23:03:40  blueyed
  * action_icon: doc, provide default for $icon_weight and $word_weight through "null"
