@@ -838,12 +838,8 @@ switch( $action )
 		}
 		break;
 
-	case 'make_posts_pre':
-		// form for edit several posts
-		break;
 	
 	case 'make_post':
-	case 'make_posts':
 		// TODO: We don't need the Filelist, move UP!
 		// Make posts with selected images:
 
@@ -936,71 +932,6 @@ switch( $action )
 				$DB->commit();
 
 				header_redirect( $dispatcher.'?ctrl=items&action=edit&p='.$edited_Item->ID );	// Will save $Messages
-				break;
-
-			case 'make_posts':
-				// MULTIPLE POST (1 per image):
-				$fileNum =0;
-				//print_r($_POST);
-				$cat_Array=param("category","array");
-				$title_Array=param("post_title","array");
-				while( $l_File = & $selected_Filelist->get_next() )
-				{
-					// Create a post:
-					$edited_Item = new Item();
-					$edited_Item->set( 'status', $item_status );
-					
-					
-					// replacing category if selected at preview screen 
-					if (isset($cat_Array[$fileNum])) {
-						$edited_Item->set( 'main_cat_ID', $cat_Array[$fileNum] );
-					} else {
-						$edited_Item->set( 'main_cat_ID', $Blog->get_default_cat_ID() );
-					}
-					
-					$title = $l_File->get('title');
-					if( empty($title) )
-					{
-						$title = $l_File->get('name');
-					}
-					
-					$edited_Item->set( 'title', $title );
-					
-					// replacing category if selected at preview screen 
-					if (isset($title_Array[$fileNum])) {
-						//echo 
-						$edited_Item->set( 'title', $title_Array[$fileNum] );
-					}
-
-					$DB->begin();
-
-					// INSERT NEW POST INTO DB:
-					$edited_Item->dbinsert();
-
-					// echo '<br>file meta: '.$l_File->meta;
-					if(	$l_File->meta == 'notfound' )
-					{	// That file has no meta data yet, create it now!
-						$l_File->dbsave();
-					}
-
-					// Let's make the link!
-					$edited_Link = new Link();
-					$edited_Link->set( 'itm_ID', $edited_Item->ID );
-					$edited_Link->set( 'file_ID', $l_File->ID );
-					$edited_Link->set( 'position', 'teaser' );
-					$edited_Link->set( 'order', 1 );
-					$edited_Link->dbinsert();
-
-					$DB->commit();
-
-					$Messages->add( sprintf( T_('&laquo;%s&raquo; has been posted.'), $l_File->dget('name') ), 'success' );
-					$fileNum++;
-				}
-
-				// Note: we redirect without restoring filter. This should allow to see the new files.
-				// &filter=restore
-				header_redirect( $dispatcher.'?ctrl=items&blog='.$blog );	// Will save $Messages
-
 				break;
 		}
 
@@ -1763,24 +1694,6 @@ if( !empty($action ) && $action != 'list' && $action != 'nil' )
 	}
 }
 
-switch( $action )
-{
-	case 'make_posts_pre':
-		// Make posts with selected images:
-
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'file' );
-
-		if( ! $selected_Filelist->count() )
-		{
-			$Messages->add( T_('Nothing selected.'), 'error' );
-			$action = 'list';
-			break;
-		}	
-		$AdminUI->disp_view( 'files/views/_file_create_posts.form.php' );
-	break;
-}
-
 /*
  * Diplay mode payload:
  */
@@ -1815,6 +1728,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.82  2011/09/13 23:25:54  lxndral
+ * creating posts from images update
+ *
  * Revision 1.81  2011/09/10 02:09:09  fplanque
  * doc
  *

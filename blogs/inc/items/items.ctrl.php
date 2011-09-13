@@ -68,6 +68,13 @@ if( $action == 'new_switchtab' && !empty( $mass_create ) )
 	$action = 'new_mass';
 }
 
+// for post from files
+if( $action == 'group_action' )
+{ // Get the real action from the select:
+	$action = param( 'group_action', 'string', '' );
+}
+
+
 switch( $action )
 {
 	case 'edit_links':
@@ -205,6 +212,143 @@ switch( $action )
 		}
 		break;
 
+	case 'make_posts_pre':
+		// form for edit several posts
+	break;
+	case 'make_posts_from_files':
+		// TODO: We don't need the Filelist, move UP!
+		// Make posts with selected images:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'file' );
+
+		$FileRootCache = & get_FileRootCache();
+		// getting root
+		$root = param("root");
+		
+		$fm_FileRoot = & $FileRootCache->get_by_ID($root, true);
+		
+		// fp> TODO: this block should move to a general level
+		// Try to go to the right blog:
+		if( $fm_FileRoot->type == 'collection' )
+		{
+			set_working_blog( $fm_FileRoot->in_type_ID );
+      // Load the blog we're in:
+			$Blog = & $BlogCache->get_by_ID( $blog );
+		}
+		// ---
+
+
+		if( empty( $Blog ) )
+		{
+			$Messages->add( T_('No destination blog is selected.'), 'error' );
+			break;
+		}
+		//$Blog->disp('name');
+
+		// Get default status (includes PERM CHECK):
+		$item_status = $Blog->get_allowed_item_status();
+		if( empty($item_status) )
+		{
+			$Messages->add( T_('Sorry, you have no permission to post into this blog.'), 'error' );
+			break;
+		}
+
+		//print_r($_POST);die();
+		load_class( 'files/model/_filelist.class.php', 'FileList' );
+		$selected_Filelist = new Filelist( $fm_FileRoot, false );
+		$fm_selected = param( "fm_selected" , "array" );
+//		print_r($fm_selected);
+		foreach( $fm_selected as $l_source_path )
+		{
+			// echo '<br>'.$l_source_path;
+			$selected_Filelist->add_by_subpath( urldecode($l_source_path), true );
+		}
+		// make sure we have loaded metas for all files in selection!
+		$selected_Filelist->load_meta();
+
+		// Ready to create post(s):
+		load_class( 'items/model/_item.class.php', 'Item' );
+
+		$fileNum =0;
+		$cat_Array=param("category","array");
+		$title_Array=param("post_title","array");
+		while( $l_File = & $selected_Filelist->get_next() )
+		{
+			// Create a post:
+			$edited_Item = new Item();
+			$edited_Item->set( 'status', $item_status );
+			
+			
+			// replacing category if selected at preview screen 
+			if ( isset($cat_Array[$fileNum]) ) 
+			{
+				// checking if selected "same as above" category option
+				if ( $cat_Array[$fileNum]!='same' ) 
+				{
+					$edited_Item->set( 'main_cat_ID', $cat_Array[$fileNum] );
+				} 
+				else 
+				{
+					$edited_Item->set( 'main_cat_ID', $cat_Array[$fileNum-1] );
+				}
+			} 
+			else 
+			{
+				$edited_Item->set( 'main_cat_ID', $Blog->get_default_cat_ID() );
+			}
+			
+			$title = $l_File->get('title');
+			if( empty($title) )
+			{
+				$title = $l_File->get('name');
+			}
+			
+			$edited_Item->set( 'title', $title );
+			
+			// replacing category if selected at preview screen 
+			if (isset($title_Array[$fileNum])) {
+				$edited_Item->set( 'title', $title_Array[$fileNum] );
+			}
+
+			$DB->begin();
+
+			// INSERT NEW POST INTO DB:
+			$edited_Item->dbinsert();
+
+			// echo '<br>file meta: '.$l_File->meta;
+			if(	$l_File->meta == 'notfound' )
+			{	// That file has no meta data yet, create it now!
+				$l_File->dbsave();
+			}
+
+			// Let's make the link!
+			$edited_Link = new Link();
+			$edited_Link->set( 'itm_ID', $edited_Item->ID );
+			$edited_Link->set( 'file_ID', $l_File->ID );
+			$edited_Link->set( 'position', 'teaser' );
+			$edited_Link->set( 'order', 1 );
+			$edited_Link->dbinsert();
+
+			$DB->commit();
+
+			$Messages->add( sprintf( T_('&laquo;%s&raquo; has been posted.'), $l_File->dget('name') ), 'success' );
+			$fileNum++;
+		}
+
+			// Note: we redirect without restoring filter. This should allow to see the new files.
+			// &filter=restore
+			header_redirect( $dispatcher.'?ctrl=items&blog='.$blog );	// Will save $Messages
+
+		// Note: we should have EXITED here. In case we don't (error, or sth...)
+
+		// Reset stuff so it doesn't interfere with upcomming display
+			unset( $edited_Item );
+			unset( $edited_Link );
+			$selected_Filelist = new Filelist( $fm_Filelist->get_FileRoot(), false );
+		break;
+
+	
 	default:
 		debug_die( 'unhandled action 1:'.htmlspecialchars($action) );
 }
@@ -939,6 +1083,10 @@ switch( $action )
 		}
 		break;
 
+	case 'make_posts_pre':
+		// Make posts with selected images action:
+	break;
+		
 	default:
 		debug_die( 'unhandled action 2: '.htmlspecialchars($action) );
 }
@@ -1324,6 +1472,24 @@ switch( $action )
 		$AdminUI->disp_payload_end ();
 		break;
 	
+	case 'make_posts_pre':
+		// Make posts with selected images action:
+		
+		$FileRootCache = & get_FileRootCache();
+		// getting root
+		$root = param("root");
+		global $fm_FileRoot;
+		$fm_FileRoot = & $FileRootCache->get_by_ID($root, true);
+		
+		// Begin payload block:
+		$AdminUI->disp_payload_begin();
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'file' );
+		
+		$AdminUI->disp_view( 'items/views/_file_create_posts.form.php' );
+		// End payload block:
+		$AdminUI->disp_payload_end();
+	break;
 	case 'list':
 	default:
 		// Begin payload block:
@@ -1392,6 +1558,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.112  2011/09/13 23:25:54  lxndral
+ * creating posts from images update
+ *
  * Revision 1.111  2011/09/04 22:13:17  fplanque
  * copyright 2011
  *

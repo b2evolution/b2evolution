@@ -592,6 +592,11 @@ $Form->begin_form();
 				}
 
 				// other actions:
+				
+				if ( selected_value == 'make_posts_pre' ) 
+				{
+					jQuery('#FilesForm').append ('<input type="hidden" name="ctrl" value="items" />');
+				}
 				return true;
 			}
 
@@ -690,6 +695,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.50  2011/09/13 23:25:54  lxndral
+ * creating posts from images update
+ *
  * Revision 1.49  2011/09/08 22:13:48  lxndral
  * pick category when creating posts from images
  *
