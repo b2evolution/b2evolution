@@ -706,6 +706,25 @@ function evo_strlen( $string )
 	return strlen($string);
 }
 
+/**
+ * mbstring wrapper for strpos function
+ *
+ * @param string
+ * @param string
+ * @return int
+ */
+function evo_strpos( $string , $needle , $offset = null ) 
+{
+	global $current_charset;
+
+	if( $current_charset != 'iso-8859-1' && $current_charset != '' && function_exists('mb_strpos') )
+	{
+		
+		return mb_strpos( $string, $needle, $offset ,$current_charset );
+	}
+
+	return strpos( $string , $needle , $offset );
+}
 
 /**
  * mbstring wrapper for substr function
@@ -4279,6 +4298,9 @@ if ( !function_exists( 'property_exists' ) ) {
 
 /*
  * $Log$
+ * Revision 1.266  2011/09/13 23:28:35  lxndral
+ * users sessions -> Hitlist update
+ *
  * Revision 1.265  2011/09/12 16:44:33  lxndral
  * internal searches fix
  *
