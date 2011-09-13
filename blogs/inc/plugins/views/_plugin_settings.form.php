@@ -51,6 +51,13 @@ load_funcs('plugins/_plugin.funcs.php');
 
 $Form = new Form( NULL, 'pluginsettings_checkchanges' );
 
+// Restore defaults button:
+$Form->global_icon( T_('Restore defaults'), 'reload', regenerate_url( 'action,plugin_class', 'action=default_settings&amp;plugin_ID=' . $edit_Plugin->ID . '&amp;crumb_plugin=' . get_crumb( 'plugin' ) ),'',3,2,
+	array(
+			'onclick'=>'if (!confirm(\''.T_('Are you sure you want to restore the default settings? This cannot be undone!').'\')) { cancelClick(event); }',
+		)
+	);
+
 // Info button:
 $Form->global_icon( T_('Display info'), 'info', regenerate_url( 'action,plugin_class', 'action=info&amp;plugin_class='.$edit_Plugin->classname ) );
 
@@ -177,9 +184,6 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 {
 	$Form->buttons_input( array(
 		array( 'type' => 'submit', 'name' => 'actionArray[update_settings]', 'value' => T_('Save !'), 'class' => 'SaveButton' ),
-		array( 'type' => 'submit', 'name' => 'actionArray[update_settings][review]', 'value' => T_('Save (and review)'), 'class' => 'SaveButton' ),
-		array( 'type' => 'reset', 'value' => T_('Reset'), 'class' => 'ResetButton' ),
-		array( 'type' => 'submit', 'name' => 'actionArray[default_settings]', 'value' => T_('Restore defaults'), 'class' => 'SaveButton' ),
 		) );
 }
 $Form->end_form();
@@ -187,6 +191,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.10  2011/09/13 23:03:24  lxndral
+ * plugin edit form update
+ *
  * Revision 1.9  2011/09/04 22:13:18  fplanque
  * copyright 2011
  *
