@@ -369,18 +369,12 @@ function skin_init( $disp )
 
 		case 'login':
 			$seo_page_type = 'Login form';
-			if( $Blog->get_setting( $disp.'_noindex' ) )
-			{	// We prefer robots not to index these pages:
-				$robots_index = false;
-			}
+			$robots_index = false;
 			break;
 
 		case 'register':
 			$seo_page_type = 'Register form';
-			if( $Blog->get_setting( $disp.'_noindex' ) )
-			{	// We prefer robots not to index these pages:
-				$robots_index = false;
-			}
+			$robots_index = false;
 			break;
 
 		case 'profile':
@@ -925,6 +919,11 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.97  2011/09/13 08:32:30  efy-asimo
+ * Add crumb check for login and register
+ * Never cache in-skin login and register
+ * Fix page caching
+ *
  * Revision 1.96  2011/09/10 22:48:41  fplanque
  * doc
  *

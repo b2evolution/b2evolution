@@ -87,6 +87,9 @@ if( ! $Settings->get('newusers_canregister') )
 switch( $action )
 {
 	case 'register':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'regform' );
+
 		/*
 		 * Do the registration:
 		 */
@@ -291,6 +294,11 @@ require $adminskins_path.'login/_reg_form.main.php';
 
 /*
  * $Log$
+ * Revision 1.113  2011/09/13 08:32:30  efy-asimo
+ * Add crumb check for login and register
+ * Never cache in-skin login and register
+ * Fix page caching
+ *
  * Revision 1.112  2011/09/06 16:25:17  efy-james
  * Require special chars in password
  *

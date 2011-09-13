@@ -222,6 +222,12 @@ class PageCache
 			return false;
 		}
 
+		if( $disp == 'login' || $disp == 'register' )
+		{	// We do NOT want caching for in-skin login and register pages
+			$Debuglog->add( 'Never cache the in-skin login and register pages!', 'pagecache' );
+			return false;
+		}
+
 		if( is_logged_in() )
 		{	// We do NOT want caching when a user is logged in (private data)
 			$Debuglog->add( 'Never cache pages for/from logged in members!', 'pagecache' );
@@ -513,7 +519,10 @@ class PageCache
 
 			// set optional header line for item view count
 			global $shutdown_count_item_views;
-			$file_head .= 'item_IDs_on_this_page:'.implode( ',', $shutdown_count_item_views )."\n";
+			if( !empty( $shutdown_count_item_views ) )
+			{
+				$file_head .= 'item_IDs_on_this_page:'.implode( ',', $shutdown_count_item_views )."\n";
+			}
 
  			$file_head .= "\n";
 
@@ -667,6 +676,11 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.34  2011/09/13 08:32:30  efy-asimo
+ * Add crumb check for login and register
+ * Never cache in-skin login and register
+ * Fix page caching
+ *
  * Revision 1.33  2011/09/05 21:36:43  sam2kb
  * minor
  *

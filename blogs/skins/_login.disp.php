@@ -70,6 +70,7 @@ if( $action != 'req_validatemail' )
 
 	$Form->hidden( 'redirect_to', $redirect_to );
 	$Form->hidden( 'inskin', true );
+	$Form->add_crumb( 'loginform' );
 
 	$Form->begin_field();
 	$Form->text_input( 'login', $login, 18, T_('Login'), T_('Type your username, <b>not</b> your email address.'), array( 'maxlength' => 20, 'class' => 'input_text' ) );
@@ -144,6 +145,11 @@ else
 
 /*
  * $Log$
+ * Revision 1.15  2011/09/13 08:32:30  efy-asimo
+ * Add crumb check for login and register
+ * Never cache in-skin login and register
+ * Fix page caching
+ *
  * Revision 1.14  2011/09/10 00:57:23  fplanque
  * doc
  *

@@ -91,6 +91,9 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 
 	header_nocache();		// Don't take risks here :p
 
+	// Check that this login request is not a CSRF hacked request:
+	$Session->assert_received_crumb( 'loginform' );
+
 	// Note: login and password cannot include '<' !
 	$login = evo_strtolower(strip_tags(remove_magic_quotes($login)));
 	$pass = strip_tags(remove_magic_quotes($pass));
@@ -322,6 +325,11 @@ $Timer->pause( '_init_login' );
 
 /*
  * $Log$
+ * Revision 1.9  2011/09/13 08:32:30  efy-asimo
+ * Add crumb check for login and register
+ * Never cache in-skin login and register
+ * Fix page caching
+ *
  * Revision 1.8  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *
