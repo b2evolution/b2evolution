@@ -517,51 +517,49 @@ class collections_Module extends Module
 		}
 
 		$entries = array();
-
 		if( $current_User->check_perm( 'blogs', 'create' ) || $current_User->check_perm( 'perm_createblog', 'allowed' ))
 		{
+			$entries['newblog_sep'] = array(
+					'separator' => true,
+				);
+
 			$entries['newblog'] = array(
 					'text' => T_('Create new blog').'&hellip;',
 					'href' => $admin_url.'?ctrl=collections&amp;action=new',
 				);
-			$entries['minfo_sep'] = array(
-					'separator' => true,
-				);
 		}
+		$topleft_Menu->add_menu_entries( 'blog', $entries );
 
-		$entries['info'] = array(
-				'text' => T_('More info'),
-				'entries' => array(
-						'b2evonet' => array(
+
+		$entries = array();
+		$entries['b2evonet'] = array(
 								'text' => T_('Open b2evolution.net'),
 								'href' => 'http://b2evolution.net/',
 								'target' => '_blank',
-							),
-						'forums' => array(
+							);
+		$entries['forums'] = array(
 								'text' => T_('Open Support forums'),
 								'href' => 'http://forums.b2evolution.net/',
 								'target' => '_blank',
-							),
-						'manual' => array(
+							);
+		$entries['manual'] = array(
 								'text' => T_('Open Online manual'),
 								'href' => 'http://manual.b2evolution.net/',
 								'target' => '_blank',
-							),
-						'info_sep' => array(
+							);
+		$entries['info_sep'] = array(
 								'separator' => true,
-							),
-						'twitter' => array(
+							);
+		$entries['twitter'] = array(
 								'text' => T_('b2evolution on twitter'),
 								'href' => 'http://twitter.com/b2evolution',
 								'target' => '_blank',
-							),
-						'facebook' => array(
+							);
+		$entries['facebook'] = array(
 								'text' => T_('b2evolution on facebook'),
 								'href' => 'http://www.facebook.com/b2evolution',
 								'target' => '_blank',
-							),
-						),
-				);
+							);
 
 		$topleft_Menu->add_menu_entries( 'b2evo', $entries );
 	}
@@ -758,6 +756,9 @@ $collections_Module = new collections_Module();
 
 /*
  * $Log$
+ * Revision 1.28  2011/09/13 16:00:18  fplanque
+ * Enhanced back-office navigation.
+ *
  * Revision 1.27  2011/09/13 15:31:35  fplanque
  * Enhanced back-office navigation.
  *

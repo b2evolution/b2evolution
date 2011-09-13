@@ -608,17 +608,6 @@ class _core_Module extends Module
 						);
 				}
 
-				if( $current_User->check_perm( 'options', 'view' ) )
-				{	// Permission to access system info
-					$entries['b2evo']['entries']['system'] = array(
-							'text' => T_('About this system').'&hellip;',
-							'href' => $admin_url.'?ctrl=system',
-						);
-					$entries['b2evo']['entries'][] = array(
-							'separator' => true,
-						);
-				}
-
 				// PLACE HOLDER FOR FILES MODULE:
 				$entries['blog']['entries']['files'] = NULL;
 
@@ -636,25 +625,7 @@ class _core_Module extends Module
 					$entries['blog']['entries']['general'] = array(
 								'text' => T_('Blog settings').'&hellip;',
 								'href' => $admin_url.'?ctrl=coll_settings'.$blog_param,
-							);
-						/*
-						'features' => array(
-								'text' => T_('Blog features').'&hellip;',
-								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=features'.$blog_param,
-							),
-						'skin' => array(
-								'text' => T_('Blog skin').'&hellip;',
-								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin'.$blog_param,
-							),
-						'widgets' => array(
-								'text' => T_('Blog widgets').'&hellip;',
-								'href' => $admin_url.'?ctrl=widgets'.$blog_param,
-							),
-						'urls' => array(
-								'text' => T_('Blog URLs').'&hellip;',
-								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=urls'.$blog_param,
-							),
-					*/
+						);
 				}
 			}
 		}
@@ -719,6 +690,14 @@ class _core_Module extends Module
 						);
 				}
 
+				if( $perm_options )
+				{
+						$entries['tools']['entries']['status'] = array(
+									'text' => T_('System status').'&hellip;',
+									'href' => $admin_url.'?ctrl=system',
+								);
+				}
+
 				if( $perm_options || $perm_slugs || $perm_maintenance )
 				{
 					$entries['tools']['entries']['tools'] = array(
@@ -730,10 +709,6 @@ class _core_Module extends Module
 							$entries['tools']['entries']['tools']['entries']['crontab'] = array(
 										'text' => T_('Scheduler').'&hellip;',
 										'href' => $admin_url.'?ctrl=crontab',
-									);
-							$entries['tools']['entries']['tools']['entries']['status'] = array(
-										'text' => T_('System status').'&hellip;',
-										'href' => $admin_url.'?ctrl=system',
 									);
 							$entries['tools']['entries']['tools']['entries']['misc'] = array(
 										'text' => T_('Misc tools').'&hellip;',
@@ -1078,6 +1053,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.79  2011/09/13 16:00:18  fplanque
+ * Enhanced back-office navigation.
+ *
  * Revision 1.78  2011/09/13 15:31:35  fplanque
  * Enhanced back-office navigation.
  *

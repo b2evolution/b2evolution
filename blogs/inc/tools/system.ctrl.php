@@ -43,7 +43,7 @@ $AdminUI->set_path( 'tools', 'system' );
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
 $AdminUI->breadcrumbpath_add( T_('Tools'), '?ctrl=crontab' );
-$AdminUI->breadcrumbpath_add( T_('About this system'), '?ctrl=system' );
+$AdminUI->breadcrumbpath_add( T_('System status'), '?ctrl=system' );
 
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -87,7 +87,7 @@ $facilitate_exploits = '<p>'.T_('When enabled, this feature is known to facilita
 $change_ini = '<p>'.T_('If possible, change this setting to <code>%s</code> in your php.ini or ask your hosting provider about it.').'</p>';
 
 
-echo '<h2>'.T_('About this system').'</h2>';
+echo '<h2>'.T_('System status').'</h2>';
 
 // Get system stats to display:
 $system_stats = get_system_stats();
@@ -632,6 +632,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.39  2011/09/13 16:00:18  fplanque
+ * Enhanced back-office navigation.
+ *
  * Revision 1.38  2011/09/11 19:41:27  fplanque
  * Added some system stats.
  *
