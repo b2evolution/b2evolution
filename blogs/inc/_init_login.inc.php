@@ -158,18 +158,18 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 					$Debuglog->add( 'Login: Empty salt_sess!', 'request' );
 					if( ($pos = strpos( $pass, '_hashed_' ) ) && substr($pass, $pos+8) == $Session->ID )
 					{ // session ID matches, no cookie problem
-						$login_error = T_('The login window has expired. Please try again.');
+						$login_error = NT_('The login window has expired. Please try again.');
 						$Debuglog->add( 'Login: Session ID matches.', 'request' );
 					}
 					else
 					{ // more general error:
-						$login_error = T_('Either you have not enabled cookies or this login window has expired.');
+						$login_error = NT_('Either you have not enabled cookies or this login window has expired.');
 						$Debuglog->add( 'Login: Session ID does not match.', 'request' );
 					}
 				}
 				elseif( $pwd_salt != $pwd_salt_sess )
 				{ // submitted salt differs from the one stored in the session
-					$login_error = T_('The login window has expired. Please try again.');
+					$login_error = NT_('The login window has expired. Please try again.');
 					$Debuglog->add( 'Login: Submitted salt and salt from Session do not match.', 'request' );
 				}
 				else
@@ -199,7 +199,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 	elseif( empty( $login_error ) )
 	{ // if the login_error wasn't set yet, add the default one:
 		// This will cause the login screen to "popup" (again)
-		$login_error = T_('Wrong login/password.');
+		$login_error = NT_('Wrong login/password.');
 	}
 
 }
@@ -232,7 +232,7 @@ else
 		// echo ' NOT logged in...';
 		$Debuglog->add( 'Login: NOT logged in... (did not try)', 'request' );
 
-		$login_error = T_('You must log in!');
+		$login_error = NT_('You must log in!');
 	}
 }
 unset($pass);
@@ -250,7 +250,7 @@ if( ! empty($current_User)
 	if( $action != 'req_validatemail' && $action != 'validatemail' )
 	{ // we're not in that action already:
 		$action = 'req_validatemail'; // for login.php
-		$login_error = T_('You must validate your email address before you can continue as a logged in user.');
+		$login_error = NT_('You must validate your email address before you can continue as a logged in user.');
 	}
 }
 else
@@ -301,7 +301,8 @@ if( ! empty( $login_error ) )
 		}
 		if( ( !empty( $Blog ) ) && ( !empty( $Blog->skin_ID ) ) )
 		{
-			$Messages->add( $login_error );
+			locale_activate( $Blog->get('locale') );
+			$Messages->add( T_( $login_error ) );
 			$SkinCache = & get_SkinCache();
 			$Skin = & $SkinCache->get_by_ID( $Blog->skin_ID );
 			$skin = $Skin->folder;
@@ -325,6 +326,9 @@ $Timer->pause( '_init_login' );
 
 /*
  * $Log$
+ * Revision 1.10  2011/09/13 09:09:04  efy-asimo
+ * Set the proper locale for in-skin login
+ *
  * Revision 1.9  2011/09/13 08:32:30  efy-asimo
  * Add crumb check for login and register
  * Never cache in-skin login and register
