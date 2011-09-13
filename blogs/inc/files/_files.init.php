@@ -320,11 +320,53 @@ class files_Module extends Module
 	}
 
 	/**
-	 * Build teh evobar menu
+	 * Build the evobar menu
 	 */
 	function build_evobar_menu()
 	{
+		/**
+		 * @var Menu
+		 */
+		global $topleft_Menu;
+		global $current_User;
+		global $admin_url;
+		global $Blog;
 
+		if( $current_User->check_perm( 'admin', 'standard' ) )
+		{
+			if( !empty($Blog) && $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
+			{	// Manage blog files:
+
+				// TODO: this is hackish and would require a proper function call
+				$topleft_Menu->_menus['entries']['blog']['disabled'] = false;
+
+				// FM enabled and permission to view files:
+				$entries['files'] = array(
+						'text' => T_('Files').'&hellip;',
+						'href' => $admin_url.'?ctrl=files',
+					);
+
+				$topleft_Menu->add_menu_entries( 'blog', $entries );
+			}
+		}
+
+		if( $current_User->check_perm( 'admin', 'restricted' ) )
+		{
+			if( $current_User->check_perm( 'files', 'view', false, NULL ) )
+			{	// Manage files generally:
+
+				// TODO: this is hackish and would require a proper function call
+				$topleft_Menu->_menus['entries']['tools']['disabled'] = false;
+
+				// FM enabled and permission to view files:
+				$entries['files'] = array(
+						'text' => T_('Files').'&hellip;',
+						'href' => $admin_url.'?ctrl=files',
+					);
+
+				$topleft_Menu->add_menu_entries( 'tools', $entries );
+			}
+		}
 	}
 
 
@@ -379,6 +421,9 @@ $files_Module = new files_Module();
 
 /*
  * $Log$
+ * Revision 1.16  2011/09/13 15:31:35  fplanque
+ * Enhanced back-office navigation.
+ *
  * Revision 1.15  2011/09/04 22:13:15  fplanque
  * copyright 2011
  *

@@ -246,6 +246,12 @@ class Menu extends Widget
 
 			foreach( $menuEntries as $loop_key => $loop_details )
 			{
+				if( empty($loop_details) )
+				{	// Empty placeholder, skip it. Might happen if the files module is disabled for example, then we had a file placeholder
+					// in the blog menu that will never be used. So don't display it...
+					continue;
+				}
+
 				if( !empty( $loop_details['separator'] ) )
 				{	// Separator
 					$r .= $templateForLevel['separator'];
@@ -401,6 +407,9 @@ class Menu extends Widget
 
 /*
  * $Log$
+ * Revision 1.18  2011/09/13 15:31:35  fplanque
+ * Enhanced back-office navigation.
+ *
  * Revision 1.17  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

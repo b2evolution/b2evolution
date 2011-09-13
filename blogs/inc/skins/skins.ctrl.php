@@ -26,6 +26,11 @@ load_funcs( 'skins/_skin.funcs.php' );
 // Check permission to display:
 $current_User->check_perm( 'options', 'view', true );
 
+// Memorize this as the last "tab" used in the Blog Settings:
+$UserSettings->set( 'pref_glob_settings_tab', $ctrl );
+$UserSettings->dbupdate();
+
+
 param( 'action', 'string', 'list' );
 
 param( 'redirect_to', 'string', '?ctrl=skins' );
@@ -247,6 +252,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.22  2011/09/13 15:31:34  fplanque
+ * Enhanced back-office navigation.
+ *
  * Revision 1.21  2011/09/12 16:43:35  lxndral
  * skins colorbox fix
  *

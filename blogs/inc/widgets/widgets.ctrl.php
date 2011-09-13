@@ -27,7 +27,42 @@ global $AdminUI;
  */
 global $Plugins;
 
+// Memorize this as the last "tab" used in the Blog Settings:
+$UserSettings->set( 'pref_coll_settings_tab', 'widgets' );
+$UserSettings->dbupdate();
+
 load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
+
+
+// Check permissions on requested blog and autoselect an appropriate blog if necessary.
+// This will prevent a fat error when switching tabs and you have restricted perms on blog properties.
+if( $selected = autoselect_blog( 'blog_properties', 'edit' ) ) // Includes perm check
+{	// We have a blog to work on:
+
+	if( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
+	{	// Selected a new blog:
+		$BlogCache = & get_BlogCache();
+		/**
+		 * @var Blog
+		 */
+		$Blog = & $BlogCache->get_by_ID( $blog );
+	}
+
+	/**
+	 * @var Blog
+	 */
+	$edited_Blog = & $Blog;
+}
+else
+{	// We could not find a blog we have edit perms on...
+	// Note: we may still have permission to edit categories!!
+	// redirect to blog list:
+	header_redirect( '?ctrl=collections' );
+	// EXITED:
+	$Messages->add( T_('Sorry, you have no permission to edit blog properties.'), 'error' );
+	$action = 'nil';
+	$tab = '';
+}
 
 param( 'action', 'string', 'list' );
 param( 'display_mode', 'string', 'normal' );
@@ -311,7 +346,7 @@ switch( $action )
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
-		
+
 		$enabled = $edited_ComponentWidget->get( 'enabled' );
 		$edited_ComponentWidget->set( 'enabled', (int)! $enabled );
 		$edited_ComponentWidget->dbupdate();
@@ -367,7 +402,7 @@ switch( $action )
  	case 're-order' : // js request
  		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
-		
+
  		$DB->begin();
 
  		// Reset the current orders and make container names temp to avoid duplicate entry errors
@@ -568,6 +603,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.47  2011/09/13 15:31:35  fplanque
+ * Enhanced back-office navigation.
+ *
  * Revision 1.46  2011/09/04 22:13:21  fplanque
  * copyright 2011
  *

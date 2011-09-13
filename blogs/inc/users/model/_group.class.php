@@ -258,7 +258,7 @@ class Group extends DataObject
 		}
 
 		$pluggable_perms = array( 'admin', 'shared_root', 'spamblacklist', 'slugs', 'templates', 'options', 'files' );
-		if( in_array( $permname, $pluggable_perms ) ) 
+		if( in_array( $permname, $pluggable_perms ) )
 		{
 			$permname = 'perm_'.$permname;
 		}
@@ -293,7 +293,7 @@ class Group extends DataObject
 
 			case 'stats':
 			case 'users':
-				if( ! $this->check_perm( 'admin', 'normal' ) )
+				if( ! $this->check_perm( 'admin', 'restricted' ) )
 				{
 					$perm = false;
 					break;
@@ -647,6 +647,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.47  2011/09/13 15:31:35  fplanque
+ * Enhanced back-office navigation.
+ *
  * Revision 1.46  2011/09/04 22:13:21  fplanque
  * copyright 2011
  *

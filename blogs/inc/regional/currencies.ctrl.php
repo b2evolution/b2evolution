@@ -29,7 +29,6 @@
  *
  * @version $Id$
  */
-
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Load Currency class (PHP4):
@@ -42,6 +41,10 @@ global $current_User;
 
 // Check minimum permission:
 $current_User->check_perm( 'options', 'view', true );
+
+// Memorize this as the last "tab" used in the Blog Settings:
+$UserSettings->set( 'pref_glob_settings_tab', $ctrl );
+$UserSettings->dbupdate();
 
 // Set options path:
 $AdminUI->set_path( 'options', 'currencies' );
@@ -90,10 +93,10 @@ switch( $action )
 
 		// Update db with new flag value.
 		$edited_Currency->dbupdate();
-		
+
 		param( 'results_curr_page', integer, '', true );
 		param( 'results_curr_order', string, '', true );
-		
+
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( regenerate_url ( '', '', '', '&' ), 303 ); // Will EXIT
 		// We have EXITed already at this point!!
@@ -309,6 +312,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2011/09/13 15:31:34  fplanque
+ * Enhanced back-office navigation.
+ *
  * Revision 1.18  2010/05/07 08:07:14  efy-asimo
  * Permissions check update (User tab, Global Settings tab) - bugfix
  *

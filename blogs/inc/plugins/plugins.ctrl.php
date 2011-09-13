@@ -35,14 +35,20 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $dispatcher;
 
+
+// Check permission to display:
+$current_User->check_perm( 'options', 'view', true );
+
+// Memorize this as the last "tab" used in the Blog Settings:
+$UserSettings->set( 'pref_glob_settings_tab', $ctrl );
+$UserSettings->dbupdate();
+
+
 $AdminUI->set_path( 'options', 'plugins' );
 
 $action = param_action( 'list' );
 
 $UserSettings->param_Request( 'plugins_disp_avail', 'plugins_disp_avail', 'integer', 0 );
-
-// Check permission to display:
-$current_User->check_perm( 'options', 'view', true );
 
 /**
  * @var Plugins_admin
@@ -1139,6 +1145,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.23  2011/09/13 15:31:35  fplanque
+ * Enhanced back-office navigation.
+ *
  * Revision 1.22  2011/09/04 22:13:18  fplanque
  * copyright 2011
  *

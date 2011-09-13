@@ -29,7 +29,6 @@
  *
  * @version $Id$
  */
-
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Load Country class (PHP4):
@@ -42,6 +41,10 @@ global $current_User;
 
 // Check minimum permission:
 $current_User->check_perm( 'options', 'view', true );
+
+// Memorize this as the last "tab" used in the Blog Settings:
+$UserSettings->set( 'pref_glob_settings_tab', $ctrl );
+$UserSettings->dbupdate();
 
 // Set options path:
 $AdminUI->set_path( 'options', 'countries' );
@@ -90,7 +93,7 @@ switch( $action )
 
 		// Update db with new flag value.
 		$edited_Country->dbupdate();
-				
+
 		param( 'results_ctry_page', integer, '', true );
 		param( 'results_ctry_order', string, '', true );
 
@@ -308,6 +311,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2011/09/13 15:31:34  fplanque
+ * Enhanced back-office navigation.
+ *
  * Revision 1.15  2010/05/07 08:07:14  efy-asimo
  * Permissions check update (User tab, Global Settings tab) - bugfix
  *

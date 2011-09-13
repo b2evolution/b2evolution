@@ -146,7 +146,7 @@ class sessions_Module extends Module
 				'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$Blog->ID,
 			);
 
-			$topleft_Menu->add_menu_entries( 'manage', $entries );
+			$topleft_Menu->add_menu_entries( 'blog', $entries );
 		}
 
 		if( $current_User->check_perm( 'stats', 'view' ) )
@@ -376,6 +376,9 @@ $sessions_Module = new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.33  2011/09/13 15:31:35  fplanque
+ * Enhanced back-office navigation.
+ *
  * Revision 1.32  2011/09/07 12:00:18  lxndral
  * internal searches update
  *

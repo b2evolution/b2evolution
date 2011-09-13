@@ -86,7 +86,8 @@ $ctrl_mappings = array(
 		'features'     => 'settings/features.ctrl.php',
 		'locales'      => 'locales/locales.ctrl.php',
 		'plugins'      => 'plugins/plugins.ctrl.php',
-		'settings'     => 'settings/settings.ctrl.php',
+		'gensettings'  => 'settings/settings.ctrl.php',
+		'settings'     => 'settings/settings_dispatch.ctrl.php',
 		'stats'        => 'sessions/stats.ctrl.php',
 		'system'       => 'tools/system.ctrl.php',
 		'user'         => 'users/user.ctrl.php',
@@ -292,7 +293,7 @@ class _core_Module extends Module
 				$permoptions = 'none';
 				break;
 
-			default: 
+			default:
 				// Other groups have no permission by default
 				$permadmin = 'none';
 				$permspam = 'none';
@@ -349,8 +350,8 @@ class _core_Module extends Module
 				'group_func' => 'check_admin_group_perm',
 				'perm_block' => 'core_general',
 				'options'  => array(
-					$none_option, 
-					array( 'restricted', T_( 'Restricted' ) ), 
+					$none_option,
+					array( 'restricted', T_( 'Restricted' ) ),
 					array( 'normal', T_( 'Normal' ) ) ),
 				'perm_type' => 'radiobox',
 				'field_lines' => false,
@@ -457,7 +458,7 @@ class _core_Module extends Module
 			case 'edit':
 				// Users has edit perms
 				if( $permlevel == 'edit' )
-				{ 
+				{
 					$perm = true;
 					break;
 				}
@@ -504,7 +505,7 @@ class _core_Module extends Module
 		$entries = NULL;
 
 		if( $perm_admin_normal )
-		{
+		{	// Normal Access to Admin:
 			$entries = array(
 				'b2evo' => array(
 						'text' => '<strong>b2evolution</strong>',
@@ -525,37 +526,32 @@ class _core_Module extends Module
 						'title' => T_('No blog is currently selected'),
 						'disabled' => true,
 					),
-				'manage' => array(
-						'text' => T_('Manage'),
-						'title' => T_('No blog is currently selected'),
-						'disabled' => true,
-					),
-				'customize' => array(
-						'text' => T_('Customize'),
+				'blog' => array(
+						'text' => T_('Blog'),
 						'title' => T_('No blog is currently selected'),
 						'disabled' => true,
 					),
 				'tools' => array(
-						'text' => T_('Tools'),
+						'text' => T_('System'),
 						'disabled' => true,
 					),
 			);
 		}
 		elseif( $perm_admin_restricted )
-		{
+		{	// restricted Access to Admin:
 			$entries = array(
 				'see' => array(
-						'text' => T_('See'),
+						'text' => T_('Site'),
 						'href' => $home_url,
 						'title' => T_('See the home page'),
 					),
-				'manage' => array(
-						'text' => T_('Manage'),
-						'title' => T_('No blog is currently selected'),
+				'tools' => array(
+						'text' => T_('System'),
 						'disabled' => true,
 					),
 			);
 		}
+
 
 		if( !empty($Blog) )
 		{	// A blog is currently selected:
@@ -582,191 +578,206 @@ class _core_Module extends Module
 				{
 					$entries['write']['title'] = T_('You don\'t have permission to post into this blog');
 				}
-	
-	
+
+
+				// BLOG MENU:
 	 			$items_url = $admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=restore';
-				$entries['manage']['href'] = $items_url;
-				$entries['manage']['disabled'] = false;
-				$entries['manage']['title'] = T_('Manage the contents of this blog');
-				$entries['manage']['entries'] = array(
-						'posts' => array(
+				$entries['blog']['href'] = $items_url;
+				$entries['blog']['disabled'] = false;
+				$entries['blog']['title'] = T_('Manage this blog');
+				$entries['blog']['entries']['posts'] = array(
 								'text' => T_('Posts').'&hellip;',
-								'href' => $items_url.'&amp;tab=list',
-							),
-						'pages' => array(
-								'text' => T_('Pages').'&hellip;',
-								'href' => $items_url.'&amp;tab=pages',
-							),
-						'intros' => array(
-								'text' => T_('Intro posts').'&hellip;',
-								'href' => $items_url.'&amp;tab=intros',
-							),
-						'podcasts' => array(
-								'text' => T_('Podcast episodes').'&hellip;',
-								'href' => $items_url.'&amp;tab=podcasts',
-							),
-						'links' => array(
-								'text' => T_('Sidebar links').'&hellip;',
-								'href' => $items_url.'&amp;tab=links',
-							),
-					);
-				if( $Blog->get_setting( 'use_workflow' ) )
-				{	// We want to use workflow properties for this blog:
-					$entries['manage']['entries']['tracker'] = array(
-							'text' => T_('Tracker').'&hellip;',
-							'href' => $items_url.'&amp;tab=tracker',
+								'href' => $items_url,
+							);
+
+				// Check if user has permission for published, draft or depreceted comments (any of these)
+				if( $current_User->check_perm( 'blog_comments', 'edit', false, $Blog->ID ) )
+				{	// Comments:
+					$entries['blog']['entries']['comments'] = array(
+							'text' => T_('Comments').'&hellip;',
+							'href' => $admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;filter=restore',
 						);
 				}
-				$entries['manage']['entries']['full'] = array(
-						'text' => T_('All Items').'&hellip;',
-						'href' => $items_url.'&amp;tab=full',
-					);
+
+				// Chapters / Categories:
+				if( $current_User->check_perm( 'blog_cats', 'edit', false, $Blog->ID ) )
+				{	// Either permission for a specific blog or the global permission:
+					$entries['blog']['entries']['chapters'] = array(
+							'text' => T_('Categories').'&hellip;',
+							'href' => $admin_url.'?ctrl=chapters&amp;blog='.$Blog->ID,
+						);
+				}
+
+				if( $current_User->check_perm( 'options', 'view' ) )
+				{	// Permission to access system info
+					$entries['b2evo']['entries']['system'] = array(
+							'text' => T_('About this system').'&hellip;',
+							'href' => $admin_url.'?ctrl=system',
+						);
+					$entries['b2evo']['entries'][] = array(
+							'separator' => true,
+						);
+				}
+
+				// PLACE HOLDER FOR FILES MODULE:
+				$entries['blog']['entries']['files'] = NULL;
+
+				// BLOG SETTINGS:
+				if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+				{	// We have permission to edit blog properties:
+					$blog_param = '&amp;blog='.$Blog->ID;
+
+					if( ! empty($entries['blog']['entries']) )
+					{	// There are already entries aboce, insert a separator:
+						$entries['blog']['entries'][] = array(
+							'separator' => true,
+						);
+					}
+					$entries['blog']['entries']['general'] = array(
+								'text' => T_('Blog settings').'&hellip;',
+								'href' => $admin_url.'?ctrl=coll_settings'.$blog_param,
+							);
+						/*
+						'features' => array(
+								'text' => T_('Blog features').'&hellip;',
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=features'.$blog_param,
+							),
+						'skin' => array(
+								'text' => T_('Blog skin').'&hellip;',
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin'.$blog_param,
+							),
+						'widgets' => array(
+								'text' => T_('Blog widgets').'&hellip;',
+								'href' => $admin_url.'?ctrl=widgets'.$blog_param,
+							),
+						'urls' => array(
+								'text' => T_('Blog URLs').'&hellip;',
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=urls'.$blog_param,
+							),
+					*/
+				}
 			}
 		}
 
-		// Check if user has permission for published, draft or depreceted comments (any of these)
-		$perm_comments = (! empty($Blog)) && $current_User->check_perm( 'blog_comments', 'edit', false, $Blog->ID );
-		// Either permission for a specific blog or the global permission:
-		$perm_files    = $current_User->check_perm( 'files', 'view', false, (! empty($Blog)) ? $Blog->ID : NULL );
-		$perm_chapters = (! empty($Blog)) && $current_User->check_perm( 'blog_cats', 'edit', false, $Blog->ID );
-
-		if( $perm_admin_normal && ( $perm_comments || $perm_chapters ) )
+		// SYSTEM MENU:
+		if( $perm_admin_restricted )
 		{
-			$entries['manage']['disabled'] = false;
-
-			if( ! empty($entries['manage']['entries']) )
-			{	// There are already entries aboce, insert a separator:
-				$entries['manage']['entries'][] = array(
-					'separator' => true,
-				);
-			}
-
-			if( $perm_comments )
-			{	// Comments:
-				$entries['manage']['entries']['comments'] = array(
-						'text' => T_('Comments').'&hellip;',
-						'href' => $admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;filter=restore',
-					);
-			}
-
-			if( $perm_chapters )
-			{	// Chapters:
-				$entries['manage']['entries']['chapters'] = array(
-						'text' => T_('Categories').'&hellip;',
-						'href' => $admin_url.'?ctrl=chapters&amp;blog='.$Blog->ID,
-					);
-			}
-		}
-
-		if( $perm_admin_restricted && $perm_files )
-		{
-			$entries['manage']['disabled'] = false;
-
-			// FM enabled and permission to view files:
-			$entries['manage']['entries']['files'] = array(
-					'text' => T_('Files').'&hellip;',
-					'href' => $admin_url.'?ctrl=files&amp;blog='.$blog,
-				);
-		}
-
-		if( $perm_admin_normal && $current_User->check_perm( 'options', 'view' ) )
-		{	// Permission to access system info
-			$entries['b2evo']['entries']['system'] = array(
-					'text' => T_('About this system').'&hellip;',
-					'href' => $admin_url.'?ctrl=system',
-				);
-			$entries['b2evo']['entries'][] = array(
-					'separator' => true,
-				);
-		}
-
-		// CUSTOMIZE:
-		if( $perm_admin_normal && !empty($Blog) && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
-		{	// We have permission to edit blog properties:
-			$blog_param = '&amp;blog='.$Blog->ID;
-
-			$entries['customize']['href'] = $admin_url.'?ctrl=widgets'.$blog_param;
-			$entries['customize']['disabled'] = false;
-			$entries['customize']['title'] = T_('Customize this blog');
-
-			$entries['customize']['entries'] = array(
-				'general' => array(
-						'text' => T_('Blog properties').'&hellip;',
-						'href' => $admin_url.'?ctrl=coll_settings'.$blog_param,
-					),
-				'features' => array(
-						'text' => T_('Blog features').'&hellip;',
-						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=features'.$blog_param,
-					),
-				'skin' => array(
-						'text' => T_('Blog skin').'&hellip;',
-						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin'.$blog_param,
-					),
-				'widgets' => array(
-						'text' => T_('Blog widgets').'&hellip;',
-						'href' => $admin_url.'?ctrl=widgets'.$blog_param,
-					),
-				'urls' => array(
-						'text' => T_('Blog URLs').'&hellip;',
-						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=urls'.$blog_param,
-					),
-			);
-		}
-
-
-		// TOOLS:
-		$perm_spam = $current_User->check_perm( 'spamblacklist', 'view', false );
-		$perm_options = $current_User->check_perm( 'options', 'view' );
-		$perm_slugs = $current_User->check_perm( 'slugs', 'view' );
-		if( $perm_admin_normal && ( $perm_spam || $perm_options || $perm_slugs ) )
-		{	// Permission to view settings:
-			if( $perm_spam )
+			if( $debug )
 			{
-				$entries['tools']['entries']['antispam'] = array(
-						'text' => T_('Antispam').'&hellip;',
-						'href' => $admin_url.'?ctrl=antispam',
+				$debug_text = 'DEBUG: ';
+				if( !empty($seo_page_type) )
+				{	// Set in skin_init()
+					$debug_text = $seo_page_type.': ';
+				}
+				if( $robots_index === false )
+				{
+					$debug_text .= 'NO INDEX';
+				}
+				else
+				{
+					$debug_text .= 'do index';
+				}
+
+				$entries['tools']['entries']['noindex'] = array(
+						'text' => $debug_text,
+						'disabled' => true,
+					);
+				$entries['tools']['entries'][''] = array(
+						'separator' => true,
 					);
 			}
+
+			if( $current_User->check_perm( 'users', 'view' ) )
+			{	// Users:
+				$entries['tools']['disabled'] = false;
+				$entries['tools']['entries']['users'] = array(
+						'text' => T_('Users').'&hellip;',
+						'href' => $admin_url.'?ctrl=users',
+					);
+			}
+
+			// PLACE HOLDER FOR FILES MODULE:
+			$entries['tools']['entries']['files'] = NULL;
+
+			$perm_spam = $current_User->check_perm( 'spamblacklist', 'view' );
+			$perm_options = $current_User->check_perm( 'options', 'view' );
+			$perm_slugs = $current_User->check_perm( 'slugs', 'view' );
+			$perm_maintenance = $current_User->check_perm( 'perm_maintenance', 'upgrade' );
+
+			if( $perm_spam || $perm_options || $perm_slugs || $perm_maintenance )
+			{
+				$entries['tools']['disabled'] = false;
+				$entries['tools']['entries']['tools_sep'] = array(
+						'separator' => true,
+					);
+
+				if( $perm_spam )
+				{
+					$entries['tools']['entries']['antispam'] = array(
+							'text' => T_('Antispam').'&hellip;',
+							'href' => $admin_url.'?ctrl=antispam',
+						);
+				}
+
+				if( $perm_options || $perm_slugs || $perm_maintenance )
+				{
+					$entries['tools']['entries']['tools'] = array(
+							'text' => T_('More tools'),
+						);
+
+					if( $perm_options )
+					{
+							$entries['tools']['entries']['tools']['entries']['crontab'] = array(
+										'text' => T_('Scheduler').'&hellip;',
+										'href' => $admin_url.'?ctrl=crontab',
+									);
+							$entries['tools']['entries']['tools']['entries']['status'] = array(
+										'text' => T_('System status').'&hellip;',
+										'href' => $admin_url.'?ctrl=system',
+									);
+							$entries['tools']['entries']['tools']['entries']['misc'] = array(
+										'text' => T_('Misc tools').'&hellip;',
+										'href' => $admin_url.'?ctrl=tools',
+									);
+					}
+
+					if( $perm_slugs )
+					{
+							$entries['tools']['entries']['tools']['entries']['slugs'] = array(
+										'text' => T_('Slugs').'&hellip;',
+										'href' => $admin_url.'?ctrl=slugs',
+									);
+					}
+
+					if( $perm_maintenance )
+					{
+						$entries['tools']['entries']['tools']['entries']['backup'] = array(
+										'text' => T_('Backup').'&hellip;',
+										'href' => $admin_url.'?ctrl=backup',
+									);
+						$entries['tools']['entries']['tools']['entries']['upgrade'] = array(
+										'text' => T_('Upgrade').'&hellip;',
+										'href' => $admin_url.'?ctrl=upgrade',
+									);
+					}
+				}
+			}
+
 
 			if( $perm_options )
-			{
-				$entries['tools']['entries']['crontab'] = array(
-						'text' => T_('Scheduler').'&hellip;',
-						'href' => $admin_url.'?ctrl=crontab',
+			{	// Global settings:
+				$entries['tools']['disabled'] = false;
+				if( !empty($entries['tools']['entries']))
+				{
+					$entries['tools']['entries']['settings_sep'] = array(
+							'separator' => true,
+						);
+				}
+				$entries['tools']['entries']['settings'] = array(
+						'text' => T_('Global settings').'&hellip;',
+						'href' => $admin_url.'?ctrl=settings',
 					);
 			}
-
-			if( $perm_slugs )
-			{
-				$entries['tools']['entries']['slugs'] = array(
-						'text' => T_('Slugs').'&hellip;',
-						'href' => $admin_url.'?ctrl=slugs' );
-			}
-		}
-
-		if( $perm_admin_normal && $debug )
-		{
-			$debug_text = 'DEBUG: ';
-			if( !empty($seo_page_type) )
-			{	// Set in skin_init()
-				$debug_text = $seo_page_type.': ';
-			}
-			if( $robots_index === false )
-			{
-				$debug_text .= 'NO INDEX';
-			}
-			else
-			{
-				$debug_text .= 'do index';
-			}
-
-			$entries['tools']['entries']['noindex_sep'] = array(
-					'separator' => true,
-				);
-			$entries['tools']['entries']['noindex'] = array(
-					'text' => $debug_text,
-					'disabled' => true,
-				);
 		}
 
 		if( $entries !== NULL )
@@ -1067,6 +1078,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.78  2011/09/13 15:31:35  fplanque
+ * Enhanced back-office navigation.
+ *
  * Revision 1.77  2011/09/06 00:54:38  fplanque
  * i18n update
  *

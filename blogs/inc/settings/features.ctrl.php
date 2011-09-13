@@ -43,6 +43,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Check minimum permission:
 $current_User->check_perm( 'options', 'view', true );
 
+// Memorize this as the last "tab" used in the Blog Settings:
+$UserSettings->set( 'pref_glob_settings_tab', $ctrl );
+$UserSettings->dbupdate();
 
 $AdminUI->set_path( 'options', 'features' );
 
@@ -183,6 +186,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.21  2011/09/13 15:31:34  fplanque
+ * Enhanced back-office navigation.
+ *
  * Revision 1.20  2011/09/04 22:13:20  fplanque
  * copyright 2011
  *

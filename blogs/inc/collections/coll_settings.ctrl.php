@@ -35,8 +35,17 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+// Store/retrieve preferred tab from UserSettings:
+$UserSettings->param_Request( 'tab', 'pref_coll_settings_tab', 'string', 'general', true /* memorize */, true /* force */ );
+if( $tab == 'widgets' )
+{	// This is another controller!
+   require_once dirname(__FILE__).'/../widgets/widgets.ctrl.php';
+   return;
+}
+
+
 param_action( 'edit' );
-param( 'tab', 'string', 'general', true );
 
 // Check permissions on requested blog and autoselect an appropriate blog if necessary.
 // This will prevent a fat error when switching tabs and you have restricted perms on blog properties.
@@ -166,7 +175,7 @@ switch( $action )
 				else
 				{ // Update params/Settings
 					$edited_Skin->load_params_from_Request();
-	
+
 					if(	! param_errors_detected() )
 					{	// Update settings:
 						$edited_Skin->dbupdate_settings();
@@ -368,6 +377,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.41  2011/09/13 15:31:35  fplanque
+ * Enhanced back-office navigation.
+ *
  * Revision 1.40  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

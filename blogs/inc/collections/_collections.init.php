@@ -31,6 +31,7 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_coll_settings'        => $tableprefix.'coll_settings',
 		'T_comments'             => $tableprefix.'comments',
 		'T_items__item'          => $tableprefix.'items__item',
+		'T_items__item_settings' => $tableprefix.'items__item_settings',
 		'T_items__itemtag'       => $tableprefix.'items__itemtag',
 		'T_items__prerendering'  => $tableprefix.'items__prerendering',
 		'T_items__status'        => $tableprefix.'items__status',
@@ -650,7 +651,7 @@ class collections_Module extends Module
 			// Determine default page based on permissions:
 			if( $coll_settings_perm )
 			{	// Default: show General Blog Settings
-				$default_page = $dispatcher.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog;
+				$default_page = $dispatcher.'?ctrl=coll_settings&amp;blog='.$blog;
 			}
 			else
 			{	// Default: Show list of blogs
@@ -757,6 +758,12 @@ $collections_Module = new collections_Module();
 
 /*
  * $Log$
+ * Revision 1.27  2011/09/13 15:31:35  fplanque
+ * Enhanced back-office navigation.
+ *
+ * Revision 1.26  2011/09/08 05:22:40  efy-asimo
+ * Remove item attending and add item settings
+ *
  * Revision 1.25  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

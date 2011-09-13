@@ -33,10 +33,12 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-
 // Check minimum permission:
 $current_User->check_perm( 'options', 'view', true );
 
+// Memorize this as the last "tab" used in the Blog Settings:
+$UserSettings->set( 'pref_glob_settings_tab', $ctrl );
+$UserSettings->dbupdate();
 
 $AdminUI->set_path( 'options', 'general' );
 
@@ -78,7 +80,7 @@ switch( $action )
 		{
 			param_error( 'reloadpage_timeout', sprintf( T_( 'Reload-page timeout must be between %d and %d seconds.' ), 0, 99999 ) );
 		}
-		$Settings->set( 'reloadpage_timeout', $reloadpage_timeout ); 
+		$Settings->set( 'reloadpage_timeout', $reloadpage_timeout );
 
 		// Smart hit count
 		$Settings->set( 'smart_hit_count', param( 'smart_hit_count', 'integer', 0 ) );
@@ -113,7 +115,7 @@ switch( $action )
 $AdminUI->breadcrumbpath_init();
 $AdminUI->breadcrumbpath_add( T_('Global settings'), '?ctrl=settings',
 		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
-$AdminUI->breadcrumbpath_add( T_('General'), '?ctrl=settings' );
+$AdminUI->breadcrumbpath_add( T_('General'), '?ctrl=gensettings' );
 
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -137,6 +139,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.30  2011/09/13 15:31:34  fplanque
+ * Enhanced back-office navigation.
+ *
  * Revision 1.29  2011/09/06 20:48:54  sam2kb
  * No new line at end of file
  *
