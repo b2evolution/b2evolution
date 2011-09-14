@@ -336,6 +336,8 @@ if( !$Messages->has_errors() )
 	}
 }
 
+// require colorbox js
+require_js_helper( 'colorbox' );
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
 $AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
@@ -440,6 +442,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.32  2011/09/14 07:54:20  efy-asimo
+ * User profile refactoring - modifications
+ *
  * Revision 1.31  2011/09/12 05:28:47  efy-asimo
  * User profile form refactoring
  *

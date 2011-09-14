@@ -1038,7 +1038,7 @@ function get_editform_title( $edited_User, $tab_title )
 	$form_title = sprintf( '%s &ndash; %s', $edited_User->dget('fullname').' &laquo;'.$edited_User->dget('login').'&raquo;', $tab_title );
 	if( $edited_User->has_avatar() )
 	{
-		$form_title = $edited_User->get_avatar_imgtag( 'crop-48x48' ).' '.$form_title;
+		$form_title = $edited_User->get_avatar_imgtag( 'crop-48x48', 'avatar', '', true ).' '.$form_title;
 	}
 	return $form_title;
 }
@@ -1046,6 +1046,9 @@ function get_editform_title( $edited_User, $tab_title )
 
 /*
  * $Log$
+ * Revision 1.53  2011/09/14 07:54:19  efy-asimo
+ * User profile refactoring - modifications
+ *
  * Revision 1.52  2011/09/12 07:50:57  efy-asimo
  * User gender validation
  *

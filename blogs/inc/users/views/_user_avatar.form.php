@@ -66,7 +66,7 @@ $Form->begin_form( $form_class, $form_title );
 $Form->begin_fieldset( $is_admin ? T_('Profile picture') : '', array( 'class'=>'fieldset clear' ) );
 
 global $admin_url;
-$avatar_tag = $edited_User->get_avatar_imgtag();
+$avatar_tag = $edited_User->get_avatar_imgtag( 'fit-160x160', 'avatar', '', true );
 if( empty( $avatar_tag ) )
 {
 	if( ( $current_User->ID == $edited_User->ID ) )
@@ -122,7 +122,7 @@ if( ( $current_User->check_perm( 'users', 'all' ) ) || ( $current_User->ID == $e
 					{
 						$url = regenerate_url( '', 'user_tab=avatar&user_ID='.$edited_User->ID.'&action=update_avatar&file_ID='.$lFile->ID.'&'.url_crumb('user'), '', '&');
 						$info_content .= '<div class="avatartag">';
-						$info_content .= '<a href="'.$url.'">'.'<img '.$lFile->get_thumb_imgtag( 'crop-64x64' ).'</a>';
+						$info_content .= '<a href="'.$url.'">'.'<img '.$lFile->get_thumb_imgtag( 'crop-80x80' ).'</a>';
 						$info_content .= '</div>';
 					}
 				}
@@ -164,6 +164,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.18  2011/09/14 07:54:20  efy-asimo
+ * User profile refactoring - modifications
+ *
  * Revision 1.17  2011/09/12 06:41:06  efy-asimo
  * Change user edit forms titles
  *

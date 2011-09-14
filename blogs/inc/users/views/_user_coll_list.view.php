@@ -31,6 +31,8 @@ global $user_profile_only;
 
 global $dispatcher, $user_tab, $user_ID;
 
+global $current_User;
+
 
 memorize_param( 'user_tab', 'string', '', $user_tab );
 memorize_param( 'user_ID', 'integer', 0, $user_ID );
@@ -41,8 +43,15 @@ $this->disp_payload_begin();
 if( !$user_profile_only )
 {
 	echo '<span style="float:right">';
-	echo action_icon( T_('Delete this user!'), 'delete', '?ctrl=users&amp;action=delete&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete'), 3, 4  );
-	echo action_icon( T_('Compose message'), 'comments', '?ctrl=threads&action=new&user_login='.$edited_User->login );
+	if( ( $current_User->check_perm( 'users', 'edit', false ) ) && ( $current_User->ID != $edited_User->ID )
+		&& ( $edited_User->ID != 1 ) )
+	{
+		echo action_icon( T_('Delete this user!'), 'delete', '?ctrl=users&amp;action=delete&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete'), 3, 4  );
+	}
+	if( $edited_User->get_msgform_possibility( $current_User ) )
+	{
+		echo action_icon( T_('Compose message'), 'comments', '?ctrl=threads&action=new&user_login='.$edited_User->login );
+	}
 	echo action_icon( ( $action != 'view' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', regenerate_url( 'user_ID,action,ctrl', 'ctrl=users' ) );
 	echo '</span>';
 }
@@ -133,6 +142,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.7  2011/09/14 07:54:20  efy-asimo
+ * User profile refactoring - modifications
+ *
  * Revision 1.6  2011/09/12 06:41:06  efy-asimo
  * Change user edit forms titles
  *

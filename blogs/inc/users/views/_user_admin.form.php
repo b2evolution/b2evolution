@@ -46,6 +46,8 @@ $this->disp_payload_begin();
 
 $Form = new Form( NULL, 'user_checkchanges' );
 
+echo_user_actions( $Form, $edited_User, 'edit' );
+
 $Form->begin_form( 'fform', get_editform_title( $edited_User, T_( 'Edit admin preferences' ) ) );
 
 $Form->add_crumb( 'user' );
@@ -86,6 +88,9 @@ $Form->begin_fieldset( T_('Additional info') );
 
 	$Form->info_field( T_('Posts'), $edited_User->get_num_posts() );
 	$Form->info_field( T_('Comments'), $edited_User->get_num_comments() );
+	$Form->info_field( T_('Last seen on'), $edited_User->get_last_session_param('lastseen') );
+	$Form->info_field( T_('Created on'), $edited_User->dget('datecreated') );
+	$Form->info_field( T_('Last seen on IP'), $edited_User->get_last_session_param('ipaddress') );
 	$Form->info_field( T_('From IP'), $edited_User->dget('ip') );
 	$Form->info_field( T_('From Domain'), $edited_User->dget('domain') );
 	$Form->info_field( T_('With Browser'), $edited_User->dget('browser') );
@@ -111,6 +116,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.3  2011/09/14 07:54:20  efy-asimo
+ * User profile refactoring - modifications
+ *
  * Revision 1.2  2011/09/12 06:41:06  efy-asimo
  * Change user edit forms titles
  *

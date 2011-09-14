@@ -385,8 +385,6 @@ if( empty( $edited_User->ID ) && $action != 'view' )
 
 $Form->begin_fieldset( T_('Additional info') );
 
-$Form->info_field( T_('Created on'), $edited_User->dget('datecreated') );
-
 if( ($url = $edited_User->get('url')) != '' )
 {
 	if( !preg_match('#://#', $url) )
@@ -639,6 +637,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.39  2011/09/14 07:54:20  efy-asimo
+ * User profile refactoring - modifications
+ *
  * Revision 1.38  2011/09/12 06:41:06  efy-asimo
  * Change user edit forms titles
  *

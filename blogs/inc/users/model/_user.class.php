@@ -2148,9 +2148,13 @@ class User extends DataObject
 	/**
 	 * Get avatar IMG tag.
 	 *
+	 * @param string size
+	 * @param string class
+	 * @param string align
+	 * @param boolean true if the avatar image should be zoomed on click, false otherwise
 	 * @return string
 	 */
-	function get_avatar_imgtag( $size = 'crop-64x64', $class = 'avatar', $align = '' )
+	function get_avatar_imgtag( $size = 'crop-64x64', $class = 'avatar', $align = '', $zoomable = false )
 	{
 		/**
 		 * @var File
@@ -2159,7 +2163,18 @@ class User extends DataObject
 		{
 			return '';
 		}
-		$r = $File->get_thumb_imgtag( $size, $class, $align );
+
+		if( $zoomable )
+		{ // return clickable avatar tag, zoom on click
+			// set random value to link_rel, this way the pictures on the page won't be grouped
+			// this is usefull because the same avatar picture may appear more times in the same page
+			$link_rel = 'lightbox[f'.$File->ID.rand(0, 1000).']';
+			$r = $File->get_tag( '', '', '', '', $size, 'original', $File->get_name(), $link_rel );
+		}
+		else
+		{
+			$r = $File->get_thumb_imgtag( $size, $class, $align );
+		}
 
 		return $r;
 	}
@@ -2453,10 +2468,39 @@ class User extends DataObject
 
 		return 'edit';
 	}
+
+
+	/**
+	 * Get session param from the user last session
+	 * 
+	 * @param string param name
+	 * @return mixed param value
+	 */
+	function get_last_session_param( $parname )
+	{
+		global $DB;
+
+		$parname = 'sess_'.$parname;
+		$query = 'SELECT sess_ID, '.$parname.'
+					FROM T_sessions
+					WHERE sess_user_ID = '.$this->ID.'
+					ORDER BY sess_ID DESC
+					LIMIT 1';
+		$result = $DB->get_row( $query );
+		if( !empty( $result ) )
+		{
+			return format_to_output( $result->$parname );
+		}
+
+		return NULL;
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.117  2011/09/14 07:54:19  efy-asimo
+ * User profile refactoring - modifications
+ *
  * Revision 1.116  2011/09/12 07:50:57  efy-asimo
  * User gender validation
  *
