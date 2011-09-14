@@ -78,6 +78,10 @@ if( $inskin && empty( $Blog ) )
 	}
 }
 
+if( $inskin && !empty( $Blog ) )
+{ // in-skin register, activate current Blog locale
+	locale_activate( $Blog->get('locale') );
+}
 
 if( ! $Settings->get('newusers_canregister') )
 {
@@ -294,6 +298,9 @@ require $adminskins_path.'login/_reg_form.main.php';
 
 /*
  * $Log$
+ * Revision 1.114  2011/09/14 05:22:28  efy-asimo
+ * Set the proper locale for in-skin register
+ *
  * Revision 1.113  2011/09/13 08:32:30  efy-asimo
  * Add crumb check for login and register
  * Never cache in-skin login and register
