@@ -122,8 +122,6 @@ class Hitlist
 		global $Debuglog, $Settings, $localtimenow;
 		global $Plugins;
 
-		$time_prune_before = ($localtimenow - ($Settings->get('auto_prune_stats') * 86400)); // 1 day = 86400 seconds
-
 		// Prune when $localtime is a NEW day (which will be the 1st request after midnight):
 		$last_prune = $Settings->get( 'auto_prune_stats_done' );
 		if( $last_prune >= date('Y-m-d', $localtimenow) && $last_prune <= date('Y-m-d', $localtimenow+86400) )
@@ -145,10 +143,10 @@ class Hitlist
 				(
 					SELECT hit_ID from T_hitlog
 				)" );
-		
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_logs__internal_searches.', 'request' );
 
 		// Optimizing tables
+		// fp> TODO see if we want to do this here
 		$DB->query('OPTIMIZE TABLE T_logs__internal_searches');
 		
 		
@@ -187,6 +185,9 @@ class Hitlist
 
 /*
  * $Log$
+ * Revision 1.27  2011/09/14 20:19:49  fplanque
+ * cleanup
+ *
  * Revision 1.26  2011/09/12 16:44:33  lxndral
  * internal searches fix
  *

@@ -25,7 +25,7 @@ class colourise_Skin extends Skin
 	 */
 	function get_default_name()
 	{
-		return 'colourise';
+		return 'Colourise';
 	}
 
 
@@ -34,9 +34,8 @@ class colourise_Skin extends Skin
 	 */
 	function get_default_type()
 	{
-		return 'colourise';
+		return 'normal';
 	}
-
 
 
 	/**
@@ -56,6 +55,8 @@ class colourise_Skin extends Skin
 			require_js_helper( 'colorbox' );
 		}
 	}
+	
+	
 	/**
 	 * Get definitions for editable params
 	 *
@@ -70,7 +71,6 @@ class colourise_Skin extends Skin
 					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
 					'defaultvalue' => 1,
 					'type'	=>	'checkbox',
-					'for_editing'	=>	true,
 				),				
 			), parent::get_param_definitions( $params )	);
 
@@ -79,4 +79,10 @@ class colourise_Skin extends Skin
 
 }
 
+/*
+ * $Log$
+ * Revision 1.4  2011/09/14 20:19:49  fplanque
+ * cleanup
+ *
+ */
 ?>

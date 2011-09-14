@@ -89,8 +89,8 @@ $Form->begin_fieldset( T_('Additional info') );
 	$Form->info_field( T_('Posts'), $edited_User->get_num_posts() );
 	$Form->info_field( T_('Comments'), $edited_User->get_num_comments() );
 	$Form->info_field( T_('Last seen on'), $edited_User->get_last_session_param('lastseen') );
+	$Form->info_field( T_('On IP'), $edited_User->get_last_session_param('ipaddress') );
 	$Form->info_field( T_('Created on'), $edited_User->dget('datecreated') );
-	$Form->info_field( T_('Last seen on IP'), $edited_User->get_last_session_param('ipaddress') );
 	$Form->info_field( T_('From IP'), $edited_User->dget('ip') );
 	$Form->info_field( T_('From Domain'), $edited_User->dget('domain') );
 	$Form->info_field( T_('With Browser'), $edited_User->dget('browser') );
@@ -116,6 +116,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.4  2011/09/14 20:19:48  fplanque
+ * cleanup
+ *
  * Revision 1.3  2011/09/14 07:54:20  efy-asimo
  * User profile refactoring - modifications
  *

@@ -214,9 +214,9 @@ switch( $action )
 
 	case 'make_posts_pre':
 		// form for edit several posts
-	break;
+		break;
+	
 	case 'make_posts_from_files':
-		// TODO: We don't need the Filelist, move UP!
 		// Make posts with selected images:
 
 		// Check that this action request is not a CSRF hacked request:
@@ -1085,7 +1085,7 @@ switch( $action )
 
 	case 'make_posts_pre':
 		// Make posts with selected images action:
-	break;
+		break;
 		
 	default:
 		debug_die( 'unhandled action 2: '.htmlspecialchars($action) );
@@ -1489,7 +1489,8 @@ switch( $action )
 		$AdminUI->disp_view( 'items/views/_file_create_posts.form.php' );
 		// End payload block:
 		$AdminUI->disp_payload_end();
-	break;
+		break;
+
 	case 'list':
 	default:
 		// Begin payload block:
@@ -1558,6 +1559,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.113  2011/09/14 20:19:48  fplanque
+ * cleanup
+ *
  * Revision 1.112  2011/09/13 23:25:54  lxndral
  * creating posts from images update
  *

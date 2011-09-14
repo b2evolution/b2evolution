@@ -216,7 +216,6 @@ if( $Settings->get('allow_avatars') )
 							'th' => T_('Picture'),
 							'th_class' => 'shrinkwrap',
 							'td_class' => 'shrinkwrap center',
-							'order' => 'user_avatar_file_ID',
 							'td' => '%user_avatar( #user_ID#, #user_avatar_file_ID# )%',
 						);
 }
@@ -256,8 +255,6 @@ $Results->cols[] = array(
 						'td' => '$ctry_name$',
 					);
 
-					
-					
 function user_mailto( $email )
 {
 	if( empty( $email ) )
@@ -317,16 +314,19 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 						'default_dir' => 'D',
 						'td' => '%mysql2localedate( #sess_lastseen#, "M-d" )%',
 					);
-if( ! $current_User->check_perm( 'users', 'edit', false ) )
-{
+					
 	$Results->cols[] = array(
 						'th' => T_('Contact'),
-						'td_class' => '',
-						'td' => '%user_mailto( #user_email# )% &nbsp;&nbsp; %user_pm( #user_ID#, #user_login# )% &nbsp;&nbsp; '.
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap',
+						'td' => '%user_mailto( #user_email# )%
+						%user_pm( #user_ID#, #user_login# )% '.
 						('~conditional( (#user_url# != \'http://\') && (#user_url# != \'\'), \'<a href="$user_url$" title="Website: $user_url$">'
 								.get_icon( 'www', 'imgtag', array( 'class' => 'middle', 'title' => 'Website: $user_url$' ) ).'</a>\', \'&nbsp;\' )~'),
 					);
 					
+if( ! $current_User->check_perm( 'users', 'edit', false ) )
+{
 	$Results->cols[] = array(
 						'th' => T_('Level'),
 						'th_class' => 'shrinkwrap',
@@ -346,15 +346,7 @@ else
 						'default_dir' => 'D',
 						'td' => '%get_icon( (#user_validated# ? "allowback" : "ban"), "imgtag" ,(#user_validated# ? array("title" => "'.T_( 'Email address has been confirmed' ).'"):array( ) ) )%',
 					);
-					
-	$Results->cols[] = array(
-						'th' => T_('Contact'),
-						'td_class' => '',
-						'td' => '%user_mailto( #user_email# )% &nbsp;&nbsp; %user_pm( #user_ID#, #user_login# )% &nbsp;&nbsp; '.
-						('~conditional( (#user_url# != \'http://\') && (#user_url# != \'\'), \'<a href="$user_url$" title="Website: $user_url$">'
-								.get_icon( 'www', 'imgtag', array( 'class' => 'middle', 'title' => 'Website: $user_url$' ) ).'</a>\', \'&nbsp;\' )~'),
-					);
-	
+
 	function display_level( $user_level, $user_ID )
 	{
 		$r = '';
@@ -407,6 +399,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.36  2011/09/14 20:19:48  fplanque
+ * cleanup
+ *
  * Revision 1.35  2011/09/13 22:35:29  lxndral
  * user list refactoring
  * sorting for photo field

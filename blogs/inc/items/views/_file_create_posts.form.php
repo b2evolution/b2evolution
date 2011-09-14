@@ -25,7 +25,6 @@
  * @package admin
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author efy-asimo: Evo Factory / Attila Simo
  *
  * @version $Id$
  */
@@ -51,6 +50,7 @@ $images_list = param('fm_selected','array');
 foreach ($images_list as $key=>$item ) {
 	$Form->hidden( 'fm_selected['. $key .']' , $item );
 }
+// fp> TODO: cleanup all this crap:
 $Form->hidden( 'confirmed', get_param('confirmed') );
 $Form->hidden( 'md5_filelist', get_param('md5_filelist') );
 $Form->hidden( 'md5_cwd', get_param('md5_cwd') );
@@ -110,7 +110,7 @@ function fcpf_categories_select ($default_Value,$parent_Category=-1,$level=0)
 	return $result_Array;
 }
 
-foreach ($images_list as $item) 
+foreach($images_list as $item) 
 {
 	$Form->begin_fieldset( T_('Post #'. ( $post_counter + 1 ) ) );
 	$Form->text_input( "post_title[". $post_counter . "]" , basename( urldecode( $item ) ) , 40, T_('Post title') );
@@ -147,4 +147,9 @@ foreach ($images_list as $item)
 $Form->end_form( array( array( 'submit', 'actionArray[make_posts_from_files]', T_('Make posts'), 'ActionButton')
 												 ) );
 	
-//print_r($_POST);
+/*
+ * $Log$
+ * Revision 1.2  2011/09/14 20:19:49  fplanque
+ * cleanup
+ *
+ */

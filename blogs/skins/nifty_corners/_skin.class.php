@@ -26,7 +26,7 @@ class nifty_corners_Skin extends Skin
 	 */
 	function get_default_name()
 	{
-		return 'nifty_corners';
+		return 'Nifty Corners';
 	}
 
 
@@ -39,6 +39,26 @@ class nifty_corners_Skin extends Skin
 	}
 
 
+	/**
+	 * Get definitions for editable params
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_param_definitions( $params )
+	{
+		$r = array_merge( array(
+				'colorbox' => array(
+					'label' => T_('Colorbox Image Zoom'),
+					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
+					'defaultvalue' => 1,
+					'type' => 'checkbox',
+				),				
+			), parent::get_param_definitions( $params )	);
+
+		return $r;
+	}
+	
 
 	/**
 	 * Get ready for displaying the skin.
@@ -58,27 +78,12 @@ class nifty_corners_Skin extends Skin
 		}
 	}
 
-	/**
-	 * Get definitions for editable params
-	 *
-	 * @see Plugin::GetDefaultSettings()
-	 * @param local params like 'for_editing' => true
-	 */
-	function get_param_definitions( $params )
-	{
-		$r = array_merge( array(
-				'colorbox' => array(
-					'label' => T_('Colorbox Image Zoom'),
-					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
-					'defaultvalue' => 1,
-					'type'	=>	'checkbox',
-					'for_editing'	=>	true,
-				),				
-			), parent::get_param_definitions( $params )	);
-
-		return $r;
-	}
-	
 }
 
+/*
+ * $Log$
+ * Revision 1.4  2011/09/14 20:19:49  fplanque
+ * cleanup
+ *
+ */
 ?>

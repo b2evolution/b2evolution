@@ -37,23 +37,6 @@ class evocamp_Skin extends Skin
 		return 'normal';
 	}
 
-
-	/**
-	 * Get ready for displaying the skin.
-	 *
-	 * This may register some CSS or JS...
-	 */
-	function display_init()
-	{
-		// call parent:
-		parent::display_init();
-
-		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
-		if ($this->get_setting("colorbox")) 
-		{
-			require_js_helper( 'colorbox' );
-		}
-	}
 	
 	/**
 	 * Get definitions for editable params
@@ -69,17 +52,37 @@ class evocamp_Skin extends Skin
 					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
 					'defaultvalue' => 1,
 					'type'	=>	'checkbox',
-					'for_editing'	=>	true,
 				),				
 			), parent::get_param_definitions( $params )	);
 
 		return $r;
 	}
 
+
+	/**
+	 * Get ready for displaying the skin.
+	 *
+	 * This may register some CSS or JS...
+	 */
+	function display_init()
+	{
+		// call parent:
+		parent::display_init();
+
+		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
+		if($this->get_setting("colorbox")) 
+		{
+			require_js_helper( 'colorbox' );
+		}
+	}
+
 }
 
 /*
  * $Log$
+ * Revision 1.5  2011/09/14 20:19:49  fplanque
+ * cleanup
+ *
  * Revision 1.4  2011/09/12 16:43:36  lxndral
  * skins colorbox fix
  *

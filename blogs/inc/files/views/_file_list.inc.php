@@ -595,7 +595,7 @@ $Form->begin_form();
 				
 				if ( selected_value == 'make_posts_pre' ) 
 				{
-					jQuery('#FilesForm').append ('<input type="hidden" name="ctrl" value="items" />');
+					jQuery('#FilesForm').append('<input type="hidden" name="ctrl" value="items" />');
 				}
 				return true;
 			}
@@ -695,6 +695,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.51  2011/09/14 20:19:49  fplanque
+ * cleanup
+ *
  * Revision 1.50  2011/09/13 23:25:54  lxndral
  * creating posts from images update
  *

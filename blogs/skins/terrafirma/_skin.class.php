@@ -26,7 +26,7 @@ class terrafirma_Skin extends Skin
 	 */
 	function get_default_name()
 	{
-		return 'terrafirma';
+		return 'Terrafirma';
 	}
 
 
@@ -41,24 +41,6 @@ class terrafirma_Skin extends Skin
 
 
 	/**
-	 * Get ready for displaying the skin.
-	 *
-	 * This may register some CSS or JS...
-	 */
-	function display_init()
-	{
-		// call parent:
-		parent::display_init();
-
-
-		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
-
-		if ($this->get_setting("colorbox")) 
-		{
-			require_js_helper( 'colorbox' );
-		}
-	}
-	/**
 	 * Get definitions for editable params
 	 *
 	 * @see Plugin::GetDefaultSettings()
@@ -71,14 +53,36 @@ class terrafirma_Skin extends Skin
 					'label' => T_('Colorbox Image Zoom'),
 					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
 					'defaultvalue' => 1,
-					'type'	=>	'checkbox',
-					'for_editing'	=>	true,
+					'type' => 'checkbox',
 				),				
 			), parent::get_param_definitions( $params )	);
 
 		return $r;
 	}
 
+
+	/**
+	 * Get ready for displaying the skin.
+	 *
+	 * This may register some CSS or JS...
+	 */
+	function display_init()
+	{
+		// call parent:
+		parent::display_init();
+
+		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
+		if ($this->get_setting("colorbox")) 
+		{
+			require_js_helper( 'colorbox' );
+		}
+	}
 }
 
+/* 
+ * $Log$
+ * Revision 1.4  2011/09/14 20:19:48  fplanque
+ * cleanup
+ *
+ */
 ?>
