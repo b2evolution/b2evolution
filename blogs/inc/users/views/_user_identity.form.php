@@ -394,16 +394,6 @@ if( ($url = $edited_User->get('url')) != '' )
 else
 	$url_fieldnote = '';
 
-if( $edited_User->get('icq') != 0 )
-	$icq_fieldnote = '<a href="http://wwp.icq.com/scripts/search.dll?to='.$edited_User->get('icq').'" target="_blank">'.get_icon( 'play', 'imgtag', array('title'=>T_('Search on ICQ.com')) ).'</a>';
-else
-	$icq_fieldnote = '';
-
-if( $edited_User->get('aim') != '' )
-	$aim_fieldnote = '<a href="aim:goim?screenname='.$edited_User->get('aim').'&amp;message=Hello">'.get_icon( 'play', 'imgtag', array('title'=>T_('Instant Message to user')) ).'</a>';
-else
-	$aim_fieldnote = '';
-
 
 if( $action != 'view' )
 { // We can edit the values:
@@ -413,22 +403,11 @@ if( $action != 'view' )
 		$Form->text_input( 'edited_user_source', $edited_User->source, 30, T_('Source'), '', array( 'maxlength' => 30 ) );
 	}
 	$Form->text_input( 'edited_user_url', $edited_User->url, 30, T_('URL'), $url_fieldnote, array( 'maxlength' => 100 ) );
-	$Form->text_input( 'edited_user_icq', $edited_User->icq, 30, T_('ICQ'), $icq_fieldnote, array( 'maxlength' => 10 ) );
-	$Form->text_input( 'edited_user_aim', $edited_User->aim, 30, T_('AIM'), $aim_fieldnote, array( 'maxlength' => 50 ) );
-	$Form->text_input( 'edited_user_msn', $edited_User->msn, 30, T_('MSN IM'), '', array( 'maxlength' => 100 ) );
-	$Form->text_input( 'edited_user_yim', $edited_User->yim, 30, T_('YahooIM'), '', array( 'maxlength' => 50 ) );
-
 }
 else
 { // display only
-
 	$Form->info( T_('URL'), $edited_User->get('url'), $url_fieldnote );
-	$Form->info( T_('ICQ'), $edited_User->get('icq', 'formvalue'), $icq_fieldnote );
-	$Form->info( T_('AIM'), $edited_User->get('aim'), $aim_fieldnote );
-	$Form->info( T_('MSN IM'), $edited_User->get('msn') );
-	$Form->info( T_('YahooIM'), $edited_User->get('yim') );
-
-  }
+}
 
 
 // This totally needs to move into User object
@@ -651,6 +630,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.41  2011/09/14 23:42:16  fplanque
+ * moved icq aim yim msn to additional userfields
+ *
  * Revision 1.40  2011/09/14 22:18:10  fplanque
  * Enhanced addition user info fields
  *

@@ -54,10 +54,6 @@ param( 'newuser_lastname', 'string', '' );
 param( 'newuser_nickname', 'string', '' );
 param( 'newuser_idmode', 'string', '' );
 param( 'newuser_locale', 'string', $default_locale );
-param( 'newuser_icq', 'string', '' );
-param( 'newuser_aim', 'string', '' );
-param( 'newuser_msn', 'string', '' );
-param( 'newuser_yim', 'string', '' );
 param( 'newuser_url', 'string', '' );
 param( 'newuser_email', 'string', '' );
 param( 'allow_pm', 'integer', 0 );           // checkbox
@@ -97,10 +93,6 @@ $Plugins->trigger_event( 'ProfileFormSent', array(
 		'newuser_nickname' => & $newuser_nickname,
 		'newuser_idmode' => & $newuser_idmode,
 		'newuser_locale' => & $newuser_locale,
-		'newuser_icq' => & $newuser_icq,
-		'newuser_aim' => & $newuser_aim,
-		'newuser_msn' => & $newuser_msn,
-		'newuser_yim' => & $newuser_yim,
 		'newuser_url' => & $newuser_url,
 		'newuser_email' => & $newuser_email,
 		'allow_pm' => & $allow_pm,
@@ -120,7 +112,6 @@ $Plugins->trigger_event( 'ProfileFormSent', array(
  */
 profile_check_params( array(
 	'nickname' => $newuser_nickname,
-	'icq' => $newuser_icq,
 	'email' => $newuser_email,
 	'url' => $newuser_url,
 	'pass1' => $pass1,
@@ -151,18 +142,14 @@ if( !empty($pass1) )
 $current_User->set( 'firstname', $newuser_firstname );
 $current_User->set( 'lastname', $newuser_lastname );
 $current_User->set( 'nickname', $newuser_nickname );
-$current_User->set( 'icq', $newuser_icq );
 $current_User->set_email( $newuser_email );
 $current_User->set( 'url', $newuser_url );
-$current_User->set( 'aim', $newuser_aim );
-$current_User->set( 'msn', $newuser_msn );
-$current_User->set( 'yim', $newuser_yim );
 $current_User->set( 'idmode', $newuser_idmode );
 $current_User->set( 'locale', $newuser_locale );
-// set allow_msgform: 
-// 0 - none, 
-// 1 - only private message, 
-// 2 - only email, 
+// set allow_msgform:
+// 0 - none,
+// 1 - only private message,
+// 2 - only email,
 // 3 - private message and email
 $newuser_allow_msgform = 0;
 if( $allow_pm )
@@ -196,6 +183,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.69  2011/09/14 23:42:16  fplanque
+ * moved icq aim yim msn to additional userfields
+ *
  * Revision 1.68  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

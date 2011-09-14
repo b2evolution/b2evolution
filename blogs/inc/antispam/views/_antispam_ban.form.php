@@ -101,7 +101,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 	}
 
 	// Check for potentially affected comments:
-	$sql = 'SELECT * 
+	$sql = 'SELECT *
 				FROM T_comments
 			 WHERE comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
 				 OR comment_author_email LIKE '.$DB->quote('%'.$keyword.'%').'
@@ -167,7 +167,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 
 	// Check for potentially affected comments:
 	$quoted_keyword = $DB->quote('%'.$keyword.'%');
-	$sql = 'SELECT T_users.* 
+	$sql = 'SELECT T_users.*
 				FROM T_users LEFT JOIN T_users__fields ON user_ID = uf_user_ID
 			 WHERE user_url LIKE '.$quoted_keyword.'
 				 OR user_email LIKE '.$quoted_keyword.'
@@ -176,9 +176,6 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 				 OR user_firstname LIKE '.$quoted_keyword.'
 				 OR user_lastname LIKE '.$quoted_keyword.'
 				 OR user_login LIKE '.$quoted_keyword.'
-				 OR user_aim LIKE '.$quoted_keyword.'
-				 OR user_msn LIKE '.$quoted_keyword.'
-				 OR user_yim LIKE '.$quoted_keyword.'
 				 OR uf_varchar LIKE '.$quoted_keyword.'
 			 ORDER BY user_login ASC
 			 LIMIT 500';
@@ -291,6 +288,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.31  2011/09/14 23:42:16  fplanque
+ * moved icq aim yim msn to additional userfields
+ *
  * Revision 1.30  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

@@ -95,7 +95,6 @@ $schema_queries = array(
 			user_firstname varchar(50) NULL,
 			user_lastname varchar(50) NULL,
 			user_nickname varchar(50) NULL,
-			user_icq int(11) unsigned NULL,
 			user_email varchar(255) NOT NULL,
 			user_url varchar(255) NULL,
 			user_ip varchar(15) NULL,
@@ -103,9 +102,6 @@ $schema_queries = array(
 			user_browser varchar(200) NULL,
 			dateYMDhour datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
 			user_level int unsigned DEFAULT 0 NOT NULL,
-			user_aim varchar(50) NULL,
-			user_msn varchar(100) NULL,
-			user_yim varchar(50) NULL,
 			user_locale varchar(20) DEFAULT 'en-EU' NOT NULL,
 			user_idmode varchar(20) NOT NULL DEFAULT 'login',
 			user_allow_msgform TINYINT NOT NULL DEFAULT '2',
@@ -286,6 +282,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.61  2011/09/14 23:42:16  fplanque
+ * moved icq aim yim msn to additional userfields
+ *
  * Revision 1.60  2011/09/14 22:18:10  fplanque
  * Enhanced addition user info fields
  *

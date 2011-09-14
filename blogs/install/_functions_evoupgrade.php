@@ -2971,24 +2971,51 @@ function upgrade_b2evo_tables()
 
 	if( $old_db_version < 10300 )
 	{	// 4.2
+		task_begin( 'Upgrading user fields...' );
+		$DB->query( 'ALTER TABLE T_users__fielddefs
+									ADD COLUMN ufdf_required enum("hidden","optional","recommended","require") NOT NULL default "optional"');
+		$DB->query( 'UPDATE T_users__fielddefs
+										SET ufdf_required = "recommended"
+									WHERE ufdf_name in ("Website", "Twitter", "Facebook") ' );
+		$DB->query( "REPLACE INTO T_users__fielddefs (ufdf_ID, ufdf_type, ufdf_name, ufdf_required)
+			 						VALUES (400000, 'text', 'About me', 'recommended');" );
+		task_end();
+
+		task_begin( 'Moving data to user fields...' );
+		$DB->query( 'INSERT INTO T_users__fields( uf_user_ID, uf_ufdf_ID, uf_varchar )
+								 SELECT user_ID, 10300, user_icq
+									 FROM T_users
+								  WHERE user_icq IS NOT NULL' );
+		$DB->query( 'INSERT INTO T_users__fields( uf_user_ID, uf_ufdf_ID, uf_varchar )
+								 SELECT user_ID, 10200, user_aim
+									 FROM T_users
+								  WHERE user_aim IS NOT NULL' );
+		$DB->query( 'INSERT INTO T_users__fields( uf_user_ID, uf_ufdf_ID, uf_varchar )
+								 SELECT user_ID, 10000, user_msn
+									 FROM T_users
+								  WHERE user_msn IS NOT NULL' );
+		$DB->query( 'INSERT INTO T_users__fields( uf_user_ID, uf_ufdf_ID, uf_varchar )
+								 SELECT user_ID, 10100, user_yim
+									 FROM T_users
+								  WHERE user_yim IS NOT NULL' );
+		task_end();
+
+		task_begin( 'Dropping obsolete user columns...' );
+		$DB->query( 'ALTER TABLE T_users
+									DROP COLUMN user_icq,
+									DROP COLUMN user_aim,
+									DROP COLUMN user_msn,
+									DROP COLUMN user_yim' );
+		task_end();
+
+		// ---
+
 		task_begin( 'Upgrading item table for hide teaser...' );
 		$DB->query( 'ALTER TABLE T_items__item
 						ADD COLUMN post_hideteaser tinyint(1) NOT NULL DEFAULT 0 AFTER post_featured');
 		$DB->query( 'UPDATE T_items__item
 										SET post_hideteaser = 1
 									WHERE post_content LIKE "%<!--noteaser-->%"' );
-
-		task_end();
-
-		task_begin( 'Upgrading user fields def table for required field...' );
-		$DB->query( 'ALTER TABLE T_users__fielddefs
-									ADD COLUMN ufdf_required enum("hidden","optional","recommended","require") NOT NULL default "optional"');
-		$DB->query( 'UPDATE T_users__fielddefs
-										SET ufdf_required = "recommended"
-									WHERE ufdf_name in ("Website", "Twitter", "Facebook") ' );
-	$DB->query( "
-    REPLACE INTO T_users__fielddefs (ufdf_ID, ufdf_type, ufdf_name, ufdf_required)
-		 VALUES	(400000, 'text',     'About me', 'recommended');" );
 		task_end();
 
 		task_begin( 'Creating table for a specific post settings...' );
@@ -3201,6 +3228,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.410  2011/09/14 23:42:16  fplanque
+ * moved icq aim yim msn to additional userfields
+ *
  * Revision 1.409  2011/09/14 22:18:09  fplanque
  * Enhanced addition user info fields
  *

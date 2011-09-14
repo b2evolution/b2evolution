@@ -1034,8 +1034,8 @@ class Plugin
 	function AfterCollectionDelete( & $params )
 	{
 	}
-	
-	
+
+
 	/**
 	 * Event handler: Defines blog kinds, their names and description.
 	 * Define blog settings in {@link Plugin::InitCollectionKinds()} method of your plugin.
@@ -1050,8 +1050,8 @@ class Plugin
 	{
 		return array();
 	}
-	
-	
+
+
 	/**
 	 * Event handler: Defines blog settings by its kind. Use {@link get_collection_kinds()} to return
 	 * an array of available blog kinds and their names.
@@ -1960,7 +1960,7 @@ class Plugin
 	 * Use this for example to read some cookie and define further handling of
 	 * this visitor or force them to login, by {@link Plugin::msg() adding a message}
 	 * of class "login_error", which will trigger the login screen.
-	 * asimo> There is no message with "login_error" class anymore, 
+	 * asimo> There is no message with "login_error" class anymore,
 	 * there is a $login_error global variable
 	 */
 	function AfterLoginAnonymousUser( & $params )
@@ -1980,7 +1980,7 @@ class Plugin
 	 * You can also {@link Plugin::msg() add a message} of class "login_error"
 	 * to prevent the user from accessing the site and triggering
 	 * the login screen.
-	 * asimo> There is no message with "login_error" class anymore, 
+	 * asimo> There is no message with "login_error" class anymore,
 	 * there is a $login_error global variable
 	 */
 	function AfterLoginRegisteredUser( & $params )
@@ -2193,10 +2193,6 @@ class Plugin
 	 *   - 'newuser_nickname': nickname (by reference)
 	 *   - 'newuser_idmode': "Identity shown" mode (by reference)
 	 *   - 'newuser_locale': locale (by reference)
-	 *   - 'newuser_icq': ICQ (by reference)
-	 *   - 'newuser_aim': AOL I.M. (by reference)
-	 *   - 'newuser_msn': MSN I.M. (by reference)
-	 *   - 'newuser_yim': Yahoo I.M. (by reference)
 	 *   - 'newuser_url': URL (by reference)
 	 *   - 'newuser_email': email (by reference)
 	 *   - 'newuser_allow_msgform': "message form" status (by reference)
@@ -3100,6 +3096,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.50  2011/09/14 23:42:16  fplanque
+ * moved icq aim yim msn to additional userfields
+ *
  * Revision 1.49  2011/09/04 22:13:18  fplanque
  * copyright 2011
  *

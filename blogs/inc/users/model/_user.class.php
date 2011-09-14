@@ -56,10 +56,6 @@ class User extends DataObject
 	var $locale;
 	var $email;
 	var $url;
-	var $icq;
-	var $aim;
-	var $msn;
-	var $yim;
 	var $ip;
 	var $domain;
 	var $browser;
@@ -237,10 +233,6 @@ class User extends DataObject
 			$this->locale = $db_row->user_locale;
 			$this->email = $db_row->user_email;
 			$this->url = $db_row->user_url;
-			$this->icq = $db_row->user_icq;
-			$this->aim = $db_row->user_aim;
-			$this->msn = $db_row->user_msn;
-			$this->yim = $db_row->user_yim;
 			$this->ip = $db_row->user_ip;
 			$this->domain = $db_row->user_domain;
 			$this->browser = $db_row->user_browser;
@@ -444,20 +436,6 @@ class User extends DataObject
 			param( 'edited_user_url', 'string', true );
 			param_check_url( 'edited_user_url', 'commenting' );
 			$this->set_from_Request('url', 'edited_user_url', true);
-
-			param( 'edited_user_icq', 'string', true );
-			param_check_number( 'edited_user_icq', T_('The ICQ UIN can only be a number, no letters allowed.') );
-			$this->set_from_Request('icq', 'edited_user_icq', true);
-
-			param( 'edited_user_aim', 'string', true );
-			$this->set_from_Request('aim', 'edited_user_aim', true);
-
-			param( 'edited_user_msn', 'string', true );
-			param_check_email( 'edited_user_msn', false );
-			$this->set_from_Request('msn', 'edited_user_msn', true);
-
-			param( 'edited_user_yim', 'string', true );
-			$this->set_from_Request('yim', 'edited_user_yim', true);
 		}
 
 		// ******* Password form ******* //
@@ -913,9 +891,6 @@ class User extends DataObject
 	{
 		switch( $parname )
 		{
-			case 'icq':
-				return $this->set_param( $parname, 'number', $parvalue, true );
-
 			case 'level':
 			case 'notify':
 			case 'notify_moderation':
@@ -2075,39 +2050,37 @@ class User extends DataObject
 
 	/**
 	 * Template function: display ICQ of the user
+	 * @deprecated
 	 */
 	function icq( $format = 'htmlbody' )
 	{
-		$this->disp( 'icq', $format );
 	}
 
 
 	/**
 	 * Template function: display AIM of the user.
-	 *
-	 * NOTE: Replaces spaces with '+' ?!?
+	 * @deprecated
 	 */
 	function aim( $format = 'htmlbody' )
 	{
-		echo format_to_output( str_replace(' ', '+', $this->get('aim') ), $format );
 	}
 
 
 	/**
 	 * Template function: display Yahoo IM of the user
+	 * @deprecated
 	 */
 	function yim( $format = 'htmlbody' )
 	{
-		$this->disp( 'yim', $format );
 	}
 
 
 	/**
 	 * Template function: display MSN of the user
+	 * @deprecated
 	 */
 	function msn( $format = 'htmlbody' )
 	{
-		$this->disp( 'msn', $format );
 	}
 
 	// }}}
@@ -2498,6 +2471,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.119  2011/09/14 23:42:16  fplanque
+ * moved icq aim yim msn to additional userfields
+ *
  * Revision 1.118  2011/09/14 22:18:10  fplanque
  * Enhanced addition user info fields
  *

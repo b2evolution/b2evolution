@@ -646,15 +646,6 @@ function profile_check_params( $params, $User = NULL )
 		param_error($params['nickname'][1], T_('Please enter a nickname (can be the same as your login).') );
 	}
 
-	// if the ICQ UIN has been entered, check to see if it has only numbers
-	if( !empty($params['icq'][0]) )
-	{
-		if( !preg_match( '#^[0-9]+$#', $params['icq'][0]) )
-		{
-			param_error( $params['icq'][1], T_('The ICQ UIN can only be a number, no letters allowed.') );
-		}
-	}
-
 	// checking e-mail address
 	if( isset($params['email'][0]) )
 	{
@@ -1028,7 +1019,7 @@ function get_prefered_name( $nickname, $firstname, $login )
 
 /**
  * Get user edit forms title
- * 
+ *
  * @param object edited User
  * @param string tab short title
  * @return string tab full title
@@ -1046,6 +1037,9 @@ function get_editform_title( $edited_User, $tab_title )
 
 /*
  * $Log$
+ * Revision 1.54  2011/09/14 23:42:16  fplanque
+ * moved icq aim yim msn to additional userfields
+ *
  * Revision 1.53  2011/09/14 07:54:19  efy-asimo
  * User profile refactoring - modifications
  *
