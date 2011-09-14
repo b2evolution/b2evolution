@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 require_once dirname(__FILE__).'/_stats_view.funcs.php';
 
-global $blog, $admin_url, $rsc_url;
+global $Blog, $admin_url, $rsc_url;
 global $Session;
 
 $internalsearches_keywords = param( 'isrch_keywords', 'string', NULL, true );
@@ -29,14 +29,15 @@ $SQL->SELECT( '*' );
 $SQL->FROM( 'T_logs__internal_searches' );
 if( !empty($internalsearches_keywords) ) // TODO: allow combine
 { // We want to filter on the goal name:
-	$SQL->WHERE_and( 'isrch_keywords LIKE '.$DB->quote($internalsearches_keywords.'%') );
+	$SQL->WHERE_and( 'isrch_keywords LIKE '.$DB->quote('%'.$internalsearches_keywords.'%') );
 }
-if ( !empty($internalsearches_keywords) ) {
-$SQL->WHERE_and( 'blog_id = '.$DB->quote( $blog ) );
+if( isset($Blog) ) 
+{
+	$SQL->WHERE_and( 'isrch_coll_ID = '.$Blog->ID );
 }
-$SQL->FROM_add( 'INNER JOIN T_hitlog ON isrch_hit_ID = hit_ID' );
-$SQL->FROM_add( 'INNER JOIN T_sessions ON hit_sess_ID = sess_ID' );
-$SQL->FROM_add( 'INNER JOIN T_blogs ON isrch_coll_ID = blog_ID' );
+$SQL->FROM_add( 'LEFT JOIN T_blogs ON isrch_coll_ID = blog_ID' );
+$SQL->FROM_add( 'LEFT JOIN T_hitlog ON isrch_hit_ID = hit_ID' );
+$SQL->FROM_add( 'LEFT JOIN T_sessions ON hit_sess_ID = sess_ID' );
 $Results = new Results( $SQL->get(), 'internalsearches_', '-A' );
 
 $Results->Cache = & get_InternalSearchesCache();
@@ -81,7 +82,7 @@ $Results->cols[] = array(
 		'th' => T_('Session'),
 		'order' => 'sess_ID',
 		'td_class' => 'right',
-		'td' => '<a href="admin.php?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0&amp;sess_ID=$sess_ID$">$sess_ID$</a>',
+		'td' => '<strong><a href="admin.php?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0&amp;sess_ID=$sess_ID$">$sess_ID$</a></strong>',
  	);
 $Results->cols[] = array(
 		'th' => T_('Hit date'),
@@ -116,6 +117,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.7  2011/09/14 21:04:06  fplanque
+ * cleanup
+ *
  * Revision 1.6  2011/09/12 16:44:33  lxndral
  * internal searches fix
  *

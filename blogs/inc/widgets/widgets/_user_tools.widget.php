@@ -61,83 +61,83 @@ class user_tools_Widget extends ComponentWidget
 				'size' => 40,
 				'defaultvalue' => T_('User tools'),
 			),
-			'user_login_link' => array(
+			
+			'user_login_link_show' => array(
 				'label' => T_( 'Login link'),
-				'size' => 40,
+				'note' => T_( 'Show link' ),
+				'type' => 'checkbox',
+				'defaultvalue' => 1,
+			),
+			'user_login_link' => array(
+				'size' => 30,
 				'note' => T_( 'Link text to display' ),
 				'type' => 'text',
 				'defaultvalue' => /* TRANS: with tailing space = action to log in */ T_( 'Login ' ),
 			),
-			'user_login_link_show' => array(
-				'label' => T_( 'Show login link'),
-				'note' => T_( 'Show or hide login link' ),
+			
+			'user_logout_link_show' => array(
+				'label' => T_( 'Logout link'),
+				'note' => T_( 'Show link' ),
 				'type' => 'checkbox',
 				'defaultvalue' => 1,
-			),
+			),			
 			'user_logout_link' => array(
-				'label' => T_( 'Logout link' ),
-				'size' => 40,
+				'size' => 30,
 				'note' => T_( 'Link text to display' ),
 				'type' => 'text',
 				'defaultvalue' => T_( 'Logout' ),
 			),
-			'user_logout_link_show' => array(
-				'label' => T_( 'Show logout link'),
-				'note' => T_( 'Show or hide logout link' ),
+			
+			'user_profile_link_show' => array(
+				'label' => T_( 'Profile link'),
+				'note' => T_( 'Show link' ),
 				'type' => 'checkbox',
 				'defaultvalue' => 1,
 			),
 			'user_profile_link' => array(
-				'label' => T_( 'Profile link' ),
-				'size' => 40,
+				'size' => 30,
 				'note' => T_( 'Link text to display' ),
 				'type' => 'text',
 				'defaultvalue' => T_( 'Profile' ),
 			),
-			'user_profile_link_show' => array(
-				'label' => T_( 'Show profile link'),
-				'note' => T_( 'Show or hide profile link' ),
+			
+			'user_subs_link_show' => array(
+				'label' => T_( 'Subscriptions link'),
+				'note' => T_( 'Show link' ),
 				'type' => 'checkbox',
 				'defaultvalue' => 1,
 			),
 			'user_subs_link' => array(
-				'label' => T_( 'Subscriptions link' ),
-				'size' => 40,
+				'size' => 30,
 				'note' => T_( 'Link text to display' ),
 				'type' => 'text',
 				'defaultvalue' => T_( 'Subscriptions' ),
 			),
-			'user_subs_link_show' => array(
-				'label' => T_( 'Show subscriptions link'),
-				'note' => T_( 'Show or hide subscriptions link' ),
+			
+			'user_admin_link_show' => array(
+				'label' => T_( 'Admin link'),
+				'note' => T_( 'Show link' ),
 				'type' => 'checkbox',
 				'defaultvalue' => 1,
 			),
 			'user_admin_link' => array(
-				'label' => T_( 'Admin link'),
-				'size' => 40,
+				'size' => 30,
 				'note' => T_( 'Link text to display' ),
 				'type' => 'text',
 				'defaultvalue' => T_( 'Admin' ),
 			),
-			'user_admin_link_show' => array(
-				'label' => T_( 'Show admin link'),
-				'note' => T_( 'Show or hide admin link' ),
+			
+			'user_register_link_show' => array(
+				'label' => T_( 'Register link'),
+				'note' => T_( 'Show link' ),
 				'type' => 'checkbox',
 				'defaultvalue' => 1,
 			),
 			'user_register_link' => array(
-				'label' => T_( 'Register link'),
-				'size' => 40,
+				'size' => 30,
 				'note' => T_( 'Link text to display' ),
 				'type' => 'text',
 				'defaultvalue' => T_( 'Register' ),
-			),
-			'user_register_link_show' => array(
-				'label' => T_( 'Show register link'),
-				'note' => T_( 'Show or hide register link' ),
-				'type' => 'checkbox',
-				'defaultvalue' => 1,
 			),
 		), parent::get_param_definitions( $params )	);
 
@@ -190,27 +190,27 @@ class user_tools_Widget extends ComponentWidget
 		echo $this->disp_params['list_start'];
 		if ( $this->get_param('user_login_link_show') ) 
 		{
-		user_login_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_login_link' ] );
+			user_login_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_login_link' ] );
 		}
 		if ( $this->get_param('user_register_link_show') ) 
 		{
-		user_register_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_register_link' ], '#', false, 'user tools widget' );
+			user_register_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_register_link' ], '#', false, 'user tools widget' );
 		}
 		if ( $this->get_param('user_admin_link_show') ) 
 		{
-		user_admin_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_admin_link' ] );
+			user_admin_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_admin_link' ] );
 		}
 		if ( $this->get_param('user_profile_link_show') ) 
 		{
-		user_profile_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_profile_link' ] );
+			user_profile_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_profile_link' ] );
 		}
 		if ( $this->get_param('user_subs_link_show') ) 
 		{
-		user_subs_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_subs_link' ] );
+			user_subs_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_subs_link' ] );
 		}
 		if ( $this->get_param('user_logout_link_show') ) 
 		{
-		user_logout_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_logout_link' ] );
+			user_logout_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_logout_link' ] );
 		}
 
 		if( isset($this->BlockCache) )
@@ -249,6 +249,9 @@ class user_tools_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.16  2011/09/14 21:04:06  fplanque
+ * cleanup
+ *
  * Revision 1.15  2011/09/13 22:18:23  lxndral
  * User tools plugin update :: checkboxes for links
  *

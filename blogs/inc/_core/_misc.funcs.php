@@ -719,12 +719,12 @@ function evo_strpos( $string , $needle , $offset = null )
 
 	if( $current_charset != 'iso-8859-1' && $current_charset != '' && function_exists('mb_strpos') )
 	{
-		
 		return mb_strpos( $string, $needle, $offset ,$current_charset );
 	}
 
 	return strpos( $string , $needle , $offset );
 }
+
 
 /**
  * mbstring wrapper for substr function
@@ -4277,27 +4277,36 @@ if ( !function_exists( 'json_encode' ) )
 	}
 }
 
-if ( !function_exists( 'property_exists' ) ) {
-		/**
-		 * Create property_exists function if it does not exist ( PHP < 5.1 )
-		 * @param object
-		 * @param string
-		 *
-		 * @return bool
-		 */
-    function property_exists( $class, $property ) {
-        if ( is_object( $class ) ) {
-            $vars = get_object_vars( $class );
-        } else {
-            $vars = get_class_vars( $class );
-        }
-        return array_key_exists( $property, $vars );
+
+if( !function_exists( 'property_exists' ) ) 
+{
+	/**
+	 * Create property_exists function if it does not exist ( PHP < 5.1 )
+	 * @param object
+	 * @param string
+	 *
+	 * @return bool
+	 */
+  function property_exists( $class, $property )
+	{
+    if ( is_object( $class ) ) 
+		{
+    	$vars = get_object_vars( $class );
+    } 
+		else
+		{
+      $vars = get_class_vars( $class );
     }
+    return array_key_exists( $property, $vars );
+  }
 } 
 
 
 /*
  * $Log$
+ * Revision 1.267  2011/09/14 21:04:06  fplanque
+ * cleanup
+ *
  * Revision 1.266  2011/09/13 23:28:35  lxndral
  * users sessions -> Hitlist update
  *

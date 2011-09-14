@@ -52,9 +52,9 @@ load_funcs('plugins/_plugin.funcs.php');
 $Form = new Form( NULL, 'pluginsettings_checkchanges' );
 
 // Restore defaults button:
-$Form->global_icon( T_('Restore defaults'), 'reload', regenerate_url( 'action,plugin_class', 'action=default_settings&amp;plugin_ID=' . $edit_Plugin->ID . '&amp;crumb_plugin=' . get_crumb( 'plugin' ) ),'',3,2,
+$Form->global_icon( T_('Restore defaults'), 'reload', regenerate_url( 'action,plugin_class', 'action=default_settings&amp;plugin_ID=' . $edit_Plugin->ID . '&amp;crumb_plugin=' . get_crumb( 'plugin' ) ), T_('Retsore defaults'),5,4,
 	array(
-			'onclick'=>'if (!confirm(\''.T_('Are you sure you want to restore the default settings? This cannot be undone!').'\')) { cancelClick(event); }',
+			'onclick'=>'if (!confirm(\''.TS_('Are you sure you want to restore the default settings? This cannot be undone!').'\')) { cancelClick(event); }',
 		)
 	);
 
@@ -191,6 +191,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.11  2011/09/14 21:04:06  fplanque
+ * cleanup
+ *
  * Revision 1.10  2011/09/13 23:03:24  lxndral
  * plugin edit form update
  *

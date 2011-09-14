@@ -54,7 +54,8 @@ if( $tab == 'sessions' && (!$perm_view_all || $blog != 0) )
 $tab3 = param( 'tab3', 'string', '', true );
 
 param( 'action', 'string' );
-if( ($tab=="refsearches") && ($tab3=="intsearches")) 
+
+if( ($tab=='refsearches') && ($tab3=='intsearches') ) 
 {
 
 	if( param( 'isrch_ID', 'integer', '', true) )
@@ -96,7 +97,6 @@ if( ($tab=="refsearches") && ($tab3=="intsearches"))
 			break;
 	
 	}
-		
 	
 }
 else
@@ -172,6 +172,8 @@ switch( $action )
 		break;
 }
 }
+
+
 if( $tab != 'sessions' )
 { // no need to show blogs list while displaying sessions
 
@@ -472,6 +474,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.31  2011/09/14 21:04:06  fplanque
+ * cleanup
+ *
  * Revision 1.30  2011/09/09 23:05:08  lxndral
  * Search for "fp>al" in code to find my comments and please make requested changed
  *

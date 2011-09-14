@@ -43,20 +43,19 @@ function stats_format_req_URI( $hit_blog_ID, $hit_uri, $max_len = 40 )
 	{
 		$full_url = $hit_uri;
 	}
-	$int_search_uri=urldecode($hit_uri);
-	if ( ( evo_strpos( $int_search_uri , '?s=' ) !==FALSE ) || ( evo_strpos( $int_search_uri , '&s=' ) !==FALSE ) ) 
-	{
-		// internal search
-		ereg("[\\?&]s=([^&#]*)",$int_search_uri,$res);
+	
+	$int_search_uri = urldecode($hit_uri);
+	if( ( evo_strpos( $int_search_uri , '?s=' ) !== false ) 
+	 || ( evo_strpos( $int_search_uri , '&s=' ) !== false ) ) 
+	{	// This is an internal search:
+		ereg( '[\\?&]s=([^&#]*)', $int_search_uri, $res );
 		$hit_uri = 'Internal search : '.$res[1];
 	} 
-	else 
-	{
-	if( evo_strlen($hit_uri) > $max_len )
+	elseif( evo_strlen($hit_uri) > $max_len )
 	{
 		$hit_uri = '...'.evo_substr( $hit_uri, -$max_len );
 	}
-	}	
+
 	return '<a href="'.$full_url.'">'.$hit_uri.'</a>';
 }
 
@@ -80,6 +79,9 @@ function stat_session_login( $login )
 
 /*
  * $Log$
+ * Revision 1.14  2011/09/14 21:04:06  fplanque
+ * cleanup
+ *
  * Revision 1.13  2011/09/13 23:28:35  lxndral
  * users sessions -> Hitlist update
  *

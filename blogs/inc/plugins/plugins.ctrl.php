@@ -536,18 +536,6 @@ switch( $action )
 
 		param( 'plugin_ID', 'integer', true );
 
-		// Next default action:
-		if( isset($actionArray['update_settings'])
-			&& is_array($actionArray['update_settings'])
-			&& isset($actionArray['update_settings']['review']) )
-		{ // "Save (and review)", next action will still be to edit
-			$action = 'edit_settings';
-		}
-		else
-		{	// Save only, next action: list
-			$action = 'list';
-		}
-
 		$edit_Plugin = & $admin_Plugins->get_by_ID( $plugin_ID );
 		if( empty($edit_Plugin) )
 		{
@@ -702,17 +690,19 @@ switch( $action )
 			}
 		}
 
-		if( $Messages->has_errors() )
-		{ // there were errors
-			$action = 'edit_settings';
+		if( ! $Messages->has_errors() )
+		{ // there were no errors, go back to list:
+			//save fadeout item
+			$Session->set('fadeout_id', $edit_Plugin->ID);
+			
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=plugins', 303 ); // Will EXIT
+	
+			// We have EXITed already at this point!!
 		}
-
-		//save fadeout item
-		$Session->set('fadeout_id', $edit_Plugin->ID);
-
-		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( '?ctrl=plugins', 303 ); // Will EXIT
-		// We have EXITed already at this point!!
+		
+		// Redisplay so user can fix errors:
+		$action = 'edit_settings';
 		break;
 
 
@@ -1145,6 +1135,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.24  2011/09/14 21:04:06  fplanque
+ * cleanup
+ *
  * Revision 1.23  2011/09/13 15:31:35  fplanque
  * Enhanced back-office navigation.
  *

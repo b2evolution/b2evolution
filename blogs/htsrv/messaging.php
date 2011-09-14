@@ -36,7 +36,7 @@ require_once $inc_path.'_main.inc.php';
 
 if( !is_logged_in() )
 {
-	debug_die( 'User must be logged in to proceed messaging updates!' );
+	debug_die( 'User must be logged in to proceed with messaging updates!' );
 }
 
 header( 'Content-Type: text/html; charset='.$io_charset );
@@ -151,6 +151,9 @@ header_redirect( $redirect_to ); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.4  2011/09/14 21:04:06  fplanque
+ * cleanup
+ *
  * Revision 1.3  2011/09/09 22:10:54  fplanque
  * doc
  *

@@ -110,7 +110,7 @@ function skin_init( $disp )
 		// CONTENT PAGES:
 		case 'single':
 		case 'page':
-// fp>asimo fp>alex : is this for javascript forms?
+// fp>asimo fp>sam2kb : is this for javascript forms?
 			require_js( 'communication.js' ); // auto requires jQuery
 
 			if( $disp == 'single' )
@@ -919,6 +919,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.98  2011/09/14 21:04:06  fplanque
+ * cleanup
+ *
  * Revision 1.97  2011/09/13 08:32:30  efy-asimo
  * Add crumb check for login and register
  * Never cache in-skin login and register
