@@ -59,6 +59,18 @@ $ProfileForm->begin_fieldset( T_('Identity') );
 	$ProfileForm->info( T_('Name'), $User->get( 'preferredname' ) );
   $ProfileForm->info( T_('Login'), $User->get('login') );
 
+	if( ! empty( $User->gender ) )
+	{
+		$ProfileForm->info( T_( 'Gender' ), $User->get_gender() );
+	}
+
+	if( ! empty( $User->ctry_ID ) )
+	{
+		$CountryCache = & get_CountryCache();
+		$user_Country = $CountryCache->get_by_ID( $User->ctry_ID );
+		$ProfileForm->info( T_( 'Country' ), $user_Country->get_name() );
+	}
+
 	$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=msgform&recipient_id='.$User->ID, '&' );
 	$msgform_url = $User->get_msgform_url( $Blog->get('msgformurl'), $redirect_to );
 	if( !empty($msgform_url) )
@@ -72,7 +84,7 @@ $ProfileForm->begin_fieldset( T_('Identity') );
 	    global $current_User;
 	    if( $current_User->accepts_pm() )
 	    {
-	      $ProfileForm->info( T_('Contact'), T_('You cannot send a private message to yourself.') );	
+	      $ProfileForm->info( T_('Contact'), T_('You cannot send a private message to yourself.') );
 	    }
 	    else
 	    {
@@ -81,7 +93,7 @@ $ProfileForm->begin_fieldset( T_('Identity') );
 	  }
 	  else
 	  {
-	    $ProfileForm->info( T_('Contact'), T_('This user does not wish to be contacted directly.') ); 
+	    $ProfileForm->info( T_('Contact'), T_('This user does not wish to be contacted directly.') );
 	  }
 	}
 
@@ -90,21 +102,11 @@ $ProfileForm->begin_fieldset( T_('Identity') );
 		$ProfileForm->info( T_('Website'), '<a href="'.$User->url.'" rel="nofollow" target="_blank">'.$User->url.'</a>' );
 	}
 
-	if( ! empty( $User->ctry_ID ) )
-	{
-		$CountryCache = & get_CountryCache();
-		$user_Country = $CountryCache->get_by_ID( $User->ctry_ID );
-		$ProfileForm->info( T_( 'Country' ), $user_Country->get_name() );
-	}
-
 $ProfileForm->end_fieldset();
 
 
 $ProfileForm->begin_fieldset( T_('Additional info') );
-	if( ( $Settings->get( 'registration_require_gender' ) != 'hidden' ) && ( $User->get( 'gender' ) !== NULL ) )
-	{
-		$ProfileForm->info( T_('Gender'), $User->gender() );
-	}
+
 	// Load the user fields:
 	$User->userfields_load();
 
@@ -117,14 +119,6 @@ $ProfileForm->begin_fieldset( T_('Additional info') );
 $ProfileForm->end_fieldset();
 
 
-$ProfileForm->begin_fieldset( T_('Miscellaneous') );
-
-	$ProfileForm->info( T_('Locale'), $User->get( 'locale' ) );
-	$ProfileForm->info( T_('Level'), $User->get('level') );
-	$ProfileForm->info( T_('Posts'), $User->get('num_posts') );
-
-$ProfileForm->end_fieldset();
-
 $Plugins->trigger_event( 'DisplayProfileFormFieldset', array( 'Form' => & $ProfileForm, 'User' => & $User, 'edit_layout' => 'public' ) );
 
 $ProfileForm->end_form();
@@ -132,6 +126,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.22  2011/09/14 22:18:10  fplanque
+ * Enhanced addition user info fields
+ *
  * Revision 1.21  2011/09/04 22:13:24  fplanque
  * copyright 2011
  *

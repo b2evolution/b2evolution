@@ -29,11 +29,6 @@
  *
  * @package admin
  *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author efy-maxim: Evo Factory / Maxim.
- * @author fplanque: Francois PLANQUE
- * @author blueyed: Daniel HAHLER
- *
  * @version $Id$
  */
 
@@ -123,7 +118,7 @@ global $form_action;
 
 
 	// Switch from input to textarea
-	function input2area(el) 
+	function input2area(el)
 	{
 		if (el) {
 			strHtml = '<textarea cols="25" rows="3" name="' + el.attr("name") + '" id="' + el.attr("id")
@@ -133,7 +128,7 @@ global $form_action;
 	}
 
 	// Switch from textarea to input
-	function area2input(el) 
+	function area2input(el)
 	{
 		if (el) {
 			strHtml = '<input type="text" class="form_text_input" size="30" maxlength="255" name="'
@@ -143,7 +138,7 @@ global $form_action;
 	}
 
 	// Switch between input and textarea automatically
-	function inputhint() 
+	function inputhint()
 	{
 		$('select[name*="type"]').change(function(e){
 			var group = $(this).children("optgroup").children('option[value='+$(this).val()+']').parent().attr("label");
@@ -315,9 +310,6 @@ if( $action != 'view' )
 
 	$Form->select( 'edited_user_idmode', $edited_User->get( 'idmode' ), array( &$edited_User, 'callback_optionsForIdMode' ), T_('Identity shown') );
 
-	$CountryCache = & get_CountryCache();
-	$Form->select_input_object( 'edited_user_ctry_ID', $edited_User->ctry_ID, $CountryCache, T_('Country'), array( 'required' => !$has_full_access, 'allow_none' => $has_full_access ) );
-
 	if( $Settings->get( 'registration_require_gender' ) != 'hidden' )
 	{
 		$Form->radio( 'edited_user_gender', $edited_User->get('gender'), array(
@@ -325,6 +317,11 @@ if( $action != 'view' )
 					array( 'F', T_('A woman') ),
 				), T_('I am') );
 	}
+
+	$CountryCache = & get_CountryCache();
+	$Form->select_input_object( 'edited_user_ctry_ID', $edited_User->ctry_ID, $CountryCache, T_('Country'), array( 'required' => !$has_full_access, 'allow_none' => $has_full_access ) );
+
+
 }
 else
 { // display only
@@ -339,17 +336,18 @@ else
 	$Form->info( T_('Last name'), $edited_User->get('lastname') );
 	$Form->info( T_('Nickname'), $edited_User->get('nickname') );
 	$Form->info( T_('Identity shown'), $edited_User->get('preferredname') );
-	$Form->info( T_('Country'), $edited_User->get_country_name() );
 
 	if( $Settings->get( 'registration_require_gender' ) != 'hidden' )
 	{
 		$user_gender = $edited_User->get( 'gender' );
 		if( ! empty( $user_gender ) )
 		{
-			$Form->info( T_('Gender'), ( $user_gender == 'M' ) ? T_( 'Male' ) : T_( 'Female' ) );
+			$Form->info( T_('Gender'), $edited_User->get_gender() );
 		}
 	}
-	$Form->info( T_('Multiple sessions'), ($UserSettings->get('login_multiple_sessions', $edited_User->ID) ? T_('Allowed') : T_('Forbidden')) );
+
+	$Form->info( T_('Country'), $edited_User->get_country_name() );
+
 }
 
 $Form->end_fieldset();
@@ -432,17 +430,12 @@ else
 
   }
 
-$Form->end_fieldset();
-
-	/***************  Experimental  **************/
-
-$Form->begin_fieldset( T_('Experimental') );
 
 // This totally needs to move into User object
 global $DB;
 
 // Get original user id for duplicate
-if ($edited_User->ID == 0) 
+if ($edited_User->ID == 0)
 {
 	$user_id = param( 'user_ID', 'string', "" );
 	if ($user_id == "" || $user_id == 0 )
@@ -455,7 +448,7 @@ else
 	$user_id = $edited_User->ID;
 }
 
-// Get existing userfields:
+// -------------------  Get existing userfields: -------------------------------
 $userfields = $DB->get_results( '
 	SELECT uf_ID, ufdf_ID, ufdf_type, ufdf_name, uf_varchar
 		FROM T_users__fields LEFT JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID
@@ -497,18 +490,28 @@ foreach( $userfields as $userfield )
 	}
 
 	// Display existing field:
-	$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, 50, $userfield->ufdf_name, $field_note, array( 'maxlength' => 255 ) );
+	if( $userfield->ufdf_type == 'text' )
+	{
+		$Form->textarea( 'uf_'.$userfield->uf_ID, $uf_val, 8, $userfield->ufdf_name, $field_note, 40 );
+	}
+	else
+	{
+		$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, 50, $userfield->ufdf_name, $field_note, array( 'maxlength' => 255 ) );
+	}
 }
 
-// Get recommended userfields:
+// ------------------------------ Get recommended userfields: ---------------------------------
+// Only recommended fields that are not already in use:
 $userfields = $DB->get_results( '
-	SELECT '. $user_id .' as uf_ID, ufdf_ID, ufdf_type, ufdf_name, "" as uf_varchar
-	from T_users__fielddefs
-	where ufdf_required = "recommend" and ufdf_ID not in
-		( select uf_ufdf_ID
-			from T_users__fields
-			where uf_user_ID = '. $user_id .'
-		) order by ufdf_ID' );
+	SELECT '.$user_id.' as uf_ID, ufdf_ID, ufdf_type, ufdf_name, "" as uf_varchar
+		FROM T_users__fielddefs
+	 WHERE ufdf_required = "recommended"
+	 				AND ufdf_ID NOT IN (
+	 					SELECT uf_ufdf_ID
+						FROM T_users__fields
+						WHERE uf_user_ID = '.$user_id.'
+					)
+	 ORDER BY ufdf_ID' );
 
 $i = 0;
 foreach( $userfields as $userfield )
@@ -547,7 +550,14 @@ foreach( $userfields as $userfield )
 	}
 
 	// Display existing field:
-	$Form->text_input( 'uf_rec_'.$i, $uf_val, 50, $userfield->ufdf_name, $field_note, array( 'maxlength' => 255 ) );
+	if( $userfield->ufdf_type == 'text' )
+	{
+		$Form->textarea( 'uf_rec_'.$i, $uf_val, 8, $userfield->ufdf_name, $field_note, 40 );
+	}
+	else
+	{
+		$Form->text_input( 'uf_rec_'.$i, $uf_val, 50, $userfield->ufdf_name, $field_note, array( 'maxlength' => 255 ) );
+	}
 }
 
 // Get list of possible field types:
@@ -555,6 +565,7 @@ foreach( $userfields as $userfield )
 $userfielddefs = $DB->get_results( '
 	SELECT ufdf_ID, ufdf_type, ufdf_name
 		FROM T_users__fielddefs
+	 WHERE ufdf_required <> "hidden"
 	 ORDER BY ufdf_ID' );
 // New fields:
 for( $i=1; $i<=3; $i++ )
@@ -576,6 +587,9 @@ for( $i=1; $i<=3; $i++ )
 				break;
 			case 300000:
 				$label .= "\n".'</optgroup><optgroup label="'.T_('Address').'">';
+				break;
+			case 400000:
+				$label .= "\n".'</optgroup><optgroup label="'.T_('Other').'">';
 				break;
 		}
 		$label .= "\n".'<option value="'.$fielddef->ufdf_ID.'"';
@@ -637,6 +651,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.40  2011/09/14 22:18:10  fplanque
+ * Enhanced addition user info fields
+ *
  * Revision 1.39  2011/09/14 07:54:20  efy-asimo
  * User profile refactoring - modifications
  *

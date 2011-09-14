@@ -346,11 +346,11 @@ class User extends DataObject
 			$userfields = $DB->get_results( '
 				SELECT ufdf_ID
 					FROM T_users__fielddefs
-				 WHERE ufdf_required = "recommend" AND ufdf_ID NOT IN
+				 WHERE ufdf_required = "recommended" AND ufdf_ID NOT IN
 								( SELECT uf_ufdf_ID
 										FROM T_users__fields
 									 WHERE uf_user_ID = '. $this->ID .'
-								) 
+								)
 			ORDER BY ufdf_ID' );
 			$i = 1;
 			foreach( $userfields as $userfield )
@@ -363,11 +363,11 @@ class User extends DataObject
 				}
 			}
 
-			// Duplicate fields:  
+			// Duplicate fields:
 			if( $is_new_user )
 			{
 				$user_id = param( 'orig_user_ID', 'string', "" );
-				if ($user_id <> "") 
+				if ($user_id <> "")
 				{
 					$userfield_IDs = $DB->get_results( '
 								SELECT uf_ID, uf_ufdf_ID
@@ -2049,15 +2049,15 @@ class User extends DataObject
 	/**
 	 * Return gender of the user
 	 */
-	function gender()
+	function get_gender()
 	{
 		switch( $this->gender )
 		{
 			case 'M':
-				return T_('Male');
+				return T_('Man');
 
 			case 'F':
-				return T_('Female');
+				return T_('Woman');
 		}
 
 		return NULL;
@@ -2472,7 +2472,7 @@ class User extends DataObject
 
 	/**
 	 * Get session param from the user last session
-	 * 
+	 *
 	 * @param string param name
 	 * @return mixed param value
 	 */
@@ -2498,6 +2498,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.118  2011/09/14 22:18:10  fplanque
+ * Enhanced addition user info fields
+ *
  * Revision 1.117  2011/09/14 07:54:19  efy-asimo
  * User profile refactoring - modifications
  *

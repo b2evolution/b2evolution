@@ -130,7 +130,7 @@ $schema_queries = array(
 			ufdf_ID int(10) unsigned NOT NULL,
 			ufdf_type char(8) NOT NULL,
 			ufdf_name varchar(255) NOT NULL,
-		  ufdf_required enum('hidden','optional','recommend','require') NOT NULL default 'optional',
+		  ufdf_required enum('hidden','optional','recommended','require') NOT NULL default 'optional',
 			PRIMARY KEY (ufdf_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -286,6 +286,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.60  2011/09/14 22:18:10  fplanque
+ * Enhanced addition user info fields
+ *
  * Revision 1.59  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

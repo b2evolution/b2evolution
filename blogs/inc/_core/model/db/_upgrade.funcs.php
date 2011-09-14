@@ -35,7 +35,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Get the delta query to adjust the current database according to a given (list of)
  * "CREATE TABLE"-, "CREATE DATABASE"-, "INSERT"- or "UPDATE"-statement(s).
  *
- * It's not recommend to use INSERT or UPDATE statements with this function, as they
+ * It's not recommended to use INSERT or UPDATE statements with this function, as they
  * are just handled "as-is".
  *
  * NOTE:
@@ -1305,7 +1305,7 @@ function install_make_db_schema_current( $display = true )
 
 /**
  * Check if needle is between quotation mark in the subject
- * 
+ *
  * @param string subject
  * @param string needle
  * @return boolean true if is between quotation mark, false otherwise
@@ -1329,7 +1329,7 @@ function is_in_quote( $subject, $needle )
 
 /**
  * Check if this subject has not closed ' character
- * 
+ *
  * @param $subject
  * @return boolean true if has not closed ' character, false otherwise
  */
@@ -1346,6 +1346,9 @@ function has_open_quote( $subject )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.22  2011/09/14 22:18:10  fplanque
+ * Enhanced addition user info fields
+ *
  * Revision 1.21  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

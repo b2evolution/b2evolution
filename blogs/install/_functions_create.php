@@ -133,11 +133,11 @@ function create_default_data()
 						( 50300, 'phone',    'Home phone', 'optional'),
 						( 60000, 'phone',    'Office FAX', 'optional'),
 						( 60100, 'phone',    'Home FAX', 'optional'),
-						(100000, 'url',      'Website', 'recommend'),
+						(100000, 'url',      'Website', 'recommended'),
 						(100100, 'url',      'Blog', 'optional'),
 						(110000, 'url',      'Linkedin', 'optional'),
-						(120000, 'url',      'Twitter', 'recommend'),
-						(130100, 'url',      'Facebook', 'recommend'),
+						(120000, 'url',      'Twitter', 'recommended'),
+						(130100, 'url',      'Facebook', 'recommended'),
 						(130200, 'url',      'Myspace', 'optional'),
 						(140000, 'url',      'Flickr', 'optional'),
 						(150000, 'url',      'YouTube', 'optional'),
@@ -148,7 +148,8 @@ function create_default_data()
 						(200200, 'text',     'Division', 'optional'),
 						(211000, 'text',     'VAT ID', 'optional'),
 						(300000, 'text',     'Main address', 'optional'),
-						(300300, 'text',     'Home address', 'optional');" );
+						(300300, 'text',     'Home address', 'optional'),
+						(400000, 'text',     'About me', 'recommended');" );
 	echo "OK.<br />\n";
 
 
@@ -739,9 +740,9 @@ function create_default_jobs( $is_upgrade = false )
 	$prune_pagecache = "( ".$DB->quote( form_date( $date, '02:00:00' ) ).", 86400, ".$DB->quote( T_( 'Prune old files from page cache' ) ).", ".$DB->quote( $prune_pagecache_ctrl ).", ".$ctsk_params." )";
 	$prune_sessions = "( ".$DB->quote( form_date( $date, '03:00:00' ) ).", 86400, ".$DB->quote( T_( 'Prune old hits & sessions' ) ).", ".$DB->quote( $prune_sessions_ctrl ).", ".$ctsk_params." )";
 	$poll_antispam = "( ".$DB->quote( form_date( $date, '04:00:00' ) ).", 86400, ".$DB->quote( T_( 'Poll the antispam blacklist' ) ).", ".$DB->quote( $poll_antispam_ctrl ).", ".$ctsk_params." )";
-	$insert_values = array( 
-		$prune_pagecache_ctrl => $prune_pagecache, 
-		$prune_sessions_ctrl => $prune_sessions, 
+	$insert_values = array(
+		$prune_pagecache_ctrl => $prune_pagecache,
+		$prune_sessions_ctrl => $prune_sessions,
 		$poll_antispam_ctrl => $poll_antispam );
 
 	if( $is_upgrade )
@@ -1352,6 +1353,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.316  2011/09/14 22:18:09  fplanque
+ * Enhanced addition user info fields
+ *
  * Revision 1.315  2011/09/09 23:42:21  sam2kb
  * minor/locale fix
  *

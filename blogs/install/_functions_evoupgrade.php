@@ -2974,7 +2974,7 @@ function upgrade_b2evo_tables()
 		task_begin( 'Upgrading item table for hide teaser...' );
 		$DB->query( 'ALTER TABLE T_items__item
 						ADD COLUMN post_hideteaser tinyint(1) NOT NULL DEFAULT 0 AFTER post_featured');
-		$DB->query( 'UPDATE T_items__item 
+		$DB->query( 'UPDATE T_items__item
 										SET post_hideteaser = 1
 									WHERE post_content LIKE "%<!--noteaser-->%"' );
 
@@ -2982,10 +2982,13 @@ function upgrade_b2evo_tables()
 
 		task_begin( 'Upgrading user fields def table for required field...' );
 		$DB->query( 'ALTER TABLE T_users__fielddefs
-									ADD COLUMN ufdf_required enum("hidden","optional","recommend","require") NOT NULL default "optional"');
+									ADD COLUMN ufdf_required enum("hidden","optional","recommended","require") NOT NULL default "optional"');
 		$DB->query( 'UPDATE T_users__fielddefs
-										SET ufdf_required = "recommend"
+										SET ufdf_required = "recommended"
 									WHERE ufdf_name in ("Website", "Twitter", "Facebook") ' );
+	$DB->query( "
+    REPLACE INTO T_users__fielddefs (ufdf_ID, ufdf_type, ufdf_name, ufdf_required)
+		 VALUES	(400000, 'text',     'About me', 'recommended');" );
 		task_end();
 
 		task_begin( 'Creating table for a specific post settings...' );
@@ -2996,11 +2999,11 @@ function upgrade_b2evo_tables()
 						PRIMARY KEY ( iset_item_ID, iset_name )
 					) ENGINE = innodb" );
 		task_end();
-		
+
 		set_upgrade_checkpoint( '10300' );
 	}
-	
-	
+
+
 	/*
 	 * ADD UPGRADES HERE.
 	 *
@@ -3198,6 +3201,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.409  2011/09/14 22:18:09  fplanque
+ * Enhanced addition user info fields
+ *
  * Revision 1.408  2011/09/10 00:57:23  fplanque
  * doc
  *

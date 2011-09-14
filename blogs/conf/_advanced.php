@@ -594,7 +594,7 @@ $public_access_to_media = true;
 
 
 /**
- * Do you want to stay in the current blog when you click on a post title or permalink, 
+ * Do you want to stay in the current blog when you click on a post title or permalink,
  * even if the post main cat belongs to another blog?
  *
  * @global boolean
