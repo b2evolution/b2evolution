@@ -47,6 +47,9 @@ load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
  */
 class User extends DataObject
 {
+	var $postcode;
+	var $age_min;
+	var $age_mac;
 	var $login;
 	var $pass;
 	var $firstname;
@@ -224,6 +227,9 @@ class User extends DataObject
 		{
 			// echo 'Instanciating existing user';
 			$this->ID = $db_row->user_ID;
+			$this->postcode = $db_row->user_postcode;
+			$this->age_min = $db_row->user_age_min;
+			$this->age_mac = $db_row->user_age_mac;	
 			$this->login = $db_row->user_login;
 			$this->pass = $db_row->user_pass;
 			$this->firstname = $db_row->user_firstname;
@@ -403,6 +409,17 @@ class User extends DataObject
 				$this->userfield_add( $new_uf_type, $new_uf_val );
 			}
 
+			param( 'edited_user_postcode', 'string', true );
+			$this->set_from_Request('postcode', 'edited_user_postcode', true);
+			
+			param( 'edited_user_age_min', 'integer', true );
+			param_check_number( 'edited_user_age_min', T_('Please enter valid age.') );
+			$this->set_from_Request('age_min', 'edited_user_age_min', true);
+			
+			param( 'edited_user_age_mac', 'integer', true );
+			param_check_number( 'edited_user_age_mac', T_('Please enter valid age.') );
+			$this->set_from_Request('age_mac', 'edited_user_age_mac', true);
+			
 			param( 'edited_user_firstname', 'string', true );
 			$this->set_from_Request('firstname', 'edited_user_firstname', true);
 
@@ -2471,6 +2488,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.120  2011/09/15 20:51:09  efy-abanipatra
+ * user postcode,age_min,age_mac added.
+ *
  * Revision 1.119  2011/09/14 23:42:16  fplanque
  * moved icq aim yim msn to additional userfields
  *

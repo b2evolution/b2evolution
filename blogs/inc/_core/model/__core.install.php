@@ -90,6 +90,9 @@ $schema_queries = array(
 		'Creating table for Users',
 		"CREATE TABLE T_users (
 			user_ID int(11) unsigned NOT NULL auto_increment,
+			user_postcode varchar(12) NULL,
+			user_age_min int unsigned NULL,
+			user_age_mac int unsigned NULL,
 			user_login varchar(20) NOT NULL,
 			user_pass CHAR(32) NOT NULL,
 			user_firstname varchar(50) NULL,
@@ -282,6 +285,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.62  2011/09/15 20:51:09  efy-abanipatra
+ * user postcode,age_min,age_mac added.
+ *
  * Revision 1.61  2011/09/14 23:42:16  fplanque
  * moved icq aim yim msn to additional userfields
  *

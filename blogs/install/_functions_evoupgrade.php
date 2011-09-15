@@ -1331,6 +1331,9 @@ function upgrade_b2evo_tables()
 
 		task_begin( 'Upgrading users table... ' );
 		$DB->query( 'ALTER TABLE T_users
+										CHANGE COLUMN user_postcode user_postcode varchar(12) NULL,
+										CHANGE COLUMN user_age_min user_age_min unsigned NULL,
+										CHANGE COLUMN user_age_mac user_age_mac unsigned NULL,
 										CHANGE COLUMN user_firstname user_firstname varchar(50) NULL,
 										CHANGE COLUMN user_lastname user_lastname varchar(50) NULL,
 										CHANGE COLUMN user_nickname user_nickname varchar(50) NULL,
@@ -3228,6 +3231,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.411  2011/09/15 20:51:09  efy-abanipatra
+ * user postcode,age_min,age_mac added.
+ *
  * Revision 1.410  2011/09/14 23:42:16  fplanque
  * moved icq aim yim msn to additional userfields
  *

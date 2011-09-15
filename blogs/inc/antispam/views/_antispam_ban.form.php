@@ -175,6 +175,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 				 OR user_nickname LIKE '.$quoted_keyword.'
 				 OR user_firstname LIKE '.$quoted_keyword.'
 				 OR user_lastname LIKE '.$quoted_keyword.'
+				 OR user_postcode LIKE '.$quoted_keyword.'
 				 OR user_login LIKE '.$quoted_keyword.'
 				 OR uf_varchar LIKE '.$quoted_keyword.'
 			 ORDER BY user_login ASC
@@ -288,6 +289,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.32  2011/09/15 20:51:09  efy-abanipatra
+ * user postcode,age_min,age_mac added.
+ *
  * Revision 1.31  2011/09/14 23:42:16  fplanque
  * moved icq aim yim msn to additional userfields
  *
