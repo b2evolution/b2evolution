@@ -56,7 +56,7 @@ if( !$user_profile_only )
 	echo '</span>';
 }
 
-echo '<h2>'.get_editform_title( $edited_User, T_( 'View personal blogs' ) ).'</h2>';
+echo '<h2>'.get_usertab_header( $edited_User, $user_tab, T_( 'View personal blogs' ) ).'</h2>';
 
 $SQL = 'SELECT * FROM T_blogs WHERE blog_owner_user_ID = '.$DB->quote($edited_User->ID);
 
@@ -142,6 +142,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.8  2011/09/15 08:58:46  efy-asimo
+ * Change user tabs display
+ *
  * Revision 1.7  2011/09/14 07:54:20  efy-asimo
  * User profile refactoring - modifications
  *

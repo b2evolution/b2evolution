@@ -247,7 +247,7 @@ if( $is_admin )
 	}
 	else
 	{
-		$form_title = get_editform_title( $edited_User, T_( 'Edit profile' ) );
+		$form_title = get_usertab_header( $edited_User, 'profile', T_( 'Edit profile' ) );
 	}
 	$form_class = 'fform';
 }
@@ -630,6 +630,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.42  2011/09/15 08:58:46  efy-asimo
+ * Change user tabs display
+ *
  * Revision 1.41  2011/09/14 23:42:16  fplanque
  * moved icq aim yim msn to additional userfields
  *

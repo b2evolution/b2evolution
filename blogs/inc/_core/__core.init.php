@@ -953,12 +953,8 @@ class _core_Module extends Module
 						'href' => '?ctrl=user&amp;user_tab=profile&amp;user_ID='.$user_ID );
 		}
 
-		if( $ctrl == 'user' )
-		{	// Viewing a specific user:
-			$users_entries['entries'] = get_user_sub_entries( true, $user_ID );
-		}
-		else
-		{	// Viewing all users:
+		if( $perm_admin_normal && $current_User->check_perm( 'users', 'view' ) )
+		{ // Has permission for viewing all users
 			// fp> the following submenu needs even further breakdown.
 			$users_entries['entries'] = array(
 							'users' => array(
@@ -1053,6 +1049,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.80  2011/09/15 08:58:45  efy-asimo
+ * Change user tabs display
+ *
  * Revision 1.79  2011/09/13 16:00:18  fplanque
  * Enhanced back-office navigation.
  *

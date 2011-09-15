@@ -13,7 +13,7 @@ if( empty($user_tab) )
 	$user_tab = 'profile';
 }
 
-$AdminUI->set_path( 'users', $user_tab );
+$AdminUI->set_path( 'users', 'users' );
 
 param_action();
 
@@ -442,6 +442,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.33  2011/09/15 08:58:46  efy-asimo
+ * Change user tabs display
+ *
  * Revision 1.32  2011/09/14 07:54:20  efy-asimo
  * User profile refactoring - modifications
  *

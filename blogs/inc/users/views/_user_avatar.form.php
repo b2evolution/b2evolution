@@ -33,7 +33,7 @@ if( !$user_profile_only )
 $is_admin = is_admin_page();
 if( $is_admin )
 {
-	$form_title = get_editform_title( $edited_User, T_( 'Edit profile picture' ) );
+	$form_title = get_usertab_header( $edited_User, 'avatar', T_( 'Edit profile picture' ) );
 	$form_class = 'fform';
 	$ctrl_param = '?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$edited_User->ID;
 }
@@ -164,6 +164,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.19  2011/09/15 08:58:46  efy-asimo
+ * Change user tabs display
+ *
  * Revision 1.18  2011/09/14 07:54:20  efy-asimo
  * User profile refactoring - modifications
  *

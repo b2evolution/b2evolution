@@ -1018,25 +1018,45 @@ function get_prefered_name( $nickname, $firstname, $login )
 
 
 /**
- * Get user edit forms title
+ * Get usertab header. Contains the user avatar image, the user tab title, and the user menu.
  *
  * @param object edited User
- * @param string tab short title
- * @return string tab full title
+ * @param string user tab name
+ * @param string user tab title
+ * @return string tab header
  */
-function get_editform_title( $edited_User, $tab_title )
+function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 {
-	$form_title = sprintf( '%s &ndash; %s', $edited_User->dget('fullname').' &laquo;'.$edited_User->dget('login').'&raquo;', $tab_title );
+	global $AdminUI;
+
+	// set title
+	$form_title = '<span class="user_title">'.sprintf( '%s &ndash; %s', $edited_User->dget('fullname').' &laquo;'.$edited_User->dget('login').'&raquo;', $user_tab_title ).'</span>';
+
+	// set avatar tag
 	if( $edited_User->has_avatar() )
 	{
-		$form_title = $edited_User->get_avatar_imgtag( 'crop-48x48', 'avatar', '', true ).' '.$form_title;
+		$avatar_tag = $edited_User->get_avatar_imgtag( 'crop-48x48', 'avatar', '', true );
 	}
-	return $form_title;
+	else
+	{
+		$avatar_tag = '';
+	}
+
+	// build menu3
+	$AdminUI->add_menu_entries( array( 'users', 'users' ), get_user_sub_entries( true, $edited_User->ID ) );
+	$AdminUI->set_path( 'users', 'users', $user_tab );
+	$user_menu3 = $AdminUI->get_html_menu( array( 'users', 'users' ), 'menu3' );
+
+	$result = $avatar_tag.'<div class="user_header_content">'.$form_title.$user_menu3.'</div>';
+	return '<div class="user_header">'.$result.'</div>'.'<div class="clear"></div>';
 }
 
 
 /*
  * $Log$
+ * Revision 1.55  2011/09/15 08:58:46  efy-asimo
+ * Change user tabs display
+ *
  * Revision 1.54  2011/09/14 23:42:16  fplanque
  * moved icq aim yim msn to additional userfields
  *

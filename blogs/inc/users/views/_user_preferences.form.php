@@ -82,7 +82,7 @@ if( !$user_profile_only )
 $is_admin = is_admin_page();
 if( $is_admin )
 {
-	$form_title = get_editform_title( $edited_User, T_( 'Edit preferences' ) );
+	$form_title = get_usertab_header( $edited_User, 'userprefs', T_( 'Edit preferences' ) );
 	$form_class = 'fform';
 }
 else
@@ -248,6 +248,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.22  2011/09/15 08:58:46  efy-asimo
+ * Change user tabs display
+ *
  * Revision 1.21  2011/09/12 06:41:06  efy-asimo
  * Change user edit forms titles
  *

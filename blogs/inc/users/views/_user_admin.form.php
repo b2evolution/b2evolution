@@ -48,7 +48,7 @@ $Form = new Form( NULL, 'user_checkchanges' );
 
 echo_user_actions( $Form, $edited_User, 'edit' );
 
-$Form->begin_form( 'fform', get_editform_title( $edited_User, T_( 'Edit admin preferences' ) ) );
+$Form->begin_form( 'fform', get_usertab_header( $edited_User, 'admin', T_( 'Edit admin preferences' ) ) );
 
 $Form->add_crumb( 'user' );
 $Form->hidden_ctrl();
@@ -116,6 +116,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.5  2011/09/15 08:58:46  efy-asimo
+ * Change user tabs display
+ *
  * Revision 1.4  2011/09/14 20:19:48  fplanque
  * cleanup
  *

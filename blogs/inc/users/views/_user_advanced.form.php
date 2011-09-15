@@ -99,7 +99,7 @@ if( !$user_profile_only )
 	echo_user_actions( $Form, $edited_User, $action );
 }
 
-$Form->begin_form( 'fform', get_editform_title( $edited_User, T_( 'Edit advanced preferences' ) ) );
+$Form->begin_form( 'fform', get_usertab_header( $edited_User, 'advanced', T_( 'Edit advanced preferences' ) ) );
 
 	$Form->add_crumb( 'user' );
 	$Form->hidden_ctrl();
@@ -238,6 +238,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.6  2011/09/15 08:58:46  efy-asimo
+ * Change user tabs display
+ *
  * Revision 1.5  2011/09/12 06:41:06  efy-asimo
  * Change user edit forms titles
  *

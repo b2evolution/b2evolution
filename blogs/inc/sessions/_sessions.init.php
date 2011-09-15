@@ -323,7 +323,7 @@ class sessions_Module extends Module
 			return;
 		}
 
-		if( $ctrl !== 'user' && $current_User->check_perm( 'stats', 'view' ) )
+		if( $current_User->check_perm( 'stats', 'view' ) )
 		{	// Viewing aggregate + Permission to view stats for ALL blogs:
 			$sessions_menu = array(
 				'sessions' => array(
@@ -376,6 +376,9 @@ $sessions_Module = new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.34  2011/09/15 08:58:46  efy-asimo
+ * Change user tabs display
+ *
  * Revision 1.33  2011/09/13 15:31:35  fplanque
  * Enhanced back-office navigation.
  *
