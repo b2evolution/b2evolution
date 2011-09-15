@@ -121,11 +121,17 @@ $ProfileForm->end_fieldset();
 
 $Plugins->trigger_event( 'DisplayProfileFormFieldset', array( 'Form' => & $ProfileForm, 'User' => & $User, 'edit_layout' => 'public' ) );
 
+// Make sure we're below the floating user avatar on the right
+echo '<div class="clear"></div>';
+
 $ProfileForm->end_form();
 
 
 /*
  * $Log$
+ * Revision 1.23  2011/09/15 22:19:10  fplanque
+ * CSS cleanup
+ *
  * Revision 1.22  2011/09/14 22:18:10  fplanque
  * Enhanced addition user info fields
  *

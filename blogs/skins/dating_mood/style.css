@@ -99,9 +99,19 @@ h4 {
 	font-size: 105%;
 }
 
+legend {
+	color: #995AE3;
+}
+
 blockquote {
-	border-color: #BE9EE3;
+	border-color: #AE8ED3;
 	background-color: #E4D9F0;
+}
+
+.note, .notes, .dimmed
+{
+	color: #AE8ED3;
+	font-size: 84%;
 }
 
 /*
@@ -163,14 +173,14 @@ div.pageHeader h1 {
 {
 	clear: both;
 	margin: 0 1ex 3ex 1ex;
-	padding: 0;
+	padding: 0 0 2px;
 	background-color:#F5EBF3;
 	border: 1px solid #D79ADC;
 }
 .bSmallHead {
 	font-size: 84%;
 	margin: 1ex;
-	color: #BE9EE3;
+	color: #AE8ED3;
 }
 .bSmallHead a {
 	color: #D699DD;
@@ -197,9 +207,13 @@ h3.bTitle a {
 	clear: both;
 	margin: 1ex;
 }
+
 div.bComment, form.bComment {
 	background-color: #F5EBF3;
-	border-color: #D79ADC;
+	border: 1px solid #D79ADC;
+	-moz-border-radius: 7px;
+	border-radius: 7px;
+	margin-bottom: 12px;
 }
 .bCommentLink a,
 .bCommentLink a:visited {
@@ -220,6 +234,7 @@ div.bComment, form.bComment {
 }
 .bComment h3 {
 	margin-top: 1ex;
+	color: #995AE3;
 }
 .bComment h3 a {
 	color: #EB34C0;
@@ -243,7 +258,7 @@ select.bComment		/* Used by the profile form */
 
 div.bCommentSmallPrint {
 	font-size: 84%;
-	color:#BE9EE3;
+	color:#AE8ED3;
 }
 
 /*
@@ -269,11 +284,6 @@ div.bCommentSmallPrint {
 .bSideItem form {
 	margin-top: 0px;
 	margin-bottom: 0px;
-}
-.dimmed
-{
-	color: #aaa;
-	font-size: 84%;
 }
 div.compact_search_form input.SearchField
 {
@@ -303,8 +313,8 @@ div.compact_search_form input.search_submit {
  * Calendar:
  */
 table.bCalendarTable caption {
-	border: 1px solid #BE9EE3;
-	background-color: #BE9EE3;
+	border: 1px solid #AE8ED3;
+	background-color: #AE8ED3;
 	border-bottom: 0;
 	color:#FFFFFF;
 }
@@ -313,11 +323,11 @@ table.bCalendarTable caption a {
 	color:#FFFFFF;
 }
 table.bCalendarTable {
-	border: 1px solid #BE9EE3;
+	border: 1px solid #AE8ED3;
 	background-color: #F5EBF3;
 }
 table.bCalendarTable tfoot td {
-	border-top: 1px solid #BE9EE3;
+	border-top: 1px solid #AE8ED3;
 	background-color: #E4D9F0;
 }
 table.bCalendarTable td a {
@@ -331,7 +341,7 @@ table.bCalendarTable tfoot td a:hover {
 	padding: 2px 1ex;
 }
 th.bCalendarHeaderCell {
-	color: #BE9EE3;
+	color: #AE8ED3;
 	font-weight:normal;
 }
 td.bCalendarCell:hover,
@@ -341,7 +351,7 @@ td.bCalendarLinkPost:hover {
 }
 #bCalendarToday {
 	background-color: #E4D9F0;
-	border-color: #be9ee3;
+	border-color: #AE8ED3;
 }
 
 /*

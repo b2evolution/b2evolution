@@ -105,7 +105,7 @@ div.bComment, /* Entire comment block */
 form.bComment /* New comment form */
 {
 	margin: 1ex 2ex;
-	padding: 0 1ex;
+	padding: 0 1em 1em;
 	border: 1px dotted #999;
 }
 #comment_preview {

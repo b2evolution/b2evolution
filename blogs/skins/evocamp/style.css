@@ -297,7 +297,7 @@ background:url(img/zekebullet.gif) 0 5px no-repeat;
 form.bComment {
 font-size:8pt;
 background: #F2ECCE;
-padding: 15px 15px 1px;
+padding: 15px 15px 15px;
 margin: 0;
 border: none;
 border-bottom:1px solid #CCC9B8;
