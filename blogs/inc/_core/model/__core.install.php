@@ -92,7 +92,7 @@ $schema_queries = array(
 			user_ID int(11) unsigned NOT NULL auto_increment,
 			user_postcode varchar(12) NULL,
 			user_age_min int unsigned NULL,
-			user_age_mac int unsigned NULL,
+			user_age_max int unsigned NULL,
 			user_login varchar(20) NOT NULL,
 			user_pass CHAR(32) NOT NULL,
 			user_firstname varchar(50) NULL,
@@ -285,6 +285,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.63  2011/09/15 22:34:09  fplanque
+ * cleanup
+ *
  * Revision 1.62  2011/09/15 20:51:09  efy-abanipatra
  * user postcode,age_min,age_mac added.
  *

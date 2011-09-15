@@ -320,9 +320,9 @@ if( $action != 'view' )
 
 	$CountryCache = & get_CountryCache();
 	$Form->select_input_object( 'edited_user_ctry_ID', $edited_User->ctry_ID, $CountryCache, T_('Country'), array( 'required' => !$has_full_access, 'allow_none' => $has_full_access ) );
-	$Form->text_input( 'edited_user_postcode', $edited_User->postcode, 20, T_('My ZIP/Postcode'), '', array( 'maxlength' => 20 ) );
-	$Form->text_input( 'edited_user_age_min', $edited_User->age_min, 10, T_('My age group'), '', array( 'number' => true ) );
-	$Form->text_input( 'edited_user_age_mac', $edited_User->age_mac, 10, T_('to'), '', array( 'number' => true ) );
+	$Form->text_input( 'edited_user_postcode', $edited_User->postcode, 12, T_('My ZIP/Postcode'), '', array( 'maxlength' => 12 ) );
+	$Form->text_input( 'edited_user_age_min', $edited_User->age_min, 3, T_('My age group'), '', array( 'number' => true ) );
+	$Form->text_input( 'edited_user_age_max', $edited_User->age_max, 3, T_('to'), '', array( 'number' => true ) );
 
 }
 else
@@ -351,7 +351,7 @@ else
 	$Form->info( T_('Country'), $edited_User->get_country_name() );
 	$Form->info( T_('My ZIP/Postcode'), $edited_User->get('postcode') );
 	$Form->info( T_('My age group'), $edited_User->get('age_min') );
-	$Form->info( T_('to'), $edited_User->get('age_mac') );
+	$Form->info( T_('to'), $edited_User->get('age_max') );
 }
 
 $Form->end_fieldset();
@@ -634,6 +634,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.44  2011/09/15 22:34:09  fplanque
+ * cleanup
+ *
  * Revision 1.43  2011/09/15 20:51:09  efy-abanipatra
  * user postcode,age_min,age_mac added.
  *

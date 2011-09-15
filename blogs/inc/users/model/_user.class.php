@@ -49,7 +49,7 @@ class User extends DataObject
 {
 	var $postcode;
 	var $age_min;
-	var $age_mac;
+	var $age_max;
 	var $login;
 	var $pass;
 	var $firstname;
@@ -229,7 +229,7 @@ class User extends DataObject
 			$this->ID = $db_row->user_ID;
 			$this->postcode = $db_row->user_postcode;
 			$this->age_min = $db_row->user_age_min;
-			$this->age_mac = $db_row->user_age_mac;	
+			$this->age_max = $db_row->user_age_max;	
 			$this->login = $db_row->user_login;
 			$this->pass = $db_row->user_pass;
 			$this->firstname = $db_row->user_firstname;
@@ -412,13 +412,13 @@ class User extends DataObject
 			param( 'edited_user_postcode', 'string', true );
 			$this->set_from_Request('postcode', 'edited_user_postcode', true);
 			
-			param( 'edited_user_age_min', 'integer', true );
-			param_check_number( 'edited_user_age_min', T_('Please enter valid age.') );
+			param( 'edited_user_age_min', 'string', true );
+			param_check_number( 'edited_user_age_min', T_('Age must be a number.') );
 			$this->set_from_Request('age_min', 'edited_user_age_min', true);
 			
-			param( 'edited_user_age_mac', 'integer', true );
-			param_check_number( 'edited_user_age_mac', T_('Please enter valid age.') );
-			$this->set_from_Request('age_mac', 'edited_user_age_mac', true);
+			param( 'edited_user_age_max', 'string', true );
+			param_check_number( 'edited_user_age_max', T_('Age must be a number.') );
+			$this->set_from_Request('age_max', 'edited_user_age_max', true);
 			
 			param( 'edited_user_firstname', 'string', true );
 			$this->set_from_Request('firstname', 'edited_user_firstname', true);
@@ -2488,6 +2488,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.121  2011/09/15 22:34:09  fplanque
+ * cleanup
+ *
  * Revision 1.120  2011/09/15 20:51:09  efy-abanipatra
  * user postcode,age_min,age_mac added.
  *

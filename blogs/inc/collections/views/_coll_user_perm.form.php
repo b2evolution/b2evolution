@@ -87,7 +87,6 @@ if( !empty( $keywords ) )
 	$SQL->add_search_field( 'user_lastname' );
 	$SQL->add_search_field( 'user_nickname' );
 	$SQL->add_search_field( 'user_email' );
-	$SQL->add_search_field( 'user_postcode' );
 	$SQL->WHERE_keywords( $keywords, 'AND' );
 }
 
@@ -511,8 +510,8 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
- * Revision 1.23  2011/09/15 20:51:09  efy-abanipatra
- * user postcode,age_min,age_mac added.
+ * Revision 1.24  2011/09/15 22:34:09  fplanque
+ * cleanup
  *
  * Revision 1.22  2011/09/07 00:28:26  sam2kb
  * Replace non-ASCII character in regular expressions with ~

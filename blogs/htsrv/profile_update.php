@@ -65,8 +65,8 @@ param( 'newuser_gender', 'string', NULL );
 param( 'pass1', 'string', '' );
 param( 'pass2', 'string', '' );
 param( 'newuser_postcode', 'string', '' );
-param( 'newuser_age_min', 'integer', '' );
-param( 'newuser_age_mac', 'integer', '' );
+param( 'newuser_age_min', 'string', '' );
+param( 'newuser_age_max', 'string', '' );
 
 /**
  * Basic security checks:
@@ -170,7 +170,7 @@ $current_User->set( 'showonline', $newuser_showonline );
 $current_User->set( 'gender', $newuser_gender );
 $current_User->set( 'postcode', $newuser_postcode );
 $current_User->set( 'age_min', $newuser_age_min );
-$current_User->set( 'age_mac', $newuser_age_mac );
+$current_User->set( 'age_max', $newuser_age_mac );
 
 // Set Messages into user's session, so they get restored on the next page (after redirect):
 if( $current_User->dbupdate() )
@@ -188,6 +188,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.71  2011/09/15 22:34:09  fplanque
+ * cleanup
+ *
  * Revision 1.70  2011/09/15 20:51:09  efy-abanipatra
  * user postcode,age_min,age_mac added.
  *
