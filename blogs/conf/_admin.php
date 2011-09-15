@@ -1,6 +1,6 @@
 <?php
 /**
- * Name : Abani Mohan Patra
+ * Name : Abani Mohan Patra.
  * This is the admin config file
  *
  * This sets how the back-office/admin interface works
