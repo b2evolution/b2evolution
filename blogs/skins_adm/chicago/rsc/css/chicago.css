@@ -1026,25 +1026,3 @@ div.breadcrumbpath {
 	margin: 0 16px 8px;
 	font-size: 84%;
 }
-
-
-/* 
-* Menu3 with title
-*/
-.user_header {
-	height: 48px;
-}
-
-.user_title {
-	margin-left: 10px;
-}
-
-.user_header .menu3 {
-	margin: 10px 0 0 10px;
-	font-size: 68%;
-}
-
-.user_header .cboxElement,
-.user_header_content {
-	float: left;
-}

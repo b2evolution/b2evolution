@@ -501,3 +501,15 @@ div.avatartag {
 	margin: 0 0.5em 0.5em 0;
 	padding: 0;
 }
+
+/*  Menu3 with title, used for User editing */
+.user_header .cboxElement {
+	float: left;
+}
+.user_header_content {
+	margin: 0 0 14px 58px;
+}
+.user_header .menu3 {
+	margin: 6px 0;
+	font-size: 72%;
+}
