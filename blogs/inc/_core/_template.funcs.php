@@ -1212,6 +1212,9 @@ function display_ajax_form( $params )
 	// Needs json_encode function to create json type params
 	$json_params = json_encode( $params );
 	$ajax_loader = "<p class='ajax-loader'><img src='".$rsc_url."img/ajax-loader2.gif' /><br />".T_( 'Form is loading...' )."</p>";
+	
+	// sam2kb>fp Cross-domain AJAX calls fail, the forms are not loaded. We have to use jsonp GET calls instead
+	// more info: http://devlog.info/2010/03/10/cross-domain-ajax/
 	?>
 	<script type="text/javascript">
 		// display loader gif until the ajax call returns
@@ -1243,6 +1246,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.92  2011/09/16 06:07:30  sam2kb
+ * doc
+ *
  * Revision 1.91  2011/09/08 23:57:59  fplanque
  * minor
  *
