@@ -93,6 +93,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.5  2011/09/16 05:50:39  sam2kb
+ * Added missing PHP closing tag ?>
+ *
  * Revision 1.4  2011/09/04 22:13:12  fplanque
  * copyright 2011
  *
@@ -106,3 +109,4 @@ exit();
  * Use ajax to display comment and contact forms
  *
  */
+?>
