@@ -46,6 +46,7 @@ $params = array_merge( array(
 		'after_more_link'     => '</p>',
 		'more_link_text'      => '#',
 // fp>sam2kb : what's a use case for this?
+// sam2kb>fp : It's very handy, you can link some posts to a different URL or just use custom anchor
 		'more_link_to'        => 'single', // 'single' becomes permalink + "#more55" where 55 is item ID
 		'anchor_text'         => '<p class="bMore">...</p>', // text to display as the more anchor (once the more link has been clicked, '#' defaults to "Follow up:")
 		'excerpt_before_text' => '<div class="excerpt">',
@@ -248,6 +249,9 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.40  2011/09/17 23:38:56  sam2kb
+ * doc
+ *
  * Revision 1.39  2011/09/17 21:14:47  fplanque
  * doc
  *
