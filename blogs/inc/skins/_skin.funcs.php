@@ -111,6 +111,7 @@ function skin_init( $disp )
 		case 'single':
 		case 'page':
 // fp>asimo fp>sam2kb : is this for javascript forms?
+// If so, can we make sure we only add it if javascript forms are turned on?
 			require_js( 'communication.js', 'blog' ); // auto requires jQuery
 
 			if( $disp == 'single' )
@@ -357,6 +358,7 @@ function skin_init( $disp )
 			break;
 
 		case 'msgform':
+// why do we need this here?
 			require_js( 'communication.js', 'blog' ); // auto requires jQuery
 		case 'messages':
 		case 'contacts':
@@ -919,6 +921,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.100  2011/09/17 21:14:47  fplanque
+ * doc
+ *
  * Revision 1.99  2011/09/17 02:32:00  fplanque
  * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
  *

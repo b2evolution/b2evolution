@@ -663,6 +663,10 @@ class Skin extends DataObject
 	}
 
 
+
+	/**
+	 * Those templates are used for example by the messaging screens.
+	 */
 	function get_template( $name )
 	{
 		switch( $name )
@@ -767,6 +771,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.32  2011/09/17 21:14:47  fplanque
+ * doc
+ *
  * Revision 1.31  2011/09/07 00:28:26  sam2kb
  * Replace non-ASCII character in regular expressions with ~
  *

@@ -45,6 +45,7 @@ $params = array_merge( array(
 		'before_more_link'    => '<p class="bMore">',
 		'after_more_link'     => '</p>',
 		'more_link_text'      => '#',
+// fp>sam2kb : what's a use case for this?
 		'more_link_to'        => 'single', // 'single' becomes permalink + "#more55" where 55 is item ID
 		'anchor_text'         => '<p class="bMore">...</p>', // text to display as the more anchor (once the more link has been clicked, '#' defaults to "Follow up:")
 		'excerpt_before_text' => '<div class="excerpt">',
@@ -247,6 +248,9 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.39  2011/09/17 21:14:47  fplanque
+ * doc
+ *
  * Revision 1.38  2011/09/04 22:13:24  fplanque
  * copyright 2011
  *
