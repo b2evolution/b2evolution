@@ -1232,7 +1232,7 @@ function display_ajax_form( $params )
 
 	// Needs json_encode function to create json type params
 	$json_params = json_encode( $params );
-	$ajax_loader = "<p class='ajax-loader'><img src='".$rsc_url."img/ajax-loader2.gif' /><br />".T_( 'Form is loading...' )."</p>";
+	$ajax_loader = "<p class='ajax-loader'><img src='".$rsc_uri."img/ajax-loader2.gif' /><br />".T_( 'Form is loading...' )."</p>";
 	?>
 	<script type="text/javascript">
 		// display loader gif until the ajax call returns
@@ -1264,6 +1264,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.94  2011/09/17 17:39:43  sam2kb
+ * req_url > req_uri
+ *
  * Revision 1.93  2011/09/17 02:31:59  fplanque
  * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
  *
