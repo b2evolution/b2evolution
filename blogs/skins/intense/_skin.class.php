@@ -74,7 +74,7 @@ class intense_Skin extends Skin
 		parent::display_init();
 		if($this->get_setting("colorbox")) 
 		{
-			require_js_helper( 'colorbox' );
+			require_js_helper( 'colorbox', 'blog' );
 		}
 	}
 }

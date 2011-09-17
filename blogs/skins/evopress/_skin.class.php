@@ -65,7 +65,7 @@ class evopress_Skin extends Skin
 					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
 					'defaultvalue' => 1,
 					'type'	=>	'checkbox',
-				),							
+				),
 			), parent::get_param_definitions( $params )	);
 
 		return $r;
@@ -87,17 +87,17 @@ class evopress_Skin extends Skin
 		// 1) Requesting them earlier as if they are @import'ed
 		// 2) Allow bundling
 		// fp> I am not 100% sure though. Comments welcome :)
-		require_css( 'basic.css' );
-		require_css( 'basic_styles.css', false, NULL, NULL, '' );	// Do not include v= for now or else that css will be loaded twice due to @import
-		require_css( 'blog_base.css' );
-		require_css( 'item_base.css', false, NULL, NULL, '' );	// Do not include v= for now or else that css will be loaded twice due to @import
-		require_css( 'item.css', true );
-		require_css( 'style.css', true );
+		require_css( 'basic.css', 'blog' );
+		require_css( 'basic_styles.css', 'blog', NULL, NULL, '' );	// Do not include v= for now or else that css will be loaded twice due to @import
+		require_css( 'blog_base.css', 'blog' );
+		require_css( 'item_base.css', 'blog', NULL, NULL, '' );	// Do not include v= for now or else that css will be loaded twice due to @import
+		require_css( 'item.css', 'relative' );
+		require_css( 'style.css', 'relative' );
 
 		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
-		if( $this->get_setting("colorbox") ) 
+		if( $this->get_setting("colorbox") )
 		{
-			require_js_helper( 'colorbox' );
+			require_js_helper( 'colorbox', 'blog' );
 		}
 	}
 
@@ -105,6 +105,9 @@ class evopress_Skin extends Skin
 
 /*
  * $Log$
+ * Revision 1.12  2011/09/17 02:31:59  fplanque
+ * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ *
  * Revision 1.11  2011/09/14 20:19:48  fplanque
  * cleanup
  *

@@ -12,13 +12,21 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $htsrv_url;
+if( isset($Blog ) )
+{
+	$submit_url = $Blog->get_local_htsrv_url().'message_send.php';
+}
+else
+{
+	$submit_url = $htsrv_url.'message_send.php';
+}
 
-$Form = new Form( $htsrv_url.'message_send.php' );
+
+$Form = new Form( $submit_url );
 	$Form->begin_form( 'bComment' );
 
 	$Form->add_crumb( 'newmessage' );
-	if( !empty( $Blog ) )
+	if( isset($Blog) )
 	{
 		$Form->hidden( 'blog', $Blog->ID );
 	}
@@ -73,6 +81,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.3  2011/09/17 02:31:58  fplanque
+ * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ *
  * Revision 1.2  2011/09/04 22:13:24  fplanque
  * copyright 2011
  *

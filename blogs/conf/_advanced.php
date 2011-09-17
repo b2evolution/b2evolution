@@ -428,7 +428,7 @@ $htsrv_path = $basepath.$htsrv_subdir;   // You should not need to change this
 $htsrv_url = $baseurl.$htsrv_subdir;     // You should not need to change this
 
 /**
- * Sensitivee URL to the htsrv folder.
+ * Sensitive URL to the htsrv folder.
  *
  * Set this separately (based on {@link $htsrv_url}), if you want to use
  * SSL for login, registration and profile updates (where passwords are
@@ -455,6 +455,7 @@ $xmlsrv_url = $baseurl.$xmlsrv_subdir;   // You should not need to change this
 $rsc_subdir = 'rsc/';                    // Subdirectory relative to base
 $rsc_path = $basepath.$rsc_subdir;       // You should not need to change this
 $rsc_url = $baseurl.$rsc_subdir;         // You should not need to change this
+$rsc_uri = $basesubpath.$rsc_subdir;
 
 /**
  * Location of the skins folder.

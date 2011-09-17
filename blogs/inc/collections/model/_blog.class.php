@@ -30,13 +30,6 @@
  *
  * @package evocore
  *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author blueyed: Daniel HAHLER.
- * @author fplanque: Francois PLANQUE.
- * @author gorgeb: Bertrand GORGE / EPISTEMA
- * @author jeffbearer: Jeff BEARER
- * @author edgester: Jason EDGECOMBE
- *
  * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -111,6 +104,17 @@ class Blog extends DataObject
 	var $media_subdir = '';
 	var $media_fullpath = '';
 	var $media_url = '';
+
+
+	/**
+	 * The URL to the basepath of that blog.
+	 * This is supposed to be the same as $baseurl but localized to the domain of the blog/
+	 *
+	 * Lazy filled by get_basepath_url()
+	 *
+	 * @var string
+	 */
+	var $basepath_url;
 
 	/**
 	 * Additional settings for the collection.  lazy filled.
@@ -230,11 +234,11 @@ class Blog extends DataObject
 				$this->set( 'urlname', empty($urlname) ? 'blog' : $urlname );
 				break;
 		}
-		
+
 		if( empty($name) && empty($shortname) && empty($urlname) )
 		{	// Not in installation mode, init custom collection kinds.
 			global $Plugins;
-			
+
 			// Defines blog settings by its kind.
 			$Plugins->trigger_event( 'InitCollectionKinds', array(
 							'Blog' => & $this,
@@ -496,9 +500,11 @@ class Blog extends DataObject
 			$this->set_setting( 'allow_anon_url', param( 'allow_anon_url', 'string', '0' ) );
 			$this->set_setting( 'allow_attachments', param( 'allow_attachments', 'string', 'registered' ) );
 			$this->set_setting( 'allow_rating', param( 'allow_rating', 'string', 'never' ) );
-			$this->set_setting( 'allow_attending', param( 'allow_attending', 'string', 'never' ) );
 			$this->set( 'allowtrackbacks', param( 'blog_allowtrackbacks', 'integer', 0 ) );
 			$this->set_setting( 'comments_orderdir', param( 'comments_orderdir', '/^(?:ASC|DESC)$/', 'ASC' ) );
+
+			// call modules update_collection_features on this blog
+			modules_call_method( 'update_collection_features', array( 'edited_Blog' => & $this ) );
 
 			$this->set_setting( 'paged_comments', param( 'paged_comments', 'integer', 0 ) );
 			param_integer_range( 'comments_per_page', 1, 9999, T_('Comments per page must be between %d and %d.') );
@@ -793,7 +799,8 @@ class Blog extends DataObject
 
 
 	/**
-	 * Generate blog URL
+	 * Generate blog URL. That is the URL of the main page/home page of the blog.
+	 * This will nto necessarily be a folder. For example, it can end in index.php?blog=4
 	 *
 	 * @param string default|dynamic|static
 	 */
@@ -847,9 +854,8 @@ class Blog extends DataObject
 
 
 	/**
-	 * Generate the baseurl of the blog (URL of the folder where the blog lives)
-	 *
-	 * @todo test
+	 * Generate the baseurl of the blog (URL of the folder where the blog lives).
+	 * Will always end with '/'.
 	 */
 	function gen_baseurl()
 	{
@@ -880,8 +886,105 @@ class Blog extends DataObject
 				debug_die( 'Unhandled Blog access type ['.$this->access_type.']' );
 		}
 
+		if( substr( $url, -1 ) != '/' )
+		{	// Crop at the last "/"
+			$url = substr( $url, 0, strrpos($url,'/')+1 );
+		}
+
 		// For case relative and absolute:
 		return preg_replace( '~^(.+)/[^/]$~', '$1/', $url );
+	}
+
+
+	/**
+	 * This is the domain of the blog.
+	 * This returns NO trailing slash.
+	 */
+	function get_baseurl_root()
+	{
+		if( preg_match( '#^(https?://(.+?)(:.+?)?)/#', $this->gen_baseurl(), $matches ) )
+		{
+			return $matches[1];
+		}
+		debug_die( 'Blog::get(baseurl)/baseurlroot - assertion failed [baseurl: '.$this->gen_baseurl().'].' );
+	}
+
+
+	/**
+	 * Get the URL to the basepath of that blog.
+	 * This is supposed to be the same as $baseurl but localized to the domain of the blog/
+	 *
+	 * @todo The current implementation may not work in all situations. See TODO below.
+	 */
+	function get_basepath_url()
+	{
+		global $basesubpath;
+
+		// fp> TODO: this may be very borked and may need some tweaking for non standard multiblog situations:
+		// One way to fix this, if neede, may be to add a settinf to Blog Settings > URLs
+		// -- Create a block for "System URLs" and give a radio option between default and custom with input field
+
+		if( empty($this->basepath_url) )
+		{
+			$this->basepath_url = $this->get_baseurl_root().$basesubpath;
+		}
+
+		return $this->basepath_url;
+	}
+
+
+	/**
+	 * Get the URL of the htsrv folder, on the current blog's domain (which is NOT always the same as the $baseurl domain!).
+	 */
+	function get_local_htsrv_url()
+	{
+		global $htsrv_subdir;
+
+		return $this->get_basepath_url().$htsrv_subdir;
+	}
+
+
+	/**
+	 * Get the URL of the media folder, on the current blog's domain (which is NOT always the same as the $baseurl domain!).
+	 */
+	function get_local_media_url()
+	{
+		global $media_subdir;
+
+		return $this->get_basepath_url().$media_subdir;
+	}
+
+
+	/**
+	 * Get the URL of the rsc folder, on the current blog's domain (which is NOT always the same as the $baseurl domain!).
+	 */
+	function get_local_rsc_url()
+	{
+		global $rsc_subdir;
+
+		return $this->get_basepath_url().$rsc_subdir;
+	}
+
+
+	/**
+	 * Get the URL of the skins folder, on the current blog's domain (which is NOT always the same as the $baseurl domain!).
+	 */
+	function get_local_skins_url()
+	{
+		global $skins_subdir;
+
+		return $this->get_basepath_url().$skins_subdir;
+	}
+
+
+	/**
+	 * Get the URL of the xmlsrv folder, on the current blog's domain (which is NOT always the same as the $baseurl domain!).
+	 */
+	function get_local_xmlsrv_url()
+	{
+		global $xmlsrv_subdir;
+
+		return $this->get_basepath_url().$xmlsrv_subdir;
 	}
 
 
@@ -1497,7 +1600,7 @@ class Blog extends DataObject
 	 */
 	function get_media_url()
 	{
-		global $media_url, $Settings, $Debuglog;
+		global $media_subdir, $Settings, $Debuglog;
 
 		if( ! $Settings->get( 'fm_enable_roots_blog' ) )
 		{ // User directories are disabled:
@@ -1508,10 +1611,10 @@ class Blog extends DataObject
 		switch( $this->media_location )
 		{
 			case 'default':
-				return $media_url.'blogs/'.$this->urlname.'/';
+				return $this->get_local_media_url().'blogs/'.$this->urlname.'/';
 
 			case 'subdir':
-				return $media_url.$this->media_subdir;
+				return $this->get_local_media_url().$media_url.$this->media_subdir;
 				break;
 
 			case 'custom':
@@ -1655,13 +1758,7 @@ class Blog extends DataObject
 				return $this->gen_baseurl();
 
 			case 'baseurlroot':
-				// fp>> TODO: cleanup
-				if( preg_match( '#^(https?://(.+?)(:.+?)?)/#', $this->gen_baseurl(), $matches ) )
-				{
-					// TODO: shouldn't that include a trailing slash?:
-					return $matches[1];
-				}
-				debug_die( 'Blog::get(baseurl)/baseurlroot - assertion failed [baseurl: '.$this->gen_baseurl().'].' );
+				return $this->get_baseurl_root();
 
 			case 'lastcommentsurl':
 				return url_add_param( $this->gen_blogurl(), 'disp=comments' );
@@ -1689,6 +1786,12 @@ class Blog extends DataObject
 
 			case 'userurl':
 				return url_add_param( $this->gen_blogurl(), 'disp=user' );
+
+			case 'loginurl':
+				return url_add_param( $this->gen_blogurl(), 'disp=login' );
+
+			case 'subsurl':
+				return url_add_param( $this->gen_blogurl(), 'disp=subs' );
 
 			case 'helpurl':
 				if( $this->get_setting( 'help_link' ) == 'slug' )
@@ -1728,6 +1831,8 @@ class Blog extends DataObject
 			case 'comments_atom_url':
 				return $this->get_comment_feed_url( '_atom' );
 
+			case 'rsd_url':
+				return $this->get_local_xmlsrv_url().'rsd.php?blog='.$this->ID;
 
 			/* Add the html for a blog-specified stylesheet
 			 * All stylesheets will be included if the blog settings allow it
@@ -2376,6 +2481,12 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.140  2011/09/17 02:31:58  fplanque
+ * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ *
+ * Revision 1.139  2011/09/08 05:22:40  efy-asimo
+ * Remove item attending and add item settings
+ *
  * Revision 1.138  2011/09/04 22:13:14  fplanque
  * copyright 2011
  *

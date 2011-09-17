@@ -48,7 +48,7 @@ $params = array_merge( array(
 
 global $c, $tb, $pb, $redir;
 
-// ----------------- ATTENDING INCLUDED HERE -----------------
+// ----------------- EVENTS INCLUDED HERE -----------------
 if( isset( $GLOBALS['events_Module'] ) )
 {
 	// fp>asimo: can you make a call to all modules here? Sth like "display_before_comments" ?
@@ -223,7 +223,7 @@ if( $Item->can_see_comments( true ) )
 				T_('This post has 1 feedback awaiting moderation... %s'),
 				T_('This post has %d feedbacks awaiting moderation... %s') );
 		// _______________________________________________________________
-	
+
 		// Display link for comments feed:
 		$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>' );
 	}
@@ -243,7 +243,7 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 		if( $DB->get_var( $sql ) > 0 )
 		{
 			echo '<p>'.T_( 'You are receiving notifications when anyone comments on any post.' );
-			echo ' <a href="'.$Blog->gen_baseurl().'?disp=subs">'.T_( 'Click here to manage your subscriptions.' ).'</a></p>';
+			echo ' <a href="'.$Blog->get('subsurl').'">'.T_( 'Click here to manage your subscriptions.' ).'</a></p>';
 			$not_subscribed = false;
 		}
 	}
@@ -251,7 +251,7 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 	if( $not_subscribed && ( $creator_User->ID == $current_User->ID ) && ( $current_User->get( 'notify' ) != 0 ) )
 	{
 		echo '<p>'.T_( 'This is your post. You are receiving notifications when anyone comments on your posts.' );
-		echo ' <a href="'.$Blog->gen_baseurl().'?disp=subs">'.T_( 'Click here to manage your subscriptions.' ).'</a></p>';
+		echo ' <a href="'.$Blog->get('subsurl').'">'.T_( 'Click here to manage your subscriptions.' ).'</a></p>';
 		$not_subscribed = false;
 	}
 	if( $not_subscribed && $Blog->get_setting( 'allow_item_subscriptions' ) )
@@ -271,7 +271,7 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 // ------------------ COMMENT FORM INCLUDED HERE ------------------
 if( $Blog->get_setting( 'ajax_form_enabled' ) )
 {
-	$json_params = array( 
+	$json_params = array(
 		'action' => 'get_comment_form',
 		'p' => $Item->ID,
 		'blog' => $Blog->ID,
@@ -290,6 +290,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.40  2011/09/17 02:31:58  fplanque
+ * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ *
  * Revision 1.39  2011/09/10 00:57:23  fplanque
  * doc
  *

@@ -90,6 +90,7 @@ class FileRoot
 		global $current_User;
 		global $Messages;
  		global $Settings, $Debuglog;
+ 		global $Blog;
 
 		// Store type:
 		$this->type = $root_type;
@@ -147,7 +148,14 @@ class FileRoot
 				{
 					$this->name = T_('Shared');
 					$this->ads_path = $ads_shared_dir;
-					$this->ads_url = $media_url.'shared/global/';
+					if( isset($Blog) )
+					{	// (for now) Let's make shared files appear as being part of the currently displayed blog:
+						$this->ads_url = $Blog->get_local_media_url().'shared/global/';
+					}
+					else
+					{
+						$this->ads_url = $media_url.'shared/global/';
+					}
 				}
 				return;
 
@@ -166,7 +174,14 @@ class FileRoot
 					global $skins_path, $skins_url;
 					$this->name = T_('Skins');
 					$this->ads_path = $skins_path;
-					$this->ads_url = $skins_url;
+					if( isset($Blog) )
+					{	// (for now) Let's make skin files appear as being part of the currently displayed blog:
+						$this->ads_url = $Blog->get_local_skins_url();
+					}
+					else
+					{
+						$this->ads_url = $skins_url;
+					}
 				}
 				return;
 		}
@@ -212,6 +227,9 @@ class FileRoot
 
 /*
  * $Log$
+ * Revision 1.15  2011/09/17 02:31:59  fplanque
+ * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ *
  * Revision 1.14  2011/09/04 22:13:15  fplanque
  * copyright 2011
  *

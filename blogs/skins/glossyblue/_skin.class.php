@@ -75,13 +75,16 @@ class glossyblue_Skin extends Skin
 		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
 		if($this->get_setting("colorbox")) 
 		{
-			require_js_helper( 'colorbox' );
+			require_js_helper( 'colorbox', 'blog' );
 		}
 	}	
 }
 
 /*
  * $Log$
+ * Revision 1.5  2011/09/17 02:31:58  fplanque
+ * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ *
  * Revision 1.4  2011/09/14 20:19:48  fplanque
  * cleanup
  *

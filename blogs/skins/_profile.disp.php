@@ -41,7 +41,7 @@ load_class( 'regional/model/_country.class.php', 'Country' );
 global $Blog, $Session, $Messages, $inc_path;
 global $action, $user_profile_only, $edited_User, $form_action;
 
-$form_action = $Blog->gen_blogurl().'?disp='.$disp;
+$form_action = url_add_param( $Blog->gen_blogurl(), 'disp='.$disp );
 
 if( ! is_logged_in() )
 { // must be logged in!
@@ -124,6 +124,9 @@ switch( $disp )
 
 /*
  * $Log$
+ * Revision 1.25  2011/09/17 02:31:58  fplanque
+ * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ *
  * Revision 1.24  2011/09/04 22:13:24  fplanque
  * copyright 2011
  *

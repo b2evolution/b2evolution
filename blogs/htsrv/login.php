@@ -29,11 +29,6 @@
  *
  * @package htsrv
  *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author blueyed: Daniel HAHLER
- * @author fplanque: Francois PLANQUE
- * @author mfollett: Matt FOLLETT.
- *
  * @version $Id$
  */
 
@@ -65,7 +60,7 @@ switch( $action )
 		// TODO: to give the user feedback through Messages, we would need to start a new $Session here and append $Messages to it.
 
 		// Redirect to $baseurl on logout if redirect URI is not set. Temporarily fix until we remove actions from redirect URIs
-		if( $redirect_to == $ReqURI ) 
+		if( $redirect_to == $ReqURI )
 			$redirect_to = $baseurl;
 
 		header_redirect(); // defaults to redirect_to param and exits
@@ -367,7 +362,7 @@ if( strlen($redirect_to) )
 			{
 				$cookie_domain_match = true;
 			}
-			elseif( $cookie_domain[0] == '.'
+			elseif( !empty($cookie_domain) && $cookie_domain[0] == '.'
 				&& substr($cookie_domain,1) == substr($parsed_redirect_to['host'], 1-strlen($cookie_domain)) )
 			{ // cookie domain includes subdomains and matches the last part of where we want to redirect to
 				$cookie_domain_match = true;
@@ -404,7 +399,7 @@ if( $inskin && use_in_skin_login() )
 	$Blog = $BlogCache->get_by_ID( $blog, false, false );
 	if( ! empty( $Blog ) )
 	{
-		$redirect = $Blog->gen_blogurl().'?disp=login';
+		$redirect = $Blog->get('loginurl');
 		header_redirect( $redirect );
 		// already exited here
 		exit(0);
@@ -429,7 +424,7 @@ switch( $action )
 		break;
 
 	default:
-		// Display login form
+		// Display login form:
 		require $adminskins_path.'login/_login_form.main.php';
 }
 
@@ -438,6 +433,9 @@ exit(0);
 
 /*
  * $Log$
+ * Revision 1.118  2011/09/17 02:31:59  fplanque
+ * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ *
  * Revision 1.117  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

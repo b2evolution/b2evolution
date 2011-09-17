@@ -111,7 +111,7 @@ function skin_init( $disp )
 		case 'single':
 		case 'page':
 // fp>asimo fp>sam2kb : is this for javascript forms?
-			require_js( 'communication.js' ); // auto requires jQuery
+			require_js( 'communication.js', 'blog' ); // auto requires jQuery
 
 			if( $disp == 'single' )
 			{
@@ -166,7 +166,7 @@ function skin_init( $disp )
 
 		case 'posts':
 // fp>sam2kb: why do we need this here?  for javascript forms?
-			require_js( 'communication.js' ); // auto requires jQuery
+			require_js( 'communication.js', 'blog' ); // auto requires jQuery
 
 			// Get list of active filters:
 			$active_filters = $MainList->get_active_filters();
@@ -357,7 +357,7 @@ function skin_init( $disp )
 			break;
 
 		case 'msgform':
-			require_js( 'communication.js' ); // auto requires jQuery
+			require_js( 'communication.js', 'blog' ); // auto requires jQuery
 		case 'messages':
 		case 'contacts':
 			$seo_page_type = 'Contact form';
@@ -566,21 +566,21 @@ function skin_base_tag()
 {
 	global $skins_url, $skin, $Blog, $disp;
 
-	if( ! empty( $skin ) )
-	{
-		$base_href = $skins_url.$skin.'/';
-	}
-	else
-	{ // No skin used:
-		if( ! empty( $Blog ) )
-		{
-			$base_href = $Blog->gen_baseurl();
+	if( ! empty( $Blog ) )
+	{	// We are displaying a blog:
+		if( ! empty( $skin ) )
+		{	// We are using a skin:
+			$base_href = $Blog->get_local_skins_url().$skin.'/';
 		}
 		else
-		{
-			global $baseurl;
-			$base_href = $baseurl;
+		{ // No skin used:
+			$base_href = $Blog->gen_baseurl();
 		}
+	}
+	else
+	{	// We are displaying a general page that is not specific to a blog:
+		global $baseurl;
+		$base_href = $baseurl;
 	}
 
 	$target = NULL;
@@ -919,6 +919,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.99  2011/09/17 02:32:00  fplanque
+ * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ *
  * Revision 1.98  2011/09/14 21:04:06  fplanque
  * cleanup
  *

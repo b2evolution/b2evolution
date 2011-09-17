@@ -41,7 +41,8 @@ if( !isset( $redirect_to ) )
 }
 
 if( $action != 'req_validatemail' )
-{
+{ // -----------------------------------------------------------------------------------------------------------------
+
 	if( empty($login_required)
 		&& $action != 'req_validatemail'
 		&& strpos($redirect_to, $admin_url) !== 0
@@ -76,8 +77,8 @@ if( $action != 'req_validatemail' )
 	$Form->text_input( 'login', $login, 18, T_('Login'), T_('Type your username, <b>not</b> your email address.'), array( 'maxlength' => 20, 'class' => 'input_text' ) );
 	$Form->end_field();
 
-	$pwd_note = '<a href="'.$htsrv_url_sensitive.'login.php?action=lostpassword&amp;redirect_to='
-		.rawurlencode( url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
+	$pwd_note = '<a href="'.$Blog->get_local_htsrv_url().'login.php?action=lostpassword&amp;redirect_to='
+		.rawurlencode( url_rel_to_same_host($redirect_to, $Blog->get_local_htsrv_url()) );
 	if( !empty($login) )
 	{
 		$pwd_note .= '&amp;login='.rawurlencode($login);
@@ -105,18 +106,19 @@ if( $action != 'req_validatemail' )
 
 	$Form->end_form();
 
-	echo '<div class="notes" style="margin: 1em"><a href="'.$htsrv_url.'login.php?redirect_to='.$redirect_to.'">'.T_( 'Use standard login form instead').' &raquo;</a></div>
+	echo '<div class="notes" style="margin: 1em"><a href="'.$Blog->get_local_htsrv_url().'login.php?redirect_to='.$redirect_to.'">'.T_( 'Use standard login form instead').' &raquo;</a></div>
 	<div class="clear"></div>';
 }
 else
 {	// -----------------------------------------------------------------------------------------------------------------
-	$Form = new Form( $htsrv_url_sensitive.'login.php', 'login_form', 'post' );
+
+	$Form = new Form( $Blog->get_local_htsrv_url().'login.php', 'login_form', 'post' );
 
 	$Form->begin_form( 'bComment' );
 
 	$Form->add_crumb( 'validateform' );
 	$Form->hidden( 'action', 'req_validatemail');
-	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
+	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $Blog->get_local_htsrv_url()) );
 	$Form->hidden( 'inskin', true );
 	if( isset( $blog ) )
 	{
@@ -145,6 +147,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.16  2011/09/17 02:31:58  fplanque
+ * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ *
  * Revision 1.15  2011/09/13 08:32:30  efy-asimo
  * Add crumb check for login and register
  * Never cache in-skin login and register

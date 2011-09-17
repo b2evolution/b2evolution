@@ -16,6 +16,7 @@ global $cookie_name, $cookie_email, $cookie_url;
 global $comment_allowed_tags, $comments_use_autobr;
 global $comment_cookies, $comment_allow_msgform;
 global $PageCache;
+global $Blog;
 
 // Default params:
 $params = array_merge( array(
@@ -137,7 +138,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 		  /* ]]> */
 		  </script>';
 
-	$Form = new Form( $htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID, 'post', NULL, 'multipart/form-data' );
+	$Form = new Form( $Blog->get_local_htsrv_url().'comment_post.php', 'bComment_form_id_'.$Item->ID, 'post', NULL, 'multipart/form-data' );
 	$Form->begin_form( 'bComment', '', array( 'target' => '_self', 'onsubmit' => 'return validateCommentForm(this);' ) );
 
 	// TODO: dh> a plugin hook would be useful here to add something to the top of the Form.
@@ -264,6 +265,9 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 
 /*
  * $Log$
+ * Revision 1.26  2011/09/17 02:31:58  fplanque
+ * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ *
  * Revision 1.25  2011/09/06 03:25:41  fplanque
  * i18n update
  *

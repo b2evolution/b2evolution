@@ -42,7 +42,7 @@ else
 	global $Blog;
 	$form_title = '';
 	$form_class = 'bComment';
-	$ctrl_param = $Blog->gen_blogurl().'?disp='.$disp;
+	$ctrl_param = url_add_param( $Blog->gen_blogurl(), 'disp='.$disp );
 }
 
 $Form->begin_form( $form_class, $form_title );
@@ -164,6 +164,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.20  2011/09/17 02:31:59  fplanque
+ * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ *
  * Revision 1.19  2011/09/15 08:58:46  efy-asimo
  * Change user tabs display
  *

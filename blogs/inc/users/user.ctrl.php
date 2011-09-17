@@ -169,7 +169,7 @@ if( !$Messages->has_errors() )
 			{
 				$action = $result;
 				break;
-			}			
+			}
 			$action = 'edit';
 			break;
 
@@ -198,10 +198,10 @@ if( !$Messages->has_errors() )
 			if( param( 'advanced_form', 'boolean', false ) )
 			{
 				$current_admin_skin = param( 'current_admin_skin', 'string' );
-				if( ( $current_admin_skin == $UserSettings->get( 'admin_skin', $current_User->ID ) ) && 
+				if( ( $current_admin_skin == $UserSettings->get( 'admin_skin', $current_User->ID ) ) &&
 					( $current_admin_skin == $UserSettings->get( 'admin_skin', $edited_User->ID ) ) )
-				{ // Save Admin skin display settings if admin skin wasn't changed, and 
-					// edited user admin skin is the same as current user admin skin 
+				{ // Save Admin skin display settings if admin skin wasn't changed, and
+					// edited user admin skin is the same as current user admin skin
 					$AdminUI->set_skin_settings( $edited_User->ID );
 				}
 
@@ -337,7 +337,7 @@ if( !$Messages->has_errors() )
 }
 
 // require colorbox js
-require_js_helper( 'colorbox' );
+require_js_helper( 'colorbox', 'rsc_url' );
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
 $AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
@@ -442,6 +442,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.34  2011/09/17 02:32:00  fplanque
+ * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ *
  * Revision 1.33  2011/09/15 08:58:46  efy-asimo
  * Change user tabs display
  *

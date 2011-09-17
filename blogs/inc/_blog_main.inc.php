@@ -118,7 +118,7 @@ if( ! isset( $resolve_extra_path ) ) { $resolve_extra_path = true; }
 if( $resolve_extra_path )
 {
 	// Check and Remove blog base URI from ReqPath:
-	$blog_baseuri = substr( $Blog->gen_baseurl(), strlen( $Blog->get('baseurlroot') ) );
+	$blog_baseuri = substr( $Blog->gen_baseurl(), strlen( $Blog->get_baseurl_root() ) );
 	$Debuglog->add( 'blog_baseuri: "'.$blog_baseuri.'"', 'params' );
 
 	// Remove trailer:
@@ -345,7 +345,7 @@ if( !empty($p) || !empty($title) )
 		$Item = & $ItemCache->get_by_urltitle( $title, false );
 
 		if( ( !empty( $Item ) ) && ( $Item !== false ) && (! $Item->is_part_of_blog( $blog ) ) )
-		{ // we have found an Item object, but it doesn't belong to the current blog 
+		{ // we have found an Item object, but it doesn't belong to the current blog
 			unset($Item);
 		}
 
@@ -668,6 +668,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.174  2011/09/17 02:31:59  fplanque
+ * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ *
  * Revision 1.173  2011/09/07 00:28:26  sam2kb
  * Replace non-ASCII character in regular expressions with ~
  *

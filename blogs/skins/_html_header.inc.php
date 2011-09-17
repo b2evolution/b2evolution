@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $xmlsrv_url;
 
-require_css( 'style.css', true );
+require_css( 'style.css', 'relative' );
 
 add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
 
@@ -45,7 +45,7 @@ add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar me
 		<?php
 	}
 	?>
- 	<link rel="EditURI" type="application/rsd+xml" title="RSD" href="<?php echo $xmlsrv_url; ?>rsd.php?blog=<?php echo $Blog->ID; ?>" />
+ 	<link rel="EditURI" type="application/rsd+xml" title="RSD" href="<?php echo $Blog->disp( 'rsd_url', 'raw' ) ?>" />
 	<meta name="viewport" content="width = 750" />
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 	<?php

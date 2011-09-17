@@ -843,6 +843,7 @@ class User extends DataObject
 	function get_media_url()
 	{
 		global $media_url, $Settings, $Debuglog;
+		global $Blog;
 
 		if( ! $Settings->get( 'fm_enable_roots_user' ) )
 		{	// User directories are disabled:
@@ -850,6 +851,13 @@ class User extends DataObject
 			return false;
 		}
 
+		if( isset($Blog) )
+		{	// We are currently looking at a blog. We are going to consider (for now) that we want the users and their files
+			// to appear as being part of that blog.
+			return $Blog->get_local_media_url().'users/'.$this->login.'/';
+		}
+
+		// System media url:
 		return $media_url.'users/'.$this->login.'/';
 	}
 
@@ -2158,7 +2166,7 @@ class User extends DataObject
 		{ // return clickable avatar tag, zoom on click
 			// set random value to link_rel, this way the pictures on the page won't be grouped
 			// this is usefull because the same avatar picture may appear more times in the same page
-			$link_rel = 'lightbox[f'.$File->ID.rand(0, 1000).']';
+			$link_rel = 'lightbox[f'.$File->ID.rand(0, 100000).']';
 			$r = $File->get_tag( '', '', '', '', $size, 'original', $File->get_name(), $link_rel );
 		}
 		else
@@ -2488,6 +2496,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.122  2011/09/17 02:31:59  fplanque
+ * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ *
  * Revision 1.121  2011/09/15 22:34:09  fplanque
  * cleanup
  *

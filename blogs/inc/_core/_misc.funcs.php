@@ -1476,7 +1476,7 @@ function is_windows()
 
 /**
  * Get all "a" tags from the given content
- *  
+ *
  * @param string content
  * @return array all <a../a> part from the given content
  */
@@ -1492,7 +1492,7 @@ function get_atags( $content )
 
 /**
  * Get all "img" tags from the given content
- *  
+ *
  * @param string content
  * @return array all <img../img> part from the given content
  */
@@ -1508,7 +1508,7 @@ function get_imgtags( $content )
 
 /**
  * Get all urls from the given content
- *  
+ *
  * @param string content
  * @return array all url from content
  */
@@ -2339,9 +2339,9 @@ function debug_info( $force = false, $force_clean = false )
 			echo "\n</tbody></table>";
 
 			// add jquery.tablesorter to the "Debug info" table.
-			global $rsc_url;
+			global $rsc_uri;
 			echo '
-			<script type="text/javascript" src="'.$rsc_url.'js/jquery/jquery.tablesorter.min.js"></script>
+			<script type="text/javascript" src="'.$rsc_uri.'js/jquery/jquery.tablesorter.min.js"></script>
 			<script type="text/javascript">
 			(function($){
 				var clicked_once;
@@ -2897,7 +2897,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 {
 	global $admin_subdir, $Debuglog, $use_strict;
 	global $conf_path;
-	global $rsc_path, $rsc_url;
+	global $rsc_path, $rsc_uri;
 
 	if( ! function_exists('get_icon_info') )
 	{
@@ -2968,7 +2968,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			/* BREAK */
 
 		case 'url':
-			return $rsc_url.$icon['file'];
+			return $rsc_uri.$icon['file'];
 			/* BREAK */
 
 		case 'size':
@@ -3003,7 +3003,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 
 
 		case 'imgtag':
-			$r = '<img src="'.$rsc_url.$icon['file'].'" ';
+			$r = '<img src="'.$rsc_uri.$icon['file'].'" ';
 
 			if( !$use_strict )
 			{	// Include non CSS fallbacks - transitional only:
@@ -3060,7 +3060,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 		case 'noimg':
 			$blank_icon = get_icon_info('pixel');
 
-			$r = '<img src="'.$rsc_url.$blank_icon['file'].'" ';
+			$r = '<img src="'.$rsc_uri.$blank_icon['file'].'" ';
 
 			// TODO: dh> add this only for !$use_strict, like above?
 			// Include non CSS fallbacks (needed by bozos... and basic skin):
@@ -4304,6 +4304,9 @@ if( !function_exists( 'property_exists' ) )
 
 /*
  * $Log$
+ * Revision 1.268  2011/09/17 02:31:59  fplanque
+ * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ *
  * Revision 1.267  2011/09/14 21:04:06  fplanque
  * cleanup
  *

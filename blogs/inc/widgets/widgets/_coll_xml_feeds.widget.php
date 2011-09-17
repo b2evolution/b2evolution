@@ -109,9 +109,9 @@ class coll_xml_feeds_Widget extends ComponentWidget
 
 	function get_title()
 	{
-		global $rsc_url;
+		global $rsc_uri;
 
-		$title = str_replace( '$icon$', '<img src="'.$rsc_url.'icons/feed-icon-16x16.gif" width="16" height="16" class="top" alt="" /> ', $this->disp_params['title']);
+		$title = str_replace( '$icon$', '<img src="'.$rsc_uri.'icons/feed-icon-16x16.gif" width="16" height="16" class="top" alt="" /> ', $this->disp_params['title']);
 		// fp> TODO: support for different icon sizes and backgrounds (at least black and white; mid grey would be cool also)
 
 		return $title;
@@ -195,6 +195,9 @@ class coll_xml_feeds_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.26  2011/09/17 02:31:59  fplanque
+ * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ *
  * Revision 1.25  2011/09/04 22:13:21  fplanque
  * copyright 2011
  *

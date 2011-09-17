@@ -128,7 +128,7 @@ elseif( $action == "reg_complete" )
 	$Form->info( T_('Email'), $email );
 	$Form->end_fieldset();
 
-	echo '<p class="center"><a href="'.$Blog->gen_baseurl().'">'.T_('Continue').' &raquo;</a> ';
+	echo '<p class="center"><a href="'.$Blog->gen_blogurl().'">'.T_('Continue').' &raquo;</a> ';
 	echo '</p>';
 
 	$Form->end_form();
@@ -141,7 +141,7 @@ elseif( $action == "reg_validation" )
 	echo '<p>'.sprintf( T_( 'If you have not received the email in the next few minutes, please check your spam folder. The email was sent from %s and has the title &laquo;%s&raquo;.' ), $notify_from,
 					'<b>'.sprintf( T_('Validate your email address for "%s"'), $login ).'</b>' ).'</p>';
 	echo '<p>'.T_( 'If you still can\'t find the email or if you would like to try with a different email address,' ).' '.
-					'<a href="'.$Blog->gen_baseurl().'">'.T_( 'click here to try again' ).'.</a></p>';
+					'<a href="'.$Blog->gen_blogurl().'">'.T_( 'click here to try again' ).'.</a></p>';
 
 	$Form->end_form();
 }
@@ -151,6 +151,9 @@ elseif( $action == "reg_validation" )
 
 /*
  * $Log$
+ * Revision 1.14  2011/09/17 02:31:58  fplanque
+ * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ *
  * Revision 1.13  2011/09/08 23:29:27  fplanque
  * More blockcache/widget fixes around login/register links.
  *

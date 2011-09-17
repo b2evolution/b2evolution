@@ -150,11 +150,12 @@ function get_login_url( $redirect_to = NULL )
 
 		if( ! empty($redirect) )
 		{
-			$redirect = '&redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $htsrv_url_sensitive ) );
+			$redirect = 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $Blog->get( 'loginurl' ) ) );
 		}
-		return $Blog->get( 'url' ).'?disp=login'.$redirect;
+		return url_add_param( $Blog->get( 'loginurl' ), $redirect );
 	}
 
+	// Normal login
 	if( ! empty($redirect) )
 	{
 		$redirect = '?redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $htsrv_url_sensitive ) );
@@ -1054,6 +1055,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.56  2011/09/17 02:31:59  fplanque
+ * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ *
  * Revision 1.55  2011/09/15 08:58:46  efy-asimo
  * Change user tabs display
  *

@@ -61,7 +61,7 @@ $ProfileForm->begin_fieldset( T_('Identity') );
 
 	if( ! empty( $User->gender ) )
 	{
-		$ProfileForm->info( T_( 'Gender' ), $User->get_gender() );
+		$ProfileForm->info( T_( 'I am' ), $User->get_gender() );
 	}
 
 	if( ! empty( $User->ctry_ID ) )
@@ -129,6 +129,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.24  2011/09/17 02:31:58  fplanque
+ * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ *
  * Revision 1.23  2011/09/15 22:19:10  fplanque
  * CSS cleanup
  *

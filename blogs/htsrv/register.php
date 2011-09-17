@@ -255,7 +255,7 @@ switch( $action )
 			$Skin = & $SkinCache->get_by_ID( $Blog->skin_ID );
 			$skin = $Skin->folder;
 			$disp = 'register';
-			$redirect_to = $Blog->gen_baseurl();
+			$redirect_to = $Blog->gen_blogurl();
 			$ads_current_skin_path = $skins_path.$skin.'/';
 			require $ads_current_skin_path.'index.main.php';
 		}
@@ -298,6 +298,9 @@ require $adminskins_path.'login/_reg_form.main.php';
 
 /*
  * $Log$
+ * Revision 1.115  2011/09/17 02:31:59  fplanque
+ * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ *
  * Revision 1.114  2011/09/14 05:22:28  efy-asimo
  * Set the proper locale for in-skin register
  *

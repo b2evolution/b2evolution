@@ -307,7 +307,7 @@ if( ! empty( $login_error ) )
 			$Skin = & $SkinCache->get_by_ID( $Blog->skin_ID );
 			$skin = $Skin->folder;
 			$disp = 'login';
-			$redirect_to = $Blog->gen_baseurl();
+			$redirect_to = $Blog->gen_blogurl();
 			$ads_current_skin_path = $skins_path.$skin.'/';
 			require $ads_current_skin_path.'index.main.php';
 			exit(0);
@@ -326,6 +326,9 @@ $Timer->pause( '_init_login' );
 
 /*
  * $Log$
+ * Revision 1.11  2011/09/17 02:31:59  fplanque
+ * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ *
  * Revision 1.10  2011/09/13 09:09:04  efy-asimo
  * Set the proper locale for in-skin login
  *

@@ -37,7 +37,7 @@ function stats_format_req_URI( $hit_blog_ID, $hit_uri, $max_len = 40 )
 	{
 		$BlogCache = & get_BlogCache();
 		$tmp_Blog = & $BlogCache->get_by_ID( $hit_blog_ID );
-		$full_url = $tmp_Blog->get('baseurlroot').$hit_uri;
+		$full_url = $tmp_Blog->get_baseurl_root().$hit_uri;
 	}
 	else
 	{
@@ -79,6 +79,9 @@ function stat_session_login( $login )
 
 /*
  * $Log$
+ * Revision 1.15  2011/09/17 02:31:59  fplanque
+ * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ *
  * Revision 1.14  2011/09/14 21:04:06  fplanque
  * cleanup
  *

@@ -596,9 +596,9 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
  *
  * @todo dh>merge with require_css()
  * @param string alias, url or filename (relative to rsc/js) for javascript file
- * @param boolean Is the file's path relative to the base path/url? -- Use false if file is in $rsc_url/js/
+ * @param boolean|string Is the file's path relative to the base path/url?
  */
-function require_js( $js_file, $relative_to_base = false )
+function require_js( $js_file, $relative_to = 'rsc_url' )
 {
 	global $rsc_url, $debug, $app_version;
 	static $required_js;
@@ -610,37 +610,52 @@ function require_js( $js_file, $relative_to_base = false )
 		'#jqueryUI_debug#' => 'jquery/jquery.ui.all.js',
 	);
 
-	// TODO: dh> I think dependencies should get handled where the files are included!
 	if( in_array( $js_file, array( '#jqueryUI#', '#jqueryUI_debug#' ) ) )
 	{	// Dependency : ensure jQuery is loaded
-		require_js( '#jquery#' );
+		require_js( '#jquery#', $relative_to );
 	}
 	elseif( $js_file == 'communication.js' )
 	{ // jQuery dependency
-		require_js( '#jquery#' );
+		require_js( '#jquery#', $relative_to );
 	}
 
-	// First get the real filename or url
-	$absolute = FALSE;
-	if( preg_match('~^https?://~', $js_file ) )
-	{ // It's an absolute url
-		$js_url = $js_file;
-		$absolute = TRUE;
-	}
-	elseif( !empty( $js_aliases[$js_file]) )
-	{ // It's an alias
-		if ( $js_file == '#jquery#' && $debug ) $js_file = '#jquery_debug#';
+	if( !empty( $js_aliases[$js_file]) )
+	{ // We are requsting an alias
+		if ( $js_file == '#jquery#' && $debug )
+		{
+			$js_file = '#jquery_debug#';
+		}
 		$js_file = $js_aliases[$js_file];
+
+		if( $relative_to === 'relative' || $relative_to === true )
+		{	// Aliases cannot be relative, make it relative to $rsc_url
+			$relative_to = 'rsc_url';
+		}
 	}
 
-	if( $relative_to_base || $absolute )
-	{
+
+	if( $relative_to === 'relative' || $relative_to === true )
+	{	// Make the file relative to current page <base>:
 		$js_url = $js_file;
+	}
+	elseif( preg_match('~^https?://~', $js_file ) )
+	{ // It's an absolute url, keep it as is:
+		$js_url = $js_file;
+	}
+	elseif( $relative_to === 'rsc_url' || $relative_to === false )
+	{	// Get the file from $rsc_url:
+		$js_url = $rsc_url.'js/'.$js_file;
+	}
+	elseif( $relative_to === 'blog' )
+	{	// Get the file from $rsc_url:
+		global $Blog;
+		$js_url = $Blog->get_local_rsc_url().'js/'.$js_file;
 	}
 	else
 	{
-		$js_url = $rsc_url.'js/'.$js_file;
+		debug_die('Unknown $relative to argument in require_css()');
 	}
+
 
 	// Be sure to get a fresh copy of this JS file after application upgrades:
 	$js_url = url_add_param( $js_url, 'v='.$app_version );
@@ -663,30 +678,36 @@ function require_js( $js_file, $relative_to_base = false )
  *
  * @todo dh>merge with require_js()
  * @param string alias, url or filename (relative to rsc/css) for CSS file
- * @param boolean|string Is the file's path relative to the base path/url? -- Use true to not add any prefix ("$rsc_url/css/").
+ * @param boolean|string Is the file's path relative to the base path/url?
  * @param string title.  The title for the link tag
  * @param string media.  ie, 'print'
+ * @param string version number to append at the end of requested url to avoid getting an old version from the cache
  */
-function require_css( $css_file, $relative_to_base = false, $title = NULL, $media = NULL, $version = '#' )
+function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media = NULL, $version = '#' )
 {
 	global $rsc_url, $debug, $app_version;
 	static $required_css;
 
-	// First get the real filename or url
-	$absolute = FALSE;
-	if( preg_match('~^https?://~', $css_file ) )
-	{ // It's an absolute url
+	if( $relative_to === 'relative' || $relative_to === true )
+	{	// Make the file relative to current page <base>:
 		$css_url = $css_file;
-		$absolute = TRUE;
 	}
-
-	if( $relative_to_base || $absolute )
-	{
+	elseif( preg_match('~^https?://~', $css_file ) )
+	{ // It's an absolute url, keep it as is:
 		$css_url = $css_file;
+	}
+	elseif( $relative_to === 'rsc_url' || $relative_to === false )
+	{	// Get the file from $rsc_url:
+		$css_url = $rsc_url.'css/'.$css_file;
+	}
+	elseif( $relative_to === 'blog' )
+	{	// Get the file from $rsc_url:
+		global $Blog;
+		$css_url = $Blog->get_local_rsc_url().'css/'.$css_file;
 	}
 	else
 	{
-		$css_url = $rsc_url . 'css/' . $css_file;
+		debug_die('Unknown $relative to argument in require_css()');
 	}
 
 	if( !empty($version) )
@@ -724,7 +745,7 @@ function require_css( $css_file, $relative_to_base = false, $title = NULL, $medi
  *
  * @param string helper, name of the required helper
  */
-function require_js_helper( $helper = '' )
+function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 {
 	static $helpers;
 
@@ -736,8 +757,8 @@ function require_js_helper( $helper = '' )
 			case 'helper' :
 				// main helper object required
 				global $debug;
-				require_js( '#jquery#' ); // dependency
-				require_js( 'helper.js' );
+				require_js( '#jquery#', $relative_to ); // dependency
+				require_js( 'helper.js', $relative_to );
 				add_js_headline('jQuery(document).ready(function()
 				{
 					b2evoHelper.Init({
@@ -748,10 +769,10 @@ function require_js_helper( $helper = '' )
 
 			case 'communications' :
 				// communications object required
-				require_js_helper('helper'); // dependency
+				require_js_helper('helper', $relative_to ); // dependency
 
 				global $dispatcher;
-				require_js( 'communication.js' );
+				require_js( 'communication.js', $relative_to );
 				add_js_headline('jQuery(document).ready(function()
 				{
 					b2evoCommunications.Init({
@@ -768,9 +789,9 @@ function require_js_helper( $helper = '' )
 			case 'colorbox':
 				// Colorbox: a lightweight Lightbox alternative -- allows zooming on images and slideshows in groups of images
 				// Added by fplanque - (MIT License) - http://colorpowered.com/colorbox/
-				require_js( '#jqueryUI#' );
-				require_js( 'colorbox/jquery.colorbox-min.js' );
-				require_css( 'colorbox/colorbox.css' );
+				require_js( '#jqueryUI#', $relative_to );
+				require_js( 'colorbox/jquery.colorbox-min.js', $relative_to );
+				require_css( 'colorbox/colorbox.css', $relative_to );
 				add_js_headline('jQuery(document).ready(function()
 						{
 							$("a[rel^=\'lightbox\']").colorbox({maxWidth:"95%", maxHeight:"90%", slideshow:true, slideshowAuto:false });
@@ -1116,7 +1137,7 @@ function powered_by( $params = array() )
 	 */
 	global $global_Cache;
 
-	global $rsc_url;
+	global $rsc_uri;
 
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
@@ -1129,7 +1150,7 @@ function powered_by( $params = array() )
 
 	echo $params['block_start'];
 
-	$img_url = str_replace( '$rsc$', $rsc_url, $params['img_url'] );
+	$img_url = str_replace( '$rsc$', $rsc_uri, $params['img_url'] );
 
 	$evo_links = $global_Cache->get( 'evo_links' );
 	if( empty( $evo_links ) )
@@ -1205,16 +1226,13 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
  */
 function display_ajax_form( $params )
 {
-	global $rsc_url, $htsrv_url;
+	global $rsc_uri, $Blog;
 
 	echo '<div class="section_requires_javascript">';
 
 	// Needs json_encode function to create json type params
 	$json_params = json_encode( $params );
 	$ajax_loader = "<p class='ajax-loader'><img src='".$rsc_url."img/ajax-loader2.gif' /><br />".T_( 'Form is loading...' )."</p>";
-	
-	// sam2kb>fp Cross-domain AJAX calls fail, the forms are not loaded. We have to use jsonp GET calls instead
-	// more info: http://devlog.info/2010/03/10/cross-domain-ajax/
 	?>
 	<script type="text/javascript">
 		// display loader gif until the ajax call returns
@@ -1223,7 +1241,7 @@ function display_ajax_form( $params )
 		function get_form()
 		{
 			$.ajax({
-				url: '<?php echo $htsrv_url; ?>anon_async.php',
+				url: '<?php echo $Blog->get_local_htsrv_url(); ?>anon_async.php',
 				type: 'POST',
 				data: <?php echo $json_params; ?>,
 				success: function(result)
@@ -1246,6 +1264,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.93  2011/09/17 02:31:59  fplanque
+ * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ *
  * Revision 1.92  2011/09/16 06:07:30  sam2kb
  * doc
  *
