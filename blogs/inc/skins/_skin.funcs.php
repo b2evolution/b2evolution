@@ -112,6 +112,7 @@ function skin_init( $disp )
 		case 'page':
 // fp>asimo fp>sam2kb : is this for javascript forms?
 // If so, can we make sure we only add it if javascript forms are turned on?
+// sam2kb>fp We may convert it into a function like require_ajax_js() and then check if AJAX forms option is enabled
 			require_js( 'communication.js', 'blog' ); // auto requires jQuery
 
 			if( $disp == 'single' )
@@ -921,6 +922,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.101  2011/09/17 22:39:46  sam2kb
+ * doc
+ *
  * Revision 1.100  2011/09/17 21:14:47  fplanque
  * doc
  *
