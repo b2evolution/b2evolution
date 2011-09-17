@@ -143,14 +143,17 @@ $schema_queries['T_logs__internal_searches'] = array(
 		'Creating internal searches table',
 		"CREATE TABLE T_logs__internal_searches (
 		  isrch_ID bigint(20) NOT NULL auto_increment,
-		  isrch_coll_ID bigint(20) NOT NULL default '0',
-		  isrch_hit_ID bigint(20) NOT NULL default '0',
-		  isrch_keywords varchar(255) NOT NULL default '',
-		  PRIMARY KEY  (`isrch_ID`)
+		  isrch_coll_ID bigint(20) NOT NULL,
+		  isrch_hit_ID bigint(20) NOT NULL,
+		  isrch_keywords varchar(255) NOT NULL,
+		  PRIMARY KEY (isrch_ID)
 		) ENGINE=MyISAM DEFAULT CHARSET = $db_storage_charset");
-		
+
 /*
  * $Log$
+ * Revision 1.24  2011/09/17 22:16:05  fplanque
+ * cleanup
+ *
  * Revision 1.23  2011/09/13 09:15:53  fplanque
  * FIX!! :(((
  *

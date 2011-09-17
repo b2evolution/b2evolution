@@ -2985,19 +2985,19 @@ function upgrade_b2evo_tables()
 		$DB->query( 'INSERT INTO T_users__fields( uf_user_ID, uf_ufdf_ID, uf_varchar )
 								 SELECT user_ID, 10300, user_icq
 									 FROM T_users
-								  WHERE user_icq IS NOT NULL' );
+								  WHERE user_icq IS NOT NULL AND TRIM(user_icq) <> ""' );
 		$DB->query( 'INSERT INTO T_users__fields( uf_user_ID, uf_ufdf_ID, uf_varchar )
 								 SELECT user_ID, 10200, user_aim
 									 FROM T_users
-								  WHERE user_aim IS NOT NULL' );
+								  WHERE user_aim IS NOT NULL AND TRIM(user_aim) <> ""' );
 		$DB->query( 'INSERT INTO T_users__fields( uf_user_ID, uf_ufdf_ID, uf_varchar )
 								 SELECT user_ID, 10000, user_msn
 									 FROM T_users
-								  WHERE user_msn IS NOT NULL' );
+								  WHERE user_msn IS NOT NULL AND TRIM(user_msn) <> ""' );
 		$DB->query( 'INSERT INTO T_users__fields( uf_user_ID, uf_ufdf_ID, uf_varchar )
 								 SELECT user_ID, 10100, user_yim
 									 FROM T_users
-								  WHERE user_yim IS NOT NULL' );
+								  WHERE user_yim IS NOT NULL AND TRIM(user_yim) <> ""' );
 		task_end();
 
 		task_begin( 'Dropping obsolete user columns...' );
@@ -3009,6 +3009,13 @@ function upgrade_b2evo_tables()
 		task_end();
 
 		// ---
+
+		task_begin( 'Adding new user columns...' );
+		$DB->query( 'ALTER TABLE T_users
+									ADD COLUMN user_postcode varchar(12) NULL AFTER user_ID,
+									ADD COLUMN user_age_min int unsigned NULL AFTER user_postcode,
+									ADD COLUMN user_age_max int unsigned NULL AFTER user_age_min' );
+		task_end();
 
 		task_begin( 'Upgrading item table for hide teaser...' );
 		$DB->query( 'ALTER TABLE T_items__item
@@ -3027,6 +3034,21 @@ function upgrade_b2evo_tables()
 					) ENGINE = innodb" );
 		task_end();
 
+		task_begin( 'Adding new column to comments...' );
+		$DB->query( 'ALTER TABLE T_comments
+									ADD COLUMN comment_in_reply_to_cmt_ID INT(10) unsigned NULL AFTER comment_status' );
+		task_end();
+
+		task_begin( 'Create table for internal searches...' );
+    $DB->query( 'CREATE TABLE T_logs__internal_searches (
+	          isrch_ID bigint(20) NOT NULL auto_increment,
+	          isrch_coll_ID bigint(20) NOT NULL,
+	          isrch_hit_ID bigint(20) NOT NULL,
+	          isrch_keywords varchar(255) NOT NULL,
+	          PRIMARY KEY (isrch_ID)
+	        ) ENGINE=MyISAM DEFAULT CHARSET = '.$db_storage_charset );
+		task_end();
+
 		set_upgrade_checkpoint( '10300' );
 	}
 
@@ -3039,38 +3061,6 @@ function upgrade_b2evo_tables()
 	 *
 	 * NOTE: every change that gets done here, should bump {@link $new_db_version} (by 100).
 	 */
-
-
-
-	/* Wait until we're sure and no longer experimental for that one...
-	task_begin( 'Moving user data to fields' );
-	// ICQ
-	$DB->query( "INSERT INTO T_users__fields( uf_user_ID, uf_ufdf_ID, uf_varchar )
-							 SELECT user_ID, 10300, user_icq
-								 FROM T_users
-								WHERE user_msn IS NOT NULL AND TRIM(user_icq) <> ''" );
-	// URL
-	$DB->query( "INSERT INTO T_users__fields( uf_user_ID, uf_ufdf_ID, uf_varchar )
-							 SELECT user_ID, 100000, user_url
-								 FROM T_users
-								WHERE user_msn IS NOT NULL AND TRIM(user_url) <> ''" );
-	// AIM
-	$DB->query( "INSERT INTO T_users__fields( uf_user_ID, uf_ufdf_ID, uf_varchar )
-							 SELECT user_ID, 10200, user_aim
-								 FROM T_users
-								WHERE user_msn IS NOT NULL AND TRIM(user_aim) <> ''" );
-	// MSN/live IM
-	$DB->query( "INSERT INTO T_users__fields( uf_user_ID, uf_ufdf_ID, uf_varchar )
-							 SELECT user_ID, 10000, user_msn
-								 FROM T_users
-								WHERE user_msn IS NOT NULL AND TRIM(user_msn) <> ''" );
-	// Yahoo IM
-	$DB->query( "INSERT INTO T_users__fields( uf_user_ID, uf_ufdf_ID, uf_varchar )
-							 SELECT user_ID, 10100, user_yim
-								 FROM T_users
-								WHERE user_msn IS NOT NULL AND TRIM(user_yim) <> ''" );
-	task_end();
-	*/
 
 
 
@@ -3228,6 +3218,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.413  2011/09/17 22:16:05  fplanque
+ * cleanup
+ *
  * Revision 1.412  2011/09/15 22:34:09  fplanque
  * cleanup
  *

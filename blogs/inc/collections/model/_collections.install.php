@@ -195,6 +195,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			comment_post_ID       int(11) unsigned NOT NULL default '0',
 			comment_type          enum('comment','linkback','trackback','pingback') NOT NULL default 'comment',
 			comment_status        ENUM('published','deprecated','draft','trash') DEFAULT 'published' NOT NULL,
+			comment_in_reply_to_cmt_ID INT(10) unsigned NULL,
 			comment_author_ID     int unsigned NULL default NULL,
 			comment_author        varchar(100) NULL,
 			comment_author_email  varchar(255) NULL,
@@ -211,7 +212,6 @@ $schema_queries = array_merge( $schema_queries, array(
 			comment_secret        varchar(32) NULL default NULL,
 			comment_notif_status  ENUM('noreq','todo','started','finished') NOT NULL DEFAULT 'noreq' COMMENT 'Have notifications been sent for this comment? How far are we in the process?',
 			comment_notif_ctsk_ID INT(10) unsigned NULL DEFAULT NULL COMMENT 'When notifications for this comment are sent through a schedule job, what is the job ID?',
-			comment_in_reply_to_cmt_ID INT(10) unsigned NOT NULL default '0',
 			PRIMARY KEY comment_ID (comment_ID),
 			KEY comment_post_ID (comment_post_ID),
 			KEY comment_date (comment_date),
@@ -383,6 +383,9 @@ $schema_queries = array_merge( $schema_queries, array(
 
 /*
  * $Log$
+ * Revision 1.38  2011/09/17 22:16:05  fplanque
+ * cleanup
+ *
  * Revision 1.37  2011/09/10 00:57:23  fplanque
  * doc
  *
