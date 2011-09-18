@@ -110,10 +110,7 @@ function skin_init( $disp )
 		// CONTENT PAGES:
 		case 'single':
 		case 'page':
-// fp>asimo fp>sam2kb : is this for javascript forms?
-// If so, can we make sure we only add it if javascript forms are turned on?
-// sam2kb>fp We may convert it into a function like require_ajax_js() and then check if AJAX forms option is enabled
-			require_js( 'communication.js', 'blog' ); // auto requires jQuery
+			init_ajax_forms(); // auto requires jQuery
 
 			if( $disp == 'single' )
 			{
@@ -167,8 +164,7 @@ function skin_init( $disp )
 			break;
 
 		case 'posts':
-// fp>sam2kb: why do we need this here?  for javascript forms?
-			require_js( 'communication.js', 'blog' ); // auto requires jQuery
+			init_ajax_forms(); // auto requires jQuery
 
 			// Get list of active filters:
 			$active_filters = $MainList->get_active_filters();
@@ -359,8 +355,7 @@ function skin_init( $disp )
 			break;
 
 		case 'msgform':
-// why do we need this here?
-			require_js( 'communication.js', 'blog' ); // auto requires jQuery
+			init_ajax_forms(); // auto requires jQuery
 		case 'messages':
 		case 'contacts':
 			$seo_page_type = 'Contact form';
@@ -922,6 +917,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.102  2011/09/18 00:56:34  sam2kb
+ * init_ajax_forms() registers headlines required by AJAX forms
+ *
  * Revision 1.101  2011/09/17 22:39:46  sam2kb
  * doc
  *

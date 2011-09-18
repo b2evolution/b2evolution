@@ -896,6 +896,20 @@ function add_js_for_toolbar()
 
 
 /**
+ * Registers headlines required by AJAX forms, only if javascript forms are enabled in blog settings
+ */
+function init_ajax_forms( $relative_to = 'blog' )
+{
+	global $Blog;
+
+	if( !empty($Blog) && $Blog->get_setting('ajax_form_enabled') )
+	{
+		require_js( 'communication.js', $relative_to );
+	}
+}
+
+
+/**
  * Outputs the collected HTML HEAD lines.
  * @see add_headline()
  * @return string
@@ -1264,6 +1278,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.95  2011/09/18 00:56:33  sam2kb
+ * init_ajax_forms() registers headlines required by AJAX forms
+ *
  * Revision 1.94  2011/09/17 17:39:43  sam2kb
  * req_url > req_uri
  *
