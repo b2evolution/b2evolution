@@ -45,14 +45,15 @@ $Form = new Form( $submit_url );
 
 	<?php
 	// Note: we use funky field names in order to defeat the most basic guestbook spam bots:
-	$Form->text( 'd', $email_author, 40, T_('From'),  T_('Your name.'), 50, 'wide_input' );
+	$Form->text_input( 'd', $email_author, 40, T_('From'), T_('Your name.'), array( 'maxlength'=>50, 'class'=>'wide_input', 'required'=>true ) );
 
 	if( $allow_msgform == 'email' )
 	{
-		$Form->text( 'f', $email_author_address, 40, T_('Email'), T_('Your email address. (Will <strong>not</strong> be displayed on this site.)'), 100, 'wide_input' );
+		$Form->text_input( 'f', $email_author_address, 40, T_('Email'), T_('Your email address. (Will <strong>not</strong> be displayed on this site.)'),
+			 array( 'maxlength'=>150, 'class'=>'wide_input', 'required'=>true ) );
 	}
 
-	$Form->text( 'g', $subject, 40, T_('Subject'), T_('Subject of your message.'), 255, 'wide_input' );
+	$Form->text_input( 'g', $subject, 40, T_('Subject'), T_('Subject of your message.'), array( 'maxlength'=>255, 'class'=>'wide_input', 'required'=>true ) );
 
 	$Form->textarea( 'h', '', 15, T_('Message'), T_('Plain text only.'), 35, 'wide_textarea' );
 
@@ -80,6 +81,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.5  2011/09/18 01:07:20  fplanque
+ * forms cleanup
+ *
  * Revision 1.4  2011/09/18 00:58:44  fplanque
  * forms cleanup
  *
