@@ -72,11 +72,12 @@ $recent_recipients = $DB->get_var('SELECT GROUP_CONCAT(DISTINCT user_login SEPAR
 
 $user_login = param( 'user_login', 'string', '');
 
-$Form->text_input( 'thrd_recipients', empty( $user_login ) ? $edited_Thread->recipients : $user_login, $params['cols'], T_('Recipients'), T_('Enter comma or space separated logins').'<br />'.get_avatar_imgtags( $recent_recipients ), array( 'maxlength'=> 255, 'required'=>true ) );
+$Form->text_input( 'thrd_recipients', empty( $user_login ) ? $edited_Thread->recipients : $user_login, $params['cols'], T_('Recipients'),
+	T_('Enter usernames. Separate with comma (,)').'<br />'.T_('Recent contacts').': '.get_avatar_imgtags( $recent_recipients ), array( 'maxlength'=> 255, 'required'=>true, 'class'=>'wide_input' ) );
 
-$Form->text_input( 'thrd_title', $edited_Thread->title, $params['cols'], T_('Subject'), '', array( 'maxlength'=> 255, 'required'=>true ) );
+$Form->text_input( 'thrd_title', $edited_Thread->title, $params['cols'], T_('Subject'), '', array( 'maxlength'=> 255, 'required'=>true, 'class'=>'wide_input' ) );
 
-$Form->textarea_input( 'msg_text', $edited_Message->text, 10, T_('Message'), array( 'cols'=>$params['cols'] ) );
+$Form->textarea_input( 'msg_text', $edited_Message->text, 10, T_('Message'), array( 'cols'=>$params['cols'], 'class'=>'wide_textarea' ) );
 
 $Form->radio( 'thrdtype', param( 'thrdtype', 'string', 'discussion' ), array(
 								array( 'discussion', T_( 'Group discussion' ) ),
@@ -88,6 +89,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 
 /*
  * $Log$
+ * Revision 1.16  2011/09/18 00:58:44  fplanque
+ * forms cleanup
+ *
  * Revision 1.15  2011/08/11 09:05:09  efy-asimo
  * Messaging in front office
  *

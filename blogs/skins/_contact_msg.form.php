@@ -23,6 +23,7 @@ else
 
 
 $Form = new Form( $submit_url );
+
 	$Form->begin_form( 'bComment' );
 
 	$Form->add_crumb( 'newmessage' );
@@ -43,19 +44,17 @@ $Form = new Form( $submit_url );
 	</fieldset>
 
 	<?php
-	// Note: we use funky field name in order to defeat the most basic guestbook spam bots:
-	$Form->text( 'd', $email_author, 40, T_('From'),  T_('Your name.'), 50, 'bComment' );
+	// Note: we use funky field names in order to defeat the most basic guestbook spam bots:
+	$Form->text( 'd', $email_author, 40, T_('From'),  T_('Your name.'), 50, 'wide_input' );
+
 	if( $allow_msgform == 'email' )
 	{
-		$Form->text( 'f', $email_author_address, 40, T_('Email'), T_('Your email address. (Will <strong>not</strong> be displayed on this site.)'), 100, 'bComment' );
-		$subject_note = T_('Subject of email message.');
+		$Form->text( 'f', $email_author_address, 40, T_('Email'), T_('Your email address. (Will <strong>not</strong> be displayed on this site.)'), 100, 'wide_input' );
 	}
-	else
-	{
-		$subject_note = T_('Subject of private message.');
-	}
-	$Form->text( 'g', $subject, 40, T_('Subject'), $subject_note, 255, 'bComment' );
-	$Form->textarea( 'h', '', 15, T_('Message'), T_('Plain text only.'), 40, 'bComment' );
+
+	$Form->text( 'g', $subject, 40, T_('Subject'), T_('Subject of your message.'), 255, 'wide_input' );
+
+	$Form->textarea( 'h', '', 15, T_('Message'), T_('Plain text only.'), 35, 'wide_textarea' );
 
 	$Plugins->trigger_event( 'DisplayMessageFormFieldset', array( 'Form' => & $Form,
 		'recipient_ID' => & $recipient_id, 'item_ID' => $post_id, 'comment_ID' => $comment_id ) );
@@ -81,6 +80,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.4  2011/09/18 00:58:44  fplanque
+ * forms cleanup
+ *
  * Revision 1.3  2011/09/17 02:31:58  fplanque
  * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
  *

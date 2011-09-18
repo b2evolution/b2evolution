@@ -135,7 +135,8 @@ $Form->begin_form( 'fform' );
 
 	$Form->begin_fieldset();
 
-	$Form->text_input( 'login', $login, 16, T_('Login'), T_('Type your username, <b>not</b> your email address.'), array( 'maxlength' => 20, 'class' => 'input_text' ) );
+	$Form->text_input( 'login', $login, 16, T_('Login'), T_('Type your username, <b>not</b> your email address.'),
+			array( 'maxlength' => 20, 'class' => 'input_text', 'required'=>true ) );
 
 	$pwd_note = '<a href="'.$htsrv_url_sensitive.'login.php?action=lostpassword&amp;redirect_to='
 		.rawurlencode( url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
@@ -145,7 +146,7 @@ $Form->begin_form( 'fform' );
 	}
 	$pwd_note .= '">'.T_('Lost password ?').'</a>';
 
-	$Form->password_input( 'pwd', '', 16, T_('Password'), array( 'note'=>$pwd_note, 'maxlength' => 70, 'class' => 'input_text' ) );
+	$Form->password_input( 'pwd', '', 16, T_('Password'), array( 'note'=>$pwd_note, 'maxlength' => 70, 'class' => 'input_text', 'required'=>true ) );
 
 
 
@@ -231,6 +232,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.29  2011/09/18 00:58:44  fplanque
+ * forms cleanup
+ *
  * Revision 1.28  2011/09/08 23:29:27  fplanque
  * More blockcache/widget fixes around login/register links.
  *

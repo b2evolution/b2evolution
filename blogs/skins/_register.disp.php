@@ -10,7 +10,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author asimo: Evo Factory / Attila Simo
- * 
+ *
  * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -74,7 +74,8 @@ if( $action == 'register' )
 	$Form->end_field();
 
 	$Form->begin_field();
-	$Form->text_input( 'email', $email, 50, T_('Email'), T_('We respect your privacy. Your email will remain strictly confidential.'), array( 'maxlength'=>255, 'class'=>'input_text', 'required'=>true ) );
+	$Form->text_input( 'email', $email, 50, T_('Email'), '<br />'.T_('We respect your privacy. Your email will remain strictly confidential.'),
+					array( 'maxlength'=>255, 'class'=>'input_text wide_input', 'required'=>true ) );
 
 	$registration_require_country = (bool)$Settings->get('registration_require_country');
 
@@ -151,6 +152,9 @@ elseif( $action == "reg_validation" )
 
 /*
  * $Log$
+ * Revision 1.15  2011/09/18 00:58:44  fplanque
+ * forms cleanup
+ *
  * Revision 1.14  2011/09/17 02:31:58  fplanque
  * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
  *

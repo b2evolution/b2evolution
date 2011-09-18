@@ -386,8 +386,14 @@ span.fieldset_icons {
 	float:right;
 }
 
+span.label_field_required {
+	color: #f00;
+	font-weight: bold;
+	margin-right: 4px;
+}
 
 span.field_error {
+	display: block;
 	color: #f00;
 }
 
@@ -416,29 +422,6 @@ span.checkbox_surround_init {
 	padding : 1px;
 }
 
-/* fp> The following breaks the login screen and probably a lot more space constrained forms.
-.label{
-padding-right:3ex;
-}
-*/
-
-/* The following is a dirty fix. */
-.field_required .label{
-	background-image:  url("../icons/mandatory_star_small.gif");
-	background-position: right top;
-	background-repeat: no-repeat;
-}
-
-input.field_required,
-/* select.field_required, // TODO: dh: does not seem to work, at least in FF 1.5 (background image) and even looks ugly in IE; would need another way to mark it. */
-textarea.field_required {
-	background-image:  url("../icons/mandatory_star_small.gif");
-	background-position: right center;
-	background-repeat: no-repeat;
-}
-span.checkbox_required {
-	border: 1px solid #d99;
-}
 
 input.large,
 textarea.large {

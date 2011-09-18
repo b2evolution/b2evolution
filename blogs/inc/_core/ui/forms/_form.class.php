@@ -2864,6 +2864,12 @@ class Form extends Widget
 
 			if( isset( $this->_common_params['clickable_label'] ) && ! $this->_common_params['clickable_label'] )
 			{	// Not set if this method is invoked by ::begin_field()
+
+				if( isset($this->_common_params['required']) )
+				{
+					$r .= '<span class="label_field_required">*</span>';
+				}
+
 				$r .= format_to_output($label, 'htmlbody').$this->label_suffix;
 			}
 			else
@@ -2872,8 +2878,14 @@ class Form extends Widget
 					.( !empty($this->_common_params['id'])
 						? ' for="'.format_to_output( $this->_common_params['id'], 'htmlattr' ).'"'
 						: '' )
-					.'>'
-					.format_to_output($label, 'htmlbody');
+					.'>';
+
+					if( isset($this->_common_params['required']) )
+					{
+						$r .= '<span class="label_field_required">*</span>';
+					}
+
+					$r .= format_to_output($label, 'htmlbody');
 
 				$r .= $this->label_suffix;
 
@@ -3061,6 +3073,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.92  2011/09/18 00:58:44  fplanque
+ * forms cleanup
+ *
  * Revision 1.91  2011/09/10 19:41:53  fplanque
  * fixing http://forums.b2evolution.net/viewtopic.php?t=22443
  *

@@ -166,7 +166,9 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 	{ // User is not logged in:
 		// Note: we use funky field names to defeat the most basic guestbook spam bots
 		$Form->text( 'u', $comment_author, 40, T_('Name'), '', 100, 'bComment' );
+
 		$Form->text( 'i', $comment_author_email, 40, T_('Email'), '<br />'.T_('Your email address will <strong>not</strong> be revealed on this site.'), 100, 'bComment' );
+
 		$Item->load_Blog();
 		if( $Item->Blog->get_setting( 'allow_anon_url' ) )
 		{
@@ -194,7 +196,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 	// Message field:
 	$note = '';
 	// $note = T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags));
-	$Form->textarea( 'p', $comment_content, $params['textarea_lines'], T_('Comment text'), $note, 40, 'bComment' );
+	$Form->textarea( 'p', $comment_content, $params['textarea_lines'], T_('Comment text'), $note, 38, 'bComment' );
 
 	// set b2evoCanvas for plugins
 	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "p" );</script>';
@@ -265,6 +267,9 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 
 /*
  * $Log$
+ * Revision 1.27  2011/09/18 00:58:44  fplanque
+ * forms cleanup
+ *
  * Revision 1.26  2011/09/17 02:31:58  fplanque
  * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
  *

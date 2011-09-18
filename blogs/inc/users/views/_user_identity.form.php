@@ -103,7 +103,8 @@ global $form_action;
 	function add_more_fields()
 	{
 		var j = jQuery("#add_more_fields").parent().parent().siblings("fieldset[id^=ffield_new_uf_val]").length;
-		for( i = j + 1; i < j + 4; i++ ){
+		for( i = j + 1; i < j + 4; i++ )
+		{
 			var strHtml = jQuery("#add_more_fields").parent().parent().prev().html();
 			strHtml = strHtml.replace(/new_uf_type_\d+/, "new_uf_type_" + i).replace(/new_uf_val_\d+/g, "new_uf_val_" + i)
 				.replace(/selected=\"selected\"/, "");
@@ -131,7 +132,7 @@ global $form_action;
 	function area2input(el)
 	{
 		if (el) {
-			strHtml = '<input type="text" class="form_text_input" size="30" maxlength="255" name="'
+			strHtml = '<input type="text" class="form_text_input" size="40" maxlength="255" name="'
 				+ el.attr("name") + '" id="' + el.attr("id") + '" value="' + el.val().replace(/\n/g, "|") + '"></textarea>';
 			el.replaceWith(strHtml);
 		}
@@ -319,8 +320,11 @@ if( $action != 'view' )
 	}
 
 	$CountryCache = & get_CountryCache();
+
 	$Form->select_input_object( 'edited_user_ctry_ID', $edited_User->ctry_ID, $CountryCache, T_('Country'), array( 'required' => !$has_full_access, 'allow_none' => $has_full_access ) );
-	$Form->text_input( 'edited_user_postcode', $edited_User->postcode, 12, T_('My ZIP/Postcode'), '', array( 'maxlength' => 12 ) );
+
+	$Form->text_input( 'edited_user_postcode', $edited_User->postcode, 12, T_('ZIP/Postcode'), '', array( 'maxlength' => 12 ) );
+
 	$Form->text_input( 'edited_user_age_min', $edited_User->age_min, 3, T_('My age group'), '', array( 'number' => true ) );
 	$Form->text_input( 'edited_user_age_max', $edited_User->age_max, 3, T_('to'), '', array( 'number' => true ) );
 
@@ -406,7 +410,7 @@ if( $action != 'view' )
 	{
 		$Form->text_input( 'edited_user_source', $edited_User->source, 30, T_('Source'), '', array( 'maxlength' => 30 ) );
 	}
-	$Form->text_input( 'edited_user_url', $edited_User->url, 30, T_('URL'), $url_fieldnote, array( 'maxlength' => 100 ) );
+	$Form->text_input( 'edited_user_url', $edited_User->url, 40, T_('URL'), $url_fieldnote, array( 'maxlength' => 100 ) );
 }
 else
 { // display only
@@ -475,11 +479,11 @@ foreach( $userfields as $userfield )
 	// Display existing field:
 	if( $userfield->ufdf_type == 'text' )
 	{
-		$Form->textarea( 'uf_'.$userfield->uf_ID, $uf_val, 8, $userfield->ufdf_name, $field_note, 40 );
+		$Form->textarea( 'uf_'.$userfield->uf_ID, $uf_val, 8, $userfield->ufdf_name, $field_note, 38 );
 	}
 	else
 	{
-		$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, 50, $userfield->ufdf_name, $field_note, array( 'maxlength' => 255 ) );
+		$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, 40, $userfield->ufdf_name, $field_note, array( 'maxlength' => 255 ) );
 	}
 }
 
@@ -535,11 +539,11 @@ foreach( $userfields as $userfield )
 	// Display existing field:
 	if( $userfield->ufdf_type == 'text' )
 	{
-		$Form->textarea( 'uf_rec_'.$i, $uf_val, 8, $userfield->ufdf_name, $field_note, 40 );
+		$Form->textarea( 'uf_rec_'.$i, $uf_val, 8, $userfield->ufdf_name, $field_note, 38 );
 	}
 	else
 	{
-		$Form->text_input( 'uf_rec_'.$i, $uf_val, 50, $userfield->ufdf_name, $field_note, array( 'maxlength' => 255 ) );
+		$Form->text_input( 'uf_rec_'.$i, $uf_val, 40, $userfield->ufdf_name, $field_note, array( 'maxlength' => 255, 'class'=>'user_info_field' ) );
 	}
 }
 
@@ -583,8 +587,8 @@ for( $i=1; $i<=3; $i++ )
 		$label .= '>'.$fielddef->ufdf_name.'</option>';
 	}
 	$label .= '</optgroup></select>';
-
-	$Form->text_input( 'new_uf_val_'.$i, param( 'new_uf_val_'.$i, 'string', '' ), 30, $label, ' ', array('maxlength' => 255, 'clickable_label'=>false) );
+	$Form->text_input( 'new_uf_val_'.$i, param( 'new_uf_val_'.$i, 'string', '' ), 40, $label, '',
+				array('maxlength' => 255, 'clickable_label'=>false, 'class'=>'user_info_new_field' ) );
 }
 
 $Form->info( '', '<a id="add_more_fields" href="javascript:add_more_fields()">+ add more fields</a>' );
@@ -634,6 +638,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.45  2011/09/18 00:58:44  fplanque
+ * forms cleanup
+ *
  * Revision 1.44  2011/09/15 22:34:09  fplanque
  * cleanup
  *

@@ -10,7 +10,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author asimo: Evo Factory / Attila Simo
- * 
+ *
  * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -74,7 +74,8 @@ if( $action != 'req_validatemail' )
 	$Form->add_crumb( 'loginform' );
 
 	$Form->begin_field();
-	$Form->text_input( 'login', $login, 18, T_('Login'), T_('Type your username, <b>not</b> your email address.'), array( 'maxlength' => 20, 'class' => 'input_text' ) );
+	$Form->text_input( 'login', $login, 18, T_('Login'), '<br />'.T_('Type your username, <b>not</b> your email address.'),
+					array( 'maxlength' => 20, 'class' => 'input_text', 'required'=>true ) );
 	$Form->end_field();
 
 	$pwd_note = '<a href="'.$Blog->get_local_htsrv_url().'login.php?action=lostpassword&amp;redirect_to='
@@ -86,7 +87,7 @@ if( $action != 'req_validatemail' )
 	$pwd_note .= '">'.T_('Lost password ?').'</a>';
 
 	$Form->begin_field();
-	$Form->password_input( 'pwd', '', 18, T_('Password'), array( 'note'=>$pwd_note, 'maxlength' => 70, 'class' => 'input_text' ) );
+	$Form->password_input( 'pwd', '', 18, T_('Password'), array( 'note'=>$pwd_note, 'maxlength' => 70, 'class' => 'input_text', 'required'=>true ) );
 	$Form->end_field();
 
 	// Allow a plugin to add fields/payload
@@ -147,6 +148,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.17  2011/09/18 00:58:44  fplanque
+ * forms cleanup
+ *
  * Revision 1.16  2011/09/17 02:31:58  fplanque
  * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
  *
