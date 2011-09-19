@@ -1,4 +1,4 @@
-<?php //Hamesh
+<?php
 /**
  * This file implements the Auto P plugin for b2evolution
  *
@@ -633,8 +633,8 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
- * Revision 1.46  2011/09/19 06:31:10  efy-hamesh
- * test commit
+ * Revision 1.47  2011/09/19 17:47:18  fplanque
+ * doc
  *
  * Revision 1.45  2010/05/13 02:45:16  blueyed
  * Fix Auto-P plugin for block tags containing a slash, e.g. with SCRIPT@type

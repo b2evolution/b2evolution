@@ -1524,7 +1524,7 @@ class Item extends ItemLight
 				'after'       => '</p>',
 				'link_text'   => '#',		// text to display as the more link
 				'anchor_text' => '#',		// text to display as the more anchor (once the more link has been clicked, # defaults to "Follow up:")
-// fp>sam2kb: why do we need this?
+// fp>sam2kb: please make 2 options 'single' and 'single#anchor'
 				'link_to'     => 'single',	// target URL for more link
 				'disppage'    => '#',		// page number to display specific page, # for url parameter
 				'format'      => 'htmlbody',
@@ -4760,6 +4760,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.245  2011/09/19 17:47:18  fplanque
+ * doc
+ *
  * Revision 1.244  2011/09/17 21:14:47  fplanque
  * doc
  *

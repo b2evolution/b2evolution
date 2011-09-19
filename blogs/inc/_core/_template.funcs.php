@@ -896,7 +896,7 @@ function add_js_for_toolbar()
 
 
 /**
- * Registers headlines required by AJAX forms, only if javascript forms are enabled in blog settings
+ * Registers headlines required by AJAX forms, but only if javascript forms are enabled in blog settings.
  */
 function init_ajax_forms( $relative_to = 'blog' )
 {
@@ -1278,6 +1278,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.96  2011/09/19 17:47:17  fplanque
+ * doc
+ *
  * Revision 1.95  2011/09/18 00:56:33  sam2kb
  * init_ajax_forms() registers headlines required by AJAX forms
  *
