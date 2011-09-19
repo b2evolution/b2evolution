@@ -2939,7 +2939,7 @@ function upgrade_b2evo_tables()
 					) ENGINE = innodb" );
 		task_end();
 
-		task_begin( 'Upgrading comments table, add subsription fields...' );
+		task_begin( 'Upgrading comments table, add subscription fields...' );
 		db_add_col( 'T_comments', 'comment_notif_status', 'ENUM("noreq","todo","started","finished") NOT NULL DEFAULT "noreq" COMMENT "Have notifications been sent for this comment? How far are we in the process?" AFTER comment_secret' );
 		db_add_col( 'T_comments', 'comment_notif_ctsk_ID', 'INT(10) unsigned NULL DEFAULT NULL COMMENT "When notifications for this comment are sent through a scheduled job, what is the job ID?" AFTER comment_notif_status' );
 		task_end();
@@ -2963,7 +2963,9 @@ function upgrade_b2evo_tables()
 		task_begin( 'Upgrading settings table... ');
 		$DB->query( 'INSERT INTO T_settings (set_name, set_value)
 						VALUES ( "smart_hit_count", 1 )' );
-		task_end();
+		$DB->query( 'ALTER TABLE T_coll_settings CHANGE COLUMN cset_value cset_value   VARCHAR( 10000 ) NULL COMMENT "The AdSense plugin wants to store very long snippets of HTML"' );
+  	task_end();
+
 
 		set_upgrade_checkpoint( '10200' );
 	}
@@ -3218,6 +3220,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.414  2011/09/19 23:23:43  fplanque
+ * Db fixes
+ *
  * Revision 1.413  2011/09/17 22:16:05  fplanque
  * cleanup
  *

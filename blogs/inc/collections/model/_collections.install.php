@@ -211,7 +211,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			comment_allow_msgform TINYINT NOT NULL DEFAULT 0,
 			comment_secret        varchar(32) NULL default NULL,
 			comment_notif_status  ENUM('noreq','todo','started','finished') NOT NULL DEFAULT 'noreq' COMMENT 'Have notifications been sent for this comment? How far are we in the process?',
-			comment_notif_ctsk_ID INT(10) unsigned NULL DEFAULT NULL COMMENT 'When notifications for this comment are sent through a schedule job, what is the job ID?',
+			comment_notif_ctsk_ID INT(10) unsigned NULL DEFAULT NULL COMMENT 'When notifications for this comment are sent through a scheduled job, what is the job ID?',
 			PRIMARY KEY comment_ID (comment_ID),
 			KEY comment_post_ID (comment_post_ID),
 			KEY comment_date (comment_date),
@@ -280,7 +280,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_items__subscriptions (
 			isub_item_ID    int(11) unsigned NOT NULL,
 			isub_user_ID    int(11) unsigned NOT NULL,
-			isub_comments   tinyint(1) NOT NULL DEFAULT 0 COMMENT 'The user wants to receive notifications for new comments',
+			isub_comments   tinyint(1) NOT NULL DEFAULT 0 COMMENT 'The user wants to receive notifications for new comments on this post',
 			PRIMARY KEY (isub_item_ID, isub_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -383,6 +383,9 @@ $schema_queries = array_merge( $schema_queries, array(
 
 /*
  * $Log$
+ * Revision 1.39  2011/09/19 23:23:43  fplanque
+ * Db fixes
+ *
  * Revision 1.38  2011/09/17 22:16:05  fplanque
  * cleanup
  *
