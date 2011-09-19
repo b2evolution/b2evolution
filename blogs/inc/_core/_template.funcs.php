@@ -232,7 +232,9 @@ function header_redirect( $redirect_to = NULL, $status = false )
 
 
 /**
- * Sends HTTP headers to avoid caching of the page.
+ * Sends HTTP headers to avoid caching of the page at the browser level
+ * (at least without revalidating with the server to make sure whether the content has changed or not).
+ *
  * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
  */
 function header_nocache( $timestamp = NULL )
@@ -261,6 +263,51 @@ function header_noexpire()
 {
 	global $servertimenow;
 	header('Expires: '.gmdate('r', $servertimenow + 31536000)); // 86400*365 (1 year)
+}
+
+
+/**
+ * Generate an etag to identify the version of the current page.
+ * We use this primarily to make a difference between the same page that has been generated for anonymous users
+ * and a version that has been generated for a specific user.
+ *
+ * A common problem without this would be that when users log out, the page cache would tell them "304 Not Modified"
+ * based on the date of the cache and then the browser would show a locally cached version of the page that includes
+ * the evobar.
+ *
+ * When a specific user logs out, the browser will send back the Etag of the logged in version it got and we will
+ * be able to detect that this is not a "304 Not Modified" case -> we will send back the anonymou version of the page.
+ */
+function gen_current_page_etag()
+{
+	global $current_User, $Messages;
+
+	if( isset($current_User) )
+	{
+		$etag = 'user:'.$current_User->ID;
+	}
+	else
+	{
+		$etag = 'user:anon';
+	}
+
+	if( $Messages->count() )
+	{	// This case has never been observed yet, but let's forward protect us against client side cached messages
+		$etag .= '-msg:'.md5($Messages->get_string('',''));
+	}
+
+	return '"'.$etag.'"';
+}
+
+
+/**
+ * This adds teh etag header
+ *
+ * @param string etag MUST be "quoted"
+ */
+function header_etag( $etag )
+{
+	header( 'ETag: '.$etag );
 }
 
 
@@ -306,7 +353,7 @@ function request_title( $params = array() )
 			'postidx_text'        => T_('Post Index'),
 			'search_text'         => T_('Search'),
 			'sitemap_text'        => T_('Site Map'),
-			'msgform_text'        => T_('Send a Message'),
+			'msgform_text'        => T_('Sending a message'),
 			'messages_text'       => T_('Messages'),
 			'contacts_text'       => T_('Contacts'),
 			'login_text'          => /* TRANS: trailing space = verb */ T_('Login '),
@@ -1278,6 +1325,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.97  2011/09/19 21:02:31  fplanque
+ * ETag support
+ *
  * Revision 1.96  2011/09/19 17:47:17  fplanque
  * doc
  *

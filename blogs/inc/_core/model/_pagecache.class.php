@@ -228,6 +228,12 @@ class PageCache
 			return false;
 		}
 
+		// In the following cases, the page may sometimes be cached, sometimes be not...
+		// We may need an etag to later determine if the client cache is the same as the server cache:
+
+		// Send etag:
+		header_etag( gen_current_page_etag() );
+
 		if( is_logged_in() )
 		{	// We do NOT want caching when a user is logged in (private data)
 			$Debuglog->add( 'Never cache pages for/from logged in members!', 'pagecache' );
@@ -243,26 +249,6 @@ class PageCache
 			return false;
 		}
 
-	/* fp> It feels like a waste of time to do this for every page hit
-	   sam2kb> I spent 20 minutes trying to figure out why caching doesn't work after upgrade,
-		 checked directory perms etc... Do you think that everybody will save cache
-		 dir content when they backup/upgrade b2evo?
-		 If blog cache directoty is missing users will have to disable and reenable
-		 caching for each blog (what if they have 100 blogs),
-		 but they won't because they will never know that caching is disabled ;)
-		 fp> Yeah, I'm actually still under the illusion that some people will just follow the upgrade instructions.
-		 Anyways, we can try to recreate the cache directory:
-		 	- everytime we upgrade
-			- everytime we try to write to it
-		 We canNOT try to recreate:
-		 	- everytime we try to read from it
-
-		if( ! $this->cache_create( false ) )
-		{	// Make sure that blog cache directory exists
-			$Debuglog->add( 'Could not create cache directory: '.$this->ads_collcache_path, 'pagecache' );
-			return false;
-		}
-	*/
 
 		// TODO: fp> If the user has submitted a comment, we might actually want to invalidate the cache...
 
@@ -383,16 +369,22 @@ class PageCache
 			{
 				$if_modified_since = strtotime( preg_replace('/;.*$/','',$_SERVER['HTTP_IF_MODIFIED_SINCE']) );
 				if( $retrieved_ts <= $if_modified_since )
-				{	// Cached version is equal to (or older than) $if_modified since; contents not modified, send 304!
+				{	// Cached version is equal to (or older than) $if_modified since; contents probably not modified...
 
-					// fp> IMPORTANT: this will not prevent you from logging out but it can prevent you from seeing you're logged out.
-					// It may tell you that the version with the evobar was not modified so your browser will show the evobar again
-					// TODO: investigate ETag & Vary Headers.
-					// Vary on cookie, does that work?
-					// ETag: maybe sending user ID would be enough  and then denying 304 whenever an Etag is sent back
+					// It is still possible that in between we have sent logged-in versions (including evobar) of the page
+					// and that the browser has an evobar version of the page in cache. Let's verify this before sending a 304...
 
-					header( 'HTTP/1.0 304 Not Modified' );
-					exit(0);
+					// We do this with an ETag header (another solution may be the Vary header)
+					if( array_key_exists( 'HTTP_IF_NONE_MATCH', $_SERVER) )
+					{
+						$if_none_match = $_SERVER['HTTP_IF_NONE_MATCH'];
+						// pre_dump($if_none_match, gen_current_page_etag() );
+						if( $if_none_match == gen_current_page_etag() )
+						{	// Ok, this seems to be really the same:
+							header( 'HTTP/1.0 304 Not Modified' );
+							exit(0);
+						}
+					}
 				}
 			}
 
@@ -507,7 +499,7 @@ class PageCache
 		}
 		else
 		{
-			// Put the URL of the page we are caching into the cache. You can never be to paranoid!
+			// Put the URL of the page we are caching into the cache. You can never be too paranoid!
 			// People can change their domain names, folder structures, etc... AND you cannot trust the hash to give a
 			// different file name in 100.00% of the cases! Serving a page for a different URL would be REEEEEALLLY BAAAAAAD!
 			global $ReqURL;
@@ -566,9 +558,9 @@ class PageCache
 
 	/**
 	 * Check if the file with the given file path should be removed during prune page cache
-	 * 
+	 *
 	 * @static
-	 * 
+	 *
 	 * @param $file_path
 	 * @return boolean true if the file should be removed, false otherwise
 	 */
@@ -601,9 +593,9 @@ class PageCache
 
 	/**
 	 * Delete those files from the given directory, which results true value on checkDelete function
-	 * 
+	 *
 	 * @static
-	 * 
+	 *
 	 * @param string directory path
 	 * @param string the first error occured deleting the directory content
 	 */
@@ -676,6 +668,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.35  2011/09/19 21:02:31  fplanque
+ * ETag support
+ *
  * Revision 1.34  2011/09/13 08:32:30  efy-asimo
  * Add crumb check for login and register
  * Never cache in-skin login and register
