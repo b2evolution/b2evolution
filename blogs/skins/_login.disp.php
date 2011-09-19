@@ -59,7 +59,7 @@ if( $action != 'req_validatemail' )
 		$links[] = get_user_logout_link();
 	}
 
-	if( count($links) )
+	if( !empty($links) )
 	{
 		echo '<div style="float:right; margin: 0 1em">'.implode( $links, ' &middot; ' ).'</div>
 		<div class="clear"></div>';
@@ -148,6 +148,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.18  2011/09/19 22:15:59  fplanque
+ * Minot/i18n
+ *
  * Revision 1.17  2011/09/18 00:58:44  fplanque
  * forms cleanup
  *

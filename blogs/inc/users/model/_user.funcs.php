@@ -675,7 +675,7 @@ function profile_check_params( $params, $User = NULL )
 		}
 		elseif( ( $params['gender'][0] != 'M' ) && ( $params['gender'][0] != 'F' ) )
 		{
-			param_error( 'gender', T_('Gender value is invalid').':'.$params['gender'][0] );
+			param_error( 'gender', 'Gender value is invalid' );
 		}
 	}
 
@@ -1055,6 +1055,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.57  2011/09/19 22:15:59  fplanque
+ * Minot/i18n
+ *
  * Revision 1.56  2011/09/17 02:31:59  fplanque
  * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
  *

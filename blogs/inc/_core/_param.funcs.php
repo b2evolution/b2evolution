@@ -1794,7 +1794,7 @@ function param_check_gender( $var, $required = false )
 	{ // empty is OK if not required:
 		if( $required )
 		{
-			param_error( $var, T_( 'Please select gender!' ) );
+			param_error( $var, T_( 'Please select a gender.' ) );
 			return false;
 		}
 		return true;
@@ -1803,7 +1803,7 @@ function param_check_gender( $var, $required = false )
 	$gender_value = $GLOBALS[$var];
 	if( ( $gender_value != 'M' ) && ( $gender_value != 'F' ) )
 	{
-		param_error( $var, T_( 'Gender value is invalid' ).':'.$gender_value );
+		param_error( $var, 'Gender value is invalid' );
 		return false;
 	}
 
@@ -2150,6 +2150,9 @@ function isset_param( $var )
 
 /*
  * $Log$
+ * Revision 1.72  2011/09/19 22:16:00  fplanque
+ * Minot/i18n
+ *
  * Revision 1.71  2011/09/12 07:50:57  efy-asimo
  * User gender validation
  *

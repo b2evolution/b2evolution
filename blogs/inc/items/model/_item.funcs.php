@@ -1480,7 +1480,7 @@ function check_categories( & $post_category, & $post_extracats )
 			check_categories_nosave( $post_category, $post_extracats); // set up the category parameters
 			if( $show_error )
 			{ // new main category without name
-				$Messages->add( T_('Please provide a name for new category!'), 'error' );
+				$Messages->add( T_('Please provide a name for new category.'), 'error' );
 				return false;
 			}
 			return true;
@@ -1949,6 +1949,9 @@ function echo_pages( $item_ID, $currentpage, $comments_number )
 
 /*
  * $Log$
+ * Revision 1.131  2011/09/19 22:15:59  fplanque
+ * Minot/i18n
+ *
  * Revision 1.130  2011/09/04 22:13:17  fplanque
  * copyright 2011
  *
