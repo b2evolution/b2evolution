@@ -252,3 +252,46 @@ div.results {
 	float: left;
 	overflow: auto;
 }
+
+/* Rating Summary*/
+table.rating_summary{
+	float: left;
+}
+table.rating_summary th, table.rating_summary td{
+	font-size: 10px;
+	line-height: 13px;
+	font-weight: normal;
+	padding: 0;
+}
+table.rating_summary th{
+	color: #00F;
+	text-decoration: underline;
+	padding-right: 5px;
+}
+table.rating_summary .progress{
+	width: 60px;
+	background: #eeeecc;
+	padding: 0;
+}
+table.rating_summary .progress>div{
+	background: #ffcc66;
+	font-size: 0;
+	text-indent: -6000px;
+}
+table.rating_summary td{
+	text-align: right;
+	padding-left: 5px;
+}
+div.rating_summary_total{
+	float: right;
+	padding-top: 38px;
+}
+div.rating_summary_total>.stars{
+	width: 60px;
+	background: url(../icons/star_small_gray.gif) repeat-x 0 0;
+}
+div.rating_summary_total>.stars>div{
+	background: url(../icons/star_small.gif) repeat-x 0 0;
+	font-size: 0;
+	text-indent: -6000px;
+}

@@ -929,6 +929,7 @@ function add_js_for_toolbar()
 	// Superfish menus:
 	require_js( 'hoverintent.js' );
 	require_js( 'superfish.js' );
+	require_js( 'jquery/jquery.raty.min.js' );
 	add_js_headline( '
 		jQuery( function() {
 			jQuery("ul.sf-menu").superfish({
@@ -1325,6 +1326,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.98  2011/09/20 15:38:17  efy-yurybakh
+ * jQuery star rating plugin
+ *
  * Revision 1.97  2011/09/19 21:02:31  fplanque
  * ETag support
  *

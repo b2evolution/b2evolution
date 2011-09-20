@@ -2449,6 +2449,49 @@ class Item extends ItemLight
 
 
 	/**
+	 * Get table with rating summary
+	 */
+	function get_rating_summary( )
+	{
+		$comments_count = $this->get_number_of_comments( 'published' );
+		if($comments_count==0)
+		{	// No Comments
+			return NULL;
+		}
+
+		$ratings = array();
+		$summary = 0;
+		for ( $i = 5; $i >= 1; $i-- )
+		{	// Calculate a summary rating for each star
+			$ratings[$i] = $this->get_number_of_comments( 'published', $i );
+			$summary += $ratings[$i]*$i;
+		}
+		$average = ceil( ( $summary / $comments_count ) / 5 * 100 );
+
+		$table = '<table class="rating_summary" cellspacing="1">';
+		foreach ( $ratings as $r => $count )
+		{	// Print a row for each star with formed data
+			$star_average = ceil( ( $count / $comments_count ) * 100 );
+			$table .= '<tr>
+				<th>'.$r.' '.T_('star').':</th>
+				<td class="progress"><div style="width:'.$star_average.'%">'.$star_average.'</div></td>
+				<td>('.$count.')</td>
+			<tr>';
+		}
+		$table .= '</table>';
+
+		// Print out a total summary for all comments
+		$table .= '<div class="rating_summary_total">
+			'.$comments_count.' '.( $comments_count > 1 ? T_('Ratings') : T_('Rating') ).'
+			<div class="stars"><div style="width:'.$average.'%">'.$average.'</div></div>
+		</div>
+		<div class="clear"></div>';
+
+		return $table;
+	}
+
+
+	/**
 	 * Template function: Displays feeback moderation info
 	 *
 	 * @param string Type of feedback to link to (feedbacks (all)/comments/trackbacks/pingbacks)
@@ -4683,9 +4726,10 @@ class Item extends ItemLight
 	 * Get the number of comments on this item
 	 *
 	 * @param string the status of counted comments
+	 * @param string the rating of counted comments
 	 * @retrun integer the number of comments
 	 */
-	function get_number_of_comments( $status = NULL )
+	function get_number_of_comments( $status = NULL, $rating = NULL )
 	{
 		global $DB;
 		$sql = 'SELECT count( comment_ID )
@@ -4693,6 +4737,10 @@ class Item extends ItemLight
 		if( $status != NULL )
 		{
 			$sql .= ' AND comment_status = "'.$status.'"';
+		}
+		if( $rating != NULL )
+		{
+			$sql .= ' AND comment_rating = "'.$rating.'"';
 		}
 		return $DB->get_var( $sql );
 	}
@@ -4760,6 +4808,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.246  2011/09/20 15:38:17  efy-yurybakh
+ * jQuery star rating plugin
+ *
  * Revision 1.245  2011/09/19 17:47:18  fplanque
  * doc
  *

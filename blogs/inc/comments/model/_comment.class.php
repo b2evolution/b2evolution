@@ -126,7 +126,7 @@ class Comment extends DataObject
 	 * @var integer
 	 */
 	var $notif_ctsk_ID;
-	
+
 	/**
 	 * Is this comment a reply to another comment ?
 	 *
@@ -396,7 +396,7 @@ class Comment extends DataObject
 	{
 		global $Settings, $Plugins, $default_avatar;
 
-		if( ! $Settings->get('allow_avatars') ) 
+		if( ! $Settings->get('allow_avatars') )
 			return;
 
 		if( $comment_author_User = & $this->get_author_User() )
@@ -1470,27 +1470,28 @@ class Comment extends DataObject
 	function rating_input( $params = array() )
 	{
 		$params = array_merge( array(
-									'before'    => '',
-									'after'     => '',
+									'before'     => '',
+									'after'      => '',
 									'label_low'  => T_('Poor'),
+									'label_2'    => T_('Bad'),
+									'label_3'    => T_('Regular'),
+									'label_4'    => T_('Good'),
 									'label_high' => T_('Excellent'),
 								), $params );
 
 		echo $params['before'];
 
-		echo $params['label_low'];
-
-		for( $i=1; $i<=5; $i++ )
-		{
-			echo '<input type="radio" class="radio" name="comment_rating" value="'.$i.'"';
-			if( $this->rating == $i )
-			{
-				echo ' checked="checked"';
-			}
-			echo ' />';
-		}
-
-		echo $params['label_high'];
+		echo '<div id="comment_rating"></div>
+		<script type="text/javascript">
+		/* <![CDATA[ */
+		$("#comment_rating").raty({
+			scoreName: "comment_rating",
+			start: '.(int)$this->rating.',
+			path: "/rsc/icons/",
+			hintList: ["'.$params['label_low'].'", "'.$params['label_2'].'", "'.$params['label_3'].'", "'.$params['label_4'].'", "'.$params['label_high'].'"]
+		});
+		/* ]]> */
+		</script>';
 
 		echo $params['after'];
 	}
@@ -1630,9 +1631,9 @@ class Comment extends DataObject
 	 * @todo dh> Indicator in url to see where the user came from (&from=subnote ["subscription notification"]) - Problem: too long urls.
 	 * @todo dh> "Beautify" like {@link Item::send_email_notifications()} ? fp > sure
 	 * @todo Should include "visibility status" in the mail to the Item's Author
-	 * 
+	 *
 	 * efy-asimo> moderatation and subscription notifications have been separated
-	 * 
+	 *
 	 * @param boolean true if send only moderation email, false otherwise
 	 * @param boolean true if send for everyone else but not for moterators, because a moderation email was sent for them
 	 */
@@ -1983,7 +1984,7 @@ class Comment extends DataObject
 
 			// Select comment attachment ids
 			$result = $DB->get_col( '
-				SELECT link_file_ID 
+				SELECT link_file_ID
 					FROM T_links
 				 WHERE link_cmt_ID = '.$this->ID );
 
@@ -2043,11 +2044,14 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.90  2011/09/20 15:38:17  efy-yurybakh
+ * jQuery star rating plugin
+ *
  * Revision 1.89  2011/09/09 22:10:54  fplanque
  * doc
  *
  * Revision 1.88  2011/09/08 13:55:50  lxndral
- * Add an 'in reply to' DB field 
+ * Add an 'in reply to' DB field
  *
  * Revision 1.87  2011/09/05 21:00:56  sam2kb
  * minor

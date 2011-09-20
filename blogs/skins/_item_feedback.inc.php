@@ -95,6 +95,7 @@ if( $Item->can_see_comments( true ) )
 			{
 				$disp_title[] = $title;
 			}
+			$rating_summary = $Item->get_rating_summary();
 		}
 		else
 		{ // Use cannot see comments
@@ -158,6 +159,7 @@ if( $Item->can_see_comments( true ) )
 		echo $params['before_section_title'];
 		echo implode( ', ', $disp_title);
 		echo $params['after_section_title'];
+		echo $rating_summary;
 
 		$CommentList = new CommentList2( $Blog, $Blog->get_setting('comments_per_page'), 'CommentCache', 'c_' );
 
@@ -290,6 +292,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.41  2011/09/20 15:38:17  efy-yurybakh
+ * jQuery star rating plugin
+ *
  * Revision 1.40  2011/09/17 02:31:58  fplanque
  * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
  *
