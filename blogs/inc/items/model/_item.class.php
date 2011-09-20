@@ -2453,7 +2453,7 @@ class Item extends ItemLight
 	 */
 	function get_rating_summary( )
 	{
-		$comments_count = $this->get_number_of_comments( 'published' );
+		$comments_count = $this->get_number_of_comments( 'published', 'all' );
 		if($comments_count==0)
 		{	// No Comments
 			return NULL;
@@ -2466,7 +2466,8 @@ class Item extends ItemLight
 			$ratings[$i] = $this->get_number_of_comments( 'published', $i );
 			$summary += $ratings[$i]*$i;
 		}
-		$average = ceil( ( $summary / $comments_count ) / 5 * 100 );
+		$average_real = number_format( $summary / $comments_count, 2, ".", "" );
+		$average = ceil( ( $average_real ) / 5 * 100 );
 
 		$table = '<table class="rating_summary" cellspacing="1">';
 		foreach ( $ratings as $r => $count )
@@ -2482,8 +2483,9 @@ class Item extends ItemLight
 
 		// Print out a total summary for all comments
 		$table .= '<div class="rating_summary_total">
-			'.$comments_count.' '.( $comments_count > 1 ? T_('Ratings') : T_('Rating') ).'
-			<div class="stars"><div style="width:'.$average.'%">'.$average.'</div></div>
+			'.$comments_count.' '.( $comments_count > 1 ? T_('ratings') : T_('rating') ).'
+			<div>Average rating:</div>
+			<div class="stars"><div style="width:'.$average.'%">'.$average.'</div></div><span>('.$average_real.')</span>
 		</div>
 		<div class="clear"></div>';
 
@@ -4740,7 +4742,14 @@ class Item extends ItemLight
 		}
 		if( $rating != NULL )
 		{
-			$sql .= ' AND comment_rating = "'.$rating.'"';
+			if( $rating == 'all' )
+			{
+				$sql .= ' AND comment_rating > 0';
+			}
+			else
+			{
+				$sql .= ' AND comment_rating = "'.$rating.'"';
+			}
 		}
 		return $DB->get_var( $sql );
 	}
@@ -4808,6 +4817,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.247  2011/09/20 16:51:12  efy-yurybakh
+ * jQuery star rating plugin (changes)
+ *
  * Revision 1.246  2011/09/20 15:38:17  efy-yurybakh
  * jQuery star rating plugin
  *

@@ -1481,15 +1481,32 @@ class Comment extends DataObject
 
 		echo $params['before'];
 
+		echo '<noscript>';
+		echo $params['label_low'];
+
+		for( $i=1; $i<=5; $i++ )
+		{
+			echo '<input type="radio" class="radio" name="comment_rating" value="'.$i.'"';
+			if( $this->rating == $i )
+			{
+				echo ' checked="checked"';
+			}
+			echo ' />';
+		}
+
+		echo $params['label_high'];
+		echo '</noscript>';
+
 		echo '<div id="comment_rating"></div>
 		<script type="text/javascript">
 		/* <![CDATA[ */
 		$("#comment_rating").raty({
 			scoreName: "comment_rating",
 			start: '.(int)$this->rating.',
-			path: "/rsc/icons/",
+			path: "'.url_absolute().'/rsc/icons/",
 			hintList: ["'.$params['label_low'].'", "'.$params['label_2'].'", "'.$params['label_3'].'", "'.$params['label_4'].'", "'.$params['label_high'].'"]
 		});
+		$("#comment_rating").prev().remove();
 		/* ]]> */
 		</script>';
 
@@ -2044,6 +2061,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.91  2011/09/20 16:51:12  efy-yurybakh
+ * jQuery star rating plugin (changes)
+ *
  * Revision 1.90  2011/09/20 15:38:17  efy-yurybakh
  * jQuery star rating plugin
  *

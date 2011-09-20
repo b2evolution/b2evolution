@@ -283,15 +283,26 @@ table.rating_summary td{
 	padding-left: 5px;
 }
 div.rating_summary_total{
-	float: right;
-	padding-top: 38px;
+	float: left;
+	padding: 5px 0 0 20px;
+}
+div.rating_summary_total>div{
+	padding-top: 5px;
 }
 div.rating_summary_total>.stars{
 	width: 60px;
 	background: url(../icons/star_small_gray.gif) repeat-x 0 0;
+	float: left;
+	padding: 0;
 }
 div.rating_summary_total>.stars>div{
 	background: url(../icons/star_small.gif) repeat-x 0 0;
 	font-size: 0;
 	text-indent: -6000px;
+}
+div.rating_summary_total>span{
+	float: left;
+	font-size: 11px;
+	line-height: 12px;
+	padding-left: 10px;
 }
