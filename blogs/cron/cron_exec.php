@@ -76,6 +76,11 @@ if( $is_cli )
 }
 else
 { // This is a web request:
+	
+	// Make sure the response is never cached:
+	header_nocache();
+	header_content_type();
+
 	?>
 	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 	<html>
@@ -206,6 +211,9 @@ if( ! $is_cli )
 
 /*
  * $Log$
+ * Revision 1.19  2011/09/20 18:10:31  sam2kb
+ * Never cache cron calls, and set correct charset
+ *
  * Revision 1.18  2008/10/28 20:50:41  blueyed
  * Adjust/fix levels passed to cron_log()
  *
