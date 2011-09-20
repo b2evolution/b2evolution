@@ -111,6 +111,7 @@ function skin_init( $disp )
 		case 'single':
 		case 'page':
 			init_ajax_forms(); // auto requires jQuery
+			init_ratings_js();
 
 			if( $disp == 'single' )
 			{
@@ -165,6 +166,7 @@ function skin_init( $disp )
 
 		case 'posts':
 			init_ajax_forms(); // auto requires jQuery
+			init_ratings_js();
 
 			// Get list of active filters:
 			$active_filters = $MainList->get_active_filters();
@@ -917,6 +919,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.103  2011/09/20 18:46:41  efy-yurybakh
+ * star rating plugin (additional remarks)
+ *
  * Revision 1.102  2011/09/18 00:56:34  sam2kb
  * init_ajax_forms() registers headlines required by AJAX forms
  *

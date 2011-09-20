@@ -2450,9 +2450,16 @@ class Item extends ItemLight
 
 	/**
 	 * Get table with rating summary
+	 *
+	 * @param array of params
 	 */
-	function get_rating_summary( )
+	function get_rating_summary( $params = array() )
 	{
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+			'rating_summary_star_totals' => 'count' // Possible values: 'count', 'percent' and 'none'
+		), $params );
+
 		$comments_count = $this->get_number_of_comments( 'published', 'all' );
 		if($comments_count==0)
 		{	// No Comments
@@ -2473,10 +2480,23 @@ class Item extends ItemLight
 		foreach ( $ratings as $r => $count )
 		{	// Print a row for each star with formed data
 			$star_average = ceil( ( $count / $comments_count ) * 100 );
+			switch( $params['rating_summary_star_totals'] )
+			{
+				case 'count':
+					$star_value = '('.$count.')';
+				break;
+				case 'percent':
+					$star_value = '('.$star_average.'%)';
+				break;
+				case 'none':
+				default:
+					$star_value = "";
+				break;
+			}
 			$table .= '<tr>
 				<th>'.$r.' '.T_('star').':</th>
 				<td class="progress"><div style="width:'.$star_average.'%">'.$star_average.'</div></td>
-				<td>('.$count.')</td>
+				<td>'.$star_value.'</td>
 			<tr>';
 		}
 		$table .= '</table>';
@@ -4817,6 +4837,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.248  2011/09/20 18:46:41  efy-yurybakh
+ * star rating plugin (additional remarks)
+ *
  * Revision 1.247  2011/09/20 16:51:12  efy-yurybakh
  * jQuery star rating plugin (changes)
  *

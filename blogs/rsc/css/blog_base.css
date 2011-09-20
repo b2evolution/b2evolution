@@ -264,8 +264,6 @@ table.rating_summary th, table.rating_summary td{
 	padding: 0;
 }
 table.rating_summary th{
-	color: #00F;
-	text-decoration: underline;
 	padding-right: 5px;
 }
 table.rating_summary .progress{

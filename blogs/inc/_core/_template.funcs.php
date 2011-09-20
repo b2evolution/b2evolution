@@ -929,7 +929,6 @@ function add_js_for_toolbar()
 	// Superfish menus:
 	require_js( 'hoverintent.js' );
 	require_js( 'superfish.js' );
-	require_js( 'jquery/jquery.raty.min.js' );
 	add_js_headline( '
 		jQuery( function() {
 			jQuery("ul.sf-menu").superfish({
@@ -953,6 +952,21 @@ function init_ajax_forms( $relative_to = 'blog' )
 	if( !empty($Blog) && $Blog->get_setting('ajax_form_enabled') )
 	{
 		require_js( 'communication.js', $relative_to );
+	}
+}
+
+
+/**
+ * Registers headlines required by comments forms, but only if javascript forms are enabled in blog settings.
+ */
+function init_ratings_js( $relative_to = 'blog' )
+{
+	global $Item;
+
+	if( !empty($Item) && $Item->can_rate() )
+	{
+		require_js( '#jquery#', $relative_to ); // dependency
+		require_js( 'jquery/jquery.raty.min.js', $relative_to );
 	}
 }
 
@@ -1326,6 +1340,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.99  2011/09/20 18:46:40  efy-yurybakh
+ * star rating plugin (additional remarks)
+ *
  * Revision 1.98  2011/09/20 15:38:17  efy-yurybakh
  * jQuery star rating plugin
  *

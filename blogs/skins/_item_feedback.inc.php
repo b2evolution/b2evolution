@@ -95,7 +95,10 @@ if( $Item->can_see_comments( true ) )
 			{
 				$disp_title[] = $title;
 			}
-			$rating_summary = $Item->get_rating_summary();
+			if( $Item->can_rate() )
+			{ // We requested to display rating summary
+				$rating_summary = $Item->get_rating_summary( $params );
+			}
 		}
 		else
 		{ // Use cannot see comments
@@ -292,6 +295,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.42  2011/09/20 18:46:41  efy-yurybakh
+ * star rating plugin (additional remarks)
+ *
  * Revision 1.41  2011/09/20 15:38:17  efy-yurybakh
  * jQuery star rating plugin
  *
