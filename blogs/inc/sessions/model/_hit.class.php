@@ -1450,11 +1450,38 @@ class Hit
 			$this->detect_useragent();
 		return $this->is_NS4;
 	}
+
+
+	/**
+	 * Is this a browser hit?
+	 * @return boolean
+	 */
+	function is_browser()
+	{
+		if( ! isset($this->is_browser) )
+			$this->is_browser = ($this->get_agent_type() == 'browser');
+		return $this->is_browser;
+	}
+
+
+	/**
+	 * Is this a robot hit?
+	 * @return boolean
+	 */
+	function is_robot()
+	{
+		if( ! isset($this->is_robot) )
+			$this->is_robot = ($this->get_agent_type() == 'robot');
+		return $this->is_robot;
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.68  2011/09/20 18:09:04  sam2kb
+ * New methods: is_browser() & is_robot()
+ *
  * Revision 1.67  2011/09/13 09:09:01  fplanque
  * fix
  *
