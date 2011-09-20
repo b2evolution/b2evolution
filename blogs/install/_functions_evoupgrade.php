@@ -2963,7 +2963,8 @@ function upgrade_b2evo_tables()
 		task_begin( 'Upgrading settings table... ');
 		$DB->query( 'INSERT INTO T_settings (set_name, set_value)
 						VALUES ( "smart_hit_count", 1 )' );
-		$DB->query( 'ALTER TABLE T_coll_settings CHANGE COLUMN cset_value cset_value   VARCHAR( 10000 ) NULL COMMENT "The AdSense plugin wants to store very long snippets of HTML"' );
+		$DB->query( 'ALTER TABLE T_coll_settings 
+									CHANGE COLUMN cset_value cset_value   VARCHAR( 10000 ) NULL COMMENT "The AdSense plugin wants to store very long snippets of HTML"' );
   	task_end();
 
 
@@ -3220,6 +3221,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.415  2011/09/20 17:36:59  fplanque
+ * no message
+ *
  * Revision 1.414  2011/09/19 23:23:43  fplanque
  * Db fixes
  *
