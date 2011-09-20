@@ -86,6 +86,7 @@ if( $Item->can_see_comments( true ) )
 
 	$type_list = array();
 	$disp_title = array();
+	$rating_summary = '';
 
 	if( $params['disp_comments'] )
 	{	// We requested to display comments
@@ -296,6 +297,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.44  2011/09/20 19:17:29  efy-yurybakh
+ * star rating plugin (additional remarks)
+ *
  * Revision 1.43  2011/09/20 18:56:55  efy-yurybakh
  * star rating plugin (additional remarks)
  *
