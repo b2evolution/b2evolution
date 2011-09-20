@@ -31,6 +31,7 @@ $params = array_merge( array(
 		'disp_trackbacks'      => true,
 		'disp_trackback_url'   => true,
 		'disp_pingbacks'       => true,
+		'disp_rating_summary'  => true,
 		'before_section_title' => '<h3>',
 		'after_section_title'  => '</h3>',
 		'comment_list_start'   => "\n\n",
@@ -95,7 +96,7 @@ if( $Item->can_see_comments( true ) )
 			{
 				$disp_title[] = $title;
 			}
-			if( $Item->can_rate() )
+			if( $params['disp_rating_summary'] )
 			{ // We requested to display rating summary
 				$rating_summary = $Item->get_rating_summary( $params );
 			}
@@ -295,6 +296,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.43  2011/09/20 18:56:55  efy-yurybakh
+ * star rating plugin (additional remarks)
+ *
  * Revision 1.42  2011/09/20 18:46:41  efy-yurybakh
  * star rating plugin (additional remarks)
  *
