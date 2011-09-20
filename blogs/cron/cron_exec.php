@@ -211,6 +211,9 @@ if( ! $is_cli )
 
 /*
  * $Log$
+ * Revision 1.20  2011/09/20 18:11:57  sam2kb
+ * minor / no new line at end of file
+ *
  * Revision 1.19  2011/09/20 18:10:31  sam2kb
  * Never cache cron calls, and set correct charset
  *
