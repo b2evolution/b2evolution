@@ -4754,12 +4754,22 @@ class Item extends ItemLight
 	function get_number_of_comments( $status = NULL, $rating = NULL )
 	{
 		global $DB;
+
+	// fp>yuriy TODO : please make one single SQL request that will GROUP BY $rating
+	// and then return all counts in an array or something (the array should probably also have
+	// entries for 'unrated', 'all_ratings' and for 'total').
+	// The array should be cached  in the Object and the query should never be repeated if
+	// we call this function again. (maybe we need to cache an array of arrays -- one for each $status)
+	// Maybe this should go to Item::get_comments_breakdown() and then get_number_of_comments()
+	// would call get_comments_breakdown($status) and return the total from the array for backward compatibility.
+
 		$sql = 'SELECT count( comment_ID )
 					FROM T_comments WHERE comment_post_ID = '.$this->ID;
 		if( $status != NULL )
 		{
 			$sql .= ' AND comment_status = "'.$status.'"';
 		}
+
 		if( $rating != NULL )
 		{
 			if( $rating == 'all' )
@@ -4837,6 +4847,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.249  2011/09/20 22:46:57  fplanque
+ * doc
+ *
  * Revision 1.248  2011/09/20 18:46:41  efy-yurybakh
  * star rating plugin (additional remarks)
  *

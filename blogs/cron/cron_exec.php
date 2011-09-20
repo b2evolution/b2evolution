@@ -75,7 +75,7 @@ if( $is_cli )
 	}
 }
 else
-{ // This is a web request:
+{ // This is a web request: (for testing purposes only. Not designed for production)
 	
 	// Make sure the response is never cached:
 	header_nocache();
@@ -211,6 +211,9 @@ if( ! $is_cli )
 
 /*
  * $Log$
+ * Revision 1.21  2011/09/20 22:46:57  fplanque
+ * doc
+ *
  * Revision 1.20  2011/09/20 18:11:57  sam2kb
  * minor / no new line at end of file
  *

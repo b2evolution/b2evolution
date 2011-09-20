@@ -97,6 +97,7 @@ if( $Item->can_see_comments( true ) )
 			{
 				$disp_title[] = $title;
 			}
+
 			if( $params['disp_rating_summary'] )
 			{ // We requested to display rating summary
 				$rating_summary = $Item->get_rating_summary( $params );
@@ -297,6 +298,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.45  2011/09/20 22:46:57  fplanque
+ * doc
+ *
  * Revision 1.44  2011/09/20 19:17:29  efy-yurybakh
  * star rating plugin (additional remarks)
  *

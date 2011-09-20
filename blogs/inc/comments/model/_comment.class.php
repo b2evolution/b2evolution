@@ -1469,18 +1469,23 @@ class Comment extends DataObject
 	 */
 	function rating_input( $params = array() )
 	{
+		// fp>yuriy : please note this global (then delete this comment ;)
+		global $rsc_uri;
+	
 		$params = array_merge( array(
 									'before'     => '',
 									'after'      => '',
-									'label_low'  => T_('Poor'),
-									'label_2'    => T_('Bad'),
-									'label_3'    => T_('Regular'),
+									'label_low'  => T_('Bad'),
+									'label_2'    => T_('Poor'),
+									'label_3'    => T_('Average'),
 									'label_4'    => T_('Good'),
 									'label_high' => T_('Excellent'),
 								), $params );
 
 		echo $params['before'];
 
+// fp>yuriy : can you try putting this into <div id="comment_rating">. Does raty replace it?
+// Is it possible to remove <noscript> once it's in there? (I don't really like/trust <noscript>)
 		echo '<noscript>';
 		echo $params['label_low'];
 
@@ -1500,13 +1505,13 @@ class Comment extends DataObject
 		echo '<div id="comment_rating"></div>
 		<script type="text/javascript">
 		/* <![CDATA[ */
-		$("#comment_rating").raty({
+		jQuery("#comment_rating").raty({
 			scoreName: "comment_rating",
 			start: '.(int)$this->rating.',
-			path: "'.url_absolute().'/rsc/icons/",
+			path: "'.$rsc_uri.'icons/",
 			hintList: ["'.$params['label_low'].'", "'.$params['label_2'].'", "'.$params['label_3'].'", "'.$params['label_4'].'", "'.$params['label_high'].'"]
 		});
-		$("#comment_rating").prev().remove();
+		jQuery("#comment_rating").prev().remove();
 		/* ]]> */
 		</script>';
 
@@ -2061,6 +2066,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.92  2011/09/20 22:46:57  fplanque
+ * doc
+ *
  * Revision 1.91  2011/09/20 16:51:12  efy-yurybakh
  * jQuery star rating plugin (changes)
  *

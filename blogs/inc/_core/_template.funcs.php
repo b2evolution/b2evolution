@@ -963,6 +963,7 @@ function init_ratings_js( $relative_to = 'blog' )
 {
 	global $Item;
 
+	// fp> Note, the following test is good for $disp == 'single', not for 'posts'
 	if( !empty($Item) && $Item->can_rate() )
 	{
 		require_js( '#jquery#', $relative_to ); // dependency
@@ -1340,6 +1341,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.100  2011/09/20 22:46:57  fplanque
+ * doc
+ *
  * Revision 1.99  2011/09/20 18:46:40  efy-yurybakh
  * star rating plugin (additional remarks)
  *

@@ -166,7 +166,8 @@ function skin_init( $disp )
 
 		case 'posts':
 			init_ajax_forms(); // auto requires jQuery
-			init_ratings_js();
+			// fp> if we add this here, we have to exetnd the inner if()
+			// init_ratings_js();
 
 			// Get list of active filters:
 			$active_filters = $MainList->get_active_filters();
@@ -919,6 +920,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.104  2011/09/20 22:46:57  fplanque
+ * doc
+ *
  * Revision 1.103  2011/09/20 18:46:41  efy-yurybakh
  * star rating plugin (additional remarks)
  *
