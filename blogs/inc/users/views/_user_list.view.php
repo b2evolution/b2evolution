@@ -76,7 +76,8 @@ if( $usr_unconfirmed )
 }
 */
 $SQL = new SQL();
-$SQL->SELECT( 'T_users.*, grp_ID, grp_name, ctry_name, MAX(T_sessions.sess_lastseen) as sess_lastseen, IFNULL(user_avatar_file_ID,0) as has_picture' );
+$SQL->SELECT( 'T_users.*, grp_ID, grp_name, ctry_name, MAX(T_sessions.sess_lastseen) as sess_lastseen, 
+			IF( IFNULL(user_avatar_file_ID,0), 1, 0 ) as has_picture' );
 $SQL->FROM( 'T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID' );
 $SQL->FROM_add( 'LEFT JOIN T_country ON user_ctry_ID = ctry_ID' );
 $SQL->FROM_add( 'LEFT JOIN T_sessions ON user_ID = sess_user_ID' );
@@ -217,6 +218,7 @@ if( $Settings->get('allow_avatars') )
 							'th_class' => 'shrinkwrap',
 							'td_class' => 'shrinkwrap center',
 							'order' => 'has_picture',
+							'default_dir' => 'D',
 							'td' => '%user_avatar( #user_ID#, #user_avatar_file_ID# )%',
 						);
 }
@@ -400,6 +402,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.38  2011/09/20 22:46:22  fplanque
+ * fixes
+ *
  * Revision 1.37  2011/09/20 08:56:52  efy-hamesh
  * Picture column header clickable in order to sort on users with a profile picture.
  *
