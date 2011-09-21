@@ -33,8 +33,6 @@ load_funcs( '/cron/_cron.funcs.php' );
  *         3 suppresses errors.
  */
 $quiet = 0;
-// Set var $quiet = 0;
-
 if( $is_cli )
 { // called through Command Line Interface, handle args:
 
@@ -213,8 +211,8 @@ if( ! $is_cli )
 
 /*
  * $Log$
- * Revision 1.22  2011/09/21 15:08:30  efy-vitalij
- * Add some comment
+ * Revision 1.23  2011/09/21 17:05:05  fplanque
+ * doc
  *
  * Revision 1.21  2011/09/20 22:46:57  fplanque
  * doc
