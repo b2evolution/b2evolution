@@ -787,11 +787,12 @@ function create_blog(
 	$blog_tagline = '',
 	$blog_longdesc = '',
 	$blog_skin_ID = 1,
-	$kind = 'std' ) // standard blog; notorious variation: "photo"
+	$kind = 'std', // standard blog; notorious variation: "photo"
+	$allow_rating = '' )
 {
 	global $default_locale;
 
- 	$Blog = new Blog( NULL );
+	$Blog = new Blog( NULL );
 
 	$Blog->init_by_kind( $kind, $blog_name, $blog_shortname, $blog_urlname );
 
@@ -804,6 +805,10 @@ function create_blog(
 
 	$Blog->set( 'access_type', 'relative' );
 	$Blog->set( 'siteurl', 'blog'.$Blog->ID.'.php' );
+	if( $allow_rating != '' )
+	{
+		$Blog->set_setting( 'allow_rating', $allow_rating );
+	}
 
 	$Blog->dbupdate();
 
@@ -895,7 +900,9 @@ function create_demo_contents()
 		$blog_stub,
 		sprintf( T_('Tagline for %s'), $blog_shortname ),
 		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-		1, 'std' ); // Skin ID
+		1, // Skin ID
+		'std',
+		'any' );
 
 	$blog_shortname = 'Blog B';
 	$blog_stub = 'b';
@@ -918,7 +925,9 @@ function create_demo_contents()
 		$blog_stub,
 		T_('Some interesting links...'),
 		sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
-		3, 'std' ); // SKin ID
+		3, // SKin ID
+		'std',
+		'any' );
 
 	$blog_shortname = 'Photoblog';
 	$blog_stub = 'photos';
@@ -1353,6 +1362,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.317  2011/09/21 11:10:38  efy-yurybakh
+ * install demo data: enable ratings for blogs 1 & 3
+ *
  * Revision 1.316  2011/09/14 22:18:09  fplanque
  * Enhanced addition user info fields
  *
