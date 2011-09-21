@@ -1454,12 +1454,11 @@ class Comment extends DataObject
 		$params = array_merge( array(
 				'before'      => '<div class="comment_rating">',
 				'after'       => '</div>',
-				'star_class'  => 'middle',
 			), $params );
 
 		echo $params['before'];
 
-		echo star_rating( $this->rating, $params['star_class'] );
+		echo star_rating( $this->rating );
 
 		echo $params['after'];
 	}
@@ -1471,7 +1470,7 @@ class Comment extends DataObject
 	{
 		// fp>yuriy : please note this global (then delete this comment ;)
 		global $rsc_uri;
-	
+
 		$params = array_merge( array(
 									'before'     => '',
 									'after'      => '',
@@ -2066,6 +2065,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.94  2011/09/21 12:46:24  fplanque
+ * changes
+ *
  * Revision 1.93  2011/09/21 06:56:06  efy-yurybakh
  * change star rating images to the sprites
  *

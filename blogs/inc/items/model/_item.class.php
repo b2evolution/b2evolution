@@ -2479,7 +2479,7 @@ class Item extends ItemLight
 			$ratings[$i] = $this->get_number_of_comments( 'published', $i );
 			$summary += $ratings[$i]*$i;
 		}
-		$average_real = number_format( $summary / $comments_count, 2, ".", "" );
+		$average_real = number_format( $summary / $comments_count, 1, ".", "" );
 		$average = ceil( ( $average_real ) / 5 * 100 );
 
 		$table = '<table class="rating_summary" cellspacing="1">';
@@ -2510,8 +2510,9 @@ class Item extends ItemLight
 		// Print out a total summary for all comments
 		$table .= '<div class="rating_summary_total">
 			'.$comments_count.' '.( $comments_count > 1 ? T_('ratings') : T_('rating') ).'
-			<div>Average rating:</div>
-			<div class="comment_rating">'.star_rating( $average_real ).'</div><span>('.$average_real.')</span>
+			<div class="average_rating">Average rating:<br />
+			'.star_rating( $average_real ).'<span>('.$average_real.')</span>
+			</div>
 		</div>
 		<div class="clear"></div>';
 
@@ -4853,6 +4854,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.252  2011/09/21 12:46:25  fplanque
+ * changes
+ *
  * Revision 1.251  2011/09/21 06:56:06  efy-yurybakh
  * change star rating images to the sprites
  *

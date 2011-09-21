@@ -1179,7 +1179,7 @@ function credits( $params = array() )
 /**
  * Display rating as 5 stars
  */
-function star_rating( $stars, $class = 'middle' )
+function star_rating( $stars, $class = 'not-used-any-more' )
 {
 	if( is_null($stars) )
 	{
@@ -1187,8 +1187,8 @@ function star_rating( $stars, $class = 'middle' )
 	}
 
 	$average = ceil( ( $stars ) / 5 * 100 );
-	
-	return '<div style="width:'.$average.'%">'.$average.'</div>';
+
+	return '<div class="star_rating"><div style="width:'.$average.'%">'.$stars.' stars</div></div>';
 }
 
 
@@ -1329,6 +1329,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.102  2011/09/21 12:46:25  fplanque
+ * changes
+ *
  * Revision 1.101  2011/09/21 06:56:06  efy-yurybakh
  * change star rating images to the sprites
  *

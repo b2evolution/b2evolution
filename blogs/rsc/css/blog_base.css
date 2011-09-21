@@ -284,26 +284,25 @@ div.rating_summary_total{
 	float: left;
 	padding: 5px 0 0 20px;
 }
-div.rating_summary_total>div{
+div.average_rating{
 	padding-top: 5px;
 }
-div.rating_summary_total>span{
+div.average_rating span{
 	float: left;
 	font-size: 11px;
 	line-height: 12px;
 	padding-left: 10px;
 }
-div.comment_rating, div.comment_rating>div{
+div.star_rating, div.star_rating>div{
 	width: 60px;
 	height: 12px;
 	background: url(../icons/star.gif) repeat-x 0 -12px;
-	font-size: 0;
-	text-indent: -6000px;
+	overflow: hidden;
+	text-indent: 100px;
 }
-div.comment_rating>div{
+div.star_rating>div{
 	background-position: 0 0;
 }
-div.rating_summary_total>.comment_rating{
+div.average_rating>.star_rating{
 	float: left;
-	padding: 0;
 }
