@@ -1842,6 +1842,15 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 		// Display delete button if current user has the rights:
 		$Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton', false, '&amp;', $save_context, true );
 
+		// Display spam button if current user has the rights:
+		$Comment->spam_link( '<div class="floatleft">'.T_('My Spam Vote').':</div>', ' ', '#', '#', 'DeleteButton', '&amp;', $save_context, true, $redirect_to );
+
+		// Display spam button if current user has the rights:
+		$Comment->notsure_link( ' ', ' ', '#', '#', 'ActionButton', '&amp;', $save_context, true, $redirect_to );
+
+		// Display spam button if current user has the rights:
+		$Comment->ok_link( ' ', ' ', '#', '#', 'PublishButton', '&amp;', $save_context, true, $redirect_to );
+
 		echo '<div class="clear"></div>';
 		echo '</div>';
 		echo '</div>';
@@ -1949,6 +1958,9 @@ function echo_pages( $item_ID, $currentpage, $comments_number )
 
 /*
  * $Log$
+ * Revision 1.132  2011/09/21 13:01:09  efy-yurybakh
+ * feature "Was this comment helpful?"
+ *
  * Revision 1.131  2011/09/19 22:15:59  fplanque
  * Minot/i18n
  *

@@ -30,6 +30,7 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_coll_user_perms'      => $tableprefix.'blogusers',
 		'T_coll_settings'        => $tableprefix.'coll_settings',
 		'T_comments'             => $tableprefix.'comments',
+		'T_comments__votes'      => $tableprefix.'comments__votes',
 		'T_items__item'          => $tableprefix.'items__item',
 		'T_items__item_settings' => $tableprefix.'items__item_settings',
 		'T_items__itemtag'       => $tableprefix.'items__itemtag',
@@ -756,6 +757,9 @@ $collections_Module = new collections_Module();
 
 /*
  * $Log$
+ * Revision 1.29  2011/09/21 13:01:04  efy-yurybakh
+ * feature "Was this comment helpful?"
+ *
  * Revision 1.28  2011/09/13 16:00:18  fplanque
  * Enhanced back-office navigation.
  *

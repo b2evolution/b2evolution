@@ -23,13 +23,18 @@ function fadeInStatus( id, status )
 	switch(status)
 	{
 		case 'published':
+		case 'ok':
 			fadeIn(id, '#339900');
 			break;
 		case 'deprecated':
+		case 'notsure':
 			fadeIn(id, '#656565');
 			break;
 		case 'deleted':
 			fadeIn(id, '#fcc');
+			break;
+		case 'spam':
+			fadeIn(id, '#ffacac');
 			break;
 	};
 }
@@ -74,6 +79,41 @@ function setCommentStatus( id, status, redirect_to )
 			'commentid': id,
 			'status': status,
 			'action': 'set_comment_status',
+			'moderation': 'commentlist',
+			'statuses': statuses,
+			'itemid': item_id,
+			'currentpage': currentpage,
+			'redirect_to': redirect_to,
+			'crumb_comment': <?php echo '\''.get_crumb('comment').'\''; ?>,
+		},
+	success: function(result)
+		{
+			delete modifieds[divid];
+			$('#comments_container').html(result);
+			show_modifieds();
+		}
+	});
+}
+
+// Set comments vote
+function setCommentVote( id, vote, redirect_to )
+{
+	var divid = 'c' + id;
+	fadeInStatus( divid, vote );
+	modifieds[divid] = vote;
+
+	var statuses = get_show_statuses();
+	var currentpage = get_current_page();
+	var item_id = get_itemid();
+
+	$.ajax({
+	type: 'POST',
+	url: '<?php echo $htsrv_url; ?>async.php',
+	data:
+		{ 'blogid': <?php echo '\''.$Blog->ID.'\''; ?>,
+			'commentid': id,
+			'vote': vote,
+			'action': 'set_comment_vote',
 			'moderation': 'commentlist',
 			'statuses': statuses,
 			'itemid': item_id,

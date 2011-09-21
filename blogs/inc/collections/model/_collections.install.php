@@ -218,6 +218,18 @@ $schema_queries = array_merge( $schema_queries, array(
 			KEY comment_type (comment_type)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
+	'T_comments__votes' => array(	// Note: pingbacks no longer supported, but previous pingbacks are to be preserved in the DB
+		'Creating table for Comments Votes',
+		"CREATE TABLE T_comments__votes (
+			cmvt_cmt_ID  int(11) unsigned NOT NULL,
+			cmvt_user_ID int unsigned NULL default NULL,
+			cmvt_helpful TINYINT(1) NULL DEFAULT NULL,
+			cmvt_spam    TINYINT(1) NULL DEFAULT NULL,
+			PRIMARY KEY (cmvt_cmt_ID, cmvt_user_ID),
+			KEY cmvt_cmt_ID (cmvt_cmt_ID),
+			KEY cmvt_user_ID (cmvt_user_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
 	'T_items__prerendering' => array(
 		'Creating item prerendering cache table',
 		"CREATE TABLE T_items__prerendering(
@@ -383,6 +395,9 @@ $schema_queries = array_merge( $schema_queries, array(
 
 /*
  * $Log$
+ * Revision 1.40  2011/09/21 13:01:09  efy-yurybakh
+ * feature "Was this comment helpful?"
+ *
  * Revision 1.39  2011/09/19 23:23:43  fplanque
  * Db fixes
  *

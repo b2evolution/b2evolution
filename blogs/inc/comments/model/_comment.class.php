@@ -301,6 +301,17 @@ class Comment extends DataObject
 
 
 	/**
+	 * Set the vote , as a number.
+	 * @param string Vote type (spam, helpful)
+	 * @access protected
+	 */
+	function set_vote( $vote_type )
+	{
+		return; // here will be code that add a vote for a comment
+	}
+
+
+	/**
 	 * Get the anchor-ID of the comment
 	 *
 	 * @return string
@@ -1013,6 +1024,77 @@ class Comment extends DataObject
 
 
 	/**
+	 * Provide link to vote a comment if user has edit rights
+	 *
+	 * @param string to display before link
+	 * @param string to display after link
+	 * @param string link text
+	 * @param string link title
+	 * @param string class name
+	 * @param string glue between url params
+	 * @param boolean save context?
+	 * @param boolean true if create AJAX button
+	 */
+	function get_vote_link( $vote_type, $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
+	{
+		global $current_User, $admin_url;
+
+		if( ! is_logged_in() ) return false;
+
+		$this->get_Item();
+
+		if( ($this->status == $vote_type) // Already Spam!
+			|| ! $current_User->check_perm( $this->blogperm_name(), '', false, $this->Item->get_blog_ID() ) )
+		{ // If User has no permission to edit comments, with this comment status:
+			return false;
+		}
+
+		switch( $vote_type )
+		{
+			case "spam":
+				if( $text == '#' ) $text = get_icon( 'delete', 'imgtag' ).' '.T_('This is spam');
+				if( $title == '#' ) $title = T_('Mark this comment as spam!');
+			break;
+			case "notsure":
+				if( $text == '#' ) $text = get_icon( 'deprecate', 'imgtag' ).' '.T_('I\'m not sure');
+				if( $title == '#' ) $title = T_('Mark this comment as not sure!');
+			break;
+			case "ok":
+				if( $text == '#' ) $text = get_icon( 'publish', 'imgtag' ).' '.T_('This is OK');
+				if( $title == '#' ) $title = T_('Mark this comment as OK!');
+			break;
+		}
+
+		$r = $before;
+		$r .= '<a href="';
+
+		if( $ajax_button )
+		{
+			if( $save_context && ( $redirect_to == NULL ) )
+			{
+				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
+			}
+			$r .= 'javascript:setCommentVote('.$this->ID.', \''.$vote_type.'\', \''.$redirect_to.'\');';
+		}
+		else
+		{
+			$r .= $admin_url.'?ctrl=comments'.$glue.'action='.$vote_type.$glue.'comment_ID='.$this->ID.'&amp;'.url_crumb('comment');
+	   		if( $save_context )
+			{
+				$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
+			}
+		}
+
+		$r .= '" title="'.$title.'"';
+		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
+		$r .= '>'.$text.'</a>';
+		$r .= $after;
+
+		return $r;
+	}
+
+
+	/**
 	 * Display link to deprecate a comment if user has edit rights
 	 *
 	 * @param string to display before link
@@ -1027,6 +1109,60 @@ class Comment extends DataObject
 	function deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
 		echo $this->get_deprecate_link( $before, $after, $text, $title, $class, $glue, $save_context, $ajax_button, $redirect_to );
+	}
+
+
+	/**
+	 * Display link to spam a comment if user has edit rights
+	 *
+	 * @param string to display before link
+	 * @param string to display after link
+	 * @param string link text
+	 * @param string link title
+	 * @param string class name
+	 * @param string glue between url params
+	 * @param boolean save context?
+	 * @param boolean true if create AJAX button
+	 */
+	function spam_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
+	{
+		echo $this->get_vote_link( 'spam', $before, $after, $text, $title, $class, $glue, $save_context, $ajax_button, $redirect_to );
+	}
+
+
+	/**
+	 * Display link to spam a comment if user has edit rights
+	 *
+	 * @param string to display before link
+	 * @param string to display after link
+	 * @param string link text
+	 * @param string link title
+	 * @param string class name
+	 * @param string glue between url params
+	 * @param boolean save context?
+	 * @param boolean true if create AJAX button
+	 */
+	function notsure_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
+	{
+		echo $this->get_vote_link( 'notsure', $before, $after, $text, $title, $class, $glue, $save_context, $ajax_button, $redirect_to );
+	}
+
+
+	/**
+	 * Display link to spam a comment if user has edit rights
+	 *
+	 * @param string to display before link
+	 * @param string to display after link
+	 * @param string link text
+	 * @param string link title
+	 * @param string class name
+	 * @param string glue between url params
+	 * @param boolean save context?
+	 * @param boolean true if create AJAX button
+	 */
+	function ok_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
+	{
+		echo $this->get_vote_link( 'ok', $before, $after, $text, $title, $class, $glue, $save_context, $ajax_button, $redirect_to );
 	}
 
 
@@ -2065,6 +2201,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.95  2011/09/21 13:01:09  efy-yurybakh
+ * feature "Was this comment helpful?"
+ *
  * Revision 1.94  2011/09/21 12:46:24  fplanque
  * changes
  *

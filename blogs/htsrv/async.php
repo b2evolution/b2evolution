@@ -225,6 +225,58 @@ switch( $action )
 
 		exit(0);
 
+	case 'set_comment_vote':
+		// Used for quick moderation of comments
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'comment' );
+
+		global $blog;
+
+		$blog = param( 'blogid', 'integer' );
+		$moderation = param( 'moderation', 'string', NULL );
+		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ), false );
+		if( $edited_Comment !== false )
+		{ // The comment still exists
+			$redirect_to = param( 'redirect_to', 'string', NULL );
+			$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
+
+			$vote = param( 'vote', 'string' );
+			$edited_Comment->set_vote( $vote );
+			$edited_Comment->dbupdate();
+
+			if( $vote == 'published' )
+			{
+				$edited_Comment->handle_notifications();
+			}
+
+			if( $moderation != NULL )
+			{
+				$statuses = param( 'statuses', 'string', NULL );
+				$item_ID = param( 'itemid', 'integer' );
+				$currentpage = param( 'currentpage', 'integer', 1 );
+
+				if( strlen($statuses) > 2 )
+				{
+					$statuses = substr( $statuses, 1, strlen($statuses) - 2 );
+				}
+				$status_list = explode( ',', $statuses );
+				if( $status_list == NULL )
+				{
+					$status_list = array( 'spam', 'notsure', 'ok' );
+				}
+
+				echo_item_comments( $blog, $item_ID, $status_list, $currentpage );
+				exit(0);
+			}
+		}
+
+		if( $moderation == NULL )
+		{
+			get_comments_awaiting_moderation( $blog );
+		}
+
+		exit(0);
+
 	case 'delete_comment':
 
 		// Check that this action request is not a CSRF hacked request:
@@ -381,6 +433,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.69  2011/09/21 13:01:04  efy-yurybakh
+ * feature "Was this comment helpful?"
+ *
  * Revision 1.68  2011/09/07 05:15:47  sam2kb
  * Create json_encode function if it does not exist ( PHP < 5.2.0 )
  *
