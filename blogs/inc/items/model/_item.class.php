@@ -1524,8 +1524,7 @@ class Item extends ItemLight
 				'after'       => '</p>',
 				'link_text'   => '#',		// text to display as the more link
 				'anchor_text' => '#',		// text to display as the more anchor (once the more link has been clicked, # defaults to "Follow up:")
-// fp>sam2kb: please make 2 options 'single' and 'single#anchor'
-				'link_to'     => 'single',	// target URL for more link
+				'link_to'     => 'single#anchor',	// target URL for more link, 'single' or 'single#anchor'
 				'disppage'    => '#',		// page number to display specific page, # for url parameter
 				'format'      => 'htmlbody',
 			), $params );
@@ -1547,9 +1546,16 @@ class Item extends ItemLight
 				// Dummy in order to keep previous translation in the loop:
 				$dummy = T_('Read more');
 			}
-			if( $params['link_to'] == 'single' )
+
+			switch( $params['link_to'] )
 			{
-				$params['link_to'] = $this->get_permanent_url().'#more'.$this->ID;
+				case 'single':
+					$params['link_to'] = $this->get_permanent_url();
+					break;
+
+				case 'single#anchor':
+					$params['link_to'] = $this->get_permanent_url().'#more'.$this->ID;
+					break;
 			}
 
 			return format_to_output( $params['before']
@@ -4847,6 +4853,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.250  2011/09/21 06:42:11  sam2kb
+ * code clean up + more params
+ *
  * Revision 1.249  2011/09/20 22:46:57  fplanque
  * doc
  *
