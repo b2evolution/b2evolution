@@ -334,23 +334,23 @@ class Blog extends DataObject
 
 
 		if( param( 'chapter_content', 'string', NULL ) !== NULL )
-		{ // What kind of content in chapter pages?
+		{ // What kind of content on chapter pages?
 			$this->set_setting( 'chapter_content', get_param( 'chapter_content' ) );
 		}
 		if( param( 'tag_content', 'string', NULL ) !== NULL )
-		{ // What kind of content in chapter pages?
+		{ // What kind of content on tags pages?
 			$this->set_setting( 'tag_content', get_param( 'tag_content' ) );
 		}
 		if( param( 'archive_content', 'string', NULL ) !== NULL )
-		{ // What kind of content in chapter pages?
+		{ // What kind of content on archive pages?
 			$this->set_setting( 'archive_content', get_param( 'archive_content' ) );
 		}
 		if( param( 'filtered_content', 'string', NULL ) !== NULL )
-		{ // What kind of content in chapter pages?
+		{ // What kind of content on filtered pages?
 			$this->set_setting( 'filtered_content', get_param( 'filtered_content' ) );
 		}
 		if( param( 'main_content', 'string', NULL ) !== NULL )
-		{ // What kind of content in chapter pages?
+		{ // What kind of content on main pages?
 			$this->set_setting( 'main_content', get_param( 'main_content' ) );
 		}
 
@@ -359,7 +359,7 @@ class Blog extends DataObject
 		// Tag posts per page:
 		$this->set_setting( 'tag_posts_per_page', param( 'tag_posts_per_page', 'integer', NULL ), true );
 
-		if( param( 'single_links',   'string', NULL ) !== NULL )
+		if( param( 'single_links', 'string', NULL ) !== NULL )
 		{ // Single post link type:
 			$this->set_setting( 'single_links', get_param( 'single_links' ) );
 		}
@@ -371,7 +371,7 @@ class Blog extends DataObject
 		}
 
 
-		if( param( 'what_to_show',   'string', NULL ) !== NULL )
+		if( param( 'what_to_show', 'string', NULL ) !== NULL )
 		{ // Show x days or x posts?:
 			$this->set_setting( 'what_to_show', get_param( 'what_to_show' ) );
 
@@ -384,7 +384,7 @@ class Blog extends DataObject
 		}
 
 
-		if( param( 'archives_sort_order',   'string', NULL ) !== NULL )
+		if( param( 'archives_sort_order', 'string', NULL ) !== NULL )
 		{
 			$this->set_setting( 'archives_sort_order', param( 'archives_sort_order', 'string', false ) );
 		}
@@ -479,9 +479,9 @@ class Blog extends DataObject
 
 		if( in_array( 'features', $groups ) )
 		{ // we want to load the workflow checkboxes:
-			$this->set_setting( 'allow_subscriptions',  param( 'allow_subscriptions', 'integer', 0 ) );
-			$this->set_setting( 'allow_item_subscriptions',  param( 'allow_item_subscriptions', 'integer', 0 ) );
-			$this->set_setting( 'enable_goto_blog',  param( 'enable_goto_blog', 'integer', 0 ) );
+			$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
+			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+			$this->set_setting( 'enable_goto_blog', param( 'enable_goto_blog', 'integer', 0 ) );
 
 			$this->set( 'allowblogcss', param( 'blog_allowblogcss', 'integer', 0 ) );
 			$this->set( 'allowusercss', param( 'blog_allowusercss', 'integer', 0 ) );
@@ -512,39 +512,39 @@ class Blog extends DataObject
 			$this->set_setting( 'default_gravatar',  param( 'default_gravatar', 'string', 'b2evo' ) );
 
 			// Public blog list
-			$this->set( 'in_bloglist',   param( 'blog_in_bloglist',   'integer', 0 ) );
+			$this->set( 'in_bloglist', param( 'blog_in_bloglist',   'integer', 0 ) );
 		}
 
 
 		if( in_array( 'seo', $groups ) )
 		{ // we want to load the workflow checkboxes:
-			$this->set_setting( 'canonical_homepage',  param( 'canonical_homepage', 'integer', 0 ) );
-			$this->set_setting( 'relcanonical_homepage',  param( 'relcanonical_homepage', 'integer', 0 ) );
-			$this->set_setting( 'canonical_item_urls',  param( 'canonical_item_urls', 'integer', 0 ) );
-			$this->set_setting( 'relcanonical_item_urls',  param( 'relcanonical_item_urls', 'integer', 0 ) );
-			$this->set_setting( 'canonical_archive_urls',  param( 'canonical_archive_urls', 'integer', 0 ) );
-			$this->set_setting( 'relcanonical_archive_urls',  param( 'relcanonical_archive_urls', 'integer', 0 ) );
-			$this->set_setting( 'canonical_cat_urls',  param( 'canonical_cat_urls', 'integer', 0 ) );
-			$this->set_setting( 'relcanonical_cat_urls',  param( 'relcanonical_cat_urls', 'integer', 0 ) );
-			$this->set_setting( 'canonical_tag_urls',  param( 'canonical_tag_urls', 'integer', 0 ) );
-			$this->set_setting( 'relcanonical_tag_urls',  param( 'relcanonical_tag_urls', 'integer', 0 ) );
-			$this->set_setting( 'default_noindex',  param( 'default_noindex', 'integer', 0 ) );
-			$this->set_setting( 'paged_noindex',  param( 'paged_noindex', 'integer', 0 ) );
-			$this->set_setting( 'paged_nofollowto',  param( 'paged_nofollowto', 'integer', 0 ) );
-			$this->set_setting( 'archive_noindex',  param( 'archive_noindex', 'integer', 0 ) );
-			$this->set_setting( 'archive_nofollowto',  param( 'archive_nofollowto', 'integer', 0 ) );
-			$this->set_setting( 'chapter_noindex',  param( 'chapter_noindex', 'integer', 0 ) );
-			$this->set_setting( 'tag_noindex',  param( 'tag_noindex', 'integer', 0 ) );
-			$this->set_setting( 'filtered_noindex',  param( 'filtered_noindex', 'integer', 0 ) );
-			$this->set_setting( 'arcdir_noindex',  param( 'arcdir_noindex', 'integer', 0 ) );
-			$this->set_setting( 'catdir_noindex',  param( 'catdir_noindex', 'integer', 0 ) );
-			$this->set_setting( 'feedback-popup_noindex',  param( 'feedback-popup_noindex', 'integer', 0 ) );
-			$this->set_setting( 'msgform_noindex',  param( 'msgform_noindex', 'integer', 0 ) );
-			$this->set_setting( 'special_noindex',  param( 'special_noindex', 'integer', 0 ) );
-			$this->set_setting( 'title_link_type',  param( 'title_link_type', 'string', '' ) );
-			$this->set_setting( 'permalinks',  param( 'permalinks', 'string', '' ) );
-			$this->set_setting( '404_response',  param( '404_response', 'string', '' ) );
-			$this->set_setting( 'help_link',  param( 'help_link', 'string', '' ) );
+			$this->set_setting( 'canonical_homepage', param( 'canonical_homepage', 'integer', 0 ) );
+			$this->set_setting( 'relcanonical_homepage', param( 'relcanonical_homepage', 'integer', 0 ) );
+			$this->set_setting( 'canonical_item_urls', param( 'canonical_item_urls', 'integer', 0 ) );
+			$this->set_setting( 'relcanonical_item_urls', param( 'relcanonical_item_urls', 'integer', 0 ) );
+			$this->set_setting( 'canonical_archive_urls', param( 'canonical_archive_urls', 'integer', 0 ) );
+			$this->set_setting( 'relcanonical_archive_urls', param( 'relcanonical_archive_urls', 'integer', 0 ) );
+			$this->set_setting( 'canonical_cat_urls', param( 'canonical_cat_urls', 'integer', 0 ) );
+			$this->set_setting( 'relcanonical_cat_urls', param( 'relcanonical_cat_urls', 'integer', 0 ) );
+			$this->set_setting( 'canonical_tag_urls', param( 'canonical_tag_urls', 'integer', 0 ) );
+			$this->set_setting( 'relcanonical_tag_urls', param( 'relcanonical_tag_urls', 'integer', 0 ) );
+			$this->set_setting( 'default_noindex', param( 'default_noindex', 'integer', 0 ) );
+			$this->set_setting( 'paged_noindex', param( 'paged_noindex', 'integer', 0 ) );
+			$this->set_setting( 'paged_nofollowto', param( 'paged_nofollowto', 'integer', 0 ) );
+			$this->set_setting( 'archive_noindex', param( 'archive_noindex', 'integer', 0 ) );
+			$this->set_setting( 'archive_nofollowto', param( 'archive_nofollowto', 'integer', 0 ) );
+			$this->set_setting( 'chapter_noindex', param( 'chapter_noindex', 'integer', 0 ) );
+			$this->set_setting( 'tag_noindex', param( 'tag_noindex', 'integer', 0 ) );
+			$this->set_setting( 'filtered_noindex', param( 'filtered_noindex', 'integer', 0 ) );
+			$this->set_setting( 'arcdir_noindex', param( 'arcdir_noindex', 'integer', 0 ) );
+			$this->set_setting( 'catdir_noindex', param( 'catdir_noindex', 'integer', 0 ) );
+			$this->set_setting( 'feedback-popup_noindex', param( 'feedback-popup_noindex', 'integer', 0 ) );
+			$this->set_setting( 'msgform_noindex', param( 'msgform_noindex', 'integer', 0 ) );
+			$this->set_setting( 'special_noindex', param( 'special_noindex', 'integer', 0 ) );
+			$this->set_setting( 'title_link_type', param( 'title_link_type', 'string', '' ) );
+			$this->set_setting( 'permalinks', param( 'permalinks', 'string', '' ) );
+			$this->set_setting( '404_response', param( '404_response', 'string', '' ) );
+			$this->set_setting( 'help_link', param( 'help_link', 'string', '' ) );
 			$this->set_setting( 'excerpts_meta_description', param( 'excerpts_meta_description', 'integer', 0 ) );
 			$this->set_setting( 'categories_meta_description', param( 'categories_meta_description', 'integer', 0 ) );
 			$this->set_setting( 'tags_meta_keywords', param( 'tags_meta_keywords', 'integer', 0 ) );
@@ -597,10 +597,10 @@ class Blog extends DataObject
 					}
 
 					if( isset($blog_urlname) && $DB->get_var( 'SELECT COUNT(*)
-															 FROM T_blogs
+															FROM T_blogs
 															WHERE blog_urlname = '.$DB->quote($blog_urlname).'
-															  AND blog_ID <> '.$this->ID
-															) )
+															AND blog_ID <> '.$this->ID
+														) )
 					{ // urlname is already in use
 						param_error( 'blog_urlname', sprintf( T_('The URL name %s is already in use by another blog. Please choose another name.'), "&laquo;$blog_urlname&raquo;" ) );
 						$blog_urlname = NULL;
@@ -672,10 +672,10 @@ class Blog extends DataObject
 
 			if( param( 'blog_media_location',  'string', NULL ) !== NULL )
 			{	// Media files location:
-				$this->set_from_Request(   'media_location' );
-				$this->set_media_subdir(    param( 'blog_media_subdir',    'string', '' ) );
-				$this->set_media_fullpath(  param( 'blog_media_fullpath',  'string', '' ) );
-				$this->set_media_url(       param( 'blog_media_url',       'string', '' ) );
+				$this->set_from_Request( 'media_location' );
+				$this->set_media_subdir( param( 'blog_media_subdir', 'string', '' ) );
+				$this->set_media_fullpath( param( 'blog_media_fullpath', 'string', '' ) );
+				$this->set_media_url( param( 'blog_media_url', 'string', '' ) );
 
 				// check params
 				switch( $this->get( 'media_location' ) )
@@ -727,8 +727,6 @@ class Blog extends DataObject
 						break;
 				}
 			}
-
-
 		}
 
 		return ! param_errors_detected();
@@ -2481,6 +2479,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.141  2011/09/21 22:08:04  sam2kb
+ * minor/cleanup
+ *
  * Revision 1.140  2011/09/17 02:31:58  fplanque
  * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
  *
