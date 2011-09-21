@@ -1459,7 +1459,7 @@ class Comment extends DataObject
 
 		echo $params['before'];
 
-		star_rating( $this->rating, $params['star_class'] );
+		echo star_rating( $this->rating, $params['star_class'] );
 
 		echo $params['after'];
 	}
@@ -2066,6 +2066,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.93  2011/09/21 06:56:06  efy-yurybakh
+ * change star rating images to the sprites
+ *
  * Revision 1.92  2011/09/20 22:46:57  fplanque
  * doc
  *

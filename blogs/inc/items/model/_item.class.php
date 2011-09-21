@@ -2511,7 +2511,7 @@ class Item extends ItemLight
 		$table .= '<div class="rating_summary_total">
 			'.$comments_count.' '.( $comments_count > 1 ? T_('ratings') : T_('rating') ).'
 			<div>Average rating:</div>
-			<div class="stars"><div style="width:'.$average.'%">'.$average.'</div></div><span>('.$average_real.')</span>
+			<div class="comment_rating">'.star_rating( $average_real ).'</div><span>('.$average_real.')</span>
 		</div>
 		<div class="clear"></div>';
 
@@ -4853,6 +4853,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.251  2011/09/21 06:56:06  efy-yurybakh
+ * change star rating images to the sprites
+ *
  * Revision 1.250  2011/09/21 06:42:11  sam2kb
  * code clean up + more params
  *

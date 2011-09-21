@@ -1186,21 +1186,9 @@ function star_rating( $stars, $class = 'middle' )
 		return;
 	}
 
-	for( $i=1; $i<=5; $i++ )
-	{
-		if( $i <= $stars )
-		{
-			echo get_icon( 'star_on', 'imgtag', array( 'class'=>$class ) );
-		}
-		elseif( $i-.5 <= $stars )
-		{
-			echo get_icon( 'star_half', 'imgtag', array( 'class'=>$class ) );
-		}
-		else
-		{
-			echo get_icon( 'star_off', 'imgtag', array( 'class'=>$class ) );
-		}
-	}
+	$average = ceil( ( $stars ) / 5 * 100 );
+	
+	return '<div style="width:'.$average.'%">'.$average.'</div>';
 }
 
 
@@ -1341,6 +1329,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.101  2011/09/21 06:56:06  efy-yurybakh
+ * change star rating images to the sprites
+ *
  * Revision 1.100  2011/09/20 22:46:57  fplanque
  * doc
  *
