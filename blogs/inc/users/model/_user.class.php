@@ -459,7 +459,7 @@ class User extends DataObject
 
 		$is_password_form = param( 'password_form', 'boolean', false );
 
-		if( $is_password_form || ( $is_identity_form && $is_new_user ) )
+		if( $is_password_form && ( $is_identity_form || $is_new_user ) )
 		{
 			param( 'edited_user_pass1', 'string', true );
 			$edited_user_pass2 = param( 'edited_user_pass2', 'string', true );
@@ -467,6 +467,31 @@ class User extends DataObject
 			if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') ) )
 			{ 	// We can set password
 				$this->set( 'pass', md5( $edited_user_pass2 ) );
+			}
+		}
+
+
+		// ******* Password edit form ****** //
+
+		if( $is_password_form && !$is_new_user )
+		{
+
+			$current_user_pass = param( 'current_user_pass', 'string', true );
+			
+			param( 'edited_user_pass1', 'string', true );
+			$edited_user_pass2 = param( 'edited_user_pass2', 'string', true );
+
+
+			if ( $this->pass == md5($current_user_pass))
+			{
+				if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') ) )
+				{ 	// We can set password
+					$this->set( 'pass', md5( $edited_user_pass2 ) );
+				}
+			}
+			else
+			{
+				param_error('current_user_pass' , T_('Please enter your current password.') );
 			}
 		}
 
@@ -2496,6 +2521,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.124  2011/09/22 12:55:56  efy-vitalij
+ * add current password input
+ *
  * Revision 1.123  2011/09/22 08:55:00  efy-asimo
  * Login problems with multidomain installs - fix
  *

@@ -95,6 +95,7 @@ if( $action != 'view' )
 { // We can edit the values:
 
 	$Form->begin_fieldset( $is_admin ? T_('Password') : '', array( 'class'=>'fieldset clear' ) );
+		$Form->password_input( 'current_user_pass', '', 20, T_('Current password'), array( 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off' ) );
 		$Form->password_input( 'edited_user_pass1', '', 20, T_('New password'), array( 'note' => sprintf( T_('Minimum length: %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off' ) );
 		$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off' ) );
 
@@ -116,6 +117,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.12  2011/09/22 12:55:56  efy-vitalij
+ * add current password input
+ *
  * Revision 1.11  2011/09/15 08:58:46  efy-asimo
  * Change user tabs display
  *
