@@ -520,6 +520,20 @@ a.permalink_right span{
 	background-position: -3px -64px;
 	width: 10px;
 }
+.sf-menu a.icon{
+	background: url(../../../../rsc/icons/icons_sprite.png) no-repeat right -80px;
+	padding-right: 18px;
+	height: 13px;
+}
+.sf-menu a.logout:hover{
+	background-position: right -96px;
+}
+.sf-menu a.icon.switch-to-blog{
+	background-position: right -128px;
+}
+.sf-menu a.icon.switch-to-admin{
+	background-position: right -112px;
+}
 
 div.edit_actions input {
 	margin: 1px 1px;

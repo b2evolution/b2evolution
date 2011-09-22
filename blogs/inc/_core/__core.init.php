@@ -850,14 +850,16 @@ class _core_Module extends Module
 				if( !empty( $Blog ) )
 				{
 					$entries['abswitch'] = array(
-							'text' => T_('Blog').' '.get_icon('switch-to-blog'),
+							'text' => T_('Blog'),
+							'class' => 'icon switch-to-blog',
 							'href' => $Blog->get( 'url' ),
 						);
 				}
 				else
 				{
 					$entries['abswitch'] = array(
-							'text' => T_('Home').' '.get_icon('switch-to-blog'),
+							'text' => T_('Home'),
+							'class' => 'icon switch-to-blog',
 							'href' => $home_url,
 						);
 				}
@@ -865,7 +867,8 @@ class _core_Module extends Module
 			else
 			{
 				$entries['abswitch'] = array(
-						'text' => T_('Admin').' '.get_icon('switch-to-admin'),
+						'text' => T_('Admin'),
+						'class' => 'icon switch-to-admin',
 						'href' => $admin_url,
 					);
 			}
@@ -875,8 +878,8 @@ class _core_Module extends Module
 
 		$topright_Menu->add_menu_entries( NULL, array(
 			'logout' => array(
-				'text' => T_('Logout').' '.get_icon('close'),
-				'class' => 'rollover',
+				'text' => T_('Logout'),
+				'class' => 'icon logout',
 				'href' => get_user_logout_url(),
 				)
 		 ) );
@@ -1049,6 +1052,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.81  2011/09/22 07:43:43  efy-yurybakh
+ * icons in a single sprite
+ *
  * Revision 1.80  2011/09/15 08:58:45  efy-asimo
  * Change user tabs display
  *

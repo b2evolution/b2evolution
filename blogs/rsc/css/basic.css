@@ -187,6 +187,20 @@ ul.sf-menu li li li.sfHover ul {
 	left:			25ex; /* match ul width */
 	top:			0;
 }
+.sf-menu a.icon{
+	background: url(../../../../rsc/icons/icons_sprite.png) no-repeat right -80px;
+	padding-right: 18px;
+	height: 13px;
+}
+.sf-menu a.logout:hover{
+	background-position: right -96px;
+}
+.sf-menu a.icon.switch-to-blog{
+	background-position: right -128px;
+}
+.sf-menu a.icon.switch-to-admin{
+	background-position: right -112px;
+}
 
 /*** DEMO SKIN ***/
 .sf-menu {
