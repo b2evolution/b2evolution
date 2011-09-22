@@ -255,6 +255,7 @@ $schema_queries = array(
 			ctry_name varchar(40) NOT NULL,
 			ctry_curr_ID int(10) unsigned NULL,
 			ctry_enabled tinyint(1) NOT NULL DEFAULT 1,
+			ctry_preferred tinyint(1) NOT NULL DEFAULT 0,
 			PRIMARY KEY ctry_ID (ctry_ID),
 			UNIQUE ctry_code (ctry_code)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -285,6 +286,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.64  2011/09/22 13:13:43  efy-vitalij
+ * add column ctry_preferred to country table
+ *
  * Revision 1.63  2011/09/15 22:34:09  fplanque
  * cleanup
  *
