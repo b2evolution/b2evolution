@@ -267,11 +267,11 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 		if( get_user_isubscription( $current_User->ID, $Item->ID ) )
 		{
 			echo '<p>'.T_( 'You will be notified by email when someone comments here.' );
-			echo ' <a href="'.$htsrv_url.'isubs_update.php?p='.$Item->ID.'&amp;notify=0&amp;'.url_crumb( 'itemsubs' ).'">'.T_( 'Click here to unsubscribe.' ).'</a></p>';
+			echo ' <a href="'.$Blog->get_local_htsrv_url().'isubs_update.php?p='.$Item->ID.'&amp;notify=0&amp;'.url_crumb( 'itemsubs' ).'">'.T_( 'Click here to unsubscribe.' ).'</a></p>';
 		}
 		else
 		{
-			echo '<p><a href="'.$htsrv_url.'isubs_update.php?p='.$Item->ID.'&amp;notify=1&amp;'.url_crumb( 'itemsubs' ).'">'.T_( 'Notify me by email when someone comments here.' ).'</a></p>';
+			echo '<p><a href="'.$Blog->get_local_htsrv_url().'isubs_update.php?p='.$Item->ID.'&amp;notify=1&amp;'.url_crumb( 'itemsubs' ).'">'.T_( 'Notify me by email when someone comments here.' ).'</a></p>';
 		}
 	}
 }
@@ -298,6 +298,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.46  2011/09/22 08:55:00  efy-asimo
+ * Login problems with multidomain installs - fix
+ *
  * Revision 1.45  2011/09/20 22:46:57  fplanque
  * doc
  *

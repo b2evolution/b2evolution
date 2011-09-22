@@ -122,7 +122,7 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
  */
 function get_login_url( $redirect_to = NULL )
 {
-	global $htsrv_url_sensitive, $edited_Blog, $generating_static;
+	global $edited_Blog, $generating_static;
 
 	if( !empty( $redirect_to ) )
 	{
@@ -155,12 +155,16 @@ function get_login_url( $redirect_to = NULL )
 		return url_add_param( $Blog->get( 'loginurl' ), $redirect );
 	}
 
+	// set secure htsrv url with the same domain as the request has
+	$secure_htsrv_url = get_secure_htsrv_url();
+
 	// Normal login
 	if( ! empty($redirect) )
 	{
-		$redirect = '?redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $htsrv_url_sensitive ) );
+		$redirect = '?redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $secure_htsrv_url ) );
 	}
-	return $htsrv_url_sensitive.'login.php'.$redirect;
+
+	return $secure_htsrv_url.'login.php'.$redirect;
 }
 
 
@@ -238,7 +242,10 @@ function get_user_register_link( $before = '', $after = '', $link_text = '', $li
 
 function get_user_register_url( $redirect = NULL, $default_source_string = '', $disp_when_logged_in = false )
 {
-	global $htsrv_url_sensitive, $Settings, $edited_Blog, $generating_static;
+	global $Settings, $edited_Blog, $generating_static;
+
+	// set secure htsrv url with the same domain as the request has
+	$secure_htsrv_url = get_secure_htsrv_url();
 
 	if( is_logged_in() && ! $disp_when_logged_in )
 	{ // Do not display, when already logged in:
@@ -261,7 +268,7 @@ function get_user_register_url( $redirect = NULL, $default_source_string = '', $
 	}
 	else
 	{
-		$register_url = $htsrv_url_sensitive.'register.php';
+		$register_url = $secure_htsrv_url.'register.php';
 	}
 
 	// Source=
@@ -294,7 +301,7 @@ function get_user_register_url( $redirect = NULL, $default_source_string = '', $
 
 	if( ! empty($redirect) )
 	{
-		$register_url = url_add_param( $register_url, 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $htsrv_url_sensitive ) ), '&' );
+		$register_url = url_add_param( $register_url, 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $secure_htsrv_url ) ), '&' );
 	}
 
 	return $register_url;
@@ -348,7 +355,10 @@ function get_user_logout_link( $before = '', $after = '', $link_text = '', $link
  */
 function get_user_logout_url()
 {
-	global $admin_url, $baseurl, $htsrv_url_sensitive, $is_admin_page, $Blog;
+	global $admin_url, $baseurl, $is_admin_page, $Blog;
+
+	// set secure htsrv url with the same domain as the request has
+	$secure_htsrv_url = get_secure_htsrv_url();
 
 	if( ! is_logged_in() )
 	{
@@ -359,12 +369,12 @@ function get_user_logout_url()
 	{
 		if( isset( $Blog ) )
 		{	// Go to the home page of the blog that was being edited:
-  		$redirect_to = $Blog->get( 'url' );
+  			$redirect_to = $Blog->get( 'url' );
 		}
 		else
 		{	// We were not editing a blog...
 			// return to global home:
-  		$redirect_to = url_rel_to_same_host( $baseurl, $htsrv_url_sensitive);
+  			$redirect_to = url_rel_to_same_host( $baseurl, $secure_htsrv_url );
   		// Alternative: return to the login page (fp> a basic user would be pretty lost on that login page)
   		// $redirect_to = url_rel_to_same_host($admin_url, $htsrv_url_sensitive);
 		}
@@ -372,10 +382,10 @@ function get_user_logout_url()
 	else
 	{	// Return to current blog page:
 		// Ignore disp and action params, after user has logged out.
-		$redirect_to = url_rel_to_same_host( regenerate_url( 'disp,action','','','&' ), $htsrv_url_sensitive );
+		$redirect_to = url_rel_to_same_host( regenerate_url( 'disp,action','','','&' ), $secure_htsrv_url );
 	}
 
-	return $htsrv_url_sensitive.'login.php?action=logout&amp;redirect_to='.rawurlencode($redirect_to);
+	return $secure_htsrv_url.'login.php?action=logout&amp;redirect_to='.rawurlencode($redirect_to);
 }
 
 
@@ -1055,6 +1065,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.58  2011/09/22 08:55:00  efy-asimo
+ * Login problems with multidomain installs - fix
+ *
  * Revision 1.57  2011/09/19 22:15:59  fplanque
  * Minot/i18n
  *

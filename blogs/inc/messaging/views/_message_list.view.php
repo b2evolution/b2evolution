@@ -307,15 +307,15 @@ $Results->cols[] = array(
 
 function delete_action( $thrd_ID, $msg_ID )
 {
-	global $htsrv_url, $Blog;
+	global $Blog;
 	if( is_admin_page() )
 	{
 		return action_icon( T_( 'Delete'), 'delete', regenerate_url( 'action', 'thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete&'.url_crumb( 'message' ) ) );
 	}
 	else
 	{
-		$redirect_to = $Blog->gen_baseurl().'?disp=messages&thrd_ID='.$thrd_ID;
-		$action_url = $htsrv_url.'messaging.php?disp=messages&thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete';
+		$redirect_to = url_add_param( $Blog->gen_baseurl(), 'disp=messages&thrd_ID='.$thrd_ID );
+		$action_url = $Blog->get_local_htsrv_url().'messaging.php?disp=messages&thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete';
 		$action_url = url_add_param( $action_url, 'redirect_to='.rawurlencode( $redirect_to ), '&' );
 		return action_icon( T_( 'Delete'), 'delete', $action_url.'&'.url_crumb( 'message' ) );
 	}
@@ -354,6 +354,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.34  2011/09/22 08:55:00  efy-asimo
+ * Login problems with multidomain installs - fix
+ *
  * Revision 1.33  2011/09/07 00:28:26  sam2kb
  * Replace non-ASCII character in regular expressions with ~
  *

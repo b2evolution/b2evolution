@@ -217,13 +217,11 @@ $Results->cols[] = array(
  */
 function contact_block( $block, $user_ID )
 {
-	global $htsrv_url;
-
 	// set action url
 	$action_url = get_messaging_url( 'contacts' );
 	if( !is_admin_page() )
 	{ // in front office the action will be processed by messaging.php
-		$action_url = $htsrv_url.'messaging.php?disp=contacts&redirect_to='.$action_url;
+		$action_url = get_samedomain_htsrv_url().'messaging.php?disp=contacts&redirect_to='.$action_url;
 	}
 
 	if( $block == 0 )
@@ -249,6 +247,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.14  2011/09/22 08:55:00  efy-asimo
+ * Login problems with multidomain installs - fix
+ *
  * Revision 1.13  2011/09/06 00:54:39  fplanque
  * i18n update
  *

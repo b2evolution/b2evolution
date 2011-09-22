@@ -37,13 +37,16 @@ $page_title = T_('Email address validation');
 $page_icon = 'icon_register.gif';
 require dirname(__FILE__).'/_html_header.inc.php';
 
-$Form = new Form( $htsrv_url_sensitive.'login.php', 'form_validatemail', 'post', 'fieldset' );
+// set secure htsrv url with the same domain as the request has
+$secure_htsrv_url = get_secure_htsrv_url();
+
+$Form = new Form( $secure_htsrv_url.'login.php', 'form_validatemail', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
 $Form->add_crumb( 'validateform' );
 $Form->hidden( 'action', 'req_validatemail');
-$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
+$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $secure_htsrv_url) );
 $Form->hidden( 'req_validatemail_submit', 1 ); // to know if the form has been submitted
 
 $Form->begin_fieldset( T_('Email address validation') );
@@ -64,12 +67,12 @@ $Form->end_form( array(array( 'name'=>'form_validatemail_submit', 'value'=>T_('S
 
 if( $current_User->group_ID == 1 )
 { // allow admin users to validate themselves by a single click:
-	$Form = new Form( $htsrv_url_sensitive.'login.php', 'form_validatemail', 'post', 'fieldset' );
+	$Form = new Form( $secure_htsrv_url.'login.php', 'form_validatemail', 'post', 'fieldset' );
 	$Form->begin_form( 'fform' );
 
 	$Form->add_crumb( 'validateform' );
 	$Form->hidden( 'action', 'validatemail');
-	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
+	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $secure_htsrv_url) );
 	$Form->hidden( 'reqID', 1 );
 	$Form->hidden( 'sessID', $Session->ID );
 
@@ -92,6 +95,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.8  2011/09/22 08:55:00  efy-asimo
+ * Login problems with multidomain installs - fix
+ *
  * Revision 1.7  2011/09/04 22:13:25  fplanque
  * copyright 2011
  *

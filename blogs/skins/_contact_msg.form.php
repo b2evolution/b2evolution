@@ -12,15 +12,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-if( isset($Blog ) )
-{
-	$submit_url = $Blog->get_local_htsrv_url().'message_send.php';
-}
-else
-{
-	$submit_url = $htsrv_url.'message_send.php';
-}
-
+$submit_url = get_samedomain_htsrv_url().'message_send.php';
 
 $Form = new Form( $submit_url );
 
@@ -81,6 +73,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.6  2011/09/22 08:55:00  efy-asimo
+ * Login problems with multidomain installs - fix
+ *
  * Revision 1.5  2011/09/18 01:07:20  fplanque
  * forms cleanup
  *

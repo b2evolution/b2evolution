@@ -1859,7 +1859,7 @@ class User extends DataObject
 	 */
 	function send_validate_email( $redirect_to_after = NULL )
 	{
-		global $app_name, $htsrv_url_sensitive, $Session;
+		global $app_name, $Session;
 
 		$request_id = generate_random_key(22);
 
@@ -1868,7 +1868,7 @@ class User extends DataObject
 			.T_('Login:')." $this->login\n"
 			.sprintf( /* TRANS: %s gets replaced by $app_name (normally "b2evolution") */ T_('Link to validate your %s account:'), $app_name )
 			."\n"
-			.$htsrv_url_sensitive.'login.php?action=validatemail'
+			.get_secure_htsrv_url().'login.php?action=validatemail'
 				.'&reqID='.$request_id
 				.'&sessID='.$Session->ID  // used to detect cookie problems
 			."\n\n-- \n"
@@ -2496,6 +2496,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.123  2011/09/22 08:55:00  efy-asimo
+ * Login problems with multidomain installs - fix
+ *
  * Revision 1.122  2011/09/17 02:31:59  fplanque
  * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
  *

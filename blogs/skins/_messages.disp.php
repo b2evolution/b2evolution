@@ -82,7 +82,7 @@ if( !isset( $params ) )
 }
 $params = array_merge( array(
 	'form_class' => 'bComment',
-	'form_action' => $htsrv_url.'messaging.php',
+	'form_action' => get_samedomain_htsrv_url().'messaging.php',
 	'form_name' => '',
 	'form_layout' => NULL,
 	'cols' => 40 
@@ -98,6 +98,9 @@ if( isset( $edited_Thread ) )
 
 /*
  * $Log$
+ * Revision 1.3  2011/09/22 08:55:00  efy-asimo
+ * Login problems with multidomain installs - fix
+ *
  * Revision 1.2  2011/09/04 22:13:24  fplanque
  * copyright 2011
  *

@@ -101,14 +101,16 @@ if( count($links) )
 	<div class="clear"></div>';
 }
 
+// set secure htsrv url with the same domain as the request has
+$secure_htsrv_url = get_secure_htsrv_url();
 
-// The login form has to point back to itself, in case $htsrv_url_sensitive is a "https" link and $redirect_to is not!
-$Form = new Form( $htsrv_url_sensitive.'login.php', 'evo_login_form', 'post', 'fieldset' );
+// The login form has to point back to itself, in case $secure_htsrv_url is a "https" link and $redirect_to is not!
+$Form = new Form( $secure_htsrv_url.'login.php', 'evo_login_form', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
 	$Form->add_crumb( 'loginform' );
-	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
+	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $secure_htsrv_url) );
 
 	if( isset( $action, $reqID, $sessID ) && $action == 'validatemail' )
 	{ // the user clicked the link from the "validate your account" email, but has not been logged in; pass on the relevant data:
@@ -138,8 +140,8 @@ $Form->begin_form( 'fform' );
 	$Form->text_input( 'login', $login, 16, T_('Login'), T_('Type your username, <b>not</b> your email address.'),
 			array( 'maxlength' => 20, 'class' => 'input_text', 'required'=>true ) );
 
-	$pwd_note = '<a href="'.$htsrv_url_sensitive.'login.php?action=lostpassword&amp;redirect_to='
-		.rawurlencode( url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
+	$pwd_note = '<a href="'.$secure_htsrv_url.'login.php?action=lostpassword&amp;redirect_to='
+		.rawurlencode( url_rel_to_same_host($redirect_to, $secure_htsrv_url) );
 	if( !empty($login) )
 	{
 		$pwd_note .= '&amp;login='.rawurlencode($login);
@@ -232,6 +234,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.30  2011/09/22 08:55:00  efy-asimo
+ * Login problems with multidomain installs - fix
+ *
  * Revision 1.29  2011/09/18 00:58:44  fplanque
  * forms cleanup
  *

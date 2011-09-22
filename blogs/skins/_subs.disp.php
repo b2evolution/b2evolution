@@ -45,7 +45,7 @@ $redirect_to = param( 'redirect_to', 'string', '' );
  * form to update the profile
  * @var Form
  */
-$Form = new Form( $htsrv_url.'subs_update.php', 'SubsForm' );
+$Form = new Form( $Blog->get_local_htsrv_url().'subs_update.php', 'SubsForm' );
 
 $Form->begin_form( 'bComment' );
 
@@ -119,6 +119,9 @@ $Form->end_form( array( array( '', '', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.11  2011/09/22 08:55:00  efy-asimo
+ * Login problems with multidomain installs - fix
+ *
  * Revision 1.10  2011/09/04 22:13:24  fplanque
  * copyright 2011
  *

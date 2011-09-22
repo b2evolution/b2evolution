@@ -47,6 +47,8 @@ if( $inskin )
 	param( 'blog', 'integer', NULL );
 }
 
+$secure_htsrv_url = get_secure_htsrv_url();
+
 // gets used by header_redirect();
 // TODO: dh> problem here is that $ReqURI won't include the e.g. "ctrl" param in a POSTed form and therefor the user lands on the default admin page after logging in (again)
 // fp> I think this will fix itself when we do another improvement: 303 redirect after each POST so that we never have an issue with people trying to reload a post
@@ -111,7 +113,7 @@ switch( $action )
 				.T_('Login:')." $login\n"
 				.T_('Link to change your password:')
 				."\n"
-				.$htsrv_url_sensitive.'login.php?action=changepwd'
+				.$secure_htsrv_url.'login.php?action=changepwd'
 					.'&login='.rawurlencode( $ForgetfulUser->login )
 					.'&reqID='.$request_id
 					.'&sessID='.$Session->ID  // used to detect cookie problems
@@ -330,53 +332,9 @@ switch( $action )
 }
 
 
-if( ! defined( 'EVO_MAIN_INIT' ) )
-{	// Do not check this if the form was included inside of _main.inc
-	// echo $htsrv_url_sensitive.'login.php';
-	// echo '<br>'.$ReqHost.$ReqPath;
-	if( $ReqHost.$ReqPath != $htsrv_url_sensitive.'login.php' )
-	{
-		$Messages->add( sprintf( T_('WARNING: you are trying to log in on <strong>%s</strong> but we expect you to log in on <strong>%s</strong>. If this is due to an automatic redirect, this will prevent you from successfully loging in. You must either fix your webserver configuration, or your %s configuration in order for these two URLs to match.'), $ReqHost.$ReqPath, $htsrv_url_sensitive.'login.php', $app_name ), 'error' );
-	}
-}
-
-
-// Test if cookie_domain matches the URL where we want to redirect to:
 if( strlen($redirect_to) )
-{
-	// Make it relative to the form's target, in case it has been set absolute (and can be made relative).
-	// Just in case it gets sent absolute. This should not trigger this warning then..!
-	$redirect_to = url_rel_to_same_host($redirect_to, $htsrv_url_sensitive);
-
-	$cookie_domain_match = false;
-	if( $redirect_to[0] == '/' )
-	{ // relative => ok
-		$cookie_domain_match = true;
-	}
-	else
-	{
-		$parsed_redirect_to = @parse_url($redirect_to);
-		if( isset($parsed_redirect_to['host']) )
-		{
-			if( $cookie_domain == $parsed_redirect_to['host'] )
-			{
-				$cookie_domain_match = true;
-			}
-			elseif( !empty($cookie_domain) && $cookie_domain[0] == '.'
-				&& substr($cookie_domain,1) == substr($parsed_redirect_to['host'], 1-strlen($cookie_domain)) )
-			{ // cookie domain includes subdomains and matches the last part of where we want to redirect to
-				$cookie_domain_match = true;
-			}
-		}
-		else
-		{
-			$cookie_domain_match = preg_match( '#^https?://[a-z\-.]*'.str_replace( '.', '\.', $cookie_domain ).'#i', $redirect_to );
-		}
-	}
-	if( ! $cookie_domain_match )
-	{
-		$Messages->add( sprintf( T_('WARNING: you are trying to log in to <strong>%s</strong> but your cookie domain is <strong>%s</strong>. You will not be able to successfully log in to the requested domain until you fix your cookie domain in your %s configuration.'), $redirect_to, $cookie_domain, $app_name ), 'error' );
-	}
+{ // Make it relative to the form's target, in case it has been set absolute (and can be made relative).
+	$redirect_to = url_rel_to_same_host( $redirect_to, $secure_htsrv_url );
 }
 
 
@@ -433,6 +391,9 @@ exit(0);
 
 /*
  * $Log$
+ * Revision 1.119  2011/09/22 08:54:59  efy-asimo
+ * Login problems with multidomain installs - fix
+ *
  * Revision 1.118  2011/09/17 02:31:59  fplanque
  * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
  *

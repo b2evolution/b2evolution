@@ -226,7 +226,7 @@ $Results->cols[] = array(
 
 function delete_action( $thread_ID )
 {
-	global $htsrv_url, $Blog;
+	global $Blog;
 	if( is_admin_page() )
 	{
 		return action_icon( T_( 'Delete'), 'delete', regenerate_url( 'action', 'thrd_ID='.$thread_ID.'&action=delete&'.url_crumb( 'thread' ) ) );
@@ -234,7 +234,7 @@ function delete_action( $thread_ID )
 	else
 	{
 		$redirect_to = $Blog->gen_baseurl().'?disp=threads';
-		return action_icon( T_( 'Delete'), 'delete', $htsrv_url.'messaging.php?thrd_ID='.$thread_ID.'&action=delete&redirect_to='.$redirect_to.'&'.url_crumb( 'thread' ) );
+		return action_icon( T_( 'Delete'), 'delete', $Blog->get_local_htsrv_url().'messaging.php?thrd_ID='.$thread_ID.'&action=delete&redirect_to='.$redirect_to.'&'.url_crumb( 'thread' ) );
 	}
 }
 
@@ -263,6 +263,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.28  2011/09/22 08:55:00  efy-asimo
+ * Login problems with multidomain installs - fix
+ *
  * Revision 1.27  2011/09/07 00:28:26  sam2kb
  * Replace non-ASCII character in regular expressions with ~
  *

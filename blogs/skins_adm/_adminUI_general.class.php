@@ -1308,12 +1308,13 @@ class AdminUI_general extends Menu
 	{
 		global $app_shortname, $app_version, $current_User, $htsrv_url_sensitive, $admin_url, $baseurl, $rsc_url;
 
+		$secure_htsrv_url = get_secure_htsrv_url();
 		$r = '
 		<div id="header">
 			<div id="headinfo">
 				<span id="headfunctions">'
 					// Note: if we log in with another user, we may not have the perms to come back to the same place any more, thus: redirect to admin home.
-					.'<a href="'.$htsrv_url_sensitive.'login.php?action=logout&amp;redirect_to='.rawurlencode(url_rel_to_same_host($admin_url, $htsrv_url_sensitive)).'">'.T_('Logout').'</a>
+					.'<a href="'.$secure_htsrv_url.'login.php?action=logout&amp;redirect_to='.rawurlencode(url_rel_to_same_host($admin_url, $secure_htsrv_url)).'">'.T_('Logout').'</a>
 					<img src="'.$rsc_url.'icons/close.gif" width="14" height="14" border="0" class="top" alt="" title="'
 					.T_('Logout').'" /></a>
 				</span>
@@ -1404,6 +1405,9 @@ class AdminUI_general extends Menu
 
 /*
  * $Log$
+ * Revision 1.116  2011/09/22 08:55:00  efy-asimo
+ * Login problems with multidomain installs - fix
+ *
  * Revision 1.115  2011/09/07 00:28:27  sam2kb
  * Replace non-ASCII character in regular expressions with ~
  *

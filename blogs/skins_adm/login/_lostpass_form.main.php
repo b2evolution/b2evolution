@@ -35,13 +35,16 @@ $page_title = T_('Lost password ?');
 $page_icon = 'icon_login.gif';
 require dirname(__FILE__).'/_html_header.inc.php';
 
-$Form = new Form( $htsrv_url_sensitive.'login.php', '', 'post', 'fieldset' );
+// set secure htsrv url with the same domain as the request has
+$secure_htsrv_url = get_secure_htsrv_url();
+
+$Form = new Form( $secure_htsrv_url.'login.php', '', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
 	$Form->add_crumb( 'lostpassform' );
 	$Form->hidden( 'action', 'retrievepassword' );
-	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
+	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $secure_htsrv_url) );
 
 	$Form->begin_fieldset();
 
@@ -65,6 +68,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.13  2011/09/22 08:55:00  efy-asimo
+ * Login problems with multidomain installs - fix
+ *
  * Revision 1.12  2011/09/07 22:44:41  fplanque
  * UI cleanup
  *

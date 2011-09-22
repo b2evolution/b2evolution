@@ -19,8 +19,6 @@ load_class( 'regional/model/_country.class.php', 'Country' );
 
 global $Settings;
 
-global $htsrv_url;
-
 global $notify_from;
 
 global $Blog;
@@ -45,7 +43,10 @@ $gender = param( 'gender', 'string', false );
 $source = param( 'source', 'string', '' );
 $redirect_to = param( 'redirect_to', 'string', '' );
 
-$Form = new Form( $htsrv_url.'register.php', 'login_form', 'post' );
+// set secure htsrv url with the same domain as the request has
+$secure_htsrv_url = get_secure_htsrv_url();
+
+$Form = new Form( $secure_htsrv_url.'register.php', 'login_form', 'post' );
 
 $Form->add_crumb( 'regform' );
 if( empty( $action ) )
@@ -121,7 +122,7 @@ elseif( $action == "reg_complete" )
 	// display register complete info ( email validation not required )
 	$Form->begin_form( 'bComment' );
 
-	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
+	$Form->hidden( 'redirect_to', url_rel_to_same_host( $redirect_to, $secure_htsrv_url ) );
 	$Form->hidden( 'inskin', 1 );
 
 	$Form->begin_fieldset();
@@ -152,6 +153,9 @@ elseif( $action == "reg_validation" )
 
 /*
  * $Log$
+ * Revision 1.16  2011/09/22 08:55:00  efy-asimo
+ * Login problems with multidomain installs - fix
+ *
  * Revision 1.15  2011/09/18 00:58:44  fplanque
  * forms cleanup
  *

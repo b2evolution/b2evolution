@@ -34,13 +34,15 @@ $page_title = T_('Registration complete');
 $page_icon = 'icon_register.gif';
 require dirname(__FILE__).'/_html_header.inc.php';
 
+// set secure htsrv url with the same domain as the request has
+$secure_htsrv_url = get_secure_htsrv_url();
 // dh> TODO: this form is not really required and only used for the info fields below.
-$Form = new Form( $htsrv_url_sensitive.'login.php', 'login', 'post', 'fieldset' );
+$Form = new Form( $secure_htsrv_url.'login.php', 'login', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
 $Form->hidden( 'login', $login );
-$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
+$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $secure_htsrv_url) );
 $Form->hidden( 'inskin', 0 );
 
 // Now the user has been logged in automatically at the end of the registration progress.
@@ -59,7 +61,7 @@ if( $action == 'reg_complete' )
 	$Form->end_fieldset();
 
 	echo '<p class="center"><a href="'
-		.htmlspecialchars(url_rel_to_same_host($redirect_to, $htsrv_url_sensitive))
+		.htmlspecialchars(url_rel_to_same_host($redirect_to, $secure_htsrv_url))
 		.'">'.T_('Continue').' &raquo;</a> '; // dh> TODO: this does not seem to be sensible for dir=rtl.
 	echo '</p>';
 }
@@ -78,6 +80,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.13  2011/09/22 08:55:00  efy-asimo
+ * Login problems with multidomain installs - fix
+ *
  * Revision 1.12  2011/09/06 03:25:41  fplanque
  * i18n update
  *

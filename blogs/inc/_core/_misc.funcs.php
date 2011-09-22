@@ -4174,6 +4174,57 @@ function get_ReqURI()
 
 
 /**
+ * Get htsrv url on the same domain as the request come from
+ * _init_hit.inc.php should be called before this call, because ReqHost and ReqPath must be initialized
+ */
+function get_samedomain_htsrv_url( $secure = false )
+{
+	global $ReqHost, $ReqPath, $htsrv_url, $htsrv_url_sensitive, $Blog;
+
+	if( $secure )
+	{
+		$req_htsrv_url = $htsrv_url_sensitive;
+	}
+	else
+	{
+		$req_htsrv_url = $htsrv_url;
+	}
+
+	if( strpos( $ReqHost.$ReqPath, $req_htsrv_url ) !== false )
+	{
+		return $req_htsrv_url;
+	}
+
+	$req_url_parts = @parse_url( $ReqHost );
+	$hsrv_url_parts = @parse_url( $req_htsrv_url );
+	if( ( !isset( $req_url_parts['host'] ) ) || ( !isset( $hsrv_url_parts['host'] ) ) )
+	{
+		debug_die( 'Invalid hosts!' );
+	}
+	$req_domain = $req_url_parts['host'];
+	$htsrv_domain = $hsrv_url_parts['host'];
+	$samedomain_htsrv_url = substr_replace( $req_htsrv_url, $req_domain, strpos( $req_htsrv_url, $htsrv_domain ), strlen( $htsrv_domain ) );
+
+	if( ( !is_admin_page() ) && ( !empty( $Blog ) ) && ( $samedomain_htsrv_url != $Blog->get_local_htsrv_url() ) )
+	{
+		debug_die( 'Inconsistent state!' );
+	}
+	return $samedomain_htsrv_url;
+}
+
+
+/**
+ * Get secure htsrv url on the same domain as the request come from
+ * It is important on login and register calls
+ * _init_hit.inc.php should be called before this call, because ReqHost and ReqPath must be initialized
+ */
+function get_secure_htsrv_url()
+{
+	return get_samedomain_htsrv_url( true );
+}
+
+
+/**
  * Set max execution time
  * @param integer seconds
  */
@@ -4304,6 +4355,9 @@ if( !function_exists( 'property_exists' ) )
 
 /*
  * $Log$
+ * Revision 1.269  2011/09/22 08:55:00  efy-asimo
+ * Login problems with multidomain installs - fix
+ *
  * Revision 1.268  2011/09/17 02:31:59  fplanque
  * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
  *

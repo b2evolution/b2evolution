@@ -39,8 +39,10 @@ $page_title = T_('New account creation');
 $page_icon = 'icon_register.gif';
 require dirname(__FILE__).'/_html_header.inc.php';
 
+// set secure htsrv url with the same domain as the request has
+$secure_htsrv_url = get_secure_htsrv_url();
 
-$Form = new Form( $htsrv_url_sensitive.'register.php', '', 'post', 'fieldset' );
+$Form = new Form( $secure_htsrv_url.'register.php', '', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
@@ -48,7 +50,7 @@ $Form->add_crumb( 'regform' );
 $Form->hidden( 'action', 'register' );
 $source = param( 'source', 'string', '' );
 $Form->hidden( 'source', $source );
-$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
+$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $secure_htsrv_url) );
 
 $Form->begin_fieldset();
 
@@ -92,7 +94,7 @@ $Form->end_form(); // display hidden fields etc
 ?>
 
 <div style="margin-top: 1em">
-	<a href="<?php echo $htsrv_url_sensitive.'login.php?redirect_to='.rawurlencode(url_rel_to_same_host($redirect_to, $htsrv_url_sensitive)) ?>">&laquo; <?php echo T_('Already have an account... ?') ?></a>
+	<a href="<?php echo $secure_htsrv_url.'login.php?redirect_to='.rawurlencode(url_rel_to_same_host($redirect_to, $secure_htsrv_url)) ?>">&laquo; <?php echo T_('Already have an account... ?') ?></a>
 </div>
 
 <?php
@@ -100,6 +102,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.30  2011/09/22 08:55:00  efy-asimo
+ * Login problems with multidomain installs - fix
+ *
  * Revision 1.29  2011/09/18 00:58:44  fplanque
  * forms cleanup
  *

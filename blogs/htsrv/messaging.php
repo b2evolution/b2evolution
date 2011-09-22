@@ -59,11 +59,11 @@ if( empty( $redirect_to ) )
 {
 	if( isset( $Blog ) )
 	{
-		$redirect_to = $Blog->gen_baseurl().'?disp='.$disp;
+		$redirect_to = url_add_param( $Blog->gen_baseurl(), 'disp='.$disp );
 	}
 	else
 	{
-		$redirect_to = $baseurl.'?disp='.$disp;
+		$redirect_to = url_add_param( $baseurl, 'disp='.$disp );
 	}
 }
 
@@ -151,6 +151,9 @@ header_redirect( $redirect_to ); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.5  2011/09/22 08:54:59  efy-asimo
+ * Login problems with multidomain installs - fix
+ *
  * Revision 1.4  2011/09/14 21:04:06  fplanque
  * cleanup
  *
