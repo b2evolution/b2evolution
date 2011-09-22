@@ -766,7 +766,7 @@ class Comment extends DataObject
 			return false;
 		}
 
-		if( $text == '#' ) $text = get_icon( 'edit' ).' '.T_('Edit...');
+		if( $text == '#' ) $text = '<span></span>'.T_('Edit...');
 		if( $title == '#' ) $title = T_('Edit this comment');
 
 		echo $before;
@@ -917,7 +917,7 @@ class Comment extends DataObject
 		{ // Use icon+text as default, if not displayed as button (otherwise just the text)
 			if( ! $button )
 			{
-				$text = get_icon( 'delete', 'imgtag' ).' '.T_('Delete!');
+				$text = '<span></span>'.T_('Delete!');
 			}
 			else
 			{
@@ -991,7 +991,7 @@ class Comment extends DataObject
 			return false;
 		}
 
-		if( $text == '#' ) $text = get_icon( 'deprecate', 'imgtag' ).' '.T_('Deprecate!');
+		if( $text == '#' ) $text = '<span></span>'.T_('Deprecate!');
 		if( $title == '#' ) $title = T_('Deprecate this comment!');
 
 		$r = $before;
@@ -1052,15 +1052,15 @@ class Comment extends DataObject
 		switch( $vote_type )
 		{
 			case "spam":
-				if( $text == '#' ) $text = get_icon( 'delete', 'imgtag' ).' '.T_('This is spam');
+				if( $text == '#' ) $text = '<span></span>'.T_('This is spam');
 				if( $title == '#' ) $title = T_('Mark this comment as spam!');
 			break;
 			case "notsure":
-				if( $text == '#' ) $text = get_icon( 'deprecate', 'imgtag' ).' '.T_('I\'m not sure');
+				if( $text == '#' ) $text = '<span></span>'.T_('I\'m not sure');
 				if( $title == '#' ) $title = T_('Mark this comment as not sure!');
 			break;
 			case "ok":
-				if( $text == '#' ) $text = get_icon( 'publish', 'imgtag' ).' '.T_('This is OK');
+				if( $text == '#' ) $text = '<span></span>'.T_('This is OK');
 				if( $title == '#' ) $title = T_('Mark this comment as OK!');
 			break;
 		}
@@ -1345,7 +1345,7 @@ class Comment extends DataObject
 		switch( $text )
 		{
 			case '#':
-				$text = get_icon( 'permalink' ).T_('Permalink');
+				$text = '<span></span>'.T_('Permalink');
 				break;
 
 			case '#icon#':
@@ -2198,6 +2198,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.97  2011/09/22 06:54:24  efy-yurybakh
+ * 5 first icons in a single sprite
+ *
  * Revision 1.96  2011/09/22 04:48:07  efy-yurybakh
  * get ratings by one sql query with "group"
  * remove <noscript> for jquery ratings plugin

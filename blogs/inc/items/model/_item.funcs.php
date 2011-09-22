@@ -1837,7 +1837,7 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 		$Comment->publish_link( ' ', ' ', '#', '#', 'PublishButton', '&amp;', $save_context, true, $redirect_to );
 
 		// Display deprecate button if current user has the rights:
-		$Comment->deprecate_link( ' ', ' ', '#', '#', 'DeleteButton', '&amp;', $save_context, true, $redirect_to );
+		$Comment->deprecate_link( ' ', ' ', '#', '#', 'DeleteButton deprecate', '&amp;', $save_context, true, $redirect_to );
 
 		// Display delete button if current user has the rights:
 		$Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton', false, '&amp;', $save_context, true );
@@ -1846,7 +1846,7 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 		$Comment->spam_link( '<div class="floatleft">'.T_('My Spam Vote').':</div>', ' ', '#', '#', 'DeleteButton', '&amp;', $save_context, true, $redirect_to );
 
 		// Display spam button if current user has the rights:
-		$Comment->notsure_link( ' ', ' ', '#', '#', 'ActionButton', '&amp;', $save_context, true, $redirect_to );
+		$Comment->notsure_link( ' ', ' ', '#', '#', 'ActionButton deprecate', '&amp;', $save_context, true, $redirect_to );
 
 		// Display spam button if current user has the rights:
 		$Comment->ok_link( ' ', ' ', '#', '#', 'PublishButton', '&amp;', $save_context, true, $redirect_to );
@@ -1958,6 +1958,9 @@ function echo_pages( $item_ID, $currentpage, $comments_number )
 
 /*
  * $Log$
+ * Revision 1.133  2011/09/22 06:54:24  efy-yurybakh
+ * 5 first icons in a single sprite
+ *
  * Revision 1.132  2011/09/21 13:01:09  efy-yurybakh
  * feature "Was this comment helpful?"
  *

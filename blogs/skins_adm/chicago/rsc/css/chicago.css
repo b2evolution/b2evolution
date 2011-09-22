@@ -454,7 +454,6 @@ h4 {
 	margin-bottom: 1ex;
 }
 
-
 /*
  * Links and buttons:
  */
@@ -494,6 +493,32 @@ a.DeleteButton:hover {
 a.PublishButton:hover {
 	color: #c00;
 	border: 1px solid #c00;
+}
+a.ActionButton span,
+a.DeleteButton span,
+a.PublishButton span,
+a.permalink_right span {
+	background: url(../../../../rsc/icons/icons_sprite.png) no-repeat 0 0;
+	width: 16px;
+	height: 16px;
+	float: left;
+	margin-right: 3px;
+}
+a.ActionButton span{
+	background-position: 0 0;
+}
+a.DeleteButton span{
+	background-position: 0 -16px;
+}
+a.deprecate span{
+	background-position: 0 -32px;
+}
+a.PublishButton span{
+	background-position: 0 -48px;
+}
+a.permalink_right span{
+	background-position: -3px -64px;
+	width: 10px;
 }
 
 div.edit_actions input {
