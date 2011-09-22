@@ -342,6 +342,12 @@ th .action_icon {
 .action_icon.deactivate{
 	background-position: 0 -32px;
 }
+.action_icon.bullet_full{
+	background-position: 0 -464px;
+}
+.action_icon.bullet_empty{
+	background-position: 0 -480px;
+}
 
 /*
  * Icon legend
