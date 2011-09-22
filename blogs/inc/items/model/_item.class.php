@@ -2477,12 +2477,14 @@ class Item extends ItemLight
 		$average_real = number_format( $ratings["summary"] / $ratings_count, 1, ".", "" );
 		$average = ceil( ( $average_real ) / 5 * 100 );
 
-		$table = '<table class="rating_summary" cellspacing="1">';
+		$table .= '<table class="rating_summary" cellspacing="1">';
 		foreach ( $ratings as $r => $count )
 		{	// Print a row for each star with formed data
 			if( !is_int($r) ) {
 				continue;
 			}
+			$html_recap .= '<div>'.str_repeat( '*', $r ).' ('.$count.')</div>';
+
 			$star_average = ceil( ( $count / $ratings_count ) * 100 );
 			switch( $params['rating_summary_star_totals'] )
 			{
@@ -2512,6 +2514,7 @@ class Item extends ItemLight
 			'.star_rating( $average_real ).'<span>('.$average_real.')</span>
 			</div>
 		</div>
+		<div class="rating_recap">'.$html_recap.'</div>
 		<div class="clear"></div>';
 
 		return $table;
@@ -4869,6 +4872,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.255  2011/09/22 05:52:03  efy-yurybakh
+ * display a recap of star ratings
+ *
  * Revision 1.254  2011/09/22 05:25:35  efy-yurybakh
  * fix ratings CSS
  *

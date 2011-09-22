@@ -304,3 +304,11 @@ div.star_rating div{
 div.average_rating .star_rating{
 	float: left;
 }
+.rating_recap{
+	clear: both;
+	font-size: 10px;
+}
+.rating_recap div{
+	float: left;
+	padding-right: 10px;
+}
