@@ -2466,26 +2466,24 @@ class Item extends ItemLight
 			'rating_summary_star_totals' => 'count' // Possible values: 'count', 'percent' and 'none'
 		), $params );
 
-		$comments_count = $this->get_number_of_comments( 'published', 'all' );
-		if($comments_count==0)
+		$ratings = $this->get_ratings();
+
+		$ratings_count = $ratings['all_ratings'];
+		if($ratings_count==0)
 		{	// No Comments
 			return NULL;
 		}
-
-		$ratings = array();
-		$summary = 0;
-		for ( $i = 5; $i >= 1; $i-- )
-		{	// Calculate a summary rating for each star
-			$ratings[$i] = $this->get_number_of_comments( 'published', $i );
-			$summary += $ratings[$i]*$i;
-		}
-		$average_real = number_format( $summary / $comments_count, 1, ".", "" );
+		
+		$average_real = number_format( $ratings["summary"] / $ratings_count, 1, ".", "" );
 		$average = ceil( ( $average_real ) / 5 * 100 );
 
 		$table = '<table class="rating_summary" cellspacing="1">';
 		foreach ( $ratings as $r => $count )
 		{	// Print a row for each star with formed data
-			$star_average = ceil( ( $count / $comments_count ) * 100 );
+			if( !is_int($r) ) {
+				continue;
+			}
+			$star_average = ceil( ( $count / $ratings_count ) * 100 );
 			switch( $params['rating_summary_star_totals'] )
 			{
 				case 'count':
@@ -2509,7 +2507,7 @@ class Item extends ItemLight
 
 		// Print out a total summary for all comments
 		$table .= '<div class="rating_summary_total">
-			'.$comments_count.' '.( $comments_count > 1 ? T_('ratings') : T_('rating') ).'
+			'.$ratings_count.' '.( $ratings_count > 1 ? T_('ratings') : T_('rating') ).'
 			<div class="average_rating">Average rating:<br />
 			'.star_rating( $average_real ).'<span>('.$average_real.')</span>
 			</div>
@@ -4755,20 +4753,11 @@ class Item extends ItemLight
 	 * Get the number of comments on this item
 	 *
 	 * @param string the status of counted comments
-	 * @param string the rating of counted comments
 	 * @retrun integer the number of comments
 	 */
-	function get_number_of_comments( $status = NULL, $rating = NULL )
+	function get_number_of_comments( $status = NULL )
 	{
 		global $DB;
-
-	// fp>yuriy TODO : please make one single SQL request that will GROUP BY $rating
-	// and then return all counts in an array or something (the array should probably also have
-	// entries for 'unrated', 'all_ratings' and for 'total').
-	// The array should be cached  in the Object and the query should never be repeated if
-	// we call this function again. (maybe we need to cache an array of arrays -- one for each $status)
-	// Maybe this should go to Item::get_comments_breakdown() and then get_number_of_comments()
-	// would call get_comments_breakdown($status) and return the total from the array for backward compatibility.
 
 		$sql = 'SELECT count( comment_ID )
 					FROM T_comments WHERE comment_post_ID = '.$this->ID;
@@ -4777,18 +4766,44 @@ class Item extends ItemLight
 			$sql .= ' AND comment_status = "'.$status.'"';
 		}
 
-		if( $rating != NULL )
+		return $DB->get_var( $sql );
+	}
+
+
+	/**
+	 * Get the ratings of comments on this item
+	 *
+	 * @retrun array the array of all ratings for this comment
+	 */
+	function get_ratings()
+	{
+		global $DB;
+
+		$sql = 'SELECT comment_rating, count( comment_ID ) AS cnt
+					FROM T_comments
+					WHERE comment_post_ID = '.$this->ID.'
+						AND comment_status = "published"
+					GROUP BY comment_rating';
+		$results = $DB->get_results( $sql );
+		
+		$ratings = array();
+		for( $i=5; $i>=0; $i-- )
 		{
-			if( $rating == 'all' )
+			foreach($results as $rating)
 			{
-				$sql .= ' AND comment_rating > 0';
-			}
-			else
-			{
-				$sql .= ' AND comment_rating = "'.$rating.'"';
+				if($rating->comment_rating == $i)
+				{
+					$ratings[$i==0 ? 'unrated' : $i] = $rating->cnt;
+					$ratings['total'] += $rating->cnt;
+					$ratings['summary'] += $rating->cnt*$i;
+					break;
+				}
+				$ratings[$i==0 ? 'unrated' : $i] = 0;
 			}
 		}
-		return $DB->get_var( $sql );
+		$ratings['all_ratings'] = $ratings['total'] - $ratings['unrated'];
+		
+		return $ratings;
 	}
 
 
@@ -4854,6 +4869,10 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.253  2011/09/22 04:48:07  efy-yurybakh
+ * get ratings by one sql query with "group"
+ * remove <noscript> for jquery ratings plugin
+ *
  * Revision 1.252  2011/09/21 12:46:25  fplanque
  * changes
  *
