@@ -508,22 +508,6 @@ function get_icon_info($name)
 			'size' => array( 16, 16 ),
 		);
 
-		case 'star_on': return array(
-			'file' => 'icons/star_small.gif',
-			'alt'	 => '*',
-			'size' => array( 12, 12 ),
-		);
-		case 'star_half': return array(
-			'file' => 'icons/star_small_half.gif',
-			'alt'	 => '+',
-			'size' => array( 12, 12 ),
-		);
-		case 'star_off': return array(
-			'file' => 'icons/star_small_gray.gif',
-			'alt'	 => '-',
-			'size' => array( 12, 12 ),
-		);
-
 		case 'recycle_full': return array(
 			'file' => 'icons/recycle_full.png',
 			'alt'  => T_('Open recycle bin'),
@@ -539,6 +523,10 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.77  2011/09/22 05:18:46  efy-yurybakh
+ * fix ratings CSS
+ * remove no longer used star icons
+ *
  * Revision 1.76  2011/09/07 00:28:26  sam2kb
  * Replace non-ASCII character in regular expressions with ~
  *

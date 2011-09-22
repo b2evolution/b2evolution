@@ -271,10 +271,10 @@ table.rating_summary .progress{
 	background: #eeeecc;
 	padding: 0;
 }
-table.rating_summary .progress>div{
+table.rating_summary .progress div{
 	background: #ffcc66;
-	font-size: 0;
-	text-indent: -6000px;
+	color: #ffcc66;
+	overflow: hidden;
 }
 table.rating_summary td{
 	text-align: right;
@@ -293,16 +293,16 @@ div.average_rating span{
 	line-height: 12px;
 	padding-left: 10px;
 }
-div.star_rating, div.star_rating>div{
+div.star_rating, div.star_rating div{
 	width: 60px;
 	height: 12px;
 	background: url(../icons/star.gif) repeat-x 0 -12px;
 	overflow: hidden;
 	text-indent: 100px;
 }
-div.star_rating>div{
+div.star_rating div{
 	background-position: 0 0;
 }
-div.average_rating>.star_rating{
+div.average_rating .star_rating{
 	float: left;
 }
