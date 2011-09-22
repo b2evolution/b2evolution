@@ -218,7 +218,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			KEY comment_type (comment_type)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
-	'T_comments__votes' => array(	// Note: pingbacks no longer supported, but previous pingbacks are to be preserved in the DB
+	'T_comments__votes' => array(
 		'Creating table for Comments Votes',
 		"CREATE TABLE T_comments__votes (
 			cmvt_cmt_ID  int(11) unsigned NOT NULL,
@@ -395,6 +395,9 @@ $schema_queries = array_merge( $schema_queries, array(
 
 /*
  * $Log$
+ * Revision 1.41  2011/09/22 03:20:54  fplanque
+ * minor
+ *
  * Revision 1.40  2011/09/21 13:01:09  efy-yurybakh
  * feature "Was this comment helpful?"
  *
