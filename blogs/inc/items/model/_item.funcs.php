@@ -1842,14 +1842,16 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 		// Display delete button if current user has the rights:
 		$Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton', false, '&amp;', $save_context, true );
 
-		// Display spam button if current user has the rights:
-		$Comment->spam_link( '<div class="floatleft">'.T_('My Spam Vote').':</div>', ' ', '#', '#', 'DeleteButton', '&amp;', $save_context, true, $redirect_to );
+		$vote_status = $Comment->get_vote_status( $current_User->ID );
 
-		// Display spam button if current user has the rights:
-		$Comment->notsure_link( ' ', ' ', '#', '#', 'ActionButton deprecate', '&amp;', $save_context, true, $redirect_to );
+		// Display Spam Vote "Spam" button if current user has the rights:
+		$Comment->spam_link( '<div class="floatleft">'.T_('My Spam Vote').':</div>', ' ', '#', '#', 'DeleteButton'.($vote_status['spam']?' disabled':''), '&amp;', $save_context, true, $redirect_to );
 
-		// Display spam button if current user has the rights:
-		$Comment->ok_link( ' ', ' ', '#', '#', 'PublishButton', '&amp;', $save_context, true, $redirect_to );
+		// Display Spam Vote "Not Sure" button if current user has the rights:
+		$Comment->notsure_link( ' ', ' ', '#', '#', 'ActionButton deprecate'.($vote_status['notsure']?' disabled':''), '&amp;', $save_context, true, $redirect_to );
+
+		// Display Spam Vote "Ok" button if current user has the rights:
+		$Comment->ok_link( ' ', ' ', '#', '#', 'PublishButton'.($vote_status['ok']?' disabled':''), '&amp;', $save_context, true, $redirect_to );
 
 		echo '<div class="clear"></div>';
 		echo '</div>';
@@ -1958,6 +1960,9 @@ function echo_pages( $item_ID, $currentpage, $comments_number )
 
 /*
  * $Log$
+ * Revision 1.134  2011/09/22 16:58:34  efy-yurybakh
+ * "comment is spam" vote
+ *
  * Revision 1.133  2011/09/22 06:54:24  efy-yurybakh
  * 5 first icons in a single sprite
  *

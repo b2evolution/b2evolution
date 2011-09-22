@@ -520,6 +520,10 @@ a.permalink_right span{
 	background-position: -3px -64px;
 	width: 10px;
 }
+a.disabled{
+	border: 1px solid #999;
+	color: #999;
+}
 .sf-menu a.icon{
 	background: url(../../../../rsc/icons/icons_sprite.png) no-repeat right -80px;
 	padding-right: 18px;

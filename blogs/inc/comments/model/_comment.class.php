@@ -302,12 +302,97 @@ class Comment extends DataObject
 
 	/**
 	 * Set the vote , as a number.
-	 * @param string Vote type (spam, helpful)
+	 * 
+	 * @param string Vote type (spam, notsure, ok)
+	 * @param int User ID
 	 * @access protected
 	 */
-	function set_vote( $vote_type )
+	function set_vote( $vote_type, $user_ID )
 	{
-		return; // here will be code that add a vote for a comment
+		global $DB;
+		
+		switch ( $vote_type )
+		{ // Set a value for spam vote
+			case "spam":
+				$vote = '1';
+				break;
+			case "notsure":
+				$vote = '0';
+				break;
+			case "ok":
+				$vote = '-1';
+				break;
+		}
+		if( !isset($vote) )
+		{ // If $vote_type is not correct from ajax request
+			return;
+		}
+		
+		if( !$DB->get_row("SELECT * FROM T_comments WHERE comment_ID = '".$this->ID."'" ) )
+		{ // If comment doesn't exist
+			return;
+		}
+		
+		$sql_update_count = '';
+		if( !$DB->get_row( "SELECT * FROM T_comments__votes WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_user_ID = '".(int)$user_ID."'" ) )
+		{ // Add a new vote for first time
+			$DB->query( "INSERT INTO T_comments__votes( cmvt_cmt_ID, cmvt_user_ID, cmvt_spam )
+												VALUES( '".$this->ID."', '".(int)$user_ID."', '".$vote."')" );
+			$spam_count = $DB->get_var( "SELECT COUNT(cmvt_spam) FROM T_comments__votes WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_spam IS NOT NULL" );
+			$sql_update_count = ", comment_spam_countvotes = '".$spam_count."'";
+		}
+		else
+		{ // Update a vote
+			$DB->query( "UPDATE T_comments__votes SET cmvt_spam = '".$vote."'
+												WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_user_ID = '".(int)$user_ID."'" );
+		}
+
+		// Update fields with spam counters for this comment
+		$spam_summary = $DB->get_var( "SELECT SUM(cmvt_spam) FROM T_comments__votes WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_spam IS NOT NULL" );
+		$DB->query( "UPDATE T_comments SET comment_spam_addvotes = '".$spam_summary."'".$sql_update_count."
+												WHERE comment_ID = '".$this->ID."'" );
+
+		return;
+	}
+
+
+	/**
+	 * Get the vote , as a array.
+	 * 
+	 * @param string Vote type (spam, notsure, ok)
+	 * @param int User ID
+	 * 
+	 * @return array
+	 */
+	function get_vote_status( $user_ID )
+	{
+		global $DB;
+		
+		$status = array(
+			'spam' => false,
+			'notsure' => false,
+			'ok' => false
+		);
+		if( $vote = $DB->get_var("SELECT cmvt_spam FROM T_comments__votes WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_user_ID = '".(int)$user_ID."'" ) )
+		{ // Get a spam vote for current comment and user
+			switch ( $vote )
+			{
+				case "1": // SPAM
+					$status['notsure'] = true;
+					$status['ok'] = true;
+					break;
+				case "0": // NOT SURE
+					$status['spam'] = true;
+					$status['ok'] = true;
+					break;
+				case "-1": // OK
+					$status['spam'] = true;
+					$status['notsure'] = true;
+					break;
+			}
+		}
+
+		return $status;
 	}
 
 
@@ -2198,6 +2283,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.98  2011/09/22 16:58:34  efy-yurybakh
+ * "comment is spam" vote
+ *
  * Revision 1.97  2011/09/22 06:54:24  efy-yurybakh
  * 5 first icons in a single sprite
  *

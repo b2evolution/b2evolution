@@ -241,8 +241,7 @@ switch( $action )
 			$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
 
 			$vote = param( 'vote', 'string' );
-			$edited_Comment->set_vote( $vote );
-			$edited_Comment->dbupdate();
+			$edited_Comment->set_vote( $vote, $current_User->ID );
 
 			if( $vote == 'published' )
 			{
@@ -433,6 +432,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.70  2011/09/22 16:58:34  efy-yurybakh
+ * "comment is spam" vote
+ *
  * Revision 1.69  2011/09/21 13:01:04  efy-yurybakh
  * feature "Was this comment helpful?"
  *
