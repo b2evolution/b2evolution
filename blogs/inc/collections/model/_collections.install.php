@@ -191,27 +191,31 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_comments' => array(	// Note: pingbacks no longer supported, but previous pingbacks are to be preserved in the DB
 		'Creating table for Comments',
 		"CREATE TABLE T_comments (
-			comment_ID            int(11) unsigned NOT NULL auto_increment,
-			comment_post_ID       int(11) unsigned NOT NULL default '0',
-			comment_type          enum('comment','linkback','trackback','pingback') NOT NULL default 'comment',
-			comment_status        ENUM('published','deprecated','draft','trash') DEFAULT 'published' NOT NULL,
+			comment_ID                 int(11) unsigned NOT NULL auto_increment,
+			comment_post_ID            int(11) unsigned NOT NULL default '0',
+			comment_type               enum('comment','linkback','trackback','pingback') NOT NULL default 'comment',
+			comment_status             ENUM('published','deprecated','draft','trash') DEFAULT 'published' NOT NULL,
 			comment_in_reply_to_cmt_ID INT(10) unsigned NULL,
-			comment_author_ID     int unsigned NULL default NULL,
-			comment_author        varchar(100) NULL,
-			comment_author_email  varchar(255) NULL,
-			comment_author_url    varchar(255) NULL,
-			comment_author_IP     varchar(23) NOT NULL default '',
-			comment_date          datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
-			comment_content       text NOT NULL,
-			comment_rating        TINYINT(1) NULL DEFAULT NULL,
-			comment_featured      TINYINT(1) NOT NULL DEFAULT 0,
-			comment_nofollow      TINYINT(1) NOT NULL DEFAULT 1,
-			comment_karma         INT(11) NOT NULL DEFAULT 0,
-			comment_spam_karma    TINYINT NULL,
-			comment_allow_msgform TINYINT NOT NULL DEFAULT 0,
-			comment_secret        varchar(32) NULL default NULL,
-			comment_notif_status  ENUM('noreq','todo','started','finished') NOT NULL DEFAULT 'noreq' COMMENT 'Have notifications been sent for this comment? How far are we in the process?',
-			comment_notif_ctsk_ID INT(10) unsigned NULL DEFAULT NULL COMMENT 'When notifications for this comment are sent through a scheduled job, what is the job ID?',
+			comment_author_ID          int unsigned NULL default NULL,
+			comment_author             varchar(100) NULL,
+			comment_author_email       varchar(255) NULL,
+			comment_author_url         varchar(255) NULL,
+			comment_author_IP          varchar(23) NOT NULL default '',
+			comment_date               datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
+			comment_content            text NOT NULL,
+			comment_rating             TINYINT(1) NULL DEFAULT NULL,
+			comment_featured           TINYINT(1) NOT NULL DEFAULT 0,
+			comment_nofollow           TINYINT(1) NOT NULL DEFAULT 1,
+			comment_helpful_addvotes   INT NOT NULL default 0,
+			comment_helpful_countvotes INT unsigned NOT NULL default 0,
+			comment_spam_addvotes      INT NOT NULL default 0,
+			comment_spam_countvotes    INT unsigned NOT NULL default 0,
+			comment_karma              INT(11) NOT NULL DEFAULT 0,
+			comment_spam_karma         TINYINT NULL,
+			comment_allow_msgform      TINYINT NOT NULL DEFAULT 0,
+			comment_secret             varchar(32) NULL default NULL,
+			comment_notif_status       ENUM('noreq','todo','started','finished') NOT NULL DEFAULT 'noreq' COMMENT 'Have notifications been sent for this comment? How far are we in the process?',
+			comment_notif_ctsk_ID      INT(10) unsigned NULL DEFAULT NULL COMMENT 'When notifications for this comment are sent through a scheduled job, what is the job ID?',
 			PRIMARY KEY comment_ID (comment_ID),
 			KEY comment_post_ID (comment_post_ID),
 			KEY comment_date (comment_date),
@@ -395,6 +399,9 @@ $schema_queries = array_merge( $schema_queries, array(
 
 /*
  * $Log$
+ * Revision 1.42  2011/09/22 05:03:11  efy-yurybakh
+ * 4 new fileds in the table T_comments
+ *
  * Revision 1.41  2011/09/22 03:20:54  fplanque
  * minor
  *
