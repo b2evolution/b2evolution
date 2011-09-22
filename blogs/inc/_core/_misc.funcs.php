@@ -2796,6 +2796,7 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $w
 			$link_attribs['class'] .= ' rollover';
 		}
 	}
+	$link_attribs['class'] .= $icon != '' ? ' '.$icon : ' noicon';
 
 	// "use_js_popup": open link in a JS popup
 	// TODO: this needs to be rewritten with jQuery instead
@@ -2842,7 +2843,7 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $w
 	{	// We MUST display an action icon in order to make the user happy:
 		// OR we default to icon because the user doesn't want the word either!!
 
-		if( $icon_s = get_icon( $icon, 'imgtag', array( 'title'=>$title ), true ) )
+		if( $icon_s = get_icon( $icon, 'sprite', array( 'title'=>$title ), true ) )
 		{
 			$r .= $icon_s;
 		}
@@ -3053,6 +3054,14 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			{ // This icon should be included into the legend:
 				$IconLegend->add_icon( $iconKey );
 			}
+
+			return $r;
+			/* BREAK */
+
+
+		case 'sprite':
+			if( $iconKey != 'new' && $iconKey != 'refresh' )
+				$r = '&nbsp;';
 
 			return $r;
 			/* BREAK */
@@ -4355,6 +4364,9 @@ if( !function_exists( 'property_exists' ) )
 
 /*
  * $Log$
+ * Revision 1.270  2011/09/22 11:40:18  efy-yurybakh
+ * icons in a single sprite
+ *
  * Revision 1.269  2011/09/22 08:55:00  efy-asimo
  * Login problems with multidomain installs - fix
  *
