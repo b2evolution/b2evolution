@@ -102,6 +102,44 @@ switch( $action )
 		// We have EXITed already at this point!!
 		break;
 
+	case 'enable_country_pref':
+	case 'disable_country_pref':
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'country' );
+
+		// Disable a country only if it is enabled, and user has edit access.
+		$current_User->check_perm( 'options', 'edit', true );
+
+		// Make sure the country information was loaded. If not, just exit with error.
+		if( empty($edited_Country) )
+		{
+			$Messages->add( sprintf( 'The country with ID %d could not be instantiated.', $ctry_ID ), 'error' );
+			break;
+		}
+
+		if ( $action == 'disable_country_pref' )
+		{	// Disable this country by setting flag to false.
+			$edited_Country->set( 'preferred', 0 );
+			$Messages->add( sprintf( T_('Disable country preference (%s, #%d).'), $edited_Country->name, $edited_Country->ID ), 'success' );
+		}
+		elseif ( $action == 'enable_country_pref' )
+		{	// Enable country by setting flag to true.
+			$edited_Country->set( 'preferred', 1 );
+			$Messages->add( sprintf( T_('Enabled country preference (%s, #%d).'), $edited_Country->name, $edited_Country->ID ), 'success' );
+		}
+
+		// Update db with new flag value.
+		$edited_Country->dbupdate();
+
+		param( 'results_ctry_page', integer, '', true );
+		param( 'results_ctry_order', string, '', true );
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( regenerate_url( '', '', '', '&' ), 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
+
 	case 'new':
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
@@ -311,6 +349,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2011/09/22 13:03:11  efy-vitalij
+ * add country pref column, clickable En column in countries and currencies results  tables
+ *
  * Revision 1.16  2011/09/13 15:31:34  fplanque
  * Enhanced back-office navigation.
  *

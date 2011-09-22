@@ -59,15 +59,23 @@ $Results->title = T_('Currencies list').get_manual_link('currencies_list');
  */
 function curr_td_enabled( $curr_enabled, $curr_ID )
 {
+	global $dispatcher;
+
+	$r = '';
 
 	if( $curr_enabled == true )
 	{
-		return get_icon('enabled', 'imgtag', array('title'=>T_('The currency is enabled.')) );
+		$r .= action_icon( T_('Disable the currency!'), 'bullet_full',
+										regenerate_url( 'action', 'action=disable_currency&amp;curr_ID='.$curr_ID.'&amp;'.url_crumb('currency') ) );
 	}
 	else
 	{
-		return get_icon('disabled', 'imgtag', array('title'=>T_('The currency is disabled.')) );
+		$r .= action_icon( T_('Enable the currency!'), 'bullet_empty',
+										regenerate_url( 'action', 'action=enable_currency&amp;curr_ID='.$curr_ID.'&amp;'.url_crumb('currency') ) );
 	}
+
+	return $r;
+
 }
 $Results->cols[] = array(
 		'th' => /* TRANS: shortcut for enabled */ T_('En'),
@@ -172,6 +180,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.14  2011/09/22 13:03:11  efy-vitalij
+ * add country pref column, clickable En column in countries and currencies results  tables
+ *
  * Revision 1.13  2010/03/01 07:52:51  efy-asimo
  * Set manual links to lowercase
  *

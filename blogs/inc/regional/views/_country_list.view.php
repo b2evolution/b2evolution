@@ -41,7 +41,7 @@ $s = param( 's', 'string', '', true );
 
 // Create query
 $SQL = new SQL();
-$SQL->SELECT( 'ctry_ID, ctry_code, ctry_name, curr_shortcut, curr_code, ctry_enabled' );
+$SQL->SELECT( 'ctry_ID, ctry_code, ctry_name, curr_shortcut, curr_code, ctry_enabled, ctry_preferred' );
 $SQL->FROM( 'T_country	LEFT JOIN T_currency ON ctry_curr_ID=curr_ID' );
 
 if( !empty($s) )
@@ -61,21 +61,61 @@ $Results->title = T_('Countries list').get_manual_link('countries_list');
 function ctry_td_enabled( $ctry_enabled, $ctry_ID )
 {
 
+	global $dispatcher;
+
+	$r = '';
+
 	if( $ctry_enabled == true )
 	{
-		return get_icon('enabled', 'imgtag', array('title'=>T_('The country is enabled.')) );
+		$r .= action_icon( T_('Disable the country!'), 'bullet_full',
+										regenerate_url( 'action', 'action=disable_country&amp;ctry_ID='.$ctry_ID.'&amp;'.url_crumb('country') ) );
 	}
 	else
 	{
-		return get_icon('disabled', 'imgtag', array('title'=>T_('The country is disabled.')) );
+		$r .= action_icon( T_('Enable the country!'), 'bullet_empty',
+										regenerate_url( 'action', 'action=enable_country&amp;ctry_ID='.$ctry_ID.'&amp;'.url_crumb('country') ) );
 	}
+	return $r;
+
 }
+
+function ctry_td_preferred( $ctry_preferred, $ctry_ID )
+{
+
+	global $dispatcher;
+
+	$r = '';
+
+	if( $ctry_preferred == true )
+	{
+		$r .= action_icon( T_('Disable country preference!'), 'bullet_full',
+										regenerate_url( 'action', 'action=disable_country_pref&amp;ctry_ID='.$ctry_ID.'&amp;'.url_crumb('country') ) );
+	}
+	else
+	{
+		$r .= action_icon( T_('Enable the preference!'), 'bullet_empty',
+										regenerate_url( 'action', 'action=enable_country_pref&amp;ctry_ID='.$ctry_ID.'&amp;'.url_crumb('country') ) );
+	}
+	return $r;
+
+}
+
+
+
 $Results->cols[] = array(
 		'th' => /* TRANS: shortcut for enabled */ T_('En'),
 		'order' => 'ctry_enabled',
-		'td' => '%ctry_td_enabled( #ctry_enabled#, #ctry_ID# )%',
+		'td' => '%ctry_td_enabled( #ctry_enabled# , #ctry_ID# )%',
 		'td_class' => 'center'
 	);
+
+$Results->cols[] = array(
+		'th' => /* TRANS: shortcut for enabled */ T_('Preferred'),
+		'order' => 'ctry_preferred',
+		'td' => '%ctry_td_preferred( #ctry_preferred# , #ctry_ID# )%',
+		'td_class' => 'center'
+	);
+
 
 /**
  * Callback to add filters on top of the result set
@@ -217,6 +257,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.21  2011/09/22 13:03:11  efy-vitalij
+ * add country pref column, clickable En column in countries and currencies results  tables
+ *
  * Revision 1.20  2010/03/01 07:52:51  efy-asimo
  * Set manual links to lowercase
  *
