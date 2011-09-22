@@ -2499,7 +2499,7 @@ class Item extends ItemLight
 			}
 			$table .= '<tr>
 				<th>'.$r.' '.T_('star').':</th>
-				<td class="progress"><div style="width:'.$star_average.'%">'.$star_average.'</div></td>
+				<td class="progress"><div style="width:'.$star_average.'%">&nbsp;</div></td>
 				<td>'.$star_value.'</td>
 			<tr>';
 		}
@@ -4869,6 +4869,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.254  2011/09/22 05:25:35  efy-yurybakh
+ * fix ratings CSS
+ *
  * Revision 1.253  2011/09/22 04:48:07  efy-yurybakh
  * get ratings by one sql query with "group"
  * remove <noscript> for jquery ratings plugin

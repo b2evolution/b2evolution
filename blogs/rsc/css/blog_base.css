@@ -273,8 +273,6 @@ table.rating_summary .progress{
 }
 table.rating_summary .progress div{
 	background: #ffcc66;
-	color: #ffcc66;
-	overflow: hidden;
 }
 table.rating_summary td{
 	text-align: right;
