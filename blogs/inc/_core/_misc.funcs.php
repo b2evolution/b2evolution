@@ -3060,6 +3060,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 
 
 		case 'sprite':
+			$r = '';
 			if( $iconKey != 'new' && $iconKey != 'refresh' )
 				$r = '&nbsp;';
 
@@ -4364,6 +4365,9 @@ if( !function_exists( 'property_exists' ) )
 
 /*
  * $Log$
+ * Revision 1.271  2011/09/22 15:07:34  efy-yurybakh
+ * fix notice
+ *
  * Revision 1.270  2011/09/22 11:40:18  efy-yurybakh
  * icons in a single sprite
  *
