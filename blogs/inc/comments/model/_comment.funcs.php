@@ -481,12 +481,13 @@ function echo_disabled_comments( $allow_comments_value, $item_url )
 	$register_link = '';
 	if( ( !$is_logged_in ) && ( $Settings->get( 'newusers_canregister' ) ) )
 	{
-		$register_link = get_user_register_link( '', '', T_( 'register now!' ), '', false, $item_url, 'reg to post comment' );
-		$register_link = '<p>'.sprintf(  T_( 'If you have no account yet, you can %s (It only takes a few seconds)' ), $register_link ).'</p>';
+		$register_link = '<p>'.sprintf(  T_( 'If you have no account yet, you can <a href="%s">register now</a>... (It only takes a few seconds!)' ), get_user_register_url( '', 'reg to post comment' ) ).'</p>';
 	}
 
 	// disabled comment form
 	echo '<form class="bComment">';
+
+	echo '<div class="comment_disabled_msg">';
 	if( $is_logged_in )
 	{
 		echo '<p>'.$disabled_text.'</p>';
@@ -496,6 +497,8 @@ function echo_disabled_comments( $allow_comments_value, $item_url )
 		echo '<p>'.$disabled_text.' '.$login_link.'</p>';
 		echo $register_link;
 	}
+	echo '</div>';
+
 	echo '<fieldset>';
 	echo '<div class="label"><label for="p">'.T_( 'Comment text:' ).'</label></div>';
 	echo '<div class="input">';
@@ -510,6 +513,9 @@ function echo_disabled_comments( $allow_comments_value, $item_url )
 
 /*
  * $Log$
+ * Revision 1.34  2011/09/23 01:29:05  fplanque
+ * small changes
+ *
  * Revision 1.33  2011/09/08 23:29:27  fplanque
  * More blockcache/widget fixes around login/register links.
  *

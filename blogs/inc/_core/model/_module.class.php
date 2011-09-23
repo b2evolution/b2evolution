@@ -75,6 +75,20 @@ class Module
 	{
 	}
 
+
+	/**
+	 * Provide translation in teh context of this module:
+	 *
+	 * @param mixed $string
+	 * @param mixed $req_locale
+	 * @return string
+	 */
+	function T_( $string, $req_locale = '' )
+	{
+		return T_( $string, $req_locale );
+	}
+
+
 	/**
 	 * could be used e.g. by a google_analytics plugin to add the javascript snippet
 	 */
@@ -84,8 +98,8 @@ class Module
 
 	/**
 	 * Displays the module's collection feature settings
-	 * 
-	 * @param array 
+	 *
+	 * @param array
 	 * 		array['Form'] - where to display;
 	 * 		array['edited_Blog'] - which blog properties should be displayed;
 	 */
@@ -95,7 +109,7 @@ class Module
 
 	/**
 	 * Updates the module's collection feature settings
-	 * 
+	 *
 	 * @param array
 	 * 		array['edited_Blog'] - which blog properties should be updated;
 	 */
@@ -105,8 +119,8 @@ class Module
 
 	/**
 	 * Displays the module's item settings
-	 * 
-	 * @param array 
+	 *
+	 * @param array
 	 * 		array['Form'] - where to display;
 	 * 		array['Blog'] - which blog item is it;
 	 * 		array['edited_Item'] - which item is it;
@@ -117,7 +131,7 @@ class Module
 
 	/**
 	 * Updates the module's collection feature settings
-	 * 
+	 *
 	 * @param array
 	 * 		array['edited_Item'] - which item setting should be updated;
 	 */
@@ -173,17 +187,8 @@ class Module
 
 /*
  * $Log$
- * Revision 1.8  2011/09/09 22:01:05  fplanque
- * doc
- *
- * Revision 1.7  2011/09/07 07:29:38  efy-asimo
- * module class improvements
- *
- * Revision 1.6  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.5  2010/05/02 19:50:51  fplanque
- * no message
+ * Revision 1.9  2011/09/23 01:29:04  fplanque
+ * small changes
  *
  */
 ?>

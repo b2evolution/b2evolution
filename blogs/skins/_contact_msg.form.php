@@ -73,6 +73,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.7  2011/09/23 01:29:05  fplanque
+ * small changes
+ *
  * Revision 1.6  2011/09/22 08:55:00  efy-asimo
  * Login problems with multidomain installs - fix
  *
@@ -92,3 +95,4 @@ $Form->end_form();
  * Use ajax to display comment and contact forms
  *
  */
+?>

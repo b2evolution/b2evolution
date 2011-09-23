@@ -2963,7 +2963,7 @@ function upgrade_b2evo_tables()
 		task_begin( 'Upgrading settings table... ');
 		$DB->query( 'INSERT INTO T_settings (set_name, set_value)
 						VALUES ( "smart_hit_count", 1 )' );
-		$DB->query( 'ALTER TABLE T_coll_settings 
+		$DB->query( 'ALTER TABLE T_coll_settings
 									CHANGE COLUMN cset_value cset_value   VARCHAR( 10000 ) NULL COMMENT "The AdSense plugin wants to store very long snippets of HTML"' );
   	task_end();
 
@@ -3049,7 +3049,7 @@ function upgrade_b2evo_tables()
 	          isrch_hit_ID bigint(20) NOT NULL,
 	          isrch_keywords varchar(255) NOT NULL,
 	          PRIMARY KEY (isrch_ID)
-	        ) ENGINE=MyISAM DEFAULT CHARSET = '.$db_storage_charset );
+	        ) ENGINE = MyISAM' );
 		task_end();
 
 		set_upgrade_checkpoint( '10300' );
@@ -3221,6 +3221,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.416  2011/09/23 01:29:04  fplanque
+ * small changes
+ *
  * Revision 1.415  2011/09/20 17:36:59  fplanque
  * no message
  *

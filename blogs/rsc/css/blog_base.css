@@ -186,6 +186,11 @@ form.bComment fieldset div.avatartag
 	padding: 0;
 }
 
+.comment_disabled_msg {
+	text-align: center;
+	color: #e00;
+}
+
 /* Avatar widget */
 div.widget_core_coll_avatar {
 	margin-top: 1em;
