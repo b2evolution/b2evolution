@@ -105,15 +105,17 @@ function ctry_td_preferred( $ctry_preferred, $ctry_ID )
 $Results->cols[] = array(
 		'th' => /* TRANS: shortcut for enabled */ T_('En'),
 		'order' => 'ctry_enabled',
-		'td' => '%ctry_td_enabled( #ctry_enabled# , #ctry_ID# )%',
-		'td_class' => 'center'
+		'td' => '%ctry_td_enabled( #ctry_enabled#, #ctry_ID# )%',
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'shrinkwrap'
 	);
 
 $Results->cols[] = array(
 		'th' => /* TRANS: shortcut for enabled */ T_('Preferred'),
 		'order' => 'ctry_preferred',
 		'td' => '%ctry_td_preferred( #ctry_preferred# , #ctry_ID# )%',
-		'td_class' => 'center'
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'shrinkwrap'
 	);
 
 
@@ -257,6 +259,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.22  2011/09/23 14:23:43  fplanque
+ * no message
+ *
  * Revision 1.21  2011/09/22 13:03:11  efy-vitalij
  * add country pref column, clickable En column in countries and currencies results  tables
  *
