@@ -72,13 +72,39 @@ function stat_session_login( $login )
 		return '<span class="note">'.T_('Anon.').'</span>';
 	}
 
-	return '<span class="nowrap">'.get_avatar_imgtag( $login, false )
-			.' <strong><a href="?ctrl=stats&amp;tab=sessions&amp;tab3=sessid&amp;user='.$login.'">'.$login.'</a></strong></span>';
+	return get_user_identity_link( $login, NULL, 'admin' );
+}
+
+
+/**
+ * Display user sessions
+ * 
+ * @param string user login
+ * @param string link text
+ */
+function stat_user_sessions( $login,  $link_text )
+{
+	return '<strong><a href="?ctrl=stats&amp;tab=sessions&amp;tab3=sessid&amp;user='.$login.'">'.$link_text.'</a></strong>';
+}
+
+
+/**
+ * Display session hits
+ * 
+ * @param string session ID
+ * @param string link text
+ */
+function stat_session_hits( $sess_ID,  $link_text )
+{
+	return '<strong><a href="?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0&amp;sess_ID='.$sess_ID.'">'.$link_text.'</a></strong>';
 }
 
 
 /*
  * $Log$
+ * Revision 1.16  2011/09/23 07:41:57  efy-asimo
+ * Unified usernames everywhere in the app - first part
+ *
  * Revision 1.15  2011/09/17 02:31:59  fplanque
  * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
  *

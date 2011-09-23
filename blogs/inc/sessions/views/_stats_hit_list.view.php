@@ -94,11 +94,19 @@ $Results->filter_area = array(
 		)
 	);
 
+if( $sess_ID == NULL )
+{
+	$session_link = '%stat_session_hits( #sess_ID#, #sess_ID# )%';
+}
+else
+{
+	$session_link = '<a href="?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0" title="'.T_( 'Show all sessions' ).'">$sess_ID$</a>';
+}
 $Results->cols[] = array(
 		'th' => T_('Session'),
 		'order' => 'hit_sess_ID',
 		'td_class' => 'right',
-		'td' => '<a href="?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0&amp;sess_ID=$sess_ID$">$sess_ID$</a>',
+		'td' => $session_link,
 	);
 
 $Results->cols[] = array(
@@ -182,6 +190,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.15  2011/09/23 07:41:57  efy-asimo
+ * Unified usernames everywhere in the app - first part
+ *
  * Revision 1.14  2011/09/04 22:13:18  fplanque
  * copyright 2011
  *

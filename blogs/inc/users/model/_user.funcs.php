@@ -529,29 +529,132 @@ function get_user_preferences_url()
 
 
 /**
+ * Get User identity link. User is given with his login or ID. User login or ID must be set.
+ *  
+ * @param string User login ( can be NULL if ID is set )
+ * @param integer User ID ( can be NULL if login is set )
+ * @param string On which user profile tab should this link point to
+ * @return NULL|string NULL if this user or the profile tab doesn't exists, the identity link otherwise.
+ */
+function get_user_identity_link( $user_login, $user_ID = NULL, $profile_tab = 'profile' )
+{
+	$UserCache = & get_UserCache();
+
+	if( empty( $user_login ) )
+	{
+		if( $user_ID == NULL )
+		{
+			return NULL;
+		}
+		$User = & $UserCache->get_by_ID( $user_ID );
+	}
+	else
+	{
+		$User = & $UserCache->get_by_login( $user_login );
+	}
+
+	if( $User == false )
+	{
+		return NULL;
+	}
+
+	return $User->get_identity_link( $profile_tab );
+}
+
+
+/**
+ * Get the available user display url
+ * 
+ * @param integer user ID
+ */
+function get_user_identity_url ( $user_ID = NULL, $profile_tab, $redirect_to = NULL )
+{
+	global $current_User;
+
+	if( $user_ID == NULL )
+	{
+		if( isset( $current_User ) )
+		{
+			$user_ID = $current_User->ID;
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+
+	if( $redirect_to == NULL )
+	{
+		$redirect_to = rawurlencode( regenerate_url( '','','','&' ) );
+	}
+
+	if( ( !isset( $current_User ) ) || 
+		( ( $user_ID != NULL ) && ( $current_User->ID != $user_ID ) && ( ! $current_User->check_perm( 'users', 'view' ) ) ) )
+	{ // user is not logged in or current User is not the same as requested user, and current User doesn't have users view permission
+		if( empty( $Blog ) )
+		{ // Incorrect state
+			return NULL;
+		}
+		else
+		{ // can't display the profile form, display the front office User form
+			return url_add_param( $Blog->gen_blogurl().'?disp=user&amp;user_ID='.$user_ID, 'redirect_to='.$redirect_to );
+		}
+	}
+
+	// return the corresponding user profile tab url
+	return url_add_param( get_user_settings_url( $profile_tab, $user_ID ), 'redirect_to='.$redirect_to );
+}
+
+
+/**
  * Get URL to a specific user settings tab (profile, avatar, pwdchange, userprefs)
  *
  * @param string user tab
+ * @param integer user ID for the requested user. If isn't set then return $current_User settings url.
  */
-function get_user_settings_url( $user_tab )
+function get_user_settings_url( $user_tab, $user_ID = NULL )
 {
 	global $current_User, $Blog, $is_admin_page, $admin_url, $ReqURI;
 
-	if( ! in_array( $user_tab, array( 'profile', 'avatar', 'pwdchange', 'userprefs' ) ) )
+	if( !is_logged_in() )
+	{
+		debug_die( 'Active user not found.' );
+	}
+
+	if( in_array( $user_tab, array( 'advanced', 'admin', 'blogs' ) ) )
+	{
+		$is_admin_tab = true;
+	}
+	else
+	{
+		$is_admin_tab = false;
+	}
+
+	if( ( !$is_admin_tab ) && ( ! in_array( $user_tab, array( 'profile', 'avatar', 'pwdchange', 'userprefs' ) ) ) )
 	{
 		debug_die( 'Not supported user tab!' );
 	}
 
-	if( $is_admin_page || empty( $Blog ) )
+	if( $user_ID == NULL )
 	{
-		$url = $admin_url.'?ctrl=user&amp;user_tab='.$user_tab.'&amp;user_ID='.$current_User->ID;
-	}
-	else
-	{
-		$url = url_add_param( $Blog->gen_blogurl(), 'disp='.$user_tab );
+		$user_ID = $current_User->ID;
 	}
 
-	return $url;
+	if( $is_admin_page || $is_admin_tab || empty( $Blog ) || $current_User->ID != $user_ID )
+	{
+		if( ( $current_User->ID != $user_ID ) && ( ! $current_User->check_perm( 'users', 'view' ) ) )
+		{
+			return NULL;
+		}
+		$current_User->get_Group();
+		if( ( $user_tab == 'admin' ) && ( $current_User->Group->ID != 1 ) )
+		{
+			$user_tab = 'profile';
+		}
+		return $admin_url.'?ctrl=user&amp;user_tab='.$user_tab.'&amp;user_ID='.$current_User->ID;
+	}
+
+	return url_add_param( $Blog->gen_blogurl(), 'disp='.$user_tab );
 }
 
 
@@ -883,7 +986,13 @@ function echo_user_actions( $Form, $edited_User, $action )
 	{
 		$Form->global_icon( T_('Compose message'), 'comments', '?ctrl=threads&action=new&user_login='.$edited_User->login );
 	}
-	$Form->global_icon( ( $action != 'view' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', regenerate_url( 'user_ID,action,ctrl', 'ctrl=users' ) );
+
+	$redirect_to = get_param( 'redirect_to' );
+	if( $redirect_to == NULL )
+	{
+		$redirect_to = regenerate_url( 'user_ID,action,ctrl', 'ctrl=users' );
+	}
+	$Form->global_icon( ( $action != 'view' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', $redirect_to );
 }
 
 
@@ -1065,6 +1174,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.59  2011/09/23 07:41:57  efy-asimo
+ * Unified usernames everywhere in the app - first part
+ *
  * Revision 1.58  2011/09/22 08:55:00  efy-asimo
  * Login problems with multidomain installs - fix
  *

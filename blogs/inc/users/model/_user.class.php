@@ -725,6 +725,34 @@ class User extends DataObject
 
 
 	/**
+	 * Get User identity link, which is a composite of user avatar and login, both point to the specific user profile tab.
+	 * 
+	 * @param string On which user profile tab should this link point to
+	 * @return string User avatar and login if the identity link is not available, the identity link otherwise.
+	 */
+	function get_identity_link( $profile_tab = 'profile' )
+	{
+		$identity_url = get_user_identity_url( $this->ID, $profile_tab );
+
+		$avatar_tag = $this->get_avatar_imgtag( 'crop-15x15', 'avatar_before_login' );
+
+		if( empty( $identity_url ) )
+		{
+			return $avatar_tag.' '.$this->login;
+		}
+
+		$link_title = T_( 'Show the user profile' );
+		if( !empty( $avatar_tag ) )
+		{
+			$avatar_tag = '<a href="'.$identity_url.'" title="'.$link_title.'">'.$avatar_tag.'</a>';
+		}
+
+		$login_link = '<a href="'.$identity_url.'" title="'.$link_title.'">'.$this->login.'</a>';
+		return $avatar_tag.$login_link;
+	}
+
+
+	/**
 	 * Get Country object
 	 */
 	function & get_Country()
@@ -2521,6 +2549,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.125  2011/09/23 07:41:57  efy-asimo
+ * Unified usernames everywhere in the app - first part
+ *
  * Revision 1.124  2011/09/22 12:55:56  efy-vitalij
  * add current password input
  *

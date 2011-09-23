@@ -18,6 +18,7 @@ $AdminUI->set_path( 'users', 'users' );
 param_action();
 
 param( 'user_ID', 'integer', NULL );	// Note: should NOT be memorized (would kill navigation/sorting) use memorize_param() if needed
+param( 'redirect_to', 'string', NULL );
 
 /**
  * @global boolean true, if user is only allowed to edit his profile
@@ -442,6 +443,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.35  2011/09/23 07:41:57  efy-asimo
+ * Unified usernames everywhere in the app - first part
+ *
  * Revision 1.34  2011/09/17 02:32:00  fplanque
  * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
  *

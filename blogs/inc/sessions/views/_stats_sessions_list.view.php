@@ -101,9 +101,9 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 						'th' => T_('Hit count'),
 						'order' => 'sess_hitcount',
-						'td_class' => 'right',
+						'td_class' => 'center',
 						'total_class' => 'right',
-						'td' => '$sess_hitcount$',
+						'td' => '%stat_session_hits( #sess_ID#, #sess_hitcount# )%',
 					);
 
 // Display results:
@@ -111,6 +111,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.11  2011/09/23 07:41:57  efy-asimo
+ * Unified usernames everywhere in the app - first part
+ *
  * Revision 1.10  2011/09/04 22:13:18  fplanque
  * copyright 2011
  *

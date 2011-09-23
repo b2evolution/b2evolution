@@ -64,9 +64,9 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 						'th' => T_('Session count'),
 						'order' => 'nb_sessions',
-						'td_class' => 'right',
+						'td_class' => 'center',
 						'total_class' => 'right',
-						'td' => '$nb_sessions$',
+						'td' => '%stat_user_sessions( #user_login#, #nb_sessions# )%',
 					);
 
 // Display results:
@@ -74,6 +74,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.14  2011/09/23 07:41:57  efy-asimo
+ * Unified usernames everywhere in the app - first part
+ *
  * Revision 1.13  2011/09/04 22:13:18  fplanque
  * copyright 2011
  *
