@@ -4392,6 +4392,9 @@ if( !function_exists( 'property_exists' ) )
 
 /*
  * $Log$
+ * Revision 1.278  2011/09/23 23:24:53  sam2kb
+ * No new line at end of file
+ *
  * Revision 1.277  2011/09/23 23:08:51  sam2kb
  * New content format "htmlfeed" for use in XML feed tags <content:encoded> & <content type="html">
  *
