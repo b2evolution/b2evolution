@@ -121,12 +121,12 @@ switch( $action )
 		if ( $action == 'disable_country_pref' )
 		{	// Disable this country by setting flag to false.
 			$edited_Country->set( 'preferred', 0 );
-			$Messages->add( sprintf( T_('Disable country preference (%s, #%d).'), $edited_Country->name, $edited_Country->ID ), 'success' );
+			$Messages->add( sprintf( T_('Removed from preferred countries (%s, #%d).'), $edited_Country->name, $edited_Country->ID ), 'success' );
 		}
 		elseif ( $action == 'enable_country_pref' )
 		{	// Enable country by setting flag to true.
 			$edited_Country->set( 'preferred', 1 );
-			$Messages->add( sprintf( T_('Enabled country preference (%s, #%d).'), $edited_Country->name, $edited_Country->ID ), 'success' );
+			$Messages->add( sprintf( T_('Added to preferred countries (%s, #%d).'), $edited_Country->name, $edited_Country->ID ), 'success' );
 		}
 
 		// Update db with new flag value.
@@ -349,6 +349,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2011/09/23 18:02:10  fplanque
+ * minor
+ *
  * Revision 1.18  2011/09/23 11:49:48  efy-vitalij
  * fix country enable/prefer bug, add preferred property to Country class
  *

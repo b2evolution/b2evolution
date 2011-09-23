@@ -778,8 +778,8 @@ class DataObjectCache
 		return $r;
 	}
 
-		/**
-	 * Returns form option list with cache contents grouped by country preff
+	/**
+	 * Returns form option list with cache contents grouped by country preference
 	 *
 	 * Load the cache if necessary
 	 *
@@ -927,6 +927,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.29  2011/09/23 18:02:10  fplanque
+ * minor
+ *
  * Revision 1.28  2011/09/23 12:09:50  efy-vitalij
  * add get_group_country_option_list function for generation countries select list with groups
  *

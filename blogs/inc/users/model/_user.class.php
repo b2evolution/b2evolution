@@ -473,7 +473,7 @@ class User extends DataObject
 
 		if( $is_password_form &&  !($is_identity_form || $is_new_user || $has_full_access) )
 		{
-		// ******* Password edit form ****** //
+			// ******* Password edit form ****** //
 			param( 'edited_user_pass1', 'string', true );
 			$edited_user_pass2 = param( 'edited_user_pass2', 'string', true );
 
@@ -487,10 +487,10 @@ class User extends DataObject
 			else
 			{
 
-				if ( $this->pass == md5($current_user_pass))
+				if( $this->pass == md5($current_user_pass) )
 				{
 					if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') ) )
-					{ 	// We can set password
+					{ // We can set password
 						$this->set( 'pass', md5( $edited_user_pass2 ) );
 					}
 				}
@@ -500,8 +500,6 @@ class User extends DataObject
 					param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') );
 				}
 			}
-
-
 
 		}
 
@@ -2559,6 +2557,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.127  2011/09/23 18:02:09  fplanque
+ * minor
+ *
  * Revision 1.126  2011/09/23 11:57:28  efy-vitalij
  * add admin functionality to password change form and edit validate messages in password edit form
  *
