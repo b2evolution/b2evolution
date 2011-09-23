@@ -33,6 +33,8 @@
 # This will add support for URLs like:  http://example.com/2006/08/29/post-title
 <IfModule mod_rewrite.c>
 	RewriteEngine On
+	php_value display_errors On
+	php_value error_reporting E_ALL
 
 	# This line may be needed or not.
 	# enabling this would prevent running ina subdir like /blog/index.php
