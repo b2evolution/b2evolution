@@ -778,6 +778,111 @@ class DataObjectCache
 		return $r;
 	}
 
+		/**
+	 * Returns form option list with cache contents grouped by country preff
+	 *
+	 * Load the cache if necessary
+	 *
+	 * @param integer|array selected ID(s) (list for multi-selects)
+	 * @param boolean provide a choice for "none" with ID ''
+	 * @param string Callback method name
+	 * @param array IDs to ignore.
+	 * @return string
+	 */
+	function get_group_country_option_list( $default = 0, $allow_none = false, $method = 'get_name', $ignore_IDs = array() )
+	{
+		if( !is_array( $default ) )
+		{
+			$default = array( $default );
+		}
+
+		if( ! $this->all_loaded && $this->load_all )
+		{ // We have not loaded all items so far, but we're allowed to.
+			if ( empty( $ignore_IDs ) )
+			{	// just load all items
+				$this->load_all();
+			}
+			else
+			{	// only load those items not listed in $ignore_IDs
+				$this->load_list( $ignore_IDs, true );
+			}
+		}
+
+		$r = '';
+
+		if( $allow_none )
+		{
+			$r .= '<option value="'.$this->none_option_value.'"';
+			if( empty($default) ) $r .= ' selected="selected"';
+			$r .= '>'.format_to_output($this->none_option_text).'</option>'."\n";
+		}
+
+		$group = array();
+		$ungroup = array();
+
+		foreach( $this->cache as $loop_Obj )
+		{
+			if ( in_array( $loop_Obj->ID, $ignore_IDs ) )
+			{	// Ignore this ID
+				continue;
+			}
+
+			if ($loop_Obj->preferred == 1)
+			{
+				$group[] = $loop_Obj;
+			}
+			else
+			{
+				$ungroup[] = $loop_Obj;
+			}
+		}
+
+		if(count($group))
+		{
+			$r .= '<optgroup label="Frequent countries">';
+			foreach( $group as $loop_Obj )
+			{
+				$r .=  '<option value="'.$loop_Obj->ID.'"';
+				if( in_array( $loop_Obj->ID, $default ) ) $r .= ' selected="selected"';
+				$r .= '>';
+				$r .= format_to_output( $loop_Obj->$method(), 'htmlbody' );
+				$r .=  '</option>'."\n";
+			}
+			$r .= '</optgroup>';
+
+			if(count($ungroup))
+			{
+				$r .= '<optgroup label="Other countries">';
+				foreach( $ungroup as $loop_Obj )
+				{
+					$r .=  '<option value="'.$loop_Obj->ID.'"';
+					if( in_array( $loop_Obj->ID, $default ) ) $r .= ' selected="selected"';
+					$r .= '>';
+					$r .= format_to_output( $loop_Obj->$method(), 'htmlbody' );
+					$r .=  '</option>'."\n";
+				}
+				$r .= '</optgroup>';
+			}
+
+		}
+		else
+		{
+			foreach( $ungroup as $loop_Obj )
+			{
+				$r .=  '<option value="'.$loop_Obj->ID.'"';
+				if( in_array( $loop_Obj->ID, $default ) ) $r .= ' selected="selected"';
+				$r .= '>';
+				$r .= format_to_output( $loop_Obj->$method(), 'htmlbody' );
+				$r .=  '</option>'."\n";
+			}
+		}
+
+	
+
+		return $r;
+	}
+
+
 
 	/**
 	 * Returns option array with cache contents
@@ -822,6 +927,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.28  2011/09/23 12:09:50  efy-vitalij
+ * add get_group_country_option_list function for generation countries select list with groups
+ *
  * Revision 1.27  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *
