@@ -2906,12 +2906,17 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 	}
 
 	$icon = get_icon_info($iconKey);
-	if( ! $icon /*|| ( ! isset( $icon['file'] ) && $what != 'imgtag' )*/ )
+	if( ! $icon )
 	{
 		$Debuglog->add('No image defined for '.var_export( $iconKey, true ).'!', 'icons');
 		return false;
 	}
-
+	
+	if( !isset( $icon['file'] ) && $what != 'imgtag' )
+	{
+		$icon['file'] = 'icons/icons_sprite.png';
+	}
+	
 	switch( $what )
 	{
 		case 'rollover':
@@ -2969,11 +2974,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			/* BREAK */
 
 		case 'url':
-			//fp>yuiry: TODO: THIS IS BROKEN:
-			// (I'm adding code to remove notices but this need a real fix)
-			if(isset($icon['file']))
-				return $rsc_uri.$icon['file'];
-			return $rsc_uri; // BROKEN
+			return $rsc_uri.$icon['file'];
 			/* BREAK */
 
 		case 'size':
@@ -4384,6 +4385,9 @@ if( !function_exists( 'property_exists' ) )
 
 /*
  * $Log$
+ * Revision 1.274  2011/09/23 16:15:14  efy-yurybakh
+ * fix "notice"
+ *
  * Revision 1.273  2011/09/23 14:01:58  fplanque
  * Quick/temporary fixes so we can work in the meantime
  *
