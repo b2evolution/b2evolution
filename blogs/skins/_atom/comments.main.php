@@ -100,7 +100,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			$content = excerpt($content);
 		}
 		?>
-		<content type="html"><![CDATA[<?php echo make_rel_links_abs($content); ?>]]></content>
+		<content type="html"><![CDATA[<?php echo format_to_output( $content, 'htmlfeed' ); ?>]]></content>
 	</entry>
 	<?php
 	} // End of comment loop.

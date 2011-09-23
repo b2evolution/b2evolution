@@ -1298,7 +1298,7 @@ class Plugins
 		$params['data'] = & $content;
 		$params['format'] = $format;
 
-		if( $format == 'htmlbody' || $format == 'entityencoded' )
+		if( in_array( $format, array('htmlbody','htmlfeed','entityencoded') ) )
 		{
 			$event = $event_prefix.'ItemAsHtml'; // 'RenderItemAsHtml'/'DisplayItemAsHtml'
 		}
@@ -1935,6 +1935,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.23  2011/09/23 23:16:01  sam2kb
+ * New content format "htmlfeed" for use in XML feed tags <content:encoded> & <content type="html">
+ *
  * Revision 1.22  2011/09/04 22:13:18  fplanque
  * copyright 2011
  *

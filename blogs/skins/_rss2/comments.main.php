@@ -101,7 +101,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 				$content = excerpt($content);
 			}
 			?><description><?php echo make_rel_links_abs( format_to_output( $content, 'entityencoded' ) ); ?></description>
-			<content:encoded><![CDATA[<?php echo make_rel_links_abs($content); ?>]]></content:encoded>
+			<content:encoded><![CDATA[<?php echo format_to_output( $content, 'htmlfeed' ); ?>]]></content:encoded>
 			<link><?php $Comment->permanent_url() ?></link>
 		</item>
 		<?php } /* End of comment loop. */ ?>

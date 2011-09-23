@@ -141,20 +141,14 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 					) );
 			?></description>
 			<content:encoded><![CDATA[<?php
-				$content = $Item->get_excerpt( 'htmlbody' );
-
-				// fp> this is another one of these "oooooh it's just a tiny little change"
-				// and "we only need to make the links absolute in RSS"
-				// and then you get half baked code! The URL LINK stays RELATIVE!! :((
-				// TODO: clean solution : work in format_to_output! --- we probably need 'htmlfeed' as 'htmlbody+absolute'
-				echo make_rel_links_abs( $content );
+				echo $Item->get_excerpt( 'htmlfeed' );
 
 				// Display Item footer text (text can be edited in Blog Settings):
 				$Item->footer( array(
 						'mode'        => 'xml',
 						'block_start' => '<div class="item_footer">',
 						'block_end'   => '</div>',
-						'format'      => 'htmlbody',
+						'format'      => 'htmlfeed',
 					) );
 			?>]]></content:encoded>
 					<?php
@@ -218,13 +212,14 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			<content:encoded><![CDATA[<?php
 				// URL link, if the post has one:
 				$Item->url_link( array(
-						'before'        => '<p>',
-						'after'         => '</p>',
-						'podcast'       => false,
+						'before'    => '<p>',
+						'after'     => '</p>',
+						'podcast'   => false,
+						'format'    => 'htmlfeed',
 					) );
 
 				// Display images that are linked to this post:
-				$content = $Item->get_images( array(
+				$Item->images( array(
 						'before' =>              '<div>',
 						'before_image' =>        '<div>',
 						'before_image_legend' => '<div><i>',
@@ -232,35 +227,38 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 						'after_image' =>         '</div>',
 						'after' =>               '</div>',
 						'image_size' =>          'fit-320x320'
-					), 'htmlbody' );
+					), 'htmlfeed' );
 
-				$content .= $Item->get_content_teaser( 1, false );
+				$Item->content_teaser( array(
+						'disppage'    => 1,
+						'stripteaser' => false,
+						'format'      => 'htmlfeed',
+					) );
 
 				if( $feed_content == 'normal' )
 				{	// Teasers only
-					$content .= $Item->get_more_link( array(
+					$Item->more_link( array(
 							'before'    => '',
 							'after'     => '',
 							'disppage'  => 1,
+							'format'    => 'htmlfeed',
 						) );
 				}
 				else
 				{	// Full contents
-					$content .= $Item->get_content_extension( 1, true );
+					$Item->content_extension( array(
+							'disppage'    => 1,
+							'force_more'  => true,
+							'format'      => 'htmlfeed',
+						) );
 				}
-
-				// fp> this is another one of these "oooooh it's just a tiny little change"
-				// and "we only need to make the links absolute in RSS"
-				// and then you get half baked code! The URL LINK stays RELATIVE!! :((
-				// TODO: clean solution : work in format_to_output! --- we probably need 'htmlfeed' as 'htmlbody+absolute'
-				echo make_rel_links_abs( $content );
 
 				// Display Item footer text (text can be edited in Blog Settings):
 				$Item->footer( array(
 						'mode'        => 'xml',
 						'block_start' => '<div class="item_footer">',
 						'block_end'   => '</div>',
-						'format'      => 'htmlbody',
+						'format'      => 'htmlfeed',
 					) );
 			?>]]></content:encoded>
 					<?php
