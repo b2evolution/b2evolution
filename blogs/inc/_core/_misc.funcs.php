@@ -2796,7 +2796,7 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $w
 			$link_attribs['class'] .= ' rollover';
 		}
 	}
-	$link_attribs['class'] .= $icon != '' ? ' '.$icon : ' noicon';
+	//$link_attribs['class'] .= $icon != '' ? ' '.$icon : ' noicon';
 
 	// "use_js_popup": open link in a JS popup
 	// TODO: this needs to be rewritten with jQuery instead
@@ -2843,7 +2843,7 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $w
 	{	// We MUST display an action icon in order to make the user happy:
 		// OR we default to icon because the user doesn't want the word either!!
 
-		if( $icon_s = get_icon( $icon, 'sprite', array( 'title'=>$title ), true ) )
+		if( $icon_s = get_icon( $icon, 'imgtag', array( 'title'=>$title ), true ) )
 		{
 			$r .= $icon_s;
 		}
@@ -2906,7 +2906,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 	}
 
 	$icon = get_icon_info($iconKey);
-	if( ! $icon || ! isset( $icon['file'] ) )
+	if( ! $icon /*|| ( ! isset( $icon['file'] ) && $what != 'imgtag' )*/ )
 	{
 		$Debuglog->add('No image defined for '.var_export( $iconKey, true ).'!', 'icons');
 		return false;
@@ -2969,7 +2969,11 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			/* BREAK */
 
 		case 'url':
-			return $rsc_uri.$icon['file'];
+			//fp>yuiry: TODO: THIS IS BROKEN:
+			// (I'm adding code to remove notices but this need a real fix)
+			if(isset($icon['file']))
+				return $rsc_uri.$icon['file'];
+			return $rsc_uri; // BROKEN
 			/* BREAK */
 
 		case 'size':
@@ -3004,66 +3008,81 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 
 
 		case 'imgtag':
-			$r = '<img src="'.$rsc_uri.$icon['file'].'" ';
-
-			if( !$use_strict )
-			{	// Include non CSS fallbacks - transitional only:
-				$r .= 'border="0" align="top" ';
-			}
-
-			// Include class (will default to "icon"):
-			if( ! isset( $params['class'] ) )
-			{
-				if( isset($icon['class']) )
-				{	// This icon has a class
-					$params['class'] = $icon['class'];
+			if( !isset( $icon['file'] ) )
+			{ // Use span tag with sprite intead of img
+				$styles = array();
+				if( isset( $icon['xy'] ) )
+				{ // Set background position in the icons_sprite.png
+					$styles[] = "background-position: -".$icon['xy'][0]."px -".$icon['xy'][1]."px";
 				}
-				else
+				if( isset( $icon['size'] ) )
+				{ // Set width & height
+					if( $icon['size'][0] != 16 )
+					{
+						$styles[] = "width: ".$icon['size'][0]."px";
+					}
+					if( $icon['size'][1] != 16 )
+					{
+						$styles[] = "height: ".$icon['size'][1]."px; line-height: ".$icon['size'][1]."px";
+					}
+				}
+				$styles = count($styles) > 0 ? ' style="'.implode( '; ', $styles).'"' : '';
+				
+				$r = '<span class="icon"'.$styles.'>'.$icon['alt'].'</span>';
+			}
+			else
+			{ // Use img tag
+				$r = '<img src="'.$rsc_uri.$icon['file'].'" ';
+
+				if( !$use_strict )
+				{	// Include non CSS fallbacks - transitional only:
+					$r .= 'border="0" align="top" ';
+				}
+
+				// Include class (will default to "icon"):
+				if( ! isset( $params['class'] ) )
 				{
-					$params['class'] = '';
+					if( isset($icon['class']) )
+					{	// This icon has a class
+						$params['class'] = $icon['class'];
+					}
+					else
+					{
+						$params['class'] = '';
+					}
+				}
+
+				// Include size (optional):
+				if( isset( $icon['size'] ) )
+				{
+					$r .= 'width="'.$icon['size'][0].'" height="'.$icon['size'][1].'" ';
+				}
+
+				// Include alt (XHTML mandatory):
+				if( ! isset( $params['alt'] ) )
+				{
+					if( isset( $icon['alt'] ) )
+					{ // alt-tag from $map_iconfiles
+						$params['alt'] = $icon['alt'];
+					}
+					else
+					{ // $iconKey as alt-tag
+						$params['alt'] = $iconKey;
+					}
+				}
+
+				// Add all the attributes:
+				$r .= get_field_attribs_as_string( $params, false );
+
+				// Close tag:
+				$r .= '/>';
+
+
+				if( $include_in_legend && ( $IconLegend = & get_IconLegend() ) )
+				{ // This icon should be included into the legend:
+					$IconLegend->add_icon( $iconKey );
 				}
 			}
-
-			// Include size (optional):
-			if( isset( $icon['size'] ) )
-			{
-				$r .= 'width="'.$icon['size'][0].'" height="'.$icon['size'][1].'" ';
-			}
-
-			// Include alt (XHTML mandatory):
-			if( ! isset( $params['alt'] ) )
-			{
-				if( isset( $icon['alt'] ) )
-				{ // alt-tag from $map_iconfiles
-					$params['alt'] = $icon['alt'];
-				}
-				else
-				{ // $iconKey as alt-tag
-					$params['alt'] = $iconKey;
-				}
-			}
-
-			// Add all the attributes:
-			$r .= get_field_attribs_as_string( $params, false );
-
-			// Close tag:
-			$r .= '/>';
-
-
-			if( $include_in_legend && ( $IconLegend = & get_IconLegend() ) )
-			{ // This icon should be included into the legend:
-				$IconLegend->add_icon( $iconKey );
-			}
-
-			return $r;
-			/* BREAK */
-
-
-		case 'sprite':
-			$r = '';
-			if( $iconKey != 'new' && $iconKey != 'refresh' )
-				$r = '&nbsp;';
-
 			return $r;
 			/* BREAK */
 
@@ -4365,6 +4384,12 @@ if( !function_exists( 'property_exists' ) )
 
 /*
  * $Log$
+ * Revision 1.273  2011/09/23 14:01:58  fplanque
+ * Quick/temporary fixes so we can work in the meantime
+ *
+ * Revision 1.272  2011/09/23 11:30:51  efy-yurybakh
+ * Make a big sprite with all backoffice icons
+ *
  * Revision 1.271  2011/09/22 15:07:34  efy-yurybakh
  * fix notice
  *

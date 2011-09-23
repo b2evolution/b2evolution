@@ -225,8 +225,8 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_comments__votes' => array(
 		'Creating table for Comments Votes',
 		"CREATE TABLE T_comments__votes (
-			cmvt_cmt_ID  int(11) unsigned NOT NULL,
-			cmvt_user_ID int unsigned NULL default NULL,
+			cmvt_cmt_ID  int(10) unsigned NOT NULL,
+			cmvt_user_ID int(10) unsigned NOT NULL,
 			cmvt_helpful TINYINT(1) NULL DEFAULT NULL,
 			cmvt_spam    TINYINT(1) NULL DEFAULT NULL,
 			PRIMARY KEY (cmvt_cmt_ID, cmvt_user_ID),
@@ -399,6 +399,9 @@ $schema_queries = array_merge( $schema_queries, array(
 
 /*
  * $Log$
+ * Revision 1.43  2011/09/23 14:01:58  fplanque
+ * Quick/temporary fixes so we can work in the meantime
+ *
  * Revision 1.42  2011/09/22 05:03:11  efy-yurybakh
  * 4 new fileds in the table T_comments
  *
