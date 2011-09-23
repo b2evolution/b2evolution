@@ -94,8 +94,8 @@ switch( $action )
 		// Update db with new flag value.
 		$edited_Country->dbupdate();
 
-		param( 'results_ctry_page', integer, '', true );
-		param( 'results_ctry_order', string, '', true );
+		param( 'results_ctry_page', 'integer', '', true );
+		param( 'results_ctry_order', 'string', '', true );
 
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( regenerate_url( '', '', '', '&' ), 303 ); // Will EXIT
@@ -132,8 +132,8 @@ switch( $action )
 		// Update db with new flag value.
 		$edited_Country->dbupdate();
 
-		param( 'results_ctry_page', integer, '', true );
-		param( 'results_ctry_order', string, '', true );
+		param( 'results_ctry_page', 'integer', '', true );
+		param( 'results_ctry_order', 'string', '', true );
 
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( regenerate_url( '', '', '', '&' ), 303 ); // Will EXIT
@@ -349,6 +349,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2011/09/23 11:49:48  efy-vitalij
+ * fix country enable/prefer bug, add preferred property to Country class
+ *
  * Revision 1.17  2011/09/22 13:03:11  efy-vitalij
  * add country pref column, clickable En column in countries and currencies results  tables
  *

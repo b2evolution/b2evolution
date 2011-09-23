@@ -43,6 +43,7 @@ class Country extends DataObject
 	var $name = '';
 	var $curr_ID = '';
 	var $enabled = 1;
+	var $preferred = 0;
 
 	/**
 	 * Constructor
@@ -67,6 +68,7 @@ class Country extends DataObject
 			$this->name          = $db_row->ctry_name;
 			$this->curr_ID       = $db_row->ctry_curr_ID;
 			$this->enabled       = $db_row->ctry_enabled;
+			$this->preferred     = $db_row->ctry_preferred;
 		}
 	}
 
@@ -145,6 +147,9 @@ class Country extends DataObject
 
 /*
  * $Log$
+ * Revision 1.18  2011/09/23 11:49:48  efy-vitalij
+ * fix country enable/prefer bug, add preferred property to Country class
+ *
  * Revision 1.17  2011/09/06 00:54:38  fplanque
  * i18n update
  *

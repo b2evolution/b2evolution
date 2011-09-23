@@ -94,8 +94,8 @@ switch( $action )
 		// Update db with new flag value.
 		$edited_Currency->dbupdate();
 
-		param( 'results_curr_page', integer, '', true );
-		param( 'results_curr_order', string, '', true );
+		param( 'results_curr_page', 'integer', '', true );
+		param( 'results_curr_order', 'string', '', true );
 
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( regenerate_url ( '', '', '', '&' ), 303 ); // Will EXIT
@@ -312,6 +312,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.20  2011/09/23 11:49:48  efy-vitalij
+ * fix country enable/prefer bug, add preferred property to Country class
+ *
  * Revision 1.19  2011/09/13 15:31:34  fplanque
  * Enhanced back-office navigation.
  *
