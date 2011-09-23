@@ -108,3 +108,14 @@ img.rightmargin {
 .ui-effects-transfer {
 	border: 2px solid red;
 }
+
+span.icon{
+	background: url(../icons/icons_sprite.png) no-repeat -112px -48px;
+	width: 16px;
+	height: 16px;
+	line-height: 16px;
+	padding: 0 !important;
+	font-size: 9px;
+	display: inline-table !important;
+	overflow: hidden;
+}

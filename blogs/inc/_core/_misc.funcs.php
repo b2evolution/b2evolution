@@ -3029,7 +3029,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 				}
 				$styles = count($styles) > 0 ? ' style="'.implode( '; ', $styles).'"' : '';
 				
-				$r = '<span class="icon"'.$styles.'>'.$icon['alt'].'</span>';
+				$r = '<span class="icon"'.$styles.' title="'.$icon['alt'].'">&nbsp;</span>';
 			}
 			else
 			{ // Use img tag
@@ -4385,6 +4385,9 @@ if( !function_exists( 'property_exists' ) )
 
 /*
  * $Log$
+ * Revision 1.275  2011/09/23 16:37:08  efy-yurybakh
+ * change a style for the span.icon
+ *
  * Revision 1.274  2011/09/23 16:15:14  efy-yurybakh
  * fix "notice"
  *
