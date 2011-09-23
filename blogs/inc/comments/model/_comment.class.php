@@ -187,6 +187,10 @@ class Comment extends DataObject
 			$this->notif_status = $db_row->comment_notif_status;
 			$this->notif_ctsk_ID = $db_row->comment_notif_ctsk_ID;
 			$this->in_reply_to_cmt_ID = $db_row->comment_in_reply_to_cmt_ID;
+			$this->comment_helpful_addvotes = $db_row->comment_helpful_addvotes;
+			$this->comment_helpful_countvotes = $db_row->comment_helpful_countvotes;
+			$this->comment_spam_addvotes = $db_row->comment_spam_addvotes;
+			$this->comment_spam_countvotes = $db_row->comment_spam_countvotes;
 		}
 	}
 
@@ -357,42 +361,71 @@ class Comment extends DataObject
 
 
 	/**
-	 * Get the vote , as a array.
+	 * Get the vote type disabled, as a array.
 	 * 
-	 * @param string Vote type (spam, notsure, ok)
 	 * @param int User ID
 	 * 
 	 * @return array
 	 */
-	function get_vote_status( $user_ID )
+	function get_vote_disabled( $user_ID )
 	{
 		global $DB;
 		
-		$status = array(
-			'spam' => false,
-			'notsure' => false,
-			'ok' => false
+		$disabled = array(
+			'spam' => '',
+			'notsure' => '',
+			'ok' => ''
 		);
-		if( $vote = $DB->get_var("SELECT cmvt_spam FROM T_comments__votes WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_user_ID = '".(int)$user_ID."'" ) )
+
+		if( $vote = $DB->get_row("SELECT cmvt_spam FROM T_comments__votes WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_user_ID = '".(int)$user_ID."'" ) )
 		{ // Get a spam vote for current comment and user
-			switch ( $vote )
+			$class_disabled = 'disabled';
+			switch ( $vote->cmvt_spam )
 			{
-				case "1": // SPAM
-					$status['notsure'] = true;
-					$status['ok'] = true;
+				case '1': // SPAM
+					$disabled['notsure'] = $disabled['ok'] = ' '.$class_disabled;
 					break;
-				case "0": // NOT SURE
-					$status['spam'] = true;
-					$status['ok'] = true;
+				case '0': // NOT SURE
+					$disabled['spam'] = $disabled['ok'] = ' '.$class_disabled;
 					break;
-				case "-1": // OK
-					$status['spam'] = true;
-					$status['notsure'] = true;
+				case '-1': // OK
+					$disabled['spam'] = $disabled['notsure'] = ' '.$class_disabled;
 					break;
 			}
 		}
 
-		return $status;
+		return $disabled;
+	}
+
+
+	/**
+	 * Get the vote summary, as a string.
+	 * 
+	 * @return string
+	 */
+	function get_vote_summary()
+	{
+		if( $this->comment_spam_countvotes == 0 )
+		{ // No spam votes for current comment
+			return '';
+		}
+
+		$summary = ceil( $this->comment_spam_addvotes / $this->comment_spam_countvotes * 100 );
+		if( $summary < -20 )
+		{ // Comment is OK
+			$summary = abs($summary).'% '.T_('OK');
+		}
+		else if( $summary >= -20 && $summary <= 20 )
+		{ // Comment is UNDECIDED
+			$summary = abs($summary).'% '.T_('UNDECIDED');
+		}
+		else if( $summary > 20 )
+		{ // Comment is SPAM
+			$summary .= '% '.T_('SPAM');
+		}
+		$summary = T_('Community says: ').$summary;
+
+		return $summary;
 	}
 
 
@@ -2283,6 +2316,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.99  2011/09/23 06:25:48  efy-yurybakh
+ * "comment is spam" vote
+ *
  * Revision 1.98  2011/09/22 16:58:34  efy-yurybakh
  * "comment is spam" vote
  *

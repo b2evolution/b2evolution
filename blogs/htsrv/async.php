@@ -242,11 +242,7 @@ switch( $action )
 
 			$vote = param( 'vote', 'string' );
 			$edited_Comment->set_vote( $vote, $current_User->ID );
-
-			if( $vote == 'published' )
-			{
-				$edited_Comment->handle_notifications();
-			}
+			$edited_Comment->dbupdate();
 
 			if( $moderation != NULL )
 			{
@@ -432,6 +428,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.71  2011/09/23 06:25:47  efy-yurybakh
+ * "comment is spam" vote
+ *
  * Revision 1.70  2011/09/22 16:58:34  efy-yurybakh
  * "comment is spam" vote
  *
