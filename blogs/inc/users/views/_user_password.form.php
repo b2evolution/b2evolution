@@ -59,6 +59,10 @@ global $user_profile_only;
  * @var the action destination of the form (NULL for pagenow)
  */
 global $form_action;
+/**
+ * @var instance of User class
+ */
+global $current_User;
 
 $Form = new Form( $form_action, 'user_checkchanges' );
 
@@ -79,6 +83,9 @@ else
 	$form_class = 'bComment';
 }
 
+$has_full_access = $current_User->check_perm( 'users', 'edit' );
+
+
 $Form->begin_form( $form_class, $form_title );
 
 	$Form->add_crumb( 'user' );
@@ -95,7 +102,11 @@ if( $action != 'view' )
 { // We can edit the values:
 
 	$Form->begin_fieldset( $is_admin ? T_('Password') : '', array( 'class'=>'fieldset clear' ) );
+
+		if (!$has_full_access)
+		{
 		$Form->password_input( 'current_user_pass', '', 20, T_('Current password'), array( 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off' ) );
+		}
 		$Form->password_input( 'edited_user_pass1', '', 20, T_('New password'), array( 'note' => sprintf( T_('Minimum length: %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off' ) );
 		$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off' ) );
 
@@ -117,6 +128,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.13  2011/09/23 11:57:28  efy-vitalij
+ * add admin functionality to password change form and edit validate messages in password edit form
+ *
  * Revision 1.12  2011/09/22 12:55:56  efy-vitalij
  * add current password input
  *

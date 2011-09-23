@@ -320,9 +320,14 @@ if( $action != 'view' )
 	}
 
 	$CountryCache = & get_CountryCache();
-
-	$Form->select_input_object( 'edited_user_ctry_ID', $edited_User->ctry_ID, $CountryCache, T_('Country'), array( 'required' => !$has_full_access, 'allow_none' => $has_full_access ) );
-
+	if (empty($edited_User->ctry_ID))
+	{
+		$Form->select_input_object( 'edited_user_ctry_ID', $edited_User->ctry_ID, $CountryCache, T_('Country'), array( 'required' => !$has_full_access, 'allow_none' => $has_full_access , 'object_callback' => 'get_group_country_option_list' ) );
+	}
+	else
+	{
+		$Form->select_input_object( 'edited_user_ctry_ID', $edited_User->ctry_ID, $CountryCache, T_('Country'), array( 'required' => !$has_full_access, 'allow_none' => $has_full_access ) );
+	}
 	$Form->text_input( 'edited_user_postcode', $edited_User->postcode, 12, T_('ZIP/Postcode'), '', array( 'maxlength' => 12 ) );
 
 	$Form->text_input( 'edited_user_age_min', $edited_User->age_min, 3, T_('My age group'), '', array( 'number' => true ) );
@@ -638,6 +643,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.46  2011/09/23 11:57:28  efy-vitalij
+ * add admin functionality to password change form and edit validate messages in password edit form
+ *
  * Revision 1.45  2011/09/18 00:58:44  fplanque
  * forms cleanup
  *

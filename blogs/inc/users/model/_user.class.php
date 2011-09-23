@@ -279,6 +279,7 @@ class User extends DataObject
 
 		$is_identity_form = param( 'identity_form', 'boolean', false );
 		$is_admin_form = param( 'admin_form', 'boolean', false );
+		$has_full_access = $current_User->check_perm( 'users', 'edit' );
 
 		// ******* Admin form or new user create ******* //
 		if( $is_admin_form || ( $is_identity_form && $is_new_user && $current_User->check_perm( 'users', 'edit', true ) ) )
@@ -459,7 +460,7 @@ class User extends DataObject
 
 		$is_password_form = param( 'password_form', 'boolean', false );
 
-		if( $is_password_form && ( $is_identity_form || $is_new_user ) )
+		if( $is_password_form && ( $is_identity_form || $is_new_user || $has_full_access  ))
 		{
 			param( 'edited_user_pass1', 'string', true );
 			$edited_user_pass2 = param( 'edited_user_pass2', 'string', true );
@@ -470,29 +471,38 @@ class User extends DataObject
 			}
 		}
 
-
-		// ******* Password edit form ****** //
-
-		if( $is_password_form && !$is_new_user )
+		if( $is_password_form &&  !($is_identity_form || $is_new_user || $has_full_access) )
 		{
-
-			$current_user_pass = param( 'current_user_pass', 'string', true );
-			
+		// ******* Password edit form ****** //
 			param( 'edited_user_pass1', 'string', true );
 			$edited_user_pass2 = param( 'edited_user_pass2', 'string', true );
 
+			$current_user_pass = param( 'current_user_pass', 'string', true );
 
-			if ( $this->pass == md5($current_user_pass))
+			if( ! strlen($current_user_pass) )
 			{
-				if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') ) )
-				{ 	// We can set password
-					$this->set( 'pass', md5( $edited_user_pass2 ) );
-				}
+				param_error('current_user_pass' , T_('Please enter your current password.') );
+				param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') );
 			}
 			else
 			{
-				param_error('current_user_pass' , T_('Please enter your current password.') );
+
+				if ( $this->pass == md5($current_user_pass))
+				{
+					if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') ) )
+					{ 	// We can set password
+						$this->set( 'pass', md5( $edited_user_pass2 ) );
+					}
+				}
+				else
+				{
+					param_error('current_user_pass' , T_('Your current password is incorrect.') );
+					param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') );
+				}
 			}
+
+
+
 		}
 
 		// ******* Preferences form ******* //
@@ -2549,6 +2559,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.126  2011/09/23 11:57:28  efy-vitalij
+ * add admin functionality to password change form and edit validate messages in password edit form
+ *
  * Revision 1.125  2011/09/23 07:41:57  efy-asimo
  * Unified usernames everywhere in the app - first part
  *
