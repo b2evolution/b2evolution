@@ -48,6 +48,7 @@ $Form->begin_form( 'fform' );
 	$Form->hidden( 'action', 'update' );
 	$Form->hidden( 'blog', $Blog->ID );
 
+// fp>yura why 'edit text' ?
 	$change_skin_link = '<span class="floatright">&nbsp;'.action_icon( T_('Select another skin...'), 'edit text', regenerate_url( 'action', 'ctrl=coll_settings&amp;skinpage=selection' ), T_('Use a different skin').' &raquo;', 3, 4 ).'</span>';
 	$load_default_settings = ' <span class="floatright">'.action_icon( T_('Reset params'), 'reload', regenerate_url( 'action', 'ctrl=skins&amp;skin_ID='.$edited_Skin->ID.'&amp;blog='.$Blog->ID.'&amp;action=reset&amp;'.url_crumb('skin') ), ' '.T_('Reset params'), 3, 4 ).'&nbsp;</span>';
 
@@ -104,6 +105,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.16  2011/09/23 22:37:09  fplanque
+ * minor / doc
+ *
  * Revision 1.15  2011/09/22 11:40:19  efy-yurybakh
  * icons in a single sprite
  *

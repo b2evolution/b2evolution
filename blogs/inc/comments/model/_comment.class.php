@@ -305,7 +305,7 @@ class Comment extends DataObject
 
 
 	/**
-	 * Set the vote , as a number.
+	 * Set the vote, as a number.
 	 * 
 	 * @param string Vote type (spam, notsure, ok)
 	 * @param int User ID
@@ -884,7 +884,8 @@ class Comment extends DataObject
 			return false;
 		}
 
-		if( $text == '#' ) $text = '<span></span>'.T_('Edit...');
+// fp>yura  why 'delete' icon for Edit ?
+		if( $text == '#' ) $text = get_icon( 'delete' ).' '.T_('Edit...');
 		if( $title == '#' ) $title = T_('Edit this comment');
 
 		echo $before;
@@ -1035,7 +1036,7 @@ class Comment extends DataObject
 		{ // Use icon+text as default, if not displayed as button (otherwise just the text)
 			if( ! $button )
 			{
-				$text = '<span></span>'.T_('Delete!');
+				$text = get_icon( 'delete' ).' '.T_('Delete!');
 			}
 			else
 			{
@@ -1109,7 +1110,7 @@ class Comment extends DataObject
 			return false;
 		}
 
-		if( $text == '#' ) $text = '<span></span>'.T_('Deprecate!');
+		if( $text == '#' ) $text = get_icon( 'deprecate' ).' '.T_('Deprecate!');
 		if( $title == '#' ) $title = T_('Deprecate this comment!');
 
 		$r = $before;
@@ -1170,15 +1171,15 @@ class Comment extends DataObject
 		switch( $vote_type )
 		{
 			case "spam":
-				if( $text == '#' ) $text = '<span></span>'.T_('This is spam');
+				if( $text == '#' ) $text = get_icon( 'delete' ).' '.T_('This is spam');
 				if( $title == '#' ) $title = T_('Mark this comment as spam!');
 			break;
 			case "notsure":
-				if( $text == '#' ) $text = '<span></span>'.T_('I\'m not sure');
+				if( $text == '#' ) $text = get_icon( 'deprecate' ).' '.('I\'m not sure');
 				if( $title == '#' ) $title = T_('Mark this comment as not sure!');
 			break;
 			case "ok":
-				if( $text == '#' ) $text = '<span></span>'.T_('This is OK');
+				if( $text == '#' ) $text = get_icon( 'publish' ).' '.('This is OK');
 				if( $title == '#' ) $title = T_('Mark this comment as OK!');
 			break;
 		}
@@ -1242,6 +1243,7 @@ class Comment extends DataObject
 	 * @param boolean save context?
 	 * @param boolean true if create AJAX button
 	 */
+// fp>yura :  please rename to vote_spam_link() 
 	function spam_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
 		echo $this->get_vote_link( 'spam', $before, $after, $text, $title, $class, $glue, $save_context, $ajax_button, $redirect_to );
@@ -1260,6 +1262,7 @@ class Comment extends DataObject
 	 * @param boolean save context?
 	 * @param boolean true if create AJAX button
 	 */
+// fp>yura :  please rename to vote_notsure_link() 
 	function notsure_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
 		echo $this->get_vote_link( 'notsure', $before, $after, $text, $title, $class, $glue, $save_context, $ajax_button, $redirect_to );
@@ -1278,6 +1281,7 @@ class Comment extends DataObject
 	 * @param boolean save context?
 	 * @param boolean true if create AJAX button
 	 */
+// fp>yura :  please rename to vote_notspam_link() 
 	function ok_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
 		echo $this->get_vote_link( 'ok', $before, $after, $text, $title, $class, $glue, $save_context, $ajax_button, $redirect_to );
@@ -1463,7 +1467,7 @@ class Comment extends DataObject
 		switch( $text )
 		{
 			case '#':
-				$text = '<span></span>'.T_('Permalink');
+				$text = get_icon( 'permalink' ).T_('Permalink');
 				break;
 
 			case '#icon#':
@@ -2316,6 +2320,12 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.101  2011/09/23 22:37:09  fplanque
+ * minor / doc
+ *
+ * Revision 1.100  2011/09/23 11:30:51  efy-yurybakh
+ * Make a big sprite with all backoffice icons
+ *
  * Revision 1.99  2011/09/23 06:25:48  efy-yurybakh
  * "comment is spam" vote
  *

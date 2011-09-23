@@ -1150,7 +1150,7 @@ function param_check_passwords( $var1, $var2, $required = false, $min_length = 6
 
 	if( ! strlen($pass1) )
 	{
-		param_error( $var1, T_('Please enter your new password twice.') );
+		param_error( $var1, T_('Please enter your new password.') );
 		param_error( $var2, T_('Please enter your new password twice.') );
 		return false;
 	}
@@ -2151,6 +2151,9 @@ function isset_param( $var )
 
 /*
  * $Log$
+ * Revision 1.74  2011/09/23 22:37:09  fplanque
+ * minor / doc
+ *
  * Revision 1.73  2011/09/23 12:07:00  efy-vitalij
  * change validation messages in param_check_passwords
  *

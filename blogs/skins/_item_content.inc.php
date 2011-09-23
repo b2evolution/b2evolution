@@ -248,7 +248,8 @@ switch( $content_mode )
 			echo '</div>';
 		}
 
-		if( ! empty($params['limit_attach']) && ($more || ! $Item->has_content_parts($params)) )
+		if( ! empty($params['limit_attach'])
+			&& ( $more || ! $Item->has_content_parts($params) ) )
 		{	// Display attachments/files that are linked to this post:
 			$Item->files( array(
 					'before' =>              $params['attach_list_start'],
@@ -262,9 +263,13 @@ switch( $content_mode )
 		}
 
 		echo $params['content_end_full'];
+
 }
 /*
  * $Log$
+ * Revision 1.43  2011/09/23 22:37:09  fplanque
+ * minor / doc
+ *
  * Revision 1.42  2011/09/21 06:42:11  sam2kb
  * code clean up + more params
  *

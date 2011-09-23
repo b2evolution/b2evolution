@@ -328,7 +328,7 @@ $cookie_name    = 'cookie'.$instance_name.'name';
 $cookie_email   = 'cookie'.$instance_name.'email';
 $cookie_url     = 'cookie'.$instance_name.'url';
 // The following handles the session:
-$cookie_session = str_replace( '.', '_', 'cookie'.$instance_name.'session'.$cookie_domain );
+$cookie_session = str_replace( '.', '_', 'session_'.$instance_name.'_'.$cookie_domain );
 /**#@-*/
 
 /**

@@ -1256,6 +1256,7 @@ switch( $action )
 			case 'update_publish': // on error
 				if( $current_User->check_perm( 'blog_del_post', 'any', false, $edited_Item->get_blog_ID() ) )
 				{	// User has permissions to delete this post
+// fp>yura ??
 					$AdminUI->global_icon( T_('Delete this post'), 'delete text', '?ctrl=items&amp;action=delete&amp;post_ID='.$edited_Item->ID.'&amp;'.url_crumb('item'),
 						 ' '.T_('Delete'), 4, 3, array(
 						 		'onclick' => 'return confirm(\''.TS_('You are about to delete this post!\\nThis cannot be undone!').'\')',
@@ -1263,6 +1264,7 @@ switch( $action )
 						 ) );
 				}
 
+// fp>yura ??
 				$AdminUI->global_icon( T_('Permanent link to full entry'), 'permalink noicon', $edited_Item->get_permanent_url(),
 						' '.T_('Permalink'), 4, 3, array(
 						 		'style' => 'margin-right: 3ex',
@@ -1559,6 +1561,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.115  2011/09/23 22:37:09  fplanque
+ * minor / doc
+ *
  * Revision 1.114  2011/09/22 11:40:19  efy-yurybakh
  * icons in a single sprite
  *

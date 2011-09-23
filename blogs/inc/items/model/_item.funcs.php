@@ -1837,6 +1837,7 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 		$Comment->publish_link( ' ', ' ', '#', '#', 'PublishButton', '&amp;', $save_context, true, $redirect_to );
 
 		// Display deprecate button if current user has the rights:
+// fp>yura why 'DeleteButton deprecate' ?
 		$Comment->deprecate_link( ' ', ' ', '#', '#', 'DeleteButton deprecate', '&amp;', $save_context, true, $redirect_to );
 
 		// Display delete button if current user has the rights:
@@ -1960,6 +1961,9 @@ function echo_pages( $item_ID, $currentpage, $comments_number )
 
 /*
  * $Log$
+ * Revision 1.136  2011/09/23 22:37:09  fplanque
+ * minor / doc
+ *
  * Revision 1.135  2011/09/23 06:25:48  efy-yurybakh
  * "comment is spam" vote
  *

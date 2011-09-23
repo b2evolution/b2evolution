@@ -2481,11 +2481,11 @@ class Item extends ItemLight
 		$table = '<table class="rating_summary" cellspacing="1">';
 		foreach ( $ratings as $r => $count )
 		{	// Print a row for each star with formed data
-			if( !is_int($r) ) {
+			if( !is_int($r) ) 
+			{
 				continue;
 			}
-			$html_recap .= '<div>'.str_repeat( '*', $r ).' ('.$count.')</div>';
-
+			
 			$star_average = ceil( ( $count / $ratings_count ) * 100 );
 			switch( $params['rating_summary_star_totals'] )
 			{
@@ -2515,7 +2515,6 @@ class Item extends ItemLight
 			'.star_rating( $average_real ).'<span>('.$average_real.')</span>
 			</div>
 		</div>
-		<div class="rating_recap">'.$html_recap.'</div>
 		<div class="clear"></div>';
 
 		return $table;
@@ -4784,10 +4783,10 @@ class Item extends ItemLight
 		global $DB;
 
 		$sql = 'SELECT comment_rating, count( comment_ID ) AS cnt
-					FROM T_comments
-					WHERE comment_post_ID = '.$this->ID.'
-						AND comment_status = "published"
-					GROUP BY comment_rating';
+							FROM T_comments
+						 WHERE comment_post_ID = '.$this->ID.'
+										AND comment_status = "published"
+						 GROUP BY comment_rating';
 		$results = $DB->get_results( $sql );
 		
 		$ratings = array();
@@ -4875,6 +4874,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.257  2011/09/23 22:37:09  fplanque
+ * minor / doc
+ *
  * Revision 1.256  2011/09/23 16:15:14  efy-yurybakh
  * fix "notice"
  *

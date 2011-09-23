@@ -77,7 +77,11 @@ class Module
 
 
 	/**
-	 * Provide translation in teh context of this module:
+	 * Provide translation in the context of this module:
+	 *
+	 * You can override this in specific modules.
+	 * Note: no fancy i18n mechanisme is provided at this point. We may add one in the future.
+	 * Especially if we have our own T_() extractor and multiple POT files.
 	 *
 	 * @param mixed $string
 	 * @param mixed $req_locale
@@ -187,6 +191,9 @@ class Module
 
 /*
  * $Log$
+ * Revision 1.10  2011/09/23 22:37:09  fplanque
+ * minor / doc
+ *
  * Revision 1.9  2011/09/23 01:29:04  fplanque
  * small changes
  *

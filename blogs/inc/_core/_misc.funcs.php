@@ -3010,7 +3010,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 
 		case 'imgtag':
 			if( !isset( $icon['file'] ) )
-			{ // Use span tag with sprite intead of img
+			{ // Use span tag with sprite instead of img
 				$styles = array();
 				if( isset( $icon['xy'] ) )
 				{ // Set background position in the icons_sprite.png
@@ -4204,7 +4204,7 @@ function get_ReqURI()
 
 
 /**
- * Get htsrv url on the same domain as the request come from
+ * Get htsrv url on the same domain as the http request came from
  * _init_hit.inc.php should be called before this call, because ReqHost and ReqPath must be initialized
  */
 function get_samedomain_htsrv_url( $secure = false )
@@ -4244,7 +4244,7 @@ function get_samedomain_htsrv_url( $secure = false )
 
 
 /**
- * Get secure htsrv url on the same domain as the request come from
+ * Get secure htsrv url on the same domain as the http request came from
  * It is important on login and register calls
  * _init_hit.inc.php should be called before this call, because ReqHost and ReqPath must be initialized
  */
@@ -4385,6 +4385,9 @@ if( !function_exists( 'property_exists' ) )
 
 /*
  * $Log$
+ * Revision 1.276  2011/09/23 22:37:09  fplanque
+ * minor / doc
+ *
  * Revision 1.275  2011/09/23 16:37:08  efy-yurybakh
  * change a style for the span.icon
  *

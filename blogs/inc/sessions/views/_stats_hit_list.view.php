@@ -112,6 +112,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('User'),
 		'order' => 'user_login',
+		'td_class' => 'shrinkwrap',
 		'td' => '%stat_session_login( #user_login# )%',
 	);
 
@@ -190,6 +191,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.16  2011/09/23 22:37:09  fplanque
+ * minor / doc
+ *
  * Revision 1.15  2011/09/23 07:41:57  efy-asimo
  * Unified usernames everywhere in the app - first part
  *

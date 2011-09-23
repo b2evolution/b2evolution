@@ -494,49 +494,10 @@ a.PublishButton:hover {
 	color: #c00;
 	border: 1px solid #c00;
 }
-a.ActionButton span,
-a.DeleteButton span,
-a.PublishButton span,
-a.permalink_right span {
-	background: url(../../../../rsc/icons/icons_sprite.png) no-repeat 0 0;
-	width: 16px;
-	height: 16px;
-	float: left;
-	margin-right: 3px;
-}
-a.ActionButton span{
-	background-position: 0 0;
-}
-a.DeleteButton span{
-	background-position: 0 -16px;
-}
-a.deprecate span{
-	background-position: 0 -32px;
-}
-a.PublishButton span{
-	background-position: 0 -48px;
-}
-a.permalink_right span{
-	background-position: -3px -64px;
-	width: 10px;
-}
+/* fp>yura if this is still needed after changing the vote icons, please put into the CSS file that is shared between all admin skins, not just the chicago admin skin */
 a.disabled{
 	border: 1px solid #999;
 	color: #999;
-}
-.sf-menu a.icon{
-	background: url(../../../../rsc/icons/icons_sprite.png) no-repeat right -80px;
-	padding-right: 18px;
-	height: 13px;
-}
-.sf-menu a.logout:hover{
-	background-position: right -96px;
-}
-.sf-menu a.icon.switch-to-blog{
-	background-position: right -128px;
-}
-.sf-menu a.icon.switch-to-admin{
-	background-position: right -112px;
 }
 
 div.edit_actions input {

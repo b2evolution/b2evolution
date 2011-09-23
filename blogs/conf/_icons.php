@@ -28,7 +28,7 @@ function get_icon_info($name)
 	switch($name)
 	{
 		case 'pixel': return array(
-			'file' => 'icons/blank.gif',	// Temporary fix
+			'file' => 'icons/blank.gif',	// fp>yura Temporary fix
 			'alt'  => '',
 			'size' => array( 1, 1 ),
 			'xy' => array( 0, 0 )
@@ -524,6 +524,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.80  2011/09/23 22:37:09  fplanque
+ * minor / doc
+ *
  * Revision 1.79  2011/09/23 14:01:57  fplanque
  * Quick/temporary fixes so we can work in the meantime
  *
