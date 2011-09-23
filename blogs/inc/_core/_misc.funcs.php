@@ -280,8 +280,15 @@ function format_to_output( $content, $format = 'htmlbody' )
 			$content = htmlspecialchars( $content, ENT_QUOTES );
 			break;
 
+		case 'htmlfeed':
+			// For use in RSS <content:encoded>, allow full HTML + absolute URLs
+			$content = make_rel_links_abs($content);
+			$content = convert_chars($content, 'html');
+			$content = str_replace(']]>', ']]&gt;', $content); // encode CDATA closing tag
+			break;
+
 		case 'htmlhead':
-			// strips out HTML (mainly for use in Title)
+			// Strips out HTML (mainly for use in Title)
 			$content = strip_tags($content);
 			$content = convert_chars($content, 'html');
 			break;
@@ -4385,6 +4392,9 @@ if( !function_exists( 'property_exists' ) )
 
 /*
  * $Log$
+ * Revision 1.277  2011/09/23 23:08:51  sam2kb
+ * New content format "htmlfeed" for use in XML feed tags <content:encoded> & <content type="html">
+ *
  * Revision 1.276  2011/09/23 22:37:09  fplanque
  * minor / doc
  *
