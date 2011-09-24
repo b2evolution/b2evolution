@@ -153,6 +153,8 @@ class AdminUI_general extends Menu
 	 */
 	function init_templates()
 	{
+		require_js( '#jquery#', 'blog' );
+		require_js( 'jquery/jquery.raty.min.js', 'blog' );
 	}
 
 	/**
@@ -1405,6 +1407,9 @@ class AdminUI_general extends Menu
 
 /*
  * $Log$
+ * Revision 1.117  2011/09/24 06:00:03  efy-yurybakh
+ * star rating plugin (backoffice)
+ *
  * Revision 1.116  2011/09/22 08:55:00  efy-asimo
  * Login problems with multidomain installs - fix
  *

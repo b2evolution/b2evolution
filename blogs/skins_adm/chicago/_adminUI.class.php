@@ -48,6 +48,8 @@ class AdminUI extends AdminUI_general
 	{
 		// This is included before controller specifc require_css() calls:
 		require_css( 'skins_adm/chicago/rsc/css/chicago.css', true );
+		require_js( '#jquery#', 'blog' );
+		require_js( 'jquery/jquery.raty.min.js', 'blog' );
 	}
 
 
@@ -467,6 +469,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.40  2011/09/24 06:00:03  efy-yurybakh
+ * star rating plugin (backoffice)
+ *
  * Revision 1.39  2011/09/10 19:41:54  fplanque
  * fixing http://forums.b2evolution.net/viewtopic.php?t=22443
  *
