@@ -3040,7 +3040,7 @@ function upgrade_b2evo_tables()
 
 	// Init Caches: (it should be possible to do this with each upgrade)
 	load_funcs('tools/model/_system.funcs.php');
-	// We're gonna need some environment in order to init caches...
+	// We gonna need some environment in order to init caches...
 	global $Settings, $Plugins;
 	if( ! is_object( $Settings ) )
 	{
@@ -3054,7 +3054,7 @@ function upgrade_b2evo_tables()
 	}
 	if( !system_init_caches() )
 	{
-		echo "<strong>The /cache folder could not be created/written to. b2evolution will still work but without caching, which will make it operate slower than optimal.</strong><br />\n";
+		echo "<strong>".T_('The /cache folder could not be created/written to. b2evolution will still work but without caching, which will make it operate slower than optimal.')."</strong><br />\n";
 	}
 
 	// Create default cron jobs (this can be done at each upgrade):
@@ -3184,6 +3184,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.418  2011/09/24 05:32:56  sam2kb
+ * i18n update
+ *
  * Revision 1.417  2011/09/24 05:22:05  sam2kb
  * Successully upgrades from versions: 0.8.6, 0.9.2, 1.10.3, 2.4.x and 3.3.x
  *
