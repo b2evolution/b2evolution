@@ -186,6 +186,7 @@ class User extends DataObject
 				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_user_ID', 'msg'=>T_('%d user permissions on blogs') ),
 				array( 'table'=>'T_subscriptions', 'fk'=>'sub_user_ID', 'msg'=>T_('%d subscriptions') ),
 				array( 'table'=>'T_items__item', 'fk'=>'post_creator_user_ID', 'msg'=>T_('%d posts created by this user') ),
+				array( 'table'=>'T_comments__votes', 'fk'=>'cmvt_user_ID', 'msg'=>T_('%d votes of comments') ),
 			);
 
 		if( $db_row == NULL )
@@ -2557,6 +2558,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.128  2011/09/24 07:38:21  efy-yurybakh
+ * delete children objects from T_comments__votes
+ *
  * Revision 1.127  2011/09/23 18:02:09  fplanque
  * minor
  *
