@@ -146,6 +146,7 @@ class Comment extends DataObject
 
 		$this->delete_cascades = array(
 				array( 'table'=>'T_links', 'fk'=>'link_cmt_ID', 'msg'=>T_('%d links to destination comments') ),
+				array( 'table'=>'T_comments__votes', 'fk'=>'cmvt_cmt_ID', 'msg'=>T_('%d votes of comment') ),
 			);
 
 		if( $db_row == NULL )
@@ -2316,6 +2317,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.103  2011/09/24 07:31:47  efy-yurybakh
+ * delete children objects from T_comments__votes
+ *
  * Revision 1.102  2011/09/24 05:30:19  efy-yurybakh
  * fp>yura
  *

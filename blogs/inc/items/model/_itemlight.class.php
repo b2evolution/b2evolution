@@ -136,6 +136,7 @@ class ItemLight extends DataObject
 				array( 'table'=>'T_links', 'fk'=>'link_itm_ID', 'msg'=>T_('%d links to destination items') ),
 				array( 'table'=>'T_postcats', 'fk'=>'postcat_post_ID', 'msg'=>T_('%d links to extra categories') ),
 				array( 'table'=>'T_comments', 'fk'=>'comment_post_ID', 'msg'=>T_('%d comments') ),
+				//array( 'table'=>'T_comments__votes', 'fk'=>'comment_post_ID', 'msg'=>T_('%d votes of comments') ),
 				array( 'table'=>'T_items__version', 'fk'=>'iver_itm_ID', 'msg'=>T_('%d versions') ),
 				array( 'table'=>'T_slug', 'fk'=>'slug_itm_ID', 'msg'=>T_('%d slugs') ),
 			);
@@ -1065,6 +1066,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.43  2011/09/24 07:31:47  efy-yurybakh
+ * delete children objects from T_comments__votes
+ *
  * Revision 1.42  2011/09/04 22:13:17  fplanque
  * copyright 2011
  *

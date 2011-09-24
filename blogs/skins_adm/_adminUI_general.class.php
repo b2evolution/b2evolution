@@ -153,8 +153,8 @@ class AdminUI_general extends Menu
 	 */
 	function init_templates()
 	{
-		require_js( '#jquery#', 'blog' );
-		require_js( 'jquery/jquery.raty.min.js', 'blog' );
+		require_js( '#jquery#', 'rsc_url' );
+		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
 	}
 
 	/**
@@ -1407,6 +1407,9 @@ class AdminUI_general extends Menu
 
 /*
  * $Log$
+ * Revision 1.118  2011/09/24 07:31:47  efy-yurybakh
+ * delete children objects from T_comments__votes
+ *
  * Revision 1.117  2011/09/24 06:00:03  efy-yurybakh
  * star rating plugin (backoffice)
  *

@@ -48,8 +48,8 @@ class AdminUI extends AdminUI_general
 	{
 		// This is included before controller specifc require_css() calls:
 		require_css( 'skins_adm/chicago/rsc/css/chicago.css', true );
-		require_js( '#jquery#', 'blog' );
-		require_js( 'jquery/jquery.raty.min.js', 'blog' );
+		require_js( '#jquery#', 'rsc_url' );
+		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
 	}
 
 
@@ -469,6 +469,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.41  2011/09/24 07:31:47  efy-yurybakh
+ * delete children objects from T_comments__votes
+ *
  * Revision 1.40  2011/09/24 06:00:03  efy-yurybakh
  * star rating plugin (backoffice)
  *
