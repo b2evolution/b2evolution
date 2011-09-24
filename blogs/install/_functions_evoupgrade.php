@@ -438,6 +438,16 @@ function upgrade_b2evo_tables()
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
+		// This table needs to be created here for proper group insertion
+		task_begin( 'Creating table for Group Settings... ' );
+		$DB->query( "CREATE TABLE T_groups__groupsettings (
+			gset_grp_ID INT(11) UNSIGNED NOT NULL,
+			gset_name VARCHAR(30) NOT NULL,
+			gset_value VARCHAR(255) NULL,
+			PRIMARY KEY (gset_grp_ID, gset_name)
+		) ENGINE = innodb" );
+		task_end();
+
 		echo 'Creating default groups... ';
 		$Group_Admins = new Group(); // COPY !
 		$Group_Admins->set( 'name', 'Administrators' );
@@ -564,56 +574,6 @@ function upgrade_b2evo_tables()
 							ADD COLUMN pref_newusers_level tinyint unsigned DEFAULT 1 NOT NULL,
 							ADD COLUMN pref_newusers_canregister tinyint unsigned DEFAULT 0 NOT NULL";
 		$DB->query( $query );
-		echo "OK.<br />\n";
-
-		echo 'Creating default groups... ';
-		$Group_Admins = new Group(); // COPY !
-		$Group_Admins->set( 'name', 'Administrators' );
-		$Group_Admins->set( 'perm_admin', 'visible' );
-		$Group_Admins->set( 'perm_blogs', 'editall' );
-		$Group_Admins->set( 'perm_stats', 'edit' );
-		$Group_Admins->set( 'perm_spamblacklist', 'edit' );
-		$Group_Admins->set( 'perm_files', 'all' );
-		$Group_Admins->set( 'perm_options', 'edit' );
-		$Group_Admins->set( 'perm_templates', 1 );
-		$Group_Admins->set( 'perm_users', 'edit' );
-		$Group_Admins->dbinsert();
-
-		$Group_Privileged = new Group(); // COPY !
-		$Group_Privileged->set( 'name', 'Privileged Bloggers' );
-		$Group_Privileged->set( 'perm_admin', 'visible' );
-		$Group_Privileged->set( 'perm_blogs', 'viewall' );
-		$Group_Privileged->set( 'perm_stats', 'view' );
-		$Group_Privileged->set( 'perm_spamblacklist', 'edit' );
-		$Group_Privileged->set( 'perm_files', 'add' );
-		$Group_Privileged->set( 'perm_options', 'view' );
-		$Group_Privileged->set( 'perm_templates', 0 );
-		$Group_Privileged->set( 'perm_users', 'view' );
-		$Group_Privileged->dbinsert();
-
-		$Group_Bloggers = new Group(); // COPY !
-		$Group_Bloggers->set( 'name', 'Bloggers' );
-		$Group_Bloggers->set( 'perm_admin', 'visible' );
-		$Group_Bloggers->set( 'perm_blogs', 'user' );
-		$Group_Bloggers->set( 'perm_stats', 'none' );
-		$Group_Bloggers->set( 'perm_spamblacklist', 'view' );
-		$Group_Bloggers->set( 'perm_files', 'view' );
-		$Group_Bloggers->set( 'perm_options', 'none' );
-		$Group_Bloggers->set( 'perm_templates', 0 );
-		$Group_Bloggers->set( 'perm_users', 'none' );
-		$Group_Bloggers->dbinsert();
-
-		$Group_Users = new Group(); // COPY !
-		$Group_Users->set( 'name', 'Basic Users' );
-		$Group_Users->set( 'perm_admin', 'none' );
-		$Group_Users->set( 'perm_blogs', 'user' );
-		$Group_Users->set( 'perm_stats', 'none' );
-		$Group_Users->set( 'perm_spamblacklist', 'none' );
-		$Group_Users->set( 'perm_files', 'none' );
-		$Group_Users->set( 'perm_options', 'none' );
-		$Group_Users->set( 'perm_templates', 0 );
-		$Group_Users->set( 'perm_users', 'none' );
-		$Group_Users->dbinsert();
 		echo "OK.<br />\n";
 
 		set_upgrade_checkpoint( '8050' );
@@ -860,7 +820,7 @@ function upgrade_b2evo_tables()
 
 
 			echo 'Creating user settings table... ';
-			$DB->query( "CREATE TABLE T_usersettings (
+			$DB->query( "CREATE TABLE {$tableprefix}usersettings (
 											uset_user_ID INT(11) UNSIGNED NOT NULL,
 											uset_name    VARCHAR( 30 ) NOT NULL,
 											uset_value   VARCHAR( 255 ) NULL,
@@ -933,7 +893,7 @@ function upgrade_b2evo_tables()
 	{
 
 			echo 'Creating table for user agents... ';
-			$DB->query( "CREATE TABLE T_useragents (
+			$DB->query( "CREATE TABLE {$tableprefix}useragents (
 										agnt_ID        INT UNSIGNED NOT NULL AUTO_INCREMENT,
 										agnt_signature VARCHAR(250) NOT NULL,
 										agnt_type      ENUM('rss','robot','browser','unknown') DEFAULT 'unknown' NOT NULL,
@@ -1011,9 +971,11 @@ function upgrade_b2evo_tables()
 	}
 
 
+	// sam2kb>fp: We need to make sure there are no values like "blog_a.php" in blog_urlname,
+	//			after this upgrade blog URLs look like $baseurl.'blog_a.php' which might be OK in 0.x version,
+	//			but this config will not work in b2evo 4. Blog URLs will be broken!
 	if( $old_db_version < 8850 )
 	{
-
 		echo 'Updating relative URLs... ';
 		// We need to move the slashes to the end:
 		$query = "UPDATE T_blogs
@@ -1034,7 +996,6 @@ function upgrade_b2evo_tables()
 
 	if( $old_db_version < 8855 )
 	{
-
 		echo 'Upgrading posts table... ';
 		$query = "ALTER TABLE {$tableprefix}posts
 							DROP COLUMN post_karma,
@@ -1500,7 +1461,7 @@ function upgrade_b2evo_tables()
 
 		echo 'Updating hitlog capabilities... ';
 		$DB->query( '
-				ALTER TABLE T_useragents ADD INDEX agnt_type ( agnt_type )' );
+				ALTER TABLE '.$tableprefix.'useragents ADD INDEX agnt_type ( agnt_type )' );
 		$DB->query( '
 				ALTER TABLE T_hitlog
 				  CHANGE COLUMN hit_referer_type hit_referer_type ENUM(\'search\',\'blacklist\',\'referer\',\'direct\',\'self\',\'admin\') NOT NULL' );
@@ -1833,7 +1794,7 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		echo 'Remove obsolete user settings... ';
-		$DB->query( 'DELETE FROM T_usersettings
+		$DB->query( 'DELETE FROM '.$tableprefix.'usersettings
 									WHERE uset_name = "plugins_disp_avail"' );
 		echo "OK.<br />\n";
 
@@ -1863,8 +1824,6 @@ function upgrade_b2evo_tables()
             )' );
 		echo "OK.<br />\n";
 
-		install_basic_skins();
-
 		echo 'Creating widgets table... ';
 		$DB->query( 'CREATE TABLE T_widget (
  						wi_ID					INT(10) UNSIGNED auto_increment,
@@ -1878,6 +1837,8 @@ function upgrade_b2evo_tables()
 						UNIQUE wi_order( wi_coll_ID, wi_sco_name, wi_order )
           )' );
 		echo "OK.<br />\n";
+
+		install_basic_skins();
 
 		echo 'Updating blogs table... ';
 		$DB->query( 'ALTER TABLE T_blogs
@@ -2565,8 +2526,9 @@ function upgrade_b2evo_tables()
 
 		// Creating table for pluggable permissions
 
+		// This table gets created during upgrade to v0.8.9 at checkpoint 8050
 		task_begin( 'Creating table for Group Settings... ' );
-		$DB->query( "CREATE TABLE T_groups__groupsettings (
+		$DB->query( "CREATE TABLE IF NOT EXISTS T_groups__groupsettings (
 			gset_grp_ID INT(11) UNSIGNED NOT NULL,
 			gset_name VARCHAR(30) NOT NULL,
 			gset_value VARCHAR(255) NULL,
@@ -2799,8 +2761,8 @@ function upgrade_b2evo_tables()
 		$rows = $DB->get_results( $sql, OBJECT, 'Get groups converted permissions' );
 		// Insert values into groupsettings table
 		foreach( $rows as $row )
-		{
-			$DB->query( 'INSERT INTO T_groups__groupsettings( gset_grp_ID, gset_name, gset_value )
+		{	// "IGNORE" is needed if we already created T_groups__groupsettings during upgrade to v0.8.9 at checkpoint 8050
+			$DB->query( 'INSERT IGNORE INTO T_groups__groupsettings( gset_grp_ID, gset_name, gset_value )
 							VALUES( '.$row->grp_ID.', "perm_spamblacklist", "'.$row->grp_perm_spamblacklist.'" ),
 								( '.$row->grp_ID.', "perm_slugs", "'.$row->grp_perm_slugs.'" ),
 								( '.$row->grp_ID.', "perm_files", "'.$row->grp_perm_files.'" ),
@@ -2855,7 +2817,8 @@ function upgrade_b2evo_tables()
 				default:
 					$value = 'none';
 			}
-			$DB->query( 'INSERT INTO T_groups__groupsettings( gset_grp_ID, gset_name, gset_value )
+			// "IGNORE" is needed if we already created T_groups__groupsettings during upgrade to v0.8.9 at checkpoint 8050
+			$DB->query( 'INSERT IGNORE INTO T_groups__groupsettings( gset_grp_ID, gset_name, gset_value )
 							VALUES( '.$row->grp_ID.', "perm_admin", "'.$value.'" )' );
 		}
 		db_drop_col( 'T_groups', 'grp_perm_admin' );
@@ -3221,6 +3184,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.417  2011/09/24 05:22:05  sam2kb
+ * Successully upgrades from versions: 0.8.6, 0.9.2, 1.10.3, 2.4.x and 3.3.x
+ *
  * Revision 1.416  2011/09/23 01:29:04  fplanque
  * small changes
  *
