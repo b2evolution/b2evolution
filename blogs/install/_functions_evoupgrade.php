@@ -3006,13 +3006,33 @@ function upgrade_b2evo_tables()
 		task_end();
 
 		task_begin( 'Create table for internal searches...' );
-    $DB->query( 'CREATE TABLE T_logs__internal_searches (
-	          isrch_ID bigint(20) NOT NULL auto_increment,
-	          isrch_coll_ID bigint(20) NOT NULL,
-	          isrch_hit_ID bigint(20) NOT NULL,
-	          isrch_keywords varchar(255) NOT NULL,
-	          PRIMARY KEY (isrch_ID)
-	        ) ENGINE = MyISAM' );
+		$DB->query( 'CREATE TABLE T_logs__internal_searches (
+						isrch_ID bigint(20) NOT NULL auto_increment,
+						isrch_coll_ID bigint(20) NOT NULL,
+						isrch_hit_ID bigint(20) NOT NULL,
+						isrch_keywords varchar(255) NOT NULL,
+						PRIMARY KEY (isrch_ID)
+					) ENGINE = MyISAM' );
+		task_end();
+
+		task_begin( 'Create table for comments votes...' );
+		$DB->query( 'CREATE TABLE T_comments__votes (
+						cmvt_cmt_ID  int(10) unsigned NOT NULL,
+						cmvt_user_ID int(10) unsigned NOT NULL,
+						cmvt_helpful TINYINT(1) NULL DEFAULT NULL,
+						cmvt_spam    TINYINT(1) NULL DEFAULT NULL,
+						PRIMARY KEY (cmvt_cmt_ID, cmvt_user_ID),
+						KEY cmvt_cmt_ID (cmvt_cmt_ID),
+						KEY cmvt_user_ID (cmvt_user_ID)
+					) ENGINE = innodb' );
+		task_end();
+
+		task_begin( 'Adding new comments columns...' );
+		$DB->query( 'ALTER TABLE T_comments
+									ADD comment_helpful_addvotes INT NOT NULL DEFAULT 0 AFTER comment_nofollow ,
+									ADD comment_helpful_countvotes INT UNSIGNED NOT NULL DEFAULT 0 AFTER comment_helpful_addvotes ,
+									ADD comment_spam_addvotes INT NOT NULL DEFAULT 0 AFTER comment_helpful_countvotes ,
+									ADD comment_spam_countvotes INT UNSIGNED NOT NULL DEFAULT 0 AFTER comment_spam_addvotes' );
 		task_end();
 
 		set_upgrade_checkpoint( '10300' );
@@ -3184,6 +3204,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.419  2011/09/24 06:29:14  efy-yurybakh
+ * add T_comments__votes in upgrade procedure
+ *
  * Revision 1.418  2011/09/24 05:32:56  sam2kb
  * i18n update
  *
