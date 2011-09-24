@@ -97,13 +97,11 @@ while( $Item = & mainlist_get_item() )
 		{	// EXCERPTS ---------------------------------------------------------------------
 			?>
 	<description><?php
-		$content = $Item->get_excerpt( 'entityencoded' );
+		$content = $Item->get_excerpt();
 
-		// fp> this is another one of these "oooooh it's just a tiny little change"
-		// and "we only need to make the links absolute in RSS"
-		// and then you get half baked code! The URL LINK stays RELATIVE!! :((
+		// Get content as "htmlbody", otherwise make_rel_links_abs() can't catch <a> and <img> tags
 		// TODO: clean solution : work in format_to_output!
-		echo make_rel_links_abs( $content );
+		echo format_to_output( make_rel_links_abs($content), 'entityencoded' );
 
 		// Display Item footer text (text can be edited in Blog Settings):
 		$Item->footer( array(

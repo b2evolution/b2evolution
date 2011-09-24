@@ -83,7 +83,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			{
 				$content = excerpt($content);
 			}
-			?><description><?php echo make_rel_links_abs( format_to_output( $content, 'entityencoded' ) ); ?></description>
+			?><description><?php echo format_to_output( make_rel_links_abs($content), 'entityencoded' ); ?></description>
 			<link><?php $Comment->permanent_url() ?></link>
 		</item>
 		<?php } // End of comment loop. ?>

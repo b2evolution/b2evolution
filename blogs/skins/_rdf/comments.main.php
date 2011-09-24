@@ -102,7 +102,7 @@ while( $Comment = & $CommentList->get_next() )
 	{
 		$content = excerpt($content);
 	}
-	?><description><?php echo make_rel_links_abs( format_to_output( $content, 'entityencoded' ) ); ?></description>
+	?><description><?php echo format_to_output( make_rel_links_abs($content), 'entityencoded' ); ?></description>
 	<content:encoded><![CDATA[<?php echo format_to_output( $content, 'htmlfeed' ); ?>]]></content:encoded>
 </item>
 <?php } // End of comment loop. ?>

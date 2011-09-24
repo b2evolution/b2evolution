@@ -119,20 +119,14 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			{	// EXCERPTS ---------------------------------------------------------------------
 				?>
 		<content type="html"><![CDATA[<?php
-				$content = $Item->get_excerpt( 'entityencoded' );
-
-				// fp> this is another one of these "oooooh it's just a tiny little change"
-				// and "we only need to make the links absolute in RSS"
-				// and then you get half baked code! The URL LINK stays RELATIVE!! :((
-				// TODO: clean solution : work in format_to_output!
-				echo make_rel_links_abs( $content );
+				echo $Item->get_excerpt('htmlfeed');
 
 				// Display Item footer text (text can be edited in Blog Settings):
 				$Item->footer( array(
 						'mode'        => 'xml',
 						'block_start' => '<div class="item_footer">',
 						'block_end'   => '</div>',
-						'format'      => 'htmlbody',
+						'format'      => 'htmlfeed',
 					) );
 		?>]]></content>
 				<?php

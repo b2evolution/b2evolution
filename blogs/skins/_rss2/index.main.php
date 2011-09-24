@@ -124,13 +124,11 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 
 					?>
 			<description><?php
-				$content = $Item->get_excerpt( 'entityencoded' );
+				$content = $Item->get_excerpt();
 
-				// fp> this is another one of these "oooooh it's just a tiny little change"
-				// and "we only need to make the links absolute in RSS"
-				// and then you get half baked code! The URL LINK stays RELATIVE!! :((
+				// Get content as "htmlbody", otherwise make_rel_links_abs() can't catch <a> and <img> tags
 				// TODO: clean solution : work in format_to_output!
-				echo make_rel_links_abs( $content );
+				echo format_to_output( make_rel_links_abs($content), 'entityencoded' );
 
 				// Display Item footer text (text can be edited in Blog Settings):
 				$Item->footer( array(
@@ -177,9 +175,9 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 						'after_image' =>         '</div>',
 						'after' =>               '</div>',
 						'image_size' =>          $image_size,
-					), 'entityencoded' );
+					), 'htmlbody' );
 
-				$content .= $Item->get_content_teaser( 1, false, 'entityencoded' );
+				$content .= $Item->get_content_teaser( 1, false );
 
 				if( $feed_content == 'normal' )
 				{	// Teasers only
@@ -187,19 +185,16 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 							'before'    => '',
 							'after'     => '',
 							'disppage'  => 1,
-							'format'    => 'entityencoded',
 						) );
 				}
 				else
 				{	// Full contents
-					$content .= $Item->get_content_extension( 1, true, 'entityencoded' );
+					$content .= $Item->get_content_extension( 1, true );
 				}
 
-				// fp> this is another one of these "oooooh it's just a tiny little change"
-				// and "we only need to make the links absolute in RSS"
-				// and then you get half baked code! The URL LINK stays RELATIVE!! :((
+				// Get content as "htmlbody", otherwise make_rel_links_abs() can't catch <a> and <img> tags
 				// TODO: clean solution : work in format_to_output!
-				echo make_rel_links_abs( $content );
+				echo format_to_output( make_rel_links_abs($content), 'entityencoded' );
 
 				// Display Item footer text (text can be edited in Blog Settings):
 				$Item->footer( array(
