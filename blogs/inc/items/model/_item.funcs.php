@@ -1845,13 +1845,13 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 		$vote_disabled = $Comment->get_vote_disabled( $current_User->ID );
 
 		// Display Spam Vote "Spam" button if current user has the rights:
-		$Comment->vote_spam_link( '<div class="floatleft">'.T_('My Spam Vote').':</div>', ' ', '#', '#', 'DeleteButton'.$vote_disabled['spam'], '&amp;', $save_context, true, $redirect_to );
+		$Comment->vote_spam_link( '<div class="vote_spam">'.$Comment->get_vote_summary( $vote_disabled ), ' ', '#', '#', $vote_disabled['spam'], '&amp;', $save_context, true, $redirect_to );
 
 		// Display Spam Vote "Not Sure" button if current user has the rights:
-		$Comment->vote_notsure_link( ' ', ' ', '#', '#', 'ActionButton'.$vote_disabled['notsure'], '&amp;', $save_context, true, $redirect_to );
+		$Comment->vote_notsure_link( ' ', ' ', '#', '#', $vote_disabled['notsure'], '&amp;', $save_context, true, $redirect_to );
 
 		// Display Spam Vote "Ok" button if current user has the rights:
-		$Comment->vote_ok_link( ' ', $Comment->get_vote_summary(), '#', '#', 'PublishButton'.$vote_disabled['ok'], '&amp;', $save_context, true, $redirect_to );
+		$Comment->vote_ok_link( ' ', '</div>', '#', '#', $vote_disabled['ok'], '&amp;', $save_context, true, $redirect_to );
 
 		echo '<div class="clear"></div>';
 		echo '</div>';
@@ -1960,6 +1960,9 @@ function echo_pages( $item_ID, $currentpage, $comments_number )
 
 /*
  * $Log$
+ * Revision 1.138  2011/09/24 13:27:36  efy-yurybakh
+ * Change voting buttons
+ *
  * Revision 1.137  2011/09/24 05:30:19  efy-yurybakh
  * fp>yura
  *

@@ -109,6 +109,7 @@ img.rightmargin {
 	border: 2px solid red;
 }
 
+/* Sprite style for the all icons*/
 span.icon{
 	background: url(../icons/icons_sprite.png) no-repeat -112px -48px;
 	width: 16px;

@@ -384,13 +384,13 @@ class Comment extends DataObject
 			switch ( $vote->cmvt_spam )
 			{
 				case '1': // SPAM
-					$disabled['notsure'] = $disabled['ok'] = ' '.$class_disabled;
+					$disabled['notsure'] = $disabled['ok'] = $class_disabled;
 					break;
 				case '0': // NOT SURE
-					$disabled['spam'] = $disabled['ok'] = ' '.$class_disabled;
+					$disabled['spam'] = $disabled['ok'] = $class_disabled;
 					break;
 				case '-1': // OK
-					$disabled['spam'] = $disabled['notsure'] = ' '.$class_disabled;
+					$disabled['spam'] = $disabled['notsure'] = $class_disabled;
 					break;
 			}
 		}
@@ -404,8 +404,13 @@ class Comment extends DataObject
 	 * 
 	 * @return string
 	 */
-	function get_vote_summary()
+	function get_vote_summary( $votes = array() )
 	{
+		if( implode( '', $votes ) == '' )
+		{ // If current user didn't vote this comment
+			return T_('My Spam Vote:');
+		}
+
 		if( $this->comment_spam_countvotes == 0 )
 		{ // No spam votes for current comment
 			return '';
@@ -1171,17 +1176,21 @@ class Comment extends DataObject
 		switch( $vote_type )
 		{
 			case "spam":
-				if( $text == '#' ) $text = get_icon( 'delete' ).' '.T_('This is spam');
+				if( $text == '#' ) $text = get_icon( 'vote_spam'.( $class != '' ? '_'.$class : '' ) );
 				if( $title == '#' ) $title = T_('Mark this comment as spam!');
 			break;
 			case "notsure":
-				if( $text == '#' ) $text = get_icon( 'deprecate' ).' '.('I\'m not sure');
+				if( $text == '#' ) $text = get_icon( 'vote_notsure'.( $class != '' ? '_'.$class : '' ) );
 				if( $title == '#' ) $title = T_('Mark this comment as not sure!');
 			break;
 			case "ok":
-				if( $text == '#' ) $text = get_icon( 'publish' ).' '.('This is OK');
+				if( $text == '#' ) $text = get_icon( 'vote_ok'.( $class != '' ? '_'.$class : '' ) );
 				if( $title == '#' ) $title = T_('Mark this comment as OK!');
 			break;
+		}
+		if( $class == 'disabled' )
+		{ // add rollover action for disabled buttons
+			 $class .= ' rollover';
 		}
 
 		$r = $before;
@@ -1198,7 +1207,7 @@ class Comment extends DataObject
 		else
 		{
 			$r .= $admin_url.'?ctrl=comments'.$glue.'action='.$vote_type.$glue.'comment_ID='.$this->ID.'&amp;'.url_crumb('comment');
-	   		if( $save_context )
+			if( $save_context )
 			{
 				$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
 			}
@@ -2317,6 +2326,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.104  2011/09/24 13:27:36  efy-yurybakh
+ * Change voting buttons
+ *
  * Revision 1.103  2011/09/24 07:31:47  efy-yurybakh
  * delete children objects from T_comments__votes
  *

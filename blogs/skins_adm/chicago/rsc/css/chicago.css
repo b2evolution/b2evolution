@@ -494,11 +494,6 @@ a.PublishButton:hover {
 	color: #c00;
 	border: 1px solid #c00;
 }
-/* fp>yura if this is still needed after changing the vote icons, please put into the CSS file that is shared between all admin skins, not just the chicago admin skin */
-a.disabled{
-	border: 1px solid #999;
-	color: #999;
-}
 
 div.edit_actions input {
 	margin: 1px 1px;

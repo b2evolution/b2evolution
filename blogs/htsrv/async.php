@@ -257,7 +257,7 @@ switch( $action )
 				$status_list = explode( ',', $statuses );
 				if( $status_list == NULL )
 				{
-					$status_list = array( 'spam', 'notsure', 'ok' );
+					$status_list = array( 'published', 'draft', 'deprecated' );
 				}
 
 				echo_item_comments( $blog, $item_ID, $status_list, $currentpage );
@@ -428,6 +428,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.72  2011/09/24 13:27:36  efy-yurybakh
+ * Change voting buttons
+ *
  * Revision 1.71  2011/09/23 06:25:47  efy-yurybakh
  * "comment is spam" vote
  *

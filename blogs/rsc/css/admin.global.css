@@ -238,116 +238,6 @@ ul.plain {
 th .action_icon {
 	font-size: 84%;
 }
-.action_icon{
-	background: url(../icons/icons_sprite.png) no-repeat 0 0;
-	min-width: 16px;
-	height: 16px;
-	display: inline-table;
-}
-.action_icon:hover{
-	text-decoration: none;
-}
-.action_icon.noicon{
-	background: none;
-}
-.action_icon.noicon:hover{
-	text-decoration: underline;
-}
-.action_icon.text{
-	padding-left: 16px;
-}
-.action_icon.delete{
-	background-position: 0 -16px;
-}
-.action_icon.new{
-	background-position: 0 -144px;
-	padding-left: 16px;
-}
-.action_icon.new:hover{
-	background-position: 0 -160px;
-	text-decoration: underline;
-}
-.action_icon.copy{
-	background-position: 0 -176px;
-}
-.action_icon.increase{
-	background-position: 0 -192px;
-}
-.action_icon.increase:hover{
-	background-position: 0 -208px;
-}
-.action_icon.decrease{
-	background-position: 0 -224px;
-}
-.action_icon.decrease:hover{
-	background-position: 0 -240px;
-}
-.action_icon.email{
-	background-position: 0 -256px;
-}
-.action_icon.comments{
-	background-position: 0 -272px;
-}
-.action_icon.manual{
-	background-position: 0 -288px;
-	font-size: 10px;
-}
-.action_icon.manual:hover{
-	background-position: 0 -304px;
-}
-.action_icon.refresh{
-	background-position: 0 -320px;
-	padding-left: 18px;
-}
-.action_icon.refresh:hover{
-	text-decoration: underline;
-}
-.action_icon.info{
-	background-position: 0 -336px;
-}
-.action_icon.folder{
-	background-position: 0 -352px;
-}
-.action_icon.reload{
-	background-position: 0 -368px;
-}
-.action_icon.reload:hover{
-	text-decoration: underline;
-}
-.action_icon.properties{
-	background-position: 0 -384px;
-}
-.action_icon.close{
-	background-position: 0 -80px;
-}
-.action_icon.close:hover{
-	background-position: 0 -96px;
-}
-.action_icon.www{
-	background: url(../icons/url.gif) no-repeat 0 0;
-	width: 34px;
-}
-.action_icon.move_down{
-	background-position: 0 -400px;
-}
-.action_icon.move_down:hover{
-	background-position: 0 -416px;
-}
-.action_icon.move_up{
-	background-position: 0 -432px;
-}
-.action_icon.move_up:hover{
-	background-position: 0 -448px;
-}
-.action_icon.deactivate{
-	background-position: 0 -32px;
-}
-.action_icon.bullet_full{
-	background-position: 0 -464px;
-}
-.action_icon.bullet_empty{
-	background-position: 0 -480px;
-}
 
 /*
  * Icon legend
@@ -628,3 +518,10 @@ div.avatartag {
 	float: left;
 }
 
+.vote_spam{
+	float: left;
+	padding: 0 10px;
+}
+.vote_spam a{
+	margin: 0 8px;
+}

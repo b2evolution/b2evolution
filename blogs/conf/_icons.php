@@ -254,10 +254,10 @@ function get_icon_info($name)
 			'xy' => array( 128, 48 )
 		);
 		case 'www': return array(   /* user's web site, plugin's help url */
-			'file' => 'icons/url.gif',
 			'alt'  => T_('WWW'),
 			'legend' => T_('Website'),
-			'size' => array( 34, 17 ),
+			'size' => array( 32, 16 ),
+			'xy' => array( 128, 128 )
 		);
 
 		case 'new': return array(
@@ -467,7 +467,7 @@ function get_icon_info($name)
 		case 'assign': return array(
 			'alt'  => T_('Assigned to'),
 			'size' => array( 27, 13 ),
-			'xy' => array( 112, 128 )
+			'xy' => array( 96, 128 )
 		);
 		case 'check_all': return array(
 			'alt'  => T_('Check all'),
@@ -505,7 +505,7 @@ function get_icon_info($name)
 		case 'feed': return array(
 			'alt'	 => T_('XML Feed'),
 			'size' => array( 16, 16 ),
-			'xy' => array( 96, 128 )
+			'xy' => array( 96, 144 )
 		);
 
 		case 'recycle_full': return array(
@@ -518,11 +518,45 @@ function get_icon_info($name)
 			'size' => array( 16, 16 ),
 			'xy' => array( 80, 112 )
 		);
+
+		case 'vote_spam': return array(
+			'alt'  => T_('Mark this comment as spam!'),
+			'size' => array( 15, 15 ),
+			'xy' => array( 16, 144 )
+		);
+		case 'vote_spam_disabled': return array(
+			'alt'  => T_('Mark this comment as spam!'),
+			'size' => array( 15, 15 ),
+			'xy' => array( 0, 144 )
+		);
+		case 'vote_notsure': return array(
+			'alt'  => T_('Mark this comment as not sure!'),
+			'size' => array( 15, 15 ),
+			'xy' => array( 48, 144 )
+		);
+		case 'vote_notsure_disabled': return array(
+			'alt'  => T_('Mark this comment as not sure!'),
+			'size' => array( 15, 15 ),
+			'xy' => array( 32, 144 )
+		);
+		case 'vote_ok': return array(
+			'alt'  => T_('Mark this comment as OK!'),
+			'size' => array( 15, 15 ),
+			'xy' => array( 80, 144 )
+		);
+		case 'vote_ok_disabled': return array(
+			'alt'  => T_('Mark this comment as OK!'),
+			'size' => array( 15, 15 ),
+			'xy' => array( 64, 144 )
+		);
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.82  2011/09/24 13:27:36  efy-yurybakh
+ * Change voting buttons
+ *
  * Revision 1.81  2011/09/24 05:30:18  efy-yurybakh
  * fp>yura
  *
