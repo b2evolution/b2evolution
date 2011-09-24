@@ -884,8 +884,7 @@ class Comment extends DataObject
 			return false;
 		}
 
-// fp>yura  why 'delete' icon for Edit ?
-		if( $text == '#' ) $text = get_icon( 'delete' ).' '.T_('Edit...');
+		if( $text == '#' ) $text = get_icon( 'edit' ).' '.T_('Edit...');
 		if( $title == '#' ) $title = T_('Edit this comment');
 
 		echo $before;
@@ -1232,7 +1231,7 @@ class Comment extends DataObject
 
 
 	/**
-	 * Display link to spam a comment if user has edit rights
+	 * Display link to vote a comment as SPAM if user has edit rights
 	 *
 	 * @param string to display before link
 	 * @param string to display after link
@@ -1243,15 +1242,14 @@ class Comment extends DataObject
 	 * @param boolean save context?
 	 * @param boolean true if create AJAX button
 	 */
-// fp>yura :  please rename to vote_spam_link() 
-	function spam_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
+	function vote_spam_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
 		echo $this->get_vote_link( 'spam', $before, $after, $text, $title, $class, $glue, $save_context, $ajax_button, $redirect_to );
 	}
 
 
 	/**
-	 * Display link to spam a comment if user has edit rights
+	 * Display link to vote a comment as NOT SURE if user has edit rights
 	 *
 	 * @param string to display before link
 	 * @param string to display after link
@@ -1262,15 +1260,14 @@ class Comment extends DataObject
 	 * @param boolean save context?
 	 * @param boolean true if create AJAX button
 	 */
-// fp>yura :  please rename to vote_notsure_link() 
-	function notsure_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
+	function vote_notsure_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
 		echo $this->get_vote_link( 'notsure', $before, $after, $text, $title, $class, $glue, $save_context, $ajax_button, $redirect_to );
 	}
 
 
 	/**
-	 * Display link to spam a comment if user has edit rights
+	 * Display link to vote a comment AS OK if user has edit rights
 	 *
 	 * @param string to display before link
 	 * @param string to display after link
@@ -1281,8 +1278,7 @@ class Comment extends DataObject
 	 * @param boolean save context?
 	 * @param boolean true if create AJAX button
 	 */
-// fp>yura :  please rename to vote_notspam_link() 
-	function ok_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
+	function vote_ok_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
 		echo $this->get_vote_link( 'ok', $before, $after, $text, $title, $class, $glue, $save_context, $ajax_button, $redirect_to );
 	}
@@ -2320,6 +2316,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.102  2011/09/24 05:30:19  efy-yurybakh
+ * fp>yura
+ *
  * Revision 1.101  2011/09/23 22:37:09  fplanque
  * minor / doc
  *

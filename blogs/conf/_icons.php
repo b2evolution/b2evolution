@@ -28,10 +28,9 @@ function get_icon_info($name)
 	switch($name)
 	{
 		case 'pixel': return array(
-			'file' => 'icons/blank.gif',	// fp>yura Temporary fix
+			'file' => 'icons/blank.gif',
 			'alt'  => '',
-			'size' => array( 1, 1 ),
-			'xy' => array( 0, 0 )
+			'size' => array( 1, 1 )
 		);
 
 		case 'dropdown': return array(
@@ -524,6 +523,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.81  2011/09/24 05:30:18  efy-yurybakh
+ * fp>yura
+ *
  * Revision 1.80  2011/09/23 22:37:09  fplanque
  * minor / doc
  *
