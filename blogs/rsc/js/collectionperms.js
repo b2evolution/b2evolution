@@ -26,7 +26,7 @@ function toggleall_wide( the_form, id, set )
 	// Trigger click() on all checkboxes that need to change.
 	// This also triggers the bozo validator, if activated!
 	var options = new Array(
-			"blog_ismember_", "blog_perm_published_", "blog_perm_protected_", "blog_perm_private_", "blog_perm_draft_", "blog_perm_deprecated_", "blog_perm_redirected_", "blog_perm_page_", "blog_perm_intro_", "blog_perm_podcast_", "blog_perm_sidebar_", "blog_perm_delpost_", "blog_perm_edit_ts_", "blog_perm_draft_cmts_", "blog_perm_publ_cmts_", "blog_perm_depr_cmts_", "blog_perm_media_upload_", "blog_perm_media_browse_", "blog_perm_media_change_", "blog_perm_cats_", "blog_perm_properties_", "blog_perm_admin_"
+			"blog_ismember_", "blog_perm_published_", "blog_perm_protected_", "blog_perm_private_", "blog_perm_draft_", "blog_perm_deprecated_", "blog_perm_redirected_", "blog_perm_page_", "blog_perm_intro_", "blog_perm_podcast_", "blog_perm_sidebar_", "blog_perm_delpost_", "blog_perm_edit_ts_", "blog_perm_draft_cmts_", "blog_perm_publ_cmts_", "blog_perm_depr_cmts_", "blog_perm_media_upload_", "blog_perm_media_browse_", "blog_perm_media_change_", "blog_perm_cats_", "blog_perm_properties_", "blog_perm_admin_", "blog_perm_vote_spam_"
 		);
 	for( var i = 0; i < options.length; i++ )
 	{
@@ -120,6 +120,7 @@ function merge_from_easy( source, userid )
 		case 'admin':
 			source.form.elements['blog_perm_admin_'+String(userid)].checked = 1;
 			source.form.elements['blog_perm_edit_ts_'+String(userid)].checked = 1;
+			source.form.elements['blog_perm_vote_spam'+String(userid)].checked = 1;
 		case 'owner':
 			source.form.elements['blog_perm_properties_'+String(userid)].checked = 1;
 			source.form.elements['blog_perm_cats_'+String(userid)].checked = 1;
@@ -205,7 +206,8 @@ function merge_from_wide( source, userid )
 										+Number(f.elements['blog_perm_sidebar_'+String(userid)].checked);
 
 		var perms_admin = Number(f.elements['blog_perm_admin_'+String(userid)].checked)
-										+Number(f.elements['blog_perm_edit_ts_'+String(userid)].checked);
+										+Number(f.elements['blog_perm_edit_ts_'+String(userid)].checked)
+										+Number(f.elements['blog_perm_vote_spam_'+String(userid)].checked);
 
 		var perm_edit = f.elements['blog_perm_edit_'+String(userid)].value;
 

@@ -74,7 +74,7 @@ $SQL->SELECT( 'user_ID, user_login, user_level, bloguser_perm_poststatuses, blog
 	. 'bloguser_perm_delpost, bloguser_perm_edit_ts, bloguser_perm_cats,'
 	. 'bloguser_perm_properties, bloguser_perm_admin, bloguser_perm_media_upload,'
 	. 'bloguser_perm_media_browse, bloguser_perm_media_change, bloguser_perm_page,'
-	. 'bloguser_perm_intro, bloguser_perm_podcast, bloguser_perm_sidebar' );
+	. 'bloguser_perm_intro, bloguser_perm_podcast, bloguser_perm_sidebar, bloguser_perm_vote_spam' );
 $SQL->FROM( 'T_users LEFT JOIN T_coll_user_perms ON (
 				 						user_ID = bloguser_user_ID
 										AND bloguser_blog_ID = '.$edited_Blog->ID.' )' );
@@ -386,6 +386,15 @@ $Results->cols[] = array(
 						'td_class' => 'center',
 					);
 
+$Results->cols[] = array(
+						'th' => T_('Spam<br />vote'),
+						'th_class' => 'checkright',
+						'order' => 'bloguser_perm_vote_spam',
+						'default_dir' => 'D',
+						'td' => '%coll_perm_checkbox( {row}, \'perm_vote_spam\', \''.TS_('Permission to give a spam vote on any comment').'\' )%',
+						'td_class' => 'center',
+					);
+
 function perm_check_all( $row )
 {
 	global $permission_to_change_admin;
@@ -510,6 +519,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.25  2011/09/25 07:06:21  efy-yurybakh
+ * Implement new permission for spam voting
+ *
  * Revision 1.24  2011/09/15 22:34:09  fplanque
  * cleanup
  *

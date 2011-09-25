@@ -75,7 +75,7 @@ $SQL->SELECT( 'grp_ID, grp_name, bloggroup_perm_poststatuses, bloggroup_perm_edi
 	. 'bloggroup_perm_delpost, bloggroup_perm_edit_ts, bloggroup_perm_cats,'
 	. 'bloggroup_perm_properties, bloggroup_perm_admin, bloggroup_perm_media_upload,'
 	. 'bloggroup_perm_media_browse, bloggroup_perm_media_change, bloggroup_perm_page,'
-	. 'bloggroup_perm_intro, bloggroup_perm_podcast, bloggroup_perm_sidebar' );
+	. 'bloggroup_perm_intro, bloggroup_perm_podcast, bloggroup_perm_sidebar, bloggroup_perm_vote_spam' );
 $SQL->FROM( 'T_groups LEFT JOIN T_coll_group_perms ON
 			( grp_ID = bloggroup_group_ID AND bloggroup_blog_ID = '.$edited_Blog->ID.' )' );
 $SQL->ORDER_BY( 'bloggroup_ismember DESC, *, grp_name, grp_ID' );
@@ -375,6 +375,15 @@ $Results->cols[] = array(
 						'td_class' => 'center',
 					);
 
+$Results->cols[] = array(
+						'th' => T_('Spam<br />vote'),
+						'th_class' => 'checkright',
+						'order' => 'bloggroup_perm_vote_spam',
+						'default_dir' => 'D',
+						'td' => '%coll_perm_checkbox( {row}, \'perm_vote_spam\', \''.TS_('Permission to give a spam vote on any comment').'\' )%',
+						'td_class' => 'center',
+					);
+
 function perm_check_all( $row )
 {
 	global $permission_to_change_admin;
@@ -497,6 +506,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.21  2011/09/25 07:06:21  efy-yurybakh
+ * Implement new permission for spam voting
+ *
  * Revision 1.20  2011/09/07 00:28:26  sam2kb
  * Replace non-ASCII character in regular expressions with ~
  *

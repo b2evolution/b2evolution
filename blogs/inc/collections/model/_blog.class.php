@@ -2007,9 +2007,9 @@ class Blog extends DataObject
 						bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_edit_ts,
 						bloguser_perm_draft_cmts, bloguser_perm_publ_cmts, bloguser_perm_depr_cmts,
 						bloguser_perm_cats, bloguser_perm_properties,
-						bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change )
+						bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change, bloguser_perm_vote_spam )
 					VALUES ( $this->ID, $current_User->ID, 1,
-						'published,protected,private,draft,deprecated', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 )" );
+						'published,protected,private,draft,deprecated', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 )" );
 		}
 
 		// Create default category:
@@ -2479,6 +2479,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.142  2011/09/25 07:06:21  efy-yurybakh
+ * Implement new permission for spam voting
+ *
  * Revision 1.141  2011/09/21 22:08:04  sam2kb
  * minor/cleanup
  *

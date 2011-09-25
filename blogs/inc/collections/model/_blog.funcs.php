@@ -122,6 +122,7 @@ function blog_update_perms( $blog, $context = 'user' )
 				'bloguser_perm_intro' => 0,
 				'bloguser_perm_podcast' => 0,
 				'bloguser_perm_sidebar' => 0,
+				'bloguser_perm_vote_spam' => 0
 			);
 
 			if( ! $current_User->check_perm( 'blog_admin', 'edit', false, $blog )
@@ -129,7 +130,6 @@ function blog_update_perms( $blog, $context = 'user' )
 			{	// We have no permission to give advanced admins perm!
 				$easy_mode = 'owner';
 			}
-			// echo $easy_mode;
 
 			// Select option
 			switch( $easy_mode )
@@ -159,6 +159,7 @@ function blog_update_perms( $blog, $context = 'user' )
 				case 'admin':
 					$easy_perms['bloguser_perm_admin'] = 1;
 					$easy_perms['bloguser_perm_edit_ts'] = 1;
+					$easy_perms['bloguser_perm_vote_spam'] = 1;
 
 				case 'owner':
 					$easy_perms['bloguser_perm_properties'] = 1;
@@ -209,7 +210,7 @@ function blog_update_perms( $blog, $context = 'user' )
 														.', '.$easy_perms['bloguser_perm_media_upload'].', '.$easy_perms['bloguser_perm_media_browse']
 														.', '.$easy_perms['bloguser_perm_media_change'].', '.$easy_perms['bloguser_perm_page']
 														.', '.$easy_perms['bloguser_perm_intro'].', '.$easy_perms['bloguser_perm_podcast']
-														.', '.$easy_perms['bloguser_perm_sidebar'].' ) ';
+														.', '.$easy_perms['bloguser_perm_sidebar'].', '.$easy_perms['bloguser_perm_vote_spam'].' ) ';
 		}
 		else
 		{	// Use checkboxes
@@ -264,10 +265,12 @@ function blog_update_perms( $blog, $context = 'user' )
 			$perm_media_browse = param( 'blog_perm_media_browse_'.$loop_ID, 'integer', 0 );
 			$perm_media_change = param( 'blog_perm_media_change_'.$loop_ID, 'integer', 0 );
 
+			$perm_vote_spam = param( 'blog_perm_vote_spam_'.$loop_ID, 'integer', 0 );
+
 			// Update those permissions in DB:
 
 			if( $ismember || count($perm_post) || $perm_delpost || $perm_edit_ts || $perm_draft_comments || $perm_publ_comments || $perm_publ_comments || 
-				$perm_cats || $perm_properties || $perm_admin || $perm_media_upload || $perm_media_browse || $perm_media_change )
+				$perm_cats || $perm_properties || $perm_admin || $perm_media_upload || $perm_media_browse || $perm_media_change || $perm_vote_spam )
 			{ // There are some permissions for this user:
 				$ismember = 1;	// Must have this permission
 
@@ -277,7 +280,7 @@ function blog_update_perms( $blog, $context = 'user' )
 																	$perm_delpost, $perm_edit_ts, $perm_draft_comments, $perm_publ_comments,
 																	$perm_depr_comments, $perm_cats, $perm_properties, $perm_admin, $perm_media_upload, 
 																	$perm_media_browse, $perm_media_change, $perm_page,	$perm_intro, $perm_podcast, 
-																	$perm_sidebar )";
+																	$perm_sidebar, $perm_vote_spam )";
 			}
 		}
 	}
@@ -290,7 +293,7 @@ function blog_update_perms( $blog, $context = 'user' )
 											{$prefix}perm_draft_cmts, {$prefix}perm_publ_cmts, {$prefix}perm_depr_cmts,
 											{$prefix}perm_cats, {$prefix}perm_properties, {$prefix}perm_admin,
 											{$prefix}perm_media_upload, {$prefix}perm_media_browse, {$prefix}perm_media_change,
-											{$prefix}perm_page, {$prefix}perm_intro, {$prefix}perm_podcast, {$prefix}perm_sidebar )
+											{$prefix}perm_page, {$prefix}perm_intro, {$prefix}perm_podcast, {$prefix}perm_sidebar, {$prefix}perm_vote_spam )
 									VALUES ".implode( ',', $inserted_values ) );
 	}
 }
@@ -346,7 +349,8 @@ function blogperms_get_easy2( $perms, $context = 'user' )
 									+(int)$perms->{'blog'.$context.'_perm_delpost'};
 
 	$perms_admin =   (int)$perms->{'blog'.$context.'_perm_admin'}
-									+(int)$perms->{'blog'.$context.'_perm_edit_ts'};
+									+(int)$perms->{'blog'.$context.'_perm_edit_ts'}
+									+(int)$perms->{'blog'.$context.'_perm_vote_spam'};
 
 	$perm_edit = $perms->{'blog'.$context.'_perm_edit'};
 
@@ -616,6 +620,9 @@ function set_cache_enabled( $cache_key, $new_status, $coll_ID = NULL, $save_sett
 
 /*
  * $Log$
+ * Revision 1.16  2011/09/25 07:06:21  efy-yurybakh
+ * Implement new permission for spam voting
+ *
  * Revision 1.15  2011/09/04 22:13:14  fplanque
  * copyright 2011
  *

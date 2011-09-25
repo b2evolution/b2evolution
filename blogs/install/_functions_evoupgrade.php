@@ -3035,6 +3035,16 @@ function upgrade_b2evo_tables()
 									ADD comment_spam_countvotes INT UNSIGNED NOT NULL DEFAULT 0 AFTER comment_spam_addvotes' );
 		task_end();
 
+		task_begin( 'Adding new user permission for spam voting...' );
+		$DB->query( 'ALTER TABLE T_coll_user_perms
+									ADD bloguser_perm_vote_spam tinyint NOT NULL default 0' );
+		task_end();
+
+		task_begin( 'Adding new group permission for spam voting...' );
+		$DB->query( 'ALTER TABLE T_coll_group_perms
+									ADD bloggroup_perm_vote_spam tinyint NOT NULL default 0' );
+		task_end();
+
 		set_upgrade_checkpoint( '10300' );
 	}
 
@@ -3204,6 +3214,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.420  2011/09/25 07:06:21  efy-yurybakh
+ * Implement new permission for spam voting
+ *
  * Revision 1.419  2011/09/24 06:29:14  efy-yurybakh
  * add T_comments__votes in upgrade procedure
  *

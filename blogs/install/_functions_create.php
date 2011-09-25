@@ -1320,17 +1320,17 @@ function create_demo_contents()
 			bloggroup_perm_poststatuses, bloggroup_perm_delpost, bloggroup_perm_edit_ts,
 			bloggroup_perm_draft_cmts, bloggroup_perm_publ_cmts, bloggroup_perm_depr_cmts,
 			bloggroup_perm_cats, bloggroup_perm_properties,
-			bloggroup_perm_media_upload, bloggroup_perm_media_browse, bloggroup_perm_media_change )
+			bloggroup_perm_media_upload, bloggroup_perm_media_browse, bloggroup_perm_media_change, bloggroup_perm_vote_spam )
 		VALUES
-			( $blog_a_ID, ".$Group_Admins->ID.", 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ),
-			( $blog_a_ID, ".$Group_Privileged->ID.", 1, 'published,deprecated,protected,private,draft', 1, 0, 1, 1, 1, 0, 0, 1, 1, 1 ),
-			( $blog_a_ID, ".$Group_Bloggers->ID.", 1, 'published,deprecated,protected,private,draft', 0, 0, 0, 0, 0, 0, 0, 1, 1, 0 ),
-			( $blog_b_ID, ".$Group_Admins->ID.", 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ),
-			( $blog_b_ID, ".$Group_Privileged->ID.", 1, 'published,deprecated,protected,private,draft', 1, 0, 1, 1, 1, 0, 0, 1, 1, 1 ),
-			( $blog_b_ID, ".$Group_Bloggers->ID.", 1, 'published,deprecated,protected,private,draft', 0, 0, 0, 0, 0, 0, 0, 1, 1, 0 ),
-			( $blog_linkblog_ID, ".$Group_Admins->ID.", 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ),
-			( $blog_linkblog_ID, ".$Group_Privileged->ID.", 1, 'published,deprecated,protected,private,draft', 1, 0, 1, 1, 1, 0, 0, 1, 1, 1 ),
-			( $blog_linkblog_ID, ".$Group_Bloggers->ID.", 1, 'published,deprecated,protected,private,draft', 0, 0, 0, 0, 0, 0, 0, 1, 1, 0 )";
+			( $blog_a_ID, ".$Group_Admins->ID.", 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ),
+			( $blog_a_ID, ".$Group_Privileged->ID.", 1, 'published,deprecated,protected,private,draft', 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1 ),
+			( $blog_a_ID, ".$Group_Bloggers->ID.", 1, 'published,deprecated,protected,private,draft', 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1 ),
+			( $blog_b_ID, ".$Group_Admins->ID.", 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ),
+			( $blog_b_ID, ".$Group_Privileged->ID.", 1, 'published,deprecated,protected,private,draft', 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1 ),
+			( $blog_b_ID, ".$Group_Bloggers->ID.", 1, 'published,deprecated,protected,private,draft', 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1 ),
+			( $blog_linkblog_ID, ".$Group_Admins->ID.", 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ),
+			( $blog_linkblog_ID, ".$Group_Privileged->ID.", 1, 'published,deprecated,protected,private,draft', 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1 ),
+			( $blog_linkblog_ID, ".$Group_Bloggers->ID.", 1, 'published,deprecated,protected,private,draft', 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1 )";
 	$DB->query( $query );
 	echo "OK.<br />\n";
 
@@ -1362,6 +1362,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.318  2011/09/25 07:06:21  efy-yurybakh
+ * Implement new permission for spam voting
+ *
  * Revision 1.317  2011/09/21 11:10:38  efy-yurybakh
  * install demo data: enable ratings for blogs 1 & 3
  *

@@ -1212,6 +1212,7 @@ class User extends DataObject
 			case 'blog_podcast':
 			case 'blog_sidebar':
 			case 'blog_edit_ts':
+			case 'blog_spam_vote':
 				// Blog permission to edit its properties...
 				if( $this->check_perm_blogowner( $perm_target_ID ) )
 				{	// Owner can do *almost* anything:
@@ -1528,6 +1529,7 @@ class User extends DataObject
 				$this->blog_post_statuses[$perm_target_blog]['blog_media_upload'] = $row['bloguser_perm_media_upload'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_media_browse'] = $row['bloguser_perm_media_browse'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_media_change'] = $row['bloguser_perm_media_change'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_spam_vote'] = $row['bloguser_perm_vote_spam'];
 			}
 		}
 
@@ -2558,6 +2560,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.129  2011/09/25 07:06:21  efy-yurybakh
+ * Implement new permission for spam voting
+ *
  * Revision 1.128  2011/09/24 07:38:21  efy-yurybakh
  * delete children objects from T_comments__votes
  *

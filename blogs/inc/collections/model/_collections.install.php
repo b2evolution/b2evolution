@@ -342,6 +342,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			bloguser_perm_intro        tinyint NOT NULL default 0,
 			bloguser_perm_podcast      tinyint NOT NULL default 0,
 			bloguser_perm_sidebar      tinyint NOT NULL default 0,
+			bloguser_perm_vote_spam    tinyint NOT NULL default 0,
 			PRIMARY KEY bloguser_pk (bloguser_blog_ID,bloguser_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -368,6 +369,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			bloggroup_perm_intro        tinyint NOT NULL default 0,
 			bloggroup_perm_podcast      tinyint NOT NULL default 0,
 			bloggroup_perm_sidebar      tinyint NOT NULL default 0,
+			bloggroup_perm_vote_spam    tinyint NOT NULL default 0,
 			PRIMARY KEY bloggroup_pk (bloggroup_blog_ID,bloggroup_group_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -399,6 +401,9 @@ $schema_queries = array_merge( $schema_queries, array(
 
 /*
  * $Log$
+ * Revision 1.44  2011/09/25 07:06:21  efy-yurybakh
+ * Implement new permission for spam voting
+ *
  * Revision 1.43  2011/09/23 14:01:58  fplanque
  * Quick/temporary fixes so we can work in the meantime
  *
