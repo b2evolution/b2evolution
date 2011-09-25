@@ -441,6 +441,7 @@ class Group extends DataObject
 						'blog_media_upload' => '0',
 						'blog_media_browse' => '0',
 						'blog_media_change' => '0',
+						'blog_vote_spam' => '0',
 					);
 			}
 			else
@@ -473,7 +474,7 @@ class Group extends DataObject
 				$this->blog_post_statuses[$perm_target_blog]['blog_media_upload'] = $row['bloggroup_perm_media_upload'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_media_browse'] = $row['bloggroup_perm_media_browse'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_media_change'] = $row['bloggroup_perm_media_change'];
-				$this->blog_post_statuses[$perm_target_blog]['blog_spam_vote'] = $row['bloggroup_perm_vote_spam'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_vote_spam'] = $row['bloggroup_perm_vote_spam'];
 			}
 		}
 
@@ -648,6 +649,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.49  2011/09/25 08:22:47  efy-yurybakh
+ * Implement new permission for spam voting
+ *
  * Revision 1.48  2011/09/25 07:06:21  efy-yurybakh
  * Implement new permission for spam voting
  *

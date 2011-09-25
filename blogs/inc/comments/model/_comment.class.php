@@ -309,12 +309,11 @@ class Comment extends DataObject
 	 * Set the vote, as a number.
 	 * 
 	 * @param string Vote type (spam, notsure, ok)
-	 * @param int User ID
 	 * @access protected
 	 */
-	function set_vote( $vote_type, $user_ID )
+	function set_vote( $vote_type )
 	{
-		global $DB;
+		global $DB, $current_User;
 		
 		switch ( $vote_type )
 		{ // Set a value for spam vote
@@ -339,18 +338,18 @@ class Comment extends DataObject
 		}
 		
 		$sql_update_count = '';
-		if( !$DB->get_row( "SELECT * FROM T_comments__votes WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_user_ID = '".(int)$user_ID."'" ) )
+		if( !$DB->get_row( "SELECT * FROM T_comments__votes WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_user_ID = '".$current_User->ID."'" ) )
 		{ // Add a new vote for first time
 			$DB->query( "INSERT INTO T_comments__votes( cmvt_cmt_ID, cmvt_user_ID, cmvt_spam )
-												VALUES( '".$this->ID."', '".(int)$user_ID."', '".$vote."')" );
-			$spam_count = (int)$DB->get_var( "SELECT COUNT(cmvt_spam) FROM T_comments__votes WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_spam IS NOT NULL" );
+												VALUES( '".$this->ID."', '".$current_User->ID."', '".$vote."')" );
+			$spam_count = (int)$DB->get_var( "SELECT COUNT(cmvt_spam) FROM T_comments__votes WHERE cmvt_cmt_ID = '".$current_User->ID."' AND cmvt_spam IS NOT NULL" );
 			$sql_update_count = ", comment_spam_countvotes = '".$spam_count."'";
 			$this->comment_spam_countvotes = $spam_count;
 		}
 		else
 		{ // Update a vote
 			$DB->query( "UPDATE T_comments__votes SET cmvt_spam = '".$vote."'
-												WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_user_ID = '".(int)$user_ID."'" );
+												WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_user_ID = '".$current_User->ID."'" );
 		}
 
 		// Update fields with spam counters for this comment
@@ -1169,12 +1168,6 @@ class Comment extends DataObject
 
 		$this->get_Item();
 
-		if( ($this->status == $vote_type) // Already Spam!
-			|| ! $current_User->check_perm( $this->blogperm_name(), '', false, $this->Item->get_blog_ID() ) )
-		{ // If User has no permission to edit comments, with this comment status:
-			return false;
-		}
-
 		switch( $vote_type )
 		{
 			case "spam":
@@ -1258,6 +1251,13 @@ class Comment extends DataObject
 	function vote_spam( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
 		global $current_User;
+
+		$this->get_Item();
+
+		if( ! $current_User->check_perm( 'blog_vote_spam', 'edit', false, $this->Item->get_blog_ID() ) )
+		{ // If User has no permission to vote spam
+			return false;
+		}
 
 		echo $before;
 
@@ -2306,6 +2306,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.106  2011/09/25 08:22:46  efy-yurybakh
+ * Implement new permission for spam voting
+ *
  * Revision 1.105  2011/09/25 03:54:20  efy-yurybakh
  * Add spam voting to dashboard
  *

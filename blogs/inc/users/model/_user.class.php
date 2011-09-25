@@ -1212,7 +1212,7 @@ class User extends DataObject
 			case 'blog_podcast':
 			case 'blog_sidebar':
 			case 'blog_edit_ts':
-			case 'blog_spam_vote':
+			case 'blog_vote_spam':
 				// Blog permission to edit its properties...
 				if( $this->check_perm_blogowner( $perm_target_ID ) )
 				{	// Owner can do *almost* anything:
@@ -1497,6 +1497,7 @@ class User extends DataObject
 						'blog_media_upload' => '0',
 						'blog_media_browse' => '0',
 						'blog_media_change' => '0',
+						'blog_vote_spam' => '0',
 					);
 			}
 			else
@@ -1529,7 +1530,7 @@ class User extends DataObject
 				$this->blog_post_statuses[$perm_target_blog]['blog_media_upload'] = $row['bloguser_perm_media_upload'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_media_browse'] = $row['bloguser_perm_media_browse'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_media_change'] = $row['bloguser_perm_media_change'];
-				$this->blog_post_statuses[$perm_target_blog]['blog_spam_vote'] = $row['bloguser_perm_vote_spam'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_vote_spam'] = $row['bloguser_perm_vote_spam'];
 			}
 		}
 
@@ -2560,6 +2561,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.130  2011/09/25 08:22:47  efy-yurybakh
+ * Implement new permission for spam voting
+ *
  * Revision 1.129  2011/09/25 07:06:21  efy-yurybakh
  * Implement new permission for spam voting
  *

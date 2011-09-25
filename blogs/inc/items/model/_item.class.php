@@ -4792,6 +4792,7 @@ class Item extends ItemLight
 		$ratings = array();
 		$ratings['total'] = 0;
 		$ratings['summary'] = 0;
+		$ratings['unrated'] = 0;
 		for( $i=5; $i>=0; $i-- )
 		{
 			foreach($results as $rating)
@@ -4874,6 +4875,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.258  2011/09/25 08:22:47  efy-yurybakh
+ * Implement new permission for spam voting
+ *
  * Revision 1.257  2011/09/23 22:37:09  fplanque
  * minor / doc
  *

@@ -238,10 +238,10 @@ switch( $action )
 		if( $edited_Comment !== false )
 		{ // The comment still exists
 			$redirect_to = param( 'redirect_to', 'string', NULL );
-			$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
+			$current_User->check_perm( 'blog_vote_spam', 'edit', true, $blog );
 
 			$vote = param( 'vote', 'string' );
-			$edited_Comment->set_vote( $vote, $current_User->ID );
+			$edited_Comment->set_vote( $vote );
 			$edited_Comment->dbupdate();
 
 			if( $moderation != NULL )
@@ -428,6 +428,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.73  2011/09/25 08:22:46  efy-yurybakh
+ * Implement new permission for spam voting
+ *
  * Revision 1.72  2011/09/24 13:27:36  efy-yurybakh
  * Change voting buttons
  *
