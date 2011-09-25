@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2011-09-20 00:07+0200\n"
-"PO-Revision-Date: 2011-09-20 02:27-0500\n"
+"POT-Creation-Date: 2011-09-24 01:00+0200\n"
+"PO-Revision-Date: 2011-09-23 23:03-0500\n"
 "Last-Translator: Alex (sam2kb)\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -188,7 +188,7 @@ msgstr "Удалить"
 #: ../../../inc/files/views/_file_delete.form.php:72
 #: ../../../inc/files/views/_file_list.inc.php:444
 #: ../../../inc/items/items.ctrl.php:1112
-#: ../../../inc/users/model/_user.funcs.php:874
+#: ../../../inc/users/model/_user.funcs.php:977
 #: ../../../inc/users/views/_user_coll_list.view.php:49
 msgid "Delete"
 msgstr "Удалить"
@@ -678,8 +678,8 @@ msgstr "Вы не вошли в систему."
 
 #: ../../../htsrv/avatar_update.php:58
 #: ../../../inc/files/files.ctrl.php:1146
-#: ../../../inc/users/model/_user.class.php:2341
-#: ../../../inc/users/model/_user.class.php:2402
+#: ../../../inc/users/model/_user.class.php:2369
+#: ../../../inc/users/model/_user.class.php:2430
 msgid "Your profile picture has been changed."
 msgstr "Ваше фото было изменено."
 
@@ -692,7 +692,7 @@ msgid "Your profile picture has been set."
 msgstr "Ваше фото было создано."
 
 #: ../../../htsrv/avatar_update.php:88
-#: ../../../inc/users/model/_user.class.php:2407
+#: ../../../inc/users/model/_user.class.php:2435
 msgid "The file you uploaded does not seem to be an image."
 msgstr "Загруженный вами файл не является изображением."
 
@@ -884,7 +884,7 @@ msgstr "Кто-то (возможно вы) запросил изменение 
 
 #: ../../../htsrv/login.php:111
 #: ../../../htsrv/register.php:217
-#: ../../../inc/users/model/_user.class.php:1817
+#: ../../../inc/users/model/_user.class.php:1845
 msgid "Login:"
 msgstr "Логин:"
 
@@ -894,13 +894,13 @@ msgstr "Ссылка для изменения вашего пароля:"
 
 #: ../../../htsrv/login.php:119
 #: ../../../htsrv/message_send.php:86
-#: ../../../inc/users/model/_user.class.php:1824
+#: ../../../inc/users/model/_user.class.php:1852
 msgid "Please note:"
 msgstr "Пожалуйста, обратите внимание:"
 
 #: ../../../htsrv/login.php:120
 #: ../../../htsrv/message_send.php:87
-#: ../../../inc/users/model/_user.class.php:1825
+#: ../../../inc/users/model/_user.class.php:1853
 msgid "For security reasons the link is only valid for your current session (by means of your session cookie)."
 msgstr "Из соображений безопасности ссылка доступна только в текущей сессии (основано на cookie сессии)."
 
@@ -1176,7 +1176,7 @@ msgid "Your profile & subscriptions have been updated."
 msgstr "Ваш профиль и подписки были обновлены."
 
 #: ../../../htsrv/trackback.php:121
-#: ../../../inc/users/model/_user.funcs.php:695
+#: ../../../inc/users/model/_user.funcs.php:798
 msgid "Supplied URL is invalid: "
 msgstr "Отправленный URL недопустим:"
 
@@ -1391,7 +1391,7 @@ msgstr "Не выбран ни один блог"
 #: ../../../inc/items/model/_item.class.php:4176
 #: ../../../inc/items/model/_item.class.php:4183
 #: ../../../inc/items/views/_item_list_table.view.php:87
-#: ../../../inc/sessions/views/_stats_hit_list.view.php:160
+#: ../../../inc/sessions/views/_stats_hit_list.view.php:169
 #: ../../../inc/widgets/widgets/_coll_comment_list.widget.php:92
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:96
 msgid "Blog"
@@ -1448,7 +1448,7 @@ msgstr "Настройки блога"
 #: ../../../inc/sessions/stats.ctrl.php:216
 #: ../../../inc/users/registration.ctrl.php:108
 #: ../../../inc/users/settings.ctrl.php:59
-#: ../../../inc/users/user.ctrl.php:343
+#: ../../../inc/users/user.ctrl.php:344
 #: ../../../inc/users/userfields.ctrl.php:219
 #: ../../../inc/users/users.ctrl.php:284
 msgid "Users"
@@ -1561,8 +1561,8 @@ msgstr "В начало"
 #: ../../../inc/collections/views/_coll_user_perm.form.php:460
 #: ../../../inc/sessions/views/_stats_browserhits.view.php:161
 #: ../../../inc/users/model/_user.funcs.php:419
-#: ../../../inc/users/model/_user.funcs.php:948
-#: ../../../inc/users/user.ctrl.php:366
+#: ../../../inc/users/model/_user.funcs.php:1057
+#: ../../../inc/users/user.ctrl.php:367
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:127
 #: ../../../install/index.php:168
 msgid "Admin"
@@ -1809,7 +1809,7 @@ msgid "The decimal value is invalid."
 msgstr "Недопустимое десятичное значение."
 
 #: ../../../inc/_core/_param.funcs.php:561
-#: ../../../inc/users/model/_user.funcs.php:667
+#: ../../../inc/users/model/_user.funcs.php:770
 msgid "The email address is invalid."
 msgstr "Email адрес недопустим."
 
@@ -1844,17 +1844,17 @@ msgstr "Пожалуйста введите правильный телефон�
 
 #: ../../../inc/_core/_param.funcs.php:1153
 #: ../../../inc/_core/_param.funcs.php:1158
-#: ../../../inc/users/model/_user.funcs.php:710
+#: ../../../inc/users/model/_user.funcs.php:813
 msgid "Please enter your password twice."
 msgstr "Введите ваш пароль дважды."
 
 #: ../../../inc/_core/_param.funcs.php:1165
-#: ../../../inc/users/model/_user.funcs.php:716
+#: ../../../inc/users/model/_user.funcs.php:819
 msgid "You typed two different passwords."
 msgstr "Вы ввели два различных пароля."
 
 #: ../../../inc/_core/_param.funcs.php:1171
-#: ../../../inc/users/model/_user.funcs.php:720
+#: ../../../inc/users/model/_user.funcs.php:823
 #, php-format
 msgid "The minimum password length is %d characters."
 msgstr "Минимальная длина пароля %d символов."
@@ -1988,8 +1988,8 @@ msgid "User Profile"
 msgstr "Профиль пользователя"
 
 #: ../../../inc/_core/_template.funcs.php:363
-#: ../../../inc/users/model/_user.funcs.php:924
-#: ../../../inc/users/user.ctrl.php:353
+#: ../../../inc/users/model/_user.funcs.php:1033
+#: ../../../inc/users/user.ctrl.php:354
 #: ../../../inc/users/views/_user_avatar.form.php:66
 #: ../../../inc/users/views/_user_identity.form.php:207
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:263
@@ -2009,8 +2009,8 @@ msgstr "Настройки пользователя"
 #: ../../../inc/items/views/_item_history.view.php:60
 #: ../../../inc/items/views/_item_list_full.view.php:433
 #: ../../../inc/sessions/views/_stats_goalhits.view.php:135
-#: ../../../inc/sessions/views/_stats_hit_list.view.php:105
-#: ../../../inc/users/user.ctrl.php:60
+#: ../../../inc/sessions/views/_stats_hit_list.view.php:113
+#: ../../../inc/users/user.ctrl.php:61
 #: ../../../inc/users/users.ctrl.php:77
 #: ../../../skins/_item_comment_form.inc.php:161
 #: ../../../skins/basic/_item_comment_form.inc.php:43
@@ -2271,7 +2271,7 @@ msgstr "Запись"
 #: ../../../inc/sessions/goals.ctrl.php:47
 #: ../../../inc/slugs/slugs.ctrl.php:44
 #: ../../../inc/users/groups.ctrl.php:84
-#: ../../../inc/users/user.ctrl.php:60
+#: ../../../inc/users/user.ctrl.php:61
 #: ../../../inc/users/userfields.ctrl.php:58
 #: ../../../inc/users/users.ctrl.php:77
 #, php-format
@@ -3017,7 +3017,7 @@ msgstr "Удалить следующие %s записей:"
 
 #: ../../../inc/antispam/views/_antispam_ban.form.php:75
 #: ../../../inc/sessions/views/_stats_goalhits.view.php:161
-#: ../../../inc/sessions/views/_stats_hit_list.view.php:131
+#: ../../../inc/sessions/views/_stats_hit_list.view.php:140
 #: ../../../inc/sessions/views/_stats_referers.view.php:63
 #: ../../../inc/sessions/views/_stats_referers.view.php:171
 #: ../../../inc/sessions/views/_stats_refsearches.view.php:61
@@ -3059,7 +3059,7 @@ msgstr "Затронутые пользователи"
 #: ../../../inc/collections/views/_coll_user_perm.form.php:175
 #: ../../../inc/collections/views/_coll_user_perm.form.php:441
 #: ../../../inc/messaging/views/_contact_list.view.php:121
-#: ../../../inc/users/model/_user.class.php:1775
+#: ../../../inc/users/model/_user.class.php:1803
 #: ../../../inc/users/views/_user_identity.form.php:81
 #: ../../../inc/users/views/_user_identity.form.php:175
 #: ../../../inc/users/views/_user_identity.form.php:210
@@ -3078,9 +3078,9 @@ msgid "Login"
 msgstr "Логин"
 
 #: ../../../inc/antispam/views/_antispam_ban.form.php:199
-#: ../../../inc/users/model/_user.class.php:1776
-#: ../../../inc/users/model/_user.class.php:1778
-#: ../../../inc/users/model/_user.class.php:1780
+#: ../../../inc/users/model/_user.class.php:1804
+#: ../../../inc/users/model/_user.class.php:1806
+#: ../../../inc/users/model/_user.class.php:1808
 #: ../../../inc/users/views/_user_identity.form.php:82
 #: ../../../inc/users/views/_user_identity.form.php:84
 #: ../../../inc/users/views/_user_identity.form.php:85
@@ -3090,9 +3090,9 @@ msgid "First name"
 msgstr "Имя"
 
 #: ../../../inc/antispam/views/_antispam_ban.form.php:200
-#: ../../../inc/users/model/_user.class.php:1777
-#: ../../../inc/users/model/_user.class.php:1778
-#: ../../../inc/users/model/_user.class.php:1780
+#: ../../../inc/users/model/_user.class.php:1805
+#: ../../../inc/users/model/_user.class.php:1806
+#: ../../../inc/users/model/_user.class.php:1808
 #: ../../../inc/users/views/_user_identity.form.php:83
 #: ../../../inc/users/views/_user_identity.form.php:84
 #: ../../../inc/users/views/_user_identity.form.php:85
@@ -3103,7 +3103,7 @@ msgstr "Фамилия"
 
 #: ../../../inc/antispam/views/_antispam_ban.form.php:201
 #: ../../../inc/messaging/views/_contact_list.view.php:129
-#: ../../../inc/users/model/_user.class.php:1774
+#: ../../../inc/users/model/_user.class.php:1802
 #: ../../../inc/users/views/_settings.form.php:32
 #: ../../../inc/users/views/_user_identity.form.php:80
 #: ../../../inc/users/views/_user_identity.form.php:182
@@ -3574,7 +3574,7 @@ msgstr "Удалить элемент &laquo;%s&raquo; ?"
 #: ../../../inc/sessions/views/_goal.form.php:38
 #: ../../../inc/skins/views/_skin.form.php:39
 #: ../../../inc/slugs/views/_slug.form.php:33
-#: ../../../inc/users/model/_user.funcs.php:880
+#: ../../../inc/users/model/_user.funcs.php:989
 #: ../../../inc/users/views/_group.form.php:140
 #: ../../../inc/users/views/_user_coll_list.view.php:55
 #: ../../../inc/users/views/_userfield.form.php:48
@@ -3851,8 +3851,8 @@ msgstr "SEO"
 #: ../../../inc/files/views/_file_settings.form.php:244
 #: ../../../inc/plugins/views/_plugin_settings.form.php:113
 #: ../../../inc/plugins/views/_plugin_settings.form.php:127
-#: ../../../inc/users/model/_user.funcs.php:942
-#: ../../../inc/users/user.ctrl.php:363
+#: ../../../inc/users/model/_user.funcs.php:1051
+#: ../../../inc/users/user.ctrl.php:364
 msgid "Advanced"
 msgstr "Дополнительно"
 
@@ -6270,17 +6270,11 @@ msgid "Log in now!"
 msgstr "Авторизоваться!"
 
 #: ../../../inc/comments/model/_comment.funcs.php:484
-#: ../../../inc/items/model/_item.class.php:743
-msgid "register now!"
-msgstr "зарегистрироваться!"
-
-#: ../../../inc/comments/model/_comment.funcs.php:485
-#: ../../../inc/items/model/_item.class.php:744
 #, php-format
-msgid "If you have no account yet, you can %s (It only takes a few seconds)"
-msgstr "Если у вас еще нет аккаунта, вы можете %s (Это займет всего несколько секунд)"
+msgid "If you have no account yet, you can <a href=\"%s\">register now</a>... (It only takes a few seconds!)"
+msgstr "Если у вас еще нет аккаунта, вы можете <a href=\"%s\">зарегистрироваться</a>... (Это займет всего несколько секунд!)"
 
-#: ../../../inc/comments/model/_comment.funcs.php:500
+#: ../../../inc/comments/model/_comment.funcs.php:503
 msgid "Comment text:"
 msgstr "Текст комментария:"
 
@@ -6440,7 +6434,7 @@ msgstr "Информация об отзыве"
 #: ../../../inc/items/views/_item_list_track.view.php:156
 #: ../../../inc/items/views/inc/_item_links.inc.php:68
 #: ../../../inc/sessions/views/_stats_goalhits.view.php:149
-#: ../../../inc/sessions/views/_stats_hit_list.view.php:119
+#: ../../../inc/sessions/views/_stats_hit_list.view.php:128
 #: ../../../inc/sessions/views/_stats_refdomains.view.php:127
 #: ../../../inc/slugs/views/_slug.form.php:46
 #: ../../../inc/slugs/views/_slug_list.view.php:106
@@ -9000,6 +8994,15 @@ msgstr "У этой записи есть один комментарий, но 
 msgid "There are %s comments on this post but you must be a member of this blog to see the comments."
 msgstr "У этой записи %s комментариев, вы должны быть членом этого блога, чтобы их открыть."
 
+#: ../../../inc/items/model/_item.class.php:743
+msgid "register now!"
+msgstr "зарегистрироваться!"
+
+#: ../../../inc/items/model/_item.class.php:744
+#, php-format
+msgid "If you have no account yet, you can %s (It only takes a few seconds)"
+msgstr "Если у вас еще нет аккаунта, вы можете %s (Это займет всего несколько секунд)"
+
 #: ../../../inc/items/model/_item.class.php:777
 msgid "Comments are closed for this post."
 msgstr "Комментарии закрыты для этой записи."
@@ -11089,7 +11092,7 @@ msgid "The database has been updated."
 msgstr "База данных обновлена."
 
 #: ../../../inc/plugins/plugins.ctrl.php:122
-#: ../../../install/_functions_evoupgrade.php:3110
+#: ../../../install/_functions_evoupgrade.php:3112
 msgid "The DB schema has been changed since confirmation."
 msgstr "Структура базы данных была изменена после подтверждения."
 
@@ -11252,7 +11255,7 @@ msgid "The plugin needs the following database changes."
 msgstr "Плагин требует следующих изменений в базе данных."
 
 #: ../../../inc/plugins/plugins.ctrl.php:982
-#: ../../../install/_functions_evoupgrade.php:3144
+#: ../../../install/_functions_evoupgrade.php:3146
 msgid "The following database changes will be carried out. If you are not sure what this means, it will probably be alright."
 msgstr "Следующие изменения базы будут выполнены. Если вы не знаете что это означает, вероятно все будет хорошо."
 
@@ -11781,7 +11784,7 @@ msgstr "Хиты"
 #: ../../../inc/sessions/goals.ctrl.php:47
 #: ../../../inc/sessions/views/_goal.form.php:40
 #: ../../../inc/sessions/views/_stats_goalhits.view.php:175
-#: ../../../inc/sessions/views/_stats_hit_list.view.php:153
+#: ../../../inc/sessions/views/_stats_hit_list.view.php:162
 #: ../../../inc/sessions/views/_stats_search_keywords.view.php:188
 msgid "Goal"
 msgstr "Гол"
@@ -12075,7 +12078,7 @@ msgstr "Хиты посещений людей, которые пришли в �
 
 #: ../../../inc/sessions/views/_stats_direct.view.php:55
 #: ../../../inc/sessions/views/_stats_goalhits.view.php:141
-#: ../../../inc/sessions/views/_stats_hit_list.view.php:111
+#: ../../../inc/sessions/views/_stats_hit_list.view.php:120
 #: ../../../inc/sessions/views/_stats_referers.view.php:55
 #: ../../../inc/sessions/views/_stats_refsearches.view.php:53
 msgid "Date Time"
@@ -12088,7 +12091,7 @@ msgid "Delete this hit!"
 msgstr "Удалить этот хит!"
 
 #: ../../../inc/sessions/views/_stats_direct.view.php:84
-#: ../../../inc/sessions/views/_stats_hit_list.view.php:167
+#: ../../../inc/sessions/views/_stats_hit_list.view.php:176
 #: ../../../inc/sessions/views/_stats_referers.view.php:116
 #: ../../../inc/sessions/views/_stats_refsearches.view.php:103
 msgid "Requested URI"
@@ -12096,7 +12099,7 @@ msgstr "Запрошенный URI"
 
 #: ../../../inc/sessions/views/_stats_direct.view.php:91
 #: ../../../inc/sessions/views/_stats_hit_list.view.php:86
-#: ../../../inc/sessions/views/_stats_hit_list.view.php:173
+#: ../../../inc/sessions/views/_stats_hit_list.view.php:182
 #: ../../../inc/sessions/views/_stats_referers.view.php:123
 #: ../../../inc/sessions/views/_stats_refsearches.view.php:110
 #: ../../../inc/sessions/views/_stats_sessions_list.view.php:96
@@ -12129,17 +12132,17 @@ msgid "All but current session"
 msgstr "Все кроме текущей сессии"
 
 #: ../../../inc/sessions/views/_stats_goalhits.view.php:128
-#: ../../../inc/sessions/views/_stats_hit_list.view.php:98
+#: ../../../inc/sessions/views/_stats_hit_list.view.php:106
 msgid "Session"
 msgstr "Сессия"
 
 #: ../../../inc/sessions/views/_stats_goalhits.view.php:155
-#: ../../../inc/sessions/views/_stats_hit_list.view.php:125
+#: ../../../inc/sessions/views/_stats_hit_list.view.php:134
 msgid "U.A."
 msgstr "Агент польз."
 
 #: ../../../inc/sessions/views/_stats_goalhits.view.php:169
-#: ../../../inc/sessions/views/_stats_hit_list.view.php:139
+#: ../../../inc/sessions/views/_stats_hit_list.view.php:148
 #: ../../../inc/sessions/views/_stats_refsearches.view.php:78
 #: ../../../inc/sessions/views/_stats_search_keywords.view.php:219
 msgid "Search keywords"
@@ -12161,7 +12164,11 @@ msgstr "Исх. знач."
 msgid "Create a new goal..."
 msgstr "Создать новый гол..."
 
-#: ../../../inc/sessions/views/_stats_hit_list.view.php:146
+#: ../../../inc/sessions/views/_stats_hit_list.view.php:103
+msgid "Show all sessions"
+msgstr "Показать все сессии"
+
+#: ../../../inc/sessions/views/_stats_hit_list.view.php:155
 #: ../../../inc/sessions/views/_stats_refsearches.view.php:85
 msgid "SR"
 msgstr "СР"
@@ -12481,7 +12488,7 @@ msgid "User name for authenticating to your mail server."
 msgstr "Имя пользователя для аутентификации на вашем почтовом сервере."
 
 #: ../../../inc/settings/views/_features.form.php:103
-#: ../../../inc/users/model/_user.funcs.php:931
+#: ../../../inc/users/model/_user.funcs.php:1040
 #: ../../../inc/users/views/_user_identity.form.php:235
 #: ../../../inc/users/views/_user_password.form.php:97
 #: ../../../install/_functions_install.php:201
@@ -13763,7 +13770,7 @@ msgstr "Уровень пользователя должен быть между
 
 #: ../../../inc/users/model/_user.class.php:301
 #: ../../../inc/users/model/_user.class.php:440
-#: ../../../inc/users/model/_user.funcs.php:663
+#: ../../../inc/users/model/_user.funcs.php:766
 msgid "Please enter your e-mail address."
 msgstr "Пожалуйста введите e-mail адрес."
 
@@ -13785,12 +13792,12 @@ msgid "Please enter a value."
 msgstr "Пожалуйста, введите значение."
 
 #: ../../../inc/users/model/_user.class.php:381
-#: ../../../inc/users/model/_user.funcs.php:646
+#: ../../../inc/users/model/_user.funcs.php:749
 msgid "Please enter a nickname (can be the same as your login)."
 msgstr "Пожалуйста, введите ник (можно использовать ваш логин)."
 
 #: ../../../inc/users/model/_user.class.php:403
-#: ../../../inc/users/model/_user.funcs.php:654
+#: ../../../inc/users/model/_user.funcs.php:757
 msgid "The ICQ UIN can only be a number, no letters allowed."
 msgstr "ICQ UIN должен быть цифровой, буквы не допускаются."
 
@@ -13799,95 +13806,99 @@ msgstr "ICQ UIN должен быть цифровой, буквы не допу
 msgid "The threshold must be between 1 and 5."
 msgstr "Порог должен быть между 1 и 5."
 
-#: ../../../inc/users/model/_user.class.php:766
+#: ../../../inc/users/model/_user.class.php:678
+msgid "Show the user profile"
+msgstr "Показать профиль пользователя"
+
+#: ../../../inc/users/model/_user.class.php:794
 #, php-format
 msgid "The user's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."
 msgstr "Пользовательская медиа папка &laquo;%s&raquo; не может быть создана, потому что родительская папка недоступна для записи или не существует."
 
-#: ../../../inc/users/model/_user.class.php:775
+#: ../../../inc/users/model/_user.class.php:803
 #, php-format
 msgid "The user's media directory &laquo;%s&raquo; could not be created."
 msgstr "Пользовательская медиа папка &laquo;%s&raquo; не может быть создана."
 
-#: ../../../inc/users/model/_user.class.php:789
+#: ../../../inc/users/model/_user.class.php:817
 #, php-format
 msgid "The user's directory &laquo;%s&raquo; has been created with permissions %s."
 msgstr "Папка пользователя  &laquo;%s&raquo; создана с разрешениями %s."
 
-#: ../../../inc/users/model/_user.class.php:1282
+#: ../../../inc/users/model/_user.class.php:1310
 #, php-format
 msgid "Group/user permission denied by %s!"
 msgstr "Доступ для группы / пользователя запрещен %s!"
 
-#: ../../../inc/users/model/_user.class.php:1815
+#: ../../../inc/users/model/_user.class.php:1843
 msgid "You need to validate your email address by clicking on the following link."
 msgstr "Вы должны подтвердить ваш email адрес пройдя по следующей ссылке."
 
 #. TRANS: %s gets replaced by $app_name (normally "b2evolution")
-#: ../../../inc/users/model/_user.class.php:1818
+#: ../../../inc/users/model/_user.class.php:1846
 #, php-format
 msgid "Link to validate your %s account:"
 msgstr "Ссылка для подтверждения вашего %s аккаунта:"
 
-#: ../../../inc/users/model/_user.class.php:1827
+#: ../../../inc/users/model/_user.class.php:1855
 #: ../../../skins/_register.disp.php:143
 #: ../../../skins_adm/login/_reg_complete.main.php:70
 #, php-format
 msgid "Validate your email address for \"%s\""
 msgstr "Подтвердить ваш email адрес для \"%s\""
 
-#: ../../../inc/users/model/_user.class.php:1900
+#: ../../../inc/users/model/_user.class.php:1928
 msgid "Send email to user"
 msgstr "Послать email пользователю"
 
-#: ../../../inc/users/model/_user.class.php:2006
+#: ../../../inc/users/model/_user.class.php:2034
 msgid "Man"
 msgstr "Мужчина"
 
-#: ../../../inc/users/model/_user.class.php:2009
+#: ../../../inc/users/model/_user.class.php:2037
 msgid "Woman"
 msgstr "Женщина"
 
-#: ../../../inc/users/model/_user.class.php:2229
-#: ../../../inc/users/model/_user.class.php:2328
-#: ../../../inc/users/model/_user.class.php:2357
-#: ../../../inc/users/model/_user.class.php:2380
+#: ../../../inc/users/model/_user.class.php:2257
+#: ../../../inc/users/model/_user.class.php:2356
+#: ../../../inc/users/model/_user.class.php:2385
+#: ../../../inc/users/model/_user.class.php:2408
 #: ../../../plugins/twitter_plugin/_twitter.plugin.php:489
 msgid "You are only allowed to update your own profile!"
 msgstr "Вам разрешено изменять только свой собственный профиль!"
 
-#: ../../../inc/users/model/_user.class.php:2261
+#: ../../../inc/users/model/_user.class.php:2289
 msgid "New user has been created."
 msgstr "Создан новый пользователь."
 
-#: ../../../inc/users/model/_user.class.php:2265
+#: ../../../inc/users/model/_user.class.php:2293
 msgid "Password has been changed."
 msgstr "Пароль изменен."
 
-#: ../../../inc/users/model/_user.class.php:2277
+#: ../../../inc/users/model/_user.class.php:2305
 #, php-format
 msgid "You cannot choose the new login \"%s\" (cannot rename user fileroot)"
 msgstr "Вы не можете изменить свой логин \"%s\" (неудалось переименовать папку пользователя)"
 
-#: ../../../inc/users/model/_user.class.php:2284
+#: ../../../inc/users/model/_user.class.php:2312
 msgid "Profile has been updated."
 msgstr "Профиль обновлен."
 
-#: ../../../inc/users/model/_user.class.php:2308
-#: ../../../inc/users/user.ctrl.php:210
-#: ../../../inc/users/user.ctrl.php:286
+#: ../../../inc/users/model/_user.class.php:2336
+#: ../../../inc/users/user.ctrl.php:211
+#: ../../../inc/users/user.ctrl.php:287
 msgid "User feature settings have been changed."
 msgstr "Пользовательские настройки были изменены."
 
-#: ../../../inc/users/model/_user.class.php:2334
+#: ../../../inc/users/model/_user.class.php:2362
 msgid "Your profile picture could not be changed!"
 msgstr "Не удалось изменить ваше фото!"
 
-#: ../../../inc/users/model/_user.class.php:2364
+#: ../../../inc/users/model/_user.class.php:2392
 msgid "Your profile picture has been removed."
 msgstr "Ваше фото удалено."
 
-#: ../../../inc/users/model/_user.class.php:2390
+#: ../../../inc/users/model/_user.class.php:2418
 msgid "You don't have permission to selected user file root."
 msgstr "У вас нет доступа к выбранной директории пользователя."
 
@@ -13913,65 +13924,65 @@ msgid "Go to the back-office..."
 msgstr "Панель управления"
 
 #: ../../../inc/users/model/_user.funcs.php:466
-#: ../../../inc/users/model/_user.funcs.php:918
-#: ../../../inc/users/user.ctrl.php:348
+#: ../../../inc/users/model/_user.funcs.php:1027
+#: ../../../inc/users/user.ctrl.php:349
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:257
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:101
 msgid "Profile"
 msgstr "Профиль"
 
-#: ../../../inc/users/model/_user.funcs.php:559
+#: ../../../inc/users/model/_user.funcs.php:662
 msgid "Subscribe"
 msgstr "Подписка"
 
-#: ../../../inc/users/model/_user.funcs.php:560
+#: ../../../inc/users/model/_user.funcs.php:663
 msgid "Subscribe to email notifications"
 msgstr "Подписаться на email уведомления"
 
-#: ../../../inc/users/model/_user.funcs.php:640
+#: ../../../inc/users/model/_user.funcs.php:743
 msgid "Please enter a login."
 msgstr "Пожалуйста, введите логин."
 
-#: ../../../inc/users/model/_user.funcs.php:674
+#: ../../../inc/users/model/_user.funcs.php:777
 msgid "Please select country."
 msgstr "Пожалуйста, выберите страну."
 
-#: ../../../inc/users/model/_user.funcs.php:682
+#: ../../../inc/users/model/_user.funcs.php:785
 msgid "Please select gender."
 msgstr "Пожалуйста, выберите ваш пол."
 
-#: ../../../inc/users/model/_user.funcs.php:724
+#: ../../../inc/users/model/_user.funcs.php:827
 msgid "The password must be different from your login."
 msgstr "Пароль не должен совпадать с логином."
 
-#: ../../../inc/users/model/_user.funcs.php:728
+#: ../../../inc/users/model/_user.funcs.php:831
 msgid "The password must be different from your nickname."
 msgstr "Пароль не должен совпадать с вашем ником."
 
-#: ../../../inc/users/model/_user.funcs.php:874
+#: ../../../inc/users/model/_user.funcs.php:977
 #: ../../../inc/users/views/_user_coll_list.view.php:49
 #: ../../../inc/users/views/_user_list.view.php:379
 msgid "Delete this user!"
 msgstr "Удалить этого пользователя!"
 
-#: ../../../inc/users/model/_user.funcs.php:878
+#: ../../../inc/users/model/_user.funcs.php:981
 #: ../../../inc/users/views/_user_coll_list.view.php:53
 msgid "Compose message"
 msgstr "Написать сообщение"
 
-#: ../../../inc/users/model/_user.funcs.php:880
+#: ../../../inc/users/model/_user.funcs.php:989
 #: ../../../inc/users/views/_user_coll_list.view.php:55
 msgid "Close user profile!"
 msgstr "Закрыть профиль пользователя!"
 
-#: ../../../inc/users/model/_user.funcs.php:936
-#: ../../../inc/users/user.ctrl.php:360
+#: ../../../inc/users/model/_user.funcs.php:1045
+#: ../../../inc/users/user.ctrl.php:361
 #: ../../../inc/users/views/_user_advanced.form.php:114
 msgid "Preferences"
 msgstr "Настройка"
 
-#: ../../../inc/users/model/_user.funcs.php:953
-#: ../../../inc/users/user.ctrl.php:369
+#: ../../../inc/users/model/_user.funcs.php:1062
+#: ../../../inc/users/user.ctrl.php:370
 #: ../../../inc/users/views/_user_coll_list.view.php:66
 msgid "Personal blogs"
 msgstr "Личные блоги"
@@ -14010,27 +14021,27 @@ msgstr "Пожалуйста, введите тип."
 msgid "Minimum password length must be between %d and %d."
 msgstr "Минимальная длинна пароля должна быть между %d и %d."
 
-#: ../../../inc/users/user.ctrl.php:32
+#: ../../../inc/users/user.ctrl.php:33
 #: ../../../inc/users/users.ctrl.php:54
 msgid "You have no permission to view other users!"
 msgstr "У вас нет прав на просмотр других пользователей!"
 
-#: ../../../inc/users/user.ctrl.php:69
+#: ../../../inc/users/user.ctrl.php:70
 #: ../../../inc/users/users.ctrl.php:98
 msgid "You have no permission to edit other users!"
 msgstr "У вас нет прав на редактирование других пользователей!"
 
-#: ../../../inc/users/user.ctrl.php:76
+#: ../../../inc/users/user.ctrl.php:77
 #: ../../../inc/users/users.ctrl.php:105
 msgid "You cannot edit the admin and demouser profile in demo mode!"
 msgstr "Вы не можете редактировать администратора и гостя в демонстрационном режиме!"
 
-#: ../../../inc/users/user.ctrl.php:248
-#: ../../../inc/users/user.ctrl.php:325
+#: ../../../inc/users/user.ctrl.php:249
+#: ../../../inc/users/user.ctrl.php:326
 msgid "Usersettings of Plugins have been updated."
 msgstr "Настройки пользователя для плагина были обновлены."
 
-#: ../../../inc/users/user.ctrl.php:357
+#: ../../../inc/users/user.ctrl.php:358
 #: ../../../inc/users/views/_user_password.form.php:73
 msgid "Change password"
 msgstr "Изменение пароля"
@@ -14394,7 +14405,7 @@ msgstr "У вас нет прав на доступ к этой вкладке!"
 
 #: ../../../inc/users/views/_user_admin.form.php:51
 msgid "User admin settings"
-msgstr ""
+msgstr "Профиль пользователя (режим администратора)"
 
 #: ../../../inc/users/views/_user_admin.form.php:73
 #: ../../../inc/users/views/_user_admin.form.php:80
@@ -16367,19 +16378,19 @@ msgstr "Похоже на то, что следующие названия за�
 msgid "I can't upgrade until you make them unique. DB field: [%s]"
 msgstr "Невозможно обновить пока вы не сделаете их уникальными. Поле БД: [%s]"
 
-#: ../../../install/_functions_evoupgrade.php:3095
+#: ../../../install/_functions_evoupgrade.php:3097
 msgid "The database schema is up to date."
 msgstr "Структура базы данных в актуальном состоянии."
 
-#: ../../../install/_functions_evoupgrade.php:3134
+#: ../../../install/_functions_evoupgrade.php:3136
 msgid "Upgrade database"
 msgstr "Обновить базу данных"
 
-#: ../../../install/_functions_evoupgrade.php:3142
+#: ../../../install/_functions_evoupgrade.php:3144
 msgid "The version number is correct, but we have detected changes in the database schema. This can happen with CVS versions..."
 msgstr "Номер версии корректный, но мы обнаружили изменения в структуре базы данных. Это может происходить в CVS версиях..."
 
-#: ../../../install/_functions_evoupgrade.php:3153
+#: ../../../install/_functions_evoupgrade.php:3155
 msgid "Upgrade database!"
 msgstr "Обновить базу данных!"
 
