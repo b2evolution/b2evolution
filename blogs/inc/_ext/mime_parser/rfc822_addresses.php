@@ -239,6 +239,7 @@ class rfc822_addresses_class
 					return($this->SetPositionedWarning('Q-encoding '.$type.' is not yet supported', $p + $c));
 			}
 			$s += 2;
+			$s += strspn($value, " \t", $s);
 		}
 		$value = $decoded;
 		$encoding = $charset;
@@ -366,13 +367,38 @@ class rfc822_addresses_class
 		return(1);
 	}
 
+	Function SkipCommentGetWhiteSpace(&$p, &$space)
+	{
+		$v = $this->v;
+		$l = strlen($v);
+		for($space = '';$p<$l;)
+		{
+			switch($w = $v[$p])
+			{
+				case ' ':
+				case "\n":
+				case "\r":
+				case "\t":
+					++$p;
+					$space .= $w;
+					break;
+				case '(':
+					if(!$this->ParseComment($p, $comment))
+						return(0);
+				default:
+					return(1);
+			}
+		}
+		return(1);
+	}
+
 	Function SkipCommentWhiteSpace(&$p)
 	{
 		$v = $this->v;
 		$l = strlen($v);
 		for(;$p<$l;)
 		{
-			switch($v[$p])
+			switch($w = $v[$p])
 			{
 				case ' ':
 				case "\n":
@@ -414,11 +440,12 @@ class rfc822_addresses_class
 		$v = $this->v;
 		$l = strlen($v);
 		$a = $p;
-		if(!$this->SkipCommentWhiteSpace($a))
+		if(!$this->SkipCommentGetWhiteSpace($a, $space))
 			return(0);
+		$match = '/^([-'.($dot ? '.' : '').'A-Za-z0-9!#$&\'*+\\/=?^_{|}~]+)/';
 		for($s = $a;$a < $l;)
 		{
-			if(preg_match('/^([-'.($dot ? '.' : '').'A-Za-z0-9!#$&\'*+\\/=?^_{|}~]+)/', substr($this->v, $a), $m))
+			if(preg_match($match, substr($this->v, $a), $m))
 				$a += strlen($m[1]);
 			elseif(Ord($v[$a]) < 128)
 				break;
@@ -429,9 +456,10 @@ class rfc822_addresses_class
 		}
 		if($s == $a)
 			return(1);
-		if(!$this->SkipCommentWhiteSpace($a))
+		$atom = $space.substr($this->v, $s, $a - $s);
+		if(!$this->SkipCommentGetWhiteSpace($a, $space))
 			return(0);
-		$atom = substr($this->v, $p, $a - $p);
+		$atom .= $space;
 		$p = $a;
 		return(1);
 	}
@@ -508,11 +536,11 @@ class rfc822_addresses_class
 				continue;
 			}
 			$w = $ph;
-			if(!$this->SkipCommentWhiteSpace($ph))
+			if(!$this->SkipCommentGetWhiteSpace($ph, $space))
 				return(0);
 			if($w != $ph)
 			{
-				$string .= substr($v, $w, $ph - $w);
+				$string .= $space;
 				continue;
 			}
 			if($ph >= $l
@@ -572,7 +600,7 @@ class rfc822_addresses_class
 			return(0);
 		if(!IsSet($domain))
 			return(1);
-		$addr_spec = $local_part.'@'.$domain;
+		$addr_spec = $local_part.'@'.trim($domain);
 		$p = $a;
 		return(1);
 	}
@@ -598,6 +626,24 @@ class rfc822_addresses_class
 		if(!$this->SkipCommentWhiteSpace($a))
 			return(0);
 		$addr = $addr_spec;
+		$p = $a;
+		return(1);
+	}
+
+	Function ParseName(&$p, &$address)
+	{
+		$address = null;
+		$a = $p;
+		if(!$this->ParsePhrase($a, $display_name))
+			return(0);
+		if(IsSet($display_name))
+		{
+			if(!$this->QDecode($p, $display_name, $encoding))
+				return(0);
+			$address['name'] = trim($display_name);
+			if(IsSet($encoding))
+				$address['encoding'] = $encoding;
+		}
 		$p = $a;
 		return(1);
 	}
@@ -658,7 +704,7 @@ class rfc822_addresses_class
 			if(!$this->ParseAddrNameAddr($p, $address))
 				return(0);
 			if(IsSet($address))
-				return($this->SetPositionedWarning('it was an unquoted address as name', $a));
+				return($this->SetPositionedWarning('it was specified an unquoted address as name', $a));
 		}
 		if(!$this->ParseNameAddr($p, $address))
 			return(0);
@@ -667,7 +713,15 @@ class rfc822_addresses_class
 		if(!$this->ParseAddrSpec($p, $addr_spec))
 			return(0);
 		if(IsSet($addr_spec))
+		{
 			$address = array('address'=>$addr_spec);
+			return(1);
+		}
+		$a = $p;
+		if($this->ignore_syntax_errors
+		&& $this->ParseName($p, $address)
+		&& IsSet($address))
+			return($this->SetPositionedWarning('it was specified a name without an address', $a));
 		return(1);
 	}
 
@@ -818,8 +872,9 @@ class rfc822_addresses_class
 		$addresses[] = $address;
 		while($p < $l)
 		{
-			if(strcmp($v[$p], ','))
-				return($this->SetPositionedError('multiple addresses must be separated by commas: ', $p));
+			if(strcmp($v[$p], ',')
+			&& !$this->SetPositionedWarning('multiple addresses must be separated by commas: ', $p))
+				return(0);
 			++$p;
 			if(!$this->ParseAddress($p, $address))
 				return(0);
