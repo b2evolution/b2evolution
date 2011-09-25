@@ -2802,6 +2802,10 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $w
 		{
 			$link_attribs['class'] .= ' rollover';
 		}
+		if( get_icon( $icon, 'sprite' ) )
+		{ // Set class "rollover_sprite" If image uses sprite
+			$link_attribs['class'] .= '_sprite';
+		}
 	}
 	//$link_attribs['class'] .= $icon != '' ? ' '.$icon : ' noicon';
 
@@ -2840,11 +2844,10 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $w
 		unset($link_attribs['use_js_size']);
 	}
 
-	// NOTE: We do not use format_to_output with get_field_attribs_as_string() here, because it interferes with the Results class (eval() fails on entitied quotes..) (blueyed)
-	$r = '<a'.get_field_attribs_as_string( $link_attribs, false ).'>';
-
 	$display_icon = ($icon_weight >= $UserSettings->get('action_icon_threshold'));
 	$display_word = ($word_weight >= $UserSettings->get('action_word_threshold'));
+
+	$a_body = '';
 
 	if( $display_icon || ! $display_word )
 	{	// We MUST display an action icon in order to make the user happy:
@@ -2852,7 +2855,7 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $w
 
 		if( $icon_s = get_icon( $icon, 'imgtag', array( 'title'=>$title ), true ) )
 		{
-			$r .= $icon_s;
+			$a_body .= $icon_s;
 		}
 		else
 		{ // fallback to word
@@ -2867,22 +2870,25 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $w
 		{ // We already have an icon, display a SHORT word:
 			if( !empty($word) )
 			{	// We have provided a short word:
-				$r .= $word;
+				$a_body .= $word;
 			}
 			else
 			{	// We fall back to alt:
-				$r .= get_icon( $icon, 'legend' );
+				$a_body .= get_icon( $icon, 'legend' );
 			}
 		}
 		else
 		{	// No icon display, let's display a LONG word/text:
-			$r .= trim( $title, ' .!' );
+			$a_body .= trim( $title, ' .!' );
 		}
+
+		// Add class "un" for icon with text
+		$link_attribs['class'] .= ' un';
 	}
 
-	$r .= '</a>';
-
-	return $r;
+	
+	// NOTE: We do not use format_to_output with get_field_attribs_as_string() here, because it interferes with the Results class (eval() fails on entitied quotes..) (blueyed)
+	return '<a'.get_field_attribs_as_string( $link_attribs, false ).'>'.$a_body.'</a>';
 }
 
 
@@ -3012,6 +3018,15 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 				default:
 					return $icon['size'];
 			}
+			/* BREAK */
+
+
+		case 'sprite':
+			if( isset( $icon['xy'] ) )
+			{	// Image uses spite file
+				return true;
+			}
+			return false;
 			/* BREAK */
 
 
@@ -4392,6 +4407,9 @@ if( !function_exists( 'property_exists' ) )
 
 /*
  * $Log$
+ * Revision 1.279  2011/09/25 02:51:44  efy-yurybakh
+ * sprite rollover
+ *
  * Revision 1.278  2011/09/23 23:24:53  sam2kb
  * No new line at end of file
  *

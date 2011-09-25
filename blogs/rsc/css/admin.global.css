@@ -234,6 +234,12 @@ ul.plain {
 	margin: 0 2px;
 	font-weight: bold;
 }
+.action_icon:hover {
+	text-decoration: none;
+}
+.action_icon.un:hover {
+	text-decoration: underline;
+}
 
 th .action_icon {
 	font-size: 84%;

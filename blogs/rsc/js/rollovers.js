@@ -30,6 +30,12 @@ function setupRollovers()
 			link.onmouseover = mouseover;
 			link.onmouseout = mouseout;
 		}
+		else if(link.className && (' ' + link.className + ' ').indexOf(' rollover_sprite ') != -1)
+		{ // The link has the rollover_sprite class (among potentially other classes):
+			// Set up event handlers:
+			link.onmouseover = mouseover_sprite;
+			link.onmouseout = mouseout_sprite;
+		}
 	}
 }
 
@@ -84,8 +90,8 @@ function mouseover(e)
  */
 function mouseout(e)
 {
- var target = findTarget(e);
- if (!target) return;
+	var target = findTarget(e);
+	if (!target) return;
 
 	var img_tag = target.childNodes[0];
 	if( img_tag.nodeName.toLowerCase() != 'img')
@@ -93,9 +99,47 @@ function mouseout(e)
 		img_tag = target.childNodes[1];
 	}
 
- // Take the "src", which names an image as "something_over.ext",
- // Make it point to "something.ext"
- img_tag.src = img_tag.src.replace(/_over(\.[^.]+)$/, '$1');
+	// Take the "src", which names an image as "something_over.ext",
+	// Make it point to "something.ext"
+	img_tag.src = img_tag.src.replace(/_over(\.[^.]+)$/, '$1');
+}
+
+
+/**
+ * MouseOver event handler for Sprite Icons
+ */
+function mouseover_sprite(e)
+{
+	var target = findTarget(e);
+	if (!target) return;
+
+	var span_tag = target.childNodes[0];
+	if( span_tag.nodeName.toLowerCase() != 'span')
+	{
+		span_tag = target.childNodes[1];
+	}
+	var xy = span_tag.style.backgroundPosition.match(/-*\d+/g);
+	// Shift background position to the right to the one icon in the sprite
+	span_tag.style.backgroundPosition = (parseInt(xy[0])-16)+'px '+parseInt(xy[1])+'px';
+}
+
+
+/**
+ * MouseOut event handler for Sprite Icons
+ */
+function mouseout_sprite(e)
+{
+	var target = findTarget(e);
+	if (!target) return;
+
+	var span_tag = target.childNodes[0];
+	if( span_tag.nodeName.toLowerCase() != 'span')
+	{
+		span_tag = target.childNodes[1];
+	}
+	var xy = span_tag.style.backgroundPosition.match(/-*\d+/g);
+	// Shift background position to the right to the one icon in the sprite
+	span_tag.style.backgroundPosition = (parseInt(xy[0])+16)+'px '+parseInt(xy[1])+'px';
 }
 
 
