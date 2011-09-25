@@ -23,18 +23,22 @@ function fadeInStatus( id, status )
 	switch(status)
 	{
 		case 'published':
-		case 'ok':
 			fadeIn(id, '#339900');
 			break;
 		case 'deprecated':
-		case 'notsure':
 			fadeIn(id, '#656565');
 			break;
 		case 'deleted':
 			fadeIn(id, '#fcc');
 			break;
 		case 'spam':
-			fadeIn(id, '#ffacac');
+			fadeIn(id, '#ffc9c9');
+			break;
+		case 'notsure':
+			fadeIn(id, '#bbbbbb');
+			break;
+		case 'ok':
+			fadeIn(id, '#bcffb5');
 			break;
 	};
 }

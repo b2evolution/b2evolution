@@ -284,6 +284,10 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 		// Display delete button if current user has the rights:
 		$Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton', false, '&amp;', true, true );
+
+		// Display Spam Voting system
+		$Comment->vote_spam( '<div class="vote_spam">', '</div>', '#', '#', '', '&amp;', true, true, $redirect_to );
+
 		echo '<div class="clear"></div>';
 		echo '</div>';
 		echo '</div>';
@@ -298,6 +302,9 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 /*
  * $Log$
+ * Revision 1.48  2011/09/25 03:54:21  efy-yurybakh
+ * Add spam voting to dashboard
+ *
  * Revision 1.47  2011/09/11 19:45:28  fplanque
  * no message
  *

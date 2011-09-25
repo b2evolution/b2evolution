@@ -1842,16 +1842,8 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 		// Display delete button if current user has the rights:
 		$Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton', false, '&amp;', $save_context, true );
 
-		$vote_disabled = $Comment->get_vote_disabled( $current_User->ID );
-
-		// Display Spam Vote "Spam" button if current user has the rights:
-		$Comment->vote_spam_link( '<div class="vote_spam">'.$Comment->get_vote_summary( $vote_disabled ), ' ', '#', '#', $vote_disabled['spam'], '&amp;', $save_context, true, $redirect_to );
-
-		// Display Spam Vote "Not Sure" button if current user has the rights:
-		$Comment->vote_notsure_link( ' ', ' ', '#', '#', $vote_disabled['notsure'], '&amp;', $save_context, true, $redirect_to );
-
-		// Display Spam Vote "Ok" button if current user has the rights:
-		$Comment->vote_ok_link( ' ', '</div>', '#', '#', $vote_disabled['ok'], '&amp;', $save_context, true, $redirect_to );
+		// Display Spam Voting system
+		$Comment->vote_spam( '<div class="vote_spam">', '</div>', '#', '#', '', '&amp;', $save_context, true, $redirect_to );
 
 		echo '<div class="clear"></div>';
 		echo '</div>';
@@ -1960,6 +1952,9 @@ function echo_pages( $item_ID, $currentpage, $comments_number )
 
 /*
  * $Log$
+ * Revision 1.139  2011/09/25 03:54:21  efy-yurybakh
+ * Add spam voting to dashboard
+ *
  * Revision 1.138  2011/09/24 13:27:36  efy-yurybakh
  * Change voting buttons
  *

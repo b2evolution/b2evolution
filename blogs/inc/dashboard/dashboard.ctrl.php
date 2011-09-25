@@ -165,6 +165,38 @@ if( $blog )
 				});
 			}
 
+			// Set comments vote
+			function setCommentVote(id, vote)
+			{
+				var divid = 'comment_' + id;
+				switch(vote)
+				{
+					case 'spam':
+						fadeIn(divid, '#ffc9c9');
+						break;
+					case 'notsure':
+						fadeIn(divid, '#bbbbbb');
+						break;
+					case 'ok':
+						fadeIn(divid, '#bcffb5');
+						break;
+				};
+
+				modifieds[divid] = vote;
+
+				$.ajax({
+				type: 'POST',
+				url: '<?php echo $htsrv_url; ?>async.php',
+				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&vote=' + vote + '&action=set_comment_vote&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
+				success: function(result)
+					{
+						// var divid = 'comment_' + id;
+						delete modifieds[divid];
+						processResult(result, modifieds);
+					}
+				});
+			}
+
 			// Delete comment
 			function deleteComment(id)
 			{
@@ -723,6 +755,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.81  2011/09/25 03:54:21  efy-yurybakh
+ * Add spam voting to dashboard
+ *
  * Revision 1.80  2011/09/04 20:17:54  fplanque
  * cleanup
  *

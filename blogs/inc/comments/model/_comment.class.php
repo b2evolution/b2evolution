@@ -343,8 +343,9 @@ class Comment extends DataObject
 		{ // Add a new vote for first time
 			$DB->query( "INSERT INTO T_comments__votes( cmvt_cmt_ID, cmvt_user_ID, cmvt_spam )
 												VALUES( '".$this->ID."', '".(int)$user_ID."', '".$vote."')" );
-			$spam_count = $DB->get_var( "SELECT COUNT(cmvt_spam) FROM T_comments__votes WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_spam IS NOT NULL" );
+			$spam_count = (int)$DB->get_var( "SELECT COUNT(cmvt_spam) FROM T_comments__votes WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_spam IS NOT NULL" );
 			$sql_update_count = ", comment_spam_countvotes = '".$spam_count."'";
+			$this->comment_spam_countvotes = $spam_count;
 		}
 		else
 		{ // Update a vote
@@ -353,9 +354,10 @@ class Comment extends DataObject
 		}
 
 		// Update fields with spam counters for this comment
-		$spam_summary = $DB->get_var( "SELECT SUM(cmvt_spam) FROM T_comments__votes WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_spam IS NOT NULL" );
+		$spam_summary = (int)$DB->get_var( "SELECT SUM(cmvt_spam) FROM T_comments__votes WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_spam IS NOT NULL" );
 		$DB->query( "UPDATE T_comments SET comment_spam_addvotes = '".$spam_summary."'".$sql_update_count."
 												WHERE comment_ID = '".$this->ID."'" );
+		$this->comment_spam_addvotes = $spam_summary;
 
 		return;
 	}
@@ -1190,8 +1192,9 @@ class Comment extends DataObject
 		}
 		if( $class == 'disabled' )
 		{ // add rollover action for disabled buttons
-			 $class .= ' rollover';
+			 $class .= ' rollover_sprite';
 		}
+		$class .= ' action_icon';
 
 		$r = $before;
 		$r .= '<a href="';
@@ -1252,45 +1255,22 @@ class Comment extends DataObject
 	 * @param boolean save context?
 	 * @param boolean true if create AJAX button
 	 */
-	function vote_spam_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
+	function vote_spam( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
-		echo $this->get_vote_link( 'spam', $before, $after, $text, $title, $class, $glue, $save_context, $ajax_button, $redirect_to );
-	}
+		global $current_User;
 
+		echo $before;
 
-	/**
-	 * Display link to vote a comment as NOT SURE if user has edit rights
-	 *
-	 * @param string to display before link
-	 * @param string to display after link
-	 * @param string link text
-	 * @param string link title
-	 * @param string class name
-	 * @param string glue between url params
-	 * @param boolean save context?
-	 * @param boolean true if create AJAX button
-	 */
-	function vote_notsure_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
-	{
-		echo $this->get_vote_link( 'notsure', $before, $after, $text, $title, $class, $glue, $save_context, $ajax_button, $redirect_to );
-	}
+		$vote_disabled = $this->get_vote_disabled( $current_User->ID );
 
+		echo $this->get_vote_summary( $vote_disabled );
+		
+		foreach( $vote_disabled as $vote_type => $vote_class)
+		{ // Print out 3 buttons for spam voting
+			echo $this->get_vote_link( $vote_type, '', '', $text, $title, $vote_class, $glue, $save_context, $ajax_button, $redirect_to );
+		}
 
-	/**
-	 * Display link to vote a comment AS OK if user has edit rights
-	 *
-	 * @param string to display before link
-	 * @param string to display after link
-	 * @param string link text
-	 * @param string link title
-	 * @param string class name
-	 * @param string glue between url params
-	 * @param boolean save context?
-	 * @param boolean true if create AJAX button
-	 */
-	function vote_ok_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
-	{
-		echo $this->get_vote_link( 'ok', $before, $after, $text, $title, $class, $glue, $save_context, $ajax_button, $redirect_to );
+		echo $after;
 	}
 
 
@@ -2326,6 +2306,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.105  2011/09/25 03:54:20  efy-yurybakh
+ * Add spam voting to dashboard
+ *
  * Revision 1.104  2011/09/24 13:27:36  efy-yurybakh
  * Change voting buttons
  *
