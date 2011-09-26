@@ -1768,6 +1768,75 @@ class Form extends Widget
 
 
 	/**
+	 * Display counrty select field and populate it with a cache object by using a callback
+	 * method.
+	 *
+	 * @uses select_input_options()
+	 * @param string Field name
+	 * @param string Default field value
+	 * @param DataObjectCache Cache containing values for list
+	 * @param string Field label to be display with the field
+	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
+	 *              - 'allow_none': allow to select [none] in list (boolean, default false)
+	 *              - 'object_callback': Object's callback method name (string, default 'get_option_list')
+	 *              - 'loop_object_method': The method on the objects inside the callback (string, default NULL)
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function select_country( $field_name, $field_value, & $field_object, $field_label, $field_params = array() )
+	{
+		global $edited_User;
+
+		if( isset($field_params['allow_none']) )
+		{
+			$allow_none = $field_params['allow_none'];
+			unset( $field_params['allow_none'] );
+		}
+		else
+		{
+			$allow_none = false;
+		}
+
+		if( isset($field_params['object_callback']) )
+		{
+			$field_object_callback = $field_params['object_callback'];
+			unset( $field_params['object_callback'] );
+		}
+		else
+		{
+			if (empty($edited_User->ctry_ID))
+			{
+				$field_object_callback = 'get_group_country_option_list';
+			}
+			else
+			{
+				$field_object_callback = 'get_option_list';
+			}
+
+		}
+
+		if( isset($field_params['loop_object_method']) )
+		{
+			$field_options = $field_object->$field_object_callback( $field_value, $allow_none, $field_params['loop_object_method'] );
+			unset( $field_params['loop_object_method'] );
+		}
+		else
+		{
+			$field_options = $field_object->$field_object_callback( $field_value, $allow_none );
+		}
+
+		if( isset($field_params['note']) )
+		{
+			$field_note = $field_params['note'];
+			unset( $field_params['note'] );
+		}
+		else
+		{
+			$field_note = '';
+		}
+
+		return $this->select_input_options( $field_name, $field_options, $field_label, $field_note, $field_params );
+	}
+	/**
 	 * Display a select field and populate it with a cache object.
 	 *
 	 * @uses select_input_object()
@@ -3073,6 +3142,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.93  2011/09/26 08:55:24  efy-vitalij
+ * add function select_country() _form.class.php
+ *
  * Revision 1.92  2011/09/18 00:58:44  fplanque
  * forms cleanup
  *
