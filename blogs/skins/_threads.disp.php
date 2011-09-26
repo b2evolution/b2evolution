@@ -91,7 +91,7 @@ if( !isset( $params ) )
 $params = array_merge( array(
 	'form_class' => 'bComment',
 	'form_title' => '',
-	'form_action' => get_samedomain_htsrv_url().'messaging.php',
+	'form_action' => $samedomain_htsrv_url.'messaging.php',
 	'form_name' => '',
 	'form_layout' => NULL,
 	'cols' => 40
@@ -120,6 +120,10 @@ switch( $disp )
 
 /**
  * $Log$
+ * Revision 1.4  2011/09/26 14:53:27  efy-asimo
+ * Login problems with multidomain installs - fix
+ * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
+ *
  * Revision 1.3  2011/09/22 08:55:00  efy-asimo
  * Login problems with multidomain installs - fix
  *

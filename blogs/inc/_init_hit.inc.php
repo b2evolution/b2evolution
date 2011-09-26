@@ -100,6 +100,19 @@ $Debuglog->add( 'vars: $ReqHost: '.$ReqHost, 'request' );
 $Debuglog->add( 'vars: $ReqURI: '.$ReqURI, 'request' );
 $Debuglog->add( 'vars: $ReqPath: '.$ReqPath, 'request' );
 
+/**
+ * Same domain htsrv url.
+ *
+ * @global string
+ */
+$samedomain_htsrv_url = get_samedomain_htsrv_url();
+
+/**
+ * Secure htsrv url.
+ *
+ * @global string
+ */
+$secure_htsrv_url = get_secure_htsrv_url();
 
 // on which page are we ?
 /* old:
@@ -234,6 +247,10 @@ $Timer->pause( '_init_hit' );
 
 /*
  * $Log$
+ * Revision 1.12  2011/09/26 14:53:27  efy-asimo
+ * Login problems with multidomain installs - fix
+ * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
+ *
  * Revision 1.11  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

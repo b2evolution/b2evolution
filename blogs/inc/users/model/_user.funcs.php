@@ -122,7 +122,7 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
  */
 function get_login_url( $redirect_to = NULL )
 {
-	global $edited_Blog, $generating_static;
+	global $edited_Blog, $generating_static, $secure_htsrv_url;
 
 	if( !empty( $redirect_to ) )
 	{
@@ -154,9 +154,6 @@ function get_login_url( $redirect_to = NULL )
 		}
 		return url_add_param( $Blog->get( 'loginurl' ), $redirect );
 	}
-
-	// set secure htsrv url with the same domain as the request has
-	$secure_htsrv_url = get_secure_htsrv_url();
 
 	// Normal login
 	if( ! empty($redirect) )
@@ -242,10 +239,7 @@ function get_user_register_link( $before = '', $after = '', $link_text = '', $li
 
 function get_user_register_url( $redirect = NULL, $default_source_string = '', $disp_when_logged_in = false )
 {
-	global $Settings, $edited_Blog, $generating_static;
-
-	// set secure htsrv url with the same domain as the request has
-	$secure_htsrv_url = get_secure_htsrv_url();
+	global $Settings, $edited_Blog, $generating_static, $secure_htsrv_url;
 
 	if( is_logged_in() && ! $disp_when_logged_in )
 	{ // Do not display, when already logged in:
@@ -355,10 +349,7 @@ function get_user_logout_link( $before = '', $after = '', $link_text = '', $link
  */
 function get_user_logout_url()
 {
-	global $admin_url, $baseurl, $is_admin_page, $Blog;
-
-	// set secure htsrv url with the same domain as the request has
-	$secure_htsrv_url = get_secure_htsrv_url();
+	global $admin_url, $baseurl, $is_admin_page, $Blog, $secure_htsrv_url;
 
 	if( ! is_logged_in() )
 	{
@@ -567,7 +558,7 @@ function get_user_identity_link( $user_login, $user_ID = NULL, $profile_tab = 'p
  * 
  * @param integer user ID
  */
-function get_user_identity_url ( $user_ID = NULL, $profile_tab, $redirect_to = NULL )
+function get_user_identity_url ( $user_ID = NULL, $profile_tab = 'profile', $redirect_to = NULL )
 {
 	global $current_User;
 
@@ -651,7 +642,7 @@ function get_user_settings_url( $user_tab, $user_ID = NULL )
 		{
 			$user_tab = 'profile';
 		}
-		return $admin_url.'?ctrl=user&amp;user_tab='.$user_tab.'&amp;user_ID='.$current_User->ID;
+		return $admin_url.'?ctrl=user&amp;user_tab='.$user_tab.'&amp;user_ID='.$user_ID;
 	}
 
 	return url_add_param( $Blog->gen_blogurl(), 'disp='.$user_tab );
@@ -870,12 +861,10 @@ function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size
 		}
 
 		if( $link && $current_User->check_perm( 'users', 'view', false ) )
-		{	// Permission to view user details
-			global $admin_url;
-	// fp>dh why did you add $admin_url here? If this is gonna be used outside of admin, it should not point to the profile in the admin but rather to the profile disp in the public blog skin
-			$img_tag = '<a href="?ctrl=user&amp;user_tab=profile&amp;user_ID='.$User->ID.'">'.$img_tag.'</a>';
+		{ // Permission to view user details
+			// The user identity url always contains the best available user info page url
+			$img_tag = '<a href="'.get_user_identity_url( $User->ID ).'">'.$img_tag.'</a>';
 		}
-
 	}
 
 	return $img_tag;
@@ -1174,6 +1163,10 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.60  2011/09/26 14:53:27  efy-asimo
+ * Login problems with multidomain installs - fix
+ * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
+ *
  * Revision 1.59  2011/09/23 07:41:57  efy-asimo
  * Unified usernames everywhere in the app - first part
  *

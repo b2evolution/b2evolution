@@ -12,7 +12,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-$submit_url = get_samedomain_htsrv_url().'message_send.php';
+$submit_url = $samedomain_htsrv_url.'message_send.php';
 
 $Form = new Form( $submit_url );
 
@@ -26,7 +26,7 @@ $Form = new Form( $submit_url );
 	$Form->hidden( 'recipient_id', $recipient_id );
 	$Form->hidden( 'post_id', $post_id );
 	$Form->hidden( 'comment_id', $comment_id );
-	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url) );
+	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $samedomain_htsrv_url) );
 
 	?>
 
@@ -73,6 +73,10 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.8  2011/09/26 14:53:27  efy-asimo
+ * Login problems with multidomain installs - fix
+ * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
+ *
  * Revision 1.7  2011/09/23 01:29:05  fplanque
  * small changes
  *

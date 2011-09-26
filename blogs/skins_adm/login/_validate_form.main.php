@@ -37,9 +37,6 @@ $page_title = T_('Email address validation');
 $page_icon = 'icon_register.gif';
 require dirname(__FILE__).'/_html_header.inc.php';
 
-// set secure htsrv url with the same domain as the request has
-$secure_htsrv_url = get_secure_htsrv_url();
-
 $Form = new Form( $secure_htsrv_url.'login.php', 'form_validatemail', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
@@ -95,6 +92,10 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.9  2011/09/26 14:53:27  efy-asimo
+ * Login problems with multidomain installs - fix
+ * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
+ *
  * Revision 1.8  2011/09/22 08:55:00  efy-asimo
  * Login problems with multidomain installs - fix
  *

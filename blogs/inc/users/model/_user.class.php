@@ -1942,7 +1942,7 @@ class User extends DataObject
 	 */
 	function send_validate_email( $redirect_to_after = NULL )
 	{
-		global $app_name, $Session;
+		global $app_name, $Session, $secure_htsrv_url;
 
 		$request_id = generate_random_key(22);
 
@@ -1951,7 +1951,7 @@ class User extends DataObject
 			.T_('Login:')." $this->login\n"
 			.sprintf( /* TRANS: %s gets replaced by $app_name (normally "b2evolution") */ T_('Link to validate your %s account:'), $app_name )
 			."\n"
-			.get_secure_htsrv_url().'login.php?action=validatemail'
+			.$secure_htsrv_url.'login.php?action=validatemail'
 				.'&reqID='.$request_id
 				.'&sessID='.$Session->ID  // used to detect cookie problems
 			."\n\n-- \n"
@@ -2608,6 +2608,10 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.133  2011/09/26 14:53:27  efy-asimo
+ * Login problems with multidomain installs - fix
+ * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
+ *
  * Revision 1.132  2011/09/26 14:49:57  efy-yurybakh
  * colored usernames
  *

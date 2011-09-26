@@ -47,8 +47,6 @@ if( $inskin )
 	param( 'blog', 'integer', NULL );
 }
 
-$secure_htsrv_url = get_secure_htsrv_url();
-
 // gets used by header_redirect();
 // TODO: dh> problem here is that $ReqURI won't include the e.g. "ctrl" param in a POSTed form and therefor the user lands on the default admin page after logging in (again)
 // fp> I think this will fix itself when we do another improvement: 303 redirect after each POST so that we never have an issue with people trying to reload a post
@@ -391,6 +389,10 @@ exit(0);
 
 /*
  * $Log$
+ * Revision 1.120  2011/09/26 14:53:27  efy-asimo
+ * Login problems with multidomain installs - fix
+ * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
+ *
  * Revision 1.119  2011/09/22 08:54:59  efy-asimo
  * Login problems with multidomain installs - fix
  *

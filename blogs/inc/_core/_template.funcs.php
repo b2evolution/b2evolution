@@ -1291,7 +1291,7 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
  */
 function display_ajax_form( $params )
 {
-	global $rsc_uri, $Blog;
+	global $rsc_uri, $samedomain_htsrv_url;
 
 	echo '<div class="section_requires_javascript">';
 
@@ -1306,7 +1306,7 @@ function display_ajax_form( $params )
 		function get_form()
 		{
 			$.ajax({
-				url: '<?php echo $Blog->get_local_htsrv_url(); ?>anon_async.php',
+				url: '<?php echo $samedomain_htsrv_url; ?>anon_async.php',
 				type: 'POST',
 				data: <?php echo $json_params; ?>,
 				success: function(result)
@@ -1329,6 +1329,10 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.103  2011/09/26 14:53:27  efy-asimo
+ * Login problems with multidomain installs - fix
+ * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
+ *
  * Revision 1.102  2011/09/21 12:46:25  fplanque
  * changes
  *

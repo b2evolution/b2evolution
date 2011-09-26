@@ -138,7 +138,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 		  /* ]]> */
 		  </script>';
 
-	$Form = new Form( $Blog->get_local_htsrv_url().'comment_post.php', 'bComment_form_id_'.$Item->ID, 'post', NULL, 'multipart/form-data' );
+	$Form = new Form( $samedomain_htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID, 'post', NULL, 'multipart/form-data' );
 	$Form->begin_form( 'bComment', '', array( 'target' => '_self', 'onsubmit' => 'return validateCommentForm(this);' ) );
 
 	// TODO: dh> a plugin hook would be useful here to add something to the top of the Form.
@@ -267,6 +267,10 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 
 /*
  * $Log$
+ * Revision 1.28  2011/09/26 14:53:27  efy-asimo
+ * Login problems with multidomain installs - fix
+ * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
+ *
  * Revision 1.27  2011/09/18 00:58:44  fplanque
  * forms cleanup
  *

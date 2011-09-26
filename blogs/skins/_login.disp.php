@@ -33,7 +33,7 @@ if( $action == 'req_login' )
 	$login_required = true;
 }
 
-global $admin_url, $ReqHost, $htsvr_url;
+global $admin_url, $ReqHost, $secure_htsrv_url;
 
 if( !isset( $redirect_to ) )
 {
@@ -78,8 +78,8 @@ if( $action != 'req_validatemail' )
 					array( 'maxlength' => 20, 'class' => 'input_text', 'required'=>true ) );
 	$Form->end_field();
 
-	$pwd_note = '<a href="'.$Blog->get_local_htsrv_url().'login.php?action=lostpassword&amp;redirect_to='
-		.rawurlencode( url_rel_to_same_host($redirect_to, $Blog->get_local_htsrv_url()) );
+	$pwd_note = '<a href="'.$secure_htsrv_url.'login.php?action=lostpassword&amp;redirect_to='
+		.rawurlencode( url_rel_to_same_host($redirect_to, $secure_htsrv_url) );
 	if( !empty($login) )
 	{
 		$pwd_note .= '&amp;login='.rawurlencode($login);
@@ -107,19 +107,19 @@ if( $action != 'req_validatemail' )
 
 	$Form->end_form();
 
-	echo '<div class="notes" style="margin: 1em"><a href="'.$Blog->get_local_htsrv_url().'login.php?redirect_to='.$redirect_to.'">'.T_( 'Use standard login form instead').' &raquo;</a></div>
+	echo '<div class="notes" style="margin: 1em"><a href="'.$secure_htsrv_url.'login.php?redirect_to='.$redirect_to.'">'.T_( 'Use standard login form instead').' &raquo;</a></div>
 	<div class="clear"></div>';
 }
 else
 {	// -----------------------------------------------------------------------------------------------------------------
 
-	$Form = new Form( $Blog->get_local_htsrv_url().'login.php', 'login_form', 'post' );
+	$Form = new Form( $secure_htsrv_url.'login.php', 'login_form', 'post' );
 
 	$Form->begin_form( 'bComment' );
 
 	$Form->add_crumb( 'validateform' );
 	$Form->hidden( 'action', 'req_validatemail');
-	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $Blog->get_local_htsrv_url()) );
+	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $secure_htsrv_url) );
 	$Form->hidden( 'inskin', true );
 	if( isset( $blog ) )
 	{
@@ -148,6 +148,10 @@ else
 
 /*
  * $Log$
+ * Revision 1.19  2011/09/26 14:53:27  efy-asimo
+ * Login problems with multidomain installs - fix
+ * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
+ *
  * Revision 1.18  2011/09/19 22:15:59  fplanque
  * Minot/i18n
  *

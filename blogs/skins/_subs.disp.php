@@ -45,13 +45,13 @@ $redirect_to = param( 'redirect_to', 'string', '' );
  * form to update the profile
  * @var Form
  */
-$Form = new Form( $Blog->get_local_htsrv_url().'subs_update.php', 'SubsForm' );
+$Form = new Form( $samedomain_htsrv_url.'subs_update.php', 'SubsForm' );
 
 $Form->begin_form( 'bComment' );
 
 	$Form->add_crumb( 'subsform' );
 	$Form->hidden( 'checkuser_id', $current_User->ID );
-	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url) );
+	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $samedomain_htsrv_url ) );
 
 	$Form->begin_fieldset( T_('Global settings') );
 
@@ -119,6 +119,10 @@ $Form->end_form( array( array( '', '', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.12  2011/09/26 14:53:27  efy-asimo
+ * Login problems with multidomain installs - fix
+ * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
+ *
  * Revision 1.11  2011/09/22 08:55:00  efy-asimo
  * Login problems with multidomain installs - fix
  *

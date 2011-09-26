@@ -307,15 +307,15 @@ $Results->cols[] = array(
 
 function delete_action( $thrd_ID, $msg_ID )
 {
-	global $Blog;
+	global $Blog, $samedomain_htsrv_url;;
 	if( is_admin_page() )
 	{
 		return action_icon( T_( 'Delete'), 'delete', regenerate_url( 'action', 'thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete&'.url_crumb( 'message' ) ) );
 	}
 	else
 	{
-		$redirect_to = url_add_param( $Blog->gen_baseurl(), 'disp=messages&thrd_ID='.$thrd_ID );
-		$action_url = $Blog->get_local_htsrv_url().'messaging.php?disp=messages&thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete';
+		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=messages&thrd_ID='.$thrd_ID );
+		$action_url = $samedomain_htsrv_url.'messaging.php?disp=messages&thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete';
 		$action_url = url_add_param( $action_url, 'redirect_to='.rawurlencode( $redirect_to ), '&' );
 		return action_icon( T_( 'Delete'), 'delete', $action_url.'&'.url_crumb( 'message' ) );
 	}
@@ -354,6 +354,10 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.35  2011/09/26 14:53:27  efy-asimo
+ * Login problems with multidomain installs - fix
+ * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
+ *
  * Revision 1.34  2011/09/22 08:55:00  efy-asimo
  * Login problems with multidomain installs - fix
  *

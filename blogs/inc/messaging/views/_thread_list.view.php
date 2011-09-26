@@ -226,15 +226,16 @@ $Results->cols[] = array(
 
 function delete_action( $thread_ID )
 {
-	global $Blog;
+	global $Blog, $samedomain_htsrv_url;
+
 	if( is_admin_page() )
 	{
 		return action_icon( T_( 'Delete'), 'delete', regenerate_url( 'action', 'thrd_ID='.$thread_ID.'&action=delete&'.url_crumb( 'thread' ) ) );
 	}
 	else
 	{
-		$redirect_to = $Blog->gen_baseurl().'?disp=threads';
-		return action_icon( T_( 'Delete'), 'delete', $Blog->get_local_htsrv_url().'messaging.php?thrd_ID='.$thread_ID.'&action=delete&redirect_to='.$redirect_to.'&'.url_crumb( 'thread' ) );
+		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=threads' );
+		return action_icon( T_( 'Delete'), 'delete', $samedomain_htsrv_url.'messaging.php?thrd_ID='.$thread_ID.'&action=delete&redirect_to='.$redirect_to.'&'.url_crumb( 'thread' ) );
 	}
 }
 
@@ -263,6 +264,10 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.29  2011/09/26 14:53:27  efy-asimo
+ * Login problems with multidomain installs - fix
+ * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
+ *
  * Revision 1.28  2011/09/22 08:55:00  efy-asimo
  * Login problems with multidomain installs - fix
  *

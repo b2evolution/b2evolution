@@ -442,6 +442,7 @@ function skin_include( $template_name, $params = array() )
 	global $Plugins, $Skin;
 	global $current_User, $Hit, $Session, $Settings;
 	global $skin_url, $htsrv_url, $htsrv_url_sensitive;
+	global $samedomain_htsrv_url, $secure_htsrv_url;
 	global $credit_links, $skin_links, $francois_links, $fplanque_links, $skinfaktory_links;
 
 	global $Timer;
@@ -920,6 +921,10 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.105  2011/09/26 14:53:27  efy-asimo
+ * Login problems with multidomain installs - fix
+ * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
+ *
  * Revision 1.104  2011/09/20 22:46:57  fplanque
  * doc
  *

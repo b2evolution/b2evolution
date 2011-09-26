@@ -34,8 +34,6 @@ $page_title = T_('Registration complete');
 $page_icon = 'icon_register.gif';
 require dirname(__FILE__).'/_html_header.inc.php';
 
-// set secure htsrv url with the same domain as the request has
-$secure_htsrv_url = get_secure_htsrv_url();
 // dh> TODO: this form is not really required and only used for the info fields below.
 $Form = new Form( $secure_htsrv_url.'login.php', 'login', 'post', 'fieldset' );
 
@@ -80,6 +78,10 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.14  2011/09/26 14:53:27  efy-asimo
+ * Login problems with multidomain installs - fix
+ * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
+ *
  * Revision 1.13  2011/09/22 08:55:00  efy-asimo
  * Login problems with multidomain installs - fix
  *

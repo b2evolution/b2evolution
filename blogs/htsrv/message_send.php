@@ -81,7 +81,7 @@ if( param( 'optout_cmt_email', 'string', '' ) )
 
 	$message = sprintf( T_("We have received a request that you do not want to receive emails through\na message form on your comments anymore.\n\nTo confirm that this request is from you, please click on the following link:") )
 		."\n\n"
-		.$htsrv_url.'message_send.php?optout_cmt_email='.$optout_cmt_email.'&req_ID='.$req_ID
+		.$samedomain_htsrv_url.'message_send.php?optout_cmt_email='.$optout_cmt_email.'&req_ID='.$req_ID
 		."\n\n"
 		.T_('Please note:')
 		.' '.T_('For security reasons the link is only valid for your current session (by means of your session cookie).')
@@ -250,7 +250,7 @@ if( $allow_msgform == 'email' )
 	elseif( $Comment )
 	{ // Visitor:
 		$message_footer .= T_("Click on the following link to not receive e-mails on your comments\nfor this e-mail address anymore:")
-			."\n".$htsrv_url.'message_send.php?optout_cmt_email='.rawurlencode($Comment->author_email);
+			."\n".$samedomain_htsrv_url.'message_send.php?optout_cmt_email='.rawurlencode($Comment->author_email);
 	}
 	
 	
@@ -339,6 +339,10 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.76  2011/09/26 14:53:27  efy-asimo
+ * Login problems with multidomain installs - fix
+ * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
+ *
  * Revision 1.75  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *
