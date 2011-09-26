@@ -83,7 +83,7 @@ if( $action == 'register' )
 	if( $registration_require_country )
 	{ // country required
 		$CountryCache = & get_CountryCache();
-		$Form->select_input_object( 'country', $country, $CountryCache, T_('Country'), array('allow_none'=>true, 'required'=>true) );
+		$Form->select_country( 'country', $country, $CountryCache, T_('Country'), array('allow_none'=>true, 'required'=>true) );
 	}
 
 	$registration_require_gender = $Settings->get( 'registration_require_gender' );
@@ -153,6 +153,9 @@ elseif( $action == "reg_validation" )
 
 /*
  * $Log$
+ * Revision 1.17  2011/09/26 09:12:04  efy-vitalij
+ * remake select_input_object to select_country field
+ *
  * Revision 1.16  2011/09/22 08:55:00  efy-asimo
  * Login problems with multidomain installs - fix
  *

@@ -66,7 +66,7 @@ $Form->begin_fieldset();
 	if( $registration_require_country )
 	{
 		$CountryCache = & get_CountryCache();
-		$Form->select_input_object( 'country', $country, $CountryCache, T_('Country'), array('allow_none'=>true, 'required'=>true) );
+		$Form->select_country( 'country', $country, $CountryCache, T_('Country'), array('allow_none'=>true, 'required'=>true) );
 	}
 
 	$registration_require_gender = $Settings->get( 'registration_require_gender' );
@@ -102,6 +102,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.31  2011/09/26 09:08:14  efy-vitalij
+ * remake select_input_object to select_country field
+ *
  * Revision 1.30  2011/09/22 08:55:00  efy-asimo
  * Login problems with multidomain installs - fix
  *
