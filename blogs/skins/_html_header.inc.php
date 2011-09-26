@@ -17,6 +17,7 @@ global $xmlsrv_url;
 require_css( 'style.css', 'relative' );
 
 add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
+init_bubbletip_js(); // Add jQuery bubbletip plugin
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -35,6 +36,12 @@ add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar me
 	<?php skin_description_tag(); ?>
 	<?php skin_keywords_tag(); ?>
 	<?php robots_tag(); ?>
+	<?php 
+	global $htsrv_url;
+
+	add_js_headline( "// Paths used by JS functions:
+		var htsrv_url = '$htsrv_url';" );
+	?>
 	<meta name="generator" content="b2evolution <?php app_version(); ?>" /> <!-- Please leave this for stats -->
 	<?php
 	if( $Blog->get_setting( 'feed_content' ) != 'none' )

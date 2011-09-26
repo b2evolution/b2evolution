@@ -57,10 +57,11 @@ headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache
 		var htsrv_url = '$htsrv_url';" );
 
 	add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
+	init_bubbletip_js(); // Add jQuery bubbletip plugin
 
- 	require_js( '#jqueryUI#' );
- 	// asimo> This was permanently removed, because we didn't find any usage of this.
- 	// require_css( 'jquery/smoothness/jquery-ui.css' );
+	require_js( '#jqueryUI#' );
+	// asimo> This was permanently removed, because we didn't find any usage of this.
+	// require_css( 'jquery/smoothness/jquery-ui.css' );
 
 	require_js( 'form_extensions.js'); // script allowing to check and uncheck all boxes in forms -- TODO: jQueryfy
 
@@ -279,6 +280,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.38  2011/09/26 19:46:02  efy-yurybakh
+ * jQuery bubble tips
+ *
  * Revision 1.37  2011/09/04 22:13:25  fplanque
  * copyright 2011
  *

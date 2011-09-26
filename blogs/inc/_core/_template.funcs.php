@@ -973,6 +973,18 @@ function init_ratings_js( $relative_to = 'blog' )
 
 
 /**
+ * Registers headlines required by comments forms, but only if javascript forms are enabled in blog settings.
+ */
+function init_bubbletip_js( $relative_to = 'rsc_url' )
+{
+	require_js( '#jquery#', $relative_to ); // dependency
+	require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
+	require_js( 'bubbletip.js', $relative_to );
+	require_css( 'jquery/bubbletip/bubbletip.css', $relative_to );
+}
+
+
+/**
  * Outputs the collected HTML HEAD lines.
  * @see add_headline()
  * @return string
@@ -1329,6 +1341,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.104  2011/09/26 19:46:02  efy-yurybakh
+ * jQuery bubble tips
+ *
  * Revision 1.103  2011/09/26 14:53:27  efy-asimo
  * Login problems with multidomain installs - fix
  * Insert globals: samedomain_htsrv_url, secure_htsrv_url;

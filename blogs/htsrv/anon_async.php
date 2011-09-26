@@ -87,12 +87,22 @@ switch( $action )
 
 		require $skins_path.'_contact_msg.form.php';
 		break;
+
+	case "get_user_bubbletip":
+		$user_login = param( 'userid', 'string' );
+
+		echo get_avatar_imgtag( $user_login, true, true, 'crop-160x160', 'avatar_above_login' );
+
+		exit(0);
 }
 
 exit();
 
 /*
  * $Log$
+ * Revision 1.6  2011/09/26 19:46:01  efy-yurybakh
+ * jQuery bubble tips
+ *
  * Revision 1.5  2011/09/16 05:50:39  sam2kb
  * Added missing PHP closing tag ?>
  *

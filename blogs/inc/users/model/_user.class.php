@@ -668,6 +668,7 @@ class User extends DataObject
 		else
 		{
 			$r = $this->dget( 'preferredname', $params['format'] );
+			$params['link_class'] = empty( $params['link_class'] ) ? 'userbubble' : $params['link_class'].' userbubble';
 		}
 
 		switch( $params['link_to'] )
@@ -696,7 +697,7 @@ class User extends DataObject
 
 		if( !empty($url) )
 		{
-			$link = '<a href="'.$url.'"';
+			$link = '<a id="username_'.$this->login.'" href="'.$url.'"';
 			if( !empty($params['link_rel']) )
 			{
 				$link .= ' rel="'.$params['link_rel'].'"';
@@ -2608,6 +2609,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.134  2011/09/26 19:46:02  efy-yurybakh
+ * jQuery bubble tips
+ *
  * Revision 1.133  2011/09/26 14:53:27  efy-asimo
  * Login problems with multidomain installs - fix
  * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
