@@ -342,7 +342,7 @@ class Comment extends DataObject
 		{ // Add a new vote for first time
 			$DB->query( "INSERT INTO T_comments__votes( cmvt_cmt_ID, cmvt_user_ID, cmvt_spam )
 												VALUES( '".$this->ID."', '".$current_User->ID."', '".$vote."')" );
-			$spam_count = (int)$DB->get_var( "SELECT COUNT(cmvt_spam) FROM T_comments__votes WHERE cmvt_cmt_ID = '".$current_User->ID."' AND cmvt_spam IS NOT NULL" );
+			$spam_count = (int)$DB->get_var( "SELECT COUNT(cmvt_spam) FROM T_comments__votes WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_spam IS NOT NULL" );
 			$sql_update_count = ", comment_spam_countvotes = '".$spam_count."'";
 			$this->comment_spam_countvotes = $spam_count;
 		}
@@ -2306,6 +2306,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.107  2011/09/26 05:58:56  efy-yurybakh
+ * fix icon style in IE
+ *
  * Revision 1.106  2011/09/25 08:22:46  efy-yurybakh
  * Implement new permission for spam voting
  *

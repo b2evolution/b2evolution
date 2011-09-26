@@ -314,13 +314,13 @@ function get_icon_info($name)
 			'rollover' => true,
 			'alt' => T_('+'),
 			'size' => array( 15, 15 ),
-			'xy' => array( 32, 80 )
+			'xy' => array( 0, 80 )
 		);
 		case 'decrease': return array(
 			'rollover' => true,
 			'alt' => T_('-'),
 			'size' => array( 15, 15 ),
-			'xy' => array( 0, 80 )
+			'xy' => array( 32, 80 )
 		);
 
 		case 'bullet_full': return array(
@@ -554,6 +554,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.83  2011/09/26 05:58:56  efy-yurybakh
+ * fix icon style in IE
+ *
  * Revision 1.82  2011/09/24 13:27:36  efy-yurybakh
  * Change voting buttons
  *

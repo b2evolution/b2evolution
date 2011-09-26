@@ -117,5 +117,5 @@ span.icon{
 	line-height: 16px;
 	padding: 0 !important;
 	font-size: 9px;
-	display: inline-table !important;
+	display: inline-block !important;
 }
