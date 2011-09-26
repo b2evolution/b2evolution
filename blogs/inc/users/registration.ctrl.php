@@ -70,6 +70,8 @@ switch ( $action )
 
 		param( 'registration_require_gender', 'string', '' );
 
+		param( 'gender_colored', 'integer', 0 );
+
 		$Settings->set_array( array(
 									 array( 'newusers_canregister', $newusers_canregister),
 
@@ -91,7 +93,9 @@ switch ( $action )
 
 									 array( 'registration_ask_locale', $registration_ask_locale),
 
-									 array( 'registration_require_gender', $registration_require_gender) ) );
+									 array( 'registration_require_gender', $registration_require_gender),
+
+									 array( 'gender_colored', $gender_colored) ) );
 
 		if( ! $Messages->has_errors() )
 		{
@@ -134,6 +138,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2011/09/26 14:49:58  efy-yurybakh
+ * colored usernames
+ *
  * Revision 1.13  2011/09/06 16:25:18  efy-james
  * Require special chars in password
  *

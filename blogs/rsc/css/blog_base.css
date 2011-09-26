@@ -258,7 +258,7 @@ div.results {
 	overflow: auto;
 }
 
-/* Rating Summary*/
+/* Rating Summary */
 table.rating_summary{
 	float: left;
 }
@@ -316,4 +316,15 @@ div.average_rating .star_rating{
 .rating_recap div{
 	float: left;
 	padding-right: 10px;
+}
+
+/* User Genders */
+.user_man{
+	color: #00F;
+}
+.user_woman{
+	color: #e100af;
+}
+.user_nogender{
+	color: #666;
 }

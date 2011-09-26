@@ -751,7 +751,8 @@ class User extends DataObject
 
 		$link_title = T_( 'Show the user profile' );
 		$link_text = '<span class="nowrap">'.$avatar_tag.$this->login.'</span>';
-		return '<a href="'.$identity_url.'" title="'.$link_title.'">'.$link_text.'</a>';
+		$link_class = $this->get_gender_class();
+		return '<a href="'.$identity_url.'" title="'.$link_title.'"'.$link_class.'>'.$link_text.'</a>';
 	}
 
 
@@ -2147,6 +2148,35 @@ class User extends DataObject
 
 
 	/**
+	 * Return attr class depending on gender of the user
+	 */
+	function get_gender_class()
+	{
+		global $Settings;
+
+		if( ! $Settings->get('gender_colored') )
+		{ // Don't set a gender class if the setting is OFF
+			return '';
+		}
+
+		switch( $this->gender )
+		{ // Set a class name for each gender type
+			case 'M':
+				$gender_class = 'user_man';
+				break;
+			case 'F':
+				$gender_class = 'user_woman';
+				break;
+			default:
+				$gender_class = 'user_nogender';
+				break;
+		}
+
+		return ' class="'.$gender_class.'"';
+	}
+
+
+	/**
 	 * Template function: display email of the user
 	 */
 	function email( $format = 'htmlbody' )
@@ -2578,6 +2608,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.132  2011/09/26 14:49:57  efy-yurybakh
+ * colored usernames
+ *
  * Revision 1.131  2011/09/26 12:06:39  efy-asimo
  * Unified usernames everywhere in the app - second part
  *

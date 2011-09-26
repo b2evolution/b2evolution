@@ -103,6 +103,8 @@ $Form->begin_fieldset( T_('Other options') );
 					array( 'required', T_('Required') ),
 				), T_('Gender'), true );
 
+	$Form->checkbox_input( 'gender_colored', $Settings->get('gender_colored'), T_('Display gender'), array( 'note'=>T_('Use colored usernames to differentiate men & women.') ) );
+
 $Form->end_fieldset();
 
 // --------------------------------------------
@@ -115,6 +117,9 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.15  2011/09/26 14:49:58  efy-yurybakh
+ * colored usernames
+ *
  * Revision 1.14  2011/09/10 22:48:41  fplanque
  * doc
  *
