@@ -376,64 +376,72 @@ if( empty($tab) )
 			exit();
 			break;
 
-		case 'find_spam_comments':
-			// Check and remove all comments and hits matching antispam blacklist:
-			$keywords = $DB->get_col('SELECT aspm_string FROM T_antispam');
-			$keywords = array_chunk( $keywords, 100 );
-			$rows_affected = 0;
+		case 'create_test_hit':
 
-			@ignore_user_abort(true);
-			set_max_execution_time(900);
 
-			// Delete comments in chunks of 100 keywords per SQL query
-			foreach( $keywords as $chunk )
+			load_class( 'items/model/_itemlistlight.class.php', 'ItemListLight' );
+
+			$BlogCache = & get_BlogCache();
+
+			$blogs_id = $BlogCache->load_public();
+			foreach ($blogs_id as $blog_id)
 			{
-				$arr = array();
-				foreach( $chunk as $word )
+				$listBlog = & $BlogCache->get_by_ID($blog_id);
+				if( empty($listBlog) )
 				{
-					$arr[] = $DB->quote('%'.$word.'%');
+					continue;
 				}
 
-				$DB->query('DELETE FROM T_comments
-							WHERE (comment_author LIKE '.implode(' OR comment_author LIKE ', $arr).')
-							OR (comment_author_email LIKE '.implode(' OR comment_author_email LIKE ', $arr).')
-							OR (comment_author_url LIKE '.implode(' OR comment_author_url LIKE ', $arr).')
-							OR (comment_content LIKE '.implode(' OR comment_content LIKE ', $arr).')',
-							'Delete spam comments');
+				$ItemList = new ItemListLight($listBlog);
+				$filters = array();
 
-				$rows_affected = $rows_affected + $DB->rows_affected;
-			}
-			$Messages->add( sprintf( T_('Deleted %d comments'), $rows_affected ), 'success' );
-			break;
+				# This is the list of categories to restrict the linkblog to (cats will be displayed recursively)
+				# Example: $linkblog_cat = '4,6,7';
+				$linkblog_cat = '';
 
-		case 'find_spam_referers':
-			$keywords = $DB->get_col('SELECT aspm_string FROM T_antispam');
-			$keywords = array_chunk( $keywords, 100 );
-			$rows_affected = 0;
+				# This is the array if categories to restrict the linkblog to (non recursive)
+				# Example: $linkblog_catsel = array( 4, 6, 7 );
+				$linkblog_catsel = array(); // $cat_array;
 
-			@ignore_user_abort(true);
-			set_max_execution_time(900);
+				// Compile cat array stuff:
+				$linkblog_cat_array = array();
+				$linkblog_cat_modifier = '';
 
-			// Delete hits in chunks of 100 keywords per SQL query
-			foreach( $keywords as $chunk )
-			{
-				$arr = array();
-				foreach( $chunk as $word )
-				{
-					$arr[] = $DB->quote('%'.$word.'%');
+				compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $listBlog->ID );
+
+				$filters['cat_array'] = $linkblog_cat_array;
+				$filters['cat_modifier'] = $linkblog_cat_modifier;
+				
+
+				$ItemList->set_default_filters($filters);
+
+				// Run the query:
+				$ItemList->query();
+
+				if( ! $ItemList->result_num_rows )
+				{	// Nothing to display:
+					continue;
 				}
 
-				$DB->query('DELETE FROM T_hitlog
-							WHERE hit_referer LIKE '.implode(' OR hit_referer LIKE ', $arr),
-							'Delete all banned hit-log entries' );
+				while( $Item = & $ItemList->get_category_group() )
+				{
+					// Open new cat:
+					$Chapter = & $Item->get_main_Chapter();
+					while( $Item = & $ItemList->get_item() )
+					{	// Display contents of the Item depending on widget params:
+						echo $text =   $Chapter->get_permanent_url(). $Item->urltitle.'<br>';
+					}
 
-				$rows_affected = $rows_affected + $DB->rows_affected;
+				}
 			}
-			$Messages->add( sprintf( T_('Deleted %d logged hits'), $rows_affected ), 'success' );
+
+			$Messages->add( sprintf( 'Testing add urls %d', 0 ), 'success' );
 			break;
+
+
+
 	}
 }
-
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
 $AdminUI->breadcrumbpath_add( T_('Tools'), '?ctrl=crontab' );
 $AdminUI->breadcrumbpath_add( T_('Miscellaneous'), '?ctrl=tools' );
@@ -469,6 +477,11 @@ if( empty($tab) )
 			$AdminUI->disp_view( 'tools/views/_create_posts.form.php' );
 			break;
 
+		case 'show_create_test_hit':
+			$AdminUI->disp_view( 'tools/views/_create_test_hit.form.php' );
+			break;
+
+
 		default:
 			$AdminUI->disp_view( 'tools/views/_misc_tools.view.php' );
 			break;
@@ -503,6 +516,12 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.45  2011/09/26 15:38:08  efy-vitalij
+ * add test hit information
+ *
+ * Revision 1.44  2011/09/05 14:17:26  sam2kb
+ * Refactor antispam controller
+ *
  * Revision 1.43  2011/09/04 22:13:21  fplanque
  * copyright 2011
  *

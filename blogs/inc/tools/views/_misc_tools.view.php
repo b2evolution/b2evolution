@@ -72,23 +72,12 @@ if( $current_User->check_perm('options', 'edit') )
 	echo '</ul>';
 	$block_item_Widget->disp_template_raw( 'block_end' );
 
-// fp>sam2kb : I really think this should go to the antispam screen instead
-// sam2kb>fp : I'll add a menu3 type tabs to antispam controller and these tools there
-// So the tabs/links will be Blacklist | Settings | Tools ?
-// fp>sam2kb : yes that sounds good. And if you can completely move antispam settings out of Global settings, it will be perfect. Thanks.
-	$block_item_Widget->title = T_('Antispam Tools');
-	$block_item_Widget->disp_template_replaced( 'block_start' );
-	echo '<ul>';
-	echo '<li><a href="'.regenerate_url('action', 'action=find_spam_comments&amp;'.url_crumb('tools')).'">'.T_('Find and delete comments matching antispam blacklist').'</a></li>';
-	echo '<li><a href="'.regenerate_url('action', 'action=find_spam_referers&amp;'.url_crumb('tools')).'">'.T_('Find and delete all banned hit-log entries').'</a></li>';
-	echo '</ul>';
-	$block_item_Widget->disp_template_raw( 'block_end' );
-
 	$block_item_Widget->title = T_('Testing Tools');
 	$block_item_Widget->disp_template_replaced( 'block_start' );
 	echo '<ul>';
 	echo '<li><a href="'.regenerate_url('action', 'action=show_create_comments&amp;'.url_crumb('tools')).'">'.T_('Create sample comments for testing moderation').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=show_create_posts&amp;'.url_crumb('tools')).'">'.T_('Create sample posts for testing').'</a></li>';
+	echo '<li><a href="'.regenerate_url('action', 'action=show_create_test_hit&amp;'.url_crumb('tools')).'">'.T_('Create sample hit data for testing').'</a></li>';
 	echo '</ul>';
 	$block_item_Widget->disp_template_raw( 'block_end' );
 
@@ -118,6 +107,12 @@ $block_item_Widget->disp_template_raw( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.12  2011/09/26 15:38:08  efy-vitalij
+ * add test hit information
+ *
+ * Revision 1.11  2011/09/05 14:17:26  sam2kb
+ * Refactor antispam controller
+ *
  * Revision 1.10  2011/09/04 22:13:21  fplanque
  * copyright 2011
  *
