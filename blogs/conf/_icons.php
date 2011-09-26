@@ -549,11 +549,25 @@ function get_icon_info($name)
 			'size' => array( 15, 15 ),
 			'xy' => array( 64, 144 )
 		);
+
+		case 'thumb_up': return array(
+			'alt'  => T_('Thumb Up'),
+			'size' => array( 13, 16 ),
+			'xy' => array( 112, 144 )
+		);
+		case 'thumb_down': return array(
+			'alt'  => T_('Thumb Down'),
+			'size' => array( 13, 16 ),
+			'xy' => array( 128, 144 )
+		);
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.84  2011/09/26 10:44:20  efy-yurybakh
+ * thumb up down icons
+ *
  * Revision 1.83  2011/09/26 05:58:56  efy-yurybakh
  * fix icon style in IE
  *
