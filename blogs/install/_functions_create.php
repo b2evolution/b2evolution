@@ -713,6 +713,12 @@ function create_default_countries()
 			(245, 'ye', 'Yemen', 144),
 			(246, 'zm', 'Zambia', 145),
 			(247, 'zw', 'Zimbabwe', 146)" );
+
+		$DB->query( "
+		UPDATE T_country
+		SET ctry_preferred = 1
+		WHERE ctry_name = 'United States'");
+
 	echo "OK.<br />\n";
 }
 
@@ -1362,6 +1368,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.319  2011/09/26 08:46:23  efy-vitalij
+ * add default preferred value to country table_functions_create.php
+ *
  * Revision 1.318  2011/09/25 07:06:21  efy-yurybakh
  * Implement new permission for spam voting
  *
