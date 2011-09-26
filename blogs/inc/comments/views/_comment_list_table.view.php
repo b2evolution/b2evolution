@@ -91,6 +91,12 @@ function get_author( $Comment )
 	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) ||
 		$Comment->get('status') == 'published' )
 	{
+		$author_User = $Comment->get_author_User();
+		if( $author_User != NULL )
+		{ // author is a registered user
+			return $author_User->get_identity_link();
+		}
+		// author is not a registered user
 		return $Comment->get_author( array( 'link_to' => 'userpage' )  );
 	}
 	else
@@ -260,6 +266,9 @@ $CommentList->display();
 
 /*
  * $Log$
+ * Revision 1.9  2011/09/26 12:06:39  efy-asimo
+ * Unified usernames everywhere in the app - second part
+ *
  * Revision 1.8  2011/09/04 22:13:15  fplanque
  * copyright 2011
  *

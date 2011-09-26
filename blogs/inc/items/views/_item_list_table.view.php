@@ -108,7 +108,7 @@ else
 			'th_class' => 'nowrap',
 			'td_class' => 'nowrap',
 			'order' => 'creator_user_ID',
-			'td' => '@get(\'t_author\')@',
+			'td' => '%get_user_identity_link( NULL, #post_creator_user_ID# )%',
 		);
 }
 
@@ -308,6 +308,9 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.32  2011/09/26 12:06:39  efy-asimo
+ * Unified usernames everywhere in the app - second part
+ *
  * Revision 1.31  2011/09/07 00:28:26  sam2kb
  * Replace non-ASCII character in regular expressions with ~
  *

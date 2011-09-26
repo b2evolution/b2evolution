@@ -88,6 +88,7 @@ $Form->begin_fieldset( T_('Additional info') );
 
 	$Form->info_field( T_('Posts'), $edited_User->get_num_posts() );
 	$Form->info_field( T_('Comments'), $edited_User->get_num_comments() );
+	$Form->info_field( T_('# of sessions'), $edited_User->get_num_sessions( true ) );
 	$Form->info_field( T_('Last seen on'), $edited_User->get_last_session_param('lastseen') );
 	$Form->info_field( T_('On IP'), $edited_User->get_last_session_param('ipaddress') );
 	$Form->info_field( T_('Created on'), $edited_User->dget('datecreated') );
@@ -116,6 +117,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.7  2011/09/26 12:06:39  efy-asimo
+ * Unified usernames everywhere in the app - second part
+ *
  * Revision 1.6  2011/09/19 22:15:59  fplanque
  * Minot/i18n
  *

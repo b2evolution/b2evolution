@@ -174,7 +174,7 @@ $Results->grp_cols[] = array(
 $Results->cols[] = array(
 						'th' => T_('Login'),
 						'order' => 'user_login',
-						'td' => '<a href="?ctrl=user&amp;user_tab=profile&amp;user_ID=$user_ID$">$user_login$</a>',
+						'td' => '%get_user_identity_link( #user_login# )%',
 					);
 
 $Results->cols[] = array(
@@ -449,7 +449,7 @@ $Results->cols = array(); // RESET!
 $Results->cols[] = array(
 						'th' => T_('Login'),
 						'order' => 'user_login',
-						'td' => '<a href="?ctrl=user&amp;user_tab=profile&amp;user_ID=$user_ID$">$user_login$</a>',
+						'td' => '%get_user_identity_link( #user_login# )%',
 					);
 
 
@@ -519,6 +519,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.26  2011/09/26 12:06:38  efy-asimo
+ * Unified usernames everywhere in the app - second part
+ *
  * Revision 1.25  2011/09/25 07:06:21  efy-yurybakh
  * Implement new permission for spam voting
  *

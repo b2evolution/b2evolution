@@ -114,7 +114,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 						'th' => T_('Owner'),
 						'order' => 'user_login',
-						'td' => '$user_login$',
+						'td' => '%get_user_identity_link( #user_login# )%',
 					);
 
 $Results->cols[] = array(
@@ -215,6 +215,9 @@ $Results->display( NULL, 'session' );
 
 /*
  * $Log$
+ * Revision 1.16  2011/09/26 12:06:38  efy-asimo
+ * Unified usernames everywhere in the app - second part
+ *
  * Revision 1.15  2011/09/04 22:13:14  fplanque
  * copyright 2011
  *

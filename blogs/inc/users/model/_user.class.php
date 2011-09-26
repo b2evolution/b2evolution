@@ -742,22 +742,16 @@ class User extends DataObject
 	function get_identity_link( $profile_tab = 'profile' )
 	{
 		$identity_url = get_user_identity_url( $this->ID, $profile_tab );
-
 		$avatar_tag = $this->get_avatar_imgtag( 'crop-15x15', 'avatar_before_login' );
 
 		if( empty( $identity_url ) )
 		{
-			return $avatar_tag.' '.$this->login;
+			return $avatar_tag.$this->login;
 		}
 
 		$link_title = T_( 'Show the user profile' );
-		if( !empty( $avatar_tag ) )
-		{
-			$avatar_tag = '<a href="'.$identity_url.'" title="'.$link_title.'">'.$avatar_tag.'</a>';
-		}
-
-		$login_link = '<a href="'.$identity_url.'" title="'.$link_title.'">'.$this->login.'</a>';
-		return $avatar_tag.$login_link;
+		$link_text = '<span class="nowrap">'.$avatar_tag.$this->login.'</span>';
+		return '<a href="'.$identity_url.'" title="'.$link_title.'">'.$link_text.'</a>';
 	}
 
 
@@ -835,6 +829,29 @@ class User extends DataObject
 		}
 
 		return $this->_num_comments;
+	}
+
+
+	/**
+	 * Get the number of user sessions
+	 * 
+	 * @param boolean set true to return the number of sessions as a link to the user sessions list
+	 * @return integer|string number of sessions or link to user sessions where the link text is the number of sessions
+	 */
+	function get_num_sessions( $link_sessions = false )
+	{
+		global $DB;
+
+		$num_sessions = $DB->get_var( 'SELECT count( sess_ID ) 
+											FROM T_sessions
+											WHERE sess_user_ID = '.$this->ID );
+
+		if( $link_sessions && ( $num_sessions > 0 ) )
+		{
+			return '<a href="?ctrl=stats&amp;tab=sessions&amp;tab3=sessid&amp;user='.$this->login.'">'.$num_sessions.'</a>';
+		}
+
+		return $num_sessions;
 	}
 
 
@@ -2561,6 +2578,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.131  2011/09/26 12:06:39  efy-asimo
+ * Unified usernames everywhere in the app - second part
+ *
  * Revision 1.130  2011/09/25 08:22:47  efy-yurybakh
  * Implement new permission for spam voting
  *
