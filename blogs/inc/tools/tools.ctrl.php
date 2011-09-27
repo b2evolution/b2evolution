@@ -378,14 +378,16 @@ if( empty($tab) )
 
 		case 'create_test_hit':
 
-
 			load_class( 'items/model/_itemlistlight.class.php', 'ItemListLight' );
+
+			$links = array();
 
 			$BlogCache = & get_BlogCache();
 
 			$blogs_id = $BlogCache->load_public();
+
 			foreach ($blogs_id as $blog_id)
-			{
+			{	// handle all public blogs
 				$listBlog = & $BlogCache->get_by_ID($blog_id);
 				if( empty($listBlog) )
 				{
@@ -415,7 +417,7 @@ if( empty($tab) )
 
 				$ItemList->set_default_filters($filters);
 
-				// Run the query:
+				// Get the items list of current blog
 				$ItemList->query();
 
 				if( ! $ItemList->result_num_rows )
@@ -428,14 +430,57 @@ if( empty($tab) )
 					// Open new cat:
 					$Chapter = & $Item->get_main_Chapter();
 					while( $Item = & $ItemList->get_item() )
-					{	// Display contents of the Item depending on widget params:
-						echo $text =   $Chapter->get_permanent_url(). $Item->urltitle.'<br>';
+					{	
+						$links[$blog_id][] =  array('link' => '/'.$listBlog->siteurl.'/'.$Chapter->get_url_path().$Item->urltitle, // trim($Chapter->get_permanent_url(NULL ,' ')).
+													'ip'   => generate_random_ip());
 					}
 
 				}
+
+			}
+			// Calculate the period of testing
+			$cur_time = time();
+			$past_time = mktime(date("H"),date("i"),date("s") ,date("m"),date("d")-10,date("Y"));
+
+			$insert_data ='';
+			$insert_data_count = 0;
+			// Sample data for hit session:
+			$hit_sess_ID = 999;
+
+			foreach ($links as $blog_key => $value)
+			{
+				// Handle the links array and form test hit data:
+				$time_shift = 0;
+				$array_count = count($value);
+
+				if (!empty($array_count))
+				{
+					for ($time_shift = $past_time; $cur_time > $time_shift; $time_shift += mt_rand(0, 5000))
+					{
+						$insert_data_count++;
+						// generate random array key:
+						$k = mt_rand(0,$array_count-1);
+
+						if ($insert_data == '')
+						{
+							$insert_data .="($hit_sess_ID, FROM_UNIXTIME($time_shift), '". $DB->escape($value[$k]['link']). "' , 'direct', $blog_key, '{$value[$k]['ip']}' , 'browser')";
+						}
+						else
+						{
+							$insert_data .=",($hit_sess_ID, FROM_UNIXTIME($time_shift), '". $DB->escape($value[$k]['link']). "' , 'direct', $blog_key,'{$value[$k]['ip']}', 'browser')";
+						}
+
+					}
+
+					$sql = "INSERT INTO T_hitlog(
+					hit_sess_ID, hit_datetime, hit_uri, hit_referer_type, hit_blog_ID, hit_remote_addr, hit_agent_type )
+					VALUES".$insert_data;
+
+					$DB->query( $sql, 'Record test hits' );
+				}
 			}
 
-			$Messages->add( sprintf( 'Testing add urls %d', 0 ), 'success' );
+			$Messages->add( sprintf( '%d test data items are added.', $insert_data_count ), 'success' );
 			break;
 
 
@@ -516,6 +561,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.46  2011/09/27 13:11:29  efy-vitalij
+ * generate sample hit data
+ *
  * Revision 1.45  2011/09/26 15:38:08  efy-vitalij
  * add test hit information
  *
