@@ -91,7 +91,7 @@ switch( $action )
 	case "get_user_bubbletip":
 		$user_login = param( 'userid', 'string' );
 
-		echo '<div class="center">'.get_avatar_imgtag( $user_login, true, true, 'crop-160x160', 'avatar_above_login' ).'</div>';
+		echo '<div class="center">'.get_avatar_imgtag( $user_login, true, true, 'fit-160x160', 'avatar_above_login' ).'</div>';
 
 		exit(0);
 }
@@ -100,6 +100,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.8  2011/09/27 12:53:52  efy-yurybakh
+ * bubbletip fix
+ *
  * Revision 1.7  2011/09/27 06:08:14  efy-yurybakh
  * Add User::get_identity_link() everywhere
  *
