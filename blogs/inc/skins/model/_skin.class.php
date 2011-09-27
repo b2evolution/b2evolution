@@ -762,6 +762,26 @@ class Skin extends DataObject
 					'show_only_date' => true,
 					'show_columns' => 'login',
 				);
+
+			case 'blockspan_form':
+				// blockspan Form settings:
+				return array(
+					'layout' => 'blockspan',		// Temporary dirty hack
+					'formstart' => '',
+					'title_fmt' => '$title$'."\n", // TODO: icons
+					'no_title_fmt' => '',          //           "
+					'fieldstart' => '<span class="block" $ID$>',
+					'labelstart' => '',
+					'labelend' => "\n",
+					'labelempty' => '',
+					'inputstart' => '',
+					'infostart' => '',
+					'inputend' => "\n",
+					'fieldend' => '</span>'.get_icon( 'pixel' )."\n",
+					'buttonsstart' => '',
+					'buttonsend' => "\n",
+					'formend' => '',
+				);
 		}
 
 		return array();
@@ -771,6 +791,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.33  2011/09/27 07:45:58  efy-asimo
+ * Front office messaging hot fixes
+ *
  * Revision 1.32  2011/09/17 21:14:47  fplanque
  * doc
  *

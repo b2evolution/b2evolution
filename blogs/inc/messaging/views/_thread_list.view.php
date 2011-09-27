@@ -188,9 +188,9 @@ $Results->cols[] = array(
 					'th' => T_('Subject'),
 					'th_class' => 'thread_subject',
 					'td_class' => 'thread_subject',
-					'td' => '~conditional( #thrd_msg_ID#>0, \'<strong><a href="'.$messages_url.'&amp;thrd_ID=$thrd_ID$" title="'
+					'td' => '~conditional( #thrd_msg_ID#>0, \'<strong><a href="'.$messages_url.'&amp;thrd_ID=$thrd_ID$&amp;thrd_title=$thrd_title$" title="'
 							.T_('Show messages...').'">$thrd_title$</a></strong>\', \'<a href="'
-							.$messages_url.'&amp;thrd_ID=$thrd_ID$" title="'.T_('Show messages...').'">$thrd_title$</a>\' )~',
+							.$messages_url.'&amp;thrd_ID=$thrd_ID$&amp;thrd_title=$thrd_title$" title="'.T_('Show messages...').'">$thrd_title$</a>\' )~',
 					);
 
 function convert_date( $date, $show_only_date )
@@ -264,6 +264,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.30  2011/09/27 07:45:58  efy-asimo
+ * Front office messaging hot fixes
+ *
  * Revision 1.29  2011/09/26 14:53:27  efy-asimo
  * Login problems with multidomain installs - fix
  * Insert globals: samedomain_htsrv_url, secure_htsrv_url;

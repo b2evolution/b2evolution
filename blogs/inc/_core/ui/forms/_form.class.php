@@ -154,7 +154,7 @@ class Form extends Widget
 	 */
 	function Form( $form_action = NULL, $form_name = '', $form_method = 'post', $layout = NULL, $enctype = '' )
 	{
-		global $AdminUI, $pagenow;
+		global $AdminUI, $pagenow, $Skin;
 
 		$this->form_name = $form_name;
 		$this->form_action = (is_null($form_action) ? $pagenow : $form_action );
@@ -176,27 +176,41 @@ class Form extends Widget
 		}
 		else
 		{	// This happens for comment forms & login screen for example...
-			$template = array(
-				'layout' => 'fieldset',
-				'formstart' => '<div>',// required before (no_)title_fmt for validation
-				'title_fmt' => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
-				'no_title_fmt' => '<span style="float:right">$global_icons$</span>'."\n",
-				'fieldset_begin' => '<fieldset $fieldset_attribs$>'."\n"
-														.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
-				'fieldset_end' => '</fieldset>'."\n",
-				'fieldstart' => '<fieldset$ID$>'."\n",
-				'labelstart' => '<div class="label">',
-				'labelend' => "</div>\n",
-				'labelempty' => '<div class="label"></div>', // so that IE6 aligns DIV.input correcctly
-				'inputstart' => '<div class="input">',
-				'infostart' => '<div class="info">',
-				'inputend' => "</div>\n",
-				'fieldend' => "</fieldset>\n\n",
-				'buttonsstart' => '<fieldset><div class="label"></div><div class="input">', // DIV.label for IE6
-				'buttonsend' => "</div></fieldset>\n\n",
-				'formend' => '</div>',
-			);
-			$layout = 'fieldset';
+			$template_is_empty = true;
+			if( ( is_object( $Skin ) ) && ( !empty( $layout ) ) )
+			{ // Get skin setting:
+				$template = $Skin->get_template( $layout.'_form' );
+				$template_is_empty = empty( $template );
+				if( !$template_is_empty )
+				{
+					$layout = $template['layout'];
+				}
+			}
+
+			if( $template_is_empty )
+			{
+				$template = array(
+					'layout' => 'fieldset',
+					'formstart' => '<div>',// required before (no_)title_fmt for validation
+					'title_fmt' => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
+					'no_title_fmt' => '<span style="float:right">$global_icons$</span>'."\n",
+					'fieldset_begin' => '<fieldset $fieldset_attribs$>'."\n"
+															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
+					'fieldset_end' => '</fieldset>'."\n",
+					'fieldstart' => '<fieldset$ID$>'."\n",
+					'labelstart' => '<div class="label">',
+					'labelend' => "</div>\n",
+					'labelempty' => '<div class="label"></div>', // so that IE6 aligns DIV.input correcctly
+					'inputstart' => '<div class="input">',
+					'infostart' => '<div class="info">',
+					'inputend' => "</div>\n",
+					'fieldend' => "</fieldset>\n\n",
+					'buttonsstart' => '<fieldset><div class="label"></div><div class="input">', // DIV.label for IE6
+					'buttonsend' => "</div></fieldset>\n\n",
+					'formend' => '</div>',
+				);
+				$layout = 'fieldset';
+			}
 		}
 
 		$this->saved_layouts = array($layout);
@@ -3142,6 +3156,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.94  2011/09/27 07:45:58  efy-asimo
+ * Front office messaging hot fixes
+ *
  * Revision 1.93  2011/09/26 08:55:24  efy-vitalij
  * add function select_country() _form.class.php
  *

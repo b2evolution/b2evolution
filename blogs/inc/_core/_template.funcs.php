@@ -465,8 +465,16 @@ function request_title( $params = array() )
 
 		case 'threads':
 		case 'messages':
-			// We are requesting the message form:
-			$r[] = $params['messages_text'];
+			// We are requesting the messages form
+			$thrd_title = param( 'thrd_title', 'string', '' );
+			if( empty( $thrd_title ) )
+			{
+				$r[] = $params['messages_text'];
+			}
+			else
+			{
+				$r[] = $thrd_title;
+			}
 			break;
 
 		case 'contacts':
@@ -1341,6 +1349,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.105  2011/09/27 07:45:57  efy-asimo
+ * Front office messaging hot fixes
+ *
  * Revision 1.104  2011/09/26 19:46:02  efy-yurybakh
  * jQuery bubble tips
  *

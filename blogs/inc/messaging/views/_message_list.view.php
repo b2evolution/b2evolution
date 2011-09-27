@@ -350,10 +350,12 @@ $Form->begin_form( $params['form_class'], '' );
 
 	$Form->textarea('msg_text', '', 10, '', '', $params[ 'cols' ], '', true);
 
-$Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'SaveButton' ),
-												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+$Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' ) ) );
 /*
  * $Log$
+ * Revision 1.36  2011/09/27 07:45:58  efy-asimo
+ * Front office messaging hot fixes
+ *
  * Revision 1.35  2011/09/26 14:53:27  efy-asimo
  * Login problems with multidomain installs - fix
  * Insert globals: samedomain_htsrv_url, secure_htsrv_url;

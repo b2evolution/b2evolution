@@ -37,12 +37,15 @@ $Form = new Form( $submit_url );
 
 	<?php
 	// Note: we use funky field names in order to defeat the most basic guestbook spam bots:
-	$Form->text_input( 'd', $email_author, 40, T_('From'), T_('Your name.'), array( 'maxlength'=>50, 'class'=>'wide_input', 'required'=>true ) );
-
 	if( $allow_msgform == 'email' )
-	{
+	{ // email form
+		$Form->text_input( 'd', $email_author, 40, T_('From'), T_('Your name.'), array( 'maxlength'=>50, 'class'=>'wide_input', 'required'=>true ) );
 		$Form->text_input( 'f', $email_author_address, 40, T_('Email'), T_('Your email address. (Will <strong>not</strong> be displayed on this site.)'),
 			 array( 'maxlength'=>150, 'class'=>'wide_input', 'required'=>true ) );
+	}
+	else
+	{ // pm form, $current_User must be set!
+		$Form->info_field( T_('From'), $current_User->get_identity_link() );
 	}
 
 	$Form->text_input( 'g', $subject, 40, T_('Subject'), T_('Subject of your message.'), array( 'maxlength'=>255, 'class'=>'wide_input', 'required'=>true ) );
@@ -73,6 +76,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.9  2011/09/27 07:45:58  efy-asimo
+ * Front office messaging hot fixes
+ *
  * Revision 1.8  2011/09/26 14:53:27  efy-asimo
  * Login problems with multidomain installs - fix
  * Insert globals: samedomain_htsrv_url, secure_htsrv_url;

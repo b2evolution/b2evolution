@@ -78,8 +78,16 @@ else
 }
 
 // Create result set:
+if( $Settings->get('allow_avatars') )
+{
+	$default_order = '--A';
+}
+else
+{
+	$default_order = '-A';
+}
 
-$Results = new Results( $select_SQL->get(), 'mct_', '', NULL, $count_SQL->get() );
+$Results = new Results( $select_SQL->get(), 'mct_', $default_order, NULL, $count_SQL->get() );
 
 $Results->title = T_('Contacts list');
 
@@ -100,6 +108,40 @@ $Results->filter_area = array(
 		)
 	);
 
+/**
+ * Get block/unblock icon
+ *
+ * @param block value
+ * @param user ID
+ * @return icon
+ */
+function contact_block( $block, $user_ID )
+{
+	global $samedomain_htsrv_url;
+	// set action url
+	$action_url = get_messaging_url( 'contacts' );
+	if( !is_admin_page() )
+	{ // in front office the action will be processed by messaging.php
+		$action_url = $samedomain_htsrv_url.'messaging.php?disp=contacts&redirect_to='.$action_url;
+	}
+
+	if( $block == 0 )
+	{
+		return action_icon( T_('Block contact'), 'file_allowed', $action_url.'&action=block&user_ID='.$user_ID.'&amp;'.url_crumb('contact') );
+	}
+	else
+	{
+		return action_icon( T_('Unblock contact'), 'file_not_allowed', $action_url.'&action=unblock&user_ID='.$user_ID.'&amp;'.url_crumb('contact') );
+	}
+}
+
+$Results->cols[] = array(
+					'th' => T_('S'),
+					'order' => 'mct_blocked',
+					'th_class' => 'shrinkwrap',
+					'td_class' => 'shrinkwrap',
+					'td' => '%contact_block( #mct_blocked#, #mct_to_user_ID# )%',
+					);
 
 if( $Settings->get('allow_avatars') )
 {
@@ -115,7 +157,16 @@ if( $Settings->get('allow_avatars') )
 		$User = & $UserCache->get_by_ID( $user_ID, false, false );
 		if( $User )
 		{
-			return $User->get_avatar_imgtag();
+			$avatar_tag = $User->get_avatar_imgtag();
+			$identity_url = get_user_identity_url( $user_ID );
+			if( !empty( $avatar_tag ) )
+			{
+				if( empty( $identity_url ) )
+				{ // current_User has no permission to view user settings, and Blog is empty
+					return $avatar_tag;
+				}
+				return '<a href="'.$identity_url.'">'.$avatar_tag.'</a>';
+			}
 		}
 		return '';
 	}
@@ -129,13 +180,28 @@ if( $Settings->get('allow_avatars') )
 
 if( in_array( 'login', $show_columns ) )
 {
-$Results->cols[] = array(
-					'th' => T_('Login'),
-					'order' => 'mct_to_user_login',
-					'th_class' => 'shrinkwrap',
-					'td_class' => 'shrinkwrap',
-					'td' => '<strong>$mct_to_user_login$</strong>',
-					);
+	function user_login( $user_ID )
+	{
+		$UserCache = & get_UserCache();
+		$User = & $UserCache->get_by_ID( $user_ID, false, false );
+		if( $User )
+		{
+			$identity_url = get_user_identity_url( $user_ID );
+			if( empty( $identity_url ) )
+			{ // current_User has no permission to view user settings, and Blog is empty
+				return '<strong>'.$User->login.'</strong>';
+			}
+			return '<a href="'.$identity_url.'"><strong>'.$User->login.'</strong></a>';
+		}
+		return '';
+	}
+	$Results->cols[] = array(
+						'th' => T_('Login'),
+						'order' => 'mct_to_user_login',
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap',
+						'td' => '%user_login( #mct_to_user_ID# )%',
+						);
 }
 
 if( in_array( 'nickname', $show_columns ) )
@@ -185,7 +251,9 @@ function user_pm ( $block, $user_login )
 {
 	if( $block == 0 )
 	{
-		return action_icon( T_('Private Message').': '.$user_login, 'comments', get_messaging_url( 'threads' ).'&action=new&user_login='.$user_login );
+		$icon_tag = get_icon( 'comments', 'imgtag', array( 'alt' => 'PM' ) );
+		$messaging_url = get_messaging_url( 'threads' ).'&action=new&user_login='.$user_login;
+		return '<a title="'.T_( 'Private Message' ).': '.$user_login.'" href="'.$messaging_url.'">'.T_( 'Send' ).$icon_tag.'</a>';
 	}
 	return '';
 }
@@ -208,46 +276,20 @@ $Results->cols[] = array(
 	'td' => '%last_contact(#mct_last_contact_datetime#, '.$display_params[ 'show_only_date' ].')%'
 );
 
-/**
- * Get block/unblock icon
- *
- * @param block value
- * @param user ID
- * @return icon
- */
-function contact_block( $block, $user_ID )
-{
-	global $samedomain_htsrv_url;
-	// set action url
-	$action_url = get_messaging_url( 'contacts' );
-	if( !is_admin_page() )
-	{ // in front office the action will be processed by messaging.php
-		$action_url = $samedomain_htsrv_url.'messaging.php?disp=contacts&redirect_to='.$action_url;
-	}
-
-	if( $block == 0 )
-	{
-		return action_icon( T_('Block contact'), 'file_allowed', $action_url.'&action=block&user_ID='.$user_ID.'&amp;'.url_crumb('contact') );
-	}
-	else
-	{
-		return action_icon( T_('Unblock contact'), 'file_not_allowed', $action_url.'&action=unblock&user_ID='.$user_ID.'&amp;'.url_crumb('contact') );
-	}
-}
-
 $Results->cols[] = array(
-					'th' => T_('Actions'),
+					'th' => T_('Message'),
 					'th_class' => 'shrinkwrap',
 					'td_class' => 'shrinkwrap',
-					'td' => '%user_pm( #mct_blocked#, #mct_to_user_login# )%'.
-							'%user_mailto( #mct_to_user_email# )%'.
-							'%contact_block( #mct_blocked#, #mct_to_user_ID# )%'
+					'td' => '%user_pm( #mct_blocked#, #mct_to_user_login# )%'
 					);
 
 $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.16  2011/09/27 07:45:58  efy-asimo
+ * Front office messaging hot fixes
+ *
  * Revision 1.15  2011/09/26 14:53:27  efy-asimo
  * Login problems with multidomain installs - fix
  * Insert globals: samedomain_htsrv_url, secure_htsrv_url;

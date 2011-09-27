@@ -3050,8 +3050,16 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					}
 				}
 				$styles = count($styles) > 0 ? ' style="'.implode( '; ', $styles).'"' : '';
-				
-				$r = '<span class="icon"'.$styles.' title="'.$icon['alt'].'">&nbsp;</span>';
+
+				if( isset( $params['alt'] ) )
+				{
+					$icon_alt = $params['alt'];
+				}
+				else
+				{
+					$icon_alt = $icon['alt'];
+				}
+				$r = '<span class="icon"'.$styles.' title="'.$icon_alt.'">&nbsp;</span>';
 			}
 			else
 			{ // Use img tag
@@ -4407,6 +4415,9 @@ if( !function_exists( 'property_exists' ) )
 
 /*
  * $Log$
+ * Revision 1.280  2011/09/27 07:45:57  efy-asimo
+ * Front office messaging hot fixes
+ *
  * Revision 1.279  2011/09/25 02:51:44  efy-yurybakh
  * sprite rollover
  *

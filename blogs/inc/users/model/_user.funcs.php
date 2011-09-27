@@ -560,7 +560,7 @@ function get_user_identity_link( $user_login, $user_ID = NULL, $profile_tab = 'p
  */
 function get_user_identity_url ( $user_ID = NULL, $profile_tab = 'profile', $redirect_to = NULL )
 {
-	global $current_User;
+	global $current_User, $Blog;
 
 	if( $user_ID == NULL )
 	{
@@ -588,7 +588,7 @@ function get_user_identity_url ( $user_ID = NULL, $profile_tab = 'profile', $red
 		}
 		else
 		{ // can't display the profile form, display the front office User form
-			return url_add_param( $Blog->gen_blogurl().'?disp=user&amp;user_ID='.$user_ID, 'redirect_to='.$redirect_to );
+			return url_add_param( $Blog->gen_blogurl(), 'disp=user&amp;user_ID='.$user_ID.'&amp;redirect_to='.$redirect_to );
 		}
 	}
 
@@ -1166,6 +1166,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.63  2011/09/27 07:45:58  efy-asimo
+ * Front office messaging hot fixes
+ *
  * Revision 1.62  2011/09/27 06:08:15  efy-yurybakh
  * Add User::get_identity_link() everywhere
  *
