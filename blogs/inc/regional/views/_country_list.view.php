@@ -43,6 +43,7 @@ $s = param( 's', 'string', '', true );
 $SQL = new SQL();
 $SQL->SELECT( 'ctry_ID, ctry_code, ctry_name, curr_shortcut, curr_code, ctry_enabled, ctry_preferred' );
 $SQL->FROM( 'T_country	LEFT JOIN T_currency ON ctry_curr_ID=curr_ID' );
+$SQL->ORDER_BY('*, ctry_code ASC');
 
 if( !empty($s) )
 {	// We want to filter on search keyword:
@@ -259,6 +260,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.24  2011/09/27 07:18:14  efy-vitalij
+ * add default order by ctry_code
+ *
  * Revision 1.23  2011/09/26 09:02:23  efy-vitalij
  * changed default sort column and name to Pref
  *
