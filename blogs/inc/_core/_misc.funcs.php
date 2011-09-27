@@ -4413,8 +4413,22 @@ if( !function_exists( 'property_exists' ) )
 } 
 
 
+/**
+ * Generate a random ip
+ *
+ * @return string ip
+ */
+function generate_random_ip()
+{
+ 	return mt_rand(0, 255).'.'.mt_rand(0, 255).'.'.mt_rand(0, 255).'.'.mt_rand(0, 255);
+}
+
+
 /*
  * $Log$
+ * Revision 1.281  2011/09/27 13:13:28  efy-vitalij
+ * add simple ip address generate function
+ *
  * Revision 1.280  2011/09/27 07:45:57  efy-asimo
  * Front office messaging hot fixes
  *
