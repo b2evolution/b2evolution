@@ -697,6 +697,7 @@ class User extends DataObject
 
 		if( !empty($url) )
 		{
+// fp>yura : please document why we need this id
 			$link = '<a id="username_'.$this->login.'" href="'.$url.'"';
 			if( !empty($params['link_rel']) )
 			{
@@ -2629,6 +2630,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.139  2011/09/27 21:05:56  fplanque
+ * no message
+ *
  * Revision 1.138  2011/09/27 17:53:59  efy-yurybakh
  * add missing rel="lightbox" in front office
  *

@@ -20,7 +20,6 @@ headers_content_mightcache( 'text/html', 0 );		// Do NOT cache error messages! (
 		<p><?php echo T_('Sorry, you have no permission to access this section.') ?></p>
 	</div>
 	<p style="text-align:center;"><?php
-	// fp>attila why httsrv with double t ?
 		$secure_httsrv_url = get_secure_htsrv_url();
 		echo '<a href="'.$secure_httsrv_url.'login.php?action=logout&amp;redirect_to='.rawurlencode(url_rel_to_same_host($ReqURL, $secure_httsrv_url)).'">'.T_('Logout').'</a>
 					&bull;
