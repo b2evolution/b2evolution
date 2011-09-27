@@ -292,6 +292,17 @@ if( $new_user_creating )
 
 $Form->begin_fieldset( T_('Identity') );
 
+if( ($url = $edited_User->get('url')) != '' )
+{
+	if( !preg_match('#://#', $url) )
+	{
+		$url = 'http://'.$url;
+	}
+	$url_fieldnote = '<a href="'.$url.'" target="_blank">'.get_icon( 'play', 'imgtag', array('title'=>T_('Visit the site')) ).'</a>';
+}
+else
+	$url_fieldnote = '';
+
 if( $action != 'view' )
 {   // We can edit the values:
 
@@ -327,6 +338,11 @@ if( $action != 'view' )
 	$Form->text_input( 'edited_user_age_min', $edited_User->age_min, 3, T_('My age group'), '', array( 'number' => true ) );
 	$Form->text_input( 'edited_user_age_max', $edited_User->age_max, 3, T_('to'), '', array( 'number' => true ) );
 
+	if( $new_user_creating )
+	{
+		$Form->text_input( 'edited_user_source', $edited_User->source, 30, T_('Source'), '', array( 'maxlength' => 30 ) );
+	}
+	$Form->text_input( 'edited_user_url', $edited_User->url, 40, T_('URL'), $url_fieldnote, array( 'maxlength' => 100 ) );
 }
 else
 { // display only
@@ -355,6 +371,8 @@ else
 	$Form->info( T_('My ZIP/Postcode'), $edited_User->get('postcode') );
 	$Form->info( T_('My age group'), $edited_User->get('age_min') );
 	$Form->info( T_('to'), $edited_User->get('age_max') );
+
+	$Form->info( T_('URL'), $edited_User->get('url'), $url_fieldnote );
 }
 
 $Form->end_fieldset();
@@ -390,33 +408,6 @@ if( empty( $edited_User->ID ) && $action != 'view' )
 
 $Form->begin_fieldset( T_('Additional info') );
 
-if( ($url = $edited_User->get('url')) != '' )
-{
-	if( !preg_match('#://#', $url) )
-	{
-		$url = 'http://'.$url;
-	}
-	$url_fieldnote = '<a href="'.$url.'" target="_blank">'.get_icon( 'play', 'imgtag', array('title'=>T_('Visit the site')) ).'</a>';
-}
-else
-	$url_fieldnote = '';
-
-
-if( $action != 'view' )
-{ // We can edit the values:
-
-	if( $new_user_creating )
-	{
-		$Form->text_input( 'edited_user_source', $edited_User->source, 30, T_('Source'), '', array( 'maxlength' => 30 ) );
-	}
-	$Form->text_input( 'edited_user_url', $edited_User->url, 40, T_('URL'), $url_fieldnote, array( 'maxlength' => 100 ) );
-}
-else
-{ // display only
-	$Form->info( T_('URL'), $edited_User->get('url'), $url_fieldnote );
-}
-
-
 // This totally needs to move into User object
 global $DB;
 
@@ -436,32 +427,33 @@ else
 
 // -------------------  Get existing userfields: -------------------------------
 $userfields = $DB->get_results( '
-	SELECT uf_ID, ufdf_ID, ufdf_type, ufdf_name, uf_varchar
-		FROM T_users__fields LEFT JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID
-	 WHERE uf_user_ID = '.$user_id.'
-	 ORDER BY uf_ID' );
+	SELECT uf_ID, ufdf_ID, ufdf_type, ufdf_name, uf_varchar, ufdf_required
+	FROM T_users__fields
+		LEFT JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID
+	WHERE uf_user_ID = '.$user_id.'
+	ORDER BY uf_ID' );
 
 foreach( $userfields as $userfield )
 {
 	switch( $userfield->ufdf_ID )
 	{
 		case 10200:
-			$field_note = '<a href="aim:goim?screenname='.$userfield->uf_varchar.'&amp;message=Hello">'.get_icon( 'play', 'imgtag', array('title'=>T_('Instant Message to user')) ).'</a>';
+			$field_note = '<a href="aim:goim?screenname='.$userfield->uf_varchar.'&amp;message=Hello" class="action_icon">'.get_icon( 'play', 'imgtag', array('title'=>T_('Instant Message to user')) ).'</a>';
 			break;
 
 		case 10300:
-			$field_note = '<a href="http://wwp.icq.com/scripts/search.dll?to='.$userfield->uf_varchar.'" target="_blank">'.get_icon( 'play', 'imgtag', array('title'=>T_('Search on ICQ.com')) ).'</a>';
+			$field_note = '<a href="http://wwp.icq.com/scripts/search.dll?to='.$userfield->uf_varchar.'" target="_blank" class="action_icon">'.get_icon( 'play', 'imgtag', array('title'=>T_('Search on ICQ.com')) ).'</a>';
 			break;
 
 		default:
-			if( $userfield->ufdf_ID >= 100000 && $userfield->ufdf_ID < 200000 )
+			if( $userfield->ufdf_type == 'url' )
 			{
 				$url = $userfield->uf_varchar;
 				if( !preg_match('#://#', $url) )
 				{
 					$url = 'http://'.$url;
 				}
-				$field_note = '<a href="'.$url.'" target="_blank">'.get_icon( 'play', 'imgtag', array('title'=>T_('Visit the site')) ).'</a>';
+				$field_note = '<a href="'.$url.'" target="_blank" class="action_icon">'.get_icon( 'play', 'imgtag', array('title'=>T_('Visit the site')) ).'</a>';
 			}
 			else
 			{
@@ -478,14 +470,19 @@ foreach( $userfields as $userfield )
 	// Display existing field:
 	if( $userfield->ufdf_type == 'text' )
 	{
-		$Form->textarea( 'uf_'.$userfield->uf_ID, $uf_val, 8, $userfield->ufdf_name, $field_note, 38 );
+		$Form->textarea( 'uf_'.$userfield->uf_ID, $uf_val, 5, $userfield->ufdf_name, $field_note, 38, '', $userfield->ufdf_required == 'require' );
 	}
 	else
 	{
-		$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, 40, $userfield->ufdf_name, $field_note, array( 'maxlength' => 255 ) );
+		$field_params = array( 'maxlength' => 255 );
+		if( $userfield->ufdf_required == 'require' )
+		{
+			$field_params['required'] = true;
+		}
+		$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, 40, $userfield->ufdf_name, $field_note, $field_params );
 	}
 }
-
+/*
 // ------------------------------ Get recommended userfields: ---------------------------------
 // Only recommended fields that are not already in use:
 $userfields = $DB->get_results( '
@@ -544,15 +541,15 @@ foreach( $userfields as $userfield )
 	{
 		$Form->text_input( 'uf_rec_'.$i, $uf_val, 40, $userfield->ufdf_name, $field_note, array( 'maxlength' => 255, 'class'=>'user_info_field' ) );
 	}
-}
+}*/
 
 // Get list of possible field types:
 // TODO: use userfield manipulation functions
 $userfielddefs = $DB->get_results( '
 	SELECT ufdf_ID, ufdf_type, ufdf_name
 		FROM T_users__fielddefs
-	 WHERE ufdf_required <> "hidden"
-	 ORDER BY ufdf_ID' );
+	WHERE ufdf_required <> "hidden"
+	ORDER BY ufdf_ID' );
 // New fields:
 for( $i=1; $i<=3; $i++ )
 {
@@ -637,6 +634,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.48  2011/09/27 17:31:19  efy-yurybakh
+ * User additional info fields
+ *
  * Revision 1.47  2011/09/26 08:51:47  efy-vitalij
  * add select_country item
  *

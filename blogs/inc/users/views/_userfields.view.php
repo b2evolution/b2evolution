@@ -103,19 +103,20 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 	'th' => T_('Type'),
 	'order' => 'ufdf_type',
-	'td' => '$ufdf_type$',
+	'td' => '%T_(#ufdf_type#)%',
 );
 
 $Results->cols[] = array(
 		'th' => T_('Name'),
 		'order' => 'ufdf_name',
-		'td' => '$ufdf_name$',
+		'td' => '%T_(#ufdf_name#)%',
 	);
 
 $Results->cols[] = array(
 		'th' => T_('Required?'),
 		'order' => 'ufdf_required',
-		'td' => '$ufdf_required$',
+		'td' => '%get_userfield_required( #ufdf_required# )%',
+		'td_class' => 'center',
 	);
 
 if( $current_User->check_perm( 'users', 'edit', false ) )
@@ -123,7 +124,6 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 	$Results->cols[] = array(
 							'th' => T_('Actions'),
 							'th_class' => 'shrinkwrap',
-							'td_class' => 'shrinkwrap',
 							'td' => action_icon( T_('Edit this user field...'), 'edit',
 										'%regenerate_url( \'action\', \'ufdf_ID=$ufdf_ID$&amp;action=edit\')%' )
 									.action_icon( T_('Duplicate this user field...'), 'copy',
@@ -142,6 +142,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.16  2011/09/27 17:31:19  efy-yurybakh
+ * User additional info fields
+ *
  * Revision 1.15  2011/09/11 00:04:45  fplanque
  * doc
  *

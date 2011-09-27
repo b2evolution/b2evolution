@@ -2188,8 +2188,11 @@ class Form extends Widget
 		$field_params = array(
 			'note' => $field_note,
 			'cols' => $field_cols,
-			'class' => $field_class,
-			'required' => $required );
+			'class' => $field_class);
+		if( $required )
+		{ // Set required only for case TRUE, because in the following code we have a condition "isset($required)" instead of "$required == true"
+			$field_params['required'] = $required;
+		}
 
 		return $this->textarea_input( $field_name, $field_value, $field_rows, $field_label, $field_params );
 	}
@@ -3156,6 +3159,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.95  2011/09/27 17:31:19  efy-yurybakh
+ * User additional info fields
+ *
  * Revision 1.94  2011/09/27 07:45:58  efy-asimo
  * Front office messaging hot fixes
  *

@@ -650,6 +650,18 @@ function get_user_settings_url( $user_tab, $user_ID = NULL )
 
 
 /**
+ * Get colored tag with user field "required"
+ *
+ * @param string required value
+ * @param integer user ID for the requested user. If isn't set then return $current_User settings url.
+ */
+function get_userfield_required( $value )
+{
+	return '<span class="userfield '.$value.'">'.T_( $value ).'</span>';
+}
+
+
+/**
  * Template tag: Provide a link to subscription screen
  */
 function user_subs_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
@@ -1166,6 +1178,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.64  2011/09/27 17:31:19  efy-yurybakh
+ * User additional info fields
+ *
  * Revision 1.63  2011/09/27 07:45:58  efy-asimo
  * Front office messaging hot fixes
  *

@@ -3057,7 +3057,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 				}
 				else
 				{
-					$icon_alt = $icon['alt'];
+					$icon_alt = isset( $icon['alt'] ) ? $icon['alt'] : '';
 				}
 				$r = '<span class="icon"'.$styles.' title="'.$icon_alt.'">&nbsp;</span>';
 			}
@@ -4426,6 +4426,9 @@ function generate_random_ip()
 
 /*
  * $Log$
+ * Revision 1.282  2011/09/27 17:31:19  efy-yurybakh
+ * User additional info fields
+ *
  * Revision 1.281  2011/09/27 13:13:28  efy-vitalij
  * add simple ip address generate function
  *

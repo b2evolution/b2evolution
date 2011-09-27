@@ -531,3 +531,17 @@ div.avatartag {
 .vote_spam a{
 	margin: 0 8px;
 }
+
+/* User fields */
+.userfield, .userfield.optional{
+	color: #000;
+}
+.userfield.recommended{
+	color: #fa0;
+}
+.userfield.hidden{
+	color: #999;
+}
+.userfield.require{
+	color: #f00;
+}

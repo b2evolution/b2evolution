@@ -28,9 +28,9 @@ function get_icon_info($name)
 	switch($name)
 	{
 		case 'pixel': return array(
-			'file' => 'icons/blank.gif',
 			'alt'  => '',
-			'size' => array( 1, 1 )
+			'size' => array( 1, 1 ),
+			'xy' => array( 0, 0 )
 		);
 
 		case 'dropdown': return array(
@@ -565,6 +565,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.85  2011/09/27 17:31:19  efy-yurybakh
+ * User additional info fields
+ *
  * Revision 1.84  2011/09/26 10:44:20  efy-yurybakh
  * thumb up down icons
  *
