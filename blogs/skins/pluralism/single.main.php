@@ -89,7 +89,7 @@ while( $Item = & mainlist_get_item() )
 			<small>
 				<?php
 					$Item->author( array(
-							'link_text'    => 'avatar',
+							'link_text'    => 'only_avatar',
 							'link_rel'     => 'nofollow',
 							'thumb_size'   => 'crop-32x32',
 							'thumb_class'  => 'leftmargin',

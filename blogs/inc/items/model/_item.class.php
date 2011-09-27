@@ -408,7 +408,7 @@ class Item extends ItemLight
 				'before'       => ' ',
 				'after'        => ' ',
 				'format'       => 'htmlbody',
-				'link_to'		   => 'userpage',
+				'link_to'      => 'userpage',
 				'link_text'    => 'preferredname',
 				'link_rel'     => '',
 				'link_class'   => '',
@@ -4875,6 +4875,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.260  2011/09/27 08:55:29  efy-yurybakh
+ * Add User::get_identity_link() everywhere
+ *
  * Revision 1.259  2011/09/27 06:08:14  efy-yurybakh
  * Add User::get_identity_link() everywhere
  *

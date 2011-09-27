@@ -745,24 +745,34 @@ class User extends DataObject
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
 				'profile_tab'  => 'profile',
-				'link_text'    => 'avatar'
+				'before'       => ' ',
+				'after'        => ' ',
+				'format'       => 'htmlbody',
+				'link_to'      => 'userpage',
+				'link_text'    => 'avatar',
+				'link_rel'     => '',
+				'link_class'   => '',
+				'thumb_size'   => 'crop-15x15',
+				'thumb_class'  => 'avatar_before_login',
 			), $params );
 		
 		$identity_url = get_user_identity_url( $this->ID, $params['profile_tab'] );
 		$avatar_tag = '';
-		if( $params['link_text'] == 'avatar' )
+		if( $params['link_text'] == 'avatar' || $params['link_text'] == 'only_avatar' )
 		{
-			$avatar_tag = $this->get_avatar_imgtag( 'crop-15x15', 'avatar_before_login' );
+			$avatar_tag = $this->get_avatar_imgtag( $params['thumb_size'], $params['thumb_class'] );
 		}
+
+		$link_login = $params['link_text'] != 'only_avatar' ? $this->login : '';
 
 		if( empty( $identity_url ) )
 		{
-			return $avatar_tag.$this->login;
+			return $avatar_tag.$link_login;
 		}
 
 		$link_title = T_( 'Show the user profile' );
-		$link_text = '<span class="nowrap">'.$avatar_tag.$this->login.'</span>';
-		$link_class = $this->get_gender_class().' userbubble';
+		$link_text = '<span class="nowrap">'.$avatar_tag.$link_login.'</span>';
+		$link_class = $this->get_gender_class().( $avatar_tag == '' ? ' userbubble' : '' );
 		return '<a id="username_'.$this->login.'"  href="'.$identity_url.'" title="'.$link_title.'" class="'.$link_class.'">'.$link_text.'</a>';
 	}
 
@@ -2619,6 +2629,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.136  2011/09/27 08:55:29  efy-yurybakh
+ * Add User::get_identity_link() everywhere
+ *
  * Revision 1.135  2011/09/27 06:08:15  efy-yurybakh
  * Add User::get_identity_link() everywhere
  *
