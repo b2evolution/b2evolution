@@ -70,11 +70,11 @@ else
 
 $SQL = new SQL();
 $SQL->SELECT( 'user_ID, user_login, user_level, bloguser_perm_poststatuses, bloguser_perm_edit, bloguser_ismember,'
-	. 'bloguser_perm_draft_cmts, bloguser_perm_publ_cmts, bloguser_perm_depr_cmts,'
+	. 'bloguser_perm_vote_spam_cmts, bloguser_perm_draft_cmts, bloguser_perm_publ_cmts, bloguser_perm_depr_cmts,'
 	. 'bloguser_perm_delpost, bloguser_perm_edit_ts, bloguser_perm_cats,'
 	. 'bloguser_perm_properties, bloguser_perm_admin, bloguser_perm_media_upload,'
 	. 'bloguser_perm_media_browse, bloguser_perm_media_change, bloguser_perm_page,'
-	. 'bloguser_perm_intro, bloguser_perm_podcast, bloguser_perm_sidebar, bloguser_perm_vote_spam' );
+	. 'bloguser_perm_intro, bloguser_perm_podcast, bloguser_perm_sidebar' );
 $SQL->FROM( 'T_users LEFT JOIN T_coll_user_perms ON (
 				 						user_ID = bloguser_user_ID
 										AND bloguser_blog_ID = '.$edited_Blog->ID.' )' );
@@ -321,7 +321,8 @@ $Results->cols[] = array(
 						'th_class' => 'checkright',
 						'order' => 'bloguser_perm_publ_cmts',
 						'default_dir' => 'D',
-						'td' => '%coll_perm_checkbox( {row}, \'perm_draft_cmts\', \''.TS_('Permission to edit draft comments in this blog').'\' )%'.
+						'td' => '%coll_perm_checkbox( {row}, \'perm_vote_spam_cmts\', \''.TS_('Permission to give a spam vote on any comment').'\' )%&nbsp;'.
+								'%coll_perm_checkbox( {row}, \'perm_draft_cmts\', \''.TS_('Permission to edit draft comments in this blog').'\' )%'.
 								'%coll_perm_checkbox( {row}, \'perm_publ_cmts\', \''.TS_('Permission to edit published comments in this blog').'\' )%'.
 								'%coll_perm_checkbox( {row}, \'perm_depr_cmts\', \''.TS_('Permission to edit deprecated comments in this blog').'\' )%',
 						'td_class' => 'center',
@@ -383,15 +384,6 @@ $Results->cols[] = array(
 						'order' => 'bloguser_perm_media_change',
 						'default_dir' => 'D',
 						'td' => '%coll_perm_checkbox( {row}, \'perm_media_change\', \''.TS_('Permission to change the blog\'s media folder content').'\' )%',
-						'td_class' => 'center',
-					);
-
-$Results->cols[] = array(
-						'th' => T_('Spam<br />vote'),
-						'th_class' => 'checkright',
-						'order' => 'bloguser_perm_vote_spam',
-						'default_dir' => 'D',
-						'td' => '%coll_perm_checkbox( {row}, \'perm_vote_spam\', \''.TS_('Permission to give a spam vote on any comment').'\' )%',
 						'td_class' => 'center',
 					);
 
@@ -519,6 +511,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.27  2011/09/27 13:30:14  efy-yurybakh
+ * spam vote checkbox
+ *
  * Revision 1.26  2011/09/26 12:06:38  efy-asimo
  * Unified usernames everywhere in the app - second part
  *

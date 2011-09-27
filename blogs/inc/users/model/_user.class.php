@@ -1239,6 +1239,7 @@ class User extends DataObject
 			case 'blog_post!redirected':
 			case 'blog_del_post':
 			case 'blog_comments':
+			case 'blog_vote_spam_comments':
 			case 'blog_draft_comments':
 			case 'blog_published_comments':
 			case 'blog_deprecated_comments':
@@ -1251,7 +1252,6 @@ class User extends DataObject
 			case 'blog_podcast':
 			case 'blog_sidebar':
 			case 'blog_edit_ts':
-			case 'blog_vote_spam':
 				// Blog permission to edit its properties...
 				if( $this->check_perm_blogowner( $perm_target_ID ) )
 				{	// Owner can do *almost* anything:
@@ -1523,6 +1523,7 @@ class User extends DataObject
 						'blog_del_post' => '0',
 						'blog_edit_ts' => '0',
 						'blog_comments' => '0',
+						'blog_vote_spam_comments' => '0',
 						'blog_draft_comments' => '0',
 						'blog_published_comments' => '0',
 						'blog_deprecated_comments' => '0',
@@ -1536,7 +1537,6 @@ class User extends DataObject
 						'blog_media_upload' => '0',
 						'blog_media_browse' => '0',
 						'blog_media_change' => '0',
-						'blog_vote_spam' => '0',
 					);
 			}
 			else
@@ -1556,6 +1556,7 @@ class User extends DataObject
 				$this->blog_post_statuses[$perm_target_blog]['blog_edit_ts'] = $row['bloguser_perm_edit_ts'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_comments'] = $row['bloguser_perm_publ_cmts']
 					+ $row['bloguser_perm_draft_cmts'] +  $row['bloguser_perm_depr_cmts'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_vote_spam_comments'] = $row['bloguser_perm_vote_spam_cmts'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_draft_comments'] = $row['bloguser_perm_draft_cmts'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_published_comments'] = $row['bloguser_perm_publ_cmts'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_deprecated_comments'] = $row['bloguser_perm_depr_cmts'];
@@ -1569,7 +1570,6 @@ class User extends DataObject
 				$this->blog_post_statuses[$perm_target_blog]['blog_media_upload'] = $row['bloguser_perm_media_upload'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_media_browse'] = $row['bloguser_perm_media_browse'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_media_change'] = $row['bloguser_perm_media_change'];
-				$this->blog_post_statuses[$perm_target_blog]['blog_vote_spam'] = $row['bloguser_perm_vote_spam'];
 			}
 		}
 
@@ -2629,6 +2629,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.137  2011/09/27 13:30:14  efy-yurybakh
+ * spam vote checkbox
+ *
  * Revision 1.136  2011/09/27 08:55:29  efy-yurybakh
  * Add User::get_identity_link() everywhere
  *

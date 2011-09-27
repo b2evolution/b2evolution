@@ -3037,12 +3037,12 @@ function upgrade_b2evo_tables()
 
 		task_begin( 'Adding new user permission for spam voting...' );
 		$DB->query( 'ALTER TABLE T_coll_user_perms
-									ADD bloguser_perm_vote_spam tinyint NOT NULL default 0' );
+									ADD bloguser_perm_vote_spam_cmts tinyint NOT NULL default 0 AFTER bloguser_perm_edit_ts' );
 		task_end();
 
 		task_begin( 'Adding new group permission for spam voting...' );
 		$DB->query( 'ALTER TABLE T_coll_group_perms
-									ADD bloggroup_perm_vote_spam tinyint NOT NULL default 0' );
+									ADD bloggroup_perm_vote_spam_cmts tinyint NOT NULL default 0 AFTER bloggroup_perm_edit_ts' );
 		task_end();
 
 		set_upgrade_checkpoint( '10300' );
@@ -3214,6 +3214,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.421  2011/09/27 13:30:15  efy-yurybakh
+ * spam vote checkbox
+ *
  * Revision 1.420  2011/09/25 07:06:21  efy-yurybakh
  * Implement new permission for spam voting
  *

@@ -1254,7 +1254,7 @@ class Comment extends DataObject
 
 		$this->get_Item();
 
-		if( ! $current_User->check_perm( 'blog_vote_spam', 'edit', false, $this->Item->get_blog_ID() ) )
+		if( ! $current_User->check_perm( 'blog_vote_spam_comments', 'edit', false, $this->Item->get_blog_ID() ) )
 		{ // If User has no permission to vote spam
 			return false;
 		}
@@ -2306,6 +2306,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.109  2011/09/27 13:30:14  efy-yurybakh
+ * spam vote checkbox
+ *
  * Revision 1.108  2011/09/27 06:08:14  efy-yurybakh
  * Add User::get_identity_link() everywhere
  *

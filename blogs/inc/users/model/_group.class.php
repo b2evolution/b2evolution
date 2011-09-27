@@ -428,6 +428,7 @@ class Group extends DataObject
 						'blog_del_post' => '0',
 						'blog_edit_ts' => '0',
 						'blog_comments' => '0',
+						'blog_vote_spam_comments' => '0',
 						'blog_draft_comments' => '0',
 						'blog_published_comments' => '0',
 						'blog_deprecated_comments' => '0',
@@ -441,7 +442,6 @@ class Group extends DataObject
 						'blog_media_upload' => '0',
 						'blog_media_browse' => '0',
 						'blog_media_change' => '0',
-						'blog_vote_spam' => '0',
 					);
 			}
 			else
@@ -461,6 +461,7 @@ class Group extends DataObject
 				$this->blog_post_statuses[$perm_target_blog]['blog_edit_ts'] = $row['bloggroup_perm_edit_ts'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_comments'] = $row['bloggroup_perm_publ_cmts']
 					+ $row['bloggroup_perm_depr_cmts'] + $row['bloggroup_perm_draft_cmts'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_vote_spam_comments'] = $row['bloggroup_perm_vote_spam_cmts'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_draft_comments'] = $row['bloggroup_perm_draft_cmts'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_published_comments'] = $row['bloggroup_perm_publ_cmts'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_deprecated_comments'] = $row['bloggroup_perm_depr_cmts'];
@@ -474,7 +475,6 @@ class Group extends DataObject
 				$this->blog_post_statuses[$perm_target_blog]['blog_media_upload'] = $row['bloggroup_perm_media_upload'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_media_browse'] = $row['bloggroup_perm_media_browse'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_media_change'] = $row['bloggroup_perm_media_change'];
-				$this->blog_post_statuses[$perm_target_blog]['blog_vote_spam'] = $row['bloggroup_perm_vote_spam'];
 			}
 		}
 
@@ -649,6 +649,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.50  2011/09/27 13:30:14  efy-yurybakh
+ * spam vote checkbox
+ *
  * Revision 1.49  2011/09/25 08:22:47  efy-yurybakh
  * Implement new permission for spam voting
  *
