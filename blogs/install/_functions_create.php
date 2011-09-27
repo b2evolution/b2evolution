@@ -461,7 +461,7 @@ function create_default_currencies()
  */
 function create_default_countries()
 {
-	global $DB;
+	global $DB, $current_locale;
 
 	echo 'Creating default countries... ';
 	$DB->query( "
@@ -714,11 +714,16 @@ function create_default_countries()
 			(246, 'zm', 'Zambia', 145),
 			(247, 'zw', 'Zimbabwe', 146)" );
 
+	if (!empty($current_locale))
+	{	// Set default preferred country from locale
+		$result = array();
+		preg_match('#.*?-(.*)#',  strtolower($current_locale),$result);
+
 		$DB->query( "
 		UPDATE T_country
 		SET ctry_preferred = 1
-		WHERE ctry_name = 'United States'");
-
+		WHERE ctry_code = '".$DB->escape($result[1])."'");
+	}
 	echo "OK.<br />\n";
 }
 
@@ -1368,6 +1373,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.320  2011/09/27 07:29:36  efy-vitalij
+ * default setting of the preffered country by the current locale is added
+ *
  * Revision 1.319  2011/09/26 08:46:23  efy-vitalij
  * add default preferred value to country table_functions_create.php
  *
