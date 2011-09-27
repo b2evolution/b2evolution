@@ -989,6 +989,9 @@ function init_bubbletip_js( $relative_to = 'rsc_url' )
 	require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
 	require_js( 'bubbletip.js', $relative_to );
 	require_css( 'jquery/bubbletip/bubbletip.css', $relative_to );
+	add_headline('<!--[if IE]>');
+	require_css( 'jquery/bubbletip/bubbletip-IE.css', $relative_to );
+	add_headline('<![endif]-->');
 }
 
 
@@ -1349,6 +1352,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.106  2011/09/27 09:18:42  efy-yurybakh
+ * jQuery bubble tips (IE fix)
+ *
  * Revision 1.105  2011/09/27 07:45:57  efy-asimo
  * Front office messaging hot fixes
  *
