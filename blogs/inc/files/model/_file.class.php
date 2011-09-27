@@ -1018,7 +1018,8 @@ class File extends DataObject
 	                  $size_name = 'original',
 	                  $image_link_to = 'original',
 	                  $image_link_title = '',	// can be text or #title# or #desc#
-	                  $image_link_rel = '' )
+	                  $image_link_rel = '',
+	                  $image_class = '' )
 	{
 		if( $this->is_dir() )
 		{	// We can't reference a directory
@@ -1031,7 +1032,12 @@ class File extends DataObject
 		{ // Make an IMG link:
 			$r = $before_image;
 
-			$img = '<img'.get_field_attribs_as_string($this->get_img_attribs($size_name)).' />';
+			if( $image_class != '' )
+			{
+				$image_class = ' class="'.$image_class.'"';
+			}
+
+			$img = '<img'.get_field_attribs_as_string($this->get_img_attribs($size_name)).$image_class.' />';
 
 			if( $image_link_to == 'original' )
 			{	// special case
@@ -2135,6 +2141,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.96  2011/09/27 17:53:59  efy-yurybakh
+ * add missing rel="lightbox" in front office
+ *
  * Revision 1.95  2011/09/06 00:54:38  fplanque
  * i18n update
  *

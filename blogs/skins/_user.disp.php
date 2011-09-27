@@ -52,7 +52,7 @@ $ProfileForm = new Form( '', 'ProfileForm' );
 
 $ProfileForm->begin_form( 'bComment' );
 
-echo $User->get_avatar_imgtag( 'fit-160x160', 'rightmargin' );
+echo $User->get_avatar_imgtag( 'fit-160x160', 'rightmargin', '', true );
 
 $ProfileForm->begin_fieldset( T_('Identity') );
 
@@ -129,6 +129,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.25  2011/09/27 17:53:59  efy-yurybakh
+ * add missing rel="lightbox" in front office
+ *
  * Revision 1.24  2011/09/17 02:31:58  fplanque
  * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
  *
