@@ -642,7 +642,7 @@ class Comment extends DataObject
 				'before_user'  => '',
 				'after_user'   => '#',
 				'format'       => 'htmlbody',
-				'link_to'		   => 'userurl>userpage',		// 'userpage' or 'userurl' or 'userurl>userpage' 'userpage>userurl'
+				'link_to'      => 'userurl>userpage',		// 'userpage' or 'userurl' or 'userurl>userpage' 'userpage>userurl'
 				'link_text'    => 'preferredname',
 				'link_rel'     => '',
 				'link_class'   => '',
@@ -658,7 +658,7 @@ class Comment extends DataObject
 
 			$author_name = format_to_output( $this->author_User->get_preferred_name(), $params['format'] );
 
-			$r = $this->author_User->get_link( $params );
+			$r = $this->author_User->get_identity_link( $params );
 
 			$r = $params['before_user'].$r.$params['after_user'];
 		}
@@ -2306,6 +2306,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.108  2011/09/27 06:08:14  efy-yurybakh
+ * Add User::get_identity_link() everywhere
+ *
  * Revision 1.107  2011/09/26 05:58:56  efy-yurybakh
  * fix icon style in IE
  *

@@ -653,7 +653,7 @@ class User extends DataObject
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
 				'format'       => 'htmlbody',
-				'link_to'		   => 'userpage', // userurl userpage 'userurl>userpage'
+				'link_to'      => 'userpage', // userurl userpage 'userurl>userpage'
 				'link_text'    => 'preferredname',
 				'link_rel'     => '',
 				'link_class'   => '',
@@ -740,10 +740,20 @@ class User extends DataObject
 	 * @param string On which user profile tab should this link point to
 	 * @return string User avatar and login if the identity link is not available, the identity link otherwise.
 	 */
-	function get_identity_link( $profile_tab = 'profile' )
+	function get_identity_link( $params = array() )
 	{
-		$identity_url = get_user_identity_url( $this->ID, $profile_tab );
-		$avatar_tag = $this->get_avatar_imgtag( 'crop-15x15', 'avatar_before_login' );
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'profile_tab'  => 'profile',
+				'link_text'    => 'avatar'
+			), $params );
+		
+		$identity_url = get_user_identity_url( $this->ID, $params['profile_tab'] );
+		$avatar_tag = '';
+		if( $params['link_text'] == 'avatar' )
+		{
+			$avatar_tag = $this->get_avatar_imgtag( 'crop-15x15', 'avatar_before_login' );
+		}
 
 		if( empty( $identity_url ) )
 		{
@@ -752,8 +762,8 @@ class User extends DataObject
 
 		$link_title = T_( 'Show the user profile' );
 		$link_text = '<span class="nowrap">'.$avatar_tag.$this->login.'</span>';
-		$link_class = $this->get_gender_class();
-		return '<a href="'.$identity_url.'" title="'.$link_title.'"'.$link_class.'>'.$link_text.'</a>';
+		$link_class = $this->get_gender_class().' userbubble';
+		return '<a id="username_'.$this->login.'"  href="'.$identity_url.'" title="'.$link_title.'" class="'.$link_class.'">'.$link_text.'</a>';
 	}
 
 
@@ -2173,7 +2183,7 @@ class User extends DataObject
 				break;
 		}
 
-		return ' class="'.$gender_class.'"';
+		return $gender_class;
 	}
 
 
@@ -2609,6 +2619,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.135  2011/09/27 06:08:15  efy-yurybakh
+ * Add User::get_identity_link() everywhere
+ *
  * Revision 1.134  2011/09/26 19:46:02  efy-yurybakh
  * jQuery bubble tips
  *

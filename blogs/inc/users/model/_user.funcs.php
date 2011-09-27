@@ -549,7 +549,7 @@ function get_user_identity_link( $user_login, $user_ID = NULL, $profile_tab = 'p
 		return NULL;
 	}
 
-	return $User->get_identity_link( $profile_tab );
+	return $User->get_identity_link( array( 'profile_tab' => $profile_tab ) );
 }
 
 
@@ -865,7 +865,7 @@ function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size
 			if( $link && $current_User->check_perm( 'users', 'view', false ) )
 			{ // Permission to view user details
 				// The user identity url always contains the best available user info page url
-				$img_tag = '<a href="'.get_user_identity_url( $User->ID ).'">'.$img_tag.'</a>';
+				$img_tag = '<a href="'.get_user_identity_url( $User->ID ).'" class="'.$User->get_gender_class().'">'.$img_tag.'</a>';
 			}
 		}
 	}
@@ -1166,6 +1166,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.62  2011/09/27 06:08:15  efy-yurybakh
+ * Add User::get_identity_link() everywhere
+ *
  * Revision 1.61  2011/09/26 19:46:02  efy-yurybakh
  * jQuery bubble tips
  *

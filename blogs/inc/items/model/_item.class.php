@@ -419,7 +419,7 @@ class Item extends ItemLight
 		// Load User
 		$this->get_creator_User();
 
-		$r = $this->creator_User->get_link( $params );
+		$r = $this->creator_User->get_identity_link( $params );
 
 		echo $params['before'].$r.$params['after'];
 	}
@@ -4875,6 +4875,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.259  2011/09/27 06:08:14  efy-yurybakh
+ * Add User::get_identity_link() everywhere
+ *
  * Revision 1.258  2011/09/25 08:22:47  efy-yurybakh
  * Implement new permission for spam voting
  *
