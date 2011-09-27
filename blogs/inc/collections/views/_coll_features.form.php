@@ -121,16 +121,6 @@ $Form->begin_fieldset( T_('Feedback options') );
 						array( $any_option, $registered_option, $member_option, $never_option,
 						), T_('Allow ratings from'), true );
 
-	echo '</div>';
-
-	$Form->radio( 'allow_attending', $edited_Blog->get_setting( 'allow_attending' ),
-						array( array( 'never', T_( 'Never' ), '', '' ),
-								array( 'enable_bypost', T_( 'Let post author decide' ), '', '' ),
-								array( 'always', T_( 'Always' ), '', '' )
-						), T_( 'Allow users to attend events posted in this blog' ), true );
-
-	echo '<div class="feedback_details_container">';
-
 	$Form->checkbox( 'blog_allowtrackbacks', $edited_Blog->get( 'allowtrackbacks' ), T_('Trackbacks'), T_("Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.") );
 
 	$status_options = array(
@@ -177,6 +167,8 @@ $Form->begin_fieldset( T_('Feedback options') );
 
 $Form->end_fieldset();
 
+// display modules collection features
+modules_call_method( 'display_collection_features', array( 'Form' => & $Form, 'edited_Blog' => & $edited_Blog ) );
 
 $Form->begin_fieldset( T_('RSS/Atom feeds') );
 	$Form->radio( 'feed_content', $edited_Blog->get_setting('feed_content'),
@@ -284,6 +276,12 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.48  2011/09/27 08:55:15  efy-asimo
+ * Display module features in different fieldset
+ *
+ * Revision 1.47  2011/09/08 05:22:40  efy-asimo
+ * Remove item attending and add item settings
+ *
  * Revision 1.46  2011/09/06 00:54:38  fplanque
  * i18n update
  *
