@@ -114,6 +114,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => /* TRANS: shortcut for preferred */ T_('Pref'),
 		'order' => 'ctry_preferred',
+		'default_dir' => 'D',
 		'td' => '%ctry_td_preferred( #ctry_preferred# , #ctry_ID# )%',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap'
@@ -260,6 +261,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.25  2011/09/27 13:09:05  efy-vitalij
+ * fixed default Pref column sorting
+ *
  * Revision 1.24  2011/09/27 07:18:14  efy-vitalij
  * add default order by ctry_code
  *
