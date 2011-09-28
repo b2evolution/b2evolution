@@ -84,11 +84,13 @@ $Form->radio( 'thrdtype', param( 'thrdtype', 'string', 'discussion' ), array(
 								array( 'individual', T_( 'Individual messages' ) )
 							), T_('Multiple recipients'), true );
 
-$Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'SaveButton' ),
-												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+$Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' ) ) );
 
 /*
  * $Log$
+ * Revision 1.17  2011/09/28 11:40:46  efy-asimo
+ * Remove the Reset button from new thread form
+ *
  * Revision 1.16  2011/09/18 00:58:44  fplanque
  * forms cleanup
  *
