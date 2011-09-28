@@ -68,6 +68,7 @@ if( $current_User->check_perm('options', 'edit') )
 	echo '<li><a href="'.regenerate_url('action', 'action=find_broken_posts&amp;'.url_crumb('tools')).'">'.T_('Find all broken posts that have no matching category').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=find_broken_slugs&amp;'.url_crumb('tools')).'">'.T_('Find all broken slugs that have no matching target post').'</a></li>';
 // fp>asimo : is this a DB maintenance tool or a FILE maintenance tool?
+// asimo>fp : It is both. It will delete the orphan files from the disk, and also from the DB.
 	echo '<li><a href="'.regenerate_url('action', 'action=delete_orphan_comment_uploads&amp;'.url_crumb('tools')).'">'.T_('Find and delete orphan comment uploads').'</a></li>';
 	echo '</ul>';
 	$block_item_Widget->disp_template_raw( 'block_end' );
@@ -107,6 +108,9 @@ $block_item_Widget->disp_template_raw( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.13  2011/09/28 11:38:59  efy-asimo
+ * doc
+ *
  * Revision 1.12  2011/09/26 15:38:08  efy-vitalij
  * add test hit information
  *
