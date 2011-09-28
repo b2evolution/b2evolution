@@ -111,7 +111,7 @@ $ProfileForm->begin_fieldset( T_('Additional info') );
 	$User->userfields_load();
 
 	// fp> TODO: have some clean iteration support
-	foreach( $User->userfields as $uf_ID=>$uf_array )
+	foreach( $User->userfields as $uf_ID => $uf_array )
 	{
 		$ProfileForm->info( $User->userfield_defs[$uf_array[0]][1], $uf_array[1] );
 	}
@@ -129,6 +129,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.26  2011/09/28 10:50:00  efy-yurybakh
+ * User additional info fields
+ *
  * Revision 1.25  2011/09/27 17:53:59  efy-yurybakh
  * add missing rel="lightbox" in front office
  *

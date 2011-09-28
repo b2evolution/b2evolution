@@ -2342,7 +2342,10 @@ class User extends DataObject
 		$userfields = $DB->get_results( '
 			SELECT uf_ID, uf_ufdf_ID, uf_varchar
 				FROM T_users__fields
-			 WHERE uf_user_ID = '.$this->ID );
+					LEFT JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID
+			WHERE uf_user_ID = '.$this->ID.'
+				AND ufdf_required != "hidden"
+			ORDER BY uf_ufdf_ID' );
 
 		foreach( $userfields as $userfield )
 		{
@@ -2629,6 +2632,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.141  2011/09/28 10:49:59  efy-yurybakh
+ * User additional info fields
+ *
  * Revision 1.140  2011/09/28 09:59:43  efy-yurybakh
  * add missing rel="lightbox" in front office
  *

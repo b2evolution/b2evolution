@@ -428,10 +428,10 @@ else
 // -------------------  Get existing userfields: -------------------------------
 $userfields = $DB->get_results( '
 	SELECT uf_ID, ufdf_ID, ufdf_type, ufdf_name, uf_varchar, ufdf_required
-	FROM T_users__fields
-		LEFT JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID
+		FROM T_users__fields
+			LEFT JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID
 	WHERE uf_user_ID = '.$user_id.'
-	ORDER BY uf_ID' );
+	ORDER BY ufdf_ID, uf_ID' );
 
 foreach( $userfields as $userfield )
 {
@@ -482,73 +482,12 @@ foreach( $userfields as $userfield )
 		$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, 40, $userfield->ufdf_name, $field_note, $field_params );
 	}
 }
-/*
-// ------------------------------ Get recommended userfields: ---------------------------------
-// Only recommended fields that are not already in use:
-$userfields = $DB->get_results( '
-	SELECT '.$user_id.' as uf_ID, ufdf_ID, ufdf_type, ufdf_name, "" as uf_varchar
-		FROM T_users__fielddefs
-	 WHERE ufdf_required = "recommended"
-	 				AND ufdf_ID NOT IN (
-	 					SELECT uf_ufdf_ID
-						FROM T_users__fields
-						WHERE uf_user_ID = '.$user_id.'
-					)
-	 ORDER BY ufdf_ID' );
-
-$i = 0;
-foreach( $userfields as $userfield )
-{
-	$i++;
-	switch( $userfield->ufdf_ID )
-	{
-		case 10200:
-			$field_note = '<a href="aim:goim?screenname='.$userfield->uf_varchar.'&amp;message=Hello">'.get_icon( 'play', 'imgtag', array('title'=>T_('Instant Message to user')) ).'</a>';
-			break;
-
-		case 10300:
-			$field_note = '<a href="http://wwp.icq.com/scripts/search.dll?to='.$userfield->uf_varchar.'" target="_blank">'.get_icon( 'play', 'imgtag', array('title'=>T_('Search on ICQ.com')) ).'</a>';
-			break;
-
-		default:
-			if( $userfield->ufdf_ID >= 100000 && $userfield->ufdf_ID < 200000 )
-			{
-				$url = $userfield->uf_varchar;
-				if( !preg_match('#://#', $url) )
-				{
-					$url = 'http://'.$url;
-				}
-				$field_note = '<a href="'.$url.'" target="_blank">'.get_icon( 'play', 'imgtag', array('title'=>T_('Visit the site')) ).'</a>';
-			}
-			else
-			{
-				$field_note = '';
-			}
-	}
-
-	$uf_val = param( 'uf_rec_'.$i, 'string', NULL );
-	if( is_null( $uf_val ) )
-	{	// No value submitted yet, get DB val:
-		$uf_val = $userfield->uf_varchar;
-	}
-
-	// Display existing field:
-	if( $userfield->ufdf_type == 'text' )
-	{
-		$Form->textarea( 'uf_rec_'.$i, $uf_val, 8, $userfield->ufdf_name, $field_note, 38 );
-	}
-	else
-	{
-		$Form->text_input( 'uf_rec_'.$i, $uf_val, 40, $userfield->ufdf_name, $field_note, array( 'maxlength' => 255, 'class'=>'user_info_field' ) );
-	}
-}*/
 
 // Get list of possible field types:
 // TODO: use userfield manipulation functions
 $userfielddefs = $DB->get_results( '
 	SELECT ufdf_ID, ufdf_type, ufdf_name
-		FROM T_users__fielddefs
-	WHERE ufdf_required <> "hidden"
+	FROM T_users__fielddefs
 	ORDER BY ufdf_ID' );
 // New fields:
 for( $i=1; $i<=3; $i++ )
@@ -634,6 +573,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.49  2011/09/28 10:50:00  efy-yurybakh
+ * User additional info fields
+ *
  * Revision 1.48  2011/09/27 17:31:19  efy-yurybakh
  * User additional info fields
  *
