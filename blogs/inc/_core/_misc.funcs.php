@@ -3118,6 +3118,9 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			/* BREAK */
 
 		case 'noimg':
+			return get_icon( 'pixel', 'imgtag', $params );
+			/* BREAK */
+			/*
 			$blank_icon = get_icon_info('pixel');
 
 			$r = '<img src="'.$rsc_uri.$blank_icon['file'].'" ';
@@ -3157,7 +3160,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			// Close tag:
 			$r .= '/>';
 
-			return $r;
+			return $r;*/
 			/* BREAK */
 	}
 }
@@ -4426,6 +4429,9 @@ function generate_random_ip()
 
 /*
  * $Log$
+ * Revision 1.283  2011/09/28 04:14:41  efy-yurybakh
+ * fix pixel
+ *
  * Revision 1.282  2011/09/27 17:31:19  efy-yurybakh
  * User additional info fields
  *
