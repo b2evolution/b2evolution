@@ -240,11 +240,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		$Form->begin_fieldset( T_('Rating') );
 
 		echo '<p>';
-		$edited_Comment->rating_input();
-		echo '</p>';
-
-		echo '<p>';
-		$edited_Comment->rating_none_input();
+		$edited_Comment->rating_input( array( 'reset' => true ) );
 		echo '</p>';
 
  		$Form->end_fieldset();
@@ -303,6 +299,9 @@ echo_comment_publishbt_js();
 
 /*
  * $Log$
+ * Revision 1.26  2011/09/28 08:35:17  efy-yurybakh
+ * backoffice (-) icon feature to remove rating
+ *
  * Revision 1.25  2011/09/04 22:13:15  fplanque
  * copyright 2011
  *

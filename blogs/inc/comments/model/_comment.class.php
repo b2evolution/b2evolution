@@ -1722,6 +1722,7 @@ class Comment extends DataObject
 									'label_3'    => T_('Average'),
 									'label_4'    => T_('Good'),
 									'label_high' => T_('Excellent'),
+									'reset' => false,
 								), $params );
 
 		echo $params['before'];
@@ -1742,6 +1743,13 @@ class Comment extends DataObject
 
 		echo $params['label_high'];
 
+		$jquery_raty_param = '';
+		if( $params['reset'] )
+		{ // Init "reset" button
+			$jquery_raty_param = 'cancel: true';
+			$this->rating_none_input( array( 'before' => '<p>', 'after' => '</p>' ) );
+		}
+
 		echo '</div>';
 		
 		echo '<script type="text/javascript">
@@ -1750,7 +1758,9 @@ class Comment extends DataObject
 			scoreName: "comment_rating",
 			start: '.(int)$this->rating.',
 			path: "'.$rsc_uri.'icons/",
-			hintList: ["'.$params['label_low'].'", "'.$params['label_2'].'", "'.$params['label_3'].'", "'.$params['label_4'].'", "'.$params['label_high'].'"]
+			hintList: ["'.$params['label_low'].'", "'.$params['label_2'].'", "'.$params['label_3'].'", "'.$params['label_4'].'", "'.$params['label_high'].'"],
+			width: 110,
+			'.$jquery_raty_param.'
 		});
 		/* ]]> */
 		</script>';
@@ -2306,6 +2316,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.110  2011/09/28 08:35:17  efy-yurybakh
+ * backoffice (-) icon feature to remove rating
+ *
  * Revision 1.109  2011/09/27 13:30:14  efy-yurybakh
  * spam vote checkbox
  *
