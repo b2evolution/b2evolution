@@ -1160,7 +1160,7 @@ class Comment extends DataObject
 	 * @param boolean save context?
 	 * @param boolean true if create AJAX button
 	 */
-	function get_vote_link( $vote_type, $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
+	function get_vote_link( $vote_type, $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false )
 	{
 		global $current_User, $admin_url;
 
@@ -1194,11 +1194,7 @@ class Comment extends DataObject
 
 		if( $ajax_button )
 		{
-			if( $save_context && ( $redirect_to == NULL ) )
-			{
-				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
-			}
-			$r .= 'javascript:setCommentVote('.$this->ID.', \''.$vote_type.'\', \''.$redirect_to.'\');';
+			$r .= 'javascript:setCommentVote('.$this->ID.', \''.$vote_type.'\' );';
 		}
 		else
 		{
@@ -1248,7 +1244,7 @@ class Comment extends DataObject
 	 * @param boolean save context?
 	 * @param boolean true if create AJAX button
 	 */
-	function vote_spam( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
+	function vote_spam( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false )
 	{
 		global $current_User;
 
@@ -1267,7 +1263,7 @@ class Comment extends DataObject
 		
 		foreach( $vote_disabled as $vote_type => $vote_class)
 		{ // Print out 3 buttons for spam voting
-			echo $this->get_vote_link( $vote_type, '', '', $text, $title, $vote_class, $glue, $save_context, $ajax_button, $redirect_to );
+			echo $this->get_vote_link( $vote_type, '', '', $text, $title, $vote_class, $glue, $save_context, $ajax_button );
 		}
 
 		echo $after;
@@ -2316,6 +2312,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.111  2011/09/28 09:22:34  efy-yurybakh
+ * "comment is spam" vote (avatar blinks)
+ *
  * Revision 1.110  2011/09/28 08:35:17  efy-yurybakh
  * backoffice (-) icon feature to remove rating
  *

@@ -226,48 +226,19 @@ switch( $action )
 		exit(0);
 
 	case 'set_comment_vote':
-		// Used for quick moderation of comments
+		// Used for quick vote of comments
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
 
-		global $blog;
-
-		$blog = param( 'blogid', 'integer' );
-		$moderation = param( 'moderation', 'string', NULL );
 		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ), false );
 		if( $edited_Comment !== false )
 		{ // The comment still exists
-			$redirect_to = param( 'redirect_to', 'string', NULL );
-			$current_User->check_perm( 'blog_vote_spam_comments', 'edit', true, $blog );
+			$current_User->check_perm( 'blog_vote_spam_comments', 'edit', true, param( 'blogid', 'integer' ) );
 
-			$vote = param( 'vote', 'string' );
-			$edited_Comment->set_vote( $vote );
+			$edited_Comment->set_vote( param( 'vote', 'string' ) );
 			$edited_Comment->dbupdate();
-
-			if( $moderation != NULL )
-			{
-				$statuses = param( 'statuses', 'string', NULL );
-				$item_ID = param( 'itemid', 'integer' );
-				$currentpage = param( 'currentpage', 'integer', 1 );
-
-				if( strlen($statuses) > 2 )
-				{
-					$statuses = substr( $statuses, 1, strlen($statuses) - 2 );
-				}
-				$status_list = explode( ',', $statuses );
-				if( $status_list == NULL )
-				{
-					$status_list = array( 'published', 'draft', 'deprecated' );
-				}
-
-				echo_item_comments( $blog, $item_ID, $status_list, $currentpage );
-				exit(0);
-			}
-		}
-
-		if( $moderation == NULL )
-		{
-			get_comments_awaiting_moderation( $blog );
+			
+			$edited_Comment->vote_spam( '', '', '#', '#', '', '&amp;', true, true );
 		}
 
 		exit(0);
@@ -428,6 +399,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.75  2011/09/28 09:22:34  efy-yurybakh
+ * "comment is spam" vote (avatar blinks)
+ *
  * Revision 1.74  2011/09/27 13:30:13  efy-yurybakh
  * spam vote checkbox
  *

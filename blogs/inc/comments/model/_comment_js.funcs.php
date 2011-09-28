@@ -100,15 +100,9 @@ function setCommentStatus( id, status, redirect_to )
 }
 
 // Set comments vote
-function setCommentVote( id, vote, redirect_to )
+function setCommentVote( id, vote )
 {
-	var divid = 'c' + id;
-	fadeInStatus( divid, vote );
-	modifieds[divid] = vote;
-
-	var statuses = get_show_statuses();
-	var currentpage = get_current_page();
-	var item_id = get_itemid();
+	fadeInStatus( 'c' + id, vote );
 
 	$.ajax({
 	type: 'POST',
@@ -118,18 +112,11 @@ function setCommentVote( id, vote, redirect_to )
 			'commentid': id,
 			'vote': vote,
 			'action': 'set_comment_vote',
-			'moderation': 'commentlist',
-			'statuses': statuses,
-			'itemid': item_id,
-			'currentpage': currentpage,
-			'redirect_to': redirect_to,
 			'crumb_comment': <?php echo '\''.get_crumb('comment').'\''; ?>,
 		},
 	success: function(result)
 		{
-			delete modifieds[divid];
-			$('#comments_container').html(result);
-			show_modifieds();
+			$('#comment_'+id).find('div.vote_spam').html( result );
 		}
 	});
 }
