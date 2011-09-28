@@ -675,6 +675,9 @@ class collections_Module extends Module
 							'features' => array(
 								'text' => T_('Features'),
 								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$blog, ),
+							'comments' => array(
+								'text' => T_('Comments'),
+								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=comments&amp;blog='.$blog, ),
 							'skin' => array(
 								'text' => T_('Skin'),
 								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog, ),
@@ -757,6 +760,9 @@ $collections_Module = new collections_Module();
 
 /*
  * $Log$
+ * Revision 1.30  2011/09/28 12:09:53  efy-yurybakh
+ * "comment was helpful" votes (new tab "comments")
+ *
  * Revision 1.29  2011/09/21 13:01:04  efy-yurybakh
  * feature "Was this comment helpful?"
  *

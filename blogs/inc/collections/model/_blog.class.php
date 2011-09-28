@@ -500,11 +500,12 @@ class Blog extends DataObject
 			$this->set_setting( 'allow_anon_url', param( 'allow_anon_url', 'string', '0' ) );
 			$this->set_setting( 'allow_attachments', param( 'allow_attachments', 'string', 'registered' ) );
 			$this->set_setting( 'allow_rating', param( 'allow_rating', 'string', 'never' ) );
+			$this->set_setting( 'allow_useful', param( 'allow_useful', 'string', '0' ) );
 			$this->set( 'allowtrackbacks', param( 'blog_allowtrackbacks', 'integer', 0 ) );
 			$this->set_setting( 'comments_orderdir', param( 'comments_orderdir', '/^(?:ASC|DESC)$/', 'ASC' ) );
 
-			// call modules update_collection_features on this blog
-			modules_call_method( 'update_collection_features', array( 'edited_Blog' => & $this ) );
+			// call modules update_collection_comments on this blog
+			modules_call_method( 'update_collection_comments', array( 'edited_Blog' => & $this ) );
 
 			$this->set_setting( 'paged_comments', param( 'paged_comments', 'integer', 0 ) );
 			param_integer_range( 'comments_per_page', 1, 9999, T_('Comments per page must be between %d and %d.') );
@@ -551,7 +552,7 @@ class Blog extends DataObject
 		}
 
 
- 		if( param( 'custom_double1', 'string', NULL ) !== NULL )
+		if( param( 'custom_double1', 'string', NULL ) !== NULL )
 		{	// Description:
 			for( $i = 1 ; $i <= 5; $i++ )
 			{
@@ -636,11 +637,11 @@ class Blog extends DataObject
 						$Messages->add( T_('Blog Folder URL').': '
 														.T_('You must provide a relative URL (without <code>http://</code> or <code>https://</code>)!'), 'error' );
 					}
-  				$this->set( 'siteurl', $blog_siteurl );
+					$this->set( 'siteurl', $blog_siteurl );
 				}
 				else
 				{
-  				$this->set( 'siteurl', '' );
+					$this->set( 'siteurl', '' );
 				}
 			}
 
@@ -2479,6 +2480,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.144  2011/09/28 12:09:53  efy-yurybakh
+ * "comment was helpful" votes (new tab "comments")
+ *
  * Revision 1.143  2011/09/27 13:30:14  efy-yurybakh
  * spam vote checkbox
  *

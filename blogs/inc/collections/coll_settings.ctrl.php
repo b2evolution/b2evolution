@@ -151,6 +151,16 @@ switch( $action )
 				}
 				break;
 
+			case 'comments':
+				if( $edited_Blog->load_from_Request( array( 'comments' ) ) )
+				{ // Commit update to the DB:
+					$edited_Blog->dbupdate();
+					$Messages->add( T_('The blog settings have been updated'), 'success' );
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( $update_redirect_url, 303 ); // Will EXIT
+				}
+				break;
+
 			case 'seo':
 				if( $edited_Blog->load_from_Request( array( 'seo' ) ) )
 				{ // Commit update to the DB:
@@ -271,6 +281,10 @@ switch( $AdminUI->get_path(1) )
 		$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 		break;
 
+	case 'comments':
+		$AdminUI->breadcrumbpath_add( T_('Comments'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		break;
+
 	case 'skin':
 		if( $skinpage == 'selection' )
 		{
@@ -331,6 +345,10 @@ switch( $AdminUI->get_path(1) )
 		$AdminUI->disp_view( 'collections/views/_coll_features.form.php' );
 		break;
 
+	case 'comments':
+		$AdminUI->disp_view( 'collections/views/_coll_comments.form.php' );
+		break;
+
 	case 'skin':
 		if( $skinpage == 'selection' )
 		{
@@ -377,6 +395,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.42  2011/09/28 12:09:53  efy-yurybakh
+ * "comment was helpful" votes (new tab "comments")
+ *
  * Revision 1.41  2011/09/13 15:31:35  fplanque
  * Enhanced back-office navigation.
  *

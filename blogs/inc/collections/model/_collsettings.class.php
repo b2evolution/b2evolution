@@ -76,7 +76,7 @@ class CollectionSettings extends AbstractSettings
 			'allow_anon_url' => '0',
 			'allow_attachments' => 'registered',
 			'allow_rating' => 'never',
-			'allow_attending' => 'never',
+			'allow_useful' => '0',
 			'comments_orderdir' => 'ASC',
 			'paged_comments' => '0',
 			'comments_per_page' => 1000,
@@ -191,6 +191,12 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.63  2011/09/28 12:09:53  efy-yurybakh
+ * "comment was helpful" votes (new tab "comments")
+ *
+ * Revision 1.62  2011/09/08 05:22:40  efy-asimo
+ * Remove item attending and add item settings
+ *
  * Revision 1.61  2011/09/04 22:13:14  fplanque
  * copyright 2011
  *

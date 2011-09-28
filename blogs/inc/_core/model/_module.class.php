@@ -122,6 +122,27 @@ class Module
 	}
 
 	/**
+	 * Displays the module's collection comments settings
+	 *
+	 * @param array
+	 * 		array['Form'] - where to display;
+	 * 		array['edited_Blog'] - which blog properties should be displayed;
+	 */
+	function display_collection_comments( $params )
+	{
+	}
+
+	/**
+	 * Updates the module's collection comments settings
+	 *
+	 * @param array
+	 * 		array['edited_Blog'] - which blog properties should be updated;
+	 */
+	function update_collection_comments( $params )
+	{
+	}
+
+	/**
 	 * Displays the module's item settings
 	 *
 	 * @param array
@@ -191,6 +212,9 @@ class Module
 
 /*
  * $Log$
+ * Revision 1.11  2011/09/28 12:09:52  efy-yurybakh
+ * "comment was helpful" votes (new tab "comments")
+ *
  * Revision 1.10  2011/09/23 22:37:09  fplanque
  * minor / doc
  *
