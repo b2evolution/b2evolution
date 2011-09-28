@@ -119,3 +119,9 @@ span.icon{
 	font-size: 9px;
 	display: inline-block !important;
 }
+.action_icon:hover {
+	text-decoration: none;
+}
+.action_icon.un:hover {
+	text-decoration: underline;
+}

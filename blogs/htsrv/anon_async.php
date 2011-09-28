@@ -94,12 +94,41 @@ switch( $action )
 		echo '<div class="center">'.get_avatar_imgtag( $user_login, true, true, 'fit-160x160', 'avatar_above_login' ).'</div>';
 
 		exit(0);
+
+	case 'set_comment_vote':
+		// Used for quick vote of comments
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'comment' );
+
+		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ), false );
+		if( $edited_Comment !== false )
+		{ // The comment still exists
+			$type = param( 'type', 'string' );
+			if( $type == 'spam' )
+			{ // Check permission for spam voting
+				$current_User->check_perm( 'blog_vote_spam_comments', 'edit', true, param( 'blogid', 'integer' ) );
+			}
+			else if( ! is_logged_in() || $type != 'useful' )
+			{ // Restrict not logged users here
+				exit(0);
+			}
+
+			$edited_Comment->set_vote( $type, param( 'vote', 'string' ) );
+			$edited_Comment->dbupdate();
+			
+			$edited_Comment->{'vote_'.$type}( '', '', '&amp;', true, true );
+		}
+
+		exit(0);
 }
 
 exit();
 
 /*
  * $Log$
+ * Revision 1.9  2011/09/28 16:15:56  efy-yurybakh
+ * "comment was helpful" votes
+ *
  * Revision 1.8  2011/09/27 12:53:52  efy-yurybakh
  * bubbletip fix
  *

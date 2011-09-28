@@ -100,23 +100,25 @@ function setCommentStatus( id, status, redirect_to )
 }
 
 // Set comments vote
-function setCommentVote( id, vote )
+function setCommentVote( id, type, vote )
 {
 	fadeInStatus( 'c' + id, vote );
 
 	$.ajax({
 	type: 'POST',
-	url: '<?php echo $htsrv_url; ?>async.php',
+	url: '<?php echo $htsrv_url; ?>anon_async.php',
 	data:
 		{ 'blogid': <?php echo '\''.$Blog->ID.'\''; ?>,
 			'commentid': id,
+			'type': type,
 			'vote': vote,
 			'action': 'set_comment_vote',
 			'crumb_comment': <?php echo '\''.get_crumb('comment').'\''; ?>,
 		},
 	success: function(result)
 		{
-			$('#comment_'+id).find('div.vote_spam').html( result );
+			$('#vote_'+type+'_'+id).after( result );
+			$('#vote_'+type+'_'+id).remove();
 		}
 	});
 }

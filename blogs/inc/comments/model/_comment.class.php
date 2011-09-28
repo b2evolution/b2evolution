@@ -308,27 +308,34 @@ class Comment extends DataObject
 	/**
 	 * Set the vote, as a number.
 	 * 
-	 * @param string Vote type (spam, notsure, ok)
+	 * @param string Vote type (spam, useful)
+	 * @param string Vote value (spam, notsure, ok, yes, no)
 	 * @access protected
 	 */
-	function set_vote( $vote_type )
+	function set_vote( $vote_type, $vote_value )
 	{
 		global $DB, $current_User;
 		
-		switch ( $vote_type )
+		if( $vote_type == 'useful' )
+		{ // Set a vote field for DB
+			$vote_type = 'helpful';
+		}
+		switch ( $vote_value )
 		{ // Set a value for spam vote
 			case "spam":
+			case "yes":
 				$vote = '1';
 				break;
 			case "notsure":
 				$vote = '0';
 				break;
 			case "ok":
+			case "no":
 				$vote = '-1';
 				break;
 		}
-		if( !isset($vote) )
-		{ // If $vote_type is not correct from ajax request
+		if( ! isset( $vote ) )
+		{ // If $vote_type or $vote_value are not correct from ajax request
 			return;
 		}
 		
@@ -340,38 +347,36 @@ class Comment extends DataObject
 		$sql_update_count = '';
 		if( !$DB->get_row( "SELECT * FROM T_comments__votes WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_user_ID = '".$current_User->ID."'" ) )
 		{ // Add a new vote for first time
-			$DB->query( "INSERT INTO T_comments__votes( cmvt_cmt_ID, cmvt_user_ID, cmvt_spam )
+			$DB->query( "INSERT INTO T_comments__votes( cmvt_cmt_ID, cmvt_user_ID, cmvt_".$vote_type." )
 												VALUES( '".$this->ID."', '".$current_User->ID."', '".$vote."')" );
-			$spam_count = (int)$DB->get_var( "SELECT COUNT(cmvt_spam) FROM T_comments__votes WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_spam IS NOT NULL" );
-			$sql_update_count = ", comment_spam_countvotes = '".$spam_count."'";
-			$this->comment_spam_countvotes = $spam_count;
 		}
 		else
 		{ // Update a vote
-			$DB->query( "UPDATE T_comments__votes SET cmvt_spam = '".$vote."'
+			$DB->query( "UPDATE T_comments__votes SET cmvt_".$vote_type." = '".$vote."'
 												WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_user_ID = '".$current_User->ID."'" );
 		}
 
-		// Update fields with spam counters for this comment
-		$spam_summary = (int)$DB->get_var( "SELECT SUM(cmvt_spam) FROM T_comments__votes WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_spam IS NOT NULL" );
-		$DB->query( "UPDATE T_comments SET comment_spam_addvotes = '".$spam_summary."'".$sql_update_count."
+		// Update fields with vote counters for this comment
+		$vote = $DB->get_row( "SELECT COUNT(cmvt_".$vote_type.") AS c, SUM(cmvt_".$vote_type.") AS s FROM T_comments__votes WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_".$vote_type." IS NOT NULL" );
+		$DB->query( "UPDATE T_comments SET comment_".$vote_type."_addvotes = '".$vote->s."', comment_".$vote_type."_countvotes = '".$vote->c."'
 												WHERE comment_ID = '".$this->ID."'" );
-		$this->comment_spam_addvotes = $spam_summary;
+		$this->{'comment_'.$vote_type.'_addvotes'} = $vote->s;
+		$this->{'comment_'.$vote_type.'_countvotes'} = $vote->c;
 
 		return;
 	}
 
 
 	/**
-	 * Get the vote type disabled, as a array.
+	 * Get the vote spam type disabled, as array.
 	 * 
 	 * @param int User ID
 	 * 
 	 * @return array
 	 */
-	function get_vote_disabled( $user_ID )
+	function get_vote_spam_disabled()
 	{
-		global $DB;
+		global $DB, $current_User;
 		
 		$disabled = array(
 			'spam' => '',
@@ -379,7 +384,7 @@ class Comment extends DataObject
 			'ok' => ''
 		);
 
-		if( $vote = $DB->get_row("SELECT cmvt_spam FROM T_comments__votes WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_user_ID = '".(int)$user_ID."'" ) )
+		if( $vote = $DB->get_row("SELECT cmvt_spam FROM T_comments__votes WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_user_ID = '".$current_User->ID."' AND cmvt_spam IS NOT NULL" ) )
 		{ // Get a spam vote for current comment and user
 			$class_disabled = 'disabled';
 			switch ( $vote->cmvt_spam )
@@ -401,26 +406,69 @@ class Comment extends DataObject
 
 
 	/**
-	 * Get the vote summary, as a string.
+	 * Get the vote spam type disabled, as array.
 	 * 
-	 * @return string
+	 * @param int User ID
+	 * 
+	 * @return array
 	 */
-	function get_vote_summary( $votes = array() )
+	function get_vote_useful_disabled()
 	{
-		if( implode( '', $votes ) == '' )
-		{ // If current user didn't vote this comment
-			return T_('My Spam Vote:');
+		global $DB, $current_User;
+		
+		$disabled = array(
+			'yes' => '',
+			'no' => ''
+		);
+
+		if( $vote = $DB->get_row("SELECT cmvt_helpful FROM T_comments__votes WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_user_ID = '".$current_User->ID."' AND cmvt_helpful IS NOT NULL" ) )
+		{ // Get a spam vote for current comment and user
+			$class_disabled = 'disabled';
+			switch ( $vote->cmvt_helpful )
+			{
+				case '1': // YES
+					$disabled['no'] = $class_disabled;
+					break;
+				case '-1': // NO
+					$disabled['yes'] = $class_disabled;
+					break;
+			}
 		}
 
-		if( $this->comment_spam_countvotes == 0 )
-		{ // No spam votes for current comment
+		return $disabled;
+	}
+
+
+	/**
+	 * Get the vote summary, as a string.
+	 * 
+	 * @param bool User already voted
+	 * @return string
+	 */
+	function get_vote_summary( $is_voted, $type = 'spam' )
+	{
+		if( ! in_array( $type, array( 'spam', 'useful' ) ) )
+		{ // Bad request
+			return '';
+		}
+		if( $is_voted )
+		{ // If current user didn't vote this comment
+			return T_( $type == 'spam' ? 'My Spam Vote:' : 'Is this comment helpful?' );
+		}
+		if( $type == 'useful' )
+		{
+			$type = 'helpful';
+		}
+
+		if( $this->{'comment_'.$type.'_countvotes'} == 0 )
+		{ // No votes for current comment
 			return '';
 		}
 
-		$summary = ceil( $this->comment_spam_addvotes / $this->comment_spam_countvotes * 100 );
+		$summary = ceil( $this->{'comment_'.$type.'_addvotes'} / $this->{'comment_'.$type.'_countvotes'} * 100 );
 		if( $summary < -20 )
 		{ // Comment is OK
-			$summary = abs($summary).'% '.T_('OK');
+			$summary = abs($summary).'% '.T_( $type == 'spam' ? 'OK' : 'not helpful' );
 		}
 		else if( $summary >= -20 && $summary <= 20 )
 		{ // Comment is UNDECIDED
@@ -428,9 +476,12 @@ class Comment extends DataObject
 		}
 		else if( $summary > 20 )
 		{ // Comment is SPAM
-			$summary .= '% '.T_('SPAM');
+			$summary .= '% '.T_( $type == 'spam' ? 'SPAM' : 'helpful');
 		}
-		$summary = T_('Community says: ').$summary;
+		if( $type == "spam" )
+		{
+			$summary = T_('Community says: ').$summary;
+		}
 
 		return $summary;
 	}
@@ -1151,36 +1202,40 @@ class Comment extends DataObject
 	/**
 	 * Provide link to vote a comment if user has edit rights
 	 *
-	 * @param string to display before link
-	 * @param string to display after link
-	 * @param string link text
-	 * @param string link title
+	 * @param string a vote type
+	 * @param string a vote value
 	 * @param string class name
 	 * @param string glue between url params
 	 * @param boolean save context?
 	 * @param boolean true if create AJAX button
 	 */
-	function get_vote_link( $vote_type, $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false )
+	function get_vote_link( $vote_type, $vote_value, $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false )
 	{
 		global $current_User, $admin_url;
 
-		if( ! is_logged_in() ) return false;
-
 		$this->get_Item();
 
-		switch( $vote_type )
+		switch( $vote_value )
 		{
 			case "spam":
-				if( $text == '#' ) $text = get_icon( 'vote_spam'.( $class != '' ? '_'.$class : '' ) );
-				if( $title == '#' ) $title = T_('Mark this comment as spam!');
+				$text = get_icon( 'vote_spam'.( $class != '' ? '_'.$class : '' ) );
+				$title = T_('Mark this comment as spam!');
 			break;
 			case "notsure":
-				if( $text == '#' ) $text = get_icon( 'vote_notsure'.( $class != '' ? '_'.$class : '' ) );
-				if( $title == '#' ) $title = T_('Mark this comment as not sure!');
+				$text = get_icon( 'vote_notsure'.( $class != '' ? '_'.$class : '' ) );
+				$title = T_('Mark this comment as not sure!');
 			break;
 			case "ok":
-				if( $text == '#' ) $text = get_icon( 'vote_ok'.( $class != '' ? '_'.$class : '' ) );
-				if( $title == '#' ) $title = T_('Mark this comment as OK!');
+				$text = get_icon( 'vote_ok'.( $class != '' ? '_'.$class : '' ) );
+				$title = T_('Mark this comment as OK!');
+			break;
+			case "yes":
+				$text = get_icon( 'thumb_up'.( $class != '' ? '_'.$class : '' ) );
+				$title = T_('Mark this comment as useful!');
+			break;
+			case "no":
+				$text = get_icon( 'thumb_down'.( $class != '' ? '_'.$class : '' ) );
+				$title = T_('Mark this comment as not useful!');
 			break;
 		}
 		if( $class == 'disabled' )
@@ -1189,16 +1244,15 @@ class Comment extends DataObject
 		}
 		$class .= ' action_icon';
 
-		$r = $before;
-		$r .= '<a href="';
+		$r = '<a href="';
 
 		if( $ajax_button )
 		{
-			$r .= 'javascript:setCommentVote('.$this->ID.', \''.$vote_type.'\' );';
+			$r .= 'javascript:setCommentVote('.$this->ID.', \''.$vote_type.'\' , \''.$vote_value.'\' );';
 		}
 		else
 		{
-			$r .= $admin_url.'?ctrl=comments'.$glue.'action='.$vote_type.$glue.'comment_ID='.$this->ID.'&amp;'.url_crumb('comment');
+			$r .= $admin_url.'?ctrl=comments'.$glue.'action='.$vote_type.$glue.'value='.$vote_value.$glue.'comment_ID='.$this->ID.'&amp;'.url_crumb('comment');
 			if( $save_context )
 			{
 				$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
@@ -1208,7 +1262,6 @@ class Comment extends DataObject
 		$r .= '" title="'.$title.'"';
 		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
 		$r .= '>'.$text.'</a>';
-		$r .= $after;
 
 		return $r;
 	}
@@ -1237,14 +1290,11 @@ class Comment extends DataObject
 	 *
 	 * @param string to display before link
 	 * @param string to display after link
-	 * @param string link text
-	 * @param string link title
-	 * @param string class name
 	 * @param string glue between url params
 	 * @param boolean save context?
 	 * @param boolean true if create AJAX button
 	 */
-	function vote_spam( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false )
+	function vote_spam( $before = '', $after = '', $glue = '&amp;', $save_context = true, $ajax_button = false )
 	{
 		global $current_User;
 
@@ -1256,16 +1306,60 @@ class Comment extends DataObject
 		}
 
 		echo $before;
+		
+		echo '<div id="vote_spam_'.$this->ID.'" class="vote_spam">';
 
-		$vote_disabled = $this->get_vote_disabled( $current_User->ID );
+		$vote_disabled = $this->get_vote_spam_disabled();
 
-		echo $this->get_vote_summary( $vote_disabled );
+		echo $this->get_vote_summary( implode( '', $vote_disabled ) == '' );
 		
 		foreach( $vote_disabled as $vote_type => $vote_class)
 		{ // Print out 3 buttons for spam voting
-			echo $this->get_vote_link( $vote_type, '', '', $text, $title, $vote_class, $glue, $save_context, $ajax_button );
+			echo $this->get_vote_link( 'spam', $vote_type, $vote_class, $glue, $save_context, $ajax_button );
 		}
 
+		echo '</div>';
+		
+		echo $after;
+	}
+
+
+	/**
+	 * Display link to vote a comment as SPAM if user has edit rights
+	 *
+	 * @param string to display before link
+	 * @param string to display after link
+	 * @param string glue between url params
+	 * @param boolean save context?
+	 * @param boolean true if create AJAX button
+	 */
+	function vote_useful( $before = '', $after = '', $glue = '&amp;', $save_context = true, $ajax_button = false )
+	{
+		global $current_User;
+
+		//$this->get_Item();
+
+		//if( ! $current_User->check_perm( 'blog_vote_useful_comments', 'edit', false, $this->Item->get_blog_ID() ) )
+		if( ! is_logged_in() )
+		{ // If User has no permission to vote spam
+			return false;
+		}
+
+		echo $before;
+		
+		echo '<span id="vote_useful_'.$this->ID.'"> &nbsp; ';
+
+		$vote_disabled = $this->get_vote_useful_disabled();
+
+		echo $this->get_vote_summary( implode( '', $vote_disabled ) == '', 'useful' );
+		
+		foreach( $vote_disabled as $vote_type => $vote_class)
+		{ // Print out 2 buttons for useful voting
+			echo $this->get_vote_link( 'useful', $vote_type, $vote_class, $glue, $save_context, $ajax_button );
+		}
+
+		echo '</span>';
+		
 		echo $after;
 	}
 
@@ -2312,6 +2406,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.113  2011/09/28 16:15:56  efy-yurybakh
+ * "comment was helpful" votes
+ *
  * Revision 1.112  2011/09/28 09:59:43  efy-yurybakh
  * add missing rel="lightbox" in front office
  *

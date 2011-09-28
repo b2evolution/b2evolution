@@ -505,7 +505,7 @@ function get_icon_info($name)
 		case 'feed': return array(
 			'alt'	 => T_('XML Feed'),
 			'size' => array( 16, 16 ),
-			'xy' => array( 96, 144 )
+			'xy' => array( 0, 160 )
 		);
 
 		case 'recycle_full': return array(
@@ -555,7 +555,17 @@ function get_icon_info($name)
 			'size' => array( 13, 16 ),
 			'xy' => array( 112, 144 )
 		);
+		case 'thumb_up_disabled': return array(
+			'alt'  => T_('Thumb Up'),
+			'size' => array( 13, 16 ),
+			'xy' => array( 96, 144 )
+		);
 		case 'thumb_down': return array(
+			'alt'  => T_('Thumb Down'),
+			'size' => array( 13, 16 ),
+			'xy' => array( 144, 144 )
+		);
+		case 'thumb_down_disabled': return array(
 			'alt'  => T_('Thumb Down'),
 			'size' => array( 13, 16 ),
 			'xy' => array( 128, 144 )
@@ -565,6 +575,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.86  2011/09/28 16:15:56  efy-yurybakh
+ * "comment was helpful" votes
+ *
  * Revision 1.85  2011/09/27 17:31:19  efy-yurybakh
  * User additional info fields
  *

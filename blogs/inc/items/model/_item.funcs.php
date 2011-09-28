@@ -1843,7 +1843,7 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 		$Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton', false, '&amp;', $save_context, true );
 
 		// Display Spam Voting system
-		$Comment->vote_spam( '<div class="vote_spam">', '</div>', '#', '#', '', '&amp;', $save_context, true );
+		$Comment->vote_spam( '', '', '&amp;', $save_context, true );
 
 		echo '<div class="clear"></div>';
 		echo '</div>';
@@ -1952,6 +1952,9 @@ function echo_pages( $item_ID, $currentpage, $comments_number )
 
 /*
  * $Log$
+ * Revision 1.141  2011/09/28 16:15:56  efy-yurybakh
+ * "comment was helpful" votes
+ *
  * Revision 1.140  2011/09/28 09:22:34  efy-yurybakh
  * "comment is spam" vote (avatar blinks)
  *

@@ -166,7 +166,7 @@ if( $blog )
 			}
 
 			// Set comments vote
-			function setCommentVote(id, vote)
+			function setCommentVote(id, type, vote)
 			{
 				var divid = 'comment_' + id;
 				switch(vote)
@@ -184,17 +184,19 @@ if( $blog )
 
 				$.ajax({
 				type: 'POST',
-				url: '<?php echo $htsrv_url; ?>async.php',
+				url: '<?php echo $htsrv_url; ?>anon_async.php',
 				data:
 					{ 'blogid': <?php echo '\''.$Blog->ID.'\''; ?>,
 						'commentid': id,
+						'type': type,
 						'vote': vote,
 						'action': 'set_comment_vote',
 						'crumb_comment': <?php echo '\''.get_crumb('comment').'\''; ?>,
 					},
 				success: function(result)
 					{
-						$('#comment_'+id).find('div.vote_spam').html( result );
+						$('#vote_'+type+'_'+id).after( result );
+						$('#vote_'+type+'_'+id).remove();
 					}
 				});
 			}
@@ -757,6 +759,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.83  2011/09/28 16:15:56  efy-yurybakh
+ * "comment was helpful" votes
+ *
  * Revision 1.82  2011/09/28 09:59:43  efy-yurybakh
  * add missing rel="lightbox" in front office
  *

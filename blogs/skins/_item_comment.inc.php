@@ -106,6 +106,7 @@ $Comment = & $params['Comment'];
 		?>
 
 		<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
+		<?php $Comment->vote_useful( '', '', '&amp;', true, true );?>
 	</div>
 <?php
   echo $params['comment_end'];
@@ -115,6 +116,9 @@ $Comment = & $params['Comment'];
 
 /*
  * $Log$
+ * Revision 1.13  2011/09/28 16:15:56  efy-yurybakh
+ * "comment was helpful" votes
+ *
  * Revision 1.12  2011/09/14 22:47:47  fplanque
  * removed excessive params
  *

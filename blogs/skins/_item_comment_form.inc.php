@@ -126,18 +126,41 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 
 
 	echo '<script type="text/javascript">
-		  /* <![CDATA[ */
-		  function validateCommentForm(form)
-		  {
-		      if( form.p.value.replace(/^\s+|\s+$/g,"").length == 0 )
-			  {
-				  alert("'.TS_('Please do not send empty comments.').'");
-				  return false;
-			  }
-		  }
-		  /* ]]> */
-		  </script>';
+/* <![CDATA[ */
+function validateCommentForm(form)
+{
+	if( form.p.value.replace(/^\s+|\s+$/g,"").length == 0 )
+	{
+		alert("'.TS_('Please do not send empty comments.').'");
+		return false;
+	}
+}
 
+
+// Set comments vote
+function setCommentVote( id, type, vote )
+{
+	$.ajax({
+	type: "POST",
+	url: "'.$htsrv_url.'anon_async.php",
+	data:
+		{ "blogid": "'.$Blog->ID.'",
+			"commentid": id,
+			"type": type,
+			"vote": vote,
+			"action": "set_comment_vote",
+			"crumb_comment": "'.get_crumb('comment').'",
+		},
+	success: function(result)
+		{
+			$("#vote_"+type+"_"+id).after( result );
+			$("#vote_"+type+"_"+id).remove();
+		}
+	});
+}
+/* ]]> */
+</script>';
+	
 	$Form = new Form( $samedomain_htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID, 'post', NULL, 'multipart/form-data' );
 	$Form->begin_form( 'bComment', '', array( 'target' => '_self', 'onsubmit' => 'return validateCommentForm(this);' ) );
 
@@ -267,6 +290,9 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 
 /*
  * $Log$
+ * Revision 1.29  2011/09/28 16:15:56  efy-yurybakh
+ * "comment was helpful" votes
+ *
  * Revision 1.28  2011/09/26 14:53:27  efy-asimo
  * Login problems with multidomain installs - fix
  * Insert globals: samedomain_htsrv_url, secure_htsrv_url;

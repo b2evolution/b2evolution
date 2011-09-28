@@ -286,7 +286,7 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 		$Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton', false, '&amp;', true, true );
 
 		// Display Spam Voting system
-		$Comment->vote_spam( '<div class="vote_spam">', '</div>', '#', '#', '', '&amp;', true, true );
+		$Comment->vote_spam( '', '', '&amp;', true, true );
 
 		echo '<div class="clear"></div>';
 		echo '</div>';
@@ -302,6 +302,9 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 /*
  * $Log$
+ * Revision 1.50  2011/09/28 16:15:56  efy-yurybakh
+ * "comment was helpful" votes
+ *
  * Revision 1.49  2011/09/28 09:22:34  efy-yurybakh
  * "comment is spam" vote (avatar blinks)
  *

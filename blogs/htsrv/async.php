@@ -225,24 +225,6 @@ switch( $action )
 
 		exit(0);
 
-	case 'set_comment_vote':
-		// Used for quick vote of comments
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'comment' );
-
-		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ), false );
-		if( $edited_Comment !== false )
-		{ // The comment still exists
-			$current_User->check_perm( 'blog_vote_spam_comments', 'edit', true, param( 'blogid', 'integer' ) );
-
-			$edited_Comment->set_vote( param( 'vote', 'string' ) );
-			$edited_Comment->dbupdate();
-			
-			$edited_Comment->vote_spam( '', '', '#', '#', '', '&amp;', true, true );
-		}
-
-		exit(0);
-
 	case 'delete_comment':
 
 		// Check that this action request is not a CSRF hacked request:
@@ -399,6 +381,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.76  2011/09/28 16:15:56  efy-yurybakh
+ * "comment was helpful" votes
+ *
  * Revision 1.75  2011/09/28 09:22:34  efy-yurybakh
  * "comment is spam" vote (avatar blinks)
  *
