@@ -99,9 +99,63 @@ function stat_session_hits( $sess_ID,  $link_text )
 	return '<strong><a href="?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0&amp;sess_ID='.$sess_ID.'">'.$link_text.'</a></strong>';
 }
 
+/**
+ * Display clickable sessID
+ *
+ * @param string session ID
+ */
+function disp_clickable_log_sessID( $hit_sess_ID)
+{
+	global $current_User;
+	static $perm = NULL;
+
+	if (empty($perm))
+	{
+	$perm = $current_User->check_perm( 'stats', 'view' );
+	}
+	if ($perm == true)
+	{
+		return '<strong><a href="?&ctrl=stats&tab=sessions&tab3=hits&colselect_submit=Filter+list&sess_ID='.$hit_sess_ID.'&remote_IP=&blog=0">'.$hit_sess_ID.'</a></strong>';
+	}
+	else
+	{
+		return "$hit_sess_ID";
+	}
+
+}
+
+/**
+ * Display clickable log IP address
+ *
+ * @param string remote adress IP
+ */
+function disp_clickable_log_IP( $hit_remote_addr )
+{
+	global $current_User;
+	static $perm = NULL;
+
+	if (empty($perm))
+	{
+	$perm = $current_User->check_perm( 'stats', 'view' );
+	}
+	if ($perm == true)
+	{
+		return '<a href="?&ctrl=stats&tab=sessions&tab3=hits&colselect_submit=Filter+list&sess_ID=&remote_IP='.$hit_remote_addr.'&blog=0">'.$hit_remote_addr.'</a>';
+	}
+	else
+	{
+		return "$hit_remote_addr";
+	}
+
+}
+
+
 
 /*
  * $Log$
+ * Revision 1.17  2011/09/28 11:33:57  efy-vitalij
+ * add IDs & IPs clickable to direct stat
+ *
  * Revision 1.16  2011/09/23 07:41:57  efy-asimo
  * Unified usernames everywhere in the app - first part
  *

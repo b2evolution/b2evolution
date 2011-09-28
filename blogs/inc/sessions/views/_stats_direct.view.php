@@ -40,15 +40,26 @@ global $blog, $admin_url, $rsc_url;
 // Create result set:
 
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE hit_ID, hit_datetime, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname' );
+$SQL->SELECT( 'SQL_NO_CACHE hit_ID, hit_sess_ID ,hit_datetime, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname' );
 $SQL->FROM( 'T_hitlog LEFT JOIN T_blogs ON hit_blog_ID = blog_ID' );
 $SQL->WHERE( 'hit_referer_type = "direct" AND hit_agent_type = "browser"' );
 if( ! empty( $blog ) )
 	$SQL->WHERE_and( 'hit_blog_ID = ' . $blog );
 
-$Results = new Results( $SQL->get(), 'lstref_', 'D' );
+$Results = new Results( $SQL->get(), 'lstref_', '-D' );
 
 $Results->title = T_('Direct browser hits');
+
+
+$Results->cols[] = array(
+		'th' => T_('Session ID'),
+		'td' => '%disp_clickable_log_sessID( #hit_sess_ID# )%',
+		'order' => 'hit_sess_ID',
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'shrinkwrap'
+
+		);
+
 
 // datetime:
 $Results->cols[] = array(
@@ -90,7 +101,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Remote IP'),
 		'order' => 'hit_remote_addr',
-		'td' => '% $GLOBALS[\'Plugins\']->get_trigger_event( \'FilterIpAddress\', $tmp_params = array(\'format\'=>\'htmlbody\', \'data\'=>\'$hit_remote_addr$\') ) %',
+		'td' => '%disp_clickable_log_IP( #hit_remote_addr# )%',
 	);
 
 // Display results:
@@ -98,6 +109,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.12  2011/09/28 11:33:57  efy-vitalij
+ * add IDs & IPs clickable to direct stat
+ *
  * Revision 1.11  2011/09/04 22:13:18  fplanque
  * copyright 2011
  *
