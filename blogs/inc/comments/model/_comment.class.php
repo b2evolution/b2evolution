@@ -1574,7 +1574,7 @@ class Comment extends DataObject
 		{
 			foreach( $attachments['images'] as $image_File )
 			{ // show image attachments
-				echo $image_File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'] );
+				echo $image_File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'], 'original', T_('Posted by ').$this->get_author_name(), 'lightbox[images]' );
 			}
 		}
 
@@ -2312,6 +2312,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.112  2011/09/28 09:59:43  efy-yurybakh
+ * add missing rel="lightbox" in front office
+ *
  * Revision 1.111  2011/09/28 09:22:34  efy-yurybakh
  * "comment is spam" vote (avatar blinks)
  *

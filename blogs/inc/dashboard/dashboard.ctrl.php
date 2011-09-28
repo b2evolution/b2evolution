@@ -182,17 +182,19 @@ if( $blog )
 						break;
 				};
 
-				modifieds[divid] = vote;
-
 				$.ajax({
 				type: 'POST',
 				url: '<?php echo $htsrv_url; ?>async.php',
-				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&vote=' + vote + '&action=set_comment_vote&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
+				data:
+					{ 'blogid': <?php echo '\''.$Blog->ID.'\''; ?>,
+						'commentid': id,
+						'vote': vote,
+						'action': 'set_comment_vote',
+						'crumb_comment': <?php echo '\''.get_crumb('comment').'\''; ?>,
+					},
 				success: function(result)
 					{
-						// var divid = 'comment_' + id;
-						delete modifieds[divid];
-						processResult(result, modifieds);
+						$('#comment_'+id).find('div.vote_spam').html( result );
 					}
 				});
 			}
@@ -755,6 +757,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.82  2011/09/28 09:59:43  efy-yurybakh
+ * add missing rel="lightbox" in front office
+ *
  * Revision 1.81  2011/09/25 03:54:21  efy-yurybakh
  * Add spam voting to dashboard
  *
