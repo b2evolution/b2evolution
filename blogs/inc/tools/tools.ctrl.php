@@ -431,54 +431,149 @@ if( empty($tab) )
 					$Chapter = & $Item->get_main_Chapter();
 					while( $Item = & $ItemList->get_item() )
 					{	
-						$links[$blog_id][] =  array('link' => '/'.$listBlog->siteurl.'/'.$Chapter->get_url_path().$Item->urltitle, // trim($Chapter->get_permanent_url(NULL ,' ')).
-													'ip'   => generate_random_ip());
+						$links[] =  array('link' => '/'.$listBlog->siteurl.'/'.$Chapter->get_url_path().$Item->urltitle, // trim($Chapter->get_permanent_url(NULL ,' ')).
+										  'blog_id'   => $blog_id);
 					}
 
 				}
 
 			}
+
+			$links_count = count($links);
+
+			if (empty($links_count))
+			{
+				$Messages->add('Do not have blog links to generate statistics');
+				break;
+			}
+
+			// generate users id array
+
+			$users_array = $DB->get_results( '
+					SELECT user_ID
+					  FROM T_users
+					  WHERE user_validated = 1', 'ARRAY_A');
+
+			$users_count = count($users_array);
+
+			if (empty ($users_count))
+			{
+				$Messages->add('Do not have valid users to generate statistics');
+				break;
+			}
+
 			// Calculate the period of testing
 			$cur_time = time();
 			$past_time = mktime(date("H"),date("i"),date("s") ,date("m"),date("d")-10,date("Y"));
 
 			$insert_data ='';
 			$insert_data_count = 0;
-			// Sample data for hit session:
-			$hit_sess_ID = 999;
 
-			foreach ($links as $blog_key => $value)
+			// create session array for testing
+			$sessions = array();
+			for ($i = 0; $i <= $users_count - 1; $i++)
 			{
-				// Handle the links array and form test hit data:
-				$time_shift = 0;
-				$array_count = count($value);
+				$sessions[] = array('sess_ID'		=> -1,
+									'sess_key'      => generate_random_key(32),
+									'sess_hitcount' => 1,
+									'sess_lastseen' => 0,
+									'sess_ipaddress'=> generate_random_ip(),
+									'sess_user_ID'  => $users_array[$i]['user_ID']);
+			}
 
-				if (!empty($array_count))
-				{
-					for ($time_shift = $past_time; $cur_time > $time_shift; $time_shift += mt_rand(0, 5000))
-					{
-						$insert_data_count++;
-						// generate random array key:
-						$k = mt_rand(0,$array_count-1);
+			// main cycle of generation
+			for ($time_shift = $past_time; $cur_time > $time_shift; $time_shift += mt_rand(0, 5000))
+			{
 
-						if ($insert_data == '')
-						{
-							$insert_data .="($hit_sess_ID, FROM_UNIXTIME($time_shift), '". $DB->escape($value[$k]['link']). "' , 'direct', $blog_key, '{$value[$k]['ip']}' , 'browser')";
-						}
-						else
-						{
-							$insert_data .=",($hit_sess_ID, FROM_UNIXTIME($time_shift), '". $DB->escape($value[$k]['link']). "' , 'direct', $blog_key,'{$value[$k]['ip']}', 'browser')";
-						}
+				$insert_data_count = $insert_data_count + 1;
 
-					}
+				$rand_i = mt_rand(0,$users_count-1);
+				$rand_link = mt_rand(0,$links_count-1);
+				$cur_seesion =  $sessions[$rand_i];
 
-					$sql = "INSERT INTO T_hitlog(
-					hit_sess_ID, hit_datetime, hit_uri, hit_referer_type, hit_blog_ID, hit_remote_addr, hit_agent_type )
-					VALUES".$insert_data;
+				if ($cur_seesion['sess_ID'] == -1)
+				{	// This session needs initialization:
+
+					$cur_seesion['sess_lastseen'] = $time_shift;
+
+					$DB->query( "
+					INSERT INTO T_sessions( sess_key, sess_hitcount, sess_lastseen, sess_ipaddress, sess_user_ID )
+					VALUES (
+						'".$cur_seesion['sess_key']."',
+						".$cur_seesion['sess_hitcount'].",
+						'".date( 'Y-m-d H:i:s', $cur_seesion['sess_lastseen'] )."',
+						".$DB->quote($cur_seesion['sess_ipaddress']).",
+						".$cur_seesion['sess_user_ID']."
+					)" );
+
+					$cur_seesion['sess_ID'] = $DB->insert_id;
+					$sessions[$rand_i] = $cur_seesion;
+
+					$sql = "INSERT INTO T_hitlog(hit_sess_ID, hit_datetime, hit_uri, hit_referer_dom_ID, hit_referer_type, hit_blog_ID, hit_remote_addr, hit_agent_type )
+					VALUES".
+						"({$cur_seesion['sess_ID']}, FROM_UNIXTIME({$cur_seesion['sess_lastseen']}), '". $DB->escape($links[$rand_link]['link']). "' , 1, 'direct', {$links[$rand_link]['blog_id']}, '{$cur_seesion['sess_ipaddress']}' , 'browser')";
 
 					$DB->query( $sql, 'Record test hits' );
+
+					//break(2);
 				}
+				else
+				{
+					if (($time_shift - $cur_seesion['sess_lastseen'])> 1000)
+					{	// This session last updated more than 1000 sec ago. Instead of this session create a new session.
+
+						$cur_seesion = array(	'sess_ID'		=> -1,
+												'sess_key'      => generate_random_key(32),
+												'sess_hitcount' => 1,
+												'sess_lastseen' => 0,
+												'sess_ipaddress'=> generate_random_ip(),
+												'sess_user_ID'  => $users_array[mt_rand(0,$users_count-1)]['user_ID']);
+
+						$cur_seesion['sess_lastseen'] = $time_shift;
+
+						$DB->query( "
+						INSERT INTO T_sessions( sess_key, sess_hitcount, sess_lastseen, sess_ipaddress, sess_user_ID )
+						VALUES (
+							'".$cur_seesion['sess_key']."',
+							".$cur_seesion['sess_hitcount'].",
+							'".date( 'Y-m-d H:i:s', $cur_seesion['sess_lastseen'] )."',
+							".$DB->quote($cur_seesion['sess_ipaddress']).",
+							".$cur_seesion['sess_user_ID']."
+						)" );
+
+						$cur_seesion['sess_ID'] = $DB->insert_id;
+						$sessions[$rand_i] = $cur_seesion;
+
+						$sql = "INSERT INTO T_hitlog(hit_sess_ID, hit_datetime, hit_uri, hit_referer_dom_ID, hit_referer_type, hit_blog_ID, hit_remote_addr, hit_agent_type )
+						VALUES".
+							"({$cur_seesion['sess_ID']}, FROM_UNIXTIME({$cur_seesion['sess_lastseen']}), '". $DB->escape($links[$rand_link]['link']). "' , 1, 'direct', {$links[$rand_link]['blog_id']}, '{$cur_seesion['sess_ipaddress']}' , 'browser')";
+
+						$DB->query( $sql, 'Record test hits' );
+
+					}
+					else
+					{
+						// Update session
+						$cur_seesion['sess_lastseen'] = $time_shift;
+						$sql = "INSERT INTO T_hitlog(hit_sess_ID, hit_datetime, hit_uri, hit_referer_dom_ID, hit_referer_type, hit_blog_ID, hit_remote_addr, hit_agent_type )
+						VALUES".
+							"({$cur_seesion['sess_ID']}, FROM_UNIXTIME({$cur_seesion['sess_lastseen']}), '". $DB->escape($links[$rand_link]['link']). "' , 1, 'self', {$links[$rand_link]['blog_id']}, '{$cur_seesion['sess_ipaddress']}' , 'browser')";
+
+						$DB->query( $sql, 'Record test hits' );
+
+						$sql = "UPDATE T_sessions SET
+								sess_hitcount = sess_hitcount + 1,
+								sess_lastseen = '".date( 'Y-m-d H:i:s', $cur_seesion['sess_lastseen'] )."'
+								WHERE sess_ID = {$cur_seesion['sess_ID']}";
+
+						$DB->query( $sql, 'Update session' );
+						$sessions[$rand_i] = $cur_seesion;
+
+					}
+				}
+
 			}
+
 
 			$Messages->add( sprintf( '%d test data items are added.', $insert_data_count ), 'success' );
 			break;
@@ -561,6 +656,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.47  2011/09/28 09:05:58  efy-vitalij
+ * add session functional to  statistical data generator
+ *
  * Revision 1.46  2011/09/27 13:11:29  efy-vitalij
  * generate sample hit data
  *
