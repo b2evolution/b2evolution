@@ -427,14 +427,37 @@ else
 
 // -------------------  Get existing userfields: -------------------------------
 $userfields = $DB->get_results( '
-	SELECT uf_ID, ufdf_ID, ufdf_type, ufdf_name, uf_varchar, ufdf_required
+	SELECT ufdf_ID, uf_ID, ufdf_type, ufdf_name, uf_varchar, ufdf_required
 		FROM T_users__fields
 			LEFT JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID
 	WHERE uf_user_ID = '.$user_id.'
-	ORDER BY ufdf_ID, uf_ID' );
+	
+	UNION
+	
+	SELECT ufdf_ID, "0" AS uf_ID, ufdf_type, ufdf_name, "" AS uf_varchar, ufdf_required
+		FROM T_users__fielddefs
+	WHERE ufdf_required IN ( "recommended", "require" )
+		AND ufdf_ID NOT IN ( SELECT uf_ufdf_ID FROM T_users__fields WHERE uf_user_ID = '.$user_id.' )
+	
+	ORDER BY 1, 2' );
 
+$uf_new_fields = param( 'uf_new', 'array' );
 foreach( $userfields as $userfield )
 {
+	$uf_val = param( 'uf_'.$userfield->uf_ID, 'string', NULL );
+
+	if( $userfield->uf_ID == '0' )
+	{ // Set uf_ID for new (not saved) fields (recommended & require types)
+		$userfield->uf_ID = 'new['.$userfield->ufdf_ID.']';
+		if( isset( $uf_new_fields[$userfield->ufdf_ID] ) )
+			$uf_val = $uf_new_fields[$userfield->ufdf_ID];
+	}
+	
+	if( is_null( $uf_val ) )
+	{ // No value submitted yet, get DB val:
+		$uf_val = $userfield->uf_varchar;
+	}
+
 	switch( $userfield->ufdf_ID )
 	{
 		case 10200:
@@ -459,12 +482,6 @@ foreach( $userfields as $userfield )
 			{
 				$field_note = '';
 			}
-	}
-
-	$uf_val = param( 'uf_'.$userfield->uf_ID, 'string', NULL );
-	if( is_null( $uf_val ) )
-	{	// No value submitted yet, get DB val:
-		$uf_val = $userfield->uf_varchar;
 	}
 
 	// Display existing field:
@@ -573,6 +590,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.50  2011/09/29 09:50:51  efy-yurybakh
+ * User fields
+ *
  * Revision 1.49  2011/09/28 10:50:00  efy-yurybakh
  * User additional info fields
  *

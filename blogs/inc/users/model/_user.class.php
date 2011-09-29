@@ -411,6 +411,24 @@ class User extends DataObject
 				$this->userfield_add( $new_uf_type, $new_uf_val );
 			}
 
+			// NEW recommended & require fields
+			$uf_new_fields = param( 'uf_new', 'array' );
+			if( count( $uf_new_fields ) > 0 )
+			{
+				$this->userfield_defs_load();
+				foreach( $uf_new_fields as $uf_new_id => $uf_new_val )
+				{
+					if( $uf_new_val != '' )
+					{ // Insert a new field in DB if it is filled
+						$this->userfield_add( (int)$uf_new_id, $uf_new_val );
+					}
+					elseif( empty($uf_new_val) && $this->userfield_defs[$uf_new_id][2] == 'require' )
+					{ // Display error for empty required field
+						param_error( 'uf_new['.$uf_new_id.']', T_('Please enter a value.') );
+					}
+				}
+			}
+
 			param( 'edited_user_postcode', 'string', true );
 			$this->set_from_Request('postcode', 'edited_user_postcode', true);
 			
@@ -2632,6 +2650,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.143  2011/09/29 09:50:51  efy-yurybakh
+ * User fields
+ *
  * Revision 1.142  2011/09/29 08:39:01  efy-yurybakh
  * - user_identity_link
  * - lightbox
