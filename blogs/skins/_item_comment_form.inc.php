@@ -136,10 +136,26 @@ function validateCommentForm(form)
 	}
 }
 
+function fadeIn( id, color )
+{
+	var bg_color = jQuery("#" + id).css( "backgroundColor" );
+	jQuery("#" + id).animate({ backgroundColor: color }, 200).animate({ backgroundColor: bg_color }, 200);
+}
 
 // Set comments vote
 function setCommentVote( id, type, vote )
 {
+	var divid = "vote_useful_" + id;
+	switch(vote)
+	{
+		case "no":
+			fadeIn(divid, "#ffc9c9");
+			break;
+		case "yes":
+			fadeIn(divid, "#bcffb5");
+			break;
+	};
+
 	$.ajax({
 	type: "POST",
 	url: "'.$htsrv_url.'anon_async.php",
@@ -290,6 +306,9 @@ function setCommentVote( id, type, vote )
 
 /*
  * $Log$
+ * Revision 1.30  2011/09/29 10:19:40  efy-yurybakh
+ * background color for voting for spam
+ *
  * Revision 1.29  2011/09/28 16:15:56  efy-yurybakh
  * "comment was helpful" votes
  *

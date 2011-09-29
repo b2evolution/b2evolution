@@ -15,7 +15,8 @@ function isDefined( variable )
 //Fade in background color
 function fadeIn( id, color )
 {
-	jQuery('#' + id).animate({ backgroundColor: color }, 200);
+	var bg_color = jQuery('#' + id).css( 'backgroundColor' );
+	jQuery('#' + id).animate({ backgroundColor: color }, 200).animate({ backgroundColor: bg_color }, 200);
 }
 
 function fadeInStatus( id, status )

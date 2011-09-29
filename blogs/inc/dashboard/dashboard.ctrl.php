@@ -240,7 +240,8 @@ if( $blog )
 			// Fade in background color
 			function fadeIn(id, color)
 			{
-				jQuery('#' + id).animate({ backgroundColor: color }, 200);
+				var bg_color = jQuery('#' + id).css( 'backgroundColor' );
+				jQuery('#' + id).animate({ backgroundColor: color }, 200).animate({ backgroundColor: bg_color }, 200);
 			}
 
 			// Delete comment author_url
@@ -759,6 +760,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.84  2011/09/29 10:19:40  efy-yurybakh
+ * background color for voting for spam
+ *
  * Revision 1.83  2011/09/28 16:15:56  efy-yurybakh
  * "comment was helpful" votes
  *
