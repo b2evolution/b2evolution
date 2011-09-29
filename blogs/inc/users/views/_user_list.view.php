@@ -87,7 +87,7 @@ $SQL->ORDER_BY( 'grp_name, *' );
 
 if( isset($collections_Module) )
 {	// We are handling blogs:
-	$SQL->SELECT_add( ', COUNT(blog_ID) AS nb_blogs' );
+	$SQL->SELECT_add( ', COUNT(DISTINCT blog_ID) AS nb_blogs' );
 	$SQL->FROM_add( ' LEFT JOIN T_blogs on user_ID = blog_owner_user_ID' );
 }
 else
@@ -402,6 +402,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.40  2011/09/29 16:31:53  sam2kb
+ * Blog count fix
+ *
  * Revision 1.39  2011/09/29 08:39:01  efy-yurybakh
  * - user_identity_link
  * - lightbox
