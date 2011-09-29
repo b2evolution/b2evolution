@@ -68,6 +68,7 @@ function create_default_data()
 {
 	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users;
 	global $DB, $locales, $current_locale;
+	global $test_install_all_features;
 
 	// Inserting sample data triggers events: instead of checking if $Plugins is an object there, just use a fake one..
 	load_class('plugins/model/_plugins_admin_no_db.class.php', 'Plugins_admin_no_DB' );
@@ -175,6 +176,10 @@ function create_default_data()
 	$User_Admin->set( 'domain', 'localhost' );
 	$User_Admin->set( 'level', 10 );
 	$User_Admin->set( 'locale', $default_locale );
+	if( $test_install_all_features )
+	{
+		$User_Admin->set( 'gender', 'F' );
+	}
 	$User_Admin->set_datecreated( $timestamp++ );
 	// Note: NEVER use database time (may be out of sync + no TZ control)
 	$User_Admin->set_Group( $Group_Admins );
@@ -801,7 +806,7 @@ function create_blog(
 	$kind = 'std', // standard blog; notorious variation: "photo"
 	$allow_rating = '' )
 {
-	global $default_locale;
+	global $default_locale, $test_install_all_features;
 
 	$Blog = new Blog( NULL );
 
@@ -816,6 +821,10 @@ function create_blog(
 
 	$Blog->set( 'access_type', 'relative' );
 	$Blog->set( 'siteurl', 'blog'.$Blog->ID.'.php' );
+	if( $test_install_all_features )
+	{
+		$allow_rating = 'any';
+	}
 	if( $allow_rating != '' )
 	{
 		$Blog->set_setting( 'allow_rating', $allow_rating );
@@ -841,6 +850,7 @@ function create_demo_contents()
 	global $DB;
 	global $default_locale;
 	global $Plugins;
+	global $test_install_all_features;
 
 	/**
 	 * @var FileRootCache
@@ -873,6 +883,10 @@ function create_demo_contents()
 	$User_Blogger->set( 'domain', 'localhost' );
 	$User_Blogger->set( 'level', 1 );
 	$User_Blogger->set( 'locale', $default_locale );
+	if( $test_install_all_features )
+	{
+		$User_Blogger->set( 'gender', 'M' );
+	}
 	$User_Blogger->set_datecreated( $timestamp++ );
 	$User_Blogger->set_Group( $Group_Bloggers );
 	$User_Blogger->dbinsert();
@@ -1316,10 +1330,34 @@ function create_demo_contents()
 	$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author,
 																				comment_author_email, comment_author_url, comment_author_IP,
 																				comment_date, comment_content, comment_karma)
-						VALUES( 1, 'comment', 'miss b2', 'missb2@example.com', 'http://example.com', '127.0.0.1',
+						VALUES( 30, 'comment', 'miss b2', 'missb2@example.com', 'http://example.com', '127.0.0.1',
 									 '$now', '".
 									 $DB->escape(T_('Hi, this is a comment.<br />To delete a comment, just log in, and view the posts\' comments, there you will have the option to edit or delete them.')). "', 0)";
 	$DB->query( $query );
+
+	if( $test_install_all_features )
+	{
+		$now = date('Y-m-d H:i:s');
+		$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author_ID, comment_author_IP,
+																			comment_date, comment_content, comment_karma, comment_notif_status)
+							VALUES( 30, 'comment', '1', '127.0.0.1', '$now', '".
+										 $DB->escape(T_('Hi, this is a comment.<br />From admin.')). "', 0, 'finished')";
+		$DB->query( $query );
+
+		$now = date('Y-m-d H:i:s');
+		$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author_ID, comment_author_IP,
+																			comment_date, comment_content, comment_karma, comment_notif_status)
+							VALUES( 30, 'comment', '2', '127.0.0.1', '$now', '".
+										 $DB->escape(T_('Hi, this is a comment.<br />From ablogger.')). "', 0, 'finished')";
+		$DB->query( $query );
+
+		$now = date('Y-m-d H:i:s');
+		$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author_ID, comment_author_IP,
+																			comment_date, comment_content, comment_karma, comment_notif_status)
+							VALUES( 30, 'comment', '3', '127.0.0.1', '$now', '".
+										 $DB->escape(T_('Hi, this is a comment.<br />From demouser.')). "', 0, 'finished')";
+		$DB->query( $query );
+	}
 
 	echo "OK.<br />\n";
 
@@ -1373,6 +1411,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.322  2011/09/29 11:29:28  efy-yurybakh
+ * add $test_install_all_features
+ *
  * Revision 1.321  2011/09/27 13:30:15  efy-yurybakh
  * spam vote checkbox
  *

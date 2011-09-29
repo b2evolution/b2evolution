@@ -335,6 +335,7 @@ function install_validate_requirements()
 function create_default_settings( $override = array() )
 {
 	global $DB, $new_db_version, $default_locale, $Group_Users;
+	global $test_install_all_features;
 
 	$defaults = array(
 		'db_version' => $new_db_version,
@@ -343,6 +344,10 @@ function create_default_settings( $override = array() )
 		'default_blog_ID' => 1,
 		'evocache_foldername' => '_evocache',
 	);
+	if( $test_install_all_features )
+	{
+		$defaults['gender_colored'] = 1;
+	}
 
 	$settings = array_merge( array_keys($defaults), array_keys($override) );
 	$settings = array_unique( $settings );
@@ -846,6 +851,9 @@ function get_antispam_query()
 
 /*
  * $Log$
+ * Revision 1.103  2011/09/29 11:29:30  efy-yurybakh
+ * add $test_install_all_features
+ *
  * Revision 1.102  2011/09/07 07:29:09  sam2kb
  * i18n update
  *

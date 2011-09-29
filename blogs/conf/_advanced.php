@@ -687,4 +687,6 @@ $evonetsrv_uri = '/evonetsrv/xmlrpc.php';
 $antispamsrv_host = 'antispam.b2evo.net';
 $antispamsrv_port = 80;
 $antispamsrv_uri = '/evonetsrv/xmlrpc.php';
+
+$test_install_all_features = false;
 ?>
