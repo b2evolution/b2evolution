@@ -228,6 +228,12 @@ switch( $tab )
 		$AdminUI->breadcrumbpath_add( T_('Direct hits'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab );
 		break;
 
+	case 'hits':
+		$AdminUI->breadcrumbpath_add( T_('Analytics'), '?ctrl=stats&amp;blog=$blog$' );
+		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
+		$AdminUI->breadcrumbpath_add( T_('Direct hits'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab );
+		break;
+
 	case 'referers':
 		$AdminUI->breadcrumbpath_add( T_('Analytics'), '?ctrl=stats&amp;blog=$blog$' );
 		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
@@ -404,6 +410,12 @@ switch( $AdminUI->get_path(1) )
 		$AdminUI->disp_view( 'sessions/views/_stats_direct.view.php' );
 		break;
 
+	case 'hits':
+		// Display VIEW:
+		$AdminUI->disp_view( 'sessions/views/_stats_all_hits.view.php' );
+		break;
+
+
 	case 'referers':
 		// Display VIEW:
 		$AdminUI->disp_view( 'sessions/views/_stats_referers.view.php' );
@@ -474,6 +486,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.32  2011/09/29 09:18:19  efy-vitalij
+ * add tab hits
+ *
  * Revision 1.31  2011/09/14 21:04:06  fplanque
  * cleanup
  *
