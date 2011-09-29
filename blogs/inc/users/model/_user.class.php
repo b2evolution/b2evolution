@@ -2204,21 +2204,23 @@ class User extends DataObject
 	{
 		global $Settings;
 
+		$gender_class = 'user';
+
 		if( ! $Settings->get('gender_colored') )
 		{ // Don't set a gender class if the setting is OFF
-			return '';
+			return $gender_class;
 		}
 
 		switch( $this->gender )
 		{ // Set a class name for each gender type
 			case 'M':
-				$gender_class = 'user man';
+				$gender_class .= ' man';
 				break;
 			case 'F':
-				$gender_class = 'user woman';
+				$gender_class .= ' woman';
 				break;
 			default:
-				$gender_class = 'user nogender';
+				$gender_class .= ' nogender';
 				break;
 		}
 
@@ -2661,6 +2663,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.146  2011/09/29 16:50:14  efy-yurybakh
+ * colored login
+ *
  * Revision 1.145  2011/09/29 16:42:19  efy-yurybakh
  * colored login
  *
