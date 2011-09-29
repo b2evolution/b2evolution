@@ -264,6 +264,9 @@ class sessions_Module extends Module
 								'other' => array(
 									'text' => T_('Direct B-hits'),
 									'href' => $dispatcher.'?ctrl=stats&amp;tab=other&amp;blog='.$blog ),
+								'hits' => array(
+									'text' => T_('All Hits'),
+									'href' => $dispatcher.'?ctrl=stats&amp;tab=hits&amp;blog='.$blog ),
 								'domains' => array(
 									'text' => T_('Referring domains'),
 									'href' => $dispatcher.'?ctrl=stats&amp;tab=domains&amp;blog='.$blog ),
@@ -376,6 +379,9 @@ $sessions_Module = new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.35  2011/09/29 09:16:16  efy-vitalij
+ * add menu item All Hits
+ *
  * Revision 1.34  2011/09/15 08:58:46  efy-asimo
  * Change user tabs display
  *
