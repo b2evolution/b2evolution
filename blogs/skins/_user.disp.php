@@ -113,6 +113,10 @@ $ProfileForm->begin_fieldset( T_('Additional info') );
 	// fp> TODO: have some clean iteration support
 	foreach( $User->userfields as $uf_ID => $uf_array )
 	{
+		if( $User->userfield_defs[$uf_array[0]][0] == 'text' )
+		{ // convert textarea values
+			$uf_array[1] = nl2br( $uf_array[1] );
+		}
 		$ProfileForm->info( $User->userfield_defs[$uf_array[0]][1], $uf_array[1] );
 	}
 
@@ -129,6 +133,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.27  2011/09/29 17:18:18  efy-yurybakh
+ * remove a pipes in textarea
+ *
  * Revision 1.26  2011/09/28 10:50:00  efy-yurybakh
  * User additional info fields
  *

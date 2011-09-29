@@ -217,12 +217,6 @@ global $form_action;
 		});
 
 		inputhint();
-
-		$('#user_checkchanges').submit(function(){
-			$("textarea").each(function(){
-				area2input($(this));
-			});
-		});
 	});
 
 
@@ -590,6 +584,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.51  2011/09/29 17:18:17  efy-yurybakh
+ * remove a pipes in textarea
+ *
  * Revision 1.50  2011/09/29 09:50:51  efy-yurybakh
  * User fields
  *
