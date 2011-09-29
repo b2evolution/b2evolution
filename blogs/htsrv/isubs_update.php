@@ -111,21 +111,57 @@ switch( $isub_type )
 	case 'isub_attend':
 		// Events are supported
 
+		$new_attendant = param( 'new_attendant', 'string', NULL );
+		if( !empty( $new_attendant ) )
+		{
+			$current_User->check_perm( 'users', 'edit', true );
+			$UserCache = & get_UserCache();
+			$new_attendant_User = $UserCache->get_by_login( $new_attendant );
+			if( $new_attendant_User )
+			{
+				$user_ID = $new_attendant_User->ID;
+			}
+			else
+			{
+				$Messages->add( sprintf( T_( 'Could not find user with %s login' ), $new_attendant ), 'error' );
+			}
+		}
+		elseif( $new_attendant !== NULL )
+		{
+			$Messages->add( T_( 'Please select a user' ), 'error' );
+		}
+		else
+		{
+			$user_ID = param( 'u', 'integer', NULL );
+		}
+
 		if( $Messages->has_errors() )
 		{ // errors detected
 			header_redirect();
 			// already exited here
 		}
 
-		if( set_user_attendant( $current_User->ID, $item_ID, $notify ) )
+		if( empty( $user_ID ) )
+		{ // user ID is empty, current User subscribed/unsubscribed
+			$user_ID = $current_User->ID;
+			$success_unsub_message = T_( 'You have successfully unsubscribed.' );
+			$success_sub_message = T_( 'You have successfully subscribed to attend this event.' );
+		}
+		else
+		{
+			$success_unsub_message = T_( 'User was successfully unsubscribed.' );
+			$success_sub_message = T_( 'User was successfully subscribed to attend this event.' );
+		}
+
+		if( set_user_attendant( $user_ID, $item_ID, $notify ) )
 		{
 			if( $notify == 0 )
 			{
-				$Messages->add( T_( 'You have successfully unsubscribed.' ), 'success' );
+				$Messages->add( $success_unsub_message, 'success' );
 			}
 			else
 			{
-				$Messages->add( T_( 'You have successfully subscribed to attend this event.' ), 'success' );
+				$Messages->add( $success_sub_message, 'success' );
 			}
 		}
 		else
@@ -142,6 +178,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.8  2011/09/29 15:26:56  efy-asimo
+ * Admin add/remove attendee feature.
+ *
  * Revision 1.7  2011/09/10 02:09:08  fplanque
  * doc
  *
