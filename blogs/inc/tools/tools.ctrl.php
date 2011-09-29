@@ -378,6 +378,26 @@ if( empty($tab) )
 
 		case 'create_test_hit':
 
+			$days = param( 'days', 'integer', 0 );
+			$min_interval = param( 'min_interval', 'integer', 0 );
+			$max_interval = param( 'max_interval', 'integer', 0 );
+
+			if ($days < 1)
+			{
+				param_error( 'days', T_('Please enter how many days of stats to generate') );
+				$action = 'show_create_test_hit';
+				break;
+			}
+
+			if (($min_interval > $max_interval) || ($min_interval < 0) || ($max_interval <= 0))
+			{
+				param_error( 'min_interval', T_('Please enter correct interval values') );
+				param_error( 'max_interval', T_('Please enter correct interval values') );
+				$action = 'show_create_test_hit';
+				break;
+			}
+			
+
 			load_class( 'items/model/_itemlistlight.class.php', 'ItemListLight' );
 
 			$links = array();
@@ -464,7 +484,7 @@ if( empty($tab) )
 
 			// Calculate the period of testing
 			$cur_time = time();
-			$past_time = mktime(date("H"),date("i"),date("s") ,date("m"),date("d")-10,date("Y"));
+			$past_time = mktime(date("H"),date("i"),date("s") ,date("m"),date("d")-$days,date("Y"));
 
 			$insert_data ='';
 			$insert_data_count = 0;
@@ -482,7 +502,7 @@ if( empty($tab) )
 			}
 
 			// main cycle of generation
-			for ($time_shift = $past_time; $cur_time > $time_shift; $time_shift += mt_rand(0, 5000))
+			for ($time_shift = $past_time; $cur_time > $time_shift; $time_shift += mt_rand($min_interval, $max_interval))
 			{
 
 				$insert_data_count = $insert_data_count + 1;
@@ -656,6 +676,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.48  2011/09/29 06:22:36  efy-vitalij
+ * add config params to statistic generator form
+ *
  * Revision 1.47  2011/09/28 09:05:58  efy-vitalij
  * add session functional to  statistical data generator
  *
