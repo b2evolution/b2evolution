@@ -824,6 +824,7 @@ function create_blog(
 	if( $test_install_all_features )
 	{
 		$allow_rating = 'any';
+		$Blog->set_setting( 'skin'.$blog_skin_ID.'_bubbletip', '1' );
 	}
 	if( $allow_rating != '' )
 	{
@@ -1411,6 +1412,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.323  2011/09/29 12:56:19  efy-yurybakh
+ * skin param for bubbletip
+ *
  * Revision 1.322  2011/09/29 11:29:28  efy-yurybakh
  * add $test_install_all_features
  *
