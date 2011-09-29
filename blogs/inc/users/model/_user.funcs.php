@@ -527,7 +527,7 @@ function get_user_preferences_url()
  * @param string On which user profile tab should this link point to
  * @return NULL|string NULL if this user or the profile tab doesn't exists, the identity link otherwise.
  */
-function get_user_identity_link( $user_login, $user_ID = NULL, $profile_tab = 'profile' )
+function get_user_identity_link( $user_login, $user_ID = NULL, $profile_tab = 'profile', $link_text = 'avatar' )
 {
 	$UserCache = & get_UserCache();
 
@@ -549,7 +549,7 @@ function get_user_identity_link( $user_login, $user_ID = NULL, $profile_tab = 'p
 		return NULL;
 	}
 
-	return $User->get_identity_link( array( 'profile_tab' => $profile_tab ) );
+	return $User->get_identity_link( array( 'profile_tab' => $profile_tab, 'link_text' => $link_text ) );
 }
 
 
@@ -574,12 +574,13 @@ function get_user_identity_url ( $user_ID = NULL, $profile_tab = 'profile', $red
 		}
 	}
 
-	if( $redirect_to == NULL )
+	if( $redirect_to == NULL && $redirect_to != false )
 	{
 		$redirect_to = rawurlencode( regenerate_url( '','','','&' ) );
 	}
 
-	if( ( !isset( $current_User ) ) || 
+	if( ( $profile_tab == 'user' && ! empty( $Blog ) ) ||
+		( !isset( $current_User ) ) || 
 		( ( $user_ID != NULL ) && ( $current_User->ID != $user_ID ) && ( ! $current_User->check_perm( 'users', 'view' ) ) ) )
 	{ // user is not logged in or current User is not the same as requested user, and current User doesn't have users view permission
 		if( empty( $Blog ) )
@@ -588,12 +589,25 @@ function get_user_identity_url ( $user_ID = NULL, $profile_tab = 'profile', $red
 		}
 		else
 		{ // can't display the profile form, display the front office User form
-			return url_add_param( $Blog->gen_blogurl(), 'disp=user&amp;user_ID='.$user_ID.'&amp;redirect_to='.$redirect_to );
+			$link = url_add_param( $Blog->gen_blogurl(), 'disp=user&amp;user_ID='.$user_ID );
+			if( isset( $redirect_to ) )
+			{
+				$link = url_add_param( $link, 'redirect_to='.$redirect_to );
+			}
+			return $link;
 		}
 	}
 
+	$profile_tab = 'profile';
 	// return the corresponding user profile tab url
-	return url_add_param( get_user_settings_url( $profile_tab, $user_ID ), 'redirect_to='.$redirect_to );
+	if( isset( $redirect_to ) )
+	{
+		return url_add_param( get_user_settings_url( $profile_tab, $user_ID ), 'redirect_to='.$redirect_to );
+	}
+	else
+	{
+		return get_user_settings_url( $profile_tab, $user_ID );
+	}
 }
 
 
@@ -621,7 +635,7 @@ function get_user_settings_url( $user_tab, $user_ID = NULL )
 		$is_admin_tab = false;
 	}
 
-	if( ( !$is_admin_tab ) && ( ! in_array( $user_tab, array( 'profile', 'avatar', 'pwdchange', 'userprefs' ) ) ) )
+	if( ( !$is_admin_tab ) && ( ! in_array( $user_tab, array( 'profile', 'user', 'avatar', 'pwdchange', 'userprefs' ) ) ) )
 	{
 		debug_die( 'Not supported user tab!' );
 	}
@@ -877,7 +891,7 @@ function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size
 			if( $link && $current_User->check_perm( 'users', 'view', false ) )
 			{ // Permission to view user details
 				// The user identity url always contains the best available user info page url
-				$img_tag = '<a href="'.get_user_identity_url( $User->ID ).'" class="'.$User->get_gender_class().'">'.$img_tag.'</a>';
+				$img_tag = '<a href="'.get_user_identity_url( $User->ID, 'user' ).'" class="'.$User->get_gender_class().'">'.$img_tag.'</a>';
 			}
 		}
 	}
@@ -1178,6 +1192,10 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.65  2011/09/29 08:39:01  efy-yurybakh
+ * - user_identity_link
+ * - lightbox
+ *
  * Revision 1.64  2011/09/27 17:31:19  efy-yurybakh
  * User additional info fields
  *

@@ -227,7 +227,7 @@ $Results->cols[] = array(
 						'th' => T_('Login'),
 						'th_class' => 'shrinkwrap',
 						'order' => 'user_login',
-						'td' => '<a href="?ctrl=user&amp;user_tab=profile&amp;user_ID=$user_ID$"><strong>$user_login$</strong></a>',
+						'td' => '%get_user_identity_link( #user_login#, #user_ID#, "profile", "text" )%',
 					);
 
 $Results->cols[] = array(
@@ -402,6 +402,10 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.39  2011/09/29 08:39:01  efy-yurybakh
+ * - user_identity_link
+ * - lightbox
+ *
  * Revision 1.38  2011/09/20 22:46:22  fplanque
  * fixes
  *

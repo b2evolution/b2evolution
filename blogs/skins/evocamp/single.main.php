@@ -82,7 +82,8 @@ skin_include( '_body_header.inc.php' );
 
 			<p class="postinfo">
 			<?php
-      	$Item->author( array(
+			$Item->author( array(
+					'profile_tab'  => 'user',
 					'before'       => T_('By').' ',
 					'after'        => ' ',
 				) );

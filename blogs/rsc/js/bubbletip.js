@@ -31,7 +31,7 @@ jQuery( document ).ready(function()
 					jQuery.ajax({ // Get user info
 						type: 'POST',
 						url: htsrv_url + 'anon_async.php',
-						data: 'action=get_user_bubbletip&userid=' + user_id,
+						data: 'action=get_user_bubbletip&userid=' + user_id + '&blog=' + blog_id,
 						success: function( result )
 						{
 							tip.html( result );

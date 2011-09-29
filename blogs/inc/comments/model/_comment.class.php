@@ -586,10 +586,16 @@ class Comment extends DataObject
 		if( ! $Settings->get('allow_avatars') )
 			return;
 
+		$author_link = get_user_identity_url( $this->author_user_ID, 'user' );
+
 		if( $comment_author_User = & $this->get_author_User() )
 		{	// Author is a user
 			if( $r = $comment_author_User->get_avatar_imgtag( $size, $class ) )
 			{	// Got an image
+				if( $author_link != '' )
+				{ // Add author link
+					$r = '<a href="'.$author_link.'">'.$r.'</a>';
+				}
 				return $r;
 			}
 		}
@@ -636,6 +642,10 @@ class Comment extends DataObject
 			$img_params['class'] = $class;
 		}
 		$imgtag = '<img'.get_field_attribs_as_string($img_params).' />';
+		if( $author_link != '' )
+		{ // Add author link
+			$imgtag = '<a href="'.$author_link.'">'.$imgtag.'</a>';
+		}
 
 		return $imgtag;
 	}
@@ -688,6 +698,7 @@ class Comment extends DataObject
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
+				'profile_tab'  => 'user',
 				'before'       => ' ',
 				'after'        => '#',
 				'before_user'  => '',
@@ -1668,7 +1679,7 @@ class Comment extends DataObject
 		{
 			foreach( $attachments['images'] as $image_File )
 			{ // show image attachments
-				echo $image_File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'], 'original', T_('Posted by ').$this->get_author_name(), 'lightbox[images]' );
+				echo $image_File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'], 'original', T_('Posted by ').$this->get_author_name(), 'lightbox[c'.$this->ID.']' );
 			}
 		}
 
@@ -2406,6 +2417,10 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.114  2011/09/29 08:39:01  efy-yurybakh
+ * - user_identity_link
+ * - lightbox
+ *
  * Revision 1.113  2011/09/28 16:15:56  efy-yurybakh
  * "comment was helpful" votes
  *

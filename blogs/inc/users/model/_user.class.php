@@ -2300,7 +2300,7 @@ class User extends DataObject
 			// set random value to link_rel, this way the pictures on the page won't be grouped
 			// this is usefull because the same avatar picture may appear more times in the same page
 			$link_rel = 'lightbox[f'.$File->ID.rand(0, 100000).']';
-			$r = $File->get_tag( '', '', '', '', $size, 'original', $File->get_name(), $link_rel, $class );
+			$r = $File->get_tag( '', '', '', '', $size, 'original', $this->login, $link_rel, $class );
 		}
 		else
 		{
@@ -2632,6 +2632,10 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.142  2011/09/29 08:39:01  efy-yurybakh
+ * - user_identity_link
+ * - lightbox
+ *
  * Revision 1.141  2011/09/28 10:49:59  efy-yurybakh
  * User additional info fields
  *

@@ -405,6 +405,7 @@ class Item extends ItemLight
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
+				'profile_tab'  => 'user',
 				'before'       => ' ',
 				'after'        => ' ',
 				'format'       => 'htmlbody',
@@ -4875,6 +4876,10 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.261  2011/09/29 08:39:01  efy-yurybakh
+ * - user_identity_link
+ * - lightbox
+ *
  * Revision 1.260  2011/09/27 08:55:29  efy-yurybakh
  * Add User::get_identity_link() everywhere
  *

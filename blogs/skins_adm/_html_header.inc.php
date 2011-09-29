@@ -54,7 +54,8 @@ headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache
 	add_js_headline( "// Paths used by JS functions:
 		var imgpath_expand = '".get_icon( 'expand', 'url' )."';
 		var imgpath_collapse = '".get_icon( 'collapse', 'url' )."';
-		var htsrv_url = '$htsrv_url';" );
+		var htsrv_url = '$htsrv_url';
+		var blog_id = '".param( 'blog', 'integer' )."';" );
 
 	add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
 	init_bubbletip_js(); // Add jQuery bubbletip plugin
@@ -280,6 +281,10 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.39  2011/09/29 08:39:01  efy-yurybakh
+ * - user_identity_link
+ * - lightbox
+ *
  * Revision 1.38  2011/09/26 19:46:02  efy-yurybakh
  * jQuery bubble tips
  *

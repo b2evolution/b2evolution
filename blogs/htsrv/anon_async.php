@@ -90,6 +90,11 @@ switch( $action )
 
 	case "get_user_bubbletip":
 		$user_login = param( 'userid', 'string' );
+		if( $blog_ID >0 )
+		{
+			$BlogCache = & get_BlogCache();
+			$Blog = $BlogCache->get_by_ID( $blog_ID );
+		}
 
 		echo '<div class="center">'.get_avatar_imgtag( $user_login, true, true, 'fit-160x160', 'avatar_above_login' ).'</div>';
 
@@ -126,6 +131,10 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.10  2011/09/29 08:39:00  efy-yurybakh
+ * - user_identity_link
+ * - lightbox
+ *
  * Revision 1.9  2011/09/28 16:15:56  efy-yurybakh
  * "comment was helpful" votes
  *

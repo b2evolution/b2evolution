@@ -125,3 +125,14 @@ span.icon{
 .action_icon.un:hover {
 	text-decoration: underline;
 }
+
+/* User Genders */
+.user_man{
+	color: #00F;
+}
+.user_woman{
+	color: #e100af;
+}
+.user_nogender{
+	color: #666;
+}

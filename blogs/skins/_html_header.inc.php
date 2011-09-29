@@ -38,9 +38,15 @@ init_bubbletip_js(); // Add jQuery bubbletip plugin
 	<?php robots_tag(); ?>
 	<?php 
 	global $htsrv_url;
+	$js_blog_id = "";
+	if( ! empty( $Blog ) )
+	{ // Set global js var "blog_id"
+		$js_blog_id = "\r\n		var blog_id = '".$Blog->ID."';";
+	}
 
 	add_js_headline( "// Paths used by JS functions:
-		var htsrv_url = '$htsrv_url';" );
+		var htsrv_url = '$htsrv_url';"
+		.$js_blog_id );
 	?>
 	<meta name="generator" content="b2evolution <?php app_version(); ?>" /> <!-- Please leave this for stats -->
 	<?php
