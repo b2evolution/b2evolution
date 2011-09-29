@@ -53,7 +53,13 @@ class photoblog_Skin extends Skin
 					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
 					'defaultvalue' => 1,
 					'type' => 'checkbox',
-				),				
+				),
+				'bubbletip' => array(
+					'label' => T_('Username bubble tips'),
+					'note' => T_('Check to enable bubble tips on usernames'),
+					'defaultvalue' => 0,
+					'type' => 'checkbox',
+				),
 			), parent::get_param_definitions( $params )	);
 
 		return $r;
@@ -81,6 +87,9 @@ class photoblog_Skin extends Skin
 
 /*
  * $Log$
+ * Revision 1.6  2011/09/29 12:22:24  efy-yurybakh
+ * skin param for bubbletip
+ *
  * Revision 1.5  2011/09/17 02:31:59  fplanque
  * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
  *

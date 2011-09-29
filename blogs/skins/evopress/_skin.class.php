@@ -64,7 +64,13 @@ class evopress_Skin extends Skin
 					'label' => T_('Colorbox Image Zoom'),
 					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
 					'defaultvalue' => 1,
-					'type'	=>	'checkbox',
+					'type' => 'checkbox',
+				),
+				'bubbletip' => array(
+					'label' => T_('Username bubble tips'),
+					'note' => T_('Check to enable bubble tips on usernames'),
+					'defaultvalue' => 0,
+					'type' => 'checkbox',
 				),
 			), parent::get_param_definitions( $params )	);
 
@@ -105,6 +111,9 @@ class evopress_Skin extends Skin
 
 /*
  * $Log$
+ * Revision 1.13  2011/09/29 12:22:24  efy-yurybakh
+ * skin param for bubbletip
+ *
  * Revision 1.12  2011/09/17 02:31:59  fplanque
  * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
  *

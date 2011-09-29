@@ -57,7 +57,13 @@ class intense_Skin extends Skin
 					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
 					'defaultvalue' => 1,
 					'type'	=>	'checkbox',
-				),							
+				),
+				'bubbletip' => array(
+					'label' => T_('Username bubble tips'),
+					'note' => T_('Check to enable bubble tips on usernames'),
+					'defaultvalue' => 0,
+					'type' => 'checkbox',
+				),
 			), parent::get_param_definitions( $params )	);
 
 		return $r;

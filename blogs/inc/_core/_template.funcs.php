@@ -985,6 +985,16 @@ function init_ratings_js( $relative_to = 'blog' )
  */
 function init_bubbletip_js( $relative_to = 'rsc_url' )
 {
+	global $Blog, $SkinCache;
+	if( ! empty( $Blog ) && ! empty ( $SkinCache ) )
+	{
+		$skin = & $SkinCache->get_by_ID( $Blog->get( 'skin_ID' ) );
+		if( ! $skin->get_setting( 'bubbletip' ) )
+		{ // If bubble tips is OFF for current Blog & Skin
+			return;
+		}
+	}
+	
 	require_js( '#jquery#', $relative_to ); // dependency
 	require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
 	require_js( 'bubbletip.js', $relative_to );
@@ -1352,6 +1362,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.107  2011/09/29 12:22:23  efy-yurybakh
+ * skin param for bubbletip
+ *
  * Revision 1.106  2011/09/27 09:18:42  efy-yurybakh
  * jQuery bubble tips (IE fix)
  *
