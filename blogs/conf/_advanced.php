@@ -114,6 +114,14 @@ $thumbnail_sizes = array(
  */
 $demo_mode = false;
 
+/**
+ * If enabled, this will create more demo contents and enable more features during install.
+ * This may result in an overloaded/bloated blog.
+ *
+ * @global boolean
+ */
+$test_install_all_features = false;
+
 
 /**
  * URL of the Home link at the top left.
@@ -687,6 +695,4 @@ $evonetsrv_uri = '/evonetsrv/xmlrpc.php';
 $antispamsrv_host = 'antispam.b2evo.net';
 $antispamsrv_port = 80;
 $antispamsrv_uri = '/evonetsrv/xmlrpc.php';
-
-$test_install_all_features = false;
 ?>
