@@ -37,6 +37,8 @@ require_once dirname(__FILE__).'/_stats_view.funcs.php';
 $exclude = param( 'exclude', 'integer', 0, true );
 $sess_ID = param( 'sess_ID', 'integer', NULL, true );
 $remote_IP = param( 'remote_IP', 'string', NULL, true );
+$referer_type = param( 'referer_type', 'string', NULL, true );
+$agent_type = param( 'agent_type', 'string', NULL, true );
 
 // Create result set:
 
@@ -69,6 +71,19 @@ elseif( !empty($remote_IP) ) // TODO: allow combine
 	$SQL->WHERE( $filter );
 	$CountSQL->WHERE( $filter );
 }
+if( !empty($referer_type) ) 
+{ 
+	$filter = 'hit_referer_type = ' .$DB->quote($referer_type);
+	$SQL->WHERE_and( $filter );
+	$CountSQL->WHERE_and( $filter );
+}
+
+if( !empty($agent_type) ) 
+{ 
+	$filter = 'hit_agent_type = '. $DB->quote($agent_type);
+	$SQL->WHERE_and( $filter );
+	$CountSQL->WHERE_and( $filter );
+}
 
 $Results = new Results( $SQL->get(), 'hits_', '--D', 20, $CountSQL->get() );
 
@@ -84,6 +99,26 @@ function filter_hits( & $Form )
 	$Form->checkbox_basic_input( 'exclude', get_param('exclude'), T_('Exclude').' &mdash; ' );
 	$Form->text_input( 'sess_ID', get_param('sess_ID'), 15, T_('Session ID'), '', array( 'maxlength'=>20 ) );
 	$Form->text_input( 'remote_IP', get_param('remote_IP'), 15, T_('Remote IP'), '', array( 'maxlength'=>23 ) );
+
+	$field_options = array ('0'			=> 'All',
+							'search'	=> 'Search',
+							'blacklist' => 'Blacklist',
+							'referer'	=> 'Referer',
+							'direct'	=> 'Direct',
+							'spam'		=> 'Spam',
+							'self'		=> 'Self',
+							);
+
+	$Form->select_input_array( 'referer_type', get_param('referer_type'), $field_options, 'Referer type', '', array('force_keys_as_values' => true) );
+
+	$field_options = array ('0'			=> 'All',
+							'rss'		=> 'RSS',
+							'robot'		=> 'Robot',
+							'browser'	=> 'Browser',
+							'unknown'	=> 'Unknown',
+							);
+
+	$Form->select_input_array( 'agent_type', get_param('agent_type'), $field_options, 'Referer type', '', array('force_keys_as_values' => true) );
 }
 $Results->filter_area = array(
 	'callback' => 'filter_hits',
@@ -91,6 +126,7 @@ $Results->filter_area = array(
 	'presets' => array(
 		'all' => array( T_('All'), '?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0' ),
 		'all_but_curr' => array( T_('All but current session'), '?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0&amp;sess_ID='.$Session->ID.'&amp;exclude=1' ),
+		'direct_hits' => array( T_('Direct hits'), '?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0&amp;referer_type=direct&amp;exclude=0' )
 		)
 	);
 
@@ -191,6 +227,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.17  2011/09/29 09:27:32  efy-vitalij
+ * add referer type and agent type filters and add direct hits filter link
+ *
  * Revision 1.16  2011/09/23 22:37:09  fplanque
  * minor / doc
  *
