@@ -186,12 +186,7 @@ if( in_array( 'login', $show_columns ) )
 		$User = & $UserCache->get_by_ID( $user_ID, false, false );
 		if( $User )
 		{
-			$identity_url = get_user_identity_url( $user_ID );
-			if( empty( $identity_url ) )
-			{ // current_User has no permission to view user settings, and Blog is empty
-				return '<strong>'.$User->login.'</strong>';
-			}
-			return '<a href="'.$identity_url.'"><strong>'.$User->login.'</strong></a>';
+			return get_user_identity_link( $User->login, $User->ID );
 		}
 		return '';
 	}
@@ -287,6 +282,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.17  2011/09/29 16:42:19  efy-yurybakh
+ * colored login
+ *
  * Revision 1.16  2011/09/27 07:45:58  efy-asimo
  * Front office messaging hot fixes
  *

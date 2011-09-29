@@ -84,6 +84,13 @@ switch( $action )
 		$comment_id = NULL;
 		$BlogCache = & get_BlogCache();
 		$Blog = $BlogCache->get_by_ID( $blog_ID );
+		$recipient_style = '';
+		if( $recipient_id >0 )
+		{
+			$RecipientCache = & get_UserCache();
+			$Recipient = $RecipientCache->get_by_ID( $recipient_id );
+			$recipient_style = ' class="'.$Recipient->get_gender_class().'"';
+		}
 
 		require $skins_path.'_contact_msg.form.php';
 		break;
@@ -131,6 +138,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.11  2011/09/29 16:42:18  efy-yurybakh
+ * colored login
+ *
  * Revision 1.10  2011/09/29 08:39:00  efy-yurybakh
  * - user_identity_link
  * - lightbox

@@ -772,7 +772,7 @@ class _core_Module extends Module
 
 		$entries = array(
 			'userprefs' => array(
-					'text' => ($current_User->has_avatar() ? $current_User->get_avatar_imgtag( 'crop-15x15', '', 'top' ).' ' : '' ).'<strong>'.$current_User->login.'</strong>',
+					'text' => ($current_User->has_avatar() ? $current_User->get_avatar_imgtag( 'crop-15x15', '', 'top' ).' ' : '' ).'<strong>'.$current_User->colored_name().'</strong>',
 					'href' => get_user_profile_url(),
 					'entries' => array(
 						'profile' => array(
@@ -850,16 +850,14 @@ class _core_Module extends Module
 				if( !empty( $Blog ) )
 				{
 					$entries['abswitch'] = array(
-							'text' => T_('Blog'),
-							'class' => 'icon switch-to-blog',
+							'text' => T_('Blog').' '.get_icon('switch-to-blog'),
 							'href' => $Blog->get( 'url' ),
 						);
 				}
 				else
 				{
 					$entries['abswitch'] = array(
-							'text' => T_('Home'),
-							'class' => 'icon switch-to-blog',
+							'text' => T_('Home').' '.get_icon('switch-to-blog'),
 							'href' => $home_url,
 						);
 				}
@@ -867,8 +865,7 @@ class _core_Module extends Module
 			else
 			{
 				$entries['abswitch'] = array(
-						'text' => T_('Admin'),
-						'class' => 'icon switch-to-admin',
+						'text' => T_('Admin').' '.get_icon('switch-to-admin'),
 						'href' => $admin_url,
 					);
 			}
@@ -878,8 +875,8 @@ class _core_Module extends Module
 
 		$topright_Menu->add_menu_entries( NULL, array(
 			'logout' => array(
-				'text' => T_('Logout'),
-				'class' => 'icon logout',
+				'text' => T_('Logout').' '.get_icon('close'),
+				'class' => 'rollover',
 				'href' => get_user_logout_url(),
 				)
 		 ) );
@@ -1052,6 +1049,12 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.83  2011/09/29 16:42:18  efy-yurybakh
+ * colored login
+ *
+ * Revision 1.82  2011/09/23 11:30:51  efy-yurybakh
+ * Make a big sprite with all backoffice icons
+ *
  * Revision 1.81  2011/09/22 07:43:43  efy-yurybakh
  * icons in a single sprite
  *

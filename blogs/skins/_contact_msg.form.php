@@ -32,7 +32,7 @@ $Form = new Form( $submit_url );
 
 	<fieldset>
 		<div class="label"><label><?php echo T_('To')?>:</label></div>
-		<div class="info"><strong><?php echo $recipient_name;?></strong></div>
+		<div class="info"><strong<?php echo $recipient_style;?>><?php echo $recipient_name;?></strong></div>
 	</fieldset>
 
 	<?php
@@ -76,6 +76,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.10  2011/09/29 16:42:19  efy-yurybakh
+ * colored login
+ *
  * Revision 1.9  2011/09/27 07:45:58  efy-asimo
  * Front office messaging hot fixes
  *

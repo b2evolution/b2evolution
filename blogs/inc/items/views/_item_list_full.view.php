@@ -161,13 +161,7 @@ while( $Item = & $ItemList->get_item() )
 					) );
 
 				// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
-				echo ' ', T_('by'), ' <acronym title="';
-				$Item->creator_User->login();
-				echo ', '.T_('level:');
-				$Item->creator_User->level();
-				echo '"><span class="bAuthor">';
-				$Item->creator_User->preferred_name();
-				echo '</span></acronym>';
+				echo ' ', T_('by'), ' ', $Item->creator_User->colored_name();
 
 				echo '<div class="bSmallHeadRight">';
 				$Item->status( array(
@@ -432,7 +426,7 @@ while( $Item = & $ItemList->get_item() )
 				<fieldset>
 					<div class="label"><?php echo T_('User') ?>:</div>
 					<div class="info">
-						<strong><?php $current_User->preferred_name()?></strong>
+						<strong><?php echo $current_User->colored_name()?></strong>
 						<?php user_profile_link( ' [', ']', T_('Edit profile') ) ?>
 						</div>
 				</fieldset>
@@ -473,6 +467,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.52  2011/09/29 16:42:19  efy-yurybakh
+ * colored login
+ *
  * Revision 1.51  2011/09/04 22:13:17  fplanque
  * copyright 2011
  *

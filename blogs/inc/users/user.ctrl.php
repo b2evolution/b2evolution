@@ -342,7 +342,7 @@ require_js_helper( 'colorbox', 'rsc_url' );
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
 $AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
-$AdminUI->breadcrumbpath_add( $edited_User->login, '?ctrl=user&amp;user_ID='.$edited_User->ID );
+$AdminUI->breadcrumbpath_add( $edited_User->colored_name(), '?ctrl=user&amp;user_ID='.$edited_User->ID );
 switch( $user_tab )
 {
 	case 'profile':
@@ -443,6 +443,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.36  2011/09/29 16:42:19  efy-yurybakh
+ * colored login
+ *
  * Revision 1.35  2011/09/23 07:41:57  efy-asimo
  * Unified usernames everywhere in the app - first part
  *

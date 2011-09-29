@@ -791,7 +791,7 @@ class User extends DataObject
 		$link_title = T_( 'Show the user profile' );
 		$link_text = '<span class="nowrap">'.$avatar_tag.$link_login.'</span>';
 		$link_class = $this->get_gender_class().( $avatar_tag == '' ? ' userbubble' : '' );
-		return '<a id="username_'.$this->login.'"  href="'.$identity_url.'" title="'.$link_title.'" class="'.$link_class.'">'.$link_text.'</a>';
+		return '<a id="username_'.$this->login.'" href="'.$identity_url.'" title="'.$link_title.'" class="'.$link_class.'">'.$link_text.'</a>';
 	}
 
 
@@ -2115,6 +2115,17 @@ class User extends DataObject
 
 
 	/**
+	 * Template function: display user's preferred name with gender color
+	 *
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function colored_name( $format = 'htmlbody' )
+	{
+		return '<span class="'.$this->get_gender_class().'">'.format_to_output( $this->get_preferred_name(), $format ).'</span>';
+	}
+
+
+	/**
 	 * Template function: display user's URL
 	 *
 	 * @param string string to display before the date (if changed)
@@ -2650,6 +2661,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.145  2011/09/29 16:42:19  efy-yurybakh
+ * colored login
+ *
  * Revision 1.144  2011/09/29 13:01:49  efy-yurybakh
  * user gender class
  *

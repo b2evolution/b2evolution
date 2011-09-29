@@ -1712,7 +1712,7 @@ class Blog extends DataObject
 				$owner = $owner_User->get( 'fullname' );
 				if( empty($owner) )
 				{
-					$owner = $owner_User->get_preferred_name();
+					$owner = $owner_User->colored_name();
 				}
 				return $owner;
 
@@ -2480,6 +2480,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.145  2011/09/29 16:42:19  efy-yurybakh
+ * colored login
+ *
  * Revision 1.144  2011/09/28 12:09:53  efy-yurybakh
  * "comment was helpful" votes (new tab "comments")
  *

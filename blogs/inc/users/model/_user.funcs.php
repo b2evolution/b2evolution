@@ -1168,7 +1168,7 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 	global $AdminUI;
 
 	// set title
-	$form_title = '<span class="user_title">'.sprintf( '%s &ndash; %s', $edited_User->dget('fullname').' &laquo;'.$edited_User->dget('login').'&raquo;', $user_tab_title ).'</span>';
+	$form_title = '<span class="user_title">'.sprintf( '%s &ndash; %s', $edited_User->dget('fullname').' &laquo;'.$edited_User->colored_name().'&raquo;', $user_tab_title ).'</span>';
 
 	// set avatar tag
 	if( $edited_User->has_avatar() )
@@ -1192,6 +1192,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.66  2011/09/29 16:42:19  efy-yurybakh
+ * colored login
+ *
  * Revision 1.65  2011/09/29 08:39:01  efy-yurybakh
  * - user_identity_link
  * - lightbox

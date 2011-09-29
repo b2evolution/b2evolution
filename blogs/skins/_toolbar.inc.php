@@ -78,7 +78,7 @@ $Plugins->trigger_event( 'AdminAfterEvobarInit' );
 		<?php
 			// Display evobar menu:
 			echo $topright_Menu->get_html_menu( NULL, 'sf-menu-right' );
- 		?>
+		?>
 	</div>
 	<div class="actions_left">
 		<?php
@@ -92,7 +92,7 @@ $Plugins->trigger_event( 'AdminAfterEvobarInit' );
 				echo '<div style="position:relative;left:5px;top:-7px;color:#999;z-index:-1;">'.$disp_detail.'</div>';
 			}
 		}
- 		?>
+		?>
 	</div>
 </div>
 
