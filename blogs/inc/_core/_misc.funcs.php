@@ -3031,12 +3031,16 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 
 
 		case 'imgtag':
-			if( !isset( $icon['file'] ) )
+			if( ! isset( $icon['file'] ) )
 			{ // Use span tag with sprite instead of img
 				$styles = array();
 				if( isset( $icon['xy'] ) )
 				{ // Set background position in the icons_sprite.png
 					$styles[] = "background-position: -".$icon['xy'][0]."px -".$icon['xy'][1]."px";
+				}
+				if( isset( $params['size'] ) )
+				{
+					$icon['size'] = $params['size'];
 				}
 				if( isset( $icon['size'] ) )
 				{ // Set width & height
@@ -3118,6 +3122,12 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			/* BREAK */
 
 		case 'noimg':
+			// Include size (optional):
+			if( isset( $icon['size'] ) )
+			{
+				$params['size'] = $icon['size'];
+			}
+
 			return get_icon( 'pixel', 'imgtag', $params );
 			/* BREAK */
 			/*
@@ -4429,6 +4439,9 @@ function generate_random_ip()
 
 /*
  * $Log$
+ * Revision 1.284  2011/09/29 12:48:22  efy-yurybakh
+ * fix the "blank" icon
+ *
  * Revision 1.283  2011/09/28 04:14:41  efy-yurybakh
  * fix pixel
  *
