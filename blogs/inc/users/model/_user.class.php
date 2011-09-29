@@ -2201,13 +2201,13 @@ class User extends DataObject
 		switch( $this->gender )
 		{ // Set a class name for each gender type
 			case 'M':
-				$gender_class = 'user_man';
+				$gender_class = 'user man';
 				break;
 			case 'F':
-				$gender_class = 'user_woman';
+				$gender_class = 'user woman';
 				break;
 			default:
-				$gender_class = 'user_nogender';
+				$gender_class = 'user nogender';
 				break;
 		}
 
@@ -2650,6 +2650,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.144  2011/09/29 13:01:49  efy-yurybakh
+ * user gender class
+ *
  * Revision 1.143  2011/09/29 09:50:51  efy-yurybakh
  * User fields
  *

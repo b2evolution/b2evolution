@@ -127,12 +127,15 @@ span.icon{
 }
 
 /* User Genders */
-.user_man{
+.user{
+	font-weight: bold;
+}
+.user.man{
 	color: #00F;
 }
-.user_woman{
+.user.woman{
 	color: #e100af;
 }
-.user_nogender{
+.user.nogender{
 	color: #666;
 }
