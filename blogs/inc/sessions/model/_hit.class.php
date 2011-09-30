@@ -173,7 +173,7 @@ class Hit
 	 *
 	 * This may INSERT a basedomain and a useragent but NOT the HIT itself!
 	 */
-	function Hit()
+	function Hit( $referer = NULL )
 	{
 		global $debug;
 
@@ -183,7 +183,7 @@ class Hit
 		// Check the REFERER and determine referer_type:
 		// TODO: dh> move this out of here, too, only if "antispam_block_spam_referers" is true,
 		//           do something about it (here or somewhere else, but early).
-		$this->detect_referer(); // May EXIT if we are set up to block referer spam.
+		$this->detect_referer( $referer ); // May EXIT if we are set up to block referer spam.
 
 		if( $debug )
 		{
@@ -252,14 +252,22 @@ class Hit
 	 *
 	 * referer_type: enum('search', 'blacklist', 'referer', 'direct'); 'spam' gets used internally
 	 */
-	function detect_referer()
+	function detect_referer( $referer = NULL )
 	{
 		global $Debuglog, $debug;
 		global $self_referer_list, $blackList;  // used to detect $referer_type
 		global $skins_path;
 		global $Settings;
 
-		$this->referer = $this->get_referer();
+		if( isset($referer) )
+		{
+			$this->referer = $referer;
+		}
+		else
+		{
+			$this->referer = $this->get_referer();
+		}
+
 
 		if( empty($this->referer) )
 		{	// NO referer
@@ -728,7 +736,7 @@ class Hit
 		{
 			$DB->commit();
 		}
-		
+
 		$s = get_param("s");
 		if( !empty($s) && !empty($blog_ID) )
 		{	// Record Internal Search:
@@ -738,7 +746,7 @@ class Hit
 			$internal_searches->set("hit_ID" , $hit_ID);
 			$internal_searches->set("keywords" , get_param("s") );
 			$internal_searches->dbinsert();
-		}		
+		}
 		$this->ID = $hit_ID;
 	}
 
@@ -996,7 +1004,7 @@ class Hit
 		static $countries;
 
 		if( !isset($countries) )
-		{	// Load 2 letter ISO country codes 
+		{	// Load 2 letter ISO country codes
 			$countries = implode( '|', $this->get_country_codes() );
 		}
 
@@ -1047,7 +1055,7 @@ class Hit
 			if( ! empty($current_User->ID) )
 			{ // select by user ID: one user counts really just once. May be even faster than the anonymous query below..!?
 				$sql = "
-					SELECT SQL_NO_CACHE hit_ID FROM T_hitlog 
+					SELECT SQL_NO_CACHE hit_ID FROM T_hitlog
 					 WHERE hit_sess_ID = ".$Session->ID."
 						 AND hit_uri = '".$DB->escape( substr($ReqURI, 0, 250) )."'
 					 LIMIT 1";
@@ -1297,7 +1305,7 @@ class Hit
 				$ie = $ie[0];
 			}
 		}
-		
+
 		$key = convert_charset($key, $evo_charset, $ie);
 		$key = evo_strtolower($key);
 
@@ -1479,6 +1487,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.69  2011/09/30 13:18:03  fplanque
+ * example
+ *
  * Revision 1.68  2011/09/20 18:09:04  sam2kb
  * New methods: is_browser() & is_robot()
  *
