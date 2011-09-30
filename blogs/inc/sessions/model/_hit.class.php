@@ -173,12 +173,18 @@ class Hit
 	 *
 	 * This may INSERT a basedomain and a useragent but NOT the HIT itself!
 	 */
-	function Hit( $referer = NULL )
+	function Hit( $referer = NULL, $IP = NULL )
 	{
 		global $debug;
 
-		// Get the first IP in the list of REMOTE_ADDR and HTTP_X_FORWARDED_FOR
-		$this->IP = get_ip_list( true );
+		if( isset($IP) )
+		{
+			$this->IP = $IP;
+		}
+		else
+		{	// Get the first IP in the list of REMOTE_ADDR and HTTP_X_FORWARDED_FOR
+			$this->IP = get_ip_list( true );
+		}
 
 		// Check the REFERER and determine referer_type:
 		// TODO: dh> move this out of here, too, only if "antispam_block_spam_referers" is true,
@@ -1487,6 +1493,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.70  2011/09/30 13:23:08  fplanque
+ * no message
+ *
  * Revision 1.69  2011/09/30 13:18:03  fplanque
  * example
  *
