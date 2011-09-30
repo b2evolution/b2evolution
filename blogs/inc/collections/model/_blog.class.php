@@ -400,6 +400,9 @@ class Blog extends DataObject
 		if( param( 'comment_feed_content', 'string', NULL ) !== NULL )
 		{ // How much content in comment feeds?
 			$this->set_setting( 'comment_feed_content', get_param( 'comment_feed_content' ) );
+
+			param_integer_range( 'comments_per_feed', 1, 9999, T_('Comments per feed must be between %d and %d.') );
+			$this->set_setting( 'comments_per_feed', get_param( 'comments_per_feed' ) );
 		}
 
 		if( param( 'require_title', 'string', NULL ) !== NULL )
@@ -2480,6 +2483,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.146  2011/09/30 04:56:39  efy-yurybakh
+ * RSS feed settings
+ *
  * Revision 1.145  2011/09/29 16:42:19  efy-yurybakh
  * colored login
  *

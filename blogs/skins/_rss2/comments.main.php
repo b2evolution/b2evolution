@@ -41,7 +41,7 @@ $CommentList->set_filters( array(
 		'statuses' => array ( 'published' ),
 		'post_ID' => $post_ID,
 		'order' => 'DESC',
-		'comments' => $Blog->get_setting('posts_per_feed'),
+		'comments' => $Blog->get_setting('comments_per_feed'),
 	) );
 
 // Get ready for display (runs the query):

@@ -135,6 +135,7 @@ class CollectionSettings extends AbstractSettings
 
 		// Comment feed settings:
 			'comment_feed_content' => 'normal',
+			'comments_per_feed' => '8',
 
 		// Sitemaps settings:
 			'enable_sitemaps' => 1,
@@ -191,6 +192,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.64  2011/09/30 04:56:39  efy-yurybakh
+ * RSS feed settings
+ *
  * Revision 1.63  2011/09/28 12:09:53  efy-yurybakh
  * "comment was helpful" votes (new tab "comments")
  *
