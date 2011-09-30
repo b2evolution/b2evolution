@@ -44,6 +44,11 @@ global $DB;
 
 global $collections_Module;
 
+if( !isset( $display_params ) )
+{ // init display_params
+	$display_params = array();
+}
+
 // query which groups have users (in order to prevent deletion of groups which have users)
 global $usedgroups;	// We need this in a callback below
 $usedgroups = $DB->get_col( 'SELECT grp_ID
@@ -397,11 +402,14 @@ else
 
 
 // Display result :
-$Results->display();
+$Results->display( $display_params );
 
 
 /*
  * $Log$
+ * Revision 1.41  2011/09/30 12:24:56  efy-yurybakh
+ * User directory
+ *
  * Revision 1.40  2011/09/29 16:31:53  sam2kb
  * Blog count fix
  *

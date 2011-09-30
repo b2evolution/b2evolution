@@ -481,6 +481,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_sitemap'        => '_sitemap.disp.php',
 				'disp_subs'           => '_subs.disp.php',
 				'disp_user'           => '_user.disp.php',
+				'disp_users'          => '_users.disp.php',
 			);
 
 		// Add plugin disp handlers:
@@ -921,6 +922,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.106  2011/09/30 12:24:56  efy-yurybakh
+ * User directory
+ *
  * Revision 1.105  2011/09/26 14:53:27  efy-asimo
  * Login problems with multidomain installs - fix
  * Insert globals: samedomain_htsrv_url, secure_htsrv_url;

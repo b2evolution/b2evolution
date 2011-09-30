@@ -366,6 +366,7 @@ function request_title( $params = array() )
 			'pwdchange_text'      => T_('Password change'),
 			'userprefs_text'      => T_('User preferences'),
 			'user_text'           => T_('User'),
+			'users_text'           => T_('Users'),
 			'subs_text'           => T_('Subscriptions'),
 			'comments_text'       => T_('Latest Comments'),
 			'feedback-popup_text' => T_('Feedback'),
@@ -534,6 +535,11 @@ function request_title( $params = array() )
 		case 'user':
 			// We are requesting the message form:
 			$r[] = $params['user_text'];
+			break;
+
+		case 'users':
+			// We are requesting the message form:
+			$r[] = $params['users_text'];
 			break;
 
 		default:
@@ -1362,6 +1368,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.108  2011/09/30 12:24:56  efy-yurybakh
+ * User directory
+ *
  * Revision 1.107  2011/09/29 12:22:23  efy-yurybakh
  * skin param for bubbletip
  *

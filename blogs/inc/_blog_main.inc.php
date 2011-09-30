@@ -603,6 +603,7 @@ if( !empty( $skin ) )
 					'threads'        => 'threads.main.php',
 					'messages'       => 'messages.main.php',
 					'contacts'       => 'contacts.main.php',
+					'users'          => 'users.main.php',
 					// All others will default to index.main.php
 				);
 
@@ -668,6 +669,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.175  2011/09/30 12:24:56  efy-yurybakh
+ * User directory
+ *
  * Revision 1.174  2011/09/17 02:31:59  fplanque
  * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
  *
