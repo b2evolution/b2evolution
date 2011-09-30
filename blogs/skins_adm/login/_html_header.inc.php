@@ -42,9 +42,12 @@ headers_content_mightcache( 'text/html', 0 );		// NEVER cache the login pages!
 
 <div class="loginblock">
 
-<?php if( isset($page_icon) ) { ?>
-<img src="<?php echo $rsc_url.'icons/'.$page_icon ?>" width="24" height="24" style="float:left; margin-right:4px" alt="" />
-<?php } ?>
+<?php
+if( isset($page_icon) )
+{
+	echo get_icon($page_icon, 'imgtag', array( 'style' => 'float:left' ) );
+}
+?>
 
 <h2 class="logintitle"><?php echo $page_title ?></h2>
 
@@ -65,6 +68,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.17  2011/09/30 10:16:50  efy-yurybakh
+ * Make a big sprite with all backoffice icons
+ *
  * Revision 1.16  2011/09/07 22:44:41  fplanque
  * UI cleanup
  *

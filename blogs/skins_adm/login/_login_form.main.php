@@ -47,7 +47,7 @@ if( $Session->has_User() )
  * Include page header (also displays Messages):
  */
 $page_title = T_('Log in to your account');
-$page_icon = 'icon_login.gif';
+$page_icon = 'login';
 
 /*
   fp> The login page is small. Let's use it as a preloader for the backoffice (which is awfully slow to initialize)
@@ -231,6 +231,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.32  2011/09/30 10:16:51  efy-yurybakh
+ * Make a big sprite with all backoffice icons
+ *
  * Revision 1.31  2011/09/26 14:53:27  efy-asimo
  * Login problems with multidomain installs - fix
  * Insert globals: samedomain_htsrv_url, secure_htsrv_url;

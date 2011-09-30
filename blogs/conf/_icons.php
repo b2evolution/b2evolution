@@ -505,7 +505,7 @@ function get_icon_info($name)
 		case 'feed': return array(
 			'alt'	 => T_('XML Feed'),
 			'size' => array( 16, 16 ),
-			'xy' => array( 0, 160 )
+			'xy' => array( 128, 160 )
 		);
 
 		case 'recycle_full': return array(
@@ -570,11 +570,31 @@ function get_icon_info($name)
 			'size' => array( 13, 16 ),
 			'xy' => array( 128, 144 )
 		);
+
+		case 'login': return array(
+			'alt'  => T_('Login'),
+			'size' => array( 24, 24 ),
+			'xy' => array( 0, 176 )
+		);
+		case 'register': return array(
+			'alt'  => T_('Register'),
+			'size' => array( 24, 24 ),
+			'xy' => array( 24, 176 )
+		);
+
+		case 'magnifier': return array(
+			'alt'  => T_('Log as a search instead'),
+			'size' => array( 14, 13 ),
+			'xy' => array( 144, 160 )
+		);
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.87  2011/09/30 10:16:49  efy-yurybakh
+ * Make a big sprite with all backoffice icons
+ *
  * Revision 1.86  2011/09/28 16:15:56  efy-yurybakh
  * "comment was helpful" votes
  *

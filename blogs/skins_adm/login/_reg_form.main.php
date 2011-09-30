@@ -36,7 +36,7 @@ load_class( 'regional/model/_country.class.php', 'Country' );
  * Include page header:
  */
 $page_title = T_('New account creation');
-$page_icon = 'icon_register.gif';
+$page_icon = 'register';
 require dirname(__FILE__).'/_html_header.inc.php';
 
 // set secure htsrv url with the same domain as the request has
@@ -102,6 +102,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.32  2011/09/30 10:16:51  efy-yurybakh
+ * Make a big sprite with all backoffice icons
+ *
  * Revision 1.31  2011/09/26 09:08:14  efy-vitalij
  * remake select_input_object to select_country field
  *

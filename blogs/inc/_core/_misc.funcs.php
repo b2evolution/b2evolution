@@ -3039,7 +3039,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					$styles[] = "background-position: -".$icon['xy'][0]."px -".$icon['xy'][1]."px";
 				}
 				if( isset( $params['size'] ) )
-				{
+				{ // Get sizes from params
 					$icon['size'] = $params['size'];
 				}
 				if( isset( $icon['size'] ) )
@@ -3052,6 +3052,10 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					{
 						$styles[] = "height: ".$icon['size'][1]."px; line-height: ".$icon['size'][1]."px";
 					}
+				}
+				if( isset( $params['style'] ) )
+				{ // Get styles from params
+					$styles[] = $params['style'];
 				}
 				$styles = count($styles) > 0 ? ' style="'.implode( '; ', $styles).'"' : '';
 
@@ -3127,6 +3131,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			{
 				$params['size'] = $icon['size'];
 			}
+			$params['style'] = 'margin: 0 2px';
 
 			return get_icon( 'pixel', 'imgtag', $params );
 			/* BREAK */
@@ -4439,6 +4444,9 @@ function generate_random_ip()
 
 /*
  * $Log$
+ * Revision 1.285  2011/09/30 10:16:50  efy-yurybakh
+ * Make a big sprite with all backoffice icons
+ *
  * Revision 1.284  2011/09/29 12:48:22  efy-yurybakh
  * fix the "blank" icon
  *

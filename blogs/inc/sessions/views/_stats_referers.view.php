@@ -70,9 +70,7 @@ if( $current_User->check_perm( 'stats', 'edit' ) )
 
 			.'<a href="%regenerate_url( \'action\', \'action=changetype&amp;new_hit_type=search&amp;hit_ID=$hit_ID$\')%" title="'
 			.T_('Log as a search instead')
-			.'"><img src="'.$rsc_url.'icons/magnifier.png" width="14" height="13" class="middle" alt="'
-			./* TRANS: Abbrev. for "move to searches" (stats) */ T_('-&gt;S')
-			.'" title="'.T_('Log as a search instead').'" /></a> '
+			.'">'.get_icon( 'magnifier' ).'</a> '
 
 			.'<a href="$hit_referer$" target="_blank">$dom_name$</a>';
 }
@@ -210,6 +208,9 @@ if( count( $res_stats ) )
 
 /*
  * $Log$
+ * Revision 1.18  2011/09/30 10:16:50  efy-yurybakh
+ * Make a big sprite with all backoffice icons
+ *
  * Revision 1.17  2011/09/04 22:13:18  fplanque
  * copyright 2011
  *

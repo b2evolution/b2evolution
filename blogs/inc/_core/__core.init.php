@@ -876,7 +876,7 @@ class _core_Module extends Module
 		$topright_Menu->add_menu_entries( NULL, array(
 			'logout' => array(
 				'text' => T_('Logout').' '.get_icon('close'),
-				'class' => 'rollover',
+				'class' => 'rollover_sprite',
 				'href' => get_user_logout_url(),
 				)
 		 ) );
@@ -1049,6 +1049,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.84  2011/09/30 10:16:50  efy-yurybakh
+ * Make a big sprite with all backoffice icons
+ *
  * Revision 1.83  2011/09/29 16:42:18  efy-yurybakh
  * colored login
  *

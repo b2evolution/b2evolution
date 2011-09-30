@@ -32,7 +32,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Include page header:
  */
 $page_title = T_('Lost password ?');
-$page_icon = 'icon_login.gif';
+$page_icon = 'login';
 require dirname(__FILE__).'/_html_header.inc.php';
 
 $Form = new Form( $secure_htsrv_url.'login.php', '', 'post', 'fieldset' );
@@ -65,6 +65,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.15  2011/09/30 10:16:51  efy-yurybakh
+ * Make a big sprite with all backoffice icons
+ *
  * Revision 1.14  2011/09/26 14:53:27  efy-asimo
  * Login problems with multidomain installs - fix
  * Insert globals: samedomain_htsrv_url, secure_htsrv_url;

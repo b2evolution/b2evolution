@@ -564,14 +564,7 @@ function get_user_identity_url ( $user_ID = NULL, $profile_tab = 'profile', $red
 
 	if( $user_ID == NULL )
 	{
-		if( isset( $current_User ) )
-		{
-			$user_ID = $current_User->ID;
-		}
-		else
-		{
-			return NULL;
-		}
+		return NULL;
 	}
 
 	if( $redirect_to == NULL && $redirect_to != false )
@@ -1192,6 +1185,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.67  2011/09/30 10:16:50  efy-yurybakh
+ * Make a big sprite with all backoffice icons
+ *
  * Revision 1.66  2011/09/29 16:42:19  efy-yurybakh
  * colored login
  *
