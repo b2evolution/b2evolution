@@ -327,39 +327,28 @@ class User extends DataObject
 				param_error( 'edited_user_login', $error_message );
 			}
 
+			// Load all defined userfields for following checking of required fields
+			$this->userfield_defs_load();
+
 			// EXPERIMENTAL user fields & EXISTING fields:
 			// Get indices of existing userfields:
-			$userfield_IDs = $DB->get_col( '
-						SELECT uf_ID
+			$userfield_IDs = $DB->get_results( '
+						SELECT uf_ID, uf_ufdf_ID
 							FROM T_users__fields
 						 WHERE uf_user_ID = '.$this->ID );
 
-			foreach( $userfield_IDs as $userfield_ID )
+			foreach( $userfield_IDs as $userfield )
 			{
-				$uf_val = param( 'uf_'.$userfield_ID, 'string', '' );
+				$field_type = ( $this->userfield_defs[$userfield->uf_ufdf_ID][0] == 'text' ) ? 'text' : 'string';
+				$uf_val = param( 'uf_'.$userfield->uf_ID, $field_type, '' );
 
-				// TODO: type checking
-				$this->userfield_update( $userfield_ID, $uf_val );
-			}
-
-			// Recommend fields:
-			$userfields = $DB->get_results( '
-				SELECT ufdf_ID
-					FROM T_users__fielddefs
-				 WHERE ufdf_required = "recommended" AND ufdf_ID NOT IN
-								( SELECT uf_ufdf_ID
-										FROM T_users__fields
-									 WHERE uf_user_ID = '. $this->ID .'
-								)
-			ORDER BY ufdf_ID' );
-			$i = 1;
-			foreach( $userfields as $userfield )
-			{
-				$uf_val = param( 'uf_rec_'.$i++, 'string', '' );
-				$uf_type = $userfield->ufdf_ID;
-				if( !empty($uf_val) )
-				{
-					$this->userfield_add( $uf_type, $uf_val );
+				if( empty( $uf_val ) && $this->userfield_defs[$userfield->uf_ufdf_ID][2] == 'require' )
+				{ // Display error for empty required field
+					param_error( 'uf_'.$userfield->uf_ID, T_('Please enter a value.') );
+				}
+				else
+				{ // Update field
+					$this->userfield_update( $userfield->uf_ID, $uf_val );
 				}
 			}
 
@@ -415,14 +404,13 @@ class User extends DataObject
 			$uf_new_fields = param( 'uf_new', 'array' );
 			if( count( $uf_new_fields ) > 0 )
 			{
-				$this->userfield_defs_load();
 				foreach( $uf_new_fields as $uf_new_id => $uf_new_val )
 				{
 					if( $uf_new_val != '' )
 					{ // Insert a new field in DB if it is filled
 						$this->userfield_add( (int)$uf_new_id, $uf_new_val );
 					}
-					elseif( empty($uf_new_val) && $this->userfield_defs[$uf_new_id][2] == 'require' )
+					elseif( empty( $uf_new_val ) && $this->userfield_defs[$uf_new_id][2] == 'require' )
 					{ // Display error for empty required field
 						param_error( 'uf_new['.$uf_new_id.']', T_('Please enter a value.') );
 					}
@@ -2663,6 +2651,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.147  2011/09/30 05:29:09  efy-yurybakh
+ * fix updating additional fields
+ *
  * Revision 1.146  2011/09/29 16:50:14  efy-yurybakh
  * colored login
  *
