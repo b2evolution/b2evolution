@@ -778,7 +778,7 @@ class User extends DataObject
 
 		$link_title = T_( 'Show the user profile' );
 		$link_text = '<span class="nowrap">'.$avatar_tag.$link_login.'</span>';
-		$link_class = $this->get_gender_class().( $avatar_tag == '' ? ' userbubble' : '' );
+		$link_class = $this->get_gender_class().' userbubble';
 		return '<a id="username_'.$this->login.'" href="'.$identity_url.'" title="'.$link_title.'" class="'.$link_class.'">'.$link_text.'</a>';
 	}
 
@@ -2651,6 +2651,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.148  2011/09/30 17:25:58  efy-yurybakh
+ * bubbletips for all identity links
+ *
  * Revision 1.147  2011/09/30 05:29:09  efy-yurybakh
  * fix updating additional fields
  *
