@@ -340,11 +340,7 @@ class sessions_Module extends Module
 						'sessid' => array(
 							'text' => T_('Sessions'),
 							'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=sessid&amp;blog=0'
-							),
-						'hits' => array(
-							'text' => T_('Hits'),
-							'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0'
-							),
+							)
 						),
 					),
 			 	);
@@ -379,6 +375,9 @@ $sessions_Module = new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.36  2011/09/30 06:25:24  efy-vitalij
+ * Remove Hits tab from User Sessions
+ *
  * Revision 1.35  2011/09/29 09:16:16  efy-vitalij
  * add menu item All Hits
  *

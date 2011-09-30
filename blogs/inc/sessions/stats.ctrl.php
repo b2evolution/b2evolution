@@ -289,9 +289,6 @@ switch( $tab )
 				// fp> TODO: include username in path if we have one
 				$AdminUI->breadcrumbpath_add( T_('Recent sessions'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab.'&amp;tab3='.$tab3 );
 				break;
-			case 'hits':
-				$AdminUI->breadcrumbpath_add( T_('Recent hits'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab.'&amp;tab3='.$tab3 );
-				break;
 		}
 		break;
 
@@ -455,11 +452,6 @@ switch( $AdminUI->get_path(1) )
 			case 'sessid':
 				$AdminUI->disp_view( 'sessions/views/_stats_sessions_list.view.php' );
 				break;
-
-			case 'hits':
-				$AdminUI->disp_view( 'sessions/views/_stats_hit_list.view.php' );
-				break;
-
 			case 'login':
 				$AdminUI->disp_view( 'sessions/views/_stats_sessions.view.php' );
 		}
@@ -486,6 +478,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.33  2011/09/30 06:25:24  efy-vitalij
+ * Remove Hits tab from User Sessions
+ *
  * Revision 1.32  2011/09/29 09:18:19  efy-vitalij
  * add tab hits
  *

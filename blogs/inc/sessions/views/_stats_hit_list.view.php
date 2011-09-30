@@ -118,7 +118,7 @@ function filter_hits( & $Form )
 							'unknown'	=> 'Unknown',
 							);
 
-	$Form->select_input_array( 'agent_type', get_param('agent_type'), $field_options, 'Referer type', '', array('force_keys_as_values' => true) );
+	$Form->select_input_array( 'agent_type', get_param('agent_type'), $field_options, 'Agent type', '', array('force_keys_as_values' => true) );
 }
 $Results->filter_area = array(
 	'callback' => 'filter_hits',
@@ -227,6 +227,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.18  2011/09/30 06:25:24  efy-vitalij
+ * Remove Hits tab from User Sessions
+ *
  * Revision 1.17  2011/09/29 09:27:32  efy-vitalij
  * add referer type and agent type filters and add direct hits filter link
  *

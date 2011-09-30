@@ -126,7 +126,7 @@ function filter_hits( & $Form )
 							'unknown'	=> 'Unknown',
 							);
 
-	$Form->select_input_array( 'agent_type', get_param('agent_type'), $field_options, 'Referer type', '', array('force_keys_as_values' => true) );
+	$Form->select_input_array( 'agent_type', get_param('agent_type'), $field_options, 'Agent type', '', array('force_keys_as_values' => true) );
 }
 $Results->filter_area = array(
 	'callback' => 'filter_hits',
