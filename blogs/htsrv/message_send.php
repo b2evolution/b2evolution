@@ -169,7 +169,7 @@ else
 	$Blog = & $BlogCache->get_by_ID( $blog, true, false );	// Optional
 }
 
-
+$allow_msgform = '';
 if( ! empty( $recipient_id ) )
 { // Get the email address for the recipient if a member:
 	$UserCache = & get_UserCache();
@@ -303,7 +303,10 @@ if( $allow_msgform == 'email' )
 else
 { // Send private message
 	load_funcs( 'messaging/model/_messaging.funcs.php' );
-	$success_message = send_private_message( $recipient_User->get( 'login' ), $subject, $message );
+	if( isset( $recipient_User ) )
+	{
+		$success_message = send_private_message( $recipient_User->get( 'login' ), $subject, $message );
+	}
 }
 
 
@@ -339,6 +342,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.77  2011/09/30 07:38:58  efy-yurybakh
+ * bubbletip for anonymous comments
+ *
  * Revision 1.76  2011/09/26 14:53:27  efy-asimo
  * Login problems with multidomain installs - fix
  * Insert globals: samedomain_htsrv_url, secure_htsrv_url;

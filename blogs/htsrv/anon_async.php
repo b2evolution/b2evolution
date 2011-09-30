@@ -97,13 +97,45 @@ switch( $action )
 
 	case "get_user_bubbletip":
 		$user_login = param( 'userid', 'string' );
+		$is_anonymous = param( 'anonymous', 'integer', 0 );
+
 		if( $blog_ID >0 )
 		{
 			$BlogCache = & get_BlogCache();
 			$Blog = $BlogCache->get_by_ID( $blog_ID );
 		}
 
-		echo '<div class="center">'.get_avatar_imgtag( $user_login, true, true, 'fit-160x160', 'avatar_above_login' ).'</div>';
+		if( $is_anonymous == 1 )
+		{ // Print info for anonymous user
+			$comment_ID = (int)$user_login;
+			if ( $comment_ID == 0)
+			{ // Bad request
+				exit(0);
+			}
+
+			$CommentCache = & get_CommentCache();
+			$Comment = $CommentCache->get_by_ID( $comment_ID );
+
+			echo '<div class="bubbletip_anon">';
+			echo $Comment->get_avatar( 'fit-160x160', 'bCommentAvatar floatcenter');
+			echo '<div>'.$Comment->get_author_name_anonymous().'</div>';
+			echo '<div>'.T_('This user is not registered on this site.').'</div>';
+			echo $Comment->get_author_url_link( '', '<div>', '</div>');
+			if( isset( $Blog ) )
+			{ // Link to send message
+				echo '<div>';
+				$Comment->msgform_link( $Blog->get('msgformurl'), '', '', get_icon( 'email', 'imgtag' ).' '.T_('Send a message') );
+				echo '</div>';
+			}
+			echo '</div>';
+
+			exit(0); 
+		}
+
+		// Registred user
+		echo '<div class="center">';
+		echo get_avatar_imgtag( $user_login, true, true, 'fit-160x160', 'avatar_above_login' );
+		echo '</div>';
 
 		exit(0);
 
@@ -138,6 +170,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.12  2011/09/30 07:38:58  efy-yurybakh
+ * bubbletip for anonymous comments
+ *
  * Revision 1.11  2011/09/29 16:42:18  efy-yurybakh
  * colored login
  *

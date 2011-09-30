@@ -28,10 +28,15 @@ jQuery( document ).ready(function()
 					jQuery( 'body' ).append( '<div id="userbubble_cache_' + user_id + '" style="display:none;"></div>' );
 					var cache = jQuery( '#userbubble_cache_' + user_id );
 					var tip = jQuery( '#userbubble_info_' + link_number );
+					var anonymous_param = '';
+					if( link.hasClass( 'anonymous' ) )
+					{ // Detect anonymous user
+						anonymous_param = '&anonymous=1';
+					}
 					jQuery.ajax({ // Get user info
 						type: 'POST',
 						url: htsrv_url + 'anon_async.php',
-						data: 'action=get_user_bubbletip&userid=' + user_id + '&blog=' + blog_id,
+						data: 'action=get_user_bubbletip&userid=' + user_id + '&blog=' + blog_id + anonymous_param,
 						success: function( result )
 						{
 							tip.html( result );

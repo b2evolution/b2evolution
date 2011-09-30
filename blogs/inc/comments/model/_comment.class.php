@@ -526,6 +526,30 @@ class Comment extends DataObject
 
 
 	/**
+	 * Get the comment anonymous author's name with gender class.
+	 *
+	 * @param string format to display author
+	 * @return string
+	 */
+	function get_author_name_anonymous( $format = 'htmlbody' )
+	{
+		global $Settings;
+
+		$gender_class = '';
+		if( $Settings->get('gender_colored') )
+		{ // Set a gender class if the setting is ON
+			$gender_class = ' nogender';
+		}
+
+		$author_name = $this->dget( 'author', $format );
+
+		$author_name = '<span id="username_'.$this->ID.'" class="user anonymous'.$gender_class.' userbubble">'.$author_name.'</span>';
+		
+		return $author_name;
+	}
+
+
+	/**
 	 * Get the EMail of the comment's author.
 	 *
 	 * @return string
@@ -733,7 +757,7 @@ class Comment extends DataObject
 				$params['link_to'] = '';
 			}
 
-			$author_name = $this->dget( 'author', $params['format'] );
+			$author_name = $this->get_author_name_anonymous( $params['format'] );
 
 			switch( $params['link_to'] )
 			{
@@ -1486,7 +1510,7 @@ class Comment extends DataObject
 			}
 		}
 
-		$form_url = url_add_param( $form_url, 'comment_id='.$this->ID.'&amp;post_id='.$this->item_ID
+		$form_url = url_add_param( $form_url, 'recipient_id=0&amp;comment_id='.$this->ID.'&amp;post_id='.$this->item_ID
 				.'&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','','','&'), $form_url)) );
 
 		if( $title == '#' ) $title = T_('Send email to comment author');
@@ -2417,6 +2441,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.115  2011/09/30 07:38:58  efy-yurybakh
+ * bubbletip for anonymous comments
+ *
  * Revision 1.114  2011/09/29 08:39:01  efy-yurybakh
  * - user_identity_link
  * - lightbox

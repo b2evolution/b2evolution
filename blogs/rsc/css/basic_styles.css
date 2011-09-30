@@ -35,6 +35,10 @@ code {
 .floatright {
 	float: right;
 }
+.floatcenter {
+	float: none !important;
+	margin: 0 auto !important;
+}
 .clear{
 	clear: both;
 }
@@ -127,7 +131,7 @@ span.icon{
 }
 
 /* User Genders */
-.user{
+.user, user.anonymous{
 	font-weight: bold;
 }
 .user.man{
@@ -136,6 +140,13 @@ span.icon{
 .user.woman{
 	color: #e100af;
 }
-.user.nogender{
+.user.nogender, user.anonymous.nogender{
 	color: #666;
+}
+
+.bubbletip_anon{
+	text-align: center;
+}
+.bubbletip_anon div{
+	margin-top: 5px;
 }
