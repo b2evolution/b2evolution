@@ -495,6 +495,9 @@ class Blog extends DataObject
 			$this->set_setting( 'enable_sitemaps', param( 'enable_sitemaps', 'integer', 0 ) );
 
 			$this->set_setting( 'post_categories', param( 'post_categories', 'string', NULL ) );
+
+			// call modules update_collection_features on this blog
+			modules_call_method( 'update_collection_features', array( 'edited_Blog' => & $this ) );
 		}
 
 		if( param( 'allow_comments', 'string', NULL ) !== NULL )
@@ -1718,6 +1721,7 @@ class Blog extends DataObject
 				$owner = $owner_User->get( 'fullname' );
 				if( empty($owner) )
 				{
+// fp>yura rename to get_colored_name()   if it doesn't echo, it should be called get_*
 					$owner = $owner_User->colored_name();
 				}
 				return $owner;
@@ -2486,6 +2490,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.148  2011/09/30 13:03:19  fplanque
+ * doc
+ *
  * Revision 1.147  2011/09/30 08:22:18  efy-asimo
  * Events update
  *

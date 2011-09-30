@@ -76,6 +76,7 @@ class CollectionSettings extends AbstractSettings
 			'allow_anon_url' => '0',
 			'allow_attachments' => 'registered',
 			'allow_rating' => 'never',
+// fp>yura rename this to 'allow_rating_comment_usefulness'
 			'allow_useful' => '0',
 			'comments_orderdir' => 'ASC',
 			'paged_comments' => '0',
@@ -192,6 +193,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.65  2011/09/30 13:03:19  fplanque
+ * doc
+ *
  * Revision 1.64  2011/09/30 04:56:39  efy-yurybakh
  * RSS feed settings
  *

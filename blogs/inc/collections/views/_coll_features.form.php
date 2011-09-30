@@ -84,7 +84,8 @@ $Form->begin_fieldset( T_('Post options').get_manual_link('blog_features_setting
 
 $Form->end_fieldset();
 
-// display modules collection feautres
+// display features settings provided by optional modules:
+// echo 'modules';
 modules_call_method( 'display_collection_features', array( 'Form' => & $Form, 'edited_Blog' => & $edited_Blog ) );
 
 $Form->begin_fieldset( T_('RSS/Atom feeds') );
@@ -187,6 +188,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.52  2011/09/30 13:03:20  fplanque
+ * doc
+ *
  * Revision 1.51  2011/09/30 08:22:18  efy-asimo
  * Events update
  *

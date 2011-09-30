@@ -145,7 +145,8 @@ $Form->begin_fieldset( T_('Feedback options') );
 
 $Form->end_fieldset();
 
-// display modules collection comments
+// display comments settings provided by optional modules:
+// echo 'modules';
 modules_call_method( 'display_collection_comments', array( 'Form' => & $Form, 'edited_Blog' => & $edited_Blog ) );
 
 $Form->begin_fieldset( T_('RSS/Atom feeds') );
@@ -181,6 +182,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.3  2011/09/30 13:03:20  fplanque
+ * doc
+ *
  * Revision 1.2  2011/09/30 04:56:39  efy-yurybakh
  * RSS feed settings
  *
