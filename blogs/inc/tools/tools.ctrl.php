@@ -399,6 +399,7 @@ if( empty($tab) )
 			
 
 			load_class( 'items/model/_itemlistlight.class.php', 'ItemListLight' );
+			load_class('sessions/model/_internal_searches.class.php', 'Internalsearches' );
 
 			$links = array();
 
@@ -521,12 +522,22 @@ if( empty($tab) )
 
 				$keyp_ID = 'NULL';
 
+				$internal_search = 0;
+				$anonim_first = 0;
+
+				if (strstr($links[$rand_link]['link'],'s=$keywords$'))
+				{
+					$internal_search = 1;
+				}
+
+
+
 				if (strstr($links[$rand_link]['link'],'$keywords$'))
 				{	// check if the current search link is selected randomly.
 					// If yes, generate search link and add it to DB
 						$keywords =  'fake search '. mt_rand(0,9);
 
-						$sql = 'SELECT keyp_ID
+				/*		$sql = 'SELECT keyp_ID
 								  FROM T_track__keyphrase
 								 WHERE keyp_phrase = '.$DB->quote($keywords);
 						$keyp_ID = $DB->get_var( $sql, 0, 0, 'Get keyphrase ID' );
@@ -538,7 +549,7 @@ if( empty($tab) )
 							$DB->query( $sql, 'Add new keyphrase' );
 							$keyp_ID = $DB->insert_id;
 						}
-
+				*/
 						$links[$rand_link]['link'] = str_replace('$keywords$', urlencode($keywords), $links[$rand_link]['link']);
 
 				}
@@ -568,12 +579,13 @@ if( empty($tab) )
 
 					$DB->query( $sql, 'Record test hits' );
 
-					//break(2);
+					$hit_ID = $DB->insert_id;
+					
 				}
 				else
 				{
-					if (($time_shift - $cur_seesion['sess_lastseen'])> 1000)
-					{	// This session last updated more than 1000 sec ago. Instead of this session create a new session.
+					if (($time_shift - $cur_seesion['sess_lastseen'])> 3000)
+					{	// This session last updated more than 3000 sec ago. Instead of this session create a new session.
 
 						$cur_seesion = array(	'sess_ID'		=> -1,
 												'sess_key'      => generate_random_key(32),
@@ -584,7 +596,7 @@ if( empty($tab) )
 
 						$cur_seesion['sess_lastseen'] = $time_shift;
 
-						if (mt_rand(0, 100) > 30)
+						if (mt_rand(0, 100) > 80)
 						{	// Create anonymous user and make double insert into hits.
 							$cur_seesion['sess_user_ID'] = -1;
 							$DB->query( "
@@ -615,6 +627,7 @@ if( empty($tab) )
 
 						if ($cur_seesion['sess_user_ID'] == -1)
 						{
+							$anonim_first = 1;
 							$sql = "INSERT INTO T_hitlog(hit_sess_ID, hit_datetime, hit_uri, hit_referer_dom_ID, hit_referer_type, hit_blog_ID, hit_remote_addr, hit_agent_type )
 							VALUES".
 								"({$cur_seesion['sess_ID']}, FROM_UNIXTIME({$cur_seesion['sess_lastseen']}), '". $DB->escape('/htsrv/login.php'). "' , 1, 'direct', NULL, '{$cur_seesion['sess_ipaddress']}' , 'browser'),".
@@ -629,17 +642,20 @@ if( empty($tab) )
 						}
 
 						$DB->query( $sql, 'Record test hits' );
+						$hit_ID = $DB->insert_id;
 
 					}
 					else
 					{
-						// Update session 
+						// Update session
 						$cur_seesion['sess_lastseen'] = $time_shift;
 						$sql = "INSERT INTO T_hitlog(hit_sess_ID, hit_datetime, hit_uri, hit_referer_dom_ID, hit_referer_type, hit_blog_ID, hit_remote_addr, hit_agent_type, hit_keyphrase_keyp_ID )
 						VALUES".
 							"({$cur_seesion['sess_ID']}, FROM_UNIXTIME({$cur_seesion['sess_lastseen']}), '". $DB->escape($links[$rand_link]['link']). "' , 1, 'self', {$links[$rand_link]['blog_id']}, '{$cur_seesion['sess_ipaddress']}' , 'browser', $keyp_ID)";
 
 						$DB->query( $sql, 'Record test hits' );
+
+						$hit_ID = $DB->insert_id;
 
 						$sql = "UPDATE T_sessions SET
 								sess_hitcount = sess_hitcount + 1,
@@ -650,6 +666,15 @@ if( empty($tab) )
 						$sessions[$rand_i] = $cur_seesion;
 
 					}
+				}
+
+				if ($internal_search == 1 && $anonim_first == 0)
+				{
+					$internal_searches = new InternalSearches();
+					$internal_searches->set("coll_ID" , $links[$rand_link]['blog_id']);
+					$internal_searches->set("hit_ID" , $hit_ID);
+					$internal_searches->set("keywords" , $keywords );
+					$internal_searches->dbinsert();
 				}
 
 			}
@@ -736,6 +761,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.50  2011/09/30 09:13:51  efy-vitalij
+ * fixed fake internal search links
+ *
  * Revision 1.49  2011/09/29 12:35:58  efy-vitalij
  * add anonymous users and fake search links
  *
