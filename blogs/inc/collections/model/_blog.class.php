@@ -482,6 +482,9 @@ class Blog extends DataObject
 
 		if( in_array( 'features', $groups ) )
 		{ // we want to load the workflow checkboxes:
+			// call modules update_collection_features on this blog
+			modules_call_method( 'update_collection_features', array( 'edited_Blog' => & $this ) );
+
 			$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
 			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
 			$this->set_setting( 'enable_goto_blog', param( 'enable_goto_blog', 'integer', 0 ) );
@@ -2483,6 +2486,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.147  2011/09/30 08:22:18  efy-asimo
+ * Events update
+ *
  * Revision 1.146  2011/09/30 04:56:39  efy-yurybakh
  * RSS feed settings
  *

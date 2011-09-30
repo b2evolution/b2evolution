@@ -84,6 +84,8 @@ $Form->begin_fieldset( T_('Post options').get_manual_link('blog_features_setting
 
 $Form->end_fieldset();
 
+// display modules collection feautres
+modules_call_method( 'display_collection_features', array( 'Form' => & $Form, 'edited_Blog' => & $edited_Blog ) );
 
 $Form->begin_fieldset( T_('RSS/Atom feeds') );
 	$Form->radio( 'feed_content', $edited_Blog->get_setting('feed_content'),
@@ -185,6 +187,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.51  2011/09/30 08:22:18  efy-asimo
+ * Events update
+ *
  * Revision 1.50  2011/09/30 04:56:39  efy-yurybakh
  * RSS feed settings
  *

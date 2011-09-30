@@ -111,6 +111,15 @@ switch( $isub_type )
 	case 'isub_attend':
 		// Events are supported
 
+		if( $notify == 1 )
+		{ // Register type can be 'attend' or 'waitlist', it must be set
+			$reg_type = param( 'reg_type', 'string', true );
+		}
+		else
+		{
+			$reg_type = 'attend';
+		}
+
 		$new_attendant = param( 'new_attendant', 'string', NULL );
 		if( !empty( $new_attendant ) )
 		{
@@ -145,7 +154,14 @@ switch( $isub_type )
 		{ // user ID is empty, current User subscribed/unsubscribed
 			$user_ID = $current_User->ID;
 			$success_unsub_message = T_( 'You have successfully unsubscribed.' );
-			$success_sub_message = T_( 'You have successfully subscribed to attend this event.' );
+			if( $reg_type == 'attend' )
+			{
+				$success_sub_message = T_( 'You have successfully subscribed to attend this event.' );
+			}
+			else
+			{
+				$success_sub_message = T_( 'You have successfully subscribed on the waiting list.' );
+			}
 		}
 		else
 		{
@@ -153,7 +169,7 @@ switch( $isub_type )
 			$success_sub_message = T_( 'User was successfully subscribed to attend this event.' );
 		}
 
-		if( set_user_attendant( $user_ID, $item_ID, $notify ) )
+		if( set_user_attendant( $user_ID, $item_ID, $notify, $reg_type ) )
 		{
 			if( $notify == 0 )
 			{
@@ -178,6 +194,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.9  2011/09/30 08:22:18  efy-asimo
+ * Events update
+ *
  * Revision 1.8  2011/09/29 15:26:56  efy-asimo
  * Admin add/remove attendee feature.
  *
