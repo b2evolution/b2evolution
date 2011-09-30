@@ -560,7 +560,8 @@ class Hit
 				}
 			}
 
-			if( ! $match && ($browscap = $this->get_browser_caps()) && $browscap->crawler )
+			if( ! $match && ($browscap = $this->get_browser_caps()) &&
+				isset($browscap->crawler) && $browscap->crawler )
 			{
 				$Debuglog->add( 'Hit:detect_useragent(): robot (through browscap)', 'request' );
 				$this->agent_type = 'robot';
@@ -1493,6 +1494,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.71  2011/09/30 16:58:54  sam2kb
+ * Fix for: http://forums.b2evolution.net/viewtopic.php?t=22888
+ *
  * Revision 1.70  2011/09/30 13:23:08  fplanque
  * no message
  *
