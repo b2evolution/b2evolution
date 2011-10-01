@@ -96,7 +96,8 @@ function stat_user_sessions( $login,  $link_text )
  */
 function stat_session_hits( $sess_ID,  $link_text )
 {
-	return '<strong><a href="?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0&amp;sess_ID='.$sess_ID.'">'.$link_text.'</a></strong>';
+        global $blog;
+	return '<strong><a href="?&ctrl=stats&tab=hits&colselect_submit=Filter+list&sess_ID='.$sess_ID.'&remote_IP=&blog='.$blog.'">'.$link_text.'</a></strong>';
 }
 
 /**
@@ -106,7 +107,7 @@ function stat_session_hits( $sess_ID,  $link_text )
  */
 function disp_clickable_log_sessID( $hit_sess_ID)
 {
-	global $current_User;
+	global $current_User, $blog;
 	static $perm = NULL;
 
 	if (empty($perm))
@@ -115,7 +116,7 @@ function disp_clickable_log_sessID( $hit_sess_ID)
 	}
 	if ($perm == true)
 	{
-		return '<strong><a href="?&ctrl=stats&tab=sessions&tab3=hits&colselect_submit=Filter+list&sess_ID='.$hit_sess_ID.'&remote_IP=&blog=0">'.$hit_sess_ID.'</a></strong>';
+		return '<strong><a href="?&ctrl=stats&tab=hits&colselect_submit=Filter+list&sess_ID='.$hit_sess_ID.'&remote_IP=&blog='.$blog.'">'.$hit_sess_ID.'</a></strong>';
 	}
 	else
 	{
@@ -131,7 +132,7 @@ function disp_clickable_log_sessID( $hit_sess_ID)
  */
 function disp_clickable_log_IP( $hit_remote_addr )
 {
-	global $current_User;
+	global $current_User, $blog;
 	static $perm = NULL;
 
 	if (empty($perm))
@@ -140,7 +141,7 @@ function disp_clickable_log_IP( $hit_remote_addr )
 	}
 	if ($perm == true)
 	{
-		return '<a href="?&ctrl=stats&tab=sessions&tab3=hits&colselect_submit=Filter+list&sess_ID=&remote_IP='.$hit_remote_addr.'&blog=0">'.$hit_remote_addr.'</a>';
+		return '<a href="?&ctrl=stats&tab=hits&colselect_submit=Filter+list&sess_ID=&remote_IP='.$hit_remote_addr.'&blog='.$blog.'">'.$hit_remote_addr.'</a>';
 	}
 	else
 	{
@@ -153,6 +154,9 @@ function disp_clickable_log_IP( $hit_remote_addr )
 
 /*
  * $Log$
+ * Revision 1.18  2011/10/01 10:05:31  efy-vitalij
+ * fix tab=hits links
+ *
  * Revision 1.17  2011/09/28 11:33:57  efy-vitalij
  * add IDs & IPs clickable to direct stat
  *

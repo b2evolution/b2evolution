@@ -144,7 +144,7 @@ if( $sess_ID == NULL )
 }
 else
 {
-	$session_link = '<a href="?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0" title="'.T_( 'Show all sessions' ).'">$sess_ID$</a>';
+	$session_link = '<a href="?ctrl=stats&amp;tab=hits&amp;blog='.$blog.'" title="'.T_( 'Show all sessions' ).'">$sess_ID$</a>';
 }
 $Results->cols[] = array(
 		'th' => T_('Session'),
@@ -225,7 +225,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Remote IP'),
 		'order' => 'hit_remote_addr',
-		'td' => '<a href="?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0&amp;remote_IP=$hit_remote_addr$">$hit_remote_addr$</a>',
+		'td' => '%disp_clickable_log_IP( #hit_remote_addr# )%',
 	);
 
 

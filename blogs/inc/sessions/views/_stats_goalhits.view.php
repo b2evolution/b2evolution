@@ -128,7 +128,7 @@ $Results->cols[] = array(
 		'th' => T_('Session'),
 		'order' => 'hit_sess_ID',
 		'td_class' => 'right',
-		'td' => '<a href="?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0&amp;sess_ID=$sess_ID$">$sess_ID$</a>',
+		'td' => '<a href="?ctrl=stats&amp;tab=hits&amp;blog=0&amp;sess_ID=$sess_ID$">$sess_ID$</a>',
 	);
 
 $Results->cols[] = array(
@@ -182,7 +182,7 @@ $Results->cols[] = array(
 		'th' => T_('Hits'),
 		'order' => 'sess_hitcount',
 		'td_class' => 'right',
-		'td' => '<a href="?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0&amp;sess_ID=$sess_ID$">$sess_hitcount$</a>',
+		'td' => '<a href="?ctrl=stats&amp;tab=hits&amp;blog=0&amp;sess_ID=$sess_ID$">$sess_hitcount$</a>',
 	);
 
 // Display results:
@@ -190,6 +190,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.11  2011/10/01 10:05:31  efy-vitalij
+ * fix tab=hits links
+ *
  * Revision 1.10  2011/09/04 22:13:18  fplanque
  * copyright 2011
  *

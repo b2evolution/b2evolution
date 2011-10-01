@@ -82,7 +82,7 @@ $Results->cols[] = array(
 		'th' => T_('Session'),
 		'order' => 'sess_ID',
 		'td_class' => 'right',
-		'td' => '<strong><a href="admin.php?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0&amp;sess_ID=$sess_ID$">$sess_ID$</a></strong>',
+		'td' => '%disp_clickable_log_sessID( #hit_sess_ID# )%',
  	);
 $Results->cols[] = array(
 		'th' => T_('Hit date'),
@@ -117,6 +117,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.8  2011/10/01 10:05:31  efy-vitalij
+ * fix tab=hits links
+ *
  * Revision 1.7  2011/09/14 21:04:06  fplanque
  * cleanup
  *

@@ -75,7 +75,7 @@ $Results->cols[] = array(
 						'order' => 'sess_ID',
 						'default_dir' => 'D',
 						'td_class' => 'right',
-						'td' => '<a href="?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0&amp;sess_ID=$sess_ID$">$sess_ID$</a>',
+						'td' => '<a href="?ctrl=stats&amp;tab=hits&amp;blog=0&amp;sess_ID=$sess_ID$">$sess_ID$</a>',
 					);
 
 $Results->cols[] = array(
@@ -111,6 +111,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.12  2011/10/01 10:05:31  efy-vitalij
+ * fix tab=hits links
+ *
  * Revision 1.11  2011/09/23 07:41:57  efy-asimo
  * Unified usernames everywhere in the app - first part
  *
