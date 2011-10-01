@@ -209,12 +209,16 @@ else
 	}
 	else
 	{
+		$recipient_style = ' class="'.$recipient_User->get_gender_class().'"';
 		require '_contact_msg.form.php';
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.26  2011/10/01 07:30:09  efy-asimo
+ * Fix recipient style notice
+ *
  * Revision 1.25  2011/09/04 22:13:24  fplanque
  * copyright 2011
  *
