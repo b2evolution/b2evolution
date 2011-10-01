@@ -132,7 +132,7 @@ $Form->end_fieldset();
 
 // --------------------------- EVENTS ---------------------------
 $Form->begin_fieldset( T_('Plugin events').' ('.T_('Advanced')
-	.') <img src="'.get_icon('expand', 'url').'" id="clickimg_pluginevents" />', array('legend_params' => array( 'onclick' => 'toggle_clickopen(\'pluginevents\')') ) );
+	.') '.get_icon('expand', 'imgtag', array( 'id' => 'clickimg_pluginevents' ) ), array('legend_params' => array( 'onclick' => 'toggle_clickopen(\'pluginevents\')') ) );
 	?>
 
 	<div id="clickdiv_pluginevents">
@@ -191,6 +191,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.12  2011/10/01 01:05:43  efy-yurybakh
+ * temp fix of expand icon
+ *
  * Revision 1.11  2011/09/14 21:04:06  fplanque
  * cleanup
  *

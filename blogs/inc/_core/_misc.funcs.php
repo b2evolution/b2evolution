@@ -3057,6 +3057,11 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 				{ // Get styles from params
 					$styles[] = $params['style'];
 				}
+				$r_id = '';
+				if( isset( $params['id'] ) )
+				{ // Get id param
+					$r_id = ' id="'.$params['id'].'"';
+				}
 				$styles = count($styles) > 0 ? ' style="'.implode( '; ', $styles).'"' : '';
 
 				if( isset( $params['alt'] ) )
@@ -3067,7 +3072,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 				{
 					$icon_alt = isset( $icon['alt'] ) ? $icon['alt'] : '';
 				}
-				$r = '<span class="icon"'.$styles.' title="'.$icon_alt.'">&nbsp;</span>';
+				$r = '<span'.$r_id.' class="icon"'.$styles.' title="'.$icon_alt.'">&nbsp;</span>';
 			}
 			else
 			{ // Use img tag
@@ -4444,6 +4449,9 @@ function generate_random_ip()
 
 /*
  * $Log$
+ * Revision 1.286  2011/10/01 01:05:43  efy-yurybakh
+ * temp fix of expand icon
+ *
  * Revision 1.285  2011/09/30 10:16:50  efy-yurybakh
  * Make a big sprite with all backoffice icons
  *
