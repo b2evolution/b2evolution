@@ -489,6 +489,9 @@ class Blog extends DataObject
 			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
 			$this->set_setting( 'enable_goto_blog', param( 'enable_goto_blog', 'integer', 0 ) );
 
+			// Public blog list
+			$this->set( 'in_bloglist', param( 'blog_in_bloglist',   'integer', 0 ) );
+
 			$this->set( 'allowblogcss', param( 'blog_allowblogcss', 'integer', 0 ) );
 			$this->set( 'allowusercss', param( 'blog_allowusercss', 'integer', 0 ) );
 
@@ -520,9 +523,6 @@ class Blog extends DataObject
 			param_integer_range( 'comments_per_page', 1, 9999, T_('Comments per page must be between %d and %d.') );
 			$this->set_setting( 'comments_per_page', get_param( 'comments_per_page' ) );
 			$this->set_setting( 'default_gravatar',  param( 'default_gravatar', 'string', 'b2evo' ) );
-
-			// Public blog list
-			$this->set( 'in_bloglist', param( 'blog_in_bloglist',   'integer', 0 ) );
 		}
 
 
@@ -2490,6 +2490,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.149  2011/10/01 09:01:25  efy-asimo
+ * Fix 'Include in public blog list' blog setting update
+ *
  * Revision 1.148  2011/09/30 13:03:19  fplanque
  * doc
  *
