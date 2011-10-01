@@ -62,6 +62,5 @@ $modules = array(
 		'sessions',
     'messaging',		// Experimental
 		'maintenance',	// Experimental
-		'events',
 	);
 ?>
