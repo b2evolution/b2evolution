@@ -164,6 +164,17 @@ class Module
 	{
 	}
 
+
+	/**
+	 * Allows the module to do something before displaying the comments for a post.
+	 *
+	 * @param array
+	 */
+	function before_comments( $params )
+	{
+	}
+
+
 	/**
 	 * Check module permission
 	 *
@@ -212,6 +223,9 @@ class Module
 
 /*
  * $Log$
+ * Revision 1.12  2011/10/01 23:45:19  fplanque
+ * clean factorization
+ *
  * Revision 1.11  2011/09/28 12:09:52  efy-yurybakh
  * "comment was helpful" votes (new tab "comments")
  *

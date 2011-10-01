@@ -49,13 +49,9 @@ $params = array_merge( array(
 
 global $c, $tb, $pb, $redir;
 
-// ----------------- EVENTS INCLUDED HERE -----------------
-if( isset( $GLOBALS['events_Module'] ) )
-{
-	// fp>asimo: can you make a call to all modules here? Sth like "display_before_comments" ?
-	display_attendees( $params );
-}
-// -------------------- END OF ATTENDING ---------------------
+// ----------------- MODULES "Before Comments" EVENT -----------------
+modules_call_method( 'before_comments', $params );
+// -------------------- END OF MODULES EVENT ---------------------
 
 // Check if user is allowed to see comments, display corresponding message if not allowed
 if( $Item->can_see_comments( true ) )
@@ -298,6 +294,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.48  2011/10/01 23:45:19  fplanque
+ * clean factorization
+ *
  * Revision 1.47  2011/09/26 14:53:27  efy-asimo
  * Login problems with multidomain installs - fix
  * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
