@@ -50,7 +50,7 @@ $Form = new Form( $submit_url );
 
 	$Form->text_input( 'g', $subject, 40, T_('Subject'), T_('Subject of your message.'), array( 'maxlength'=>255, 'class'=>'wide_input', 'required'=>true ) );
 
-	$Form->textarea( 'h', '', 15, T_('Message'), T_('Plain text only.'), 35, 'wide_textarea' );
+	$Form->textarea( 'h', '', 15, T_('Message'), T_('Plain text only.'), 35, 'wide_textarea', true );
 
 	$Plugins->trigger_event( 'DisplayMessageFormFieldset', array( 'Form' => & $Form,
 		'recipient_ID' => & $recipient_id, 'item_ID' => $post_id, 'comment_ID' => $comment_id ) );
@@ -76,6 +76,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.11  2011/10/01 07:09:13  efy-asimo
+ * Fix message send
+ *
  * Revision 1.10  2011/09/29 16:42:19  efy-yurybakh
  * colored login
  *

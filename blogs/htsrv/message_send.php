@@ -124,10 +124,6 @@ $recipient_User = NULL;
 $Comment = NULL;
 
 // Core param validation
-if( empty($sender_name) )
-{
-	$Messages->add( T_('Please fill in your name.'), 'error' );
-}
 
 if( empty($subject) )
 {
@@ -223,6 +219,10 @@ elseif( ! empty( $comment_id ) )
 
 if( $allow_msgform == 'email' )
 {
+	if( empty($sender_name) )
+	{
+		$Messages->add( T_('Please fill in your name.'), 'error' );
+	}
 	if( empty($sender_address) )
 	{
 		$Messages->add( T_('Please fill in your email.'), 'error' );
@@ -252,8 +252,8 @@ if( $allow_msgform == 'email' )
 		$message_footer .= T_("Click on the following link to not receive e-mails on your comments\nfor this e-mail address anymore:")
 			."\n".$samedomain_htsrv_url.'message_send.php?optout_cmt_email='.rawurlencode($Comment->author_email);
 	}
-	
-	
+
+
 	// Trigger event: a Plugin could add a $category="error" message here..
 	$Plugins->trigger_event( 'MessageFormSent', array(
 		'recipient_ID' => & $recipient_id,
@@ -266,8 +266,8 @@ if( $allow_msgform == 'email' )
 		'sender_name' => & $sender_name,
 		'sender_email' => & $sender_address,
 		) );
-	
-	
+
+
 	if( $Messages->has_errors() )
 	{ // there were errors: display them and get out of here
 		$Messages->display( T_('Cannot send email, please correct these errors:'),
@@ -300,8 +300,8 @@ if( $allow_msgform == 'email' )
 	 // Send mail
 	$success_message = send_mail( $recipient_address, $recipient_name, $subject, $message, $notify_from, NULL, array( 'Reply-To' => $sender_address ) );
 }
-else
-{ // Send private message
+elseif( ! $Messages->has_errors() )
+{ // There were no errors, Send private message
 	load_funcs( 'messaging/model/_messaging.funcs.php' );
 	if( isset( $recipient_User ) )
 	{
@@ -335,6 +335,11 @@ else
 	}
 }
 
+if( $Messages->has_errors() )
+{
+	header_redirect( url_add_param( $Blog->gen_blogurl(), 'disp=msgform&recipient_id='.$recipient_id ) );
+	//exited here
+}
 
 // redirect Will save $Messages into Session:
 header_redirect(); // exits!
@@ -342,6 +347,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.78  2011/10/01 07:09:13  efy-asimo
+ * Fix message send
+ *
  * Revision 1.77  2011/09/30 07:38:58  efy-yurybakh
  * bubbletip for anonymous comments
  *
