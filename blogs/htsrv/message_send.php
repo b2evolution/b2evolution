@@ -308,6 +308,10 @@ elseif( ! $Messages->has_errors() )
 		$success_message = send_private_message( $recipient_User->get( 'login' ), $subject, $message );
 	}
 }
+else
+{
+	$success_message = false;
+}
 
 
 // Plugins should cleanup their temporary data here:
@@ -333,10 +337,6 @@ else
 	{
 		$Messages->add( T_('Sorry, could not send your message.'), 'error' );
 	}
-}
-
-if( $Messages->has_errors() )
-{
 	header_redirect( url_add_param( $Blog->gen_blogurl(), 'disp=msgform&recipient_id='.$recipient_id ) );
 	//exited here
 }
@@ -347,6 +347,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.79  2011/10/01 07:16:25  efy-asimo
+ * Fix message send - update
+ *
  * Revision 1.78  2011/10/01 07:09:13  efy-asimo
  * Fix message send
  *
