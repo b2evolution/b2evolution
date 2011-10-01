@@ -563,6 +563,41 @@ function check_is_email( $email )
 }
 
 
+
+/**
+ * Check if the value is a valid login (in terms of allowed chars)
+ *
+ * @param string param name
+ * @param string regexp
+ * @param string error message
+ * @param string|NULL error message for form field ($err_msg gets used if === NULL).
+ * @return boolean true if OK
+ */
+function param_check_valid_login( $var )
+{
+	if( empty( $GLOBALS[$var] ) )
+	{ // empty variable is OK
+		return T_('Please choose a username.' );
+	}
+
+	// fp> TODO: make this regexp configurable in user registration settings
+	// WARNING: allowing ' or " or > or < will open security issues!
+	// NOTE: allowing @ will make some "average" users use their email address (not good for their spam health)
+	// NOTE: in some places usernames are typed in by other users (messaging) or admins.
+	// Having cryptic logins with hard to type letters is a PITA.
+	// NOTE: the regexp below includes accented lowercase letters from the Latin1 charset.
+	if( ! preg_match( '~^[A-Za-z0-9\xDF-\xF6\xF8-\xFF_.]*$~', $GLOBALS[$var] ) )
+	{
+		param_error( $var, T_('Logins can only contain letters, digits and the following characters: _ .') );
+		// fp> TODO: check why a dash '-' prevents renaming the fileroot
+		return false;
+	}
+	return true;
+}
+
+
+
+
 /**
  * @param string param name
  * @return boolean true if OK
@@ -2151,6 +2186,9 @@ function isset_param( $var )
 
 /*
  * $Log$
+ * Revision 1.75  2011/10/01 23:01:48  fplanque
+ * better be safe than sorry on logins!
+ *
  * Revision 1.74  2011/09/23 22:37:09  fplanque
  * minor / doc
  *

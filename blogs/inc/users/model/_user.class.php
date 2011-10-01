@@ -230,7 +230,7 @@ class User extends DataObject
 			$this->ID = $db_row->user_ID;
 			$this->postcode = $db_row->user_postcode;
 			$this->age_min = $db_row->user_age_min;
-			$this->age_max = $db_row->user_age_max;	
+			$this->age_max = $db_row->user_age_max;
 			$this->login = $db_row->user_login;
 			$this->pass = $db_row->user_pass;
 			$this->firstname = $db_row->user_firstname;
@@ -274,7 +274,7 @@ class User extends DataObject
 
 		$is_new_user = ( $this->ID == 0 );
 		$edited_user_login = param( 'edited_user_login', 'string' );
-		param_check_not_empty( 'edited_user_login', T_( 'You must provide a login!' ) );
+		param_check_valid_login( 'edited_user_login' );
 		// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
 		$this->set_from_Request( 'login', 'edited_user_login', true, 'evo_strtolower' );
 
@@ -419,15 +419,15 @@ class User extends DataObject
 
 			param( 'edited_user_postcode', 'string', true );
 			$this->set_from_Request('postcode', 'edited_user_postcode', true);
-			
+
 			param( 'edited_user_age_min', 'string', true );
 			param_check_number( 'edited_user_age_min', T_('Age must be a number.') );
 			$this->set_from_Request('age_min', 'edited_user_age_min', true);
-			
+
 			param( 'edited_user_age_max', 'string', true );
 			param_check_number( 'edited_user_age_max', T_('Age must be a number.') );
 			$this->set_from_Request('age_max', 'edited_user_age_max', true);
-			
+
 			param( 'edited_user_firstname', 'string', true );
 			$this->set_from_Request('firstname', 'edited_user_firstname', true);
 
@@ -742,7 +742,7 @@ class User extends DataObject
 
 	/**
 	 * Get User identity link, which is a composite of user avatar and login, both point to the specific user profile tab.
-	 * 
+	 *
 	 * @param string On which user profile tab should this link point to
 	 * @return string User avatar and login if the identity link is not available, the identity link otherwise.
 	 */
@@ -761,7 +761,7 @@ class User extends DataObject
 				'thumb_size'   => 'crop-15x15',
 				'thumb_class'  => 'avatar_before_login',
 			), $params );
-		
+
 		$identity_url = get_user_identity_url( $this->ID, $params['profile_tab'] );
 		$avatar_tag = '';
 		if( $params['link_text'] == 'avatar' || $params['link_text'] == 'only_avatar' )
@@ -862,7 +862,7 @@ class User extends DataObject
 
 	/**
 	 * Get the number of user sessions
-	 * 
+	 *
 	 * @param boolean set true to return the number of sessions as a link to the user sessions list
 	 * @return integer|string number of sessions or link to user sessions where the link text is the number of sessions
 	 */
@@ -870,7 +870,7 @@ class User extends DataObject
 	{
 		global $DB;
 
-		$num_sessions = $DB->get_var( 'SELECT count( sess_ID ) 
+		$num_sessions = $DB->get_var( 'SELECT count( sess_ID )
 											FROM T_sessions
 											WHERE sess_user_ID = '.$this->ID );
 
@@ -2651,6 +2651,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.149  2011/10/01 23:01:48  fplanque
+ * better be safe than sorry on logins!
+ *
  * Revision 1.148  2011/09/30 17:25:58  efy-yurybakh
  * bubbletips for all identity links
  *

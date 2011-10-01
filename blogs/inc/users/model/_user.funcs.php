@@ -360,7 +360,7 @@ function get_user_logout_url()
 	{
 		if( isset( $Blog ) )
 		{	// Go to the home page of the blog that was being edited:
-  			$redirect_to = $Blog->get( 'url' );
+  		$redirect_to = $Blog->get( 'url' );
 		}
 		else
 		{	// We were not editing a blog...
@@ -521,7 +521,7 @@ function get_user_preferences_url()
 
 /**
  * Get User identity link. User is given with his login or ID. User login or ID must be set.
- *  
+ *
  * @param string User login ( can be NULL if ID is set )
  * @param integer User ID ( can be NULL if login is set )
  * @param string On which user profile tab should this link point to
@@ -555,7 +555,7 @@ function get_user_identity_link( $user_login, $user_ID = NULL, $profile_tab = 'p
 
 /**
  * Get the available user display url
- * 
+ *
  * @param integer user ID
  */
 function get_user_identity_url ( $user_ID = NULL, $profile_tab = 'profile', $redirect_to = NULL )
@@ -573,7 +573,7 @@ function get_user_identity_url ( $user_ID = NULL, $profile_tab = 'profile', $red
 	}
 
 	if( ( $profile_tab == 'user' && ! empty( $Blog ) ) ||
-		( !isset( $current_User ) ) || 
+		( !isset( $current_User ) ) ||
 		( ( $user_ID != NULL ) && ( $current_User->ID != $user_ID ) && ( ! $current_User->check_perm( 'users', 'view' ) ) ) )
 	{ // user is not logged in or current User is not the same as requested user, and current User doesn't have users view permission
 		if( empty( $Blog ) )
@@ -759,10 +759,7 @@ function profile_check_params( $params, $User = NULL )
 	}
 
 	// checking login has been typed:
-	if( isset($params['login']) && empty($params['login'][0]) )
-	{
-		param_error( 'login', T_('Please enter a login.') );
-	}
+	param_check_valid_login( 'login' );
 
 	// checking the nickname has been typed
 	if( isset($params['nickname']) && empty($params['nickname'][0]) )
@@ -1185,6 +1182,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.68  2011/10/01 23:01:48  fplanque
+ * better be safe than sorry on logins!
+ *
  * Revision 1.67  2011/09/30 10:16:50  efy-yurybakh
  * Make a big sprite with all backoffice icons
  *

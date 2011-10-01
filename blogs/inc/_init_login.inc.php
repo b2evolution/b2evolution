@@ -93,6 +93,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 
 	// Check that this login request is not a CSRF hacked request:
 	$Session->assert_received_crumb( 'loginform' );
+	// fp> NOTE: TODO: now that we require goign through the login form, all the login logic that is here can probably be moved to login.php ?
 
 	// Note: login and password cannot include '<' !
 	$login = evo_strtolower(strip_tags(remove_magic_quotes($login)));
@@ -326,6 +327,9 @@ $Timer->pause( '_init_login' );
 
 /*
  * $Log$
+ * Revision 1.12  2011/10/01 23:01:48  fplanque
+ * better be safe than sorry on logins!
+ *
  * Revision 1.11  2011/09/17 02:31:59  fplanque
  * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
  *
@@ -348,20 +352,5 @@ $Timer->pause( '_init_login' );
  *
  * Revision 1.5  2011/02/15 05:31:53  sam2kb
  * evo_strtolower mbstring wrapper for strtolower function
- *
- * Revision 1.4  2010/11/18 15:09:16  efy-asimo
- * create $login_error global variable
- *
- * Revision 1.3  2010/04/12 19:14:31  blueyed
- * doc
- *
- * Revision 1.2  2010/02/08 17:51:25  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.1  2009/12/06 05:20:36  fplanque
- * Violent refactoring for _main.inc.php
- * Sorry for potential side effects.
- * This needed to be done badly -- for clarity!
- *
  */
 ?>
