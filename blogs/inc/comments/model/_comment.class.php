@@ -307,7 +307,7 @@ class Comment extends DataObject
 
 	/**
 	 * Set the vote, as a number.
-	 * 
+	 *
 	 * @param string Vote type (spam, useful)
 	 * @param string Vote value (spam, notsure, ok, yes, no)
 	 * @access protected
@@ -315,7 +315,7 @@ class Comment extends DataObject
 	function set_vote( $vote_type, $vote_value )
 	{
 		global $DB, $current_User;
-		
+
 		if( $vote_type == 'useful' )
 		{ // Set a vote field for DB
 			$vote_type = 'helpful';
@@ -338,12 +338,12 @@ class Comment extends DataObject
 		{ // If $vote_type or $vote_value are not correct from ajax request
 			return;
 		}
-		
+
 		if( !$DB->get_row("SELECT * FROM T_comments WHERE comment_ID = '".$this->ID."'" ) )
 		{ // If comment doesn't exist
 			return;
 		}
-		
+
 		$sql_update_count = '';
 		if( !$DB->get_row( "SELECT * FROM T_comments__votes WHERE cmvt_cmt_ID = '".$this->ID."' AND cmvt_user_ID = '".$current_User->ID."'" ) )
 		{ // Add a new vote for first time
@@ -369,15 +369,15 @@ class Comment extends DataObject
 
 	/**
 	 * Get the vote spam type disabled, as array.
-	 * 
+	 *
 	 * @param int User ID
-	 * 
+	 *
 	 * @return array
 	 */
 	function get_vote_spam_disabled()
 	{
 		global $DB, $current_User;
-		
+
 		$disabled = array(
 			'spam' => '',
 			'notsure' => '',
@@ -407,15 +407,15 @@ class Comment extends DataObject
 
 	/**
 	 * Get the vote spam type disabled, as array.
-	 * 
+	 *
 	 * @param int User ID
-	 * 
+	 *
 	 * @return array
 	 */
 	function get_vote_useful_disabled()
 	{
 		global $DB, $current_User;
-		
+
 		$disabled = array(
 			'yes' => '',
 			'no' => ''
@@ -441,7 +441,7 @@ class Comment extends DataObject
 
 	/**
 	 * Get the vote summary, as a string.
-	 * 
+	 *
 	 * @param bool User already voted
 	 * @return string
 	 */
@@ -544,7 +544,7 @@ class Comment extends DataObject
 		$author_name = $this->dget( 'author', $format );
 
 		$author_name = '<span id="username_'.$this->ID.'" class="user anonymous'.$gender_class.' userbubble">'.$author_name.'</span>';
-		
+
 		return $author_name;
 	}
 
@@ -610,7 +610,7 @@ class Comment extends DataObject
 		if( ! $Settings->get('allow_avatars') )
 			return;
 
-		$author_link = get_user_identity_url( $this->author_user_ID, 'user' );
+		$author_link = get_user_identity_url( $this->author_user_ID );
 
 		if( $comment_author_User = & $this->get_author_User() )
 		{	// Author is a user
@@ -1341,20 +1341,20 @@ class Comment extends DataObject
 		}
 
 		echo $before;
-		
+
 		echo '<div id="vote_spam_'.$this->ID.'" class="vote_spam">';
 
 		$vote_disabled = $this->get_vote_spam_disabled();
 
 		echo $this->get_vote_summary( implode( '', $vote_disabled ) == '' );
-		
+
 		foreach( $vote_disabled as $vote_type => $vote_class)
 		{ // Print out 3 buttons for spam voting
 			echo $this->get_vote_link( 'spam', $vote_type, $vote_class, $glue, $save_context, $ajax_button );
 		}
 
 		echo '</div>';
-		
+
 		echo $after;
 	}
 
@@ -1381,20 +1381,20 @@ class Comment extends DataObject
 		}
 
 		echo $before;
-		
+
 		echo '<span id="vote_useful_'.$this->ID.'"> &nbsp; ';
 
 		$vote_disabled = $this->get_vote_useful_disabled();
 
 		echo $this->get_vote_summary( implode( '', $vote_disabled ) == '', 'useful' );
-		
+
 		foreach( $vote_disabled as $vote_type => $vote_class)
 		{ // Print out 2 buttons for useful voting
 			echo $this->get_vote_link( 'useful', $vote_type, $vote_class, $glue, $save_context, $ajax_button );
 		}
 
 		echo '</span>';
-		
+
 		echo $after;
 	}
 
@@ -1876,7 +1876,7 @@ class Comment extends DataObject
 		}
 
 		echo '</div>';
-		
+
 		echo '<script type="text/javascript">
 		/* <![CDATA[ */
 		jQuery("#comment_rating").html("").raty({
@@ -1889,7 +1889,7 @@ class Comment extends DataObject
 		});
 		/* ]]> */
 		</script>';
-		
+
 		echo $params['after'];
 	}
 
@@ -2441,6 +2441,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.116  2011/10/02 02:52:10  fplanque
+ * no message
+ *
  * Revision 1.115  2011/09/30 07:38:58  efy-yurybakh
  * bubbletip for anonymous comments
  *

@@ -2,6 +2,8 @@
 /**
  * This file updates the current user's item subscriptions!
  *
+ * @todo fp> move this to spmething like action.php or call_module.php
+ *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
@@ -65,7 +67,7 @@ if( $type == 'attend' )
 	if( !isset( $GLOBALS[ 'events_Module' ] ) )
 	{
 		// fp>asimo: can we move the whole thing to htsrv/action.php instead?
-		// action.php would expect a param called module and then it would call the 
+		// action.php would expect a param called module and then it would call the
 		// approriate module with the method handle_htsrv_action()
 		bad_request_die( 'Event attending is not supported!' );
 	}
@@ -120,7 +122,7 @@ switch( $isub_type )
 			$reg_type = 'attend';
 		}
 
-		$new_attendant = param( 'new_attendant', 'string', NULL );
+		$new_attendant = param( 'new_attendee', 'string', NULL );
 		if( !empty( $new_attendant ) )
 		{
 			$current_User->check_perm( 'users', 'edit', true );
@@ -169,7 +171,7 @@ switch( $isub_type )
 			$success_sub_message = T_( 'User was successfully subscribed to attend this event.' );
 		}
 
-		if( set_user_attendant( $user_ID, $item_ID, $notify, $reg_type ) )
+		if( set_user_attendee( $user_ID, $item_ID, $notify, $reg_type ) )
 		{
 			if( $notify == 0 )
 			{
@@ -194,6 +196,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.10  2011/10/02 02:51:11  fplanque
+ * no message
+ *
  * Revision 1.9  2011/09/30 08:22:18  efy-asimo
  * Events update
  *
