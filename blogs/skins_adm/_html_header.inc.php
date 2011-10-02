@@ -52,8 +52,8 @@ headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache
 	global $rsc_path, $rsc_url, $htsrv_url;
 
 	add_js_headline( "// Paths used by JS functions:
-		var imgpath_expand = '".get_icon( 'expand', 'url' )."';
-		var imgpath_collapse = '".get_icon( 'collapse', 'url' )."';
+		var bgxy_expand = '".get_icon( 'expand', 'xy' )."';
+		var bgxy_collapse = '".get_icon( 'collapse', 'xy' )."';
 		var htsrv_url = '$htsrv_url';
 		var blog_id = '".param( 'blog', 'integer' )."';" );
 
@@ -281,6 +281,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.40  2011/10/02 12:38:33  efy-yurybakh
+ * fix sprite icons
+ *
  * Revision 1.39  2011/09/29 08:39:01  efy-yurybakh
  * - user_identity_link
  * - lightbox

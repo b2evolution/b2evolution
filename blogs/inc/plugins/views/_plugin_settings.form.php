@@ -131,8 +131,9 @@ $Form->end_fieldset();
 
 
 // --------------------------- EVENTS ---------------------------
-$Form->begin_fieldset( T_('Plugin events').' ('.T_('Advanced')
-	.') '.get_icon('expand', 'imgtag', array( 'id' => 'clickimg_pluginevents' ) ), array('legend_params' => array( 'onclick' => 'toggle_clickopen(\'pluginevents\')') ) );
+$Form->begin_fieldset( T_('Plugin events').' ('.T_('Advanced').') '.get_icon('expand', 'imgtag', array( 'id' => 'clickimg_pluginevents' ) ),
+											 array('legend_params' => array( 'onclick' => 'toggle_clickopen(\'pluginevents\')') )
+											 );
 	?>
 
 	<div id="clickdiv_pluginevents">
@@ -191,6 +192,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.13  2011/10/02 12:38:30  efy-yurybakh
+ * fix sprite icons
+ *
  * Revision 1.12  2011/10/01 01:05:43  efy-yurybakh
  * temp fix of expand icon
  *

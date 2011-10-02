@@ -3021,6 +3021,14 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			/* BREAK */
 
 
+		case 'xy':
+			if( isset( $icon['xy'] ) )
+			{ // Return data for style property "background-position"
+				return "-".$icon['xy'][0]."px -".$icon['xy'][1]."px";
+			}
+			return false;
+
+
 		case 'sprite':
 			if( isset( $icon['xy'] ) )
 			{	// Image uses spite file
@@ -3041,6 +3049,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 				if( isset( $params['size'] ) )
 				{ // Get sizes from params
 					$icon['size'] = $params['size'];
+					unset( $params['size'] );
 				}
 				if( isset( $icon['size'] ) )
 				{ // Set width & height
@@ -3057,22 +3066,25 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 				{ // Get styles from params
 					$styles[] = $params['style'];
 				}
-				$r_id = '';
-				if( isset( $params['id'] ) )
-				{ // Get id param
-					$r_id = ' id="'.$params['id'].'"';
+				if( count( $styles ) > 0 )
+				{
+					$params['style'] = implode( '; ', $styles);
 				}
-				$styles = count($styles) > 0 ? ' style="'.implode( '; ', $styles).'"' : '';
 
 				if( isset( $params['alt'] ) )
 				{
-					$icon_alt = $params['alt'];
+					$params['title'] = $icon['alt'];
+					unset( $params['alt'] );
 				}
-				else
+				else if( ! isset( $params['alt'] ) && isset( $icon['alt'] ) )
 				{
-					$icon_alt = isset( $icon['alt'] ) ? $icon['alt'] : '';
+					$params['title'] = $icon['alt'];
 				}
-				$r = '<span'.$r_id.' class="icon"'.$styles.' title="'.$icon_alt.'">&nbsp;</span>';
+
+				// Add all the attributes:
+				$params = get_field_attribs_as_string( $params, false );
+
+				$r = '<span class="icon"'.$params.'>&nbsp;</span>';
 			}
 			else
 			{ // Use img tag
@@ -4449,6 +4461,9 @@ function generate_random_ip()
 
 /*
  * $Log$
+ * Revision 1.287  2011/10/02 12:38:29  efy-yurybakh
+ * fix sprite icons
+ *
  * Revision 1.286  2011/10/01 01:05:43  efy-yurybakh
  * temp fix of expand icon
  *

@@ -146,14 +146,14 @@ function toggle_clickopen( id, hide, displayVisible )
 	if( hide )
 	{
 		clickdiv.style.display = 'none';
-		clickimg.src = imgpath_expand;
+		clickimg.style.backgroundPosition = bgxy_expand;
 
 		return false;
 	}
 	else
 	{
 		clickdiv.style.display = displayVisible;
-		clickimg.src = imgpath_collapse;
+		clickimg.style.backgroundPosition = bgxy_collapse;
 
 		return false;
 	}
@@ -293,13 +293,13 @@ function toggle_filter_area( filter_name )
 	if( hide )
 	{	// Hide/collapse filters:
 		clickdiv.style.display = 'none';
-		clickimg.src = imgpath_expand;
+		clickimg.style.backgroundPosition = bgxy_expand;
 		asyncRequest( htsrv_url+'async.php?collapse='+filter_name );
 	}
 	else
 	{	// Show/expand filters
 		clickdiv.style.display = 'block';
-		clickimg.src = imgpath_collapse;
+		clickimg.style.backgroundPosition = bgxy_collapse;
 		asyncRequest( htsrv_url+'async.php?expand='+filter_name );
 	}
 

@@ -230,6 +230,7 @@ ul.plain {
 
 
 .action_icon,
+.widget_actions a,
 .no_icon {
 	margin: 0 2px;
 	font-weight: bold;

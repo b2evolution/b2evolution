@@ -15,8 +15,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $htsrv_url;
 
 add_js_headline( "// Paths used by JS functions:
-		var imgpath_expand = '".get_icon( 'expand', 'url' )."';
-		var imgpath_collapse = '".get_icon( 'collapse', 'url' )."';
+		var bgxy_expand = '".get_icon( 'expand', 'xy' )."';
+		var bgxy_collapse = '".get_icon( 'collapse', 'xy' )."';
 		var htsrv_url = '$htsrv_url';" );
 
 // Require results.css to display contact query results in a table
@@ -26,6 +26,9 @@ require $ads_current_skin_path.'index.main.php';
 
 /*
  * $Log$
+ * Revision 1.3  2011/10/02 12:38:33  efy-yurybakh
+ * fix sprite icons
+ *
  * Revision 1.2  2011/09/04 22:13:24  fplanque
  * copyright 2011
  *
