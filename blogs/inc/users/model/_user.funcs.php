@@ -558,7 +558,7 @@ function get_user_identity_link( $user_login, $user_ID = NULL, $profile_tab = 'p
  *
  * @param integer user ID
  */
-function get_user_identity_url ( $user_ID = NULL, $profile_tab = 'profile', $redirect_to = NULL )
+function get_user_identity_url( $user_ID )
 {
 	global $current_User, $Blog;
 
@@ -567,40 +567,18 @@ function get_user_identity_url ( $user_ID = NULL, $profile_tab = 'profile', $red
 		return NULL;
 	}
 
-	if( $redirect_to == NULL && $redirect_to != false )
-	{
-		$redirect_to = rawurlencode( regenerate_url( '','','','&' ) );
+	if( isset($Blog) && !is_admin_page() )
+	{ // can't display the profile form, display the front office User form
+		return url_add_param( $Blog->gen_blogurl(), 'disp=user&amp;user_ID='.$user_ID );
 	}
 
-	if( ( $profile_tab == 'user' && ! empty( $Blog ) ) ||
-		( !isset( $current_User ) ) ||
-		( ( $user_ID != NULL ) && ( $current_User->ID != $user_ID ) && ( ! $current_User->check_perm( 'users', 'view' ) ) ) )
-	{ // user is not logged in or current User is not the same as requested user, and current User doesn't have users view permission
-		if( empty( $Blog ) )
-		{ // Incorrect state
-			return NULL;
-		}
-		else
-		{ // can't display the profile form, display the front office User form
-			$link = url_add_param( $Blog->gen_blogurl(), 'disp=user&amp;user_ID='.$user_ID );
-			if( isset( $redirect_to ) )
-			{
-				$link = url_add_param( $link, 'redirect_to='.$redirect_to );
-			}
-			return $link;
-		}
+	if( ($current_User->ID == $user_ID ) || $current_User->check_perm( 'users', 'view' ) )
+	{	// Go to backoffice profile:
+		return get_user_settings_url( 'profile', $user_ID );
 	}
 
-	$profile_tab = 'profile';
-	// return the corresponding user profile tab url
-	if( isset( $redirect_to ) )
-	{
-		return url_add_param( get_user_settings_url( $profile_tab, $user_ID ), 'redirect_to='.$redirect_to );
-	}
-	else
-	{
-		return get_user_settings_url( $profile_tab, $user_ID );
-	}
+	// can't show anything:
+	return null;
 }
 
 
@@ -881,7 +859,7 @@ function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size
 			if( $link && $current_User->check_perm( 'users', 'view', false ) )
 			{ // Permission to view user details
 				// The user identity url always contains the best available user info page url
-				$img_tag = '<a href="'.get_user_identity_url( $User->ID, 'user' ).'" class="'.$User->get_gender_class().'">'.$img_tag.'</a>';
+				$img_tag = '<a href="'.get_user_identity_url( $User->ID ).'" class="'.$User->get_gender_class().'">'.$img_tag.'</a>';
 			}
 		}
 	}
@@ -1182,6 +1160,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.69  2011/10/02 02:53:35  fplanque
+ * cleanup. What a mess!!!
+ *
  * Revision 1.68  2011/10/01 23:01:48  fplanque
  * better be safe than sorry on logins!
  *

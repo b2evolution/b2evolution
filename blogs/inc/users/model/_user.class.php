@@ -743,14 +743,12 @@ class User extends DataObject
 	/**
 	 * Get User identity link, which is a composite of user avatar and login, both point to the specific user profile tab.
 	 *
-	 * @param string On which user profile tab should this link point to
 	 * @return string User avatar and login if the identity link is not available, the identity link otherwise.
 	 */
 	function get_identity_link( $params = array() )
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'profile_tab'  => 'profile',
 				'before'       => ' ',
 				'after'        => ' ',
 				'format'       => 'htmlbody',
@@ -762,7 +760,8 @@ class User extends DataObject
 				'thumb_class'  => 'avatar_before_login',
 			), $params );
 
-		$identity_url = get_user_identity_url( $this->ID, $params['profile_tab'] );
+		$identity_url = get_user_identity_url( $this->ID );
+
 		$avatar_tag = '';
 		if( $params['link_text'] == 'avatar' || $params['link_text'] == 'only_avatar' )
 		{
@@ -2651,6 +2650,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.150  2011/10/02 02:53:35  fplanque
+ * cleanup. What a mess!!!
+ *
  * Revision 1.149  2011/10/01 23:01:48  fplanque
  * better be safe than sorry on logins!
  *
