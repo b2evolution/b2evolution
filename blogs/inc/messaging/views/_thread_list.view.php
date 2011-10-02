@@ -85,9 +85,21 @@ foreach( $DB->get_results( $recipients_SQL->get() ) as $row )
 
 // Get params from request
 $s = param( 's', 'string', '', true );
+$u = param( 'u', 'string', '', true );
 
-if( !empty( $s ) )
+if( !empty( $s ) || !empty( $u ) )
 {	// We want to filter on search keyword:
+
+	$filter_sql = array();
+	if( !empty( $s ) )
+	{ // Search by title
+		$filter_sql[] = 'threads.thrd_title LIKE "%'.$DB->escape($s).'%"';
+	}
+	if( !empty( $u ) )
+	{ // Search by user names
+		$filter_sql[] = 'CONCAT_WS( " ", threads.thrd_recipients, threads.thrd_usernames) LIKE "%'.$DB->escape($u).'%"';
+	}
+	$filter_sql = ( count( $filter_sql ) > 0 ) ? ' WHERE '.implode( ' OR ', $filter_sql) : '';
 
 	// Create SELECT query
 	$select_SQL = 'SELECT * FROM
@@ -105,24 +117,24 @@ if( !empty( $s ) )
 								LEFT OUTER JOIN T_messaging__thread mt ON mts.tsta_thread_ID = mt.thrd_ID
 								LEFT OUTER JOIN T_messaging__message mm ON mts.tsta_first_unread_msg_ID = mm.msg_ID
 								WHERE mts.tsta_user_ID = '.$current_User->ID.'
-								ORDER BY mts.tsta_first_unread_msg_ID DESC, mt.thrd_datemodified DESC) AS threads
-					WHERE CONCAT_WS( " ", threads.thrd_title, threads.thrd_recipients, threads.thrd_usernames) LIKE "%'.$DB->escape($s).'%"';
+								ORDER BY mts.tsta_first_unread_msg_ID DESC, mt.thrd_datemodified DESC) AS threads'.
+						$filter_sql;
 
 	// Create COUNT query
 	$count_SQL = 'SELECT COUNT(*) FROM
 					(SELECT mt.thrd_title,
 						(SELECT GROUP_CONCAT(ru.user_login SEPARATOR \', \')
-		      			FROM T_messaging__threadstatus AS rts
-		          			LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID AND ru.user_ID <> '.$current_User->ID.'
-		              		WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_recipients,
-		              	(SELECT CONCAT_WS(" ", GROUP_CONCAT(ru.user_firstname), GROUP_CONCAT(ru.user_lastname), GROUP_CONCAT(ru.user_nickname))
+								FROM T_messaging__threadstatus AS rts
+									LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID AND ru.user_ID <> '.$current_User->ID.'
+											WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_recipients,
+										(SELECT CONCAT_WS(" ", GROUP_CONCAT(ru.user_firstname), GROUP_CONCAT(ru.user_lastname), GROUP_CONCAT(ru.user_nickname))
 						FROM T_messaging__threadstatus AS rts
 							LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID AND ru.user_ID <> '.$current_User->ID.'
 							WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_usernames
-		  			FROM T_messaging__threadstatus mts
-		  				LEFT OUTER JOIN T_messaging__thread mt ON mts.tsta_thread_ID = mt.thrd_ID
-		          		WHERE mts.tsta_user_ID = '.$current_User->ID.') AS r
-		          WHERE CONCAT_WS( " ", r.thrd_title, r.thrd_recipients, r.thrd_usernames) LIKE "%'.$DB->escape($s).'%"';
+						FROM T_messaging__threadstatus mts
+							LEFT OUTER JOIN T_messaging__thread mt ON mts.tsta_thread_ID = mt.thrd_ID
+									WHERE mts.tsta_user_ID = '.$current_User->ID.') AS threads'.
+						$filter_sql;
 }
 else
 {
@@ -166,7 +178,8 @@ if( $unread_messages_count > 0 )
  */
 function filter_recipients( & $Form )
 {
-	$Form->text( 's', get_param('s'), 30, T_('Search'), '', 255 );
+	$Form->text( 's', get_param('s'), 20, T_('Search'), '', 255 );
+	$Form->text( 'u', get_param('u'), 10, T_('User'), '', 255 );
 }
 
 $Results->filter_area = array(
@@ -178,8 +191,8 @@ $Results->filter_area = array(
 
 $Results->cols[] = array(
 					'th' => T_('With'),
-					'th_class' => 'thread_with',
-					'td_class' => 'thread_with',
+					'th_class' => 'thread_with shrinkwrap',
+					'td_class' => 'thread_with shrinkwrap',
 					'td' => '%get_avatar_imgtags( #thrd_recipients# )%',
 					);
 
@@ -188,9 +201,7 @@ $Results->cols[] = array(
 					'th' => T_('Subject'),
 					'th_class' => 'thread_subject',
 					'td_class' => 'thread_subject',
-					'td' => '~conditional( #thrd_msg_ID#>0, \'<strong><a href="'.$messages_url.'&amp;thrd_ID=$thrd_ID$&amp;thrd_title=$thrd_title$" title="'
-							.T_('Show messages...').'">$thrd_title$</a></strong>\', \'<a href="'
-							.$messages_url.'&amp;thrd_ID=$thrd_ID$&amp;thrd_title=$thrd_title$" title="'.T_('Show messages...').'">$thrd_title$</a>\' )~',
+					'td' => '<a href="'.$messages_url.'&amp;thrd_ID=$thrd_ID$&amp;thrd_title=~conditional( #thrd_title#!="", #thrd_title#, "(no subject)")~" title="'.T_('Show messages...').'"><strong>~conditional( #thrd_title#!="", #thrd_title#, "<i>(no subject)</i>")~</strong></a>',
 					);
 
 function convert_date( $date, $show_only_date )
@@ -205,7 +216,7 @@ function convert_date( $date, $show_only_date )
 
 $show_only_date = $display_params[ 'show_only_date' ];
 $Results->cols[] = array(
-					'th' => T_('Last message'),
+					'th' => T_('Last msg'),
 					'th_class' => 'shrinkwrap',
 					'td_class' => 'shrinkwrap',
 					'td' => '~conditional( #thrd_msg_ID#>0, \'<span style="color:red">%convert_date(#thrd_unread_since#,'.$show_only_date.')%</span>\', \'<span style="color:green">%convert_date(#thrd_datemodified#,'.$show_only_date.')%</span>\')~' );
@@ -220,7 +231,7 @@ function get_read_by( $thread_ID )
 $Results->cols[] = array(
 					'th' => T_('Read by'),
 					'th_class' => 'shrinkwrap',
-					'td_class' => 'top',
+					'td_class' => 'shrinkwrap top',
 					'td' => '%get_read_by( #thrd_ID# )%',
 					);
 
@@ -242,7 +253,7 @@ function delete_action( $thread_ID )
 if( $current_User->check_perm( 'perm_messaging', 'delete' ) )
 {	// We have permission to modify:
 	$Results->cols[] = array(
-							'th' => T_('Actions'),
+							'th' => T_('Del'),
 							'th_class' => 'shrinkwrap',
 							'td_class' => 'shrinkwrap',
 							'td' => '%delete_action(  #thrd_ID#  )%',
@@ -264,6 +275,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.31  2011/10/02 15:25:03  efy-yurybakh
+ * small messaging UI design changes
+ *
  * Revision 1.30  2011/09/27 07:45:58  efy-asimo
  * Front office messaging hot fixes
  *

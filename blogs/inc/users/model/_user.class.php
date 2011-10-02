@@ -674,7 +674,6 @@ class User extends DataObject
 		else
 		{
 			$r = $this->dget( 'preferredname', $params['format'] );
-			$params['link_class'] = empty( $params['link_class'] ) ? 'userbubble' : $params['link_class'].' userbubble';
 		}
 
 		switch( $params['link_to'] )
@@ -777,8 +776,7 @@ class User extends DataObject
 
 		$link_title = T_( 'Show the user profile' );
 		$link_text = '<span class="nowrap">'.$avatar_tag.$link_login.'</span>';
-		$link_class = $this->get_gender_class().' userbubble';
-		return '<a id="username_'.$this->login.'" href="'.$identity_url.'" title="'.$link_title.'" class="'.$link_class.'">'.$link_text.'</a>';
+		return '<a id="username_'.$this->login.'" href="'.$identity_url.'" title="'.$link_title.'" class="'.$this->get_gender_class().'">'.$link_text.'</a>';
 	}
 
 
@@ -2650,6 +2648,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.151  2011/10/02 15:25:03  efy-yurybakh
+ * small messaging UI design changes
+ *
  * Revision 1.150  2011/10/02 02:53:35  fplanque
  * cleanup. What a mess!!!
  *

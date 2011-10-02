@@ -10,10 +10,10 @@
  */
 jQuery( document ).ready(function()
 {
-	if( $( '.userbubble' ).length > 0 )
+	if( $( '[id^=username_]' ).length > 0 )
 	{ // If links with username exist on the page
 		var link_number = 1;
-		jQuery( '.userbubble' ).live("mouseover", function()
+		jQuery( '[id^=username_]' ).live("mouseover", function()
 		{
 			var link = jQuery( this );
 			if( link.attr( 'id' ).match( 'username_' ) )

@@ -167,7 +167,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 			{
 				echo '<li><input type="radio" name="assgn" value="'.$loop_Obj->ID.'" class="radio"';
 				if( $loop_Obj->ID == $assgn ) echo ' checked="checked"';
-				echo ' /> <a id="username_'.$loop_Obj->login.'" href="'.regenerate_url( 'assgn', 'assgn='.$loop_Obj->ID ).'" class="'.$loop_Obj->get_gender_class().' userbubble">';
+				echo ' /> <a id="username_'.$loop_Obj->login.'" href="'.regenerate_url( 'assgn', 'assgn='.$loop_Obj->ID ).'" class="'.$loop_Obj->get_gender_class().'">';
 				$loop_Obj->preferred_name();
 				echo '</a></li>';
 			}
@@ -191,7 +191,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 			{
 				echo '<li><input type="radio" name="author" value="'.$loop_Obj->ID.'" class="radio"';
 				if( $loop_Obj->ID == $author ) echo ' checked="checked"';
-				echo ' /> <a id="username_'.$loop_Obj->login.'" href="'.regenerate_url( 'author', 'author='.$loop_Obj->ID ).'" class="'.$loop_Obj->get_gender_class().' userbubble">';
+				echo ' /> <a id="username_'.$loop_Obj->login.'" href="'.regenerate_url( 'author', 'author='.$loop_Obj->ID ).'" class="'.$loop_Obj->get_gender_class().'">';
 				$loop_Obj->preferred_name();
 				echo '</a></li>';
 			}
@@ -270,6 +270,9 @@ echo $template['block_end'];
 
 /*
  * $Log$
+ * Revision 1.23  2011/10/02 15:25:03  efy-yurybakh
+ * small messaging UI design changes
+ *
  * Revision 1.22  2011/09/29 16:42:19  efy-yurybakh
  * colored login
  *

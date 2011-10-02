@@ -180,21 +180,19 @@ if( $Settings->get('allow_avatars') )
 
 if( in_array( 'login', $show_columns ) )
 {
-	function user_login( $user_ID )
+	function user_login( $user_ID, $link = true )
 	{
 		$UserCache = & get_UserCache();
 		$User = & $UserCache->get_by_ID( $user_ID, false, false );
 		if( $User )
 		{
-			return get_user_identity_link( $User->login, $User->ID );
+			return $link ? get_user_identity_link( $User->login, $User->ID ) : $User->login;
 		}
 		return '';
 	}
 	$Results->cols[] = array(
 						'th' => T_('Login'),
 						'order' => 'mct_to_user_login',
-						'th_class' => 'shrinkwrap',
-						'td_class' => 'shrinkwrap',
 						'td' => '%user_login( #mct_to_user_ID# )%',
 						);
 }
@@ -215,6 +213,8 @@ if( in_array( 'name', $show_columns ) )
 $Results->cols[] = array(
 					'th' => T_('Name'),
 					'order' => 'mct_to_user_name',
+					'th_class' => 'shrinkwrap',
+					'td_class' => 'shrinkwrap',
 					'td' => '$mct_to_user_name$',
 					);
 }
@@ -248,27 +248,38 @@ function user_pm ( $block, $user_login )
 	{
 		$icon_tag = get_icon( 'comments', 'imgtag', array( 'alt' => 'PM' ) );
 		$messaging_url = get_messaging_url( 'threads' ).'&action=new&user_login='.$user_login;
-		return '<a title="'.T_( 'Private Message' ).': '.$user_login.'" href="'.$messaging_url.'">'.T_( 'Send' ).$icon_tag.'</a>';
+		return '<a title="'.T_( 'Private Message' ).': '.$user_login.'" href="'.$messaging_url.'">'.$icon_tag.T_( 'Send' ).'</a>';
 	}
 	return '';
 }
 
-function last_contact( $date, $show_only_date )
+function last_contact( $date, $show_only_date, $user_ID )
 {
 	//global $show_only_date;
 	if( $show_only_date )
 	{
-		return mysql2localedate( $date );
+		$data = mysql2localedate( $date );
+	}
+	else
+	{
+		$data = mysql2localedatetime( $date );
 	}
 
-	return mysql2localedatetime( $date );
+	$login = user_login( $user_ID, false );
+	if( $login != '' )
+	{
+		$threads_url = get_messaging_url( 'threads' ).'&amp;colselect_submit=Filter+list&amp;u='.$login;
+		$data = '<a href="'.$threads_url.'">'.$data.'</a>';
+	}
+
+	return $data;
 }
 
 $Results->cols[] = array(
 	'th' => /* TRANS: time related */ T_('Last contact'),
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'shrinkwrap',
-	'td' => '%last_contact(#mct_last_contact_datetime#, '.$display_params[ 'show_only_date' ].')%'
+	'td' => '%last_contact(#mct_last_contact_datetime#, '.$display_params[ 'show_only_date' ].', #mct_to_user_ID#)%'
 );
 
 $Results->cols[] = array(
@@ -282,6 +293,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.18  2011/10/02 15:25:03  efy-yurybakh
+ * small messaging UI design changes
+ *
  * Revision 1.17  2011/09/29 16:42:19  efy-yurybakh
  * colored login
  *

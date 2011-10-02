@@ -543,7 +543,7 @@ class Comment extends DataObject
 
 		$author_name = $this->dget( 'author', $format );
 
-		$author_name = '<span id="username_'.$this->ID.'" class="user anonymous'.$gender_class.' userbubble">'.$author_name.'</span>';
+		$author_name = '<span id="username_'.$this->ID.'" class="user anonymous'.$gender_class.'">'.$author_name.'</span>';
 
 		return $author_name;
 	}
@@ -2441,6 +2441,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.117  2011/10/02 15:25:02  efy-yurybakh
+ * small messaging UI design changes
+ *
  * Revision 1.116  2011/10/02 02:52:10  fplanque
  * no message
  *

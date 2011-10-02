@@ -854,14 +854,7 @@ function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size
 			$img_tag = '<span class="nowrap">'.$img_tag.$user_login.'</span>';
 		}
 
-		if( isset( $current_User ) )
-		{
-			if( $link && $current_User->check_perm( 'users', 'view', false ) )
-			{ // Permission to view user details
-				// The user identity url always contains the best available user info page url
-				$img_tag = '<a href="'.get_user_identity_url( $User->ID ).'" class="'.$User->get_gender_class().'">'.$img_tag.'</a>';
-			}
-		}
+		$img_tag = '<a id="username_'.$User->login.'" href="'.get_user_identity_url( $User->ID ).'" class="'.$User->get_gender_class().'">'.$img_tag.'</a>';
 	}
 
 	return $img_tag;
@@ -1160,6 +1153,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.70  2011/10/02 15:25:03  efy-yurybakh
+ * small messaging UI design changes
+ *
  * Revision 1.69  2011/10/02 02:53:35  fplanque
  * cleanup. What a mess!!!
  *
