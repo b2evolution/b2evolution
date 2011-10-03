@@ -533,10 +533,8 @@ class Comment extends DataObject
 	 */
 	function get_author_name_anonymous( $format = 'htmlbody' )
 	{
-		global $Settings;
-
 		$gender_class = '';
-		if( $Settings->get('gender_colored') )
+		if( check_setting( 'gender_colored' ) )
 		{ // Set a gender class if the setting is ON
 			$gender_class = ' nogender';
 		}
@@ -2441,6 +2439,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.119  2011/10/03 10:07:05  efy-yurybakh
+ * bubbletips & identity_links cleanup
+ *
  * Revision 1.118  2011/10/03 07:02:21  efy-yurybakh
  * bubbletips & identity_links cleanup
  *

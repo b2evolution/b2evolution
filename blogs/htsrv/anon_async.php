@@ -101,6 +101,25 @@ switch( $action )
 		$user_ID = param( 'userid', 'integer', 0 );
 		$comment_ID = param( 'commentid', 'integer', 0 );
 
+		if( strpos( $_SERVER["HTTP_REFERER"], "/admin.php" ) !== FALSE )
+		{ // If ajax is requested from admin page we should to set a variable $is_admin_page = true if user has permissions
+			// Check global permission:
+			if( empty($current_User) || ! $current_User->check_perm( 'admin', 'restricted' ) )
+			{ // No permission to access admin...
+				require $adminskins_path.'_access_denied.main.php';
+			}
+			else
+			{ // Set this page as admin page
+				$is_admin_page = true;
+			}
+		}
+
+		if( $blog_ID > 0 )
+		{ // Get Blog if ID is set
+			$BlogCache = & get_BlogCache();
+			$Blog = $BlogCache->get_by_ID( $blog_ID );
+		}
+
 		if( $user_ID > 0 )
 		{ // Print info of the registred users
 			$UserCache = & get_UserCache();
@@ -123,17 +142,11 @@ switch( $action )
 			echo '<div>'.T_('This user is not registered on this site.').'</div>';
 			echo $Comment->get_author_url_link( '', '<div>', '</div>');
 
-			if( $blog_ID > 0 )
-			{ // Get Blog if ID is set
-				$BlogCache = & get_BlogCache();
-				$Blog = $BlogCache->get_by_ID( $blog_ID );
-
-				if( isset( $Blog ) )
-				{ // Link to send message
-					echo '<div>';
-					$Comment->msgform_link( $Blog->get('msgformurl'), '', '', get_icon( 'email', 'imgtag' ).' '.T_('Send a message') );
-					echo '</div>';
-				}
+			if( isset( $Blog ) )
+			{ // Link to send message
+				echo '<div>';
+				$Comment->msgform_link( $Blog->get('msgformurl'), '', '', get_icon( 'email', 'imgtag' ).' '.T_('Send a message') );
+				echo '</div>';
 			}
 			echo '</div>';
 		}
@@ -171,6 +184,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.15  2011/10/03 10:07:05  efy-yurybakh
+ * bubbletips & identity_links cleanup
+ *
  * Revision 1.14  2011/10/03 07:02:21  efy-yurybakh
  * bubbletips & identity_links cleanup
  *

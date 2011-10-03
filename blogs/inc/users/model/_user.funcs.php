@@ -194,6 +194,41 @@ function use_in_skin_login()
 
 
 /**
+ * Check a settings from user for Back office and from skin for Front office
+ * 
+ * @param string Setting name
+ * @return bool Use colored gender
+ */
+function check_setting( $setting_name )
+{
+	global $Settings, $Blog, $SkinCache;
+
+	if( is_admin_page() )
+	{ // Check setting in the Back office
+		if( $Settings->get( $setting_name ) )
+		{ // Set TRUE if the setting is ON
+			return true;
+		}
+	}
+	else
+	{ // Check setting in the Front office for current blog & skin
+		global $Blog, $SkinCache;
+		if( ! isset( $SkinCache ) )
+		{ // Init $SkinCache if it doesn't still exist
+			$SkinCache = & get_SkinCache();
+		}
+		$skin = & $SkinCache->get_by_ID( $Blog->get( 'skin_ID' ) );
+		if( $skin->get_setting( $setting_name ) )
+		{ // If setting is ON for current Blog & Skin
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+/**
  * Template tag: Output a link to new user registration
  * @param string
  * @param string
@@ -854,7 +889,15 @@ function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size
 			$img_tag = '<span class="nowrap">'.$img_tag.$user_login.'</span>';
 		}
 
-		$img_tag = '<a href="'.get_user_identity_url( $User->ID ).'" class="'.$User->get_gender_class().'" rel="bubbletip_user_'.$User->ID.'">'.$img_tag.'</a>';
+		$identity_url = get_user_identity_url( $User->ID );
+		if( empty( $identity_url ) )
+		{ // Current user has not permissions to view other user profile
+			$img_tag = '<span class="'.$User->get_gender_class().'" rel="bubbletip_user_'.$User->ID.'">'.$img_tag.'</span>';
+		}
+		else
+		{ // Show avatar & user login as link to the profile page
+			$img_tag = '<a href="'.$identity_url.'" class="'.$User->get_gender_class().'" rel="bubbletip_user_'.$User->ID.'">'.$img_tag.'</a>';
+		}
 	}
 
 	return $img_tag;
@@ -1153,6 +1196,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.73  2011/10/03 10:07:05  efy-yurybakh
+ * bubbletips & identity_links cleanup
+ *
  * Revision 1.72  2011/10/03 07:02:21  efy-yurybakh
  * bubbletips & identity_links cleanup
  *

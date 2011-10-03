@@ -991,14 +991,9 @@ function init_ratings_js( $relative_to = 'blog' )
  */
 function init_bubbletip_js( $relative_to = 'rsc_url' )
 {
-	global $Blog, $SkinCache;
-	if( ! empty( $Blog ) && ! empty ( $SkinCache ) )
-	{
-		$skin = & $SkinCache->get_by_ID( $Blog->get( 'skin_ID' ) );
-		if( ! $skin->get_setting( 'bubbletip' ) )
-		{ // If bubble tips is OFF for current Blog & Skin
-			return;
-		}
+	if( ! check_setting( 'bubbletip' ) )
+	{ // If setting "bubbletip" is OFF for current case
+		return;
 	}
 	
 	require_js( '#jquery#', $relative_to ); // dependency
@@ -1368,6 +1363,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.109  2011/10/03 10:07:05  efy-yurybakh
+ * bubbletips & identity_links cleanup
+ *
  * Revision 1.108  2011/09/30 12:24:56  efy-yurybakh
  * User directory
  *

@@ -783,7 +783,7 @@ class User extends DataObject
 
 		if( empty( $identity_url ) )
 		{
-			return $avatar_tag.$link_login;
+			return '<span class="'.$this->get_gender_class().'" rel="bubbletip_user_'.$this->ID.'">'.$avatar_tag.$link_login.'</span>';
 		}
 
 		$link_title = T_( 'Show the user profile' );
@@ -2188,12 +2188,10 @@ class User extends DataObject
 	 */
 	function get_gender_class()
 	{
-		global $Settings;
-
 		$gender_class = 'user';
 
-		if( ! $Settings->get('gender_colored') )
-		{ // Don't set a gender class if the setting is OFF
+		if( ! check_setting( 'gender_colored' ) )
+		{ // Don't set gender color if setting is OFF
 			return $gender_class;
 		}
 
@@ -2649,6 +2647,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.153  2011/10/03 10:07:05  efy-yurybakh
+ * bubbletips & identity_links cleanup
+ *
  * Revision 1.152  2011/10/03 07:02:21  efy-yurybakh
  * bubbletips & identity_links cleanup
  *

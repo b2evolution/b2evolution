@@ -53,6 +53,12 @@ class asevo_Skin extends Skin
 					'defaultvalue' => 1,
 					'type'	=>	'checkbox',
 				),
+				'gender_colored' => array(
+					'label' => T_('Display gender'),
+					'note' => T_('Use colored usernames to differentiate men & women.'),
+					'defaultvalue' => 0,
+					'type' => 'checkbox',
+				),
 				'bubbletip' => array(
 					'label' => T_('Username bubble tips'),
 					'note' => T_('Check to enable bubble tips on usernames'),
@@ -87,6 +93,9 @@ class asevo_Skin extends Skin
 
 /*
  * $Log$
+ * Revision 1.7  2011/10/03 10:07:06  efy-yurybakh
+ * bubbletips & identity_links cleanup
+ *
  * Revision 1.6  2011/09/29 12:22:23  efy-yurybakh
  * skin param for bubbletip
  *

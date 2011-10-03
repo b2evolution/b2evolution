@@ -72,6 +72,8 @@ switch ( $action )
 
 		param( 'gender_colored', 'integer', 0 );
 
+		param( 'bubbletip', 'integer', 0 );
+
 		$Settings->set_array( array(
 									 array( 'newusers_canregister', $newusers_canregister),
 
@@ -81,7 +83,7 @@ switch ( $action )
 
 									 array( 'newusers_mustvalidate', $newusers_mustvalidate),
 
-		                             array( 'newusers_revalidate_emailchg', $newusers_revalidate_emailchg),
+									 array( 'newusers_revalidate_emailchg', $newusers_revalidate_emailchg),
 
 									 array( 'user_minpwdlen', $user_minpwdlen),
 
@@ -95,7 +97,9 @@ switch ( $action )
 
 									 array( 'registration_require_gender', $registration_require_gender),
 
-									 array( 'gender_colored', $gender_colored) ) );
+									 array( 'gender_colored', $gender_colored),
+
+									 array( 'bubbletip', $bubbletip) ) );
 
 		if( ! $Messages->has_errors() )
 		{
@@ -138,6 +142,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2011/10/03 10:07:06  efy-yurybakh
+ * bubbletips & identity_links cleanup
+ *
  * Revision 1.14  2011/09/26 14:49:58  efy-yurybakh
  * colored usernames
  *
