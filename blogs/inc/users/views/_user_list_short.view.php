@@ -1,0 +1,202 @@
+<?php
+/**
+ * This file implements the UI view for the user list for user viewing.
+ *
+ * This file is part of the evoCore framework - {@link http://evocore.net/}
+ * See also {@link http://sourceforge.net/projects/evocms/}.
+ *
+ * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ *
+ * {@internal License choice
+ * - If you have received this file as part of a package, please find the license.txt file in
+ *   the same folder or the closest folder above for complete license terms.
+ * - If you have received this file individually (e-g: from http://evocms.cvs.sourceforge.net/)
+ *   then you must choose one of the following licenses before using the file:
+ *   - GNU General Public License 2 (GPL) - http://www.opensource.org/licenses/gpl-license.php
+ *   - Mozilla Public License 1.1 (MPL) - http://www.opensource.org/licenses/mozilla1.1.php
+ * }}
+ *
+ * {@internal Open Source relicensing agreement:
+ * }}
+ *
+ * @package admin
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author fplanque: Francois PLANQUE
+ *
+ * @version $Id$
+ */
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+
+/**
+ * @var User
+ */
+global $current_User;
+/**
+ * @var GeneralSettings
+ */
+global $Settings;
+/**
+ * @var DB
+ */
+global $DB;
+
+global $collections_Module;
+
+if( !isset( $display_params ) )
+{ // init display_params
+	$display_params = array();
+}
+
+/*
+ * Query user list:
+ */
+$keywords = param( 'keywords', 'string', '', true );
+// fp> TODO: implement this like other filtersets in the app. You need a checkbox, or better yet: a select that allows: Confirmed/Unconfirmed/All
+// $usr_unconfirmed = param( 'usr_unconfirmed', 'boolean', false, true );
+
+$where_clause = '';
+
+if( !empty( $keywords ) )
+{
+	$kw_array = split( ' ', $keywords );
+	foreach( $kw_array as $kw )
+	{
+		// Note: we use CONCAT_WS (Concat With Separator) because CONCAT returns NULL if any arg is NULL
+		$where_clause .= 'CONCAT_WS( " ", user_login ) LIKE "%'.$DB->escape($kw).'%" AND ';
+	}
+}
+// fp> TODO: implement this like other filtersets in the app. You need a checkbox, or better yet: a select that allows: Confirmed/Unconfirmed/All
+/*
+if( $usr_unconfirmed )
+{
+	$where_clause .= 'user_validated = 0 AND ';
+}
+*/
+$SQL = new SQL();
+$SQL->SELECT( 'T_users.*, ctry_name, IF( IFNULL(user_avatar_file_ID,0), 1, 0 ) as has_picture' );
+$SQL->FROM( 'T_users LEFT JOIN T_country ON user_ctry_ID = ctry_ID' );
+$SQL->WHERE( $where_clause.' 1' );
+$SQL->GROUP_BY( 'user_ID' );
+
+if( isset($collections_Module) )
+{	// We are handling blogs:
+	$SQL->SELECT_add( ', COUNT(DISTINCT blog_ID) AS nb_blogs' );
+	$SQL->FROM_add( ' LEFT JOIN T_blogs on user_ID = blog_owner_user_ID' );
+}
+else
+{
+	$SQL->SELECT_add( ', 0 AS nb_blogs' );
+}
+
+$count_sql = 'SELECT COUNT(*)
+							 	FROM T_users
+							 WHERE '.$where_clause.' 1';
+
+if( $Settings->get('allow_avatars') )
+{ // Sort by login
+	$default_sort = '-A';
+}
+else
+{ // Sort by login (if pictures are not allowed )
+	$default_sort = 'A';
+}
+
+$Results = new Results( $SQL->get(), 'user_', $default_sort, NULL, $count_sql );
+
+$Results->title = T_('Users').get_manual_link('users_and_groups');
+
+/*
+ * Table icons:
+ */
+if( $current_User->check_perm( 'users', 'edit', false ) )
+{ // create new user link
+	global $admin_url;
+	$Results->global_icon( T_('Create a new user...'), 'new', $admin_url.'?ctrl=user&amp;action=new&amp;user_tab=profile', T_('Add user').' &raquo;', 3, 4  );
+}
+
+
+/**
+ * Callback to add filters on top of the result set
+ *
+ * @param Form
+ */
+function filter_userlist( & $Form )
+{
+	$Form->text( 'keywords', get_param('keywords'), 20, T_('Keywords'), T_('Separate with space'), 50 );
+}
+$Results->filter_area = array(
+	'callback' => 'filter_userlist',
+	'url_ignore' => 'results_user_page,keywords',
+	'presets' => array(
+		'all' => array( T_('All users'), get_messaging_url( 'users' ) ),
+// fp> TODO: implement this like other filtersets in the app. You need a checkbox, or better yet: a select that allows: Confirmed/Unconfirmed/All
+//		'unconfirmed' => array( T_('Unconfirmed email'), '?ctrl=users&amp;usr_unconfirmed=1' ),
+		)
+	);
+
+
+/*
+ * Grouping params:
+ */
+$Results->ID_col = 'user_ID';
+
+
+/*
+ * Data columns:
+ */
+
+if( $Settings->get('allow_avatars') )
+{
+	function user_avatar( $user_ID, $user_avatar_file_ID )
+	{
+		$FileCache = & get_FileCache();
+
+		// Do not halt on error. A file can disappear without the profile being updated.
+		/**
+		 * @var File
+		 */
+		if( ! $File = & $FileCache->get_by_ID( $user_avatar_file_ID, false, false ) )
+		{
+			return '';
+		}
+		$identity_link = get_user_identity_url( $user_ID );
+		return '<a href="'.$identity_link.'">'.$File->get_thumb_imgtag( 'crop-48x48' ).'</a>';
+	}
+	$Results->cols[] = array(
+							'th' => T_('Picture'),
+							'th_class' => 'shrinkwrap',
+							'td_class' => 'shrinkwrap center',
+							'order' => 'has_picture',
+							'default_dir' => 'D',
+							'td' => '%user_avatar( #user_ID#, #user_avatar_file_ID# )%',
+						);
+}
+
+$Results->cols[] = array(
+						'th' => T_('Login'),
+						'order' => 'user_login',
+						'td' => '%get_user_identity_link( #user_login#, #user_ID#, "profile", "text" )%',
+					);
+
+$Results->cols[] = array(
+						'th' => T_('Country'),
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap',
+						'order' => 'ctry_name',
+						'td' => '$ctry_name$',
+					);
+
+// Display result :
+$Results->display( $display_params );
+
+
+/*
+ * $Log$
+ * Revision 1.1  2011/10/03 13:37:50  efy-yurybakh
+ * User directory
+ *
+ * 
+ */
+?>

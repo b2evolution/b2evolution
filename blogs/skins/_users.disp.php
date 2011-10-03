@@ -81,7 +81,7 @@ $params = array_merge( array(
 switch( $disp )
 {
 	case 'users':
-		require $inc_path.'users/views/_user_list.view.php';
+		require $inc_path.'users/views/_user_list_short.view.php';
 		break;
 
 	default:
@@ -90,6 +90,9 @@ switch( $disp )
 
 /**
  * $Log$
+ * Revision 1.2  2011/10/03 13:37:49  efy-yurybakh
+ * User directory
+ *
  * Revision 1.1  2011/09/30 12:24:56  efy-yurybakh
  * User directory
  *
