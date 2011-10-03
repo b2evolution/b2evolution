@@ -563,7 +563,6 @@ function check_is_email( $email )
 }
 
 
-
 /**
  * Check if the value is a valid login (in terms of allowed chars)
  *
@@ -580,13 +579,13 @@ function param_check_valid_login( $var )
 		return T_('Please choose a username.' );
 	}
 
-	// fp> TODO: make this regexp configurable in user registration settings
 	// WARNING: allowing ' or " or > or < will open security issues!
+	// WARNING: allowing special chars like latin 1 accented chars ( \xDF-\xF6\xF8-\xFF ) will create issues with
+	// user media directory names (tested on Max OS X) -- Do no allow any of this until we have a clean & safe media dir name generator.
 	// NOTE: allowing @ will make some "average" users use their email address (not good for their spam health)
 	// NOTE: in some places usernames are typed in by other users (messaging) or admins.
 	// Having cryptic logins with hard to type letters is a PITA.
-	// NOTE: the regexp below includes accented lowercase letters from the Latin1 charset.
-	if( ! preg_match( '~^[A-Za-z0-9\xDF-\xF6\xF8-\xFF_.]*$~', $GLOBALS[$var] ) )
+	if( ! preg_match( '~^[A-Za-z0-9_.]*$~', $GLOBALS[$var] ) )
 	{
 		param_error( $var, T_('Logins can only contain letters, digits and the following characters: _ .') );
 		// fp> TODO: check why a dash '-' prevents renaming the fileroot
@@ -594,8 +593,6 @@ function param_check_valid_login( $var )
 	}
 	return true;
 }
-
-
 
 
 /**
@@ -2186,6 +2183,9 @@ function isset_param( $var )
 
 /*
  * $Log$
+ * Revision 1.76  2011/10/03 16:36:54  fplanque
+ * Next time anyone wants to life restrictions on login, you'd better make a strong case about how thoroughly you tested this!
+ *
  * Revision 1.75  2011/10/01 23:01:48  fplanque
  * better be safe than sorry on logins!
  *
