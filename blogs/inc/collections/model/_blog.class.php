@@ -511,8 +511,8 @@ class Blog extends DataObject
 			$this->set_setting( 'disable_comments_bypost', param( 'disable_comments_bypost', 'string', '0' ) );
 			$this->set_setting( 'allow_anon_url', param( 'allow_anon_url', 'string', '0' ) );
 			$this->set_setting( 'allow_attachments', param( 'allow_attachments', 'string', 'registered' ) );
-			$this->set_setting( 'allow_rating', param( 'allow_rating', 'string', 'never' ) );
-			$this->set_setting( 'allow_useful', param( 'allow_useful', 'string', '0' ) );
+			$this->set_setting( 'allow_rating_items', param( 'allow_rating_items', 'string', 'never' ) );
+			$this->set_setting( 'allow_rating_comment_helpfulness', param( 'allow_rating_comment_helpfulness', 'string', '0' ) );
 			$this->set( 'allowtrackbacks', param( 'blog_allowtrackbacks', 'integer', 0 ) );
 			$this->set_setting( 'comments_orderdir', param( 'comments_orderdir', '/^(?:ASC|DESC)$/', 'ASC' ) );
 
@@ -2489,6 +2489,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.151  2011/10/03 17:13:04  efy-yurybakh
+ * review fp>yura comments
+ *
  * Revision 1.150  2011/10/03 07:02:21  efy-yurybakh
  * bubbletips & identity_links cleanup
  *

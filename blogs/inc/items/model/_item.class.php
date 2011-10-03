@@ -840,7 +840,7 @@ class Item extends ItemLight
 	 *
 	 * @private function
 	 *
-	 * @param string blog settings name. Param value can be 'allow_comments', 'allow_attachments','allow_rating'
+	 * @param string blog settings name. Param value can be 'allow_comments', 'allow_attachments','allow_rating_items'
 	 * @return boolean  true if user is allowed for the corresponding action
 	 */
 	function check_blog_settings( $settings_name )
@@ -888,7 +888,7 @@ class Item extends ItemLight
 	 */
 	function can_rate()
 	{
-		return $this->check_blog_settings( 'allow_rating' );
+		return $this->check_blog_settings( 'allow_rating_items' );
 	}
 
 
@@ -4876,6 +4876,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.262  2011/10/03 17:13:04  efy-yurybakh
+ * review fp>yura comments
+ *
  * Revision 1.261  2011/09/29 08:39:01  efy-yurybakh
  * - user_identity_link
  * - lightbox

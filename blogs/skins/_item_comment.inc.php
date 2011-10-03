@@ -106,7 +106,7 @@ $Comment = & $params['Comment'];
 		?>
 
 		<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
-		<?php $Comment->vote_useful( '', '', '&amp;', true, true );?>
+		<?php $Comment->vote_helpful( '', '', '&amp;', true, true );?>
 	</div>
 <?php
   echo $params['comment_end'];
@@ -116,6 +116,9 @@ $Comment = & $params['Comment'];
 
 /*
  * $Log$
+ * Revision 1.14  2011/10/03 17:13:04  efy-yurybakh
+ * review fp>yura comments
+ *
  * Revision 1.13  2011/09/28 16:15:56  efy-yurybakh
  * "comment was helpful" votes
  *

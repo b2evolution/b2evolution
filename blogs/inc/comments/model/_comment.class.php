@@ -308,7 +308,7 @@ class Comment extends DataObject
 	/**
 	 * Set the vote, as a number.
 	 *
-	 * @param string Vote type (spam, useful)
+	 * @param string Vote type (spam, helpful)
 	 * @param string Vote value (spam, notsure, ok, yes, no)
 	 * @access protected
 	 */
@@ -316,9 +316,9 @@ class Comment extends DataObject
 	{
 		global $DB, $current_User;
 
-		if( $vote_type == 'useful' )
-		{ // Set a vote field for DB
-			$vote_type = 'helpful';
+		if( ! in_array( $vote_type, array( 'spam', 'helpful' ) ) )
+		{ // Restrict access for bad requests
+			return;
 		}
 		switch ( $vote_value )
 		{ // Set a value for spam vote
@@ -335,7 +335,7 @@ class Comment extends DataObject
 				break;
 		}
 		if( ! isset( $vote ) )
-		{ // If $vote_type or $vote_value are not correct from ajax request
+		{ // If $vote_value is not correct from ajax request
 			return;
 		}
 
@@ -406,13 +406,11 @@ class Comment extends DataObject
 
 
 	/**
-	 * Get the vote spam type disabled, as array.
-	 *
-	 * @param int User ID
+	 * Get the vote helpful type disabled, as array.
 	 *
 	 * @return array
 	 */
-	function get_vote_useful_disabled()
+	function get_vote_helpful_disabled()
 	{
 		global $DB, $current_User;
 
@@ -443,21 +441,18 @@ class Comment extends DataObject
 	 * Get the vote summary, as a string.
 	 *
 	 * @param bool User already voted
+	 * @param type Vote type (spam, helpful)
 	 * @return string
 	 */
 	function get_vote_summary( $is_voted, $type = 'spam' )
 	{
-		if( ! in_array( $type, array( 'spam', 'useful' ) ) )
+		if( ! in_array( $type, array( 'spam', 'helpful' ) ) )
 		{ // Bad request
 			return '';
 		}
 		if( $is_voted )
 		{ // If current user didn't vote this comment
 			return T_( $type == 'spam' ? 'My Spam Vote:' : 'Is this comment helpful?' );
-		}
-		if( $type == 'useful' )
-		{
-			$type = 'helpful';
 		}
 
 		if( $this->{'comment_'.$type.'_countvotes'} == 0 )
@@ -1264,11 +1259,11 @@ class Comment extends DataObject
 			break;
 			case "yes":
 				$text = get_icon( 'thumb_up'.( $class != '' ? '_'.$class : '' ) );
-				$title = T_('Mark this comment as useful!');
+				$title = T_('Mark this comment as helpful!');
 			break;
 			case "no":
 				$text = get_icon( 'thumb_down'.( $class != '' ? '_'.$class : '' ) );
-				$title = T_('Mark this comment as not useful!');
+				$title = T_('Mark this comment as not helpful!');
 			break;
 		}
 		if( $class == 'disabled' )
@@ -1358,7 +1353,7 @@ class Comment extends DataObject
 
 
 	/**
-	 * Display link to vote a comment as SPAM if user has edit rights
+	 * Display links to vote a comment as HELPFUL if user is logged
 	 *
 	 * @param string to display before link
 	 * @param string to display after link
@@ -1366,29 +1361,28 @@ class Comment extends DataObject
 	 * @param boolean save context?
 	 * @param boolean true if create AJAX button
 	 */
-	function vote_useful( $before = '', $after = '', $glue = '&amp;', $save_context = true, $ajax_button = false )
+	function vote_helpful( $before = '', $after = '', $glue = '&amp;', $save_context = true, $ajax_button = false )
 	{
 		global $current_User;
 
-		//$this->get_Item();
+		$this->get_Item()->load_Blog();
 
-		//if( ! $current_User->check_perm( 'blog_vote_useful_comments', 'edit', false, $this->Item->get_blog_ID() ) )
-		if( ! is_logged_in() )
-		{ // If User has no permission to vote spam
+		if( ! is_logged_in() || ! $this->Item->Blog->get_setting('allow_rating_comment_helpfulness') )
+		{ // If User is not logged OR Users cannot vote
 			return false;
 		}
 
 		echo $before;
 
-		echo '<span id="vote_useful_'.$this->ID.'"> &nbsp; ';
+		echo '<span id="vote_helpful_'.$this->ID.'"> &nbsp; ';
 
-		$vote_disabled = $this->get_vote_useful_disabled();
+		$vote_disabled = $this->get_vote_helpful_disabled();
 
-		echo $this->get_vote_summary( implode( '', $vote_disabled ) == '', 'useful' );
+		echo $this->get_vote_summary( implode( '', $vote_disabled ) == '', 'helpful' );
 
 		foreach( $vote_disabled as $vote_type => $vote_class)
-		{ // Print out 2 buttons for useful voting
-			echo $this->get_vote_link( 'useful', $vote_type, $vote_class, $glue, $save_context, $ajax_button );
+		{ // Print out 2 buttons for helpful voting
+			echo $this->get_vote_link( 'helpful', $vote_type, $vote_class, $glue, $save_context, $ajax_button );
 		}
 
 		echo '</span>';
@@ -2439,6 +2433,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.120  2011/10/03 17:13:04  efy-yurybakh
+ * review fp>yura comments
+ *
  * Revision 1.119  2011/10/03 10:07:05  efy-yurybakh
  * bubbletips & identity_links cleanup
  *

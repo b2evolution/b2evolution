@@ -804,7 +804,7 @@ function create_blog(
 	$blog_longdesc = '',
 	$blog_skin_ID = 1,
 	$kind = 'std', // standard blog; notorious variation: "photo"
-	$allow_rating = '' )
+	$allow_rating_items = '' )
 {
 	global $default_locale, $test_install_all_features;
 
@@ -823,12 +823,12 @@ function create_blog(
 	$Blog->set( 'siteurl', 'blog'.$Blog->ID.'.php' );
 	if( $test_install_all_features )
 	{
-		$allow_rating = 'any';
+		$allow_rating_items = 'any';
 		$Blog->set_setting( 'skin'.$blog_skin_ID.'_bubbletip', '1' );
 	}
-	if( $allow_rating != '' )
+	if( $allow_rating_items != '' )
 	{
-		$Blog->set_setting( 'allow_rating', $allow_rating );
+		$Blog->set_setting( 'allow_rating_items', $allow_rating_items );
 	}
 
 	$Blog->dbupdate();
@@ -1419,6 +1419,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.326  2011/10/03 17:13:04  efy-yurybakh
+ * review fp>yura comments
+ *
  * Revision 1.325  2011/10/03 07:18:15  efy-yurybakh
  * set girl avatar in the test install mode
  *

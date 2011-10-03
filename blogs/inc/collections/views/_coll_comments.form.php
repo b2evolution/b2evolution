@@ -93,11 +93,11 @@ $Form->begin_fieldset( T_('Feedback options') );
 						array(  $any_option, $registered_option, $member_option, $never_option,
 						), T_('Allow attachments from'), true );
 
-	$Form->radio( 'allow_rating', $edited_Blog->get_setting( 'allow_rating' ),
+	$Form->radio( 'allow_rating_items', $edited_Blog->get_setting( 'allow_rating_items' ),
 						array( $any_option, $registered_option, $member_option, $never_option,
 						), T_('Allow star ratings from'), true );
 
-	$Form->checkbox( 'allow_useful', $edited_Blog->get_setting( 'allow_useful' ), T_('Allow useful/not useful'), T_("Allow users to say if a comment was useful or not.") );
+	$Form->checkbox( 'allow_rating_comment_helpfulness', $edited_Blog->get_setting( 'allow_rating_comment_helpfulness' ), T_('Allow helpful/not helpful'), T_("Allow users to say if a comment was helpful or not.") );
 
 	$Form->checkbox( 'blog_allowtrackbacks', $edited_Blog->get( 'allowtrackbacks' ), T_('Trackbacks'), T_("Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.") );
 
@@ -182,6 +182,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.4  2011/10/03 17:13:04  efy-yurybakh
+ * review fp>yura comments
+ *
  * Revision 1.3  2011/09/30 13:03:20  fplanque
  * doc
  *

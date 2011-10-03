@@ -175,7 +175,7 @@ switch( $action )
 			{ // Check permission for spam voting
 				$current_User->check_perm( 'blog_vote_spam_comments', 'edit', true, param( 'blogid', 'integer' ) );
 			}
-			else if( ! is_logged_in() || $type != 'useful' )
+			else if( ! is_logged_in() || $type != 'helpful' )
 			{ // Restrict not logged users here
 				exit(0);
 			}
@@ -193,6 +193,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.17  2011/10/03 17:13:04  efy-yurybakh
+ * review fp>yura comments
+ *
  * Revision 1.16  2011/10/03 14:45:16  efy-yurybakh
  * Add User::get_identity_link() everywhere
  *

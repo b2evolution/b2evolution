@@ -75,9 +75,8 @@ class CollectionSettings extends AbstractSettings
 			'disable_comments_bypost' => '1',
 			'allow_anon_url' => '0',
 			'allow_attachments' => 'registered',
-			'allow_rating' => 'never',
-// fp>yura rename this to 'allow_rating_comment_usefulness'
-			'allow_useful' => '0',
+			'allow_rating_items' => 'never',
+			'allow_rating_comment_helpfulness' => '0',
 			'comments_orderdir' => 'ASC',
 			'paged_comments' => '0',
 			'comments_per_page' => 1000,
@@ -193,6 +192,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.66  2011/10/03 17:13:04  efy-yurybakh
+ * review fp>yura comments
+ *
  * Revision 1.65  2011/09/30 13:03:19  fplanque
  * doc
  *

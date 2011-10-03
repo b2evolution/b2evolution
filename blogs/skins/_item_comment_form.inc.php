@@ -145,7 +145,7 @@ function fadeIn( id, color )
 // Set comments vote
 function setCommentVote( id, type, vote )
 {
-	var divid = "vote_useful_" + id;
+	var divid = "vote_helpful_" + id;
 	switch(vote)
 	{
 		case "no":
@@ -306,6 +306,9 @@ function setCommentVote( id, type, vote )
 
 /*
  * $Log$
+ * Revision 1.34  2011/10/03 17:13:04  efy-yurybakh
+ * review fp>yura comments
+ *
  * Revision 1.33  2011/10/03 15:58:18  efy-yurybakh
  * Add User::get_identity_link() everywhere
  *
