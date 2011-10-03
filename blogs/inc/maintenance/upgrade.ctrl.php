@@ -115,6 +115,13 @@ switch( $action )
 
 	case 'download':
 		// STEP 2: DOWNLOAD.
+
+		if( $demo_mode )
+		{
+			echo('This feature is disabled on the demo server.');
+			break;
+		}
+
 		$block_item_Widget = new Widget( 'block_item' );
 		$block_item_Widget->title = T_('Downloading, unzipping & installing package...');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
@@ -159,6 +166,13 @@ switch( $action )
 
 	case 'unzip':
 		// STEP 3: UNZIP.
+
+		if( $demo_mode )
+		{
+			echo('This feature is disabled on the demo server.');
+			break;
+		}
+
 		if( !isset( $block_item_Widget ) )
 		{
 			$block_item_Widget = new Widget( 'block_item' );
@@ -200,6 +214,13 @@ switch( $action )
 
 	case 'install':
 		// STEP 4: INSTALL.
+
+		if( $demo_mode )
+		{
+			echo('This feature is disabled on the demo server.');
+			break;
+		}
+
 		if( !isset( $block_item_Widget ) )
 		{
 			$block_item_Widget = new Widget( 'block_item' );
@@ -311,6 +332,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2011/10/03 17:59:59  fplanque
+ * demo mode
+ *
  * Revision 1.13  2011/02/10 23:07:21  fplanque
  * minor/doc
  *

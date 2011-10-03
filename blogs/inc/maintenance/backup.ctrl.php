@@ -78,9 +78,15 @@ switch( $action )
 		break;
 
 	case 'backup':
+		if( $demo_mode )
+		{
+			echo('This feature is disabled on the demo server.');
+			break;
+		}
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'backup' );
-		
+
 		$Form = new Form( NULL, 'backup_progress', 'post' );
 
 		// Interactive / flush() backup should start here
@@ -92,7 +98,7 @@ switch( $action )
 		if( $maintenance_mode = param( 'bk_maintenance_mode', 'boolean' ) )
 		{	// Enable maintenance mode
 			$success = switch_maintenance_mode( true, T_( 'System backup is in progress. Please reload this page in a few minutes.' ) );
-			
+
 			// Make sure we exit the maintenance mode if PHP dies
 			register_shutdown_function( 'switch_maintenance_mode', false );
 		}
@@ -120,6 +126,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2011/10/03 17:59:59  fplanque
+ * demo mode
+ *
  * Revision 1.8  2010/10/27 23:55:40  sam2kb
  * Register shutdown function to exit the maintenance mode if PHP dies
  *
