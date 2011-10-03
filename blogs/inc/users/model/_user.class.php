@@ -740,6 +740,18 @@ class User extends DataObject
 
 
 	/**
+	 * Get user's preferred name with gender color
+	 *
+	 * @param string Output format, see {@link format_to_output()}
+	 * @return string User's preferred name with gender color if this available
+	 */
+	function get_colored_name( $format = 'htmlbody' )
+	{
+		return '<span class="'.$this->get_gender_class().'">'.format_to_output( $this->get_preferred_name(), $format ).'</span>';
+	}
+
+
+	/**
 	 * Get User identity link, which is a composite of user avatar and login, both point to the specific user profile tab.
 	 *
 	 * @return string User avatar and login if the identity link is not available, the identity link otherwise.
@@ -776,7 +788,7 @@ class User extends DataObject
 
 		$link_title = T_( 'Show the user profile' );
 		$link_text = '<span class="nowrap">'.$avatar_tag.$link_login.'</span>';
-		return '<a id="username_'.$this->login.'" href="'.$identity_url.'" title="'.$link_title.'" class="'.$this->get_gender_class().'">'.$link_text.'</a>';
+		return '<a href="'.$identity_url.'" title="'.$link_title.'" class="'.$this->get_gender_class().'" rel="bubbletip_user_'.$this->ID.'">'.$link_text.'</a>';
 	}
 
 
@@ -2100,17 +2112,6 @@ class User extends DataObject
 
 
 	/**
-	 * Template function: display user's preferred name with gender color
-	 *
-	 * @param string Output format, see {@link format_to_output()}
-	 */
-	function colored_name( $format = 'htmlbody' )
-	{
-		return '<span class="'.$this->get_gender_class().'">'.format_to_output( $this->get_preferred_name(), $format ).'</span>';
-	}
-
-
-	/**
 	 * Template function: display user's URL
 	 *
 	 * @param string string to display before the date (if changed)
@@ -2648,6 +2649,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.152  2011/10/03 07:02:21  efy-yurybakh
+ * bubbletips & identity_links cleanup
+ *
  * Revision 1.151  2011/10/02 15:25:03  efy-yurybakh
  * small messaging UI design changes
  *

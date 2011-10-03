@@ -348,7 +348,7 @@ if( $action == 'new' )
 }
 else
 {
-	$AdminUI->breadcrumbpath_add( $edited_User->colored_name(), '?ctrl=user&amp;user_ID='.$edited_User->ID );
+	$AdminUI->breadcrumbpath_add( $edited_User->get_colored_name(), '?ctrl=user&amp;user_ID='.$edited_User->ID );
 }
 switch( $user_tab )
 {
@@ -450,6 +450,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.38  2011/10/03 07:02:21  efy-yurybakh
+ * bubbletips & identity_links cleanup
+ *
  * Revision 1.37  2011/10/01 09:12:50  efy-asimo
  * New user create - fix
  *

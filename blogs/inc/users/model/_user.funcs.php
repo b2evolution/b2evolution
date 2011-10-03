@@ -854,9 +854,7 @@ function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size
 			$img_tag = '<span class="nowrap">'.$img_tag.$user_login.'</span>';
 		}
 
-// fp>yura do NOT use an id in a function that can be called multiple times on the same page.
-// IDs must be unique.
-		$img_tag = '<a id="username_'.$User->login.'" href="'.get_user_identity_url( $User->ID ).'" class="'.$User->get_gender_class().'">'.$img_tag.'</a>';
+		$img_tag = '<a href="'.get_user_identity_url( $User->ID ).'" class="'.$User->get_gender_class().'" rel="bubbletip_user_'.$User->ID.'">'.$img_tag.'</a>';
 	}
 
 	return $img_tag;
@@ -1131,7 +1129,7 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 	global $AdminUI;
 
 	// set title
-	$form_title = '<span class="user_title">'.sprintf( '%s &ndash; %s', $edited_User->dget('fullname').' &laquo;'.$edited_User->colored_name().'&raquo;', $user_tab_title ).'</span>';
+	$form_title = '<span class="user_title">'.sprintf( '%s &ndash; %s', $edited_User->dget('fullname').' &laquo;'.$edited_User->get_colored_name().'&raquo;', $user_tab_title ).'</span>';
 
 	// set avatar tag
 	if( $edited_User->has_avatar() )
@@ -1155,6 +1153,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.72  2011/10/03 07:02:21  efy-yurybakh
+ * bubbletips & identity_links cleanup
+ *
  * Revision 1.71  2011/10/03 01:15:37  fplanque
  * doc
  *

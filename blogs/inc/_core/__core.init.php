@@ -772,7 +772,7 @@ class _core_Module extends Module
 
 		$entries = array(
 			'userprefs' => array(
-					'text' => ($current_User->has_avatar() ? $current_User->get_avatar_imgtag( 'crop-15x15', '', 'top' ).' ' : '' ).'<strong>'.$current_User->colored_name().'</strong>',
+					'text' => ($current_User->has_avatar() ? $current_User->get_avatar_imgtag( 'crop-15x15', '', 'top' ).' ' : '' ).'<strong>'.$current_User->get_colored_name().'</strong>',
 					'href' => get_user_profile_url(),
 					'entries' => array(
 						'profile' => array(
@@ -1049,6 +1049,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.85  2011/10/03 07:02:21  efy-yurybakh
+ * bubbletips & identity_links cleanup
+ *
  * Revision 1.84  2011/09/30 10:16:50  efy-yurybakh
  * Make a big sprite with all backoffice icons
  *

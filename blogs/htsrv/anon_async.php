@@ -85,7 +85,7 @@ switch( $action )
 		$BlogCache = & get_BlogCache();
 		$Blog = $BlogCache->get_by_ID( $blog_ID );
 		$recipient_style = '';
-		if( $recipient_id >0 )
+		if( $recipient_id > 0 )
 		{
 			$RecipientCache = & get_UserCache();
 			$Recipient = $RecipientCache->get_by_ID( $recipient_id );
@@ -98,24 +98,21 @@ switch( $action )
 	case 'get_user_bubbletip':
 		// Get contents of a user bubbletip
 		// Displays avatar & name
-		$user_login = param( 'userid', 'string' );  // rename "userid" param ro user_ID ; rename $user_login to appropriate name
-		$is_anonymous = param( 'anonymous', 'integer', 0 ); // rename "anonymous" param to comment_ID
+		$user_ID = param( 'userid', 'integer', 0 );
+		$comment_ID = param( 'commentid', 'integer', 0 );
 
-		if( $blog_ID >0 )
-		{
-			$BlogCache = & get_BlogCache();
-			$Blog = $BlogCache->get_by_ID( $blog_ID );
+		if( $user_ID > 0 )
+		{ // Print info of the registred users
+			$UserCache = & get_UserCache();
+			$User = & $UserCache->get_by_ID( $user_ID );
+
+			// Display user avatar with login
+			echo '<div class="center">';
+			echo get_avatar_imgtag( $User->login, true, true, 'fit-160x160', 'avatar_above_login' );
+			echo '</div>';
 		}
-
-		if( $is_anonymous == 1 )
+		else if( $comment_ID > 0 )
 		{ // Print info for an anonymous user who posted a comment
-// fp> This is dirty. Pass comment_ID
-			$comment_ID = (int)$user_login;
-			if( $comment_ID == 0)
-			{ // Bad request
-				exit(0);
-			}
-
 			$CommentCache = & get_CommentCache();
 			$Comment = $CommentCache->get_by_ID( $comment_ID );
 
@@ -125,21 +122,21 @@ switch( $action )
 			echo '<div>'.$Comment->get_author_name_anonymous().'</div>';
 			echo '<div>'.T_('This user is not registered on this site.').'</div>';
 			echo $Comment->get_author_url_link( '', '<div>', '</div>');
-			if( isset( $Blog ) )
-			{ // Link to send message
-				echo '<div>';
-				$Comment->msgform_link( $Blog->get('msgformurl'), '', '', get_icon( 'email', 'imgtag' ).' '.T_('Send a message') );
-				echo '</div>';
+
+			if( $blog_ID > 0 )
+			{ // Get Blog if ID is set
+				$BlogCache = & get_BlogCache();
+				$Blog = $BlogCache->get_by_ID( $blog_ID );
+
+				if( isset( $Blog ) )
+				{ // Link to send message
+					echo '<div>';
+					$Comment->msgform_link( $Blog->get('msgformurl'), '', '', get_icon( 'email', 'imgtag' ).' '.T_('Send a message') );
+					echo '</div>';
+				}
 			}
 			echo '</div>';
-
-			exit(0);
 		}
-
-		// Registred user
-		echo '<div class="center">';
-		echo get_avatar_imgtag( $user_login, true, true, 'fit-160x160', 'avatar_above_login' );
-		echo '</div>';
 
 		exit(0);
 
@@ -174,6 +171,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.14  2011/10/03 07:02:21  efy-yurybakh
+ * bubbletips & identity_links cleanup
+ *
  * Revision 1.13  2011/10/03 01:15:37  fplanque
  * doc
  *

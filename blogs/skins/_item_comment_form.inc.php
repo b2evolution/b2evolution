@@ -198,7 +198,7 @@ function setCommentVote( id, type, vote )
 
 	if( is_logged_in() )
 	{ // User is logged in:
-		$Form->info_field( T_('User'), '<strong>'.$current_User->colored_name().'</strong>'
+		$Form->info_field( T_('User'), '<strong>'.$current_User->get_colored_name().'</strong>'
 			.' '.get_user_profile_link( ' [', ']', T_('Edit profile') ) );
 	}
 	else
@@ -306,6 +306,9 @@ function setCommentVote( id, type, vote )
 
 /*
  * $Log$
+ * Revision 1.32  2011/10/03 07:02:22  efy-yurybakh
+ * bubbletips & identity_links cleanup
+ *
  * Revision 1.31  2011/09/29 16:42:19  efy-yurybakh
  * colored login
  *

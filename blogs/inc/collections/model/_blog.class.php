@@ -1721,8 +1721,7 @@ class Blog extends DataObject
 				$owner = $owner_User->get( 'fullname' );
 				if( empty($owner) )
 				{
-// fp>yura rename to get_colored_name()   if it doesn't echo, it should be called get_*
-					$owner = $owner_User->colored_name();
+					$owner = $owner_User->get_colored_name();
 				}
 				return $owner;
 
@@ -2490,6 +2489,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.150  2011/10/03 07:02:21  efy-yurybakh
+ * bubbletips & identity_links cleanup
+ *
  * Revision 1.149  2011/10/01 09:01:25  efy-asimo
  * Fix 'Include in public blog list' blog setting update
  *
