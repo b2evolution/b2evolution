@@ -854,6 +854,8 @@ function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size
 			$img_tag = '<span class="nowrap">'.$img_tag.$user_login.'</span>';
 		}
 
+// fp>yura do NOT use an id in a function that can be called multiple times on the same page.
+// IDs must be unique.
 		$img_tag = '<a id="username_'.$User->login.'" href="'.get_user_identity_url( $User->ID ).'" class="'.$User->get_gender_class().'">'.$img_tag.'</a>';
 	}
 
@@ -1153,6 +1155,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.71  2011/10/03 01:15:37  fplanque
+ * doc
+ *
  * Revision 1.70  2011/10/02 15:25:03  efy-yurybakh
  * small messaging UI design changes
  *

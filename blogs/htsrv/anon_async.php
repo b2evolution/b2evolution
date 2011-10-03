@@ -20,7 +20,7 @@
  * }}
  *
  * @package evocore
- * 
+ *
  * @version $Id$
  */
 
@@ -95,9 +95,11 @@ switch( $action )
 		require $skins_path.'_contact_msg.form.php';
 		break;
 
-	case "get_user_bubbletip":
-		$user_login = param( 'userid', 'string' );
-		$is_anonymous = param( 'anonymous', 'integer', 0 );
+	case 'get_user_bubbletip':
+		// Get contents of a user bubbletip
+		// Displays avatar & name
+		$user_login = param( 'userid', 'string' );  // rename "userid" param ro user_ID ; rename $user_login to appropriate name
+		$is_anonymous = param( 'anonymous', 'integer', 0 ); // rename "anonymous" param to comment_ID
 
 		if( $blog_ID >0 )
 		{
@@ -106,9 +108,10 @@ switch( $action )
 		}
 
 		if( $is_anonymous == 1 )
-		{ // Print info for anonymous user
+		{ // Print info for an anonymous user who posted a comment
+// fp> This is dirty. Pass comment_ID
 			$comment_ID = (int)$user_login;
-			if ( $comment_ID == 0)
+			if( $comment_ID == 0)
 			{ // Bad request
 				exit(0);
 			}
@@ -117,6 +120,7 @@ switch( $action )
 			$Comment = $CommentCache->get_by_ID( $comment_ID );
 
 			echo '<div class="bubbletip_anon">';
+
 			echo $Comment->get_avatar( 'fit-160x160', 'bCommentAvatar floatcenter');
 			echo '<div>'.$Comment->get_author_name_anonymous().'</div>';
 			echo '<div>'.T_('This user is not registered on this site.').'</div>';
@@ -129,7 +133,7 @@ switch( $action )
 			}
 			echo '</div>';
 
-			exit(0); 
+			exit(0);
 		}
 
 		// Registred user
@@ -159,7 +163,7 @@ switch( $action )
 
 			$edited_Comment->set_vote( $type, param( 'vote', 'string' ) );
 			$edited_Comment->dbupdate();
-			
+
 			$edited_Comment->{'vote_'.$type}( '', '', '&amp;', true, true );
 		}
 
@@ -170,6 +174,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.13  2011/10/03 01:15:37  fplanque
+ * doc
+ *
  * Revision 1.12  2011/09/30 07:38:58  efy-yurybakh
  * bubbletip for anonymous comments
  *
