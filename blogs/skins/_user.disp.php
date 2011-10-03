@@ -57,7 +57,7 @@ echo $User->get_avatar_imgtag( 'fit-160x160', 'rightmargin', '', true );
 $ProfileForm->begin_fieldset( T_('Identity') );
 
 	$ProfileForm->info( T_('Name'), $User->get( 'preferredname' ) );
-  $ProfileForm->info( T_('Login'), $User->get('login') );
+	$ProfileForm->info( T_('Login'), $User->get_colored_name() );
 
 	if( ! empty( $User->gender ) )
 	{
@@ -133,6 +133,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.28  2011/10/03 07:18:15  efy-yurybakh
+ * set girl avatar in the test install mode
+ *
  * Revision 1.27  2011/09/29 17:18:18  efy-yurybakh
  * remove a pipes in textarea
  *

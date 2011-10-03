@@ -219,24 +219,24 @@ function create_default_data()
 	$DB->query( "INSERT INTO T_filetypes
 			(ftyp_ID, ftyp_extensions, ftyp_name, ftyp_mimetype, ftyp_icon, ftyp_viewtype, ftyp_allowed)
 		VALUES
-			(1, 'gif', 'GIF image', 'image/gif', 'image2.png', 'image', 'any'),
-			(2, 'png', 'PNG image', 'image/png', 'image2.png', 'image', 'any'),
-			(3, 'jpg jpeg', 'JPEG image', 'image/jpeg', 'image2.png', 'image', 'any'),
-			(4, 'txt', 'Text file', 'text/plain', 'document.png', 'text', 'registered'),
-			(5, 'htm html', 'HTML file', 'text/html', 'html.png', 'browser', 'admin'),
-			(6, 'pdf', 'PDF file', 'application/pdf', 'pdf.png', 'browser', 'registered'),
-			(7, 'doc', 'Microsoft Word file', 'application/msword', 'doc.gif', 'external', 'registered'),
-			(8, 'xls', 'Microsoft Excel file', 'application/vnd.ms-excel', 'xls.gif', 'external', 'registered'),
-			(9, 'ppt', 'Powerpoint', 'application/vnd.ms-powerpoint', 'ppt.gif', 'external', 'registered'),
-			(10, 'pps', 'Slideshow', 'pps', 'pps.gif', 'external', 'registered'),
-			(11, 'zip', 'ZIP archive', 'application/zip', 'zip.gif', 'external', 'registered'),
-			(12, 'php php3 php4 php5 php6', 'PHP script', 'application/x-httpd-php', 'php.gif', 'text', 'admin'),
+			(1, 'gif', 'GIF image', 'image/gif', 'file_image', 'image', 'any'),
+			(2, 'png', 'PNG image', 'image/png', 'file_image', 'image', 'any'),
+			(3, 'jpg jpeg', 'JPEG image', 'image/jpeg', 'file_image', 'image', 'any'),
+			(4, 'txt', 'Text file', 'text/plain', 'file_document', 'text', 'registered'),
+			(5, 'htm html', 'HTML file', 'text/html', 'file_www', 'browser', 'admin'),
+			(6, 'pdf', 'PDF file', 'application/pdf', 'file_pdf', 'browser', 'registered'),
+			(7, 'doc', 'Microsoft Word file', 'application/msword', 'file_doc', 'external', 'registered'),
+			(8, 'xls', 'Microsoft Excel file', 'application/vnd.ms-excel', 'file_xls', 'external', 'registered'),
+			(9, 'ppt', 'Powerpoint', 'application/vnd.ms-powerpoint', 'file_ppt', 'external', 'registered'),
+			(10, 'pps', 'Slideshow', 'pps', 'file_pps', 'external', 'registered'),
+			(11, 'zip', 'ZIP archive', 'application/zip', 'file_zip', 'external', 'registered'),
+			(12, 'php php3 php4 php5 php6', 'PHP script', 'application/x-httpd-php', 'file_php', 'text', 'admin'),
 			(13, 'css', 'Style sheet', 'text/css', '', 'text', 'registered'),
-			(14, 'mp3', 'MPEG audio file', 'audio/mpeg', '', 'browser', 'registered'),
-			(15, 'm4a', 'MPEG audio file', 'audio/x-m4a', '', 'browser', 'registered'),
-			(16, 'mp4', 'MPEG video', 'video/mp4', '', 'browser', 'registered'),
-			(17, 'mov', 'Quicktime video', 'video/quicktime', '', 'browser', 'registered'),
-			(18, 'm4v', 'MPEG video file', 'video/x-m4v', '', 'browser', 'registered')
+			(14, 'mp3', 'MPEG audio file', 'audio/mpeg', 'file_sound', 'browser', 'registered'),
+			(15, 'm4a', 'MPEG audio file', 'audio/x-m4a', 'file_sound', 'browser', 'registered'),
+			(16, 'mp4', 'MPEG video', 'video/mp4', 'file_video', 'browser', 'registered'),
+			(17, 'mov', 'Quicktime video', 'video/quicktime', 'file_video', 'browser', 'registered'),
+			(18, 'm4v', 'MPEG video file', 'video/x-m4v', 'file_video', 'browser', 'registered')
 		" );
 	echo "OK.<br />\n";
 
@@ -864,7 +864,14 @@ function create_demo_contents()
 	load_class( 'items/model/_link.class.php', 'Link' );
 
 	task_begin('Assigning avatar to Admin... ');
-	$edit_File = new File( 'user', 1, 'faceyourmanga_admin_boy.png' );
+	if( $test_install_all_features )
+	{ // Set girl avatar in the test mode
+		$edit_File = new File( 'user', 1, 'faceyourmanga_admin_girl.png' );
+	}
+	else
+	{
+		$edit_File = new File( 'user', 1, 'faceyourmanga_admin_boy.png' );
+	}
 	// Load meta data AND MAKE SURE IT IS CREATED IN DB:
 	$edit_File->load_meta( true );
 	$UserCache = & get_UserCache();
@@ -1412,6 +1419,12 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.325  2011/10/03 07:18:15  efy-yurybakh
+ * set girl avatar in the test install mode
+ *
+ * Revision 1.324  2011/09/30 11:20:21  efy-yurybakh
+ * Make a big sprite with all backoffice icons
+ *
  * Revision 1.323  2011/09/29 12:56:19  efy-yurybakh
  * skin param for bubbletip
  *
