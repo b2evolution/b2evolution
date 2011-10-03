@@ -32,7 +32,7 @@ $Form = new Form( $submit_url );
 
 	<fieldset>
 		<div class="label"><label><?php echo T_('To')?>:</label></div>
-		<div class="info"><strong<?php echo $recipient_style;?>><?php echo $recipient_name;?></strong></div>
+		<div class="info"><strong><?php echo $recipient_link;?></strong></div>
 	</fieldset>
 
 	<?php
@@ -76,6 +76,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.12  2011/10/03 14:45:16  efy-yurybakh
+ * Add User::get_identity_link() everywhere
+ *
  * Revision 1.11  2011/10/01 07:09:13  efy-asimo
  * Fix message send
  *

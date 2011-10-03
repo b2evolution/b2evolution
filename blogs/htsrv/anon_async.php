@@ -81,15 +81,24 @@ switch( $action )
 		$allow_msgform = param( 'allow_msgform', 'string', '' );
 		$redirect_to = param( 'redirect_to', 'string', '' );
 		$post_id = NULL;
-		$comment_id = NULL;
+		$comment_id = param( 'comment_id', 'integer', 0 );
 		$BlogCache = & get_BlogCache();
 		$Blog = $BlogCache->get_by_ID( $blog_ID );
-		$recipient_style = '';
+
 		if( $recipient_id > 0 )
-		{
+		{ // Get identity link for existed users
 			$RecipientCache = & get_UserCache();
 			$Recipient = $RecipientCache->get_by_ID( $recipient_id );
-			$recipient_style = ' class="'.$Recipient->get_gender_class().'"';
+			$recipient_link = $Recipient->get_identity_link( array( 'link_text' => 'text' ) );
+		}
+		else if( $comment_id > 0 )
+		{ // Anonymous Users
+			$gender_class = '';
+			if( check_setting( 'gender_colored' ) )
+			{ // Set a gender class if the setting is ON
+				$gender_class = ' nogender';
+			}
+			$recipient_link = '<span class="user anonymous'.$gender_class.'" rel="bubbletip_comment_'.$comment_id.'">'.$recipient_name.'</span>';
 		}
 
 		require $skins_path.'_contact_msg.form.php';
@@ -184,6 +193,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.16  2011/10/03 14:45:16  efy-yurybakh
+ * Add User::get_identity_link() everywhere
+ *
  * Revision 1.15  2011/10/03 10:07:05  efy-yurybakh
  * bubbletips & identity_links cleanup
  *

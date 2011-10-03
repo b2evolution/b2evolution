@@ -201,6 +201,7 @@ else
 			'email_author_address' => $email_author_address,
 			'allow_msgform' => $allow_msgform,
 			'blog' => $Blog->ID,
+			'comment_id' => $comment_id,
 			'redirect_to' => $redirect_to,
 			'params' => $params );
 
@@ -209,13 +210,23 @@ else
 	}
 	else
 	{
-		$recipient_style = ' class="'.$recipient_User->get_gender_class().'"';
+		if( ! empty( $recipient_User ) )
+		{ // Get identity link for existed users
+			$recipient_link = $recipient_User->get_identity_link( array( 'link_text' => 'text' ) );
+		}
+		else
+		{ // Get login name for anonymous user
+			$recipient_link = $Comment->get_author_name_anonymous();
+		}
 		require '_contact_msg.form.php';
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.27  2011/10/03 14:45:16  efy-yurybakh
+ * Add User::get_identity_link() everywhere
+ *
  * Revision 1.26  2011/10/01 07:30:09  efy-asimo
  * Fix recipient style notice
  *
