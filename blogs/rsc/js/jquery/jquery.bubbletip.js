@@ -36,6 +36,7 @@
 				offsetTop: 0,
 				offsetLeft: 0,
 				deltaPosition: 30,
+				deltaShift: 10,
 				deltaDirection: 'up', // direction: up | down | left | right
 				animationDuration: 250,
 				animationEasing: 'swing', // linear | swing
@@ -266,20 +267,20 @@
 				if (_options.positionAt.match(/^element$/i)) {
 					var offset = _options.positionAtElement.offset();
 					if (_options.deltaDirection.match(/^up$/i)) {
-						_calc.top = offset.top + _options.offsetTop - _wrapper.outerHeight();
+						_calc.top = offset.top + _options.offsetTop - _wrapper.outerHeight() + _options.deltaShift;
 						_calc.left = offset.left + _options.offsetLeft + ((_options.positionAtElement.outerWidth() - _wrapper.outerWidth()) / 2);
 						_calc.delta = _options.deltaPosition;
 					} else if (_options.deltaDirection.match(/^down$/i)) {
-						_calc.top = offset.top + _options.positionAtElement.outerHeight() + _options.offsetTop;
+						_calc.top = offset.top + _options.positionAtElement.outerHeight() + _options.offsetTop - _options.deltaShift;
 						_calc.left = offset.left + _options.offsetLeft + ((_options.positionAtElement.outerWidth() - _wrapper.outerWidth()) / 2);
 						_calc.delta = -_options.deltaPosition;
 					} else if (_options.deltaDirection.match(/^left$/i)) {
 						_calc.top = offset.top + _options.offsetTop + ((_options.positionAtElement.outerHeight() - _wrapper.outerHeight()) / 2);
-						_calc.left = offset.left + _options.offsetLeft - _wrapper.outerWidth();
+						_calc.left = offset.left + _options.offsetLeft - _wrapper.outerWidth() + _options.deltaShift;
 						_calc.delta = _options.deltaPosition;
 					} else if (_options.deltaDirection.match(/^right$/i)) {
 						_calc.top = offset.top + _options.offsetTop + ((_options.positionAtElement.outerHeight() - _wrapper.outerHeight()) / 2);
-						_calc.left = offset.left + _options.positionAtElement.outerWidth() + _options.offsetLeft;
+						_calc.left = offset.left + _options.positionAtElement.outerWidth() + _options.offsetLeft - _options.deltaShift;
 						_calc.delta = -_options.deltaPosition;
 					}
 				} else if (_options.positionAt.match(/^body$/i)) {
