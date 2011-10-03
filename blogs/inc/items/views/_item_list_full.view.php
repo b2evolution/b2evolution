@@ -426,7 +426,7 @@ while( $Item = & $ItemList->get_item() )
 				<fieldset>
 					<div class="label"><?php echo T_('User') ?>:</div>
 					<div class="info">
-						<strong><?php echo $current_User->get_colored_name()?></strong>
+						<strong><?php echo $current_User->get_identity_link( array( 'link_text' => 'text' ) )?></strong>
 						<?php user_profile_link( ' [', ']', T_('Edit profile') ) ?>
 						</div>
 				</fieldset>
@@ -467,6 +467,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.55  2011/10/03 15:58:17  efy-yurybakh
+ * Add User::get_identity_link() everywhere
+ *
  * Revision 1.54  2011/10/03 12:10:28  efy-yurybakh
  * bubbletips & identity_links cleanup
  *

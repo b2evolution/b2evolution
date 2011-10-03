@@ -42,7 +42,7 @@ global $comment_cookies, $comment_allow_msgform;
 		<tr valign="top" bgcolor="#eeeeee">
 			<td align="right"><strong><?php echo T_('User') ?>:</strong></td>
 			<td align="left">
-				<strong><?php echo $current_User->get_colored_name()?></strong>
+				<strong><?php echo $current_User->get_identity_link( array( 'link_text' => 'text' ) )?></strong>
 				<?php user_profile_link( ' [', ']', T_('Edit profile') ) ?>
 				</td>
 		</tr>

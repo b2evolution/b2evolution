@@ -198,7 +198,7 @@ function setCommentVote( id, type, vote )
 
 	if( is_logged_in() )
 	{ // User is logged in:
-		$Form->info_field( T_('User'), '<strong>'.$current_User->get_colored_name().'</strong>'
+		$Form->info_field( T_('User'), '<strong>'.$current_User->get_identity_link( array( 'link_text' => 'text' ) ).'</strong>'
 			.' '.get_user_profile_link( ' [', ']', T_('Edit profile') ) );
 	}
 	else
@@ -306,6 +306,9 @@ function setCommentVote( id, type, vote )
 
 /*
  * $Log$
+ * Revision 1.33  2011/10/03 15:58:18  efy-yurybakh
+ * Add User::get_identity_link() everywhere
+ *
  * Revision 1.32  2011/10/03 07:02:22  efy-yurybakh
  * bubbletips & identity_links cleanup
  *
