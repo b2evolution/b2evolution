@@ -174,4 +174,42 @@ $user_agents = array(
 	array('aggregator', ' Planet/', 'Planet Feed Reader'),
 	array('aggregator', 'UniversalFeedParser/', 'Universal Feed Parser'),
 );
+
+$referer_type_array = array (
+	'0'			=> 'All',
+	'search'	=> 'Search',
+	'blacklist' => 'Blacklist',
+	'referer'	=> 'Referer',
+	'direct'	=> 'Direct',
+	'spam'		=> 'Spam',
+	'self'		=> 'Self',
+	'admin'		=> 'Admin'
+							);
+
+
+$referer_type_color = array(
+	'search'	=> '0099FF',
+	'blacklist' => 'ff00ff',
+	'referer'	=> '00CCFF',
+	'direct'	=> '00FFCC',
+	'spam'		=> 'FF0000',
+	'self'		=> '00FF99',
+	'admin'		=> '999999'
+	);
+
+$agent_type_array = array (
+	'0'			=> 'All',
+	'rss'		=> 'RSS',
+	'robot'		=> 'Robot',
+	'browser'	=> 'Browser',
+	'unknown'	=> 'Unknown',
+	);
+
+
+$agent_type_color = array(
+	'rss'		=> 'FF6600',
+	'robot'		=> 'FF9900',
+	'browser'	=> 'FFCC00',
+	'unknown'	=> 'cccccc'
+);
 ?>
