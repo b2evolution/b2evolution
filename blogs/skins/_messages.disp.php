@@ -85,7 +85,7 @@ $params = array_merge( array(
 	'form_action' => $samedomain_htsrv_url.'messaging.php',
 	'form_name' => '',
 	'form_layout' => NULL,
-	'cols' => 40 
+	'cols' => 35 
 	), $params );
 
 // Display messages list:
@@ -98,6 +98,9 @@ if( isset( $edited_Thread ) )
 
 /*
  * $Log$
+ * Revision 1.5  2011/10/03 12:00:33  efy-yurybakh
+ * Small messaging UI design changes
+ *
  * Revision 1.4  2011/09/26 14:53:27  efy-asimo
  * Login problems with multidomain installs - fix
  * Insert globals: samedomain_htsrv_url, secure_htsrv_url;

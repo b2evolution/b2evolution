@@ -77,7 +77,7 @@ $Form->text_input( 'thrd_recipients', empty( $user_login ) ? $edited_Thread->rec
 
 $Form->text_input( 'thrd_title', $edited_Thread->title, $params['cols'], T_('Subject'), '', array( 'maxlength'=> 255, 'required'=>true, 'class'=>'wide_input' ) );
 
-$Form->textarea_input( 'msg_text', $edited_Message->text, 10, T_('Message'), array( 'cols'=>$params['cols'], 'class'=>'wide_textarea' ) );
+$Form->textarea_input( 'msg_text', $edited_Message->text, 10, T_('Message'), array( 'cols'=>$params['cols'], 'class'=>'wide_textarea', 'required'=>true ) );
 
 $Form->radio( 'thrdtype', param( 'thrdtype', 'string', 'discussion' ), array(
 								array( 'discussion', T_( 'Group discussion' ) ),
@@ -88,6 +88,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Send message
 
 /*
  * $Log$
+ * Revision 1.18  2011/10/03 12:00:33  efy-yurybakh
+ * Small messaging UI design changes
+ *
  * Revision 1.17  2011/09/28 11:40:46  efy-asimo
  * Remove the Reset button from new thread form
  *

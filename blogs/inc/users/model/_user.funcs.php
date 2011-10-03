@@ -912,19 +912,32 @@ function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size
  * @param avatar size
  * @param style class
  * @param image align
+ * @param read status, Set icon of the read status, TRUE - users have seen message, else FALSE
  * @return coma separated login <img> tag
  */
-function get_avatar_imgtags( $user_logins_list, $show_login = true, $link = true, $size = 'crop-15x15', $class = 'avatar_before_login', $align = '' )
+function get_avatar_imgtags( $user_logins_list, $show_login = true, $link = true, $size = 'crop-15x15', $class = 'avatar_before_login', $align = '', $read_status = NULL )
 {
 	if( !is_array( $user_logins_list ) )
 	{
 		$user_logins_list = explode( ', ', $user_logins_list );
 	}
 
+	$icon = '';
 	$user_imgtags_list = array();
 	foreach( $user_logins_list as $user_login )
 	{
-		$user_imgtags_list[] = get_avatar_imgtag( $user_login, $show_login, $link, $size, $class, $align );
+		if( ! is_null( $read_status ) )
+		{ // Add icon behind user login (read status)
+			if( $read_status )
+			{ // User has seen a message
+				$icon = get_icon( 'allowback', 'imgtag', array( 'alt' => sprintf( T_('%s has seen this message.'), $user_login ), 'style' => 'margin:0 2px' ) );
+			}
+			else
+			{ // User has not seen a message
+				$icon = get_icon( 'bullet_blue', 'imgtag', array( 'alt' => sprintf( T_('%s has NOT seen this message yet.'), $user_login ), 'style' => 'margin:0 2px' ) );
+			}
+		}
+		$user_imgtags_list[] = '<span class="nowrap">'.$icon.get_avatar_imgtag( $user_login, $show_login, $link, $size, $class, $align ).'</span>';
 	}
 	return implode( ', ', $user_imgtags_list );
 }
@@ -1196,6 +1209,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.74  2011/10/03 12:00:33  efy-yurybakh
+ * Small messaging UI design changes
+ *
  * Revision 1.73  2011/10/03 10:07:05  efy-yurybakh
  * bubbletips & identity_links cleanup
  *

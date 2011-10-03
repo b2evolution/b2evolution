@@ -66,18 +66,18 @@ foreach( $DB->get_results( $recipients_SQL->get() ) as $row )
 
 	if( !empty( $row->thr_read ) )
 	{
-		$read_by .= '<span style="color:green">';
-		$read_by .= get_avatar_imgtags( $row->thr_read, true, false );
+		$read_by .= '<div>';
+		$read_by .= get_avatar_imgtags( $row->thr_read, true, false, 'crop-15x15', 'avatar_before_login', '', true );
 		if( !empty( $row->thr_unread ) )
 		{
 			$read_by .= ', ';
 		}
-		$read_by .= '</span>';
+		$read_by .= '</div>';
 	}
 
 	if( !empty( $row->thr_unread ) )
 	{
-		$read_by .= '<span style="color:red">'.get_avatar_imgtags( $row->thr_unread, true, false ).'</span>';
+		$read_by .= '<div>'.get_avatar_imgtags( $row->thr_unread, true, false, 'crop-15x15', 'avatar_before_login', '', false ).'</div>';
 	}
 
 	$read_unread_recipients[$row->thr_ID] = $read_by;
@@ -192,7 +192,7 @@ $Results->filter_area = array(
 $Results->cols[] = array(
 					'th' => T_('With'),
 					'th_class' => 'thread_with shrinkwrap',
-					'td_class' => 'thread_with shrinkwrap',
+					'td_class' => 'thread_with',
 					'td' => '%get_avatar_imgtags( #thrd_recipients# )%',
 					);
 
@@ -231,7 +231,7 @@ function get_read_by( $thread_ID )
 $Results->cols[] = array(
 					'th' => T_('Read by'),
 					'th_class' => 'shrinkwrap',
-					'td_class' => 'shrinkwrap top',
+					'td_class' => 'top',
 					'td' => '%get_read_by( #thrd_ID# )%',
 					);
 
@@ -275,6 +275,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.32  2011/10/03 12:00:33  efy-yurybakh
+ * Small messaging UI design changes
+ *
  * Revision 1.31  2011/10/02 15:25:03  efy-yurybakh
  * small messaging UI design changes
  *

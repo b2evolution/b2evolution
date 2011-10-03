@@ -132,6 +132,12 @@ function get_icon_info($name)
 			'size' => array( 16, 16 ),
 			'xy' => array( 16, 32 )
 		);
+		case 'file_document': return array(
+			'ext'  => '\.(txt)',
+			'alt'  => '',
+			'size' => array( 16, 16 ),
+			'xy' => array( 32, 48 )
+		);
 		case 'file_www': return array(
 			'ext'  => '\.html?',
 			'alt'  => '',
@@ -162,7 +168,7 @@ function get_icon_info($name)
 			'size' => array( 16, 16 ),
 			'xy' => array( 96, 32 )
 		);
-		case 'file_document': return array(
+		case 'file_pdf': return array(
 			'ext'  => '\.pdf',
 			'alt'  => '',
 			'size' => array( 16, 16 ),
@@ -192,17 +198,36 @@ function get_icon_info($name)
 			'size' => array( 16, 16 ),
 			'xy' => array( 16, 48 )
 		);
-		case 'file_document': return array(
-			'ext'  => '\.te?xt',
-			'alt'  => '',
-			'size' => array( 16, 16 ),
-			'xy' => array( 32, 48 )
-		);
 		case 'file_pk': return array(
 			'ext'  => '\.(zip|rar)',
 			'alt'  => '',
 			'size' => array( 16, 16 ),
 			'xy' => array( 48, 48 )
+		);
+		case 'file_doc': return array(
+			'alt'  => '',
+			'size' => array( 16, 16 ),
+			'xy' => array( 64, 48 )
+		);
+		case 'file_xls': return array(
+			'alt'  => '',
+			'size' => array( 16, 16 ),
+			'xy' => array( 80, 48 )
+		);
+		case 'file_ppt': return array(
+			'alt'  => '',
+			'size' => array( 16, 16 ),
+			'xy' => array( 96, 48 )
+		);
+		case 'file_pps': return array(
+			'alt'  => '',
+			'size' => array( 16, 16 ),
+			'xy' => array( 112, 48 )
+		);
+		case 'file_zip': return array(
+			'alt'  => '',
+			'size' => array( 16, 16 ),
+			'xy' => array( 128, 48 )
 		);
 
 
@@ -222,12 +247,12 @@ function get_icon_info($name)
 		case 'refresh': return array(
 			'alt'  => T_('Refresh'),
 			'size' => array( 16, 16 ),
-			'xy' => array( 64, 48 )
+			'xy' => array( 32, 160 )
 		);
 		case 'reload': return array(
 			'alt'  => T_('Reload'),
 			'size' => array( 15, 15 ),
-			'xy' => array( 80, 48 )
+			'xy' => array( 48, 160 )
 		);
 
 		case 'download': return array(
@@ -240,18 +265,18 @@ function get_icon_info($name)
 		case 'warning': return array( // TODO: not really transparent at its borders
 			'alt'  => T_('Warning'),
 			'size' => array( 16, 16 ),
-			'xy' => array( 96, 48 )
+			'xy' => array( 64, 160 )
 		);
 
 		case 'info': return array(
 			'alt'  => T_('Info'),
 			'size' => array( 16, 16 ),
-			'xy' => array( 112, 48 )
+			'xy' => array( 80, 160 )
 		);
 		case 'email': return array(
 			'alt'  => T_('Email'),
 			'size' => array( 13, 10 ),
-			'xy' => array( 128, 48 )
+			'xy' => array( 96, 160 )
 		);
 		case 'www': return array(   /* user's web site, plugin's help url */
 			'alt'  => T_('WWW'),
@@ -333,10 +358,10 @@ function get_icon_info($name)
 			'size' => array( 9, 9 ),
 			'xy' => array( 48, 96 )
 		);
-		case 'bullet_red': return array(
-			'file' => 'icons/bullet_red.gif',
-			'alt'  => '&nbsp;',
+		case 'bullet_blue': return array(
+			'alt'  => '&bull;',
 			'size' => array( 9, 9 ),
+			'xy' => array( 0, 192 )
 		);
 
 		case 'activate': return array(
@@ -505,7 +530,7 @@ function get_icon_info($name)
 		case 'feed': return array(
 			'alt'	 => T_('XML Feed'),
 			'size' => array( 16, 16 ),
-			'xy' => array( 128, 160 )
+			'xy' => array( 0, 160 )
 		);
 
 		case 'recycle_full': return array(
@@ -574,24 +599,30 @@ function get_icon_info($name)
 		case 'login': return array(
 			'alt'  => T_('Login'),
 			'size' => array( 24, 24 ),
-			'xy' => array( 0, 176 )
+			'xy' => array( 128, 160 )
 		);
 		case 'register': return array(
 			'alt'  => T_('Register'),
 			'size' => array( 24, 24 ),
-			'xy' => array( 24, 176 )
+			'xy' => array( 128, 184 )
 		);
 
 		case 'magnifier': return array(
 			'alt'  => T_('Log as a search instead'),
 			'size' => array( 14, 13 ),
-			'xy' => array( 144, 160 )
+			'xy' => array( 16, 160 )
 		);
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.89  2011/10/03 12:00:33  efy-yurybakh
+ * Small messaging UI design changes
+ *
+ * Revision 1.88  2011/09/30 11:20:21  efy-yurybakh
+ * Make a big sprite with all backoffice icons
+ *
  * Revision 1.87  2011/09/30 10:16:49  efy-yurybakh
  * Make a big sprite with all backoffice icons
  *

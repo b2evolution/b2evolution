@@ -116,17 +116,17 @@ foreach( $DB->get_results( $unread_recipients_SQL->get() ) as $row )
 	$read_by = '';
 	if( !empty( $read_recipiens ) )
 	{
-		$read_by .= '<span style="color:green">'.get_avatar_imgtags( $read_recipiens, true, false );
+		$read_by .= '<div>'.get_avatar_imgtags( $read_recipiens, true, false, 'crop-15x15', 'avatar_before_login', '', true );
 		if( !empty ( $unread_recipients ) )
 		{
 			$read_by .= ', ';
 		}
-		$read_by .= '</span>';
+		$read_by .= '</div>';
 	}
 
 	if( !empty ( $unread_recipients ) )
 	{
-		$read_by .= '<span style="color:red">'.get_avatar_imgtags( $unread_recipients, true, false ).'</span>';
+		$read_by .= '<div>'.get_avatar_imgtags( $unread_recipients, true, false, 'crop-15x15', 'avatar_before_login', '', false ).'</div>';
 	}
 
 	$read_by_list[$row->msg_ID] = $read_by ;
@@ -214,8 +214,6 @@ $Results->filter_area = array(
  */
 function user_avatar( $user_ID, $user_avatar_file_ID )
 {
-	global $current_User, $admin_url;
-
 	if( ! $GLOBALS['Settings']->get('allow_avatars') ) 
 		return '';
 
@@ -226,14 +224,7 @@ function user_avatar( $user_ID, $user_avatar_file_ID )
 		return '';
 	}
 
-	if( $current_User->check_perm( 'users', 'view' ) )
-	{
-		return '<a href="'.$admin_url.'?ctrl=user&amp;user_tab=profile&amp;user_ID='.$user_ID.'">'.$File->get_thumb_imgtag( 'crop-80x80' ).'</a>';
-	}
-	else
-	{
-		return $File->get_thumb_imgtag( 'crop-80x80' );
-	}
+	return $File->get_thumb_imgtag( 'crop-80x80' );
 }
 /**
  * Create author cell for message list table
@@ -247,7 +238,7 @@ function user_avatar( $user_ID, $user_avatar_file_ID )
  */
 function author( $user_ID, $user_login, $user_first_name, $user_last_name, $user_avatar_ID, $datetime)
 {
-	$author = '<b>'.$user_login.'</b>';
+	$author = $user_login;
 
 	$avatar = user_avatar( $user_ID, $user_avatar_ID );
 
@@ -273,7 +264,23 @@ function author( $user_ID, $user_login, $user_first_name, $user_last_name, $user
 		$author .= '<br />'.$full_name;
 	}
 
-	return $author.'<br /><span class="note">'.mysql2localedatetime( $datetime ).'</span>';
+	$identity_url = get_user_identity_url( $user_ID );
+
+	$UserCache = & get_UserCache();
+	$User = & $UserCache->get_by_ID( $user_ID );
+	$user_class = $User->get_gender_class();
+
+	if( empty( $identity_url ) )
+	{ // If current user doens't have an access to view profile page
+		$author = '<div class="'.$user_class.' center" rel="bubbletip_user_'.$user_ID.'">'.$author.'</div>';
+	}
+	else
+	{ // Current user can view the profile page
+		$link_title = T_( 'Show the user profile' );
+		$author = '<a href="'.$identity_url.'" title="'.$link_title.'" class="'.$user_class.' center" style="display:block" rel="bubbletip_user_'.$user_ID.'">'.$author.'</a>';
+	}
+
+	return $author.'<span class="note">'.mysql2localedatetime( $datetime ).'</span>';
 }
 $Results->cols[] = array(
 		'th' => T_('Author'),
@@ -348,11 +355,14 @@ $Form->begin_form( $params['form_class'], '' );
 
 	$Form->info_field(T_('Reply to'), get_avatar_imgtags( $recipients ), array('required'=>true));
 
-	$Form->textarea('msg_text', '', 10, '', '', $params[ 'cols' ], '', true);
+	$Form->textarea('msg_text', '', 10, T_('Message'), '', $params[ 'cols' ], '', true);
 
 $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' ) ) );
 /*
  * $Log$
+ * Revision 1.37  2011/10/03 12:00:33  efy-yurybakh
+ * Small messaging UI design changes
+ *
  * Revision 1.36  2011/09/27 07:45:58  efy-asimo
  * Front office messaging hot fixes
  *

@@ -3073,7 +3073,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 
 				if( isset( $params['alt'] ) )
 				{
-					$params['title'] = $icon['alt'];
+					$params['title'] = $params['alt'];
 					unset( $params['alt'] );
 				}
 				else if( ! isset( $params['alt'] ) && isset( $icon['alt'] ) )
@@ -4461,6 +4461,9 @@ function generate_random_ip()
 
 /*
  * $Log$
+ * Revision 1.288  2011/10/03 12:00:33  efy-yurybakh
+ * Small messaging UI design changes
+ *
  * Revision 1.287  2011/10/02 12:38:29  efy-yurybakh
  * fix sprite icons
  *

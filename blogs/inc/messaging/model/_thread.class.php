@@ -87,13 +87,16 @@ class Thread extends DataObject
 	{
 		global $thrd_recipients;
 
+		// Resipients
+		$this->set_string_from_param( 'recipients', true );
+
 		// Title
 		param( 'thrd_title', 'string' );
 		param_check_not_empty( 'thrd_title', T_('Please enter a subject') );
 		$this->set_from_Request( 'title', 'thrd_title' );
 
-		// Resipients
-		$this->set_string_from_param( 'recipients', true );
+		// Message
+		param_check_not_empty( 'msg_text', T_('Please enter a message') );
 
 		$this->param_check__recipients( 'thrd_recipients', $thrd_recipients );
 
@@ -319,6 +322,9 @@ class Thread extends DataObject
 
 /*
  * $Log$
+ * Revision 1.21  2011/10/03 12:00:33  efy-yurybakh
+ * Small messaging UI design changes
+ *
  * Revision 1.20  2011/02/15 05:31:53  sam2kb
  * evo_strtolower mbstring wrapper for strtolower function
  *
