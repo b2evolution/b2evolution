@@ -161,7 +161,7 @@ while( $Item = & $ItemList->get_item() )
 					) );
 
 				// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
-				echo ' ', T_('by'), ' ', $Item->creator_User->get_colored_name();
+				echo ' ', T_('by'), ' ', $Item->creator_User->get_identity_link( array( 'link_text' => 'text' ) );
 
 				echo '<div class="bSmallHeadRight">';
 				$Item->status( array(
@@ -467,6 +467,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.54  2011/10/03 12:10:28  efy-yurybakh
+ * bubbletips & identity_links cleanup
+ *
  * Revision 1.53  2011/10/03 07:02:21  efy-yurybakh
  * bubbletips & identity_links cleanup
  *
