@@ -1988,8 +1988,19 @@ class Form extends Widget
 			$force_keys_as_values = false;
 		}
 
+		if( isset($field_params['background_color']) )
+		{
+			$color_array = $field_params['background_color'];
+			unset($field_params['background_color']); // not an attribute to <select>
+		}
+		else
+		{
+			$color_array = false;
+		}
+
+
 		// Build $options_list
-		$options_list = Form::get_select_options_string($field_options, $field_value, $force_keys_as_values);
+		$options_list = Form::get_select_options_string($field_options, $field_value, $force_keys_as_values, $color_array);
 
 		return $this->select_input_options( $field_name, $options_list, $field_label, $field_note, $field_params );
 	}
@@ -2004,7 +2015,7 @@ class Form extends Widget
 	 *                which are strings will be used).
 	 * @return string
 	 */
-	function get_select_options_string($field_options, $field_value = NULL, $force_keys_as_values = false)
+	function get_select_options_string($field_options, $field_value = NULL, $force_keys_as_values = false, $color_array = false)
 	{
 		$r = '';
 
@@ -2013,8 +2024,14 @@ class Form extends Widget
 			// Get the value attribute from key if is_string():
 			$l_value = ($force_keys_as_values || is_string($l_key)) ? $l_key : $l_option;
 
-			$r .= '<option value="'.format_to_output($l_value, 'formvalue').'"';
-
+			if (empty($color_array) || !isset($color_array[$l_value]))
+			{
+				$r .= '<option value="'.format_to_output($l_value, 'formvalue').'"';
+			}
+			else
+			{
+				$r .= '<option style="background-color: #'.$color_array[$l_value].'" value="'.format_to_output($l_value, 'formvalue').'"';
+			}
 			if(
 					( is_array( $field_value ) && in_array( $l_value, $field_value ) ) ||
 					( !is_array( $field_value ) && (string)$l_value == (string)$field_value ) // cast to string so "1,2" is != 1
@@ -3159,6 +3176,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.96  2011/10/03 10:45:14  efy-vitalij
+ * add background color parm to select_input_array()
+ *
  * Revision 1.95  2011/09/27 17:31:19  efy-yurybakh
  * User additional info fields
  *
