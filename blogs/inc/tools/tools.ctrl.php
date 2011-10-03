@@ -502,6 +502,7 @@ if( empty($tab) )
 			$sessions = array();
 			for ($i = 0; $i <= $users_count - 1; $i++)
 			{
+				mt_srand(crc32(microtime()));
 				$sessions[] = array('sess_ID'		=> -1,
 									'sess_key'      => generate_random_key(32),
 									'sess_hitcount' => 1,
@@ -511,9 +512,10 @@ if( empty($tab) )
 			}
 
 			// main cycle of generation
+			mt_srand(crc32(microtime()));
 			for ($time_shift = $past_time; $cur_time > $time_shift; $time_shift += mt_rand($min_interval, $max_interval))
 			{
-
+				mt_srand(crc32(microtime()));
 				$insert_data_count = $insert_data_count + 1;
 
 				$rand_i = mt_rand(0,$users_count-1);
@@ -761,6 +763,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.51  2011/10/03 12:36:56  efy-vitalij
+ * fix random hits generator
+ *
  * Revision 1.50  2011/09/30 09:13:51  efy-vitalij
  * fixed fake internal search links
  *
