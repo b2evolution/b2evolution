@@ -51,7 +51,7 @@ jQuery( document ).ready(function()
 					{ // If success request - fill div with user data, save same data to the cache, init bubble tip
 						tip.html( result );
 						cache.html( result );
-						link.bubbletip( tip, { showOnInit: true } );
+						link.bubbletip( tip, { showOnInit: true, deltaShift: 5 } );
 					}
 				});
 			}
