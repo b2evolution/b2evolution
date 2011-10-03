@@ -31,7 +31,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 require_once dirname(__FILE__).'/_stats_view.funcs.php';
 
 
-global $blog, $admin_url, $rsc_url, $AdminUI;
+global $blog, $admin_url, $rsc_url, $AdminUI, $agent_type_color;
 
 echo '<h2>'.T_('Hits from indexing robots / spiders / crawlers - Summary').'</h2>';
 
@@ -82,7 +82,7 @@ if( count($res_hits) )
 	require dirname(__FILE__).'/inc/_bar_chart.inc.php';
 
 	$chart[ 'series_color' ] = array (
-			'ff9900',
+			$agent_type_color['robot'],
 		);
 
 
@@ -174,6 +174,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.17  2011/10/03 10:41:25  efy-vitalij
+ * add colors to statistic
+ *
  * Revision 1.16  2011/09/04 22:13:18  fplanque
  * copyright 2011
  *

@@ -25,7 +25,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url, $rsc_url, $AdminUI;
+global $blog, $admin_url, $rsc_url, $AdminUI, $agent_type_color;
 
 echo '<h2>'.T_('Hits from RSS/Atom feed readers - Summary').'</h2>';
 
@@ -76,7 +76,7 @@ if( count($res_hits) )
 	require dirname(__FILE__).'/inc/_bar_chart.inc.php';
 
 	$chart[ 'series_color' ] = array (
-			'ff6600',
+			$agent_type_color['rss'],
 		);
 
 	echo '<div class="center">';
@@ -88,6 +88,9 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.13  2011/10/03 10:41:25  efy-vitalij
+ * add colors to statistic
+ *
  * Revision 1.12  2011/09/04 22:13:18  fplanque
  * copyright 2011
  *

@@ -25,7 +25,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url, $AdminUI;
+global $blog, $admin_url, $AdminUI, $agent_type_color;
 
 echo '<h2>'.T_('Global hits - Summary').get_manual_link('global_hits_summary').'</h2>';
 
@@ -95,10 +95,10 @@ if( count($res_hits) )
 	require dirname(__FILE__).'/inc/_bar_chart.inc.php';
 
 	$chart[ 'series_color' ] = array (
-			'ff6600',
-			'ff9900',
-			'ffcc00',
-			'cccccc',
+			$agent_type_color['rss'],
+			$agent_type_color['robot'],
+			$agent_type_color['browser'],
+			$agent_type_color['unknown'],
 		);
 
 
@@ -121,14 +121,13 @@ if( count($res_hits) )
 
 	$last_date = 0;
 
-
 	echo '<table class="grouped" cellspacing="0">';
 	echo '<tr>';
 	echo '<th class="firstcol">'.T_('Date').'</th>';
-	echo '<th style="background-color: #ff6600"><a href="?ctrl=stats&amp;tab=summary&amp;tab3=feed&amp;blog='.$blog.'">'.T_('RSS/Atom').'</a></th>';
-	echo '<th style="background-color: #ff9900"><a href="?ctrl=stats&amp;tab=summary&amp;tab3=robot&amp;blog='.$blog.'">'.T_('Robots').'</a></th>';
-	echo '<th style="background-color: #ffcc00"><a href="?ctrl=stats&amp;tab=summary&amp;tab3=browser&amp;blog='.$blog.'">'.T_('Browsers').'</a></th>';
-	echo '<th style="background-color: #cccccc">'.T_('Unknown').'</th>';
+	echo '<th style="background-color: #'.$agent_type_color['rss'].'"><a href="?ctrl=stats&amp;tab=summary&amp;tab3=feed&amp;blog='.$blog.'">'.T_('RSS/Atom').'</a></th>';
+	echo '<th style="background-color: #'.$agent_type_color['robot'].'"><a href="?ctrl=stats&amp;tab=summary&amp;tab3=robot&amp;blog='.$blog.'">'.T_('Robots').'</a></th>';
+	echo '<th style="background-color: #'.$agent_type_color['browser'].'"><a href="?ctrl=stats&amp;tab=summary&amp;tab3=browser&amp;blog='.$blog.'">'.T_('Browsers').'</a></th>';
+	echo '<th style="background-color: #'.$agent_type_color['unknown'].'">'.T_('Unknown').'</th>';
 	echo '<th class="lastcol">'.T_('Total').'</th>';
 	echo '</tr>';
 
@@ -209,6 +208,9 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.18  2011/10/03 10:41:25  efy-vitalij
+ * add colors to statistic
+ *
  * Revision 1.17  2011/09/04 22:13:18  fplanque
  * copyright 2011
  *

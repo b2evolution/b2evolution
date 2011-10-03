@@ -108,25 +108,13 @@ function filter_hits( & $Form )
 	$Form->text_input( 'sess_ID', get_param('sess_ID'), 15, T_('Session ID'), '', array( 'maxlength'=>20 ) );
 	$Form->text_input( 'remote_IP', get_param('remote_IP'), 15, T_('Remote IP'), '', array( 'maxlength'=>23 ) );
 
-	$field_options = array ('0'			=> 'All',
-							'search'	=> 'Search',
-							'blacklist' => 'Blacklist',
-							'referer'	=> 'Referer',
-							'direct'	=> 'Direct',
-							'spam'		=> 'Spam',
-							'self'		=> 'Self',
-							);
+	global $referer_type_color, $referer_type_array;
+	
+	$Form->select_input_array( 'referer_type', get_param('referer_type'), $referer_type_array, 'Referer type', '', array('force_keys_as_values' => true, 'background_color' => $referer_type_color) );
 
-	$Form->select_input_array( 'referer_type', get_param('referer_type'), $field_options, 'Referer type', '', array('force_keys_as_values' => true) );
+	global $agent_type_color, $agent_type_array;
 
-	$field_options = array ('0'			=> 'All',
-							'rss'		=> 'RSS',
-							'robot'		=> 'Robot',
-							'browser'	=> 'Browser',
-							'unknown'	=> 'Unknown',
-							);
-
-	$Form->select_input_array( 'agent_type', get_param('agent_type'), $field_options, 'Agent type', '', array('force_keys_as_values' => true) );
+	$Form->select_input_array( 'agent_type', get_param('agent_type'), $agent_type_array, 'Agent type', '', array('force_keys_as_values' => true, 'background_color' => $agent_type_color) );
 }
 $Results->filter_area = array(
 	'callback' => 'filter_hits',
@@ -171,13 +159,13 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Type'),
 		'order' => 'hit_referer_type',
-		'td' => '$hit_referer_type$',
+		'td' => '%disp_color_referer( #hit_referer_type# )%',
 	);
 
 $Results->cols[] = array(
-		'th' => T_('U.A.'),
+		'th' => T_('Agent'),
 		'order' => 'hit_agent_type',
-		'td' => '$hit_agent_type$',
+		'td' => '%disp_color_agent( #hit_agent_type# )%',
 	);
 
 $Results->cols[] = array(

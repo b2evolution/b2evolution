@@ -152,8 +152,48 @@ function disp_clickable_log_IP( $hit_remote_addr )
 
 
 
+/**
+ * Display color referer
+ *
+ * @param hit referer type
+ */
+function disp_color_referer( $hit_referer_type )
+{
+	global $referer_type_color;
+	if (!empty ($referer_type_color[$hit_referer_type]))
+	{
+		return '<span style="background-color: #'.$referer_type_color[$hit_referer_type].'" >'.$hit_referer_type.'</span>';
+	}
+	else
+	{
+		return "$hit_referer_type";
+	}
+
+}
+
+/**
+ * Display color agent type
+ *
+ * @param hit agent type
+ */
+function disp_color_agent( $hit_agent_type )
+{
+	global $agent_type_color;
+	if (!empty ($agent_type_color[$hit_agent_type]))
+	{
+		return '<span style="background-color: #'.$agent_type_color[$hit_agent_type].'" >'.$hit_agent_type.'</span>';
+	}
+	else
+	{
+		return "$hit_agent_type";
+	}
+
+}
 /*
  * $Log$
+ * Revision 1.19  2011/10/03 10:41:25  efy-vitalij
+ * add colors to statistic
+ *
  * Revision 1.18  2011/10/01 10:05:31  efy-vitalij
  * fix tab=hits links
  *

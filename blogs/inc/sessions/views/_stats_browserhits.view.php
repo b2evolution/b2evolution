@@ -25,7 +25,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url, $AdminUI;
+global $blog, $admin_url, $AdminUI, $referer_type_color;
 
 echo '<h2>'.T_('Hits from web browsers - Summary').get_manual_link('browser_hits_summary').'</h2>';
 
@@ -113,16 +113,15 @@ if( count($res_hits) )
 	// Include common chart properties:
 	require dirname(__FILE__).'/inc/_bar_chart.inc.php';
 
+
 	$chart[ 'series_color' ] = array (
-			'0099ff',
-			'00ccff',
-			'00ffcc',
-			'00ff99',
-
-			'ff00ff',
-			'ff0000',
-
-			'999999',
+			$referer_type_color['search'],
+			$referer_type_color['referer'],
+			$referer_type_color['direct'],
+			$referer_type_color['self'],
+			$referer_type_color['blacklist'],		
+			$referer_type_color['spam'],
+			$referer_type_color['admin'],
 		);
 
 	echo '<div class="center">';
@@ -152,13 +151,13 @@ if( count($res_hits) )
 	<table class="grouped" cellspacing="0">
 		<tr>
 			<th class="firstcol"><?php echo T_('Date') ?></th>
-			<th style="background-color: #0099ff"><?php echo T_('Refering searches') ?></th>
-			<th style="background-color: #00ccff"><?php echo T_('Referers') ?></th>
-			<th style="background-color: #00ffcc"><?php echo T_('Direct accesses') ?></th>
-			<th style="background-color: #00ff99"><?php echo T_('Self referred') ?></th>
-			<th style="background-color: #ff00ff"><?php	echo T_('Special referrers') ?></th>
-			<th style="background-color: #ff0000"><?php echo T_('Referer spam') ?></th>
-			<th style="background-color: #999999"><?php echo T_('Admin') ?></th>
+			<th style="background-color: #<?php echo $referer_type_color['search'] ?>"><?php echo T_('Refering searches') ?></th>
+			<th style="background-color: #<?php echo $referer_type_color['referer'] ?>"><?php echo T_('Referers') ?></th>
+			<th style="background-color: #<?php echo $referer_type_color['direct'] ?>"><?php echo T_('Direct accesses') ?></th>
+			<th style="background-color: #<?php echo $referer_type_color['self'] ?>"><?php echo T_('Self referred') ?></th>
+			<th style="background-color: #<?php echo $referer_type_color['blacklist'] ?>"><?php echo T_('Special referrers') ?></th>
+			<th style="background-color: #<?php echo $referer_type_color['spam'] ?>"><?php echo T_('Referer spam') ?></th>
+			<th style="background-color: #<?php echo $referer_type_color['admin'] ?>"><?php echo T_('Admin') ?></th>
 			<th class="lastcol"><?php echo T_('Total') ?></th>
 		</tr>
 		<?php
@@ -250,6 +249,9 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.18  2011/10/03 10:41:25  efy-vitalij
+ * add colors to statistic
+ *
  * Revision 1.17  2011/09/04 22:13:18  fplanque
  * copyright 2011
  *
