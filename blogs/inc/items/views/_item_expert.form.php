@@ -329,10 +329,13 @@ $Form->begin_form( '', '', $params );
 <div class="right_col">
 
 	<?php
+    // ################### MODULES SPECIFIC ITEM SETTINGS ###################
+
+    modules_call_method( 'display_item_settings', array( 'Form' => & $Form, 'Blog' => & $Blog, 'edited_Item' => & $edited_Item ) );
+
 	// ################### CATEGORIES ###################
 
 	cat_select( $Form );
-
 
 	// ################### PROPERTIES ###################
 
@@ -422,15 +425,6 @@ $Form->begin_form( '', '', $params );
 		$Form->end_fieldset();
 	}
 
-	// ################### ATTENDING ###################
-
-	if( $Blog->get_setting( 'allow_attending' ) == 'enable_bypost' )
-	{
-		$Form->begin_fieldset( T_( 'Attending events' ) );
-		$Form->checkbox_basic_input( 'post_attend_status', $edited_Item->get( 'attend_status' ), T_('Allow users to attend this event') );
-		$Form->end_fieldset();
-	}
-
 	?>
 
 </div>
@@ -461,6 +455,12 @@ echo_onchange_newcat();
 
 /*
  * $Log$
+ * Revision 1.81  2011/10/04 21:56:00  fplanque
+ * minor
+ *
+ * Revision 1.80  2011/09/08 05:22:40  efy-asimo
+ * Remove item attending and add item settings
+ *
  * Revision 1.79  2011/09/04 22:13:17  fplanque
  * copyright 2011
  *

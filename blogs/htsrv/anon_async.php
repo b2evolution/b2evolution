@@ -71,6 +71,7 @@ switch( $action )
 		require $skins_path.$skin.'_item_comment_form.inc.php';
 		break;
 
+
 	case 'get_msg_form':
 		// display send message form
 		$recipient_id = param( 'recipient_id', 'integer', 0 );
@@ -104,13 +105,14 @@ switch( $action )
 		require $skins_path.'_contact_msg.form.php';
 		break;
 
+
 	case 'get_user_bubbletip':
 		// Get contents of a user bubbletip
 		// Displays avatar & name
 		$user_ID = param( 'userid', 'integer', 0 );
 		$comment_ID = param( 'commentid', 'integer', 0 );
 
-		if( strpos( $_SERVER["HTTP_REFERER"], "/admin.php" ) !== FALSE )
+		if( strpos( $_SERVER["HTTP_REFERER"], "/admin.php" ) !== false )
 		{	// If ajax is requested from admin page we should to set a variable $is_admin_page = true if user has permissions
 			// Check global permission:
 			if( empty($current_User) || ! $current_User->check_perm( 'admin', 'restricted' ) )
@@ -177,6 +179,7 @@ switch( $action )
 
 		exit(0);
 
+
 	case 'set_comment_vote':
 		// Used for quick vote of comments
 		// Check that this action request is not a CSRF hacked request:
@@ -208,6 +211,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.21  2011/10/04 21:56:00  fplanque
+ * minor
+ *
  * Revision 1.20  2011/10/04 15:32:07  efy-yurybakh
  * Additional Display settings
  *
