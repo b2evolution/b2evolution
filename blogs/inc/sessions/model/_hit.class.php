@@ -167,13 +167,32 @@ class Hit
 	var $_serprank = NULL;
 	var $_search_engine = NULL;
 
+	/**
+	 * Session ID
+	 */
+	 var $session_id;
+
+	/**
+	 * Hit time
+	 */
+	 var $hit_time;
+
+	 /**
+	  *  Test mode
+	  */
+	 var $test_mode;
+
+	 /**
+	  * Test URI
+	  */
+	 var $test_uri;
 
 	/**
 	 * Constructor
 	 *
 	 * This may INSERT a basedomain and a useragent but NOT the HIT itself!
 	 */
-	function Hit( $referer = NULL, $IP = NULL )
+	function Hit( $referer = NULL, $IP = NULL, $session_id= NULL, $hit_time = NULL, $test_mode = NULL , $test_uri = NULL, $user_agent = NULL)
 	{
 		global $debug;
 
@@ -186,6 +205,30 @@ class Hit
 			$this->IP = get_ip_list( true );
 		}
 
+		if (!empty($session_id))
+		{
+			$this->session_id = $session_id;
+		}
+
+		if (!empty($hit_time))
+		{
+			$this->hit_time = $hit_time;
+		}
+
+		if (!empty($test_mode))
+		{
+			$this->test_mode = $test_mode;
+		}
+
+		if (!empty($test_uri))
+		{
+			$this->test_uri = $test_uri;
+		}
+
+		if (!empty($test_uri))
+		{
+			$this->user_agent = $user_agent;
+		}
 		// Check the REFERER and determine referer_type:
 		// TODO: dh> move this out of here, too, only if "antispam_block_spam_referers" is true,
 		//           do something about it (here or somewhere else, but early).
@@ -208,13 +251,15 @@ class Hit
 	function detect_admin_page()
 	{
 		global $Debuglog;
-
-		if( is_admin_page() )
-		{	// We are inside of admin, this supersedes 'direct' access
-			// NOTE: this is not really a referer type but more a hit type
-			$Debuglog->add( 'Hit: Referer is admin page.', 'request' );
-			$this->referer_type = 'admin';
-			return true;
+		if (empty($this->test_mode))
+		{
+			if( is_admin_page() )
+			{	// We are inside of admin, this supersedes 'direct' access
+				// NOTE: this is not really a referer type but more a hit type
+				$Debuglog->add( 'Hit: Referer is admin page.', 'request' );
+				$this->referer_type = 'admin';
+				return true;
+			}
 		}
 		return false;
 	}
@@ -646,7 +691,7 @@ class Hit
 	{
 		global $Settings, $Debuglog, $is_admin_page;
 
-		if( $is_admin_page && ! $Settings->get('log_admin_hits') )
+		if( $is_admin_page && ! $Settings->get('log_admin_hits') && empty($this->test_mode))
 		{	// We don't want to log admin hits:
 			$Debuglog->add( 'Hit: Hit NOT logged, (Admin page logging is disabled)', 'request' );
 			return false;
@@ -680,22 +725,30 @@ class Hit
 
 		$Debuglog->add( 'Hit: Recording the hit.', 'request' );
 
-		if( !empty($Blog) )
+		if (empty($this->test_uri))
 		{
-			$blog_ID = $Blog->ID;
-		}
-		elseif( !empty( $blog ) )
-		{
-			if( ! is_numeric($blog) )
-			{ // this can be anything given by URL param "blog"! (because it's called on shutdown)
-			  // see todo in param().
-				$blog = NULL;
+			if( !empty($Blog) )
+			{
+				$blog_ID = $Blog->ID;
 			}
-			$blog_ID = $blog;
+			elseif( !empty( $blog ) )
+			{
+				if( ! is_numeric($blog) )
+				{ // this can be anything given by URL param "blog"! (because it's called on shutdown)
+				  // see todo in param().
+					$blog = NULL;
+				}
+				$blog_ID = $blog;
+			}
+			else
+			{
+				$blog_ID = NULL;
+			}
 		}
 		else
 		{
-			$blog_ID = NULL;
+			$blog_ID = $this->test_uri['blog_id'];
+			$ReqURI = $this->test_uri['link'];
 		}
 
 		$hit_uri = substr($ReqURI, 0, 250); // VARCHAR(250) and likely to be longer
@@ -727,14 +780,30 @@ class Hit
 		$serprank = $this->get_serprank();
 
 		// insert hit into DB table:
-		$sql = "
-			INSERT INTO T_hitlog(
-				hit_sess_ID, hit_datetime, hit_uri, hit_referer_type,
-				hit_referer, hit_referer_dom_ID, hit_keyphrase_keyp_ID, hit_serprank, hit_blog_ID, hit_remote_addr, hit_agent_type )
-			VALUES( '".$Session->ID."', FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($hit_uri)."', '".$this->referer_type
-				."', '".$DB->escape($hit_referer)."', ".$DB->null($this->get_referer_domain_ID()).', '.$DB->null($keyp_ID)
-				.', '.$DB->null($serprank).', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', '".$this->get_agent_type()."'
-			)";
+		if (empty($this->test_mode))
+		{
+			$sql = "
+				INSERT INTO T_hitlog(
+					hit_sess_ID, hit_datetime, hit_uri, hit_referer_type,
+					hit_referer, hit_referer_dom_ID, hit_keyphrase_keyp_ID, hit_serprank, hit_blog_ID, hit_remote_addr, hit_agent_type )
+				VALUES( '".$Session->ID."', FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($hit_uri)."', '".$this->referer_type
+					."', '".$DB->escape($hit_referer)."', ".$DB->null($this->get_referer_domain_ID()).', '.$DB->null($keyp_ID)
+					.', '.$DB->null($serprank).', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', '".$this->get_agent_type()."'
+				)";
+		}
+		else
+		{
+			$sql = "
+				INSERT INTO T_hitlog(
+					hit_sess_ID, hit_datetime, hit_uri, hit_referer_type,
+					hit_referer, hit_referer_dom_ID, hit_keyphrase_keyp_ID, hit_serprank, hit_blog_ID, hit_remote_addr, hit_agent_type )
+				VALUES( '".$this->session_id."', FROM_UNIXTIME(".$this->hit_time."), '".$DB->escape($hit_uri)."', '".$this->referer_type
+					."', '".$DB->escape($hit_referer)."', ".$DB->null($this->get_referer_domain_ID()).', '.$DB->null($keyp_ID)
+					.', '.$DB->null($serprank).', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', '".$this->get_agent_type()."'
+				)";
+
+		}
+
 
 		$DB->query( $sql, 'Record the hit' );
 		$hit_ID = $DB->insert_id;
@@ -744,6 +813,10 @@ class Hit
 			$DB->commit();
 		}
 
+		if ( ! empty($this->test_mode) && !empty($this->test_uri['s']))
+		{
+		 set_param('s', $this->test_uri['s']);
+		}
 		$s = get_param("s");
 		if( !empty($s) && !empty($blog_ID) )
 		{	// Record Internal Search:
@@ -1494,6 +1567,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.72  2011/10/04 09:40:26  efy-vitalij
+ * modified Hit class
+ *
  * Revision 1.71  2011/09/30 16:58:54  sam2kb
  * Fix for: http://forums.b2evolution.net/viewtopic.php?t=22888
  *
