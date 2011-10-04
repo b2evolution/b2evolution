@@ -893,29 +893,7 @@ function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size
 	$img_tag = '';
 	if( $User !== false )
 	{
-		$img_tag = $User->get_avatar_imgtag( $size, $class, $align );
-
-		if( $img_tag != '' && $avatar_overlay_text != '' )
-		{	// Display overlay text if it is enabled
-			global $thumbnail_sizes;
-			$width = $thumbnail_sizes[$size][1];
-			$overlay_lines = explode( "\r\n", $avatar_overlay_text);
-			$max_line_length = 0;
-			foreach( $overlay_lines as $line )
-			{	// Find the most long line of the overlay text
-				if( $max_line_length < strlen($line) )
-				{	// Get max long line
-					$max_line_length = strlen($line);
-				}
-			}
-			if( $max_line_length > 0 )
-			{	// Don't display an overlay text if max is not defined
-				// Calculate approximate font size, 1.7 - is custom coefficient of the font
-				$font_size = ceil( ( $width / $max_line_length ) * 1.7 );
-
-				$img_tag = '<div class="bubletip_overlay_text">'.$img_tag.'<div style="font-size:'.$font_size.'px">'.nl2br($avatar_overlay_text).'<div>'.nl2br($avatar_overlay_text).'</div></div></div>';
-			}
-		}
+		$img_tag = $User->get_avatar_imgtag( $size, $class, $align, false, $avatar_overlay_text );
 
 		if( $show_login )
 		{
@@ -1242,6 +1220,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.77  2011/10/04 17:16:05  efy-yurybakh
+ * Params for disp=user
+ *
  * Revision 1.76  2011/10/04 15:32:08  efy-yurybakh
  * Additional Display settings
  *

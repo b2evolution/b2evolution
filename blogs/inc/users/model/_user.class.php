@@ -2298,9 +2298,10 @@ class User extends DataObject
 	 * @param string class
 	 * @param string align
 	 * @param boolean true if the avatar image should be zoomed on click, false otherwise
+	 * @param avatar overlay text
 	 * @return string
 	 */
-	function get_avatar_imgtag( $size = 'crop-64x64', $class = 'avatar', $align = '', $zoomable = false )
+	function get_avatar_imgtag( $size = 'crop-64x64', $class = 'avatar', $align = '', $zoomable = false, $avatar_overlay_text = '' )
 	{
 		/**
 		 * @var File
@@ -2322,7 +2323,50 @@ class User extends DataObject
 			$r = $File->get_thumb_imgtag( $size, $class, $align );
 		}
 
+		if( $r != '' && $avatar_overlay_text != '' )
+		{	// Add overlay text if it is enabled
+			$r = $this->get_avatar_overlay_text( $r, $size, $avatar_overlay_text, $class );
+		}
+
 		return $r;
+	}
+
+
+	/**
+	 * Get overlay text for avatar img tag
+	 *
+	 * @param img tag
+	 * @param avatar size
+	 * @param avatar overlay text
+	 * @param string class
+	 * @return html string, img tag with overlay text
+	 */
+	function get_avatar_overlay_text( $img_tag, $size, $avatar_overlay_text, $class = '' )
+	{
+		global $thumbnail_sizes;
+		if( ! isset( $thumbnail_sizes[$size] ) )
+		{	// Bad thumbnail size
+			return $img_tag;
+		}
+		$width = $thumbnail_sizes[$size][1];
+		$overlay_lines = explode( "\r\n", $avatar_overlay_text);
+		$max_line_length = 0;
+		foreach( $overlay_lines as $line )
+		{	// Find the most long line of the overlay text
+			if( $max_line_length < strlen($line) )
+			{	// Get max long line
+				$max_line_length = strlen($line);
+			}
+		}
+		if( $max_line_length > 0 )
+		{	// Don't display an overlay text if max is not defined
+			// Calculate approximate font size, 1.7 - is custom coefficient of the font
+			$font_size = ceil( ( $width / $max_line_length ) * 1.7 );
+
+			$img_tag = '<div class="bubletip_overlay_text '.$class.'">'.$img_tag.'<div style="font-size:'.$font_size.'px">'.nl2br($avatar_overlay_text).'<div>'.nl2br($avatar_overlay_text).'</div></div></div>';
+		}
+
+		return $img_tag;
 	}
 
 
@@ -2647,6 +2691,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.154  2011/10/04 17:16:05  efy-yurybakh
+ * Params for disp=user
+ *
  * Revision 1.153  2011/10/03 10:07:05  efy-yurybakh
  * bubbletips & identity_links cleanup
  *

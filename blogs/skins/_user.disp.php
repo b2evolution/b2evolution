@@ -32,6 +32,13 @@ global $Blog;
  */
 global $Settings;
 
+// Default params:
+$params = array_merge( array(
+		'avatar_image_size'                => 'fit-160x160',
+		'avatar_image_size_if_anonymous'   => 'fit-160x160-blur-18',
+		'avatar_overlay_text_if_anonymous' => '#default#'
+	), $params );
+
 $user_ID = param( 'user_ID', 'integer', '' );
 if( empty($user_ID) )
 {	// Grab the blog owner
@@ -52,7 +59,25 @@ $ProfileForm = new Form( '', 'ProfileForm' );
 
 $ProfileForm->begin_form( 'bComment' );
 
-echo $User->get_avatar_imgtag( 'fit-160x160', 'rightmargin', '', true );
+$avatar_overlay_text = '';
+if( is_logged_in() )
+{	// Avatar size for logged in user
+	$avatar_image_size = $params['avatar_image_size'];
+}
+else
+{	// Avatar settings for anonymous user
+	$avatar_image_size = $params['avatar_image_size_if_anonymous'];
+	if( $params['avatar_overlay_text_if_anonymous'] != '#default#' )
+	{	// Get overlay text from params
+		$avatar_overlay_text = $params['avatar_overlay_text_if_anonymous'];
+	}
+	else
+	{	// Get default overlay text from Back-office settings
+		$avatar_overlay_text = $Settings->get('bubbletip_overlay');
+	}
+}
+
+echo $User->get_avatar_imgtag( $avatar_image_size, 'rightmargin', '', true, $avatar_overlay_text );
 
 $ProfileForm->begin_fieldset( T_('Identity') );
 
@@ -133,6 +158,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.29  2011/10/04 17:16:05  efy-yurybakh
+ * Params for disp=user
+ *
  * Revision 1.28  2011/10/03 07:18:15  efy-yurybakh
  * set girl avatar in the test install mode
  *

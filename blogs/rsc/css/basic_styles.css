@@ -98,7 +98,7 @@ img.leftmargin {
 	margin-top:.2ex;
 	margin-bottom:.2ex;
 }
-img.rightmargin {
+img.rightmargin, div.rightmargin {
 	float:right;
 	margin-left:1ex;
 	margin-top:.2ex;
