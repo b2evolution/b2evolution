@@ -880,9 +880,10 @@ function profile_check_params( $params, $User = NULL )
  * @param avatar size
  * @param style class
  * @param image align
+ * @param avatar overlay text
  * @return login <img> tag
  */
-function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size = 'crop-15x15', $class = 'avatar_before_login', $align = '' )
+function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size = 'crop-15x15', $class = 'avatar_before_login', $align = '', $avatar_overlay_text = '' )
 {
 	global $current_User;
 
@@ -894,6 +895,28 @@ function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size
 	{
 		$img_tag = $User->get_avatar_imgtag( $size, $class, $align );
 
+		if( $img_tag != '' && $avatar_overlay_text != '' )
+		{	// Display overlay text if it is enabled
+			global $thumbnail_sizes;
+			$width = $thumbnail_sizes[$size][1];
+			$overlay_lines = explode( "\r\n", $avatar_overlay_text);
+			$max_line_length = 0;
+			foreach( $overlay_lines as $line )
+			{	// Find the most long line of the overlay text
+				if( $max_line_length < strlen($line) )
+				{	// Get max long line
+					$max_line_length = strlen($line);
+				}
+			}
+			if( $max_line_length > 0 )
+			{	// Don't display an overlay text if max is not defined
+				// Calculate approximate font size, 1.7 - is custom coefficient of the font
+				$font_size = ceil( ( $width / $max_line_length ) * 1.7 );
+
+				$img_tag = '<div class="bubletip_overlay_text">'.$img_tag.'<div style="font-size:'.$font_size.'px">'.nl2br($avatar_overlay_text).'<div>'.nl2br($avatar_overlay_text).'</div></div></div>';
+			}
+		}
+
 		if( $show_login )
 		{
 			$img_tag = '<span class="nowrap">'.$img_tag.$user_login.'</span>';
@@ -901,11 +924,11 @@ function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size
 
 		$identity_url = get_user_identity_url( $User->ID );
 		if( empty( $identity_url ) )
-		{ // Current user has not permissions to view other user profile
+		{	// Current user has not permissions to view other user profile
 			$img_tag = '<span class="'.$User->get_gender_class().'" rel="bubbletip_user_'.$User->ID.'">'.$img_tag.'</span>';
 		}
 		else
-		{ // Show avatar & user login as link to the profile page
+		{	// Show avatar & user login as link to the profile page
 			$img_tag = '<a href="'.$identity_url.'" class="'.$User->get_gender_class().'" rel="bubbletip_user_'.$User->ID.'">'.$img_tag.'</a>';
 		}
 	}
@@ -1219,6 +1242,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.76  2011/10/04 15:32:08  efy-yurybakh
+ * Additional Display settings
+ *
  * Revision 1.75  2011/10/04 13:06:26  efy-yurybakh
  * Additional Display settings
  *

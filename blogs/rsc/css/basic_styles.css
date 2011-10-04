@@ -150,3 +150,21 @@ span.icon{
 .bubbletip_anon div{
 	margin-top: 5px;
 }
+
+/* Overlay text on the buble tips */
+.bubletip_overlay_text{
+	position: relative;
+}
+.bubletip_overlay_text div{
+	position: absolute;
+	top: 0;
+	left: 2px;
+	width: 100%;
+	text-align: center;
+	color: #EEE;
+}
+.bubletip_overlay_text div div{
+	top: -2px;
+	left: -2px;
+	color: #000;
+}

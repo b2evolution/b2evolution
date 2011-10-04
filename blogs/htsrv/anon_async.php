@@ -134,6 +134,7 @@ switch( $action )
 			$UserCache = & get_UserCache();
 			$User = & $UserCache->get_by_ID( $user_ID );
 
+			$avatar_overlay_text = '';
 			if( is_admin_page() )
 			{	// Set avatar size for Back-office
 				$avatar_size = $Settings->get('bubbletip_size_admin');
@@ -145,10 +146,12 @@ switch( $action )
 			else
 			{	// Set avatar size for Anonymous users
 				$avatar_size = $Settings->get('bubbletip_size_anonymous');
+				$avatar_overlay_text = $Settings->get('bubbletip_overlay');
 			}
+
 			// Display user avatar with login
 			echo '<div class="center">';
-			echo get_avatar_imgtag( $User->login, true, true, $avatar_size, 'avatar_above_login' );
+			echo get_avatar_imgtag( $User->login, true, true, $avatar_size, 'avatar_above_login', '', $avatar_overlay_text );
 			echo '</div>';
 		}
 		else if( $comment_ID > 0 )
@@ -205,6 +208,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.20  2011/10/04 15:32:07  efy-yurybakh
+ * Additional Display settings
+ *
  * Revision 1.19  2011/10/04 13:06:26  efy-yurybakh
  * Additional Display settings
  *
