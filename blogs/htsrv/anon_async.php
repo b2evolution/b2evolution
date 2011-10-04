@@ -134,9 +134,17 @@ switch( $action )
 			$UserCache = & get_UserCache();
 			$User = & $UserCache->get_by_ID( $user_ID );
 
+			if( is_logged_in() )
+			{ // Set avatar for logged users
+				$avatar_size = 'fit-160x160';
+			}
+			else
+			{ // Set avatar with blur effect for NOT logged users
+				$avatar_size = 'fit-160x160-blur-13';
+			}
 			// Display user avatar with login
 			echo '<div class="center">';
-			echo get_avatar_imgtag( $User->login, true, true, 'fit-160x160', 'avatar_above_login' );
+			echo get_avatar_imgtag( $User->login, true, true, $avatar_size, 'avatar_above_login' );
 			echo '</div>';
 		}
 		else if( $comment_ID > 0 )
@@ -193,6 +201,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.18  2011/10/04 09:16:31  efy-yurybakh
+ * blur effect
+ *
  * Revision 1.17  2011/10/03 17:13:04  efy-yurybakh
  * review fp>yura comments
  *

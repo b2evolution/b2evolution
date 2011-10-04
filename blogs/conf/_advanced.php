@@ -86,7 +86,7 @@ $log_app_errors = 1;
  *
  * NOTE: this gets used for general resizing, too. E.g. in the coll_avatar_Widget.
  *
- * type, width, height, quality
+ * type, width, height, quality, percent of blur effect
  */
 $thumbnail_sizes = array(
 			'fit-720x500' => array( 'fit', 720, 500, 90 ),
@@ -95,6 +95,8 @@ $thumbnail_sizes = array(
 			'fit-400x320' => array( 'fit', 400, 320, 85 ),
 			'fit-320x320' => array( 'fit', 320, 320, 85 ),
 			'fit-160x160' => array( 'fit', 160, 160, 80 ),
+			'fit-160x160-blur-13' => array( 'fit', 160, 160, 80, 13 ),
+			'fit-160x160-blur-18' => array( 'fit', 160, 160, 80, 18 ),
 			'fit-160x120' => array( 'fit', 160, 120, 80 ),
 			'fit-80x80' => array( 'fit', 80, 80, 80 ),
 			'crop-80x80' => array( 'crop', 80, 80, 85 ),

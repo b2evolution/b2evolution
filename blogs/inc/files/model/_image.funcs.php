@@ -304,9 +304,10 @@ function output_image( $imh, $mimetype )
  * @param string Thumbnail type ('crop'|'fit')
  * @param int Thumbnail width
  * @param int Thumbnail height
+ * @param int Thumbnail percent of blur effect (0 - No blur, 1% - Max blur effect, 99% - Min blur effect)
  * @return array short error code + dest image handler
  */
-function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height )
+function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height, $thumb_percent_blur = 0 )
 {
 	$src_width = imagesx( $src_imh ) ;
 	$src_height = imagesy( $src_imh );
@@ -343,6 +344,10 @@ function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height )
 		return array( '!GD-library internal error (resample)', $dest_imh );
 	}
 
+	if( $thumb_percent_blur > 0 )
+	{	// Apply blur effect
+		$dest_imh = pixelblur( $dest_imh, $dest_width, $dest_height, $thumb_percent_blur );
+	}
 
 	// TODO: imageinterlace();
 
@@ -350,8 +355,42 @@ function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height )
 }
 
 
+/**
+ * Apply blur effect
+ *
+ * @param resource Image resource
+ * @param int Source width
+ * @param int Source height
+ * @param int Percent of blur effect (0 - No blur, 1% - Max blur effect, 99% - Min blur effect)
+ * @return resource Image resource
+ */
+function pixelblur( $image_source, $width_source, $height_source, $percent_blur )
+{
+	if( $percent_blur < 1 && $percent_blur > 99 )
+	{	// Don't spend a time for processing of blur effect with bad percent request
+		return $image_source;
+	}
+
+	$width_resized = ceil( $width_source * $percent_blur / 100 );
+	$height_resized = ceil( $height_source * $percent_blur / 100 );
+
+	$image_resized = imagecreatetruecolor( $width_resized, $height_resized );
+	// Reduce image size by given percent
+	imagecopyresampled( $image_resized, $image_source, 0, 0, 0, 0, $width_resized, $height_resized, $width_source, $height_source );
+	// Apply blur effect from GD library
+	imagefilter( $image_resized, IMG_FILTER_GAUSSIAN_BLUR );
+	// Expand image to the source size
+	imagecopyresampled( $image_source, $image_resized, 0, 0, 0, 0, $width_source, $height_source, $width_resized, $height_resized );
+
+	return $image_source;
+}
+
+
 /*
  * $Log$
+ * Revision 1.25  2011/10/04 09:16:31  efy-yurybakh
+ * blur effect
+ *
  * Revision 1.24  2011/09/04 22:13:15  fplanque
  * copyright 2011
  *

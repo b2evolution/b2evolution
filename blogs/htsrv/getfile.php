@@ -116,7 +116,7 @@ if( !empty($size) && $File->is_image() )
 	}
 
 	// Set all params for requested size:
-	list( $thumb_type, $thumb_width, $thumb_height, $thumb_quality ) = $thumbnail_sizes[$size_name];
+	list( $thumb_type, $thumb_width, $thumb_height, $thumb_quality, $thumb_percent_blur ) = $thumbnail_sizes[$size_name];
 
 	$Filetype = & $File->get_Filetype();
 	// pre_dump( $Filetype );
@@ -150,7 +150,7 @@ if( !empty($size) && $File->is_image() )
 	
 			if( empty( $err ) )
 			{
-				list( $err, $dest_imh ) = generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height );
+				list( $err, $dest_imh ) = generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height, $thumb_percent_blur );
 				if( empty( $err ) )
 				{
 					$err = $File->save_thumb_to_cache( $dest_imh, $size_name, $mimetype, $thumb_quality );
@@ -243,6 +243,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.58  2011/10/04 09:16:31  efy-yurybakh
+ * blur effect
+ *
  * Revision 1.57  2011/09/06 20:48:54  sam2kb
  * No new line at end of file
  *
