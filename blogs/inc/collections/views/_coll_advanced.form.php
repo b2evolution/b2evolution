@@ -114,7 +114,14 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 
 
 	$Form->begin_fieldset( T_('Caching').' ['.T_('Admin').']'.get_manual_link('collection_cache_settings') );
-		$Form->checkbox_input( 'ajax_form_enabled', $edited_Blog->get_setting('ajax_form_enabled'), T_('Enable AJAX forms'), array( 'note'=>T_('Comment and contacts forms will be fetched by javascript') ) );
+		$ajax_enabled = $edited_Blog->get_setting( 'ajax_form_enabled' );
+		$ajax_loggedin_params = array( 'note' => T_('Also use JS forms for logged in users') );
+		if( !$ajax_enabled )
+		{
+			$ajax_loggedin_params[ 'disabled' ] = 'disabled';
+		}
+		$Form->checkbox_input( 'ajax_form_enabled', $ajax_enabled, T_('Enable AJAX forms'), array( 'note'=>T_('Comment and contacts forms will be fetched by javascript') ) );
+		$Form->checkbox_input( 'ajax_form_loggedin_enabled', $edited_Blog->get_setting('ajax_form_loggedin_enabled'), '', $ajax_loggedin_params );
 		$Form->checkbox_input( 'cache_enabled', $edited_Blog->get_setting('cache_enabled'), T_('Enable page cache'), array( 'note'=>T_('Cache rendered blog pages') ) );
 		$Form->checkbox_input( 'cache_enabled_widgets', $edited_Blog->get_setting('cache_enabled_widgets'), T_('Enable widget cache'), array( 'note'=>T_('Cache rendered widgets') ) );
 	$Form->end_fieldset();
@@ -202,9 +209,14 @@ $Form->end_form( array(
 <script type="text/javascript">
 	jQuery( '#ajax_form_enabled' ).click( function()
 	{
-		if( jQuery( '#ajax_form_enabled' ).attr( "checked" ) == false )
+		if( jQuery( '#ajax_form_enabled' ).attr( "checked" ) )
+		{
+			jQuery( '#ajax_form_loggedin_enabled' ).attr( "disabled", false );
+		}
+		else
 		{
 			jQuery( '#cache_enabled' ).attr( "checked", false );
+			jQuery( '#ajax_form_loggedin_enabled' ).attr( "disabled", true );
 		}
 	} );
 	jQuery( '#cache_enabled' ).click( function()
@@ -212,6 +224,7 @@ $Form->end_form( array(
 		if( jQuery( '#cache_enabled' ).attr( "checked" ) )
 		{
 			jQuery( '#ajax_form_enabled' ).attr( "checked", true );
+			jQuery( '#ajax_form_loggedin_enabled' ).attr( "disabled", false );
 		}
 	} );
 </script>
@@ -219,6 +232,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.36  2011/10/04 08:39:30  efy-asimo
+ * Comment and message forms save/reload content in case of error
+ *
  * Revision 1.35  2011/09/04 22:13:14  fplanque
  * copyright 2011
  *

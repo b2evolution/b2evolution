@@ -14,6 +14,18 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 $submit_url = $samedomain_htsrv_url.'message_send.php';
 
+if( ( $unsaved_message_params = get_message_params_from_session() ) == NULL )
+{ // set message default to empty string
+	$message = '';
+}
+else
+{ // set saved message params
+	$subject = $unsaved_message_params[ 'subject' ];
+	$message = $unsaved_message_params[ 'message' ];
+	$email_author = $unsaved_message_params[ 'sender_name' ];
+	$email_author_address = $unsaved_message_params[ 'sender_address' ];
+}
+
 $Form = new Form( $submit_url );
 
 	$Form->begin_form( 'bComment' );
@@ -50,7 +62,7 @@ $Form = new Form( $submit_url );
 
 	$Form->text_input( 'g', $subject, 40, T_('Subject'), T_('Subject of your message.'), array( 'maxlength'=>255, 'class'=>'wide_input', 'required'=>true ) );
 
-	$Form->textarea( 'h', '', 15, T_('Message'), T_('Plain text only.'), 35, 'wide_textarea', true );
+	$Form->textarea( 'h', $message, 15, T_('Message'), T_('Plain text only.'), 35, 'wide_textarea', true );
 
 	$Plugins->trigger_event( 'DisplayMessageFormFieldset', array( 'Form' => & $Form,
 		'recipient_ID' => & $recipient_id, 'item_ID' => $post_id, 'comment_ID' => $comment_id ) );
@@ -76,6 +88,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.13  2011/10/04 08:39:30  efy-asimo
+ * Comment and message forms save/reload content in case of error
+ *
  * Revision 1.12  2011/10/03 14:45:16  efy-yurybakh
  * Add User::get_identity_link() everywhere
  *

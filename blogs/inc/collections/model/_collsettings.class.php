@@ -141,7 +141,8 @@ class CollectionSettings extends AbstractSettings
 			'enable_sitemaps' => 1,
 
 		// General settings:
-			'ajax_form_enabled' => 0,
+			'ajax_form_enabled' => 0,				// Comment and contacts forms will be fetched by javascript
+			'ajax_form_loggedin_enabled' => 0,		// Also use JS forms for logged in users
 			'cache_enabled' => 0,
 			'cache_enabled_widgets' => 0,
 			'in_skin_login' => 0,							// Use in skin login form every time it's possible
@@ -192,6 +193,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.67  2011/10/04 08:39:30  efy-asimo
+ * Comment and message forms save/reload content in case of error
+ *
  * Revision 1.66  2011/10/03 17:13:04  efy-yurybakh
  * review fp>yura comments
  *

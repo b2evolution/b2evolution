@@ -283,7 +283,7 @@ function create_new_thread()
  */
 function create_new_message( $thrd_ID, $has_non_blocked_contacts )
 {
-	global $current_User, $Messages;
+	global $current_User, $Messages, $edited_Message;
 
 	// Insert new message:
 	$edited_Message = new Message();
@@ -363,8 +363,40 @@ function get_messaging_sub_entries( $is_admin )
 	);
 }
 
+
+/**
+ * Save message form params into the current Session
+ * 
+ * @param Array message form params
+ */
+function save_message_params_to_session( $unsaved_message_Array )
+{
+	global $Session;
+	$Session->set( 'core.unsaved_message_Array', $unsaved_message_Array );
+}
+
+
+/**
+ * Get message form params from the current Session
+ * 
+ * @return Array|NULL message form params array if Session core.unsaved_message_Array is set, NULL otherwise 
+ */
+function get_message_params_from_session()
+{
+	global $Session;
+	if( ( $unsaved_message_Array = $Session->get( 'core.unsaved_message_Array' ) ) && is_array( $unsaved_message_Array ) )
+	{
+		$Session->delete( 'core.unsaved_message_Array' );
+		return $unsaved_message_Array;
+	}
+	return NULL;
+}
+
 /*
  * $Log$
+ * Revision 1.14  2011/10/04 08:39:30  efy-asimo
+ * Comment and message forms save/reload content in case of error
+ *
  * Revision 1.13  2011/08/11 09:05:09  efy-asimo
  * Messaging in front office
  *

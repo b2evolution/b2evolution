@@ -174,7 +174,7 @@ if( $disp_comment_form )
 {	// We want to display the comments form:
 	if( $Item->can_comment( '<p><em>', '</em></p>', '#', '#', '<h4>'.T_('Leave a comment').':</h4>' ) )
 	{ // User can leave a comment
-		if( $Blog->get_setting( 'ajax_form_enabled' ) )
+		if( $Blog->get_ajax_form_enabled() )
 		{
 			$json_params = array( 
 				'action' => 'get_comment_form',

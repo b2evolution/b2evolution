@@ -267,7 +267,7 @@ if( $Item->can_see_comments( true ) )
 }
 
 // ------------------ COMMENT FORM INCLUDED HERE ------------------
-if( $Blog->get_setting( 'ajax_form_enabled' ) )
+if( $Blog->get_ajax_form_enabled() )
 {
 	$json_params = array( 
 		'action' => 'get_comment_form',

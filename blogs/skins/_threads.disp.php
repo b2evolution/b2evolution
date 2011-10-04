@@ -29,6 +29,7 @@ if( !empty( $Skin ) ) {
 } else {
 	$display_params = NULL;
 }
+$thrdtype = 'discussion';
 
 if( !is_logged_in() )
 {
@@ -52,10 +53,17 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'perm_messaging', 'reply', true );
 
-		// We don't have a model to use, start with blank object:
 		$edited_Thread = new Thread();
 		$edited_Message = new Message();
 		$edited_Message->Thread = & $edited_Thread;
+
+		if( ( $unsaved_message_params = get_message_params_from_session() ) !== NULL )
+		{ // set Message and Thread saved params from Session
+			$edited_Message->text = $unsaved_message_params[ 'message' ];
+			$edited_Thread->title = $unsaved_message_params[ 'subject' ];
+			$edited_Thread->recipients = $unsaved_message_params[ 'thrd_recipients' ];
+			$thrdtype = $unsaved_message_params[ 'thrdtype' ];
+		}
 		break;
 
 	default:
@@ -94,7 +102,8 @@ $params = array_merge( array(
 	'form_action' => $samedomain_htsrv_url.'messaging.php',
 	'form_name' => '',
 	'form_layout' => NULL,
-	'cols' => 40
+	'cols' => 40,
+	'thrdtype' => $thrdtype,
 	), $params );
 
 switch( $disp )
@@ -120,6 +129,9 @@ switch( $disp )
 
 /**
  * $Log$
+ * Revision 1.5  2011/10/04 08:39:30  efy-asimo
+ * Comment and message forms save/reload content in case of error
+ *
  * Revision 1.4  2011/09/26 14:53:27  efy-asimo
  * Login problems with multidomain installs - fix
  * Insert globals: samedomain_htsrv_url, secure_htsrv_url;

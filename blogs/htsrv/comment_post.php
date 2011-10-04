@@ -317,6 +317,12 @@ if( $Messages->has_errors() )
 	{
 		$page_title = T_('Errors while processing your comment');
 	}
+	$Comment->set( 'preview_attachments', $preview_attachments );
+	save_comment_to_session( $Comment );
+	header_redirect(); // 303 redirect
+	// exited here
+
+	/* asimo>fp I think we may delete this commented part below:
 	// TODO: dh> HEAD part should be some global front end include file..
 	// fp> actually, I'd like the error messages to de displayed in a skinnable file. Something that looks like the _main skin file but with minimum extra gadgets (in order to save on DB requests at each "spam denied" error)
 	// fp> So please don't waste time on implementing a half baked solution.
@@ -337,7 +343,7 @@ if( $Messages->has_errors() )
 	</body>
 	</html>
 	<?php
-	exit(0);
+	exit(0);*/
 }
 
 if( $action == 'preview' )
@@ -478,6 +484,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.152  2011/10/04 08:39:29  efy-asimo
+ * Comment and message forms save/reload content in case of error
+ *
  * Revision 1.151  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

@@ -511,8 +511,40 @@ function echo_disabled_comments( $allow_comments_value, $item_url )
 }
 
 
+/**
+ * Save Comment object into the current Session
+ * 
+ * @param $Comment
+ */
+function save_comment_to_session( $Comment )
+{
+	global $Session;
+	$Session->set( 'core.unsaved_Comment', $Comment );
+}
+
+
+/**
+ * Get Comment object from the current Session
+ * 
+ * @return Comment|NULL Comment object if Session core.unsaved_Comment param is set, NULL otherwise 
+ */
+function get_comment_from_session()
+{
+	global $Session;
+	if( ( $mass_Comment = $Session->get( 'core.unsaved_Comment' ) ) && is_a( $mass_Comment, 'Comment' ) )
+	{
+		$Session->delete( 'core.unsaved_Comment' );
+		return $mass_Comment;
+	}
+	return NULL;
+}
+
+
 /*
  * $Log$
+ * Revision 1.35  2011/10/04 08:39:30  efy-asimo
+ * Comment and message forms save/reload content in case of error
+ *
  * Revision 1.34  2011/09/23 01:29:05  fplanque
  * small changes
  *

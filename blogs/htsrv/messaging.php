@@ -90,6 +90,13 @@ switch( $disp )
 			if( !create_new_thread() )
 			{ // unsuccessful new thread creation
 				$redirect_to .= '&action=new';
+				// save new message and thread params into the Session to not lose the content
+				$unsaved_message_params = array();
+				$unsaved_message_params[ 'subject' ] = $edited_Thread->title;
+				$unsaved_message_params[ 'message' ] = $edited_Message->text;
+				$unsaved_message_params[ 'thrdtype' ] = param( 'thrdtype', 'string', 'discussion' );
+				$unsaved_message_params[ 'thrd_recipients' ] = $thrd_recipients;
+				save_message_params_to_session( $unsaved_message_params );
 			}
 		}
 		elseif( $action == 'delete' )
@@ -151,6 +158,9 @@ header_redirect( $redirect_to ); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.6  2011/10/04 08:39:29  efy-asimo
+ * Comment and message forms save/reload content in case of error
+ *
  * Revision 1.5  2011/09/22 08:54:59  efy-asimo
  * Login problems with multidomain installs - fix
  *

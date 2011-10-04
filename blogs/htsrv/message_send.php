@@ -116,6 +116,8 @@ $sender_name = param( 'd', 'string', '' );
 $sender_address = param( 'f', 'string', '' );
 $subject = param( 'g', 'string', '' );
 $message = param( 'h', 'html', '' );	// We accept html but we will NEVER display it
+// save the message original content
+$original_content = $message;
 
 // Prevent register_globals injection!
 $recipient_address = '';
@@ -268,37 +270,39 @@ if( $allow_msgform == 'email' )
 		) );
 
 
-	if( $Messages->has_errors() )
-	{ // there were errors: display them and get out of here
-		$Messages->display( T_('Cannot send email, please correct these errors:'),
-		'[<a href="javascript:history.go(-1)">'. T_('Back to email editing') . '</a>]' );
-		exit(0);
+	$success_message = ( !$Messages->has_errors() );
+	if( $success_message )
+	{ // no errors, try to send the message
+		// show sender name
+		$message_header = $sender_name." has sent you this message:\n\n";
+
+		// show sender email address
+		$message_footer = sprintf( T_( 'By replying to this message, your email will go directly to %s' ), $sender_address )."\n\n".$message_footer;
+
+		if( !empty( $Blog ) )
+		{
+			$message = $message
+				."\n\n-- \n"
+				.sprintf( T_('This message was sent via the messaging system on %s.'), $Blog->name )."\n"
+				.$Blog->get('url')."\n\n"
+				.$message_footer;
+		}
+		else
+		{
+			$message = $message
+				."\n\n-- \n"
+				.sprintf( T_('This message was sent via the messaging system on %s.'), $baseurl )."\n\n"
+				.$message_footer;
+		}
+
+		 // Send mail
+		$success_message = send_mail( $recipient_address, $recipient_name, $subject, $message, $notify_from, NULL, array( 'Reply-To' => $sender_address ) );
+		if( !$success_message )
+		{
+			$Messages->add( T_('Sorry, could not send email.')
+				.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
+		}
 	}
-
-	// show sender name
-	$message_header = $sender_name." has sent you this message:\n\n";
-
-	// show sender email address
-	$message_footer = sprintf( T_( 'By replying to this message, your email will go directly to %s' ), $sender_address )."\n\n".$message_footer;
-
-	if( !empty( $Blog ) )
-	{
-		$message = $message
-			."\n\n-- \n"
-			.sprintf( T_('This message was sent via the messaging system on %s.'), $Blog->name )."\n"
-			.$Blog->get('url')."\n\n"
-			.$message_footer;
-	}
-	else
-	{
-		$message = $message
-			."\n\n-- \n"
-			.sprintf( T_('This message was sent via the messaging system on %s.'), $baseurl )."\n\n"
-			.$message_footer;
-	}
-
-	 // Send mail
-	$success_message = send_mail( $recipient_address, $recipient_name, $subject, $message, $notify_from, NULL, array( 'Reply-To' => $sender_address ) );
 }
 elseif( ! $Messages->has_errors() )
 { // There were no errors, Send private message
@@ -306,10 +310,14 @@ elseif( ! $Messages->has_errors() )
 	if( isset( $recipient_User ) )
 	{
 		$success_message = send_private_message( $recipient_User->get( 'login' ), $subject, $message );
+		if( !$success_message )
+		{
+			$Messages->add( T_('Sorry, could not send your message.'), 'error' );
+		}
 	}
 }
 else
-{
+{ // message param error
 	$success_message = false;
 }
 
@@ -327,16 +335,14 @@ if( $success_message )
 	$Messages->add( T_('Your message has been sent.'), 'success' );
 }
 else
-{
-	if( $allow_msgform == 'email' )
-	{
-		$Messages->add( T_('Sorry, could not send email.')
-				.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
-	}
-	else
-	{
-		$Messages->add( T_('Sorry, could not send your message.'), 'error' );
-	}
+{ // unsuccessful message send, save message params into the Session to not lose the content
+	$unsaved_message_params = array();
+	$unsaved_message_params[ 'sender_name' ] = $sender_name;
+	$unsaved_message_params[ 'sender_address' ] = $sender_address;
+	$unsaved_message_params[ 'subject' ] = $subject;
+	$unsaved_message_params[ 'message' ] = $original_content;
+	save_message_params_to_session( $unsaved_message_params );
+
 	header_redirect( url_add_param( $Blog->gen_blogurl(), 'disp=msgform&recipient_id='.$recipient_id ) );
 	//exited here
 }
@@ -347,6 +353,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.80  2011/10/04 08:39:29  efy-asimo
+ * Comment and message forms save/reload content in case of error
+ *
  * Revision 1.79  2011/10/01 07:16:25  efy-asimo
  * Fix message send - update
  *

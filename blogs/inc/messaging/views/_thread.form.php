@@ -46,6 +46,7 @@ $params = array_merge( array(
 	'form_layout' => 'compact',
 	'redirect_to' => regenerate_url( 'action', '', '', '&' ),
 	'cols' => 80,
+	'thrdtype' => param( 'thrdtype', 'string', 'discussion' ),
 	), $params );
 
 $Form = new Form( $params['form_action'], $params['form_name'], 'post', $params['form_layout'] );
@@ -79,7 +80,7 @@ $Form->text_input( 'thrd_title', $edited_Thread->title, $params['cols'], T_('Sub
 
 $Form->textarea_input( 'msg_text', $edited_Message->text, 10, T_('Message'), array( 'cols'=>$params['cols'], 'class'=>'wide_textarea', 'required'=>true ) );
 
-$Form->radio( 'thrdtype', param( 'thrdtype', 'string', 'discussion' ), array(
+$Form->radio( 'thrdtype', $params['thrdtype'], array(
 								array( 'discussion', T_( 'Group discussion' ) ),
 								array( 'individual', T_( 'Individual messages' ) )
 							), T_('Multiple recipients'), true );
@@ -88,6 +89,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Send message
 
 /*
  * $Log$
+ * Revision 1.19  2011/10/04 08:39:30  efy-asimo
+ * Comment and message forms save/reload content in case of error
+ *
  * Revision 1.18  2011/10/03 12:00:33  efy-yurybakh
  * Small messaging UI design changes
  *

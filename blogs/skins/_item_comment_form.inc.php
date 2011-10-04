@@ -81,28 +81,38 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 	}
 	else
 	{ // New comment:
-		$Comment = new Comment();
-		if( ( !empty( $PageCache ) ) && ( $PageCache->is_collecting ) )
-		{	// This page is going into the cache, we don't want personal data cached!!!
-			// fp> These fields should be filled out locally with Javascript tapping directly into the cookies. Anyone JS savvy enough to do that?
-			$comment_author = '';
-			$comment_author_email = '';
-			$comment_author_url = '';
+		if( ( $Comment = get_comment_from_session() ) == NULL )
+		{ // there is no saved Comment in Session
+			$Comment = new Comment();
+			if( ( !empty( $PageCache ) ) && ( $PageCache->is_collecting ) )
+			{	// This page is going into the cache, we don't want personal data cached!!!
+				// fp> These fields should be filled out locally with Javascript tapping directly into the cookies. Anyone JS savvy enough to do that?
+				$comment_author = '';
+				$comment_author_email = '';
+				$comment_author_url = '';
+			}
+			else
+			{
+				$comment_author = isset($_COOKIE[$cookie_name]) ? trim($_COOKIE[$cookie_name]) : '';
+				$comment_author_email = isset($_COOKIE[$cookie_email]) ? trim($_COOKIE[$cookie_email]) : '';
+				$comment_author_url = isset($_COOKIE[$cookie_url]) ? trim($_COOKIE[$cookie_url]) : '';
+			}
+			if( empty($comment_author_url) )
+			{	// Even if we have a blank cookie, let's reset this to remind the bozos what it's for
+				$comment_author_url = 'http://';
+			}
+
+			$comment_content =  $params['default_text'];
 		}
 		else
-		{
-			$comment_author = isset($_COOKIE[$cookie_name]) ? trim($_COOKIE[$cookie_name]) : '';
-			$comment_author_email = isset($_COOKIE[$cookie_email]) ? trim($_COOKIE[$cookie_email]) : '';
-			$comment_author_url = isset($_COOKIE[$cookie_url]) ? trim($_COOKIE[$cookie_url]) : '';
+		{ // set saved Comment attributes from Session
+			$comment_content = $Comment->content;
+			$comment_author = $Comment->author;
+			$comment_author_email = $Comment->author_email;
+			$comment_author_url = $Comment->author_url;
+			$comment_attachments = $Comment->preview_attachments;
 		}
-		if( empty($comment_author_url) )
-		{	// Even if we have a blank cookie, let's reset this to remind the bozos what it's for
-			$comment_author_url = 'http://';
-		}
-
-		$comment_content =  $params['default_text'];
 	}
-
 
 	if( ( !empty( $PageCache ) ) && ( $PageCache->is_collecting ) )
 	{	// This page is going into the cache, we don't want personal data cached!!!
@@ -306,6 +316,9 @@ function setCommentVote( id, type, vote )
 
 /*
  * $Log$
+ * Revision 1.35  2011/10/04 08:39:30  efy-asimo
+ * Comment and message forms save/reload content in case of error
+ *
  * Revision 1.34  2011/10/03 17:13:04  efy-yurybakh
  * review fp>yura comments
  *

@@ -466,6 +466,7 @@ class Blog extends DataObject
 		if( in_array( 'cache', $groups ) )
 		{ // we want to load the cache params:
 			$this->set_setting( 'ajax_form_enabled', param( 'ajax_form_enabled', 'integer', 0 ) );
+			$this->set_setting( 'ajax_form_loggedin_enabled', param( 'ajax_form_loggedin_enabled', 'integer', 0 ) );
 			$this->set_setting( 'cache_enabled_widgets', param( 'cache_enabled_widgets', 'integer', 0 ) );
 		}
 
@@ -2485,10 +2486,28 @@ class Blog extends DataObject
 		return $DB->get_var( $sql );
 
 	}
+
+
+	/**
+	 * Get the corresponding ajax form enabled setting
+	 * 
+	 * @return boolean true if ajax form is enabled, false otherwise
+	 */
+	function get_ajax_form_enabled()
+	{
+		if( is_logged_in() )
+		{
+			return $this->get_setting( 'ajax_form_loggedin_enabled' );
+		}
+		return $this->get_setting( 'ajax_form_enabled' );
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.152  2011/10/04 08:39:30  efy-asimo
+ * Comment and message forms save/reload content in case of error
+ *
  * Revision 1.151  2011/10/03 17:13:04  efy-yurybakh
  * review fp>yura comments
  *

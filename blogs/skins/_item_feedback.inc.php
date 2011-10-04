@@ -273,7 +273,7 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 }
 
 // ------------------ COMMENT FORM INCLUDED HERE ------------------
-if( $Blog->get_setting( 'ajax_form_enabled' ) )
+if( $Blog->get_ajax_form_enabled() )
 {
 	$json_params = array(
 		'action' => 'get_comment_form',
@@ -294,6 +294,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.49  2011/10/04 08:39:30  efy-asimo
+ * Comment and message forms save/reload content in case of error
+ *
  * Revision 1.48  2011/10/01 23:45:19  fplanque
  * clean factorization
  *

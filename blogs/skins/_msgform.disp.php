@@ -31,9 +31,9 @@ global $DB;
  *       BUT, for the logout link remembering it here is too late normally.. :/
  */
 $redirect_to = param( 'redirect_to', 'string', '' ); // pass-through (hidden field)
-$recipient_id = param( 'recipient_id', 'integer', '' );
-$post_id = param( 'post_id', 'integer', '' );
-$comment_id = param( 'comment_id', 'integer', '' );
+$recipient_id = param( 'recipient_id', 'integer', 0 );
+$post_id = param( 'post_id', 'integer', 0 );
+$comment_id = param( 'comment_id', 'integer', 0 );
 $subject = param( 'subject', 'string', '' );
 
 
@@ -180,12 +180,12 @@ else
 		}
 	}
 	?>
-	
+
 	<!-- form to send email -->
 	<?php
 
 	// Form to send email
-	if( !empty( $Blog ) && ( $Blog->get_setting( 'ajax_form_enabled' ) ) )
+	if( !empty( $Blog ) && ( $Blog->get_ajax_form_enabled() ) )
 	{
 		if( empty( $subject ) )
 		{
@@ -224,6 +224,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.28  2011/10/04 08:39:30  efy-asimo
+ * Comment and message forms save/reload content in case of error
+ *
  * Revision 1.27  2011/10/03 14:45:16  efy-yurybakh
  * Add User::get_identity_link() everywhere
  *

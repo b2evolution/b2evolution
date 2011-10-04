@@ -21,9 +21,20 @@ global $comment_cookies, $comment_allow_msgform;
 <h4><?php echo T_('Leave a comment') ?>:</h4>
 
 <?php
-	$comment_author = isset($_COOKIE[$cookie_name]) ? trim($_COOKIE[$cookie_name]) : '';
-	$comment_author_email = isset($_COOKIE[$cookie_email]) ? trim($_COOKIE[$cookie_email]) : '';
-	$comment_author_url = isset($_COOKIE[$cookie_url]) ? trim($_COOKIE[$cookie_url]) : '';
+	if( ( $Comment = get_comment_from_session() ) == NULL )
+	{
+		$comment_author = isset($_COOKIE[$cookie_name]) ? trim($_COOKIE[$cookie_name]) : '';
+		$comment_author_email = isset($_COOKIE[$cookie_email]) ? trim($_COOKIE[$cookie_email]) : '';
+		$comment_author_url = isset($_COOKIE[$cookie_url]) ? trim($_COOKIE[$cookie_url]) : '';
+		$comment_text = '';
+	}
+	else
+	{
+		$comment_author = $Comment->author;
+		$comment_author_email = $Comment->author_email;
+		$comment_author_url = $Comment->author_url;
+		$comment_text = $Comment->content;
+	}
 	$redirect = htmlspecialchars(url_rel_to_same_host(regenerate_url('','','','&'), $htsrv_url));
 ?>
 
@@ -75,7 +86,7 @@ global $comment_cookies, $comment_allow_msgform;
 
 	<tr valign="top" bgcolor="#eeeeee">
 		<td align="right"><label for="comment"><strong><?php echo T_('Comment text') ?>:</strong></label></td>
-		<td align="left" width="450"><textarea cols="50" rows="12" name="p" id="comment" tabindex="4"></textarea><br />
+		<td align="left" width="450"><textarea cols="50" rows="12" name="p" id="comment" tabindex="4"><?php echo $comment_text ?></textarea><br />
 			<small><?php echo T_('Allowed XHTML tags'), ': ', htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)) ?></small>
 		</td>
 	</tr>
