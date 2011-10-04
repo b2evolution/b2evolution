@@ -398,8 +398,10 @@ if( empty($tab) )
 			}
 			
 
+			global $baseurlroot;
 			load_class( 'items/model/_itemlistlight.class.php', 'ItemListLight' );
-			load_class('sessions/model/_internal_searches.class.php', 'Internalsearches' );
+
+			load_class( 'sessions/model/_hit.class.php', 'Hit' );
 
 			$links = array();
 
@@ -463,7 +465,6 @@ if( empty($tab) )
 				$links[] =  array('link' => '/'.$listBlog->siteurl.'?s=$keywords$&disp=search&submit=Search',
 								  'blog_id'   => $blog_id);
 
-
 			}
 
 			$links_count = count($links);
@@ -508,7 +509,8 @@ if( empty($tab) )
 									'sess_hitcount' => 1,
 									'sess_lastseen' => 0,
 									'sess_ipaddress'=> generate_random_ip(),
-									'sess_user_ID'  => $users_array[$i]['user_ID']);
+									'sess_user_ID'  => $users_array[$i]['user_ID'],
+									'pervios_link'	=> '');
 			}
 
 			// main cycle of generation
@@ -522,38 +524,16 @@ if( empty($tab) )
 				$rand_link = mt_rand(0,$links_count-1);
 				$cur_seesion =  $sessions[$rand_i];
 
-				$keyp_ID = 'NULL';
-
-				$internal_search = 0;
-				$anonim_first = 0;
-
-				if (strstr($links[$rand_link]['link'],'s=$keywords$'))
-				{
-					$internal_search = 1;
-				}
-
-
 
 				if (strstr($links[$rand_link]['link'],'$keywords$'))
 				{	// check if the current search link is selected randomly.
 					// If yes, generate search link and add it to DB
 						$keywords =  'fake search '. mt_rand(0,9);
-
-				/*		$sql = 'SELECT keyp_ID
-								  FROM T_track__keyphrase
-								 WHERE keyp_phrase = '.$DB->quote($keywords);
-						$keyp_ID = $DB->get_var( $sql, 0, 0, 'Get keyphrase ID' );
-
-						if( empty( $keyp_ID ) )
-						{
-							$sql = 'INSERT INTO T_track__keyphrase( keyp_phrase )
-								VALUES ('.$DB->quote($keywords).')';
-							$DB->query( $sql, 'Add new keyphrase' );
-							$keyp_ID = $DB->insert_id;
-						}
-				*/
 						$links[$rand_link]['link'] = str_replace('$keywords$', urlencode($keywords), $links[$rand_link]['link']);
-
+						if (strstr($links[$rand_link]['link'],'s='))
+						{
+							$links[$rand_link]['s'] = $keywords;
+						}
 				}
 
 
@@ -575,14 +555,10 @@ if( empty($tab) )
 					$cur_seesion['sess_ID'] = $DB->insert_id;
 					$sessions[$rand_i] = $cur_seesion;
 
-					$sql = "INSERT INTO T_hitlog(hit_sess_ID, hit_datetime, hit_uri, hit_referer_dom_ID, hit_referer_type, hit_blog_ID, hit_remote_addr, hit_agent_type , hit_keyphrase_keyp_ID)
-						VALUES".
-						"({$cur_seesion['sess_ID']}, FROM_UNIXTIME({$cur_seesion['sess_lastseen']}), '". $DB->escape($links[$rand_link]['link']). "' , 1, 'direct', {$links[$rand_link]['blog_id']}, '{$cur_seesion['sess_ipaddress']}' , 'browser', $keyp_ID)";
+					$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen'], 1, $links[$rand_link]);
+					$Test_hit->log();
 
-					$DB->query( $sql, 'Record test hits' );
 
-					$hit_ID = $DB->insert_id;
-					
 				}
 				else
 				{
@@ -594,7 +570,9 @@ if( empty($tab) )
 												'sess_hitcount' => 1,
 												'sess_lastseen' => 0,
 												'sess_ipaddress'=> generate_random_ip(),
-												'sess_user_ID'  => $users_array[mt_rand(0,$users_count-1)]['user_ID']);
+												'sess_user_ID'  => $users_array[mt_rand(0,$users_count-1)]['user_ID'],
+												'pervios_link'	=> ''
+							);
 
 						$cur_seesion['sess_lastseen'] = $time_shift;
 
@@ -625,39 +603,48 @@ if( empty($tab) )
 						}
 
 						$cur_seesion['sess_ID'] = $DB->insert_id;
-						$sessions[$rand_i] = $cur_seesion;
-
+						
 						if ($cur_seesion['sess_user_ID'] == -1)
 						{
-							$anonim_first = 1;
-							$sql = "INSERT INTO T_hitlog(hit_sess_ID, hit_datetime, hit_uri, hit_referer_dom_ID, hit_referer_type, hit_blog_ID, hit_remote_addr, hit_agent_type )
-							VALUES".
-								"({$cur_seesion['sess_ID']}, FROM_UNIXTIME({$cur_seesion['sess_lastseen']}), '". $DB->escape('/htsrv/login.php'). "' , 1, 'direct', NULL, '{$cur_seesion['sess_ipaddress']}' , 'browser'),".
-								"({$cur_seesion['sess_ID']}, FROM_UNIXTIME({$cur_seesion['sess_lastseen']} + 3), '". $DB->escape('/htsrv/login.php?redirect_to=fake_stat'). "' , 1, 'self', NULL, '{$cur_seesion['sess_ipaddress']}' , 'browser')";
+							$link =  array(	'link'		=> '/htsrv/login.php',
+											'blog_id'   => 1);
+
+							$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen'], 1, $link);
+
+							$Test_hit->log();
+
+							$link =  array('link'		=> '/htsrv/login.php?redirect_to=fake_stat',
+										   'blog_id'	=> 1);
+
+							$Test_hit = new Hit($baseurlroot, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen'] + 3, 1, $link);
+
+							$Test_hit->log();
+
+							$cur_seesion['pervios_link'] = $baseurlroot.$link['link'];
+
 
 						}
 						else
 						{
-							$sql = "INSERT INTO T_hitlog(hit_sess_ID, hit_datetime, hit_uri, hit_referer_dom_ID, hit_referer_type, hit_blog_ID, hit_remote_addr, hit_agent_type, hit_keyphrase_keyp_ID  )
-							VALUES".
-								"({$cur_seesion['sess_ID']}, FROM_UNIXTIME({$cur_seesion['sess_lastseen']}), '". $DB->escape($links[$rand_link]['link']). "' , 1, 'direct', {$links[$rand_link]['blog_id']}, '{$cur_seesion['sess_ipaddress']}' , 'browser', $keyp_ID)";
-						}
+							$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen'], 1, $links[$rand_link]);
+							$Test_hit->log();
+							$cur_seesion['pervios_link'] = $baseurlroot.$links[$rand_link]['link'];
 
-						$DB->query( $sql, 'Record test hits' );
-						$hit_ID = $DB->insert_id;
+
+  						}
+
+
 
 					}
 					else
 					{
 						// Update session
 						$cur_seesion['sess_lastseen'] = $time_shift;
-						$sql = "INSERT INTO T_hitlog(hit_sess_ID, hit_datetime, hit_uri, hit_referer_dom_ID, hit_referer_type, hit_blog_ID, hit_remote_addr, hit_agent_type, hit_keyphrase_keyp_ID )
-						VALUES".
-							"({$cur_seesion['sess_ID']}, FROM_UNIXTIME({$cur_seesion['sess_lastseen']}), '". $DB->escape($links[$rand_link]['link']). "' , 1, 'self', {$links[$rand_link]['blog_id']}, '{$cur_seesion['sess_ipaddress']}' , 'browser', $keyp_ID)";
 
-						$DB->query( $sql, 'Record test hits' );
+						$Test_hit = new Hit($cur_seesion['pervios_link'], $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen'], 1, $links[$rand_link]);
+						$Test_hit->log();
 
-						$hit_ID = $DB->insert_id;
+
 
 						$sql = "UPDATE T_sessions SET
 								sess_hitcount = sess_hitcount + 1,
@@ -665,19 +652,15 @@ if( empty($tab) )
 								WHERE sess_ID = {$cur_seesion['sess_ID']}";
 
 						$DB->query( $sql, 'Update session' );
+
+						$cur_seesion['pervios_link'] = $baseurlroot.$links[$rand_link]['link'];
+
 						$sessions[$rand_i] = $cur_seesion;
 
 					}
 				}
 
-				if ($internal_search == 1 && $anonim_first == 0)
-				{
-					$internal_searches = new InternalSearches();
-					$internal_searches->set("coll_ID" , $links[$rand_link]['blog_id']);
-					$internal_searches->set("hit_ID" , $hit_ID);
-					$internal_searches->set("keywords" , $keywords );
-					$internal_searches->dbinsert();
-				}
+			$sessions[$rand_i] = $cur_seesion;
 
 			}
 
@@ -763,6 +746,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.52  2011/10/04 09:47:17  efy-vitalij
+ * remake hits generator to HIT class
+ *
  * Revision 1.51  2011/10/03 12:36:56  efy-vitalij
  * fix random hits generator
  *
