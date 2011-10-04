@@ -313,10 +313,6 @@ $Plugins->trigger_event('BeforeCommentFormInsert', array(
  */
 if( $Messages->has_errors() )
 {
-	if( ! isset($page_title) )
-	{
-		$page_title = T_('Errors while processing your comment');
-	}
 	$Comment->set( 'preview_attachments', $preview_attachments );
 	save_comment_to_session( $Comment );
 	header_redirect(); // 303 redirect
@@ -484,6 +480,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.153  2011/10/04 08:42:18  efy-asimo
+ * Remove unused code
+ *
  * Revision 1.152  2011/10/04 08:39:29  efy-asimo
  * Comment and message forms save/reload content in case of error
  *
