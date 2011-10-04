@@ -95,6 +95,7 @@ $ctrl_mappings = array(
 		'userfields'   => 'users/userfields.ctrl.php',
 		'usersettings' => 'users/settings.ctrl.php',
 		'registration' => 'users/registration.ctrl.php',
+		'display'      => 'users/display.ctrl.php',
 		'groups'       => 'users/groups.ctrl.php',
 		'upload'       => 'files/upload.ctrl.php',
 		'slugs'        => 'slugs/slugs.ctrl.php',
@@ -962,14 +963,17 @@ class _core_Module extends Module
 								'href' => '?ctrl=users'	),
 							'usersettings' => array(
 								'text' => T_('User settings'),
- 								'href' => '?ctrl=usersettings',
- 								'entries' => array(
+								'href' => '?ctrl=usersettings',
+								'entries' => array(
 									'usersettings' => array(
 										'text' => T_('User latitude'),
- 										'href' => '?ctrl=usersettings' ),
+										'href' => '?ctrl=usersettings' ),
 									'registration' => array(
 										'text' => T_('Registration'),
- 										'href' => '?ctrl=registration' ),
+										'href' => '?ctrl=registration' ),
+									'display' => array(
+										'text' => T_('Display'),
+										'href' => '?ctrl=display' ),
 									'userfields' => array(
 										'text' => T_('User fields'),
 										'href' => '?ctrl=userfields' ),
@@ -1049,6 +1053,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.86  2011/10/04 13:06:26  efy-yurybakh
+ * Additional Display settings
+ *
  * Revision 1.85  2011/10/03 07:02:21  efy-yurybakh
  * bubbletips & identity_links cleanup
  *

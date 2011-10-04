@@ -103,10 +103,6 @@ $Form->begin_fieldset( T_('Other options') );
 					array( 'required', T_('Required') ),
 				), T_('Gender'), true );
 
-	$Form->checkbox_input( 'gender_colored', $Settings->get('gender_colored'), T_('Display gender'), array( 'note'=>T_('Use colored usernames to differentiate men & women.') ) );
-
-	$Form->checkbox_input( 'bubbletip', $Settings->get('bubbletip'), T_('Username bubble tips'), array( 'note'=>T_('Check to enable bubble tips on usernames') ) );
-
 $Form->end_fieldset();
 
 // --------------------------------------------
@@ -119,6 +115,9 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.17  2011/10/04 13:06:26  efy-yurybakh
+ * Additional Display settings
+ *
  * Revision 1.16  2011/10/03 10:07:06  efy-yurybakh
  * bubbletips & identity_links cleanup
  *

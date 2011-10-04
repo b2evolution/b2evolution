@@ -132,6 +132,13 @@ class GeneralSettings extends AbstractSettings
 
 		'nickname_editing' => 'edited-user',		// "never" - Never allow; "default-no" - Let users decide, default to "no" for new users; "default-yes" - Let users decide, default to "yes" for new users; "always" - Always allow
 		'multiple_sessions' => 'userset_default_no', // multiple sessions settings -- overriden for demo mode in contructor
+
+		'bubbletip' => 1, // Display bubletips in the Back-office
+		'bubbletip_size_admin' => 'fit-160x160', // Avatar size in the bubbletip in the Back-office
+		'bubbletip_size_front' => 'fit-160x160', // Avatar size in the bubbletip in the Front-office
+		'bubbletip_anonymous' => 1, // Display bubbletips in Front-office for anonymous users
+		'bubbletip_size_anonymous' => 'fit-160x160-blur-18', // Avatar size in the bubbletip in the Front-office for anonymous users
+		'bubbletip_overlay' => "Log in to\r\nsee this\r\nimage",// Overlay text on the profile image for anonymous users
 	);
 
 
@@ -239,6 +246,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.40  2011/10/04 13:06:26  efy-yurybakh
+ * Additional Display settings
+ *
  * Revision 1.39  2011/09/10 21:37:53  fplanque
  * minor
  *

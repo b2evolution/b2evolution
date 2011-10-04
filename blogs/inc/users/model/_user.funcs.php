@@ -196,7 +196,7 @@ function use_in_skin_login()
 /**
  * Check a settings from user for Back office and from skin for Front office
  * 
- * @param string Setting name
+ * @param string Setting name ( gender_colored OR bubbletip)
  * @return bool Use colored gender
  */
 function check_setting( $setting_name )
@@ -204,23 +204,33 @@ function check_setting( $setting_name )
 	global $Settings, $Blog, $SkinCache;
 
 	if( is_admin_page() )
-	{ // Check setting in the Back office
+	{	// Check setting in the Back office
 		if( $Settings->get( $setting_name ) )
-		{ // Set TRUE if the setting is ON
+		{	// Set TRUE if the setting is ON
 			return true;
 		}
 	}
 	else
-	{ // Check setting in the Front office for current blog & skin
+	{	// Check setting in the Front office for current blog & skin
 		global $Blog, $SkinCache;
 		if( ! isset( $SkinCache ) )
-		{ // Init $SkinCache if it doesn't still exist
+		{	// Init $SkinCache if it doesn't still exist
 			$SkinCache = & get_SkinCache();
 		}
 		$skin = & $SkinCache->get_by_ID( $Blog->get( 'skin_ID' ) );
 		if( $skin->get_setting( $setting_name ) )
 		{ // If setting is ON for current Blog & Skin
-			return true;
+			if( $setting_name == 'bubbletip' )
+			{	// Check separate case for setting 'bubbletip'
+				if( is_logged_in() || $Settings->get( $setting_name.'_anonymous' ) )
+				{	// If user is logged in OR Anonymous user can see bubbletips
+					return true;
+				}
+			}
+			else
+			{ // Setting 'gender_colored' doesn't depend on user's logged status
+				return true;
+			}
 		}
 	}
 
@@ -1209,6 +1219,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.75  2011/10/04 13:06:26  efy-yurybakh
+ * Additional Display settings
+ *
  * Revision 1.74  2011/10/03 12:00:33  efy-yurybakh
  * Small messaging UI design changes
  *

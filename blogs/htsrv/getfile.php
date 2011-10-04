@@ -115,6 +115,10 @@ if( !empty($size) && $File->is_image() )
 		$size_name = 'fit-80x80';
 	}
 
+	if( ! isset ( $thumbnail_sizes[$size_name][4] ) )
+	{	// Set blur percent in 0 by default
+		$thumbnail_sizes[$size_name][4] = 0;
+	}
 	// Set all params for requested size:
 	list( $thumb_type, $thumb_width, $thumb_height, $thumb_quality, $thumb_percent_blur ) = $thumbnail_sizes[$size_name];
 
@@ -243,6 +247,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.59  2011/10/04 13:06:26  efy-yurybakh
+ * Additional Display settings
+ *
  * Revision 1.58  2011/10/04 09:16:31  efy-yurybakh
  * blur effect
  *

@@ -70,10 +70,6 @@ switch ( $action )
 
 		param( 'registration_require_gender', 'string', '' );
 
-		param( 'gender_colored', 'integer', 0 );
-
-		param( 'bubbletip', 'integer', 0 );
-
 		$Settings->set_array( array(
 									 array( 'newusers_canregister', $newusers_canregister),
 
@@ -95,11 +91,7 @@ switch ( $action )
 
 									 array( 'registration_ask_locale', $registration_ask_locale),
 
-									 array( 'registration_require_gender', $registration_require_gender),
-
-									 array( 'gender_colored', $gender_colored),
-
-									 array( 'bubbletip', $bubbletip) ) );
+									 array( 'registration_require_gender', $registration_require_gender) ) );
 
 		if( ! $Messages->has_errors() )
 		{
@@ -142,6 +134,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2011/10/04 13:06:26  efy-yurybakh
+ * Additional Display settings
+ *
  * Revision 1.15  2011/10/03 10:07:06  efy-yurybakh
  * bubbletips & identity_links cleanup
  *

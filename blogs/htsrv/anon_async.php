@@ -111,36 +111,40 @@ switch( $action )
 		$comment_ID = param( 'commentid', 'integer', 0 );
 
 		if( strpos( $_SERVER["HTTP_REFERER"], "/admin.php" ) !== FALSE )
-		{ // If ajax is requested from admin page we should to set a variable $is_admin_page = true if user has permissions
+		{	// If ajax is requested from admin page we should to set a variable $is_admin_page = true if user has permissions
 			// Check global permission:
 			if( empty($current_User) || ! $current_User->check_perm( 'admin', 'restricted' ) )
-			{ // No permission to access admin...
+			{	// No permission to access admin...
 				require $adminskins_path.'_access_denied.main.php';
 			}
 			else
-			{ // Set this page as admin page
+			{	// Set this page as admin page
 				$is_admin_page = true;
 			}
 		}
 
 		if( $blog_ID > 0 )
-		{ // Get Blog if ID is set
+		{	// Get Blog if ID is set
 			$BlogCache = & get_BlogCache();
 			$Blog = $BlogCache->get_by_ID( $blog_ID );
 		}
 
 		if( $user_ID > 0 )
-		{ // Print info of the registred users
+		{	// Print info of the registred users
 			$UserCache = & get_UserCache();
 			$User = & $UserCache->get_by_ID( $user_ID );
 
-			if( is_logged_in() )
-			{ // Set avatar for logged users
-				$avatar_size = 'fit-160x160';
+			if( is_admin_page() )
+			{	// Set avatar size for Back-office
+				$avatar_size = $Settings->get('bubbletip_size_admin');
+			}
+			else if( is_logged_in() )
+			{	// Set avatar size for logged in users in the Front-office
+				$avatar_size = $Settings->get('bubbletip_size_front');
 			}
 			else
-			{ // Set avatar with blur effect for NOT logged users
-				$avatar_size = 'fit-160x160-blur-13';
+			{	// Set avatar size for Anonymous users
+				$avatar_size = $Settings->get('bubbletip_size_anonymous');
 			}
 			// Display user avatar with login
 			echo '<div class="center">';
@@ -148,7 +152,7 @@ switch( $action )
 			echo '</div>';
 		}
 		else if( $comment_ID > 0 )
-		{ // Print info for an anonymous user who posted a comment
+		{	// Print info for an anonymous user who posted a comment
 			$CommentCache = & get_CommentCache();
 			$Comment = $CommentCache->get_by_ID( $comment_ID );
 
@@ -160,7 +164,7 @@ switch( $action )
 			echo $Comment->get_author_url_link( '', '<div>', '</div>');
 
 			if( isset( $Blog ) )
-			{ // Link to send message
+			{	// Link to send message
 				echo '<div>';
 				$Comment->msgform_link( $Blog->get('msgformurl'), '', '', get_icon( 'email', 'imgtag' ).' '.T_('Send a message') );
 				echo '</div>';
@@ -201,6 +205,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.19  2011/10/04 13:06:26  efy-yurybakh
+ * Additional Display settings
+ *
  * Revision 1.18  2011/10/04 09:16:31  efy-yurybakh
  * blur effect
  *
