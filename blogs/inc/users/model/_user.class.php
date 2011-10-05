@@ -2364,9 +2364,10 @@ class User extends DataObject
 			// Calculate approximate font size, 1.7 - is custom coefficient of the font
 			$font_size = ceil( ( $width / $max_line_length ) * 1.7 );
 			// Set line-height for centering text by vertical
-			$line_height = ceil( $height / count( $overlay_lines ) );
+			$line_height = ceil( ( $height / count( $overlay_lines ) ) * 0.82 );
+			$padding_top = $line_height * 0.32;
 
-			$img_tag = '<div class="bubletip_overlay_text '.$class.'">'.$img_tag.'<div style="font-size:'.$font_size.'px;line-height:'.$line_height.'px">'.nl2br($avatar_overlay_text).'</div></div>';
+			$img_tag = '<div class="bubletip_overlay_text '.$class.'">'.$img_tag.'<div style="font-size:'.$font_size.'px;line-height:'.$line_height.'px;padding-top:'.$padding_top.'px">'.nl2br($avatar_overlay_text).'</div></div>';
 		}
 
 		return $img_tag;
@@ -2694,6 +2695,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.156  2011/10/05 18:20:25  efy-yurybakh
+ * overlay text spacing
+ *
  * Revision 1.155  2011/10/05 07:40:51  efy-yurybakh
  * white text with black outline
  *
