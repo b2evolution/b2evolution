@@ -158,6 +158,9 @@ class CollectionSettings extends AbstractSettings
 			'enable_goto_blog' => 1,						// Go to blog after publishing post
 
 			'post_categories' => 'main_extra_cat_post',		// Post category setting
+			
+			'image_size_directory' => 'crop-15x15',
+			'image_size_messaging' => 'crop-15x15',
 		);
 
 
@@ -193,6 +196,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.68  2011/10/05 12:05:02  efy-yurybakh
+ * Blog settings > features tab refactoring
+ *
  * Revision 1.67  2011/10/04 08:39:30  efy-asimo
  * Comment and message forms save/reload content in case of error
  *

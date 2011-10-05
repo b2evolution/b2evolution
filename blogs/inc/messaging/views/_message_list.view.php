@@ -116,7 +116,7 @@ foreach( $DB->get_results( $unread_recipients_SQL->get() ) as $row )
 	$read_by = '';
 	if( !empty( $read_recipiens ) )
 	{
-		$read_by .= '<div>'.get_avatar_imgtags( $read_recipiens, true, false, 'crop-15x15', 'avatar_before_login', '', true );
+		$read_by .= '<div>'.get_avatar_imgtags( $read_recipiens, true, false, $Blog->get_setting('image_size_messaging'), 'avatar_before_login', '', true );
 		if( !empty ( $unread_recipients ) )
 		{
 			$read_by .= ', ';
@@ -126,7 +126,7 @@ foreach( $DB->get_results( $unread_recipients_SQL->get() ) as $row )
 
 	if( !empty ( $unread_recipients ) )
 	{
-		$read_by .= '<div>'.get_avatar_imgtags( $unread_recipients, true, false, 'crop-15x15', 'avatar_before_login', '', false ).'</div>';
+		$read_by .= '<div>'.get_avatar_imgtags( $unread_recipients, true, false, $Blog->get_setting('image_size_messaging'), 'avatar_before_login', '', false ).'</div>';
 	}
 
 	$read_by_list[$row->msg_ID] = $read_by ;
@@ -360,6 +360,9 @@ $Form->begin_form( $params['form_class'], '' );
 $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' ) ) );
 /*
  * $Log$
+ * Revision 1.38  2011/10/05 12:05:02  efy-yurybakh
+ * Blog settings > features tab refactoring
+ *
  * Revision 1.37  2011/10/03 12:00:33  efy-yurybakh
  * Small messaging UI design changes
  *

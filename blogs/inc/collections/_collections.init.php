@@ -674,10 +674,19 @@ class collections_Module extends Module
 								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog, ),
 							'features' => array(
 								'text' => T_('Features'),
-								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$blog, ),
-							'comments' => array(
-								'text' => T_('Comments'),
-								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=comments&amp;blog='.$blog, ),
+								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$blog,
+								'entries' => array(
+									'features' => array(
+										'text' => T_('Posts'),
+										'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$blog ),
+									'comments' => array(
+										'text' => T_('Comments'),
+										'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=comments&amp;blog='.$blog ),
+									'other' => array(
+										'text' => T_('Other'),
+										'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=other&amp;blog='.$blog ),
+								),
+							),
 							'skin' => array(
 								'text' => T_('Skin'),
 								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog, ),
@@ -760,6 +769,9 @@ $collections_Module = new collections_Module();
 
 /*
  * $Log$
+ * Revision 1.31  2011/10/05 12:05:01  efy-yurybakh
+ * Blog settings > features tab refactoring
+ *
  * Revision 1.30  2011/09/28 12:09:53  efy-yurybakh
  * "comment was helpful" votes (new tab "comments")
  *

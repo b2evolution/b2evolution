@@ -371,19 +371,6 @@ class Blog extends DataObject
 		}
 
 
-		if( param( 'what_to_show', 'string', NULL ) !== NULL )
-		{ // Show x days or x posts?:
-			$this->set_setting( 'what_to_show', get_param( 'what_to_show' ) );
-
-			param_integer_range( 'posts_per_page', 1, 9999, T_('Items/days per page must be between %d and %d.') );
-			$this->set_setting( 'archive_mode', param( 'archive_mode', 'string', true ) );
-			$this->set_setting( 'posts_per_page', get_param( 'posts_per_page' ) );
-
- 			$this->set_setting( 'orderby', param( 'orderby', 'string', true ) );
- 			$this->set_setting( 'orderdir', param( 'orderdir', 'string', true ) );
-		}
-
-
 		if( param( 'archives_sort_order', 'string', NULL ) !== NULL )
 		{
 			$this->set_setting( 'archives_sort_order', param( 'archives_sort_order', 'string', false ) );
@@ -481,27 +468,50 @@ class Blog extends DataObject
 			$this->set_setting( 'in_skin_login', param( 'in_skin_login', 'integer', 0 ) );
 		}
 
+		if( in_array( 'styles', $groups ) )
+		{ // we want to load the styles params:
+			$this->set( 'allowblogcss', param( 'blog_allowblogcss', 'integer', 0 ) );
+			$this->set( 'allowusercss', param( 'blog_allowusercss', 'integer', 0 ) );
+		}
+
 		if( in_array( 'features', $groups ) )
 		{ // we want to load the workflow checkboxes:
+			$this->set_setting( 'enable_goto_blog', param( 'enable_goto_blog', 'integer', 0 ) );
+
+			$this->set_setting( 'post_categories', param( 'post_categories', 'string', NULL ) );
+
+			// Show x days or x posts?:
+			$this->set_setting( 'what_to_show', param( 'what_to_show', 'string', '' ) );
+
+			param_integer_range( 'posts_per_page', 1, 9999, T_('Items/days per page must be between %d and %d.') );
+			$this->set_setting( 'posts_per_page', get_param( 'posts_per_page' ) );
+
+			$this->set_setting( 'orderby', param( 'orderby', 'string', true ) );
+			$this->set_setting( 'orderdir', param( 'orderdir', 'string', true ) );
+
 			// call modules update_collection_features on this blog
 			modules_call_method( 'update_collection_features', array( 'edited_Blog' => & $this ) );
+		}
+
+		if( in_array( 'comments', $groups ) )
+		{ // we want to load the workflow checkboxes:
+			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+		}
+
+		if( in_array( 'other', $groups ) )
+		{ // we want to load the workflow checkboxes:
+			$this->set_setting( 'enable_sitemaps', param( 'enable_sitemaps', 'integer', 0 ) );
 
 			$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
 			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
-			$this->set_setting( 'enable_goto_blog', param( 'enable_goto_blog', 'integer', 0 ) );
 
 			// Public blog list
 			$this->set( 'in_bloglist', param( 'blog_in_bloglist',   'integer', 0 ) );
 
-			$this->set( 'allowblogcss', param( 'blog_allowblogcss', 'integer', 0 ) );
-			$this->set( 'allowusercss', param( 'blog_allowusercss', 'integer', 0 ) );
+			$this->set_setting( 'image_size_directory', param( 'image_size_directory', 'string' ) );
+			$this->set_setting( 'image_size_messaging', param( 'image_size_messaging', 'string' ) );
 
-			$this->set_setting( 'enable_sitemaps', param( 'enable_sitemaps', 'integer', 0 ) );
-
-			$this->set_setting( 'post_categories', param( 'post_categories', 'string', NULL ) );
-
-			// call modules update_collection_features on this blog
-			modules_call_method( 'update_collection_features', array( 'edited_Blog' => & $this ) );
+			$this->set_setting( 'archive_mode', param( 'archive_mode', 'string', true ) );
 		}
 
 		if( param( 'allow_comments', 'string', NULL ) !== NULL )
@@ -2505,6 +2515,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.153  2011/10/05 12:05:02  efy-yurybakh
+ * Blog settings > features tab refactoring
+ *
  * Revision 1.152  2011/10/04 08:39:30  efy-asimo
  * Comment and message forms save/reload content in case of error
  *

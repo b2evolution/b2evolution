@@ -200,6 +200,17 @@ $Form->begin_fieldset( T_('Software credits').get_manual_link('software_credits'
 $Form->end_fieldset();
 
 
+if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+{	// Permission to edit advanced admin settings
+
+	$Form->begin_fieldset( T_('Skin and style').' ['.T_('Admin').']' );
+		$Form->checkbox( 'blog_allowblogcss', $edited_Blog->get( 'allowblogcss' ), T_('Allow customized blog CSS file'), T_('You will be able to customize the blog\'s skin stylesheet with a file named style.css in the blog\'s media file folder.') );
+		$Form->checkbox( 'blog_allowusercss', $edited_Blog->get( 'allowusercss' ), T_('Allow user customized CSS file for this blog'), T_('Users will be able to customize the blog and skin stylesheets with a file named style.css in their personal file folder.') );
+	$Form->end_fieldset();
+
+}
+
+
 $Form->end_form( array(
 	array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
 	array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
@@ -232,6 +243,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.37  2011/10/05 12:05:02  efy-yurybakh
+ * Blog settings > features tab refactoring
+ *
  * Revision 1.36  2011/10/04 08:39:30  efy-asimo
  * Comment and message forms save/reload content in case of error
  *

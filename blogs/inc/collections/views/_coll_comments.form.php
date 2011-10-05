@@ -159,6 +159,12 @@ $Form->begin_fieldset( T_('RSS/Atom feeds') );
 	$Form->text( 'comments_per_feed', $edited_Blog->get_setting('comments_per_feed'), 4, T_('Comments in feeds'),  T_('How many of the latest comments do you want to include in RSS & Atom feeds?'), 4 );
 $Form->end_fieldset();
 
+
+$Form->begin_fieldset( T_('Subscriptions') );
+	$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), T_('Email subscriptions'), T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
+$Form->end_fieldset();
+
+
 $Form->end_form( array(
 	array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
 	array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
@@ -182,6 +188,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.5  2011/10/05 12:05:02  efy-yurybakh
+ * Blog settings > features tab refactoring
+ *
  * Revision 1.4  2011/10/03 17:13:04  efy-yurybakh
  * review fp>yura comments
  *

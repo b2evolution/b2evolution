@@ -140,6 +140,7 @@ if( $Settings->get('allow_avatars') )
 {
 	function user_avatar( $user_ID, $user_avatar_file_ID )
 	{
+		global $Blog;
 		$FileCache = & get_FileCache();
 
 		// Do not halt on error. A file can disappear without the profile being updated.
@@ -151,7 +152,7 @@ if( $Settings->get('allow_avatars') )
 			return '';
 		}
 		$identity_link = get_user_identity_url( $user_ID );
-		return '<a href="'.$identity_link.'">'.$File->get_thumb_imgtag( 'crop-15x15' ).'</a>';
+		return '<a href="'.$identity_link.'">'.$File->get_thumb_imgtag( $Blog->get_setting('image_size_directory') ).'</a>';
 	}
 	$Results->cols[] = array(
 							'th' => T_('Picture'),
@@ -183,6 +184,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.3  2011/10/05 12:05:02  efy-yurybakh
+ * Blog settings > features tab refactoring
+ *
  * Revision 1.2  2011/10/05 07:54:51  efy-yurybakh
  * User directory (fix error if accessed anonymously)
  *

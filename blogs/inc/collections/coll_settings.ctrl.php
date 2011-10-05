@@ -142,17 +142,9 @@ switch( $action )
 				break;
 
 			case 'features':
-				if( $edited_Blog->load_from_Request( array( 'features' ) ) )
-				{ // Commit update to the DB:
-					$edited_Blog->dbupdate();
-					$Messages->add( T_('The blog settings have been updated'), 'success' );
-					// Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( $update_redirect_url, 303 ); // Will EXIT
-				}
-				break;
-
 			case 'comments':
-				if( $edited_Blog->load_from_Request( array( 'comments' ) ) )
+			case 'other':
+				if( $edited_Blog->load_from_Request( array( $tab ) ) )
 				{ // Commit update to the DB:
 					$edited_Blog->dbupdate();
 					$Messages->add( T_('The blog settings have been updated'), 'success' );
@@ -226,7 +218,7 @@ switch( $action )
 				break;
 
 			case 'advanced':
-				if( $edited_Blog->load_from_Request( array( 'pings', 'cache', 'authors', 'login' ) ) )
+				if( $edited_Blog->load_from_Request( array( 'pings', 'cache', 'authors', 'login', 'styles' ) ) )
 				{ // Commit update to the DB:
 					$cache_status = param( 'cache_enabled', 'integer', 0 );
 					load_funcs( 'collections/model/_blog.funcs.php' );
@@ -278,11 +270,21 @@ switch( $AdminUI->get_path(1) )
 		break;
 
 	case 'features':
+		$AdminUI->set_path( 'blogs', 'features', $tab );
 		$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( T_('Post'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 		break;
 
 	case 'comments':
+		$AdminUI->set_path( 'blogs', 'features', $tab );
+		$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=features' );
 		$AdminUI->breadcrumbpath_add( T_('Comments'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		break;
+
+	case 'other':
+		$AdminUI->set_path( 'blogs', 'features', $tab );
+		$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=features' );
+		$AdminUI->breadcrumbpath_add( T_('Other'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 		break;
 
 	case 'skin':
@@ -342,11 +344,18 @@ switch( $AdminUI->get_path(1) )
 		break;
 
 	case 'features':
-		$AdminUI->disp_view( 'collections/views/_coll_features.form.php' );
-		break;
-
-	case 'comments':
-		$AdminUI->disp_view( 'collections/views/_coll_comments.form.php' );
+		switch( $AdminUI->get_path(2) )
+		{
+			case 'comments';
+				$AdminUI->disp_view( 'collections/views/_coll_comments.form.php' );
+				break;
+			case 'other';
+				$AdminUI->disp_view( 'collections/views/_coll_other.form.php' );
+				break;
+			default:
+				$AdminUI->disp_view( 'collections/views/_coll_features.form.php' );
+				break;
+		}
 		break;
 
 	case 'skin':
@@ -395,6 +404,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.43  2011/10/05 12:05:01  efy-yurybakh
+ * Blog settings > features tab refactoring
+ *
  * Revision 1.42  2011/09/28 12:09:53  efy-yurybakh
  * "comment was helpful" votes (new tab "comments")
  *

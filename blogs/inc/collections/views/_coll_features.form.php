@@ -25,30 +25,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $edited_Blog;
 
-?>
-<script type="text/javascript">
-	<!--
-	function show_hide_feedback_details(ob)
-	{
-		var fldset = jQuery( '.feedback_details_container' );
-		if( ob.value == 'never' )
-		{
-			for( i = 0; i < fldset.length; i++ )
-			{
-				fldset[i].style.display = 'none';
-			}
-		}
-		else
-		{
-			for( i = 0; i < fldset.length; i++ )
-			{
-				fldset[i].style.display = '';
-			}
-		}
-	}
-	//-->
-</script>
-<?php
 
 $Form = new Form( NULL, 'coll_features_checkchanges' );
 
@@ -108,12 +84,6 @@ $Form->begin_fieldset( T_('RSS/Atom feeds') );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Sitemaps') );
-	$Form->checkbox( 'enable_sitemaps', $edited_Blog->get_setting( 'enable_sitemaps' ),
-						T_( 'Enable sitemaps' ), T_( 'Check to allow usage of skins with the "sitemap" type.' ) );
-$Form->end_fieldset();
-
-
 $Form->begin_fieldset( T_('Custom field names') );
 	$notes = array(
 			T_('Ex: Price'),
@@ -139,30 +109,17 @@ $Form->begin_fieldset( T_('Custom field names') );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Subscriptions') );
-	$Form->checkbox( 'allow_subscriptions', $edited_Blog->get_setting( 'allow_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new post and/or comment.') );
-	$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), '', T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
-	// TODO: checkbox 'Enable RSS/Atom feeds'
-	// TODO2: which feeds (skins)?
+$Form->begin_fieldset( T_('Post list') );
+	$Form->select_input_array( 'orderby', $edited_Blog->get_setting('orderby'), get_available_sort_options(), T_('Order by'), T_('Default ordering of posts.') );
+	$Form->select_input_array( 'orderdir', $edited_Blog->get_setting('orderdir'), array(
+												'ASC'  => T_('Ascending'),
+												'DESC' => T_('Descending'), ), T_('Direction') );
+	$Form->radio( 'what_to_show', $edited_Blog->get_setting('what_to_show'),
+								array(  array( 'days', T_('days') ),
+												array( 'posts', T_('posts') ),
+											), T_('Display unit'), false,  T_('Do you want to restrict on the number of days or the number of posts?') );
+	$Form->text( 'posts_per_page', $edited_Blog->get_setting('posts_per_page'), 4, T_('Posts/Days per page'), T_('How many days or posts do you want to display on the home page?'), 4 );
 $Form->end_fieldset();
-
-$Form->begin_fieldset( T_('List of public blogs') );
-	$Form->checkbox( 'blog_in_bloglist', $edited_Blog->get( 'in_bloglist' ), T_('Include in public blog list'), T_('Check this if you want this blog to be advertised in the list of all public blogs on this system.') );
-$Form->end_fieldset();
-
-if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
-{	// Permission to edit advanced admin settings
-
-	$Form->begin_fieldset( T_('Skin and style').' ['.T_('Admin').']' );
-
-		$SkinCache = & get_SkinCache();
-		$SkinCache->load_all();
-		$Form->select_input_object( 'blog_skin_ID', $edited_Blog->skin_ID, $SkinCache, T_('Skin') );
-		$Form->checkbox( 'blog_allowblogcss', $edited_Blog->get( 'allowblogcss' ), T_('Allow customized blog CSS file'), T_('You will be able to customize the blog\'s skin stylesheet with a file named style.css in the blog\'s media file folder.') );
-		$Form->checkbox( 'blog_allowusercss', $edited_Blog->get( 'allowusercss' ), T_('Allow user customized CSS file for this blog'), T_('Users will be able to customize the blog and skin stylesheets with a file named style.css in their personal file folder.') );
-	$Form->end_fieldset();
-
-}
 
 
 $Form->end_form( array(
@@ -170,24 +127,14 @@ $Form->end_form( array(
 	array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
 ?>
-<script type="text/javascript">
-	jQuery( '#paged_comments' ).click( function()
-	{
-		if ( $('#paged_comments').is(':checked') )
-		{
-			$('#comments_per_page').val('20');
-		}
-		else
-		{
-			$('#comments_per_page').val('1000');
-		}
-	} );
-</script>
 <?php
 
 
 /*
  * $Log$
+ * Revision 1.53  2011/10/05 12:05:02  efy-yurybakh
+ * Blog settings > features tab refactoring
+ *
  * Revision 1.52  2011/09/30 13:03:20  fplanque
  * doc
  *

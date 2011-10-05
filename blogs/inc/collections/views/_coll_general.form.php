@@ -83,33 +83,6 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link('blogs_general_p
 	$Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Content / Posts') );
-	$Form->select_input_array( 'orderby', $edited_Blog->get_setting('orderby'), get_available_sort_options(), T_('Order by'), T_('Default ordering of posts.') );
-	$Form->select_input_array( 'orderdir', $edited_Blog->get_setting('orderdir'), array(
-												'ASC'  => T_('Ascending'),
-												'DESC' => T_('Descending'), ), T_('Direction') );
-	$Form->radio( 'what_to_show', $edited_Blog->get_setting('what_to_show'),
-								array(  array( 'days', T_('days') ),
-												array( 'posts', T_('posts') ),
-											), T_('Display unit'), false,  T_('Do you want to restrict on the number of days or the number of posts?') );
-	$Form->text( 'posts_per_page', $edited_Blog->get_setting('posts_per_page'), 4, T_('Posts/Days per page'), T_('How many days or posts do you want to display on the home page?'), 4 );
-	$Form->radio( 'archive_mode',  $edited_Blog->get_setting('archive_mode'),
-							array(  array( 'monthly', T_('monthly') ),
-											array( 'weekly', T_('weekly') ),
-											array( 'daily', T_('daily') ),
-											array( 'postbypost', T_('post by post') )
-										), T_('Archive grouping'), false,  T_('How do you want to browse the post archives? May also apply to permalinks.') );
-
-	// TODO: Hide if archive_mode != 'postbypost' (JS)
-	// fp> there should probably be no post by post mode since we do have other ways to list posts now
-	// fp> TODO: this is display param and should go to plugin/widget
-	$Form->radio( 'archives_sort_order',  $edited_Blog->get_setting('archives_sort_order'),
-							array(  array( 'date', T_('date') ),
-											array( 'title', T_('title') ),
-										), T_('Archive sorting'), false,  T_('How to sort your archives? (only in post by post mode)') );
-$Form->end_fieldset();
-
-
 $Form->begin_fieldset( T_('Description') );
 	$Form->text( 'blog_tagline', $edited_Blog->get( 'tagline' ), 50, T_('Tagline'), T_('This is displayed under the blog name on the blog template.'), 250 );
 	$Form->textarea( 'blog_longdesc', $edited_Blog->get( 'longdesc' ), 5, T_('Long Description'), T_('This is displayed on the blog template.'), 50, 'large' );
@@ -123,6 +96,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.27  2011/10/05 12:05:02  efy-yurybakh
+ * Blog settings > features tab refactoring
+ *
  * Revision 1.26  2011/09/04 22:13:14  fplanque
  * copyright 2011
  *
