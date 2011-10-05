@@ -137,6 +137,7 @@ switch( $action )
 			$User = & $UserCache->get_by_ID( $user_ID );
 
 			$avatar_overlay_text = '';
+			$link_overlay_class = '';
 			if( is_admin_page() )
 			{	// Set avatar size for Back-office
 				$avatar_size = $Settings->get('bubbletip_size_admin');
@@ -149,11 +150,12 @@ switch( $action )
 			{	// Set avatar size for Anonymous users
 				$avatar_size = $Settings->get('bubbletip_size_anonymous');
 				$avatar_overlay_text = $Settings->get('bubbletip_overlay');
+				$link_overlay_class = 'overlay_link';
 			}
 
 			// Display user avatar with login
 			echo '<div class="center">';
-			echo get_avatar_imgtag( $User->login, true, true, $avatar_size, 'avatar_above_login', '', $avatar_overlay_text );
+			echo get_avatar_imgtag( $User->login, true, true, $avatar_size, 'avatar_above_login', '', $avatar_overlay_text, $link_overlay_class );
 			echo '</div>';
 		}
 		else if( $comment_ID > 0 )
@@ -211,6 +213,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.22  2011/10/05 07:40:51  efy-yurybakh
+ * white text with black outline
+ *
  * Revision 1.21  2011/10/04 21:56:00  fplanque
  * minor
  *

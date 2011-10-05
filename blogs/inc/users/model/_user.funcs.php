@@ -878,12 +878,13 @@ function profile_check_params( $params, $User = NULL )
  * @param if true show user login after avatar
  * @param if true link to user profile
  * @param avatar size
- * @param style class
+ * @param style class of image
  * @param image align
  * @param avatar overlay text
+ * @param style class of link
  * @return login <img> tag
  */
-function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size = 'crop-15x15', $class = 'avatar_before_login', $align = '', $avatar_overlay_text = '' )
+function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size = 'crop-15x15', $img_class = 'avatar_before_login', $align = '', $avatar_overlay_text = '', $link_class = '' )
 {
 	global $current_User;
 
@@ -893,11 +894,11 @@ function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size
 	$img_tag = '';
 	if( $User !== false )
 	{
-		$img_tag = $User->get_avatar_imgtag( $size, $class, $align, false, $avatar_overlay_text );
+		$img_tag = $User->get_avatar_imgtag( $size, $img_class, $align, false, $avatar_overlay_text );
 
 		if( $show_login )
 		{
-			$img_tag = '<span class="nowrap">'.$img_tag.$user_login.'</span>';
+			$img_tag = '<span class="nowrap">'.$img_tag.'<b>'.$user_login.'</b></span>';
 		}
 
 		$identity_url = get_user_identity_url( $User->ID );
@@ -907,7 +908,8 @@ function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size
 		}
 		else
 		{	// Show avatar & user login as link to the profile page
-			$img_tag = '<a href="'.$identity_url.'" class="'.$User->get_gender_class().'" rel="bubbletip_user_'.$User->ID.'">'.$img_tag.'</a>';
+			$link_class = ( $link_class != '' ) ? ' '.$link_class : '';
+			$img_tag = '<a href="'.$identity_url.'" class="'.$User->get_gender_class().$link_class.'" rel="bubbletip_user_'.$User->ID.'">'.$img_tag.'</a>';
 		}
 	}
 
@@ -1220,6 +1222,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.78  2011/10/05 07:40:51  efy-yurybakh
+ * white text with black outline
+ *
  * Revision 1.77  2011/10/04 17:16:05  efy-yurybakh
  * Params for disp=user
  *

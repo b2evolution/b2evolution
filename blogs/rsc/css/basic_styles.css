@@ -158,13 +158,16 @@ span.icon{
 .bubletip_overlay_text div{
 	position: absolute;
 	top: 0;
-	left: 2px;
+	left: 0;
 	width: 100%;
 	text-align: center;
-	color: #EEE;
+	text-shadow: 2px 0 #000, -2px 0 #000, 0 2px #000, 0 -2px #000;
+	color: #FFF;
+	font-weight: bold;
 }
-.bubletip_overlay_text div div{
-	top: -2px;
-	left: -2px;
-	color: #000;
+a.overlay_link:hover{
+	text-decoration: none;
+}
+a.overlay_link:hover b{
+	text-decoration: underline;
 }

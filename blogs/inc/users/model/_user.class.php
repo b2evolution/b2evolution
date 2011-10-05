@@ -2348,7 +2348,6 @@ class User extends DataObject
 		{	// Bad thumbnail size
 			return $img_tag;
 		}
-		$width = $thumbnail_sizes[$size][1];
 		$overlay_lines = explode( "\r\n", $avatar_overlay_text);
 		$max_line_length = 0;
 		foreach( $overlay_lines as $line )
@@ -2359,11 +2358,15 @@ class User extends DataObject
 			}
 		}
 		if( $max_line_length > 0 )
-		{	// Don't display an overlay text if max is not defined
+		{	// Display an overlay text if max length is defined
+			$width = $thumbnail_sizes[$size][1];
+			$height = $thumbnail_sizes[$size][2];
 			// Calculate approximate font size, 1.7 - is custom coefficient of the font
 			$font_size = ceil( ( $width / $max_line_length ) * 1.7 );
+			// Set line-height for centering text by vertical
+			$line_height = ceil( $height / count( $overlay_lines ) );
 
-			$img_tag = '<div class="bubletip_overlay_text '.$class.'">'.$img_tag.'<div style="font-size:'.$font_size.'px">'.nl2br($avatar_overlay_text).'<div>'.nl2br($avatar_overlay_text).'</div></div></div>';
+			$img_tag = '<div class="bubletip_overlay_text '.$class.'">'.$img_tag.'<div style="font-size:'.$font_size.'px;line-height:'.$line_height.'px">'.nl2br($avatar_overlay_text).'</div></div>';
 		}
 
 		return $img_tag;
@@ -2691,6 +2694,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.155  2011/10/05 07:40:51  efy-yurybakh
+ * white text with black outline
+ *
  * Revision 1.154  2011/10/04 17:16:05  efy-yurybakh
  * Params for disp=user
  *
