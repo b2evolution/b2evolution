@@ -331,7 +331,7 @@ $Form->begin_form( '', '', $params );
 	<?php
     // ################### MODULES SPECIFIC ITEM SETTINGS ###################
 
-    modules_call_method( 'display_item_settings', array( 'Form' => & $Form, 'Blog' => & $Blog, 'edited_Item' => & $edited_Item ) );
+	modules_call_method( 'display_item_settings', array( 'Form' => & $Form, 'Blog' => & $Blog, 'edited_Item' => & $edited_Item ) );
 
 	// ################### CATEGORIES ###################
 
@@ -455,6 +455,9 @@ echo_onchange_newcat();
 
 /*
  * $Log$
+ * Revision 1.82  2011/10/05 14:16:55  efy-asimo
+ * Display module specific item settings in both item edit form
+ *
  * Revision 1.81  2011/10/04 21:56:00  fplanque
  * minor
  *

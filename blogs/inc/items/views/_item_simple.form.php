@@ -228,6 +228,10 @@ $Form->begin_form( '', '', $params );
 <div class="right_col">
 
 	<?php
+	// ################### MODULES SPECIFIC ITEM SETTINGS ###################
+
+	modules_call_method( 'display_item_settings', array( 'Form' => & $Form, 'Blog' => & $Blog, 'edited_Item' => & $edited_Item ) );
+
 	// ################### CATEGORIES ###################
 
 	cat_select( $Form );
@@ -287,6 +291,9 @@ echo_autocomplete_tags();
 
 /*
  * $Log$
+ * Revision 1.47  2011/10/05 14:16:55  efy-asimo
+ * Display module specific item settings in both item edit form
+ *
  * Revision 1.46  2011/09/04 22:13:17  fplanque
  * copyright 2011
  *
