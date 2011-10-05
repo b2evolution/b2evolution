@@ -152,7 +152,7 @@ if( $Settings->get('allow_avatars') )
 			return '';
 		}
 		$identity_link = get_user_identity_url( $user_ID );
-		return '<a href="'.$identity_link.'">'.$File->get_thumb_imgtag( $Blog->get_setting('image_size_directory') ).'</a>';
+		return '<a href="'.$identity_link.'">'.$File->get_thumb_imgtag( $Blog->get_setting('image_size_user_list') ).'</a>';
 	}
 	$Results->cols[] = array(
 							'th' => T_('Picture'),
@@ -184,6 +184,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.4  2011/10/05 17:58:54  efy-yurybakh
+ * change the default profile picture sizes
+ *
  * Revision 1.3  2011/10/05 12:05:02  efy-yurybakh
  * Blog settings > features tab refactoring
  *

@@ -160,8 +160,8 @@ class CollectionSettings extends AbstractSettings
 			'post_categories' => 'main_extra_cat_post',		// Post category setting
 
 		// Other settings:
-			'image_size_directory' => 'crop-15x15', // Used in disp = users
-			'image_size_messaging' => 'crop-15x15', // Used in disp = threads
+			'image_size_user_list' => 'crop-32x32', // Used in disp = users
+			'image_size_messaging' => 'crop-32x32', // Used in disp = threads
 
 		// Time frame settings:
 			'timestamp_min' => 'yes',
@@ -201,6 +201,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.70  2011/10/05 17:58:53  efy-yurybakh
+ * change the default profile picture sizes
+ *
  * Revision 1.69  2011/10/05 13:49:07  efy-yurybakh
  * Add settings for a $timestamp_min & $timestamp_max
  *

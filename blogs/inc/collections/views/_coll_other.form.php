@@ -60,7 +60,7 @@ if( isset($GLOBALS['files_Module']) )
 	$params['force_keys_as_values'] = true;
 	
 	$Form->begin_fieldset( T_('User directory') );
-			$Form->select_input_array( 'image_size_directory', $edited_Blog->get_setting( 'image_size_directory' ), get_available_thumb_sizes(), T_('Profile picture size'), '', $params );
+			$Form->select_input_array( 'image_size_user_list', $edited_Blog->get_setting( 'image_size_user_list' ), get_available_thumb_sizes(), T_('Profile picture size'), '', $params );
 	$Form->end_fieldset();
 		
 	$Form->begin_fieldset( T_('Messaging') );
@@ -97,6 +97,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.2  2011/10/05 17:58:54  efy-yurybakh
+ * change the default profile picture sizes
+ *
  * Revision 1.1  2011/10/05 12:05:02  efy-yurybakh
  * Blog settings > features tab refactoring
  *

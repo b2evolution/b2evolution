@@ -514,7 +514,7 @@ class Blog extends DataObject
 			// Public blog list
 			$this->set( 'in_bloglist', param( 'blog_in_bloglist',   'integer', 0 ) );
 
-			$this->set_setting( 'image_size_directory', param( 'image_size_directory', 'string' ) );
+			$this->set_setting( 'image_size_user_list', param( 'image_size_user_list', 'string' ) );
 			$this->set_setting( 'image_size_messaging', param( 'image_size_messaging', 'string' ) );
 
 			$this->set_setting( 'archive_mode', param( 'archive_mode', 'string', true ) );
@@ -2575,6 +2575,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.155  2011/10/05 17:58:53  efy-yurybakh
+ * change the default profile picture sizes
+ *
  * Revision 1.154  2011/10/05 13:49:07  efy-yurybakh
  * Add settings for a $timestamp_min & $timestamp_max
  *
