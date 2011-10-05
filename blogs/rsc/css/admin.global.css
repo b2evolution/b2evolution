@@ -540,3 +540,38 @@ div.avatartag {
 .userfield.require{
 	color: #f00;
 }
+
+.reftype_search{
+	background-color: #0099FF;
+}
+.reftype_blacklist{
+	background-color: #ff00ff;
+}
+.reftype_referer{
+	background-color: #00CCFF;
+}
+.reftype_direct{
+	background-color: #00FFCC;
+}
+.reftype_spam{
+	background-color: #FF0000;
+}
+.reftype_self{
+	background-color: #00FF99;
+}
+.reftype_admin{
+	background-color: #999999;
+}
+
+.agent_rss{
+	background-color: #FF6600;
+}
+.agent_robot{
+	background-color: #FF9900;
+}
+.agent_browser{
+	background-color: #FFCC00;
+}
+.agent_unknown{
+	background-color: #CCCCCC;
+}
