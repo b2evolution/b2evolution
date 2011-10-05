@@ -968,7 +968,8 @@ class Table extends Widget
 		{
 			$output = substr( $output, 0, -1 ).get_field_attribs_as_string( $extra_attr ).'>';
 		}
-
+		// Check variables in column declaration:
+		$output = $this->parse_class_content( $output );
 		echo $output;
 	}
 
@@ -1013,6 +1014,9 @@ class Table extends Widget
 
 /*
  * $Log$
+ * Revision 1.21  2011/10/05 08:05:44  efy-vitalij
+ * add function parse_class_content in display_col_start
+ *
  * Revision 1.20  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *
