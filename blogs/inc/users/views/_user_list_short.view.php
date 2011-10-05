@@ -105,17 +105,6 @@ else
 
 $Results = new Results( $SQL->get(), 'user_', $default_sort, NULL, $count_sql );
 
-$Results->title = T_('Users').get_manual_link('users_and_groups');
-
-/*
- * Table icons:
- */
-if( $current_User->check_perm( 'users', 'edit', false ) )
-{ // create new user link
-	global $admin_url;
-	$Results->global_icon( T_('Create a new user...'), 'new', $admin_url.'?ctrl=user&amp;action=new&amp;user_tab=profile', T_('Add user').' &raquo;', 3, 4  );
-}
-
 
 /**
  * Callback to add filters on top of the result set
@@ -162,7 +151,7 @@ if( $Settings->get('allow_avatars') )
 			return '';
 		}
 		$identity_link = get_user_identity_url( $user_ID );
-		return '<a href="'.$identity_link.'">'.$File->get_thumb_imgtag( 'crop-48x48' ).'</a>';
+		return '<a href="'.$identity_link.'">'.$File->get_thumb_imgtag( 'crop-15x15' ).'</a>';
 	}
 	$Results->cols[] = array(
 							'th' => T_('Picture'),
@@ -194,6 +183,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.2  2011/10/05 07:54:51  efy-yurybakh
+ * User directory (fix error if accessed anonymously)
+ *
  * Revision 1.1  2011/10/03 13:37:50  efy-yurybakh
  * User directory
  *

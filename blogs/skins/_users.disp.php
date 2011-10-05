@@ -28,36 +28,9 @@ if( !empty( $Skin ) ) {
 	$display_params = NULL;
 }
 
-if( !is_logged_in() )
-{
-	debug_die( 'You are not logged in!' );
-}
-
 if( !isset( $disp ) )
 {
 	$disp = 'users';
-}
-
-// Get action parameter from request:
-$action = param_action( 'view' );
-
-// Preload users to show theirs avatars
-load_messaging_threads_recipients( $current_User->ID );
-
-switch( $action )
-{
-	case 'new':
-		// Check permission:
-		$current_User->check_perm( 'perm_edit', 'reply', true );
-
-		// We don't have a model to use, start with blank object:
-		$edited_User = new User();
-		break;
-
-	default:
-		// Check permission:
-		$current_User->check_perm( 'perm_messaging', 'reply', true );
-		break;
 }
 
 // ----------------------- End Init variables --------------------------
@@ -90,6 +63,9 @@ switch( $disp )
 
 /**
  * $Log$
+ * Revision 1.3  2011/10/05 07:54:51  efy-yurybakh
+ * User directory (fix error if accessed anonymously)
+ *
  * Revision 1.2  2011/10/03 13:37:49  efy-yurybakh
  * User directory
  *
