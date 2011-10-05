@@ -653,11 +653,11 @@ class Results extends Table
 
 				/*
 				 *
-				 * On a un problème avec la recherche sur les sociétés
-				 * si on fait un select count(*), ça sort un nombre de réponses énorme
+				 * On a un problï¿½me avec la recherche sur les sociï¿½tï¿½s
+				 * si on fait un select count(*), ï¿½a sort un nombre de rï¿½ponses ï¿½norme
 				 * mais on ne sait pas pourquoi... la solution est de lister des champs dans le COUNT()
-				 * MAIS malheureusement ça ne fonctionne pas pour d'autres requêtes.
-				 * L'idéal serait de réussir à isoler qu'est-ce qui, dans la requête SQL, provoque le comportement
+				 * MAIS malheureusement ï¿½a ne fonctionne pas pour d'autres requï¿½tes.
+				 * L'idï¿½al serait de rï¿½ussir ï¿½ isoler qu'est-ce qui, dans la requï¿½te SQL, provoque le comportement
 				 * bizarre....
 				 */
 				// Tentative 1:
@@ -666,7 +666,7 @@ class Results extends Table
 				// if( preg_match( '#(,|JOIN)#si', $matches[1] ) )
 				// { // there was a coma or a JOIN clause in the FROM clause of the original query,
 				// Tentative 2:
-				// fplanque: je pense que la différence est sur la présence de DISTINCT ou non.
+				// fplanque: je pense que la diffï¿½rence est sur la prï¿½sence de DISTINCT ou non.
 				// if( preg_match( '#\s DISTINCT \s#six', $sql_count, $matches ) )
 				if( preg_match( '#\s DISTINCT \s+ ([A-Za-z_]+)#six', $sql_count, $matches ) )
 				{ //
@@ -1385,7 +1385,7 @@ class Results extends Table
 	 *
 	 * This is one of the key functions to look at when you want to use the Results class.
 	 * - $var$
-	 * - £var£
+	 * - ï¿½varï¿½
 	 * - #var#
 	 * - {row}
 	 * - %func()%
@@ -1396,9 +1396,9 @@ class Results extends Table
 		// Make variable substitution for STRINGS:
 		$content = preg_replace( '#\$ (\w+) \$#ix', "'.format_to_output(\$row->$1).'", $content );
 		// Make variable substitution for URL STRINGS:
-		$content = preg_replace( '#\£ (\w+) \£#ix', "'.format_to_output(\$row->$1, 'urlencoded').'", $content );
+		$content = preg_replace( '#\ï¿½ (\w+) \ï¿½#ix', "'.format_to_output(\$row->$1, 'urlencoded').'", $content );
 		// Make variable substitution for escaped strings:
-		$content = preg_replace( '#² (\w+) ²#ix', "'.htmlentities(\$row->$1).'", $content );
+		$content = preg_replace( '#ï¿½ (\w+) ï¿½#ix', "'.htmlentities(\$row->$1).'", $content );
 		// Make variable substitution for RAWS:
 		$content = preg_replace( '!\# (\w+) \#!ix', "\$row->$1", $content );
 		// Make variable substitution for full ROW:
@@ -1413,13 +1413,33 @@ class Results extends Table
 		$content = preg_replace( '#~ (.+?) ~#ix', "'.$1.'", $content );
 
 		// @deprecated by ~func()~. Left here for backward compatibility only, to be removed in future versions.
-		$content = preg_replace( '#¤ (.+?) ¤#ix', "'.$1.'", $content );
+		$content = preg_replace( '#ï¿½ (.+?) ï¿½#ix', "'.$1.'", $content );
 
 		// Make callback function move_icons for orderable lists // dh> what does it do?
 		$content = str_replace( '{move}', "'.\$this->move_icons().'", $content );
 
 		$content = str_replace( '{CUR_IDX}', $this->current_idx, $content );
 		$content = str_replace( '{TOTAL_ROWS}', $this->total_rows, $content );
+
+		return $content;
+	}
+
+	/**
+	 * Handle variable subtitutions for class column contents.
+	 *
+	 * This is one of the key functions to look at when you want to use the Results class.
+	 * - #var#
+	 */
+	function parse_class_content( $content )
+	{
+		// Make variable substitution for RAWS:
+		while (preg_match('!\# (\w+) \#!ix', $content, $matchesarray))
+		{ // Replace all matches to the content of the current row's cell. That means that several variables can be inserted to the class.
+			if (! empty($this->rows[$this->current_idx]->$matchesarray[1]))
+			{
+				$content = str_replace($matchesarray[0],$this->rows[$this->current_idx]->$matchesarray[1] , $content);
+			}
+		}
 
 		return $content;
 	}
@@ -1853,6 +1873,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.42  2011/10/05 08:07:16  efy-vitalij
+ * add function parse_class_content
+ *
  * Revision 1.41  2011/09/10 22:03:45  fplanque
  * doc
  *
