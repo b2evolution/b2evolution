@@ -398,7 +398,7 @@ if( empty($tab) )
 			}
 			
 
-			global $baseurlroot;
+			global $baseurlroot, $admin_url;
 			load_class( 'items/model/_itemlistlight.class.php', 'ItemListLight' );
 
 			load_class( 'sessions/model/_hit.class.php', 'Hit' );
@@ -467,6 +467,31 @@ if( empty($tab) )
 
 			}
 
+			$referes = array('http://www.fake-referer1.com',
+							 'http://www.fake-referer2.com',
+							 'http://www.fake-referer3.com',
+							 'http://www.fake-referer4.com',
+							 'http://www.fake-referer5.com',
+							 'http://www.fake-referer6.com',
+							 'http://www.fake-referer7.com',
+							 'http://www.fake-referer8.com',
+							 'http://www.fake-referer9.com',
+							 'http://www.mail.google.com/fake/referer',
+							 'http://www.webmail.aol.com/fake/referer',
+							 'http://www.mail.yahoo.com/fake/referer',
+							 'http://bloglines.com/fake/referer',
+							 'http://www.fake-refer-online-casino1.com',
+							 'http://www.fake-refer-online-casino2.com',
+							 'http://www.fake-refer-online-casino3.com',
+							 'http://www.google.com/url?sa=t&rct=j&q=$keywords$&source=web&cd=4',
+							 'http://www.bing.com/search?q=$keywords$&src=IE-SearchBox&FORM=IE8SRC'
+							);
+
+			$ref_count = count($referes) - 1;
+
+			$admin_link = array('link'=> $admin_url,
+								'blog_id' => NULL);
+
 			$links_count = count($links);
 
 			if (empty($links_count))
@@ -501,9 +526,10 @@ if( empty($tab) )
 
 			// create session array for testing
 			$sessions = array();
+			mt_srand(crc32(microtime()));
 			for ($i = 0; $i <= $users_count - 1; $i++)
 			{
-				mt_srand(crc32(microtime()));
+				
 				$sessions[] = array('sess_ID'		=> -1,
 									'sess_key'      => generate_random_key(32),
 									'sess_hitcount' => 1,
@@ -514,10 +540,10 @@ if( empty($tab) )
 			}
 
 			// main cycle of generation
-			mt_srand(crc32(microtime()));
+			//mt_srand(crc32(microtime()));
 			for ($time_shift = $past_time; $cur_time > $time_shift; $time_shift += mt_rand($min_interval, $max_interval))
 			{
-				mt_srand(crc32(microtime()));
+				//mt_srand(crc32(microtime()));
 				$insert_data_count = $insert_data_count + 1;
 
 				$rand_i = mt_rand(0,$users_count-1);
@@ -528,6 +554,7 @@ if( empty($tab) )
 				if (strstr($links[$rand_link]['link'],'$keywords$'))
 				{	// check if the current search link is selected randomly.
 					// If yes, generate search link and add it to DB
+						//mt_srand(crc32(microtime()+ $time_shift));
 						$keywords =  'fake search '. mt_rand(0,9);
 						$links[$rand_link]['link'] = str_replace('$keywords$', urlencode($keywords), $links[$rand_link]['link']);
 						if (strstr($links[$rand_link]['link'],'s='))
@@ -603,13 +630,29 @@ if( empty($tab) )
 						}
 
 						$cur_seesion['sess_ID'] = $DB->insert_id;
+
+						if (mt_rand(0, 100) > 20)
+						{
+							//$ref_count
+							$ref_link = $referes[mt_rand(0,$ref_count)];
+							if (strstr($ref_link,'$keywords$'))
+							{	// check if the current search link is selected randomly.
+									$keywords =  'fake search '. mt_rand(0,9);
+									$ref_link = str_replace('$keywords$', urlencode($keywords), $ref_link);
+							}
+
+						}
+						else
+						{
+							$ref_link = '';
+						}
 						
 						if ($cur_seesion['sess_user_ID'] == -1)
 						{
 							$link =  array(	'link'		=> '/htsrv/login.php',
 											'blog_id'   => 1);
 
-							$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen'], 1, $link);
+							$Test_hit = new Hit($ref_link, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen'], 1, $link);
 
 							$Test_hit->log();
 
@@ -626,10 +669,19 @@ if( empty($tab) )
 						}
 						else
 						{
-							$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen'], 1, $links[$rand_link]);
-							$Test_hit->log();
-							$cur_seesion['pervios_link'] = $baseurlroot.$links[$rand_link]['link'];
+							if (mt_rand(0, 100) < 10)
+							{	// Test hit to admin page
+								$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen'], 1, $admin_link , NULL, 1);
+								$Test_hit->log();
+								$cur_seesion['pervios_link'] = $admin_url;
+							}
+							else
+							{
+								$Test_hit = new Hit($ref_link, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen'], 1, $links[$rand_link]);
+								$Test_hit->log();
+								$cur_seesion['pervios_link'] = $baseurlroot.$links[$rand_link]['link'];
 
+							}
 
   						}
 
@@ -746,6 +798,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.53  2011/10/05 13:42:12  efy-vitalij
+ * change fake statistic generator
+ *
  * Revision 1.52  2011/10/04 09:47:17  efy-vitalij
  * remake hits generator to HIT class
  *
