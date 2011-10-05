@@ -73,7 +73,7 @@ function skin_init( $disp )
 	 * This will give more detail when $disp == 'posts'; otherwise it will have the same content as $disp
 	 * @var string
 	 */
-	global $disp_detail;
+	global $disp_detail, $htsrv_url, $Settings;
 
 	global $Timer;
 
@@ -387,6 +387,22 @@ function skin_init( $disp )
 			if( $Blog->get_setting( 'special_noindex' ) )
 			{	// We prefer robots not to index these pages:
 				$robots_index = false;
+			}
+			break;
+
+		case 'users':
+			if( ! is_logged_in() && ! $Settings->get('allow_anonymous_user_list') )
+			{	// Redirect to the login page for anonymous user and if setting is OFF
+				$redirect_to = $Blog->get('url').'?disp='.$disp;
+				header_redirect( $htsrv_url.'login.php?redirect_to='.rawurlencode($redirect_to), 302 );
+			}
+			break;
+
+		case 'user':
+			if( ! is_logged_in() && ! $Settings->get('allow_anonymous_user_profiles') )
+			{	// Redirect to the login page for anonymous user and if setting is OFF
+				$redirect_to = $Blog->get('url').'?disp='.$disp.'&user_ID='.param( 'user_ID' );
+				header_redirect( $htsrv_url.'login.php?redirect_to='.rawurlencode($redirect_to), 302 );
 			}
 			break;
 
@@ -922,6 +938,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.107  2011/10/05 17:44:23  efy-yurybakh
+ * Checks for disp=user & users
+ *
  * Revision 1.106  2011/09/30 12:24:56  efy-yurybakh
  * User directory
  *

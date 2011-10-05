@@ -62,6 +62,10 @@ switch ( $action )
 
 		param( 'bubbletip_overlay' );
 
+		param( 'allow_anonymous_user_list', 'integer', 0 );
+
+		param( 'allow_anonymous_user_profiles', 'integer', 0 );
+
 		$Settings->set_array( array(
 									 array( 'gender_colored', $gender_colored),
 
@@ -75,7 +79,11 @@ switch ( $action )
 
 									 array( 'bubbletip_size_anonymous', $bubbletip_size_anonymous),
 
-									 array( 'bubbletip_overlay', $bubbletip_overlay) ) );
+									 array( 'bubbletip_overlay', $bubbletip_overlay),
+
+									 array( 'allow_anonymous_user_list', $allow_anonymous_user_list),
+
+									 array( 'allow_anonymous_user_profiles', $allow_anonymous_user_profiles) ) );
 
 		if( ! $Messages->has_errors() )
 		{
@@ -118,6 +126,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2011/10/05 17:44:23  efy-yurybakh
+ * Checks for disp=user & users
+ *
  * Revision 1.1  2011/10/04 13:06:26  efy-yurybakh
  * Additional Display settings
  *

@@ -62,14 +62,6 @@ $Form->begin_form( 'fform', '',
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('General display options') );
-
-		$Form->checkbox_input( 'gender_colored', $Settings->get('gender_colored'), T_('Display gender'), array( 'note'=>T_('Use colored usernames to differentiate men & women.') ) );
-
-$Form->end_fieldset();
-
-// --------------------------------------------
-
 $Form->begin_fieldset( T_('Bubble tips in back-office') );
 
 	$Form->checkbox_input( 'bubbletip', $Settings->get('bubbletip'), T_('Username bubble tips'), array( 'note'=>T_('Check to enable bubble tips on usernames') ) );
@@ -113,6 +105,24 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
+$Form->begin_fieldset( T_('Back office display options') );
+
+		$Form->checkbox_input( 'gender_colored', $Settings->get('gender_colored'), T_('Display gender'), array( 'note'=>T_('Use colored usernames to differentiate men & women.') ) );
+
+$Form->end_fieldset();
+
+// --------------------------------------------
+
+$Form->begin_fieldset( T_('Permissions for anonymous users') );
+
+	$Form->checkbox_input( 'allow_anonymous_user_list', $Settings->get('allow_anonymous_user_list'), T_('Allow to see user list') );
+
+	$Form->checkbox_input( 'allow_anonymous_user_profiles', $Settings->get('allow_anonymous_user_profiles'), T_('Allow to see user profiles') );
+
+$Form->end_fieldset();
+
+// --------------------------------------------
+
 if( $current_User->check_perm( 'users', 'edit' ) )
 {
 	$Form->end_form( array( array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
@@ -121,6 +131,9 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.2  2011/10/05 17:44:24  efy-yurybakh
+ * Checks for disp=user & users
+ *
  * Revision 1.1  2011/10/04 13:06:26  efy-yurybakh
  * Additional Display settings
  *
