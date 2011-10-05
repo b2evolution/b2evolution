@@ -1439,6 +1439,10 @@ class Results extends Table
 			{
 				$content = str_replace($matchesarray[0],$this->rows[$this->current_idx]->$matchesarray[1] , $content);
 			}
+			else
+			{
+				$content = str_replace($matchesarray[0],$matchesarray[1] , $content);
+			}
 		}
 
 		return $content;
@@ -1873,6 +1877,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.43  2011/10/05 08:52:31  efy-vitalij
+ * fix function parse_class_content()
+ *
  * Revision 1.42  2011/10/05 08:07:16  efy-vitalij
  * add function parse_class_content
  *
