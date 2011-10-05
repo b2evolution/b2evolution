@@ -189,11 +189,19 @@ $Results->filter_area = array(
 		)
 	);
 
+if( isset($Blog) )
+{
+  $image_size = $Blog->get_setting('image_size_messaging');
+}
+else
+{
+  $image_size = 'crop-32x32';
+}
 $Results->cols[] = array(
 					'th' => T_('With'),
 					'th_class' => 'thread_with shrinkwrap',
 					'td_class' => 'thread_with',
-					'td' => '%get_avatar_imgtags( #thrd_recipients#, true, true, "'.$Blog->get_setting('image_size_messaging').'" )%',
+					'td' => '%get_avatar_imgtags( #thrd_recipients#, true, true, "'.$image_size.'" )%',
 					);
 
 $messages_url = get_messaging_url( 'messages' );
@@ -275,6 +283,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.34  2011/10/05 21:24:06  fplanque
+ * fix
+ *
  * Revision 1.33  2011/10/05 12:05:02  efy-yurybakh
  * Blog settings > features tab refactoring
  *
