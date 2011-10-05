@@ -111,7 +111,7 @@ class coll_xml_feeds_Widget extends ComponentWidget
 	{
 		global $rsc_uri;
 
-		$title = str_replace( '$icon$', '<img src="'.$rsc_uri.'icons/feed-icon-16x16.gif" width="16" height="16" class="top" alt="" /> ', $this->disp_params['title']);
+		$title = str_replace( '$icon$', get_icon('feed'), $this->disp_params['title']);
 		// fp> TODO: support for different icon sizes and backgrounds (at least black and white; mid grey would be cool also)
 
 		return $title;
@@ -195,6 +195,9 @@ class coll_xml_feeds_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.27  2011/10/05 19:21:18  efy-yurybakh
+ * fix feed icon sprite
+ *
  * Revision 1.26  2011/09/17 02:31:59  fplanque
  * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
  *
