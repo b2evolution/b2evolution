@@ -103,7 +103,7 @@ function skin_init( $disp )
 			break;
 	}
 
-	// SEO stuff:
+	// SEO stuff & redirects if necessary:
 	$seo_page_type = NULL;
 	switch( $disp )
 	{
@@ -359,14 +359,28 @@ function skin_init( $disp )
 
 		case 'msgform':
 			init_ajax_forms(); // auto requires jQuery
-		case 'messages':
-		case 'contacts':
+
 			$seo_page_type = 'Contact form';
 			if( $Blog->get_setting( $disp.'_noindex' ) )
 			{	// We prefer robots not to index these pages:
 				$robots_index = false;
 			}
 			break;
+
+    case 'messages':
+    case 'contacts':    
+    case 'threads':
+      // The messaging module can only be used by logged in users:
+      if( ! is_logged_in() )
+      { // Redirect to the login page for anonymous users
+        header_redirect( get_login_url(), 302 );
+        // will have exited
+      }
+      
+      // just in case some robot would be logged in:
+      $seo_page_type = 'Messaging module';
+      $robots_index = false;
+      break;
 
 		case 'login':
 			$seo_page_type = 'Login form';
@@ -406,7 +420,7 @@ function skin_init( $disp )
 				header_redirect( get_login_url( $redirect_to ), 302 );
 			}
 			break;
-
+      
 		case '404':
 			// We have a 404 unresolved content error
 			// How do we want do deal with it?
@@ -939,6 +953,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.109  2011/10/05 19:19:00  fplanque
+ * redirects for anonymous users
+ *
  * Revision 1.108  2011/10/05 19:12:39  efy-yurybakh
  * Checks for disp=user & users
  *
