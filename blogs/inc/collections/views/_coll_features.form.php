@@ -122,6 +122,25 @@ $Form->begin_fieldset( T_('Post list') );
 $Form->end_fieldset();
 
 
+$Form->begin_fieldset( T_('Time frame') );
+
+	$Form->radio( 'timestamp_min', $edited_Blog->get_setting('timestamp_min'),
+								array(  array( 'yes', T_('yes') ),
+												array( 'no', T_('no') ),
+												array( 'duration', T_('only the last') ),
+											), T_('Show past posts'), true );
+	$Form->duration_input( 'timestamp_min_duration', $edited_Blog->get_setting('timestamp_min_duration'), '' );
+
+	$Form->radio( 'timestamp_max', $edited_Blog->get_setting('timestamp_max'),
+								array(  array( 'yes', T_('yes') ),
+												array( 'no', T_('no') ),
+												array( 'duration', T_('only the next') ),
+											), T_('Show future posts'), true );
+	$Form->duration_input( 'timestamp_max_duration', $edited_Blog->get_setting('timestamp_max_duration'), '' );
+
+$Form->end_fieldset();
+
+
 $Form->end_form( array(
 	array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
 	array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
@@ -132,6 +151,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.54  2011/10/05 13:49:07  efy-yurybakh
+ * Add settings for a $timestamp_min & $timestamp_max
+ *
  * Revision 1.53  2011/10/05 12:05:02  efy-yurybakh
  * Blog settings > features tab refactoring
  *

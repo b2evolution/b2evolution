@@ -158,9 +158,14 @@ class CollectionSettings extends AbstractSettings
 			'enable_goto_blog' => 1,						// Go to blog after publishing post
 
 			'post_categories' => 'main_extra_cat_post',		// Post category setting
-			
-			'image_size_directory' => 'crop-15x15',
-			'image_size_messaging' => 'crop-15x15',
+
+		// Other settings:
+			'image_size_directory' => 'crop-15x15', // Used in disp = users
+			'image_size_messaging' => 'crop-15x15', // Used in disp = threads
+
+		// Time frame settings:
+			'timestamp_min' => 'yes',
+			'timestamp_max' => 'no',
 		);
 
 
@@ -196,6 +201,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.69  2011/10/05 13:49:07  efy-yurybakh
+ * Add settings for a $timestamp_min & $timestamp_max
+ *
  * Revision 1.68  2011/10/05 12:05:02  efy-yurybakh
  * Blog settings > features tab refactoring
  *

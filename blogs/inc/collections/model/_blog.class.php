@@ -489,6 +489,12 @@ class Blog extends DataObject
 			$this->set_setting( 'orderby', param( 'orderby', 'string', true ) );
 			$this->set_setting( 'orderdir', param( 'orderdir', 'string', true ) );
 
+			// Time frame
+			$this->set_setting( 'timestamp_min', param( 'timestamp_min', 'string', '' ) );
+			$this->set_setting( 'timestamp_min_duration', param_duration( 'timestamp_min_duration' ) );
+			$this->set_setting( 'timestamp_max', param( 'timestamp_max', 'string', '' ) );
+			$this->set_setting( 'timestamp_max_duration', param_duration( 'timestamp_max_duration' ) );
+
 			// call modules update_collection_features on this blog
 			modules_call_method( 'update_collection_features', array( 'edited_Blog' => & $this ) );
 		}
@@ -2511,10 +2517,67 @@ class Blog extends DataObject
 		}
 		return $this->get_setting( 'ajax_form_enabled' );
 	}
+
+
+	/**
+	 * Get timestamp value from the setting "timestamp_min"
+	 *
+	 * @return string
+	 */
+	function get_timestamp_min()
+	{
+		$timestamp_min = $this->get_setting( 'timestamp_min' );
+		
+		switch ( $timestamp_min )
+		{
+			case 'duration': // Set timestamp to show post before this date
+				$timestamp_value = time() - $this->get_setting( 'timestamp_min_duration' );
+				break;
+			case 'no': // Don't show past posts
+				$timestamp_value = 'now';
+				break;
+			case 'yes': // Show all past posts
+			default:
+				$timestamp_value = '';
+				break;
+		}
+
+		return $timestamp_value;
+	}
+
+
+	/**
+	 * Get timestamp value from the setting "timestamp_max"
+	 *
+	 * @return string
+	 */
+	function get_timestamp_max()
+	{
+		$timestamp_max = $this->get_setting( 'timestamp_max' );
+		
+		switch ( $timestamp_max )
+		{
+			case 'duration': // Set timestamp to show post after this date
+				$timestamp_value = time() + $this->get_setting( 'timestamp_max_duration' );
+				break;
+			case 'yes': // Show all future posts
+				$timestamp_value = '';
+				break;
+			case 'no': // Don't show future posts
+			default:
+				$timestamp_value = 'now';
+				break;
+		}
+
+		return $timestamp_value;
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.154  2011/10/05 13:49:07  efy-yurybakh
+ * Add settings for a $timestamp_min & $timestamp_max
+ *
  * Revision 1.153  2011/10/05 12:05:02  efy-yurybakh
  * Blog settings > features tab refactoring
  *
