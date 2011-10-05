@@ -1812,6 +1812,9 @@ class Blog extends DataObject
 			case 'userurl':
 				return url_add_param( $this->gen_blogurl(), 'disp=user' );
 
+			case 'usersurl':
+				return url_add_param( $this->gen_blogurl(), 'disp=users' );
+
 			case 'loginurl':
 				return url_add_param( $this->gen_blogurl(), 'disp=login' );
 
@@ -2575,6 +2578,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.156  2011/10/05 19:12:39  efy-yurybakh
+ * Checks for disp=user & users
+ *
  * Revision 1.155  2011/10/05 17:58:53  efy-yurybakh
  * change the default profile picture sizes
  *

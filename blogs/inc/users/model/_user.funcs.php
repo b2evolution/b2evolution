@@ -152,7 +152,7 @@ function get_login_url( $redirect_to = NULL )
 		{
 			$redirect = 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $Blog->get( 'loginurl' ) ) );
 		}
-		return url_add_param( $Blog->get( 'loginurl' ), $redirect );
+		return url_add_param( $Blog->get( 'loginurl' ), $redirect, '&' );
 	}
 
 	// Normal login
@@ -1222,6 +1222,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.79  2011/10/05 19:12:39  efy-yurybakh
+ * Checks for disp=user & users
+ *
  * Revision 1.78  2011/10/05 07:40:51  efy-yurybakh
  * white text with black outline
  *

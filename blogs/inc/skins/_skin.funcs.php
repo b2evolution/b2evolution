@@ -73,7 +73,7 @@ function skin_init( $disp )
 	 * This will give more detail when $disp == 'posts'; otherwise it will have the same content as $disp
 	 * @var string
 	 */
-	global $disp_detail, $htsrv_url, $Settings;
+	global $disp_detail, $Settings;
 
 	global $Timer;
 
@@ -391,18 +391,19 @@ function skin_init( $disp )
 			break;
 
 		case 'users':
-			if( ! is_logged_in() && ! $Settings->get('allow_anonymous_user_list') )
+			if( ! is_logged_in() && ! $Settings->get( 'allow_anonymous_user_list' ) )
 			{	// Redirect to the login page for anonymous user and if setting is OFF
-				$redirect_to = $Blog->get('url').'?disp='.$disp;
-				header_redirect( $htsrv_url.'login.php?redirect_to='.rawurlencode($redirect_to), 302 );
+				$redirect_to = $Blog->get( 'usersurl' );
+				header_redirect( get_login_url( $redirect_to ), 302 );
 			}
 			break;
 
 		case 'user':
-			if( ! is_logged_in() && ! $Settings->get('allow_anonymous_user_profiles') )
+			if( ! is_logged_in() && ! $Settings->get( 'allow_anonymous_user_profiles' ) )
 			{	// Redirect to the login page for anonymous user and if setting is OFF
-				$redirect_to = $Blog->get('url').'?disp='.$disp.'&user_ID='.param( 'user_ID' );
-				header_redirect( $htsrv_url.'login.php?redirect_to='.rawurlencode($redirect_to), 302 );
+				$user_ID = param( 'user_ID', 'integer', 0 );
+				$redirect_to = url_add_param( $Blog->get( 'userurl' ), 'user_ID='.$user_ID, '&' );
+				header_redirect( get_login_url( $redirect_to ), 302 );
 			}
 			break;
 
@@ -938,6 +939,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.108  2011/10/05 19:12:39  efy-yurybakh
+ * Checks for disp=user & users
+ *
  * Revision 1.107  2011/10/05 17:44:23  efy-yurybakh
  * Checks for disp=user & users
  *
