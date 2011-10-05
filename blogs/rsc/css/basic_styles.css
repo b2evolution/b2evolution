@@ -105,14 +105,6 @@ img.rightmargin, div.rightmargin {
 	margin-bottom:.2ex;
 }
 
-/* Comment recycling */
-#recycle_bin {
-	float: right;
-}
-.ui-effects-transfer {
-	border: 2px solid red;
-}
-
 /* Sprite style for the all icons*/
 span.icon{
 	background: url(../icons/icons_sprite.png) no-repeat -112px -48px;
@@ -127,47 +119,5 @@ span.icon{
 	text-decoration: none;
 }
 .action_icon.un:hover {
-	text-decoration: underline;
-}
-
-/* User Genders */
-.user, user.anonymous{
-	font-weight: bold;
-}
-.user.man{
-	color: #00F;
-}
-.user.woman{
-	color: #e100af;
-}
-.user.nogender, user.anonymous.nogender{
-	color: #666;
-}
-
-.bubbletip_anon{
-	text-align: center;
-}
-.bubbletip_anon div{
-	margin-top: 5px;
-}
-
-/* Overlay text on the buble tips */
-.bubletip_overlay_text{
-	position: relative;
-}
-.bubletip_overlay_text div{
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	text-align: center;
-	text-shadow: 2px 0 #000, -2px 0 #000, 0 2px #000, 0 -2px #000;
-	color: #FFF;
-	font-weight: bold;
-}
-a.overlay_link:hover{
-	text-decoration: none;
-}
-a.overlay_link:hover b{
 	text-decoration: underline;
 }

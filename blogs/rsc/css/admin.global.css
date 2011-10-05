@@ -494,6 +494,16 @@ ul.widget_list li {
 	color: #f66;
 }
 
+
+/* Comment recycling */
+#recycle_bin {
+    float: right;
+}
+.ui-effects-transfer {
+    border: 2px solid red;
+}
+
+
 /*
  * Avatar selection:
  */
