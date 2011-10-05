@@ -119,7 +119,7 @@ $Results->title = T_('Referring domains');
 $Results->cols[] = array(
 						'th' => T_('Domain name'),
 						'order' => 'dom_name',
-						'td' => '²dom_name²',
+						'td' => '$dom_name$',
 						'total' => '<strong>'.T_('Global total').'</strong>',
 					);
 
@@ -160,6 +160,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.9  2011/10/05 22:46:06  fplanque
+ * fix
+ *
  * Revision 1.8  2011/09/04 22:13:18  fplanque
  * copyright 2011
  *
