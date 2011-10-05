@@ -178,11 +178,11 @@ $user_agents = array(
 $referer_type_array = array (
 	'0'			=> 'All',
 	'search'	=> 'Search',
-	'blacklist' => 'Blacklist',
 	'referer'	=> 'Referer',
 	'direct'	=> 'Direct',
-	'spam'		=> 'Spam',
 	'self'		=> 'Self',
+	'blacklist' => 'Blacklist',
+	'spam'		=> 'Spam',
 	'admin'		=> 'Admin'
 							);
 
