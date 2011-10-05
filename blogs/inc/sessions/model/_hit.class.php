@@ -192,7 +192,7 @@ class Hit
 	 *
 	 * This may INSERT a basedomain and a useragent but NOT the HIT itself!
 	 */
-	function Hit( $referer = NULL, $IP = NULL, $session_id= NULL, $hit_time = NULL, $test_mode = NULL , $test_uri = NULL, $user_agent = NULL)
+	function Hit( $referer = NULL, $IP = NULL, $session_id= NULL, $hit_time = NULL, $test_mode = NULL , $test_uri = NULL, $user_agent = NULL, $test_admin = NULL)
 	{
 		global $debug;
 
@@ -225,9 +225,14 @@ class Hit
 			$this->test_uri = $test_uri;
 		}
 
-		if (!empty($test_uri))
+		if (!empty($user_agent))
 		{
 			$this->user_agent = $user_agent;
+		}
+
+		if (!empty($test_admin))
+		{
+			$this->test_admin = $test_admin;
 		}
 		// Check the REFERER and determine referer_type:
 		// TODO: dh> move this out of here, too, only if "antispam_block_spam_referers" is true,
@@ -251,7 +256,7 @@ class Hit
 	function detect_admin_page()
 	{
 		global $Debuglog;
-		if (empty($this->test_mode))
+		if (empty($this->test_mode) || (!empty($this->test_mode) && !empty($this->test_admin)))
 		{
 			if( is_admin_page() )
 			{	// We are inside of admin, this supersedes 'direct' access
@@ -368,10 +373,10 @@ class Hit
 				// This type may be superseeded by admin page
 				// fp> 2009-05-10: because of the 12 char limit above the following is probably no longer needed. Please enable it back if anyone has a problem with admin being detected as blacklist
 				// if( ! $this->detect_admin_page() )
-				{	// Not an admin page:
+					// Not an admin page:
 					$Debuglog->add( 'Hit: detect_referer(): blacklist ('.$lBlacklist.')', 'request' );
 					$this->referer_type = 'blacklist';
-				}
+				
 				return;
 			}
 		}
@@ -703,7 +708,7 @@ class Hit
 			return false;
 		}
 
-		if( $this->referer_type == 'spam' && ! $Settings->get('log_spam_hits') )
+		if( ($this->referer_type == 'spam' && ! $Settings->get('log_spam_hits')) && empty($this->test_mode) )
 		{	// We don't want to log referer spam hits:
 			$Debuglog->add( 'Hit: Hit NOT logged, (Referer spam)', 'request' );
 			return false;
@@ -1567,6 +1572,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.73  2011/10/05 13:39:11  efy-vitalij
+ * add test functional
+ *
  * Revision 1.72  2011/10/04 09:40:26  efy-vitalij
  * modified Hit class
  *
