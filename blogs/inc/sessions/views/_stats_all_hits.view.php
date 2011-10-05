@@ -159,13 +159,16 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Type'),
 		'order' => 'hit_referer_type',
-		'td' => '%disp_color_referer( #hit_referer_type# )%',
+		'td_class' => 'reftype_#hit_referer_type#',
+		'td' => '$hit_referer_type$',
 	);
 
 $Results->cols[] = array(
 		'th' => T_('Agent'),
 		'order' => 'hit_agent_type',
-		'td' => '%disp_color_agent( #hit_agent_type# )%',
+		'td_class' => 'agent_#hit_agent_type#',
+		'td' => '$hit_agent_type$',
+
 	);
 
 $Results->cols[] = array(
