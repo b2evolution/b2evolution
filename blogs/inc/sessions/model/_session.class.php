@@ -564,6 +564,8 @@ class Session
 			return true;
 		}
 
+		$crumb_valid_latest = $crumb_value;
+
 		// Retrieve previous saved crumb:
 		$crumb_recalled = $this->get( 'crumb_prev_'.$crumb_name, '-0' );
 		list( $crumb_value, $crumb_time ) = explode( '-', $crumb_recalled );
@@ -581,6 +583,15 @@ class Session
 		echo '<p>'.sprintf( T_('Have you waited more than %d minutes before submitting your request?'), floor($crumb_expires/60) ).'</p>';
 		echo '<p>'.T_('Please go back to the previous page and refresh it before submitting the form again.').'</p>';
 		echo '</div>';
+
+		if( $debug > 0 )
+		{
+			echo '<div>';
+			echo '<p>Received crumb:'.$crumb_received.'</p>';
+			echo '<p>Latest saved crumb:'.$crumb_valid_latest.'</p>';
+			echo '<p>Previous saved crumb:'.$crumb_value.'</p>';
+			echo '</div>';
+		}
 
 		echo '<div>';
 		echo '<p class="warning">'.T_('Alternatively, you can try to resubmit your request with a refreshed crumb:').'</p>';
@@ -628,6 +639,10 @@ function session_unserialize_callback( $classname )
 			load_class( 'items/model/_item.class.php', 'Item' );
 			return true;
 
+		case 'itemsettings':
+			load_class( 'items/model/_itemsettings.class.php', 'ItemSettings' );
+			return true;
+
 		case 'group':
 			load_class( 'users/model/_group.class.php', 'Group' );
 			return true;
@@ -654,6 +669,7 @@ function session_unserialize_load_all_classes()
 	load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
 	load_class( 'comments/model/_comment.class.php', 'Comment' );
 	load_class( 'items/model/_item.class.php', 'Item' );
+	load_class( 'items/model/_itemsettings.class.php', 'ItemSettings' );
 	load_class( 'users/model/_group.class.php', 'Group' );
 	load_class( 'users/model/_user.class.php', 'User' );
 }
@@ -661,6 +677,12 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.40  2011/10/06 14:41:39  efy-asimo
+ * Display received and valid crumbs on crumb error
+ *
+ * Revision 1.39  2011/09/08 05:22:40  efy-asimo
+ * Remove item attending and add item settings
+ *
  * Revision 1.38  2011/09/04 22:13:18  fplanque
  * copyright 2011
  *
