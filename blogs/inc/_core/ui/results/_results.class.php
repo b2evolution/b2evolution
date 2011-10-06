@@ -1424,30 +1424,6 @@ class Results extends Table
 		return $content;
 	}
 
-	/**
-	 * Handle variable subtitutions for class column contents.
-	 *
-	 * This is one of the key functions to look at when you want to use the Results class.
-	 * - #var#
-	 */
-	function parse_class_content( $content )
-	{
-		// Make variable substitution for RAWS:
-		while (preg_match('!\# (\w+) \#!ix', $content, $matchesarray))
-		{ // Replace all matches to the content of the current row's cell. That means that several variables can be inserted to the class.
-			if (! empty($this->rows[$this->current_idx]->$matchesarray[1]))
-			{
-				$content = str_replace($matchesarray[0],$this->rows[$this->current_idx]->$matchesarray[1] , $content);
-			}
-			else
-			{
-				$content = str_replace($matchesarray[0],$matchesarray[1] , $content);
-			}
-		}
-
-		return $content;
-	}
-
 
 	/**
 	 *
@@ -1877,6 +1853,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.44  2011/10/06 07:33:06  efy-vitalij
+ * remove function parse_class_content()
+ *
  * Revision 1.43  2011/10/05 08:52:31  efy-vitalij
  * fix function parse_class_content()
  *
