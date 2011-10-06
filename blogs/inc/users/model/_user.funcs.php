@@ -203,6 +203,11 @@ function check_setting( $setting_name )
 {
 	global $Settings, $Blog, $SkinCache;
 
+	if( ! isset( $Blog ) )
+	{	// If we use some page without blog data
+		return false;
+	}
+
 	if( is_admin_page() )
 	{	// Check setting in the Back office
 		if( $Settings->get( $setting_name ) )
@@ -1222,6 +1227,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.80  2011/10/06 12:14:38  efy-yurybakh
+ * fix check_setting for non-blog page
+ *
  * Revision 1.79  2011/10/05 19:12:39  efy-yurybakh
  * Checks for disp=user & users
  *
