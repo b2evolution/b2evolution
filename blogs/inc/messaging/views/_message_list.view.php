@@ -24,7 +24,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher, $action, $current_User;
+global $dispatcher, $action, $current_User, $Blog;
 
 // in front office there is no function call, $edited_Thread is available
 if( !isset( $edited_Thread ) )
@@ -360,6 +360,9 @@ $Form->begin_form( $params['form_class'], '' );
 $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' ) ) );
 /*
  * $Log$
+ * Revision 1.39  2011/10/06 04:52:14  efy-asimo
+ * fix
+ *
  * Revision 1.38  2011/10/05 12:05:02  efy-yurybakh
  * Blog settings > features tab refactoring
  *

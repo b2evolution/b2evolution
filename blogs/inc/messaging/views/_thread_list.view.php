@@ -27,7 +27,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $current_User;
 global $unread_messages_count;
 global $read_unread_recipients;
-global $DB;
+global $DB, $Blog;
 
 if( !isset( $display_params ) )
 { // init display_params
@@ -77,7 +77,7 @@ foreach( $DB->get_results( $recipients_SQL->get() ) as $row )
 
 	if( !empty( $row->thr_unread ) )
 	{
-		$read_by .= '<div>'.get_avatar_imgtags( $row->thr_unread, true, false, $Blog->get_setting('image_size_messaging'), 'avatar_before_login', '', false ).'</div>';
+		$read_by .= '<div>'.get_avatar_imgtags( $row->thr_unread, true, false, $Blog->get_setting( 'image_size_messaging' ), 'avatar_before_login', '', false ).'</div>';
 	}
 
 	$read_unread_recipients[$row->thr_ID] = $read_by;
@@ -283,6 +283,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.35  2011/10/06 04:52:14  efy-asimo
+ * fix
+ *
  * Revision 1.34  2011/10/05 21:24:06  fplanque
  * fix
  *
