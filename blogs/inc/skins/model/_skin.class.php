@@ -224,7 +224,7 @@ class Skin extends DataObject
 
 
 	/**
-	 * Discover containers included in skin file
+	 * Discover containers included in skin files
 	 */
 	function discover_containers()
 	{
@@ -308,7 +308,10 @@ class Skin extends DataObject
 		return true;
 	}
 
+
 	/**
+   * Get the list of containers that have been previously discovered for this skin.
+   *
 	 * @return array
 	 */
 	function get_containers()
@@ -328,6 +331,7 @@ class Skin extends DataObject
 
 		return $this->container_list;
 	}
+
 
 	/**
 	 * Update the DB based on previously recorded changes
@@ -384,9 +388,9 @@ class Skin extends DataObject
 
 		// Get a list of all currently empty containers:
 		$sql = 'SELECT sco_name
-						FROM T_skins__container LEFT JOIN T_widget ON ( sco_name = wi_sco_name )
-						WHERE sco_skin_ID = '.$this->ID.'
-						GROUP BY sco_name
+						  FROM T_skins__container LEFT JOIN T_widget ON ( sco_name = wi_sco_name )
+						 WHERE sco_skin_ID = '.$this->ID.'
+						 GROUP BY sco_name
 						HAVING COUNT(wi_ID) = 0';
 		$empty_containers_list = $DB->get_col( $sql, 0, 'Get empty containers' );
 		//pre_dump( $empty_containers_list );
@@ -663,7 +667,6 @@ class Skin extends DataObject
 	}
 
 
-
 	/**
 	 * Those templates are used for example by the messaging screens.
 	 */
@@ -791,6 +794,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.35  2011/10/06 15:39:06  fplanque
+ * minor
+ *
  * Revision 1.34  2011/10/05 19:19:00  fplanque
  * redirects for anonymous users
  *
