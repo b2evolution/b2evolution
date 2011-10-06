@@ -165,7 +165,7 @@ class calendar_plugin extends Plugin
 		global $Blog, $cat_array, $cat_modifier;
 		global $show_statuses;
 		global $author, $assgn, $status, $types;
-		global $m, $w, $dstart, $timestamp_min, $timestamp_max;
+		global $m, $w, $dstart;
 		global $s, $sentence, $exact;
 
 		/**
@@ -250,7 +250,7 @@ class calendar_plugin extends Plugin
 			$Calendar->ItemQuery->where_statuses( $status );
 
 			// - - - + * * if a month is specified in the querystring, load that month:
-			$Calendar->ItemQuery->where_datestart( /* NO m */'', /* NO w */'', $dstart, '', $timestamp_min, $timestamp_max );
+			$Calendar->ItemQuery->where_datestart( /* NO m */'', /* NO w */'', $dstart, '', $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
 
 			// Keyword search stuff:
 			$Calendar->ItemQuery->where_keywords( $s, $sentence, $exact );
@@ -267,7 +267,7 @@ class calendar_plugin extends Plugin
 			$Calendar->ItemQuery->where_visibility( $show_statuses );
 
 			// - - - + * * if a month is specified in the querystring, load that month:
-			$Calendar->ItemQuery->where_datestart( /* NO m */'', /* NO w */'', '', '', $timestamp_min, $timestamp_max );
+			$Calendar->ItemQuery->where_datestart( /* NO m */'', /* NO w */'', '', '', $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
 
 			// Exclude pages and intros:
 			$Calendar->ItemQuery->where_types( '-1000,1500,1520,1530,1570,1600' );
@@ -1147,6 +1147,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.61  2011/10/06 11:49:47  efy-yurybakh
+ * Replace all timestamp_min & timestamp_max with Blog's methods
+ *
  * Revision 1.60  2011/09/04 22:13:23  fplanque
  * copyright 2011
  *

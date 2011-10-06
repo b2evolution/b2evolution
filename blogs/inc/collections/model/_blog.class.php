@@ -2529,11 +2529,16 @@ class Blog extends DataObject
 	 */
 	function get_timestamp_min()
 	{
+		if( is_admin_page() )
+		{	// Show ALL posts in the Back-office
+			return NULL;
+		}
+
 		$timestamp_min = $this->get_setting( 'timestamp_min' );
-		
+
 		switch ( $timestamp_min )
 		{
-			case 'duration': // Set timestamp to show post before this date
+			case 'duration': // Set timestamp to show past posts after this date
 				$timestamp_value = time() - $this->get_setting( 'timestamp_min_duration' );
 				break;
 			case 'no': // Don't show past posts
@@ -2556,11 +2561,16 @@ class Blog extends DataObject
 	 */
 	function get_timestamp_max()
 	{
+		if( is_admin_page() )
+		{	// Show ALL posts in the Back-office
+			return NULL;
+		}
+
 		$timestamp_max = $this->get_setting( 'timestamp_max' );
-		
+
 		switch ( $timestamp_max )
 		{
-			case 'duration': // Set timestamp to show post after this date
+			case 'duration': // Set timestamp to show future posts before this date
 				$timestamp_value = time() + $this->get_setting( 'timestamp_max_duration' );
 				break;
 			case 'yes': // Show all future posts
@@ -2578,6 +2588,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.157  2011/10/06 11:49:47  efy-yurybakh
+ * Replace all timestamp_min & timestamp_max with Blog's methods
+ *
  * Revision 1.156  2011/10/05 19:12:39  efy-yurybakh
  * Checks for disp=user & users
  *

@@ -272,7 +272,7 @@ switch( $AdminUI->get_path(1) )
 	case 'features':
 		$AdminUI->set_path( 'blogs', 'features', $tab );
 		$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
-		$AdminUI->breadcrumbpath_add( T_('Post'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( T_('Posts'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 		break;
 
 	case 'comments':
@@ -404,6 +404,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.44  2011/10/06 11:49:47  efy-yurybakh
+ * Replace all timestamp_min & timestamp_max with Blog's methods
+ *
  * Revision 1.43  2011/10/05 12:05:01  efy-yurybakh
  * Blog settings > features tab refactoring
  *

@@ -26,14 +26,6 @@ $tempskin = '_rdf';
 # You should not have to change this.
 $show_statuses = array();
 
-# Here you can set a limit before which posts will be ignored
-# You can use a unix timestamp value or 'now' which will hide all posts in the past
-$timestamp_min = '';
-
-# Here you can set a limit after which posts will be ignored
-# You can use a unix timestamp value or 'now' which will hide all posts in the future
-$timestamp_max = 'now';
-
 /**
  * That's it, now let b2evolution do the rest! :)
  */

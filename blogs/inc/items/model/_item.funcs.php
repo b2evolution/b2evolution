@@ -48,12 +48,11 @@ function init_MainList( $items_nb_limit )
 {
 	global $MainList;
 	global $Blog;
-	global $timestamp_min, $timestamp_max;
 	global $preview;
 	global $disp;
 	global $postIDlist, $postIDarray;
 
-	$MainList = new ItemList2( $Blog, $timestamp_min, $timestamp_max, $items_nb_limit );	// COPY (FUNC)
+	$MainList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $items_nb_limit );	// COPY (FUNC)
 
 	if( ! $preview )
 	{
@@ -103,7 +102,6 @@ function init_MainList( $items_nb_limit )
 function & get_featured_Item()
 {
 	global $Blog;
-	global $timestamp_min, $timestamp_max;
 	global $disp, $disp_detail, $MainList;
 	global $featured_displayed_item_ID;
 
@@ -113,7 +111,7 @@ function & get_featured_Item()
 		return $Item;
 	}
 
-	$FeaturedList = new ItemList2( $Blog, $timestamp_min, $timestamp_max, 1 );
+	$FeaturedList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), 1 );
 
 	$FeaturedList->set_default_filters( $MainList->filters );
 
@@ -1952,6 +1950,9 @@ function echo_pages( $item_ID, $currentpage, $comments_number )
 
 /*
  * $Log$
+ * Revision 1.142  2011/10/06 11:49:47  efy-yurybakh
+ * Replace all timestamp_min & timestamp_max with Blog's methods
+ *
  * Revision 1.141  2011/09/28 16:15:56  efy-yurybakh
  * "comment was helpful" votes
  *

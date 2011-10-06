@@ -210,7 +210,6 @@ class coll_item_list_Widget extends ComponentWidget
 		 */
 		global $MainList;
 		global $BlogCache, $Blog;
-		global $timestamp_min, $timestamp_max;
 		global $Item;
 
 		$this->init_display( $params );
@@ -236,12 +235,12 @@ class coll_item_list_Widget extends ComponentWidget
 
 		if( $this->disp_params['disp_teaser'] )
 		{ // We want to show some of the post content, we need to load more info: use ItemList2
-			$ItemList = new ItemList2( $listBlog, $timestamp_min, $timestamp_max, $limit, 'ItemCache', $this->code.'_' );
+			$ItemList = new ItemList2( $listBlog, $listBlog->get_timestamp_min(), $listBlog->get_timestamp_max(), $limit, 'ItemCache', $this->code.'_' );
 		}
 		else
 		{ // no excerpts, use ItemListLight
 			load_class( 'items/model/_itemlistlight.class.php', 'ItemListLight' );
-			$ItemList = new ItemListLight( $listBlog, $timestamp_min, $timestamp_max, $limit, 'ItemCacheLight', $this->code.'_' );
+			$ItemList = new ItemListLight( $listBlog, $listBlog->get_timestamp_min(), $listBlog->get_timestamp_max(), $limit, 'ItemCacheLight', $this->code.'_' );
 		}
 
 		//$cat_array = sanitize_id_list($this->disp_params['cat_IDs'], true);
@@ -444,6 +443,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.34  2011/10/06 11:49:47  efy-yurybakh
+ * Replace all timestamp_min & timestamp_max with Blog's methods
+ *
  * Revision 1.33  2011/09/04 22:13:21  fplanque
  * copyright 2011
  *

@@ -20,14 +20,6 @@ $skin = '';
 # You should not have to change this.
 $show_statuses = array();
 
-# Here you can set a limit before which posts will be ignored
-# You can use a unix timestamp value or 'now' which will hide all posts in the past
-$timestamp_min = '';
-
-# Here you can set a limit after which posts will be ignored
-# You can use a unix timestamp value or 'now' which will hide all posts in the future
-$timestamp_max = 'now';
-
 # Additionnaly, you can set other values (see URL params in the manual)...
 # $order = 'ASC'; // This for example would display the blog in chronological order...
 
@@ -309,7 +301,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 
 			<h3>#2: <a href="<?php $Blog_B->disp( 'blogurl', 'raw' ) ?>"><?php echo $Blog_B->disp( 'name', 'htmlbody' ) ?></a></h3>
 			<?php
-			$BlogBList = new ItemList2( $Blog_B, $timestamp_min, $timestamp_max, $posts );
+			$BlogBList = new ItemList2( $Blog_B, $Blog_B->get_timestamp_min(), $Blog_B->get_timestamp_max(), $posts );
 
 			$BlogBList->set_filters( array(
 					'authors' => $author,
@@ -368,7 +360,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 		?>
 		<h3>#3: <a href="<?php $Blog_roll->disp( 'blogurl', 'raw' ) ?>"><?php echo $Blog_roll->disp( 'name', 'htmlbody' ) ?></a></h3>
 		<?php
-		$LinkblogList = new ItemList2( $Blog_roll, $timestamp_min, $timestamp_max, $posts );
+		$LinkblogList = new ItemList2( $Blog_roll, $Blog_roll->get_timestamp_min(), $Blog_roll->get_timestamp_max(), $posts );
 
 		$LinkblogList->set_filters( array(
 				'authors' => $author,

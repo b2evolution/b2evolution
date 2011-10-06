@@ -370,7 +370,6 @@ class ArchiveList extends Results
 		global $Blog;
 		global $show_statuses;
 		global $author, $assgn, $status, $types;
-		global $timestamp_min, $timestamp_max;
 		global $s, $sentence, $exact;
 
 		$this->dbtable = $dbtable;
@@ -405,7 +404,7 @@ class ArchiveList extends Results
 			$this->ItemQuery->where_statuses( $status );
 
 			// - - - + * * timestamp restrictions:
-			$this->ItemQuery->where_datestart( '', '', '', '', $timestamp_min, $timestamp_max );
+			$this->ItemQuery->where_datestart( '', '', '', '', $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
 
 			// Keyword search stuff:
 			$this->ItemQuery->where_keywords( $s, $sentence, $exact );
@@ -421,7 +420,7 @@ class ArchiveList extends Results
 			$this->ItemQuery->where_visibility( $show_statuses );
 
 			// - - - + * * timestamp restrictions:
-			$this->ItemQuery->where_datestart( '', '', '', '', $timestamp_min, $timestamp_max );
+			$this->ItemQuery->where_datestart( '', '', '', '', $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
 
 			// Include all types except pages, intros and sidebar links:
 			$this->ItemQuery->where_types( '-1000,1500,1520,1530,1570,1600,3000' );
@@ -469,10 +468,8 @@ class ArchiveList extends Results
 			case 'postbypost':
 			default:
 				// ----------------------------- POSY BY POST ARCHIVES --------------------------------
-				global $timestamp_min, $timestamp_max;
-		
-		                $this->count_total_rows();
-				$archives_list = new ItemListLight( $Blog , $timestamp_min, $timestamp_max, $this->total_rows );
+				$this->count_total_rows();
+				$archives_list = new ItemListLight( $Blog , $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $this->total_rows );
 				$archives_list->set_filters( array(
 				'visibility_array' => array( 'published' ),  // We only want to advertised published items
 				'types' => '-1000,1500,1520,1530,1570,1600,3000',	// Include all types except pages, intros and sidebar links:
@@ -631,6 +628,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.64  2011/10/06 11:49:47  efy-yurybakh
+ * Replace all timestamp_min & timestamp_max with Blog's methods
+ *
  * Revision 1.63  2011/09/04 22:13:23  fplanque
  * copyright 2011
  *

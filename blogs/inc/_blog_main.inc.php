@@ -316,10 +316,6 @@ param( 'redir', 'string', 'yes', false );				// Do we allow redirection to canon
 param( 'preview', 'integer', 0, true );         // Is this preview ?
 param( 'stats', 'integer', 0 );									// Deprecated but might still be used by spambots
 
-// In case these were not set by the stub:
-if( !isset($timestamp_min) ) $timestamp_min = '';
-if( !isset($timestamp_max) ) $timestamp_max = '';
-
 
 
 // Front page detection & selection should probably occur here.
@@ -669,6 +665,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.176  2011/10/06 11:49:47  efy-yurybakh
+ * Replace all timestamp_min & timestamp_max with Blog's methods
+ *
  * Revision 1.175  2011/09/30 12:24:56  efy-yurybakh
  * User directory
  *

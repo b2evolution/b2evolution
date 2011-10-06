@@ -14,14 +14,6 @@ $blog = 1;
 # Let's force the use of the sitemap skin:
 $tempskin = '_sitemap';
 
-# Here you can set a limit before which posts will be ignored
-# You can use a unix timestamp value or 'now' which will hide all posts in the past
-$timestamp_min = '';
-
-# Here you can set a limit after which posts will be ignored
-# You can use a unix timestamp value or 'now' which will hide all posts in the future
-$timestamp_max = 'now';
-
 # Sitemap spec requires UTF-8, so let's force all outputs to UTF-8:
 $force_io_charset_if_accepted = 'utf-8';
 

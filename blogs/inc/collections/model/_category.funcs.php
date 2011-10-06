@@ -138,7 +138,6 @@ function get_catblog( $cat_ID )
 function cat_load_cache()
 {
 	global $DB, $cache_categories;
-	global $timestamp_min, $timestamp_max;
 	global $Settings;
 	global $Timer;
 
@@ -499,6 +498,9 @@ function cat_req_dummy()
 
 /*
  * $Log$
+ * Revision 1.16  2011/10/06 11:49:47  efy-yurybakh
+ * Replace all timestamp_min & timestamp_max with Blog's methods
+ *
  * Revision 1.15  2011/09/04 22:13:14  fplanque
  * copyright 2011
  *

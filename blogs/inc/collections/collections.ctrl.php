@@ -209,10 +209,6 @@ switch( $action )
 				$blog = $edited_Blog->ID;
 				# This setting retricts posts to those published, thus hiding drafts.
 				$show_statuses = array();
-				# Here you can set a limit before which posts will be ignored
-				$timestamp_min = '';
-				# Here you can set a limit after which posts will be ignored
-				$timestamp_max = 'now';
 
 				require $edited_Blog->get('dynfilepath');
 
@@ -373,6 +369,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.31  2011/10/06 11:49:47  efy-yurybakh
+ * Replace all timestamp_min & timestamp_max with Blog's methods
+ *
  * Revision 1.30  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *
