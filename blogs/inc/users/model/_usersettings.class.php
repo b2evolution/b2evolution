@@ -77,6 +77,8 @@ class UserSettings extends AbstractSettings
 		'show_evobar' => 1,
 		'show_breadcrumbs' => 1,
 		'show_menu' => 1,
+
+		'notify_messages' => 1, 	// Notify user when receives a private message
 	);
 
 
@@ -215,6 +217,10 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.16  2011/10/06 06:18:29  efy-asimo
+ * Add messages link to settings
+ * Update messaging notifications
+ *
  * Revision 1.15  2011/09/04 22:13:21  fplanque
  * copyright 2011
  *

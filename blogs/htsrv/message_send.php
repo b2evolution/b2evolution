@@ -333,6 +333,11 @@ if( $success_message )
 {
 	// Never say to whom we sent the email -- prevent user enumeration.
 	$Messages->add( T_('Your message has been sent.'), 'success' );
+	if( $allow_msgform == 'PM' )
+	{
+		header_redirect(  url_add_param( $Blog->gen_blogurl(), 'disp=threads' ) );
+		// exited here
+	}
 }
 else
 { // unsuccessful message send, save message params into the Session to not lose the content
@@ -353,6 +358,10 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.81  2011/10/06 06:18:29  efy-asimo
+ * Add messages link to settings
+ * Update messaging notifications
+ *
  * Revision 1.80  2011/10/04 08:39:29  efy-asimo
  * Comment and message forms save/reload content in case of error
  *

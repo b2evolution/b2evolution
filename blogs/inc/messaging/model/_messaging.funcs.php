@@ -343,7 +343,7 @@ function get_messaging_url( $disp = 'threads' )
  */
 function get_messaging_sub_entries( $is_admin )
 {
-	global $Blog;
+	global $Blog, $current_User;
 
 	if( $is_admin )
 	{
@@ -354,13 +354,24 @@ function get_messaging_sub_entries( $is_admin )
 		$url = $Blog->gen_blogurl().'?disp=';
 	}
 
-	return array( 'threads' => array(
-						'text' => T_('Messages'),
-						'href' => $url.'threads' ),
-					'contacts' => array(
-						'text' => T_('Contacts'),
-						'href' => $url.'contacts' ),
-	);
+	$messaging_sub_entries = array( 
+								'threads' => array(
+									'text' => T_('Messages'),
+									'href' => $url.'threads' ),
+								'contacts' => array(
+									'text' => T_('Contacts'),
+									'href' => $url.'contacts' ),
+							);
+
+	if( $is_admin && $current_User->check_perm( 'options', 'edit' ) )
+	{
+		$messaging_sub_entries[ 'msgsettings' ] = array(
+													'text' => T_('Settings'),
+													'href' => $url.'msgsettings'
+												);
+	}
+
+	return $messaging_sub_entries;
 }
 
 
@@ -394,6 +405,10 @@ function get_message_params_from_session()
 
 /*
  * $Log$
+ * Revision 1.15  2011/10/06 06:18:29  efy-asimo
+ * Add messages link to settings
+ * Update messaging notifications
+ *
  * Revision 1.14  2011/10/04 08:39:30  efy-asimo
  * Comment and message forms save/reload content in case of error
  *

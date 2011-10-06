@@ -115,9 +115,14 @@ if( $action != 'view' )
 		array( 'PM', 1, T_( 'Allow others to send me private messages' ), ( ( $edited_User->get( 'allow_msgform' ) % 2 == 1 ) && ( !$pm_disabled ) ), $pm_disabled ),
 		array( 'email', 2, T_( 'Allow others to send me emails through a message form (email address will never be displayed)' ),  $edited_User->get( 'allow_msgform' ) > 1 ) );
 	$Form->checklist( $messaging_options, 'edited_user_msgform', T_('Message form') );
+	// user notification options
 	$notify_options = array(
 		array( 'edited_user_notify', 1, T_( 'Notify me by email whenever a comment is published on one of <strong>my</strong> posts.' ), $edited_User->get( 'notify' ) ),
 		array( 'edited_user_notify_moderation', 2, T_( 'Notify me by email whenever a comment is awaiting moderation on one of <strong>my</strong> blogs.' ), $edited_User->get( 'notify_moderation' ) ) );
+	if( $edited_User->check_perm( 'perm_messaging', 'reply' ) )
+	{ // show messaging notification settings only if messaging is available for edited user
+		$notify_options[] = array( 'edited_user_notify_messages', 1, T_( 'Notify me by email whenever I receive a private message.' ),  $UserSettings->get( 'notify_messages', $edited_User->ID ) );
+	}
 	$Form->checklist( $notify_options, 'edited_user_notification', T_( 'Notifications' ) );
 }
 else
@@ -248,6 +253,10 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.23  2011/10/06 06:18:29  efy-asimo
+ * Add messages link to settings
+ * Update messaging notifications
+ *
  * Revision 1.22  2011/09/15 08:58:46  efy-asimo
  * Change user tabs display
  *

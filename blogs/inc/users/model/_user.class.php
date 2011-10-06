@@ -544,6 +544,11 @@ class User extends DataObject
 			param( 'edited_user_notify_moderation', 'integer', 0 );
 			$this->set_from_Request('notify_moderation', 'edited_user_notify_moderation', true);
 
+			if( $this->check_perm( 'perm_messaging', 'reply' ) )
+			{
+				$UserSettings->set( 'notify_messages', param( 'edited_user_notify_messages', 'integer', 0 ), $this->ID );
+			}
+
 			// Other preferences
 			param( 'edited_user_locale', 'string', true );
 			$this->set_from_Request('locale', 'edited_user_locale', true);
@@ -2695,6 +2700,10 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.157  2011/10/06 06:18:29  efy-asimo
+ * Add messages link to settings
+ * Update messaging notifications
+ *
  * Revision 1.156  2011/10/05 18:20:25  efy-yurybakh
  * overlay text spacing
  *

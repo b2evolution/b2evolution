@@ -413,17 +413,18 @@ class Message extends DataObject
 	 */
 	function send_email_notifications( $new_thread = true )
 	{
-		global $DB, $current_User, $admin_url, $baseurl;
-		global $app_name;
+		global $DB, $current_User, $admin_url, $baseurl, $app_name;
+		global $UserSettings, $Settings;
 
 		// Select recipients of the current thread:
 		$SQL = new SQL();
-		$SQL->SELECT( 'u.user_login, u.user_email, u.user_notify, u.user_nickname, u.user_firstname' );
+		$SQL->SELECT( 'u.user_login, u.user_email, u.user_nickname, u.user_firstname, us.uset_value as notify_messages' );
 		$SQL->FROM( 'T_messaging__threadstatus ts
 						INNER JOIN T_messaging__contact c
 							ON ts.tsta_user_ID = c.mct_to_user_ID AND c.mct_from_user_ID = '.$this->author_user_ID.' AND c.mct_blocked = 0
 						LEFT OUTER JOIN T_users u
-							ON ts.tsta_user_ID = u.user_ID' );
+							ON ts.tsta_user_ID = u.user_ID
+						LEFT OUTER JOIN T_users__usersettings us ON u.user_ID = us.uset_user_ID AND us.uset_name = "notify_messages"' );
 		$SQL->WHERE( 'ts.tsta_thread_ID = '.$this->Thread->ID.' AND ts.tsta_user_ID <> '.$this->author_user_ID );
 
 		// Construct message subject and body:
@@ -432,13 +433,32 @@ class Message extends DataObject
 		$body = $current_User->login;
 		$body .= ' ';
 
+		// set message link
+		$messages_link_to = $Settings->get( 'messages_link_to' );
+		if( $messages_link_to == 'admin' )
+		{
+			$message_link = $admin_url.'?ctrl=messages&thrd_ID='.$this->Thread->ID;
+		}
+		else
+		{
+			$BlogCache = & get_BlogCache();
+			$link_to_Blog = $BlogCache->get_by_ID( $messages_link_to, false, false );
+			if( $link_to_Blog )
+			{
+				$message_link = url_add_param( $link_to_Blog->gen_blogurl(), 'disp=messages&thrd_ID='.$this->Thread->ID.'&thrd_title='.$this->Thread->title );
+			}
+			else
+			{
+				$message_link = $admin_url.'?ctrl=messages&thrd_ID='.$this->Thread->ID;
+			}
+		}
 		if( $new_thread )
 		{
 			$subject = sprintf( T_( 'New conversation created: "%s"' ), $this->Thread->title );
 
 			$body .= sprintf( /* TRANS: Space at the end */ T_( 'has created the "%s" conversation. ' ), $this->Thread->title );
 			$body .= "\n";
-			$body .= sprintf( T_( 'To read it, click on this link: %s' ), $admin_url.'?ctrl=messages&thrd_ID='.$this->Thread->ID );
+			$body .= sprintf( T_( 'To read it, click on this link: %s' ), $message_link );
 		}
 		else
 		{
@@ -446,8 +466,7 @@ class Message extends DataObject
 
 			$body .= sprintf( /* TRANS: Space at the end */ T_( 'has created a new message in the "%s" conversation. ' ), $this->Thread->title );
 			$body .= "\n";
-			$body .= sprintf( T_( 'To read it, click on this link: %s' ),
-								$admin_url.'?ctrl=messages&thrd_ID='.$this->Thread->ID );
+			$body .= sprintf( T_( 'To read it, click on this link: %s' ), $message_link );
 		}
 
 		$body .= "\n\n";
@@ -465,7 +484,8 @@ class Message extends DataObject
 		$ret = true;
 		foreach( $DB->get_results( $SQL->get() ) as $row )
 		{
-			if( $row->user_notify )
+			$notify_messages = ( isset( $row->notify_messages ) ) ? $row->notify_messages : $UserSettings->get_default( 'notify_messages' );
+			if( $notify_messages )
 			{
 				$name = get_prefered_name( $row->user_nickname, $row->user_firstname, $row->user_login );
 				$body = sprintf( $salutation, $name ).$body.sprintf( $footer, $row->user_login );
@@ -479,6 +499,10 @@ class Message extends DataObject
 
 /*
  * $Log$
+ * Revision 1.28  2011/10/06 06:18:29  efy-asimo
+ * Add messages link to settings
+ * Update messaging notifications
+ *
  * Revision 1.27  2011/08/18 11:41:51  efy-asimo
  * Send all emails from noreply and email contents review
  *

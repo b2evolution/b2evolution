@@ -91,6 +91,7 @@ class GeneralSettings extends AbstractSettings
 		'registration_ask_locale' => '0',
 
 		'allow_avatars' => 1,
+		'messages_link_to' => 'admin',		// message link on the notification email should link to the admin or to a blog
 
 		'regexp_filename' => '^[a-zA-Z0-9\-_. ]+$', // TODO: accept (spaces and) special chars / do full testing on this
 		'regexp_dirname' => '^[a-zA-Z0-9\-_]+$', // TODO: accept spaces and special chars / do full testing on this
@@ -248,6 +249,10 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.42  2011/10/06 06:18:29  efy-asimo
+ * Add messages link to settings
+ * Update messaging notifications
+ *
  * Revision 1.41  2011/10/05 17:44:23  efy-yurybakh
  * Checks for disp=user & users
  *

@@ -53,6 +53,7 @@ $db_config['aliases']['T_messaging__contact'] = $tableprefix.'messaging__contact
 $ctrl_mappings['messages'] = 'messaging/messages.ctrl.php';
 $ctrl_mappings['threads'] = 'messaging/threads.ctrl.php';
 $ctrl_mappings['contacts'] = 'messaging/contacts.ctrl.php';
+$ctrl_mappings['msgsettings'] = 'messaging/msg_settings.ctrl.php';
 
 
 
@@ -330,6 +331,10 @@ $messaging_Module = new messaging_Module();
 
 /*
  * $Log$
+ * Revision 1.22  2011/10/06 06:18:29  efy-asimo
+ * Add messages link to settings
+ * Update messaging notifications
+ *
  * Revision 1.21  2011/08/11 09:05:09  efy-asimo
  * Messaging in front office
  *
