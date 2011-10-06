@@ -82,7 +82,6 @@ foreach( $DB->get_results( $recipients_SQL->get() ) as $row )
 
 	$read_unread_recipients[$row->thr_ID] = $read_by;
 }
-
 // Get params from request
 $s = param( 's', 'string', '', true );
 $u = param( 'u', 'string', '', true );
@@ -204,12 +203,42 @@ $Results->cols[] = array(
 					'td' => '%get_avatar_imgtags( #thrd_recipients#, true, true, "'.$image_size.'" )%',
 					);
 
-$messages_url = get_messaging_url( 'messages' );
+/**
+ * Get subject as link with icon (read or unread)
+ *
+ * @param thread ID
+ * @param thread title
+ * @param message ID (If ID > 0 - message is still unread)
+ * @return string link with subject
+ */
+function message_subject_link( $thrd_ID, $thrd_title, $thrd_msg_ID )
+{
+	$messages_url = get_messaging_url( 'messages' );
+	if( $thrd_title == '' )
+	{
+		$thrd_title = '<i>(no subject)</i>';
+	}
+	if( $thrd_msg_ID > 0 )
+	{	// Message is unread
+		$read_icon = get_icon( 'bullet_blue', 'imgtag', array( 'style' => 'margin:0 2px' ) );
+	}
+	else
+	{	// Mesage is read
+		$read_icon = get_icon( 'pixel', 'imgtag', array( 'size' => array( 12, 11 ) ) );
+	}
+
+	$link = $read_icon.'<a href="'.$messages_url.'&amp;thrd_ID='.$thrd_ID.'&amp;thrd_title='.strip_tags($thrd_title).'" title="'.T_('Show messages...').'">';
+	$link .= '<strong>'.$thrd_title.'</strong>';
+	$link .= '</a>';
+
+	return $link;
+}
+
 $Results->cols[] = array(
 					'th' => T_('Subject'),
 					'th_class' => 'thread_subject',
 					'td_class' => 'thread_subject',
-					'td' => '<a href="'.$messages_url.'&amp;thrd_ID=$thrd_ID$&amp;thrd_title=~conditional( #thrd_title#!="", #thrd_title#, "(no subject)")~" title="'.T_('Show messages...').'"><strong>~conditional( #thrd_title#!="", #thrd_title#, "<i>(no subject)</i>")~</strong></a>',
+					'td' => '%message_subject_link( #thrd_ID#, #thrd_title#, #thrd_msg_ID# )%',
 					);
 
 function convert_date( $date, $show_only_date )
@@ -227,7 +256,7 @@ $Results->cols[] = array(
 					'th' => T_('Last msg'),
 					'th_class' => 'shrinkwrap',
 					'td_class' => 'shrinkwrap',
-					'td' => '~conditional( #thrd_msg_ID#>0, \'<span style="color:red">%convert_date(#thrd_unread_since#,'.$show_only_date.')%</span>\', \'<span style="color:green">%convert_date(#thrd_datemodified#,'.$show_only_date.')%</span>\')~' );
+					'td' => '~conditional( #thrd_msg_ID#>0, \'%convert_date(#thrd_unread_since#,'.$show_only_date.')%\', \'%convert_date(#thrd_datemodified#,'.$show_only_date.')%\')~' );
 
 function get_read_by( $thread_ID )
 {
@@ -237,7 +266,7 @@ function get_read_by( $thread_ID )
 }
 
 $Results->cols[] = array(
-					'th' => T_('Read by'),
+					'th' => T_('Read?'),
 					'th_class' => 'shrinkwrap',
 					'td_class' => 'top',
 					'td' => '%get_read_by( #thrd_ID# )%',
@@ -283,6 +312,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.36  2011/10/06 16:45:55  efy-yurybakh
+ * small messaging UI design changes (additional email)
+ *
  * Revision 1.35  2011/10/06 04:52:14  efy-asimo
  * fix
  *

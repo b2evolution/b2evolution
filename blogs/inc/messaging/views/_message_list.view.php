@@ -119,7 +119,7 @@ foreach( $DB->get_results( $unread_recipients_SQL->get() ) as $row )
 		$read_by .= '<div>'.get_avatar_imgtags( $read_recipiens, true, false, $Blog->get_setting('image_size_messaging'), 'avatar_before_login', '', true );
 		if( !empty ( $unread_recipients ) )
 		{
-			$read_by .= ', ';
+			$read_by .= '<br />';
 		}
 		$read_by .= '</div>';
 	}
@@ -244,7 +244,7 @@ function author( $user_ID, $user_login, $user_first_name, $user_last_name, $user
 
 	if( !empty( $avatar ) )
 	{
-		$author = $avatar.'<br />'.$author;
+		$author = $avatar.'<br /><b>'.$author.'</b>';
 	}
 
 	$full_name = '';
@@ -261,7 +261,7 @@ function author( $user_ID, $user_login, $user_first_name, $user_last_name, $user
 
 	if( !empty( $full_name ) )
 	{
-		$author .= '<br />'.$full_name;
+		$author .= '<br /><b>'.$full_name.'</b>';
 	}
 
 	$identity_url = get_user_identity_url( $user_ID );
@@ -277,7 +277,7 @@ function author( $user_ID, $user_login, $user_first_name, $user_last_name, $user
 	else
 	{ // Current user can view the profile page
 		$link_title = T_( 'Show the user profile' );
-		$author = '<a href="'.$identity_url.'" title="'.$link_title.'" class="'.$user_class.' center" style="display:block" rel="bubbletip_user_'.$user_ID.'">'.$author.'</a>';
+		$author = '<a href="'.$identity_url.'" title="'.$link_title.'" class="'.$user_class.' center overlay_link" style="display:block" rel="bubbletip_user_'.$user_ID.'">'.$author.'</a>';
 	}
 
 	return $author.'<span class="note">'.mysql2localedatetime( $datetime ).'</span>';
@@ -306,7 +306,7 @@ function get_read_by( $message_ID )
 }
 
 $Results->cols[] = array(
-					'th' => T_('Read by'),
+					'th' => T_('Read?'),
 					'th_class' => 'shrinkwrap',
 					'td_class' => 'top',
 					'td' => '%get_read_by( #msg_ID# )%',
@@ -360,6 +360,9 @@ $Form->begin_form( $params['form_class'], '' );
 $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' ) ) );
 /*
  * $Log$
+ * Revision 1.40  2011/10/06 16:45:55  efy-yurybakh
+ * small messaging UI design changes (additional email)
+ *
  * Revision 1.39  2011/10/06 04:52:14  efy-asimo
  * fix
  *

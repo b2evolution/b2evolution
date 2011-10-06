@@ -952,12 +952,12 @@ function get_avatar_imgtags( $user_logins_list, $show_login = true, $link = true
 			}
 			else
 			{ // User has not seen a message
-				$icon = get_icon( 'bullet_blue', 'imgtag', array( 'alt' => sprintf( T_('%s has NOT seen this message yet.'), $user_login ), 'style' => 'margin:0 2px' ) );
+				$icon = get_icon( 'bullet_blue', 'imgtag', array( 'alt' => sprintf( T_('%s has NOT seen this message yet.'), $user_login ), 'style' => 'margin:0 4px' ) );
 			}
 		}
 		$user_imgtags_list[] = '<span class="nowrap">'.$icon.get_avatar_imgtag( $user_login, $show_login, $link, $size, $class, $align ).'</span>';
 	}
-	return implode( ', ', $user_imgtags_list );
+	return implode( '<br />', $user_imgtags_list );
 }
 
 
@@ -1227,6 +1227,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.81  2011/10/06 16:45:55  efy-yurybakh
+ * small messaging UI design changes (additional email)
+ *
  * Revision 1.80  2011/10/06 12:14:38  efy-yurybakh
  * fix check_setting for non-blog page
  *

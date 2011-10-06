@@ -669,45 +669,45 @@ div.widget_not_in_cache div.debug_widget_name {
 
 /* User Genders */
 .user, user.anonymous{
-    font-weight: bold;
+	font-weight: bold;
 }
 .user.man{
-    color: #00F;
+	color: #00F;
 }
 .user.woman{
-    color: #e100af;
+	color: #e100af;
 }
 .user.nogender, user.anonymous.nogender{
-    color: #666;
+	color: #666;
 }
 
 .bubbletip_anon{
-    text-align: center;
+	text-align: center;
 }
 .bubbletip_anon div{
-    margin-top: 5px;
+	margin-top: 5px;
 }
 
 /* Overlay text on the bubble tips */
 .bubletip_overlay_text{
-    position: relative;
+	position: relative;
 }
 .bubletip_overlay_text div{
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    /* text-shadow: -1px -1px #000, -1px 0 #000, -1px 1px #000, 0 1px #000, 1px 1px #000, 1px 0 #000, 1px -1px #000, 0 -1px #000; */
-    text-shadow: -1px -1px #000, -2px 0 #000, -1px 1px #000, 0 2px #000, 1px 1px #000, 2px 0 #000, 1px -1px #000, 0 -2px #000;
-    color: #FFF;
-    font-weight: bold;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	text-align: center;
+	/* text-shadow: -1px -1px #000, -1px 0 #000, -1px 1px #000, 0 1px #000, 1px 1px #000, 1px 0 #000, 1px -1px #000, 0 -1px #000; */
+	text-shadow: -1px -1px #000, -2px 0 #000, -1px 1px #000, 0 2px #000, 1px 1px #000, 2px 0 #000, 1px -1px #000, 0 -2px #000;
+	color: #FFF;
+	font-weight: bold;
 }
 a.overlay_link:hover{
-    text-decoration: none;
+	text-decoration: none;
 }
 a.overlay_link:hover b{
-    text-decoration: underline;
+	text-decoration: underline;
 }
 
 
