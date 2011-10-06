@@ -2042,7 +2042,7 @@ class Comment extends DataObject
 
 		if( $only_moderators || $except_moderators )
 		{ // get moderators
-			$sql = 'SELECT DISTINCT user_email, user_locale, user_ID, user_login, user_nickname, user_firstname
+			$sql = 'SELECT DISTINCT user_email, user_locale, user_ID, user_login, user_nickname, user_firstname, user_unsubscribe_key
 						FROM T_coll_user_perms INNER JOIN T_users ON bloguser_user_ID = user_ID
 						WHERE bloguser_blog_ID = '.$edited_Blog->ID.
 						' AND bloguser_perm_draft_cmts <> 0 AND bloguser_perm_publ_cmts <> 0
@@ -2433,6 +2433,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.121  2011/10/06 20:11:12  fplanque
+ * tentative fix
+ *
  * Revision 1.120  2011/10/03 17:13:04  efy-yurybakh
  * review fp>yura comments
  *
