@@ -50,9 +50,8 @@ class google_maps_plugin extends Plugin
 	/*
 	 * These variables MAY be overriden.
 	 */
-	var $apply_rendering = 'opt-out';
 	var $number_of_installs = 1;
-	var $group = 'rendering';
+	var $group = 'widget';
 
 
 	/**
@@ -321,18 +320,16 @@ class google_maps_plugin extends Plugin
 		$Item = $params['Item'];
 		require_js( '#jqueryUI#');
 		$params['Form']->begin_fieldset( 'Google Maps plugin' );
-		//$params['Form']->info_field( 'Gmaps Plagin', 'This is the  plugin responding to the AdminDisplayItemFormFieldset event.' );
-		$params['Form']->hidden( 'item_double3', $Item->get('double3'), array('id' => 'item_double3'));
-		$params['Form']->hidden( 'item_double4', $Item->get('double4'), array('id' => 'item_double4'));
 		$params['Form']->hidden( 'google_map_zoom', '', array('id' => 'google_map_zoom'));
-		$params['Form']->text_input( 'address', '', 50, 'Input adress', '', array('maxlength'=>500, 'style'=>'width:200px;height:30px; font-size:15px;', 'id' =>'searchbox'));
+		$params['Form']->text_input( 'address', '', 50, 'Input adress', '', array('maxlength'=>500, 'id' =>'searchbox'));
+		$params['Form']->button(array ('id' => 'locate_on_map', 'type' =>'button', 'value' => 'Locate on map') );
 
 		$lat = $Item->get('double3');
 		$lng = $Item->get('double4');
 
 	?>
 
-	<div id="map_canvas" style="width:400px; height:400px; float: left;"></div>
+	<div id="map_canvas" style="width:100%; height:400px; margin: 5px 5px 5px 5px;"></div>
 	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
 	<script type="text/javascript">
 	<?php
@@ -340,50 +337,56 @@ class google_maps_plugin extends Plugin
 	{
 		?>
 		var latlng = new google.maps.LatLng(<?php echo $lat; ?>, <?php echo $lng;?>);
-		var myOptions = {
-		  zoom: 8,
-		  center: latlng,
-		  mapTypeId: google.maps.MapTypeId.ROADMAP
-		};
-
-		var map = new google.maps.Map(document.getElementById("map_canvas"),
-			myOptions);
-
-		marker = new google.maps.Marker({
-		position: latlng,
-		map: map,
-		title:"Position",
-		draggable: true
-		});
-
 		<?php
 	}
 	else
 	{
 		?>
 		var latlng = new google.maps.LatLng(48.856614, 2.3522219000000177);
-		var myOptions = {
-		  zoom: 8,
-		  center: latlng,
-		  mapTypeId: google.maps.MapTypeId.ROADMAP
-		};
-		var map = new google.maps.Map(document.getElementById("map_canvas"),
-			myOptions);
-		var marker = new google.maps.Marker();
-
 		<?php
-
 	}
 	?>
+	var mapTypes = new Array();
+	mapTypes.push(google.maps.MapTypeId.HYBRID);
+	mapTypes.push(google.maps.MapTypeId.ROADMAP);
+	mapTypes.push(google.maps.MapTypeId.SATELLITE);
+	mapTypes.push(google.maps.MapTypeId.TERRAIN);
+
+
+	var myOptions = {
+		  zoom: 11,
+		  center: latlng,
+		  mapTypeId: google.maps.MapTypeId.HYBRID,
+		  mapTypeControlOptions:
+			  {
+			   style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+			   mapTypeIds: mapTypes
+			  }
+		};
+
+	var map = new google.maps.Map(document.getElementById("map_canvas"),
+			myOptions);
+
+//	var traffic = new google.maps.TrafficLayer();
+//	traffic.setMap(map);
+
+	var marker = new google.maps.Marker({
+		position: latlng,
+		map: map,
+		title:"Position",
+		draggable: true
+		});
 
 	var geocoder = new google.maps.Geocoder();
-	//var marker = null;
+	var searchLoc = null;
+	var bounds = null;
+	
 	google.maps.event.addListener(marker, 'dragend', function()
-		{
-			map.setCenter(marker.getPosition());
-			jQuery('#item_double3').val(marker.getPosition().lat());
-			jQuery('#item_double4').val(marker.getPosition().lng());
-		});
+	{
+		map.setCenter(marker.getPosition());
+		jQuery('#item_double3').val(marker.getPosition().lat());
+		jQuery('#item_double4').val(marker.getPosition().lng());
+	});
 
 	google.maps.event.addListener(map, 'zoom_changed', function()
 	{
@@ -427,34 +430,8 @@ class google_maps_plugin extends Plugin
 			{
 				if (status == google.maps.GeocoderStatus.OK)
 				{
-					var searchLoc = results[0].geometry.location;
-					var bounds = results[0].geometry.bounds;
-
-					if (marker != null)
-					{
-						marker.setMap(null);
-					}
-
-					marker = new google.maps.Marker({
-					position: searchLoc,
-					map: map,
-					title:"Position",
-					draggable: true
-					});
-					map.fitBounds(bounds);
-					google.maps.event.addListener(marker, 'dragend', function()
-					{
-						map.setCenter(marker.getPosition());
-						jQuery('#item_double3').val(marker.getPosition().lat());
-						jQuery('#item_double4').val(marker.getPosition().lng());
-
-					});
-					var lat = results[0].geometry.location.lat();
-					jQuery('#item_double3').val(lat);
-					var lng = results[0].geometry.location.lng();
-					jQuery('#item_double4').val(lng);
-					jQuery('#google_map_zoom').val(map.getZoom());
-
+					searchLoc = results[0].geometry.location;
+					bounds = results[0].geometry.bounds;
 
 					geocoder.geocode({'latLng': searchLoc}, function(results1, status1)
 					{
@@ -476,42 +453,49 @@ class google_maps_plugin extends Plugin
 						}
 					});
 				}
+				else
+				{
+					searchLoc = null;
+					bounds = null;
+				}
 				  });
 			   },
 		select: function(event,ui)
 		{
 			var pos = ui.item.position;
 			var lct = ui.item.locType;
-			var bounds = ui.item.bounds;
-			var location = ui.item.location;
-			if (bounds)
-			{
-			map.fitBounds(bounds);
-			if (marker != null)
-				{
-					marker.setMap(null);
-				}
-
-				marker = new google.maps.Marker({
-				position: location,
-				map: map,
-				title:"Position",
-				draggable: true
-				});
-				google.maps.event.addListener(marker, 'dragend', function()
-				{
-				map.setCenter(marker.getPosition());
-				jQuery('#item_double3').val(marker.getPosition().lat());
-				jQuery('#item_double4').val(marker.getPosition().lng());
-				});
-				var lat = location.lat();
-				jQuery('#item_double3').val(location.lat());
-				jQuery('#item_double4').val(location.lng());
-				jQuery('#google_map_zoom').val(map.getZoom());
-			}
-
+			bounds = ui.item.bounds;
+			searchLoc = ui.item.location;
 		}
 		});
+	jQuery('#locate_on_map').click(function(){
+	if (searchLoc != null)
+	{
+				if (marker != null)
+					{
+						marker.setMap(null);
+					}
+
+					marker = new google.maps.Marker({
+					position: searchLoc,
+					map: map,
+					title:"Position",
+					draggable: true
+					});
+					map.fitBounds(bounds);
+					google.maps.event.addListener(marker, 'dragend', function()
+					{
+						map.setCenter(marker.getPosition());
+						jQuery('#item_double3').val(marker.getPosition().lat());
+						jQuery('#item_double4').val(marker.getPosition().lng());
+
+					});
+					jQuery('#item_double3').val(searchLoc.lat());
+					jQuery('#item_double4').val(searchLoc.lng());
+					jQuery('#google_map_zoom').val(map.getZoom());
+	}
+
+	})
 	</script>
 
 	<?php
@@ -527,8 +511,58 @@ class google_maps_plugin extends Plugin
 		require_js( '#jquery#');
 	}
 
+	function SkinTag( $params )
+	{
+		global $Item;
+		$lat = $Item->get('double3');
+		$lng = $Item->get('double4');
+	?>
+	<div id="map_canvas" style="width:300px; height:300px; margin: 5px 5px 5px 5px;"></div>
+	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+	<script type="text/javascript">
+	<?php
+	if (!empty($lat) && !empty($lng))
+	{
+		?>
+		var latlng = new google.maps.LatLng(<?php echo $lat; ?>, <?php echo $lng;?>);
+		<?php
+	}
+	else
+	{
+		?>
+		var latlng = new google.maps.LatLng(48.856614, 2.3522219000000177);
+		<?php
+	}
+	?>
+	var mapTypes = new Array();
+	mapTypes.push(google.maps.MapTypeId.HYBRID);
+	mapTypes.push(google.maps.MapTypeId.ROADMAP);
+	mapTypes.push(google.maps.MapTypeId.SATELLITE);
+	mapTypes.push(google.maps.MapTypeId.TERRAIN);
 
+	var myOptions = {
+		  zoom: 11,
+		  center: latlng,
+		  mapTypeId: google.maps.MapTypeId.HYBRID,
+		  mapTypeControlOptions:
+			  {
+			   style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+			   mapTypeIds: mapTypes
+			  }
+		};
 
+	var map = new google.maps.Map(document.getElementById("map_canvas"),
+			myOptions);
+
+	var marker = new google.maps.Marker({
+		position: latlng,
+		map: map,
+		title:"Position"
+		});
+
+	</script>
+	<?php
+	}
 
 	/**
 	 * Event handler: Gets invoked in /toolbar.inc.php after the menu structure is built.
@@ -666,5 +700,10 @@ class google_maps_plugin extends Plugin
 	}
 
 }
-
+/*
+ * $Log$
+ * Revision 1.3  2011/10/07 14:35:36  efy-vitalij
+ * remake google maps plugin
+ *
+ */
 ?>
