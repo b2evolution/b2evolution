@@ -541,7 +541,7 @@ class google_maps_plugin extends Plugin
 	mapTypes.push(google.maps.MapTypeId.TERRAIN);
 
 	var myOptions = {
-		  zoom: 11,
+		  zoom: 17,
 		  center: latlng,
 		  mapTypeId: google.maps.MapTypeId.HYBRID,
 		  mapTypeControlOptions:
@@ -702,6 +702,9 @@ class google_maps_plugin extends Plugin
 }
 /*
  * $Log$
+ * Revision 1.4  2011/10/07 15:08:57  efy-vitalij
+ * change widget display zoom
+ *
  * Revision 1.3  2011/10/07 14:35:36  efy-vitalij
  * remake google maps plugin
  *
