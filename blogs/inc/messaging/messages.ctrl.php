@@ -35,6 +35,13 @@ load_class( 'messaging/model/_message.class.php', 'Message' );
  */
 global $current_User;
 
+// Check minimum permission:
+if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
+{
+	$Messages->add( 'Sorry, you are not allowed to view messages!' );
+	header_redirect( $admin_url );
+}
+
 // Set options path:
 $AdminUI->set_path( 'messaging', 'threads' );
 
@@ -52,9 +59,6 @@ if( param( 'thrd_ID', 'integer', '', true) )
 	}
 }
 
-// Check minimum permission:
-$current_User->check_perm( 'perm_messaging', 'reply', true );
-
 if( param( 'msg_ID', 'integer', '', true) )
 {// Load message from cache:
 	$MessageCache = & get_MessageCache();
@@ -66,8 +70,16 @@ if( param( 'msg_ID', 'integer', '', true) )
 	}
 }
 
-// Preload users to show theirs avatars
-load_messaging_thread_recipients( $thrd_ID );
+if( empty( $thrd_ID ) )
+{
+	$Messages->add( T_( 'Can\'t show messages without thread!' ), 'error' );
+	$action = 'nil';
+}
+else
+{
+	// Preload users to show theirs avatars
+	load_messaging_thread_recipients( $thrd_ID );
+}
 
 switch( $action )
 {
@@ -161,6 +173,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2011/10/07 05:43:45  efy-asimo
+ * Check messaging availability before display
+ *
  * Revision 1.18  2011/08/11 09:05:09  efy-asimo
  * Messaging in front office
  *

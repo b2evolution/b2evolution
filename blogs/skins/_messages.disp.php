@@ -45,12 +45,19 @@ if( $thrd_ID = param( 'thrd_ID', 'integer', '', true) )
 		unset( $edited_Thread );
 		forget_param( 'thrd_ID' );
 		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Thread') ), 'error' );
-		$Messages->display();
 	}
 }
 
-// Preload users to show theirs avatars
-load_messaging_thread_recipients( $thrd_ID );
+if( ( empty( $thrd_ID ) ) || ( empty( $edited_Thread ) ) )
+{
+	$Messages->add( T_( 'Can\'t show messages without thread!' ), 'error' );
+	$Messages->display();
+}
+else
+{
+	// Preload users to show theirs avatars
+	load_messaging_thread_recipients( $thrd_ID );
+}
 
 // Display menu
 echo '<div class="tabs">';
@@ -98,6 +105,9 @@ if( isset( $edited_Thread ) )
 
 /*
  * $Log$
+ * Revision 1.6  2011/10/07 05:43:45  efy-asimo
+ * Check messaging availability before display
+ *
  * Revision 1.5  2011/10/03 12:00:33  efy-yurybakh
  * Small messaging UI design changes
  *

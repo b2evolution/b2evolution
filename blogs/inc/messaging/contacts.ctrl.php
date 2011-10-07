@@ -30,7 +30,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $DB, $current_User;
 
 // Check minimum permission:
-$current_User->check_perm( 'perm_messaging', 'reply', true );
+if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
+{
+	$Messages->add( 'Sorry, you are not allowed to view cotnacts!' );
+	header_redirect( $admin_url );
+}
 
 // Set options path:
 $AdminUI->set_path( 'messaging', 'contacts' );
@@ -100,6 +104,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2011/10/07 05:43:45  efy-asimo
+ * Check messaging availability before display
+ *
  * Revision 1.7  2011/08/11 09:05:09  efy-asimo
  * Messaging in front office
  *
