@@ -165,7 +165,7 @@ class archives_plugin extends Plugin
 		// Daily archive date format?
 		if( (!isset($params['day_date_format'])) || ($params['day_date_format'] == '') )
 		{
-		 	$dateformat = locale_datefmt();
+			$dateformat = locale_datefmt();
 			$params['day_date_format'] = $dateformat;
 		}
 
@@ -386,6 +386,17 @@ class ArchiveList extends Results
 		// - - Select a specific Item:
 		// $this->ItemQuery->where_ID( $p, $title );
 
+		if( is_admin_page() )
+		{	// Don't restrict a posts in the Back-office
+			$timestamp_min = NULL;
+			$timestamp_max = NULL;
+		}
+		else
+		{	// Restrict posts by date started
+			$timestamp_min = $Blog->get_timestamp_min();
+			$timestamp_max = $Blog->get_timestamp_max();
+		}
+
 		if( $preserve_context )
 		{	// We want to preserve the current context:
 			// * - - Restrict to selected blog/categories:
@@ -404,7 +415,7 @@ class ArchiveList extends Results
 			$this->ItemQuery->where_statuses( $status );
 
 			// - - - + * * timestamp restrictions:
-			$this->ItemQuery->where_datestart( '', '', '', '', $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
+			$this->ItemQuery->where_datestart( '', '', '', '', $timestamp_min, $timestamp_max );
 
 			// Keyword search stuff:
 			$this->ItemQuery->where_keywords( $s, $sentence, $exact );
@@ -420,7 +431,7 @@ class ArchiveList extends Results
 			$this->ItemQuery->where_visibility( $show_statuses );
 
 			// - - - + * * timestamp restrictions:
-			$this->ItemQuery->where_datestart( '', '', '', '', $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
+			$this->ItemQuery->where_datestart( '', '', '', '', $timestamp_min, $timestamp_max );
 
 			// Include all types except pages, intros and sidebar links:
 			$this->ItemQuery->where_types( '-1000,1500,1520,1530,1570,1600,3000' );
@@ -628,6 +639,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.65  2011/10/07 07:22:59  efy-yurybakh
+ * Replace all timestamp_min & timestamp_max with Blog's methods
+ *
  * Revision 1.64  2011/10/06 11:49:47  efy-yurybakh
  * Replace all timestamp_min & timestamp_max with Blog's methods
  *

@@ -24,6 +24,8 @@ $CommentList->set_filters( array(
 		'statuses' => array ( 'published' ),
 		'order' => 'DESC',
 		'comments' => 50,
+		'timestamp_min' => $Blog->get_timestamp_min(),
+		'timestamp_max' => $Blog->get_timestamp_max(),
 	) );
 
 // Get ready for display (runs the query):
@@ -82,6 +84,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.16  2011/10/07 07:22:59  efy-yurybakh
+ * Replace all timestamp_min & timestamp_max with Blog's methods
+ *
  * Revision 1.15  2011/09/04 22:13:24  fplanque
  * copyright 2011
  *

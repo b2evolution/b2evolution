@@ -2529,11 +2529,6 @@ class Blog extends DataObject
 	 */
 	function get_timestamp_min()
 	{
-		if( is_admin_page() )
-		{	// Show ALL posts in the Back-office
-			return NULL;
-		}
-
 		$timestamp_min = $this->get_setting( 'timestamp_min' );
 
 		switch ( $timestamp_min )
@@ -2561,11 +2556,6 @@ class Blog extends DataObject
 	 */
 	function get_timestamp_max()
 	{
-		if( is_admin_page() )
-		{	// Show ALL posts in the Back-office
-			return NULL;
-		}
-
 		$timestamp_max = $this->get_setting( 'timestamp_max' );
 
 		switch ( $timestamp_max )
@@ -2588,6 +2578,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.158  2011/10/07 07:22:59  efy-yurybakh
+ * Replace all timestamp_min & timestamp_max with Blog's methods
+ *
  * Revision 1.157  2011/10/06 11:49:47  efy-yurybakh
  * Replace all timestamp_min & timestamp_max with Blog's methods
  *

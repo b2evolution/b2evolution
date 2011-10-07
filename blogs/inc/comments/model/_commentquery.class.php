@@ -168,6 +168,30 @@ class CommentQuery extends SQL
 
 
 	/**
+	 * Restrict to a specific post comments by post_datestart
+	 * 
+	 * @param timestamp min - Do not show comments from posts before this timestamp
+	 * @param timestamp max - Do not show comments from posts after this timestamp
+	 */
+	function where_post_datestart( $timestamp_min, $timestamp_max )
+	{
+		if( empty( $timestamp_min ) && empty ( $timestamp_max ) )
+		{	// Don't restrict
+			return;
+		}
+
+		$dbtable = 'T_items__item';
+		$dbprefix = 'post_';
+		$dbIDname = 'ID';
+
+		$ItemQuery = new ItemQuery( $dbtable, $dbprefix, $dbIDname );
+		$ItemQuery->where_datestart( '', '', '', '', $timestamp_min, $timestamp_max );
+		
+		$this->WHERE_and( $ItemQuery->get_where( '' ) );
+	}
+
+
+	/**
 	 * Restrict to specific authors
 	 *
 	 * @param string List of authors (author IDs) to restrict to (must have been previously validated)
@@ -488,6 +512,9 @@ class CommentQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.9  2011/10/07 07:22:59  efy-yurybakh
+ * Replace all timestamp_min & timestamp_max with Blog's methods
+ *
  * Revision 1.8  2011/09/04 22:13:15  fplanque
  * copyright 2011
  *

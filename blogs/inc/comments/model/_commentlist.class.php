@@ -114,6 +114,8 @@ class CommentList2 extends DataObjectList2
 				'comments' => $this->limit,
 				'page' => 1,
 				'featured' => NULL,
+				'timestamp_min' => NULL, // Do not show comments from posts before this timestamp
+				'timestamp_max' => NULL, // Do not show comments from posts after this timestamp
 		) );
 	}
 
@@ -446,6 +448,7 @@ class CommentList2 extends DataObjectList2
 		$this->CommentQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
 		$this->CommentQuery->where_statuses( $this->filters['statuses'] );
 		$this->CommentQuery->where_types( $this->filters['types'] );
+		$this->CommentQuery->where_post_datestart( $this->filters['timestamp_min'], $this->filters['timestamp_max'] );
 
 
 		/*
@@ -749,6 +752,9 @@ class CommentList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.37  2011/10/07 07:22:59  efy-yurybakh
+ * Replace all timestamp_min & timestamp_max with Blog's methods
+ *
  * Revision 1.36  2011/09/06 05:42:46  efy-asimo
  * Comment list visibility display - fix
  *

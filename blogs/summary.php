@@ -128,7 +128,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 		<ul>
 		<?php	// Get the 3 last posts for each blog:
 
-			$BlogBList = new ItemList2( $l_Blog, NULL, 'now', 3 );
+			$BlogBList = new ItemList2( $l_Blog, $l_Blog->get_timestamp_min(), $l_Blog->get_timestamp_max(), 3 );
 
 			$BlogBList->set_filters( array(
 					'order' => 'DESC',
