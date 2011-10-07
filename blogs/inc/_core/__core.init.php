@@ -914,7 +914,7 @@ class _core_Module extends Module
 							'entries' => array(
 								'general' => array(
 									'text' => T_('General'),
-									'href' => '?ctrl=settings' ),
+									'href' => '?ctrl=gensettings' ),
 								'features' => array(
 									'text' => T_('Features'),
 									'href' => '?ctrl=features' ),
@@ -1053,6 +1053,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.87  2011/10/07 00:40:23  fplanque
+ * fix
+ *
  * Revision 1.86  2011/10/04 13:06:26  efy-yurybakh
  * Additional Display settings
  *
