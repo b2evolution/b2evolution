@@ -48,9 +48,8 @@ $Form->begin_form( 'fform', T_('General Settings'),
 	array( 'onsubmit'=>'var es=this.elements; for( var i=0; i < es.length; i++ ) { es[i].disabled=false; };' ) );
 
 $Form->add_crumb( 'globalsettings' );
-$Form->hidden( 'ctrl', 'settings' );
+$Form->hidden( 'ctrl', 'gensettings' );
 $Form->hidden( 'action', 'update' );
-$Form->hidden( 'tab', 'general' );
 
 // --------------------------------------------
 
@@ -114,6 +113,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.27  2011/10/07 01:52:12  fplanque
+ * more fixes
+ *
  * Revision 1.26  2011/09/04 22:13:20  fplanque
  * copyright 2011
  *

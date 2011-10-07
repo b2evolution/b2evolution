@@ -6,14 +6,10 @@
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
  * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
- * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
  * @package admin
- *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author efy-asimo: Attila Simo.
  *
  * @version $Id$
  */
@@ -38,17 +34,13 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Generate'), 'SaveButton' 
 
 /*
  * $Log$
+ * Revision 1.3  2011/10/07 01:52:12  fplanque
+ * more fixes
+ *
  * Revision 1.2  2011/09/29 06:22:36  efy-vitalij
  * add config params to statistic generator form
  *
  * Revision 1.1  2011/09/26 15:38:08  efy-vitalij
  * add test hit information
- *
- * Revision 1.2  2011/09/04 22:13:21  fplanque
- * copyright 2011
- *
- * Revision 1.1  2010/12/06 14:27:57  efy-asimo
- * Generate sample posts tool
- *
  */
 ?>

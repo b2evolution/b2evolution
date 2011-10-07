@@ -58,7 +58,6 @@ $Form->begin_form( 'fform', T_('Global Features') );
 $Form->add_crumb( 'globalsettings' );
 $Form->hidden( 'ctrl', 'features' );
 $Form->hidden( 'action', 'update' );
-$Form->hidden( 'tab', 'features' );
 
 $Form->begin_fieldset( T_('Online Help').get_manual_link('online help'));
 	$Form->checkbox_input( 'webhelp_enabled', $Settings->get('webhelp_enabled'), T_('Online Help links'), array( 'note' => T_('Online help links provide context sensitive help to certain features.' ) ) );
@@ -219,6 +218,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.31  2011/10/07 01:52:12  fplanque
+ * more fixes
+ *
  * Revision 1.30  2011/09/04 22:13:20  fplanque
  * copyright 2011
  *

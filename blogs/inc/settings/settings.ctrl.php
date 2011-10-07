@@ -105,7 +105,7 @@ switch( $action )
 			$Settings->dbupdate();
 			$Messages->add( T_('General settings updated.'), 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=settings', 303 ); // Will EXIT
+			header_redirect( '?ctrl=gensettings', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		break;
@@ -139,6 +139,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.31  2011/10/07 01:52:12  fplanque
+ * more fixes
+ *
  * Revision 1.30  2011/09/13 15:31:34  fplanque
  * Enhanced back-office navigation.
  *

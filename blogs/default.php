@@ -52,7 +52,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 	<!-- InstanceBeginEditable name="head" -->
 	<base href="<?php echo $baseurl ?>" />
 	<!-- InstanceEndEditable -->
-	<!-- InstanceParam name="lang" type="text" value="&lt;?php locale_lang() ?&gt;" --> 
+	<!-- InstanceParam name="lang" type="text" value="&lt;?php locale_lang() ?&gt;" -->
 </head>
 
 <body>
@@ -78,15 +78,15 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 
 	<div class="wrapper1">
 	<div class="wrapper2">
-		<span class="version_top"><!-- InstanceBeginEditable name="Version" --><?php echo T_('Default page') ?><!-- InstanceEndEditable --></span>	
-	
+		<span class="version_top"><!-- InstanceBeginEditable name="Version" --><?php echo T_('Default page') ?><!-- InstanceEndEditable --></span>
+
 		<a href="http://b2evolution.net/" target="_blank"><img src="rsc/img/distrib/b2evolution-logo.gif" alt="b2evolution" width="237" height="92" /></a>
-		
+
 		<div class="menu_top"><!-- InstanceBeginEditable name="MenuTop" -->
 			<span class="floatright"><a href="<?php echo $baseurl ?>">Home</a> &bull; <a href="<?php echo $admin_url ?>">Admin</a> </span>
 			&nbsp;
 		<!-- InstanceEndEditable --></div>
-		
+
 		<!-- InstanceBeginEditable name="Main" -->
 		<?php
 		/**
@@ -122,7 +122,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 
 						echo '<p>'.T_('You haven\'t set a default blog yet. Thus, you see this default page.').'</p>';
 						?>
-						<p><a href="<?php echo $admin_url ?>?ctrl=settings&amp;tab=general"><?php echo T_( 'Set a default blog' ) ?> &raquo;</a></p>
+						<p><a href="<?php echo $admin_url ?>?ctrl=gensettings"><?php echo T_( 'Set a default blog' ) ?> &raquo;</a></p>
 						<?php
 					}
 					?>
@@ -200,12 +200,12 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 
 <!-- InstanceEndEditable -->
 	</div>
-		
+
 	<div class="body_fade_out">
-		
+
 	<div class="menu_bottom"><!-- InstanceBeginEditable name="MenuBottom" -->Powered by <a href="http://b2evolution.net/" target="_blank">b2evolution</a> &bull; <a href="http://manual.b2evolution.net/" target="_blank">Manual</a> &bull; <a href="http://forums.b2evolution.net/" target="_blank">Forums</a>
 		<!-- InstanceEndEditable --></div>
-	
+
 	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->
 		<a href="contact.php"><?php echo T_('Contact the admin') ?></a>
 		<?php
@@ -218,7 +218,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 				) );
 		?>
 		<!-- InstanceEndEditable --></div>
-		
+
 	</div>
 	</div>
 
