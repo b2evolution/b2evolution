@@ -23,10 +23,6 @@
  *
  * @package evocore
  *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author efy-bogdan: Evo Factory / Bogdan.
- * @author fplanque: Francois PLANQUE
- *
  * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -126,12 +122,13 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2011/10/07 02:55:38  fplanque
+ * doc
+ *
  * Revision 1.2  2011/10/05 17:44:23  efy-yurybakh
  * Checks for disp=user & users
  *
  * Revision 1.1  2011/10/04 13:06:26  efy-yurybakh
  * Additional Display settings
- *
- *
  */
 ?>

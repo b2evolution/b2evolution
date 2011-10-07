@@ -21,9 +21,6 @@
  *
  * @package admin
  *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois PLANQUE
- *
  * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -184,6 +181,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.5  2011/10/07 02:55:38  fplanque
+ * doc
+ *
  * Revision 1.4  2011/10/05 17:58:54  efy-yurybakh
  * change the default profile picture sizes
  *
@@ -195,7 +195,5 @@ $Results->display( $display_params );
  *
  * Revision 1.1  2011/10/03 13:37:50  efy-yurybakh
  * User directory
- *
- * 
  */
 ?>

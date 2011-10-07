@@ -26,12 +26,13 @@ require $ads_current_skin_path.'index.main.php';
 
 /*
  * $Log$
+ * Revision 1.3  2011/10/07 02:55:37  fplanque
+ * doc
+ *
  * Revision 1.2  2011/10/02 12:38:33  efy-yurybakh
  * fix sprite icons
  *
  * Revision 1.1  2011/09/30 12:24:56  efy-yurybakh
  * User directory
- *
- * 
  */
 ?>
