@@ -247,12 +247,12 @@ function get_icon_info($name)
 		case 'refresh': return array(
 			'alt'  => T_('Refresh'),
 			'size' => array( 16, 16 ),
-			'xy' => array( 32, 160 )
+			'xy' => array( 32, 96 )
 		);
 		case 'reload': return array(
 			'alt'  => T_('Reload'),
 			'size' => array( 15, 15 ),
-			'xy' => array( 48, 160 )
+			'xy' => array( 48, 96 )
 		);
 
 		case 'download': return array(
@@ -276,7 +276,7 @@ function get_icon_info($name)
 		case 'email': return array(
 			'alt'  => T_('Email'),
 			'size' => array( 13, 10 ),
-			'xy' => array( 96, 160 )
+			'xy' => array( 32, 160 )
 		);
 		case 'www': return array(   /* user's web site, plugin's help url */
 			'alt'  => T_('WWW'),
@@ -333,6 +333,11 @@ function get_icon_info($name)
 			'size' => array( 14, 14 ),
 			'xy' => array( 0, 96 )
 		);
+		case 'xross': return array(
+			'alt'  => T_('Del'),
+			'size' => array( 13, 13 ),
+			'xy' => array( 144, 64 )
+		);
 
 
 		case 'increase': return array(
@@ -351,17 +356,37 @@ function get_icon_info($name)
 		case 'bullet_full': return array(
 			'alt'  => '&bull;',
 			'size' => array( 9, 9 ),
-			'xy' => array( 32, 96 )
+			'xy' => array( 0, 192 )
 		);
 		case 'bullet_empty': return array(
 			'alt'  => '&nbsp;',
 			'size' => array( 9, 9 ),
-			'xy' => array( 48, 96 )
+			'xy' => array( 16, 192 )
 		);
 		case 'bullet_blue': return array(
 			'alt'  => '&bull;',
 			'size' => array( 9, 9 ),
-			'xy' => array( 0, 192 )
+			'xy' => array( 32, 192 )
+		);
+		case 'bullet_red': return array(
+			'alt'  => '&bull;',
+			'size' => array( 9, 9 ),
+			'xy' => array( 48, 192 )
+		);
+		case 'bullet_orange': return array(
+			'alt'  => '&bull;',
+			'size' => array( 9, 9 ),
+			'xy' => array( 64, 192 )
+		);
+		case 'bullet_green': return array(
+			'alt'  => '&bull;',
+			'size' => array( 9, 9 ),
+			'xy' => array( 80, 192 )
+		);
+		case 'bullet_yellow': return array(
+			'alt'  => '&bull;',
+			'size' => array( 9, 9 ),
+			'xy' => array( 96, 192 )
 		);
 
 		case 'activate': return array(
@@ -403,7 +428,7 @@ function get_icon_info($name)
 		case 'calendar': return array(
 			'alt'  => T_('Calendar'),
 			'size' => array( 16, 15 ),
-			'xy' => array( 144, 64 )
+			'xy' => array( 48, 160 )
 		);
 
 		case 'parent_childto_arrow': return array(
@@ -617,6 +642,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.90  2011/10/07 08:15:21  efy-yurybakh
+ * multiple color bullets icons
+ *
  * Revision 1.89  2011/10/03 12:00:33  efy-yurybakh
  * Small messaging UI design changes
  *
