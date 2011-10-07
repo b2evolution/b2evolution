@@ -405,13 +405,13 @@ function get_icon_info($name)
 			'alt'  => /* TRANS: Short for "Activate(d)" */ T_('Act.'),
 			'legend' => T_('Activated'),
 			'size' => array( 9, 9 ),
-			'xy' => array( 32, 96 )
+			'xy' => array( 0, 192 )
 		);
 		case 'disabled': return array(
 			'alt'  => /* TRANS: Short for "Deactivate(d)" */ T_('Deact.'),
 			'legend' => T_('Deactivated'),
 			'size' => array( 9, 9 ),
-			'xy' => array( 48, 96 )
+			'xy' => array( 16, 192 )
 		);
 
 		case 'link': return array(
@@ -642,6 +642,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.91  2011/10/07 10:19:44  efy-yurybakh
+ * multiple color bullets icons
+ *
  * Revision 1.90  2011/10/07 08:15:21  efy-yurybakh
  * multiple color bullets icons
  *
