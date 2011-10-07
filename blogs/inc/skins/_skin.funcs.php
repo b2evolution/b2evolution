@@ -398,11 +398,8 @@ function skin_init( $disp )
 			break;
 
 		case 'users':
-			if( ! is_logged_in() && ! $Settings->get( 'allow_anonymous_user_list' ) )
-			{	// Redirect to the login page for anonymous user and if setting is OFF
-				$redirect_to = $Blog->get( 'usersurl' );
-				header_redirect( get_login_url( $redirect_to ), 302 );
-			}
+			$seo_page_type = 'Users list';
+			$robots_index = false;
 			break;
 
 		case 'user':
@@ -946,6 +943,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.111  2011/10/07 06:12:22  efy-asimo
+ * Check users availability before display
+ *
  * Revision 1.110  2011/10/07 05:43:45  efy-asimo
  * Check messaging availability before display
  *
