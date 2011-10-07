@@ -31,7 +31,7 @@
  */
 function insert_basic_widgets( $blog_id, $initial_install = false )
 {
-	global $DB;
+	global $DB, $test_install_all_features;
 
 	$default_blog_param = 's:7:"blog_ID";s:0:"";';
 	if( $initial_install )
@@ -134,6 +134,11 @@ function insert_basic_widgets( $blog_id, $initial_install = false )
 							VALUES( '.$blog_id.', "Menu", 3, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'ownercontact'))).'" )' );
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
 							VALUES( '.$blog_id.', "Menu", 4, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'login'))).'" )' );
+		if( $test_install_all_features )
+		{	// Add menu with User Directory
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
+								VALUES( '.$blog_id.', "Menu", 5, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'users'))).'" )' );
+		}
 
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 							VALUES( '.$blog_id.', "Menu Top", 1, "core", "coll_search_form" )' );
@@ -182,6 +187,9 @@ function insert_basic_widgets( $blog_id, $initial_install = false )
 
 /*
  * $Log$
+ * Revision 1.10  2011/10/07 11:24:52  efy-yurybakh
+ * Extend  _menu_link.widget.php
+ *
  * Revision 1.9  2011/09/04 22:13:21  fplanque
  * copyright 2011
  *

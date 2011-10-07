@@ -43,6 +43,7 @@ $menu_link_widget_link_types = array(
 		'register' => T_('Registration form'),
 		'profile' => T_('Profile form'),
 		'avatar' => T_('Profile picture editing'),
+		'users' => T_('User Directory'),
 		'item' => T_('Any item (post, page, etc...)'),
 		'url' => T_('Any URL'),
 	);
@@ -263,6 +264,16 @@ class menu_link_Widget extends ComponentWidget
 				$text = T_('Profile picture');
 				break;
 
+			case 'users':
+				global $Settings;
+				if( ! is_logged_in() && ! $Settings->get( 'allow_anonymous_user_list' ) )
+				{	// Don't allow anonymous users to see users list
+					return false;
+				}
+				$url = $Blog->get( 'usersurl' );
+				$text = T_('User Directory');
+				break;
+
 			case 'item':
 				$ItemCache = & get_ItemCache();
 				/**
@@ -341,6 +352,9 @@ class menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.23  2011/10/07 11:24:53  efy-yurybakh
+ * Extend  _menu_link.widget.php
+ *
  * Revision 1.22  2011/09/08 23:29:27  fplanque
  * More blockcache/widget fixes around login/register links.
  *
