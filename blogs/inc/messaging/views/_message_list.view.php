@@ -208,22 +208,14 @@ $Results->filter_area = array(
  * Get user avatar
  *
  * @param integer user ID
- * @param integer avatar ID
  * @return string
  */
-function user_avatar( $user_ID, $user_avatar_file_ID )
+function user_avatar( $user_ID )
 {
-	if( ! $GLOBALS['Settings']->get('allow_avatars') ) 
-		return '';
-
-	$FileCache = & get_FileCache();
-
-	if( ! $File = & $FileCache->get_by_ID( $user_avatar_file_ID, false, false ) )
-	{
-		return '';
-	}
-
-	return $File->get_thumb_imgtag( 'crop-80x80' );
+	$UserCache = & get_UserCache();
+	$User = & $UserCache->get_by_ID( $user_ID );
+	
+	return $User->get_avatar_imgtag( 'crop-80x80' );
 }
 /**
  * Create author cell for message list table
@@ -239,7 +231,7 @@ function author( $user_ID, $user_login, $user_first_name, $user_last_name, $user
 {
 	$author = $user_login;
 
-	$avatar = user_avatar( $user_ID, $user_avatar_ID );
+	$avatar = user_avatar( $user_ID );
 
 	if( !empty( $avatar ) )
 	{
@@ -359,6 +351,9 @@ $Form->begin_form( $params['form_class'], '' );
 $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' ) ) );
 /*
  * $Log$
+ * Revision 1.42  2011/10/07 17:22:52  efy-yurybakh
+ * user avatar display default
+ *
  * Revision 1.41  2011/10/07 13:14:45  efy-yurybakh
  * Small messaging UI design changes (changed specs)
  *

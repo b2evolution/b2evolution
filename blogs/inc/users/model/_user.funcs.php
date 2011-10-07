@@ -967,6 +967,48 @@ function get_avatar_imgtags( $user_logins_list, $show_login = true, $link = true
 
 
 /**
+ * Get avatar <img> tag with default picture
+ *
+ * @param avatar size
+ * @param style class of image
+ * @param image align
+ * @return <img> tag
+ */
+function get_avatar_imgtag_default( $size = 'crop-15x15', $class = '', $align = '' )
+{
+	global $Settings;
+
+	if( ! $Settings->get('allow_avatars') )
+	{	// Don't allow avatars
+		return '';
+	}
+
+	global $thumbnail_sizes;
+
+	if( isset( $thumbnail_sizes[$size] ) )
+	{	// Get img tag with default avatar
+		global $default_avatar;
+
+		$width = $thumbnail_sizes[$size][1];
+		$height = $thumbnail_sizes[$size][2];
+
+		if( $class != '' )
+		{
+			$class = ' class="'.$class.'"';
+		}
+		if( $align != '' )
+		{
+			$align = ' align="'.$align.'"';
+		}
+
+		return '<img src="'.$default_avatar.'" alt="" width="'.$width.'" height="'.$height.'"'.$align.$class.' />';
+	}
+
+	return '';
+}
+
+
+/**
  * Convert seconds duration
  *
  * @param integer seconds
@@ -1217,7 +1259,7 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 	}
 	else
 	{
-		$avatar_tag = '';
+		$avatar_tag = get_avatar_imgtag_default( 'crop-48x48', 'floatleft' );
 	}
 
 	// build menu3
@@ -1232,6 +1274,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.83  2011/10/07 17:22:52  efy-yurybakh
+ * user avatar display default
+ *
  * Revision 1.82  2011/10/07 13:14:45  efy-yurybakh
  * Small messaging UI design changes (changed specs)
  *

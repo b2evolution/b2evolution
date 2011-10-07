@@ -105,11 +105,6 @@ class coll_avatar_Widget extends ComponentWidget
 
 		$owner_User = & $Blog->get_owner_User();
 
-		if( ! $owner_User->has_avatar() )
-		{
-			return false;
-		}
-
 		// START DISPLAY:
 		echo $this->disp_params['block_start'];
 
@@ -150,6 +145,9 @@ class coll_avatar_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.12  2011/10/07 17:22:52  efy-yurybakh
+ * user avatar display default
+ *
  * Revision 1.11  2011/09/06 00:54:38  fplanque
  * i18n update
  *

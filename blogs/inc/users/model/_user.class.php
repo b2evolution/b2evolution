@@ -2312,12 +2312,12 @@ class User extends DataObject
 		 * @var File
 		 */
 		if( ! $File = & $this->get_avatar_File() )
-		{
-			return '';
+		{	// User doesn't have an avatar
+			return get_avatar_imgtag_default( $size, $class, $align );
 		}
 
 		if( $zoomable )
-		{ // return clickable avatar tag, zoom on click
+		{	// return clickable avatar tag, zoom on click
 			// set random value to link_rel, this way the pictures on the page won't be grouped
 			// this is usefull because the same avatar picture may appear more times in the same page
 			$link_rel = 'lightbox[f'.$File->ID.rand(0, 100000).']';
@@ -2700,6 +2700,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.158  2011/10/07 17:22:52  efy-yurybakh
+ * user avatar display default
+ *
  * Revision 1.157  2011/10/06 06:18:29  efy-asimo
  * Add messages link to settings
  * Update messaging notifications

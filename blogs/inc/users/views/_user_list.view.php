@@ -204,19 +204,17 @@ $Results->cols[] = array(
 
 if( $Settings->get('allow_avatars') )
 {
-	function user_avatar( $user_ID, $user_avatar_file_ID )
+	function user_avatar( $user_ID )
 	{
-		$FileCache = & get_FileCache();
-
-		// Do not halt on error. A file can disappear without the profile being updated.
-		/**
-		 * @var File
-		 */
-		if( ! $File = & $FileCache->get_by_ID( $user_avatar_file_ID, false, false ) )
-		{
-			return '';
-		}
-		return '<a href="?ctrl=user&amp;user_tab=profile&amp;user_ID='.$user_ID.'">'.$File->get_thumb_imgtag( 'crop-48x48' ).'</a>';
+		global $Blog;
+		
+		$UserCache = & get_UserCache();
+		$User = & $UserCache->get_by_ID( $user_ID );
+		
+		return $User->get_identity_link( array(
+			'link_text' => 'only_avatar',
+			'thumb_size' => 'crop-48x48',
+			) );
 	}
 	$Results->cols[] = array(
 							'th' => T_('Picture'),
@@ -407,6 +405,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.42  2011/10/07 17:22:52  efy-yurybakh
+ * user avatar display default
+ *
  * Revision 1.41  2011/09/30 12:24:56  efy-yurybakh
  * User directory
  *

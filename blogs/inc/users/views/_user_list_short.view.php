@@ -135,21 +135,17 @@ $Results->ID_col = 'user_ID';
 
 if( $Settings->get('allow_avatars') )
 {
-	function user_avatar( $user_ID, $user_avatar_file_ID )
+	function user_avatar( $user_ID )
 	{
 		global $Blog;
-		$FileCache = & get_FileCache();
-
-		// Do not halt on error. A file can disappear without the profile being updated.
-		/**
-		 * @var File
-		 */
-		if( ! $File = & $FileCache->get_by_ID( $user_avatar_file_ID, false, false ) )
-		{
-			return '';
-		}
-		$identity_link = get_user_identity_url( $user_ID );
-		return '<a href="'.$identity_link.'">'.$File->get_thumb_imgtag( $Blog->get_setting('image_size_user_list') ).'</a>';
+		
+		$UserCache = & get_UserCache();
+		$User = & $UserCache->get_by_ID( $user_ID );
+		
+		return $User->get_identity_link( array(
+			'link_text' => 'only_avatar',
+			'thumb_size' => $Blog->get_setting('image_size_user_list'),
+			) );
 	}
 	$Results->cols[] = array(
 							'th' => T_('Picture'),
@@ -157,7 +153,7 @@ if( $Settings->get('allow_avatars') )
 							'td_class' => 'shrinkwrap center',
 							'order' => 'has_picture',
 							'default_dir' => 'D',
-							'td' => '%user_avatar( #user_ID#, #user_avatar_file_ID# )%',
+							'td' => '%user_avatar( #user_ID# )%',
 						);
 }
 
@@ -181,6 +177,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.6  2011/10/07 17:22:52  efy-yurybakh
+ * user avatar display default
+ *
  * Revision 1.5  2011/10/07 02:55:38  fplanque
  * doc
  *
