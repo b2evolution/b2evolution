@@ -86,6 +86,10 @@ img.avatar_before_login {
 	margin-right: 2px;
 	vertical-align: top;
 }
+img.avatar_before_login_middle {
+	margin-right: 2px;
+	vertical-align: middle;
+}
 img.avatar_above_login {
 	display: block;
 	margin: 0 auto;

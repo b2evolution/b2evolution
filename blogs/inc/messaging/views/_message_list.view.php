@@ -108,7 +108,6 @@ foreach( $DB->get_results( $unread_recipients_SQL->get() ) as $row )
 	}
 
 	$read_recipiens = array_diff( $recipients, $unread_recipients );
-	$read_recipiens[] = $current_User->login;
 
 	asort( $read_recipiens );
 	asort( $unread_recipients );
@@ -116,7 +115,7 @@ foreach( $DB->get_results( $unread_recipients_SQL->get() ) as $row )
 	$read_by = '';
 	if( !empty( $read_recipiens ) )
 	{
-		$read_by .= '<div>'.get_avatar_imgtags( $read_recipiens, true, false, $Blog->get_setting('image_size_messaging'), 'avatar_before_login', '', true );
+		$read_by .= '<div>'.get_avatar_imgtags( $read_recipiens, true, false, $Blog->get_setting('image_size_messaging'), '', '', true, false );
 		if( !empty ( $unread_recipients ) )
 		{
 			$read_by .= '<br />';
@@ -126,7 +125,7 @@ foreach( $DB->get_results( $unread_recipients_SQL->get() ) as $row )
 
 	if( !empty ( $unread_recipients ) )
 	{
-		$read_by .= '<div>'.get_avatar_imgtags( $unread_recipients, true, false, $Blog->get_setting('image_size_messaging'), 'avatar_before_login', '', false ).'</div>';
+		$read_by .= '<div>'.get_avatar_imgtags( $unread_recipients, true, false, $Blog->get_setting('image_size_messaging'), '', '', false, false ).'</div>';
 	}
 
 	$read_by_list[$row->msg_ID] = $read_by ;
@@ -360,6 +359,9 @@ $Form->begin_form( $params['form_class'], '' );
 $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' ) ) );
 /*
  * $Log$
+ * Revision 1.41  2011/10/07 13:14:45  efy-yurybakh
+ * Small messaging UI design changes (changed specs)
+ *
  * Revision 1.40  2011/10/06 16:45:55  efy-yurybakh
  * small messaging UI design changes (additional email)
  *

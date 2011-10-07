@@ -887,9 +887,10 @@ function profile_check_params( $params, $User = NULL )
  * @param image align
  * @param avatar overlay text
  * @param style class of link
+ * @param if true show user avatar
  * @return login <img> tag
  */
-function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size = 'crop-15x15', $img_class = 'avatar_before_login', $align = '', $avatar_overlay_text = '', $link_class = '' )
+function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size = 'crop-15x15', $img_class = 'avatar_before_login', $align = '', $avatar_overlay_text = '', $link_class = '', $show_avatar = true )
 {
 	global $current_User;
 
@@ -899,7 +900,10 @@ function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size
 	$img_tag = '';
 	if( $User !== false )
 	{
-		$img_tag = $User->get_avatar_imgtag( $size, $img_class, $align, false, $avatar_overlay_text );
+		if( $show_avatar )
+		{	// Get user avatar
+			$img_tag = $User->get_avatar_imgtag( $size, $img_class, $align, false, $avatar_overlay_text );
+		}
 
 		if( $show_login )
 		{
@@ -931,9 +935,10 @@ function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size
  * @param style class
  * @param image align
  * @param read status, Set icon of the read status, TRUE - users have seen message, else FALSE
+ * @param if true show user avatar
  * @return coma separated login <img> tag
  */
-function get_avatar_imgtags( $user_logins_list, $show_login = true, $link = true, $size = 'crop-15x15', $class = 'avatar_before_login', $align = '', $read_status = NULL )
+function get_avatar_imgtags( $user_logins_list, $show_login = true, $link = true, $size = 'crop-15x15', $class = 'avatar_before_login', $align = '', $read_status = NULL, $show_avatar = true )
 {
 	if( !is_array( $user_logins_list ) )
 	{
@@ -955,7 +960,7 @@ function get_avatar_imgtags( $user_logins_list, $show_login = true, $link = true
 				$icon = get_icon( 'bullet_blue', 'imgtag', array( 'alt' => sprintf( T_('%s has NOT seen this message yet.'), $user_login ), 'style' => 'margin:0 4px' ) );
 			}
 		}
-		$user_imgtags_list[] = '<span class="nowrap">'.$icon.get_avatar_imgtag( $user_login, $show_login, $link, $size, $class, $align ).'</span>';
+		$user_imgtags_list[] = '<span class="nowrap">'.$icon.get_avatar_imgtag( $user_login, $show_login, $link, $size, $class, $align, '', '', $show_avatar ).'</span>';
 	}
 	return implode( '<br />', $user_imgtags_list );
 }
@@ -1227,6 +1232,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.82  2011/10/07 13:14:45  efy-yurybakh
+ * Small messaging UI design changes (changed specs)
+ *
  * Revision 1.81  2011/10/06 16:45:55  efy-yurybakh
  * small messaging UI design changes (additional email)
  *

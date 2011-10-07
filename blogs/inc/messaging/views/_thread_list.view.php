@@ -67,17 +67,17 @@ foreach( $DB->get_results( $recipients_SQL->get() ) as $row )
 	if( !empty( $row->thr_read ) )
 	{
 		$read_by .= '<div>';
-		$read_by .= get_avatar_imgtags( $row->thr_read, true, false, $Blog->get_setting('image_size_messaging'), 'avatar_before_login', '', true );
+		$read_by .= get_avatar_imgtags( $row->thr_read, true, false, $Blog->get_setting('image_size_messaging'), '', '', true, false );
 		if( !empty( $row->thr_unread ) )
 		{
-			$read_by .= ', ';
+			$read_by .= '<br />';
 		}
 		$read_by .= '</div>';
 	}
 
 	if( !empty( $row->thr_unread ) )
 	{
-		$read_by .= '<div>'.get_avatar_imgtags( $row->thr_unread, true, false, $Blog->get_setting( 'image_size_messaging' ), 'avatar_before_login', '', false ).'</div>';
+		$read_by .= '<div>'.get_avatar_imgtags( $row->thr_unread, true, false, $Blog->get_setting( 'image_size_messaging' ), '', '', false, false ).'</div>';
 	}
 
 	$read_unread_recipients[$row->thr_ID] = $read_by;
@@ -200,7 +200,7 @@ $Results->cols[] = array(
 					'th' => T_('With'),
 					'th_class' => 'thread_with shrinkwrap',
 					'td_class' => 'thread_with',
-					'td' => '%get_avatar_imgtags( #thrd_recipients#, true, true, "'.$image_size.'" )%',
+					'td' => '%get_avatar_imgtags( #thrd_recipients#, true, true, "'.$image_size.'", "avatar_before_login_middle" )%',
 					);
 
 /**
@@ -312,6 +312,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.37  2011/10/07 13:14:45  efy-yurybakh
+ * Small messaging UI design changes (changed specs)
+ *
  * Revision 1.36  2011/10/06 16:45:55  efy-yurybakh
  * small messaging UI design changes (additional email)
  *
