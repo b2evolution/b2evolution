@@ -351,7 +351,7 @@ function get_messaging_sub_entries( $is_admin )
 	}
 	else
 	{
-		$url = $Blog->gen_blogurl().'?disp=';
+		$url = url_add_param( $Blog->gen_blogurl(), 'disp=' );
 	}
 
 	$messaging_sub_entries = array( 
@@ -405,6 +405,9 @@ function get_message_params_from_session()
 
 /*
  * $Log$
+ * Revision 1.16  2011/10/08 06:59:46  efy-yurybakh
+ * fix bad urls
+ *
  * Revision 1.15  2011/10/06 06:18:29  efy-asimo
  * Add messages link to settings
  * Update messaging notifications

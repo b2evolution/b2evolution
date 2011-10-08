@@ -308,7 +308,7 @@ function get_user_register_url( $redirect = NULL, $default_source_string = '', $
 		$BlogCache = & get_BlogCache();
 		$Blog = $BlogCache->get_by_ID( $blog );
 
-		$register_url = $Blog->get( 'url' ).'?disp=register';
+		$register_url = url_add_param( $Blog->get( 'url' ), 'disp=register' );
 	}
 	else
 	{
@@ -1114,13 +1114,13 @@ function get_user_sub_entries( $is_admin, $user_ID )
 
 	if( $is_admin )
 	{
-		$ctrl_param = '?ctrl=user&amp;user_tab=';
+		$ctrl_param = 'ctrl=user&amp;user_tab=';
 		$user_param = '&amp;user_ID='.$user_ID;
 		$base_url = '';
 	}
 	else
 	{
-		$ctrl_param = '?disp=';
+		$ctrl_param = 'disp=';
 		$user_param = '';
 		$base_url = $Blog->gen_blogurl();
 	}
@@ -1131,42 +1131,42 @@ function get_user_sub_entries( $is_admin, $user_ID )
 	{
 		$users_sub_entries['profile'] = array(
 							'text' => T_('Profile'),
-							'href' => $base_url.$ctrl_param.'profile'.$user_param	);
+							'href' => url_add_param( $base_url, $ctrl_param.'profile'.$user_param ) );
 
 		if( $Settings->get('allow_avatars') )
 		{
 			$users_sub_entries['avatar'] = array(
 							'text' => T_('Profile picture'),
-							'href' => $base_url.$ctrl_param.'avatar'.$user_param );
+							'href' => url_add_param( $base_url, $ctrl_param.'avatar'.$user_param ) );
 		}
 
 		if( $edit_perm )
 		{
 			$users_sub_entries['pwdchange'] = array(
 								'text' => T_('Password'),
-								'href' => $base_url.$ctrl_param.'pwdchange'.$user_param );
+								'href' => url_add_param( $base_url, $ctrl_param.'pwdchange'.$user_param ) );
 		}
 
 		$users_sub_entries['userprefs'] = array(
 							'text' => T_('Preferences'),
-	 						'href' => $base_url.$ctrl_param.'userprefs'.$user_param );
+							'href' => url_add_param( $base_url, $ctrl_param.'userprefs'.$user_param ) );
 
 		if( $is_admin )
-		{ // show this only in backoffice
+		{	// show this only in backoffice
 			$users_sub_entries['advanced'] = array(
 								'text' => T_('Advanced'),
-								'href' => '?ctrl=user&amp;user_tab=advanced'.$user_param );
+								'href' => url_add_param( $base_url, 'ctrl=user&amp;user_tab=advanced'.$user_param ) );
 
 			if( $current_User->group_ID == 1 )
-			{ // Only admin users can see the 'Admin' tab
+			{	// Only admin users can see the 'Admin' tab
 				$users_sub_entries['admin'] = array(
 									'text' => T_('Admin'),
-									'href' => '?ctrl=user&amp;user_tab=admin'.$user_param );
+									'href' => url_add_param( $base_url, 'ctrl=user&amp;user_tab=admin'.$user_param ) );
 			}
 
 			$users_sub_entries['blogs'] = array(
 								'text' => T_('Personal blogs'),
-		 						'href' => '?ctrl=user&amp;user_tab=blogs'.$user_param );
+								'href' => url_add_param( $base_url, 'ctrl=user&amp;user_tab=blogs'.$user_param ) );
 		}
 	}
 
@@ -1274,6 +1274,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.84  2011/10/08 06:59:46  efy-yurybakh
+ * fix bad urls
+ *
  * Revision 1.83  2011/10/07 17:22:52  efy-yurybakh
  * user avatar display default
  *

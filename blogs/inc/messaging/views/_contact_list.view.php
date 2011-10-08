@@ -117,12 +117,11 @@ $Results->filter_area = array(
  */
 function contact_block( $block, $user_ID )
 {
-	global $samedomain_htsrv_url;
 	// set action url
 	$action_url = get_messaging_url( 'contacts' );
 	if( !is_admin_page() )
 	{ // in front office the action will be processed by messaging.php
-		$action_url = $samedomain_htsrv_url.'messaging.php?disp=contacts&redirect_to='.$action_url;
+		$action_url = get_samedomain_htsrv_url().'messaging.php?disp=contacts&redirect_to='.rawurlencode( $action_url );
 	}
 
 	if( $block == 0 )
@@ -293,6 +292,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.19  2011/10/08 06:59:46  efy-yurybakh
+ * fix bad urls
+ *
  * Revision 1.18  2011/10/02 15:25:03  efy-yurybakh
  * small messaging UI design changes
  *

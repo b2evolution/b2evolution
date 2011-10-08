@@ -122,6 +122,7 @@ switch( $disp )
 			debug_die( "Invalid action param" );
 		}
 		set_contact_blocked( $user_ID, ( ( $action == 'block' ) ? 1 : 0 ) );
+		$redirect_to = str_replace( '&amp;', '&', $redirect_to );
 		break;
 
 	// messages action
@@ -158,6 +159,9 @@ header_redirect( $redirect_to ); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.7  2011/10/08 06:59:45  efy-yurybakh
+ * fix bad urls
+ *
  * Revision 1.6  2011/10/04 08:39:29  efy-asimo
  * Comment and message forms save/reload content in case of error
  *
