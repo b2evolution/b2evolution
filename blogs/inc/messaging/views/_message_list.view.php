@@ -320,14 +320,11 @@ function delete_action( $thrd_ID, $msg_ID )
 }
 
 if( $current_User->check_perm( 'perm_messaging', 'delete' ) && $Results->total_rows > 1 )
-{
-	// We have permission to modify:
-
+{	// We have permission to modify and there are more than 1 message (otherwise it's better to delete the whole thread):
 	$Results->cols[] = array(
 							'th' => T_('Del'),
 							'th_class' => 'shrinkwrap',
 							'td_class' => 'shrinkwrap',
-							// Do not display the icon if the message cannot be deleted
 							'td' => '%delete_action( #msg_thread_ID#, #msg_ID#)%',
 						);
 }
@@ -351,6 +348,9 @@ $Form->begin_form( $params['form_class'], '' );
 $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' ) ) );
 /*
  * $Log$
+ * Revision 1.44  2011/10/08 01:27:05  fplanque
+ * no message
+ *
  * Revision 1.43  2011/10/08 01:12:16  fplanque
  * small changes
  *
