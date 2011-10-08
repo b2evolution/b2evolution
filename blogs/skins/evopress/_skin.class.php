@@ -39,8 +39,8 @@ class evopress_Skin extends Skin
 
 
 	/**
-   * Get definitions for editable params
-   *
+	 * Get definitions for editable params
+	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param local params like 'for_editing' => true
 	 */
@@ -117,6 +117,9 @@ class evopress_Skin extends Skin
 
 /*
  * $Log$
+ * Revision 1.15  2011/10/08 05:48:43  fplanque
+ * minor
+ *
  * Revision 1.14  2011/10/03 10:07:06  efy-yurybakh
  * bubbletips & identity_links cleanup
  *
