@@ -773,7 +773,7 @@ class _core_Module extends Module
 
 		$entries = array(
 			'userprefs' => array(
-					'text' => ($current_User->has_avatar() ? $current_User->get_avatar_imgtag( 'crop-15x15', '', 'top' ).' ' : '' ).'<strong>'.$current_User->get_colored_name().'</strong>',
+					'text' => $current_User->get_avatar_imgtag( 'crop-15x15', '', 'top' ).' <strong>'.$current_User->get_colored_name().'</strong>',
 					'href' => get_user_profile_url(),
 					'entries' => array(
 						'profile' => array(
@@ -1053,6 +1053,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.88  2011/10/08 07:23:29  efy-yurybakh
+ * In skin posting
+ *
  * Revision 1.87  2011/10/07 00:40:23  fplanque
  * fix
  *

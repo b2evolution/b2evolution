@@ -152,11 +152,13 @@ if( $Settings->get('allow_avatars') )
 	 */
 	function user_avatar( $user_ID )
 	{
+		global $Blog;
+
 		$UserCache = & get_UserCache();
 		$User = & $UserCache->get_by_ID( $user_ID, false, false );
 		if( $User )
 		{
-			$avatar_tag = $User->get_avatar_imgtag();
+			$avatar_tag = $User->get_avatar_imgtag( $Blog->get_setting('image_size_messaging') );
 			$identity_url = get_user_identity_url( $user_ID );
 			if( !empty( $avatar_tag ) )
 			{
@@ -185,7 +187,7 @@ if( in_array( 'login', $show_columns ) )
 		$User = & $UserCache->get_by_ID( $user_ID, false, false );
 		if( $User )
 		{
-			return $link ? get_user_identity_link( $User->login, $User->ID ) : $User->login;
+			return $link ? get_user_identity_link( $User->login, $User->ID, 'user', 'text' ) : $User->login;
 		}
 		return '';
 	}
@@ -292,6 +294,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.20  2011/10/08 07:23:30  efy-yurybakh
+ * In skin posting
+ *
  * Revision 1.19  2011/10/08 06:59:46  efy-yurybakh
  * fix bad urls
  *

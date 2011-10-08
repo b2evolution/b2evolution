@@ -1253,14 +1253,7 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 	$form_title = '<span class="user_title">'.sprintf( '%s &ndash; %s', $edited_User->dget('fullname').' &laquo;'.$edited_User->get_colored_name().'&raquo;', $user_tab_title ).'</span>';
 
 	// set avatar tag
-	if( $edited_User->has_avatar() )
-	{
-		$avatar_tag = $edited_User->get_avatar_imgtag( 'crop-48x48', 'avatar', '', true );
-	}
-	else
-	{
-		$avatar_tag = get_avatar_imgtag_default( 'crop-48x48', 'floatleft' );
-	}
+	$avatar_tag = $edited_User->get_avatar_imgtag( 'crop-48x48', 'floatleft', '', true );
 
 	// build menu3
 	$AdminUI->add_menu_entries( array( 'users', 'users' ), get_user_sub_entries( true, $edited_User->ID ) );
@@ -1274,6 +1267,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.85  2011/10/08 07:23:30  efy-yurybakh
+ * In skin posting
+ *
  * Revision 1.84  2011/10/08 06:59:46  efy-yurybakh
  * fix bad urls
  *
