@@ -268,7 +268,7 @@ function get_read_by( $thread_ID )
 $Results->cols[] = array(
 					'th' => T_('Read?'),
 					'th_class' => 'shrinkwrap',
-					'td_class' => 'top',
+					'td_class' => '',
 					'td' => '%get_read_by( #thrd_ID# )%',
 					);
 
@@ -312,6 +312,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.38  2011/10/08 01:12:16  fplanque
+ * small changes
+ *
  * Revision 1.37  2011/10/07 13:14:45  efy-yurybakh
  * Small messaging UI design changes (changed specs)
  *

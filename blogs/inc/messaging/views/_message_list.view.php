@@ -214,7 +214,7 @@ function user_avatar( $user_ID )
 {
 	$UserCache = & get_UserCache();
 	$User = & $UserCache->get_by_ID( $user_ID );
-	
+
 	return $User->get_avatar_imgtag( 'crop-80x80' );
 }
 /**
@@ -319,16 +319,16 @@ function delete_action( $thrd_ID, $msg_ID )
 	}
 }
 
-if( $current_User->check_perm( 'perm_messaging', 'delete' ) )
+if( $current_User->check_perm( 'perm_messaging', 'delete' ) && $Results->total_rows > 1 )
 {
 	// We have permission to modify:
 
 	$Results->cols[] = array(
-							'th' => T_('Actions'),
+							'th' => T_('Del'),
 							'th_class' => 'shrinkwrap',
 							'td_class' => 'shrinkwrap',
 							// Do not display the icon if the message cannot be deleted
-							'td' => $Results->total_rows == 1 ? '' : '%delete_action( #msg_thread_ID#, #msg_ID#)%',
+							'td' => '%delete_action( #msg_thread_ID#, #msg_ID#)%',
 						);
 }
 
@@ -351,6 +351,9 @@ $Form->begin_form( $params['form_class'], '' );
 $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' ) ) );
 /*
  * $Log$
+ * Revision 1.43  2011/10/08 01:12:16  fplanque
+ * small changes
+ *
  * Revision 1.42  2011/10/07 17:22:52  efy-yurybakh
  * user avatar display default
  *
