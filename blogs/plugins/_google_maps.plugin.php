@@ -80,103 +80,14 @@ class google_maps_plugin extends Plugin
 	function GetDefaultSettings( & $params )
 	{
 		$r = array(
-			'click_me' => array(
-				'label' => 'Click me!',
-				'defaultvalue' => '1',
-				'type' => 'checkbox',
-			),
-			'input_me' => array(
-				'label' => 'How are you?',
-				'defaultvalue' => '',
-				'note' => 'Welcome to b2evolution',
-			),
-			'number' => array(
-				'label' => 'Number',
-				'defaultvalue' => '8',
-				'note' => '1-9',
-				'valid_range' => array( 'min'=>1, 'max'=>9 ),
-			),
-			'my_select' => array(
-				'label' => 'Selector',
-				'id' => $this->classname.'_my_select',
-				'onchange' => 'document.getElementById("'.$this->classname.'_a_disabled_one").disabled = ( this.value == "sun" );',
-				'defaultvalue' => 'one',
-				'type' => 'select',
-				'options' => array( 'sun' => 'Sunday', 'mon' => 'Monday' ),
-				'note' => 'This combo is connected with the next field',
-			),
-			'a_disabled_one' => array(
-				'label' => 'This one is disabled',
-				'id' => $this->classname.'_a_disabled_one',
-				'type' => 'checkbox',
-				'defaultvalue' => '1',
-				'disabled' => true, // this can be useful if you detect that something cannot be changed. You probably want to add a 'note' then, too.
-				'note' => 'Change the above select input to "Monday" to enable it.',
-			),
-			'select_multiple' => array(
-				'label' => $this->T_( 'Multiple select' ),
-				'type' => 'select',
-				'multiple' => true,
-				'allow_none' => true,
-				'options' => array( 'sci' => $this->T_( 'Scissors' ), 'pap' => $this->T_( 'Paper' ), 'sto' => $this->T_( 'Stone') ),
-				'defaultvalue' => array( 'sci', 'sto' ),
-				'note' => $this-> T_( 'This is a free style Multiple Select. You can choose zero or one or more items' )
-			),
-			/*
-			 * note: The $this->T_( string )function tanslates the string.
-			 * However since it inherits from the class Plugin you will need
-			 * to provide the translation on a per plugin basis. In other
-			 * words: this will not be translated through B2evolution.
-			 */
-			'blog' => array(
-				'label' => 'A blog',
-				'type' => 'select_blog',  // TODO: does not scale with 500 blogs
-				'allow_none' => true,
-			),
-			'blogs' => array(
-				'label' => 'A set of blogs',
-				'type' => 'select_blog',	// TODO: BROKEN + does not scale with 500 blogs
-				'multiple' => true,
-				'allow_none' => true,
-			),
-			'single_user' => array(
-				'label' => 'A single user',
-				'type' => 'select_user',
-				'allow_none' => true,
-				'default_value' => 0,
-				'note' => 'Allows chosing none or one user'
-			),
-			'sets' => array(
-				'type' => 'select_user',
-				'label' => 'Multiple users',
-				'min_count' => 0,
-				'max_count' => 3,
-				'multiple' => 'true',
-				'allow_none' => true,
-				'note' => 'Allows none or one or more than one user (up to three in this example)',
-				'entries' => array(
-					'user' => array(
-						'label' => 'A user',
-						'type' => 'select_user',		// TODO: does not scale with 500 users
-						'allow_none' => true,
-					),
-				),
-			),
-			'maxlen' => array(
-				'label' => 'Max',
-				'type' => 'textarea',
-				'maxlength' => 10,
-				'note' => 'Maximum length is 10 here.',
-			),
-		);
+			'width' => array(
+				'label' => 'Widget width(px)',
+				'defaultvalue' => '0',
+				'note' => '100% width if left empty',
+				'valid_range' => array( 'min'=>0 ),
+			)
+			);
 
-		if( $params['for_editing'] )
-		{ // we're asked for the settings for editing:
-			if( $this->Settings->get('my_select') == 'mon' )
-			{
-				$r['a_disabled_one']['disabled'] = false;
-			}
-		}
 
 		return $r;
 	}
@@ -192,18 +103,15 @@ class google_maps_plugin extends Plugin
 	 */
 	function GetDefaultUserSettings()
 	{
-		return array(
-				'echo_random' => array(
-					'label' => 'Echo a random number in AdminBeginPayload event',
-					'type' => 'checkbox',
-					'defaultvalue' => '0',
-				),
-				'deactivate' => array(
-					'label' => 'Deactivate',
-					'type' => 'checkbox',
-					'defaultvalue' => '0',
-				),
+		$r = array(
+			'width' => array(
+				'label' => 'Widget width(px)',
+				'defaultvalue' => '0',
+				'note' => '100% width if left empty',
+				'valid_range' => array( 'min'=>0 ),
+			)
 			);
+		return $r;
 	}
 
 
@@ -356,7 +264,7 @@ class google_maps_plugin extends Plugin
 	var myOptions = {
 		  zoom: 11,
 		  center: latlng,
-		  mapTypeId: google.maps.MapTypeId.HYBRID,
+		  mapTypeId: google.maps.MapTypeId.ROADMAP,
 		  mapTypeControlOptions:
 			  {
 			   style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
@@ -378,15 +286,61 @@ class google_maps_plugin extends Plugin
 		});
 
 	var geocoder = new google.maps.Geocoder();
+	var geo_region = null;
+
+	function set_region(region_code)
+	{
+		geo_region = region_code;
+	}
+
+	geocoder.geocode({'latLng': latlng}, function(region_res, region_status)
+		{
+			if (region_status == google.maps.GeocoderStatus.OK)
+			{
+				if (region_res)
+				{
+					var country = region_res.pop();
+					set_region(country.address_components[0].short_name);
+				}
+			}
+			else
+			{
+				set_region('');
+			}
+		});
+
+
 	var searchLoc = null;
 	var bounds = null;
-	
+
+	function marker_dragend(marker, map)
+	{
 	google.maps.event.addListener(marker, 'dragend', function()
 	{
 		map.setCenter(marker.getPosition());
 		jQuery('#item_double3').val(marker.getPosition().lat());
 		jQuery('#item_double4').val(marker.getPosition().lng());
+
+		geocoder.geocode({'latLng': marker.getPosition()}, function(region_res, region_status)
+		{
+			if (region_status == google.maps.GeocoderStatus.OK)
+			{
+				if (region_res)
+				{
+					var country = region_res.pop();
+					set_region(country.address_components[0].short_name);
+				}
+			}
+			else
+			{
+				set_region('');
+			}
+		});
+
 	});
+	}
+	
+	marker_dragend(marker, map);
 
 	google.maps.event.addListener(map, 'zoom_changed', function()
 	{
@@ -405,16 +359,27 @@ class google_maps_plugin extends Plugin
 		draggable: true
 		});
 
+		geocoder.geocode({'latLng': event.latLng}, function(region_res, region_status)
+		{
+			if (region_status == google.maps.GeocoderStatus.OK)
+			{
+				if (region_res)
+				{
+					var country = region_res.pop();
+					set_region(country.address_components[0].short_name);
+				}
+			}
+			else
+			{
+				set_region('');
+			}
+		});
+
 		map.setCenter(marker.getPosition());
 		jQuery('#item_double3').val(event.latLng.lat());
 		jQuery('#item_double4').val(event.latLng.lng());
 
-		google.maps.event.addListener(marker, 'dragend', function()
-		{
-			map.setCenter(marker.getPosition());
-			jQuery('#item_double3').val(marker.getPosition().lat());
-			jQuery('#item_double4').val(marker.getPosition().lng());
-		});
+		marker_dragend(marker, map);
 	});
 
 
@@ -426,7 +391,7 @@ class google_maps_plugin extends Plugin
 			{
 				geocoder = new google.maps.Geocoder();
 			}
-			geocoder.geocode( {'address': request.term }, function(results, status)
+			geocoder.geocode( {'address': request.term, 'region' : geo_region }, function(results, status)
 			{
 				if (status == google.maps.GeocoderStatus.OK)
 				{
@@ -471,28 +436,46 @@ class google_maps_plugin extends Plugin
 	jQuery('#locate_on_map').click(function(){
 	if (searchLoc != null)
 	{
-				if (marker != null)
-					{
-						marker.setMap(null);
-					}
 
-					marker = new google.maps.Marker({
-					position: searchLoc,
-					map: map,
-					title:"Position",
-					draggable: true
-					});
-					map.fitBounds(bounds);
-					google.maps.event.addListener(marker, 'dragend', function()
-					{
-						map.setCenter(marker.getPosition());
-						jQuery('#item_double3').val(marker.getPosition().lat());
-						jQuery('#item_double4').val(marker.getPosition().lng());
+	geocoder.geocode({'latLng': searchLoc}, function(region_res, region_status)
+		{
+			if (region_status == google.maps.GeocoderStatus.OK)
+			{
+				if (region_res)
+				{
+					var country = region_res.pop();
+					set_region(country.address_components[0].short_name);
+				}
+			}
+			else
+			{
+				set_region('');
+			}
+		});
 
-					});
-					jQuery('#item_double3').val(searchLoc.lat());
-					jQuery('#item_double4').val(searchLoc.lng());
-					jQuery('#google_map_zoom').val(map.getZoom());
+		if (marker != null)
+		{
+			marker.setMap(null);
+		}
+
+		marker = new google.maps.Marker({
+			position: searchLoc,
+			map: map,
+			title:"Position",
+			draggable: true
+			});
+		if (bounds !== undefined)
+		{
+			map.fitBounds(bounds);
+		}
+		else
+		{
+			map.setCenter(searchLoc);
+		}
+		marker_dragend(marker, map);
+		jQuery('#item_double3').val(searchLoc.lat());
+		jQuery('#item_double4').val(searchLoc.lng());
+		jQuery('#google_map_zoom').val(map.getZoom());
 	}
 
 	})
@@ -513,55 +496,58 @@ class google_maps_plugin extends Plugin
 
 	function SkinTag( $params )
 	{
+		 
+
 		global $Item;
 		$lat = $Item->get('double3');
 		$lng = $Item->get('double4');
-	?>
-	<div id="map_canvas" style="width:300px; height:300px; margin: 5px 5px 5px 5px;"></div>
-	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
-	<script type="text/javascript">
-	<?php
-	if (!empty($lat) && !empty($lng))
-	{
+		if (empty($lat) && empty($lng))
+		{
+			return;
+		}
+
+		 $width = $this->Settings->get('width');
+		 if (empty($width))
+		 {
+			$width = 'width:100%';
+		 }
+		 else
+		 {
+			$width = 'width:'.$width.'px';
+		 }
+
+
 		?>
+		<div id="map_canvas" style="<?php echo $width; ?>; height:300px; margin: 5px 5px 5px 5px;"></div>
+		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+		<script type="text/javascript">
 		var latlng = new google.maps.LatLng(<?php echo $lat; ?>, <?php echo $lng;?>);
+		var mapTypes = new Array();
+		mapTypes.push(google.maps.MapTypeId.HYBRID);
+		mapTypes.push(google.maps.MapTypeId.ROADMAP);
+		mapTypes.push(google.maps.MapTypeId.SATELLITE);
+		mapTypes.push(google.maps.MapTypeId.TERRAIN);
+
+		var myOptions = {
+			  zoom: 17,
+			  center: latlng,
+			  mapTypeId: google.maps.MapTypeId.ROADMAP,
+			  mapTypeControlOptions:
+				  {
+				   style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+				   mapTypeIds: mapTypes
+				  }
+			};
+		var map = new google.maps.Map(document.getElementById("map_canvas"),
+				myOptions);
+		var marker = new google.maps.Marker({
+			position: latlng,
+			map: map,
+			title:"Position"
+			});
+
+		</script>
 		<?php
-	}
-	else
-	{
-		?>
-		var latlng = new google.maps.LatLng(48.856614, 2.3522219000000177);
-		<?php
-	}
-	?>
-	var mapTypes = new Array();
-	mapTypes.push(google.maps.MapTypeId.HYBRID);
-	mapTypes.push(google.maps.MapTypeId.ROADMAP);
-	mapTypes.push(google.maps.MapTypeId.SATELLITE);
-	mapTypes.push(google.maps.MapTypeId.TERRAIN);
-
-	var myOptions = {
-		  zoom: 17,
-		  center: latlng,
-		  mapTypeId: google.maps.MapTypeId.HYBRID,
-		  mapTypeControlOptions:
-			  {
-			   style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
-			   mapTypeIds: mapTypes
-			  }
-		};
-
-	var map = new google.maps.Map(document.getElementById("map_canvas"),
-			myOptions);
-
-	var marker = new google.maps.Marker({
-		position: latlng,
-		map: map,
-		title:"Position"
-		});
-
-	</script>
-	<?php
 	}
 
 	/**
@@ -702,6 +688,9 @@ class google_maps_plugin extends Plugin
 }
 /*
  * $Log$
+ * Revision 1.5  2011/10/10 10:37:00  efy-vitalij
+ * add gmaps plugin functional
+ *
  * Revision 1.4  2011/10/07 15:08:57  efy-vitalij
  * change widget display zoom
  *
