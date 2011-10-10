@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2011-10-10 21:25+0200\n"
+"POT-Creation-Date: 2011-10-10 21:58+0200\n"
 "PO-Revision-Date: 2011-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1337,6 +1337,18 @@ msgstr ""
 #: ../../../inc/_blog_main.inc.php:533
 #, php-format
 msgid "The skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file."
+msgstr ""
+
+#: ../../../inc/_core/__core.init.php:116
+#: ../../../inc/files/model/_file.class.php:710
+#: ../../../inc/sessions/views/_stats_refdomains.view.php:102
+#: ../../../inc/sessions/views/_stats_refdomains.view.php:111
+#: ../../../inc/sessions/views/_stats_summary.view.php:130
+#: ../../../inc/tools/model/_system.funcs.php:382
+#: ../../../inc/tools/model/_system.funcs.php:412
+#: ../../../inc/widgets/model/_widget.class.php:174
+#: ../../../inc/widgets/model/_widget.class.php:230
+msgid "Unknown"
 msgstr ""
 
 #: ../../../inc/_core/__core.init.php:325
@@ -7601,17 +7613,6 @@ msgstr ""
 #: ../../../inc/files/model/_file.class.php:699
 #: ../../../inc/files/views/_file_list.inc.php:218
 msgid "Directory"
-msgstr ""
-
-#: ../../../inc/files/model/_file.class.php:710
-#: ../../../inc/sessions/views/_stats_refdomains.view.php:102
-#: ../../../inc/sessions/views/_stats_refdomains.view.php:111
-#: ../../../inc/sessions/views/_stats_summary.view.php:130
-#: ../../../inc/tools/model/_system.funcs.php:382
-#: ../../../inc/tools/model/_system.funcs.php:412
-#: ../../../inc/widgets/model/_widget.class.php:174
-#: ../../../inc/widgets/model/_widget.class.php:230
-msgid "Unknown"
 msgstr ""
 
 #. TRANS: short for '<directory>'
@@ -15309,7 +15310,7 @@ msgid "Preferred locale for admin interface, notifications, etc."
 msgstr ""
 
 #: ../../../inc/users/views/_user_preferences.form.php:176
-msgid "Check this if you want to log in from different computers/browsers at the same time. Otherwise, logging in from a new computer/browser will disconnect you on the previous one."
+msgid "Check this if you want to be able to log in from different computers/browsers at the same time. Otherwise, logging in from a new computer/browser will automatically disconnect you on the previous one."
 msgstr ""
 
 #: ../../../inc/users/views/_user_preferences.form.php:198
@@ -18466,21 +18467,19 @@ msgstr ""
 msgid "Log in!"
 msgstr ""
 
-#: ../../../skins/_login.disp.php:102 ../../../skins/_register.disp.php:112
-#: ../../../skins_adm/login/_login_form.main.php:168
-#: ../../../skins_adm/login/_lostpass_form.main.php:58
-#: ../../../skins_adm/login/_reg_form.main.php:90
-#, php-format
-msgid "Your IP address (%s) and the current time are being logged."
-msgstr ""
-
-#: ../../../skins/_login.disp.php:105
-#: ../../../skins_adm/login/_login_form.main.php:223
+#: ../../../skins/_login.disp.php:102
+#: ../../../skins_adm/login/_login_form.main.php:219
 msgid "No account yet? Register here"
 msgstr ""
 
-#: ../../../skins/_login.disp.php:110
+#: ../../../skins/_login.disp.php:107
 msgid "Use standard login form instead"
+msgstr ""
+
+#: ../../../skins/_login.disp.php:109 ../../../skins/_register.disp.php:118
+#: ../../../skins_adm/login/_html_footer.inc.php:31
+#, php-format
+msgid "Your IP address: %s"
 msgstr ""
 
 #: ../../../skins/_login.disp.php:133
@@ -18559,8 +18558,8 @@ msgstr ""
 msgid "Register my account now!"
 msgstr ""
 
-#: ../../../skins/_register.disp.php:115
-#: ../../../skins_adm/login/_reg_form.main.php:97
+#: ../../../skins/_register.disp.php:113
+#: ../../../skins_adm/login/_reg_form.main.php:95
 msgid "Already have an account... ?"
 msgstr ""
 
@@ -19045,7 +19044,7 @@ msgstr ""
 msgid "You will have to accept cookies in order to log in."
 msgstr ""
 
-#: ../../../skins_adm/login/_login_form.main.php:200
+#: ../../../skins_adm/login/_login_form.main.php:197
 msgid "Please wait..."
 msgstr ""
 

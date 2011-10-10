@@ -173,7 +173,7 @@ if( $action != 'view' )
 	else
 	{
 		$Form->checkbox( 'edited_user_set_login_multiple_sessions', $multiple_sessions_value, T_('Multiple sessions'),
-				T_('Check this if you want to log in from different computers/browsers at the same time. Otherwise, logging in from a new computer/browser will disconnect you on the previous one.'),
+				T_('Check this if you want to be able to log in from different computers/browsers at the same time. Otherwise, logging in from a new computer/browser will automatically disconnect you on the previous one.'),
 				'', 1, $multiple_sessions_field_disabled );
 	}
 
@@ -253,6 +253,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.25  2011/10/10 20:04:09  fplanque
+ * i18n cleanup
+ *
  * Revision 1.24  2011/10/07 00:40:01  fplanque
  * changed wording
  *

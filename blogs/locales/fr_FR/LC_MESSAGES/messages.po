@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 2.5\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2011-10-10 21:25+0200\n"
-"PO-Revision-Date: 2011-10-10 21:26+0100\n"
+"POT-Creation-Date: 2011-10-10 21:58+0200\n"
+"PO-Revision-Date: 2011-10-10 21:58+0100\n"
 "Last-Translator: Francois Planque <http://fplanque.com>\n"
 "Language-Team: François Planque <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -1412,6 +1412,18 @@ msgstr "L'habillage/skin [%s] n'est pas installé sur ce système."
 #, php-format
 msgid "The skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file."
 msgstr "L'habillage [%s] affectée au blog [%s] n'existe pas. Elle doit être correctement configurée dans les <a %s>propriétés du blog</a> ou dans le fichier stub."
+
+#: ../../../inc/_core/__core.init.php:116
+#: ../../../inc/files/model/_file.class.php:710
+#: ../../../inc/sessions/views/_stats_refdomains.view.php:102
+#: ../../../inc/sessions/views/_stats_refdomains.view.php:111
+#: ../../../inc/sessions/views/_stats_summary.view.php:130
+#: ../../../inc/tools/model/_system.funcs.php:382
+#: ../../../inc/tools/model/_system.funcs.php:412
+#: ../../../inc/widgets/model/_widget.class.php:174
+#: ../../../inc/widgets/model/_widget.class.php:230
+msgid "Unknown"
+msgstr "Inconnu"
 
 #: ../../../inc/_core/__core.init.php:325
 #: ../../../inc/files/_files.init.php:186
@@ -7715,17 +7727,6 @@ msgstr "Fichier &laquo;%s&raquo;"
 #: ../../../inc/files/views/_file_list.inc.php:218
 msgid "Directory"
 msgstr "Répertoire"
-
-#: ../../../inc/files/model/_file.class.php:710
-#: ../../../inc/sessions/views/_stats_refdomains.view.php:102
-#: ../../../inc/sessions/views/_stats_refdomains.view.php:111
-#: ../../../inc/sessions/views/_stats_summary.view.php:130
-#: ../../../inc/tools/model/_system.funcs.php:382
-#: ../../../inc/tools/model/_system.funcs.php:412
-#: ../../../inc/widgets/model/_widget.class.php:174
-#: ../../../inc/widgets/model/_widget.class.php:230
-msgid "Unknown"
-msgstr "Inconnu"
 
 #. TRANS: short for '<directory>'
 #: ../../../inc/files/model/_file.class.php:993
@@ -15247,7 +15248,7 @@ msgstr "Code postal"
 #: ../../../inc/users/views/_user_identity.form.php:332
 #: ../../../inc/users/views/_user_identity.form.php:366
 msgid "My age group"
-msgstr "Ma tranche d'âge"
+msgstr "Ma tranche d'âge: de"
 
 #: ../../../inc/users/views/_user_identity.form.php:365
 msgid "My ZIP/Postcode"
@@ -15388,7 +15389,7 @@ msgstr "Changer le mot de passe!"
 
 #: ../../../inc/users/views/_user_password.form.php:123
 msgid "Abandon password change"
-msgstr "Abandon le changement de mot de passe"
+msgstr "Abandonner le changement de mot de passe"
 
 #: ../../../inc/users/views/_user_preferences.form.php:85
 msgid "Edit preferences"
@@ -15408,7 +15409,7 @@ msgstr "des emails à travers un formulaire qui ne révélera PAS mon adresse email
 
 #: ../../../inc/users/views/_user_preferences.form.php:117
 msgid "Other users can send me"
-msgstr "Les autres utilisateurs peuvent m'envoyer"
+msgstr "Les autres peuvent m'envoyer"
 
 #: ../../../inc/users/views/_user_preferences.form.php:122
 msgid "I receive a private message."
@@ -15442,7 +15443,7 @@ msgstr "Autres préférences"
 #: ../../../inc/users/views/_user_preferences.form.php:144
 #: ../../../inc/users/views/_user_preferences.form.php:228
 msgid "Preferred locale"
-msgstr "Locale préférée"
+msgstr "Langue préférée"
 
 #: ../../../inc/users/views/_user_preferences.form.php:144
 #: ../../../inc/users/views/_user_preferences.form.php:228
@@ -15450,8 +15451,8 @@ msgid "Preferred locale for admin interface, notifications, etc."
 msgstr "Locale préférée pour l'interface d'administration, les notifications, etc."
 
 #: ../../../inc/users/views/_user_preferences.form.php:176
-msgid "Check this if you want to log in from different computers/browsers at the same time. Otherwise, logging in from a new computer/browser will disconnect you on the previous one."
-msgstr "Cochez cette option si vous voulez vous connecter à partir de différents ordinateurs / navigateurs à la fois. Sinon, se connectez depuis un autre ordinateur / navigateur vous déconnectera sur le précédent."
+msgid "Check this if you want to be able to log in from different computers/browsers at the same time. Otherwise, logging in from a new computer/browser will automatically disconnect you on the previous one."
+msgstr "Cochez cette option si vous voulez pouvoir vous connecter à partir de différents ordinateurs / navigateurs simultanément. Dans le cas contraire, chaque nouvelle connection sur un nouvel ordinateur / navigateur vous déconnectera automatiquement du précédent."
 
 #: ../../../inc/users/views/_user_preferences.form.php:198
 msgid "use default duration"
@@ -18739,22 +18740,20 @@ msgid "Log in!"
 msgstr "Se connecter!"
 
 #: ../../../skins/_login.disp.php:102
-#: ../../../skins/_register.disp.php:112
-#: ../../../skins_adm/login/_login_form.main.php:168
-#: ../../../skins_adm/login/_lostpass_form.main.php:58
-#: ../../../skins_adm/login/_reg_form.main.php:90
-#, php-format
-msgid "Your IP address (%s) and the current time are being logged."
-msgstr "Votre adresse IP (%s) et l'heure courante sont enregistrés."
-
-#: ../../../skins/_login.disp.php:105
-#: ../../../skins_adm/login/_login_form.main.php:223
+#: ../../../skins_adm/login/_login_form.main.php:219
 msgid "No account yet? Register here"
 msgstr "Pas encore de compte? Inscrivez-vous ici"
 
-#: ../../../skins/_login.disp.php:110
+#: ../../../skins/_login.disp.php:107
 msgid "Use standard login form instead"
 msgstr "Utiliser le formulaire de connexion standard à la place"
+
+#: ../../../skins/_login.disp.php:109
+#: ../../../skins/_register.disp.php:118
+#: ../../../skins_adm/login/_html_footer.inc.php:31
+#, php-format
+msgid "Your IP address: %s"
+msgstr "Votre adresse IP: %s"
 
 #: ../../../skins/_login.disp.php:133
 #: ../../../skins_adm/login/_validate_form.main.php:52
@@ -18835,8 +18834,8 @@ msgstr "Langue préférrée"
 msgid "Register my account now!"
 msgstr "Créer mon compte maintenant!"
 
-#: ../../../skins/_register.disp.php:115
-#: ../../../skins_adm/login/_reg_form.main.php:97
+#: ../../../skins/_register.disp.php:113
+#: ../../../skins_adm/login/_reg_form.main.php:95
 msgid "Already have an account... ?"
 msgstr "Vous avez déjà un compte... ?"
 
@@ -19321,7 +19320,7 @@ msgstr "Atteindre l'interface d'admin!"
 msgid "You will have to accept cookies in order to log in."
 msgstr "Vous devrez accepter les cookies pour pouvoir vous connecter."
 
-#: ../../../skins_adm/login/_login_form.main.php:200
+#: ../../../skins_adm/login/_login_form.main.php:197
 msgid "Please wait..."
 msgstr "Merci de patienter..."
 
@@ -19381,6 +19380,9 @@ msgstr "Ce gabarit de démo affiche un résumé des derniers posts dans tous les bl
 #: ../../../summary.php:161
 msgid "More posts..."
 msgstr "Plus de posts..."
+
+#~ msgid "Your IP address (%s) and the current time are being logged."
+#~ msgstr "Votre adresse IP (%s) et l'heure courante sont enregistrés."
 
 #~ msgid "Replacement tags: %s."
 #~ msgstr "Tags possibles:"
@@ -19575,9 +19577,6 @@ msgstr "Plus de posts..."
 
 #~ msgid "Login form"
 #~ msgstr "Formulaire de connexion"
-
-#~ msgid "Your IP address ("
-#~ msgstr "Votre adresse IP"
 
 #~ msgid "Register form"
 #~ msgstr "Formulaire d'inscription"

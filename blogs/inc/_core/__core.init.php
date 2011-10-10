@@ -113,7 +113,7 @@ function & get_CountryCache()
 
 	if( ! isset( $CountryCache ) )
 	{	// Cache doesn't exist yet:
-		$CountryCache = new DataObjectCache( 'Country', true, 'T_country', 'ctry_', 'ctry_ID', 'ctry_code', 'ctry_name', 'Unknown');
+		$CountryCache = new DataObjectCache( 'Country', true, 'T_country', 'ctry_', 'ctry_ID', 'ctry_code', 'ctry_name', T_('Unknown') );
 	}
 
 	return $CountryCache;
@@ -1053,6 +1053,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.89  2011/10/10 20:04:09  fplanque
+ * i18n cleanup
+ *
  * Revision 1.88  2011/10/08 07:23:29  efy-yurybakh
  * In skin posting
  *
