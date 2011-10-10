@@ -1,13 +1,13 @@
 <?php
 /**
  * This file is the template that includes required css files to display threads
- * 
+ *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
- * 
+ *
  * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -17,7 +17,7 @@ global $htsrv_url;
 // The messaging module can only be used by logged in users:
 if( ! is_logged_in() )
 { // Redirect to the login page for anonymous users
-	header_redirect( get_login_url(), 302 );
+	header_redirect( get_login_url('cannot see threads'), 302 );
 	// will have exited
 }
 
@@ -40,6 +40,9 @@ require $ads_current_skin_path.'index.main.php';
 
 /*
  * $Log$
+ * Revision 1.5  2011/10/10 20:46:39  fplanque
+ * registration source tracking
+ *
  * Revision 1.4  2011/10/07 05:43:45  efy-asimo
  * Check messaging availability before display
  *

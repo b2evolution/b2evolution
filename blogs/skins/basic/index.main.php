@@ -260,8 +260,8 @@ skin_init( $disp );
 		?>
 
 		<?php
-			user_login_link( ' [', '] ' );
-			user_register_link( ' [', '] ' );
+			user_login_link( ' [', '] ', '', '#', 'sidebar login link' );
+			user_register_link( ' [', '] ', '', '#', false, 'sidebar register link' );
 			user_admin_link( ' [', '] ' );
 			user_logout_link( ' [', '] ' );
 		?>

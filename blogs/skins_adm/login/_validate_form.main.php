@@ -54,7 +54,7 @@ $Form->begin_fieldset( T_('Email address validation') );
 	echo '<li>'.T_('As soon as you receive the email, click on the link therein to activate your account.').'</li>';
 	echo '</ol>';
 
-	$Form->text_input( 'email', $email, 16, T_('Email'), '', array( 'maxlength'=>255, 'class'=>'input_text', 'required'=>true ) );
+	$Form->text_input( 'email', $email, 50, T_('Email'), '', array( 'maxlength'=>255, 'class'=>'input_text', 'required'=>true ) );
 
 	$Plugins->trigger_event( 'DisplayValidateAccountFormFieldset', array( 'Form' => & $Form ) );
 
@@ -92,6 +92,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.11  2011/10/10 20:46:39  fplanque
+ * registration source tracking
+ *
  * Revision 1.10  2011/09/30 10:16:51  efy-yurybakh
  * Make a big sprite with all backoffice icons
  *

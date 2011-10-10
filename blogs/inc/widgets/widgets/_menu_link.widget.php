@@ -225,7 +225,7 @@ class menu_link_Widget extends ComponentWidget
 
 			case 'login':
 				if( is_logged_in() ) return false;
-				$url = get_login_url();
+				$url = get_login_url( 'menu link' );
 				if( isset($this->BlockCache) )
 				{	// Do NOT cache because some of these links are using a redirect_to param, which makes it page dependent.
 					// so this will be cached by the PageCache; there is no added benefit to cache it in the BlockCache
@@ -352,6 +352,9 @@ class menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.25  2011/10/10 20:46:39  fplanque
+ * registration source tracking
+ *
  * Revision 1.24  2011/10/10 19:48:31  fplanque
  * i18n & login display cleaup
  *

@@ -221,6 +221,7 @@ function header_redirect( $redirect_to = NULL, $status = false )
 			header( 'HTTP/1.1 302 Found' );
 	}
 
+  // debug_die($redirect_to);
 	if( headers_sent() )
 	{
 		debug_die('Headers have already been sent. Cannot <a href="'.htmlspecialchars($redirect_to).'">redirect</a>.');
@@ -995,7 +996,7 @@ function init_bubbletip_js( $relative_to = 'rsc_url' )
 	{ // If setting "bubbletip" is OFF for current case
 		return;
 	}
-	
+
 	require_js( '#jquery#', $relative_to ); // dependency
 	require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
 	require_js( 'bubbletip.js', $relative_to );
@@ -1363,6 +1364,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.110  2011/10/10 20:46:39  fplanque
+ * registration source tracking
+ *
  * Revision 1.109  2011/10/03 10:07:05  efy-yurybakh
  * bubbletips & identity_links cleanup
  *

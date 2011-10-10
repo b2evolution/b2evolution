@@ -98,7 +98,7 @@ function user_pass_ok( $login, $pass, $pass_is_md5 = false )
 /**
  * Template tag: Output link to login
  */
-function user_login_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
+function user_login_link( $before = '', $after = '', $link_text = '', $link_title = '#', $source = 'user login link' )
 {
 	if( is_logged_in() ) return false;
 
@@ -106,7 +106,7 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
 	if( $link_title == '#' ) $link_title = T_('Log in if you have an account...');
 
 	$r = $before;
-	$r .= '<a href="'.get_login_url().'" title="'.$link_title.'">';
+	$r .= '<a href="'.get_login_url( $source  ).'" title="'.$link_title.'">';
 	$r .= $link_text;
 	$r .= '</a>';
 	$r .= $after;
@@ -118,9 +118,11 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
 /**
  * Get url to login
  *
+ * @param string describe the source ina word or two, used for stats (search current calls to this function for examples)
+ * @param string
  * @return string
  */
-function get_login_url( $redirect_to = NULL )
+function get_login_url( $source, $redirect_to = NULL )
 {
 	global $edited_Blog, $generating_static, $secure_htsrv_url;
 
@@ -144,24 +146,24 @@ function get_login_url( $redirect_to = NULL )
 	if( use_in_skin_login() )
 	{ // use in-skin login
 		global $blog;
-
 		$BlogCache = & get_BlogCache();
 		$Blog = $BlogCache->get_by_ID( $blog );
-
 		if( ! empty($redirect) )
 		{
 			$redirect = 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $Blog->get( 'loginurl' ) ) );
 		}
-		return url_add_param( $Blog->get( 'loginurl' ), $redirect, '&' );
+		$url = url_add_param( $Blog->get( 'loginurl' ), $redirect, '&' );
 	}
+  else
+	{ // Normal login
+	  if( ! empty($redirect) )
+	  {
+		  $redirect = '?redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $secure_htsrv_url ) );
+	  }
+    $url = $secure_htsrv_url.'login.php'.$redirect;
+  }
 
-	// Normal login
-	if( ! empty($redirect) )
-	{
-		$redirect = '?redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $secure_htsrv_url ) );
-	}
-
-	return $secure_htsrv_url.'login.php'.$redirect;
+	return url_add_param( $url, 'source='.rawurlencode($source), '&' );
 }
 
 
@@ -195,7 +197,7 @@ function use_in_skin_login()
 
 /**
  * Check a settings from user for Back office and from skin for Front office
- * 
+ *
  * @param string Setting name ( gender_colored OR bubbletip)
  * @return bool Use colored gender
  */
@@ -1267,6 +1269,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.86  2011/10/10 20:46:39  fplanque
+ * registration source tracking
+ *
  * Revision 1.85  2011/10/08 07:23:30  efy-yurybakh
  * In skin posting
  *

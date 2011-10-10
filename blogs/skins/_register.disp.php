@@ -40,7 +40,7 @@ $login = param( 'login', 'string', '' );
 $email = param( 'email', 'string', '' );
 $country = param( 'country', 'string', NULL );
 $gender = param( 'gender', 'string', false );
-$source = param( 'source', 'string', '' );
+$source = param( 'source', 'string', 'register form' );
 $redirect_to = param( 'redirect_to', 'string', '' );
 
 // set secure htsrv url with the same domain as the request has
@@ -110,7 +110,7 @@ if( $action == 'register' )
 	$Form->buttons_input($submit_button);
 
 	echo '<div class="login_actions" style="margin: 1em 0 1ex">';
-	echo '<strong><a href="'.get_login_url($redirect_to).'">&laquo; '.T_('Already have an account... ?').'</a></strong>';
+	echo '<strong><a href="'.get_login_url( $source, $redirect_to).'">&laquo; '.T_('Already have an account... ?').'</a></strong>';
 	echo '</div>';
 
 	$Form->end_form();
@@ -153,6 +153,9 @@ elseif( $action == "reg_validation" )
 
 /*
  * $Log$
+ * Revision 1.19  2011/10/10 20:46:39  fplanque
+ * registration source tracking
+ *
  * Revision 1.18  2011/10/10 19:48:31  fplanque
  * i18n & login display cleaup
  *

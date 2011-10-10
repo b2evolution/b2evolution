@@ -754,7 +754,7 @@ class Item extends ItemLight
 		}
 
 		// User is not logged in, needs to display login link
-		$login_link = '<a href="'.get_login_url( regenerate_url() ).'">'.T_( 'Log in now!' ).'</a>';
+		$login_link = '<a href="'.get_login_url( 'cannot see comments', regenerate_url() ).'">'.T_( 'Log in now!' ).'</a>';
 		echo '<p>'.$display_text.' '.$login_link.'</p>';
 		if( $Settings->get( 'newusers_canregister' ) )
 		{ // needs to display register link
@@ -2474,7 +2474,7 @@ class Item extends ItemLight
 		{	// No Comments
 			return NULL;
 		}
-		
+
 		$average_real = number_format( $ratings["summary"] / $ratings_count, 1, ".", "" );
 		$average = ceil( ( $average_real ) / 5 * 100 );
 
@@ -2482,11 +2482,11 @@ class Item extends ItemLight
 		$table = '<table class="rating_summary" cellspacing="1">';
 		foreach ( $ratings as $r => $count )
 		{	// Print a row for each star with formed data
-			if( !is_int($r) ) 
+			if( !is_int($r) )
 			{
 				continue;
 			}
-			
+
 			$star_average = ceil( ( $count / $ratings_count ) * 100 );
 			switch( $params['rating_summary_star_totals'] )
 			{
@@ -4789,7 +4789,7 @@ class Item extends ItemLight
 										AND comment_status = "published"
 						 GROUP BY comment_rating';
 		$results = $DB->get_results( $sql );
-		
+
 		$ratings = array();
 		$ratings['total'] = 0;
 		$ratings['summary'] = 0;
@@ -4809,7 +4809,7 @@ class Item extends ItemLight
 			}
 		}
 		$ratings['all_ratings'] = $ratings['total'] - $ratings['unrated'];
-		
+
 		return $ratings;
 	}
 
@@ -4876,6 +4876,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.263  2011/10/10 20:46:39  fplanque
+ * registration source tracking
+ *
  * Revision 1.262  2011/10/03 17:13:04  efy-yurybakh
  * review fp>yura comments
  *

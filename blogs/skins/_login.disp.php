@@ -69,9 +69,11 @@ if( $action != 'req_validatemail' )
 
 	$Form->begin_form( 'bComment' );
 
+  $Form->add_crumb( 'loginform' );
+  $source = param( 'source', 'string', 'inskin login form' );
+  $Form->hidden( 'source', $source );
 	$Form->hidden( 'redirect_to', $redirect_to );
 	$Form->hidden( 'inskin', true );
-	$Form->add_crumb( 'loginform' );
 
 	$Form->begin_field();
 	$Form->text_input( 'login', $login, 18, T_('Login'), '<br />'.T_('Type your username, <b>not</b> your email address.'),
@@ -99,12 +101,12 @@ if( $action != 'req_validatemail' )
 	$Form->buttons_input($submit_button);
 
 	echo '<div class="login_actions" style="text-align:right; margin: 1em 0 1ex">';
-	echo get_user_register_link( '<strong>', '</strong>', T_('No account yet? Register here').' &raquo;', '#', true /*disp_when_logged_in*/, $redirect_to, 'inskin login' );
+	echo get_user_register_link( '<strong>', '</strong>', T_('No account yet? Register here').' &raquo;', '#', true /*disp_when_logged_in*/, $redirect_to, $source );
 	echo '</div>';
 
 	$Form->end_form();
 
-	echo '<div class="notes" style="margin: 1em"><a href="'.$secure_htsrv_url.'login.php?redirect_to='.$redirect_to.'">'.T_( 'Use standard login form instead').' &raquo;</a></div>';
+	echo '<div class="notes" style="margin: 1em"><a href="'.$secure_htsrv_url.'login.php?source='.rawurlencode($source).'redirect_to='.$redirect_to.'">'.T_( 'Use standard login form instead').' &raquo;</a></div>';
 
   echo '<div class="form_footer_notes">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
 
@@ -135,7 +137,7 @@ else
 	echo '<li>'.T_('As soon as you receive the email, click on the link therein to activate your account.').'</li>';
 	echo '</ol>';
 
-	$Form->text_input( 'email', $email, 16, T_('Email'), '', array( 'maxlength'=>255, 'class'=>'input_text', 'required'=>true ) );
+	$Form->text_input( 'email', $email, 50, T_('Email'), '', array( 'maxlength'=>255, 'class'=>'input_text', 'required'=>true ) );
 	$Form->end_fieldset();
 
 	// Submit button:
@@ -148,6 +150,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.21  2011/10/10 20:46:39  fplanque
+ * registration source tracking
+ *
  * Revision 1.20  2011/10/10 19:48:31  fplanque
  * i18n & login display cleaup
  *

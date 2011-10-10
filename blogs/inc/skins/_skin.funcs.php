@@ -368,7 +368,7 @@ function skin_init( $disp )
 			break;
 
 		case 'messages':
-		case 'contacts':    
+		case 'contacts':
 		case 'threads':
 			// just in case some robot would be logged in:
 			$seo_page_type = 'Messaging module';
@@ -407,10 +407,10 @@ function skin_init( $disp )
 			{	// Redirect to the login page for anonymous user and if setting is OFF
 				$user_ID = param( 'user_ID', 'integer', 0 );
 				$redirect_to = url_add_param( $Blog->get( 'userurl' ), 'user_ID='.$user_ID, '&' );
-				header_redirect( get_login_url( $redirect_to ), 302 );
+				header_redirect( get_login_url( 'cannot see user', $redirect_to ), 302 );
 			}
 			break;
-      
+
 		case '404':
 			// We have a 404 unresolved content error
 			// How do we want do deal with it?
@@ -943,6 +943,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.112  2011/10/10 20:46:39  fplanque
+ * registration source tracking
+ *
  * Revision 1.111  2011/10/07 06:12:22  efy-asimo
  * Check users availability before display
  *

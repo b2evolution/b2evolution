@@ -107,6 +107,8 @@ $Form = new Form( $secure_htsrv_url.'login.php', 'evo_login_form', 'post', 'fiel
 $Form->begin_form( 'fform' );
 
 	$Form->add_crumb( 'loginform' );
+  $source = param( 'source', 'string', 'std login form' );
+  $Form->hidden( 'source', $source );
 	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $secure_htsrv_url) );
 
 	if( isset( $action, $reqID, $sessID ) && $action == 'validatemail' )
@@ -216,7 +218,7 @@ $Form->end_form();
 
 <div class="login_actions" style="text-align:right">
 	<?php
-	echo get_user_register_link( '', '', T_('No account yet? Register here').' &raquo;', '#', true /*disp_when_logged_in*/, $redirect_to, 'login form' );
+	echo get_user_register_link( '', '', T_('No account yet? Register here').' &raquo;', '#', true /*disp_when_logged_in*/, $redirect_to, $source );
 	?>
 </div>
 
@@ -227,6 +229,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.34  2011/10/10 20:46:39  fplanque
+ * registration source tracking
+ *
  * Revision 1.33  2011/10/10 19:48:31  fplanque
  * i18n & login display cleaup
  *
