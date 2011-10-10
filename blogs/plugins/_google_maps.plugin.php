@@ -391,7 +391,7 @@ class google_maps_plugin extends Plugin
 			{
 				geocoder = new google.maps.Geocoder();
 			}
-			geocoder.geocode( {'address': request.term, 'region' : geo_region }, function(results, status)
+			geocoder.geocode( {'address': request.term, 'region' : geo_region, 'bounds':  map.getBounds() }, function(results, status)
 			{
 				if (status == google.maps.GeocoderStatus.OK)
 				{
@@ -688,6 +688,9 @@ class google_maps_plugin extends Plugin
 }
 /*
  * $Log$
+ * Revision 1.6  2011/10/10 11:39:52  efy-vitalij
+ * add gmaps plugin functional
+ *
  * Revision 1.5  2011/10/10 10:37:00  efy-vitalij
  * add gmaps plugin functional
  *
