@@ -669,7 +669,7 @@ for ( $index = 1; $index <= $imap_obj->Nmsgs; $index++ )
 		}
 		else
 		{
-			echo_message( T_( 'Files module is disabled or missing!' ), ERROR, 0 );
+			echo_message( 'Files module is disabled or missing!', ERROR, 0 );
 		}
 	}
 
@@ -725,6 +725,9 @@ if( $test > 0 )
 
 /*
  * $Log$
+ * Revision 1.52  2011/10/10 19:48:31  fplanque
+ * i18n & login display cleaup
+ *
  * Revision 1.51  2011/09/06 00:54:38  fplanque
  * i18n update
  *

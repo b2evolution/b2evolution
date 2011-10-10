@@ -146,7 +146,7 @@ class Comment extends DataObject
 
 		$this->delete_cascades = array(
 				array( 'table'=>'T_links', 'fk'=>'link_cmt_ID', 'msg'=>T_('%d links to destination comments') ),
-				array( 'table'=>'T_comments__votes', 'fk'=>'cmvt_cmt_ID', 'msg'=>T_('%d votes of comment') ),
+				array( 'table'=>'T_comments__votes', 'fk'=>'cmvt_cmt_ID', 'msg'=>T_('%d votes on comment') ),
 			);
 
 		if( $db_row == NULL )
@@ -2433,6 +2433,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.122  2011/10/10 19:48:31  fplanque
+ * i18n & login display cleaup
+ *
  * Revision 1.121  2011/10/06 20:11:12  fplanque
  * tentative fix
  *

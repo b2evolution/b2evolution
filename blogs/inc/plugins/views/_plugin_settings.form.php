@@ -52,7 +52,7 @@ load_funcs('plugins/_plugin.funcs.php');
 $Form = new Form( NULL, 'pluginsettings_checkchanges' );
 
 // Restore defaults button:
-$Form->global_icon( T_('Restore defaults'), 'reload', regenerate_url( 'action,plugin_class', 'action=default_settings&amp;plugin_ID=' . $edit_Plugin->ID . '&amp;crumb_plugin=' . get_crumb( 'plugin' ) ), T_('Retsore defaults'),5,4,
+$Form->global_icon( T_('Restore defaults'), 'reload', regenerate_url( 'action,plugin_class', 'action=default_settings&amp;plugin_ID=' . $edit_Plugin->ID . '&amp;crumb_plugin=' . get_crumb( 'plugin' ) ), T_('Restore defaults'),5,4,
 	array(
 			'onclick'=>'if (!confirm(\''.TS_('Are you sure you want to restore the default settings? This cannot be undone!').'\')) { cancelClick(event); }',
 		)
@@ -192,6 +192,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.14  2011/10/10 19:48:32  fplanque
+ * i18n & login display cleaup
+ *
  * Revision 1.13  2011/10/02 12:38:30  efy-yurybakh
  * fix sprite icons
  *

@@ -109,13 +109,13 @@ if( $action == 'register' )
 
 	$Form->buttons_input($submit_button);
 
-	$Form->info( '', '', sprintf( T_('Your IP address (%s) and the current time are being logged.'), $Hit->IP ) );
-
 	echo '<div class="login_actions" style="margin: 1em 0 1ex">';
 	echo '<strong><a href="'.get_login_url($redirect_to).'">&laquo; '.T_('Already have an account... ?').'</a></strong>';
 	echo '</div>';
 
 	$Form->end_form();
+
+  echo '<div class="form_footer_notes">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
 }
 elseif( $action == "reg_complete" )
 {	// -----------------------------------------------------------------------------------------------------------------
@@ -153,6 +153,9 @@ elseif( $action == "reg_validation" )
 
 /*
  * $Log$
+ * Revision 1.18  2011/10/10 19:48:31  fplanque
+ * i18n & login display cleaup
+ *
  * Revision 1.17  2011/09/26 09:12:04  efy-vitalij
  * remake select_input_object to select_country field
  *

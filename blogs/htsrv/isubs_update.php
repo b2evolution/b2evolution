@@ -134,12 +134,12 @@ switch( $isub_type )
 			}
 			else
 			{
-				$Messages->add( sprintf( T_( 'Could not find user with %s login' ), $new_attendant ), 'error' );
+				$Messages->add( sprintf( T_( 'User %s not found.' ), $new_attendant ), 'error' );
 			}
 		}
 		elseif( $new_attendant !== NULL )
 		{
-			$Messages->add( T_( 'Please select a user' ), 'error' );
+			$Messages->add( T_( 'Please select a user.' ), 'error' );
 		}
 		else
 		{
@@ -196,6 +196,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.11  2011/10/10 19:48:31  fplanque
+ * i18n & login display cleaup
+ *
  * Revision 1.10  2011/10/02 02:51:11  fplanque
  * no message
  *

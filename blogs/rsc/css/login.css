@@ -79,6 +79,12 @@ div.loginblock legend {
 	font-weight: bold;
 }
 
+.form_footer_notes {
+  text-align: center;
+  color: #999;
+  font-size: 78%;
+}
+
 .footer {
 	text-align: center;
 	font-size: 74%;

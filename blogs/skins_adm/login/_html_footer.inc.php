@@ -20,16 +20,16 @@
  * }}
  *
  * @package htsrv
- *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois PLANQUE.
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 ?>
 
 </div>
 
+
 <?php
+  echo '<div class="form_footer_notes">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
+
 	// Please help us promote b2evolution and leave this logo on your blog:
 	powered_by( array(
 			'block_start' => '<div class="center" style="margin:1em">',
@@ -63,6 +63,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <?php
 /*
  * $Log$
+ * Revision 1.9  2011/10/10 19:48:31  fplanque
+ * i18n & login display cleaup
+ *
  * Revision 1.8  2011/09/07 22:44:41  fplanque
  * UI cleanup
  *

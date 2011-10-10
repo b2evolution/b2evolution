@@ -384,15 +384,15 @@ if( empty($tab) )
 
 			if ($days < 1)
 			{
-				param_error( 'days', T_('Please enter how many days of stats to generate') );
+				param_error( 'days', 'Please enter how many days of stats to generate' );
 				$action = 'show_create_test_hit';
 				break;
 			}
 
 			if (($min_interval > $max_interval) || ($min_interval < 0) || ($max_interval <= 0))
 			{
-				param_error( 'min_interval', T_('Please enter correct interval values') );
-				param_error( 'max_interval', T_('Please enter correct interval values') );
+				param_error( 'min_interval', 'Please enter correct interval values' );
+				param_error( 'max_interval', 'Please enter correct interval values' );
 				$action = 'show_create_test_hit';
 				break;
 			}
@@ -798,6 +798,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.54  2011/10/10 19:48:32  fplanque
+ * i18n & login display cleaup
+ *
  * Revision 1.53  2011/10/05 13:42:12  efy-vitalij
  * change fake statistic generator
  *

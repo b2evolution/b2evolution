@@ -70,13 +70,16 @@ $Results->cols[] = array(
 
 $Results->global_icon( T_('Cancel empty recycle bin'), 'close', regenerate_url( 'action', 'action=list&filter=reset'), 3, 4  );
 
-echo '<p>[<a href="'.regenerate_url( 'action,blog_ID', 'action=trash_delete' ).'&amp;'.url_crumb('comment').'">'.T_( 'Empty all blog\'s recycle bin' ).'</a>]</p>';
+echo '<p>[<a href="'.regenerate_url( 'action,blog_ID', 'action=trash_delete' ).'&amp;'.url_crumb('comment').'">'.T_( 'Empty all blogs\' recycle bin' ).'</a>]</p>';
 
 $Results->display();
 
 
 /*
  * $Log$
+ * Revision 1.6  2011/10/10 19:48:31  fplanque
+ * i18n & login display cleaup
+ *
  * Revision 1.5  2011/09/06 00:54:38  fplanque
  * i18n update
  *

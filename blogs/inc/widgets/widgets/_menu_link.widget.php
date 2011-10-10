@@ -43,7 +43,7 @@ $menu_link_widget_link_types = array(
 		'register' => T_('Registration form'),
 		'profile' => T_('Profile form'),
 		'avatar' => T_('Profile picture editing'),
-		'users' => T_('User Directory'),
+		'users' => T_('User directory'),
 		'item' => T_('Any item (post, page, etc...)'),
 		'url' => T_('Any URL'),
 	);
@@ -271,7 +271,7 @@ class menu_link_Widget extends ComponentWidget
 					return false;
 				}
 				$url = $Blog->get( 'usersurl' );
-				$text = T_('User Directory');
+				$text = T_('User directory');
 				break;
 
 			case 'item':
@@ -352,6 +352,9 @@ class menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.24  2011/10/10 19:48:31  fplanque
+ * i18n & login display cleaup
+ *
  * Revision 1.23  2011/10/07 11:24:53  efy-yurybakh
  * Extend  _menu_link.widget.php
  *

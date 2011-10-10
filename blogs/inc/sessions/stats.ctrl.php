@@ -65,7 +65,7 @@ if( ($tab=='refsearches') && ($tab3=='intsearches') )
 		{	// We could not find the internal search to edit:
 			unset( $edited_intsearch );
 			forget_param( 'isrch_ID' );
-			$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('InternalSearch') ), 'error' );
+			$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Internal Search') ), 'error' );
 			$action = 'nil';
 		}
 	}
@@ -478,6 +478,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.34  2011/10/10 19:48:31  fplanque
+ * i18n & login display cleaup
+ *
  * Revision 1.33  2011/09/30 06:25:24  efy-vitalij
  * Remove Hits tab from User Sessions
  *

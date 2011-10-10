@@ -55,8 +55,6 @@ $Form->begin_form( 'fform' );
 
 	$Form->buttons_input( array(array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Send me an email now!'), 'class' => 'ActionButton' )) );
 
-	$Form->info( '', '', sprintf( T_('Your IP address (%s) and the current time are being logged.'), $Hit->IP ) );
-
 	$Form->end_fieldset();;
 
 $Form->end_form();
@@ -65,6 +63,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.16  2011/10/10 19:48:31  fplanque
+ * i18n & login display cleaup
+ *
  * Revision 1.15  2011/09/30 10:16:51  efy-yurybakh
  * Make a big sprite with all backoffice icons
  *

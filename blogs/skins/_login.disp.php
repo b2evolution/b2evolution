@@ -98,17 +98,17 @@ if( $action != 'req_validatemail' )
 
 	$Form->buttons_input($submit_button);
 
-	//echo '<div class="center notes">'.sprintf( T_('Your IP address (%s) and the current time are being logged.'), $Hit->IP ).'</div>';
-	$Form->info( '', '', sprintf( T_('Your IP address (%s) and the current time are being logged.'), $Hit->IP ) );
-
 	echo '<div class="login_actions" style="text-align:right; margin: 1em 0 1ex">';
 	echo get_user_register_link( '<strong>', '</strong>', T_('No account yet? Register here').' &raquo;', '#', true /*disp_when_logged_in*/, $redirect_to, 'inskin login' );
 	echo '</div>';
 
 	$Form->end_form();
 
-	echo '<div class="notes" style="margin: 1em"><a href="'.$secure_htsrv_url.'login.php?redirect_to='.$redirect_to.'">'.T_( 'Use standard login form instead').' &raquo;</a></div>
-	<div class="clear"></div>';
+	echo '<div class="notes" style="margin: 1em"><a href="'.$secure_htsrv_url.'login.php?redirect_to='.$redirect_to.'">'.T_( 'Use standard login form instead').' &raquo;</a></div>';
+
+  echo '<div class="form_footer_notes">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
+
+	echo '<div class="clear"></div>';
 }
 else
 {	// -----------------------------------------------------------------------------------------------------------------
@@ -148,6 +148,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.20  2011/10/10 19:48:31  fplanque
+ * i18n & login display cleaup
+ *
  * Revision 1.19  2011/09/26 14:53:27  efy-asimo
  * Login problems with multidomain installs - fix
  * Insert globals: samedomain_htsrv_url, secure_htsrv_url;

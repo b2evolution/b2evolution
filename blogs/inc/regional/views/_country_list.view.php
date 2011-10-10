@@ -89,12 +89,12 @@ function ctry_td_preferred( $ctry_preferred, $ctry_ID )
 
 	if( $ctry_preferred == true )
 	{
-		$r .= action_icon( T_('Disable country preference!'), 'bullet_full',
+		$r .= action_icon( T_('Remove from preferred countries'), 'bullet_full',
 										regenerate_url( 'action', 'action=disable_country_pref&amp;ctry_ID='.$ctry_ID.'&amp;'.url_crumb('country') ) );
 	}
 	else
 	{
-		$r .= action_icon( T_('Enable the preference!'), 'bullet_empty',
+		$r .= action_icon( T_('Add to preferred countries'), 'bullet_empty',
 										regenerate_url( 'action', 'action=enable_country_pref&amp;ctry_ID='.$ctry_ID.'&amp;'.url_crumb('country') ) );
 	}
 	return $r;
@@ -261,6 +261,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.26  2011/10/10 19:48:32  fplanque
+ * i18n & login display cleaup
+ *
  * Revision 1.25  2011/09/27 13:09:05  efy-vitalij
  * fixed default Pref column sorting
  *

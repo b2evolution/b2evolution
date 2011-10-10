@@ -345,7 +345,7 @@ if( ! $current_User->check_perm( 'users', 'edit', false ) )
 else
 {
 	$Results->cols[] = array(
-						'th' => T_('C'),
+						'th' => /* TRANS: email Confirmed */ T_('C'),
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'shrinkwrap',
 						'order' => 'user_validated',
@@ -405,6 +405,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.43  2011/10/10 19:48:32  fplanque
+ * i18n & login display cleaup
+ *
  * Revision 1.42  2011/10/07 17:22:52  efy-yurybakh
  * user avatar display default
  *

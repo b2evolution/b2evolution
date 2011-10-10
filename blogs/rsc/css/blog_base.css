@@ -191,6 +191,14 @@ form.bComment fieldset div.avatartag
 	color: #e00;
 }
 
+.form_footer_notes {
+  margin: 2em auto 1em;
+  text-align: center;
+  color: #999;
+  font-size: 78%;
+}
+
+
 /* Avatar widget */
 div.widget_core_coll_avatar {
 	margin-top: 1em;
@@ -299,12 +307,12 @@ div.average_rating span{
 div.star_rating, div.star_rating div{
 	width: 60px;
 	height: 12px;
-	background: url(../icons/icons_sprite.png) repeat-x -64px -160px;
+	background: url(../icons/icons_sprite.png) repeat-x -64px -176px;
 	overflow: hidden;
 	text-indent: 100px;
 }
 div.star_rating div{
-	background-position: 0 -160px;
+	background-position: 0 -176px;
 }
 div.average_rating .star_rating{
 	float: left;

@@ -46,7 +46,7 @@ switch ( $action )
 		$Settings->set( 'messages_link_to', param( 'messages_link_to', 'string', true ) );
 		$Settings->dbupdate();
 
-		$Messages->add( T_( 'Settings was updated' ), 'success' );
+		$Messages->add( T_( 'Settings were updated.' ), 'success' );
 		break;
 }
 
@@ -68,6 +68,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2011/10/10 19:48:31  fplanque
+ * i18n & login display cleaup
+ *
  * Revision 1.1  2011/10/06 06:18:29  efy-asimo
  * Add messages link to settings
  * Update messaging notifications

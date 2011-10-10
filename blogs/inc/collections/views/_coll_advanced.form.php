@@ -182,9 +182,9 @@ $Form->begin_fieldset( T_('Meta data').get_manual_link('blog_meta_data') );
 		T_('Use &lt;br /&gt; to insert a line break. You might want to put your copyright or <a href="%s" target="_blank">creative commons</a> notice here.'),
 		'http://creativecommons.org/license/' ), 1000, 'large' );
 	$Form->textarea( 'single_item_footer_text', $edited_Blog->get_setting( 'single_item_footer_text' ), 2, T_('Single post footer'),
-		T_('This will be displayed after each post in single post view.').' '.sprintf( T_('Replacement tags: %s.'), '<b>$perm_url$</b>, <b>$title$</b>, <b>$excerpt$</b>, <b>$views$</b>, <b>$author$</b>, <b>$author_login$</b>' ), 50, 'large' );
+		T_('This will be displayed after each post in single post view.').' '.sprintf( T_('Available variables: %s.'), '<b>$perm_url$</b>, <b>$title$</b>, <b>$excerpt$</b>, <b>$views$</b>, <b>$author$</b>, <b>$author_login$</b>' ), 50, 'large' );
 	$Form->textarea( 'xml_item_footer_text', $edited_Blog->get_setting( 'xml_item_footer_text' ), 2, T_('Post footer in RSS/Atom'),
-		T_('This will be appended to each post in your RSS/Atom feeds.').' '.sprintf( T_('Replacement tags: %s.'), T_('same as above') ), 50, 'large' );
+		T_('This will be appended to each post in your RSS/Atom feeds.').' '.sprintf( T_('Available variables: %s.'), T_('same as above') ), 50, 'large' );
 	$Form->textarea( 'blog_notes', $edited_Blog->get( 'notes' ), 5, T_('Notes'),
 		T_('Additional info. Appears in the backoffice.'), 50, 'large' );
 $Form->end_fieldset();
@@ -243,6 +243,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.38  2011/10/10 19:48:31  fplanque
+ * i18n & login display cleaup
+ *
  * Revision 1.37  2011/10/05 12:05:02  efy-yurybakh
  * Blog settings > features tab refactoring
  *

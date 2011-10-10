@@ -165,8 +165,6 @@ $Form->begin_form( 'fform' );
 
 	echo '<div class="center notes" style="margin: 1em 0">'.T_('You will have to accept cookies in order to log in.').'</div>';
 
-	$Form->info( '', '', sprintf( T_('Your IP address (%s) and the current time are being logged.'), $Hit->IP ) );
-
 	$Form->end_fieldset();
 
 	// Passthrough REQUEST data (when login is required after having POSTed something)
@@ -174,7 +172,6 @@ $Form->begin_form( 'fform' );
 	//  and "action" is protected via crumbs)
 	$Form->hiddens_by_key( remove_magic_quotes($_REQUEST) );
 $Form->end_form();
-
 ?>
 
 <script type="text/javascript">
@@ -217,20 +214,22 @@ $Form->end_form();
 	?>
 </script>
 
-
 <div class="login_actions" style="text-align:right">
 	<?php
 	echo get_user_register_link( '', '', T_('No account yet? Register here').' &raquo;', '#', true /*disp_when_logged_in*/, $redirect_to, 'login form' );
 	?>
 </div>
 
-
 <?php
+
 require dirname(__FILE__).'/_html_footer.inc.php';
 
 
 /*
  * $Log$
+ * Revision 1.33  2011/10/10 19:48:31  fplanque
+ * i18n & login display cleaup
+ *
  * Revision 1.32  2011/09/30 10:16:51  efy-yurybakh
  * Make a big sprite with all backoffice icons
  *

@@ -277,7 +277,7 @@ if( $allow_msgform == 'email' )
 		$message_header = $sender_name." has sent you this message:\n\n";
 
 		// show sender email address
-		$message_footer = sprintf( T_( 'By replying to this message, your email will go directly to %s' ), $sender_address )."\n\n".$message_footer;
+		$message_footer = sprintf( T_( 'By replying, your email will go directly to %s.' ), $sender_address )."\n\n".$message_footer;
 
 		if( !empty( $Blog ) )
 		{
@@ -358,6 +358,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.82  2011/10/10 19:48:31  fplanque
+ * i18n & login display cleaup
+ *
  * Revision 1.81  2011/10/06 06:18:29  efy-asimo
  * Add messages link to settings
  * Update messaging notifications
