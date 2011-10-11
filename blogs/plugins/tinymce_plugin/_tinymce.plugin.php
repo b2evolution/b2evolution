@@ -281,6 +281,9 @@ class tinymce_plugin extends Plugin
 
 		// Get init params, depending on edit mode: simple|expert
 		$tmce_init = $this->get_tmce_init( $params['edit_layout'] );
+		
+		if( $params['edit_layout'] != 'inskin' )
+		{	// Don't show HTML mode for 'In-skin editing mode'
 		?>
 
 		<input id="tinymce_plugin_toggle_button"
@@ -288,7 +291,9 @@ class tinymce_plugin extends Plugin
 			value="WYSIWYG"
 			style="display:none"
 			title="<?php echo htmlspecialchars($this->T_('Toggle between WYSIWYG and plain HTML editor')); ?>" />
-
+		<?php
+		}
+		?>
 		<script type="text/javascript">
 			jQuery("#tinymce_plugin_toggle_button").click( function() {
 				tinymce_plugin_toggleEditor('<?php echo $this->tmce_editor_id; ?>'); } );
@@ -699,29 +704,65 @@ class tinymce_plugin extends Plugin
 			$tmce_plugins_array[] = 'contextmenu';
 		}
 
-		/* ----------- button row 1 ------------ */
+		if( $edit_layout == 'inskin' )
+		{	// In-skin editing mode
 
-		$tmce_theme_advanced_buttons1_array = array(
-			'bold,italic,strikethrough,forecolor,backcolor',
-			'fontselect,fontsizeselect',
-			'removeformat',
-			'nonbreaking,charmap',
-			'image,media',
-			'link,unlink',
-			'fullscreen'
-		);
+			/* ----------- button row 1 ------------ */
 
-		/* ----------- button row 2 ------------ */
+			$tmce_theme_advanced_buttons1_array = array(
+				'bold,italic,strikethrough,forecolor,backcolor',
+				'fontselect,fontsizeselect',
+				'removeformat',
+				'nonbreaking,charmap',
+				'image,media'
+			);
 
-		$tmce_theme_advanced_buttons2_array = array(
-			'formatselect,styleselect',
-			'bullist,numlist',
-			'outdent,indent',
-			'justifyleft,justifycenter,justifyright,justifyfull',
-			'morebtn,pagebreak',
-			'undo,redo',
-			'search,replace'
-		);
+			/* ----------- button row 2 ------------ */
+
+			$tmce_theme_advanced_buttons2_array = array(
+				'formatselect,styleselect',
+				'bullist,numlist',
+				'outdent,indent',
+				'justifyleft,justifycenter,justifyright,justifyfull',
+				'morebtn,pagebreak',
+				'fullscreen'
+			);
+
+			/* ----------- button row 3 ------------ */
+
+			$tmce_theme_advanced_buttons3_array = array(
+				'link,unlink',
+				'undo,redo',
+				'search,replace'
+			);
+		}
+		else
+		{	// Simple & Expert modes
+
+			/* ----------- button row 1 ------------ */
+
+			$tmce_theme_advanced_buttons1_array = array(
+				'bold,italic,strikethrough,forecolor,backcolor',
+				'fontselect,fontsizeselect',
+				'removeformat',
+				'nonbreaking,charmap',
+				'image,media',
+				'link,unlink',
+				'fullscreen'
+			);
+
+			/* ----------- button row 2 ------------ */
+
+			$tmce_theme_advanced_buttons2_array = array(
+				'formatselect,styleselect',
+				'bullist,numlist',
+				'outdent,indent',
+				'justifyleft,justifycenter,justifyright,justifyfull',
+				'morebtn,pagebreak',
+				'undo,redo',
+				'search,replace'
+			);
+		}
 
 		if( $edit_layout == 'expert' )
 		{	// Simple needs to be simpler than expert

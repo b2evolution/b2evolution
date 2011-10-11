@@ -146,6 +146,7 @@ class CollectionSettings extends AbstractSettings
 			'cache_enabled' => 0,
 			'cache_enabled_widgets' => 0,
 			'in_skin_login' => 0,							// Use in skin login form every time it's possible
+			'in_skin_editing' => 0,
 			'default_cat_ID' => NULL,						// Default Cat for new posts
 			'require_title' => 'required',  		// Is a title for items required ("required", "optional", "none")
 			'ping_plugins'   => 'ping_pingomatic,ping_b2evonet,evo_twitter', // ping plugin codes, separated by comma
@@ -201,6 +202,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.71  2011/10/11 18:26:10  efy-yurybakh
+ * In skin posting (beta)
+ *
  * Revision 1.70  2011/10/05 17:58:53  efy-yurybakh
  * change the default profile picture sizes
  *

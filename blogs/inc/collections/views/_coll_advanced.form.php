@@ -128,6 +128,7 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 
 	$Form->begin_fieldset( T_('Login').' ['.T_('Admin').']'.get_manual_link('collection_login_settings') );
 		$Form->checkbox_input( 'in_skin_login', $edited_Blog->get_setting( 'in_skin_login' ), T_( 'In-skin login' ), array( 'note' => T_( 'Use in-skin login form every time it\'s possible' ) ) );
+		$Form->checkbox_input( 'in_skin_editing', $edited_Blog->get_setting( 'in_skin_editing' ), T_( 'In-skin editing' ) );
 	$Form->end_fieldset();
 
 	$Form->begin_fieldset( '['. T_('Deprecated'). '] '.T_('Static file generation').' ['.T_('Admin').']'.get_manual_link('static_file_generation') );
@@ -243,6 +244,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.39  2011/10/11 18:26:10  efy-yurybakh
+ * In skin posting (beta)
+ *
  * Revision 1.38  2011/10/10 19:48:31  fplanque
  * i18n & login display cleaup
  *

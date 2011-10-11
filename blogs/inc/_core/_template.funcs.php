@@ -371,6 +371,8 @@ function request_title( $params = array() )
 			'subs_text'           => T_('Subscriptions'),
 			'comments_text'       => T_('Latest Comments'),
 			'feedback-popup_text' => T_('Feedback'),
+			'edit_text_create'    => T_('New post'),
+			'edit_text_update'    => T_('Editing post'),
 		), $params );
 
 	if( $params['auto_pilot'] == 'seo_title' )
@@ -539,8 +541,15 @@ function request_title( $params = array() )
 			break;
 
 		case 'users':
-			// We are requesting the message form:
 			$r[] = $params['users_text'];
+			break;
+
+		case 'edit':
+			$action = param_action();
+			$p = param( 'p', 'integer', 0 );
+			$r[] = ( $action == 'edit_switchtab' || $p > 0 ) ? $params['edit_text_update'] : $params['edit_text_create'];
+			init_datepicker_js();
+			require_js( 'admin.js' );
 			break;
 
 		default:
@@ -1008,6 +1017,37 @@ function init_bubbletip_js( $relative_to = 'rsc_url' )
 
 
 /**
+ * Registers headlines for initialization of datepicker inputs
+ */
+function init_datepicker_js()
+{
+	$datefmt = locale_datefmt();
+	$datefmt = str_replace( array( 'd', 'j', 'm', 'Y' ), array( 'dd', 'd', 'mm', 'yy' ), $datefmt );
+	require_css( 'jquery/smoothness/jquery-ui.css' );
+	add_js_headline( 'jQuery(function(){
+		var monthNames = ["'.T_('January').'","'.T_('February').'", "'.T_('March').'",
+						  "'.T_('April').'", "'.T_('May').'", "'.T_('June').'",
+						  "'.T_('July').'", "'.T_('August').'", "'.T_('September').'",
+						  "'.T_('October').'", "'.T_('November').'", "'.T_('December').'"];
+
+		var dayNamesMin = ["'.T_('Sun').'", "'.T_('Mon').'", "'.T_('Tue').'",
+						  "'.T_('Wed').'", "'.T_('Thu').'", "'.T_('Fri').'", "'.T_('Sat').'"];
+
+		var docHead = document.getElementsByTagName("head")[0];
+		for (i=0;i<dayNamesMin.length;i++)
+			dayNamesMin[i] = dayNamesMin[i].substr(0, 2)
+
+		jQuery(".form_date_input").datepicker({
+			dateFormat: "'.$datefmt.'",
+			monthNames: monthNames,
+			dayNamesMin: dayNamesMin,
+			firstDay: '.locale_startofweek().'
+		})
+	})' );
+}
+
+
+/**
  * Outputs the collected HTML HEAD lines.
  * @see add_headline()
  * @return string
@@ -1364,6 +1404,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.111  2011/10/11 18:26:10  efy-yurybakh
+ * In skin posting (beta)
+ *
  * Revision 1.110  2011/10/10 20:46:39  fplanque
  * registration source tracking
  *

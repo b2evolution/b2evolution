@@ -466,6 +466,7 @@ class Blog extends DataObject
 		if( in_array( 'login', $groups ) )
 		{ // we want to load the login params:
 			$this->set_setting( 'in_skin_login', param( 'in_skin_login', 'integer', 0 ) );
+			$this->set_setting( 'in_skin_editing', param( 'in_skin_editing', 'integer', 0 ) );
 		}
 
 		if( in_array( 'styles', $groups ) )
@@ -2578,6 +2579,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.159  2011/10/11 18:26:10  efy-yurybakh
+ * In skin posting (beta)
+ *
  * Revision 1.158  2011/10/07 07:22:59  efy-yurybakh
  * Replace all timestamp_min & timestamp_max with Blog's methods
  *

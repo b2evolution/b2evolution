@@ -498,6 +498,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_subs'           => '_subs.disp.php',
 				'disp_user'           => '_user.disp.php',
 				'disp_users'          => '_users.disp.php',
+				'disp_edit'           => '_edit.disp.php',
 			);
 
 		// Add plugin disp handlers:
@@ -938,6 +939,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.114  2011/10/11 18:26:10  efy-yurybakh
+ * In skin posting (beta)
+ *
  * Revision 1.113  2011/10/11 06:42:42  efy-asimo
  * Remove unnecessary check
  *

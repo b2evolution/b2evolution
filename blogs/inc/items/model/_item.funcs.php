@@ -589,8 +589,9 @@ function get_newcategory_link()
  *
  * @param Form
  * @param boolean true: use form fields, false: display only
+ * @param boolean true: show links for add new category & manual
  */
-function cat_select( $Form, $form_fields = true )
+function cat_select( $Form, $form_fields = true, $show_title_links = true )
 {
 	global $cache_categories, $blog, $current_blog_ID, $current_User, $edited_Item, $cat_select_form_fields;
 	global $cat_sel_total_count, $dispatcher;
@@ -601,7 +602,16 @@ function cat_select( $Form, $form_fields = true )
 		return;
 	}
 
-	$Form->begin_fieldset( get_newcategory_link().T_('Categories').get_manual_link('item_categories_fieldset'), array( 'class'=>'extracats', 'id' => 'itemform_categories' ) );
+	if( $show_title_links )
+	{	// Use in Back-office
+		$fieldset_title = get_newcategory_link().T_('Categories').get_manual_link('item_categories_fieldset');
+	}
+	else
+	{
+		$fieldset_title = T_('Categories');
+	}
+
+	$Form->begin_fieldset( $fieldset_title, array( 'class'=>'extracats', 'id' => 'itemform_categories' ) );
 
 	$cat_sel_total_count = 0;
 	$r ='';
@@ -1947,9 +1957,53 @@ function echo_pages( $item_ID, $currentpage, $comments_number )
 	echo '</div>';
 }
 
+/**
+ * Get item edit modes
+ * 
+ * @param integer blog ID
+ * @param string action
+ * @param string path to admin page
+ * @param string tab switch params
+ * @return array with modes
+ */
+function get_item_edit_modes( $blog_ID, $action, $dispatcher, $tab_switch_params )
+{
+	$BlogCache = & get_BlogCache();
+	$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+
+	$modes = array();
+	$modes['simple'] = array(
+		'text' => T_('Simple'),
+		'href' => $dispatcher.'?ctrl=items&amp;action='.$action.'&amp;tab=simple&amp;'.$tab_switch_params,
+		'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$dispatcher.'?ctrl=items&amp;tab=simple&amp;blog='.$blog_ID.'\' );',
+		// 'name' => 'switch_to_simple_tab_nocheckchanges', // no bozo check
+	);
+	$modes['expert'] = array(
+		'text' => T_('Expert'),
+		'href' => $dispatcher.'?ctrl=items&amp;action='.$action.'&amp;tab=expert&amp;'.$tab_switch_params,
+		'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$dispatcher.'?ctrl=items&amp;tab=expert&amp;blog='.$blog_ID.'\' );',
+		// 'name' => 'switch_to_expert_tab_nocheckchanges', // no bozo check
+	);
+	if( $Blog->get_setting( 'in_skin_editing' ) )
+	{	// Show 'In skin' tab if Blog setting 'In-skin editing' is ON
+		$mode_inskin_url = url_add_param( $Blog->get( 'url' ), 'disp=edit' );
+		$mode_inskin_action = get_samedomain_htsrv_url().'item_edit.php';
+		$modes['inskin'] = array(
+			'text' => T_('In skin'),
+			'href' => $mode_inskin_url,
+			'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$mode_inskin_action.'\' );',
+		);
+	}
+
+	return $modes;
+}
+
 
 /*
  * $Log$
+ * Revision 1.143  2011/10/11 18:26:10  efy-yurybakh
+ * In skin posting (beta)
+ *
  * Revision 1.142  2011/10/06 11:49:47  efy-yurybakh
  * Replace all timestamp_min & timestamp_max with Blog's methods
  *

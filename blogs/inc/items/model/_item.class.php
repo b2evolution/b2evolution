@@ -2792,10 +2792,18 @@ class Item extends ItemLight
 		// default params
 		$params += array('save_context' => true);
 
-		$url = $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$this->ID;
-		if( $params['save_context'] )
-		{
-			$url .= '&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ).'#'.$this->get_anchor_id() );
+		$this->load_Blog();
+		if( $this->Blog->get_setting( 'in_skin_editing' ) && ! is_admin_page() )
+		{	// We have a mode 'In-skin editing' for the current Blog
+			$url = url_add_param( $this->Blog->get( 'url' ), 'disp=edit&p='.$this->ID );
+		}
+		else
+		{	// Edit a post from Back-office
+			$url = $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$this->ID;
+			if( $params['save_context'] )
+			{
+				$url .= '&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ).'#'.$this->get_anchor_id() );
+			}
 		}
 		return $url;
 	}
@@ -4876,6 +4884,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.264  2011/10/11 18:26:10  efy-yurybakh
+ * In skin posting (beta)
+ *
  * Revision 1.263  2011/10/10 20:46:39  fplanque
  * registration source tracking
  *

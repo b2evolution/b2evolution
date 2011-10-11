@@ -826,6 +826,7 @@ function create_blog(
 	{
 		$allow_rating_items = 'any';
 		$Blog->set_setting( 'skin'.$blog_skin_ID.'_bubbletip', '1' );
+		$Blog->set_setting( 'in_skin_editing', '1' );
 	}
 	if( $allow_rating_items != '' )
 	{
@@ -1425,6 +1426,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.328  2011/10/11 18:26:10  efy-yurybakh
+ * In skin posting (beta)
+ *
  * Revision 1.327  2011/10/11 05:52:14  efy-asimo
  * Messages menu link widget
  *

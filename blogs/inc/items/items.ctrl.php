@@ -1229,23 +1229,7 @@ switch( $action )
 		// Get tab ("simple" or "expert") from Request or UserSettings:
 		$tab = $UserSettings->param_Request( 'tab', 'pref_edit_tab', 'string', NULL, true /* memorize */, true /* force */ );
 
-		$AdminUI->add_menu_entries(
-				'items',
-				array(
-						'simple' => array(
-							'text' => T_('Simple'),
-							'href' => $dispatcher.'?ctrl=items&amp;action='.$action.'&amp;tab=simple&amp;'.$tab_switch_params,
-							'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$dispatcher.'?tab=simple&amp;blog='.$blog.'\' );',
-							// 'name' => 'switch_to_simple_tab_nocheckchanges', // no bozo check
-							),
-						'expert' => array(
-							'text' => T_('Expert'),
-							'href' => $dispatcher.'?ctrl=items&amp;action='.$action.'&amp;tab=expert&amp;'.$tab_switch_params,
-							'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$dispatcher.'?tab=expert&amp;blog='.$blog.'\' );',
-							// 'name' => 'switch_to_expert_tab_nocheckchanges', // no bozo check
-							),
-					)
-			);
+		$AdminUI->add_menu_entries( 'items', get_item_edit_modes( $blog, $action, $dispatcher, $tab_switch_params ) );
 
 		switch( $action )
 		{
@@ -1559,6 +1543,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.117  2011/10/11 18:26:10  efy-yurybakh
+ * In skin posting (beta)
+ *
  * Revision 1.116  2011/09/24 05:30:19  efy-yurybakh
  * fp>yura
  *

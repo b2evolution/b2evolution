@@ -571,7 +571,14 @@ class _core_Module extends Module
 			{
 				if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 				{	// We have permission to add a post with at least one status:
-					$entries['write']['href'] = $admin_url.'?ctrl=items&amp;action=new&amp;blog='.$Blog->ID;
+					if( $Blog->get_setting( 'in_skin_editing' ) && ! is_admin_page() )
+					{	// We have a mode 'In-skin editing' for the current Blog
+						$entries['write']['href'] = url_add_param( $Blog->get( 'url' ), 'disp=edit' );
+					}
+					else
+					{	// Edit a post from Back-office
+						$entries['write']['href'] = $admin_url.'?ctrl=items&amp;action=new&amp;blog='.$Blog->ID;
+					}
 					$entries['write']['disabled'] = false;
 					$entries['write']['title'] = T_('Write a new post into this blog');
 				}
@@ -1053,6 +1060,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.90  2011/10/11 18:26:10  efy-yurybakh
+ * In skin posting (beta)
+ *
  * Revision 1.89  2011/10/10 20:04:09  fplanque
  * i18n cleanup
  *
