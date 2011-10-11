@@ -82,13 +82,27 @@ class google_maps_plugin extends Plugin
 		$r = array(
 			'width' => array(
 				'label' => 'Widget width(px)',
-				'defaultvalue' => '0',
+				'defaultvalue' => '',
 				'note' => '100% width if left empty',
-				'valid_range' => array( 'min'=>0 ),
+				),
+			'height_front' => array(
+				'label' => 'Map height on page (px)',
+				'defaultvalue' => '300',
+				'note' => '',
+				'valid_range' => array( 'min'=>1)),
+			'height_back' => array(
+				'label' => 'Map height on edit post page (px)',
+				'defaultvalue' => '300',
+				'note' => '',
+				'valid_range' => array( 'min'=>1)),
+			'map_type' => array(
+				'label' => T_( 'Map default view ' ),
+				'type' => 'radio',
+				'options' => array( array('map', T_( 'Map' )), array('satellite',T_( 'Satellite' ))),
+				'defaultvalue' => 'map',
+				'note' => ''
 			)
 			);
-
-
 		return $r;
 	}
 
@@ -103,15 +117,7 @@ class google_maps_plugin extends Plugin
 	 */
 	function GetDefaultUserSettings()
 	{
-		$r = array(
-			'width' => array(
-				'label' => 'Widget width(px)',
-				'defaultvalue' => '0',
-				'note' => '100% width if left empty',
-				'valid_range' => array( 'min'=>0 ),
-			)
-			);
-		return $r;
+		return array();
 	}
 
 
@@ -225,9 +231,24 @@ class google_maps_plugin extends Plugin
 	 */
 	function AdminDisplayItemFormFieldset( & $params )
 	{
+		global $Blog;
+
+		$params['Form']->begin_fieldset( 'Google Maps plugin' );
+
+		$field_name1 = strtolower($Blog->get_setting('custom_double3'));
+		$field_name2 = strtolower($Blog->get_setting('custom_double4'));
+
+		if ($field_name1 != 'latitude' || $field_name2 != 'longitude')
+		{
+			$params['Form']->info_field('Error',T_('You must configure the following custom fields (double3 as Latitude, double4 as Longitude ) so the Google Maps plugin can save is coordinates'));
+			//echo T_('You must configure the following custom fields (double3 as Latitude, double4 as Longitude ) so the Google Maps plugin can save is coordinates');
+			$params['Form']->end_fieldset();
+			return;
+		}
+
+
 		$Item = $params['Item'];
 		require_js( '#jqueryUI#');
-		$params['Form']->begin_fieldset( 'Google Maps plugin' );
 		$params['Form']->hidden( 'google_map_zoom', '', array('id' => 'google_map_zoom'));
 		$params['Form']->text_input( 'address', '', 50, 'Input adress', '', array('maxlength'=>500, 'id' =>'searchbox'));
 		$params['Form']->button(array ('id' => 'locate_on_map', 'type' =>'button', 'value' => 'Locate on map') );
@@ -235,9 +256,12 @@ class google_maps_plugin extends Plugin
 		$lat = $Item->get('double3');
 		$lng = $Item->get('double4');
 
-	?>
+		$height = (int)$this->Settings->get('height_back');
+		$height = 'height:'.$height.'px';
+		 
 
-	<div id="map_canvas" style="width:100%; height:400px; margin: 5px 5px 5px 5px;"></div>
+	?>
+	<div id="map_canvas" style="width:100%; <?php echo $height; ?>; margin: 5px 5px 5px 5px;"></div>
 	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
 	<script type="text/javascript">
 	<?php
@@ -253,6 +277,21 @@ class google_maps_plugin extends Plugin
 		var latlng = new google.maps.LatLng(48.856614, 2.3522219000000177);
 		<?php
 	}
+
+	$map_type = (string)$this->Settings->get('map_type');
+	switch ($map_type)
+	{
+		case 'satellite':
+			?>
+			var mapTypeId = google.maps.MapTypeId.SATELLITE;
+			<?php
+			break;
+		default:
+			?>
+			var mapTypeId = google.maps.MapTypeId.ROADMAP;
+			<?php
+			break;
+	}
 	?>
 	var mapTypes = new Array();
 	mapTypes.push(google.maps.MapTypeId.HYBRID);
@@ -264,7 +303,8 @@ class google_maps_plugin extends Plugin
 	var myOptions = {
 		  zoom: 11,
 		  center: latlng,
-		  mapTypeId: google.maps.MapTypeId.ROADMAP,
+		  mapTypeId: mapTypeId,
+		  scrollwheel : false,
 		  mapTypeControlOptions:
 			  {
 			   style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
@@ -433,7 +473,9 @@ class google_maps_plugin extends Plugin
 			searchLoc = ui.item.location;
 		}
 		});
-	jQuery('#locate_on_map').click(function(){
+
+function locate()
+{
 	if (searchLoc != null)
 	{
 
@@ -478,7 +520,18 @@ class google_maps_plugin extends Plugin
 		jQuery('#google_map_zoom').val(map.getZoom());
 	}
 
-	})
+}
+
+	jQuery("#searchbox").keypress(function(event){
+		if (event.keyCode == 13)
+		{
+			locate();
+			return false
+		}
+
+	});
+
+	jQuery('#locate_on_map').click(locate);
 	</script>
 
 	<?php
@@ -496,9 +549,18 @@ class google_maps_plugin extends Plugin
 
 	function SkinTag( $params )
 	{
-		 
-
 		global $Item;
+
+		global $Blog;
+
+		$field_name1 = strtolower($Blog->get_setting('custom_double3'));
+		$field_name2 = strtolower($Blog->get_setting('custom_double4'));
+
+		if ($field_name1 != 'latitude' || $field_name2 != 'longitude')
+		{
+			return;
+		}
+
 		$lat = $Item->get('double3');
 		$lng = $Item->get('double4');
 		if (empty($lat) && empty($lng))
@@ -506,7 +568,7 @@ class google_maps_plugin extends Plugin
 			return;
 		}
 
-		 $width = $this->Settings->get('width');
+		 $width = (int)$this->Settings->get('width');
 		 if (empty($width))
 		 {
 			$width = 'width:100%';
@@ -516,11 +578,30 @@ class google_maps_plugin extends Plugin
 			$width = 'width:'.$width.'px';
 		 }
 
+		 $height = (int)$this->Settings->get('height_front');
+		 $height = 'height:'.$height.'px';
+
 
 		?>
-		<div id="map_canvas" style="<?php echo $width; ?>; height:300px; margin: 5px 5px 5px 5px;"></div>
+		<div id="map_canvas" style="<?php echo $width; ?>; <?php echo $height; ?>; margin: 5px 5px 5px 5px;"></div>
 		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
 		<script type="text/javascript">
+	<?php
+	$map_type = (string)$this->Settings->get('map_type');
+	switch ($map_type)
+	{
+		case 'satellite':
+			?>
+			var mapTypeId = google.maps.MapTypeId.SATELLITE;
+			<?php
+			break;
+		default:
+			?>
+			var mapTypeId = google.maps.MapTypeId.ROADMAP;
+			<?php
+			break;
+	}
+	?>
 		var latlng = new google.maps.LatLng(<?php echo $lat; ?>, <?php echo $lng;?>);
 		var mapTypes = new Array();
 		mapTypes.push(google.maps.MapTypeId.HYBRID);
@@ -531,7 +612,8 @@ class google_maps_plugin extends Plugin
 		var myOptions = {
 			  zoom: 17,
 			  center: latlng,
-			  mapTypeId: google.maps.MapTypeId.ROADMAP,
+			  mapTypeId: mapTypeId,
+			  scrollwheel: false,
 			  mapTypeControlOptions:
 				  {
 				   style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
@@ -688,6 +770,9 @@ class google_maps_plugin extends Plugin
 }
 /*
  * $Log$
+ * Revision 1.7  2011/10/11 11:34:35  efy-vitalij
+ * add gmaps plugin functional
+ *
  * Revision 1.6  2011/10/10 11:39:52  efy-vitalij
  * add gmaps plugin functional
  *
