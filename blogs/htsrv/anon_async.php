@@ -153,8 +153,11 @@ switch( $action )
 				$link_overlay_class = 'overlay_link';
 			}
 
+			$width = $thumbnail_sizes[$avatar_size][1];
+			$height = $thumbnail_sizes[$avatar_size][2];
 			// Display user avatar with login
-			echo '<div class="center">';
+			// Attributes 'w' & 'h' we use for following js-scale div If image is downloading first time (Fix bubbletip)
+			echo '<div class="center" w="'.$width.'" h="'.$height.'">';
 			echo get_avatar_imgtag( $User->login, true, true, $avatar_size, 'avatar_above_login', '', $avatar_overlay_text, $link_overlay_class );
 			echo '</div>';
 		}
@@ -213,6 +216,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.23  2011/10/11 10:54:13  efy-yurybakh
+ * bubble tip bugs
+ *
  * Revision 1.22  2011/10/05 07:40:51  efy-yurybakh
  * white text with black outline
  *

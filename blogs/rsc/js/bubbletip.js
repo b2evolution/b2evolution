@@ -51,6 +51,13 @@ jQuery( document ).ready(function()
 					{ // If success request - fill div with user data, save same data to the cache, init bubble tip
 						tip.html( result );
 						cache.html( result );
+						if( tip.find( 'img' ).width() == 0 )
+						{	// Fix bubbletip size in first time downloading
+							var div = tip.find( 'div' );
+							var width = div.attr( 'w' );
+							var height = parseInt( div.attr( 'h' ) ) + 10;
+							div.attr( 'style', 'width:' + width + 'px;height:' + height + 'px;' );
+						}
 						link.bubbletip( tip, { showOnInit: true, deltaShift: 5, calculateOnShow: true } );
 					}
 				});
