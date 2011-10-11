@@ -74,23 +74,6 @@ switch( $action )
 
 // ----------------------- End Init variables --------------------------
 
-echo '<div class="tabs">';
-$entries = get_messaging_sub_entries( false );
-foreach( $entries as $entry => $entry_data )
-{
-	if( $entry == $disp )
-	{
-		echo '<div class="selected">';
-	}
-	else
-	{
-		echo '<div class="option">';
-	}
-	echo '<a href='.$entry_data['href'].'>'.$entry_data['text'].'</a>';
-	echo '</div>';
-}
-echo '</div>';
-
 // set params
 if( !isset( $params ) )
 {
@@ -129,6 +112,9 @@ switch( $disp )
 
 /**
  * $Log$
+ * Revision 1.6  2011/10/11 05:52:15  efy-asimo
+ * Messages menu link widget
+ *
  * Revision 1.5  2011/10/04 08:39:30  efy-asimo
  * Comment and message forms save/reload content in case of error
  *

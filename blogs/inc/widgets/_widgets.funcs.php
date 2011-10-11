@@ -134,10 +134,14 @@ function insert_basic_widgets( $blog_id, $initial_install = false )
 							VALUES( '.$blog_id.', "Menu", 3, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'ownercontact'))).'" )' );
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
 							VALUES( '.$blog_id.', "Menu", 4, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'login'))).'" )' );
+		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
+							VALUES( '.$blog_id.', "Menu", 5, "core", "msg_menu_link", "'.$DB->escape(serialize(array('link_type'=>'messages'))).'" )' );
+		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
+							VALUES( '.$blog_id.', "Menu", 6, "core", "msg_menu_link", "'.$DB->escape(serialize(array('link_type'=>'contacts', 'show_badge'=>0))).'" )' );
 		if( $test_install_all_features )
 		{	// Add menu with User Directory
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
-								VALUES( '.$blog_id.', "Menu", 5, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'users'))).'" )' );
+								VALUES( '.$blog_id.', "Menu", 7, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'users'))).'" )' );
 		}
 
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
@@ -187,6 +191,9 @@ function insert_basic_widgets( $blog_id, $initial_install = false )
 
 /*
  * $Log$
+ * Revision 1.11  2011/10/11 05:52:14  efy-asimo
+ * Messages menu link widget
+ *
  * Revision 1.10  2011/10/07 11:24:52  efy-yurybakh
  * Extend  _menu_link.widget.php
  *

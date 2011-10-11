@@ -59,29 +59,6 @@ else
 	load_messaging_thread_recipients( $thrd_ID );
 }
 
-// Display menu
-echo '<div class="tabs">';
-$selected = $disp;
-if( $selected == 'messages' )
-{ // There is no messages menu item, it belongs to threads.
-	$selected = 'threads';
-}
-$entries = get_messaging_sub_entries( false );
-foreach( $entries as $entry => $entry_data )
-{
-	if( $entry == $selected )
-	{
-		echo '<div class="selected">';
-	}
-	else
-	{
-		echo '<div class="option">';
-	}
-	echo '<a href='.$entry_data['href'].'>'.$entry_data['text'].'</a>';
-	echo '</div>';
-}
-echo '</div>'; // Display menu end
-
 // init params
 if( !isset( $params ) )
 {
@@ -105,6 +82,9 @@ if( isset( $edited_Thread ) )
 
 /*
  * $Log$
+ * Revision 1.7  2011/10/11 05:52:15  efy-asimo
+ * Messages menu link widget
+ *
  * Revision 1.6  2011/10/07 05:43:45  efy-asimo
  * Check messaging availability before display
  *

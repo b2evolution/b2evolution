@@ -804,7 +804,8 @@ function create_blog(
 	$blog_longdesc = '',
 	$blog_skin_ID = 1,
 	$kind = 'std', // standard blog; notorious variation: "photo"
-	$allow_rating_items = '' )
+	$allow_rating_items = '',
+	$use_inskin_login = 0 )
 {
 	global $default_locale, $test_install_all_features;
 
@@ -829,6 +830,10 @@ function create_blog(
 	if( $allow_rating_items != '' )
 	{
 		$Blog->set_setting( 'allow_rating_items', $allow_rating_items );
+	}
+	if( $use_inskin_login )
+	{
+		$Blog->set_setting( 'in_skin_login', 1 );
 	}
 
 	$Blog->dbupdate();
@@ -935,7 +940,8 @@ function create_demo_contents()
 		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 		1, // Skin ID
 		'std',
-		'any' );
+		'any',
+		1 );
 
 	$blog_shortname = 'Blog B';
 	$blog_stub = 'b';
@@ -1419,6 +1425,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.327  2011/10/11 05:52:14  efy-asimo
+ * Messages menu link widget
+ *
  * Revision 1.326  2011/10/03 17:13:04  efy-yurybakh
  * review fp>yura comments
  *

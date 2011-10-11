@@ -42,6 +42,7 @@ $core_componentwidget_defs = array(
 			'coll_search_form',
 			'coll_xml_feeds',
 			'menu_link',
+			'msg_menu_link',
 		'*'.T_('Meta info for the blog'),
 			'coll_title',
 			'coll_tagline',
@@ -117,6 +118,9 @@ echo '</ul>';
 
 /*
  * $Log$
+ * Revision 1.31  2011/10/11 05:52:14  efy-asimo
+ * Messages menu link widget
+ *
  * Revision 1.30  2011/09/04 22:13:21  fplanque
  * copyright 2011
  *
