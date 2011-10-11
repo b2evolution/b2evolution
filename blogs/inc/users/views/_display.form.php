@@ -113,7 +113,7 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Permissions for anonymous users') );
 
 	$Form->checkbox_input( 'allow_anonymous_user_list', $Settings->get('allow_anonymous_user_list'), T_('Allow to see user list') );
-
+	// Allow anonymous users to see the user display ( disp=user )
 	$Form->checkbox_input( 'allow_anonymous_user_profiles', $Settings->get('allow_anonymous_user_profiles'), T_('Allow to see user profiles') );
 
 $Form->end_fieldset();
@@ -128,6 +128,9 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.4  2011/10/11 06:38:50  efy-asimo
+ * Add corresponding error messages when login required
+ *
  * Revision 1.3  2011/10/07 02:55:38  fplanque
  * doc
  *

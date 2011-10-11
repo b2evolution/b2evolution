@@ -142,6 +142,7 @@ class GeneralSettings extends AbstractSettings
 		'bubbletip_size_anonymous' => 'fit-160x160-blur-18', // Avatar size in the bubbletip in the Front-office for anonymous users
 		'bubbletip_overlay' => "Log in to\r\nsee this\r\nimage",// Overlay text on the profile image for anonymous users
 		'allow_anonymous_user_list' => 1, // Allow anonymous users to see user list (disp=users)
+		'allow_anonymous_user_profiles' => 0 // Allow anonymous users to see the user display ( disp=user )
 	);
 
 
@@ -249,6 +250,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.43  2011/10/11 06:38:50  efy-asimo
+ * Add corresponding error messages when login required
+ *
  * Revision 1.42  2011/10/06 06:18:29  efy-asimo
  * Add messages link to settings
  * Update messaging notifications

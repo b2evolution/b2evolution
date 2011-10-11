@@ -599,6 +599,7 @@ if( !empty( $skin ) )
 					'threads'        => 'threads.main.php',
 					'messages'       => 'messages.main.php',
 					'contacts'       => 'contacts.main.php',
+					'user'           => 'user.main.php',
 					'users'          => 'users.main.php',
 					// All others will default to index.main.php
 				);
@@ -665,6 +666,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.177  2011/10/11 06:38:50  efy-asimo
+ * Add corresponding error messages when login required
+ *
  * Revision 1.176  2011/10/06 11:49:47  efy-yurybakh
  * Replace all timestamp_min & timestamp_max with Blog's methods
  *

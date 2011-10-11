@@ -12,11 +12,12 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $htsrv_url;
+global $htsrv_url, $Messages;
 
 // The messaging module can only be used by logged in users:
 if( ! is_logged_in() )
 { // Redirect to the login page for anonymous users
+	$Messages->add( T_( 'You must log in to read & send messages.' ) );
 	header_redirect( get_login_url('cannot see threads'), 302 );
 	// will have exited
 }
@@ -40,6 +41,9 @@ require $ads_current_skin_path.'index.main.php';
 
 /*
  * $Log$
+ * Revision 1.6  2011/10/11 06:38:50  efy-asimo
+ * Add corresponding error messages when login required
+ *
  * Revision 1.5  2011/10/10 20:46:39  fplanque
  * registration source tracking
  *
