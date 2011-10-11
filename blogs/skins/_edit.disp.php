@@ -78,6 +78,7 @@ else if( empty( $action ) )
 	$action = 'new';
 	$edited_Item = new Item();
 	$edited_Item->set( 'status', 'published' );
+	check_categories_nosave ( $post_category, $post_extracats );
 }
 
 $entries = get_item_edit_modes( $Blog->ID, $action, $admin_url, 'blog='.$Blog->ID );
@@ -98,6 +99,9 @@ switch( $disp )
 
 /*
  * $Log$
+ * Revision 1.2  2011/10/11 19:04:29  efy-yurybakh
+ * In skin posting (beta)
+ *
  * Revision 1.1  2011/10/11 18:26:11  efy-yurybakh
  * In skin posting (beta)
  *

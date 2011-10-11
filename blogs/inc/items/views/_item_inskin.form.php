@@ -125,7 +125,10 @@ $Form->begin_form( 'inskin', '', $params );
 	// ---------------------------- TEXTAREA -------------------------------------
 	$Form->fieldstart = '<div class="edit_area">';
 	$Form->fieldend = "</div>\n";
-	$Form->textarea_input( 'content', $item_content, 16, '', array( 'cols' => 40 , 'id' => 'itemform_post_content' ) );
+	$Form->labelstart = '';
+	$Form->labelend = '';
+	$Form->labelempty = '';
+	$Form->textarea_input( 'content', $item_content, 16, NULL, array( 'cols' => 50 , 'id' => 'itemform_post_content' ) );
 	?>
 	<script type="text/javascript" language="JavaScript">
 		<!--
@@ -196,6 +199,9 @@ echo_autocomplete_tags();
 
 /*
  * $Log$
+ * Revision 1.2  2011/10/11 19:04:29  efy-yurybakh
+ * In skin posting (beta)
+ *
  * Revision 1.1  2011/10/11 18:26:11  efy-yurybakh
  * In skin posting (beta)
  *
