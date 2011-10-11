@@ -403,12 +403,7 @@ function skin_init( $disp )
 			break;
 
 		case 'user':
-			if( ! is_logged_in() && ! $Settings->get( 'allow_anonymous_user_profiles' ) )
-			{	// Redirect to the login page for anonymous user and if setting is OFF
-				$user_ID = param( 'user_ID', 'integer', 0 );
-				$redirect_to = url_add_param( $Blog->get( 'userurl' ), 'user_ID='.$user_ID, '&' );
-				header_redirect( get_login_url( 'cannot see user', $redirect_to ), 302 );
-			}
+			$seo_page_type = 'User display';
 			break;
 
 		case '404':
@@ -943,6 +938,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.113  2011/10/11 06:42:42  efy-asimo
+ * Remove unnecessary check
+ *
  * Revision 1.112  2011/10/10 20:46:39  fplanque
  * registration source tracking
  *
