@@ -160,9 +160,13 @@ switch( $isub_type )
 			{
 				$success_sub_message = T_( 'You have successfully subscribed to attend this event.' );
 			}
-			else
+			elseif( $reg_type == 'waitlist' )
 			{
 				$success_sub_message = T_( 'You have successfully subscribed on the waiting list.' );
+			}
+			else
+			{
+				$success_sub_message = T_( 'You have successfully subscribed on the "Also attended" list.' );
 			}
 		}
 		else
@@ -196,6 +200,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.12  2011/10/11 07:55:00  efy-asimo
+ * Events "Also attend"
+ *
  * Revision 1.11  2011/10/10 19:48:31  fplanque
  * i18n & login display cleaup
  *
