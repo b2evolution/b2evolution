@@ -175,7 +175,14 @@ switch( $isub_type )
 			$success_sub_message = T_( 'User was successfully subscribed to attend this event.' );
 		}
 
-		if( set_user_attendee( $user_ID, $item_ID, $notify, $reg_type ) )
+		$is_back_attend = ( $reg_type == 'back_attend' );
+		$modify_date = !( $is_back_attend || $reg_type == 'no_show' );
+		if( $is_back_attend )
+		{
+			$reg_type = 'attend';
+		}
+
+		if( set_user_attendee( $user_ID, $item_ID, $notify, $reg_type, $modify_date ) )
 		{
 			if( $notify == 0 )
 			{
@@ -200,6 +207,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.13  2011/10/11 09:31:53  efy-asimo
+ * Events "No show" list
+ *
  * Revision 1.12  2011/10/11 07:55:00  efy-asimo
  * Events "Also attend"
  *
