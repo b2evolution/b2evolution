@@ -1983,23 +1983,25 @@ class User extends DataObject
 	 */
 	function send_validate_email( $redirect_to_after = NULL )
 	{
-		global $app_name, $Session, $secure_htsrv_url;
+		global $app_name, $Session, $secure_htsrv_url, $baseurl, $notify_from;
 
 		$request_id = generate_random_key(22);
 
-		$message = T_('You need to validate your email address by clicking on the following link.')
-			."\n\n"
-			.T_('Login:')." $this->login\n"
-			.sprintf( /* TRANS: %s gets replaced by $app_name (normally "b2evolution") */ T_('Link to validate your %s account:'), $app_name )
-			."\n"
+		$message = sprintf( T_('Someone -- presumably you -- has registered an account on %s with your email address.'), $baseurl )
+      ."\n\n"
+      .sprintf( T_('Your login is: %s'), $this->login )
+      ."\n\n"
+      .T_('Please validate this account creation by clicking on the following link:')."\n"
 			.$secure_htsrv_url.'login.php?action=validatemail'
 				.'&reqID='.$request_id
 				.'&sessID='.$Session->ID  // used to detect cookie problems
+      ."\n\n"
+      .sprintf( T_('Also, because of spam filters, we recommend you add %s to your address book to make sure you will receive future notifications when someone sends you a private message.'), $notify_from )
 			."\n\n-- \n"
 			.T_('Please note:')
 			.' '.T_('For security reasons the link is only valid for your current session (by means of your session cookie).');
 
-		$r = send_mail( $this->email, NULL, sprintf( T_('Validate your email address for "%s"'), $this->login ), $message );
+		$r = send_mail( $this->email, NULL, sprintf( T_('Validate your email address for "%s"!'), $this->login ), $message );
 
 		if( $r )
 		{ // save request_id into Session
@@ -2178,10 +2180,10 @@ class User extends DataObject
 		switch( $this->gender )
 		{
 			case 'M':
-				return T_('Man');
+				return T_('A man');
 
 			case 'F':
-				return T_('Woman');
+				return T_('A woman');
 		}
 
 		return NULL;
@@ -2700,6 +2702,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.160  2011/10/11 02:05:41  fplanque
+ * i18n/wording cleanup
+ *
  * Revision 1.159  2011/10/10 19:48:31  fplanque
  * i18n & login display cleaup
  *

@@ -81,10 +81,11 @@ echo $User->get_avatar_imgtag( $avatar_image_size, 'rightmargin', '', true, $ava
 
 $ProfileForm->begin_fieldset( T_('Identity') );
 
-	$ProfileForm->info( T_('Name'), $User->get( 'preferredname' ) );
-	$ProfileForm->info( T_('Login'), $User->get_colored_name() );
+  $ProfileForm->info( T_('Login'), $User->get_colored_name() );
 
-	if( ! empty( $User->gender ) )
+	$ProfileForm->info( T_('Name'), $User->get( 'preferredname' ) );
+
+	// if( ! empty( $User->gender ) )
 	{
 		$ProfileForm->info( T_( 'I am' ), $User->get_gender() );
 	}
@@ -95,6 +96,14 @@ $ProfileForm->begin_fieldset( T_('Identity') );
 		$user_Country = $CountryCache->get_by_ID( $User->ctry_ID );
 		$ProfileForm->info( T_( 'Country' ), $user_Country->get_name() );
 	}
+  else
+  {
+    $ProfileForm->info( T_( 'Country' ), '' );
+  }
+
+  $ProfileForm->info( T_( 'ZIP/Postcode' ), $User->dget('postcode','htmlbody') );
+
+  $ProfileForm->info( T_( 'My age group' ), sprintf( T_('from %d to %d years old'), $User->get('age_min'), $User->get('age_max') ) );
 
 	$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=msgform&recipient_id='.$User->ID, '&' );
 	$msgform_url = $User->get_msgform_url( $Blog->get('msgformurl'), $redirect_to );
@@ -158,6 +167,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.30  2011/10/11 02:05:42  fplanque
+ * i18n/wording cleanup
+ *
  * Revision 1.29  2011/10/04 17:16:05  efy-yurybakh
  * Params for disp=user
  *

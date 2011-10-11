@@ -329,7 +329,7 @@ if( $action != 'view' )
 
 	$Form->text_input( 'edited_user_postcode', $edited_User->postcode, 12, T_('ZIP/Postcode'), '', array( 'maxlength' => 12 ) );
 
-	$Form->text_input( 'edited_user_age_min', $edited_User->age_min, 3, T_('My age group'), '', array( 'number' => true ) );
+	$Form->text_input( 'edited_user_age_min', $edited_User->age_min, 3, T_('My age group: from'), '', array( 'number' => true ) );
 	$Form->text_input( 'edited_user_age_max', $edited_User->age_max, 3, T_('to'), '', array( 'number' => true ) );
 
 	if( $new_user_creating )
@@ -425,14 +425,14 @@ $userfields = $DB->get_results( '
 		FROM T_users__fields
 			LEFT JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID
 	WHERE uf_user_ID = '.$user_id.'
-	
+
 	UNION
-	
+
 	SELECT ufdf_ID, "0" AS uf_ID, ufdf_type, ufdf_name, "" AS uf_varchar, ufdf_required
 		FROM T_users__fielddefs
 	WHERE ufdf_required IN ( "recommended", "require" )
 		AND ufdf_ID NOT IN ( SELECT uf_ufdf_ID FROM T_users__fields WHERE uf_user_ID = '.$user_id.' )
-	
+
 	ORDER BY 1, 2' );
 
 $uf_new_fields = param( 'uf_new', 'array' );
@@ -446,7 +446,7 @@ foreach( $userfields as $userfield )
 		if( isset( $uf_new_fields[$userfield->ufdf_ID] ) )
 			$uf_val = $uf_new_fields[$userfield->ufdf_ID];
 	}
-	
+
 	if( is_null( $uf_val ) )
 	{ // No value submitted yet, get DB val:
 		$uf_val = $userfield->uf_varchar;
@@ -584,6 +584,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.52  2011/10/11 02:05:41  fplanque
+ * i18n/wording cleanup
+ *
  * Revision 1.51  2011/09/29 17:18:17  efy-yurybakh
  * remove a pipes in textarea
  *

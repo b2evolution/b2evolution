@@ -265,7 +265,7 @@ function create_new_thread()
 				$edited_Message->dbinsert_individual();
 			}
 
-			$Messages->add( T_('New thread created.'), 'success' );
+			$Messages->add( T_('Message sent.'), 'success' );
 
 			return true;
 		}
@@ -308,7 +308,7 @@ function create_new_message( $thrd_ID, $has_non_blocked_contacts )
 		{
 			// Insert in DB:
 			$edited_Message->dbinsert_message();
-			$Messages->add( T_('New message created.'), 'success' );
+			$Messages->add( T_('Message sent.'), 'success' );
 
 			return true;
 		}
@@ -405,6 +405,9 @@ function get_message_params_from_session()
 
 /*
  * $Log$
+ * Revision 1.17  2011/10/11 02:05:41  fplanque
+ * i18n/wording cleanup
+ *
  * Revision 1.16  2011/10/08 06:59:46  efy-yurybakh
  * fix bad urls
  *

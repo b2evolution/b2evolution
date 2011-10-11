@@ -262,7 +262,6 @@ div.section_requires_javascript p.ajax-loader {
 div.results {
 	margin: 0;
 	width: 100%;
-	float: left;
 	overflow: auto;
 }
 

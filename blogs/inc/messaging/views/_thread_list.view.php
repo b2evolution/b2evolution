@@ -66,18 +66,12 @@ foreach( $DB->get_results( $recipients_SQL->get() ) as $row )
 
 	if( !empty( $row->thr_read ) )
 	{
-		$read_by .= '<div>';
-		$read_by .= get_avatar_imgtags( $row->thr_read, true, false, $Blog->get_setting('image_size_messaging'), '', '', true, false );
-		if( !empty( $row->thr_unread ) )
-		{
-			$read_by .= '<br />';
-		}
-		$read_by .= '</div>';
+		$read_by .= get_avatar_imgtags( $row->thr_read, false, false, 'crop-15x15', '', '', true, false );
 	}
 
 	if( !empty( $row->thr_unread ) )
 	{
-		$read_by .= '<div>'.get_avatar_imgtags( $row->thr_unread, true, false, $Blog->get_setting( 'image_size_messaging' ), '', '', false, false ).'</div>';
+		$read_by .= get_avatar_imgtags( $row->thr_unread, false, false, 'crop-15x15', '', '', false, false );
 	}
 
 	$read_unread_recipients[$row->thr_ID] = $read_by;
@@ -258,17 +252,23 @@ $Results->cols[] = array(
 					'td_class' => 'shrinkwrap',
 					'td' => '~conditional( #thrd_msg_ID#>0, \'%convert_date(#thrd_unread_since#,'.$show_only_date.')%\', \'%convert_date(#thrd_datemodified#,'.$show_only_date.')%\')~' );
 
+
+/**
+ * Read? column
+ *
+ * @param mixed $thread_ID
+ * @return mixed
+ */
 function get_read_by( $thread_ID )
 {
 	global $read_unread_recipients;
 
 	return $read_unread_recipients[$thread_ID];
 }
-
 $Results->cols[] = array(
 					'th' => T_('Read?'),
 					'th_class' => 'shrinkwrap',
-					'td_class' => '',
+					'td_class' => 'center',
 					'td' => '%get_read_by( #thrd_ID# )%',
 					);
 
@@ -312,6 +312,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.39  2011/10/11 02:05:42  fplanque
+ * i18n/wording cleanup
+ *
  * Revision 1.38  2011/10/08 01:12:16  fplanque
  * small changes
  *

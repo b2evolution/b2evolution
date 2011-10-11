@@ -839,7 +839,7 @@ class DataObjectCache
 
 		if(count($group))
 		{
-			$r .= '<optgroup label="Frequent countries">';
+			$r .= '<optgroup label="'.T_('Frequent countries').'">';
 			foreach( $group as $loop_Obj )
 			{
 				$r .=  '<option value="'.$loop_Obj->ID.'"';
@@ -852,7 +852,7 @@ class DataObjectCache
 
 			if(count($ungroup))
 			{
-				$r .= '<optgroup label="Other countries">';
+				$r .= '<optgroup label="'.T_('Other countries').'">';
 				foreach( $ungroup as $loop_Obj )
 				{
 					$r .=  '<option value="'.$loop_Obj->ID.'"';
@@ -877,7 +877,7 @@ class DataObjectCache
 			}
 		}
 
-	
+
 
 		return $r;
 	}
@@ -927,6 +927,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.30  2011/10/11 02:05:41  fplanque
+ * i18n/wording cleanup
+ *
  * Revision 1.29  2011/09/23 18:02:10  fplanque
  * minor
  *

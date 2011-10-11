@@ -195,7 +195,7 @@ switch( $action )
 
 		if( is_logged_in() && $current_User->validated )
 		{ // Already validated, e.g. clicked on an obsolete email link:
-			$Messages->add( T_('Your account has already been validated.'), 'note' );
+			$Messages->add( T_('Your email address has already been validated.'), 'note' );
 			// no break: cleanup & redirect below
 		}
 		else
@@ -236,18 +236,24 @@ switch( $action )
 			}
 
 			// Validate user:
-
 			$current_User->set( 'validated', 1 );
 			$current_User->dbupdate();
 
 			$Messages->add( T_( 'Your email address has been validated.' ), 'success' );
 		}
 
-		$redirect_to = $Session->get( 'core.validatemail.redirect_to' );
+    // fp>asimo: Please add a "Users setting" to the backoffice to determine if we want to return to original page after email validation
+		// $redirect_to = $Session->get( 'core.validatemail.redirect_to' );
+    $redirect_to = '';
 
-		if( empty($redirect_to) && $current_User->check_perm('admin') )
-		{ // User can access backoffice
-			$redirect_to = $admin_url;
+		if( empty($redirect_to) )
+		{ // Redirect user to home page:
+      // fp>asimo: Please add a "Users setting" to the backoffice to determine if validation
+      // emails should act in backoffice or in a specific blog
+      // (very similar to  the setting for messaging)
+      // Use this also to redirecdt to inskin login uf there is a validation error above.
+      // TEMPORARY DIRTY:
+			$redirect_to = $baseurl.'?disp=avatar';
 		}
 
 		// Cleanup:
@@ -389,6 +395,9 @@ exit(0);
 
 /*
  * $Log$
+ * Revision 1.121  2011/10/11 02:05:41  fplanque
+ * i18n/wording cleanup
+ *
  * Revision 1.120  2011/09/26 14:53:27  efy-asimo
  * Login problems with multidomain installs - fix
  * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
