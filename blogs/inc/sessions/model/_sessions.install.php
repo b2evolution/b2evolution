@@ -85,6 +85,8 @@ $schema_queries['T_hitlog'] = array(
 			hit_sess_ID           INT UNSIGNED,
 			hit_datetime          DATETIME NOT NULL DEFAULT '2000-01-01 00:00:00',
 			hit_uri               VARCHAR(250) DEFAULT NULL,
+			hit_disp			  VARCHAR(30) DEFAULT NULL,
+			hit_ctrl			  VARCHAR(30) DEFAULT NULL,
 			hit_referer_type      ENUM('search','blacklist','spam','referer','direct','self','admin') NOT NULL,
 			hit_referer           VARCHAR(250) DEFAULT NULL,
 			hit_referer_dom_ID    INT UNSIGNED DEFAULT NULL,
@@ -151,6 +153,9 @@ $schema_queries['T_logs__internal_searches'] = array(
 
 /*
  * $Log$
+ * Revision 1.25  2011/10/12 07:25:02  efy-vitalij
+ * add columns hit_disp, hit_ctrl to T_hitlog
+ *
  * Revision 1.24  2011/09/17 22:16:05  fplanque
  * cleanup
  *
