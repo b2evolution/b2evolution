@@ -47,7 +47,7 @@ $UserSettings->set( 'pref_glob_settings_tab', $ctrl );
 $UserSettings->dbupdate();
 
 // Set options path:
-$AdminUI->set_path( 'options', 'currencies' );
+$AdminUI->set_path( 'options', 'regional', 'currencies' );
 
 // Get action parameter from request:
 param_action();
@@ -261,6 +261,7 @@ switch( $action )
 $AdminUI->breadcrumbpath_init();
 $AdminUI->breadcrumbpath_add( T_('Global settings'), '?ctrl=settings',
 		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
+$AdminUI->breadcrumbpath_add( T_('Regional settings'), '?ctrl=locales' );
 $AdminUI->breadcrumbpath_add( T_('Currencies'), '?ctrl=currencies' );
 
 
@@ -312,6 +313,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.21  2011/10/12 16:09:16  efy-yurybakh
+ * Regional settings menu refactoring
+ *
  * Revision 1.20  2011/09/23 11:49:48  efy-vitalij
  * fix country enable/prefer bug, add preferred property to Country class
  *

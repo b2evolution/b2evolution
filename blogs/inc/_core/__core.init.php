@@ -927,13 +927,18 @@ class _core_Module extends Module
 									'href' => '?ctrl=features' ),
 								'regional' => array(
 									'text' => T_('Regional'),
-									'href' => '?ctrl=locales'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ) ),
-								'countries' => array(
-									'text' => T_('Countries'),
-									'href' => '?ctrl=countries'),
-								'currencies' => array(
-									'text' => T_('Currencies'),
-									'href' => '?ctrl=currencies'),
+									'href' => '?ctrl=locales'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ),
+									'entries' => array(
+										'locales' => array(
+											'text' => T_('Locales, Time'),
+											'href' => '?ctrl=locales'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ) ),
+										'countries' => array(
+											'text' => T_('Countries'),
+											'href' => '?ctrl=countries' ),
+										'currencies' => array(
+											'text' => T_('Currencies'),
+											'href' => '?ctrl=currencies' ),
+										) ),
 								'plugins' => array(
 									'text' => T_('Plugins'),
 									'href' => '?ctrl=plugins'),
@@ -1060,6 +1065,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.91  2011/10/12 16:09:16  efy-yurybakh
+ * Regional settings menu refactoring
+ *
  * Revision 1.90  2011/10/11 18:26:10  efy-yurybakh
  * In skin posting (beta)
  *

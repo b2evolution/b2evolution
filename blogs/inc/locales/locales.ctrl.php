@@ -40,7 +40,7 @@ $current_User->check_perm( 'options', 'view', true );
 $UserSettings->set( 'pref_glob_settings_tab', $ctrl );
 $UserSettings->dbupdate();
 
-$AdminUI->set_path( 'options', 'regional' );
+$AdminUI->set_path( 'options', 'regional', 'locales' );
 
 param( 'action', 'string' );
 param( 'edit_locale', 'string' );
@@ -379,6 +379,7 @@ $AdminUI->breadcrumbpath_init();
 $AdminUI->breadcrumbpath_add( T_('Global settings'), '?ctrl=settings',
 		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
 $AdminUI->breadcrumbpath_add( T_('Regional settings'), '?ctrl=locales' );
+$AdminUI->breadcrumbpath_add( T_('Locales'), '?ctrl=locales' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -401,6 +402,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2011/10/12 16:09:16  efy-yurybakh
+ * Regional settings menu refactoring
+ *
  * Revision 1.12  2011/09/13 15:31:34  fplanque
  * Enhanced back-office navigation.
  *
