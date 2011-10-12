@@ -183,6 +183,11 @@ class Hit
 	 var $test_mode;
 
 	 /**
+	  *  Test rss mode
+	  */
+	 var $test_rss;
+
+	 /**
 	  * Test URI
 	  */
 	 var $test_uri;
@@ -192,7 +197,7 @@ class Hit
 	 *
 	 * This may INSERT a basedomain and a useragent but NOT the HIT itself!
 	 */
-	function Hit( $referer = NULL, $IP = NULL, $session_id= NULL, $hit_time = NULL, $test_mode = NULL , $test_uri = NULL, $user_agent = NULL, $test_admin = NULL)
+	function Hit( $referer = NULL, $IP = NULL, $session_id= NULL, $hit_time = NULL, $test_mode = NULL , $test_uri = NULL, $user_agent = NULL, $test_admin = NULL, $test_rss = NULL)
 	{
 		global $debug;
 
@@ -233,6 +238,11 @@ class Hit
 		if (!empty($test_admin))
 		{
 			$this->test_admin = $test_admin;
+		}
+
+		if (!empty($test_rss))
+		{
+			$this->test_rss = $test_rss;
 		}
 		// Check the REFERER and determine referer_type:
 		// TODO: dh> move this out of here, too, only if "antispam_block_spam_referers" is true,
@@ -591,7 +601,7 @@ class Hit
 		 * fp> TODO: this is WEAK! Do we really need to know before going into the skin?
 		 * dh> not necessary, but only where ->agent_type gets used (logging).
 		 */
-		if( isset( $Skin ) && $Skin->type == 'feed' )
+		if( (isset( $Skin ) && $Skin->type == 'feed') || !empty($this->test_rss) )
 		{
 			$Debuglog->add( 'Hit: detect_useragent(): RSS', 'request' );
 			$this->agent_type = 'rss';
@@ -726,7 +736,7 @@ class Hit
 	 */
 	function record_the_hit()
 	{
-		global $DB, $Session, $ReqURI, $Blog, $blog, $localtimenow, $Debuglog;
+		global $DB, $Session, $ReqURI, $Blog, $blog, $localtimenow, $Debuglog, $disp, $ctrl;
 
 		$Debuglog->add( 'Hit: Recording the hit.', 'request' );
 
@@ -789,20 +799,24 @@ class Hit
 		{
 			$sql = "
 				INSERT INTO T_hitlog(
-					hit_sess_ID, hit_datetime, hit_uri, hit_referer_type,
+					hit_sess_ID, hit_datetime, hit_uri, hit_disp, hit_ctrl, hit_referer_type,
 					hit_referer, hit_referer_dom_ID, hit_keyphrase_keyp_ID, hit_serprank, hit_blog_ID, hit_remote_addr, hit_agent_type )
-				VALUES( '".$Session->ID."', FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($hit_uri)."', '".$this->referer_type
+				VALUES( '".$Session->ID."', FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($hit_uri)."', ".$DB->null_string($disp).", ".$DB->null_string($ctrl).", '".$this->referer_type
 					."', '".$DB->escape($hit_referer)."', ".$DB->null($this->get_referer_domain_ID()).', '.$DB->null($keyp_ID)
 					.', '.$DB->null($serprank).', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', '".$this->get_agent_type()."'
 				)";
 		}
 		else
 		{
+			// Test mode
+			isset($this->test_uri['disp']) ? $test_disp = $this->test_uri['disp'] : $test_disp = NULL;
+			isset($this->test_uri['ctrl']) ? $test_ctrl = $this->test_uri['ctrl'] : $test_ctrl = NULL;
+
 			$sql = "
 				INSERT INTO T_hitlog(
-					hit_sess_ID, hit_datetime, hit_uri, hit_referer_type,
+					hit_sess_ID, hit_datetime, hit_uri, hit_disp, hit_ctrl, hit_referer_type,
 					hit_referer, hit_referer_dom_ID, hit_keyphrase_keyp_ID, hit_serprank, hit_blog_ID, hit_remote_addr, hit_agent_type )
-				VALUES( '".$this->session_id."', FROM_UNIXTIME(".$this->hit_time."), '".$DB->escape($hit_uri)."', '".$this->referer_type
+				VALUES( '".$this->session_id."', FROM_UNIXTIME(".$this->hit_time."), '".$DB->escape($hit_uri)."', ".$DB->null_string($test_disp).", ".$DB->null_string($test_ctrl).", '".$this->referer_type
 					."', '".$DB->escape($hit_referer)."', ".$DB->null($this->get_referer_domain_ID()).', '.$DB->null($keyp_ID)
 					.', '.$DB->null($serprank).', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', '".$this->get_agent_type()."'
 				)";
@@ -1572,6 +1586,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.74  2011/10/12 11:19:54  efy-vitalij
+ * add logging page and display params, add test_rss functional
+ *
  * Revision 1.73  2011/10/05 13:39:11  efy-vitalij
  * add test functional
  *
