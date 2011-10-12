@@ -521,6 +521,18 @@ class DB
 			return $val;
 	}
 
+	/**
+	 * @return string Return the given value as quoted string or 'NULL', if it's === NULL.
+	 */
+	function null_string($val)
+	{
+		if( $val === NULL )
+			return 'NULL';
+		else
+			return "'$val'";
+
+	}
+
 
 	/**
 	 * Returns the correct WEEK() function to get the week number for the given date.
@@ -1697,6 +1709,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.55  2011/10/12 10:31:23  efy-vitalij
+ * add function null_string()
+ *
  * Revision 1.54  2011/09/07 00:28:26  sam2kb
  * Replace non-ASCII character in regular expressions with ~
  *
