@@ -161,7 +161,7 @@ $Form->end_fieldset();
 	cat_select( $Form, true, false );
 	echo '<br />';
 
-	echo '<table cellspacing="0" class="compose_layout">';
+	echo '<table cellspacing="0" width="100%">';
 	echo '<tr><td class="label"><label for="item_tags">'.T_('Tags').':</strong> <span class="notes">'.T_('sep by ,').'</span></label></label></td>';
 	echo '<td class="input">';
 	$Form->text_input( 'item_tags', $item_tags, 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
@@ -171,9 +171,8 @@ $Form->end_fieldset();
 
 <div class="clear"></div>
 
+<div class="right">
 <?php // ------------------------------- ACTIONS ----------------------------------
-	echo '<div class="right">';
-
 	if( $creating )
 	{	// Create new post
 		$Form->submit( array( 'actionArray[create]', T_('Publish!'), 'SaveButton', '' ) );
@@ -184,19 +183,23 @@ $Form->end_fieldset();
 	}
 
 	echo '<br /><br /><a href="'.$advanced_edit_link['href'].'" onclick="'.$advanced_edit_link['onclick'].'" class="small">'.T_('Go to advanced edit screen').'</a>';
-	echo '</div>';
+?>
+</div>
+<?php
 // ================================== END OF EDIT FORM ==================================
 $Form->end_form();
 
 
 // ####################### JS BEHAVIORS #########################
-echo_publishnowbutton_js();
 // New category input box:
 echo_onchange_newcat();
 echo_autocomplete_tags();
 
 /*
  * $Log$
+ * Revision 1.4  2011/10/12 13:54:36  efy-yurybakh
+ * In skin posting
+ *
  * Revision 1.3  2011/10/12 11:23:31  efy-yurybakh
  * In skin posting (beta)
  *

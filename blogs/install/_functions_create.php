@@ -826,6 +826,7 @@ function create_blog(
 	{
 		$allow_rating_items = 'any';
 		$Blog->set_setting( 'skin'.$blog_skin_ID.'_bubbletip', '1' );
+		$Blog->set_setting( 'skin'.$blog_skin_ID.'_gender_colored', '1' );
 		$Blog->set_setting( 'in_skin_editing', '1' );
 	}
 	if( $allow_rating_items != '' )
@@ -1426,6 +1427,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.329  2011/10/12 13:54:36  efy-yurybakh
+ * In skin posting
+ *
  * Revision 1.328  2011/10/11 18:26:10  efy-yurybakh
  * In skin posting (beta)
  *

@@ -32,8 +32,6 @@ if( !empty( $action ) && $action != 'new' )
 	$Session->assert_received_crumb( 'item' );
 }
 
-load_class( 'items/model/_item.class.php', 'Item' );
-
 switch( $action )
 {
 	case 'update' :
@@ -60,6 +58,7 @@ switch( $action )
 {
 	case 'new_switchtab': // this gets set as action by JS, when we switch tabs
 		// New post form  (can be a bookmarklet form if mode == bookmarklet )
+		load_class( 'items/model/_item.class.php', 'Item' );
 		$edited_Item = new Item();
 
 		$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
@@ -97,8 +96,6 @@ switch( $action )
 		break;
 
 	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
-		// This is somewhat in between new and edit...
-
 		// Check permission based on DB status:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
@@ -130,7 +127,7 @@ switch( $action )
 		$tab_switch_params = 'p='.$edited_Item->ID;
 		break;
 
-	case 'create':
+	case 'create': // Create a new post
 		$exit_after_save = ( $action != 'create_edit' );
 
 		// We need early decoding of these in order to check permissions:
@@ -228,7 +225,7 @@ switch( $action )
 		header_redirect( $edited_Item->get_tinyurl() );
 		break;
 
-	case 'update':
+	case 'update': // Update an existing post
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'item' );
 
@@ -311,7 +308,7 @@ switch( $action )
 		break;
 }
 
-// in-skin display
+// Display a 'In-skin editing' form
 $SkinCache = & get_SkinCache();
 $Skin = & $SkinCache->get_by_ID( $Blog->skin_ID );
 $skin = $Skin->folder;
@@ -321,6 +318,9 @@ require $ads_current_skin_path.'index.main.php';
 
 /*
  * $Log$
+ * Revision 1.3  2011/10/12 13:54:36  efy-yurybakh
+ * In skin posting
+ *
  * Revision 1.2  2011/10/12 11:23:31  efy-yurybakh
  * In skin posting (beta)
  *

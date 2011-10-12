@@ -104,6 +104,11 @@ function init_inskin_editing()
 	global $item_tags, $item_title, $item_content;
 	global $admin_url, $redirect_to, $advanced_edit_link;
 
+	if( ! $Blog->get_setting( 'in_skin_editing' ) )
+	{	// Redirect to the Back-office editing (setting is OFF)
+		header_redirect( $admin_url.'?ctrl=items&action=new&blog='.$Blog->ID );
+	}
+
 	// Post ID, go from $_GET when we edit post from Front-office
 	$post_ID = param( 'p', 'integer', 0 );
 
@@ -2053,6 +2058,9 @@ function get_item_edit_modes( $blog_ID, $action, $dispatcher, $tab_switch_params
 
 /*
  * $Log$
+ * Revision 1.145  2011/10/12 13:54:36  efy-yurybakh
+ * In skin posting
+ *
  * Revision 1.144  2011/10/12 11:23:31  efy-yurybakh
  * In skin posting (beta)
  *
