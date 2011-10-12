@@ -29,9 +29,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Helper function for "Requested URI" column
  * @param integer Blog ID
  * @param string Requested URI
+ * @param integer Output string lenght
+ * @param string Display
+ * @param string Controller
  * @return string
  */
-function stats_format_req_URI( $hit_blog_ID, $hit_uri, $max_len = 40 )
+function stats_format_req_URI( $hit_blog_ID, $hit_uri, $max_len = 40, $hit_disp = NULL, $hit_ctrl = NULL)
 {
 	if( !empty( $hit_blog_ID ) )
 	{
@@ -54,6 +57,20 @@ function stats_format_req_URI( $hit_blog_ID, $hit_uri, $max_len = 40 )
 	elseif( evo_strlen($hit_uri) > $max_len )
 	{
 		$hit_uri = '...'.evo_substr( $hit_uri, -$max_len );
+	}
+
+	if ($hit_disp != NULL || $hit_ctrl != NULL)
+	{
+		$hit_uri = '';
+
+		if ($hit_disp != NULL)
+		{
+			$hit_uri = "[disp=$hit_disp]";
+		}
+		if ($hit_ctrl != NULL)
+		{
+			$hit_uri = $hit_uri."[ctrl=$hit_ctrl]";
+		}
 	}
 
 	return '<a href="'.$full_url.'">'.$hit_uri.'</a>';
@@ -191,6 +208,9 @@ function disp_color_agent( $hit_agent_type )
 }
 /*
  * $Log$
+ * Revision 1.20  2011/10/12 11:28:54  efy-vitalij
+ * add params display and controller to function stats_format_req_URI
+ *
  * Revision 1.19  2011/10/03 10:41:25  efy-vitalij
  * add colors to statistic
  *
