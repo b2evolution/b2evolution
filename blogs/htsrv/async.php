@@ -189,7 +189,9 @@ switch( $action )
 			$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
 
 			$status = param( 'status', 'string' );
-			$edited_Comment->set('status', $status );
+			$edited_Comment->set( 'status', $status );
+			// Comment moderation is done, don't keep "secret" moderation access
+			$edited_Comment->set( 'secret', NULL );
 			$edited_Comment->dbupdate();
 
 			if( $status == 'published' )
@@ -381,6 +383,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.77  2011/10/12 13:34:36  efy-asimo
+ * Delete comment secret on comment update
+ *
  * Revision 1.76  2011/09/28 16:15:56  efy-yurybakh
  * "comment was helpful" votes
  *

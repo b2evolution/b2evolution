@@ -51,6 +51,8 @@ switch( $action )
 {
 	case 'publish':
 		$posted_Comment->set('status', 'published' );
+		// Comment moderation is done, don't keep "secret" moderation access
+		$posted_Comment->set( 'secret', NULL );
 
 		$posted_Comment->dbupdate();	// Commit update to the DB
 
@@ -64,6 +66,8 @@ switch( $action )
 
 	case 'deprecate':
 		$posted_Comment->set('status', 'deprecated' );
+		// Comment moderation is done, don't keep "secret" moderation access
+		$posted_Comment->set( 'secret', NULL );
 
 		$posted_Comment->dbupdate();	// Commit update to the DB
 
@@ -206,6 +210,9 @@ else
 <?php
 /*
  * $Log$
+ * Revision 1.16  2011/10/12 13:34:36  efy-asimo
+ * Delete comment secret on comment update
+ *
  * Revision 1.15  2011/10/12 00:34:09  fplanque
  * comment quick review, not just for drafts
  *

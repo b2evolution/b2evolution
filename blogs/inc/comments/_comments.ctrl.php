@@ -209,6 +209,7 @@ switch( $action )
 		{
 			$comment_status = 'published';
 		}
+		$old_comment_status = $edited_Comment->get( 'status' );
 		$edited_Comment->set( 'status', $comment_status );
 
 		param( 'comment_nofollow', 'integer', 0 );
@@ -217,6 +218,11 @@ switch( $action )
 		if( $Messages->has_errors() )
 		{	// There have been some validation errors:
 			break;
+		}
+
+		if( $old_comment_status != $comment_status )
+		{ // Comment moderation is done, don't keep "secret" moderation access
+			$edited_Comment->set( 'secret', NULL );
 		}
 
 		// UPDATE DB:
@@ -239,6 +245,8 @@ switch( $action )
 		$Session->assert_received_crumb( 'comment' );
 
 		$edited_Comment->set('status', 'published' );
+		// Comment moderation is done, don't keep "secret" moderation access
+		$edited_Comment->set( 'secret', NULL );
 
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
@@ -257,6 +265,8 @@ switch( $action )
 		$Session->assert_received_crumb( 'comment' );
 
 		$edited_Comment->set('status', 'deprecated' );
+		// Comment moderation is done, don't keep "secret" moderation access
+		$edited_Comment->set( 'secret', NULL );
 
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
@@ -507,6 +517,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.47  2011/10/12 13:34:36  efy-asimo
+ * Delete comment secret on comment update
+ *
  * Revision 1.46  2011/09/06 00:54:38  fplanque
  * i18n update
  *
