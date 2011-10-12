@@ -79,14 +79,13 @@ function switch_maintenance_mode( $enable, $msg = '' )
 
 <p>'.$msg.'</p>
 
+<hr />
+
+<p>Site administrators: please view the source of this page for details.</p>
+
 <!--
 
-In order to put b2evolution into maintenance mode, rename this file to maintenance.html (with NO _ at the beginning).
-
-In order to put b2evolution into maintenance mode but still allow access to the install script,
-rename this file to imaintenance.html (with an i at the beginning).
-
-Edit the contents of this file to change the message that is displayed during maintenance.
+If you need to manually put b2evolution out of maintenance mode, delete or rename the file /conf/maintenance.html
 
 -->
 
@@ -365,6 +364,9 @@ function aliases_to_tables( $aliases )
 
 /*
  * $Log$
+ * Revision 1.12  2011/10/12 00:49:34  fplanque
+ * Stop panic attacks
+ *
  * Revision 1.11  2011/06/15 06:29:44  sam2kb
  * Relocate "set_max_execution_time" function
  *
