@@ -398,7 +398,8 @@ if( empty($tab) )
 			}
 			
 
-			global $baseurlroot, $admin_url;
+			global $baseurlroot, $admin_url, $user_agents;
+
 			load_class( 'items/model/_itemlistlight.class.php', 'ItemListLight' );
 
 			load_class( 'sessions/model/_hit.class.php', 'Hit' );
@@ -461,9 +462,25 @@ if( empty($tab) )
 				}
 
 				// add search links for all blogs
+				$links[] =  array('link'	=> '/'.$listBlog->siteurl.'?s=$keywords$&disp=search&submit=Search',
+								  'blog_id' => $blog_id);
 
-				$links[] =  array('link' => '/'.$listBlog->siteurl.'?s=$keywords$&disp=search&submit=Search',
-								  'blog_id'   => $blog_id);
+				$links[] =  array('link'	=> '/'.$listBlog->siteurl.'?disp=users',
+								  'blog_id'	=> $blog_id,
+								  'disp'	=> 'users');
+
+				$links[] =  array('link'	=> '/'.$listBlog->siteurl.'?disp=users&user_ID=1',
+								  'blog_id'	=> $blog_id,
+								  'disp'	=> 'users');
+
+				$links[] =  array('link'	=> '/'.$listBlog->siteurl.'?disp=threads',
+								  'blog_id'	=> $blog_id,
+								  'disp'	=> 'threads');
+
+				$links[] =  array('link'	=> '/'.$listBlog->siteurl.'?disp=profile',
+								  'blog_id'	=> $blog_id,
+								  'disp'	=> 'profile');
+
 
 			}
 
@@ -486,6 +503,17 @@ if( empty($tab) )
 							 'http://www.google.com/url?sa=t&rct=j&q=$keywords$&source=web&cd=4',
 							 'http://www.bing.com/search?q=$keywords$&src=IE-SearchBox&FORM=IE8SRC'
 							);
+
+			$robots = array();
+			foreach( $user_agents as $lUserAgent )
+			{
+				if( $lUserAgent[0] == 'robot')
+				{
+				$robots[] = $lUserAgent[1];
+				}
+			}
+
+			$robots_count = count($robots) - 1;
 
 			$ref_count = count($referes) - 1;
 
@@ -536,7 +564,8 @@ if( empty($tab) )
 									'sess_lastseen' => 0,
 									'sess_ipaddress'=> generate_random_ip(),
 									'sess_user_ID'  => $users_array[$i]['user_ID'],
-									'pervios_link'	=> '');
+									'pervios_link'	=> '',
+									'robot'			=> '');
 			}
 
 			// main cycle of generation
@@ -589,7 +618,7 @@ if( empty($tab) )
 				}
 				else
 				{
-					if (($time_shift - $cur_seesion['sess_lastseen'])> 3000)
+					if (($time_shift - $cur_seesion['sess_lastseen'])> 3000 || !empty($cur_seesion['robot']))
 					{	// This session last updated more than 3000 sec ago. Instead of this session create a new session.
 
 						$cur_seesion = array(	'sess_ID'		=> -1,
@@ -598,12 +627,13 @@ if( empty($tab) )
 												'sess_lastseen' => 0,
 												'sess_ipaddress'=> generate_random_ip(),
 												'sess_user_ID'  => $users_array[mt_rand(0,$users_count-1)]['user_ID'],
-												'pervios_link'	=> ''
+												'pervios_link'	=> '',
+												'robot'			=> ''
 							);
 
 						$cur_seesion['sess_lastseen'] = $time_shift;
-
-						if (mt_rand(0, 100) > 80)
+						$r_num  = mt_rand(0, 100);
+						if ($r_num > 40)
 						{	// Create anonymous user and make double insert into hits.
 							$cur_seesion['sess_user_ID'] = -1;
 							$DB->query( "
@@ -614,6 +644,11 @@ if( empty($tab) )
 								'".date( 'Y-m-d H:i:s', $cur_seesion['sess_lastseen'] )."',
 								".$DB->quote($cur_seesion['sess_ipaddress'])."
 							)" );
+							
+							if ($r_num >= 80 )
+							{ // Create robot hit
+								$cur_seesion['robot'] = $robots[mt_rand(0,$robots_count)];
+							}
 						}
 
 						else
@@ -649,21 +684,36 @@ if( empty($tab) )
 						
 						if ($cur_seesion['sess_user_ID'] == -1)
 						{
-							$link =  array(	'link'		=> '/htsrv/login.php',
-											'blog_id'   => 1);
+							if (empty($cur_seesion['robot']))
+							{
+								$link =  array(	'link'		=> '/htsrv/login.php',
+												'blog_id'   => 1);
 
-							$Test_hit = new Hit($ref_link, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen'], 1, $link);
+								$Test_hit = new Hit($ref_link, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen'], 1, $link);
 
-							$Test_hit->log();
+								$Test_hit->log();
 
-							$link =  array('link'		=> '/htsrv/login.php?redirect_to=fake_stat',
-										   'blog_id'	=> 1);
+								$link =  array('link'		=> '/htsrv/login.php?redirect_to=fake_stat',
+											   'blog_id'	=> 1);
 
-							$Test_hit = new Hit($baseurlroot, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen'] + 3, 1, $link);
+								$Test_hit = new Hit($baseurlroot, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen'] + 3, 1, $link);
 
-							$Test_hit->log();
+								$Test_hit->log();
 
-							$cur_seesion['pervios_link'] = $baseurlroot.$link['link'];
+								$cur_seesion['pervios_link'] = $baseurlroot.$link['link'];
+							}
+							else
+							{
+								if (mt_rand(0, 100) < 50)
+								{	// robot hit
+									$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen'], 1, $links[$rand_link], $cur_seesion['robot']);
+								}
+								else
+								{	// rss/atom hit
+									$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen'], 1, $links[$rand_link], NULL, NULL, 1);
+								}
+								$Test_hit->log();
+							}
 
 
 						}
@@ -798,6 +848,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.55  2011/10/12 11:23:18  efy-vitalij
+ * add rss and robot hits generation
+ *
  * Revision 1.54  2011/10/10 19:48:32  fplanque
  * i18n & login display cleaup
  *
