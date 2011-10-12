@@ -43,7 +43,7 @@ $agent_type = param( 'agent_type', 'string', NULL, true );
 // Create result set:
 
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE hit_ID, sess_ID, hit_datetime, hit_referer_type, hit_uri, hit_blog_ID, hit_referer, hit_remote_addr,'
+$SQL->SELECT( 'SQL_NO_CACHE hit_ID, sess_ID, hit_datetime, hit_referer_type, hit_uri, hit_disp, hit_ctrl, hit_blog_ID, hit_referer, hit_remote_addr,'
 	. 'user_login, hit_agent_type, blog_shortname, dom_name, goal_name, keyp_phrase, hit_serprank' );
 $SQL->FROM( 'T_hitlog LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID'
 	. ' LEFT JOIN T_track__keyphrase ON hit_keyphrase_keyp_ID = keyp_ID'
@@ -159,14 +159,14 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Type'),
 		'order' => 'hit_referer_type',
-		'td_class' => 'reftype_#hit_referer_type#',
+		'td_class' => 'reftype_#hit_referer_type# small shrinkwrap',
 		'td' => '$hit_referer_type$',
 	);
 
 $Results->cols[] = array(
 		'th' => T_('Agent'),
 		'order' => 'hit_agent_type',
-		'td_class' => 'agent_#hit_agent_type#',
+		'td_class' => 'agent_#hit_agent_type# small shrinkwrap',
 		'td' => '$hit_agent_type$',
 
 	);
@@ -210,7 +210,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Requested URI'),
 		'order' => 'hit_uri',
-		'td' => '%stats_format_req_URI( #hit_blog_ID#, #hit_uri# )%',
+		'td' => '%stats_format_req_URI( #hit_blog_ID#, #hit_uri#, 40, #hit_disp#, #hit_ctrl# )%',
 	);
 
 $Results->cols[] = array(
@@ -223,3 +223,10 @@ $Results->cols[] = array(
 
 // Display results:
 $Results->display();
+
+/*
+ * $Log$
+ * Revision 1.6  2011/10/12 11:45:28  efy-vitalij
+ * change Requested URI column
+ *
+ */
