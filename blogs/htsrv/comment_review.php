@@ -1,6 +1,6 @@
 <?php
 /**
- * This is file implements the comments quick edit operations after mail notification.
+ * This is file implements the comments quick edit operations after email notification.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -39,6 +39,8 @@ else
 // Check the secret parameter (This doubles as a CRUMB)
 if( $secret != $posted_Comment->get('secret') )
 {	// Invalid secret, no moderation allowed here, go to regular form with regular login requirements:
+  $Messages->add( T_('Invalid secret key. Quick moderation not available.') );
+  // fp> TODO: this does not display on login form... :/ (but works if already logged in)
 	header_redirect( $to_comment_edit );
 }
 
@@ -144,18 +146,18 @@ if ($secret == $posted_Comment->get('secret') && ($secret != NULL) )
 	{
 		// delete url button
 		echo '<input type="submit" name="actionArray[deleteurl]"';
-		echo ' value="'.T_('Delete URL').'" title="'.T_('Delete comment URL').'"/>';
+		echo ' value="'.T_('Delete URL').'" title="'.T_('Delete comment URL').'" />';
 		echo "\n";
 
 		// antispam tool button
 		echo '<input type="submit" name="actionArray[antispamtool]"';
-		echo ' value="'.T_('Antispam tool').'" title="'.T_('Antispam tool').'"/>';
+		echo ' value="'.T_('Antispam tool').'" title="'.T_('Antispam tool').'" />';
 		echo "\n";
 	}
 
-	echo '<input type="hidden" name="secret" value="'.$secret.'"';
+	echo '<input type="hidden" name="secret" value="'.$secret.'" />';
 	echo "\n";
-	echo '<input type="hidden" name="cmt_ID" value="'.$cmt_ID.'"';
+	echo '<input type="hidden" name="cmt_ID" value="'.$cmt_ID.'" />';
 	echo "\n";
 }
 else
@@ -204,6 +206,9 @@ else
 <?php
 /*
  * $Log$
+ * Revision 1.15  2011/10/12 00:34:09  fplanque
+ * comment quick review, not just for drafts
+ *
  * Revision 1.14  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

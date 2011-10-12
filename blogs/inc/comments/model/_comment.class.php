@@ -2014,13 +2014,6 @@ class Comment extends DataObject
 	/**
 	 * Send email notifications to subscribed users:
 	 *
-	 * @todo fp> SEPARATE MODERATION notifications from SUBSCRIPTION notifications
-	 * @todo shall we notify suscribers of blog were this is in extra-cat?
-	 * @todo cache message by locale like {@link Item::send_email_notifications()}
-	 * @todo dh> Indicator in url to see where the user came from (&from=subnote ["subscription notification"]) - Problem: too long urls.
-	 * @todo dh> "Beautify" like {@link Item::send_email_notifications()} ? fp > sure
-	 * @todo Should include "visibility status" in the mail to the Item's Author
-	 *
 	 * efy-asimo> moderatation and subscription notifications have been separated
 	 *
 	 * @param boolean true if send only moderation email, false otherwise
@@ -2041,7 +2034,7 @@ class Comment extends DataObject
 		$notify_users = array();
 
 		if( $only_moderators || $except_moderators )
-		{ // get moderators
+		{ // we need the list of moderators:
 			$sql = 'SELECT DISTINCT user_email, user_locale, user_ID, user_login, user_nickname, user_firstname, user_unsubscribe_key
 						FROM T_coll_user_perms INNER JOIN T_users ON bloguser_user_ID = user_ID
 						WHERE bloguser_blog_ID = '.$edited_Blog->ID.
@@ -2064,9 +2057,10 @@ class Comment extends DataObject
 			}
 		}
 		else
-		{
+		{ // Not just moderators:
 			$moderators = array();
 			$except_condition = '';
+
 			if( $except_moderators )
 			{ // Set except moderators condition. Exclude moderators who already got a notification email.
 				foreach( $moderators_to_notify as $moderator )
@@ -2096,7 +2090,7 @@ class Comment extends DataObject
 				}
 			}
 
-			// Get list of users who want to be notified about the this post comments
+			// Get list of users who want to be notified about the this post comments:
 			if( $edited_Blog->get_setting( 'allow_item_subscriptions' ) )
 			{ // item subscriptions is allowed
 				$sql = 'SELECT DISTINCT user_email, user_locale, user_ID, user_unsubscribe_key, user_login, user_nickname, user_firstname
@@ -2114,7 +2108,7 @@ class Comment extends DataObject
 				}
 			}
 
-			// Get list of users who want to be notfied about this blog comments
+			// Get list of users who want to be notfied about this blog comments:
 			if( $edited_Blog->get_setting( 'allow_subscriptions' ) )
 			{ // blog subscription is allowed
 				$sql = 'SELECT DISTINCT user_email, user_locale, user_ID, user_unsubscribe_key, user_login, user_nickname, user_firstname
@@ -2142,9 +2136,11 @@ class Comment extends DataObject
 		/*
 		 * We have a list of email addresses to notify:
 		 */
+
 		// TODO: dh> this reveals the comments author's email address to all subscribers!!
 		//           $notify_from should get used by default, unless the user has opted in to be the sender!
 		// fp>If the subscriber has permission to moderate the comments, he SHOULD receive the email address.
+    // fp>asimo: please set reply_to for moderators/blog/post owners only -- NOT for other subscribers
 		if( $this->get_author_User() )
 		{ // Comment from a registered user:
 			$reply_to = $this->author_User->get('email');
@@ -2217,7 +2213,7 @@ class Comment extends DataObject
 			}
 
 			$notify_message = $notify_salutation.
-				T_('Comment').': '.str_replace('&amp;', '&', $this->get_permanent_url())."\n"
+				T_('New comment').': '.str_replace('&amp;', '&', $this->get_permanent_url())."\n"
 				// TODO: fp> We MAY want to force a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 				.$notify_message;
 
@@ -2231,10 +2227,10 @@ class Comment extends DataObject
 
 			if( $notify_type == 'moderator' )
 			{ // moderation email
-				if( $this->status == 'draft' )
+        // fp> users have asked for this even if not draft:
+        // if( $this->status == 'draft' )
 				{
-					$secret_value = '&secret='.$this->secret;
-					$notify_message .= T_('Quick moderation').': '.$htsrv_url.'comment_review.php?cmt_ID='.$this->ID.$secret_value."\n\n";
+					$notify_message .= T_('Quick moderation').': '.$htsrv_url.'comment_review.php?cmt_ID='.$this->ID.'&secret='.$this->secret."\n\n";
 				}
 				$notify_message .= T_('Edit comment').': '.$admin_url.'?ctrl=comments&action=edit&comment_ID='.$this->ID."\n\n";
 			}
@@ -2278,6 +2274,7 @@ class Comment extends DataObject
 				$Debuglog->add( $mail_dump, 'notification' );
 			}
 
+      // Send the email:
 			send_mail( $notify_email, NULL, $subject, $notify_message, NULL, NULL, array( 'Reply-To' => $reply_to ) );
 
 			locale_restore_previous();
@@ -2294,9 +2291,10 @@ class Comment extends DataObject
 	{
 		global $Plugins;
 
-		if( $this->status != 'draft' )
+		// if( $this->status != 'draft' )
 		{	// We don't want to keep "secret" moderation access once we've published or deprecated a comment
-			$this->set( 'secret', null );
+      // fp>asimo: please change the following to null not in dbupdate but explicitely when a comment is updated from quick moderation OR from normal edit form
+      // $this->set( 'secret', null );
 		}
 
 		$dbchanges = $this->dbchanges;
@@ -2341,9 +2339,10 @@ class Comment extends DataObject
 			}
 		}
 
-		if( $this->status == 'draft' )
+		//if( $this->status == 'draft' )
 		{	// We will allow "secret" moderation only to draft comments:
-			$this->set( 'secret', generate_random_key() );
+      // fp> users have requested this for all comments
+      $this->set( 'secret', generate_random_key() );
 		}
 
 		$dbchanges = $this->dbchanges;
@@ -2433,6 +2432,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.123  2011/10/12 00:34:07  fplanque
+ * comment quick review, not just for drafts
+ *
  * Revision 1.122  2011/10/10 19:48:31  fplanque
  * i18n & login display cleaup
  *
