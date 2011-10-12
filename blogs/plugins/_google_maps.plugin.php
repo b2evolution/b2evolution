@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the TEST plugin.
+ * This file implements the Google Maps plugin plugin.
  *
  * For the most recent and complete Plugin API documentation
  * see {@link Plugin} in ../evocore/_plugin.class.php.
@@ -28,9 +28,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * TEST Plugin
+ * Google Maps Plugin
  *
- * This plugin responds to virtually all possible plugin events :P
+ * 
  *
  * @package plugins
  */
@@ -122,111 +122,6 @@ class google_maps_plugin extends Plugin
 
 
 	/**
-	 * We trigger an extra event ourself (which we also provide ourselves).
-	 *
-	 * @return array
-	 */
-	function GetExtraEvents()
-	{
-		return array(
-				// Gets "min" and "max" as params and should return a random number in between:
-				'test_plugin_get_random' => 'TEST event that returns a random number.',
-			);
-	}
-
-
-	/**
-	 * Define a test cron job
-	 */
-	function GetCronJobs( & $params )
-	{
-		return array(
-				array(
-					'name' => 'TEST plugin - cron job',
-					'ctrl' => 'test_job',
-					'params' => array( 'param' => 1 ),
-				),
-			);
-	}
-
-
-	/**
-	 * Execute/Handle a test/sample cronjob.
-	 */
-	function ExecCronJob( & $params )
-	{
-		if( $params['ctrl'] == 'test_job' )
-		{
-			return array( 'code' => 1, 'message' => 'Test successful.' );
-		}
-	}
-
-
-	/**
-	 * Deactive the plugin for the current request if the user wants it so.
-	 * @see Plugin::AppendLoginRegisteredUser()
-	 */
-	function AppendLoginRegisteredUser()
-	{
-		if( $this->UserSettings->get('deactivate') )
-		{
-			$this->forget_events();
-		}
-	}
-
-
-	/**
-	 * Define some dependencies.
-	 *
-	 * @see Plugin::GetDependencies()
-	 * @return array
-	 */
-	function GetDependencies()
-	{
-		return array(
-				'recommends' => array(
-					'events_by_one' => array( array('Foo', 'Bar'), array('FooBar', 'BarFoo') ), // a plugin that provides "Foo" and "Bar", and one (may be the same) that provides "FooBar" and "BarFoo"
-					'events' => array( 'some_event', 'some_other_event' ),
-					'plugins' => array( array( 'some_plugin', '1' ) ), // at least version 1 of some_plugin
-				),
-
-				'requires' => array(
-					// Same syntax as with the 'recommends' class above, but would prevent the plugin from being installed.
-				),
-			);
-	}
-
-
-	/**
-	 * Gets asked for, if user settings get updated.
-	 *
-	 * We just add a note.
-	 *
-	 * @see Plugin::PluginUserSettingsUpdateAction()
-	 */
-	function PluginUserSettingsUpdateAction()
-	{
-		if( $this->UserSettings->get('echo_random') )
-		{
-			$this->msg( 'TEST plugin: Random numbers have been disabled.' );
-		}
-		else
-		{
-			$this->msg( 'TEST plugin: Random numbers have been enabled.' );
-		}
-
-		return true;
-	}
-
-
-	/**
-	 * Event handlers:
-	 */
-
-
-
-
-	/**
 	 * @see Plugin::AdminDisplayItemFormFieldset()
 	 */
 	function AdminDisplayItemFormFieldset( & $params )
@@ -242,8 +137,8 @@ class google_maps_plugin extends Plugin
 		{
 		  echo T_('You must configure the following custom fields (double3 as Latitude, double4 as Longitude )
       so the Google Maps plugin can save its coordinates.');
-			$params['Form']->end_fieldset();
-			return;
+		$params['Form']->end_fieldset();
+		return;
 		}
 
 
@@ -358,8 +253,11 @@ class google_maps_plugin extends Plugin
 	google.maps.event.addListener(marker, 'dragend', function()
 	{
 		map.setCenter(marker.getPosition());
-		jQuery('#item_double3').val(marker.getPosition().lat());
-		jQuery('#item_double4').val(marker.getPosition().lng());
+		jQuery('input[name=item_double3]').val(marker.getPosition().lat());
+
+
+
+		jQuery('input[name=item_double4]').val(marker.getPosition().lng());
 
 		geocoder.geocode({'latLng': marker.getPosition()}, function(region_res, region_status)
 		{
@@ -416,8 +314,8 @@ class google_maps_plugin extends Plugin
 		});
 
 		map.setCenter(marker.getPosition());
-		jQuery('#item_double3').val(event.latLng.lat());
-		jQuery('#item_double4').val(event.latLng.lng());
+		jQuery('input[name=item_double3]').val(event.latLng.lat());
+		jQuery('input[name=item_double4]').val(event.latLng.lng());
 
 		marker_dragend(marker, map);
 	});
@@ -515,8 +413,8 @@ function locate()
 			map.setCenter(searchLoc);
 		}
 		marker_dragend(marker, map);
-		jQuery('#item_double3').val(searchLoc.lat());
-		jQuery('#item_double4').val(searchLoc.lng());
+		jQuery('input[name=item_double3]').val(searchLoc.lat());
+		jQuery('input[name=item_double4]').val(searchLoc.lng());
 		jQuery('#google_map_zoom').val(map.getZoom());
 	}
 
@@ -632,120 +530,6 @@ function locate()
 		<?php
 	}
 
-	/**
-	 * Event handler: Gets invoked in /toolbar.inc.php after the menu structure is built.
-	 *
-	 * @see Plugin::AdminAfterEvobarInit()
-	 */
-	function AdminAfterEvobarInit()
-	{
-
-		// The following is a tiny bit hackish and should probably be abstracted a bit, but just a little bit
-		// The idea is too let plugins hook pretty much anywhere into the menu structure, including Left AND Right menus.
-
-		global $topleft_Menu;
-		$topleft_Menu->add_menu_entries( 'tools', array(
-				'urls_sep' => array(
-						'separator' => true,
-					),
-				'urls' => array(
-						'text' => 'Test plugin&hellip;',
-						'href' => $this->get_tools_tab_url(),
-					),
-			) );
-
-	}
-
-
-	/**
-	 * Event handler: Gets invoked in /admin.php for every backoffice page after
-	 *                the menu structure is built. You can use the {@link $AdminUI} object
-	 *                to modify it.
-	 *
-	 * This is the hook to register menu entries. See {@link register_menu_entry()}.
-	 *
-	 * @see Plugin::AdminAfterMenuInit()
-	 */
-	function AdminAfterMenuInit()
-	{
-		$this->register_menu_entry( 'Test tab' );
-	}
-
-
-	/**
-	 * Event handler: Called when handling actions for the "Tools" menu.
-	 *
-	 * Use {@link $Messages} to add Messages for the user.
-	 *
-	 * @see Plugin::AdminToolAction()
-	 */
-	function AdminToolAction( $params )
-	{
-		global $Messages;
-
-		$Messages->add( 'Hello, This is the AdminToolAction for the TEST plugin.' );
-	}
-
-
-	/**
-	 * Event handler: Called when displaying the block in the "Tools" menu.
-	 *
-	 * @see Plugin::AdminToolPayload()
-	 */
-	function AdminToolPayload( $params )
-	{
-		echo 'Hello, This is the AdminToolPayload for the TEST plugin.';
-	}
-
-
-	/**
-	 * Event handler: Method that gets invoked when our tab (?tab=plug_ID_X) is selected.
-	 *
-	 * You should catch params (GET/POST) here and do actions (no output!).
-	 * Use {@link $Messages} to add messages for the user.
-	 *
-	 * @see Plugin::AdminTabAction()
-	 */
-	function AdminTabAction()
-	{
-		global $Plugins;
-
-		$this->text_from_AdminTabAction = '<p>This is text from AdminTabAction for the TEST plugin.</p>'
-			.'<p>Here is a random number: '
-			.$Plugins->get_trigger_event_first_return('test_plugin_get_random', array( 'min'=>-1000, 'max'=>1000 )).'</p>';
-
-		if( $this->param_text = param( $this->get_class_id('text') ) )
-		{
-			$this->text_from_AdminTabAction .= '<p>You have said: '.$this->param_text.'</p>';
-		}
-	}
-
-
-	/**
-	 * Event handler: Gets invoked when our tab is selected and should get displayed.
-	 *
-	 * @see Plugin::AdminTabPayload()
-	 */
-	function AdminTabPayload()
-	{
-		echo 'Hello, this is the AdminTabPayload for the TEST plugin.';
-
-		echo $this->text_from_AdminTabAction;
-
-		// TODO: this is tedious.. should either be a global function (get_admin_Form()) or a plugin helper..
-		$Form = new Form();
-		$Form->begin_form();
-
-		$Form->add_crumb( 'plugin_test' );
-		$Form->hidden_ctrl(); // needed to pass the "ctrl=tools" param
-		$Form->hiddens_by_key( get_memorized() ); // needed to pass all other memorized params, especially "tab"
-
-		$Form->text_input( $this->get_class_id().'_text', $this->param_text, '20', 'Text' );
-
-		$Form->button_input(); // default "submit" button
-
-		$Form->end_form();
-	}
 
 	/**
 	 * Event handler: Called when the plugin has been installed.
@@ -770,6 +554,9 @@ function locate()
 }
 /*
  * $Log$
+ * Revision 1.9  2011/10/12 12:43:34  efy-vitalij
+ * fix bug
+ *
  * Revision 1.8  2011/10/12 02:23:52  fplanque
  * minor
  *
