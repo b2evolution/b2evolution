@@ -240,8 +240,8 @@ class google_maps_plugin extends Plugin
 
 		if ($field_name1 != 'latitude' || $field_name2 != 'longitude')
 		{
-			$params['Form']->info_field('Error',T_('You must configure the following custom fields (double3 as Latitude, double4 as Longitude ) so the Google Maps plugin can save is coordinates'));
-			//echo T_('You must configure the following custom fields (double3 as Latitude, double4 as Longitude ) so the Google Maps plugin can save is coordinates');
+		  echo T_('You must configure the following custom fields (double3 as Latitude, double4 as Longitude )
+      so the Google Maps plugin can save its coordinates.');
 			$params['Form']->end_fieldset();
 			return;
 		}
@@ -258,7 +258,7 @@ class google_maps_plugin extends Plugin
 
 		$height = (int)$this->Settings->get('height_back');
 		$height = 'height:'.$height.'px';
-		 
+
 
 	?>
 	<div id="map_canvas" style="width:100%; <?php echo $height; ?>; margin: 5px 5px 5px 5px;"></div>
@@ -379,7 +379,7 @@ class google_maps_plugin extends Plugin
 
 	});
 	}
-	
+
 	marker_dragend(marker, map);
 
 	google.maps.event.addListener(map, 'zoom_changed', function()
@@ -770,6 +770,9 @@ function locate()
 }
 /*
  * $Log$
+ * Revision 1.8  2011/10/12 02:23:52  fplanque
+ * minor
+ *
  * Revision 1.7  2011/10/11 11:34:35  efy-vitalij
  * add gmaps plugin functional
  *
