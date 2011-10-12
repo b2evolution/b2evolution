@@ -548,7 +548,7 @@ class Session
 	 */
 	function assert_received_crumb( $crumb_name )
 	{
-		global $servertimenow, $crumb_expires;
+		global $servertimenow, $crumb_expires, $debug;
 
 		if( ! $crumb_received = param( 'crumb_'.$crumb_name, 'string', NULL ) )
 		{ // We did not receive a crumb!
@@ -677,6 +677,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.41  2011/10/12 00:34:44  fplanque
+ * fix
+ *
  * Revision 1.40  2011/10/06 14:41:39  efy-asimo
  * Display received and valid crumbs on crumb error
  *
