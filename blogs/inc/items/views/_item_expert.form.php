@@ -78,6 +78,7 @@ $Form->begin_form( '', '', $params );
 	$Form->add_crumb( 'item' );
 	$Form->hidden( 'ctrl', 'items' );
 	$Form->hidden( 'blog', $Blog->ID );
+	$Form->hidden( 'mode_editing', 'expert' ); // used by in-skin mode when we want back in a last editing mode
 	if( isset( $mode ) )   $Form->hidden( 'mode', $mode );	// used by bookmarklet
 	if( isset( $edited_Item ) )
 	{
@@ -455,6 +456,9 @@ echo_onchange_newcat();
 
 /*
  * $Log$
+ * Revision 1.83  2011/10/12 11:23:31  efy-yurybakh
+ * In skin posting (beta)
+ *
  * Revision 1.82  2011/10/05 14:16:55  efy-asimo
  * Display module specific item settings in both item edit form
  *

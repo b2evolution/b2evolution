@@ -32,9 +32,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Blog, $Session, $Messages, $inc_path;
-global $action, $edited_Item, $form_action, $mode;
-
+global $Blog, $Session, $inc_path;
+global $action, $form_action;
 
 /**
  * @var User
@@ -51,40 +50,11 @@ global $Settings;
 
 global $pagenow;
 
-global $Session;
-
-global $mode;
-global $post_comment_status, $trackback_url, $item_tags;
+global $trackback_url;
 global $bozo_start_modified, $creating;
-global $edited_Item, $item_title, $item_content;
-global $redirect_to, $advanced_edit_link, $form_action;
-global $admin_url;
-
-$p = param( 'p', 'integer', 0 );
-
-if( $p > 0 )
-{	// Edit post
-	$action = 'edit';
-	global $post_ID;
-	$post_ID = $p;
-	$ItemCache = & get_ItemCache ();
-	$edited_Item = $ItemCache->get_by_ID ( $post_ID );
-	$item_title = $edited_Item->title;
-	$item_content = $edited_Item->content;
-	$item_tags = implode( ', ', $edited_Item->get_tags() );
-}
-else if( empty( $action ) )
-{	// Create new post
-	$action = 'new';
-	$edited_Item = new Item();
-	$edited_Item->set( 'status', 'published' );
-	check_categories_nosave ( $post_category, $post_extracats );
-}
-
-$entries = get_item_edit_modes( $Blog->ID, $action, $admin_url, 'blog='.$Blog->ID );
-$advanced_edit_link = $entries['simple'];
-
-$form_action = get_samedomain_htsrv_url().'item_edit.php';
+global $edited_Item, $item_tags, $item_title, $item_content;
+global $post_category, $post_extracats;
+global $admin_url, $redirect_to, $advanced_edit_link, $form_action;
 
 // Display form
 switch( $disp )
@@ -99,6 +69,9 @@ switch( $disp )
 
 /*
  * $Log$
+ * Revision 1.3  2011/10/12 11:23:32  efy-yurybakh
+ * In skin posting (beta)
+ *
  * Revision 1.2  2011/10/11 19:04:29  efy-yurybakh
  * In skin posting (beta)
  *

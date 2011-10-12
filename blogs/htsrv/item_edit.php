@@ -48,14 +48,11 @@ switch( $action )
 		set_working_blog( $Blog->ID );
 
 		// Where are we going to redirect to?
-		//param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID, '&' ) );
+		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID, '&' ) );
 
 		// What form button has been pressed?
 		param( 'save', 'string', '' );
 		$exit_after_save = ( $action != 'update_edit' );
-		break;
-	case 'create':
-		$exit_after_save = ( $action != 'create_edit' );
 		break;
 }
 
@@ -94,8 +91,10 @@ switch( $action )
 
 		// Params we need for tab switching:
 		$tab_switch_params = 'blog='.$blog;
-		break;
 
+		// Where are we going to redirect to?
+		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID, '&' ) );
+		break;
 
 	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
 		// This is somewhat in between new and edit...
@@ -132,6 +131,8 @@ switch( $action )
 		break;
 
 	case 'create':
+		$exit_after_save = ( $action != 'create_edit' );
+
 		// We need early decoding of these in order to check permissions:
 		$post_status = param( 'post_status', 'string', 'published' );
 		
@@ -236,22 +237,6 @@ switch( $action )
 
 		// We need early decoding of these in order to check permissions:
 		param( 'post_status', 'string', 'published' );
-
-		if( $action == 'update_publish' )
-		{
-			if( ! in_array( $post_status, array( 'private', 'protected' ) ) )
-			{	/* Only use "published" if something other than "private"
-				   or "protected" has been selected: */
-				$post_status = 'published';
-			}
-			else
-			{
-				// Tblue> Message contents could be confusing.
-				$Messages->add( sprintf( T_( 'The post has been updated but not published because it seems like you wanted to set its status to "%s" instead. If you really want to make it public, manually change its status to "Published" and click the "Save" button.' ),
-									$post_status == 'protected' ? T_( 'Protected' ) : T_( 'Private' ) ), 'error' );
-			}
-
-		}
 		
 		// Check if new category was started to create.  If yes check if it is valid.
 		$isset_category = check_categories ( $post_category, $post_extracats );
@@ -266,7 +251,7 @@ switch( $action )
 
 		// UPDATE POST:
 		// Set the params we already got:
-		$edited_Item->set ( 'status', 'published' );
+		$edited_Item->set ( 'status', $post_status );
 		
 		if( $isset_category )
 		{ // we change the categories only if the check was succesfull
@@ -310,15 +295,21 @@ switch( $action )
 
 		$Messages->add( T_('Post has been updated.'), 'success' );
 
+		if( ! in_array( $post_status, array( 'published', 'protected', 'private' ) ) )
+		{	// If post is not published we show it in the Back-office
+			$edited_Item->load_Blog();
+			$redirect_to =  url_add_param( $admin_url, 'ctrl=items&blog='.$edited_Item->Blog->ID.'&p='.$edited_Item->ID, '&' );
+		}
+		else
+		{	// User can see this post in the Front-office
+			$redirect_to = $edited_Item->get_tinyurl();
+		}
+
 		// REDIRECT / EXIT
-		header_redirect( $edited_Item->get_tinyurl(), 303 );
+		header_redirect( $redirect_to );
 		/* EXITED */
 		break;
 }
-
-
-$item_title = $edited_Item->title;
-$item_content = $edited_Item->content;
 
 // in-skin display
 $SkinCache = & get_SkinCache();
@@ -330,6 +321,9 @@ require $ads_current_skin_path.'index.main.php';
 
 /*
  * $Log$
+ * Revision 1.2  2011/10/12 11:23:31  efy-yurybakh
+ * In skin posting (beta)
+ *
  * Revision 1.1  2011/10/11 18:26:11  efy-yurybakh
  * In skin posting (beta)
  *

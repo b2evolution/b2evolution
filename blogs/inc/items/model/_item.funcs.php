@@ -95,6 +95,58 @@ function init_MainList( $items_nb_limit )
 
 
 /**
+ * Prepare the 'In-skin editing'.
+ * 
+ */
+function init_inskin_editing()
+{
+	global $Blog, $edited_Item, $action, $form_action;
+	global $item_tags, $item_title, $item_content;
+	global $admin_url, $redirect_to, $advanced_edit_link;
+
+	// Post ID, go from $_GET when we edit post from Front-office
+	$post_ID = param( 'p', 'integer', 0 );
+
+	if( $post_ID > 0 )
+	{	// Edit post
+		global $post_extracats;
+		$action = 'edit';
+
+		$ItemCache = & get_ItemCache ();
+		$edited_Item = $ItemCache->get_by_ID ( $post_ID );
+
+		check_categories_nosave ( $post_category, $post_extracats );
+		$post_extracats = postcats_get_byID( $post_ID );
+
+		$redirect_to = url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID, '&' );
+	}
+	else if( empty( $action ) )
+	{	// Create new post (from Front-office)
+		$action = 'new';
+
+		load_class( 'items/model/_item.class.php', 'Item' );
+		$edited_Item = new Item();
+		$edited_Item->set( 'status', 'published' );
+		$edited_Item->set( 'hideteaser', 0 );
+		check_categories_nosave ( $post_category, $post_extracats );
+
+		$redirect_to = url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID, '&' );
+	}
+
+	// Used in the edit form
+	$item_title = $edited_Item->title;
+	$item_content = $edited_Item->content;
+	$item_tags = implode( ', ', $edited_Item->get_tags() );
+
+	// Get an url for a link 'Go to advanced edit screen'
+	$mode_editing = param( 'mode_editing', 'string', 'simple' );
+	$entries = get_item_edit_modes( $Blog->ID, $action, $admin_url, 'blog='.$Blog->ID );
+	$advanced_edit_link = $entries[$mode_editing];
+
+	$form_action = get_samedomain_htsrv_url().'item_edit.php';
+}
+
+/**
  * Return an Item if an Intro or a Featured item is available for display in current disp.
  *
  * @return Item
@@ -2001,6 +2053,9 @@ function get_item_edit_modes( $blog_ID, $action, $dispatcher, $tab_switch_params
 
 /*
  * $Log$
+ * Revision 1.144  2011/10/12 11:23:31  efy-yurybakh
+ * In skin posting (beta)
+ *
  * Revision 1.143  2011/10/11 18:26:10  efy-yurybakh
  * In skin posting (beta)
  *

@@ -205,7 +205,7 @@ function check_setting( $setting_name )
 {
 	global $Settings, $Blog, $SkinCache;
 
-	if( ! isset( $Blog ) )
+	if( ! isset( $Blog ) && ! is_admin_page() )
 	{	// If we use some page without blog data
 		return false;
 	}
@@ -1269,6 +1269,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.87  2011/10/12 11:23:31  efy-yurybakh
+ * In skin posting (beta)
+ *
  * Revision 1.86  2011/10/10 20:46:39  fplanque
  * registration source tracking
  *

@@ -545,11 +545,9 @@ function request_title( $params = array() )
 			break;
 
 		case 'edit':
-			$action = param_action();
-			$p = param( 'p', 'integer', 0 );
+			$action = param_action(); // Edit post by switching into 'In skin' mode from Back-office
+			$p = param( 'p', 'integer', 0 ); // Edit post from Front-office
 			$r[] = ( $action == 'edit_switchtab' || $p > 0 ) ? $params['edit_text_update'] : $params['edit_text_create'];
-			init_datepicker_js();
-			require_js( 'admin.js' );
 			break;
 
 		default:
@@ -1021,6 +1019,8 @@ function init_bubbletip_js( $relative_to = 'rsc_url' )
  */
 function init_datepicker_js()
 {
+	require_js( '#jquery#' );
+
 	$datefmt = locale_datefmt();
 	$datefmt = str_replace( array( 'd', 'j', 'm', 'Y' ), array( 'dd', 'd', 'mm', 'yy' ), $datefmt );
 	require_css( 'jquery/smoothness/jquery-ui.css' );
@@ -1404,6 +1404,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.112  2011/10/12 11:23:31  efy-yurybakh
+ * In skin posting (beta)
+ *
  * Revision 1.111  2011/10/11 18:26:10  efy-yurybakh
  * In skin posting (beta)
  *

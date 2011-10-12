@@ -406,6 +406,12 @@ function skin_init( $disp )
 			$seo_page_type = 'User display';
 			break;
 
+		case 'edit':
+			init_datepicker_js();
+			require_js( 'admin.js' );
+			init_inskin_editing();
+			break;
+
 		case '404':
 			// We have a 404 unresolved content error
 			// How do we want do deal with it?
@@ -939,6 +945,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.115  2011/10/12 11:23:31  efy-yurybakh
+ * In skin posting (beta)
+ *
  * Revision 1.114  2011/10/11 18:26:10  efy-yurybakh
  * In skin posting (beta)
  *

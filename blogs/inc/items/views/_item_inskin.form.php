@@ -22,7 +22,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
 
-global $admin_url;
 $Form = new Form( $form_action, 'item_checkchanges', 'post' );
 
 // ================================ START OF EDIT FORM ================================
@@ -38,7 +37,6 @@ $Form->begin_form( 'inskin', '', $params );
 	$Form->add_crumb( 'item' );
 	$Form->hidden( 'ctrl', 'items' );
 	$Form->hidden( 'blog', $Blog->ID );
-	if( isset( $mode ) )   $Form->hidden( 'mode', $mode ); // used by bookmarklet
 	if( isset( $edited_Item ) )
 	{
 		$Form->hidden( 'post_ID', $edited_Item->ID );
@@ -61,7 +59,7 @@ $Form->begin_form( 'inskin', '', $params );
 
 	// Fields used in "advanced" form, but not here:
 	$Form->hidden( 'post_status', $edited_Item->get( 'status' ) );
-	$Form->hidden( 'post_comment_status', 'open' );
+	$Form->hidden( 'post_comment_status', $edited_Item->get( 'comment_status' ) );
 	$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
 	$Form->hidden( 'item_typ_ID', $edited_Item->ptyp_ID );
 	$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
@@ -83,7 +81,7 @@ $Form->begin_form( 'inskin', '', $params );
 	$Form->hidden( 'renderers_displayed', 1 );
 	$Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
 	$Form->hidden( 'item_featured', $edited_Item->featured );
-	//$Form->hidden( 'item_hideteaser', $edited_Item->hideteaser );
+	$Form->hidden( 'item_hideteaser', $edited_Item->hideteaser );
 	$Form->hidden( 'item_order', $edited_Item->order );
 
 	$creator_User = $edited_Item->get_creator_User();
@@ -199,6 +197,9 @@ echo_autocomplete_tags();
 
 /*
  * $Log$
+ * Revision 1.3  2011/10/12 11:23:31  efy-yurybakh
+ * In skin posting (beta)
+ *
  * Revision 1.2  2011/10/11 19:04:29  efy-yurybakh
  * In skin posting (beta)
  *
