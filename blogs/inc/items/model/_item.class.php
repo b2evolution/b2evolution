@@ -2794,11 +2794,15 @@ class Item extends ItemLight
 		$params += array('save_context' => true);
 
 		$this->load_Blog();
+		$url = false;
 		if( $this->Blog->get_setting( 'in_skin_editing' ) && ! is_admin_page() )
 		{	// We have a mode 'In-skin editing' for the current Blog
-			$url = url_add_param( $this->Blog->get( 'url' ), 'disp=edit&p='.$this->ID );
+			if( check_item_perm_edit( $this->ID, false ) )
+			{	// Current user can edit this post
+				$url = url_add_param( $this->Blog->get( 'url' ), 'disp=edit&p='.$this->ID );
+			}
 		}
-		else
+		else if( $current_User->check_perm( 'admin', 'normal' ) )
 		{	// Edit a post from Back-office
 			$url = $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$this->ID;
 			if( $params['save_context'] )
@@ -4885,6 +4889,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.266  2011/10/13 18:52:04  efy-yurybakh
+ * In skin posting (permission)
+ *
  * Revision 1.265  2011/10/12 15:31:28  efy-yurybakh
  * In skin posting (fix a saving of field 'Excerpt')
  *

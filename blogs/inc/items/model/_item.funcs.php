@@ -2067,19 +2067,30 @@ function get_item_edit_modes( $blog_ID, $action, $dispatcher, $tab_switch_params
 /**
  * Check permission for editing of the item by current user
  * 
- * @param post ID
+ * @param integer post ID
+ * @param boolean Set TRUE if we want to redirect when user cannot edit this post
+ * @return boolean TRUE - user can edit this post
  */
-function check_item_perm_edit( $post_ID )
+function check_item_perm_edit( $post_ID, $do_redirect = true )
 {
-	global $Blog, $Messages, $current_User;
+	global $Messages;
 
 	// The edit module can only be used by logged in users:
 	if( ! is_logged_in() )
-	{	// Redirect to the login page for anonymous users
-		$Messages->add( T_( 'You must log in to create & edit a posts.' ) );
-		header_redirect( get_login_url('cannot edit posts'), 302 );
-		// will have exited
+	{
+		if( $do_redirect )
+		{	// Redirect to the login page for anonymous users
+			$Messages->add( T_( 'You must log in to create & edit a posts.' ) );
+			header_redirect( get_login_url('cannot edit posts'), 302 );
+			// will have exited
+		}
+		else
+		{	// Anonymous users cannot edit posts
+			return false;
+		}
 	}
+
+	global $Blog, $current_User;
 
 	$user_can_edit = false;
 
@@ -2097,20 +2108,29 @@ function check_item_perm_edit( $post_ID )
 	}
 
 	if( ! $user_can_edit )
-	{	// Redirect to the blog url for users without messaging permission
-		$Messages->add( $permission_message );
-		if( empty( $Blog ) )
-		{	// Bad request without blog ID
-			global $home_url;
-			$redirect_to = $home_url;
+	{
+		if( $do_redirect )
+		{	// Redirect to the blog url for users without messaging permission
+			$Messages->add( $permission_message );
+			if( empty( $Blog ) )
+			{	// Bad request without blog ID
+				global $home_url;
+				$redirect_to = $home_url;
+			}
+			else
+			{	// Redirect to the current blog
+				$redirect_to = $Blog->gen_blogurl();
+			}
+			header_redirect( $redirect_to, 302 );
+			// will have exited
 		}
 		else
-		{	// Redirect to the current blog
-			$redirect_to = $Blog->gen_blogurl();
+		{	// Current user cannot edit this post
+			return false;
 		}
-		header_redirect( $redirect_to, 302 );
-		// will have exited
 	}
+
+	return true;
 }
 
 
@@ -2184,6 +2204,9 @@ function get_item_new_link( $before = '', $after = '', $link_text = '', $link_ti
 
 /*
  * $Log$
+ * Revision 1.150  2011/10/13 18:52:04  efy-yurybakh
+ * In skin posting (permission)
+ *
  * Revision 1.149  2011/10/13 17:15:53  efy-yurybakh
  * In skin posting (permission)
  *
