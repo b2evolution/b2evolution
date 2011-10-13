@@ -296,8 +296,8 @@ class menu_link_Widget extends ComponentWidget
 				break;
 
 			case 'postnew':
-				if( ! is_logged_in() || ! $Blog->get_setting( 'in_skin_editing' ) )
-				{	// Don't allow anonymous users to create a new post & If setting is OFF
+				if( ! check_item_perm_create() )
+				{	// Don't allow users to create a new post
 					return false;
 				}
 				$url = url_add_param( $Blog->get( 'url' ), 'disp=edit' );
@@ -362,6 +362,9 @@ class menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.27  2011/10/13 17:15:53  efy-yurybakh
+ * In skin posting (permission)
+ *
  * Revision 1.26  2011/10/13 15:49:43  efy-yurybakh
  * In skin posting (changes)
  *

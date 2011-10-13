@@ -2088,16 +2088,17 @@ function check_item_perm_edit( $post_ID )
 		$ItemCache = & get_ItemCache ();
 		$edited_Item = $ItemCache->get_by_ID ( $post_ID );
 		$user_can_edit = $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item );
+		$permission_message = T_('You don\'t have permission to edit this post');
 	}
 	else
 	{	// Check permissions for creating of a new item
-		// TODO: It seems we don't have a such permisson 'create a new post'. We have to create it.
-		$user_can_edit = $current_User->check_perm( 'admin', 'normal' );
+		$user_can_edit = $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID );
+		$permission_message = T_('You don\'t have permission to post into this blog');
 	}
 
 	if( ! $user_can_edit )
 	{	// Redirect to the blog url for users without messaging permission
-		$Messages->add( 'You are not allowed to create & edit a posts!' );
+		$Messages->add( $permission_message );
 		if( empty( $Blog ) )
 		{	// Bad request without blog ID
 			global $home_url;
@@ -2110,6 +2111,34 @@ function check_item_perm_edit( $post_ID )
 		header_redirect( $redirect_to, 302 );
 		// will have exited
 	}
+}
+
+
+/**
+ * Check permission for creating of a new item by current user
+ * 
+ * @return boolean, TRUE if user can create a new post for the current blog
+ */
+function check_item_perm_create()
+{
+	global $Blog;
+
+	if( empty( $Blog ) )
+	{	// Strange case, but we restrict to create a new post
+		return false;
+	}
+
+	if( ! is_logged_in() || ! $Blog->get_setting( 'in_skin_editing' ) )
+	{	// Don't allow anonymous users to create a new post & If setting is OFF
+		return false;
+	}
+	else
+	{	// Check permissions for current user
+		global $current_User;
+		return $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID );
+	}
+
+	return true;
 }
 
 
@@ -2131,8 +2160,8 @@ function get_item_new_link( $before = '', $after = '', $link_text = '', $link_ti
 {
 	global $Blog;
 
-	if( ! is_logged_in() || ! $Blog->get_setting( 'in_skin_editing' ) )
-	{	// Don't allow anonymous users to create a new post & If setting is OFF
+	if( ! check_item_perm_create() )
+	{	// Don't allow users to create a new post
 		return false;
 	}
 
@@ -2155,6 +2184,9 @@ function get_item_new_link( $before = '', $after = '', $link_text = '', $link_ti
 
 /*
  * $Log$
+ * Revision 1.149  2011/10/13 17:15:53  efy-yurybakh
+ * In skin posting (permission)
+ *
  * Revision 1.148  2011/10/13 15:49:43  efy-yurybakh
  * In skin posting (changes)
  *
