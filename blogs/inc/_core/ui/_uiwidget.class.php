@@ -1031,6 +1031,12 @@ class Table extends Widget
 			}
 		}
 
+		while (preg_match('#% (.+?) %#ix', $content, $matchesarray))
+		{
+			 eval('$result = '.$matchesarray[1].';');
+			 $content = str_replace($matchesarray[0],$result, $content);
+		}
+
 		return $content;
 	}
 
@@ -1038,6 +1044,9 @@ class Table extends Widget
 
 /*
  * $Log$
+ * Revision 1.23  2011/10/13 12:46:03  efy-vitalij
+ * changed function parse_class_content
+ *
  * Revision 1.22  2011/10/06 07:34:04  efy-vitalij
  * add function parse_class_content()
  *
