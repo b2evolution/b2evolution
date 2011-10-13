@@ -391,7 +391,7 @@ class Hit
 					// Not an admin page:
 					$Debuglog->add( 'Hit: detect_referer(): blacklist ('.$lBlacklist.')', 'request' );
 					$this->referer_type = 'blacklist';
-				
+
 				return;
 			}
 		}
@@ -858,6 +858,9 @@ class Hit
 
 	/**
 	 * Update hit response code
+   *
+   * @todo fp>vitaliy get rid of this function
+   *
 	 * @param mixed Response code
 	 */
 	function response_code_update($http_response_code)
@@ -871,7 +874,7 @@ class Hit
 		else
 		{
 			$sql = "UPDATE T_hitlog SET hit_response_code = $this->hit_response_code WHERE hit_ID = $this->ID";
-			$DB->query( $sql, 'Update the hit response code' );			
+			$DB->query( $sql, 'Update the hit response code' );
 		}
 
 	}
@@ -1611,6 +1614,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.76  2011/10/13 14:42:29  fplanque
+ * doc
+ *
  * Revision 1.75  2011/10/13 12:35:23  efy-vitalij
  * add loging hit_response_code
  *
