@@ -4459,8 +4459,29 @@ function generate_random_ip()
 }
 
 
+function hit_response_code_class($hit_response_code)
+{
+	$class = '';
+	if ($hit_response_code >= 200 && $hit_response_code < 300)
+	{
+		$class =  "code_2xx";
+	}
+	if ($hit_response_code >= 300 && $hit_response_code < 400)
+	{
+		$class =  "code_3xx";
+	}
+	if ($hit_response_code >= 400)
+	{
+		$class =  "code_4xx";
+	}
+	return $class;
+}
+
 /*
  * $Log$
+ * Revision 1.289  2011/10/13 12:41:05  efy-vitalij
+ * add function hit_response_code_class
+ *
  * Revision 1.288  2011/10/03 12:00:33  efy-yurybakh
  * Small messaging UI design changes
  *
