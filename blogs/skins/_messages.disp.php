@@ -41,10 +41,16 @@ if( $thrd_ID = param( 'thrd_ID', 'integer', '', true) )
 {// Load thread from cache:
 	$ThreadCache = & get_ThreadCache();
 	if( ($edited_Thread = & $ThreadCache->get_by_ID( $thrd_ID, false )) === false )
-	{
+	{	// Thread doesn't exists with this ID
 		unset( $edited_Thread );
 		forget_param( 'thrd_ID' );
 		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Thread') ), 'error' );
+	}
+	else if( ! $edited_Thread->check_thread_recipient( $current_User->ID ) )
+	{	// Current user is not recipient of this thread
+		unset( $edited_Thread );
+		forget_param( 'thrd_ID' );
+		$Messages->add( sprintf( T_('You are not allowed to view this &laquo;%s&raquo;.'), T_('Thread') ), 'error' );
 	}
 }
 
@@ -82,6 +88,9 @@ if( isset( $edited_Thread ) )
 
 /*
  * $Log$
+ * Revision 1.8  2011/10/13 18:08:17  efy-yurybakh
+ * fix bug in the message list
+ *
  * Revision 1.7  2011/10/11 05:52:15  efy-asimo
  * Messages menu link widget
  *

@@ -52,9 +52,17 @@ if( param( 'thrd_ID', 'integer', '', true) )
 {// Load thread from cache:
 	$ThreadCache = & get_ThreadCache();
 	if( ($edited_Thread = & $ThreadCache->get_by_ID( $thrd_ID, false )) === false )
-	{	unset( $edited_Thread );
+	{	// Thread doesn't exists with this ID
+		unset( $edited_Thread );
 		forget_param( 'thrd_ID' );
 		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Thread') ), 'error' );
+		$action = 'nil';
+	}
+	else if( ! $edited_Thread->check_thread_recipient( $current_User->ID ) )
+	{	// Current user is not recipient of this thread
+		unset( $edited_Thread );
+		forget_param( 'thrd_ID' );
+		$Messages->add( sprintf( T_('You are not allowed to view this &laquo;%s&raquo;.'), T_('Thread') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -173,6 +181,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.20  2011/10/13 18:08:16  efy-yurybakh
+ * fix bug in the message list
+ *
  * Revision 1.19  2011/10/07 05:43:45  efy-asimo
  * Check messaging availability before display
  *
