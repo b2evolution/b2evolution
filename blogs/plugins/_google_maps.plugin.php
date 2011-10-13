@@ -437,6 +437,12 @@ function locate()
 	}
 
 
+	function DisplayItemFormFieldset(& $params)
+	{
+		$this->AdminDisplayItemFormFieldset( $params );
+	}
+
+
 	/**
 	 * @see Plugin::SkinBeginHtmlHead()
 	 */
@@ -554,6 +560,9 @@ function locate()
 }
 /*
  * $Log$
+ * Revision 1.10  2011/10/13 07:05:34  efy-vitalij
+ * add DisplayItemFormFieldset
+ *
  * Revision 1.9  2011/10/12 12:43:34  efy-vitalij
  * fix bug
  *
