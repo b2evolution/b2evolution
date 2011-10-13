@@ -94,7 +94,8 @@ $schema_queries['T_hitlog'] = array(
 			hit_serprank					INT UNSIGNED DEFAULT NULL,
 			hit_blog_ID           int(11) UNSIGNED NULL DEFAULT NULL,
 			hit_remote_addr       VARCHAR(40) DEFAULT NULL,
-			hit_agent_type				ENUM('rss','robot','browser','unknown') DEFAULT 'unknown' NOT NULL,
+			hit_agent_type		  ENUM('rss','robot','browser','unknown') DEFAULT 'unknown' NOT NULL,
+			hit_response_code     INT DEFAULT NULL,
 			PRIMARY KEY              (hit_ID),
 			INDEX hit_blog_ID        ( hit_blog_ID ),
 			INDEX hit_uri            ( hit_uri ),
@@ -153,6 +154,9 @@ $schema_queries['T_logs__internal_searches'] = array(
 
 /*
  * $Log$
+ * Revision 1.26  2011/10/13 12:15:31  efy-vitalij
+ * add column 'hit_response_code' to T_hitlog
+ *
  * Revision 1.25  2011/10/12 07:25:02  efy-vitalij
  * add columns hit_disp, hit_ctrl to T_hitlog
  *
