@@ -202,6 +202,10 @@ function header_redirect( $redirect_to = NULL, $status = false )
 		$Session->dbsave(); // If we don't save now, we run the risk that the redirect goes faster than the PHP script shutdown.
 	}
 
+	if( ! empty($Hit) )
+	{
+		$Hit->response_code_update($http_response_code);
+	}
 	// see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 	switch( $http_response_code )
 	{
@@ -1404,6 +1408,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.113  2011/10/13 12:39:31  efy-vitalij
+ * add logging http_response_code to Hit
+ *
  * Revision 1.112  2011/10/12 11:23:31  efy-yurybakh
  * In skin posting (beta)
  *
