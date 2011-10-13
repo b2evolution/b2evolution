@@ -561,7 +561,7 @@ function request_title( $params = array() )
 			if( $params['auto_pilot'] != 'seo_title' )
 			{	// Add close icon
 				global $Blog;
-				$title .= action_icon( T_('Cancel editing!'), 'close', $Blog->gen_blogurl(), NULL, NULL, NULL, array( 'class' => 'floatright') );
+				$title .= action_icon( T_('Cancel editing'), 'close', $Blog->gen_blogurl(), ' '.T_('Cancel editing'), NULL, 3, array( 'class' => 'floatright', 'style' => 'font-size:12px;line-height:12px;font-weight:normal' ) );
 			}
 			$r[] = $title;
 			break;
@@ -1420,6 +1420,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.116  2011/10/13 15:49:43  efy-yurybakh
+ * In skin posting (changes)
+ *
  * Revision 1.115  2011/10/13 14:42:29  fplanque
  * doc
  *

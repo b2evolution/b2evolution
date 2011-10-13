@@ -345,6 +345,10 @@ form.inskin .edit_area textarea{
 /*
  * Categories selection table:
  */
+.extracats legend{
+	color: #000;
+	padding: 10px 0 5px;
+}
 table.catselect {
 	border-spacing:0;
 	width:100%;

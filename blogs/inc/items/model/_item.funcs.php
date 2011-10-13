@@ -2113,8 +2113,51 @@ function check_item_perm_edit( $post_ID )
 }
 
 
+/**
+ * Template tag: Display a link to create a new post
+ */
+function item_new_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
+{
+	echo get_item_new_link( $before, $after, $link_text, $link_title );
+}
+
+
+/**
+ * Template tag: Get a link to create a new post
+ *
+ * @return string|false
+ */
+function get_item_new_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
+{
+	global $Blog;
+
+	if( ! is_logged_in() || ! $Blog->get_setting( 'in_skin_editing' ) )
+	{	// Don't allow anonymous users to create a new post & If setting is OFF
+		return false;
+	}
+
+	if( $link_text == '' )
+	{	// Default text
+		$link_text = T_('Write a new post');
+	}
+
+	if( $link_title == '#' ) $link_title = T_('Write a new post');
+
+	$r = $before
+		.'<a href="'.url_add_param( $Blog->get( 'url' ), 'disp=edit' ).'" title="'.$link_title.'">'
+		.$link_text
+		.'</a>'
+		.$after;
+
+	return $r;
+}
+
+
 /*
  * $Log$
+ * Revision 1.148  2011/10/13 15:49:43  efy-yurybakh
+ * In skin posting (changes)
+ *
  * Revision 1.147  2011/10/13 13:09:27  efy-yurybakh
  * In skin posting (changes)
  *

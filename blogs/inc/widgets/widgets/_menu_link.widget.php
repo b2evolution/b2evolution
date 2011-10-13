@@ -46,6 +46,7 @@ $menu_link_widget_link_types = array(
 		'users' => T_('User directory'),
 		'item' => T_('Any item (post, page, etc...)'),
 		'url' => T_('Any URL'),
+		'postnew' => T_('Write a new post'),
 	);
 
 /**
@@ -294,6 +295,15 @@ class menu_link_Widget extends ComponentWidget
 				$text = '[URL]';	// should normally be overriden below...
 				break;
 
+			case 'postnew':
+				if( ! is_logged_in() || ! $Blog->get_setting( 'in_skin_editing' ) )
+				{	// Don't allow anonymous users to create a new post & If setting is OFF
+					return false;
+				}
+				$url = url_add_param( $Blog->get( 'url' ), 'disp=edit' );
+				$text = T_('Write a new post');
+				break;
+
 			case 'home':
 			default:
 				$url = $Blog->get('url');
@@ -352,6 +362,9 @@ class menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.26  2011/10/13 15:49:43  efy-yurybakh
+ * In skin posting (changes)
+ *
  * Revision 1.25  2011/10/10 20:46:39  fplanque
  * registration source tracking
  *

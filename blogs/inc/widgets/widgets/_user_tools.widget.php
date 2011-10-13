@@ -80,7 +80,7 @@ class user_tools_Widget extends ComponentWidget
 				'note' => T_( 'Show link' ),
 				'type' => 'checkbox',
 				'defaultvalue' => 1,
-			),			
+			),
 			'user_logout_link' => array(
 				'size' => 30,
 				'note' => T_( 'Link text to display' ),
@@ -138,6 +138,19 @@ class user_tools_Widget extends ComponentWidget
 				'note' => T_( 'Link text to display' ),
 				'type' => 'text',
 				'defaultvalue' => T_( 'Register' ),
+			),
+
+			'user_postnew_link_show' => array(
+				'label' => T_( 'Write a new post link'),
+				'note' => T_( 'Show link' ),
+				'type' => 'checkbox',
+				'defaultvalue' => 1,
+			),
+			'user_postnew_link' => array(
+				'size' => 30,
+				'note' => T_( 'Link text to display' ),
+				'type' => 'text',
+				'defaultvalue' => T_( 'Write a new post' ),
 			),
 		), parent::get_param_definitions( $params )	);
 
@@ -208,6 +221,10 @@ class user_tools_Widget extends ComponentWidget
 		{
 			user_subs_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_subs_link' ] );
 		}
+		if ( $this->get_param('user_postnew_link_show') ) 
+		{
+			item_new_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_postnew_link' ] );
+		}
 		if ( $this->get_param('user_logout_link_show') ) 
 		{
 			user_logout_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_logout_link' ] );
@@ -249,6 +266,9 @@ class user_tools_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.17  2011/10/13 15:49:43  efy-yurybakh
+ * In skin posting (changes)
+ *
  * Revision 1.16  2011/09/14 21:04:06  fplanque
  * cleanup
  *
