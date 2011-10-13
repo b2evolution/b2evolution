@@ -80,7 +80,7 @@ if( ($tab=='refsearches') && ($tab3=='intsearches') )
 			$Session->assert_received_crumb( 'internalsearches' );
 	
 			// Check permission:
-			$sessions_Module->check_perm( 'edit' );
+			$current_User->check_perm( 'stats', 'edit', true );
 	
 			// Make sure we got an isrch_ID:
 			param( 'isrch_ID', 'integer', true );
@@ -478,6 +478,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.35  2011/10/13 05:47:24  efy-asimo
+ * Remove old permission check from session Module
+ *
  * Revision 1.34  2011/10/10 19:48:31  fplanque
  * i18n & login display cleaup
  *

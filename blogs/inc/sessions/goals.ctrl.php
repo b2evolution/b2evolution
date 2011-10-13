@@ -29,8 +29,7 @@ global $dispatcher;
 $blog = 0;
 
 // Do we have permission to view all stats (aggregated stats) ?
-$sessions_Module->check_perm( 'view' );
-
+$current_User->check_perm( 'stats', 'view', true );
 
 $tab3 = param( 'tab3', 'string', 'goals', true );
 $AdminUI->set_path( 'stats', 'goals', $tab3 );
@@ -55,7 +54,7 @@ switch( $action )
 	case 'new':
 	case 'copy':
 		// Check permission:
-		$sessions_Module->check_perm( 'edit' );
+		$current_User->check_perm( 'stats', 'edit', true );
 
 		if( ! isset($edited_Goal) )
 		{	// We don't have a model to use, start with blank object:
@@ -72,7 +71,7 @@ switch( $action )
 		// Edit file type form...:
 
 		// Check permission:
-		$sessions_Module->check_perm( 'edit' );
+		$current_User->check_perm( 'stats', 'edit', true );
 
 		// Make sure we got an ftyp_ID:
 		param( 'goal_ID', 'integer', true );
@@ -88,7 +87,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'goal' );
 
 		// Check permission:
-		$sessions_Module->check_perm( 'edit' );
+		$current_User->check_perm( 'stats', 'edit', true );
 
 		// load data from request
 		if( $edited_Goal->load_from_Request() )
@@ -142,7 +141,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'goal' );
 
 		// Check permission:
-		$sessions_Module->check_perm( 'edit' );
+		$current_User->check_perm( 'stats', 'edit', true );
 
 		// Make sure we got an ftyp_ID:
 		param( 'goal_ID', 'integer', true );
@@ -187,7 +186,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'goal' );
 
 		// Check permission:
-		$sessions_Module->check_perm( 'edit' );
+		$current_User->check_perm( 'stats', 'edit', true );
 
 		// Make sure we got an ftyp_ID:
 		param( 'goal_ID', 'integer', true );
@@ -287,6 +286,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.25  2011/10/13 05:47:24  efy-asimo
+ * Remove old permission check from session Module
+ *
  * Revision 1.24  2011/09/04 22:13:18  fplanque
  * copyright 2011
  *

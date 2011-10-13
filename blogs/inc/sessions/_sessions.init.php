@@ -351,23 +351,6 @@ class sessions_Module extends Module
 			}
 		}
 	}
-
-	/**
-	 * Check global permissions for this module (not for specific object - those should be handled in the appropriate DataObject class)
-	 *
-	 * @todo fp> break up central User::check_perm() so that add-on modules do not need to add code into User class.
-	 *
-	 * @param mixed $action
-	 * @param mixed $assert
-	 */
-	function check_perm( $action = 'view', $assert = true )
-	{
-		global $current_User;
-
-		return $current_User->check_perm( 'stats', $action, $assert );
-	}
-
-
 }
 
 $sessions_Module = new sessions_Module();
@@ -375,6 +358,9 @@ $sessions_Module = new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.37  2011/10/13 05:47:24  efy-asimo
+ * Remove old permission check from session Module
+ *
  * Revision 1.36  2011/09/30 06:25:24  efy-vitalij
  * Remove Hits tab from User Sessions
  *
