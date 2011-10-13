@@ -65,12 +65,14 @@ function stats_format_req_URI( $hit_blog_ID, $hit_uri, $max_len = 40, $hit_disp 
 
 		if ($hit_disp != NULL)
 		{
-			$hit_uri = "[disp=$hit_disp]";
+			$hit_uri = '[disp=<a href="'.$full_url.'">'.$hit_disp.'</a>]';
 		}
 		if ($hit_ctrl != NULL)
 		{
-			$hit_uri = $hit_uri."[ctrl=$hit_ctrl]";
+			$hit_uri =$hit_uri.' [ctrl=<a href="'.$full_url.'">'.$hit_ctrl.'</a>]';
 		}
+
+		return $hit_uri;
 	}
 
 	return '<a href="'.$full_url.'">'.$hit_uri.'</a>';
@@ -208,6 +210,9 @@ function disp_color_agent( $hit_agent_type )
 }
 /*
  * $Log$
+ * Revision 1.21  2011/10/13 13:25:08  efy-vitalij
+ * remake function stats_format_req_URI
+ *
  * Revision 1.20  2011/10/12 11:28:54  efy-vitalij
  * add params display and controller to function stats_format_req_URI
  *
