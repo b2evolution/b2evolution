@@ -582,6 +582,14 @@ div.avatartag {
 .agent_browser{
 	background-color: #FFCC00;
 }
-.agent_unknown{
-	background-color: #CCCCCC;
+
+.code_2xx{
+	background-color: #00FF99;
 }
+.code_3xx{
+	background-color: #FF6600;
+}
+.code_4xx{
+	background-color: #FF0000;
+}
+
