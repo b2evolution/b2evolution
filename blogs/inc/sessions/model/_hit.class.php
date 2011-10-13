@@ -799,10 +799,12 @@ class Hit
 		// Extract the serprank from search referers:
 		$serprank = $this->get_serprank();
 
+    // fp>vitaliy : get rid of this and just use the already existing global $http_response_code  (make sure it's updated correctly everywhere though)
 		if( $disp == '404' && $this->hit_response_code == 200 )
 		{
 			$this->hit_response_code = (int)$disp;
 		}
+
 		// insert hit into DB table:
 		if (empty($this->test_mode))
 		{
@@ -1614,6 +1616,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.77  2011/10/13 14:46:55  fplanque
+ * doc
+ *
  * Revision 1.76  2011/10/13 14:42:29  fplanque
  * doc
  *

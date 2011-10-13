@@ -112,7 +112,13 @@ function headers_content_mightcache( $type = 'text/html', $max_age = '#', $chars
  */
 function header_redirect( $redirect_to = NULL, $status = false )
 {
-	global $Hit, $baseurl, $Blog, $htsrv_url_sensitive;
+  /**
+  * put your comment there...
+  *
+  * @var Hit
+  */
+ 	global $Hit;
+  global $baseurl, $Blog, $htsrv_url_sensitive;
 	global $Session, $Debuglog, $Messages;
 	global $http_response_code;
 
@@ -1414,6 +1420,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.115  2011/10/13 14:42:29  fplanque
+ * doc
+ *
  * Revision 1.114  2011/10/13 13:09:27  efy-yurybakh
  * In skin posting (changes)
  *
