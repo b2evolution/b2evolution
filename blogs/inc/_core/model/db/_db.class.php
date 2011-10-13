@@ -521,7 +521,10 @@ class DB
 			return $val;
 	}
 
+
 	/**
+   * fp>vitaliy !!!!!!!!!!!!!!!!!
+   *
 	 * @return string Return the given value as quoted string or 'NULL', if it's === NULL.
 	 */
 	function null_string($val)
@@ -1709,6 +1712,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.56  2011/10/13 22:53:38  fplanque
+ * no message
+ *
  * Revision 1.55  2011/10/12 10:31:23  efy-vitalij
  * add function null_string()
  *
