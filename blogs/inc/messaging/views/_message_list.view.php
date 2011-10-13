@@ -100,6 +100,15 @@ $unread_recipients = array();
 
 // Create array for read by
 
+if( empty( $Blog ) )
+{	// Set avatar size for a case when blog is not defined
+	$avatar_size = 'crop-32x32';
+}
+else
+{	// Get avatar size from blog settings
+	$avatar_size = $Blog->get_setting('image_size_messaging');
+}
+
 foreach( $DB->get_results( $unread_recipients_SQL->get() ) as $row )
 {
 	if( !empty( $row->msg_unread ) )
@@ -115,7 +124,7 @@ foreach( $DB->get_results( $unread_recipients_SQL->get() ) as $row )
 	$read_by = '';
 	if( !empty( $read_recipiens ) )
 	{
-		$read_by .= '<div>'.get_avatar_imgtags( $read_recipiens, true, false, $Blog->get_setting('image_size_messaging'), '', '', true, false );
+		$read_by .= '<div>'.get_avatar_imgtags( $read_recipiens, true, false, $avatar_size, '', '', true, false );
 		if( !empty ( $unread_recipients ) )
 		{
 			$read_by .= '<br />';
@@ -125,7 +134,7 @@ foreach( $DB->get_results( $unread_recipients_SQL->get() ) as $row )
 
 	if( !empty ( $unread_recipients ) )
 	{
-		$read_by .= '<div>'.get_avatar_imgtags( $unread_recipients, true, false, $Blog->get_setting('image_size_messaging'), '', '', false, false ).'</div>';
+		$read_by .= '<div>'.get_avatar_imgtags( $unread_recipients, true, false, $avatar_size, '', '', false, false ).'</div>';
 	}
 
 	$read_by_list[$row->msg_ID] = $read_by ;
@@ -348,6 +357,9 @@ $Form->begin_form( $params['form_class'], '' );
 $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' ) ) );
 /*
  * $Log$
+ * Revision 1.45  2011/10/13 16:02:14  efy-yurybakh
+ * fix bug in the message list
+ *
  * Revision 1.44  2011/10/08 01:27:05  fplanque
  * no message
  *
