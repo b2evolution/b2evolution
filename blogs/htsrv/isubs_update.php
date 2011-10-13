@@ -122,22 +122,38 @@ switch( $isub_type )
 			$reg_type = 'attend';
 		}
 
-		$new_attendant = param( 'new_attendee', 'string', NULL );
-		if( !empty( $new_attendant ) )
+		$new_attendee = param( 'new_attendee', 'string', NULL );
+		if( !empty( $new_attendee ) )
 		{
 			$current_User->check_perm( 'users', 'edit', true );
 			$UserCache = & get_UserCache();
-			$new_attendant_User = $UserCache->get_by_login( $new_attendant );
-			if( $new_attendant_User )
+			$new_attendee_User = $UserCache->get_by_login( $new_attendee );
+			// the new attendee user on which list should be registered
+			$new_attendee_list = param( 'new_attendee_list', 'string', 'ML' );
+			switch( $new_attendee_list )
 			{
-				$user_ID = $new_attendant_User->ID;
+				case 'ML':
+					$reg_type = 'attend';
+					break;
+				case 'WL':
+					$reg_type = 'waitlist';
+					break;
+				case 'AA':
+					$reg_type = 'also_attended';
+					break;
+				default:
+					$Messages->add( T_( 'Invalid list type received' ), 'error' );
+			}
+			if( $new_attendee_User )
+			{
+				$user_ID = $new_attendee_User->ID;
 			}
 			else
 			{
-				$Messages->add( sprintf( T_( 'User %s not found.' ), $new_attendant ), 'error' );
+				$Messages->add( sprintf( T_( 'User %s not found.' ), $new_attendee ), 'error' );
 			}
 		}
-		elseif( $new_attendant !== NULL )
+		elseif( $new_attendee !== NULL )
 		{
 			$Messages->add( T_( 'Please select a user.' ), 'error' );
 		}
@@ -207,6 +223,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.14  2011/10/13 07:05:42  efy-asimo
+ * Admin add attendee radio select
+ *
  * Revision 1.13  2011/10/11 09:31:53  efy-asimo
  * Events "No show" list
  *
