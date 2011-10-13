@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution 2.5\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2011-10-11 03:51+0200\n"
-"PO-Revision-Date: 2011-10-11 03:52+0100\n"
+"PO-Revision-Date: 2011-10-12 18:57+0100\n"
 "Last-Translator: Francois Planque <http://fplanque.com>\n"
 "Language-Team: François Planque <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -1159,7 +1159,7 @@ msgstr ""
 #: ../../../htsrv/message_send.php:280
 #, php-format
 msgid "By replying, your email will go directly to %s."
-msgstr ""
+msgstr "En répondant, votre email ira directement à %s."
 
 #: ../../../htsrv/message_send.php:286
 #: ../../../htsrv/message_send.php:294
@@ -1255,11 +1255,11 @@ msgstr "Votre profil n'a pas changé."
 
 #: ../../../htsrv/quick_unsubscribe.php:22
 msgid "The user you are trying to unsubscribe does not seem to exist. You may already have deleted your account."
-msgstr ""
+msgstr "L'utilisateur que vous essayez de désabonner ne semble pas exister. Peut-être avez vous déjà supprimé votre compte..."
 
 #: ../../../htsrv/quick_upload.php:54
 msgid "You don't have permission to upload on this file root."
-msgstr ""
+msgstr "Vous n'avez pas la permission d'uploader dans cette racine de fichiers."
 
 #: ../../../htsrv/quick_upload.php:108
 #: ../../../inc/files/model/_file.funcs.php:1212
@@ -4518,7 +4518,7 @@ msgstr ""
 
 #: ../../../inc/collections/views/_coll_advanced.form.php:100
 msgid "RSS2 Feed URL"
-msgstr ""
+msgstr "URL du flux RSS2"
 
 #: ../../../inc/collections/views/_coll_advanced.form.php:101
 msgid "Example: Your Feedburner RSS2 URL which should replace the original feed URL."
@@ -8012,7 +8012,7 @@ msgstr "Lier cette image à votre post"
 
 #: ../../../inc/files/upload.ctrl.php:404
 msgid "recommended - allows automatic resizing"
-msgstr ""
+msgstr "recommandé - permet le redimensionnement automatique"
 
 #: ../../../inc/files/upload.ctrl.php:408
 msgid "Link this file to your post"
@@ -12411,7 +12411,7 @@ msgstr "Hits récents"
 #: ../../../inc/sessions/views/_stats_goalhits.view.php:114
 #: ../../../inc/sessions/views/_stats_hit_list.view.php:99
 msgid "Exclude"
-msgstr "Exclurer"
+msgstr "Exclure"
 
 #: ../../../inc/sessions/views/_stats_all_hits.view.php:108
 #: ../../../inc/sessions/views/_stats_direct.view.php:55
@@ -18530,7 +18530,7 @@ msgstr ""
 
 #: ../../../plugins/watermark_plugin/_watermark.plugin.php:60
 msgid "The text to write on the image."
-msgstr ""
+msgstr "Le texte à écrire sur l'image."
 
 #: ../../../plugins/watermark_plugin/_watermark.plugin.php:66
 #, php-format

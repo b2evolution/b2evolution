@@ -10,7 +10,6 @@
  * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
- *
  */
 
 // Load classes
@@ -63,6 +62,9 @@ switch( $disp )
 
 /**
  * $Log$
+ * Revision 1.4  2011/10/13 17:40:53  fplanque
+ * no message
+ *
  * Revision 1.3  2011/10/05 07:54:51  efy-yurybakh
  * User directory (fix error if accessed anonymously)
  *

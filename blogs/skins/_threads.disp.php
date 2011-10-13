@@ -10,7 +10,6 @@
  * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
- *
  */
 
 // Load classes
@@ -112,6 +111,9 @@ switch( $disp )
 
 /**
  * $Log$
+ * Revision 1.7  2011/10/13 17:40:53  fplanque
+ * no message
+ *
  * Revision 1.6  2011/10/11 05:52:15  efy-asimo
  * Messages menu link widget
  *

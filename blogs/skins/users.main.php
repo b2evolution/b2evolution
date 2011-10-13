@@ -17,7 +17,7 @@ global $htsrv_url, $Messages;
 if( ! is_logged_in() && ! $Settings->get( 'allow_anonymous_user_list' ) )
 {	// Redirect to the login page if not logged in and allow anonymous user setting is OFF
 	$redirect_to = $Blog->get( 'usersurl' );
-	$Messages->add( T_( 'You must log in to see the user directory' ) );
+	$Messages->add( T_( 'You must log in to see the user directory.' ) );
 	header_redirect( get_login_url( 'cannot see users', $redirect_to ), 302 );
 }
 
@@ -33,6 +33,9 @@ require $ads_current_skin_path.'index.main.php';
 
 /*
  * $Log$
+ * Revision 1.7  2011/10/13 17:40:53  fplanque
+ * no message
+ *
  * Revision 1.6  2011/10/11 06:38:50  efy-asimo
  * Add corresponding error messages when login required
  *
