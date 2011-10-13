@@ -371,7 +371,7 @@ function request_title( $params = array() )
 			'pwdchange_text'      => T_('Password change'),
 			'userprefs_text'      => T_('User preferences'),
 			'user_text'           => T_('User'),
-			'users_text'           => T_('Users'),
+			'users_text'          => T_('Users'),
 			'subs_text'           => T_('Subscriptions'),
 			'comments_text'       => T_('Latest Comments'),
 			'feedback-popup_text' => T_('Feedback'),
@@ -551,7 +551,13 @@ function request_title( $params = array() )
 		case 'edit':
 			$action = param_action(); // Edit post by switching into 'In skin' mode from Back-office
 			$p = param( 'p', 'integer', 0 ); // Edit post from Front-office
-			$r[] = ( $action == 'edit_switchtab' || $p > 0 ) ? $params['edit_text_update'] : $params['edit_text_create'];
+			$title = ( $action == 'edit_switchtab' || $p > 0 ) ? $params['edit_text_update'] : $params['edit_text_create'];
+			if( $params['auto_pilot'] != 'seo_title' )
+			{	// Add close icon
+				global $Blog;
+				$title .= action_icon( T_('Cancel editing!'), 'close', $Blog->gen_blogurl(), NULL, NULL, NULL, array( 'class' => 'floatright') );
+			}
+			$r[] = $title;
 			break;
 
 		default:
@@ -1408,6 +1414,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.114  2011/10/13 13:09:27  efy-yurybakh
+ * In skin posting (changes)
+ *
  * Revision 1.113  2011/10/13 12:39:31  efy-vitalij
  * add logging http_response_code to Hit
  *

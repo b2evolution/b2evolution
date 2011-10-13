@@ -134,6 +134,7 @@ function init_inskin_editing()
 		$edited_Item->set( 'status', 'published' );
 		$edited_Item->set( 'hideteaser', 0 );
 		check_categories_nosave ( $post_category, $post_extracats );
+		$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
 
 		$redirect_to = url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID, '&' );
 	}
@@ -1121,12 +1122,19 @@ function visibility_select( & $Form, $post_status, $mass_create = false )
  *
  * @todo dh> should display erroneous values (e.g. when giving invalid date) as current (form) value, too.
  * @param Form
+ * @param boolean Break line
+ * @param string Title
  */
-function issue_date_control( $Form, $break = false )
+function issue_date_control( $Form, $break = false, $field_title = '' )
 {
 	global $edited_Item;
 
-	echo T_('Issue date').':<br />';
+	if( $field_title == '' )
+	{
+		$field_title = T_('Issue date');
+	}
+
+	echo $field_title.':<br />';
 
 	echo '<label><input type="radio" name="item_dateset" id="set_issue_date_now" value="0" '
 				.( ($edited_Item->dateset == 0) ? 'checked="checked"' : '' )
@@ -2107,6 +2115,9 @@ function check_item_perm_edit( $post_ID )
 
 /*
  * $Log$
+ * Revision 1.147  2011/10/13 13:09:27  efy-yurybakh
+ * In skin posting (changes)
+ *
  * Revision 1.146  2011/10/13 11:40:10  efy-yurybakh
  * In skin posting (permission)
  *

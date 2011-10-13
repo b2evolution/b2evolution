@@ -32,6 +32,7 @@ if( !empty( $bozo_start_modified ) )
 {
 	$params['bozo_start_modified'] = true;
 }
+
 $Form->begin_form( 'inskin', '', $params );
 
 	$Form->add_crumb( 'item' );
@@ -152,7 +153,7 @@ $Form->end_fieldset();
 		$Form->inputstart = '';
 		$Form->inputend = '';
 		echo '<br /><div id="itemform_edit_timestamp" class="edit_fieldgroup">';
-		issue_date_control( $Form, false );
+		issue_date_control( $Form, false, '<strong>'.T_('Issue date').'</strong>' );
 		echo '</div>';
 
 		$Form->end_fieldset();
@@ -162,7 +163,7 @@ $Form->end_fieldset();
 	echo '<br />';
 
 	echo '<table cellspacing="0" width="100%">';
-	echo '<tr><td class="label"><label for="item_tags">'.T_('Tags').':</strong> <span class="notes">'.T_('sep by ,').'</span></label></label></td>';
+	echo '<tr><td class="label"><label for="item_tags"><strong>'.T_('Tags').':</strong> <span class="notes">'.T_('sep by ,').'</span></label></td>';
 	echo '<td class="input">';
 	$Form->text_input( 'item_tags', $item_tags, 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
 	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
@@ -200,6 +201,9 @@ echo_autocomplete_tags();
 
 /*
  * $Log$
+ * Revision 1.6  2011/10/13 13:09:27  efy-yurybakh
+ * In skin posting (changes)
+ *
  * Revision 1.5  2011/10/13 11:40:10  efy-yurybakh
  * In skin posting (permission)
  *
