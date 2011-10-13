@@ -601,6 +601,7 @@ if( !empty( $skin ) )
 					'contacts'       => 'contacts.main.php',
 					'user'           => 'user.main.php',
 					'users'          => 'users.main.php',
+					'edit'           => 'edit.main.php',
 					// All others will default to index.main.php
 				);
 
@@ -666,6 +667,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.178  2011/10/13 11:40:10  efy-yurybakh
+ * In skin posting (permission)
+ *
  * Revision 1.177  2011/10/11 06:38:50  efy-asimo
  * Add corresponding error messages when login required
  *

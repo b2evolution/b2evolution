@@ -182,7 +182,10 @@ $Form->end_fieldset();
 		$Form->submit( array( 'actionArray[update]', T_('Save changes'), 'SaveButton', '' ) );
 	}
 
-	echo '<br /><br /><a href="'.$advanced_edit_link['href'].'" onclick="'.$advanced_edit_link['onclick'].'" class="small">'.T_('Go to advanced edit screen').'</a>';
+	if( $current_User->check_perm( 'admin', 'normal' ) )
+	{	// If current user has an access to the Back-office
+		echo '<br /><br /><a href="'.$advanced_edit_link['href'].'" onclick="'.$advanced_edit_link['onclick'].'" class="small">'.T_('Go to advanced edit screen').'</a>';
+	}
 ?>
 </div>
 <?php
@@ -197,6 +200,9 @@ echo_autocomplete_tags();
 
 /*
  * $Log$
+ * Revision 1.5  2011/10/13 11:40:10  efy-yurybakh
+ * In skin posting (permission)
+ *
  * Revision 1.4  2011/10/12 13:54:36  efy-yurybakh
  * In skin posting
  *

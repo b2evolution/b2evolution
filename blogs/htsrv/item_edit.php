@@ -19,11 +19,9 @@ if( empty( $Blog ) )
 	}
 }
 
-if( ! is_logged_in() )
-{ // must be logged in!
-	echo '<p class="error">'.T_( 'You are not logged in.' ).'</p>';
-	return;
-}
+$post_ID = param ( 'post_ID', 'integer', 0 );
+
+check_item_perm_edit( $post_ID );
 
 $action = param_action();
 
@@ -318,6 +316,9 @@ require $ads_current_skin_path.'index.main.php';
 
 /*
  * $Log$
+ * Revision 1.4  2011/10/13 11:40:09  efy-yurybakh
+ * In skin posting (permission)
+ *
  * Revision 1.3  2011/10/12 13:54:36  efy-yurybakh
  * In skin posting
  *

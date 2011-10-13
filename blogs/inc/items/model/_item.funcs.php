@@ -2056,8 +2056,60 @@ function get_item_edit_modes( $blog_ID, $action, $dispatcher, $tab_switch_params
 }
 
 
+/**
+ * Check permission for editing of the item by current user
+ * 
+ * @param post ID
+ */
+function check_item_perm_edit( $post_ID )
+{
+	global $Blog, $Messages, $current_User;
+
+	// The edit module can only be used by logged in users:
+	if( ! is_logged_in() )
+	{	// Redirect to the login page for anonymous users
+		$Messages->add( T_( 'You must log in to create & edit a posts.' ) );
+		header_redirect( get_login_url('cannot edit posts'), 302 );
+		// will have exited
+	}
+
+	$user_can_edit = false;
+
+	if( $post_ID > 0 )
+	{	// Check permissions for editing of the current item
+		$ItemCache = & get_ItemCache ();
+		$edited_Item = $ItemCache->get_by_ID ( $post_ID );
+		$user_can_edit = $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item );
+	}
+	else
+	{	// Check permissions for creating of a new item
+		// TODO: It seems we don't have a such permisson 'create a new post'. We have to create it.
+		$user_can_edit = $current_User->check_perm( 'admin', 'normal' );
+	}
+
+	if( ! $user_can_edit )
+	{	// Redirect to the blog url for users without messaging permission
+		$Messages->add( 'You are not allowed to create & edit a posts!' );
+		if( empty( $Blog ) )
+		{	// Bad request without blog ID
+			global $home_url;
+			$redirect_to = $home_url;
+		}
+		else
+		{	// Redirect to the current blog
+			$redirect_to = $Blog->gen_blogurl();
+		}
+		header_redirect( $redirect_to, 302 );
+		// will have exited
+	}
+}
+
+
 /*
  * $Log$
+ * Revision 1.146  2011/10/13 11:40:10  efy-yurybakh
+ * In skin posting (permission)
+ *
  * Revision 1.145  2011/10/12 13:54:36  efy-yurybakh
  * In skin posting
  *
