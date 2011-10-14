@@ -741,7 +741,7 @@ class Hit
 	 */
 	function record_the_hit()
 	{
-		global $DB, $Session, $ReqURI, $Blog, $blog, $localtimenow, $Debuglog, $disp, $ctrl;
+		global $DB, $Session, $ReqURI, $Blog, $blog, $localtimenow, $Debuglog, $disp, $ctrl, $http_response_code;
 
 		$Debuglog->add( 'Hit: Recording the hit.', 'request' );
 
@@ -800,11 +800,7 @@ class Hit
 		$serprank = $this->get_serprank();
 
     // fp>vitaliy : get rid of this and just use the already existing global $http_response_code  (make sure it's updated correctly everywhere though)
-		if( $disp == '404' && $this->hit_response_code == 200 )
-		{
-			$this->hit_response_code = (int)$disp;
-		}
-
+		$this->hit_response_code = $http_response_code;
 		// insert hit into DB table:
 		if (empty($this->test_mode))
 		{
@@ -812,9 +808,9 @@ class Hit
 				INSERT INTO T_hitlog(
 					hit_sess_ID, hit_datetime, hit_uri, hit_disp, hit_ctrl, hit_referer_type,
 					hit_referer, hit_referer_dom_ID, hit_keyphrase_keyp_ID, hit_serprank, hit_blog_ID, hit_remote_addr, hit_agent_type, hit_response_code )
-				VALUES( ".$DB->null_string($Session->ID).", FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($hit_uri)."', ".$DB->null_string($disp).", ".$DB->null_string($ctrl).", '".$this->referer_type
+				VALUES( '".$this->session_id."', FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($hit_uri)."', ".$DB->quote($disp).", ".$DB->quote($ctrl).", '".$this->referer_type
 					."', '".$DB->escape($hit_referer)."', ".$DB->null($this->get_referer_domain_ID()).', '.$DB->null($keyp_ID)
-					.', '.$DB->null($serprank).', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', '".$this->get_agent_type()."', ".$this->hit_response_code.")";
+					.', '.$DB->null($serprank).', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', '".$this->get_agent_type()."', ".$DB->null($this->hit_response_code).")";
 		}
 		else
 		{
@@ -826,9 +822,9 @@ class Hit
 				INSERT INTO T_hitlog(
 					hit_sess_ID, hit_datetime, hit_uri, hit_disp, hit_ctrl, hit_referer_type,
 					hit_referer, hit_referer_dom_ID, hit_keyphrase_keyp_ID, hit_serprank, hit_blog_ID, hit_remote_addr, hit_agent_type, hit_response_code )
-				VALUES( '".$this->session_id."', FROM_UNIXTIME(".$this->hit_time."), '".$DB->escape($hit_uri)."', ".$DB->null_string($test_disp).", ".$DB->null_string($test_ctrl).", '".$this->referer_type
+				VALUES( '".$this->session_id."', FROM_UNIXTIME(".$this->hit_time."), '".$DB->escape($hit_uri)."', ".$DB->quote($test_disp).", ".$DB->quote($test_ctrl).", '".$this->referer_type
 					."', '".$DB->escape($hit_referer)."', ".$DB->null($this->get_referer_domain_ID()).', '.$DB->null($keyp_ID)
-					.', '.$DB->null($serprank).', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', '".$this->get_agent_type()."', ".$this->hit_response_code.")";
+					.', '.$DB->null($serprank).', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', '".$this->get_agent_type()."', ".$DB->null($this->hit_response_code).")";
 
 		}
 
@@ -856,29 +852,6 @@ class Hit
 			$internal_searches->dbinsert();
 		}
 		$this->ID = $hit_ID;
-	}
-
-	/**
-	 * Update hit response code
-   *
-   * @todo fp>vitaliy get rid of this function
-   *
-	 * @param mixed Response code
-	 */
-	function response_code_update($http_response_code)
-	{
-		$this->hit_response_code = (int) $http_response_code;
-
-		if ( ! $this->logged )
-		{
-			$this->log();
-		}
-		else
-		{
-			$sql = "UPDATE T_hitlog SET hit_response_code = $this->hit_response_code WHERE hit_ID = $this->ID";
-			$DB->query( $sql, 'Update the hit response code' );
-		}
-
 	}
 
 	/**
@@ -1616,6 +1589,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.78  2011/10/14 09:58:38  efy-vitalij
+ * fix and remake hit_response_code registration
+ *
  * Revision 1.77  2011/10/13 14:46:55  fplanque
  * doc
  *
