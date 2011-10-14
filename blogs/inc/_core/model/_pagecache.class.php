@@ -381,7 +381,7 @@ class PageCache
 						// pre_dump($if_none_match, gen_current_page_etag() );
 						if( $if_none_match == gen_current_page_etag() )
 						{	// Ok, this seems to be really the same:
-							header( 'HTTP/1.0 304 Not Modified' );
+							header_http_response( 'HTTP/1.0 304 Not Modified' );
 							exit(0);
 						}
 					}
@@ -668,6 +668,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.36  2011/10/14 10:12:15  efy-vitalij
+ * add function header_http_response
+ *
  * Revision 1.35  2011/09/19 21:02:31  fplanque
  * ETag support
  *
