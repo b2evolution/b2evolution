@@ -367,44 +367,6 @@ function imgsize( $path, $param = 'widthheight' )
 
 
 /**
- * Add a trailing slash, if none present
- *
- * @param string the path/url
- * @return string the path/url with trailing slash
- */
-function trailing_slash( $path )
-{
-	if( empty($path) || substr( $path, -1 ) == '/' )
-	{
-		return $path;
-	}
-	else
-	{
-		return $path.'/';
-	}
-}
-
-
-/**
- * Remove trailing slash, if present
- *
- * @param string the path/url
- * @return string the path/url without trailing slash
- */
-function no_trailing_slash( $path )
-{
-	if( substr( $path, -1 ) == '/' )
-	{
-		return substr( $path, 0, strlen( $path )-1 );
-	}
-	else
-	{
-		return $path;
-	}
-}
-
-
-/**
  * Remove leading slash, if any.
  *
  * @param string
@@ -1495,6 +1457,9 @@ function remove_orphan_files( $file_ids = NULL, $older_then = NULL )
 
 /*
  * $Log$
+ * Revision 1.61  2011/10/14 20:44:32  sam2kb
+ * Core functions trailing_slash and no_trailing_slash moved out from Files module
+ *
  * Revision 1.60  2011/09/08 01:04:25  sam2kb
  * minor/translation hint
  *

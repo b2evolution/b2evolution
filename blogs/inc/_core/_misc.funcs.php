@@ -4433,18 +4433,18 @@ if( !function_exists( 'property_exists' ) )
 	 *
 	 * @return bool
 	 */
-  function property_exists( $class, $property )
+	function property_exists( $class, $property )
 	{
-    if ( is_object( $class ) ) 
+		if( is_object( $class ) ) 
 		{
-    	$vars = get_object_vars( $class );
-    } 
+			$vars = get_object_vars( $class );
+		} 
 		else
 		{
-      $vars = get_class_vars( $class );
-    }
-    return array_key_exists( $property, $vars );
-  }
+			$vars = get_class_vars( $class );
+		}
+		return array_key_exists( $property, $vars );
+	}
 } 
 
 
@@ -4457,6 +4457,7 @@ function generate_random_ip()
 {
  	return mt_rand(0, 255).'.'.mt_rand(0, 255).'.'.mt_rand(0, 255).'.'.mt_rand(0, 255);
 }
+
 
 /**
  * Generate html response code class
@@ -4481,6 +4482,7 @@ function hit_response_code_class($hit_response_code)
 	return $class;
 }
 
+
 /**
  * Update global $http_response_code and call function header()
  * @param string Header
@@ -4503,8 +4505,50 @@ function header_http_response($string, $code = NULL)
 	header($string);
 }
 
+
+/**
+ * Add a trailing slash, if none present
+ *
+ * @param string the path/url
+ * @return string the path/url with trailing slash
+ */
+function trailing_slash( $path )
+{
+	if( empty($path) || evo_substr( $path, -1 ) == '/' )
+	{
+		return $path;
+	}
+	else
+	{
+		return $path.'/';
+	}
+}
+
+
+/**
+ * Remove trailing slash, if present
+ *
+ * @param string the path/url
+ * @return string the path/url without trailing slash
+ */
+function no_trailing_slash( $path )
+{
+	if( evo_substr( $path, -1 ) == '/' )
+	{
+		return evo_substr( $path, 0, evo_strlen( $path )-1 );
+	}
+	else
+	{
+		return $path;
+	}
+}
+
+
 /*
  * $Log$
+ * Revision 1.291  2011/10/14 20:43:19  sam2kb
+ * Core functions trailing_slash and no_trailing_slash moved out from Files module
+ *
  * Revision 1.290  2011/10/14 09:51:41  efy-vitalij
  * add function header_http_response
  *
