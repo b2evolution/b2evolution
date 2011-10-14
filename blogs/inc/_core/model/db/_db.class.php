@@ -521,22 +521,6 @@ class DB
 			return $val;
 	}
 
-
-	/**
-   * fp>vitaliy !!!!!!!!!!!!!!!!!
-   *
-	 * @return string Return the given value as quoted string or 'NULL', if it's === NULL.
-	 */
-	function null_string($val)
-	{
-		if( $val === NULL )
-			return 'NULL';
-		else
-			return "'$val'";
-
-	}
-
-
 	/**
 	 * Returns the correct WEEK() function to get the week number for the given date.
 	 *
@@ -1712,6 +1696,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.57  2011/10/14 09:54:36  efy-vitalij
+ * remove function null_string()
+ *
  * Revision 1.56  2011/10/13 22:53:38  fplanque
  * no message
  *
