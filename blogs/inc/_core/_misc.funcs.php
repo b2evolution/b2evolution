@@ -2148,7 +2148,7 @@ function bad_request_die( $additional_info = '' )
 	{
 		load_funcs('_core/_template.funcs.php');
 		headers_content_mightcache( 'text/html', 0 );		// Do NOT cache error messages! (Users would not see they fixed them)
-		header('HTTP/1.0 400 Bad Request');
+		header_http_response('HTTP/1.0 400 Bad Request');
 	}
 
 	echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
@@ -4458,7 +4458,11 @@ function generate_random_ip()
  	return mt_rand(0, 255).'.'.mt_rand(0, 255).'.'.mt_rand(0, 255).'.'.mt_rand(0, 255);
 }
 
-
+/**
+ * Generate html response code class
+ * @param integer response code
+ * @return string class
+ */
 function hit_response_code_class($hit_response_code)
 {
 	$class = '';
@@ -4477,8 +4481,33 @@ function hit_response_code_class($hit_response_code)
 	return $class;
 }
 
+/**
+ * Update global $http_response_code and call function header()
+ * @param string Header
+ * @param integer Header response code
+ */
+function header_http_response($string, $code = NULL)
+{
+	global $http_response_code;
+	if (is_null($code))
+	{
+		if (preg_match("/(\d{3})/", $string, $matches))
+		{
+			$http_response_code = (int)$matches[0];
+		}
+	}
+	else
+	{
+		$http_response_code = $code;
+	}
+	header($string);
+}
+
 /*
  * $Log$
+ * Revision 1.290  2011/10/14 09:51:41  efy-vitalij
+ * add function header_http_response
+ *
  * Revision 1.289  2011/10/13 12:41:05  efy-vitalij
  * add function hit_response_code_class
  *
