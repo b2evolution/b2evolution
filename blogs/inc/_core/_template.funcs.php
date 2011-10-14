@@ -208,27 +208,23 @@ function header_redirect( $redirect_to = NULL, $status = false )
 		$Session->dbsave(); // If we don't save now, we run the risk that the redirect goes faster than the PHP script shutdown.
 	}
 
-	if( ! empty($Hit) )
-	{
-		$Hit->response_code_update($http_response_code);
-	}
 	// see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 	switch( $http_response_code )
 	{
 		case 301:
 			// This should be a permanent move redirect!
-			header( 'HTTP/1.1 301 Moved Permanently' );
+			header_http_response( 'HTTP/1.1 301 Moved Permanently' );
 			break;
 
 		case 303:
 			// This should be a "follow up" redirect
 			// Note: Also see http://de3.php.net/manual/en/function.header.php#50588 and the other comments around
-			header( 'HTTP/1.1 303 See Other' );
+			header_http_response( 'HTTP/1.1 303 See Other' );
 			break;
 
 		case 302:
 		default:
-			header( 'HTTP/1.1 302 Found' );
+			header_http_response( 'HTTP/1.1 302 Found' );
 	}
 
   // debug_die($redirect_to);
@@ -1420,6 +1416,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.117  2011/10/14 10:03:26  efy-vitalij
+ * replaced the function header with header_http_response
+ *
  * Revision 1.116  2011/10/13 15:49:43  efy-yurybakh
  * In skin posting (changes)
  *

@@ -6,7 +6,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-header('HTTP/1.0 403 Forbidden');
+header_http_response('HTTP/1.0 403 Forbidden');
 header('Content-Type: text/html; charset=iso-8859-1'); // no translation
 
 ?>
