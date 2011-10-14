@@ -114,17 +114,17 @@ switch( $isub_type )
 		// Events are supported
 
 		if( $notify == 1 )
-		{ // Register type can be 'attend' or 'waitlist', it must be set
+		{ // Register type can be 'attend', 'waitlist', 'also_attend' - it must be set
 			$reg_type = param( 'reg_type', 'string', true );
 		}
 		else
-		{
+		{ // unregister
 			$reg_type = 'attend';
 		}
 
 		$new_attendee = param( 'new_attendee', 'string', NULL );
 		if( !empty( $new_attendee ) )
-		{
+		{ // admin user add an attendee to a list
 			$current_User->check_perm( 'users', 'edit', true );
 			$UserCache = & get_UserCache();
 			$new_attendee_User = $UserCache->get_by_login( $new_attendee );
@@ -134,6 +134,9 @@ switch( $isub_type )
 			{
 				case 'ML':
 					$reg_type = 'attend';
+					break;
+				case 'NS':
+					$reg_type = 'no_show';
 					break;
 				case 'WL':
 					$reg_type = 'waitlist';
@@ -188,7 +191,7 @@ switch( $isub_type )
 		else
 		{
 			$success_unsub_message = T_( 'User was successfully unsubscribed.' );
-			$success_sub_message = T_( 'User was successfully subscribed to attend this event.' );
+			$success_sub_message = T_( 'User was successfully subscribed.' );
 		}
 
 		$is_back_attend = ( $reg_type == 'back_attend' );
@@ -223,6 +226,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.15  2011/10/14 04:43:49  efy-asimo
+ * Admin add attendee radio select - update
+ *
  * Revision 1.14  2011/10/13 07:05:42  efy-asimo
  * Admin add attendee radio select
  *
