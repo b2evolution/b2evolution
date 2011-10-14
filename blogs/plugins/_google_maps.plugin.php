@@ -156,7 +156,7 @@ class google_maps_plugin extends Plugin
 
 
 	?>
-	<div id="map_canvas" style="width:100%; <?php echo $height; ?>; margin: 5px 5px 5px 5px;"></div>
+	<div id="map_canvas" style="width:100%; <?php echo $height; ?>; margin: 5px 0px;"></div>
 	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
 	<script type="text/javascript">
 	<?php
@@ -560,6 +560,9 @@ function locate()
 }
 /*
  * $Log$
+ * Revision 1.11  2011/10/14 07:38:12  efy-vitalij
+ * change displaying of map style
+ *
  * Revision 1.10  2011/10/13 07:05:34  efy-vitalij
  * add DisplayItemFormFieldset
  *
