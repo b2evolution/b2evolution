@@ -4544,8 +4544,53 @@ function no_trailing_slash( $path )
 }
 
 
+/**
+ * Provide sys_get_temp_dir for older versions of PHP (< 5.2.1)
+ *
+ * @return string path to system temporary directory
+ */
+if( !function_exists( 'sys_get_temp_dir' ) )
+{
+	function sys_get_temp_dir()
+	{
+		// Try to get from environment variable
+		if( !empty($_ENV['TMP']) )
+		{
+			return realpath( $_ENV['TMP'] );
+		}
+		elseif( !empty($_ENV['TMPDIR']) )
+		{
+			return realpath( $_ENV['TMPDIR'] );
+		}
+		elseif( !empty($_ENV['TEMP']) )
+		{
+			return realpath( $_ENV['TEMP'] );
+		}
+		else
+		{	// Detect by creating a temporary file
+
+			// Try to use system's temporary directory as random name shouldn't exist
+			$temp_file = tempnam( sha1(uniqid(rand()), true), '' );
+			if( $temp_file )
+			{
+				$temp_dir = realpath( dirname($temp_file) );
+				unlink($temp_file);
+				return $temp_dir;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+}
+
+
 /*
  * $Log$
+ * Revision 1.292  2011/10/14 22:16:07  sam2kb
+ * Provide sys_get_temp_dir() for older versions of PHP (< 5.2.1)
+ *
  * Revision 1.291  2011/10/14 20:43:19  sam2kb
  * Core functions trailing_slash and no_trailing_slash moved out from Files module
  *
