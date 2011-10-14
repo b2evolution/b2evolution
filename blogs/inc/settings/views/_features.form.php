@@ -84,12 +84,13 @@ $Form->begin_fieldset( T_('Blog by email').get_manual_link('blog_by_email') );
 	// fp> TODO: this is IMPOSSIBLE to turn back on when you have no javascript!!! :((
 	echo '<div id="eblog_section" style="'.( $Settings->get('eblog_enabled') ? '' : 'display:none' ).'">';
 
+		// sam2kb> TODO: javascript to preset default eblog_server_port when eblog_method and/or eblog_encrypt change
 		$Form->select_input_array( 'eblog_method', $Settings->get('eblog_method'), array( 'pop3' => T_('POP3'), 'imap' => T_('IMAP'), ), // TRANS: E-Mail retrieval method
 			T_('Retrieval method'), T_('Choose a method to retrieve the emails.') );
 
 		$Form->text_input( 'eblog_server_host', $Settings->get('eblog_server_host'), 40, T_('Mail Server'), T_('Hostname or IP address of your incoming mail server.'), array( 'maxlength' => 255 ) );
 
-		$Form->text_input( 'eblog_server_port', $Settings->get('eblog_server_port'), 5, T_('Port Number'), T_('Port number of your incoming mail server (Defaults: pop3: 110 imap: 143).'), array( 'maxlength' => 6 ) );
+		$Form->text_input( 'eblog_server_port', $Settings->get('eblog_server_port'), 5, T_('Port Number'), T_('Port number of your incoming mail server (Defaults: pop3: 110, imap: 143, imap SSL/TLS: 993).'), array( 'maxlength' => 6 ) );
 
 		$Form->radio( 'eblog_encrypt', $Settings->get('eblog_encrypt'), array(
 																			array( 'none', T_('None'), ),
@@ -218,6 +219,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.32  2011/10/14 07:52:25  sam2kb
+ * minor/doc
+ *
  * Revision 1.31  2011/10/07 01:52:12  fplanque
  * more fixes
  *
