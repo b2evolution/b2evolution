@@ -292,66 +292,67 @@ if( $allow_javascript )
 if( $use_strict )
 {
 	$allowed_attributes = array
-	(
-		'div' => $A_attrs,								// Strict
-		'p' => $A_attrs,								// Strict
-		'h1' => $A_attrs,								// Strict
-		'h2' => $A_attrs,								// Strict
-		'h3' => $A_attrs,								// Strict
-		'h4' => $A_attrs,								// Strict
-		'h5' => $A_attrs,								// Strict
-		'h6' => $A_attrs,								// Strict
-		'ul' => $A_attrs,	// Strict
-		'ol' => $A_attrs,	// Strict
-		'li' => $A_attrs,							// Strict
-		'dl' => $A_attrs,					// Strict
-		'hr' => $A_attrs,															// Strict
-		'pre' => $A_attrs.' xml:space',								// Strict
-		'a' => $A_attrs.' charset type href hreflang rel rev shape coords',			// Strict
-		'br' => $A_coreattrs,				// Strict
-		'img' => $A_attrs.' src alt longdesc height width usemap ismap',	// Strict
-		'legend' => $A_attrs,							// Strict
-		'table' => $A_attrs.' summary width border frame rules cellspacing cellpadding',  // Strict
-		'caption' => $A_attrs,						// Strict
-		'tr' => $A_attrs.' '.$A_cellhalign.' '.$A_cellvalign,	// Strict
-		'th' => $A_attrs.' abbr axis headers scope rowspan colspan '.$A_cellhalign.' '.$A_cellvalign,	// Strict
-		'td' => $A_attrs.' abbr axis headers scope rowspan colspan '.$A_cellhalign.' '.$A_cellvalign,	// Strict
+	(	// Strict
+		'div' => $A_attrs,
+		'p' => $A_attrs,
+		'h1' => $A_attrs,
+		'h2' => $A_attrs,
+		'h3' => $A_attrs,
+		'h4' => $A_attrs,
+		'h5' => $A_attrs,
+		'h6' => $A_attrs,
+		'ul' => $A_attrs,
+		'ol' => $A_attrs,
+		'li' => $A_attrs,
+		'dl' => $A_attrs,
+		'hr' => $A_attrs,
+		'pre' => $A_attrs.' xml:space',
+		'a' => $A_attrs.' charset type href hreflang rel rev shape coords name',
+		'br' => $A_coreattrs,
+		'img' => $A_attrs.' src alt longdesc height width usemap ismap',
+		'legend' => $A_attrs,
+		'table' => $A_attrs.' summary width border frame rules cellspacing cellpadding',
+		'caption' => $A_attrs,
+		'tr' => $A_attrs.' '.$A_cellhalign.' '.$A_cellvalign,
+		'th' => $A_attrs.' abbr axis headers scope rowspan colspan '.$A_cellhalign.' '.$A_cellvalign,
+		'td' => $A_attrs.' abbr axis headers scope rowspan colspan '.$A_cellhalign.' '.$A_cellvalign,
 	);
 }
 else
 {
 	$allowed_attributes = array
-	(
-		'div' => $A_attrs.' '.$A_TextAlign,		// Transitional
-		'p' => $A_attrs.' '.$A_TextAlign,		// Transitional
-		'h1' => $A_attrs.' '.$A_TextAlign,		// Transitional
-		'h2' => $A_attrs.' '.$A_TextAlign,		// Transitional
-		'h3' => $A_attrs.' '.$A_TextAlign,		// Transitional
-		'h4' => $A_attrs.' '.$A_TextAlign,		// Transitional
-		'h5' => $A_attrs.' '.$A_TextAlign,		// Transitional
-		'h6' => $A_attrs.' '.$A_TextAlign,		// Transitional
-		'ul' => $A_attrs.' type compact',	// Transitional
-		'ol' => $A_attrs.' type compact start',	// Transitional
-		'menu' => $A_attrs.' compact',	// Transitional only
-		'dir' => $A_attrs.' compact',	// Transitional only
-		'li' => $A_attrs.' type value',	// Transitional
-		'dl' => $A_attrs.' compact',	// Transitional
-		'hr' => $A_attrs.' align noshade size width',		// Transitional
-		'pre' => $A_attrs.' width xml:space',						// Transitional
+	(	// Transitional
+		'div' => $A_attrs.' '.$A_TextAlign,
+		'p' => $A_attrs.' '.$A_TextAlign,
+		'h1' => $A_attrs.' '.$A_TextAlign,
+		'h2' => $A_attrs.' '.$A_TextAlign,
+		'h3' => $A_attrs.' '.$A_TextAlign,
+		'h4' => $A_attrs.' '.$A_TextAlign,
+		'h5' => $A_attrs.' '.$A_TextAlign,
+		'h6' => $A_attrs.' '.$A_TextAlign,
+		'ul' => $A_attrs.' type compact',
+		'ol' => $A_attrs.' type compact start',
+		'menu' => $A_attrs.' compact',			// Transitional only
+		'dir' => $A_attrs.' compact',			// Transitional only
+		'li' => $A_attrs.' type value',
+		'dl' => $A_attrs.' compact',
+		'hr' => $A_attrs.' align noshade size width',
+		'pre' => $A_attrs.' width xml:space',
 		'center' => $A_attrs,					// Transitional only
-		'a' => $A_attrs.' charset type href hreflang rel rev shape coords target',	// Transitional
-		'br' => $A_coreattrs.' clear',	// Transitional
+		// sam2kb> TODO: 'name' is deprecated by 'id', we should allow 'id' in <a> tags without 'href' attribute
+		'a' => $A_attrs.' charset type href hreflang rel rev shape coords target name',
+		'br' => $A_coreattrs.' clear',
 		'u' => $A_attrs,						// Transitional only
 		's' => $A_attrs,						// Transitional only
-		'strike' => $A_attrs,			// Transitional only
+		'strike' => $A_attrs,					// Transitional only
 		'font' => $A_coreattrs.' '.$A_i18n.' size color face',	// Transitional only
-		'img' => $A_attrs.' src alt name longdesc height width usemap ismap align border hspace vspace',	// Transitional
-		'legend' => $A_attrs.' align',				// Transitional
-		'table' => $A_attrs.' summary width border frame rules cellspacing cellpadding align bgcolor',								// Transitional
-		'caption' => $A_attrs.' align',																								// Transitional
-		'tr' => $A_attrs.' '.$A_cellhalign.' '.$A_cellvalign.' bgcolor',																// Transitional
-		'th' => $A_attrs.' abbr axis headers scope rowspan colspan '.$A_cellhalign.' '.$A_cellvalign.' nowrap bgcolor width height',	// Transitional
-		'td' => $A_attrs.' abbr axis headers scope rowspan colspan '.$A_cellhalign.' '.$A_cellvalign.' nowrap bgcolor width height',	// Transitional
+		'img' => $A_attrs.' src alt name longdesc height width usemap ismap align border hspace vspace',
+		'legend' => $A_attrs.' align',
+		'table' => $A_attrs.' summary width border frame rules cellspacing cellpadding align bgcolor',
+		'caption' => $A_attrs.' align',
+		'tr' => $A_attrs.' '.$A_cellhalign.' '.$A_cellvalign.' bgcolor',
+		'th' => $A_attrs.' abbr axis headers scope rowspan colspan '.$A_cellhalign.' '.$A_cellvalign.' nowrap bgcolor width height',
+		'td' => $A_attrs.' abbr axis headers scope rowspan colspan '.$A_cellhalign.' '.$A_cellvalign.' nowrap bgcolor width height',
 	);
 }
 $allowed_attributes += array
@@ -567,6 +568,9 @@ $comments_allowed_attributes = array
 
 /*
  * $Log$
+ * Revision 1.12  2011/10/14 18:44:12  sam2kb
+ * Allow 'name' attribute in <a> tags
+ *
  * Revision 1.11  2011/09/04 22:13:21  fplanque
  * copyright 2011
  *
