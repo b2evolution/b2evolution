@@ -171,7 +171,11 @@ $Form->end_fieldset();
 ?>
 
 <div class="clear"></div>
-
+<?php
+// ####################### PLUGIN FIELDSETS #########################
+$Plugins->trigger_event( 'DisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item, 'edit_layout' => 'inskin' ) );
+?>
+<div class="clear"></div>
 <div class="right">
 <?php // ------------------------------- ACTIONS ----------------------------------
 	if( $creating )
@@ -201,6 +205,9 @@ echo_autocomplete_tags();
 
 /*
  * $Log$
+ * Revision 1.7  2011/10/14 07:42:02  efy-vitalij
+ * add trigger event 'DisplayItemFormFieldset'
+ *
  * Revision 1.6  2011/10/13 13:09:27  efy-yurybakh
  * In skin posting (changes)
  *
