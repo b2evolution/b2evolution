@@ -870,7 +870,13 @@ function cat_select_after_last( $parent_cat_ID, $level )
  */
 function cat_select_new()
 {
-	global $blog;
+	global $blog, $current_User;
+
+	if( ! $current_User->check_perm( 'blog_cats', '', false, $blog ) )
+	{	// Current user cannot add/edit a categories for this blog
+		return '';
+	}
+
 	$new_maincat = param( 'new_maincat', 'boolean', false );
 	$new_extracat = param( 'new_extracat', 'boolean', false );
 	if( $new_maincat || $new_extracat )
@@ -1546,6 +1552,14 @@ function check_categories( & $post_category, & $post_extracats )
 
 	if( ! $post_category || in_array( 0, $post_extracats ) )	// if category key is 0 => means it is a new category
 	{
+		global $current_User;
+		if( ! $current_User->check_perm( 'blog_cats', '', false, $Blog->ID ) )
+		{	// Current user cannot add a categories for this blog
+			check_categories_nosave( $post_category, $post_extracats); // set up the category parameters
+			$Messages->add( T_('You are not allowed to create a new category.'), 'error' );
+			return false;
+		}
+
 		$category_name = param( 'category_name', 'string', true );
 		if( $category_name == '' )
 		{
@@ -2204,6 +2218,9 @@ function get_item_new_link( $before = '', $after = '', $link_text = '', $link_ti
 
 /*
  * $Log$
+ * Revision 1.151  2011/10/14 07:23:09  efy-yurybakh
+ * In skin posting (categories permission)
+ *
  * Revision 1.150  2011/10/13 18:52:04  efy-yurybakh
  * In skin posting (permission)
  *
