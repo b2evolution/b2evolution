@@ -12,9 +12,9 @@ load_class( 'messaging/model/_message.class.php', 'Message' );
 global $current_User;
 
 // Check minimum permission:
-if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
+if( !$current_User->check_perm( 'perm_messaging', 'abuse' ) )
 {
-	$Messages->add( 'Sorry, you are not allowed to view threads!' );
+	$Messages->add( 'Sorry, you are not allowed to abuse management!' );
 	header_redirect( $admin_url );
 }
 
@@ -23,10 +23,10 @@ if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
  */
 global $perm_abuse_management;
 
-$perm_abuse_management = false;
+$perm_abuse_management = true;
 
 // Set options path:
-$AdminUI->set_path( 'messaging', 'threads' );
+$AdminUI->set_path( 'messaging', 'abuse' );
 
 // Get action parameter from request:
 param_action();
@@ -47,39 +47,6 @@ load_messaging_threads_recipients( $current_User->ID );
 
 switch( $action )
 {
-	case 'new':
-		if( ! isset($edited_Message) )
-		{	// We don't have a model to use, start with blank object:
-			$edited_Thread = new Thread();
-			$edited_Message = new Message();
-		}
-		else
-		{	// Duplicate object in order no to mess with the cache:
-			$edited_Thread = duplicate( $edited_Message->Thread ); // PHP4/5 abstraction
-			$edited_Message = duplicate( $edited_Message ); // PHP4/5 abstraction
-			$edited_Message->ID = 0;
-		}
-		$edited_Message->Thread = & $edited_Thread;
-
-		break;
-
-	case 'create': // Record new thread
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'thread' );
-
-		if( create_new_thread() )
-		{ // new thread has been created successful
-			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=threads', 303 ); // Will EXIT
-			// We have EXITed already at this point!!
-		}
-
-		// Couldn't create the new Thread, reset variables to create another. 
-		$edited_Thread = new Thread();
-		$edited_Message = new Message();
-		$edited_Message->Thread = & $edited_Thread;
-		break;
-
 	case 'delete':
 		// Delete thread:
 		// Check that this action request is not a CSRF hacked request:
@@ -101,7 +68,7 @@ switch( $action )
 			forget_param( 'msg_ID' );
 			$Messages->add( $msg, 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=threads', 303 ); // Will EXIT
+			header_redirect( '?ctrl=abuse', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		else
@@ -117,7 +84,7 @@ switch( $action )
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
 $AdminUI->breadcrumbpath_add( T_('Messages'), '?ctrl=threads' );
-$AdminUI->breadcrumbpath_add( T_('Conversations'), '?ctrl=threads' );
+$AdminUI->breadcrumbpath_add( T_('Abuse Management'), '?ctrl=abuse' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -144,11 +111,6 @@ switch( $action )
 		$AdminUI->disp_view( 'messaging/views/_thread_list.view.php' );
 		break;
 
-	case 'new':
-	case 'create':
-		$AdminUI->disp_view( 'messaging/views/_thread.form.php' );
-		break;
-
 	default:
 		// No specific request, list all threads:
 		// Cleanup context:
@@ -166,52 +128,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.19  2011/10/14 19:02:14  efy-yurybakh
+ * Revision 1.1  2011/10/14 19:02:14  efy-yurybakh
  * Messaging Abuse Management
  *
- * Revision 1.18  2011/10/07 05:43:45  efy-asimo
- * Check messaging availability before display
- *
- * Revision 1.17  2011/08/11 09:05:09  efy-asimo
- * Messaging in front office
- *
- * Revision 1.16  2010/01/30 18:55:32  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.15  2010/01/15 16:57:38  efy-yury
- * update messaging: crumbs
- *
- * Revision 1.14  2010/01/03 12:03:17  fplanque
- * More crumbs...
- *
- * Revision 1.13  2009/12/06 22:55:20  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.12  2009/10/08 20:05:52  efy-maxim
- * Modular/Pluggable Permissions
- *
- * Revision 1.11  2009/09/26 12:00:43  tblue246
- * Minor/coding style
- *
- * Revision 1.10  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.9  2009/09/19 20:31:38  efy-maxim
- * 'Reply' permission : SQL queries to check permission ; Block/Unblock functionality; Error messages on insert thread/message
- *
- * Revision 1.8  2009/09/19 11:29:05  efy-maxim
- * Refactoring
- *
- * Revision 1.7  2009/09/18 16:16:50  efy-maxim
- * comments tab in messaging module
- *
- * Revision 1.6  2009/09/18 10:38:31  efy-maxim
- * 15x15 icons next to login in messagin module
- *
- * Revision 1.5  2009/09/16 22:03:40  fplanque
- * doc
  *
  */
 ?>

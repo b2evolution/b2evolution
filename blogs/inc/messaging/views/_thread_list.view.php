@@ -28,6 +28,7 @@ global $current_User;
 global $unread_messages_count;
 global $read_unread_recipients;
 global $DB, $Blog;
+global $perm_abuse_management;
 
 if( !isset( $display_params ) )
 { // init display_params
@@ -40,25 +41,7 @@ $display_params = array_merge( array(
 
 // Select read/unread users for each thread
 
-$recipients_SQL = new SQL();
-
-$recipients_SQL->SELECT( 'ts.tsta_thread_ID AS thr_ID,
-							GROUP_CONCAT(DISTINCT ur.user_login ORDER BY ur.user_login SEPARATOR \', \') AS thr_read,
-    						GROUP_CONCAT(DISTINCT uu.user_login ORDER BY uu.user_login SEPARATOR \', \') AS thr_unread' );
-
-$recipients_SQL->FROM( 'T_messaging__threadstatus ts
-							LEFT OUTER JOIN T_messaging__threadstatus tsr
-								ON ts.tsta_thread_ID = tsr.tsta_thread_ID AND tsr.tsta_first_unread_msg_ID IS NULL
-							LEFT OUTER JOIN T_users ur
-								ON tsr.tsta_user_ID = ur.user_ID AND ur.user_ID <> '.$current_User->ID.'
-							LEFT OUTER JOIN T_messaging__threadstatus tsu
-								ON ts.tsta_thread_ID = tsu.tsta_thread_ID AND tsu.tsta_first_unread_msg_ID IS NOT NULL
-							LEFT OUTER JOIN T_users uu
-								ON tsu.tsta_user_ID = uu.user_ID AND uu.user_ID <> '.$current_User->ID );
-
-$recipients_SQL->WHERE( 'ts.tsta_user_ID ='.$current_User->ID );
-
-$recipients_SQL->GROUP_BY( 'ts.tsta_thread_ID' );
+$recipients_SQL = get_threads_recipients_sql();
 
 foreach( $DB->get_results( $recipients_SQL->get() ) as $row )
 {
@@ -76,84 +59,9 @@ foreach( $DB->get_results( $recipients_SQL->get() ) as $row )
 
 	$read_unread_recipients[$row->thr_ID] = $read_by;
 }
-// Get params from request
-$s = param( 's', 'string', '', true );
-$u = param( 'u', 'string', '', true );
-
-if( !empty( $s ) || !empty( $u ) )
-{	// We want to filter on search keyword:
-
-	$filter_sql = array();
-	if( !empty( $s ) )
-	{ // Search by title
-		$filter_sql[] = 'threads.thrd_title LIKE "%'.$DB->escape($s).'%"';
-	}
-	if( !empty( $u ) )
-	{ // Search by user names
-		$filter_sql[] = 'CONCAT_WS( " ", threads.thrd_recipients, threads.thrd_usernames) LIKE "%'.$DB->escape($u).'%"';
-	}
-	$filter_sql = ( count( $filter_sql ) > 0 ) ? ' WHERE '.implode( ' OR ', $filter_sql) : '';
-
-	// Create SELECT query
-	$select_SQL = 'SELECT * FROM
-						(SELECT mt.thrd_ID, mt.thrd_title, mt.thrd_datemodified,
-								mts.tsta_first_unread_msg_ID AS thrd_msg_ID, mm.msg_datetime AS thrd_unread_since,
-								(SELECT GROUP_CONCAT(ru.user_login ORDER BY ru.user_login SEPARATOR \', \')
-									FROM T_messaging__threadstatus AS rts
-										LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID AND ru.user_ID <> '.$current_User->ID.'
-										WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_recipients,
-								(SELECT CONCAT_WS(" ", GROUP_CONCAT(ru.user_firstname), GROUP_CONCAT(ru.user_lastname), GROUP_CONCAT(ru.user_nickname))
-									FROM T_messaging__threadstatus AS rts
-										LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID AND ru.user_ID <> '.$current_User->ID.'
-										WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_usernames
-						FROM T_messaging__threadstatus mts
-								LEFT OUTER JOIN T_messaging__thread mt ON mts.tsta_thread_ID = mt.thrd_ID
-								LEFT OUTER JOIN T_messaging__message mm ON mts.tsta_first_unread_msg_ID = mm.msg_ID
-								WHERE mts.tsta_user_ID = '.$current_User->ID.'
-								ORDER BY mts.tsta_first_unread_msg_ID DESC, mt.thrd_datemodified DESC) AS threads'.
-						$filter_sql;
-
-	// Create COUNT query
-	$count_SQL = 'SELECT COUNT(*) FROM
-					(SELECT mt.thrd_title,
-						(SELECT GROUP_CONCAT(ru.user_login SEPARATOR \', \')
-								FROM T_messaging__threadstatus AS rts
-									LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID AND ru.user_ID <> '.$current_User->ID.'
-											WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_recipients,
-										(SELECT CONCAT_WS(" ", GROUP_CONCAT(ru.user_firstname), GROUP_CONCAT(ru.user_lastname), GROUP_CONCAT(ru.user_nickname))
-						FROM T_messaging__threadstatus AS rts
-							LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID AND ru.user_ID <> '.$current_User->ID.'
-							WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_usernames
-						FROM T_messaging__threadstatus mts
-							LEFT OUTER JOIN T_messaging__thread mt ON mts.tsta_thread_ID = mt.thrd_ID
-									WHERE mts.tsta_user_ID = '.$current_User->ID.') AS threads'.
-						$filter_sql;
-}
-else
-{
-	// Create SELECT query
-	$select_SQL = 'SELECT * FROM
-					(SELECT mt.thrd_ID, mt.thrd_title, mt.thrd_datemodified,
-							mts.tsta_first_unread_msg_ID AS thrd_msg_ID, mm.msg_datetime AS thrd_unread_since,
-						(SELECT GROUP_CONCAT(ru.user_login ORDER BY ru.user_login SEPARATOR \', \')
-						FROM T_messaging__threadstatus AS rts
-							LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID AND ru.user_ID <> '.$current_User->ID.'
-							WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_recipients
-					FROM T_messaging__threadstatus mts
-						LEFT OUTER JOIN T_messaging__thread mt ON mts.tsta_thread_ID = mt.thrd_ID
-						LEFT OUTER JOIN T_messaging__message mm ON mts.tsta_first_unread_msg_ID = mm.msg_ID
-						WHERE mts.tsta_user_ID = '.$current_User->ID.'
-						ORDER BY mts.tsta_first_unread_msg_ID DESC, mt.thrd_datemodified DESC) AS threads';
-
-	// Create COUNT quiery
-	$count_SQL = 'SELECT COUNT(*)
-					FROM T_messaging__threadstatus
-						WHERE tsta_user_ID = '.$current_User->ID;
-}
 
 // Create result set:
-
-$Results = new Results( $select_SQL, 'thrd_', '', NULL, $count_SQL );
+$Results = get_threads_results();
 
 $Results->Cache = & get_ThreadCache();
 
@@ -178,23 +86,23 @@ function filter_recipients( & $Form )
 $Results->filter_area = array(
 	'callback' => 'filter_recipients',
 	'presets' => array(
-		'all' => array( T_('All'), get_messaging_url( 'threads' ) ),
+		'all' => array( T_('All'), get_messaging_url( $perm_abuse_management ? 'abuse' : 'threads' ) ),
 		)
 	);
 
 if( isset($Blog) )
 {
-  $image_size = $Blog->get_setting('image_size_messaging');
+	$image_size = $Blog->get_setting('image_size_messaging');
 }
 else
 {
-  $image_size = 'crop-32x32';
+	$image_size = 'crop-32x32';
 }
 $Results->cols[] = array(
-					'th' => T_('With'),
+					'th' => T_( $perm_abuse_management ? 'Between' : 'With' ),
 					'th_class' => 'thread_with shrinkwrap',
 					'td_class' => 'thread_with',
-					'td' => '%get_avatar_imgtags( #thrd_recipients#, true, true, "'.$image_size.'", "avatar_before_login_middle" )%',
+					'td' => '%get_avatar_imgtags( #thrd_recipients#, true, true, "'.$image_size.'", "avatar_before_login_middle mb1" )%',
 					);
 
 /**
@@ -207,6 +115,8 @@ $Results->cols[] = array(
  */
 function message_subject_link( $thrd_ID, $thrd_title, $thrd_msg_ID )
 {
+	global $perm_abuse_management;
+
 	$messages_url = get_messaging_url( 'messages' );
 	if( $thrd_title == '' )
 	{
@@ -221,7 +131,13 @@ function message_subject_link( $thrd_ID, $thrd_title, $thrd_msg_ID )
 		$read_icon = get_icon( 'pixel', 'imgtag', array( 'size' => array( 12, 11 ) ) );
 	}
 
-	$link = $read_icon.'<a href="'.$messages_url.'&amp;thrd_ID='.$thrd_ID.'&amp;thrd_title='.strip_tags($thrd_title).'" title="'.T_('Show messages...').'">';
+	$tab = '';
+	if( $perm_abuse_management )
+	{	// We are in Abuse Management
+		$tab = '&amp;tab=abuse';
+	}
+
+	$link = $read_icon.'<a href="'.$messages_url.'&amp;thrd_ID='.$thrd_ID.$tab.'" title="'.T_('Show messages...').'">';
 	$link .= '<strong>'.$thrd_title.'</strong>';
 	$link .= '</a>';
 
@@ -297,21 +213,27 @@ if( $current_User->check_perm( 'perm_messaging', 'delete' ) )
 						);
 }
 
-if( is_admin_page() )
-{
-	$newmsg_url = regenerate_url( 'action', 'action=new' );
-}
-else
-{
-	$newmsg_url = regenerate_url( 'disp', 'disp=threads&action=new' );
-}
+if( ! $perm_abuse_management )
+{	// Show link to create a new conversation
+	if( is_admin_page() )
+	{
+		$newmsg_url = regenerate_url( 'action', 'action=new' );
+	}
+	else
+	{
+		$newmsg_url = regenerate_url( 'disp', 'disp=threads&action=new' );
+	}
 
-$Results->global_icon( T_('Create a new conversation...'), 'new', $newmsg_url, T_('Compose new').' &raquo;', 3, 4  );
+	$Results->global_icon( T_('Create a new conversation...'), 'new', $newmsg_url, T_('Compose new').' &raquo;', 3, 4  );
+}
 
 $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.40  2011/10/14 19:02:14  efy-yurybakh
+ * Messaging Abuse Management
+ *
  * Revision 1.39  2011/10/11 02:05:42  fplanque
  * i18n/wording cleanup
  *

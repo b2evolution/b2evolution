@@ -54,6 +54,7 @@ $ctrl_mappings['messages'] = 'messaging/messages.ctrl.php';
 $ctrl_mappings['threads'] = 'messaging/threads.ctrl.php';
 $ctrl_mappings['contacts'] = 'messaging/contacts.ctrl.php';
 $ctrl_mappings['msgsettings'] = 'messaging/msg_settings.ctrl.php';
+$ctrl_mappings['abuse'] = 'messaging/abuse.ctrl.php';
 
 
 
@@ -124,7 +125,8 @@ class messaging_Module extends Module
 		switch( $grp_ID )
 		{
 			case 1: // Administrators group ID equals 1
-				$permname = 'delete';
+				global $test_install_all_features;
+				$permname = $test_install_all_features ? 'abuse' : 'delete';
 				break;
 			case 2: // Privileged Bloggers group equals 2
 				$permname = 'write';
@@ -166,7 +168,8 @@ class messaging_Module extends Module
 						array( 'none', T_( 'No Access' ), '' ),
 						array( 'reply', T_( 'Read & Send messages to people in contacts list only (except for blocked contacts)' ), '' ),
 						array( 'write', T_( 'Read & Send messages to anyone (except for blocked contacts)' ), '' ),
-						array( 'delete', T_( 'Read, Send & Delete any messages (including for blocked contacts)' ), '' )  ) ) );
+						array( 'delete', T_( 'Read, Send & Delete any messages (including for blocked contacts)' ), '' ),
+						array( 'abuse', T_( 'Abuse Management' ), '' )  ) ) );
 		// We can return as many permissions as we want.
 		// In other words, one module can return many pluggable permissions.
 		return $permissions;
@@ -213,6 +216,13 @@ class messaging_Module extends Module
 		$perm = false;
 		switch ( $permvalue )
 		{
+			case 'abuse':
+				// Abuse Management & Read, Send & Delete any messages (able to send messages even for blocked contacts)
+				if( $permlevel == 'abuse' )
+				{
+					$perm = true;
+					break;
+				}
 			case 'delete':
 				// Read, Send & Delete any messages (able to send messages even for blocked contacts)
 				if( $permlevel == 'delete' )
@@ -331,6 +341,9 @@ $messaging_Module = new messaging_Module();
 
 /*
  * $Log$
+ * Revision 1.23  2011/10/14 19:02:14  efy-yurybakh
+ * Messaging Abuse Management
+ *
  * Revision 1.22  2011/10/06 06:18:29  efy-asimo
  * Add messages link to settings
  * Update messaging notifications

@@ -24,7 +24,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher, $action, $current_User, $Blog;
+global $dispatcher, $action, $current_User, $Blog, $perm_abuse_management;
 
 // in front office there is no function call, $edited_Thread is available
 if( !isset( $edited_Thread ) )
@@ -342,21 +342,27 @@ $Results->display( $display_params );
 
 echo '<div class="fieldset clear"></div>';
 
-$Form = new Form( $params[ 'form_action' ], $params[ 'form_name' ], 'post', $params[ 'form_layout' ] );
+if( ! $perm_abuse_management )
+{
+	$Form = new Form( $params[ 'form_action' ], $params[ 'form_name' ], 'post', $params[ 'form_layout' ] );
 
-$Form->begin_form( $params['form_class'], '' );
+	$Form->begin_form( $params['form_class'], '' );
 
-	$Form->add_crumb( 'message' );
-	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',msg_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
-	$Form->hidden( 'redirect_to', $params[ 'redirect_to' ] );
+		$Form->add_crumb( 'message' );
+		$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',msg_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
+		$Form->hidden( 'redirect_to', $params[ 'redirect_to' ] );
 
-	$Form->info_field(T_('Reply to'), get_avatar_imgtags( $recipients ), array('required'=>true));
+		$Form->info_field(T_('Reply to'), get_avatar_imgtags( $recipients, true, true, 'crop-15x15', 'avatar_before_login mb1' ), array('required'=>true));
 
-	$Form->textarea('msg_text', '', 10, T_('Message'), '', $params[ 'cols' ], '', true);
+		$Form->textarea('msg_text', '', 10, T_('Message'), '', $params[ 'cols' ], '', true);
 
-$Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' ) ) );
+	$Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' ) ) );
+}
 /*
  * $Log$
+ * Revision 1.46  2011/10/14 19:02:14  efy-yurybakh
+ * Messaging Abuse Management
+ *
  * Revision 1.45  2011/10/13 16:02:14  efy-yurybakh
  * fix bug in the message list
  *

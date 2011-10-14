@@ -42,11 +42,23 @@ if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
 	header_redirect( $admin_url );
 }
 
-// Set options path:
-$AdminUI->set_path( 'messaging', 'threads' );
-
 // Get action parameter from request:
 param_action();
+
+/**
+ * @var set TRUE if we want to see a messages as abuse manager
+ */
+global $perm_abuse_management;
+
+$tab = param( 'tab', 'string' );
+if( $tab == 'abuse' && $current_User->check_perm( 'perm_messaging', 'abuse' ) )
+{	// We go from abuse management and have a permissions
+	$perm_abuse_management = true;
+}
+else
+{
+	$perm_abuse_management = false;
+}
 
 if( param( 'thrd_ID', 'integer', '', true) )
 {// Load thread from cache:
@@ -58,8 +70,8 @@ if( param( 'thrd_ID', 'integer', '', true) )
 		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Thread') ), 'error' );
 		$action = 'nil';
 	}
-	else if( ! $edited_Thread->check_thread_recipient( $current_User->ID ) )
-	{	// Current user is not recipient of this thread
+	else if( ! $edited_Thread->check_thread_recipient( $current_User->ID ) && ! $perm_abuse_management )
+	{	// Current user is not recipient of this thread and he is not abuse manager
 		unset( $edited_Thread );
 		forget_param( 'thrd_ID' );
 		$Messages->add( sprintf( T_('You are not allowed to view this &laquo;%s&raquo;.'), T_('Thread') ), 'error' );
@@ -138,9 +150,17 @@ switch( $action )
 
 }
 
-
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
 $AdminUI->breadcrumbpath_add( T_('Messages'), '?ctrl=threads' );
+if( $perm_abuse_management )
+{	// We see a messages from abuse management
+	$AdminUI->breadcrumbpath_add( T_('Abuse Management'), '?ctrl=abuse' );
+	$AdminUI->set_path( 'messaging', 'abuse' );
+}
+else
+{	// Set options path:
+	$AdminUI->set_path( 'messaging', 'threads' );
+}
 
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -181,6 +201,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.21  2011/10/14 19:02:14  efy-yurybakh
+ * Messaging Abuse Management
+ *
  * Revision 1.20  2011/10/13 18:08:16  efy-yurybakh
  * fix bug in the message list
  *

@@ -121,3 +121,7 @@ span.icon{
 .action_icon.un:hover {
 	text-decoration: underline;
 }
+
+.mb1{
+	margin-bottom: 1px;
+}

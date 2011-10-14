@@ -476,14 +476,23 @@ function request_title( $params = array() )
 		case 'threads':
 		case 'messages':
 			// We are requesting the messages form
-			$thrd_title = param( 'thrd_title', 'string', '' );
-			if( empty( $thrd_title ) )
+			$thrd_ID = param( 'thrd_ID', 'integer', 0 );
+			if( empty( $thrd_ID ) )
 			{
 				$r[] = $params['messages_text'];
 			}
 			else
-			{
-				$r[] = $thrd_title;
+			{	// We get a thread title by ID
+				load_class( 'messaging/model/_thread.class.php', 'Thread' );
+				$ThreadCache = & get_ThreadCache();
+				if( $Thread = $ThreadCache->get_by_ID( $thrd_ID, false ) )
+				{	// Thread exists and we get a title
+					$r[] = $Thread->title;
+				}
+				else
+				{	// Bad request with not existing thread
+					$r[] = strip_tags( $params['messages_text'] );
+				}
 			}
 			break;
 
@@ -1416,6 +1425,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.118  2011/10/14 19:02:13  efy-yurybakh
+ * Messaging Abuse Management
+ *
  * Revision 1.117  2011/10/14 10:03:26  efy-vitalij
  * replaced the function header with header_http_response
  *

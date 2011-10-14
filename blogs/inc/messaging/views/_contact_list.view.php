@@ -158,7 +158,15 @@ if( $Settings->get('allow_avatars') )
 		$User = & $UserCache->get_by_ID( $user_ID, false, false );
 		if( $User )
 		{
-			$avatar_tag = $User->get_avatar_imgtag( $Blog->get_setting('image_size_messaging') );
+			if( empty( $Blog ) )
+			{
+				$avatar_size = 'crop-32x32';
+			}
+			else
+			{
+				$avatar_size = $Blog->get_setting('image_size_messaging');
+			}
+			$avatar_tag = $User->get_avatar_imgtag( $avatar_size );
 			$identity_url = get_user_identity_url( $user_ID );
 			if( !empty( $avatar_tag ) )
 			{
@@ -294,6 +302,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.21  2011/10/14 19:02:14  efy-yurybakh
+ * Messaging Abuse Management
+ *
  * Revision 1.20  2011/10/08 07:23:30  efy-yurybakh
  * In skin posting
  *

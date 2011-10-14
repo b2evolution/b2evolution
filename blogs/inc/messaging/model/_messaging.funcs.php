@@ -369,6 +369,13 @@ function get_messaging_sub_entries( $is_admin )
 													'text' => T_('Settings'),
 													'href' => $url.'msgsettings'
 												);
+		if( $current_User->check_perm( 'perm_messaging', 'abuse' ) )
+		{
+			$messaging_sub_entries[ 'abuse' ] = array(
+														'text' => T_('Abuse Management'),
+														'href' => $url.'abuse'
+													);
+		}
 	}
 
 	return $messaging_sub_entries;
@@ -403,8 +410,214 @@ function get_message_params_from_session()
 	return NULL;
 }
 
+
+/**
+ * Get threads recipients SQL
+ * 
+ * @return SQL object
+ */
+function get_threads_recipients_sql()
+{
+	global $perm_abuse_management, $current_User;
+
+	$user_sql_limit = '';
+	$user_sql_limit2 = '';
+	if( ! $perm_abuse_management )
+	{	// Non abuse management
+		$user_sql_limit = ' AND ur.user_ID <> '.$current_User->ID;
+		$user_sql_limit2 = ' AND uu.user_ID <> '.$current_User->ID;
+	}
+
+	$recipients_SQL = new SQL();
+
+	$recipients_SQL->SELECT( 'ts.tsta_thread_ID AS thr_ID,
+								GROUP_CONCAT(DISTINCT ur.user_login ORDER BY ur.user_login SEPARATOR \', \') AS thr_read,
+								GROUP_CONCAT(DISTINCT uu.user_login ORDER BY uu.user_login SEPARATOR \', \') AS thr_unread' );
+
+	$recipients_SQL->FROM( 'T_messaging__threadstatus ts
+								LEFT OUTER JOIN T_messaging__threadstatus tsr
+									ON ts.tsta_thread_ID = tsr.tsta_thread_ID AND tsr.tsta_first_unread_msg_ID IS NULL
+								LEFT OUTER JOIN T_users ur
+									ON tsr.tsta_user_ID = ur.user_ID'.$user_sql_limit.'
+								LEFT OUTER JOIN T_messaging__threadstatus tsu
+									ON ts.tsta_thread_ID = tsu.tsta_thread_ID AND tsu.tsta_first_unread_msg_ID IS NOT NULL
+								LEFT OUTER JOIN T_users uu
+									ON tsu.tsta_user_ID = uu.user_ID'.$user_sql_limit2 );
+
+	if( ! $perm_abuse_management )
+	{	// Get a messages only of current user
+		$recipients_SQL->WHERE( 'ts.tsta_user_ID ='.$current_User->ID );
+	}
+
+	$recipients_SQL->GROUP_BY( 'ts.tsta_thread_ID' );
+
+	return $recipients_SQL;
+}
+
+
+/**
+ * Get threads SQL
+ * 
+ * @return Results object
+ */
+function get_threads_results()
+{
+	global $perm_abuse_management, $current_User, $DB;
+
+	// Get params from request
+	$s = param( 's', 'string', '', true );
+	$u = param( 'u', 'string', '', true );
+
+	$filter_sql = '';
+	if( !empty( $s ) || !empty( $u ) )
+	{	// We want to filter on search keyword:
+		$filter_sql = array();
+		if( !empty( $s ) )
+		{ // Search by title
+			$filter_sql[] = 'threads.thrd_title LIKE "%'.$DB->escape($s).'%"';
+		}
+		if( !empty( $u ) )
+		{ // Search by user names
+			$filter_sql[] = 'CONCAT_WS( " ", threads.thrd_recipients, threads.thrd_usernames) LIKE "%'.$DB->escape($u).'%"';
+		}
+		$filter_sql = ( count( $filter_sql ) > 0 ) ? ' WHERE '.implode( ' OR ', $filter_sql) : '';
+	}
+	
+	if( $perm_abuse_management )
+	{	// Abuse Management
+
+		if( $filter_sql != '' )
+		{	// We want to filter on search keyword:
+			// Create SELECT query
+			$select_SQL = 'SELECT * FROM
+								(SELECT mt.thrd_ID, mt.thrd_title, mt.thrd_datemodified,
+									mts.tsta_first_unread_msg_ID AS thrd_msg_ID, mm.msg_datetime AS thrd_unread_since,
+									(SELECT GROUP_CONCAT(ru.user_login ORDER BY ru.user_login SEPARATOR \', \')
+										FROM T_messaging__threadstatus AS rts
+											LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID
+										WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_recipients,
+									(SELECT CONCAT_WS(" ", GROUP_CONCAT(ru.user_firstname), GROUP_CONCAT(ru.user_lastname), GROUP_CONCAT(ru.user_nickname))
+										FROM T_messaging__threadstatus AS rts
+											LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID
+										WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_usernames
+								FROM T_messaging__thread mt
+									LEFT OUTER JOIN T_messaging__threadstatus mts ON mts.tsta_thread_ID = mt.thrd_ID
+									LEFT OUTER JOIN T_messaging__message mm ON mts.tsta_first_unread_msg_ID = mm.msg_ID
+								GROUP BY mt.thrd_ID
+								ORDER BY mts.tsta_first_unread_msg_ID DESC, mt.thrd_datemodified DESC) AS threads'.
+								$filter_sql;
+
+			// Create COUNT query
+			$count_SQL = 'SELECT COUNT(*) FROM
+							(SELECT mt.thrd_title,
+								(SELECT GROUP_CONCAT(ru.user_login SEPARATOR \', \')
+									FROM T_messaging__threadstatus AS rts
+										LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID
+									WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_recipients,
+								(SELECT CONCAT_WS(" ", GROUP_CONCAT(ru.user_firstname), GROUP_CONCAT(ru.user_lastname), GROUP_CONCAT(ru.user_nickname))
+									FROM T_messaging__threadstatus AS rts
+										LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID
+									WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_usernames
+							FROM T_messaging__threadstatus mts
+								LEFT OUTER JOIN T_messaging__thread mt ON mts.tsta_thread_ID = mt.thrd_ID
+							GROUP BY mt.thrd_ID) AS threads'.
+							$filter_sql;
+		}
+		else
+		{
+			// Create SELECT query
+			$select_SQL = 'SELECT * FROM
+							(SELECT mt.thrd_ID, mt.thrd_title, mt.thrd_datemodified,
+									mts.tsta_first_unread_msg_ID AS thrd_msg_ID, mm.msg_datetime AS thrd_unread_since,
+								(SELECT GROUP_CONCAT(ru.user_login ORDER BY ru.user_login SEPARATOR \', \')
+								FROM T_messaging__threadstatus AS rts
+									LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID
+									WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_recipients
+							FROM T_messaging__thread mt
+								LEFT OUTER JOIN T_messaging__threadstatus mts ON mts.tsta_thread_ID = mt.thrd_ID
+								LEFT OUTER JOIN T_messaging__message mm ON mts.tsta_first_unread_msg_ID = mm.msg_ID
+							GROUP BY mt.thrd_ID
+							ORDER BY mts.tsta_first_unread_msg_ID DESC, mt.thrd_datemodified DESC) AS threads';
+
+			// Create COUNT quiery
+			$count_SQL = 'SELECT COUNT(*)
+							FROM T_messaging__thread';
+		}
+	}
+	else
+	{	// Threads only for the current user
+		if( $filter_sql != '' )
+		{	// We want to filter on search keyword:
+			// Create SELECT query
+			$select_SQL = 'SELECT * FROM
+								(SELECT mt.thrd_ID, mt.thrd_title, mt.thrd_datemodified,
+										mts.tsta_first_unread_msg_ID AS thrd_msg_ID, mm.msg_datetime AS thrd_unread_since,
+										(SELECT GROUP_CONCAT(ru.user_login ORDER BY ru.user_login SEPARATOR \', \')
+											FROM T_messaging__threadstatus AS rts
+												LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID AND ru.user_ID <> '.$current_User->ID.'
+												WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_recipients,
+										(SELECT CONCAT_WS(" ", GROUP_CONCAT(ru.user_firstname), GROUP_CONCAT(ru.user_lastname), GROUP_CONCAT(ru.user_nickname))
+											FROM T_messaging__threadstatus AS rts
+												LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID AND ru.user_ID <> '.$current_User->ID.'
+												WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_usernames
+								FROM T_messaging__threadstatus mts
+										LEFT OUTER JOIN T_messaging__thread mt ON mts.tsta_thread_ID = mt.thrd_ID
+										LEFT OUTER JOIN T_messaging__message mm ON mts.tsta_first_unread_msg_ID = mm.msg_ID
+										WHERE mts.tsta_user_ID = '.$current_User->ID.'
+										ORDER BY mts.tsta_first_unread_msg_ID DESC, mt.thrd_datemodified DESC) AS threads'.
+								$filter_sql;
+
+			// Create COUNT query
+			$count_SQL = 'SELECT COUNT(*) FROM
+							(SELECT mt.thrd_title,
+								(SELECT GROUP_CONCAT(ru.user_login SEPARATOR \', \')
+										FROM T_messaging__threadstatus AS rts
+											LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID AND ru.user_ID <> '.$current_User->ID.'
+													WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_recipients,
+												(SELECT CONCAT_WS(" ", GROUP_CONCAT(ru.user_firstname), GROUP_CONCAT(ru.user_lastname), GROUP_CONCAT(ru.user_nickname))
+								FROM T_messaging__threadstatus AS rts
+									LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID AND ru.user_ID <> '.$current_User->ID.'
+									WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_usernames
+								FROM T_messaging__threadstatus mts
+									LEFT OUTER JOIN T_messaging__thread mt ON mts.tsta_thread_ID = mt.thrd_ID
+											WHERE mts.tsta_user_ID = '.$current_User->ID.') AS threads'.
+								$filter_sql;
+		}
+		else
+		{
+			// Create SELECT query
+			$select_SQL = 'SELECT * FROM
+							(SELECT mt.thrd_ID, mt.thrd_title, mt.thrd_datemodified,
+									mts.tsta_first_unread_msg_ID AS thrd_msg_ID, mm.msg_datetime AS thrd_unread_since,
+								(SELECT GROUP_CONCAT(ru.user_login ORDER BY ru.user_login SEPARATOR \', \')
+								FROM T_messaging__threadstatus AS rts
+									LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID AND ru.user_ID <> '.$current_User->ID.'
+									WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_recipients
+							FROM T_messaging__threadstatus mts
+								LEFT OUTER JOIN T_messaging__thread mt ON mts.tsta_thread_ID = mt.thrd_ID
+								LEFT OUTER JOIN T_messaging__message mm ON mts.tsta_first_unread_msg_ID = mm.msg_ID
+								WHERE mts.tsta_user_ID = '.$current_User->ID.'
+								ORDER BY mts.tsta_first_unread_msg_ID DESC, mt.thrd_datemodified DESC) AS threads';
+
+			// Create COUNT quiery
+			$count_SQL = 'SELECT COUNT(*)
+							FROM T_messaging__threadstatus
+								WHERE tsta_user_ID = '.$current_User->ID;
+		}
+	}
+
+	// Create result set:
+
+	$Results = new Results( $select_SQL, 'thrd_', '', NULL, $count_SQL );
+
+	return $Results;
+}
+
 /*
  * $Log$
+ * Revision 1.18  2011/10/14 19:02:14  efy-yurybakh
+ * Messaging Abuse Management
+ *
  * Revision 1.17  2011/10/11 02:05:41  fplanque
  * i18n/wording cleanup
  *
