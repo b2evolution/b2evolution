@@ -369,13 +369,13 @@ function get_messaging_sub_entries( $is_admin )
 													'text' => T_('Settings'),
 													'href' => $url.'msgsettings'
 												);
-		if( $current_User->check_perm( 'perm_messaging', 'abuse' ) )
-		{
-			$messaging_sub_entries[ 'abuse' ] = array(
-														'text' => T_('Abuse Management'),
-														'href' => $url.'abuse'
-													);
-		}
+	}
+	if( $current_User->check_perm( 'perm_messaging', 'abuse' ) )
+	{
+		$messaging_sub_entries[ 'abuse' ] = array(
+													'text' => T_('Abuse Management'),
+													'href' => $url.'abuse'
+												);
 	}
 
 	return $messaging_sub_entries;
@@ -615,6 +615,9 @@ function get_threads_results()
 
 /*
  * $Log$
+ * Revision 1.19  2011/10/15 07:28:15  efy-yurybakh
+ * Messaging Abuse Management
+ *
  * Revision 1.18  2011/10/14 19:02:14  efy-yurybakh
  * Messaging Abuse Management
  *
