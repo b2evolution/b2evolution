@@ -98,3 +98,11 @@ form {
 div.error {
 	margin: 2ex 0 1ex 0;
 }
+
+.scrollable {
+	height: 300px;
+	overflow: auto;
+	border: 1px solid #CCC;
+	padding: 5px 10px;
+	background: #FFC;
+}
