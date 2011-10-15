@@ -2310,10 +2310,23 @@ class User extends DataObject
 
 		if( $zoomable )
 		{	// return clickable avatar tag, zoom on click
-			// set random value to link_rel, this way the pictures on the page won't be grouped
-			// this is usefull because the same avatar picture may appear more times in the same page
-			$link_rel = 'lightbox[f'.$File->ID.rand(0, 100000).']';
-			$r = $File->get_tag( '', '', '', '', $size, 'original', $this->login, $link_rel, $class );
+			if( is_logged_in() )
+			{	// Only logged in users can see a big picture of the avatar
+				// set random value to link_rel, this way the pictures on the page won't be grouped
+				// this is usefull because the same avatar picture may appear more times in the same page
+				$link_rel = 'lightbox[f'.$File->ID.rand(0, 100000).']';
+				$r = $File->get_tag( '', '', '', '', $size, 'original', $this->login, $link_rel, $class );
+			}
+			else
+			{	// Anonymous user get an avatar picture with link to login page
+				global $Blog;
+				$redirect_to = '';
+				if( isset( $Blog ) )
+				{	// Redirect user after login
+					$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=user&user_ID='.$this->ID, '&' );
+				}
+				$r = '<a href="'.get_login_url( 'cannot see avatar', $redirect_to ) .'">'.$File->get_thumb_imgtag( $size, $class, $align ).'</a>';
+			}
 		}
 		else
 		{
@@ -2340,11 +2353,27 @@ class User extends DataObject
 	 */
 	function get_avatar_overlay_text( $img_tag, $size, $avatar_overlay_text, $class = '' )
 	{
-		global $thumbnail_sizes;
-		if( ! isset( $thumbnail_sizes[$size] ) )
-		{	// Bad thumbnail size
+		preg_match( '/ width="(\d+)" height="(\d+)" /i', $img_tag, $img_sizes );
+		if( count( $img_sizes ) == 3 )
+		{	// img tag has a defined width & height
+			$width = $img_sizes[1];
+			$height = $img_sizes[2];
+		}
+		else
+		{	// We try to get a sizes from config
+			global $thumbnail_sizes;
+			if( isset( $thumbnail_sizes[$size] ) )
+			{	// Set a sizes
+				$width = $thumbnail_sizes[$size][1];
+				$height = $thumbnail_sizes[$size][2];
+			}
+		}
+
+		if( empty( $width ) || empty( $height ) )
+		{	// If sizes is not defined we cannot calculate a font-size for an overlay text
 			return $img_tag;
 		}
+
 		$overlay_lines = explode( "\r\n", $avatar_overlay_text);
 		$max_line_length = 0;
 		foreach( $overlay_lines as $line )
@@ -2356,15 +2385,29 @@ class User extends DataObject
 		}
 		if( $max_line_length > 0 )
 		{	// Display an overlay text if max length is defined
-			$width = $thumbnail_sizes[$size][1];
-			$height = $thumbnail_sizes[$size][2];
 			// Calculate approximate font size, 1.7 - is custom coefficient of the font
 			$font_size = ceil( ( $width / $max_line_length ) * 1.7 );
 			// Set line-height for centering text by vertical
 			$line_height = ceil( ( $height / count( $overlay_lines ) ) * 0.82 );
-			$padding_top = $line_height * 0.32;
+			// Padding-top give us a vertical centering
+			$padding_top = ceil( $line_height * 0.32 );
 
-			$img_tag = '<div class="bubletip_overlay_text '.$class.'">'.$img_tag.'<div style="font-size:'.$font_size.'px;line-height:'.$line_height.'px;padding-top:'.$padding_top.'px">'.nl2br($avatar_overlay_text).'</div></div>';
+			$tag_is_linked = false;
+			if( strpos( $img_tag, '</a>' ) !== false )
+			{	// img_tag is located inside tag <a>, we should to remove a end of the tag and then add
+				$img_tag = str_replace( '</a>', '', $img_tag );
+				$tag_is_linked = true;
+			}
+			$img_tag = '<div class="bubletip_overlay_text '.$class.'">'.
+					$img_tag.
+					'<div style="font-size:'.$font_size.'px;line-height:'.$line_height.'px;padding-top:'.$padding_top.'px">'.
+						nl2br($avatar_overlay_text).
+					'</div>';
+			if( $tag_is_linked )
+			{	// Add end of the tag which is removed above
+				$img_tag .= '</a>';
+			}
+			$img_tag .= '</div>';
 		}
 
 		return $img_tag;
@@ -2692,6 +2735,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.162  2011/10/15 18:17:02  efy-yurybakh
+ * overlay text spacing on the avatar
+ *
  * Revision 1.161  2011/10/15 15:03:27  efy-yurybakh
  * Additional info fields - step 2
  *

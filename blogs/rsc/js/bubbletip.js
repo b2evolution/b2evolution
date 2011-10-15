@@ -53,7 +53,7 @@ jQuery( document ).ready(function()
 						cache.html( result );
 						if( tip.find( 'img' ).width() == 0 )
 						{	// Fix bubbletip size in first time downloading
-							var div = tip.find( 'div' );
+							var div = tip.find( 'div.center' );
 							var width = div.attr( 'w' );
 							var height = parseInt( div.attr( 'h' ) ) + 10;
 							div.attr( 'style', 'width:' + width + 'px;height:' + height + 'px;' );
