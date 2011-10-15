@@ -124,11 +124,11 @@ function message_subject_link( $thrd_ID, $thrd_title, $thrd_msg_ID )
 	}
 	if( $thrd_msg_ID > 0 )
 	{	// Message is unread
-		$read_icon = get_icon( 'bullet_blue', 'imgtag', array( 'style' => 'margin:0 2px' ) );
+		$read_icon = get_icon( 'bullet_red', 'imgtag', array( 'style' => 'margin:0 2px' ) );
 	}
 	else
 	{	// Mesage is read
-		$read_icon = get_icon( 'pixel', 'imgtag', array( 'size' => array( 12, 11 ) ) );
+		$read_icon = get_icon( 'allowback', 'imgtag' );
 	}
 
 	$tab = '';
@@ -231,6 +231,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.42  2011/10/15 09:15:24  efy-yurybakh
+ * messaging UI design changes
+ *
  * Revision 1.41  2011/10/15 07:15:02  efy-yurybakh
  * Messaging Abuse Management
  *

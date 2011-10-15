@@ -959,7 +959,7 @@ function get_avatar_imgtags( $user_logins_list, $show_login = true, $link = true
 			}
 			else
 			{ // User has not seen a message
-				$icon = get_icon( 'bullet_blue', 'imgtag', array( 'alt' => sprintf( T_('%s has NOT seen this message yet.'), $user_login ), 'style' => 'margin:1px 4px' ) );
+				$icon = get_icon( 'bullet_red', 'imgtag', array( 'alt' => sprintf( T_('%s has NOT seen this message yet.'), $user_login ), 'style' => 'margin:1px 4px' ) );
 			}
 		}
 		$user_imgtags_list[] = '<span class="nowrap">'.$icon.get_avatar_imgtag( $user_login, $show_login, $link, $size, $class, $align, '', '', $show_avatar ).'</span>';
@@ -1269,6 +1269,9 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 /*
  * $Log$
+ * Revision 1.89  2011/10/15 09:15:25  efy-yurybakh
+ * messaging UI design changes
+ *
  * Revision 1.88  2011/10/15 07:15:02  efy-yurybakh
  * Messaging Abuse Management
  *
