@@ -18,13 +18,6 @@ if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
 	header_redirect( $admin_url );
 }
 
-/**
- * @var set TRUE if we want to see a messages as abuse manager
- */
-global $perm_abuse_management;
-
-$perm_abuse_management = false;
-
 // Set options path:
 $AdminUI->set_path( 'messaging', 'threads' );
 
@@ -166,6 +159,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.20  2011/10/15 07:15:02  efy-yurybakh
+ * Messaging Abuse Management
+ *
  * Revision 1.19  2011/10/14 19:02:14  efy-yurybakh
  * Messaging Abuse Management
  *

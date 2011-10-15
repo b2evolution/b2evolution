@@ -314,10 +314,15 @@ $Results->cols[] = array(
 
 function delete_action( $thrd_ID, $msg_ID )
 {
-	global $Blog, $samedomain_htsrv_url;;
+	global $Blog, $samedomain_htsrv_url, $perm_abuse_management;
 	if( is_admin_page() )
 	{
-		return action_icon( T_( 'Delete'), 'delete', regenerate_url( 'action', 'thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete&'.url_crumb( 'message' ) ) );
+		$tab = '';
+		if( $perm_abuse_management )
+		{	// We are in Abuse Management
+			$tab = '&tab=abuse';
+		}
+		return action_icon( T_( 'Delete'), 'delete', regenerate_url( 'action', 'thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete'.$tab.'&'.url_crumb( 'message' ) ) );
 	}
 	else
 	{
@@ -342,24 +347,29 @@ $Results->display( $display_params );
 
 echo '<div class="fieldset clear"></div>';
 
-if( ! $perm_abuse_management )
-{
-	$Form = new Form( $params[ 'form_action' ], $params[ 'form_name' ], 'post', $params[ 'form_layout' ] );
+$Form = new Form( $params[ 'form_action' ], $params[ 'form_name' ], 'post', $params[ 'form_layout' ] );
 
-	$Form->begin_form( $params['form_class'], '' );
+$Form->begin_form( $params['form_class'], '' );
 
-		$Form->add_crumb( 'message' );
-		$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',msg_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
-		$Form->hidden( 'redirect_to', $params[ 'redirect_to' ] );
+	$Form->add_crumb( 'message' );
+	if( $perm_abuse_management )
+	{	// To back in the abuse management
+		memorize_param( 'tab', 'string', 'abuse' );
+	}
+	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',msg_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
+	$Form->hidden( 'redirect_to', $params[ 'redirect_to' ] );
 
-		$Form->info_field(T_('Reply to'), get_avatar_imgtags( $recipients, true, true, 'crop-15x15', 'avatar_before_login mb1' ), array('required'=>true));
+	$Form->info_field(T_('Reply to'), get_avatar_imgtags( $recipients, true, true, 'crop-15x15', 'avatar_before_login mb1' ), array('required'=>true));
 
-		$Form->textarea('msg_text', '', 10, T_('Message'), '', $params[ 'cols' ], '', true);
+	$Form->textarea('msg_text', '', 10, T_('Message'), '', $params[ 'cols' ], '', true);
 
-	$Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' ) ) );
-}
+$Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' ) ) );
+
 /*
  * $Log$
+ * Revision 1.47  2011/10/15 07:15:02  efy-yurybakh
+ * Messaging Abuse Management
+ *
  * Revision 1.46  2011/10/14 19:02:14  efy-yurybakh
  * Messaging Abuse Management
  *

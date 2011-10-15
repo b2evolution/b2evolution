@@ -28,7 +28,7 @@ global $current_User;
 global $unread_messages_count;
 global $read_unread_recipients;
 global $DB, $Blog;
-global $perm_abuse_management;
+global $perm_abuse_management; // TRUE if we go from Abuse Management
 
 if( !isset( $display_params ) )
 { // init display_params
@@ -231,6 +231,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.41  2011/10/15 07:15:02  efy-yurybakh
+ * Messaging Abuse Management
+ *
  * Revision 1.40  2011/10/14 19:02:14  efy-yurybakh
  * Messaging Abuse Management
  *

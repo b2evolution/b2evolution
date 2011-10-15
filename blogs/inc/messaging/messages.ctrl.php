@@ -101,6 +101,13 @@ else
 	load_messaging_thread_recipients( $thrd_ID );
 }
 
+
+$param_tab = '';
+if( $perm_abuse_management )
+{	// After completing of the action ( create | delete ) we want back to the abuse managment
+	$param_tab = '&tab=abuse';
+}
+
 switch( $action )
 {
 	case 'create': // Record new message
@@ -111,7 +118,7 @@ switch( $action )
 		if( create_new_message( $thrd_ID, !empty( $non_blocked_contacts ) ) )
 		{
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=messages&thrd_ID='.$thrd_ID, 303 ); // Will EXIT
+			header_redirect( '?ctrl=messages&thrd_ID='.$thrd_ID.$param_tab, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		break;
@@ -136,7 +143,7 @@ switch( $action )
 			$Messages->add( T_('Message deleted.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=messages&thrd_ID='.$thrd_ID, 303 ); // Will EXIT
+			header_redirect( '?ctrl=messages&thrd_ID='.$thrd_ID.$param_tab, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		else
@@ -181,6 +188,10 @@ switch( $action )
 		break;
 
 	case 'delete':
+		if( $perm_abuse_management )
+		{	// Save a tab param for hidden fields of the form
+			memorize_param( 'tab', 'string', 'abuse' );
+		}
 		// We need to ask for confirmation:
 		$edited_Message->confirm_delete( T_('Delete message?'),
 				'message', $action, get_memorized( 'action' ) );
@@ -201,6 +212,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.22  2011/10/15 07:15:02  efy-yurybakh
+ * Messaging Abuse Management
+ *
  * Revision 1.21  2011/10/14 19:02:14  efy-yurybakh
  * Messaging Abuse Management
  *
