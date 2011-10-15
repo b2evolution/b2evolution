@@ -99,25 +99,6 @@ global $form_action;
 		jQuery( '#edited_user_idmode option[value="namelf"]' ).text( lastName + " " + firstName + idmodes["namelf"] );
 	}
 
-	// Add more fields when click on the link
-	function add_more_fields()
-	{
-		var j = jQuery("#add_more_fields").parent().parent().siblings("fieldset[id^=ffield_new_uf_val]").length;
-		for( i = j + 1; i < j + 4; i++ )
-		{
-			var strHtml = jQuery("#add_more_fields").parent().parent().prev().html();
-			strHtml = strHtml.replace(/new_uf_type_\d+/, "new_uf_type_" + i).replace(/new_uf_val_\d+/g, "new_uf_val_" + i)
-				.replace(/selected=\"selected\"/, "");
-			strHtml = '<fieldset id="ffield_new_uf_val_' + i + '">' + strHtml + '</fieldset>';
-			jQuery("#add_more_fields").parent().parent().before(strHtml);
-			area2input(jQuery("#new_uf_val_" + i));
-			jQuery("#new_uf_val_" + i).val("").next().text("");
-		}
-		jQuery("input[name=new_fields_num]").val(j+3);
-		inputhint();
-	}
-
-
 	// Switch from input to textarea
 	function input2area(el)
 	{
@@ -419,6 +400,15 @@ else
 	$user_id = $edited_User->ID;
 }
 
+$userfields_new_sql = '';
+$new_field_type = param( 'new_field_type', 'integer', 0 );
+if( $new_field_type > 0 && $Messages->has_errors() )
+{	// Means we want to add a new field (step 2)
+	$userfields_new_sql = 'OR ufdf_ID = "'.$new_field_type.'"';
+	// We save a new field type here to remmember it after submiting of the form
+	$Form->hidden( 'new_field_type', $new_field_type );
+}
+
 // -------------------  Get existing userfields: -------------------------------
 $userfields = $DB->get_results( '
 	SELECT ufdf_ID, uf_ID, ufdf_type, ufdf_name, uf_varchar, ufdf_required
@@ -430,10 +420,11 @@ $userfields = $DB->get_results( '
 
 	SELECT ufdf_ID, "0" AS uf_ID, ufdf_type, ufdf_name, "" AS uf_varchar, ufdf_required
 		FROM T_users__fielddefs
-	WHERE ufdf_required IN ( "recommended", "require" )
-		AND ufdf_ID NOT IN ( SELECT uf_ufdf_ID FROM T_users__fields WHERE uf_user_ID = '.$user_id.' )
+	WHERE ( ufdf_required IN ( "recommended", "require" )
+		AND ufdf_ID NOT IN ( SELECT uf_ufdf_ID FROM T_users__fields WHERE uf_user_ID = '.$user_id.' ) )
+		'.$userfields_new_sql.'
 
-	ORDER BY 1, 2' );
+	ORDER BY 1, 2 DESC' );
 
 $uf_new_fields = param( 'uf_new', 'array' );
 foreach( $userfields as $userfield )
@@ -494,51 +485,19 @@ foreach( $userfields as $userfield )
 	}
 }
 
-// Get list of possible field types:
-// TODO: use userfield manipulation functions
-$userfielddefs = $DB->get_results( '
-	SELECT ufdf_ID, ufdf_type, ufdf_name
-	FROM T_users__fielddefs
-	ORDER BY ufdf_ID' );
-// New fields:
-for( $i=1; $i<=3; $i++ )
-{
-	$label = '<select name="new_uf_type_'.$i.'"><option value="">'.T_('Add field...').'</option><optgroup label="'.T_('Instant Messaging').'">';
-	foreach( $userfielddefs as $fielddef )
-	{
-		// check for group header:
-		switch( $fielddef->ufdf_ID )
-		{
-			case 50000:
-				$label .= "\n".'</optgroup><optgroup label="'.T_('Phone').'">';
-				break;
-			case 100000:
-				$label .= "\n".'</optgroup><optgroup label="'.T_('Web').'">';
-				break;
-			case 200000:
-				$label .= "\n".'</optgroup><optgroup label="'.T_('Organization').'">';
-				break;
-			case 300000:
-				$label .= "\n".'</optgroup><optgroup label="'.T_('Address').'">';
-				break;
-			case 400000:
-				$label .= "\n".'</optgroup><optgroup label="'.T_('Other').'">';
-				break;
-		}
-		$label .= "\n".'<option value="'.$fielddef->ufdf_ID.'"';
-		if( param( 'new_uf_type_'.$i, 'string', '' ) == $fielddef->ufdf_ID )
-		{	// We had selected this type before getting an error:
-			$label .= ' selected="selected"';
-		}
-		$label .= '>'.$fielddef->ufdf_name.'</option>';
-	}
-	$label .= '</optgroup></select>';
-	$Form->text_input( 'new_uf_val_'.$i, param( 'new_uf_val_'.$i, 'string', '' ), 40, $label, '',
-				array('maxlength' => 255, 'clickable_label'=>false, 'class'=>'user_info_new_field' ) );
-}
+// ------------------- Add new field: -------------------------------
+echo '<br />';
 
-$Form->info( '', '<a id="add_more_fields" href="javascript:add_more_fields()">+ add more fields</a>' );
-$Form->hidden( 'new_fields_num', '3' );
+// Hidden field to detect that we press on the button 'Add'
+$Form->hidden( 'action_new_field', '' );
+
+$Form->output = false;
+$button_add_field = $Form->button( array( 'type' => 'button', 'value' => 'Add', 'id' => 'button_add_field' ) );
+$Form->output = true;
+
+$Form->select( 'new_field_type', '', 'callback_options_user_new_fields', T_('Add a field of type'), $button_add_field );
+
+
 $Form->hidden( 'orig_user_ID', $user_id );
 
 $Form->end_fieldset();
@@ -579,11 +538,27 @@ $Form->end_form();
 		// change -First name Last name- and -Last name First name- texts
 		name_onchange();
 	} );
+
+	// Action for the button when we want to add a new field in the Additional info
+	jQuery( '#button_add_field' ).click( function ()
+	{
+		if( $( 'input[name=new_field_type]' ).length > 0 )
+		{	// Remove a hidden input which storing a current new field to add
+			$( 'input[name=new_field_type]' ).remove();
+		}
+		// Set an actions fields to add a new field
+		$( 'input[name=action_new_field]' ).val( 'add' )
+																			 .after( '<input type="hidden" value="update" name="action" />' );
+		$( '#user_checkchanges' ).submit();
+	} );
 </script>
 <?php
 
 /*
  * $Log$
+ * Revision 1.53  2011/10/15 15:03:28  efy-yurybakh
+ * Additional info fields - step 2
+ *
  * Revision 1.52  2011/10/11 02:05:41  fplanque
  * i18n/wording cleanup
  *

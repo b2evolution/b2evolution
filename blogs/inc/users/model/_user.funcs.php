@@ -1267,8 +1267,68 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 }
 
 
+/**
+ * Callback function to initialize a select element on the identity user form
+ *
+ * @param string Value
+ * @return string Option elements for the select tag
+ */
+function callback_options_user_new_fields( $value )
+{
+	global $DB;
+
+	// Get list of possible field types:
+	$userfielddefs = $DB->get_results( '
+		SELECT ufdf_ID, ufdf_type, ufdf_name
+		  FROM T_users__fielddefs
+		 WHERE ufdf_required != "hidden"
+		ORDER BY ufdf_ID' );
+
+	$field_options = '';
+
+	if( count( $userfielddefs ) > 0 )
+	{	// Field types exist in DB
+		$field_options .= '<option value="">'.T_('Add field...').'</option>'."\n".'<optgroup label="'.T_('Instant Messaging').'">';
+		foreach( $userfielddefs as $fielddef )
+		{
+			// check for group header:
+			switch( $fielddef->ufdf_ID )
+			{
+				case 50000:
+					$field_options .= "\n".'</optgroup><optgroup label="'.T_('Phone').'">';
+					break;
+				case 100000:
+					$field_options .= "\n".'</optgroup><optgroup label="'.T_('Web').'">';
+					break;
+				case 200000:
+					$field_options .= "\n".'</optgroup><optgroup label="'.T_('Organization').'">';
+					break;
+				case 300000:
+					$field_options .= "\n".'</optgroup><optgroup label="'.T_('Address').'">';
+					break;
+				case 400000:
+					$field_options .= "\n".'</optgroup><optgroup label="'.T_('Other').'">';
+					break;
+			}
+			$field_options .= "\n".'<option value="'.$fielddef->ufdf_ID.'"';
+			if( $value == $fielddef->ufdf_ID )
+			{	// We had selected this type before getting an error:
+				$field_options .= ' selected="selected"';
+			}
+			$field_options .= '>'.$fielddef->ufdf_name.'</option>';
+		}
+		$field_options .= '</optgroup>';
+	}
+
+	return $field_options;
+}
+
+
 /*
  * $Log$
+ * Revision 1.90  2011/10/15 15:03:27  efy-yurybakh
+ * Additional info fields - step 2
+ *
  * Revision 1.89  2011/10/15 09:15:25  efy-yurybakh
  * messaging UI design changes
  *

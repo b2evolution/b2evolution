@@ -374,44 +374,34 @@ class User extends DataObject
 				}
 			}
 
-			// NEW fields:
-			$new_fields_num = param( 'new_fields_num', 'integer', 0 );
-			$new_fields_num = ( $new_fields_num > 0 ) ? $new_fields_num : 3 ;
-			for( $i=1; $i<=$new_fields_num; $i++ )
-			{	// new fields:
-				$new_uf_type = param( 'new_uf_type_'.$i, 'integer', '' );
-				$new_uf_val = param( 'new_uf_val_'.$i, 'text', '' );
-				$new_uf_val = preg_replace( "~(\n)~", "|", $new_uf_val );
-				if( empty($new_uf_type) && empty($new_uf_val) )
-				{
-					continue;
+			// Add a new field:
+			$action_new_field = param( 'action_new_field', 'string' );
+			if( $action_new_field == 'add' )
+			{	// Button 'Add' is pressed
+				$new_field_type = param( 'new_field_type', 'integer', 0 );
+				if( empty( $new_field_type ) )
+				{	// We cannot add a new field without type
+					param_error( 'new_field_type', T_('Please select a field type.') );
 				}
-
-				if( empty($new_uf_type) )
-				{
-					param_error( 'new_uf_val_'.$i, T_('Please select a field type.') );
+				else
+				{	// Mark a new field to enter a value
+					param_error( 'uf_new['.$new_field_type.']', T_('Please enter a value of the new field.') );
 				}
-				if( empty($new_uf_val) )
-				{
-					param_error( 'new_uf_val_'.$i, T_('Please enter a value.') );
-				}
-
-				// TODO: type checking
-				$this->userfield_add( $new_uf_type, $new_uf_val );
 			}
 
 			// NEW recommended & require fields
 			$uf_new_fields = param( 'uf_new', 'array' );
 			if( count( $uf_new_fields ) > 0 )
 			{
+				$new_field_type = param( 'new_field_type', 'integer', 0 );
 				foreach( $uf_new_fields as $uf_new_id => $uf_new_val )
 				{
 					if( $uf_new_val != '' )
 					{ // Insert a new field in DB if it is filled
 						$this->userfield_add( (int)$uf_new_id, $uf_new_val );
 					}
-					elseif( empty( $uf_new_val ) && $this->userfield_defs[$uf_new_id][2] == 'require' )
-					{ // Display error for empty required field
+					elseif( empty( $uf_new_val ) && ( $this->userfield_defs[$uf_new_id][2] == 'require' || $new_field_type == $uf_new_id ) )
+					{ // Display error for empty required field & new adding field
 						param_error( 'uf_new['.$uf_new_id.']', T_('Please enter a value.') );
 					}
 				}
@@ -2702,6 +2692,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.161  2011/10/15 15:03:27  efy-yurybakh
+ * Additional info fields - step 2
+ *
  * Revision 1.160  2011/10/11 02:05:41  fplanque
  * i18n/wording cleanup
  *
