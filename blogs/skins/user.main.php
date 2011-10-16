@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is the template that includes required css files to display users
+ * This file is the template that includes required css files to display a user profile
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -14,11 +14,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $htsrv_url, $Messages;
 
-if( ! is_logged_in() && ! $Settings->get( 'allow_anonymous_user_list' ) )
+if( ! is_logged_in() && ! $Settings->get( 'allow_anonymous_user_profiles' ) )
 {	// Redirect to the login page if not logged in and allow anonymous user setting is OFF
 	$redirect_to = $Blog->get( 'usersurl' );
-	$Messages->add( T_( 'You must log in to view the user directory.' ) );
-	header_redirect( get_login_url( 'cannot see users', $redirect_to ), 302 );
+	$Messages->add( T_( 'You must log in to view this user profile.' ) );
+	header_redirect( get_login_url( 'cannot see user', $redirect_to ), 302 );
 }
 
 add_js_headline( "// Paths used by JS functions:
@@ -26,14 +26,11 @@ add_js_headline( "// Paths used by JS functions:
 		var bgxy_collapse = '".get_icon( 'collapse', 'xy' )."';
 		var htsrv_url = '$htsrv_url';" );
 
-// Require results.css to display thread query results in a table
-require_css( 'results.css' );
-
 require $ads_current_skin_path.'index.main.php';
 
 /*
  * $Log$
- * Revision 1.8  2011/10/16 20:34:16  fplanque
+ * Revision 1.1  2011/10/16 20:34:52  fplanque
  * To whomever forgot to check in this file: please check that this version is correct.
  *
  * Revision 1.7  2011/10/13 17:40:53  fplanque
