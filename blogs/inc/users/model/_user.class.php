@@ -385,7 +385,7 @@ class User extends DataObject
 				}
 				else
 				{	// Mark a new field to enter a value
-					param_error( 'uf_new['.$new_field_type.']', T_('Please enter a value of the new field.') );
+					param_error( 'uf_new['.$new_field_type.']', T_('Please enter a value in this new field.') );
 				}
 			}
 
@@ -2735,6 +2735,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.163  2011/10/17 22:27:02  fplanque
+ * no message
+ *
  * Revision 1.162  2011/10/15 18:17:02  efy-yurybakh
  * overlay text spacing on the avatar
  *
