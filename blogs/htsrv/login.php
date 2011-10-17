@@ -239,6 +239,15 @@ switch( $action )
 			$current_User->set( 'validated', 1 );
 			$current_User->dbupdate();
 
+			if( $Settings->get( 'newusers_findcomments' ) )
+			{	// We have to assign the all old comments from current user by email
+				$DB->query( '
+					UPDATE T_comments
+					   SET comment_author_ID = "'.$current_User->ID.'"
+					 WHERE comment_author_email = "'.$current_User->email.'"
+					   AND comment_author_ID IS NULL' );
+			}
+
 			$Messages->add( T_( 'Your email address has been validated.' ), 'success' );
 		}
 
@@ -395,6 +404,9 @@ exit(0);
 
 /*
  * $Log$
+ * Revision 1.122  2011/10/17 17:53:11  efy-yurybakh
+ * Detect previous comments after email validation
+ *
  * Revision 1.121  2011/10/11 02:05:41  fplanque
  * i18n/wording cleanup
  *

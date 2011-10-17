@@ -86,6 +86,7 @@ class GeneralSettings extends AbstractSettings
 		'newusers_canregister' => '0',
 		'newusers_mustvalidate' => '1',
 		'newusers_revalidate_emailchg' => '0',
+		'newusers_findcomments' => '1',
 		'newusers_level' => '1',
 		'registration_require_gender' => 'optional',
 		'registration_ask_locale' => '0',
@@ -250,6 +251,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.44  2011/10/17 17:53:11  efy-yurybakh
+ * Detect previous comments after email validation
+ *
  * Revision 1.43  2011/10/11 06:38:50  efy-asimo
  * Add corresponding error messages when login required
  *

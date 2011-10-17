@@ -75,6 +75,8 @@ $Form->begin_fieldset( T_('Email validation') );
 
 	$Form->checkbox( 'newusers_revalidate_emailchg', $Settings->get('newusers_revalidate_emailchg'), T_('Validate email changes'), T_('Check to require users to re-validate when they change their email address.' ) );
 
+	$Form->checkbox( 'newusers_findcomments', $Settings->get('newusers_findcomments'), T_('Find old comments'), T_('After each email validation, find comments left by the user based on the email address and attach them to the user account.' ) );
+
 $Form->end_fieldset();
 
 // --------------------------------------------
@@ -115,6 +117,9 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.18  2011/10/17 17:53:11  efy-yurybakh
+ * Detect previous comments after email validation
+ *
  * Revision 1.17  2011/10/04 13:06:26  efy-yurybakh
  * Additional Display settings
  *

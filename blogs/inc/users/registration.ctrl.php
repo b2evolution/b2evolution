@@ -58,6 +58,8 @@ switch ( $action )
 
 		param( 'newusers_revalidate_emailchg', 'integer', 0 );
 
+		param( 'newusers_findcomments', 'integer', 0 );
+
 		param_integer_range( 'user_minpwdlen', 1, 32, T_('Minimum password length must be between %d and %d.') );
 
 		param( 'js_passwd_hashing', 'integer', 0 );
@@ -80,6 +82,8 @@ switch ( $action )
 									 array( 'newusers_mustvalidate', $newusers_mustvalidate),
 
 									 array( 'newusers_revalidate_emailchg', $newusers_revalidate_emailchg),
+
+									 array( 'newusers_findcomments', $newusers_findcomments),
 
 									 array( 'user_minpwdlen', $user_minpwdlen),
 
@@ -134,6 +138,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2011/10/17 17:53:11  efy-yurybakh
+ * Detect previous comments after email validation
+ *
  * Revision 1.16  2011/10/04 13:06:26  efy-yurybakh
  * Additional Display settings
  *
