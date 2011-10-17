@@ -128,9 +128,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2011/10/17 00:20:38  fplanque
+ * minor
+ *
  * Revision 1.1  2011/10/14 19:02:14  efy-yurybakh
  * Messaging Abuse Management
- *
- *
  */
 ?>

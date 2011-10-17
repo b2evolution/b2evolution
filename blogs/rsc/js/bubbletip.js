@@ -55,17 +55,17 @@ jQuery( document ).ready(function()
 						{	// Fix bubbletip size in first time downloading
 							var div = tip.find( 'div.center' );
 							var width = div.attr( 'w' );
-							var height = parseInt( div.attr( 'h' ) ) + 10;
+							var height = parseInt( div.attr( 'h' ) ) + 9;
 							div.attr( 'style', 'width:' + width + 'px;height:' + height + 'px;' );
 						}
-						link.bubbletip( tip, { showOnInit: true, deltaShift: 5, calculateOnShow: true } );
+						link.bubbletip( tip, { showOnInit: true, deltaShift: 9, calculateOnShow: true } );
 					}
 				});
 			}
 			else
 			{ // Init bubbletip from cached element
 				jQuery( '#' + div_bubbletip_ID ).html( jQuery( '#' + div_cache_ID ).html() );
-				link.bubbletip( jQuery( '#' + div_bubbletip_ID ), { showOnInit: true } );
+				link.bubbletip( jQuery( '#' + div_bubbletip_ID ), { showOnInit: true, deltaShift: 10 } );
 			}
 			link_number++;
 		}

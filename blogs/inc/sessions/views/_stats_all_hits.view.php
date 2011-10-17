@@ -214,7 +214,7 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => T_('Response CODE'),
+		'th' => T_('Resp Code'),
 		'order' => 'hit_response_code',
 		'td' => '$hit_response_code$',
 		'td_class' => '%hit_response_code_class( #hit_response_code# )% small shrinkwrap'
@@ -233,6 +233,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.8  2011/10/17 00:20:39  fplanque
+ * minor
+ *
  * Revision 1.7  2011/10/13 12:50:07  efy-vitalij
  * add column 'Response CODE'
  *

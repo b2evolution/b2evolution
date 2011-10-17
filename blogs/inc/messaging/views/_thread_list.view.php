@@ -49,12 +49,12 @@ foreach( $DB->get_results( $recipients_SQL->get() ) as $row )
 
 	if( !empty( $row->thr_read ) )
 	{
-		$read_by .= get_avatar_imgtags( $row->thr_read, false, false, 'crop-15x15', '', '', true, false );
+		$read_by .= get_avatar_imgtags( $row->thr_read, false, false, 'crop-15x15', '', '', true, false ).'<br />';
 	}
 
 	if( !empty( $row->thr_unread ) )
 	{
-		$read_by .= get_avatar_imgtags( $row->thr_unread, false, false, 'crop-15x15', '', '', false, false );
+		$read_by .= get_avatar_imgtags( $row->thr_unread, false, false, 'crop-15x15', '', '', false, false ).'<br />';
 	}
 
 	$read_unread_recipients[$row->thr_ID] = $read_by;
@@ -231,6 +231,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.43  2011/10/17 00:20:39  fplanque
+ * minor
+ *
  * Revision 1.42  2011/10/15 09:15:24  efy-yurybakh
  * messaging UI design changes
  *

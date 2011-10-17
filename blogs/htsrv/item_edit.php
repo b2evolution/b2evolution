@@ -316,6 +316,9 @@ require $ads_current_skin_path.'index.main.php';
 
 /*
  * $Log$
+ * Revision 1.5  2011/10/17 00:20:39  fplanque
+ * minor
+ *
  * Revision 1.4  2011/10/13 11:40:09  efy-yurybakh
  * In skin posting (permission)
  *
@@ -327,7 +330,5 @@ require $ads_current_skin_path.'index.main.php';
  *
  * Revision 1.1  2011/10/11 18:26:11  efy-yurybakh
  * In skin posting (beta)
- *
- * 
  */
 ?>
