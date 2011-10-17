@@ -488,6 +488,19 @@ if( $Comment->ID )
 	else
 	{
 		$Messages->add( T_('Your comment has been submitted. It will appear once it has been approved.'), 'success' );
+
+		if( !is_logged_in() && $Settings->get( 'newusers_canregister' ) && $Comment->Item->Blog->get_setting( 'comments_register' ) )
+		{	// Redirect to the registration form
+			$Messages->add( T_('Create a user account now so that other users can contact you after reading your comment.'), 'error' );
+
+			$register_user = array(
+				'name' => $Comment->author,
+				'email' => $Comment->author_email
+			);
+			$Session->set( 'core.register_user', $register_user );
+
+			header_redirect( get_user_register_url( $Comment->Item->get_url( 'public_view' ), 'reg after comment' ) );
+		}
 	}
 
 	if( !is_logged_in() )
@@ -507,6 +520,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.156  2011/10/17 17:02:28  efy-yurybakh
+ * Let people create an account just after posting a comment
+ *
  * Revision 1.155  2011/10/17 15:32:46  efy-yurybakh
  * Let people create an account just after posting a comment
  *

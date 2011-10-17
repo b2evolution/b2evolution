@@ -88,6 +88,16 @@ if( ! $Settings->get('newusers_canregister') )
 	$action = 'disabled';
 }
 
+if( $register_user = $Session->get('core.register_user') )
+{	// Get an user data from predefined session (after adding of a comment)
+	$login = preg_replace( '/[^a-z0-9 ]/i', '', $register_user['name'] );
+	$login = str_replace( ' ', '_', $login );
+	$login = substr( $login, 0, 20 );
+	$email = $register_user['email'];
+
+	$Session->delete( 'core.register_user' );
+}
+
 switch( $action )
 {
 	case 'register':
@@ -298,6 +308,9 @@ require $adminskins_path.'login/_reg_form.main.php';
 
 /*
  * $Log$
+ * Revision 1.116  2011/10/17 17:02:28  efy-yurybakh
+ * Let people create an account just after posting a comment
+ *
  * Revision 1.115  2011/09/17 02:31:59  fplanque
  * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
  *

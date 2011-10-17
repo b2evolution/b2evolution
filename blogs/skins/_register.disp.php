@@ -43,6 +43,16 @@ $gender = param( 'gender', 'string', false );
 $source = param( 'source', 'string', 'register form' );
 $redirect_to = param( 'redirect_to', 'string', '' );
 
+if( $register_user = $Session->get('core.register_user') )
+{	// Get an user data from predefined session (after adding of a comment)
+	$login = preg_replace( '/[^a-z0-9 ]/i', '', $register_user['name'] );
+	$login = str_replace( ' ', '_', $login );
+	$login = substr( $login, 0, 20 );
+	$email = $register_user['email'];
+
+	$Session->delete( 'core.register_user' );
+}
+
 // set secure htsrv url with the same domain as the request has
 $secure_htsrv_url = get_secure_htsrv_url();
 
@@ -153,6 +163,9 @@ elseif( $action == "reg_validation" )
 
 /*
  * $Log$
+ * Revision 1.20  2011/10/17 17:02:28  efy-yurybakh
+ * Let people create an account just after posting a comment
+ *
  * Revision 1.19  2011/10/10 20:46:39  fplanque
  * registration source tracking
  *
