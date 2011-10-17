@@ -87,6 +87,7 @@ $ctrl_mappings = array(
 		'locales'      => 'locales/locales.ctrl.php',
 		'plugins'      => 'plugins/plugins.ctrl.php',
 		'gensettings'  => 'settings/settings.ctrl.php',
+		'remotepublish' => 'settings/remotepublish.ctrl.php',
 		'settings'     => 'settings/settings_dispatch.ctrl.php',
 		'stats'        => 'sessions/stats.ctrl.php',
 		'system'       => 'tools/system.ctrl.php',
@@ -925,6 +926,17 @@ class _core_Module extends Module
 								'features' => array(
 									'text' => T_('Features'),
 									'href' => '?ctrl=features' ),
+								'remotepublish' => array(
+									'text' => T_('Remote Publishing'),
+									'href' => '?ctrl=remotepublish',
+									'entries' => array(
+										'eblog' => array(
+											'text' => T_('Post by Email'),
+											'href' => '?ctrl=remotepublish&amp;tab=eblog' ),
+										'xmlrpc' => array(
+											'text' => T_('XML-RPC'),
+											'href' => '?ctrl=remotepublish&amp;tab=xmlrpc' )
+										) ),
 								'regional' => array(
 									'text' => T_('Regional'),
 									'href' => '?ctrl=locales'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ),
@@ -1065,6 +1077,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.92  2011/10/17 20:14:24  sam2kb
+ * Post by Email converted into internal scheduled job
+ *
  * Revision 1.91  2011/10/12 16:09:16  efy-yurybakh
  * Regional settings menu refactoring
  *

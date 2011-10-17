@@ -120,17 +120,21 @@ class GeneralSettings extends AbstractSettings
 		'newblog_cache_enabled' => 0,
 		'newblog_cache_enabled_widget' => 0,
 
-		'eblog_enabled' => 0,						// blog by email
-		'eblog_method' => 'pop3',					// blog by email
-		'eblog_encrypt' => 'none',					// blog by email
-		'eblog_server_port' => 110,					// blog by email
-		'eblog_default_category' => 1,				// blog by email
-		'AutoBR' => 0,								// Used for email blogging. fp> TODO: should be replaced by "email renderers/decoders/cleaners"...
-		'eblog_add_imgtag' => 1,					// blog by email
-		'eblog_body_terminator' => '___',			// blog by email
-		'eblog_subject_prefix' => 'blog:',			// blog by email
+		// Post by Email
+		'eblog_enabled' => 0,
+		'eblog_method' => 'pop3',
+		'eblog_encrypt' => 'none',
+		'eblog_server_port' => 110,
+		'eblog_default_category' => 1,
+		'eblog_add_imgtag' => 0,
+		'eblog_body_terminator' => '___',
+		'eblog_subject_prefix' => 'blog:',
+		'eblog_autobr' => 0,
+		'eblog_html_tag_limit' => 1,
+		'eblog_delete_emails' => 1,
+
 		'general_xmlrpc' => 1,
-		'xmlrpc_default_title' => '',		//default title for posts created throgh blogger api
+		'xmlrpc_default_title' => '',				// default title for posts created throgh blogger api
 
 		'nickname_editing' => 'edited-user',		// "never" - Never allow; "default-no" - Let users decide, default to "no" for new users; "default-yes" - Let users decide, default to "yes" for new users; "always" - Always allow
 		'multiple_sessions' => 'userset_default_no', // multiple sessions settings -- overriden for demo mode in contructor
@@ -251,6 +255,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.45  2011/10/17 20:14:24  sam2kb
+ * Post by Email converted into internal scheduled job
+ *
  * Revision 1.44  2011/10/17 17:53:11  efy-yurybakh
  * Detect previous comments after email validation
  *

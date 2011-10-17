@@ -61,6 +61,7 @@ if( $action == 'new' || $action == 'create' )
 			'anstispam_poll' => T_('Poll the antispam blacklist'),
 			'prune_hits_sessions' => T_('Prune old hits & sessions'),
 			'prune_page_cache' => T_('Prune old files from page cache'),
+			'post_by_email' => T_('Create posts by email'),
 			// post notifications, not user schedulable
 		);
 	$cron_job_params = array(
@@ -78,6 +79,9 @@ if( $action == 'new' || $action == 'create' )
 				'params' => NULL ),
 			'prune_page_cache' => array(
 				'ctrl' => 'cron/jobs/_prune_page_cache.job.php',
+				'params' => NULL ),
+			'post_by_email' => array(
+				'ctrl' => 'cron/jobs/_post_by_email.job.php',
 				'params' => NULL ),
 			// post notifications, not user schedulable
 		);
@@ -300,6 +304,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2011/10/17 20:14:24  sam2kb
+ * Post by Email converted into internal scheduled job
+ *
  * Revision 1.14  2011/09/04 22:13:15  fplanque
  * copyright 2011
  *

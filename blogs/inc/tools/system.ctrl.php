@@ -498,7 +498,7 @@ $imap_loaded = extension_loaded( 'imap' );
 init_system_check( 'PHP IMAP extension', $imap_loaded ? T_( 'Loaded' ) : T_( 'Not loaded' ) );
 if ( ! $imap_loaded )
 {
-	disp_system_check( 'warning', T_( 'You will not be able to use the Blog by email feature of b2evolution. Enable the IMAP extension in your php.ini file or ask your hosting provider about it.' ) );
+	disp_system_check( 'warning', T_( 'You will not be able to use the Post by Email feature of b2evolution. Enable the IMAP extension in your php.ini file or ask your hosting provider about it.' ) );
 }
 else
 {
@@ -632,6 +632,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.40  2011/10/17 20:14:24  sam2kb
+ * Post by Email converted into internal scheduled job
+ *
  * Revision 1.39  2011/09/13 16:00:18  fplanque
  * Enhanced back-office navigation.
  *

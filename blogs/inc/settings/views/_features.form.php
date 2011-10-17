@@ -75,86 +75,6 @@ $Form->begin_fieldset( T_('After each new post or comment...').get_manual_link('
 		array( 'lines' => true ) );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Blog by email').get_manual_link('blog_by_email') );
-
-	$Form->checkbox_input( 'eblog_enabled', $Settings->get('eblog_enabled'), T_('Enable Blog by email'),
-		array( 'note' => sprintf(T_('Note: This feature needs the php_imap extension (currently %s).' ), extension_loaded( 'imap' ) ? T_('loaded') : T_('NOT loaded')), 'onclick' =>
-			'document.getElementById("eblog_section").style.display = (this.checked==true ? "" : "none") ;' ) );
-
-	// fp> TODO: this is IMPOSSIBLE to turn back on when you have no javascript!!! :((
-	echo '<div id="eblog_section" style="'.( $Settings->get('eblog_enabled') ? '' : 'display:none' ).'">';
-
-		// sam2kb> TODO: javascript to preset default eblog_server_port when eblog_method and/or eblog_encrypt change
-		$Form->select_input_array( 'eblog_method', $Settings->get('eblog_method'), array( 'pop3' => T_('POP3'), 'imap' => T_('IMAP'), ), // TRANS: E-Mail retrieval method
-			T_('Retrieval method'), T_('Choose a method to retrieve the emails.') );
-
-		$Form->text_input( 'eblog_server_host', $Settings->get('eblog_server_host'), 40, T_('Mail Server'), T_('Hostname or IP address of your incoming mail server.'), array( 'maxlength' => 255 ) );
-
-		$Form->text_input( 'eblog_server_port', $Settings->get('eblog_server_port'), 5, T_('Port Number'), T_('Port number of your incoming mail server (Defaults: pop3: 110, imap: 143, imap SSL/TLS: 993).'), array( 'maxlength' => 6 ) );
-
-		$Form->radio( 'eblog_encrypt', $Settings->get('eblog_encrypt'), array(
-																			array( 'none', T_('None'), ),
-																			array( 'ssl', T_('SSL'), ),
-																			array( 'tls', T_('TLS'), ),
-																		), T_('Encryption method') );
-
-		$Form->text_input( 'eblog_username', $Settings->get('eblog_username'), 15, T_('Account Name'), T_('User name for authenticating to your mail server.'), array( 'maxlength' => 255 ) );
-
-		$Form->password_input( 'eblog_password', $Settings->get('eblog_password'),15,T_('Password'), array( 'maxlength' => 255, 'note' => T_('Password for authenticating to your mail server.') ) );
-
-		//TODO: have a drop down list of available blogs and categories
-		$Form->text_input( 'eblog_default_category', $Settings->get('eblog_default_category'), 5, T_('Default Category ID'), T_('By default emailed posts will have this category.'), array( 'maxlength' => 6 ) );
-
-		$Form->text_input( 'eblog_subject_prefix', $Settings->get('eblog_subject_prefix'), 15, T_('Subject Prefix'), T_('Email subject must start with this prefix to be imported.'), array( 'maxlength' => 255 ) );
-
-		// eblog test links
-		// TODO: "cron/" is supposed to not reside in the server's DocumentRoot, therefor is not necessarily accessible
-		$getmailurl = $baseurl.'cron/getmail.php?test=';
-		$Form->info_field(
-			T_('Perform Server Test'),
-			' <a id="eblog_test" target="_blank" href="'.$getmailurl.'1" onclick=\'return pop_up_window( "'.$getmailurl.'1", "getmail" )\'>[ ' . T_('connection') . ' ]</a>'
-			.' <a id="eblog_test" target="_blank" href="'.$getmailurl.'2" onclick=\'return pop_up_window( "'.$getmailurl.'2", "getmail" )\'>[ ' . T_('messages') . ' ]</a>'
-			.' <a id="eblog_test" target="_blank" href="'.$getmailurl.'3" onclick=\'return pop_up_window( "'.$getmailurl.'3", "getmail" )\'>[ ' . T_('verbose') . ' ]</a>',
-			array() );
-
-//		$Form->info_field ('','<a id="eblog_test_email" href="#" onclick=\'return pop_up_window( "' . $htsrv_url . 'getmail.php?test=email", "getmail" )\'>' . T_('Test email') . '</a>',array());
-		// special show / hide link
-		$Form->info_field('', get_link_showhide( 'eblog_show_more','eblog_section_more', T_('Hide extra options'), T_('Show extra options...') ) );
-
-
-		// TODO: provide Non-JS functionality
-		echo '<div id="eblog_section_more" style="display:none">';
-
-			$Form->checkbox( 'eblog_novalidatecert', $Settings->get('eblog_novalidatecert'), T_('Do not validate certificate'), T_('Do not validate the certificate from the TLS/SSL server. Check this if you are using a self-signed certificate.') );
-
-			$Form->checkbox( 'eblog_add_imgtag', $Settings->get('eblog_add_imgtag'), T_('Add &lt;img&gt; tags'), T_('Display image attachments using &lt;img&gt; tags (instead of creating a link).'));
-
-			$Form->checkbox( 'AutoBR', $Settings->get('AutoBR'), T_('Email/MMS Auto-BR'), T_('Add &lt;BR /&gt; tags to mail/MMS posts.') );
-
-			$Form->text_input( 'eblog_body_terminator', $Settings->get('eblog_body_terminator'), 15, T_('Body Terminator'), T_('Starting from this string, everything will be ignored, including this string.'), array( 'maxlength' => 255 )  );
-
-			$Form->checkbox_input( 'eblog_test_mode', $Settings->get('eblog_test_mode'), T_('Test Mode'), array( 'note' => T_('Check to run Blog by Email in test mode.' ) ) );
-
-			/* tblue> this isn't used/implemented at the moment
-			$Form->checkbox_input( 'eblog_phonemail', $Settings->get('eblog_phonemail'), T_('Phone Email *'),
-				array( 'note' => 'Some mobile phone email services will send identical subject &amp; content on the same line. If you use such a service, check this option, and indicate a separator string when you compose your message, you\'ll type your subject then the separator string then you type your login:password, then the separator, then content.' ) );
-
-			$Form->text_input( 'eblog_phonemail_separator', $Settings->get('eblog_phonemail_separator'), 15, T_('Phonemail Separator'), '',
-												array( 'maxlength' => 255 ) );*/
-
-		echo '</div>';
-
-	echo '</div>';
-$Form->end_fieldset();
-
-// fp> TODO: it would be awesome to be able to enable the different APIs individually
-// that way you minimalize security/spam risks by enable just what you need.
-$Form->begin_fieldset( T_('Remote publishing').get_manual_link('remote_publishing') );
-	$Form->checkbox_input( 'general_xmlrpc', $Settings->get('general_xmlrpc'), T_('Enable XML-RPC'), array( 'note' => T_('Enable the Movable Type, MetaWeblog, Blogger and B2 XML-RPC publishing protocols.') ) );
-	$Form->text_input( 'xmlrpc_default_title', $Settings->get('xmlrpc_default_title'), 50, T_('Default title'), T_('Default title for items created with a XML-RPC API that doesn\'t send a post title (e. g. the Blogger API).'), array( 'maxlength' => 255 ) );
-$Form->end_fieldset();
-
-
 $Form->begin_fieldset( T_('Hit & session logging').get_manual_link('hit_logging') );
 
 	$Form->checklist( array(
@@ -219,6 +139,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.33  2011/10/17 20:14:24  sam2kb
+ * Post by Email converted into internal scheduled job
+ *
  * Revision 1.32  2011/10/14 07:52:25  sam2kb
  * minor/doc
  *

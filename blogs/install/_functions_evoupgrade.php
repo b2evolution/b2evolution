@@ -1219,18 +1219,18 @@ function upgrade_b2evo_tables()
 		$DB->query( "INSERT INTO T_filetypes
 				(ftyp_ID, ftyp_extensions, ftyp_name, ftyp_mimetype, ftyp_icon, ftyp_viewtype, ftyp_allowed)
 			VALUES
-				(1, 'gif', 'GIF image', 'image/gif', 'image2.png', 'image', 1),
-				(2, 'png', 'PNG image', 'image/png', 'image2.png', 'image', 1),
-				(3, 'jpg jpeg', 'JPEG image', 'image/jpeg', 'image2.png', 'image', 1),
-				(4, 'txt', 'Text file', 'text/plain', 'document.png', 'text', 1),
-				(5, 'htm html', 'HTML file', 'text/html', 'html.png', 'browser', 0),
-				(6, 'pdf', 'PDF file', 'application/pdf', 'pdf.png', 'browser', 1),
-				(7, 'doc', 'Microsoft Word file', 'application/msword', 'doc.gif', 'external', 1),
-				(8, 'xls', 'Microsoft Excel file', 'application/vnd.ms-excel', 'xls.gif', 'external', 1),
-				(9, 'ppt', 'Powerpoint', 'application/vnd.ms-powerpoint', 'ppt.gif', 'external', 1),
-				(10, 'pps', 'Slideshow', 'pps', 'pps.gif', 'external', 1),
-				(11, 'zip', 'ZIP archive', 'application/zip', 'zip.gif', 'external', 1),
-				(12, 'php php3 php4 php5 php6', 'PHP script', 'application/x-httpd-php', 'php.gif', 'text', 0),
+				(1, 'gif', 'GIF image', 'image/gif', 'file_image', 'image', 1),
+				(2, 'png', 'PNG image', 'image/png', 'file_image', 'image', 1),
+				(3, 'jpg jpeg', 'JPEG image', 'image/jpeg', 'file_image', 'image', 1),
+				(4, 'txt', 'Text file', 'text/plain', 'file_document', 'text', 1),
+				(5, 'htm html', 'HTML file', 'text/html', 'file_www', 'browser', 0),
+				(6, 'pdf', 'PDF file', 'application/pdf', 'file_pdf', 'browser', 1),
+				(7, 'doc', 'Microsoft Word file', 'application/msword', 'file_doc', 'external', 1),
+				(8, 'xls', 'Microsoft Excel file', 'application/vnd.ms-excel', 'file_xls', 'external', 1),
+				(9, 'ppt', 'Powerpoint', 'application/vnd.ms-powerpoint', 'file_ppt', 'external', 1),
+				(10, 'pps', 'Slideshow', 'pps', 'file_pps', 'external', 1),
+				(11, 'zip', 'ZIP archive', 'application/zip', 'file_zip', 'external', 1),
+				(12, 'php php3 php4 php5 php6', 'PHP script', 'application/x-httpd-php', 'file_php', 'text', 0),
 				(13, 'css', 'Style sheet', 'text/css', '', 'text', 1)
 			" );
 		echo "OK.<br />\n";
@@ -3048,6 +3048,22 @@ function upgrade_b2evo_tables()
 		set_upgrade_checkpoint( '10300' );
 	}
 
+	if( $old_db_version < 10400 )
+	{	// 4.2 part 2
+		task_begin( 'Updating "Post by Email" settings...' );
+		$DB->query( 'UPDATE T_settings SET set_name = "eblog_autobr" WHERE set_name = "AutoBR"' );
+		task_end();
+
+		if( $DB->get_var('SELECT set_value FROM T_settings WHERE set_name = "eblog_enabled"') )
+		{	// eblog enabled, let's create a scheduled job for it
+			task_begin( 'Creating "Post by Email" scheduled job...' );
+			$start_date = form_date( date2mysql($GLOBALS['localtimenow'] + 86400), '05:00:00' ); // start tomorrow
+			$DB->query( '
+				INSERT INTO T_cron__task ( ctsk_start_datetime, ctsk_repeat_after, ctsk_name, ctsk_controller, ctsk_params )
+				VALUES ( '.$DB->quote( $start_date ).', 86400, '.$DB->quote( T_('Create posts by email') ).', '.$DB->quote( 'cron/jobs/_post_by_email.job.php' ).', '.$DB->quote( 'N;' ).' )' );
+			task_end();
+		}
+	}
 
 	/*
 	 * ADD UPGRADES HERE.
@@ -3214,6 +3230,12 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.423  2011/10/17 20:14:24  sam2kb
+ * Post by Email converted into internal scheduled job
+ *
+ * Revision 1.422  2011/09/30 11:20:21  efy-yurybakh
+ * Make a big sprite with all backoffice icons
+ *
  * Revision 1.421  2011/09/27 13:30:15  efy-yurybakh
  * spam vote checkbox
  *

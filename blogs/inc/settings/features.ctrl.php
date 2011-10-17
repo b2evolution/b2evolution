@@ -70,57 +70,6 @@ switch( $action )
  		param( 'outbound_notifications_mode', 'string', true );
 		$Settings->set( 'outbound_notifications_mode',  get_param('outbound_notifications_mode') );
 
-		// Blog by email
-		param( 'eblog_enabled', 'boolean', 0 );
-		$Settings->set( 'eblog_enabled', $eblog_enabled );
-
-		param( 'eblog_method', 'string', true );
-		$Settings->set( 'eblog_method', strtolower(trim($eblog_method)));
-
-		param( 'eblog_encrypt', 'string', true );
-		$Settings->set( 'eblog_encrypt', $eblog_encrypt );
-
-		param( 'eblog_novalidatecert', 'boolean', 0 );
-		$Settings->set( 'eblog_novalidatecert', $eblog_novalidatecert );
-
-		param( 'eblog_server_host', 'string', true );
-		$Settings->set( 'eblog_server_host', evo_strtolower(trim($eblog_server_host)));
-
-		param( 'eblog_server_port', 'integer', true );
-		$Settings->set( 'eblog_server_port', $eblog_server_port );
-
-		param( 'eblog_username', 'string', true );
-		$Settings->set( 'eblog_username', trim($eblog_username));
-
-		param( 'eblog_password', 'string', true );
-		$Settings->set( 'eblog_password', trim($eblog_password));
-
-		param( 'eblog_default_category', 'integer', true );
-		$Settings->set( 'eblog_default_category', $eblog_default_category );
-
-		param( 'eblog_subject_prefix', 'string', true );
-		$Settings->set( 'eblog_subject_prefix', trim($eblog_subject_prefix) );
-
-		param( 'AutoBR', 'boolean', 0 );
-		$Settings->set( 'AutoBR', $AutoBR );
-
-		param( 'eblog_body_terminator', 'string', true );
-		$Settings->set( 'eblog_body_terminator', trim($eblog_body_terminator) );
-
-		param( 'eblog_test_mode', 'boolean', 0 );
-		$Settings->set( 'eblog_test_mode', $eblog_test_mode );
-
-		param( 'eblog_add_imgtag', 'boolean', 0 );
-		$Settings->set( 'eblog_add_imgtag', $eblog_add_imgtag );
-
-		/* tblue> this isn't used/implemented at the moment
-		param( 'eblog_phonemail', 'integer', 0 );
-		$Settings->set( 'eblog_phonemail', $eblog_phonemail );
-
-		param( 'eblog_phonemail_separator', 'string', true );
-		$Settings->set( 'eblog_phonemail_separator', trim($eblog_phonemail_separator) );*/
-
-
 		// Hit & Session logs
 		$Settings->set( 'log_public_hits', param( 'log_public_hits', 'integer', 0 ) );
 		$Settings->set( 'log_admin_hits', param( 'log_admin_hits', 'integer', 0 ) );
@@ -141,12 +90,6 @@ switch( $action )
 
 		$Settings->set( 'cross_posting', param( 'cross_posting', 'integer', 0 ) );
 		$Settings->set( 'cross_posting_blogs', param( 'cross_posting_blogs', 'integer', 0 ) );
-
-		//XML-RPC
-		$Settings->set( 'general_xmlrpc', param( 'general_xmlrpc', 'integer', 0 ) );
-
-		param( 'xmlrpc_default_title', 'string', true );
-		$Settings->set( 'xmlrpc_default_title', trim($xmlrpc_default_title) );
 
 		if( ! $Messages->has_errors() )
 		{
@@ -186,6 +129,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.22  2011/10/17 20:14:24  sam2kb
+ * Post by Email converted into internal scheduled job
+ *
  * Revision 1.21  2011/09/13 15:31:34  fplanque
  * Enhanced back-office navigation.
  *
