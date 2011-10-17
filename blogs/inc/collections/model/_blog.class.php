@@ -504,6 +504,7 @@ class Blog extends DataObject
 		{ // we want to load the workflow checkboxes:
 			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
 			$this->set_setting( 'comments_detect_email', param( 'comments_detect_email', 'integer', 0 ) );
+			$this->set_setting( 'comments_register', param( 'comments_register', 'integer', 0 ) );
 		}
 
 		if( in_array( 'other', $groups ) )
@@ -2580,6 +2581,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.161  2011/10/17 15:32:46  efy-yurybakh
+ * Let people create an account just after posting a comment
+ *
  * Revision 1.160  2011/10/17 15:10:29  efy-yurybakh
  * If there is an email address in a comment, do not allow posting the comment
  *

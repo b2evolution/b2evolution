@@ -82,6 +82,7 @@ class CollectionSettings extends AbstractSettings
 			'comments_per_page' => 1000,
 			'default_gravatar' => 'b2evo',
 			'comments_detect_email' => 1,
+			'comments_register' => 1,
 
 		// Archive settings:
 			'arcdir_noindex' => '1',						// META NOINDEX on Archive directory
@@ -203,6 +204,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.73  2011/10/17 15:32:46  efy-yurybakh
+ * Let people create an account just after posting a comment
+ *
  * Revision 1.72  2011/10/17 15:10:29  efy-yurybakh
  * If there is an email address in a comment, do not allow posting the comment
  *

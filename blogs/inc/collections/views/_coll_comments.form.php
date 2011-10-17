@@ -166,7 +166,9 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Registration of commenters') );
-	$Form->checkbox( 'comments_detect_email', $edited_Blog->get_setting( 'comments_detect_email' ), T_('Email addresses'), T_( 'Detect email addresses in comments .' ) );
+	$Form->checkbox( 'comments_detect_email', $edited_Blog->get_setting( 'comments_detect_email' ), T_('Email addresses'), T_( 'Detect email addresses in comments.' ) );
+
+	$Form->checkbox( 'comments_register', $edited_Blog->get_setting( 'comments_register' ), T_('Register after comment'), T_( 'Display the registration form right after submitting a comment.' ) );
 $Form->end_fieldset();
 
 
@@ -193,6 +195,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.7  2011/10/17 15:32:47  efy-yurybakh
+ * Let people create an account just after posting a comment
+ *
  * Revision 1.6  2011/10/17 15:10:29  efy-yurybakh
  * If there is an email address in a comment, do not allow posting the comment
  *

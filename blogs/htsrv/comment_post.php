@@ -372,7 +372,7 @@ if( $action == 'preview' )
 		if( $Settings->get( 'newusers_canregister' ) )
 		{	// Users can register and we give them a links to log in and registration
 			$link_log_in = get_user_login_link( '', '', T_( 'log in' ), '#', 'blocked comment email', $commented_Item->get_url( 'public_view' ) );
-			$link_register = get_user_register_link( '', '', T_( 'create an account now' ), '#', false, $commented_Item->get_url( 'public_view' ) );
+			$link_register = get_user_register_link( '', '', T_( 'create an account now' ), '#', false, $commented_Item->get_url( 'public_view' ), 'blocked comment email' );
 			$Messages->add( sprintf( T_('Your comment contains an email address. Please %s or %s instead. This will allow people to send you private messages without revealing your email address to SPAM robots.'), $link_log_in, $link_register ), 'error' );
 		}
 		else
@@ -507,6 +507,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.155  2011/10/17 15:32:46  efy-yurybakh
+ * Let people create an account just after posting a comment
+ *
  * Revision 1.154  2011/10/17 15:10:29  efy-yurybakh
  * If there is an email address in a comment, do not allow posting the comment
  *
