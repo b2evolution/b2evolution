@@ -144,6 +144,19 @@ function insert_basic_widgets( $blog_id, $initial_install = false )
 								VALUES( '.$blog_id.', "Menu", 7, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'users'))).'" )' );
 		}
 
+
+		if( $blog_id == 1 && $test_install_all_features )
+		{	
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_enabled)
+								VALUES( '.$blog_id.', "Item Single", 1, "plugin", "evo_Gmaps", 1)' );
+			// add blog collection setting to activate additional fields
+			
+			$DB->query( 'INSERT INTO T_coll_settings(cset_coll_ID, cset_name, cset_value)
+								VALUES( '.$blog_id.', "custom_double3" , "Latitude"),
+									  ( '.$blog_id.', "custom_double4" , "Longitude")');
+
+		}
+
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 							VALUES( '.$blog_id.', "Menu Top", 1, "core", "coll_search_form" )' );
 
@@ -191,6 +204,9 @@ function insert_basic_widgets( $blog_id, $initial_install = false )
 
 /*
  * $Log$
+ * Revision 1.12  2011/10/17 10:39:08  efy-vitalij
+ * added automatic installation evo_Gmaps widget for blog 1  in function insert_basic_widgets if $test_install_all_features = 1
+ *
  * Revision 1.11  2011/10/11 05:52:14  efy-asimo
  * Messages menu link widget
  *
