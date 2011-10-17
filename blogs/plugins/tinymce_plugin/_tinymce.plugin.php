@@ -500,6 +500,16 @@ class tinymce_plugin extends Plugin
 	}
 
 
+
+	/**
+	 * Init the TinyMCE object.
+	 *
+	 * @return boolean
+	 */
+	function DisplayEditorButton( & $params )
+	{
+		return $this->AdminDisplayEditorButton($params);
+	}
 	/**
 	 * Wrapper to either use {@link fetch_remote_page()} from b2evo or our own copy.
 	 *
