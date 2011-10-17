@@ -4467,6 +4467,7 @@ function generate_random_ip()
 function hit_response_code_class($hit_response_code)
 {
 	$class = '';
+	
 	if ($hit_response_code >= 200 && $hit_response_code < 300)
 	{
 		$class =  "code_2xx";
@@ -4475,10 +4476,18 @@ function hit_response_code_class($hit_response_code)
 	{
 		$class =  "code_3xx";
 	}
+
+	if ($hit_response_code == 304)
+	{
+		$class =  "code_304";
+	}
+
 	if ($hit_response_code >= 400)
 	{
 		$class =  "code_4xx";
 	}
+
+
 	return $class;
 }
 
@@ -4588,6 +4597,9 @@ if( !function_exists( 'sys_get_temp_dir' ) )
 
 /*
  * $Log$
+ * Revision 1.293  2011/10/17 12:09:46  efy-vitalij
+ * changed function hit_response_code_class()
+ *
  * Revision 1.292  2011/10/14 22:16:07  sam2kb
  * Provide sys_get_temp_dir() for older versions of PHP (< 5.2.1)
  *
