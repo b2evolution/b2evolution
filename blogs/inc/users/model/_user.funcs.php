@@ -106,7 +106,7 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
 
 /**
  * Get link to login
- * 
+ *
  * @param string Text before link
  * @param string Text after link
  * @param string Link text
@@ -277,7 +277,7 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
 
 /**
  * Template tag: Get a link to new user registration
- * 
+ *
  * @param string
  * @param string
  * @param string
@@ -307,6 +307,14 @@ function get_user_register_link( $before = '', $after = '', $link_text = '', $li
 	return $r;
 }
 
+
+/**
+ * put your comment there...
+ *
+ * @param mixed $redirect
+ * @param mixed $default_source_string
+ * @param mixed $disp_when_logged_in
+ */
 function get_user_register_url( $redirect = NULL, $default_source_string = '', $disp_when_logged_in = false )
 {
 	global $Settings, $edited_Blog, $generating_static, $secure_htsrv_url;
@@ -1344,6 +1352,9 @@ function callback_options_user_new_fields( $value )
 
 /*
  * $Log$
+ * Revision 1.92  2011/10/17 23:06:06  fplanque
+ * comment teasing cleanup.
+ *
  * Revision 1.91  2011/10/17 15:10:30  efy-yurybakh
  * If there is an email address in a comment, do not allow posting the comment
  *

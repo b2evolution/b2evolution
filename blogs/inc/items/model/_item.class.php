@@ -715,6 +715,7 @@ class Item extends ItemLight
 		// Set display text
 		switch( $this->Blog->get_setting( 'allow_view_comments' ) )
 		{
+
 			case 'registered':
 				if( $number_of_comments == 0 )
 				{
@@ -722,13 +723,14 @@ class Item extends ItemLight
 				}
 				elseif ( $number_of_comments == 1 )
 				{
-					$display_text = T_( 'There is one comment on this post but you must be logged in to see the comments.' );
+					$display_text = T_( 'There is <b>one comment</b> on this post but you must be logged in to see the comments.' );
 				}
 				else
 				{
-					$display_text = sprintf( T_( 'There are %s comments on this post but you must be logged in to see the comments.' ), $number_of_comments );
+					$display_text = sprintf( T_( 'There are <b>%s comments</b> on this post but you must be logged in to see the comments.' ), $number_of_comments );
 				}
 				break;
+
 			case 'member':
 				if( $number_of_comments == 0 )
 				{
@@ -743,25 +745,30 @@ class Item extends ItemLight
 					$display_text = sprintf( T_( 'There are %s comments on this post but you must be a member of this blog to see the comments.' ), $number_of_comments );
 				}
 				break;
+
 			default:
 				// any is already handled, moderators shouldn't get any message
 				return false;
 		}
 
+		echo '<div class="comment_posting_disabled_msg">';
+
 		if( is_logged_in() )
 		{
 			echo $display_text;
-			return false;
+		}
+		else
+		{	// User is not logged in, needs to display login link
+			$login_link = '<a href="'.get_login_url( 'cannot see comments', regenerate_url() ).'">'.T_( 'Log in now!' ).'</a>';
+			echo '<p>'.$display_text.' '.$login_link.'</p>';
+			if( $Settings->get( 'newusers_canregister' ) )
+			{ // needs to display register link
+				echo '<p>'.sprintf( T_( 'If you have no account yet, you can <a href="%s">register now</a>...<br />(It only takes a few seconds!)' ),
+							get_user_register_url( '', 'reg to see comments' ) ).'</p>';
+			}
 		}
 
-		// User is not logged in, needs to display login link
-		$login_link = '<a href="'.get_login_url( 'cannot see comments', regenerate_url() ).'">'.T_( 'Log in now!' ).'</a>';
-		echo '<p>'.$display_text.' '.$login_link.'</p>';
-		if( $Settings->get( 'newusers_canregister' ) )
-		{ // needs to display register link
-			$register_link = get_user_register_link( '', '', T_( 'register now!' ), '', false, regenerate_url(), 'reg to see comments' );
-			echo '<p>'.sprintf(  T_( 'If you have no account yet, you can %s (It only takes a few seconds)' ), $register_link ).'</p>';
-		}
+		echo '</div>';
 
 		return false;
 	}
@@ -4889,6 +4896,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.267  2011/10/17 23:06:07  fplanque
+ * comment teasing cleanup.
+ *
  * Revision 1.266  2011/10/13 18:52:04  efy-yurybakh
  * In skin posting (permission)
  *

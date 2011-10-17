@@ -197,9 +197,14 @@ form.bComment fieldset div.avatartag
 	padding: 0;
 }
 
-.comment_disabled_msg {
+.comment_viewing_disabled_msg,
+.comment_posting_disabled_msg {
 	text-align: center;
-	color: #e00;
+	background-color: #fec;
+	padding: 1px;
+	margin: 4px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
 }
 
 .form_footer_notes {

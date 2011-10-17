@@ -467,9 +467,11 @@ function echo_disabled_comments( $allow_comments_value, $item_url )
 		case 'member':
 			$disabled_text = T_( 'You must be a member of this blog to comment.' );
 			break;
+
 		case 'registered':
 			$disabled_text = T_( 'You must be logged in to leave a comment.' );
 			break;
+
 		default:
 			// case any or never, in this case comment form is already displayed, or comments are not allowed at all.
 			return;
@@ -481,13 +483,13 @@ function echo_disabled_comments( $allow_comments_value, $item_url )
 	$register_link = '';
 	if( ( !$is_logged_in ) && ( $Settings->get( 'newusers_canregister' ) ) )
 	{
-		$register_link = '<p>'.sprintf(  T_( 'If you have no account yet, you can <a href="%s">register now</a>... (It only takes a few seconds!)' ), get_user_register_url( '', 'reg to post comment' ) ).'</p>';
+		$register_link = '<p>'.sprintf( T_( 'If you have no account yet, you can <a href="%s">register now</a>...<br />(It only takes a few seconds!)' ), get_user_register_url( '', 'reg to post comment' ) ).'</p>';
 	}
 
 	// disabled comment form
 	echo '<form class="bComment">';
 
-	echo '<div class="comment_disabled_msg">';
+	echo '<div class="comment_posting_disabled_msg">';
 	if( $is_logged_in )
 	{
 		echo '<p>'.$disabled_text.'</p>';
@@ -542,6 +544,9 @@ function get_comment_from_session()
 
 /*
  * $Log$
+ * Revision 1.37  2011/10/17 23:06:07  fplanque
+ * comment teasing cleanup.
+ *
  * Revision 1.36  2011/10/10 20:46:40  fplanque
  * registration source tracking
  *
