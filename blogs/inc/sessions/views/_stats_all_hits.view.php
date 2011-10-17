@@ -206,20 +206,18 @@ $Results->cols[] = array(
 		'td' => '$blog_shortname$',
 	);
 
-// Requested URI (linked to blog's baseurlroot+URI):
-$Results->cols[] = array(
-		'th' => T_('Requested URI'),
-		'order' => 'hit_uri',
-		'td' => '%stats_format_req_URI( #hit_blog_ID#, #hit_uri#, 40, #hit_disp#, #hit_ctrl# )%',
-	);
-
 $Results->cols[] = array(
 		'th' => T_('Resp Code'),
 		'order' => 'hit_response_code',
 		'td' => '$hit_response_code$',
 		'td_class' => '%hit_response_code_class( #hit_response_code# )% small shrinkwrap'
 	);
-
+// Requested URI (linked to blog's baseurlroot+URI):
+$Results->cols[] = array(
+		'th' => T_('Requested URI'),
+		'order' => 'hit_uri',
+		'td' => '%stats_format_req_URI( #hit_blog_ID#, #hit_uri#, 40, #hit_disp#, #hit_ctrl# )%',
+	);
 $Results->cols[] = array(
 		'th' => T_('Remote IP'),
 		'order' => 'hit_remote_addr',
@@ -233,6 +231,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.9  2011/10/17 12:07:05  efy-vitalij
+ * edit column 'Resp Code'
+ *
  * Revision 1.8  2011/10/17 00:20:39  fplanque
  * minor
  *
