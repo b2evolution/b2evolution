@@ -584,12 +584,19 @@ div.avatartag {
 }
 
 .code_2xx{
-	background-color: #00FF99;
+	color: #00FF99;
+	font-weight: bold;
 }
 .code_3xx{
-	background-color: #FF6600;
+	color: #FF6600;
+	font-weight: bold;
+}
+.code_304{
+	color: #00FF00;
+	font-weight: bold;
 }
 .code_4xx{
-	background-color: #FF0000;
+	color: #FF0000;
+	font-weight: bold;
 }
 
