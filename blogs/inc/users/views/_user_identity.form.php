@@ -400,6 +400,7 @@ else
 	$user_id = $edited_User->ID;
 }
 
+global $Messages;
 $userfields_new_sql = '';
 $new_field_type = param( 'new_field_type', 'integer', 0 );
 if( $new_field_type > 0 && $Messages->has_errors() )
@@ -556,6 +557,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.54  2011/10/17 06:30:07  efy-yurybakh
+ * fix add field
+ *
  * Revision 1.53  2011/10/15 15:03:28  efy-yurybakh
  * Additional info fields - step 2
  *
