@@ -36,6 +36,8 @@ $params = array_merge( array(
 		'after_comment_form'   => '',
 	), $params );
 
+$email_is_detected = false; // Used when comment contains an email strings
+
 /*
  * Comment form:
  */
@@ -57,11 +59,16 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 				$PageCache->abort_collect();
 			}
 
+			if( $Comment->email_is_detected )
+			{	// We set it to define a some styles below
+				$email_is_detected = true;
+			}
+
 			// ------------------ PREVIEW COMMENT INCLUDED HERE ------------------
 			skin_include( $params['comment_template'], array(
 					'Comment'              => & $Comment,
-					'comment_start'        => $params['preview_start'],
-					'comment_end'          => $params['preview_end'],
+					'comment_start'        => $Comment->email_is_detected ? $params['comment_error_start'] : $params['preview_start'],
+					'comment_end'          => $Comment->email_is_detected ? $params['comment_error_end'] : $params['preview_end'],
 				) );
 			// Note: You can customize the default item feedback by copying the generic
 			// /skins/_item_comment.inc.php file into the current skin folder.
@@ -278,9 +285,19 @@ function setCommentVote( id, type, vote )
 													.' <span class="note">('.T_('For my next comment on this site').')</span>';
 		// TODO: If we got info from cookies, Add a link called "Forget me now!" (without posting a comment).
 
-		$comment_options[] = '<label><input type="checkbox" class="checkbox" name="comment_allow_msgform" tabindex="8"'
+		$msgform_class_start = '';
+		$msgform_class_end = '';
+		if( $email_is_detected )
+		{	// Set a class when comment contains a email
+			$msgform_class_start = '<div class="comment_recommended_option">';
+			$msgform_class_end = '</div>';
+		}
+
+		$comment_options[] = $msgform_class_start.
+													'<label><input type="checkbox" class="checkbox" name="comment_allow_msgform" tabindex="8"'
 													.( $comment_allow_msgform ? ' checked="checked"' : '' ).' value="1" /> '.T_('Allow message form').'</label>'
-													.' <span class="note">('.T_('Allow users to contact me through a message form -- Your email will <strong>not</strong> be revealed!').')</span>';
+													.' <span class="note">('.T_('Allow users to contact me through a message form -- Your email will <strong>not</strong> be revealed!').')</span>'.
+													$msgform_class_end;
 		// TODO: If we have an email in a cookie, Add links called "Add a contact icon to all my previous comments" and "Remove contact icon from all my previous comments".
 	}
 
@@ -316,6 +333,9 @@ function setCommentVote( id, type, vote )
 
 /*
  * $Log$
+ * Revision 1.36  2011/10/17 15:10:30  efy-yurybakh
+ * If there is an email address in a comment, do not allow posting the comment
+ *
  * Revision 1.35  2011/10/04 08:39:30  efy-asimo
  * Comment and message forms save/reload content in case of error
  *

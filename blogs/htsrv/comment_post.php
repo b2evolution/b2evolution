@@ -53,6 +53,7 @@ $comment = param( 'p', 'html' );
 
 param( 'comment_autobr', 'integer', ($comments_use_autobr == 'always') ? 1 : 0 );
 $commented_Item->load_Blog(); // Make sure Blog is loaded (will be needed whether logged in or not)
+$blog = $commented_Item->Blog->ID;
 
 if( is_logged_in() )
 {
@@ -120,6 +121,8 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 // Check that this action request is not a CSRF hacked request:
 $Session->assert_received_crumb( 'comment' );
 
+$comments_email_is_detected = false;
+
 if( $User )
 {	// User is logged in (or provided, e.g. via OpenID plugin)
 	// Does user have permission to edit?
@@ -170,6 +173,15 @@ else
 	if( $error = validate_url( $url, 'commenting' ) )
 	{
 		$Messages->add( T_('Supplied website address is invalid: ').$error, 'error' );
+	}
+
+	if( $commented_Item->Blog->get_setting( 'comments_detect_email' ) )
+	{	// Detect email addresses in comments
+		if( preg_match( '/(([_a-z0-9-]+)(\.[_a-z0-9-]+)*@([a-z0-9-]+)(\.[a-z0-9-]+)*(\.[a-z]{2,}))/i', $comment ) )
+		{	// Comment contains an email address
+			$action = 'preview';
+			$comments_email_is_detected = true;
+		}
 	}
 }
 
@@ -346,6 +358,7 @@ if( $action == 'preview' )
 { // set the Comment into user's session and redirect.
 	$Comment->set( 'original_content', $original_comment ); // used in the textarea input field again
 	$Comment->set( 'preview_attachments', $preview_attachments ); // memorize attachments
+	$Comment->set( 'email_is_detected', $comments_email_is_detected ); // used to change a style of the comment
 	$Session->set( 'core.preview_Comment', $Comment );
 	$Session->set( 'core.no_CachePageContent', 1 );
 	$Session->dbsave();
@@ -353,6 +366,20 @@ if( $action == 'preview' )
 	// This message serves the purpose that the next page will not even try to retrieve preview from cache... (and won't collect data to be cached)
 	// This is session based, so it's not 100% safe to prevent caching. We are also using explicit caching prevention whenever personal data is displayed
 	$Messages->add( T_('This is a preview only! Do not forget to send your comment!'), 'error' );
+
+	if( $comments_email_is_detected )
+	{	// Comment contains an email address, We should show an error about this
+		if( $Settings->get( 'newusers_canregister' ) )
+		{	// Users can register and we give them a links to log in and registration
+			$link_log_in = get_user_login_link( '', '', T_( 'log in' ), '#', 'blocked comment email', $commented_Item->get_url( 'public_view' ) );
+			$link_register = get_user_register_link( '', '', T_( 'create an account now' ), '#', false, $commented_Item->get_url( 'public_view' ) );
+			$Messages->add( sprintf( T_('Your comment contains an email address. Please %s or %s instead. This will allow people to send you private messages without revealing your email address to SPAM robots.'), $link_log_in, $link_register ), 'error' );
+		}
+		else
+		{	// No registration
+			$Messages->add( T_('Your comment contains an email address. We recommend you check the box "Allow message form." below instead. This will allow people to contact you without revealing your email address to SPAM robots.'), 'error' );
+		}
+	}
 
 	// Passthrough comment_cookies & comment_allow_msgform params:
 	// fp> moved this down here in order to keep return URLs clean whenever this is not needed.
@@ -480,6 +507,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.154  2011/10/17 15:10:29  efy-yurybakh
+ * If there is an email address in a comment, do not allow posting the comment
+ *
  * Revision 1.153  2011/10/04 08:42:18  efy-asimo
  * Remove unused code
  *

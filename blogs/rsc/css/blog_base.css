@@ -111,6 +111,17 @@ form.bComment /* New comment form */
 #comment_preview {
 	background-color: #eee;
 }
+#comment_error {
+	background-color: #FBF2EE;
+	border-color: #DD9999;;
+	color: #EE0000;
+}
+.comment_recommended_option{
+	color: #0C0;
+}
+.comment_recommended_option .note{
+	color: #9D9;
+}
 div.bCommentTitle {
 	margin: 1ex 0;
 	font-weight: bold;

@@ -100,18 +100,34 @@ function user_pass_ok( $login, $pass, $pass_is_md5 = false )
  */
 function user_login_link( $before = '', $after = '', $link_text = '', $link_title = '#', $source = 'user login link' )
 {
+	echo get_user_login_link( $before, $after, $link_text, $link_title, $source );
+}
+
+
+/**
+ * Get link to login
+ * 
+ * @param string Text before link
+ * @param string Text after link
+ * @param string Link text
+ * @param string Link title
+ * @param string Source
+ * @return string Link for log in
+ */
+function get_user_login_link( $before = '', $after = '', $link_text = '', $link_title = '#', $source = 'user login link', $redirect_to = NULL )
+{
 	if( is_logged_in() ) return false;
 
 	if( $link_text == '' ) $link_text = T_('Log in');
 	if( $link_title == '#' ) $link_title = T_('Log in if you have an account...');
 
 	$r = $before;
-	$r .= '<a href="'.get_login_url( $source  ).'" title="'.$link_title.'">';
+	$r .= '<a href="'.get_login_url( $source, $redirect_to ).'" title="'.$link_title.'">';
 	$r .= $link_text;
 	$r .= '</a>';
 	$r .= $after;
 
-	echo $r;
+	return $r;
 }
 
 
@@ -261,6 +277,8 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
 
 /**
  * Template tag: Get a link to new user registration
+ * 
+ * @param string
  * @param string
  * @param string
  * @param string
@@ -1326,6 +1344,9 @@ function callback_options_user_new_fields( $value )
 
 /*
  * $Log$
+ * Revision 1.91  2011/10/17 15:10:30  efy-yurybakh
+ * If there is an email address in a comment, do not allow posting the comment
+ *
  * Revision 1.90  2011/10/15 15:03:27  efy-yurybakh
  * Additional info fields - step 2
  *

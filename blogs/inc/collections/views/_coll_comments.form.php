@@ -165,6 +165,11 @@ $Form->begin_fieldset( T_('Subscriptions') );
 $Form->end_fieldset();
 
 
+$Form->begin_fieldset( T_('Registration of commenters') );
+	$Form->checkbox( 'comments_detect_email', $edited_Blog->get_setting( 'comments_detect_email' ), T_('Email addresses'), T_( 'Detect email addresses in comments .' ) );
+$Form->end_fieldset();
+
+
 $Form->end_form( array(
 	array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
 	array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
@@ -188,6 +193,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.6  2011/10/17 15:10:29  efy-yurybakh
+ * If there is an email address in a comment, do not allow posting the comment
+ *
  * Revision 1.5  2011/10/05 12:05:02  efy-yurybakh
  * Blog settings > features tab refactoring
  *

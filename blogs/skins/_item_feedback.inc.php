@@ -40,6 +40,8 @@ $params = array_merge( array(
 		'comment_end'          => '</div>',
 		'preview_start'        => '<div class="bComment" id="comment_preview">',
 		'preview_end'          => '</div>',
+		'comment_error_start'  => '<div class="bComment" id="comment_error">',
+		'comment_error_end'    => '</div>',
 		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
 		'link_to'		           => 'userurl>userpage',		    // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		'form_title_start'     => '<h3>',
@@ -294,6 +296,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.50  2011/10/17 15:10:30  efy-yurybakh
+ * If there is an email address in a comment, do not allow posting the comment
+ *
  * Revision 1.49  2011/10/04 08:39:30  efy-asimo
  * Comment and message forms save/reload content in case of error
  *

@@ -334,6 +334,7 @@ function create_default_settings( $override = array() )
 	if( $test_install_all_features )
 	{
 		$defaults['gender_colored'] = 1;
+		$defaults['newusers_canregister'] = 1;
 	}
 
 	$settings = array_merge( array_keys($defaults), array_keys($override) );
@@ -844,6 +845,9 @@ function get_antispam_query()
 
 /*
  * $Log$
+ * Revision 1.106  2011/10/17 15:10:30  efy-yurybakh
+ * If there is an email address in a comment, do not allow posting the comment
+ *
  * Revision 1.105  2011/10/17 10:33:01  efy-vitalij
  * add google_maps plugin installation if $test_install_all_features = true
  *

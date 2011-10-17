@@ -81,6 +81,7 @@ class CollectionSettings extends AbstractSettings
 			'paged_comments' => '0',
 			'comments_per_page' => 1000,
 			'default_gravatar' => 'b2evo',
+			'comments_detect_email' => 1,
 
 		// Archive settings:
 			'arcdir_noindex' => '1',						// META NOINDEX on Archive directory
@@ -202,6 +203,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.72  2011/10/17 15:10:29  efy-yurybakh
+ * If there is an email address in a comment, do not allow posting the comment
+ *
  * Revision 1.71  2011/10/11 18:26:10  efy-yurybakh
  * In skin posting (beta)
  *
