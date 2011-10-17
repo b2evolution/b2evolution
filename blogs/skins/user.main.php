@@ -25,6 +25,9 @@ require $ads_current_skin_path.'index.main.php';
 
 /*
  * $Log$
+ * Revision 1.3  2011/10/17 22:00:30  fplanque
+ * cleanup
+ *
  * Revision 1.2  2011/10/17 12:14:14  efy-asimo
  * User main dispaly - update
  *

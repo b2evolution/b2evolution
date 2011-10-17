@@ -705,7 +705,7 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called when displaying editor buttons.
+	 * Event handler: Called when displaying editor buttons (in back-office).
 	 *
 	 * This method, if implemented, should output the buttons
 	 * (probably as html INPUT elements) and return true, if
@@ -3096,6 +3096,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.51  2011/10/17 22:00:31  fplanque
+ * cleanup
+ *
  * Revision 1.50  2011/09/14 23:42:16  fplanque
  * moved icq aim yim msn to additional userfields
  *

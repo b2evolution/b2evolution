@@ -94,10 +94,12 @@ class Plugins_admin extends Plugins
 		{
 			$supported_events = array(
 				'AdminAfterPageFooter' => 'This gets called after the backoffice HTML footer has been displayed.',
-				'AdminDisplayEditorButton' => 'Display action buttons on the edit screen(s)',
-				'AdminDisplayToolbar' => 'Display a toolbar on the edit screen(s)',
+				'AdminDisplayEditorButton' => 'Display action buttons on the edit screens in the back-office',
+				'DisplayEditorButton' => 'Display action buttons on the edit screen in the front-office',
+				'AdminDisplayToolbar' => 'Display a toolbar on the edit screens',
 				'AdminDisplayCommentFormFieldset' => 'Display form fieldsets on the backoffice comment editing form',
 				'AdminDisplayItemFormFieldset' => 'Display form fieldsets on the backoffice item editing screen(s)',
+				'DisplayItemFormFieldset' => 'Display form fieldsets on the frontoffice item editing screen(s)',
 				'AdminEndHtmlHead' => 'This gets called at the end of the HTML HEAD section in backoffice skins',
 				'AdminAfterEvobarInit' => 'This gets called after the Evobar menu has been initialized.',
 				'AdminAfterMenuInit' => 'This gets called after the backoffice menu has been initialized.',
@@ -119,11 +121,11 @@ class Plugins_admin extends Plugins
 				'AfterCommentDelete' => 'Gets called after a comment has been deleted from the database.',
 				'AfterCommentInsert' => 'Gets called after a comment has been inserted into the database.',
 				'AfterCommentUpdate' => 'Gets called after a comment has been updated in the database.',
-				
+
 				'AfterCollectionDelete' => 'Gets called after a blog has been deleted from the database.',
 				'AfterCollectionInsert' => 'Gets called after a blog has been inserted into the database.',
 				'AfterCollectionUpdate' => 'Gets called after a blog has been updated in the database.',
-				
+
 				'GetCollectionKinds' => 'Defines blog kinds, their names and description.',
 				'InitCollectionKinds' => 'Defines blog settings by its kind.',
 
@@ -170,7 +172,7 @@ class Plugins_admin extends Plugins
 				'SkinTag' => 'This method gets invoked when a plugin is called by its code. Providing this method causes the plugin to be listed as a widget.',
 
 				'AppendHitLog' => 'Called when a hit gets logged, but before it gets recorded.',
-				
+
 				'BeforeThumbCreate' => 'This gets called before an image thumbnail gets created.',
 				'AfterFileUpload' => 'Called before an uploaded file gets saved on server.',
 
@@ -230,8 +232,6 @@ class Plugins_admin extends Plugins
 				// allow plugins to handle $disp modes
 				'GetHandledDispModes' => 'Called when building possible $disp list',
 				'HandleDispMode' => 'Called when displaying $disp',
-				'DisplayItemFormFieldset' => 'Display form fieldsets on the frontoffice item editing screen(s)',
-				'DisplayEditorButton' => 'Display action buttons on the edit screen(s)',
 			);
 
 			if( ! defined('EVO_IS_INSTALLING') || ! EVO_IS_INSTALLING )
@@ -325,8 +325,8 @@ class Plugins_admin extends Plugins
 		// Get subdirs in $this->plugins_path
 		$subdirs = array();
 		$subdirs = get_filenames( $this->plugins_path, false, true, true, false );
-		
-		if( empty($subdirs) ) 
+
+		if( empty($subdirs) )
 			return;
 
 		// Skip plugins which are in a directory that starts with an underscore ("_")
@@ -343,7 +343,7 @@ class Plugins_admin extends Plugins
 		foreach( $subdirs as $subdir )
 		{
 			// Some directories may be unreadable ( get_filenames returns false which is not an array )
-			if( !$files = get_filenames( $subdir, true, false, true, false ) ) 
+			if( !$files = get_filenames( $subdir, true, false, true, false ) )
 				continue;
 
 			foreach( $files as $filename )
@@ -1490,6 +1490,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.40  2011/10/17 22:00:31  fplanque
+ * cleanup
+ *
  * Revision 1.39  2011/10/17 10:26:54  efy-vitalij
  * add supported event 'DisplayEditorButton'
  *

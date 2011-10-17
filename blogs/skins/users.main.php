@@ -21,6 +21,8 @@ if( ! is_logged_in() && ! $Settings->get( 'allow_anonymous_user_list' ) )
 	header_redirect( get_login_url( 'cannot see users', $redirect_to ), 302 );
 }
 
+// var bgxy_expand is used by toggle_filter_area() and toggle_clickopen()
+// var htsrv_url is used for AJAX callbacks
 add_js_headline( "// Paths used by JS functions:
 		var bgxy_expand = '".get_icon( 'expand', 'xy' )."';
 		var bgxy_collapse = '".get_icon( 'collapse', 'xy' )."';
@@ -33,6 +35,9 @@ require $ads_current_skin_path.'index.main.php';
 
 /*
  * $Log$
+ * Revision 1.9  2011/10/17 22:00:30  fplanque
+ * cleanup
+ *
  * Revision 1.8  2011/10/16 20:34:16  fplanque
  * To whomever forgot to check in this file: please check that this version is correct.
  *

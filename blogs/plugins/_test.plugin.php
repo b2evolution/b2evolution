@@ -372,7 +372,7 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * Event handler: Called when displaying editor buttons.
+	 * Event handler: Called when displaying editor buttons (in back-office).
 	 *
 	 * @see Plugin::AdminDisplayEditorButton()
 	 * @param array Associative array of parameters
@@ -820,8 +820,8 @@ class test_plugin extends Plugin
 		$this->debug_log('BeforeSessionsDelete: Could have prevented the deletion of all sessions older than ' ).date('Y-m-d H:i:s', $params['cutoff_timestamp' ] );
 		return;
 	}
-	
-	
+
+
 	/**
 	 * Event handler: Defines blog kinds, their names and description.
 	 * Define blog settings in {@link Plugin::InitCollectionKinds()} method of your plugin.
@@ -844,11 +844,11 @@ class test_plugin extends Plugin
 					'desc' => 'Description is changed by TEST plugin.',
 				),
 			) );
-		
+
 		return $params['kinds'];
 	}
-	
-	
+
+
 	/**
 	 * Event handler: Defines blog settings by its kind. Use {@link get_collection_kinds()} to return
 	 * an array of available blog kinds and their names.
@@ -864,16 +864,16 @@ class test_plugin extends Plugin
 	{
 		// Load blog functions
 		load_funcs( 'collections/model/_blog.funcs.php' );
-		
+
 		// Get all available blog kinds
 		$kinds = get_collection_kinds();
-		
+
 		switch( $params['kind'] )
 		{
 			case 'std': // override standard blog settings
 				$params['Blog']->set( 'name', $kinds[$params['kind']]['name'] );
 				break;
-			
+
 			case 'test_kind':
 				$params['Blog']->set( 'name', $kinds[$params['kind']]['name'] );
 				$params['Blog']->set( 'shortname', 'Test blog' );
@@ -885,6 +885,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.94  2011/10/17 22:00:31  fplanque
+ * cleanup
+ *
  * Revision 1.93  2011/09/04 22:13:23  fplanque
  * copyright 2011
  *

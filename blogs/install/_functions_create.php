@@ -68,6 +68,7 @@ function create_default_data()
 {
 	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users;
 	global $DB, $locales, $current_locale;
+	// This will install all sorts of additional things... for testing purposes:
 	global $test_install_all_features;
 
 	// Inserting sample data triggers events: instead of checking if $Plugins is an object there, just use a fake one..
@@ -720,14 +721,13 @@ function create_default_countries()
 			(247, 'zw', 'Zimbabwe', 146)" );
 
 	if (!empty($current_locale))
-	{	// Set default preferred country from locale
+	{	// Set default preferred country from current locale
 		$result = array();
-		preg_match('#.*?-(.*)#',  strtolower($current_locale),$result);
+		preg_match('#.*?-(.*)#', strtolower($current_locale),$result);
 
-		$DB->query( "
-		UPDATE T_country
-		SET ctry_preferred = 1
-		WHERE ctry_code = '".$DB->escape($result[1])."'");
+		$DB->query( "UPDATE T_country
+										SET ctry_preferred = 1
+									WHERE ctry_code = '".$DB->escape($result[1])."'");
 	}
 	echo "OK.<br />\n";
 }
@@ -1427,6 +1427,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.330  2011/10/17 22:00:30  fplanque
+ * cleanup
+ *
  * Revision 1.329  2011/10/12 13:54:36  efy-yurybakh
  * In skin posting
  *

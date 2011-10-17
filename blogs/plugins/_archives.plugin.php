@@ -387,7 +387,7 @@ class ArchiveList extends Results
 		// $this->ItemQuery->where_ID( $p, $title );
 
 		if( is_admin_page() )
-		{	// Don't restrict a posts in the Back-office
+		{	// Don't restrict by date in the Back-office
 			$timestamp_min = NULL;
 			$timestamp_max = NULL;
 		}
@@ -639,6 +639,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.66  2011/10/17 22:00:31  fplanque
+ * cleanup
+ *
  * Revision 1.65  2011/10/07 07:22:59  efy-yurybakh
  * Replace all timestamp_min & timestamp_max with Blog's methods
  *

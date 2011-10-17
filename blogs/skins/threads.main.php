@@ -29,6 +29,8 @@ if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
 	// will have exited
 }
 
+// var bgxy_expand is used by toggle_filter_area() and toggle_clickopen()
+// var htsrv_url is used for AJAX callbacks
 add_js_headline( "// Paths used by JS functions:
 		var bgxy_expand = '".get_icon( 'expand', 'xy' )."';
 		var bgxy_collapse = '".get_icon( 'collapse', 'xy' )."';
@@ -41,6 +43,9 @@ require $ads_current_skin_path.'index.main.php';
 
 /*
  * $Log$
+ * Revision 1.7  2011/10/17 22:00:30  fplanque
+ * cleanup
+ *
  * Revision 1.6  2011/10/11 06:38:50  efy-asimo
  * Add corresponding error messages when login required
  *

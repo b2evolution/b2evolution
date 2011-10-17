@@ -257,7 +257,7 @@ class tinymce_plugin extends Plugin
 
 
 	/**
-	 * Init the TinyMCE object.
+	 * Init the TinyMCE object (in backoffice).
 	 *
 	 * This is done late, so that scriptaculous has been loaded before,
 	 * which got used by the youtube_plugin and caused problems with tinyMCE.
@@ -281,7 +281,7 @@ class tinymce_plugin extends Plugin
 
 		// Get init params, depending on edit mode: simple|expert
 		$tmce_init = $this->get_tmce_init( $params['edit_layout'] );
-		
+
 		if( $params['edit_layout'] != 'inskin' )
 		{	// Don't show HTML mode for 'In-skin editing mode'
 		?>
@@ -500,9 +500,8 @@ class tinymce_plugin extends Plugin
 	}
 
 
-
 	/**
-	 * Init the TinyMCE object.
+	 * Init the TinyMCE object (in front office).
 	 *
 	 * @return boolean
 	 */
@@ -510,6 +509,8 @@ class tinymce_plugin extends Plugin
 	{
 		return $this->AdminDisplayEditorButton($params);
 	}
+
+
 	/**
 	 * Wrapper to either use {@link fetch_remote_page()} from b2evo or our own copy.
 	 *

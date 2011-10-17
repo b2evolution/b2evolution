@@ -551,6 +551,8 @@ div.avatartag {
 	color: #f00;
 }
 
+
+/* Stats & logs screens */
 .reftype_search{
 	background-color: #0099FF;
 }
@@ -584,19 +586,18 @@ div.avatartag {
 }
 
 .code_2xx{
-	color: #00FF99;
+	color: #0f0;
 	font-weight: bold;
 }
 .code_3xx{
-	color: #FF6600;
+	color: #f80;
 	font-weight: bold;
 }
 .code_304{
-	color: #00FF00;
+	color: #0a0;
 	font-weight: bold;
 }
 .code_4xx{
-	color: #FF0000;
+	color: #f00;
 	font-weight: bold;
 }
-

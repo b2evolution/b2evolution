@@ -186,7 +186,6 @@ $referer_type_array = array (
 	'admin'		=> 'Admin'
 							);
 
-
 $referer_type_color = array(
 	'search'	=> '0099FF',
 	'blacklist' => 'ff00ff',

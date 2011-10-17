@@ -51,6 +51,8 @@ headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache
 
 	global $rsc_path, $rsc_url, $htsrv_url;
 
+	// var bgxy_expand is used by toggle_filter_area() and toggle_clickopen()
+	// var htsrv_url is used for AJAX callbacks
 	add_js_headline( "// Paths used by JS functions:
 		var bgxy_expand = '".get_icon( 'expand', 'xy' )."';
 		var bgxy_collapse = '".get_icon( 'collapse', 'xy' )."';
@@ -281,6 +283,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.41  2011/10/17 22:00:31  fplanque
+ * cleanup
+ *
  * Revision 1.40  2011/10/02 12:38:33  efy-yurybakh
  * fix sprite icons
  *

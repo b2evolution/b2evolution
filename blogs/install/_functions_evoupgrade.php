@@ -1215,22 +1215,21 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		echo 'Creating default file types... ';
-	// TODO: dh> shouldn't they get localized to the app's default locale?
 		$DB->query( "INSERT INTO T_filetypes
 				(ftyp_ID, ftyp_extensions, ftyp_name, ftyp_mimetype, ftyp_icon, ftyp_viewtype, ftyp_allowed)
 			VALUES
-				(1, 'gif', 'GIF image', 'image/gif', 'file_image', 'image', 1),
-				(2, 'png', 'PNG image', 'image/png', 'file_image', 'image', 1),
-				(3, 'jpg jpeg', 'JPEG image', 'image/jpeg', 'file_image', 'image', 1),
-				(4, 'txt', 'Text file', 'text/plain', 'file_document', 'text', 1),
-				(5, 'htm html', 'HTML file', 'text/html', 'file_www', 'browser', 0),
-				(6, 'pdf', 'PDF file', 'application/pdf', 'file_pdf', 'browser', 1),
-				(7, 'doc', 'Microsoft Word file', 'application/msword', 'file_doc', 'external', 1),
-				(8, 'xls', 'Microsoft Excel file', 'application/vnd.ms-excel', 'file_xls', 'external', 1),
-				(9, 'ppt', 'Powerpoint', 'application/vnd.ms-powerpoint', 'file_ppt', 'external', 1),
-				(10, 'pps', 'Slideshow', 'pps', 'file_pps', 'external', 1),
-				(11, 'zip', 'ZIP archive', 'application/zip', 'file_zip', 'external', 1),
-				(12, 'php php3 php4 php5 php6', 'PHP script', 'application/x-httpd-php', 'file_php', 'text', 0),
+				(1, 'gif', 'GIF image', 'image/gif', 'image2.png', 'image', 1),
+				(2, 'png', 'PNG image', 'image/png', 'image2.png', 'image', 1),
+				(3, 'jpg jpeg', 'JPEG image', 'image/jpeg', 'image2.png', 'image', 1),
+				(4, 'txt', 'Text file', 'text/plain', 'document.png', 'text', 1),
+				(5, 'htm html', 'HTML file', 'text/html', 'html.png', 'browser', 0),
+				(6, 'pdf', 'PDF file', 'application/pdf', 'pdf.png', 'browser', 1),
+				(7, 'doc', 'Microsoft Word file', 'application/msword', 'doc.gif', 'external', 1),
+				(8, 'xls', 'Microsoft Excel file', 'application/vnd.ms-excel', 'xls.gif', 'external', 1),
+				(9, 'ppt', 'Powerpoint', 'application/vnd.ms-powerpoint', 'ppt.gif', 'external', 1),
+				(10, 'pps', 'Slideshow', 'pps', 'pps.gif', 'external', 1),
+				(11, 'zip', 'ZIP archive', 'application/zip', 'zip.gif', 'external', 1),
+				(12, 'php php3 php4 php5 php6', 'PHP script', 'application/x-httpd-php', 'php.gif', 'text', 0),
 				(13, 'css', 'Style sheet', 'text/css', '', 'text', 1)
 			" );
 		echo "OK.<br />\n";
@@ -3086,7 +3085,7 @@ function upgrade_b2evo_tables()
 
 	// Init Caches: (it should be possible to do this with each upgrade)
 	load_funcs('tools/model/_system.funcs.php');
-	// We gonna need some environment in order to init caches...
+	// We're going to need some environment in order to init caches...
 	global $Settings, $Plugins;
 	if( ! is_object( $Settings ) )
 	{
@@ -3230,6 +3229,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.424  2011/10/17 22:00:30  fplanque
+ * cleanup
+ *
  * Revision 1.423  2011/10/17 20:14:24  sam2kb
  * Post by Email converted into internal scheduled job
  *

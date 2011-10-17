@@ -521,6 +521,7 @@ class DB
 			return $val;
 	}
 
+
 	/**
 	 * Returns the correct WEEK() function to get the week number for the given date.
 	 *
@@ -1696,6 +1697,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.58  2011/10/17 22:00:31  fplanque
+ * cleanup
+ *
  * Revision 1.57  2011/10/14 09:54:36  efy-vitalij
  * remove function null_string()
  *
