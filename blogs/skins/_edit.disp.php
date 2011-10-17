@@ -161,7 +161,7 @@ $Form->begin_form( 'inskin', '', $params );
 
   <?php
   // CALL PLUGINS NOW:
-  $Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'inskin' ) );
+  $Plugins->trigger_event( 'DisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'inskin' ) );
 
 $Form->end_fieldset();
 
@@ -197,7 +197,7 @@ $Form->end_fieldset();
 
 <?php
 // ####################### PLUGIN FIELDSETS #########################
-$Plugins->trigger_event( 'DisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item, 'edit_layout' => 'inskin' ) );
+$Plugins->trigger_event( 'DisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item) );
 ?>
 
 <div class="clear"></div>
@@ -231,6 +231,9 @@ echo_autocomplete_tags();
 
 /*
  * $Log$
+ * Revision 1.5  2011/10/17 10:22:07  efy-vitalij
+ * changed trigger event 'AdminDisplayEditorButton' to 'DisplayEditorButton'
+ *
  * Revision 1.4  2011/10/16 19:39:06  fplanque
  * Moved inskin.form to _edit.disp because there is no use for inskin.from in the backoffice.
  *
