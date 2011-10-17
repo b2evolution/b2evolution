@@ -117,10 +117,7 @@ form.bComment /* New comment form */
 	color: #EE0000;
 }
 .comment_recommended_option{
-	color: #0C0;
-}
-.comment_recommended_option .note{
-	color: #9D9;
+	color: #0a0;
 }
 div.bCommentTitle {
 	margin: 1ex 0;

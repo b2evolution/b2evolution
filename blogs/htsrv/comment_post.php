@@ -491,7 +491,7 @@ if( $Comment->ID )
 
 		if( !is_logged_in() && $Settings->get( 'newusers_canregister' ) && $Comment->Item->Blog->get_setting( 'comments_register' ) )
 		{	// Redirect to the registration form
-			$Messages->add( T_('Create a user account now so that other users can contact you after reading your comment.'), 'error' );
+			$Messages->add( T_('ATTENTION: Create a user account now so that other users can contact you after reading your comment.'), 'error' );
 
 			$register_user = array(
 				'name' => $Comment->author,
@@ -520,6 +520,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.157  2011/10/17 23:30:53  fplanque
+ * cleanup
+ *
  * Revision 1.156  2011/10/17 17:02:28  efy-yurybakh
  * Let people create an account just after posting a comment
  *
