@@ -231,6 +231,7 @@ class Plugins_admin extends Plugins
 				'GetHandledDispModes' => 'Called when building possible $disp list',
 				'HandleDispMode' => 'Called when displaying $disp',
 				'DisplayItemFormFieldset' => 'Display form fieldsets on the frontoffice item editing screen(s)',
+				'DisplayEditorButton' => 'Display action buttons on the edit screen(s)',
 			);
 
 			if( ! defined('EVO_IS_INSTALLING') || ! EVO_IS_INSTALLING )
@@ -1489,6 +1490,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.39  2011/10/17 10:26:54  efy-vitalij
+ * add supported event 'DisplayEditorButton'
+ *
  * Revision 1.38  2011/10/14 07:46:36  efy-vitalij
  * add event 'DisplayItemFormFieldset' to array of supported events
  *
