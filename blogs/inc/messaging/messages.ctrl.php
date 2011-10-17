@@ -114,6 +114,12 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'message' );
 
+		if( ! $edited_Thread->check_thread_recipient( $current_User->ID ) )
+		{	// Deny to write a new message for not involved in users
+			$Messages->add( T_('You cannot write a message here.'), 'error' );
+			header_redirect( '?ctrl=messages&thrd_ID='.$thrd_ID.$param_tab, 303 ); // Will EXIT
+		}
+
 		$non_blocked_contacts = $edited_Thread->load_contacts();
 		if( create_new_message( $thrd_ID, !empty( $non_blocked_contacts ) ) )
 		{
@@ -212,6 +218,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.23  2011/10/17 18:33:53  efy-yurybakh
+ * Messaging Abuse Management (don't allow posting in foreign threads)
+ *
  * Revision 1.22  2011/10/15 07:15:02  efy-yurybakh
  * Messaging Abuse Management
  *
