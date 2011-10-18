@@ -37,7 +37,7 @@ jQuery( document ).ready(function()
 
 			jQuery( 'body' ).append( '<div id="' + div_bubbletip_ID + '" style="display:none;"></div>' );
 
-			var bubbletip_params = { showOnInit: true, deltaShift: 0 };
+			var bubbletip_params = { showOnInit: true, deltaShift: 9 };
 			if( jQuery( '#' + div_cache_ID ).length == 0 )
 			{	// Create a div for cache user data
 				jQuery( 'body' ).append( '<div id="' + div_cache_ID + '" style="display:none;"></div>' );
