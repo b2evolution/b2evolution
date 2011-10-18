@@ -31,8 +31,11 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $Settings, $result_message;
-global $pbm_item_files, $pbm_messages, $pbm_items, $post_cntr, $del_cntr;
+global $Settings, $DB, $result_message, $default_locale, $current_charset;
+global $pbm_item_files, $pbm_messages, $pbm_items, $post_cntr, $del_cntr, $is_cron_mode;
+
+// Are we in cron job mode?
+$is_cron_mode = 'yes';
 
 load_funcs( 'cron/model/_post_by_mail.funcs.php');
 
@@ -48,6 +51,14 @@ if( ! extension_loaded('imap') )
 	return 2; // error
 }
 
+// Make sure current locale is set
+locale_overwritefromDB();
+locale_activate( $default_locale );
+
+// Set encoding for MySQL connection:
+$DB->set_connection_charset( $current_charset );
+
+load_funcs( '_core/_param.funcs.php' );
 load_class( 'items/model/_itemlist.class.php', 'ItemList' );
 load_class( '_ext/mime_parser/rfc822_addresses.php', 'rfc822_addresses_class' );
 load_class( '_ext/mime_parser/mime_parser.php', 'mime_parser_class' );
@@ -121,6 +132,9 @@ return 1; // success
 
 /*
  * $Log$
+ * Revision 1.2  2011/10/18 07:28:12  sam2kb
+ * Post by Email fixes
+ *
  * Revision 1.1  2011/10/17 20:16:52  sam2kb
  * Post by Email converted into internal scheduled job
  *

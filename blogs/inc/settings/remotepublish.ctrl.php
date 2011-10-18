@@ -112,8 +112,9 @@ switch( $action )
 		}
 		break;
 
-	case 'test_connection':
-	case 'test_posting':
+	case 'test_1':
+	case 'test_2':
+	case 'test_3':
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'globalsettings' );
 
@@ -132,14 +133,14 @@ switch( $action )
 
 		global $pbm_messages;
 
-		if( $action == 'test_connection' )
+		if( $action == 'test_1' )
 		{
 			if( $mbox = pbm_connect() )
 			{	// Close opened connection
 				imap_close( $mbox );
 			}
 		}
-		elseif( $action == 'test_posting' )
+		elseif( $action == 'test_2' || $action == 'test_3' )
 		{
 			if( $mbox = pbm_connect() )
 			{
@@ -150,8 +151,10 @@ switch( $action )
 
 				if( $imap_obj->Nmsgs > 0 )
 				{
-					// Pretend that we're in test mode. DO NOT save this setting!
-					$Settings->set('eblog_test_mode', 1);
+					if( $action == 'test_2' )
+					{	// Pretend that we're in test mode. DO NOT save this setting!
+						$Settings->set('eblog_test_mode', 1);
+					}
 
 					// We will read only 1 message from server in test mode
 					pbm_process_messages( $mbox, 1 );
@@ -163,6 +166,8 @@ switch( $action )
 				imap_close( $mbox );
 			}
 		}
+
+		$Messages->clear(); // Clear all messages
 
 		if( !empty($pbm_messages) )
 		{	// We will display the output in a scrollable fieldset
@@ -222,6 +227,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2011/10/18 07:28:12  sam2kb
+ * Post by Email fixes
+ *
  * Revision 1.1  2011/10/17 20:16:52  sam2kb
  * Post by Email converted into internal scheduled job
  *

@@ -38,14 +38,21 @@ $Form->hidden( 'action', 'update' );
 $Form->begin_fieldset( T_('Test saved settings') );
 
 	$url = '?ctrl=remotepublish&amp;tab=eblog&amp;'.url_crumb('globalsettings').'&amp;action=';
-	$Form->info_field( T_('Perform Server Test'),
-				'<a href="'.$url.'test_connection">[ '.T_('connection').' ]</a>
-				<a href="'.$url.'test_posting">[ '.T_('messages').' ]</a>' );
+	$Form->info_field( T_('Perform tests'),
+				'<a href="'.$url.'test_1">['.T_('server connection').']</a>&nbsp;&nbsp;
+				<a href="'.$url.'test_2">['.T_('simulate posting').']</a>&nbsp;&nbsp;
+				<a href="'.$url.'test_3">['.T_('create one post').']</a>' );
 
 	if( !empty($eblog_test_output) )
 	{
-		echo '<div class="red center" style="margin-top:30px">'.T_('This is just a test run. Nothing will be posted to the database nor will your inbox be altered').'</div>';
-		echo '<div style="padding: 6px; margin:5px; border: 1px solid #CCC; overflow:scroll; height: 400px">'.$eblog_test_output.'</div>';
+		echo '<div style="margin-top:25px"></div>';
+		if( $action == 'test_2' )
+		{
+			echo '<div class="red center">'.T_('This is just a test run. Nothing will be posted to the database nor
+ will your inbox be altered').'</div>';
+		}
+		// Display scrollable div
+		echo '<div style="padding: 6px; margin:5px; border: 1px solid #CCC; overflow:scroll; height: 350px">'.$eblog_test_output.'</div>';
 	}
 	
 $Form->end_fieldset();
@@ -135,6 +142,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.2  2011/10/18 07:28:12  sam2kb
+ * Post by Email fixes
+ *
  * Revision 1.1  2011/10/17 20:16:52  sam2kb
  * Post by Email converted into internal scheduled job
  *

@@ -124,7 +124,7 @@ function pbm_connect()
 function pbm_process_messages( & $mbox, $limit )
 {
 	global $Settings;
-	global $pbm_item_files, $pbm_messages, $pbm_items, $post_cntr, $del_cntr;
+	global $pbm_item_files, $pbm_messages, $pbm_items, $post_cntr, $del_cntr, $is_cron_mode;
 
 	// No execution time limit
 	set_max_execution_time(0);
@@ -319,6 +319,17 @@ function pbm_process_messages( & $mbox, $limit )
 			rmdir_r( $tmpDirMIME );
 			continue;
 		}
+
+		$pbmUser->get_Group(); // Load group
+		if( ! empty($is_cron_mode) )
+		{	// Assign current User if we are in cron mode. This is needed in order to check user permissions
+			global $current_User;
+			$current_User = duplicate($pbmUser);
+		}
+
+		// Activate User's locale
+		locale_activate( $pbmUser->get('locale') );
+
 		pbm_msg('<b class="green">Success</b>');
 
 		if( $post_categories = xmlrpc_getpostcategories( $content ) )
@@ -419,8 +430,8 @@ function pbm_process_messages( & $mbox, $limit )
 
 		// CHECK and FORMAT content
 		$context = $Settings->get('eblog_html_tag_limit') ? 'commenting' : 'posting';
-		$post_title = check_html_sanity( trim($post_title), $context, false );
-		$content = check_html_sanity( trim($content), $context, $do_auto_br );
+		$post_title = check_html_sanity( trim($post_title), $context, false, $pbmUser );
+		$content = check_html_sanity( trim($content), $context, $do_auto_br, $pbmUser );
 
 		global $Messages;
 		if( $Messages->has_errors() )
@@ -436,7 +447,7 @@ function pbm_process_messages( & $mbox, $limit )
 
 		if( $test_mode_on )
 		{	// Test mode
-			pbm_msg( '<b class="green">It looks like the post can be successfully saved in the database. However we won\'t save it in test mode.</b>' );
+			pbm_msg( '<b class="green">It looks like the post can be successfully saved in the database. However we will not do it in test mode.</b>' );
 		}
 		else
 		{
@@ -646,8 +657,9 @@ function pbm_process_attachments( & $content, $mailAttachments, $mediadir, $medi
 			$filename = $prename.$cnt.$sufname;
 			++$cnt;
 		}
-		pbm_msg( sprintf('File name is %s (we could have changed it if there was a file with the same name already)', $filename) );
+		pbm_msg( sprintf('New file name is <b>%s</b>', $filename) );
 
+		$imginfo = NULL;
 		if( ! $Settings->get('eblog_test_mode') )
 		{
 			pbm_msg( 'Saving file to: '.htmlspecialchars($mediadir.$filename) );
@@ -660,10 +672,10 @@ function pbm_process_attachments( & $content, $mailAttachments, $mediadir, $medi
 			// chmod uploaded file:
 			$chmod = $Settings->get('fm_default_chmod_file');
 			@chmod( $mediadir.$filename, octdec( $chmod ) );
-		}
 
-		$imginfo = @getimagesize($mediadir.$filename);
-		pbm_msg( 'Is this an image?: '.(is_array($imginfo) ? 'yes' : 'no') );
+			$imginfo = @getimagesize($mediadir.$filename);
+			pbm_msg( 'Is this an image?: '.(is_array($imginfo) ? 'yes' : 'no') );
+		}
 
 		if( $type == 'attach' )
 		{
@@ -842,6 +854,9 @@ function pbm_tempdir( $dir, $prefix = 'tmp', $mode = 0700 )
 
 /*
  * $Log$
+ * Revision 1.2  2011/10/18 07:28:12  sam2kb
+ * Post by Email fixes
+ *
  * Revision 1.1  2011/10/17 20:16:52  sam2kb
  * Post by Email converted into internal scheduled job
  *
