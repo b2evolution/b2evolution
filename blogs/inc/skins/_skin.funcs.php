@@ -505,6 +505,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_user'           => '_user.disp.php',
 				'disp_users'          => '_users.disp.php',
 				'disp_edit'           => '_edit.disp.php',
+				'disp_module_form'    => '_module_form.disp.php',
 			);
 
 		// Add plugin disp handlers:
@@ -945,6 +946,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.117  2011/10/18 09:14:34  efy-asimo
+ * Ability to display different module forms and handle module actions  inside the module
+ *
  * Revision 1.116  2011/10/14 10:14:15  efy-vitalij
  * add function header_http_response
  *
