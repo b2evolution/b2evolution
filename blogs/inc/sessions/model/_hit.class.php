@@ -183,12 +183,15 @@ class Hit
 	 var $hit_response_code = 200;
 
 	 /**
-	  *  Test mode
+	  * Test mode
+		* fp>vitaliy what is this for?
+		* Test what & when?
 	  */
 	 var $test_mode;
 
 	 /**
-	  *  Test rss mode
+	  * Test rss mode
+		* fp>vitaliy what is this for?
 	  */
 	 var $test_rss;
 
@@ -335,7 +338,7 @@ class Hit
 			$this->referer = $referer;
 		}
 		else
-		{
+		{	// Get referer from HTTP request
 			$this->referer = $this->get_referer();
 		}
 
@@ -388,10 +391,10 @@ class Hit
 				// This type may be superseeded by admin page
 				// fp> 2009-05-10: because of the 12 char limit above the following is probably no longer needed. Please enable it back if anyone has a problem with admin being detected as blacklist
 				// if( ! $this->detect_admin_page() )
-					// Not an admin page:
+				{	// Not an admin page:
 					$Debuglog->add( 'Hit: detect_referer(): blacklist ('.$lBlacklist.')', 'request' );
 					$this->referer_type = 'blacklist';
-
+				}
 				return;
 			}
 		}
@@ -745,7 +748,7 @@ class Hit
 
 		$Debuglog->add( 'Hit: Recording the hit.', 'request' );
 
-		if (empty($this->test_uri))
+		if(empty($this->test_uri))
 		{
 			if( !empty($Blog) )
 			{
@@ -853,6 +856,7 @@ class Hit
 		}
 		$this->ID = $hit_ID;
 	}
+
 
 	/**
 	 * Get the keyphrase from the referer
@@ -1589,6 +1593,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.79  2011/10/18 01:13:18  fplanque
+ * no message
+ *
  * Revision 1.78  2011/10/14 09:58:38  efy-vitalij
  * fix and remake hit_response_code registration
  *
