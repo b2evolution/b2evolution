@@ -406,8 +406,6 @@ $new_field_type = param( 'new_field_type', 'integer', 0 );
 if( $new_field_type > 0 && $Messages->has_errors() )
 {	// Means we want to add a new field (step 2)
 	$userfields_new_sql = 'OR ufdf_ID = "'.$new_field_type.'"';
-	// We save a new field type here to remmember it after submiting of the form
-	$Form->hidden( 'new_field_type', $new_field_type );
 }
 
 // -------------------  Get existing userfields: -------------------------------
@@ -427,88 +425,13 @@ $userfields = $DB->get_results( '
 
 	ORDER BY 1, 2 DESC' );
 
-$uf_new_fields = param( 'uf_new', 'array' );
-foreach( $userfields as $userfield )
-{
-	$uf_val = param( 'uf_'.$userfield->uf_ID, 'string', NULL );
-
-	if( $userfield->uf_ID == '0' )
-	{ // Set uf_ID for new (not saved) fields (recommended & require types)
-		$userfield->uf_ID = 'new['.$userfield->ufdf_ID.']';
-		if( isset( $uf_new_fields[$userfield->ufdf_ID] ) )
-			$uf_val = $uf_new_fields[$userfield->ufdf_ID];
-	}
-
-	if( is_null( $uf_val ) )
-	{ // No value submitted yet, get DB val:
-		$uf_val = $userfield->uf_varchar;
-	}
-
-	switch( $userfield->ufdf_ID )
-	{
-		case 10200:
-			$field_note = '<a href="aim:goim?screenname='.$userfield->uf_varchar.'&amp;message=Hello" class="action_icon">'.get_icon( 'play', 'imgtag', array('title'=>T_('Instant Message to user')) ).'</a>';
-			break;
-
-		case 10300:
-			$field_note = '<a href="http://wwp.icq.com/scripts/search.dll?to='.$userfield->uf_varchar.'" target="_blank" class="action_icon">'.get_icon( 'play', 'imgtag', array('title'=>T_('Search on ICQ.com')) ).'</a>';
-			break;
-
-		default:
-			if( $userfield->ufdf_type == 'url' )
-			{
-				$url = $userfield->uf_varchar;
-				if( !preg_match('#://#', $url) )
-				{
-					$url = 'http://'.$url;
-				}
-				$field_note = '<a href="'.$url.'" target="_blank" class="action_icon">'.get_icon( 'play', 'imgtag', array('title'=>T_('Visit the site')) ).'</a>';
-			}
-			else
-			{
-				$field_note = '';
-			}
-	}
-
-	// Display existing field:
-	switch( $userfield->ufdf_type )
-	{
-		case 'text':
-			$Form->textarea( 'uf_'.$userfield->uf_ID, $uf_val, 5, $userfield->ufdf_name, $field_note, 38, '', $userfield->ufdf_required == 'require' );
-			break;
-
-		case 'list':
-			$uf_options = explode( "\n", str_replace( "\r", '', $userfield->ufdf_options ) );
-			$field_params = array();
-			if( $userfield->ufdf_required == 'require' )
-			{
-				$field_params['required'] = true;
-			}
-			else
-			{	// Add empty value for not required fields
-				$uf_options = array_merge( array( '---' ), $uf_options );
-			}
-			$Form->select_input_array( 'uf_'.$userfield->uf_ID, $uf_val, $uf_options, $userfield->ufdf_name, '', $field_params );
-			break;
-
-		default:
-			$field_params = array( 'maxlength' => 255 );
-			if( $userfield->ufdf_required == 'require' )
-			{
-				$field_params['required'] = true;
-			}
-			$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, 40, $userfield->ufdf_name, $field_note, $field_params );
-	}
-}
+userfields_display( $userfields, $Form );
 
 // ------------------- Add new field: -------------------------------
 echo '<br />';
 
-// Hidden field to detect that we press on the button 'Add'
-$Form->hidden( 'action_new_field', '' );
-
 $Form->output = false;
-$button_add_field = $Form->button( array( 'type' => 'button', 'value' => 'Add', 'id' => 'button_add_field' ) );
+$button_add_field = $Form->button( array( 'type' => 'submit', 'name' => 'actionArray[add_field]', 'value' => 'Add', 'id' => 'button_add_field' ) );
 $Form->output = true;
 
 $Form->select( 'new_field_type', '', 'callback_options_user_new_fields', T_('Add a field of type'), $button_add_field );
@@ -555,23 +478,45 @@ $Form->end_form();
 		name_onchange();
 	} );
 
-	// Action for the button when we want to add a new field in the Additional info
 	jQuery( '#button_add_field' ).click( function ()
-	{
-		if( jQuery( 'input[name=new_field_type]' ).length > 0 )
-		{	// Remove a hidden input which storing a current new field to add
-			jQuery( 'input[name=new_field_type]' ).remove();
+	{	// Action for the button when we want to add a new field in the Additional info
+		var field_id = jQuery( this ).parent().prev().find( 'option:selected' ).val();
+
+		if( field_id == '' )
+		{	// Mark select element of field types as error
+			if( ! jQuery( this ).parent().prev().hasClass( 'field_error' ) )
+			{	// To avoid if user press the button with second time when he already see an error
+				jQuery( this ).parent().prev().addClass( 'field_error' );
+				jQuery( this ).after( '<span class="field_error"><?php echo T_('Please select a field type.'); ?></span>' );
+			}
+			// We should to stop the ajax request without field_id
+			return false;
 		}
-		// Set an actions fields to add a new field
-		jQuery( 'input[name=action_new_field]' ).val( 'add' )
-																			 .after( '<input type="hidden" value="update" name="action" />' );
-		jQuery( '#user_checkchanges' ).submit();
+		else
+		{	// Remove an error class from the field
+			jQuery( this ).parent().prev().removeClass( 'field_error' );
+			jQuery( this ).parent().find( 'span.field_error' ).remove();
+		}
+
+		$.ajax({
+		type: 'POST',
+		url: htsrv_url + 'anon_async.php',
+		data: 'action=get_user_new_field&field_id=' + field_id,
+		success: function(result)
+			{
+				jQuery( '#ffield_new_field_type' ).prev().before( result );
+			}
+		});
+		return false;
 	} );
 </script>
 <?php
 
 /*
  * $Log$
+ * Revision 1.57  2011/10/18 16:20:38  efy-yurybakh
+ * Ajax implementation of "add field"
+ *
  * Revision 1.56  2011/10/18 13:13:33  efy-yurybakh
  * delete floatcenter
  *

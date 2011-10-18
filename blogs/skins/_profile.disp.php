@@ -74,6 +74,7 @@ switch( $action )
 		break;
 
 	case 'update':
+	case 'add_field':
 		$current_User->update_from_request();
 		$Messages->display();
 		break;
@@ -124,6 +125,9 @@ switch( $disp )
 
 /*
  * $Log$
+ * Revision 1.26  2011/10/18 16:20:38  efy-yurybakh
+ * Ajax implementation of "add field"
+ *
  * Revision 1.25  2011/09/17 02:31:58  fplanque
  * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
  *

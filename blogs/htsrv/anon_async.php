@@ -210,12 +210,35 @@ switch( $action )
 		}
 
 		exit(0);
+
+	case 'get_user_new_field':
+		// Used in the identity user form to add a new field
+		$field_ID = param( 'field_id', 'integer', 0 );
+
+		if( $field_ID == 0 )
+		{	// Bad request
+			exit(0);
+		}
+
+		$userfields = $DB->get_results( '
+			SELECT ufdf_ID, "0" AS uf_ID, ufdf_type, ufdf_name, "" AS uf_varchar, ufdf_required, ufdf_options
+				FROM T_users__fielddefs
+			WHERE ufdf_ID = "'.$field_ID.'"' );
+
+		$Form = new Form();
+
+		userfields_display( $userfields, $Form );
+
+		exit(0);
 }
 
 exit();
 
 /*
  * $Log$
+ * Revision 1.25  2011/10/18 16:20:37  efy-yurybakh
+ * Ajax implementation of "add field"
+ *
  * Revision 1.24  2011/10/18 13:13:32  efy-yurybakh
  * delete floatcenter
  *

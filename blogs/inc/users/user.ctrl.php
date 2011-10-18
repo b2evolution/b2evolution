@@ -175,6 +175,7 @@ if( !$Messages->has_errors() )
 			break;
 
 		case 'update':
+		case 'add_field':
 			// Check that this action request is not a CSRF hacked request:
 			$Session->assert_received_crumb( 'user' );
 
@@ -450,6 +451,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.39  2011/10/18 16:20:37  efy-yurybakh
+ * Ajax implementation of "add field"
+ *
  * Revision 1.38  2011/10/03 07:02:21  efy-yurybakh
  * bubbletips & identity_links cleanup
  *

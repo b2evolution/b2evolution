@@ -1349,9 +1349,101 @@ function callback_options_user_new_fields( $value )
 	return $field_options;
 }
 
+/**
+ * Display user fields from given array
+ *
+ * @param array User fields given from sql query with following structure:
+ * 						ufdf_ID
+ * 						uf_ID
+ * 						ufdf_type
+ * 						ufdf_name
+ * 						uf_varchar
+ * 						ufdf_required
+ * 						ufdf_option
+ * @param object Form
+ */
+function userfields_display( $userfields, $Form )
+{
+	$uf_new_fields = param( 'uf_new', 'array' );
+	foreach( $userfields as $userfield )
+	{
+		$uf_val = param( 'uf_'.$userfield->uf_ID, 'string', NULL );
+
+		if( $userfield->uf_ID == '0' )
+		{	// Set uf_ID for new (not saved) fields (recommended & require types)
+			$userfield->uf_ID = 'new['.$userfield->ufdf_ID.']';
+			if( isset( $uf_new_fields[$userfield->ufdf_ID] ) )
+				$uf_val = $uf_new_fields[$userfield->ufdf_ID];
+		}
+
+		if( is_null( $uf_val ) )
+		{	// No value submitted yet, get DB val:
+			$uf_val = $userfield->uf_varchar;
+		}
+
+		switch( $userfield->ufdf_ID )
+		{
+			case 10200:
+				$field_note = '<a href="aim:goim?screenname='.$userfield->uf_varchar.'&amp;message=Hello" class="action_icon">'.get_icon( 'play', 'imgtag', array('title'=>T_('Instant Message to user')) ).'</a>';
+				break;
+
+			case 10300:
+				$field_note = '<a href="http://wwp.icq.com/scripts/search.dll?to='.$userfield->uf_varchar.'" target="_blank" class="action_icon">'.get_icon( 'play', 'imgtag', array('title'=>T_('Search on ICQ.com')) ).'</a>';
+				break;
+
+			default:
+				if( $userfield->ufdf_type == 'url' )
+				{
+					$url = $userfield->uf_varchar;
+					if( !preg_match('#://#', $url) )
+					{
+						$url = 'http://'.$url;
+					}
+					$field_note = '<a href="'.$url.'" target="_blank" class="action_icon">'.get_icon( 'play', 'imgtag', array('title'=>T_('Visit the site')) ).'</a>';
+				}
+				else
+				{
+					$field_note = '';
+				}
+		}
+
+		// Display existing field:
+		switch( $userfield->ufdf_type )
+		{
+			case 'text':
+				$Form->textarea( 'uf_'.$userfield->uf_ID, $uf_val, 5, $userfield->ufdf_name, $field_note, 38, '', $userfield->ufdf_required == 'require' );
+				break;
+
+			case 'list':
+				$uf_options = explode( "\n", str_replace( "\r", '', $userfield->ufdf_options ) );
+				$field_params = array();
+				if( $userfield->ufdf_required == 'require' )
+				{
+					$field_params['required'] = true;
+				}
+				else
+				{	// Add empty value for not required fields
+					$uf_options = array_merge( array( '---' ), $uf_options );
+				}
+				$Form->select_input_array( 'uf_'.$userfield->uf_ID, $uf_val, $uf_options, $userfield->ufdf_name, '', $field_params );
+				break;
+
+			default:
+				$field_params = array( 'maxlength' => 255 );
+				if( $userfield->ufdf_required == 'require' )
+				{
+					$field_params['required'] = true;
+				}
+				$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, 40, $userfield->ufdf_name, $field_note, $field_params );
+		}
+	}
+}
 
 /*
  * $Log$
+ * Revision 1.93  2011/10/18 16:20:37  efy-yurybakh
+ * Ajax implementation of "add field"
+ *
  * Revision 1.92  2011/10/17 23:06:06  fplanque
  * comment teasing cleanup.
  *

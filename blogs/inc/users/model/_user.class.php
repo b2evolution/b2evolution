@@ -269,7 +269,7 @@ class User extends DataObject
 	 */
 	function load_from_Request()
 	{
-		global $DB, $Settings, $UserSettings, $GroupCache, $Messages;
+		global $DB, $Settings, $UserSettings, $GroupCache, $Messages, $action;
 		global $current_User;
 
 		$is_new_user = ( $this->ID == 0 );
@@ -380,9 +380,8 @@ class User extends DataObject
 			}
 
 			// Add a new field:
-			$action_new_field = param( 'action_new_field', 'string' );
-			if( $action_new_field == 'add' )
-			{	// Button 'Add' is pressed
+			if( $action == 'add_field' )
+			{	// Button 'Add' new field is pressed
 				$new_field_type = param( 'new_field_type', 'integer', 0 );
 				if( empty( $new_field_type ) )
 				{	// We cannot add a new field without type
@@ -2745,6 +2744,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.165  2011/10/18 16:20:37  efy-yurybakh
+ * Ajax implementation of "add field"
+ *
  * Revision 1.164  2011/10/18 12:28:13  efy-yurybakh
  * Info fields: select lists - give list of configurable options
  *
