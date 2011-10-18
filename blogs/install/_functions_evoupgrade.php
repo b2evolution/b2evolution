@@ -3031,7 +3031,8 @@ function upgrade_b2evo_tables()
 									ADD comment_helpful_addvotes INT NOT NULL DEFAULT 0 AFTER comment_nofollow ,
 									ADD comment_helpful_countvotes INT UNSIGNED NOT NULL DEFAULT 0 AFTER comment_helpful_addvotes ,
 									ADD comment_spam_addvotes INT NOT NULL DEFAULT 0 AFTER comment_helpful_countvotes ,
-									ADD comment_spam_countvotes INT UNSIGNED NOT NULL DEFAULT 0 AFTER comment_spam_addvotes' );
+									ADD comment_spam_countvotes INT UNSIGNED NOT NULL DEFAULT 0 AFTER comment_spam_addvotes ,
+									CHANGE COLUMN comment_notif_ctsk_ID comment_notif_ctsk_ID      INT(10) unsigned NULL DEFAULT NULL COMMENT "When notifications for this comment are sent through a scheduled job, what is the job ID?"');
 		task_end();
 
 		task_begin( 'Adding new user permission for spam voting...' );
@@ -3044,8 +3045,13 @@ function upgrade_b2evo_tables()
 									ADD bloggroup_perm_vote_spam_cmts tinyint NOT NULL default 0 AFTER bloggroup_perm_edit_ts' );
 		task_end();
 
+		$DB->query( 'ALTER TABLE T_country ADD COLUMN ctry_preferred tinyint(1) NOT NULL DEFAULT 0 AFTER ctry_enabled' );
+
+		$DB->query( 'ALTER TABLE T_items__subscriptions CHANGE COLUMN isub_comments isub_comments   tinyint(1) NOT NULL DEFAULT 0 COMMENT "The user wants to receive notifications for new comments on this post"' );
+
 		set_upgrade_checkpoint( '10300' );
 	}
+
 
 	if( $old_db_version < 10400 )
 	{	// 4.2 part 2
@@ -3062,6 +3068,12 @@ function upgrade_b2evo_tables()
 				VALUES ( '.$DB->quote( $start_date ).', 86400, '.$DB->quote( T_('Create posts by email') ).', '.$DB->quote( 'cron/jobs/_post_by_email.job.php' ).', '.$DB->quote( 'N;' ).' )' );
 			task_end();
 		}
+
+		$DB->query( 'ALTER TABLE T_hitlog
+								ADD COLUMN hit_disp        VARCHAR(30) DEFAULT NULL AFTER hit_uri,
+								ADD COLUMN hit_ctrl        VARCHAR(30) DEFAULT NULL AFTER hit_disp,
+								ADD COLUMN hit_response_code     INT DEFAULT NULL AFTER hit_agent_type ' );
+
 	}
 
 	/*
@@ -3229,6 +3241,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.425  2011/10/18 00:45:31  fplanque
+ * Upgrade update
+ *
  * Revision 1.424  2011/10/17 22:00:30  fplanque
  * cleanup
  *
