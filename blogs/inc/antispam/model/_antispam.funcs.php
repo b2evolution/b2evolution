@@ -212,11 +212,6 @@ function antispam_poll_abuse()
 	load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
 	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port);
 	$client->debug = $debug;
-	
-	if( function_exists('mb_internal_encoding') )
-	{	// Fixes warning on cron "Converting from  to : not supported..."
-		$client->request_charset_encoding = $GLOBALS['xmlrpc_internalencoding'] = mb_internal_encoding();
-	}
 
 	// Get datetime from last update, because we only want newer stuff...
 	$last_update = $Settings->get( 'antispam_last_update' );
@@ -345,7 +340,7 @@ function get_ban_domain( $url )
  *
  * Creates an sql command part, which is a condition, that restrict to show comments from those blogs,
  * where current user has no edit permission for comments.
- * It is used by the antispam_list.ctrl, when current_User wants to delete the affected comments.
+ * It is used by the antispam.ctrl, when current_User wants to delete the affected comments.
  * 
  * @param boolean delete draft comments
  * @param boolean delete published comments
@@ -463,6 +458,12 @@ function echo_affected_comments( $affected_comments, $status, $keyword, $noperms
 
 /*
  * $Log$
+ * Revision 1.21  2011/10/18 06:45:10  sam2kb
+ * Fixing PHP warnings "Converting from  to : not supported..."
+ *
+ * Revision 1.20  2011/09/05 14:17:26  sam2kb
+ * Refactor antispam controller
+ *
  * Revision 1.19  2011/09/04 22:13:13  fplanque
  * copyright 2011
  *

@@ -920,6 +920,11 @@
 
 			// by default the xml parser can support these 3 charset encodings
 			$this->accepted_charset_encodings = array('UTF-8', 'ISO-8859-1', 'US-ASCII');
+
+			if( function_exists('mb_internal_encoding') )
+			{	// Fixes PHP warnings "Converting from  to : not supported..."
+				$this->request_charset_encoding = $GLOBALS['xmlrpc_internalencoding'] = mb_internal_encoding();
+			}
 		}
 
 		/**
@@ -3697,6 +3702,9 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 
 /*
  * $Log$
+ * Revision 1.11  2011/10/18 06:45:09  sam2kb
+ * Fixing PHP warnings "Converting from  to : not supported..."
+ *
  * Revision 1.10  2010/02/26 22:15:47  fplanque
  * whitespace/doc/minor
  *
