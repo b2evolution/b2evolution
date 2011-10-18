@@ -342,6 +342,11 @@ class User extends DataObject
 				$field_type = ( $this->userfield_defs[$userfield->uf_ufdf_ID][0] == 'text' ) ? 'text' : 'string';
 				$uf_val = param( 'uf_'.$userfield->uf_ID, $field_type, '' );
 
+				if( $this->userfield_defs[$userfield->uf_ufdf_ID][0] == 'list' && $uf_val == '---' )
+				{	// Option list has a value '---' for empty value
+					$uf_val = '';
+				}
+
 				if( empty( $uf_val ) && $this->userfield_defs[$userfield->uf_ufdf_ID][2] == 'require' )
 				{ // Display error for empty required field
 					param_error( 'uf_'.$userfield->uf_ID, T_('Please enter a value.') );
@@ -396,6 +401,11 @@ class User extends DataObject
 				$new_field_type = param( 'new_field_type', 'integer', 0 );
 				foreach( $uf_new_fields as $uf_new_id => $uf_new_val )
 				{
+					if( $this->userfield_defs[$uf_new_id][0] == 'list' && $uf_new_val == '---' )
+					{	// Option list has a value '---' for empty value
+						$uf_new_val = '';
+					}
+
 					if( $uf_new_val != '' )
 					{ // Insert a new field in DB if it is filled
 						$this->userfield_add( (int)$uf_new_id, $uf_new_val );
@@ -2374,7 +2384,7 @@ class User extends DataObject
 			return $img_tag;
 		}
 
-		$overlay_lines = explode( "\r\n", $avatar_overlay_text);
+		$overlay_lines = explode( "\n", str_replace( "\r", '', $avatar_overlay_text ) );
 		$max_line_length = 0;
 		foreach( $overlay_lines as $line )
 		{	// Find the most long line of the overlay text
@@ -2735,6 +2745,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.164  2011/10/18 12:28:13  efy-yurybakh
+ * Info fields: select lists - give list of configurable options
+ *
  * Revision 1.163  2011/10/17 22:27:02  fplanque
  * no message
  *

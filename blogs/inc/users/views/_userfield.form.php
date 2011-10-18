@@ -66,6 +66,12 @@ $Form->begin_form( 'fform', $creating ?  T_('New user field') : T_('User field')
 		T_('Type'), '', array( 'required'=>true ) );
 
 	$Form->text_input( 'ufdf_name', $edited_Userfield->name, 50, T_('Name'), '', array( 'maxlength'=> 255, 'required'=>true ) );
+
+	// Show this textarea only for field type with "Option list"
+	echo '<div id="div_ufdf_options"'. ( $edited_Userfield->type != 'list' ? ' style="display:none"' : '' ) .'>';
+	$Form->textarea_input( 'ufdf_options', $edited_Userfield->options, 10, T_('Options'), array( 'required' => true, 'note' => T_('Enter one option per line') ) );
+	echo '</div>';
+
 	if( $edited_Userfield->required )
 	{
 		$Form->radio_input( 'ufdf_required', $edited_Userfield->required, $edited_Userfield->get_requireds(), T_('Required?'), array( 'required'=>true ) );
@@ -87,9 +93,27 @@ else
 	$Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'SaveButton' ),
 													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 }
+?>
+<script type="text/javascript">
+	jQuery( '#ufdf_type' ).change( function()
+	{	// Show textarea input only for field type with "Option list"
+		if( jQuery( this ).val() == 'list' )
+		{
+			jQuery( '#div_ufdf_options' ).show();
+		}
+		else
+		{
+			jQuery( '#div_ufdf_options' ).hide();
+		}
+	} );
+</script>
+<?php
 
 /*
  * $Log$
+ * Revision 1.10  2011/10/18 12:28:13  efy-yurybakh
+ * Info fields: select lists - give list of configurable options
+ *
  * Revision 1.9  2011/09/10 22:48:41  fplanque
  * doc
  *

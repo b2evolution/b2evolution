@@ -42,6 +42,7 @@ class Userfield extends DataObject
 {
 	var $type = '';
 	var $name = '';
+	var $options = '';
 	var $required = '';
 
 	/**
@@ -59,13 +60,14 @@ class Userfield extends DataObject
 
 		$this->delete_restrictions = array();
 
-  	$this->delete_cascades = array();
+		$this->delete_cascades = array();
 
- 		if( $db_row != NULL )
+		if( $db_row != NULL )
 		{
 			$this->ID            = $db_row->ufdf_ID;
 			$this->type          = $db_row->ufdf_type;
 			$this->name          = $db_row->ufdf_name;
+			$this->options       = $db_row->ufdf_options;
 			$this->required      = $db_row->ufdf_required;
 		}
 		else
@@ -84,6 +86,7 @@ class Userfield extends DataObject
 		return array(
 			'email'  => T_('Email address'),
 			'word'   => T_('Single word'),
+			'list'   => T_('Option list'),
 			'number' => T_('Number'),
 			'phone'  => T_('Phone number'),
 			'url'    => T_('URL'),
@@ -122,6 +125,17 @@ class Userfield extends DataObject
 		// Name
 		param_string_not_empty( 'ufdf_name', T_('Please enter a name.') );
 		$this->set_from_Request( 'name' );
+
+		// Options
+		if( param( 'ufdf_type', 'string' ) == 'list' )
+		{
+			$ufdf_options = explode( "\n", param( 'ufdf_options', 'raw' ) );
+			if( count( $ufdf_options ) < 2 )
+			{	// We don't want save an option list with one item
+				param_error( 'ufdf_options', T_('Please enter at least 2 options on 2 different lines.') );
+			}
+			$this->set_from_Request( 'options' );
+		}
 
 		// Required
 		param_string_not_empty( 'ufdf_required', T_('Please select Hidden, Optional, Recommended or Required.') );

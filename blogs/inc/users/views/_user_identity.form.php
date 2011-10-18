@@ -412,14 +412,14 @@ if( $new_field_type > 0 && $Messages->has_errors() )
 
 // -------------------  Get existing userfields: -------------------------------
 $userfields = $DB->get_results( '
-	SELECT ufdf_ID, uf_ID, ufdf_type, ufdf_name, uf_varchar, ufdf_required
+	SELECT ufdf_ID, uf_ID, ufdf_type, ufdf_name, uf_varchar, ufdf_required, ufdf_options
 		FROM T_users__fields
 			LEFT JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID
 	WHERE uf_user_ID = '.$user_id.'
 
 	UNION
 
-	SELECT ufdf_ID, "0" AS uf_ID, ufdf_type, ufdf_name, "" AS uf_varchar, ufdf_required
+	SELECT ufdf_ID, "0" AS uf_ID, ufdf_type, ufdf_name, "" AS uf_varchar, ufdf_required, ufdf_options
 		FROM T_users__fielddefs
 	WHERE ( ufdf_required IN ( "recommended", "require" )
 		AND ufdf_ID NOT IN ( SELECT uf_ufdf_ID FROM T_users__fields WHERE uf_user_ID = '.$user_id.' ) )
@@ -471,18 +471,33 @@ foreach( $userfields as $userfield )
 	}
 
 	// Display existing field:
-	if( $userfield->ufdf_type == 'text' )
+	switch( $userfield->ufdf_type )
 	{
-		$Form->textarea( 'uf_'.$userfield->uf_ID, $uf_val, 5, $userfield->ufdf_name, $field_note, 38, '', $userfield->ufdf_required == 'require' );
-	}
-	else
-	{
-		$field_params = array( 'maxlength' => 255 );
-		if( $userfield->ufdf_required == 'require' )
-		{
-			$field_params['required'] = true;
-		}
-		$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, 40, $userfield->ufdf_name, $field_note, $field_params );
+		case 'text':
+			$Form->textarea( 'uf_'.$userfield->uf_ID, $uf_val, 5, $userfield->ufdf_name, $field_note, 38, '', $userfield->ufdf_required == 'require' );
+			break;
+
+		case 'list':
+			$uf_options = explode( "\n", str_replace( "\r", '', $userfield->ufdf_options ) );
+			$field_params = array();
+			if( $userfield->ufdf_required == 'require' )
+			{
+				$field_params['required'] = true;
+			}
+			else
+			{	// Add empty value for not required fields
+				$uf_options = array_merge( array( '---' ), $uf_options );
+			}
+			$Form->select_input_array( 'uf_'.$userfield->uf_ID, $uf_val, $uf_options, $userfield->ufdf_name, '', $field_params );
+			break;
+
+		default:
+			$field_params = array( 'maxlength' => 255 );
+			if( $userfield->ufdf_required == 'require' )
+			{
+				$field_params['required'] = true;
+			}
+			$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, 40, $userfield->ufdf_name, $field_note, $field_params );
 	}
 }
 
@@ -557,6 +572,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.55  2011/10/18 12:28:13  efy-yurybakh
+ * Info fields: select lists - give list of configurable options
+ *
  * Revision 1.54  2011/10/17 06:30:07  efy-yurybakh
  * fix add field
  *

@@ -3117,6 +3117,11 @@ function upgrade_b2evo_tables()
 						SET ftyp_icon = "file_video"
 						WHERE ftyp_extensions IN ( "mp4", "mov", "m4v" )' );
 
+		// Add new field "ufdf_options" to save a values of the Option list
+		task_begin( 'Upgrading user fields...' );
+		$DB->query( 'ALTER TABLE T_users__fielddefs
+						ADD ufdf_options TEXT NOT NULL AFTER ufdf_name' );
+		task_end();
 	}
 
 	/*
@@ -3284,6 +3289,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.427  2011/10/18 12:28:13  efy-yurybakh
+ * Info fields: select lists - give list of configurable options
+ *
  * Revision 1.426  2011/10/18 10:18:28  efy-yurybakh
  * proper upgrade of filetypes
  *
