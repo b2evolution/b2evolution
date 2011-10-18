@@ -729,7 +729,25 @@ class Plugin
 		return false;		// Do nothing by default.
 	}
 
-
+	/**
+	 * Event handler: Called when displaying editor buttons (in front-office).
+	 *
+	 * This method, if implemented, should output the buttons
+	 * (probably as html INPUT elements) and return true, if
+	 * button(s) have been displayed.
+	 *
+	 * You should provide an unique html ID with your button.
+	 *
+	 * @param array Associative array of parameters.
+	 *   - 'target_type': either 'Comment' or 'Item'.
+	 *   - 'edit_layout': "simple", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
+	 *                    NOTE: Please respect the "simple" mode, which should display only the most simple things!
+	 * @return boolean did we display a button?
+	 */
+	function DisplayEditorButton( $params )
+	{
+		return false;		// Do nothing by default.
+	}
 	/**
 	 * Event handler: Called when displaying editor toolbars.
 	 *
@@ -1299,6 +1317,21 @@ class Plugin
 	 * @return boolean did we display something?
 	 */
 	function AdminDisplayItemFormFieldset( & $params )
+	{
+		return false;		// Do nothing by default.
+	}
+
+	/**
+	 * Event handler: Called at the end of the "Edit item" form in front-office.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the {@link Form} object (by reference)
+	 *   - 'Item': the Item which gets edited (by reference)
+	 *   - 'edit_layout': "simple", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
+	 *                    NOTE: Please respect the "simple" mode, which should display only the most simple things!
+	 * @return boolean did we display something?
+	 */
+	function DisplayItemFormFieldset( & $params )
 	{
 		return false;		// Do nothing by default.
 	}
@@ -3096,6 +3129,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.52  2011/10/18 08:37:21  efy-vitalij
+ * added event handlers DisplayEditorButton, DisplayItemFormFieldset
+ *
  * Revision 1.51  2011/10/17 22:00:31  fplanque
  * cleanup
  *
