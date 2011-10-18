@@ -4445,41 +4445,6 @@ function generate_random_ip()
  	return mt_rand(0, 255).'.'.mt_rand(0, 255).'.'.mt_rand(0, 255).'.'.mt_rand(0, 255);
 }
 
-
-// fp>vitaliy: move to a file that is not included everywhere!
-/**
- * Generate html response code class
- * @param integer response code
- * @return string class
- */
-function hit_response_code_class($hit_response_code)
-{
-	$class = '';
-	
-	if ($hit_response_code >= 200 && $hit_response_code < 300)
-	{
-		$class =  "code_2xx";
-	}
-	if ($hit_response_code >= 300 && $hit_response_code < 400)
-	{
-		$class =  "code_3xx";
-	}
-
-	if ($hit_response_code == 304)
-	{
-		$class =  "code_304";
-	}
-
-	if ($hit_response_code >= 400)
-	{
-		$class =  "code_4xx";
-	}
-
-
-	return $class;
-}
-
-
 // fp>vitaliy: move to a file that is not included everywhere!
 /**
  * Update global $http_response_code and call function header()
@@ -4586,6 +4551,9 @@ if( !function_exists( 'sys_get_temp_dir' ) )
 
 /*
  * $Log$
+ * Revision 1.295  2011/10/18 08:14:42  efy-vitalij
+ * removed function hit_response_code_class
+ *
  * Revision 1.294  2011/10/18 01:13:18  fplanque
  * no message
  *
