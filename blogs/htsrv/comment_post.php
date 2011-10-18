@@ -371,9 +371,16 @@ if( $action == 'preview' )
 	{	// Comment contains an email address, We should show an error about this
 		if( $Settings->get( 'newusers_canregister' ) )
 		{	// Users can register and we give them a links to log in and registration
-			$link_log_in = get_user_login_link( '', '', T_( 'log in' ), '#', 'blocked comment email', $commented_Item->get_url( 'public_view' ) );
-			$link_register = get_user_register_link( '', '', T_( 'create an account now' ), '#', false, $commented_Item->get_url( 'public_view' ), 'blocked comment email' );
-			$Messages->add( sprintf( T_('Your comment contains an email address. Please %s or %s instead. This will allow people to send you private messages without revealing your email address to SPAM robots.'), $link_log_in, $link_register ), 'error' );
+			$link_log_in = 'href="'.get_login_url( 'blocked comment email', $commented_Item->get_url( 'public_view' ) ).'"';
+			$link_register = 'href="'.get_user_register_url( $commented_Item->get_url( 'public_view' ), 'blocked comment email' ).'"';
+			$Messages->add( sprintf( T_('Your comment contains an email address. Please <a %s>log in</a> or <a %s>create an account now</a> instead. This will allow people to send you private messages without revealing your email address to SPAM robots.'), $link_log_in, $link_register ), 'error' );
+
+			// Save the user data if he will go to register form after this action
+			$register_user = array(
+				'name' => $Comment->author,
+				'email' => $Comment->author_email
+			);
+			$Session->set( 'core.register_user', $register_user );
 		}
 		else
 		{	// No registration
@@ -520,6 +527,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.158  2011/10/18 09:16:18  efy-yurybakh
+ * If there is an email address in a comment, do not allow posting the comment (changes)
+ *
  * Revision 1.157  2011/10/17 23:30:53  fplanque
  * cleanup
  *
