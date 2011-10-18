@@ -38,7 +38,7 @@ global $current_User;
 // Check minimum permission:
 if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
 {
-	$Messages->add( 'Sorry, you are not allowed to view messages!' );
+	$Messages->add( T_('Sorry, you are not allowed to view messages!') );
 	header_redirect( $admin_url );
 }
 
@@ -67,14 +67,14 @@ if( param( 'thrd_ID', 'integer', '', true) )
 	{	// Thread doesn't exists with this ID
 		unset( $edited_Thread );
 		forget_param( 'thrd_ID' );
-		$Messages->add( T_('The requested thread does not exist any longer.', 'error' );
+		$Messages->add( T_('The requested thread does not exist any longer.'), 'error' );
 		$action = 'nil';
 	}
 	else if( ! $edited_Thread->check_thread_recipient( $current_User->ID ) && ! $perm_abuse_management )
 	{	// Current user is not recipient of this thread and he is not abuse manager
 		unset( $edited_Thread );
 		forget_param( 'thrd_ID' );
-		$Messages->add( T_('You are not allowed to view this thread.', 'error' );
+		$Messages->add( T_('You are not allowed to view this thread.'), 'error' );
 		$action = 'nil';
 	}
 }
@@ -85,7 +85,7 @@ if( param( 'msg_ID', 'integer', '', true) )
 	if( ($edited_Message = & $MessageCache->get_by_ID( $msg_ID, false )) === false )
 	{	unset( $edited_Message );
 		forget_param( 'msg_ID' );
-		$Messages->add( 'The requested message does not exist any longer.', 'error' );
+		$Messages->add( T_('The requested message does not exist any longer.'), 'error' );
 		$action = 'nil';
 	}
 }
@@ -218,6 +218,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.25  2011/10/18 17:10:25  efy-yurybakh
+ * translation
+ *
  * Revision 1.24  2011/10/18 00:04:45  fplanque
  * i18n update
  *
