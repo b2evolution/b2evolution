@@ -67,14 +67,14 @@ if( param( 'thrd_ID', 'integer', '', true) )
 	{	// Thread doesn't exists with this ID
 		unset( $edited_Thread );
 		forget_param( 'thrd_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Thread') ), 'error' );
+		$Messages->add( T_('The requested thread does not exist any longer.', 'error' );
 		$action = 'nil';
 	}
 	else if( ! $edited_Thread->check_thread_recipient( $current_User->ID ) && ! $perm_abuse_management )
 	{	// Current user is not recipient of this thread and he is not abuse manager
 		unset( $edited_Thread );
 		forget_param( 'thrd_ID' );
-		$Messages->add( sprintf( T_('You are not allowed to view this &laquo;%s&raquo;.'), T_('Thread') ), 'error' );
+		$Messages->add( T_('You are not allowed to view this thread.', 'error' );
 		$action = 'nil';
 	}
 }
@@ -85,7 +85,7 @@ if( param( 'msg_ID', 'integer', '', true) )
 	if( ($edited_Message = & $MessageCache->get_by_ID( $msg_ID, false )) === false )
 	{	unset( $edited_Message );
 		forget_param( 'msg_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Message') ), 'error' );
+		$Messages->add( 'The requested message does not exist any longer.', 'error' );
 		$action = 'nil';
 	}
 }
@@ -116,7 +116,7 @@ switch( $action )
 
 		if( ! $edited_Thread->check_thread_recipient( $current_User->ID ) )
 		{	// Deny to write a new message for not involved in users
-			$Messages->add( T_('You cannot write a message here.'), 'error' );
+			$Messages->add( T_('You cannot post a message in a thread you\'re not involved in.'), 'error' );
 			header_redirect( '?ctrl=messages&thrd_ID='.$thrd_ID.$param_tab, 303 ); // Will EXIT
 		}
 
@@ -218,6 +218,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.24  2011/10/18 00:04:45  fplanque
+ * i18n update
+ *
  * Revision 1.23  2011/10/17 18:33:53  efy-yurybakh
  * Messaging Abuse Management (don't allow posting in foreign threads)
  *

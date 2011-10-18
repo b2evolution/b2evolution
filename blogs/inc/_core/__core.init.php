@@ -926,17 +926,6 @@ class _core_Module extends Module
 								'features' => array(
 									'text' => T_('Features'),
 									'href' => '?ctrl=features' ),
-								'remotepublish' => array(
-									'text' => T_('Remote Publishing'),
-									'href' => '?ctrl=remotepublish',
-									'entries' => array(
-										'eblog' => array(
-											'text' => T_('Post by Email'),
-											'href' => '?ctrl=remotepublish&amp;tab=eblog' ),
-										'xmlrpc' => array(
-											'text' => T_('XML-RPC'),
-											'href' => '?ctrl=remotepublish&amp;tab=xmlrpc' )
-										) ),
 								'regional' => array(
 									'text' => T_('Regional'),
 									'href' => '?ctrl=locales'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ),
@@ -954,6 +943,17 @@ class _core_Module extends Module
 								'plugins' => array(
 									'text' => T_('Plugins'),
 									'href' => '?ctrl=plugins'),
+								'remotepublish' => array(
+									'text' => T_('Remote Publishing'),
+									'href' => '?ctrl=remotepublish',
+									'entries' => array(
+										'eblog' => array(
+											'text' => T_('Post by Email'),
+											'href' => '?ctrl=remotepublish&amp;tab=eblog' ),
+										'xmlrpc' => array(
+											'text' => T_('XML-RPC'),
+											'href' => '?ctrl=remotepublish&amp;tab=xmlrpc' )
+										) ),
 							)
 						),
 					) );
@@ -1077,6 +1077,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.93  2011/10/18 00:04:45  fplanque
+ * i18n update
+ *
  * Revision 1.92  2011/10/17 20:14:24  sam2kb
  * Post by Email converted into internal scheduled job
  *

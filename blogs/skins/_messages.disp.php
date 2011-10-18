@@ -44,13 +44,13 @@ if( $thrd_ID = param( 'thrd_ID', 'integer', '', true) )
 	{	// Thread doesn't exists with this ID
 		unset( $edited_Thread );
 		forget_param( 'thrd_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Thread') ), 'error' );
+		$Messages->add( 'The requested thread does not exist any longer.', 'error' );
 	}
 	else if( ! $edited_Thread->check_thread_recipient( $current_User->ID ) )
 	{	// Current user is not recipient of this thread
 		unset( $edited_Thread );
 		forget_param( 'thrd_ID' );
-		$Messages->add( sprintf( T_('You are not allowed to view this &laquo;%s&raquo;.'), T_('Thread') ), 'error' );
+		$Messages->add( T_('You are not allowed to view this thread.', 'error' );
 	}
 }
 
@@ -88,6 +88,9 @@ if( isset( $edited_Thread ) )
 
 /*
  * $Log$
+ * Revision 1.9  2011/10/18 00:04:45  fplanque
+ * i18n update
+ *
  * Revision 1.8  2011/10/13 18:08:17  efy-yurybakh
  * fix bug in the message list
  *

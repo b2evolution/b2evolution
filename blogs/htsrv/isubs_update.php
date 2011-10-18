@@ -145,7 +145,7 @@ switch( $isub_type )
 					$reg_type = 'also_attended';
 					break;
 				default:
-					$Messages->add( T_( 'Invalid list type received' ), 'error' );
+					$Messages->add( 'Invalid list type received', 'error' );
 			}
 			if( $new_attendee_User )
 			{
@@ -226,6 +226,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.16  2011/10/18 00:04:44  fplanque
+ * i18n update
+ *
  * Revision 1.15  2011/10/14 04:43:49  efy-asimo
  * Admin add attendee radio select - update
  *

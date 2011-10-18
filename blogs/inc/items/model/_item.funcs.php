@@ -2094,7 +2094,7 @@ function check_item_perm_edit( $post_ID, $do_redirect = true )
 	{
 		if( $do_redirect )
 		{	// Redirect to the login page for anonymous users
-			$Messages->add( T_( 'You must log in to create & edit a posts.' ) );
+			$Messages->add( T_( 'You must log in to create & edit posts.' ) );
 			header_redirect( get_login_url('cannot edit posts'), 302 );
 			// will have exited
 		}
@@ -2218,6 +2218,9 @@ function get_item_new_link( $before = '', $after = '', $link_text = '', $link_ti
 
 /*
  * $Log$
+ * Revision 1.152  2011/10/18 00:04:45  fplanque
+ * i18n update
+ *
  * Revision 1.151  2011/10/14 07:23:09  efy-yurybakh
  * In skin posting (categories permission)
  *
