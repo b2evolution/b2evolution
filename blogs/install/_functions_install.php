@@ -124,7 +124,7 @@ function display_base_config_recap()
  */
 function install_newdb()
 {
-	global $new_db_version;
+	global $new_db_version, $admin_url, $random_password;
 
 	/*
 	 * -----------------------------------------------------------------------------------
@@ -189,6 +189,19 @@ function install_newdb()
 
 		create_demo_contents();
 	}
+
+	echo '<h2>'.T_('Installation successful!').'</h2>';
+
+	echo '<p><strong>';
+	printf( T_('Now you can <a %s>log in</a> with the following credentials:'), 'href="'.$admin_url.'"' );
+	echo '</strong></p>';
+
+	echo '<table>';
+	echo '<tr><td>', T_( 'Login' ), ': &nbsp;</td><td><strong><evo:password>admin</evo:password></strong></td></tr>';
+	printf( '<tr><td>%s: &nbsp;</td><td><strong><evo:password>%s</evo:password></strong></td></tr>', T_( 'Password' ), $random_password );
+	echo '</table>';
+
+	echo '<p>'.T_('Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.').'</p>';
 }
 
 
@@ -845,6 +858,9 @@ function get_antispam_query()
 
 /*
  * $Log$
+ * Revision 1.107  2011/10/18 00:17:50  fplanque
+ * rollback of unwanted scrollable window
+ *
  * Revision 1.106  2011/10/17 15:10:30  efy-yurybakh
  * If there is an email address in a comment, do not allow posting the comment
  *
