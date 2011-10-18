@@ -1010,7 +1010,7 @@ class Table extends Widget
 		}
 	}
 
-		/**
+	/**
 	 * Handle variable subtitutions for class column contents.
 	 *
 	 * This is one of the key functions to look at when you want to use the Results class.
@@ -1027,7 +1027,7 @@ class Table extends Widget
 			}
 			else
 			{
-				$content = str_replace($matchesarray[0],$matchesarray[1] , $content);
+				$content = str_replace($matchesarray[0], 'NULL' , $content);
 			}
 		}
 
@@ -1044,6 +1044,9 @@ class Table extends Widget
 
 /*
  * $Log$
+ * Revision 1.24  2011/10/18 07:43:17  efy-vitalij
+ * changed function parse_class_content
+ *
  * Revision 1.23  2011/10/13 12:46:03  efy-vitalij
  * changed function parse_class_content
  *
