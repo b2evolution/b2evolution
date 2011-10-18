@@ -801,8 +801,6 @@ class Hit
 
 		// Extract the serprank from search referers:
 		$serprank = $this->get_serprank();
-
-    // fp>vitaliy : get rid of this and just use the already existing global $http_response_code  (make sure it's updated correctly everywhere though)
 		$this->hit_response_code = $http_response_code;
 		// insert hit into DB table:
 		if (empty($this->test_mode))
@@ -811,7 +809,7 @@ class Hit
 				INSERT INTO T_hitlog(
 					hit_sess_ID, hit_datetime, hit_uri, hit_disp, hit_ctrl, hit_referer_type,
 					hit_referer, hit_referer_dom_ID, hit_keyphrase_keyp_ID, hit_serprank, hit_blog_ID, hit_remote_addr, hit_agent_type, hit_response_code )
-				VALUES( '".$this->session_id."', FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($hit_uri)."', ".$DB->quote($disp).", ".$DB->quote($ctrl).", '".$this->referer_type
+				VALUES( '".$Session->ID."', FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($hit_uri)."', ".$DB->quote($disp).", ".$DB->quote($ctrl).", '".$this->referer_type
 					."', '".$DB->escape($hit_referer)."', ".$DB->null($this->get_referer_domain_ID()).', '.$DB->null($keyp_ID)
 					.', '.$DB->null($serprank).', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', '".$this->get_agent_type()."', ".$DB->null($this->hit_response_code).")";
 		}
@@ -1593,6 +1591,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.80  2011/10/18 06:09:14  efy-vitalij
+ * fix hit class error
+ *
  * Revision 1.79  2011/10/18 01:13:18  fplanque
  * no message
  *
