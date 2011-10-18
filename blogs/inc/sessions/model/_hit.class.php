@@ -184,14 +184,20 @@ class Hit
 
 	 /**
 	  * Test mode
-		* fp>vitaliy what is this for?
-		* Test what & when?
+	  * The mode used by geneartion of a fake statisctics. In this case test_mode = 1
+	  * fp>vitaliy what is this for?
+	  * Test what & when?
+	  * 
 	  */
 	 var $test_mode;
 
 	 /**
 	  * Test rss mode
-		* fp>vitaliy what is this for?
+	  * fp>vitaliy what is this for?
+	  * Test_rss is used for geneartion of fake statistics. In the normal mode
+	  * Hit class determines rss hit using $Skin->type == 'feed'. In the test mode
+	  * skin type doesn't change and that is why the new variable was needed to emulate
+	  * skin type.
 	  */
 	 var $test_rss;
 
@@ -1591,6 +1597,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.81  2011/10/18 08:07:10  efy-vitalij
+ * add comments
+ *
  * Revision 1.80  2011/10/18 06:09:14  efy-vitalij
  * fix hit class error
  *
