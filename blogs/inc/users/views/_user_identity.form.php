@@ -558,20 +558,23 @@ $Form->end_form();
 	// Action for the button when we want to add a new field in the Additional info
 	jQuery( '#button_add_field' ).click( function ()
 	{
-		if( $( 'input[name=new_field_type]' ).length > 0 )
+		if( jQuery( 'input[name=new_field_type]' ).length > 0 )
 		{	// Remove a hidden input which storing a current new field to add
-			$( 'input[name=new_field_type]' ).remove();
+			jQuery( 'input[name=new_field_type]' ).remove();
 		}
 		// Set an actions fields to add a new field
-		$( 'input[name=action_new_field]' ).val( 'add' )
+		jQuery( 'input[name=action_new_field]' ).val( 'add' )
 																			 .after( '<input type="hidden" value="update" name="action" />' );
-		$( '#user_checkchanges' ).submit();
+		jQuery( '#user_checkchanges' ).submit();
 	} );
 </script>
 <?php
 
 /*
  * $Log$
+ * Revision 1.56  2011/10/18 13:13:33  efy-yurybakh
+ * delete floatcenter
+ *
  * Revision 1.55  2011/10/18 12:28:13  efy-yurybakh
  * Info fields: select lists - give list of configurable options
  *

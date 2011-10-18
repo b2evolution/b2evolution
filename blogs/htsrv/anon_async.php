@@ -168,7 +168,7 @@ switch( $action )
 
 			echo '<div class="bubbletip_anon">';
 
-			echo $Comment->get_avatar( 'fit-160x160', 'bCommentAvatar floatcenter');
+			echo $Comment->get_avatar( 'fit-160x160', 'bCommentAvatarCenter' );
 			echo '<div>'.$Comment->get_author_name_anonymous().'</div>';
 			echo '<div>'.T_('This user is not registered on this site.').'</div>';
 			echo $Comment->get_author_url_link( '', '<div>', '</div>');
@@ -216,6 +216,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.24  2011/10/18 13:13:32  efy-yurybakh
+ * delete floatcenter
+ *
  * Revision 1.23  2011/10/11 10:54:13  efy-yurybakh
  * bubble tip bugs
  *

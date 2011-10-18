@@ -35,10 +35,6 @@ code {
 .floatright {
 	float: right;
 }
-.floatcenter {
-	float: none !important;
-	margin: 0 auto !important;
-}
 .clear{
 	clear: both;
 }
