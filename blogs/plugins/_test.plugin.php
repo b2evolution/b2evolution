@@ -390,6 +390,21 @@ class test_plugin extends Plugin
 		return true;
 	}
 
+	/**
+	 * Event handler: Called when displaying editor buttons (in front-office).
+	 *
+	 * @see Plugin::DisplayEditorButton()
+	 * @param array Associative array of parameters
+	 * @return boolean did we display ?
+	 */
+	function DisplayEditorButton( & $params )
+	{
+		?>
+		<input type="button" value="TEST" onclick="alert('Hi! This is the TEST plugin (DisplayEditorButton)!');" />
+		<?php
+		return true;
+	}
+
 
 	/**
 	 * @see Plugin::AdminDisplayItemFormFieldset()
@@ -398,6 +413,16 @@ class test_plugin extends Plugin
 	{
 		$params['Form']->begin_fieldset( 'TEST plugin' );
 		$params['Form']->info_field( 'TEST plugin', 'This is the TEST plugin responding to the AdminDisplayItemFormFieldset event.' );
+		$params['Form']->end_fieldset( 'Foo' );
+	}
+
+	/**
+	 * @see Plugin::DisplayItemFormFieldset()
+	 */
+	function DisplayItemFormFieldset( & $params )
+	{
+		$params['Form']->begin_fieldset( 'TEST plugin' );
+		$params['Form']->info_field( 'TEST plugin', 'This is the TEST plugin responding to the DisplayItemFormFieldset event.' );
 		$params['Form']->end_fieldset( 'Foo' );
 	}
 
@@ -885,6 +910,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.95  2011/10/18 08:39:42  efy-vitalij
+ * adde event handlers DisplayItemFormFieldset, DisplayEditorButton
+ *
  * Revision 1.94  2011/10/17 22:00:31  fplanque
  * cleanup
  *
