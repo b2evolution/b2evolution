@@ -286,10 +286,45 @@ function stats_search_keywords( $keyphrase, $length = 45 )
 	return '<span title="'.format_to_output( $keyphrase_orig, 'htmlattr' ).'">'.$keyphrase.'</span>';
 }
 
+// fp>vitaliy: move to a file that is not included everywhere!
+/**
+ * Generate html response code class
+ * @param integer response code
+ * @return string class
+ */
+function hit_response_code_class($hit_response_code)
+{
+	$class = '';
+
+	if ($hit_response_code >= 200 && $hit_response_code < 300)
+	{
+		$class =  "code_2xx";
+	}
+	if ($hit_response_code >= 300 && $hit_response_code < 400)
+	{
+		$class =  "code_3xx";
+	}
+
+	if ($hit_response_code == 304)
+	{
+		$class =  "code_304";
+	}
+
+	if ($hit_response_code >= 400)
+	{
+		$class =  "code_4xx";
+	}
+
+
+	return $class;
+}
 
 
 /*
  * $Log$
+ * Revision 1.23  2011/10/18 08:08:42  efy-vitalij
+ * add function hit_response_code_class
+ *
  * Revision 1.22  2011/09/04 22:13:18  fplanque
  * copyright 2011
  *
