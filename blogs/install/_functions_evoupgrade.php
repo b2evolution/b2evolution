@@ -3074,6 +3074,49 @@ function upgrade_b2evo_tables()
 								ADD COLUMN hit_ctrl        VARCHAR(30) DEFAULT NULL AFTER hit_disp,
 								ADD COLUMN hit_response_code     INT DEFAULT NULL AFTER hit_agent_type ' );
 
+		// Update ftyp_icon column
+		// Last versions used a image file name for this field,
+		// but from now we should use a icon name from the file /conf/_icons.php
+		$DB->query( 'UPDATE T_filetypes
+						SET ftyp_icon = "file_image"
+						WHERE ftyp_extensions IN ( "gif", "png", "jpg jpeg" )' );
+		$DB->query( 'UPDATE T_filetypes
+						SET ftyp_icon = "file_document"
+						WHERE ftyp_extensions = "txt"' );
+		$DB->query( 'UPDATE T_filetypes
+						SET ftyp_icon = "file_www"
+						WHERE ftyp_extensions = "htm html"' );
+		$DB->query( 'UPDATE T_filetypes
+						SET ftyp_icon = "file_pdf"
+						WHERE ftyp_extensions = "pdf"' );
+		$DB->query( 'UPDATE T_filetypes
+						SET ftyp_icon = "file_doc"
+						WHERE ftyp_extensions = "doc"' );
+		$DB->query( 'UPDATE T_filetypes
+						SET ftyp_icon = "file_xls"
+						WHERE ftyp_extensions = "xls"' );
+		$DB->query( 'UPDATE T_filetypes
+						SET ftyp_icon = "file_ppt"
+						WHERE ftyp_extensions = "ppt"' );
+		$DB->query( 'UPDATE T_filetypes
+						SET ftyp_icon = "file_pps"
+						WHERE ftyp_extensions = "pps"' );
+		$DB->query( 'UPDATE T_filetypes
+						SET ftyp_icon = "file_zip"
+						WHERE ftyp_extensions = "zip"' );
+		$DB->query( 'UPDATE T_filetypes
+						SET ftyp_icon = "file_php"
+						WHERE ftyp_extensions = "php php3 php4 php5 php6"' );
+		$DB->query( 'UPDATE T_filetypes
+						SET ftyp_icon = ""
+						WHERE ftyp_extensions = "css"' );
+		$DB->query( 'UPDATE T_filetypes
+						SET ftyp_icon = "file_sound"
+						WHERE ftyp_extensions IN ( "mp3", "m4a" )' );
+		$DB->query( 'UPDATE T_filetypes
+						SET ftyp_icon = "file_video"
+						WHERE ftyp_extensions IN ( "mp4", "mov", "m4v" )' );
+
 	}
 
 	/*
@@ -3241,6 +3284,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.426  2011/10/18 10:18:28  efy-yurybakh
+ * proper upgrade of filetypes
+ *
  * Revision 1.425  2011/10/18 00:45:31  fplanque
  * Upgrade update
  *
