@@ -81,7 +81,7 @@ echo $User->get_avatar_imgtag( $avatar_image_size, 'rightmargin', '', true, $ava
 
 $ProfileForm->begin_fieldset( T_('Identity') );
 
-  $ProfileForm->info( T_('Login'), $User->get_colored_name() );
+	$ProfileForm->info( T_('Login'), $User->get_colored_name() );
 
 	$ProfileForm->info( T_('Name'), $User->get( 'preferredname' ) );
 
@@ -96,39 +96,39 @@ $ProfileForm->begin_fieldset( T_('Identity') );
 		$user_Country = $CountryCache->get_by_ID( $User->ctry_ID );
 		$ProfileForm->info( T_( 'Country' ), $user_Country->get_name() );
 	}
-  else
-  {
-    $ProfileForm->info( T_( 'Country' ), '' );
-  }
+	else
+	{
+		$ProfileForm->info( T_( 'Country' ), '' );
+	}
 
-  $ProfileForm->info( T_( 'ZIP/Postcode' ), $User->dget('postcode','htmlbody') );
+	$ProfileForm->info( T_( 'ZIP/Postcode' ), $User->dget('postcode','htmlbody') );
 
-  $ProfileForm->info( T_( 'My age group' ), sprintf( T_('from %d to %d years old'), $User->get('age_min'), $User->get('age_max') ) );
+	$ProfileForm->info( T_( 'My age group' ), sprintf( T_('from %d to %d years old'), $User->get('age_min'), $User->get('age_max') ) );
 
 	$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=msgform&recipient_id='.$User->ID, '&' );
 	$msgform_url = $User->get_msgform_url( $Blog->get('msgformurl'), $redirect_to );
 	if( !empty($msgform_url) )
 	{
-	  $ProfileForm->info( T_('Contact'), '<a href="'.$msgform_url.'">'.T_('Send a message').'</a>' );
+		$ProfileForm->info( T_('Contact'), '<a href="'.$msgform_url.'">'.T_('Send a message').'</a>' );
 	}
 	else
 	{
-	  if( is_logged_in() && $User->accepts_pm() )
-	  {
-	    global $current_User;
-	    if( $current_User->accepts_pm() )
-	    {
-	      $ProfileForm->info( T_('Contact'), T_('You cannot send a private message to yourself.') );
-	    }
-	    else
-	    {
-	      $ProfileForm->info( T_('Contact'), T_('This user can only be contacted through private messages but you are not allowed to send any private messages.') );
-	    }
-	  }
-	  else
-	  {
-	    $ProfileForm->info( T_('Contact'), T_('This user does not wish to be contacted directly.') );
-	  }
+		if( is_logged_in() && $User->accepts_pm() )
+		{
+			global $current_User;
+			if( $current_User->accepts_pm() )
+			{
+				$ProfileForm->info( T_('Contact'), T_('You cannot send a private message to yourself.') );
+			}
+			else
+			{
+				$ProfileForm->info( T_('Contact'), T_('This user can only be contacted through private messages but you are not allowed to send any private messages.') );
+			}
+		}
+		else
+		{
+			$ProfileForm->info( T_('Contact'), T_('This user does not wish to be contacted directly.') );
+		}
 	}
 
 	if( !empty($User->url) )
@@ -164,9 +164,18 @@ echo '<div class="clear"></div>';
 
 $ProfileForm->end_form();
 
+if( $User->ID == $current_User->ID )
+{	// Display edit link profile for owner
+	echo '<div class="center">';
+	echo '<a href="'.url_add_param( $Blog->get('url'), 'disp=profile' ).'">'.T_('Edit my profile').'</a>';
+	echo '</div>';
+}
 
 /*
  * $Log$
+ * Revision 1.31  2011/10/19 12:33:50  efy-yurybakh
+ * link "Edit my profile"
+ *
  * Revision 1.30  2011/10/11 02:05:42  fplanque
  * i18n/wording cleanup
  *
