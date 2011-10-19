@@ -400,14 +400,6 @@ else
 	$user_id = $edited_User->ID;
 }
 
-global $Messages;
-$userfields_new_sql = '';
-$new_field_type = param( 'new_field_type', 'integer', 0 );
-if( $new_field_type > 0 && $Messages->has_errors() )
-{	// Means we want to add a new field (step 2)
-	$userfields_new_sql = 'OR ufdf_ID = "'.$new_field_type.'"';
-}
-
 // -------------------  Get existing userfields: -------------------------------
 $userfields = $DB->get_results( '
 	SELECT ufdf_ID, uf_ID, ufdf_type, ufdf_name, uf_varchar, ufdf_required, ufdf_options
@@ -419,13 +411,31 @@ $userfields = $DB->get_results( '
 
 	SELECT ufdf_ID, "0" AS uf_ID, ufdf_type, ufdf_name, "" AS uf_varchar, ufdf_required, ufdf_options
 		FROM T_users__fielddefs
-	WHERE ( ufdf_required IN ( "recommended", "require" )
-		AND ufdf_ID NOT IN ( SELECT uf_ufdf_ID FROM T_users__fields WHERE uf_user_ID = '.$user_id.' ) )
-		'.$userfields_new_sql.'
+	WHERE ufdf_required IN ( "recommended", "require" )
+		AND ufdf_ID NOT IN ( SELECT uf_ufdf_ID FROM T_users__fields WHERE uf_user_ID = '.$user_id.' )
 
 	ORDER BY 1, 2' );
 
 userfields_display( $userfields, $Form );
+
+// -------------------  Display new added userfields: -------------------------------
+global $add_field_types, $Messages;
+
+if( $Messages->has_errors() )
+{	// Display new added fields(from submitted form) only if errors are exist
+	if( is_array( $add_field_types ) && count( $add_field_types ) > 0 )
+	{	// This case happens when user add a new required field and he doesn't fill it, then we should show all fields again
+		foreach( $add_field_types as $add_field_type )
+		{	// We use "foreach" because sometimes user add a many fields with the same type
+			$userfields = $DB->get_results( '
+			SELECT ufdf_ID, "0" AS uf_ID, ufdf_type, ufdf_name, "" AS uf_varchar, ufdf_required, ufdf_options
+				FROM T_users__fielddefs
+			WHERE ufdf_ID = "'.$add_field_type.'"' );
+
+			userfields_display( $userfields, $Form, 'add' );
+		}
+	}
+}
 
 // ------------------- Add new field: -------------------------------
 echo '<br />';
@@ -510,9 +520,9 @@ $Form->end_form();
 		return false;
 	} );
 	
-	jQuery( '[name^=uf_new]' ).live( 'focus', function ()
+	jQuery( '[name^=uf_new], [name^=uf_add]' ).live( 'focus', function ()
 	{	// Auto select the value for the field of type
-		var field_id = parseInt( jQuery( this ).attr( 'name' ).replace( /uf_new\[(\d+)\]\[\]/, '$1' ) );
+		var field_id = parseInt( jQuery( this ).attr( 'name' ).replace( /uf_(new|add)\[(\d+)\]\[\]/, '$2' ) );
 		if( field_id > 0 )
 		{
 			jQuery( '#new_field_type' ).val( field_id );
@@ -523,6 +533,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.60  2011/10/19 12:14:59  efy-yurybakh
+ * default empty value for required option fields
+ *
  * Revision 1.59  2011/10/19 07:33:39  efy-yurybakh
  * Additional info fields - step 2 (SECURITY)
  *

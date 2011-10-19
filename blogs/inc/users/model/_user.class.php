@@ -379,7 +379,7 @@ class User extends DataObject
 				}
 			}
 
-			// Add a new field:
+			// Add a new field: (JS is not enabled)
 			if( $action == 'add_field' )
 			{	// Button 'Add' new field is pressed
 				$new_field_type = param( 'new_field_type', 'integer', 0 );
@@ -389,30 +389,55 @@ class User extends DataObject
 				}
 				else
 				{	// Mark a new field to enter a value
-					param_error( 'uf_new['.$new_field_type.'][]', T_('Please enter a value in this new field.') );
+					param_error( 'uf_add['.$new_field_type.'][]', T_('Please enter a value in this new field.') );
 				}
+
+				// Save an adding field to display it again if errors will be exist
+				global $add_field_types;
+				$add_field_types = array( $new_field_type );
 			}
 
-			// NEW recommended & require fields
+			// Save a New recommended & require fields AND Adding fields
 			$uf_new_fields = param( 'uf_new', 'array' );
-			if( count( $uf_new_fields ) > 0 )
+			$uf_add_fields = param( 'uf_add', 'array' );
+			if( count( $uf_new_fields ) > 0 || count( $uf_add_fields ) > 0 )
 			{
-				foreach( $uf_new_fields as $uf_new_id => $uf_new_vals )
+				$uf_fields = array(
+					'new' => $uf_new_fields,
+					'add' => $uf_add_fields
+				);
+				foreach( $uf_fields as $uf_type => $uf_new_fields )
 				{
-					foreach( $uf_new_vals as $uf_new_val )
+					if( $uf_type == 'add' )
+					{	// Save an adding fields to display it again if errors will be exist
+						global $add_field_types;
+						if( ! isset( $add_field_types ) )
+						{	// Don't rewrite already existing array
+							$add_field_types = array();
+						}
+					}
+					foreach( $uf_new_fields as $uf_new_id => $uf_new_vals )
 					{
-						if( $this->userfield_defs[$uf_new_id][0] == 'list' && $uf_new_val == '---' )
-						{	// Option list has a value '---' for empty value
-							$uf_new_val = '';
-						}
+						foreach( $uf_new_vals as $uf_new_val )
+						{
+							if( $this->userfield_defs[$uf_new_id][0] == 'list' && $uf_new_val == '---' )
+							{	// Option list has a value '---' for empty value
+								$uf_new_val = '';
+							}
 
-						if( $uf_new_val != '' )
-						{	// Insert a new field in DB if it is filled
-							$this->userfield_add( (int)$uf_new_id, trim( strip_tags( $uf_new_val ) ) );
-						}
-						elseif( empty( $uf_new_val ) && $this->userfield_defs[$uf_new_id][2] == 'require' )
-						{	// Display error for empty required field & new adding field
-							param_error( 'uf_new['.$uf_new_id.'][]', T_('Please enter a value.') );
+							if( $uf_new_val != '' )
+							{	// Insert a new field in DB if it is filled
+								$this->userfield_add( (int)$uf_new_id, trim( strip_tags( $uf_new_val ) ) );
+							}
+							elseif( empty( $uf_new_val ) && $this->userfield_defs[$uf_new_id][2] == 'require' )
+							{	// Display error for empty required field & new adding field
+								param_error( 'uf_'.$uf_type.'['.$uf_new_id.'][]', T_('Please enter a value.') );
+							}
+
+							if( $uf_type == 'add' )
+							{	// Save new added field, it used on the _user_identity.form
+								$add_field_types[] = $uf_new_id;
+							}
 						}
 					}
 				}
@@ -2745,6 +2770,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.168  2011/10/19 12:14:59  efy-yurybakh
+ * default empty value for required option fields
+ *
  * Revision 1.167  2011/10/19 07:33:39  efy-yurybakh
  * Additional info fields - step 2 (SECURITY)
  *

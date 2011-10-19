@@ -227,7 +227,7 @@ switch( $action )
 
 		$Form = new Form();
 
-		userfields_display( $userfields, $Form );
+		userfields_display( $userfields, $Form, 'add' );
 
 		exit(0);
 }
@@ -236,6 +236,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.26  2011/10/19 12:14:58  efy-yurybakh
+ * default empty value for required option fields
+ *
  * Revision 1.25  2011/10/18 16:20:37  efy-yurybakh
  * Ajax implementation of "add field"
  *

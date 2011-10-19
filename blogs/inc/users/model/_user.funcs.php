@@ -1355,19 +1355,33 @@ function callback_options_user_new_fields( $value )
  * 						ufdf_required
  * 						ufdf_option
  * @param object Form
+ * @param string Field name of the new fields ( new | add )
  */
-function userfields_display( $userfields, $Form )
+function userfields_display( $userfields, $Form, $new_field_name = 'new' )
 {
-	$uf_new_fields = param( 'uf_new', 'array' );
+	// Array contains a values of the new fields from the request
+	$uf_new_fields = param( 'uf_'.$new_field_name, 'array' );
+
+	// Type of the new field
+	global $new_field_type;
+
 	foreach( $userfields as $userfield )
 	{
 		$uf_val = param( 'uf_'.$userfield->uf_ID, 'string', NULL );
 
+		$uf_ID = $userfield->uf_ID;
 		if( $userfield->uf_ID == '0' )
 		{	// Set uf_ID for new (not saved) fields (recommended & require types)
-			$userfield->uf_ID = 'new['.$userfield->ufdf_ID.'][]';
-			if( isset( $uf_new_fields[$userfield->ufdf_ID][0] ) )
-				$uf_val = $uf_new_fields[$userfield->ufdf_ID][0];
+			$userfield->uf_ID = $new_field_name.'['.$userfield->ufdf_ID.'][]';
+
+			$value_num = 'uf_'.$new_field_name.'_'.$userfield->ufdf_ID.'prev_value_num';
+			global $$value_num;	// Used when user add a many fields with the same type
+			$$value_num = (int)$$value_num;
+			if( isset( $uf_new_fields[$userfield->ufdf_ID][$$value_num] ) )
+			{	// Get a value from submitted form
+				$uf_val = $uf_new_fields[$userfield->ufdf_ID][$$value_num];
+				$$value_num++;
+			}
 		}
 
 		if( is_null( $uf_val ) )
@@ -1415,7 +1429,8 @@ function userfields_display( $userfields, $Form )
 				{
 					$field_params['required'] = true;
 				}
-				else
+				if( $userfield->ufdf_required != 'require' || // Not required field
+						$uf_ID == '0' ) // New reqired field has to have an empty value
 				{	// Add empty value for not required fields
 					$uf_options = array_merge( array( '---' ), $uf_options );
 				}
@@ -1435,6 +1450,9 @@ function userfields_display( $userfields, $Form )
 
 /*
  * $Log$
+ * Revision 1.96  2011/10/19 12:14:59  efy-yurybakh
+ * default empty value for required option fields
+ *
  * Revision 1.95  2011/10/19 07:33:39  efy-yurybakh
  * Additional info fields - step 2 (SECURITY)
  *
