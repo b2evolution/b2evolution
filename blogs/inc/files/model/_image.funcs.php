@@ -378,7 +378,10 @@ function pixelblur( $image_source, $width_source, $height_source, $percent_blur 
 	// Reduce image size by given percent
 	imagecopyresampled( $image_resized, $image_source, 0, 0, 0, 0, $width_resized, $height_resized, $width_source, $height_source );
 	// Apply blur effect from GD library
-	imagefilter( $image_resized, IMG_FILTER_GAUSSIAN_BLUR );
+  if( function_exists('imagefilter') )
+  {
+    imagefilter( $image_resized, IMG_FILTER_GAUSSIAN_BLUR );
+  }
 	// Expand image to the source size
 	imagecopyresampled( $image_source, $image_resized, 0, 0, 0, 0, $width_source, $height_source, $width_resized, $height_resized );
 
@@ -388,6 +391,9 @@ function pixelblur( $image_source, $width_source, $height_source, $percent_blur 
 
 /*
  * $Log$
+ * Revision 1.26  2011/10/19 04:59:24  fplanque
+ * no message
+ *
  * Revision 1.25  2011/10/04 09:16:31  efy-yurybakh
  * blur effect
  *
