@@ -1371,9 +1371,9 @@ function userfields_display( $userfields, $Form )
 
 		if( $userfield->uf_ID == '0' )
 		{	// Set uf_ID for new (not saved) fields (recommended & require types)
-			$userfield->uf_ID = 'new['.$userfield->ufdf_ID.']';
-			if( isset( $uf_new_fields[$userfield->ufdf_ID] ) )
-				$uf_val = $uf_new_fields[$userfield->ufdf_ID];
+			$userfield->uf_ID = 'new['.$userfield->ufdf_ID.'][]';
+			if( isset( $uf_new_fields[$userfield->ufdf_ID][0] ) )
+				$uf_val = $uf_new_fields[$userfield->ufdf_ID][0];
 		}
 
 		if( is_null( $uf_val ) )
@@ -1441,6 +1441,9 @@ function userfields_display( $userfields, $Form )
 
 /*
  * $Log$
+ * Revision 1.94  2011/10/19 06:37:26  efy-yurybakh
+ * Ajax implementation of "add field" (multiple fields & auto select type)
+ *
  * Revision 1.93  2011/10/18 16:20:37  efy-yurybakh
  * Ajax implementation of "add field"
  *

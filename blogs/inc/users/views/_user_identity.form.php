@@ -423,7 +423,7 @@ $userfields = $DB->get_results( '
 		AND ufdf_ID NOT IN ( SELECT uf_ufdf_ID FROM T_users__fields WHERE uf_user_ID = '.$user_id.' ) )
 		'.$userfields_new_sql.'
 
-	ORDER BY 1, 2 DESC' );
+	ORDER BY 1, 2' );
 
 userfields_display( $userfields, $Form );
 
@@ -509,11 +509,23 @@ $Form->end_form();
 		});
 		return false;
 	} );
+	
+	jQuery( '[name^=uf_new]' ).live( 'focus', function ()
+	{	// Auto select the value for the field of type
+		var field_id = parseInt( jQuery( this ).attr( 'name' ).replace( /uf_new\[(\d+)\]\[\]/, '$1' ) );
+		if( field_id > 0 )
+		{
+			jQuery( '#new_field_type' ).val( field_id );
+		}
+	} );
 </script>
 <?php
 
 /*
  * $Log$
+ * Revision 1.58  2011/10/19 06:37:26  efy-yurybakh
+ * Ajax implementation of "add field" (multiple fields & auto select type)
+ *
  * Revision 1.57  2011/10/18 16:20:38  efy-yurybakh
  * Ajax implementation of "add field"
  *

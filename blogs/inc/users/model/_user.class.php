@@ -389,7 +389,7 @@ class User extends DataObject
 				}
 				else
 				{	// Mark a new field to enter a value
-					param_error( 'uf_new['.$new_field_type.']', T_('Please enter a value in this new field.') );
+					param_error( 'uf_new['.$new_field_type.'][]', T_('Please enter a value in this new field.') );
 				}
 			}
 
@@ -397,21 +397,23 @@ class User extends DataObject
 			$uf_new_fields = param( 'uf_new', 'array' );
 			if( count( $uf_new_fields ) > 0 )
 			{
-				$new_field_type = param( 'new_field_type', 'integer', 0 );
-				foreach( $uf_new_fields as $uf_new_id => $uf_new_val )
+				foreach( $uf_new_fields as $uf_new_id => $uf_new_vals )
 				{
-					if( $this->userfield_defs[$uf_new_id][0] == 'list' && $uf_new_val == '---' )
-					{	// Option list has a value '---' for empty value
-						$uf_new_val = '';
-					}
+					foreach( $uf_new_vals as $uf_new_val )
+					{
+						if( $this->userfield_defs[$uf_new_id][0] == 'list' && $uf_new_val == '---' )
+						{	// Option list has a value '---' for empty value
+							$uf_new_val = '';
+						}
 
-					if( $uf_new_val != '' )
-					{ // Insert a new field in DB if it is filled
-						$this->userfield_add( (int)$uf_new_id, $uf_new_val );
-					}
-					elseif( empty( $uf_new_val ) && ( $this->userfield_defs[$uf_new_id][2] == 'require' || $new_field_type == $uf_new_id ) )
-					{ // Display error for empty required field & new adding field
-						param_error( 'uf_new['.$uf_new_id.']', T_('Please enter a value.') );
+						if( $uf_new_val != '' )
+						{	// Insert a new field in DB if it is filled
+							$this->userfield_add( (int)$uf_new_id, $uf_new_val );
+						}
+						elseif( empty( $uf_new_val ) && $this->userfield_defs[$uf_new_id][2] == 'require' )
+						{	// Display error for empty required field & new adding field
+							param_error( 'uf_new['.$uf_new_id.'][]', T_('Please enter a value.') );
+						}
 					}
 				}
 			}
@@ -2744,6 +2746,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.166  2011/10/19 06:37:26  efy-yurybakh
+ * Ajax implementation of "add field" (multiple fields & auto select type)
+ *
  * Revision 1.165  2011/10/18 16:20:37  efy-yurybakh
  * Ajax implementation of "add field"
  *
