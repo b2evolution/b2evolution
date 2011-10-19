@@ -101,6 +101,13 @@ class Module
 	}
 
 	/**
+	 * Create the module's own demo content
+	 */
+	function create_demo_contents()
+	{
+	}
+
+	/**
 	 * Displays the module's collection feature settings
 	 *
 	 * @param array
@@ -223,6 +230,9 @@ class Module
 
 /*
  * $Log$
+ * Revision 1.13  2011/10/19 15:00:34  efy-asimo
+ * Modules can add their own demo contents
+ *
  * Revision 1.12  2011/10/01 23:45:19  fplanque
  * clean factorization
  *

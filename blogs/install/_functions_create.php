@@ -1414,6 +1414,7 @@ function create_demo_contents()
 	echo "OK.<br />\n";
 	*/
 
+	modules_call_method( 'create_demo_contents' );
 
 	install_basic_widgets();
 
@@ -1427,6 +1428,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.331  2011/10/19 15:00:34  efy-asimo
+ * Modules can add their own demo contents
+ *
  * Revision 1.330  2011/10/17 22:00:30  fplanque
  * cleanup
  *
