@@ -1818,11 +1818,11 @@ class Form extends Widget
 		else
 		{
 			if (empty($edited_User->ctry_ID))
-			{
+			{	// if edited user didn't select a country then we form a dropdown list of countries using 'get_group_country_option_list' function.
 				$field_object_callback = 'get_group_country_option_list';
 			}
 			else
-			{
+			{	// if edited user has a selected country then we display a usual list of countries.
 				$field_object_callback = 'get_option_list';
 			}
 
@@ -3176,6 +3176,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.97  2011/10/19 14:57:22  efy-vitalij
+ * add comments to a select_country function
+ *
  * Revision 1.96  2011/10/03 10:45:14  efy-vitalij
  * add background color parm to select_input_array()
  *
