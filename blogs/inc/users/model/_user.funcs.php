@@ -817,12 +817,6 @@ function profile_check_params( $params, $User = NULL )
 	// checking login has been typed:
 	param_check_valid_login( 'login' );
 
-	// checking the nickname has been typed
-	if( isset($params['nickname']) && empty($params['nickname'][0]) )
-	{
-		param_error($params['nickname'][1], T_('Please enter a nickname (can be the same as your login).') );
-	}
-
 	// checking e-mail address
 	if( isset($params['email'][0]) )
 	{
@@ -1441,6 +1435,9 @@ function userfields_display( $userfields, $Form )
 
 /*
  * $Log$
+ * Revision 1.95  2011/10/19 07:33:39  efy-yurybakh
+ * Additional info fields - step 2 (SECURITY)
+ *
  * Revision 1.94  2011/10/19 06:37:26  efy-yurybakh
  * Ajax implementation of "add field" (multiple fields & auto select type)
  *

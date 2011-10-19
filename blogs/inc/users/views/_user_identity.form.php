@@ -288,7 +288,7 @@ if( $action != 'view' )
 	$nickname_editing = $Settings->get( 'nickname_editing' );
 	if( ( $nickname_editing == 'edited-user' && $edited_User->ID == $current_User->ID ) || ( $nickname_editing != 'hidden' && $has_full_access ) )
 	{
-		$Form->text_input( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), '', array( 'maxlength' => 50, 'required' => true, 'onchange' => 'idmodes_onchange( "nickname" )' ) );
+		$Form->text_input( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), '', array( 'maxlength' => 50, 'onchange' => 'idmodes_onchange( "nickname" )' ) );
 	}
 	else
 	{
@@ -523,6 +523,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.59  2011/10/19 07:33:39  efy-yurybakh
+ * Additional info fields - step 2 (SECURITY)
+ *
  * Revision 1.58  2011/10/19 06:37:26  efy-yurybakh
  * Ajax implementation of "add field" (multiple fields & auto select type)
  *

@@ -408,7 +408,7 @@ class User extends DataObject
 
 						if( $uf_new_val != '' )
 						{	// Insert a new field in DB if it is filled
-							$this->userfield_add( (int)$uf_new_id, $uf_new_val );
+							$this->userfield_add( (int)$uf_new_id, trim( strip_tags( $uf_new_val ) ) );
 						}
 						elseif( empty( $uf_new_val ) && $this->userfield_defs[$uf_new_id][2] == 'require' )
 						{	// Display error for empty required field & new adding field
@@ -442,7 +442,6 @@ class User extends DataObject
 			else
 			{
 				param( 'edited_user_nickname', 'string', true );
-				param_check_not_empty( 'edited_user_nickname', T_('Please enter a nickname (can be the same as your login).') );
 				$this->set_from_Request('nickname', 'edited_user_nickname', true);
 			}
 
@@ -2746,6 +2745,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.167  2011/10/19 07:33:39  efy-yurybakh
+ * Additional info fields - step 2 (SECURITY)
+ *
  * Revision 1.166  2011/10/19 06:37:26  efy-yurybakh
  * Ajax implementation of "add field" (multiple fields & auto select type)
  *

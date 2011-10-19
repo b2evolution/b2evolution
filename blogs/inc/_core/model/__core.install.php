@@ -129,18 +129,18 @@ $schema_queries = array(
 			ufdf_ID int(10) unsigned NOT NULL,
 			ufdf_type char(8) NOT NULL,
 			ufdf_name varchar(255) NOT NULL,
-		  ufdf_options TEXT NOT NULL,
-		  ufdf_required enum('hidden','optional','recommended','require') NOT NULL default 'optional',
+			ufdf_options TEXT NOT NULL,
+			ufdf_required enum('hidden','optional','recommended','require') NOT NULL default 'optional',
 			PRIMARY KEY (ufdf_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_users__fields' => array(
 		'Creating table for User fields',
 		"CREATE TABLE T_users__fields (
-		  uf_ID      int(10) unsigned NOT NULL auto_increment,
-		  uf_user_ID int(10) unsigned NOT NULL,
-		  uf_ufdf_ID int(10) unsigned NOT NULL,
-		  uf_varchar varchar(255) NOT NULL,
+			uf_ID      int(10) unsigned NOT NULL auto_increment,
+			uf_user_ID int(10) unsigned NOT NULL,
+			uf_ufdf_ID int(10) unsigned NOT NULL,
+			uf_varchar varchar(255) NOT NULL,
 			PRIMARY KEY (uf_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -287,6 +287,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.66  2011/10/19 07:33:39  efy-yurybakh
+ * Additional info fields - step 2 (SECURITY)
+ *
  * Revision 1.65  2011/10/19 03:22:31  fplanque
  * doc
  *

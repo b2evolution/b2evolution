@@ -129,7 +129,7 @@ class Userfield extends DataObject
 		// Options
 		if( param( 'ufdf_type', 'string' ) == 'list' )
 		{
-			$ufdf_options = explode( "\n", param( 'ufdf_options', 'raw' ) );
+			$ufdf_options = explode( "\n", param( 'ufdf_options', 'text' ) );
 			if( count( $ufdf_options ) < 2 )
 			{	// We don't want save an option list with one item
 				param_error( 'ufdf_options', T_('Please enter at least 2 options on 2 different lines.') );
