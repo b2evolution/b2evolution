@@ -179,7 +179,7 @@ class msg_menu_link_Widget extends ComponentWidget
 
 		if( ( $this->disp_params[ 'show_badge' ] ) && ( $unread_messages_count > 0 ) )
 		{
-			$badge = '<span class="badge">'.$unread_messages_count.'</span>';
+			$badge = ' <span class="badge">'.$unread_messages_count.'</span>';
 		}
 		else
 		{
@@ -202,6 +202,9 @@ class msg_menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.2  2011/10/19 03:51:20  fplanque
+ * minor
+ *
  * Revision 1.1  2011/10/11 05:52:15  efy-asimo
  * Messages menu link widget
  *

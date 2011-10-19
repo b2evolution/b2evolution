@@ -50,13 +50,13 @@ if( $thrd_ID = param( 'thrd_ID', 'integer', '', true) )
 	{	// Current user is not recipient of this thread
 		unset( $edited_Thread );
 		forget_param( 'thrd_ID' );
-		$Messages->add( T_('You are not allowed to view this thread.', 'error' );
+		$Messages->add( T_('You are not allowed to view this thread.'), 'error' );
 	}
 }
 
 if( ( empty( $thrd_ID ) ) || ( empty( $edited_Thread ) ) )
 {
-	$Messages->add( T_( 'Can\'t show messages without thread!' ), 'error' );
+	$Messages->add( T_('Can\'t show messages without thread!'), 'error' );
 	$Messages->display();
 }
 else
@@ -75,7 +75,7 @@ $params = array_merge( array(
 	'form_action' => $samedomain_htsrv_url.'messaging.php',
 	'form_name' => '',
 	'form_layout' => NULL,
-	'cols' => 35 
+	'cols' => 35
 	), $params );
 
 // Display messages list:
@@ -88,6 +88,9 @@ if( isset( $edited_Thread ) )
 
 /*
  * $Log$
+ * Revision 1.10  2011/10/19 03:51:19  fplanque
+ * minor
+ *
  * Revision 1.9  2011/10/18 00:04:45  fplanque
  * i18n update
  *
