@@ -182,6 +182,8 @@ $Form->end_fieldset();
 		$Form->end_fieldset();
 	}
 
+	modules_call_method( 'display_item_settings', array( 'Form' => & $Form, 'Blog' => & $Blog, 'edited_Item' => & $edited_Item ) );
+
 	cat_select( $Form, true, false );
 	echo '<br />';
 
@@ -231,6 +233,9 @@ echo_autocomplete_tags();
 
 /*
  * $Log$
+ * Revision 1.7  2011/10/19 11:43:11  efy-asimo
+ * display modules item params in the in-skin edit form
+ *
  * Revision 1.6  2011/10/18 17:14:56  efy-yurybakh
  * replace spaces with tabs
  *
