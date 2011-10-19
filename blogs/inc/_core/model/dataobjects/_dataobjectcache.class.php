@@ -811,35 +811,39 @@ class DataObjectCache
 		$r = '';
 
 		if( $allow_none )
-		{
+		{	// we set current value of a country if it is sent to function
 			$r .= '<option value="'.$this->none_option_value.'"';
 			if( empty($default) ) $r .= ' selected="selected"';
 			$r .= '>'.format_to_output($this->none_option_text).'</option>'."\n";
 		}
 
-		$group = array();
-		$ungroup = array();
+		$pref_countries = array(); //preferred countries.
+		$rest_countries = array(); // not preffered countries (the rest)
 
 		foreach( $this->cache as $loop_Obj )
 		{
 			if ( in_array( $loop_Obj->ID, $ignore_IDs ) )
-			{	// Ignore this ID
+			{	// if we have ID of countries that we have to ignore we just do not include them here. 
+				//Ignore this ID
 				continue;
 			}
 
 			if($loop_Obj->preferred == 1)
-			{
-				$group[] = $loop_Obj;
+			{  // if the country is preferred we add it to selected array.
+				$pref_countries[] = $loop_Obj;
 			}
-
-			$ungroup[] = $loop_Obj;
+			else
+			{ // If it is not preferred it will get here $rest_countries
+			$rest_countries[] = $loop_Obj;
+			}
 
 		}
 
-		if(count($group))
-		{
+		if(count($pref_countries))
+		{	// if we don't have preferred countries in this case we don't have to show optgroup
+			// in option list
 			$r .= '<optgroup label="'.T_('Frequent countries').'">';
-			foreach( $group as $loop_Obj )
+			foreach( $pref_countries as $loop_Obj )
 			{
 				$r .=  '<option value="'.$loop_Obj->ID.'"';
 				if( in_array( $loop_Obj->ID, $default ) ) $r .= ' selected="selected"';
@@ -849,10 +853,10 @@ class DataObjectCache
 			}
 			$r .= '</optgroup>';
 
-			if(count($ungroup))
-			{
+			if(count($rest_countries))
+			{ // if we don't have rest countries we do not create optgroup for them
 				$r .= '<optgroup label="'.T_('Other countries').'">';
-				foreach( $ungroup as $loop_Obj )
+				foreach( $rest_countries as $loop_Obj )
 				{
 					$r .=  '<option value="'.$loop_Obj->ID.'"';
 					if( in_array( $loop_Obj->ID, $default ) ) $r .= ' selected="selected"';
@@ -864,8 +868,8 @@ class DataObjectCache
 			}
 		}
 		else
-		{
-			foreach( $ungroup as $loop_Obj )
+		{	// if we have only rest countries we get here
+			foreach( $rest_countries as $loop_Obj )
 			{
 				$r .=  '<option value="'.$loop_Obj->ID.'"';
 				if( in_array( $loop_Obj->ID, $default ) ) $r .= ' selected="selected"';
@@ -923,6 +927,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.32  2011/10/19 15:19:01  efy-vitalij
+ * added comments to get_group_country_option_list function
+ *
  * Revision 1.31  2011/10/19 03:22:31  fplanque
  * doc
  *
