@@ -456,10 +456,10 @@ $Form->end_fieldset();
 if( $action != 'view' )
 { // Edit buttons
 	$action_buttons = array(
-		array( '', 'actionArray[update]', T_('Save !'), 'SaveButton' ),
-		array( 'reset', '', T_('Reset'), 'ResetButton' ) );
+		array( '', 'actionArray[update]', T_('Save !'), 'SaveButton' ) );
 	if( $is_admin )
 	{
+		$action_buttons[] = array( 'reset', '', T_('Reset'), 'ResetButton' );
 		// dh> TODO: Non-Javascript-confirm before trashing all settings with a misplaced click.
 		$action_buttons[] = array( 'type' => 'submit', 'name' => 'actionArray[default_settings]', 'value' => T_('Restore defaults'), 'class' => 'ResetButton',
 			'onclick' => "return confirm('".TS_('This will reset all your user settings.').'\n'.TS_('This cannot be undone.').'\n'.TS_('Are you sure?')."');" );
@@ -533,6 +533,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.61  2011/10/19 12:40:14  efy-yurybakh
+ * remove "Reset" button from disp=profile
+ *
  * Revision 1.60  2011/10/19 12:14:59  efy-yurybakh
  * default empty value for required option fields
  *
