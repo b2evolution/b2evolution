@@ -66,16 +66,26 @@ echo '<tbody>';
 
 	// Display quick upload
 	echo '<td id="fm_files">';
-	echo '<div id="upload_queue"></div>';
-	echo '<input id="quickupload" type="file" multiple="multiple" />';
-	echo '<input id="saveBtn" type="hidden" value="'.T_('Save modified files'),'" class="ActionButton" />';
+	//echo '<div id="upload_queue"></div>';
+	//echo '<input id="quickupload" type="file" multiple="multiple" />';
+	
+	?>
+	<div id="file-uploader">
+		<noscript>
+			<p>Please enable JavaScript to use file uploader.</p>
+		</noscript>
+	</div>
+	<?php
+	echo '<input id="saveBtn" type="submit" style="display: none;" name="saveBtn" value="'.T_('Save modified files'),'" class="ActionButton" />';
 
 	$root_and_path = $fm_FileRoot->ID.'::';
-	$quick_upload_url = $htsrv_url.'quick_upload.php?upload=true';
+	$quick_upload_url = $htsrv_url.'quick_upload_new.php?upload=true';
 	?>
 	<script type="text/javascript">
 
-		var url = <?php echo '"'.$quick_upload_url.'&root_and_path='.$root_and_path.'&'.url_crumb( 'file' ).'"'; ?>;
+		
+		var url = <?php echo '"'.$quick_upload_url.'&'.url_crumb( 'file' ).'"'; ?>;
+		var root_and_path = '<?php echo $root_and_path ?>';
 		var uploading_text = <?php echo '"'.T_( 'Uploading' ).'"'; ?>;
 		var incompatible_browser = <?php echo '"'.T_( 'Your browser does not support XMLHttpRequest technology! Please use the standard upload instead.' ).'"'; ?>;
 		var maxsize = <?php echo $Settings->get( 'upload_maxkb' )*1024; ?>;
@@ -85,7 +95,48 @@ echo '<tbody>';
 		jQuery( '#fm_dirtree input[type=radio]' ).click( function()
 		{
 			url = "<?php echo $quick_upload_url; ?>"+"&root_and_path="+this.value+"&"+"<?php echo url_crumb( 'file' ); ?>";
+			//uploader._options.action = url;
+			root_and_path = this.value;
+			uploader.setParams({root_and_path: root_and_path});
 		} );
+
+        jQuery(document).ready( function(){
+				uploader = new qq.FileUploader({
+                element: document.getElementById('file-uploader'),
+                action: url,
+                debug: true,
+				onSubmit: function(id, fileName){
+					var test = 1;
+				},
+				onProgress: function(id, fileName, loaded, total){
+					var test = 1;
+				},
+				onComplete: function(id, fileName, responseJSON){
+					var realid = id.toString();
+					var re = /(\d+)*$/
+					id = realid.match(re);
+
+					var container = jQuery('.qq-upload-list > li:eq('+ id[0] +')');
+					if (responseJSON.success.status == undefined)
+					{
+						var text = htmlspecialchars_decode(responseJSON.success);
+					}
+					else
+					{
+						var text = htmlspecialchars_decode(responseJSON.success.text);
+						jQuery('#saveBtn').show();
+					}
+					container.append(text);
+					
+				},
+				onCancel: function(id, fileName){
+					
+				},
+				params: {
+				root_and_path: root_and_path
+				}
+            });
+        });
 	</script>
 	<?php
 
@@ -103,6 +154,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.6  2011/10/19 14:41:07  efy-vitalij
+ * made changes for new uploader
+ *
  * Revision 1.5  2011/09/19 22:16:00  fplanque
  * Minot/i18n
  *

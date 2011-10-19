@@ -68,8 +68,10 @@ $action = param_action();
 if( $tab3 == 'quick' )
 {
 	require_css( 'quick_upload.css' );
-	require_js( 'multiupload/sendfile.js' );
-	require_js( 'multiupload/quick_upload.js' );
+	//require_js( 'multiupload/sendfile.js' );
+	//require_js( 'multiupload/quick_upload.js' );
+	require_js( 'multiupload/fileuploader.js' );
+	require_css( 'fileuploader.css' );
 }
 
 // INIT params:
@@ -481,6 +483,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.50  2011/10/19 14:42:45  efy-vitalij
+ * made changes for new uploader
+ *
  * Revision 1.49  2011/09/06 20:28:37  sam2kb
  * i18n update
  *
