@@ -42,7 +42,7 @@ $Session->assert_received_crumb( $module_name.'_action' );
 foreach( $modules as $module )
 {
 	if( $module == $module_name )
-	{ // the requested module was founded
+	{ // the requested module was found
 		$Module = & $GLOBALS[$module.'_Module'];
 		if( method_exists( $Module, 'handle_htsrv_action' ) )
 		{	// Module has handle_htsrv_action function, we can call it
@@ -57,6 +57,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.2  2011/10/19 03:22:31  fplanque
+ * doc
+ *
  * Revision 1.1  2011/10/18 09:14:34  efy-asimo
  * Ability to display different module forms and handle module actions  inside the module
  *

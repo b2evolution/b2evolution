@@ -729,6 +729,7 @@ class Plugin
 		return false;		// Do nothing by default.
 	}
 
+
 	/**
 	 * Event handler: Called when displaying editor buttons (in front-office).
 	 *
@@ -748,6 +749,8 @@ class Plugin
 	{
 		return false;		// Do nothing by default.
 	}
+	
+	
 	/**
 	 * Event handler: Called when displaying editor toolbars.
 	 *
@@ -1320,6 +1323,7 @@ class Plugin
 	{
 		return false;		// Do nothing by default.
 	}
+
 
 	/**
 	 * Event handler: Called at the end of the "Edit item" form in front-office.
@@ -3129,6 +3133,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.53  2011/10/19 03:22:31  fplanque
+ * doc
+ *
  * Revision 1.52  2011/10/18 08:37:21  efy-vitalij
  * added event handlers DisplayEditorButton, DisplayItemFormFieldset
  *

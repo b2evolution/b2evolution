@@ -827,14 +827,13 @@ class DataObjectCache
 				continue;
 			}
 
-			if ($loop_Obj->preferred == 1)
+			if($loop_Obj->preferred == 1)
 			{
 				$group[] = $loop_Obj;
 			}
-			else
-			{
-				$ungroup[] = $loop_Obj;
-			}
+
+			$ungroup[] = $loop_Obj;
+
 		}
 
 		if(count($group))
@@ -863,7 +862,6 @@ class DataObjectCache
 				}
 				$r .= '</optgroup>';
 			}
-
 		}
 		else
 		{
@@ -876,8 +874,6 @@ class DataObjectCache
 				$r .=  '</option>'."\n";
 			}
 		}
-
-
 
 		return $r;
 	}
@@ -927,6 +923,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.31  2011/10/19 03:22:31  fplanque
+ * doc
+ *
  * Revision 1.30  2011/10/11 02:05:41  fplanque
  * i18n/wording cleanup
  *

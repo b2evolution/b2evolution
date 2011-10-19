@@ -390,6 +390,7 @@ class test_plugin extends Plugin
 		return true;
 	}
 
+
 	/**
 	 * Event handler: Called when displaying editor buttons (in front-office).
 	 *
@@ -415,6 +416,7 @@ class test_plugin extends Plugin
 		$params['Form']->info_field( 'TEST plugin', 'This is the TEST plugin responding to the AdminDisplayItemFormFieldset event.' );
 		$params['Form']->end_fieldset( 'Foo' );
 	}
+
 
 	/**
 	 * @see Plugin::DisplayItemFormFieldset()
@@ -910,6 +912,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.96  2011/10/19 03:22:31  fplanque
+ * doc
+ *
  * Revision 1.95  2011/10/18 08:39:42  efy-vitalij
  * adde event handlers DisplayItemFormFieldset, DisplayEditorButton
  *
