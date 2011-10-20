@@ -1433,8 +1433,9 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new' )
 					$field_params['required'] = true;
 				}
 				if( $userfield->ufdf_required != 'require' || // Not required field
-						$uf_ID == '0' ) // New reqired field has to have an empty value
-				{	// Add empty value for not required fields
+						$uf_ID == '0' || // New reqired field has to have an empty value
+						( $uf_val != '' && ! in_array( $uf_val, $uf_options ) ) ) // Required field has a value that doesn't exist
+				{	// Add empty value
 					$uf_options = array_merge( array( '---' ), $uf_options );
 				}
 				$Form->select_input_array( 'uf_'.$userfield->uf_ID, $uf_val, $uf_options, $userfield->ufdf_name, '', $field_params );
@@ -1479,6 +1480,9 @@ function callback_filter_userlist( & $Form )
 
 /*
  * $Log$
+ * Revision 1.98  2011/10/20 17:09:52  efy-yurybakh
+ * Info fields: select lists - give list of configurable options (changes for old values of the required fields)
+ *
  * Revision 1.97  2011/10/20 15:22:50  efy-yurybakh
  * new filters for users list
  *
