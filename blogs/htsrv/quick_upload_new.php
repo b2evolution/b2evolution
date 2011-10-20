@@ -51,7 +51,20 @@ class qqUploadedFileXhr {
 
 	function get_content()
 	{
-		return file_get_contents("php://input");
+        $input = fopen("php://input", "rb");
+        $temp = tmpfile();
+		stream_copy_to_stream($input, $temp);
+        fclose($input);
+
+		fseek($temp, 0, SEEK_SET);
+		$contents = '';
+
+		while (!feof($temp))
+		{
+			$contents .= fread($temp, 8192);
+		}
+		fclose($temp);
+		return $contents;
 	}
 
 
@@ -59,6 +72,7 @@ class qqUploadedFileXhr {
     function getName() {
         return $_GET['qqfile'];
     }
+
     function getSize() {
         if (isset($_SERVER["CONTENT_LENGTH"])){
             return (int)$_SERVER["CONTENT_LENGTH"];
@@ -82,16 +96,27 @@ class qqUploadedFileForm {
         }
         return true;
     }
+
     function getName() {
         return $_FILES['qqfile']['name'];
     }
+	
     function getSize() {
         return $_FILES['qqfile']['size'];
     }
 
 	function get_content()
 	{
-		return file_get_contents($_FILES['qqfile']['tmp_name']);
+		$temp = fopen($_FILES['qqfile']['tmp_name'], "rb");
+		fseek($temp, 0, SEEK_SET);
+		$contents = '';
+		while (!feof($temp))
+		{
+			$contents .= fread($temp, 8192);
+		}
+		fclose($temp);
+		return $contents;
+		//return file_get_contents($_FILES['qqfile']['tmp_name']);
 	}
 
 }
@@ -125,8 +150,6 @@ global $current_User;
 param( 'upload', 'boolean', true );
 param( 'root_and_path', 'string', true );
 
-//echo (json_encode(array('success'=>'<span class="result_error">Bad request. Unknown upload location!</span>')));;
-//exit();
 
 // Check that this action request is not a CSRF hacked request:
 $Session->assert_received_crumb( 'file' );
@@ -159,9 +182,6 @@ if( $upload && ( !$current_User->check_perm( 'files', 'add', false, $fm_FileRoot
 
 if( $upload )
 {
-	// basic checks
-
-	{
 		// create the object and assign property
 
 		if (isset($_GET['qqfile']))
@@ -237,14 +257,14 @@ if( $upload )
 				$message = '<br />';
 				$message .= sprintf( T_('%s was renamed to %s. Would you like to replace %s with the new version instead?'),
 									'&laquo;'.$oldName.'&raquo;', '&laquo;'.$newName.'&raquo;', '&laquo;'.$oldName.'&raquo;' );
-				$message .= '<li class="invalid" title="'.T_('File name changed.').'">';
+				$message .= '<div class="invalid" title="'.T_('File name changed.').'">';
 				$message .= '<input type="radio" name="Renamed_'.$newFile->ID.'" value="Yes" id="Yes_'.$newFile->ID.'"/>';
 				$message .= '<label for="Yes_'.$newFile->ID.'">';
 				$message .= sprintf( T_("Replace the old version %s with the new version %s and keep old version as %s."), $oldFile_thumb, $newFile_thumb, $newName ).'</label><br />';
 				$message .= '<input type="radio" name="Renamed_'.$newFile->ID.'" value="No" id="No_'.$newFile->ID.'" checked="checked"/>';
 				$message .= '<label for="No_'.$newFile->ID.'">';
 				$message .= sprintf( T_("Don't touch the old version and keep the new version as %s."), $newName ).'</label><br />';
-				$message .= '</li>';
+				$message .= '</div>';
 				
 			}
 			if( !empty( $message ) )
@@ -268,7 +288,7 @@ if( $upload )
 					$newFile_thumb = $newFile->get_size_formatted();
 				}
 				
-				$message = "OK $newFile_thumb ";
+				$message = "<span class=\"result_success\"> OK </span> $newFile_thumb ";
 				//echo (htmlspecialchars(json_encode(array('success'=>$message))));
 				out_echo($message, $specialchars);
 				exit();
@@ -280,8 +300,6 @@ if( $upload )
 		//echo htmlspecialchars(json_encode(array('success'=>$message)));
 		out_echo($message, $specialchars);
 		exit();
-	}
-
 
 }
 
@@ -292,6 +310,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.2  2011/10/20 11:51:49  efy-vitalij
+ * changed function get_content in classes qqUploadedFileXhr, qqUploadedFileForm, made some changes in response
+ *
  * Revision 1.1  2011/10/19 14:17:33  efy-vitalij
  * add file quick_upload_new.php
  *
