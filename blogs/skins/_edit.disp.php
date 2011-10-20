@@ -175,7 +175,7 @@ $Form->end_fieldset();
 		$Form->labelend = '';
 		$Form->inputstart = '';
 		$Form->inputend = '';
-		echo '<br /><div id="itemform_edit_timestamp" class="edit_fieldgroup">';
+		echo '<div id="itemform_edit_timestamp" class="edit_fieldgroup">';
 		issue_date_control( $Form, false, '<strong>'.T_('Issue date').'</strong>' );
 		echo '</div>';
 
@@ -192,7 +192,7 @@ $Form->end_fieldset();
 	echo '<td class="input">';
 	$Form->text_input( 'item_tags', $item_tags, 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
 	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
-	echo '</table><br />';
+	echo '</table>';
 ?>
 
 <div class="clear"></div>
@@ -233,6 +233,9 @@ echo_autocomplete_tags();
 
 /*
  * $Log$
+ * Revision 1.8  2011/10/20 06:39:55  efy-asimo
+ * Small display modifications
+ *
  * Revision 1.7  2011/10/19 11:43:11  efy-asimo
  * display modules item params in the in-skin edit form
  *

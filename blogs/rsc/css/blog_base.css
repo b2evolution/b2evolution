@@ -350,7 +350,7 @@ form.inskin{
 form.inskin fieldset{
 	border: none;
 	padding: 0;
-	margin: 0;
+	margin: 10px 0 0;
 }
 form.inskin .edit_fieldgroup .label{
 	display: none;
@@ -363,10 +363,6 @@ form.inskin .edit_area textarea{
 /*
  * Categories selection table:
  */
-.extracats legend{
-	color: #000;
-	padding: 10px 0 5px;
-}
 table.catselect {
 	border-spacing:0;
 	width:100%;

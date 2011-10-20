@@ -145,12 +145,12 @@ function insert_basic_widgets( $blog_id, $initial_install = false )
 		}
 
 
-		if( $blog_id == 1 && $test_install_all_features )
-		{	
+		if( ( $blog_id == 1 || $blog_id == 5 ) && $test_install_all_features )
+		{
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_enabled)
 								VALUES( '.$blog_id.', "Item Single", 1, "plugin", "evo_Gmaps", 1)' );
 			// add blog collection setting to activate additional fields
-			
+
 			$DB->query( 'INSERT INTO T_coll_settings(cset_coll_ID, cset_name, cset_value)
 								VALUES( '.$blog_id.', "custom_double3" , "Latitude"),
 									  ( '.$blog_id.', "custom_double4" , "Longitude")');
@@ -204,6 +204,9 @@ function insert_basic_widgets( $blog_id, $initial_install = false )
 
 /*
  * $Log$
+ * Revision 1.13  2011/10/20 06:39:54  efy-asimo
+ * Small display modifications
+ *
  * Revision 1.12  2011/10/17 10:39:08  efy-vitalij
  * added automatic installation evo_Gmaps widget for blog 1  in function insert_basic_widgets if $test_install_all_features = 1
  *
