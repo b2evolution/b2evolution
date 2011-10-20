@@ -752,6 +752,8 @@ class Hit
 	{
 		global $DB, $Session, $ReqURI, $Blog, $blog, $localtimenow, $Debuglog, $disp, $ctrl, $http_response_code;
 
+		// To log current display and controller the global variables $disp and $ctrl are used. They can be setup while calling of some controller
+		// or while forming a page. In case if these variables aren't setup, NULL is recorded to the DB.
 		$Debuglog->add( 'Hit: Recording the hit.', 'request' );
 
 		if(empty($this->test_uri))
@@ -1597,6 +1599,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.82  2011/10/20 13:17:06  efy-vitalij
+ * doc
+ *
  * Revision 1.81  2011/10/18 08:07:10  efy-vitalij
  * add comments
  *
