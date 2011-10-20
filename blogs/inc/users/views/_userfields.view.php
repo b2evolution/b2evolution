@@ -109,7 +109,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Name'),
 		'order' => 'ufdf_name',
-		'td' => '%T_(#ufdf_name#)%',
+		'td' => '<a href="%regenerate_url( \'action\', \'ufdf_ID=$ufdf_ID$&amp;action=edit\' )%">%T_(#ufdf_name#)%</a>',
 	);
 
 $Results->cols[] = array(
@@ -142,6 +142,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.17  2011/10/20 17:22:21  efy-yurybakh
+ * clickable Names on ?ctrl=userfields
+ *
  * Revision 1.16  2011/09/27 17:31:19  efy-yurybakh
  * User additional info fields
  *
