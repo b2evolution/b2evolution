@@ -63,6 +63,7 @@ $keywords = param( 'keywords', 'string', '', true );
 // $usr_unconfirmed = param( 'usr_unconfirmed', 'boolean', false, true );
 
 $where_clause = '';
+$left_join_clause = '';
 
 if( !empty( $keywords ) )
 {
@@ -71,6 +72,35 @@ if( !empty( $keywords ) )
 	{
 		// Note: we use CONCAT_WS (Concat With Separator) because CONCAT returns NULL if any arg is NULL
 		$where_clause .= 'CONCAT_WS( " ", user_login, user_firstname, user_lastname, user_nickname, user_email) LIKE "%'.$DB->escape($kw).'%" AND ';
+	}
+}
+
+if( $Settings->get( 'registration_require_gender' ) != 'hidden' )
+{	// Filter by gender
+	$gender_men = param( 'gender_men', 'boolean', false );
+	$gender_women = param( 'gender_women', 'boolean', false );
+	if( ( $gender_men && ! $gender_women ) || ( ! $gender_men && $gender_women ) )
+	{	// Find men OR women
+		$where_clause .= 'user_gender = "'.( $gender_men ? 'M' : 'F' ).'" AND ';
+	}
+	else if( $gender_men && $gender_women )
+	{	// Find men AND women
+		$where_clause .= 'user_gender IN ( "M", "F" ) AND ';
+	}
+}
+
+$criteria_type = param( 'criteria_type', 'integer', 0 );
+$criteria_value = param( 'criteria_value', 'string' );
+if( $criteria_type > 0 && $criteria_value != '' )
+{	// Filter by Specific criteria
+	$criteria_words = explode( ' ', $criteria_value );
+	if( count( $criteria_words ) > 0 )
+	{
+		$left_join_clause .= ' LEFT JOIN T_users__fields ON uf_user_ID = user_ID AND uf_ufdf_ID = "'.$DB->escape($criteria_type).'"';
+		foreach( $criteria_words as $word )
+		{
+			$where_clause .= 'uf_varchar LIKE "%'.$DB->escape($word).'%" AND ';
+		}
 	}
 }
 // fp> TODO: implement this like other filtersets in the app. You need a checkbox, or better yet: a select that allows: Confirmed/Unconfirmed/All
@@ -83,7 +113,7 @@ if( $usr_unconfirmed )
 $SQL = new SQL();
 $SQL->SELECT( 'T_users.*, grp_ID, grp_name, ctry_name, MAX(T_sessions.sess_lastseen) as sess_lastseen, 
 			IF( IFNULL(user_avatar_file_ID,0), 1, 0 ) as has_picture' );
-$SQL->FROM( 'T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID' );
+$SQL->FROM( 'T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID'.$left_join_clause );
 $SQL->FROM_add( 'LEFT JOIN T_country ON user_ctry_ID = ctry_ID' );
 $SQL->FROM_add( 'LEFT JOIN T_sessions ON user_ID = sess_user_ID' );
 $SQL->WHERE( $where_clause.' 1' );
@@ -101,7 +131,7 @@ else
 }
 
 $count_sql = 'SELECT COUNT(*)
-							 	FROM T_users
+							 	FROM T_users'.$left_join_clause.'
 							 WHERE '.$where_clause.' 1';
 
 if( $Settings->get('allow_avatars') )
@@ -127,17 +157,8 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 }
 
 
-/**
- * Callback to add filters on top of the result set
- *
- * @param Form
- */
-function filter_userlist( & $Form )
-{
-	$Form->text( 'keywords', get_param('keywords'), 20, T_('Keywords'), T_('Separate with space'), 50 );
-}
 $Results->filter_area = array(
-	'callback' => 'filter_userlist',
+	'callback' => 'callback_filter_userlist',
 	'url_ignore' => 'results_user_page,keywords',
 	'presets' => array(
 		'all' => array( T_('All users'), '?ctrl=users' ),
@@ -405,6 +426,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.44  2011/10/20 15:22:50  efy-yurybakh
+ * new filters for users list
+ *
  * Revision 1.43  2011/10/10 19:48:32  fplanque
  * i18n & login display cleaup
  *

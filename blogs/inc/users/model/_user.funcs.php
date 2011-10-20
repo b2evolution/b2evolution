@@ -1308,7 +1308,10 @@ function callback_options_user_new_fields( $value )
 
 	if( count( $userfielddefs ) > 0 )
 	{	// Field types exist in DB
-		$field_options .= '<option value="">'.T_('Add field...').'</option>'."\n".'<optgroup label="'.T_('Instant Messaging').'">';
+		global $user_fields_empty_name;
+		$empty_name = isset( $user_fields_empty_name ) ? $user_fields_empty_name : T_('Add field...');
+
+		$field_options .= '<option value="">'.$empty_name.'</option>'."\n".'<optgroup label="'.T_('Instant Messaging').'">';
 		foreach( $userfielddefs as $fielddef )
 		{
 			// check for group header:
@@ -1448,8 +1451,37 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new' )
 	}
 }
 
+/**
+ * Callback to add filters on top of the result set
+ *
+ * @param Form
+ */
+function callback_filter_userlist( & $Form )
+{
+	global $Settings;
+
+	$Form->text( 'keywords', get_param('keywords'), 20, T_('Keywords'), T_('Separate with space'), 50 );
+
+	if( $Settings->get( 'registration_require_gender' ) != 'hidden' )
+	{
+		$Form->checkbox( 'gender_men', get_param('gender_men'), T_('Men') );
+		$Form->checkbox( 'gender_women', get_param('gender_women'), T_('Women') );
+	}
+
+	$Form->output = false;
+	$criteria_input = $Form->text( 'criteria_value', get_param('criteria_value'), 20, '', '', 50 );
+	$Form->output = true;
+
+	global $user_fields_empty_name;
+	$user_fields_empty_name = T_('Select...');
+	$Form->select( 'criteria_type', get_param( 'criteria_type' ), 'callback_options_user_new_fields', T_('Specific criteria'), $criteria_input );
+}
+
 /*
  * $Log$
+ * Revision 1.97  2011/10/20 15:22:50  efy-yurybakh
+ * new filters for users list
+ *
  * Revision 1.96  2011/10/19 12:14:59  efy-yurybakh
  * default empty value for required option fields
  *

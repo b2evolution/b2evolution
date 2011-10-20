@@ -54,6 +54,7 @@ $keywords = param( 'keywords', 'string', '', true );
 // $usr_unconfirmed = param( 'usr_unconfirmed', 'boolean', false, true );
 
 $where_clause = '';
+$left_join_clause = '';
 
 if( !empty( $keywords ) )
 {
@@ -64,6 +65,36 @@ if( !empty( $keywords ) )
 		$where_clause .= 'CONCAT_WS( " ", user_login ) LIKE "%'.$DB->escape($kw).'%" AND ';
 	}
 }
+
+if( $Settings->get( 'registration_require_gender' ) != 'hidden' )
+{	// Filter by gender
+	$gender_men = param( 'gender_men', 'boolean', false );
+	$gender_women = param( 'gender_women', 'boolean', false );
+	if( ( $gender_men && ! $gender_women ) || ( ! $gender_men && $gender_women ) )
+	{	// Find men OR women
+		$where_clause .= 'user_gender = "'.( $gender_men ? 'M' : 'F' ).'" AND ';
+	}
+	else if( $gender_men && $gender_women )
+	{	// Find men AND women
+		$where_clause .= 'user_gender IN ( "M", "F" ) AND ';
+	}
+}
+
+$criteria_type = param( 'criteria_type', 'integer', 0 );
+$criteria_value = param( 'criteria_value', 'string' );
+if( $criteria_type > 0 && $criteria_value != '' )
+{	// Filter by Specific criteria
+	$criteria_words = explode( ' ', $criteria_value );
+	if( count( $criteria_words ) > 0 )
+	{
+		$left_join_clause .= ' LEFT JOIN T_users__fields ON uf_user_ID = user_ID AND uf_ufdf_ID = "'.$DB->escape($criteria_type).'"';
+		foreach( $criteria_words as $word )
+		{
+			$where_clause .= 'uf_varchar LIKE "%'.$DB->escape($word).'%" AND ';
+		}
+	}
+}
+
 // fp> TODO: implement this like other filtersets in the app. You need a checkbox, or better yet: a select that allows: Confirmed/Unconfirmed/All
 /*
 if( $usr_unconfirmed )
@@ -73,7 +104,7 @@ if( $usr_unconfirmed )
 */
 $SQL = new SQL();
 $SQL->SELECT( 'T_users.*, ctry_name, IF( IFNULL(user_avatar_file_ID,0), 1, 0 ) as has_picture' );
-$SQL->FROM( 'T_users LEFT JOIN T_country ON user_ctry_ID = ctry_ID' );
+$SQL->FROM( 'T_users LEFT JOIN T_country ON user_ctry_ID = ctry_ID'.$left_join_clause );
 $SQL->WHERE( $where_clause.' 1' );
 $SQL->GROUP_BY( 'user_ID' );
 
@@ -88,7 +119,7 @@ else
 }
 
 $count_sql = 'SELECT COUNT(*)
-							 	FROM T_users
+							 	FROM T_users'.$left_join_clause.'
 							 WHERE '.$where_clause.' 1';
 
 if( $Settings->get('allow_avatars') )
@@ -103,17 +134,8 @@ else
 $Results = new Results( $SQL->get(), 'user_', $default_sort, NULL, $count_sql );
 
 
-/**
- * Callback to add filters on top of the result set
- *
- * @param Form
- */
-function filter_userlist( & $Form )
-{
-	$Form->text( 'keywords', get_param('keywords'), 20, T_('Keywords'), T_('Separate with space'), 50 );
-}
 $Results->filter_area = array(
-	'callback' => 'filter_userlist',
+	'callback' => 'callback_filter_userlist',
 	'url_ignore' => 'results_user_page,keywords',
 	'presets' => array(
 		'all' => array( T_('All users'), get_messaging_url( 'users' ) ),
@@ -177,6 +199,9 @@ $Results->display( $display_params );
 
 /*
  * $Log$
+ * Revision 1.7  2011/10/20 15:22:50  efy-yurybakh
+ * new filters for users list
+ *
  * Revision 1.6  2011/10/07 17:22:52  efy-yurybakh
  * user avatar display default
  *
