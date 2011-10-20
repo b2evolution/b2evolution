@@ -123,35 +123,35 @@ function create_default_data()
 	echo 'Creating user field definitions... ';
 	// fp> Anyone, please add anything you can think of. It's better to start with a large list that update it progressively.
 	$DB->query( "
-    INSERT INTO T_users__fielddefs (ufdf_ID, ufdf_type, ufdf_name, ufdf_required)
-		 VALUES ( 10000, 'email',    'MSN/Live IM', 'optional'),
-						( 10100, 'word',     'Yahoo IM', 'optional'),
-						( 10200, 'word',     'AOL AIM', 'optional'),
-						( 10300, 'number',   'ICQ ID', 'optional'),
-						( 40000, 'phone',    'Skype', 'optional'),
-						( 50000, 'phone',    'Main phone', 'optional'),
-						( 50100, 'phone',    'Cell phone', 'optional'),
-						( 50200, 'phone',    'Office phone', 'optional'),
-						( 50300, 'phone',    'Home phone', 'optional'),
-						( 60000, 'phone',    'Office FAX', 'optional'),
-						( 60100, 'phone',    'Home FAX', 'optional'),
-						(100000, 'url',      'Website', 'recommended'),
-						(100100, 'url',      'Blog', 'optional'),
-						(110000, 'url',      'Linkedin', 'optional'),
-						(120000, 'url',      'Twitter', 'recommended'),
-						(130100, 'url',      'Facebook', 'recommended'),
-						(130200, 'url',      'Myspace', 'optional'),
-						(140000, 'url',      'Flickr', 'optional'),
-						(150000, 'url',      'YouTube', 'optional'),
-						(160000, 'url',      'Digg', 'optional'),
-						(160100, 'url',      'StumbleUpon', 'optional'),
-						(200000, 'text',     'Role', 'optional'),
-						(200100, 'text',     'Organization', 'optional'),
-						(200200, 'text',     'Division', 'optional'),
-						(211000, 'text',     'VAT ID', 'optional'),
-						(300000, 'text',     'Main address', 'optional'),
-						(300300, 'text',     'Home address', 'optional'),
-						(400000, 'text',     'About me', 'recommended');" );
+    INSERT INTO T_users__fielddefs (ufdf_ID, ufdf_type, ufdf_name, ufdf_required, ufdf_duplicated)
+		 VALUES ( 10000, 'email',    'MSN/Live IM',  'optional',    '1'),
+						( 10100, 'word',     'Yahoo IM',     'optional',    '1'),
+						( 10200, 'word',     'AOL AIM',      'optional',    '1'),
+						( 10300, 'number',   'ICQ ID',       'optional',    '1'),
+						( 40000, 'phone',    'Skype',        'optional',    '0'),
+						( 50000, 'phone',    'Main phone',   'optional',    '0'),
+						( 50100, 'phone',    'Cell phone',   'optional',    '1'),
+						( 50200, 'phone',    'Office phone', 'optional',    '1'),
+						( 50300, 'phone',    'Home phone',   'optional',    '0'),
+						( 60000, 'phone',    'Office FAX',   'optional',    '0'),
+						( 60100, 'phone',    'Home FAX',     'optional',    '0'),
+						(100000, 'url',      'Website',      'recommended', '1'),
+						(100100, 'url',      'Blog',         'optional',    '1'),
+						(110000, 'url',      'Linkedin',     'optional',    '0'),
+						(120000, 'url',      'Twitter',      'recommended', '0'),
+						(130100, 'url',      'Facebook',     'recommended', '0'),
+						(130200, 'url',      'Myspace',      'optional',    '0'),
+						(140000, 'url',      'Flickr',       'optional',    '0'),
+						(150000, 'url',      'YouTube',      'optional',    '0'),
+						(160000, 'url',      'Digg',         'optional',    '0'),
+						(160100, 'url',      'StumbleUpon',  'optional',    '0'),
+						(200000, 'text',     'Role',         'optional',    '0'),
+						(200100, 'text',     'Organization', 'optional',    '0'),
+						(200200, 'text',     'Division',     'optional',    '0'),
+						(211000, 'text',     'VAT ID',       'optional',    '0'),
+						(300000, 'text',     'Main address', 'optional',    '0'),
+						(300300, 'text',     'Home address', 'optional',    '0'),
+						(400000, 'text',     'About me',     'recommended', '0');" );
 	echo "OK.<br />\n";
 
 
@@ -1428,6 +1428,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.332  2011/10/20 12:14:55  efy-yurybakh
+ * Allow/disabled multiple instances of same field
+ *
  * Revision 1.331  2011/10/19 15:00:34  efy-asimo
  * Modules can add their own demo contents
  *

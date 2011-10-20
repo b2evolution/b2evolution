@@ -81,6 +81,8 @@ $Form->begin_form( 'fform', $creating ?  T_('New user field') : T_('User field')
 		$Form->radio_input( 'ufdf_required', 'optional', $edited_Userfield->get_requireds(), T_('Required?'), array( 'required'=>true ) );
 	}
 
+	$Form->checkbox( 'ufdf_duplicated', $edited_Userfield->get('duplicated'), T_('Duplicated?'), T_('User can add a several instances of this field type') );
+
 if( $creating )
 {
 	$Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'SaveButton' ),
@@ -111,6 +113,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.11  2011/10/20 12:14:55  efy-yurybakh
+ * Allow/disabled multiple instances of same field
+ *
  * Revision 1.10  2011/10/18 12:28:13  efy-yurybakh
  * Info fields: select lists - give list of configurable options
  *

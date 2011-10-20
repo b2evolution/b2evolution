@@ -214,6 +214,7 @@ switch( $action )
 	case 'get_user_new_field':
 		// Used in the identity user form to add a new field
 		$field_ID = param( 'field_id', 'integer', 0 );
+		$user_ID = param( 'user_id', 'integer', 0 );
 
 		if( $field_ID == 0 )
 		{	// Bad request
@@ -221,9 +222,27 @@ switch( $action )
 		}
 
 		$userfields = $DB->get_results( '
-			SELECT ufdf_ID, "0" AS uf_ID, ufdf_type, ufdf_name, "" AS uf_varchar, ufdf_required, ufdf_options
+			SELECT ufdf_ID, "0" AS uf_ID, ufdf_type, ufdf_name, "" AS uf_varchar, ufdf_required, ufdf_options, ufdf_duplicated
 				FROM T_users__fielddefs
 			WHERE ufdf_ID = "'.$field_ID.'"' );
+
+		if( $userfields[0]->ufdf_duplicated == 0 )
+		{	// This field can be only one instance for one user
+			echo '[0]'; // not duplicated field
+
+			$user_field_exist = $DB->get_var( '
+				SELECT uf_ID
+					FROM T_users__fields
+				WHERE uf_user_ID = "'.$user_ID.'" AND uf_ufdf_ID = "'.$field_ID.'"' );
+			if( $user_field_exist > 0 )
+			{	// User already has a current field type
+				exit(0);
+			}
+		}
+		else
+		{	// It Means: this field can be duplicated
+			echo '[1]';
+		}
 
 		$Form = new Form();
 
@@ -236,6 +255,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.27  2011/10/20 12:14:54  efy-yurybakh
+ * Allow/disabled multiple instances of same field
+ *
  * Revision 1.26  2011/10/19 12:14:58  efy-yurybakh
  * default empty value for required option fields
  *

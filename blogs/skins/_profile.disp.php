@@ -41,7 +41,7 @@ load_class( 'regional/model/_country.class.php', 'Country' );
 global $Blog, $Session, $Messages, $inc_path;
 global $action, $user_profile_only, $edited_User, $form_action;
 
-$form_action = url_add_param( $Blog->gen_blogurl(), 'disp='.$disp );
+$form_action = url_add_param( $Blog->gen_blogurl(), 'disp='.$disp, '&' );
 
 if( ! is_logged_in() )
 { // must be logged in!
@@ -125,6 +125,9 @@ switch( $disp )
 
 /*
  * $Log$
+ * Revision 1.27  2011/10/20 12:14:55  efy-yurybakh
+ * Allow/disabled multiple instances of same field
+ *
  * Revision 1.26  2011/10/18 16:20:38  efy-yurybakh
  * Ajax implementation of "add field"
  *

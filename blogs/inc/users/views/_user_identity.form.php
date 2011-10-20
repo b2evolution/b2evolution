@@ -444,7 +444,7 @@ $Form->output = false;
 $button_add_field = $Form->button( array( 'type' => 'submit', 'name' => 'actionArray[add_field]', 'value' => 'Add', 'id' => 'button_add_field' ) );
 $Form->output = true;
 
-$Form->select( 'new_field_type', '', 'callback_options_user_new_fields', T_('Add a field of type'), $button_add_field );
+$Form->select( 'new_field_type', param( 'new_field_type', 'integer', 0 ), 'callback_options_user_new_fields', T_('Add a field of type'), $button_add_field );
 
 
 $Form->hidden( 'orig_user_ID', $user_id );
@@ -456,7 +456,7 @@ $Form->end_fieldset();
 if( $action != 'view' )
 { // Edit buttons
 	$action_buttons = array(
-		array( '', 'actionArray[update]', T_('Save !'), 'SaveButton' ) );
+		array( '', 'actionArray[update]', T_( $is_admin ? 'Save !' : 'Save changes' ), 'SaveButton' ) );
 	if( $is_admin )
 	{
 		$action_buttons[] = array( 'reset', '', T_('Reset'), 'ResetButton' );
@@ -494,45 +494,88 @@ $Form->end_form();
 
 		if( field_id == '' )
 		{	// Mark select element of field types as error
-			if( ! jQuery( this ).parent().prev().hasClass( 'field_error' ) )
-			{	// To avoid if user press the button with second time when he already see an error
-				jQuery( this ).parent().prev().addClass( 'field_error' );
-				jQuery( this ).after( '<span class="field_error"><?php echo T_('Please select a field type.'); ?></span>' );
-			}
+			field_type_error( '<?php echo T_('Please select a field type.'); ?>' );
 			// We should to stop the ajax request without field_id
 			return false;
 		}
 		else
 		{	// Remove an error class from the field
-			jQuery( this ).parent().prev().removeClass( 'field_error' );
-			jQuery( this ).parent().find( 'span.field_error' ).remove();
+			field_type_error_clear();
 		}
 
+		var this_obj = jQuery( this );
 		$.ajax({
 		type: 'POST',
 		url: htsrv_url + 'anon_async.php',
-		data: 'action=get_user_new_field&field_id=' + field_id,
+		data: 'action=get_user_new_field&user_id=<?php echo $edited_User->ID; ?>&field_id=' + field_id,
 		success: function(result)
 			{
-				jQuery( '#ffield_new_field_type' ).prev().before( result );
+				if( result == '[0]' )
+				{	// This field(not duplicated) already exists for current user
+					field_type_error( '<?php echo T_('You already added this field, please select another.'); ?>' );
+				}
+				else
+				{
+					var field_duplicated = parseInt( result.replace( /^\[(\d+)\](.*)/, '$1' ) );
+					if( field_duplicated == 0 )
+					{	// This field is NOT duplicated
+						var field_id = parseInt( result.replace( /(.*)fieldset id="ffield_uf_add_(\d+)_(.*)/, '$2' ) );
+						if( jQuery( '[id^=uf_new_' + field_id + '], [id^=uf_add_' + field_id + ']' ).length > 0 )
+						{	// This field already exists(on the html form, not in DB) AND user cannot add a duplicate
+							field_type_error( '<?php echo T_('You already added this field, please select another.'); ?>' );
+							return false;
+						}
+					}
+					jQuery( '#ffield_new_field_type' ).prev().before( result.replace( /^\[\d+\](.*)/, '$1' ) );
+				}
 			}
 		});
+
 		return false;
 	} );
-	
+
 	jQuery( '[name^=uf_new], [name^=uf_add]' ).live( 'focus', function ()
 	{	// Auto select the value for the field of type
 		var field_id = parseInt( jQuery( this ).attr( 'name' ).replace( /uf_(new|add)\[(\d+)\]\[\]/, '$2' ) );
 		if( field_id > 0 )
 		{
 			jQuery( '#new_field_type' ).val( field_id );
+			field_type_error_clear();
 		}
 	} );
+	
+	jQuery( '#new_field_type' ).change( function ()
+	{	// Remove all errors messages from field "Add a field of type:"
+		field_type_error_clear();
+	} );
+	
+	function field_type_error( message )
+	{	// Add an error message for the "field of type" select
+		jQuery( 'select#new_field_type' ).addClass( 'field_error' );
+		var span_error = jQuery( 'select#new_field_type' ).next().find( 'span.field_error' );
+		if( span_error.length > 0 )
+		{	// Replace a content of the existing span element
+			span_error.html( message );
+		}
+		else
+		{	// Create a new span element for error message
+			jQuery( 'select#new_field_type' ).next().append( '<span class="field_error">' + message + '</span>' );
+		}
+	}
+	
+	function field_type_error_clear()
+	{	// Remove an error style from the "field of type" select
+		jQuery( 'select#new_field_type' ).removeClass( 'field_error' )
+																			.next().find( 'span.field_error' ).remove();
+	}
 </script>
 <?php
 
 /*
  * $Log$
+ * Revision 1.62  2011/10/20 12:14:55  efy-yurybakh
+ * Allow/disabled multiple instances of same field
+ *
  * Revision 1.61  2011/10/19 12:40:14  efy-yurybakh
  * remove "Reset" button from disp=profile
  *

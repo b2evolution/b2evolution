@@ -44,6 +44,7 @@ class Userfield extends DataObject
 	var $name = '';
 	var $options = '';
 	var $required = '';
+	var $duplicated = '1';
 
 	/**
 	 * Constructor
@@ -69,6 +70,7 @@ class Userfield extends DataObject
 			$this->name          = $db_row->ufdf_name;
 			$this->options       = $db_row->ufdf_options;
 			$this->required      = $db_row->ufdf_required;
+			$this->duplicated    = $db_row->ufdf_duplicated;
 		}
 		else
 		{	// Create a new user field:
@@ -140,6 +142,10 @@ class Userfield extends DataObject
 		// Required
 		param_string_not_empty( 'ufdf_required', T_('Please select Hidden, Optional, Recommended or Required.') );
 		$this->set_from_Request( 'required' );
+
+		// Duplicated
+		param( 'ufdf_duplicated', 'integer', 0 );
+		$this->set_from_Request( 'duplicated' );
 
 		return ! param_errors_detected();
 	}

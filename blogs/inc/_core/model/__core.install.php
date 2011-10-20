@@ -131,6 +131,7 @@ $schema_queries = array(
 			ufdf_name varchar(255) NOT NULL,
 			ufdf_options TEXT NOT NULL,
 			ufdf_required enum('hidden','optional','recommended','require') NOT NULL default 'optional',
+			ufdf_duplicated tinyint(1) NOT NULL default 0,
 			PRIMARY KEY (ufdf_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -287,6 +288,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.67  2011/10/20 12:14:55  efy-yurybakh
+ * Allow/disabled multiple instances of same field
+ *
  * Revision 1.66  2011/10/19 07:33:39  efy-yurybakh
  * Additional info fields - step 2 (SECURITY)
  *

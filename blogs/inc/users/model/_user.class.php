@@ -379,6 +379,9 @@ class User extends DataObject
 				}
 			}
 
+			$uf_new_fields = param( 'uf_new', 'array' );	// Recommended & required fields (it still not saved in DB)
+			$uf_add_fields = param( 'uf_add', 'array' );	// Added fields
+
 			// Add a new field: (JS is not enabled)
 			if( $action == 'add_field' )
 			{	// Button 'Add' new field is pressed
@@ -388,18 +391,54 @@ class User extends DataObject
 					param_error( 'new_field_type', T_('Please select a field type.') );
 				}
 				else
-				{	// Mark a new field to enter a value
-					param_error( 'uf_add['.$new_field_type.'][]', T_('Please enter a value in this new field.') );
-				}
+				{	// Save an adding field(in the array) to display it again if errors will be exist
+					$new_field_type_exists = false;
 
-				// Save an adding field to display it again if errors will be exist
-				global $add_field_types;
-				$add_field_types = array( $new_field_type );
+					if( $this->userfield_defs[$new_field_type][4] == '1' )
+					{	// This field can be duplicated
+						global $add_field_types;
+						$add_field_types = array( $new_field_type );
+					}
+					else
+					{	// We should to solve we can add this field or don't
+						if( ! isset( $uf_new_fields[$new_field_type] ) && ! isset( $uf_add_fields[$new_field_type] ) )
+						{	// User is adding this field first time
+							if( is_array( $userfield_IDs ) && count( $userfield_IDs ) > 0 )
+							{	// User has fields that saved in DB
+								foreach( $userfield_IDs as $userfield )
+								{
+									if( $userfield->uf_ufdf_ID == $new_field_type )
+									{	// New adding field already exists for current user in DB
+										$new_field_type_exists = true;
+										break;
+									}
+								}
+							}
+							if( ! $new_field_type_exists )
+							{	// Field doesn't still exist for current user
+								global $add_field_types;
+								$add_field_types = array( $new_field_type );
+							}
+						}
+						else
+						{	// Field exists, no duplicates available
+							$new_field_type_exists = true;
+						}
+
+						if( $new_field_type_exists )
+						{	// Field already is added for current user, we should display error about this
+							param_error( 'new_field_type', T_('You already added this field, please select another.') );
+						}
+					}
+
+					if( ! $new_field_type_exists )
+					{	// Mark a new field to enter a value
+						param_error( 'uf_add['.$new_field_type.'][]', T_('Please enter a value in this new field.') );
+					}
+				}
 			}
 
 			// Save a New recommended & require fields AND Adding fields
-			$uf_new_fields = param( 'uf_new', 'array' );
-			$uf_add_fields = param( 'uf_add', 'array' );
 			if( count( $uf_new_fields ) > 0 || count( $uf_add_fields ) > 0 )
 			{
 				$uf_fields = array(
@@ -427,7 +466,7 @@ class User extends DataObject
 
 							if( $uf_new_val != '' )
 							{	// Insert a new field in DB if it is filled
-								$this->userfield_add( (int)$uf_new_id, trim( strip_tags( $uf_new_val ) ) );
+								$this->userfield_add( (int)$uf_new_id, format_to_output( $uf_new_val, 'formvalue' ) );
 							}
 							elseif( empty( $uf_new_val ) && $this->userfield_defs[$uf_new_id][2] == 'require' )
 							{	// Display error for empty required field & new adding field
@@ -2508,12 +2547,18 @@ class User extends DataObject
 		if( !isset($this->userfield_defs) )
 		{
 			$userfield_defs = $DB->get_results( '
-				SELECT ufdf_ID, ufdf_type, ufdf_name, ufdf_required
+				SELECT ufdf_ID, ufdf_type, ufdf_name, ufdf_required, ufdf_options, ufdf_duplicated
 					FROM T_users__fielddefs' );
 
 			foreach( $userfield_defs as $userfield_def )
 			{
-				$this->userfield_defs[$userfield_def->ufdf_ID] = array( $userfield_def->ufdf_type, $userfield_def->ufdf_name, $userfield_def->ufdf_required ); //jamesz
+				$this->userfield_defs[$userfield_def->ufdf_ID] = array(
+					$userfield_def->ufdf_type,
+					$userfield_def->ufdf_name,
+					$userfield_def->ufdf_required,
+					$userfield_def->ufdf_options,
+					$userfield_def->ufdf_duplicated
+				); //jamesz
 			}
 		}
 	}
@@ -2770,6 +2815,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.169  2011/10/20 12:14:55  efy-yurybakh
+ * Allow/disabled multiple instances of same field
+ *
  * Revision 1.168  2011/10/19 12:14:59  efy-yurybakh
  * default empty value for required option fields
  *
