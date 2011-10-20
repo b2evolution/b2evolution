@@ -169,6 +169,9 @@ class CollectionSettings extends AbstractSettings
 		// Time frame settings:
 			'timestamp_min' => 'yes',
 			'timestamp_max' => 'no',
+
+		// Back-end settings, these can't be modified by the users, it will be modified from code:
+			'last_invalidation_timestamp' => 0,
 		);
 
 
@@ -204,6 +207,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.74  2011/10/20 16:32:57  efy-asimo
+ * Invalidate PageCaches after specific settings update
+ *
  * Revision 1.73  2011/10/17 15:32:46  efy-yurybakh
  * Let people create an account just after posting a comment
  *

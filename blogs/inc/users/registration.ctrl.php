@@ -47,6 +47,9 @@ switch ( $action )
 		// Check permission:
 		$current_User->check_perm( 'users', 'edit', true );
 
+		// keep old newusers_canregister setting value to check if we need to invalidate pagecaches
+		$old_newusers_canregister = $Settings->get( 'newusers_canregister' );
+
 		// UPDATE general settings:
 		param( 'newusers_canregister', 'integer', 0 );
 
@@ -100,7 +103,11 @@ switch ( $action )
 		if( ! $Messages->has_errors() )
 		{
 			if( $Settings->dbupdate() )
-			{
+			{ // update was successful
+				if( $old_newusers_canregister != $newusers_canregister )
+				{ // invalidate all PageCaches
+					invalidate_pagecaches();
+				}
 				$Messages->add( T_('General settings updated.'), 'success' );
 				// Redirect so that a reload doesn't write to the DB twice:
 				header_redirect( '?ctrl=registration', 303 ); // Will EXIT
@@ -138,6 +145,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2011/10/20 16:32:57  efy-asimo
+ * Invalidate PageCaches after specific settings update
+ *
  * Revision 1.17  2011/10/17 17:53:11  efy-yurybakh
  * Detect previous comments after email validation
  *

@@ -19,8 +19,10 @@ switch ( $action )
 		// Check permission:
 		$current_User->check_perm( 'users', 'edit', true );
 
-		// UPDATE general settings:
+		// keep old allow_avatars setting value to check if we need to invalidate pagecaches
+		$old_allow_avatars = $Settings->get( 'allow_avatars' );
 
+		// UPDATE general settings:
 		param( 'allow_avatars', 'integer', 0 );
 		$Settings->set( 'allow_avatars', $allow_avatars );
 
@@ -43,10 +45,15 @@ switch ( $action )
 		{
 			if( $Settings->dbupdate() )
 			{
+				if( $old_allow_avatars != $allow_avatars )
+				{ // invalidate all PageCaches
+					invalidate_pagecaches();
+				}
+
 				$Messages->add( T_('General settings updated.'), 'success' );
 			}
 		}
-		
+
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( '?ctrl=usersettings', 303 ); // Will EXIT
 		// We have EXITed already at this point!!
@@ -81,6 +88,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2011/10/20 16:32:57  efy-asimo
+ * Invalidate PageCaches after specific settings update
+ *
  * Revision 1.10  2010/11/25 15:16:35  efy-asimo
  * refactor $Messages
  *

@@ -212,6 +212,9 @@ switch( $action )
 		// we call $Plugins(!) here: the Plugin gets disabled on the current page already and it should not get (un)registered on $admin_Plugins!
 		$Plugins->set_Plugin_status( $edit_Plugin, 'disabled' ); // sets $edit_Plugin->status
 
+		// invalidate all PageCaches
+		invalidate_pagecaches();
+
 		$Messages->add( /* TRANS: plugin name, class name and ID */ sprintf( T_('Disabled "%s" plugin (%s, #%d).'), $edit_Plugin->name, $edit_Plugin->classname, $edit_Plugin->ID ), 'success' );
 
 		//save fadeout item
@@ -280,6 +283,9 @@ switch( $action )
 			// we call $Plugins(!) here: the Plugin gets active on the current page already and it should not get (un)registered on $admin_Plugins!
 			$Plugins->set_Plugin_status( $edit_Plugin, 'enabled' ); // sets $edit_Plugin->status
 
+			// invalidate all PageCaches
+			invalidate_pagecaches();
+
 			$Messages->add( /* TRANS: plugin name, class name and ID */ sprintf( T_('Enabled "%s" plugin (%s, #%d).'), $edit_Plugin->name, $edit_Plugin->classname, $edit_Plugin->ID ), 'success' );
 		}
 		else
@@ -341,6 +347,8 @@ switch( $action )
 
 		if( $changed )
 		{
+			// invalidate all PageCaches
+			invalidate_pagecaches();
 			$Messages->add( T_('Plugins have been reloaded.'), 'success' );
 		}
 		else
@@ -413,6 +421,9 @@ switch( $action )
 
 		// Install completed:
 		$r = $admin_Plugins->call_method( $edit_Plugin->ID, 'AfterInstall', $params = array() );
+
+		// invalidate all PageCaches
+		invalidate_pagecaches();
 
 		// Try to enable plugin:
 		$enable_return = $edit_Plugin->BeforeEnable();
@@ -490,6 +501,8 @@ switch( $action )
 
 		if( $uninstall_ok === true )
 		{ // Plugin said "YES":
+			// invalidate all PageCaches
+			invalidate_pagecaches();
 
 			if( $uninstall_tables_to_drop )
 			{ // There are tables with the prefix for this plugin:
@@ -1135,6 +1148,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.25  2011/10/20 16:32:57  efy-asimo
+ * Invalidate PageCaches after specific settings update
+ *
  * Revision 1.24  2011/09/14 21:04:06  fplanque
  * cleanup
  *

@@ -2087,11 +2087,15 @@ class Blog extends DataObject
 	 */
 	function dbupdate()
 	{
-		global $DB, $Plugins;
+		global $DB, $Plugins, $servertimenow;
 
 		$DB->begin();
 
 		parent::dbupdate();
+
+		// if this blog settings was modified we need to invalidate this blog's page caches
+		// this way all existing cached page on this blog will be regenerated during next display
+		$this->set_setting( 'last_invalidation_timestamp', $servertimenow );
 
 		if( isset( $this->CollectionSettings ) )
 		{
@@ -2581,6 +2585,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.162  2011/10/20 16:32:57  efy-asimo
+ * Invalidate PageCaches after specific settings update
+ *
  * Revision 1.161  2011/10/17 15:32:46  efy-yurybakh
  * Let people create an account just after posting a comment
  *

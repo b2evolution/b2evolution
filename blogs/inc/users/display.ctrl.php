@@ -85,6 +85,9 @@ switch ( $action )
 		{
 			if( $Settings->dbupdate() )
 			{
+				// invalidate all PageCaches
+				invalidate_pagecaches();
+
 				$Messages->add( T_('Display settings updated.'), 'success' );
 				// Redirect so that a reload doesn't write to the DB twice:
 				header_redirect( '?ctrl=display', 303 ); // Will EXIT
@@ -122,6 +125,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2011/10/20 16:32:57  efy-asimo
+ * Invalidate PageCaches after specific settings update
+ *
  * Revision 1.3  2011/10/07 02:55:38  fplanque
  * doc
  *

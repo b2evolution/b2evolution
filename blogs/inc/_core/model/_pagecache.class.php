@@ -68,6 +68,10 @@ class PageCache
 	 */
 	var $is_collecting = false;
 
+	/**
+	 * Cache Blog. It should be NULL if this is not a blog PageCache.
+	 */
+	var $cache_Blog = NULL;
 
 	/**
 	 * Constructor
@@ -97,6 +101,7 @@ class PageCache
 		{	// Cache for a specific Blog/Collection:
 			// We need to set this even if cache is not enabled (yet) bc it's used for creating:
 			$this->ads_collcache_path = $cache_path.'c'.$Blog->ID.'/';
+			$this->cache_Blog = $Blog;
 
 			if( ! $Blog->get_setting('cache_enabled') )
 			{	// We do NOT want caching for this collection
@@ -280,6 +285,7 @@ class PageCache
 		global $ReqURL;
 		global $servertimenow;
 		global $Timer;
+		global $Settings;
 
 		// What would be the cache file for the current URL?
 		$af_cache_file = $this->get_af_filecache_path();
@@ -303,6 +309,25 @@ class PageCache
 		$lines = @file( $af_cache_file, false );
 		$Timer->pause( 'Read cache file' );
 
+		if( $this->cache_Blog != NULL )
+		{
+			$last_invalidation_timestamp = $this->cache_Blog->get_setting( 'last_invalidation_timestamp' );
+			if( $last_invalidation_timestamp == 0 )
+			{
+				$this->cache_Blog->set_setting( 'last_invalidation_timestamp', $servertimenow );
+				$this->cache_Blog->dbupdate();
+			}
+		}
+		else
+		{
+			$last_invalidation_timestamp = $Settings->get( 'last_invalidation_timestamp' );
+			if( $last_invalidation_timestamp == 0 )
+			{
+				$Settings->set( 'last_invalidation_timestamp', $servertimenow );
+				$Settings->dbupdate();
+			}
+		}
+
 		// fp> note we are using empty() so that we detect both the case where there is no file and the case where the file
 		// might have ended up empty because PHP crashed while writing to it or sth like that...
 		if( ! empty($lines) )
@@ -325,7 +350,7 @@ class PageCache
 			unset($lines[1]);
 			$cache_age = $servertimenow-$retrieved_ts;
 			$Debuglog->add( 'Cache age: '.floor($cache_age/60).' min '.($cache_age % 60).' sec', 'pagecache' );
-			if( $cache_age > $this->max_age_seconds )
+			if( ( $cache_age > $this->max_age_seconds ) || ( $last_invalidation_timestamp > $retrieved_ts ) )
 			{	// Cache has expired
 				return false;
 			}
@@ -668,6 +693,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.37  2011/10/20 16:32:57  efy-asimo
+ * Invalidate PageCaches after specific settings update
+ *
  * Revision 1.36  2011/10/14 10:12:15  efy-vitalij
  * add function header_http_response
  *

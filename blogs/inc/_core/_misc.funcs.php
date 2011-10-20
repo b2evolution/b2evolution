@@ -4119,6 +4119,35 @@ function get_active_opcode_cache()
 
 
 /**
+ * Invalidate all page caches.
+ * This function should be processed every time, when some users or global settings was modified,
+ * and this modification has an imortant influence for the front office display.
+ * Modifications that requires to invalidate all page caches:
+ *   - installing/removing/reloading/enabling/disabling plugins
+ *   - editing user settings like allow profile pics, new users can register, user settings>display
+ */
+function invalidate_pagecaches()
+{
+	global $servertimenow, $DB, $Settings;
+
+	// get all blog ids
+	$blog_ids = $DB->get_col( 'SELECT blog_ID FROM T_blogs' );
+	// build invalidate query
+	$query = 'REPLACE INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value ) VALUES';
+	foreach( $blog_ids as $blog_id )
+	{
+		$query .= ' ('.$blog_id.', "last_invalidation_timestamp", '.$servertimenow.' ),';
+	}
+	$query = substr( $query, 0, strlen( $query ) - 1 );
+	$DB->query( $query, 'Invalidate blogs\'s page caches' );
+
+	// Invalidate general cache content also
+	$Settings->set( 'last_invalidation_timestamp', $servertimenow );
+	$Settings->dbupdate();
+}
+
+
+/**
  * Get comments awaiting moderation number
  *
  * @todo fp>max please put this into dashboard.funcs
@@ -4551,6 +4580,9 @@ if( !function_exists( 'sys_get_temp_dir' ) )
 
 /*
  * $Log$
+ * Revision 1.296  2011/10/20 16:32:56  efy-asimo
+ * Invalidate PageCaches after specific settings update
+ *
  * Revision 1.295  2011/10/18 08:14:42  efy-vitalij
  * removed function hit_response_code_class
  *
