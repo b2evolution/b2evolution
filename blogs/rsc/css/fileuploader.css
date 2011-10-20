@@ -4,10 +4,12 @@
     display:block; /* or inline-block */
     width: 100%; padding: 7px 0; text-align:center;
     background:#880000; border-bottom:1px solid #ddd;color:#fff;
+	font-weight: bold;
 }
 
 .qq-upload-button span {
-	font-weight: bold;
+	font-weight: normal;
+	font-size: small;
 }
 
 .qq-upload-button-hover {background:#cc0000;}
