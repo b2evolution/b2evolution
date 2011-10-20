@@ -72,6 +72,15 @@ if( $tab3 == 'quick' )
 	//require_js( 'multiupload/quick_upload.js' );
 	require_js( 'multiupload/fileuploader.js' );
 	require_css( 'fileuploader.css' );
+
+	if (!($Hit->is_firefox() || $Hit->is_chrome()))
+	{
+	$Messages->add( T_('Your browser does not support full upload functionality. You can only: upload files one by one without the possibility of using Drag & Drop' ), 'note');
+	}
+	else
+	{
+	$Messages->add( T_('Your browser supports full upload functionality'), 'note');
+	}
 }
 
 // INIT params:
@@ -444,6 +453,7 @@ if( isset($_FILES) && count( $_FILES ) )
 
 file_controller_build_tabs();
 
+
 $AdminUI->set_path( 'files', 'upload', $tab3 );
 
 // fp> TODO: this here is a bit sketchy since we have Blog & fileroot not necessarilly in sync. Needs investigation / propositions.
@@ -460,7 +470,6 @@ $AdminUI->breadcrumbpath_add( /* TRANS: noun */ T_('Upload'), '?ctrl=upload&amp;
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
-
 // Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
 $AdminUI->disp_body_top();
 
@@ -483,6 +492,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.51  2011/10/20 11:41:38  efy-vitalij
+ * made changes for new uploader, added messages for different browsers
+ *
  * Revision 1.50  2011/10/19 14:42:45  efy-vitalij
  * made changes for new uploader
  *
