@@ -41,6 +41,8 @@ global $htsrv_url;
 
 global $ads_list_path, $fm_FileRoot;
 
+global $Hit, $Messages;
+
 $this->disp_payload_begin();
 
 $Form = new Form( NULL, 'fm_upload_checkchanges', 'post' );
@@ -70,7 +72,7 @@ echo '<tbody>';
 	//echo '<input id="quickupload" type="file" multiple="multiple" />';
 	
 	?>
-	<div id="file-uploader">
+	<div id="file-uploader" style="width: 100%;">
 		<noscript>
 			<p>Please enable JavaScript to use file uploader.</p>
 		</noscript>
@@ -80,10 +82,21 @@ echo '<tbody>';
 
 	$root_and_path = $fm_FileRoot->ID.'::';
 	$quick_upload_url = $htsrv_url.'quick_upload_new.php?upload=true';
+
+	if ($Hit->is_firefox() || $Hit->is_chrome())
+	{
+		$button_text = T_('Drag & Drop files to upload here <br> <span> or click to manually select files </span>');
+	}
+	else
+	{
+		$button_text = T_('Click to manually select files');
+	}
+
+
 	?>
 	<script type="text/javascript">
 
-		
+
 		var url = <?php echo '"'.$quick_upload_url.'&'.url_crumb( 'file' ).'"'; ?>;
 		var root_and_path = '<?php echo $root_and_path ?>';
 		var uploading_text = <?php echo '"'.T_( 'Uploading' ).'"'; ?>;
@@ -91,11 +104,11 @@ echo '<tbody>';
 		var maxsize = <?php echo $Settings->get( 'upload_maxkb' )*1024; ?>;
 		var size_error = <?php echo '"<span class=\"result_error\">'.T_('The file is too large: %1 but the maximum allowed is %2.').'</span>"'; ?>;
 		var ok_text =  <?php echo '"'.T_( 'OK' ).'"'; ?>;
+		var button_text = <?php echo '"'.$button_text.'"';?>;
 
 		jQuery( '#fm_dirtree input[type=radio]' ).click( function()
 		{
 			url = "<?php echo $quick_upload_url; ?>"+"&root_and_path="+this.value+"&"+"<?php echo url_crumb( 'file' ); ?>";
-			//uploader._options.action = url;
 			root_and_path = this.value;
 			uploader.setParams({root_and_path: root_and_path});
 		} );
@@ -105,6 +118,7 @@ echo '<tbody>';
                 element: document.getElementById('file-uploader'),
                 action: url,
                 debug: true,
+				sizeLimit: maxsize,
 				onSubmit: function(id, fileName){
 					var test = 1;
 				},
@@ -130,8 +144,24 @@ echo '<tbody>';
 					
 				},
 				onCancel: function(id, fileName){
-					
 				},
+            	messages: {
+				typeError: "{file} has invalid extension. Only {extensions} are allowed.",
+				sizeError: "{file} is too large, maximum file size is {sizeLimit}.",
+				minSizeError: "{file} is too small, minimum file size is {minSizeLimit}.",
+				emptyError: "{file} is empty, please select files again without it.",
+				onLeave: "The files are being uploaded, if you leave now the upload will be cancelled."
+				},
+				showMessage: function(message){
+					alert(message);
+				},
+				template: '<div class="qq-uploader">' +
+                '<div class="qq-upload-drop-area"><span>Drop files here to upload</span></div>' +
+                '<div class="qq-upload-button">'+ button_text +'</div>' +
+                '<ul class="qq-upload-list"></ul>' +
+				'</div>',
+
+
 				params: {
 				root_and_path: root_and_path
 				}
@@ -154,6 +184,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.7  2011/10/20 11:37:50  efy-vitalij
+ * made changes for new uploader
+ *
  * Revision 1.6  2011/10/19 14:41:07  efy-vitalij
  * made changes for new uploader
  *
