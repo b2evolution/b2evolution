@@ -320,8 +320,22 @@ function hit_response_code_class($hit_response_code)
 }
 
 
+/**
+ * Generate a random ip
+ *
+ * @return string ip
+ */
+function generate_random_ip()
+{
+	return mt_rand(0, 255).'.'.mt_rand(0, 255).'.'.mt_rand(0, 255).'.'.mt_rand(0, 255);
+}
+
+
 /*
  * $Log$
+ * Revision 1.24  2011/10/21 07:35:21  efy-vitalij
+ * added function generate_random_ip
+ *
  * Revision 1.23  2011/10/18 08:08:42  efy-vitalij
  * add function hit_response_code_class
  *
