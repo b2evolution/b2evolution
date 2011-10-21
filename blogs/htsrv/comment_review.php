@@ -42,13 +42,21 @@ if( $comment_Blog->get_setting( 'comment_quick_moderation' ) == 'never' )
 { // comment quick moderation setting was set to 'never' after this comment quick moderation link was created
 	// don't allow quick moderation
 	$Messages->add( T_('Quick moderation not available.') );
-	header_redirect( $to_comment_edit );
 }
 
 // Check the secret parameter (This doubles as a CRUMB)
 if( ( $secret != $posted_Comment->get('secret') ) || empty( $secret ) )
-{	// Invalid secret, no moderation allowed here, go to regular form with regular login requirements:
+{ // Invalid secret, no moderation allowed here, go to regular form with regular login requirements:
 	$Messages->add( T_('Invalid secret key. Quick moderation not available.') );
+}
+
+if( $posted_Comment->status == 'trash' )
+{ // Comment is already in trash
+	$Messages->add( T_('The comment was already deleted. Quick moderation not available.') );
+}
+
+if( $Messages->has_errors() )
+{ // quick moderation is not available, redirect to normal edit form
 	header_redirect( $to_comment_edit );
 }
 
@@ -139,7 +147,7 @@ if ($secret == $posted_Comment->get('secret') && ($secret != NULL) )
 	echo "\n";
 
 	// deprecate button
-	if( $posted_Comment->status != 'deprecated')
+	if( $posted_Comment->status != 'deprecated' )
 	{
 		echo '<input type="submit" name="actionArray[deprecate]"';
 		echo ' value="'.T_('Deprecate').'" title="'.T_('Deprecate this comment').'"/>';
@@ -218,6 +226,9 @@ else
 <?php
 /*
  * $Log$
+ * Revision 1.18  2011/10/21 07:28:19  efy-asimo
+ * Don't allow trash comments quick moderation
+ *
  * Revision 1.17  2011/10/21 07:10:47  efy-asimo
  * Comment quick moderation option
  *
