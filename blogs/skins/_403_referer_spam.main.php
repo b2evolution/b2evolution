@@ -7,7 +7,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // fp>vitaliy  move HTTP/1.0  into header_http_response('')
-header_http_response('HTTP/1.0 403 Forbidden');
+header_http_response('403 Forbidden');
 header('Content-Type: text/html; charset=iso-8859-1'); // no translation
 
 ?>
@@ -31,4 +31,11 @@ header('Content-Type: text/html; charset=iso-8859-1'); // no translation
 </html>
 <?php
 	exit(0);
+
+/*
+ * $Log$
+ * Revision 1.5  2011/10/21 06:51:38  efy-vitalij
+ * added function header_http_response
+ *
+ */
 ?>

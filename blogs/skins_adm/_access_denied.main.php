@@ -6,7 +6,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-header_http_response('HTTP/1.0 403 Forbidden');
+header_http_response('403 Forbidden');
 headers_content_mightcache( 'text/html', 0 );		// Do NOT cache error messages! (Users would not see they fixed them)
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -29,4 +29,10 @@ headers_content_mightcache( 'text/html', 0 );		// Do NOT cache error messages! (
 </html>
 <?php
 	exit(0);
+/*
+ * $Log$
+ * Revision 1.10  2011/10/21 06:58:09  efy-vitalij
+ * added function header_http_response
+ *
+ */
 ?>
