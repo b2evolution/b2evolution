@@ -63,7 +63,7 @@ if( !empty($Goal->goal_redir_url) )
 		}
 	}
 
-	header_http_response( 'HTTP/1.1 302 Found' );
+	header_http_response( '302 Found' );
 	header( 'Location: '.$redir_url, true, 302 ); // explictly setting the status is required for (fast)cgi
 	// TODO: dh> str_repeat won't be enough (when gzipped), see http://core.trac.wordpress.org/ticket/8942
 	//           should be probably a more general function and get used in e.g. bad_request_die(), too (if necessary)
@@ -106,6 +106,9 @@ $DB->query( $sql );
 
 /*
  * $Log$
+ * Revision 1.12  2011/10/21 07:08:13  efy-vitalij
+ * changed function header_http_response
+ *
  * Revision 1.11  2011/10/14 10:16:07  efy-vitalij
  * add function header_http_response
  *

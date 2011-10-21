@@ -724,11 +724,11 @@ function skin_404_header()
 	switch( $resp_code = $Blog->get_setting( '404_response' ) )
 	{
 		case '404':
-			header_http_response('HTTP/1.0 404 Not Found');
+			header_http_response('404 Not Found');
 			break;
 
 		case '410':
-			header_http_response('HTTP/1.0 410 Gone');
+			header_http_response('410 Gone');
 			break;
 
 		case '301':
@@ -946,6 +946,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.118  2011/10/21 07:04:51  efy-vitalij
+ * changed function header_http_response
+ *
  * Revision 1.117  2011/10/18 09:14:34  efy-asimo
  * Ability to display different module forms and handle module actions  inside the module
  *
