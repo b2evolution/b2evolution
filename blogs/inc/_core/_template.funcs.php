@@ -213,18 +213,18 @@ function header_redirect( $redirect_to = NULL, $status = false )
 	{
 		case 301:
 			// This should be a permanent move redirect!
-			header_http_response( 'HTTP/1.1 301 Moved Permanently' );
+			header_http_response( '301 Moved Permanently' );
 			break;
 
 		case 303:
 			// This should be a "follow up" redirect
 			// Note: Also see http://de3.php.net/manual/en/function.header.php#50588 and the other comments around
-			header_http_response( 'HTTP/1.1 303 See Other' );
+			header_http_response( '303 See Other' );
 			break;
 
 		case 302:
 		default:
-			header_http_response( 'HTTP/1.1 302 Found' );
+			header_http_response( '302 Found' );
 	}
 
   // debug_die($redirect_to);
@@ -1425,6 +1425,9 @@ function display_ajax_form( $params )
 
 /*
  * $Log$
+ * Revision 1.119  2011/10/21 06:39:49  efy-vitalij
+ * changed function header_http_response
+ *
  * Revision 1.118  2011/10/14 19:02:13  efy-yurybakh
  * Messaging Abuse Management
  *

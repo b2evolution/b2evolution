@@ -2132,7 +2132,7 @@ function bad_request_die( $additional_info = '' )
 	{
 		load_funcs('_core/_template.funcs.php');
 		headers_content_mightcache( 'text/html', 0 );		// Do NOT cache error messages! (Users would not see they fixed them)
-		header_http_response('HTTP/1.0 400 Bad Request');
+		header_http_response('400 Bad Request');
 	}
 
 	echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
@@ -4483,6 +4483,9 @@ function generate_random_ip()
 function header_http_response($string, $code = NULL)
 {
 	global $http_response_code;
+
+	$string = 'HTTP/1.1 '. $string;
+
 	if (is_null($code))
 	{
 		if (preg_match("/(\d{3})/", $string, $matches))
@@ -4580,6 +4583,9 @@ if( !function_exists( 'sys_get_temp_dir' ) )
 
 /*
  * $Log$
+ * Revision 1.297  2011/10/21 06:38:06  efy-vitalij
+ * changed function header_http_response
+ *
  * Revision 1.296  2011/10/20 16:32:56  efy-asimo
  * Invalidate PageCaches after specific settings update
  *
