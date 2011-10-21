@@ -104,17 +104,16 @@ $Results->title = T_('Recent hits');
  */
 function filter_hits( & $Form )
 {
+	global $referer_type_color, $referer_type_array;
+	global $agent_type_color, $agent_type_array;
+
 	$Form->checkbox_basic_input( 'exclude', get_param('exclude'), T_('Exclude').' &mdash; ' );
 	$Form->text_input( 'sess_ID', get_param('sess_ID'), 15, T_('Session ID'), '', array( 'maxlength'=>20 ) );
 	$Form->text_input( 'remote_IP', get_param('remote_IP'), 15, T_('Remote IP'), '', array( 'maxlength'=>23 ) );
 
-	global $referer_type_color, $referer_type_array;
-	
+	$Form->select_input_array( 'agent_type', get_param('agent_type'), $agent_type_array, 'Agent type', '', array('force_keys_as_values' => true, 'background_color' => $agent_type_color) );
 	$Form->select_input_array( 'referer_type', get_param('referer_type'), $referer_type_array, 'Referer type', '', array('force_keys_as_values' => true, 'background_color' => $referer_type_color) );
 
-	global $agent_type_color, $agent_type_array;
-
-	$Form->select_input_array( 'agent_type', get_param('agent_type'), $agent_type_array, 'Agent type', '', array('force_keys_as_values' => true, 'background_color' => $agent_type_color) );
 }
 $Results->filter_area = array(
 	'callback' => 'filter_hits',
@@ -156,12 +155,6 @@ $Results->cols[] = array(
 		'td' => '%mysql2localedatetime_spans( #hit_datetime#, "M-d" )%',
  	);
 
-$Results->cols[] = array(
-		'th' => T_('Type'),
-		'order' => 'hit_referer_type',
-		'td_class' => 'reftype_#hit_referer_type# small shrinkwrap',
-		'td' => '$hit_referer_type$',
-	);
 
 $Results->cols[] = array(
 		'th' => T_('Agent'),
@@ -169,6 +162,13 @@ $Results->cols[] = array(
 		'td_class' => 'agent_#hit_agent_type# small shrinkwrap',
 		'td' => '$hit_agent_type$',
 
+	);
+
+$Results->cols[] = array(
+		'th' => T_('Referer'),
+		'order' => 'hit_referer_type',
+		'td_class' => 'reftype_#hit_referer_type# small shrinkwrap',
+		'td' => '$hit_referer_type$',
 	);
 
 $Results->cols[] = array(
@@ -231,6 +231,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.10  2011/10/21 08:24:41  efy-vitalij
+ * *** empty log message ***
+ *
  * Revision 1.9  2011/10/17 12:07:05  efy-vitalij
  * edit column 'Resp Code'
  *
