@@ -296,7 +296,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Message'),
 		'td_class' => 'left top',
-		'td' => '~conditional( empty(#msg_text#), \''.$edited_Thread->title.'\', \'%nl2br(#msg_text#)%\')~',
+		'td' => '~conditional( empty(#msg_text#), \''.format_to_output( $edited_Thread->title, 'htmlspecialchars' ).'\', \'%nl2br(#msg_text#)%\')~',
 	);
 
 function get_read_by( $message_ID )
@@ -371,6 +371,9 @@ if( $edited_Thread->check_thread_recipient( $current_User->ID ) )
 
 /*
  * $Log$
+ * Revision 1.49  2011/10/21 07:24:02  efy-yurybakh
+ * Problems with messaging
+ *
  * Revision 1.48  2011/10/17 18:33:53  efy-yurybakh
  * Messaging Abuse Management (don't allow posting in foreign threads)
  *

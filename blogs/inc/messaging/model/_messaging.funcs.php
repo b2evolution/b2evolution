@@ -491,7 +491,7 @@ function get_threads_results()
 			// Create SELECT query
 			$select_SQL = 'SELECT * FROM
 								(SELECT mt.thrd_ID, mt.thrd_title, mt.thrd_datemodified,
-									mts.tsta_first_unread_msg_ID AS thrd_msg_ID, mm.msg_datetime AS thrd_unread_since,
+									mts.tsta_first_unread_msg_ID AS thrd_msg_ID, mt.thrd_datemodified AS thrd_unread_since,
 									(SELECT GROUP_CONCAT(ru.user_login ORDER BY ru.user_login SEPARATOR \', \')
 										FROM T_messaging__threadstatus AS rts
 											LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID
@@ -502,9 +502,8 @@ function get_threads_results()
 										WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_usernames
 								FROM T_messaging__thread mt
 									LEFT OUTER JOIN T_messaging__threadstatus mts ON mts.tsta_thread_ID = mt.thrd_ID
-									LEFT OUTER JOIN T_messaging__message mm ON mts.tsta_first_unread_msg_ID = mm.msg_ID
 								GROUP BY mt.thrd_ID
-								ORDER BY mts.tsta_first_unread_msg_ID DESC, mt.thrd_datemodified DESC) AS threads'.
+								ORDER BY mt.thrd_datemodified DESC) AS threads'.
 								$filter_sql;
 
 			// Create COUNT query
@@ -528,16 +527,15 @@ function get_threads_results()
 			// Create SELECT query
 			$select_SQL = 'SELECT * FROM
 							(SELECT mt.thrd_ID, mt.thrd_title, mt.thrd_datemodified,
-									mts.tsta_first_unread_msg_ID AS thrd_msg_ID, mm.msg_datetime AS thrd_unread_since,
+									mts.tsta_first_unread_msg_ID AS thrd_msg_ID, mt.thrd_datemodified AS thrd_unread_since,
 								(SELECT GROUP_CONCAT(ru.user_login ORDER BY ru.user_login SEPARATOR \', \')
 								FROM T_messaging__threadstatus AS rts
 									LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID
 									WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_recipients
 							FROM T_messaging__thread mt
 								LEFT OUTER JOIN T_messaging__threadstatus mts ON mts.tsta_thread_ID = mt.thrd_ID
-								LEFT OUTER JOIN T_messaging__message mm ON mts.tsta_first_unread_msg_ID = mm.msg_ID
 							GROUP BY mt.thrd_ID
-							ORDER BY mts.tsta_first_unread_msg_ID DESC, mt.thrd_datemodified DESC) AS threads';
+							ORDER BY mt.thrd_datemodified DESC) AS threads';
 
 			// Create COUNT quiery
 			$count_SQL = 'SELECT COUNT(*)
@@ -615,6 +613,9 @@ function get_threads_results()
 
 /*
  * $Log$
+ * Revision 1.20  2011/10/21 07:24:02  efy-yurybakh
+ * Problems with messaging
+ *
  * Revision 1.19  2011/10/15 07:28:15  efy-yurybakh
  * Messaging Abuse Management
  *
