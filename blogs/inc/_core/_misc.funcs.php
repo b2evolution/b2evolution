@@ -4465,17 +4465,6 @@ if( !function_exists( 'property_exists' ) )
 
 // fp>vitaliy: move to a file that is not included everywhere!
 /**
- * Generate a random ip
- *
- * @return string ip
- */
-function generate_random_ip()
-{
- 	return mt_rand(0, 255).'.'.mt_rand(0, 255).'.'.mt_rand(0, 255).'.'.mt_rand(0, 255);
-}
-
-// fp>vitaliy: move to a file that is not included everywhere!
-/**
  * Update global $http_response_code and call function header()
  * @param string Header
  * @param integer Header response code
@@ -4583,6 +4572,9 @@ if( !function_exists( 'sys_get_temp_dir' ) )
 
 /*
  * $Log$
+ * Revision 1.298  2011/10/21 07:31:19  efy-vitalij
+ * removed function generate_random_ip
+ *
  * Revision 1.297  2011/10/21 06:38:06  efy-vitalij
  * changed function header_http_response
  *
