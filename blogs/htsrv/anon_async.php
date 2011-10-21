@@ -34,7 +34,7 @@ require_once $inc_path.'_main.inc.php';
 
 load_funcs( '../inc/skins/_skin.funcs.php' );
 
-global $skins_path;
+global $skins_path, $disp, $ctrl;
 param( 'action', 'string', '' );
 $item_ID = param( 'p', 'integer' );
 $blog_ID = param( 'blog', 'integer' );
@@ -182,7 +182,7 @@ switch( $action )
 			echo '</div>';
 		}
 
-		exit(0);
+		break;
 
 
 	case 'set_comment_vote':
@@ -200,7 +200,7 @@ switch( $action )
 			}
 			else if( ! is_logged_in() || $type != 'helpful' )
 			{ // Restrict not logged users here
-				exit(0);
+				break;
 			}
 
 			$edited_Comment->set_vote( $type, param( 'vote', 'string' ) );
@@ -209,7 +209,7 @@ switch( $action )
 			$edited_Comment->{'vote_'.$type}( '', '', '&amp;', true, true );
 		}
 
-		exit(0);
+		break;
 
 	case 'get_user_new_field':
 		// Used in the identity user form to add a new field
@@ -218,7 +218,7 @@ switch( $action )
 
 		if( $field_ID == 0 )
 		{	// Bad request
-			exit(0);
+			break;
 		}
 
 		$userfields = $DB->get_results( '
@@ -236,7 +236,7 @@ switch( $action )
 				WHERE uf_user_ID = "'.$user_ID.'" AND uf_ufdf_ID = "'.$field_ID.'"' );
 			if( $user_field_exist > 0 )
 			{	// User already has a current field type
-				exit(0);
+				break;
 			}
 		}
 		else
@@ -248,13 +248,19 @@ switch( $action )
 
 		userfields_display( $userfields, $Form, 'add' );
 
-		exit(0);
+		break;
 }
 
-exit();
+$disp = NULL;
+$ctrl = NULL;
+
+exit(0);
 
 /*
  * $Log$
+ * Revision 1.28  2011/10/21 05:41:13  efy-vitalij
+ * set $disp and $ctrl as NULL before exit
+ *
  * Revision 1.27  2011/10/20 12:14:54  efy-yurybakh
  * Allow/disabled multiple instances of same field
  *
