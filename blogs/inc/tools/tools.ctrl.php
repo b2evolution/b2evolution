@@ -404,6 +404,8 @@ if( empty($tab) )
 
 			load_class( 'sessions/model/_hit.class.php', 'Hit' );
 
+			load_funcs('sessions/model/_hitlog.funcs.php');
+
 			$links = array();
 
 			$BlogCache = & get_BlogCache();
@@ -848,6 +850,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.56  2011/10/21 07:33:30  efy-vitalij
+ * add call load_funcs('sessions/model/_hitlog.funcs.php')
+ *
  * Revision 1.55  2011/10/12 11:23:18  efy-vitalij
  * add rss and robot hits generation
  *
