@@ -234,6 +234,10 @@ else
 		$Debuglog->add( 'Login: NOT logged in... (did not try)', 'request' );
 
 		$login_error = NT_('You must log in!');
+		if( $Messages->has_errors() )
+		{
+			$login_error .= '<br />'.$Messages->get_string( '', '', 'error' );
+		}
 	}
 }
 unset($pass);
@@ -327,6 +331,9 @@ $Timer->pause( '_init_login' );
 
 /*
  * $Log$
+ * Revision 1.13  2011/10/21 07:10:47  efy-asimo
+ * Comment quick moderation option
+ *
  * Revision 1.12  2011/10/01 23:01:48  fplanque
  * better be safe than sorry on logins!
  *

@@ -221,8 +221,8 @@ switch( $action )
 		}
 
 		if( $old_comment_status != $comment_status )
-		{ // Comment moderation is done, don't keep "secret" moderation access
-			$edited_Comment->set( 'secret', NULL );
+		{ // Comment moderation is done, handle moderation "secret"
+			$edited_Comment->handle_qm_secret();
 		}
 
 		// UPDATE DB:
@@ -245,8 +245,8 @@ switch( $action )
 		$Session->assert_received_crumb( 'comment' );
 
 		$edited_Comment->set('status', 'published' );
-		// Comment moderation is done, don't keep "secret" moderation access
-		$edited_Comment->set( 'secret', NULL );
+		// Comment moderation is done, handle moderation "secret"
+		$edited_Comment->handle_qm_secret();
 
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
@@ -265,8 +265,8 @@ switch( $action )
 		$Session->assert_received_crumb( 'comment' );
 
 		$edited_Comment->set('status', 'deprecated' );
-		// Comment moderation is done, don't keep "secret" moderation access
-		$edited_Comment->set( 'secret', NULL );
+		// Comment moderation is done, handle moderation "secret"
+		$edited_Comment->handle_qm_secret();
 
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
@@ -517,6 +517,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.48  2011/10/21 07:10:47  efy-asimo
+ * Comment quick moderation option
+ *
  * Revision 1.47  2011/10/12 13:34:36  efy-asimo
  * Delete comment secret on comment update
  *

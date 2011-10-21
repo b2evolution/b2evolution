@@ -101,14 +101,6 @@ $Form->begin_fieldset( T_('Feedback options') );
 
 	$Form->checkbox( 'blog_allowtrackbacks', $edited_Blog->get( 'allowtrackbacks' ), T_('Trackbacks'), T_("Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.") );
 
-	$status_options = array(
-			'draft'      => T_('Draft'),
-			'published'  => T_('Published'),
-			'deprecated' => T_('Deprecated')
-		);
-	$Form->select_input_array( 'new_feedback_status', $edited_Blog->get_setting('new_feedback_status'), $status_options,
-				T_('New feedback status'), T_('This status will be assigned to new comments/trackbacks from non moderators (unless overriden by plugins).') );
-
 	$Form->radio( 'comments_orderdir', $edited_Blog->get_setting('comments_orderdir'),
 						array(	array( 'ASC', T_('Chronologic') ),
 								array ('DESC', T_('Reverse') ),
@@ -148,6 +140,25 @@ $Form->end_fieldset();
 // display comments settings provided by optional modules:
 // echo 'modules';
 modules_call_method( 'display_collection_comments', array( 'Form' => & $Form, 'edited_Blog' => & $edited_Blog ) );
+
+$Form->begin_fieldset( T_('Comment moderation') );
+	$status_options = array(
+			'draft'      => T_('Draft'),
+			'published'  => T_('Published'),
+			'deprecated' => T_('Deprecated')
+		);
+	// put this on feedback details container, this way it won't be displayed if comment posting is not allowed  
+	echo '<div class="feedback_details_container">';
+	$Form->select_input_array( 'new_feedback_status', $edited_Blog->get_setting('new_feedback_status'), $status_options,
+				T_('New feedback status'), T_('This status will be assigned to new comments/trackbacks from non moderators (unless overriden by plugins).') );
+	echo '</div>';
+
+	$Form->radio( 'comment_quick_moderation', $edited_Blog->get_setting( 'comment_quick_moderation' ),
+					array(  array( 'never', T_('Never') ),
+							array( 'expire', T_('Links expire on first edit action') ),
+							array( 'always', T_('Always available') )
+						), T_('Comment quick moderation'), true );
+$Form->end_fieldset();
 
 $Form->begin_fieldset( T_('RSS/Atom feeds') );
 	$Form->radio( 'comment_feed_content', $edited_Blog->get_setting('comment_feed_content'),
@@ -195,6 +206,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.8  2011/10/21 07:10:47  efy-asimo
+ * Comment quick moderation option
+ *
  * Revision 1.7  2011/10/17 15:32:47  efy-yurybakh
  * Let people create an account just after posting a comment
  *

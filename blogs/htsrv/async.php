@@ -190,8 +190,8 @@ switch( $action )
 
 			$status = param( 'status', 'string' );
 			$edited_Comment->set( 'status', $status );
-			// Comment moderation is done, don't keep "secret" moderation access
-			$edited_Comment->set( 'secret', NULL );
+			// Comment moderation is done, handle moderation "secret"
+			$edited_Comment->handle_qm_secret();
 			$edited_Comment->dbupdate();
 
 			if( $status == 'published' )
@@ -383,6 +383,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.78  2011/10/21 07:10:47  efy-asimo
+ * Comment quick moderation option
+ *
  * Revision 1.77  2011/10/12 13:34:36  efy-asimo
  * Delete comment secret on comment update
  *

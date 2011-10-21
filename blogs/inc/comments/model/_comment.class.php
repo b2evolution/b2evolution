@@ -1365,9 +1365,10 @@ class Comment extends DataObject
 	{
 		global $current_User;
 
-		$this->get_Item()->load_Blog();
+		$comment_Item = & $this->get_Item();
+		$comment_Item->load_Blog();
 
-		if( ! is_logged_in() || ! $this->Item->Blog->get_setting('allow_rating_comment_helpfulness') )
+		if( ! is_logged_in() || ! $comment_Item->Blog->get_setting('allow_rating_comment_helpfulness') )
 		{ // If User is not logged OR Users cannot vote
 			return false;
 		}
@@ -2227,9 +2228,8 @@ class Comment extends DataObject
 
 			if( $notify_type == 'moderator' )
 			{ // moderation email
-        // fp> users have asked for this even if not draft:
-        // if( $this->status == 'draft' )
-				{
+				if( ( $edited_Blog->get_setting( 'comment_quick_moderation' ) != 'never' ) && ( !empty( $this->secret ) ) )
+				{ // quick moderation is permitted, and comment secret was set
 					$notify_message .= T_('Quick moderation').': '.$htsrv_url.'comment_review.php?cmt_ID='.$this->ID.'&secret='.$this->secret."\n\n";
 				}
 				$notify_message .= T_('Edit comment').': '.$admin_url.'?ctrl=comments&action=edit&comment_ID='.$this->ID."\n\n";
@@ -2283,6 +2283,25 @@ class Comment extends DataObject
 
 
 	/**
+	 * Handle quick moderation secret param: checks if comment secret should expire after first comment moderation, and delete the secret if required
+	 * This should be called after every kind of commment moderation
+	 */
+	function handle_qm_secret( $save_comment = false )
+	{
+		$comment_Item = & $this->get_Item();
+		$comment_Item->load_Blog();
+		if( $comment_Item->Blog->get_setting( 'comment_quick_moderation' ) == 'expire' )
+		{ // comment secret expires after first comment moderation
+			$this->set( 'secret', NULL );
+		}
+		if( $save_comment )
+		{
+			$this->dbupdate();
+		}
+	}
+
+
+	/**
 	 * Trigger event AfterCommentUpdate after calling parent method.
 	 *
 	 * @return boolean true on success
@@ -2290,12 +2309,6 @@ class Comment extends DataObject
 	function dbupdate()
 	{
 		global $Plugins;
-
-		// if( $this->status != 'draft' )
-		{	// We don't want to keep "secret" moderation access once we've published or deprecated a comment
-      // fp>asimo: please change the following to null not in dbupdate but explicitely when a comment is updated from quick moderation OR from normal edit form
-      // $this->set( 'secret', null );
-		}
 
 		$dbchanges = $this->dbchanges;
 
@@ -2339,10 +2352,13 @@ class Comment extends DataObject
 			}
 		}
 
-		//if( $this->status == 'draft' )
-		{	// We will allow "secret" moderation only to draft comments:
-      // fp> users have requested this for all comments
-      $this->set( 'secret', generate_random_key() );
+		// set comment secret for quick moderation
+		// fp> users have requested this for all comments
+		$comment_Item = & $this->get_Item();
+		$comment_Blog = & $comment_Item->get_Blog();
+		if( $comment_Blog->get_setting( 'comment_quick_moderation' ) != 'never' )
+		{ // quick moderation is permitted, set comment secret
+			$this->set( 'secret', generate_random_key() );
 		}
 
 		$dbchanges = $this->dbchanges;
@@ -2432,6 +2448,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.124  2011/10/21 07:10:48  efy-asimo
+ * Comment quick moderation option
+ *
  * Revision 1.123  2011/10/12 00:34:07  fplanque
  * comment quick review, not just for drafts
  *

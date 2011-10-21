@@ -502,6 +502,7 @@ class Blog extends DataObject
 
 		if( in_array( 'comments', $groups ) )
 		{ // we want to load the workflow checkboxes:
+			$this->set_setting( 'comment_quick_moderation',  param( 'comment_quick_moderation', 'string', 'expire' ) );
 			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
 			$this->set_setting( 'comments_detect_email', param( 'comments_detect_email', 'integer', 0 ) );
 			$this->set_setting( 'comments_register', param( 'comments_register', 'integer', 0 ) );
@@ -2587,6 +2588,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.164  2011/10/21 07:10:47  efy-asimo
+ * Comment quick moderation option
+ *
  * Revision 1.163  2011/10/21 04:57:45  efy-asimo
  * doc
  *

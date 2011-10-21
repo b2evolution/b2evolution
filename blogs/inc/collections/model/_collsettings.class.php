@@ -83,6 +83,7 @@ class CollectionSettings extends AbstractSettings
 			'default_gravatar' => 'b2evo',
 			'comments_detect_email' => 1,
 			'comments_register' => 1,
+			'comment_quick_moderation' => 'expire', // Comment quick moderation can be 'never', 'expire' - Links expire on first edit action, and 'always'
 
 		// Archive settings:
 			'arcdir_noindex' => '1',						// META NOINDEX on Archive directory
@@ -207,6 +208,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.75  2011/10/21 07:10:47  efy-asimo
+ * Comment quick moderation option
+ *
  * Revision 1.74  2011/10/20 16:32:57  efy-asimo
  * Invalidate PageCaches after specific settings update
  *

@@ -36,11 +36,19 @@ else
 	header_redirect( $to_dashboard );
 }
 
+$comment_Item = & $posted_Comment->get_Item();
+$comment_Blog = $comment_Item->get_Blog();
+if( $comment_Blog->get_setting( 'comment_quick_moderation' ) == 'never' )
+{ // comment quick moderation setting was set to 'never' after this comment quick moderation link was created
+	// don't allow quick moderation
+	$Messages->add( T_('Quick moderation not available.') );
+	header_redirect( $to_comment_edit );
+}
+
 // Check the secret parameter (This doubles as a CRUMB)
-if( $secret != $posted_Comment->get('secret') )
+if( ( $secret != $posted_Comment->get('secret') ) || empty( $secret ) )
 {	// Invalid secret, no moderation allowed here, go to regular form with regular login requirements:
-  $Messages->add( T_('Invalid secret key. Quick moderation not available.') );
-  // fp> TODO: this does not display on login form... :/ (but works if already logged in)
+	$Messages->add( T_('Invalid secret key. Quick moderation not available.') );
 	header_redirect( $to_comment_edit );
 }
 
@@ -51,8 +59,8 @@ switch( $action )
 {
 	case 'publish':
 		$posted_Comment->set('status', 'published' );
-		// Comment moderation is done, don't keep "secret" moderation access
-		$posted_Comment->set( 'secret', NULL );
+		// Comment moderation is done, handle moderation "secret"
+		$posted_Comment->handle_qm_secret();
 
 		$posted_Comment->dbupdate();	// Commit update to the DB
 
@@ -66,8 +74,8 @@ switch( $action )
 
 	case 'deprecate':
 		$posted_Comment->set('status', 'deprecated' );
-		// Comment moderation is done, don't keep "secret" moderation access
-		$posted_Comment->set( 'secret', NULL );
+		// Comment moderation is done, handle moderation "secret"
+		$posted_Comment->handle_qm_secret();
 
 		$posted_Comment->dbupdate();	// Commit update to the DB
 
@@ -210,6 +218,9 @@ else
 <?php
 /*
  * $Log$
+ * Revision 1.17  2011/10/21 07:10:47  efy-asimo
+ * Comment quick moderation option
+ *
  * Revision 1.16  2011/10/12 13:34:36  efy-asimo
  * Delete comment secret on comment update
  *
