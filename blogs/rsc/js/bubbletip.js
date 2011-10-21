@@ -50,16 +50,19 @@ jQuery( document ).ready(function()
 					data: 'action=get_user_bubbletip' + '&blog=' + blog_id + request_param,
 					success: function( result )
 					{	// If success request - fill div with user data, save same data to the cache, init bubble tip
-						tip.html( result );
-						cache.html( result );
-						if( tip.find( 'img' ).width() == 0 )
-						{	// Fix bubbletip size in first time downloading
-							var div = tip.find( 'div.center' );
-							var width = div.attr( 'w' );
-							var height = parseInt( div.attr( 'h' ) ) + 9;
-							div.attr( 'style', 'width:' + width + 'px;height:' + height + 'px;' );
+						if( result != '' )
+						{	// Init Bubbletip only if ajax content is received
+							tip.html( result );
+							cache.html( result );
+							if( tip.find( 'img' ).width() == 0 )
+							{	// Fix bubbletip size in first time downloading
+								var div = tip.find( 'div.center' );
+								var width = div.attr( 'w' );
+								var height = parseInt( div.attr( 'h' ) ) + 9;
+								div.attr( 'style', 'width:' + width + 'px;height:' + height + 'px;' );
+							}
+							link.bubbletip( tip, bubbletip_params );
 						}
-						link.bubbletip( tip, bubbletip_params );
 					}
 				});
 			}
