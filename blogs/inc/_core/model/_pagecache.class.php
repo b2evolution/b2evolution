@@ -406,7 +406,7 @@ class PageCache
 						// pre_dump($if_none_match, gen_current_page_etag() );
 						if( $if_none_match == gen_current_page_etag() )
 						{	// Ok, this seems to be really the same:
-							header_http_response( 'HTTP/1.0 304 Not Modified' );
+							header_http_response( '304 Not Modified' );
 							exit(0);
 						}
 					}
@@ -693,6 +693,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.38  2011/10/21 07:00:49  efy-vitalij
+ * changed function header_http_response
+ *
  * Revision 1.37  2011/10/20 16:32:57  efy-asimo
  * Invalidate PageCaches after specific settings update
  *
