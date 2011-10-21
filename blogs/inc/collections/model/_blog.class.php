@@ -2095,6 +2095,8 @@ class Blog extends DataObject
 
 		// if this blog settings was modified we need to invalidate this blog's page caches
 		// this way all existing cached page on this blog will be regenerated during next display
+		// TODO: Ideally we want to detect if the changes are minor/irrelevant to caching and not invalidate the page cache if not necessary. 
+		// In case of doubt (and for unknown changes), it's better to invalidate.
 		$this->set_setting( 'last_invalidation_timestamp', $servertimenow );
 
 		if( isset( $this->CollectionSettings ) )
@@ -2585,6 +2587,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.163  2011/10/21 04:57:45  efy-asimo
+ * doc
+ *
  * Revision 1.162  2011/10/20 16:32:57  efy-asimo
  * Invalidate PageCaches after specific settings update
  *
