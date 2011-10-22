@@ -11,7 +11,7 @@
 jQuery( document ).ready(function()
 {
 	var link_number = 1;
-	jQuery( '[rel^=bubbletip_]' ).live("mouseover", function()
+	jQuery( '[rel^=bubbletip_]' ).live( 'mouseover', function()
 	{	// Prepare event mouseover for a element with bubbletip effect
 		var link = jQuery( this );
 		var div_cache_ID = '';
@@ -32,7 +32,7 @@ jQuery( document ).ready(function()
 
 		if( div_cache_ID != '' )
 		{	// Init bubbletip for the first time event "mouseover"
-			link.attr( 'id', 'bubblelink' + link_number ).removeAttr( 'rel' );
+			link.attr( 'id', 'bubblelink' + link_number );
 			var div_bubbletip_ID = 'bubbletip_info_' + link_number;
 
 			jQuery( 'body' ).append( '<div id="' + div_bubbletip_ID + '" style="display:none;"></div>' );
@@ -61,17 +61,39 @@ jQuery( document ).ready(function()
 								var height = parseInt( div.attr( 'h' ) ) + 9;
 								div.attr( 'style', 'width:' + width + 'px;height:' + height + 'px;' );
 							}
+							if( link.hasClass( 'hide_bubbletip' ) )
+							{	// We use this class as flag to understand that when ajax was loading
+								// the mouse pointer already left out this element
+								// and we don't need to show a bubbletip on init event
+								bubbletip_params.showOnInit = false;
+								link.removeClass( 'hide_bubbletip' )
+							}
 							link.bubbletip( tip, bubbletip_params );
+							link.removeAttr( 'rel' );	// Remove this attr from link to avoid of the repeating of init bubbletip
 						}
 					}
 				});
 			}
 			else
 			{	// Init bubbletip from cached element
-				jQuery( '#' + div_bubbletip_ID ).html( jQuery( '#' + div_cache_ID ).html() );
-				link.bubbletip( jQuery( '#' + div_bubbletip_ID ), bubbletip_params );
+				if( jQuery( '#' + div_cache_ID ).html() != '' )
+				{	// Ajax content is downloaded and we can show a bubbletip
+					jQuery( '#' + div_bubbletip_ID ).html( jQuery( '#' + div_cache_ID ).html() );
+					link.bubbletip( jQuery( '#' + div_bubbletip_ID ), bubbletip_params );
+					link.removeAttr( 'rel' );	// Remove this attr from link to avoid of the repeating of init bubbletip
+				}
+				else
+				{	// Div cache is empty when ajax content didn't still download (it is downloading now)
+					// We should wait a next mouseover event to init bubbletip
+					jQuery( '#' + div_bubbletip_ID ).remove();
+				}
 			}
 			link_number++;
 		}
 	});
+	
+	jQuery( '[rel^=bubbletip_]' ).live( 'mouseout', function()
+	{	// This class-flag is used to know that mouse pointer is leaving this element
+		jQuery( this ).addClass( 'hide_bubbletip' );
+	} );
 });
