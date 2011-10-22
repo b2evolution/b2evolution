@@ -487,7 +487,9 @@ $Form->end_form();
 		// change -First name Last name- and -Last name First name- texts
 		name_onchange();
 	} );
+</script>
 
+<script type="text/javascript">
 	jQuery( '#button_add_field' ).click( function ()
 	{	// Action for the button when we want to add a new field in the Additional info
 		var field_id = jQuery( this ).parent().prev().find( 'option:selected' ).val();
@@ -527,6 +529,12 @@ $Form->end_form();
 						}
 					}
 					jQuery( '#ffield_new_field_type' ).prev().before( result.replace( /^\[\d+\](.*)/, '$1' ) );
+
+					var new_added_field_obj = jQuery( '#ffield_new_field_type' ).prev().prev().find( 'input[id^=uf_add_]' );
+					if( new_added_field_obj.length > 0 )
+					{	// Assign autocomplete event
+						new_added_field_obj.autocomplete( user_field_autocomplete_params );
+					}
 				}
 			}
 		});
@@ -543,12 +551,12 @@ $Form->end_form();
 			field_type_error_clear();
 		}
 	} );
-	
+
 	jQuery( '#new_field_type' ).change( function ()
 	{	// Remove all errors messages from field "Add a field of type:"
 		field_type_error_clear();
 	} );
-	
+
 	function field_type_error( message )
 	{	// Add an error message for the "field of type" select
 		jQuery( 'select#new_field_type' ).addClass( 'field_error' );
@@ -562,17 +570,34 @@ $Form->end_form();
 			jQuery( 'select#new_field_type' ).next().append( '<span class="field_error">' + message + '</span>' );
 		}
 	}
-	
+
 	function field_type_error_clear()
 	{	// Remove an error style from the "field of type" select
 		jQuery( 'select#new_field_type' ).removeClass( 'field_error' )
 																			.next().find( 'span.field_error' ).remove();
 	}
 </script>
+
+<script type="text/javascript">
+// These params also used for the new added field from the ajax request
+var user_field_autocomplete_params = {
+		source: function(request, response) {
+			jQuery.getJSON( htsrv_url + 'anon_async.php?action=get_user_field_autocomplete', {
+				term: request.term, attr_id: this.element[0].getAttribute( 'id' )
+			}, response);
+		},
+	};
+// Plugin jQuery(...).live() doesn't work with autocomplete
+// We should assign an autocomplete event for each new added field
+jQuery('input[id^=uf_]').autocomplete( user_field_autocomplete_params );
+</script>
 <?php
 
 /*
  * $Log$
+ * Revision 1.63  2011/10/22 07:38:39  efy-yurybakh
+ * Add a suggestion AJAX script to userfields
+ *
  * Revision 1.62  2011/10/20 12:14:55  efy-yurybakh
  * Allow/disabled multiple instances of same field
  *

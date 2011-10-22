@@ -386,6 +386,8 @@ function skin_init( $disp )
 			break;
 
 		case 'profile':
+			global $rsc_url;
+			require_css( $rsc_url.'css/jquery/smoothness/jquery-ui.css' );
 		case 'avatar':
 		case 'pwdchange':
 		case 'userprefs':
@@ -946,6 +948,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.119  2011/10/22 07:38:39  efy-yurybakh
+ * Add a suggestion AJAX script to userfields
+ *
  * Revision 1.118  2011/10/21 07:04:51  efy-vitalij
  * changed function header_http_response
  *

@@ -249,6 +249,39 @@ switch( $action )
 		userfields_display( $userfields, $Form, 'add' );
 
 		break;
+
+	case 'get_user_field_autocomplete':
+		// Used for autocompletion of the user field
+		$attr_id = param( 'attr_id', 'string' );
+		$term = param( 'term', 'string' );
+		
+		$field_type_id = 0;
+		if( preg_match( '/^uf_(new|add)_(\d+)_/i', $attr_id, $match ) )
+		{	// From new fields we can get the value for uf_ufdf_ID
+			$field_type_id = (int)$match[2];
+		}
+		else if( preg_match( '/^uf_(\d+)$/i', $attr_id, $match ) )
+		{	// From fields in DB we can get only uf_ID, then we should get a value uf_ufdf_ID from DB
+			$field_id = (int)$match[1];
+			$field_type_id = $DB->get_var( '
+				SELECT uf_ufdf_ID
+				  FROM T_users__fields
+				 WHERE uf_ID = "'.$field_id.'"' );
+		}
+
+		if( $field_type_id == 0 )
+		{	// Bad request
+			break;
+		}
+
+		echo json_encode( $DB->get_col( '
+			SELECT DISTINCT ( uf_varchar )
+			  FROM T_users__fields
+			 WHERE uf_varchar LIKE '.$DB->quote('%'.$term.'%').'
+			   AND uf_ufdf_ID = "'.$field_type_id.'"
+			 ORDER BY uf_varchar' ) );
+
+		break;
 }
 
 $disp = NULL;
@@ -258,6 +291,9 @@ exit(0);
 
 /*
  * $Log$
+ * Revision 1.29  2011/10/22 07:38:38  efy-yurybakh
+ * Add a suggestion AJAX script to userfields
+ *
  * Revision 1.28  2011/10/21 05:41:13  efy-vitalij
  * set $disp and $ctrl as NULL before exit
  *

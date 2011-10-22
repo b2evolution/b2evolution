@@ -355,6 +355,7 @@ switch( $user_tab )
 {
 	case 'profile':
 		$AdminUI->breadcrumbpath_add( T_('Profile'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+		require_css( $rsc_url.'css/jquery/smoothness/jquery-ui.css' );
 		break;
 	case 'avatar':
 		if( isset($GLOBALS['files_Module']) )
@@ -451,6 +452,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.40  2011/10/22 07:38:39  efy-yurybakh
+ * Add a suggestion AJAX script to userfields
+ *
  * Revision 1.39  2011/10/18 16:20:37  efy-yurybakh
  * Ajax implementation of "add field"
  *

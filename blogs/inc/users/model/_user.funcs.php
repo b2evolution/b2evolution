@@ -1311,11 +1311,12 @@ function callback_options_user_new_fields( $value )
 		global $user_fields_empty_name;
 		$empty_name = isset( $user_fields_empty_name ) ? $user_fields_empty_name : T_('Add field...');
 
-		$field_options .= '<option value="">'.$empty_name.'</option>'."\n".'<optgroup label="'.T_('Instant Messaging').'">';
+		$field_options .= '<option value="">'.$empty_name.'</option>';
+		//"\n".'<optgroup label="'.T_('Instant Messaging').'">';
 		foreach( $userfielddefs as $fielddef )
 		{
 			// check for group header:
-			switch( $fielddef->ufdf_ID )
+			/*switch( $fielddef->ufdf_ID )
 			{
 				case 50000:
 					$field_options .= "\n".'</optgroup><optgroup label="'.T_('Phone').'">';
@@ -1332,7 +1333,7 @@ function callback_options_user_new_fields( $value )
 				case 400000:
 					$field_options .= "\n".'</optgroup><optgroup label="'.T_('Other').'">';
 					break;
-			}
+			}*/
 			$field_options .= "\n".'<option value="'.$fielddef->ufdf_ID.'"';
 			if( $value == $fielddef->ufdf_ID )
 			{	// We had selected this type before getting an error:
@@ -1340,7 +1341,7 @@ function callback_options_user_new_fields( $value )
 			}
 			$field_options .= '>'.$fielddef->ufdf_name.'</option>';
 		}
-		$field_options .= '</optgroup>';
+		//$field_options .= '</optgroup>';
 	}
 
 	return $field_options;
@@ -1480,6 +1481,9 @@ function callback_filter_userlist( & $Form )
 
 /*
  * $Log$
+ * Revision 1.99  2011/10/22 07:38:39  efy-yurybakh
+ * Add a suggestion AJAX script to userfields
+ *
  * Revision 1.98  2011/10/20 17:09:52  efy-yurybakh
  * Info fields: select lists - give list of configurable options (changes for old values of the required fields)
  *

@@ -3117,18 +3117,21 @@ function upgrade_b2evo_tables()
 						SET ftyp_icon = "file_video"
 						WHERE ftyp_extensions IN ( "mp4", "mov", "m4v" )' );
 
+		task_begin( 'Upgrading user fields...' );
 		// Add new fields:
 		// 		"ufdf_options" to save a values of the Option list
 		// 		"ufdf_duplicated" to add a several instances
-		task_begin( 'Upgrading user fields...' );
 		$DB->query( 'ALTER TABLE T_users__fielddefs
-						ADD ufdf_options TEXT NOT NULL AFTER ufdf_name' );
-		$DB->query( 'ALTER TABLE T_users__fielddefs
+						ADD ufdf_options TEXT NOT NULL AFTER ufdf_name,
 						ADD ufdf_duplicated tinyint(1) NOT NULL default 0' );
 		// Set default values of the field "ufdf_duplicated"
 		$DB->query( 'UPDATE T_users__fielddefs
 						SET ufdf_duplicated = "1"
 						WHERE ufdf_ID IN ( 10000, 10100, 10200, 10300, 50100, 50200, 100000, 100100 )' );
+		// Add Indexes
+		$DB->query( 'ALTER TABLE T_users__fields
+						ADD INDEX uf_ufdf_ID ( uf_ufdf_ID ),
+						ADD INDEX uf_varchar ( uf_varchar ) ' );
 		task_end();
 	}
 
@@ -3297,6 +3300,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.429  2011/10/22 07:38:39  efy-yurybakh
+ * Add a suggestion AJAX script to userfields
+ *
  * Revision 1.428  2011/10/20 12:14:55  efy-yurybakh
  * Allow/disabled multiple instances of same field
  *

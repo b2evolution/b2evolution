@@ -142,7 +142,9 @@ $schema_queries = array(
 			uf_user_ID int(10) unsigned NOT NULL,
 			uf_ufdf_ID int(10) unsigned NOT NULL,
 			uf_varchar varchar(255) NOT NULL,
-			PRIMARY KEY (uf_ID)
+			PRIMARY KEY (uf_ID),
+			INDEX uf_ufdf_ID ( uf_ufdf_ID ),
+			INDEX uf_varchar ( uf_varchar )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_locales' => array(
@@ -288,6 +290,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.68  2011/10/22 07:38:39  efy-yurybakh
+ * Add a suggestion AJAX script to userfields
+ *
  * Revision 1.67  2011/10/20 12:14:55  efy-yurybakh
  * Allow/disabled multiple instances of same field
  *
