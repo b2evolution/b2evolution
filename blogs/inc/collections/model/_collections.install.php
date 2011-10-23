@@ -329,6 +329,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			bloguser_perm_edit           ENUM('no','own','lt','le','all','redirected') NOT NULL default 'no',
 			bloguser_perm_delpost        tinyint NOT NULL default 0,
 			bloguser_perm_edit_ts        tinyint NOT NULL default 0,
+			bloguser_perm_own_cmts       tinyint NOT NULL default 0,
 			bloguser_perm_vote_spam_cmts tinyint NOT NULL default 0,
 			bloguser_perm_draft_cmts     tinyint NOT NULL default 0,
 			bloguser_perm_publ_cmts      tinyint NOT NULL default 0,
@@ -356,6 +357,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			bloggroup_perm_edit           ENUM('no','own','lt','le','all','redirected') NOT NULL default 'no',
 			bloggroup_perm_delpost        tinyint NOT NULL default 0,
 			bloggroup_perm_edit_ts        tinyint NOT NULL default 0,
+			bloggroup_perm_own_cmts       tinyint NOT NULL default 0,
 			bloggroup_perm_vote_spam_cmts tinyint NOT NULL default 0,
 			bloggroup_perm_draft_cmts     tinyint NOT NULL default 0,
 			bloggroup_perm_publ_cmts      tinyint NOT NULL default 0,
@@ -401,6 +403,9 @@ $schema_queries = array_merge( $schema_queries, array(
 
 /*
  * $Log$
+ * Revision 1.46  2011/10/23 09:19:42  efy-yurybakh
+ * Implement new permission for comment editing
+ *
  * Revision 1.45  2011/09/27 13:30:14  efy-yurybakh
  * spam vote checkbox
  *

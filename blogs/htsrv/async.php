@@ -186,7 +186,14 @@ switch( $action )
 		if( $edited_Comment !== false )
 		{ // The comment still exists
 			$redirect_to = param( 'redirect_to', 'string', NULL );
-			$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
+
+			$edited_Comment_Item = & $edited_Comment->get_Item();
+			if( ! $current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', false, $blog ) &&
+					! $current_User->check_perm( 'blog_own_comments', '', false, $edited_Comment_Item ) )
+			{	// All permissions are denied
+				$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
+				$current_User->check_perm( 'blog_own_comments', '', true, $edited_Comment_Item );
+			}
 
 			$status = param( 'status', 'string' );
 			$edited_Comment->set( 'status', $status );
@@ -238,7 +245,14 @@ switch( $action )
 		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ), false );
 		if( $edited_Comment !== false )
 		{ // The comment still exists
-			$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
+			$edited_Comment_Item = & $edited_Comment->get_Item();
+			if( ! $current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', false, $blog ) &&
+					! $current_User->check_perm( 'blog_own_comments', '', false, $edited_Comment_Item ) )
+			{	// All permissions are denied
+				$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
+				$current_User->check_perm( 'blog_own_comments', '', true, $edited_Comment_Item );
+			}
+
 			$edited_Comment->dbdelete();
 		}
 
@@ -263,7 +277,14 @@ switch( $action )
 			$edited_Comment = & Comment_get_by_ID( $commentID, false );
 			if( $edited_Comment !== false )
 			{ // The comment still exists
-				$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
+				$edited_Comment_Item = & $edited_Comment->get_Item();
+				if( ! $current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', false, $blog ) &&
+						! $current_User->check_perm( 'blog_own_comments', '', false, $edited_Comment_Item ) )
+				{	// All permissions are denied
+					$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
+					$current_User->check_perm( 'blog_own_comments', '', true, $edited_Comment_Item );
+				}
+
 				$edited_Comment->dbdelete();
 			}
 		}
@@ -292,7 +313,14 @@ switch( $action )
 		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ), false );
 		if( $edited_Comment !== false && $edited_Comment->author_url != NULL )
 		{ // The comment still exists
-			$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
+			$edited_Comment_Item = & $edited_Comment->get_Item();
+			if( ! $current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', false, $blog ) &&
+					! $current_User->check_perm( 'blog_own_comments', '', false, $edited_Comment_Item ) )
+			{	// All permissions are denied
+				$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
+				$current_User->check_perm( 'blog_own_comments', '', true, $edited_Comment_Item );
+			}
+
 			$edited_Comment->set( 'author_url', NULL );
 			$edited_Comment->dbupdate();
 		}
@@ -383,6 +411,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.79  2011/10/23 09:19:41  efy-yurybakh
+ * Implement new permission for comment editing
+ *
  * Revision 1.78  2011/10/21 07:10:47  efy-asimo
  * Comment quick moderation option
  *

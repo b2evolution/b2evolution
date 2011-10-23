@@ -306,9 +306,11 @@ class BlogCache extends DataObjectCache
 
 			case 'blog_comments':
 				// user needs to have permission for at least one kind of comments (published, draft, deprecated)
-				$sql .= "OR bloguser_perm_draft_cmts <> 0
+				$sql .= "OR bloguser_perm_own_cmts <> 0
+						OR bloguser_perm_draft_cmts <> 0
 						OR bloguser_perm_publ_cmts <> 0
 						OR bloguser_perm_depr_cmts <> 0
+						OR bloggroup_perm_own_cmts <> 0
 						OR bloggroup_perm_draft_cmts <> 0
 						OR bloggroup_perm_publ_cmts <> 0
 						OR bloggroup_perm_depr_cmts <> 0";
@@ -366,6 +368,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.16  2011/10/23 09:19:42  efy-yurybakh
+ * Implement new permission for comment editing
+ *
  * Revision 1.15  2011/09/04 22:13:14  fplanque
  * copyright 2011
  *

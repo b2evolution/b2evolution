@@ -3133,6 +3133,19 @@ function upgrade_b2evo_tables()
 						ADD INDEX uf_ufdf_ID ( uf_ufdf_ID ),
 						ADD INDEX uf_varchar ( uf_varchar ) ' );
 		task_end();
+
+		task_begin( 'Upgrading permissions...' );
+		// Group permissions
+		$DB->query( 'ALTER TABLE T_coll_group_perms
+						ADD bloggroup_perm_own_cmts tinyint NOT NULL default 0 AFTER bloggroup_perm_edit_ts' );
+		// Set default values for Administrators & Privileged Bloggers groups
+		$DB->query( 'UPDATE T_coll_group_perms
+						SET bloggroup_perm_own_cmts = "1"
+						WHERE bloggroup_group_ID IN ( 1, 2 )' );
+		// User permissions
+		$DB->query( 'ALTER TABLE T_coll_user_perms
+						ADD bloguser_perm_own_cmts tinyint NOT NULL default 0 AFTER bloguser_perm_edit_ts' );
+		task_end();
 	}
 
 	/*
@@ -3300,6 +3313,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.430  2011/10/23 09:19:42  efy-yurybakh
+ * Implement new permission for comment editing
+ *
  * Revision 1.429  2011/10/22 07:38:39  efy-yurybakh
  * Add a suggestion AJAX script to userfields
  *

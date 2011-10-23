@@ -2565,7 +2565,9 @@ class Item extends ItemLight
 								), $params );
 		*/
 
-		if( isset($current_User) && $current_User->check_perm( 'blog_draft_comments', 'edit', false, $this->get_blog_ID() ) )
+		if( isset($current_User) && 
+				( $current_User->check_perm( 'blog_draft_comments', 'edit', false, $this->get_blog_ID() ) ||
+					$current_User->check_perm( 'blog_own_comments', '', false, $this ) ) )
 		{	// We jave permission to edit comments:
 			if( $edit_comments_link == '#' )
 			{	// Use default link:
@@ -4896,6 +4898,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.268  2011/10/23 09:19:42  efy-yurybakh
+ * Implement new permission for comment editing
+ *
  * Revision 1.267  2011/10/17 23:06:07  fplanque
  * comment teasing cleanup.
  *

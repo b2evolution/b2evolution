@@ -900,7 +900,8 @@ class Comment extends DataObject
 		if( $this->author_url( '', ' <span &bull; Url: id="commenturl_'.$this->ID.'" <span class="bUrl" >', '</span>' ) )
 		{
 			$Item = & $this->get_Item();
-			if( $current_User->check_perm( $this->blogperm_name(), '', false, $Item->get_blog_ID() ) )
+			if( $current_User->check_perm( $this->blogperm_name(), '', false, $Item->get_blog_ID() ) || 
+					$current_User->check_perm( 'blog_own_comments', '', false, $Item ) )
 			{ // There is an URL and we have permission to edit this comment...
 				if( $redirect_to == NULL )
 				{
@@ -965,7 +966,8 @@ class Comment extends DataObject
 
 		$this->get_Item();
 
-		if( ! $current_User->check_perm( $this->blogperm_name(), '', false, $this->Item->get_blog_ID() ) )
+		if( ! $current_User->check_perm( $this->blogperm_name(), '', false, $this->Item->get_blog_ID() ) &&
+				! $current_User->check_perm( 'blog_own_comments', '', false, $this->Item ) )
 		{ // If User has no permission to edit comments with this comment status:
 			return false;
 		}
@@ -1009,7 +1011,9 @@ class Comment extends DataObject
 		if( ! is_logged_in() ) return false;
 
 		$Item = & $this->get_Item();
-		if( $check_perm && ! $current_User->check_perm( $this->blogperm_name(), '', false, $Item->get_blog_ID() ) )
+		if( $check_perm && 
+				! $current_User->check_perm( $this->blogperm_name(), '', false, $Item->get_blog_ID() ) &&
+				! $current_User->check_perm( 'blog_own_comments', '', false, $Item ) )
 		{ // If current user has no permission to edit comments, with this comment status:
 			return false;
 		}
@@ -1034,7 +1038,7 @@ class Comment extends DataObject
 		else
 		{
 			$url = $admin_url.'?ctrl=comments&amp;action=delete_url&amp;comment_ID='.$this->ID.'&amp;'.url_crumb('comment') ;
-			echo ' <a href="'.$url.$redirect_to.'"'.get_icon( 'delete' ).'</a>';
+			echo ' <a href="'.$url.$redirect_to.'">'.get_icon( 'delete' ).'</a>';
 		}
 	}
 
@@ -1053,7 +1057,11 @@ class Comment extends DataObject
 
 		if( ! is_logged_in() ) return false;
 
-		if( $check_perm && ! $current_User->check_perm( 'spamblacklist', 'edit' ) )
+		//$Item = & $this->get_Item();
+
+		if( $check_perm &&
+				! $current_User->check_perm( 'spamblacklist', 'edit' ) /*&&
+				! $current_User->check_perm( 'blog_own_comments', '', false, $Item )*/ )
 		{ // if current user has no permission to edit spams
 			return false;
 		}
@@ -1112,7 +1120,8 @@ class Comment extends DataObject
 
 		$this->get_Item();
 
-		if( ! $current_User->check_perm( $this->blogperm_name(), '', false, $this->Item->get_blog_ID() ) )
+		if( ! $current_User->check_perm( $this->blogperm_name(), '', false, $this->Item->get_blog_ID() ) &&
+				! $current_User->check_perm( 'blog_own_comments', '', false, $this->Item ) )
 		{ // If User has no permission to edit comments, with this comment status:
 			return false;
 		}
@@ -1131,7 +1140,7 @@ class Comment extends DataObject
 		if( $title == '#' ) $title = T_('Delete this comment');
 
 		$url = $admin_url.'?ctrl=comments&amp;action=delete&amp;comment_ID='.$this->ID.'&amp;'.url_crumb('comment') ;
-   		if( $save_context )
+		if( $save_context )
 		{
 			$url .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
 		}
@@ -1189,8 +1198,9 @@ class Comment extends DataObject
 
 		$this->get_Item();
 
-		if( ($this->status == 'deprecated') // Already deprecateded!
-			|| ! $current_User->check_perm( $this->blogperm_name(), '', false, $this->Item->get_blog_ID() ) )
+		if( ($this->status == 'deprecated') || // Already deprecateded!
+				( ! $current_User->check_perm( $this->blogperm_name(), '', false, $this->Item->get_blog_ID() ) &&
+					! $current_User->check_perm( 'blog_own_comments', '', false, $this->Item ) ) )
 		{ // If User has no permission to edit comments, with this comment status:
 			return false;
 		}
@@ -1412,8 +1422,9 @@ class Comment extends DataObject
 
 		$this->get_Item();
 
-		if( ($this->status == 'published') // Already published!
-			|| ! $current_User->check_perm( $this->blogperm_name(), '', false, $this->Item->get_blog_ID() ) )
+		if( ($this->status == 'published') || // Already published!
+				( ! $current_User->check_perm( $this->blogperm_name(), '', false, $this->Item->get_blog_ID() ) &&
+					! $current_User->check_perm( 'blog_own_comments', '', false, $this->Item ) ) )
 		{ // If User has no permission to edit comments, with this comment status:
 			return false;
 		}
@@ -1704,7 +1715,8 @@ class Comment extends DataObject
 		{ // add ban icons
 			$Item = & $this->get_Item();
 			// check if user has edit permission for this comment
-			$ban_urls = $current_User->check_perm( $this->blogperm_name(), '', false, $Item->get_blog_ID() );
+			$ban_urls = $current_User->check_perm( $this->blogperm_name(), '', false, $Item->get_blog_ID() ) ||
+									$current_User->check_perm( 'blog_own_comments', '', false, $Item );
 		}
 
 		if( $ban_urls )
@@ -2448,6 +2460,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.125  2011/10/23 09:19:42  efy-yurybakh
+ * Implement new permission for comment editing
+ *
  * Revision 1.124  2011/10/21 07:10:48  efy-asimo
  * Comment quick moderation option
  *

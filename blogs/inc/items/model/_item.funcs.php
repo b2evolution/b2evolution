@@ -1863,7 +1863,8 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 	$Item = & $Comment->get_Item(); 
 	$Blog = & $Item->get_Blog();
 
-	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) )
+	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) || 
+			$current_User->check_perm( 'blog_own_comments', 'edit', false, $Item ) )
 	{
 		echo '<div id="c'.$comment_ID.'" class="bComment bComment';
 		$Comment->status('raw');
@@ -2218,6 +2219,9 @@ function get_item_new_link( $before = '', $after = '', $link_text = '', $link_ti
 
 /*
  * $Log$
+ * Revision 1.153  2011/10/23 09:19:42  efy-yurybakh
+ * Implement new permission for comment editing
+ *
  * Revision 1.152  2011/10/18 00:04:45  fplanque
  * i18n update
  *

@@ -109,6 +109,7 @@ function blog_update_perms( $blog, $context = 'user' )
 				'bloguser_perm_poststatuses' => array(),
 				'bloguser_perm_delpost' => 0,
 				'bloguser_perm_edit_ts' => 0,
+				'bloguser_perm_own_cmts' => 0,
 				'bloguser_perm_vote_spam_cmts' => 0,
 				'bloguser_perm_draft_cmts' => 0,
 				'bloguser_perm_publ_cmts' => 0,
@@ -169,6 +170,7 @@ function blog_update_perms( $blog, $context = 'user' )
 
 				case 'moderator':
 					$easy_perms['bloguser_perm_poststatuses'][] = 'redirected';
+					$easy_perms['bloguser_perm_own_cmts'] = 1;
 					$easy_perms['bloguser_perm_vote_spam_cmts'] = 1;
 					$easy_perms['bloguser_perm_draft_cmts'] = 1;
 					$easy_perms['bloguser_perm_publ_cmts'] = 1;
@@ -204,7 +206,7 @@ function blog_update_perms( $blog, $context = 'user' )
 														.', '.$DB->quote($easy_perms['bloguser_perm_poststatuses'])
 														.', '.$DB->quote($easy_perms['bloguser_perm_edit'])
 														.', '.$easy_perms['bloguser_perm_delpost'].', '.$easy_perms['bloguser_perm_edit_ts']
-														.', '.$easy_perms['bloguser_perm_vote_spam_cmts'].', '.$easy_perms['bloguser_perm_draft_cmts']
+														.', '.$easy_perms['bloguser_perm_own_cmts'].', '.$easy_perms['bloguser_perm_vote_spam_cmts'].', '.$easy_perms['bloguser_perm_draft_cmts']
 														.', '.$easy_perms['bloguser_perm_publ_cmts'].', '.$easy_perms['bloguser_perm_depr_cmts']
 														.', '.$easy_perms['bloguser_perm_cats']
 														.', '.$easy_perms['bloguser_perm_properties'].', '.$easy_perms['bloguser_perm_admin']
@@ -247,6 +249,7 @@ function blog_update_perms( $blog, $context = 'user' )
 			$perm_delpost = param( 'blog_perm_delpost_'.$loop_ID, 'integer', 0 );
 			$perm_edit_ts = param( 'blog_perm_edit_ts_'.$loop_ID, 'integer', 0 );
 
+			$perm_own_comments = param( 'blog_perm_own_cmts_'.$loop_ID, 'integer', 0 );
 			$perm_vote_spam_comments = param( 'blog_perm_vote_spam_cmts_'.$loop_ID, 'integer', 0 );
 			$perm_draft_comments = param( 'blog_perm_draft_cmts_'.$loop_ID, 'integer', 0 );
 			$perm_publ_comments = param( 'blog_perm_publ_cmts_'.$loop_ID, 'integer', 0 );
@@ -269,7 +272,7 @@ function blog_update_perms( $blog, $context = 'user' )
 
 			// Update those permissions in DB:
 
-			if( $ismember || count($perm_post) || $perm_delpost || $perm_edit_ts || $perm_vote_spam_comments || $perm_draft_comments || $perm_publ_comments || $perm_publ_comments || 
+			if( $ismember || count($perm_post) || $perm_delpost || $perm_edit_ts || $perm_own_comments || $perm_vote_spam_comments || $perm_draft_comments || $perm_publ_comments || $perm_publ_comments || 
 				$perm_cats || $perm_properties || $perm_admin || $perm_media_upload || $perm_media_browse || $perm_media_change )
 			{ // There are some permissions for this user:
 				$ismember = 1;	// Must have this permission
@@ -277,7 +280,7 @@ function blog_update_perms( $blog, $context = 'user' )
 				// insert new perms:
 				$inserted_values[] = " ( $blog, $loop_ID, $ismember, ".$DB->quote(implode(',',$perm_post)).",
 																	".$DB->quote($perm_edit).",
-																	$perm_delpost, $perm_edit_ts, $perm_vote_spam_comments, $perm_draft_comments, $perm_publ_comments,
+																	$perm_delpost, $perm_edit_ts, $perm_own_comments, $perm_vote_spam_comments, $perm_draft_comments, $perm_publ_comments,
 																	$perm_depr_comments, $perm_cats, $perm_properties, $perm_admin, $perm_media_upload, 
 																	$perm_media_browse, $perm_media_change, $perm_page,	$perm_intro, $perm_podcast, 
 																	$perm_sidebar )";
@@ -290,7 +293,7 @@ function blog_update_perms( $blog, $context = 'user' )
 	{
 		$DB->query( "INSERT INTO $table( {$prefix}blog_ID, {$ID_field}, {$prefix}ismember,
 											{$prefix}perm_poststatuses, {$prefix}perm_edit, {$prefix}perm_delpost, {$prefix}perm_edit_ts,
-											{$prefix}perm_vote_spam_cmts, {$prefix}perm_draft_cmts, {$prefix}perm_publ_cmts, {$prefix}perm_depr_cmts,
+											{$prefix}perm_own_cmts, {$prefix}perm_vote_spam_cmts, {$prefix}perm_draft_cmts, {$prefix}perm_publ_cmts, {$prefix}perm_depr_cmts,
 											{$prefix}perm_cats, {$prefix}perm_properties, {$prefix}perm_admin,
 											{$prefix}perm_media_upload, {$prefix}perm_media_browse, {$prefix}perm_media_change,
 											{$prefix}perm_page, {$prefix}perm_intro, {$prefix}perm_podcast, {$prefix}perm_sidebar )
@@ -339,6 +342,7 @@ function blogperms_get_easy2( $perms, $context = 'user' )
 									+ (in_array( 'published', $perms_post ) ? 1 : 0);
 
 	$perms_moderator = (in_array( 'redirected', $perms_post ) ? 1 : 0)
+									+(int)$perms->{'blog'.$context.'_perm_own_cmts'}
 									+(int)$perms->{'blog'.$context.'_perm_vote_spam_cmts'}
 									+(int)$perms->{'blog'.$context.'_perm_draft_cmts'}
 									+(int)$perms->{'blog'.$context.'_perm_publ_cmts'}
@@ -620,6 +624,9 @@ function set_cache_enabled( $cache_key, $new_status, $coll_ID = NULL, $save_sett
 
 /*
  * $Log$
+ * Revision 1.18  2011/10/23 09:19:42  efy-yurybakh
+ * Implement new permission for comment editing
+ *
  * Revision 1.17  2011/09/27 13:30:14  efy-yurybakh
  * spam vote checkbox
  *

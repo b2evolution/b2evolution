@@ -1313,6 +1313,20 @@ class User extends DataObject
 				}
 				break;
 
+			case 'blog_own_comments':
+				// Check permission to edit comments for own items
+				if( $this->check_perm_itemowner( $perm_target_ID ) )
+				{	// Current user is owner of this item
+					$Item = & $perm_target;
+					// Get a blog ID of this item to following checking permissions
+					$perm_target_ID = $Item->get_blog_ID();
+					/* continue */
+				}
+				else
+				{	// Current user is NOT owner of this item - NO permissions
+					$perm = false;
+					break;
+				}
 			case 'blog_ismember':
 			case 'blog_post_statuses':
 			case 'blog_post!published':
@@ -1353,7 +1367,7 @@ class User extends DataObject
 					break;
 				}
 
-				if( $perm_target > 0 )
+				if( $perm_target_ID > 0 )
 				{ // Check user perm for this blog:
 					$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target_ID );
 					if( ! $perm )
@@ -1361,6 +1375,7 @@ class User extends DataObject
 						$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target_ID );
 					}
 				}
+
 				break;
 
 			case 'item_post!CURSTATUS':
@@ -1532,18 +1547,41 @@ class User extends DataObject
 	 */
 	function check_perm_blogowner( $blog_ID )
 	{
-		if( empty($blog_ID) )
+		if( empty( $blog_ID ) )
 		{
 			return false;
 		}
 
 		$BlogCache = & get_BlogCache();
-    /**
+		/**
 		 * @var Blog
 		 */
 		$Blog = & $BlogCache->get_by_ID( $blog_ID );
 
 		return ( $Blog->owner_user_ID == $this->ID );
+	}
+
+
+	/**
+	 * Check if the user is the owner of the designated item (which gives him a lot of permissions)
+	 *
+	 * @param integer
+	 * @return boolean
+	 */
+	function check_perm_itemowner( $item_ID )
+	{
+		if( empty( $item_ID ) )
+		{
+			return false;
+		}
+
+		$ItemCache = & get_ItemCache();
+		/**
+		 * @var Item
+		 */
+		$Item = & $ItemCache->get_by_ID( $item_ID );
+
+		return ( $Item->creator_user_ID == $this->ID );
 	}
 
 
@@ -1607,6 +1645,7 @@ class User extends DataObject
 						'blog_del_post' => '0',
 						'blog_edit_ts' => '0',
 						'blog_comments' => '0',
+						'blog_own_comments' => '0',
 						'blog_vote_spam_comments' => '0',
 						'blog_draft_comments' => '0',
 						'blog_published_comments' => '0',
@@ -1638,8 +1677,9 @@ class User extends DataObject
 				$this->blog_post_statuses[$perm_target_blog]['blog_edit'] = $row['bloguser_perm_edit'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_del_post'] = $row['bloguser_perm_delpost'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_edit_ts'] = $row['bloguser_perm_edit_ts'];
-				$this->blog_post_statuses[$perm_target_blog]['blog_comments'] = $row['bloguser_perm_publ_cmts']
-					+ $row['bloguser_perm_draft_cmts'] +  $row['bloguser_perm_depr_cmts'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_comments'] = $row['bloguser_perm_own_cmts'] + $row['bloguser_perm_publ_cmts']
+					+ $row['bloguser_perm_draft_cmts'] + $row['bloguser_perm_depr_cmts'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_own_comments'] = $row['bloguser_perm_own_cmts'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_vote_spam_comments'] = $row['bloguser_perm_vote_spam_cmts'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_draft_comments'] = $row['bloguser_perm_draft_cmts'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_published_comments'] = $row['bloguser_perm_publ_cmts'];
@@ -2815,6 +2855,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.170  2011/10/23 09:19:42  efy-yurybakh
+ * Implement new permission for comment editing
+ *
  * Revision 1.169  2011/10/20 12:14:55  efy-yurybakh
  * Allow/disabled multiple instances of same field
  *

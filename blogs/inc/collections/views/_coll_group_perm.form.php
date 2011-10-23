@@ -71,7 +71,7 @@ else
 
 $SQL = new SQL();
 $SQL->SELECT( 'grp_ID, grp_name, bloggroup_perm_poststatuses, bloggroup_perm_edit, bloggroup_ismember,'
-	. 'bloggroup_perm_vote_spam_cmts, bloggroup_perm_draft_cmts, bloggroup_perm_publ_cmts, bloggroup_perm_depr_cmts,'
+	. 'bloggroup_perm_own_cmts, bloggroup_perm_vote_spam_cmts, bloggroup_perm_draft_cmts, bloggroup_perm_publ_cmts, bloggroup_perm_depr_cmts,'
 	. 'bloggroup_perm_delpost, bloggroup_perm_edit_ts, bloggroup_perm_cats,'
 	. 'bloggroup_perm_properties, bloggroup_perm_admin, bloggroup_perm_media_upload,'
 	. 'bloggroup_perm_media_browse, bloggroup_perm_media_change, bloggroup_perm_page,'
@@ -88,25 +88,15 @@ if( !empty( $keywords ) )
 
 // Display layout selector:
 // TODO: cancel event in switch layout (or it will trigger bozo validator)
-echo '<div style="float:right">';
+/*echo '<div style="float:right">';
 	echo T_('Layout').': ';
-	echo '[<a href="?ctrl=coll_settings&amp;action=edit&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'&amp;layout=default"
-					onclick="blogperms_switch_layout(\'default\'); return false;">'.T_('Simple').'</a>] ';
-
 	echo '[<a href="?ctrl=coll_settings&amp;action=edit&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'&amp;layout=wide"
 					onclick="blogperms_switch_layout(\'wide\'); return false;">'.T_('Advanced').'</a>] ';
-
-	if( $debug )
-	{	// Debug mode = both modes are displayed:
-		echo '[<a href="?ctrl=coll_settings&amp;action=edit&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'&amp;layout=all"
-						onclick="blogperms_switch_layout(\'all\'); return false;">Debug</a>] ';
-	}
-echo '</div>';
+echo '</div>';*/
 // Display wide layout:
 ?>
 
-<div id="userlist_wide" class="clear" style="<?php
-	echo 'display:'.( ($layout == 'wide' || $layout == 'all' ) ? 'block' : 'none' ) ?>">
+<div id="userlist_wide" class="clear">
 
 <?php
 
@@ -310,7 +300,8 @@ $Results->cols[] = array(
 						'th_class' => 'checkright',
 						'order' => 'bloggroup_perm_publ_cmts',
 						'default_dir' => 'D',
-						'td' => '%coll_perm_checkbox( {row}, \'perm_vote_spam_cmts\', \''.TS_('Permission to give a spam vote on any comment').'\' )%&nbsp;'.
+						'td' => '%coll_perm_checkbox( {row}, \'perm_own_cmts\', \''.TS_('Permission to edit comments on their own posts').'\' )%&nbsp;'.
+								'%coll_perm_checkbox( {row}, \'perm_vote_spam_cmts\', \''.TS_('Permission to give a spam vote on any comment').'\' )%&nbsp;'.
 								'%coll_perm_checkbox( {row}, \'perm_draft_cmts\', \''.TS_('Permission to edit draft comments in this blog').'\' )%'.
 								'%coll_perm_checkbox( {row}, \'perm_publ_cmts\', \''.TS_('Permission to edit published comments in this blog').'\' )%'.
 								'%coll_perm_checkbox( {row}, \'perm_depr_cmts\', \''.TS_('Permission to edit deprecated comments in this blog').'\' )%',
@@ -349,32 +340,16 @@ $Results->cols[] = array(
 
 // Media Directory:
 $Results->cols[] = array(
-						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Media directory'),
-						'th' => /* TRANS: verb */ T_('Upload '),
+						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Media<br />Dir'),
 						'th_class' => 'checkright',
 						'order' => 'bloggroup_perm_media_upload',
 						'default_dir' => 'D',
-						'td' => '%coll_perm_checkbox( {row}, \'perm_media_upload\', \''.TS_('Permission to upload into blog\'s media folder').'\' )%',
+						'td' => '%coll_perm_checkbox( {row}, \'perm_media_upload\', \''.TS_('Permission to upload into blog\'s media folder').'\' )%'.
+										'%coll_perm_checkbox( {row}, \'perm_media_browse\', \''.TS_('Permission to browse blog\'s media folder').'\' )%'.
+										'%coll_perm_checkbox( {row}, \'perm_media_change\', \''.TS_('Permission to change the blog\'s media folder content').'\' )%',
 						'td_class' => 'center',
 					);
-$Results->cols[] = array(
-						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Media directory'),
-						'th' => T_('Read'),
-						'th_class' => 'checkright',
-						'order' => 'bloggroup_perm_media_browse',
-						'default_dir' => 'D',
-						'td' => '%coll_perm_checkbox( {row}, \'perm_media_browse\', \''.TS_('Permission to browse blog\'s media folder').'\' )%',
-						'td_class' => 'center',
-					);
-$Results->cols[] = array(
-						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Media directory'),
-						'th' => T_('Write'),
-						'th_class' => 'checkright',
-						'order' => 'bloggroup_perm_media_change',
-						'default_dir' => 'D',
-						'td' => '%coll_perm_checkbox( {row}, \'perm_media_change\', \''.TS_('Permission to change the blog\'s media folder content').'\' )%',
-						'td_class' => 'center',
-					);
+
 
 function perm_check_all( $row )
 {
@@ -402,82 +377,6 @@ $Results->display();
 echo '</div>';
 
 
-// Display simple layout:
-?>
-<div id="userlist_default" class="clear" style="<?php
-	echo 'display:'.( ($layout == 'default' || $layout == 'all' ) ? 'block' : 'none' ) ?>">
-
-<?php
-
-
-// Change filter definitions for simple layout:
-
-$Results->filter_area = array(
-	'submit' => 'actionArray[filter2]',
-	'callback' => 'filter_colluserlist',
-	'url_ignore' => 'action,results_colluser_page,keywords1,keywords2',
-	'presets' => array(
-		'all' => array( T_('All users'), regenerate_url( 'action,results_colluser_page,keywords1,keywords2', 'action=edit' ) ),
-		)
-	);
-
-
-// Change column definitions for simple layout:
-
-$Results->cols = array(); // RESET!
-
-$Results->cols[] = array(
-						'th' => T_('Login'),
-						'order' => 'user_login',
-						'td' => '<a href="?ctrl=users&amp;grp_ID=$grp_ID$">$grp_name$</a>',
-					);
-
-
-function simple_coll_perm_radios( $row )
-{
-	global $permission_to_change_admin;
-
-	$r = '';
-	$user_easy_group = blogperms_get_easy2( $row, 'group' );
-	foreach( array(
-								array( 'nomember', T_('Not Member') ),
-								array( 'member', T_('Member') ),
-								array( 'contrib', T_('Contributor') ),
-								array( 'editor', T_('Publisher') ),
-								array( 'moderator', T_('Moderator') ),
-								array( 'owner',  T_('Owner') ),
-								array( 'admin',  T_('Admin') ),
-								array( 'custom',  T_('Custom') )
-							) as $lkey => $easy_group )
-	{
-		$r .= '<input type="radio" id="blog_perm_easy_'.$row->grp_ID.'_'.$lkey.'" name="blog_perm_easy_'.$row->grp_ID.'" value="'.$easy_group[0].'"';
-		if( $easy_group[0] == $user_easy_group )
-		{
-			$r .= ' checked="checked"';
-		}
-		if( ! $permission_to_change_admin
-				&& ( $row->bloggroup_perm_admin || $easy_group[0] == 'admin' ) )
-		{ // No permission to touch nOR create admins
-	 		$r .= ' disabled="disabled"';
-		}
-		$r .= ' onclick="merge_from_easy( this, '.$row->grp_ID.' )" class="radio" />
-		<label for="blog_perm_easy_'.$row->grp_ID.'_'.$lkey.'">'.$easy_group[1].'</label> ';
-	}
-
-	return $r;
-}
-$Results->cols[] = array(
-						'th' => T_('Role'),
-						'td' => '%simple_coll_perm_radios( {row} )%',
-					);
-
-
-// Display SIMPLE:
-$Results->display();
-
-
-echo '</div>';
-
 // Permission note:
 // fp> TODO: link
 echo '<p class="note center">'.T_('Note: General group permissions may further restrict or extend any media folder permissions defined here.').'</p>';
@@ -498,6 +397,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.23  2011/10/23 09:19:42  efy-yurybakh
+ * Implement new permission for comment editing
+ *
  * Revision 1.22  2011/09/27 13:30:14  efy-yurybakh
  * spam vote checkbox
  *

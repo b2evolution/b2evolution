@@ -51,7 +51,13 @@ switch( $action )
 		$Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Check permission:
-		$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
+		if( ! $current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', false, $blog ) &&
+				! $current_User->check_perm( 'blog_own_comments', '', false, $edited_Comment_Item ) )
+		{	// All permissions are denied
+			$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
+			$current_User->check_perm( 'blog_own_comments', '', true, $edited_Comment_Item );
+			// TODO: It would be good if we combine these two permissions into one, To avoid a duplicate calling of these functions
+		}
 
 		// Where are we going to redirect to?
 		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$edited_Comment_Item->ID, '&' ) );
@@ -517,6 +523,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.49  2011/10/23 09:19:42  efy-yurybakh
+ * Implement new permission for comment editing
+ *
  * Revision 1.48  2011/10/21 07:10:47  efy-asimo
  * Comment quick moderation option
  *

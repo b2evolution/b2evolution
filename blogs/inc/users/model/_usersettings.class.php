@@ -67,7 +67,7 @@ class UserSettings extends AbstractSettings
 		'fm_showdate'       => 'compact',
 		'fm_allowfiltering' => 'simple',
 
-		'blogperms_layout' => 'default',	// selected view in blog (user/group) perms
+		'blogperms_layout' => 'wide',	// selected view in blog (user/group) perms
 
 		'login_multiple_sessions' => 0, 	// disallow multiple concurrent sessions by default
 		'timeout_sessions' => NULL,			// user session timeout (NULL means application default)
@@ -217,6 +217,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.17  2011/10/23 09:19:42  efy-yurybakh
+ * Implement new permission for comment editing
+ *
  * Revision 1.16  2011/10/06 06:18:29  efy-asimo
  * Add messages link to settings
  * Update messaging notifications

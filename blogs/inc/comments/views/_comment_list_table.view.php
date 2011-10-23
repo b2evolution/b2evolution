@@ -64,7 +64,11 @@ $CommentList->cols[] = array(
 function get_type( $Comment )
 {
 	global $current_User, $Blog;
-	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) )
+
+	$Item = & $Comment->get_Item();
+
+	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) ||
+			$current_User->check_perm( 'blog_own_comments', '', false, $Item ) )
 	{
 		return $Comment->get( 'type' );
 	}
@@ -88,8 +92,12 @@ $CommentList->cols[] = array(
 function get_author( $Comment )
 {
 	global $current_User, $Blog;
+
+	$Item = & $Comment->get_Item();
+
 	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) ||
-		$Comment->get('status') == 'published' )
+			$current_User->check_perm( 'blog_own_comments', '', false, $Item ) ||
+			$Comment->get('status') == 'published' )
 	{
 		$author_User = $Comment->get_author_User();
 		if( $author_User != NULL )
@@ -119,7 +127,11 @@ $CommentList->cols[] = array(
 function get_url( $Comment )
 {
 	global $current_User, $Blog;
-	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) )
+
+	$Item = & $Comment->get_Item();
+
+	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) ||
+			$current_User->check_perm( 'blog_own_comments', '', false, $Item ) )
 	{
 		return $Comment->author_url_with_actions( NULL, false );
 	}
@@ -144,7 +156,11 @@ $CommentList->cols[] = array(
 function get_author_email( $Comment )
 {
 	global $current_User, $Blog;
-	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) )
+
+	$Item = & $Comment->get_Item();
+
+	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) ||
+			$current_User->check_perm( 'blog_own_comments', '', false, $Item ) )
 	{
 		return $Comment->get_author_email();
 	}
@@ -169,7 +185,11 @@ $CommentList->cols[] = array(
 function get_author_ip( $Comment )
 {
 	global $current_User, $Blog;
-	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) )
+
+	$Item = & $Comment->get_Item();
+
+	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) ||
+			$current_User->check_perm( 'blog_own_comments', '', false, $Item ) )
 	{
 		return $Comment->get( 'author_IP' );
 	}
@@ -194,7 +214,11 @@ $CommentList->cols[] = array(
 function get_spam_karma( $Comment )
 {
 	global $current_User, $Blog;
-	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) )
+
+	$Item = & $Comment->get_Item();
+
+	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) ||
+			$current_User->check_perm( 'blog_own_comments', '', false, $Item ) )
 	{
 		return $Comment->get( 'spam_karma' );
 	}
@@ -238,8 +262,11 @@ function comment_edit_actions( $Comment )
 {
 	global $Blog, $current_User;
 
+	$Item = & $Comment->get_Item();
+
 	// Display edit and delete button if current user has the rights:
-	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ))
+	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) ||
+			$current_User->check_perm( 'blog_own_comments', '', false, $Item ) )
 	{
 		$redirect_to = rawurlencode( regenerate_url( 'comment_ID,action', 'filter=restore', '', '&' ) );
 
@@ -266,6 +293,9 @@ $CommentList->display();
 
 /*
  * $Log$
+ * Revision 1.10  2011/10/23 09:19:42  efy-yurybakh
+ * Implement new permission for comment editing
+ *
  * Revision 1.9  2011/09/26 12:06:39  efy-asimo
  * Unified usernames everywhere in the app - second part
  *

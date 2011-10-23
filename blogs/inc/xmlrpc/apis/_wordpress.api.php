@@ -358,8 +358,15 @@ function wp_deletecomment( $m )
 		$edited_Comment = $cache_Comments[$comment_ID];
 	}
 
+	$edited_Comment_Item = & $edited_Comment->get_Item();
+
 	// Check permission:
-	$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $Blog->ID );
+	if( ! $current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', false, $blog ) &&
+			! $current_User->check_perm( 'blog_own_comments', '', false, $edited_Comment_Item ) )
+	{	// All permissions are denied
+		$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
+		$current_User->check_perm( 'blog_own_comments', '', true, $edited_Comment_Item );
+	}
 
 	$edited_Comment->dbdelete();
 
@@ -413,6 +420,9 @@ $xmlrpc_procs['wp.deleteComment'] = array(
 
 /*
  * $Log$
+ * Revision 1.16  2011/10/23 09:19:42  efy-yurybakh
+ * Implement new permission for comment editing
+ *
  * Revision 1.15  2010/06/01 11:33:20  efy-asimo
  * Split blog_comments advanced permission (published, deprecated, draft)
  * Use this new permissions (Antispam tool,when edit/delete comments)
