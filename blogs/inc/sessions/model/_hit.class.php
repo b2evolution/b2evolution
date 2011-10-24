@@ -62,6 +62,16 @@ class Hit
 	 */
 	var $referer;
 
+
+	/**
+	 * The type of hit.
+	 *
+	 * 'standard'|'rss'|'admin'|'ajax'|'service'
+	 *
+	 * @var string
+	 */
+	var $hit_type;
+
 	/**
 	 * The type of referer.
 	 *
@@ -258,6 +268,9 @@ class Hit
 		{
 			$this->test_rss = $test_rss;
 		}
+
+		$this->hit_type = $this->get_hit_type();
+		
 		// Check the REFERER and determine referer_type:
 		// TODO: dh> move this out of here, too, only if "antispam_block_spam_referers" is true,
 		//           do something about it (here or somewhere else, but early).
@@ -285,8 +298,8 @@ class Hit
 			if( is_admin_page() )
 			{	// We are inside of admin, this supersedes 'direct' access
 				// NOTE: this is not really a referer type but more a hit type
-				$Debuglog->add( 'Hit: Referer is admin page.', 'request' );
-				$this->referer_type = 'admin';
+				// $Debuglog->add( 'Hit: Referer is admin page.', 'request' );
+				//$this->referer_type = 'admin';
 				return true;
 			}
 		}
@@ -335,7 +348,7 @@ class Hit
 	function detect_referer( $referer = NULL )
 	{
 		global $Debuglog, $debug;
-		global $self_referer_list, $blackList;  // used to detect $referer_type
+		global $self_referer_list, $SpecialList;  // used to detect $referer_type
 		global $skins_path;
 		global $Settings;
 
@@ -354,6 +367,14 @@ class Hit
 			// This type may be superseeded and set to 'admin'
 			if( ! $this->detect_admin_page() )
 			{	// Not an admin page:
+				$this->referer_type = 'direct';
+			}
+			else
+			{
+				if (empty($this->hit_type))
+				{
+					$this->hit_type = 'admin';
+				}
 				$this->referer_type = 'direct';
 			}
 			return;
@@ -379,18 +400,26 @@ class Hit
 					$Debuglog->add( 'Hit: detect_referer(): self referer ('.$self_referer.')', 'request' );
 					$this->referer_type = 'self';
 				}
+				else
+				{
+					if (empty($this->hit_type))
+					{
+						$this->hit_type = 'admin';	
+					}
+					$this->referer_type = 'self';
+				}
 				return;
 			}
 		}
 
 
-		// Check blacklist, see {@link $blackList}
+		// Check Special list, see {@link $SpecialList}
 		// NOTE: This is NOT the antispam!!
 		// fplanque: we log these (again), because if we didn't we woudln't detect
 		// reloads on these... and that would be a problem!
-		foreach( $blackList as $lBlacklist )
+		foreach( $SpecialList as $lSpeciallist )
 		{
-			$pos = strpos( $this->referer, $lBlacklist );
+			$pos = strpos( $this->referer, $lSpeciallist );
 			// If not starting within in the first 12 chars it's probably an url param as in &url=http://this_blog.com
 			if( $pos !== false && $pos <= 12 )
 			{
@@ -398,8 +427,8 @@ class Hit
 				// fp> 2009-05-10: because of the 12 char limit above the following is probably no longer needed. Please enable it back if anyone has a problem with admin being detected as blacklist
 				// if( ! $this->detect_admin_page() )
 				{	// Not an admin page:
-					$Debuglog->add( 'Hit: detect_referer(): blacklist ('.$lBlacklist.')', 'request' );
-					$this->referer_type = 'blacklist';
+					$Debuglog->add( 'Hit: detect_referer(): blacklist ('.$lSpeciallist.')', 'request' );
+					$this->referer_type = 'special';
 				}
 				return;
 			}
@@ -618,10 +647,13 @@ class Hit
 		if( (isset( $Skin ) && $Skin->type == 'feed') || !empty($this->test_rss) )
 		{
 			$Debuglog->add( 'Hit: detect_useragent(): RSS', 'request' );
-			$this->agent_type = 'rss';
+			if (empty($this->hit_type))
+			{
+				$this->hit_type = 'rss';
+			}
 		}
-		else
-		{ // Lookup robots
+		
+		 // Lookup robots
 			$match = false;
 			foreach( $user_agents as $lUserAgent )
 			{
@@ -640,7 +672,7 @@ class Hit
 				$Debuglog->add( 'Hit:detect_useragent(): robot (through browscap)', 'request' );
 				$this->agent_type = 'robot';
 			}
-		}
+		
 	}
 
 
@@ -810,14 +842,28 @@ class Hit
 		// Extract the serprank from search referers:
 		$serprank = $this->get_serprank();
 		$this->hit_response_code = $http_response_code;
+
+		if (empty($this->hit_type))
+		{
+			if ( isset($_SERVER['HTTP_X_REQUESTED_WITH']) && (strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') )
+			{
+				$this->hit_type = 'ajax';
+			}
+			else
+			{
+				$this->hit_type = 'standard';
+			}
+		}
+
+
 		// insert hit into DB table:
 		if (empty($this->test_mode))
 		{
 			$sql = "
 				INSERT INTO T_hitlog(
-					hit_sess_ID, hit_datetime, hit_uri, hit_disp, hit_ctrl, hit_referer_type,
+					hit_sess_ID, hit_datetime, hit_uri, hit_disp, hit_ctrl, hit_type ,hit_referer_type,
 					hit_referer, hit_referer_dom_ID, hit_keyphrase_keyp_ID, hit_serprank, hit_blog_ID, hit_remote_addr, hit_agent_type, hit_response_code )
-				VALUES( '".$Session->ID."', FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($hit_uri)."', ".$DB->quote($disp).", ".$DB->quote($ctrl).", '".$this->referer_type
+				VALUES( '".$Session->ID."', FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($hit_uri)."', ".$DB->quote($disp).", ".$DB->quote($ctrl).", '".$this->hit_type."', '".$this->referer_type
 					."', '".$DB->escape($hit_referer)."', ".$DB->null($this->get_referer_domain_ID()).', '.$DB->null($keyp_ID)
 					.', '.$DB->null($serprank).', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', '".$this->get_agent_type()."', ".$DB->null($this->hit_response_code).")";
 		}
@@ -829,9 +875,9 @@ class Hit
 
 			$sql = "
 				INSERT INTO T_hitlog(
-					hit_sess_ID, hit_datetime, hit_uri, hit_disp, hit_ctrl, hit_referer_type,
+					hit_sess_ID, hit_datetime, hit_uri, hit_disp, hit_ctrl, hit_type, hit_referer_type,
 					hit_referer, hit_referer_dom_ID, hit_keyphrase_keyp_ID, hit_serprank, hit_blog_ID, hit_remote_addr, hit_agent_type, hit_response_code )
-				VALUES( '".$this->session_id."', FROM_UNIXTIME(".$this->hit_time."), '".$DB->escape($hit_uri)."', ".$DB->quote($test_disp).", ".$DB->quote($test_ctrl).", '".$this->referer_type
+				VALUES( '".$this->session_id."', FROM_UNIXTIME(".$this->hit_time."), '".$DB->escape($hit_uri)."', ".$DB->quote($test_disp).", ".$DB->quote($test_ctrl).", '".$this->hit_type."', '".$this->referer_type
 					."', '".$DB->escape($hit_referer)."', ".$DB->null($this->get_referer_domain_ID()).', '.$DB->null($keyp_ID)
 					.', '.$DB->null($serprank).', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', '".$this->get_agent_type()."', ".$DB->null($this->hit_response_code).")";
 
@@ -861,6 +907,39 @@ class Hit
 			$internal_searches->dbinsert();
 		}
 		$this->ID = $hit_ID;
+	}
+
+
+	/**
+	 * Get hit type from the uri
+	 * @return mixed Hit type
+	 */
+	function get_hit_type()
+	{
+		global $ReqURI;
+		if( $this->hit_type )
+		{
+			return $this->hit_type;
+		}
+
+		$ajax_array = array('htsrv/async.php', 'htsrv/anon_async.php');
+
+		foreach ($ajax_array as $ajax)
+		{
+			if (strstr($ReqURI,$ajax))
+			{
+				return 'ajax';
+			}
+		}
+
+		if (strstr($ReqURI,'htsrv/'))
+		{
+			return 'service';
+		}
+		else
+		{
+			return NULL;
+		}
 	}
 
 
@@ -1599,6 +1678,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.83  2011/10/24 13:58:07  efy-vitalij
+ * added hit_type determination and changed 'blacklist' to 'special'
+ *
  * Revision 1.82  2011/10/20 13:17:06  efy-vitalij
  * doc
  *
