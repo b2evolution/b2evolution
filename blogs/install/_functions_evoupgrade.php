@@ -3069,10 +3069,12 @@ function upgrade_b2evo_tables()
 			task_end();
 		}
 
-		$DB->query( 'ALTER TABLE T_hitlog
-								ADD COLUMN hit_disp        VARCHAR(30) DEFAULT NULL AFTER hit_uri,
-								ADD COLUMN hit_ctrl        VARCHAR(30) DEFAULT NULL AFTER hit_disp,
-								ADD COLUMN hit_response_code     INT DEFAULT NULL AFTER hit_agent_type ' );
+		$DB->query( "ALTER TABLE T_hitlog
+								CHANGE COLUMN hit_referer_type  hit_referer_type ENUM(  'search',  'special',  'spam',  'referer',  'direct',  'self',  'admin' ) NOT NULL,
+								ADD COLUMN hit_disp VARCHAR(30) DEFAULT NULL AFTER hit_uri,
+								ADD COLUMN hit_ctrl VARCHAR(30) DEFAULT NULL AFTER hit_disp,
+								ADD COLUMN hit_type	ENUM('standard','rss','admin','ajax', 'service') DEFAULT 'standard' NOT NULL AFTER hit_ctrl,
+								ADD COLUMN hit_response_code INT DEFAULT NULL AFTER hit_agent_type " );
 
 		// Update ftyp_icon column
 		// Last versions used a image file name for this field,
@@ -3313,6 +3315,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.431  2011/10/24 13:53:05  efy-vitalij
+ * added changes to T_hitlog table
+ *
  * Revision 1.430  2011/10/23 09:19:42  efy-yurybakh
  * Implement new permission for comment editing
  *
