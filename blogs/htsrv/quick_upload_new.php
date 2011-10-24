@@ -201,7 +201,7 @@ if( $upload )
 		if( $Settings->get( 'upload_maxkb' ) && ( $file->getSize() > $Settings->get( 'upload_maxkb' )*1024 ) )
 		{
 			$message = '<span class="result_error">'.
-			sprintf( T_('The file is too large: %s but the maximum allowed is %s.'), $file->size, $Settings->get( 'upload_maxkb' )*1024 )
+			sprintf( T_('The file is too large: %s byte but the maximum allowed is %s byte.'), $file->getSize(), $Settings->get( 'upload_maxkb' )*1024 )
 			. '</span>';
 			//echo htmlspecialchars(json_encode(array('success'=>$message)));
 			out_echo($message, $specialchars);
@@ -310,6 +310,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.3  2011/10/24 08:45:46  efy-vitalij
+ * changed file validation
+ *
  * Revision 1.2  2011/10/20 11:51:49  efy-vitalij
  * changed function get_content in classes qqUploadedFileXhr, qqUploadedFileForm, made some changes in response
  *
