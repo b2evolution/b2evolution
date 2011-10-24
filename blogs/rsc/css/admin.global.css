@@ -556,7 +556,7 @@ div.avatartag {
 .reftype_search{
 	background-color: #0099FF;
 }
-.reftype_blacklist{
+.reftype_special{
 	background-color: #ff00ff;
 }
 .reftype_referer{
@@ -575,9 +575,6 @@ div.avatartag {
 	background-color: #999999;
 }
 
-.agent_rss{
-	background-color: #FF6600;
-}
 .agent_robot{
 	background-color: #FF9900;
 }
@@ -600,4 +597,20 @@ div.avatartag {
 .code_4xx{
 	color: #f00;
 	font-weight: bold;
+}
+
+.hit_type_standard{
+	background-color:  #0092ef;
+}
+.hit_type_rss{
+	background-color: #FF6600;
+}
+.hit_type_ajax{
+	background-color: #009900;
+}
+.hit_type_service{
+	background-color: #0072FF;
+}
+.hit_type_admin{
+	background-color: #e0e0e0;
 }
