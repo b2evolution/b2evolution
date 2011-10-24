@@ -45,7 +45,7 @@ $self_referer_list = array(
 
 
 /**
- * Blacklist: referrers that should not be considered as "real" referers in stats.
+ * Speciallist: referrers that should not be considered as "real" referers in stats.
  * This should typically include stat services, online email services, online aggregators, etc.
  *
  * The following substrings will be looked up in the referer http header
@@ -64,7 +64,7 @@ $self_referer_list = array(
  *
  * @global array
  */
-$blackList = array(
+$SpecialList = array(
 	// webmails
 	'.mail.yahoo.com/',
 	'//mail.google.com/',
@@ -181,14 +181,14 @@ $referer_type_array = array (
 	'referer'	=> 'Referer',
 	'direct'	=> 'Direct',
 	'self'		=> 'Self',
-	'blacklist' => 'Blacklist',
+	'special'	=> 'Special',
 	'spam'		=> 'Spam',
 	'admin'		=> 'Admin'
 							);
 
 $referer_type_color = array(
 	'search'	=> '0099FF',
-	'blacklist' => 'ff00ff',
+	'special'	=> 'ff00ff',
 	'referer'	=> '00CCFF',
 	'direct'	=> '00FFCC',
 	'spam'		=> 'FF0000',
@@ -211,4 +211,23 @@ $agent_type_color = array(
 	'browser'	=> 'FFCC00',
 	'unknown'	=> 'cccccc'
 );
+
+$hit_type_array = array (
+	'0'			=> 'All',
+	'standard'	=> 'Standard',
+	'service'	=> 'Service',
+	'rss'		=> 'RSS',
+	'ajax'		=> 'AJAX',
+	'admin'		=> 'Andmin'
+	);
+
+$hit_type_color = array(
+	'standard'	=> '0092ef',
+	'service'	=> '0072FF',
+	'rss'		=> 'FF6600',
+	'ajax'		=> '009900',
+	'admin'		=> 'e0e0e0'
+);
+
+
 ?>
