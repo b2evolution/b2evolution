@@ -39,11 +39,12 @@ $sess_ID = param( 'sess_ID', 'integer', NULL, true );
 $remote_IP = param( 'remote_IP', 'string', NULL, true );
 $referer_type = param( 'referer_type', 'string', NULL, true );
 $agent_type = param( 'agent_type', 'string', NULL, true );
+$hit_type = param( 'hit_type', 'string', NULL, true );
 
 // Create result set:
 
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE hit_ID, sess_ID, hit_datetime, hit_referer_type, hit_uri, hit_disp, hit_ctrl, hit_blog_ID, hit_referer, hit_remote_addr,'
+$SQL->SELECT( 'SQL_NO_CACHE hit_ID, sess_ID, hit_datetime, hit_type, hit_referer_type, hit_uri, hit_disp, hit_ctrl, hit_blog_ID, hit_referer, hit_remote_addr,'
 	. 'user_login, hit_agent_type, blog_shortname, dom_name, goal_name, keyp_phrase, hit_serprank, hit_response_code' );
 $SQL->FROM( 'T_hitlog LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID'
 	. ' LEFT JOIN T_track__keyphrase ON hit_keyphrase_keyp_ID = keyp_ID'
@@ -86,6 +87,15 @@ if( !empty($agent_type) )
 	$CountSQL->WHERE_and( $filter );
 }
 
+if( !empty($hit_type) )
+{
+	$filter = 'hit_type = '. $DB->quote($hit_type);
+	$SQL->WHERE_and( $filter );
+	$CountSQL->WHERE_and( $filter );
+}
+
+
+
 if ( !empty( $blog ) )
 {
 	$filter = 'hit_blog_ID = ' .$DB->escape($blog);
@@ -106,6 +116,7 @@ function filter_hits( & $Form )
 {
 	global $referer_type_color, $referer_type_array;
 	global $agent_type_color, $agent_type_array;
+	global $hit_type_color, $hit_type_array;
 
 	$Form->checkbox_basic_input( 'exclude', get_param('exclude'), T_('Exclude').' &mdash; ' );
 	$Form->text_input( 'sess_ID', get_param('sess_ID'), 15, T_('Session ID'), '', array( 'maxlength'=>20 ) );
@@ -113,6 +124,7 @@ function filter_hits( & $Form )
 
 	$Form->select_input_array( 'agent_type', get_param('agent_type'), $agent_type_array, 'Agent type', '', array('force_keys_as_values' => true, 'background_color' => $agent_type_color) );
 	$Form->select_input_array( 'referer_type', get_param('referer_type'), $referer_type_array, 'Referer type', '', array('force_keys_as_values' => true, 'background_color' => $referer_type_color) );
+	$Form->select_input_array( 'hit_type', get_param('hit_type'), $hit_type_array, 'Hit type', '', array('force_keys_as_values' => true, 'background_color' => $hit_type_color) );
 
 }
 $Results->filter_area = array(
@@ -162,6 +174,13 @@ $Results->cols[] = array(
 		'td_class' => 'agent_#hit_agent_type# small shrinkwrap',
 		'td' => '$hit_agent_type$',
 
+	);
+
+$Results->cols[] = array(
+		'th' => T_('Hit type'),
+		'order' => 'hit_type',
+		'td_class' => 'hit_type_#hit_type# small shrinkwrap',
+		'td' => '$hit_type$',
 	);
 
 $Results->cols[] = array(
@@ -231,6 +250,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.11  2011/10/24 14:08:19  efy-vitalij
+ * added 'Hit type' filter, 'Hit type' column
+ *
  * Revision 1.10  2011/10/21 08:24:41  efy-vitalij
  * *** empty log message ***
  *
