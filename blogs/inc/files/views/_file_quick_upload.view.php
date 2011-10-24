@@ -119,18 +119,8 @@ echo '<tbody>';
                 action: url,
                 debug: true,
 				sizeLimit: maxsize,
-				onSubmit: function(id, fileName){
-					var test = 1;
-				},
-				onProgress: function(id, fileName, loaded, total){
-					var test = 1;
-				},
 				onComplete: function(id, fileName, responseJSON){
-					var realid = id.toString();
-					var re = /(\d+)*$/
-					id = realid.match(re);
-
-					var container = jQuery('.qq-upload-list > li:eq('+ id[0] +')');
+					var container = jQuery(uploader._getItemByFileId(id));
 					if (responseJSON.success.status == undefined)
 					{
 						var text = htmlspecialchars_decode(responseJSON.success);
@@ -153,7 +143,9 @@ echo '<tbody>';
 				onLeave: "The files are being uploaded, if you leave now the upload will be cancelled."
 				},
 				showMessage: function(message){
-					alert(message);
+
+					jQuery('.qq-upload-list').append('<li class=" qq-upload-success"><span class="qq-upload-file"></span><span class="qq-upload-size" style="display: inline;"></span><span class="qq-upload-failed-text">Failed</span><span class="result_error">'+message+'</span></li>')
+
 				},
 				template: '<div class="qq-uploader">' +
                 '<div class="qq-upload-drop-area"><span>Drop files here to upload</span></div>' +
@@ -184,6 +176,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.8  2011/10/24 08:52:08  efy-vitalij
+ * changed upload functions
+ *
  * Revision 1.7  2011/10/20 11:37:50  efy-vitalij
  * made changes for new uploader
  *
