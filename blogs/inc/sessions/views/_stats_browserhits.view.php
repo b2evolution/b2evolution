@@ -54,6 +54,37 @@ $sql .= ' GROUP BY year, month, day, referer_type
 $res_hits = $DB->get_results( $sql, ARRAY_A, 'Get hit summary' );
 
 
+// as we moved 'admin' hit type from hit_referer_type to hit_type column, I had to make the selection more difficult.
+$sql = '
+	SELECT SQL_NO_CACHE COUNT(*) AS hits, CONCAT(hit_type) AS referer_type, EXTRACT(YEAR FROM hit_datetime) AS year,
+			   EXTRACT(MONTH FROM hit_datetime) AS month, EXTRACT(DAY FROM hit_datetime) AS day
+		FROM T_hitlog
+	 WHERE hit_agent_type = "browser" AND hit_type="admin"';
+if( $blog > 0 )
+{
+	$sql .= ' AND hit_blog_ID = '.$blog;
+}
+$sql .= ' GROUP BY year, month, day, referer_type
+					ORDER BY year DESC, month DESC, day DESC, referer_type';
+$res_hits_admin = $DB->get_results( $sql, ARRAY_A, 'Get hit summary' );
+
+$res_hits = array_merge($res_hits, $res_hits_admin);
+
+// the function for sorting of arrays by time.
+function array_cmp($a, $b)
+{
+	$this_date_a = mktime( 0, 0, 0, $a['month'], $a['day'], $a['year'] );
+	$this_date_b = mktime( 0, 0, 0, $b['month'], $b['day'], $b['year'] );
+    if ($this_date_a == $this_date_b) {
+        return 0;
+    }
+    return ($this_date_a > $this_date_b) ? -1 : 1;
+}
+
+// sorting array
+usort($res_hits, "array_cmp");
+
+
 /*
  * Chart
  */
@@ -66,7 +97,7 @@ if( count($res_hits) )
 			'referer' => 2,
 			'direct'  => 3,
 			'self'    => 4,
-			'blacklist' => 5,
+			'special' => 5,
 			'spam'    => 6,
 			'admin'   => 7,
 		);
@@ -119,7 +150,7 @@ if( count($res_hits) )
 			$referer_type_color['referer'],
 			$referer_type_color['direct'],
 			$referer_type_color['self'],
-			$referer_type_color['blacklist'],		
+			$referer_type_color['special'],
 			$referer_type_color['spam'],
 			$referer_type_color['admin'],
 		);
@@ -138,7 +169,7 @@ if( count($res_hits) )
 		'referer' => 0,
 		'search' => 0,
 		'self' => 0,
-		'blacklist' => 0,
+		'special' => 0,
 		'spam' => 0,
 		'admin' => 0,
 	);
@@ -155,7 +186,7 @@ if( count($res_hits) )
 			<th style="background-color: #<?php echo $referer_type_color['referer'] ?>"><?php echo T_('Referers') ?></th>
 			<th style="background-color: #<?php echo $referer_type_color['direct'] ?>"><?php echo T_('Direct accesses') ?></th>
 			<th style="background-color: #<?php echo $referer_type_color['self'] ?>"><?php echo T_('Self referred') ?></th>
-			<th style="background-color: #<?php echo $referer_type_color['blacklist'] ?>"><?php echo T_('Special referrers') ?></th>
+			<th style="background-color: #<?php echo $referer_type_color['special'] ?>"><?php echo T_('Special referrers') ?></th>
 			<th style="background-color: #<?php echo $referer_type_color['spam'] ?>"><?php echo T_('Referer spam') ?></th>
 			<th style="background-color: #<?php echo $referer_type_color['admin'] ?>"><?php echo T_('Admin') ?></th>
 			<th class="lastcol"><?php echo T_('Total') ?></th>
@@ -180,7 +211,7 @@ if( count($res_hits) )
 					<td class="right"><?php echo $hits['referer'] ?></td>
 					<td class="right"><?php echo $hits['direct'] ?></td>
 					<td class="right"><?php echo $hits['self'] ?></td>
-					<td class="right"><?php echo $hits['blacklist'] ?></td>
+					<td class="right"><?php echo $hits['special'] ?></td>
 					<td class="right"><?php echo $hits['spam'] ?></td>
 					<td class="right"><?php echo $hits['admin'] ?></td>
 					<td class="lastcol right"><?php echo array_sum($hits) ?></td>
@@ -191,7 +222,7 @@ if( count($res_hits) )
 						'referer' => 0,
 						'search' => 0,
 						'self' => 0,
-						'blacklist' => 0,
+						'special' => 0,
 						'spam' => 0,
 						'admin' => 0,
 					);
@@ -218,7 +249,7 @@ if( count($res_hits) )
 				<td class="right"><?php echo $hits['referer'] ?></td>
 				<td class="right"><?php echo $hits['direct'] ?></td>
 				<td class="right"><?php echo $hits['self'] ?></td>
-				<td class="right"><?php echo $hits['blacklist'] ?></td>
+				<td class="right"><?php echo $hits['special'] ?></td>
 				<td class="right"><?php echo $hits['spam'] ?></td>
 				<td class="right"><?php echo $hits['admin'] ?></td>
 				<td class="lastcol right"><?php echo array_sum($hits) ?></td>
@@ -235,7 +266,7 @@ if( count($res_hits) )
 		<td class="right"><?php echo $hits_total['referer'] ?></td>
 		<td class="right"><?php echo $hits_total['direct'] ?></td>
 		<td class="right"><?php echo $hits_total['self'] ?></td>
-		<td class="right"><?php echo $hits_total['blacklist'] ?></td>
+		<td class="right"><?php echo $hits_total['special'] ?></td>
 		<td class="right"><?php echo $hits_total['spam'] ?></td>
 		<td class="right"><?php echo $hits_total['admin'] ?></td>
 		<td class="lastcol right"><?php echo array_sum($hits_total) ?></td>
@@ -249,6 +280,10 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.19  2011/10/24 14:11:53  efy-vitalij
+ * changed the alorithm of data receiving, added 'admin' hit type from hit_type column.
+ * Replaced 'blacklist' with 'special'.
+ *
  * Revision 1.18  2011/10/03 10:41:25  efy-vitalij
  * add colors to statistic
  *
