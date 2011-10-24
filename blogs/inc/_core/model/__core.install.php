@@ -127,12 +127,21 @@ $schema_queries = array(
 		'Creating table for User field definitions',
 		"CREATE TABLE T_users__fielddefs (
 			ufdf_ID int(10) unsigned NOT NULL,
+			ufdf_ufgp_ID int(10) unsigned NOT NULL,
 			ufdf_type char(8) NOT NULL,
 			ufdf_name varchar(255) NOT NULL,
 			ufdf_options TEXT NOT NULL,
 			ufdf_required enum('hidden','optional','recommended','require') NOT NULL default 'optional',
 			ufdf_duplicated tinyint(1) NOT NULL default 0,
 			PRIMARY KEY (ufdf_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_users__fieldgroups' => array(
+		'Creating table for Groups of user field definitions',
+		"CREATE TABLE T_users__fieldgroups (
+			ufgp_ID int(10) unsigned NOT NULL auto_increment,
+			ufgp_name varchar(255) NOT NULL,
+			PRIMARY KEY (ufgp_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_users__fields' => array(
@@ -290,6 +299,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.69  2011/10/24 18:32:35  efy-yurybakh
+ * Groups for user fields
+ *
  * Revision 1.68  2011/10/22 07:38:39  efy-yurybakh
  * Add a suggestion AJAX script to userfields
  *

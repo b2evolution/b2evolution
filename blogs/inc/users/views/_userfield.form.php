@@ -62,8 +62,11 @@ $Form->begin_form( 'fform', $creating ?  T_('New user field') : T_('User field')
 		$Form->hidden( 'ufdf_ID', $edited_Userfield->ID );
 	}
 
+	$Form->select_input_array( 'ufdf_ufgp_ID', $edited_Userfield->group_ID, $edited_Userfield->get_groups(),
+		T_('Group'), '', array( 'required' => true, 'force_keys_as_values' => true ) );
+
 	$Form->select_input_array( 'ufdf_type', $edited_Userfield->type, $edited_Userfield->get_types(),
-		T_('Type'), '', array( 'required'=>true ) );
+		T_('Type'), '', array( 'required' => true ) );
 
 	$Form->text_input( 'ufdf_name', $edited_Userfield->name, 50, T_('Name'), '', array( 'maxlength'=> 255, 'required'=>true ) );
 
@@ -113,6 +116,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.12  2011/10/24 18:32:35  efy-yurybakh
+ * Groups for user fields
+ *
  * Revision 1.11  2011/10/20 12:14:55  efy-yurybakh
  * Allow/disabled multiple instances of same field
  *

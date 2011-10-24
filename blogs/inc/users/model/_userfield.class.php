@@ -40,6 +40,7 @@ load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
  */
 class Userfield extends DataObject
 {
+	var $group_ID = '';
 	var $type = '';
 	var $name = '';
 	var $options = '';
@@ -66,6 +67,7 @@ class Userfield extends DataObject
 		if( $db_row != NULL )
 		{
 			$this->ID            = $db_row->ufdf_ID;
+			$this->group_ID      = $db_row->ufdf_ufgp_ID;
 			$this->type          = $db_row->ufdf_type;
 			$this->name          = $db_row->ufdf_name;
 			$this->options       = $db_row->ufdf_options;
@@ -106,6 +108,23 @@ class Userfield extends DataObject
 		 );
 	}
 
+
+	/**
+	 * Returns array of user field groups
+	 *
+	 * @return array
+	 */
+	function get_groups()
+	{
+		global $DB;
+
+		return $DB->get_assoc( '
+			SELECT ufgp_ID, ufgp_name
+			  FROM T_users__fieldgroups
+			 ORDER BY ufgp_ID' );
+	}
+
+
 	/**
 	 * Load data from Request form fields.
 	 *
@@ -119,6 +138,10 @@ class Userfield extends DataObject
 			param_check_number( 'new_ufdf_ID', T_('ID must be a number.'), true );
 			$this->set_from_Request( 'ID', 'new_ufdf_ID' );
 		}
+
+		// Group
+		param_string_not_empty( 'ufdf_ufgp_ID', T_('Please select a group.') );
+		$this->set_from_Request( 'ufgp_ID' );
 
 		// Type
 		param_string_not_empty( 'ufdf_type', T_('Please enter a type.') );

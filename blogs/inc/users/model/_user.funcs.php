@@ -1299,10 +1299,11 @@ function callback_options_user_new_fields( $value )
 
 	// Get list of possible field types:
 	$userfielddefs = $DB->get_results( '
-		SELECT ufdf_ID, ufdf_type, ufdf_name
+		SELECT ufdf_ID, ufdf_type, ufdf_name, ufgp_ID, ufgp_name
 		  FROM T_users__fielddefs
+		  LEFT JOIN T_users__fieldgroups ON ufgp_ID = ufdf_ufgp_ID
 		 WHERE ufdf_required != "hidden"
-		ORDER BY ufdf_ID' );
+		 ORDER BY ufdf_ufgp_ID, ufdf_ID' );
 
 	$field_options = '';
 
@@ -1312,36 +1313,26 @@ function callback_options_user_new_fields( $value )
 		$empty_name = isset( $user_fields_empty_name ) ? $user_fields_empty_name : T_('Add field...');
 
 		$field_options .= '<option value="">'.$empty_name.'</option>';
-		//"\n".'<optgroup label="'.T_('Instant Messaging').'">';
-		foreach( $userfielddefs as $fielddef )
+		$current_group_ID = 0;
+		foreach( $userfielddefs as $f => $fielddef )
 		{
-			// check for group header:
-			/*switch( $fielddef->ufdf_ID )
-			{
-				case 50000:
-					$field_options .= "\n".'</optgroup><optgroup label="'.T_('Phone').'">';
-					break;
-				case 100000:
-					$field_options .= "\n".'</optgroup><optgroup label="'.T_('Web').'">';
-					break;
-				case 200000:
-					$field_options .= "\n".'</optgroup><optgroup label="'.T_('Organization').'">';
-					break;
-				case 300000:
-					$field_options .= "\n".'</optgroup><optgroup label="'.T_('Address').'">';
-					break;
-				case 400000:
-					$field_options .= "\n".'</optgroup><optgroup label="'.T_('Other').'">';
-					break;
-			}*/
+			if( $fielddef->ufgp_ID != $current_group_ID )
+			{	// New group
+				if( $f != 0 )
+				{	// Close tag of previous group
+					$field_options .= "\n".'</optgroup>';
+				}
+				$field_options .= "\n".'<optgroup label="'.$fielddef->ufgp_name.'">';
+			}
 			$field_options .= "\n".'<option value="'.$fielddef->ufdf_ID.'"';
 			if( $value == $fielddef->ufdf_ID )
 			{	// We had selected this type before getting an error:
 				$field_options .= ' selected="selected"';
 			}
 			$field_options .= '>'.$fielddef->ufdf_name.'</option>';
+			$current_group_ID = $fielddef->ufgp_ID;
 		}
-		//$field_options .= '</optgroup>';
+		$field_options .= "\n".'</optgroup>';
 	}
 
 	return $field_options;
@@ -1481,6 +1472,9 @@ function callback_filter_userlist( & $Form )
 
 /*
  * $Log$
+ * Revision 1.100  2011/10/24 18:32:35  efy-yurybakh
+ * Groups for user fields
+ *
  * Revision 1.99  2011/10/22 07:38:39  efy-yurybakh
  * Add a suggestion AJAX script to userfields
  *

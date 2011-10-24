@@ -3119,17 +3119,48 @@ function upgrade_b2evo_tables()
 						SET ftyp_icon = "file_video"
 						WHERE ftyp_extensions IN ( "mp4", "mov", "m4v" )' );
 
-		task_begin( 'Upgrading user fields...' );
+		task_begin( 'Creating table for Groups of user field definitions...' );
+		$DB->query( 'CREATE TABLE T_users__fieldgroups (
+				ufgp_ID int(10) unsigned NOT NULL auto_increment,
+				ufgp_name varchar(255) NOT NULL,
+				PRIMARY KEY (ufgp_ID)
+			) ENGINE = innodb' );
+		$DB->query( 'INSERT INTO T_users__fieldgroups ( ufgp_name )
+				VALUES ( "Instant Messaging" ), ( "Phone" ), ( "Web" ), ( "Organization" ), ( "Address" ), ( "Other" ) ' );
+		task_end();
+
+		task_begin( 'Upgrading user field definitions...' );
 		// Add new fields:
 		// 		"ufdf_options" to save a values of the Option list
 		// 		"ufdf_duplicated" to add a several instances
+		// 		"ufdf_ufgp_ID" - Group ID
 		$DB->query( 'ALTER TABLE T_users__fielddefs
 						ADD ufdf_options TEXT NOT NULL AFTER ufdf_name,
-						ADD ufdf_duplicated tinyint(1) NOT NULL default 0' );
+						ADD ufdf_duplicated tinyint(1) NOT NULL default 0,
+						ADD ufdf_ufgp_ID int(10) unsigned NOT NULL AFTER ufdf_ID' );
 		// Set default values of the field "ufdf_duplicated"
 		$DB->query( 'UPDATE T_users__fielddefs
 						SET ufdf_duplicated = "1"
 						WHERE ufdf_ID IN ( 10000, 10100, 10200, 10300, 50100, 50200, 100000, 100100 )' );
+		// Group fields by default
+		$DB->query( 'UPDATE T_users__fielddefs
+						SET ufdf_ufgp_ID = "1"
+						WHERE ufdf_ID <= 40000 ' );
+		$DB->query( 'UPDATE T_users__fielddefs
+						SET ufdf_ufgp_ID = "2"
+						WHERE ufdf_ID > 40000 AND ufdf_ID <= 60100' );
+		$DB->query( 'UPDATE T_users__fielddefs
+						SET ufdf_ufgp_ID = "3"
+						WHERE ufdf_ID > 60100 AND ufdf_ID <= 160100' );
+		$DB->query( 'UPDATE T_users__fielddefs
+						SET ufdf_ufgp_ID = "4"
+						WHERE ufdf_ID > 160100 AND ufdf_ID <= 211000' );
+		$DB->query( 'UPDATE T_users__fielddefs
+						SET ufdf_ufgp_ID = "5"
+						WHERE ufdf_ID > 211000 AND ufdf_ID <= 300300' );
+		$DB->query( 'UPDATE T_users__fielddefs
+						SET ufdf_ufgp_ID = "6"
+						WHERE ufdf_ID > 300300' );
 		// Add Indexes
 		$DB->query( 'ALTER TABLE T_users__fields
 						ADD INDEX uf_ufdf_ID ( uf_ufdf_ID ),
@@ -3315,6 +3346,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.432  2011/10/24 18:32:35  efy-yurybakh
+ * Groups for user fields
+ *
  * Revision 1.431  2011/10/24 13:53:05  efy-vitalij
  * added changes to T_hitlog table
  *

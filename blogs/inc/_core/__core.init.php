@@ -58,6 +58,7 @@ $db_config['aliases'] = array(
 		'T_settings'              => $tableprefix.'settings',
 		'T_users'                 => $tableprefix.'users',
 		'T_users__fielddefs'      => $tableprefix.'users__fielddefs',
+		'T_users__fieldgroups'    => $tableprefix.'users__fieldgroups',
 		'T_users__fields'         => $tableprefix.'users__fields',
 		'T_users__usersettings'   => $tableprefix.'users__usersettings',
 		'T_slug'                  => $tableprefix.'slug',
@@ -79,27 +80,28 @@ $db_config['aliases'] = array(
  * @global array
  */
 $ctrl_mappings = array(
-		'antispam'     => 'antispam/antispam.ctrl.php',
-		'crontab'      => 'cron/cronjobs.ctrl.php',
-		'countries'    => 'regional/countries.ctrl.php',
-		'currencies'   => 'regional/currencies.ctrl.php',
-		'features'     => 'settings/features.ctrl.php',
-		'locales'      => 'locales/locales.ctrl.php',
-		'plugins'      => 'plugins/plugins.ctrl.php',
-		'gensettings'  => 'settings/settings.ctrl.php',
-		'remotepublish' => 'settings/remotepublish.ctrl.php',
-		'settings'     => 'settings/settings_dispatch.ctrl.php',
-		'stats'        => 'sessions/stats.ctrl.php',
-		'system'       => 'tools/system.ctrl.php',
-		'user'         => 'users/user.ctrl.php',
-		'users'        => 'users/users.ctrl.php',
-		'userfields'   => 'users/userfields.ctrl.php',
-		'usersettings' => 'users/settings.ctrl.php',
-		'registration' => 'users/registration.ctrl.php',
-		'display'      => 'users/display.ctrl.php',
-		'groups'       => 'users/groups.ctrl.php',
-		'upload'       => 'files/upload.ctrl.php',
-		'slugs'        => 'slugs/slugs.ctrl.php',
+		'antispam'         => 'antispam/antispam.ctrl.php',
+		'crontab'          => 'cron/cronjobs.ctrl.php',
+		'countries'        => 'regional/countries.ctrl.php',
+		'currencies'       => 'regional/currencies.ctrl.php',
+		'features'         => 'settings/features.ctrl.php',
+		'locales'          => 'locales/locales.ctrl.php',
+		'plugins'          => 'plugins/plugins.ctrl.php',
+		'gensettings'      => 'settings/settings.ctrl.php',
+		'remotepublish'    => 'settings/remotepublish.ctrl.php',
+		'settings'         => 'settings/settings_dispatch.ctrl.php',
+		'stats'            => 'sessions/stats.ctrl.php',
+		'system'           => 'tools/system.ctrl.php',
+		'user'             => 'users/user.ctrl.php',
+		'users'            => 'users/users.ctrl.php',
+		'userfields'       => 'users/userfields.ctrl.php',
+		'userfieldsgroups' => 'users/userfieldsgroups.ctrl.php',
+		'usersettings'     => 'users/settings.ctrl.php',
+		'registration'     => 'users/registration.ctrl.php',
+		'display'          => 'users/display.ctrl.php',
+		'groups'           => 'users/groups.ctrl.php',
+		'upload'           => 'files/upload.ctrl.php',
+		'slugs'            => 'slugs/slugs.ctrl.php',
 	);
 
 
@@ -210,6 +212,24 @@ function & get_UserFieldCache()
 	}
 
 	return $UserFieldCache;
+}
+
+
+/**
+ * Get the UserFieldGroupCache
+ *
+ * @return UserFieldGroupCache
+ */
+function & get_UserFieldGroupCache()
+{
+	global $UserFieldGroupCache;
+
+	if( ! isset( $UserFieldGroupCache ) )
+	{	// Cache doesn't exist yet:
+		$UserFieldGroupCache = new DataObjectCache( 'UserfieldGroup', false, 'T_users__fieldgroups', 'ufgp_', 'ufgp_ID', 'ufgp_name', 'ufgp_name' ); // COPY (FUNC)
+	}
+
+	return $UserFieldGroupCache;
 }
 
 
@@ -1077,6 +1097,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.94  2011/10/24 18:32:35  efy-yurybakh
+ * Groups for user fields
+ *
  * Revision 1.93  2011/10/18 00:04:45  fplanque
  * i18n update
  *

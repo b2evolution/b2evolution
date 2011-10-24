@@ -35,6 +35,12 @@ load_class( 'users/model/_userfield.class.php', 'Userfield' );
 
 global $dispatcher;
 
+// query which groups have user field definitions (in order to prevent deletion of groups which have user field definitions)
+global $usedgroups;	// We need this in a callback below
+$usedgroups = $DB->get_col( 'SELECT ufgp_ID
+			FROM T_users__fieldgroups INNER JOIN T_users__fielddefs ON ufdf_ufgp_ID = ufgp_ID
+			GROUP BY ufgp_ID');
+
 // Get params from request
 $s = param( 's', 'string', '', true );
 $s_type = param( 's_type', 'string', '', true );
@@ -42,21 +48,37 @@ $s_type = param( 's_type', 'string', '', true );
 // Create query
 $SQL = new SQL();
 $SQL->SELECT( '*' );
-$SQL->FROM( 'T_users__fielddefs' );
+$SQL->FROM( 'T_users__fielddefs RIGHT JOIN T_users__fieldgroups ON ufdf_ufgp_ID = ufgp_ID' );
+
+$where_clause = '';
 
 if( !empty($s) )
 {	// We want to filter on search keyword:
 	// Note: we use CONCAT_WS (Concat With Separator) because CONCAT returns NULL if any arg is NULL
-	$SQL->WHERE_and( 'CONCAT_WS( " ", ufdf_name ) LIKE "%'.$DB->escape($s).'%"' );
+	$where_clause = 'CONCAT_WS( " ", ufdf_name ) LIKE "%'.$DB->escape($s).'%"';
 }
 
 if( !empty( $s_type ) )
 {	// We want to filter on user field type:
-	$SQL->WHERE_and( 'ufdf_type LIKE "%'.$DB->escape($s_type).'%"' );
+	$where_clause = 'ufdf_type LIKE "%'.$DB->escape($s_type).'%"';
+}
+
+if( $where_clause != '' )
+{
+	$SQL->WHERE_and( $where_clause );
+}
+$SQL->GROUP_BY( 'ufdf_ID, ufgp_ID' );
+$SQL->ORDER_BY( 'ufgp_ID, *' );
+
+$count_sql = 'SELECT COUNT(*)
+							  FROM T_users__fielddefs';
+if( $where_clause != '' )
+{
+	$count_sql .= ' WHERE '.$where_clause;
 }
 
 // Create result set:
-$Results = new Results( $SQL->get(), 'ufdf_', 'A' );
+$Results = new Results( $SQL->get(), 'ufdf_', 'A', NULL, $count_sql );
 
 $Results->title = T_('User fields');
 
@@ -93,6 +115,52 @@ $Results->filter_area = array(
 	);
 
 
+/*
+ * Grouping params:
+ */
+$Results->group_by = 'ufgp_ID';
+$Results->ID_col = 'ufdf_ID';
+
+
+/*
+ * Group columns:
+ */
+$Results->grp_cols[] = array(
+						'td_colspan' => -1,  // nb_colds - 1
+						'td' => '<a href="?ctrl=userfieldsgroups&amp;action=edit&amp;ufgp_ID=$ufgp_ID$">$ufgp_name$</a>',
+					);
+
+function grp_actions( & $row )
+{
+	global $usedgroups, $current_User;
+
+	$r = '';
+	if( $current_User->check_perm( 'users', 'edit', false ) )
+	{
+		$r = action_icon( T_('Edit this group...'), 'edit', regenerate_url( 'ctrl,action', 'ctrl=userfieldsgroups&amp;action=edit&amp;ufgp_ID='.$row->ufgp_ID ) );
+	
+		$r .= action_icon( T_('Duplicate this group...'), 'copy', regenerate_url( 'ctrl,action', 'ctrl=userfieldsgroups&amp;action=new&amp;ufgp_ID='.$row->ufgp_ID ) );
+	
+		if( !in_array( $row->ufgp_ID, $usedgroups ) )
+		{ // delete
+			$r .= action_icon( T_('Delete this group!'), 'delete', regenerate_url( 'ctrl,action', 'ctrl=userfieldsgroups&amp;action=delete&amp;ufgp_ID='.$row->ufgp_ID.'&amp;'.url_crumb('userfieldgroup') ) );
+		}
+		else
+		{
+			$r .= get_icon( 'delete', 'noimg' );
+		}
+	}
+	return $r;
+}
+$Results->grp_cols[] = array(
+						'td_class' => 'shrinkwrap',
+						'td' => '%grp_actions( {row} )%',
+					);
+
+
+/*
+ * Data columns:
+ */
 $Results->cols[] = array(
 		'th' => T_('ID'),
 		'order' => 'ufdf_ID',
@@ -132,8 +200,10 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 										'%regenerate_url( \'action\', \'ufdf_ID=$ufdf_ID$&amp;action=delete&amp;'.url_crumb('userfield').'\')%' ),
 						);
 
-  $Results->global_icon( T_('Create a new user field...'), 'new',
-				regenerate_url( 'action', 'action=new' ), T_('New user field').' &raquo;', 3, 4  );
+	$Results->global_icon( T_('Create a new user field...'), 'new',
+				'?ctrl=userfields&action=new', T_('New user field').' &raquo;', 3, 4 );
+	$Results->global_icon( T_('Create a new group for user fields...'), 'new',
+				'?ctrl=userfieldsgroups&action=new', T_('New group for user fields').' &raquo;', 3, 4 );
 }
 
 
@@ -142,6 +212,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.18  2011/10/24 18:32:35  efy-yurybakh
+ * Groups for user fields
+ *
  * Revision 1.17  2011/10/20 17:22:21  efy-yurybakh
  * clickable Names on ?ctrl=userfields
  *

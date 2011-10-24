@@ -120,38 +120,49 @@ function create_default_data()
 	$Group_Users->dbinsert();
 	echo "OK.<br />\n";
 
+	echo 'Creating groups for user field definitions... ';
+	$DB->query( "
+		INSERT INTO T_users__fieldgroups (ufgp_name)
+		 VALUES ( 'Instant Messaging' ),
+						( 'Phone' ),
+						( 'Web' ),
+						( 'Organization' ),
+						( 'Address' ),
+						( 'Other' )" );
+	echo "OK.<br />\n";
+
 	echo 'Creating user field definitions... ';
 	// fp> Anyone, please add anything you can think of. It's better to start with a large list that update it progressively.
 	$DB->query( "
-    INSERT INTO T_users__fielddefs (ufdf_ID, ufdf_type, ufdf_name, ufdf_required, ufdf_duplicated)
-		 VALUES ( 10000, 'email',    'MSN/Live IM',  'optional',    '1'),
-						( 10100, 'word',     'Yahoo IM',     'optional',    '1'),
-						( 10200, 'word',     'AOL AIM',      'optional',    '1'),
-						( 10300, 'number',   'ICQ ID',       'optional',    '1'),
-						( 40000, 'phone',    'Skype',        'optional',    '0'),
-						( 50000, 'phone',    'Main phone',   'optional',    '0'),
-						( 50100, 'phone',    'Cell phone',   'optional',    '1'),
-						( 50200, 'phone',    'Office phone', 'optional',    '1'),
-						( 50300, 'phone',    'Home phone',   'optional',    '0'),
-						( 60000, 'phone',    'Office FAX',   'optional',    '0'),
-						( 60100, 'phone',    'Home FAX',     'optional',    '0'),
-						(100000, 'url',      'Website',      'recommended', '1'),
-						(100100, 'url',      'Blog',         'optional',    '1'),
-						(110000, 'url',      'Linkedin',     'optional',    '0'),
-						(120000, 'url',      'Twitter',      'recommended', '0'),
-						(130100, 'url',      'Facebook',     'recommended', '0'),
-						(130200, 'url',      'Myspace',      'optional',    '0'),
-						(140000, 'url',      'Flickr',       'optional',    '0'),
-						(150000, 'url',      'YouTube',      'optional',    '0'),
-						(160000, 'url',      'Digg',         'optional',    '0'),
-						(160100, 'url',      'StumbleUpon',  'optional',    '0'),
-						(200000, 'text',     'Role',         'optional',    '0'),
-						(200100, 'text',     'Organization', 'optional',    '0'),
-						(200200, 'text',     'Division',     'optional',    '0'),
-						(211000, 'text',     'VAT ID',       'optional',    '0'),
-						(300000, 'text',     'Main address', 'optional',    '0'),
-						(300300, 'text',     'Home address', 'optional',    '0'),
-						(400000, 'text',     'About me',     'recommended', '0');" );
+		INSERT INTO T_users__fielddefs (ufdf_ID, ufdf_ufgp_ID, ufdf_type, ufdf_name, ufdf_required, ufdf_duplicated)
+		 VALUES ( 10000, 1, 'email',    'MSN/Live IM',  'optional',    '1'),
+						( 10100, 1, 'word',     'Yahoo IM',     'optional',    '1'),
+						( 10200, 1, 'word',     'AOL AIM',      'optional',    '1'),
+						( 10300, 1, 'number',   'ICQ ID',       'optional',    '1'),
+						( 40000, 1, 'phone',    'Skype',        'optional',    '0'),
+						( 50000, 2, 'phone',    'Main phone',   'optional',    '0'),
+						( 50100, 2, 'phone',    'Cell phone',   'optional',    '1'),
+						( 50200, 2, 'phone',    'Office phone', 'optional',    '1'),
+						( 50300, 2, 'phone',    'Home phone',   'optional',    '0'),
+						( 60000, 2, 'phone',    'Office FAX',   'optional',    '0'),
+						( 60100, 2, 'phone',    'Home FAX',     'optional',    '0'),
+						(100000, 3, 'url',      'Website',      'recommended', '1'),
+						(100100, 3, 'url',      'Blog',         'optional',    '1'),
+						(110000, 3, 'url',      'Linkedin',     'optional',    '0'),
+						(120000, 3, 'url',      'Twitter',      'recommended', '0'),
+						(130100, 3, 'url',      'Facebook',     'recommended', '0'),
+						(130200, 3, 'url',      'Myspace',      'optional',    '0'),
+						(140000, 3, 'url',      'Flickr',       'optional',    '0'),
+						(150000, 3, 'url',      'YouTube',      'optional',    '0'),
+						(160000, 3, 'url',      'Digg',         'optional',    '0'),
+						(160100, 3, 'url',      'StumbleUpon',  'optional',    '0'),
+						(200000, 4, 'text',     'Role',         'optional',    '0'),
+						(200100, 4, 'text',     'Organization', 'optional',    '0'),
+						(200200, 4, 'text',     'Division',     'optional',    '0'),
+						(211000, 4, 'text',     'VAT ID',       'optional',    '0'),
+						(300000, 5, 'text',     'Main address', 'optional',    '0'),
+						(300300, 5, 'text',     'Home address', 'optional',    '0'),
+						(400000, 6, 'text',     'About me',     'recommended', '0');" );
 	echo "OK.<br />\n";
 
 
@@ -1428,6 +1439,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.334  2011/10/24 18:32:35  efy-yurybakh
+ * Groups for user fields
+ *
  * Revision 1.333  2011/10/23 09:19:42  efy-yurybakh
  * Implement new permission for comment editing
  *
