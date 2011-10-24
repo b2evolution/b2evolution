@@ -473,7 +473,12 @@ qq.FileUploaderBasic.prototype = {
             name = file.fileName != null ? file.fileName : file.name;
             size = file.fileSize != null ? file.fileSize : file.size;
         }
-                    
+// changing : // fix problem in opera
+		if (!size && file.files != undefined)
+		{
+			size = size || file.files[0].size;
+		}
+// ^^^^^^^^^
         if (! this._isAllowedExtension(name)){            
             this._error('typeError', name);
             return false;
