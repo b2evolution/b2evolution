@@ -605,7 +605,7 @@ class test_plugin extends Plugin
 	/**
 	 * Event handler: Called when rendering item/post contents as HTML.
 	 *
-	 * Note: return value is ignored. You have to change $params['content'].
+	 * Note: return value is ignored. You have to change $params['data'].
 	 *
 	 * @see Plugin::RenderItemAsHtml()
 	 */
@@ -618,7 +618,7 @@ class test_plugin extends Plugin
 	/**
 	 * Event handler: Called when rendering item/post contents as XML.
 	 *
-	 * Note: return value is ignored. You have to change $params['content'].
+	 * Note: return value is ignored. You have to change $params['data'].
 	 *
 	 * @see Plugin::RenderItemAsXml()
 	 */
@@ -632,7 +632,7 @@ class test_plugin extends Plugin
 	/**
 	 * Event handler: Called when rendering item/post contents as text.
 	 *
-	 * Note: return value is ignored. You have to change $params['content'].
+	 * Note: return value is ignored. You have to change $params['data'].
 	 *
 	 * @see Plugin::RenderItemAsText()
 	 */
@@ -645,7 +645,7 @@ class test_plugin extends Plugin
 	/**
 	 * Event handler: Called when displaying item/post contents as HTML.
 	 *
-	 * Note: return value is ignored. You have to change $params['content'].
+	 * Note: return value is ignored. You have to change $params['data'].
 	 *
 	 * @see Plugin::DisplayItemAsHtml()
 	 */
@@ -658,7 +658,7 @@ class test_plugin extends Plugin
 	/**
 	 * Event handler: Called when displaying item/post contents as XML.
 	 *
-	 * Note: return value is ignored. You have to change $params['content'].
+	 * Note: return value is ignored. You have to change $params['data'].
 	 *
 	 * @see Plugin::DisplayItemAsXml()
 	 */
@@ -671,7 +671,7 @@ class test_plugin extends Plugin
 	/**
 	 * Event handler: Called when displaying item/post contents as text.
 	 *
-	 * Note: return value is ignored. You have to change $params['content'].
+	 * Note: return value is ignored. You have to change $params['data'].
 	 *
 	 * @see Plugin::DisplayItemAsText()
 	 */
@@ -912,6 +912,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.97  2011/10/27 03:36:12  sam2kb
+ * minor
+ *
  * Revision 1.96  2011/10/19 03:22:31  fplanque
  * doc
  *
