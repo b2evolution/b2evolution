@@ -84,6 +84,16 @@ class intense_Skin extends Skin
 	{
 		// call parent:
 		parent::display_init();
+
+		require_css( 'basic_styles.css', 'blog' ); // the REAL basic styles
+		require_css( 'basic.css', 'blog' ); // Basic styles
+		require_css( 'img.css', 'blog' ); // Standard image styles
+		require_css( 'blog_base.css', 'blog' ); // Default styles for the blog navigation
+		require_css( 'item_base.css', 'blog' ); // Default styles for the post CONTENT
+		require_css( 'forms.css', 'blog' ); // Default form styles
+		require_css( 'comments.css', 'blog' ); // Default comment styles
+		add_headline( '<!--[if IE]><link rel="stylesheet" type="text/css" href="ie.css" /><![endif]-->' );
+
 		if($this->get_setting("colorbox")) 
 		{
 			require_js_helper( 'colorbox', 'blog' );

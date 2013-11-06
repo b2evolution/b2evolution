@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -148,29 +148,6 @@ class Plugin
 
 
 	/**
-	 * If this is a rendering plugin, when should rendering apply?
-	 *
-	 * This is the default value for the plugin and can be overriden in the Plugins
-	 * administration for plugins that provide rendering events.
-	 *
-	 * {@internal The actual value for the plugin gets stored in T_plugins.plug_apply_rendering.}}
-	 *
-	 * Possible values:
-	 * - 'stealth': gets always used, but not displayed as option
-	 * - 'always': gets always used, and displayed as disabled checkbox
-	 * - 'opt-out': enabled by default
-	 * - 'opt-in': disabled by default
-	 * - 'lazy': checkbox gets displayed, but is disabled
-	 * - 'never': cannot get used as a renderer
-	 *
-	 * @todo blueyed>> IMHO we would need another value, which is the same as "lazy", but does not display a checkbox, which is useful for Plugins that add themselves as renderers on Item update
-	 *
-	 * @var string
-	 */
-	var $apply_rendering = 'never'; // By default, this may not be a rendering plugin
-
-
-	/**
 	 * Number of allowed installs.
 	 *
 	 * When installing the plugin it gets checked if the plugin is already installed this
@@ -286,6 +263,14 @@ class Plugin
 	 * @var boolean
 	 */
 	var $_trans_loaded_global = false;
+
+	/**
+	 * Plugin URL
+	 * This gets lazy-filled with both 'abs' and 'rel' URLs by {@link get_plugin_url()}.
+	 *
+	 * @var array
+	 */
+	private $_plugin_url = array();
 
 	/**#@-*/
 
@@ -496,7 +481,38 @@ class Plugin
 	 */
 	function get_coll_setting_definitions( & $params )
 	{
-		return array();
+		if( $this->group != 'rendering' )
+		{
+			return array();
+		}
+
+		$render_note = get_manual_link('Plugin/apply_rendering');
+		if( empty( $this->code ) )
+		{
+			$render_note .= ' '.T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
+		}
+		$admin_Plugins = & get_Plugins_admin();
+		$rendering_options = $admin_Plugins->get_apply_rendering_values( true );
+		$default_post_rendering = ( isset( $params['default_post_rendering'] ) && in_array( $params['default_post_rendering'], $rendering_options ) ) ? $params['default_post_rendering'] : 'opt-out';
+		$default_comment_rendering = ( isset( $params['default_comment_rendering'] ) && in_array( $params['default_comment_rendering'], $rendering_options ) ) ? $params['default_comment_rendering'] : 'never';
+		$r = array(
+			'coll_apply_rendering' => array(
+					'label' => T_('Apply rendering to posts'),
+					'type' => 'select',
+					'options' => $rendering_options,
+					'defaultvalue' => $default_post_rendering,
+					'note' => $render_note,
+				),
+			'coll_apply_comment_rendering' => array(
+					'label' => T_('Apply rendering to comments'),
+					'type' => 'select',
+					'options' => $rendering_options,
+					'defaultvalue' => $default_comment_rendering,
+					'note' => $render_note,
+				),
+			);
+
+		return $r;
 	}
 
 
@@ -749,8 +765,8 @@ class Plugin
 	{
 		return false;		// Do nothing by default.
 	}
-	
-	
+
+
 	/**
 	 * Event handler: Called when displaying editor toolbars.
 	 *
@@ -830,6 +846,24 @@ class Plugin
 	 */
 	function BeforeBlogDisplay( & $params )
 	{
+	}
+
+
+	/**
+	 * Event handler: Called when a MainList object gets created.
+	 *
+	 * Note: you must create your own MainList object here, set filters and query the database, see init_MainList() for detailes.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'MainList': The "MainList" object (by reference).
+	 *   - 'limit': The number of posts to display
+	 *
+	 * @return boolean True if you've created your own MainList object and queried the database, false otherwise.
+	 */
+	function InitMainList( & $params )
+	{
+		// Do nothing by default:
+		return false;
 	}
 
 
@@ -1105,6 +1139,7 @@ class Plugin
 	 *   - 'data': the data (by reference). You probably want to modify this.
 	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
 	 *   - 'Item': the {@link Item} object which gets rendered.
+	 *   - 'view_type': What part of a post are we displaying: 'teaser', 'extension' or 'full'
 	 * @return boolean Have we changed something?
 	 */
 	function RenderItemAsHtml( & $params )
@@ -1132,6 +1167,7 @@ class Plugin
 	 *   - 'data': the data (by reference). You probably want to modify this.
 	 *   - 'format': see {@link format_to_output()}. Only 'xml' will arrive here.
 	 *   - 'Item': the {@link Item} object which gets rendered.
+	 *   - 'view_type': What part of a post are we displaying: 'teaser', 'extension' or 'full'
 	 * @return boolean Have we changed something?
 	 */
 	function RenderItemAsXml( & $params )
@@ -1149,6 +1185,7 @@ class Plugin
 	 *   - 'data': the data (by reference). You probably want to modify this.
 	 *   - 'format': see {@link format_to_output()}. Only 'text' will arrive here.
 	 *   - 'Item': the {@link Item} object which gets rendered.
+	 *   - 'view_type': What part of a post are we displaying: 'teaser', 'extension' or 'full'
 	 * @return boolean Have we changed something?
 	 */
 	function RenderItemAsText()
@@ -1169,6 +1206,7 @@ class Plugin
 	 *   - 'Item': The {@link Item} that gets displayed (by reference).
 	 *   - 'preview': Is this only a preview?
 	 *   - 'dispmore': Does this include the "more" text (if available), which means "full post"?
+	 *   - 'view_type': What part of a post are we displaying: 'teaser', 'extension' or 'full'
 	 * @return boolean Have we changed something?
 	 */
 	function DisplayItemAsHtml( & $params )
@@ -1189,6 +1227,7 @@ class Plugin
 	 *   - 'Item': The {@link Item} that gets displayed (by reference).
 	 *   - 'preview': Is this only a preview?
 	 *   - 'dispmore': Does this include the "more" text (if available), which means "full post"?
+	 *   - 'view_type': What part of a post are we displaying: 'teaser', 'extension' or 'full'
 	 * @return boolean Have we changed something?
 	 */
 	function DisplayItemAsXml( & $params )
@@ -1209,6 +1248,7 @@ class Plugin
 	 *   - 'Item': The {@link Item} that gets displayed (by reference).
 	 *   - 'preview': Is this only a preview?
 	 *   - 'dispmore': Does this include the "more" text (if available), which means "full post"?
+	 *   - 'view_type': What part of a post are we displaying: 'teaser', 'extension' or 'full'
 	 * @return boolean Have we changed something?
 	 */
 	function DisplayItemAsText( & $params )
@@ -1525,7 +1565,6 @@ class Plugin
 	 *   - 'comment': the comment text (by reference)
 	 *   - 'original_comment': the original, unfiltered comment text - you should not modify it here,
 	 *      this is meant e.g. for the OpenID plugin to re-inject it after redirection (by reference)
-	 *   - 'comment_autobr': is the Auto-BR checkbox checked (by reference)
 	 *   - 'action': "save" or "preview" (by reference)
 	 *   - 'User': {@link User}, if logged in or null (by reference)
 	 *   - 'anon_name': Name of the anonymous commenter (by reference)
@@ -1704,6 +1743,17 @@ class Plugin
 	 */
 	function FilterCommentContent( & $params )
 	{
+		if( $this->group == 'rendering' )
+		{ // All plugin from 'rendering' group has a 'coll_apply_comment_rendering' setting
+			$Comment = & $params['Comment'];
+			$comment_Item = & $Comment->get_Item();
+			$comment_Blog = & $comment_Item->get_Blog();
+			if( in_array( $this->code, $Comment->get_renderers_validated() ) )
+			{ // Always allow rendering for comment
+				$render_params = array_merge(  array( 'data' => & $Comment->content ), $params );
+				$this->RenderItemAsHtml( $render_params );
+			}
+		}
 	}
 
 	// }}}
@@ -1771,8 +1821,11 @@ class Plugin
 	 * Event handler: Called after a message has been sent through the public email form.
 	 *
 	 * This is meant to cleanup generated data.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'success_message' (bool): true if the message has been sent, false otherwise
 	 */
-	function MessageFormSentCleanup()
+	function MessageFormSentCleanup( & $params )
 	{
 	}
 
@@ -1841,6 +1894,8 @@ class Plugin
 	 *   - 'size': size name (by reference)
 	 *   - 'mimetype': mimetype of thumbnail (by reference)
 	 *   - 'quality': JPEG image quality [0-100] (by reference)
+	 *   - 'root_type': file root type 'user', 'group', 'collection' etc. (by reference)
+	 *   - 'root_type_ID': ID of user, group or collection (by reference)
 	 */
 	function BeforeThumbCreate( & $params )
 	{
@@ -1987,6 +2042,18 @@ class Plugin
 
 	// }}}
 
+	// PluginCollSettings {{{
+	/**
+	 * Event handler: Called as action just before updating plugin's collection/blog settings.
+	 *
+	 * Use this to add notes/errors through {@link Plugin::msg()} or to process saved settings.
+	 */
+	function PluginCollSettingsUpdateAction()
+	{
+	}
+
+	// }}}
+
 
 	// User related events, including registration and login (procedure): {{{
 
@@ -2061,6 +2128,21 @@ class Plugin
 
 
 	/**
+	 * Event handler: Called at the begining of the "Register as new user" form.
+	 *
+	 * You might want to use this to inject antispam payload to use
+	 * in {@link Plugin::RegisterFormSent()}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the comment form generating object (by reference)
+	 *   - 'inskin': boolean true if the form is displayed in skin
+	 */
+	function DisplayRegisterFormBefore( & $params )
+	{
+	}
+
+
+	/**
 	 * Event handler: Called at the end of the "Register as new user" form.
 	 *
 	 * You might want to use this to inject antispam payload to use
@@ -2068,6 +2150,7 @@ class Plugin
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Form': the comment form generating object (by reference)
+	 *   - 'inskin': boolean true if the form is displayed in skin
 	 */
 	function DisplayRegisterFormFieldset( & $params )
 	{
@@ -2205,6 +2288,7 @@ class Plugin
 	 *   - 'edit_layout':
 	 *			"public" - public frontend user profile form (info only),
 	 *			"private" - private frontend user profile form (editable),
+	 *   - 'is_admin_page': (boolean) indicates whether we are in frontend or backoffice
 	 */
 	function DisplayProfileFormFieldset( & $params )
 	{
@@ -2228,7 +2312,6 @@ class Plugin
 	 *   - 'newuser_firstname': firstname (by reference)
 	 *   - 'newuser_lastname': lastname (by reference)
 	 *   - 'newuser_nickname': nickname (by reference)
-	 *   - 'newuser_idmode': "Identity shown" mode (by reference)
 	 *   - 'newuser_locale': locale (by reference)
 	 *   - 'newuser_url': URL (by reference)
 	 *   - 'newuser_email': email (by reference)
@@ -2364,6 +2447,41 @@ class Plugin
 	{
 	}
 
+
+	/**
+	 * Event handler: called at the end of {@link DataObject::dbinsert() inserting an object in the database}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Object': the related Object (by reference)
+	 *   - 'type': class name of deleted Object (Chapter, File, Blog, Link, Comment, Slug etc.) (by reference)
+	 */
+	function AfterObjectInsert( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called at the end of {@link DataObject::dbupdate() updating an object in the database}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Object': the related Object (by reference)
+	 *   - 'type': class name of deleted Object (Chapter, File, Blog, Link, Comment, Slug etc.) (by reference)
+	 */
+	function AfterObjectUpdate( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called at the end of {@link DataObject::dbdelete() deleting an object from the database}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Object': the related Object (by reference)
+	 *   - 'type': class name of deleted Object (Chapter, File, Blog, Link, Comment, Slug etc.) (by reference)
+	 */
+	function AfterObjectDelete( & $params )
+	{
+	}
 	// }}}
 
 
@@ -2391,6 +2509,27 @@ class Plugin
 	 * @see dnsbl_antispam_plugin
 	 */
 	function SessionLoaded()
+	{
+	}
+
+
+	/**
+	 * Event handler: Called right after initializing plugins. This is the earliest event you can use.
+	 *
+	 * This is meant to be a good point for doing early processing and cancelling the request.
+	 * Note that at this point DB charset is not set, Session and Hit aren't initialized
+	 */
+	function AfterPluginsInit()
+	{
+	}
+
+
+	/**
+	 * Event handler: Called at the end of _main.inc.php. This is the the latest event called before blog initialization.
+	 *
+	 * This is meant to be a good point for doing processing that don't require a blog to be initialized.
+	 */
+	function AfterMainInit()
 	{
 	}
 
@@ -2494,13 +2633,15 @@ class Plugin
 		{
 			$this->_trans_loaded_global = true;
 
+			// fp> TODO: there should not be any filestats for plugins that don't implement localization.
 			if( file_exists( $globalfile_path ) && is_readable( $globalfile_path ) )
 			{
 				include_once $globalfile_path;
 			}
 			else
 			{
-				$this->debug_log( 'T_: Plugin global messages file does not exist or is not readable: '.$globalfile_path, 'locale' );
+				// This is pollution of the debug log.
+				// $this->debug_log( 'T_: Plugin global messages file does not exist or is not readable: '.$globalfile_path, 'locale' );
 			}
 		}
 
@@ -2541,23 +2682,26 @@ class Plugin
 	 */
 	function get_plugin_url( $abs = false )
 	{
-		global $plugins_url, $plugins_path;
+		global $ReqHost, $plugins_url, $plugins_path;
 
-		// Get sub-path below $plugins_path, if any:
-		$sub_path = preg_replace( ':^'.preg_quote($plugins_path, ':').':', '', dirname($this->classfile_path).'/' );
+		$key = $abs ? 'abs' : 'rel';
 
-		$r = $plugins_url.$sub_path;
-
-		// Use the same protocol as with current host (so includes from within https do not fail when on http):
-		$r = url_same_protocol($r);
-
-		// Make it relative to current host, if absolute is not required:
-		if( ! $abs )
+		if( empty($this->_plugin_url) )
 		{
-			global $ReqHost;
-			$r = url_rel_to_same_host($r, $ReqHost);
+			// Get sub-path below $plugins_path, if any
+			$sub_path = preg_replace( ':^'.preg_quote($plugins_path, ':').':', '', dirname($this->classfile_path).'/' );
+
+			$r = $plugins_url.$sub_path;
+
+			// Use the same protocol as with current host (so includes from within https do not fail when on http)
+			$r = url_same_protocol($r);
+
+			$this->_plugin_url = array(
+					'abs' => $r, // absolute
+					'rel' => url_rel_to_same_host($r, $ReqHost), // relative to current host
+				);
 		}
-		return $r;
+		return $this->_plugin_url[$key];
 	}
 
 
@@ -2653,10 +2797,10 @@ class Plugin
 	 *
 	 * @param string Text for the tab.
 	 * @param string|array Path to add the menu entry into.
-	 *        See {@link AdminUI::add_menu_entries()}. Default: 'tools' for the Tools menu.
+	 *        See {@link AdminUI::add_menu_entries()}. Default: 'options' -> 'misc' for the Tools menu.
 	 * @param array Optional params. See {@link AdminUI::add_menu_entries()}.
 	 */
-	function register_menu_entry( $text, $path = 'tools', $menu_entry_props = array() )
+	function register_menu_entry( $text, $path = array( 'options', 'misc' ), $menu_entry_props = array() )
 	{
 		global $AdminUI;
 
@@ -2858,7 +3002,6 @@ class Plugin
 	 *         - anchor to {@link $help_url} ("#anchor")
 	 *         - absolute link to some URL, e.g. "http://example.com/example.php"
 	 *         - '$help_url' or empty for {@link $help_url}, then also the "www" icon gets used
-	 *         - '$readme' to link to the plugin's README.html file (if available)
 	 * @return string The html A tag, linking to the help (or empty in case of $readme, if there is none).
 	 */
 	function get_help_link( $target = '' )
@@ -2873,22 +3016,14 @@ class Plugin
 		{
 			$url = $this->get_help_url();
 			$title = T_('Homepage of the plugin');
-			$icon = 'www';
+			$icon = 'help';
+			$link_attribs['class'] = 'action_icon help_plugin_icon';
+			$link_attribs['rel'] = format_to_output( $this->long_desc, 'htmlspecialchars' );
 		}
 		elseif( $target == '$readme' )
 		{ // README
-			if( ! $this->get_help_file() )
-			{
-				return '';
-			}
-
-			global $admin_url;
-
-			$link_attribs['use_js_popup'] = true;
-			$link_attribs['use_js_size'] = '500, 400';
-			$title = T_('Local documentation of the plugin');
-			$url = url_add_param( $admin_url, 'ctrl=plugins&amp;action=disp_help_plain&amp;plugin_class='.$this->classname );
-			$icon = 'help';
+			// fplanque> note: we do NOT want the plugin to waste time searching for files on disk -- this has been replaced with bubbletips.
+			return '';
 		}
 		elseif( substr($target, 0, 1) == '#' )
 		{ // anchor
@@ -2932,7 +3067,8 @@ class Plugin
 	 */
 	function get_README_link()
 	{
-		return $this->get_help_link('$readme');
+		// fplanque> note: we do NOT want the plugin to waste time searching for files on disk -- this has been replaced with bubbletips.
+		return '';
 	}
 
 
@@ -2948,7 +3084,7 @@ class Plugin
 	{
 		global $default_locale, $plugins_path, $current_User;
 
-		if( ! $current_User->check_perm( 'options', 'view', false ) )
+		if( empty( $current_User ) || !$current_User->check_perm( 'options', 'view', false ) )
 		{ // README gets displayed through plugins controller, which requires these perms
 			// TODO: Catch "disp_help" and "disp_help_plain" messages in plugins.php before general perms check!?
 			return false;
@@ -2987,6 +3123,21 @@ class Plugin
 	 */
 	function get_edit_settings_link()
 	{
+		if( $url = $this->get_edit_settings_url() )
+		{
+			return action_icon( T_('Edit plugin settings!'), 'edit', $url );
+		}
+		return false;
+	}
+
+
+	/**
+	 * Get an URL to edit the Plugin's settings (if the user has permission).
+	 *
+	 * @return false|string
+	 */
+	function get_edit_settings_url()
+	{
 		global $current_User, $admin_url;
 
 		if( ! $current_User->check_perm( 'options', 'edit', false ) )
@@ -2994,7 +3145,26 @@ class Plugin
 			return false;
 		}
 
-		return action_icon( T_('Edit plugin settings!'), 'edit', $admin_url.'?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$this->ID );
+		return $admin_url.'?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$this->ID;
+	}
+
+
+	/**
+	 * Get Widget setting
+	 * @param string Name of setting
+	 * @param array Array of params (like widget params)
+	 * @return mixed|null
+	 */
+	function get_widget_setting( $name = NULL, $params = NULL )
+	{
+		if ( empty( $name ) || ! isset ( $params[$name] ) )
+		{
+			return NULL;
+		}
+		else
+		{
+			return $params[$name];
+		}
 	}
 
 
@@ -3053,6 +3223,11 @@ class Plugin
 	 */
 	function get_coll_setting( $parname, & $Blog )
 	{
+		if( empty($Blog) )
+		{	// Blog is not defined
+			return NULL;
+		}
+
 		// Name of the setting in the blog settings:
 		$blog_setting_name = 'plugin'.$this->ID.'_'.$parname;
 
@@ -3064,7 +3239,7 @@ class Plugin
 		}
 
 		// Try default values:
-		$params = $this->get_coll_setting_definitions( $tmp_params = array('for_editing'=>true) );
+		$params = $this->get_coll_setting_definitions( $tmp_params = array( 'for_editing' => true, 'blog_type' => $Blog->get( 'type' ) ) );
 		if( isset( $params[$parname]['defaultvalue'] ) )
 		{	// We have a default value:
 			return $params[$parname]['defaultvalue'] ;
@@ -3128,386 +3303,40 @@ class Plugin
 		$blog_setting_name = 'plugin'.$this->ID.'_'.$parname;
 		$Blog->delete_setting( $blog_setting_name );
 	}
+
+
+	/**
+	 * This method should return a string that used as suffix
+	 *   for the field 'From Country' on the user profile page in the BackOffice
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'User': the related User (by reference)
+	 * @return string Field suffix
+	 */
+	function GetUserFromCountrySuffix( & $params )
+	{
+		return '';
+	}
+
+
+	/**
+	 * This method should return an array that used as additional columns
+	 *   for the results table in the BackOffice
+	 *
+	 * @param array Associative array of parameters
+	 * @return array Columns
+	 */
+	function GetAdditionalColumnsTable( & $params  )
+	{
+		return false;
+	}
 }
 
 
 /*
  * $Log$
- * Revision 1.53  2011/10/19 03:22:31  fplanque
- * doc
+ * Revision 1.55  2013/11/06 08:04:35  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.52  2011/10/18 08:37:21  efy-vitalij
- * added event handlers DisplayEditorButton, DisplayItemFormFieldset
- *
- * Revision 1.51  2011/10/17 22:00:31  fplanque
- * cleanup
- *
- * Revision 1.50  2011/09/14 23:42:16  fplanque
- * moved icq aim yim msn to additional userfields
- *
- * Revision 1.49  2011/09/04 22:13:18  fplanque
- * copyright 2011
- *
- * Revision 1.48  2010/11/24 14:55:30  efy-asimo
- * Add user gender
- *
- * Revision 1.47  2010/11/18 15:09:16  efy-asimo
- * create $login_error global variable
- *
- * Revision 1.46  2010/09/30 13:18:01  efy-asimo
- * use blog param instead global Blog
- *
- * Revision 1.45  2010/09/29 13:19:02  efy-asimo
- * Twitter user unlink, and twitter config params move to plugin
- *
- * Revision 1.44  2010/08/24 08:20:19  efy-asimo
- * twitter plugin oAuth
- *
- * Revision 1.43  2010/06/01 02:44:44  sam2kb
- * New hooks added: GetCollectionKinds and InitCollectionKinds.
- * Use them to define new and override existing presets for new blogs.
- * See http://forums.b2evolution.net/viewtopic.php?t=21015
- *
- * Revision 1.42  2010/05/16 23:10:31  blueyed
- * Fix doc
- *
- * Revision 1.41  2010/05/13 15:12:04  blueyed
- * doc
- *
- * Revision 1.40  2010/05/11 16:30:01  blueyed
- * fix doc
- *
- * Revision 1.39  2010/05/07 08:07:14  efy-asimo
- * Permissions check update (User tab, Global Settings tab) - bugfix
- *
- * Revision 1.38  2010/04/22 18:58:31  blueyed
- * Fix doc
- *
- * Revision 1.37  2010/03/18 21:58:59  blueyed
- * doc
- *
- * Revision 1.36  2010/03/14 06:36:57  sam2kb
- * New plugin hooks: BeforeThumbCreate, AfterFileUpload
- *
- * Revision 1.35  2010/02/23 05:07:17  sam2kb
- * New plugin hooks: DisplayProfileFormFieldset and ProfileFormSent
- *
- * Revision 1.34  2010/02/08 17:53:23  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.33  2010/01/03 12:36:15  fplanque
- * Renamed hooks
- *
- * Revision 1.32  2010/01/02 20:11:08  sam2kb
- * Added new hooks: AfterBlogInsert, AfterBlogUpdate, AfterBlogDelete
- *
- * Revision 1.31  2009/09/25 07:32:53  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.30  2009/09/23 21:37:03  blueyed
- * Unify Debuglogging of T_ methods.
- *
- * Revision 1.29  2009/09/06 21:50:25  tblue246
- * Remove EVO_NEXT_VERSION, which at a point was not replaced and is useless now (since nobody knows by what version it should be replaced now).
- *
- * Revision 1.28  2009/08/25 16:54:24  tblue246
- * Doc
- *
- * Revision 1.27  2009/07/06 23:00:33  fplanque
- * minor
- *
- * Revision 1.26  2009/07/04 01:52:51  fplanque
- * doc
- *
- * Revision 1.25  2009/07/02 22:01:14  blueyed
- * Fix BeforeSessionsDelete: add it to base plugin class, test plugin and implement FPs requirements.
- *
- * Revision 1.24  2009/06/22 19:31:07  tblue246
- * Skin-specific translations ("locales" folder in the skin's folder, directory structure is the same as for plugins).
- *
- * Revision 1.23  2009/05/26 20:14:10  blueyed
- * BeforeDisable now gets triggered only if status gets changed to disabled. Also do not update status, if it would be the same, but add safety net (which rather should be an assert prolly).
- *
- * Revision 1.22  2009/05/26 19:31:58  fplanque
- * Plugins can now have Settings that are specific to each blog.
- *
- * Revision 1.21  2009/05/26 18:29:11  fplanque
- * yeah I know I just fucked up the PHP doc on that but now I can actually READ the options and make sense of them for the first time ever!
- * No, adding tons of HTML markup in teh comments is not a good idea.
- * If using ascii lists doesn't resolve to html lists, it's not the comments that ,need to be fixed, it's phpdoc.
- *
- * Revision 1.20  2009/03/23 23:04:43  fplanque
- * Demo of how to tap into menu structure from a plugin.
- *
- * Revision 1.19  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.18  2009/03/08 23:34:29  blueyed
- * Plugin::__get: use $Plugins for instantiating settings. Previously Plugins_admin was used here ("because Plugin::BeforeEnable() may use $Settings"), but that made no sense. Thanks, Tblue.
- *
- * Revision 1.17  2009/03/08 23:02:19  blueyed
- * doc
- *
- * Revision 1.16  2009/03/08 22:37:33  fplanque
- * doc
- *
- * Revision 1.15  2009/03/06 14:12:27  tblue246
- * Added missing documentation for Plugin hooks
- *
- * Revision 1.14  2009/03/05 23:38:53  blueyed
- * Merge autoload branch (lp:~blueyed/b2evolution/autoload) into CVS HEAD.
- *
- * Revision 1.13  2009/03/03 20:15:49  tblue246
- * T_(): Adding workaround for PHP 4 compatibility...
- *
- * Revision 1.12  2009/02/28 16:47:56  blueyed
- * Fix Plugins::init_settings: it is not meant to work for uninstalled plugins. Add according debug_die calls for PHP>=5.1 in Plugin::__get.
- *
- * Revision 1.11  2009/02/25 20:15:21  tblue246
- * L10n:
- * - Remove Gettext functionality (that means we now use our PHP arrays from the _global.php files only).
- * - Try to merge most functionality of Plugin::T_() into the global T_() function.
- *
- * Revision 1.10  2009/01/22 23:56:47  blueyed
- * todo
- *
- * Revision 1.9  2008/06/17 18:41:34  blueyed
- * Add Plugin::TS_(), doing the same as TS_() but for plugins.
- *
- * Revision 1.8  2008/04/06 19:19:30  fplanque
- * Started moving some intelligence to the Modules.
- * 1) Moved menu structure out of the AdminUI class.
- * It is part of the app structure, not the UI. Up to this point at least.
- * Note: individual Admin skins can still override the whole menu.
- * 2) Moved DB schema to the modules. This will be reused outside
- * of install for integrity checks and backup.
- * 3) cleaned up config files
- *
- * Revision 1.7  2008/02/11 20:53:50  blueyed
- * fix indent
- *
- * Revision 1.6  2008/01/21 09:35:32  fplanque
- * (c) 2008
- *
- * Revision 1.5  2008/01/14 23:41:47  fplanque
- * cleanup load_funcs( urls ) in main because it is ubiquitously used
- *
- * Revision 1.4  2007/09/22 22:11:18  fplanque
- * minor
- *
- * Revision 1.3  2007/08/11 17:59:05  blueyed
- * Mention also trackback in GetSpamKarmaForComment doc
- *
- * Revision 1.2  2007/08/03 20:40:49  blueyed
- * - doc for todos/discussion
- * - Made get_plugin_url more usable again
- *
- * Revision 1.1  2007/06/25 11:00:41  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.161  2007/06/20 21:42:14  fplanque
- * implemented working widget/plugin params
- *
- * Revision 1.160  2007/06/19 22:54:04  blueyed
- * doc fix
- *
- * Revision 1.159  2007/06/19 22:53:25  blueyed
- * todos/doc fixes
- *
- * Revision 1.158  2007/06/19 00:03:26  fplanque
- * doc / trying to make sense of automatic settings forms generation.
- *
- * Revision 1.157  2007/05/28 15:18:30  fplanque
- * cleanup
- *
- * Revision 1.156  2007/05/26 19:05:03  blueyed
- * Return array() in GetDefaultUserSettings, as with GetDefaultSettings
- *
- * Revision 1.155  2007/05/06 21:14:19  personman2
- * Fixed broken link from Tools > Scheduler to Tools > [any plugin tab]
- *
- * Revision 1.154  2007/04/28 22:33:26  blueyed
- * Fixed "must return reference notice" for __get()
- *
- * Revision 1.153  2007/04/26 00:11:08  fplanque
- * (c) 2007
- *
- * Revision 1.152  2007/03/26 21:34:59  blueyed
- * Removed $Plugin->Plugins reference
- *
- * Revision 1.151  2007/03/26 21:04:12  blueyed
- * Return by reference in __get()
- *
- * Revision 1.150  2007/02/28 23:21:53  blueyed
- * Pass $original_comment to CommentFormSent and "action" to BeforeCommentFormInsert
- *
- * Revision 1.149  2007/02/25 02:03:51  fplanque
- * no message
- *
- * Revision 1.148  2007/02/23 00:21:23  blueyed
- * Fixed Plugins::get_next() if the last Plugin got unregistered; Added AdminBeforeItemEditDelete hook
- *
- * Revision 1.147  2007/02/22 22:14:13  blueyed
- * Improved CommentFormSent hook
- *
- * Revision 1.146  2007/02/19 23:20:07  blueyed
- * Added plugin event SkinEndHtmlBody
- *
- * Revision 1.145  2007/02/17 21:12:14  blueyed
- * Removed magic in Plugin::get_htsrv_url() which used the blog url and assumed that "htsrv" was available in there
- *
- * Revision 1.144  2007/02/03 20:25:37  blueyed
- * Added "sender_name", "sender_email" and "subject" params to MessageFormSent
- *
- * Revision 1.143  2007/02/03 19:49:36  blueyed
- * Added "Blog" param to MessageFormSent hook
- *
- * Revision 1.142  2007/01/28 23:58:46  blueyed
- * - Added hook CommentFormSent
- * - Re-ordered comment_post.php to: init, validate, process
- * - RegisterFormSent hook can now filter the form values in a clean way
- *
- * Revision 1.141  2007/01/27 16:08:53  blueyed
- * Pass "User" param to PluginUserSettingsEditDisplayAfter plugin hook
- *
- * Revision 1.140  2007/01/27 15:19:06  blueyed
- * doc
- *
- * Revision 1.139  2007/01/26 21:52:42  blueyed
- * Improved LoginAttempt hook: all params get passed by reference and "pass_ok" has been added
- *
- * Revision 1.138  2007/01/25 00:59:49  blueyed
- * Do not pass "original_comment" in BeforeCommentFormInsert as a reference: makes no sense
- *
- * Revision 1.137  2007/01/24 00:48:58  fplanque
- * Refactoring
- *
- * Revision 1.136  2007/01/20 23:48:10  blueyed
- * Changed plugin default URL to manual.b2evolution.net/classname_plugin
- *
- * Revision 1.135  2007/01/17 23:37:10  blueyed
- * Bypass new $default param in Plugin::session_get()
- *
- * Revision 1.134  2007/01/14 18:05:45  blueyed
- * Optimized "info", "disp_help" and "disp_help_plain" actions by refering to them through classname, which makes Plugins::discover() unnecessary
- *
- * Revision 1.133  2007/01/13 16:41:51  blueyed
- * doc
- *
- * Revision 1.132  2007/01/13 03:34:00  fplanque
- * ...
- *
- * Revision 1.131  2007/01/12 21:01:23  blueyed
- * doc about $Plugins member
- *
- * Revision 1.130  2007/01/12 05:14:42  fplanque
- * doc
- *
- * Revision 1.129  2006/12/28 23:20:40  fplanque
- * added plugin event for displaying comment form toolbars
- * used by smilies plugin
- *
- * Revision 1.128  2006/12/22 22:29:35  blueyed
- * Support for "multiple" attribute in SELECT elements, especially for GetDefault(User)Settings plugin callback
- *
- * Revision 1.127  2006/12/07 23:13:13  fplanque
- * @var needs to have only one argument: the variable type
- * Otherwise, I can't code!
- *
- * Revision 1.126  2006/12/05 00:24:10  blueyed
- * doc fix
- *
- * Revision 1.125  2006/12/04 00:18:53  fplanque
- * keeping the login hashing
- *
- * Revision 1.123  2006/12/01 20:34:03  blueyed
- * Moved Plugins::get_apply_rendering_values() and Plugins::set_apply_rendering() to Plugins_admin class
- *
- * Revision 1.122  2006/12/01 16:47:26  blueyed
- * - Use EVO_NEXT_VERSION, which should get replaced with the next version 1.10 or 2.0 or whatever
- * - "action" param for PluginSettingsValidateSet
- * - Removed deprecated Plugin::set_param()
- *
- * Revision 1.121  2006/12/01 16:26:34  blueyed
- * Added AdminDisplayCommentFormFieldset hook
- *
- * Revision 1.120  2006/12/01 02:03:04  blueyed
- * Moved Plugins::set_event_status() to Plugins_admin
- *
- * Revision 1.119  2006/11/24 18:27:27  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.118  2006/11/17 18:36:22  blueyed
- * dbchanges param for AfterItemUpdate, AfterItemInsert, AfterCommentUpdate and AfterCommentInsert
- *
- * Revision 1.117  2006/11/16 23:43:39  blueyed
- * - "key" entry for array-type Plugin(User)Settings can define an input field for the key of the settings entry
- * - cleanup
- *
- * Revision 1.116  2006/11/15 21:14:04  blueyed
- * "Restore defaults" in user profile
- *
- * Revision 1.115  2006/11/14 00:21:33  blueyed
- * doc
- *
- * Revision 1.114  2006/11/12 02:12:58  blueyed
- * removed bloat param
- *
- * Revision 1.113  2006/11/11 20:33:14  blueyed
- * Moved BeforeBlogDisplay hook to after $skin has been determined
- *
- * Revision 1.112  2006/11/10 17:14:20  blueyed
- * Added "select_blog" type for Plugin (User)Settings
- *
- * Revision 1.111  2006/11/09 22:27:57  blueyed
- * doc
- *
- * Revision 1.110  2006/11/04 18:16:31  blueyed
- * MFB: note about bug in 1.8.x
- *
- * Revision 1.109  2006/11/02 15:57:10  blueyed
- * doc
- *
- * Revision 1.108  2006/11/01 23:18:58  blueyed
- * Fixed __get()
- *
- * Revision 1.106  2006/10/30 19:53:27  blueyed
- * doc fix
- *
- * Revision 1.105  2006/10/30 19:00:36  blueyed
- * Lazy-loading of Plugin (User)Settings for PHP5 through overloading
- *
- * Revision 1.104  2006/10/29 20:07:34  blueyed
- * Added "app_min" plugin dependency; Deprecated "api_min"
- *
- * Revision 1.103  2006/10/28 20:07:01  blueyed
- * Deprecated Plugin::set_param() - no use
- *
- * Revision 1.102  2006/10/28 15:01:36  blueyed
- * Documentation
- *
- * Revision 1.100  2006/10/14 16:27:05  blueyed
- * Client-side password hashing in the login form.
- *
- * Revision 1.99  2006/10/08 22:59:31  blueyed
- * Added GetProvidedSkins and DisplaySkin hooks. Allow for optimization in Plugins::trigger_event_first_return()
- *
- * Revision 1.98  2006/10/08 22:13:06  blueyed
- * Added "float" type to Plugin Setting types.
- *
- * Revision 1.97  2006/10/05 01:06:37  blueyed
- * Removed dirty "hack"; added ItemApplyAsRenderer hook instead.
- *
- * Revision 1.96  2006/10/04 23:51:02  blueyed
- * Dirty workaround for lazy renderers who detect when they should apply and pre-rendering
- *
- * Revision 1.95  2006/10/01 22:21:54  blueyed
- * edit_layout param fixes/doc
- *
- * Revision 1.94  2006/10/01 22:11:42  blueyed
- * Ping services as plugins.
- *
- * Revision 1.93  2006/10/01 15:11:08  blueyed
- * Added DisplayItemAs* equivs to RenderItemAs*; removed DisplayItemAllFormats; clearing of pre-rendered cache, according to plugin event changes
  */
 ?>

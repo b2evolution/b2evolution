@@ -5,7 +5,7 @@
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -286,92 +286,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.25  2011/10/13 05:47:24  efy-asimo
- * Remove old permission check from session Module
- *
- * Revision 1.24  2011/09/04 22:13:18  fplanque
- * copyright 2011
- *
- * Revision 1.23  2010/02/08 17:53:55  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.22  2010/01/30 18:55:33  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.21  2010/01/10 23:24:09  fplanque
- * crumbs...
- *
- * Revision 1.20  2010/01/03 12:03:17  fplanque
- * More crumbs...
- *
- * Revision 1.19  2009/12/12 01:13:08  fplanque
- * A little progress on breadcrumbs on menu structures alltogether...
- *
- * Revision 1.18  2009/12/06 22:55:21  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.17  2009/09/25 07:33:14  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.16  2009/09/19 20:49:51  fplanque
- * Cleaner way of implementing permissions.
- *
- * Revision 1.15  2009/09/14 13:39:00  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.14  2009/09/03 07:24:58  efy-maxim
- * 1. Show edit screen again if current currency/goal exists in database.
- * 2. Convert currency code to uppercase
- *
- * Revision 1.13  2009/09/02 22:50:49  efy-maxim
- * Clean error message for currency/goal already exists
- *
- * Revision 1.12  2009/08/31 20:35:31  fplanque
- * cleanup
- *
- * Revision 1.11  2009/08/31 14:22:10  tblue246
- * Better fix
- *
- * Revision 1.9  2009/08/30 20:58:10  tblue246
- * Goals ctrl: 1. Do not use localized messages to determine action. 2. Removed redundant "copy" action (always use "new" action with goal_ID).
- *
- * Revision 1.8  2009/08/30 19:54:24  fplanque
- * less translation messgaes for infrequent errors
- *
- * Revision 1.7  2009/08/30 14:13:49  fplanque
- * clean redirects after DB actions
- *
- * Revision 1.6  2009/08/30 00:42:57  fplanque
- * minor
- *
- * Revision 1.5  2009/07/06 23:52:25  sam2kb
- * Hardcoded "admin.php" replaced with $dispatcher
- *
- * Revision 1.4  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.3  2008/05/10 22:59:09  fplanque
- * keyphrase logging
- *
- * Revision 1.2  2008/04/24 01:56:08  fplanque
- * Goal hit summary
- *
- * Revision 1.1  2008/04/17 11:53:18  fplanque
- * Goal editing
- *
- * Revision 1.2  2008/01/21 09:35:28  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 10:59:51  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.13  2007/04/26 00:11:13  fplanque
- * (c) 2007
- *
- * Revision 1.12  2006/11/26 01:42:08  fplanque
- * doc
+ * Revision 1.26  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

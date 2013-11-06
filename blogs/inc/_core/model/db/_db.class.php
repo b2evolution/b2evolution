@@ -15,7 +15,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004 by Justin Vincent - {@link http://php.justinvincent.com}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
@@ -167,6 +167,14 @@ class DB
 	 * You need to use InnoDB in order to enable this.  See the {@link $db_config "table_options" key}.
 	 */
 	var $use_transactions = false;
+
+	/**
+	 * Which transaction isolation level should be used?
+	 * 
+	 * Possible values in case of MySQL: REPEATABLE READ | READ COMMITTED | READ UNCOMMITTED | SERIALIZABLE
+	 * Defailt value is REPEATABLE READ
+	 */
+	var $transaction_isolation_level = 'REPEATABLE READ';
 
 	/**
 	 * How many transactions are currently nested?
@@ -474,6 +482,16 @@ class DB
 
 
 	/**
+	 * Escapes text for SQL LIKE special characters % and _
+	 */
+	function like_escape($str)
+	{
+		$str = str_replace( array('%', '_'), array('\\%', '\\_'), $str );
+		return $this->escape($str);
+	}
+
+
+	/**
 	 * Format a string correctly for safe insert under all PHP conditions
 	 */
 	function escape($str)
@@ -766,7 +784,15 @@ class DB
 			//          IMHO, a cleaner solution would be to use {T_xxx} in the queries and replace it here. In object properties (e.g. DataObject::$dbtablename), only "T_xxx" would get used and surrounded by "{..}" in the queries it creates.
 
 			if( preg_match( '~^\s*(UPDATE\s+)(.*?)(\sSET\s.*)$~is', $query, $match ) )
-			{ // replace only between UPDATE and SET:
+			{ // replace only between UPDATE and SET, but check subqueries:
+				if( preg_match( '~^(.*SELECT.*FROM\s+)(.*?)(\s.*)$~is', $match[3], $subquery_match ) )
+				{ // replace in subquery
+					$match[3] = $subquery_match[1].preg_replace( $this->dbaliases, $this->dbreplaces, $subquery_match[2] ).$subquery_match[3];
+				}
+				if( preg_match( '~^(.*SELECT.*JOIN\s+)(.*?)(\s.*)$~is', $match[3], $subquery_match ) )
+				{ // replace in whole subquery, there can be any number of JOIN:
+					$match[3] = preg_replace( $this->dbaliases, $this->dbreplaces, $match[3] );
+				}
 				$query = $match[1].preg_replace( $this->dbaliases, $this->dbreplaces, $match[2] ).$match[3];
 			}
 			elseif( preg_match( '~^\s*(INSERT|REPLACE\s+)(.*?)(\s(VALUES|SET)\s.*)$~is', $query, $match ) )
@@ -841,6 +867,12 @@ class DB
 			if( is_resource($this->result) )
 			{
 				mysql_free_result($this->result);
+			}
+			$last_errno = mysql_errno($this->dbhandle);
+			if( $this->use_transactions && ( $this->transaction_isolation_level == 'SERIALIZABLE' ) && ( 1213 == $last_errno ) )
+			{ // deadlock exception occured, transaction must be rolled back
+				$this->rollback_nested_transaction = true;
+				return false;
 			}
 			$this->print_error( '', '', $title );
 			return false;
@@ -1322,7 +1354,7 @@ class DB
 
 					echo '<code id="'.$div_id.'" style="display:none">'.$sql_short.'</code>';
 					echo '<code id="'.$div_id.'_full">'.$sql.'</code>';
-					echo '<script type="text/javascript">debug_onclick_toggle_div("'.$div_id.','.$div_id.'_full", "Hide full SQL", "Show full SQL");</script>';
+					echo '<script type="text/javascript">debug_onclick_toggle_div("'.$div_id.','.$div_id.'_full", "Show less", "Show more", false);</script>';
 				}
 				else
 				{
@@ -1526,14 +1558,34 @@ class DB
 	 *
 	 * Note 3: The default isolation level is REPEATABLE READ.
 	 */
-	function begin()
+	function begin( $transaction_isolation_level = 'REPEATABLE READ' )
 	{
-		if( $this->use_transactions )
-		{
-			$this->query( 'BEGIN', 'BEGIN transaction' );
-
-			$this->transaction_nesting_level++;
+		if( !$this->use_transactions )
+		{ // don't use transactions at all
+			return;
 		}
+
+		$transaction_isolation_level = strtoupper( $transaction_isolation_level );
+		if( !in_array( $transaction_isolation_level, array( 'REPEATABLE READ', 'READ COMMITTED', 'READ UNCOMMITTED', 'SERIALIZABLE' ) ) )
+		{
+			debug_die( 'Invalid transaction isolation level!' );
+		}
+
+		if( ( $this->transaction_isolation_level != $transaction_isolation_level ) && ( !$this->transaction_nesting_level ) )
+		{ // It is the beggining of a new transaction and the isolation level was changed
+			// Set session transaction isolation level to the new value
+			$this->transaction_isolation_level = $transaction_isolation_level;
+			$this->query( 'SET SESSION TRANSACTION ISOLATION LEVEL '.$transaction_isolation_level, 'Set transaction isolation level' );
+		}
+		// attila> Transaction isolation level can't be changed inside a transaction!
+		// attila> When transaction handling was refactored we may call debug_die() when an inner transaction isolation level is set to SERIALIZABLE but the outer is not
+
+		if( !$this->transaction_nesting_level )
+		{ // Start a new transaction
+			$this->query( 'BEGIN', 'BEGIN transaction' );
+		}
+
+		$this->transaction_nesting_level++;
 	}
 
 
@@ -1542,24 +1594,31 @@ class DB
 	 */
 	function commit()
 	{
-		if( $this->use_transactions )
-		{
-			if( $this->transaction_nesting_level == 1 )
-			{ // Only COMMIT if there are no remaining nested transactions:
-				if( $this->rollback_nested_transaction )
-				{
-					$this->query( 'ROLLBACK', 'ROLLBACK transaction because there was a failure somewhere in the nesting of transactions' );
-				}
-				else
-				{
-					$this->query( 'COMMIT', 'COMMIT transaction' );
-				}
-				$this->rollback_nested_transaction = false;
-			}
-			if( $this->transaction_nesting_level )
+		if( !$this->use_transactions )
+		{ // don't use transactions at all
+			return;
+		}
+
+		if( $this->transaction_nesting_level == 1 )
+		{ // Only COMMIT if there are no remaining nested transactions:
+			if( $this->rollback_nested_transaction )
 			{
-				$this->transaction_nesting_level--;
+				$this->query( 'ROLLBACK', 'ROLLBACK transaction because there was a failure somewhere in the nesting of transactions' );
 			}
+			else
+			{
+				$this->query( 'COMMIT', 'COMMIT transaction' );
+			}
+			if( $this->transaction_isolation_level != 'REPEATABLE READ' )
+			{ // Set transaction isolation level back to default
+				$this->query( 'SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ', 'Set transaction isolation level' );
+			}
+			$this->rollback_nested_transaction = false;
+		}
+
+		if( $this->transaction_nesting_level )
+		{ // decrease transaction nesting level
+			$this->transaction_nesting_level--;
 		}
 	}
 
@@ -1569,21 +1628,27 @@ class DB
 	 */
 	function rollback()
 	{
-		if( $this->use_transactions )
+		if( !$this->use_transactions )
+		{ // don't use transactions at all
+			return;
+		}
+
+		if( $this->transaction_nesting_level == 1 )
+		{ // Only ROLLBACK if there are no remaining nested transactions:
+			$this->query( 'ROLLBACK', 'ROLLBACK transaction' );
+			if( $this->transaction_isolation_level != 'REPEATABLE READ' )
+			{ // Set transaction isolation level back to default
+				$this->query( 'SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ', 'Set transaction isolation level' );
+			}
+			$this->rollback_nested_transaction = false;
+		}
+		else
+		{ // Remember we'll have to roll back at the end!
+			$this->rollback_nested_transaction = true;
+		}
+		if( $this->transaction_nesting_level )
 		{
-			if( $this->transaction_nesting_level == 1 )
-			{ // Only ROLLBACK if there are no remaining nested transactions:
-				$this->query( 'ROLLBACK', 'ROLLBACK transaction' );
-				$this->rollback_nested_transaction = false;
-			}
-			else
-			{ // Remember we'll have to roll back at the end!
-				$this->rollback_nested_transaction = true;
-			}
-			if( $this->transaction_nesting_level )
-			{
-				$this->transaction_nesting_level--;
-			}
+			$this->transaction_nesting_level--;
 		}
 	}
 
@@ -1697,305 +1762,8 @@ class DB
 
 /*
  * $Log$
- * Revision 1.58  2011/10/17 22:00:31  fplanque
- * cleanup
+ * Revision 1.60  2013/11/06 08:03:47  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.57  2011/10/14 09:54:36  efy-vitalij
- * remove function null_string()
- *
- * Revision 1.56  2011/10/13 22:53:38  fplanque
- * no message
- *
- * Revision 1.55  2011/10/12 10:31:23  efy-vitalij
- * add function null_string()
- *
- * Revision 1.54  2011/09/07 00:28:26  sam2kb
- * Replace non-ASCII character in regular expressions with ~
- *
- * Revision 1.53  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.52  2010/05/02 00:02:30  blueyed
- * DB::dump_queries: Fix mysql_free_result when using profiling/explain.
- *
- * Revision 1.51  2010/03/29 19:02:00  blueyed
- * DB class: improve debugging
- *  - Improve format_query parsing
- *  - dump_queries: crop long queries (toggable)
- *  - Move toggle JS to rsc/js/debug.js
- *
- * Revision 1.50  2010/02/08 17:51:51  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.49  2010/01/16 05:21:25  sam2kb
- * Deleted crap text at the bottom
- *
- * Revision 1.48  2010/01/15 18:34:12  blueyed
- * The dl function is deprecated and not available in PHP 5.3. Do not make us produce white pages.
- *
- * Revision 1.47  2009/12/10 20:13:24  blueyed
- * Add log_errors property to DB and set it to false in get_db_version to not
- * log SQL errors which are expected during install.
- *
- * Revision 1.46  2009/12/06 01:52:54  blueyed
- * Add 'htmlspecialchars' type to format_to_output, same as formvalue, but less irritating. Useful for strmaxlen, which is being used in more places now.
- *
- * Revision 1.45  2009/12/01 20:37:11  blueyed
- * DB::select: set dbname
- *
- * Revision 1.44  2009/11/30 00:22:04  fplanque
- * clean up debug info
- * show more timers in view of block caching
- *
- * Revision 1.43  2009/11/16 20:44:07  blueyed
- *  - Use escape in quote (makes mocking in tests easier)
- *  - get_var: add support for $y=NULL (next row)
- *
- * Revision 1.42  2009/10/27 21:57:43  fplanque
- * minor/doc
- *
- * Revision 1.41  2009/10/19 21:56:01  blueyed
- * error_log SQL errors
- *
- * Revision 1.40  2009/10/04 21:10:16  blueyed
- * Merge db-noresultcache via whissip.
- *
- * Revision 1.39  2009/09/20 22:35:56  blueyed
- * whoops.
- *
- * Revision 1.38  2009/09/20 22:05:34  blueyed
- * DB:
- *  - log_queries requires $debug to be enabled, otherwise you won't see
- *    any results, but the performance drawback.
- *  - Save two IFs
- *
- * Revision 1.37  2009/09/16 20:50:52  tblue246
- * Do not divide by zero; style fix
- *
- * Revision 1.36  2009/09/13 21:32:42  blueyed
- * DB: display toggle links below dumped queries inline, saving some screen space.
- *
- * Revision 1.35  2009/09/13 21:32:16  blueyed
- * DB: add "debug_profile_queries" option, which uses MySQL profiling. Info is displayed when dumping queries and total time is compared to measured time.
- *
- * Revision 1.34  2009/09/13 21:29:59  blueyed
- * DB: fix debug_get_rows_table, which returned 'No results' since 1.32. Only display result related info if there are any rows now.
- *
- * Revision 1.33  2009/07/25 00:47:21  blueyed
- * Add log_queries param to DB constructor. Used from tests for performance reason.
- *
- * Revision 1.32  2009/07/25 00:39:00  blueyed
- * DB::debug_get_rows_table: only print result rows, if there is a result.
- *
- * Revision 1.31  2009/07/24 23:36:47  blueyed
- * doc
- *
- * Revision 1.30  2009/07/22 20:51:18  blueyed
- * Only display P and brackets if there is a DB error, which is not the case with wrong user/pass (oddly)
- *
- * Revision 1.29  2009/07/12 23:18:22  fplanque
- * upgrading tables to innodb
- *
- * Revision 1.28  2009/07/10 15:59:04  sam2kb
- * Change DB connection charset only if SET NAMES worked
- *
- * Revision 1.27  2009/07/10 10:54:06  tblue246
- * Doc
- *
- * Revision 1.26  2009/07/09 23:23:40  fplanque
- * Check that DB supports proper charset before installing.
- *
- * Revision 1.25  2009/07/09 22:57:32  fplanque
- * Fixed init of connection_charset, especially during install.
- *
- * Revision 1.24  2009/04/22 19:43:02  blueyed
- * debug_get_rows_table: use get_row (and properly for HEAD, where it does not default to NULL/next row (fixing r1.23)
- *
- * Revision 1.23  2009/04/22 19:27:36  blueyed
- * debug_get_rows_table: use get_row instead of get_results, since it stops after 'max rows'.
- *
- * Revision 1.22  2009/03/08 23:57:40  fplanque
- * 2009
- *
- * Revision 1.21  2009/03/03 00:59:10  fplanque
- * doc
- *
- * Revision 1.20  2009/03/03 00:33:06  fplanque
- * no need to do all that extra processing and html sending by default, even when debug is on.
- *
- * Revision 1.19  2009/03/02 21:36:51  blueyed
- * Add "toggle" links to EXPLAIN, Results and Function trace lists in
- * DB::dump_queries.
- * debug_explain_joins, debug_dump_function_trace_for_queries and
- * debug_dump_rows follow debug/log_queries now, since they are collapsed
- * now and provide valuable info.
- * TODO: those lists contain HTML still, maybe strip tags in them?
- *
- * Revision 1.18  2009/02/22 17:52:03  blueyed
- * Fix indent
- *
- * Revision 1.17  2009/02/11 20:04:42  blueyed
- * Drop usage of $func_call - got only set, but never used.
- *
- * Revision 1.16  2009/02/05 15:09:35  blueyed
- * DB class: fix EXPLAIN for queries starting with (SELECT (e.g. unions)
- *
- * Revision 1.15  2008/11/17 11:41:35  blueyed
- * Fix DB::save_error_state/DB::restore_error_state to also handle $last_error/$error and make it chainable
- *
- * Revision 1.14  2008/11/17 11:20:26  blueyed
- * Remove wrapper for mysql_real_escape_string, if it does not exist - it exists since PHP 4.3
- *
- * Revision 1.13  2008/11/17 11:16:19  blueyed
- * DB::print_error(): do not display errors if $halt_on_error is true, but $show_errors is false
- *
- * Revision 1.12  2008/11/07 23:20:10  tblue246
- * debug_info() now supports plain text output for the CLI.
- *
- * Revision 1.11  2008/10/10 14:00:06  blueyed
- * Improved DB error handling
- *
- * Revision 1.10  2008/09/29 21:31:18  blueyed
- * Add DB::save_error_state()/restore_error_state() to unify ignoring of errors
- *
- * Revision 1.9  2008/09/27 07:54:33  fplanque
- * minor
- *
- * Revision 1.8  2008/04/24 01:56:08  fplanque
- * Goal hit summary
- *
- * Revision 1.7  2008/02/19 11:11:17  fplanque
- * no message
- *
- * Revision 1.6  2008/02/15 12:50:40  waltercruz
- * Verifying if MySQL version is greater than 5.0.2 to set the SQL Mode  to TRADITIONAL
- *
- * Revision 1.5  2008/01/21 09:35:24  fplanque
- * (c) 2008
- *
- * Revision 1.4  2007/12/28 18:59:26  blueyed
- * - Fix for table_options and trailing semicolon
- * - todo about table_options
- *
- * Revision 1.3  2007/12/09 21:25:22  blueyed
- * doc
- *
- * Revision 1.2  2007/10/01 19:02:23  fplanque
- * MySQL version check
- *
- * Revision 1.1  2007/06/25 10:58:58  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.61  2007/06/19 23:17:52  blueyed
- * Force MySQL strict mode, if $debug
- *
- * Revision 1.60  2007/06/19 23:15:08  blueyed
- * doc fixes
- *
- * Revision 1.59  2007/05/14 02:44:14  fplanque
- * allow quoting of arrays
- *
- * Revision 1.58  2007/04/26 00:11:07  fplanque
- * (c) 2007
- *
- * Revision 1.57  2007/03/11 22:30:08  fplanque
- * cleaned up group perms
- *
- * Revision 1.56  2007/02/09 17:28:56  blueyed
- * doc
- *
- * Revision 1.55  2007/01/29 01:21:22  blueyed
- * Do not let $transaction_nesting_level become negative!
- *
- * Revision 1.54  2007/01/25 05:14:13  fplanque
- * rollback
- *
- * Revision 1.52  2006/12/14 00:42:04  fplanque
- * A little bit of windows detection / normalization
- *
- * Revision 1.51  2006/12/07 23:12:21  fplanque
- * @var needs to have only one argument: the variable type
- * Otherwise, I can't code!
- *
- * Revision 1.50  2006/12/03 21:27:21  blueyed
- * Save and reset $error with set_connection_charset(); TODO
- *
- * Revision 1.49  2006/11/28 02:52:26  fplanque
- * doc
- *
- * Revision 1.48  2006/11/28 00:33:01  blueyed
- * Removed DB::compString() (never used) and DB::get_list() (just a macro and better to have in the 4 used places directly; Cleanup/normalization; no extended regexp, when not needed!
- *
- * Revision 1.47  2006/11/27 20:54:07  fplanque
- * doc
- *
- * Revision 1.46  2006/11/27 01:35:47  blueyed
- * Removed get_col_info() and free mysql_result in query() always again
- *
- * Revision 1.45  2006/11/26 11:12:38  fplanque
- * doc / todo
- *
- * Revision 1.44  2006/11/26 03:17:53  blueyed
- * doc about resource freeing and flush() in general
- *
- * Revision 1.43  2006/11/26 02:30:39  fplanque
- * doc / todo
- *
- * Revision 1.42  2006/11/24 18:27:27  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.41  2006/11/23 15:33:58  blueyed
- * Small opt
- *
- * Revision 1.40  2006/11/20 12:23:28  blueyed
- * Optimized col_info handling: obsoleted DB::col_info: use DB::get_col_info() instead (lazy-loading of column info)
- *
- * Revision 1.39  2006/11/19 23:30:38  fplanque
- * made simpletest almost installable by almost bozos almost like me
- *
- * Revision 1.38  2006/11/18 03:44:48  fplanque
- * reverted to optimized col info
- *
- * Revision 1.36  2006/11/17 01:44:38  fplanque
- * A function should NEVER FAIL SILENTLY!
- *
- * Revision 1.35  2006/11/14 17:35:39  blueyed
- * small opt
- *
- * Revision 1.34  2006/11/04 18:39:15  blueyed
- * Normalized
- *
- * Revision 1.33  2006/11/04 18:11:42  fplanque
- * comments
- *
- * Revision 1.32  2006/11/04 01:29:55  blueyed
- * Better error displaying. Fix: use $html_str in print_error()
- *
- * Revision 1.31  2006/11/04 01:22:29  blueyed
- * Proposed fix for users with PHP < 4.3: let them get the PHP error.
- *
- * Revision 1.30  2006/11/03 00:22:21  blueyed
- * $log_queries follows $debug global; Removed dumpvar() and vardump() - use pre_dump()
- *
- * Revision 1.29  2006/11/02 19:49:22  fplanque
- * no message
- *
- * Revision 1.28  2006/10/28 15:05:25  blueyed
- * CLI/non-HTML support for print_error() and format_query()
- *
- * Revision 1.27  2006/10/14 03:05:59  blueyed
- * MFB: fix
- *
- * Revision 1.26  2006/10/10 21:42:42  blueyed
- * Optimization: only collect $col_info, if $log_queries is enabled. TODO.
- *
- * Revision 1.25  2006/10/10 21:24:29  blueyed
- * Fix for the optimization
- *
- * Revision 1.24  2006/10/10 21:21:40  blueyed
- * Fixed possible SQL error, if table_options get used and theres a semicolon at the end of query; +optimization
- *
- * Revision 1.23  2006/10/10 21:17:42  blueyed
- * Fixed possible fatal error while collecting col_info for CREATE and DROP queries
  */
 ?>

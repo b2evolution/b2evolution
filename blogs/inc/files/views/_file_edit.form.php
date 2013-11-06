@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -58,43 +58,8 @@ $Form->end_form();
 
 /*
  * $Log$
- * Revision 1.8  2011/09/04 22:13:16  fplanque
- * copyright 2011
+ * Revision 1.9  2013/11/06 08:04:15  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.7  2010/02/08 17:52:56  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.6  2010/01/30 18:55:26  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.5  2010/01/19 21:10:25  efy-yury
- * update: crumbs
- *
- * Revision 1.4  2009/03/08 23:57:43  fplanque
- * 2009
- *
- * Revision 1.3  2008/10/11 22:20:48  blueyed
- * Fix edit and properties view in file browser. (edit_File has been renamed to edited_File)
- *
- * Revision 1.2  2008/01/21 09:35:29  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 11:00:00  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.4  2007/04/26 00:11:10  fplanque
- * (c) 2007
- *
- * Revision 1.3  2007/01/24 03:45:29  fplanque
- * decrap / removed a lot of bloat...
- *
- * Revision 1.2  2007/01/24 02:35:42  fplanque
- * refactoring
- *
- * Revision 1.1  2006/12/07 20:03:32  fplanque
- * Woohoo! File editing... means all skin editing.
- *
- * Revision 1.5  2006/11/24 18:27:25  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

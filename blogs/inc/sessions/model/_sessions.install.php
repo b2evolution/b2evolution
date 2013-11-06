@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -43,13 +43,14 @@ global $db_storage_charset;
 $schema_queries['T_sessions'] = array(
 		'Creating table for active sessions',
 		"CREATE TABLE T_sessions (
-			sess_ID        INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-			sess_key       CHAR(32) NULL,
-			sess_hitcount  INT(10) UNSIGNED NOT NULL DEFAULT 1,
-			sess_lastseen  DATETIME NOT NULL DEFAULT '2000-01-01 00:00:00',
-			sess_ipaddress VARCHAR(39) NOT NULL DEFAULT '',
-			sess_user_ID   INT(10) DEFAULT NULL,
-			sess_data      MEDIUMBLOB DEFAULT NULL,
+			sess_ID          INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			sess_key         CHAR(32) NULL,
+			sess_start_ts    TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			sess_lastseen_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00' COMMENT 'User last logged activation time. Value may be off by up to 60 seconds',
+			sess_ipaddress   VARCHAR(39) NOT NULL DEFAULT '',
+			sess_user_ID     INT(10) DEFAULT NULL,
+			sess_data        MEDIUMBLOB DEFAULT NULL,
+			sess_device      VARCHAR(8) NOT NULL DEFAULT '',
 			PRIMARY KEY      ( sess_ID ),
 		  KEY sess_user_ID (sess_user_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
@@ -62,10 +63,9 @@ $schema_queries['T_basedomains'] = array(
 			dom_ID     INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			dom_name   VARCHAR(250) NOT NULL DEFAULT '',
 			dom_status ENUM('unknown','whitelist','blacklist') NOT NULL DEFAULT 'unknown',
-			dom_type   ENUM('unknown','normal','searcheng','aggregator') NOT NULL DEFAULT 'unknown',
+			dom_type   ENUM('unknown','normal','searcheng','aggregator','email') NOT NULL DEFAULT 'unknown',
 			PRIMARY KEY     (dom_ID),
-			UNIQUE dom_name (dom_name),
-			INDEX dom_type  (dom_type)
+			UNIQUE dom_type_name (dom_type, dom_name)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
 
 $schema_queries['T_track__keyphrase'] = array(
@@ -73,6 +73,8 @@ $schema_queries['T_track__keyphrase'] = array(
 		"CREATE TABLE T_track__keyphrase (
 			keyp_ID      INT UNSIGNED NOT NULL AUTO_INCREMENT,
 			keyp_phrase  VARCHAR( 255 ) NOT NULL,
+			keyp_count_refered_searches INT UNSIGNED DEFAULT 0,
+			keyp_count_internal_searches INT UNSIGNED DEFAULT 0,
 			PRIMARY KEY        ( keyp_ID ),
 			UNIQUE keyp_phrase ( keyp_phrase )
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
@@ -85,16 +87,19 @@ $schema_queries['T_hitlog'] = array(
 			hit_sess_ID           INT UNSIGNED,
 			hit_datetime          DATETIME NOT NULL DEFAULT '2000-01-01 00:00:00',
 			hit_uri               VARCHAR(250) DEFAULT NULL,
-			hit_disp			  VARCHAR(30) DEFAULT NULL,
-			hit_ctrl			  VARCHAR(30) DEFAULT NULL,
-			hit_referer_type      ENUM('search','blacklist','spam','referer','direct','self','admin') NOT NULL,
+			hit_disp              VARCHAR(30) DEFAULT NULL,
+			hit_ctrl              VARCHAR(30) DEFAULT NULL,
+			hit_action            VARCHAR(30) DEFAULT NULL,
+			hit_type              ENUM('standard','rss','admin','ajax', 'service') DEFAULT 'standard' NOT NULL,
+			hit_referer_type      ENUM('search','special','spam','referer','direct','self') NOT NULL,
 			hit_referer           VARCHAR(250) DEFAULT NULL,
 			hit_referer_dom_ID    INT UNSIGNED DEFAULT NULL,
 			hit_keyphrase_keyp_ID INT UNSIGNED DEFAULT NULL,
-			hit_serprank					INT UNSIGNED DEFAULT NULL,
+			hit_keyphrase         VARCHAR(255) DEFAULT NULL,
+			hit_serprank          INT UNSIGNED DEFAULT NULL,
 			hit_blog_ID           int(11) UNSIGNED NULL DEFAULT NULL,
 			hit_remote_addr       VARCHAR(40) DEFAULT NULL,
-			hit_agent_type		  ENUM('rss','robot','browser','unknown') DEFAULT 'unknown' NOT NULL,
+			hit_agent_type        ENUM('robot','browser','unknown') DEFAULT 'unknown' NOT NULL,
 			hit_response_code     INT DEFAULT NULL,
 			PRIMARY KEY              (hit_ID),
 			INDEX hit_blog_ID        ( hit_blog_ID ),
@@ -140,51 +145,12 @@ $schema_queries['T_track__goalhit'] = array(
 		  PRIMARY KEY  (ghit_ID),
 		  KEY ghit_goal_ID (ghit_goal_ID),
 		  KEY ghit_hit_ID (ghit_hit_ID)
-   ) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
-
-$schema_queries['T_logs__internal_searches'] = array(
-		'Creating internal searches table',
-		"CREATE TABLE T_logs__internal_searches (
-		  isrch_ID bigint(20) NOT NULL auto_increment,
-		  isrch_coll_ID bigint(20) NOT NULL,
-		  isrch_hit_ID bigint(20) NOT NULL,
-		  isrch_keywords varchar(255) NOT NULL,
-		  PRIMARY KEY (isrch_ID)
-		) ENGINE=MyISAM DEFAULT CHARSET = $db_storage_charset");
+		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
 
 /*
  * $Log$
- * Revision 1.26  2011/10/13 12:15:31  efy-vitalij
- * add column 'hit_response_code' to T_hitlog
+ * Revision 1.28  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.25  2011/10/12 07:25:02  efy-vitalij
- * add columns hit_disp, hit_ctrl to T_hitlog
- *
- * Revision 1.24  2011/09/17 22:16:05  fplanque
- * cleanup
- *
- * Revision 1.23  2011/09/13 09:15:53  fplanque
- * FIX!! :(((
- *
- * Revision 1.22  2011/09/12 15:33:05  lxndral
- * sessions table creation fix
- *
- * Revision 1.21  2011/09/10 21:37:53  fplanque
- * minor
- *
- * Revision 1.20  2011/09/09 23:05:08  lxndral
- * Search for "fp>al" in code to find my comments and please make requested changed
- *
- * Revision 1.19  2011/09/08 11:06:02  lxndral
- * fix for sessions install script (internal searches)
- *
- * Revision 1.18  2011/09/07 22:44:41  fplanque
- * UI cleanup
- *
- * Revision 1.17  2011/09/07 12:00:20  lxndral
- * internal searches update
- *
- * Revision 1.16  2011/09/04 22:13:18  fplanque
- * copyright 2011
  */
 ?>

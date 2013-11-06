@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -196,48 +196,8 @@ class ItemTypeCache extends DataObjectCache
 
 /*
  * $Log$
- * Revision 1.11  2011/09/04 22:13:17  fplanque
- * copyright 2011
+ * Revision 1.12  2013/11/06 08:04:15  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.10  2010/02/08 17:53:16  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.9  2009/09/14 13:17:28  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.8  2009/09/05 18:17:40  tblue246
- * DataObjectCache/BlogCache::get_option_list(): Back again... Allow custom value for "None" option and use 0 for BlogCache.
- *
- * Revision 1.6  2009/08/22 20:31:01  tblue246
- * New feature: Post type permissions
- *
- * Revision 1.5  2009/03/15 20:35:18  fplanque
- * Universal Item List proof of concept
- *
- * Revision 1.4  2009/03/08 23:57:44  fplanque
- * 2009
- *
- * Revision 1.3  2009/01/23 22:08:12  tblue246
- * - Filter reserved post types from dropdown box on the post form (expert tab).
- * - Indent/doc fixes
- * - Do not check whether a post title is required when only e. g. switching tabs.
- *
- * Revision 1.2  2008/01/21 09:35:31  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 11:00:28  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.14  2007/05/14 02:43:05  fplanque
- * Started renaming tables. There probably won't be a better time than 2.0.
- *
- * Revision 1.13  2007/04/26 00:11:12  fplanque
- * (c) 2007
- *
- * Revision 1.12  2006/11/24 18:27:24  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.11  2006/11/20 19:51:28  blueyed
- * doc: package gsbcore => evocore
  */
 ?>

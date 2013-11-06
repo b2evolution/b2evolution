@@ -7,7 +7,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * @copyright (c)2007 by Lee Turner - {@link http://leeturner.org/}.
  *
  * @license GNU General Public License 2 (GPL) - http://www.opensource.org/licenses/gpl-license.php
@@ -49,16 +49,15 @@ class twitter_plugin extends Plugin
 	 */
 	var $code = 'evo_twitter';
 	var $priority = 50;
-	var $version = '4.1';
+	var $version = '5.0.0';
 	var $author = 'b2evolution Group';
 
 	/*
 	 * These variables MAY be overriden.
 	 */
-	var $apply_rendering = 'never';
 	var $group = 'ping';
 	var $number_of_installs = 1;
-
+	var $message_length_limit = 140; // The maximum allowed number of characters in a message
 
 	/**
 	 * Init
@@ -137,18 +136,13 @@ class twitter_plugin extends Plugin
 	 */
 	function ItemSendPing( & $params )
 	{
-		/**
-		 * @var Blog
-		 */
-		$item_Blog = $params['Item']->get_Blog();
-
 		$content = array(
 				'title'		=> $params['Item']->dget('title', 'xml'),
 				'excerpt'	=> $params['Item']->dget('excerpt', 'xml'),
 				'url'		=> $params['Item']->get_tinyurl(),
 			);
 
-		return $this->send_a_tweet( $content, $item_Blog, $params['xmlrpcresp'] );
+		return $this->send_a_tweet( $content, $params['Item'], $params['xmlrpcresp'] );
 	}
 
 	/**
@@ -222,59 +216,36 @@ class twitter_plugin extends Plugin
 	 */
 	function get_twitter_link( $target_type, $target_id )
 	{
+		global $Blog;
+
 		require_once 'twitteroauth/twitteroauth.php';
-		global $BlogCache;
 
-		// decide to set Plugin CollSettings or UserSettings
-		if( $target_type == 'blog' )
-		{ // CollSettings
-			// get setting from db
-			$Blog = $BlogCache->get_by_ID( $target_id, false, false );
-			if( empty( $Blog ) ) {
-				return '<p>Could not initialize</p>';
-			}
-			$oauth_token = $this->get_coll_setting( 'twitter_token', $Blog );
-			if( !empty( $oauth_token ) )
-			{ // blog has already a linked twitter user, get token secret
-				$oauth_token_secret = $this->get_coll_setting( 'twitter_secret', $Blog );
-				$oauth_contact = $this->get_coll_setting( 'twitter_contact', $Blog );
-			}
-		}
-		elseif ( $target_type == 'user' )
-		{ // UserSettings
-			// get setting from db
-			if( empty( $this->UserSettings ) ) 
-			{
-				return NULL;
-			}
-			$oauth_token = $this->UserSettings->get( 'twitter_token', $target_id );
-			if( !empty( $oauth_token ) )
-			{ // user has already a linked twitter user, get token secret
-				$oauth_token_secret = $this->UserSettings->get( 'twitter_secret', $target_id );
-				$oauth_contact = $this->UserSettings->get( 'twitter_contact', $target_id );
-			}
-		}
+		// Uses either plugin CollSettings or UserSettings
+		$oauth = $this->get_oauth_info( array(
+				'type'	=> $target_type,
+				'ID'	=> $target_id,
+			) );
 
-		if( !empty( $oauth_token ) )
+		if( !empty( $oauth['token'] ) )
 		{ // already linked
-			if( empty( $oauth_contact ) )
+			if( empty( $oauth['contact'] ) )
 			{
-				$oauth_contact = $this->get_twitter_contact( $oauth_token, $oauth_token_secret );
-				if( ! empty( $oauth_contact ) )
+				$oauth['contact'] = $this->get_twitter_contact( $oauth['token'], $oauth['token_secret'] );
+				if( ! empty( $oauth['contact'] ) )
 				{
 					if( $target_type == 'blog' )
 					{ // CollSettings
-						$this->set_coll_setting( 'twitter_contact', $oauth_contact, $Blog->ID );
+						$this->set_coll_setting( 'twitter_contact', $oauth['contact'], $Blog->ID );
 						$Blog->dbupdate();
 					}
 					else if( $target_type == 'user' )
 					{ // UserSettings
-						$this->UserSettings->set( 'twitter_contact', $oauth_contact, $target_id );
+						$this->UserSettings->set( 'twitter_contact', $oauth['contact'], $target_id );
 						$this->UserSettings->dbupdate();
 					}
 				}
 			}
-			$result = T_('Linked to').': @'.$oauth_contact.'. ';
+			$result = T_('Linked to').': @'.$oauth['contact'].'. ';
 		}
 
 		// create new connection
@@ -505,32 +476,81 @@ class twitter_plugin extends Plugin
 		header_redirect( $redirect_to );
 		// We have EXITed already at this point!!
 	}
-	
-	
-	function send_a_tweet( $content, $item_Blog, & $xmlrpcresp )
+
+
+	function get_oauth_info( $params = array() )
 	{
-		// Try to get twitter account for Blog:
-		$oauth_token = $this->get_coll_setting( 'twitter_token', $item_Blog );
-		$oauth_token_secret = $this->get_coll_setting( 'twitter_secret', $item_Blog );
-		if( empty($oauth_token) || empty($oauth_token_secret) )
-		{ // Not found, fallback to Trying to get twitter account for User:
-			$oauth_token = $this->UserSettings->get( 'twitter_token' );
-			$oauth_token_secret = $this->UserSettings->get( 'twitter_secret' );
-			if( empty($oauth_token) || empty($oauth_token_secret) )
-			{	// Still no twitter account found:
-				$xmlrpcresp = T_('You must configure a twitter username/password before you can post to twitter.');
-				return false;
-			}
-			else
-			{	// Get additional params from User Setttings:
-				$msg = $this->UserSettings->get( 'twitter_msg_format' );
-				$oauth_contact = $this->UserSettings->get( 'twitter_contact' );
-			}
+		$params = array_merge( array(
+				'type'		=> '',
+				'ID'		=> '',
+				'blog_ID'	=> '',
+				'user_ID'	=> '',
+			), $params );
+
+		if( $params['type'] == 'blog' )
+		{	// Get from CollSettings
+			$blog_ID = $params['ID'];
+			$try_user = false;
+		}
+		elseif( $params['type'] == 'user' )
+		{	// Get from UserSettings
+			$user_ID = $params['ID'];
+			$try_user = true;
 		}
 		else
-		{	// Get additional params from Blog Setttings:
-			$msg = $this->get_coll_setting( 'twitter_msg_format', $item_Blog );
-			$oauth_contact = $this->get_coll_setting( 'twitter_contact', $item_Blog );
+		{	// Get from any
+			$blog_ID = $params['blog_ID'];
+			$user_ID = $params['user_ID'];
+			$try_user = true;
+		}
+
+		$r = array();
+
+		if( ! empty($blog_ID) )
+		{	// CollSettings
+			$BlogCache = & get_Cache('BlogCache');
+			$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+			if( !empty( $Blog ) )
+			{
+				$r['token'] = $this->get_coll_setting( 'twitter_token', $Blog );
+				if( !empty($r['token']) )
+				{	// There is already a linked twitter user in this Blog, get token secret
+					$r['token_secret'] = $this->get_coll_setting( 'twitter_secret', $Blog );
+					$r['contact'] = $this->get_coll_setting( 'twitter_contact', $Blog );
+					$r['msg_format'] = $this->get_coll_setting( 'twitter_msg_format', $Blog );
+
+					$try_user = false; // Do not overwrite
+				}
+			}
+		}
+
+		if( $try_user && ! empty($user_ID) )
+		{	// UserSettings
+			$r['token'] = $this->UserSettings->get( 'twitter_token', $user_ID );
+			if( !empty( $r['token'] ) )
+			{	// There is already a linked twitter user in this User, get token secret
+				$r['token_secret'] = $this->UserSettings->get( 'twitter_secret', $user_ID );
+				$r['contact'] = $this->UserSettings->get( 'twitter_contact', $user_ID );
+				$r['msg_format'] = $this->UserSettings->get( 'twitter_msg_format', $user_ID );
+			}
+		}
+
+		return $r;
+	}
+
+
+	function send_a_tweet( $content, & $Item, & $xmlrpcresp )
+	{
+		// Uses either plugin CollSettings or UserSettings
+		$oauth = $this->get_oauth_info( array(
+				'user_ID'	=> $Item->get_creator_User()->ID,
+				'blog_ID'	=> $Item->get_Blog()->ID,
+			) );
+
+		if( empty($oauth['msg_format']) || empty($oauth['token']) || empty($oauth['token_secret']) )
+		{ // Not found, fallback to Trying to get twitter account for User:
+			$xmlrpcresp = T_('You must configure a twitter username/password before you can post to twitter.');
+			return false;
 		}
 
 		$content = array_merge( array(
@@ -539,17 +559,52 @@ class twitter_plugin extends Plugin
 					'url'		=> ''
 				), $content );
 
-		$msg = str_replace( array( '$title$', '$excerpt$', '$url$' ),
-							array( $content['title'], $content['excerpt'], $content['url'] ), $msg );
+		$msg = str_replace(
+				array( '$title$', '$excerpt$' ),
+				array( $content['title'], $content['excerpt'] ),
+				$oauth['msg_format']
+			);
+
+		$msg_len = evo_strlen($msg);
+		$full_url_len = evo_strlen( $content['url'] );
+		$base_url_len = evo_strlen( $Item->get_Blog()->get_baseurl_root() );
+
+		if( (evo_strpos($msg, '$url$') === 0) && ($base_url_len + $msg_len - 5) > $this->message_length_limit )
+		{	// The message is too long and is starting with $url$
+			$max_len = $this->message_length_limit + $full_url_len - $base_url_len;
+			$msg = strmaxlen( str_replace( '$url$', $content['url'], $msg ), $max_len, '...' );
+		}
+		elseif( (evo_strpos(strrev($msg), 'p2b# $lru$') === 0) && ($base_url_len + $msg_len - 10) > $this->message_length_limit )
+		{	// The message is too long and is ending on '$url$ #b2p'
+			// Strip $url$, crop the message, and add URL to the end
+			$max_len = $this->message_length_limit - $base_url_len -1; // save room for space character
+			$msg = strmaxlen( str_replace( '$url$ #b2p', '', $msg ), $max_len, '...' );
+			$msg .= ' '.$content['url'].' #b2p';
+		}
+		elseif( (evo_strpos(strrev($msg), '$lru$') === 0) && ($base_url_len + $msg_len - 5) > $this->message_length_limit )
+		{	// Same as above, but without '#b2p' suffix
+			$max_len = $this->message_length_limit - $base_url_len -1; // save room for space character
+			$msg = strmaxlen( str_replace( '$url$', '', $msg ), $max_len, '...' );
+			$msg .= ' '.$content['url'];
+		}
+		elseif( (evo_strpos($msg, '$url$') !== false) && ($base_url_len + $msg_len - 5) > $this->message_length_limit )
+		{	// Message is too long and $url$ is somewhere in the middle
+			// We can't do much, it will be rejected by Twitter
+			// TODO: find a way to trim X chars before the URL and Y chars after
+			$msg = str_replace( '$url$', $content['url'], $msg );
+		}
+		else
+		{	// We don't want to add URL. Crop the message if needed
+			$msg = strmaxlen( str_replace( '$url$', $content['url'], $msg ), $this->message_length_limit, '...' );
+		}
 
 		require_once 'twitteroauth/twitteroauth.php';
-		$connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $oauth_token, $oauth_token_secret );
-
+		$connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $oauth['token'], $oauth['token_secret'] );
 		$result = $connection->post('statuses/update', array( 'status' => $msg ));
 
 		if( empty($result) )
 		{
-			$xmlrpcresp = 'Unknown error while posting "'.$msg.'" to account @'.$oauth_contact;
+			$xmlrpcresp = 'Unknown error while posting "'.$msg.'" to account @'.$oauth['contact'];
 			return false;
 		}
 		elseif( !empty($result->error) )
@@ -558,130 +613,20 @@ class twitter_plugin extends Plugin
 			return false;
 		}
 
-		if( empty( $oauth_contact ) )
+		if( empty($oauth['contact']) )
 		{
-			$oauth_contact = $this->get_twitter_contact( $oauth_token, $oauth_token_secret );
+			$oauth['contact'] = $this->get_twitter_contact( $oauth['token'], $oauth['token_secret'] );
 		}
 
-		$xmlrpcresp = T_('Posted to account @').$oauth_contact;
+		$xmlrpcresp = T_('Posted to account @').$oauth['contact'];
 		return true;
 	}
 }
 
 /*
  * $Log$
- * Revision 1.33  2011/09/06 00:54:38  fplanque
- * i18n update
+ * Revision 1.35  2013/11/06 08:05:35  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.32  2011/09/04 21:32:17  fplanque
- * minor MFB 4-1
- *
- * Revision 1.31  2011/05/28 02:34:44  sam2kb
- * minor
- *
- * Revision 1.30  2011/04/06 13:30:56  efy-asimo
- * Refactor profile display
- *
- * Revision 1.29  2011/03/12 21:41:33  fplanque
- * minor debug messages
- *
- * Revision 1.28  2011/02/10 23:07:22  fplanque
- * minor/doc
- *
- * Revision 1.27  2010/12/17 12:16:00  sam2kb
- * Allow tweeting custom messages, not only from Item
- *
- * Revision 1.26  2010/11/09 16:19:57  efy-asimo
- * disable twitter plugin, if curl is not loaded
- *
- * Revision 1.25  2010/10/12 12:52:17  efy-asimo
- * Move twitter callback and twitter unlink into twitter plugin class
- *
- * Revision 1.24  2010/10/05 12:53:46  efy-asimo
- * Move twitter_unlink into twitter_plugin
- *
- * Revision 1.23  2010/10/01 13:56:32  efy-asimo
- * twitter plugin save contact and fix
- *
- * Revision 1.22  2010/09/29 13:19:03  efy-asimo
- * Twitter user unlink, and twitter config params move to plugin
- *
- * Revision 1.21  2010/09/21 13:00:57  efy-asimo
- * Twitter plugin fix
- *
- * Revision 1.20  2010/08/24 08:20:19  efy-asimo
- * twitter plugin oAuth
- *
- * Revision 1.19  2010/05/11 11:56:31  efy-asimo
- * twitter plugin use tiny url
- *
- * Revision 1.18  2010/03/29 19:35:14  blueyed
- * doc/todo
- *
- * Revision 1.17  2009/09/15 18:02:05  fplanque
- * please make a separate plugin for identi.ca
- *
- * Revision 1.15  2009/06/29 02:14:04  fplanque
- * no message
- *
- * Revision 1.14  2009/06/26 22:07:20  tblue246
- * Minor (single quotes)
- *
- * Revision 1.13  2009/06/04 18:02:48  yabs
- * Removed CURL requirement.
- * Added $Item->excerpt as a replacement value ( note : I haven't added any char count check, you may wish to consider adding one )
- *
- * Revision 1.12  2009/05/28 14:47:33  fplanque
- * minor
- *
- * Revision 1.11  2009/05/28 12:49:48  fplanque
- * no message
- *
- * Revision 1.10  2009/05/27 18:00:04  fplanque
- * doc
- *
- * Revision 1.9  2009/05/27 14:02:11  fplanque
- * suggesting a hashtag : #b2p means "b2 post" http://tinyurl.com/qkdtwc
- *
- * Revision 1.8  2009/05/26 19:48:29  fplanque
- * Version bump.
- *
- * Revision 1.7  2009/05/26 19:35:22  fplanque
- * Twitter plugin: each blog can now notify a different twitter account!
- *
- * Revision 1.6  2009/05/26 18:30:02  tblue246
- * Doc, again
- *
- * Revision 1.5  2009/05/26 18:22:47  fplanque
- * better settings
- *
- * Revision 1.4  2009/05/26 18:05:12  tblue246
- * Doc
- *
- * Revision 1.3  2009/05/26 17:29:46  fplanque
- * A little bit of error management
- * (ps: BeforeEnable unecessary? how so?)
- * Tblue> I don't think the plugin code will be empty (unless the user
- *        modifies it, but why should he do that...)?
- * fp> why should we not check it? -- If user can fuck up, user WILL fuck
- *     up. Mind you it happened to me without even touching the setting;
- *     just by installing the plugin with a wrong class name.
- * Tblue> OK, the check doesn't hurt anyway. :-) "Better safe than sorry"
- *        (or summat).
- *
- * Revision 1.2  2009/05/26 17:18:36  tblue246
- * - Twitter plugin:
- * 	- removed unnecessary BeforeEnable() method.
- * 	- Todo: Do not depend on cURL
- * 	- Minor code improvements
- * - fetch_remote_page(): Todo about supporting HTTP POST requests
- *
- * Revision 1.1  2009/05/26 17:00:04  fplanque
- * added twitter plugin + better auto-install code for plugins in general
- *
- * v0.4 - Added the ability to customize the update text.
- * v0.3 - Removed echo of success or failure as this was causing a problem with the latest b2evolution
- * v0.2 - Included source parameter
- * v0.1 - Initial Release
  */
 ?>

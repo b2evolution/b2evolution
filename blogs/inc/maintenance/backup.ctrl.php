@@ -5,7 +5,7 @@
  * This file is part of b2evolution - {@link http://b2evolution.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -39,7 +39,7 @@ $current_User->check_perm( 'perm_maintenance', 'backup', true );
 load_class( 'maintenance/model/_backup.class.php', 'Backup' );
 
 // Set options path:
-$AdminUI->set_path( 'tools', 'backup' );
+$AdminUI->set_path( 'options', 'misc', 'backup' );
 
 // Get action parameter from request:
 param_action( 'start' );
@@ -55,7 +55,8 @@ if( $action == 'backup' && !$current_Backup->load_from_Request() )
 
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('Tools'), '?ctrl=crontab' );
+$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system' );
+$AdminUI->breadcrumbpath_add( T_('Maintenance'), '?ctrl=tools' );
 $AdminUI->breadcrumbpath_add( T_('Backup'), '?ctrl=backup' );
 
 
@@ -100,7 +101,7 @@ switch( $action )
 			$success = switch_maintenance_mode( true, T_( 'System backup is in progress. Please reload this page in a few minutes.' ) );
 
 			// Make sure we exit the maintenance mode if PHP dies
-			register_shutdown_function( 'switch_maintenance_mode', false );
+			register_shutdown_function( 'switch_maintenance_mode', false, '', true );
 		}
 
 		if( $success )
@@ -126,35 +127,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.9  2011/10/03 17:59:59  fplanque
- * demo mode
- *
- * Revision 1.8  2010/10/27 23:55:40  sam2kb
- * Register shutdown function to exit the maintenance mode if PHP dies
- *
- * Revision 1.7  2010/01/30 18:55:32  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.6  2010/01/16 14:27:04  efy-yury
- * crumbs, fadeouts, redirect, action_icon
- *
- * Revision 1.5  2009/12/06 22:55:18  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.4  2009/11/18 21:54:25  efy-maxim
- * compatibility fix for PHP4
- *
- * Revision 1.3  2009/10/21 14:27:38  efy-maxim
- * upgrade
- *
- * Revision 1.2  2009/10/20 14:38:54  efy-maxim
- * maintenance modulde: downloading - unpacking - verifying destination files - backing up - copying new files - upgrade database using regular script (Warning: it is very unstable version! Please, don't use maintenance modulde, because it can affect your data )
- *
- * Revision 1.1  2009/10/18 20:15:51  efy-maxim
- * 1. backup, upgrade have been moved to maintenance module
- * 2. maintenance module permissions
+ * Revision 1.11  2013/11/06 08:04:25  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

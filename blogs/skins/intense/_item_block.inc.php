@@ -41,6 +41,10 @@ $params = array_merge( array(
 				'after'  => '</div>',
 			) );
 	}
+	if( $Item->status != 'published' )
+	{
+		$Item->status( array( 'format' => 'styled' ) );
+	}
 ?>
 
 <h2 class="post-title"><?php $Item->title(); ?></h2>

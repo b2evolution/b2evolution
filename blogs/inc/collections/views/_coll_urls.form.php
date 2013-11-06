@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal Open Source relicensing agreement:
@@ -121,14 +121,14 @@ $Form->begin_fieldset( T_('Blog URL').' ['.T_('Admin').']'.get_manual_link('blog
 		}
 
 		$siteurl_relative_warning = '';
- 		if( ! preg_match( '~(^|/|\.php.?)$~i', $blog_siteurl_relative ) )
- 		{
+		if( ! preg_match( '~(^|/|\.php.?)$~i', $blog_siteurl_relative ) )
+		{
 			$siteurl_relative_warning = ' <span class="note red">'.T_('WARNING: it is highly recommended that this ends in with a / or .php !').'</span>';
 		}
 
 		$siteurl_absolute_warning = '';
- 		if( ! preg_match( '~(^|/|\.php.?)$~i', $blog_siteurl_absolute ) )
- 		{
+		if( ! preg_match( '~(^|/|\.php.?)$~i', $blog_siteurl_absolute ) )
+		{
 			$siteurl_absolute_warning = ' <span class="note red">'.T_('WARNING: it is highly recommended that this ends in with a / or .php !').'</span>';
 		}
 
@@ -175,9 +175,9 @@ $Form->begin_fieldset( T_('Blog URL').' ['.T_('Admin').']'.get_manual_link('blog
 										'onclick="document.getElementById( \'blog_siteurl_relative\' ).focus();"'
 			),
 			array( 'subdom', T_('Subdomain of basedomain'),
-										'http://url_name.'.$basedomain.'/',
+										preg_replace( '#(https?://)#i', '$1'.$edited_Blog->urlname.'.', $baseurl ),
 										'',
-										'onclick="update_urlpreview( \'http://\'+document.getElementById( \'blog_urlname\' ).value+\'.'.$basedomain.'/\' )"'
+										'onclick="update_urlpreview( \'http://\'+document.getElementById( \'blog_urlname\' ).value+\'.'.preg_replace( '#(https?://)#i', '', $baseurl ).'\' )"'
 			),
 			array( 'absolute', T_('Absolute URL').':',
 										'',
@@ -333,120 +333,8 @@ $Form->end_form();
 
 /*
  * $Log$
- * Revision 1.29  2011/09/04 22:13:14  fplanque
- * copyright 2011
+ * Revision 1.31  2013/11/06 08:03:58  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.28  2010/02/08 17:52:09  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.27  2010/01/03 13:45:36  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.26  2009/10/18 16:28:06  fplanque
- * no message
- *
- * Revision 1.25  2009/10/10 21:53:12  tblue246
- * TODO
- *
- * Revision 1.24  2009/09/26 12:00:42  tblue246
- * Minor/coding style
- *
- * Revision 1.23  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.22  2009/04/22 22:46:34  blueyed
- * Add support for rel=tag in tag URLs. This adds a new tag_links mode 'prefix-only', which requires a prefix (default: tag) and uses no suffix (dash/colon/semicolon). Also adds more JS juice and cleans up/normalized previously existing JS. Not much tested, but implemented as discussed on ML.
- *
- * Revision 1.21  2009/04/22 20:27:17  blueyed
- * Fix hiding of 'Prefix' box for 'Tag page URLs' select. Use jQuery for easy hide-on-init.
- *
- * Revision 1.20  2009/03/17 02:00:26  waltercruz
- * blogs/inc/_blog_main.inc.php
- *
- * Revision 1.19  2009/03/08 23:57:42  fplanque
- * 2009
- *
- * Revision 1.18  2008/09/09 06:03:30  fplanque
- * More tag URL options
- * Enhanced URL resolution for categories and tags
- *
- * Revision 1.17  2008/01/21 09:35:27  fplanque
- * (c) 2008
- *
- * Revision 1.16  2008/01/17 17:43:52  fplanque
- * cleaner urls by default
- *
- * Revision 1.15  2008/01/07 02:53:27  fplanque
- * cleaner tag urls
- *
- * Revision 1.14  2007/12/27 18:20:00  fplanque
- * cosmetics
- *
- * Revision 1.13  2007/12/27 01:58:48  fplanque
- * additional SEO
- *
- * Revision 1.12  2007/11/29 21:23:35  fplanque
- * Changed wording.
- *
- * Revision 1.11  2007/11/25 14:28:17  fplanque
- * additional SEO settings
- *
- * Revision 1.10  2007/11/24 21:41:12  fplanque
- * additional SEO settings
- *
- * Revision 1.9  2007/11/03 04:56:03  fplanque
- * permalink / title links cleanup
- *
- * Revision 1.8  2007/11/02 02:39:07  fplanque
- * refactored blog settings / UI
- *
- * Revision 1.7  2007/10/08 08:31:59  fplanque
- * nicer forms
- *
- * Revision 1.6  2007/10/06 21:17:26  fplanque
- * cleanup
- *
- * Revision 1.5  2007/10/04 00:44:21  waltercruz
- * Not erasing category prefix in javascript.
- *
- * Revision 1.4  2007/10/01 13:41:07  waltercruz
- * Category prefix, trying to make the code more b2evo style
- *
- * Revision 1.3  2007/09/29 01:50:50  fplanque
- * temporary rollback; waiting for new version
- *
- * Revision 1.1  2007/06/25 10:59:38  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.10  2007/05/29 01:17:20  fplanque
- * advanced admin blog settings are now restricted by a special permission
- *
- * Revision 1.9  2007/05/28 15:18:30  fplanque
- * cleanup
- *
- * Revision 1.8  2007/05/28 01:35:23  fplanque
- * fixed static page generation
- *
- * Revision 1.7  2007/04/26 00:11:05  fplanque
- * (c) 2007
- *
- * Revision 1.6  2007/03/25 15:07:38  fplanque
- * multiblog fixes
- *
- * Revision 1.5  2007/03/25 13:20:52  fplanque
- * cleaned up blog base urls
- * needs extensive testing...
- *
- * Revision 1.4  2007/03/24 20:41:16  fplanque
- * Refactored a lot of the link junk.
- * Made options blog specific.
- * Some junk still needs to be cleaned out. Will do asap.
- *
- * Revision 1.3  2007/01/23 08:06:25  fplanque
- * Simplified!!!
- *
- * Revision 1.2  2006/12/11 00:32:26  fplanque
- * allow_moving_chapters stting moved to UI
- * chapters are now called categories in the UI
  */
 ?>

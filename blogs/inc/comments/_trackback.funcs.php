@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -43,7 +43,7 @@ function trackbacks( $post_trackbacks, $Item )
 	global $Messages;
 
 	$excerpt = $Item->get_excerpt();
-	
+
 	$Messages->add( T_('Excerpt sent in trackbacks:').' '.$excerpt, 'note' );
 	$trackback_urls = split('( )+', $post_trackbacks,10);		// fplanque: ;
 	foreach($trackback_urls as $tb_url)
@@ -224,76 +224,8 @@ function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
- * Revision 1.15  2011/09/04 22:13:15  fplanque
- * copyright 2011
+ * Revision 1.16  2013/11/06 08:03:58  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.14  2010/02/08 17:52:10  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.13  2009/12/29 18:44:22  sam2kb
- * Trackbacks use $Item->get_excerpt()
- *
- * Revision 1.12  2009/12/06 01:52:55  blueyed
- * Add 'htmlspecialchars' type to format_to_output, same as formvalue, but less irritating. Useful for strmaxlen, which is being used in more places now.
- *
- * Revision 1.11  2009/10/04 23:06:30  fplanque
- * doc
- *
- * Revision 1.10  2009/10/04 16:47:47  blueyed
- * todo
- *
- * Revision 1.9  2009/09/26 12:00:42  tblue246
- * Minor/coding style
- *
- * Revision 1.8  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.7  2009/07/08 02:38:55  sam2kb
- * Replaced strlen & substr with their mbstring wrappers evo_strlen & evo_substr when needed
- *
- * Revision 1.6  2009/03/08 23:57:42  fplanque
- * 2009
- *
- * Revision 1.5  2008/09/27 16:57:22  tblue246
- * minor
- *
- * Revision 1.4  2008/09/26 19:00:47  tblue246
- * Partial rewrite of trackback(): use fsockopen() for GET requests instead of fopen().
- *
- * Revision 1.3  2008/01/21 09:35:27  fplanque
- * (c) 2008
- *
- * Revision 1.2  2007/12/18 10:25:58  yabs
- * bugfix ( http://forums.b2evolution.net/viewtopic.php?t=13583 )
- *
- * Revision 1.1  2007/06/25 10:59:40  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.14  2007/05/09 00:58:54  fplanque
- * massive cleanup of old functions
- *
- * Revision 1.13  2007/04/26 00:11:08  fplanque
- * (c) 2007
- *
- * Revision 1.12  2007/03/24 20:41:16  fplanque
- * Refactored a lot of the link junk.
- * Made options blog specific.
- * Some junk still needs to be cleaned out. Will do asap.
- *
- * Revision 1.11  2006/12/12 02:53:57  fplanque
- * Activated new item/comments controllers + new editing navigation
- * Some things are unfinished yet. Other things may need more testing.
- *
- * Revision 1.10  2006/09/15 23:42:15  blueyed
- * Fixed possible E_NOTICE when sending a successful trackback
- *
- * Revision 1.9  2006/08/21 16:07:44  fplanque
- * refactoring
- *
- * Revision 1.8  2006/08/19 07:56:31  fplanque
- * Moved a lot of stuff out of the automatic instanciation in _main.inc
- *
- * Revision 1.7  2006/07/04 17:32:30  fplanque
- * no message
  */
 ?>

@@ -40,8 +40,8 @@ class _atom_Skin extends Skin
 
 /*
  * $Log$
- * Revision 1.1  2009/05/23 20:20:18  fplanque
- * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
+ * Revision 1.2  2013/11/06 08:05:42  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

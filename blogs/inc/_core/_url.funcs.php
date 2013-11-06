@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -675,22 +675,52 @@ function url_rel_to_same_host( $url, $target_url )
  * Make an $url absolute according to $host, if it is not absolute yet.
  *
  * @param string URL
- * @param string Host (including protocol, e.g. 'http://example.com'); defaults to {@link $ReqHost}
+ * @param string Base (including protocol, e.g. 'http://example.com'); autodedected
  * @return string
  */
-function url_absolute( $url, $host = NULL )
+function url_absolute( $url, $base = NULL )
 {
+	load_funcs('_ext/_url_rel2abs.php');
+
 	if( is_absolute_url($url) )
-	{ // URL is already absolute
+	{	// URL is already absolute
 		return $url;
 	}
 
-	if( empty($host) )
-	{
-		global $ReqHost;
-		$host = $ReqHost;
+	if( empty($base) )
+	{	// Detect current page base
+		global $Blog, $ReqHost, $base_tag_set, $baseurl;
+
+		if( $base_tag_set )
+		{	// <base> tag is set
+			$base = $base_tag_set;
+		}
+		else
+		{
+			if( ! empty( $Blog ) )
+			{	// Get original blog skin, not passed with 'tempskin' param
+				$SkinCache = & get_SkinCache();
+				if( ($Skin = $SkinCache->get_by_ID( $Blog->get_skin_ID(), false )) !== false )
+				{
+					$base = $Blog->get_local_skins_url().$Skin->folder.'/';
+				}
+				else
+				{ // Skin not set:
+					$base = $Blog->gen_baseurl();
+				}
+			}
+			else
+			{	// We are displaying a general page that is not specific to a blog:
+				$base = $ReqHost;
+			}
+		}
 	}
-	return $host.$url;
+
+	if( ($absurl = url_to_absolute($url, $base)) === false )
+	{	// Return relative URL in case of error
+		$absurl = $url;
+	}
+	return $absurl;
 }
 
 
@@ -706,12 +736,6 @@ function url_absolute( $url, $host = NULL )
  */
 function make_rel_links_abs( $s, $host = NULL )
 {
-	if( empty($host) )
-	{
-		global $ReqHost;
-		$host = $ReqHost;
-	}
-
 	$s = preg_replace_callback( '~(<[^>]+?)\b((?:src|href)\s*=\s*)(["\'])?([^\\3]+?)(\\3)~i', create_function( '$m', '
 		return $m[1].$m[2].$m[3].url_absolute($m[4], "'.$host.'").$m[5];' ), $s );
 	return $s;
@@ -745,9 +769,18 @@ function disp_url( $url, $max_length = NULL )
  * @param string URL
  * @return boolean
  */
-function is_absolute_url($url)
+function is_absolute_url( $url )
 {
-    return (bool)preg_match('~^(?:\w+:)?//~', $url);
+	load_funcs('_ext/_url_rel2abs.php');
+
+	if( ($parsed_url = split_url($url)) !== false )
+	{
+		if( !empty($parsed_url['scheme']) || !empty($parsed_url['host']) )
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -822,221 +855,52 @@ function idna_decode( $url )
 }
 
 
+/**
+ * Get disp urls for Frontoffice part OR ctrl urls for Backoffice
+ *
+ * @param string specific sub entry url
+ * @param string additional params
+ */
+function get_dispctrl_url( $dispctrl, $params = '' )
+{
+	global $Blog;
+
+	if( $params != '' )
+	{
+		$params = '&amp;'.$params;
+	}
+
+	if( is_admin_page() || empty( $Blog ) )
+	{	// Backoffice part
+		global $admin_url;
+		return url_add_param( $admin_url, 'ctrl='.$dispctrl.$params );
+	}
+
+	return url_add_param( $Blog->gen_blogurl(), 'disp='.$dispctrl.$params );
+}
+
+
+/**
+ * Get link tag
+ *
+ * @param string Url
+ * @param string Link Text
+ * @return string HTML link tag
+ */
+function get_link_tag( $url, $text = '' )
+{
+	if( empty( $text ) )
+	{
+		$text = $url;
+	}
+
+	return '<a href="'.$url.'">'.$text.'</a>';
+}
+
 /* {{{ Revision log:
  * $Log$
- * Revision 1.55  2011/09/07 00:28:26  sam2kb
- * Replace non-ASCII character in regular expressions with ~
+ * Revision 1.57  2013/11/06 08:03:47  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.54  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.53  2011/02/15 06:13:49  sam2kb
- * strlen replaced with evo_strlen to support utf-8 logins and domain names
- *
- * Revision 1.52  2010/07/26 06:52:15  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.51  2010/05/15 21:12:04  blueyed
- * Fix url_rel_to_same_host for both '0' as path, query or fragment, and the fragment itself ('#' instead of '?').
- *
- * Revision 1.50  2010/04/08 18:28:02  blueyed
- * crumb refactoring: add get_crumb
- *
- * Revision 1.49  2010/02/08 17:51:38  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.48  2010/01/09 21:04:06  blueyed
- * doc
- *
- * Revision 1.47  2010/01/09 17:46:05  fplanque
- * minor
- *
- * Revision 1.46  2010/01/09 01:11:01  sam2kb
- * Prevent PHP warning caused by CURLOPT_FOLLOWLOCATION and safe_mode/open_basedir
- * Added missing return to CURL method
- *
- * Revision 1.45  2010/01/02 21:13:32  fplanque
- * demo of Crumbs in action urls (GET not POST).
- * Normalized code a little (not perfect).
- *
- * Revision 1.44  2009/10/27 21:57:45  fplanque
- * minor/doc
- *
- * Revision 1.43  2009/10/16 19:58:46  blueyed
- * fetch_remote_page:
- *  - add max_size_kb param (TODO: implement this also for curl, currently it gets skipped).
- *  - add some config for curl: CURLOPT_FOLLOWLOCATION=1, CURLOPT_MAXREDIRS=3
- *  - add "mimetype" info to $info
- *
- * Revision 1.42  2009/09/28 22:57:51  blueyed
- * Fix url_rel_to_same_host for protocol relative URLs (//example.org/)
- *
- * Revision 1.41  2009/09/27 13:12:53  blueyed
- * Add get_param_urlencoded: use it in regenerate_url and add functionality to pass array of params to url_add_param
- *
- * Revision 1.40  2009/09/15 12:09:52  tblue246
- * More load_class() fixes
- *
- * Revision 1.39  2009/09/14 18:37:07  fplanque
- * doc/cleanup/minor
- *
- * Revision 1.38  2009/09/14 11:41:23  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.37  2009/08/24 13:07:10  tblue246
- * Fixed bugs in fetch_remote_page()
- *
- * Revision 1.36  2009/06/04 21:20:23  blueyed
- * Fix url_add_param if last char is question mark. Add and move tests.
- *
- * Revision 1.35  2009/05/26 17:18:36  tblue246
- * - Twitter plugin:
- * 	- removed unnecessary BeforeEnable() method.
- * 	- Todo: Do not depend on cURL
- * 	- Minor code improvements
- * - fetch_remote_page(): Todo about supporting HTTP POST requests
- *
- * Revision 1.34  2009/05/26 16:16:50  fplanque
- * minor
- *
- * Revision 1.33  2009/05/19 19:19:59  blueyed
- * doc. yes. ;)
- *
- * Revision 1.32  2009/05/05 19:00:30  tblue246
- * More error checking...
- *
- * Revision 1.31  2009/05/04 11:28:32  tblue246
- * error checking
- *
- * Revision 1.30  2009/05/04 11:12:51  tblue246
- * minor
- *
- * Revision 1.29  2009/05/02 20:36:55  tblue246
- * fetch_remote_page(): Allow the use of URLs without a scheme (assume "http://").
- *
- * Revision 1.28  2009/05/02 19:14:42  tblue246
- * Improved fetch_remote_page(). e. g. if fopen() returns false, check if this was caused by an HTTP response with the status code 404.
- *
- * Revision 1.27  2009/03/08 23:57:40  fplanque
- * 2009
- *
- * Revision 1.26  2009/02/26 23:33:46  blueyed
- * Update IDNA library to 0.6.2 (includes at least a fix for mbstring.func_overload).
- * Since it is PHP5 only, PHP4 won't benefit from it.
- * Add wrapper idna_encode() and idna_decode() to url.funcs to handle loading
- * of the PHP5 or PHP4 class.
- * Move test.
- *
- * Revision 1.25  2009/02/26 22:16:54  blueyed
- * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
- *
- * Revision 1.24  2009/01/23 17:23:09  fplanque
- * doc/minor
- *
- * Revision 1.23  2009/01/21 21:22:07  blueyed
- * Add is_absolute_url
- *
- * Revision 1.22  2009/01/21 21:17:31  blueyed
- * validate_url: allow spaces in URL path. They are valid and allowed
- * in the file manager. So this allows linking to uploaded pictures
- * (which contain spaces in the file name).
- * Previously, newlines have been valid in URLs! (due to use of "[^ ]")
- * Add test.
- *
- * Revision 1.21  2009/01/21 21:06:18  blueyed
- * url_rel_to_same_host:
- *  - Tests have been moved to url.funcs.simpletest.php.
- *  - Add currently failing tests for handling of URLs without protocol,
- *    which parse_url parses as path-only.
- *  - Add note to phpdoc.
- *
- * Revision 1.20  2008/12/20 22:36:33  blueyed
- * Add is_same_url() to compare URLs without taking case of urlencoded parts into account. This is required to prevent infinite redirects in the handling of canonical URLs.
- *
- * Revision 1.19  2008/05/10 21:30:39  fplanque
- * better UTF-8 handling
- *
- * Revision 1.18  2008/05/06 23:23:46  fplanque
- * timeout handling
- *
- * Revision 1.17  2008/05/04 15:49:33  blueyed
- * doc
- *
- * Revision 1.16  2008/04/14 16:01:36  fplanque
- * url validation fix
- *
- * Revision 1.15  2008/03/09 03:31:58  blueyed
- * validate_url: convert URL to IDN, before checking it (LP: #195702)
- *
- * Revision 1.14  2008/03/09 02:34:26  blueyed
- * minor: fix typo in comment
- *
- * Revision 1.13  2008/02/19 11:11:17  fplanque
- * no message
- *
- * Revision 1.11  2008/02/11 23:43:07  fplanque
- * support for localhost
- *
- * Revision 1.10  2008/02/09 16:19:31  fplanque
- * fixed commenting bugs
- *
- * Revision 1.9  2008/01/21 09:35:23  fplanque
- * (c) 2008
- *
- * Revision 1.8  2008/01/20 15:31:12  fplanque
- * configurable validation/security rules
- *
- * Revision 1.7  2008/01/19 18:24:24  fplanque
- * antispam checking refactored
- *
- * Revision 1.6  2008/01/19 15:45:28  fplanque
- * refactoring
- *
- * Revision 1.5  2008/01/18 15:53:42  fplanque
- * Ninja refactoring
- *
- * Revision 1.4  2008/01/05 02:25:23  fplanque
- * refact
- *
- * Revision 1.3  2007/11/27 22:31:57  fplanque
- * debugged blog moderation
- *
- * Revision 1.2  2007/07/03 22:16:15  blueyed
- * Solved todo: changed order to "cURL, fsockopen, fopen" for fetch_remote_page
- *
- * Revision 1.1  2007/06/25 10:58:54  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.10  2007/04/26 00:11:08  fplanque
- * (c) 2007
- *
- * Revision 1.9  2007/03/12 22:39:42  blueyed
- * Fixed just introduced E_PARSE
- *
- * Revision 1.8  2007/03/12 22:12:58  blueyed
- * fetch_remote_page(): handle case when fsockopen is disabled
- *
- * Revision 1.7  2007/03/08 22:55:21  blueyed
- * fetch_remote_page: Added "used_method" to $info and errno to "curl" method.
- *
- * Revision 1.6  2006/12/22 00:25:15  blueyed
- * Do not send URL fragment in GET
- *
- * Revision 1.5  2006/12/21 21:50:52  fplanque
- * doc
- *
- * Revision 1.4  2006/12/19 21:35:26  blueyed
- * fetch_remote_page(): if url_fopen fails, use fsockopen-fallback (for errstr and status). Plus minor fixes.
- *
- * Revision 1.3  2006/12/01 17:31:38  blueyed
- * Fixed url_fopen method for fetch_remote_page
- *
- * Revision 1.2  2006/11/29 20:48:46  blueyed
- * Moved url_rel_to_same_host() from _misc.funcs.php to _url.funcs.php
- *
- * Revision 1.1  2006/11/25 23:00:39  blueyed
- * Added file for URL handling. Includes fetch_remote_page()
- *
- * }}}
  */
 ?>

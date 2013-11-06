@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -46,6 +46,12 @@ $current_User->check_perm( 'options', 'view', true );
 
 param( 'action', 'string' );
 
+if( $demo_mode && !empty($action) )
+{
+	$Messages->add( 'You cannot make any edits on this screen while in demo mode.', 'error' );
+	$action = '';
+}
+
 switch( $action )
 {
 	case 'update':
@@ -69,7 +75,11 @@ switch( $action )
 					'fm_default_chmod_file',
 					'upload_enabled',
 					'upload_maxkb',
-					'regexp_filename' ) );
+					'regexp_filename',
+					'exif_orientation',
+					'fm_resize_enable',
+					'fm_resize_width',
+					'fm_resize_height' ) );
 			if( $Settings->dbupdate() )
 			{
 				$Messages->add( T_('Restored default values.'), 'success' );
@@ -155,6 +165,16 @@ switch( $action )
 				$Settings->set( 'evocache_foldername', $evocache_foldername );
 			}
 
+			// Save Image options
+			param( 'exif_orientation', 'integer', 0 );
+			$Settings->set( 'exif_orientation', $exif_orientation );
+			param( 'fm_resize_enable', 'integer', 0 );
+			$Settings->set( 'fm_resize_enable', $fm_resize_enable );
+			param( 'fm_resize_width', 'integer', 0 );
+			$Settings->set( 'fm_resize_width', $fm_resize_width );
+			param( 'fm_resize_height', 'integer', 0 );
+			$Settings->set( 'fm_resize_height', $fm_resize_height );
+
 			if( ! $Messages->has_errors() )
 			{
 				if( $Settings->dbupdate() )
@@ -185,9 +205,8 @@ $AdminUI->set_path( 'files', 'settings', 'settings' );
 
 // fp> TODO: this here is a bit sketchy since we have Blog & fileroot not necessarilly in sync. Needs investigation / propositions.
 // Note: having both allows to post from any media dir into any blog.
-$AdminUI->breadcrumbpath_init();
+$AdminUI->breadcrumbpath_init( false );
 $AdminUI->breadcrumbpath_add( T_('Files'), '?ctrl=files&amp;blog=$blog$' );
-$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=settings' );
 $AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=fileset' );
 
 
@@ -211,52 +230,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.15  2011/09/04 22:13:15  fplanque
- * copyright 2011
- *
- * Revision 1.14  2010/11/25 15:16:34  efy-asimo
- * refactor $Messages
- *
- * Revision 1.13  2010/07/13 07:10:15  efy-asimo
- * Group file settings and file types tabs into a single Settings tab, with a 3rd level selection
- *
- * Revision 1.12  2010/04/02 07:27:11  efy-asimo
- * cache folders rename and Filelist navigation - fix
- *
- * Revision 1.11  2010/03/28 17:08:08  fplanque
- * minor
- *
- * Revision 1.10  2010/03/24 12:35:58  efy-asimo
- * Rename evocache folders after File settings update
- *
- * Revision 1.9  2010/03/12 10:52:52  efy-asimo
- * Set EvoCache  folder names - task
- *
- * Revision 1.8  2010/02/08 17:52:14  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.7  2010/01/17 04:14:41  fplanque
- * minor / fixes
- *
- * Revision 1.6  2010/01/16 14:27:03  efy-yury
- * crumbs, fadeouts, redirect, action_icon
- *
- * Revision 1.5  2009/12/06 22:55:18  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.4  2009/03/08 23:57:42  fplanque
- * 2009
- *
- * Revision 1.3  2008/09/23 06:18:34  fplanque
- * File manager now supports a shared directory (/media/shared/global/)
- *
- * Revision 1.2  2008/01/21 09:35:28  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 10:59:51  fplanque
- * MODULES (refactored MVC)
+ * Revision 1.17  2013/11/06 08:04:08  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

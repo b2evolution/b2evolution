@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -92,7 +92,25 @@ global $AdminUI;
 // Begin payload block:
 $this->disp_payload_begin();
 
+// ------------------- PREV/NEXT USER LINKS -------------------
+user_prevnext_links( array(
+		'block_start'  => '<table class="prevnext_user"><tr>',
+		'prev_start'   => '<td width="33%">',
+		'prev_end'     => '</td>',
+		'prev_no_user' => '<td width="33%">&nbsp;</td>',
+		'back_start'   => '<td width="33%" class="back_users_list">',
+		'back_end'     => '</td>',
+		'next_start'   => '<td width="33%" class="right">',
+		'next_end'     => '</td>',
+		'next_no_user' => '<td width="33%">&nbsp;</td>',
+		'block_end'    => '</tr></table>',
+		'user_tab'     => 'advanced'
+	) );
+// ------------- END OF PREV/NEXT USER LINKS -------------------
+
 $Form = new Form( NULL, 'user_checkchanges' );
+
+$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
 
 if( !$user_profile_only )
 {
@@ -145,7 +163,17 @@ if( $action != 'view' )
 	$Form->checkbox( 'edited_user_focusonfirst', $UserSettings->get( 'focus_on_first_input', $edited_User->ID ), T_('Focus on first field'), T_('The focus will automatically go to the first input text field.') );
 
 	// Number of results per page
-	$Form->text( 'edited_user_results_per_page', $UserSettings->get( 'results_per_page', $edited_User->ID ), 3, T_('Results per page'), T_('Number of rows displayed in results tables.') );
+	$results_per_page_options = array(
+			'10' => sprintf( T_('%s lines'), '10' ),
+			'20' => sprintf( T_('%s lines'), '20' ),
+			'30' => sprintf( T_('%s lines'), '30' ),
+			'40' => sprintf( T_('%s lines'), '40' ),
+			'50' => sprintf( T_('%s lines'), '50' ),
+			'100' => sprintf( T_('%s lines'), '100' ),
+			'200' => sprintf( T_('%s lines'), '200' ),
+			'500' => sprintf( T_('%s lines'), '500' ),
+		);
+	$Form->select_input_array( 'edited_user_results_per_page', $UserSettings->get( 'results_per_page', $edited_User->ID ), $results_per_page_options, T_('Results per page'), T_('Number of rows displayed in results tables.'), array( 'force_keys_as_values' => true ) );
 }
 else
 { // display only
@@ -238,23 +266,8 @@ $this->disp_payload_end();
 
 /*
  * $Log$
- * Revision 1.6  2011/09/15 08:58:46  efy-asimo
- * Change user tabs display
- *
- * Revision 1.5  2011/09/12 06:41:06  efy-asimo
- * Change user edit forms titles
- *
- * Revision 1.4  2011/09/04 22:13:21  fplanque
- * copyright 2011
- *
- * Revision 1.3  2011/09/04 21:32:17  fplanque
- * minor MFB 4-1
- *
- * Revision 1.2  2011/05/11 07:11:52  efy-asimo
- * User settings update
- *
- * Revision 1.1  2011/04/06 13:30:56  efy-asimo
- * Refactor profile display
+ * Revision 1.8  2013/11/06 08:05:04  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
- ?>
+?>

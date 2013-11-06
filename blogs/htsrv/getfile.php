@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -98,6 +98,18 @@ $FileRoot = & $FileRootCache->get_by_ID( $root );
 // Load file object (not the file content):
 $File = new File( $FileRoot->type, $FileRoot->in_type_ID, $path );
 
+// Check if the request has an If-Modified-Since date
+if( array_key_exists( 'HTTP_IF_MODIFIED_SINCE', $_SERVER) )
+{
+	$if_modified_since = strtotime( preg_replace('/;.*$/','',$_SERVER['HTTP_IF_MODIFIED_SINCE']) );
+	$file_lastmode_ts = $File->get_lastmod_ts();
+	if( $file_lastmode_ts <= $if_modified_since )
+	{ // file was not modified since if_modified_since ts
+		header_http_response( '304 Not Modified' );
+		exit(0);
+	}
+}
+
 if( !empty($size) && $File->is_image() )
 {	// We want a thumbnail:
 	// fp> TODO: for more efficient caching, this should probably redirect to the static file right after creating it (when $public_access_to_media=true OF COURSE)
@@ -135,13 +147,13 @@ if( !empty($size) && $File->is_image() )
 	if( $err == '!Thumbnail not found in'.$Settings->get( 'evocache_foldername' ) )
 	{	// The thumbnail wasn't already in the cache, try to generate and cache it now:
 		$err = NULL;		// Short error code
-		
+
 		list( $src_width, $src_height ) = imgsize( $File->get_full_path() );
-		
+
 		if( ! $resample_all_images && $src_width <= $thumb_width && $src_height <= $thumb_height )
 		{	// There is no need to resample, use original!
 			$err = $File->get_af_thumb_path( $size_name, $mimetype, true );
-			
+
 			if( $err[0] != '!' && @copy( $File->get_full_path(), $err ) )
 			{	// File was saved. Ouput that same file immediately:
 				// note: @copy returns FALSE on failure, if not muted it'll print the error on screen
@@ -151,7 +163,7 @@ if( !empty($size) && $File->is_image() )
 		else
 		{	// Resample
 			list( $err, $src_imh ) = load_image( $File->get_full_path(), $mimetype );
-	
+
 			if( empty( $err ) )
 			{
 				list( $err, $dest_imh ) = generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height, $thumb_percent_blur );
@@ -183,7 +195,7 @@ if( !empty($size) && $File->is_image() )
 		// $err = 'w='.$car_width.' '.$err;
 
 		// Wrap error message and split it into lines:
-		$err_lines = split( "\n", wordwrap( $err, $car_width, "\n", true ) );
+		$err_lines = preg_split( '~\n~', wordwrap( $err, $car_width, "\n", true ) );
 		$im_handle = imagecreatetruecolor( $thumb_width, $thumb_height ); // Create a black image
 		if( count($err_lines)*$line_height > $thumb_height )
 		{ // Message does not fit into picture:
@@ -196,7 +208,7 @@ if( !empty($size) && $File->is_image() )
 			// Recreate error lines, if it has been rewritten/shortened.
 			if( $rewritten )
 			{
-				$err_lines = split( "\n", wordwrap( $err, $car_width, "\n", true ) );
+				$err_lines = preg_split( '~\n~', wordwrap( $err, $car_width, "\n", true ) );
 			}
 		}
 
@@ -247,183 +259,8 @@ else
 
 /*
  * $Log$
- * Revision 1.59  2011/10/04 13:06:26  efy-yurybakh
- * Additional Display settings
- *
- * Revision 1.58  2011/10/04 09:16:31  efy-yurybakh
- * blur effect
- *
- * Revision 1.57  2011/09/06 20:48:54  sam2kb
- * No new line at end of file
- *
- * Revision 1.56  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.55  2010/11/03 19:44:14  sam2kb
- * Increased modularity - files_Module
- * Todo:
- * - split core functions from _file.funcs.php
- * - check mtimport.ctrl.php and wpimport.ctrl.php
- * - do not create demo Photoblog and posts with images (Blog A)
- *
- * Revision 1.54  2010/03/15 03:01:26  sam2kb
- * New plugin: Watermark. Adds text watermark to generated thumbnails e.g. copyright notice
- *
- * Revision 1.53  2010/03/12 10:52:52  efy-asimo
- * Set EvoCache  folder names - task
- *
- * Revision 1.52  2010/02/08 17:51:05  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.51  2010/01/30 18:55:15  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.50  2010/01/22 04:28:51  fplanque
- * fixes
- *
- * Revision 1.49  2010/01/19 19:14:20  sam2kb
- * doc
- *
- * Revision 1.48  2010/01/19 19:03:06  fplanque
- * doc
- *
- * Revision 1.47  2010/01/16 06:05:42  sam2kb
- * Copy original image to .evocache if its size is lower or equal to requested thumb size
- *
- * Revision 1.46  2009/12/04 23:27:49  fplanque
- * cleanup Expires: header handling
- *
- * Revision 1.45  2009/12/02 01:00:07  fplanque
- * header_nocache & header_noexpire
- *
- * Revision 1.44  2009/11/30 22:17:38  blueyed
- * Improve error messages in images. save_image: catch errors. getfile: shorten errors, if required.
- *
- * Revision 1.43  2009/11/29 23:55:08  fplanque
- * leave pre_dumps! This has a tendency to crash a lot these days. prolly some faulty GD or PHP version. i'm not sure.
- *
- * Revision 1.41  2009/11/11 20:16:15  fplanque
- * doc
- *
- * Revision 1.40  2009/09/29 02:52:20  fplanque
- * doc
- *
- * Revision 1.39  2009/09/27 19:09:20  blueyed
- * todo
- *
- * Revision 1.38  2009/09/25 07:32:51  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.37  2009/09/20 23:54:24  blueyed
- * File::output_cached_thumb handles mtime param, and uses it to send a
- * far in the future Expires header.
- * mtime param gets forwarded from getfile.php.
- * This makes browsers finally cache files served through getfile.php.
- *
- * Revision 1.36  2009/09/19 23:34:58  fplanque
- * security risk
- *
- * Revision 1.35  2009/09/19 21:54:08  blueyed
- * Fix getfile.php for files containing multiple dots.
- *
- * Revision 1.34  2009/09/01 16:10:29  tblue246
- * minor
- *
- * Revision 1.33  2009/08/31 21:55:52  fplanque
- * no message
- *
- * Revision 1.32  2009/08/29 12:23:55  tblue246
- * - SECURITY:
- * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.
- * 	- files.ctrl.php: Removed redundant calls to User::check_perm().
- * 	- XML-RPC APIs: Added missing permission checks.
- * 	- items.ctrl.php: Check permission to edit item with current status (also checks user levels) for update actions.
- * - XML-RPC client: Re-added check for zlib support (removed by update).
- * - XML-RPC APIs: Corrected method signatures (return type).
- * - Localization:
- * 	- Fixed wrong permission description in blog user/group permissions screen.
- * 	- Removed wrong TRANS comment
- * 	- de-DE: Fixed bad translation strings (double quotes + HTML attribute = mess).
- * - File upload:
- * 	- Suppress warnings generated by move_uploaded_file().
- * 	- File browser: Hide link to upload screen if no upload permission.
- * - Further code optimizations.
- *
- * Revision 1.31  2009/08/06 14:55:45  fplanque
- * doc
- *
- * Revision 1.30  2009/07/31 01:27:52  blueyed
- * TODO
- *
- * Revision 1.29  2009/07/31 00:17:20  blueyed
- * Move File::thumbnail to getfile.php, where it gets used exclusively. ACKed by FP.
- *
- * Revision 1.28  2009/03/08 23:57:36  fplanque
- * 2009
- *
- * Revision 1.27  2009/02/21 23:10:43  fplanque
- * Minor
- *
- * Revision 1.26  2009/02/19 04:53:21  blueyed
- * getfile.php: escape filename in Content-disposition header.
- *
- * Revision 1.25  2009/02/19 04:48:13  blueyed
- * Lazy-instantiate Filetype of a file, moved to get_Filetype. Bugfix: unset Filetype if name changes.
- *
- * Revision 1.24  2009/02/10 23:37:41  blueyed
- * Add status param to debug_die() and use it for "Forbidden" in getfile.php. This has quite some potential to get reverted, but then debug_die() should not get used there, maybe?!
- *
- * Revision 1.23  2009/02/10 23:28:59  blueyed
- * Add mtime-Expires caching to getfile.php.
- *  - getfile.php links have a mtime param to make the URLs unique
- *  - Add File::get_getfile_url
- *  - getfile.php sends "Expires: 'in 10 years'" (not for thumbs yet, see
- *    TODO)
- *
- * Revision 1.22  2009/01/19 21:50:47  fplanque
- * minor
- *
- * Revision 1.21  2009/01/17 21:09:27  blueyed
- * doc/todo
- *
- * Revision 1.20  2008/09/19 20:11:50  blueyed
- * getfile.php: fail if file is not readable and check if Filetype is set
- *
- * Revision 1.19  2008/09/15 10:35:28  fplanque
- * Fixed bug where thumbnails are only created when user is logged in
- *
- * Revision 1.18  2008/07/11 23:49:01  blueyed
- * TODO: add etag/modified-since support to getfile.php
- *
- * Revision 1.17  2008/07/07 05:59:26  fplanque
- * minor / doc / rollback of overzealous indetation "fixes"
- *
- * Revision 1.14  2008/01/21 09:35:23  fplanque
- * (c) 2008
- *
- * Revision 1.13  2007/04/26 00:11:14  fplanque
- * (c) 2007
- *
- * Revision 1.12  2006/12/13 20:10:30  fplanque
- * object responsibility delegation?
- *
- * Revision 1.11  2006/12/13 18:10:21  fplanque
- * thumbnail resampling proof of concept
- *
- * Revision 1.10  2006/12/13 03:08:28  fplanque
- * thumbnail implementation design demo
- *
- * Revision 1.9  2006/11/24 18:27:22  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.8  2006/08/19 07:56:29  fplanque
- * Moved a lot of stuff out of the automatic instanciation in _main.inc
- *
- * Revision 1.7  2006/04/19 20:13:48  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.6  2006/04/11 21:22:25  fplanque
- * partial cleanup
+ * Revision 1.61  2013/11/06 08:03:44  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

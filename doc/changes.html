@@ -6,6 +6,8 @@
 	<!-- InstanceEndEditable -->
 	<meta name="viewport" content="width = 750" />
 	<meta name="robots" content="noindex, follow" />
+	<link href="../blogs/rsc/css/basic_styles.css" rel="stylesheet" type="text/css" />
+	<link href="../blogs/rsc/css/basic.css" rel="stylesheet" type="text/css" />
 	<link href="../blogs/rsc/css/evo_distrib_2.css" rel="stylesheet" type="text/css" />
 	<!-- InstanceBeginEditable name="head" --><!-- InstanceEndEditable -->
 	<!-- InstanceParam name="lang" type="text" value="en-US" -->
@@ -29,46 +31,100 @@
 		<div class="block1">
 		<div class="block2">
 		<div class="block3">
+			<h1>5.x series</h1>
+			<p>Skins and plugins from v2, v3 &amp; v4 are globally compatible with v5 by there may be some glitches if they are poking directly into b2evolution's internal variables or DB.</p>
 
+			<h2>5.0.1-alpha-5</h2>
+
+			<p>Believe it or not, the list is so long we didn't have time to compile it, clean it up and make it readable. Please go to
+			<a href="http://b2evolution.net/man/introduction/what-s-new/5-x-series/">http://b2evolution.net/man/introduction/what-s-new/5-x-series/</a>
+			for details.</p>
+
+			<p><b>WARNING: this is an alpha version. We do not recommend running it on production unless you know what you are doing and feel
+			comfortable with poking around in PHP &amp; SQL in case of problems.</b></p>
+
+			<h2>5.0.0-alpha-4</h2>
+
+			<p>Believe it or not, the list is so long we didn't have time to compile it, clean it up and make it readable. Please go to
+			<a href="http://b2evolution.net/man/introduction/what-s-new/5-x-series/">http://b2evolution.net/man/introduction/what-s-new/5-x-series/</a>
+			for details.</p>
+
+			<p><b>WARNING: this is an alpha version. We do not recommend running it on production unless you know what you are doing and feel
+			comfortable with poking around in PHP &amp; SQL in case of problems.</b></p>
+		</div>
+		</div>
+		</div>
+
+
+		<div class="block1">
+		<div class="block2">
+		<div class="block3">
 			<h1>4.x series</h1>
 			<p>Skins and plugins from v2 &amp; v3 are compatible with v4 and should run without problems.</p>
-			<h2>4.2.0-beta</h2>
- 		  <ul>
-		  		<li>Private messaging, available as part of the blog skin, for all users to talk to each other. (@evofactory)</li>
-	            <li>Internal searches are now being logged so you can better understand what your audience is looking for. (@evofactory)</li>
-	            <li>It is now possible to require users to use at least one special character in their password. (@evofactory)</li>
-	            <li>Enhanced user fields. (@evofactory)</li>
-	            <li>ICQ, AIM, YIM and MSN have been moved to optional user fields and are no longer part of the base user profile. (@francoisplanque)</li>
-		  		<li>Ability to pick a category for each image when creating posts from images. (@evofactory))</li>
-	            <li>No teaser is no longer a comment. It's a checkbox now. (@evofactory))</li>
-				<li>All admin icons are now grouped in a single sprite for better performance (@evofactory)</li>
-				<li>Feature to vote on comments to determine if they are spam.</li>
-				<li>Feature to display a summary of comment ratings atop the comments. (@evofactory)</li>
-				<li>New plugin events</li>
-				<li>In skin editing. It's now possible to create/edit posts without leaving the blog! (@evofactory)</li>
-	            <li>Google Maps plugin allows to optionally select &amp; show a location for each post. (@evofactory)</li>
-	            <li>Implemented practical source tracking for user registrations (@evofactory)</li>
-				<li>Enabling/Disabling display of posts in the future/past can now be done in the admin. By default we show past post but don't show future posts until their publication date/time (@evofactory)</li>
-				<li>Support for prefered countries (will be displayed first in country selectors, for example on registration screen)</li>
-				<li>Extended user fields. It's now possible to have textarea fields.</li>
 
-			    <li><strong>Post by Email:</strong>
-                  (@sam2kb)
-                  <ul>
-                    <li>The standalone file getmail.php converted into internal scheduled job, you don't need to call it directly any more.</li>
-                    <li>Can create posts from HTML messages (rich text is not supported at the moment).</li>
-                    <li>Added support of inline images with relative to email URLs.</li>
-                    <li>Added an option to attach images to posts instead of inserting them with &lt;img&gt; tags.</li>
-                    <li>It's now possible to define main and extra categories for your post in the email.</li>
-                  </ul>
-            </li>
-	      	</ul>
+			<h2>4.1.6-stable</h2>
+			<ul>
+			  <li>Fixed: MySQL error in installer during blog cache invalidation.</li>
+			  <li>Fixed: Smilies toolbar in comments stopped working after upgrade to v4.1.5.</li>
+			  <li>Fixed: Unread message status update after message delete.</li>
+			  <li>Fixed: Use evo_charset in htmlentities().</li>
+			  <li>Fixed: Archives plugin.</li>
+			  <li>Fixed: XSS vulnerability.</li>
+			  <li>Other minor bug fixes.</li>
+			</ul>
 
-		<h2>4.1.2-stable</h2>
-        <ul>
-          <li>Added hint in maintenance.html generated during backup so that site admins know how to get rid of it.</li>
-          <li>Added quick moderation also for published comments.</li>
-        </ul>
+			<h2>4.1.5-stable</h2>
+			<ul>
+			  <li>Use UTF-8 as internal b2evolution charset in PHP 5.4.</li>
+			  <li>Added a little entropy to throw off spambots.</li>
+			  <li>Added demo of the Sidebar Links widget to Blog B.</li>
+			  <li>Fixed: Properly extract keywords from Google Image searches.</li>
+			  <li>Fixed: An error occurred on cache invalidation if the system doesn't have blogs.</li>
+			  <li>Fixed: An error occurred on saving skin settings if there were empty containers.</li>
+			  <li>Fixed: Tags from pages, podcasts and intro posts will not show in Tag Cloud widget.</li>
+			  <li>Fixed: Display of line numbers in Code highlight plugin.</li>
+			  <li>Other minor bug fixes.</li>
+			</ul>
+
+		  <h2>4.1.4-stable</h2>
+			<ul>
+			  <li>Now supports PHP 5.4.</li>
+			  <li>Fixed: Allow HD YouTube video code in Videoplug plugin.</li>
+			  <li>Fixed: Properly quote complex jQuery selectors.</li>
+			  <li>Fixed: Do not allow user session timeout values lower than $crumb_expires.</li>
+			  <li>Fixed: Demo mode restrictions.</li>
+			  <li>Fixed: Remove SQL and JS injection opportunities.</li>
+			  <li>Other minor bug fixes.</li>
+			</ul>
+
+			<h2>4.1.3-stable</h2>
+			<ul>
+			  <li>Added extra security check to file upload process.</li>
+              <li>Restricted file setting edits in demo mode.</li>
+              <li>Improved detection of known search engines, improved performance.</li>
+              <li>Upgrade TinyMCE editor to version 3.4.8.</li>
+              <li>Fixed: UI response when deleting comment from recycle bin.</li>
+              <li>Fixed: Use of blog locale in AJAX forms.</li>
+              <li>Fixed: substr_count() made compatible with PHP < 5.1</li>
+              <li>Fixed: In-skin login charset issue.</li>
+              <li>Fixed: Not encoding ampersands in tag URLs.</li>
+			  <li>Fixed: Loading required _url.funcs.php file in cron job mode.</li>
+			  <li>Fixed: PHP error with undefined function array_combine().</li>
+			  <li>Fixed: Intro-Sub was not properly overriding Intro-Cat.</li>
+			  <li>Fixed: Hide "Write new post" and "Comments" links from dashboard if user doesn't have permission, and other small permission checks update.</li>
+			  <li>Fixed: Private message notifications emails in case of group conversations.</li>
+			  <li>Fixed: Sub template [_item_block.inc.php] not found.</li>
+			  <li>Other minor bug fixes.</li>
+			</ul>
+
+			<h2>4.1.2-stable</h2>
+			<ul>
+			  <li>The page cache will be invalidated if the blog settings or some important global settings are changed.</li>
+			  <li>Added hint in maintenance.html generated during backup so that site admins know how to get rid of it.</li>
+			  <li>Added quick moderation also for published comments.</li>
+			  <li>Added missing file: /rsc/img/jquery_theme/ui-bg_glass_75_ffffff_1x400.png </li>
+			  <li>Bug fixes</li>
+			</ul>
 
 			<h2>4.1.1-stable</h2>
 	 		  <ul>
@@ -1798,7 +1854,7 @@
 			Online resources: <a href="http://b2evolution.net/" target="_blank">Official website</a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank">Find a host</a> &bull; <a href="http://manual.b2evolution.net/" target="_blank">Manual</a> &bull; <a href="http://forums.b2evolution.net/" target="_blank">Forums</a>
 		<!-- InstanceEndEditable --></div>
 
-	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->Copyright © 2003-2011 by François Planque &amp; others · <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a><!-- InstanceEndEditable --></div>
+	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->Copyright © 2003-2013 by François Planque &amp; others · <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a><!-- InstanceEndEditable --></div>
 
 	</div>
 	</div>

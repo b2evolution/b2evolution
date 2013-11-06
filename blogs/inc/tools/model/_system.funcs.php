@@ -5,7 +5,7 @@
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal Open Source relicensing agreement:
  * }}
@@ -17,7 +17,7 @@
  *
  * @version $Id$
  */
-
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Collect system stats for display on the "About this system" page
@@ -209,10 +209,13 @@ function system_check_blog_cache( $blog_ID = NULL, $repair = false )
 
 	$Blog = NULL;
 	$result = NULL;
-	if( ( $blog_ID == NULL ) && ( $Settings->get( 'general_cache_enabled' ) ) )
+	if( $blog_ID == NULL )
 	{
-		$result = system_check_dir( 'cache', 'general/' );
-		$before_msg = T_( 'General cache' ).': ';
+		if( $Settings->get( 'general_cache_enabled' ) )
+		{
+			$result = system_check_dir( 'cache', 'general/' );
+			$before_msg = T_( 'General cache' ).': ';
+		}
 	}
 	else
 	{
@@ -474,44 +477,20 @@ function system_check_gd_version()
 	return $gd_version;
 }
 
+/**
+ * @return integer
+ */
+function system_check_max_execution_time()
+{
+	$max_execution_time = ini_get('max_execution_time');
+
+	return $max_execution_time;
+}
+
 /*
  * $Log$
- * Revision 1.13  2011/09/11 19:45:28  fplanque
- * no message
- *
- * Revision 1.12  2011/09/11 19:41:26  fplanque
- * Added some system stats.
- *
- * Revision 1.11  2011/09/04 22:13:21  fplanque
- * copyright 2011
- *
- * Revision 1.10  2011/03/15 09:34:05  efy-asimo
- * have checkboxes for enabling caching in new blogs
- * refactorize cache create/enable/disable
- *
- * Revision 1.9  2011/02/25 21:52:14  fplanque
- * partial rollback. install folder needs to be removed completely for max safety. There is no in between "ok" state.
- *
- * Revision 1.7  2010/02/08 17:54:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.6  2009/05/15 19:11:37  fplanque
- * attempt to not kill the '?'
- *
- * Revision 1.5  2009/04/13 14:50:22  tblue246
- * Typo, bugfix
- *
- * Revision 1.4  2009/04/12 20:15:38  tblue246
- * Make more strings available for translation
- *
- * Revision 1.3  2009/04/11 15:33:56  tblue246
- * Typo + Fixed possible bug when UID == 0 (also, posix_geteuid() does not return a special value on error).
- *
- * Revision 1.2  2009/03/08 23:57:46  fplanque
- * 2009
- *
- * Revision 1.1  2008/04/24 22:05:59  fplanque
- * factorized system checks
+ * Revision 1.15  2013/11/06 08:04:54  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

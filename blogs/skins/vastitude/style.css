@@ -3,11 +3,15 @@ Original b2evolution template: Vastitude
 design by Andrew Hreschak
 blog.thedarksighed.com
 */
-@import url(../../rsc/css/basic.css);	/* Import basic styles */
 
 body {
 	font:86% Tahoma, "Lucida Sans", Arial, Verdana, Sans-Serif;
-	background:#4c4c4e;}
+	background:#4c4c4e;
+}
+
+textarea, input, select, option, optgroup, ul.ui-autocomplete, li.token-input-token-facebook, div.token-input-dropdown-facebook {
+	font: 12.38px Tahoma, "Lucida Sans", Arial, Verdana, Sans-Serif;
+}
 
 li.widget_core_coll_title, li.widget_core_coll_longdesc, li.widget_plugin_evo_Calr, li.widget_core_coll_search_form, li.widget_core_linkblog, li.widget_core_coll_category_list, li.widget_core_coll_common_links, li.widget_core_coll_xml_feeds, li.widget_core_user_tools, li.widget_core_coll_xml_feeds ul li, li.prevnext {list-style:none;}
 table.prevnext_post {margin: 20px 0;}
@@ -295,4 +299,36 @@ div.powered_by {
 .post_date {
 	font-size: 0.9em;
 	font-weight: bold;
+}
+
+.ui-autocomplete li{
+	list-style: none;
+}
+
+.item_custom_fields {
+	margin-top: 10px;
+}
+
+/* jQuery Tokeninput plugin */
+div.input ul.token-input-list-facebook {
+	width: 100%;
+	background: #FFF;
+}
+
+/* Not published comments display */
+#styled_content_block .bComment .status_draft,
+#styled_content_block .bComment .status_review,
+#styled_content_block .bComment .status_community,
+#styled_content_block .bComment .status_protected,
+#styled_content_block .bComment .status_private {
+	left: 10px;
+	top: 24px;
+}
+/* Not published posts display */
+#styled_content_block .bSmallHead .status_draft,
+#styled_content_block .bSmallHead .status_review,
+#styled_content_block .bSmallHead .status_community,
+#styled_content_block .bSmallHead .status_protected,
+#styled_content_block .bSmallHead .status_private {
+	top: -40px;
 }

@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -32,13 +32,21 @@ $params = array_merge( array(
 
 <div id="<?php $Item->anchor_id() ?>" lang="<?php $Item->lang() ?>">
 
-<div class="bTitle"><h3 class="bTitle"><?php $Item->title(); ?></h3></div>
+<div class="bTitle"><h3 class="bTitle"><?php
+	$Item->title( array(
+		'link_type' => 'permalink'
+		) );
+?></h3></div>
 
 	<div class="<?php $Item->div_classes( $params ) ?>" >
 
 		<div class="bSmallHead">
 		<?php
-   		$Item->permanent_link( array(
+			if( $Item->status != 'published' )
+			{
+				$Item->status( array( 'format' => 'styled' ) );
+			}
+			$Item->permanent_link( array(
 				'text' => '#icon#',
 			) );
 
@@ -130,14 +138,8 @@ $params = array_merge( array(
 
 /*
  * $Log$
- * Revision 1.3  2011/09/04 22:13:24  fplanque
- * copyright 2011
- *
- * Revision 1.2  2010/02/08 17:56:33  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.1  2009/05/23 14:12:42  fplanque
- * All default skins now support featured posts and intro posts.
+ * Revision 1.5  2013/11/06 08:05:48  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

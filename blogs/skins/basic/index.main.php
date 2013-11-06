@@ -23,6 +23,8 @@ if( version_compare( $app_version, '2.4.1' ) < 0 )
 // Do inits depending on current $disp:
 skin_init( $disp );
 
+require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
+
 // ----------------------------- HEADER BEGINS HERE ------------------------------
 ?>
 <html>
@@ -142,7 +144,11 @@ skin_init( $disp );
 			<h3>
 				<?php $Item->issue_time(); ?>
 				<a href="<?php $Item->permanent_url() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" border="0" align="absmiddle" /></a>
-				<?php $Item->title(); ?>
+				<?php
+					$Item->title( array(
+							'link_type' => 'permalink'
+						) );
+				?>
 			</h3>
 
 			<blockquote>
@@ -156,6 +162,11 @@ skin_init( $disp );
 						'include_external'=> true,
 						'link_categories' => true,
 					) );
+
+					if( $Item->status != 'published' )
+					{
+						$Item->status( array( 'before' => ' &bull; <small>'.T_('Status').': ', 'after' => '</small>' ) );
+					}
 				?>
 
 				<?php

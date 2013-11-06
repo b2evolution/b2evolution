@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -39,6 +39,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Dependencies
  */
 load_funcs('antispam/model/_antispam.funcs.php');
+load_funcs('tools/model/_email.funcs.php');
 
 // @todo sam2kb> Move core functions get_admin_skins, get_filenames, cleardir_r, rmdir_r and some other
 // to a separate file, and split files_Module from _core_Module
@@ -57,13 +58,15 @@ function modules_call_method( $method_name, $params = NULL )
 		$Module = & $GLOBALS[$module.'_Module'];
 		if( $params == NULL )
 		{
-			$Module->{$method_name}();
+			$ret = $Module->{$method_name}();
 		}
 		else
 		{
-			$Module->{$method_name}( $params );
+			$ret = $Module->{$method_name}( $params );
 		}
 	}
+
+	return $ret;
 }
 
 
@@ -536,7 +539,7 @@ function strmaxwords( $str, $maxwords = 50, $params = array() )
 	}
 
 	// restrict content to required number of words and balance the tags out
-	$str = balance_Tags( evo_substr( $str, 0, $i ) );
+	$str = balance_tags( evo_substr( $str, 0, $i ) );
 
 	if( $params['always_continue'] || $maxwords == false )
 	{ // we want a continued text
@@ -704,7 +707,7 @@ function evo_strlen( $string )
  * @param string
  * @return int
  */
-function evo_strpos( $string , $needle , $offset = null ) 
+function evo_strpos( $string , $needle , $offset = null )
 {
 	global $current_charset;
 
@@ -770,36 +773,94 @@ function evo_substr( $string, $start = 0, $length = '#' )
 function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = array() )
 {
 	if( preg_match_all( $pattern, $text, $matches, PREG_OFFSET_CAPTURE | PREG_PATTERN_ORDER ) )
-	{ // $pattern matches, call the callback method on each non-matching block
-		$pos = 0;
-		$new_r = '';
+	{	// $pattern matches, call the callback method on full text except of matching blocks
 
-		foreach( $matches[0] as $l_matching )
-		{
-			$pos_match = $l_matching[1];
-			$non_match = substr( $text, $pos, ($pos_match - $pos) );
+		// Create an unique string in order to replace all matching blocks temporarily
+		$unique_replacement = md5( mktime() + rand() );
 
-			// Callback:
-			$callback_params = $params;
-			array_unshift( $callback_params, $non_match );
-			$new_r .= call_user_func_array( $callback, $callback_params );
-
-			$new_r .= $l_matching[0];
-			$pos += strlen($non_match)+strlen($l_matching[0]);
+		$matches_search = array();
+		$matches_replace = array();
+		foreach( $matches[0] as $l => $l_matching )
+		{	// Build arrays with a source code of the matching blocks and with temporary replacement
+			$matches_source[] = $l_matching[0];
+			$matches_temp[] = '?'.$l.$unique_replacement.$l.'?';
 		}
+
+		// Replace all matching blocks with temporary text like '?X219a33da9c1b8f4e335bffc015df8c96X?'
+		// where X is index of match block in array $matches[0]
+		// It is used to avoid any changes in the matching blocks
+		$text = str_ireplace( $matches_source, $matches_temp, $text );
 
 		// Callback:
 		$callback_params = $params;
-		array_unshift( $callback_params, substr( $text, $pos ) );
-		#pre_dump( $matches, $callback_params );
-		$new_r .= call_user_func_array( $callback, $callback_params );
+		array_unshift( $callback_params, $text );
+		$text = call_user_func_array( $callback, $callback_params );
 
-		return $new_r;
+		// Revert a source code of the matching blocks in content
+		$text = str_ireplace( $matches_temp, $matches_source, $text );
+
+		return $text;
 	}
 
 	$callback_params = $params;
 	array_unshift( $callback_params, $text );
 	return call_user_func_array( $callback, $callback_params );
+}
+
+
+/**
+ * Replace content outside blocks <code></code> & <pre></pre>
+ *
+ * @param array|string Search list
+ * @param array|string Replace list
+ * @param string Source content
+ * @return string Replaced content
+ */
+function replace_content_outcode( $search, $replace, $content, $replace_function_callback = 'replace_content' )
+{
+	if( !empty( $search ) && !empty( $replace ) )
+	{
+		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false )
+		{	// Call replace_content() on everything outside code/pre:
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				$replace_function_callback, array( $search, $replace ) );
+		}
+		else
+		{	// No code/pre blocks, replace on the whole thing
+			$content = call_user_func( $replace_function_callback, $content, $search, $replace );
+		}
+	}
+
+	return $content;
+}
+
+
+/**
+ * Replace content, Used for function callback_on_non_matching_blocks(), because there is different order of params
+ *
+ * @param string Source content
+ * @param array|string Search list
+ * @param array|string Replace list
+ * @return string Replaced content
+ */
+function replace_content( $content, $search, $replace )
+{
+	return preg_replace( $search, $replace, $content );
+}
+
+
+/**
+ * Replace content by callback, Used for function callback_on_non_matching_blocks(), because there is different order of params
+ *
+ * @param string Source content
+ * @param array|string Search list
+ * @param array|string Replace callback
+ * @return string Replaced content
+ */
+function replace_content_callback( $content, $search, $replace_callback )
+{
+	return preg_replace_callback( $search, $replace_callback, $content );
 }
 
 
@@ -815,13 +876,18 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
  *
  * {@internal This function gets tested in misc.funcs.simpletest.php.}}
  *
+ * @param string Text
+ * @param string Url delimeter
+ * @param string Callback function name
+ * @param string Additional attributes for tag <a>
  * @return string
  */
-function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickable_callback' )
+function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickable_callback', $additional_attrs = '' )
 {
 	$r = '';
 	$inside_tag = false;
 	$in_a_tag = false;
+	$in_code_tag = false;
 	$in_tag_quote = false;
 	$from_pos = 0;
 	$i = 0;
@@ -881,6 +947,25 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 					break;
 			}
 		}
+		elseif( $in_code_tag )
+		{	// In a code but no longer inside <code>...</code> tag or any other embedded tag like <strong> or whatever
+			switch( $text[$i] )
+			{
+				case '<':
+					if( strtolower(substr($text, $i+1, 5)) == '/code' )
+					{	// Ok, this is the end tag of the code:
+						// $r .= substr($text, $from_pos, $i-$from_pos+4);
+						// $from_pos = $i+4;
+						$i += 7;
+						// pre_dump( 'END A TAG: '.substr($text, $from_pos, $i-$from_pos) );
+						$r .= substr($text, $from_pos, $i-$from_pos);
+						$from_pos = $i;
+						$in_code_tag = false;
+						$in_tag_quote = false;
+					}
+					break;
+			}
+		}
 		else
 		{ // State: we're not currently in any tag:
 			// Find next tag opening:
@@ -899,14 +984,19 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 				$in_a_tag = true;
 			}
 
+			if( ( substr( $text, $i+1, 4 ) == 'code') )
+			{ // opening "code" tag
+				$in_code_tag = true;
+			}
+
 			// Make the text before the opening < clickable:
 			if( is_array($callback) )
 			{
-				$r .= $callback[0]->$callback[1]( substr($text, $from_pos, $i-$from_pos), $moredelim );
+				$r .= $callback[0]->$callback[1]( substr($text, $from_pos, $i-$from_pos), $moredelim, $additional_attrs );
 			}
 			else
 			{
-				$r .= $callback( substr($text, $from_pos, $i-$from_pos), $moredelim );
+				$r .= $callback( substr($text, $from_pos, $i-$from_pos), $moredelim, $additional_attrs );
 			}
 			$from_pos = $i;
 
@@ -925,11 +1015,11 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 	{	// Make remplacements in the remaining part:
 		if( is_array($callback) )
 		{
-			$r .= $callback[0]->$callback[1]( substr($text, $from_pos), $moredelim );
+			$r .= $callback[0]->$callback[1]( substr($text, $from_pos), $moredelim, $additional_attrs );
 		}
 		else
 		{
-			$r .= $callback( substr($text, $from_pos), $moredelim );
+			$r .= $callback( substr($text, $from_pos), $moredelim, $additional_attrs );
 		}
 	}
 
@@ -947,25 +1037,36 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
  * fp> I'm thinking of moving this into the autolinks plugin (only place where it's used)
  *     and break it up into something more systematic.
  *
+ * @param string Text
+ * @param string Url delimeter
+ * @param string Additional attributes for tag <a>
  * @return string The clickable text.
  */
-function make_clickable_callback( $text, $moredelim = '&amp;' )
+function make_clickable_callback( $text, $moredelim = '&amp;', $additional_attrs = '' )
 {
-	$pattern_domain = '([a-z0-9\-]+\.[a-z0-9\-.\~]+)'; // a domain name (not very strict)
+	if( !empty( $additional_attrs ) )
+	{
+		$additional_attrs = ' '.trim( $additional_attrs );
+	}
+	//return $text;
+	/*preg_match( '/<code>([.\r\n]+?)<\/code>/i', $text, $matches );
+	pre_dump( $text, $matches );*/
+
+	$pattern_domain = '([\p{L}0-9\-]+\.[\p{L}0-9\-.\~]+)'; // a domain name (not very strict)
 	$text = preg_replace(
 		/* Tblue> I removed the double quotes from the first RegExp because
 				  it made URLs in tag attributes clickable.
 				  See http://forums.b2evolution.net/viewtopic.php?p=92073 */
-		array( '#(^|[\s>])(https?|mailto)://([^<>{}\s]+[^.,<>{}\s])#i',
-			'#(^|[\s>])aim:([^,<\s]+)#i',
-			'#(^|[\s>])icq:(\d+)#i',
-			'#(^|[\s>])www\.'.$pattern_domain.'((?:/[^<\s]*)?[^.,\s])#i',
-			'#(^|[\s>])([a-z0-9\-_.]+?)@'.$pattern_domain.'([^.,<\s]+)#i', ),
-		array( '$1<a href="$2://$3">$2://$3</a>',
-			'$1<a href="aim:goim?screenname=$2$3'.$moredelim.'message='.rawurlencode(T_('Hello')).'">$2$3</a>',
-			'$1<a href="http://wwp.icq.com/scripts/search.dll?to=$2">$2</a>',
-			'$1<a href="http://www.$2$3$4">www.$2$3$4</a>',
-			'$1<a href="mailto:$2@$3$4">$2@$3$4</a>', ),
+		array( '#(^|[\s>\(]|\[url=)(https?|mailto)://([^<>{}\s]+[^.,<>{}\s\]\)])#i',
+			'#(^|[\s>\(]|\[url=)aim:([^,<\s\]\)]+)#i',
+			'#(^|[\s>\(]|\[url=)icq:(\d+)#i',
+			'#(^|[\s>\(]|\[url=)www\.'.$pattern_domain.'((?:/[^<\s]*)?[^.,\s\]\)])#i',
+			'#(^|[\s>\(]|\[url=)([a-z0-9\-_.]+?)@'.$pattern_domain.'([^.,<\s\]\)]+)#i', ),
+		array( '$1<a href="$2://$3"'.$additional_attrs.'>$2://$3</a>',
+			'$1<a href="aim:goim?screenname=$2$3'.$moredelim.'message='.rawurlencode(T_('Hello')).'"'.$additional_attrs.'>$2$3</a>',
+			'$1<a href="http://wwp.icq.com/scripts/search.dll?to=$2"'.$additional_attrs.'>$2</a>',
+			'$1<a href="http://www.$2$3$4"'.$additional_attrs.'>www.$2$3$4</a>',
+			'$1<a href="mailto:$2@$3$4"'.$additional_attrs.'>$2@$3$4</a>', ),
 		$text );
 
 	return $text;
@@ -989,19 +1090,26 @@ function date2mysql( $ts )
  * Convert a MYSQL date to a UNIX timestamp.
  *
  * @param string Date formatted as "Y-m-d H:i:s"
+ * @param boolean true to use GM time
  * @return integer UNIX timestamp
  */
-function mysql2timestamp( $m )
+function mysql2timestamp( $m, $useGM = false )
 {
-	return mktime(substr($m,11,2),substr($m,14,2),substr($m,17,2),substr($m,5,2),substr($m,8,2),substr($m,0,4));
+	$func = $useGM ? 'gmmktime' : 'mktime';
+	return $func(substr($m,11,2),substr($m,14,2),substr($m,17,2),substr($m,5,2),substr($m,8,2),substr($m,0,4));
 }
 
 /**
  * Convert a MYSQL date -- WITHOUT the time -- to a UNIX timestamp
+ *
+ * @param string Date formatted as "Y-m-d"
+ * @param boolean true to use GM time
+ * @return integer UNIX timestamp
  */
-function mysql2datestamp( $m )
+function mysql2datestamp( $m, $useGM = false )
 {
-	return mktime( 0, 0, 0, substr($m,5,2), substr($m,8,2), substr($m,0,4) );
+	$func = $useGM ? 'gmmktime' : 'mktime';
+	return $func( 0, 0, 0, substr($m,5,2), substr($m,8,2), substr($m,0,4) );
 }
 
 /**
@@ -1171,6 +1279,120 @@ function date_sprintf_callback( $matches )
 }
 
 
+/**
+ * Get date name when date was happened
+ *
+ * @param integer Timestamp
+ * @return string Name of date (Today, Yesterday, x days ago, x months ago, x years ago)
+ */
+function date_ago( $timestamp )
+{
+	global $servertimenow;
+
+	$days = floor( ( $servertimenow - $timestamp ) / 86400 );
+	$months = ceil( $days / 31 );
+
+	if( $days < 1 )
+	{	// Today
+		return T_('Today');
+	}
+	elseif( $days == 1 )
+	{	// Yesterday
+		return T_('Yesterday');
+	}
+	elseif( $days > 1 && $days <= 31 )
+	{	// Days
+		return sprintf( T_('%s days ago'), $days );
+	}
+	elseif( $days > 31 && $months <= 12 )
+	{	// Months
+		return sprintf( $months == 1 ? T_('%s month ago') : T_('%s months ago'), $months );
+	}
+	else
+	{	// Years
+		$years = floor( $months / 12 );
+		return sprintf( $years == 1 ? T_('%s year ago') : T_('%s years ago'), $years );
+	}
+}
+
+
+/**
+ * Convert seconds to readable period
+ *
+ * @param integer Seconds
+ * @return string Readable time period
+ */
+function seconds_to_period( $seconds )
+{
+	$periods = array(
+		array( 31536000, T_('1 year'),   T_('%s years') ), // 365 days
+		array( 2592000,  T_('1 month'),  T_('%s months') ), // 30 days
+		array( 86400,    T_('1 day'),    T_('%s days') ),
+		array( 3600,     T_('1 hour'),   T_('%s hours') ),
+		array( 60,       T_('1 minute'), T_('%s minutes') ),
+		array( 1,        T_('1 second'), T_('%s seconds') ),
+	);
+
+	foreach( $periods as $p_info )
+	{
+		$period_value = intval( $seconds / $p_info[0] * 10 ) /10;
+		if( $period_value >= 1 )
+		{ // Stop on this period
+			if( $period_value == 1 )
+			{ // One unit of period
+				$period_text = $p_info[1];
+			}
+			else
+			{ // Two and more units of period
+				$period_text = sprintf( $p_info[2], $period_value );
+			}
+			break;
+		}
+	}
+
+	if( !isset( $period_text ) )
+	{ // 0 seconds
+		$period_text = sprintf( T_('%s seconds'), 0 );
+	}
+
+	return $period_text;
+}
+
+
+/**
+ * Converts an ISO 8601 date to MySQL DateTime format.
+ *
+ * @param string date and time in ISO 8601 format {@link http://en.wikipedia.org/wiki/ISO_8601}.
+ * @return string date and time in MySQL DateTime format Y-m-d H:i:s.
+ */
+function iso8601_to_datetime( $iso_date )
+{
+	return preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})(Z|[\+|\-][0-9]{2,4}){0,1}#', '$1-$2-$3 $4:$5:$6', $iso_date);
+}
+
+
+/**
+ * Converts a MySQL DateTime to ISO 8601 date format.
+ *
+ * @param string date and time in MySQL DateTime format Y-m-d H:i:s
+ * @return string date and time in ISO 8601 format {@link http://en.wikipedia.org/wiki/ISO_8601}.
+ */
+function datetime_to_iso8601( $datetime, $useGM = false )
+{
+	$iso_date = mysql2date('U', $datetime);
+
+	if( $useGM )
+	{
+		$iso_date = gmdate('Ymd', $iso_date).'T'.gmdate('H:i:s', $iso_date);
+	}
+	else
+	{
+		$iso_date = date('Ymd', $iso_date).'T'.date('H:i:s', $iso_date);
+	}
+
+	return $iso_date;
+}
+
 
 /**
  *
@@ -1242,6 +1464,40 @@ function remove_seconds($timestamp, $format = 'Y-m-d H:i')
 
 
 /**
+ * Convert from seconds to months, days, hours, minutes and seconds
+ *
+ * @param integer duration in seconds
+ * @result array of [ months, days, hours, minutes, seconds ]
+ */
+function get_duration_fields( $duration )
+{
+	$result = array();
+	$month_seconds = 2592000; // 1 month
+	$months = floor( $duration / $month_seconds );
+	$duration = $duration - $months * $month_seconds;
+	$result[ 'months' ] = $months;
+
+	$day_seconds = 86400; // 1 day
+	$days = floor( $duration / $day_seconds );
+	$duration = $duration - $days * $day_seconds;
+	$result[ 'days' ] = $days;
+
+	$hour_seconds = 3600; // 1 hour
+	$hours = floor( $duration / $hour_seconds );
+	$duration = $duration - $hours * $hour_seconds;
+	$result[ 'hours' ] = $hours;
+
+	$minute_seconds = 60; // 1 minute
+	$minutes = floor( $duration / $minute_seconds );
+	$duration = $duration - $minutes * $minute_seconds;
+	$result[ 'minutes' ] = $minutes;
+
+	$result[ 'seconds' ] = $duration;
+	return $result;
+}
+
+
+/**
  * Validate variable
  *
  * @param string param name
@@ -1264,7 +1520,7 @@ function param_validate( $variable, $validator, $required = false, $custom_msg =
 	{	// Variable not set, we cannot handle this using the validator function...
 		if( $required )
 		{	// Add error:
-			param_check_not_empty( $variable );
+			param_check_not_empty( $variable, $custom_msg );
 			return false;
 		}
 
@@ -1437,7 +1693,59 @@ function is_word( $word )
 
 
 /**
- * Check if the login is valid
+ * Check if the login is valid (in terms of allowed chars)
+ *
+ * @param string login
+ * @return boolean true if OK
+ */
+function is_valid_login( $login, $force_strict_logins = false )
+{
+	global $Settings;
+
+	$strict_logins = $Settings->get('strict_logins');
+
+	// NOTE: in some places usernames are typed in by other users (messaging) or admins.
+	// Having cryptic logins with hard to type letters is a PITA.
+
+	// Step 1
+	// Forbid the following characters in logins
+	if( preg_match( '~[\'"><@\s]~', $login ) )
+	{	// WARNING: allowing ' or " or > or < will open security issues!
+		// NOTE: allowing @ will make some "average" users use their email address (not good for their spam health)
+		// NOTE: we do not allow whitespace in logins
+		return false;
+	}
+
+	// Step 2
+	if( ($strict_logins || $force_strict_logins) && ! preg_match( '~^[A-Za-z0-9_.]+$~', $login ) )
+	{	// WARNING: allowing special chars like latin 1 accented chars ( \xDF-\xF6\xF8-\xFF ) will create issues with
+		// user media directory names (tested on Max OS X) -- Do no allow any of this until we have a clean & safe media dir name generator.
+
+		// fp> TODO: check why a dash '-' prevents renaming the fileroot
+		return false;
+	}
+	elseif( ! $strict_logins )
+	{	// We allow any character that is not explicitly forbidden in Step 1
+		// Enforce additional limitations
+		$login = preg_replace( '|%([a-fA-F0-9][a-fA-F0-9])|', '', $login ); // Kill octets
+		$login = preg_replace( '/&.+?;/', '', $login ); // Kill entities
+	}
+
+	// Step 3
+	// Special case, the login is valid however we forbid it's usage.
+	// param_check_valid_login() will display a special error message in this case.
+	if( preg_match( '~^usr_~', $login ) )
+	{	// Logins cannot start with 'usr_', this prefix is reserved for system use
+		// We create user media directories for users with non-ASCII logins in format /media/users/usr_55/, where 55 is user ID
+		return 'usr';
+	}
+
+	return true;
+}
+
+
+/**
+ * Check if the login is valid (user exists)
  *
  * @param string login
  * @return boolean true if OK
@@ -1648,25 +1956,24 @@ function xmlrpc_logresult( $result, & $message_Log, $log_payload = true )
 		return false;
 	}
 
-	// We got a response:
-	$val = $result->value();
-	$value = xmlrpc_decode_recurse($result->value());
-
-	if( is_array($value) )
-	{
-		$out = '';
-		foreach($value as $l_value)
-		{
-			$out .= ' ['.$l_value.'] ';
-		}
-	}
-	else
-	{
-		$out = $value;
-	}
-
 	if( $log_payload )
 	{
+		// We got a response:
+		$value = xmlrpc_decode_recurse($result->value());
+
+		if( is_array($value) )
+		{
+			$out = '';
+			foreach($value as $l_value)
+			{
+				$out .= ' ['.var_export($l_value, true).'] ';
+			}
+		}
+		else
+		{
+			$out = $value;
+		}
+
 		$message_Log->add( T_('Response').': '.$out, 'success' );
 	}
 
@@ -2170,14 +2477,81 @@ function bad_request_die( $additional_info = '' )
  */
 function debug_info( $force = false, $force_clean = false )
 {
-	global $debug, $debug_done, $Debuglog, $DB, $obhandler_debug, $Timer, $ReqHost, $ReqPath, $is_cli;
+	global $debug, $debug_done, $debug_jslog, $debug_jslog_done, $Debuglog, $DB, $obhandler_debug, $Timer, $ReqHost, $ReqPath, $is_cli;
 	global $cache_imgsize, $cache_File;
 	global $Session;
-	global $db_config, $tableprefix, $http_response_code;
+	global $db_config, $tableprefix, $http_response_code, $disp, $disp_detail, $robots_index, $robots_follow, $content_type_header;
 	/**
 	 * @var Hit
 	 */
 	global $Hit;
+
+	// Detect content-type
+	$content_type = NULL;
+	foreach(headers_list() as $header)
+	{
+		if( stripos($header, 'content-type:') !== false )
+		{ // content type sent
+			# "Content-Type:text/html;charset=utf-8" => "text/html"
+			$content_type = trim(array_shift(explode(';', array_pop(explode(':', $header, 2)))));
+			break;
+		}
+	}
+
+	// ---- Print AJAX Log
+	if( empty( $debug_jslog_done ) && ( $debug || $debug_jslog ) && $content_type == 'text/html' )
+	{	// Display debug jslog once
+		global $rsc_url, $app_version;
+
+		echo '<script type="text/javascript" src="'.$rsc_url.'js/debug_jslog.js"></script>';
+		echo '<script type="text/javascript" src="'.$rsc_url.'js/jquery/jquery.cookie.min.js"></script>';
+		$jquery_ui_css_url = url_add_param( $rsc_url.'css/jquery/smoothness/jquery-ui.css', 'v='.$app_version );
+		echo '<link href="'.$jquery_ui_css_url.'" type="text/css" rel="stylesheet" />';
+
+		$jslog_style_cookies = param_cookie( 'jslog_style', 'string' );
+		$jslog_styles = array();
+		if( !empty( $jslog_style_cookies ) )
+		{	// Get styles only from cookies
+			$jslog_style_cookies = explode( ';', $jslog_style_cookies );
+			foreach( $jslog_style_cookies as $jsc => $style )
+			{
+				if( strpos( $style, 'height' ) !== false /*|| ( strpos( $style, 'display' ) !== false && !$debug_jslog )*/ )
+				{	// Unset the height param from defined styles ( and the display param if jslog is disabled )
+					unset( $jslog_style_cookies[$jsc] );
+				}
+			}
+			$jslog_styles[] = implode( ';', $jslog_style_cookies );
+		}
+		else
+		{
+			if( !is_logged_in() )
+			{	// Align top when evobar is hidden
+				$jslog_styles[] = 'top:0';
+			}
+			if( $debug_jslog )
+			{	// Display the jslog
+				$jslog_styles[] = 'display:block';
+			}
+		}
+		$jslog_styles = count( $jslog_styles ) > 0 ? ' style="'.implode( ';', $jslog_styles ).'"' : '';
+
+		$close_url = url_add_param( $_SERVER['REQUEST_URI'], 'jslog' );
+		echo '<div id="debug_ajax_info" class="debug"'.$jslog_styles.'>';
+		echo '<div class="jslog_titlebar">'.
+				T_('AJAX Debug log').
+				get_manual_link('ajax_debug_log').
+				action_icon( T_('Close'), 'close', $close_url, NULL, NULL, NULL, array( 'class' => 'jslog_switcher' ) ).
+			'</div>';
+		echo '<div id="jslog_container"></div>';
+		echo '<div class="jslog_statusbar">'.
+				'<a href="'.$_SERVER['REQUEST_URI'].'#" class="jslog_clear">'.T_('Clear').'</a>'.
+			'</div>';
+		echo '</div>';
+
+		// Make sure debug jslog output only happens once:
+		$debug_jslog_done = true;
+	}
+	// ----
 
 	if( !$force )
 	{
@@ -2194,16 +2568,6 @@ function debug_info( $force = false, $force_clean = false )
 		// Do not display, if no content-type header has been sent or it's != "text/html" (debug > 1 skips this)
 		if( $debug < 2 )
 		{
-			$content_type = NULL;
-			foreach(headers_list() as $header)
-			{
-				if( stripos($header, 'content-type:') !== false )
-				{ // content type sent
-					# "Content-Type:text/html;charset=utf-8" => "text/html"
-					$content_type = trim(array_shift(explode(';', array_pop(explode(':', $header, 2)))));
-					break;
-				}
-			}
 			if( $content_type != 'text/html' )
 			{
 				return;
@@ -2235,6 +2599,39 @@ function debug_info( $force = false, $force_clean = false )
 
 	if( !$obhandler_debug )
 	{ // don't display changing items when we want to test obhandler
+
+		// ---------------------------
+
+		echo '<div class="log_container"><div>';
+
+		echo 'HTTP Response code: '.$http_response_code;
+		echo $clean ? "\n" : '<br />';
+
+		echo '$content_type_header: '.$content_type_header;
+		echo $clean ? "\n" : '<br />';
+
+		echo '$disp: '.$disp.' -- detail: '.$disp_detail;
+		echo $clean ? "\n" : '<br />';
+
+		echo '$robots_index: '.$robots_index;
+		echo $clean ? "\n" : '<br />';
+
+		echo '$robots_follow: '.$robots_follow;
+		echo $clean ? "\n" : '<br />';
+
+		echo '</div></div>';
+
+		// ================================== DB Summary ================================
+		if( isset($DB) )
+		{
+			echo '<div class="log_container"><div>';
+			echo $DB->num_queries.' SQL queries executed in '.$Timer->get_duration( 'SQL QUERIES' )." seconds\n";
+			if( ! $clean )
+			{
+				echo ' &nbsp; <a href="'.$ReqHostPathQuery.'#evo_debug_queries">scroll down to details</a><p>';
+			}
+			echo '</div></div>';
+		}
 
 		// ========================== Timer table ================================
 		$time_page = $Timer->get_duration( 'total' );
@@ -2274,7 +2671,7 @@ function debug_info( $force = false, $force_clean = false )
 			// Output "total":
 			echo "\n<tfoot><tr>"
 				.'<td>total</td>'
-				.'<td class="right">'.$total_time.'</td>'
+				.'<td class="right red">'.$total_time.'</td>'
 				.'<td class="right">'.$percent_total.'%</td>'
 				.'<td class="right">'.$Timer->get_count('total').'</td></tr></tfoot>';
 
@@ -2336,33 +2733,28 @@ function debug_info( $force = false, $force_clean = false )
 			<script type="text/javascript">
 			(function($){
 				var clicked_once;
-				$("table.debug_timer th").click( function(event) {
+				jQuery("table.debug_timer th").click( function(event) {
 					if( clicked_once ) return; else clicked_once = true;
-					$("#evo-debuglog-timer-long tr").appendTo($("table.debug_timer tbody")[0]);
-					$("#evo-debuglog-timer-long-header").remove();
+					jQuery("#evo-debuglog-timer-long tr").appendTo(jQuery("table.debug_timer tbody")[0]);
+					jQuery("#evo-debuglog-timer-long-header").remove();
 					// click for tablesorter:
-					$("table.debug_timer").tablesorter();
+					jQuery("table.debug_timer").tablesorter();
 					jQuery(event.currentTarget).click();
 				});
 			})(jQuery);
 			</script>';
 		}
 
-		// ================================== DB Summary ================================
-		if( isset($DB) )
-		{
-			echo $DB->num_queries.' SQL queries executed in '.$Timer->get_duration( 'SQL QUERIES' )." seconds\n";
-			if( ! $clean )
-			{
-				echo ' &nbsp; <a href="'.$ReqHostPathQuery.'#evo_debug_queries">scroll down to details</a><p>';
-			}
-		}
 
 		// ================================ Opcode caching ================================
+		echo '<div class="log_container"><div>';
 		echo 'Opcode cache: '.get_active_opcode_cache();
 		echo $clean ? "\n" : '<p>';
+		echo '</div></div>';
 
 		// ================================ Memory Usage ================================
+		echo '<div class="log_container"><div>';
+
 		foreach( array( // note: 8MB is default for memory_limit and is reported as 8388608 bytes
 			'memory_get_usage' => array( 'display' => 'Memory usage', 'high' => 8000000 ),
 			'memory_get_peak_usage' /* PHP 5.2 */ => array( 'display' => 'Memory peak usage', 'high' => 8000000 ) ) as $l_func => $l_var )
@@ -2391,11 +2783,8 @@ function debug_info( $force = false, $force_clean = false )
 		echo 'Len of serialized $cache_File: '.strlen(serialize($cache_File));
 		echo $clean ? "\n" : '<br />';
 
+		echo '</div></div>';
 	}
-
-
-	echo 'HTTP Response code: '.$http_response_code;
-	echo $clean ? "\n" : '<br />';
 
 
 	// DEBUGLOG(s) FROM PREVIOUS SESSIONS, after REDIRECT(s) (with list of categories at top):
@@ -2520,11 +2909,11 @@ function debug_info( $force = false, $force_clean = false )
 			echo '<pre>';
 		}
 
-		echo T_('DB Username').': '.$db_config['user']."\n".
-			 T_('DB Database').': '.$db_config['name']."\n".
-			 T_('DB Host').': '.(isset($db_config['host']) ? $db_config['host'] : 'unset (localhost)')."\n".
-			 T_('DB tables prefix').': '.$tableprefix."\n".
-			 T_('DB connection charset').': '.$db_config['connection_charset']."\n";
+		echo 'Config DB Username: '.$db_config['user']."\n".
+			'Config DB Database: '.$db_config['name']."\n".
+			 'Config DB Host: '.(isset($db_config['host']) ? $db_config['host'] : 'unset (localhost)')."\n".
+			 'Config DB tables prefix: '.$tableprefix."\n".
+			 'Config DB connection charset: '.$db_config['connection_charset']."\n";
 
 		echo $clean ? "\n" : '</pre>';
 	}
@@ -2535,6 +2924,8 @@ function debug_info( $force = false, $force_clean = false )
 	}
 	else
 	{
+		echo '<pre>Current DB charset: '.$DB->connection_charset."</pre>\n";
+
 		$DB->dump_queries( ! $clean );
 	}
 
@@ -2602,43 +2993,103 @@ function mail_encode_header_string( $header_str, $mode = 'Q' )
 
 
 /**
- * Sends a mail, wrapping PHP's mail() function.
+ * Get setting's value from General or User's settings
+ *
+ * @param integer User ID
+ * @param string Setting ( email | name )
+ * @return string Setting's value
+ */
+function user_get_notification_sender( $user_ID, $setting )
+{
+	global $Settings;
+
+	$setting_name = 'notification_sender_'.$setting;
+
+	if( empty( $user_ID ) )
+	{	// Get value from general settings
+		return $Settings->get( $setting_name );
+	}
+
+	$UserCache = & get_UserCache();
+	if( $User = & $UserCache->get_by_ID( $user_ID ) )
+	{
+		if( $User->check_status( 'is_validated' ) )
+		{	// User is Activated or Autoactivated
+			global $UserSettings;
+			if( $UserSettings->get( $setting_name, $user_ID ) == '' )
+			{	// The user's setting is not defined yet
+				// Update the user's setting from general setting
+				$UserSettings->set( $setting_name, $Settings->get( $setting_name ), $user_ID );
+				$UserSettings->dbupdate();
+			}
+			else
+			{	// User has a defined setting; Use this
+				return $UserSettings->get( $setting_name, $user_ID );
+			}
+		}
+	}
+
+	return $Settings->get( $setting_name );
+}
+
+
+/**
+ * Sends an email, wrapping PHP's mail() function.
+ * ALL emails sent by b2evolution must be sent through this function (for consistency and for logging)
  *
  * {@link $current_locale} will be used to set the charset.
  *
- * Note: we use a single \n as line ending, though it does not comply to
- * {@link http://www.faqs.org/rfcs/rfc2822 RFC2822}, but seems to be safer,
+ * Note: we use a single \n as line ending, though it does not comply to {@link http://www.faqs.org/rfcs/rfc2822 RFC2822}, but seems to be safer,
  * because some mail transfer agents replace \n by \r\n automatically.
  *
  * @todo Unit testing with "nice addresses" This gets broken over and over again.
  *
- * @param string Recipient email address. (Caould be multiple comma-separated addresses.)
- * @param string Recipient name. (Only use if sending to a single address)
+ * @param string Recipient email address.
+ * @param string Recipient name.
  * @param string Subject of the mail
  * @param string The message text
- * @param string From address, being added to headers (we'll prevent injections);
- *               see {@link http://securephp.damonkohler.com/index.php/Email_Injection}.
- *               Defaults to {@link $notify_from} if NULL.
+ * @param string From address, being added to headers (we'll prevent injections); see {@link http://securephp.damonkohler.com/index.php/Email_Injection}.
+ *               Defaults to {@link GeneralSettings::get('notification_sender_email') } if NULL.
  * @param string From name.
  * @param array Additional headers ( headername => value ). Take care of injection!
+ * @param integer User ID
  * @return boolean True if mail could be sent (not necessarily delivered!), false if not - (return value of {@link mail()})
  */
-function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name = NULL, $headers = array() )
+function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name = NULL, $headers = array(), $user_ID = NULL )
 {
-	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $notify_from;
+	// Stop a request from the blocked IP addresses
+	antispam_block_ip();
+
+	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $Settings, $demo_mode;
+
+	// Memorize email address
+	$to_email_address = $to;
 
 	$NL = "\r\n";
+
+	if( $demo_mode )
+	{ // Debug mode restriction: Sending email in debug mode is not allowed
+		return false;
+	}
 
 	if( !is_array( $headers ) )
 	{ // Make sure $headers is an array
 		$headers = array( $headers );
 	}
 
-	if( empty($from) )
+	if( empty( $from ) )
 	{
-		$from = $notify_from;
+		$from = user_get_notification_sender( $user_ID, 'email' );
 	}
 
+	if( empty( $from_name ) )
+	{
+		$from_name = user_get_notification_sender( $user_ID, 'name' );
+	}
+
+	$return_path = $Settings->get( 'notification_return_path' );
+
+	// Add real name into $from...
 	if( ! is_windows() )
 	{	// fplanque: Windows XP, Apache 1.3, PHP 4.4, MS SMTP : will not accept "nice" addresses.
 		if( !empty( $to_name ) )
@@ -2654,9 +3105,14 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	$from = mail_sanitize_header_string( $from, true );
 	// From has to go into headers
 	$headers['From'] = $from;
+	if( !empty( $return_path ) )
+	{	// Set a return path
+		$headers['Return-Path'] = $return_path;
+	}
 
 	// echo 'sending email to: ['.htmlspecialchars($to).'] from ['.htmlspecialchars($from).']';
 
+	$clear_subject = $subject;
 	$subject = mail_encode_header_string($subject);
 
 	$message = str_replace( array( "\r\n", "\r" ), $NL, $message );
@@ -2665,14 +3121,21 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	// fp> why do we actually convert to $current_charset?
 	// dh> I do not remember. Appears to make sense sending it unconverted in $evo_charset.
 	$message = convert_charset( $message, $current_charset, $evo_charset );
-	// Specify charset and content-type of email
-	$headers['Content-Type'] = 'text/plain; charset='.$current_charset;
+
+	if( !isset( $headers['Content-Type'] ) )
+	{	// Specify charset and content-type of email
+		$headers['Content-Type'] = 'text/plain; charset='.$current_charset;
+	}
+	$headers['MIME-Version'] = '1.0';
 
 
 	// ADDITIONAL HEADERS:
 	$headers['X-Mailer'] = $app_name.' '.$app_version.' - PHP/'.phpversion();
-	$headers['X-Remote-Addr'] = implode( ',', get_ip_list() );
-
+	$ip_list = implode( ',', get_ip_list() );
+	if( !empty( $ip_list ) )
+	{ // Add X-Remote_Addr param only if its value is not empty
+		$headers['X-Remote-Addr'] = $ip_list;
+	}
 
 	// COMPACT HEADERS:
 	$headerstring = '';
@@ -2682,27 +3145,274 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		$headerstring .= $lKey.': '.$lValue.$NL;
 	}
 
+	// Set an additional parameter for the return path:
+	if( !empty($return_path) )
+	{
+		$additional_parameters = '-r '.$return_path;
+	}
+	else
+	{
+		$additional_parameters = '';
+	}
+
+	if( mail_is_blocked( $to_email_address ) )
+	{ // Check if the email address is blocked
+		$Debuglog->add( 'Sending mail to &laquo;'.htmlspecialchars( $to_email_address ).'&raquo; FAILED, because this email marked with spam or permanent errors.', 'error' );
+
+		mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'blocked' );
+
+		return false;
+	}
+
 	// SEND MESSAGE:
 	if( $debug > 1 )
 	{	// We agree to die for debugging...
-		if( ! mail( $to, $subject, $message, $headerstring ) )
+		if( ! mail( $to, $subject, $message, $headerstring, $additional_parameters ) )
 		{
-			debug_die( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.' );
+			mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error' );
+
+			debug_die( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.', 'error' );
 		}
 	}
 	else
 	{	// Soft debugging only....
-		if( ! @mail( $to, $subject, $message, $headerstring ) )
+		if( ! @mail( $to, $subject, $message, $headerstring, $additional_parameters ) )
 		{
 			$Debuglog->add( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.', 'error' );
+
+			mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error' );
+
 			return false;
 		}
 	}
 
 	$Debuglog->add( 'Sent mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo;.' );
+
+	mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'ok' );
+
 	return true;
 }
 
+
+/**
+ * Sends an email to User
+ *
+ * @param integer Recipient ID.
+ * @param string Subject of the mail
+ * @param string Email template name
+ * @param array Email template params
+ * @param boolean Force to send this email even if the user is not activated. By default not activated user won't get emails.
+ *                Pasword reset, and account activation emails must be always forced.
+ * @param array Additional headers ( headername => value ). Take care of injection!
+ * @return boolean True if mail could be sent (not necessarily delivered!), false if not - (return value of {@link mail()})
+ */
+function send_mail_to_User( $user_ID, $subject, $template_name, $template_params = array(), $force_on_non_activated = false, $headers = array() )
+{
+	global $UserSettings, $current_charset;
+
+	$UserCache = & get_UserCache();
+	if( $User = $UserCache->get_by_ID( $user_ID ) )
+	{
+		if( !$User->check_status( 'can_receive_any_message' ) )
+		{ // user status doesn't allow to receive nor emails nor private messages
+			return false;
+		}
+
+		if( !( $User->check_status( 'is_validated' ) || $force_on_non_activated ) )
+		{ // user is not activated and non activated users should not receive emails, unless force_on_non_activated is turned on
+			return false;
+		}
+
+		// UserSettings update is not required yet
+		$update_settings = false;
+		// Check if a new email to User with the corrensponding email type is allowed
+		switch( $template_name )
+		{
+			case 'validate_account_easy':
+				 if( !$template_params['is_reminder'] )
+				 { // this is not a notification email
+				 	break;
+				 }
+			case 'notify_message':
+			case 'unread_message_reminder':
+			case 'notify_post':
+			case 'notify_comment':
+			case 'user_activated':
+			case 'close_account':
+			case 'user_reported':
+				// this is a notificaiton email
+				if( !check_allow_new_email( 'notification_email_limit', 'last_notification_email', $User->ID ) )
+				{ // more notification email is not allowed today
+					return false;
+				}
+				$update_settings = true;
+				break;
+			case 'newsletter':
+				// this is a newsletter email
+				if( !check_allow_new_email( 'newsletter_limit', 'last_newsletter', $User->ID ) )
+				{ // more newsletter email is not allowed today
+					return false;
+				}
+				$update_settings = true;
+				break;
+		}
+
+		// Update notification sender's info from General settings
+		$User->update_sender();
+
+		switch( $UserSettings->get( 'email_format', $User->ID ) )
+		{	// Set Content-Type from user's setting "Email format"
+			case 'auto':
+				$template_params['boundary'] = 'b2evo-'.md5( rand() );
+				$headers['Content-Type'] = 'multipart/mixed; boundary="'.$template_params['boundary'].'"';
+				break;
+			case 'html':
+				$headers['Content-Type'] = 'text/html; charset='.$current_charset;
+				break;
+			case 'text':
+				$headers['Content-Type'] = 'text/plain; charset='.$current_charset;
+				break;
+		}
+
+		// Get a message text from template file
+		$message = mail_template( $template_name, $UserSettings->get( 'email_format', $User->ID ), $template_params, $User );
+
+		// Autoinsert user's data
+		$subject = mail_autoinsert_user_data( $subject, $User );
+		$message = mail_autoinsert_user_data( $message, $User );
+
+		if( send_mail( $User->email, NULL, $subject, $message, NULL, NULL, $headers, $user_ID ) )
+		{ // email was sent, update last email settings;
+			if( $update_settings )
+			{ // User Settings need to be updated
+				$UserSettings->dbupdate();
+			}
+			return true;
+		}
+	}
+
+	// No user or email could not be sent
+	return false;
+}
+
+
+/**
+ * Autoinsert user's data into subject or message of the email
+ *
+ * @param string Text
+ * @param object User
+ * @return string Text
+*/
+function mail_autoinsert_user_data( $text, $User = NULL )
+{
+	if( !$User )
+	{	// No user
+		return $text;
+	}
+
+	$rpls_from = array( '$login$' , '$email$', '$user_ID$', '$unsubscribe_key$' );
+	$rpls_to = array( $User->login, $User->email, $User->ID, md5( $User->ID.$User->unsubscribe_key ) );
+
+	return str_replace( $rpls_from, $rpls_to, $text );
+}
+
+
+/**
+ * Get a mail message text by template name
+ *
+ * @param string Template name
+ * @param string Email format ( auto | html | text )
+ * @param array Params
+ * @param object User
+ * @return string Mail message
+ */
+function mail_template( $template_name, $format = 'auto', $params = array(), $User = NULL )
+{
+	global $emailskins_path, $current_charset, $is_admin_page;
+
+	$value_is_admin_page = $is_admin_page;
+	// Set TRUE to use gender settings from back office
+	$is_admin_page = true;
+
+	// Set extension of template
+	$template_exts = array();
+	switch( $format )
+	{
+		case 'auto':
+			// $template_exts['non-mime'] = '.txt.php'; // The area that is ignored by MIME-compliant clients
+			$template_exts['html'] = '.html.php';
+			$template_exts['text'] = '.txt.php';
+			$boundary = $params['boundary'];
+			$boundary_alt = 'b2evo-alt-'.md5( rand() );
+			$template_headers = array(
+					'html' => 'Content-Type: text/html; charset='.$current_charset,
+					'text' => 'Content-Type: text/plain; charset='.$current_charset,
+				);
+			break;
+
+		case 'html':
+			$template_exts['html'] = '.html.php';
+			break;
+
+		case 'text':
+			$template_exts['text'] = '.txt.php';
+			break;
+	}
+
+	$template_message = '';
+
+	if( isset( $boundary, $boundary_alt ) )
+	{	// Start new boundary content
+		$template_message .= "\n".'--'.$boundary."\n";
+		$template_message .= 'Content-Type: multipart/alternative; boundary="'.$boundary_alt.'"'."\n\n";
+	}
+
+	foreach( $template_exts as $format => $ext )
+	{
+		if( isset( $boundary, $boundary_alt ) && $format != 'non-mime' )
+		{	// Start new boundary alt content
+			$template_message .= "\n".'--'.$boundary_alt."\n";
+		}
+
+		if( isset( $template_headers[ $format ] ) )
+		{	// Header data for each content
+			$template_message .= $template_headers[ $format ]."\n\n";
+		}
+
+		// Get mail template
+		ob_start();
+		$template_header = $emailskins_path.'_header.inc'.$ext;
+		if( @file_exists( $template_header ) )
+		{	// Include message header if it exists
+			require $template_header;
+		}
+
+		$template_body = $emailskins_path.$template_name.$ext;
+		if( @file_exists( $template_body ) )
+		{	// Include message body text if it exists
+			require $template_body;
+		}
+
+		$template_message .= ob_get_contents();
+		ob_end_clean();
+
+		if( $format == 'html' && !empty( $User ) )
+		{	// Replace login with gender colored link + icon
+			$template_message = str_replace( '$login$', $User->get_colored_login( array( 'mask' => '$avatar$ $login$' ) ), $template_message );
+		}
+	}
+
+	if( isset( $boundary, $boundary_alt ) )
+	{	// End all boundary contents
+		$template_message .= "\n".'--'.$boundary_alt.'--'."\n";
+		$template_message .= "\n".'--'.$boundary.'--'."\n";
+	}
+
+	// Return back the value
+	$is_admin_page = $value_is_admin_page;
+
+	return $template_message;
+}
 
 
 /**
@@ -2753,9 +3463,10 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
  *         - 'use_js_popup': if true, the link gets opened as JS popup. You must also pass an "id" attribute for this!
  *         - 'use_js_size': use this to override the default popup size ("500, 400")
  *         - 'class': defaults to 'action_icon', if not set; use "" to not use it
+ * @param array Attributes for the icon
  * @return string The generated action icon link.
  */
-function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $word_weight = NULL, $link_attribs = array() )
+function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $word_weight = NULL, $link_attribs = array(), $icon_attribs = array() )
 {
 	global $UserSettings;
 
@@ -2829,8 +3540,8 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $w
 		unset($link_attribs['use_js_size']);
 	}
 
-	$display_icon = ($icon_weight >= $UserSettings->get('action_icon_threshold'));
-	$display_word = ($word_weight >= $UserSettings->get('action_word_threshold'));
+	$display_icon = empty( $UserSettings ) ? false : ($icon_weight >= $UserSettings->get('action_icon_threshold'));
+	$display_word = empty( $UserSettings ) ? false : ($word_weight >= $UserSettings->get('action_word_threshold'));
 
 	$a_body = '';
 
@@ -2838,7 +3549,11 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $w
 	{	// We MUST display an action icon in order to make the user happy:
 		// OR we default to icon because the user doesn't want the word either!!
 
-		if( $icon_s = get_icon( $icon, 'imgtag', array( 'title'=>$title ), true ) )
+		$icon_attribs = array_merge( array(
+				'title' => $title
+			), $icon_attribs );
+
+		if( $icon_s = get_icon( $icon, 'imgtag', $icon_attribs, true ) )
 		{
 			$a_body .= $icon_s;
 		}
@@ -2867,12 +3582,11 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $w
 			$a_body .= trim( $title, ' .!' );
 		}
 
-		// Add class "un" for icon with text
-// fp>yura: what does "un" mean?
-		$link_attribs['class'] .= ' un';
+		// Add class "hoverlink" for icon with text
+		$link_attribs['class'] .= ' hoverlink';
 	}
 
-	
+
 	// NOTE: We do not use format_to_output with get_field_attribs_as_string() here, because it interferes with the Results class (eval() fails on entitied quotes..) (blueyed)
 	return '<a'.get_field_attribs_as_string( $link_attribs, false ).'>'.$a_body.'</a>';
 }
@@ -2910,12 +3624,12 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 		$Debuglog->add('No image defined for '.var_export( $iconKey, true ).'!', 'icons');
 		return false;
 	}
-	
+
 	if( !isset( $icon['file'] ) && $what != 'imgtag' )
 	{
 		$icon['file'] = 'icons/icons_sprite.png';
 	}
-	
+
 	switch( $what )
 	{
 		case 'rollover':
@@ -3028,10 +3742,17 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			if( ! isset( $icon['file'] ) )
 			{ // Use span tag with sprite instead of img
 				$styles = array();
-				if( isset( $icon['xy'] ) )
+
+				if( isset( $params['xy'] ) )
+				{ // Get background position from params
+					$styles[] = "background-position: ".$params['xy'][0]."px ".$params['xy'][1]."px";
+					unset( $params['xy'] );
+				}
+				else if( isset( $icon['xy'] ) )
 				{ // Set background position in the icons_sprite.png
 					$styles[] = "background-position: -".$icon['xy'][0]."px -".$icon['xy'][1]."px";
 				}
+
 				if( isset( $params['size'] ) )
 				{ // Get sizes from params
 					$icon['size'] = $params['size'];
@@ -3048,6 +3769,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 						$styles[] = "height: ".$icon['size'][1]."px; line-height: ".$icon['size'][1]."px";
 					}
 				}
+
 				if( isset( $params['style'] ) )
 				{ // Get styles from params
 					$styles[] = $params['style'];
@@ -3057,20 +3779,32 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					$params['style'] = implode( '; ', $styles);
 				}
 
-				if( isset( $params['alt'] ) )
-				{
-					$params['title'] = $params['alt'];
-					unset( $params['alt'] );
+				if( ! isset( $params['title'] ) )
+				{	// Use 'alt' for 'title'
+					if( isset( $params['alt'] ) )
+					{
+						$params['title'] = $params['alt'];
+						unset( $params['alt'] );
+					}
+					else if( ! isset( $params['alt'] ) && isset( $icon['alt'] ) )
+					{
+						$params['title'] = $icon['alt'];
+					}
 				}
-				else if( ! isset( $params['alt'] ) && isset( $icon['alt'] ) )
-				{
-					$params['title'] = $icon['alt'];
+
+				if( isset( $params['class'] ) )
+				{	// Get class from params
+					$params['class'] = 'icon '.$params['class'];
+				}
+				else
+				{	// Set default class
+					$params['class'] = 'icon';
 				}
 
 				// Add all the attributes:
 				$params = get_field_attribs_as_string( $params, false );
 
-				$r = '<span class="icon"'.$params.'>&nbsp;</span>';
+				$r = '<span'.$params.'>&nbsp;</span>';
 			}
 			else
 			{ // Use img tag
@@ -3493,17 +4227,27 @@ function format_french_phone( $phone )
  * QUESTION: launch new window with javascript maybe?
  * @param string Topic
  *        The topic should be in a format like [\w]+(/[\w]+)*, e.g features/online_help.
+ * @param string link text, leave it NULL to get link with manual icon
  * @return string
  */
-function get_manual_link( $topic )
+function get_manual_link( $topic, $link_text = NULL )
 {
 	global $Settings, $current_locale, $app_shortname, $app_version;
 
 	if( $Settings->get('webhelp_enabled') )
 	{
-		$manual_url = 'http://manual.b2evolution.net/redirect/'.str_replace(' ','_',strtolower($topic)).'?lang='.$current_locale.'&amp;app='.$app_shortname.'&amp;version='.$app_version;
+		// $manual_url = 'http://manual.b2evolution.net/redirect/'.str_replace(' ','_',strtolower($topic)).'?lang='.$current_locale.'&amp;app='.$app_shortname.'&amp;version='.$app_version;
+		// fp> TODO: this below is a temmporary hack while we work on the new manual:
+		$manual_url = 'http://b2evolution.net/man/'.str_replace('_','-',strtolower($topic));
 
-		$webhelp_link = action_icon( T_('Open relevant page in online manual'), 'manual', $manual_url, T_('Manual'), 5, 1, array( 'target' => '_blank' ) );
+		if( $link_text == NULL )
+		{
+			$webhelp_link = action_icon( T_('Open relevant page in online manual'), 'manual', $manual_url, T_('Manual'), 5, 1, array( 'target' => '_blank', 'style' => 'vertical-align:top' ) );
+		}
+		else
+		{
+			$webhelp_link = '<a href="'.$manual_url.'" target = "_blank">'.$link_text.'</a>';
+		}
 
 		return ' '.$webhelp_link;
 	}
@@ -3558,6 +4302,48 @@ function is_admin_page()
 	global $is_admin_page;
 
 	return isset($is_admin_page) && $is_admin_page === true; // check for type also, because of register_globals!
+}
+
+
+/**
+ * Does the given url require logged in user
+ *
+ * @param string url
+ * @param boolean set true to also check if url is login screen or not
+ * @return boolean
+ */
+function require_login( $url, $check_login_screen )
+{
+	global $Settings;
+	if( preg_match( '#/admin.php([&?].*)?$#', $url ) )
+	{ // admin always require logged in user
+		return true;
+	}
+
+	if( $check_login_screen &&  preg_match( '#/login.php([&?].*)?$#', $url ) )
+	{
+		return true;
+	}
+
+	$disp_names = 'threads|messages|contacts';
+	if( !$Settings->get( 'allow_anonymous_user_list' ) )
+	{
+		$disp_names .= '|users';
+	}
+	if( !$Settings->get( 'allow_anonymous_user_profiles' ) )
+	{
+		$disp_names .= '|user';
+	}
+	if( $check_login_screen )
+	{
+		$disp_names .= '|login';
+	}
+	if( preg_match( '#disp=('.$disp_names.')#', $url ) )
+	{ // $url require logged in user
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -3918,22 +4704,80 @@ function format_to_js( $unformatted )
 
 
 /**
+ * Get available cort oprions for items
+ *
  * @return array key=>name
  */
 function get_available_sort_options()
 {
 	return array(
-		'datestart'    => T_('Date issued (Default)'),
-		'order'        => T_('Order (as explicitly specified)'),
+		'datestart'       => T_('Date issued (Default)'),
+		'order'           => T_('Order (as explicitly specified)'),
 		//'datedeadline' => T_('Deadline'),
-		'title'        => T_('Title'),
-		'datecreated'  => T_('Date created'),
-		'datemodified' => T_('Date last modified'),
-		'urltitle'     => T_('URL "filename"'),
-		'priority'     => T_('Priority'),
-		'views'        => T_('Views'),
+		'title'           => T_('Title'),
+		'datecreated'     => T_('Date created'),
+		'datemodified'    => T_('Date last modified'),
+		'last_touched_ts' => T_('Date last touched'),
+		'urltitle'        => T_('URL "filename"'),
+		'priority'        => T_('Priority'),
+		'views'           => T_('Views'),
+		'RAND'            => T_('Random order!'),
+	);
+}
+
+
+/**
+ * Get available cort oprions for blogs
+ *
+ * @return array key=>name
+ */
+function get_coll_sort_options()
+{
+	return array(
+		'ID'           => T_('Blog ID (Default)'),
+		'name'         => T_('Name'),
+		'shortname'    => T_('Short name'),
+		'tagline'      => T_('Tagline'),
+		'description'  => T_('Description'),
+		'urlname'      => T_('URL "filename"'),
 		'RAND'         => T_('Random order!'),
 	);
+}
+
+
+/**
+ * Converts array to form option list
+ *
+ * @param integer|array selected key
+ * @param boolean provide a choice for "none" with value ''
+ * @return string
+ */
+function array_to_option_list( $array, $default = '', $allow_none = false )
+{
+	if( !is_array( $default ) )
+	{
+		$default = array( $default );
+	}
+
+	$r = '';
+
+	if( $allow_none )
+	{
+		$r .= '<option value="'.$this->none_option_value.'"';
+		if( empty($default) ) $r .= ' selected="selected"';
+		$r .= '>'.format_to_output($this->none_option_text).'</option>'."\n";
+	}
+
+	foreach( $array as $k=>$v )
+	{
+		$r .=  '<option value="'.format_to_output($k,'formvalue').'"';
+		if( in_array( $k, $default ) ) $r .= ' selected="selected"';
+		$r .= '>';
+		$r .= format_to_output( $v, 'htmlbody' );
+		$r .=  '</option>'."\n";
+	}
+
+	return $r;
 }
 
 
@@ -4093,7 +4937,7 @@ function get_active_opcode_cache()
 	{
 		// fp>blueyed? why did you remove the following 2 lines? your comment above is not clear.
 		$apc_info = apc_cache_info( '', true );
-		if( $apc_info['num_entries'] )
+		if( isset( $apc_info['num_entries'] ) && ( $apc_info['num_entries'] ) )
 		{
 			return 'APC';
 		}
@@ -4128,53 +4972,26 @@ function get_active_opcode_cache()
  */
 function invalidate_pagecaches()
 {
-	global $servertimenow, $DB, $Settings;
+	global $DB, $Settings, $servertimenow;
+
+	// get current server time
+	$timestamp = ( empty( $servertimenow ) ? time() : $servertimenow );
 
 	// get all blog ids
-	$blog_ids = $DB->get_col( 'SELECT blog_ID FROM T_blogs' );
-	// build invalidate query
-	$query = 'REPLACE INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value ) VALUES';
-	foreach( $blog_ids as $blog_id )
-	{
-		$query .= ' ('.$blog_id.', "last_invalidation_timestamp", '.$servertimenow.' ),';
+	if( $blog_ids = $DB->get_col( 'SELECT blog_ID FROM T_blogs' ) )
+	{	// build invalidate query
+		$query = 'REPLACE INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value ) VALUES';
+		foreach( $blog_ids as $blog_id )
+		{
+			$query .= ' ('.$blog_id.', "last_invalidation_timestamp", '.$timestamp.' ),';
+		}
+		$query = substr( $query, 0, strlen( $query ) - 1 );
+		$DB->query( $query, 'Invalidate blogs\'s page caches' );
 	}
-	$query = substr( $query, 0, strlen( $query ) - 1 );
-	$DB->query( $query, 'Invalidate blogs\'s page caches' );
 
 	// Invalidate general cache content also
-	$Settings->set( 'last_invalidation_timestamp', $servertimenow );
+	$Settings->set( 'last_invalidation_timestamp', $timestamp );
 	$Settings->dbupdate();
-}
-
-
-/**
- * Get comments awaiting moderation number
- *
- * @todo fp>max please put this into dashboard.funcs
- *
- * @param integer blog ID
- * @return integer
- */
-function get_comments_awaiting_moderation_number( $blog_ID )
-{
-	global $DB;
-
-	$BlogCache = & get_BlogCache();
-	$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
-
-	$sql = 'SELECT COUNT(DISTINCT(comment_ID))
-				FROM T_comments
-					INNER JOIN T_items__item ON comment_post_ID = post_ID ';
-
-	$sql .= 'INNER JOIN T_postcats ON post_ID = postcat_post_ID
-				INNER JOIN T_categories othercats ON postcat_cat_ID = othercats.cat_ID ';
-
-	$sql .= 'WHERE '.$Blog->get_sql_where_aggregate_coll_IDs('othercats.cat_blog_ID');
-	$sql .= ' AND comment_type IN (\'comment\',\'trackback\',\'pingback\') ';
-	$sql .= ' AND comment_status = \'draft\'';
-	$sql .= ' AND '.statuses_where_clause();
-
-	return $DB->get_var( $sql );
 }
 
 
@@ -4268,7 +5085,7 @@ function get_ReqURI()
 		Go to your <a href="<?php echo $baseurl.$install_subdir ?>phpinfo.php">phpinfo page</a>,
 		look for occurences of <code><?php
 		// take the baseurlroot out..
-		echo preg_replace('#^'.$baseurlroot.'#', '', $baseurl.$install_subdir )
+		echo preg_replace('#^'.preg_quote( $baseurlroot, '#' ).'#', '', $baseurl.$install_subdir )
 		?>phpinfo.php</code> and copy all lines
 		containing this to the <a href="http://forums.b2evolution.net">forum</a>. Also specify what webserver
 		you're running on.
@@ -4358,6 +5175,11 @@ function set_max_execution_time( $seconds )
  */
 function sanitize_id_list( $str, $return_array = false, $quote = false )
 {
+	if( is_null($str) )
+	{	// Allow NULL values
+		$str = '';
+	}
+
 	// Explode and trim
 	$array = array_map( 'trim', explode(',', $str) );
 
@@ -4439,7 +5261,47 @@ if ( !function_exists( 'json_encode' ) )
 }
 
 
-if( !function_exists( 'property_exists' ) ) 
+/**
+ * A wrapper for json_encode function
+ * We need to pass valid UTF-8 string to json_encode, otherwise it may return NULL
+ *
+ * @param mixed
+ * @return string
+ */
+function evo_json_encode( $a = false )
+{
+	if( is_string($a) )
+	{	// Convert to UTF-8
+		$a = current_charset_to_utf8($a);
+	}
+	elseif( is_array($a) )
+	{	// Recursively convert to UTF-8
+		array_walk_recursive( $a, 'current_charset_to_utf8' );
+	}
+
+	return json_encode($a);
+}
+
+
+/**
+ * A helper function to conditionally convert a string from current charset to UTF-8
+ *
+ * @param mixed
+ * @return mixed
+ */
+function current_charset_to_utf8( $a )
+{
+	global $current_charset;
+
+	if( is_string($a) && $current_charset != '' && $current_charset != 'utf-8' )
+	{
+		return convert_charset( $a, 'utf-8', $current_charset );
+	}
+	return $a;
+}
+
+
+if( !function_exists( 'property_exists' ) )
 {
 	/**
 	 * Create property_exists function if it does not exist ( PHP < 5.1 )
@@ -4450,17 +5312,17 @@ if( !function_exists( 'property_exists' ) )
 	 */
 	function property_exists( $class, $property )
 	{
-		if( is_object( $class ) ) 
+		if( is_object( $class ) )
 		{
 			$vars = get_object_vars( $class );
-		} 
+		}
 		else
 		{
 			$vars = get_class_vars( $class );
 		}
 		return array_key_exists( $property, $vars );
 	}
-} 
+}
 
 
 // fp>vitaliy: move to a file that is not included everywhere!
@@ -4570,163 +5432,294 @@ if( !function_exists( 'sys_get_temp_dir' ) )
 }
 
 
+/**
+ * Provide inet_pton for older versions of PHP (< 5.1.0 linux & < 5.3.0 windows)
+ *
+ * Converts a human readable IP address to its packed in_addr representation
+ * @param string A human readable IPv4 or IPv6 address
+ * @return string The in_addr representation of the given address, or FALSE if a syntactically invalid address is given (for example, an IPv4 address without dots or an IPv6 address without colons
+ */
+if( !function_exists( 'inet_pton' ) )
+{
+	function inet_pton( $ip )
+	{
+		if( strpos( $ip, '.' ) !== FALSE )
+		{	// IPv4
+			$ip = pack( 'N', ip2long( $ip ) );
+		}
+		elseif( strpos( $ip, ':' ) !== FALSE )
+		{	// IPv6
+			$ip = explode( ':', $ip );
+			$res = str_pad( '', ( 4 * ( 8 - count( $ip ) ) ), '0000', STR_PAD_LEFT );
+			foreach( $ip as $seg )
+			{
+				$res .= str_pad( $seg, 4, '0', STR_PAD_LEFT );
+			}
+			$ip = pack( 'H'.strlen( $res ), $res );
+		}
+		else
+		{	// Invalid IP address
+			$ip = FALSE;
+		}
+
+		return $ip;
+	}
+}
+
+
+/**
+ * Convert integer to IP address
+ *
+ * @param integer Number
+ * @return string IP address
+ */
+function int2ip( $int )
+{
+	$ip = array();
+	$ip[0] = (int) ( $int / 256 / 256 / 256 );
+	$ip[1] = (int) ( ( $int - ( $ip[0] * 256 * 256 * 256 ) ) / 256 / 256 );
+	$ip[2] = (int) ( ( $int - ( $ip[0] * 256 * 256 * 256 ) - ( $ip[1] * 256 * 256 ) ) / 256 );
+	$ip[3] = $int - ( $ip[0] * 256 * 256 * 256 ) - ( $ip[1] * 256 * 256 ) - ( $ip[2] * 256 );
+
+	return $ip[0].'.'.$ip[1].'.'.$ip[2].'.'.$ip[3];
+}
+
+
+/**
+ * Convert IP address to integer (get only 32bits of IPv6 address)
+ *
+ * @param string IP address
+ * @return integer Number
+ */
+function ip2int( $ip )
+{
+	if( filter_var( $ip, FILTER_VALIDATE_IP ) === false )
+	{	// IP format is incorrect
+		return 0;
+	}
+
+	if( $ip == '::1' )
+	{	// Reserved IP for localhost
+		$ip = '127.0.0.1';
+	}
+
+	$parts = unpack( 'N*', inet_pton( $ip ) );
+
+	if( strpos( $ip, '.' ) !== false )
+	{	// fix IPv4
+		$parts = array( 1 => 0, 2 => 0, 3 => 0, 4 => $parts[1] );
+	}
+	foreach( $parts as &$part )
+	{	// convert any unsigned ints to signed from unpack.
+		// this should be OK as it will be a PHP float not an int
+		if( $part < 0 )
+		{
+			$part += 4294967296;
+		}
+	}
+
+	// Return only small range of IPv6
+	return $parts[4];
+}
+
+
+/**
+ * Provide array_combine for older versions of PHP (< 5.0.0)
+ *
+ * Creates an array by using one array for keys and another for its values
+ * @param array Keys
+ * @param array Values
+ * @return array Combined array, FALSE if the number of elements for each array isn't equal.
+ */
+if( !function_exists( 'array_combine' ) )
+{
+	function array_combine( $arr1, $arr2 )
+	{
+		if( count( $arr1 ) != count( $arr2 ) )
+		{
+			return false;
+		}
+
+		$out = array();
+		foreach( $arr1 as $key1 => $value1 )
+		{
+			$out[$value1] = $arr2[$key1];
+		}
+		return $out;
+	}
+}
+
+
+/**
+ * Provide array_combine for older versions of PHP (< 5.0.0)
+ *
+ * List of already/potentially sent HTTP responsee headers(),
+ * CANNOT be implemented
+ */
+if( !function_exists( 'headers_list' ) )
+{
+	function headers_list()
+	{
+		return array();
+	}
+}
+
+
+/**
+ * Provide array_fill_keys for older versions of PHP (< 5.2.0)
+ *
+ * Fills an array with the value of the value parameter, using the values of the keys array as keys.
+ * @param array Keys
+ * @param mixed Value
+ * @return array Filled array
+ */
+if( !function_exists( 'array_fill_keys' ) )
+{
+	function array_fill_keys( $array, $value )
+	{
+		$filled_array = array();
+		foreach( $array as $key )
+		{
+			$filled_array[$key] = $value;
+		}
+
+		return $filled_array;
+	}
+}
+
+
+/**
+ * Provide htmlspecialchars_decode for older versions of PHP (< 5.1.0)
+ *
+ * Convert special HTML entities back to characters
+ * @param string Text to decode
+ * @return string The decoded text
+ */
+if( !function_exists( 'htmlspecialchars_decode' ) )
+{
+	function htmlspecialchars_decode( $text )
+	{
+		return strtr( $text, array_flip( get_html_translation_table( HTML_SPECIALCHARS ) ) );
+	}
+}
+
+
+/**
+ * Provide array_walk_recursive for older versions of PHP (< 5.1.0)
+ *
+ * Apply a user function recursively to every member of an array
+ * @param array The input array
+ * @param string Funcname
+ * @param string If the optional userdata parameter is supplied, it will be passed as the third parameter to the callback funcname.
+ * @return TRUE on success or FALSE on failure
+ */
+if( !function_exists( 'array_walk_recursive' ) )
+{
+	function array_walk_recursive( &$input, $funcname, $userdata = '' )
+	{
+		if( !is_callable( $funcname ) )
+		{
+			return false;
+		}
+
+		if( !is_array( $input ) )
+		{
+			return false;
+		}
+
+		foreach( $input AS $key => $value )
+		{
+			if( is_array( $input[$key] ) )
+			{
+				array_walk_recursive( $input[$key], $funcname, $userdata );
+			}
+			else
+			{
+				$saved_value = $value;
+				if( !empty( $userdata ) )
+				{
+					$funcname( $value, $key, $userdata );
+				}
+				else
+				{
+					$funcname( $value, $key );
+				}
+
+				if( $value != $saved_value )
+				{
+					$input[$key] = $value;
+				}
+			}
+		}
+
+		return true;
+	}
+}
+
+
+/**
+ * Save text data to file, create target file if it doesn't exist
+ *
+ * @param string data to be written
+ * @param string filename (full path to a file)
+ * @param string fopen mode
+ */
+function save_to_file( $data, $filename, $mode = 'a' )
+{
+	global $Settings;
+
+	if( ! file_exists($filename) )
+	{	// Create target file
+		@touch( $filename );
+
+		// Doesn't work during installation
+		if( !empty($Settings) )
+		{
+			$chmod = $Settings->get('fm_default_chmod_dir');
+			@chmod( $filename, octdec($chmod) );
+		}
+	}
+
+	if( ! is_writable($filename) )
+	{
+		return false;
+	}
+
+	$f = @fopen( $filename, $mode );
+	$ok = @fwrite( $f, $data );
+	@fclose( $f );
+
+	if( $ok && file_exists($filename) )
+	{
+		return $filename;
+	}
+	return false;
+}
+
+
+/**
+ * Check if current request is AJAX
+ * Used in order to get only content of the requested page
+ *
+ * @param string Template name
+ * @return boolean TRUE/FALSE
+ */
+function is_ajax_content( $template_name = '' )
+{
+	global $ajax_content_mode;
+
+	// Template names of content: @see skin_include()
+	$content_templates = array( '$disp$', '_item_block.inc.php', '_item_content.inc.php' );
+
+	return !empty( $ajax_content_mode ) &&
+		$ajax_content_mode === true &&
+		!in_array( $template_name, $content_templates );
+}
+
 /*
  * $Log$
- * Revision 1.298  2011/10/21 07:31:19  efy-vitalij
- * removed function generate_random_ip
+ * Revision 1.300  2013/11/06 08:03:47  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.297  2011/10/21 06:38:06  efy-vitalij
- * changed function header_http_response
- *
- * Revision 1.296  2011/10/20 16:32:56  efy-asimo
- * Invalidate PageCaches after specific settings update
- *
- * Revision 1.295  2011/10/18 08:14:42  efy-vitalij
- * removed function hit_response_code_class
- *
- * Revision 1.294  2011/10/18 01:13:18  fplanque
- * no message
- *
- * Revision 1.293  2011/10/17 12:09:46  efy-vitalij
- * changed function hit_response_code_class()
- *
- * Revision 1.292  2011/10/14 22:16:07  sam2kb
- * Provide sys_get_temp_dir() for older versions of PHP (< 5.2.1)
- *
- * Revision 1.291  2011/10/14 20:43:19  sam2kb
- * Core functions trailing_slash and no_trailing_slash moved out from Files module
- *
- * Revision 1.290  2011/10/14 09:51:41  efy-vitalij
- * add function header_http_response
- *
- * Revision 1.289  2011/10/13 12:41:05  efy-vitalij
- * add function hit_response_code_class
- *
- * Revision 1.288  2011/10/03 12:00:33  efy-yurybakh
- * Small messaging UI design changes
- *
- * Revision 1.287  2011/10/02 12:38:29  efy-yurybakh
- * fix sprite icons
- *
- * Revision 1.286  2011/10/01 01:05:43  efy-yurybakh
- * temp fix of expand icon
- *
- * Revision 1.285  2011/09/30 10:16:50  efy-yurybakh
- * Make a big sprite with all backoffice icons
- *
- * Revision 1.284  2011/09/29 12:48:22  efy-yurybakh
- * fix the "blank" icon
- *
- * Revision 1.283  2011/09/28 04:14:41  efy-yurybakh
- * fix pixel
- *
- * Revision 1.282  2011/09/27 17:31:19  efy-yurybakh
- * User additional info fields
- *
- * Revision 1.281  2011/09/27 13:13:28  efy-vitalij
- * add simple ip address generate function
- *
- * Revision 1.280  2011/09/27 07:45:57  efy-asimo
- * Front office messaging hot fixes
- *
- * Revision 1.279  2011/09/25 02:51:44  efy-yurybakh
- * sprite rollover
- *
- * Revision 1.278  2011/09/23 23:24:53  sam2kb
- * No new line at end of file
- *
- * Revision 1.277  2011/09/23 23:08:51  sam2kb
- * New content format "htmlfeed" for use in XML feed tags <content:encoded> & <content type="html">
- *
- * Revision 1.276  2011/09/23 22:37:09  fplanque
- * minor / doc
- *
- * Revision 1.275  2011/09/23 16:37:08  efy-yurybakh
- * change a style for the span.icon
- *
- * Revision 1.274  2011/09/23 16:15:14  efy-yurybakh
- * fix "notice"
- *
- * Revision 1.273  2011/09/23 14:01:58  fplanque
- * Quick/temporary fixes so we can work in the meantime
- *
- * Revision 1.272  2011/09/23 11:30:51  efy-yurybakh
- * Make a big sprite with all backoffice icons
- *
- * Revision 1.271  2011/09/22 15:07:34  efy-yurybakh
- * fix notice
- *
- * Revision 1.270  2011/09/22 11:40:18  efy-yurybakh
- * icons in a single sprite
- *
- * Revision 1.269  2011/09/22 08:55:00  efy-asimo
- * Login problems with multidomain installs - fix
- *
- * Revision 1.268  2011/09/17 02:31:59  fplanque
- * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
- *
- * Revision 1.267  2011/09/14 21:04:06  fplanque
- * cleanup
- *
- * Revision 1.266  2011/09/13 23:28:35  lxndral
- * users sessions -> Hitlist update
- *
- * Revision 1.265  2011/09/12 16:44:33  lxndral
- * internal searches fix
- *
- * Revision 1.264  2011/09/07 07:29:38  efy-asimo
- * module class improvements
- *
- * Revision 1.263  2011/09/07 05:15:47  sam2kb
- * Create json_encode function if it does not exist ( PHP < 5.2.0 )
- *
- * Revision 1.262  2011/09/07 00:28:26  sam2kb
- * Replace non-ASCII character in regular expressions with ~
- *
- * Revision 1.261  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.260  2011/09/04 20:17:54  fplanque
- * cleanup
- *
- * Revision 1.259  2011/08/31 23:51:19  sam2kb
- * Added eAccelerator to get_active_opcode_cache
- *
- * Revision 1.258  2011/08/26 03:15:52  sam2kb
- * minor/doc
- *
- * Revision 1.257  2011/08/25 22:38:57  fplanque
- * minor/doc
- *
- * Revision 1.256  2011/07/12 23:16:36  sam2kb
- * sanitize_id_list() returns array if requested
- *
- * Revision 1.255  2011/07/12 22:13:34  sam2kb
- * New function "sanitize_id_list"
- *
- * Revision 1.254  2011/06/15 06:29:44  sam2kb
- * Relocate "set_max_execution_time" function
- *
- * Revision 1.253  2011/06/15 04:47:38  sam2kb
- * Strip www prefix if hostname is a subdomain
- *
- * Revision 1.252  2011/05/23 02:20:06  sam2kb
- * Option to display excerpts in comment feeds, or disable feeds completely
- *
- * Revision 1.251  2011/05/04 17:44:21  sam2kb
- * More checks before forking a shutdown process
- *
- * Revision 1.250  2011/02/23 21:45:18  fplanque
- * minor / cleanup
- *
- * Revision 1.249  2011/02/15 05:31:53  sam2kb
- * evo_strtolower mbstring wrapper for strtolower function
- *
- * Revision 1.248  2011/01/10 02:24:04  sam2kb
- * Check if POSIX functions loaded
- * Fixes http://forums.b2evolution.net/viewtopic.php?t=21893
- *
- * Revision 1.247  2011/01/02 02:20:25  sam2kb
- * typo: explicitely => explicitly
  */
 ?>

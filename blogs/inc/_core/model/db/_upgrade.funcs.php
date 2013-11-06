@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link https://thequod.de/}.
  *
  * {@link db_delta()} is based on dbDelta() from {@link http://wordpress.com Wordpress}, see
@@ -102,44 +102,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 	foreach( $queries as $qry )
 	{
 		// Remove any comments from the SQL:
-		$n = strlen($qry);
-		$in_string = false;
-		for( $i = 0; $i < $n; $i++ )
-		{
-			if( $qry[$i] == '\\' )
-			{ // backslash/escape; skip
-				continue;
-			}
-			if( $qry[$i] == '"' || $qry[$i] == "'" )
-			{
-				if( ! $in_string )
-				{ // string begins:
-					$in_string = $qry[$i];
-				}
-				elseif( $qry[$i] === $in_string )
-				{
-					$in_string = false;
-				}
-			}
-			elseif( $in_string === false )
-			{ // not in string, check for comment start:
-				if( $qry[$i] == '#' || substr($qry, $i, 3) == '-- ' )
-				{ // comment start
-					// search for newline
-					for( $j = $i+1; $j < $n; $j++ )
-					{
-						if( $qry[$j] == "\n" || $qry[$j] == "\r" )
-						{
-							break;
-						}
-					}
-					// remove comment
-					$qry = substr($qry, 0, $i).substr($qry, $j);
-					$n = strlen($qry);
-					continue;
-				}
-			}
-		}
+		$qry = remove_comments_from_query( $qry );
 
 		if( preg_match( '|^(\s*CREATE TABLE\s+)(IF NOT EXISTS\s+)?([^\s(]+)(.*)$|is', $qry, $match) )
 		{
@@ -219,6 +182,11 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 		 * @global array Column field names of PRIMARY KEY, lowercased (if any)
 		 */
 		$primary_key_fields = array();
+		
+		/**
+		 * @global array Column field names of FOREIGN KEY, lowercased (if any)
+		 */
+		$foreign_key_fields = array();
 
 		/**
 		 * @global array of col_names that have KEYs (including PRIMARY; lowercased). We use this for AUTO_INCREMENT magic.
@@ -247,56 +215,13 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 
 
 		// Get all of the field names in the query from between the parens
-		preg_match( '|\((.*)\)(.*)$|s', $items[$table_lowered][0]['queries'][0], $match ); // we have only one query here
-		$qryline = trim($match[1]);
-		$qry_table_options = trim($match[2]);
-
-		// Separate field lines into an array
-		#$flds = preg_split( '~,(\r?\n|\r)~', $qryline, -1, PREG_SPLIT_NO_EMPTY );
-
-		$flds = array();
-		$in_parens = 0;
-		$in_quote = false;
-		$buffer = '';
-		for( $i = 0; $i < strlen($qryline); $i++ )
-		{
-			$c = $qryline[$i];
-
-			if( ( $c == ',' ) && ( ! $in_parens ) && ( ! $in_quote ) )
-			{ // split here:
-				$flds[] = trim($buffer);
-				$buffer = '';
-				continue;
-			}
-
-			if( $c == '(' )
-			{
-				$in_parens++;
-			}
-			elseif( $c == ')' )
-			{
-				$in_parens--;
-			}
-
-			if( ( ! $in_parens ) && ( $c == "'" ) && ( $qryline[$i - 1] != '\\' ) )
-			{ // Text between quotation marks outside from parentheses, must be in a field COMMENT
-				// Commas in field comments are not separating two fields, so don't split there.
-				$in_quote = ! $in_quote;
-			}
-
-			$buffer .= $c;
-		}
-		if( strlen($buffer) )
-		{
-			$flds[] = trim($buffer);
-		}
+		$flds = get_fieldlines_from_query( $items[$table_lowered][0]['queries'][0] );
 
 		//echo "<hr/><pre>\n".print_r(strtolower($table), true).":\n".print_r($items, true)."</pre><hr/>";
 
 		// ALTER ENGINE, if different (and given in query):
-		if( preg_match( '~\bENGINE\s*=\s*(\w+)~', $qry_table_options, $match ) )
+		if( ( $wanted_engine = get_engine_from_query( $items[$table_lowered][0]['queries'][0] ) ) !== false )
 		{
-			$wanted_engine = $match[1];
 			$current_engine = $DB->get_row( '
 				SHOW TABLE STATUS LIKE '.$DB->quote($table) );
 			$current_engine = $current_engine->Engine;
@@ -320,18 +245,27 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 
 			$create_definition = trim($create_definition, ", \r\n\t");
 
-			if( in_array( $fieldname_lowered, array( '', 'primary', 'index', 'fulltext', 'unique', 'key' ) ) )
+			if( in_array( $fieldname_lowered, array( '', 'primary', 'foreign', 'index', 'fulltext', 'unique', 'key' ) ) )
 			{ // INDEX (but not in column_definition - those get handled later)
 				$add_index = array(
 					'create_definition' => $create_definition,
 				);
 
 				if( !  preg_match( '~^(PRIMARY(?:\s+KEY)|(?:FULLTEXT|UNIQUE)(?:\s+(?:INDEX|KEY))?|KEY|INDEX) (?:\s+()     (\w+)      )? (\s+USING\s+\w+)? \s* \((.*)\)$~ix', $create_definition, $match )
-					&& ! preg_match( '~^(PRIMARY(?:\s+KEY)|(?:FULLTEXT|UNIQUE)(?:\s+(?:INDEX|KEY))?|KEY|INDEX) (?:\s+([`"])([\w\s]+)\\2)? (\s+USING\s+\w+)? \s* \((.*)\)$~ix', $create_definition, $match ) )
+					&& ! preg_match( '~^(PRIMARY(?:\s+KEY)|(?:FULLTEXT|UNIQUE)(?:\s+(?:INDEX|KEY))?|KEY|INDEX) (?:\s+([`"])([\w\s]+)\\2)? (\s+USING\s+\w+)? \s* \((.*)\)$~ix', $create_definition, $match )
+					&& ! preg_match( '~^(FOREIGN\s+KEY) \s* \((.*)\) \s* (REFERENCES) \s* ([^( ]*) \s* \((.*)\) \s* (.*)$~ixs', $create_definition, $match ) )
 				{ // invalid type, should not happen
 					debug_die( 'Invalid type in $indices: '.$create_definition );
 					// TODO: add test: Invalid type in $indices: KEY "coord" ("lon","lat")
 				}
+
+				if( $fieldname_lowered == 'foreign' )
+				{ // Remember FOREIGN KEY fields, but they don't have to be indexed
+					$reference_table_name = db_delta_remove_quotes(preg_replace( $DB->dbaliases, $DB->dbreplaces, $match[4] ));
+					$foreign_key_fields[] = array( 'fk_fields' => $match[2], 'reference_table' => $reference_table_name, 'reference_columns' => $match[5], 'fk_definition' => $match[6], 'create' => true );
+					continue;
+				}
+
 				$add_index['keyword'] = $match[1];
 				$add_index['name'] = strtoupper($match[3]);
 				$add_index['type'] = $match[4]; // "USING [type_name]"
@@ -1096,6 +1030,30 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 		// Remove the original table creation query from processing
 		array_shift( $items[$table_lowered] );
 
+		// Add foreign key constraints
+		$result = db_delta_foreign_keys( $foreign_key_fields, $table, false );
+		foreach( $result as $foreign_key_update )
+		{ // loop through foreign key differences in this table
+			if( $foreign_key_update['type'] == 'alter_engine' )
+			{ // this is an alter engine command, check if this command was already added during engine difference detection, and skip to the next if it was added
+				$skip = false;
+				foreach( $items[$table_lowered] as $itemlist )
+				{
+					if( ( $itemlist[ 'type' ] == 'alter_engine' ) && ( $itemlist['queries'][0] == $foreign_key_update['queries'][0] ) )
+					{ // the same command was already added, don't add again
+						$skip = true;
+						break;
+					}
+				}
+				if( $skip )
+				{ // skip is set, don't add the alter engine command again
+					continue;
+				}
+			}
+			// add FK updates
+			$items[$table_lowered][] = $foreign_key_update;
+		}
+
 		// Add the remaining indices (which are not "inline" with a column definition and therefor already handled):
 		$add_index_queries = array();
 		foreach( $indices as $k => $index )
@@ -1115,7 +1073,8 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 			$query = array(
 				'queries' => array($query.' ADD '.$index['create_definition']),
 				'note' => 'Added index <strong>'.$index['create_definition'].'</strong>',
-				'type' => 'add_index' );
+				'type' => 'add_index',
+				'name' => $index['name'] );
 
 			// Check if the index creation has to get appended after any DROPs (required for indices with the same name)
 			$append_after_drops = false;
@@ -1145,7 +1104,8 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 			$items[$table_lowered][] = array(
 				'queries' => array("ALTER TABLE {$table} DROP ".( $index_info['name'] == 'PRIMARY' ? 'PRIMARY KEY' : 'INDEX '.$index_info['name'] )),
 				'note' => 'Dropped index <strong>'.$index_info['name'].'</strong>',
-				'type' => 'drop_index' );
+				'type' => 'drop_index',
+				'name' => $index_info['name'] );
 		}
 
 		// Add queries to (re)create (maybe changed indices) to the end
@@ -1162,7 +1122,23 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 			foreach( $itemlist as $k => $item )
 			{
 				if( in_array($item['type'], $exclude_types) )
-				{
+				{ // this type of update should be excluded
+					if( $item['type'] == 'drop_index' )
+					{ // drop index command should not be excluded in case when we would like to update an index!
+						$skip = false;
+						foreach( $itemlist as $other_item )
+						{ // check if there are an add_index command for the same table with the same index name
+							if( ( $other_item['type'] == 'add_index' ) && ( strcasecmp( $item['name'], $other_item['name'] ) === 0 ) )
+							{ // add index with the same index name was found so we need to process this drop_index command to be able to add a new correct index with the same name
+								$skip = true;
+								break;
+							}
+						}
+						if( $skip )
+						{ // skip excluding this item
+							continue;
+						}
+					}
 					unset( $items[$table][$k] );
 					$removed_one = true;
 				}
@@ -1181,6 +1157,25 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 		{
 			unset( $items[$table] );
 			continue;
+		}
+
+		// Check if we have alter engine and drop foreign key queries for the same table. In this case the drop query must be processed before the alter engine query!
+		$alter_engine_index = NULL;
+		for( $i = 0; $i < count( $itemlist ); $i++ )
+		{
+			if( ( $itemlist[$i]['type'] == 'alter_engine' ) && ( $alter_engine_index == NULL ) )
+			{ // save alter engine query index
+				$alter_engine_index = $i;
+			}
+			elseif( ( $itemlist[$i]['type'] == 'drop_foreign_key' ) && ( $alter_engine_index !== NULL ) && ( $alter_engine_index < $i ) )
+			{ // switch engine update and drop foreign key queries, because in many cases we must drop the foreign key first to be able to chagne the table engine
+				$switch_item = $itemlist[$alter_engine_index];
+				$items[$table][$alter_engine_index] = $itemlist[$i];
+				$items[$table][$i] = $switch_item;
+				// save new alter engine index and the alter engine command in case of we have to drop multiple foreign keys
+				$alter_engine_index = $i;
+				$itemlist[$i] = $switch_item;
+			}
 		}
 	}
 
@@ -1228,6 +1223,196 @@ function db_delta_remove_quotes($fieldname, $quotes = '`"')
 
 
 /**
+ * Get the delta queries between existing foreign key values and new foreign key values in the given table
+ * 
+ * @param array foreign key lines from the install script Create Table commands
+ * @param string the processed table name
+ * @param boolean set to false to not process the required queries without asking the user consent
+ * @param string leave this to NUL for delta, set to 'add' to add a new foreign key and set to 'drop' to drop a single foreign key.
+ * @return array the delta queries if there are any or empty array if the required db queries have been processed or if there are no foreign key differences
+ */
+function db_delta_foreign_keys( $foreign_key_fields, $table, $silent = true, $action = NULL )
+{
+	global $DB;
+
+	$result = array();
+
+	// get create table sql from db
+	$ct_sql = $DB->get_var( 'SHOW CREATE TABLE '.$table, 1, 0 );
+
+	// Check related tables engine because the foreign key table and the reference table both must have InnoDB engine
+	if( !empty( $foreign_key_fields ) && ( $action != 'drop' ) )
+	{ // we have foreign key contraints, and we don't want to drop that ( In case of drop FK the table engine doesn't matter )
+		// which tables engine must be changed
+		$modify_table_eninges = array( $table => 'InnoDB' );
+		foreach( $foreign_key_fields as $foreign_key )
+		{ // check reference tables engine
+			$modify_table_eninges[ $foreign_key['reference_table'] ] = 'InnoDB';
+		}
+		$engine_queries = db_delta_table_engines( $modify_table_eninges, $silent );
+		if( !$silent && !empty( $engine_queries ) )
+		{
+			$result = array_merge( $engine_queries, $result );
+		}
+	}
+
+	// get foreign key constraints from db
+	$existing_foreign_key_fields = array();
+	$db_fieldlines = get_fieldlines_from_query( $ct_sql );
+	foreach( $db_fieldlines as $fieldname => $fieldline )
+	{ // loop through all field lines and get those lines where are foreign key definitions
+		$fieldline = str_replace( array( '`', '"' ), '', $fieldline );
+		if( preg_match( '~^(?:(CONSTRAINT)* \s* ([^ ]*)) \s* (FOREIGN\s+KEY) \s* \((.*)\) \s* (REFERENCES) \s* ([^( ]*) \s* \((.*)\) \s* (.*)$~ixs', $fieldline, $match ) )
+		{ // add existing foreign key fields, but set drop param to true only if we don't want to add/drop a single foreign key!
+			$existing_foreign_key_fields[] = array( 'fk_symbol' => $match[2], 'fk_fields' => $match[4], 'reference_table' => $match[6], 'reference_columns' => $match[7], 'fk_definition' => $match[8], 'drop' => ( $action == NULL ) );
+		}
+	}
+
+	foreach( $existing_foreign_key_fields as &$existing_foreign_key )
+	{ // loop through existing foreign key definitions
+		foreach( $foreign_key_fields as &$foreign_key )
+		{ // loop through the install script foreign key definitions
+			if( ( $action == NULL ) && ( !$existing_foreign_key['drop'] ) && ( !$foreign_key['create'] ) )
+			{ // if we already know that an old key should not be removed, and the recent key already exists skip this check
+				continue;
+			}
+			// check if the two foreign key constraint is the same or not
+			$match_found = ( $existing_foreign_key['fk_fields'] == $foreign_key['fk_fields'] )
+				&& ( $existing_foreign_key['reference_table'] == $foreign_key['reference_table'] )
+				&& ( $existing_foreign_key['reference_columns'] == $foreign_key['reference_columns'] );
+			$exact_match_found = ( $match_found && ( $existing_foreign_key['fk_definition'] == $foreign_key['fk_definition'] ) );
+			if( ( !empty( $action ) ) && $match_found )
+			{ // action is not empty it means that we would like to add or drop a single foreign key
+				if( $action == 'drop' )
+				{ // set existing foreign key to be droped
+					$existing_foreign_key['drop'] = true;
+					break;
+				}
+				elseif( $action = 'add' )
+				{ // add a new foreign key
+					if( $exact_match_found )
+					{ // Exact match found so the FK already exists with the same definition
+						return;
+					}
+					// foreign key exists but not with the given definition so we have to drop the old FK
+					$existing_foreign_key['drop'] = true;
+					break;
+				}
+			}
+			// if exact match found betwen existing and recent foreign keys then we should not drop the old one
+			$existing_foreign_key['drop'] = $existing_foreign_key['drop'] && ( !$exact_match_found );
+			// if recent foreign keys already exists then we doesn't have to create a new one
+			$foreign_key['create'] = $foreign_key['create'] && ( !$exact_match_found );
+		}
+		if( ( $action !== NULL ) && ( $existing_foreign_key['drop'] ) )
+		{ // in case of add/drop a single foreign key, if we have found a match, then we don't have to look forward
+			break;
+		}
+	}
+	unset( $existing_foreign_key );
+	unset( $foreign_key );
+
+	foreach( $existing_foreign_key_fields as $existing_foreign_key )
+	{ // loop through existing foreign keys
+		if( $existing_foreign_key['drop'] )
+		{ // this foreign key constraint should be removed, create the query
+			$query = 'ALTER TABLE '.$table.' DROP FOREIGN KEY '.$existing_foreign_key['fk_symbol'];
+			if( $silent )
+			{ // execute query in silent mode
+				$DB->query( $query );
+			}
+			else
+			{ // set query definition
+				$result[] = array(
+					'queries' => array( $query ),
+					'note' => 'Drop <strong>'.$existing_foreign_key['fk_symbol'].'</strong> foreign key constraint from <strong>'.$table.'</strong> table.',
+					'type' => 'drop_foreign_key' );
+			}
+		}
+	}
+	foreach( $foreign_key_fields as $foreign_key )
+	{ // loop through in up to date foreign keys
+		if( $foreign_key['create'] )
+		{ // // this foreign key constraint is new, it must be created
+			// Create delete query for orphan entries
+			$delete_query = 'DELETE FROM '.$table.
+								' WHERE '.$foreign_key['fk_fields'].' NOT IN (
+									SELECT DISTINCT('.$foreign_key['reference_columns'].') FROM '.$foreign_key['reference_table'].' )';
+			$query = 'ALTER TABLE '.$table.' ADD FOREIGN KEY ('.$foreign_key['fk_fields'].') REFERENCES '.$foreign_key['reference_table'].' ('.$foreign_key['reference_columns'].') '.$foreign_key['fk_definition'];
+			if( $silent )
+			{ // execute queries in silent mode
+				if( $DB->query( $delete_query ) !== false )
+				{ // orphan child entries have been deleted, create foreign key
+					$DB->query( $query );
+				}
+			}
+			else
+			{ // set query definition
+				$result[] = array(
+					'queries' => array( $delete_query ),
+					'note' => 'Delete orphan <strong>'.$table.'</strong> entries.',
+					'type' => 'delete_orphan_entries' );
+				$result[] = array(
+					'queries' => array( $query ),
+					'note' => 'Add foreign key constraint on <strong>'.$table.'('.$foreign_key['fk_fields'].')'.'</strong> in reference to <strong>'.$foreign_key['reference_table'].'('.$foreign_key['reference_columns'].')'.'</strong>',
+					'type' => 'add_foreign_key' );
+			}
+		}
+	}
+
+	return $result;
+}
+
+
+/**
+ * Get/Process the delta queries between existing and required table engines. This function is used for Foreign Key update.
+ * 
+ * @param array tableName => expectedEngine values
+ * @param booelan set to true to process the required DB queries, false to return the requested queries
+ * @result array|NULL the delta queries if there are any or empty array if the required db queries have been processed or if there are no difference between tables engine
+ */
+function db_delta_table_engines( $tables, $silent )
+{
+	global $DB;
+
+	if( empty( $tables ) )
+	{ // no tables to check
+		return NULL;
+	}
+
+	$modify_engine_queries = array();
+	foreach( $tables as $table => $engine )
+	{
+		$table = strtolower( $table );
+		$engine = strtolower( $engine );
+		// get table engine from db
+		$current_engine = $DB->get_row( 'SHOW TABLE STATUS LIKE '.$DB->quote($table) );
+		$current_engine = $current_engine->Engine;
+		if( strtolower( $current_engine ) != strtolower( $engine ) )
+		{ // table engine is not the expected one
+			$modify_engine_queries[] = array(
+					'queries' => array( 'ALTER TABLE '.$table.' ENGINE='.$engine ),
+					'note' => 'Alter engine of <strong>'.$table.'.</strong> to <strong>innodb</strong>',
+					'type' => 'alter_engine'
+				);
+		}
+	}
+
+	if( !$silent )
+	{ // return queries
+		return $modify_engine_queries;
+	}
+
+	// Update engines silently
+	foreach( $modify_engine_queries as $query )
+	{
+		$DB->query( $query['queries'][0] );
+	}
+	return NULL;
+}
+
+
+/**
  * Alter the DB schema to match the current expected one ({@link $schema_queries}).
  *
  * @todo if used by install only, then put it into the install folder!!!
@@ -1269,6 +1454,7 @@ function install_make_db_schema_current( $display = true )
 				if( count($itemlist) == 1 && $itemlist[0]['type'] == 'create_table' )
 				{
 					echo $itemlist[0]['note']."<br />\n";
+					flush();
 					foreach( $itemlist[0]['queries'] as $query )
 					{ // should be just one, but just in case
 						if( $debug >= 2 )
@@ -1344,103 +1530,137 @@ function has_open_quote( $subject )
 }
 
 
+/**
+ * Remove any comments from the SQL query
+ * 
+ * @param string query
+ * @return string the same query without comments
+ */
+function remove_comments_from_query( $query )
+{
+	$n = strlen( $query );
+	$in_string = false;
+	for( $i = 0; $i < $n; $i++ )
+	{
+		if( $query[$i] == '\\' )
+		{ // backslash/escape; skip
+			continue;
+		}
+		if( $query[$i] == '"' || $query[$i] == "'" )
+		{
+			if( ! $in_string )
+			{ // string begins:
+				$in_string = $query[$i];
+			}
+			elseif( $query[$i] === $in_string )
+			{
+				$in_string = false;
+			}
+		}
+		elseif( $in_string === false )
+		{ // not in string, check for comment start:
+			if( $query[$i] == '#' || substr($query, $i, 3) == '-- ' )
+			{ // comment start
+				// search for newline
+				for( $j = $i+1; $j < $n; $j++ )
+				{
+					if( $query[$j] == "\n" || $query[$j] == "\r" )
+					{
+						break;
+					}
+				}
+				// remove comment
+				$query = substr($query, 0, $i).substr($query, $j);
+				$n = strlen($query);
+				continue;
+			}
+		}
+	}
+	// return query without comments
+	return $query;
+}
+
+
+/**
+ * Get all lines from a create table query
+ * 
+ * @param string the query
+ * @return array field lines
+ */
+function get_fieldlines_from_query( $query )
+{
+	// Get all of the field names in the query from between the parens
+	preg_match( '|\((.*)\).*$|s', $query, $match ); // we have only one query here
+	$qrylines = trim($match[1]);
+
+	$flds = array();
+	$in_parens = 0;
+	$in_quote = false;
+	$buffer = '';
+	for( $i = 0; $i < strlen($qrylines); $i++ )
+	{
+		$c = $qrylines[$i];
+
+		if( ( $c == ',' ) && ( ! $in_parens ) && ( ! $in_quote ) )
+		{ // split here:
+			$line = trim($buffer);
+			preg_match( '|^([^\s(]+)|', $line, $linematch );
+			$fieldname = db_delta_remove_quotes($linematch[1]);
+			if( isset( $flds[$fieldname] ) )
+			{
+				$fieldname .= '_'.$i;
+			}
+			$flds[$fieldname] = $line;
+			$buffer = '';
+			continue;
+		}
+
+		if( $c == '(' )
+		{
+			$in_parens++;
+		}
+		elseif( $c == ')' )
+		{
+			$in_parens--;
+		}
+
+		if( ( ! $in_parens ) && ( $c == "'" ) && ( $qrylines[$i - 1] != '\\' ) )
+		{ // Text between quotation marks outside from parentheses, must be in a field COMMENT
+			// Commas in field comments are not separating two fields, so don't split there.
+			$in_quote = ! $in_quote;
+		}
+
+		$buffer .= $c;
+	}
+	if( strlen($buffer) )
+	{
+		$flds[] = trim($buffer);
+	}
+
+	return $flds;
+}
+
+
+/**
+ * Get engine type from a Create Table query
+ * 
+ * @param string the query
+ * @return mixed false if ENGINE is not given in the query, the ENGINE type otherwise
+ */
+function get_engine_from_query( $query )
+{
+	if( preg_match( '~\bENGINE\s*=\s*(\w+)~', $query, $match ) )
+	{
+		return $match[1];
+	}
+	return false;	
+}
+
+
 /* {{{ Revision log:
  * $Log$
- * Revision 1.22  2011/09/14 22:18:10  fplanque
- * Enhanced addition user info fields
+ * Revision 1.24  2013/11/06 08:03:47  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.21  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.20  2011/09/01 06:45:49  efy-asimo
- * Auto upgrade DB - Check differences between fields COMMENT
- *
- * Revision 1.19  2011/08/30 06:41:56  efy-asimo
- * Fix ALTER requests on automatic update when there is a COMMENT
- *
- * Revision 1.18  2010/05/15 22:18:20  blueyed
- * db_delta: add failing test_field_collate_changes test. COLLATE attribute for e.g. VARCHAR gets not looked at.
- *
- * Revision 1.17  2010/04/11 23:02:27  blueyed
- * db_delta: fix regexp for indices using 'USING \w+'
- *
- * Revision 1.16  2010/02/08 17:51:55  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.15  2009/11/26 21:55:46  blueyed
- * db_delta: fix for indices containing whitespace
- *
- * Revision 1.14  2009/11/24 01:13:30  blueyed
- * db_delta: another fix for fulltext indices, and another for renaming of indices, where the old one has to be dropped before the new one can be created.
- *
- * Revision 1.13  2009/11/16 14:53:48  tblue246
- * db_delta_remove_quotes(): Do not call strlen() on every for loop iteration.
- *
- * Revision 1.12  2009/11/15 23:01:16  blueyed
- * Fix db_delta for ANSI style SQL (double quotes). Also fix/add support for fulltext indices.
- *
- * Revision 1.11  2009/10/11 02:34:52  blueyed
- * db_delta: fix implicit default, if length is used for numeric fields, e.g. 'int(11)'
- *
- * Revision 1.10  2009/09/21 03:31:23  fplanque
- * made autoupgrade more verbose in debug mode
- *
- * Revision 1.9  2009/04/11 23:24:49  fplanque
- * blep
- *
- * Revision 1.8  2009/03/08 23:57:40  fplanque
- * 2009
- *
- * Revision 1.7  2009/02/25 21:03:29  blueyed
- * install_make_db_schema_current: Output create table entries in debug mode, too. Not tested.
- *
- * Revision 1.6  2008/10/03 21:56:05  blueyed
- * db_delta: fix index names surrounded in backticks. Add test.
- *
- * Revision 1.5  2008/09/26 19:14:17  tblue246
- * minor
- *
- * Revision 1.4  2008/06/22 13:42:57  blueyed
- * db_delta(): add new query_type 'alter_engine', which adds a query to change the engine used for a table. Includes test.
- *
- * Revision 1.3  2008/01/21 09:35:24  fplanque
- * (c) 2008
- *
- * Revision 1.2  2008/01/09 00:22:17  blueyed
- * db_delta(): remove comments from queries
- *
- * Revision 1.1  2007/06/25 10:59:00  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.34  2007/04/26 00:11:08  fplanque
- * (c) 2007
- *
- * Revision 1.33  2007/04/15 22:16:59  blueyed
- * db_delta() fixes regarding index handlin
- *
- * Revision 1.32  2007/02/11 02:17:27  blueyed
- * Normalized case handling for $fieldtype; fixed $update_default for ENUM
- *
- * Revision 1.29  2007/01/18 21:03:51  blueyed
- * db_delta() fixes: splitting fields by comma; inline UNIQUE and PK handling
- *
- * Revision 1.28  2007/01/14 21:55:07  blueyed
- * doc
- *
- * Revision 1.27  2007/01/14 21:40:17  blueyed
- * db_delta() fix for PK handling/obsoleting
- *
- * Revision 1.26  2007/01/14 03:05:54  blueyed
- * db_delta() fix: handle/remove backticks in auto-generated index names
- *
- * Revision 1.25  2007/01/12 01:34:39  fplanque
- * doc
- *
- * Revision 1.24  2007/01/12 01:21:38  blueyed
- * db_delta() fixes: handle backticks (to be tested more), dropping all existing columns in a table and index/key names (to be tested more)
- *
- * Revision 1.23  2006/11/24 17:41:59  blueyed
- * Fixed NULL handling of TIMESTAMPs and work around the buggy behaviour I was experiencing
- * }}}
  */
 ?>

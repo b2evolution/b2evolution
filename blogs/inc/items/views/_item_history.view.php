@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -28,10 +28,29 @@ global $Blog;
  */
 global $edited_Item;
 
-$sql1 = 'SELECT "'.$edited_Item->mod_date.'" AS iver_edit_datetime, "'.$edited_Item->lastedit_user_ID.'" AS user_login, "Current version" AS action';
+global $admin_url;
+
+if( $lastedit_User = & $edited_Item->get_lastedit_User() )
+{	// Get login of last edit user
+	$lastedit_user_login = $lastedit_User->get( 'login' );
+}
+else
+{	// User was deleted
+	$lastedit_user_login = T_('(deleted user)');
+}
+
+$sql_current_version = 'SELECT "C" AS iver_ID,
+		"'.$edited_Item->datemodified.'" AS iver_edit_datetime,
+		"'.$edited_Item->lastedit_user_ID.'" AS iver_edit_user_ID,
+		"'.T_('Current version').'" AS action,
+		"'.$edited_Item->status.'" AS iver_status,
+		"'.$edited_Item->title.'" AS iver_title,
+		"'.str_replace( '"', '\"', $lastedit_user_login ).'" AS user_login';
 $SQL = new SQL();
-$SQL->SELECT( 'iver_edit_datetime, user_login,  "Archived version" AS action' );
-$SQL->FROM( 'T_items__version LEFT JOIN T_users ON iver_edit_user_ID = user_ID' );
+$SQL->SELECT( 'iver_ID, iver_edit_datetime, iver_edit_user_ID, "'.T_('Archived version').'" AS action, iver_status, iver_title, user_login' );
+$SQL->FROM( 'T_items__version' );
+// LEFT JOIN users to display versions edited by already deleted users
+$SQL->FROM_add( 'LEFT JOIN T_users ON iver_edit_user_ID = user_ID' );
 $SQL->WHERE( 'iver_itm_ID = ' . $edited_Item->ID );
 // fp> not actually necessary:
 // UNION
@@ -42,10 +61,76 @@ $CountSQL->SELECT( 'COUNT(*)+1' );
 $CountSQL->FROM( 'T_items__version' );
 $CountSQL->WHERE( $SQL->get_where( '' ) );
 
+$revisions_count = $DB->get_var( $CountSQL->get() );
+
+$default_order = $revisions_count > 1 ? '---D' : '-D';
+
 // Create result set:
-$Results = new Results( $sql1 . ' UNION ' . $SQL->get(), 'iver_', 'D', NULL, $CountSQL->get() );
+$Results = new Results( $sql_current_version . ' UNION ' . $SQL->get(), 'iver_', $default_order, NULL, $CountSQL->get() );
 
 $Results->title = T_('Item history (experimental) for:').' '.$edited_Item->get_title();
+
+/**
+ * Get radio input to select a revision to compare
+ *
+ * @param integer Revision ID
+ * @param string Input name
+ * @param integer Number of selected revision
+ * @param string Direction (up | down)
+ */
+function iver_compare_selector( $revision_ID, $input_name, $selected, $direction = 'up' )
+{
+	global $iver_compare_selector;
+	if( !isset( $iver_compare_selector ) )
+	{
+		$iver_compare_selector = array();
+	}
+	if( !isset( $iver_compare_selector[ $input_name ] ) )
+	{
+		$iver_compare_selector[ $input_name ] = 0;
+	}
+	$iver_compare_selector[ $input_name ]++;
+
+	$style = '';
+	if( ( $iver_compare_selector[ $input_name ] < $selected && $direction == 'up' ) || 
+	    ( $iver_compare_selector[ $input_name ] > $selected && $direction == 'down' ) )
+	{	// Hide inputs
+		$style = ' style="display:none"';
+	}
+
+	$checked = '';
+	if( $iver_compare_selector[ $input_name ] == $selected )
+	{	// Select this input
+		$checked = ' checked="checked"';
+	}
+
+	return '<input type="radio" name="'.$input_name.'" value="'.$revision_ID.'"'.$style.$checked.' />';
+}
+
+if( $revisions_count > 1 )
+{	// Dispay the selectors to compare the revisions
+	$Results->cols[] = array(
+							'th' => '',
+							'th_class' => 'shrinkwrap',
+							'td_class' => 'shrinkwrap',
+							'td' => '%iver_compare_selector( #iver_ID#, "r1", 2 )%',
+						);
+
+	$Results->cols[] = array(
+							'th' => '',
+							'th_class' => 'shrinkwrap',
+							'td_class' => 'shrinkwrap',
+							'td' => '%iver_compare_selector( #iver_ID#, "r2", 1, "down" )%',
+						);
+}
+
+$Results->cols[] = array(
+						'th' => T_('ID'),
+						'order' => 'iver_ID',
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap',
+						'td' => '$iver_ID$',
+					);
 
 $Results->cols[] = array(
 						'th' => T_('Date'),
@@ -53,46 +138,141 @@ $Results->cols[] = array(
 						'default_dir' => 'D',
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'shrinkwrap',
-						'td' => '$iver_edit_datetime$',
+						'td' => '%mysql2localedatetime_spans( #iver_edit_datetime#, "M-d" )%',
 					);
 
+/**
+ * Get item version editor login with link to user profile
+ * 
+ * @param integer editor user ID
+ * @return string user profile link or 'Deleted user' text if the user doesn't exist anymore
+ */
+function iver_editor_login( $user_ID )
+{
+	$r = get_user_identity_link( NULL, $user_ID );
+	if( empty( $r ) )
+	{
+		return T_('(deleted user)');
+	}
+	return $r;
+}
 $Results->cols[] = array(
 						'th' => T_('User'),
 						'order' => 'user_login',
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'shrinkwrap',
-						'td' => '$user_login$',
+						'td' => '%iver_editor_login( #iver_edit_user_ID# )%',
+					);
+
+/**
+ * Get post status label from DB value
+ *
+ * @param string Status value
+ * @return string Status label
+ */
+function iver_status_label( $iver_status )
+{
+	$statuses = get_visibility_statuses();
+	return isset( $statuses[ $iver_status ] ) ? $statuses[ $iver_status ] : $iver_status;
+}
+$Results->cols[] = array(
+						'th' => T_('Status'),
+						'order' => 'iver_status',
+						'td' => '%iver_status_label( #iver_status# )%',
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap',
 					);
 
 $Results->cols[] = array(
 						'th' => T_('Note'),
 						'order' => 'action',
-						'td' => '$action$',
+						'td' => '<a href="'.url_add_param( $admin_url, 'ctrl=items&amp;action=history_details&amp;p='.$edited_Item->ID.'&amp;r=' ).'$iver_ID$">$action$</a>',
 					);
 
+$Results->cols[] = array(
+						'th' => T_('Title'),
+						'order' => 'title',
+						'td' => '$iver_title$',
+					);
+
+function history_td_actions( $iver_ID )
+{
+	if( (int)$iver_ID == 0 )
+	{	// Dont' display a restore link for current version
+		return;
+	}
+
+	$restore_link = '<a href="'.regenerate_url( 'action', 'action=history_restore&amp;r='.$iver_ID.'&amp;'.url_crumb( 'item' ) ).'">'.T_('Restore').'</a>';
+
+	return $restore_link;
+}
+
+$Results->cols[] = array(
+						'th' => T_('Actions'),
+						'td' => '%history_td_actions( #iver_ID# )%',
+						'td_class' => 'shrinkwrap',
+					);
+
+$Form = new Form();
+
+$Form->add_crumb( 'item' );
+$Form->hidden_ctrl();
+$Form->hidden( 'p', get_param( 'p' ) );
+
+$Form->begin_form();
 
 $Results->display();
 
+$Form->buttonsstart = '';
+$Form->buttonsend = '';
+
+$buttons = array();
+if( $revisions_count > 1 )
+{	// Button to compare the revisions
+	$buttons = array( array( 'submit', 'actionArray[history_compare]', T_('Compare selected revisions'), 'SaveButton' ) );
+	echo get_icon( 'multi_action', 'imgtag', array( 'style' => 'margin-left:18px;position:relative;top:-5px;') );
+}
+$Form->end_form( $buttons );
+
+if( $revisions_count > 2 )
+{	// Print JS code for selectors to compare the revisions
+?>
+<script type="text/javascript">
+jQuery( document ).ready( function()
+{
+	jQuery( 'input[name=r1]:eq(1)' ).attr( 'checked', 'checked' );
+	jQuery( 'input[name=r2]:eq(0)' ).attr( 'checked', 'checked' );
+	<?php /*jQuery( 'input[name=r1]:lt(1)' ).hide();
+	jQuery( 'input[name=r2]:gt(0)' ).hide();*/ ?>
+} );
+jQuery( 'input[name=r1]' ).click( function()
+{
+	var index = jQuery( 'input[name=r1]' ).index( jQuery( this ) );
+	jQuery( 'input[name=r2]:lt(' + index + ')' ).show();
+	jQuery( 'input[name=r2]:gt(' + ( index - 1 ) + ')' ).hide();
+} );
+
+jQuery( 'input[name=r2]' ).click( function()
+{
+	var index = jQuery( 'input[name=r2]' ).index( jQuery( this ) );
+	jQuery( 'input[name=r1]:gt(' + index + ')' ).show();
+	jQuery( 'input[name=r1]:lt(' + ( index + 1 ) + ')' ).hide();
+} );
+</script>
+<noscript><?php /* Display all selectors for browsers withOUT JavaScript */ ?>
+<style>
+div.results td.shrinkwrap input {
+	display: block !important;
+}
+</style>
+</noscript>
+<?php
+}
 
 /*
  * $Log$
- * Revision 1.6  2011/09/04 22:13:17  fplanque
- * copyright 2011
- *
- * Revision 1.5  2010/02/08 17:53:16  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.4  2010/01/30 18:55:31  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.3  2009/09/25 13:09:36  efy-vyacheslav
- * Using the SQL class to prepare queries
- *
- * Revision 1.2  2009/03/08 23:57:44  fplanque
- * 2009
- *
- * Revision 1.1  2009/02/25 01:02:10  fplanque
- * Basic version history of post edits
+ * Revision 1.8  2013/11/06 08:04:24  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

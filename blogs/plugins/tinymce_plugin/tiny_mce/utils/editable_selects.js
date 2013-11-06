@@ -3,8 +3,11 @@
  *
  * Makes select boxes editable.
  *
- * @author Moxiecode
- * @copyright Copyright © 2004-2008, Moxiecode Systems AB, All rights reserved.
+ * Copyright 2009, Moxiecode Systems AB
+ * Released under LGPL License.
+ *
+ * License: http://tinymce.moxiecode.com/license
+ * Contributing: http://tinymce.moxiecode.com/contributing
  */
 
 var TinyMCE_EditableSelects = {
@@ -15,7 +18,7 @@ var TinyMCE_EditableSelects = {
 
 		for (i=0; i<nl.length; i++) {
 			if (nl[i].className.indexOf('mceEditableSelect') != -1) {
-				o = new Option('(value)', '__mce_add_custom__');
+				o = new Option(tinyMCEPopup.editor.translate('value'), '__mce_add_custom__');
 
 				o.className = 'mceAddSelectValue';
 

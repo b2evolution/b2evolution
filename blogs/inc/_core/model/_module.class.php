@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -101,6 +101,13 @@ class Module
 	}
 
 	/**
+	 * Upgrade the module's tables in b2evo database
+	 */
+	function upgrade_b2evo_tables()
+	{
+	}
+
+	/**
 	 * Create the module's own demo content
 	 */
 	function create_demo_contents()
@@ -171,6 +178,47 @@ class Module
 	{
 	}
 
+	/**
+	 * Update Item after insert
+	 *
+	 * @param array
+	 * 		array['edited_Item'] - which item setting should be updated;
+	 */
+	function update_item_after_insert( $params )
+	{
+	}
+
+	/**
+	 * Get "where" clause for item statuses
+	 *
+	 * @param array
+	 * 		array['statuses'] - which items statuses are used to show
+	 */
+	function get_item_statuses_where_clause( $params )
+	{
+	}
+
+	/**
+	 * Call method at the end of constructor of class Item
+	 *
+	 * @param array
+	 * 		array['Item'] - which item setting should be updated;
+	 */
+	function constructor_item( $params )
+	{
+	}
+
+
+	/**
+	 * Update thread after creating new object "Thread"
+	 *
+	 * @param array
+	 * 		array['Thread'] - which thread setting should be updated;
+	 */
+	function update_new_thread( $params )
+	{
+	}
+
 
 	/**
 	 * Allows the module to do something before displaying the comments for a post.
@@ -189,15 +237,15 @@ class Module
 	 * @param string Requested permission level
 	 * @param mixed Permission target (blog ID, array of cat IDs...)
 	 * @param string function name
+	 * $param object user's Group - can't be NULL
 	 * @return boolean True on success (permission is granted), false if permission is not granted
 	 *                 NULL if permission not implemented.
 	 */
-	function check_perm( $permname, $permlevel, $permtarget, $function, $Group = NULL )
+	function check_perm( $permname, $permlevel, $permtarget, $function, $Group )
 	{
-		if( ! isset( $Group ) )
-		{
-			global $current_User;
-			$Group = & $current_User->get_Group();
+		if( empty( $Group ) )
+		{ // group must be set
+			return NULL;
 		}
 
 		$GroupSettings = & $Group->get_GroupSettings();
@@ -226,24 +274,50 @@ class Module
 		// Required parameters of check permission function not found
 		return NULL;
 	}
+
+
+	/**
+	 * Get contacts list params
+	 */
+	function get_contacts_list_params()
+	{
+	}
+
+
+	/**
+	 * Switch actions for contacts
+	 *
+	 * @param array
+	 */
+	function switch_contacts_actions( $params = array() )
+	{
+	}
+
+
+	/**
+	 * Check Minimum PHP version required for the module
+	 * 
+	 * @param string module name/id
+	 */
+	function check_required_php_version( $module )
+	{
+		global $app_name, $app_version, $required_php_version;
+
+		$php_version = phpversion();
+		if( version_compare( $php_version, $required_php_version[ $module ], '<' ) )
+		{
+			$error_message = sprintf( 'You cannot use %1s module of %2$s %3$s on this server because it requires PHP version %4$s or higher. You are running version %5$s.',
+								$module, $app_name, $app_version, $required_php_version[ $module ], $php_version );
+
+			die('<h1>Insufficient Requirements</h1><p>'.$error_message.'</p>');
+		}
+	}
 }
 
 /*
  * $Log$
- * Revision 1.13  2011/10/19 15:00:34  efy-asimo
- * Modules can add their own demo contents
- *
- * Revision 1.12  2011/10/01 23:45:19  fplanque
- * clean factorization
- *
- * Revision 1.11  2011/09/28 12:09:52  efy-yurybakh
- * "comment was helpful" votes (new tab "comments")
- *
- * Revision 1.10  2011/09/23 22:37:09  fplanque
- * minor / doc
- *
- * Revision 1.9  2011/09/23 01:29:04  fplanque
- * small changes
+ * Revision 1.15  2013/11/06 08:03:47  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

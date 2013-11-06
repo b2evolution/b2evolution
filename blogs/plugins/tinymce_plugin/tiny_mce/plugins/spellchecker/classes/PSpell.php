@@ -2,6 +2,7 @@
 /**
  * $Id$
  *
+ * @package MCManager.includes
  * @author Moxiecode
  * @copyright Copyright © 2004-2007, Moxiecode Systems AB, All rights reserved.
  */

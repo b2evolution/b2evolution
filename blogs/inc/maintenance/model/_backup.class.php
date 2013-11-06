@@ -3,7 +3,7 @@
  * This file is part of b2evolution - {@link http://b2evolution.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -271,7 +271,13 @@ class Backup
 
 		if( $root_included = $this->backup_paths['application_files'] )
 		{
-			$included_files = get_filenames( $basepath, true, true, true, false, true, true );
+			$filename_params = array(
+					'recurse'			=> false,
+					'basename'			=> true,
+					'trailing_slash'	=> true,
+					//'inc_evocache'	=> true, // Uncomment to backup ?evocache directories
+				);
+			$included_files = get_filenames( $basepath, $filename_params );
 		}
 
 		// Prepare included/excluded paths
@@ -440,7 +446,7 @@ class Backup
 				$num_fields = count( $row );
 				for( $index = 0; $index < $num_fields; $index++ )
 				{
-					$row[$index] = ereg_replace("\n","\\n", addslashes( $row[$index] ) );
+					$row[$index] = str_replace("\n","\\n", addslashes( $row[$index] ) );
 
 	            	if ( isset($row[$index]) )
 	            	{
@@ -599,33 +605,8 @@ class Backup
 
 /*
  * $Log$
- * Revision 1.9  2010/07/26 06:52:16  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.8  2009/12/08 22:38:13  fplanque
- * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
- *
- * Revision 1.7  2009/11/22 19:15:34  efy-maxim
- * load class
- *
- * Revision 1.6  2009/11/20 23:56:40  fplanque
- * minor  + doc
- *
- * Revision 1.5  2009/11/18 21:54:25  efy-maxim
- * compatibility fix for PHP4
- *
- * Revision 1.4  2009/10/21 14:27:39  efy-maxim
- * upgrade
- *
- * Revision 1.3  2009/10/20 14:38:54  efy-maxim
- * maintenance modulde: downloading - unpacking - verifying destination files - backing up - copying new files - upgrade database using regular script (Warning: it is very unstable version! Please, don't use maintenance modulde, because it can affect your data )
- *
- * Revision 1.2  2009/10/19 12:21:04  efy-maxim
- * system ZipArchive
- *
- * Revision 1.1  2009/10/18 20:15:51  efy-maxim
- * 1. backup, upgrade have been moved to maintenance module
- * 2. maintenance module permissions
+ * Revision 1.11  2013/11/06 08:04:25  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

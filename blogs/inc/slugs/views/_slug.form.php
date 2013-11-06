@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -61,11 +61,8 @@ else
 
 /*
  * $Log$
- * Revision 1.4  2011/09/04 22:13:20  fplanque
- * copyright 2011
- *
- * Revision 1.3  2010/07/26 06:52:27  efy-asimo
- * MFB v-4-0
+ * Revision 1.5  2013/11/06 08:04:54  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

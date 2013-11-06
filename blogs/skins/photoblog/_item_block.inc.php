@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -62,6 +62,10 @@ $params = array_merge( array(
 		<div class="bSmallHead">
 
 			<?php
+				if( $Item->status != 'published' )
+				{
+					$Item->status( array( 'format' => 'styled' ) );
+				}
 				// Link to comments, trackbacks, etc.:
 				$Item->feedback_link( array(
 								'type' => 'feedbacks',
@@ -90,7 +94,11 @@ $params = array_merge( array(
 					) );
 			?>
 
-			<h3 class="bTitle"><?php $Item->title(); ?></h3>
+			<h3 class="bTitle linked"><?php
+				$Item->title( array(
+					'link_type' => 'permalink'
+					) );
+			?></h3>
 
 			<?php
 				$Item->issue_date( array(
@@ -188,26 +196,8 @@ $params = array_merge( array(
 <?php
 /*
  * $Log$
- * Revision 1.6  2011/09/04 22:13:25  fplanque
- * copyright 2011
- *
- * Revision 1.5  2010/02/08 17:56:36  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.4  2009/11/11 03:24:51  fplanque
- * misc/cleanup
- *
- * Revision 1.3  2009/10/11 03:00:11  blueyed
- * Add "position" and "order" properties to attachments.
- * Position can be "teaser" or "aftermore" for now.
- * Order defines the sorting of attachments.
- * Needs testing and refinement. Upgrade might work already, be careful!
- *
- * Revision 1.2  2009/06/28 17:37:54  tblue246
- * Adding list of possible values for the image_size param to Photoblog skin to make life easier for new/unexperienced users.
- *
- * Revision 1.1  2009/05/23 14:12:42  fplanque
- * All default skins now support featured posts and intro posts.
+ * Revision 1.8  2013/11/06 08:05:48  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

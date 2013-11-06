@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -97,7 +97,7 @@ class ItemQuery extends SQL
 			{
 				$eq_p = ' = ';
 			}
-			
+
 			$this->WHERE_and( $this->dbIDname.$eq_p.intval($this->p) );
 			$r = true;
 		}
@@ -114,7 +114,7 @@ class ItemQuery extends SQL
 			{
 				$eq_title = ' = ';
 			}
-			
+
 			global $DB;
 			$this->WHERE_and( $this->dbprefix.'urltitle'.$eq_title.$DB->quote($this->title) );
 			$r = true;
@@ -222,7 +222,9 @@ class ItemQuery extends SQL
 	 * @param Blog
 	 * @param array
 	 * @param string
-	 * @param string 'wide' to search in extra cats too, 'main' for main cat only
+	 * @param string 'wide' to search in extra cats too
+	 *               'main' for main cat only
+	 *               'extra' for extra cats only
 	 */
 	function where_chapter2( & $Blog, $cat_array, $cat_modifier, $cat_focus = 'wide' )
 	{
@@ -232,10 +234,11 @@ class ItemQuery extends SQL
 		$this->cat_array = $cat_array;
 		$this->cat_modifier = $cat_modifier;
 
-		if( $cat_focus == 'wide' )
+		if( $cat_focus == 'wide' || $cat_focus == 'extra' )
 		{
+			$sql_join_categories = ( $cat_focus == 'extra' ) ? ' AND post_main_cat_ID != cat_ID' : '';
 			$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
-												INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
+												INNER JOIN T_categories ON postcat_cat_ID = cat_ID'.$sql_join_categories );
 			// fp> we try to restrict as close as possible to the posts but I don't know if it matters
 			$cat_ID_field = 'postcat_cat_ID';
 		}
@@ -696,7 +699,7 @@ class ItemQuery extends SQL
 	function where_keywords( $keywords, $phrase, $exact )
 	{
 		global $DB;
-		
+
 		$this->keywords = $keywords;
 		$this->phrase = $phrase;
 		$this->exact = $exact;
@@ -754,123 +757,8 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
- * Revision 1.27  2011/09/12 16:44:33  lxndral
- * internal searches fix
+ * Revision 1.29  2013/11/06 08:04:15  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.26  2011/09/10 02:09:09  fplanque
- * doc
- *
- * Revision 1.25  2011/09/08 22:05:12  lxndral
- * fix for hitlog task
- *
- * Revision 1.24  2011/09/07 12:00:16  lxndral
- * internal searches update
- *
- * Revision 1.24  2011/09/05 23:27:21  Alexander
- * added internal search item insertion
- *
- * Revision 1.23  2011/09/04 22:13:17  fplanque
- * copyright 2011
- *
- * Revision 1.22  2011/02/10 23:07:21  fplanque
- * minor/doc
- *
- * Revision 1.21  2010/06/07 19:00:17  sam2kb
- * Exclude current Item from related posts list
- *
- * Revision 1.20  2010/02/26 22:15:47  fplanque
- * whitespace/doc/minor
- *
- * Revision 1.18  2010/02/26 04:13:52  sam2kb
- * where_ID_list() now accepts a minus (-) modifier
- *
- * Revision 1.17  2010/02/26 02:05:53  sam2kb
- * typo
- *
- * Revision 1.16  2010/02/08 17:53:16  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.15  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.14  2009/09/15 19:31:54  fplanque
- * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
- * PHP 4 compatible. Even better on PHP 5.
- * I may have broken a few things. Sorry. This is pretty hard to do in one swoop without any glitch.
- * Thanks for fixing or reporting if you spot issues.
- *
- * Revision 1.13  2009/09/14 18:37:07  fplanque
- * doc/cleanup/minor
- *
- * Revision 1.12  2009/09/14 13:17:28  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.11  2009/09/13 21:29:22  blueyed
- * MySQL query cache optimization: remove information about seconds from post_datestart and item_issue_date.
- *
- * Revision 1.10  2009/03/08 23:57:44  fplanque
- * 2009
- *
- * Revision 1.9  2009/01/23 00:05:25  blueyed
- * Add Blog::get_sql_where_aggregate_coll_IDs, which adds support for '*' in list of aggregated blogs.
- *
- * Revision 1.8  2009/01/19 21:40:59  fplanque
- * Featured post proof of concept
- *
- * Revision 1.7  2008/09/28 17:40:39  waltercruz
- * Removing done todos
- *
- * Revision 1.6  2008/01/21 09:35:31  fplanque
- * (c) 2008
- *
- * Revision 1.5  2007/12/26 17:53:25  fplanque
- * minor
- *
- * Revision 1.4  2007/12/26 11:27:47  yabs
- * added post_ID_list to filters
- *
- * Revision 1.3  2007/11/27 22:31:57  fplanque
- * debugged blog moderation
- *
- * Revision 1.2  2007/07/01 03:58:08  fplanque
- * cat_array cleanup/debug
- *
- * Revision 1.1  2007/06/25 11:00:28  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.19  2007/06/11 22:01:53  blueyed
- * doc fixes
- *
- * Revision 1.18  2007/05/27 00:35:26  fplanque
- * tag display + tag filtering
- *
- * Revision 1.17  2007/04/26 00:11:12  fplanque
- * (c) 2007
- *
- * Revision 1.16  2007/03/26 12:59:18  fplanque
- * basic pages support
- *
- * Revision 1.15  2007/03/19 21:57:36  fplanque
- * ItemLists: $cat_focus and $unit extensions
- *
- * Revision 1.14  2007/02/14 15:04:35  waltercruz
- * Changing the date queries to the EXTRACT syntax
- *
- * Revision 1.13  2007/02/06 13:37:45  waltercruz
- * Changing double quotes to single quotes
- *
- * Revision 1.12  2007/01/29 20:04:23  blueyed
- * MFB: Fixed inclusion of sub-categories in item list
- *
- * Revision 1.11  2006/12/17 23:42:38  fplanque
- * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
- * Look into Advanced Settings for the aggregating blog.
- * There may be side effects and new bugs created by this. Please report them :]
- *
- * Revision 1.10  2006/11/24 18:27:24  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.9  2006/09/07 00:48:55  fplanque
- * lc parameter for locale filtering of posts
  */
 ?>

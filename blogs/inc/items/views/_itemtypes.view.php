@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -122,18 +122,8 @@ $Results->display();
 
 /**
  * $Log$
- * Revision 1.4  2010/01/30 18:55:32  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.3  2010/01/03 13:10:57  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.2  2009/09/29 18:44:00  fplanque
- * doc
- *
- * Revision 1.1  2009/09/25 11:36:43  efy-sergey
- * Replaced "simple list" manager for Post types. Also allow to edit ID for Item types
- *
+ * Revision 1.5  2013/11/06 08:04:24  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

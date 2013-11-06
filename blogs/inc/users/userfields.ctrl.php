@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -133,7 +133,7 @@ switch( $action )
 				{
 					case 'create_copy':
 						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=userfields&action=new&ufdf_ID='.$entered_userfield_id, 303 ); // Will EXIT
+						header_redirect( '?ctrl=userfields&action=new&ufdf_ID='.$edited_Userfield->ID, 303 ); // Will EXIT
 						// We have EXITed already at this point!!
 						break;
 					case 'create_new':
@@ -211,6 +211,60 @@ switch( $action )
 				$action = 'view';
 			}
 		}
+		break;
+
+	case 'move_up':
+	case 'move_down':
+		// Move up/down user field...:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'userfield' );
+
+		// Check permission:
+		$current_User->check_perm( 'users', 'edit', true );
+
+		// Make sure we got an ufdf_ID:
+		param( 'ufdf_ID', 'integer', true );
+
+		if( $action == 'move_up' )
+		{	// Set variables for "move up" action
+			$order_condition = '<';
+			$order_direction = 'DESC';
+		}
+		else
+		{	// move down
+			$order_condition = '>';
+			$order_direction = 'ASC';
+		}
+
+		// Get near field, We should exchange the order with this field
+		$switched_Userfield = $DB->get_row( 'SELECT ufdf_ID, ufdf_order
+			FROM T_users__fielddefs
+			WHERE ufdf_ufgp_ID = '.$edited_Userfield->group_ID.'
+				AND ufdf_order '.$order_condition.' '.$edited_Userfield->order.'
+			ORDER BY ufdf_order '.$order_direction.'
+			LIMIT 1' );
+
+		if( is_null( $switched_Userfield ) )
+		{	// Current field is first or last in group, no change ordering
+			break;
+		}
+
+		$DB->begin();
+
+		// Updare order of editing field
+		$DB->query( 'UPDATE T_users__fielddefs
+			SET ufdf_order = '.$switched_Userfield->ufdf_order.'
+			WHERE ufdf_ID = '.$edited_Userfield->ID );
+
+		// Update order of near field
+		$DB->query( 'UPDATE T_users__fielddefs
+			SET ufdf_order = '.$edited_Userfield->order.'
+			WHERE ufdf_ID = '.$switched_Userfield->ufdf_ID );
+
+		$DB->commit();
+
+		$Messages->add( 'Order is changed.', 'success' );
 		break;
 
 }

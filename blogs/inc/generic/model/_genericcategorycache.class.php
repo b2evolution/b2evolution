@@ -7,7 +7,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -87,9 +87,9 @@ class GenericCategoryCache extends GenericCache
 	/**
 	 * Constructor
 	 */
-	function GenericCategoryCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname = 'ID', $name_field = NULL, $subset_property = NULL, $order_by = '' )
+	function GenericCategoryCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname = 'ID', $name_field = NULL, $subset_property = NULL, $order_by = '', $allow_none_text = NULL, $allow_none_value = '', $select = '' )
 	{
-		parent::GenericCache( $objtype, $load_all, $tablename, $prefix, $dbIDname, $name_field, $order_by );
+		parent::GenericCache( $objtype, $load_all, $tablename, $prefix, $dbIDname, $name_field, $order_by, $allow_none_text, $allow_none_value, $select );
 
 		$this->subset_property = $subset_property;
 	}
@@ -100,8 +100,8 @@ class GenericCategoryCache extends GenericCache
 	 */
 	function clear()
 	{
- 		$this->subset_cache = array();
- 		$this->loaded_subsets = array();
+		$this->subset_cache = array();
+		$this->loaded_subsets = array();
 		$this->root_cats = array();
 		$this->subset_root_cats = array();
 		$this->revealed_all_children = false;
@@ -155,7 +155,7 @@ class GenericCategoryCache extends GenericCache
 			echo 'Revealing all children -- this is not yet handling all edge cases that the subset version can handle';
 
 			// Make sure everything has been loaded:
-    	$this->load_all();
+			$this->load_all();
 
 			// Reveal children:
 			if( !empty( $this->cache ) )
@@ -185,7 +185,7 @@ class GenericCategoryCache extends GenericCache
 				// Make sure everything has been loaded:
 				$this->load_all();
 
-    		echo 'REVEALING ALL SUBSETS in a row. Is this needed?';
+				echo 'REVEALING ALL SUBSETS in a row. Is this needed?';
 
 				foreach( $this->subset_cache as $subset_ID => $dummy )
 				{
@@ -207,7 +207,7 @@ class GenericCategoryCache extends GenericCache
 				$Debuglog->add( 'Revealing subset of children', 'CategoryCache' );
 
 				// Make sure the requested subset has been loaded:
-    		$this->load_subset($subset_ID);
+				$this->load_subset($subset_ID);
 
 				// Reveal children:
 				if( !empty( $this->subset_cache[$subset_ID] ) )
@@ -357,6 +357,18 @@ class GenericCategoryCache extends GenericCache
 
 		}
 
+		if( !empty( $cat->parent_ID ) && !empty( $callbacks['posts'] ) )
+		{	// Callback to display the posts under subchapters
+			if( is_array( $callbacks['posts'] ) )
+			{	// object callback:
+				$r .= $callbacks['posts'][0]->{$callbacks['posts'][1]}( $cat->parent_ID );
+			}
+			else
+			{
+				$r .= $callbacks['posts']( $cat->parent_ID );
+			}
+		}
+
 		if( is_array( $callbacks['after_level'] ) )
 		{ // object callback:
 			$r .= $callbacks['after_level'][0]->{$callbacks['after_level'][1]}( $level ); // </ul>
@@ -434,54 +446,8 @@ class GenericCategoryCache extends GenericCache
 
 /*
  * $Log$
- * Revision 1.12  2011/09/06 17:14:43  sam2kb
- * minor/typo
+ * Revision 1.14  2013/11/06 08:04:15  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.11  2011/09/04 22:13:17  fplanque
- * copyright 2011
- *
- * Revision 1.10  2010/02/08 17:53:03  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.9  2009/11/30 00:22:05  fplanque
- * clean up debug info
- * show more timers in view of block caching
- *
- * Revision 1.8  2009/09/14 13:11:37  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.7  2009/03/08 23:57:43  fplanque
- * 2009
- *
- * Revision 1.6  2009/01/28 21:23:23  fplanque
- * Manual ordering of categories
- *
- * Revision 1.5  2008/12/28 19:00:14  fplanque
- * Fixed multiple category parent/child recursion issues. It should no longer be possible to "lose" categories by creating loops.
- *
- * Revision 1.4  2008/01/21 09:35:30  fplanque
- * (c) 2008
- *
- * Revision 1.3  2007/10/08 08:33:15  fplanque
- * rollback until needed
- *
- * Revision 1.1  2007/06/25 11:00:16  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.15  2007/04/26 00:11:11  fplanque
- * (c) 2007
- *
- * Revision 1.14  2006/12/10 02:01:11  fplanque
- * doc
- *
- * Revision 1.13  2006/12/10 01:52:27  fplanque
- * old cats are now officially dead :>
- *
- * Revision 1.12  2006/12/09 02:37:44  fplanque
- * Prevent user from creating loops in the chapter tree
- * (still needs a check before writing to DB though)
- *
- * Revision 1.11  2006/11/26 01:42:09  fplanque
- * doc
  */
 ?>

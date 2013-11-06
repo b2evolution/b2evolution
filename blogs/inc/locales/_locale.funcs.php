@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -495,53 +495,35 @@ function locale_dialing_code( $locale = '' )
  * Template function: Display locale flag
  *
  * @param string locale to use, '' for current
- * @param string collection name (subdir of img/flags)
- * @param string name of class for IMG tag
- * @param string deprecated HTML align attribute
+ * @param string collection name (subdir of img/flags)   !! OLD PARAM - NOT USED IN THE FUNCTION ANYMORE !!
+ * @param string name of class for IMG tag   !! OLD PARAM - NOT USED IN THE FUNCTION ANYMORE !!
+ * @param string deprecated HTML align attribute   !! OLD PARAM - NOT USED IN THE FUNCTION ANYMORE !!
  * @param boolean to echo or not
- * @param mixed use absolute url (===true) or path to flags directory (used in installer)
+ * @param mixed use absolute url (===true) or path to flags directory (used in installer)   !! OLD PARAM - NOT USED IN THE FUNCTION ANYMORE !!
  */
 function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $align = '', $disp = true, $absoluteurl = true )
 {
-	global $locales, $current_locale, $rsc_path, $rsc_url;
+	global $locales, $current_locale, $country_flags_bg;
 
-	if( empty($locale) ) $locale = $current_locale;
+	if( empty( $locale ) )
+	{
+		$locale = $current_locale;
+	}
 
 	// extract flag name:
-	$country = strtolower(substr( $locale, 3, 2 ));
+	$country_code = strtolower( substr( $locale, 3, 2 ) );
 
-	$img_attribs = array(
-		'alt' => isset($locales[$locale]['name']) ? $locales[$locale]['name'] : $locale,
+	$flag_attribs = array(
+		'class' => 'flag',
+		'title' => isset($locales[$locale]['name']) ? $locales[$locale]['name'] : $locale,
 	);
 
-	if( $absoluteurl !== true )
-	{
-		$absoluteurl = trailing_slash($absoluteurl);
-		$img_attribs['src'] = $absoluteurl.$collection.'/'.$country.'.gif';
-	}
-	else
-	{
-		// subpath below $rsc_path
-		$subpath = 'flags/'.$collection.'/'.$country.'.gif';
-
-		if( ! is_file( $rsc_path.$subpath ) )
-		{ // File does not exist
-			$country = 'default';
-			$subpath = 'flags/'.$collection.'/'.$country.'.gif';
-		}
-		$img_attribs['src'] = $rsc_url.$subpath;
-
-		// Add size, if available.
-		if( $img_wh = imgsize($rsc_path.$subpath, 'widthheight_assoc') )
-		{
-			$img_attribs += $img_wh;
-		}
+	if( isset( $country_flags_bg[ $country_code ] ) )
+	{	// Set background-position from config
+		$flag_attribs['style'] = 'background-position:'.$country_flags_bg[ $country_code ];
 	}
 
-	if( ! empty( $class ) ) $img_attribs['class'] = $class;
-	if( ! empty( $align ) ) $img_attribs['align'] = $align;
-
-	$r = '<img'.get_field_attribs_as_string($img_attribs).' />';
+	$r = '<span'.get_field_attribs_as_string( $flag_attribs ).'></span>';
 
 	if( $disp )
 		echo $r;   // echo it
@@ -738,7 +720,7 @@ function locale_overwritefromDB()
 	$priocounter = 0;
 	$query = 'SELECT
 						loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_startofweek,
-						loc_name, loc_messages, loc_priority, loc_enabled
+						loc_name, loc_messages, loc_priority, loc_transliteration_map, loc_enabled
 						FROM T_locales ORDER BY loc_priority';
 
 	foreach( $DB->get_results( $query, ARRAY_A ) as $row )
@@ -756,6 +738,13 @@ function locale_overwritefromDB()
 		//remember that we used this
 		$usedprios[] = $priocounter;
 
+		$transliteration_map = '';
+		// Try to unserialize the value
+		if( ($r = @unserialize(@base64_decode($row[ 'loc_transliteration_map' ]))) !== false )
+		{
+			$transliteration_map = $r;
+		}
+
 		$locales[ $row['loc_locale'] ] = array(
 				'charset'     => $row[ 'loc_charset' ],
 				'datefmt'     => $row[ 'loc_datefmt' ],
@@ -763,6 +752,7 @@ function locale_overwritefromDB()
 				'startofweek' => $row[ 'loc_startofweek' ],
 				'name'        => $row[ 'loc_name' ],
 				'messages'    => $row[ 'loc_messages' ],
+				'transliteration_map' => $transliteration_map,
 				'priority'    => $priocounter,
 				'enabled'     => $row[ 'loc_enabled' ],
 				'fromdb'      => 1
@@ -855,13 +845,27 @@ function locale_updateDB()
 
 	$locales = $templocales;
 
-	$query = "REPLACE INTO T_locales ( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_startofweek, loc_name, loc_messages, loc_priority, loc_enabled ) VALUES ";
+	$query = "REPLACE INTO T_locales ( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_startofweek, loc_name, loc_messages, loc_priority, loc_transliteration_map, loc_enabled ) VALUES ";
 	foreach( $locales as $localekey => $lval )
 	{
 		if( empty($lval['messages']) )
 		{ // if not explicit messages file is given we'll translate the locale
 			$lval['messages'] = strtr($localekey, '-', '_');
 		}
+
+		$transliteration_map = '';
+		if( !empty($lval['transliteration_map']) )
+		{
+			if( is_string($lval['transliteration_map']) )
+			{	// The value is already serialized and encoded
+				$transliteration_map = $lval['transliteration_map'];
+			}
+			else
+			{	// Encode the value
+				$transliteration_map = base64_encode( serialize($lval['transliteration_map']) );
+			}
+		}
+
 		$query .= '(
 			'.$DB->quote($localekey).',
 			'.$DB->quote($lval['charset']).',
@@ -871,6 +875,7 @@ function locale_updateDB()
 			'.$DB->quote($lval['name']).',
 			'.$DB->quote($lval['messages']).',
 			'.$DB->quote($lval['priority']).',
+			'.$DB->quote($transliteration_map).',
 			'.$DB->quote($lval['enabled']).'
 		), ';
 	}
@@ -976,7 +981,7 @@ function check_encoding($str, $encoding)
 	{
 		return mb_check_encoding($str, $encoding);
 	}
-	
+
 	return NULL;
 }
 
@@ -1006,7 +1011,7 @@ function init_charsets( $req_io_charset )
 	if( ! empty($force_io_charset_if_accepted) )
 	{ // we want to force a specific charset:
 		if( ! isset($_SERVER['HTTP_ACCEPT_CHARSET']) // all allowed
-			|| preg_match( '~\b(\*|'.$force_io_charset_if_accepted.')\b~', $_SERVER['HTTP_ACCEPT_CHARSET'] ) )
+			|| preg_match( '~\b(\*|'.preg_quote( $force_io_charset_if_accepted, '~' ).')\b~', $_SERVER['HTTP_ACCEPT_CHARSET'] ) )
 		{
 			$req_io_charset = $force_io_charset_if_accepted; // pretend that the first one has been requested
 		}
@@ -1087,13 +1092,23 @@ function locales_load_available_defs()
 	$locale_defs = array();
 
 	// Get all locale folder names:
-	$locale_folders = get_filenames( $locales_path, false, true, true, false, true );
+	$filename_params = array(
+			'inc_files'	=> false,
+			'recurse'	=> false,
+			'basename'	=> true,
+		);
+	$locale_folders = get_filenames( $locales_path, $filename_params );
 	// Go through all locale folders:
 	foreach( $locale_folders as $locale_folder )
 	{
 		$ad_locale_folder = $locales_path.'/'.$locale_folder;
 		// Get files in folder:
-		$locale_def_files = get_filenames( $ad_locale_folder, true, false, true, false, true );
+		$filename_params = array(
+				'inc_dirs'	=> false,
+				'recurse'	=> false,
+				'basename'	=> true,
+			);
+		$locale_def_files = get_filenames( $ad_locale_folder, $filename_params );
 		// Go through files in locale folder:
 		foreach( $locale_def_files as $locale_def_file )
 		{	// Check if it's a definition file:
@@ -1139,211 +1154,123 @@ function locales_load_available_defs()
 
 }
 
+
+/**
+ * Get a number of the messages in the .PO & .POT file
+ *
+ * @param string File name (messages.po)
+ * @param boolean TRUE - to calc a percent of translated messages
+ * @return integer Number of the messages
+ */
+function locale_file_po_info( $po_file_name, $calc_percent_done = false )
+{
+	$all = 0;
+	$fuzzy = 0;
+	$this_fuzzy = false;
+	$untranslated = 0;
+	$translated = 0;
+	$status = '-';
+	$matches = array();
+
+	if( file_exists( $po_file_name ) )
+	{
+		$lines = file( $po_file_name );
+		$lines[] = '';	// Adds a blank line at the end in order to ensure complete handling of the file
+
+		foreach( $lines as $line )
+		{
+			if( trim( $line ) == '' )
+			{	// Blank line, go back to base status:
+				if( $status == 't' )
+				{	// ** End of a translation ** :
+					if( $msgstr == '' )
+					{
+						$untranslated++;
+						// echo 'untranslated: ', $msgid, '<br />';
+					}
+					else
+					{
+						$translated++;
+					}
+					if( $msgid == '' && $this_fuzzy )
+					{	// It's OK if first line is fuzzy
+						$fuzzy--;
+					}
+					$msgid = '';
+					$msgstr = '';
+					$this_fuzzy = false;
+				}
+				$status = '-';
+			}
+			elseif( ( $status == '-' ) && preg_match( '#^msgid "(.*)"#', $line, $matches ) )
+			{	// Encountered an original text
+				$status = 'o';
+				$msgid = $matches[1];
+				// echo 'original: "', $msgid, '"<br />';
+				$all++;
+			}
+			elseif( ( $status == 'o' ) && preg_match( '#^msgstr "(.*)"#', $line, $matches ) )
+			{	// Encountered a translated text
+				$status = 't';
+				$msgstr = $matches[1];
+				// echo 'translated: "', $msgstr, '"<br />';
+			}
+			elseif( preg_match( '#^"(.*)"#', $line, $matches ) )
+			{	// Encountered a followup line
+				if( $status == 'o' )
+					$msgid .= $matches[1];
+				elseif( $status == 't' )
+					$msgstr .= $matches[1];
+			}
+			elseif( strpos( $line,'#, fuzzy' ) === 0 )
+			{
+				$this_fuzzy = true;
+				$fuzzy++;
+			}
+		}
+	}
+
+	$info = array(
+			'all'          => $all,
+			'fuzzy'        => $fuzzy,
+			'translated'   => $translated,
+			'untranslated' => $untranslated
+		);
+
+	if( $calc_percent_done )
+	{
+		$info['percent'] = locale_file_po_percent_done( $info );
+	}
+
+	return $info;
+}
+
+
+/**
+ * Get a percent of translated messages in the .PO file
+ *
+ * @param array File info (see result of the function locale_file_po_info() )
+ * @return integer Percent
+ */
+function locale_file_po_percent_done( $po_file_info )
+{
+	global $messages_pot_file_info;
+
+	if( !isset( $messages_pot_file_info ) )
+	{	// Initialize a file info for the main language file if it doesn't yet set
+		global $locales_path;
+		$messages_pot_file_info = locale_file_po_info( $locales_path.'messages.pot' );
+	}
+
+	$percent_done = ( $messages_pot_file_info['all'] > 0 ) ? round( ( $po_file_info['translated'] - $po_file_info['fuzzy'] / 2 ) / $messages_pot_file_info['all'] * 100 ) : 0;
+
+	return $percent_done;
+}
+
 /*
  * $Log$
- * Revision 1.51  2011/09/09 21:45:57  fplanque
- * doc
+ * Revision 1.53  2013/11/06 08:04:25  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.50  2011/09/07 07:22:00  sam2kb
- * Normalize line breaks in supplied string before trying to translate it
- *
- * Revision 1.49  2011/09/07 00:28:26  sam2kb
- * Replace non-ASCII character in regular expressions with ~
- *
- * Revision 1.48  2011/09/04 22:13:18  fplanque
- * copyright 2011
- *
- * Revision 1.47  2011/03/02 00:52:01  fplanque
- * added @author tag
- *
- * Revision 1.46  2011/02/27 17:45:11  fplanque
- * no message
- *
- * Revision 1.45  2011/02/10 23:07:21  fplanque
- * minor/doc
- *
- * Revision 1.41.2.1  2010/07/03 23:17:47  fplanque
- * revert unwanted
- *
- * Revision 1.42  2010/06/17 17:48:46  blueyed
- * Fix locale_from_httpaccept, complete rewrite.
- *
- * Revision 1.41  2010/05/13 19:09:08  blueyed
- * debug_locale=true
- *
- * Revision 1.40  2010/02/08 17:53:23  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.39  2009/12/12 03:54:05  blueyed
- * convert_charset: do not depend on Timer global
- *
- * Revision 1.38  2009/12/11 23:55:48  fplanque
- * doc
- *
- * Revision 1.37  2009/12/09 21:59:40  blueyed
- * Add check_encoding and can_check_encoding functions.
- *
- * Revision 1.36  2009/11/30 00:22:05  fplanque
- * clean up debug info
- * show more timers in view of block caching
- *
- * Revision 1.35  2009/10/01 18:50:15  tblue246
- * convert_charset(): Trying to remove unreliable charset detection and modify all calls accordingly -- needs testing to ensure all charset conversions work as expected.
- *
- * Revision 1.34  2009/09/30 21:14:20  blueyed
- * omg, fix locale_flag
- *
- * Revision 1.33  2009/09/30 17:41:19  blueyed
- * locale_flag: add image width/height
- *
- * Revision 1.32  2009/09/23 21:37:03  blueyed
- * Unify Debuglogging of T_ methods.
- *
- * Revision 1.31  2009/08/31 17:21:32  fplanque
- * minor
- *
- * Revision 1.30  2009/08/26 22:36:25  tblue246
- * Todo about mb_detect_encoding()
- *
- * Revision 1.29  2009/08/25 19:56:02  blueyed
- * Add convert_charset timer.
- *
- * Revision 1.28  2009/07/09 22:57:32  fplanque
- * Fixed init of connection_charset, especially during install.
- *
- * Revision 1.27  2009/06/23 07:52:02  tblue246
- * Add missing $param to TS_()
- *
- * Revision 1.26  2009/06/22 19:31:06  tblue246
- * Skin-specific translations ("locales" folder in the skin's folder, directory structure is the same as for plugins).
- *
- * Revision 1.25  2009/05/28 23:01:03  blueyed
- * Add Debuglog when charsets are not setup yet when translating: encoding issues in e.g. login form.. :/
- *
- * Revision 1.24  2009/03/15 23:07:56  tblue246
- * minor
- *
- * Revision 1.23  2009/03/15 12:44:39  tblue246
- * doc
- *
- * Revision 1.22  2009/03/15 08:37:08  yabs
- * Adding translation strings for b2evoHelper object
- *
- * Revision 1.21  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.20  2009/03/06 00:11:27  blueyed
- * Abstract POFile handling to POFile class completely.
- *  - move gettext/pofile.class.php to blogs/inc/locales
- *  - use it in locales.ctrl
- * _global.php generation:
- *  - use double quotes only when necessary (msgid/msgstr containing e.g. \n),
- *    this speeds up reading the file a lot
- *  - add __meta__ key to trans array, used for versioning, so old files still
- *    get handled (and converted when being read)
- * Not tested for long in CVS HEAD, but works well in whissip for some time
- * already.
- *
- * Revision 1.19  2009/03/03 20:15:49  tblue246
- * T_(): Adding workaround for PHP 4 compatibility...
- *
- * Revision 1.18  2009/03/03 15:00:22  tblue246
- * PHP 4 compat BREAKS plugin translations!
- *
- * Revision 1.17  2009/03/03 00:52:18  fplanque
- * & $ext_transarray = NULL does not wrok on PHP4
- * PLEASE CONFIRM THAT CODE WORKS WITHOUT &
- *
- * Revision 1.16  2009/02/25 23:47:12  blueyed
- * T(): return string always, if messages are not set; not only if $evo_char is defined (and it gets converted); minor doc
- *
- * Revision 1.15  2009/02/25 20:15:21  tblue246
- * L10n:
- * - Remove Gettext functionality (that means we now use our PHP arrays from the _global.php files only).
- * - Try to merge most functionality of Plugin::T_() into the global T_() function.
- *
- * Revision 1.14  2009/01/29 18:16:35  tblue246
- * Hide language chooser on post form in expert mode if there's only one locale.
- *
- * Revision 1.13  2008/09/07 09:13:28  fplanque
- * Locale definitions are now included in language packs.
- * A bit experimental but it should work...
- *
- * Revision 1.12  2008/07/01 21:52:54  blueyed
- * convert_charset(): return string itself unconverted, if $dest_charset is empty, which may happen when $evo_charset is not defined yet(?)
- *
- * Revision 1.11  2008/07/01 08:34:10  fplanque
- * minor
- *
- * Revision 1.10  2008/06/30 21:24:20  blueyed
- * - convert_charset(): auto-detect source encoding, if not given (UTF-8, ISO-8859-1, ISO-8859-15)
- * - extract_keyphrase_from_referer: use convert_charset() to convert query string to $evo_charset
- *
- * Revision 1.9  2008/05/10 21:30:39  fplanque
- * better UTF-8 handling
- *
- * Revision 1.8  2008/03/07 02:04:45  blueyed
- * fix indent again
- *
- * Revision 1.7  2008/03/07 00:54:42  blueyed
- * indent
- *
- * Revision 1.6  2008/02/08 22:24:46  fplanque
- * bugfixes
- *
- * Revision 1.5  2008/01/21 09:35:32  fplanque
- * (c) 2008
- *
- * Revision 1.4  2007/11/03 21:04:27  fplanque
- * skin cleanup
- *
- * Revision 1.3  2007/07/09 21:24:12  fplanque
- * cleanup of admin page top
- *
- * Revision 1.2  2007/06/26 02:40:54  fplanque
- * security checks
- *
- * Revision 1.1  2007/06/25 11:00:37  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.38  2007/04/26 00:11:02  fplanque
- * (c) 2007
- *
- * Revision 1.37  2007/03/04 20:14:16  fplanque
- * GMT date now in system checks
- *
- * Revision 1.36  2006/12/04 21:20:28  blueyed
- * Abstracted convert_special_charsets() out of urltitle_validate()
- *
- * Revision 1.35  2006/11/27 01:36:04  blueyed
- * doc typo
- *
- * Revision 1.34  2006/11/24 18:27:25  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.33  2006/11/16 22:33:52  blueyed
- * some more charset issue releated TODOs.. :/
- *
- * Revision 1.32  2006/11/14 21:12:38  blueyed
- * Fix for gettext-T_()
- *
- * Revision 1.31  2006/11/14 00:47:32  fplanque
- * doc
- *
- * Revision 1.30  2006/11/02 15:58:08  blueyed
- * todo/note
- *
- * Revision 1.29  2006/10/31 00:33:26  blueyed
- * Fixed item_issue_date for preview
- *
- * Revision 1.28  2006/10/29 21:20:53  blueyed
- * Replace special characters in generated URL titles
- *
- * Revision 1.27  2006/10/24 23:04:05  blueyed
- * Added can_convert_charsets() function
- *
- * Revision 1.26  2006/10/04 12:55:24  blueyed
- * - Reload $Blog, if charset has changed for Blog locale
- * - only update DB connection charset, if not forced with $db_config['connection_charset']
  */
 ?>

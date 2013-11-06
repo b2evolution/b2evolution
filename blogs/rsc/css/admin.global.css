@@ -43,6 +43,7 @@ div.dashboard_sidebar li li {
 .dashboard_thumbnails {
 	float:left;
 	margin-right: 2px;
+	width: 100%;
 }
 .dashboard_thumbnails img {
 	border: 1px solid #000;
@@ -61,6 +62,11 @@ h3.dashboard_post_title {
 	font-size: 84%;
 	padding-right: 2px;
 	float: left;
+}
+
+div.dashboard_rating {
+	float: left;
+	margin-right: 5px;
 }
 
 
@@ -89,10 +95,10 @@ h3.dashboard_post_title {
 
 #overlay_page.overlay_page_active{
 	position:fixed;
+	top:40px;
 	bottom:5%;
 	right:5%;
-	height:90%;
-	width:90%;
+	left:5%;
 	overflow:auto;
 	z-index:999;
 	background:#f1f6f8;
@@ -303,6 +309,14 @@ div.skinshot {
 	padding: 0;
 }
 
+div.coll_settings_skinshot {
+	width: 256px;
+	height: 212px;
+	background-color: #ccc;
+	margin: 1ex;
+	padding-top: 1px;
+}
+
 div.skinshot_placeholder {
 	width: 240px;
 	height: 180px;
@@ -324,13 +338,15 @@ div.skinshot_name {
 	font-size: 170%;
 }
 
-div.skinshot div.legend {
+div.skinshot div.legend,
+div.coll_settings_skinshot div.legend {
 	width: 240px;
 	margin: .5ex 1ex 1ex 1ex;
 	padding: 0;
 }
 
-div.skinshot div.actions {
+div.skinshot div.actions,
+div.coll_settings_skinshot div.actions {
 	float: right;
 	margin: 0;
 	padding: 0;
@@ -442,11 +458,61 @@ div.menu3 {
 }
 div.menu3 .option3,
 div.menu3 .current {
-	margin-left: 1em;
 	font-weight: bold;
+	margin-right: 2px;
+}
+div.menu3 a {
+	color: #000;
+	font-size: 11px;
+	display: inline-block;
+	line-height: 15px;
+	padding: 0 10px 1px;
+}
+div.menu3 a:hover {
+	text-decoration: none;
+	color: #FFF;
+	border-radius: 8px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	-khtml-border-radius: 8px;
+	/* Safari 4-5, Chrome 1-9 */
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#b1b1b1), to(#9e9e9e));
+	/* Safari 5.1, Chrome 10+ */
+	background: -webkit-linear-gradient(top, #9e9e9e, #b1b1b1);
+	/* Firefox 3.6+ */
+	background: -moz-linear-gradient(top, #9e9e9e, #b1b1b1);
+	/* IE 10 */
+	background: -ms-linear-gradient(top, #9e9e9e, #b1b1b1);
+	/* Opera 11.10+ */
+	background: -o-linear-gradient(top, #9e9e9e, #b1b1b1);
+	/* IE */
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#9e9e9e', endColorstr='#b1b1b1');
+}
+div.menu3 .current a, div.menu3 .current a:hover {
+	border-radius: 8px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	-khtml-border-radius: 8px;
+
+	-moz-box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
+	-webkit-box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
+	box-shadow: 0 1px 2px 1px rgba(0, 0, 0, 0.3) inset;
+
+	/* Safari 4-5, Chrome 1-9 */
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#8b8d8d), to(#757777));
+	/* Safari 5.1, Chrome 10+ */
+	background: -webkit-linear-gradient(top, #757777, #8b8d8d);
+	/* Firefox 3.6+ */
+	background: -moz-linear-gradient(top, #757777, #8b8d8d);
+	/* IE 10 */
+	background: -ms-linear-gradient(top, #757777, #8b8d8d);
+	/* Opera 11.10+ */
+	background: -o-linear-gradient(top, #757777, #8b8d8d);
+	/* IE */
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#757777', endColorstr='#8b8d8d');
 }
 div.menu3 .current a {
-	color: #f00;
+	color: #fff;
 }
 
 
@@ -510,7 +576,18 @@ ul.widget_list li {
 div.avatartag {
 	float: left;
 	margin: 0 0.5em 0.5em 0;
-	padding: 0;
+}
+div.avatartag a {
+	outline: none;
+}
+
+table.prevnext_user {
+	width: 100%;
+	margin: -5px 0 5px 0;
+}
+table.prevnext_user .back_users_list {
+	text-align: center;
+	font-size: 84%;
 }
 
 /*  Menu3 with title, used for User editing */
@@ -518,23 +595,28 @@ div.avatartag {
 	height: 48px;
 }
 .user_header .menu3 {
-	margin: 6px 0 0;
-	font-size: 71%;
+	margin: 12px 0 0;
 }
 .user_header .cboxElement {
 	float: left;
-	margin: 0 10px 0 0;
 }
 .user_header_content {
 	float: left;
+	margin-left: 6px;
+}
+.user_header_content h2.user_title {
+	line-height: 14px;
+	margin-top: 2px;
 }
 
-.vote_spam{
+.vote_spam {
 	float: left;
-	padding: 0 10px;
+	padding: 1px 10px 0;
 }
-.vote_spam a{
-	margin: 0 8px;
+.vote_spam a, .vote_spam span {
+	vertical-align: middle;
+	top: -1px;
+	display: inline-block;
 }
 
 /* User fields */
@@ -582,6 +664,11 @@ div.avatartag {
 	background-color: #FFCC00;
 }
 
+.agent_rss{
+	background-color: #FF6600;
+}
+
+
 .code_2xx{
 	color: #0f0;
 	font-weight: bold;
@@ -613,4 +700,111 @@ div.avatartag {
 }
 .hit_type_admin{
 	background-color: #e0e0e0;
+}
+
+.dom_type_edit {
+	width: 200px;
+	height: 30px;
+}
+.dom_type_edit span {
+	color: #0092ef;
+}
+
+.dom_type_edit_error {
+	background: #fbb;
+}
+
+.compact_data {
+	white-space: nowrap;
+	font-size: 84%;
+}
+
+pre.email_log {
+	overflow: auto;
+	font-size: 112%;
+	margin: .5ex 0;
+}
+pre.email_log_scroll {
+	overflow: scroll;
+	font-size: 112%;
+	margin: .5ex 0;
+	border: 1px solid #ccc;
+	max-width: 900px;
+}
+pre.email_log span,
+pre.email_log_scroll span {
+	background: #eee;
+}
+
+div#user_status_icon, div#email_status_icon, div#iprange_status_icon {
+	float: left;
+	padding: 5px 5px 0 0;
+}
+
+/* Diff */
+table.diff, td.diff-otitle, td.diff-ntitle {
+	background-color: white;
+}
+td.diff-otitle, td.diff-ntitle {
+	text-align: center;
+	width: 50%;
+}
+td.diff-marker {
+	text-align: right;
+}
+td.diff-lineno {
+	font-weight: bold;
+}
+td.diff-addedline {
+	background: none repeat scroll 0 0 #CCFFCC;
+	font-size: smaller;
+}
+td.diff-deletedline {
+	background: none repeat scroll 0 0 #FFFFAA;
+	font-size: smaller;
+}
+td.diff-context {
+	background: none repeat scroll 0 0 #EEEEEE;
+	font-size: smaller;
+}
+.diffchange {
+	color: red;
+	font-weight: bold;
+	text-decoration: none;
+	white-space: pre-wrap;
+}
+table.diff {
+	border: medium none;
+	border-spacing: 4px;
+	table-layout: fixed;
+	width: 100%;
+}
+table.diff td {
+	padding: 0;
+}
+table.diff col.diff-marker {
+	width: 2%;
+}
+table.diff col.diff-content {
+	width: 48%;
+}
+table.diff td div {
+	overflow: auto;
+	word-wrap: break-word;
+}
+
+td.diff-title-deletedline, td.diff-title-addedline {
+	text-align: center;
+	font-size: 120%;
+	font-weight: bold;
+}
+
+.RedButton {
+	background: #F00;
+	color: #FFF;
+	border: 1px solid #000;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-khtml-border-radius: 4px;
 }

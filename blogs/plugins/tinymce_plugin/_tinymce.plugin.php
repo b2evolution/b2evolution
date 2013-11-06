@@ -38,7 +38,7 @@ class tinymce_plugin extends Plugin
 	var $code = 'evo_TinyMCE';
 	var $name = 'TinyMCE';
 	var $priority = 10;
-	var $version = '3.3.0';
+	var $version = '5.0.0';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -279,11 +279,17 @@ class tinymce_plugin extends Plugin
 			return;
 		}
 
+		if( !empty( $Blog ) )
+		{
+			if( !$Blog->get_setting( 'allow_html_post' ) )
+			{	// Only when HTML is allowed in post
+				return false;
+			}
+		}
+
 		// Get init params, depending on edit mode: simple|expert
 		$tmce_init = $this->get_tmce_init( $params['edit_layout'] );
 
-		if( $params['edit_layout'] != 'inskin' )
-		{	// Don't show HTML mode for 'In-skin editing mode'
 		?>
 
 		<input id="tinymce_plugin_toggle_button"
@@ -291,9 +297,7 @@ class tinymce_plugin extends Plugin
 			value="WYSIWYG"
 			style="display:none"
 			title="<?php echo htmlspecialchars($this->T_('Toggle between WYSIWYG and plain HTML editor')); ?>" />
-		<?php
-		}
-		?>
+
 		<script type="text/javascript">
 			jQuery("#tinymce_plugin_toggle_button").click( function() {
 				tinymce_plugin_toggleEditor('<?php echo $this->tmce_editor_id; ?>'); } );
@@ -470,11 +474,12 @@ class tinymce_plugin extends Plugin
 		</script>
 
 		<?php
-		if( is_object($edited_Item) && !empty($edited_Item->editor_code) )
+		$item_editor_code = ( is_object($edited_Item) ) ? $edited_Item->get_setting( 'editor_code' ) : NULL;
+		if( !empty( $item_editor_code ) )
 		{	// We have a preference for the current post, follow it:
 			// Use tinyMCE if code matched the code of the current plugin.
 			// fp> Note: this is a temporary solution; in the long term, this will be part of the API and the appropriate plugin will be selected.
-			$use_tinymce = ($edited_Item->editor_code == $this->code);
+			$use_tinymce = ($item_editor_code == $this->code);
 		}
 		else
 		{	// We have no pref, fall back to whatever current user has last used:
@@ -868,6 +873,10 @@ class tinymce_plugin extends Plugin
 		$init_options[] = 'theme_advanced_buttons4 : "'.$tmce_theme_advanced_buttons4.'"';
 		// UI options:
 		$init_options[] = 'theme_advanced_blockformats : "p,pre,blockquote,h2,h3,h4,h5,h6,address,dt,dd,div"';
+		$init_options[] = 'style_formats : [
+			{ title : "Wide DIV", block : "div", classes : "wide_scroll" },
+			{ title : ".nowrap", block : "div", classes : "nowrap" }
+		]';
 		// if( $edit_layout == 'expert' )
 		{
 			$init_options[] = 'theme_advanced_path_location : "bottom"';
@@ -885,20 +894,22 @@ class tinymce_plugin extends Plugin
 		// fp> we are not aiming for perfect wysiwyg (too heavy), just for a relevant look & feel.
 		// dh>We can/should use class_filter to only keep useful classes.
 		// fp> how???
-			if( ! empty( $Blog->skin_ID) )
+			$content_css = '';
+			$blog_skin_ID = $Blog->get_skin_ID();
+			if( ! empty( $blog_skin_ID ) )
 			{
 				$SkinCache = & get_SkinCache();
 				/**
 				 * @var Skin
 				 */
-				$Skin = $SkinCache->get_by_ID( $Blog->skin_ID );
+				$Skin = $SkinCache->get_by_ID( $blog_skin_ID );
 				$item_css_url = $skins_url.$Skin->folder.'/item.css';
 				// else: $item_css_url = $rsc_url.'css/item_base.css';
-				$content_css = ','.$item_css_url;		// fp> TODO: this needs to be a param... "of course" -- if none: else item_default.css ?
+				$content_css .= ','.$item_css_url;		// fp> TODO: this needs to be a param... "of course" -- if none: else item_default.css ?
 			}
 			// else item_default.css -- is it still possible to have no skin ?
 
-		$init_options[] = 'content_css : "'.$this->get_plugin_url().'editor.css?v='.($debug ? $localtimenow : $this->version )
+		$init_options[] = 'content_css : "'.$this->get_plugin_url().'editor.css?v='.( $debug ? $localtimenow : $this->version )
 									.$content_css.'"';
 
 /* fp> the following seems like something that filters classes but the way it's done doesn't make sense to me.
@@ -1003,9 +1014,8 @@ class tinymce_plugin extends Plugin
 		if( !empty($params['item']) )
 		{	// Save the status last used by this Item:
 			// fp> TODO: also do that on CREATE post because it won't have been done here:
-			$sql = 'UPDATE T_items__item
-								 SET post_editor_code = '.$DB->quote( (int)$params['on'] ? $this->code : 'html' )
-						.' WHERE post_ID = '.$DB->quote((int)$params['item']);
+			$sql = 'REPLACE INTO T_items__item_settings ( iset_item_ID, iset_name, iset_value )
+								VALUES( '.$DB->quote((int)$params['item']).', '.$DB->quote( 'editor_code' ).', '.$DB->quote( (int)$params['on'] ? $this->code : 'html' ).' )';
 			$DB->query( $sql, 'Save editor state for current post' );
 		}
 

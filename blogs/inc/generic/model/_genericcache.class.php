@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -44,9 +44,9 @@ class GenericCache extends DataObjectCache
 	/**
 	 * Constructor
 	 */
-	function GenericCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname = 'ID', $name_field = NULL, $order_by = '', $allow_none_text = NULL )
+	function GenericCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname = 'ID', $name_field = NULL, $order_by = '', $allow_none_text = NULL, $allow_none_value = '', $select = '' )
 	{
-		parent::DataObjectCache( $objtype, $load_all, $tablename, $prefix, $dbIDname, $name_field, $order_by, $allow_none_text );
+		parent::DataObjectCache( $objtype, $load_all, $tablename, $prefix, $dbIDname, $name_field, $order_by, $allow_none_text, $allow_none_value, $select );
 	}
 
 
@@ -68,40 +68,8 @@ class GenericCache extends DataObjectCache
 
 /*
  * $Log$
- * Revision 1.8  2011/09/04 22:13:17  fplanque
- * copyright 2011
+ * Revision 1.10  2013/11/06 08:04:15  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.7  2010/02/26 18:36:04  fplanque
- * this seemed wrong
- *
- * Revision 1.6  2010/02/08 17:53:02  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.5  2010/01/30 18:55:27  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.4  2009/09/14 12:25:47  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.3  2009/03/08 23:57:43  fplanque
- * 2009
- *
- * Revision 1.2  2008/01/21 09:35:30  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 11:00:14  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.9  2007/06/11 22:01:53  blueyed
- * doc fixes
- *
- * Revision 1.8  2007/04/26 00:11:11  fplanque
- * (c) 2007
- *
- * Revision 1.7  2006/12/05 01:35:27  blueyed
- * Hooray for less complexity and the 8th param for DataObjectCache()
- *
- * Revision 1.6  2006/11/24 18:27:24  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

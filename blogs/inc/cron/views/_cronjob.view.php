@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -25,18 +25,23 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $cjob_row;
+global $cjob_row, $current_User, $admin_url;
 
 $Form = new Form( NULL, 'cronlog' );
+
+if( empty( $cjob_row->clog_status ) && $current_User->check_perm( 'options', 'edit', false, NULL ) )
+{ // User can edit this job:
+	$Form->global_icon( T_('Edit this job'), 'edit', $admin_url.'?ctrl=crontab&amp;action=edit&amp;ctsk_ID='.$cjob_row->ctsk_ID, T_('Edit this job...'), 3, 3 );
+}
 
 $Form->global_icon( T_('Close sheet'), 'close', regenerate_url( 'action,cjob_ID' ) );
 
 $Form->begin_form( 'fform', T_('Scheduled job') );
 
-	$Form->begin_fieldset( T_('Job details').get_manual_link('scheduler_job_info') );
+	$Form->begin_fieldset( T_('Job details').get_manual_link( $cjob_row->ctsk_name ) );
 
 		$Form->info( T_('Job #'), $cjob_row->ctsk_ID );
-		$Form->info( T_('Job name'), $cjob_row->ctsk_name );
+		$Form->info( T_('Job name'), $cjob_row->ctsk_name.get_manual_link( $cjob_row->ctsk_name ) );
 		$Form->info( T_('Scheduled at'), mysql2localedatetime($cjob_row->ctsk_start_datetime) );
 		$cjob_repeat_after = '';
 		if( $cjob_repeat_after_days = floor( $cjob_row->ctsk_repeat_after / 86400 ) )
@@ -67,7 +72,63 @@ $Form->begin_form( 'fform', T_('Scheduled job') );
 			$Form->info( T_('Status'), '<span class="cron_'.$cjob_row->clog_status.'">'.$cjob_row->clog_status.'</span>' );
 			$Form->info( T_('Real start time'), mysql2localedatetime($cjob_row->clog_realstart_datetime) );
 			$Form->info( T_('Real stop time'), mysql2localedatetime($cjob_row->clog_realstop_datetime) );
-			$Form->info( T_('Messages'), str_replace( "\n", "<br />\n", $cjob_row->clog_messages ) );
+			$Form->info( T_('Duration'), seconds_to_period( strtotime( $cjob_row->clog_realstop_datetime ) - strtotime( $cjob_row->clog_realstart_datetime ) ) );
+			$cron_messages_data = @unserialize( $cjob_row->clog_messages );
+			if( !is_array( $cron_messages_data ) )
+			{	// Simple messages
+				$Form->info( T_('Messages'), str_replace( "\n", "<br />\n", $cjob_row->clog_messages ) );
+			}
+			else
+			{	// Serialized data
+				if( isset( $cron_messages_data['message'] ) )
+				{	// Display message
+					$Form->info( T_('Messages'), str_replace( "\n", "<br />\n", $cron_messages_data['message'] ) );
+				}
+
+				if( isset( $cron_messages_data['table_cols'], $cron_messages_data['table_data'] ) && ( !empty( $cron_messages_data['table_data'] ) ) )
+				{	// Display table with report
+					$Table = new Table( NULL, 'cron_' );
+
+					$Table->cols = array();
+					if( !empty( $cron_messages_data['table_cols'] ) )
+					{
+						foreach( $cron_messages_data['table_cols'] as $col_name )
+						{
+							$Table->cols[] = array( 'th' => $col_name );
+						}
+					}
+
+					$Table->display_init();
+
+					$Table->display_list_start();
+
+					// COLUMN HEADERS:
+					$Table->display_col_headers();
+
+					// BODY START:
+					$Table->display_body_start();
+
+					// Display table rows
+					foreach( $cron_messages_data['table_data'] as $data_row )
+					{
+						$Table->display_line_start( false, false );
+
+						foreach( $data_row as $row_value )
+						{
+							$Table->display_col_start();
+							echo $row_value;
+							$Table->display_col_end();
+						}
+
+						$Table->display_line_end();
+					}
+
+					// BODY END:
+					$Table->display_body_end();
+
+					$Table->display_list_end();
+				}
+			}
 		}
 
 	$Form->end_fieldset();
@@ -77,35 +138,8 @@ $Form->end_form();
 
 /*
  * $Log$
- * Revision 1.7  2011/09/04 22:13:15  fplanque
- * copyright 2011
- *
- * Revision 1.6  2010/02/08 17:52:14  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.5  2010/01/30 18:55:23  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.4  2009/03/08 23:57:42  fplanque
- * 2009
- *
- * Revision 1.3  2008/01/21 09:35:28  fplanque
- * (c) 2008
- *
- * Revision 1.2  2007/09/12 21:00:31  fplanque
- * UI improvements
- *
- * Revision 1.1  2007/06/25 10:59:49  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.3  2007/04/26 00:11:09  fplanque
- * (c) 2007
- *
- * Revision 1.2  2006/11/24 18:27:25  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.1  2006/06/26 23:09:34  fplanque
- * Really working cronjob environment :)
+ * Revision 1.9  2013/11/06 08:04:07  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

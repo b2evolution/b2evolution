@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -43,6 +43,7 @@ class SQL
 	var $from = '';
 	var $where = '';
 	var $group_by = '';
+	var $having = '';
 	var $order_by = '';
 	var $limit = '';
 	var $search_field = array();
@@ -70,6 +71,7 @@ class SQL
 		$sql .= $this->get_from();
 		$sql .= $this->get_where();
 		$sql .= $this->get_group_by();
+		$sql .= $this->get_having();
 		$sql .= $this->get_order_by();
 		$sql .= $this->get_limit();
 		return $sql;
@@ -85,6 +87,7 @@ class SQL
 		echo $this->get_from( '<br />FROM ' );
 		echo $this->get_where( '<br />WHERE ' );
 		echo $this->get_group_by( '<br />GROUP BY ' );
+		echo $this->get_having( '<br />HAVING ' );
 		echo $this->get_order_by( '<br />ORDER BY ' );
 		echo $this->get_limit( '<br />LIMIT ' );
 	}
@@ -140,6 +143,20 @@ class SQL
 		if( !empty($this->group_by) )
 		{
 			return $prefix.$this->group_by;
+		}
+
+		return '';
+	}
+
+
+  /**
+	 * Get HAVING clause if there is something inside
+	 */
+	function get_having( $prefix = ' HAVING ' )
+	{
+		if( !empty($this->having) )
+		{
+			return $prefix.$this->having;
 		}
 
 		return '';
@@ -273,12 +290,38 @@ class SQL
 		$this->group_by = $group_by;
 	}
 
+	function HAVING( $having )
+	{
+		$this->having = $having;
+	}
+
+	/**
+	 * Extends the HAVING clause with AND
+	 *
+	 * @param string
+	 */
+	function HAVING_and( $having_and )
+	{
+		if( empty( $having_and ) )
+		{	// Nothing to append:
+			return false;
+		}
+
+		if( ! empty( $this->having ) )
+		{ // We already have something in the HAVING clause:
+			$this->having .= ' AND ';
+		}
+
+		// Append payload:
+		$this->having .= '('.$having_and.')';
+	}
+
 	function ORDER_BY( $order_by )
 	{
 		$this->order_by = $order_by;
 	}
 
- 	function ORDER_BY_prepend( $order_by_prepend )
+	function ORDER_BY_prepend( $order_by_prepend )
 	{
 		if( empty( $order_by_prepend ) )
 		{
@@ -411,37 +454,8 @@ class SQL
 
 /*
  * $Log$
- * Revision 1.8  2011/09/04 22:13:13  fplanque
- * copyright 2011
+ * Revision 1.10  2013/11/06 08:03:47  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.7  2010/02/08 17:51:55  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.6  2009/12/06 21:47:44  blueyed
- * SQL: add title property
- *
- * Revision 1.5  2009/10/11 02:32:18  blueyed
- * todo
- *
- * Revision 1.4  2009/09/25 20:26:27  fplanque
- * fixes/doc
- *
- * Revision 1.3  2009/03/08 23:57:40  fplanque
- * 2009
- *
- * Revision 1.2  2008/01/21 09:35:24  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 10:58:59  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.11  2007/04/26 00:11:08  fplanque
- * (c) 2007
- *
- * Revision 1.10  2007/02/06 13:27:26  waltercruz
- * Changing double quotes to single quotes
- *
- * Revision 1.9  2006/11/24 18:27:27  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

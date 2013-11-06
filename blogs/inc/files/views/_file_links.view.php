@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -30,9 +30,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * @var Item
+ * @var LinkOwner
  */
-global $edited_Item;
+global $LinkOwner;
 
 global $mode;
 
@@ -46,20 +46,17 @@ if( $mode != 'upload' )
 
 	$Form->hidden_ctrl();
 
-	$SQL = new SQL();
-	$SQL->SELECT( 'link_ID, link_ltype_ID, T_files.*' );
-	$SQL->FROM( 'T_links INNER JOIN T_files ON link_file_ID = file_ID' );
-	$SQL->WHERE( 'link_itm_ID = ' . $edited_Item->ID );
+	$SQL = $LinkOwner->get_SQL();
 
 	$Results = new Results( $SQL->get(), 'link_' );
 
+	$view_link_title = $LinkOwner->T_( 'View this owner...' );
 	$Results->title = sprintf( T_('Files linked to &laquo;%s&raquo;'),
-					'<a href="?ctrl=items&amp;blog='.$edited_Item->get_blog_ID().'&amp;p='.$edited_Item->ID.'" title="'
-					.T_('View this post...').'">'.$edited_Item->dget('title').'</a>' );
+					'<a href="'.$LinkOwner->get_view_url().'" title="'.$view_link_title.'">'.$LinkOwner->get( 'title' ).'</a>' );
 
-	if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
-	{ // User has permission to edit this post
-		$Results->global_icon( T_('Edit this post...'), 'edit', '?ctrl=items&amp;action=edit&amp;p='.$edited_Item->ID, T_('Edit') );
+	if( $LinkOwner->check_perm( 'edit', false ) )
+	{
+		$Results->global_icon( $LinkOwner->T_( 'Edit this owner...' ), 'edit', $LinkOwner->get_edit_url(), T_('Edit') );
 	}
 
 	// Close link mode and continue in File Manager (remember the Item_ID though):
@@ -94,13 +91,13 @@ if( $mode != 'upload' )
 		 * @global File
 		 */
 		global $current_File, $current_User;
-		global $edited_Item;
+		global $LinkOwner;
 
 		$r = T_( 'You don\'t have permission to access this file root' );
 		if( $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
 		{
 			// File relative path & name:
-			$r = $current_File->get_linkedit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID );
+			$r = $current_File->get_linkedit_link( $LinkOwner->type, $LinkOwner->get_ID() );
 		}
 		return $r;
 	}
@@ -120,131 +117,38 @@ if( $mode != 'upload' )
 							'td' => '$file_title$',
 						);
 
-
 	// ACTIONS COLUMN:
-	function file_actions( $link_ID )
-	{
-		global $current_File, $edited_Item, $current_User;
-
-		$r = '';
-		if( $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
-		{
-			if( $current_File->is_dir() )
-				$title = T_('Locate this directory!');
-			else
-				$title = T_('Locate this file!');
-	
-	
-			$r = $current_File->get_linkedit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID,
-							get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title );
-		}
-		if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
-		{	// Check that we have permission to edit item:
-			$r .= action_icon( T_('Delete this link!'), 'unlink',
-	                      regenerate_url( 'action', 'link_ID='.$link_ID.'&amp;action=unlink&amp;'.url_crumb('link') ) );
-		}
-
-		return $r;
-	}
 	$Results->cols[] = array(
 							'th' => T_('Actions'),
 							'th_class' => 'shrinkwrap',
 							'td_class' => 'shrinkwrap',
-							'td' => '%file_actions( #link_ID# )%',
+							'td' => '%link_actions( #link_ID#, {CUR_IDX}, {TOTAL_ROWS} )%',
 						);
+
+	// POSITION COLUMN:
+	$Results->cols[] = array(
+						'th' => T_('Position'),
+						'td_class' => 'shrinkwrap',
+						'td' => '%display_link_position( {row} )%',
+					);
 
 	$Results->display();
 
 	$Form->end_form( );
 }
 
-if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+if( $LinkOwner->check_perm( 'edit' ) )
 {	// Check that we have permission to edit item:
-	echo '<div>', sprintf( T_('Click on link %s icons below to link additional files to the post %s.'),
-							get_icon( 'link', 'imgtag', array('class'=>'top') ),
-							'&laquo;<strong>'.$edited_Item->dget( 'title' ).'</strong>&raquo;' ), '</div>';
+	echo '<div>', $LinkOwner->T_( 'Click on link %s icons below to link additional files to $ownerTitle$.',
+							get_icon( 'link', 'imgtag', array('class'=>'top') ) ), '</div>';
 }
 
 
 
 /*
  * $Log$
- * Revision 1.18  2011/09/04 22:13:16  fplanque
- * copyright 2011
+ * Revision 1.20  2013/11/06 08:04:15  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.17  2011/02/23 02:04:03  fplanque
- * minor
- *
- * Revision 1.16  2011/01/18 16:23:03  efy-asimo
- * add shared_root perm and refactor file perms - part1
- *
- * Revision 1.15  2010/02/08 17:52:57  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.14  2010/01/30 18:55:27  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.13  2010/01/03 13:10:58  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.12  2009/10/13 22:28:06  blueyed
- * "Locate this directory" for dirs. Cries for refactoring.
- *
- * Revision 1.11  2009/09/25 13:09:36  efy-vyacheslav
- * Using the SQL class to prepare queries
- *
- * Revision 1.10  2009/07/04 15:58:26  tblue246
- * Translation fixes and update of German translation
- *
- * Revision 1.9  2009/03/08 23:57:43  fplanque
- * 2009
- *
- * Revision 1.8  2009/02/25 22:17:53  blueyed
- * ItemLight: lazily load blog_ID and main_Chapter.
- * There is more, but I do not want to skim the diff again, after
- * "cvs ci" failed due to broken pipe.
- *
- * Revision 1.7  2008/09/23 05:26:38  fplanque
- * Handle attaching files when multiple posts are edited simultaneously
- *
- * Revision 1.6  2008/04/14 19:50:51  fplanque
- * enhanced attachments handling in post edit mode
- *
- * Revision 1.5  2008/04/13 20:40:06  fplanque
- * enhanced handlign of files attached to items
- *
- * Revision 1.4  2008/04/03 22:03:08  fplanque
- * added "save & edit" and "publish now" buttons to edit screen.
- *
- * Revision 1.3  2008/01/21 09:35:29  fplanque
- * (c) 2008
- *
- * Revision 1.2  2007/09/26 21:53:23  fplanque
- * file manager / file linking enhancements
- *
- * Revision 1.1  2007/06/25 11:00:01  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.13  2007/04/26 00:11:10  fplanque
- * (c) 2007
- *
- * Revision 1.12  2006/12/14 01:46:29  fplanque
- * refactoring / factorized image preview display
- *
- * Revision 1.11  2006/12/14 00:33:53  fplanque
- * thumbnails & previews everywhere.
- * this is getting good :D
- *
- * Revision 1.10  2006/12/12 19:39:07  fplanque
- * enhanced file links / permissions
- *
- * Revision 1.9  2006/12/12 18:04:53  fplanque
- * fixed item links
- *
- * Revision 1.8  2006/12/07 20:03:32  fplanque
- * Woohoo! File editing... means all skin editing.
- *
- * Revision 1.7  2006/11/24 18:27:25  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

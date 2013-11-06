@@ -33,11 +33,6 @@ function get_icon_info($name)
 			'xy' => array( 0, 0 )
 		);
 
-		case 'dropdown': return array(
-			'alt'  => '&darr;',
-			'size' => array( 11, 8 ),
-			'xy' => array( 16, 0 )
-		);
 		case 'switch-to-admin': return array(
 			'alt'  => /* TRANS: short for "Switch to _A_dmin" */ T_('Adm'),
 			'size' => array( 13, 14 ),
@@ -69,16 +64,6 @@ function get_icon_info($name)
 			'size' => array( 16, 15 ),
 			'xy' => array( 48, 16 )
 		);
-		case 'folder_home': return array(   // home folder
-			'alt'  => T_('Home folder'),
-			'size' => array( 16, 16 ),
-			'xy' => array( 64, 16 )
-		);
-		case 'file_edit': return array(     // edit a file
-			'alt'  => T_('Edit'),
-			'size' => array( 16, 16 ),
-			'xy' => array( 80, 16 )
-		);
 		case 'file_copy': return array(     // copy a file/folder
 			'alt'  => T_('Copy'),
 			'size' => array( 16, 16 ),
@@ -95,11 +80,6 @@ function get_icon_info($name)
 			'size' => array( 16, 16 ),
 			'xy' => array( 128, 16 )
 		);
-		case 'file_perms': return array(    // edit permissions of a file
-			'alt'  => T_('Permissions'),
-			'size' => array( 16, 16 ),
-			'xy' => array( 144, 16 )
-		);
 
 
 		case 'ascending': return array(     // ascending sort order
@@ -113,6 +93,27 @@ function get_icon_info($name)
 			'xy' => array( 80, 0 )
 		);
 
+		case 'sort_desc_on': return array(
+			'alt'  => T_('Descending order'),
+			'size' => array( 12, 11 ),
+			'xy' => array( 64, 208 )
+		);
+		case 'sort_asc_on': return array(
+			'alt'  => T_('Ascending order'),
+			'size' => array( 12, 11 ),
+			'xy' => array( 80, 208 )
+		);
+		case 'sort_desc_off': return array(
+			'alt'  => T_('Descending order'),
+			'size' => array( 12, 11 ),
+			'xy' => array( 96, 208 )
+		);
+		case 'sort_asc_off': return array(
+			'alt'  => T_('Ascending order'),
+			'size' => array( 12, 11 ),
+			'xy' => array( 112, 208 )
+		);
+
 		case 'window_new': return array(    // open in a new window
 			'alt'  => T_('New window'),
 			'size' => array( 15, 13 ),
@@ -120,12 +121,6 @@ function get_icon_info($name)
 		);
 
 
-		case 'file_word': return array(
-			'ext'  => '\.(s[txd]w|doc|rtf)',
-			'alt'  => '',
-			'size' => array( 16, 16 ),
-			'xy' => array( 0, 32 )
-		);
 		case 'file_image': return array(
 			'ext'  => '\.(gif|png|jpe?g)',
 			'alt'  => '',
@@ -244,15 +239,26 @@ function get_icon_info($name)
 			'xy' => array( 112, 0 )
 		);
 
+		case 'filters_show': return array(
+			'alt'  => T_('Expand'),
+			'size' => array( 15, 15 ),
+			'xy' => array( 64, 16 )
+		);
+		case 'filters_hide': return array(
+			'alt'  => T_('Collapse'),
+			'size' => array( 15, 15 ),
+			'xy' => array( 80, 16 )
+		);
+
 		case 'refresh': return array(
 			'alt'  => T_('Refresh'),
 			'size' => array( 16, 16 ),
-			'xy' => array( 32, 96 )
+			'xy' => array( 128, 208 )
 		);
 		case 'reload': return array(
 			'alt'  => T_('Reload'),
 			'size' => array( 15, 15 ),
-			'xy' => array( 48, 96 )
+			'xy' => array( 144, 208 )
 		);
 
 		case 'download': return array(
@@ -265,18 +271,23 @@ function get_icon_info($name)
 		case 'warning': return array( // TODO: not really transparent at its borders
 			'alt'  => T_('Warning'),
 			'size' => array( 16, 16 ),
-			'xy' => array( 64, 160 )
+			'xy' => array( 64, 176 )
+		);
+		case 'warning_yellow': return array(
+			'alt'  => T_('Warning'),
+			'size' => array( 16, 16 ),
+			'xy' => array( 48, 176 )
 		);
 
 		case 'info': return array(
 			'alt'  => T_('Info'),
 			'size' => array( 16, 16 ),
-			'xy' => array( 80, 160 )
+			'xy' => array( 80, 176 )
 		);
 		case 'email': return array(
 			'alt'  => T_('Email'),
-			'size' => array( 13, 10 ),
-			'xy' => array( 32, 160 )
+			'size' => array( 16, 12 ),
+			'xy' => array( 32, 176 )
 		);
 		case 'www': return array(   /* user's web site, plugin's help url */
 			'alt'  => T_('WWW'),
@@ -331,7 +342,7 @@ function get_icon_info($name)
 			'rollover' => true,
 			'alt' => T_('Close'),
 			'size' => array( 14, 14 ),
-			'xy' => array( 0, 96 )
+			'xy' => array( 0, 224 )
 		);
 		case 'xross': return array(
 			'alt'  => T_('Del'),
@@ -339,29 +350,16 @@ function get_icon_info($name)
 			'xy' => array( 144, 64 )
 		);
 
-
-		case 'increase': return array(
-			'rollover' => true,
-			'alt' => T_('+'),
-			'size' => array( 15, 15 ),
-			'xy' => array( 0, 80 )
-		);
-		case 'decrease': return array(
-			'rollover' => true,
-			'alt' => T_('-'),
-			'size' => array( 15, 15 ),
-			'xy' => array( 32, 80 )
-		);
-
+		case 'bullet_black':
 		case 'bullet_full': return array(
 			'alt'  => '&bull;',
 			'size' => array( 9, 9 ),
-			'xy' => array( 0, 192 )
+			'xy' => array( 96, 176 )
 		);
 		case 'bullet_empty': return array(
 			'alt'  => '&nbsp;',
 			'size' => array( 9, 9 ),
-			'xy' => array( 16, 192 )
+			'xy' => array( 112, 176 )
 		);
 		case 'bullet_blue': return array(
 			'alt'  => '&bull;',
@@ -388,6 +386,16 @@ function get_icon_info($name)
 			'size' => array( 9, 9 ),
 			'xy' => array( 96, 192 )
 		);
+		case 'bullet_brown': return array(
+			'alt'  => '&bull;',
+			'size' => array( 9, 9 ),
+			'xy' => array( 112, 192 )
+		);
+		case 'bullet_white': return array(
+			'alt'  => '&bull;',
+			'size' => array( 9, 9 ),
+			'xy' => array( 0, 192 )
+		);
 
 		case 'activate': return array(
 			'alt'  => /* TRANS: Short for "Activate(d)" */ T_('Act.'),
@@ -405,13 +413,13 @@ function get_icon_info($name)
 			'alt'  => /* TRANS: Short for "Activate(d)" */ T_('Act.'),
 			'legend' => T_('Activated'),
 			'size' => array( 9, 9 ),
-			'xy' => array( 0, 192 )
+			'xy' => array( 96, 176 )
 		);
 		case 'disabled': return array(
 			'alt'  => /* TRANS: Short for "Deactivate(d)" */ T_('Deact.'),
 			'legend' => T_('Deactivated'),
 			'size' => array( 9, 9 ),
-			'xy' => array( 16, 192 )
+			'xy' => array( 112, 176 )
 		);
 
 		case 'link': return array(
@@ -423,12 +431,6 @@ function get_icon_info($name)
 			'alt'  => T_('Unlink'),
 			'size' => array( 14, 14 ),
 			'xy' => array( 112, 96 )
-		);
-
-		case 'calendar': return array(
-			'alt'  => T_('Calendar'),
-			'size' => array( 16, 15 ),
-			'xy' => array( 48, 160 )
 		);
 
 		case 'parent_childto_arrow': return array(
@@ -467,12 +469,12 @@ function get_icon_info($name)
 		);
 		case 'file_allowed_registered': return array(
 			'alt'  => T_( 'Allowed for registered users' ),
-			'size' => array( 16, 14 ),
+			'size' => array( 12, 16 ),
 			'xy' => array( 112, 112 )
 		);
 		case 'file_not_allowed': return array(
 			'alt'  => T_( 'Blocked' ),
-			'size' => array( 16, 14 ),
+			'size' => array( 11, 14 ),
 			'xy' => array( 128, 112 )
 		);
 
@@ -482,17 +484,19 @@ function get_icon_info($name)
 			'xy' => array( 0, 112 )
 		);
 		case 'nocomment': return array(
-			'alt'  => T_('Comments'),
+			'alt'  => T_('No comment'),
 			'size' => array( 15, 16 ),
-			'xy' => array( 0, 112 )
+			'xy' => array( 16, 112 )
 		);
 
+		case 'move_up_blue':
 		case 'move_up': return array(
 			'rollover' => true,
 			'alt'  => T_( 'Up' ),
 			'size' => array( 12, 13 ),
 			'xy' => array( 96, 80 )
 		);
+		case 'move_down_blue':
 		case 'move_down': return array(
 			'rollover' => true,
 			'alt'  => T_( 'Down'),
@@ -513,12 +517,59 @@ function get_icon_info($name)
 			'size' => array( 12, 13 ),
 			'xy' => array( 0, 0 )
 		);
-
-		case 'assign': return array(
-			'alt'  => T_('Assigned to'),
-			'size' => array( 27, 13 ),
-			'xy' => array( 96, 128 )
+		case 'move_left': return array(
+			'rollover' => true,
+			'alt'  => T_( 'Left' ),
+			'size' => array( 13, 12 ),
+			'xy' => array( 0, 96 )
 		);
+		case 'move_right': return array(
+			'rollover' => true,
+			'alt'  => T_( 'Right'),
+			'size' => array( 13, 12 ),
+			'xy' => array( 32, 96 )
+		);
+		case 'move_down_orange': return array(
+			'alt'  => T_('Down'),
+			'size' => array( 12, 13 ),
+			'xy' => array( 80, 80 )
+		);
+		case 'move_up_orange': return array(
+			'alt'  => T_('Up'),
+			'size' => array( 12, 13 ),
+			'xy' => array( 112, 80 )
+		);
+		case 'move_down_green': return array(
+			'alt'  => T_('Down'),
+			'size' => array( 12, 13 ),
+			'xy' => array( 64, 240 )
+		);
+		case 'move_up_green': return array(
+			'alt'  => T_('Up'),
+			'size' => array( 12, 13 ),
+			'xy' => array( 80, 240 )
+		);
+		case 'move_down_magenta': return array(
+			'alt'  => T_('Down'),
+			'size' => array( 12, 13 ),
+			'xy' => array( 96, 240 )
+		);
+		case 'move_up_magenta': return array(
+			'alt'  => T_('Up'),
+			'size' => array( 12, 13 ),
+			'xy' => array( 112, 240 )
+		);
+		case 'move_down_grey': return array(
+			'alt'  => T_('Down'),
+			'size' => array( 12, 13 ),
+			'xy' => array( 128, 240 )
+		);
+		case 'move_up_grey': return array(
+			'alt'  => T_('Up'),
+			'size' => array( 12, 13 ),
+			'xy' => array( 144, 240 )
+		);
+
 		case 'check_all': return array(
 			'alt'  => T_('Check all'),
 			'size' => array( 16, 16 ),
@@ -541,10 +592,15 @@ function get_icon_info($name)
 			'size' => array( 13, 13 ),
 			'xy' => array( 48, 128 )
 		);
-		case 'ban': return array( // TODO: make this transparent
+		case 'ban': return array(
 			'alt'  => /* TRANS: Abbrev. */ T_('Ban'),
 			'size' => array( 13, 13 ),
-			'xy' => array( 64, 128 )
+			'xy' => array( 112, 128 )
+		);
+		case 'ban_disabled': return array(
+			'alt'  => T_('Ban'),
+			'size' => array( 13, 13 ),
+			'xy' => array( 96, 128 )
 		);
 		case 'play': return array( // used to write an e-mail, visit site or contact through IM
 			'alt'  => '&gt;',
@@ -555,7 +611,7 @@ function get_icon_info($name)
 		case 'feed': return array(
 			'alt'	 => T_('XML Feed'),
 			'size' => array( 16, 16 ),
-			'xy' => array( 0, 160 )
+			'xy' => array( 0, 176 )
 		);
 
 		case 'recycle_full': return array(
@@ -602,22 +658,22 @@ function get_icon_info($name)
 
 		case 'thumb_up': return array(
 			'alt'  => T_('Thumb Up'),
-			'size' => array( 13, 16 ),
+			'size' => array( 15, 15 ),
 			'xy' => array( 112, 144 )
 		);
 		case 'thumb_up_disabled': return array(
 			'alt'  => T_('Thumb Up'),
-			'size' => array( 13, 16 ),
+			'size' => array( 15, 15 ),
 			'xy' => array( 96, 144 )
 		);
 		case 'thumb_down': return array(
 			'alt'  => T_('Thumb Down'),
-			'size' => array( 13, 16 ),
+			'size' => array( 15, 15 ),
 			'xy' => array( 144, 144 )
 		);
 		case 'thumb_down_disabled': return array(
 			'alt'  => T_('Thumb Down'),
-			'size' => array( 13, 16 ),
+			'size' => array( 15, 15 ),
 			'xy' => array( 128, 144 )
 		);
 
@@ -635,136 +691,77 @@ function get_icon_info($name)
 		case 'magnifier': return array(
 			'alt'  => T_('Log as a search instead'),
 			'size' => array( 14, 13 ),
-			'xy' => array( 16, 160 )
+			'xy' => array( 16, 176 )
+		);
+
+		case 'add': return array(
+			'alt'  => T_('Add'),
+			'size' => array( 16, 16 ),
+			'xy' => array( 32, 224 )
+		);
+		case 'remove': return array(
+			'alt'  => T_('Remove'),
+			'size' => array( 16, 16 ),
+			'xy' => array( 48, 224 )
+		);
+
+		case 'multi_action': return array(
+			'alt'  => T_('Action for selected elements'),
+			'size' => array( 16, 16 ),
+			'xy' => array( 112, 224 )
+		);
+
+		case 'rotate_right': return array(
+			'alt'  => T_('Rotate this picture 90&deg; to the right'),
+			'size' => array( 15, 16 ),
+			'xy' => array( 64, 224 )
+		);
+		case 'rotate_left': return array(
+			'alt'  => T_('Rotate this picture 90&deg; to the left'),
+			'size' => array( 15, 16 ),
+			'xy' => array( 80, 224 )
+		);
+		case 'rotate_180': return array(
+			'alt'  => T_('Rotate this picture 180&deg;'),
+			'size' => array( 14, 16 ),
+			'xy' => array( 96, 224 )
+		);
+
+		case 'notification': return array(
+			'alt'  => T_('Email notification'),
+			'size' => array( 15, 12 ),
+			'xy' => array( 144, 224 )
+		);
+
+		case 'width_increase': return array(
+			'alt'  => T_('Increase width'),
+			'size' => array( 32, 32 ),
+			'xy' => array( 0, 240 )
+		);
+		case 'width_decrease': return array(
+			'alt'  => T_('Decrease width'),
+			'size' => array( 32, 32 ),
+			'xy' => array( 32, 240 )
+		);
+
+		case 'post': return array(
+			'alt'  => T_('Post'),
+			'size' => array( 15, 15 ),
+			'xy' => array( 144, 16 )
+		);
+
+		case 'stop': return array(
+			'alt'  => T_('Stop'),
+			'size' => array( 16, 16 ),
+			'xy' => array( 64, 128 )
 		);
 	}
 }
 
 /*
  * $Log$
- * Revision 1.91  2011/10/07 10:19:44  efy-yurybakh
- * multiple color bullets icons
- *
- * Revision 1.90  2011/10/07 08:15:21  efy-yurybakh
- * multiple color bullets icons
- *
- * Revision 1.89  2011/10/03 12:00:33  efy-yurybakh
- * Small messaging UI design changes
- *
- * Revision 1.88  2011/09/30 11:20:21  efy-yurybakh
- * Make a big sprite with all backoffice icons
- *
- * Revision 1.87  2011/09/30 10:16:49  efy-yurybakh
- * Make a big sprite with all backoffice icons
- *
- * Revision 1.86  2011/09/28 16:15:56  efy-yurybakh
- * "comment was helpful" votes
- *
- * Revision 1.85  2011/09/27 17:31:19  efy-yurybakh
- * User additional info fields
- *
- * Revision 1.84  2011/09/26 10:44:20  efy-yurybakh
- * thumb up down icons
- *
- * Revision 1.83  2011/09/26 05:58:56  efy-yurybakh
- * fix icon style in IE
- *
- * Revision 1.82  2011/09/24 13:27:36  efy-yurybakh
- * Change voting buttons
- *
- * Revision 1.81  2011/09/24 05:30:18  efy-yurybakh
- * fp>yura
- *
- * Revision 1.80  2011/09/23 22:37:09  fplanque
- * minor / doc
- *
- * Revision 1.79  2011/09/23 14:01:57  fplanque
- * Quick/temporary fixes so we can work in the meantime
- *
- * Revision 1.78  2011/09/23 11:30:50  efy-yurybakh
- * Make a big sprite with all backoffice icons
- *
- * Revision 1.77  2011/09/22 05:18:46  efy-yurybakh
- * fix ratings CSS
- * remove no longer used star icons
- *
- * Revision 1.76  2011/09/07 00:28:26  sam2kb
- * Replace non-ASCII character in regular expressions with ~
- *
- * Revision 1.75  2011/09/06 18:38:39  sam2kb
- * minor
- *
- * Revision 1.74  2011/09/06 18:33:52  sam2kb
- * minor/removed weird character
- *
- * Revision 1.73  2011/03/10 14:54:18  efy-asimo
- * Allow file types modification & add m4v file type
- *
- * Revision 1.72  2011/02/24 13:11:28  efy-asimo
- * Change recycle icons size
- *
- * Revision 1.71  2011/02/24 07:42:26  efy-asimo
- * Change trashcan to Recycle bin
- *
- * Revision 1.70  2010/01/22 20:20:16  efy-asimo
- * Remove File manager rename file
- *
- * Revision 1.69  2008/03/31 21:13:47  fplanque
- * Reverted ubergeekyness
- *
- * Revision 1.67  2008/02/14 02:19:50  fplanque
- * cleaned up stats
- *
- * Revision 1.66  2008/01/17 17:42:09  fplanque
- * minor
- *
- * Revision 1.65  2008/01/16 23:55:48  blueyed
- * todo about trans conflict!
- *
- * Revision 1.64  2007/11/24 15:23:13  fplanque
- * minor
- *
- * Revision 1.63  2007/11/22 22:53:14  blueyed
- * get_icon_info(): relative to $rsc_url/$rsc_path (instead of $rsc_subdir)
- *
- * Revision 1.62  2007/11/02 01:42:16  fplanque
- * comment ratings
- *
- * Revision 1.61  2007/09/12 21:00:30  fplanque
- * UI improvements
- *
- * Revision 1.60  2007/09/08 23:20:14  fplanque
- * gettext update
- *
- * Revision 1.59  2007/09/08 19:31:28  fplanque
- * cleanup of XML feeds for comments on individual posts.
- *
- * Revision 1.58  2007/05/23 22:45:07  blueyed
- * TRANS comments
- *
- * Revision 1.57  2007/03/24 20:35:57  fplanque
- * minor
- *
- * Revision 1.56  2007/03/04 05:24:52  fplanque
- * some progress on the toolbar menu
- *
- * Revision 1.55  2007/01/29 09:24:41  fplanque
- * icon stuff
- *
- * Revision 1.54  2007/01/23 22:30:14  fplanque
- * empty icons cleanup
- *
- * Revision 1.53  2007/01/07 18:42:35  fplanque
- * cleaned up reload/refresh icons & links
- *
- * Revision 1.52  2006/12/26 00:55:58  fplanque
- * wording
- *
- * Revision 1.51  2006/12/07 20:03:31  fplanque
- * Woohoo! File editing... means all skin editing.
- *
- * Revision 1.50  2006/12/02 22:58:12  fplanque
- * minor
+ * Revision 1.93  2013/11/06 08:03:44  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

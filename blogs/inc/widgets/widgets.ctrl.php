@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal Open Source relicensing agreement:
  * }}
@@ -71,6 +71,7 @@ if( $display_mode == 'js' )
 {	// Javascript in debug mode conflicts/fails.
 	// fp> TODO: either fix the debug javascript or have an easy way to disable JS in the debug output.
 	$debug = 0;
+	$debug_jslog = false;
 }
 // This should probably be handled with teh existing $mode var
 
@@ -152,8 +153,9 @@ switch( $display_mode )
 }
 
 // Get Skin used by current Blog:
+$blog_normal_skin_ID = $Blog->get_setting( 'normal_skin_ID' );
 $SkinCache = & get_SkinCache();
-$Skin = & $SkinCache->get_by_ID( $Blog->skin_ID );
+$Skin = & $SkinCache->get_by_ID( $blog_normal_skin_ID );
 // Make sure containers are loaded for that skin:
 $container_list = $Skin->get_containers();
 
@@ -453,7 +455,7 @@ switch( $action )
 		/**
 		 * @var Skin
 		 */
-		$edited_Skin = & $SkinCache->get_by_ID( $Blog->skin_ID );
+		$edited_Skin = & $SkinCache->get_by_ID( $blog_normal_skin_ID );
 
 		// Look for containers in skin file:
 		$edited_Skin->discover_containers();
@@ -475,7 +477,7 @@ if( $display_mode == 'normal' )
 	 * Display page header, menus & messages:
 	 */
 	$AdminUI->set_coll_list_params( 'blog_properties', 'edit', array( 'ctrl' => 'widgets' ),
-				T_('List'), '?ctrl=collections&amp;blog=0' );
+				T_('All'), '?ctrl=collections&amp;blog=0' );
 
 	$AdminUI->set_path( 'blogs', 'widgets' );
 
@@ -508,8 +510,8 @@ if( $display_mode == 'normal' )
 	require_css( 'blog_widgets.css' );
 
 
-	$AdminUI->breadcrumbpath_init( false );
-	$AdminUI->breadcrumbpath_add( T_('Blog settings'), '?ctrl=coll_settings&amp;blog=$blog$' );
+	$AdminUI->breadcrumbpath_init( true );
+	$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=coll_settings&amp;blog=$blog$' );
 	$AdminUI->breadcrumbpath_add( T_('Widgets'), '?ctrl=widgets&amp;blog=$blog$' );
 
 	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -603,123 +605,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.47  2011/09/13 15:31:35  fplanque
- * Enhanced back-office navigation.
+ * Revision 1.49  2013/11/06 08:05:04  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.46  2011/09/04 22:13:21  fplanque
- * copyright 2011
- *
- * Revision 1.45  2010/02/08 17:54:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.44  2010/01/30 18:55:35  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.43  2010/01/29 17:21:38  efy-yury
- * add: crumbs in ajax calls
- *
- * Revision 1.42  2010/01/21 18:16:49  efy-yury
- * update: fadeouts
- *
- * Revision 1.41  2010/01/20 20:46:47  efy-yury
- * fix: toggleWidget bug in js
- * add: widjets controller redirect
- *
- * Revision 1.40  2010/01/17 04:14:38  fplanque
- * minor / fixes
- *
- * Revision 1.39  2010/01/16 14:27:04  efy-yury
- * crumbs, fadeouts, redirect, action_icon
- *
- * Revision 1.38  2009/12/20 20:38:26  fplanque
- * Enhanced skin containers reload for skin developers
- *
- * Revision 1.37  2009/12/12 01:13:08  fplanque
- * A little progress on breadcrumbs on menu structures alltogether...
- *
- * Revision 1.36  2009/09/29 03:47:07  fplanque
- * doc
- *
- * Revision 1.35  2009/09/26 20:51:37  tblue246
- * minor
- *
- * Revision 1.34  2009/09/26 12:00:44  tblue246
- * Minor/coding style
- *
- * Revision 1.33  2009/09/25 07:33:30  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.32  2009/09/18 15:30:24  waltercruz
- * Fixing load_class for PHP5
- *
- * Revision 1.31  2009/09/14 13:52:55  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.30  2009/09/12 11:01:28  efy-arrin
- * Included the ClassName in the loadclass() with proper UpperCase
- *
- * Revision 1.29  2009/08/03 13:19:11  tblue246
- * Fixed http://forums.b2evolution.net//viewtopic.php?p=94778
- *
- * Revision 1.28  2009/08/03 12:35:09  tblue246
- * JS widget screen: Open settings page after adding a new widget
- *
- * Revision 1.27  2009/07/07 15:21:10  yabs
- * Bug fix : error messages are now shown
- *
- * Revision 1.26  2009/06/01 12:23:59  tblue246
- * Translation fixes
- *
- * Revision 1.25  2009/03/15 01:32:35  fplanque
- * fixed yabbariffic bug that killed widgets when editing 2 different blogs at the same time
- *
- * Revision 1.24  2009/03/14 21:50:46  fplanque
- * still cleaning up...
- *
- * Revision 1.23  2009/03/14 20:53:41  fplanque
- * Fixed the add widget links so that you now know what you can click on or not
- *
- * Revision 1.22  2009/03/14 20:01:05  fplanque
- * stop the clickless nonsense that opens and closes without your consent
- *
- * Revision 1.21  2009/03/13 02:32:08  fplanque
- * Cleaned up widgets.
- * Removed stupid widget_name param.
- *
- * Revision 1.20  2009/03/13 00:59:20  fplanque
- * fixing debug mode
- *
- * Revision 1.19  2009/03/08 23:57:46  fplanque
- * 2009
- *
- * Revision 1.18  2009/02/23 18:21:07  tblue246
- * Fixing log :/
- *
- * Revision 1.17  2009/02/23 18:13:40  yabs
- * Next attempt at rolling back my incompetance :D
- *
- * Revision 1.16  2009/02/23 08:13:31  yabs
- * Added check for excerpts
- *
- * Revision 1.15  2009/02/05 21:33:34  tblue246
- * Allow the user to enable/disable widgets.
- * Todo:
- * 	* Fix CSS for the widget state bullet @ JS widget UI.
- * 	* Maybe find a better solution than modifying get_Cache() to get only enabled widgets... :/
- * 	* Buffer JS requests when toggling the state of a widget??
- *
- * Revision 1.14  2008/12/30 23:00:42  fplanque
- * Major waste of time rolling back broken black magic! :(
- * 1) It was breaking the backoffice as soon as $admin_url was not a direct child of $baseurl.
- * 2) relying on dynamic argument decoding for backward comaptibility is totally unmaintainable and unreliable
- * 3) function names with () in log break searches big time
- * 4) complexity with no purpose (at least as it was)
- *
- * Revision 1.12  2008/10/05 04:36:50  fplanque
- * notes for Yabba
- *
- * Revision 1.11  2008/10/02 23:33:08  blueyed
- * - require_js(): remove dirty dependency handling for communication.js.
- * - Add add_js_headline() for adding inline JS and use it for admin already.
  */
 ?>

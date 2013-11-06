@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -65,6 +65,10 @@ class Widget
 	 */
 	var $global_icons = array();
 
+	/**
+	 * Top block which located near second level tabs
+	 */
+	var $top_block = '';
 
 	/**
 	 * Constructor
@@ -200,6 +204,14 @@ class Widget
 			case 'no_results':
 				// No Results text:
 				return $this->no_results_text;
+
+			case 'top_block':
+				// Top block:
+				return $this->top_block;
+
+			case 'prefix' :
+				//prefix
+				return $this->param_prefix;
 
 			default:
 				return '[Unknown:'.$matches[1].']';
@@ -387,13 +399,13 @@ class Table extends Widget
 
 		if( $fold_state == 'collapsed' )
 		{
-			echo '<a class="filters_title" href="'.regenerate_url( '', 'expand='.$option_name ).'"
+			echo '<a class="filters_title" href="'.regenerate_url( 'action,target', 'action=expand_filter&target='.$option_name ).'"
 								onclick="return toggle_filter_area(\''.$option_name.'\');" >'
 						.get_icon( 'expand', 'imgtag', array( 'id' => 'clickimg_'.$option_name ) );
 		}
 		else
 		{
-			echo '<a class="filters_title" href="'.regenerate_url( '', 'collapse='.$option_name ).'"
+			echo '<a class="filters_title" href="'.regenerate_url( 'action,target', 'action=collapse_filter&target='.$option_name ).'"
 								onclick="return toggle_filter_area(\''.$option_name.'\');" >'
 						.get_icon( 'collapse', 'imgtag', array( 'id' => 'clickimg_'.$option_name ) );
 		}
@@ -414,7 +426,14 @@ class Table extends Widget
 				}
 				else
 				{	// Display preset filter link:
-					$r[] = '[<a href="'.$preset[1].'">'.$preset[0].'</a>]';
+					if( isset( $preset[2] ) )
+					{	// Link with additional params
+						$r[] = '<span '.$preset[2].'>[<a href="'.$preset[1].'">'.$preset[0].'</a>]</span>';
+					}
+					else
+					{
+						$r[] = '[<a href="'.$preset[1].'">'.$preset[0].'</a>]';
+					}
 				}
 			}
 
@@ -505,6 +524,11 @@ class Table extends Widget
 			return;
 		}
 
+		if( empty( $this->param_prefix ) )
+		{	// Deny to use a list without prefix
+			debug_die( 'You must define a $param_prefix before you can use filters.' );
+		}
+
 		$option_name = $this->param_prefix.'filters';
 
 		$this->display_option_area( $option_name, 'filter_area', T_('Filters'), T_('Filter list'), 'expanded' );
@@ -519,7 +543,7 @@ class Table extends Widget
 	function display_list_start()
 	{
 		if( $this->total_pages == 0 )
-		{ // There are no results! Nothing to display!
+		{	// There are no results! Nothing to display!
 			echo $this->replace_vars( $this->params['no_results_start'] );
 		}
 		else
@@ -550,13 +574,15 @@ class Table extends Widget
 	/**
 	 * Display list/table head.
 	 *
-	 * This includes list head/title and column headers.
+	 * This includes list head/title and filters.
 	 * EXPERIMENTAL: also dispays <tfoot>
 	 */
 	function display_head()
 	{
-		echo $this->params['head_start'];
-
+		if( is_ajax_content() )
+		{	// Don't display this content on AJAX request
+			return;
+		}
 
 		// DISPLAY TITLE:
 		if( isset($this->title) )
@@ -571,16 +597,9 @@ class Table extends Widget
 		$this->display_colselect();
 
 
-		// DISPLAY COLUMN HEADERS:
-		$this->display_col_headers();
-
-
-		echo $this->params['head_end'];
-
-
 		// Experimental:
-		echo $this->params['tfoot_start'];
-		echo $this->params['tfoot_end'];
+		/*echo $this->params['tfoot_start'];
+		echo $this->params['tfoot_end'];*/
 	}
 
 
@@ -590,6 +609,8 @@ class Table extends Widget
 	 */
 	function display_col_headers()
 	{
+		echo $this->params['head_start'];
+
 		if( isset( $this->cols ) )
 		{
 
@@ -853,6 +874,8 @@ class Table extends Widget
 				echo $this->params['line_end'];
 			}
 		} // this->cols not set
+
+		echo $this->params['head_end'];
 	}
 
 
@@ -966,7 +989,19 @@ class Table extends Widget
 		// Tblue> TODO: Make this more elegant (e. g.: replace "$extra_attr$" with the attributes string).
 		if( $extra_attr )
 		{
-			$output = substr( $output, 0, -1 ).get_field_attribs_as_string( $extra_attr ).'>';
+			if ( ! isset ($extra_attr['format_to_output']))
+			{
+				$output = substr( $output, 0, -1 ).get_field_attribs_as_string( $extra_attr ).'>';
+			}
+			else
+			{
+				$format_to_output = $extra_attr['format_to_output'];
+				unset($extra_attr['format_to_output']);
+				$output = substr( $output, 0, -1 ).get_field_attribs_as_string( $extra_attr, $format_to_output ).'>';
+
+				
+			}
+
 		}
 		// Check variables in column declaration:
 		$output = $this->parse_class_content( $output );
@@ -1040,106 +1075,40 @@ class Table extends Widget
 		return $content;
 	}
 
+
+	/**
+	 * Init results params from skin template params. It's used when Results table is filled from ajax result.
+	 *
+	 * @param string the template param which can have values( 'admin', 'front' )
+	 * @param string the name of the skin
+	 */
+	function init_params_by_skin( $skin_type, $skin_name )
+	{
+		switch( $skin_type )
+		{
+			case 'admin': // admin skin type
+				global $adminskins_path;
+				require_once $adminskins_path.$skin_name.'/_adminUI.class.php';
+				$this->params = AdminUI::get_template( 'Results' );
+				break;
+
+			case 'front': // front office skin type
+				global $skins_path;
+				require_once $skins_path.$skin_name.'/_skin.class.php';
+				$this->params = Skin::get_template( 'Results' );
+				break;
+
+			default:
+				debug_die( 'Invalid results template param!' );
+		}
+	}
+
 }
 
 /*
  * $Log$
- * Revision 1.24  2011/10/18 07:43:17  efy-vitalij
- * changed function parse_class_content
- *
- * Revision 1.23  2011/10/13 12:46:03  efy-vitalij
- * changed function parse_class_content
- *
- * Revision 1.22  2011/10/06 07:34:04  efy-vitalij
- * add function parse_class_content()
- *
- * Revision 1.21  2011/10/05 08:05:44  efy-vitalij
- * add function parse_class_content in display_col_start
- *
- * Revision 1.20  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.19  2010/05/02 19:50:51  fplanque
- * no message
- *
- * Revision 1.18  2010/05/02 01:34:00  blueyed
- * Results: filter_area: use GET instead of POST. Makes going back more smooth. Also, GET is semantically more correct anyway.
- *
- * Revision 1.17  2010/02/08 17:51:58  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.16  2009/11/30 00:22:04  fplanque
- * clean up debug info
- * show more timers in view of block caching
- *
- * Revision 1.15  2009/09/27 13:52:22  tblue246
- * minor
- *
- * Revision 1.14  2009/09/26 21:26:19  tblue246
- * minor
- *
- * Revision 1.13  2009/09/26 21:23:02  tblue246
- * Non-JS widgets screen: Use proper colspan for "No widgets" message.
- *
- * Revision 1.12  2009/09/16 01:33:55  fplanque
- * no message
- *
- * Revision 1.11  2009/04/14 01:17:28  fplanque
- * better handling of colselect
- *
- * Revision 1.10  2009/04/13 20:51:03  fplanque
- * long overdue cleanup of "no results" display: putting filter sback in right position
- *
- * Revision 1.9  2009/03/08 23:57:41  fplanque
- * 2009
- *
- * Revision 1.8  2009/01/28 21:23:23  fplanque
- * Manual ordering of categories
- *
- * Revision 1.7  2008/04/24 01:56:08  fplanque
- * Goal hit summary
- *
- * Revision 1.6  2008/01/21 09:35:24  fplanque
- * (c) 2008
- *
- * Revision 1.5  2007/09/26 21:53:23  fplanque
- * file manager / file linking enhancements
- *
- * Revision 1.4  2007/09/04 13:23:18  fplanque
- * Fixed display for category screen.
- *
- * Revision 1.3  2007/09/03 18:32:50  fplanque
- * enhanced dashboard / comment moderation
- *
- * Revision 1.2  2007/07/24 23:29:26  blueyed
- * todo
- *
- * Revision 1.1  2007/06/25 10:59:01  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.16  2007/04/26 00:11:08  fplanque
- * (c) 2007
- *
- * Revision 1.15  2007/01/14 22:06:48  fplanque
- * support for customized 'no results' messages
- *
- * Revision 1.14  2007/01/11 21:06:05  fplanque
- * bugfix
- *
- * Revision 1.13  2007/01/11 02:25:06  fplanque
- * refactoring of Table displays
- * body / line / col / fadeout
- *
- * Revision 1.12  2007/01/09 00:49:04  blueyed
- * todo
- *
- * Revision 1.11  2007/01/08 23:44:19  fplanque
- * inserted Table widget
- * WARNING: this has nothing to do with ComponentWidgets...
- * (except that I'm gonna need the Table Widget when handling the ComponentWidgets :>
- *
- * Revision 1.10  2006/11/26 01:42:10  fplanque
- * doc
+ * Revision 1.26  2013/11/06 08:03:47  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

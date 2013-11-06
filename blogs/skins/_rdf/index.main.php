@@ -200,9 +200,14 @@ while( $Item = & mainlist_get_item() )
 			), 'htmlfeed' );
 
 		$Item->content_teaser( array(
-				'disppage'    => 1,
-				'stripteaser' => true, // sam2kb>fp why true? We DO need to display teaser no matter what $feed_content is
-				'format'      => 'htmlfeed',
+				'disppage'            => 1,
+				'stripteaser'         => true, // sam2kb>fp why true? We DO need to display teaser no matter what $feed_content is
+				'format'              => 'htmlfeed',
+				'before_image'        => '<div>',
+				'before_image_legend' => '<div><i>',
+				'after_image_legend'  => '</i></div>',
+				'after_image'         => '</div>',
+				'image_size'          => 'fit-320x320'
 			) );
 
 		if( $feed_content == 'normal' )

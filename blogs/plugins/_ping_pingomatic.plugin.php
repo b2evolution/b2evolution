@@ -8,7 +8,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -54,7 +54,6 @@ class ping_pingomatic_plugin extends Plugin
 	/*
 	 * These variables MAY be overriden.
 	 */
-	var $apply_rendering = 'never';
 	var $group = 'ping';
 	var $number_of_installs = 1;
 
@@ -99,32 +98,8 @@ class ping_pingomatic_plugin extends Plugin
 
 /*
  * $Log$
- * Revision 1.9  2011/09/04 22:13:23  fplanque
- * copyright 2011
- *
- * Revision 1.8  2010/02/08 17:55:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.7  2009/03/08 23:57:47  fplanque
- * 2009
- *
- * Revision 1.6  2008/01/21 09:35:41  fplanque
- * (c) 2008
- *
- * Revision 1.5  2007/04/26 00:11:04  fplanque
- * (c) 2007
- *
- * Revision 1.4  2007/04/20 02:53:13  fplanque
- * limited number of installs
- *
- * Revision 1.3  2006/11/24 18:27:27  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.2  2006/10/11 17:21:09  blueyed
- * Fixes
- *
- * Revision 1.1  2006/10/01 22:26:48  blueyed
- * Initial import of ping plugins.
+ * Revision 1.11  2013/11/06 08:05:22  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

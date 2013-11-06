@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage evopress
@@ -25,6 +25,7 @@ $params = array_merge( array(
 
 	), $params );
 
+echo '<div id="styled_content_block">'; // Beginning of posts display
 ?>
 <div id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $params ) ?>" lang="<?php $Item->lang() ?>">
 
@@ -39,6 +40,10 @@ $params = array_merge( array(
 					'before'    => '<div class="floatright">',
 					'after'     => '</div>',
 				) );
+		}
+		if( $Item->status != 'published' )
+		{
+			$Item->status( array( 'format' => 'styled' ) );
 		}
 	?>
 
@@ -63,7 +68,7 @@ $params = array_merge( array(
 				'link_text'    => 'preferredname',
 				'link_rel'     => '',
 				'link_class'   => '',
-				'thumb_size'   => 'crop-32x32',
+				'thumb_size'   => 'crop-top-32x32',
 				'thumb_class'  => ''
 			) );
 
@@ -152,4 +157,6 @@ $params = array_merge( array(
 
 <?php
 locale_restore_previous();	// Restore previous locale (Blog locale)
+
+echo '</div>'; // End of posts display
 ?>

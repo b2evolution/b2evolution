@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -116,62 +116,41 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 	}
 	else
 	{ // create comment arrays
-		$draft_comments = array();
-		$published_comments = array();
-		$deprecated_comments = array();
-		$draft_noperms_count = 0;
-		$publ_noperms_count = 0;
-		$depr_noperms_count = 0;
+		$comments_by_status = array( 'published' => array(), 'community' => array(), 'protected' => array(), 'private' => array(), 'draft' => array(), 'review' => array(), 'deprecated' => array() );
+		$no_perms_count = array( 'published' => 0, 'community' => 0, 'protected' => 0, 'private' => 0, 'draft' => 0, 'review' => 0, 'deprecated' => 0 );
 		foreach( $res_affected_comments as $row_stats )
 		{ // select comments
 			$affected_Comment = new Comment($row_stats);
-			$affected_Item = & $affected_Comment->get_Item();
-			$comment_blog = $affected_Item->get_blog_ID();
-			switch( $affected_Comment->get( 'status' ) )
-			{
-				case 'draft':
-					if( ! $current_User->check_perm( 'blog_draft_comments', 'edit', false, $comment_blog ) )
-					{ // no permission to delete
-						$draft_noperms_count++;
-						continue;
-					}
-					$draft_comments[] = $affected_Comment;
-					break;
-				case 'published':
-					if( ! $current_User->check_perm( 'blog_published_comments', 'edit', false, $comment_blog ) )
-					{ // no permission to delete
-						$publ_noperms_count++;
-						continue;
-					}
-					$published_comments[] = $affected_Comment;
-					break;
-				case 'deprecated':
-					if( ! $current_User->check_perm( 'blog_deprecated_comments', 'edit', false, $comment_blog ) )
-					{ // no permission to delete
-						$depr_noperms_count++;
-						continue;
-					}
-					$deprecated_comments[] = $affected_Comment;
-					break;
-				case 'trash':
-					break;
-				default:
-					debug_die( 'Invalid comment status' );
+			$comment_status = $affected_Comment->get( 'status' );
+			if( $comment_status == 'trash' )
+			{ // This comment was already deleted
+				continue;
 			}
+			if( !$current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $affected_Comment ) )
+			{ // no permission to delete
+				$no_perms_count[$comment_status] = $no_perms_count[$comment_status] + 1;
+				continue;
+			}
+			// Add comment to the corresponding list
+			$comments_by_status[$comment_status][] = $affected_Comment;
 		}
+
 		// show comments
-		echo_affected_comments( $draft_comments, 'draft', $keyword, $draft_noperms_count );
-		echo_affected_comments( $published_comments, 'published', $keyword, $publ_noperms_count );
-		echo_affected_comments( $deprecated_comments, 'deprecated', $keyword, $depr_noperms_count );
+		foreach( $comments_by_status as $status => $comments )
+		{
+			echo_affected_comments( $comments, $status, $keyword, $no_perms_count[$status] );
+		}
 	}
 
 	// Check for potentially affected comments:
 	$quoted_keyword = $DB->quote('%'.$keyword.'%');
-	$sql = 'SELECT T_users.*
-				FROM T_users LEFT JOIN T_users__fields ON user_ID = uf_user_ID
+	$sql = 'SELECT DISTINCT T_users.*
+				FROM T_users 
+					LEFT JOIN T_users__fields ON user_ID = uf_user_ID
+					LEFT JOIN T_users__usersettings user_domain_setting ON user_ID = user_domain_setting.uset_user_ID AND user_domain_setting.uset_name = "user_domain"
 			 WHERE user_url LIKE '.$quoted_keyword.'
 				 OR user_email LIKE '.$quoted_keyword.'
-				 OR user_domain LIKE '.$quoted_keyword.'
+				 OR user_domain_setting.uset_value LIKE '.$quoted_keyword.'
 				 OR user_nickname LIKE '.$quoted_keyword.'
 				 OR user_firstname LIKE '.$quoted_keyword.'
 				 OR user_lastname LIKE '.$quoted_keyword.'
@@ -288,102 +267,8 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
- * Revision 1.33  2011/09/15 22:34:09  fplanque
- * cleanup
- *
- * Revision 1.31  2011/09/14 23:42:16  fplanque
- * moved icq aim yim msn to additional userfields
- *
- * Revision 1.30  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.29  2011/05/11 07:11:51  efy-asimo
- * User settings update
- *
- * Revision 1.28  2011/02/14 14:13:24  efy-asimo
- * Comments trash status
- *
- * Revision 1.27  2010/12/17 13:00:09  sam2kb
- * Don't make sentenses too complicated for translators, remember about declension.
- *
- * Revision 1.26  2010/11/04 00:48:17  fplanque
- * no message
- *
- * Revision 1.25  2010/07/26 06:52:15  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.24  2010/06/24 08:54:05  efy-asimo
- * PHP 4 compatibility
- *
- * Revision 1.23  2010/06/23 09:30:55  efy-asimo
- * Comments display and Antispam ban form modifications
- *
- * Revision 1.22  2010/06/17 08:54:52  efy-asimo
- * antispam screen, antispam tool dispplay fix
- *
- * Revision 1.21  2010/06/02 07:29:57  efy-asimo
- * Antispam tool - add affected users table
- *
- * Revision 1.20  2010/06/01 11:33:19  efy-asimo
- * Split blog_comments advanced permission (published, deprecated, draft)
- * Use this new permissions (Antispam tool,when edit/delete comments)
- *
- * Revision 1.19  2010/05/14 08:16:04  efy-asimo
- * antispam tool ban form - create seperate table for different comments
- *
- * Revision 1.18  2010/05/10 14:26:17  efy-asimo
- * Paged Comments & filtering & add comments listview
- *
- * Revision 1.17  2010/02/26 08:34:33  efy-asimo
- * dashboard -> ban icon should be javascripted task
- *
- * Revision 1.16  2010/02/08 17:52:06  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.15  2010/01/30 18:55:20  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.14  2010/01/03 17:56:05  fplanque
- * crumbs & stuff
- *
- * Revision 1.13  2010/01/03 13:45:38  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.12  2009/12/06 01:52:55  blueyed
- * Add 'htmlspecialchars' type to format_to_output, same as formvalue, but less irritating. Useful for strmaxlen, which is being used in more places now.
- *
- * Revision 1.11  2009/09/13 21:26:50  blueyed
- * SQL_NO_CACHE for SELECT queries using T_hitlog
- *
- * Revision 1.10  2009/07/08 02:38:55  sam2kb
- * Replaced strlen & substr with their mbstring wrappers evo_strlen & evo_substr when needed
- *
- * Revision 1.9  2009/03/08 23:57:41  fplanque
- * 2009
- *
- * Revision 1.8  2009/03/05 22:39:00  blueyed
- * Add load_funcs, which was required at some point (can't remember, seen during comparison)
- *
- * Revision 1.7  2008/04/15 21:53:30  fplanque
- * minor
- *
- * Revision 1.6  2008/04/04 17:02:21  fplanque
- * cleanup of global settings
- *
- * Revision 1.5  2008/03/17 09:08:28  afwas
- * minor
- *
- * Revision 1.4  2008/01/21 09:35:25  fplanque
- * (c) 2008
- *
- * Revision 1.3  2007/12/29 18:55:32  fplanque
- * better antispam banning screen
- *
- * Revision 1.2  2007/11/22 14:16:43  fplanque
- * antispam / banning cleanup
- *
- * Revision 1.1  2007/09/04 14:56:19  fplanque
- * antispam cleanup
+ * Revision 1.35  2013/11/06 08:03:48  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

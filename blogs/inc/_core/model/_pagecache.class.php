@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -88,7 +88,7 @@ class PageCache
 		{	// Cache for "other" "genereic" "special" pages:
 			$this->ads_collcache_path = $cache_path.'general/';
 
-			if( ! $Settings->get('general_cache_enabled') )
+			if( ( ! empty( $Settings ) ) && ( ! $Settings->get('general_cache_enabled') ) )
 			{	// We do NOT want caching for this collection
 				$Debuglog->add( 'General cache not enabled.', 'pagecache' );
 			}
@@ -148,6 +148,12 @@ class PageCache
 	 */
 	function gen_filecache_path( $url )
 	{
+		global $skin;
+
+		if( !empty( $skin ) )
+		{ // add skin folder into the end of the url before creating the hash to have different cache files for different skins
+			$url .= $skin;
+		}
 		$url_hash = md5($url);	// fp> is this teh fastest way to hash this into something not too obvious to guess?
 		// echo $url_hash;
 
@@ -227,8 +233,8 @@ class PageCache
 			return false;
 		}
 
-		if( $disp == 'login' || $disp == 'register' )
-		{	// We do NOT want caching for in-skin login and register pages
+		if( $disp == 'login' || $disp == 'register' || $disp == 'lostpassword' )
+		{	// We do NOT want caching for in-skin login, register and lostpassord pages
 			$Debuglog->add( 'Never cache the in-skin login and register pages!', 'pagecache' );
 			return false;
 		}
@@ -540,6 +546,11 @@ class PageCache
 			{
 				$file_head .= 'item_IDs_on_this_page:'.implode( ',', $shutdown_count_item_views )."\n";
 			}
+			global $skin;
+			if( !empty( $skin ) )
+			{ // add current skin folder into the cache file header 
+				$file_head .= 'skin:'.$skin."\n";
+			}
 
  			$file_head .= "\n";
 
@@ -693,122 +704,8 @@ class PageCache
 
 /*
  * $Log$
- * Revision 1.38  2011/10/21 07:00:49  efy-vitalij
- * changed function header_http_response
+ * Revision 1.40  2013/11/06 08:03:47  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.37  2011/10/20 16:32:57  efy-asimo
- * Invalidate PageCaches after specific settings update
- *
- * Revision 1.36  2011/10/14 10:12:15  efy-vitalij
- * add function header_http_response
- *
- * Revision 1.35  2011/09/19 21:02:31  fplanque
- * ETag support
- *
- * Revision 1.34  2011/09/13 08:32:30  efy-asimo
- * Add crumb check for login and register
- * Never cache in-skin login and register
- * Fix page caching
- *
- * Revision 1.33  2011/09/05 21:36:43  sam2kb
- * minor
- *
- * Revision 1.32  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.31  2011/09/04 21:32:18  fplanque
- * minor MFB 4-1
- *
- * Revision 1.30  2011/08/12 08:29:00  efy-asimo
- * Post view count - fix, and crazy view counting option
- *
- * Revision 1.29  2011/06/26 17:30:56  sam2kb
- * Added global param $pagecache_max_age
- *
- * Revision 1.28  2011/06/26 16:30:41  sam2kb
- * minor
- *
- * Revision 1.27  2011/03/15 09:34:05  efy-asimo
- * have checkboxes for enabling caching in new blogs
- * refactorize cache create/enable/disable
- *
- * Revision 1.26  2011/02/10 23:07:21  fplanque
- * minor/doc
- *
- * Revision 1.25  2010/11/25 15:16:34  efy-asimo
- * refactor $Messages
- *
- * Revision 1.24  2010/09/08 13:32:19  efy-asimo
- * prune page cache - without caching the file names
- *
- * Revision 1.23  2010/07/26 06:52:15  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.22  2010/06/30 05:44:19  efy-asimo
- * prune page cache fix - don't delete CVS folders and content
- *
- * Revision 1.21  2010/06/24 06:03:59  efy-asimo
- * Prune page cache - don't stop after the first error - fix
- *
- * Revision 1.20  2010/05/21 10:46:31  efy-asimo
- * move prune_page_cache() function from _file.funcs.php to _pagecache.class.php
- *
- * Revision 1.19  2010/02/08 17:51:48  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.18  2009/12/22 08:53:34  fplanque
- * global $ReqURL
- *
- * Revision 1.17  2009/12/06 03:24:11  fplanque
- * minor/doc/fixes
- *
- * Revision 1.16  2009/12/05 01:21:59  fplanque
- * PageChace 304 handling
- *
- * Revision 1.15  2009/12/03 06:05:40  fplanque
- * Make cache performance visible (instead of hidden behind Apache's SendBuffer)
- *
- * Revision 1.14  2009/11/30 04:31:37  fplanque
- * BlockCache Proof Of Concept
- *
- * Revision 1.13  2009/11/30 00:22:04  fplanque
- * clean up debug info
- * show more timers in view of block caching
- *
- * Revision 1.12  2009/09/08 21:32:41  fplanque
- * doc
- *
- * Revision 1.11  2009/09/08 02:59:33  sam2kb
- * doc
- *
- * Revision 1.10  2009/09/07 23:35:49  fplanque
- * cleanup
- *
- * Revision 1.9  2009/09/06 05:40:44  sam2kb
- * Make sure that blog cache directory exists
- *
- * Revision 1.8  2009/08/26 19:03:59  tblue246
- * doc
- *
- * Revision 1.7  2009/03/08 23:57:40  fplanque
- * 2009
- *
- * Revision 1.6  2009/01/25 19:09:32  blueyed
- * phpdoc fixes
- *
- * Revision 1.5  2008/10/05 07:18:06  fplanque
- * thow in a tiny doc about windows bug
- *
- * Revision 1.4  2008/10/05 07:11:38  fplanque
- * I think it's atomic now
- *
- * Revision 1.3  2008/10/05 04:43:19  fplanque
- * minor, and would 4096 serve any purpose?
- *
- * Revision 1.2  2008/10/03 16:27:56  blueyed
- * Fix indent, cleanup, doc
- *
- * Revision 1.1  2008/09/28 08:06:06  fplanque
- * Refactoring / extended page level caching
- * */
+ */
 ?>

@@ -229,7 +229,7 @@ skin_include( '_html_header.inc.php' );
 
 </div>
 
-<div class="clear"><img src="<?php echo $rsc_url; ?>img/blank.gif" width="1" height="1" alt="" /></div>
+<div class="clear"><?php echo get_icon( 'pixel' ); ?></div>
 
 </div>
 </div>

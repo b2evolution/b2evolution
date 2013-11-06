@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -47,6 +47,7 @@ $menu_link_widget_link_types = array(
 		'item' => T_('Any item (post, page, etc...)'),
 		'url' => T_('Any URL'),
 		'postnew' => T_('Write a new post'),
+		'myprofile' => T_('My profile'),
 	);
 
 /**
@@ -207,12 +208,16 @@ class menu_link_Widget extends ComponentWidget
 				break;
 
 			case 'latestcomments':
+				if( !$Blog->get_setting( 'comments_latest' ) )
+				{ // This page is disabled
+					return false;
+				}
 				$url = $Blog->get('lastcommentsurl');
 				$text = T_('Latest comments');
 				break;
 
 			case 'owneruserinfo':
-				$url = $Blog->get('userurl');
+				$url = url_add_param( $Blog->get('userurl'), 'user_ID='.$Blog->owner_user_ID );
 				$text = T_('Owner details');
 				break;
 
@@ -304,6 +309,15 @@ class menu_link_Widget extends ComponentWidget
 				$text = T_('Write a new post');
 				break;
 
+			case 'myprofile':
+				if( ! is_logged_in() )
+				{	// Don't show this link for not logged in users
+					return false;
+				}
+				$url = url_add_param( $Blog->get( 'url' ), 'disp=user' );
+				$text = T_('My profile');
+				break;
+
 			case 'home':
 			default:
 				$url = $Blog->get('url');
@@ -362,99 +376,8 @@ class menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
- * Revision 1.27  2011/10/13 17:15:53  efy-yurybakh
- * In skin posting (permission)
- *
- * Revision 1.26  2011/10/13 15:49:43  efy-yurybakh
- * In skin posting (changes)
- *
- * Revision 1.25  2011/10/10 20:46:39  fplanque
- * registration source tracking
- *
- * Revision 1.24  2011/10/10 19:48:31  fplanque
- * i18n & login display cleaup
- *
- * Revision 1.23  2011/10/07 11:24:53  efy-yurybakh
- * Extend  _menu_link.widget.php
- *
- * Revision 1.22  2011/09/08 23:29:27  fplanque
- * More blockcache/widget fixes around login/register links.
- *
- * Revision 1.21  2011/09/07 18:25:11  fplanque
- * widget & blockcache fixes
- *
- * Revision 1.20  2011/09/04 22:13:21  fplanque
- * copyright 2011
- *
- * Revision 1.19  2010/04/22 22:49:28  blueyed
- * menu widgets: doc/todo/indent
- *
- * Revision 1.18  2010/02/08 17:54:48  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.17  2009/12/22 23:13:39  fplanque
- * Skins v4, step 1:
- * Added new disp modes
- * Hooks for plugin disp modes
- * Enhanced menu widgets (BIG TIME! :)
- *
- * Revision 1.16  2009/09/14 13:54:13  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.15  2009/09/12 11:03:13  efy-arrin
- * Included the ClassName in the loadclass() with proper UpperCase
- *
- * Revision 1.14  2009/07/02 00:50:59  fplanque
- * doc.
- *
- * Revision 1.13  2009/07/01 09:47:51  yabs
- * bug fix
- *
- * Revision 1.12  2009/05/31 20:57:27  tblue246
- * Translation fix/minor
- *
- * Revision 1.11  2009/04/12 21:52:56  tblue246
- * Fixed translation string
- *
- * Revision 1.10  2009/04/12 09:41:16  tblue246
- * Fix translation string
- *
- * Revision 1.9  2009/03/13 02:32:07  fplanque
- * Cleaned up widgets.
- * Removed stupid widget_name param.
- *
- * Revision 1.8  2009/03/08 23:57:46  fplanque
- * 2009
- *
- * Revision 1.7  2008/01/21 09:35:37  fplanque
- * (c) 2008
- *
- * Revision 1.6  2007/12/23 16:16:18  fplanque
- * Wording improvements
- *
- * Revision 1.5  2007/12/23 15:07:07  fplanque
- * Clean widget name
- *
- * Revision 1.3  2007/12/23 14:14:25  fplanque
- * Enhanced widget name display
- *
- * Revision 1.2  2007/12/22 19:55:00  yabs
- * cleanup from adding core params
- *
- * Revision 1.1  2007/09/28 02:17:48  fplanque
- * Menu widgets
- *
- * Revision 1.1  2007/06/25 11:02:06  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.3  2007/06/20 21:42:13  fplanque
- * implemented working widget/plugin params
- *
- * Revision 1.2  2007/06/20 00:48:17  fplanque
- * some real life widget settings
- *
- * Revision 1.1  2007/06/18 21:25:47  fplanque
- * one class per core widget
+ * Revision 1.29  2013/11/06 08:05:09  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

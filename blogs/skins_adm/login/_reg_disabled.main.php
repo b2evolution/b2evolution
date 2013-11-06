@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -45,32 +45,8 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
- * Revision 1.6  2011/09/04 22:13:25  fplanque
- * copyright 2011
- *
- * Revision 1.5  2010/02/08 17:56:56  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.4  2009/03/08 23:58:01  fplanque
- * 2009
- *
- * Revision 1.3  2008/01/21 09:35:43  fplanque
- * (c) 2008
- *
- * Revision 1.2  2007/09/23 18:55:17  fplanque
- * attempting to debloat. The Log class is insane.
- *
- * Revision 1.1  2007/06/25 11:02:39  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.4  2007/04/26 00:11:10  fplanque
- * (c) 2007
- *
- * Revision 1.3  2006/11/24 18:27:26  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.2  2006/04/19 20:13:52  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
+ * Revision 1.7  2013/11/06 08:05:53  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

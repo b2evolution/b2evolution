@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2004 by The University of North Carolina at Charlotte as
  * contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
@@ -53,8 +53,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param string Category name
  * @param string Category ID ('NULL' as string(!) for root)
  * @param integer|NULL Blog ID (will be taken from parent cat, if empty)
+ * @param string Category description
+ * @param boolean Set to true if the new object needs to be added into the ChapterCache after it was created
+ * @param integer Category order
  */
-function cat_create( $cat_name, $cat_parent_ID, $cat_blog_ID = NULL)
+function cat_create( $cat_name, $cat_parent_ID, $cat_blog_ID = NULL, $cat_description = NULL, $add_to_cache = false, $cat_order = NULL )
 {
 	global $DB;
 
@@ -75,12 +78,22 @@ function cat_create( $cat_name, $cat_parent_ID, $cat_blog_ID = NULL)
 
 	$new_Chapter = new Chapter(NULL, $cat_blog_ID);
 	$new_Chapter->set('name', $cat_name);
-	$new_Chapter->set('urlname', strtolower($cat_name)); // TODO: should get handled by set("name")
 	$new_Chapter->set('parent_ID', $cat_parent_ID);
+	if( !empty( $cat_description ) )
+	{	// Set decription
+		$new_Chapter->set('description', $cat_description);
+	}
+	$new_Chapter->set('order', $cat_order);
 
 
 	if( ! $new_Chapter->dbinsert() )
 		return 0;
+
+	if( $add_to_cache )
+	{ // add new Category into the Cache
+		$ChapterCache = & get_ChapterCache();
+		$ChapterCache->add( $new_Chapter );
+	}
 
 	return $new_Chapter->ID;
 }
@@ -131,6 +144,20 @@ function get_catblog( $cat_ID )
 
 
 /**
+ * Get category permanent url by category ID
+ *
+ * @param integer category ID
+ */
+function get_caturl( $cat_ID )
+{
+	$ChapterCache = & get_ChapterCache();
+	$Chapter = $ChapterCache->get_by_ID($cat_ID);
+
+	return $Chapter->get_permanent_url();
+}
+
+
+/**
  * Load cache for category definitions.
  *
  * Warning: this loads all categories for ALL blogs
@@ -149,16 +176,19 @@ function cat_load_cache()
 	$Timer->resume( 'cat_load_cache' );
 
 	// echo "loading CAT cache";
-	$sql = 'SELECT cat_ID, cat_parent_ID, cat_name, cat_blog_ID
-					FROM T_categories';
 	if( $Settings->get('chapter_ordering') == 'manual' )
 	{	// Manual order
-		$sql .= ' ORDER BY cat_order';
+		$select_temp_order = ', IF( cat_order IS NULL, 999999999, cat_order ) AS temp_order';
+		$sql_order = ' ORDER BY temp_order';
 	}
 	else
 	{	// Alphabetic order
-		$sql .= ' ORDER BY cat_name';
+		$select_temp_order = '';
+		$sql_order = ' ORDER BY cat_name';
 	}
+	$sql = 'SELECT cat_ID, cat_parent_ID, cat_name, cat_blog_ID'.$select_temp_order.'
+					FROM T_categories'
+					.$sql_order;
 
 
 	foreach( $DB->get_results( $sql, ARRAY_A, 'loading CAT cache' ) as $myrow )
@@ -212,7 +242,7 @@ function cat_load_cache()
  */
 function cat_load_postcats_cache()
 {
-	global $DB, $cache_postcats, $postIDlist, $preview;
+	global $DB, $cache_postcats, $postIDlist, $preview, $blog;
 
 	if( isset($cache_postcats) )
 	{ // already done!
@@ -229,13 +259,26 @@ function cat_load_postcats_cache()
 		return;
 	}
 
+	$sql = NULL;
 	if( !empty($postIDlist) )
 	{
 		$sql = "SELECT postcat_post_ID, postcat_cat_ID
 						FROM T_postcats
 						WHERE postcat_post_ID IN ($postIDlist)
 						ORDER BY postcat_post_ID, postcat_cat_ID";
+	}
+	elseif( !empty( $blog ) )
+	{ // This is a hack to load all postcats from this blog.
+		// This was required because in some cases the $postIDlist is not set but we would like to use the itemlight class get_Cahpters() function
+		// TODO: This part should be fixed when this function will be deleted.
+		$sql = "SELECT postcat_post_ID, postcat_cat_ID
+						FROM T_postcats INNER JOIN T_categories ON cat_ID = postcat_cat_ID
+						WHERE cat_blog_ID = ".$DB->quote( $blog )."
+						ORDER BY postcat_post_ID, postcat_cat_ID";
+	}
 
+	if( !empty( $sql ) )
+	{
 		foreach( $DB->get_results( $sql, ARRAY_A ) as $myrow )
 		{
 			$postcat_post_ID = $myrow["postcat_post_ID"];
@@ -247,6 +290,78 @@ function cat_load_postcats_cache()
 			// echo "just cached: post=$postcat_post_ID  cat=".$myrow["postcat_cat_ID"]."<br />";
 		}
 	}
+}
+
+
+/**
+ * Get # of posts for each category in a blog
+ *
+ * @param integer Category ID
+ * @param integer Blog ID
+ */
+function get_postcount_in_category( $cat_ID, $blog_ID = NULL )
+{
+	if( is_null( $blog_ID ) )
+	{
+		global $blog;
+		$blog_ID = $blog;
+	}
+
+	global $DB, $number_of_posts_in_cat;
+
+	if( !isset( $number_of_posts_in_cat[ (string) $blog_ID ] ) )
+	{
+		$SQL = new SQL( 'Get # of posts for each category in a blog' );
+		$SQL->SELECT( 'cat_ID, count( postcat_post_ID ) c' );
+		$SQL->FROM( 'T_categories' );
+		$SQL->FROM_add( 'INNER JOIN T_postcats ON postcat_cat_ID = cat_id' );
+		$SQL->FROM_add( 'INNER JOIN T_items__item ON postcat_post_ID = post_id' );
+		$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $blog_ID ) );
+		// fp> TODO: the following probably needs to be ALL except $posttypes_specialtypes
+		$SQL->WHERE_and( 'post_ptyp_ID IN ( '.$DB->quote( array( 1, 2000 ) ).' )' );
+		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses(), 'post_', $blog_ID, 'blog_post!', true ) );
+		$SQL->GROUP_BY( 'cat_ID' );
+		$number_of_posts_in_cat[ (string) $blog_ID ] = $DB->get_assoc( $SQL->get() );
+	}
+
+	return isset( $number_of_posts_in_cat[(string) $blog_ID][$cat_ID] ) ? (int) $number_of_posts_in_cat[(string) $blog_ID][$cat_ID] : 0;
+}
+
+
+/**
+ * Get # of comments for each category in a blog
+ *
+ * @param integer Category ID
+ * @param integer Blog ID
+ */
+function get_commentcount_in_category( $cat_ID, $blog_ID = NULL )
+{
+	if( is_null( $blog_ID ) )
+	{
+		global $blog;
+		$blog_ID = $blog;
+	}
+
+	global $DB, $number_of_comments_in_cat;
+
+	if( !isset( $number_of_comments_in_cat[(string) $blog_ID] ) )
+	{
+		$SQL = new SQL();
+		$SQL->SELECT( 'cat_ID, COUNT( comment_ID ) c' );
+		$SQL->FROM( 'T_comments' );
+		$SQL->FROM_add( 'LEFT JOIN T_postcats ON comment_post_ID = postcat_post_ID' );
+		$SQL->FROM_add( 'LEFT JOIN T_categories ON postcat_cat_ID = cat_id' );
+		$SQL->FROM_add( 'LEFT JOIN T_items__item ON comment_post_ID = post_id' );
+		$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $blog_ID ) );
+		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses(), 'comment_', $blog_ID, 'blog_comment!', true ) );
+		// add where condition to show only those posts commetns which are visible for the current User
+		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses(), 'post_', $blog_ID, 'blog_post!', true ) );
+		$SQL->GROUP_BY( 'cat_ID' );
+
+		$number_of_comments_in_cat[(string) $blog_ID] = $DB->get_assoc( $SQL->get() );
+	}
+
+	return isset( $number_of_comments_in_cat[(string) $blog_ID][$cat_ID] ) ? (int) $number_of_comments_in_cat[(string) $blog_ID][$cat_ID] : 0;
 }
 
 
@@ -498,95 +613,8 @@ function cat_req_dummy()
 
 /*
  * $Log$
- * Revision 1.16  2011/10/06 11:49:47  efy-yurybakh
- * Replace all timestamp_min & timestamp_max with Blog's methods
+ * Revision 1.18  2013/11/06 08:03:57  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.15  2011/09/04 22:13:14  fplanque
- * copyright 2011
- *
- * Revision 1.14  2010/07/26 06:52:15  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.13  2010/05/22 12:22:49  efy-asimo
- * move $allow_cross_posting in the backoffice
- *
- * Revision 1.12  2010/02/08 17:52:09  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.11  2009/09/29 22:28:04  blueyed
- * cat_create: use Chapter class
- *
- * Revision 1.10  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.9  2009/08/29 12:23:55  tblue246
- * - SECURITY:
- * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.
- * 	- files.ctrl.php: Removed redundant calls to User::check_perm().
- * 	- XML-RPC APIs: Added missing permission checks.
- * 	- items.ctrl.php: Check permission to edit item with current status (also checks user levels) for update actions.
- * - XML-RPC client: Re-added check for zlib support (removed by update).
- * - XML-RPC APIs: Corrected method signatures (return type).
- * - Localization:
- * 	- Fixed wrong permission description in blog user/group permissions screen.
- * 	- Removed wrong TRANS comment
- * 	- de-DE: Fixed bad translation strings (double quotes + HTML attribute = mess).
- * - File upload:
- * 	- Suppress warnings generated by move_uploaded_file().
- * 	- File browser: Hide link to upload screen if no upload permission.
- * - Further code optimizations.
- *
- * Revision 1.8  2009/03/08 23:57:42  fplanque
- * 2009
- *
- * Revision 1.7  2009/03/04 01:57:26  fplanque
- * doc
- *
- * Revision 1.6  2009/03/03 21:32:49  blueyed
- * TODO/doc about cat_load_postcats_cache
- *
- * Revision 1.5  2009/03/03 21:21:09  blueyed
- * Deprecate get_the_category_by_ID and replace its usage with ChapterCache
- * in core.
- *
- * Revision 1.4  2009/03/03 20:34:52  blueyed
- * doc
- *
- * Revision 1.3  2009/01/28 21:23:22  fplanque
- * Manual ordering of categories
- *
- * Revision 1.2  2008/01/21 09:35:26  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 10:59:32  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.29  2007/05/28 01:33:22  fplanque
- * permissions/fixes
- *
- * Revision 1.28  2007/05/09 00:58:55  fplanque
- * massive cleanup of old functions
- *
- * Revision 1.27  2007/04/26 00:11:06  fplanque
- * (c) 2007
- *
- * Revision 1.26  2007/03/24 20:41:16  fplanque
- * Refactored a lot of the link junk.
- * Made options blog specific.
- * Some junk still needs to be cleaned out. Will do asap.
- *
- * Revision 1.25  2006/12/17 23:42:38  fplanque
- * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
- * Look into Advanced Settings for the aggregating blog.
- * There may be side effects and new bugs created by this. Please report them :]
- *
- * Revision 1.24  2006/11/26 02:30:39  fplanque
- * doc / todo
- *
- * Revision 1.23  2006/11/24 18:27:23  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.22  2006/11/22 20:38:17  blueyed
- * todo
  */
 ?>

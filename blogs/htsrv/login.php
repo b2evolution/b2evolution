@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -38,9 +38,9 @@
 require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'_main.inc.php';
 
+$login = param( $dummy_fields[ 'login' ], 'string', '' );
 param( 'action', 'string', 'req_login' );
 param( 'mode', 'string', '' );
-param( 'login', 'string', '' );
 param( 'inskin', 'boolean', false );
 if( $inskin )
 {
@@ -48,8 +48,6 @@ if( $inskin )
 }
 
 // gets used by header_redirect();
-// TODO: dh> problem here is that $ReqURI won't include the e.g. "ctrl" param in a POSTed form and therefor the user lands on the default admin page after logging in (again)
-// fp> I think this will fix itself when we do another improvement: 303 redirect after each POST so that we never have an issue with people trying to reload a post
 param( 'redirect_to', 'string', $ReqURI );
 
 switch( $action )
@@ -61,43 +59,120 @@ switch( $action )
 
 		// Redirect to $baseurl on logout if redirect URI is not set. Temporarily fix until we remove actions from redirect URIs
 		if( $redirect_to == $ReqURI )
+		{
 			$redirect_to = $baseurl;
+		}
 
 		header_redirect(); // defaults to redirect_to param and exits
 		/* exited */
 		break;
 
+	case 'closeaccount': // close user account and log out
+		global $Session, $Messages, $UserSettings;
+		$Session->assert_received_crumb( 'closeaccountform' );
+
+		if( is_logged_in() && $current_User->update_status_from_Request( true, 'closed' ) )
+		{ // user account was closed successful
+			// Send notification email about closed account to users with edit users permission
+			$email_template_params = array(
+					'login'   => $current_User->login,
+					'email'   => $current_User->email,
+					'reason'  => param( 'account_close_reason', 'text', '' ),
+					'user_ID' => $current_User->ID,
+				);
+			send_admin_notification( NT_('User account closed'), 'close_account', $email_template_params );
+
+			// log out current User
+			logout();
+		}
+		else
+		{ // db update was unsuccessful
+			$Messages->add( T_( 'Unable to close your account. Please contact to system administrator.' ) );
+		}
+
+		header_redirect();
+		/* exited */
+		break;
 
 	case 'retrievepassword': // Send passwort change request by mail
+		global $servertimenow;
 		$login_required = true; // Do not display "Without login.." link on the form
 
-		$UserCache = & get_UserCache();
-		$ForgetfulUser = & $UserCache->get_by_login( $login );
+		$request_ts_login = $Session->get( 'core.changepwd.request_ts_login' );
+		if( $request_ts_login != NULL )
+		{
+			list( $last_request_ts, $last_request_login ) = preg_split( '~_~', $request_ts_login );
+			if( ( $login == $last_request_login ) && ( ( $servertimenow - 300 ) < $last_request_ts ) )
+			{ // the same request was sent from the same session in the last five minutes
+				$Messages->add( sprintf( T_('We have already sent you a password recovery email at %s. Please allow 5 minutes for delivery before requesting a new one.' ), date( locale_datetimefmt(), $last_request_ts ) ) );
+				$action = 'req_login';
+				break;
+			}
+		}
 
-		if( ! $ForgetfulUser )
+		$UserCache = & get_UserCache();
+		$UserCache->clear();
+		if( is_email( $login ) )
+		{ // user gave an email, get users by email
+			$only_activated = false;
+			// load all not closed users with this email address
+			$UserCache->load_where( 'user_email = "'.$login.'" && user_status <> "closed"' );
+
+			$not_activated_Ids = array();
+			while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
+			{ // Iterate through UserCache
+				if( $iterator_User->check_status( 'is_validated' ) )
+				{
+					$only_activated = true;
+				}
+				else
+				{ // strore not activated user Ids for further use
+					$not_activated_Ids[] = $iterator_User->ID;
+				}
+			}
+
+			// if we have activated users then remove every not activated from the cache
+			if( $only_activated && ( !empty( $not_activated_Ids ) ) )
+			{
+				foreach( $not_activated_Ids as $not_activated_Id )
+				{
+					$UserCache->remove_by_ID( $not_activated_Id );
+				}
+			}
+
+			$UserCache->rewind();
+			$forgetful_User = & $UserCache->get_next();
+			$UserCache->rewind();
+		}
+		else
+		{ // get user by login
+			$forgetful_User = & $UserCache->get_by_login( $login );
+		}
+
+		if( ! $forgetful_User )
 		{ // User does not exist
 			// pretend that the email is sent for avoiding guessing user_login
-			$Messages->add( T_('If you correctly typed in your login, a link to change your password has been sent to your registered email address.' ), 'success' );
+			$Messages->add( T_('If you correctly entered your login or email address, a link to change your password has been sent to your registered email address.' ), 'success' );
 			$action = 'req_login';
 			break;
 		}
 
-		// echo 'email: ', $ForgetfulUser->email;
-		// echo 'locale: '.$ForgetfulUser->locale;
+		// echo 'email: ', $forgetful_User->email;
+		// echo 'locale: '.$forgetful_User->locale;
 
-		if( $demo_mode && ($ForgetfulUser->login == 'demouser' || $ForgetfulUser->ID == 1) )
+		if( $demo_mode && ($forgetful_User->ID <= 3) )
 		{
 			$Messages->add( T_('You cannot reset this account in demo mode.'), 'error' );
 			$action = 'req_login';
 			break;
 		}
 
-		locale_temp_switch( $ForgetfulUser->locale );
+		locale_temp_switch( $forgetful_User->locale );
 
 		// DEBUG!
 		// echo $message.' (password not set yet, only when sending email does not fail);
 
-		if( empty( $ForgetfulUser->email ) )
+		if( empty( $forgetful_User->email ) )
 		{
 			$Messages->add( T_('You have no email address with your profile, therefore we cannot reset your password.')
 				.' '.T_('Please try contacting the admin.'), 'error' );
@@ -106,22 +181,26 @@ switch( $action )
 		{
 			$request_id = generate_random_key(22); // 22 to make it not too long for URL but unique/safe enough
 
-			$message = T_( 'Somebody (presumably you) has requested a password change for your account.' )
-				."\n\n"
-				.T_('Login:')." $login\n"
-				.T_('Link to change your password:')
-				."\n"
-				.$secure_htsrv_url.'login.php?action=changepwd'
-					.'&login='.rawurlencode( $ForgetfulUser->login )
-					.'&reqID='.$request_id
-					.'&sessID='.$Session->ID  // used to detect cookie problems
-				."\n\n-- \n"
-				.T_('Please note:')
-				.' '.T_('For security reasons the link is only valid for your current session (by means of your session cookie).')
-				."\n\n"
-				.T_('If it was not you that requested this password change, simply ignore this mail.');
+			// Count how many users match to this login ( It can be more then one in case of email login )
+			$user_ids = $UserCache->get_ID_array();
+			$user_count = count( $user_ids );
 
-			if( ! send_mail( $ForgetfulUser->email, NULL, sprintf( T_('Password change request for %s'), $ForgetfulUser->login ), $message, $notify_from ) )
+			// Set blog param for email link
+			$blog_param = '';
+			if( !empty( $blog ) )
+			{
+				$blog_param = '&inskin=true&blog='.$blog;
+			}
+
+			$subject = sprintf( T_( 'Password change request for %s' ), $login );
+			$email_template_params = array(
+					'UserCache'      => $UserCache,
+					'user_count'     => $user_count,
+					'request_id'     => $request_id,
+					'blog_param'     => $blog_param,
+				);
+
+			if( ! send_mail_to_User( $forgetful_User->ID, $subject, 'password_change_request', $email_template_params, true ) )
 			{
 				$Messages->add( T_('Sorry, the email with the link to reset your password could not be sent.')
 					.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
@@ -129,9 +208,10 @@ switch( $action )
 			else
 			{
 				$Session->set( 'core.changepwd.request_id', $request_id, 86400 * 2 ); // expires in two days (or when clicked)
+				$Session->set( 'core.changepwd.request_ts_login', $servertimenow.'_'.$login, 360 ); // request timestamp and login/email - expires in six minutes
 				$Session->dbsave(); // save immediately
 
-				$Messages->add( T_('If you correctly typed in your login, a link to change your password has been sent to your registered email address.' ), 'success' );
+				$Messages->add( T_('If you correctly entered your login or email address, a link to change your password has been sent to your registered email address.' ), 'success' );
 			}
 		}
 
@@ -146,9 +226,9 @@ switch( $action )
 		param( 'sessID', 'integer', '' );
 
 		$UserCache = & get_UserCache();
-		$ForgetfulUser = & $UserCache->get_by_login($login);
+		$forgetful_User = & $UserCache->get_by_login($login);
 
-		if( ! $ForgetfulUser || empty($reqID) )
+		if( ! $forgetful_User || empty($reqID) )
 		{ // This was not requested
 			$Messages->add( T_('Invalid password change request! Please try again...'), 'error' );
 			$action = 'lostpassword';
@@ -174,26 +254,89 @@ switch( $action )
 		}
 
 		// Link User to Session:
-		$Session->set_user_ID( $ForgetfulUser->ID );
+		$Session->set_user_ID( $forgetful_User->ID );
 
 		// Add Message to change the password:
 		$Messages->add( T_( 'Please change your password to something you remember now.' ), 'success' );
 
 		// Note: the 'core.changepwd.request_id' Session setting gets removed in b2users.php
 
-		// Redirect to the user's profile in the "users" controller:
-		// TODO: This will probably fail if the user has no admin-access permission! Redirect to profile page in blog instead!?
+		// Redirect to the user's change password tab
+		$changepwd_url = NULL;
+		if( !empty( $blog ) )
+		{ // blog is set, redirect to in-skin change password form
+			$BlogCache = & get_BlogCache();
+			$Blog = $BlogCache->get_by_ID( $blog );
+			if( $Blog )
+			{
+				$changepwd_url = url_add_param( $Blog->gen_blogurl(), 'disp=pwdchange&reqID='.$reqID );
+			}
+		}
+		if( empty( $changepwd_url ) )
+		{ // redirect to admin change password form
+			$changepwd_url = url_add_param( $admin_url, 'ctrl=user&user_tab=pwdchange&user_ID='.$forgetful_User->ID.'&reqID='.$reqID, '&' );
+		}
 		// redirect Will save $Messages into Session:
-		header_redirect( url_add_param( $admin_url, 'ctrl=users&user_ID='.$ForgetfulUser->ID, '&' ) ); // display user's profile
+		header_redirect( $changepwd_url ); // display user's change password tab
 		/* exited */
 		break;
 
 
+	case 'activateaccount': // Clicked to activate account link from an account activation reminder email
+		// Stop a request from the blocked IP addresses
+		antispam_block_ip();
+
+		global $UserSettings, $Session, $baseurl;
+
+		// get user id and reminder key
+		$userID = param( 'userID', 'integer', '' );
+		$reminder_key = param( 'reminderKey', 'string', '' );
+
+		$UserCache = & get_UserCache();
+		$User = $UserCache->get_by_ID( $userID );
+		$last_reminder_key = $UserSettings->get( 'last_activation_reminder_key', $userID );
+		if( !$User->check_status( 'can_be_validated' ) )
+		{
+			if( $User->check_status( 'is_validated' ) )
+			{ // Already activated, e.g. clicked on an obsolete email link:
+				$Messages->add( T_('Your account has already been activated.'), 'note' );
+				$action = 'req_login';
+				break;
+			}
+			elseif( $User->check_status( 'is_closed' ) )
+			{ // Account was closed, don't let to activate the account
+				$Messages->add( T_('Your account is closed. You cannot activate it.'), 'error' );
+				// redirect to base url
+				header_redirect( $baseurl );
+				/* exited */
+			}
+		}
+		elseif( empty( $last_reminder_key ) || ( $last_reminder_key != $reminder_key ) )
+		{ // the reminder key in db is empty or not equal with the received one
+			$Messages->add( T_('Invalid account activation request!'), 'error' );
+			$action = 'req_validatemail';
+			break;
+		}
+
+		// log in with user
+		$Session->set_user_ID( $userID );
+
+		// activate user account
+		$User->activate_from_Request();
+		$Messages->add( T_('Your account is now activated.'), 'success' );
+
+		header_redirect( redirect_after_account_activation() );
+		/* exited */
+		break;
+
 	case 'validatemail': // Clicked "Validate email" link from a mail
+		// Stop a request from the blocked IP addresses
+		antispam_block_ip();
+
 		param( 'reqID', 'string', '' );
 		param( 'sessID', 'integer', '' );
 
-		if( is_logged_in() && $current_User->validated )
+		if( check_user_status( 'is_validated' ) )
 		{ // Already validated, e.g. clicked on an obsolete email link:
 			$Messages->add( T_('Your email address has already been validated.'), 'note' );
 			// no break: cleanup & redirect below
@@ -235,42 +378,21 @@ switch( $action )
 				break;
 			}
 
-			// Validate user:
-			$current_User->set( 'validated', 1 );
-			$current_User->dbupdate();
-
-			if( $Settings->get( 'newusers_findcomments' ) )
-			{	// We have to assign the all old comments from current user by email
-				$DB->query( '
-					UPDATE T_comments
-					   SET comment_author_ID = "'.$current_User->ID.'"
-					 WHERE comment_author_email = "'.$current_User->email.'"
-					   AND comment_author_ID IS NULL' );
-			}
+			// activate user account
+			$current_User->activate_from_Request();
 
 			$Messages->add( T_( 'Your email address has been validated.' ), 'success' );
 		}
 
-    // fp>asimo: Please add a "Users setting" to the backoffice to determine if we want to return to original page after email validation
-		// $redirect_to = $Session->get( 'core.validatemail.redirect_to' );
-    $redirect_to = '';
-
-		if( empty($redirect_to) )
-		{ // Redirect user to home page:
-      // fp>asimo: Please add a "Users setting" to the backoffice to determine if validation
-      // emails should act in backoffice or in a specific blog
-      // (very similar to  the setting for messaging)
-      // Use this also to redirecdt to inskin login uf there is a validation error above.
-      // TEMPORARY DIRTY:
-			$redirect_to = $baseurl.'?disp=avatar';
-		}
+		// init redirect_to
+		$redirect_to = redirect_after_account_activation();
 
 		// Cleanup:
 		$Session->delete('core.validatemail.request_ids');
 		$Session->delete('core.validatemail.redirect_to');
 
 		// redirect Will save $Messages into Session:
-		header_redirect();
+		header_redirect( $redirect_to );
 		/* exited */
 		break;
 
@@ -281,7 +403,8 @@ switch( $action )
 /* For actions that other delegate to from the switch above: */
 switch( $action )
 {
-	case 'req_validatemail': // Send email validation link by mail (initial form and action)
+	case 'req_validatemail':
+		// Send activation link by email (initial form and action)
 		if( ! is_logged_in() )
 		{
 			$Messages->add( T_('You have to be logged in to request an account validation link.'), 'error' );
@@ -289,18 +412,41 @@ switch( $action )
 			break;
 		}
 
-		if( $current_User->validated || ! $Settings->get('newusers_mustvalidate') )
-		{ // validating emails is not activated/necessary (check this after login, so it gets not "announced")
+		if( check_user_status( 'is_validated' ) )
+		{ // Activation not required (check this after login, so it does not get "announced")
 			$action = '';
 			break;
 		}
 
 		param( 'req_validatemail_submit', 'integer', 0 ); // has the form been submitted
-		param( 'email', 'string', $current_User->email ); // the email address is editable
+		$email = param( $dummy_fields['email'], 'string', $current_User->email ); // the email address is editable
 
 		if( $req_validatemail_submit )
 		{ // Form has been submitted
-			param_check_email( 'email', true );
+			param_check_email( $dummy_fields['email'], true );
+
+			// check if user email was changed
+			$email_changed = ( $current_User->get( 'email' ) != $email );
+
+			// check if we really needs to send a new validation email
+			if( !$email_changed )
+			{ // the email was not changed
+				$last_activation_email_date = $UserSettings->get( 'last_activation_email', $current_User->ID );
+				if( ! empty( $last_activation_email_date ) )
+				{ // at least one validation email was sent
+					// convert date to timestamp
+					$last_activation_email_ts = mysql2timestamp( $last_activation_email_date );
+					$activate_requests_limit = $Settings->get( 'activate_requests_limit' );
+					if( $servertimenow - $last_activation_email_ts < $activate_requests_limit )
+					{ // a validation email was sent to the same email address less then the x seconds, where x is the "Activation requests limit" value
+						// get difference between local time and server time
+						$time_difference = $Settings->get('time_difference');
+						// get last activation email local date and time
+						$last_email_date = date( locale_datetimefmt(), $last_activation_email_ts + $time_difference );
+						$Messages->add( sprintf( T_( "We have already sent you an activation message to %s at %s. Please allow %d minutes for delivery before requesting a new one." ), $email, $last_email_date, $activate_requests_limit / 60 ) );
+					}
+				}
+			}
 
 			// Call plugin event to allow catching input in general and validating own things from DisplayRegisterFormFieldset event
 			$Plugins->trigger_event( 'ValidateAccountFormSent' );
@@ -310,16 +456,24 @@ switch( $action )
 				break;
 			}
 
-			// Update user's email:
-			$current_User->set_email( $email );
-			if( $current_User->dbupdate() )
-			{
-				$Messages->add( T_('Your profile has been updated.'), 'note' );
+			if( $email_changed )
+			{ // Update user's email:
+				$current_User->set_email( $email );
+				if( !$current_User->dbupdate() )
+				{ // email address couldn't be updated
+					$Messages->add( T_('Could not update your email address.'), 'error' );
+					break;
+				}
 			}
 
-			if( $current_User->send_validate_email($redirect_to) )
+			$inskin_blog = $inskin ? $blog : NULL;
+			if( $current_User->send_validate_email( $redirect_to, $inskin_blog, $email_changed ) )
 			{
 				$Messages->add( sprintf( /* TRANS: %s gets replaced by the user's email address */ T_('An email has been sent to your email address (%s). Please click on the link therein to validate your account.'), $current_User->dget('email') ), 'success' );
+			}
+			elseif( $demo_mode )
+			{
+				$Messages->add( T_('Sorry, could not send email. Sending email in debug mode is disabled.' ), 'error' );
 			}
 			else
 			{
@@ -353,7 +507,7 @@ if( strlen($redirect_to) )
 
 if( preg_match( '#/login.php([&?].*)?$#', $redirect_to ) )
 { // avoid "endless loops"
-	$redirect_to = $admin_url;
+	$redirect_to = $baseurl;
 }
 
 // Remove login and pwd parameters from URL, so that they do not trigger the login screen again:
@@ -370,7 +524,28 @@ if( $inskin && use_in_skin_login() )
 	$Blog = $BlogCache->get_by_ID( $blog, false, false );
 	if( ! empty( $Blog ) )
 	{
-		$redirect = $Blog->get('loginurl');
+		if( !empty( $login_error ) )
+		{
+			$Messages->add( T_( $login_error ) );
+		}
+		if( empty( $redirect_to ) )
+		{
+			$redirect_to = $Blog->gen_blogurl();
+		}
+		// check if action was req_validatemail
+		if( ( $action == 'req_validatemail' ) && !empty( $current_User ) )
+		{ // redirect to inskin activate account page
+			$redirect = url_add_param( $Blog->gen_blogurl(), 'disp=activateinfo', '&' );
+			if( $Messages->has_errors() )
+			{	// Redirect to a form for requesting an activation again if some errors exist
+				$redirect = url_add_param( $redirect, 'force_request=1', '&' );
+			}
+		}
+		else
+		{ // redirect to inskin login page
+			$redirect = url_add_param( $Blog->gen_blogurl(), 'disp=login', '&' );
+		}
+		$redirect = url_add_param( $redirect, 'redirect_to='.$redirect_to, '&' );
 		header_redirect( $redirect );
 		// already exited here
 		exit(0);
@@ -384,12 +559,18 @@ switch( $action )
 {
 	case 'lostpassword':
 		// Lost password:
-		// Display retrieval form:
-		require $adminskins_path.'login/_lostpass_form.main.php';
+		$page_title = T_('Lost password ?');
+		$page_icon = 'login';
+		$hidden_params = array( 'redirect_to' => url_rel_to_same_host($redirect_to, $secure_htsrv_url) );
+		// Include page header:
+		require $adminskins_path.'login/_html_header.inc.php';
+		// Display form:
+		display_lostpassword_form( $login, $hidden_params );
+		require $adminskins_path.'login/_html_footer.inc.php';
 		break;
 
 	case 'req_validatemail':
-		// Send email validation link by mail (initial form and action)
+		// Send activation link by email (initial form and action)
 		// Display validation form:
 		require $adminskins_path.'login/_validate_form.main.php';
 		break;
@@ -404,230 +585,8 @@ exit(0);
 
 /*
  * $Log$
- * Revision 1.122  2011/10/17 17:53:11  efy-yurybakh
- * Detect previous comments after email validation
- *
- * Revision 1.121  2011/10/11 02:05:41  fplanque
- * i18n/wording cleanup
- *
- * Revision 1.120  2011/09/26 14:53:27  efy-asimo
- * Login problems with multidomain installs - fix
- * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
- *
- * Revision 1.119  2011/09/22 08:54:59  efy-asimo
- * Login problems with multidomain installs - fix
- *
- * Revision 1.118  2011/09/17 02:31:59  fplanque
- * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
- *
- * Revision 1.117  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.116  2011/09/04 21:32:17  fplanque
- * minor MFB 4-1
- *
- * Revision 1.115  2011/08/18 11:41:51  efy-asimo
- * Send all emails from noreply and email contents review
- *
- * Revision 1.114  2011/06/14 13:33:55  efy-asimo
- * in-skin register
- *
- * Revision 1.113  2011/02/20 22:31:38  fplanque
- * minor / doc
- *
- * Revision 1.112  2010/11/25 15:16:34  efy-asimo
- * refactor $Messages
- *
- * Revision 1.111  2010/11/20 19:19:03  sam2kb
- * Redirect to $baseurl on logout if redirect URI is not set. Temporarily fix until we remove actions from redirect URIs
- *
- * Revision 1.110  2010/02/08 17:51:05  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.109  2009/12/04 23:27:49  fplanque
- * cleanup Expires: header handling
- *
- * Revision 1.108  2009/09/26 12:00:42  tblue246
- * Minor/coding style
- *
- * Revision 1.107  2009/09/25 07:32:51  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.106  2009/05/28 20:57:22  blueyed
- * Rolling back additional activation of locale in htsrv (register, login). http://forums.b2evolution.net/viewtopic.php?p=92006#92006
- *
- * Revision 1.105  2009/03/08 23:57:36  fplanque
- * 2009
- *
- * Revision 1.104  2009/02/24 00:46:11  sam2kb
- * Activate the default locale - same as on reg page
- * See http://forums.b2evolution.net/viewtopic.php?t=13770
- *
- * Revision 1.103  2009/02/23 07:59:46  sam2kb
- * Activate default locale
- *
- * Revision 1.102  2008/12/21 18:43:11  blueyed
- * Fix E_NOTICE with new cookie_domain handling
- *
- * Revision 1.101  2008/12/21 17:51:23  blueyed
- * Merge fix for cookie domain warning from whissip branch. This fixes the warning for cookie_domain=.example.com when logging into example.com.
- *
- * Revision 1.100  2008/04/13 15:15:59  fplanque
- * attempt to fix email headers for non latin charsets
- *
- * Revision 1.99  2008/02/19 11:11:16  fplanque
- * no message
- *
- * Revision 1.98  2008/01/21 09:35:23  fplanque
- * (c) 2008
- *
- * Revision 1.97  2008/01/14 23:41:48  fplanque
- * cleanup load_funcs( urls ) in main because it is ubiquitously used
- *
- * Revision 1.96  2008/01/06 16:42:27  blueyed
- * Fix call to undefined function when accessing admin.php and _url.funcs.php has not been loaded
- *
- * Revision 1.95  2007/12/10 01:05:23  blueyed
- * Improve check performance
- *
- * Revision 1.94  2007/06/25 10:58:49  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.93  2007/05/15 18:35:03  blueyed
- * Use the same string when faking a success message!
- *
- * Revision 1.92  2007/04/26 00:11:14  fplanque
- * (c) 2007
- *
- * Revision 1.91  2007/02/26 03:41:16  fplanque
- * doc
- *
- * Revision 1.90  2007/02/21 23:52:26  fplanque
- * doc
- *
- * Revision 1.89  2007/02/21 21:16:14  blueyed
- * todo
- *
- * Revision 1.88  2007/02/13 21:03:40  blueyed
- * Improved login/register/validation process:
-// So seriously now:  "been validated already" and then "already been validated" on the same line!!! I don't think this is funny any longer. ("already been" is better)
- * - "Your account has been validated already." if an account had already been validated
- * - "We have already sent you %d email(s) with a validation link." note
- * - Autologin the user after he has registered (he just typed his credentials!)
- *
- * Revision 1.87  2007/02/03 19:48:55  blueyed
- * Fixed possible E_NOTICE
- *
- * Revision 1.86  2007/01/26 18:40:43  blueyed
- * Saner order of validate-email-link error message handling.
- *
- * Revision 1.85  2007/01/19 03:06:57  fplanque
- * Changed many little thinsg in the login procedure.
- * There may be new bugs, sorry. I tested this for several hours though.
- * More refactoring to be done.
- *
- * Revision 1.84  2007/01/18 23:59:29  fplanque
- * Re: Secunia. Proper sanitization.
- *
- * Revision 1.82  2007/01/17 23:54:54  blueyed
- * fixed "empty $redirect_to" regression
- *
- * Revision 1.81  2006/12/28 19:18:49  fplanque
- * trap yet another login/cookie caveat
- *
- * Revision 1.80  2006/12/28 15:44:31  fplanque
- * login refactoring / simplified
- *
- * Revision 1.79  2006/12/06 23:25:32  blueyed
- * Fixed bookmarklet plugins (props Danny); removed unneeded bookmarklet handling in core
- *
- * Revision 1.78  2006/12/06 22:30:07  fplanque
- * Fixed this use case:
- * Users cannot register themselves.
- * Admin creates users that are validated by default. (they don't have to validate)
- * Admin can invalidate a user. (his email, address actually)
- *
- * Revision 1.77  2006/11/26 02:30:38  fplanque
- * doc / todo
- *
- * Revision 1.76  2006/11/24 18:27:22  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.75  2006/11/24 18:06:02  blueyed
- * Handle saving of $Messages centrally in header_redirect()
- *
- * Revision 1.74  2006/10/23 22:19:02  blueyed
- * Fixed/unified encoding of redirect_to param. Use just rawurlencode() and no funky &amp; replacements
- *
- * Revision 1.73  2006/10/12 23:48:15  blueyed
- * Fix for if redirect_to is relative
- *
- * Revision 1.72  2006/08/21 19:07:52  blueyed
- * doc
- *
- * Revision 1.71  2006/08/21 16:07:43  fplanque
- * refactoring
- *
- * Revision 1.70  2006/08/20 22:25:20  fplanque
- * param_() refactoring part 2
- *
- * Revision 1.69  2006/08/19 07:56:29  fplanque
- * Moved a lot of stuff out of the automatic instanciation in _main.inc
- *
- * Revision 1.68  2006/07/26 20:19:15  blueyed
- * Set $current_User = NULL on logout (not false!)
- *
- * Revision 1.67  2006/07/17 01:33:13  blueyed
- * Fixed account validation by email for users who registered themselves
- *
- * Revision 1.66  2006/07/08 17:04:18  fplanque
- * minor
- *
- * Revision 1.65  2006/07/08 13:33:54  blueyed
- * Autovalidate admin group instead of primary admin user only.
- * Also delegate to req_validatemail action on failure directly instead of providing a link.
- *
- * Revision 1.64  2006/07/04 23:38:08  blueyed
- * Validate email: admin user (#1) has an extra button to validate him/herself through the form; store multiple req_validatemail keys in the user's session.
- *
- * Revision 1.63  2006/06/25 23:34:15  blueyed
- * wording pt2
- *
- * Revision 1.62  2006/06/25 23:23:38  blueyed
- * wording
- *
- * Revision 1.61  2006/06/22 22:30:04  blueyed
- * htsrv url for password related scripts (login, register and profile update)
- *
- * Revision 1.60  2006/05/19 18:15:04  blueyed
- * Merged from v-1-8 branch
- *
- * Revision 1.59.2.1  2006/05/19 15:06:23  fplanque
- * dirty sync
- *
- * Revision 1.59  2006/05/05 21:47:42  blueyed
- * consistency
- *
- * Revision 1.58  2006/04/24 20:52:30  fplanque
- * no message
- *
- * Revision 1.57  2006/04/22 02:54:37  blueyed
- * Fixes: Always go to validatemail form; delete used request ID
- *
- * Revision 1.56  2006/04/22 02:36:38  blueyed
- * Validate users on registration through email link (+cleanup around it)
- *
- * Revision 1.55  2006/04/20 12:15:32  fplanque
- * no message
- *
- * Revision 1.54  2006/04/19 23:50:39  blueyed
- * Normalized Messages handling (error displaying and transport in Session)
- *
- * Revision 1.53  2006/04/19 20:13:48  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.52  2006/04/11 21:22:25  fplanque
- * partial cleanup
+ * Revision 1.124  2013/11/06 08:03:44  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

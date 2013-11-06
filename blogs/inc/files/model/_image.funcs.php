@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -30,13 +30,21 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
+ * Get available thumbnail sizes
+ *
+ * @param string The text that used for the "None" option 
  * @return array 'key'=>'name'
  */
-function get_available_thumb_sizes()
+function get_available_thumb_sizes( $allow_none_text = NULL )
 {
 	global $thumbnail_sizes;
 
 	$thumb_size_names = array();
+
+	if( !empty( $allow_none_text ) )
+	{	// 'None' option
+		$thumb_size_names[''] = $allow_none_text;
+	}
 
 	foreach( $thumbnail_sizes as $key=>$dummy )
 	{
@@ -54,9 +62,10 @@ function get_available_thumb_sizes()
  * @param integer source height
  * @param integer constrained width
  * @param integer constrained height
+ * @param string align: center, top
  * @return array ( x, y, width, height )
  */
-function crop_to_constraint( $src_width, $src_height, $max_width, $max_height )
+function crop_to_constraint( $src_width, $src_height, $max_width, $max_height, $align = 'center' )
 {
 	$src_ratio = $src_width / $src_height;
 	$max_ratio = $max_width / $max_height;
@@ -69,7 +78,14 @@ function crop_to_constraint( $src_width, $src_height, $max_width, $max_height )
 	else
 	{
 		$x = 0;
-		$y = ($src_height - $src_width/$max_ratio) / 2;
+		if( $align == 'top' )
+		{	// top - 15%
+			$y = ( $src_height - $src_width ) * 0.15;
+		}
+		else
+		{	// center
+			$y = ($src_height - $src_width/$max_ratio) / 2;
+		}
 		$src_height = $src_width/$max_ratio;
 	}
 
@@ -320,7 +336,9 @@ function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height, $th
 	switch( $thumb_type )
 	{
 		case 'crop':
-			list( $src_x, $src_y, $src_width, $src_height) = crop_to_constraint( $src_width, $src_height, $thumb_width, $thumb_height );
+		case 'crop-top':
+			$align = $thumb_type == 'crop-top' ? 'top' : 'center';
+			list( $src_x, $src_y, $src_width, $src_height) = crop_to_constraint( $src_width, $src_height, $thumb_width, $thumb_height, $align );
 			$dest_width = $thumb_width;
 			$dest_height = $thumb_height;
 			break;
@@ -389,115 +407,176 @@ function pixelblur( $image_source, $width_source, $height_source, $percent_blur 
 }
 
 
+/**
+ * Rotate image
+ *
+ * @param object File
+ * @param integer # degrees to rotate
+ * @return boolean TRUE if rotating is successful
+ */
+function rotate_image( $File, $degrees )
+{
+	$Filetype = & $File->get_Filetype();
+	if( !$Filetype )
+	{	// Error
+		return false;
+	}
+
+	// Load image
+	list( $err, $imh ) = load_image( $File->get_full_path(), $Filetype->mimetype );
+	if( !empty( $err ) )
+	{	// Error
+		return false;
+	}
+
+	// Rotate image
+	if( ! $imh = @imagerotate( $imh, (int)$degrees, 0 ) )
+	{	// If func imagerorate is not defined for example:
+		return false;
+	}
+
+	// Save image
+	save_image( $imh, $File->get_full_path(), $Filetype->mimetype );
+
+	// Remove the old thumbnails
+	$File->rm_cache();
+
+	return true;
+}
+
+
+/**
+ * Provide imagerotate for undefined cases
+ *
+ * Rotate an image with a given angle
+ * @param resource Image: An image resource, returned by one of the image creation functions, such as imagecreatetruecolor().
+ * @param integer Angle: Rotation angle, in degrees. The rotation angle is interpreted as the number of degrees to rotate the image anticlockwise.
+ * @param string Bgd_color: Specifies the color of the uncovered zone after the rotation
+ * @param integer Ignore_transparent: If set and non-zero, transparent colors are ignored (otherwise kept).
+ * @return resource Returns an image resource for the rotated image, or FALSE on failure.
+ */
+if( !function_exists( 'imagerotate' ) )
+{
+	/**
+	 * Imagerotate replacement. ignore_transparent is work for png images
+	 * Also, have some standard functions for 90, 180 and 270 degrees.
+	 */
+	function imagerotate( $srcImg, $angle, $bgcolor, $ignore_transparent = 0 )
+	{
+		function rotateX( $x, $y, $theta )
+		{
+			return $x * cos( $theta ) - $y * sin( $theta );
+		}
+		function rotateY( $x, $y, $theta )
+		{
+			return $x * sin( $theta ) + $y * cos( $theta );
+		}
+
+		$srcw = imagesx( $srcImg );
+		$srch = imagesy( $srcImg );
+
+		//Normalize angle
+		$angle %= 360;
+
+		if( $angle == 0 )
+		{
+			if( $ignore_transparent == 0 )
+			{
+				imagesavealpha( $srcImg, true );
+			}
+			return $srcImg;
+		}
+
+		// Convert the angle to radians
+		$theta = deg2rad( $angle );
+
+		//Standart case of rotate
+		if( ( abs( $angle ) == 90 ) || ( abs( $angle ) == 270) )
+		{
+			$width = $srch;
+			$height = $srcw;
+			if( ( $angle == 90 ) || ( $angle == -270 ) )
+			{
+				$minX = 0;
+				$maxX = $width;
+				$minY = -$height+1;
+				$maxY = 1;
+			}
+			else if( ( $angle == -90 ) || ( $angle == 270 ) )
+			{
+				$minX = -$width+1;
+				$maxX = 1;
+				$minY = 0;
+				$maxY = $height;
+			}
+		}
+		else if( abs( $angle ) === 180 )
+		{
+			$width = $srcw;
+			$height = $srch;
+			$minX = -$width+1;
+			$maxX = 1;
+			$minY = -$height+1;
+			$maxY = 1;
+		}
+		else
+		{
+			// Calculate the width of the destination image.
+			$temp = array( rotateX( 0, 0, 0-$theta ),
+					rotateX( $srcw, 0, 0-$theta ),
+					rotateX( 0, $srch, 0-$theta ),
+					rotateX( $srcw, $srch, 0-$theta )
+				);
+			$minX = floor( min( $temp ) );
+			$maxX = ceil( max( $temp ) );
+			$width = $maxX - $minX;
+
+			// Calculate the height of the destination image.
+			$temp = array( rotateY( 0, 0, 0-$theta ),
+					rotateY( $srcw, 0, 0-$theta ),
+					rotateY( 0, $srch, 0-$theta ),
+					rotateY( $srcw, $srch, 0-$theta )
+				);
+			$minY = floor( min( $temp ) );
+			$maxY = ceil( max( $temp ) );
+			$height = $maxY - $minY;
+		}
+
+		$destimg = imagecreatetruecolor( $width, $height );
+		if( $ignore_transparent == 0 )
+		{
+			imagefill( $destimg, 0, 0, imagecolorallocatealpha( $destimg, 255,255, 255, 127 ) );
+			imagesavealpha( $destimg, true );
+		}
+
+		// sets all pixels in the new image
+		for( $x = $minX; $x < $maxX; $x++ )
+		{
+			for( $y = $minY; $y < $maxY; $y++ )
+			{
+				// fetch corresponding pixel from the source image
+				$srcX = round( rotateX( $x, $y, $theta ) );
+				$srcY = round( rotateY( $x, $y, $theta ) );
+				if( $srcX >= 0 && $srcX < $srcw && $srcY >= 0 && $srcY < $srch )
+				{
+					$color = imagecolorat( $srcImg, $srcX, $srcY );
+				}
+				else
+				{
+					$color = $bgcolor;
+				}
+				imagesetpixel( $destimg, $x-$minX, $y-$minY, $color );
+			}
+		}
+		return $destimg;
+	}
+}
+
+
 /*
  * $Log$
- * Revision 1.26  2011/10/19 04:59:24  fplanque
- * no message
- *
- * Revision 1.25  2011/10/04 09:16:31  efy-yurybakh
- * blur effect
- *
- * Revision 1.24  2011/09/04 22:13:15  fplanque
- * copyright 2011
- *
- * Revision 1.23  2010/04/22 20:43:27  blueyed
- * trigger_error, if load_image failed
- *
- * Revision 1.22  2010/02/21 04:47:07  sam2kb
- * crop_to_constraint: fixed crop proportions
- *
- * Revision 1.21  2010/02/08 17:52:18  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.20  2009/11/30 22:17:38  blueyed
- * Improve error messages in images. save_image: catch errors. getfile: shorten errors, if required.
- *
- * Revision 1.19  2009/11/11 20:23:59  fplanque
- * oops, sorry.
- *
- * Revision 1.18  2009/11/11 20:16:14  fplanque
- * doc
- *
- * Revision 1.17  2009/10/14 23:56:05  blueyed
- * indent
- *
- * Revision 1.16  2009/10/14 23:55:22  blueyed
- * generate_thumb: use transparent background. Works for png and gif, as far as I can see. Please try to break it.
- *
- * Revision 1.15  2009/10/04 14:02:18  tblue246
- * fix
- *
- * Revision 1.14  2009/10/04 12:32:53  blueyed
- * Use error_log instead of trigger_error.
- *
- * Revision 1.13  2009/10/04 11:23:21  tblue246
- * doc
- *
- * Revision 1.12  2009/10/04 01:24:56  blueyed
- * load_image: refactored, add call to trigger_error.
- *
- * Revision 1.11  2009/10/02 20:34:32  blueyed
- * Improve handling of wrong file extensions for image.
- *  - load_image: if the wrong mimetype gets passed, return error, instead of letting imagecreatefrom* fail
- *  - upload: detect wrong extensions, rename accordingly and add a warning
- *
- * Revision 1.10  2009/09/20 01:10:36  blueyed
- * todo
- *
- * Revision 1.9  2009/09/20 00:46:28  blueyed
- * load_image: handle error case a bit better.
- *
- * Revision 1.8  2009/09/12 20:51:58  tblue246
- * phpdoc fixes
- *
- * Revision 1.7  2009/07/30 21:34:55  blueyed
- * scale_to_constraint: support NULL/0 for max_width/max_height, allowing formats like '640x'. doc.
- *
- * Revision 1.6  2009/03/08 23:57:43  fplanque
- * 2009
- *
- * Revision 1.5  2009/01/13 22:51:28  fplanque
- * rollback / normalized / MFB
- *
- * Revision 1.4  2008/09/24 08:35:11  fplanque
- * Support of "cropped" thumbnails (the image will always fill the whole thumbnail area)
- * Thumbnail sizes can be configured in /conf/_advanced.php
- *
- * Revision 1.3  2008/01/21 09:35:29  fplanque
- * (c) 2008
- *
- * Revision 1.2  2008/01/06 04:23:49  fplanque
- * thumbnail enhancement
- *
- * Revision 1.1  2007/06/25 10:59:57  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.9  2007/05/28 11:28:22  fplanque
- * file perm fix / thumbnails
- *
- * Revision 1.8  2007/04/26 00:11:10  fplanque
- * (c) 2007
- *
- * Revision 1.7  2007/03/20 07:39:08  fplanque
- * filemanager fixes, including the chmod octal stuff
- *
- * Revision 1.6  2007/03/08 00:22:35  blueyed
- * TODO
- *
- * Revision 1.5  2007/01/19 08:20:36  fplanque
- * Addressed resized image quality.
- *
- * Revision 1.4  2006/12/13 22:43:24  fplanque
- * default perms for newly created thumbnails
- *
- * Revision 1.3  2006/12/13 21:23:56  fplanque
- * .evocache folders / saving of thumbnails
- *
- * Revision 1.2  2006/12/13 20:10:31  fplanque
- * object responsibility delegation?
- *
- * Revision 1.1  2006/12/13 18:10:21  fplanque
- * thumbnail resampling proof of concept
+ * Revision 1.28  2013/11/06 08:04:08  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

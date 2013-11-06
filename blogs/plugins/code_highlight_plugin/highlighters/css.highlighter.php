@@ -4,7 +4,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2009 by Yabba/Scott - {@link http://astonishme.co.uk/contact/}.
  *
  * {@internal License choice
@@ -166,35 +166,8 @@ class am_css_highlighter
 
 /*
  * $Log$
- * Revision 1.8  2011/09/07 00:28:26  sam2kb
- * Replace non-ASCII character in regular expressions with ~
- *
- * Revision 1.7  2011/09/04 22:13:23  fplanque
- * copyright 2011
- *
- * Revision 1.6  2010/02/08 17:56:01  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.5  2009/03/08 23:57:51  fplanque
- * 2009
- *
- * Revision 1.4  2009/01/25 23:13:55  blueyed
- * Fix CVS log section, which is not phpdoc
- *
- * Revision 1.3  2008/10/02 21:52:10  blueyed
- * fix doc
- *
- * Revision 1.2  2008/03/21 10:33:55  yabs
- * added back to cvs
- *
- * Revision 1.1.2.3  2007/04/23 12:00:36  yabs
- * removed "extend Plugins"
- *
- * Revision 1.1.2.2  2007/04/21 10:47:07  yabs
- * Minor changes
- *
- * Revision 1.1.2.1  2007/04/21 10:07:41  yabs
- * Added to cvs
+ * Revision 1.9  2013/11/06 08:05:22  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

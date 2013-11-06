@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -54,13 +54,19 @@ class ItemLight extends DataObject
 	 * @var string
 	 */
 	var $issue_date;
-	var $mod_date;
 
- 	var $title;
+	/**
+	 * Last modification date (timestamp)
+	 * This should get compared to {@link $localtimenow}.
+	 * @var integer
+	 */
+	var $datemodified;
 
- 	var $excerpt;
+	var $title;
 
- 	var $urltitle;
+	var $excerpt;
+
+	var $urltitle;
 
 	var $canonical_slug_ID;
 
@@ -138,6 +144,9 @@ class ItemLight extends DataObject
 				array( 'table'=>'T_comments', 'fk'=>'comment_post_ID', 'msg'=>T_('%d comments') ),
 				array( 'table'=>'T_items__version', 'fk'=>'iver_itm_ID', 'msg'=>T_('%d versions') ),
 				array( 'table'=>'T_slug', 'fk'=>'slug_itm_ID', 'msg'=>T_('%d slugs') ),
+				array( 'table'=>'T_items__itemtag', 'fk'=>'itag_itm_ID', 'msg'=>T_('%d links to tags') ),
+				array( 'table'=>'T_items__item_settings', 'fk'=>'iset_item_ID', 'msg'=>T_('%d items settings') ),
+				array( 'table'=>'T_items__subscriptions', 'fk'=>'isub_item_ID', 'msg'=>T_('%d items subscriptions') ),
 			);
 
 		$this->objtype = $objtype;
@@ -150,12 +159,9 @@ class ItemLight extends DataObject
 		else
 		{
 			$this->ID = $db_row->$dbIDname;
-			$this->datemodified = $db_row->post_datemodified; // Needed for history display
-			/* Tblue> Both of the next two member variables are used in
-			 *        various places, maybe we should decide on one?! */
-			$this->issue_date = $db_row->post_datestart;
-			$this->datestart = $db_row->post_datestart;
-			$this->mod_date = $db_row->post_datemodified;
+			$this->issue_date = $db_row->post_datestart;			// Publication date of a post/item
+			$this->datestart = $db_row->post_datestart;			// This is the same as issue_date, but unfortunatly both of them are used, One of them should be removed
+			$this->datemodified = $db_row->post_datemodified;			// Date of last edit of post/item
 			$this->main_cat_ID = $db_row->post_main_cat_ID;
 			$this->urltitle = $db_row->post_urltitle;
 			$this->canonical_slug_ID = $db_row->post_canonical_slug_ID;
@@ -327,14 +333,23 @@ class ItemLight extends DataObject
 	 */
 	function get_permanent_url( $permalink_type = '', $blogurl = '', $glue = '&amp;' )
 	{
-		global $DB, $cacheweekly, $Settings;
+		global $DB, $cacheweekly, $Settings, $posttypes_specialtypes, $posttypes_nopermanentURL;
 
-		if( in_array( $this->ptyp_ID, array( 1000, 1500, 1520, 1530, 1570, 1600 ) ) ) // page & intros
-		{	// force use of single url:
-			$permalink_type = 'single';
+		if( in_array( $this->ptyp_ID, $posttypes_specialtypes ) ) // page, intros, sidebar
+		{	// This is not an "in stream" post:
+			if( in_array( $this->ptyp_ID, $posttypes_nopermanentURL ) )
+			{	// This type of post is not allowed to have a permalink:
+				$permalink_type = 'none';
+			}
+			else
+			{ // allowed to have a permalink:
+				// force use of single url:
+				$permalink_type = 'single';
+			}
 		}
 		elseif( empty( $permalink_type ) )
-		{ // Use default from collection settings:
+		{	// Normal "in stream" post:
+			// Use default from collection settings (may be an "in stream" URL):
 			$this->get_Blog();
 			$permalink_type = $this->Blog->get_setting( 'permalinks' );
 		}
@@ -346,6 +361,12 @@ class ItemLight extends DataObject
 
 			case 'subchap':
 				return $this->get_chapter_url( $blogurl, $glue );
+
+			case 'none':
+				// This is a silent fallback when we try to permalink to an Item that cannot be addressed directly:
+				// Link to blog home:
+				$this->get_Blog();
+				return $this->Blog->gen_blogurl();
 
 			case 'single':
 			default:
@@ -378,6 +399,7 @@ class ItemLight extends DataObject
 				'link_categories' => true,
 				'link_title'      => '#',
 				'format'          => 'htmlbody',
+				'show_locked'     => false,
 			), $params );
 
 
@@ -423,6 +445,11 @@ class ItemLight extends DataObject
 				$cat_name = $params['before_external'].$cat_name.$params['after_external'];
 			}
 
+			if( $Chapter->lock && $params[ 'show_locked' ] )
+			{
+				$cat_name .= '<span style="padding-left:5px;" >'.get_icon( 'file_not_allowed', 'imgtag', array( 'title' => T_('Locked')) ).'</span>';
+			}
+
 			$categoryNames[] = $cat_name;
 		}
 
@@ -433,14 +460,76 @@ class ItemLight extends DataObject
 
 
 	/**
+	 * Add nav_target param into the end of the url, but only if it is necessary
+	 *
+	 * @param string the url
+	 * @param string the current blog or current skin post_navigation setting
+	 * @param integer the ID of the navigation target
+	 * @param string glue
+	 * @return string the received url or the received url extended with the navigation param
+	 */
+	function add_navigation_param( $url, $post_navigation, $nav_target, $glue = '&amp;' )
+	{
+		if( empty( $url ) || empty( $nav_target ) )
+		{ // the url or the navigation target is not set we can't modify anything
+			return $url;
+		}
+
+		switch( $post_navigation )
+		{
+			case 'same_category': // navigate through the selected category
+				if( $this->main_cat_ID != $nav_target )
+				{
+					$url = url_add_param( $url, 'cat='.$nav_target, $glue );
+				}
+				break;
+
+			// 'same_tag' should be added here, with 'tag' param
+
+			case 'same_author': // navigate through this item author's posts ( param not needed because a post always has only one author )
+			case 'same_blog': // by default don't add any param
+			default:
+				break;
+		}
+
+		return $url;
+	}
+
+
+	/**
 	 * Template function: display main category name
 	 *
 	 * @param string Output format, see {@link format_to_output()}
+	 * @param array Params
 	 */
-	function main_category( $format = 'htmlbody' )
+	function main_category( $format = 'htmlbody', $params = array() )
 	{
+		$params = array_merge( array(
+				'display_link' => false, // TRUE to display category's name as link
+				'link_class'   => ''
+			), $params );
+
 		$Chapter = & $this->get_main_Chapter();
+
+		if( $params['display_link'] )
+		{	// Display category's name as link
+
+			$link_class = '';
+			if( !empty( $params['link_class'] ) )
+			{	// Set attribute for class
+				$link_class = 'class="'.$params['link_class'].'"';
+			}
+
+			echo '<a href="'.$Chapter->get_permanent_url().'"'.$link_class.'>';
+		}
+
+		// Display category's name
 		$Chapter->disp( 'name', $format );
+
+		if( $params['display_link'] )
+		{
+			echo '</a>';
+		}
 	}
 
 
@@ -463,12 +552,18 @@ class ItemLight extends DataObject
 		{ // dh> may not be set! (demo logs)
 			$categoryIDs = $cache_postcats[$this->ID];
 		}
-		else $categoryIDs = array();
+		else
+		{
+			$categoryIDs = postcats_get_byID( $this->ID );
+		}
 
 		$chapters = array();
 		foreach( $categoryIDs as $cat_ID )
 		{
-			$chapters[] = & $ChapterCache->get_by_ID( $cat_ID );
+			if( $Chapter = & $ChapterCache->get_by_ID( $cat_ID, false ) )
+			{
+				$chapters[] = $Chapter;
+			}
 		}
 
 		return $chapters;
@@ -482,13 +577,84 @@ class ItemLight extends DataObject
 	 */
 	function & get_main_Chapter()
 	{
-		if( is_null($this->main_Chapter) )
+		if( is_null( $this->main_Chapter ) )
 		{
 			$ChapterCache = & get_ChapterCache();
 			/**
 			 * @var Chapter
 			 */
-			$this->main_Chapter = & $ChapterCache->get_by_ID( $this->main_cat_ID );
+			$this->main_Chapter = & $ChapterCache->get_by_ID( $this->main_cat_ID, false );
+			if( empty( $this->main_Chapter ) )
+			{	// If main chapter is broken we should get it from one of extra chapters
+				$chapters = $this->get_Chapters();
+				foreach( $chapters as $Chapter )
+				{
+					if( !empty( $Chapter ) )
+					{	// We have found a valid Chapter...
+						$this->main_Chapter = & $Chapter;
+						$this->main_cat_ID = $Chapter->ID;
+						break;
+					}
+				}
+			}
+			if( empty( $this->main_Chapter ) )
+			{	// If we still don't have a valid Chapter, display clean error and die().
+				global $admin_url, $Blog, $blog;
+				if( empty( $Blog ) )
+				{
+					if( !empty( $blog ) )
+					{
+						$BlogCache = & get_BlogCache();
+						$Blog = & $BlogCache->get_by_ID( $blog, false );
+					}
+				}
+
+				$url_to_edit_post = $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$this->ID;
+
+				if( !empty( $Blog ) )
+				{
+					$url_to_edit_post .= '&amp;blog='.$Blog->ID;
+					if( is_admin_page() )
+					{	// Try to set a main category
+						$default_cat_ID = $Blog->get_setting( 'default_cat_ID' );
+						if( !empty( $default_cat_ID ) )
+						{	// If default category is set
+							$this->main_cat_ID = $default_cat_ID;
+							$this->main_Chapter = & $ChapterCache->get_by_ID( $this->main_cat_ID, false );
+						}
+						else
+						{	// Set from first chapter of the blog
+							$ChapterCache->clear();
+							$ChapterCache->load_subset( $Blog->ID );
+							if( $Chapter = & $ChapterCache->get_next() )
+							{
+								$this->main_cat_ID = $Chapter->ID;
+								$this->main_Chapter = & $Chapter;
+							}
+						}
+					}
+				}
+
+				$message = sprintf( 'Item with ID <a %s>%s</a> has an invalid main category ID %s.',
+						'href="'.$url_to_edit_post.'"',
+						$this->ID,
+						$this->main_cat_ID
+					);
+				if( empty( $Blog ) )
+				{	// No blog defined
+					$message .= ' In addition we cannot fallback to the default category because no valid blog ID has been specified.';
+				}
+
+				if( empty( $this->main_Chapter ) )
+				{	// Main chapter is not defined, because blog doesn't have the default cat ID and even blog doesn't have any categories
+					debug_die( $message );
+				}
+				else
+				{	// Main chapter is defined, we can show the page
+					global $Messages;
+					$Messages->add( $message );
+				}
+			}
 		}
 		return $this->main_Chapter;
 	}
@@ -605,10 +771,20 @@ class ItemLight extends DataObject
 				'format'      => 'htmlbody',
 				'class'       => 'flag',
 				'align'       => '',
+				'locale'      => 'item', // Possible values: 'item', 'blog', custom locale, empty string for current locale
 			), $params );
 
+		if( $params['locale'] == 'blog' )
+		{
+			$params['locale'] = $this->get_Blog()->locale;
+		}
+		elseif( $params['locale'] == 'item' )
+		{
+			$params['locale'] = $this->locale;
+		}
+
 		echo $params['before'];
-		echo locale_flag( $this->locale, $params['collection'], $params['class'], $params['align'] );
+		echo locale_flag( $params['locale'], $params['collection'], $params['class'], $params['align'] );
 		echo $params['after'];
 	}
 
@@ -634,6 +810,22 @@ class ItemLight extends DataObject
 		echo format_to_output( $locale['name'], $format );
 	}
 
+	/**
+	 * Get last mod date (datetime) of Item
+	 *
+	 * @param string date/time format: leave empty to use locale default date format
+	 * @param boolean true if you want GMT
+	 */
+	function get_mod_date( $format = '', $useGM = false )
+	{
+		if( empty($format) )
+		{
+			return mysql2date( locale_datefmt(), $this->datemodified, $useGM );
+		}
+
+		return mysql2date( $format, $this->datemodified, $useGM );
+	}
+
 
 	/**
 	 * Template function: display last mod date (datetime) of Item
@@ -643,10 +835,7 @@ class ItemLight extends DataObject
 	 */
 	function mod_date( $format = '', $useGM = false )
 	{
-		if( empty($format) )
-			echo mysql2date( locale_datefmt(), $this->mod_date, $useGM );
-		else
-			echo mysql2date( $format, $this->mod_date, $useGM );
+		echo $this->get_mod_date( $format, $useGM );
 	}
 
 
@@ -659,9 +848,9 @@ class ItemLight extends DataObject
 	function mod_time( $format = '', $useGM = false )
 	{
 		if( empty($format) )
-			echo mysql2date( locale_timefmt(), $this->mod_date, $useGM );
+			echo mysql2date( locale_timefmt(), $this->datemodified, $useGM );
 		else
-			echo mysql2date( $format, $this->mod_date, $useGM );
+			echo mysql2date( $format, $this->datemodified, $useGM );
 	}
 
 
@@ -745,7 +934,7 @@ class ItemLight extends DataObject
 	 * @param string link title
 	 * @param string class name
 	 */
-	function get_permanent_link( $text = '#', $title = '#', $class = '', $target_blog = '' )
+	function get_permanent_link( $text = '#', $title = '#', $class = '', $target_blog = '', $post_navigation = '', $nav_target = NULL )
 	{
 		global $current_User, $Blog;
 
@@ -779,6 +968,8 @@ class ItemLight extends DataObject
 		}
 
 		$url = $this->get_permanent_url( $permalink_type, $blogurl );
+		// add navigation param if necessary
+		$url = $this->add_navigation_param( $url, $post_navigation, $nav_target );
 
 		// Display as link
 		$r = '<a href="'.$url.'" title="'.$title.'"';
@@ -840,17 +1031,27 @@ class ItemLight extends DataObject
 	 */
 	function get_title( $params = array() )
 	{
-		global $ReqURL, $Blog;
+		global $ReqURL, $Blog, $MainList;
+
+		// Set default post navigation
+		$def_post_navigation = empty( $Blog ) ? 'same_blog' : $Blog->get_setting( 'post_navigation' );
 
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'before'      => '',
-				'after'       => '',
-				'format'      => 'htmlbody',
-				'link_type'   => '#',
-				'max_length'  => '',
-				'target_blog' => '',
+				'before'          => '',
+				'after'           => '',
+				'format'          => 'htmlbody',
+				'link_type'       => '#',
+				'link_class'      => '#',
+				'max_length'      => '',
+				'target_blog'     => '',
+				'nav_target'      => NULL,
+				'post_navigation' => $def_post_navigation,
+				'title_field'     => 'title',
 			), $params );
+
+		// Set post navigation target
+		$nav_target = ( ( $params['nav_target'] === NULL ) && isset($MainList) && !empty( $MainList->nav_target ) ) ? $MainList->nav_target : $params['nav_target'];
 
 		$blogurl = '';
 		if( !empty($Blog) && $this->check_cross_post_nav( $params['target_blog'], $Blog->ID ) )
@@ -858,7 +1059,7 @@ class ItemLight extends DataObject
 			$blogurl = $Blog->gen_blogurl();
 		}
 
-		$title = format_to_output( $this->title, $params['format'] );
+		$title = format_to_output( $this->$params['title_field'], $params['format'] );
 
 		if( $params['max_length'] != '' )
 		{	// Crop long title
@@ -913,10 +1114,21 @@ class ItemLight extends DataObject
 			default:
 		}
 
+		if( !empty( $url ) )
+		{ // url is set, also add navigation param if it is necessary
+			$url = $this->add_navigation_param( $url, $params['post_navigation'], $nav_target );
+		}
+
+		$link_class = '';
+		if( $params['link_class'] != '#' )
+		{
+			$link_class = ' class="'.$params['link_class'].'"';
+		}
+
 		$r = $params['before'];
 		if( !empty($url) )
 		{
-			$r .= '<a href="'.$url.'">'.$title.'</a>';
+			$r .= '<a href="'.$url.'"'.$link_class.'>'.$title.'</a>';
 		}
 		else
 		{
@@ -1016,12 +1228,22 @@ class ItemLight extends DataObject
 
 			case 'issue_date':
 			case 'datestart':
-				$this->issue_date = $parvalue;
-				return $this->set_param( 'datestart', 'date', $parvalue, false );
+				// Remove seconds from issue date and start date
+				// fp> TODO: this should only be done if the date is in the future. If it's in the past there are no sideeffects to having seconds.
+				// asimo> Why do we have two parameter with the same content if only one is stored in the database?
+				// Also it doesn't make sense to remove seconds from a db date field because the database format has seconds anyway.
+				// If we remove seconds from datstart field, then datestart will be always inserted into the dbchagnes even if it was not changed.
+				// If we don't want seconds in the end of the datestart then we need to remove it in the itemlight constructor as well.
+				// asimo> We have to set seconds to '00' and not remove them, this way the posts can appear right after creating, and the format is OK as well.
+				$parvalue_empty_seconds = remove_seconds(strtotime($parvalue), 'Y-m-d H:i:s');
+				$this->issue_date = $parvalue_empty_seconds;
+				return $this->set_param( 'datestart', 'date', $parvalue_empty_seconds, false );
 
 			case 'ptyp_ID':
 			case 'canonical_slug_ID':
 			case 'tiny_slug_ID':
+			case 'dateset':
+			case 'excerpt_autogenerated':
 				return $this->set_param( $parname, 'number', $parvalue, true );
 
 			default:
@@ -1065,340 +1287,8 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
- * Revision 1.44  2011/09/27 21:05:57  fplanque
- * no message
+ * Revision 1.46  2013/11/06 08:04:15  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.42  2011/09/04 22:13:17  fplanque
- * copyright 2011
- *
- * Revision 1.41  2011/01/02 02:20:25  sam2kb
- * typo: explicitely => explicitly
- *
- * Revision 1.40  2010/10/19 02:00:53  fplanque
- * MFB
- *
- * Revision 1.37.2.3  2010/10/17 19:35:35  fplanque
- * fix
- *
- * Revision 1.37.2.2  2010/09/21 14:37:41  efy-asimo
- * Requesting a post in the wrong blog - fix
- *
- * Revision 1.37.2.1  2010/09/15 13:03:30  efy-asimo
- * Cross post navigatation
- *
- * Revision 1.37  2010/04/12 09:41:36  efy-asimo
- * private URL shortener - task
- *
- * Revision 1.36  2010/04/07 08:26:11  efy-asimo
- * Allow multiple slugs per post - update & fix
- *
- * Revision 1.35  2010/03/29 12:25:31  efy-asimo
- * allow multiple slugs per post
- *
- * Revision 1.34  2010/03/21 05:03:15  sam2kb
- * get_title: option to crop title to 'max_length' characters
- *
- * Revision 1.33  2010/02/08 17:53:14  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.32  2010/01/16 17:51:14  sam2kb
- * Never translate post types, they translated twice if already in user locale.
- * Plus default types aren't defined anywhere and don't get translated anyway.
- *
- * Revision 1.31  2009/12/22 08:53:34  fplanque
- * global $ReqURL
- *
- * Revision 1.30  2009/12/21 01:29:54  fplanque
- * little things
- *
- * Revision 1.29  2009/12/21 00:40:18  fplanque
- * don't link single page to itself
- *
- * Revision 1.28  2009/09/28 23:56:22  blueyed
- * doc
- *
- * Revision 1.27  2009/09/26 12:00:43  tblue246
- * Minor/coding style
- *
- * Revision 1.26  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.25  2009/09/24 00:01:02  blueyed
- * indent
- *
- * Revision 1.24  2009/09/21 03:44:32  fplanque
- * doc
- *
- * Revision 1.23  2009/09/20 19:47:07  blueyed
- * Add post_excerpt_autogenerated field.
- * "text" params get unified newlines now and "excerpt" is a text param.
- * This is required for detecting if it has been changed really.
- * If something is wrong about this, please make sure that an unchanged
- * excerpt won't update the one in DB (when posting the item form).
- *
- * Revision 1.22  2009/09/14 13:17:28  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.21  2009/07/17 23:11:11  tblue246
- * - DataObject::set_param(): Correctly decide whether to update values with $fieldtype == 'number' (see code for detailed explanation).
- * - Item class: Doc about updating excerpt without updating the datemodified field.
- * - ItemLight class: Add missing member variable.
- *
- * Revision 1.20  2009/07/05 00:50:29  fplanque
- * no message
- *
- * Revision 1.19  2009/07/04 23:14:30  tblue246
- * Backoffice/full post list: Link titles of sidebar links to "link to" URLs by default
- *
- * Revision 1.18  2009/03/15 02:16:35  fplanque
- * auto link option for titles
- *
- * Revision 1.17  2009/03/08 23:57:44  fplanque
- * 2009
- *
- * Revision 1.16  2009/03/03 21:32:49  blueyed
- * TODO/doc about cat_load_postcats_cache
- *
- * Revision 1.15  2009/02/27 19:46:55  blueyed
- * ItemLight::set(main_cat_ID): unset main_Chapter before NULLing it, since it's a reference to the cache object. Also invalidate $Blog when setting main_cat_ID.
- *
- * Revision 1.14  2009/02/25 22:17:53  blueyed
- * ItemLight: lazily load blog_ID and main_Chapter.
- * There is more, but I do not want to skim the diff again, after
- * "cvs ci" failed due to broken pipe.
- *
- * Revision 1.13  2009/02/24 22:58:20  fplanque
- * Basic version history of post edits
- *
- * Revision 1.12  2009/01/21 23:30:12  fplanque
- * feature/intro posts display adjustments
- *
- * Revision 1.11  2009/01/21 20:33:49  fplanque
- * different display between featured and intro posts
- *
- * Revision 1.10  2009/01/21 18:23:26  fplanque
- * Featured posts and Intro posts
- *
- * Revision 1.9  2008/06/20 01:22:04  blueyed
- * Add ItemLight::get_title(). Make ItemLight::title() use this.
- *
- * Revision 1.8  2008/01/21 09:35:31  fplanque
- * (c) 2008
- *
- * Revision 1.7  2008/01/14 07:22:07  fplanque
- * Refactoring
- *
- * Revision 1.6  2007/11/03 23:54:38  fplanque
- * skin cleanup continued
- *
- * Revision 1.5  2007/11/03 21:04:27  fplanque
- * skin cleanup
- *
- * Revision 1.4  2007/11/03 04:56:04  fplanque
- * permalink / title links cleanup
- *
- * Revision 1.3  2007/09/09 12:51:58  fplanque
- * cleanup
- *
- * Revision 1.2  2007/09/09 09:15:59  yabs
- * validation
- *
- * Revision 1.1  2007/06/25 11:00:26  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.9  2007/06/21 00:44:37  fplanque
- * linkblog now a widget
- *
- * Revision 1.8  2007/05/14 02:47:23  fplanque
- * (not so) basic Tags framework
- *
- * Revision 1.7  2007/05/13 22:53:31  fplanque
- * allow feeds restricted to post excerpts
- *
- * Revision 1.6  2007/05/13 22:02:07  fplanque
- * removed bloated $object_def
- *
- * Revision 1.5  2007/04/26 00:11:12  fplanque
- * (c) 2007
- *
- * Revision 1.4  2007/03/26 12:59:18  fplanque
- * basic pages support
- *
- * Revision 1.3  2007/03/24 20:41:16  fplanque
- * Refactored a lot of the link junk.
- * Made options blog specific.
- * Some junk still needs to be cleaned out. Will do asap.
- *
- * Revision 1.2  2007/03/18 03:49:20  fplanque
- * fix
- *
- * Revision 1.1  2007/03/18 03:43:19  fplanque
- * EXPERIMENTAL
- * Splitting Item/ItemLight and ItemList/ItemListLight
- * Goal: Handle Items with less footprint than with their full content
- * (will be even worse with multiple languages/revisions per Item)
- *
- * Revision 1.162  2007/03/11 23:57:07  fplanque
- * item editing: allow setting to 'redirected' status
- *
- * Revision 1.161  2007/03/06 12:18:08  fplanque
- * got rid of dirty Item::content()
- * Advantage: the more link is now independant. it can be put werever people want it
- *
- * Revision 1.160  2007/03/05 04:52:42  fplanque
- * better precision for viewcounts
- *
- * Revision 1.159  2007/03/05 04:49:17  fplanque
- * better precision for viewcounts
- *
- * Revision 1.158  2007/03/05 02:13:26  fplanque
- * improved dashboard
- *
- * Revision 1.157  2007/03/05 01:47:50  fplanque
- * splitting up Item::content() - proof of concept.
- * needs to be optimized.
- *
- * Revision 1.156  2007/03/03 01:14:11  fplanque
- * new methods for navigating through posts in single item display mode
- *
- * Revision 1.155  2007/03/02 04:40:38  fplanque
- * fixed/commented a lot of stuff with the feeds
- *
- * Revision 1.154  2007/03/02 03:09:12  fplanque
- * rss length doesn't make sense since it doesn't apply to html format anyway.
- * clean solutionwould be to handle an "excerpt" field separately
- *
- * Revision 1.153  2007/02/23 19:16:07  blueyed
- * MFB: Fixed handling of Item::content for pre-rendering (it gets passed by reference!)
- *
- * Revision 1.152  2007/02/18 22:51:26  waltercruz
- * Fixing a little confusion with quotes and string concatenation
- *
- * Revision 1.151  2007/02/08 03:45:40  waltercruz
- * Changing double quotes to single quotes
- *
- * Revision 1.150  2007/02/05 13:32:49  waltercruz
- * Changing double quotes to single quotes
- *
- * Revision 1.149  2007/01/26 04:52:53  fplanque
- * clean comment popups (skins 2.0)
- *
- * Revision 1.148  2007/01/26 02:12:06  fplanque
- * cleaner popup windows
- *
- * Revision 1.147  2007/01/23 03:46:24  fplanque
- * cleaned up presentation
- *
- * Revision 1.146  2007/01/19 10:45:42  fplanque
- * images everywhere :D
- * At this point the photoblogging code can be considered operational.
- *
- * Revision 1.145  2007/01/11 19:29:50  blueyed
- * Fixed E_NOTICE when using the "excerpt" feature
- *
- * Revision 1.144  2006/12/26 00:08:29  fplanque
- * wording
- *
- * Revision 1.143  2006/12/21 22:35:28  fplanque
- * No regression. But a change in usage. The more link must be configured in the skin.
- * Renderers cannot side-effect on the more tag any more and that actually makes the whole thing safer.
- *
- * Revision 1.142  2006/12/20 13:57:34  blueyed
- * TODO about regression because of pre-rendering and the <!--more--> tag
- *
- * Revision 1.141  2006/12/18 13:31:12  fplanque
- * fixed broken more tag
- *
- * Revision 1.140  2006/12/16 01:30:46  fplanque
- * Setting to allow/disable email subscriptions on a per blog basis
- *
- * Revision 1.139  2006/12/15 22:59:05  fplanque
- * doc
- *
- * Revision 1.138  2006/12/14 22:26:31  blueyed
- * Fixed E_NOTICE and displaying of pings into $Messages (though "hackish")
- *
- * Revision 1.137  2006/12/12 02:53:56  fplanque
- * Activated new item/comments controllers + new editing navigation
- * Some things are unfinished yet. Other things may need more testing.
- *
- * Revision 1.136  2006/12/07 23:13:11  fplanque
- * @var needs to have only one argument: the variable type
- * Otherwise, I can't code!
- *
- * Revision 1.135  2006/12/06 23:55:53  fplanque
- * hidden the dead body of the sidebar plugin + doc
- *
- * Revision 1.134  2006/12/05 14:28:29  blueyed
- * Fixed wordcount==0 handling; has been saved as NULL
- *
- * Revision 1.133  2006/12/05 06:38:40  blueyed
- * doc
- *
- * Revision 1.132  2006/12/05 00:39:56  fplanque
- * fixed some more permalinks/archive links
- *
- * Revision 1.131  2006/12/05 00:34:39  blueyed
- * Implemented custom "None" option text in DataObjectCache; Added for $ItemStatusCache, $GroupCache, UserCache and BlogCache; Added custom text for Item::priority_options()
- *
- * Revision 1.130  2006/12/04 20:52:40  blueyed
- * typo
- *
- * Revision 1.129  2006/12/04 19:57:58  fplanque
- * How often must I fix the weekly archives until they stop bugging me?
- *
- * Revision 1.128  2006/12/04 19:41:11  fplanque
- * Each blog can now have its own "archive mode" settings
- *
- * Revision 1.127  2006/12/03 18:15:32  fplanque
- * doc
- *
- * Revision 1.126  2006/12/01 20:04:31  blueyed
- * Renamed Plugins_admin::validate_list() to validate_renderer_list()
- *
- * Revision 1.125  2006/12/01 19:46:42  blueyed
- * Moved Plugins::validate_list() to Plugins_admin class; added stub in Plugins, because at least the starrating_plugin uses it
- *
- * Revision 1.124  2006/11/28 20:04:11  blueyed
- * No edit link, if ID==0 to avoid confusion in preview, see http://forums.b2evolution.net/viewtopic.php?p=47422#47422
- *
- * Revision 1.123  2006/11/24 18:27:24  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.122  2006/11/22 20:48:58  blueyed
- * Added Item::get_Chapters() and Item::get_main_Chapter(); refactorized
- *
- * Revision 1.121  2006/11/22 20:12:18  blueyed
- * Use $format param in Item::categories()
- *
- * Revision 1.120  2006/11/19 22:17:42  fplanque
- * minor / doc
- *
- * Revision 1.119  2006/11/19 16:07:31  blueyed
- * Fixed saving empty renderers list. This should also fix the saving of "default" instead of the explicit renderer list
- *
- * Revision 1.118  2006/11/17 18:36:23  blueyed
- * dbchanges param for AfterItemUpdate, AfterItemInsert, AfterCommentUpdate and AfterCommentInsert
- *
- * Revision 1.117  2006/11/13 20:49:52  fplanque
- * doc/cleanup :/
- *
- * Revision 1.116  2006/11/10 20:14:11  blueyed
- * doc, fix
- *
- * Revision 1.115  2006/11/02 16:12:49  blueyed
- * MFB
- *
- * Revision 1.114  2006/11/02 16:01:00  blueyed
- * doc
- *
- * Revision 1.113  2006/10/29 18:33:23  blueyed
- * doc fix
- *
- * Revision 1.112  2006/10/23 22:19:02  blueyed
- * Fixed/unified encoding of redirect_to param. Use just rawurlencode() and no funky &amp; replacements
- *
- * Revision 1.111  2006/10/18 00:03:51  blueyed
- * Some forgotten url_rel_to_same_host() additions
  */
 ?>

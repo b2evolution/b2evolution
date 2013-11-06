@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -46,6 +46,13 @@ class CommentList2 extends DataObjectList2
 	var $CommentQuery;
 
 	/**
+	 * SQL object for the ItemQuery
+	 *
+	 * This will be used to get those item Ids which comments should be listed
+	 */
+	var $ItemQuery;
+
+	/**
 	 * Blog object this CommentList refers to
 	 */
 	var $Blog;
@@ -60,7 +67,7 @@ class CommentList2 extends DataObjectList2
 	 * @param string Name to be used when saving the filterset (leave empty to use default for collection)
 	 */
 	function CommentList2(
-		$Blog,
+		$Blog = NULL,
 		$limit = 1000,
 		$cache_name = 'CommentCache',	// name of cache to be used
 		$param_prefix = '',
@@ -77,13 +84,17 @@ class CommentList2 extends DataObjectList2
 
 		$this->Blog = & $Blog;
 
+		// The Item SQL Query object:
+		$this->ItemQuery = new ItemQuery( 'T_items__item', 'post_', 'post_ID' );
+		$this->ItemQuery->blog = $this->Blog->ID;
+
 		if( !empty( $filterset_name ) )
 		{	// Set the filterset_name with the filterset_name param
 			$this->filterset_name = 'CommentList_filters_'.$filterset_name;
 		}
 		else
 		{	// Set a generic filterset_name
-			$this->filterset_name = 'CommentList_filters_coll'.$this->Blog->ID;
+			$this->filterset_name = 'CommentList_filters_coll'.( !is_null( $this->Blog ) ? $this->Blog->ID : '0' );
 		}
 
 		$this->page_param = $param_prefix.'paged';
@@ -91,6 +102,7 @@ class CommentList2 extends DataObjectList2
 		// Initialize the default filter set:
 		$this->set_default_filters( array(
 				'filter_preset' => NULL,
+				'author_IDs' => NULL,
 				'author' => NULL,
 				'author_email' => NULL,
 				'author_url' => NULL,
@@ -107,15 +119,17 @@ class CommentList2 extends DataObjectList2
 				'phrase' => 'AND',
 				'exact' => 0,
 				'statuses' => NULL,
+				'expiry_statuses' => array( 'active' ), // Show active/expired comments
 				'types' => array( 'comment','trackback','pingback' ),
 				'orderby' => 'date',
-				'order' => $this->Blog->get_setting('orderdir'),
+				'order' => !is_null( $this->Blog ) ? $this->Blog->get_setting('orderdir') : 'DESC',
 				//'order' => 'DESC',
 				'comments' => $this->limit,
 				'page' => 1,
 				'featured' => NULL,
 				'timestamp_min' => NULL, // Do not show comments from posts before this timestamp
 				'timestamp_max' => NULL, // Do not show comments from posts after this timestamp
+				'threaded_comments' => false, // Mode to display the comment replies
 		) );
 	}
 
@@ -129,21 +143,9 @@ class CommentList2 extends DataObjectList2
 	{
 		// The SQL Query object:
 		$this->CommentQuery = new CommentQuery( $this->Cache->dbtablename, $this->Cache->dbprefix, $this->Cache->dbIDname );
+		$this->ItemQuery = new ItemQuery( 'T_items__item', 'post_', 'post_ID' );
 
 		parent::reset();
-	}
-
-
-	/**
-	 * Set default filter values we always want to use if not individually specified otherwise:
-	 *
-	 * @param array default filters to be merged with the class defaults
-	 * @param array default filters for each preset, to be merged with general default filters if the preset is used
-	 */
-	function set_default_filters( $default_filters, $preset_filters = array() )
-	{
-		$this->default_filters = array_merge( $this->default_filters, $default_filters );
-		$this->preset_filters = $preset_filters;
 	}
 
 
@@ -181,6 +183,7 @@ class CommentList2 extends DataObjectList2
 			/*
 			 * Restrict to selected authors attribute:
 			 */
+			memorize_param( $this->param_prefix.'author_IDs', 'string', $this->default_filters['author_IDs'], $this->filters['author_IDs'] );  // List of authors ID to restrict to
 			memorize_param( $this->param_prefix.'author', 'string', $this->default_filters['author'], $this->filters['author'] );  // List of authors ID to restrict to
 			memorize_param( $this->param_prefix.'author_email', 'string', $this->default_filters['author_email'], $this->filters['author_email'] );  // List of authors email to restrict to
 			memorize_param( $this->param_prefix.'author_url', 'string', $this->default_filters['author_url'], $this->filters['author_url'] );  // List of authors url to restrict to
@@ -206,6 +209,11 @@ class CommentList2 extends DataObjectList2
 			 * Restrict to selected statuses:
 			 */
 			memorize_param( $this->param_prefix.'show_statuses', 'array', $this->default_filters['statuses'], $this->filters['statuses'] );  // List of statuses to restrict to
+
+			/*
+			 * Restrict to not active/expired comments:
+			 */
+			memorize_param( $this->param_prefix.'expiry_statuses', 'array', $this->default_filters['expiry_statuses'], $this->filters['expiry_statuses'] );  // List of expiry statuses to restrict to
 
 			/*
 			 * Restrict to selected comment type:
@@ -249,7 +257,7 @@ class CommentList2 extends DataObjectList2
 		if( $use_filters )
 		{
 			// Do we want to restore filters or do we want to create a new filterset
-			$filter_action = param( $this->param_prefix.'filter', 'string', 'save' );
+			$filter_action = param( /*$this->param_prefix.*/'filter', 'string', 'save' );
 			switch( $filter_action )
 			{
 				case 'restore':
@@ -281,17 +289,23 @@ class CommentList2 extends DataObjectList2
 		/*
 		 * Restrict to selected author:
 		 */
+		$this->filters['author_IDs'] = param( $this->param_prefix.'author_IDs', '/^-?[0-9]+(,[0-9]+)*$/', $this->default_filters['author_IDs'], true );      // List of authors ID to restrict to
 		$this->filters['author'] = param( $this->param_prefix.'author', '/^-?[0-9]+(,[0-9]+)*$/', $this->default_filters['author'], true );      // List of authors to restrict to
 		$this->filters['author_email'] = param( $this->param_prefix.'author_email', 'string', $this->default_filters['author_email'], true );
 		$this->filters['author_url'] = param( $this->param_prefix.'author_url', 'string', $this->default_filters['author_url'], true );
 		$this->filters['url_match'] = param( $this->param_prefix.'url_match', 'string', $this->default_filters['url_match'], true );
 		$this->filters['include_emptyurl'] = param( $this->param_prefix.'include_emptyurl', 'string', $this->default_filters['include_emptyurl'], true );
-		//$this->filters['author_IP'] = param( $this->param_prefix.'author_IP', 'string', $this->default_filters['author_IP'], true );
+		$this->filters['author_IP'] = param( $this->param_prefix.'author_IP', 'string', $this->default_filters['author_IP'], true );
 
 		/*
 		 * Restrict to selected statuses:
 		 */
 		$this->filters['statuses'] = param( $this->param_prefix.'show_statuses', 'array', $this->default_filters['statuses'], true );      // List of statuses to restrict to
+
+		/*
+		 * Restrict to active/expired comments:
+		 */
+		$this->filters['expiry_statuses'] = param( $this->param_prefix.'expiry_statuses', 'array', $this->default_filters['expiry_statuses'], true );      // List of expiry statuses to restrict to
 
 		/*
 		 * Restrict to selected types:
@@ -335,82 +349,14 @@ class CommentList2 extends DataObjectList2
 
 
 	/**
-	 * Activate preset default filters if necessary
-	 *
-	 */
-	function activate_preset_filters()
-	{
-		$filter_preset = $this->filters['filter_preset'];
-
-		if( empty( $filter_preset ) )
-		{ // No filter preset, there are no additional defaults to use:
-			return;
-		}
-
-		// Override general defaults with the specific defaults for the preset:
-		$this->default_filters = array_merge( $this->default_filters, $this->preset_filters[$filter_preset] );
-
-		// Save the name of the preset in order for is_filtered() to work properly:
-		$this->default_filters['filter_preset'] = $this->filters['filter_preset'];
-	}
-
-
-	/**
-	 * Save current filterset to session.
-	 */
-	function save_filterset()
-	{
-		/**
-		 * @var Session
-		 */
-		global $Session, $Debuglog;
-
-		$Debuglog->add( 'Saving filterset <strong>'.$this->filterset_name.'</strong>', 'filters' );
-
-		$Session->set( $this->filterset_name, $this->filters );
-	}
-
-
-	/**
-	 * Load previously saved filterset from session.
-	 *
-	 * @return boolean true if we could restore something
-	 */
-	function restore_filterset()
-	{
-	  /**
-	   * @var Session
-	   */
-		global $Session;
-	  /**
-	   * @var Request
-	   */
-
-		global $Debuglog;
-
-		$filters = $Session->get( $this->filterset_name );
-
-		if( empty($filters) )
-		{ // set_filters() expects array
-			$filters = array();
-		}
-
-		$Debuglog->add( 'Restoring filterset <strong>'.$this->filterset_name.'</strong>', 'filters' );
-
-		// Restore filters:
-		$this->set_filters( $filters );
-
-		return true;
-	}
-
-
-	/**
 	 *
 	 *
 	 * @todo count?
 	 */
 	function query_init()
 	{
+		global $DB;
+
 		if( empty( $this->filters ) )
 		{	// Filters have not been set before, we'll use the default filterset:
 			// If there is a preset filter, we need to activate its specific defaults:
@@ -427,28 +373,29 @@ class CommentList2 extends DataObjectList2
 		 * Resrict to selected blog
 		 */
 		// If we dont have specific comment or post ids, we have to restric to blog
-		if( ( $this->filters['post_ID'] == NULL || ( ! empty($this->filters['post_ID']) && substr( $this->filters['post_ID'], 0, 1 ) == '-') ) &&
+		if( !is_null( $this->Blog ) &&
+			( $this->filters['post_ID'] == NULL || ( ! empty($this->filters['post_ID']) && substr( $this->filters['post_ID'], 0, 1 ) == '-') ) &&
 			( $this->filters['comment_ID'] == NULL || ( ! empty($this->filters['comment_ID']) && substr( $this->filters['comment_ID'], 0, 1 ) == '-') ) &&
 			( $this->filters['comment_ID_list'] == NULL || ( ! empty($this->filters['comment_ID_list']) && substr( $this->filters['comment_ID_list'], 0, 1 ) == '-') ) )
 		{ // restriction for blog
-			$this->CommentQuery->blog_restrict( $this->Blog );
+			$this->ItemQuery->where_chapter( $this->Blog->ID );
 		}
 
 		/*
 		 * filtering stuff:
 		 */
-		$this->CommentQuery->where_author( $this->filters['author'] );
+		$this->CommentQuery->where_author( $this->filters['author_IDs'] );
 		$this->CommentQuery->where_author_email( $this->filters['author_email'] );
 		$this->CommentQuery->where_author_url( $this->filters['author_url'], $this->filters['url_match'], $this->filters['include_emptyurl'] );
 		$this->CommentQuery->where_author_IP( $this->filters['author_IP'] );
-		$this->CommentQuery->where_post_ID( $this->filters['post_ID'] );
+		$this->ItemQuery->where_ID( $this->filters['post_ID'] );
 		$this->CommentQuery->where_ID( $this->filters['comment_ID'], $this->filters['author'] );
 		$this->CommentQuery->where_ID_list( $this->filters['comment_ID_list'] );
 		$this->CommentQuery->where_rating( $this->filters['rating_toshow'], $this->filters['rating_turn'], $this->filters['rating_limit'] );
 		$this->CommentQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
 		$this->CommentQuery->where_statuses( $this->filters['statuses'] );
 		$this->CommentQuery->where_types( $this->filters['types'] );
-		$this->CommentQuery->where_post_datestart( $this->filters['timestamp_min'], $this->filters['timestamp_max'] );
+		$this->ItemQuery->where_datestart( '', '', '', '', $this->filters['timestamp_min'], $this->filters['timestamp_max'] );
 
 
 		/*
@@ -456,13 +403,46 @@ class CommentList2 extends DataObjectList2
 		 */
 		$order_by = gen_order_clause( $this->filters['orderby'], $this->filters['order'], $this->Cache->dbprefix, $this->Cache->dbIDname );
 
+		if( $this->filters['threaded_comments'] )
+		{	// In mode "Threaded comments" we should get all replies in the begining of the list
+			$order_by = $this->Cache->dbprefix.'in_reply_to_cmt_ID DESC, '.$order_by;
+		}
+
 		$this->CommentQuery->order_by( $order_by );
+
+		// GET Item IDs, this way we don't have to JOIN two times the items and the categories table into the comment query
+		if( isset( $this->filters['post_ID'] ) && is_admin_page() )
+		{ // Allow all kind of post status ( This statuses will be filtered later by user perms )
+			$post_show_statuses = get_visibility_statuses( 'keys' );
+		}
+		else
+		{ // Allow only inskin statuses for posts
+			$post_show_statuses = get_inskin_statuses();
+		}
+		$this->ItemQuery->where_visibility( $post_show_statuses );
+		$sql_item_IDs = 'SELECT DISTINCT post_ID'
+						.$this->ItemQuery->get_from()
+						.$this->ItemQuery->get_where();
+		$item_IDs = $DB->get_col( $sql_item_IDs, 0, 'Get CommentQuery Item IDs' );
+		if( empty( $item_IDs ) )
+		{ // There is no item which belongs to the given blog and user may view it, so there are no comments either
+			parent::count_total_rows( 0 );
+			$this->CommentQuery->WHERE_and( 'FALSE' );
+			return;
+		}
+		$this->CommentQuery->where_post_ID( implode( ',', $item_IDs ) );
+
+		/*
+		 * Restrict to active comments by default, show expired comments only if it was requested
+		 * Note: This condition makes the CommentQuery a lot slower!
+		 */
+		$this->CommentQuery->expiry_restrict( $this->filters['expiry_statuses'] );
 
 		/*
 		 * GET TOTAL ROW COUNT:
 		 */
 		$sql_count = '
-				SELECT COUNT( DISTINCT '.$this->Cache->dbIDname.') '
+				SELECT COUNT( '.$this->Cache->dbIDname.') '
 					.$this->CommentQuery->get_from()
 					.$this->CommentQuery->get_where();
 
@@ -516,7 +496,8 @@ class CommentList2 extends DataObjectList2
 		// in ORDER BY must appear in the query. This make que query work with PostgreSQL and
 		// other databases.
 		// fp> That can dramatically fatten the returned data. You must handle this in the postgres class (check that order fields are in select)
-		$step1_sql = 'SELECT DISTINCT '.$this->Cache->dbIDname // .', '.implode( ', ', $order_cols_to_select )
+		// asimo> Note: DISTINCT was removed from the query because we should use DISTINCT only in those cases when the same field value may occur more then one times ( This is not the case )
+		$step1_sql = 'SELECT '.$this->Cache->dbIDname // .', '.implode( ', ', $order_cols_to_select )
 									.$this->CommentQuery->get_from()
 									.$this->CommentQuery->get_where()
 									.$this->CommentQuery->get_group_by()
@@ -551,7 +532,6 @@ class CommentList2 extends DataObjectList2
 	 */
 	function get_filter_titles( $ignore = array(), $params = array() )
 	{
-		global $post_statuses;
 		$title_array = array();
 
 		if( empty ($this->filters) )
@@ -561,10 +541,12 @@ class CommentList2 extends DataObjectList2
 
 		if( isset( $this->filters['statuses'] ) )
 		{
+			$visibility_statuses = get_visibility_statuses( '', array( 'redirected' ) );
+
 			$visibility_array = array();
 			foreach( $this->filters['statuses'] as $status )
 			{
-				$visibility_array[] = T_( $post_statuses[ $status ] );
+				$visibility_array[] = $visibility_statuses[ $status ];
 			}
 			$title_array['statuses'] = T_('Visibility').': '.implode( ', ', $visibility_array );
 		}
@@ -613,8 +595,8 @@ class CommentList2 extends DataObjectList2
 
 		return parent::display_if_empty( $params );
 	}
-	
-	
+
+
 	/**
 	 * Template tag
 	 *
@@ -622,8 +604,6 @@ class CommentList2 extends DataObjectList2
 	 */
 	function page_links( $params = array() )
 	{
-		global $generating_static;
-
 		$default_params = array(
 				'block_start' => '<p class="center">',
 				'block_end' => '</p>',
@@ -639,11 +619,6 @@ class CommentList2 extends DataObjectList2
 				'list_span' => 11,
 				'scroll_list_range' => 5,
 			);
-		
-		if( !empty($generating_static) )
-		{	// When generating a static page, act as if we were currently on the blog main page:
-			$default_params['page_url'] = $this->Blog->get('url');
-		}
 
 		// Use defaults + overrides:
 		$params = array_merge( $default_params, $params );
@@ -659,7 +634,7 @@ class CommentList2 extends DataObjectList2
 			$params['links_format'] = '$prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$';
 		}
 
- 		if( $this->Blog->get_setting( 'paged_nofollowto' ) )
+		if( !is_null( $this->Blog ) && $this->Blog->get_setting( 'paged_nofollowto' ) )
 		{	// We prefer robots not to follow to pages:
 			$this->nofollow_pagenav = true;
 		}
@@ -688,10 +663,8 @@ class CommentList2 extends DataObjectList2
 	{
 		$col_order_fields = $this->cols[$col_idx]['order'];
 
-		// pre_dump( $col_order_fields, $this->filters['orderby'], $this->filters['order'] );
-
 		// Current order:
-		if( $this->filters['orderby'] == $col_order_fields )
+		if( $this->filters['orderby'] == $col_order_fields || $this->param_prefix.$this->filters['orderby'] == $col_order_fields  )
 		{
 			$col_sort_values['current_order'] = $this->filters['order'];
 		}
@@ -737,7 +710,7 @@ class CommentList2 extends DataObjectList2
 
 	/**
 	 * Checks if currently selected filter contains only comments trash status
-	 * 
+	 *
 	 * @return boolean
 	 */
 	function is_trashfilter()
@@ -752,70 +725,8 @@ class CommentList2 extends DataObjectList2
 
 /*
  * $Log$
- * Revision 1.37  2011/10/07 07:22:59  efy-yurybakh
- * Replace all timestamp_min & timestamp_max with Blog's methods
+ * Revision 1.39  2013/11/06 08:03:58  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.36  2011/09/06 05:42:46  efy-asimo
- * Comment list visibility display - fix
- *
- * Revision 1.35  2011/09/04 22:13:15  fplanque
- * copyright 2011
- *
- * Revision 1.34  2011/02/24 07:42:27  efy-asimo
- * Change trashcan to Recycle bin
- *
- * Revision 1.33  2011/02/23 21:45:18  fplanque
- * minor / cleanup
- *
- * Revision 1.32  2011/02/14 14:13:24  efy-asimo
- * Comments trash status
- *
- * Revision 1.31  2010/12/18 15:01:54  sam2kb
- * Don't display page links if requested page is out of range
- *
- * Revision 1.30  2010/10/19 02:00:53  fplanque
- * MFB
- *
- * Revision 1.29  2010/10/13 14:07:55  efy-asimo
- * Optional paged comments in the front end
- *
- * Revision 1.28  2010/09/02 07:48:32  efy-asimo
- * ItemList and CommentList doc
- *
- * Revision 1.27  2010/07/26 06:52:16  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.26  2010/06/23 09:30:55  efy-asimo
- * Comments display and Antispam ban form modifications
- *
- * Revision 1.25  2010/06/08 01:49:53  sam2kb
- * Paged comments in frontend
- *
- * Revision 1.24  2010/05/24 21:27:58  sam2kb
- * Fixed some translated strings
- *
- * Revision 1.23  2010/05/10 14:26:17  efy-asimo
- * Paged Comments & filtering & add comments listview
- *
- * Revision 1.22  2010/03/28 19:27:47  fplanque
- * minor
- *
- * Revision 1.21  2010/03/27 15:55:48  blueyed
- * cleanup
- *
- * Revision 1.20  2010/03/27 15:51:17  blueyed
- * Minor doc. whitespace.
- *
- * Revision 1.19  2010/03/25 10:45:57  efy-asimo
- * add filter by URL to comments screen
- *
- * Revision 1.18  2010/03/25 07:47:40  efy-asimo
- * Add filter by rating to comments screen
- *
- * Revision 1.17  2010/03/15 17:12:10  efy-asimo
- * Add filters to Comment page
- *
- * Revision 1.16  2010/03/11 10:34:57  efy-asimo
- * Rewrite CommentList to CommentList2 rewrite
  */
 ?>

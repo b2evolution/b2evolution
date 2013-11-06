@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -62,6 +62,7 @@ class ItemCache extends DataObjectCache
 		parent::DataObjectCache( $objType, false, $dbtablename, $dbprefix, $dbIDname );
 	}
 
+
 	/**
 	 * Get an object from cache by its urltitle
 	 *
@@ -80,11 +81,12 @@ class ItemCache extends DataObjectCache
 	    // Get from SlugCache
 			$SlugCache = & get_SlugCache();
 			$req_Slug =  $SlugCache->get_by_name( $req_urltitle, $halt_on_error, $halt_on_empty );
+
 			if( $req_Slug && $req_Slug->get( 'type' ) == 'item' )
 			{	// It is in SlugCache
-				if( $Item = $this->get_by_ID( $req_Slug->get( 'itm_ID' ), $halt_on_error ) !== false )
+				$itm_ID = $req_Slug->get( 'itm_ID' );
+				if( $Item = $this->get_by_ID( $itm_ID, $halt_on_error, $halt_on_empty ) )
 				{
-					$Item = $this->get_by_ID( $req_Slug->get( 'itm_ID' ), $halt_on_error );
 					$this->urltitle_index[$req_urltitle] = $Item;
 				}
 				else
@@ -140,14 +142,16 @@ class ItemCache extends DataObjectCache
 			if( !isset( $this->urltitle_index[$urltitle] ) )
 			{ // not yet in cache:
 				$SlugCache = & get_SlugCache();
-				$req_Slug =  $SlugCache->get_by_name( $urltitle, false, false );
-				if( $req_Slug->get( 'type' ) == 'item' )
-				{	// Is item slug
-					if( $Item = $this->get_by_ID( $req_Slug->get( 'itm_ID' ), false ) )
-					{	// Set cahce 
-						$this->urltitle_index[$urltitle] = $Item;
-						$Debuglog->add( "Cached <strong>$this->objtype($urltitle)</strong>" );
-						continue;
+				if( $req_Slug = $SlugCache->get_by_name( $urltitle, false, false ) )
+				{
+					if( $req_Slug->get( 'type' ) == 'item' )
+					{	// Is item slug
+						if( $Item = $this->get_by_ID( $req_Slug->get( 'itm_ID' ), false ) )
+						{	// Set cache 
+							$this->urltitle_index[$urltitle] = $Item;
+							$Debuglog->add( "Cached <strong>$this->objtype($urltitle)</strong>" );
+							continue;
+						}
 					}
 				}
 				// Set cache for non found objects:
@@ -161,46 +165,8 @@ class ItemCache extends DataObjectCache
 
 /*
  * $Log$
- * Revision 1.11  2011/09/04 22:13:17  fplanque
- * copyright 2011
+ * Revision 1.13  2013/11/06 08:04:15  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.10  2010/07/26 06:52:16  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.9  2010/04/22 18:59:09  blueyed
- * Add halt_on_empty param to get_by_urltitle and use it. Bug: did when looking up single char bad URLs.
- *
- * Revision 1.8  2010/03/29 12:25:31  efy-asimo
- * allow multiple slugs per post
- *
- * Revision 1.7  2010/02/08 17:53:14  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.6  2009/09/14 18:37:07  fplanque
- * doc/cleanup/minor
- *
- * Revision 1.5  2009/09/14 13:17:28  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.4  2009/03/08 23:57:44  fplanque
- * 2009
- *
- * Revision 1.3  2008/09/27 07:54:33  fplanque
- * minor
- *
- * Revision 1.2  2008/01/21 09:35:31  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 11:00:25  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.10  2007/05/14 02:43:05  fplanque
- * Started renaming tables. There probably won't be a better time than 2.0.
- *
- * Revision 1.9  2007/04/26 00:11:12  fplanque
- * (c) 2007
- *
- * Revision 1.8  2006/11/24 18:27:24  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

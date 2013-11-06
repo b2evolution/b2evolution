@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -45,7 +45,7 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'country_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Delete this country!'), 'delete', regenerate_url( 'action', 'action=delete' ) );
+$Form->global_icon( T_('Delete this country!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('country') ) );
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', $creating ?  T_('New country') : T_('Country') );
@@ -59,7 +59,7 @@ $Form->begin_form( 'fform', $creating ?  T_('New country') : T_('Country') );
 
 	$CurrencyCache = & get_CurrencyCache();
 
-	$Form->select_input_object( 'ctry_curr_ID', $edited_Country->curr_ID, $CurrencyCache, T_( 'Default Currency' ), array( 'allow_none' => true ) );
+	$Form->select_input_object( 'ctry_curr_ID', $edited_Country->curr_ID, $CurrencyCache, T_('Default Currency'), array( 'allow_none' => true ) );
 
 if( $creating )
 {
@@ -76,17 +76,8 @@ else
 
 /*
  * $Log$
- * Revision 1.11  2010/01/03 12:03:17  fplanque
- * More crumbs...
- *
- * Revision 1.10  2009/09/26 12:00:43  tblue246
- * Minor/coding style
- *
- * Revision 1.9  2009/09/25 07:33:14  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.8  2009/09/10 18:24:07  fplanque
- * doc
+ * Revision 1.13  2013/11/06 08:04:36  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

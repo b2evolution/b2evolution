@@ -4,7 +4,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -105,70 +105,8 @@ class bookmarklet_plugin extends Plugin
 
 /*
  * $Log$
- * Revision 1.25  2011/09/04 22:13:23  fplanque
- * copyright 2011
- *
- * Revision 1.24  2010/02/08 17:55:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.23  2009/03/08 23:57:47  fplanque
- * 2009
- *
- * Revision 1.22  2009/03/04 00:10:42  blueyed
- * Make Hit constructor more lazy.
- *  - Move referer_dom_ID generation/fetching to own method
- *  - wrap Debuglog additons with "debug"
- *  - Conditionally call detect_useragent, if required. Move
- *    vars to methods for this
- *  - get_user_agent alone does not require detect_useragent
- * Feel free to revert it (since it changed all the is_foo vars
- * to methods - PHP5 would allow to use __get to handle legacy
- * access to those vars however), but please consider also
- * removing this stuff from HTML classnames, since that is kind
- * of disturbing/unreliable by itself).
- *
- * Revision 1.21  2008/01/22 00:21:24  personman2
- * Fixing bookmarklet to work with Safari, Firefox
- *
- * Revision 1.20  2008/01/21 09:35:39  fplanque
- * (c) 2008
- *
- * Revision 1.19  2007/04/26 00:11:04  fplanque
- * (c) 2007
- *
- * Revision 1.18  2007/04/20 02:53:13  fplanque
- * limited number of installs
- *
- * Revision 1.17  2006/12/12 02:53:57  fplanque
- * Activated new item/comments controllers + new editing navigation
- * Some things are unfinished yet. Other things may need more testing.
- *
- * Revision 1.16  2006/12/06 23:25:32  blueyed
- * Fixed bookmarklet plugins (props Danny); removed unneeded bookmarklet handling in core
- *
- * Revision 1.15.2.2  2006/11/04 19:55:11  fplanque
- * Reinjected old Log blocks. Removing them from CVS was a bad idea -- especially since Daniel has decided branch 1.9 was his HEAD...
- *
- * Revision 1.15  2006/07/10 20:19:30  blueyed
- * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
- *
- * Revision 1.14  2006/07/07 21:26:49  blueyed
- * Bumped to 1.9-dev
- *
- * Revision 1.13  2006/07/06 19:56:29  fplanque
- * no message
- *
- * Revision 1.12  2006/06/16 21:30:57  fplanque
- * Started clean numbering of plugin versions (feel free do add dots...)
- *
- * Revision 1.11  2006/05/30 19:39:55  fplanque
- * plugin cleanup
- *
- * Revision 1.10  2006/05/19 15:59:52  blueyed
- * Fixed bookmarklet plugin. Thanks to personman for pointing it out.
- *
- * Revision 1.9  2006/04/11 21:22:26  fplanque
- * partial cleanup
+ * Revision 1.26  2013/11/06 08:05:22  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

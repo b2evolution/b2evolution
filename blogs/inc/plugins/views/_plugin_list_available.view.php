@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -156,10 +156,6 @@ while( $loop_Plugin = & $AvailablePlugins->get_next() )
 			{
 				$help_icons[] = $help_external;
 			}
-			if( $help_internal = $loop_Plugin->get_help_link('$readme') )
-			{
-				$help_icons[] = $help_internal;
-			}
 			if( ! empty($help_icons) )
 			{
 				echo ' '.implode( ' ', $help_icons );
@@ -214,87 +210,8 @@ echo '</p>';
 
 /*
  * $Log$
- * Revision 1.14  2011/09/04 22:13:18  fplanque
- * copyright 2011
- *
- * Revision 1.13  2010/03/01 07:52:51  efy-asimo
- * Set manual links to lowercase
- *
- * Revision 1.12  2010/02/14 14:18:39  efy-asimo
- * insert manual links
- *
- * Revision 1.11  2010/02/08 17:53:55  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.10  2010/01/30 18:55:33  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.9  2010/01/03 12:26:32  fplanque
- * Crumbs for plugins. This is a little bit tough because it's a non standard controller.
- * There may be missing crumbs, especially during install. Please add missing ones when you spot them.
- *
- * Revision 1.8  2009/09/14 13:30:09  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.7  2009/07/06 23:52:24  sam2kb
- * Hardcoded "admin.php" replaced with $dispatcher
- *
- * Revision 1.6  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.5  2008/03/21 10:28:16  yabs
- * minor fix
- *
- * Revision 1.4  2008/03/17 08:59:46  afwas
- * minor
- *
- * Revision 1.3  2008/01/21 09:35:32  fplanque
- * (c) 2008
- *
- * Revision 1.2  2008/01/08 00:10:45  blueyed
- * Info about getting new plugins on the "available plugins" view
- *
- * Revision 1.1  2007/06/25 11:00:54  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.12  2007/04/26 00:11:12  fplanque
- * (c) 2007
- *
- * Revision 1.11  2007/01/23 22:23:04  fplanque
- * FIXED (!!!) disappearing help window!
- *
- * Revision 1.10  2007/01/14 08:21:01  blueyed
- * Optimized "info", "disp_help" and "disp_help_plain" actions by refering to them through classname, which makes Plugins::discover() unnecessary
- *
- * Revision 1.9  2007/01/13 22:38:13  fplanque
- * normalized
- *
- * Revision 1.8  2007/01/11 02:25:06  fplanque
- * refactoring of Table displays
- * body / line / col / fadeout
- *
- * Revision 1.7  2007/01/09 22:42:23  fplanque
- * tfoot
- *
- * Revision 1.6  2007/01/09 00:49:04  blueyed
- * todo
- *
- * Revision 1.5  2007/01/09 00:29:52  blueyed
- * Fixed HTML: wrong "</foot></tfoot>"
- *
- * Revision 1.4  2007/01/08 23:44:19  fplanque
- * inserted Table widget
- * WARNING: this has nothing to do with ComponentWidgets...
- * (except that I'm gonna need the Table Widget when handling the ComponentWidgets :>
- *
- * Revision 1.3  2007/01/07 18:42:35  fplanque
- * cleaned up reload/refresh icons & links
- *
- * Revision 1.2  2006/12/20 23:46:01  blueyed
- * Part of last change to _set_plugins.form.php has been lost while splitting
- *
- * Revision 1.1  2006/12/20 23:07:23  blueyed
- * Moved list of available plugins to separate sub-screen/form
+ * Revision 1.16  2013/11/06 08:04:36  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

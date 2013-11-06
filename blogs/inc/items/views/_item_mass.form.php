@@ -3,7 +3,7 @@
  * This file is part of b2evolution - {@link http://b2evolution.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -93,8 +93,8 @@ $Form->begin_form( '', '', $params );
 	$Form->hidden( 'post_excerpt', $edited_Item->get( 'excerpt' ) );
 	$Form->hidden( 'post_urltitle', $edited_Item->get( 'urltitle' ) );
 	$Form->hidden( 'titletag', $edited_Item->get( 'titletag' ) );
-	$Form->hidden( 'metadesc', $edited_Item->get( 'metadesc' ) );
-	$Form->hidden( 'metakeywords', $edited_Item->get( 'metakeywords' ) );
+	$Form->hidden( 'metadesc', $edited_Item->get_setting( 'post_metadesc' ) );
+	$Form->hidden( 'custom_headers', $edited_Item->get_setting( 'post_custom_headers' ) );
 
 	if( $Blog->get_setting( 'use_workflow' ) )
 	{	// We want to use workflow properties for this blog:
@@ -105,18 +105,11 @@ $Form->begin_form( '', '', $params );
 	}
 	$Form->hidden( 'trackback_url', $trackback_url );
 	$Form->hidden( 'item_featured', $edited_Item->featured );
-	$Form->hidden( 'item_hideteaser', $edited_Item->hideteaser );
+	$Form->hidden( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ) );
+	$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'post_expiry_delay' ) );
 	$Form->hidden( 'item_order', $edited_Item->order );
-	// CUSTOM FIELDS double
-	for( $i = 1 ; $i <= 5; $i++ )
-	{	// For each custom double field:
-		$Form->hidden( 'item_double'.$i, $edited_Item->{'double'.$i} );
-	}
-	// CUSTOM FIELDS varchar
-	for( $i = 1 ; $i <= 3; $i++ )
-	{	// For each custom varchar field:
-		$Form->hidden( 'item_varchar'.$i, $edited_Item->{'varchar'.$i} );
-	}
+	// CUSTOM FIELDS
+	display_hidden_custom_fields( $Form, $edited_Item );
 
 	// TODO: Form::hidden() do not add, if NULL?!
 
@@ -226,45 +219,8 @@ echo_onchange_newcat();
 
 /*
  * $Log$
- * Revision 1.14  2011/08/24 12:16:43  efy-james
- * Add checkbox for hide teaser
- *
- * Revision 1.13  2011/03/02 09:45:59  efy-asimo
- * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
- *
- * Revision 1.12  2010/03/04 19:36:04  fplanque
- * minor/doc
- *
- * Revision 1.11  2010/02/05 09:51:40  efy-asimo
- * create categories on the fly
- *
- * Revision 1.10  2010/01/30 18:55:31  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.9  2010/01/03 13:45:36  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.8  2009/11/23 00:35:19  sam2kb
- * minor
- *
- * Revision 1.7  2009/10/28 10:30:32  efy-maxim
- * 6px
- *
- * Revision 1.6  2009/10/26 17:58:58  efy-maxim
- * mass create fix and design improvement
- *
- * Revision 1.5  2009/10/19 13:28:16  efy-maxim
- * paragraphs at each line break or separate posts with a blank line
- *
- * Revision 1.4  2009/10/18 20:46:27  fplanque
- * no message
- *
- * Revision 1.3  2009/10/18 11:29:43  efy-maxim
- * 1. mass create in 'All' tab; 2. "Text Renderers" and "Comments"
- *
- * Revision 1.2  2009/10/18 08:16:55  efy-maxim
- * log
+ * Revision 1.16  2013/11/06 08:04:24  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
-
 ?>

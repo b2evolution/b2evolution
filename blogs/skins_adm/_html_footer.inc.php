@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -78,60 +78,8 @@ include_footerlines(); // enables translation strings for js
 <?php
 /*
  * $Log$
- * Revision 1.15  2011/09/04 22:13:25  fplanque
- * copyright 2011
+ * Revision 1.16  2013/11/06 08:05:49  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.14  2010/02/08 17:56:48  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.13  2009/10/12 23:03:32  blueyed
- * Fix displaying of Messages in $mode windows (e.g. file uploads) and enable
- * them in the attachment iframe.
- *
- * Revision 1.12  2009/03/23 23:29:01  fplanque
- * version bump
- *
- * Revision 1.11  2009/03/15 08:39:35  yabs
- * Adding translation strings for b2evoHelper object
- *
- * Revision 1.10  2009/03/08 23:57:56  fplanque
- * 2009
- *
- * Revision 1.9  2009/02/19 04:22:45  blueyed
- * Fix for PHP4, as expected.
- *
- * Revision 1.8  2009/02/19 03:54:44  blueyed
- * Optimize: move instantiation of $IconLegend (and $UserSettings query) out of main.inc.php, into get_IconLegend. TODO: test if it works with PHP4, or if it needs assignment by reference. Will do so on the test server.
- *
- * Revision 1.7  2008/04/13 20:40:06  fplanque
- * enhanced handlign of files attached to items
- *
- * Revision 1.6  2008/02/19 11:11:23  fplanque
- * no message
- *
- * Revision 1.5  2008/01/21 15:02:01  fplanque
- * fixed evobar
- *
- * Revision 1.4  2008/01/21 09:35:43  fplanque
- * (c) 2008
- *
- * Revision 1.3  2007/09/17 01:36:39  fplanque
- * look 'ma: just spent 5 hours on a smooth sized footer logo :P
- *
- * Revision 1.2  2007/07/16 02:53:04  fplanque
- * checking in mods needed by the chicago adminskin,
- * so that incompatibilities with legacy & evo can be detected early.
- *
- * Revision 1.1  2007/06/25 11:02:34  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.9  2007/05/02 18:28:05  fplanque
- * copyright credits logo
- *
- * Revision 1.8  2007/04/26 00:11:11  fplanque
- * (c) 2007
- *
- * Revision 1.7  2006/11/26 01:42:09  fplanque
- * doc
  */
 ?>

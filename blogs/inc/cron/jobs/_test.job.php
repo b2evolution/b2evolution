@@ -14,14 +14,8 @@ return 1; /* ok */
 
 /*
  * $Log$
- * Revision 1.1  2007/06/25 10:59:47  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.3  2006/06/26 23:10:24  fplanque
- * minor / doc
- *
- * Revision 1.1.2.1  2006/06/12 20:00:33  fplanque
- * one too many massive syncs...
+ * Revision 1.2  2013/11/06 08:04:07  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

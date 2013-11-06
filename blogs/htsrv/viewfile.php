@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -84,6 +84,46 @@ $FileRoot = & $FileRootCache->get_by_ID( $root );
 // Create file object
 $selected_File = new File( $FileRoot->type , $FileRoot->in_type_ID, $path, true );
 
+$action = param_action();
+switch( $action )
+{
+	case 'rotate_90_left':
+	case 'rotate_180':
+	case 'rotate_90_right':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'image' );
+
+		load_funcs( 'files/model/_image.funcs.php' );
+
+		switch( $action )
+		{
+			case 'rotate_90_left':
+				$degrees = 90;
+				break;
+			case 'rotate_180':
+				$degrees = 180;
+				break;
+			case 'rotate_90_right':
+				$degrees = 270;
+				break;
+		}
+
+		if( rotate_image( $selected_File, $degrees ) )
+		{	// Image was rotated successfully
+			header_redirect( regenerate_url( 'action,crumb_image', 'action=reload_parent', '', '&' ) );
+		}
+		break;
+
+	case 'reload_parent':
+		// Reload parent window to update rotated image
+		$JS_additional = 'window.opener.location.reload(true);';
+		break;
+}
+
+// Add CSS:
+require_css( 'basic_styles.css', 'rsc_url' ); // the REAL basic styles
+require_css( 'basic.css', 'rsc_url' ); // Basic styles
+require_css( 'viewfile.css', 'rsc_url' );
 
 headers_content_mightcache( 'text/html' );		// In most situations, you do NOT want to cache dynamic content!
 ?>
@@ -91,7 +131,10 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<title><?php echo $selected_File->dget('name').' ('.T_('Preview').')'; ?></title>
-	<link href="<?php echo $rsc_url ?>css/viewfile.css" rel="stylesheet" type="text/css" />
+	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
+<?php if( isset( $JS_additional ) ) { ?>
+	<script type="text/javascript"><?php echo $JS_additional; ?></script>
+<?php } ?>
 </head>
 
 <body>
@@ -118,6 +161,16 @@ switch( $viewtype )
 			}
 			echo 'src="'.$selected_File->get_url().'"'
 						.' width="'.$imgSize[0].'" height="'.$imgSize[1].'" />';
+
+			$url_rotate_90_left = regenerate_url( '', 'action=rotate_90_left'.'&'.url_crumb('image') );
+			$url_rotate_180 = regenerate_url( '', 'action=rotate_180'.'&'.url_crumb('image') );
+			$url_rotate_90_right = regenerate_url( '', 'action=rotate_90_right'.'&'.url_crumb('image') );
+
+			echo '<div class="center">';
+			echo action_icon( T_('Rotate this picture 90&deg; to the left'), 'rotate_left', $url_rotate_90_left, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
+			echo action_icon( T_('Rotate this picture 180&deg;'), 'rotate_180', $url_rotate_180, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
+			echo action_icon( T_('Rotate this picture 90&deg; to the right'), 'rotate_right', $url_rotate_90_right, '', 0, 0 );
+			echo '</div>';
 
 			echo '<div class="subline">';
 			echo '<p><strong>'.$selected_File->dget( 'title' ).'</strong></p>';
@@ -264,128 +317,8 @@ switch( $viewtype )
 <?php
 /*
  * $Log$
- * Revision 1.32  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.31  2010/11/03 19:44:14  sam2kb
- * Increased modularity - files_Module
- * Todo:
- * - split core functions from _file.funcs.php
- * - check mtimport.ctrl.php and wpimport.ctrl.php
- * - do not create demo Photoblog and posts with images (Blog A)
- *
- * Revision 1.30  2010/04/22 18:32:14  blueyed
- * viewfile.php: Add content-type-foo classes, namely content-type-image and content-type-text
- *
- * Revision 1.29  2010/04/22 18:28:26  blueyed
- * getfile.php: Memorize root, viewtype and path params.
- *
- * Revision 1.28  2010/02/08 17:51:18  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.27  2010/01/30 18:55:15  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.26  2009/12/04 23:27:49  fplanque
- * cleanup Expires: header handling
- *
- * Revision 1.25  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.24  2009/08/29 12:23:55  tblue246
- * - SECURITY:
- * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.
- * 	- files.ctrl.php: Removed redundant calls to User::check_perm().
- * 	- XML-RPC APIs: Added missing permission checks.
- * 	- items.ctrl.php: Check permission to edit item with current status (also checks user levels) for update actions.
- * - XML-RPC client: Re-added check for zlib support (removed by update).
- * - XML-RPC APIs: Corrected method signatures (return type).
- * - Localization:
- * 	- Fixed wrong permission description in blog user/group permissions screen.
- * 	- Removed wrong TRANS comment
- * 	- de-DE: Fixed bad translation strings (double quotes + HTML attribute = mess).
- * - File upload:
- * 	- Suppress warnings generated by move_uploaded_file().
- * 	- File browser: Hide link to upload screen if no upload permission.
- * - Further code optimizations.
- *
- * Revision 1.23  2009/03/08 23:57:38  fplanque
- * 2009
- *
- * Revision 1.22  2009/01/13 22:51:28  fplanque
- * rollback / normalized / MFB
- *
- * Revision 1.21  2008/09/28 08:06:03  fplanque
- * Refactoring / extended page level caching
- *
- * Revision 1.20  2008/07/07 05:59:26  fplanque
- * minor / doc / rollback of overzealous indetation "fixes"
- *
- * Revision 1.18  2008/02/19 11:11:16  fplanque
- * no message
- *
- * Revision 1.17  2008/01/21 09:35:23  fplanque
- * (c) 2008
- *
- * Revision 1.16  2007/09/23 18:55:17  fplanque
- * attempting to debloat. The Log class is insane.
- *
- * Revision 1.15  2007/04/26 00:11:14  fplanque
- * (c) 2007
- *
- * Revision 1.14  2006/12/23 22:53:11  fplanque
- * extra security
- *
- * Revision 1.13  2006/12/07 15:23:42  fplanque
- * filemanager enhanced, refactored, extended to skins directory
- *
- * Revision 1.12  2006/11/24 18:27:22  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.11  2006/10/18 00:15:32  blueyed
- * Major rewrite of styleswitcher.js, started out with a single fix and fixed some more.
- *
- * Revision 1.10  2006/08/19 07:56:29  fplanque
- * Moved a lot of stuff out of the automatic instanciation in _main.inc
- *
- * Revision 1.9  2006/05/19 18:15:04  blueyed
- * Merged from v-1-8 branch
- *
- * Revision 1.8.2.1  2006/05/19 15:06:23  fplanque
- * dirty sync
- *
- * Revision 1.8  2006/04/29 01:24:04  blueyed
- * More decent charset support;
- * unresolved issues include:
- *  - front office still forces the blog's locale/charset!
- *  - if there's content in utf8, it cannot get displayed with an I/O charset of latin1
- *
- * Revision 1.7  2006/04/19 20:13:48  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.6  2006/04/04 22:20:29  blueyed
- * "Gracefully" die, if no $current_User set
- *
- * Revision 1.5  2006/03/12 23:08:53  fplanque
- * doc cleanup
- *
- * Revision 1.4  2006/03/12 03:03:32  blueyed
- * Fixed and cleaned up "filemanager".
- *
- * Revision 1.3  2006/02/23 21:11:47  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.2  2005/12/16 13:50:49  blueyed
- * FileRoot::get_by_ID() from post-phoenix
- *
- * Revision 1.1  2005/12/14 19:36:16  fplanque
- * Enhanced file management
- *
- * Revision 1.17  2005/11/21 18:33:19  fplanque
- * Too many undiscussed changes all around: Massive rollback! :((
- * As said before, I am only taking CLEARLY labelled bugfixes.
+ * Revision 1.34  2013/11/06 08:03:44  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

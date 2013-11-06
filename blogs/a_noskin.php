@@ -12,7 +12,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage noskin
@@ -66,6 +66,13 @@ if( ! $PageCache->check() )
 // Do inits depending on current $disp:
 skin_init( $disp );
 
+// Add CSS:
+require_css( 'basic_styles.css', 'rsc_url' ); // the REAL basic styles
+require_css( 'basic.css', 'rsc_url' ); // Basic styles
+require_css( 'blog_base.css', 'rsc_url' ); // Default styles for the blog navigation
+require_css( 'item_base.css', 'rsc_url' ); // Default styles for the post CONTENT
+require_css( 'fp02.css', 'rsc_url' );
+
 add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
 
 ?>
@@ -81,7 +88,6 @@ add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar me
 		// ------------------------------ END OF REQUEST TITLE -----------------------------
 	?></title>
 <!-- InstanceEndEditable -->
-<link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
 <!-- InstanceBeginEditable name="head" -->
 	<?php skin_content_meta(); /* Charset for static pages */ ?>
 	<?php $Plugins->trigger_event( 'SkinBeginHtmlHead' ); ?>
@@ -101,7 +107,7 @@ add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar me
 	require $skins_path.'_toolbar.inc.php';
 	// ------------------------------- END OF TOOLBAR --------------------------------
 	echo "\n";
-	if( is_logged_in() )
+	if( show_toolbar() )
 	{
 		echo '<div id="skin_wrapper" class="skin_wrapper_loggedin">';
 	}

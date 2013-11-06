@@ -62,6 +62,7 @@ if( version_compare( $app_version, '2.4.1' ) < 0 )
 // Display message if no post:
 display_if_empty();
 
+echo '<div id="styled_content_block">'; // Beginning of posts display
 while( $Item = & mainlist_get_item() )
 {	// For each blog post, do everything below up to the closing curly brace "}"
 	?>
@@ -72,9 +73,17 @@ while( $Item = & mainlist_get_item() )
 
 	<div id="<?php $Item->anchor_id() ?>" class="post post<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
 
-		<h2 class="title"><?php $Item->title(); ?></h2>
+		<h2 class="title"><?php
+			$Item->title( array(
+				'link_type' => 'permalink'
+				) );
+		?></h2>
 
 		<?php
+			if( $Item->status != 'published' )
+			{
+				$Item->status( array( 'format' => 'styled' ) );
+			}
 
 			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 			skin_include( '_item_content.inc.php', array(
@@ -158,6 +167,7 @@ while( $Item = & mainlist_get_item() )
 	<?php
 	locale_restore_previous();	// Restore previous locale (Blog locale)
 }
+echo '</div>'; // End of posts display
 ?>
 
 </div>

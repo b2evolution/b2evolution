@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -97,12 +97,8 @@ $Form->end_form( array(
 
 /*
  * $Log$
- * Revision 1.2  2011/10/05 17:58:54  efy-yurybakh
- * change the default profile picture sizes
- *
- * Revision 1.1  2011/10/05 12:05:02  efy-yurybakh
- * Blog settings > features tab refactoring
- *
+ * Revision 1.3  2013/11/06 08:03:58  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

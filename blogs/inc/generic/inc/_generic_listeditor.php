@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -335,44 +335,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.11  2011/09/04 22:13:16  fplanque
- * copyright 2011
- *
- * Revision 1.10  2010/02/08 17:53:02  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.9  2010/01/03 18:52:57  fplanque
- * crumbs...
- *
- * Revision 1.8  2010/01/03 12:03:17  fplanque
- * More crumbs...
- *
- * Revision 1.7  2009/12/12 01:13:08  fplanque
- * A little progress on breadcrumbs on menu structures alltogether...
- *
- * Revision 1.6  2009/09/25 20:26:26  fplanque
- * fixes/doc
- *
- * Revision 1.5  2009/09/24 13:50:31  efy-sergey
- * Moved the Global Settings>Post types & Post statuses tabs to "Posts / Comments > Settings > Post types & Post statuses"
- *
- * Revision 1.4  2009/08/30 19:54:24  fplanque
- * less translation messgaes for infrequent errors
- *
- * Revision 1.3  2009/03/08 23:57:43  fplanque
- * 2009
- *
- * Revision 1.2  2008/01/21 09:35:30  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 11:00:12  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.8  2007/04/26 00:11:11  fplanque
- * (c) 2007
- *
- * Revision 1.7  2006/11/26 01:42:08  fplanque
- * doc
+ * Revision 1.12  2013/11/06 08:04:15  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

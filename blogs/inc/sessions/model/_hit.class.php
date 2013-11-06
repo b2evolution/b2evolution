@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -76,12 +76,19 @@ class Hit
 	 * The type of referer.
 	 *
 	 * Note: "spam" referers do not get logged.
-	 * 'search'|'blacklist'|'referer'|'direct'|'spam'|'self'
+	 * 'search'|'special'|'referer'|'direct'|'spam'|'self'
 	 *
 	 * @var string
 	 */
 	var $referer_type;
 
+
+	/**
+	 * The dom_type of the referer's base domain in T_basedomains
+	 * 'unknown'|'normal'|'searcheng'|'aggregator'|'email'
+	 * @var string
+	 */
+	var $dom_type = 'unknown';
 	/**
 	 * The ID of the referer's base domain in T_basedomains
 	 *
@@ -172,7 +179,7 @@ class Hit
 	/**
 	 * Extracted from search referers:
 	 */
-	var $_search_params_extracted = false;
+	var $_search_params_tried = false;
 	var $_keyphrase = NULL;
 	var $_serprank = NULL;
 	var $_search_engine = NULL;
@@ -192,12 +199,19 @@ class Hit
 	 */
 	 var $hit_response_code = 200;
 
+	/**
+	 * Hit action
+	 */
+	 var $action;
+
+
+
 	 /**
 	  * Test mode
 	  * The mode used by geneartion of a fake statisctics. In this case test_mode = 1
 	  * fp>vitaliy what is this for?
 	  * Test what & when?
-	  * 
+	  *
 	  */
 	 var $test_mode;
 
@@ -270,7 +284,7 @@ class Hit
 		}
 
 		$this->hit_type = $this->get_hit_type();
-		
+
 		// Check the REFERER and determine referer_type:
 		// TODO: dh> move this out of here, too, only if "antispam_block_spam_referers" is true,
 		//           do something about it (here or somewhere else, but early).
@@ -404,7 +418,7 @@ class Hit
 				{
 					if (empty($this->hit_type))
 					{
-						$this->hit_type = 'admin';	
+						$this->hit_type = 'admin';
 					}
 					$this->referer_type = 'self';
 				}
@@ -494,11 +508,25 @@ class Hit
 				{	// This is the first time this base domain visits:
 
 					// The INSERT below can fail, probably if we get two simultaneous hits (seen in the demo logfiles)
+					if ($this->agent_type == 'robot' || $this->hit_type == 'rss')
+					{
+						$this->dom_type = 'aggregator';
+					}
+					elseif($this->referer_type == 'search')
+					{
+						$this->dom_type = 'searcheng';
+					}
+					elseif($this->referer_type == 'referer' || $this->referer_type == 'self')
+					{
+						$this->dom_type = 'normal';
+					}
+
+
 					$DB->save_error_state();
 
 					if( $DB->query( '
-						INSERT INTO T_basedomains( dom_name )
-							VALUES( '.$DB->quote($referer_basedomain).' )' ) )
+						INSERT INTO T_basedomains( dom_name, dom_type)
+							VALUES( '.$DB->quote($referer_basedomain).', '.$DB->quote($this->dom_type).' )' ) )
 					{ // INSERTed ok:
 						$this->referer_domain_ID = $DB->insert_id;
 					}
@@ -568,10 +596,12 @@ class Hit
 			}
 			elseif( $browscap = $this->get_browser_caps() )
 			{
-				$Debuglog->add( 'Hit:detect_useragent(): Trying to detect platform using browscap', 'request' );
-				$Debuglog->add( 'Hit:detect_useragent(): Raw platform string: '.$browscap->platform, 'request' );
+				$platform = isset($browscap->platform) ? $browscap->platform : '';
 
-				$platform = strtolower( $browscap->platform );
+				$Debuglog->add( 'Hit:detect_useragent(): Trying to detect platform using browscap', 'request' );
+				$Debuglog->add( 'Hit:detect_useragent(): Raw platform string: "'.$platform.'"', 'request' );
+
+				$platform = strtolower( $platform );
 				if( $platform == 'linux' || in_array( substr( $platform, 0, 3 ), array( 'win', 'mac' ) ) )
 				{
 					$this->agent_platform = $platform;
@@ -639,20 +669,7 @@ class Hit
 		$Debuglog->add( 'Hit:detect_useragent(): Agent name: '.$this->agent_name, 'request' );
 		$Debuglog->add( 'Hit:detect_useragent(): Agent platform: '.$this->agent_platform, 'request' );
 
-		/*
-		 * Detect requests for XML feeds by $skin / $tempskin param.
-		 * fp> TODO: this is WEAK! Do we really need to know before going into the skin?
-		 * dh> not necessary, but only where ->agent_type gets used (logging).
-		 */
-		if( (isset( $Skin ) && $Skin->type == 'feed') || !empty($this->test_rss) )
-		{
-			$Debuglog->add( 'Hit: detect_useragent(): RSS', 'request' );
-			if (empty($this->hit_type))
-			{
-				$this->hit_type = 'rss';
-			}
-		}
-		
+
 		 // Lookup robots
 			$match = false;
 			foreach( $user_agents as $lUserAgent )
@@ -672,8 +689,8 @@ class Hit
 				$Debuglog->add( 'Hit:detect_useragent(): robot (through browscap)', 'request' );
 				$this->agent_type = 'robot';
 			}
-		
-	}
+
+		}
 
 
 	/**
@@ -788,6 +805,8 @@ class Hit
 		// or while forming a page. In case if these variables aren't setup, NULL is recorded to the DB.
 		$Debuglog->add( 'Hit: Recording the hit.', 'request' );
 
+		$this->action = $this->get_action();
+
 		if(empty($this->test_uri))
 		{
 			if( !empty($Blog) )
@@ -821,7 +840,32 @@ class Hit
 		$keyphrase = $this->get_keyphrase();
 
 		$keyp_ID = NULL;
-		if( !empty( $keyphrase ) )
+
+		if ( empty ($keyphrase) )
+		{	// No search hit
+			if ( ! empty($this->test_mode) && !empty($this->test_uri['s']))
+			{
+				$s = $this->test_uri['s'];
+			}
+			else
+			{
+				$s = get_param("s");
+			}
+			if( !empty($s) && !empty($blog_ID) )
+			{	// Record Internal Search:
+				$keyphrase  = $s;
+/*						load_class('sessions/model/_internal_searches.class.php', 'Internalsearches' );
+						$internal_searches = new InternalSearches();
+						$internal_searches->set("coll_ID" , $blog_ID);
+						$internal_searches->set("hit_ID" , $hit_ID);
+						$internal_searches->set("keywords" , get_param("s") );
+						$internal_searches->dbinsert();
+*/			}
+		}
+
+
+
+/*		if( !empty( $keyphrase ) )
 		{
 			$DB->begin();
 
@@ -838,20 +882,33 @@ class Hit
 				$keyp_ID = $DB->insert_id;
 			}
 		}
-
+*/
 		// Extract the serprank from search referers:
 		$serprank = $this->get_serprank();
-		$this->hit_response_code = $http_response_code;
+
+		if (!empty($http_response_code))
+		{	//  in some cases $http_response_code not set and we can use value by default
+			$this->hit_response_code = $http_response_code;
+		}
 
 		if (empty($this->hit_type))
 		{
-			if ( isset($_SERVER['HTTP_X_REQUESTED_WITH']) && (strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') )
+			global $Skin;
+
+			if( (isset( $Skin ) && $Skin->type == 'feed') || !empty($this->test_rss) )
 			{
-				$this->hit_type = 'ajax';
+				$this->hit_type = 'rss';
 			}
 			else
 			{
-				$this->hit_type = 'standard';
+				if ( isset($_SERVER['HTTP_X_REQUESTED_WITH']) && (strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') )
+				{
+					$this->hit_type = 'ajax';
+				}
+				else
+				{
+					$this->hit_type = 'standard';
+				}
 			}
 		}
 
@@ -861,10 +918,10 @@ class Hit
 		{
 			$sql = "
 				INSERT INTO T_hitlog(
-					hit_sess_ID, hit_datetime, hit_uri, hit_disp, hit_ctrl, hit_type ,hit_referer_type,
-					hit_referer, hit_referer_dom_ID, hit_keyphrase_keyp_ID, hit_serprank, hit_blog_ID, hit_remote_addr, hit_agent_type, hit_response_code )
-				VALUES( '".$Session->ID."', FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($hit_uri)."', ".$DB->quote($disp).", ".$DB->quote($ctrl).", '".$this->hit_type."', '".$this->referer_type
-					."', '".$DB->escape($hit_referer)."', ".$DB->null($this->get_referer_domain_ID()).', '.$DB->null($keyp_ID)
+					hit_sess_ID, hit_datetime, hit_uri, hit_disp, hit_ctrl, hit_action, hit_type ,hit_referer_type,
+					hit_referer, hit_referer_dom_ID, hit_keyphrase_keyp_ID, hit_keyphrase, hit_serprank, hit_blog_ID, hit_remote_addr, hit_agent_type, hit_response_code )
+				VALUES( '".$Session->ID."', FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($hit_uri)."', ".$DB->quote($disp).", ".$DB->quote($ctrl).", ".$DB->quote($this->action).", '".$this->hit_type."', '".$this->referer_type
+					."', '".$DB->escape($hit_referer)."', ".$DB->null($this->get_referer_domain_ID()).', '.$DB->null($keyp_ID).', '.$DB->quote($keyphrase)
 					.', '.$DB->null($serprank).', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', '".$this->get_agent_type()."', ".$DB->null($this->hit_response_code).")";
 		}
 		else
@@ -872,13 +929,14 @@ class Hit
 			// Test mode
 			isset($this->test_uri['disp']) ? $test_disp = $this->test_uri['disp'] : $test_disp = NULL;
 			isset($this->test_uri['ctrl']) ? $test_ctrl = $this->test_uri['ctrl'] : $test_ctrl = NULL;
+			$this->action = NULL;
 
 			$sql = "
 				INSERT INTO T_hitlog(
-					hit_sess_ID, hit_datetime, hit_uri, hit_disp, hit_ctrl, hit_type, hit_referer_type,
-					hit_referer, hit_referer_dom_ID, hit_keyphrase_keyp_ID, hit_serprank, hit_blog_ID, hit_remote_addr, hit_agent_type, hit_response_code )
-				VALUES( '".$this->session_id."', FROM_UNIXTIME(".$this->hit_time."), '".$DB->escape($hit_uri)."', ".$DB->quote($test_disp).", ".$DB->quote($test_ctrl).", '".$this->hit_type."', '".$this->referer_type
-					."', '".$DB->escape($hit_referer)."', ".$DB->null($this->get_referer_domain_ID()).', '.$DB->null($keyp_ID)
+					hit_sess_ID, hit_datetime, hit_uri, hit_disp, hit_ctrl, hit_action, hit_type, hit_referer_type,
+					hit_referer, hit_referer_dom_ID, hit_keyphrase_keyp_ID, hit_keyphrase ,hit_serprank, hit_blog_ID, hit_remote_addr, hit_agent_type, hit_response_code )
+				VALUES( '".$this->session_id."', FROM_UNIXTIME(".$this->hit_time."), '".$DB->escape($hit_uri)."', ".$DB->quote($test_disp).", ".$DB->quote($test_ctrl).", ".$DB->quote($this->action).", '".$this->hit_type."', '".$this->referer_type
+					."', '".$DB->escape($hit_referer)."', ".$DB->null($this->get_referer_domain_ID()).', '.$DB->null($keyp_ID).', '.$DB->quote($keyphrase)
 					.', '.$DB->null($serprank).', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', '".$this->get_agent_type()."', ".$DB->null($this->hit_response_code).")";
 
 		}
@@ -892,20 +950,6 @@ class Hit
 			$DB->commit();
 		}
 
-		if ( ! empty($this->test_mode) && !empty($this->test_uri['s']))
-		{
-		 set_param('s', $this->test_uri['s']);
-		}
-		$s = get_param("s");
-		if( !empty($s) && !empty($blog_ID) )
-		{	// Record Internal Search:
-			load_class('sessions/model/_internal_searches.class.php', 'Internalsearches' );
-			$internal_searches = new InternalSearches();
-			$internal_searches->set("coll_ID" , $blog_ID);
-			$internal_searches->set("hit_ID" , $hit_ID);
-			$internal_searches->set("keywords" , get_param("s") );
-			$internal_searches->dbinsert();
-		}
 		$this->ID = $hit_ID;
 	}
 
@@ -942,23 +986,48 @@ class Hit
 		}
 	}
 
+	/**
+	 * Get hit action
+	 * @return mixed Hit action
+	 */
+	function get_action()
+	{
+		global $ReqURI, $action;
+		if( $this->action )
+		{
+			return $this->action;
+		}
+
+		if (strstr($ReqURI,'htsrv/getfile.php'))
+		{ // special case
+			return 'getfile';
+		}
+		if (!empty ($action))
+		{
+			return $action;
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+
+
 
 	/**
 	 * Get the keyphrase from the referer
 	 */
 	function get_keyphrase()
 	{
-		if( $this->_search_params_extracted )
+		if( $this->_search_params_tried )
 		{
 			return $this->_keyphrase;
 		}
 
 		if( $this->referer_type == 'search' )
 		{
-			Hit::extract_params_from_referer( $this->referer );
+			$this->extract_params_from_referer( $this->referer );
 		}
-
-		$this->_search_params_extracted = true;
 
 		return $this->_keyphrase;
 	}
@@ -969,17 +1038,15 @@ class Hit
 	 */
 	function get_serprank()
 	{
-		if( $this->_search_params_extracted )
+		if( $this->_search_params_tried )
 		{
 			return $this->_serprank;
 		}
 
 		if( $this->referer_type == 'search' )
 		{
-			Hit::extract_params_from_referer( $this->referer );
+			$this->extract_params_from_referer( $this->referer );
 		}
-
-		$this->_search_params_extracted = true;
 
 		return $this->_serprank;
 	}
@@ -990,17 +1057,15 @@ class Hit
 	 */
 	function get_search_engine()
 	{
-		if( $this->_search_params_extracted )
+		if( $this->_search_params_tried )
 		{
 			return $this->_search_engine;
 		}
 
 		if( $this->referer_type == 'search' )
 		{
-			Hit::extract_params_from_referer( $this->referer );
+			$this->extract_params_from_referer( $this->referer );
 		}
-
-		$this->_search_params_extracted = true;
 
 		return $this->_search_engine;
 	}
@@ -1129,9 +1194,16 @@ class Hit
 
 	function get_param_from_string( $string, $param )
 	{
-		parse_str($string, $array);
-		$value = isset($array[$param]) ? $array[$param] : NULL;
+		// Make sure the string does not start with "?", otherwise parse_str adds the question mark to the first param
+		$string = preg_replace( '~^\?~', '', $string );
 
+		parse_str($string, $array);
+
+		$value = NULL;
+		if( isset($array[$param]) && trim($array[$param]) != '' )
+		{
+			$value = $array[$param];
+		}
 		return $value;
 	}
 
@@ -1147,7 +1219,21 @@ class Hit
 
 		if( is_null( $this->country_codes ) )
 		{
-			$this->country_codes = $DB->get_col('SELECT ctry_code FROM T_country', 0, 'get 2 letter ISO country codes' );
+			// sam2kb> Save one DB query on every page load
+			// $this->country_codes = $DB->get_col('SELECT ctry_code FROM T_regional__country', 0, 'get 2 letter ISO country codes' );
+
+			$countries = 'ad, ae, af, ag, ai, al, am, an, ao, aq, ar, as, at, au, aw, ax, az, ba, bb, bd, be, bf, bg, bh, bi,
+							bj, bl, bm, bn, bo, br, bs, bt, bv, bw, by, bz, ca, cc, cd, cf, cg, ch, ci, ck, cl, cm, cn, co, cr,
+							cu, cv, cx, cy, cz, de, dj, dk, dm, do, dz, ec, ee, eg, eh, er, es, et, fi, fj, fk, fm, fo, fr, ga,
+							gb, gd, ge, gf, gg, gh, gi, gl, gm, gn, gp, gq, gr, gs, gt, gu, gw, gy, hk, hm, hn, hr, ht, hu, id,
+							ie, il, im, in, io, iq, ir, is, it, je, jm, jo, jp, ke, kg, kh, ki, km, kn, kp, kr, kw, ky, kz, la,
+							lb, lc, li, lk, lr, ls, lt, lu, lv, ly, ma, mc, md, me, mf, mg, mh, mk, ml, mm, mn, mo, mp, mq, mr,
+							ms, mt, mu, mv, mw, mx, my, mz, na, nc, ne, nf, ng, ni, nl, no, np, nr, nu, nz, om, pa, pe, pf, pg,
+							ph, pk, pl, pm, pn, pr, ps, pt, pw, py, qa, re, ro, rs, ru, rw, sa, sb, sc, sd, se, sg, sh, si, sj,
+							sk, sl, sm, sn, so, sr, st, sv, sy, sz, tc, td, tf, tg, th, tj, tk, tl, tm, tn, to, tr, tt, tv, tw,
+							tz, ua, ug, um, us, uy, uz, va, vc, ve, vg, vi, vn, vu, wf, ws, ye, yt, za, zm, zw';
+
+			$this->country_codes = array_map( 'trim', explode(',', $countries) );
 		}
 		return $this->country_codes;
 	}
@@ -1199,12 +1285,15 @@ class Hit
 			$countries = implode( '|', $this->get_country_codes() );
 		}
 
+		// Add not ISO 3166-1 country code top level domains
+		$other_ccTLDs = ', uk, eu';
+
 		return preg_replace(
 			array(
 				'/^(w+[0-9]*|search)\./',
 				'/(^|\.)m\./',
-				'/(\.(com|org|net|co|it|edu))?\.('.$countries.')(\/|$)/',
-				'/^('.$countries.')\./',
+				'/(\.(com|org|net|co|it|edu))?\.('.$countries.$other_ccTLDs.')(\/|$)/',
+				'/^('.$countries.$other_ccTLDs.')\./',
 			),
 			array(
 				'',
@@ -1294,6 +1383,16 @@ class Hit
 	}
 
 
+	/*
+	 * Is this a search referer hit?
+	 *
+	 * Note: in some situations it is not possible to detect search keywords (like google redirect URLs),
+	 * and in stats you may see [n.a.] in 'Search keywords' column.
+	 *
+	 * @param string Hit referer
+	 * @param boolean true to return an array, false to return boolean
+	 * @return boolean|array of normalized referer parts: (host, path, query, fragment)
+	 */
 	function is_search_referer( $referer, $return_params = false )
 	{
 		global $search_engine_params;
@@ -1363,7 +1462,7 @@ class Hit
 	 * - strtolowered: "QUErY test!" will return "query test!"
 	 * - trimmed: extra spaces before and after are removed
 	 *
-	 * Lists of supported search engines can be found in /conf/_stats.php
+	 * A list of supported search engines can be found in /inc/sessions/model/_search_engines.php
 	 * The function returns false when a keyword couldn't be found.
 	 * 	 eg. if the url is "http://www.google.com/partners.html" this will return false,
 	 *       as the google keyword parameter couldn't be found.
@@ -1377,7 +1476,10 @@ class Hit
 	 */
 	function extract_params_from_referer( $ref )
 	{
-		global $search_engine_params, $evo_charset;
+		global $Debuglog, $search_engine_params, $evo_charset, $current_charset;
+
+		// Make sure we don't try params extraction twice
+		$this->_search_params_tried = true;
 
 		@list($ref_host, $ref_path, $query, $fragment) = $this->is_search_referer($ref, true);
 
@@ -1405,12 +1507,12 @@ class Hit
 			$keyword_param = array($keyword_param);
 		}
 
-		if( $search_engine_name == 'Google Images'
-			|| ($search_engine_name == 'Google' && strpos($ref, '/imgres') !== false) )
-		{
+		if( $search_engine_name == 'Google Images' || ($search_engine_name == 'Google' && strpos($ref, '/imgres') !== false) )
+		{	// Google image search
+			$search_engine_name = 'Google Images';
+
 			$query = urldecode(trim( $this->get_param_from_string($query, 'prev') ));
 			$query = str_replace( '&', '&amp;', strstr($query, '?') );
-			$search_engine_name = 'Google Images';
 		}
 		elseif( $search_engine_name == 'Google' && (strpos($query, '&as_') !== false || strpos($query, 'as_') === 0) )
 		{
@@ -1459,7 +1561,14 @@ class Hit
 		}
 
 		if( empty($key) )
-		{
+		{	// Not a search referer
+			if( $this->referer_type == 'search' )
+			{	// If the referer was detected as 'search' we need to change it back to 'referer'
+				// to keep search stats clean.
+				$this->referer_type = 'referer';
+				$Debuglog->add( 'Hit: extract_params_from_referer() overrides referer type set by detect_referer(): "search" -> "referer"', 'request' );
+			}
+
 			return false;
 		}
 
@@ -1498,8 +1607,11 @@ class Hit
 		}
 
 		$key = convert_charset($key, $evo_charset, $ie);
+		// convert to lower string but keep in evo_charset
+		$saved_charset = $current_charset;
+		$current_charset = $evo_charset;
 		$key = evo_strtolower($key);
-
+		$current_charset = $saved_charset;
 
 		// Extract the "serp rank"
 		// Typically http://google.com?s=keyphraz&start=18 returns 18
@@ -1541,7 +1653,6 @@ class Hit
 		$this->_search_engine = $search_engine_name;
 		$this->_keyphrase = $key;
 		$this->_serprank = isset($serprank) ? $serprank : NULL;
-		$this->_search_params_extracted = true;
 
 		return array(
 				'engine_name'	=> $this->_search_engine,
@@ -1604,6 +1715,17 @@ class Hit
 		if( ! isset($this->is_macIE) )
 			$this->detect_useragent();
 		return $this->is_macIE;
+	}
+
+	/**
+	 * Is this Internet Explorer?
+	 * @return boolean
+	 */
+	function is_IE()
+	{
+		if( ! isset($this->is_IE) )
+			$this->detect_useragent();
+		return $this->is_IE;
 	}
 
 	/**
@@ -1678,184 +1800,8 @@ class Hit
 
 /*
  * $Log$
- * Revision 1.83  2011/10/24 13:58:07  efy-vitalij
- * added hit_type determination and changed 'blacklist' to 'special'
+ * Revision 1.85  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.82  2011/10/20 13:17:06  efy-vitalij
- * doc
- *
- * Revision 1.81  2011/10/18 08:07:10  efy-vitalij
- * add comments
- *
- * Revision 1.80  2011/10/18 06:09:14  efy-vitalij
- * fix hit class error
- *
- * Revision 1.79  2011/10/18 01:13:18  fplanque
- * no message
- *
- * Revision 1.78  2011/10/14 09:58:38  efy-vitalij
- * fix and remake hit_response_code registration
- *
- * Revision 1.77  2011/10/13 14:46:55  fplanque
- * doc
- *
- * Revision 1.76  2011/10/13 14:42:29  fplanque
- * doc
- *
- * Revision 1.75  2011/10/13 12:35:23  efy-vitalij
- * add loging hit_response_code
- *
- * Revision 1.74  2011/10/12 11:19:54  efy-vitalij
- * add logging page and display params, add test_rss functional
- *
- * Revision 1.73  2011/10/05 13:39:11  efy-vitalij
- * add test functional
- *
- * Revision 1.72  2011/10/04 09:40:26  efy-vitalij
- * modified Hit class
- *
- * Revision 1.71  2011/09/30 16:58:54  sam2kb
- * Fix for: http://forums.b2evolution.net/viewtopic.php?t=22888
- *
- * Revision 1.70  2011/09/30 13:23:08  fplanque
- * no message
- *
- * Revision 1.69  2011/09/30 13:18:03  fplanque
- * example
- *
- * Revision 1.68  2011/09/20 18:09:04  sam2kb
- * New methods: is_browser() & is_robot()
- *
- * Revision 1.67  2011/09/13 09:09:01  fplanque
- * fix
- *
- * Revision 1.66  2011/09/12 16:44:33  lxndral
- * internal searches fix
- *
- * Revision 1.65  2011/09/04 22:13:18  fplanque
- * copyright 2011
- *
- * Revision 1.64  2011/08/12 08:29:00  efy-asimo
- * Post view count - fix, and crazy view counting option
- *
- * Revision 1.63  2011/07/05 13:11:22  sam2kb
- * Fix undefined variable "url"
- *
- * Revision 1.62  2011/06/27 00:49:48  sam2kb
- * Fixed encoding detection
- *
- * Revision 1.60  2010/03/08 21:55:55  fplanque
- * bleh
- *
- * Revision 1.59  2010/03/08 21:53:37  blueyed
- * Fix Hit::extract_keyphrase_from_referer for cases where parse_url fails with missing host, e.g. ":1" at the end.
- *
- * Revision 1.58  2010/02/08 17:53:55  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.57  2009/12/21 23:50:44  blueyed
- * doc
- *
- * Revision 1.56  2009/12/12 22:43:02  sam2kb
- * Detect Google Chrome. $Hit->is_chrome()
- *
- * Revision 1.55  2009/12/12 02:04:10  blueyed
- * doc
- *
- * Revision 1.54  2009/12/11 23:55:48  fplanque
- * doc
- *
- * Revision 1.53  2009/12/09 22:05:46  blueyed
- * Hit: extract_keyphrase_from_referer: test for utf-8 and iso-8859-15 in query string, where the referer contains no input encoding ("ie") hint.
- *
- * Revision 1.52  2009/12/09 22:04:37  blueyed
- * Hit: add get_search_engine. This will return the matched search engine name (if defined as key in $search_engines) or the matched pattern.
- *
- * Revision 1.51  2009/12/09 22:02:30  blueyed
- * Hit refactoring: add get_referer method.
- *
- * Revision 1.50  2009/12/09 20:09:32  blueyed
- * indent
- *
- * Revision 1.49  2009/12/08 22:38:13  fplanque
- * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
- *
- * Revision 1.48  2009/11/30 00:22:05  fplanque
- * clean up debug info
- * show more timers in view of block caching
- *
- * Revision 1.47  2009/11/24 01:03:00  blueyed
- * Fix transformation of duplicate entries in T_ user agents.
- *
- * Revision 1.46  2009/11/15 19:05:44  fplanque
- * no message
- *
- * Revision 1.45  2009/11/08 23:01:52  blueyed
- * Fix encoding/decoding of keyphrases from referers. Also, make the images.google code only apply to images.google.*
- *
- * Revision 1.44  2009/10/29 20:42:34  blueyed
- * Handle conversion of agnt_type from 'unknown' to a known type.
- *
- * Revision 1.43  2009/10/20 20:07:47  blueyed
- * Hit: init is_IE
- *
- * Revision 1.42  2009/10/13 10:02:01  tblue246
- * Hit::get_browser_caps(): Cache result.
- *
- * Revision 1.41  2009/10/13 09:39:03  tblue246
- * Bugfix
- *
- * Revision 1.40  2009/10/13 09:35:01  tblue246
- * Correctly detect Linux using browscap
- *
- * Revision 1.39  2009/10/12 22:51:58  blueyed
- * Hit: detect 'linux' as platform, too. Make the call to get_browser() more lazy.
- *
- * Revision 1.38  2009/10/03 20:43:40  tblue246
- * Commit message cleanup...
- *
- * Revision 1.37  2009/10/03 20:07:51  tblue246
- * - Hit::detect_user_agent():
- * 	- Try to use get_browser() to get platform information or detect robots if "normal" detection failed.
- * 	- Use Skin::type to detect RSS readers.
- * - Removed unneeded functions.
- * - translate_user_agent(): Use get_browser() if translation failed.
- *
- * Revision 1.36  2009/10/01 18:50:16  tblue246
- * convert_charset(): Trying to remove unreliable charset detection and modify all calls accordingly -- needs testing to ensure all charset conversions work as expected.
- *
- * Revision 1.35  2009/09/13 21:26:50  blueyed
- * SQL_NO_CACHE for SELECT queries using T_hitlog
- *
- * Revision 1.34  2009/08/31 21:47:02  fplanque
- * no message
- *
- * Revision 1.33  2009/08/31 01:45:28  sam2kb
- * $known_search_params definitions moved to conf/_stats.php
- * added "wd" param for baidu.com
- *
- * Revision 1.32  2009/08/30 15:35:51  tblue246
- * doc
- *
- * Revision 1.31  2009/08/30 14:00:13  fplanque
- * minor
- *
- * Revision 1.30  2009/08/22 15:27:38  tblue246
- * - FileRoot::FileRoot():
- * 	- Only try to create shared dir if enabled.
- * - Hit::extract_serprank_from_referer():
- * 	- Do not explode() $ref string, but use a (dynamically generated) RegExp instead. Tested and should work.
- *
- * Revision 1.29  2009/08/15 06:16:05  sam2kb
- * Better serp rank extraction
- *
- * Revision 1.28  2009/07/29 23:49:15  sam2kb
- * Better keywords extraction for google image search
- *
- * Revision 1.27  2009/07/27 18:58:31  blueyed
- * Fix E_FATAL in Hit::get_user_agent
- *
- * Revision 1.26  2009/07/08 02:38:55  sam2kb
- * Replaced strlen & substr with their mbstring wrappers evo_strlen & evo_substr when needed
  */
 ?>

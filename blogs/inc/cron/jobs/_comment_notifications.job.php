@@ -8,13 +8,19 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Settings, $Messages;
+global $Settings, $Messages, $UserSettings;
 
 // Get the ID of the comment we are supposed notify:
 if( empty( $job_params['comment_ID'] ) )
 {
 	$result_message = 'No comment_ID parameter received.'; // No trans.
 	return 3;
+}
+
+if( empty( $UserSettings ) )
+{ // initialize UserSettings, because in CLI mode is not initialized yet
+	load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
+	$UserSettings = new UserSettings();
 }
 
 $except_moderators = false;
@@ -45,6 +51,9 @@ $CommentCache = & get_CommentCache();
  */
 $edited_Comment = & $CommentCache->get_by_ID( $comment_ID );
 
+// Load required functions ( we need to load here, because in CLI mode it is not loaded )
+load_funcs( '_core/_url.funcs.php' );
+
 // Send email notifications now!
 $edited_Comment->send_email_notifications( false, $except_moderators );
 
@@ -64,8 +73,8 @@ return 1; /* ok */
 
 /*
  * $Log$
- * Revision 1.1  2011/06/28 13:04:29  efy-asimo
- * Add missing comment_notifications job
+ * Revision 1.3  2013/11/06 08:04:07  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

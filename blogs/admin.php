@@ -9,7 +9,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -49,22 +49,42 @@ require_once dirname(__FILE__).'/conf/_config.php';
  */
 $is_admin_page = true;
 
-
+// user must be logged in and his/her account must be validated before access to admin 
 $login_required = true;
+$validate_required = true;
 require_once $inc_path.'_main.inc.php';
 
 
 // Check global permission:
 if( ! $current_User->check_perm( 'admin', 'restricted' ) )
 {	// No permission to access admin...
-	require $adminskins_path.'_access_denied.main.php';
+	// asimo> This should always denied access, but we insert a hack to create a temporary solution
+	// We do allow comments and items actions, if the redirect is set to the front office! This way users without admin access may use the comments, and items controls.
+	$test_ctrl = param( 'ctrl', '/^[a-z0-9_]+$/', '', false );
+	$test_redirect_to = param( 'redirect_to', 'string', '', false );
+	$test_action = param_action();
+	// asimo> If we also would like to allow publish, deprecate and delete item/comment actions for users without admin access, we must uncomment the commented part below.
+	if( ( ( $test_ctrl !== 'comments' ) && ( $test_ctrl !== 'items' ) )
+		|| empty( $test_redirect_to ) || ( strpos( $test_redirect_to, $admin_url ) === 0 )
+		|| empty( $test_action ) || !in_array( $test_action, array( 'update', 'publish'/*, 'deprecate', 'delete'*/ ) ) )
+	{
+		require $adminskins_path.'_access_denied.main.php';
+	}
 }
 
-
-/*
- * Asynchronous processing options that may be required on any page
- */
-require_once $inc_path.'_async.inc.php';
+// Check user email is validated to make sure users can never has access to admin without a validated email address
+if( !$current_User->check_status( 'can_access_admin' ) )
+{
+	if( $current_User->check_status( 'can_be_validated' ) )
+	{ // redirect back to the login page
+		$action = 'req_validatemail';
+		require $htsrv_path.'login.php';
+	}
+	else
+	{ // show access denied
+		require $adminskins_path.'_access_denied.main.php';
+	}
+}
 
 
 /*
@@ -178,153 +198,57 @@ $AdminUI = new AdminUI();
 // Get requested controller and memorize it:
 param( 'ctrl', '/^[a-z0-9_]+$/', $default_ctrl, true );
 
+if( empty( $dont_request_controller ) || !$dont_request_controller )
+{	// Don't request the controller if we want initialize only the admin configs above (Used on AJAX refreshing of results table)
 
-// Redirect old-style URLs (e.g. /admin/plugins.php), if they come here because the webserver maps "/admin/" to "/admin.php"
-// NOTE: this is just meant as a transformation from pre-1.8 to 1.8!
-if( ! empty( $_SERVER['PATH_INFO'] ) && $_SERVER['PATH_INFO'] != $_SERVER['PHP_SELF'] ) // the "!= PHP_SELF" check seems needed by IIS..
-{
-	// Try to find the appropriate controller (ctrl) setting
-	foreach( $ctrl_mappings as $k => $v )
+	// Redirect old-style URLs (e.g. /admin/plugins.php), if they come here because the webserver maps "/admin/" to "/admin.php"
+	// NOTE: this is just meant as a transformation from pre-1.8 to 1.8!
+	if( ! empty( $_SERVER['PATH_INFO'] ) && $_SERVER['PATH_INFO'] != $_SERVER['PHP_SELF'] ) // the "!= PHP_SELF" check seems needed by IIS..
 	{
-		if( preg_match( '~'.preg_quote( $_SERVER['PATH_INFO'], '~' ).'$~', $v ) )
+		// Try to find the appropriate controller (ctrl) setting
+		foreach( $ctrl_mappings as $k => $v )
 		{
-			$ctrl = $k;
-			break;
+			if( preg_match( '~'.preg_quote( $_SERVER['PATH_INFO'], '~' ).'$~', $v ) )
+			{
+				$ctrl = $k;
+				break;
+			}
 		}
-	}
 
-	// Sanitize QUERY_STRING
-	if( ! empty( $_SERVER['QUERY_STRING'] ) )
-	{
-		$query_string = explode( '&', $_SERVER['QUERY_STRING'] );
-		foreach( $query_string as $k => $v )
+		// Sanitize QUERY_STRING
+		if( ! empty( $_SERVER['QUERY_STRING'] ) )
 		{
-			$query_string[$k] = strip_tags($v);
+			$query_string = explode( '&', $_SERVER['QUERY_STRING'] );
+			foreach( $query_string as $k => $v )
+			{
+				$query_string[$k] = strip_tags($v);
+			}
+			$query_string = '&'.implode( '&', $query_string );
 		}
-		$query_string = '&'.implode( '&', $query_string );
+		else
+		{
+			$query_string = '';
+		}
+
+		header_redirect( url_add_param( $admin_url, 'ctrl='.$ctrl.$query_string, '&' ), true );
+		exit(0);
 	}
-	else
+
+
+	// Check matching controller file:
+	if( !isset($ctrl_mappings[$ctrl]) )
 	{
-		$query_string = '';
+		debug_die( 'The requested controller ['.$ctrl.'] does not exist.' );
 	}
 
-	header_redirect( url_add_param( $admin_url, 'ctrl='.$ctrl.$query_string, '&' ), true );
-	exit(0);
+	// Call the requested controller:
+	require $inc_path.$ctrl_mappings[$ctrl];
 }
-
-
-// Check matching controller file:
-if( !isset($ctrl_mappings[$ctrl]) )
-{
-	debug_die( 'The requested controller ['.$ctrl.'] does not exist.' );
-}
-
-// Call the requested controller:
-require $inc_path.$ctrl_mappings[$ctrl];
 
 /*
  * $Log$
- * Revision 1.39  2011/09/04 22:13:12  fplanque
- * copyright 2011
- *
- * Revision 1.38  2011/02/15 15:36:59  efy-asimo
- * Change access to admin permission
- *
- * Revision 1.37  2010/02/08 17:50:26  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.36  2010/01/30 18:55:13  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.35  2009/11/30 00:22:04  fplanque
- * clean up debug info
- * show more timers in view of block caching
- *
- * Revision 1.34  2009/09/26 12:00:41  tblue246
- * Minor/coding style
- *
- * Revision 1.33  2009/09/25 07:32:51  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.32  2009/08/30 00:30:52  fplanque
- * increased modularity
- *
- * Revision 1.31  2009/03/08 23:57:34  fplanque
- * 2009
- *
- * Revision 1.30  2008/04/06 19:19:31  fplanque
- * Started moving some intelligence to the Modules.
- * 1) Moved menu structure out of the AdminUI class.
- * It is part of the app structure, not the UI. Up to this point at least.
- * Note: individual Admin skins can still override the whole menu.
- * 2) Moved DB schema to the modules. This will be reused outside
- * of install for integrity checks and backup.
- * 3) cleaned up config files
- *
- * Revision 1.29  2008/02/19 11:11:14  fplanque
- * no message
- *
- * Revision 1.28  2008/01/23 12:51:21  fplanque
- * posts now have divs with IDs
- *
- * Revision 1.27  2008/01/21 09:35:22  fplanque
- * (c) 2008
- *
- * Revision 1.26  2007/09/03 16:44:28  fplanque
- * chicago admin skin
- *
- * Revision 1.25  2007/07/13 23:47:36  fplanque
- * New start pages!
- *
- * Revision 1.24  2007/06/25 10:58:47  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.23  2007/04/26 00:11:14  fplanque
- * (c) 2007
- *
- * Revision 1.22  2007/03/11 20:40:14  fplanque
- * misuse of globals
- *
- * Revision 1.21  2007/03/07 02:37:15  fplanque
- * OMG I decided that pregenerating the menus was getting to much of a PITA!
- * It's a zillion problems with the permissions.
- * This will be simplified a lot. Enough of these crazy stuff.
- *
- * Revision 1.20  2007/01/24 13:44:56  fplanque
- * cleaned up upload
- *
- * Revision 1.19  2007/01/24 00:48:57  fplanque
- * Refactoring
- *
- * Revision 1.18  2006/11/24 18:27:22  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.17  2006/08/26 20:32:48  fplanque
- * fixed redirects
- *
- * Revision 1.16  2006/08/05 23:37:03  fplanque
- * no message
- *
- * Revision 1.14  2006/07/06 19:56:29  fplanque
- * no message
- *
- * Revision 1.13  2006/06/13 21:49:14  blueyed
- * Merged from 1.8 branch
- *
- * Revision 1.12.2.1  2006/06/12 20:00:29  fplanque
- * one too many massive syncs...
- *
- * Revision 1.12  2006/04/19 22:26:24  blueyed
- * cleanup/polish
- *
- * Revision 1.11  2006/04/19 20:13:48  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.10  2006/04/14 19:25:31  fplanque
- * evocore merge with work app
- *
- * Revision 1.9  2006/04/11 21:22:25  fplanque
- * partial cleanup
+ * Revision 1.41  2013/11/06 08:03:44  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

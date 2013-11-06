@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -33,11 +33,12 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $io_charset, $rsc_url, $UserSettings, $Debuglog, $Plugins, $generating_static;
+global $io_charset, $rsc_url, $UserSettings, $Debuglog, $Plugins;
 global $month, $month_abbrev, $weekday, $weekday_abbrev; /* for localized calendar */
 global $debug, $Hit;
 
 headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache the admin pages!
+require_js( 'ajax.js' );	// Functions to work with AJAX response data
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
@@ -57,10 +58,13 @@ headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache
 		var bgxy_expand = '".get_icon( 'expand', 'xy' )."';
 		var bgxy_collapse = '".get_icon( 'collapse', 'xy' )."';
 		var htsrv_url = '$htsrv_url';
-		var blog_id = '".param( 'blog', 'integer' )."';" );
+		var blog_id = '".param( 'blog', 'integer' )."';
+		var is_backoffice = true;" );
 
 	add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
 	init_bubbletip_js(); // Add jQuery bubbletip plugin
+	init_scrollwide_js(); // Add jQuery Wide Scroll plugin
+	init_results_js(); // Add functions to work with Results tables
 
 	require_js( '#jqueryUI#' );
 	// asimo> This was permanently removed, because we didn't find any usage of this.
@@ -283,166 +287,8 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
- * Revision 1.41  2011/10/17 22:00:31  fplanque
- * cleanup
+ * Revision 1.43  2013/11/06 08:05:49  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.40  2011/10/02 12:38:33  efy-yurybakh
- * fix sprite icons
- *
- * Revision 1.39  2011/09/29 08:39:01  efy-yurybakh
- * - user_identity_link
- * - lightbox
- *
- * Revision 1.38  2011/09/26 19:46:02  efy-yurybakh
- * jQuery bubble tips
- *
- * Revision 1.37  2011/09/04 22:13:25  fplanque
- * copyright 2011
- *
- * Revision 1.36  2010/10/22 15:09:57  efy-asimo
- * Remove autoloading datepciker css, instead load before every usage, also remove jquery-ui.css load
- *
- * Revision 1.35  2010/06/15 20:17:55  blueyed
- * Load jQuery UI css.
- *
- * Revision 1.34  2010/06/08 20:16:54  sam2kb
- * Changed $datefmt search/replace sequence
- *
- * Revision 1.33  2010/02/10 05:15:31  sam2kb
- * Date format "j" failes in datepicker. Code clean-up.
- *
- * Revision 1.32  2010/02/08 17:56:48  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.31  2009/12/08 20:16:13  fplanque
- * Better handling of the publish! button on post forms
- *
- * Revision 1.30  2009/12/04 23:27:50  fplanque
- * cleanup Expires: header handling
- *
- * Revision 1.29  2009/12/01 01:52:08  fplanque
- * Fixed issue with Debuglog in case of redirect -- Thanks @blueyed for help.
- *
- * Revision 1.28  2009/09/25 22:50:31  tblue246
- * More outstanding bugfixes
- *
- * Revision 1.27  2009/04/11 23:50:34  fplanque
- * diiiiiirtyyyyy
- *
- * Revision 1.26  2009/03/24 22:11:58  fplanque
- * Packaged inclusion of javascript for the toolbar
- *
- * Revision 1.25  2009/03/22 23:39:33  fplanque
- * new evobar Menu structure
- * Superfish jQuery menu library
- * + removed obsolete JS includes
- *
- * Revision 1.24  2009/03/13 00:43:05  fplanque
- * no message
- *
- * Revision 1.23  2009/03/08 23:57:56  fplanque
- * 2009
- *
- * Revision 1.22  2009/03/04 00:10:43  blueyed
- * Make Hit constructor more lazy.
- *  - Move referer_dom_ID generation/fetching to own method
- *  - wrap Debuglog additons with "debug"
- *  - Conditionally call detect_useragent, if required. Move
- *    vars to methods for this
- *  - get_user_agent alone does not require detect_useragent
- * Feel free to revert it (since it changed all the is_foo vars
- * to methods - PHP5 would allow to use __get to handle legacy
- * access to those vars however), but please consider also
- * removing this stuff from HTML classnames, since that is kind
- * of disturbing/unreliable by itself).
- *
- * Revision 1.21  2009/02/23 00:11:21  afwas
- * Added $rsc_url to make the link to css file absolute.
- *
- * Revision 1.20  2009/02/22 19:31:11  tblue246
- * Bugfix (see rev 1.18) is not needed anymore.
- *
- * Revision 1.19  2009/02/22 18:46:56  afwas
- * - Reverted 1.14 && 1.15 because that didn't work for edited posts.
- * - Cut one of the functions for datepicker (handles change of radiobutton in other jQuery because the time can also change)
- * - Added dynamically loaded (and removed!) stylesheet for datepicker.
- *
- * Revision 1.18  2009/02/22 18:09:40  tblue246
- * Bugfix
- *
- * Revision 1.17  2009/02/22 16:35:15  blueyed
- * TODO comment
- *
- * Revision 1.16  2009/02/22 07:43:08  afwas
- * Minor: simplification of javaScript function generateTitle()
- *
- * Revision 1.15  2009/02/22 06:53:39  afwas
- * Minor: simplification of javaScript function generateTitle()
- *
- * Revision 1.14  2009/02/21 23:10:43  fplanque
- * Minor
- *
- * Revision 1.13  2009/02/01 00:11:02  blueyed
- * Use jQuery document.ready for focus_on_first_input
- *
- * Revision 1.12  2009/01/24 03:10:20  afwas
- * - added jQuery that sets 'Set to' radiobutton (#set_issue_date_to) after time or date have been manually modified.
- * - Recoded javaScript in jQuery: changes to #post_title are added to document.head. This jS originated from /inc/items/views/inc/_item_form_behaviors.
- *
- * Revision 1.11  2009/01/23 23:19:54  afwas
- * Set the radiobutton to 'Set to' if a date is picked
- *
- * Revision 1.10  2009/01/23 22:14:39  afwas
- * Added jQuery datepicker, removed javaScript popup calendar
- *
- * Revision 1.9  2008/10/02 23:33:08  blueyed
- * - require_js(): remove dirty dependency handling for communication.js.
- * - Add add_js_headline() for adding inline JS and use it for admin already.
- *
- * Revision 1.8  2008/09/28 08:06:13  fplanque
- * Refactoring / extended page level caching
- *
- * Revision 1.7  2008/04/03 14:54:34  fplanque
- * date fixes
- *
- * Revision 1.6  2008/02/08 22:24:46  fplanque
- * bugfixes
- *
- * Revision 1.5  2008/01/21 15:02:01  fplanque
- * fixed evobar
- *
- * Revision 1.4  2008/01/21 09:35:43  fplanque
- * (c) 2008
- *
- * Revision 1.3  2007/07/04 23:36:10  blueyed
- * Fixed folding
- *
- * Revision 1.2  2007/06/30 22:03:34  fplanque
- * cleanup
- *
- * Revision 1.1  2007/06/25 11:02:35  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.32  2007/06/24 22:35:57  fplanque
- * cleanup
- *
- * Revision 1.30  2007/06/24 20:09:06  personman2
- * switching to require_css and require_js in admin skins
- *
- * Revision 1.28  2007/04/26 00:11:11  fplanque
- * (c) 2007
- *
- * Revision 1.27  2007/03/12 22:59:32  blueyed
- * Fixed inclusion of jQuery
- *
- * Revision 1.26  2007/03/11 18:04:30  blueyed
- * Updated jQuery; now uncompressed jquery.js gets used in backoffice if $debug is true and jquery.js exists - otherwise the compressed jquery.min.js gets used.
- * jquery.js is not meant to get shipped in releases!
- *
- * Revision 1.25  2006/11/26 23:25:20  blueyed
- * Newline at the end, so "view-source" is nicer
- *
- * Revision 1.24  2006/11/26 02:30:39  fplanque
- * doc / todo
  */
 ?>

@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -38,7 +38,7 @@ $Form->hidden( 'action', 'update' );
 // fp> TODO: it would be awesome to be able to enable the different APIs individually
 // that way you minimalize security/spam risks by enable just what you need.
 $Form->begin_fieldset( T_('Remote publishing').get_manual_link('remote_publishing') );
-	$Form->checkbox_input( 'general_xmlrpc', $Settings->get('general_xmlrpc'), T_('Enable XML-RPC'), array( 'note' => T_('Enable the Movable Type, MetaWeblog, Blogger and B2 XML-RPC publishing protocols.') ) );
+	$Form->checkbox_input( 'general_xmlrpc', $Settings->get('general_xmlrpc'), T_('Enable XML-RPC'), array( 'note' => T_('Enable the Movable Type, MetaWeblog, WordPress, Blogger and B2 XML-RPC publishing protocols.') ) );
 	$Form->text_input( 'xmlrpc_default_title', $Settings->get('xmlrpc_default_title'), 50, T_('Default title'), '<br />'.T_('Default title for items created with a XML-RPC API that doesn\'t send a post title (e. g. the Blogger API).'), array( 'maxlength' => 255 ) );
 $Form->end_fieldset();
 
@@ -53,8 +53,8 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
- * Revision 1.1  2011/10/17 20:16:52  sam2kb
- * Post by Email converted into internal scheduled job
+ * Revision 1.3  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

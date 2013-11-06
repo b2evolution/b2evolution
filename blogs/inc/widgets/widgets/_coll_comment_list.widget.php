@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -191,63 +191,8 @@ class coll_comment_list_Widget extends ComponentWidget
 
 /*
  * $Log$
- * Revision 1.20  2011/09/04 22:13:21  fplanque
- * copyright 2011
- *
- * Revision 1.19  2010/03/11 10:35:09  efy-asimo
- * Rewrite CommentList to CommentList2 task
- *
- * Revision 1.18  2010/02/08 17:54:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.17  2010/01/30 18:55:35  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.16  2009/09/26 12:00:44  tblue246
- * Minor/coding style
- *
- * Revision 1.15  2009/09/25 07:33:31  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.14  2009/09/14 13:54:13  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.13  2009/09/12 11:03:13  efy-arrin
- * Included the ClassName in the loadclass() with proper UpperCase
- *
- * Revision 1.12  2009/09/10 13:44:57  tblue246
- * Translation fixes/update
- *
- * Revision 1.11  2009/03/13 02:32:07  fplanque
- * Cleaned up widgets.
- * Removed stupid widget_name param.
- *
- * Revision 1.10  2009/03/08 23:57:46  fplanque
- * 2009
- *
- * Revision 1.9  2008/09/24 08:44:11  fplanque
- * Fixed and normalized order params for widgets (Comments not done yet)
- *
- * Revision 1.8  2008/09/23 09:04:32  fplanque
- * moved media index to a widget
- *
- * Revision 1.7  2008/05/06 23:35:47  fplanque
- * The correct way to add linebreaks to widgets is to add them to $disp_params when the container is called, right after the array_merge with defaults.
- *
- * Revision 1.5  2008/01/21 09:35:37  fplanque
- * (c) 2008
- *
- * Revision 1.4  2007/12/26 23:12:48  yabs
- * changing RANDOM to RAND
- *
- * Revision 1.3  2007/12/26 20:04:54  fplanque
- * minor
- *
- * Revision 1.2  2007/12/24 12:05:31  yabs
- * bugfix "order" is a reserved name, used by wi_order
- *
- * Revision 1.1  2007/12/24 11:02:42  yabs
- * added to cvs
+ * Revision 1.21  2013/11/06 08:05:09  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

@@ -21,6 +21,12 @@ require_once dirname(__FILE__).'/../conf/_config.php';
  */
 require_once $inc_path .'_main.inc.php';
 
+if( $Settings->get( 'system_lock' ) )
+{ // System is locked down for maintenance, Stop cron execution
+	echo 'Scheduled tasks cannot be executed at this time because the system is in maintenance lock.';
+	exit(0);
+}
+
 /**
  * Cron support functions
  */
@@ -73,6 +79,15 @@ if( $is_cli )
 			}
 		}
 	}
+
+	global $default_locale, $current_charset;
+
+	// We don't load _init_session.inc.php in CLI mode, so we set locale and DB connection charset here
+	locale_overwritefromDB();
+	locale_activate( $default_locale );
+
+	// Init charset handling - this will also set the encoding for MySQL connection
+	init_charsets( $current_charset );
 }
 else
 { // This is a web request: (for testing purposes only. Not designed for production)
@@ -81,12 +96,15 @@ else
 	header_nocache();
 	header_content_type();
 
+	// Add CSS:
+	require_css( 'basic_styles.css', 'rsc_url' ); // the REAL basic styles
+	require_css( 'basic.css', 'rsc_url' ); // Basic styles
 	?>
 	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 	<html>
 	<head>
 		<title>Cron exec</title>
-		<link rel="stylesheet" type="text/css" href="<?php echo $rsc_url ?>css/basic.css">
+		<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 	</head>
 	<body>
 		<h1>Cron exec</h1>
@@ -110,6 +128,7 @@ $sql = 'SELECT *
 				 ORDER BY ctsk_start_datetime ASC, ctsk_ID ASC
 				 LIMIT 1';
 $task = $DB->get_row( $sql, OBJECT, 0, 'Get next task to run in queue which has not started execution yet' );
+$error_task = NULL;
 
 if( empty( $task ) )
 {
@@ -166,21 +185,35 @@ else
 			$cron_params = unserialize( $task->ctsk_params );
 		}
 
-		// The job may need to know its ID (to set logical locks for example):
+		// The job may need to know its ID and name (to set logical locks for example):
 		$cron_params['ctsk_ID'] = $ctsk_ID;
 
 		// EXECUTE
-		call_job( $task->ctsk_controller, $cron_params );
+		$error_message = call_job( $task->ctsk_controller, $cron_params );
+		if( !empty( $error_message ) )
+		{
+			$error_task = array(
+					'ID'      => $ctsk_ID,
+					'name'    => $ctsk_name,
+					'message' => $error_message,
+				);
+		}
 
 		// Record task as finished:
 		if( empty($timestop) )
 		{
 			$timestop = time() + $time_difference;
 		}
+
+		if( is_array( $result_message ) )
+		{	// If result is array we should store it as serialized data
+			$result_message = serialize( $result_message );
+		}
+
 		$sql = ' UPDATE T_cron__log
 								SET clog_status = '.$DB->quote($result_status).',
-										clog_realstop_datetime = '.$DB->quote( date2mysql($timestop) ).',
-										clog_messages = '.$DB->quote($result_message) /* May be NULL */.'
+										clog_realstop_datetime = '.$DB->quote( date2mysql( $timestop ) ).',
+										clog_messages = '.$DB->quote( $result_message ) /* May be NULL */.'
 							WHERE clog_ctsk_ID = '.$ctsk_ID;
 		$DB->query( $sql, 'Record task as finished.' );
 	}
@@ -189,11 +222,7 @@ else
 
 //echo 'detecting timeouts...';
 // Detect timed out tasks:
-$sql = ' UPDATE T_cron__log
-						SET clog_status = "timeout"
-					WHERE clog_status = "started"
-								AND clog_realstart_datetime < '.$DB->quote( date2mysql( time() + $time_difference - $cron_timeout_delay ) );
-$DB->query( $sql, 'Detect cron timeouts.' );
+detect_timeout_cron_jobs( $error_task );
 
 
 
@@ -211,32 +240,8 @@ if( ! $is_cli )
 
 /*
  * $Log$
- * Revision 1.23  2011/09/21 17:05:05  fplanque
- * doc
- *
- * Revision 1.21  2011/09/20 22:46:57  fplanque
- * doc
- *
- * Revision 1.20  2011/09/20 18:11:57  sam2kb
- * minor / no new line at end of file
- *
- * Revision 1.19  2011/09/20 18:10:31  sam2kb
- * Never cache cron calls, and set correct charset
- *
- * Revision 1.18  2008/10/28 20:50:41  blueyed
- * Adjust/fix levels passed to cron_log()
- *
- * Revision 1.17  2008/10/28 19:51:01  blueyed
- * Cron: implement different levels of quietness. Passing '-q -q' to cron_exec.php is now silent on successful execution.
- *
- * Revision 1.16  2008/02/19 11:11:15  fplanque
- * no message
- *
- * Revision 1.15  2008/01/19 17:27:06  blueyed
- * todo
- *
- * Revision 1.14  2007/06/25 10:58:48  fplanque
- * MODULES (refactored MVC)
+ * Revision 1.25  2013/11/06 08:03:44  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

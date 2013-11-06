@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2008 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * {@internal License choice
@@ -145,45 +145,8 @@ class coll_avatar_Widget extends ComponentWidget
 
 /*
  * $Log$
- * Revision 1.12  2011/10/07 17:22:52  efy-yurybakh
- * user avatar display default
- *
- * Revision 1.11  2011/09/06 00:54:38  fplanque
- * i18n update
- *
- * Revision 1.10  2011/09/04 22:13:21  fplanque
- * copyright 2011
- *
- * Revision 1.9  2010/11/03 19:44:15  sam2kb
- * Increased modularity - files_Module
- * Todo:
- * - split core functions from _file.funcs.php
- * - check mtimport.ctrl.php and wpimport.ctrl.php
- * - do not create demo Photoblog and posts with images (Blog A)
- *
- * Revision 1.8  2010/02/08 17:54:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.7  2009/12/01 04:19:25  fplanque
- * even more invalidation dimensions
- *
- * Revision 1.6  2009/12/01 03:45:37  fplanque
- * multi dimensional invalidation
- *
- * Revision 1.5  2009/10/03 21:00:50  tblue246
- * Bugfixes
- *
- * Revision 1.4  2009/09/30 19:09:39  blueyed
- * trans fix
- *
- * Revision 1.3  2009/09/20 01:35:52  fplanque
- * Factorized User::get_link()
- *
- * Revision 1.2  2009/09/20 00:51:43  fplanque
- * OMG!!
- *
- * Revision 1.1  2009/09/20 00:33:59  blueyed
- * Add widget to display avatar of collection/blog owner. Install it for all new blogs by default.
+ * Revision 1.13  2013/11/06 08:05:09  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

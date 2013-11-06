@@ -108,6 +108,12 @@ class custom_Skin extends Skin
 		// call parent:
 		parent::display_init();
 
+		// Add CSS:
+		require_css( 'basic_styles.css', 'blog' ); // the REAL basic styles
+		require_css( 'basic.css', 'blog' ); // Basic styles
+		require_css( 'blog_base.css', 'blog' ); // Default styles for the blog navigation
+		require_css( 'item_base.css', 'blog' ); // Default styles for the post CONTENT
+
 		// Make sure standard CSS is called ahead of custom CSS generated below:
 		require_css( 'style.css', true );
 
@@ -144,53 +150,8 @@ class custom_Skin extends Skin
 
 /*
  * $Log$
- * Revision 1.16  2011/10/03 10:07:06  efy-yurybakh
- * bubbletips & identity_links cleanup
- *
- * Revision 1.15  2011/09/29 12:22:23  efy-yurybakh
- * skin param for bubbletip
- *
- * Revision 1.14  2011/09/17 02:31:59  fplanque
- * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
- *
- * Revision 1.13  2011/09/14 20:19:49  fplanque
- * cleanup
- *
- * Revision 1.11  2011/09/10 21:18:33  fplanque
- * cleanup
- *
- * Revision 1.10  2011/09/09 23:26:47  lxndral
- * Add _skins.class.php to all skins  (Easy task)
- *
- * Revision 1.9  2011/09/07 00:28:26  sam2kb
- * Replace non-ASCII character in regular expressions with ~
- *
- * Revision 1.8  2011/09/04 02:30:20  fplanque
- * colorbox integration (MIT license)
- *
- * Revision 1.7  2010/01/19 19:38:41  fplanque
- * minor
- *
- * Revision 1.6  2010/01/16 17:08:36  efy-eugene
- * Selection of sidebar position added
- *
- * Revision 1.5  2010/01/13 23:40:21  fplanque
- * cleanup
- *
- * Revision 1.4  2010/01/13 17:21:40  efy-eugene
- * Checkbox parameter added
- *
- * Revision 1.3  2009/05/24 21:14:38  fplanque
- * _skin.class.php can now provide skin specific settings.
- * Demo: the custom skin has configurable header colors.
- * The settings can be changed through Blog Settings > Skin Settings.
- * Anyone is welcome to extend those settings for any skin you like.
- *
- * Revision 1.2  2009/05/23 22:49:10  fplanque
- * skin settings
- *
- * Revision 1.1  2009/05/23 20:20:17  fplanque
- * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
+ * Revision 1.18  2013/11/06 08:05:43  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

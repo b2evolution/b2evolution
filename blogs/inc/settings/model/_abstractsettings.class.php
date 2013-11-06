@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -225,6 +225,8 @@ class AbstractSettings
 				}
 				else foreach( $result as $loop_row )
 				{
+					$this->cache[$loop_row->{$this->col_key_names[0]}] = new stdClass();
+
 					$this->cache[$loop_row->{$this->col_key_names[0]}]->value = $loop_row->{$this->col_value_name};
 					$this->cache[$loop_row->{$this->col_key_names[0]}]->dbUptodate = true;
 					$this->cache[$loop_row->{$this->col_key_names[0]}]->dbRemove = false;
@@ -238,6 +240,8 @@ class AbstractSettings
 				}
 				else foreach( $result as $loop_row )
 				{
+					$this->cache[$loop_row->{$this->col_key_names[0]}][$loop_row->{$this->col_key_names[1]}] = new stdClass();
+
 					$this->cache[$loop_row->{$this->col_key_names[0]}][$loop_row->{$this->col_key_names[1]}]->value = $loop_row->{$this->col_value_name};
 					$this->cache[$loop_row->{$this->col_key_names[0]}][$loop_row->{$this->col_key_names[1]}]->dbUptodate = true;
 					$this->cache[$loop_row->{$this->col_key_names[0]}][$loop_row->{$this->col_key_names[1]}]->dbRemove = false;
@@ -251,6 +255,8 @@ class AbstractSettings
 				}
 				else foreach( $result as $loop_row )
 				{
+					$this->cache[$loop_row->{$this->col_key_names[0]}][$loop_row->{$this->col_key_names[1]}][$loop_row->{$this->col_key_names[2]}] = new stdClass();
+
 					$this->cache[$loop_row->{$this->col_key_names[0]}][$loop_row->{$this->col_key_names[1]}][$loop_row->{$this->col_key_names[2]}]->value = $loop_row->{$this->col_value_name};
 					$this->cache[$loop_row->{$this->col_key_names[0]}][$loop_row->{$this->col_key_names[1]}][$loop_row->{$this->col_key_names[2]}]->dbUptodate = true;
 					$this->cache[$loop_row->{$this->col_key_names[0]}][$loop_row->{$this->col_key_names[1]}][$loop_row->{$this->col_key_names[2]}]->dbRemove = false;
@@ -295,6 +301,7 @@ class AbstractSettings
 					// Try to unserialize setting (once) - this is as fast as checking an array of values that should get unserialized
 					if( ($r = @unserialize($this->cache[ $col_key1 ]->value)) !== false )
 					{
+						$this->cache[ $col_key1 ] = new stdClass();
 						$this->cache[ $col_key1 ]->value = $r;
 					}
 					else
@@ -306,6 +313,7 @@ class AbstractSettings
 				else
 				{	// The value is not in the cache, we use the default:
 					$r = $this->get_default( $col_key1 );
+					$this->cache[ $col_key1 ] = new stdClass();
 					$this->cache[ $col_key1 ]->value = $r; // remember in cache
 					$this->cache[ $col_key1 ]->dbUptodate = true;
 					$this->cache[ $col_key1 ]->unserialized = true;
@@ -325,6 +333,7 @@ class AbstractSettings
 					// Try to unserialize setting (once) - this is as fast as checking an array of values that should get unserialized
 					if( ($r = @unserialize($this->cache[ $col_key1 ][ $col_key2 ]->value)) !== false )
 					{
+						$this->cache[ $col_key1 ][ $col_key2 ] = new stdClass();
 						$this->cache[ $col_key1 ][ $col_key2 ]->value = $r;
 					}
 					else
@@ -336,6 +345,7 @@ class AbstractSettings
 				else
 				{
 					$r = $this->get_default( $col_key2 );
+					$this->cache[ $col_key1 ][ $col_key2 ] = new stdClass();
 					$this->cache[ $col_key1 ][ $col_key2 ]->value = $r; // remember in cache
 					$this->cache[ $col_key1 ][ $col_key2 ]->dbUptodate = true;
 					$this->cache[ $col_key1 ][ $col_key2 ]->unserialized = true;
@@ -355,6 +365,7 @@ class AbstractSettings
 					// Try to unserialize setting (once) - this is as fast as checking an array of values that should get unserialized
 					if( ($r = @unserialize($this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->value)) !== false )
 					{
+						$this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ] = new stdClass();
 						$this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->value = $r;
 					}
 					else
@@ -366,6 +377,7 @@ class AbstractSettings
 				else
 				{
 					$r = $this->get_default( $col_key3 );
+					$this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ] = new stdClass();
 					$this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->value = $r; // remember in cache
 					$this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->dbUptodate = true;
 					$this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->unserialized = true;
@@ -467,11 +479,16 @@ class AbstractSettings
 				return false;
 		}
 
+		if( ! is_object($atCache) )
+		{	// PHP 5.4 fix for "Warning: Creating default object from empty value"
+			$atCache = new stdClass();
+		}
+
 		$atCache->dbRemove = false;
 
 		if( isset($atCache->value) )
 		{
-			if( $atCache->value == $value )
+			if( $atCache->value === (string)$value )
 			{ // already set
 				$Debuglog->add( $debugMsg.' Already set to the same value.', 'settings' );
 				return false;
@@ -528,6 +545,11 @@ class AbstractSettings
 
 			default:
 				return false;
+		}
+
+		if( ! is_object($atCache) )
+		{	// PHP 5.4 fix for "Warning: Creating default object from empty value"
+			$atCache = new stdClass();
 		}
 
 		$atCache->dbRemove = true;
@@ -760,58 +782,8 @@ class AbstractSettings
 
 /*
  * $Log$
- * Revision 1.10  2011/09/04 22:13:20  fplanque
- * copyright 2011
+ * Revision 1.12  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.9  2010/02/08 17:53:55  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.8  2010/01/22 08:39:02  sam2kb
- * Fixied warning: call_user_func_array() expects parameter 2 to be array
- *
- * Revision 1.7  2009/11/30 00:22:05  fplanque
- * clean up debug info
- * show more timers in view of block caching
- *
- * Revision 1.6  2009/10/08 20:05:52  efy-maxim
- * Modular/Pluggable Permissions
- *
- * Revision 1.5  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.4  2008/01/21 09:35:34  fplanque
- * (c) 2008
- *
- * Revision 1.3  2007/11/28 16:57:50  fplanque
- * bugfix when trying to access a serialized value rigth after setting it
- *
- * Revision 1.2  2007/11/28 16:38:20  fplanque
- * minor
- *
- * Revision 1.1  2007/06/25 11:01:20  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.21  2007/04/26 00:10:59  fplanque
- * (c) 2007
- *
- * Revision 1.20  2007/02/06 00:41:52  waltercruz
- * Changing double quotes to single quotes
- *
- * Revision 1.19  2006/12/07 23:13:11  fplanque
- * @var needs to have only one argument: the variable type
- * Otherwise, I can't code!
- *
- * Revision 1.18  2006/11/24 18:27:25  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.17  2006/11/15 21:04:46  blueyed
- * - Fixed removing setting after delete() and get() (from defaults) (When getting value from default do not reset $dbRemove property)
- * - Opt: default settings are already unserialized
- *
- * Revision 1.16  2006/11/15 20:18:50  blueyed
- * Fixed AbstractSettings::delete(): unset properties in cache
- *
- * Revision 1.15  2006/11/04 01:35:02  blueyed
- * Fixed unserializing of array()
  */
 ?>

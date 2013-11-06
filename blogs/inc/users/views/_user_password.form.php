@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -64,7 +64,44 @@ global $form_action;
  */
 global $current_User;
 
+global $Session;
+
+// Default params:
+$default_params = array(
+		'skin_form_params' => array(),
+	);
+
+if( isset( $params ) )
+{	// Merge with default params
+	$params = array_merge( $default_params, $params );
+}
+else
+{	// Use a default params
+	$params = $default_params;
+}
+
+// ------------------- PREV/NEXT USER LINKS -------------------
+user_prevnext_links( array(
+		'block_start'  => '<table class="prevnext_user"><tr>',
+		'prev_start'   => '<td width="33%">',
+		'prev_end'     => '</td>',
+		'prev_no_user' => '<td width="33%">&nbsp;</td>',
+		'back_start'   => '<td width="33%" class="back_users_list">',
+		'back_end'     => '</td>',
+		'next_start'   => '<td width="33%" class="right">',
+		'next_end'     => '</td>',
+		'next_no_user' => '<td width="33%">&nbsp;</td>',
+		'block_end'    => '</tr></table>',
+		'user_tab'     => 'pwdchange'
+	) );
+// ------------- END OF PREV/NEXT USER LINKS -------------------
+
+// check if reqID exists. If exists it means that this form is displayed because a password change request by email.
+$reqID = param( 'reqID', 'string', '' );
+
 $Form = new Form( $form_action, 'user_checkchanges' );
+
+$Form->switch_template_parts( $params['skin_form_params'] );
 
 if( !$user_profile_only )
 {
@@ -76,6 +113,7 @@ if( $is_admin )
 {
 	$form_title = get_usertab_header( $edited_User, 'pwdchange', T_( 'Change password' ) );
 	$form_class = 'fform';
+	$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
 }
 else
 {
@@ -92,9 +130,14 @@ $Form->begin_form( $form_class, $form_title );
 	$Form->hidden_ctrl();
 	$Form->hidden( 'user_tab', 'pwdchange' );
 	$Form->hidden( 'password_form', '1' );
+	$Form->hidden( 'reqID', $reqID );
 
 	$Form->hidden( 'user_ID', $edited_User->ID );
 	$Form->hidden( 'edited_user_login', $edited_User->login );
+	if( isset( $Blog ) )
+	{
+		$Form->hidden( 'blog', $Blog->ID );
+	}
 
 	/***************  Password  **************/
 
@@ -103,9 +146,12 @@ if( $action != 'view' )
 
 	$Form->begin_fieldset( $is_admin ? T_('Password') : '', array( 'class'=>'fieldset clear' ) );
 
-		if (!$has_full_access)
+		// current password is not required:
+		//   - current user has full access and not editing his own pasword
+		//   - password change requested by email
+		if( !( ( $has_full_access && $edited_User->ID != $current_User->ID ) || ( !empty( $reqID ) && $reqID == $Session->get( 'core.changepwd.request_id' ) ) ) )
 		{
-		$Form->password_input( 'current_user_pass', '', 20, T_('Current password'), array( 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off' ) );
+			$Form->password_input( 'current_user_pass', '', 20, T_('Current password'), array( 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off' ) );
 		}
 		$Form->password_input( 'edited_user_pass1', '', 20, T_('New password'), array( 'note' => sprintf( T_('Minimum length: %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off' ) );
 		$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off' ) );
@@ -125,47 +171,19 @@ if( $action != 'view' )
 
 $Form->end_form();
 
+// Display javascript password strength indicator bar
+display_password_indicator( array(
+			'pass1-id'    => 'edited_user_pass1',
+			'pass2-id'    => 'edited_user_pass2',
+			'login-id'    => 'edited_user_login',
+			'field-width' => 165,
+	) );
+
 
 /*
  * $Log$
- * Revision 1.13  2011/09/23 11:57:28  efy-vitalij
- * add admin functionality to password change form and edit validate messages in password edit form
- *
- * Revision 1.12  2011/09/22 12:55:56  efy-vitalij
- * add current password input
- *
- * Revision 1.11  2011/09/15 08:58:46  efy-asimo
- * Change user tabs display
- *
- * Revision 1.10  2011/09/12 06:41:06  efy-asimo
- * Change user edit forms titles
- *
- * Revision 1.9  2011/09/04 22:13:21  fplanque
- * copyright 2011
- *
- * Revision 1.8  2011/05/11 07:11:52  efy-asimo
- * User settings update
- *
- * Revision 1.7  2011/04/06 13:30:56  efy-asimo
- * Refactor profile display
- *
- * Revision 1.6  2010/10/17 18:53:04  sam2kb
- * Added a link to delete edited user
- *
- * Revision 1.5  2010/02/08 17:54:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.4  2010/01/30 18:55:35  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.3  2010/01/03 16:28:35  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.2  2009/11/21 13:39:05  efy-maxim
- * 'Cancel editing' fix
- *
- * Revision 1.1  2009/10/28 10:02:42  efy-maxim
- * rename some php files
+ * Revision 1.15  2013/11/06 08:05:04  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

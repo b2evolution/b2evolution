@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -102,23 +102,8 @@ $Comment = & $params['Comment'];
 
 /*
  * $Log$
- * Revision 1.6  2011/09/04 22:13:24  fplanque
- * copyright 2011
- *
- * Revision 1.5  2010/02/08 17:56:12  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.4  2009/03/08 23:57:56  fplanque
- * 2009
- *
- * Revision 1.3  2008/01/21 09:35:42  fplanque
- * (c) 2008
- *
- * Revision 1.2  2007/12/22 17:24:35  fplanque
- * cleanup
- *
- * Revision 1.1  2007/12/22 16:41:05  fplanque
- * Modular feedback template.
+ * Revision 1.7  2013/11/06 08:05:36  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

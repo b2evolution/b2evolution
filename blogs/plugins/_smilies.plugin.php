@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @author fplanque: Francois PLANQUE.
  * @author gorgeb: Bertrand GORGE / EPISTEMA
@@ -29,8 +29,7 @@ class smilies_plugin extends Plugin
 	 * fp> There is... I can't remember the exact problem thouh. Probably some interaction with the code highlight or the video plugins.
 	 */
 	var $priority = 15;
-	var $version = '4.0.5';
-	var $apply_rendering = 'opt-in';
+	var $version = '5.0.0';
 	var $group = 'rendering';
 	var $number_of_installs = 3; // QUESTION: dh> why 3?
 
@@ -80,12 +79,6 @@ class smilies_plugin extends Plugin
 					'defaultvalue' => 0,
 					'type' => 'checkbox',
 					'note' => T_('This is the default setting. Users can override it in their profile.'),
-				),
-				'render_comments' => array(	// fp> Note: this is not a default in this version, it's an 'always' :]
-					'label' => $this->T_('Render comments'),
-					'note' => $this->T_('Check to also render smilies in comments.'),
-					'defaultvalue' => 0,
-					'type' => 'checkbox',
 				),
 				// TODO (yabs) : Display these as images and individual inputs
 				'smiley_list' => array(
@@ -166,6 +159,19 @@ XX(      graydead.gif
 
 
 	/**
+	 * Define here default collection/blog settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::get_coll_setting_definitions()}.
+	 */
+	function get_coll_setting_definitions( & $params )
+	{
+		$default_params = array_merge( $params, array( 'default_post_rendering' => 'opt-in' ) );
+		return parent::get_coll_setting_definitions( $default_params );
+	}
+
+
+	/**
 	 * Display a toolbar in admin
 	 *
 	 * @param array Associative array of parameters
@@ -189,7 +195,26 @@ XX(      graydead.gif
 	 */
 	function DisplayCommentToolbar( & $params )
 	{
-		if( $this->Settings->get( 'render_comments' )
+		if( !empty( $params['Comment'] ) )
+		{ // Comment is set, get Blog from comment
+			$Comment = & $params['Comment'];
+			if( !empty( $Comment->item_ID ) )
+			{
+				$comment_Item = & $Comment->get_Item();
+				$Blog = & $comment_Item->get_Blog();
+			}
+		}
+
+		if( empty( $Blog ) )
+		{ // Comment is not set, try global Blog
+			global $Blog;
+			if( empty( $Blog ) )
+			{ // We can't get a Blog, this way "apply_comment_rendering" plugin collection setting is not available
+				return false;
+			}
+		}
+
+		if( $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog )
 		&& ( ( is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
 			|| ( !is_logged_in() && $this->Settings->get( 'use_toolbar_default' ) ) ) )
 		{
@@ -232,21 +257,6 @@ XX(      graydead.gif
 	/**
 	 * Perform rendering
 	 *
-	 * @see Plugin::FilterCommentContent()
-	 */
-	function FilterCommentContent( & $params )
-	{
-		if( $this->Settings->get( 'render_comments' ) )
-		{
-			$this->RenderItemAsHtml( $params );
-		}
-	}
-
-
-
-	/**
-	 * Perform rendering
-	 *
 	 * @see Plugin::RenderItemAsHtml()
 	 */
 	function RenderItemAsHtml( & $params )
@@ -281,13 +291,13 @@ XX(      graydead.gif
 
 		// Lazy-check first, using stristr() (stripos() is only available since PHP5):
 		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false )
-		{ // Call ReplaceTagSafe() on everything outside <pre></pre> and <code></code>:
+		{ // Call ReplaceTagSafe() on everything outside code/pre:
 			$content = callback_on_non_matching_blocks( $content,
 					'~<(code|pre)[^>]*>.*?</\1>~is',
 					array( & $this, 'ReplaceTagSafe' ) );
 		}
 		else
-		{ // No CODE or PRE blocks, replace on the whole thing
+		{ // No code/pre blocks, replace on the whole thing
 			$content = $this->ReplaceTagSafe($content);
 		}
 
@@ -424,139 +434,8 @@ XX(      graydead.gif
 
 /*
  * $Log$
- * Revision 1.54  2011/09/04 22:13:23  fplanque
- * copyright 2011
- *
- * Revision 1.53  2011/06/05 03:53:39  sam2kb
- * Bugfix: http://forums.b2evolution.net/viewtopic.php?t=22468
- *
- * Revision 1.52  2010/02/08 17:55:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.51  2009/09/30 21:23:33  blueyed
- * smilies_plugin: version 4.0.0-dev, cleaned up image processing. Outputs width/height now.
- *
- * Revision 1.50  2009/07/12 19:35:31  fplanque
- * make rendering opt-in
- *
- * Revision 1.49  2009/03/08 23:57:47  fplanque
- * 2009
- *
- * Revision 1.48  2009/03/04 02:08:51  fplanque
- * keep it real
- *
- * Revision 1.47  2009/03/03 14:58:14  afwas
- * Added class 'edit_toolbar'. These toolbars now have two classes (thanks blueyed.)
- *
- * Revision 1.46  2009/03/03 13:06:44  afwas
- * All toolbars have the class 'edit_toolbar'. Changed to 'smiley_toolbar'
- *
- * Revision 1.45  2009/01/19 21:41:44  fplanque
- * Too many people find the smiley bar "ugly" :/
- * No longer display it by default
- *
- * Revision 1.44  2008/01/21 09:35:41  fplanque
- * (c) 2008
- *
- * Revision 1.43  2007/08/12 19:44:41  blueyed
- * Fixed :yes: smilie
- *
- * Revision 1.42  2007/06/18 21:21:57  fplanque
- * doc
- *
- * Revision 1.41  2007/06/16 20:26:44  blueyed
- * doc
- *
- * Revision 1.40  2007/04/26 00:11:04  fplanque
- * (c) 2007
- *
- * Revision 1.39  2007/04/20 01:42:32  fplanque
- * removed excess javascript
- *
- * Revision 1.38  2007/01/15 03:55:22  fplanque
- * lowered priority so there is no conflict with other replacements generating smileys.
- *
- * Revision 1.37  2006/12/28 23:20:40  fplanque
- * added plugin event for displaying comment form toolbars
- * used by smilies plugin
- *
- * Revision 1.31.2.10  2006/12/27 09:41:12  yabs
- * Removed b2evocanvas, minor other changes, clarified doc
- *
- * Revision 1.31.2.9  2006/12/26 03:18:51  fplanque
- * assigned a few significant plugin groups
- *
- * Revision 1.31.2.8  2006/12/16 04:30:59  fplanque
- * doc
- *
- * Revision 1.31.2.7  2006/12/03 08:27:35  yabs
- * Removed user setting - render_comments
- * Changed behaviour - render_comments_default used instead
- * Added skintag to display toolbar ifsmilies in comments enabled - usersetting overrides toolbar default
- * Other minor changes to code
- *
- * Revision 1.31.2.6  2006/11/27 19:12:50  fplanque
- * 1.9 POT has gone public. No more unnecessary changes.
- * 1.9.x language packs should work for ALL 1.9.x versions.
- * Adding strings is okay. Removing strings/changing strings for fun is not OK.
- * Move to 1.10 or 2.0
- *
- * Revision 1.34  2006/11/27 00:28:36  blueyed
- * trans fix
- *
- * Revision 1.33  2006/08/10 09:07:12  yabs
- * minor mods + added note re smilies folder
- *
- * Revision 1.32  2006/08/09 07:33:46  yabs
- * Redid the format of smiley settings, added ability to comment out a smiley and add optional comments to the end of a definition
- *
- * Revision 1.31  2006/08/07 18:26:21  fplanque
- * nuked obsolete smilies conf file
- *
- * Revision 1.30  2006/08/01 23:55:14  blueyed
- * minor: doc; removed level of indentation
- *
- * Revision 1.29  2006/08/01 08:44:31  yabs
- * Minor change - checks if skin has /smilies/ folder before start of checking for images
- *
- * Revision 1.28  2006/08/01 08:20:47  yabs
- * Added ability for admin skins to override default smiley images
- * Tidied up my previous code
- *
- * Revision 1.27  2006/07/31 16:19:04  yabs
- * Moved settings to admin
- * Added smilies in comments ( as user setting )
- * Added ability for blog skins to override default smiley images
- *
- * *note*
- * These changes are a tad quick 'n' dirty, I'm working on a cleaner version and will commit soon
- *
- * Revision 1.26  2006/07/12 21:13:17  blueyed
- * Javascript callback handler (e.g., for interaction of WYSIWYG editors with toolbar plugins)
- *
- * Revision 1.25  2006/07/10 20:19:30  blueyed
- * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
- *
- * Revision 1.24  2006/07/07 21:26:49  blueyed
- * Bumped to 1.9-dev
- *
- * Revision 1.23  2006/07/06 19:56:29  fplanque
- * no message
- *
- * Revision 1.22  2006/06/16 21:30:57  fplanque
- * Started clean numbering of plugin versions (feel free do add dots...)
- *
- * Revision 1.21  2006/05/30 20:26:59  blueyed
- * typo
- *
- * Revision 1.20  2006/05/30 19:39:55  fplanque
- * plugin cleanup
- *
- * Revision 1.19  2006/04/24 20:16:08  blueyed
- * Use callback_on_non_matching_blocks(); excluding PRE and CODE blocks
- *
- * Revision 1.18  2006/04/11 21:22:26  fplanque
- * partial cleanup
+ * Revision 1.56  2013/11/06 08:05:22  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

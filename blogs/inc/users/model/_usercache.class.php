@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -81,13 +81,22 @@ class UserCache extends DataObjectCache
 	 *
 	 * Does not halt on error.
 	 *
+	 * @param string user login
+	 * @param boolean force to run db query to get user by the given login.
+	 *        !IMPORTANT! Set this to false only if it's sure that this user was already loaded if it exists on DB!
+	 *
 	 * @return false|User Reference to the user object or false if not found
 	 */
-	function & get_by_login( $login )
+	function & get_by_login( $login, $force_db_check = true )
 	{
 		// Make sure we have a lowercase login:
 		// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes.
 		$login = evo_strtolower( $login );
+
+		if( !( $force_db_check || isset( $this->cache_login[$login] ) ) )
+		{ // force db check is false and this login is not set in the cache it means that user with the given login doesn't exists
+			$this->cache_login[$login] = false;
+		}
 
 		if( !isset( $this->cache_login[$login] ) )
 		{
@@ -136,6 +145,86 @@ class UserCache extends DataObjectCache
 		}
 
 		return $User;
+	}
+
+
+	/**
+	 * Get a user object by email and password
+	 * If multiple accounts match, give priority to:
+	 *  -accounts that are activated over non activated accounts
+	 *  -accounts that were used more recently than others
+	 *
+	 * @param string email address
+	 * @param string md5 hashed password
+	 * @param string hashed password - If this is set, it means we need to check the hasshed password instead of the md5 password
+	 * @param string password salt
+	 * @return false|array false if user with this email not exists, array( $User, $exists_more ) pair otherwise
+	 */
+	function get_by_emailAndPwd( $email, $pass_md5, $pwd_hashed = NULL, $pwd_salt = NULL )
+	{
+		global $DB;
+
+		// Get all users with matching email address
+		$result = $DB->get_results('SELECT * FROM T_users
+					WHERE LOWER(user_email) = '.$DB->quote( evo_strtolower($email) ).'
+					ORDER BY user_lastseen_ts DESC, user_status ASC');
+
+		if( empty( $result ) )
+		{ // user was not found with the given email address
+			return false;
+		}
+
+		// check if exists more user with the same email address
+		$exists_more = ( count( $result ) > 1 );
+		$index = -1;
+		$first_matched_index = false;
+		// iterate through the result list
+		foreach( $result as $row )
+		{
+			$index++;
+			if( empty( $pwd_hashed ) )
+			{
+				if( $row->user_pass != $pass_md5 )
+				{ // password doesn't match
+					continue;
+				}
+			}
+			elseif( sha1($row->user_pass.$pwd_salt) != $pwd_hashed )
+			{ // password doesn't match
+				continue;
+			}
+			// a user with matched password was found
+			$first_matched_index = $index;
+			if( ( $row->user_status == 'activated' ) || ( $row->user_status == 'autoactivated' ) )
+			{ // an activated user was found, break from the iteration
+				$User = new User( $row );
+				break;
+			}
+			if( ( !isset( $first_notclosed_User ) ) && ( $row->user_status != 'closed' ) )
+			{
+				$first_notclosed_User = new User( $row );
+			}
+		}
+
+		if( !isset( $User ) )
+		{ // There is no activated user with the given email and password
+			if( isset( $first_notclosed_User ) )
+			{ // Get first not closed user with the given email and password
+				$User = $first_notclosed_User;
+			}
+			elseif( $first_matched_index !== false )
+			{ // There is only closed user with the given email and password
+				$User = new User( $result[$first_matched_index] );
+			}
+			else
+			{ // No matched user was found
+				return false;
+			}
+		}
+
+		// Add user to the cache and return result
+		$this->add( $User );
+		return array( & $User, $exists_more );
 	}
 
 
@@ -255,11 +344,12 @@ class UserCache extends DataObjectCache
 	/**
 	 * Handle our login cache.
 	 */
-	function remove_by_ID( $reg_ID )
+	function remove_by_ID( $req_ID )
 	{
 		if( isset($this->cache[$req_ID]) )
 		{
-			unset( $this->cache_login[ $this->cache[$req_ID] ] );
+			$Obj = & $this->cache[$req_ID];
+			unset( $this->cache_login[ evo_strtolower($Obj->login) ] );
 		}
 		parent::remove_by_ID($req_ID);
 	}
@@ -268,58 +358,8 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
- * Revision 1.12  2011/09/04 22:13:21  fplanque
- * copyright 2011
+ * Revision 1.14  2013/11/06 08:05:03  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.11  2011/02/15 05:31:53  sam2kb
- * evo_strtolower mbstring wrapper for strtolower function
- *
- * Revision 1.10  2010/02/08 17:54:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.9  2009/09/19 11:29:05  efy-maxim
- * Refactoring
- *
- * Revision 1.8  2009/09/18 15:47:11  fplanque
- * doc/cleanup
- *
- * Revision 1.7  2009/09/18 10:38:31  efy-maxim
- * 15x15 icons next to login in messagin module
- *
- * Revision 1.6  2009/09/14 13:46:11  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.5  2009/09/12 11:15:43  efy-arrin
- * Included the ClassName in loadclass with proper UpperCase
- *
- * Revision 1.4  2009/08/30 00:42:11  fplanque
- * fixed user form
- *
- * Revision 1.3  2009/03/08 23:57:46  fplanque
- * 2009
- *
- * Revision 1.2  2008/01/21 09:35:36  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 11:01:47  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.10  2007/04/26 00:11:11  fplanque
- * (c) 2007
- *
- * Revision 1.9  2007/02/08 03:48:22  waltercruz
- * Changing double quotes to single quotes
- *
- * Revision 1.8  2006/12/05 01:35:27  blueyed
- * Hooray for less complexity and the 8th param for DataObjectCache()
- *
- * Revision 1.7  2006/12/05 00:34:39  blueyed
- * Implemented custom "None" option text in DataObjectCache; Added for $ItemStatusCache, $GroupCache, UserCache and BlogCache; Added custom text for Item::priority_options()
- *
- * Revision 1.6  2006/11/24 18:27:25  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.5  2006/10/13 10:01:07  blueyed
- * Fixed clear() and remove_by_ID() for UserCache and its own caches + test
  */
 ?>

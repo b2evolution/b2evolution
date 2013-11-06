@@ -79,7 +79,7 @@ function b2edit_open_preview( form, newaction )
  *
  * This is used to switch to another blog or tab, but "keep" the input in the form.
  */
-function b2edit_reload( form, newaction, blog )
+function b2edit_reload( form, newaction, blog, params )
 {
 	// Set the new form action URL:
 	if( ! set_new_form_action(form, newaction) )
@@ -87,14 +87,31 @@ function b2edit_reload( form, newaction, blog )
 		return false;
 	}
 
+	var hidden_action_set = false;
+
 	// Set the new form "action" HIDDEN value:
 	if( form.elements.namedItem("actionArray[update]") )
 	{
 		jQuery(form).append('<input type="hidden" name="action" value="edit_switchtab" />');
+		hidden_action_set = true;
 	}
 	else if( form.elements.namedItem("actionArray[create]") )
 	{
 		jQuery(form).append('<input type="hidden" name="action" value="new_switchtab" />');
+		hidden_action_set = true;
+	}
+	else
+	{
+		jQuery(form).append('<input type="hidden" name="action" value="switchtab" />');
+		hidden_action_set = true;
+	}
+
+	if( hidden_action_set && ( typeof params != 'undefined' ) )
+	{
+		for( param in params )
+		{
+			jQuery(form).append('<input type="hidden" name="' + param + '" value="' + params[param] + '" />');
+		}
 	}
 
 	// Set the blog we are switching to:

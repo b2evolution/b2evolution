@@ -96,6 +96,7 @@ skin_include( '_html_header.inc.php' );
 				<form action="<?php $Blog->gen_blogurl() ?>" method="get" class="search">
 				<input name="s" size="15" value="" class="form_text_input" type="text" />&nbsp;<input name="submit" class="searchsubmit" value="Go" type="submit" /></form></div>
 				<?php } ?>
+				<div class="clear"></div>
 			</div>
 
 
@@ -148,6 +149,7 @@ skin_include( '_html_header.inc.php' );
 					// Display message if no post:
 					display_if_empty();
 
+					echo '<div id="styled_content_block">'; // Beginning of posts display
 					while( $Item = & mainlist_get_item() )
 					{	// For each blog post:
 						// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
@@ -157,6 +159,7 @@ skin_include( '_html_header.inc.php' );
 							) );
 						// ----------------------------END ITEM BLOCK  ----------------------------
 					} // ---------------------------------- END OF POSTS ------------------------------------
+					echo '</div>'; // End of posts display
 				?>
 
 				<?php

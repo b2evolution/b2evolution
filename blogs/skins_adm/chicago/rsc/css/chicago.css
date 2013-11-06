@@ -7,11 +7,6 @@
  *
  * @package admin
  */
-@import url("../../../../rsc/css/basic.css");            /* Import basic styles */
-@import url("../../../../rsc/css/results.css");          /* Import results/tables styles */
-@import url("../../../../rsc/css/item_base.css");   /* TODO: remove when skins have params */
-@import url("../../../../rsc/css/fileman.css");     /* TODO: move to appropriate controller - Import filemanager styles */
-@import url("../../../../rsc/css/admin.global.css");     /* Import basic admin styles */
 
 body {
 	margin: 0;
@@ -20,6 +15,12 @@ body {
 	color: #000;
 	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
 	font-size: 84%;
+}
+textarea, input, ul.ui-autocomplete, div.input li.token-input-token-facebook, body div.token-input-dropdown-facebook {
+	font: 13px Arial, Helvetica, sans-serif;
+}
+select, option, optgroup {
+	font: 11px "Lucida Grande", sans-serif;
 }
 
 .wrapper {
@@ -211,6 +212,9 @@ div.tabbedpanelblock {
 	background: #f1f6f8 url(../img/panel_shade8.png) repeat-x bottom;
 	padding: 14px;
 }
+div.panelblock {
+	padding-top: 5px;
+}
 
 div.pan_bot {
 	background: url(../img/panel_bb.gif) repeat-x;
@@ -299,9 +303,11 @@ textarea,
 input.form_text_input,
 input.form_date_input,
 input.SearchField {
-	background: #FFFFFF url(../img/shadow-in.png) no-repeat left top;
 	border: 1px solid #9db0bc;
 	padding: 2px
+	-moz-box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
+	-webkit-box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
+	box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
 }
 input.field_error,
 select.field_error,
@@ -311,8 +317,10 @@ textarea.field_error {
 }
 .fieldset_title {
 	width: 100%;
-	margin-top: 1ex;
 	background: url(../img/title_left.gif) no-repeat left top;
+}
+.fieldset_title.ui-droppable {
+	margin-top: 1ex;
 }
 .fieldset_title_right {
 	padding: 0 5px;
@@ -371,11 +379,15 @@ table.filelist {
 	margin-top: 0;
 	border-color: #9db0bc;
 }
-table.grouped tr.filters td,
+table.grouped tr.filters td, div.filters,
 #fm_bar,
 table.filelist tr.listfooter td {
 	background-color: #E0E9F0;
 	border-color: #9db0bc;
+}
+div.filters {
+	border: 1px solid #9db0bc;
+	border-bottom: none;
 }
 table.grouped th,
 table.filelist th {
@@ -427,11 +439,27 @@ table.filelist td {
 }
 table.grouped tr.group td {
 	border-color: #9db0bc;
+	border-top: 1px solid #9db0bc;
 	background-color: #C3D5E2;
+}
+table.grouped tr:first-child.group td {
+	border-top: none;
 }
 table.grouped tr.total td {
 	border-top: 1px solid #9DB0BC;
 	background-color:#CCDCE6;
+}
+/*
+ * Results navigation:
+ */
+.results_nav {
+	background-color: #CCDCE6;
+	border: 1px solid #9db0bc;
+	border-bottom: none;
+}
+.results_nav.nav_footer {
+	border-bottom: 1px solid #9db0bc;
+	border-top: none;
 }
 
 /*
@@ -453,6 +481,7 @@ h4 {
 	font-size: 110%;
 	margin-bottom: 1ex;
 }
+
 
 /*
  * Links and buttons:
@@ -535,10 +564,10 @@ td.browse_right_col {
 	width: 19em;
 }
 .block_item_wrap {
-	margin: 0 0 1em 0;
+	margin: 1ex 0 1em 0;
 }
 .browse_side_item_wrap {
-	margin: 0 0 1em 1em;
+	margin: 1ex 0 1em 1em;
 }
 .block_item,
 .browse_side_item {
@@ -622,7 +651,8 @@ div.bComment > p { /* padding for e.g. "No feedback for this post yet..." */
 .bViews,
 .bPriority,
 .bAssignee,
-.bExtStatus
+.bExtStatus,
+.bExpired
 {
 	font-weight:bold;
 }
@@ -640,6 +670,32 @@ div.bPostpublished {
 div.bCommentpublished span.bStatus,
 .status_published {
 	color: #0b0;
+}
+
+div.bPostcommunity {
+	border: 1px solid #2E8BB9;
+	background-color: #fff;
+}
+.bPostcommunity > div.bSmallHead /* Direct child only */
+{
+	border-bottom: 1px solid #2E8BB9;
+}
+.bPostcommunity span.bStatus,
+.status_community {
+	color: #2E8BB9;
+}
+
+div.bPostreview {
+	border: 1px solid #CC0099;
+	background-color: #fff;
+}
+.bPostreview > div.bSmallHead /* Direct child only */
+{
+	border-bottom: 1px solid #CC0099;
+}
+.bPostreview span.bStatus,
+.status_review {
+	color: #CC0099;
 }
 
 .bPostprotected {
@@ -680,6 +736,15 @@ div.bCommentdraft span.bStatus,
 	color: #f96;
 	background-color: #ff9;
 }
+
+#comments_block .status_community,
+#comments_block .status_protected,
+#comments_block .status_draft,
+#comments_block .status_review {
+	top: -8px !important;
+	left: 8px !important;
+}
+
 .bPostdraft > div.bSmallHead, /* Direct child only */
 div.bCommentdraft > div.bSmallHead /* Direct child only */
 {
@@ -750,6 +815,25 @@ div.bCommenttrash span.bStatus,
 	background-color: #faa;
 }
 
+div.block_item div.bCommentexpired {
+	border: 1px solid #f66;
+	background-color: #FCFBD9;
+}
+div.bCommentexpired > div.bSmallHead /* Direct child only */
+{
+	background-color: #F6F5CB;
+	border-bottom: 1px solid #f66;
+}
+div.bCommentexpired div.CommentActionsArea {
+	border: none;
+	border-top: 1px solid #f66;
+	background-color: #F6F5CB;
+}
+div.bCommentexpired span.bExpired
+{
+	color: #f66;
+}
+
 .bPostredirected {
 	border: 1px solid #639;
 	background-color: #dcf;
@@ -787,6 +871,7 @@ div.bCommenttrash span.bStatus,
 .bText {
 	margin: 0;
 	padding: 0;
+	max-width: 1100px;
 }
 
 .bSideItem ul,
@@ -979,7 +1064,8 @@ th.checkright {
 /*
  * Skin selection:
  */
-div.skinshot {
+div.skinshot,
+div.coll_settings_skinshot {
 	background-color: #E0E9F0;
 }
 div.skinshot_placeholder {
@@ -1024,4 +1110,48 @@ div.system_check {
 div.breadcrumbpath {
 	margin: 0 16px 8px;
 	font-size: 84%;
+}
+
+.quick_search_form {
+	float: right;
+	margin: -5px 3px 0 0;
+}
+
+/* jQuery Tokeninput plugin */
+div.input ul.token-input-list-facebook {
+	width: 97%;
+	border: 1px solid #9db0bc;
+	padding: 2px 4px 0;
+	-moz-box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
+	-webkit-box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
+	box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
+}
+@media screen and (-webkit-min-device-pixel-ratio:0) { /* Safari & Chrome only */
+	div.input ul.token-input-list-facebook {
+		margin-left: 2px;
+	}
+}
+div#ffield_item_tags ul.token-input-list-facebook {
+	width: 100%;
+}
+#itemform_adv_props ul.token-input-list-facebook {
+	width: 100%;
+	padding-right: 0;
+}
+
+/* Statuses of posts & comments display */
+#styled_content_block .status_draft,
+#styled_content_block .status_review,
+#styled_content_block .status_community,
+#styled_content_block .status_protected,
+#styled_content_block .status_private,
+#styled_content_block .status_published,
+#styled_content_block .status_deprecated,
+#styled_content_block .status_redirected {
+	top: -7px;
+	left: 7px;
+}
+span.note.status_draft span {
+	color: #fff;
+	background-color: #FFCC33;
 }

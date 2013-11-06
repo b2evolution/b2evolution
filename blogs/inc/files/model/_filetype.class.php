@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -111,10 +111,7 @@ class Filetype extends DataObject
 		$this->set_from_Request( 'mimetype' );
 
 		// Icon for the mime type
-		if( param( 'ftyp_icon', 'string', '' ) )
-		{
-			param_check_filename( 'ftyp_icon', T_('Please enter a file name.') );
-		}
+		param( 'ftyp_icon', 'string', '' );
 		$this->set_from_Request( 'icon' );
 
 		// View type
@@ -183,10 +180,10 @@ class Filetype extends DataObject
 		$icon = $this->icon;
 		if( empty($icon) )
 		{ // use default icon
-			$icon = 'default.png';
+			$icon = 'file_unknown';
 		}
 
-		return '<img src="'.$rsc_url.'icons/fileicons/'.$icon.'" alt="" title="'.$this->dget('name', 'htmlattr').'" class="middle" />';
+		return get_icon( $icon, 'imgtag', array( 'alt' => $this->dget('name', 'htmlattr') ) );
 	}
 
 
@@ -210,7 +207,7 @@ class Filetype extends DataObject
 	function is_allowed( $allow_locked = NULL )
 	{
 		global $current_User;
-		if( !is_logged_in() )
+		if( !is_logged_in( false ) )
 		{
 			return $this->allowed == 'any';
 		}
@@ -224,37 +221,8 @@ class Filetype extends DataObject
 
 /*
  * $Log$
- * Revision 1.10  2011/09/04 22:13:15  fplanque
- * copyright 2011
- *
- * Revision 1.9  2011/03/10 14:54:18  efy-asimo
- * Allow file types modification & add m4v file type
- *
- * Revision 1.8  2010/02/08 17:52:18  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.7  2009/10/13 23:06:01  blueyed
- * minor
- *
- * Revision 1.6  2009/10/02 20:34:32  blueyed
- * Improve handling of wrong file extensions for image.
- *  - load_image: if the wrong mimetype gets passed, return error, instead of letting imagecreatefrom* fail
- *  - upload: detect wrong extensions, rename accordingly and add a warning
- *
- * Revision 1.5  2009/09/14 13:04:53  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.4  2009/08/30 17:27:03  fplanque
- * better NULL param handling all over the app
- *
- * Revision 1.3  2009/03/08 23:57:43  fplanque
- * 2009
- *
- * Revision 1.2  2008/01/21 09:35:29  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 10:59:57  fplanque
- * MODULES (refactored MVC)
+ * Revision 1.13  2013/11/06 08:04:08  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -44,8 +44,11 @@ class Userfield extends DataObject
 	var $type = '';
 	var $name = '';
 	var $options = '';
-	var $required = '';
-	var $duplicated = '1';
+	var $required = 'optional';
+	var $duplicated = 'allowed';
+	var $order = '';
+	var $suggest = '1';
+	var $bubbletip = '';
 
 	/**
 	 * Constructor
@@ -66,13 +69,16 @@ class Userfield extends DataObject
 
 		if( $db_row != NULL )
 		{
-			$this->ID            = $db_row->ufdf_ID;
-			$this->group_ID      = $db_row->ufdf_ufgp_ID;
-			$this->type          = $db_row->ufdf_type;
-			$this->name          = $db_row->ufdf_name;
-			$this->options       = $db_row->ufdf_options;
-			$this->required      = $db_row->ufdf_required;
-			$this->duplicated    = $db_row->ufdf_duplicated;
+			$this->ID         = $db_row->ufdf_ID;
+			$this->group_ID   = $db_row->ufdf_ufgp_ID;
+			$this->type       = $db_row->ufdf_type;
+			$this->name       = $db_row->ufdf_name;
+			$this->options    = $db_row->ufdf_options;
+			$this->required   = $db_row->ufdf_required;
+			$this->duplicated = $db_row->ufdf_duplicated;
+			$this->order      = $db_row->ufdf_order;
+			$this->suggest    = $db_row->ufdf_suggest;
+			$this->bubbletip  = $db_row->ufdf_bubbletip;
 		}
 		else
 		{	// Create a new user field:
@@ -98,6 +104,12 @@ class Userfield extends DataObject
 		 );
 	}
 
+
+	/**
+	 * Returns array of possible user field required types
+	 *
+	 * @return array
+	 */
 	function get_requireds()
 	{
 		return array(
@@ -108,6 +120,20 @@ class Userfield extends DataObject
 		 );
 	}
 
+
+	/**
+	 * Returns array of possible user field duplicated types
+	 *
+	 * @return array
+	 */
+	function get_duplicateds()
+	{
+		return array(
+			array( 'value' => 'forbidden', 'label' => T_('Forbidden') ),
+			array( 'value' => 'allowed', 'label' => T_('Allowed') ),
+			array( 'value' => 'list', 'label' => T_('List style') ),
+		 );
+	}
 
 	/**
 	 * Returns array of user field groups
@@ -121,7 +147,27 @@ class Userfield extends DataObject
 		return $DB->get_assoc( '
 			SELECT ufgp_ID, ufgp_name
 			  FROM T_users__fieldgroups
-			 ORDER BY ufgp_ID' );
+			 ORDER BY ufgp_order, ufgp_ID' );
+	}
+
+
+	/**
+	 * Get last order number for current group
+	 * Used in the action add a new field OR move fielddef from other group
+	 *
+	 * @param integer Group ID
+	 * @return integer
+	 */
+	function get_last_order( $group_ID )
+	{
+		global $DB;
+
+		$order = $DB->get_var( '
+			SELECT MAX( ufdf_order )
+			  FROM T_users__fielddefs
+			 WHERE ufdf_ufgp_ID = '.$DB->quote( $group_ID ) );
+
+		return $order + 1;
 	}
 
 
@@ -132,13 +178,6 @@ class Userfield extends DataObject
 	 */
 	function load_from_Request()
 	{
-		// get new ID
-		if( param( 'new_ufdf_ID', 'string', NULL ) !== NULL )
-		{
-			param_check_number( 'new_ufdf_ID', T_('ID must be a number.'), true );
-			$this->set_from_Request( 'ID', 'new_ufdf_ID' );
-		}
-
 		// Group
 		param_string_not_empty( 'ufdf_ufgp_ID', T_('Please select a group.') );
 		$this->set_from_Request( 'ufgp_ID' );
@@ -153,7 +192,7 @@ class Userfield extends DataObject
 
 		// Options
 		if( param( 'ufdf_type', 'string' ) == 'list' )
-		{
+		{	// Save 'Options' only for Field type == 'Option list'
 			$ufdf_options = explode( "\n", param( 'ufdf_options', 'text' ) );
 			if( count( $ufdf_options ) < 2 )
 			{	// We don't want save an option list with one item
@@ -163,12 +202,29 @@ class Userfield extends DataObject
 		}
 
 		// Required
-		param_string_not_empty( 'ufdf_required', T_('Please select Hidden, Optional, Recommended or Required.') );
+		param_string_not_empty( 'ufdf_required', 'Please select Hidden, Optional, Recommended or Required.' );
 		$this->set_from_Request( 'required' );
 
 		// Duplicated
-		param( 'ufdf_duplicated', 'integer', 0 );
+		param_string_not_empty( 'ufdf_duplicated', 'Please select Forbidden, Allowed or List style.' );
 		$this->set_from_Request( 'duplicated' );
+
+		// Order
+		if( $this->group_ID != $this->ufgp_ID )
+		{	// Group is changing, set order as last
+			$this->set( 'order', $this->get_last_order( $this->ufgp_ID ) );
+		}
+
+		// Suggest
+		if( param( 'ufdf_type', 'string' ) == 'word' )
+		{ // Save 'Suggest values' only for Field type == 'Single word'
+			param( 'ufdf_suggest', 'integer', 0 );
+			$this->set_from_Request( 'suggest' );
+		}
+
+		// Bubbletip
+		param( 'ufdf_bubbletip', 'text', '' );
+		$this->set_from_Request( 'bubbletip' );
 
 		return ! param_errors_detected();
 	}

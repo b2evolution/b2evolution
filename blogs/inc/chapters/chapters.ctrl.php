@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -32,15 +32,6 @@ else
 {
 	$action = 'nil';
 }
-
-/**
- * Delete restrictions
- */
-$delete_restrictions = array(
-		array( 'table'=>'T_categories', 'fk'=>'cat_parent_ID', 'msg'=>T_('%d sub categories') ),
-		array( 'table'=>'T_items__item', 'fk'=>'post_main_cat_ID', 'msg'=>T_('%d posts within category through main cat') ),
-		array( 'table'=>'T_postcats', 'fk'=>'postcat_cat_ID', 'msg'=>T_('%d posts within category through extra cat') ),
-	);
 
 $restrict_title = T_('Cannot delete category');	 //&laquo;%s&raquo;
 
@@ -118,6 +109,29 @@ if( !empty( $locked_IDs )
 	$action = 'list';
 }
 
+// Check that action request is not a CSRF hacked request and user has permission for the action
+switch( $action )
+{
+	case 'create':
+	case 'update':
+	case 'delete':
+	case 'make_default':
+	case 'set_meta':
+	case 'unset_meta':
+	case 'lock':
+	case 'unlock':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'element' );
+		/* NO BREAK */
+	case 'new':
+	case 'move':
+	case 'edit':
+		if( ! $permission_to_edit )
+		{
+			debug_die( 'No permission to edit' );
+		}
+		break;
+}
 
 /**
  * Perform action:
@@ -126,11 +140,6 @@ switch( $action )
 {
 	case 'new':
 		// New action
-
-		if( ! $permission_to_edit )
-		{
-			debug_die( 'No permission to edit' );
-		}
 
 		$edited_GenericCategory = & $GenericCategoryCache->new_obj( NULL, $subset_ID );
 		$edited_GenericCategory->blog_ID = $edited_Blog->ID;
@@ -159,11 +168,6 @@ switch( $action )
 		// Make sure we got an ID:
 		param( $GenericCategoryCache->dbIDname, 'integer', true );
 
-		if( ! $permission_to_edit )
-		{
-			debug_die( 'No permission to edit' );
-		}
-
 		// Get the page number we come from:
 		$previous_page = param( 'results'.$GenericCategoryCache->dbprefix.'page', 'integer', 1, true );
 
@@ -172,14 +176,6 @@ switch( $action )
 
 	case 'create':
 		// Insert new element...:
-
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'element' );
-
-		if( ! $permission_to_edit )
-		{
-			debug_die( 'No permission to edit' );
-		}
 
 		$edited_GenericCategory = & $GenericCategoryCache->new_obj( NULL, $subset_ID );
 
@@ -196,8 +192,20 @@ switch( $action )
 				// We want to highlight the edited object on next list display:
 				$Session->set( 'fadeout_array', array($edited_GenericCategory->ID) );
 
+				if( param( 'redirect_page', 'string', '' ) == 'manual' )
+				{ // Redirect to manual pages
+					$redirect_to = $admin_url.'?ctrl=items&blog='.$blog.'&tab=manual';
+					if( !empty( $edited_GenericCategory->parent_ID ) )
+					{ // Open parent category to display new created category
+						$redirect_to .= '&cat_ID='.$edited_GenericCategory->parent_ID;
+					}
+				}
+				else
+				{ // Redirect to chapters list
+					$redirect_to = $admin_url.'?ctrl=chapters&blog='.$blog;
+				}
 				// Redirect so that a reload doesn't write to the DB twice:
-				header_redirect( '?ctrl=chapters&blog='.$blog, 303 ); // Will EXIT
+				header_redirect( $redirect_to, 303 ); // Will EXIT
 				// We have EXITed already at this point!!
 			}
 		}
@@ -207,15 +215,7 @@ switch( $action )
 	case 'update':
 		// Make sure we got an ID:
 
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'element' );
-
 		param( $GenericCategoryCache->dbIDname, 'integer', true );
-
-		if( ! $permission_to_edit )
-		{
-			debug_die( 'No permission to edit' );
-		}
 
 		// LOAD FORM DATA:
 		if( $edited_GenericCategory->load_from_Request() )
@@ -229,11 +229,22 @@ switch( $action )
 			$result_fadeout[$edited_GenericCategory->dbIDname][] = $edited_GenericCategory->ID;
 
 			// We want to highlight the edited object on next list display:
- 			$Session->set( 'fadeout_array', array($edited_GenericCategory->ID));
+			$Session->set( 'fadeout_array', array($edited_GenericCategory->ID));
 
-			$action = 'list';
+			if( param( 'redirect_page', 'string', '' ) == 'manual' )
+			{ // Redirect to manual pages
+				$redirect_to = $admin_url.'?ctrl=items&blog='.$blog.'&tab=manual';
+				if( !empty( $edited_GenericCategory->parent_ID ) )
+				{ // Open parent category to display new created category
+					$redirect_to .= '&cat_ID='.$edited_GenericCategory->parent_ID;
+				}
+			}
+			else
+			{ // Redirect to chapters list
+				$redirect_to = $admin_url.'?ctrl=chapters&blog='.$blog;
+			}
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=chapters&blog='.$blog, 303 ); // Will EXIT
+			header_redirect( $redirect_to, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		else
@@ -249,8 +260,8 @@ switch( $action )
 		$Session->assert_received_crumb( 'element' );
 
 		// EXTENSION
- 		if( ! $Settings->get('allow_moving_chapters') )
- 		{
+		if( ! $Settings->get('allow_moving_chapters') )
+		{
 			debug_die( 'Moving of chapters is disabled' );
 		}
 
@@ -258,14 +269,14 @@ switch( $action )
 		param( $GenericCategoryCache->dbIDname, 'integer', true );
 
 		// Control permission to edit source blog:
-   	$edited_Blog = & $edited_GenericCategory->get_Blog();
+		$edited_Blog = & $edited_GenericCategory->get_Blog();
 		if( ! $current_User->check_perm( 'blog_cats', '', false, $edited_Blog->ID ) )
 		{
 			debug_die( 'No permission to edit source collection.' );
 			/* die */
 		}
 
- 		// Control permission to edit destination blog:
+		// Control permission to edit destination blog:
 		param( 'cat_coll_ID', 'integer', true );
 		if( ! $current_User->check_perm( 'blog_cats', '', false, $cat_coll_ID ) )
 		{
@@ -299,29 +310,32 @@ switch( $action )
 	case 'delete':
 		// Delete entry:
 
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'element' );
-
 		param( $GenericCategoryCache->dbIDname, 'integer', true );
-
-		if( ! $permission_to_edit )
-		{
-			debug_die( 'No permission to edit' );
-		}
-
-		// Set restrictions for element
-		$edited_GenericCategory->delete_restrictions = $delete_restrictions;
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
+			$parent_ID = $edited_GenericCategory->parent_ID;
 			$msg = sprintf( T_('Element &laquo;%s&raquo; deleted.'), $edited_GenericCategory->dget( 'name' ) );
 			$GenericCategoryCache->dbdelete_by_ID( $edited_GenericCategory->ID );
 			unset($edited_GenericCategory);
 			forget_param( $GenericCategoryCache->dbIDname );
 			$Messages->add( $msg, 'success' );
-			$action = 'list';
+
+			if( param( 'redirect_page', 'string', '' ) == 'manual' )
+			{ // Redirect to manual pages
+				$redirect_to = $admin_url.'?ctrl=items&blog='.$blog.'&tab=manual';
+				if( !empty( $parent_ID ) )
+				{ // Open parent category to display new created category
+					$redirect_to .= '&cat_ID='.$parent_ID;
+				}
+			}
+			else
+			{ // Redirect to chapters list
+				$redirect_to = $admin_url.'?ctrl=chapters&blog='.$blog;
+			}
+
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=chapters&blog='.$blog, 303 ); // Will EXIT
+			header_redirect( $redirect_to, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		else
@@ -337,17 +351,91 @@ switch( $action )
 		break;
 
 	case 'make_default':
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'element' );
-
-		if( ! $permission_to_edit )
-		{
-			debug_die( 'No permission to edit' );
-		}
+		// Make category as default
 
 		$edited_Blog->set_setting( 'default_cat_ID', $edited_GenericCategory->ID );
 		$edited_Blog->dbsave();
+		break;
 
+	case 'set_meta':
+		// Make category as meta category
+
+		// Start serializable transaction because a category can be meta only if it has no posts
+		$DB->begin( 'SERIALIZABLE' );
+
+		// Category can be set as meta if it has no posts
+		$result = !$edited_GenericCategory->has_posts();
+		$edited_GenericCategory->set( 'meta', '1' );
+
+		// Save category
+		if( $result && $edited_GenericCategory->dbsave() )
+		{ // Category has no posts and it was saved successful
+			$Messages->add( sprintf( T_('The category &laquo;%s&raquo; was made as meta category.'), $edited_GenericCategory->dget('name') ), 'success' );
+			$DB->commit();
+		}
+		else
+		{
+			$Messages->add( sprintf( T_('The category &laquo;%s&raquo; cannot be set as meta category. You must remove the posts it contains first.'), $edited_GenericCategory->dget('name') ) );
+			$DB->rollback();
+		}
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=chapters&blog='.$blog, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
+
+	case 'unset_meta':
+		// Revert to simple category
+
+		$edited_GenericCategory->set( 'meta', '0' );
+		if( $edited_GenericCategory->dbsave() )
+		{
+			$Messages->add( sprintf( T_('The category &laquo;%s&raquo; was reverted from meta category.'), $edited_GenericCategory->dget('name') ), 'success' );
+		}
+		else
+		{
+			$Messages->add( sprintf( T_('The category &laquo;%s&raquo; couldn\'t be reverted from meta category.'), $edited_GenericCategory->dget('name') ), 'error' );
+		}
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=chapters&blog='.$blog, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
+
+	case 'lock':
+		// Lock category
+
+		$edited_GenericCategory->set( 'lock', '1' );
+		if( $edited_GenericCategory->dbsave() )
+		{
+			$Messages->add( sprintf( T_('The category &laquo;%s&raquo; was locked.'), $edited_GenericCategory->dget('name') ), 'success' );
+		}
+		else
+		{
+			$Messages->add( sprintf( T_('The category &laquo;%s&raquo; couldn\t be locked.'), $edited_GenericCategory->dget('name') ), 'error' );
+		}
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=chapters&blog='.$blog, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
+
+	case 'unlock':
+		// Unlock category
+
+		$edited_GenericCategory->set( 'lock', '0' );
+		if( $edited_GenericCategory->dbsave() )
+		{
+			$Messages->add( sprintf( T_('The category &laquo;%s&raquo; was unlocked.'), $edited_GenericCategory->dget('name') ), 'success' );
+		}
+		else
+		{
+			$Messages->add( sprintf( T_('The category &laquo;%s&raquo; couldn\t be unlocked.'), $edited_GenericCategory->dget('name') ), 'error' );
+		}
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=chapters&blog='.$blog, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
 		break;
 }
 
@@ -413,6 +501,8 @@ switch( $action )
 		// Begin payload block:
 		$AdminUI->disp_payload_begin();
 
+		param( 'redirect_page', 'string', '', true );
+
 		if( $action == 'delete' )
 		{	// We need to ask for confirmation:
 			$edited_GenericCategory->confirm_delete(
@@ -474,64 +564,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.24  2011/09/05 15:12:22  sam2kb
- * minor
+ * Revision 1.26  2013/11/06 08:03:57  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.23  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.22  2011/01/02 02:20:25  sam2kb
- * typo: explicitely => explicitly
- *
- * Revision 1.21  2010/02/08 17:52:06  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.20  2010/01/13 22:09:44  fplanque
- * normalized
- *
- * Revision 1.19  2010/01/13 19:19:41  efy-yury
- * update cahpters: crumbs, fadeouts, redirect, action_icon
- *
- * Revision 1.18  2010/01/03 12:03:18  fplanque
- * More crumbs...
- *
- * Revision 1.17  2009/12/20 22:12:16  fplanque
- * doc
- *
- * Revision 1.16  2009/12/18 23:32:30  blueyed
- * Typos, trans todo nuked
- *
- * Revision 1.15  2009/12/12 01:13:08  fplanque
- * A little progress on breadcrumbs on menu structures alltogether...
- *
- * Revision 1.14  2009/09/14 11:26:19  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.13  2009/09/05 13:51:11  efy-maxim
- * pass correct Blog_ID in categories
- *
- * Revision 1.12  2009/08/30 19:54:25  fplanque
- * less translation messgaes for infrequent errors
- *
- * Revision 1.11  2009/05/17 18:09:09  tblue246
- * Update POT file
- *
- * Revision 1.10  2009/04/21 20:52:49  blueyed
- * trans comment
- *
- * Revision 1.9  2009/03/08 23:57:41  fplanque
- * 2009
- *
- * Revision 1.8  2009/01/28 22:34:21  fplanque
- * Default cat for each blog can now be chosen explicitly
- *
- * Revision 1.7  2009/01/28 21:23:23  fplanque
- * Manual ordering of categories
- *
- * Revision 1.6  2008/01/21 09:35:26  fplanque
- * (c) 2008
- *
- * Revision 1.5  2008/01/05 02:28:17  fplanque
- * enhanced blog selector (bloglist_buttons)
  */
 ?>

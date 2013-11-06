@@ -22,11 +22,11 @@ class auto_p_plugin extends Plugin
 	var $code = 'b2WPAutP';
 	var $name = 'Auto P';
 	var $priority = 70;
-	var $version = '3.3';
-	var $apply_rendering = 'opt-in';
+	var $version = '5.0.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
+	var $help_url = 'http://b2evolution.net/man/technical-reference/renderer-plugins/auto-p-plugin';
 	var $number_of_installs = 1;
 
 	/**
@@ -52,7 +52,7 @@ class auto_p_plugin extends Plugin
 	function PluginInit( & $params )
 	{
 		$this->short_desc = T_('Automatic &lt;P&gt; and &lt;BR&gt; tags');
-		$this->long_desc = T_('This renderer will automatically detect paragraphs on double line-breaks. and mark them with appropriate HTML &lt;P&gt; tags.<br />
+		$this->long_desc = T_('This renderer will automatically detect paragraphs on double line-breaks and mark them with appropriate HTML &lt;P&gt; tags.<br />
 			Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 	}
 
@@ -108,11 +108,43 @@ class auto_p_plugin extends Plugin
 		$content = '';
 		for( $i = 0; $i < count($content_parts); $i = $i+2 )
 		{
-			$content .= $this->handle_blocks( $content_parts[$i] );
+			/*
+			yura: If it is used to render outside code/pre tags it closes a <p> tag before each <code>/<pre> block and again open new <p> after that.
+			      So it looks as blocks <code>/<pre> is contained in separate <p>, and the line is broken.
+			      Probably we should forgot about preventing this render plugin in <code>/<pre> blocks.
+			if( stristr( $content_parts[$i], '<code' ) !== false || stristr( $content_parts[$i], '<pre' ) !== false )
+			{	// Call handle_blocks() on everything outside code/pre:
+				$content .= callback_on_non_matching_blocks( $content_parts[$i],
+					'~<(code|pre)[^>]*>.*?</\1>~is',
+					array( $this, 'handle_blocks' ) );
+			}
+			else
+			{	// No code/pre blocks, replace on the whole thing
+			*/
+				$content .= $this->handle_blocks( $content_parts[$i] );
+			//}
 			$content .= $content_parts[$i+1];
 		}
 
 		return true;
+	}
+
+
+	/**
+	 * Define here default collection/blog settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::get_coll_setting_definitions()}.
+	 */
+	function get_coll_setting_definitions( & $params )
+	{
+		$default_params = array_merge( $params,
+			array(
+				'default_comment_rendering' => 'stealth',
+				'default_post_rendering' => 'opt-out'
+			)
+		);
+		return parent::get_coll_setting_definitions( $default_params );
 	}
 
 
@@ -548,7 +580,7 @@ class auto_p_plugin extends Plugin
 		while( 1 )
 		{
 			#echo '<hr />loop_text:'; pre_dump( $loop_text );
-			if( preg_match( '~^(.*?)(<\s*(/)?\s*'.$tag.'\s*(/\s*)?>)~is', $loop_text, $after_match ) )
+			if( preg_match( '~^(.*?)(<\s*(/)?\s*'.preg_quote( $tag, '~' ).'\s*(/\s*)?>)~is', $loop_text, $after_match ) )
 			{
 				#pre_dump( 'after_match', $after_match );
 				$text_in_tag .= $after_match[1];
@@ -633,120 +665,8 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
- * Revision 1.47  2011/09/19 17:47:18  fplanque
- * doc
- *
- * Revision 1.45  2010/05/13 02:45:16  blueyed
- * Fix Auto-P plugin for block tags containing a slash, e.g. with SCRIPT@type
- *
- * Revision 1.44  2009/08/01 19:09:47  blueyed
- * auto_p_plugin: BR not allowed in DL, but DD AND DT. Add test.
- *
- * Revision 1.43  2009/07/12 19:35:31  fplanque
- * make rendering opt-in
- *
- * Revision 1.42  2008/01/14 18:08:48  blueyed
- * Add OBJECT to list of block tags (i.e. no P/BR therein)
- *
- * Revision 1.41  2008/01/04 23:14:20  blueyed
- * Fix auto_p_plugin to not pee in the middle of some tags
- *
- * Revision 1.40  2007/07/04 19:59:12  blueyed
- * Auto-P: Do not add BR in html comments, nor wrap it in a P
- *
- * Revision 1.39  2007/07/04 19:52:00  blueyed
- * Auto-P: Do not add BR in SCRIPT, nor wrap it in a paragraph
- *
- * Revision 1.38  2007/05/21 17:44:10  blueyed
- * Auto-P: Fixed adding linebreaks/BR tags directly in OL elements
- *
- * Revision 1.37  2007/04/20 02:53:13  fplanque
- * limited number of installs
- *
- * Revision 1.36  2007/01/17 23:35:58  blueyed
- * Removed obsolete question/todo
- *
- * Revision 1.35  2006/12/26 03:19:12  fplanque
- * assigned a few significant plugin groups
- *
- * Revision 1.34  2006/12/20 13:42:54  blueyed
- * Made Auto-P plugin work again and let it handle also nextpage and noteaser special tags
- *
- * Revision 1.33  2006/12/18 13:31:12  fplanque
- * fixed broken more tag
- *
- * Revision 1.32  2006/12/07 23:13:13  fplanque
- * @var needs to have only one argument: the variable type
- * Otherwise, I can't code!
- *
- * Revision 1.31  2006/11/09 22:19:39  blueyed
- * Fix: split blocks by "<!--more-->" before working on them
- *
- * Revision 1.30  2006/08/26 15:57:39  blueyed
- * Fixed handling of self-closing inline tags in Auto-P
- *
- * Revision 1.29  2006/08/24 01:00:28  fplanque
- * Versioning
- *
- * Revision 1.28  2006/08/21 01:34:04  blueyed
- * Auto-P: BR is not allowed in UL, but LI
- *
- * Revision 1.27  2006/08/21 00:42:29  blueyed
- * Fix for leading and trailing newline in inline tags
- *
- * Revision 1.26  2006/08/20 23:37:46  blueyed
- * Fix: there were no <br /> after inline tags
- *
- * Revision 1.25  2006/08/20 22:41:36  blueyed
- * Fixed Auto-P: "the web is not a type-writer". Split blocks by two or more newlines and do not pee <br/> everywhere.
- *
- * Revision 1.24  2006/08/16 01:13:29  blueyed
- * Auto-P plugin: fix for self-closing block tags
- *
- * Revision 1.23  2006/07/31 22:03:01  blueyed
- * More fixes to the Auto-P plugin
- *
- * Revision 1.22  2006/07/27 21:35:54  blueyed
- * fix
- *
- * Revision 1.21  2006/07/27 21:17:29  blueyed
- * Fixed Auto-P plugin
- *
- * Revision 1.20  2006/07/10 20:19:30  blueyed
- * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
- *
- * Revision 1.19  2006/07/07 21:26:49  blueyed
- * Bumped to 1.9-dev
- *
- * Revision 1.18  2006/07/05 21:41:17  blueyed
- * fixes
- *
- * Revision 1.17  2006/07/05 20:10:17  blueyed
- * Merge/Parse error fixed
- *
- * Revision 1.16  2006/07/05 19:54:02  blueyed
- * Auto-P-plugin: respect newlines to create empty paragraphs
- *
- * Revision 1.15  2006/06/19 19:25:28  blueyed
- * Fixed auto-p plugin: <code> is an inline element
- *
- * Revision 1.14  2006/06/16 21:30:57  fplanque
- * Started clean numbering of plugin versions (feel free do add dots...)
- *
- * Revision 1.13  2006/05/30 19:39:55  fplanque
- * plugin cleanup
- *
- * Revision 1.12  2006/05/22 18:14:16  blueyed
- * Fixed the fixed auto-p-plugin
- *
- * Revision 1.11  2006/05/21 01:42:39  blueyed
- * Fixed Auto-P Plugin
- *
- * Revision 1.10  2006/04/22 01:30:26  blueyed
- * Fix for HR, CODE and FIELDSET by balupton (http://forums.b2evolution.net/viewtopic.php?p=35709#35709)
- *
- * Revision 1.9  2006/04/11 21:22:26  fplanque
- * partial cleanup
+ * Revision 1.49  2013/11/06 08:05:22  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

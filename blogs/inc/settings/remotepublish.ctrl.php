@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -72,9 +72,6 @@ switch( $action )
 				param( 'eblog_subject_prefix', 'string', true );
 				$Settings->set( 'eblog_subject_prefix', $eblog_subject_prefix );
 
-				param( 'eblog_autobr', 'boolean', 0 );
-				$Settings->set( 'eblog_autobr', $eblog_autobr );
-
 				param( 'eblog_body_terminator', 'string', true );
 				$Settings->set( 'eblog_body_terminator', $eblog_body_terminator );
 
@@ -92,6 +89,17 @@ switch( $action )
 
 				param( 'eblog_delete_emails', 'boolean', 0 );
 				$Settings->set( 'eblog_delete_emails', $eblog_delete_emails );
+
+				if( param( 'renderers_displayed', 'integer', 0 ) )
+				{ // use "renderers" value only if it has been displayed (may be empty)
+					global $Plugins;
+					$autoselect_blog = autoselect_blog( 'blog_post_statuses', 'edit' );
+					$BlogCache = & get_BlogCache();
+					$setting_Blog = & $BlogCache->get_by_ID( $autoselect_blog );
+					$renderer_params = array( 'Blog' => & $setting_Blog, 'setting_name' => 'coll_apply_rendering' );
+					$renderers = $Plugins->validate_renderer_list( param( 'eblog_renderers', 'array', array() ), $renderer_params );
+					$Settings->set( 'eblog_renderers', $renderers );
+				}
 				break;
 
 			case 'xmlrpc':
@@ -153,6 +161,7 @@ switch( $action )
 				{
 					if( $action == 'test_2' )
 					{	// Pretend that we're in test mode. DO NOT save this setting!
+						$eblog_saved_test_mode_value = $Settings->get('eblog_test_mode');
 						$Settings->set('eblog_test_mode', 1);
 					}
 
@@ -176,8 +185,8 @@ switch( $action )
 		break;
 }
 
-$AdminUI->breadcrumbpath_init();
-$AdminUI->breadcrumbpath_add( T_('Global settings'), '?ctrl=settings',
+$AdminUI->breadcrumbpath_init( false );
+$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system',
 		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
 $AdminUI->breadcrumbpath_add( T_('Remote publishing'), '?ctrl=remotepublish' );
 
@@ -227,11 +236,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.2  2011/10/18 07:28:12  sam2kb
- * Post by Email fixes
- *
- * Revision 1.1  2011/10/17 20:16:52  sam2kb
- * Post by Email converted into internal scheduled job
+ * Revision 1.4  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

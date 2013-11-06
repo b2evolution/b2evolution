@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -135,32 +135,8 @@ class ItemType extends DataObject
 
 /*
  * $Log$
- * Revision 1.9  2011/09/04 22:13:17  fplanque
- * copyright 2011
- *
- * Revision 1.8  2010/02/08 17:53:16  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.7  2009/12/07 23:59:09  blueyed
- * Punctuation.
- *
- * Revision 1.6  2009/09/29 18:43:58  fplanque
- * doc
- *
- * Revision 1.5  2009/09/25 11:36:44  efy-sergey
- * Replaced "simple list" manager for Post types. Also allow to edit ID for Item types
- *
- * Revision 1.4  2009/09/14 13:17:28  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.3  2009/03/08 23:57:44  fplanque
- * 2009
- *
- * Revision 1.2  2008/01/21 09:35:31  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 11:00:28  fplanque
- * MODULES (refactored MVC)
+ * Revision 1.10  2013/11/06 08:04:15  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

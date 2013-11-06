@@ -4,7 +4,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2007 by Yabba/Scott - {@link http://astonishme.co.uk/contact/}.
  *
  * {@internal License choice
@@ -108,12 +108,12 @@ class am_php_highlighter
 		if( empty( $this->highlight_colours ) )
 		{	// get the users php_ini colours for highlight_string()
 			$this->highlight_colours = array(
-					'highlight_bg' => '<span class="'.ini_get( 'highlight.bg' ),
-					'highlight_comment' => '<span class="'.ini_get( 'highlight.comment' ),
-					'highlight_default' => '<span class="'.ini_get( 'highlight.default' ),
-					'highlight_html' => '<span class="'.ini_get( 'highlight.html' ),
-					'highlight_keyword' => '<span class="'.ini_get( 'highlight.keyword' ),
-					'highlight_string' => '<span class="'.ini_get( 'highlight.string' ),
+					'highlight_bg' => '<span class="#FFFFFF',
+					'highlight_comment' => '<span class="#FF8000',
+					'highlight_default' => '<span class="#0000BB',
+					'highlight_html' => '<span class="#000000',
+					'highlight_keyword' => '<span class="#007700',
+					'highlight_string' => '<span class="#DD0000',
 				);
 		}
 		// lets sort out the code and highlighting
@@ -135,7 +135,7 @@ class am_php_highlighter
 			// top code with < ?php & to ensure highlight occurs
 			highlight_string( '<?php'."\n"
 			// convert relevant entities back for highlighting
-			.str_replace( array( '&lt;', '&gt;', '&amp;' ), array( '<', '>', '&' ),
+			.str_replace( array( '&lt;', '&gt;', '&amp;', '&quot;' ), array( '<', '>', '&', '"' ),
 			// get rid of empty start/end lines, and add */ to the end to overcome highlight_string() bug with unterminated comments
 			 trim( $block ) )."\n".'*/', true)
 			) ) ) ), '<br />' )
@@ -162,41 +162,8 @@ class am_php_highlighter
 
 /*
  * $Log$
- * Revision 1.12  2011/09/04 22:13:23  fplanque
- * copyright 2011
- *
- * Revision 1.11  2010/02/08 17:56:01  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.10  2009/03/08 23:57:51  fplanque
- * 2009
- *
- * Revision 1.9  2009/01/25 23:13:55  blueyed
- * Fix CVS log section, which is not phpdoc
- *
- * Revision 1.8  2008/01/21 09:35:42  fplanque
- * (c) 2008
- *
- * Revision 1.7  2007/12/26 17:34:25  fplanque
- * no message
- *
- * Revision 1.6  2007/06/26 02:40:54  fplanque
- * security checks
- *
- * Revision 1.5  2007/06/20 21:33:23  blueyed
- * fixed doc
- *
- * Revision 1.4  2007/06/20 19:16:36  blueyed
- * Fixed doc
- *
- * Revision 1.3  2007/06/17 13:28:22  blueyed
- * Fixed doc
- *
- * Revision 1.2  2007/05/04 20:43:08  fplanque
- * MFB
- *
- * Revision 1.1.2.3  2007/04/23 12:00:36  yabs
- * removed "extend Plugins"
+ * Revision 1.14  2013/11/06 08:05:22  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

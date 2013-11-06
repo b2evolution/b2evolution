@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2013 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -40,7 +40,7 @@ param( 'display_mode', 'string' );
 
 if( $display_mode != 'js' )
 {
-	$AdminUI->set_path( 'tools', 'antispam' );
+	$AdminUI->set_path( 'options', 'antispam' );
 }
 else
 {	// This is an Ajax response
@@ -56,6 +56,7 @@ param( 'filteron', 'string', '', true );
 param( 'filter', 'array', array() );
 
 $tab3 = param( 'tab3', 'string', '', true );
+$tool = param( 'tool', 'string', '', true );
 
 if( isset($filter['off']) )
 {
@@ -65,6 +66,19 @@ if( isset($filter['off']) )
 
 // Check permission:
 $current_User->check_perm( 'spamblacklist', 'view', true );
+
+
+if( param( 'iprange_ID', 'integer', '', true) )
+{	// Load IP Range object
+	load_class( 'antispam/model/_iprange.class.php', 'IPRange' );
+	$IPRangeCache = & get_IPRangeCache();
+	if( ( $edited_IPRange = & $IPRangeCache->get_by_ID( $iprange_ID, false ) ) === false )
+	{	// We could not find the goal to edit:
+		unset( $edited_IPRange );
+		forget_param( 'iprange_ID' );
+		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('IP Range') ), 'error' );
+	}
+}
 
 switch( $action )
 {
@@ -77,9 +91,16 @@ switch( $action )
 
 		$keyword = evo_substr( $keyword, 0, 80 );
 		param( 'delhits', 'integer', 0 );
-		param( 'deldraft', 'integer', 0 );
-		param( 'delpublished', 'integer', 0 );
-		param( 'deldeprecated', 'integer', 0 );
+		$all_statuses = get_visibility_statuses( 'keys', array( 'trash', 'redirected' ) );
+		$delstatuses = array();
+		foreach( $all_statuses as $status )
+		{ // collect which comments should be delteded
+			if( param( 'del'.$status, 'integer', 0 ) )
+			{ // matching comments with this status should be deleted
+				$delstatuses[] = $status;
+			}
+		}
+		$delcomments = count( $delstatuses );
 		param( 'blacklist_locally', 'integer', 0 );
 		param( 'report', 'integer', 0 );
 
@@ -100,10 +121,9 @@ switch( $action )
 			$Messages->add( sprintf( T_('Deleted %d logged hits matching &laquo;%s&raquo;.'), $r, htmlspecialchars($keyword) ), 'success' );
 		}
 
-		$delcomments = $deldraft || $delpublished || $deldeprecated;
 		if( $delcomments )
 		{ // select banned comments
-			$del_condition = blog_restrict( $deldraft, $delpublished, $deldeprecated );
+			$del_condition = blog_restrict( $delstatuses );
 			$keyword_cond = '(comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
 							OR comment_author_email LIKE '.$DB->quote('%'.$keyword.'%').'
 							OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
@@ -329,12 +349,111 @@ switch( $action )
 		}
 		$Messages->add( sprintf( T_('Deleted %d logged hits'), $rows_affected ), 'success' );
 		break;
+
+	case 'iprange_create':
+		// Create new IP Range...
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'iprange' );
+
+		// Check permission:
+		$current_User->check_perm( 'spamblacklist', 'edit', true );
+
+		$edited_IPRange = new IPRange();
+
+		// load data from request
+		if( $edited_IPRange->load_from_Request() )
+		{	// We could load data from form without errors:
+			// Insert in DB:
+			$edited_IPRange->dbinsert();
+			$Messages->add( T_('New IP Range created.'), 'success' );
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=antispam&tab3=ipranges', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+		$action = 'iprange_new';
+		break;
+
+	case 'iprange_update':
+		// Update IP Range...
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'iprange' );
+
+		// Check permission:
+		$current_User->check_perm( 'spamblacklist', 'edit', true );
+
+		// Make sure we got an iprange_ID:
+		param( 'iprange_ID', 'integer', true );
+
+		// load data from request
+		if( $edited_IPRange->load_from_Request() )
+		{	// We could load data from form without errors:
+			// Update IP Range in DB:
+			$edited_IPRange->dbupdate();
+			$Messages->add( T_('IP Range updated.'), 'success' );
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=antispam&tab3=ipranges', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+		$action = 'iprange_edit';
+		break;
+
+	case 'iprange_delete':
+		// Delete IP Range...
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'iprange' );
+
+		// Check permission:
+		$current_User->check_perm( 'spamblacklist', 'edit', true );
+
+		// Make sure we got an iprange_ID:
+		param( 'iprange_ID', 'integer', true );
+
+		if( $edited_IPRange->dbdelete() )
+		{
+			$Messages->add( T_('IP Range deleted.'), 'success' );
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=antispam&tab3=ipranges', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+		break;
+
+	case 'bankruptcy_delete':
+		// Delete ALL comments from selected blogs
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'antispam' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		$bankruptcy_blogs_IDs = param( 'bankruptcy_blogs', 'array', array() );
+
+		if( empty( $bankruptcy_blogs ) )
+		{
+			$Messages->add( T_('Please select at least one blog.'), 'error' );
+		}
+
+		if( !param_errors_detected() )
+		{ // Try to obtain some serious time to do some serious processing (15 minutes)
+			set_max_execution_time( 900 );
+			// Turn off the output buffering to do the correct work of the function flush()
+			@ini_set( 'output_buffering', 'off' );
+			// Set this to start deleting in the template file
+			$delete_bankruptcy_blogs = true;
+		}
+		break;
 }
 
 if( $display_mode != 'js')
 {
 	$AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-	$AdminUI->breadcrumbpath_add( T_('Tools'), '?ctrl=crontab' );
+	$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system' );
 	$AdminUI->breadcrumbpath_add( T_('Antispam'), '?ctrl=antispam' );
 
 	if( empty($tab3) )
@@ -353,6 +472,19 @@ if( $display_mode != 'js')
 
 		case 'blacklist':
 			$AdminUI->breadcrumbpath_add( T_('Blacklist'), '?ctrl=antispam' );
+			break;
+
+		case 'ipranges':
+			if( empty( $action ) )
+			{	// View a list of IP ranges
+				require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+			}
+			elseif( ! $current_User->check_perm( 'spamblacklist', 'edit' ) )
+			{	// Check permission to create/edit IP range
+				$Messages->add( T_('You have no permission to edit IP range!'), 'error' );
+				$action = '';
+			}
+			$AdminUI->breadcrumbpath_add( T_('IP Ranges'), '?ctrl=antispam&amp;tab3='.$tab3 );
 			break;
 	}
 
@@ -378,7 +510,38 @@ switch( $tab3 )
 		break;
 
 	case 'tools':
-		$AdminUI->disp_view( 'antispam/views/_antispam_tools.view.php' );
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		switch( $tool )
+		{
+			case 'bankruptcy':
+				$comment_status = param( 'comment_status', 'string', 'draft' );
+				$AdminUI->disp_view( 'antispam/views/_antispam_tools_bankruptcy.view.php' );
+				break;
+
+			default:
+				$AdminUI->disp_view( 'antispam/views/_antispam_tools.view.php' );
+				break;
+		}
+		break;
+
+	case 'ipranges':
+		switch( $action )
+		{
+			case 'iprange_new':
+				$edited_IPRange = new IPRange();
+				$AdminUI->disp_view( 'antispam/views/_antispam_ipranges.form.php' );
+				break;
+
+			case 'iprange_edit':
+				$AdminUI->disp_view( 'antispam/views/_antispam_ipranges.form.php' );
+				break;
+
+			default:	// View list of the IP Ranges
+				$AdminUI->disp_view( 'antispam/views/_antispam_ipranges.view.php' );
+				break;
+		}
 		break;
 
 	case 'blacklist':
@@ -406,85 +569,8 @@ if( $display_mode != 'js')
 
 /*
  * $Log$
- * Revision 1.2  2011/09/05 14:20:21  sam2kb
- * minor / version update
+ * Revision 1.4  2013/11/06 08:03:48  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.22  2011/09/05 14:17:26  sam2kb
- * Refactor antispam controller
- *
- * Revision 1.21  2011/02/10 23:07:21  fplanque
- * minor/doc
- *
- * Revision 1.20  2010/11/25 15:16:34  efy-asimo
- * refactor $Messages
- *
- * Revision 1.19  2010/10/18 15:29:35  efy-asimo
- * ajax calls charset - fix
- *
- * Revision 1.18  2010/06/01 11:33:19  efy-asimo
- * Split blog_comments advanced permission (published, deprecated, draft)
- * Use this new permissions (Antispam tool,when edit/delete comments)
- *
- * Revision 1.17  2010/05/14 08:16:04  efy-asimo
- * antispam tool ban form - create seperate table for different comments
- *
- * Revision 1.16  2010/03/05 09:22:25  efy-asimo
- * modify refresh comments visual effect on dashboard
- *
- * Revision 1.15  2010/03/03 15:59:46  fplanque
- * minor/doc
- *
- * Revision 1.14  2010/03/02 11:59:11  efy-asimo
- * refresh icon for dashboard comment list
- *
- * Revision 1.13  2010/02/28 23:38:39  fplanque
- * minor changes
- *
- * Revision 1.12  2010/02/26 08:34:33  efy-asimo
- * dashboard -> ban icon should be javascripted task
- *
- * Revision 1.11  2010/02/08 17:52:06  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.10  2010/01/17 04:14:45  fplanque
- * minor / fixes
- *
- * Revision 1.9  2010/01/16 14:27:03  efy-yury
- * crumbs, fadeouts, redirect, action_icon
- *
- * Revision 1.8  2010/01/03 17:56:05  fplanque
- * crumbs & stuff
- *
- * Revision 1.7  2009/12/06 22:55:22  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.6  2009/07/08 02:38:55  sam2kb
- * Replaced strlen & substr with their mbstring wrappers evo_strlen & evo_substr when needed
- *
- * Revision 1.5  2009/03/08 23:57:41  fplanque
- * 2009
- *
- * Revision 1.4  2008/04/04 17:02:24  fplanque
- * cleanup of global settings
- *
- * Revision 1.3  2008/01/21 09:35:25  fplanque
- * (c) 2008
- *
- * Revision 1.2  2007/09/04 14:56:19  fplanque
- * antispam cleanup
- *
- * Revision 1.1  2007/06/25 10:59:23  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.10  2007/04/26 00:11:14  fplanque
- * (c) 2007
- *
- * Revision 1.9  2007/03/01 02:42:03  fplanque
- * prevent miserable failure when trying to delete heavy spam.
- *
- * Revision 1.8  2006/12/07 21:16:55  fplanque
- * killed templates
  */
 ?>

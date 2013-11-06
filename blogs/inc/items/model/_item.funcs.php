@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -46,44 +46,47 @@ load_class( 'items/model/_itemlist.class.php', 'ItemList2' );
  */
 function init_MainList( $items_nb_limit )
 {
-	global $MainList;
-	global $Blog;
+	global $MainList, $Blog, $Plugins;
 	global $preview;
 	global $disp;
 	global $postIDlist, $postIDarray;
 
-	$MainList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $items_nb_limit );	// COPY (FUNC)
-
-	if( ! $preview )
+	// Allow plugins to prepare their own MainList object
+	if( ! $Plugins->trigger_event_first_true('InitMainList', array( 'MainList' => &$MainList, 'limit' => $items_nb_limit ) ) )
 	{
-		if( $disp == 'page' )
-		{	// Get  pages:
-			$MainList->set_default_filters( array(
-					'types' => '1000',		// pages
-					// 'types' => '1000,1500,1520,1530,1570',		// pages and intros (intros should normally never be called)
-				) );
+		$MainList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $items_nb_limit );	// COPY (FUNC)
+
+		if( ! $preview )
+		{
+			if( $disp == 'page' )
+			{	// Get pages:
+				$MainList->set_default_filters( array(
+						'types' => '1000',		// pages
+					) );
+			}
+
+			// else: we are in posts mode
+
+			// pre_dump( $MainList->default_filters );
+			$MainList->load_from_Request( false );
+			// pre_dump( $MainList->filters );
+			// echo '<br/>'.( $MainList->is_filtered() ? 'filtered' : 'NOT filtered' );
+			// $MainList->dump_active_filters();
+
+			// Run the query:
+			$MainList->query();
+
+			// Old style globals for category.funcs:
+			$postIDlist = $MainList->get_page_ID_list();
+			$postIDarray = $MainList->get_page_ID_array();
 		}
-		// else: we are either in single or in posts mode
+		else
+		{	// We want to preview a single post, we are going to fake a lot of things...
+			$MainList->preview_from_request();
 
-		// pre_dump( $MainList->default_filters );
-		$MainList->load_from_Request( false );
-		// pre_dump( $MainList->filters );
-		// echo '<br/>'.( $MainList->is_filtered() ? 'filtered' : 'NOT filtered' );
-		// $MainList->dump_active_filters();
-
-		// Run the query:
-		$MainList->query();
-
-		// Old style globals for category.funcs:
-		$postIDlist = $MainList->get_page_ID_list();
-		$postIDarray = $MainList->get_page_ID_array();
-	}
-	else
-	{	// We want to preview a single post, we are going to fake a lot of things...
-		$MainList->preview_from_request();
-
-		// Legacy for the category display
-		$cat_array = array();
+			// Legacy for the category display
+			$cat_array = array();
+		}
 	}
 
 	param( 'more', 'integer', 0, true );
@@ -96,7 +99,7 @@ function init_MainList( $items_nb_limit )
 
 /**
  * Prepare the 'In-skin editing'.
- * 
+ *
  */
 function init_inskin_editing()
 {
@@ -109,8 +112,13 @@ function init_inskin_editing()
 		header_redirect( $admin_url.'?ctrl=items&action=new&blog='.$Blog->ID );
 	}
 
+	$tab_switch_params = 'blog='.$Blog->ID;
+
 	// Post ID, go from $_GET when we edit post from Front-office
 	$post_ID = param( 'p', 'integer', 0 );
+
+	// Post ID, go from $_GET when we copy post from Front-office
+	$copy_post_ID = param( 'cp', 'integer', 0 );
 
 	if( $post_ID > 0 )
 	{	// Edit post
@@ -124,29 +132,67 @@ function init_inskin_editing()
 		$post_extracats = postcats_get_byID( $post_ID );
 
 		$redirect_to = url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID, '&' );
+		$tab_switch_params .= '&amp;p='.$edited_Item->ID;
 	}
-	else if( empty( $action ) )
+	elseif( $copy_post_ID > 0 )
+	{	// Copy post
+		global $localtimenow;
+		$action = 'new';
+
+		$ItemCache = & get_ItemCache ();
+		$edited_Item = $ItemCache->get_by_ID ( $copy_post_ID );
+
+		$edited_Item_Blog = $edited_Item->get_Blog();
+		$item_status = $edited_Item_Blog->get_allowed_item_status();
+
+		$edited_Item->set( 'status', $item_status );
+		$edited_Item->set( 'dateset', 0 );	// Date not explicitly set yet
+		$edited_Item->set( 'issue_date', date( 'Y-m-d H:i:s', $localtimenow ) );
+
+		modules_call_method( 'constructor_item', array( 'Item' => & $edited_Item ) );
+
+		check_categories_nosave ( $post_category, $post_extracats );
+
+		$redirect_to = url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID, '&' );
+	}
+	elseif( empty( $action ) )
 	{	// Create new post (from Front-office)
 		$action = 'new';
 
 		load_class( 'items/model/_item.class.php', 'Item' );
 		$edited_Item = new Item();
-		$edited_Item->set( 'status', 'published' );
-		$edited_Item->set( 'hideteaser', 0 );
+		$def_status = get_highest_publish_status( 'post', $Blog->ID, false );
+		$edited_Item->set( 'status', $def_status );
 		check_categories_nosave ( $post_category, $post_extracats );
 		$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
+
+		// Set default locations from current user
+		$edited_Item->set_creator_location( 'country' );
+		$edited_Item->set_creator_location( 'region' );
+		$edited_Item->set_creator_location( 'subregion' );
+		$edited_Item->set_creator_location( 'city' );
+
+		// Set object params:
+		$edited_Item->load_from_Request( /* editing? */ false, /* creating? */ true );
 
 		$redirect_to = url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID, '&' );
 	}
 
 	// Used in the edit form
-	$item_title = $edited_Item->title;
-	$item_content = $edited_Item->content;
+	$item_title = htmlspecialchars_decode( $edited_Item->title );
+	$item_content = htmlspecialchars_decode( $edited_Item->content );
+
+	// Format content for editing, if we were not already in editing...
+	$Plugins_admin = & get_Plugins_admin();
+	$edited_Item->load_Blog();
+	$params = array( 'object_type' => 'Item', 'object_Blog' => & $edited_Item->Blog );
+	$Plugins_admin->unfilter_contents( $item_title /* by ref */, $item_content /* by ref */, $edited_Item->get_renderers_validated(), $params );
+
 	$item_tags = implode( ', ', $edited_Item->get_tags() );
 
 	// Get an url for a link 'Go to advanced edit screen'
-	$mode_editing = param( 'mode_editing', 'string', 'simple' );
-	$entries = get_item_edit_modes( $Blog->ID, $action, $admin_url, 'blog='.$Blog->ID );
+	$mode_editing = param( 'mode_editing', 'string', 'expert' );
+	$entries = get_item_edit_modes( $Blog->ID, $action, $admin_url, $tab_switch_params );
 	$advanced_edit_link = $entries[$mode_editing];
 
 	$form_action = get_samedomain_htsrv_url().'item_edit.php';
@@ -160,64 +206,84 @@ function init_inskin_editing()
 function & get_featured_Item()
 {
 	global $Blog;
-	global $disp, $disp_detail, $MainList;
-	global $featured_displayed_item_ID;
+	global $disp, $disp_detail, $MainList, $FeaturedList;
+	global $featured_displayed_item_IDs;
 
 	if( $disp != 'posts' || !isset($MainList) )
-	{	// If we're not displaying postS, don't display a feature post on top!
+	{	// If we're not currently displaying posts, no need to try & display a featured/intro post on top!
 		$Item = NULL;
 		return $Item;
 	}
 
-	$FeaturedList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), 1 );
+	if( !isset( $FeaturedList ) )
+	{	// Don't repeat if we've done this already -- Initialize the featured list only first time this function is called in a skin:
 
-	$FeaturedList->set_default_filters( $MainList->filters );
+		// Get ready to obtain 1 post only:
+		$FeaturedList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), 1 );
 
-	if( ! $MainList->is_filtered() )
-	{	// Restrict to 'main' and 'all' intros:
-		$restrict_to_types = '1500,1600';
-	}
-	else
-	{	// Filtered...
-		// echo $disp_detail;
-		switch( $disp_detail )
-		{
-			case 'posts-cat':
-				$restrict_to_types = '1520,1570,1600';
-				break;
-			case 'posts-tag':
-				$restrict_to_types = '1530,1570,1600';
-				break;
-			default:
-				$restrict_to_types = '1570,1600';
+		// Set default filters for the current page:
+		$FeaturedList->set_default_filters( $MainList->filters );
+
+		if( ! $MainList->is_filtered() )
+		{	// This is not a filtered page, so we are on the home page.
+			// The competing intro-* types are: 'main' and 'all':
+			// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
+			$restrict_to_types = '1500,1600';
+		}
+		else
+		{	// We are on a filtered... it means a category page or sth like this...
+			// echo $disp_detail;
+			switch( $disp_detail )
+			{
+				case 'posts-cat':
+				case 'posts-subcat':
+					// The competing intro-* types are: 'cat' and 'all':
+					// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
+					$restrict_to_types = '1520,1600';
+					break;
+
+				case 'posts-tag':
+					// The competing intro-* types are: 'tag' and 'all':
+					// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
+					$restrict_to_types = '1530,1600';
+					break;
+
+				default:
+					// The competing intro-* types are: 'sub' and 'all':
+					// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
+					$restrict_to_types = '1570,1600';
+			}
+		}
+
+		$FeaturedList->set_filters( array(
+				'types' => $restrict_to_types,
+			), false /* Do NOT memorize!! */ );
+		// pre_dump( $FeaturedList->filters );
+		// Run the query:
+		$FeaturedList->query();
+
+		if( $FeaturedList->result_num_rows == 0 )
+		{ // No Intro page was found, try to find a featured post instead:
+
+			$FeaturedList->reset();
+
+			$FeaturedList->set_filters( array(
+					'featured' => 1,  // Featured posts only (TODO!)
+					// Types will already be reset to defaults here
+				), false /* Do NOT memorize!! */ );
+
+			// Run the query:
+			$FeaturedList->query();
 		}
 	}
 
-	$FeaturedList->set_filters( array(
-			'types' => $restrict_to_types,
-		), false /* Do NOT memorize!! */ );
-	// pre_dump( $FeaturedList->filters );
-	// Run the query:
-	$FeaturedList->query();
-
-	if( $FeaturedList->result_num_rows == 0 )
-	{ // No Intro page was found, try to find a featured post instead:
-
-		$FeaturedList->reset();
-
-		$FeaturedList->set_filters( array(
-				'featured' => 1,  // Featured posts only (TODO!)
-				// Types will already be reset to defaults here
-			), false /* Do NOT memorize!! */ );
-
-		// Run the query:
-		$FeaturedList->query();
-	}
-
+	// Get next featured item
 	$Item = $FeaturedList->get_item();
 
-	// Memorize that ID so that it can later be filtered out normal display:
-	$featured_displayed_item_ID = $Item ? $Item->ID : NULL;
+	if( $Item )
+	{	// Memorize that ID so that it can later be filtered out normal display:
+		$featured_displayed_item_IDs[] = $Item->ID;
+	}
 
 	return $Item;
 }
@@ -271,7 +337,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 		$urltitle = 'title';
 	}
 
-	// Leave only first 5 words in order to get a shorter URL 
+	// Leave only first 5 words in order to get a shorter URL
 	// (which is generally accepted as a better practice)
 	// User can manually enter a very long URL if he wants
 	$slug_changed = param( 'slug_changed' );
@@ -477,127 +543,117 @@ function bpost_count_words( $str )
 
 
 /**
- * Construct the where clause to limit retrieved posts on their status
+ * Construct the where clause to limit retrieved posts/comment on their status
+ *
+ * TODO: asimo> would be good to move this function to an items and comments common file
  *
  * @param Array statuses of posts we want to get
+ * @param string post/comment table db prefix
+ * @param integer blog ID
+ * @param string permission prefix: 'blog_post!' or 'blog_comment!'
+ * @param boolean filter statuses by the current user perm and current page, by default is true. It should be false only e.g. when we have to count comments awaiting moderation. 
+ * @return string statuses where condition 
  */
-function statuses_where_clause( $show_statuses = '', $dbprefix = 'post_', $req_blog = NULL )
+function statuses_where_clause( $show_statuses = NULL, $dbprefix = 'post_', $req_blog = NULL, $perm_prefix = 'blog_post!', $filter_by_perm = true )
 {
 	global $current_User, $blog;
 
-	if( is_null($req_blog ) )
-	{
+	if( is_null( $req_blog ) )
+	{ // try to init request blog if it was not set
 		global $blog;
 		$req_blog = $blog;
 	}
 
-	if( empty($show_statuses) )
-		$show_statuses = array( 'published', 'protected', 'private' );
+	if( empty( $show_statuses ) )
+	{ // use in-skin statuses if show_statuses is empty
+		$show_statuses = get_inskin_statuses();
+	}
 
-	$where = ' ( ';
-	$or = '';
+	// init where clauses array
+	$where = array();
 
-	if( ($key = array_search( 'private', $show_statuses )) !== false )
-	{ // Special handling for Private status:
-		unset( $show_statuses[$key] );
-		if( is_logged_in() )
-		{ // We need to be logged in to have a chance to see this:
-			$where .= $or.' ( '.$dbprefix."status = 'private' AND ".$dbprefix.'creator_user_ID = '.$current_User->ID.' ) ';
-			$or = ' OR ';
+	// Set additional "where" clause from modules method
+	$ret = modules_call_method( 'get_item_statuses_where_clause', array( 'blog_ID' => $req_blog, 'statuses' => $show_statuses ) );
+	if( !empty( $ret ) )
+	{
+		$where[] = $ret;
+	}
+
+	if( $filter_by_perm )
+	{ // filter allowed statuses by the current User perms and by the current page ( front or back office )
+		$allowed_statuses = array();
+		$is_logged_in = is_logged_in( false );
+		$creator_coll_name = ( $dbprefix == 'post_' ) ? $dbprefix.'creator_user_ID' : $dbprefix.'author_ID';
+		// Iterate through all statuses and set allowed to true only if the corresponding status is allowed in case of any post/comments
+		// If the status is not allowed to show, but exists further conditions which may allow it, then set the condition.
+		foreach( $show_statuses as $key => $status )
+		{
+			switch( $status )
+			{
+				case 'community': // It is always allowed for logged in users
+					$allowed = $is_logged_in;
+					break;
+
+				case 'protected': // It is always allowed for members
+					$allowed = ( $is_logged_in && ( $current_User->check_perm( 'blog_ismember', 1, false, $req_blog ) ) );
+					break;
+
+				case 'private': // It is allowed for users who has global 'editall' permission but only on back-office
+					$allowed = ( is_admin_page() && $current_User->check_perm( 'blogs', 'editall' ) );
+					if( !$allowed && $is_logged_in && $current_User->check_perm( $perm_prefix.'private', 'create', false, $req_blog ) )
+					{ // Own private posts/comments are allowed if user can create private posts/comments
+						$where[] = ' ( '.$dbprefix."status = 'private' AND ".$creator_coll_name.' = '.$current_User->ID.' ) ';
+					}
+					break;
+
+				case 'review': // It is allowed for users who have permission to create comments with 'review' status and have at least 'lt' posts/comments edit perm
+					$allowed = ( $is_logged_in && $current_User->check_perm( $perm_prefix.'review', 'moderate', false, $req_blog ) );
+					if( !$allowed && $is_logged_in && $current_User->check_perm( $perm_prefix.'review', 'create', false, $req_blog ) )
+					{ // Own posts/comments with 'review' status are allowed if user can create posts/comments with 'review' status
+						$where[] = ' ( '.$dbprefix."status = 'review' AND ".$creator_coll_name.' = '.$current_User->ID.' ) ';
+					}
+					break;
+
+				case 'draft': // In back-office it is always allowed for users who may create posts/commetns with 'draft' status
+					$allowed = ( is_admin_page() && $current_User->check_perm( $perm_prefix.'draft', 'create', false, $req_blog ) );
+					if( !$allowed && $is_logged_in && $current_User->check_perm( $perm_prefix.'draft', 'create', false, $req_blog ) )
+					{ // In front-office only authors may see their own draft posts/comments, but only if the have permission to create draft posts/comments
+						$where[] = ' ( '.$dbprefix."status = 'draft' AND ".$creator_coll_name.' = '.$current_User->ID.' ) ';
+					}
+					break;
+
+				case 'deprecated': // In back-office it is always allowed for users who may create posts/comments with 'deprecated' status
+					$allowed = ( is_admin_page() && $current_User->check_perm( $perm_prefix.'deprecated', 'create', false, $req_blog ) );
+					// In front-office it is never allowed
+					break;
+
+				case 'published': // Published post/comments are always allowed
+				default: // Allow other statuses by default
+					$allowed = true;
+			}
+
+			if( $allowed )
+			{ // All posts/comments with this status can be displayed in the request blog for the current User ( or for anonymous )
+				$allowed_statuses[] = $status;
+			}
 		}
 	}
-
-	if( $key = array_search( 'protected', $show_statuses ) )
-	{ // Special handling for Protected status:
-		if( (!is_logged_in())
-			|| ($req_blog == 0) // No blog specified (ONgsb)
-			|| (!$current_User->check_perm( 'blog_ismember', 1, false, $req_blog )) )
-		{ // we are not allowed to see this if we are not a member of the current blog:
-			unset( $show_statuses[$key] );
-		}
+	else
+	{ // we are not filtering so all status are allowed
+		$allowed_statuses = $show_statuses;
 	}
 
-	// Remaining statuses:
-	$other_statuses = '';
-	$sep = '';
-	foreach( $show_statuses as $other_status )
-	{
-		$other_statuses .= $sep.'\''.$other_status.'\'';
-		$sep = ',';
-	}
-	if( strlen( $other_statuses ) )
-	{
-		$where .= $or.$dbprefix.'status IN ('. $other_statuses .') ';
+	if( count( $allowed_statuses ) )
+	{ // add allowed statuses condition
+		$where[] = $dbprefix.'status IN ( \''.implode( '\',\'', $allowed_statuses ).'\' )';
 	}
 
-	$where .= ') ';
+	$where = count( $where ) > 0 ? ' ( '.implode( ' OR ', $where ).' ) ' : '';
 
 	// echo $where;
 	return $where;
 }
 
-
-/**
- * Compose screen: display attachment iframe
- *
- * @param Form
- * @param boolean
- * @param Item
- * @param Blog
- */
-function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog, $iframe_name = NULL )
-{
-	global $admin_url, $dispatcher;
-	global $current_User;
-	global $Settings;
-
-	if( ! isset($GLOBALS['files_Module']) ) 
-		return;
-
-	$fieldset_title = T_('Images &amp; Attachments').get_manual_link('post_attachments_fieldset');
-
-	if( $creating )
-	{	// Creating new post
-		$fieldset_title .= ' - <a id="title_file_add" href="#" >'.get_icon( 'folder', 'imgtag' ).' '.T_('Add/Link files').'</a> <span class="note">(popup)</span>';
-
-		$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_createlinks' ) );
-		$Form->hidden( 'is_attachments', 'false' );
-
-		echo '<table cellspacing="0" cellpadding="0"><tr><td>';
-		$Form->submit( array( 'actionArray[create_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & start attaching files'), 'SaveEditButton' ) );
-		echo '</td></tr></table>';
-
-		$Form->end_fieldset();
-	}
-	else
-	{ // Editing post
-
-		if( $iframe_name == NULL )
-		{
-			$iframe_name = 'attach_'.generate_random_key( 16 );
-		}
-
-		$fieldset_title .= ' - <a href="'.$admin_url.'?ctrl=items&amp;action=edit_links&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;item_ID='.$edited_Item->ID
-					.'" target="'.$iframe_name.'">'.get_icon( 'refresh', 'imgtag' ).' '.T_('Refresh').'</a>';
-
-		if( $current_User->check_perm( 'files', 'view', false, $Blog->ID )
-			&& $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
-		{	// Check that we have permission to edit item:
-
-			$fieldset_title .= ' - <a href="'.$dispatcher.'?ctrl=files&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID
-						.'" onclick="return pop_up_window( \''.$dispatcher.'?ctrl=files&amp;mode=upload&amp;iframe_name='
-						.$iframe_name.'&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID.'\', \'fileman_upload\', 1000 )">'
-						.get_icon( 'folder', 'imgtag' ).' '.T_('Add/Link files').'</a> <span class="note">(popup)</span>';
-		}
-
-		$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_links' ) );
-
-		echo '<iframe src="'.$admin_url.'?ctrl=items&amp;action=edit_links&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;item_ID='.$edited_Item->ID
-					.'" name="'.$iframe_name.'" width="100%" marginwidth="0" height="160" marginheight="0" align="top" scrolling="auto" frameborder="0" id="attachmentframe"></iframe>';
-
-		$Form->end_fieldset();
-	}
-}
 
 /**
  * Get post category setting
@@ -648,8 +704,9 @@ function get_newcategory_link()
  * @param Form
  * @param boolean true: use form fields, false: display only
  * @param boolean true: show links for add new category & manual
+ * @param array Params
  */
-function cat_select( $Form, $form_fields = true, $show_title_links = true )
+function cat_select( $Form, $form_fields = true, $show_title_links = true, $params = array() )
 {
 	global $cache_categories, $blog, $current_blog_ID, $current_User, $edited_Item, $cat_select_form_fields;
 	global $cat_sel_total_count, $dispatcher;
@@ -660,13 +717,25 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true )
 		return;
 	}
 
+	$params = array_merge( array(
+			'categories_name' => T_('Categories'),
+		), $params );
+
+	$cat = param( 'cat', 'integer', 0 );
+	if( empty( $edited_Item->ID ) && !empty( $cat ) )
+	{	// If the GET param 'cat' is defined we should preselect the category for new created post
+		global $post_extracats;
+		$post_extracats = array( $cat );
+		$edited_Item->main_cat_ID = $cat;
+	}
+
 	if( $show_title_links )
 	{	// Use in Back-office
-		$fieldset_title = get_newcategory_link().T_('Categories').get_manual_link('item_categories_fieldset');
+		$fieldset_title = get_newcategory_link().$params['categories_name'].get_manual_link('item_categories_fieldset');
 	}
 	else
 	{
-		$fieldset_title = T_('Categories');
+		$fieldset_title = $params['categories_name'];
 	}
 
 	$Form->begin_fieldset( $fieldset_title, array( 'class'=>'extracats', 'id' => 'itemform_categories' ) );
@@ -681,7 +750,7 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true )
 	$r .= '<table cellspacing="0" class="catselect">';
 	if( get_post_cat_setting($blog) == 3 )
 	{ // Main + Extra cats option is set, display header
-		$r .= cat_select_header();
+		$r .= cat_select_header( $params );
 	}
 
 	if( get_allow_cross_posting() >= 2 ||
@@ -727,7 +796,7 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true )
 
 	echo $r;
 
-	if( isset($blog) && get_allow_cross_posting() ) 
+	if( isset($blog) && get_allow_cross_posting() )
 	{
 		echo '<script type="text/javascript">jQuery.getScript("'.$rsc_url.'js/jquery/jquery.scrollto.js", function () {
 			jQuery("#itemform_categories").scrollTo( "#catselect_blog'.$blog.'" );
@@ -738,17 +807,25 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true )
 
 /**
  * Header for {@link cat_select()}
+ *
+ * @param array Params
  */
-function cat_select_header()
+function cat_select_header( $params = array() )
 {
+	$params = array_merge( array(
+			'category_name'        => T_('Category'),
+			'category_main_title'  => T_('Main category'),
+			'category_extra_title' => T_('Additional category'),
+		), $params );
+
 	// main cat header
-	$r = '<thead><tr><th class="selector catsel_main" title="'.T_('Main category').'">'.T_('Main').'</th>';
+	$r = '<thead><tr><th class="selector catsel_main" title="'.$params['category_main_title'].'">'.T_('Main').'</th>';
 
 	// extra cat header
-	$r .= '<th class="selector catsel_extra" title="'.T_('Additional category').'">'.T_('Extra').'</th>';
+	$r .= '<th class="selector catsel_extra" title="'.$params['category_extra_title'].'">'.T_('Extra').'</th>';
 
 	// category header
-	$r .= '<th class="catsel_name">'.T_('Category').'</th><!--[if IE 7]><th width="1"><!-- for IE7 --></th><![endif]--></tr></thead>';
+	$r .= '<th class="catsel_name">'.$params['category_name'].'</th><!--[if IE 7]><th width="1"><!-- for IE7 --></th><![endif]--></tr></thead>';
 
 	return $r;
 }
@@ -766,20 +843,27 @@ function cat_select_before_first( $parent_cat_ID, $level )
  */
 function cat_select_before_each( $cat_ID, $level, $total_count )
 { // callback to display sublist element
-	global $current_blog_ID, $blog, $post_extracats, $edited_Item;
+	global $current_blog_ID, $blog, $post_extracats, $edited_Item, $current_User;
 	global $creating, $cat_select_level, $cat_select_form_fields;
 	global $cat_sel_total_count;
 
-	$cat_sel_total_count++;
-
 	$ChapterCache = & get_ChapterCache();
 	$thisChapter = $ChapterCache->get_by_ID($cat_ID);
+
+	if( $thisChapter->lock && !$current_User->check_perm( 'blog_cats', '', false, $current_blog_ID ) )
+	{	// This chapter is locked and current user has no permission to edit the categories of this blog
+		return;
+	}
+
+	$cat_sel_total_count++;
+
 	$r = "\n".'<tr class="'.( $total_count%2 ? 'odd' : 'even' ).'">';
 
 	// RADIO for main cat:
 	if( get_post_cat_setting($blog) != 2 )
 	{ // if no "Multiple categories per post" option is set display radio
-		if( ($current_blog_ID == $blog) || (get_allow_cross_posting( $blog ) >= 2) )
+		if( !$thisChapter->meta
+			&& ( ($current_blog_ID == $blog) || (get_allow_cross_posting( $blog ) >= 2) ) )
 		{ // This is current blog or we allow moving posts accross blogs
 			if( $cat_select_form_fields )
 			{	// We want a form field:
@@ -806,8 +890,9 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 	// CHECKBOX:
 	if( get_post_cat_setting( $blog ) >= 2 )
 	{ // We allow multiple categories or main + extra cat,  display checkbox:
-		if( ($current_blog_ID == $blog) || ( get_allow_cross_posting( $blog ) % 2 == 1 )
-			|| ( ( get_allow_cross_posting( $blog ) == 2 ) && ( get_post_cat_setting( $blog ) == 2 ) ) )
+		if( !$thisChapter->meta
+			&& ( ($current_blog_ID == $blog) || ( get_allow_cross_posting( $blog ) % 2 == 1 )
+				|| ( ( get_allow_cross_posting( $blog ) == 2 ) && ( get_post_cat_setting( $blog ) == 2 ) ) ) )
 		{ // This is the current blog or we allow cross posting (select extra cat from another blog)
 			if( $cat_select_form_fields )
 			{	// We want a form field:
@@ -832,15 +917,29 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 		}
 	}
 
+	$additional_style = '';
+
+	if( $thisChapter->meta )
+	{	// Change style of meta category
+		$additional_style .= 'font-weight:bold;';
+	}
+
+	$chapter_lock_status = '';
+	if( $thisChapter->lock )
+	{	// Add icon for locked category
+		$chapter_lock_status = '<span style="padding-left:5px">'.get_icon( 'file_not_allowed', 'imgtag', array( 'title' => T_('Locked')) ).'</span>';
+	}
+
 	$BlogCache = & get_BlogCache();
 	$r .= '<td class="catsel_name"><label'
 				.' for="'.( get_post_cat_setting( $blog ) == 2
 					? 'sel_extracat_'.$cat_ID
 					: 'sel_maincat_'.$cat_ID ).'"'
-				.' style="padding-left:'.($level-1).'em;">'
-				.htmlspecialchars($thisChapter->name).'</label>'
+				.' style="padding-left:'.($level-1).'em;'.$additional_style.'">'
+				.$thisChapter->name.'</label>'
+				.$chapter_lock_status
 				.' <a href="'.htmlspecialchars($thisChapter->get_permanent_url()).'" title="'.htmlspecialchars(T_('View category in blog.')).'">'
-				.'&nbsp;&raquo;&nbsp; ' // TODO: dh> provide an icon instead? // fp> maybe the A(dmin)/B(log) icon from the toolbar? And also use it for permalinks to posts?
+				.'&nbsp;&raquo;&nbsp;' // TODO: dh> provide an icon instead? // fp> maybe the A(dmin)/B(log) icon from the toolbar? And also use it for permalinks to posts?
 				.'</a></td>'
 				.'<!--[if IE 7]><td width="1"><!-- for IE7 --></td><![endif]--></tr>'
 				."\n";
@@ -930,39 +1029,58 @@ function cat_select_new()
 
 /**
  * Used by the items & the comments controllers
+ *
+ * @param boolean TRUE - to display third level tabs, FALSE - to hide them(used in the edit mode)
  */
-function attach_browse_tabs()
+function attach_browse_tabs( $display_tabs3 = true )
 {
 	global $AdminUI, $Blog, $current_User, $dispatcher, $ItemTypeCache;
-	$AdminUI->add_menu_entries(
-			'items',
-			array(
-					'full' => array(
-						'text' => T_('All'),
-						'href' => $dispatcher.'?ctrl=items&amp;tab=full&amp;filter=restore&amp;blog='.$Blog->ID,
-						),
-					'list' => array(
-						'text' => T_('Posts'),
-						'href' => $dispatcher.'?ctrl=items&amp;tab=list&amp;filter=restore&amp;blog='.$Blog->ID,
-						),
-					'pages' => array(
-						'text' => T_('Pages'),
-						'href' => $dispatcher.'?ctrl=items&amp;tab=pages&amp;filter=restore&amp;blog='.$Blog->ID,
-						),
-					'intros' => array(
-						'text' => T_('Intros'),
-						'href' => $dispatcher.'?ctrl=items&amp;tab=intros&amp;filter=restore&amp;blog='.$Blog->ID,
-						),
-					'podcasts' => array(
-						'text' => T_('Podcasts'),
-						'href' => $dispatcher.'?ctrl=items&amp;tab=podcasts&amp;filter=restore&amp;blog='.$Blog->ID,
-						),
-					'links' => array(
-						'text' => T_('Sidebar links'),
-						'href' => $dispatcher.'?ctrl=items&amp;tab=links&amp;filter=restore&amp;blog='.$Blog->ID,
-						),
-				)
+
+	$menu_entries = array(
+			'full' => array(
+				'text' => T_('All'),
+				'href' => $dispatcher.'?ctrl=items&amp;tab=full&amp;filter=restore&amp;blog='.$Blog->ID,
+				),
 		);
+
+	if( $Blog->get( 'type' ) == 'manual' )
+	{ // Display this tab only for manual blogs
+		$menu_entries = array_merge( $menu_entries, array(
+				'manual' => array(
+					'text' => T_('Manual Pages'),
+					'href' => $dispatcher.'?ctrl=items&amp;tab=manual&amp;filter=restore&amp;blog='.$Blog->ID,
+					),
+			) );
+	}
+
+	$menu_entries = array_merge( $menu_entries, array(
+			'list' => array(
+				'text' => T_('Posts'),
+				'href' => $dispatcher.'?ctrl=items&amp;tab=list&amp;filter=restore&amp;blog='.$Blog->ID,
+				),
+			'pages' => array(
+				'text' => T_('Pages'),
+				'href' => $dispatcher.'?ctrl=items&amp;tab=pages&amp;filter=restore&amp;blog='.$Blog->ID,
+				),
+			'intros' => array(
+				'text' => T_('Intros'),
+				'href' => $dispatcher.'?ctrl=items&amp;tab=intros&amp;filter=restore&amp;blog='.$Blog->ID,
+				),
+			'podcasts' => array(
+				'text' => T_('Podcasts'),
+				'href' => $dispatcher.'?ctrl=items&amp;tab=podcasts&amp;filter=restore&amp;blog='.$Blog->ID,
+				),
+			'links' => array(
+				'text' => T_('Sidebar links'),
+				'href' => $dispatcher.'?ctrl=items&amp;tab=links&amp;filter=restore&amp;blog='.$Blog->ID,
+				),
+			'ads' => array(
+				'text' => T_('Advertisements'),
+				'href' => $dispatcher.'?ctrl=items&amp;tab=ads&amp;filter=restore&amp;blog='.$Blog->ID,
+				),
+		) );
+
+	$AdminUI->add_menu_entries( 'items', $menu_entries );
 
 	/* fp> Custom types should be variations of normal posts by default
 	  I am ok with giving extra tabs to SOME of them but then the
@@ -972,7 +1090,7 @@ function attach_browse_tabs()
 		Note: you can also make a select list "group with: posts|pages|etc...|other|own tab"
 
 		$ItemTypeCache = & get_ItemTypeCache();
-		$default_post_types = array(1,1000,1500,1520,1530,1570,1600,2000,3000);
+		$default_post_types = array(1,1000,1500,1520,1530,1570,1600,2000,3000,4000,5000);
 		$items_types = array_values( array_keys( $ItemTypeCache->get_option_array() ) );
 		// a tab for custom types
 		if ( array_diff($items_types,$default_post_types) )
@@ -1014,22 +1132,25 @@ function attach_browse_tabs()
 					)
 			);
 
-		$AdminUI->add_menu_entries( array('items','comments'), array(
-				'fullview' => array(
-					'text' => T_('Full text view'),
-					'href' => $dispatcher.'?ctrl=comments&amp;tab3=fullview&amp;filter=restore'
-					),
-				'listview' => array(
-					'text' => T_('List view'),
-					'href' => $dispatcher.'?ctrl=comments&amp;tab3=listview&amp;filter=restore'
-					),
-				)
-			);
+		if( $display_tabs3 )
+		{
+			$AdminUI->add_menu_entries( array('items','comments'), array(
+					'fullview' => array(
+						'text' => T_('Full text view'),
+						'href' => $dispatcher.'?ctrl=comments&amp;tab3=fullview&amp;filter=restore'
+						),
+					'listview' => array(
+						'text' => T_('List view'),
+						'href' => $dispatcher.'?ctrl=comments&amp;tab3=listview&amp;filter=restore'
+						),
+					)
+				);
+		}
 	}
 
 
 	// What perms do we have?
-	$coll_settings_perm = $current_User->check_perm( 'blog_properties', 'any', false, $Blog->ID );
+	$coll_settings_perm = $current_User->check_perm( 'options', 'view', false, $Blog->ID );
 	$settings_url = '?ctrl=itemtypes&amp;tab=settings&amp;tab3=types';
 	if( $coll_chapters_perm = $current_User->check_perm( 'blog_cats', '', false, $Blog->ID ) )
 	{
@@ -1082,44 +1203,38 @@ function attach_browse_tabs()
 
 /**
  * Allow to select status/visibility
+ *
+ * @param object Form
+ * @param string Status
+ * @param boolean Mass create
+ * @param array labels of statuses
  */
-function visibility_select( & $Form, $post_status, $mass_create = false )
+function visibility_select( & $Form, $post_status, $mass_create = false, $labels = array(), $field_label = '' )
 {
+	$labels = array_merge( get_visibility_statuses('notes-array'), $labels );
+
 	global $current_User, $Blog;
+
+	$mass_create_statuses = array( 'redirected' );
 
 	$sharing_options = array();
 
-	if( $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID ) )
+	foreach( $labels as $status => $label )
 	{
-		$sharing_options[] = array( 'published', T_('Published').' <span class="notes">'.T_('(Public)').'</span>' );
+		if( $current_User->check_perm( 'blog_post!'.$status, 'create', false, $Blog->ID ) &&
+		    ( !in_array( $status, $mass_create_statuses ) || !$mass_create ) )
+		{
+			$sharing_options[] = array( $status, $label[0].' <span class="notes">'.$label[1].'</span>' );
+		}
 	}
 
-	if( $current_User->check_perm( 'blog_post!protected', 'edit', false, $Blog->ID ) )
-	{
-		$sharing_options[] = array( 'protected', T_('Protected').' <span class="notes">'.T_('(Members only)').'</span>' );
+	if( count( $sharing_options ) == 1 )
+	{ // Only one status is available, don't show visibility select
+		$Form->hidden( 'post_status', $sharing_options[0][0] );
+		return;
 	}
 
-	if( $current_User->check_perm( 'blog_post!private', 'edit', false, $Blog->ID ) )
-	{
-		$sharing_options[] = array( 'private', T_('Private').' <span class="notes">'.T_('(You only)').'</span>' );
-	}
-
-	if( $current_User->check_perm( 'blog_post!draft', 'edit', false, $Blog->ID ) )
-	{
-		$sharing_options[] = array( 'draft', T_('Draft').' <span class="notes">'.T_('(Not published!)').'</span>' );
-	}
-
-	if( $current_User->check_perm( 'blog_post!deprecated', 'edit', false, $Blog->ID ) )
-	{
-		$sharing_options[] = array( 'deprecated', T_('Deprecated').' <span class="notes">'.T_('(Not published!)').'</span>' );
-	}
-
-	if( !$mass_create && $current_User->check_perm( 'blog_post!redirected', 'edit', false, $Blog->ID ) )
-	{
-		$sharing_options[] = array( 'redirected', T_('Redirected').' <span class="notes">(301)</span>' );
-	}
-
-	$Form->radio( 'post_status', $post_status, $sharing_options, '', true );
+	$Form->radio( 'post_status', $post_status, $sharing_options, $field_label, true );
 }
 
 
@@ -1212,23 +1327,60 @@ function item_link_by_urltitle( $params = array() )
 }
 
 
-function echo_publish_buttons( $Form, $creating, $edited_Item )
+/**
+ * Load new status when the item was published
+ * If the status is invalid then an error message will be added to messages
+ *
+ * @param boolean true if creating new post, false on update
+ * @return string the publish status or an allowed status if the given status was invalid
+ */
+function load_publish_status( $creating = false )
+{
+	global $Messages;
+
+	$publish_status = param( 'publish_status', 'string', '' );
+	if( ! in_array( $publish_status, array( 'published', 'community', 'protected', 'private' ) ) )
+	{ // Publish with the given status doesn't exists "published"
+		if( $creating )
+		{
+			$Messages->add( T_( 'The post has been created but not published because it seems like you wanted to publish with an invalid status.'), 'error' );
+		}
+		else
+		{
+			$Messages->add( T_( 'The post has been updated but not published because it seems like you wanted to publish with an invalid status.'), 'error' );
+		}
+		$publish_status = 'draft';
+	}
+	return $publish_status;
+}
+
+
+function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, $display_preview = false )
 {
 	global $Blog, $current_User;
-	global $next_action; // needs to be passed out for echo_publishnowbutton_js( $action )
+	global $next_action, $highest_publish_status; // needs to be passed out for echo_publishnowbutton_js( $action )
 
 	// ---------- PREVIEW ----------
-	$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
-	$Form->button( array( 'button', '', T_('Preview'), 'PreviewButton', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
+	if( !$inskin || $display_preview )
+	{
+		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
+		$Form->button( array( 'button', '', T_('Preview'), 'PreviewButton', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
+	}
 
 	// ---------- SAVE ----------
 	$next_action = ($creating ? 'create' : 'update');
-	$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton' ) );
+	if( !$inskin )
+	{ // Show Save & Edit only on admin mode
+		$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton' ) );
+	}
 	$Form->submit( array( 'actionArray['.$next_action.']', /* TRANS: This is the value of an input submit button */ T_('Save'), 'SaveButton' ) );
 
-	if( $edited_Item->status == 'draft'
-			&& $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID )	// TODO: if we actually set the primary cat to another blog, we may still get an ugly perm die
-			&& $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+	list( $highest_publish_status, $publish_text ) = get_highest_publish_status( 'post', $Blog->ID );
+	if( !isset( $edited_Item->status ) )
+	{
+		$edited_Item->status = $highest_publish_status;
+	}
+	if( $edited_Item->status != $highest_publish_status )
 	{	// Only allow publishing if in draft mode. Other modes are too special to run the risk of 1 click publication.
 		$publish_style = 'display: inline';
 	}
@@ -1236,9 +1388,10 @@ function echo_publish_buttons( $Form, $creating, $edited_Item )
 	{
 		$publish_style = 'display: none';
 	}
+	$Form->hidden( 'publish_status', $highest_publish_status );
 	$Form->submit( array(
 		'actionArray['.$next_action.'_publish]',
-		/* TRANS: This is the value of an input submit button */ T_('Publish!'),
+		/* TRANS: This is the value of an input submit button */ $publish_text,
 		'SaveButton',
 		'',
 		$publish_style
@@ -1257,7 +1410,7 @@ function echo_attaching_files_button_js( & $iframe_name )
 	$iframe_name = 'attach_'.generate_random_key( 16 );
 	?>
 	<script type="text/javascript">
-			pop_up_window( '<?php echo $dispatcher; ?>?ctrl=files&mode=upload&iframe_name=<?php echo $iframe_name ?>&fm_mode=link_item&item_ID=<?php echo $edited_Item->ID?>', 'fileman_upload', 1000 );
+			pop_up_window( '<?php echo $dispatcher; ?>?ctrl=files&mode=upload&iframe_name=<?php echo $iframe_name ?>&fm_mode=link_object&link_type=item&link_object_ID=<?php echo $edited_Item->ID?>', 'fileman_upload', 1000 );
 	</script>
 	<?php
 }
@@ -1292,7 +1445,7 @@ function echo_link_files_js()
 			jQuery( '#title_file_add' ).click( function()
 			{
 				jQuery( 'input[name=is_attachments]' ).attr("value", "true");
-				jQuery( '#itemform_createlinks input[name=actionArray[create_edit]]' ).click();
+				jQuery( '#itemform_createlinks input[name="actionArray[create_edit]"]' ).click();
 			} );
 	</script>
 	<?php
@@ -1306,14 +1459,15 @@ function echo_link_files_js()
  */
 function echo_publishnowbutton_js()
 {
-	global $next_action;
+	global $next_action, $highest_publish_status;
 	?>
 	<script type="text/javascript">
 		jQuery( '#itemform_visibility input[type=radio]' ).click( function()
 		{
-			var publishnow_btn = jQuery( '.edit_actions input[name=actionArray[<?php echo $next_action; ?>_publish]]' );
+			var publishnow_btn = jQuery( '.edit_actions input[name="actionArray[<?php echo $next_action; ?>_publish]"]' );
+			var public_status = '<?php echo $highest_publish_status; ?>';
 
-			if( this.value != 'draft' )
+			if( this.value == public_status || public_status == 'draft' )
 			{	// Hide the "Publish NOW !" button:
 				publishnow_btn.css( 'display', 'none' );
 			}
@@ -1331,57 +1485,47 @@ function echo_publishnowbutton_js()
  * Output Javascript for tags autocompletion.
  * @todo dh> a more facebook like widget would be: http://plugins.jquery.com/project/facelist
  *           "ListBuilder" is being planned for jQuery UI: http://wiki.jqueryui.com/ListBuilder
+ *
+ * @param array Tags
  */
-function echo_autocomplete_tags()
+function echo_autocomplete_tags( $tags = array() )
 {
 	global $htsrv_url;
 
-	$url_crumb = url_crumb('item');
+	// Initialize an array to pre-fill the tags input
+	$prefilled_tags = array();
+	if( !empty( $tags ) )
+	{
+		foreach( $tags as $tag_name )
+		{
+			$prefilled_tags[] = array( 'id' => $tag_name, 'title' => $tag_name );
+		}
+	}
 
-	echo <<<EOD
+	//echo <<<EOD
+?>
 	<script type="text/javascript">
 	(function($){
-		$(function() {
-			function split(val) {
-				return val.split(/\s*,\s*/);
-			}
-			function extractLast(term) {
-				return split(term).pop();
-			}
-
-			$("#item_tags").autocomplete({
-				source: function(request, response) {
-					$.getJSON("${htsrv_url}async.php?action=get_tags&${url_crumb}", {
-						term: extractLast(request.term)
-					}, response);
-				},
-				search: function() {
-					// custom minLength
-					var term = extractLast(this.value);
-					if (term.length < 1) {
-						return false;
-					}
-				},
-				focus: function() {
-					// prevent value inserted on focus
-					return false;
-				},
-				select: function(event, ui) {
-					var terms = split( this.value );
-					// remove the current input
-					terms.pop();
-					// add the selected item
-					terms.push( ui.item.value );
-					// add placeholder to get the comma-and-space at the end
-					terms.push("");
-					this.value = terms.join(", ");
-					return false;
+		jQuery(function() {
+			jQuery( '#item_tags' ).tokenInput(
+				'<?php echo $htsrv_url.'async.php?action=get_tags' ?>',
+				{
+					theme: 'facebook',
+					queryParam: 'term',
+					propertyToSearch: 'title',
+					tokenValue: 'title',
+					preventDuplicates: true,
+					prePopulate: <?php echo evo_json_encode( $prefilled_tags ) ?>,
+					hintText: '<?php echo TS_('Type in a tag') ?>',
+					noResultsText: '<?php echo TS_('No results') ?>',
+					searchingText: '<?php echo TS_('Searching...') ?>'
 				}
-			});
+			);
 		});
 	})(jQuery);
 	</script>
-EOD;
+<?php
+//EOD;
 }
 
 
@@ -1750,9 +1894,9 @@ function echo_show_comments_changed()
 	<script type="text/javascript">
 		jQuery( '[name |= show_comments]' ).change( function()
 		{
-			var item_id = $('#comments_container').attr('value');
+			var item_id = jQuery('#comments_container').attr('value');
 			if( ! isDefined( item_id) )
-			{ // if item_id is not defined, we have to show all comments from current blog 
+			{ // if item_id is not defined, we have to show all comments from current blog
 				item_id = -1;
 			}
 			refresh_item_comments( item_id, 1 );
@@ -1764,7 +1908,7 @@ function echo_show_comments_changed()
 
 /**
  * Display CommentList with the given filters
- * 
+ *
  * @param int blog
  * @param item item
  * @param array status filters
@@ -1772,8 +1916,7 @@ function echo_show_comments_changed()
  * @param $comment_IDs
  * @param string comment IDs string to exclude from the list
  */
-function echo_item_comments( $blog_ID, $item_ID, $statuses = array( 'draft', 'published', 'deprecated' ),
-	$currentpage = 1, $limit = 20, $comment_IDs = array() )
+function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage = 1, $limit = 20, $comment_IDs = array(), $filterset_name = '' )
 {
 	global $inc_path, $status_list, $Blog, $admin_url;
 
@@ -1781,7 +1924,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = array( 'draft', 'pu
 	$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
 
 	global $CommentList;
-	$CommentList = new CommentList2( $Blog );
+	$CommentList = new CommentList2( $Blog, $limit, 'CommentCache', '', $filterset_name );
 
 	$exlude_ID_list = NULL;
 	if( !empty($comment_IDs) )
@@ -1789,12 +1932,17 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = array( 'draft', 'pu
 		$exlude_ID_list = '-'.implode( ",", $comment_IDs );
 	}
 
-	// if item_ID == -1 then don't use item filter! display all comments from current blog 
+	if( empty( $statuses ) )
+	{
+		$statuses = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
+	}
+
+	// if item_ID == -1 then don't use item filter! display all comments from current blog
 	if( $item_ID == -1 )
 	{
 		$item_ID = NULL;
 	}
-	// set redirect_to 
+	// set redirect_to
 	if( $item_ID != null )
 	{ // redirect to the items full view
 		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&blog='.$blog_ID.'&p='.$item_ID, '&' ) );
@@ -1846,30 +1994,41 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = array( 'draft', 'pu
 
 /**
  * Display a comment corresponding the given comment id
- * 
+ *
  * @param int comment id
  * @param string where to redirect after comment edit
  * @param boolean true to set the new redirect param, false otherwise
  */
 function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 {
-	global $current_User;
+	global $current_User, $localtimenow;
 
 	$CommentCache = & get_CommentCache();
+	/**
+	* @var Comment
+	*/
 	$Comment = $CommentCache->get_by_ID( $comment_ID );
-
-	$is_published = ( $Comment->get( 'status' ) == 'published' );
-
-	$Item = & $Comment->get_Item(); 
+	$Item = & $Comment->get_Item();
 	$Blog = & $Item->get_Blog();
 
-	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) || 
-			$current_User->check_perm( 'blog_own_comments', 'edit', false, $Item ) )
-	{
-		echo '<div id="c'.$comment_ID.'" class="bComment bComment';
-		$Comment->status('raw');
-		echo '">';
+	$is_published = ( $Comment->get( 'status' ) == 'published' );
+	$expiry_delay = $Item->get_setting( 'post_expiry_delay' );
+	$is_expired = ( !empty( $expiry_delay ) && ( ( $localtimenow - mysql2timestamp( $Comment->get( 'date' ) ) ) > $expiry_delay ) );
 
+	echo '<div id="c'.$comment_ID.'" class="bComment bComment';
+	// check if comment is expired
+	if( $is_expired )
+	{ // comment is expired
+		echo 'expired';
+	}
+	else
+	{ // comment is not expired
+		$Comment->status('raw');
+	}
+	echo '">';
+
+	if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
+	{	// User can moderate this comment
 		echo '<div class="bSmallHead">';
 		echo '<div>';
 
@@ -1878,6 +2037,10 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 		echo '<span class="bStatus">';
 		$Comment->status();
 		echo '</span>';
+		$Comment->permanent_link( array(
+				'before' => '<br />',
+				'text'   => '#text#'
+			) );
 		echo '</div>';
 
 		echo '<span class="bDate">';
@@ -1893,12 +2056,20 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 
 		echo '</div>';
 		echo '<div style="padding-top:3px">';
-		$Comment->author_ip( 'IP: <span class="bIP">', '</span> &middot; ' );
+		if( $is_expired )
+		{
+			echo '<div class="bSmallHeadRight">';
+			echo '<span class="bExpired">'.T_('EXPIRED').'</span>';
+			echo '</div>';
+		}
+		$Comment->author_ip( 'IP: <span class="bIP">', '</span> &middot; ', true );
+		$Comment->ip_country( '', ' &middot; ' );
 		$Comment->author_url_with_actions( /*$redirect_to*/'', true, true );
 		echo '</div>';
 		echo '</div>';
 
 		echo '<div class="bCommentContent">';
+		$Comment->status( 'styled' );
 		echo '<div class="bTitle">';
 		echo T_('In response to:')
 				.' <a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$Item->dget('title').'</a>';
@@ -1914,35 +2085,39 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 		echo '</div>';
 
 		echo '<div class="CommentActionsArea">';
-		$Comment->permanent_link( array(
-				'class'    => 'permalink_right'
-			) );
+
+		echo '<div class="floatleft">';
 
 		// Display edit button if current user has the rights:
-		$Comment->edit_link( ' ', ' ', '#', '#', 'ActionButton', '&amp;', $save_context, $redirect_to );
+		$Comment->edit_link( ' ', ' ', get_icon( 'edit' ), '#', 'roundbutton', '&amp;', $save_context, $redirect_to );
 
+		echo '<span class="roundbutton_group">';
 		// Display publish NOW button if current user has the rights:
-		$Comment->publish_link( ' ', ' ', '#', '#', 'PublishButton', '&amp;', $save_context, true, $redirect_to );
+		$link_params = array(
+			'class'        => 'roundbutton_text',
+			'save_context' => $save_context,
+			'ajax_button'  => true,
+			'redirect_to'  => $redirect_to,
+		);
+		$Comment->raise_link( $link_params );
 
 		// Display deprecate button if current user has the rights:
-		$Comment->deprecate_link( ' ', ' ', '#', '#', 'DeleteButton', '&amp;', $save_context, true, $redirect_to );
+		$Comment->lower_link( $link_params );
 
 		// Display delete button if current user has the rights:
-		$Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton', false, '&amp;', $save_context, true );
+		$Comment->delete_link( '', '', '#', '#', 'roundbutton_text', false, '&amp;', $save_context, true, '#', $redirect_to );
+		echo '</span>';
+
+		echo '</div>';
 
 		// Display Spam Voting system
 		$Comment->vote_spam( '', '', '&amp;', $save_context, true );
 
 		echo '<div class="clear"></div>';
 		echo '</div>';
-		echo '</div>';
 	}
 	else
-	{
-		echo '<div id="c'.$comment_ID.'" class="bComment bComment';
-		$Comment->status('raw');
-		echo '">';
-
+	{	// No permissions to moderate of this comment, just preview
 		echo '<div class="bSmallHead">';
 		echo '<div>';
 
@@ -1977,16 +2152,17 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 		}
 
 		echo '<div class="clear"></div>';
-		echo '</div>';
 	}
+
+	echo '</div>'; // end
 }
 
 
 /**
  * Display a page link on item full view
- * 
+ *
  * @param integer the item id
- * @param string link text 
+ * @param string link text
  * @param integer the page number
  */
 function echo_pagenumber( $item_ID, $text, $value )
@@ -1997,29 +2173,80 @@ function echo_pagenumber( $item_ID, $text, $value )
 
 /**
  * Display page links on item full view
- * 
+ *
  * @param integer the item id
  * @param integer current page number
  * @param integer all comments number in the list
+ * @param array Params
  */
-function echo_pages( $item_ID, $currentpage, $comments_number )
+function echo_pages( $item_ID, $currentpage, $comments_number, $params = array() )
 {
-	$comments_per_page = 20;
-	if( ( ( $currentpage - 1 ) * $comments_per_page ) >= $comments_number )
-	{ // current page number is greater then all page number, set current page to the last existing page
-		$currentpage = intval( ( $comments_number - 1 ) / $comments_per_page ) + 1;
+	$params = array_merge( array(
+			'list_span'  => 11, // The number of pages to display for one time
+			'page_size'  => 20, // The number of comments on one page
+			'list_start' => '<div class="results_nav" id="paging">',
+			'list_end'   => '</div>',
+			'prev_text'  => T_('Previous'),
+			'next_text'  => T_('Next'),
+			'pages_text' => '<strong>'.T_('Pages').'</strong>:',
+		), $params );
+
+	if( $comments_number == 0 )
+	{ // No comments
+		return;
 	}
+
+	$total_pages = ceil( $comments_number / $params['page_size'] );
+
+	if( $currentpage > $total_pages )
+	{ // current page number is greater then all page number, set current page to the last existing page
+		$currentpage = $total_pages;
+	}
+
+	// Set first page
+	if( $currentpage <= intval( $params['list_span'] / 2 ) )
+	{ // the current page number is small
+		$first_page = 1;
+	}
+	elseif( $currentpage > $total_pages - intval( $params['list_span'] / 2 ) )
+	{ // the current page number is big
+		$first_page = max( 1, $total_pages - $params['list_span'] + 1 );
+	}
+	else
+	{ // the current page number can be centered
+		$first_page = $currentpage - intval( $params['list_span'] / 2 );
+	}
+
+	// Set last page
+	if( $currentpage > $total_pages - intval( $params['list_span'] / 2 ) )
+	{ // the current page number is big
+		$last_page = $total_pages;
+	}
+	else
+	{
+		$last_page = min( $total_pages, $first_page + $params['list_span'] - 1 );
+	}
+
 	echo '<div id="currentpage" value='.$currentpage.' /></div>';
-	echo '<div class="results_nav" id="paging">';
+	echo $params['list_start'];
 	if( $comments_number > 0 )
 	{
-		echo '<strong>'.T_('Pages').'</strong>:';
+		echo $params['pages_text'];
 		if( $currentpage > 1 )
-		{ // previous link
-			echo_pagenumber( $item_ID, T_('Previous'), $currentpage - 1 );
+		{ // link to previous page
+			echo_pagenumber( $item_ID, $params['prev_text'], $currentpage - 1 );
 		}
-		for( $i = 1; ( ( $i - 1 ) * $comments_per_page ) < $comments_number; $i++ )
-		{
+		if( $first_page > 1 )
+		{ // link to first page
+			echo_pagenumber( $item_ID, '1', '1' );
+		}
+		if( $first_page > 2 )
+		{ // link to previous pages
+			$page_i = ceil( $first_page / 2 );
+			echo_pagenumber( $item_ID, '...', $page_i );
+		}
+		for( $i = $first_page; $i <= $last_page; $i++ )
+		{ // Display list with pages
 			if( $i == $currentpage )
 			{
 				echo ' <strong>'.$i.'</strong>';
@@ -2029,17 +2256,26 @@ function echo_pages( $item_ID, $currentpage, $comments_number )
 				echo_pagenumber( $item_ID, $i, $i );
 			}
 		}
-		if( ( $currentpage * $comments_per_page ) < $comments_number )
-		{ // next link
-			echo_pagenumber( $item_ID, T_('Next'), $currentpage + 1 );
+		if( $last_page < $total_pages - 1 )
+		{ // link to next pages
+			$page_i = $last_page + floor( ( $total_pages - $last_page ) / 2 );
+			echo_pagenumber( $item_ID, '...', $page_i );
+		}
+		if( $last_page < $total_pages )
+		{ // link to last page
+			echo_pagenumber( $item_ID, $total_pages, $total_pages );
+		}
+		if( $currentpage < $total_pages )
+		{ // link to next page
+			echo_pagenumber( $item_ID, $params['next_text'], $currentpage + 1 );
 		}
 	}
-	echo '</div>';
+	echo $params['list_end'];
 }
 
 /**
  * Get item edit modes
- * 
+ *
  * @param integer blog ID
  * @param string action
  * @param string path to admin page
@@ -2048,6 +2284,8 @@ function echo_pages( $item_ID, $currentpage, $comments_number )
  */
 function get_item_edit_modes( $blog_ID, $action, $dispatcher, $tab_switch_params )
 {
+	global $current_User;
+
 	$BlogCache = & get_BlogCache();
 	$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
 
@@ -2055,18 +2293,18 @@ function get_item_edit_modes( $blog_ID, $action, $dispatcher, $tab_switch_params
 	$modes['simple'] = array(
 		'text' => T_('Simple'),
 		'href' => $dispatcher.'?ctrl=items&amp;action='.$action.'&amp;tab=simple&amp;'.$tab_switch_params,
-		'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$dispatcher.'?ctrl=items&amp;tab=simple&amp;blog='.$blog_ID.'\' );',
+		'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$dispatcher.'?ctrl=items&amp;blog='.$blog_ID.'\', null, {tab:\'simple\'} );',
 		// 'name' => 'switch_to_simple_tab_nocheckchanges', // no bozo check
 	);
 	$modes['expert'] = array(
 		'text' => T_('Expert'),
 		'href' => $dispatcher.'?ctrl=items&amp;action='.$action.'&amp;tab=expert&amp;'.$tab_switch_params,
-		'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$dispatcher.'?ctrl=items&amp;tab=expert&amp;blog='.$blog_ID.'\' );',
+		'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$dispatcher.'?ctrl=items&amp;blog='.$blog_ID.'\', null, {tab:\'expert\'} );',
 		// 'name' => 'switch_to_expert_tab_nocheckchanges', // no bozo check
 	);
-	if( $Blog->get_setting( 'in_skin_editing' ) )
-	{	// Show 'In skin' tab if Blog setting 'In-skin editing' is ON
-		$mode_inskin_url = url_add_param( $Blog->get( 'url' ), 'disp=edit' );
+	if( $Blog->get_setting( 'in_skin_editing' ) && ( $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID ) || get_param( 'p' ) > 0 ) )
+	{	// Show 'In skin' tab if Blog setting 'In-skin editing' is ON and User has a permission to publish item in this blog
+		$mode_inskin_url = url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;'.$tab_switch_params );
 		$mode_inskin_action = get_samedomain_htsrv_url().'item_edit.php';
 		$modes['inskin'] = array(
 			'text' => T_('In skin'),
@@ -2081,7 +2319,7 @@ function get_item_edit_modes( $blog_ID, $action, $dispatcher, $tab_switch_params
 
 /**
  * Check permission for editing of the item by current user
- * 
+ *
  * @param integer post ID
  * @param boolean Set TRUE if we want to redirect when user cannot edit this post
  * @return boolean TRUE - user can edit this post
@@ -2089,22 +2327,6 @@ function get_item_edit_modes( $blog_ID, $action, $dispatcher, $tab_switch_params
 function check_item_perm_edit( $post_ID, $do_redirect = true )
 {
 	global $Messages;
-
-	// The edit module can only be used by logged in users:
-	if( ! is_logged_in() )
-	{
-		if( $do_redirect )
-		{	// Redirect to the login page for anonymous users
-			$Messages->add( T_( 'You must log in to create & edit posts.' ) );
-			header_redirect( get_login_url('cannot edit posts'), 302 );
-			// will have exited
-		}
-		else
-		{	// Anonymous users cannot edit posts
-			return false;
-		}
-	}
-
 	global $Blog, $current_User;
 
 	$user_can_edit = false;
@@ -2118,7 +2340,8 @@ function check_item_perm_edit( $post_ID, $do_redirect = true )
 	}
 	else
 	{	// Check permissions for creating of a new item
-		$user_can_edit = $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID );
+		$perm_target = empty( $Blog ) ? NULL : $Blog->ID;
+		$user_can_edit = $current_User->check_perm( 'blog_post_statuses', 'edit', false, $perm_target );
 		$permission_message = T_('You don\'t have permission to post into this blog');
 	}
 
@@ -2151,7 +2374,7 @@ function check_item_perm_edit( $post_ID, $do_redirect = true )
 
 /**
  * Check permission for creating of a new item by current user
- * 
+ *
  * @return boolean, TRUE if user can create a new post for the current blog
  */
 function check_item_perm_create()
@@ -2163,7 +2386,7 @@ function check_item_perm_create()
 		return false;
 	}
 
-	if( ! is_logged_in() || ! $Blog->get_setting( 'in_skin_editing' ) )
+	if( ! is_logged_in( false ) || ! $Blog->get_setting( 'in_skin_editing' ) )
 	{	// Don't allow anonymous users to create a new post & If setting is OFF
 		return false;
 	}
@@ -2217,566 +2440,1323 @@ function get_item_new_link( $before = '', $after = '', $link_text = '', $link_ti
 }
 
 
+/**
+ * Display location select elements (Country, Region, Subregion, City)
+ *
+ * @param object Form
+ * @param object Edited Item
+ */
+function echo_item_location_form( & $Form, & $edited_Item )
+{
+	load_class( 'regional/model/_country.class.php', 'Country' );
+	load_funcs( 'regional/model/_regional.funcs.php' );
+
+	$edited_Item_Blog = $edited_Item->get_Blog();
+	if( !$edited_Item_Blog->country_visible() )
+	{	// If country is NOT visible it means all other location fields also are not visible, so exit here
+		return;
+	}
+
+	global $rsc_url;
+
+	$Form->begin_fieldset( T_('Location') );
+
+	$Form->switch_layout( 'table' );
+	$Form->labelstart = '<td class="right"><strong>';
+	$Form->labelend = '</strong></td>';
+
+	echo $Form->formstart;
+
+	$button_refresh_regional = '<button id="%s" type="submit" name="actionArray[edit_switchtab]" class="action_icon refresh_button">'.get_icon( 'refresh' ).'</button>';
+	$button_refresh_regional .= '<img src="'.$rsc_url.'img/ajax-loader.gif" alt="'.T_('Loading...').'" title="'.T_('Loading...').'" style="display:none;margin-left:5px" align="top" />';
+
+	// Country
+	$CountryCache = & get_CountryCache();
+	$Form->select_country( 'item_ctry_ID', $edited_Item->ctry_ID, $CountryCache, T_('Country'), array( 'required' => ( $edited_Item->Blog->get_setting( 'location_country' ) == 'required' ), 'allow_none' => true ) );
+
+	if( $edited_Item->Blog->region_visible() )
+	{	// Region
+		$Form->select_input_options( 'item_rgn_ID', get_regions_option_list( $edited_Item->ctry_ID, $edited_Item->rgn_ID, array( 'none_option_text' => T_( 'Unknown' ) ) ), T_( 'Region' ), sprintf( $button_refresh_regional, 'button_refresh_region' ), array( 'required' => ( $edited_Item->Blog->get_setting( 'location_region' ) == 'required' ) ) );
+	}
+
+	if( $edited_Item->Blog->subregion_visible() )
+	{	// Subregion
+		$Form->select_input_options( 'item_subrg_ID', get_subregions_option_list( $edited_Item->rgn_ID, $edited_Item->subrg_ID, array( 'none_option_text' => T_( 'Unknown' ) ) ), T_( 'Sub-region' ), sprintf( $button_refresh_regional, 'button_refresh_subregion' ), array( 'required' => ( $edited_Item->Blog->get_setting( 'location_subregion' ) == 'required' ) ) );
+	}
+
+	if( $edited_Item->Blog->city_visible() )
+	{	// City
+		$Form->select_input_options( 'item_city_ID', get_cities_option_list( $edited_Item->ctry_ID, $edited_Item->rgn_ID, $edited_Item->subrg_ID, $edited_Item->city_ID, array( 'none_option_text' => T_( 'Unknown' ) ) ), T_( 'City' ), sprintf( $button_refresh_regional, 'button_refresh_city' ), array( 'required' => ( $edited_Item->Blog->get_setting( 'location_city' ) == 'required' ) ) );
+	}
+
+	echo $Form->formend;
+
+	$Form->switch_layout( NULL );
+
+	$Form->end_fieldset();
+}
+
+
+/**
+ * Get custom fields for item of current Blog
+ *
+ * @return array Custom fields = array( 'name', 'type', 'title' )
+ */
+function get_item_custom_fields()
+{
+	global $Blog;
+
+	$custom_fields = array();
+
+	if( empty( $Blog ) )
+	{	// No Blog
+		return $custom_fields;
+	}
+
+	foreach( array( 'double', 'varchar' ) as $type )
+	{ // get all types of custom fields
+		$count_custom_field = $Blog->get_setting( 'count_custom_'.$type );
+		for( $i = 1; $i <= $count_custom_field; $i++ )
+		{ // Add each custom field with type $type to the custom_fields array
+			$field_guid = $Blog->get_setting( 'custom_'.$type.$i );
+			$field_type_guid = $type.'_'.$field_guid;
+			$field_title = $Blog->get_setting( 'custom_'.$field_type_guid );
+			$field_fname = $Blog->get_setting( 'custom_fname_'.$field_guid );
+			if( $field_title && $field_fname )
+			{
+				$field_index = preg_replace( '/\s+/', '_', strtolower( trim( $field_fname ) ) );
+				$custom_fields[$field_index] = array(
+						'name' => $field_type_guid,
+						'type' => $type,
+						'title' => $field_title
+					);
+			}
+		}
+	}
+
+	return $custom_fields;
+}
+
+
+/**
+ * Display custom field settings as hidden input values
+ *
+ * @param object Form
+ * @param object edited Item
+ */
+function display_hidden_custom_fields( & $Form, & $edited_Item )
+{
+	$edited_Item->load_Blog();
+
+	foreach( array( 'double', 'varchar' ) as $type )
+	{ // get all types of custom fields
+		$count_custom_field = $edited_Item->Blog->get_setting( 'count_custom_'.$type );
+		for( $i = 1; $i <= $count_custom_field; $i++ )
+		{ // For each custom field with type $type:
+			$field_guid = $edited_Item->Blog->get_setting( 'custom_'.$type.$i );
+			$Form->hidden( 'item_'.$type.'_'.$field_guid, $edited_Item->get_setting( 'custom_'.$type.'_'.$field_guid ) );
+		}
+	}
+}
+
+
+/**
+ * Log a creating of new item (Increase counter in global cache)
+ *
+ * @param string Source of item creation ( 'through_admin', 'through_xmlrpc', 'through_email' )
+ */
+function log_new_item_create( $created_through )
+{
+	/**
+	 * @var AbstractSettings
+	 */
+	global $global_Cache;
+
+	if( empty( $global_Cache ) )
+	{	// Init global cache if it is not defined (for example, during on install process)
+		$global_Cache = new AbstractSettings( 'T_global__cache', array( 'cach_name' ), 'cach_cache', 0 /* load all */ );
+	}
+
+	if( !in_array( $created_through, array( 'through_admin', 'through_xmlrpc', 'through_email' ) ) )
+	{	// Set default value if source is wrong
+		$created_through = 'through_admin';
+	}
+
+	// Set variable name for current post counter
+	$cache_var_name = 'post_'.$created_through;
+
+	// Get previuos counter value
+	$counter = (int) $global_Cache->get( $cache_var_name );
+
+	// Increase counter
+	$global_Cache->set( $cache_var_name, $counter + 1 );
+
+	// Update the changed data in global cache
+	$global_Cache->dbupdate();
+}
+
+
+/**
+ * Display the manual pages results table
+ *
+ * @param array Params
+ */
+function items_manual_results_block( $params = array() )
+{
+	// Make sure we are not missing any param:
+	$params = array_merge( array(
+			'results_param_prefix' => 'items_manual_',
+		), $params );
+
+	if( !is_logged_in() )
+	{ // Only logged in users can access to this function
+		return;
+	}
+
+	global $current_User, $blog, $Blog, $admin_url, $Session;
+
+	$result_fadeout = $Session->get( 'fadeout_array' );
+
+	$cat_ID = param( 'cat_ID', 'integer', 0 );
+
+	if( empty( $Blog ) )
+	{ // Init Blog
+		$BlogCache = & get_BlogCache();
+		$blog = get_param( 'blog' );
+		if( !empty( $blog ) )
+		{ // Get Blog by ID
+			$Blog = $BlogCache->get_by_ID( $blog, false );
+		}
+		if( empty( $Blog ) && !empty( $cat_ID ) )
+		{ // Get Blog from chapter ID
+			$ChapterCache = & get_ChapterCache();
+			if( $Chapter = & $ChapterCache->get_by_ID( $cat_ID, false ) )
+			{
+				$Blog = $Chapter->get_Blog();
+				$blog = $Blog->ID;
+			}
+		}
+	}
+
+	if( empty( $Blog ) || $Blog->get( 'type' ) != 'manual' )
+	{ // No Blog, Exit here
+		return;
+	}
+
+	if( is_ajax_content() )
+	{
+		$order_action = param( 'order_action', 'string' );
+
+		if( $order_action == 'update' )
+		{ // Update an order to new value
+			$order_value = (int)param( 'order_value', 'string', 0 );
+			$order_data = param( 'order_data', 'string' );
+			$order_data = explode( '-', $order_data );
+			$order_obj_ID = (int)$order_data[2];
+			if( $order_obj_ID > 0 )
+			{
+				switch( $order_data[1] )
+				{
+					case 'chapter':
+						// Update chapter order
+						$ChapterCache = & get_ChapterCache();
+						if( $updated_Chapter = & $ChapterCache->get_by_ID( $order_obj_ID, false ) )
+						{
+							if( $current_User->check_perm( 'blog_cats', '', false, $updated_Chapter->blog_ID ) )
+							{ // Check permission to edit this Chapter
+								$updated_Chapter->set( 'order', $order_value );
+								$updated_Chapter->dbupdate();
+								$ChapterCache->clear();
+							}
+						}
+						break;
+
+					case 'item':
+						// Update item order
+						$ItemCache = & get_ItemCache();
+						if( $updated_Item = & $ItemCache->get_by_ID( $order_obj_ID, false ) )
+						{
+							if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $updated_Item ) )
+							{ // Check permission to edit this Item
+								$updated_Item->set( 'order', $order_value );
+								$updated_Item->dbupdate();
+							}
+						}
+						break;
+				}
+			}
+		}
+	}
+
+	load_class( '_core/ui/_uiwidget.class.php', 'Table' );
+
+	$Table = new Table( NULL, $params['results_param_prefix'] );
+
+	$Table->title = T_('Manual Pages');
+
+	// Redirect to manual pages after adding chapter
+	$redirect_page = '&amp;redirect_page=manual';
+	$Table->global_icon( T_('Add new chapter...'), 'add', $admin_url.'?ctrl=chapters&amp;action=new&amp;blog='.$blog.$redirect_page, ' '.T_('Add top level chapter').' &raquo;', 3, 4 );
+
+	$Table->cols[] = array(
+							'th' => T_('Name'),
+						);
+	$Table->cols[] = array(
+							'th' => T_('URL "slug"'),
+						);
+	$Table->cols[] = array(
+							'th' => T_('Order'),
+							'th_class' => 'shrinkwrap',
+						);
+	$Table->cols[] = array(
+							'th' => T_('Actions'),
+						);
+
+	if( is_ajax_content() )
+	{ // init results param by template name
+		if( !isset( $params[ 'skin_type' ] ) || ! isset( $params[ 'skin_name' ] ) )
+		{
+			debug_die( 'Invalid ajax results request!' );
+		}
+		$Table->init_params_by_skin( $params[ 'skin_type' ], $params[ 'skin_name' ] );
+	}
+
+	$Table->display_init( NULL, $result_fadeout );
+
+	$Table->display_head();
+
+	echo $Table->replace_vars( $Table->params['content_start'] );
+
+	$Table->display_list_start();
+
+		$Table->display_col_headers();
+
+		$Table->display_body_start();
+
+		manual_display_chapters();
+
+		$Table->display_body_end();
+
+	$Table->display_list_end();
+
+	// Flush fadeout
+	$Session->delete( 'fadeout_array');
+	
+	echo $Table->params['content_end'];
+
+	if( !is_ajax_content() )
+	{ // Create this hidden div to get a function name for AJAX request
+		echo '<div id="'.$params['results_param_prefix'].'ajax_callback" style="display:none">'.__FUNCTION__.'</div>';
+	}
+}
+
+
+/**
+ * Display the created items results table
+ *
+ * @param array Params
+ */
+function items_created_results_block( $params = array() )
+{
+	// Make sure we are not missing any param:
+	$params = array_merge( array(
+			'edited_User'          => NULL,
+			'results_param_prefix' => 'actv_postown_',
+			'results_title'        => T_('Posts created by the user'),
+			'results_no_text'      => T_('User has no own created posts'),
+		), $params );
+
+	if( !is_logged_in() )
+	{	// Only logged in users can access to this function
+		return;
+	}
+
+	global $current_User;
+	if( !$current_User->check_perm( 'users', 'edit' ) )
+	{	// Check minimum permission:
+		return;
+	}
+
+	$edited_User = $params['edited_User'];
+	if( !$edited_User )
+	{	// No defined User, probably the function is calling from AJAX request
+		$user_ID = param( 'user_ID', 'integer', 0 );
+		if( empty( $user_ID ) )
+		{	// Bad request, Exit here
+			return;
+		}
+		$UserCache = & get_UserCache();
+		if( ( $edited_User = & $UserCache->get_by_ID( $user_ID, false ) ) === false )
+		{	// Bad request, Exit here
+			return;
+		}
+	}
+
+	global $DB;
+
+	param( 'user_tab', 'string', '', true );
+	param( 'user_ID', 'integer', 0, true );
+
+	$SQL = new SQL();
+	$SQL->SELECT( '*' );
+	$SQL->FROM( 'T_items__item' );
+	$SQL->WHERE( 'post_creator_user_ID = '.$DB->quote( $edited_User->ID ) );
+
+	// Create result set:
+	$created_items_Results = new Results( $SQL->get(), $params['results_param_prefix'], 'D' );
+	$created_items_Results->Cache = & get_ItemCache();
+	$created_items_Results->title = $params['results_title'];
+	$created_items_Results->no_results_text = $params['results_no_text'];
+
+	// Get a count of the post which current user can delete
+	$deleted_posts_created_count = count( $edited_User->get_deleted_posts( 'created' ) );
+	if( $created_items_Results->total_rows > 0 && $deleted_posts_created_count > 0 )
+	{	// Display action icon to delete all records if at least one record exists & current user can delete at least one item created by user
+		$created_items_Results->global_icon( sprintf( T_('Delete all post created by %s'), $edited_User->login ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_posts_created&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
+	}
+
+	// Initialize Results object
+	items_results( $created_items_Results, array(
+			'field_prefix' => 'post_',
+			'display_ord' => false,
+			'display_history' => false,
+		) );
+
+	$display_params = array(
+		'before' => '<div class="results" style="margin-top:25px" id="created_posts_result">'
+	);
+
+	if( is_ajax_content() )
+	{ // init results param by template name
+		if( !isset( $params[ 'skin_type' ] ) || ! isset( $params[ 'skin_name' ] ) )
+		{
+			debug_die( 'Invalid ajax results request!' );
+		}
+		$created_items_Results->init_params_by_skin( $params[ 'skin_type' ], $params[ 'skin_name' ] );
+	}
+
+	$created_items_Results->display( $display_params );
+
+	if( !is_ajax_content() )
+	{	// Create this hidden div to get a function name for AJAX request
+		echo '<div id="'.$params['results_param_prefix'].'ajax_callback" style="display:none">'.__FUNCTION__.'</div>';
+	}
+}
+
+
+/**
+ * Display the edited items results table
+ *
+ * @param array Params
+ */
+function items_edited_results_block( $params = array() )
+{
+	// Make sure we are not missing any param:
+	$params = array_merge( array(
+			'edited_User'          => NULL,
+			'results_param_prefix' => 'actv_postedit_',
+			'results_title'        => T_('Posts edited by the user'),
+			'results_no_text'      => T_('User has no own edited posts'),
+		), $params );
+
+	if( !is_logged_in() )
+	{	// Only logged in users can access to this function
+		return;
+	}
+
+	global $current_User;
+	if( !$current_User->check_perm( 'users', 'edit' ) )
+	{	// Check minimum permission:
+		return;
+	}
+
+	$edited_User = $params['edited_User'];
+	if( !$edited_User )
+	{	// No defined User, probably the function is calling from AJAX request
+		$user_ID = param( 'user_ID', 'integer', 0 );
+		if( empty( $user_ID ) )
+		{	// Bad request, Exit here
+			return;
+		}
+		$UserCache = & get_UserCache();
+		if( ( $edited_User = & $UserCache->get_by_ID( $user_ID, false ) ) === false )
+		{	// Bad request, Exit here
+			return;
+		}
+	}
+
+	global $DB;
+
+	param( 'user_tab', 'string', '', true );
+	param( 'user_ID', 'integer', 0, true );
+
+	$edited_versions_SQL = new SQL();
+	$edited_versions_SQL->SELECT( 'DISTINCT( iver_itm_ID )' );
+	$edited_versions_SQL->FROM( 'T_items__version' );
+	$edited_versions_SQL->WHERE( 'iver_edit_user_ID = '.$DB->quote( $edited_User->ID ) );
+
+	$SQL = new SQL();
+	$SQL->SELECT( '*' );
+	$SQL->FROM( 'T_items__item ' );
+	$SQL->WHERE( '( ( post_lastedit_user_ID = '.$DB->quote( $edited_User->ID ).' ) OR ( post_ID IN ( '.$edited_versions_SQL->get().' ) ) )' );
+	$SQL->WHERE_and( 'post_creator_user_ID != '.$DB->quote( $edited_User->ID ) );
+
+	// Create result set:
+	$edited_items_Results = new Results( $SQL->get(), $params['results_param_prefix'], 'D' );
+	$edited_items_Results->Cache = & get_ItemCache();
+	$edited_items_Results->title = $params['results_title'];
+	$edited_items_Results->no_results_text = $params['results_no_text'];
+
+	// Get a count of the post which current user can delete
+	$deleted_posts_edited_count = count( $edited_User->get_deleted_posts( 'edited' ) );
+	if( $edited_items_Results->total_rows > 0 && $deleted_posts_edited_count > 0 )
+	{	// Display actino icon to delete all records if at least one record exists & current user can delete at least one item created by user
+		$edited_items_Results->global_icon( sprintf( T_('Delete all post edited by %s'), $edited_User->login ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_posts_edited&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
+	}
+
+	// Initialize Results object
+	items_results( $edited_items_Results, array(
+			'field_prefix' => 'post_',
+			'display_ord' => false,
+			'display_history' => false,
+		) );
+
+	if( is_ajax_content() )
+	{ // init results param by template name
+		if( !isset( $params[ 'skin_type' ] ) || ! isset( $params[ 'skin_name' ] ) )
+		{
+			debug_die( 'Invalid ajax results request!' );
+		}
+		$edited_items_Results->init_params_by_skin( $params[ 'skin_type' ], $params[ 'skin_name' ] );
+	}
+
+	$display_params = array(
+		'before' => '<div class="results" style="margin-top:25px" id="edited_posts_result">'
+	);
+	$edited_items_Results->display( $display_params );
+
+	if( !is_ajax_content() )
+	{	// Create this hidden div to get a function name for AJAX request
+		echo '<div id="'.$params['results_param_prefix'].'ajax_callback" style="display:none">'.__FUNCTION__.'</div>';
+	}
+}
+
+
+/**
+ * Display the items list (Used to load next page of the items by AJAX)
+ *
+ * @param array Params
+ */
+function items_list_block_by_page( $params = array() )
+{
+	$params = array_merge( array(
+			'skin_name'    => '',
+			'content_mode' => 'auto', // 'auto' will auto select depending on $disp-detail
+			'image_size'   => 'fit-400x320',
+			'block_start'  => '<div class="navigation ajax">',
+			'block_end'    => '</div>',
+			'links_format' => '$next$',
+			'next_text'    => T_('Load more entries').'&hellip;',
+		), $params );
+
+	if( !skin_init_ajax( $params['skin_name'], 'posts' ) )
+	{	// Exit here if skin cannot be initialized
+		return;
+	}
+
+	while( $Item = & mainlist_get_item() )
+	{	// For each blog post:
+		// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
+		skin_include( '_item_block.inc.php', $params );
+		// ----------------------------END ITEM BLOCK  ----------------------------
+	}
+
+	// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
+	mainlist_page_links( $params );
+	// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
+}
+
+
+/**
+ * Initialize Results object for items list
+ *
+ * @param object Results
+ * @param array Params
+ */
+function items_results( & $items_Results, $params = array() )
+{
+	global $Blog;
+
+	// Make sure we are not missing any param:
+	$params = array_merge( array(
+			'tab' => '',
+			'field_prefix' => '',
+			'display_date' => true,
+			'display_permalink' => true,
+			'display_blog' => true,
+			'display_type' => true,
+			'display_author' => true,
+			'display_title' => true,
+			'display_title_flag' => true,
+			'display_title_status' => true,
+			'display_visibility_actions' => true,
+			'display_ord' => true,
+			'display_history' => true,
+			'display_actions' => true,
+		), $params );
+
+	if( $params['display_date'] )
+	{	// Display Date column
+		$td = '<span class="date">@get_issue_date()@</span>';
+		if( $params['display_permalink'] )
+		{
+			$td = '@get_permanent_link( get_icon(\'permalink\'), \'\', \'\', \'auto\' )@ '.$td;
+		}
+		$items_Results->cols[] = array(
+				'th' => T_('Date'),
+				'order' => $params['field_prefix'].'datestart',
+				'default_dir' => 'D',
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap',
+				'td' => $td,
+			);
+	}
+
+	if( $params['display_blog'] )
+	{	// Display Blog column
+		if( !empty( $Blog ) && $Blog->get_setting( 'aggregate_coll_IDs' ) )
+		{ // Aggregated blog: display name of blog
+			$items_Results->cols[] = array(
+					'th' => T_('Blog'),
+					'th_class' => 'nowrap',
+					'td_class' => 'nowrap',
+					'td' => '@load_Blog()@<a href="~regenerate_url( \'blog,results_order\', \'blog=@blog_ID@\' )~">@Blog->dget(\'shortname\')@</a>',
+				);
+		}
+	}
+
+	if( $params['tab'] == 'intros' && $params['display_type'] )
+	{ // Display Type column:
+		$items_Results->cols[] = array(
+				'th' => T_('Type'),
+				'th_class' => 'nowrap',
+				'td_class' => 'nowrap',
+				'order' => $params['field_prefix'].'ptyp_ID',
+				'td' => '@type()@',
+			);
+	}
+	else if( $params['display_author'] )
+	{ // Display Author column:
+		$items_Results->cols[] = array(
+				'th' => T_('Author'),
+				'th_class' => 'nowrap',
+				'td_class' => 'nowrap',
+				'order' => $params['field_prefix'].'creator_user_ID',
+				'td' => '%get_user_identity_link( NULL, #post_creator_user_ID# )%',
+			);
+	}
+
+	if( $params['display_title'] )
+	{ // Display Title column
+		$items_Results->cols[] = array(
+				'th' => T_('Title'),
+				'order' => $params['field_prefix'].'title',
+				'td_class' => 'tskst_$post_pst_ID$',
+				'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, '.(int)$params['display_title_flag'].', '.(int)$params['display_title_status'].' )%</strong>',
+			);
+	}
+
+	if( $params['display_visibility_actions'] )
+	{ // Display Visibility actions
+		$items_Results->cols[] = array(
+				'th' => T_('Title'),
+				'td_class' => 'shrinkwrap',
+				'td' => '%item_visibility( {Obj} )%',
+			);
+	}
+
+	if( $params['display_ord'] )
+	{	// Display Ord column
+		$items_Results->cols[] = array(
+				'th' => T_('Ord'),
+				'order' => $params['field_prefix'].'order',
+				'td_class' => 'right',
+				'td' => '$post_order$',
+			);
+	}
+
+	if( $params['display_history'] )
+	{	// Display History (i) column
+		$items_Results->cols[] = array(
+				'th' => /* TRANS: abbrev for info */ T_('i'),
+				'order' => $params['field_prefix'].'datemodified',
+				'default_dir' => 'D',
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap',
+				'td' => '<a href="?ctrl=items&amp;p=$post_ID$&amp;action=history">@history_info_icon()@</a>',
+			);
+	}
+
+	if( $params['display_actions'] )
+	{	// Display Actions column
+		$items_Results->cols[] = array(
+				'th' => T_('Actions'),
+				'td_class' => 'shrinkwrap',
+				'td' => '%item_edit_actions( {Obj} )%',
+			);
+	}
+}
+
+
+/**
+ * Helper functions to display Items results.
+ * New ( not display helper ) functions must be created above item_results function
+ */
+
+/**
+ * Get a link with task title
+ *
+ * @param object Item
+ * @param boolean Display country flag
+ * @param boolean Display status banner
+ * @return string Link
+ */
+function task_title_link( $Item, $display_flag = true, $display_status = false )
+{
+	global $current_User, $admin_url;
+
+	$col = '';
+	if( $display_status && is_logged_in() )
+	{ // Display status
+		$col .= $Item->get_status( array( 'format' => 'styled' ) );
+	}
+
+	if( $display_flag )
+	{ // Display country flag
+		$col .= locale_flag( $Item->locale, 'w16px', 'flag', '', false ).' ';
+	}
+
+	$Item->get_Blog();
+
+	if( is_admin_page() )
+	{ // Url to item page in backoffice
+		$item_url = $admin_url.'?ctrl=items&amp;blog='.$Item->get_blog_ID().'&amp;p='.$Item->ID;
+	}
+	else
+	{ // Url to item page in frontoffice
+		$item_url = $Item->get_permanent_url();
+	}
+
+	if( $Item->Blog->get_setting( 'allow_comments' ) != 'never' )
+	{ // The current blog can have comments:
+		$nb_comments = generic_ctp_number( $Item->ID, 'feedback' );
+		$comments_url = is_admin_page() ? $item_url : url_add_tail( $item_url, '#comments' );
+		$col .= '<a href="'.$comments_url.'" title="'.sprintf( T_('%d feedbacks'), $nb_comments ).'" class="">';
+		if( $nb_comments )
+		{
+			$col .= get_icon( 'comments' );
+		}
+		else
+		{
+			$col .= get_icon( 'nocomment' );
+		}
+		$col .= '</a> ';
+	}
+
+	$col .= '<a href="'.$item_url.'" class="" title="'.
+								T_('View this post...').'">'.$Item->dget( 'title' ).'</a></strong>';
+
+	return $col;
+}
+
+/**
+ * Get the icons to publish or to deprecate the item
+ *
+ * @param object Item
+ * @return string Action icons
+ */
+function item_visibility( $Item )
+{
+	// Display publish NOW button if current user has the rights:
+	$r = $Item->get_publish_link( ' ', ' ', get_icon( 'publish' ), '#', '' );
+
+	// Display deprecate if current user has the rights:
+	$r .= $Item->get_deprecate_link( ' ', ' ', get_icon( 'deprecate' ), '#', '' );
+
+	if( empty( $r ) )
+	{	// for IE
+		$r = '&nbsp;';
+	}
+
+	return $r;
+}
+
+/**
+ * Edit Actions:
+ *
+ * @param Item
+ */
+function item_edit_actions( $Item )
+{
+	$r = '';
+
+	if( isset($GLOBALS['files_Module']) )
+	{
+		$r .= action_icon( T_('Edit linked files...'), 'folder',
+					url_add_param( $Item->get_Blog()->get_filemanager_link(), 'fm_mode=link_object&amp;link_type=item&amp;link_object_ID='.$Item->ID ), T_('Files') );
+	}
+
+	// Display edit button if current user has the rights:
+	$r .= $Item->get_edit_link( array(
+		'before' => ' ',
+		'after' => ' ',
+		'text' => get_icon( 'edit' ),
+		'title' => '#',
+		'class' => '' ) );
+
+	// Display duplicate button if current user has the rights:
+	$r .= $Item->get_copy_link( array(
+		'before' => ' ',
+		'after' => ' ',
+		'text' => get_icon( 'copy', 'imgtag', array( 'title' => T_('Duplicate this post...') ) ),
+		'title' => '#',
+		'class' => '' ) );
+
+	// Display delete button if current user has the rights:
+	$r .= $Item->get_delete_link( ' ', ' ', get_icon( 'delete' ), '#', '', false, '#', '#', regenerate_url( '', '', '', '&' ) );
+
+	return $r;
+}
+
+
+/**
+ * Display chapters list
+ *
+ * @param array Params
+ */
+function manual_display_chapters( $params = array(), $level = 0 )
+{
+	$params = array_merge( array(
+			'parent_cat_ID'      => 0,
+		), $params );
+
+	global $Blog, $blog, $cat_ID;
+
+	$chapters = manual_get_chapters( (int)$params['parent_cat_ID'] );
+
+	if( empty( $chapters ) )
+	{ // No categories, Exit here
+		return;
+	}
+
+	if( empty( $Blog ) && !empty( $blog ) )
+	{ // Set Blog if it still doesn't exist
+		$BlogCache = & get_BlogCache();
+		$Blog = & $BlogCache->get_by_ID( $blog, false );
+	}
+
+	if( empty( $Blog ) )
+	{ // No Blog, Exit here
+		return;
+	}
+
+	$chapter_path = array();
+	if( !empty( $cat_ID ) )
+	{ // A category is opened
+		$chapter_path = manual_get_chapter_path( $cat_ID );
+	}
+	//pre_dump($chapter_path);
+
+	foreach( $chapters as $Chapter )
+	{ // Display all given chapters
+		manual_display_chapter( array_merge( $params, array(
+				'Chapter'      => $Chapter,
+				'chapter_path' => $chapter_path,
+			) ), $level );
+	}
+}
+
+
+/**
+ * Display chapter and children
+ *
+ * @param array Params
+ * @param integer Level of the category in the recursive tree
+ */
+function manual_display_chapter( $params = array(), $level = 0 )
+{
+	$params = array_merge( array(
+			'Chapter'      => NULL,
+			'chapter_path' => array(),
+		), $params );
+
+	global $Blog;
+
+	if( empty( $params['Chapter'] ) )
+	{ // No Chapter, Exit here
+		return;
+	}
+
+	$Chapter = & $params['Chapter'];
+
+	$is_selected = false;
+	$is_opened = false;
+
+	$classes = array();
+	if( !empty( $params['chapter_path'] ) && in_array( $Chapter->ID, $params['chapter_path'] ) )
+	{ // A category is selected
+		$is_selected = true;
+	}
+	if( !empty( $Chapter->children ) && $is_selected )
+	{ // A category is opened
+		$is_opened = true;
+	}
+	else if( $Chapter->has_posts() && $is_selected )
+	{ // A category is selected and it has the posts
+		$is_opened = true;
+	}
+
+	manual_display_chapter_row( $Chapter, $level, $is_opened );
+
+	if( $is_selected )
+	{
+		global $Settings;
+
+		if( $Settings->get( 'chapter_ordering' ) == 'manual' &&
+				$Blog->get_setting( 'orderby' ) == 'order' &&
+				$Blog->get_setting( 'orderdir' ) == 'ASC' )
+		{ // Items & categories are ordered by manual field 'order'
+			// In this mode we should show them in one merged list ordered by field 'order'
+			$chapters_items_mode = 'order';
+		}
+		else
+		{ // Standard mode for all other cases
+			$chapters_items_mode = 'std';
+		}
+
+		if( $chapters_items_mode != 'order' )
+		{ // Display all subchapters
+			manual_display_chapters( array_merge( $params, array(
+					'parent_cat_ID'      => $Chapter->ID,
+				) ), $level + 1 );
+		}
+
+		if( $Chapter->has_posts() || $is_opened )
+		{ // Display the posts/subcategories of this chapter
+			manual_display_posts( array_merge( $params, array(
+				'chapter_ID'          => $Chapter->ID,
+				'chapters_items_mode' => $chapters_items_mode,
+			) ), $level + 1 );
+		}
+	}
+}
+
+
+/**
+ * Display a list of the posts for current chapter
+ *
+ * @param array params
+ * @return string List with posts
+ */
+function manual_display_posts( $params = array(), $level = 0 )
+{
+	$params = array_merge( array(
+			'chapter_ID'          => 0,
+			'chapters_items_mode' => 'std',
+		), $params );
+
+	global $DB, $Blog, $blog;
+
+	if( empty( $Blog ) && !empty( $blog ) )
+	{ // Set Blog if it still doesn't exist
+		$BlogCache = & get_BlogCache();
+		$Blog = & $BlogCache->get_by_ID( $blog, false );
+	}
+
+	if( empty( $params['chapter_ID'] ) || empty( $Blog ) )
+	{ // No chapter ID, Exit here
+		return;
+	}
+
+	if( $params['chapters_items_mode'] == 'order' )
+	{ // Get all subchapters in this mode to following insertion into posts list below
+		$sub_chapters = manual_get_chapters( $params['chapter_ID'] );
+	}
+
+	// Get the posts of current category
+	$ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $Blog->get_setting('posts_per_page') );
+	$ItemList->load_from_Request();
+	$ItemList->set_filters( array(
+			'cat_array' => array( $params['chapter_ID'] ), // Limit only by selected cat (exclude posts from child categories)
+			'unit'      => 'all', // Display all items of this category, Don't limit by page
+		) );
+	$ItemList->query();
+
+	// Split items in two arrays to know what items are from main category and what items are from extra category
+	$items_main = array();
+	$items_extra = array();
+	while( $cur_Item = $ItemList->get_item() )
+	{
+		if( $cur_Item->main_cat_ID == $params['chapter_ID'] )
+		{ // Item is from main category
+			$items_main[] = $cur_Item;
+		}
+		else
+		{ // Item is from extra catogry
+			$items_extra[] = $cur_Item;
+		}
+	}
+
+
+	// ---- Display Items from MAIN category ---- //
+	$prev_item_order = 0;
+	foreach( $items_main as $cur_Item )
+	{
+		if( $params['chapters_items_mode'] == 'order' )
+		{ // In this mode we display the chapters inside a posts list
+			foreach( $sub_chapters as $s => $sub_Chapter )
+			{ // Loop through categories to find for current order
+				if( ( $sub_Chapter->get( 'order' ) <= $cur_Item->get( 'order' ) && $sub_Chapter->get( 'order' ) > $prev_item_order ) ||
+							/* This condition is needed for NULL order: */
+							( $cur_Item->get( 'order' ) == 0 && $sub_Chapter->get( 'order' ) >= $cur_Item->get( 'order' ) ) )
+				{ // Display chapter
+					manual_display_chapter( array_merge( $params, array(
+							'Chapter'      => $sub_Chapter,
+						) ), $level );
+					// Remove this chapter from array to avoid the duplicates
+					unset( $sub_chapters[ $s ] );
+				}
+			}
+
+			// Save current post order for next iteration
+			$prev_item_order = $cur_Item->get( 'order' );
+		}
+
+		manual_display_post_row( $cur_Item, $level, array(
+				'post_navigation' => 'same_category', // we are always navigating through category in this skin
+				'nav_target'      => $params['chapter_ID'], // set the category ID as nav target
+				'link_type'       => 'permalink',
+				'title_field'     => 'urltitle',
+			) );
+	}
+
+	if( $params['chapters_items_mode'] == 'order' )
+	{
+		foreach( $sub_chapters as $s => $sub_Chapter )
+		{ // Loop through rest categories that have order more than last item
+			manual_display_chapter( array_merge( $params, array(
+					'Chapter' => $sub_Chapter,
+				) ), $level );
+			// Remove this chapter from array to avoid the duplicates
+			unset( $sub_chapters[ $s ] );
+		}
+	}
+
+
+	// ---- Display Items from EXTRA category ---- //
+	foreach( $items_extra as $cur_Item )
+	{
+		manual_display_post_row( $cur_Item, $level, array(
+			'post_navigation' => 'same_category', // we are always navigating through category in this skin
+			'nav_target'      => $params['chapter_ID'], // set the category ID as nav target
+			'link_type'       => 'permalink',
+			'title_field'     => 'urltitle',
+			'title_before'    => '<i>',
+			'title_after'     => '</i>',
+		) );
+	}
+}
+
+/**
+ * Get chapters
+ *
+ * @param integer Chapter parent ID
+ */
+function manual_get_chapters( $parent_ID = 0 )
+{
+	global $Blog, $skin_chapters_cache;
+
+	if( !isset( $skin_chapters_cache ) )
+	{ // Get the all chapters for current blog
+		$ChapterCache = & get_ChapterCache();
+		$ChapterCache->load_subset( $Blog->ID );
+
+		if( isset( $ChapterCache->subset_cache[ $Blog->ID ] ) )
+		{
+			$chapters = $ChapterCache->subset_cache[ $Blog->ID ];
+
+			$skin_chapters_cache = array();
+			foreach( $chapters as $chapter_ID => $Chapter )
+			{ // Init children
+				//pre_dump( $Chapter->ID.' - '.$Chapter->get_name().' : '.$Chapter->get( 'parent_ID' ) );
+				if( $Chapter->get( 'parent_ID' ) == 0 )
+				{
+					$Chapter->children = manual_get_chapter_children( $Chapter->ID );
+					$skin_chapters_cache[ $Chapter->ID ] = $Chapter;
+				}
+			}
+		}
+	}
+
+	if( $parent_ID > 0 )
+	{ // Get the chapters by parent
+		$ChapterCache = & get_ChapterCache();
+		if( $Chapter = & $ChapterCache->get_by_ID( $parent_ID, false ) )
+		{
+			return $Chapter->children;
+		}
+		else
+		{ // Invalid ID of parent category
+			return array();
+		}
+	}
+
+	return $skin_chapters_cache;
+}
+
+
+/**
+ * Get the children of current chapter recursively
+ *
+ * @param integer Parent ID
+ * @return array Chapter children
+ */
+function manual_get_chapter_children( $parent_ID = 0 )
+{
+	global $blog;
+
+	$ChapterCache = & get_ChapterCache();
+
+	$chapter_children = array();
+	if( isset( $ChapterCache->subset_cache[ $blog ] ) )
+	{
+		$chapters = $ChapterCache->subset_cache[ $blog ];
+		foreach( $chapters as $Chapter )
+		{
+			if( $parent_ID == $Chapter->get( 'parent_ID' ) )
+			{
+				$Chapter->children = manual_get_chapter_children( $Chapter->ID );
+				$chapter_children[ $Chapter->ID ] = $Chapter;
+			}
+		}
+	}
+
+	return $chapter_children;
+}
+
+
+/**
+ * Get an array with chapters ID that located in current path
+ *
+ * @param integer Chapter ID
+ * @return array Chapters ID
+ */
+function manual_get_chapter_path( $chapter_ID )
+{
+	global $blog;
+	$ChapterCache = & get_ChapterCache();
+	$ChapterCache->load_subset( $blog );
+
+	$chapter_path = array( $chapter_ID );
+	if( isset( $ChapterCache->subset_cache[ $blog ] ) )
+	{
+		$chapters = $ChapterCache->subset_cache[ $blog ];
+		if( isset( $chapters[ $chapter_ID ] ) )
+		{
+			$Chapter = $chapters[ $chapter_ID ];
+			while( $Chapter->get( 'parent_ID' ) > 0 )
+			{
+				$chapter_path[] = $Chapter->get( 'parent_ID' );
+				// Select a parent chapter
+				$Chapter = $chapters[ $Chapter->get( 'parent_ID' ) ];
+			}
+		}
+	}
+
+	return $chapter_path;
+}
+
+
+/**
+ * Display chapter row
+ *
+ * @param object Chapter
+ * @param integer Level of the category in the recursive tree
+ * @param boolean TRUE - if category is opened
+ */
+function manual_display_chapter_row( $Chapter, $level, $is_opened = false )
+{
+	global $line_class, $current_User, $Settings;
+	global $admin_url;
+	global $Session;
+
+	$result_fadeout = $Session->get( 'fadeout_array' );
+
+	$line_class = $line_class == 'even' ? 'odd' : 'even';
+
+	$perm_edit = $current_User->check_perm( 'blog_cats', '', false, $Chapter->blog_ID );
+	$perm_create_item = $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Chapter->blog_ID );
+
+	// Redirect to manual pages after adding/editing chapter
+	$redirect_page = '&amp;redirect_page=manual';
+
+	$r = '<tr id="cat-'.$Chapter->ID.'" class="'.$line_class.( isset( $result_fadeout ) && in_array( $Chapter->ID, $result_fadeout ) ? ' fadeout-ffff00': '' ).'">';
+
+	// Name
+	if( $is_opened )
+	{ // Chapter is expanded
+		$cat_icon = get_icon( 'filters_hide' );
+		$param_cat = '';
+		if( $parent_Chapter = & $Chapter->get_parent_Chapter() )
+		{
+			$param_cat = '&amp;cat_ID='.$parent_Chapter->ID;
+		}
+		$open_url = $admin_url.'?ctrl=items&amp;tab=manual'.$param_cat;
+	}
+	else
+	{ // Chapter is collapsed
+		$cat_icon = get_icon( 'filters_show' );
+		$open_url = $admin_url.'?ctrl=items&amp;tab=manual&amp;cat_ID='.$Chapter->ID;
+	}
+	$r .= '<td class="firstcol">'
+					.'<strong style="padding-left: '.($level).'em;">'
+						.'<a href="'.$open_url.'">'.$cat_icon.'</a>';
+	if( $perm_edit )
+	{ // Current user can edit the chapters of the blog
+		$edit_url = $admin_url.'?ctrl=chapters&amp;blog='.$Chapter->blog_ID.'&amp;cat_ID='.$Chapter->ID.'&amp;action=edit'.$redirect_page;
+		$r .= '<a href="'.$edit_url.'" title="'.T_('Edit...').'">'.$Chapter->dget('name').'</a>';
+	}
+	else
+	{
+		$r .= $Chapter->dget('name');
+	}
+	$r .= '</strong></td>';
+
+	// URL "slug"
+	$r .= '<td><a href="'.htmlspecialchars($Chapter->get_permanent_url()).'">'.$Chapter->dget('urlname').'</a></td>';
+
+	// Order
+	$order_attrs = '';
+	if( $perm_edit )
+	{ // Add availability to edit an order if current user can edit chapters
+		$order_attrs = ' id="order-chapter-'.$Chapter->ID.'" title="'.format_to_output( T_('Click to change an order'), 'htmlattr' ).'"';
+	}
+	$r .= '<td class="center"'.$order_attrs.'>'.$Chapter->dget('order').'</td>';
+
+	// Actions
+	$r .= '<td class="lastcol shrinkwrap">';
+	if( $perm_edit || $perm_create_item )
+	{ // Current user can edit the chapters of the blog or can create item in the blog
+		if( $perm_edit )
+		{ // Create/Edit chapter, Move to another blog
+			$r .= action_icon( T_('Edit...'), 'edit', $edit_url );
+			if( $Settings->get('allow_moving_chapters') )
+			{ // If moving cats between blogs is allowed:
+				$r .= action_icon( T_('Move to a different blog...'), 'file_move', $admin_url.'?ctrl=chapters&amp;blog='.$Chapter->blog_ID.'&amp;cat_ID='.$Chapter->ID.'&amp;action=move', T_('Move') );
+			}
+			$r .= action_icon( T_('New chapter...'), 'add', $admin_url.'?ctrl=chapters&amp;blog='.$Chapter->blog_ID.'&amp;cat_parent_ID='.$Chapter->ID.'&amp;action=new'.$redirect_page );
+		}
+		if( $perm_create_item )
+		{ // Create new item
+			$redirect_to = '&amp;redirect_to='.urlencode( $admin_url.'?ctrl=items&tab=manual&cat_ID='.$Chapter->ID );
+			$r .= action_icon( T_('New manual page...'), 'new', $admin_url.'?ctrl=items&action=new&blog='.$Chapter->blog_ID.'&amp;cat='.$Chapter->ID.$redirect_to, NULL, NULL, NULL, array(), array( 'style' => 'width:12px' ) );
+		}
+		if( $perm_edit )
+		{ // Delete chapter
+			$r .= action_icon( T_('Delete chapter...'), 'delete', $admin_url.'?ctrl=chapters&amp;blog='.$Chapter->blog_ID.'&amp;cat_ID='.$Chapter->ID.'&amp;action=delete&amp;'.url_crumb('element').$redirect_page );
+		}
+	}
+	else
+	{
+		$r .= '&nbsp;';
+	}
+	$r .= '</td>';
+
+	$r .= '</tr>';
+
+	echo $r;
+}
+
+
+/**
+ * Display item row
+ *
+ * @param object Item
+ * @param integer Level of the category in the recursive tree
+ * @param array Params
+ */
+function manual_display_post_row( $Item, $level, $params = array() )
+{
+	global $line_class, $current_User, $Settings;
+	global $admin_url;
+	global $Session;
+
+	$result_fadeout = $Session->get( 'fadeout_array' );
+
+	$params = array_merge( array(
+			'title_before' => '',
+			'title_after'  => '',
+		), $params );
+
+	$line_class = $line_class == 'even' ? 'odd' : 'even';
+
+	$r = '<tr id="item-'.$Item->ID.'" class="'.$line_class.( isset( $result_fadeout ) && in_array( 'item-'.$Item->ID, $result_fadeout ) ? ' fadeout-ffff00': '' ).'">';
+
+	// Title
+	$edit_url = $Item->ID;
+	$item_icon = get_icon( 'post', 'imgtag', array( 'title' => '' ) );
+	$item_edit_url = $Item->get_edit_url();
+	$r .= '<td class="firstcol"><strong style="padding-left: '.($level).'em;">';
+	if( !empty( $item_edit_url ) )
+	{ // If current user can edit this item
+		$r .= '<a href="'.$Item->get_edit_url().'" title="'.T_('Edit...').'">';
+	}
+	else
+	{
+		$r .= '';
+	}
+	$r .= $params['title_before']
+			.$item_icon
+			.$Item->dget('title')
+			.$params['title_after'];
+	$r .= !empty( $item_edit_url ) ? '</a>' : '';
+	$r .= '</strong></td>';
+
+	// URL "slug"
+	$edit_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Item->ID.'&amp;action=edit' );
+	$r .= '<td>'.$Item->get_title( $params );
+	if( $current_User->check_perm( 'slugs', 'view', false ) )
+	{ // Display icon to view all slugs of this item if current user has permission
+		$r .= ' '.action_icon( T_('Edit slugs...'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID );
+	}
+	$r .= '</td>';
+
+	// Order
+	$order_attrs = '';
+	if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+	{ // Add availability to edit an order if current user can edit this item
+		$order_attrs = ' id="order-item-'.$Item->ID.'" title="'.format_to_output( T_('Click to change an order'), 'htmlattr' ).'"';
+	}
+	$r .= '<td class="center"'.$order_attrs.'>'.$Item->dget('order').'</td>';
+
+	// Actions
+	$r .= '<td class="lastcol shrinkwrap">'.item_edit_actions( $Item ).'</td>';
+
+	$r .= '</tr>';
+
+	echo $r;
+}
+
+/**
+ * End of helper functions block to display Items results.
+ * New ( not display helper ) functions must be created above items_results function.
+ */
+
+
 /*
  * $Log$
- * Revision 1.153  2011/10/23 09:19:42  efy-yurybakh
- * Implement new permission for comment editing
+ * Revision 1.155  2013/11/06 08:04:15  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.152  2011/10/18 00:04:45  fplanque
- * i18n update
- *
- * Revision 1.151  2011/10/14 07:23:09  efy-yurybakh
- * In skin posting (categories permission)
- *
- * Revision 1.150  2011/10/13 18:52:04  efy-yurybakh
- * In skin posting (permission)
- *
- * Revision 1.149  2011/10/13 17:15:53  efy-yurybakh
- * In skin posting (permission)
- *
- * Revision 1.148  2011/10/13 15:49:43  efy-yurybakh
- * In skin posting (changes)
- *
- * Revision 1.147  2011/10/13 13:09:27  efy-yurybakh
- * In skin posting (changes)
- *
- * Revision 1.146  2011/10/13 11:40:10  efy-yurybakh
- * In skin posting (permission)
- *
- * Revision 1.145  2011/10/12 13:54:36  efy-yurybakh
- * In skin posting
- *
- * Revision 1.144  2011/10/12 11:23:31  efy-yurybakh
- * In skin posting (beta)
- *
- * Revision 1.143  2011/10/11 18:26:10  efy-yurybakh
- * In skin posting (beta)
- *
- * Revision 1.142  2011/10/06 11:49:47  efy-yurybakh
- * Replace all timestamp_min & timestamp_max with Blog's methods
- *
- * Revision 1.141  2011/09/28 16:15:56  efy-yurybakh
- * "comment was helpful" votes
- *
- * Revision 1.140  2011/09/28 09:22:34  efy-yurybakh
- * "comment is spam" vote (avatar blinks)
- *
- * Revision 1.139  2011/09/25 03:54:21  efy-yurybakh
- * Add spam voting to dashboard
- *
- * Revision 1.138  2011/09/24 13:27:36  efy-yurybakh
- * Change voting buttons
- *
- * Revision 1.137  2011/09/24 05:30:19  efy-yurybakh
- * fp>yura
- *
- * Revision 1.136  2011/09/23 22:37:09  fplanque
- * minor / doc
- *
- * Revision 1.135  2011/09/23 06:25:48  efy-yurybakh
- * "comment is spam" vote
- *
- * Revision 1.134  2011/09/22 16:58:34  efy-yurybakh
- * "comment is spam" vote
- *
- * Revision 1.133  2011/09/22 06:54:24  efy-yurybakh
- * 5 first icons in a single sprite
- *
- * Revision 1.132  2011/09/21 13:01:09  efy-yurybakh
- * feature "Was this comment helpful?"
- *
- * Revision 1.131  2011/09/19 22:15:59  fplanque
- * Minot/i18n
- *
- * Revision 1.130  2011/09/04 22:13:17  fplanque
- * copyright 2011
- *
- * Revision 1.129  2011/09/04 20:29:10  fplanque
- * Rollback. Collapsible filter blocks are ok if: 1) the order stays the same and 2) any block that doesn't use the default params displays open when arriving on the page.
- *
- * Revision 1.128  2011/08/16 07:02:25  efy-asimo
- * Fix attaching files issue on new post create
- *
- * Revision 1.127  2011/08/16 06:02:52  efy-asimo
- * Remove extra category check by default
- *
- * Revision 1.126  2011/06/15 20:30:38  sam2kb
- * Change message type to "note"
- * See http://forums.b2evolution.net/viewtopic.php?t=22334
- *
- * Revision 1.124  2011/02/10 23:07:21  fplanque
- * minor/doc
- *
- * Revision 1.123  2011/01/06 14:31:47  efy-asimo
- * advanced blog permissions:
- *  - add blog_edit_ts permission
- *  - make the display more compact
- *
- * Revision 1.122  2010/11/25 15:16:35  efy-asimo
- * refactor $Messages
- *
- * Revision 1.121  2010/11/03 19:44:15  sam2kb
- * Increased modularity - files_Module
- * Todo:
- * - split core functions from _file.funcs.php
- * - check mtimport.ctrl.php and wpimport.ctrl.php
- * - do not create demo Photoblog and posts with images (Blog A)
- *
- * Revision 1.120  2010/10/19 02:00:53  fplanque
- * MFB
- *
- * Revision 1.119  2010/09/29 14:53:50  efy-asimo
- * Item full view comment list - fix
- *
- * Revision 1.118  2010/09/28 13:03:16  efy-asimo
- * Paged comments on item full view
- *
- * Revision 1.117  2010/09/23 14:21:00  efy-asimo
- * antispam in comment text feature
- *
- * Revision 1.116  2010/08/05 08:04:12  efy-asimo
- * Ajaxify comments on itemList FullView and commentList FullView pages
- *
- * Revision 1.109.2.5  2010/07/06 21:00:34  fplanque
- * doc
- *
- * Revision 1.114  2010/06/30 07:34:42  efy-asimo
- * Cross posting fix - ingore extra cats from different blogs, when cross posting is disabled
- *
- * Revision 1.113  2010/06/24 07:03:11  efy-asimo
- * move the cross posting options to the bottom of teh Features tab & fix error message after moving post
- *
- * Revision 1.112  2010/06/17 17:42:54  blueyed
- * doc
- *
- * Revision 1.111  2010/06/15 20:12:51  blueyed
- * Autocompletion for tags in item edit forms, via echo_autocomplete_tags
- *
- * Revision 1.110  2010/06/01 11:33:20  efy-asimo
- * Split blog_comments advanced permission (published, deprecated, draft)
- * Use this new permissions (Antispam tool,when edit/delete comments)
- *
- * Revision 1.109  2010/05/24 07:18:53  efy-asimo
- * Allow cross posting - fix
- *
- * Revision 1.108  2010/05/22 12:22:49  efy-asimo
- * move $allow_cross_posting in the backoffice
- *
- * Revision 1.107  2010/05/10 14:26:17  efy-asimo
- * Paged Comments & filtering & add comments listview
- *
- * Revision 1.106  2010/05/02 00:13:28  blueyed
- * urltitle_validate: make it use the current urlname, if invoked via empty urltitle, instead of creating a new one over and over again. See tests.
- *
- * Revision 1.105  2010/05/01 18:43:53  blueyed
- * TODO/doc: why limit urlnames to 5 words?
- *
- * Revision 1.104  2010/05/01 16:14:56  blueyed
- * Item categories form: use IE Conditional Comments for IE7 code. I do not know if IE8 should use the same workaround. But Firefox does not and an extra table column looks ugly here.
- *
- * Revision 1.103  2010/04/30 20:35:55  blueyed
- * Item edit form:
- *  - allow_cross_posting=2 related fixes:
- *    - add cat_select_new input box at the end of the main category blog,
- *      not at the end of the list.
- *    - scroll to selected blog in category list DIV (TODO: test with IE),
- *      adds HTML IDs to the table groups.
- *
- * Revision 1.102  2010/04/12 09:41:36  efy-asimo
- * private URL shortener - task
- *
- * Revision 1.101  2010/04/07 08:26:10  efy-asimo
- * Allow multiple slugs per post - update & fix
- *
- * Revision 1.100  2010/03/27 15:37:00  blueyed
- * whitespace
- *
- * Revision 1.99  2010/03/15 20:12:24  efy-yury
- * slug fix
- *
- * Revision 1.98  2010/03/12 09:47:34  efy-asimo
- * New category creation fix
- *
- * Revision 1.97  2010/03/09 11:30:21  efy-asimo
- * create categories on the fly -  fix
- *
- * Revision 1.96  2010/03/08 21:06:36  fplanque
- * minor/doc
- *
- * Revision 1.95  2010/03/07 12:59:50  efy-yury
- * update slugs
- *
- * Revision 1.94  2010/03/06 13:24:38  efy-asimo
- * doc for check_categories function
- *
- * Revision 1.93  2010/03/04 19:36:04  fplanque
- * minor/doc
- *
- * Revision 1.92  2010/03/03 21:04:31  fplanque
- * minor / doc
- *
- * Revision 1.91  2010/02/16 16:52:46  efy-yury
- * slugs
- *
- * Revision 1.90  2010/02/13 16:22:30  efy-yury
- * slug field autofill
- *
- * Revision 1.89  2010/02/08 17:53:10  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.88  2010/02/05 09:51:34  efy-asimo
- * create categories on the fly
- *
- * Revision 1.87  2010/02/04 16:41:11  efy-yury
- * add "Add/Link files" link
- *
- * Revision 1.86  2010/02/02 21:17:17  efy-yury
- * update: attachments popup now opens when pushed the button 'Save and start attaching files'
- *
- * Revision 1.85  2010/01/30 18:55:30  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.84  2010/01/17 16:15:22  sam2kb
- * Localization clean-up
- *
- * Revision 1.83  2010/01/03 18:52:57  fplanque
- * crumbs...
- *
- * Revision 1.82  2009/12/12 01:13:08  fplanque
- * A little progress on breadcrumbs on menu structures alltogether...
- *
- * Revision 1.81  2009/12/08 20:16:12  fplanque
- * Better handling of the publish! button on post forms
- *
- * Revision 1.80  2009/12/06 22:55:21  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.79  2009/11/19 17:25:09  tblue246
- * Make evo_iconv_transliterate() aware of the post locale
- *
- * Revision 1.78  2009/10/26 17:58:57  efy-maxim
- * mass create fix and design improvement
- *
- * Revision 1.77  2009/10/19 13:28:15  efy-maxim
- * paragraphs at each line break or separate posts with a blank line
- *
- * Revision 1.76  2009/10/18 11:29:42  efy-maxim
- * 1. mass create in 'All' tab; 2. "Text Renderers" and "Comments"
- *
- * Revision 1.75  2009/10/15 20:54:25  tblue246
- * create_multiple_posts(): Code improvements, e. g. removed second loop.
- *
- * Revision 1.74  2009/10/12 11:59:44  efy-maxim
- * Mass create
- *
- * Revision 1.73  2009/10/07 00:52:00  sam2kb
- * Titles in cat_select_header()
- *
- * Revision 1.72  2009/10/01 18:50:12  tblue246
- * convert_charset(): Trying to remove unreliable charset detection and modify all calls accordingly -- needs testing to ensure all charset conversions work as expected.
- *
- * Revision 1.71  2009/09/26 12:00:43  tblue246
- * Minor/coding style
- *
- * Revision 1.70  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.69  2009/09/24 13:50:31  efy-sergey
- * Moved the Global Settings>Post types & Post statuses tabs to "Posts / Comments > Settings > Post types & Post statuses"
- *
- * Revision 1.68  2009/09/20 21:44:01  blueyed
- * whitespace
- *
- * Revision 1.67  2009/09/20 18:13:20  fplanque
- * doc
- *
- * Revision 1.66  2009/09/20 13:59:13  waltercruz
- * Adding a tab to show custom types (will be displayed only if you have custom types)
- *
- * Revision 1.65  2009/09/15 19:31:54  fplanque
- * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
- * PHP 4 compatible. Even better on PHP 5.
- * I may have broken a few things. Sorry. This is pretty hard to do in one swoop without any glitch.
- * Thanks for fixing or reporting if you spot issues.
- *
- * Revision 1.64  2009/09/14 18:37:07  fplanque
- * doc/cleanup/minor
- *
- * Revision 1.63  2009/09/13 21:51:01  blueyed
- * Fix bpost_count_words to use unicode. Fixes the russian test.
- *
- * Revision 1.62  2009/09/13 21:29:21  blueyed
- * MySQL query cache optimization: remove information about seconds from post_datestart and item_issue_date.
- *
- * Revision 1.61  2009/08/29 12:23:56  tblue246
- * - SECURITY:
- * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.
- * 	- files.ctrl.php: Removed redundant calls to User::check_perm().
- * 	- XML-RPC APIs: Added missing permission checks.
- * 	- items.ctrl.php: Check permission to edit item with current status (also checks user levels) for update actions.
- * - XML-RPC client: Re-added check for zlib support (removed by update).
- * - XML-RPC APIs: Corrected method signatures (return type).
- * - Localization:
- * 	- Fixed wrong permission description in blog user/group permissions screen.
- * 	- Removed wrong TRANS comment
- * 	- de-DE: Fixed bad translation strings (double quotes + HTML attribute = mess).
- * - File upload:
- * 	- Suppress warnings generated by move_uploaded_file().
- * 	- File browser: Hide link to upload screen if no upload permission.
- * - Further code optimizations.
- *
- * Revision 1.60  2009/08/23 20:08:27  tblue246
- * - Check extra categories when validating post type permissions.
- * - Removed User::check_perm_catusers() + Group::check_perm_catgroups() and modified User::check_perm() to perform the task previously covered by these two methods, fixing a redundant check of blog group permissions and a malfunction introduced by the usage of Group::check_perm_catgroups().
- *
- * Revision 1.59  2009/08/23 13:42:48  tblue246
- * Doc. Please read.
- *
- * Revision 1.58  2009/08/22 20:31:01  tblue246
- * New feature: Post type permissions
- *
- * Revision 1.57  2009/08/22 17:07:08  tblue246
- * Minor/coding style
- *
- * Revision 1.56  2009/07/06 23:52:24  sam2kb
- * Hardcoded "admin.php" replaced with $dispatcher
- *
- * Revision 1.55  2009/07/06 22:49:11  fplanque
- * made some small changes on "publish now" handling.
- * Basically only display it for drafts everywhere.
- *
- * Revision 1.54  2009/07/06 16:04:08  tblue246
- * Moved echo_publishnowbutton_js() to _item.funcs.php
- *
- * Revision 1.53  2009/07/04 19:19:08  tblue246
- * Bugfix
- *
- * Revision 1.52  2009/07/04 19:14:30  tblue246
- * bpost_count_words(): Use str_word_count if the \p escape sequence is not supported. This is the case for PHP versions before 4.4.0 and 5.1.0.
- *
- * Revision 1.51  2009/07/01 23:54:05  fplanque
- * doc
- *
- * Revision 1.50  2009/06/28 20:02:43  fplanque
- * ROLLBACK: b2evo requires PHP 4.3 as a minimum version.This is already a very old version. Code to accomodate older versions is bloat.
- *
- * Revision 1.49  2009/06/12 22:02:17  blueyed
- * cat_select: do not link the category name, but add an extra link: cat name is useful for selecting.
- *
- * Revision 1.48  2009/06/12 21:39:46  blueyed
- * cat_select: link each category name to the permanent url
- *
- * Revision 1.47  2009/06/01 17:42:47  tblue246
- * bpost_count_words(): Better PCRE test
- *
- * Revision 1.46  2009/06/01 16:56:27  tblue246
- * Bugfix
- *
- * Revision 1.45  2009/06/01 16:36:54  tblue246
- * Make bpost_count_words() work with extreme old PHP versions and versions not supporting the PCRE escape \p
- *
- * Revision 1.44  2009/05/25 19:47:45  fplanque
- * better linking of files
- *
- * Revision 1.43  2009/04/14 22:30:05  blueyed
- * TODO for bpost_count_words
- *
- * Revision 1.42  2009/04/14 14:57:48  tblue246
- * Trying to fix bpost_count_words()
- *
- * Revision 1.41  2009/04/13 22:33:23  tblue246
- * Doc
- *
- * Revision 1.40  2009/03/15 18:46:37  fplanque
- * please don't do whitespace edits
- *
- * Revision 1.39  2009/03/15 12:33:00  tblue246
- * minor
- *
- * Revision 1.38  2009/03/13 00:53:13  fplanque
- * super nasty sneaky bug
- *
- * Revision 1.36  2009/03/08 23:57:44  fplanque
- * 2009
- *
- * Revision 1.35  2009/03/03 21:21:09  blueyed
- * Deprecate get_the_category_by_ID and replace its usage with ChapterCache
- * in core.
- *
- * Revision 1.34  2009/02/22 23:14:29  fplanque
- * partial rollback of stuff that can't be right...
- *
- * Revision 1.33  2009/02/21 23:10:43  fplanque
- * Minor
- *
- * Revision 1.32  2009/02/02 00:04:28  tblue246
- * Fixing doc
- *
- * Revision 1.31  2009/01/24 00:29:27  waltercruz
- * Implementing links in the blog itself, not in a linkblog, first attempt
- *
- * Revision 1.30  2009/01/23 21:34:52  fplanque
- * fixed UGLY bug on page 2,3,4
- *
- * Revision 1.29  2009/01/23 17:23:09  fplanque
- * doc/minor
- *
- * Revision 1.28  2009/01/22 18:44:56  blueyed
- * Fix E_NOTICE if there is no featured item. Add TODO about this assignment.
- *
- * Revision 1.27  2009/01/21 22:26:26  fplanque
- * Added tabs to post browsing admin screen All/Posts/Pages/Intros/Podcasts/Comments
- *
- * Revision 1.26  2009/01/21 20:33:49  fplanque
- * different display between featured and intro posts
- *
- * Revision 1.25  2009/01/21 18:23:26  fplanque
- * Featured posts and Intro posts
- *
- * Revision 1.24  2009/01/19 21:40:59  fplanque
- * Featured post proof of concept
- *
- * Revision 1.23  2008/12/28 23:35:51  fplanque
- * Autogeneration of category/chapter slugs(url names)
- *
- * Revision 1.22  2008/12/27 21:09:28  fplanque
- * minor
- *
- * Revision 1.21  2008/12/23 02:23:05  tblue246
- * Make bpost_count_words() work more accurate. Inaccuracy reported by sam2kb ( http://forums.b2evolution.net/viewtopic.php?t=16596 ).
- *
- * Revision 1.20  2008/12/22 01:56:54  fplanque
- * minor
- *
- * Revision 1.19  2008/12/09 21:57:37  tblue246
- * PHPDoc; strip a possible dash (-) at the end of an URL title which could prevent access to the post when a trailing dash is used to identify tag page URLs (see http://forums.b2evolution.net/viewtopic.php?p=84288 ).
- *
- * Revision 1.18  2008/09/23 07:56:47  fplanque
- * Demo blog now uses shared files folder for demo media + more images in demo posts
- *
- * Revision 1.17  2008/09/23 05:26:38  fplanque
- * Handle attaching files when multiple posts are edited simultaneously
- *
- * Revision 1.16  2008/04/14 19:50:51  fplanque
- * enhanced attachments handling in post edit mode
- *
- * Revision 1.15  2008/04/14 16:24:39  fplanque
- * use ActionArray[] to make action handlign more robust
- *
- * Revision 1.14  2008/04/13 20:40:06  fplanque
- * enhanced handlign of files attached to items
- *
- * Revision 1.13  2008/04/03 19:37:37  fplanque
- * category selector will be smaller if less than 11 cats
- *
- * Revision 1.12  2008/04/03 19:33:27  fplanque
- * category selector will be smaller if less than 11 cats
- *
- * Revision 1.11  2008/04/03 14:54:34  fplanque
- * date fixes
- *
- * Revision 1.10  2008/03/22 19:32:22  fplanque
- * minor
- *
- * Revision 1.9  2008/03/22 15:20:19  fplanque
- * better issue time control
- *
- * Revision 1.8  2008/03/21 16:07:03  fplanque
- * longer post slugs
- *
- * Revision 1.7  2008/01/21 09:35:31  fplanque
- * (c) 2008
- *
- * Revision 1.6  2007/12/21 21:52:51  fplanque
- * added tag
- *
- * Revision 1.5  2007/09/23 18:57:15  fplanque
- * filter handling fixes
- *
- * Revision 1.4  2007/09/07 20:11:18  fplanque
- * Better category selector
- *
- * Revision 1.3  2007/09/03 20:01:53  blueyed
- * Fixed "Add a new category»" link (blog param)
- *
- * Revision 1.2  2007/09/03 16:44:28  fplanque
- * chicago admin skin
- *
- * Revision 1.1  2007/06/25 11:00:25  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.52  2007/05/28 01:33:22  fplanque
- * permissions/fixes
- *
- * Revision 1.51  2007/05/14 02:43:05  fplanque
- * Started renaming tables. There probably won't be a better time than 2.0.
- *
- * Revision 1.50  2007/05/13 20:44:11  fplanque
- * url fix
- *
- * Revision 1.49  2007/05/09 01:01:32  fplanque
- * permissions cleanup
- *
- * Revision 1.48  2007/05/07 18:03:28  fplanque
- * cleaned up skin code a little
- *
- * Revision 1.47  2007/04/26 00:11:11  fplanque
- * (c) 2007
- *
- * Revision 1.46  2007/03/26 14:21:30  fplanque
- * better defaults for pages implementation
- *
- * Revision 1.45  2007/03/26 12:59:18  fplanque
- * basic pages support
- *
- * Revision 1.44  2007/03/18 00:31:18  fplanque
- * Delegated MainList init to skin *pages* which need it.
- *
- * Revision 1.43  2007/03/11 23:56:02  fplanque
- * fixed some post editing oddities / variable cleanup (more could be done)
- *
- * Revision 1.42  2007/03/03 01:14:12  fplanque
- * new methods for navigating through posts in single item display mode
- *
- * Revision 1.41  2007/02/12 15:42:40  fplanque
- * public interface for looping over a cache
- *
- * Revision 1.40  2007/02/06 13:34:20  waltercruz
- * Changing double quotes to single quotes
- *
- * Revision 1.39  2006/12/23 23:37:35  fplanque
- * refactoring / Blog::get_default_cat_ID()
- *
- * Revision 1.38  2006/12/16 17:05:55  blueyed
- * todo
- *
- * Revision 1.37  2006/12/15 23:31:21  fplanque
- * reauthorized _ in urltitles.
- * No breaking of legacy permalinks.
- * - remains the default placeholder though.
- *
- * Revision 1.36  2006/12/12 23:23:30  fplanque
- * finished post editing v2.0
- *
- * Revision 1.35  2006/12/12 02:53:56  fplanque
- * Activated new item/comments controllers + new editing navigation
- * Some things are unfinished yet. Other things may need more testing.
- *
- * Revision 1.34  2006/12/11 17:26:21  fplanque
- * some cross-linking
- *
- * Revision 1.33  2006/12/04 21:20:27  blueyed
- * Abstracted convert_special_charsets() out of urltitle_validate()
- *
- * Revision 1.32  2006/12/03 22:23:26  fplanque
- * doc
- *
- * Revision 1.31  2006/11/24 18:27:24  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.30  2006/11/23 00:37:35  blueyed
- * Added two more replacements in urltitle_validate and pass charset to htmlentities()
  */
 ?>

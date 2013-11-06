@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -37,11 +37,20 @@ global $Blog;
  */
 global $Plugins;
 
+global $current_User, $admin_url;
 
 $Form = new Form( NULL, 'plugin_settings_checkchanges' );
 
 // PluginUserSettings
 load_funcs('plugins/_plugin.funcs.php');
+
+if( $current_User->check_perm( 'options', 'edit', false ) )
+{	// Display this message only if current user has permission to manage the plugins
+	echo '<p class="center">'
+			.sprintf( T_('Here you can configure some plugins individually for each blog. To manage your installed plugins go <a %s>here</a>.'),
+					      'href="'.$admin_url.'?ctrl=plugins"' )
+		.'</p>';
+}
 
 $have_plugins = false;
 $Plugins->restart();
@@ -58,7 +67,8 @@ while( $loop_Plugin = & $Plugins->get_next() )
 	// We use output buffers here to display the fieldset only if there's content in there
 	ob_start();
 
-	$Form->begin_fieldset( $loop_Plugin->name.get_manual_link('blog_plugin_settings') );
+	$priority_link = '<a href="'.$loop_Plugin->get_edit_settings_url().'#ffield_edited_plugin_code">'.$loop_Plugin->priority.'</a>';
+	$Form->begin_fieldset( $loop_Plugin->name.' ('.T_('Priority').': '.$priority_link.')'.get_manual_link('blog_plugin_settings') );
 
 	ob_start();
 
@@ -103,32 +113,8 @@ else
 
 /*
  * $Log$
- * Revision 1.10  2011/09/04 22:13:14  fplanque
- * copyright 2011
- *
- * Revision 1.9  2010/09/08 15:07:44  efy-asimo
- * manual links
- *
- * Revision 1.8  2010/08/24 08:20:19  efy-asimo
- * twitter plugin oAuth
- *
- * Revision 1.7  2010/02/08 17:52:09  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.6  2010/01/30 18:55:21  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.5  2010/01/03 13:45:36  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.4  2009/08/09 19:15:12  fplanque
- * fix for when there are multiple plugins with blog specific settings
- *
- * Revision 1.3  2009/05/28 10:08:56  tblue246
- * Display a message if there are no plugin settings
- *
- * Revision 1.2  2009/05/27 16:19:06  fplanque
- * Plugins can now have Settings that are specific to each blog.
+ * Revision 1.12  2013/11/06 08:03:58  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

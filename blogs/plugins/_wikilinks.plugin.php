@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  * @ignore
@@ -22,11 +22,11 @@ class wikilinks_plugin extends Plugin
 	var $code = 'b2evWiLi';
 	var $name = 'Wiki Links';
 	var $priority = 35;
-	var $version = '1.9-dev';
-	var $apply_rendering = 'opt-in';
+	var $version = '5.0.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
+	var $help_url = 'http://b2evolution.net/man/technical-reference/renderer-plugins/wiki-links-plugin';
 	var $number_of_installs = 1;
 
 	/**
@@ -35,8 +35,37 @@ class wikilinks_plugin extends Plugin
 	function PluginInit( & $params )
 	{
 		$this->short_desc = T_('Wiki Links converter');
-		$this->long_desc = T_('WikiWord links are created with a CamelCased WikiWord, a ((link)), or a [[link ]].<br />
-		 CamelCased words will be exploded to camel_case which should then match a post url title.');
+		$this->long_desc = T_('You can create links with [[CamelCase]] or ((CamelCase)) which will try to link to the category or the post with the slug "camel-case". See manual for more.');
+	}
+
+
+	/**
+	 * Define here default collection/blog settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::get_coll_setting_definitions()}.
+	 */
+	function get_coll_setting_definitions( & $params )
+	{
+		$default_values = array(
+				'default_post_rendering' => 'opt-in'
+			);
+
+		if( !empty( $params['blog_type'] ) && $params['blog_type'] != 'forum' )
+		{	// Set the default settings depends on blog type
+			$default_values['default_comment_rendering'] = 'never';
+		}
+
+		$default_params = array_merge( $params, $default_values );
+		return array_merge( parent::get_coll_setting_definitions( $default_params ),
+			array(
+				'link_without_brackets' => array(
+					'label' => $this->T_('Links without brackets'),
+					'type' => 'checkbox',
+					'defaultvalue' => 0,
+					'note' => $this->T_('Enable this to create the links from words like WikiWord without brackets [[]]'),
+				)
+			) );
 	}
 
 
@@ -54,7 +83,16 @@ class wikilinks_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		global $ItemCache, $admin_url, $blog;
+		global $ItemCache, $admin_url, $blog, $evo_charset;
+
+		$Item = $params['Item'];
+		$item_Blog = & $Item->get_Blog();
+
+		$regexp_modifier = '';
+		if( $evo_charset == 'utf-8' )
+		{ // Add this modifier to work with UTF-8 strings correctly
+			$regexp_modifier = 'u';
+		}
 
 		// Regular links:
 		$search = array(
@@ -74,7 +112,7 @@ class wikilinks_plugin extends Plugin
 			'<a href="$1">$4</a>'
 		);
 
-		$content = preg_replace( $search, $replace, $content );
+		$content = replace_content_outcode( $search, $replace, $content );
 
 /* QUESTION: fplanque, implementation of this planned? then use make_clickable() - or remove this comment
 	$ret = preg_replace("#([\n ])aim:([^,< \n\r]+)#i", "\\1<a href=\"aim:goim?screenname=\\2\\3&message=Hello\">\\2\\3</a>", $ret);
@@ -85,18 +123,83 @@ class wikilinks_plugin extends Plugin
 
 	$ret = preg_replace("#([\n ])([a-z0-9\-_.]+?)@([^,< \n\r]+)#i", "\\1<a href=\"mailto:\\2@\\3\">\\2@\\3</a>", $ret); */
 
+		// To use function replace_special_chars()
+		load_funcs('locales/_charset.funcs.php');
 
 		// WIKIWORDS:
 
 		$search_wikiwords = array();
 		$replace_links = array();
 
-		// STANDALONE WIKIWORDS:
+		if( $this->get_coll_setting( 'link_without_brackets', $item_Blog ) )
+		{	// Create the links from standalone WikiWords
+
+			// STANDALONE WIKIWORDS:
+			$search = '/
+					(?<= \s | ^ )													# Lookbehind for whitespace
+					([\p{Lu}]+[\p{Ll}0-9_]+([\p{Lu}]+[\p{L}0-9_]+)+)	# WikiWord or WikiWordLong
+					(?= [\.,:;!\?] \s | \s | $ )											# Lookahead for whitespace or punctuation
+				/x'.$regexp_modifier;	// x = extended (spaces + comments allowed)
+
+			if( preg_match_all( $search, $content, $matches, PREG_SET_ORDER) )
+			{
+				// Construct array of wikiwords to look up in post urltitles
+				$wikiwords = array();
+				foreach( $matches as $match )
+				{
+					// Convert the WikiWord to an urltitle
+					$WikiWord = $match[0];
+					$Wiki_Word = preg_replace( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '$1-$2', $WikiWord );
+					$wiki_word = evo_strtolower( $Wiki_Word );
+					// echo '<br />Match: [', $WikiWord, '] -> [', $wiki_word, ']';
+					$wiki_word = replace_special_chars( $wiki_word );
+					$wikiwords[ $WikiWord ] = $wiki_word;
+				}
+
+				// Lookup all urltitles at once in DB and preload cache:
+				$ItemCache = & get_ItemCache();
+				$ItemCache->load_urltitle_array( $wikiwords );
+
+				// Construct arrays for replacing wikiwords by links:
+				foreach( $wikiwords as $WikiWord => $wiki_word )
+				{
+					// WikiWord
+					$search_wikiwords[] = '/
+						(?<= \s | ^ ) 						# Lookbehind for whitespace or start
+						(?<! <span\ class="NonExistentWikiWord"> )
+						'.$WikiWord.'							# Specific WikiWord to replace
+						(?= [\.,:;!\?] \s | \s | $ )							# Lookahead for whitespace or end of string
+						/sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
+
+
+					// Find matching Item:
+					if( ($Item = & $ItemCache->get_by_urltitle( $wiki_word, false )) !== false )
+					{ // Item Found
+						$permalink = $Item->get_permanent_url();
+
+						// WikiWord
+						$replace_links[] = '<a href="'.$permalink.'">'.$Item->get( 'title' ).'</a>';
+
+					}
+					else
+					{ // Item not found
+
+						$create_link = isset($blog) ? ('<a href="'.$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$blog.'&amp;post_title='.preg_replace( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
+
+						// WikiWord
+						$replace_links[] = '<span class="NonExistentWikiWord">'.$WikiWord.$create_link.'</span>';
+
+					}
+				}
+			}
+		}
+
+		// BRACKETED WIKIWORDS:
 		$search = '/
-				(?<= \s | ^ )													# Lookbehind for whitespace
-				([A-Z]+[a-z0-9_]+([A-Z]+[A-Za-z0-9_]+)+)	# WikiWord or WikiWordLong
-				(?= [\.,:;!\?] \s | \s | $ )											# Lookahead for whitespace or punctuation
-			/x';	// x = extended (spaces + comments allowed)
+				(?<= \(\( | \[\[ )										# Lookbehind for (( or [[
+				([\p{L}0-9]+[\p{L}0-9_\-]*)									# Anything from Wikiword to WikiWordLong
+				(?= ( \s .*? )? ( \)\) | \]\] ) )			# Lookahead for )) or ]]
+			/x'.$regexp_modifier;	// x = extended (spaces + comments allowed)
 
 		if( preg_match_all( $search, $content, $matches, PREG_SET_ORDER) )
 		{
@@ -106,215 +209,123 @@ class wikilinks_plugin extends Plugin
 			{
 				// Convert the WikiWord to an urltitle
 				$WikiWord = $match[0];
-				$Wiki_Word = preg_replace( '*([^A-Z_])([A-Z])*', '$1_$2', $WikiWord );
-				$wiki_word = strtolower( $Wiki_Word );
+				if( preg_match( '/^[\p{Ll}0-9_\-]+$/'.$regexp_modifier, $WikiWord ) )
+				{	// This WikiWord already matches a slug format
+					$Wiki_Word = $WikiWord;
+					$wiki_word = $Wiki_Word;
+				}
+				else
+				{	// Convert WikiWord to slug format
+					$Wiki_Word = preg_replace( array( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '*([^0-9])([0-9])*'.$regexp_modifier ), '$1-$2', $WikiWord );
+					$wiki_word = evo_strtolower( $Wiki_Word );
+				}
 				// echo '<br />Match: [', $WikiWord, '] -> [', $wiki_word, ']';
+				$wiki_word = replace_special_chars( $wiki_word );
 				$wikiwords[ $WikiWord ] = $wiki_word;
 			}
 
 			// Lookup all urltitles at once in DB and preload cache:
+			$ChapterCache = & get_ChapterCache();
+			$ChapterCache->load_urlname_array( $wikiwords );
 			$ItemCache = & get_ItemCache();
 			$ItemCache->load_urltitle_array( $wikiwords );
 
 			// Construct arrays for replacing wikiwords by links:
 			foreach( $wikiwords as $WikiWord => $wiki_word )
 			{
-				// WikiWord
-				$search_wikiwords[] = '/
-					(?<= \s | ^ ) 						# Lookbehind for whitespace or start
-					(?<! <span\ class="NonExistentWikiWord"> )
+				// [[WikiWord text]]
+				$search_wikiwords[] = '*
+					\[\[
 					'.$WikiWord.'							# Specific WikiWord to replace
-					(?= [\.,:;!\?] \s | \s | $ )							# Lookahead for whitespace or end of string
-					/sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
+					\s (.+?)
+					\]\]
+					*sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
+
+				// ((WikiWord text))
+				$search_wikiwords[] = '*
+					\(\(
+					'.$WikiWord.'							# Specific WikiWord to replace
+					\s (.+?)
+					\)\)
+					*sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
+
+				// [[Wikiword]]
+				$search_wikiwords[] = '*
+					\[\[
+					'.$WikiWord.'							# Specific WikiWord to replace
+					\]\]
+					*sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
+
+				// ((Wikiword))
+				$search_wikiwords[] = '*
+					\(\(
+					'.$WikiWord.'							# Specific WikiWord to replace
+					\)\)
+					*sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
 
 
-				// Find matching Item:
-				if( ($Item = & $ItemCache->get_by_urltitle( $wiki_word, false )) !== false )
-				{ // Item Found
+				// Find matching Chapter or Item:
+				$permalink = '';
+				$link_text = preg_replace( array( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '*([^0-9])([0-9])*'.$regexp_modifier ), '$1 $2', $WikiWord );
+				$link_text = ucwords( str_replace( '-', ' ', $link_text ) );
+				if( ($Chapter = & $ChapterCache->get_by_urlname( $wiki_word, false )) !== false )
+				{ // Chapter is found
+					$permalink = $Chapter->get_permanent_url();
+					$existing_link_text = $Chapter->get( 'name' );
+				}
+				elseif( ($Item = & $ItemCache->get_by_urltitle( $wiki_word, false )) !== false )
+				{ // Item is found
 					$permalink = $Item->get_permanent_url();
+					$existing_link_text = $Item->get( 'title' );
+				}
 
-					// WikiWord
-					$replace_links[] = '<a href="'.$permalink.'">'.$WikiWord.'</a>';
+				if( !empty( $permalink ) )
+				{	// Chapter or Item are found
+					// [[WikiWord text]]
+					$replace_links[] = '<a href="'.$permalink.'">$1</a>';
 
+					// ((WikiWord text))
+					$replace_links[] = '<a href="'.$permalink.'">$1</a>';
+
+					// [[Wikiword]]
+					$replace_links[] = '<a href="'.$permalink.'">'.$existing_link_text.'</a>';
+
+					// ((Wikiword))
+					$replace_links[] = '<a href="'.$permalink.'">'.$link_text.'</a>';
 				}
 				else
-				{ // Item not found
+				{	// Chapter and Item are not found
+					$create_link = isset($blog) ? ('<a href="'.$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$blog.'&amp;post_title='.preg_replace( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
 
-					$create_link = isset($blog) ? ('<a href="'.$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$blog.'&amp;post_title='.preg_replace( '*([^A-Z_])([A-Z])*', '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
+					// [[WikiWord text]]
+					$replace_links[] = '<span class="NonExistentWikiWord">$1'.$create_link.'</span>';
 
-					// WikiWord
-					$replace_links[] = '<span class="NonExistentWikiWord">'.$WikiWord.$create_link.'</span>';
+					// ((WikiWord text))
+					$replace_links[] = '<span class="NonExistentWikiWord">$1'.$create_link.'</span>';
 
+					// [[Wikiword]]
+					$replace_links[] = '<span class="NonExistentWikiWord">'.$link_text.$create_link.'</span>';
+
+					// ((Wikiword))
+					$replace_links[] = '<span class="NonExistentWikiWord">'.$link_text.$create_link.'</span>';
 				}
 			}
-		}
-
-		// BRACKETED WIKIWORDS:
-		$search = '/
-				(?<= \(\( | \[\[ )										# Lookbehind for (( or [[
-				([A-Z]+[A-Za-z0-9_]*)									# Anything from Wikiword to WikiWordLong
-				(?= ( \s .*? )? ( \)\) | \]\] ) )			# Lookahead for )) or ]]
-			/x';	// x = extended (spaces + comments allowed)
-
-		if( preg_match_all( $search, $content, $matches, PREG_SET_ORDER) )
-		{
-		// Construct array of wikiwords to look up in post urltitles
-		$wikiwords = array();
-		foreach( $matches as $match )
-		{
-			// Convert the WikiWord to an urltitle
-			$WikiWord = $match[0];
-			$Wiki_Word = preg_replace( '*([^A-Z_])([A-Z])*', '$1_$2', $WikiWord );
-			$wiki_word = strtolower( $Wiki_Word );
-			// echo '<br />Match: [', $WikiWord, '] -> [', $wiki_word, ']';
-			$wikiwords[ $WikiWord ] = $wiki_word;
-		}
-
-		// Lookup all urltitles at once in DB and preload cache:
-		$ItemCache = & get_ItemCache();
-		$ItemCache->load_urltitle_array( $wikiwords );
-
-		// Construct arrays for replacing wikiwords by links:
-		foreach( $wikiwords as $WikiWord => $wiki_word )
-		{
-			// [[WikiWord text]]
-			$search_wikiwords[] = '*
-				\[\[
-				'.$WikiWord.'							# Specific WikiWord to replace
-				\s (.+?)
-				\]\]
-				*sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
-
-			// ((WikiWord text))
-			$search_wikiwords[] = '*
-				\(\(
-				'.$WikiWord.'							# Specific WikiWord to replace
-				\s (.+?)
-				\)\)
-				*sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
-
-			// [[Wikiword]]
-			$search_wikiwords[] = '*
-				\[\[
-				'.$WikiWord.'							# Specific WikiWord to replace
-				\]\]
-				*sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
-
-			// ((Wikiword))
-			$search_wikiwords[] = '*
-				\(\(
-				'.$WikiWord.'							# Specific WikiWord to replace
-				\)\)
-				*sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
-
-
-			// Find matching Item:
-			if( ($Item = & $ItemCache->get_by_urltitle( $wiki_word, false )) !== false )
-			{ // Item Found
-				$permalink = $Item->get_permanent_url();
-
-				// [[WikiWord text]]
-				$replace_links[] = '<a href="'.$permalink.'">$1</a>';
-
-				// ((WikiWord text))
-				$replace_links[] = '<a href="'.$permalink.'">$1</a>';
-
-				// [[Wikiword]]
-				$replace_links[] = '<a href="'.$permalink.'">'.$WikiWord.'</a>';
-
-				// ((Wikiword))
-				$replace_links[] = '<a href="'.$permalink.'">'.$WikiWord.'</a>';
-			}
-			else
-			{ // Item not found
-
-				$create_link = isset($blog) ? ('<a href="'.$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$blog.'&amp;post_title='.preg_replace( '*([^A-Z_])([A-Z])*', '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
-
-				// [[WikiWord text]]
-				$replace_links[] = '<span class="NonExistentWikiWord">$1'.$create_link.'</span>';
-
-				// ((WikiWord text))
-				$replace_links[] = '<span class="NonExistentWikiWord">$1'.$create_link.'</span>';
-
-				// [[Wikiword]]
-				$replace_links[] = '<span class="NonExistentWikiWord">'.$WikiWord.$create_link.'</span>';
-
-				// ((Wikiword))
-				$replace_links[] = '<span class="NonExistentWikiWord">'.$WikiWord.$create_link.'</span>';
-			}
-		}
 		}
 
 		// echo '<br />---';
 
 		// pre_dump( $search_wikiwords );
 
-		if( count( $search_wikiwords ) )
-		{ // We have set some links to replace:
-			$content = preg_replace( $search_wikiwords, $replace_links, $content );
-		}
+		$content = replace_content_outcode( $search_wikiwords, $replace_links, $content );
 
 		return true;
 	}
 }
 
-
 /*
  * $Log$
- * Revision 1.31  2011/09/04 22:13:23  fplanque
- * copyright 2011
- *
- * Revision 1.30  2010/02/08 17:55:50  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.29  2009/09/26 12:00:44  tblue246
- * Minor/coding style
- *
- * Revision 1.28  2009/09/25 07:33:31  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.27  2009/03/08 23:57:48  fplanque
- * 2009
- *
- * Revision 1.26  2008/01/21 09:35:41  fplanque
- * (c) 2008
- *
- * Revision 1.25  2007/04/26 00:11:04  fplanque
- * (c) 2007
- *
- * Revision 1.24  2007/04/20 02:53:13  fplanque
- * limited number of installs
- *
- * Revision 1.23  2006/12/26 03:19:12  fplanque
- * assigned a few significant plugin groups
- *
- * Revision 1.22  2006/12/12 02:53:57  fplanque
- * Activated new item/comments controllers + new editing navigation
- * Some things are unfinished yet. Other things may need more testing.
- *
- * Revision 1.21  2006/08/19 07:56:32  fplanque
- * Moved a lot of stuff out of the automatic instanciation in _main.inc
- *
- * Revision 1.20  2006/07/10 20:19:30  blueyed
- * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
- *
- * Revision 1.19  2006/07/07 21:26:49  blueyed
- * Bumped to 1.9-dev
- *
- * Revision 1.18  2006/07/06 19:56:29  fplanque
- * no message
- *
- * Revision 1.17  2006/06/16 21:30:57  fplanque
- * Started clean numbering of plugin versions (feel free do add dots...)
- *
- * Revision 1.16  2006/05/30 20:28:56  blueyed
- * typo
- *
- * Revision 1.15  2006/05/30 19:39:56  fplanque
- * plugin cleanup
- *
- * Revision 1.14  2006/04/11 21:22:26  fplanque
- * partial cleanup
+ * Revision 1.33  2013/11/06 08:05:22  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

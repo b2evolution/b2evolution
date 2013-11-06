@@ -6,7 +6,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -44,7 +44,7 @@ class Plugins_admin extends Plugins
 	 * Load all plugins (not just enabled ones).
 	 */
 	var $sql_load_plugins_table = '
-			SELECT plug_ID, plug_priority, plug_classname, plug_code, plug_name, plug_shortdesc, plug_apply_rendering, plug_status, plug_version, plug_spam_weight
+			SELECT plug_ID, plug_priority, plug_classname, plug_code, plug_name, plug_shortdesc, plug_status, plug_version, plug_spam_weight
 			  FROM T_plugins
 			 ORDER BY plug_priority, plug_classname';
 
@@ -78,6 +78,7 @@ class Plugins_admin extends Plugins
 	 *  - PluginUserSettingsEditDisplayAfter (Called after displaying normal user settings)
 	 *  - PluginUserSettingsValidateSet (Called before setting a plugin's user setting in the backoffice)
 	 *  - PluginVersionChanged (Called when we detect a version change)
+	 *  - PluginCollSettingsUpdateAction (Called as action before updating the collection/blog's settings)
 	 *
 	 *  The max length of event names is 40 chars (T_pluginevents.pevt_event).
 	 *
@@ -105,7 +106,7 @@ class Plugins_admin extends Plugins
 				'AdminAfterMenuInit' => 'This gets called after the backoffice menu has been initialized.',
 				'AdminTabAction' => 'This gets called before AdminTabPayload when the Tools tab for the plugin is selected; no output allowed!',
 				'AdminTabPayload' => 'This gets called when the Tools tab for the plugin is selected and content should be displayed.',
-				'AdminToolAction' => '', // Tblue> Not used yet/anymore?
+				'AdminToolAction' => '',
 				'AdminToolPayload' => 'This gets called when the plugin\'s block in the Tools menu should be displayed.',
 
 				'AdminBeforeItemEditCreate' => 'This gets called before a new item gets created from the backoffice.',
@@ -126,6 +127,10 @@ class Plugins_admin extends Plugins
 				'AfterCollectionInsert' => 'Gets called after a blog has been inserted into the database.',
 				'AfterCollectionUpdate' => 'Gets called after a blog has been updated in the database.',
 
+				'AfterObjectDelete' => 'Gets called after a data object has been deleted from the database.',
+				'AfterObjectInsert' => 'Gets called after a data object has been inserted into the database.',
+				'AfterObjectUpdate' => 'Gets called after a data object has been updated in the database.',
+
 				'GetCollectionKinds' => 'Defines blog kinds, their names and description.',
 				'InitCollectionKinds' => 'Defines blog settings by its kind.',
 
@@ -143,6 +148,9 @@ class Plugins_admin extends Plugins
 				'RenderItemAsHtml' => 'Renders content when generated as HTML.',
 				'RenderItemAsXml' => 'Renders content when generated as XML.',
 				'RenderItemAsText' => 'Renders content when generated as plain text.',
+				'RenderItemAttachment' => 'Renders item attachment.',
+				'RenderCommentAttachment' => 'Renders comment attachment.',
+
 
 				// fp> rename to "DispRender"
 				// dh> TODO: those do not get called anymore!
@@ -182,6 +190,7 @@ class Plugins_admin extends Plugins
 				'DisplayMessageFormButton' => 'Called in the submit button section of the frontend message form.',
 				'DisplayMessageFormFieldset' => 'Called at the end of the frontend message form.',
 				'DisplayLoginFormFieldset' => 'Called when displaying the "Login" form.',
+				'DisplayRegisterFormBefore' => 'Called when displaying the "Register" form.',
 				'DisplayRegisterFormFieldset' => 'Called when displaying the "Register" form.',
 				'DisplayValidateAccountFormFieldset' => 'Called when displaying the "Validate account" form.',
 				'DisplayProfileFormFieldset' => 'Called when displaying the "User profile" form.',
@@ -213,6 +222,8 @@ class Plugins_admin extends Plugins
 				'AppendUserRegistrTransact' => 'Gets appended to the transaction that creates a new user on registration.',
 				'AfterUserRegistration' => 'Gets called after a new user has registered.',
 
+				'AfterPluginsInit' => 'Gets called after $Plugins is initialized, this is the earliest event.',
+				'AfterMainInit' => 'Called at the end of _main.inc.php, this is the the latest event called before blog initialization.',
 				'SessionLoaded' => 'Gets called after $Session is initialized, quite early.',
 				'BeforeSessionsDelete' => 'Gets called when sessions are being pruned to enable plugin house cleaning, plugin might change the sess_lastseen timestamp of any sessions they want to keep',
 
@@ -220,6 +231,7 @@ class Plugins_admin extends Plugins
 				'AfterLoginRegisteredUser' => 'Gets called at the end of the login procedure for registered users.',
 
 				'BeforeBlogDisplay' => 'Gets called before a (part of the blog) gets displayed.',
+				'InitMainList' => 'Initializes the MainList object. Use this method to create your own MainList, see init_MainList()',
 				'SkinBeginHtmlHead' => 'Gets called at the top of the HTML HEAD section in a skin.',
 				'SkinEndHtmlBody' => 'Gets called at the end of the skin\'s HTML BODY section.',
 				'DisplayTrackbackAddr' => 'Called to display the trackback URL for an item.',
@@ -227,6 +239,8 @@ class Plugins_admin extends Plugins
 				'GetCronJobs' => 'Gets a list of implemented cron jobs.',
 				'GetProvidedSkins' => 'Get a list of "skins" handled by the plugin.',
 
+				// sam2kb> This hook is not used anywhere
+				// TODO: remove it
 				'PluginUserSettingsEditAction' => 'Called as action before editing a user\'s settings.',
 
 				// allow plugins to handle $disp modes
@@ -320,11 +334,15 @@ class Plugins_admin extends Plugins
 
 		$Debuglog->add( 'Discovering plugins...', 'plugins' );
 
-		// too inefficient: foreach( get_filenames( $this->plugins_path, true, false ) as $path )
+		// too inefficient: foreach( get_filenames( $this->plugins_path, array('inc_dirs' => false) ) as $path )
 
+		$filename_params = array(
+				'inc_files'	=> false,
+				'recurse'	=> false,
+			);
 		// Get subdirs in $this->plugins_path
 		$subdirs = array();
-		$subdirs = get_filenames( $this->plugins_path, false, true, true, false );
+		$subdirs = get_filenames( $this->plugins_path, $filename_params );
 
 		if( empty($subdirs) )
 			return;
@@ -343,8 +361,14 @@ class Plugins_admin extends Plugins
 		foreach( $subdirs as $subdir )
 		{
 			// Some directories may be unreadable ( get_filenames returns false which is not an array )
-			if( !$files = get_filenames( $subdir, true, false, true, false ) )
+			$filename_params = array(
+					'inc_dirs'	=> false,
+					'recurse'	=> false,
+				);
+			if( !$files = get_filenames( $subdir, $filename_params ) )
+			{
 				continue;
+			}
 
 			foreach( $files as $filename )
 			{
@@ -383,12 +407,12 @@ class Plugins_admin extends Plugins
 		if( empty( $apply_rendering_values ) )
 		{
 			$apply_rendering_values = array(
-					'stealth' => '',
-					'always' => '',
-					'opt-out' => '',
-					'opt-in' => '',
-					'lazy' => '',
-					'never' => '',
+					'stealth' => 'stealth',
+					'always' => 'always',
+					'opt-out' => 'opt-out',
+					'opt-in' => 'opt-in',
+					'lazy' => 'automatic', // The plugin will automatically deside to use rendering or not 
+					'never' => 'never',
 				);
 		}
 		if( ! $with_desc )
@@ -418,6 +442,17 @@ class Plugins_admin extends Plugins
 
 		$plugin_class_methods = array();
 
+		if( $Plugin->group == 'rendering' )
+		{ // All Plugin from 'rendering' groups handle the FilterCommentContent
+			$plugin_class_methods[] = 'FilterCommentContent';
+		}
+
+		if( ! function_exists('token_get_all') )
+		{
+			$Debuglog->add( 'get_registered_events(): PHP function token_get_all() is not available', array('plugins', 'error') );
+			return array();
+		}
+
 		if( ! is_readable($Plugin->classfile_path) )
 		{
 			$Debuglog->add( 'get_registered_events(): "'.$Plugin->classfile_path.'" is not readable.', array('plugins', 'error') );
@@ -429,7 +464,6 @@ class Plugins_admin extends Plugins
 			$Debuglog->add( 'get_registered_events(): "'.$Plugin->classfile_path.'" could not get read.', array('plugins', 'error') );
 			return array();
 		}
-
 		$supported_events = array_keys( $this->get_supported_events() );
 
 		// TODO: allow optional Plugin callback to get list of methods. Like Plugin::GetRegisteredEvents().
@@ -440,7 +474,8 @@ class Plugins_admin extends Plugins
 
 		// TODO: dh> only match in the relevant "class block"
 		$had_func_token = false;
-		foreach( token_get_all( $classfile_contents ) as $token )
+		$token_all = token_get_all( $classfile_contents );
+		foreach( $token_all as $token )
 		{
 			if( ! is_array( $token ) )
 			{	// Single characters does not interest us:
@@ -549,8 +584,8 @@ class Plugins_admin extends Plugins
 		$DB->begin();
 
 		$DB->query( '
-				INSERT INTO T_plugins( plug_classname, plug_priority, plug_code, plug_apply_rendering, plug_version, plug_status )
-				VALUES( "'.$classname.'", '.$Plugin->priority.', '.$DB->quote($Plugin->code).', '.$DB->quote($Plugin->apply_rendering).', '.$DB->quote($Plugin->version).', '.$DB->quote($Plugin->status).' ) ' );
+				INSERT INTO T_plugins( plug_classname, plug_priority, plug_code, plug_version, plug_status )
+				VALUES( "'.$classname.'", '.$Plugin->priority.', '.$DB->quote($Plugin->code).', '.$DB->quote($Plugin->version).', '.$DB->quote($Plugin->status).' ) ' );
 
 		// Unset auto-generated ID info
 		unset( $this->index_ID_Plugins[ $Plugin->ID ] );
@@ -564,7 +599,6 @@ class Plugins_admin extends Plugins
 				'plug_priority' => $Plugin->priority,
 				'plug_classname' => $Plugin->classname,
 				'plug_code' => $Plugin->code,
-				'plug_apply_rendering' => $Plugin->apply_rendering,
 				'plug_status' => $Plugin->status,
 				'plug_version' => $Plugin->version,
 			);
@@ -628,19 +662,25 @@ class Plugins_admin extends Plugins
 		              WHERE puset_plug_ID = $plugin_ID" );
 
 		// Delete Plugin events (constraints)
-		foreach( $DB->get_col( '
-				SELECT pevt_event
-				  FROM T_pluginevents
-				 WHERE pevt_enabled = 1' ) as $event )
-		{
-			if( strpos($event, 'RenderItemAs') === 0 )
-			{ // Clear pre-rendered content cache, if RenderItemAs* events get removed:
-				$DB->query( 'DELETE FROM T_items__prerendering WHERE 1=1' );
-				$ItemCache = & get_ItemCache();
-				$ItemCache->clear();
-				break;
-			}
+		$plugin_events = $DB->get_col( '
+					SELECT pevt_event
+					FROM T_pluginevents
+					WHERE pevt_enabled = 1'
+		);
+		$plugin_events = implode( '.', $plugin_events );
+		if( strpos( $plugin_events, 'RenderItemAs' ) !== false )
+		{ // Clear pre-rendered content cache, if RenderItemAs* events get removed:
+			$DB->query( 'DELETE FROM T_items__prerendering WHERE 1=1' );
 		}
+		if( strpos( $plugin_events, 'FilterCommentContent' ) !== false )
+		{ // Clear pre-rendered comments content cache, if FilterCommentContent plugin get removed
+			$DB->query( 'DELETE FROM T_comments__prerendering WHERE 1=1' );
+		}
+
+		// Remove plugin collection settings
+		$DB->query( "DELETE FROM T_coll_settings
+		              WHERE cset_name LIKE 'plugin".$plugin_ID."_%'" );
+
 		$DB->query( "DELETE FROM T_pluginevents
 		              WHERE pevt_plug_ID = $plugin_ID" );
 
@@ -811,47 +851,52 @@ class Plugins_admin extends Plugins
 
 
 	/**
-	 * Set the apply_rendering value for a given Plugin ID.
-	 *
-	 * It makes sure that the index is handled and writes it to DB.
-	 *
-	 * @return boolean true if set to new value, false in case of error or if already set to same value
+	 * Reload all plugins to detect changes
+	 *  - Register new events
+	 *  - Unregister obsolete events
+	 *  - Detect plugins with no code and try to have at least one plugin with the default code
+	 * 
+	 * @return boolean true if plugins have been changed, false otherwise
 	 */
-	function set_apply_rendering( $plugin_ID, $apply_rendering )
+	function reload_plugins()
 	{
-		global $DB;
+		$this->restart();
+		$this->load_events();
+		$changed = false;
+		while( $loop_Plugin = & $this->get_next() )
+		{ // loop through in each plugin
+			// NOTE: we don't need to handle plug_version here, because it gets handled in Plugins::register() already.
 
-		if( ! in_array( $apply_rendering, $this->get_apply_rendering_values() ) )
-		{
-			debug_die( 'Plugin apply_rendering not in allowed list.' );
+			// Discover new events:
+			if( $this->save_events( $loop_Plugin, array() ) )
+			{
+				$changed = true;
+			}
+
+			// Detect plugins with no code and try to have at least one plugin with the default code:
+			if( empty($loop_Plugin->code) )
+			{ // Instantiated Plugin has no code
+				$default_Plugin = & $this->register($loop_Plugin->classname);
+
+				if( ! empty($default_Plugin->code) // Plugin has default code
+				    && ! $this->get_by_code( $default_Plugin->code ) ) // Default code is not in use (anymore)
+				{ // Set the Plugin's code to the default one
+					if( $this->set_code( $loop_Plugin->ID, $default_Plugin->code ) )
+					{
+						$changed = true;
+					}
+				}
+
+				$this->unregister($default_Plugin, true);
+			}
 		}
 
-		$Plugin = & $this->get_by_ID($plugin_ID);
-		if( ! $Plugin )
-		{
-			return false;
+		if( $changed )
+		{ // invalidate all PageCaches
+			invalidate_pagecaches();
 		}
 
-		if( $this->index_ID_rows[$Plugin->ID]['plug_apply_rendering'] == $apply_rendering )
-		{ // Already set to same value
-			return false;
-		}
-
-		$r = $DB->query( '
-			UPDATE T_plugins
-			  SET plug_apply_rendering = '.$DB->quote($apply_rendering).'
-			WHERE plug_ID = '.$plugin_ID );
-
-		$Plugin->apply_rendering = $apply_rendering;
-
-		// Apply-rendering index:
-		if( ! isset( $this->index_apply_rendering_codes[ $Plugin->apply_rendering ] )
-		    || ! in_array( $Plugin->code, $this->index_apply_rendering_codes[ $Plugin->apply_rendering ] ) )
-		{
-			$this->index_apply_rendering_codes[ $Plugin->apply_rendering ][] = $Plugin->code;
-		}
-
-		return true;
+		return $changed;
 	}
 
 
@@ -1367,6 +1412,86 @@ class Plugins_admin extends Plugins
 
 
 	/**
+	 * Handle filter/unfilter_contents
+	 * 
+	 * See {@link Plugins_admin::filter_contents()} and {@link Plugins_admin::unfilter_contents()}
+	 * 
+	 * @param array renderer codes to use for opt-out, opt-in and lazy
+	 * @param array array params key => value, must contain:
+	 *  - 'event' => 'FilterItemContents' or 'UnfilterItemContents'
+	 *  - 'object_type' => 'Item' or 'Comment'
+	 *  - 'object_Blog' => the Blog where the edited Object belongs to
+	 *  - 'title' => the object title
+	 *  - 'content' => the object content
+	 *  @return mixed string rendered content on success | false on failure
+	 */
+	function process_event_filtering( $renderers, & $params )
+	{
+		if( !isset( $params['event'] ) || !in_array( $params['event'], array( 'FilterItemContents', 'UnfilterItemContents' ) ) )
+		{ // invalid event param
+			return false;
+		}
+
+		if( !isset( $params['object_Blog'] ) )
+		{
+			global $Blog;
+			if( empty( $Blog ) )
+			{
+				return false;
+			}
+			$params['object_Blog'] = & $Blog;
+		}
+
+		if( isset( $params['object_type'] ) && ( $params['object_type'] == 'Comment' ) )
+		{
+			$rendering_setting_name = 'coll_apply_comment_rendering';
+		}
+		else
+		{
+			$rendering_setting_name = 'coll_apply_rendering';
+		}
+
+		$params = array_merge( array(
+				'title' => & $title,
+				'content' => & $content,
+			), $params
+		);
+
+		$event = $params['event'];
+		$filter_Plugins = $this->get_list_by_event( $event );
+
+		foreach( $filter_Plugins as $loop_filter_Plugin )
+		{ // Go through whole list of renders
+			switch( $loop_filter_Plugin->get_coll_setting( $rendering_setting_name, $params['object_Blog'] ) )
+			{
+				case 'stealth':
+				case 'always':
+					// echo 'FORCED ';
+					$this->call_method( $loop_filter_Plugin->ID, $event, $params );
+					break;
+
+				case 'opt-out':
+				case 'opt-in':
+				case 'lazy':
+					if( in_array( $loop_filter_Plugin->code, $renderers ) )
+					{ // Option is activated
+						// echo 'OPT ';
+						$this->call_method( $loop_filter_Plugin->ID, $event, $params );
+					}
+					// else echo 'NOOPT ';
+					break;
+
+				case 'never':
+					// echo 'NEVER ';
+					break;	// STOP, don't render, go to next renderer
+			}
+		}
+
+		return $content;
+	}
+
+
+	/**
 	 * Filter (post) contents by calling the relevant filter plugins.
 	 *
 	 * Works very much like render() except that it's called at insert/update time and BEFORE validation.
@@ -1379,47 +1504,19 @@ class Plugins_admin extends Plugins
 	 *
 	 * @param string content to render (by reference)
 	 * @param array renderer codes to use for opt-out, opt-in and lazy
-	 * @return string rendered content
+	 * @param array params must contain the 'object_type' ( Item or Comment ) and the 'object_Blog'
+	 * @return mixed string rendered content on success | false on failure
 	 */
-	function filter_contents( & $title, & $content, $renderers )
+	function filter_contents( & $title, & $content, $renderers, & $params )
 	{
-		// echo 'CALLING FILTERS: '.implode(',',$renderers);
+		$params = array_merge( array(
+				'event' => 'FilterItemContents',
+				'title' => & $title,
+				'content' => & $content,
+			), $params
+		);
 
-		$params['title'] = & $title;
-		$params['content'] = & $content;
-
-		$filter_Plugins = $this->get_list_by_event( 'FilterItemContents' );
-
-		foreach( $filter_Plugins as $loop_filter_Plugin )
-		{ // Go through whole list of renders
-			// echo ' ',$loop_RendererPlugin->code, ':';
-
-			switch( $loop_filter_Plugin->apply_rendering )
-			{
-				case 'stealth':
-				case 'always':
-					// echo 'FORCED ';
-					$this->call_method( $loop_filter_Plugin->ID, 'FilterItemContents', $params );
-					break;
-
-				case 'opt-out':
-				case 'opt-in':
-				case 'lazy':
-					if( in_array( $loop_filter_Plugin->code, $renderers ) )
-					{ // Option is activated
-						// echo 'OPT ';
-						$this->call_method( $loop_filter_Plugin->ID, 'FilterItemContents', $params );
-					}
-					// else echo 'NOOPT ';
-					break;
-
-				case 'never':
-					// echo 'NEVER ';
-					break;	// STOP, don't render, go to next renderer
-			}
-		}
-
-		return $content;
+		return $this->process_event_filtering( $renderers, $params );
 	}
 
 
@@ -1441,300 +1538,28 @@ class Plugins_admin extends Plugins
 	 * @param string title to render (by reference)
 	 * @param string content to render (by reference)
 	 * @param array renderer codes to use for opt-out, opt-in and lazy
-	 * @return string rendered content
+	 * @param array params must contain the 'object_type' ( Item or Comment ) and the 'object_Blog'
+	 * @return mixed string rendered content on success | false on failure
 	 */
-	function unfilter_contents( & $title, & $content, $renderers )
+	function unfilter_contents( & $title, & $content, $renderers, & $params )
 	{
-		// echo 'CALLING FILTERS: '.implode(',',$renderers);
-
-		$params['title'] = & $title;
-		$params['content'] = & $content;
-
-		$filter_Plugins = $this->get_list_by_event( 'UnfilterItemContents' );
+		$params = array_merge( array(
+				'event' => 'UnfilterItemContents',
+				'title' => & $title,
+				'content' => & $content,
+			), $params
+		);
 
 		// fp> TODO: reverse order
-
-		foreach( $filter_Plugins as $loop_filter_Plugin )
-		{ // Go through whole list of renders
-			// echo ' ',$loop_RendererPlugin->code, ':';
-
-			switch( $loop_filter_Plugin->apply_rendering )
-			{
-				case 'stealth':
-				case 'always':
-					// echo 'FORCED ';
-					$this->call_method( $loop_filter_Plugin->ID, 'UnfilterItemContents', $params );
-					break;
-
-				case 'opt-out':
-				case 'opt-in':
-				case 'lazy':
-					if( in_array( $loop_filter_Plugin->code, $renderers ) )
-					{ // Option is activated
-						// echo 'OPT ';
-						$this->call_method( $loop_filter_Plugin->ID, 'UnfilterItemContents', $params );
-					}
-					// else echo 'NOOPT ';
-					break;
-
-				case 'never':
-					// echo 'NEVER ';
-					break;	// STOP, don't render, go to next renderer
-			}
-		}
-
-		return $content;
+		return $this->process_event_filtering( $renderers, $params );
 	}
 
 }
 
 /*
  * $Log$
- * Revision 1.40  2011/10/17 22:00:31  fplanque
- * cleanup
+ * Revision 1.42  2013/11/06 08:04:36  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.39  2011/10/17 10:26:54  efy-vitalij
- * add supported event 'DisplayEditorButton'
- *
- * Revision 1.38  2011/10/14 07:46:36  efy-vitalij
- * add event 'DisplayItemFormFieldset' to array of supported events
- *
- * Revision 1.37  2011/09/04 22:13:18  fplanque
- * copyright 2011
- *
- * Revision 1.36  2011/02/20 23:37:06  fplanque
- * minor/doc
- *
- * Revision 1.35  2011/01/11 05:39:50  sam2kb
- * Additional checks in plugins discover function
- *
- * Revision 1.34  2010/06/01 02:44:44  sam2kb
- * New hooks added: GetCollectionKinds and InitCollectionKinds.
- * Use them to define new and override existing presets for new blogs.
- * See http://forums.b2evolution.net/viewtopic.php?t=21015
- *
- * Revision 1.33  2010/05/24 14:50:40  fplanque
- * no message
- *
- * Revision 1.32  2010/03/14 06:36:58  sam2kb
- * New plugin hooks: BeforeThumbCreate, AfterFileUpload
- *
- * Revision 1.31  2010/02/26 22:15:48  fplanque
- * whitespace/doc/minor
- *
- *
- * Revision 1.29  2010/02/23 05:07:17  sam2kb
- * New plugin hooks: DisplayProfileFormFieldset and ProfileFormSent
- *
- * Revision 1.28  2010/02/08 17:53:24  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.27  2010/01/03 12:36:15  fplanque
- * Renamed hooks
- *
- * Revision 1.26  2010/01/02 20:11:08  sam2kb
- * Added new hooks: AfterBlogInsert, AfterBlogUpdate, AfterBlogDelete
- *
- * Revision 1.25  2009/12/22 23:13:38  fplanque
- * Skins v4, step 1:
- * Added new disp modes
- * Hooks for plugin disp modes
- * Enhanced menu widgets (BIG TIME! :)
- *
- * Revision 1.24  2009/09/26 12:00:43  tblue246
- * Minor/coding style
- *
- * Revision 1.23  2009/09/25 07:33:14  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.22  2009/09/14 13:24:14  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.21  2009/07/12 19:12:51  fplanque
- * doc
- *
- * Revision 1.20  2009/07/06 22:55:11  fplanque
- * minor
- *
- * Revision 1.19  2009/07/06 14:55:06  yabs
- * doc
- *
- * Revision 1.18  2009/07/02 21:57:11  blueyed
- * doc fix: move files and classes to the plugins package
- *
- * Revision 1.17  2009/07/02 00:01:50  fplanque
- * needs optimization.
- *
- * Revision 1.16  2009/07/01 23:55:48  fplanque
- * doc
- *
- * Revision 1.15  2009/06/14 12:17:18  yabs
- * adding BeforeSessionsDelete trigger to enable plugins to perform housekeeping based on the sessions that are about to be pruned
- *
- * Revision 1.14  2009/06/07 14:23:24  yabs
- * enabling plugin disp types
- *
- * Revision 1.13  2009/05/26 12:48:11  tblue246
- * - Plugins_admin::get_registered_events(): Fixed possible bug.
- * - Added test case for Plugins_admin::get_registered_events().
- * - Added a sample plugin for the test case.
- *
- * Revision 1.12  2009/05/25 21:10:07  tblue246
- * Plugins_admin::get_registered_events(): Use PHP's tokenizer instead of preg_match_all()
- *
- * Revision 1.11  2009/05/22 17:36:50  sam2kb
- * Added array_unique to prevent "Duplicate entry" errors
- *
- * Revision 1.10  2009/03/23 23:05:34  fplanque
- * Demo of how to tap into menu structure from a plugin.
- *
- * Revision 1.9  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.8  2009/03/06 14:12:28  tblue246
- * Added missing documentation for Plugin hooks
- *
- * Revision 1.7  2009/02/28 22:49:02  blueyed
- * Fix check for valid filename in discover.
- *
- * Revision 1.6  2009/02/27 20:25:08  blueyed
- * Move Plugins_admin::validate_renderer_list back to Plugins, since it gets used for displaying items and saves (at least) a load_plugins_table call/query
- *
- * Revision 1.5  2009/02/23 06:12:25  sam2kb
- * Quotes replaced, see http://forums.b2evolution.net/viewtopic.php?t=17994
- *
- * Revision 1.4  2008/01/21 09:35:32  fplanque
- * (c) 2008
- *
- * Revision 1.3  2007/07/24 23:29:25  blueyed
- * todo
- *
- * Revision 1.2  2007/07/04 23:37:29  blueyed
- * PluginUserSettingsEditAction gets triggered and therefor needs to be in the
- * list of "available events", so Plugins can actually hook there.
- *
- * Revision 1.1  2007/06/25 11:00:46  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.41  2007/05/14 02:43:05  fplanque
- * Started renaming tables. There probably won't be a better time than 2.0.
- *
- * Revision 1.40  2007/04/26 00:11:08  fplanque
- * (c) 2007
- *
- * Revision 1.39  2007/04/05 22:57:33  fplanque
- * Added hook: UnfilterItemContents
- *
- * Revision 1.38  2007/03/31 22:46:47  fplanque
- * FilterItemContent event
- *
- * Revision 1.37  2007/03/12 14:07:08  waltercruz
- * Changing the WHERE 1 queries to boolean (WHERE 1=1) queries to satisfy the standarts
- *
- * Revision 1.36  2007/02/24 23:03:00  blueyed
- * MFB: Fixed "Unknown dependency type" error display
- *
- * Revision 1.35  2007/02/23 00:21:23  blueyed
- * Fixed Plugins::get_next() if the last Plugin got unregistered; Added AdminBeforeItemEditDelete hook
- *
- * Revision 1.34  2007/02/19 23:20:07  blueyed
- * Added plugin event SkinEndHtmlBody
- *
- * Revision 1.33  2007/02/18 23:19:28  blueyed
- * doc
- *
- * Revision 1.32  2007/02/18 20:52:38  blueyed
- * Load parent class
- *
- * Revision 1.31  2007/02/16 13:34:08  waltercruz
- * Changing double quotes to single quotes
- *
- * Revision 1.30  2007/01/28 23:58:46  blueyed
- * - Added hook CommentFormSent
- * - Re-ordered comment_post.php to: init, validate, process
- * - RegisterFormSent hook can now filter the form values in a clean way
- *
- * Revision 1.29  2007/01/20 23:43:12  blueyed
- * bugfix for new discover(): exclude subdirs that start with "_" now again
- *
- * Revision 1.28  2007/01/20 16:03:24  blueyed
- * Optimized discover()
- *
- * Revision 1.27  2007/01/15 19:28:29  blueyed
- * Small opt
- *
- * Revision 1.26  2007/01/14 18:15:51  blueyed
- * Nuked hackish $is_admin_class as per todo
- *
- * Revision 1.25  2007/01/13 14:57:28  blueyed
- * Removed $is_admin_class hack from load_events() by re-implementing (copying most of it) to Plugins_admin as per todo
- *
- * Revision 1.24  2007/01/12 05:14:42  fplanque
- * doc
- *
- * Revision 1.23  2007/01/09 01:00:51  blueyed
- * todo
- *
- * Revision 1.22  2007/01/09 00:53:53  blueyed
- * doc
- *
- * Revision 1.21  2007/01/07 19:39:44  fplanque
- * doc
- *
- * Revision 1.20  2007/01/07 05:26:01  fplanque
- * doc
- *
- * Revision 1.19  2006/12/28 23:20:40  fplanque
- * added plugin event for displaying comment form toolbars
- * used by smilies plugin
- *
- * Revision 1.18  2006/12/07 23:13:13  fplanque
- * @var needs to have only one argument: the variable type
- * Otherwise, I can't code!
- *
- * Revision 1.17  2006/12/04 00:18:53  fplanque
- * keeping the login hashing
- *
- * Revision 1.14  2006/12/01 20:46:25  blueyed
- * Moved Plugins::set_priority() to Plugins_admin class
- *
- * Revision 1.13  2006/12/01 20:44:01  blueyed
- * Moved Plugins::set_code() to Plugins_admin class
- *
- * Revision 1.12  2006/12/01 20:41:38  blueyed
- * Moved Plugins::uninstall() to Plugins_admin class
- *
- * Revision 1.11  2006/12/01 20:34:03  blueyed
- * Moved Plugins::get_apply_rendering_values() and Plugins::set_apply_rendering() to Plugins_admin class
- *
- * Revision 1.10  2006/12/01 20:19:15  blueyed
- * Moved Plugins::get_supported_events() to Plugins_admin class
- *
- * Revision 1.9  2006/12/01 20:13:24  blueyed
- * Moved Plugins::count_regs() to Plugins_admin class
- *
- * Revision 1.8  2006/12/01 20:11:24  blueyed
- * Renamed Plugins_admin::validate_list() to validate_renderer_list()
- *
- * Revision 1.7  2006/12/01 20:01:38  blueyed
- * Moved Plugins::validate_dependencies() to Plugins_admin class
- *
- * Revision 1.6  2006/12/01 19:46:42  blueyed
- * Moved Plugins::validate_list() to Plugins_admin class; added stub in Plugins, because at least the starrating_plugin uses it
- *
- * Revision 1.5  2006/12/01 19:16:00  blueyed
- * Moved Plugins::get_registered_events() to Plugins_admin class
- *
- * Revision 1.4  2006/12/01 18:18:22  blueyed
- * Moved Plugins::save_events() to Plugins_admin class
- *
- * Revision 1.3  2006/12/01 02:03:04  blueyed
- * Moved Plugins::set_event_status() to Plugins_admin
- *
- * Revision 1.2  2006/11/30 05:57:54  blueyed
- * Moved Plugins::install() and sort() galore to Plugins_admin
- *
- * Revision 1.1  2006/11/30 05:43:40  blueyed
- * Moved Plugins::discover() to Plugins_admin::discover(); Renamed Plugins_no_DB to Plugins_admin_no_DB (and deriving from Plugins_admin)
  */
 ?>

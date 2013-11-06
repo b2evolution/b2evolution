@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage evopress
@@ -38,6 +38,10 @@ $params = array_merge( array(
 					'before'    => '<div class="floatright">',
 					'after'     => '</div>',
 				) );
+		}
+		if( $Item->status != 'published' )
+		{
+			$Item->status( array( 'format' => 'styled' ) );
 		}
 	?>
 

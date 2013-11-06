@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal Note: we need at least one file in the main package}}
  *
@@ -20,43 +20,7 @@ require_once dirname(__FILE__).'/conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
 
-$BlogCache = & get_BlogCache();
-
-if( preg_match( '#^(.+?)index.php/([^/]+)#', $ReqHost.$ReqPath, $matches ) )
-{ // We have an URL blog name:
-	$Debuglog->add( 'Found a potential URL blog name: '.$matches[2], 'detectblog' );
-	if( (($Blog = & $BlogCache->get_by_urlname( $matches[2], false )) !== false) )
-	{ // We found a matching blog:
-		$blog = $Blog->ID;
-	}
-}
-
-if( empty($blog) )
-{ // No blog identified by URL name, let's try to match the absolute URL
-	if( preg_match( '#^(.+?)index.php#', $ReqHost.$ReqPath, $matches ) )
-	{ // Remove what's not part of the absolute URL
-		$ReqAbsUrl = $matches[1];
-	}
-	else
-	{
-		$ReqAbsUrl = $ReqHost.$ReqPath;
-	}
-	$Debuglog->add( 'Looking up absolute url : '.$ReqAbsUrl, 'detectblog' );
-
-	if( (($Blog = & $BlogCache->get_by_url( $ReqAbsUrl, false )) !== false) )
-	{ // We found a matching blog:
-		$blog = $Blog->ID;
-		$Debuglog->add( 'Found matching blog: '.$blog, 'detectblog' );
-	}
-}
-
-if( empty($blog) )
-{ // Still no blog requested, use default
-	$blog = $Settings->get('default_blog_ID');
-	$Debuglog->add( 'Using default blog '.$blog, 'detectblog' );
-}
-
-if( empty($blog) )
+if( !init_requested_blog() )
 { // No specific blog to be displayed:
 	echo 'No default blog is set.';
 	exit();

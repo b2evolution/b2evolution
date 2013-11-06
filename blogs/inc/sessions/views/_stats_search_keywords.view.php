@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -31,6 +31,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 require_once dirname(__FILE__).'/_stats_view.funcs.php';
 
 load_class( '/sessions/model/_goal.class.php', 'Goal' );
+load_funcs('/cron/_cron.funcs.php');
 
 global $blog, $admin_url, $rsc_url, $goal_ID, $localtimenow;
 global $datestartinput, $datestart, $datestopinput, $datestop;
@@ -73,6 +74,10 @@ if( param_errors_detected() )
 }
 else
 {
+// fp> WTF? Are you kidding me? This MUST be factorized with the cron task!
+
+	keyphrase_job();
+
 	$SQL = new SQL();
 	if( empty( $goal_ID ) && empty($goal_name)  )
 	{	// We're not restricting to one or more Goals, get ALL possible keyphrases:
@@ -116,8 +121,7 @@ else
 			$SQL->WHERE_and( 'goalhit_hit.hit_datetime <= '.$DB->quote($datestop.' 23:59:59') );
 		}
 	}
-	$SQL->WHERE_and( ' T_hitlog.hit_referer_type = "search"
-						 				AND hit_agent_type = "browser"' );
+	$SQL->WHERE_and( 'hit_agent_type = "browser"' );
 	if( $split_engines )
 	{
 		$SQL->GROUP_BY( 'keyp_ID, T_hitlog.hit_referer_dom_ID' );
@@ -149,6 +153,7 @@ else
 
 	// DATA:
 	$SQL->SELECT_add( ', keyp_phrase' );
+	$SQL->SELECT_add( ', keyp_count_refered_searches, keyp_count_internal_searches' );
 
 	if( $split_engines )
 	{
@@ -164,7 +169,7 @@ else
 }
 
 // Create result set:
-$Results = new Results( $sql, '', $split_engines ? '--D' : '-D' , NULL, $sql_count );
+$Results = new Results( $sql, 'keywords_', $split_engines ? '--D' : '-D' , NULL, $sql_count );
 
 $Results->title = T_('Keyphrases');
 
@@ -250,6 +255,20 @@ else
 }
 
 $Results->cols[] = array(
+		'th' => T_('Refered searches'),
+		'order' => 'keyp_count_refered_searches',
+		'td' => '$keyp_count_refered_searches$',
+		'td_class' => 'nowrap right',
+);
+
+$Results->cols[] = array(
+		'th' => T_('Internal searches'),
+		'order' => 'keyp_count_internal_searches',
+		'td' => '$keyp_count_internal_searches$',
+		'td_class' => 'nowrap right',
+);
+
+$Results->cols[] = array(
 		'th' => '%',
 		'order' => 'count',
 		'default_dir' => 'D',
@@ -265,75 +284,14 @@ $Results->cols[] = array(
 		'td' => '%addup_percentage( #count#, '.$total.' )%',
 	);
 
+$Results->global_icon( T_('Reset counters'), 'file_delete', regenerate_url( 'action', 'action=reset_counters' ), T_('Reset counters').' &raquo;', 3, 4  );
 // Display results:
 $Results->display();
 
 /*
  * $Log$
- * Revision 1.12  2011/09/04 22:13:18  fplanque
- * copyright 2011
+ * Revision 1.14  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.11  2011/05/23 03:15:52  sam2kb
- * minor
- *
- * Revision 1.10  2010/11/03 19:44:15  sam2kb
- * Increased modularity - files_Module
- * Todo:
- * - split core functions from _file.funcs.php
- * - check mtimport.ctrl.php and wpimport.ctrl.php
- * - do not create demo Photoblog and posts with images (Blog A)
- *
- * Revision 1.9  2010/02/08 17:53:55  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.8  2010/01/30 18:55:34  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.7  2009/12/08 22:38:13  fplanque
- * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
- *
- * Revision 1.6  2009/09/25 07:33:14  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.5  2009/09/14 13:38:33  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.4  2009/07/09 00:11:18  fplanque
- * minor
- *
- * Revision 1.3  2009/07/08 01:45:48  sam2kb
- * Added param $length to stats_search_keywords()
- * Changed keywords length for better accessibility on low resolution screens
- *
- * Revision 1.2  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.1  2008/05/26 19:30:39  fplanque
- * enhanced analytics
- *
- * Revision 1.5  2008/05/10 22:59:10  fplanque
- * keyphrase logging
- *
- * Revision 1.4  2008/02/19 11:11:18  fplanque
- * no message
- *
- * Revision 1.3  2008/02/14 02:19:52  fplanque
- * cleaned up stats
- *
- * Revision 1.2  2008/01/21 09:35:34  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 11:01:05  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.7  2007/04/26 00:11:13  fplanque
- * (c) 2007
- *
- * Revision 1.6  2007/03/20 09:53:26  fplanque
- * Letting boggers view their own stats.
- * + Letthing admins view the aggregate by default.
- *
- * Revision 1.5  2006/11/26 01:42:10  fplanque
- * doc
  */
 ?>

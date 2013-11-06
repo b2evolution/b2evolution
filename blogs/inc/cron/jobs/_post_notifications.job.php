@@ -49,6 +49,9 @@ $ItemCache = & get_ItemCache();
  */
 $edited_Item = & $ItemCache->get_by_ID( $item_ID );
 
+// Load required functions ( we need to load here, because in CLI mode it is not loaded )
+load_funcs( '_core/_url.funcs.php' );
+
 // send outbound pings:
 if( ! $edited_Item->send_outbound_pings() )
 {
@@ -75,42 +78,8 @@ return 1; /* ok */
 
 /*
  * $Log$
- * Revision 1.5  2011/04/07 13:55:03  efy-asimo
- * Show asynchronous notifications result
- *
- * Revision 1.4  2009/09/26 12:00:42  tblue246
- * Minor/coding style
- *
- * Revision 1.3  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.2  2008/05/10 23:53:46  fplanque
- * fix
- *
- * Revision 1.1  2007/06/25 10:59:46  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.6  2007/05/14 02:43:03  fplanque
- * Started renaming tables. There probably won't be a better time than 2.0.
- *
- * Revision 1.5  2007/02/26 03:41:16  fplanque
- * doc
- *
- * Revision 1.4  2007/02/13 01:30:31  blueyed
- * TODO: do not notify about not published comments / use "outbound_notifications_mode" setting for comments, too
- *
- * Revision 1.3  2006/12/12 02:53:56  fplanque
- * Activated new item/comments controllers + new editing navigation
- * Some things are unfinished yet. Other things may need more testing.
- *
- * Revision 1.2  2006/11/26 22:25:12  blueyed
- * MFB: Normalized messages (dot at end of full sentences)
- *
- * Revision 1.1  2006/08/24 00:43:28  fplanque
- * scheduled pings part 2
- *
- * Revision 1.1  2006/07/06 19:59:08  fplanque
- * better logs, better stats, better pruning
+ * Revision 1.7  2013/11/06 08:04:07  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

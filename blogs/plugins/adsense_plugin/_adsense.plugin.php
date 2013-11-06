@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -22,12 +22,11 @@ class adsense_plugin extends Plugin
 	var $code = 'evo_adsense';
 	var $name = 'AdSense';
 	var $priority = 10;
-	var $apply_rendering = 'opt-out';
 	var $group = 'rendering';
 	var $help_url = 'http://b2evolution.net/blog-ads/adsense-plugin.php';
 	var $short_desc;
 	var $long_desc;
-	var $version = '4.0.0';
+	var $version = '5.0.0';
 	var $number_of_installs = 1;
 
 	/**
@@ -85,7 +84,6 @@ class adsense_plugin extends Plugin
 	}
 
 
-
 	/**
 	 * Define here default collection/blog settings that are to be made available in the backoffice.
 	 *
@@ -112,7 +110,7 @@ class adsense_plugin extends Plugin
 				),
 			);
 
-		return $r;
+		return array_merge( parent::get_coll_setting_definitions( $params ), $r );
 	}
 
 
@@ -178,7 +176,7 @@ class adsense_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		$content = preg_replace_callback( '~<!-- \[adsense:\] -->~', array( $this, 'DisplayItem_callback' ), $content );
+		$content = replace_content_outcode( '~<!-- \[adsense:\] -->~', array( $this, 'DisplayItem_callback' ), $content, 'replace_content_callback' );
 
 		return true;
 	}
@@ -190,7 +188,7 @@ class adsense_plugin extends Plugin
 	function DisplayItem_callback( $matches )
 	{
 		global $Blog;
-		
+
 	  	/**
 		 * How many blocks already displayed?
 		 */
@@ -246,38 +244,8 @@ class adsense_plugin extends Plugin
 
 /*
  * $Log$
- * Revision 1.11  2011/09/07 00:28:26  sam2kb
- * Replace non-ASCII character in regular expressions with ~
- *
- * Revision 1.10  2011/09/04 22:13:23  fplanque
- * copyright 2011
- *
- * Revision 1.9  2010/03/08 21:26:27  fplanque
- * minor/doc
- *
- * Revision 1.8  2010/03/01 04:24:33  sam2kb
- * Save plugin settings after update
- *
- * Revision 1.7  2010/03/01 04:05:58  sam2kb
- * Per-blog plugin settings
- *
- * Revision 1.6  2010/02/08 17:55:50  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.5  2009/03/08 23:57:48  fplanque
- * 2009
- *
- * Revision 1.4  2009/01/25 19:09:32  blueyed
- * phpdoc fixes
- *
- * Revision 1.3  2008/09/27 00:05:55  fplanque
- * minor/version bump
- *
- * Revision 1.2  2008/01/21 09:35:41  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/10/08 22:50:09  fplanque
- * integrated adsense plugin
+ * Revision 1.13  2013/11/06 08:05:22  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

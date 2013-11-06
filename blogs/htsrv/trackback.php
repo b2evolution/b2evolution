@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -39,6 +39,18 @@
 require_once dirname(__FILE__).'/../conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
+
+if( $Settings->get('system_lock') )
+{ // System is locked for maintenance, trackbacks are not allowed
+	$Messages->add( T_('You cannot leave a comment at this time because the system is under maintenance. Please try again in a few moments.'), 'error' );
+	header_redirect(); // Will save $Messages into Session
+}
+
+// Do not append Debuglog to response!
+$debug = false;
+
+// Do not append Debug JSlog to response!
+$debug_jslog = false;
 
 /**
  * Send a trackback response and exits.
@@ -102,7 +114,7 @@ if( !( $Blog = & $commented_Item->get_Blog() ) )
 	trackback_response( 1, 'Sorry, could not get the post\'s weblog.' ); // exits
 }
 
-if( ! $Blog->get('allowtrackbacks') )
+if( ! $commented_Item->can_receive_pings() )
 {
 	trackback_response( 1, 'Sorry, this weblog does not allow you to trackback its posts.' ); // exits
 }
@@ -143,7 +155,7 @@ if( ! empty($title) )
 }
 $comment .= $excerpt;
 
-$comment = format_to_post( $comment, 1, 1 ); // includes antispam
+$comment = format_to_post( $comment, 1 ); // includes antispam
 if( empty($comment) )
 { // comment should not be empty!
 	$Messages->add( T_('Please do not send empty comment'), 'error' );
@@ -213,123 +225,8 @@ trackback_response( 0, 'ok' );
 
 /*
  * $Log$
- * Revision 1.77  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.76  2011/09/04 21:32:17  fplanque
- * minor MFB 4-1
- *
- * Revision 1.75  2011/05/19 17:47:07  efy-asimo
- * register for updates on a specific blog post
- *
- * Revision 1.74  2010/11/25 15:16:34  efy-asimo
- * refactor $Messages
- *
- * Revision 1.73  2010/02/08 17:51:16  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.72  2010/01/30 18:55:15  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.71  2009/09/27 12:57:29  blueyed
- * strmaxlen: add format param, which is used on the (possibly) cropped string.
- *
- * Revision 1.70  2009/09/26 12:00:42  tblue246
- * Minor/coding style
- *
- * Revision 1.69  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.68  2009/09/20 18:54:58  blueyed
- * Use strmaxlen
- *
- * Revision 1.67  2009/03/08 23:57:37  fplanque
- * 2009
- *
- * Revision 1.66  2008/09/28 05:05:06  fplanque
- * minor
- *
- * Revision 1.65  2008/09/27 16:52:30  tblue246
- * Exit with a trackback error instead of debug_die()ing when there's no post with the supplied post ID.
- *
- * Revision 1.64  2008/02/19 11:11:16  fplanque
- * no message
- *
- * Revision 1.63  2008/01/21 09:35:23  fplanque
- * (c) 2008
- *
- * Revision 1.62  2008/01/19 18:24:25  fplanque
- * antispam checking refactored
- *
- * Revision 1.61  2008/01/19 15:45:29  fplanque
- * refactoring
- *
- * Revision 1.60  2008/01/19 10:57:11  fplanque
- * Splitting XHTML checking by group and interface
- *
- * Revision 1.59  2007/04/26 00:11:14  fplanque
- * (c) 2007
- *
- * Revision 1.58  2007/02/13 01:30:31  blueyed
- * TODO: do not notify about not published comments / use "outbound_notifications_mode" setting for comments, too
- *
- * Revision 1.57  2006/12/22 00:26:41  blueyed
- * Require absolute URL for trackback source; Correct charset for trackback_response()
- *
- * Revision 1.56  2006/11/24 18:27:22  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.55  2006/08/19 07:56:29  fplanque
- * Moved a lot of stuff out of the automatic instanciation in _main.inc
- *
- * Revision 1.54  2006/07/03 21:04:48  fplanque
- * translation cleanup
- *
- * Revision 1.53  2006/05/30 00:15:11  blueyed
- * Do not use Item::can_comment here.
- *
- * Revision 1.52  2006/05/29 23:57:13  blueyed
- * todo
- *
- * Revision 1.51  2006/05/29 22:27:46  blueyed
- * Use NULL instead of false for "no display".
- *
- * Revision 1.50  2006/05/29 19:54:45  fplanque
- * no message
- *
- * Revision 1.49  2006/05/20 01:56:07  blueyed
- * ItemCanComment hook; "disable anonymous feedback" through basic antispam plugin
- *
- * Revision 1.48  2006/05/19 18:15:04  blueyed
- * Merged from v-1-8 branch
- *
- * Revision 1.47.2.1  2006/05/19 15:06:23  fplanque
- * dirty sync
- *
- * Revision 1.47  2006/05/02 04:36:24  blueyed
- * Spam karma changed (-100..100 instead of abs/max); Spam weight for plugins; publish/delete threshold
- *
- * Revision 1.46  2006/05/01 05:20:38  blueyed
- * Check for duplicate content in comments/trackback.
- *
- * Revision 1.45  2006/05/01 04:25:04  blueyed
- * Normalization
- *
- * Revision 1.44  2006/04/27 21:03:51  blueyed
- * Cleanup, fix and add Plugin hook
- *
- * Revision 1.43  2006/04/20 16:31:29  fplanque
- * comment moderation (finished for 1.8)
- *
- * Revision 1.42  2006/04/19 20:13:48  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.41  2006/04/19 15:56:02  blueyed
- * Renamed T_posts.post_comments to T_posts.post_comment_status (DB column rename!);
- * and Item::comments to Item::comment_status (Item API change)
- *
- * Revision 1.40  2006/04/11 21:22:25  fplanque
- * partial cleanup
+ * Revision 1.79  2013/11/06 08:03:44  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

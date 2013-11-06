@@ -8,7 +8,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -109,7 +109,7 @@ class ItemListLight extends DataObjectList2
 			$filterset_name = ''				// Name to be used when saving the filterset (leave empty to use default for collection)
 		)
 	{
-		global $Settings;
+		global $Settings, $posttypes_specialtypes;
 
 		// Call parent constructor:
 		parent::DataObjectList2( get_Cache($cache_name), $limit, $param_prefix, NULL );
@@ -125,7 +125,7 @@ class ItemListLight extends DataObjectList2
 		}
 		else
 		{	// Set a generic filterset_name
-			$this->filterset_name = 'ItemList_filters_coll'.$this->Blog->ID;
+			$this->filterset_name = 'ItemList_filters_coll'.( !is_null( $this->Blog ) ? $this->Blog->ID : '0' );
 		}
 
 		$this->page_param = $param_prefix.'paged';
@@ -155,11 +155,11 @@ class ItemListLight extends DataObjectList2
 				'ymdhms_min' => NULL,
 				'ymdhms_max' => NULL,
 				'statuses' => NULL,
-				'types' => '-1000,1500,1520,1530,1570,1600,3000',	// All types except pages, intros and sidebar links
-				'visibility_array' => array( 'published', 'protected', 'private' ),
-				'orderby' => $this->Blog->get_setting('orderby'),
-				'order' => $this->Blog->get_setting('orderdir'),
-				'unit' => $this->Blog->get_setting('what_to_show'),
+				'types' => '-'.implode(',',$posttypes_specialtypes),	// Keep content post types, Exclide pages, intros, sidebar links and ads
+				'visibility_array' => get_inskin_statuses(),
+				'orderby' => !is_null( $this->Blog ) ? $this->Blog->get_setting('orderby') : 'datestart',
+				'order' => !is_null( $this->Blog ) ? $this->Blog->get_setting('orderdir') : 'DESC',
+				'unit' => !is_null( $this->Blog ) ? $this->Blog->get_setting('what_to_show'): 'posts',
 				'posts' => $this->limit,
 				'page' => 1,
 				'featured' => NULL,
@@ -178,19 +178,6 @@ class ItemListLight extends DataObjectList2
 		$this->ItemQuery = new ItemQuery( $this->Cache->dbtablename, $this->Cache->dbprefix, $this->Cache->dbIDname );
 
 		parent::reset();
-	}
-
-
-	/**
-	 * Set default filter values we always want to use if not individually specified otherwise:
-	 *
-	 * @param array default filters to be merged with the class defaults
-	 * @param array default filters for each preset, to be merged with general default filters if the preset is used
-	 */
-	function set_default_filters( $default_filters, $preset_filters = array() )
-	{
-		$this->default_filters = array_merge( $this->default_filters, $default_filters );
-		$this->preset_filters = $preset_filters;
 	}
 
 
@@ -342,7 +329,7 @@ class ItemListLight extends DataObjectList2
 		if( $use_filters )
 		{
 			// Do we want to restore filters or do we want to create a new filterset
-			$filter_action = param( $this->param_prefix.'filter', 'string', 'save' );
+			$filter_action = param( /*$this->param_prefix.*/'filter', 'string', 'save' );
 			// echo ' filter action: ['.$filter_action.'] ';
 			switch( $filter_action )
 			{
@@ -380,7 +367,7 @@ class ItemListLight extends DataObjectList2
 		 * Blog & Chapters/categories restrictions:
 		 */
 		// Get chapters/categories (and compile those values right away)
-		param_compile_cat_array( /* TODO: check $this->Blog->ID == 1 ? 0 :*/ $this->Blog->ID,
+		param_compile_cat_array( /* TODO: check $this->Blog->ID == 1 ? 0 :*/ !is_null( $this->Blog ) ? $this->Blog->ID : 0,
 								$this->default_filters['cat_modifier'], $this->default_filters['cat_array'] );
 
 		$this->filters['cat_array'] = get_param( 'cat_array' );
@@ -531,84 +518,6 @@ class ItemListLight extends DataObjectList2
 
 
 	/**
-	 * Activate preset default filters if necessary
-	 *
-	 */
-	function activate_preset_filters()
-	{
-		$filter_preset = $this->filters['filter_preset'];
-
-		if( empty( $filter_preset ) )
-		{ // No filter preset, there are no additional defaults to use:
-			return;
-		}
-
-		// Override general defaults with the specific defaults for the preset:
-		$this->default_filters = array_merge( $this->default_filters, $this->preset_filters[$filter_preset] );
-
-		// Save the name of the preset in order for is_filtered() to work properly:
-		$this->default_filters['filter_preset'] = $this->filters['filter_preset'];
-	}
-
-
-	/**
-	 * Save current filterset to session.
-	 */
-	function save_filterset()
-	{
-		/**
-		 * @var Session
-		 */
-		global $Session, $Debuglog;
-
-		$Debuglog->add( 'Saving filterset <strong>'.$this->filterset_name.'</strong>', 'filters' );
-
-		$Session->set( $this->filterset_name, $this->filters );
-	}
-
-
-	/**
-	 * Load previously saved filterset from session.
-	 *
-	 * @return boolean true if we could restore something
-	 */
-	function restore_filterset()
-	{
-	  /**
-	   * @var Session
-	   */
-		global $Session;
-	  /**
-	   * @var Request
-	   */
-
-		global $Debuglog;
-
-		$filters = $Session->get( $this->filterset_name );
-
-		/*
-		fp> 2007-09-26> even if there are no filters, we need to "set" them in order to set global variables like $show_statuses
-		if( empty($filters) )
-		{ // We have no saved filters:
-			return false;
-		}
-		*/
-
-		if( empty($filters) )
-		{ // set_filters() expects array
-			$filters = array();
-		}
-
-		$Debuglog->add( 'Restoring filterset <strong>'.$this->filterset_name.'</strong>', 'filters' );
-
-		// Restore filters:
-		$this->set_filters( $filters );
-
-		return true;
-	}
-
-
-	/**
 	 *
 	 *
 	 * @todo count?
@@ -636,8 +545,17 @@ class ItemListLight extends DataObjectList2
 		/*
 		 * filtering stuff:
 		 */
-		$this->ItemQuery->where_chapter2( $this->Blog, $this->filters['cat_array'], $this->filters['cat_modifier'],
+		if( !is_null( $this->Blog ) )
+		{ // Get the posts only for current Blog
+			$this->ItemQuery->where_chapter2( $this->Blog, $this->filters['cat_array'], $this->filters['cat_modifier'],
 																			$this->filters['cat_focus'] );
+		}
+		else // $this->Blog == NULL
+		{ // If we want to get the posts from all blogs
+			// Save for future use (permission checks..)
+			$this->ItemQuery->blog = 0;
+			$this->ItemQuery->Blog = $this->Blog;
+		}
 		$this->ItemQuery->where_tags( $this->filters['tags'] );
 		$this->ItemQuery->where_author( $this->filters['authors'] );
 		$this->ItemQuery->where_assignees( $this->filters['assignees'] );
@@ -667,7 +585,7 @@ class ItemListLight extends DataObjectList2
 		{	// Use blog setting here because 'orderby' might be set to 'ID_list' as default filter
 			$this->filters['orderby'] = $this->Blog->get_setting('orderby');
 		}
-		
+
 		if( empty($order_by) )
 		{
 			$order_by = gen_order_clause( $this->filters['orderby'], $this->filters['order'], $this->Cache->dbprefix, $this->Cache->dbIDname );
@@ -907,7 +825,7 @@ class ItemListLight extends DataObjectList2
 	 */
 	function get_filter_titles( $ignore = array(), $params = array() )
 	{
-		global $month, $post_statuses;
+		global $month;
 
 		$params = array_merge( array(
 				'category_text' => T_('Category').': ',
@@ -1031,13 +949,13 @@ class ItemListLight extends DataObjectList2
 		if( !empty($this->filters['authors']) )
 		{
 			$authors = preg_split('~\s*,\s*~', $this->filters['authors'], -1, PREG_SPLIT_NO_EMPTY);
-			if( $authors ) 
+			if( $authors )
 			{
 				$UserCache = get_UserCache();
 				$author_names = array();
-				foreach( $authors as $author_ID ) 
+				foreach( $authors as $author_ID )
 				{
-					if( $tmp_Author = $UserCache->get_by_ID($author_ID, false) ) 
+					if( $tmp_Author = $UserCache->get_by_ID($author_ID, false) )
 					{
 						$author_names[] = htmlspecialchars($tmp_Author->get_preferred_name());
 					}
@@ -1087,10 +1005,12 @@ class ItemListLight extends DataObjectList2
 		if( count( $this->filters['visibility_array'] ) < 5
 			&& !in_array( 'visibility', $ignore ) )
 		{
+			$post_statuses = get_visibility_statuses();
+
 			$status_titles = array();
 			foreach( $this->filters['visibility_array'] as $status )
 			{
-				$status_titles[] = T_( $post_statuses[$status] );
+				$status_titles[] = $post_statuses[$status];
 			}
 			$title_array[] = T_('Visibility').': '.implode( ', ', $status_titles );
 		}
@@ -1492,8 +1412,6 @@ class ItemListLight extends DataObjectList2
 	 */
 	function page_links( $params = array() )
 	{
-		global $generating_static;
-
 		$default_params = array(
 				'block_start' => '<p class="center">',
 				'block_end' => '</p>',
@@ -1509,10 +1427,6 @@ class ItemListLight extends DataObjectList2
 				'list_span' => 11,
 				'scroll_list_range' => 5,
 			);
-	  if( !empty($generating_static) )
-	  {	// When generating a static page, act as if we were currently on the blog main page:
-	  	$default_params['page_url'] = $this->Blog->get('url');
-		}
 
 		// Use defaults + overrides:
 		$params = array_merge( $default_params, $params );
@@ -1543,245 +1457,8 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
- * Revision 1.46  2011/09/04 22:13:17  fplanque
- * copyright 2011
+ * Revision 1.48  2013/11/06 08:04:15  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.45  2010/12/18 13:48:38  sam2kb
- * Don't display page links if requested page is out of range
- *
- * Revision 1.44  2010/09/02 07:48:33  efy-asimo
- * ItemList and CommentList doc
- *
- * Revision 1.43  2010/04/12 09:41:36  efy-asimo
- * private URL shortener - task
- *
- * Revision 1.42  2010/04/07 08:26:11  efy-asimo
- * Allow multiple slugs per post - update & fix
- *
- * Revision 1.41  2010/03/08 18:18:24  sam2kb
- * Fixes to query_init(): preserve post order in post_ID_list
- *
- * Revision 1.40  2010/03/04 16:40:35  fplanque
- * minor
- *
- * Revision 1.39  2010/03/04 00:58:32  sam2kb
- * query_init(): preserve post order in post_ID_list
- *
- * Revision 1.38  2010/02/08 17:53:15  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.37  2010/01/30 18:55:30  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.36  2010/01/30 03:40:11  fplanque
- * minor
- *
- * Revision 1.35  2010/01/29 00:32:21  blueyed
- * Display preferred user name in author filter.
- *
- * Revision 1.34  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.33  2009/09/20 23:52:34  blueyed
- * Add dateformat param to get_lastpostdate
- *
- * Revision 1.32  2009/09/14 13:17:28  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.31  2009/03/15 21:02:33  tblue246
- * Check m and w parameters (fixes a PHP notice when specifying an invalid month).
- *
- * Revision 1.30  2009/03/13 00:54:37  fplanque
- * calling it "sidebar links"
- *
- * Revision 1.29  2009/03/08 23:57:44  fplanque
- * 2009
- *
- * Revision 1.28  2009/03/03 21:21:09  blueyed
- * Deprecate get_the_category_by_ID and replace its usage with ChapterCache
- * in core.
- *
- * Revision 1.27  2009/02/25 17:18:03  waltercruz
- * Linkroll stuff, take #2
- *
- * Revision 1.26  2009/01/21 22:26:26  fplanque
- * Added tabs to post browsing admin screen All/Posts/Pages/Intros/Podcasts/Comments
- *
- * Revision 1.25  2009/01/21 18:23:26  fplanque
- * Featured posts and Intro posts
- *
- * Revision 1.24  2009/01/19 21:40:59  fplanque
- * Featured post proof of concept
- *
- * Revision 1.23  2008/09/24 08:44:12  fplanque
- * Fixed and normalized order params for widgets (Comments not done yet)
- *
- * Revision 1.22  2008/07/01 08:32:13  fplanque
- * minor
- *
- * Revision 1.21  2008/05/30 17:42:40  blueyed
- * whitespace, minor doc
- *
- * Revision 1.20  2008/03/22 19:39:28  fplanque
- * <title> tag support
- *
- * Revision 1.19  2008/01/21 09:35:31  fplanque
- * (c) 2008
- *
- * Revision 1.18  2007/12/26 23:12:00  yabs
- * changing RANDOM to RAND
- *
- * Revision 1.17  2007/12/26 17:53:24  fplanque
- * minor
- *
- * Revision 1.16  2007/12/26 11:27:47  yabs
- * added post_ID_list to filters
- *
- * Revision 1.15  2007/12/24 10:37:19  yabs
- * adding random order
- *
- * Revision 1.14  2007/11/27 22:31:57  fplanque
- * debugged blog moderation
- *
- * Revision 1.13  2007/11/25 14:28:17  fplanque
- * additional SEO settings
- *
- * Revision 1.12  2007/11/24 21:41:12  fplanque
- * additional SEO settings
- *
- * Revision 1.11  2007/11/11 23:43:37  blueyed
- * Proper fix for array_merge warnings (http://forums.b2evolution.net/viewtopic.php?t=12944); Props Afwas
- *
- * Revision 1.10  2007/11/03 21:04:27  fplanque
- * skin cleanup
- *
- * Revision 1.9  2007/11/01 03:19:34  blueyed
- * Fix for array_merge in PHP5, props yettyn
- *
- * Revision 1.8  2007/10/10 09:02:36  fplanque
- * PHP5 fix
- *
- * Revision 1.7  2007/10/01 01:06:31  fplanque
- * Skin/template functions cleanup.
- *
- * Revision 1.6  2007/09/26 20:26:36  fplanque
- * improved ItemList filters
- *
- * Revision 1.5  2007/09/23 18:57:15  fplanque
- * filter handling fixes
- *
- * Revision 1.4  2007/09/19 20:03:18  yabs
- * minor bug fix ( http://forums.b2evolution.net/viewtopic.php?p=60493#60493 )
- *
- * Revision 1.3  2007/09/03 16:46:58  fplanque
- * minor
- *
- * Revision 1.2  2007/06/29 00:24:43  fplanque
- * $cat_array cleanup tentative
- *
- * Revision 1.1  2007/06/25 11:00:27  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.8  2007/06/21 00:44:37  fplanque
- * linkblog now a widget
- *
- * Revision 1.7  2007/05/27 00:35:26  fplanque
- * tag display + tag filtering
- *
- * Revision 1.6  2007/05/13 22:53:31  fplanque
- * allow feeds restricted to post excerpts
- *
- * Revision 1.5  2007/05/13 22:02:09  fplanque
- * removed bloated $object_def
- *
- * Revision 1.4  2007/03/26 14:21:30  fplanque
- * better defaults for pages implementation
- *
- * Revision 1.3  2007/03/26 12:59:18  fplanque
- * basic pages support
- *
- * Revision 1.2  2007/03/19 21:57:36  fplanque
- * ItemLists: $cat_focus and $unit extensions
- *
- * Revision 1.1  2007/03/18 03:43:19  fplanque
- * EXPERIMENTAL
- * Splitting Item/ItemLight and ItemList/ItemListLight
- * Goal: Handle Items with less footprint than with their full content
- * (will be even worse with multiple languages/revisions per Item)
- *
- * Revision 1.53  2007/03/18 01:39:54  fplanque
- * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
- * (more to come)
- *
- * Revision 1.52  2007/03/12 14:02:41  waltercruz
- * Adding the columns in order by to the query to satisfy the SQL Standarts
- *
- * Revision 1.51  2007/03/03 03:37:56  fplanque
- * extended prev/next item links
- *
- * Revision 1.50  2007/03/03 01:14:12  fplanque
- * new methods for navigating through posts in single item display mode
- *
- * Revision 1.49  2007/01/26 04:49:17  fplanque
- * cleanup
- *
- * Revision 1.48  2007/01/23 09:25:40  fplanque
- * Configurable sort order.
- *
- * Revision 1.47  2007/01/20 23:05:11  blueyed
- * todos
- *
- * Revision 1.46  2007/01/19 21:48:09  blueyed
- * Fixed possible notice in preview_from_request()
- *
- * Revision 1.45  2006/12/17 23:42:38  fplanque
- * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
- * Look into Advanced Settings for the aggregating blog.
- * There may be side effects and new bugs created by this. Please report them :]
- *
- * Revision 1.44  2006/12/05 00:01:15  fplanque
- * enhanced photoblog skin
- *
- * Revision 1.43  2006/12/04 18:16:50  fplanque
- * Each blog can now have its own "number of page/days to display" settings
- *
- * Revision 1.42  2006/11/28 00:33:01  blueyed
- * Removed DB::compString() (never used) and DB::get_list() (just a macro and better to have in the 4 used places directly; Cleanup/normalization; no extended regexp, when not needed!
- *
- * Revision 1.41  2006/11/24 18:27:24  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.40  2006/11/17 00:19:22  blueyed
- * Switch to user locale for validating item_issue_date, because it uses T_()
- *
- * Revision 1.39  2006/11/17 00:09:15  blueyed
- * TODO: error/E_NOTICE with invalid issue date
- *
- * Revision 1.38  2006/11/12 02:13:19  blueyed
- * doc, whitespace
- *
- * Revision 1.37  2006/11/11 17:33:50  blueyed
- * doc
- *
- * Revision 1.36  2006/11/04 19:38:53  blueyed
- * Fixes for hook move
- *
- * Revision 1.35  2006/11/02 16:00:42  blueyed
- * Moved AppendItemPreviewTransact hook, so it can throw error messages
- *
- * Revision 1.34  2006/10/31 00:33:26  blueyed
- * Fixed item_issue_date for preview
- *
- * Revision 1.33  2006/10/10 17:09:39  blueyed
- * doc
- *
- * Revision 1.32  2006/10/08 22:35:01  blueyed
- * TODO: limit===NULL handling
- *
- * Revision 1.31  2006/10/05 01:17:36  blueyed
- * Removed unnecessary/doubled call to Item::update_renderers_from_Plugins()
- *
- * Revision 1.30  2006/10/05 01:06:36  blueyed
- * Removed dirty "hack"; added ItemApplyAsRenderer hook instead.
  */
 ?>

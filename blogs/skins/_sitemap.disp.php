@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -86,20 +86,8 @@ skin_widget( array(
 
 /*
  * $Log$
- * Revision 1.4  2011/09/04 22:13:24  fplanque
- * copyright 2011
- *
- * Revision 1.3  2011/08/03 15:03:33  sam2kb
- * Display all posts and pages
- *
- * Revision 1.2  2010/02/08 17:56:14  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.1  2009/12/22 23:13:39  fplanque
- * Skins v4, step 1:
- * Added new disp modes
- * Hooks for plugin disp modes
- * Enhanced menu widgets (BIG TIME! :)
+ * Revision 1.5  2013/11/06 08:05:36  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

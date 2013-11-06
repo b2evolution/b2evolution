@@ -31,8 +31,8 @@ headers_content_mightcache( 'text/html', 0 );		// Do NOT cache error messages! (
 	exit(0);
 /*
  * $Log$
- * Revision 1.10  2011/10/21 06:58:09  efy-vitalij
- * added function header_http_response
+ * Revision 1.11  2013/11/06 08:05:49  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

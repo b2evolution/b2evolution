@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -33,7 +33,9 @@ global $Blog;
  */
 global $ItemList;
 
-global $redirect_to;
+global $redirect_to, $current_User, $admin_url;
+
+$perm_slugs_view = $current_User->check_perm( 'slugs', 'view' );
 
 $Form = new Form();
 
@@ -66,12 +68,18 @@ while( $Item = & $ItemList->get_item() )
 	{
 		break;
 	}
-	
+
 	$Form->begin_fieldset( '', array( 'class' => 'fieldset clear' ));
-	
-	$Form->text( 'mass_title_'.$Item->ID , $Item->get( 'title'), 70, T_('Title'), '', 255 );
-	$Form->text( 'mass_urltitle_'.$Item->ID, $Item->get( 'urltitle'), 70, T_('URL title "slug"'), '', 255 );
-	$Form->text( 'mass_titletag_'.$Item->ID, $Item->get( 'titletag'), 70, T_( htmlspecialchars('<title> tag') ), '', 255 );
+
+	$edit_slug_link = '';
+	if( $perm_slugs_view )
+	{	// user has permission to view slugs:
+		$edit_slug_link = '&nbsp;'.action_icon( T_('Edit slugs...'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID );
+	}
+
+	$Form->text( 'mass_title_'.$Item->ID , $Item->get( 'title' ), 70, T_('Title'), '', 255 );
+	$Form->text( 'mass_urltitle_'.$Item->ID, $Item->get_slugs(), 70, T_('URL slugs').$edit_slug_link, '', 255 );
+	$Form->text( 'mass_titletag_'.$Item->ID, $Item->get( 'titletag' ), 70, T_( htmlspecialchars('<title> tag') ), '', 255 );
 
 	$Form->end_fieldset();
 }
@@ -85,11 +93,8 @@ $Form->end_form();
 
 /*
  * $Log$
- * Revision 1.4  2011/09/04 22:13:17  fplanque
- * copyright 2011
- *
- * Revision 1.3  2010/07/26 06:52:16  efy-asimo
- * MFB v-4-0
+ * Revision 1.5  2013/11/06 08:04:24  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

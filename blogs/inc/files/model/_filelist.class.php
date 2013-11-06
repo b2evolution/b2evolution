@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -302,8 +302,6 @@ class Filelist
 	 *
 	 * NOTE: this does not work for arbitrary lists!
 	 *
-	 * @todo flatmode always shows hidden files, even if we don't want them :/
-	 *
 	 * @uses $flatmode
 	 * @return boolean True on sucess, false on failure (not accessible)
 	 */
@@ -328,8 +326,15 @@ class Filelist
 		$this->_rdfs_rel_path_index = array();
 		$this->_order_index = array();
 
-		// Attempt list files for requested directory: (recursively if flat mode):
-		if( ($filepath_array = get_filenames( $this->_ads_list_path, $this->include_files, $this->include_dirs, true, $this->flatmode )) === false )
+		// Attempt to list files for requested directory: (recursively if flat mode):
+		$filename_params = array(
+				'inc_files'		=> $this->include_files,
+				'inc_dirs'		=> $this->include_dirs,
+				'recurse'		=> $this->flatmode,
+				'inc_hidden'	=> $this->_show_hidden_files,
+				'inc_evocache'	=> $this->_show_evocache,
+			);
+		if( ($filepath_array = get_filenames( $this->_ads_list_path, $filename_params )) === false )
 		{
 			$Messages->add( sprintf( T_('Cannot open directory &laquo;%s&raquo;!'), $this->_ads_list_path ), 'error' );
 			return false;
@@ -1260,77 +1265,8 @@ class Filelist
 
 /*
  * $Log$
- * Revision 1.12  2011/09/04 22:13:15  fplanque
- * copyright 2011
+ * Revision 1.14  2013/11/06 08:04:08  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.11  2010/11/25 15:16:34  efy-asimo
- * refactor $Messages
- *
- * Revision 1.10  2010/04/02 07:27:11  efy-asimo
- * cache folders rename and Filelist navigation - fix
- *
- * Revision 1.9  2010/02/08 17:52:18  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.8  2009/09/27 20:56:40  blueyed
- * Implement Filelist:get_next non-recursively, which prevents a 'max recursion reached' error and is way smarter anyway.
- *
- * Revision 1.7  2009/09/26 12:00:42  tblue246
- * Minor/coding style
- *
- * Revision 1.6  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.5  2009/09/14 13:04:53  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.4  2009/03/08 23:57:43  fplanque
- * 2009
- *
- * Revision 1.3  2009/02/10 22:38:59  blueyed
- *  - Handle more File properties in File class lazily.
- *  - Cleanup recursive size handling:
- *    - Add Filelist::get_File_size
- *    - Add Filelist::get_File_size_formatted
- *    - Add File::_recursive_size/get_recursive_size
- *    - Drop File::setSize
- *    - get_dirsize_recursive: includes size of directories (e.g. 4kb here)
- *
- * Revision 1.2  2008/01/21 09:35:29  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 10:59:55  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.28  2007/06/19 23:15:08  blueyed
- * doc fixes
- *
- * Revision 1.27  2007/04/26 00:11:10  fplanque
- * (c) 2007
- *
- * Revision 1.26  2007/02/10 18:01:58  waltercruz
- * Changing double quotes to single quotes
- *
- * Revision 1.25  2007/01/24 13:28:38  fplanque
- * todo
- *
- * Revision 1.24  2007/01/24 13:26:56  fplanque
- * fixed sort by type
- *
- * Revision 1.23  2007/01/24 12:18:25  blueyed
- * Fixed PHP-fnmatch() implementation (for Windows)
- *
- * Revision 1.22  2006/12/24 00:52:56  fplanque
- * Make posts with images - Proof of concept
- *
- * Revision 1.21  2006/12/07 23:13:10  fplanque
- * @var needs to have only one argument: the variable type
- * Otherwise, I can't code!
- *
- * Revision 1.20  2006/12/07 20:03:32  fplanque
- * Woohoo! File editing... means all skin editing.
- *
- * Revision 1.19  2006/11/24 18:27:24  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

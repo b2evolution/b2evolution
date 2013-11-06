@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -25,31 +25,62 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url, $rsc_url;
+global $blog, $admin_url, $rsc_url, $UserSettings, $edited_User, $user_tab, $Plugins;
 
 /**
  * View funcs
  */
 require_once dirname(__FILE__).'/_stats_view.funcs.php';
 
-$user = param( 'user', 'string', '', true );
+$user_ID = param( 'user_ID', 'integer', 0, true );
 
 // Create result set:
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE sess_ID, user_login, sess_hitcount, sess_lastseen, sess_ipaddress' );
+$SQL->SELECT( 'SQL_NO_CACHE sess_ID, user_login, TIMESTAMPDIFF( SECOND, sess_start_ts, sess_lastseen_ts ) as sess_length, sess_lastseen_ts, sess_ipaddress' );
 $SQL->FROM( 'T_sessions LEFT JOIN T_users ON sess_user_ID = user_ID' );
 
 $Count_SQL = new SQL();
 $Count_SQL->SELECT( 'SQL_NO_CACHE COUNT(sess_ID)' );
 $Count_SQL->FROM( 'T_sessions LEFT JOIN T_users ON sess_user_ID = user_ID' );
 
-if( !empty( $user ) )
-{
-	$SQL->WHERE( 'user_login LIKE "%'.$DB->escape($user).'%"' );
-	$Count_SQL->WHERE( 'user_login LIKE "%'.$DB->escape($user).'%"' );
+if( empty( $user_ID ) )
+{ // display only this user sessions in user tab
+	$user_ID = $edited_User->ID;
 }
 
-$Results = new Results( $SQL->get(), 'sess_', 'D', 20, $Count_SQL->get() );
+$SQL->WHERE( 'user_ID = '.$user_ID );
+$Count_SQL->WHERE( 'user_ID = '.$user_ID );
+
+memorize_param( 'user_tab', 'string', '', $user_tab );
+
+// Begin payload block:
+$this->disp_payload_begin();
+
+// ------------------- PREV/NEXT USER LINKS -------------------
+user_prevnext_links( array(
+		'block_start'  => '<table class="prevnext_user"><tr>',
+		'prev_start'   => '<td width="33%">',
+		'prev_end'     => '</td>',
+		'prev_no_user' => '<td width="33%">&nbsp;</td>',
+		'back_start'   => '<td width="33%" class="back_users_list">',
+		'back_end'     => '</td>',
+		'next_start'   => '<td width="33%" class="right">',
+		'next_end'     => '</td>',
+		'next_no_user' => '<td width="33%">&nbsp;</td>',
+		'block_end'    => '</tr></table>',
+		'user_tab'     => 'sessions'
+	) );
+// ------------- END OF PREV/NEXT USER LINKS -------------------
+
+$Results = new Results( $SQL->get(), 'sess_', 'D', $UserSettings->get( 'results_per_page' ), $Count_SQL->get() );
+
+// echo user edit action icons
+echo_user_actions( $Results, $edited_User, 'edit' );
+echo '<span class="floatright">'.$Results->gen_global_icons().'</span>';
+$Results->global_icons = array();
+
+// echo user tabs
+echo '<div>'.get_usertab_header( $edited_User, $user_tab, T_( 'Sessions' ) ).'</div>';
 
 $Results->title = T_('Recent sessions');
 
@@ -58,17 +89,6 @@ $Results->title = T_('Recent sessions');
  *
  * @param Form
  */
-function filter_sessions( & $Form )
-{
-	$Form->text( 'user', get_param('user'), 20, T_('User login') );
-}
-$Results->filter_area = array(
-	'callback' => 'filter_sessions',
-	'url_ignore' => 'results_sess_page,user',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=stats&amp;tab=sessions&amp;tab3=sessid&amp;blog=0' ),
-		)
-	);
 
 $Results->cols[] = array(
 						'th' => T_('ID'),
@@ -80,10 +100,10 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 						'th' => T_('Last seen'),
-						'order' => 'sess_lastseen',
+						'order' => 'sess_lastseen_ts',
 						'default_dir' => 'D',
 						'td_class' => 'timestamp',
-						'td' => '%mysql2localedatetime_spans( #sess_lastseen# )%',
+						'td' => '%mysql2localedatetime_spans( #sess_lastseen_ts# )%',
  					);
 
 $Results->cols[] = array(
@@ -98,55 +118,73 @@ $Results->cols[] = array(
 						'td' => '$sess_ipaddress$',
 					);
 
+// Get additional columns from the Plugins
+$plugin_params = array(
+		'table'  => 'sessions',
+		'column' => 'sess_ipaddress'
+	);
+$Plugins->restart();
+while( $loop_Plugin = & $Plugins->get_next() )
+{
+	$columns = $loop_Plugin->GetAdditionalColumnsTable( $plugin_params );
+	if( !empty( $columns ) && is_array( $columns ) )
+	{
+		foreach( $columns as $column )
+		{
+			$Results->cols[] = $column;
+		}
+	}
+}
+
+function display_sess_length( $sess_ID, $sess_length )
+{
+	$result = '';
+	$second = $sess_length % 60;
+	$sess_length = ( $sess_length - $second ) / 60;
+	$minute = $sess_length % 60;
+	$sess_length = ( $sess_length - $minute ) / 60;
+	$hour = $sess_length % 24;
+	$day = ( $sess_length - $hour ) / 24;
+
+	if( $day > 0 )
+	{
+		$result = sprintf( ( ( $day > 1 ) ? T_( '%d days' ) : T_( '%d day' ) ), $day ).' ';
+	}
+	if( $hour < 10 )
+	{
+		$hour = '0'.$hour;
+	}
+	if( $minute < 10 )
+	{
+		$minute = '0'.$minute;
+	}
+	if( $second < 10 )
+	{
+		$second = '0'.$second;
+	}
+
+	$result .= $hour.':'.$minute.':'.$second;
+	return stat_session_hits( $sess_ID, $result );
+}
+
 $Results->cols[] = array(
-						'th' => T_('Hit count'),
-						'order' => 'sess_hitcount',
+						'th' => T_('Session length'),
+						'order' => 'sess_length',
 						'td_class' => 'center',
 						'total_class' => 'right',
-						'td' => '%stat_session_hits( #sess_ID#, #sess_hitcount# )%',
+						'td' => '%display_sess_length( #sess_ID#, #sess_length# )%',
 					);
 
 // Display results:
 $Results->display();
 
+// End payload block:
+$this->disp_payload_end();
+
 /*
  * $Log$
- * Revision 1.12  2011/10/01 10:05:31  efy-vitalij
- * fix tab=hits links
- *
- * Revision 1.11  2011/09/23 07:41:57  efy-asimo
- * Unified usernames everywhere in the app - first part
- *
- * Revision 1.10  2011/09/04 22:13:18  fplanque
- * copyright 2011
- *
- * Revision 1.9  2010/02/08 17:53:55  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.8  2010/01/30 18:55:34  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.7  2009/09/15 18:39:25  efy-sasha
- * Converted old style SQL request using SQL class.
- *
- * Revision 1.6  2009/09/13 21:27:20  blueyed
- * SQL_NO_CACHE for SELECT queries using T_sessions
- *
- * Revision 1.5  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.4  2008/12/27 21:09:28  fplanque
- * minor
- *
- * Revision 1.3  2008/12/27 20:19:30  fplanque
- * partial rollback ( changes don't make sense to me )
- *
- * Revision 1.2  2008/11/20 23:11:41  blueyed
- * Session stats: fix SQL for 'Sessions'/user view and ignore invalidated sessions
- * fp>why ignore invalidated sessions?
- *
- * Revision 1.1  2008/03/22 19:58:18  fplanque
- * missing views
+ * Revision 1.14  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

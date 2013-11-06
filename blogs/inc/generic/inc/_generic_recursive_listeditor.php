@@ -8,7 +8,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -308,43 +308,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.8  2011/09/04 22:13:16  fplanque
- * copyright 2011
+ * Revision 1.9  2013/11/06 08:04:15  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.7  2010/03/03 18:56:50  fplanque
- * minor
- *
- * Revision 1.6  2010/02/08 17:53:02  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.5  2010/01/03 12:03:17  fplanque
- * More crumbs...
- *
- * Revision 1.4  2009/08/30 19:54:24  fplanque
- * less translation messgaes for infrequent errors
- *
- * Revision 1.3  2009/03/08 23:57:43  fplanque
- * 2009
- *
- * Revision 1.2  2008/01/21 09:35:30  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 11:00:13  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.13  2007/04/26 00:11:11  fplanque
- * (c) 2007
- *
- * Revision 1.12  2007/01/07 05:27:41  fplanque
- * extended fadeout, but still not fixed everywhere
- *
- * Revision 1.11  2006/12/09 17:59:33  fplanque
- * started "moving chapters accross blogs" feature
- *
- * Revision 1.10  2006/11/24 18:27:23  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.9  2006/11/22 15:39:11  yabs
- * Removed duplicate  footer call
  */
 ?>

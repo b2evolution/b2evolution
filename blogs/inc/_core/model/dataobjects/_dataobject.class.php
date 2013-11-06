@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -96,6 +96,7 @@ class DataObject
 	 * @param string datetime field name
 	 * @param string User ID field name
 	 * @param string User ID field name
+	 * @param string datetime field name
 	 */
 	function DataObject( $tablename, $prefix = '', $dbIDname = 'ID', $datecreated_field = '', $datemodified_field = '', $creator_field = '', $lasteditor_field = '' )
 	{
@@ -133,7 +134,7 @@ class DataObject
 	 */
 	function dbupdate( $auto_track_modification = true )
 	{
-		global $DB, $localtimenow, $current_User;
+		global $DB, $Plugins, $localtimenow, $current_User;
 
 		if( $this->ID == 0 ) { debug_die( 'New object cannot be updated!' ); }
 
@@ -200,6 +201,8 @@ class DataObject
 		// Reset changes in object:
 		$this->dbchanges = array();
 
+		$Plugins->trigger_event( 'AfterObjectUpdate', $params = array( 'Object' => & $this, 'type' => get_class($this) ) );
+
 		return true;
 	}
 
@@ -216,7 +219,7 @@ class DataObject
 	 */
 	function dbinsert()
 	{
-		global $DB, $localtimenow, $current_User;
+		global $DB, $Plugins, $localtimenow, $current_User;
 
 		if( $this->ID != 0 && !$this->allow_ID_insert )
 		{
@@ -224,25 +227,28 @@ class DataObject
 		}
 
 		if( !empty($this->datecreated_field) )
-		{	// We want to track creation date:
+		{ // We want to track creation date:
 			$this->set_param( $this->datecreated_field, 'date', date('Y-m-d H:i:s',$localtimenow) );
 		}
 		if( !empty($this->datemodified_field) )
-		{	// We want to track modification date:
+		{ // We want to track modification date:
 			$this->set_param( $this->datemodified_field, 'date', date('Y-m-d H:i:s',$localtimenow) );
 		}
-		if( !empty($this->creator_field) )
-		{	// We want to track creator:
-			if( empty($this->creator_user_ID) )
-			{	// No creator assigned yet, use current user:
-				$this->set_param( $this->creator_field, 'number', $current_User->ID );
+		if( is_logged_in() )
+		{ // Assign user's ID only when user is logged in
+			if( !empty($this->creator_field) )
+			{ // We want to track creator:
+				if( empty($this->creator_user_ID) )
+				{ // No creator assigned yet, use current user:
+					$this->set_param( $this->creator_field, 'number', $current_User->ID );
+				}
 			}
-		}
-		if( !empty($this->lasteditor_field) )
-		{	// We want to track last editor:
-			if( empty($this->lastedit_user_ID) )
-			{	// No editor assigned yet, use current user:
-				$this->set_param( $this->lasteditor_field, 'number', $current_User->ID );
+			if( !empty($this->lasteditor_field) )
+			{ // We want to track last editor:
+				if( empty($this->lastedit_user_ID) )
+				{ // No editor assigned yet, use current user:
+					$this->set_param( $this->lasteditor_field, 'number', $current_User->ID );
+				}
 			}
 		}
 
@@ -291,6 +297,8 @@ class DataObject
 		// Reset changes in object:
 		$this->dbchanges = array();
 
+		$Plugins->trigger_event( 'AfterObjectInsert', $params = array( 'Object' => & $this, 'type' => get_class($this) ) );
+
 		return true;
 	}
 
@@ -324,7 +332,7 @@ class DataObject
 	 */
 	function dbdelete()
 	{
-		global $DB, $Messages, $db_config;
+		global $DB, $Messages, $Plugins, $db_config;
 
 		if( $this->ID == 0 ) { debug_die( 'Non persistant object cannot be deleted!' ); }
 
@@ -341,9 +349,16 @@ class DataObject
 					continue;
 				}
 
+				// add more where condition
+				$more_restriction = '';
+				if( isset( $restriction['and_condition'] ) )
+				{
+					$more_restriction .= ' AND ( '.$restriction['and_condition'].' )';
+				}
+
 				$DB->query( '
 					DELETE FROM '.$restriction['table'].'
-					WHERE '.$restriction['fk'].' = '.$this->ID,
+					WHERE '.$restriction['fk'].' = '.$this->ID.$more_restriction,
 					'Cascaded delete' );
 			}
 		}
@@ -353,6 +368,8 @@ class DataObject
 			DELETE FROM $this->dbtablename
 			WHERE $this->dbIDname = $this->ID",
 			'Main delete' );
+
+		$Plugins->trigger_event( 'AfterObjectDelete', $params = array( 'Object' => & $this, 'type' => get_class($this) ) );
 
 		if( count($this->delete_cascades) )
 		{	// There were cascading deletes
@@ -371,17 +388,31 @@ class DataObject
 	/**
 	 * Check existence of specified value in unique field.
 	 *
-	 * @param string Name of unique field
-	 * @param mixed specified value
+	 * @param string Name of unique field  OR array of Names (for UNIQUE index with MULTIPLE fields)
+	 * @param mixed specified value        OR array of Values (for UNIQUE index with MULTIPLE fields)
 	 * @return int ID if value exists otherwise NULL/false
 	 */
-	function dbexists($unique_field, $value)
+	function dbexists( $unique_fields, $values )
 	{
 		global $DB;
 
+		if( is_array( $unique_fields ) && is_array( $values ) )
+		{	// UNIQUE index consists of MULTIPLE fields
+			$sql_where = array();
+			foreach( $unique_fields as $i => $unique_field )
+			{
+				$sql_where[] = $unique_field." = ".$DB->quote( $values[$i] );
+			}
+			$sql_where = implode( ' AND ', $sql_where );
+		}
+		else
+		{	// UNIQUE index consists of ONE field
+			$sql_where = $unique_fields." = ".$DB->quote( $values );
+		}
+
 		$sql = "SELECT $this->dbIDname
 						  FROM $this->dbtablename
-					   WHERE $unique_field = ".$DB->quote($value)."
+					   WHERE $sql_where
 						   AND $this->dbIDname != $this->ID";
 
 		return $DB->get_var( $sql );
@@ -419,10 +450,11 @@ class DataObject
 				}
 				else
 				{ // count and show how many object is connected
+					$extra_condition = ( isset( $restriction['and_condition'] ) ) ? ' AND '.$restriction['and_condition'] : '';
 					$count = $DB->get_var(
 					'SELECT COUNT(*)
 					   FROM '.$restriction['table'].'
-					  WHERE '.$restriction['fk'].' = '.$this->ID,
+					  WHERE '.$restriction['fk'].' = '.$this->ID.$extra_condition,
 					0, 0, 'restriction/cascade check' );
 					if( $count )
 					{
@@ -470,8 +502,9 @@ class DataObject
 	 * @param string crumb name
 	 * @param string "action" param value to use (hidden field)
 	 * @param array Hidden keys (apart from "action")
+	 * @param array Additional messages for restriction messages, array( '0' - message text, '1' - message type )
 	 */
-	function confirm_delete( $confirm_title, $crumb_name, $delete_action, $hiddens )
+	function confirm_delete( $confirm_title, $crumb_name, $delete_action, $hiddens, $additional_messages = array() )
 	{
 		global $Messages;
 
@@ -482,6 +515,14 @@ class DataObject
 
 		$restriction_Messages = $this->check_relations( 'delete_cascades' );
 
+		if( !empty( $additional_messages ) )
+		{ // Initialaize additional messages
+			foreach( $additional_messages as $additional_message )
+			{
+				$restriction_Messages->add( $additional_message[0], $additional_message[1] );
+			}
+		}
+
 		if( $restriction_Messages->count() )
 		{	// The will be cascading deletes, issue WARNING:
 			echo '<h3>'.T_('WARNING: Deleting this object will also delete:').'</h3>';
@@ -491,6 +532,8 @@ class DataObject
 		echo '<p class="warning">'.$confirm_title.'</p>';
 		echo '<p class="warning">'.T_('THIS CANNOT BE UNDONE!').'</p>';
 
+		$redirect_to = param( 'redirect_to', 'string', '' );
+
 		$Form = new Form( '', 'form_confirm', 'get', '' );
 
 		$Form->begin_form( 'inline' );
@@ -498,13 +541,17 @@ class DataObject
 			$Form->hiddens_by_key( $hiddens );
 			$Form->hidden( 'action', $delete_action );
 			$Form->hidden( 'confirm', 1 );
+			$Form->hidden( 'redirect_to', $redirect_to );
 			$Form->button( array( 'submit', '', T_('I am sure!'), 'DeleteButton' ) );
 		$Form->end_form();
 
-		$Form = new Form( '', 'form_cancel', 'get', '' );
+		$Form = new Form( $redirect_to, 'form_cancel', 'get', '' );
 
 		$Form->begin_form( 'inline' );
-			$Form->hiddens_by_key( $hiddens );
+			if( empty( $redirect_to ) )
+			{ // If redirect url is not defined we should go to current url after cancel action
+				$Form->hiddens_by_key( $hiddens );
+			}
 			$Form->button( array( 'submit', '', T_('CANCEL'), 'CancelButton' ) );
 		$Form->end_form();
 
@@ -830,7 +877,7 @@ class DataObject
 			$history[1] = sprintf( T_('Last mod on %s'), mysql2localedate( $this->{$this->datemodified_field} ) );
 		}
 
-		return get_icon( 'history', $what = 'imgtag', array( 'title'=>implode( ' - ', $history ) ), true );
+		return get_icon( 'history', 'imgtag', array( 'title'=>implode( ' - ', $history ) ), true );
 	}
 }
 
@@ -838,142 +885,8 @@ class DataObject
 
 /*
  * $Log$
- * Revision 1.38  2011/09/04 22:13:13  fplanque
- * copyright 2011
+ * Revision 1.40  2013/11/06 08:03:47  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.37  2010/11/25 15:16:34  efy-asimo
- * refactor $Messages
- *
- * Revision 1.36  2010/03/19 09:48:55  efy-asimo
- * file deleting restrictions - task
- *
- * Revision 1.35  2010/02/08 17:51:50  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.34  2010/01/10 23:24:07  fplanque
- * crumbs...
- *
- * Revision 1.33  2010/01/03 12:03:17  fplanque
- * More crumbs...
- *
- * Revision 1.32  2009/12/01 02:04:45  fplanque
- * minor
- *
- * Revision 1.31  2009/11/30 22:57:27  blueyed
- * Add 'dbfield' dbchange type. This allows setting something to a db field. E.g. 'lastupdate=lastupdate'.
- *
- * Revision 1.30  2009/10/12 23:52:46  blueyed
- * todo
- *
- * Revision 1.29  2009/10/04 23:06:30  fplanque
- * doc
- *
- * Revision 1.28  2009/10/04 12:23:40  efy-maxim
- * validate has been renamed to param_validate function
- *
- * Revision 1.27  2009/09/30 15:15:59  efy-maxim
- * NULL check for validation function
- *
- * Revision 1.26  2009/09/29 21:07:24  blueyed
- * todo/question
- *
- * Revision 1.25  2009/09/26 12:00:42  tblue246
- * Minor/coding style
- *
- * Revision 1.24  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.23  2009/09/24 19:48:30  efy-maxim
- * validators
- *
- * Revision 1.22  2009/09/24 09:36:04  efy-maxim
- * validation_function
- *
- * Revision 1.21  2009/09/23 02:46:40  fplanque
- * doc
- *
- * Revision 1.20  2009/09/22 07:07:24  efy-bogdan
- * user.ctrl.php cleanup
- *
- * Revision 1.19  2009/09/20 20:07:18  blueyed
- *  - DataObject::dbexists quotes always
- *  - phpdoc fixes
- *  - style fixes
- *
- * Revision 1.18  2009/09/20 18:09:41  tblue246
- * revert
- *
- * Revision 1.16  2009/09/20 12:17:15  efy-sergey
- * fixed wrong ID asigning for tables without auto_increment fields
- *
- * Revision 1.15  2009/09/19 20:49:51  fplanque
- * Cleaner way of implementing permissions.
- *
- * Revision 1.14  2009/09/11 18:34:05  fplanque
- * userfields editing module.
- * needs further cleanup but I think it works.
- *
- * Revision 1.13  2009/09/02 23:29:34  fplanque
- * doc
- *
- * Revision 1.12  2009/09/02 22:50:48  efy-maxim
- * Clean error message for currency/goal already exists
- *
- * Revision 1.11  2009/09/02 17:47:23  fplanque
- * doc/minor
- *
- * Revision 1.10  2009/08/30 02:37:14  fplanque
- * support for simple form processing
- *
- * Revision 1.9  2009/07/19 22:14:22  fplanque
- * Clean resolution of the excerpt mod date bullcrap.
- * It took 4 lines of code...
- *
- * Revision 1.8  2009/07/18 16:30:14  tblue246
- * Better solution for preventing an update of the datemodified field when the excerpt gets autogenerated.
- *
- * Revision 1.7  2009/07/18 11:09:26  tblue246
- * Use is_int() and is_float() instead of gettype() -- better performance.
- *
- * Revision 1.6  2009/07/17 23:11:11  tblue246
- * - DataObject::set_param(): Correctly decide whether to update values with $fieldtype == 'number' (see code for detailed explanation).
- * - Item class: Doc about updating excerpt without updating the datemodified field.
- * - ItemLight class: Add missing member variable.
- *
- * Revision 1.5  2009/07/17 17:50:10  tblue246
- * Item class: Prevent update of datemodified field if only the post excerpt gets updated.
- *
- * Revision 1.4  2009/03/08 23:57:40  fplanque
- * 2009
- *
- * Revision 1.3  2008/04/17 11:53:17  fplanque
- * Goal editing
- *
- * Revision 1.2  2008/01/21 09:35:24  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 10:58:56  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.26  2007/05/14 02:43:04  fplanque
- * Started renaming tables. There probably won't be a better time than 2.0.
- *
- * Revision 1.25  2007/05/13 22:02:07  fplanque
- * removed bloated $object_def
- *
- * Revision 1.24  2007/04/26 00:11:09  fplanque
- * (c) 2007
- *
- * Revision 1.23  2007/01/07 23:37:26  fplanque
- * doc cleanup
- *
- * Revision 1.22  2006/12/10 23:20:55  fplanque
- * hum...
- *
- * Revision 1.21  2006/12/10 03:04:31  blueyed
- * todo
- *
- * Revision 1.20  2006/11/24 18:27:24  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

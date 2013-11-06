@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -32,9 +32,17 @@ $params = array_merge( array(
 		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
 	?>
 
-	<h2 class="bTitle"><?php $Item->title(); ?></h2>
+	<h2 class="bTitle linked"><?php
+		$Item->title( array(
+			'link_type' => 'permalink'
+			) );
+	?></h2>
 	<div class="bSmallHead">
 	<?php
+		if( $Item->status != 'published' )
+		{
+			$Item->status( array( 'format' => 'styled' ) );
+		}
 		$Item->issue_date( array(
 				'before'      => ' ',
 				'after'       => ' ',
@@ -46,7 +54,7 @@ $params = array_merge( array(
 				'after'        => '</strong>',
 			) );
 		$Item->msgform_link( array(
-				'text'    => '<img src="img/envelope.gif" alt="[mail]" width="13" height="10" class="middle" />',
+				'text'    => '<span class="mb_icon envelope"></span>',
 			) );
 	?>
 	<?php
@@ -100,12 +108,12 @@ $params = array_merge( array(
 				) );
 
 			$Item->permanent_link( array(
-					'text' => '<img src="img/page.gif" alt="Permalink" width="9" height="12" class="middle" />',
+					'text' => '<span class="mb_icon page"></span>',
 				) );
 		?>
 	</div>
-	<img src="../../rsc/img/blank.gif" width="1" height="1" alt="" />
 	<?php
+		echo get_icon( 'pixel' );
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array(
 				'before_section_title' => '<h4>',
@@ -125,14 +133,8 @@ $params = array_merge( array(
 
 /*
  * $Log$
- * Revision 1.3  2011/09/04 22:13:24  fplanque
- * copyright 2011
- *
- * Revision 1.2  2010/02/08 17:56:31  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.1  2009/05/23 14:12:42  fplanque
- * All default skins now support featured posts and intro posts.
+ * Revision 1.5  2013/11/06 08:05:48  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

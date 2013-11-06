@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -40,7 +40,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( 'settings/model/_abstractsettings.class.php', 'AbstractSettings' );
 
 /**
- * Class to handle the settings for users
+ * Class to handle the settings for users, and any user name-value pair which is not frequently used 
  *
  * @package evocore
  */
@@ -78,7 +78,60 @@ class UserSettings extends AbstractSettings
 		'show_breadcrumbs' => 1,
 		'show_menu' => 1,
 
+		'last_activation_email' => NULL, // It should be the date of the last account activation email. If it is not set, and users is not activated means activation email wasn't sent.
+		'last_unread_messages_reminder' => NULL, // It will be the date when the last unread message reminder email was sent
+		'last_notification_email' => NULL, // It must have a 'timestamp_number' format, where the timestamp ( servertime ) is the last notification email ts, and the number is how many notification email was sent on that day
+		'last_newsletter' => NULL, // It must have a 'timestamp_number' format, where the timestamp ( servertime ) is the last newsletter ts, and the number is how many newsletter was sent on that day
+		'last_activation_reminder_key' => NULL, // It will be set at the first time when activation reminder email will be sent
+		'activation_reminder_count' => 0, // How many activation reminder was sent since the user is not activated
+		'send_activation_reminder' => 1, // Send reminder to activate my account if it is not activated
+
+		// admin user notifications
+		'notify_new_user_registration' => 1, // Notify admin user when a new user has registered
+		'notify_activated_account' => 1, // Notify admin user when an account has been activated by email
+		'notify_closed_account' => 1, // Notify admin user when an account has been closed by the account owner
+		'notify_reported_account' => 1, // Notify admin user when an account has been reported by another user
+		'notify_cronjob_error' => 1, // Notify admin user when a scheduled task ends with an error or timeout
+
+		'account_close_ts' => NULL, // It will be the date when the account was closed. Until the account is not closed this will be NULL.
+		'account_close_reason' => NULL, // It will be the reason why the account was closed. Until the account is not closed this will be NULL.
+
+		'last_new_thread' => NULL, // It is the date when the user has created the last new thread, NULL if User has never create a new thread
+		'new_thread_count' => 0, // How many new thread was created by this user TODAY!
+
+		'show_online' => 1,     // Show if user is online or not
+		'user_domain' => NULL,  // User domain
+		'user_browser' => NULL, // User browser
+
+		'email_format' => 'auto', // Email format: auto | html | text
+
+		'admin_skin' => 'chicago',  // User default admin skin
+	);
+
+	/**
+	 * The configurable default settings.
+	 * Add those settings below, which default value is saved in GeneralSettings.
+	 * For these option we didn't add a default value here intentionally, this way it will get the default value from general settings!
+	 * All of this options must have a pair with a 'def_' prefix in GeneralSettings class.
+	 * We use this array when we are reseting the default settings.
+	 *
+	 * @access protected
+	 * @var array
+	 */
+	var $_configurable_defaults = array(
 		'notify_messages' => 1, 	// Notify user when receives a private message
+		'notify_unread_messages' => 1, // Notify user when he has unread messages more then 24 hour, and he was not notified in the last 3 days
+		'notify_published_comments' => 1,
+		'notify_comment_moderation' => 0,
+
+		'enable_PM' => 1,
+		'enable_email' => 1,
+
+		'newsletter_news' => 1, // Send news
+		'newsletter_ads'  => 0, // Send ADs
+
+		'notification_email_limit' => 3, // How many notification email is allowed per day for this user
+		'newsletter_limit' => 1, // How many newsletter email is allowed per day for this user
 	);
 
 
@@ -99,19 +152,31 @@ class UserSettings extends AbstractSettings
 	 */
 	function get( $setting, $user_ID = NULL )
 	{
+		global $Settings;
+
 		if( ! isset($user_ID) )
 		{
 			global $current_User;
 
 			if( ! isset($current_User) )
 			{ // no current/logged in user:
-				return $this->get_default($setting);
+				$result = $this->get_default($setting);
+				if( $result == NULL )
+				{
+					$result = $Settings->get( 'def_'.$setting );
+				}
+				return $result;
 			}
 
 			$user_ID = $current_User->ID;
 		}
 
-		return parent::get( $user_ID, $setting );
+		$result = parent::get( $user_ID, $setting );
+		if( $result == NULL )
+		{
+			$result = $Settings->get( 'def_'.$setting );
+		}
+		return $result;
 	}
 
 
@@ -212,100 +277,33 @@ class UserSettings extends AbstractSettings
 		set_param( $param_name, $value );
 		return get_param($param_name);
 	}
+
+
+	/**
+	 * Reset a user settings to the default values
+	 * 
+	 * @param integer user ID
+	 * @param boolean set to true to save modifications
+	 */
+	function reset_to_defaults( $user_ID, $db_save = true )
+	{
+		// Remove all UserSettings where a default or configurable default exists:
+		foreach( $this->_defaults as $k => $v )
+		{
+			$this->delete( $k, $user_ID );
+		}
+		foreach( $this->_configurable_defaults as $k => $v )
+		{
+			$this->delete( $k, $user_ID );
+		}
+	}
 }
 
 
 /*
  * $Log$
- * Revision 1.17  2011/10/23 09:19:42  efy-yurybakh
- * Implement new permission for comment editing
+ * Revision 1.19  2013/11/06 08:05:03  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.16  2011/10/06 06:18:29  efy-asimo
- * Add messages link to settings
- * Update messaging notifications
- *
- * Revision 1.15  2011/09/04 22:13:21  fplanque
- * copyright 2011
- *
- * Revision 1.14  2010/11/18 13:56:06  efy-asimo
- * admin skin preferences
- *
- * Revision 1.13  2010/02/08 17:54:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.12  2009/11/12 00:46:32  fplanque
- * doc/minor/handle demo mode
- *
- * Revision 1.11  2009/10/28 13:41:56  efy-maxim
- * default multiple sessions settings
- *
- * Revision 1.10  2009/10/27 23:06:45  fplanque
- * doc
- *
- * Revision 1.9  2009/10/27 16:43:34  efy-maxim
- * custom session timeout
- *
- * Revision 1.8  2009/10/17 16:31:33  efy-maxim
- * Renamed: T_groupsettings to T_groups__groupsettings, T_usersettings to T_users__usersettings
- *
- * Revision 1.7  2009/09/14 13:46:11  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.6  2009/03/20 03:38:04  fplanque
- * rollback -- http://forums.b2evolution.net/viewtopic.php?t=18269
- *
- * Revision 1.4  2009/03/08 23:57:46  fplanque
- * 2009
- *
- * Revision 1.3  2008/01/21 09:35:36  fplanque
- * (c) 2008
- *
- * Revision 1.2  2007/06/30 22:10:32  fplanque
- * changed default
- *
- * Revision 1.1  2007/06/25 11:01:48  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.32  2007/05/26 22:21:32  blueyed
- * Made $limit for Results configurable per user
- *
- * Revision 1.31  2007/05/13 18:49:55  fplanque
- * made autoselect_blog() more robust under PHP4
- *
- * Revision 1.30  2007/04/26 00:11:11  fplanque
- * (c) 2007
- *
- * Revision 1.29  2007/02/25 01:39:06  fplanque
- * wording
- *
- * Revision 1.28  2007/02/21 22:21:30  blueyed
- * "Multiple sessions" user setting
- *
- * Revision 1.27  2007/01/25 03:17:00  fplanque
- * visual cleanup for average users
- * geeky stuff preserved as options
- *
- * Revision 1.26  2007/01/24 01:57:07  fplanque
- * minor
- *
- * Revision 1.25  2007/01/23 05:00:25  fplanque
- * better user defaults
- *
- * Revision 1.24  2006/12/18 03:20:22  fplanque
- * _header will always try to set $Blog.
- * controllers can use valid_blog_requested() to make sure we have one
- * controllers should call set_working_blog() to change $blog, so that it gets memorized in the user settings
- *
- * Revision 1.23  2006/12/18 01:43:26  fplanque
- * minor bugfix
- *
- * Revision 1.22  2006/11/24 18:27:25  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.21  2006/11/12 17:37:41  fplanque
- * code for "simple" is "default"
- *
- * Revision 1.20  2006/11/04 17:43:14  blueyed
- * Blog perm layout views: fixed non-JS links (ctrl param) and store selected one in UserSettings (TODO for switching by JS)
  */
 ?>

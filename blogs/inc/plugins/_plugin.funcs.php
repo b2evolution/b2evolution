@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -92,7 +92,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		$params['note'] = $parmeta['note'];
 	}
 
-	if( ! isset($parmeta['type']) ||  $parmeta['type'] == 'html_input' )
+	if( ! isset($parmeta['type']) || $parmeta['type'] == 'html_input' )
 	{
 		$parmeta['type'] = 'text';
 	}
@@ -138,14 +138,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		{
 			case 'begin_fieldset':
 				$fieldset_title = $set_label;
-				if( isset($help_icon) )
-				{
-					$Form->begin_fieldset( $fieldset_title, array(), array($help_icon) );
-				}
-				else
-				{
-					$Form->begin_fieldset( $fieldset_title );
-				}
+				$Form->begin_fieldset( $fieldset_title.$help_icon );
 				break;
 
 			case 'end_fieldset':
@@ -154,6 +147,15 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 			case 'separator':
 				echo '<hr />';
+				break;
+
+			case 'html': // Output HTML code here
+				if( ! isset($parmeta['value']) )
+				{
+					$parmeta['value'] = '<div class="error">HTML layout usage:<pre>'.
+							htmlentities("'layout' => 'html',\n'value' => '<em>My HTML code</em>',").'</pre></div>';
+				}
+				echo $parmeta['value'];
 				break;
 		}
 		return;
@@ -279,6 +281,8 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		case 'array':
 			$has_array_type = true;
 
+			// Always use 'fieldset' layout to display it the same way from normal and ajax calls
+			$Form->switch_layout( 'fieldset' );
 			if( substr_count( $parname, '[' ) % 2 )
 			{ // this refers to a specific array type set (with index pos at the end), e.g. when adding a field through AJAX:
 				$pos_last_bracket = strrpos($parname, '[');
@@ -310,37 +314,24 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			{ // Display value of the setting. It may be empty, if there's no set yet.
 				foreach( $disp_arrays as $k => $v )
 				{
-					$fieldset_icons = array();
+					$remove_action = '';
 					if( ! isset($parmeta['min_count']) || count($set_value) > $parmeta['min_count'] )
 					{ // provide icon to remove this set
-						$fieldset_icons[] = action_icon(
+						$remove_action = action_icon(
 								T_('Delete set!'),
 								'delete',
 								regenerate_url( 'action', array('action=del_settings_set&amp;set_path='.$parname.'['.$k.']'.( $set_type == 'UserSettings' ? '&amp;user_ID='.$user_ID : '' ), 'plugin_ID='.$Obj->ID) ),
 								'',
 								5, 0, /* icon/text prio */
-								// attach onclick event to remove the whole fieldset (AJAX):
+								// attach onclick event to remove the whole fieldset:
 								array(
 									'onclick' => "
-										var oThis = this;
-										jQuery.get('{$htsrv_url}async.php', {
-												action: 'del_plugin_sett_set',
-												plugin_ID: '{$Obj->ID}',
-												user_ID: '$user_ID',
-												set_type: '$set_type',
-												set_path: '{$parname}[$k]'
-											},
-											function(r, status) {
-												if( r == 'OK' )
-												{
-													jQuery(oThis).parents('fieldset:first').remove();
-												}
-										} );
+										jQuery('#".$parname.'_'.$k_nb."').remove();
 										return false;",
 									)
 								);
 					}
-					$Form->begin_fieldset( '#'.$k_nb, array('class'=>'bordered'), $fieldset_icons );
+					$Form->begin_fieldset( '#'.$k_nb.$remove_action, array( 'class' => 'bordered', 'id' => $parname.'_'.$k_nb ) );
 
 					if( isset($parmeta['key']) )
 					{ // KEY FOR THIS ENTRY:
@@ -372,14 +363,15 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			{ // no max_number defined or not reached: display link to add a new set
 				$set_path = $parname.'['.$k_nb.']';
 
-				echo '<div>';
+				echo '<div id="'.$parname.'_add_new">';
 				echo action_icon(
 					sprintf( T_('Add a new set of &laquo;%s&raquo;'), $set_label),
 					'new',
 					regenerate_url( 'action', array('action=add_settings_set', 'set_path='.$set_path.( $set_type == 'UserSettings' ? '&amp;user_ID='.get_param('user_ID') : '' ), 'plugin_ID='.$Obj->ID) ),
 					T_('New set'),
 					5, 1, /* icon/text prio */
-					array('onclick'=> "
+					// Replace the 'add new' action icon div with a new set of setting and a new 'add new' action icon div
+					array('onclick'=>"
 						var oThis = this;
 						jQuery.get('{$htsrv_url}async.php', {
 								action: 'add_plugin_sett_set',
@@ -388,7 +380,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 								set_path: '$set_path'
 							},
 							function(r, status) {
-								jQuery(oThis).parent('div').html(r);
+								jQuery('#".$parname."_add_new').replaceWith(r);
 							}
 						);
 						return false;")
@@ -400,6 +392,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			{ // close the surrounding fieldset:
 				$Form->end_fieldset();
 			}
+			$Form->switch_layout( NULL );
 
 			break;
 
@@ -1055,139 +1048,76 @@ function handle_array_keys_in_plugin_settings( & $a )
 }
 
 
+/**
+ * Helper function to do the action part of DB schema upgrades for "enable" and "install"
+ * actions.
+ *
+ * @param object Plugin
+ * @param boolean Force install DB for the plugin (used in installation of b2evo)
+ * @return boolean True, if no changes needed or done; false if we should break out to display "install_db_schema" action payload.
+ */
+function install_plugin_db_schema_action( & $Plugin, $force_install_db_deltas = false )
+{
+	global $action, $inc_path, $install_db_deltas, $DB, $Messages;
+
+	$action = 'list';
+	// Prepare vars for DB layout changes
+	$install_db_deltas_confirm_md5 = param( 'install_db_deltas_confirm_md5' );
+
+	$db_layout = $Plugin->GetDbLayout();
+	$install_db_deltas = array(); // This holds changes to make, if any (just all queries)
+	//pre_dump( $db_layout );
+
+	if( ! empty($db_layout) )
+	{ // The plugin has a DB layout attached
+		load_funcs('_core/model/db/_upgrade.funcs.php');
+
+		// Get the queries to make:
+		foreach( db_delta($db_layout) as $table => $queries )
+		{
+			foreach( $queries as $query_info )
+			{
+				foreach( $query_info['queries'] as $query )
+				{ // subqueries for this query (usually one, but may include required other queries)
+					$install_db_deltas[] = $query;
+				}
+			}
+		}
+
+		if( ! empty($install_db_deltas) )
+		{ // delta queries to make
+			if( empty($install_db_deltas_confirm_md5) && !$force_install_db_deltas )
+			{ // delta queries have to be confirmed in payload
+				$action = 'install_db_schema';
+				return false;
+			}
+			elseif( $install_db_deltas_confirm_md5 == md5( implode('', $install_db_deltas) ) || $force_install_db_deltas )
+			{ // Confirmed in first step:
+				foreach( $install_db_deltas as $query )
+				{
+					$DB->query( $query );
+				}
+
+				$Messages->add( T_('The database has been updated.'), 'success' );
+			}
+			else
+			{ // should not happen
+				$Messages->add( T_('The DB schema has been changed since confirmation.'), 'error' );
+
+				// delta queries have to be confirmed (again) in payload
+				$action = 'install_db_schema';
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+
 /*
  * $Log$
- * Revision 1.20  2011/09/04 22:13:18  fplanque
- * copyright 2011
+ * Revision 1.22  2013/11/06 08:04:35  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.19  2010/08/24 08:20:19  efy-asimo
- * twitter plugin oAuth
- *
- * Revision 1.18  2010/05/13 15:13:13  blueyed
- * Fix E_NOTICE with empty/optional 'note' entry in 'select' entries.
- *
- * Revision 1.17  2010/02/08 17:53:23  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.16  2010/01/27 15:20:08  efy-asimo
- * Change select list to radio button
- *
- * Revision 1.15  2010/01/26 15:49:35  efy-asimo
- * Widget param type radio
- *
- * Revision 1.14  2009/09/26 12:00:43  tblue246
- * Minor/coding style
- *
- * Revision 1.13  2009/09/25 07:32:53  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.12  2009/07/08 02:38:55  sam2kb
- * Replaced strlen & substr with their mbstring wrappers evo_strlen & evo_substr when needed
- *
- * Revision 1.11  2009/07/04 17:42:39  tblue246
- * Translation fix: Default error messages for min/max values (plugin settings) were badly worded.
- *
- * Revision 1.10  2009/05/26 19:31:59  fplanque
- * Plugins can now have Settings that are specific to each blog.
- *
- * Revision 1.9  2009/05/24 21:14:38  fplanque
- * _skin.class.php can now provide skin specific settings.
- * Demo: the custom skin has configurable header colors.
- * The settings can be changed through Blog Settings > Skin Settings.
- * Anyone is welcome to extend those settings for any skin you like.
- *
- * Revision 1.8  2009/05/23 22:49:10  fplanque
- * skin settings
- *
- * Revision 1.7  2009/03/13 02:32:33  fplanque
- * bugfix
- *
- * Revision 1.6  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.5  2008/05/30 19:54:21  blueyed
- * bugfix for corner case, if setting is not an array really
- *
- * Revision 1.4  2008/02/13 11:34:06  blueyed
- * Explicitly call jQuery(), not the shortcut ($())
- *
- * Revision 1.3  2008/01/21 09:35:32  fplanque
- * (c) 2008
- *
- * Revision 1.2  2007/09/03 23:45:56  blueyed
- * Use always the array key as value for "select" settings.
- *
- * Revision 1.1  2007/06/25 11:00:42  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.48  2007/06/19 20:40:26  fplanque
- * renamed generic functions to autoform_*
- *
- * Revision 1.47  2007/06/19 18:47:27  fplanque
- * Nuked unnecessary Param (or I'm missing something badly :/)
- *
- * Revision 1.46  2007/06/19 00:03:26  fplanque
- * doc / trying to make sense of automatic settings forms generation.
- *
- * Revision 1.45  2007/04/26 00:11:08  fplanque
- * (c) 2007
- *
- * Revision 1.44  2007/04/02 20:32:57  blueyed
- * Commented out block that caused problems
- *
- * Revision 1.43  2007/01/23 08:57:36  fplanque
- * decrap!
- *
- * Revision 1.42  2006/12/22 22:36:07  blueyed
- * Fixed selecting selected "None" option in "multiple" selects
- *
- * Revision 1.41  2006/12/22 22:29:35  blueyed
- * Support for "multiple" attribute in SELECT elements, especially for GetDefault(User)Settings plugin callback
- *
- * Revision 1.40  2006/12/10 12:36:58  blueyed
- * passthrough "rows" and "maxlength" attributes to input elements
- *
- * Revision 1.39  2006/12/09 01:55:36  fplanque
- * feel free to fill in some missing notes
- * hint: "login" does not need a note! :P
- *
- * Revision 1.38  2006/12/05 02:34:05  blueyed
- * Fix for "Minor refactoring".. :/
- *
- * Revision 1.36  2006/12/05 01:59:12  blueyed
- * Added validation for all types of (User)Settings
- *
- * Revision 1.35  2006/12/04 22:26:06  blueyed
- * Fixed calling GetDefault(User)Settings with $params in set_Settings_for_Plugin_from_Request()
- *
- * Revision 1.34  2006/12/04 21:39:49  blueyed
- * Minor refactoring
- *
- * Revision 1.33  2006/12/01 16:47:26  blueyed
- * - Use EVO_NEXT_VERSION, which should get replaced with the next version 1.10 or 2.0 or whatever
- * - "action" param for PluginSettingsValidateSet
- * - Removed deprecated Plugin::set_param()
- *
- * Revision 1.32  2006/11/24 18:27:27  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.31  2006/11/16 23:43:40  blueyed
- * - "key" entry for array-type Plugin(User)Settings can define an input field for the key of the settings entry
- * - cleanup
- *
- * Revision 1.30  2006/11/10 17:14:20  blueyed
- * Added "select_blog" type for Plugin (User)Settings
- *
- * Revision 1.29  2006/11/10 16:37:57  blueyed
- * Fixed ID for AJAX DIV
- *
- * Revision 1.28  2006/11/09 23:40:57  blueyed
- * Fixed Plugin UserSettings array type editing; Added jquery and use it for AJAHifying Plugin (User)Settings editing of array types
- *
- * Revision 1.27  2006/11/02 15:56:53  blueyed
- * Add note about having to save the settings, before adding a new set.
- *
- * Revision 1.26  2006/10/08 22:13:05  blueyed
- * Added "float" type to Plugin Setting types.
  */
 ?>

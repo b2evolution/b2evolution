@@ -9,7 +9,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -54,10 +54,10 @@ $fadeout_id = $Session->get('fadeout_id');
 load_funcs('plugins/_plugin.funcs.php');
 
 $SQL = new SQL();
-$SQL->SELECT( 'plug_status, plug_ID, plug_priority, plug_code, plug_apply_rendering' );
+$SQL->SELECT( 'plug_status, plug_ID, plug_priority, plug_code' );
 $SQL->FROM( 'T_plugins' );
 
-$Results = new Results( $SQL->get(), 'plug_', '-A-' /* by name */, 0 /* no limit */ );
+$Results = new Results( $SQL->get(), 'plug_', '--A' /* by name */, 0 /* no limit */ );
 
 $Results->Cache = & $admin_Plugins;
 
@@ -77,6 +77,23 @@ $Results->grp_cols[] = array(
 */
 
 $Results->title = T_('Installed plugins').get_manual_link('installed_plugins');
+
+if( count( $admin_Plugins->get_plugin_groups() ) )
+{
+	/*
+	 * Grouping params:
+	 */
+	$Results->group_by_obj_prop = 'group';
+
+
+	/*
+	 * Group columns:
+	 */
+	$Results->grp_cols[] = array(
+			'td_colspan' => 0,
+			'td' => '% {Obj}->group %',
+		);
+}
 
 /*
  * STATUS TD:
@@ -143,26 +160,6 @@ $Results->cols[] = array(
 		'td' => '% plugin_results_td_name( {Obj} ) %',
 	);
 
-if( count($admin_Plugins->get_plugin_groups()) )
-{
-	/*
-	 * PLUGIN GROUP TD:
-	 */
-	function plugin_results_group_order_callback( $a, $b, $order )
-	{
-		global $admin_Plugins;
-
-		$r = $admin_Plugins->sort_Plugin_group( $a->ID, $b->ID );
-		if( $order == 'DESC' ) { $r = -$r; }
-		return $r;
-	}
-	$Results->cols[] = array(
-			'th' => T_('Group'),
-			'order_objects_callback' => 'plugin_results_group_order_callback',
-			'td' => '% {Obj}->group %',
-		);
-}
-
 /*
  * PRIORITY TD:
  */
@@ -171,34 +168,6 @@ $Results->cols[] = array(
 		'order' => 'plug_priority',
 		'td' => '$plug_priority$',
 		'td_class' => 'right',
-	);
-
-/*
- * APPLY RENDERING TD:
- */
-$apply_rendering_values = $admin_Plugins->get_apply_rendering_values(true); // with descs
-function plugin_results_td_apply_rendering($apply_rendering)
-{
-	global $admin_Plugins, $apply_rendering_values;
-
-	return '<span title="'.format_to_output( $apply_rendering_values[$apply_rendering], 'htmlattr' )
-			.'">'.$apply_rendering.'</span>';
-}
-$Results->cols[] = array(
-		'th' => T_('Apply'),
-		'th_title' => T_('When should rendering apply?'),
-		'order' => 'plug_apply_rendering',
-		'td' => '%plugin_results_td_apply_rendering( \'$plug_apply_rendering$\' )%',
-	);
-
-/*
- * PLUGIN CODE TD:
- */
-$Results->cols[] = array(
-		'th' => /* TRANS: Code of a plugin */ T_('Code'),
-		'th_title' => T_('The code to call the plugin by code (SkinTag) or as Renderer.'),
-		'order' => 'plug_code',
-		'td' => '% {Obj}->code %',
 	);
 
 /*
@@ -217,14 +186,23 @@ $Results->cols[] = array(
 	);
 
 /*
+ * PLUGIN CODE TD:
+ */
+$Results->cols[] = array(
+		'th' => /* TRANS: Code of a plugin */ T_('Code'),
+		'th_title' => T_('The code to call the plugin by code (SkinTag) or as Renderer.'),
+		'order' => 'plug_code',
+		'td' => '% {Obj}->code %',
+	);
+
+/*
  * HELP TD:
  */
 function plugin_results_td_help( $Plugin )
 {
 	return action_icon( T_('Display info'), 'info', regenerate_url( 'action,plugin_class', 'action=info&amp;plugin_class='.$Plugin->classname ) )
 		// Help icons, if available:
-		.$Plugin->get_help_link('$help_url')
-		.' '.$Plugin->get_help_link('$readme');
+		.$Plugin->get_help_link('$help_url');
 }
 $Results->cols[] = array(
 		'th' => T_('Help'),
@@ -285,104 +263,8 @@ $Session->delete( 'fadeout_id');
 
 /*
  * $Log$
- * Revision 1.15  2011/09/04 22:13:18  fplanque
- * copyright 2011
+ * Revision 1.17  2013/11/06 08:04:36  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.14  2010/10/19 02:00:53  fplanque
- * MFB
- *
- * Revision 1.13  2010/09/08 15:07:44  efy-asimo
- * manual links
- *
- * Revision 1.12  2010/03/01 07:52:51  efy-asimo
- * Set manual links to lowercase
- *
- * Revision 1.11  2010/02/14 14:18:39  efy-asimo
- * insert manual links
- *
- * Revision 1.10  2010/02/08 17:53:55  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.9  2010/01/30 18:55:33  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.8  2010/01/16 11:19:23  efy-yury
- * update plugins: redirect and fadeouts
- *
- * Revision 1.7  2010/01/03 12:26:32  fplanque
- * Crumbs for plugins. This is a little bit tough because it's a non standard controller.
- * There may be missing crumbs, especially during install. Please add missing ones when you spot them.
- *
- * Revision 1.6  2009/12/09 17:39:08  blueyed
- * typos
- *
- * Revision 1.5  2009/09/25 13:09:36  efy-vyacheslav
- * Using the SQL class to prepare queries
- *
- * Revision 1.4  2009/07/08 05:24:42  sam2kb
- * Hardcoded "admin.php" replaced with $dispatcher
- *
- * Revision 1.3  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.2  2008/01/21 09:35:32  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 11:00:54  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.52  2007/06/05 00:01:21  blueyed
- * Fixed display of the available plugins Results table, by using 0 for no limit
- *
- * Revision 1.51  2007/04/26 00:11:12  fplanque
- * (c) 2007
- *
- * Revision 1.50  2007/03/19 21:22:48  blueyed
- * doc
- *
- * Revision 1.49  2007/02/05 22:17:29  blueyed
- * Fixed sorting plugins by description
- *
- * Revision 1.48  2007/01/14 08:21:01  blueyed
- * Optimized "info", "disp_help" and "disp_help_plain" actions by refering to them through classname, which makes Plugins::discover() unnecessary
- *
- * Revision 1.47  2007/01/13 22:28:13  fplanque
- * doc
- *
- * Revision 1.46  2007/01/13 19:37:39  blueyed
- * Removed grouping by group from installed plugins. It should be an alternative view probably, if it is useful at all
- *
- * Revision 1.45  2007/01/13 19:19:58  blueyed
- * Group by plugin group; removed the "Group" column therefor
- *
- * Revision 1.44  2007/01/07 18:42:35  fplanque
- * cleaned up reload/refresh icons & links
- *
- * Revision 1.43  2006/12/20 23:07:23  blueyed
- * Moved list of available plugins to separate sub-screen/form
- *
- * Revision 1.42  2006/12/16 04:07:10  fplanque
- * visual cleanup
- *
- * Revision 1.41  2006/12/05 05:41:42  fplanque
- * created playground for skin management
- *
- * Revision 1.40  2006/11/30 05:43:39  blueyed
- * Moved Plugins::discover() to Plugins_admin::discover(); Renamed Plugins_no_DB to Plugins_admin_no_DB (and deriving from Plugins_admin)
- *
- * Revision 1.39  2006/11/30 00:30:33  blueyed
- * Some minor memory optimizations regarding "Plugins" screen
- *
- * Revision 1.38  2006/11/24 18:27:26  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.37  2006/11/05 18:21:08  fplanque
- * This is about the 4th time I fix the CSS for the plugins list :(
- *
- * Revision 1.36  2006/10/26 21:24:14  blueyed
- * Do not display "reload events" links, if no perms
- *
- * Revision 1.35  2006/10/08 19:50:10  blueyed
- * Re-enabled sorting plugins by name, group and desc again
  */
 ?>

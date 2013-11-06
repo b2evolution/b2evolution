@@ -10,7 +10,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -83,6 +83,19 @@ class Session
 	var $is_validated = false;
 
 	/**
+	 * Session start timestamp
+	 * @var string
+	 */
+	var $start_ts;
+
+	/**
+	 * Session last seen timestamp which was logged
+	 * Value may be off by up to 60 seconds
+	 * @var string
+	 */
+	var $lastseen_ts;
+
+	/**
 	 * Data stored for the session.
 	 *
 	 * This holds an array( expire, value ) for each data item key.
@@ -94,6 +107,12 @@ class Session
 
 	var $_session_needs_save = false;
 
+	/**
+	 * The user device from where this session was created
+	 * 
+	 * @var string
+	 */
+	var $sess_device;
 
 	/**
 	 * Constructor
@@ -140,11 +159,11 @@ class Session
 				}
 
 				$row = $DB->get_row( '
-					SELECT sess_ID, sess_key, sess_data, sess_user_ID
+					SELECT sess_ID, sess_key, sess_data, sess_user_ID, sess_start_ts, sess_lastseen_ts, sess_device
 					  FROM T_sessions
 					 WHERE sess_ID  = '.$DB->quote($session_id_by_cookie).'
 					   AND sess_key = '.$DB->quote($session_key_by_cookie).'
-					   AND UNIX_TIMESTAMP(sess_lastseen) > '.( $localtimenow - $timeout_sessions ) );
+					   AND UNIX_TIMESTAMP(sess_lastseen_ts) > '.( $localtimenow - $timeout_sessions ) );
 				if( empty( $row ) )
 				{
 					$Debuglog->add( 'Session: Session ID/key combination is invalid!', 'request' );
@@ -155,7 +174,10 @@ class Session
 					$this->ID = $row->sess_ID;
 					$this->key = $row->sess_key;
 					$this->user_ID = $row->sess_user_ID;
+					$this->start_ts = mysql2timestamp( $row->sess_start_ts );
+					$this->lastseen_ts = mysql2timestamp( $row->sess_lastseen_ts );
 					$this->is_validated = true;
+					$this->sess_device = $row->sess_device;
 
 					$Debuglog->add( 'Session: Session user_ID: '.var_export($this->user_ID, true), 'request' );
 
@@ -211,20 +233,41 @@ class Session
 
 
 		if( $this->ID )
-		{ // there was a valid session before; data needs to be updated at page exit (lastseen)
-			$this->session_needs_save( true );
+		{ // there was a valid session before
+			if( $this->lastseen_ts < $localtimenow - 60 )
+			{ // lastseen timestamp is older then a minute, it needs to be updated at page exit
+				$this->session_needs_save( true );
+			}
 		}
 		else
 		{ // create a new session! :
 			$this->key = generate_random_key(32);
 
+			// Detect user device
+			global $user_devices;
+			$this->sess_device = '';
+
+			if( !empty($_SERVER['HTTP_USER_AGENT']) )
+			{
+				foreach( $user_devices as $device_name => $device_regexp )
+				{
+					if( preg_match( '~'.$device_regexp.'~i', $_SERVER['HTTP_USER_AGENT'] ) )
+					{
+						$this->sess_device = $device_name;
+						break;
+					}
+				}
+			}
+
 			// We need to INSERT now because we need an ID now! (for the cookie)
 			$DB->query( "
-				INSERT INTO T_sessions( sess_key, sess_lastseen, sess_ipaddress )
+				INSERT INTO T_sessions( sess_key, sess_start_ts, sess_lastseen_ts, sess_ipaddress, sess_device )
 				VALUES (
 					'".$this->key."',
 					'".date( 'Y-m-d H:i:s', $localtimenow )."',
-					".$DB->quote($Hit->IP)."
+					'".date( 'Y-m-d H:i:s', $localtimenow )."',
+					".$DB->quote( $Hit->IP ).",
+					".$DB->quote( $this->sess_device )."
 				)" );
 
 			$this->ID = $DB->insert_id;
@@ -447,8 +490,7 @@ class Session
 	 	// Note: we increase the hitcoutn every time. That assumes that there will be no 2 calls for a single hit.
 	 	//       Anyway it is not a big problem if this number is approximate.
 		$sql = "UPDATE T_sessions SET
-				sess_hitcount = sess_hitcount + 1,
-				sess_lastseen = '".date( 'Y-m-d H:i:s', $localtimenow )."',
+				sess_lastseen_ts = '".date( 'Y-m-d H:i:s', $localtimenow )."',
 				sess_data = ".$DB->quote( $sess_data ).",
 				sess_ipaddress = '".$Hit->IP."',
 				sess_key = ".$DB->quote( $this->key );
@@ -545,14 +587,19 @@ class Session
 	 * The received crumb must match a crumb we previously saved less than 2 hours ago.
 	 *
 	 * @param string crumb name
+	 * @param boolean true if the script should die on error
 	 */
-	function assert_received_crumb( $crumb_name )
+	function assert_received_crumb( $crumb_name, $die = true )
 	{
 		global $servertimenow, $crumb_expires, $debug;
 
 		if( ! $crumb_received = param( 'crumb_'.$crumb_name, 'string', NULL ) )
 		{ // We did not receive a crumb!
-			bad_request_die( 'Missing crumb ['.$crumb_name.'] -- It looks like this request is not legit.' );
+			if( $die )
+			{
+				bad_request_die( 'Missing crumb ['.$crumb_name.'] -- It looks like this request is not legit.' );
+			}
+			return false;
 		}
 
 		// Retrieve latest saved crumb:
@@ -573,6 +620,11 @@ class Session
 		{	// Crumb is valid
 			// echo '<p>-<p>-<p>B';
 			return true;
+		}
+
+		if( ! $die )
+		{
+			return false;
 		}
 
 		// ERROR MESSAGE, with form/button to bypass and enough warning hopefully.
@@ -604,6 +656,28 @@ class Session
 		echo '</div>';
 
 		die();
+	}
+
+
+	/**
+	 * Was this session created from a mobile device
+	 */
+	function is_mobile_session()
+	{
+		global $mobile_user_devices;
+
+		return array_key_exists( $this->sess_device, $mobile_user_devices );
+	}
+
+
+	/**
+	 * Was this session created from a mobile device
+	 */
+	function is_tablet_session()
+	{
+		global $tablet_user_devices;
+
+		return array_key_exists( $this->sess_device, $tablet_user_devices );
 	}
 }
 
@@ -677,184 +751,8 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
- * Revision 1.41  2011/10/12 00:34:44  fplanque
- * fix
+ * Revision 1.43  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.40  2011/10/06 14:41:39  efy-asimo
- * Display received and valid crumbs on crumb error
- *
- * Revision 1.39  2011/09/08 05:22:40  efy-asimo
- * Remove item attending and add item settings
- *
- * Revision 1.38  2011/09/04 22:13:18  fplanque
- * copyright 2011
- *
- * Revision 1.37  2011/06/26 17:06:40  sam2kb
- * Added global param $crumb_expires
- *
- * Revision 1.36  2010/11/25 15:16:35  efy-asimo
- * refactor $Messages
- *
- * Revision 1.35  2010/07/26 06:52:27  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.34  2010/05/15 22:24:23  blueyed
- * Session::assert_crumb: better error message, and most importantly, a way to bypass.
- *
- * Revision 1.33  2010/05/15 21:13:20  blueyed
- * doc
- *
- * Revision 1.32  2010/04/28 21:15:44  blueyed
- * assert_received_crumb: use bad_request_die some more. Improve doc/todo.
- *
- * Revision 1.31  2010/03/18 19:33:54  blueyed
- * assert_received_crumb: use bad_request_die, not debug_die. doc/todo
- *
- * Revision 1.30  2010/03/08 21:06:31  fplanque
- * minor/doc
- *
- * Revision 1.29  2010/03/06 01:03:35  blueyed
- * todo
- *
- * Revision 1.28  2010/03/06 00:33:59  blueyed
- * doc
- *
- * Revision 1.27  2010/02/08 17:53:55  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.26  2010/01/02 17:24:31  fplanque
- * Crumbs - Proof of concept
- *
- * Revision 1.25  2009/12/01 01:52:08  fplanque
- * Fixed issue with Debuglog in case of redirect -- Thanks @blueyed for help.
- *
- * Revision 1.24  2009/12/01 01:32:59  blueyed
- * whitespace/typo
- *
- * Revision 1.23  2009/12/01 00:29:09  fplanque
- * bugfix
- *
- * Revision 1.22  2009/11/30 00:22:05  fplanque
- * clean up debug info
- * show more timers in view of block caching
- *
- * Revision 1.21  2009/11/12 03:54:17  fplanque
- * wording/doc/cleanup
- *
- * Revision 1.20  2009/11/12 00:46:31  fplanque
- * doc/minor/handle demo mode
- *
- * Revision 1.19  2009/10/27 16:43:33  efy-maxim
- * custom session timeout
- *
- * Revision 1.18  2009/10/25 22:02:43  efy-maxim
- * 1. multiple sessions check
- * 2. user form deleted
- *
- * Revision 1.17  2009/09/26 12:00:43  tblue246
- * Minor/coding style
- *
- * Revision 1.16  2009/09/25 19:12:39  blueyed
- * Allow caching for the load-session-data query. After all, a user might click somewhere before the next one arrives (re query cache).
- *
- * Revision 1.15  2009/09/25 07:33:14  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.14  2009/09/14 14:36:16  tblue246
- * Fixing broken commits by efy-arrin
- *
- * Revision 1.13  2009/09/14 13:38:10  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.12  2009/09/13 21:27:20  blueyed
- * SQL_NO_CACHE for SELECT queries using T_sessions
- *
- * Revision 1.11  2009/05/28 22:46:14  blueyed
- * doc
- *
- * Revision 1.10  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.9  2008/12/27 21:09:28  fplanque
- * minor
- *
- * Revision 1.8  2008/12/22 01:56:54  fplanque
- * minor
- *
- * Revision 1.7  2008/11/20 23:30:57  blueyed
- * Quote IP when creating new session
- *
- * Revision 1.6  2008/11/20 23:27:07  blueyed
- * minor indenting
- *
- * Revision 1.5  2008/09/13 11:07:43  fplanque
- * speed up display of dashboard on first login of the day
- *
- * Revision 1.4  2008/03/18 00:31:40  blueyed
- * Fix loading of required classes for unserialize, if ini_set() is disabled (ref: http://forums.b2evolution.net//viewtopic.php?p=71333#71333)
- *
- * Revision 1.3  2008/02/19 11:11:18  fplanque
- * no message
- *
- * Revision 1.2  2008/01/21 09:35:33  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 11:01:00  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.43  2007/06/19 22:50:15  blueyed
- * cleanup
- *
- * Revision 1.42  2007/05/13 22:02:09  fplanque
- * removed bloated $object_def
- *
- * Revision 1.41  2007/04/26 00:11:11  fplanque
- * (c) 2007
- *
- * Revision 1.40  2007/04/23 15:08:39  blueyed
- * TODO
- *
- * Revision 1.39  2007/04/05 21:53:51  fplanque
- * fix for OVH
- *
- * Revision 1.38  2007/03/11 18:29:50  blueyed
- * Use is_array for session data check
- *
- * Revision 1.37  2007/02/25 01:39:05  fplanque
- * wording
- *
- * Revision 1.36  2007/02/21 22:21:30  blueyed
- * "Multiple sessions" user setting
- *
- * Revision 1.35  2007/02/15 16:37:53  waltercruz
- * Changing double quotes to single quotes
- *
- * Revision 1.34  2007/02/14 14:38:04  waltercruz
- * Changing double quotes to single quotes
- *
- * Revision 1.33  2007/01/27 15:18:23  blueyed
- * doc
- *
- * Revision 1.32  2007/01/27 01:02:49  blueyed
- * debug_die() if ini_set() fails on Session data restore
- *
- * Revision 1.31  2007/01/16 00:08:44  blueyed
- * Implemented $default param for Session::get()
- *
- * Revision 1.30  2006/12/28 15:43:31  fplanque
- * minor
- *
- * Revision 1.29  2006/12/17 23:44:35  fplanque
- * minor cleanup
- *
- * Revision 1.28  2006/12/07 23:13:11  fplanque
- * @var needs to have only one argument: the variable type
- * Otherwise, I can't code!
- *
- * Revision 1.27  2006/11/24 18:27:24  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.26  2006/11/14 21:13:58  blueyed
- * I've spent > 2 hours debugging this charset nightmare and all I've got are those lousy TODOs..
  */
 ?>

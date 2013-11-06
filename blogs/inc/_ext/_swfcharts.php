@@ -146,8 +146,8 @@ function DrawChart( $chart )
 
 /*
  * $Log$
- * Revision 1.2  2009/03/16 15:58:26  tblue246
- * Code cleanup (if this should violate the "PHP/SWF charts" license, please revert...)
+ * Revision 1.3  2013/11/06 08:03:48  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

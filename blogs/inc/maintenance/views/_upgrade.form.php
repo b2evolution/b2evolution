@@ -3,7 +3,7 @@
  * This file is part of b2evolution - {@link http://b2evolution.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -102,27 +102,8 @@ switch( $action )
 
 /*
  * $Log$
- * Revision 1.7  2010/01/30 18:55:32  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.6  2009/11/19 12:10:53  efy-maxim
- * Force 'upgrade' for debug mode
- *
- * Revision 1.5  2009/11/15 19:44:02  fplanque
- * minor
- *
- * Revision 1.4  2009/10/22 10:52:57  efy-maxim
- * upgrade - messages
- *
- * Revision 1.3  2009/10/21 14:27:39  efy-maxim
- * upgrade
- *
- * Revision 1.2  2009/10/20 14:38:55  efy-maxim
- * maintenance modulde: downloading - unpacking - verifying destination files - backing up - copying new files - upgrade database using regular script (Warning: it is very unstable version! Please, don't use maintenance modulde, because it can affect your data )
- *
- * Revision 1.1  2009/10/18 20:15:51  efy-maxim
- * 1. backup, upgrade have been moved to maintenance module
- * 2. maintenance module permissions
+ * Revision 1.8  2013/11/06 08:04:25  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

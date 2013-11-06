@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal Open Source relicensing agreement:
  * }}
@@ -37,7 +37,9 @@ switch( $action )
 {
 	case 'edit':
 	case 'update':
+	case 'switch_view':
 	case 'publish':
+	case 'restrict':
 	case 'deprecate':
 	case 'delete_url':
 	case 'update_publish':
@@ -50,14 +52,34 @@ switch( $action )
 		$BlogCache = & get_BlogCache();
 		$Blog = & $BlogCache->get_by_ID( $blog );
 
-		// Check permission:
-		if( ! $current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', false, $blog ) &&
-				! $current_User->check_perm( 'blog_own_comments', '', false, $edited_Comment_Item ) )
-		{	// All permissions are denied
-			$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
-			$current_User->check_perm( 'blog_own_comments', '', true, $edited_Comment_Item );
-			// TODO: It would be good if we combine these two permissions into one, To avoid a duplicate calling of these functions
+		// Some users can delete & change a status of comments in their own posts, set corresponding permlevel
+		if( $action == 'publish' || $action == 'update_publish' )
+		{ // Load the new comment status from publish request and set perm check values
+			$publish_status = param( 'publish_status', 'string', '' );
+			$check_permname = 'comment!'.$publish_status;
+			$check_permlevel = ( $action == 'publish' ) ? 'moderate' : 'edit';
 		}
+		elseif( $action == 'deprecate' )
+		{ // set perm check values
+			$check_permname = 'comment!deprecated';
+			$check_permlevel = 'moderate';
+		}
+		else
+		{ // set default perm check values
+			$comment_status = param( 'comment_status', 'string', 'CURSTATUS' );
+			$check_permname = 'comment!'.$comment_status;
+			$check_permlevel = ( $action == 'delete' ) ? 'delete' : 'edit';
+		}
+		// Check permission:
+		$current_User->check_perm( $check_permname, $check_permlevel, true, $edited_Comment );
+
+		$comment_title = '';
+		$comment_content = htmlspecialchars_decode( $edited_Comment->content );
+
+		// Format content for editing, if we were not already in editing...
+		$Plugins_admin = & get_Plugins_admin();
+		$params = array( 'object_type' => 'Comment', 'object_Blog' => & $Blog );
+		$Plugins_admin->unfilter_contents( $comment_title /* by ref */, $comment_content /* by ref */, $edited_Comment_Item->get_renderers_validated(), $params );
 
 		// Where are we going to redirect to?
 		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$edited_Comment_Item->ID, '&' ) );
@@ -90,7 +112,13 @@ switch( $action )
 		break;
 
 	case 'list':
-	  // Check permission:
+	case 'mass_delete':
+		if( $action == 'mass_delete' )
+		{ // Check permission:
+			$current_User->check_perm( 'blogs', 'all', true );
+		}
+
+		// Check permission:
 		$selected = autoselect_blog( 'blog_comments', 'edit' );
 		if( ! $selected )
 		{ // No blog could be selected
@@ -98,20 +126,65 @@ switch( $action )
 			$action = 'nil';
 		}
 		elseif( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
-		{	// Selected a new blog:
+		{ // Selected a new blog:
 			$BlogCache = & get_BlogCache();
 			$Blog = & $BlogCache->get_by_ID( $blog );
 		}
+		break;
+
+	case 'spam':
+		// Used for quick SPAM vote of comments
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'comment' );
+
+		param( 'comment_ID', 'integer', true );
+		$edited_Comment = & Comment_get_by_ID( $comment_ID );
+
+		$edited_Comment_Item = & $edited_Comment->get_Item();
+		set_working_blog( $edited_Comment_Item->get_blog_ID() );
+		$BlogCache = & get_BlogCache();
+		$Blog = & $BlogCache->get_by_ID( $blog );
+
+		// Check permission for spam voting
+		$current_User->check_perm( 'blog_vote_spam_comments', 'edit', true, $Blog->ID );
+
+		if( $edited_Comment !== false )
+		{ // The comment still exists
+			if( $current_User->ID != $edited_Comment->author_user_ID )
+			{ // Do not allow users to vote on their own comments
+				$edited_Comment->set_vote( 'spam', param( 'value', 'string' ) );
+				$edited_Comment->dbupdate();
+			}
+		}
+
+		// Where are we going to redirect to?
+		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=comments&blog='.$blog.'&filter=restore', '&' ) );
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( $redirect_to, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
 		break;
 
 	default:
 		debug_die( 'unhandled action 1' );
 }
 
+// Set the third level tab
+param( 'tab3', 'string', '', true );
 
 $AdminUI->breadcrumbpath_init();
 $AdminUI->breadcrumbpath_add( T_('Contents'), '?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' );
 $AdminUI->breadcrumbpath_add( T_('Comments'), '?ctrl=comments&amp;blog=$blog$&amp;filter=restore' );
+switch( $tab3 )
+{
+	case 'listview':
+		$AdminUI->breadcrumbpath_add( T_('List view'), '?ctrl=comments&amp;blog=$blog$&amp;tab3='.$tab3.'&amp;filter=restore' );
+		break;
+
+	case 'fullview':
+		$AdminUI->breadcrumbpath_add( T_('Full text view'), '?ctrl=comments&amp;blog=$blog$&amp;tab3='.$tab3.'&amp;filter=restore' );
+		break;
+}
 
 $AdminUI->set_path( 'items' );	// Sublevel may be attached below
 
@@ -120,18 +193,34 @@ $AdminUI->set_path( 'items' );	// Sublevel may be attached below
  */
 switch( $action )
 {
- 	case 'nil':
+	case 'nil':
 		// Do nothing
 		break;
 
 
 	case 'edit':
-		$AdminUI->title = $AdminUI->title_titlearea = T_('Editing comment').' #'.$edited_Comment->ID;
+		$AdminUI->title_titlearea = T_('Editing comment').' #'.$edited_Comment->ID;
+
+		// Generate available blogs list:
+		$AdminUI->set_coll_list_params( 'blog_comments', 'edit',
+						array( 'ctrl' => 'comments', 'filter' => 'restore' ), NULL, '' );
+
+		/*
+		 * Add sub menu entries:
+		 * We do this here instead of _header because we need to include all filter params into regenerate_url()
+		 */
+		attach_browse_tabs( false );
+
+		$AdminUI->set_path( 'items', 'comments' );
+
+		$AdminUI->breadcrumbpath_add( sprintf( T_('Comment #%s'), $edited_Comment->ID ), '?ctrl=comments&amp;comment_ID='.$edited_Comment->ID.'&amp;action=edit' );
+		$AdminUI->breadcrumbpath_add( T_('Edit'), '?ctrl=comments&amp;comment_ID='.$edited_Comment->ID.'&amp;action=edit' );
 		break;
 
 
 	case 'update_publish':
 	case 'update':
+	case 'switch_view':
 		// fp> TODO: $edited_Comment->load_from_Request( true );
 
 		// Check that this action request is not a CSRF hacked request:
@@ -190,11 +279,38 @@ switch( $action )
 			}
 		}
 
-		// Content:
-		param( 'content', 'html' );
-		param( 'post_autobr', 'integer', ($comments_use_autobr == 'always') ? 1 : 0 );
+		$edited_Comment_Item = $edited_Comment->get_Item();
+		$edited_Comment_Item->load_Blog();
+		if( $edited_Comment_Item->Blog->get_setting( 'allow_html_comment' ) )
+		{	// HTML is allowed for this comment
+			$text_format = 'html';
+		}
+		else
+		{	// HTML is disallowed for this comment
+			$text_format = 'htmlspecialchars';
+		}
 
-		param_check_html( 'content', T_('Invalid comment text.'), '#', $post_autobr );	// Check this is backoffice content (NOT with comment rules)
+		// Content:
+		param( 'content', $text_format );
+
+		// Renderers:
+		if( param( 'renderers_displayed', 'integer', 0 ) )
+		{ // use "renderers" value only if it has been displayed (may be empty)
+			global $Plugins;
+			$renderers = $Plugins->validate_renderer_list( param( 'renderers', 'array', array() ), array( 'Comment' => & $edited_Comment ) );
+			$edited_Comment->set_renderers( $renderers );
+		}
+
+		// Trigger event: a Plugin could add a $category="error" message here..
+		// This must get triggered before any internal validation and must pass all relevant params.
+		// The OpenID plugin will validate a given OpenID here (via redirect and coming back here).
+		$Plugins->trigger_event( 'CommentFormSent', array(
+				'dont_remove_pre' => true,
+				'comment_post_ID' => $edited_Comment_Item->ID,
+				'comment' => & $content,
+			) );
+
+		param_check_html( 'content', T_('Invalid comment text.') );	// Check this is backoffice content (NOT with comment rules)
 		$edited_Comment->set( 'content', get_param( 'content' ) );
 
 		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
@@ -213,7 +329,7 @@ switch( $action )
 		$comment_status = param( 'comment_status', 'string', 'published' );
 		if( $action == 'update_publish' )
 		{
-			$comment_status = 'published';
+			$comment_status = $publish_status;
 		}
 		$old_comment_status = $edited_Comment->get( 'status' );
 		$edited_Comment->set( 'status', $comment_status );
@@ -231,18 +347,22 @@ switch( $action )
 			$edited_Comment->handle_qm_secret();
 		}
 
-		// UPDATE DB:
-		$edited_Comment->dbupdate();	// Commit update to the DB
+		// If action is switch_view then don't save the edited Comment yet, only change the edit view
+		if( $action != 'switch_view' )
+		{ // UPDATE DB:
+			$edited_Comment->dbupdate();	// Commit update to the DB
 
-		if( $edited_Comment->status == 'published' )
-		{ // comment status was set to published or it was already published, needs to handle notifications
-			$edited_Comment->handle_notifications();
+			if( $edited_Comment->status == 'published' )
+			{ // comment status was set to published or it was already published, needs to handle notifications
+				$edited_Comment->handle_notifications();
+			}
+	
+			$Messages->add( T_('Comment has been updated.'), 'success' );	
+
+			header_redirect( $redirect_to );
+			/* exited */
 		}
 
-		$Messages->add( T_('Comment has been updated.'), 'success' );
-
-		header_redirect( $redirect_to );
-		/* exited */
 		break;
 
 
@@ -250,7 +370,7 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
 
-		$edited_Comment->set('status', 'published' );
+		$edited_Comment->set( 'status', $publish_status );
 		// Comment moderation is done, handle moderation "secret"
 		$edited_Comment->handle_qm_secret();
 
@@ -259,7 +379,46 @@ switch( $action )
 		// comment status was set to published, needs to handle notifications
 		$edited_Comment->handle_notifications();
 
-		$Messages->add( T_('Comment has been published.'), 'success' );
+		// Set the success message corresponding for the new status
+		switch( $edited_Comment->status )
+		{
+			case 'published':
+				$success_message = T_('Comment has been published.');
+				break;
+			case 'community':
+				$success_message = T_('The comment is now visible by the community.');
+				break;
+			case 'protected':
+				$success_message = T_('The comment is now visible by the members.');
+				break;
+			case 'review':
+				$success_message = T_('The comment is now visible by moderators.');
+				break;
+			default:
+				$success_message = T_('Comment has been updated.');
+				break;
+		}
+		$Messages->add( $success_message, 'success' );
+
+		header_redirect( $redirect_to );
+		/* exited */
+		break;
+
+
+	case 'restrict':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'comment' );
+
+		$edited_Comment->set( 'status', $comment_status );
+		// Comment moderation is done, handle moderation "secret"
+		$edited_Comment->handle_qm_secret();
+
+		$edited_Comment->dbupdate();	// Commit update to the DB
+
+		// comment status was set to published, needs to handle notifications
+		$edited_Comment->handle_notifications();
+
+		$Messages->add( T_('Comment has been restricted.'), 'success' );
 
 		header_redirect( $redirect_to );
 		/* exited */
@@ -303,11 +462,12 @@ switch( $action )
 		$Session->assert_received_crumb( 'comment' );
 
 		// fp> TODO: non JS confirm
+		$success_message = ( $edited_Comment->status == 'trash' ) ? T_('Comment has been deleted.') : T_('Comment has been recycled.');
 
 		// Delete from DB:
 		$edited_Comment->dbdelete();
 
-		$Messages->add( T_('Comment has been deleted.'), 'success' );
+		$Messages->add( $success_message, 'success' );
 
 		header_redirect( $redirect_to );
 		break;
@@ -361,7 +521,17 @@ switch( $action )
 		/*
 		 * Trash comments:
 		 */
-		$AdminUI->title = $AdminUI->title_titlearea = T_('Comment recycle bins');
+		$AdminUI->title_titlearea = T_('Comment recycle bins');
+
+		/*
+		 * Add sub menu entries:
+		 * We do this here instead of _header because we need to include all filter params into regenerate_url()
+		 */
+		attach_browse_tabs( false );
+
+		$AdminUI->set_path( 'items', 'comments' );
+
+		$AdminUI->breadcrumbpath_add( T_('Comment recycle bins'), '?ctrl=comments&amp;action=emptytrash' );
 		break;
 
 	case 'elevate':
@@ -389,10 +559,11 @@ switch( $action )
 		break;
 
 	case 'list':
+	case 'mass_delete':
 		/*
 		 * Latest comments:
 		 */
-		$AdminUI->title = $AdminUI->title_titlearea = T_('Latest comments');
+		$AdminUI->title_titlearea = T_('Latest comments');
 
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_comments', 'edit',
@@ -406,25 +577,73 @@ switch( $action )
 
 		$AdminUI->append_path_level( 'comments' );
 
-		// Set the third level tab
-		param( 'tab3', 'string', 'fullview', true );
+		if( empty( $tab3 ) )
+		{
+			$tab3 = 'fullview';
+		}
+
 		$AdminUI->set_path( 'items', 'comments', $tab3 );
 
+		$comments_list_param_prefix = 'cmnt_';
+		if( !empty( $tab3 ) )
+		{	// Use different param prefix for each tab
+			$comments_list_param_prefix .= $tab3.'_';
+		}
 		/*
 		 * List of comments to display:
 		 */
-		$CommentList = new CommentList2( $Blog );
+		$CommentList = new CommentList2( $Blog, NULL, 'CommentCache', $comments_list_param_prefix, $tab3 );
 
 		// Filter list:
 		$CommentList->set_default_filters( array(
-				'statuses' => array( 'published', 'draft', 'deprecated' ),
-				'comments' => $UserSettings->get( 'results_per_page', $current_User->ID ),
+				'statuses' => get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) ),
+				//'comments' => $UserSettings->get( 'results_per_page' ),
 			) );
 
 		$CommentList->load_from_Request();
 
-		break;
+		/**
+		 * Mass delete comments
+		 */
+		param( 'mass_type', 'string', '' );
+		if( $action == 'mass_delete' && !empty( $mass_type ) )
+		{
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'comment' );
 
+			$CommentList->limit = 0; // Remove a limit to get comments from all pages
+			$CommentList->query();
+
+			switch( $mass_type )
+			{
+				case 'recycle':
+					// Move the comments to recycle bin:
+					foreach( $CommentList->rows as $Comment )
+					{
+						$deleted_Comment = & Comment_get_by_ID( $Comment->comment_ID );
+						$deleted_Comment->dbdelete();
+					}
+
+					$Messages->add( sprintf( T_( '%s comments were moved to recycle bin.' ), $CommentList->total_rows ), 'success' );
+					break;
+
+				case 'delete': // Delete the comments permanently:
+					foreach( $CommentList->rows as $Comment )
+					{
+						$deleted_Comment = & Comment_get_by_ID( $Comment->comment_ID );
+						$deleted_Comment->set( 'status', 'trash' );
+						$deleted_Comment->dbdelete();
+					}
+
+					$Messages->add( sprintf( T_( '%s comments were deleted permanently.' ), $CommentList->total_rows ), 'success' );
+					break;
+			}
+
+			// Redirect to refresh comments list
+			header_redirect( regenerate_url( 'action', '', '', '&' ) );
+		}
+
+		break;
 
 	default:
 		debug_die( 'unhandled action 2' );
@@ -442,7 +661,7 @@ if( ( $action == 'edit' ) || ( $action == 'update_publish' ) || ( $action == 'up
 	require_css( 'ui.datepicker.css' );
 }
 
-require_css( 'rsc/css/blog_base.css', true );
+require_css( 'rsc/css/blog_base.css', true ); // Default styles for the blog navigation
 require_js( 'communication.js' ); // auto requires jQuery
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -465,6 +684,7 @@ switch( $action )
 	case 'elevate':
 	case 'update_publish':
 	case 'update':	// on error
+	case 'switch_view':
 		// Begin payload block:
 		$AdminUI->disp_payload_begin();
 
@@ -523,194 +743,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.49  2011/10/23 09:19:42  efy-yurybakh
- * Implement new permission for comment editing
- *
- * Revision 1.48  2011/10/21 07:10:47  efy-asimo
- * Comment quick moderation option
- *
- * Revision 1.47  2011/10/12 13:34:36  efy-asimo
- * Delete comment secret on comment update
- *
- * Revision 1.46  2011/09/06 00:54:38  fplanque
- * i18n update
- *
- * Revision 1.45  2011/09/04 22:13:15  fplanque
- * copyright 2011
- *
- * Revision 1.44  2011/05/19 17:47:07  efy-asimo
- * register for updates on a specific blog post
- *
- * Revision 1.43  2011/03/23 14:09:28  efy-asimo
- * Elevate comment into a post feature
- *
- * Revision 1.42  2011/02/25 22:04:08  fplanque
- * minor / UI cleanup
- *
- * Revision 1.41  2011/02/24 07:42:27  efy-asimo
- * Change trashcan to Recycle bin
- *
- * Revision 1.40  2011/02/14 14:13:24  efy-asimo
- * Comments trash status
- *
- * Revision 1.39  2011/02/10 23:07:21  fplanque
- * minor/doc
- *
- * Revision 1.38  2011/01/06 14:31:47  efy-asimo
- * advanced blog permissions:
- *  - add blog_edit_ts permission
- *  - make the display more compact
- *
- * Revision 1.37  2010/11/25 15:16:34  efy-asimo
- * refactor $Messages
- *
- * Revision 1.36  2010/10/22 15:09:57  efy-asimo
- * Remove autoloading datepciker css, instead load before every usage, also remove jquery-ui.css load
- *
- * Revision 1.35  2010/09/20 14:26:23  efy-asimo
- * doc - merged from v-4-0
- *
- * Revision 1.34  2010/08/05 08:04:12  efy-asimo
- * Ajaxify comments on itemList FullView and commentList FullView pages
- *
- * Revision 1.33  2010/07/26 06:52:16  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.32  2010/07/20 06:49:28  efy-asimo
- * admin user can move comments to different post
- * add comments to msgform
- *
- * Revision 1.31  2010/07/19 09:35:02  efy-asimo
- * Fix messaging permission setup
- * Update comments number per page
- *
- * Revision 1.30  2010/06/24 08:54:05  efy-asimo
- * PHP 4 compatibility
- *
- * Revision 1.29  2010/06/23 09:30:55  efy-asimo
- * Comments display and Antispam ban form modifications
- *
- * Revision 1.28  2010/06/01 11:33:19  efy-asimo
- * Split blog_comments advanced permission (published, deprecated, draft)
- * Use this new permissions (Antispam tool,when edit/delete comments)
- *
- * Revision 1.27  2010/05/10 14:26:17  efy-asimo
- * Paged Comments & filtering & add comments listview
- *
- * Revision 1.26  2010/03/30 11:14:01  efy-asimo
- * move comments from one post to another
- *
- * Revision 1.25  2010/03/15 17:12:09  efy-asimo
- * Add filters to Comment page
- *
- * Revision 1.24  2010/03/11 10:34:33  efy-asimo
- * Rewrite CommentList to CommentList2 task
- *
- * Revision 1.23  2010/02/08 17:52:09  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.22  2010/01/31 17:39:51  efy-asimo
- * delete url from comments in dashboard and comments form
- *
- * Revision 1.21  2010/01/29 23:07:01  efy-asimo
- * Publish Comment button
- *
- * Revision 1.20  2010/01/23 00:30:09  fplanque
- * no message
- *
- * Revision 1.19  2010/01/13 22:09:44  fplanque
- * normalized
- *
- * Revision 1.18  2010/01/13 19:49:45  efy-yury
- * update comments: crumbs
- *
- * Revision 1.17  2009/12/06 22:55:20  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.16  2009/09/26 12:00:42  tblue246
- * Minor/coding style
- *
- * Revision 1.15  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.14  2009/08/26 23:37:00  tblue246
- * Backoffice comment editing: Allow changing of "Allow message form" setting for guest comments
- *
- * Revision 1.13  2009/03/08 23:57:42  fplanque
- * 2009
- *
- * Revision 1.12  2009/02/25 22:17:53  blueyed
- * ItemLight: lazily load blog_ID and main_Chapter.
- * There is more, but I do not want to skim the diff again, after
- * "cvs ci" failed due to broken pipe.
- *
- * Revision 1.11  2009/01/25 18:57:56  blueyed
- * phpdoc: fix multiple package tags error
- *
- * Revision 1.10  2008/02/09 16:19:31  fplanque
- * fixed commenting bugs
- *
- * Revision 1.9  2008/01/21 09:35:27  fplanque
- * (c) 2008
- *
- * Revision 1.8  2008/01/20 18:20:23  fplanque
- * Antispam per group setting
- *
- * Revision 1.7  2008/01/19 15:45:28  fplanque
- * refactoring
- *
- * Revision 1.6  2008/01/18 15:53:42  fplanque
- * Ninja refactoring
- *
- * Revision 1.5  2008/01/05 02:28:17  fplanque
- * enhanced blog selector (bloglist_buttons)
- *
- * Revision 1.4  2007/12/18 23:51:33  fplanque
- * nofollow handling in comment urls
- *
- * Revision 1.3  2007/11/02 01:51:55  fplanque
- * comment ratings
- *
- * Revision 1.2  2007/09/04 19:51:27  fplanque
- * in-context comment editing
- *
- * Revision 1.1  2007/06/25 10:59:39  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.9  2007/05/13 18:49:54  fplanque
- * made autoselect_blog() more robust under PHP4
- *
- * Revision 1.8  2007/05/09 01:01:32  fplanque
- * permissions cleanup
- *
- * Revision 1.7  2007/04/26 00:11:09  fplanque
- * (c) 2007
- *
- * Revision 1.6  2007/03/07 02:37:52  fplanque
- * OMG I decided that pregenerating the menus was getting to much of a PITA!
- * It's a zillion problems with the permissions.
- * This will be simplified a lot. Enough of these crazy stuff.
- *
- * Revision 1.5  2006/12/26 00:55:58  fplanque
- * wording
- *
- * Revision 1.4  2006/12/18 03:20:41  fplanque
- * _header will always try to set $Blog.
- * controllers can use valid_blog_requested() to make sure we have one
- * controllers should call set_working_blog() to change $blog, so that it gets memorized in the user settings
- *
- * Revision 1.3  2006/12/17 23:42:38  fplanque
- * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
- * Look into Advanced Settings for the aggregating blog.
- * There may be side effects and new bugs created by this. Please report them :]
- *
- * Revision 1.2  2006/12/12 02:47:47  fplanque
- * Completed comment controller
- *
- * Revision 1.1  2006/12/12 02:01:52  fplanque
- * basic comment controller
+ * Revision 1.51  2013/11/06 08:03:58  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

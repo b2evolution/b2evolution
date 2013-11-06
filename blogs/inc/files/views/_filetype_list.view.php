@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -151,50 +151,8 @@ $Session->delete( 'fadeout_id');
 
 /*
  * $Log$
- * Revision 1.15  2011/09/06 20:28:37  sam2kb
- * i18n update
- *
- * Revision 1.14  2011/09/04 22:13:16  fplanque
- * copyright 2011
- *
- * Revision 1.13  2011/03/10 14:54:18  efy-asimo
- * Allow file types modification & add m4v file type
- *
- * Revision 1.12  2010/02/08 17:53:02  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.11  2010/01/30 18:55:27  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.10  2010/01/28 03:42:20  fplanque
- * minor
- *
- * Revision 1.9  2010/01/23 12:54:49  efy-yury
- * add: fadeouts
- *
- * Revision 1.8  2010/01/03 13:10:58  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.7  2009/09/25 13:09:36  efy-vyacheslav
- * Using the SQL class to prepare queries
- *
- * Revision 1.6  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.5  2009/07/06 23:52:24  sam2kb
- * Hardcoded "admin.php" replaced with $dispatcher
- *
- * Revision 1.4  2009/03/08 23:57:43  fplanque
- * 2009
- *
- * Revision 1.3  2008/01/21 09:35:30  fplanque
- * (c) 2008
- *
- * Revision 1.2  2007/09/08 20:23:03  fplanque
- * action icons / wording
- *
- * Revision 1.1  2007/06/25 11:00:12  fplanque
- * MODULES (refactored MVC)
+ * Revision 1.16  2013/11/06 08:04:15  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

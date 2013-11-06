@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -63,6 +63,7 @@ class Cronjob extends DataObject
 		{	// Loading an object from DB:
 			$this->ID              = $db_row->ctsk_ID;
 			$this->start_datetime  = $db_row->ctsk_start_datetime;
+			$this->start_timestamp = strtotime( $db_row->ctsk_start_datetime );
 			$this->repeat_after    = $db_row->ctsk_repeat_after;
 			$this->name            = $db_row->ctsk_name;
 			$this->controller      = $db_row->ctsk_controller;
@@ -70,7 +71,8 @@ class Cronjob extends DataObject
 		}
 		else
 		{	// New object:
-
+			global $localtimenow;
+			$this->start_timestamp = $localtimenow;
 		}
 	}
 
@@ -92,7 +94,7 @@ class Cronjob extends DataObject
 				return $this->set_param( 'params', 'string', serialize($parvalue), false );
 
 			case 'name':
-				return $this->set_param( $parname, 'string', evo_substr( $parvalue, 0, 50 ), false );
+				return $this->set_param( $parname, 'string', evo_substr( $parvalue, 0, 255 ), false );
 		}
 
 		return $this->set_param( $parname, 'string', $parvalue, $make_null );
@@ -115,45 +117,121 @@ class Cronjob extends DataObject
 
 		return parent::get( $parname );
 	}
+
+
+	/**
+	 * Load data from Request form fields.
+	 *
+	 * @return boolean true if loaded data seems valid.
+	 */
+	function load_from_Request( $cron_job_names = array(), $cron_job_params = array() )
+	{
+		if( $this->ID > 0 || get_param( 'ctsk_ID' ) > 0 )
+		{	// Update or copy cron job
+			$cjob_name = param( 'cjob_name', 'string', true );
+			param_check_not_empty( 'cjob_name', T_('Please enter job name') );
+		}
+		else
+		{	// Create new cron job
+			$cjob_type = param( 'cjob_type', 'string', true );
+			if( !isset( $cron_job_params[$cjob_type] ) )
+			{
+				param_error( 'cjob_type', T_('Invalid job type') );
+				$cjob_name = '';
+			}
+			else
+			{
+				$cjob_name = $cron_job_names[$cjob_type];
+			}
+		}
+
+		// start datetime:
+		param_date( 'cjob_date', T_('Please enter a valid date.'), true );
+		param_time( 'cjob_time' );
+		$this->set( 'start_datetime', form_date( get_param( 'cjob_date' ), get_param( 'cjob_time' ) ) );
+
+		// repeat after:
+		$cjob_repeat_after = param_duration( 'cjob_repeat_after' );
+		if( $cjob_repeat_after == 0 )
+		{
+			$cjob_repeat_after = NULL;
+		}
+		$this->set( 'repeat_after', $cjob_repeat_after );
+
+		// name:
+		$this->set( 'name', $cjob_name );
+
+		if( $this->ID == 0 && get_param( 'ctsk_ID' ) == 0 )
+		{	// Set these params only on creating and copying actions
+			// controller:
+			$this->set( 'controller', $cron_job_params[$cjob_type]['ctrl'] );
+
+			// params:
+			$this->set( 'params', $cron_job_params[$cjob_type]['params'] );
+		}
+
+		return ! param_errors_detected();
+	}
+
+
+	/**
+	 * Get status
+	 *
+	 * @return string Status
+	 */
+	function get_status()
+	{
+		global $DB;;
+
+		if( $this->ID > 0 )
+		{
+			$SQL = new SQL( 'Get status of scheduled job' );
+			$SQL->SELECT( 'clog_status' );
+			$SQL->FROM( 'T_cron__log' );
+			$SQL->WHERE( 'clog_ctsk_ID = '.$DB->quote( $this->ID ) );
+			$status = $DB->get_var( $SQL->get() );
+		}
+
+		if( empty( $status ) )
+		{	// Set default status for new cron jobs and for cron jobs without log
+			$status = 'pending';
+		}
+
+		return $status;
+	}
+
+
+	/**
+	 * Update the DB based on previously recorded changes
+	 *
+	 * @return boolean true
+	 */
+	function dbupdate()
+	{
+		global $DB;
+
+		$DB->begin();
+
+		if( $this->get_status() == 'pending' )
+		{	// Update crob jobs only with "pending" status
+			$result = parent::dbupdate();
+		}
+		else
+		{	// Don't update this cron job
+			$DB->rollback();
+			return false;
+		}
+
+		$DB->commit();
+
+		return $result;
+	}
 }
 
 /*
  * $Log$
- * Revision 1.8  2011/09/04 22:13:15  fplanque
- * copyright 2011
- *
- * Revision 1.7  2011/06/20 22:08:36  sam2kb
- * Use evo_substr
- *
- * Revision 1.6  2010/02/08 17:52:14  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.5  2009/09/14 12:53:57  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.4  2009/03/08 23:57:42  fplanque
- * 2009
- *
- * Revision 1.3  2008/01/21 09:35:28  fplanque
- * (c) 2008
- *
- * Revision 1.2  2007/09/04 22:08:31  fplanque
- * fixes
- *
- * Revision 1.1  2007/06/25 10:59:47  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.4  2007/04/26 00:11:09  fplanque
- * (c) 2007
- *
- * Revision 1.3  2006/11/24 18:27:24  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.2  2006/09/21 15:26:28  blueyed
- * Fixed dependency (and tests)
- *
- * Revision 1.1  2006/08/24 00:43:28  fplanque
- * scheduled pings part 2
+ * Revision 1.10  2013/11/06 08:04:07  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

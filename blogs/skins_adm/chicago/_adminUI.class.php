@@ -6,7 +6,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -46,8 +46,22 @@ class AdminUI extends AdminUI_general
 	 */
 	function init_templates()
 	{
+		global $Hit;
+
 		// This is included before controller specifc require_css() calls:
+		require_css( 'basic_styles.css', 'rsc_url' ); // the REAL basic styles
+		require_css( 'basic.css', 'rsc_url' ); // Basic styles
+		require_css( 'results.css', 'rsc_url' ); // Results/tables styles
+		require_css( 'item_base.css', 'rsc_url' ); // Default styles for the post CONTENT
+		require_css( 'fileman.css', 'rsc_url' ); // Filemanager styles
+		require_css( 'admin.global.css', 'rsc_url' ); // Basic admin styles
 		require_css( 'skins_adm/chicago/rsc/css/chicago.css', true );
+
+		if ( $Hit->is_IE() )
+		{
+			require_css( 'admin_global_ie.css', 'rsc_url' );
+		}
+
 		require_js( '#jquery#', 'rsc_url' );
 		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
 	}
@@ -172,7 +186,7 @@ class AdminUI extends AdminUI_general
 			case 'sub':
 				// a payload block with embedded submenu
 				return array(
-						'before' => $pb_begin1
+						'before' => $pb_begin1.'$top_block$'
 							.'<span style="float:right">$global_icons$</span>'
 							.'<table class="tabs" cellspacing="0"><tr>'
 							.'<td class="first"></td>',
@@ -205,33 +219,28 @@ class AdminUI extends AdminUI_general
 				return array(
 					'page_url' => '', // All generated links will refer to the current page
 					'before' => '<div class="results">',
+					'content_start' => '<div id="$prefix$ajax_content">',
 					'header_start' => '<div class="results_nav">',
 						'header_text' => '<strong>'.T_('Pages').'</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$',
 						'header_text_single' => '',
 					'header_end' => '</div>',
-					'list_start' => '',
-						'head_start' => '',
-							'head_title' => '<div class="fieldset_title"><div class="fieldset_title_right"><div class="fieldset_title_bg">
-																	<span style="float:right">$global_icons$</span>$title$
-																</div></div></div>'
-															."\n\n"
-															.'<table class="grouped" cellspacing="0">'
-							                ."\n<thead>\n",
-							'filters_start' => '<tr class="filters"><td colspan="$nb_cols$">',
-							'filters_end' => '</td></tr>',
+					'head_title' => '<div class="fieldset_title"><div class="fieldset_title_right"><div class="fieldset_title_bg">
+															<span style="float:right">$global_icons$</span>$title$
+														</div></div></div>'."\n",
+					'filters_start' => '<div class="filters">',
+					'filters_end' => '</div>',
+					'list_start' => '<div class="table_scroll">'."\n"
+					               .'<table class="grouped" cellspacing="0">'."\n",
+						'head_start' => '<thead>'."\n",
 							'line_start_head' => '<tr class="clickable_headers">',  // TODO: fusionner avec colhead_start_first; mettre a jour admin_UI_general; utiliser colspan="$headspan$"
 							'colhead_start' => '<th $class_attrib$>',
 							'colhead_start_first' => '<th class="firstcol $class$">',
 							'colhead_start_last' => '<th class="lastcol $class$">',
 							'colhead_end' => "</th>\n",
-							'sort_asc_off' => '<img src="../admin/img/grey_arrow_up.gif" alt="A" title="'.T_('Ascending order')
-							                    .'" height="12" width="11" />',
-							'sort_asc_on' => '<img src="../admin/img/black_arrow_up.gif" alt="A" title="'.T_('Ascending order')
-							                    .'" height="12" width="11" />',
-							'sort_desc_off' => '<img src="../admin/img/grey_arrow_down.gif" alt="D" title="'.T_('Descending order')
-							                    .'" height="12" width="11" />',
-							'sort_desc_on' => '<img src="../admin/img/black_arrow_down.gif" alt="D" title="'.T_('Descending order')
-							                    .'" height="12" width="11" />',
+							'sort_asc_off' => get_icon( 'sort_asc_off' ),
+							'sort_asc_on' => get_icon( 'sort_asc_on' ),
+							'sort_desc_off' => get_icon( 'sort_desc_off' ),
+							'sort_desc_on' => get_icon( 'sort_desc_on' ),
 							'basic_sort_off' => '',
 							'basic_sort_asc' => get_icon( 'ascending' ),
 							'basic_sort_desc' => get_icon( 'descending' ),
@@ -264,13 +273,13 @@ class AdminUI extends AdminUI_general
 							'total_col_start_last' => '<td class="lastcol $class$">',
 							'total_col_end' => "</td>\n",
 						'total_line_end' => "</tr>\n\n",
-					'list_end' => "</table>\n\n",
-					'footer_start' => '<div class="results_nav">',
-					'footer_text' => '<strong>'.T_('Pages').'</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$'
+					'list_end' => "</table></div>\n\n",
+					'footer_start' => '<div class="results_nav nav_footer">',
+					'footer_text' => '<strong>'.T_('Pages').'</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$<br />$page_size$'
 					                  /* T_('Page $scroll_list$ out of $total_pages$   $prev$ | $next$<br />'. */
 					                  /* '<strong>$total_pages$ Pages</strong> : $prev$ $list$ $next$' */
 					                  /* .' <br />$first$  $list_prev$  $list$  $list_next$  $last$ :: $prev$ | $next$') */,
-					'footer_text_single' => '',
+					'footer_text_single' => '$page_size$',
 					'footer_text_no_limit' => '', // Text if theres no LIMIT and therefor only one page anyway
 						'prev_text' => T_('Previous'),
 						'next_text' => T_('Next'),
@@ -281,12 +290,10 @@ class AdminUI extends AdminUI_general
 						'list_span' => 11,
 						'scroll_list_range' => 5,
 					'footer_end' => "</div>\n\n",
-					'no_results_start' => '<div class="fieldset_title"><div class="fieldset_title_right"><div class="fieldset_title_bg">
-																		<span style="float:right">$global_icons$</span>$title$
-																	</div></div></div>'."\n\n"
-																.'<table class="grouped" cellspacing="0">'."\n",
+					'no_results_start' => '<table class="grouped" cellspacing="0">'."\n",
 					'no_results_end'   => '<tr class="lastline"><td class="firstcol lastcol">$no_results$</td></tr>'
 								                .'</table>'."\n\n",
+				'content_end' => '</div>',
 				'after' => '</div><div class="clear"></div>',
 				'sort_type' => 'basic'
 				);
@@ -323,11 +330,11 @@ class AdminUI extends AdminUI_general
 					'formstart' => '',
 					'title_fmt' => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
 					'no_title_fmt' => '<span style="float:right">$global_icons$</span>'."\n",
-					'fieldstart' => '<fieldset $ID$>'."\n",
 					'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><div class="fieldset_title"><div class="fieldset_title_right">
 						<div class="fieldset_title_bg" $title_attribs$>$fieldset_title$</div></div></div>
 						<fieldset $fieldset_attribs$>'."\n", // $fieldset_attribs will contain ID
 					'fieldset_end' => '</fieldset></div>'."\n",
+					'fieldstart' => '<fieldset $ID$>'."\n",
 					'labelstart' => '<div class="label">',
 					'labelend' => "</div>\n",
 					'labelempty' => '<div class="label"></div>', // so that IE6 aligns DIV.input correcctly
@@ -354,7 +361,7 @@ class AdminUI extends AdminUI_general
 						'block_start' => '<div class="block_item_wrap"><div class="fieldset_title"><div class="fieldset_title_right"><div class="fieldset_title_bg">
 																		<span style="float:right">$global_icons$</span>$title$
 																	</div></div></div>
-																	<div class="block_item">',
+																	<div class="block_item" id="styled_content_block">',
 						'block_end' => '</div></div>',
 					);
 
@@ -469,111 +476,8 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
- * Revision 1.41  2011/09/24 07:31:47  efy-yurybakh
- * delete children objects from T_comments__votes
- *
- * Revision 1.40  2011/09/24 06:00:03  efy-yurybakh
- * star rating plugin (backoffice)
- *
- * Revision 1.39  2011/09/10 19:41:54  fplanque
- * fixing http://forums.b2evolution.net/viewtopic.php?t=22443
- *
- * Revision 1.38  2011/09/07 07:15:23  sam2kb
- * Make sure results block is not floating
- *
- * Revision 1.37  2011/09/04 22:13:25  fplanque
- * copyright 2011
- *
- * Revision 1.36  2010/12/06 13:15:41  efy-asimo
- * Admin skin preferences, show evobar - fix
- *
- * Revision 1.35  2010/11/25 15:16:35  efy-asimo
- * refactor $Messages
- *
- * Revision 1.34  2010/11/22 13:44:33  efy-asimo
- * Admin skin preferences update
- *
- * Revision 1.33  2010/11/18 13:56:06  efy-asimo
- * admin skin preferences
- *
- * Revision 1.32  2010/05/06 18:58:14  blueyed
- * Admin: skin: chicago: fix duplicate ID within fieldset_begin. Use fieldset_wrapper_ID for the wrapper.
- *
- * Revision 1.31  2010/02/08 17:56:48  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.30  2010/01/23 00:30:09  fplanque
- * no message
- *
- * Revision 1.27  2009/12/11 03:01:16  fplanque
- * breadcrumbs improved
- *
- * Revision 1.26  2009/12/06 22:55:20  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.25  2009/11/22 18:20:08  fplanque
- * Dashboard CSS enhancements
- *
- * Revision 1.24  2009/10/12 23:03:32  blueyed
- * Fix displaying of Messages in $mode windows (e.g. file uploads) and enable
- * them in the attachment iframe.
- *
- * Revision 1.23  2009/08/31 17:21:31  fplanque
- * minor
- *
- * Revision 1.22  2009/07/02 00:18:06  fplanque
- * no message
- *
- * Revision 1.21  2009/06/09 11:59:55  yabs
- * bug fix
- *
- * Revision 1.20  2009/06/09 07:41:30  yabs
- * added replacement vars for class && id for fieldset_begin()
- *
- * Revision 1.19  2009/05/18 02:59:16  fplanque
- * Skins can now have an item.css file to specify content formats. Used in TinyMCE.
- * Note there are temporarily too many CSS files.
- * Two ways of solving is: smart resource bundles and/or merge files that have only marginal benefit in being separate
- *
- * Revision 1.18  2009/04/13 20:51:03  fplanque
- * long overdue cleanup of "no results" display: putting filter sback in right position
- *
- * Revision 1.17  2009/03/08 23:57:56  fplanque
- * 2009
- *
- * Revision 1.16  2009/03/07 21:33:54  blueyed
- * Fix indent, nuke globals.
- *
- * Revision 1.15  2009/03/04 00:10:43  blueyed
- * Make Hit constructor more lazy.
- *  - Move referer_dom_ID generation/fetching to own method
- *  - wrap Debuglog additons with "debug"
- *  - Conditionally call detect_useragent, if required. Move
- *    vars to methods for this
- *  - get_user_agent alone does not require detect_useragent
- * Feel free to revert it (since it changed all the is_foo vars
- * to methods - PHP5 would allow to use __get to handle legacy
- * access to those vars however), but please consider also
- * removing this stuff from HTML classnames, since that is kind
- * of disturbing/unreliable by itself).
- *
- * Revision 1.14  2008/12/30 23:00:41  fplanque
- * Major waste of time rolling back broken black magic! :(
- * 1) It was breaking the backoffice as soon as $admin_url was not a direct child of $baseurl.
- * 2) relying on dynamic argument decoding for backward comaptibility is totally unmaintainable and unreliable
- * 3) function names with () in log break searches big time
- * 4) complexity with no purpose (at least as it was)
- *
- * Revision 1.12  2008/04/14 19:50:51  fplanque
- * enhanced attachments handling in post edit mode
- *
- * Revision 1.11  2008/02/14 02:19:55  fplanque
- * cleaned up stats
- *
- * Revision 1.10  2008/01/22 14:31:05  fplanque
- * minor
+ * Revision 1.43  2013/11/06 08:05:52  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

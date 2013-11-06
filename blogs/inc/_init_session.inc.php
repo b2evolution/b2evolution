@@ -8,7 +8,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -32,12 +32,6 @@
  * }}
  *
  * @package evocore
- *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois PLANQUE
- * @author blueyed: Daniel HAHLER
- * @author mfollett: Matt FOLLETT
- * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
  * @version $Id$
  */
@@ -83,8 +77,8 @@ $Plugins->trigger_event( 'SessionLoaded' );
 
 
 // Trigger a page content caching plugin. This would either return the cached content here or start output buffering
-if( empty($generating_static) )
-{
+/* fp> if you still need this, please let me know which plugin uses that.
+
 	if( $Session->get( 'core.no_CachePageContent' ) )
 	{ // The event is disabled for this request:
 		$Session->delete('core.no_CachePageContent');
@@ -97,13 +91,14 @@ if( empty($generating_static) )
 		// Note: we should not use debug_info() here, because the plugin has probably sent a Content-Length header.
 		exit(0);
 	}
-}
 
 
-// TODO: we need an event hook here for the transport_optimizer_plugin, which must get called, AFTER another plugin might have started an output buffer for caching already.
+// TODO: we need an event hook here for the transport_optimizer_plugin, which must get called,
+//       AFTER another plugin might have started an output buffer for caching already.
 //       Plugin priority is no option, because CachePageContent is a trigger_event_first_true event, for obvious reasons.
 //       Name?
 //       This must not be exactly here, but before any output.
+*/
 
 
 // The following is needed during login, not sure that's right :/
@@ -147,31 +142,4 @@ if( is_logged_in() && $current_User->get('locale') != $current_locale && ! $loca
 
 
 $Timer->pause( '_init_session' );
-
-
-/*
- * $Log$
- * Revision 1.6  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.5  2010/04/13 22:23:38  blueyed
- * Use header_redirect for canonical admin redirect. Also add extra header to aid debugging.
- *
- * Revision 1.4  2010/02/08 17:51:25  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.3  2010/01/30 18:55:15  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.2  2009/12/06 05:34:31  fplanque
- * Violent refactoring for _main.inc.php
- * Sorry for potential side effects.
- * This needed to be done badly -- for clarity!
- *
- * Revision 1.1  2009/12/06 05:20:36  fplanque
- * Violent refactoring for _main.inc.php
- * Sorry for potential side effects.
- * This needed to be done badly -- for clarity!
- *
- */
 ?>

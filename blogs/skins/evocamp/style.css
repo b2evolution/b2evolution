@@ -4,12 +4,12 @@
 * Distributed under GPL license with b2evolution with written permission from Michael D. Pollock (2007-06-22).
 */
 
-@import url("../../rsc/css/basic.css");	/* Import basic styles */
-@import url("../../rsc/css/blog_base.css");	/* Import default blog navigation styles */
-@import url("item.css");	/* Import blog content styles */
-
 
 /* -------------------[ Main Page Elements ]------------------- */
+
+textarea, input, select, option, optgroup, ul.ui-autocomplete, li.token-input-token-facebook, div.token-input-dropdown-facebook {
+	font: 10.66px georgia,times,'times new roman', serif;
+}
 
 #outer_wrap {
 font-size: 10pt;
@@ -262,7 +262,7 @@ padding: 0;
 list-style-type:none;
 padding-left:15px;
 margin:0;
-background:url(img/zekebullet.gif) 0 5px no-repeat;
+background:url(img/icons.gif) 0 -24px no-repeat;
 }
 
 /* -------------------[ Middle Content ]------------------- */
@@ -289,7 +289,13 @@ padding: 0;
 list-style-type:none;
 padding-left:15px;
 margin:0;
-background:url(img/zekebullet.gif) 0 5px no-repeat;
+background:url(img/icons.gif) 0 -24px no-repeat;
+}
+
+#midcontent li.widget_core_coll_item_list.nobullets ul li {
+background: none;
+margin-left: 0;
+padding-left: 0;
 }
 
 /* -------------------[ Form Elements ]------------------- */
@@ -351,6 +357,10 @@ margin-bottom: 15px;
 #comment_preview {
 background-color: #f2ecce;
 }
+.comment_notification {
+	border-bottom:1px solid #CCC9B8;
+	padding: 15px 15px 0;
+}
 
 /* -------------------[ Misc Tags and Classes ]------------------- */
 
@@ -368,7 +378,7 @@ list-style-type: none;
 
 .post ul li, .singlepost ul li {
 list-style-type:none;
-background: url(img/zekebullet.gif) 0 4px no-repeat;
+background: url(img/icons.gif) 0 -25px no-repeat;
 padding: 0 0 2px 14px;
 }
 
@@ -405,7 +415,7 @@ margin: 0;
 .postinfo {
 font-family:tahoma,geneva,verdana,sans-serif;
 font-size: 8pt;
-background: url(img/doc.gif) 0 3px no-repeat;
+background: url(img/icons.gif) -12px 4px no-repeat;
 clear: both;
 margin: 0 0 10px;
 padding-left: 14px;
@@ -434,15 +444,15 @@ clear:both;
 }
 
 p.bMore a {
-background: url(img/arrow-rt.gif) 100% 70% no-repeat;
+background: url(img/icons.gif) right -12px no-repeat;
 padding-right:16px;
 }
 
 /* -------------------[ Search ]------------------- */
 
-.SearchField {
+div.compact_search_form input.SearchField {
 font-size:8pt;
-width: 140px;
+width: 110px;
 margin-right: 2px;
 }
 .search p {
@@ -451,7 +461,7 @@ margin-bottom: 0;
 .search {
 margin-bottom: 15px;
 }
-.search .submit {
+input.submit {
 font-size:8pt;
 }
 
@@ -543,7 +553,7 @@ list-style-type: none;
 list-style-type:none;
 padding: 0 0 0 14px;
 margin: 0 0 2px;
-background: url(img/zekebullet.gif) 0 3px no-repeat;
+background: url(img/icons.gif) 0 -26px no-repeat;
 }
 
 ul#archives {
@@ -598,4 +608,24 @@ text-decoration: underline;
 
 div.widget_core_coll_title {
 	padding-top: 45px;
+}
+
+/* jQuery Tokeninput plugin */
+div.input ul.token-input-list-facebook {
+	width: 345px;
+	background: #FFF;
+}
+
+/* Not published comments display */
+#styled_content_block .status_draft,
+#styled_content_block .status_review,
+#styled_content_block .status_community,
+#styled_content_block .status_protected,
+#styled_content_block .status_private {
+	top: -15px;
+	left: 15px;
+}
+
+#styled_content_block .postinfo {
+	clear:none;
 }

@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -37,6 +37,10 @@ $Comment = & $params['Comment'];
 <?php
 	$Comment->anchor();
 	echo $params['comment_start'];
+	if( $Comment->status != 'published' )
+	{
+		$Comment->status( 'styled' );
+	}
 ?>
 	<div class="bCommentTitle">
 	<?php
@@ -92,7 +96,9 @@ $Comment = & $params['Comment'];
 		}
 	?>
 	</div>
-	<?php $Comment->rating(); ?>
+	<?php
+	$Comment->rating();
+	?>
 	<div class="bCommentText">
 		<?php
 			$Comment->avatar();
@@ -101,62 +107,25 @@ $Comment = & $params['Comment'];
 	</div>
 	<div class="bCommentSmallPrint">
 		<?php
-			$Comment->edit_link( '', '', '#', '#', 'permalink_right' ); /* Link to backoffice for editing */
-			$Comment->delete_link( '', '', '#', '#', 'permalink_right' ); /* Link to backoffice for deleting */
+			$commented_Item = & $Comment->get_Item();
+			$Comment->edit_link( '', '', '#', '#', 'permalink_right', '&amp;', true, rawurlencode( $Comment->get_permanent_url() ) ); /* Link to backoffice for editing */
+			$Comment->delete_link( '', '', '#', '#', 'permalink_right', false, '&amp;', true, false, '#', rawurlencode( $commented_Item->get_permanent_url() ) ); /* Link to backoffice for deleting */
 		?>
 
 		<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
+		<?php $Comment->reply_link(); /* Link for replying to the Comment */ ?>
 		<?php $Comment->vote_helpful( '', '', '&amp;', true, true );?>
 	</div>
 <?php
-  echo $params['comment_end'];
+	echo $params['comment_end'];
 ?>
 <!-- ========== END of a COMMENT/TB/PB ========== -->
 <?php
 
 /*
  * $Log$
- * Revision 1.14  2011/10/03 17:13:04  efy-yurybakh
- * review fp>yura comments
- *
- * Revision 1.13  2011/09/28 16:15:56  efy-yurybakh
- * "comment was helpful" votes
- *
- * Revision 1.12  2011/09/14 22:47:47  fplanque
- * removed excessive params
- *
- * Revision 1.11  2011/09/11 03:31:17  sam2kb
- * Added some comment params
- *
- * Revision 1.10  2011/09/04 22:13:24  fplanque
- * copyright 2011
- *
- * Revision 1.9  2010/11/07 18:50:45  fplanque
- * Added Comment::author2() with skins v2 style params.
- *
- * Revision 1.8  2010/02/08 17:56:10  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.7  2009/09/29 00:19:12  blueyed
- * Link author of comments by default, instead of displaying the URL separately. Document template function call. Leave old call to author_url commented.
- *
- * Revision 1.6  2009/09/16 21:29:31  sam2kb
- * Display user/visitor avatar in comments
- *
- * Revision 1.5  2009/03/08 23:57:56  fplanque
- * 2009
- *
- * Revision 1.4  2008/10/03 22:00:47  blueyed
- * Indent fixes
- *
- * Revision 1.3  2008/01/21 09:35:42  fplanque
- * (c) 2008
- *
- * Revision 1.2  2007/12/22 17:24:35  fplanque
- * cleanup
- *
- * Revision 1.1  2007/12/22 16:41:05  fplanque
- * Modular feedback template.
+ * Revision 1.16  2013/11/06 08:05:36  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

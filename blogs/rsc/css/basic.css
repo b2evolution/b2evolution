@@ -3,11 +3,17 @@
  * It now also contains all sorts of base styles like the toolbar and debug for backward comaptibility with older skins... :/
  */
 
-@import url("basic_styles.css");	/* Import the REAL basic styles */
-
 body {
 	padding: 0;
 	margin: 0;
+}
+
+a[rel~=nofollow]:hover {
+	background: #f8e0e0;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-khtml-border-radius: 2px;
+	border-radius: 2px;
 }
 
 /**
@@ -95,6 +101,53 @@ img.avatar_above_login {
 	margin: 0 auto;
 }
 
+.avatar_rounded {
+	background: #FFF;
+	border: 1px solid #CCC;
+	padding: 2px;
+	display: inline-block;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-khtml-border-radius: 4px;
+	border-radius: 4px;
+	text-align: center;
+}
+.avatar_rounded:hover {
+	text-decoration: none;
+}
+.avatar_rounded img {
+	-moz-border-radius-topleft: 2px; -moz-border-radius-topright: 2px;
+	-webkit-border-radius: 2px 2px 0 0;
+	-khtml-border-radius-topleft: 2px; -khtml-border-radius-topright: 2px;
+	border-radius: 2px 2px 0 0;
+}
+
+.avatar_main_frame {
+	background: #FFF;
+	border: 1px solid #CCC;
+	padding: 2px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-khtml-border-radius: 4px;
+	border-radius: 4px;
+	display: table;
+	vertical-align: middle;
+}
+.avatar_main_frame img {
+	-moz-border-radius-topleft: 2px; -moz-border-radius-bottomleft: 2px;
+	-webkit-border-radius: 2px 0 0 2px;
+	-khtml-border-radius-topleft: 2px; -khtml-border-radius-bottomleft: 2px;
+	border-radius: 2px 0 0 2px;
+}
+.avatar_main_frame a.cboxElement {
+	display: table-cell;
+}
+.avatar_main_frame div {
+	display: table-cell;
+	vertical-align: middle;
+	padding-left: 5px;
+}
+
 /*
  * Evo Toolbar
  * Note: there may be some properties that seem overkill but the fact is we need to override
@@ -112,7 +165,7 @@ div#evo_toolbar {
 	font-family: "Microsoft sans serif", sans-serif, Arial, Helvetica;
 
 	position: fixed;
-	z-index: 99;
+	z-index: 10000;
 	left: 0px;
 	top: 0px;
 	height: 21px;
@@ -235,11 +288,13 @@ ul.sf-menu li li li.sfHover ul {
 .sf-menu li li {
 	background:		ThreeDFace; /* IE6 */
 }
-.sf-menu li li a {
-	padding: 6px 2ex;
+.sf-menu li li a, .sf-menu li li.separator div {
 	border: none;
 	border-left: 1px solid ThreeDHighlight;
 	border-right: 1px solid ThreeDShadow;
+}
+.sf-menu li li a {
+	padding: 6px 2ex;
 }
 .sf-menu li li:first-child > a {
 	border-top: 1px solid ThreeDHighlight;
@@ -329,7 +384,7 @@ ul.sf-menu li li li.sfHover ul {
 	height:			10px;
 	text-indent: 	-999em;
 	overflow:		hidden;
-	background:		url('../img/superfish-arrows-ffffff.png') no-repeat -10px -100px; /* 8-bit indexed alpha png. IE6 gets solid image only */
+	background:		url('../img/superfish-arrows.png') no-repeat -10px -100px; /* 8-bit indexed alpha png. IE6 gets solid image only */
 }
 a > .sf-sub-indicator {  /* give all except IE6 the correct values */
 	top:			4px;
@@ -367,6 +422,7 @@ li.sfHover > a > .sf-sub-indicator {
 	-moz-border-radius-topright: 17px;
 	-webkit-border-top-right-radius: 17px;
 	-webkit-border-bottom-left-radius: 17px;
+	border-radius: 0 17px 0 17px;
 }
 .sf-shadow ul.sf-shadow-off {
 	background: transparent;
@@ -456,6 +512,32 @@ label.radiooption {
 	margin-right: 1em;
 }
 
+.linkbutton {
+	border: 1px solid #bbb;
+	margin-right: 5px;
+	padding: 2px 3px;
+	font: normal 12px Arial, Sans-serif;
+	height:30px;
+	background-color: #EEEEEE;
+	cursor:pointer;
+	-moz-border-radius: 3px;
+	-khtml-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+}
+.linkbutton:hover {
+	background-color: #DEF2FC;
+}
+.linkbutton a {
+	background-color: transparent;
+	text-decoration: none;
+	color: #000;
+}
+.linkbutton a:hover {
+	text-decoration: none;
+	color: #000;
+}
+
 /* Enhanced form */
 .eform label {
 	font-weight:bold;
@@ -513,6 +595,9 @@ legend {
 	padding-top: .5ex;
 	/* border: 1px solid #f00; */
 }
+.fform fieldset.info_full div.info {
+	margin-left: 5px;
+}
 
 
 /* hide checkbox in order to indent exactly the same size */
@@ -540,10 +625,9 @@ div.log_container ul,
 div.action_messages ul,
 div.log_container ol,
 div.action_messages ol {
-	list-style: square;
-	list-style-image:none;
-	margin:1ex 0;
-	padding-left:3ex;
+	list-style: none;
+	margin: 1ex 0;
+	padding-left: 0;
 }
 div.log_container div,
 div.action_messages div {
@@ -572,9 +656,9 @@ div.log_container div.log_warning,
 div.action_messages div.log_warning,
 div.warning,
 td.warning {
-	border:1px solid #d99;
-	background:#fbf2ee;
-	color:#e00;
+	border:1px solid #f60;
+	background:#fff0dd;
+	color:#f60;
 }
 
 p.error,
@@ -585,6 +669,19 @@ p.warning {
 }
 p.error {
 	margin: 1ex;
+}
+
+div.bText div.log_container ul {
+	padding: 0;
+	text-indent: 0;
+}
+div.bText div.log_container li {
+	margin: 0;
+	padding: 0;
+	background: none;
+}
+div.bText div.log_container ul li:before {
+	content: none;
 }
 /* }}} */
 
@@ -599,12 +696,24 @@ div.skin_error {
 
 table.widget_grid {
 	margin: 8px auto 1px;
-}
-table.widget_grid td {
-	background-color: #ccc;
+	border-collapse: separate;
+	border-spacing: 3px;
 }
 table.widget_grid td {
 	padding: 0;
+	background-color: #fff;
+	border: 1px solid #ddd;
+	vertical-align: top;
+}
+table.widget_grid img {
+	padding: 1px;
+}
+table.widget_grid .note {
+	text-align: center;
+	padding: 2px;
+	border-top: 1px solid #ddd;
+	line-height: normal;
+	display:block;
 }
 
 div.debug_container {
@@ -659,6 +768,7 @@ div.widget_not_in_cache div.debug_widget_name {
 .badge {
 	position: relative;
 	top: -1px;
+	border-radius:12px;
 	-moz-border-radius:12px;
 	-webkit-border-radius:12px;
 	background-color:red;
@@ -673,7 +783,14 @@ div.widget_not_in_cache div.debug_widget_name {
 /* User Genders */
 .user, user.anonymous{
 	font-weight: bold;
+	word-wrap: break-word;
 }
+
+.user.closed,
+.user.deleted {
+	color: #666;
+}
+
 .user.man{
 	color: #00F;
 }
@@ -681,9 +798,19 @@ div.widget_not_in_cache div.debug_widget_name {
 	color: #e100af;
 }
 .user.nogender, user.anonymous.nogender{
-	color: #666;
+	color: #000;
 }
 
+.bubbletip_user ul{
+	padding: 0;
+	margin: 0;
+}
+.bubbletip_user ul li{
+	margin: 0.5ex 0;
+	padding: 0;
+	list-style: none;
+	text-align: center;
+}
 .bubbletip_anon{
 	text-align: center;
 }
@@ -737,7 +864,7 @@ div.debug h4 {
 div.debug code {
 	font-family: Monaco,"Courier New", Courier, monospace;
 	font-size: 9pt;
-	margin:1ex;
+	margin:1ex 1ex 0;
 	display:block;
 }
 
@@ -779,5 +906,101 @@ div.debug td.odd {
 	background-color: #eee;
 }
 
+/*
+ * AJAX Debug output formatting:
+ */
+a.jslog_switcher {
+	cursor: pointer;
+	float: right;
+}
+div#debug_ajax_info {
+	display: none;
+	position: fixed;
+	top: 23px;
+	left: 0;
+	z-index: 100000;
+	min-width: 190px;
+	min-height : 83px;
+	opacity: 0.85;
+	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=85);
+}
+div#debug_ajax_info.debug {
+	padding: 0;
+}
+div#debug_ajax_info h2 {
+	margin-top: 0;
+}
+div#debug_ajax_info h4 {
+	margin-bottom: 5px;
+}
+div#debug_ajax_info h4.error {
+	color: #F00;
+}
+div#debug_ajax_info p {
+	margin: 5px 0 2px 0;
+	font-weight: bold;
+}
+div#debug_ajax_info #jslog_container {
+	max-height: 500px;
+	overflow-y: auto;
+	padding: 0 10px;
+	min-height : 43px;
+}
 
+div#debug_ajax_info .jslog_titlebar, div#debug_ajax_info .jslog_statusbar {
+	padding: 1px 3px;
+}
+div#debug_ajax_info .jslog_titlebar {
+	border-bottom: 1px solid #AAA;
+	cursor: move;
+	background: #006;
+	opacity: 0.85;
+	color: #FFF;
+	font-weight: bold;
+}
+div#debug_ajax_info .jslog_statusbar {
+	border-top: 1px solid #AAA;
+	padding-right: 10px;
+}
 
+div#debug_ajax_info .ui-resizable-e {
+	right: 0;
+	z-index: 999;
+}
+div#debug_ajax_info .ui-resizable-s {
+	bottom: 0;
+	z-index: 999;
+}
+div#debug_ajax_info .ui-resizable-se {
+	z-index: 1000;
+}
+
+div.jslog {
+	display: none;
+}
+
+ul.jslog_note, ul.jslog_error {
+	padding: 0;
+	background: #DDDDDD;
+	border: 1px solid #6287C2;
+	margin: 0 auto 1ex auto;
+	padding: 1ex 1ex 1ex 3ex;
+}
+ul.jslog_error {
+	border: 1px solid #d99;
+	background: #fbf2ee;
+	color: #e00;
+}
+
+/* Item Custom Fields */
+.item_custom_fields {
+	border: none;
+	margin-bottom: 10px;
+	border-collapse: collapse;
+}
+.item_custom_fields th, .item_custom_fields td {
+	padding: 0 10px 0 0;
+}
+.item_custom_fields th {
+	text-align: left;
+}

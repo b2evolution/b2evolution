@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -28,6 +28,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( 'users/model/_userlist.class.php', 'UserList' );
 
 /**
  * @var User
@@ -38,11 +39,15 @@ global $current_User;
  */
 global $Settings;
 /**
+ * @var UserSettings
+ */
+global $UserSettings;
+/**
  * @var DB
  */
 global $DB;
 
-global $collections_Module;
+global $collections_Module, $admin_url;
 
 if( !isset( $display_params ) )
 { // init display_params
@@ -55,170 +60,88 @@ $usedgroups = $DB->get_col( 'SELECT grp_ID
                              FROM T_groups INNER JOIN T_users ON user_grp_ID = grp_ID
 							 GROUP BY grp_ID');
 
-/*
- * Query user list:
- */
-$keywords = param( 'keywords', 'string', '', true );
-// fp> TODO: implement this like other filtersets in the app. You need a checkbox, or better yet: a select that allows: Confirmed/Unconfirmed/All
-// $usr_unconfirmed = param( 'usr_unconfirmed', 'boolean', false, true );
+$UserList = new UserList( 'admin', $UserSettings->get('results_per_page'), 'users_', array( 'join_city' => false ) );
 
-$where_clause = '';
-$left_join_clause = '';
+$default_filters = array( 'order' => '/user_lastseen_ts/D' );
 
-if( !empty( $keywords ) )
-{
-	$kw_array = split( ' ', $keywords );
-	foreach( $kw_array as $kw )
-	{
-		// Note: we use CONCAT_WS (Concat With Separator) because CONCAT returns NULL if any arg is NULL
-		$where_clause .= 'CONCAT_WS( " ", user_login, user_firstname, user_lastname, user_nickname, user_email) LIKE "%'.$DB->escape($kw).'%" AND ';
-	}
-}
-
-if( $Settings->get( 'registration_require_gender' ) != 'hidden' )
-{	// Filter by gender
-	$gender_men = param( 'gender_men', 'boolean', false );
-	$gender_women = param( 'gender_women', 'boolean', false );
-	if( ( $gender_men && ! $gender_women ) || ( ! $gender_men && $gender_women ) )
-	{	// Find men OR women
-		$where_clause .= 'user_gender = "'.( $gender_men ? 'M' : 'F' ).'" AND ';
-	}
-	else if( $gender_men && $gender_women )
-	{	// Find men AND women
-		$where_clause .= 'user_gender IN ( "M", "F" ) AND ';
-	}
-}
-
-$criteria_type = param( 'criteria_type', 'integer', 0 );
-$criteria_value = param( 'criteria_value', 'string' );
-if( $criteria_type > 0 && $criteria_value != '' )
-{	// Filter by Specific criteria
-	$criteria_words = explode( ' ', $criteria_value );
-	if( count( $criteria_words ) > 0 )
-	{
-		$left_join_clause .= ' LEFT JOIN T_users__fields ON uf_user_ID = user_ID AND uf_ufdf_ID = "'.$DB->escape($criteria_type).'"';
-		foreach( $criteria_words as $word )
-		{
-			$where_clause .= 'uf_varchar LIKE "%'.$DB->escape($word).'%" AND ';
-		}
-	}
-}
-// fp> TODO: implement this like other filtersets in the app. You need a checkbox, or better yet: a select that allows: Confirmed/Unconfirmed/All
-/*
-if( $usr_unconfirmed )
-{
-	$where_clause .= 'user_validated = 0 AND ';
-}
-*/
-$SQL = new SQL();
-$SQL->SELECT( 'T_users.*, grp_ID, grp_name, ctry_name, MAX(T_sessions.sess_lastseen) as sess_lastseen, 
-			IF( IFNULL(user_avatar_file_ID,0), 1, 0 ) as has_picture' );
-$SQL->FROM( 'T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID'.$left_join_clause );
-$SQL->FROM_add( 'LEFT JOIN T_country ON user_ctry_ID = ctry_ID' );
-$SQL->FROM_add( 'LEFT JOIN T_sessions ON user_ID = sess_user_ID' );
-$SQL->WHERE( $where_clause.' 1' );
-$SQL->GROUP_BY( 'user_ID, grp_ID' );
-$SQL->ORDER_BY( 'grp_name, *' );
-
-if( isset($collections_Module) )
-{	// We are handling blogs:
-	$SQL->SELECT_add( ', COUNT(DISTINCT blog_ID) AS nb_blogs' );
-	$SQL->FROM_add( ' LEFT JOIN T_blogs on user_ID = blog_owner_user_ID' );
-}
-else
-{
-	$SQL->SELECT_add( ', 0 AS nb_blogs' );
-}
-
-$count_sql = 'SELECT COUNT(*)
-							 	FROM T_users'.$left_join_clause.'
-							 WHERE '.$where_clause.' 1';
-
-if( $Settings->get('allow_avatars') )
-{
-	$default_sort = '--A';
-}
-else
-{
-	$default_sort = '-A';
-}
-
-$Results = new Results( $SQL->get(), 'user_', $default_sort, NULL, $count_sql );
-
-$Results->title = T_('Groups & Users').get_manual_link('users_and_groups');
+$UserList->title = T_('Groups & Users').get_manual_link('users_and_groups');
 
 /*
  * Table icons:
  */
 if( $current_User->check_perm( 'users', 'edit', false ) )
-{ // create new user link
-	$Results->global_icon( T_('Create a new user...'), 'new', '?ctrl=user&amp;action=new&amp;user_tab=profile', T_('Add user').' &raquo;', 3, 4  );
-	$Results->global_icon( T_('Create a new group...'), 'new', '?ctrl=groups&amp;action=new', T_('Add group').' &raquo;', 3, 4  );
+{	// create new user/group link
+	$UserList->global_icon( T_('Refresh users list...'), 'refresh', '?ctrl=users&amp;filter=refresh', T_('Refresh').' &raquo;', 3, 4 );
+	$UserList->global_icon( T_('Create a new user...'), 'new', '?ctrl=user&amp;action=new&amp;user_tab=profile', T_('Add user').' &raquo;', 3, 4 );
+	$UserList->global_icon( T_('Create a new group...'), 'new', '?ctrl=groups&amp;action=new', T_('Add group').' &raquo;', 3, 4 );
 }
 
 
-$Results->filter_area = array(
-	'callback' => 'callback_filter_userlist',
-	'url_ignore' => 'results_user_page,keywords',
-	'presets' => array(
-		'all' => array( T_('All users'), '?ctrl=users' ),
-// fp> TODO: implement this like other filtersets in the app. You need a checkbox, or better yet: a select that allows: Confirmed/Unconfirmed/All
-//		'unconfirmed' => array( T_('Unconfirmed email'), '?ctrl=users&amp;usr_unconfirmed=1' ),
-		)
-	);
+global $action;
+if( $action == 'show_recent' )
+{	// Sort an users list by "Registered" field
+	$UserList->set_order( 'user_created_datetime' );
+}
+
+$UserList->set_default_filters( $default_filters );
+$UserList->load_from_Request();
 
 
-/*
- * Grouping params:
- */
-$Results->group_by = 'grp_ID';
-$Results->ID_col = 'user_ID';
+if( $UserList->filters['group'] != -1 )
+{ // List is grouped
+
+	/*
+	 * Grouping params:
+	 */
+	$UserList->group_by = 'grp_ID';
 
 
-/*
- * Group columns:
- */
-$Results->grp_cols[] = array(
-						'td_class' => 'firstcol'.($current_User->check_perm( 'users', 'edit', false ) ? '' : ' lastcol' ),
-						'td_colspan' => -1,  // nb_colds - 1
-						'td' => '<a href="?ctrl=groups&amp;grp_ID=$grp_ID$">$grp_name$</a>'
-										.'~conditional( (#grp_ID# == '.$Settings->get('newusers_grp_ID').'), \' <span class="notes">('.T_('default group for new users').')</span>\' )~',
-					);
+	/*
+	 * Group columns:
+	 */
+	$UserList->grp_cols[] = array(
+							'td_class' => 'firstcol'.($current_User->check_perm( 'users', 'edit', false ) ? '' : ' lastcol' ),
+							'td_colspan' => -1,  // nb_colds - 1
+							'td' => '<a href="?ctrl=groups&amp;grp_ID=$grp_ID$">$grp_name$</a>'
+											.'~conditional( (#grp_ID# == '.$Settings->get('newusers_grp_ID').'), \' <span class="notes">('.T_('default group for new users').')</span>\' )~',
+						);
 
-function grp_actions( & $row )
-{
-	global $usedgroups, $Settings, $current_User;
-
-	$r = '';
-	if( $current_User->check_perm( 'users', 'edit', false ) )
+	function grp_actions( & $row )
 	{
-		$r = action_icon( T_('Edit this group...'), 'edit', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;grp_ID='.$row->grp_ID ) );
-	
-		$r .= action_icon( T_('Duplicate this group...'), 'copy', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;action=new&amp;grp_ID='.$row->grp_ID ) );
-	
-		if( ($row->grp_ID != 1) && ($row->grp_ID != $Settings->get('newusers_grp_ID')) && !in_array( $row->grp_ID, $usedgroups ) )
-		{ // delete
-			$r .= action_icon( T_('Delete this group!'), 'delete', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;action=delete&amp;grp_ID='.$row->grp_ID.'&amp;'.url_crumb('group') ) );
-		}
-		else
+		global $usedgroups, $Settings, $current_User;
+
+		$r = '';
+		if( $current_User->check_perm( 'users', 'edit', false ) )
 		{
-			$r .= get_icon( 'delete', 'noimg' );
+			$r = action_icon( T_('Edit this group...'), 'edit', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;action=edit&amp;grp_ID='.$row->grp_ID ) );
+
+			$r .= action_icon( T_('Duplicate this group...'), 'copy', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;action=new&amp;grp_ID='.$row->grp_ID ) );
+
+			if( ($row->grp_ID != 1) && ($row->grp_ID != $Settings->get('newusers_grp_ID')) && !in_array( $row->grp_ID, $usedgroups ) )
+			{ // delete
+				$r .= action_icon( T_('Delete this group!'), 'delete', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;action=delete&amp;grp_ID='.$row->grp_ID.'&amp;'.url_crumb('group') ) );
+			}
+			else
+			{
+				$r .= get_icon( 'delete', 'noimg' );
+			}
 		}
+		return $r;
 	}
-	return $r;
+	$UserList->grp_cols[] = array(
+							'td_class' => 'shrinkwrap',
+							'td' => '%grp_actions( {row} )%',
+						);
+
 }
-$Results->grp_cols[] = array(
-						'td_class' => 'shrinkwrap',
-						'td' => '%grp_actions( {row} )%',
-					);
 
 /*
  * Data columns:
  */
-$Results->cols[] = array(
+$UserList->cols[] = array(
 						'th' => T_('ID'),
-						'th_class' => 'shrinkwrap',
-						'td_class' => 'shrinkwrap',
+						'th_class' => 'shrinkwrap small',
+						'td_class' => 'shrinkwrap small',
 						'order' => 'user_ID',
 						'td' => '$user_ID$',
 					);
@@ -228,58 +151,67 @@ if( $Settings->get('allow_avatars') )
 	function user_avatar( $user_ID )
 	{
 		global $Blog;
-		
+
 		$UserCache = & get_UserCache();
 		$User = & $UserCache->get_by_ID( $user_ID );
-		
+
 		return $User->get_identity_link( array(
 			'link_text' => 'only_avatar',
-			'thumb_size' => 'crop-48x48',
+			'thumb_size' => 'crop-top-48x48',
 			) );
 	}
-	$Results->cols[] = array(
+	$UserList->cols[] = array(
 							'th' => T_('Picture'),
-							'th_class' => 'shrinkwrap',
-							'td_class' => 'shrinkwrap center',
+							'th_class' => 'shrinkwrap small',
+							'td_class' => 'shrinkwrap center small',
 							'order' => 'has_picture',
 							'default_dir' => 'D',
 							'td' => '%user_avatar( #user_ID#, #user_avatar_file_ID# )%',
 						);
 }
 
-$Results->cols[] = array(
+$UserList->cols[] = array(
 						'th' => T_('Login'),
-						'th_class' => 'shrinkwrap',
+						'th_class' => 'shrinkwrap small',
+						'td_class' => 'small',
 						'order' => 'user_login',
 						'td' => '%get_user_identity_link( #user_login#, #user_ID#, "profile", "text" )%',
 					);
 
-$Results->cols[] = array(
-						'th' => T_('Nickname'),
-						'th_class' => 'shrinkwrap',
-						'order' => 'user_nickname',
-						'td' => '$user_nickname$',
-					);
+$nickname_editing = $Settings->get( 'nickname_editing' );
+if( $nickname_editing != 'hidden' && $current_User->check_perm( 'users', 'edit' ) )
+{
+	$UserList->cols[] = array(
+							'th' => T_('Nickname'),
+							'th_class' => 'shrinkwrap small',
+							'td_class' => 'small',
+							'order' => 'user_nickname',
+							'td' => '$user_nickname$',
+						);
+}
 
-$Results->cols[] = array(
+$UserList->cols[] = array(
 						'th' => T_('Name'),
+						'th_class' => 'small',
+						'td_class' => 'small',
 						'order' => 'user_lastname, user_firstname',
 						'td' => '$user_firstname$ $user_lastname$',
 					);
 
-$Results->cols[] = array(
+$UserList->cols[] = array(
 						'th' => T_('Gender'),
-						'th_class' => 'shrinkwrap',
-						'td_class' => 'shrinkwrap',
+						'th_class' => 'shrinkwrap small',
+						'td_class' => 'shrinkwrap small',
 						'order' => 'user_gender',
 						'td' => '$user_gender$',
 					);
 
-$Results->cols[] = array(
+$UserList->cols[] = array(
 						'th' => T_('Country'),
-						'th_class' => 'shrinkwrap',
-						'order' => 'ctry_name',
-						'td' => '$ctry_name$',
+						'th_class' => 'shrinkwrap small',
+						'td_class' => 'shrinkwrap small',
+						'order' => 'c.ctry_name',
+						'td' => '%country_flag( #ctry_code#, #ctry_name#, "w16px", "flag", "", false, true, "", false )% $ctry_name$',
 					);
 
 function user_mailto( $email )
@@ -299,65 +231,159 @@ function user_pm ( $user_ID, $user_login )
 	{
 		return '&nbsp;';
 	}
-	return action_icon( T_('Private Message').': '.$user_login, 'comments', '?ctrl=threads&action=new&user_login='.$user_login );
+
+	$UserCache = & get_UserCache();
+	$User = & $UserCache->get_by_ID( $user_ID );
+	if( $User && ( $User->get_msgform_possibility() == 'PM' ) )
+	{ // return new pm link only, if current User may send private message to User
+		return action_icon( T_('Private Message').': '.$user_login, 'comments', '?ctrl=threads&action=new&user_login='.$user_login );
+	}
+
+	return '';
+}
+
+function user_status( $user_status, $user_ID )
+{
+	global $current_User;
+
+	$user_status_icons = get_user_status_icons( true );
+	$status_content = $user_status_icons[ $user_status ];
+
+	if( is_admin_page() && ( $current_User->check_perm( 'users', 'edit' ) ) )
+	{ // current User is an administrator and view is displayed on admin interface, return link to user admin tab
+		return '<a href="'.get_user_identity_url( $user_ID, 'admin' ).'">'.$status_content.'</a>';
+	}
+
+	return $status_content;
 }
 
 if( isset($collections_Module) )
 {	// We are handling blogs:
-	$Results->cols[] = array(
+	$UserList->cols[] = array(
 							'th' => T_('Blogs'),
 							'order' => 'nb_blogs',
-							'th_class' => 'shrinkwrap',
-							'td_class' => 'center',
-							'td' => '~conditional( (#nb_blogs# > 0), #nb_blogs#, \'&nbsp;\' )~',
+							'th_class' => 'shrinkwrap small',
+							'td_class' => 'center small',
+							'td' => '~conditional( (#nb_blogs# > 0), \'<a href="admin.php?ctrl=user&amp;user_tab=activity&amp;user_ID=$user_ID$" title="'.format_to_output( T_('View personal blogs'), 'htmlattr' ).'">$nb_blogs$</a>\', \'&nbsp;\' )~',
 						);
 }
 
 if( $current_User->check_perm( 'users', 'edit', false ) )
 {
-	$Results->cols[] = array(
+	$UserList->cols[] = array(
 						'th' => T_('Source'),
-						'th_class' => 'shrinkwrap',
-						'td_class' => 'center',
+						'th_class' => 'shrinkwrap small',
+						'td_class' => 'center small',
 						'order' => 'user_source',
 						'default_dir' => 'D',
 						'td' => '$user_source$',
 					);
 }
 
-	$Results->cols[] = array(
-						'th' => T_('Registered'),
-						'th_class' => 'shrinkwrap',
-						'td_class' => 'center',
-						'order' => 'dateYMDhour',
+$UserList->cols[] = array(
+					'th' => T_('Registered'),
+					'th_class' => 'shrinkwrap small',
+					'td_class' => 'center small',
+					'order' => 'user_created_datetime',
+					'default_dir' => 'D',
+					'td' => '%mysql2localedate( #user_created_datetime#, "M-d" )%',
+				);
+
+/**
+ * Get a flag of registration country with a link to user's sessions page
+ *
+ * @param integer User ID
+ * @param string Country code
+ * @param string Country name
+ * @return string
+*/
+function user_reg_country( $user_ID, $country_code, $country_name )
+{
+	global $current_User, $admin_url;
+
+	$flag = country_flag( $country_code, $country_name, 'w16px', 'flag', '', false, true, '', false );
+	if( empty( $flag ) )
+	{ // No flag or registration country
+		$flag = '?';
+	}
+
+	if( $current_User->check_perm( 'users', 'edit' ) )
+	{ // Only users with edit all users permission can see the 'Sessions' tab
+		$flag = '<a href="'.$admin_url.'?ctrl=user&amp;user_tab=sessions&amp;user_ID='.$user_ID.'">'.$flag.'</a>';
+	}
+
+	return $flag;
+}
+$UserList->cols[] = array(
+					'th' => T_('RC'),
+					'th_class' => 'shrinkwrap small',
+					'td_class' => 'shrinkwrap small',
+					'order' => 'rc.ctry_name',
+					'td' => '%user_reg_country( #user_ID#, #reg_ctry_code#, #reg_ctry_name# )%',
+				);
+
+$UserList->cols[] = array(
+					'th' => T_('Profile update'),
+					'th_class' => 'shrinkwrap small',
+					'td_class' => 'center small',
+					'order' => 'user_profileupdate_date',
+					'default_dir' => 'D',
+					'td' => '%mysql2localedate( #user_profileupdate_date#, "M-d" )%',
+				);
+$UserList->cols[] = array(
+					'th' => T_('Last Visit'),
+					'th_class' => 'shrinkwrap small',
+					'td_class' => 'center small',
+					'order' => 'user_lastseen_ts',
+					'default_dir' => 'D',
+					'td' => '%mysql2localedate( #user_lastseen_ts#, "M-d" )%',
+				);
+
+$UserList->cols[] = array(
+					'th' => T_('Contact'),
+					'th_class' => 'shrinkwrap small',
+					'td_class' => 'shrinkwrap small',
+					'td' => '%user_mailto( #user_email# )%
+					%user_pm( #user_ID#, #user_login# )%'.
+					('~conditional( (#user_url# != \'http://\') && (#user_url# != \'\'), \' <a href="$user_url$" target="_blank" title="'.format_to_output( T_('Website'), 'htmlattr' ).': $user_url$">'
+							.get_icon( 'www', 'imgtag', array( 'class' => 'middle', 'title' => format_to_output( T_('Website'), 'htmlattr' ).': $user_url$' ) ).'</a>\', \'&nbsp;\' )~'),
+				);
+
+$filter_reported = param( 'reported', 'integer' );
+if( $filter_reported )
+{	// Filter is set to 'Reported users'
+	$userlist_col_reputaion = array(
+						'th' => T_('Rep'),
+						'th_class' => 'shrinkwrap small',
+						'td_class' => 'shrinkwrap small',
+						'order' => 'user_rep',
 						'default_dir' => 'D',
-						'td' => '%mysql2localedate( #dateYMDhour#, "M-d" )%',
+						'td' => '$user_rep$',
 					);
-	$Results->cols[] = array(
-						'th' => T_('Last Visit'),
-						'th_class' => 'shrinkwrap',
-						'td_class' => 'center',
-						'order' => 'sess_lastseen',
-						'default_dir' => 'D',
-						'td' => '%mysql2localedate( #sess_lastseen#, "M-d" )%',
-					);
-					
-	$Results->cols[] = array(
-						'th' => T_('Contact'),
-						'th_class' => 'shrinkwrap',
-						'td_class' => 'shrinkwrap',
-						'td' => '%user_mailto( #user_email# )%
-						%user_pm( #user_ID#, #user_login# )% '.
-						('~conditional( (#user_url# != \'http://\') && (#user_url# != \'\'), \'<a href="$user_url$" title="Website: $user_url$">'
-								.get_icon( 'www', 'imgtag', array( 'class' => 'middle', 'title' => 'Website: $user_url$' ) ).'</a>\', \'&nbsp;\' )~'),
-					);
-					
+}
+
+if( $UserList->filters['group'] == -1 )
+{ // List is ungrouped, Display column with group name
+	$UserList->cols[] = array(
+			'th' => T_('Group'),
+			'th_class' => 'shrinkwrap small',
+			'td_class' => 'shrinkwrap small',
+			'order' => 'grp_name',
+			'td' => '$grp_name$',
+		);
+}
+
 if( ! $current_User->check_perm( 'users', 'edit', false ) )
 {
-	$Results->cols[] = array(
+	if( $filter_reported )
+	{
+		$UserList->cols[] = $userlist_col_reputaion;
+	}
+
+	$UserList->cols[] = array(
 						'th' => T_('Level'),
-						'th_class' => 'shrinkwrap',
-						'td_class' => 'right',
+						'th_class' => 'shrinkwrap small',
+						'td_class' => 'shrinkwrap small',
 						'order' => 'user_level',
 						'default_dir' => 'D',
 						'td' => '$user_level$',
@@ -365,210 +391,90 @@ if( ! $current_User->check_perm( 'users', 'edit', false ) )
 }
 else
 {
-	$Results->cols[] = array(
-						'th' => /* TRANS: email Confirmed */ T_('C'),
-						'th_class' => 'shrinkwrap',
-						'td_class' => 'shrinkwrap',
-						'order' => 'user_validated',
+	$UserList->cols[] = array(
+						'th' => /* TRANS: Account status */ T_( 'Status' ),
+						'th_class' => 'shrinkwrap small',
+						'td_class' => 'shrinkwrap small',
+						'order' => 'user_status',
 						'default_dir' => 'D',
-						'td' => '%get_icon( (#user_validated# ? "allowback" : "ban"), "imgtag" ,(#user_validated# ? array("title" => "'.T_( 'Email address has been confirmed' ).'"):array( ) ) )%',
+						'td' => '%user_status( #user_status#, #user_ID# )%'
 					);
 
-	function display_level( $user_level, $user_ID )
+	if( $filter_reported )
 	{
-		$r = '';
-		if( $user_level > 0)
-		{
-			$r .= action_icon( TS_('Decrease user level'), 'decrease',
-							regenerate_url( 'action', 'action=promote&amp;prom=down&amp;user_ID='.$user_ID.'&amp;'.url_crumb('user') ) );
-		}
-		else
-		{
-			$r .= get_icon( 'decrease', 'noimg' );
-		}
-		$r .= sprintf( '<code>% 2d </code>', $user_level );
-		if( $user_level < 10 )
-		{
-			$r.= action_icon( TS_('Increase user level'), 'increase',
-							regenerate_url( 'action', 'action=promote&amp;prom=up&amp;user_ID='.$user_ID.'&amp;'.url_crumb('user') ) );
-		}
-		else
-		{
-	  	$r .= get_icon( 'increase', 'noimg' );
-		}
-		return $r;
+		$UserList->cols[] = $userlist_col_reputaion;
 	}
-	$Results->cols[] = array(
+
+	$UserList->cols[] = array(
 						'th' => T_('Level'),
-						'th_class' => 'shrinkwrap',
-						'td_class' => 'shrinkwrap',
+						'th_class' => 'shrinkwrap small',
+						'td_class' => 'shrinkwrap user_level_edit small',
 						'order' => 'user_level',
 						'default_dir' => 'D',
-						'td' => '%display_level( #user_level#, #user_ID# )%',
+						'td' => '<a href="#" rel="$user_level$">$user_level$</a>',
 					);
 
-	$Results->cols[] = array(
+	$UserList->cols[] = array(
 						'th' => T_('Actions'),
-						'td_class' => 'shrinkwrap',
+						'th_class' => 'small',
+						'td_class' => 'shrinkwrap small',
 						'td' => action_icon( T_('Edit this user...'), 'edit', '%regenerate_url( \'ctrl,action\', \'ctrl=user&amp;user_ID=$user_ID$&amp;user_tab=profile\' )%' )
 										.action_icon( T_('Duplicate this user...'), 'copy', '%regenerate_url( \'ctrl,action\', \'ctrl=user&amp;action=new&amp;user_ID=$user_ID$&amp;user_tab=profile\' )%' )
-										.'~conditional( (#user_ID# != 1) && (#nb_blogs# < 1) && (#user_ID# != '.$current_User->ID.'), \''
+										.'~conditional( (#user_ID# != 1) && (#user_ID# != '.$current_User->ID.'), \''
 											.action_icon( T_('Delete this user!'), 'delete',
 												'%regenerate_url( \'action\', \'action=delete&amp;user_ID=$user_ID$&amp;'.url_crumb('user').'\' )%' ).'\', \''
 	                    .get_icon( 'delete', 'noimg' ).'\' )~'
 					);
 }
 
+// Execute query
+$UserList->query();
+
+
+$filter_presets = array(
+		'all' => array( T_('All users'), get_dispctrl_url( 'users&amp;filter=new' ) ),
+		'men' => array( T_('Men'), get_dispctrl_url( 'users', 'gender_men=1&amp;filter=new' ) ),
+		'women' => array( T_('Women'), get_dispctrl_url( 'users', 'gender_women=1&amp;filter=new' ) ),
+	);
+
+if( is_admin_page() )
+{ // Add show only activated users filter only on admin interface
+	$filter_presets['activated'] = array( T_('Activated users'), get_dispctrl_url( 'users', 'status_activated=1&amp;filter=new' ) );
+	if( $current_User->check_perm( 'users', 'edit' ) )
+	{ // Show "Reported Users" filter only for users with edit user permission
+		$filter_presets['reported'] = array( T_('Reported users'), get_dispctrl_url( 'users', 'reported=1&amp;filter=new' ) );
+	}
+}
+
+if( $UserList->is_filtered() )
+{	// Display link to reset filters only if some filter is applied
+	$filter_presets['reset'] = array( T_('Reset Filters'), get_dispctrl_url( 'users&amp;filter=reset' ), 'class="floatright"' );
+}
+
+$UserList->filter_area = array(
+	'callback' => 'callback_filter_userlist',
+	'url_ignore' => 'users_paged,u_paged,keywords',
+	'presets' => $filter_presets,
+	);
+
 
 // Display result :
-$Results->display( $display_params );
+$UserList->display( $display_params );
 
+
+if( $current_User->check_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
+{	// Newsletter button
+	echo '<p class="center">';
+	echo '<input type="button" value="'.T_('Send newsletter to the current selection').'" onclick="location.href=\''.$admin_url.'?ctrl=newsletter\'" />';
+	echo '</p>';
+}
+
+load_funcs( 'users/model/_user_js.funcs.php' );
 
 /*
  * $Log$
- * Revision 1.44  2011/10/20 15:22:50  efy-yurybakh
- * new filters for users list
+ * Revision 1.46  2013/11/06 08:05:04  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.43  2011/10/10 19:48:32  fplanque
- * i18n & login display cleaup
- *
- * Revision 1.42  2011/10/07 17:22:52  efy-yurybakh
- * user avatar display default
- *
- * Revision 1.41  2011/09/30 12:24:56  efy-yurybakh
- * User directory
- *
- * Revision 1.40  2011/09/29 16:31:53  sam2kb
- * Blog count fix
- *
- * Revision 1.39  2011/09/29 08:39:01  efy-yurybakh
- * - user_identity_link
- * - lightbox
- *
- * Revision 1.38  2011/09/20 22:46:22  fplanque
- * fixes
- *
- * Revision 1.37  2011/09/20 08:56:52  efy-hamesh
- * Picture column header clickable in order to sort on users with a profile picture.
- *
- * Revision 1.36  2011/09/14 20:19:48  fplanque
- * cleanup
- *
- * Revision 1.35  2011/09/13 22:35:29  lxndral
- * user list refactoring
- * sorting for photo field
- *
- * Revision 1.34  2011/09/07 00:28:26  sam2kb
- * Replace non-ASCII character in regular expressions with ~
- *
- * Revision 1.33  2011/09/06 00:54:38  fplanque
- * i18n update
- *
- * Revision 1.32  2011/09/04 22:13:21  fplanque
- * copyright 2011
- *
- * Revision 1.31  2011/05/11 07:11:52  efy-asimo
- * User settings update
- *
- * Revision 1.30  2011/02/23 21:45:18  fplanque
- * minor / cleanup
- *
- * Revision 1.29  2011/02/17 14:56:38  efy-asimo
- * Add user source param
- *
- * Revision 1.28  2011/01/07 14:36:15  efy-asimo
- * Display Gender $ Country on user list
- *
- * Revision 1.27  2010/10/17 18:51:57  sam2kb
- * Display email validation status
- *
- * Revision 1.26  2010/09/08 15:07:45  efy-asimo
- * manual links
- *
- * Revision 1.25  2010/05/07 08:07:14  efy-asimo
- * Permissions check update (User tab, Global Settings tab) - bugfix
- *
- * Revision 1.24  2010/02/08 17:54:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.23  2010/01/03 13:10:57  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.22  2009/12/12 19:14:11  fplanque
- * made avatars optional + fixes on img props
- *
- * Revision 1.21  2009/12/07 23:07:34  blueyed
- * Whitespace.
- *
- * Revision 1.20  2009/11/21 13:31:59  efy-maxim
- * 1. users controller has been refactored to users and user controllers
- * 2. avatar tab
- * 3. jQuery to show/hide custom duration
- *
- * Revision 1.19  2009/10/26 12:59:37  efy-maxim
- * users management
- *
- * Revision 1.18  2009/10/25 15:22:47  efy-maxim
- * user - identity, password, preferences tabs
- *
- * Revision 1.17  2009/09/26 12:00:44  tblue246
- * Minor/coding style
- *
- * Revision 1.16  2009/09/25 07:33:15  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.15  2009/09/24 10:14:14  efy-bogdan
- * Separate controller added for groups
- *
- * Revision 1.14  2009/09/24 06:56:02  efy-bogdan
- * Cleanup users.ctrl.php
- *
- * Revision 1.13  2009/09/23 14:19:57  efy-bogdan
- * Listing null groups error fixed
- *
- * Revision 1.12  2009/09/23 13:32:21  efy-bogdan
- * Separate controller added for groups
- *
- * Revision 1.11  2009/09/14 10:33:20  efy-maxim
- * messagin module improvements
- *
- * Revision 1.10  2009/09/12 18:44:11  efy-maxim
- * Messaging module improvements
- *
- * Revision 1.9  2009/09/12 00:21:02  fplanque
- * search cleanup
- *
- * Revision 1.8  2009/08/30 00:43:52  fplanque
- * increased modularity
- *
- * Revision 1.7  2009/03/08 23:57:46  fplanque
- * 2009
- *
- * Revision 1.6  2008/09/29 08:30:40  fplanque
- * Avatar support
- *
- * Revision 1.5  2008/01/21 09:35:36  fplanque
- * (c) 2008
- *
- * Revision 1.4  2007/09/22 22:11:40  fplanque
- * fixed user list navigation
- *
- * Revision 1.3  2007/09/08 20:23:04  fplanque
- * action icons / wording
- *
- * Revision 1.2  2007/09/04 14:57:07  fplanque
- * interface cleanup
- *
- * Revision 1.1  2007/06/25 11:01:52  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.15  2007/04/26 00:11:13  fplanque
- * (c) 2007
- *
- * Revision 1.14  2007/01/23 22:09:03  fplanque
- * visual alignment
- *
- * Revision 1.13  2006/11/24 18:27:26  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

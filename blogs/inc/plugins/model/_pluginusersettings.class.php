@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -132,69 +132,8 @@ class PluginUserSettings extends AbstractSettings
 
 /*
  * $Log$
- * Revision 1.7  2011/09/04 22:13:18  fplanque
- * copyright 2011
+ * Revision 1.8  2013/11/06 08:04:36  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.6  2010/02/08 17:53:27  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.5  2009/09/14 13:24:14  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.4  2009/07/02 21:57:11  blueyed
- * doc fix: move files and classes to the plugins package
- *
- * Revision 1.3  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.2  2008/01/21 09:35:32  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 11:00:53  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.8  2007/04/26 00:11:02  fplanque
- * (c) 2007
- *
- * Revision 1.7  2006/11/24 18:27:25  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.6  2006/04/19 20:13:50  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.5  2006/03/24 19:37:53  fplanque
- * no message
- *
- * Revision 1.4  2006/03/24 01:12:26  blueyed
- * Catch cases where $current_User is not set (yet) and no user_ID is given and add debuglog entries.
- *
- * Revision 1.3  2006/03/12 23:08:59  fplanque
- * doc cleanup
- *
- * Revision 1.2  2006/03/11 02:02:00  blueyed
- * Normalized t_pluginusersettings
- *
- * Revision 1.1  2006/02/27 16:57:12  blueyed
- * PluginUserSettings - allows a plugin to store user related settings
- *
- * Revision 1.2  2006/02/24 22:09:00  blueyed
- * Plugin enhancements
- *
- * Revision 1.1  2006/02/23 21:11:58  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.3  2005/12/22 23:13:40  blueyed
- * Plugins' API changed and handling optimized
- *
- * Revision 1.2  2005/12/08 22:32:19  blueyed
- * Merged from post-phoenix; Added/fixed delete() (has to be derived to allow using it without plug_ID)
- *
- * Revision 1.1.2.2  2005/12/06 21:56:21  blueyed
- * Get PluginSettings straight (removing $default_keys).
- *
- * Revision 1.1.2.1  2005/11/16 22:45:32  blueyed
- * DNS Blacklist antispam plugin; T_pluginsettings; Backoffice editing for plugins settings; $Plugin->Settings; MERGE from HEAD;
  */
 ?>

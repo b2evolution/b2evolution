@@ -69,16 +69,25 @@ skin_include( '_body_header.inc.php' );
 		// Display message if no post:
 		display_if_empty();
 
+		echo '<div id="styled_content_block">';
 		while( $Item = & mainlist_get_item() )
 		{	// For each blog post, do everything below up to the closing curly brace "}"
 		?>
 		<div id="<?php $Item->anchor_id() ?>" class="post post<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
 
 			<?php
+				if( $Item->status != 'published' )
+				{
+					$Item->status( array( 'format' => 'styled' ) );
+				}
 				$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
 			?>
 
-			<h2><?php $Item->title(); ?></h2>
+			<h2><?php
+				$Item->title( array(
+					'link_type' => 'permalink'
+				) );
+			?></h2>
 
 			<p class="postinfo">
 			<?php
@@ -162,6 +171,7 @@ skin_include( '_body_header.inc.php' );
 		<?php
 			locale_restore_previous();	// Restore previous locale (Blog locale)
 		}
+		echo '</div>';
 	?>
 
 	<?php

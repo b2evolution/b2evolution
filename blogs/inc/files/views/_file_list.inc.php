@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -63,9 +63,9 @@ global $Messages;
  */
 global $selected_Filelist;
 /**
- * @var Item
+ * @var Link Owner
  */
-global $edited_Item;
+global $LinkOwner;
 
 global $edited_User;
 
@@ -219,7 +219,7 @@ $Form->begin_form();
 			}
 			else
 			{
-				echo $lFile->get_preview_thumb( 'fulltype' );
+				echo $lFile->get_preview_thumb( 'fulltype', true );
 			}
 		}
 		else
@@ -282,7 +282,7 @@ $Form->begin_form();
 				// TODO: dh> provide support for direcories (display included files).
 
 				// fp> here might not be the best place to put the perm check
-				if( isset($edited_Item) && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+				if( isset( $LinkOwner ) && $LinkOwner->check_perm( 'edit' ) )
 				{	// Offer option to link the file to an Item (or anything else):
 					$link_attribs = array();
 					$link_action = 'link';
@@ -475,10 +475,11 @@ $Form->begin_form();
 				<?php
 					if( ! $Messages->has_errors() )
 					{ // no Filelist errors, the directory must be empty
+						$Messages->clear();
 						$Messages->add( T_('No files found.')
 							.( $fm_Filelist->is_filtering() ? '<br />'.T_('Filter').': &laquo;'.$fm_Filelist->get_filter().'&raquo;' : '' ), 'error' );
+						$Messages->display( '', '' );
 					}
-					$Messages->display( '', '' );
 				?>
 			</td>
 		</tr>
@@ -504,9 +505,9 @@ $Form->begin_form();
 			 * TODO: fp> the following is a good idea but in case we also have $mode == 'upload' it currently doesn't refresh the list of attachements
 			 * which makes it seem like this feature is broken. Please add necessary javascript for this.
 			 */
-			if( $fm_mode == 'link_item' && $mode != 'upload' )
-			{	// We are linking to a post...
-				$field_options['link'] = T_('Link files to current post');
+			if( $fm_mode == 'link_object' && $mode != 'upload' )
+			{	// We are linking to an object...
+				$field_options['link'] = $LinkOwner->T_( 'Link files to current owner' );
 			}
 
 			if( $mode != 'upload' && ($fm_Filelist->get_root_type() == 'collection' || !empty($Blog))
@@ -592,8 +593,8 @@ $Form->begin_form();
 				}
 
 				// other actions:
-				
-				if ( selected_value == 'make_posts_pre' ) 
+
+				if ( selected_value == 'make_posts_pre' )
 				{
 					jQuery('#FilesForm').append('<input type="hidden" name="ctrl" value="items" />');
 				}
@@ -695,272 +696,8 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
- * Revision 1.51  2011/09/14 20:19:49  fplanque
- * cleanup
+ * Revision 1.53  2013/11/06 08:04:15  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.50  2011/09/13 23:25:54  lxndral
- * creating posts from images update
- *
- * Revision 1.49  2011/09/08 22:13:48  lxndral
- * pick category when creating posts from images
- *
- * Revision 1.48  2011/09/06 00:54:38  fplanque
- * i18n update
- *
- * Revision 1.47  2011/09/04 22:13:16  fplanque
- * copyright 2011
- *
- * Revision 1.46  2011/02/15 15:37:00  efy-asimo
- * Change access to admin permission
- *
- * Revision 1.45  2011/02/14 15:31:43  efy-asimo
- * files "Edit properties" needs edit permission
- *
- * Revision 1.44  2011/01/18 16:23:03  efy-asimo
- * add shared_root perm and refactor file perms - part1
- *
- * Revision 1.43  2010/11/25 15:16:34  efy-asimo
- * refactor $Messages
- *
- * Revision 1.42  2010/09/16 14:12:24  efy-asimo
- * New avatar upload
- *
- * Revision 1.41  2010/07/26 06:52:16  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.40  2010/04/30 20:26:33  blueyed
- * Code compression with scrollTo code.
- *
- * Revision 1.39  2010/04/08 18:28:02  blueyed
- * crumb refactoring: add get_crumb
- *
- * Revision 1.38  2010/03/30 23:25:09  blueyed
- * Fix edit file links. They were missing the crumb. Coming next: Syntax highlighting.
- *
- * Revision 1.37  2010/03/28 17:08:08  fplanque
- * minor
- *
- * Revision 1.36  2010/03/18 06:14:33  sam2kb
- * Link multiple files to item
- *
- * Revision 1.35  2010/02/08 17:52:57  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.34  2010/01/30 18:55:27  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.33  2010/01/25 18:18:29  efy-yury
- * add : crumbs
- *
- * Revision 1.32  2010/01/22 20:20:21  efy-asimo
- * Remove File manager rename file
- *
- * Revision 1.31  2010/01/03 13:10:57  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.30  2009/11/11 03:24:51  fplanque
- * misc/cleanup
- *
- * Revision 1.29  2009/10/13 22:36:01  blueyed
- * Highlight files and directories in the filemanager when opened via 'Locate this' link. Adds scrollTo jQuery plugin.
- *
- * Revision 1.28  2009/10/10 21:08:18  blueyed
- * linkctrl might be set, but empty.
- *
- * Revision 1.27  2009/10/07 23:43:25  fplanque
- * doc
- *
- * Revision 1.26  2009/09/29 20:17:06  efy-maxim
- * linkctrl & linkdata parameters
- *
- * Revision 1.25  2009/09/29 03:14:22  fplanque
- * doc
- *
- * Revision 1.24  2009/09/26 15:18:12  efy-maxim
- * temporary solution for file/image types
- *
- * Revision 1.23  2009/08/30 23:22:26  blueyed
- * When inserting tags for selected files to an item, implode multiple file tags using newlines, not just space. Makes it a lot easier to handle the tag soup.
- *
- * Revision 1.22  2009/08/30 22:18:25  blueyed
- * todo
- *
- * Revision 1.21  2009/08/29 12:23:56  tblue246
- * - SECURITY:
- * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.
- * 	- files.ctrl.php: Removed redundant calls to User::check_perm().
- * 	- XML-RPC APIs: Added missing permission checks.
- * 	- items.ctrl.php: Check permission to edit item with current status (also checks user levels) for update actions.
- * - XML-RPC client: Re-added check for zlib support (removed by update).
- * - XML-RPC APIs: Corrected method signatures (return type).
- * - Localization:
- * 	- Fixed wrong permission description in blog user/group permissions screen.
- * 	- Removed wrong TRANS comment
- * 	- de-DE: Fixed bad translation strings (double quotes + HTML attribute = mess).
- * - File upload:
- * 	- Suppress warnings generated by move_uploaded_file().
- * 	- File browser: Hide link to upload screen if no upload permission.
- * - Further code optimizations.
- *
- * Revision 1.20  2009/07/02 00:26:46  fplanque
- * doc
- *
- * Revision 1.19  2009/06/28 19:54:59  tblue246
- * doc
- *
- * Revision 1.18  2009/06/28 19:39:24  fplanque
- * why was global $edited_User removed?
- * Tblue> This file gets included by _file_browse.view.php only and
- *        $edited_User is already declared as global there. But you are
- *        right, the code is easier to understand if we place a global
- *        $edited_User here, too. Additionally, it avoids confusing bugs
- *        if this file should ever get included by some other file then
- *        _file_browse.view.php. I will re-add the "global" statement to
- *        v-3-2, sorry for the mess.
- * fp> it is used at line 287 in this file !!!
- *
- * Revision 1.17  2009/06/23 20:53:54  tblue246
- * File browser: Display a help notice when changing an user avatar
- *
- * Revision 1.16  2009/05/25 20:24:20  fplanque
- * cleaned up some more UI
- *
- * Revision 1.15  2009/03/08 23:57:43  fplanque
- * 2009
- *
- * Revision 1.14  2009/03/03 01:01:06  fplanque
- * ok, but missing blank img
- *
- * Revision 1.13  2009/02/23 20:50:45  blueyed
- * Only display 'link/chain' icon for files, since dirs are not supported yet.
- *
- * Revision 1.12  2009/02/10 22:39:00  blueyed
- *  - Handle more File properties in File class lazily.
- *  - Cleanup recursive size handling:
- *    - Add Filelist::get_File_size
- *    - Add Filelist::get_File_size_formatted
- *    - Add File::_recursive_size/get_recursive_size
- *    - Drop File::setSize
- *    - get_dirsize_recursive: includes size of directories (e.g. 4kb here)
- *
- * Revision 1.11  2008/09/29 08:30:38  fplanque
- * Avatar support
- *
- * Revision 1.10  2008/09/23 05:26:38  fplanque
- * Handle attaching files when multiple posts are edited simultaneously
- *
- * Revision 1.9  2008/07/11 23:23:19  blueyed
- * Always display full last modification date+time in title of lastmod TD in filelist
- *
- * Revision 1.8  2008/05/31 00:12:13  fplanque
- * wording
- *
- * Revision 1.7  2008/04/14 19:50:51  fplanque
- * enhanced attachments handling in post edit mode
- *
- * Revision 1.6  2008/04/14 17:39:54  fplanque
- * create 1 post with all images attached
- *
- * Revision 1.5  2008/04/14 17:03:52  fplanque
- * "with selected files" cleanup
- *
- * Revision 1.4  2008/04/03 22:03:08  fplanque
- * added "save & edit" and "publish now" buttons to edit screen.
- *
- * Revision 1.3  2008/01/28 20:17:44  fplanque
- * better display of image file linking while in 'upload' mode
- *
- * Revision 1.2  2008/01/21 09:35:29  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 11:00:02  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.8  2007/06/24 22:35:57  fplanque
- * cleanup
- *
- * Revision 1.7  2007/04/26 00:11:10  fplanque
- * (c) 2007
- *
- * Revision 1.6  2007/04/20 01:42:32  fplanque
- * removed excess javascript
- *
- * Revision 1.5  2007/01/26 02:12:06  fplanque
- * cleaner popup windows
- *
- * Revision 1.4  2007/01/25 03:45:49  fplanque
- * deactivated broken feature
- *
- * Revision 1.3  2007/01/25 03:17:00  fplanque
- * visual cleanup for average users
- * geeky stuff preserved as options
- *
- * Revision 1.2  2007/01/25 02:42:01  fplanque
- * cleanup
- *
- * Revision 1.1  2007/01/24 07:18:22  fplanque
- * file split
- *
- * Revision 1.42  2007/01/24 05:57:55  fplanque
- * cleanup / settings
- *
- * Revision 1.41  2007/01/24 03:45:29  fplanque
- * decrap / removed a lot of bloat...
- *
- * Revision 1.40  2007/01/24 02:35:42  fplanque
- * refactoring
- *
- * Revision 1.39  2007/01/24 01:40:14  fplanque
- * Upload tab now stays in context
- *
- * Revision 1.38  2007/01/23 22:30:14  fplanque
- * empty icons cleanup
- *
- * Revision 1.37  2007/01/09 00:55:16  blueyed
- * fixed typo(s)
- *
- * Revision 1.36  2007/01/07 18:42:35  fplanque
- * cleaned up reload/refresh icons & links
- *
- * Revision 1.35  2006/12/24 00:52:57  fplanque
- * Make posts with images - Proof of concept
- *
- * Revision 1.34  2006/12/23 22:53:10  fplanque
- * extra security
- *
- * Revision 1.33  2006/12/22 00:17:05  fplanque
- * got rid of dirty globals
- * some refactoring
- *
- * Revision 1.32  2006/12/14 02:18:23  fplanque
- * fixed navigation
- *
- * Revision 1.31  2006/12/14 01:46:29  fplanque
- * refactoring / factorized image preview display
- *
- * Revision 1.30  2006/12/14 00:33:53  fplanque
- * thumbnails & previews everywhere.
- * this is getting good :D
- *
- * Revision 1.29  2006/12/13 18:10:22  fplanque
- * thumbnail resampling proof of concept
- *
- * Revision 1.28  2006/12/13 03:08:28  fplanque
- * thumbnail implementation design demo
- *
- * Revision 1.27  2006/12/12 19:39:07  fplanque
- * enhanced file links / permissions
- *
- * Revision 1.26  2006/12/12 18:04:53  fplanque
- * fixed item links
- *
- * Revision 1.25  2006/12/07 20:03:32  fplanque
- * Woohoo! File editing... means all skin editing.
- *
- * Revision 1.24  2006/12/07 15:23:42  fplanque
- * filemanager enhanced, refactored, extended to skins directory
- *
- * Revision 1.23  2006/11/24 18:27:25  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

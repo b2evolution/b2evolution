@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -44,42 +44,30 @@ switch ( $action )
 		$current_User->check_perm( 'users', 'edit', true );
 
 		// UPDATE display settings:
+		param( 'use_gravatar', 'integer', 0 );
+		param( 'default_gravatar', 'string', 'b2evo' );
 		param( 'gender_colored', 'integer', 0 );
-
 		param( 'bubbletip', 'integer', 0 );
-
 		param( 'bubbletip_size_admin', 'string', '' );
-
 		param( 'bubbletip_size_front', 'string', '' );
-
 		param( 'bubbletip_anonymous', 'integer', 0 );
-
 		param( 'bubbletip_size_anonymous', 'string', '' );
-
 		param( 'bubbletip_overlay' );
-
 		param( 'allow_anonymous_user_list', 'integer', 0 );
-
 		param( 'allow_anonymous_user_profiles', 'integer', 0 );
 
 		$Settings->set_array( array(
-									 array( 'gender_colored', $gender_colored),
-
-									 array( 'bubbletip', $bubbletip),
-
-									 array( 'bubbletip_size_admin', $bubbletip_size_admin),
-
-									 array( 'bubbletip_size_front', $bubbletip_size_front),
-
-									 array( 'bubbletip_anonymous', $bubbletip_anonymous),
-
-									 array( 'bubbletip_size_anonymous', $bubbletip_size_anonymous),
-
-									 array( 'bubbletip_overlay', $bubbletip_overlay),
-
-									 array( 'allow_anonymous_user_list', $allow_anonymous_user_list),
-
-									 array( 'allow_anonymous_user_profiles', $allow_anonymous_user_profiles) ) );
+									 array( 'use_gravatar', $use_gravatar ),
+									 array( 'default_gravatar', $default_gravatar ),
+									 array( 'gender_colored', $gender_colored ),
+									 array( 'bubbletip', $bubbletip ),
+									 array( 'bubbletip_size_admin', $bubbletip_size_admin ),
+									 array( 'bubbletip_size_front', $bubbletip_size_front ),
+									 array( 'bubbletip_anonymous', $bubbletip_anonymous ),
+									 array( 'bubbletip_size_anonymous', $bubbletip_size_anonymous ),
+									 array( 'bubbletip_overlay', $bubbletip_overlay ),
+									 array( 'allow_anonymous_user_list', $allow_anonymous_user_list ),
+									 array( 'allow_anonymous_user_profiles', $allow_anonymous_user_profiles ) ) );
 
 		if( ! $Messages->has_errors() )
 		{
@@ -125,16 +113,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.4  2011/10/20 16:32:57  efy-asimo
- * Invalidate PageCaches after specific settings update
+ * Revision 1.5  2013/11/06 08:04:55  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.3  2011/10/07 02:55:38  fplanque
- * doc
- *
- * Revision 1.2  2011/10/05 17:44:23  efy-yurybakh
- * Checks for disp=user & users
- *
- * Revision 1.1  2011/10/04 13:06:26  efy-yurybakh
- * Additional Display settings
  */
 ?>

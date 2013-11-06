@@ -5,6 +5,7 @@
  * @(#) $Id$
  *
  */
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /*
 {metadocument}<?xml version="1.0" encoding="ISO-8859-1" ?>

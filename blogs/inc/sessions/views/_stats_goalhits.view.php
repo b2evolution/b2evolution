@@ -5,7 +5,7 @@
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -14,7 +14,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $blog, $admin_url, $rsc_url;
-global $Session;
+global $Session, $UserSettings;
 
 /**
  * View funcs
@@ -54,7 +54,7 @@ else
 {
 	// Create result set:
 	$SQL = new SQL();
-	$SQL->SELECT( 'hit_ID, sess_ID, sess_hitcount, hit_datetime, hit_referer_type, hit_uri, hit_blog_ID, hit_referer, hit_remote_addr,
+	$SQL->SELECT( 'hit_ID, sess_ID, hit_datetime, hit_referer_type, hit_uri, hit_blog_ID, hit_referer, hit_remote_addr,
 									user_login, hit_agent_type, dom_name, goal_name, keyp_phrase' );
 	$SQL->FROM( 'T_track__goalhit LEFT JOIN T_hitlog ON ghit_hit_ID = hit_ID
 									LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
@@ -95,7 +95,7 @@ else
 	}
 }
 
-$Results = new Results( $SQL->get(), 'hits_', '--D', 20, $SQL_count->get() );
+$Results = new Results( $SQL->get(), 'ghits_', '--D', $UserSettings->get( 'results_per_page' ), $SQL_count->get() );
 
 $Results->title = T_('Recent goal hits');
 
@@ -104,7 +104,7 @@ $Results->title = T_('Recent goal hits');
  *
  * @param Form
  */
-function filter_hits( & $Form )
+function filter_goal_hits( & $Form )
 {
 	global $datestart, $datestop;
 
@@ -116,7 +116,7 @@ function filter_hits( & $Form )
 	$Form->text_input( 'goal_name', get_param('goal_name'), 20, T_('Goal names starting with'), '', array( 'maxlength'=>50 ) );
 }
 $Results->filter_area = array(
-	'callback' => 'filter_hits',
+	'callback' => 'filter_goal_hits',
 	'url_ignore' => 'results_hits_page,exclude,sess_ID,goal_name,datestartinput,datestart,datestopinput,datestop',
 	'presets' => array(
 		'all' => array( T_('All'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;blog=0' ),
@@ -178,50 +178,13 @@ $Results->cols[] = array(
 		'td' => '$goal_name$',
 	);
 
-$Results->cols[] = array(
-		'th' => T_('Hits'),
-		'order' => 'sess_hitcount',
-		'td_class' => 'right',
-		'td' => '<a href="?ctrl=stats&amp;tab=hits&amp;blog=0&amp;sess_ID=$sess_ID$">$sess_hitcount$</a>',
-	);
-
 // Display results:
 $Results->display();
 
 /*
  * $Log$
- * Revision 1.11  2011/10/01 10:05:31  efy-vitalij
- * fix tab=hits links
- *
- * Revision 1.10  2011/09/04 22:13:18  fplanque
- * copyright 2011
- *
- * Revision 1.9  2010/02/08 17:53:55  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.8  2010/01/30 18:55:34  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.7  2009/12/08 22:38:13  fplanque
- * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
- *
- * Revision 1.6  2009/09/20 00:27:08  fplanque
- * cleanup/doc/simplified
- *
- * Revision 1.5  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.4  2008/05/26 19:30:38  fplanque
- * enhanced analytics
- *
- * Revision 1.3  2008/05/10 22:59:10  fplanque
- * keyphrase logging
- *
- * Revision 1.2  2008/04/17 11:53:21  fplanque
- * Goal editing
- *
- * Revision 1.1  2008/03/22 19:58:18  fplanque
- * missing views
+ * Revision 1.13  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

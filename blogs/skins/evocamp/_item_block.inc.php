@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage evocamp
@@ -38,6 +38,10 @@ $params = array_merge( array(
 					'before'    => '<div class="floatright">',
 					'after'     => '</div>',
 				) );
+		}
+		if( $Item->status != 'published' )
+		{
+			$Item->status( array( 'format' => 'styled' ) );
 		}
 	?>
 
@@ -108,20 +112,8 @@ locale_restore_previous();	// Restore previous locale (Blog locale)
 
 /*
  * $Log$
- * Revision 1.5  2011/09/04 22:13:24  fplanque
- * copyright 2011
- *
- * Revision 1.4  2011/09/04 02:30:20  fplanque
- * colorbox integration (MIT license)
- *
- * Revision 1.3  2010/02/08 17:56:22  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.2  2009/12/21 01:29:54  fplanque
- * little things
- *
- * Revision 1.1  2009/05/23 14:12:42  fplanque
- * All default skins now support featured posts and intro posts.
+ * Revision 1.7  2013/11/06 08:05:43  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

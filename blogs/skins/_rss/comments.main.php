@@ -23,6 +23,13 @@ if( $feed_content == 'none' )
 	debug_die( 'Feeds are disabled.');
 }
 
+if( !$Blog->get_setting( 'comments_latest' ) )
+{ // The latest comments are disabled for current blog
+	// Redirect to page with text/html mime type
+	header_redirect( get_dispctrl_url( 'comments' ), 302 );
+	// will have exited
+}
+
 $post_ID = NULL;
 if( isset($Item) )
 {	// Comments for a specific Item:

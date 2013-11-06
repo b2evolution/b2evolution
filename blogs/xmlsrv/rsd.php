@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @todo fp> do we want to restrict API definitions to a specific blog with blogID="" ?
  *
@@ -32,7 +32,14 @@ echo '<?xml version="1.0" encoding="UTF-8"?'.'>';
 	  <engineLink>http://b2evolution.net/</engineLink>
 	  <homePageLink><?php echo $baseurl; ?></homePageLink>
 	  <apis>
-	    <api name="MetaWeblog" preferred="true" apiLink="<?php echo $xmlsrv_url; ?>xmlrpc.php"<?php
+	    <api name="WordPress" preferred="true" apiLink="<?php echo $xmlsrv_url; ?>xmlrpc.php"<?php
+	    	if( !empty($blog) ) { echo ' blogID="'.$blog.'"'; }
+	    	?>>
+				<settings>
+					<docs>https://codex.wordpress.org/XML-RPC_wp</docs>
+				</settings>
+			</api>
+	    <api name="MetaWeblog" preferred="false" apiLink="<?php echo $xmlsrv_url; ?>xmlrpc.php"<?php
 	    	if( !empty($blog) ) { echo ' blogID="'.$blog.'"'; }
 	    	?>>
 				<settings>
@@ -67,23 +74,8 @@ echo '<?xml version="1.0" encoding="UTF-8"?'.'>';
 
 /*
  * $Log$
- * Revision 1.6  2011/09/04 22:13:25  fplanque
- * copyright 2011
- *
- * Revision 1.5  2010/02/08 17:57:04  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.4  2009/03/08 23:58:15  fplanque
- * 2009
- *
- * Revision 1.3  2008/05/04 23:01:05  blueyed
- * fix fatal phpdoc errors
- *
- * Revision 1.2  2008/01/13 03:10:22  fplanque
- * Enhanced RSD
- *
- * Revision 1.1  2008/01/12 22:51:11  fplanque
- * RSD support
+ * Revision 1.8  2013/11/06 08:05:53  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

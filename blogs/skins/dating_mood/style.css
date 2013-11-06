@@ -1,9 +1,5 @@
 /* Designed by Francois PLANQUE - http://fplanque.net/ */
 
-@import url("../../rsc/css/basic.css");	/* Import basic styles */
-@import url("../../rsc/css/blog_base.css");	/* Default styles for the blog navigation */
-@import url("../../rsc/css/item_base.css");	/* Default styles for the post CONTENT */
-
 /*
  * Main page construct:
  */
@@ -14,7 +10,9 @@ body {
 	color: #fff;
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 84%;
-
+}
+textarea, input, select, option, optgroup, ul.ui-autocomplete, li.token-input-token-facebook, div.token-input-dropdown-facebook {
+	font: 13.43px Arial, Helvetica, sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -30,13 +28,16 @@ div.wrapper /* Main centered zone */
 div.outerwrap /* Main rounded content zone */
 {
 	margin: 2ex 0 1ex 0;
-	padding: 5px 0;
 }
 div.innerwrap /* Main white content zone */
 {
-	padding: 0;
+	padding: 5px 0;
 	border: 1px solid #fff; /* needed to force inner paddings */
 	background-color:#fff;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	-khtml-border-radius: 8px;
+	border-radius: 8px;
 }
 div.pageHeader /* Title zone */
 {
@@ -143,6 +144,8 @@ div.top_menu ul {
 div.top_menu li {
 	display: inline;
 	padding-right: 2ex;
+	white-space: nowrap;
+	float: left;
 }
 div.top_menu a {
 	color: #E600B1;
@@ -188,8 +191,12 @@ div.pageHeader h1 {
 div.bTitle {
 	clear: both;
 	margin: 1ex 1ex 0 1ex;
-	padding: 4px 0 3px 0;
+	padding: 5px 0 3px 0;
 	background-color:#D699DD;
+	-moz-border-radius-topleft: 6px; -moz-border-radius-topright: 6px;
+	-webkit-border-radius: 6px 6px 0 0;
+	-khtml-border-radius-topleft: 6px; -khtml-border-radius-topright: 6px;
+	border-radius: 6px 6px 0 0;
 }
 h3.bTitle {
 	margin: 0 1ex;
@@ -290,13 +297,11 @@ div.compact_search_form input.SearchField
 	border: 1px solid #EB34C0;
 	background-color: #F5EBF3;
 	padding: 2px;
-	margin: 0;
-	width: 163px;
+	margin: 0 3px 0 0;
+	width: 123px;
 }
 div.compact_search_form input.search_submit {
 	color: #EB34C0;
-	display:block;
-	width: 100px;
 	margin: 5px auto;
 }
 
@@ -363,4 +368,39 @@ form.bComment fieldset div.info
 {
 	padding-top: 0;
 	/* font-size: 84%; */
+}
+
+div.item_location {
+	margin: 1ex;
+}
+.item_custom_fields {
+	margin-left: 1ex;
+}
+
+/* jQuery Tokeninput plugin */
+div.input ul.token-input-list-facebook {
+	width: 345px;
+	background: #FFF;
+}
+div.token-input-dropdown-facebook {
+	color: #000 !important;
+}
+
+/* Not published comments display */
+#styled_content_block .bComment .status_draft,
+#styled_content_block .bComment .status_review,
+#styled_content_block .bComment .status_community,
+#styled_content_block .bComment .status_protected,
+#styled_content_block .bComment .status_private {
+	top: 0px;
+	left: 14px;
+}
+/* Not published posts display */
+#styled_content_block .bSmallHead .status_draft,
+#styled_content_block .bSmallHead .status_review,
+#styled_content_block .bSmallHead .status_community,
+#styled_content_block .bSmallHead .status_protected,
+#styled_content_block .bSmallHead .status_private {
+	top: -6px;
+	left: 6px;
 }

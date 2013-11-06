@@ -1,5 +1,7 @@
 <?php
 
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
 global $Blog, $htsrv_url, $current_User, $Session, $admin_url, $status_list;
 
 ?>
@@ -16,32 +18,34 @@ function isDefined( variable )
 function fadeIn( id, color )
 {
 	var bg_color = jQuery('#' + id).css( 'backgroundColor' );
-	jQuery('#' + id).animate({ backgroundColor: color }, 200).animate({ backgroundColor: bg_color }, 200);
+	jQuery('#' + id).animate({ backgroundColor: color }, 200);
+	return bg_color;
 }
 
 function fadeInStatus( id, status )
 {
 	switch(status)
 	{
+		
 		case 'published':
-			fadeIn(id, '#339900');
-			break;
+			return fadeIn( id, '#99EE44' );
+		case 'community':
+			return fadeIn( id, '#2E8BB9' );
+		case 'protected':
+			return fadeIn( id, '#FF9C2A' );
+		case 'review':
+			return fadeIn( id, '#CC0099' );
 		case 'deprecated':
-			fadeIn(id, '#656565');
-			break;
+			return fadeIn( id, '#656565' );
 		case 'deleted':
-			fadeIn(id, '#fcc');
-			break;
+			return fadeIn( id, '#fcc' );
 		case 'spam':
-			fadeIn(id, '#ffc9c9');
-			break;
+			return fadeIn( id, '#ffc9c9' );
 		case 'notsure':
-			fadeIn(id, '#bbbbbb');
-			break;
+			return fadeIn( id, '#bbbbbb' );
 		case 'ok':
-			fadeIn(id, '#bcffb5');
-			break;
-	};
+			return fadeIn( id, '#bcffb5' );
+	}
 }
 
 function delete_comment_url( comment_id )
@@ -49,11 +53,11 @@ function delete_comment_url( comment_id )
 	var divid = 'commenturl_' + comment_id;
 	fadeIn(divid, '#fcc');
 
-	$.ajax({
+	jQuery.ajax({
 		type: 'POST',
 		url: '<?php echo $htsrv_url; ?>async.php',
 		data: 'blogid=' + <?php echo $Blog->ID ?> + '&commentid=' + comment_id + '&action=delete_comment_url' + '&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
-		success: function(result) { $('#' + divid).remove(); }
+		success: function(result) { jQuery('#' + divid).remove(); }
 	});
 }
 
@@ -75,14 +79,16 @@ function setCommentStatus( id, status, redirect_to )
 	var statuses = get_show_statuses();
 	var currentpage = get_current_page();
 	var item_id = get_itemid();
+	var limit = get_limit();
 
-	$.ajax({
+	jQuery.ajax({
 	type: 'POST',
 	url: '<?php echo $htsrv_url; ?>async.php',
 	data:
 		{ 'blogid': <?php echo '\''.$Blog->ID.'\''; ?>,
 			'commentid': id,
 			'status': status,
+			'limit': limit,
 			'action': 'set_comment_status',
 			'moderation': 'commentlist',
 			'statuses': statuses,
@@ -94,18 +100,37 @@ function setCommentStatus( id, status, redirect_to )
 	success: function(result)
 		{
 			delete modifieds[divid];
-			$('#comments_container').html(result);
+			jQuery( '#comments_container' ).html( ajax_debug_clear( result ) );
+			jQuery( '.vote_spam' ).show();
 			show_modifieds();
 		}
 	});
 }
 
+// Display voting tool when JS is enable
+jQuery( 'document' ).ready( function() { jQuery( '.vote_spam' ).show(); } );
 // Set comments vote
 function setCommentVote( id, type, vote )
 {
-	fadeInStatus( 'c' + id, vote );
+	var color = fadeInStatus( 'c' + id, vote );
 
-	$.ajax({
+	var highlight_class = '';
+	switch(vote)
+	{
+		case 'spam':
+			highlight_class = 'roundbutton_red';
+			break;
+		case 'ok':
+			highlight_class = 'roundbutton_green';
+			break;
+	}
+
+	if( highlight_class != '' )
+	{
+		jQuery( '#vote_'+type+'_'+id ).find( 'a.roundbutton, span.roundbutton' ).addClass( highlight_class );
+	}
+
+	jQuery.ajax({
 	type: 'POST',
 	url: '<?php echo $htsrv_url; ?>anon_async.php',
 	data:
@@ -118,8 +143,9 @@ function setCommentVote( id, type, vote )
 		},
 	success: function(result)
 		{
-			$('#vote_'+type+'_'+id).after( result );
-			$('#vote_'+type+'_'+id).remove();
+			fadeIn( 'c' + id, color );
+			jQuery('#vote_'+type+'_'+id).after( ajax_debug_clear( result ) );
+			jQuery('#vote_'+type+'_'+id).remove();
 		}
 	});
 }
@@ -134,7 +160,7 @@ function deleteComment( commentIds )
 	for(var id in commentIds)
 	{
 		var divid = 'c' + commentIds[id];
-		if( $('#'+divid) != null )
+		if( jQuery('#'+divid) != null )
 		{
 			fadeIn(divid, '#fcc');
 			modifieds[divid] = 'deleted';
@@ -144,26 +170,37 @@ function deleteComment( commentIds )
 	var statuses = get_show_statuses();
 	var item_id = get_itemid();
 	var currentpage = get_current_page();
+	var limit = get_limit();
 
-	$.ajax({
+	jQuery.ajax({
 	type: 'POST',
 	url: '<?php echo $htsrv_url; ?>async.php',
 	data: 'action=get_opentrash_link&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
 	success: function(result)
 		{
-			jQuery('#recycle_bin').replaceWith( result );
+			jQuery('#recycle_bin').replaceWith( ajax_debug_clear( result ) );
 		}
 	});
 
-	$.ajax({
+	jQuery.ajax({
 	type: 'POST',
 	url: '<?php echo $htsrv_url; ?>async.php',
-	data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentIds=' + commentIds + '&action=delete_comments&itemid=' + item_id + '&statuses=' + statuses + '&currentpage=' + currentpage + '&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
+	data: 
+		{ 'blogid': '<?php echo $Blog->ID; ?>',
+			'commentIds': commentIds,
+			'action': 'delete_comments',
+			'itemid': item_id,
+			'statuses': statuses,
+			'currentpage': currentpage,
+			'limit': limit,
+			'crumb_comment': '<?php echo get_crumb('comment'); ?>',
+		},
 	success: function(result)
 		{
-			jQuery('#' + divid).effect('transfer', { to: $('#recycle_bin') }, 700, function() {
+			jQuery( '#' + divid ).effect( 'transfer', { to: jQuery( '#recycle_bin' ) }, 700, function() {
 				delete modifieds[divid];
-				$('#comments_container').html(result);
+				jQuery( '#comments_container' ).html( ajax_debug_clear( result ) );
+				jQuery( '.vote_spam' ).show();
 				show_modifieds();
 			});
 		}
@@ -208,7 +245,9 @@ function closeAntispamSettings()
 // Ban comment url
 function ban_url( authorurl )
 {
-	$.ajax({
+	<?php global $rsc_url; ?>
+	antispamSettings( '<img src="<?php echo $rsc_url; ?>img/ajax-loader2.gif" alt="<?php echo T_('Loading...'); ?>" title="<?php echo T_('Loading...'); ?>" style="display:block;margin:auto;position:absolute;top:0;bottom:0;left:0;right:0;" />' );
+	jQuery.ajax({
 		type: 'POST',
 		url: '<?php echo $admin_url; ?>',
 		data: 'ctrl=antispam&action=ban&display_mode=js&mode=iframe&request=checkban&keyword=' + authorurl +
@@ -225,7 +264,7 @@ function refresh_overlay()
 {
 	var parameters = jQuery( '#antispam_add' ).serialize();
 
-	$.ajax({
+	jQuery.ajax({
 		type: 'POST',
 		url: '<?php echo $admin_url; ?>',
 		data: 'action=ban&display_mode=js&mode=iframe&request=checkban&' + parameters,
@@ -252,43 +291,53 @@ function refreshAfterBan( deleted_ids )
 
 function startRefreshComments( item_id, currentpage )
 {
-	$('#comments_container').fadeTo( 'slow', 0.1, function() {
+	jQuery('#comments_container').fadeTo( 'slow', 0.1, function() {
 		refresh_item_comments( item_id, currentpage );
 	} );
 }
 
 function endRefreshComments( result )
 {
-	$('#comments_container').html(result);
-	$('#comments_container').fadeTo( "slow", 1 );
+	jQuery('#comments_container').html(result);
+	jQuery('#comments_container').fadeTo( "slow", 1 );
 }
 
 function get_current_page()
 {
-	if( ( isDefined( $('#currentpage') ) ) && isDefined( $('#currentpage').attr('value') ) )
+	if( ( isDefined( jQuery('#currentpage') ) ) && isDefined( jQuery('#currentpage').attr('value') ) )
 	{
-		return $('#currentpage').attr('value');
+		return jQuery('#currentpage').attr('value');
 	}
 	return 1;
 }
 
+function get_limit()
+{
+	var limit = jQuery( 'select[name$=_per_page]' );
+	if( ( isDefined( limit ) ) )
+	{
+		return limit.val();
+	}
+	return 0;
+}
+
 function get_show_statuses()
 {
-	if( $('#only_draft') && $('#only_draft').attr('checked') )
+	if( jQuery('#only_draft') && jQuery('#only_draft').attr('checked') )
 	{
 		return '(draft)';
 	}
-	else if( $('#only_published') && $('#only_published').attr('checked') )
+	else if( jQuery('#only_published') && jQuery('#only_published').attr('checked') )
 	{
 		return '(published)';
 	}
 
-	return '(draft,published,deprecated)';
+	return '(published,community,protected,private,review,draft,deprecated)';
 }
 
 function get_itemid()
 {
-	var item_id = $('#comments_container').attr('value');
+	var item_id = jQuery('#comments_container').attr('value');
 	if( ! isDefined( item_id) )
 	{
 		item_id = -1;
@@ -308,13 +357,13 @@ function refresh_item_comments( item_id, currentpage )
 	{ // show all comments
 		item_id = -1;
 	}
-	$.ajax({
+	jQuery.ajax({
 		type: 'POST',
 		url: '<?php echo $htsrv_url; ?>async.php',
 		data: 'blogid=' + <?php echo $Blog->ID; ?> + '&action=refresh_item_comments&itemid=' + item_id + '&statuses=' + statuses + '&currentpage=' + currentpage,
 		success: function(result)
 		{
-			endRefreshComments( result );
+			endRefreshComments( ajax_debug_clear( result ) );
 			show_modifieds();
 		}
 	});

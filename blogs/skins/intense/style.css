@@ -2,12 +2,6 @@
  * Original Design: sofaspud -- http://saltedsugar.com/
 */
 
-@import url(../../rsc/css/basic.css);	/* Import basic styles */
-@import url(../../rsc/css/img.css);	/* Import standard image styles */
-@import url(../../rsc/css/blog_elements.css);	/* Import standard blog elements styles */
-@import url(../../rsc/css/forms.css);	/* Import default form styles */
-@import url(../../rsc/css/comments.css);	/* Import default comment styles */
-
 body{
 	margin:0px;
 	padding:0px;
@@ -35,6 +29,9 @@ h2, h3{
 	font-size:1.8em;
 	color:#0a294f;
 	margin:8px 0;
+}
+h2.linked a{
+	color:#0a294f;
 }
 h4{
 	font-size:1.6em;
@@ -132,10 +129,18 @@ img{
 }
 
 /* rounded corners */
-.tl{background:#333 url(rsc/img/corners/tl.gif) no-repeat top left;}
-.tr{background:transparent url(rsc/img/corners/tr.gif) no-repeat top right;}
-.br{background:transparent url(rsc/img/corners/br.gif) no-repeat bottom right;}
-.bl{background:transparent url(rsc/img/corners/bl.gif) no-repeat bottom left;}
+.rounded{
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	-khtml-border-radius: 8px;
+	border-radius: 8px;
+}
+.rounded_bottom{
+	-moz-border-radius-bottomleft: 8px; -moz-border-radius-bottomright: 8px;
+	-webkit-border-radius: 0 0 8px 8px;
+	-khtml-border-radius-bottomleft: 8px; -khtml-border-radius-bottomright: 8px;
+	border-radius: 0 0 8px 8px;
+}
 
 /* forms */
 fieldset
@@ -173,16 +178,14 @@ form p{
 
 /* top section */
 #top{
-	background:url(rsc/img/contentbg.gif) repeat-y top center;
-}
-
-/* very bottom curve */
-#bottom{
-	background:url(rsc/img/container_b.gif) no-repeat bottom center;
-	height:9px;
-}
-* html #bottom{
-	margin-top:-4px;
+	background: #FFF;
+	border: 2px solid #DDD;
+	border-top: none;
+	-moz-border-radius-bottomleft: 8px; -moz-border-radius-bottomright: 8px;
+	-webkit-border-radius: 0 0 8px 8px;
+	-khtml-border-radius-bottomleft: 8px; -khtml-border-radius-bottomright: 8px;
+	border-radius: 0 0 8px 8px;
+	padding-bottom: 8px;
 }
 
 /* header */
@@ -383,7 +386,6 @@ content: "\00BB \0020";
 	color:#fff;
 	text-align:left;
 	clear:both;
-	background:#222;
 }
 .footer div{
 	height:50px;
@@ -423,4 +425,35 @@ textarea{
 #header, #content, #sidebar, #footer, .widget
 {
 	overflow:hidden;
+}
+
+div.input input, ul.ui-autocomplete {
+	font: 11px Verdana,Arial,Helvetica,sans-serif;
+}
+
+div.compact_search_form input.SearchField {
+	width: 140px;
+}
+
+/* jQuery Tokeninput plugin */
+div.input ul.token-input-list-facebook {
+	width: 285px;
+}
+
+/* Not published comments display */
+#styled_content_block .bComment .status_draft,
+#styled_content_block .bComment .status_review,
+#styled_content_block .bComment .status_community,
+#styled_content_block .bComment .status_protected,
+#styled_content_block .bComment .status_private {
+	top: 0px;
+	left: 11px;
+}
+/* Not published posts display */
+#styled_content_block .evo_post_head .status_draft,
+#styled_content_block .evo_post_head .status_review,
+#styled_content_block .evo_post_head .status_community,
+#styled_content_block .evo_post_head .status_protected,
+#styled_content_block .evo_post_head .status_private {
+	top: -3px;
 }

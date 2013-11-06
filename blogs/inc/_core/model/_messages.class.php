@@ -9,7 +9,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -104,7 +104,10 @@ class Messages
 		$this->messages_text[$this->count] = $text;
 		$this->messages_type[$this->count] = $type;
 		$this->count++;
-		$this->has_errors = ( $type == 'error' );
+		if( !$this->has_errors )
+		{
+			$this->has_errors = ( $type == 'error' );
+		}
 	}
 
 
@@ -120,7 +123,10 @@ class Messages
 		{
 			$this->messages_text[] = $p_Messages->messages_text[$i];
 			$this->messages_type[] = $p_Messages->messages_type[$i];
-			$this->has_errors = ( $p_Messages->messages_type[$i] == 'error' );
+			if( !$this->has_errors )
+			{
+				$this->has_errors = ( $p_Messages->messages_type[$i] == 'error' );
+			}
 		}
 	}
 
@@ -288,72 +294,8 @@ class Messages
 
 /*
  * $Log$
- * Revision 1.5  2011/09/04 22:13:13  fplanque
- * copyright 2011
+ * Revision 1.7  2013/11/06 08:03:47  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.4  2010/11/26 12:49:11  efy-asimo
- * Messages class - fix
- *
- * Revision 1.3  2010/11/25 15:16:34  efy-asimo
- * refactor $Messages
- *
- * Revision 1.2  2010/02/08 17:51:48  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.1  2009/11/30 00:22:04  fplanque
- * clean up debug info
- * show more timers in view of block caching
- *
- * Revision 1.9  2009/09/02 20:17:50  blueyed
- * Log: Drop li.clear workaround for Konqueror, where it has been fixed.
- *
- * Revision 1.8  2009/03/08 23:57:40  fplanque
- * 2009
- *
- * Revision 1.7  2009/02/23 20:18:00  blueyed
- * Log_noop: add constructor as no-op, too. Make the 'do-nothing' funcs take less lines.
- *
- * Revision 1.6  2009/02/22 18:09:40  blueyed
- * TODO
- *
- * Revision 1.5  2008/11/07 23:20:10  tblue246
- * debug_info() now supports plain text output for the CLI.
- *
- * Revision 1.4  2008/01/21 09:35:24  fplanque
- * (c) 2008
- *
- * Revision 1.3  2008/01/19 10:57:11  fplanque
- * Splitting XHTML checking by group and interface
- *
- * Revision 1.2  2007/09/23 18:55:17  fplanque
- * attempting to debloat. The Log class is insane.
- *
- * Revision 1.1  2007/06/25 10:58:55  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.19  2007/06/19 23:22:28  blueyed
- * doc fixes
- *
- * Revision 1.18  2007/06/16 19:20:38  blueyed
- * doc/question
- *
- * Revision 1.17  2007/05/07 18:03:28  fplanque
- * cleaned up skin code a little
- *
- * Revision 1.16  2007/04/26 00:11:08  fplanque
- * (c) 2007
- *
- * Revision 1.15  2007/01/13 22:28:12  fplanque
- * doc
- *
- * Revision 1.14  2006/12/07 23:13:13  fplanque
- * @var needs to have only one argument: the variable type
- * Otherwise, I can't code!
- *
- * Revision 1.13  2006/11/30 00:28:13  blueyed
- * Interface fixes for Log_noop
- *
- * Revision 1.12  2006/11/24 18:27:27  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

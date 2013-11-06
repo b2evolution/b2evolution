@@ -3,7 +3,7 @@
  * This file is part of b2evolution - {@link http://b2evolution.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -72,7 +72,12 @@ function get_affected_paths( $path )
 	}
 	elseif( $path == '*' )
 	{
-		$affected_paths .= implode( ', ', get_filenames( $basepath, false, true, true, false, true ) );
+		$filename_params = array(
+				'inc_files'	=> false,
+				'recurse'	=> false,
+				'basename'	=> true,
+			);
+		$affected_paths .= implode( ', ', get_filenames( $basepath, $filename_params ) );
 	}
 	else
 	{
@@ -170,39 +175,8 @@ $Form->end_form( array( array( 'submit', 'actionArray[backup]', T_('Backup'), 'S
 
 /*
  * $Log$
- * Revision 1.12  2010/07/26 06:52:16  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.11  2010/02/26 22:15:52  fplanque
- * whitespace/doc/minor
- *
- * Revision 1.9  2010/02/04 19:32:38  blueyed
- * trans fixes
- *
- * Revision 1.8  2010/01/30 18:55:32  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.7  2010/01/17 16:15:24  sam2kb
- * Localization clean-up
- *
- * Revision 1.6  2010/01/16 14:27:04  efy-yury
- * crumbs, fadeouts, redirect, action_icon
- *
- * Revision 1.5  2009/11/18 21:54:25  efy-maxim
- * compatibility fix for PHP4
- *
- * Revision 1.4  2009/10/21 14:27:39  efy-maxim
- * upgrade
- *
- * Revision 1.3  2009/10/20 14:38:55  efy-maxim
- * maintenance modulde: downloading - unpacking - verifying destination files - backing up - copying new files - upgrade database using regular script (Warning: it is very unstable version! Please, don't use maintenance modulde, because it can affect your data )
- *
- * Revision 1.2  2009/10/19 12:21:05  efy-maxim
- * system ZipArchive
- *
- * Revision 1.1  2009/10/18 20:15:51  efy-maxim
- * 1. backup, upgrade have been moved to maintenance module
- * 2. maintenance module permissions
+ * Revision 1.14  2013/11/06 08:04:25  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

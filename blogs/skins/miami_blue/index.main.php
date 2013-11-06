@@ -150,6 +150,7 @@ skin_include( '_html_header.inc.php' );
 		// Display message if no post:
 		display_if_empty();
 
+		echo '<div id="styled_content_block">'; // Beginning of posts display
 		while( $Item = & mainlist_get_item() )
 		{	// For each blog post:
 			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
@@ -159,6 +160,7 @@ skin_include( '_html_header.inc.php' );
 				) );
 			// ----------------------------END ITEM BLOCK  ----------------------------
 		} // ---------------------------------- END OF POSTS ------------------------------------
+		echo '</div>'; // End of posts display
 
 	?>
 

@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -39,7 +39,25 @@ global $dispatcher;
 global $usedgroups;	// We need this in a callback below
 $usedgroups = $DB->get_col( 'SELECT ufgp_ID
 			FROM T_users__fieldgroups INNER JOIN T_users__fielddefs ON ufdf_ufgp_ID = ufgp_ID
-			GROUP BY ufgp_ID');
+			GROUP BY ufgp_ID' );
+
+// Get IDs of userfields that first/last in the own group, to hide action icon "move up/down"
+global $userfields_group_sides;
+$userfields_group_sides = array();
+$userfields_group_sides['first'] = $DB->get_col( 'SELECT ufdf_ID
+			FROM T_users__fielddefs f1
+			WHERE ufdf_order = 
+					( SELECT MIN(f2.ufdf_order)
+						FROM T_users__fielddefs f2
+						WHERE f2.ufdf_ufgp_ID = f1.ufdf_ufgp_ID )
+			GROUP BY ufdf_ufgp_ID' );
+$userfields_group_sides['last'] = $DB->get_col( 'SELECT ufdf_ID
+			FROM T_users__fielddefs f1
+			WHERE ufdf_order = 
+					( SELECT MAX(f2.ufdf_order)
+						FROM T_users__fielddefs f2
+						WHERE f2.ufdf_ufgp_ID = f1.ufdf_ufgp_ID )
+			GROUP BY ufdf_ufgp_ID' );
 
 // Get params from request
 $s = param( 's', 'string', '', true );
@@ -68,7 +86,7 @@ if( $where_clause != '' )
 	$SQL->WHERE_and( $where_clause );
 }
 $SQL->GROUP_BY( 'ufdf_ID, ufgp_ID' );
-$SQL->ORDER_BY( 'ufgp_ID, *' );
+$SQL->ORDER_BY( 'ufgp_order, ufgp_name, ufdf_order' );
 
 $count_sql = 'SELECT COUNT(*)
 							  FROM T_users__fielddefs';
@@ -125,85 +143,130 @@ $Results->ID_col = 'ufdf_ID';
 /*
  * Group columns:
  */
+$group_td_colspan = $current_User->check_perm( 'users', 'edit', false ) ? -2 : 0;
 $Results->grp_cols[] = array(
-						'td_colspan' => -1,  // nb_colds - 1
+						'td_colspan' => $group_td_colspan,
 						'td' => '<a href="?ctrl=userfieldsgroups&amp;action=edit&amp;ufgp_ID=$ufgp_ID$">$ufgp_name$</a>',
 					);
+if( $current_User->check_perm( 'users', 'edit', false ) )
+{	// We have permission to modify:
+	$Results->grp_cols[] = array(
+							'td' => '$ufgp_order$',
+							'td_class' => 'center',
+						);
 
-function grp_actions( & $row )
-{
-	global $usedgroups, $current_User;
-
-	$r = '';
-	if( $current_User->check_perm( 'users', 'edit', false ) )
+	function grp_actions( & $row )
 	{
-		$r = action_icon( T_('Edit this group...'), 'edit', regenerate_url( 'ctrl,action', 'ctrl=userfieldsgroups&amp;action=edit&amp;ufgp_ID='.$row->ufgp_ID ) );
-	
-		$r .= action_icon( T_('Duplicate this group...'), 'copy', regenerate_url( 'ctrl,action', 'ctrl=userfieldsgroups&amp;action=new&amp;ufgp_ID='.$row->ufgp_ID ) );
-	
-		if( !in_array( $row->ufgp_ID, $usedgroups ) )
-		{ // delete
-			$r .= action_icon( T_('Delete this group!'), 'delete', regenerate_url( 'ctrl,action', 'ctrl=userfieldsgroups&amp;action=delete&amp;ufgp_ID='.$row->ufgp_ID.'&amp;'.url_crumb('userfieldgroup') ) );
-		}
-		else
+		global $usedgroups, $current_User;
+
+		$r = '';
+		if( $current_User->check_perm( 'users', 'edit', false ) )
 		{
-			$r .= get_icon( 'delete', 'noimg' );
+			$r = action_icon( T_('Edit this group...'), 'edit', regenerate_url( 'ctrl,action', 'ctrl=userfieldsgroups&amp;action=edit&amp;ufgp_ID='.$row->ufgp_ID ) )
+					.action_icon( T_('Duplicate this group...'), 'copy', regenerate_url( 'ctrl,action', 'ctrl=userfieldsgroups&amp;action=new&amp;ufgp_ID='.$row->ufgp_ID ) );
+		
+			if( !in_array( $row->ufgp_ID, $usedgroups ) )
+			{ // delete
+				$r .= action_icon( T_('Delete this group!'), 'delete', regenerate_url( 'ctrl,action', 'ctrl=userfieldsgroups&amp;action=delete&amp;ufgp_ID='.$row->ufgp_ID.'&amp;'.url_crumb('userfieldgroup') ) );
+			}
+			else
+			{
+				$r .= get_icon( 'delete', 'noimg' );
+			}
 		}
+		return $r;
 	}
-	return $r;
+	$Results->grp_cols[] = array(
+							'td_class' => 'shrinkwrap',
+							'td' => '%grp_actions( {row} )%',
+						);
 }
-$Results->grp_cols[] = array(
-						'td_class' => 'shrinkwrap',
-						'td' => '%grp_actions( {row} )%',
-					);
 
 
 /*
  * Data columns:
  */
 $Results->cols[] = array(
-		'th' => T_('ID'),
-		'order' => 'ufdf_ID',
-		'td_class' => 'center',
-		'td' => '$ufdf_ID$',
+		'th' => T_('Name'),
+		'td' => '<a href="%regenerate_url( \'action\', \'ufdf_ID=$ufdf_ID$&amp;action=edit\' )%"><strong>%T_(#ufdf_name#)%</strong></a>',
 	);
 
 $Results->cols[] = array(
 	'th' => T_('Type'),
-	'order' => 'ufdf_type',
 	'td' => '%T_(#ufdf_type#)%',
 );
 
 $Results->cols[] = array(
-		'th' => T_('Name'),
-		'order' => 'ufdf_name',
-		'td' => '<a href="%regenerate_url( \'action\', \'ufdf_ID=$ufdf_ID$&amp;action=edit\' )%">%T_(#ufdf_name#)%</a>',
-	);
-
-$Results->cols[] = array(
 		'th' => T_('Required?'),
-		'order' => 'ufdf_required',
 		'td' => '%get_userfield_required( #ufdf_required# )%',
 		'td_class' => 'center',
 	);
 
+$Results->cols[] = array(
+		'th' => T_('Multiple values'),
+		'td' => '$ufdf_duplicated$',
+		'td_class' => 'center',
+	);
+
 if( $current_User->check_perm( 'users', 'edit', false ) )
-{ // We have permission to modify:
+{	// We have permission to modify:
+	function order_actions( & $row )
+	{
+		global $userfields_group_sides;
+
+		$r = '';
+
+		if( in_array( $row->ufdf_ID, $userfields_group_sides['first'] ) )
+		{	// First record, no change ordering, print blank icon
+			$r .= get_icon( 'move_down', 'noimg' );
+		}
+		else
+		{
+			$r .= action_icon( T_('Move up'), 'move_up',
+					regenerate_url( 'ctrl,action', 'ctrl=userfields&amp;ufdf_ID='.$row->ufdf_ID.'&amp;action=move_up&amp;'.url_crumb('userfield') ) );
+		}
+
+		if( in_array( $row->ufdf_ID, $userfields_group_sides['last'] ) )
+		{	// Last record, no change ordering, print blank icon
+			$r .= get_icon( 'move_down', 'noimg' );
+		}
+		else
+		{
+			$r .= action_icon( T_('Move down'), 'move_down',
+					regenerate_url( 'ctrl,action', 'ctrl=userfields&amp;ufdf_ID='.$row->ufdf_ID.'&amp;action=move_down&amp;'.url_crumb('userfield') ) );
+		}
+
+		return $r;
+	}
+
+	$Results->cols[] = array(
+			'th' => T_('Order'),
+			'td' => '%order_actions( {row} )%',
+			'td_class' => 'shrinkwrap',
+		);
+
+	function fld_actions( & $row )
+	{
+		$r = action_icon( T_('Edit this user field...'), 'edit',
+					regenerate_url( 'ctrl,action', 'ctrl=userfields&amp;ufdf_ID='.$row->ufdf_ID.'&amp;action=edit') )
+				.action_icon( T_('Duplicate this user field...'), 'copy',
+					regenerate_url( 'ctrl,action', 'ctrl=userfields&amp;ufdf_ID='.$row->ufdf_ID.'&amp;action=new') )
+				.action_icon( T_('Delete this user field!'), 'delete',
+					regenerate_url( 'ctrl,action', 'ctrl=userfields&amp;ufdf_ID='.$row->ufdf_ID.'&amp;action=delete&amp;'.url_crumb('userfield') ) );
+
+		return $r;
+	}
+
 	$Results->cols[] = array(
 							'th' => T_('Actions'),
-							'th_class' => 'shrinkwrap',
-							'td' => action_icon( T_('Edit this user field...'), 'edit',
-										'%regenerate_url( \'action\', \'ufdf_ID=$ufdf_ID$&amp;action=edit\')%' )
-									.action_icon( T_('Duplicate this user field...'), 'copy',
-										'%regenerate_url( \'action\', \'ufdf_ID=$ufdf_ID$&amp;action=new\')%' )
-									.action_icon( T_('Delete this user field!'), 'delete',
-										'%regenerate_url( \'action\', \'ufdf_ID=$ufdf_ID$&amp;action=delete&amp;'.url_crumb('userfield').'\')%' ),
+							'td_class' => 'shrinkwrap',
+							'td' => '%fld_actions( {row} )%',
 						);
 
 	$Results->global_icon( T_('Create a new user field...'), 'new',
 				'?ctrl=userfields&action=new', T_('New user field').' &raquo;', 3, 4 );
-	$Results->global_icon( T_('Create a new group for user fields...'), 'new',
-				'?ctrl=userfieldsgroups&action=new', T_('New group for user fields').' &raquo;', 3, 4 );
+	$Results->global_icon( T_('Create a new user field group...'), 'new',
+				'?ctrl=userfieldsgroups&action=new', T_('New user field group').' &raquo;', 3, 4 );
 }
 
 
@@ -212,42 +275,8 @@ $Results->display();
 
 /*
  * $Log$
- * Revision 1.18  2011/10/24 18:32:35  efy-yurybakh
- * Groups for user fields
- *
- * Revision 1.17  2011/10/20 17:22:21  efy-yurybakh
- * clickable Names on ?ctrl=userfields
- *
- * Revision 1.16  2011/09/27 17:31:19  efy-yurybakh
- * User additional info fields
- *
- * Revision 1.15  2011/09/11 00:04:45  fplanque
- * doc
- *
- * Revision 1.14  2011/09/10 22:48:41  fplanque
- * doc
- *
- * Revision 1.13  2011/08/29 08:51:14  efy-james
- * Default / mandatory additional fields
- *
- * Revision 1.12  2010/05/07 08:07:14  efy-asimo
- * Permissions check update (User tab, Global Settings tab) - bugfix
- *
- * Revision 1.11  2010/02/26 22:15:48  fplanque
- * whitespace/doc/minor
- *
- * Revision 1.9  2010/01/03 13:10:57  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.8  2009/09/20 00:27:08  fplanque
- * cleanup/doc/simplified
- *
- * Revision 1.6  2009/09/16 18:22:57  fplanque
- * Readded with -kkv option
- *
- * Revision 1.1  2009/09/11 18:34:05  fplanque
- * userfields editing module.
- * needs further cleanup but I think it works.
+ * Revision 1.20  2013/11/06 08:05:04  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

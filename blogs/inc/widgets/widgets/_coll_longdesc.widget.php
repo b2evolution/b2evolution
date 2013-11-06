@@ -1,11 +1,11 @@
 <?php
 /**
- * This file implements the xyz Widget class.
+ * This file implements the Long description Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -125,48 +125,8 @@ class coll_longdesc_Widget extends ComponentWidget
 
 /*
  * $Log$
- * Revision 1.13  2011/09/04 22:13:21  fplanque
- * copyright 2011
- *
- * Revision 1.12  2010/02/08 17:54:48  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.11  2009/09/14 13:54:13  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.10  2009/09/12 11:03:13  efy-arrin
- * Included the ClassName in the loadclass() with proper UpperCase
- *
- * Revision 1.9  2009/09/10 13:44:57  tblue246
- * Translation fixes/update
- *
- * Revision 1.8  2009/03/14 15:27:01  blueyed
- * coll_longdesc_Widget: do not add hardcoded P tags around the long desc, which can be html itself
- *
- * Revision 1.7  2009/03/13 02:32:07  fplanque
- * Cleaned up widgets.
- * Removed stupid widget_name param.
- *
- * Revision 1.6  2009/03/08 23:57:46  fplanque
- * 2009
- *
- * Revision 1.5  2008/05/06 23:35:47  fplanque
- * The correct way to add linebreaks to widgets is to add them to $disp_params when the container is called, right after the array_merge with defaults.
- *
- * Revision 1.3  2008/01/21 09:35:37  fplanque
- * (c) 2008
- *
- * Revision 1.2  2007/12/23 17:47:59  fplanque
- * fixes
- *
- * Revision 1.1  2007/06/25 11:02:13  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.2  2007/06/20 21:42:13  fplanque
- * implemented working widget/plugin params
- *
- * Revision 1.1  2007/06/18 21:25:47  fplanque
- * one class per core widget
+ * Revision 1.14  2013/11/06 08:05:09  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

@@ -8,7 +8,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -33,12 +33,6 @@
  *
  * @package evocore
  *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois PLANQUE
- * @author blueyed: Daniel HAHLER
- * @author mfollett: Matt FOLLETT
- * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
- *
  * @version $Id$
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
@@ -57,28 +51,38 @@ if( !isset($login_required) )
 {
 	$login_required = false;
 }
+if( !isset($validate_required) )
+{
+	$validate_required = param( 'validate_required', 'boolean', false );
+}
 
 global $login_error;
+/**
+ * Login error message
+ * @global string
+ */
+$login_error = '';
 
 $login = NULL;
 $pass = NULL;
 $pass_md5 = NULL;
+$email_login = false;
 
-if( isset($_POST['login'] ) && isset($_POST['pwd'] ) )
+if( isset($_POST[ $dummy_fields[ 'login' ] ] ) && isset($_POST[ $dummy_fields[ 'pwd' ] ] ) )
 { // Trying to log in with a POST
-	$login = $_POST['login'];
-	$pass = $_POST['pwd'];
-	unset($_POST['pwd']); // password will be hashed below
+	$login = $_POST[ $dummy_fields[ 'login' ] ];
+	$pass = $_POST[ $dummy_fields[ 'pwd' ] ];
+	unset($_POST[ $dummy_fields[ 'pwd' ] ]); // password will be hashed below
 }
-elseif( isset($_GET['login'] ) )
+elseif( isset($_GET[ $dummy_fields[ 'login' ] ] ) )
 { // Trying to log in with a GET; we might only provide a user here.
-	$login = $_GET['login'];
-	$pass = isset($_GET['pwd']) ? $_GET['pwd'] : '';
-	unset($_GET['pwd']); // password will be hashed below
+	$login = $_GET[ $dummy_fields[ 'login' ] ];
+	$pass = isset($_GET[ $dummy_fields[ 'pwd' ] ]) ? $_GET[ $dummy_fields[ 'pwd' ] ] : '';
+	unset($_GET[ $dummy_fields[ 'pwd' ] ]); // password will be hashed below
 }
 
-$Debuglog->add( 'Login: login: '.var_export($login, true), 'request' );
-$Debuglog->add( 'Login: pass: '.( empty($pass) ? '' : 'not' ).' empty', 'request' );
+$Debuglog->add( 'Login: login: '.var_export($login, true), '_init_login' );
+$Debuglog->add( 'Login: pass: '.( empty($pass) ? '' : 'not' ).' empty', '_init_login' );
 
 // either 'login' (normal) or 'redirect_to_backoffice' may be set here. This also helps to display the login form again, if either login or pass were empty.
 $login_action = param_arrayindex( 'login_action' );
@@ -87,7 +91,15 @@ $UserCache = & get_UserCache();
 
 if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 { // User is trying to login right now
-	$Debuglog->add( 'Login: User is trying to log in.', 'request' );
+
+	// Stop a request from the blocked IP addresses
+	antispam_block_ip();
+
+	global $action;
+	// Set $action so it can be recorded in the hitlog:
+	$action = 'login';
+
+	$Debuglog->add( 'Login: User is trying to log in.', '_init_login' );
 
 	header_nocache();		// Don't take risks here :p
 
@@ -95,7 +107,8 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 	$Session->assert_received_crumb( 'loginform' );
 	// fp> NOTE: TODO: now that we require goign through the login form, all the login logic that is here can probably be moved to login.php ?
 
-	// Note: login and password cannot include '<' !
+	// Note: login and password cannot include ' or " or > or <
+	// Note: login cannot include @
 	$login = evo_strtolower(strip_tags(remove_magic_quotes($login)));
 	$pass = strip_tags(remove_magic_quotes($pass));
 	$pass_md5 = md5( $pass );
@@ -108,7 +121,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 	param('pwd_salt', 'string', ''); // just for comparison with the one from Session
 	$pwd_salt_sess = $Session->get('core.pwd_salt');
 
-	// $Debuglog->add( 'Login: salt: '.var_export($pwd_salt, true).', session salt: '.var_export($pwd_salt_sess, true) );
+	// $Debuglog->add( 'Login: salt: '.var_export($pwd_salt, true).', session salt: '.var_export($pwd_salt_sess, true), '_init_login' );
 
 	$transmit_hashed_password = (bool)$Settings->get('js_passwd_hashing') && !(bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
 	if( $transmit_hashed_password )
@@ -120,7 +133,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 		$pwd_hashed = '';
 	}
 
-	// $Debuglog->add( 'Login: pwd_hashed: '.var_export($pwd_hashed, true).', pass: '.var_export($pass, true) );
+	// $Debuglog->add( 'Login: pwd_hashed: '.var_export($pwd_hashed, true).', pass: '.var_export($pass, true), '_init_login' );
 
 	$pass_ok = false;
 	// Trigger Plugin event, which could create the user, according to another database:
@@ -143,64 +156,101 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 	}
 	else
 	{ // Check login and password
-
-		// Make sure that we can load the user:
-		$User = & $UserCache->get_by_login($login);
+		if( is_email( $login ) )
+		{ // we have an email address instead of login name
+			// get user by email and password
+			list( $User, $exists_more ) = $UserCache->get_by_emailAndPwd( $login, $pass_md5, $pwd_hashed, $pwd_salt );
+			if( $User )
+			{ // user was found
+				$email_login = $User->get( 'login' );
+			}
+		}
+		elseif( param_check_valid_login( $dummy_fields[ 'login' ] ) )
+		{ // Make sure that we can load the user:
+			$User = & $UserCache->get_by_login($login);
+		}
+		else
+		{
+			$User = false;
+		}
 
 		if( $User && ! $pass_ok )
 		{ // check the password, if no plugin has said "it's ok":
 			if( ! empty($pwd_hashed) )
 			{ // password hashed by JavaScript:
 
-				$Debuglog->add( 'Login: Hashed password available.', 'request' );
+				$Debuglog->add( 'Login: Hashed password available.', '_init_login' );
 
 				if( empty($pwd_salt_sess) )
 				{ // no salt stored in session: either cookie problem or the user had already tried logging in (from another window for example)
-					$Debuglog->add( 'Login: Empty salt_sess!', 'request' );
+					$Debuglog->add( 'Login: Empty salt_sess!', '_init_login' );
 					if( ($pos = strpos( $pass, '_hashed_' ) ) && substr($pass, $pos+8) == $Session->ID )
 					{ // session ID matches, no cookie problem
-						$login_error = NT_('The login window has expired. Please try again.');
-						$Debuglog->add( 'Login: Session ID matches.', 'request' );
+						$login_error = T_('The login window has expired. Please try again.');
+						$Debuglog->add( 'Login: Session ID matches.', '_init_login' );
 					}
 					else
 					{ // more general error:
-						$login_error = NT_('Either you have not enabled cookies or this login window has expired.');
-						$Debuglog->add( 'Login: Session ID does not match.', 'request' );
+						$login_error = T_('Either you have not enabled cookies or this login window has expired.');
+						$Debuglog->add( 'Login: Session ID does not match.', '_init_login' );
 					}
 				}
 				elseif( $pwd_salt != $pwd_salt_sess )
 				{ // submitted salt differs from the one stored in the session
-					$login_error = NT_('The login window has expired. Please try again.');
-					$Debuglog->add( 'Login: Submitted salt and salt from Session do not match.', 'request' );
+					$login_error = T_('The login window has expired. Please try again.');
+					$Debuglog->add( 'Login: Submitted salt and salt from Session do not match.', '_init_login' );
 				}
 				else
 				{ // compare the password, using the salt stored in the Session:
 					#pre_dump( sha1($User->pass.$pwd_salt), $pwd_hashed );
 					$pass_ok = sha1($User->pass.$pwd_salt) == $pwd_hashed;
 					$Session->delete('core.pwd_salt');
-					$Debuglog->add( 'Login: Compared hashed passwords. Result: '.(int)$pass_ok, 'request' );
+					$Debuglog->add( 'Login: Compared hashed passwords. Result: '.(int)$pass_ok, '_init_login' );
 				}
 			}
 			else
 			{
 				$pass_ok = ( $User->pass == $pass_md5 );
-				$Debuglog->add( 'Login: Compared raw passwords. Result: '.(int)$pass_ok, 'request' );
+				$Debuglog->add( 'Login: Compared raw passwords. Result: '.(int)$pass_ok, '_init_login' );
 			}
 		}
 	}
 
 	if( $pass_ok )
 	{ // Login succeeded, set cookies
-		$Debuglog->add( 'Login: User successfully logged in with username and password...', 'login');
+		$Debuglog->add( 'Login: User successfully logged in with username and password...', '_init_login');
 		// set the user from the login that succeeded
+		if( $email_login )
+		{
+			$login = $email_login;
+		}
 		$current_User = & $UserCache->get_by_login($login);
-		// save the user for later hits
-		$Session->set_User( $current_User );
+		// check and don't login if the current user account was closed
+		if( $current_User->check_status( 'is_closed' ) )
+		{ // user account was closed
+			unset( $current_User );
+			$login_error = T_('This account is closed. You cannot log in.');
+		}
+		elseif( $Settings->get('system_lock') && !$current_User->check_perm( 'users', 'edit' ) )
+		{ // System is locked for maintenance and current user has no permission to log in this mode
+			unset( $current_User );
+			$login_error = T_('You cannot log in at this time because the system is under maintenance. Please try again in a few moments.');
+		}
+		else
+		{ // save the user for later hits
+			$Session->set_User( $current_User );
+
+			if( $Settings->get('system_lock') && $current_User->check_perm( 'users', 'edit' ) )
+			{ // System is locked for maintenance but current user has permission to log in, Display a message about this mode
+				$system_lock_url = ' href="'.$admin_url.'?ctrl=gensettings"';
+				$Messages->add( sprintf( T_('The site is currently locked for maintenance. Click <a %s>here</a> to access lock settings.'), $system_lock_url ), 'warning' );
+			}
+		}
 	}
 	elseif( empty( $login_error ) )
 	{ // if the login_error wasn't set yet, add the default one:
 		// This will cause the login screen to "popup" (again)
-		$login_error = NT_('Wrong login/password.');
+		$login_error = T_('Wrong login/password.');
 	}
 
 }
@@ -213,7 +263,26 @@ elseif( $Session->has_User() /* logged in */
 	// get the user ID from the session and set up the user again
 	$current_User = & $UserCache->get_by_ID( $Session->user_ID );
 
-	$Debuglog->add( 'Login: Was already logged in... ['.$current_User->get('login').']', 'request' );
+	if( $Settings->get('system_lock') )
+	{ // System is locked for maintenance
+		if( $current_User->check_perm( 'users', 'edit' ) )
+		{ // Current user is a "super admin"
+			if( ! $Messages->count() )
+			{ // If there are no other messages yet, display a warning about the system lock
+				$system_lock_url = ' href="'.$admin_url.'?ctrl=gensettings"';
+				$Messages->add( sprintf( T_('The site is currently locked for maintenance. Click <a %s>here</a> to access lock settings.'), $system_lock_url ), 'warning' );
+			}
+		}
+		else
+		{ // Current user has no permission to be logged in on this mode, we must logout it
+			logout();
+			$login_error = T_('You have been logged out because the system is under maintenance. Please log in again in a few moments.');
+		}
+	}
+	else
+	{
+		$Debuglog->add( 'Login: Was already logged in... ['.$current_User->get('login').']', '_init_login' );
+	}
 }
 else
 { // The Session has no user or $login is given (and differs from current user), allow alternate authentication through Plugin:
@@ -221,44 +290,37 @@ else
 	    && $Session->has_User()  # the plugin should have attached the user to $Session
 	)
 	{
-		$Debuglog->add( 'Login: User has been authenticated through plugin #'.$event_return['plugin_ID'].' (AlternateAuthentication)', 'request' );
+		$Debuglog->add( 'Login: User has been authenticated through plugin #'.$event_return['plugin_ID'].' (AlternateAuthentication)', '_init_login' );
 		$current_User = & $UserCache->get_by_ID( $Session->user_ID );
 	}
 	elseif( $login_required )
-	{ /*
+	{	/*
 		 * ---------------------------------------------------------
 		 * User was not logged in at all, but login is required
 		 * ---------------------------------------------------------
 		 */
 		// echo ' NOT logged in...';
-		$Debuglog->add( 'Login: NOT logged in... (did not try)', 'request' );
+		$Debuglog->add( 'Login: NOT logged in... (did not try)', '_init_login' );
 
-		$login_error = NT_('You must log in!');
-		if( $Messages->has_errors() )
-		{
-			$login_error .= '<br />'.$Messages->get_string( '', '', 'error' );
-		}
+		$login_error = T_('You must log in!');
 	}
 }
 unset($pass);
 
-
+$action = param( 'action', 'string', NULL );
 // Check if the user needs to be validated, but is not yet:
-// TODO: dh> this block prevents registration, if you are logged in already, but not validated!
-//       (e.g. when registered as "foo", you cannot register as "bar" until you logout (but there's no link in sight)
-//        or validate the "foo" account)
-if( ! empty($current_User)
-		&& ! $current_User->validated
-		&& $Settings->get('newusers_mustvalidate') // same check as in login.php
-		&& param('action', 'string', '') != 'logout' ) // fp> TODO: non validated users should be automatically logged out
-{ // efy-asimo> It's not a good idea to automatically log out the user, because needs to send a validation email.
-	if( $action != 'req_validatemail' && $action != 'validatemail' )
-	{ // we're not in that action already:
-		$action = 'req_validatemail'; // for login.php
-		$login_error = NT_('You must validate your email address before you can continue as a logged in user.');
+if( check_user_status( 'can_be_validated' ) // user is logged in but not validated and validation is required
+	&& $action != 'logout'
+	&& $action != 'req_validatemail' && $action != 'validatemail' && $validate_required )
+{ // we're not in that action already:
+	$action = 'req_validatemail'; // for login.php
+	if( $is_admin_page )
+	{
+		$login_error = T_('In order to access the admin interface, you must first activate your account by clicking on the activation link in the email we sent you. <b>See below:</b>');
 	}
 }
-else
+// asimo> If login action is not empty and there was no login error, and action is not logut the we must log in
+if( !empty($login_action) && empty( $login_error ) && ( $action != 'logout' ) )
 { // Trigger plugin event that allows the plugins to re-act on the login event:
 	// TODO: dh> these events should provide a flag "login_attempt_failed".
 	if( empty($current_User) )
@@ -277,7 +339,18 @@ else
 			}
 			else
 			{
-				param( 'redirect_to', 'string', $baseurl );
+				$redirect_to = param( 'redirect_to', 'string', $baseurl );
+				if( preg_match( '#/login.php([&?].*)?$#', $redirect_to ) ||
+					preg_match( '#/register.php([&?].*)?$#', $redirect_to ) ||
+					preg_match( '#disp=(login|register)#', $redirect_to ) )
+				{ // avoid redirect back to login/register screen. This shouldn't occur.
+					$redirect_to = $baseurl;
+				}
+			}
+
+			if( $email_login )
+			{
+				$Messages->add( sprintf( T_( 'You are now logged in as <b>%s</b>' ), $login ), ( $exists_more ? 'error' : 'success' ) );
 			}
 
 			header_redirect( $redirect_to );
@@ -287,43 +360,65 @@ else
 }
 
 if( ! empty( $login_error ) )
-{
+{	// ----- LOGIN FAILED -----
+	$Debuglog->add( 'Login error: '.$login_error, '_init_login' );
+	// inskin param is set when the login request come from the front office
+	// we need this to decide if we should use display in-skin login from or not
 	param( 'inskin', 'boolean', 0 );
+	$Debuglog->add( 'Param inskin: '.$inskin, '_init_login' );
 	if( $inskin || use_in_skin_login() )
 	{ // Use in-skin login
+		$Debuglog->add( 'Trying to use in-skin login', '_init_login' );
+
 		if( is_logged_in() )
 		{ // user is logged in, but the email address is not validated yet
 			$login = $current_User->login;
 			$email = $current_User->email;
 		}
-		if( empty( $Blog ) )
-		{
-			if( isset( $blog) && $blog > 0 )
-			{
-				$BlogCache = & get_BlogCache();
-				$Blog = $BlogCache->get_by_ID( $blog, false, false );
-			}
+
+		if( empty( $Blog ) && init_requested_blog() )
+		{ // $blog is set, init $Blog also
+			$BlogCache = & get_BlogCache();
+			$Blog = $BlogCache->get_by_ID( $blog, false, false );
 		}
-		if( ( !empty( $Blog ) ) && ( !empty( $Blog->skin_ID ) ) )
-		{
+
+		$blog_skin_ID = NULL;
+		if( !empty( $Blog ) )
+		{ // Blog was set
+			$blog_skin_ID = $Blog->get_skin_ID();
+		}
+
+		if( !empty( $blog_skin_ID ) )
+		{ // Blog exists and skin ID is set
 			locale_activate( $Blog->get('locale') );
 			$Messages->add( T_( $login_error ) );
 			$SkinCache = & get_SkinCache();
-			$Skin = & $SkinCache->get_by_ID( $Blog->skin_ID );
+			$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
 			$skin = $Skin->folder;
 			$disp = 'login';
-			$redirect_to = $Blog->gen_blogurl();
+			// fp> We ABSOLUTELY want to recover the previous redirect_to so that after a new login attempt that may be successful,
+			// we will finally reach our intended destination. This is paramount with emails telling people to come back to the site
+			// to read a message or sth like that. They must log in first and they may enter teh wrong password multiple times.
+			// fp>attila: make sure you understand this.
+			param( 'redirect_to', 'string', $Blog->gen_blogurl() );
 			$ads_current_skin_path = $skins_path.$skin.'/';
+			// Init charset handling:
+			init_charsets( $current_charset );
 			require $ads_current_skin_path.'index.main.php';
 			exit(0);
+			// --- EXITED !! ---
 		}
+
+		$Debuglog->add( 'we have NO valid blog to use for inskin login', '_init_login' );
 	}
 
 	// Use standard login
+	$Debuglog->add( 'Using standard login', '_init_login' );
 	// Init charset handling:
 	init_charsets( $current_charset );
 	require $htsrv_path.'login.php';
 	exit(0);
+	// --- EXITED !! ---
 }
 
 $Timer->pause( '_init_login' );
@@ -331,33 +426,8 @@ $Timer->pause( '_init_login' );
 
 /*
  * $Log$
- * Revision 1.13  2011/10/21 07:10:47  efy-asimo
- * Comment quick moderation option
+ * Revision 1.15  2013/11/06 08:03:47  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.12  2011/10/01 23:01:48  fplanque
- * better be safe than sorry on logins!
- *
- * Revision 1.11  2011/09/17 02:31:59  fplanque
- * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
- *
- * Revision 1.10  2011/09/13 09:09:04  efy-asimo
- * Set the proper locale for in-skin login
- *
- * Revision 1.9  2011/09/13 08:32:30  efy-asimo
- * Add crumb check for login and register
- * Never cache in-skin login and register
- * Fix page caching
- *
- * Revision 1.8  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.7  2011/06/14 13:33:55  efy-asimo
- * in-skin register
- *
- * Revision 1.6  2011/03/24 15:15:05  efy-asimo
- * in-skin login - feature
- *
- * Revision 1.5  2011/02/15 05:31:53  sam2kb
- * evo_strtolower mbstring wrapper for strtolower function
  */
 ?>

@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -42,8 +42,9 @@ global $current_User;
 // Check minimum permission:
 $current_User->check_perm( 'options', 'view', true );
 
-// Memorize this as the last "tab" used in the Blog Settings:
+// Memorize this as the last "tab" used in the Global Settings:
 $UserSettings->set( 'pref_glob_settings_tab', $ctrl );
+$UserSettings->set( 'pref_glob_regional_tab', $ctrl );
 $UserSettings->dbupdate();
 
 // Set options path:
@@ -296,8 +297,8 @@ switch( $action )
 }
 
 
-$AdminUI->breadcrumbpath_init();
-$AdminUI->breadcrumbpath_add( T_('Global settings'), '?ctrl=settings',
+$AdminUI->breadcrumbpath_init( false );
+$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system',
 		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
 $AdminUI->breadcrumbpath_add( T_('Regional settings'), '?ctrl=locales' );
 $AdminUI->breadcrumbpath_add( T_('Countries'), '?ctrl=countries' );
@@ -350,58 +351,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.20  2011/10/12 16:09:16  efy-yurybakh
- * Regional settings menu refactoring
- *
- * Revision 1.19  2011/09/23 18:02:10  fplanque
- * minor
- *
- * Revision 1.18  2011/09/23 11:49:48  efy-vitalij
- * fix country enable/prefer bug, add preferred property to Country class
- *
- * Revision 1.17  2011/09/22 13:03:11  efy-vitalij
- * add country pref column, clickable En column in countries and currencies results  tables
- *
- * Revision 1.16  2011/09/13 15:31:34  fplanque
- * Enhanced back-office navigation.
- *
- * Revision 1.15  2010/05/07 08:07:14  efy-asimo
- * Permissions check update (User tab, Global Settings tab) - bugfix
- *
- * Revision 1.14  2010/01/20 20:08:32  efy-asimo
- * Countries&Currencies redirect fix + RSS/Atom feeds image size select list
- *
- * Revision 1.13  2010/01/18 18:25:32  efy-asimo
- * Redirect fix - Countries&Currencies
- *
- * Revision 1.12  2010/01/17 04:14:43  fplanque
- * minor / fixes
- *
- * Revision 1.11  2010/01/16 14:16:31  efy-asimo
- * Currencies/Countries cosmetics and regenerate_url after Enable/Disable
- *
- * Revision 1.10  2010/01/03 12:03:17  fplanque
- * More crumbs...
- *
- * Revision 1.9  2009/12/06 22:55:19  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.8  2009/09/29 03:14:22  fplanque
- * doc
- *
- * Revision 1.7  2009/09/28 20:54:59  efy-khurram
- * Implemented support for enabling disabling countries.
- *
- * Revision 1.6  2009/09/26 12:00:43  tblue246
- * Minor/coding style
- *
- * Revision 1.5  2009/09/25 07:33:14  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.4  2009/09/10 18:24:07  fplanque
- * doc
+ * Revision 1.22  2013/11/06 08:04:36  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

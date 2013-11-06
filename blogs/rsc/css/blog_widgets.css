@@ -97,13 +97,17 @@ clear:both;
 }
 
 .available_widgets{
-	width:44em;
-	position:absolute;
+	top: 40px;
+	left: 5%;
+	right: 5%;
+	bottom: 5%;
+	position: fixed;
 	background:#f1f6ff;
 	display:none;
 	border: 1px solid #9DB0BC;
 	margin:0;
 	padding:0;
+	z-index: 999;
 }
 
 .available_widgets_active{
@@ -118,9 +122,13 @@ display:block;
 }
 
 #available_widgets_inner{
-padding: 1em;
-height:300px;
-overflow:auto;
+	padding: 1em;
+	overflow: auto;
+	position: fixed;
+	top: 62px;
+	left: 5%;
+	right: 5%;
+	bottom: 5%;
 }
 
 .available_widgets h2 {
@@ -155,10 +163,10 @@ display:none;
 
 #widget_settings.widget_settings_active{
 position:fixed;
+top:40px;
 bottom:5%;
 right:5%;
-height:90%;
-width:90%;
+left:5%;
 overflow:auto;
 z-index:999;
 background:#f1f6f8;

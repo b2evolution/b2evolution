@@ -282,17 +282,6 @@ function bufferedServerCall()
 	var new_widget_order = getWidgetOrder();
 	if( new_widget_order != current_widgets )
 	{	// widget order has changed, we need to update
-		if( reorder_delay_remaining > 0 )
-		{ // we're still pending
-			window.clearTimeout( reorder_widgets_queue );// reset the timeout
-			reorder_delay_remaining -= 100; // reduce the delay
-			jQuery( '#server_messages' ).html( '<div class="log_container"><div class="log_error">'
-							+T_( 'Changes pending' )+' <strong>' + str_repeat( '.', reorder_delay_remaining / 100 )+'</strong></div></div>' ); // update pending message
-			reorder_widgets_queue = window.setTimeout( 'bufferedServerCall()', 100 ); // set timeout
-			jQuery( '.server_update' ).removeClass( 'server_update' ).addClass( 'pending_update' ); // set "needs updating"
-			return; // continue waiting
-		}
-
 		jQuery( '#server_messages' ).html( '<div class="log_container"><div class="log_message">'+T_( 'Saving changes' )+'</div></a>' ); // inform user
 
 		current_widgets = new_widget_order; // store current order
@@ -450,6 +439,9 @@ function convertAvailableList()
 	// Open list on click, not on hover!
 	jQuery( ".fieldset_title_bg > span > a" ).attr( 'href', '#' ).bind( 'click', function(e)
 	{
+		// add placeholder for widgets settings form:
+		jQuery( 'body' ).append( '<div id="screen_mask" onclick="closeAvailableWidgets()"></div>' );
+		jQuery( '#screen_mask' ).fadeTo(1,0.5).fadeIn(200);
 		offset = jQuery( this ).offset();
 		var y = offset.top;
 		// can't dislay any lower than this!:
@@ -457,10 +449,7 @@ function convertAvailableList()
 		var max_y = jQuery( document ).height() - 10 - jQuery( '.available_widgets' ).height();
 		if( max_y < 20 ) { max_y = 20 };
 		if( y > max_y ) { y = max_y };
-		jQuery( '.available_widgets' ).css(
-			{top : y,
-			right: jQuery( typeof opera == 'object' ? window : document ).width() - offset.left - jQuery( this ).width() } )
-			.addClass( 'available_widgets_active' ).attr( 'id', 'available_'+jQuery( this ).attr( "id" ) );
+		jQuery( '.available_widgets' ).addClass( 'available_widgets_active' ).attr( 'id', 'available_'+jQuery( this ).attr( "id" ) );
 
 		// cancel default href action:
 		return false;
@@ -507,6 +496,7 @@ function convertAvailableList()
 function closeAvailableWidgets()
 {
 	jQuery('.available_widgets').removeClass( 'available_widgets_active' );
+	jQuery( '#screen_mask' ).remove();
 }
 
 
@@ -515,7 +505,7 @@ function closeAvailableWidgets()
  */
 function addNewWidget( widget_list_item, admin_call )
 {
-	jQuery( '.available_widgets' ).removeClass( 'available_widgets_active' );// close open windows
+	closeAvailableWidgets()
 
 	var widget_id = jQuery( widget_list_item ).attr( "id" );
 	jQuery( widget_list_item ).attr( "id", widget_id );

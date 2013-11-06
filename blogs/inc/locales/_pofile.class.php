@@ -358,11 +358,8 @@ class POTFile extends POFile
 
 /*
  * $Log$
- * Revision 1.3  2009/04/10 11:30:35  tblue246
- * "Translate" msgids and msgstrs properly
- *
- * Revision 1.2  2009/03/08 22:37:39  fplanque
- * doc
+ * Revision 1.4  2013/11/06 08:04:25  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

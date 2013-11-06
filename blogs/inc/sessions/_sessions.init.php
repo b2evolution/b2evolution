@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -28,6 +28,16 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+
+/**
+ * Minimum PHP version required for sessions module to function properly
+ */
+$required_php_version[ 'sessions' ] = '5.0';
+
+/**
+ * Minimum MYSQL version required for sessions module to function properly
+ */
+$required_mysql_version[ 'sessions' ] = '4.1';
 
 /**
  * Aliases for table names:
@@ -115,6 +125,7 @@ class sessions_Module extends Module
 	 */
 	function init()
 	{
+		$this->check_required_php_version( 'sessions' );
 	}
 
 	/**
@@ -142,8 +153,28 @@ class sessions_Module extends Module
 				'separator' => true,
 			);
 			$entries['stats'] = array(
-				'text' => T_('Blog stats').'&hellip;',
+				'text' => T_('Blog analytics'),
 				'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$Blog->ID,
+				'entries' => array(
+					'summary' => array(
+						'text' => T_('Hit summary').'&hellip;',
+						'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$Blog->ID ),
+					'refsearches' => array(
+						'text' => T_('Search B-hits').'&hellip;',
+						'href' => $admin_url.'?ctrl=stats&amp;tab=refsearches&amp;tab3=hits&amp;blog='.$Blog->ID ),
+					'referers' => array(
+						'text' => T_('Referered B-hits').'&hellip;',
+						'href' => $admin_url.'?ctrl=stats&amp;tab=referers&amp;blog='.$Blog->ID ),
+					'other' => array(
+						'text' => T_('Direct B-hits').'&hellip;',
+						'href' => $admin_url.'?ctrl=stats&amp;tab=other&amp;blog='.$Blog->ID ),
+					'hits' => array(
+						'text' => T_('All Hits').'&hellip;',
+						'href' => $admin_url.'?ctrl=stats&amp;tab=hits&amp;blog='.$Blog->ID ),
+					'domains' => array(
+						'text' => T_('Referring domains').'&hellip;',
+						'href' => $admin_url.'?ctrl=stats&amp;tab=domains&amp;blog='.$Blog->ID ),
+					)
 			);
 
 			$topleft_Menu->add_menu_entries( 'blog', $entries );
@@ -166,20 +197,43 @@ class sessions_Module extends Module
 				);
 			}
 
-			$entries = array(
-				'stats' => array(
-						'text' => T_('Global Stats').'&hellip;',
-						'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog=0',
-					 ),
-				'sessions' => array(
-						'text' => T_('User sessions').'&hellip;',
-						'href' => $admin_url.'?ctrl=stats&amp;tab=sessions&amp;tab3=login&amp;blog=0',
-					 ),
-				'goals' => array(
-						'text' => T_('Goals').'&hellip;',
-						'href' => $admin_url.'?ctrl=goals',
-					 ),
+			$entries = array();
+			$entries['stats'] = array(
+					'text' => T_('Global analytics'),
+					'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog=0',
+					'entries' => array(
+						'summary' => array(
+							'text' => T_('Hit summary').'&hellip;',
+							'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog=0' ),
+						'refsearches' => array(
+							'text' => T_('Search B-hits').'&hellip;',
+							'href' => $admin_url.'?ctrl=stats&amp;tab=refsearches&amp;tab3=hits&amp;blog=0' ),
+						'referers' => array(
+							'text' => T_('Referered B-hits').'&hellip;',
+							'href' => $admin_url.'?ctrl=stats&amp;tab=referers&amp;blog=0' ),
+						'other' => array(
+							'text' => T_('Direct B-hits').'&hellip;',
+							'href' => $admin_url.'?ctrl=stats&amp;tab=other&amp;blog=0' ),
+						'hits' => array(
+							'text' => T_('All Hits').'&hellip;',
+							'href' => $admin_url.'?ctrl=stats&amp;tab=hits&amp;blog=0' ),
+						'domains' => array(
+							'text' => T_('Referring domains').'&hellip;',
+							'href' => $admin_url.'?ctrl=stats&amp;tab=domains&amp;blog=0' ),
+						'goals' => array(
+							'text' => T_('Goals').'&hellip;',
+							'href' => $admin_url.'?ctrl=goals' ),
+						)
 				);
+
+			if( !is_admin_page() )
+			{
+				$blog_ID = empty( $Blog ) ? 0 : $Blog->ID;
+				$entries['stats_page'] = array(
+						'text' => T_('Page stats').'&hellip;',
+						'href' => $admin_url.'?ctrl=stats&tab=hits&blog='.$blog_ID.'&reqURI='.rawurlencode( $_SERVER['REQUEST_URI'] ),
+					);
+			}
 
 			$topleft_Menu->add_menu_entries( 'tools', $entries );
 		}
@@ -213,7 +267,7 @@ class sessions_Module extends Module
 					NULL, // root
 					array(
 						'stats' => array(
-							'text' => T_('Stats'),
+							'text' => T_('Analytics'),
 							'href' => $dispatcher.'?ctrl=stats&amp;tab=summary&amp;tab3=global',
 							'entries' => array(
 								'summary' => array(
@@ -253,9 +307,6 @@ class sessions_Module extends Module
 										'topengines' => array(
 											'text' => T_('Top engines'),
 											'href' => $dispatcher.'?ctrl=stats&amp;tab=refsearches&amp;tab3=topengines&amp;blog='.$blog ),
-										'intsearches' => array(
-											'text' => T_('Internal searches'),
-											'href' => $dispatcher.'?ctrl=stats&amp;tab=refsearches&amp;tab3=intsearches&amp;blog='.$blog ),
 										),
 									 ),
 								'referers' => array(
@@ -301,56 +352,6 @@ class sessions_Module extends Module
 				);
 		}
 	}
-
-	/**
-	 * Builds the 3rd half of the menu. This is the one with the configuration features
-	 *
-	 * At some point this might be displayed differently than the 1st half.
-	 */
-	function build_menu_3()
-	{
-
-		global $blog, $dispatcher, $ctrl;
-		/**
-		 * @var User
-		 */
-		global $current_User;
-		global $Blog;
-		/**
-		 * @var AdminUI_general
-		 */
-		global $AdminUI;
-
-		if( !$current_User->check_perm( 'admin', 'normal' ) )
-		{
-			return;
-		}
-
-		if( $current_User->check_perm( 'stats', 'view' ) )
-		{	// Viewing aggregate + Permission to view stats for ALL blogs:
-			$sessions_menu = array(
-				'sessions' => array(
-					'text' => T_('User sessions'),
-					'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=login&amp;blog=0',
-					'entries' => array(
-						'login' => array(
-							'text' => T_('Users'),
-							'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=login&amp;blog=0'
-							),
-						'sessid' => array(
-							'text' => T_('Sessions'),
-							'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=sessid&amp;blog=0'
-							)
-						),
-					),
-			 	);
-			// insert at 2nd position:
-			if( ! $AdminUI->insert_menu_entries_after( 'users', $sessions_menu, 0 )	)
-			{
-				$AdminUI->add_menu_entries( 'user', $sessions_menu );
-			}
-		}
-	}
 }
 
 $sessions_Module = new sessions_Module();
@@ -358,130 +359,8 @@ $sessions_Module = new sessions_Module();
 
 /*
  * $Log$
- * Revision 1.37  2011/10/13 05:47:24  efy-asimo
- * Remove old permission check from session Module
- *
- * Revision 1.36  2011/09/30 06:25:24  efy-vitalij
- * Remove Hits tab from User Sessions
- *
- * Revision 1.35  2011/09/29 09:16:16  efy-vitalij
- * add menu item All Hits
- *
- * Revision 1.34  2011/09/15 08:58:46  efy-asimo
- * Change user tabs display
- *
- * Revision 1.33  2011/09/13 15:31:35  fplanque
- * Enhanced back-office navigation.
- *
- * Revision 1.32  2011/09/07 12:00:18  lxndral
- * internal searches update
- *
- * Revision 1.31  2011/09/04 22:13:18  fplanque
- * copyright 2011
- *
- * Revision 1.30  2011/02/15 15:37:00  efy-asimo
- * Change access to admin permission
- *
- * Revision 1.29  2010/02/08 17:53:55  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.28  2010/01/30 18:55:33  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.27  2009/12/08 22:38:13  fplanque
- * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
- *
- * Revision 1.26  2009/11/21 13:31:59  efy-maxim
- * 1. users controller has been refactored to users and user controllers
- * 2. avatar tab
- * 3. jQuery to show/hide custom duration
- *
- * Revision 1.25  2009/10/26 12:59:36  efy-maxim
- * users management
- *
- * Revision 1.24  2009/10/25 15:22:44  efy-maxim
- * user - identity, password, preferences tabs
- *
- * Revision 1.23  2009/09/25 20:45:41  fplanque
- * fix
- *
- * Revision 1.22  2009/09/21 03:14:35  fplanque
- * modularized a little more
- *
- * Revision 1.21  2009/09/20 18:13:20  fplanque
- * doc
- *
- * Revision 1.20  2009/09/20 12:00:31  efy-sergey
- * Moved Stats>User Sessions tab 2nd position
- *
- * Revision 1.19  2009/09/20 00:27:08  fplanque
- * cleanup/doc/simplified
- *
- * Revision 1.18  2009/09/19 21:49:03  efy-sergey
- * Moved Stats>User Sessions tab to Users>Sessions
- *
- * Revision 1.17  2009/09/19 20:49:51  fplanque
- * Cleaner way of implementing permissions.
- *
- * Revision 1.16  2009/09/16 00:48:50  fplanque
- * getting a bit more serious with modules
- *
- * Revision 1.15  2009/09/15 19:31:54  fplanque
- * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
- * PHP 4 compatible. Even better on PHP 5.
- * I may have broken a few things. Sorry. This is pretty hard to do in one swoop without any glitch.
- * Thanks for fixing or reporting if you spot issues.
- *
- * Revision 1.14  2009/08/30 00:30:52  fplanque
- * increased modularity
- *
- * Revision 1.13  2009/07/06 23:52:25  sam2kb
- * Hardcoded "admin.php" replaced with $dispatcher
- *
- * Revision 1.12  2009/05/16 00:29:41  fplanque
- * better menu structure (load the fastest page by default)
- *
- * Revision 1.11  2009/04/15 13:17:20  tblue246
- * bugfixes
- *
- * Revision 1.10  2009/03/23 22:19:45  fplanque
- * evobar right menu is now also customizable by plugins
- *
- * Revision 1.9  2009/03/23 04:09:43  fplanque
- * Best. Evobar. Menu. Ever.
- * menu is now extensible by plugins
- *
- * Revision 1.8  2009/03/22 23:39:33  fplanque
- * new evobar Menu structure
- * Superfish jQuery menu library
- * + removed obsolete JS includes
- *
- * Revision 1.7  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.6  2009/03/07 21:35:09  blueyed
- * doc
- *
- * Revision 1.5  2008/05/26 19:30:32  fplanque
- * enhanced analytics
- *
- * Revision 1.4  2008/05/10 22:59:09  fplanque
- * keyphrase logging
- *
- * Revision 1.3  2008/04/24 01:56:08  fplanque
- * Goal hit summary
- *
- * Revision 1.2  2008/04/17 11:53:18  fplanque
- * Goal editing
- *
- * Revision 1.1  2008/04/06 19:19:30  fplanque
- * Started moving some intelligence to the Modules.
- * 1) Moved menu structure out of the AdminUI class.
- * It is part of the app structure, not the UI. Up to this point at least.
- * Note: individual Admin skins can still override the whole menu.
- * 2) Moved DB schema to the modules. This will be reused outside
- * of install for integrity checks and backup.
- * 3) cleaned up config files
+ * Revision 1.39  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

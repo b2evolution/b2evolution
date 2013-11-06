@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -52,10 +52,10 @@ class Currency extends DataObject
 	function Currency( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_currency', 'curr_', 'curr_ID' );
+		parent::DataObject( 'T_regional__currency', 'curr_', 'curr_ID' );
 
 		$this->delete_restrictions = array(
-				array( 'table'=>'T_country', 'fk'=>'ctry_curr_ID', 'msg'=>T_('%d related countries') ),
+				array( 'table'=>'T_regional__country', 'fk'=>'ctry_curr_ID', 'msg'=>T_('%d related countries') ),
 			);
 
 		$this->delete_cascades = array();
@@ -178,47 +178,8 @@ class Currency extends DataObject
 
 /*
  * $Log$
- * Revision 1.16  2011/09/06 00:54:38  fplanque
- * i18n update
- *
- * Revision 1.15  2010/04/07 08:26:11  efy-asimo
- * Allow multiple slugs per post - update & fix
- *
- * Revision 1.14  2010/03/19 09:48:59  efy-asimo
- * file deleting restrictions - task
- *
- * Revision 1.13  2010/01/17 04:14:40  fplanque
- * minor / fixes
- *
- * Revision 1.12  2010/01/15 17:27:28  efy-asimo
- * Global Settings > Currencies - Add Enable/Disable column
- *
- * Revision 1.11  2009/09/20 20:07:18  blueyed
- *  - DataObject::dbexists quotes always
- *  - phpdoc fixes
- *  - style fixes
- *
- * Revision 1.10  2009/09/14 13:31:36  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.9  2009/09/07 12:40:57  efy-maxim
- * Ability to select the default currency when editing a country
- *
- * Revision 1.8  2009/09/05 14:39:48  efy-maxim
- * Delete Restrictions for currency
- *
- * Revision 1.7  2009/09/04 19:00:05  efy-maxim
- * currency/country codes validators have been improved using param_check_regexp() function
- *
- * Revision 1.6  2009/09/03 18:29:29  efy-maxim
- * currency/country code validators
- *
- * Revision 1.5  2009/09/03 07:24:58  efy-maxim
- * 1. Show edit screen again if current currency/goal exists in database.
- * 2. Convert currency code to uppercase
- *
- * Revision 1.4  2009/09/02 23:29:34  fplanque
- * doc
+ * Revision 1.18  2013/11/06 08:04:36  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

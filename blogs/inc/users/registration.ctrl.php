@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -52,53 +52,103 @@ switch ( $action )
 
 		// UPDATE general settings:
 		param( 'newusers_canregister', 'integer', 0 );
-
 		param( 'newusers_grp_ID', 'integer', true );
 
 		param_integer_range( 'newusers_level', 0, 9, T_('User level must be between %d and %d.') );
 
+		// UPDATE default user settings
+		param( 'enable_PM', 'integer', 0 );
+		param( 'enable_email', 'integer', 0 );
+		param( 'notify_messages', 'integer', 0 );
+		param( 'notify_unread_messages', 'integer', 0 );
+		param( 'notify_published_comments', 'integer', 0 );
+		param( 'notify_comment_moderation', 'integer', 0 );
+		param( 'newsletter_news', 'integer', 0 );
+		param( 'newsletter_ads', 'integer', 0 );
+		param_integer_range( 'notification_email_limit', 0, 999, T_('Notificaiton email limit must be between %d and %d.') );
+		param_integer_range( 'newsletter_limit', 0, 999, T_('Newsletter limit must be between %d and %d.') );
+
+		// UPDATE account activation by email
 		param( 'newusers_mustvalidate', 'integer', 0 );
-
 		param( 'newusers_revalidate_emailchg', 'integer', 0 );
-
+		param( 'validation_process', 'string', true );
+		$activate_requests_limit = param_duration( 'activate_requests_limit' );
 		param( 'newusers_findcomments', 'integer', 0 );
+
+		$after_email_validation = param( 'after_email_validation', 'string', 'return_to_original' );
+		if( $after_email_validation != 'return_to_original' )
+		{
+			$after_email_validation = param( 'specific_after_validation_url', 'string', NULL );
+			param_check_url( 'specific_after_validation_url', 'email_validation' );
+		}
+
+		$after_registration = param( 'after_registration', 'string', 'return_to_original' );
+		if( $after_registration != 'return_to_original' )
+		{
+			$after_registration = param( 'specific_after_registration_url', 'string', NULL );
+			param_check_url( 'specific_after_registration_url', 'after_registration' );
+		}
 
 		param_integer_range( 'user_minpwdlen', 1, 32, T_('Minimum password length must be between %d and %d.') );
 
 		param( 'js_passwd_hashing', 'integer', 0 );
-
 		param( 'passwd_special', 'integer', 0 );
-
+		param( 'strict_logins', 'integer', 0 );
 		param( 'registration_require_country', 'integer', 0 );
-
+		param( 'registration_require_firstname', 'integer', 0 );
 		param( 'registration_ask_locale', 'integer', 0 );
-
 		param( 'registration_require_gender', 'string', '' );
 
+		// We are about to allow non-ASCII logins
+		// Let's check if there are users with logins starting with reserved prefix usr_
+		if( ! $strict_logins && $invalid_users = find_logins_with_reserved_prefix() )
+		{
+			// Enforce strict logins until all invalid logins are changed
+			$strict_logins = true;
+
+			$user_edit_url = regenerate_url( 'ctrl,action', 'ctrl=user&amp;user_tab=profile&amp;user_ID=' );
+			foreach( $invalid_users as $inv_user )
+			{
+				$msg[] = '<li>'.action_icon( T_('Edit this user...'), 'edit', $user_edit_url.$inv_user->user_ID, 5, 0 ).' [ '.$inv_user->user_login.' ]</li>';
+			}
+
+			if( !empty($msg) )
+			{
+				$Messages->add( T_('The following user logins must be changed in order for you to disable "Require strict logins" setting:')
+							.'<ol style="list-style-type:decimal; list-style-position: inside">'.implode( "\n", $msg ).'</ol>', 'note' );
+			}
+		}
+
 		$Settings->set_array( array(
-									 array( 'newusers_canregister', $newusers_canregister),
-
-									 array( 'newusers_grp_ID', $newusers_grp_ID),
-
-									 array( 'newusers_level', $newusers_level),
-
-									 array( 'newusers_mustvalidate', $newusers_mustvalidate),
-
-									 array( 'newusers_revalidate_emailchg', $newusers_revalidate_emailchg),
-
-									 array( 'newusers_findcomments', $newusers_findcomments),
-
-									 array( 'user_minpwdlen', $user_minpwdlen),
-
-									 array( 'js_passwd_hashing', $js_passwd_hashing),
-
-									 array( 'passwd_special', $passwd_special),
-
-									 array( 'registration_require_country', $registration_require_country),
-
-									 array( 'registration_ask_locale', $registration_ask_locale),
-
-									 array( 'registration_require_gender', $registration_require_gender) ) );
+					 array( 'newusers_canregister', $newusers_canregister ),
+					 array( 'newusers_grp_ID', $newusers_grp_ID ),
+					 array( 'newusers_level', $newusers_level ),
+					 array( 'def_enable_PM', $enable_PM ),
+					 array( 'def_enable_email', $enable_email ),
+					 array( 'def_notify_messages', $notify_messages ),
+					 array( 'def_notify_unread_messages', $notify_unread_messages ),
+					 array( 'def_notify_published_comments', $notify_published_comments ),
+					 array( 'def_notify_comment_moderation', $notify_comment_moderation ),
+					 array( 'def_newsletter_news', $newsletter_news ),
+					 array( 'def_newsletter_ads', $newsletter_ads ),
+					 array( 'def_notification_email_limit', $notification_email_limit ),
+					 array( 'def_newsletter_limit', $newsletter_limit ),
+					 array( 'newusers_mustvalidate', $newusers_mustvalidate ),
+					 array( 'newusers_revalidate_emailchg', $newusers_revalidate_emailchg ),
+					 array( 'activate_requests_limit', $activate_requests_limit ),
+					 array( 'validation_process', $validation_process ),
+					 array( 'newusers_findcomments', $newusers_findcomments ),
+					 array( 'after_email_validation', $after_email_validation ),
+					 array( 'after_registration', $after_registration ),
+					 array( 'user_minpwdlen', $user_minpwdlen ),
+					 array( 'js_passwd_hashing', $js_passwd_hashing ),
+					 array( 'passwd_special', $passwd_special ),
+					 array( 'strict_logins', $strict_logins ),
+					 array( 'registration_require_country', $registration_require_country ),
+					 array( 'registration_require_firstname', $registration_require_firstname ),
+					 array( 'registration_ask_locale', $registration_ask_locale ),
+					 array( 'registration_require_gender', $registration_require_gender )
+				) );
 
 		if( ! $Messages->has_errors() )
 		{
@@ -145,61 +195,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.18  2011/10/20 16:32:57  efy-asimo
- * Invalidate PageCaches after specific settings update
- *
- * Revision 1.17  2011/10/17 17:53:11  efy-yurybakh
- * Detect previous comments after email validation
- *
- * Revision 1.16  2011/10/04 13:06:26  efy-yurybakh
- * Additional Display settings
- *
- * Revision 1.15  2011/10/03 10:07:06  efy-yurybakh
- * bubbletips & identity_links cleanup
- *
- * Revision 1.14  2011/09/26 14:49:58  efy-yurybakh
- * colored usernames
- *
- * Revision 1.13  2011/09/06 16:25:18  efy-james
- * Require special chars in password
- *
- * Revision 1.12  2011/06/14 13:33:56  efy-asimo
- * in-skin register
- *
- * Revision 1.11  2010/11/25 15:16:35  efy-asimo
- * refactor $Messages
- *
- * Revision 1.10  2010/11/24 14:55:30  efy-asimo
- * Add user gender
- *
- * Revision 1.9  2010/05/07 08:07:14  efy-asimo
- * Permissions check update (User tab, Global Settings tab) - bugfix
- *
- * Revision 1.8  2010/01/09 13:30:12  efy-yury
- * added redirect 303 for prevent dublicate sql executions
- *
- * Revision 1.7  2010/01/03 17:45:21  fplanque
- * crumbs & stuff
- *
- * Revision 1.6  2009/12/06 22:55:19  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.5  2009/09/16 05:35:49  efy-bogdan
- * Require country checkbox added
- *
- * Revision 1.4  2009/09/15 12:11:23  efy-bogdan
- * Clean structure
- *
- * Revision 1.3  2009/09/15 09:20:49  efy-bogdan
- * Moved the "email validation" and the "security options" blocks to the Users -> Registration tab
- *
- * Revision 1.2  2009/09/15 02:43:35  fplanque
- * doc
- *
- * Revision 1.1  2009/09/14 12:01:00  efy-bogdan
- * User Registration tab
+ * Revision 1.20  2013/11/06 08:04:55  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

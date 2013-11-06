@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -35,7 +35,7 @@ $sql = "
 	SELECT SQL_NO_CACHE COUNT(*) AS hits, EXTRACT(YEAR FROM hit_datetime) AS year,
 			   EXTRACT(MONTH FROM hit_datetime) AS month, EXTRACT(DAY FROM hit_datetime) AS day
 		FROM T_hitlog
-	 WHERE hit_agent_type = 'rss'";
+	 WHERE hit_type = 'rss'";
 if( $blog > 0 )
 {
 	$sql .= ' AND hit_blog_ID = '.$blog;
@@ -88,57 +88,8 @@ if( count($res_hits) )
 
 /*
  * $Log$
- * Revision 1.13  2011/10/03 10:41:25  efy-vitalij
- * add colors to statistic
+ * Revision 1.15  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.12  2011/09/04 22:13:18  fplanque
- * copyright 2011
- *
- * Revision 1.11  2010/02/08 17:53:55  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.10  2009/12/08 22:38:13  fplanque
- * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
- *
- * Revision 1.9  2009/12/06 22:55:19  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.8  2009/09/13 21:26:50  blueyed
- * SQL_NO_CACHE for SELECT queries using T_hitlog
- *
- * Revision 1.7  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.6  2009/02/27 22:57:26  blueyed
- * Use load_funcs for swfcharts, and especially only include it when needed (in the stats controllers only, not main.inc)
- *
- * Revision 1.5  2008/02/14 05:45:38  fplanque
- * cleaned up stats
- *
- * Revision 1.4  2008/02/14 02:19:53  fplanque
- * cleaned up stats
- *
- * Revision 1.3  2008/01/21 18:16:33  personman2
- * Different chart bg colors for each admin skin
- *
- * Revision 1.2  2008/01/21 09:35:34  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 11:01:08  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.6  2007/04/26 00:11:13  fplanque
- * (c) 2007
- *
- * Revision 1.5  2007/02/10 17:59:03  waltercruz
- * Changing double quotes to single quotes and the MySQL date functions to the standart ones
- *
- * Revision 1.4  2006/11/26 23:39:29  blueyed
- * trans: "and" instead of "&amp;" (Which should have been "&" anyway!)
- *
- * Revision 1.3  2006/11/24 18:27:26  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

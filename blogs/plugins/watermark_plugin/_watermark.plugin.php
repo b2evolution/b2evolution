@@ -4,11 +4,11 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  *
- * @author sam2kb: Alex - {@link http://ru.b2evo.net/}
+ * @author sam2kb: Alex - {@link http://b2evo.sonorth.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -23,10 +23,9 @@ class watermark_plugin extends Plugin
 	var $name = 'Watermark';
 	var $group = 'files';
 	var $priority = 10;
-	var $apply_rendering = 'never';
 	var $short_desc;
 	var $long_desc;
-	var $version = '1.0.0';
+	var $version = '5.0.0';
 	var $number_of_installs = 1;
 
 	var $fonts_dir = '';
@@ -79,22 +78,57 @@ class watermark_plugin extends Plugin
 	}
 
 
+	/**
+	 * Define here default collection/blog settings that are to be made available in the backoffice.
+	 *
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_coll_setting_definitions( & $params )
+	{
+		$r = array(
+			'coll_text' => array(
+					'label' => 'Image text',
+					'size' => 70,
+					'defaultvalue' => $this->Settings->get('text'),
+					'note' => T_('The text to write on the image.'),
+				),
+			'coll_font' => array(
+					'label' => 'Font file name',
+					'size' => 30,
+					'defaultvalue' => $this->Settings->get('font'),
+					'note' => sprintf(T_('You can upload your own fonts to the plugin\'s font directory (%s), then use the filename here. By default "%s" is used.'),
+						rel_path_to_base($this->fonts_dir), rel_path_to_base($this->get_default_font())),
+				),
+			'coll_font_size' => array(
+					'label' => 'Font size',
+					'type' => 'select',
+					'options' => array(6=>6,8=>8,10=>10,12=>12,14=>14,16=>16,18=>18,20=>20,22=>22,24=>24,
+							26=>26,28=>28,30=>30,32=>32,34=>34,36=>36,38=>38,40=>40,42=>42,44=>44,46=>46,
+							48=>48,50=>50,52=>52,54=>54,56=>56,58=>58,60=>60,62=>62,64=>64,66=>66,68=>68),
+					'defaultvalue' => $this->Settings->get('font_size'),
+					'note' => '',
+				),
+			);
+
+		return $r;
+	}
+
+
 	function PluginSettingsUpdateAction()
 	{
-		global $media_path, $Settings;
-
 		$font = $this->Settings->get('font');
 
-		if( !empty($font) && !is_readable($this->fonts_dir.'/'.$font) )
-		{
-			$this->msg( sprintf( T_('Unable to load font file: %s'), $this->fonts_dir.'/'.$font ), 'error' );
-			return false;
-		}
+		return $this->settings_update_action( $font );
+	}
 
-		// Delete file cache
-		// TODO> clear cache only if settings are changed
-		//       (could use PluginSettingsValidateSet for this)
-		delete_cachefolders();
+
+	function PluginCollSettingsUpdateAction()
+	{
+		global $Blog;
+
+		$font = $this->get_coll_setting('coll_font', $Blog);
+
+		return $this->settings_update_action( $font );
 	}
 
 
@@ -102,7 +136,7 @@ class watermark_plugin extends Plugin
 	{
 		if( !function_exists('imagettftext') )
 		{	// The function imagettftext() is not available.
-			return T_('The function imagettftext() is not available.');
+			return 'The function imagettftext() is not available.'; // Conf error, no translation
 		}
 
 		delete_cachefolders();
@@ -128,6 +162,20 @@ class watermark_plugin extends Plugin
 	}
 
 
+	function settings_update_action( $font = '' )
+	{
+		if( !empty($font) && !is_readable($this->fonts_dir.'/'.$font) )
+		{
+			$this->msg( sprintf( T_('Unable to load font file: %s'), $this->fonts_dir.'/'.$font ), 'error' );
+			return false;
+		}
+
+		// Delete file cache
+		// TODO> clear cache only if settings have changed
+		//       (could use PluginSettingsValidateSet for this)
+		delete_cachefolders();
+	}
+
 
 	/**
 	 * This gets called before an image thumbnail gets created.
@@ -140,9 +188,30 @@ class watermark_plugin extends Plugin
 	 *   - 'size': size name (by reference)
 	 *   - 'mimetype': mimetype of thumbnail (by reference)
 	 *   - 'quality': JPEG image quality [0-100] (by reference)
+	 *   - 'root_type': file root type 'user', 'group', 'collection' etc. (by reference)
+	 *   - 'root_type_ID': ID of user, group or collection (by reference)
 	 */
 	function BeforeThumbCreate( & $params )
 	{
+		if( $params['root_type'] == 'collection' )
+		{
+			$BlogCache = & get_BlogCache();
+			$Blog = & $BlogCache->get_by_ID( $params['root_type_ID'], false, false );
+		}
+
+		if( !empty($Blog) )
+		{	// Use blog settings when possible
+			$font = $this->get_coll_setting('coll_font', $Blog);
+			$text = $this->get_coll_setting('coll_text', $Blog);
+			$font_size = $this->get_coll_setting('coll_font_size', $Blog);
+		}
+		else
+		{	// Use global settings
+			$font = $this->Settings->get('font');
+			$text = $this->Settings->get('text');
+			$font_size = $this->Settings->get('font_size');
+		}
+		
 		if( !function_exists('imagettftext') )
 		{	// The function imagettftext() is not available.
 			return;
@@ -157,7 +226,7 @@ class watermark_plugin extends Plugin
 			return;
 		}
 
-		if( $font = $this->Settings->get('font') )
+		if( $font )
 		{	// Custom font
 			$font = $this->fonts_dir.'/'.$font;
 		}
@@ -172,8 +241,7 @@ class watermark_plugin extends Plugin
 			return;
 		}
 
-		$text = html_entity_decode($this->Settings->get('text'));
-		$font_size = $this->Settings->get('font_size');
+		$text = html_entity_decode( $text );
 
 		// Text margins
 		$margin_left = 10;
@@ -223,11 +291,6 @@ class watermark_plugin extends Plugin
 	{
 		return true;
 	}
-
 }
 
-
-/*
- * $ Log: $
- */
 ?>

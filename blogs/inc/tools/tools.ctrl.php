@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  * @author blueyed: Daniel HAHLER
@@ -15,11 +15,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 load_funcs('plugins/_plugin.funcs.php');
+load_funcs('tools/model/_dbmaintenance.funcs.php');
+load_funcs('tools/model/_tool.funcs.php');
 
 // load item class
 load_class( 'items/model/_item.class.php', 'Item' );
 
 param( 'tab', 'string', '', true );
+param( 'tab3', 'string', 'tools', true );
 
 $tab_Plugin = NULL;
 $tab_plugin_ID = false;
@@ -50,7 +53,7 @@ if( ! empty($tab) )
 }
 
 // Highlight the requested tab (if valid):
-$AdminUI->set_path( 'tools', $tab );
+$AdminUI->set_path( 'options', 'misc', !empty( $tab ) ? $tab : $tab3 );
 
 
 if( empty($tab) )
@@ -59,147 +62,69 @@ if( empty($tab) )
 	{
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'tools' );
-	
+
 		// fp> TODO: have an option to only PRUNE files older than for example 30 days
 		$current_User->check_perm('options', 'edit', true);
 	}
 
+	set_max_execution_time(0);
+
+	$Plugins->trigger_event( 'AdminToolAction' );
+
 	switch( $action )
 	{
 		case 'del_itemprecache':
-			$DB->query('DELETE FROM T_items__prerendering WHERE 1=1');
+			// Clear pre-renderered item cache (DB)
+			dbm_delete_itemprecache();
+			break;
+
+		case 'del_commentprecache':
+			// Clear pre-renderered comment cache (DB)
+			$DB->query('DELETE FROM T_comments__prerendering WHERE 1=1');
 
 			$Messages->add( sprintf( T_('Removed %d cached entries.'), $DB->rows_affected ), 'success' );
 			break;
 
 		case 'del_pagecache':
 			// Delete the page cache /blogs/cache
-			global $cache_path;
-
-			// Clear general cache directory
-			if( cleardir_r( $cache_path.'general' ) )
-			{
-				$Messages->add( sprintf( T_('General cache deleted: %s'), $cache_path.'general' ), 'note' );
-			}
-			else
-			{
-				$Messages->add( sprintf( T_('Could not delete general cache: %s'), $cache_path.'general' ), 'error' );
-			}
-
-			$SQL = 'SELECT blog_ID FROM T_blogs
-					INNER JOIN T_coll_settings ON ( blog_ID = cset_coll_ID
-								AND cset_name = "cache_enabled"
-								AND cset_value = "1" )
-					WHERE 1=1';
-
-			if( $blog_array = $DB->get_col( $SQL ) )
-			{
-				foreach( $blog_array as $l_blog )
-				{	// Clear blog cache
-					if( cleardir_r( $cache_path.'c'.$l_blog ) )
-					{
-						$Messages->add( sprintf( T_('Blog %d cache deleted: %s'), $l_blog, $cache_path.'c'.$l_blog ), 'note' );
-					}
-					else
-					{
-						$Messages->add( sprintf( T_('Could not delete blog %d cache: %s'), $l_blog, $cache_path.'c'.$l_blog ), 'error' );
-					}
-				}
-			}
-
-			$Messages->add( T_('Page cache deleted.'), 'success' );
+			dbm_delete_pagecache();
 			break;
 
 		case 'del_filecache':
 			// delete the thumbnail cahces .evocache
-			// TODO> handle custom media directories dh> ??
-			// Delete any ?evocache folders:
-			$deleted_dirs = delete_cachefolders($Messages);
-			$Messages->add( sprintf( T_('Deleted %d directories.'), $deleted_dirs ), 'success' );
+			dbm_delete_filecache();
 			break;
 
 		case 'repair_cache':
-			load_funcs( 'tools/model/_system.funcs.php' );
-			$result = system_check_caches();
-			if( empty( $result ) )
-			{
-				$Messages->add( T_( 'All cache folders are working properly.' ), 'success' );
-			}
-			else
-			{
-				$error_message = T_( 'Unable to repair all cache folders becaue of file permissions' ).':<br />';
-				$Messages->add( $error_message.implode( '<br />', $result ) );
-			}
+			// Repair cache
+			dbm_repair_cache();
 			break;
 
-		case 'optimize_tables':
-			// Optimize MyISAM tables
-			global $tableprefix;
-
-			$db_optimized = false;
-			$tables = $DB->get_results( 'SHOW TABLE STATUS FROM `'.$DB->dbname.'` LIKE \''.$tableprefix.'%\'');
-
-			foreach( $tables as $table )
-			{
-				// Before MySQL 4.1.2, the "Engine" field was labeled as "Type".
-				if( ( ( isset( $table->Engine ) && $table->Engine == 'MyISAM' )
-					  || ( isset( $table->Type ) && $table->Type == 'MyISAM' ) )
-					&& $table->Data_free )
-				{	// Optimization needed
-					if( !$DB->query( 'OPTIMIZE TABLE '.$table->Name ) )
-					{
-						$Messages->add( sprintf( T_('Database table %s could not be optimized.'), '<b>'.$table->Name.'</b>' ), 'note' );
-					}
-					else
-					{
-						$db_optimized = true;
-						$Messages->add( sprintf( T_('Database table %s optimized.'), '<b>'.$table->Name.'</b>' ), 'success' );
-					}
-				}
-			}
-
-			if( !$db_optimized )
-			{
-				$Messages->add( T_('Database tables are already optimized.'), 'success' );
-			}
+		case 'optimize_tables': // Optimize MyISAM & InnoDB tables
+		case 'check_tables':    // Check ALL database tables
+		case 'analyze_tables':  // Analize ALL database tables
+			$template_action = $action;
 			break;
 
 		case 'find_broken_posts':
-			// select broken items
-			$sql = 'SELECT * FROM T_items__item
-						WHERE post_canonical_slug_ID NOT IN (
-							SELECT slug_ID FROM T_slug )';
-			$broken_items = $DB->get_results( $sql, OBJECT, 'Find broken posts' );
-			$num_deleted = 0;
-			foreach( $broken_items as $row )
-			{ // delete broken items
-				$broken_Item = new Item( $row );
-				if( $broken_Item->dbdelete() )
-				{
-					$num_deleted++;
-				}
-			}
-
-			$Messages->add( sprintf( T_('Deleted %d posts.'), $num_deleted ), 'success' );
+			// Find all broken posts that have no matching category
+			dbm_find_broken_posts();
 			break;
 
 		case 'find_broken_slugs':
-			// delete broken slugs
-			$r = $DB->query( 'DELETE FROM T_slug
-								WHERE slug_type = "item" and slug_itm_ID NOT IN (
-									SELECT post_ID FROM T_items__item )' );
-
-			if( $r !== false )
-			{
-				$Messages->add( sprintf( T_('Deleted %d slugs.'), $r ), 'success' );
-			}
+			// Find all broken slugs that have no matching target post
+			dbm_find_broken_slugs();
 			break;
 
 		case 'delete_orphan_comment_uploads':
 			// delete orphan comment upload, older than 24 hours
-			$count = remove_orphan_files( NULL, 24 );
+			dbm_delete_orphan_comment_uploads();
+			break;
 
-			$Messages->add( sprintf( T_('%d files have been deleted'), $count ), 'success' );
+		case 'prune_hits_sessions':
+			// Prune old hits & sessions
+			load_class( 'sessions/model/_hitlist.class.php', 'Hitlist' );
+			Hitlist::dbprune(); // will prune once per day, according to Settings
 			break;
 
 		case 'create_sample_comments':
@@ -225,63 +150,8 @@ if( empty($tab) )
 				break;
 			}
 
-			$curr_orderby = $selected_Blog->get_setting('orderby');
-			if( $curr_orderby == 'RAND' )
-			{
-				$curr_orderby .= '()';
-			}
-			else
-			{
-				$curr_orderby = 'post_'.$curr_orderby;
-			}
-			$curr_orderdir = $selected_Blog->get_setting('orderdir');
-
-			// find the $num_posts latest posts in blog
-			$sql = 'SELECT post_ID 
-						FROM T_items__item INNER JOIN T_categories ON post_main_cat_ID = cat_ID
-					 WHERE cat_blog_ID = '.$blog_ID.' AND post_status = '.$DB->quote( 'published' ).'
-					 ORDER BY '.$curr_orderby.' '.$curr_orderdir.', post_ID '.$curr_orderdir.'
-					 LIMIT '.$num_posts;
-			$items_result = $DB->get_results( $sql, ARRAY_A, 'Find the x latest posts in blog' );
-
-			$count = 1;
-			$fix_content = 'This is an auto generated comment for testing the moderation features.
-							http://www.test.com/test_comment_';
-			// go through on selected items
-			foreach( $items_result as $row )
-			{
-				$item_ID = $row['post_ID'];
-				// create $num_comments comments for each item
-				for( $i = 0; $i < $num_comments; $i++ )
-				{
-					$author = 'Test '.$count;
-					$email = 'test_'.$count.'@test.com';
-					$url = 'http://www.test.com/test_comment_'.$count;
-
-					$content = $fix_content.$count;
-					for( $j = 0; $j < 50; $j++ )
-					{ // create 50 random word
-						$length = rand(1, 15);
-						$word = generate_random_key( $length, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' );
-						$content = $content.' '.$word;
-					}
-
-					// create and save a new comment
-					$Comment = new Comment();
-					$Comment->set( 'post_ID', $item_ID );
-					$Comment->set( 'status', 'draft' );
-					$Comment->set( 'author', $author );
-					$Comment->set( 'author_email', $email );
-					$Comment->set( 'author_url', $url );
-					$Comment->set( 'content', $content );
-					$Comment->set( 'date', date( 'Y-m-d H:i:s', $localtimenow ) );
-					$Comment->set( 'author_IP', $Hit->IP );
-					$Comment->dbsave();
-					$count++;
-				}
-			}
-
-			$Messages->add( sprintf( T_('Created %d comments.'), $count - 1 ), 'success' );
+			// Execute a creating of comments inside template in order to see a process
+			$template_action = 'create_sample_comments';
 			break;
 
 		case 'create_sample_posts':
@@ -319,7 +189,7 @@ if( empty($tab) )
 				$Item->set( 'title', 'Generated post '.$i );
 				$Item->set( 'content', $content );
 				$Item->set( 'status', 'published' );
-				$Item->set( 'dateset', '1' );
+				$Item->set( 'dateset', 1 );
 				// set post main cat ID, from selected blog
 				$Item->set( 'main_cat_ID', $selected_Blog->get_default_cat_ID() );
 				$Item->set( 'datestart', date( 'Y-m-d H:i:s', $time ) );
@@ -329,36 +199,41 @@ if( empty($tab) )
 			$Messages->add( sprintf( T_('Created %d posts.'), $num_posts ), 'success' );
 			break;
 
-		case 'recreate_itemslugs':
-			$ItemCache = get_ItemCache();
-			$ItemCache->load_where( '( post_title != "" ) AND ( post_urltitle = "title" OR post_urltitle LIKE "title-%" )');
-			$items = $ItemCache->get_ID_array();
-			$count_slugs = 0;
+		case 'create_sample_users':
+			$num_users = param( 'num_users', 'string', 0 );
+			$group_ID = param( 'group_ID', 'string', 0 );
 
-			set_max_execution_time(0);
-
-			foreach( $items as $item_ID )
-			{
-				$Item = $ItemCache->get_by_ID($item_ID);
-
-				$prev_urltitle = $Item->get( 'urltitle' );
-				$item_title = $Item->get( 'title' );
-
-				// check if post title is not empty and urltitle was auto generated ( equals title or title-[0-9]+ )
-				// Note: urltitle will be auto generated on this form (title-[0-9]+), if post title wass empty and, urltitle was not set
-				// Note: Even if a post title was set to 'title' on purpose it's possible, that this tool will change the post urltitle
-				if( ( ! empty( $item_title ) ) && ( ( $prev_urltitle == 'title' ) || ( preg_match( '#^title-[0-9]+$#', $prev_urltitle ) ) ) )
-				{
-					// set urltitle empty, so the item update function will regenerate the item slug
-					$Item->set( 'urltitle', '' );
-					$result = $Item->dbupdate(/* do not autotrack modification */ false, /* update slug */ true, /* do not update excerpt */ false); 
-					if( ( $result ) && ( $prev_urltitle != $Item->get( 'urltitle' ) ) )
-					{ // update was successful, and item urltitle was changed
-						$count_slugs++;
-					}
-				}
+			if( ! param_check_number( 'num_users', T_('"How many users" field must be a number'), true ) )
+			{	// param errors
+				$action = 'show_create_users';
+				break;
 			}
-			$Messages->add( sprintf( 'Created %d new URL slugs.', $count_slugs ), 'success' );
+
+			$content = T_( 'This is an auto generated post for testing moderation.' );
+			for( $i = 1; $i <= $num_users; $i++ )
+			{
+				$login = generate_random_key( rand(3, 20), 'abcdefghijklmnopqrstuvwxyz1234567890' );
+				while( user_exists($login) )
+				{	// Generate new unique login
+					$login = generate_random_key( rand(3, 20), 'abcdefghijklmnopqrstuvwxyz1234567890' );
+				}
+
+				$User = new User();
+				// Create out of range hashes for better security
+				$User->set( 'pass', generate_random_key( 32, 'abcdefghijklmnopqrstuvwxyz1234567890' ) );
+				$User->set( 'login', $login );
+				$User->set( 'email', 'test_'.$i.'@test.com' );
+				$User->set( 'firstname', 'Test user '.$i );
+				$User->set( 'url', 'http://www.test-'.rand(1,3).'.com/test_user_'.$i );
+				$User->set( 'group_ID', $group_ID );
+				$User->dbinsert();
+			}
+			$Messages->add( sprintf( T_('Created %d users.'), $num_users ), 'success' );
+			break;
+
+		case 'recreate_itemslugs':
+			// Recreate all item slugs (change title-[0-9] canonical slugs to a slug generated from current title). Old slugs will still work, but redirect to the new one.
+			dbm_recreate_itemslugs();
 			break;
 
 		case 'del_obsolete_tags':
@@ -396,389 +271,150 @@ if( empty($tab) )
 				$action = 'show_create_test_hit';
 				break;
 			}
-			
-
-			global $baseurlroot, $admin_url, $user_agents;
-
-			load_class( 'items/model/_itemlistlight.class.php', 'ItemListLight' );
-
-			load_class( 'sessions/model/_hit.class.php', 'Hit' );
 
 			load_funcs('sessions/model/_hitlog.funcs.php');
 
-			$links = array();
-
-			$BlogCache = & get_BlogCache();
-
-			$blogs_id = $BlogCache->load_public();
-
-			foreach ($blogs_id as $blog_id)
-			{	// handle all public blogs
-				$listBlog = & $BlogCache->get_by_ID($blog_id);
-				if( empty($listBlog) )
-				{
-					continue;
-				}
-
-				$ItemList = new ItemListLight($listBlog);
-				$filters = array();
-
-				# This is the list of categories to restrict the linkblog to (cats will be displayed recursively)
-				# Example: $linkblog_cat = '4,6,7';
-				$linkblog_cat = '';
-
-				# This is the array if categories to restrict the linkblog to (non recursive)
-				# Example: $linkblog_catsel = array( 4, 6, 7 );
-				$linkblog_catsel = array(); // $cat_array;
-
-				// Compile cat array stuff:
-				$linkblog_cat_array = array();
-				$linkblog_cat_modifier = '';
-
-				compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $listBlog->ID );
-
-				$filters['cat_array'] = $linkblog_cat_array;
-				$filters['cat_modifier'] = $linkblog_cat_modifier;
-				
-
-				$ItemList->set_default_filters($filters);
-
-				// Get the items list of current blog
-				$ItemList->query();
-
-				if( ! $ItemList->result_num_rows )
-				{	// Nothing to display:
-					continue;
-				}
-
-				while( $Item = & $ItemList->get_category_group() )
-				{
-					// Open new cat:
-					$Chapter = & $Item->get_main_Chapter();
-					while( $Item = & $ItemList->get_item() )
-					{	
-						$links[] =  array('link' => '/'.$listBlog->siteurl.'/'.$Chapter->get_url_path().$Item->urltitle, // trim($Chapter->get_permanent_url(NULL ,' ')).
-										  'blog_id'   => $blog_id);
-					}
-
-				}
-
-				// add search links for all blogs
-				$links[] =  array('link'	=> '/'.$listBlog->siteurl.'?s=$keywords$&disp=search&submit=Search',
-								  'blog_id' => $blog_id);
-
-				$links[] =  array('link'	=> '/'.$listBlog->siteurl.'?disp=users',
-								  'blog_id'	=> $blog_id,
-								  'disp'	=> 'users');
-
-				$links[] =  array('link'	=> '/'.$listBlog->siteurl.'?disp=users&user_ID=1',
-								  'blog_id'	=> $blog_id,
-								  'disp'	=> 'users');
-
-				$links[] =  array('link'	=> '/'.$listBlog->siteurl.'?disp=threads',
-								  'blog_id'	=> $blog_id,
-								  'disp'	=> 'threads');
-
-				$links[] =  array('link'	=> '/'.$listBlog->siteurl.'?disp=profile',
-								  'blog_id'	=> $blog_id,
-								  'disp'	=> 'profile');
-
-
-			}
-
-			$referes = array('http://www.fake-referer1.com',
-							 'http://www.fake-referer2.com',
-							 'http://www.fake-referer3.com',
-							 'http://www.fake-referer4.com',
-							 'http://www.fake-referer5.com',
-							 'http://www.fake-referer6.com',
-							 'http://www.fake-referer7.com',
-							 'http://www.fake-referer8.com',
-							 'http://www.fake-referer9.com',
-							 'http://www.mail.google.com/fake/referer',
-							 'http://www.webmail.aol.com/fake/referer',
-							 'http://www.mail.yahoo.com/fake/referer',
-							 'http://bloglines.com/fake/referer',
-							 'http://www.fake-refer-online-casino1.com',
-							 'http://www.fake-refer-online-casino2.com',
-							 'http://www.fake-refer-online-casino3.com',
-							 'http://www.google.com/url?sa=t&rct=j&q=$keywords$&source=web&cd=4',
-							 'http://www.bing.com/search?q=$keywords$&src=IE-SearchBox&FORM=IE8SRC'
-							);
-
-			$robots = array();
-			foreach( $user_agents as $lUserAgent )
-			{
-				if( $lUserAgent[0] == 'robot')
-				{
-				$robots[] = $lUserAgent[1];
-				}
-			}
-
-			$robots_count = count($robots) - 1;
-
-			$ref_count = count($referes) - 1;
-
-			$admin_link = array('link'=> $admin_url,
-								'blog_id' => NULL);
-
-			$links_count = count($links);
-
-			if (empty($links_count))
-			{
-				$Messages->add('Do not have blog links to generate statistics');
-				break;
-			}
-
-			// generate users id array
-
-			$users_array = $DB->get_results( '
-					SELECT user_ID
-					  FROM T_users
-					  WHERE user_validated = 1
-					  LIMIT 10'
-					, 'ARRAY_A');
-
-			$users_count = count($users_array);
-
-			if (empty ($users_count))
-			{
-				$Messages->add('Do not have valid users to generate statistics');
-				break;
-			}
-
-			// Calculate the period of testing
-			$cur_time = time();
-			$past_time = mktime(date("H"),date("i"),date("s") ,date("m"),date("d")-$days,date("Y"));
-
-			$insert_data ='';
-			$insert_data_count = 0;
-
-			// create session array for testing
-			$sessions = array();
-			mt_srand(crc32(microtime()));
-			for ($i = 0; $i <= $users_count - 1; $i++)
-			{
-				
-				$sessions[] = array('sess_ID'		=> -1,
-									'sess_key'      => generate_random_key(32),
-									'sess_hitcount' => 1,
-									'sess_lastseen' => 0,
-									'sess_ipaddress'=> generate_random_ip(),
-									'sess_user_ID'  => $users_array[$i]['user_ID'],
-									'pervios_link'	=> '',
-									'robot'			=> '');
-			}
-
-			// main cycle of generation
-			//mt_srand(crc32(microtime()));
-			for ($time_shift = $past_time; $cur_time > $time_shift; $time_shift += mt_rand($min_interval, $max_interval))
-			{
-				//mt_srand(crc32(microtime()));
-				$insert_data_count = $insert_data_count + 1;
-
-				$rand_i = mt_rand(0,$users_count-1);
-				$rand_link = mt_rand(0,$links_count-1);
-				$cur_seesion =  $sessions[$rand_i];
-
-
-				if (strstr($links[$rand_link]['link'],'$keywords$'))
-				{	// check if the current search link is selected randomly.
-					// If yes, generate search link and add it to DB
-						//mt_srand(crc32(microtime()+ $time_shift));
-						$keywords =  'fake search '. mt_rand(0,9);
-						$links[$rand_link]['link'] = str_replace('$keywords$', urlencode($keywords), $links[$rand_link]['link']);
-						if (strstr($links[$rand_link]['link'],'s='))
-						{
-							$links[$rand_link]['s'] = $keywords;
-						}
-				}
-
-
-				if ($cur_seesion['sess_ID'] == -1)
-				{	// This session needs initialization:
-
-					$cur_seesion['sess_lastseen'] = $time_shift;
-
-					$DB->query( "
-					INSERT INTO T_sessions( sess_key, sess_hitcount, sess_lastseen, sess_ipaddress, sess_user_ID )
-					VALUES (
-						'".$cur_seesion['sess_key']."',
-						".$cur_seesion['sess_hitcount'].",
-						'".date( 'Y-m-d H:i:s', $cur_seesion['sess_lastseen'] )."',
-						".$DB->quote($cur_seesion['sess_ipaddress']).",
-						".$cur_seesion['sess_user_ID']."
-					)" );
-
-					$cur_seesion['sess_ID'] = $DB->insert_id;
-					$sessions[$rand_i] = $cur_seesion;
-
-					$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen'], 1, $links[$rand_link]);
-					$Test_hit->log();
-
-
-				}
-				else
-				{
-					if (($time_shift - $cur_seesion['sess_lastseen'])> 3000 || !empty($cur_seesion['robot']))
-					{	// This session last updated more than 3000 sec ago. Instead of this session create a new session.
-
-						$cur_seesion = array(	'sess_ID'		=> -1,
-												'sess_key'      => generate_random_key(32),
-												'sess_hitcount' => 1,
-												'sess_lastseen' => 0,
-												'sess_ipaddress'=> generate_random_ip(),
-												'sess_user_ID'  => $users_array[mt_rand(0,$users_count-1)]['user_ID'],
-												'pervios_link'	=> '',
-												'robot'			=> ''
-							);
-
-						$cur_seesion['sess_lastseen'] = $time_shift;
-						$r_num  = mt_rand(0, 100);
-						if ($r_num > 40)
-						{	// Create anonymous user and make double insert into hits.
-							$cur_seesion['sess_user_ID'] = -1;
-							$DB->query( "
-							INSERT INTO T_sessions( sess_key, sess_hitcount, sess_lastseen, sess_ipaddress)
-							VALUES (
-								'".$cur_seesion['sess_key']."',
-								".$cur_seesion['sess_hitcount'].",
-								'".date( 'Y-m-d H:i:s', $cur_seesion['sess_lastseen'] )."',
-								".$DB->quote($cur_seesion['sess_ipaddress'])."
-							)" );
-							
-							if ($r_num >= 80 )
-							{ // Create robot hit
-								$cur_seesion['robot'] = $robots[mt_rand(0,$robots_count)];
-							}
-						}
-
-						else
-						{
-						$DB->query( "
-							INSERT INTO T_sessions( sess_key, sess_hitcount, sess_lastseen, sess_ipaddress, sess_user_ID )
-							VALUES (
-								'".$cur_seesion['sess_key']."',
-								".$cur_seesion['sess_hitcount'].",
-								'".date( 'Y-m-d H:i:s', $cur_seesion['sess_lastseen'] )."',
-								".$DB->quote($cur_seesion['sess_ipaddress']).",
-								".$cur_seesion['sess_user_ID']."
-							)" );
-						}
-
-						$cur_seesion['sess_ID'] = $DB->insert_id;
-
-						if (mt_rand(0, 100) > 20)
-						{
-							//$ref_count
-							$ref_link = $referes[mt_rand(0,$ref_count)];
-							if (strstr($ref_link,'$keywords$'))
-							{	// check if the current search link is selected randomly.
-									$keywords =  'fake search '. mt_rand(0,9);
-									$ref_link = str_replace('$keywords$', urlencode($keywords), $ref_link);
-							}
-
-						}
-						else
-						{
-							$ref_link = '';
-						}
-						
-						if ($cur_seesion['sess_user_ID'] == -1)
-						{
-							if (empty($cur_seesion['robot']))
-							{
-								$link =  array(	'link'		=> '/htsrv/login.php',
-												'blog_id'   => 1);
-
-								$Test_hit = new Hit($ref_link, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen'], 1, $link);
-
-								$Test_hit->log();
-
-								$link =  array('link'		=> '/htsrv/login.php?redirect_to=fake_stat',
-											   'blog_id'	=> 1);
-
-								$Test_hit = new Hit($baseurlroot, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen'] + 3, 1, $link);
-
-								$Test_hit->log();
-
-								$cur_seesion['pervios_link'] = $baseurlroot.$link['link'];
-							}
-							else
-							{
-								if (mt_rand(0, 100) < 50)
-								{	// robot hit
-									$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen'], 1, $links[$rand_link], $cur_seesion['robot']);
-								}
-								else
-								{	// rss/atom hit
-									$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen'], 1, $links[$rand_link], NULL, NULL, 1);
-								}
-								$Test_hit->log();
-							}
-
-
-						}
-						else
-						{
-							if (mt_rand(0, 100) < 10)
-							{	// Test hit to admin page
-								$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen'], 1, $admin_link , NULL, 1);
-								$Test_hit->log();
-								$cur_seesion['pervios_link'] = $admin_url;
-							}
-							else
-							{
-								$Test_hit = new Hit($ref_link, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen'], 1, $links[$rand_link]);
-								$Test_hit->log();
-								$cur_seesion['pervios_link'] = $baseurlroot.$links[$rand_link]['link'];
-
-							}
-
-  						}
-
-
-
-					}
-					else
-					{
-						// Update session
-						$cur_seesion['sess_lastseen'] = $time_shift;
-
-						$Test_hit = new Hit($cur_seesion['pervios_link'], $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen'], 1, $links[$rand_link]);
-						$Test_hit->log();
-
-
-
-						$sql = "UPDATE T_sessions SET
-								sess_hitcount = sess_hitcount + 1,
-								sess_lastseen = '".date( 'Y-m-d H:i:s', $cur_seesion['sess_lastseen'] )."'
-								WHERE sess_ID = {$cur_seesion['sess_ID']}";
-
-						$DB->query( $sql, 'Update session' );
-
-						$cur_seesion['pervios_link'] = $baseurlroot.$links[$rand_link]['link'];
-
-						$sessions[$rand_i] = $cur_seesion;
-
-					}
-				}
-
-			$sessions[$rand_i] = $cur_seesion;
-
-			}
-
+			$insert_data_count = generate_hit_stat($days, $min_interval, $max_interval);
 
 			$Messages->add( sprintf( '%d test data items are added.', $insert_data_count ), 'success' );
 			break;
 
+		case 'create_sample_messages':
+			$num_loops = param( 'num_loops', 'string', 0 );
+			$num_messages = param( 'num_messages', 'string', 0 );
+			$num_words = param( 'num_words', 'string', 0 );
+			$max_users = param( 'max_users', 'string', 0 );
 
+			if ( ! ( param_check_number( 'num_loops', T_('"How many loops" field must be a number'), true ) &&
+				param_check_number( 'num_messages', T_('"How many messages in each conversation" field must be a number'), true ) &&
+				param_check_number( 'num_words', T_('"How many words in each message" field must be a number'), true ) &&
+				param_check_number( 'max_users', T_('"Max # of participants in a conversation" field must be a number'), true ) ) )
+			{	// param errors
+				$action = 'show_create_messages';
+				break;
+			}
+
+			// Get all users
+			$SQL = new SQL();
+			$SQL->SELECT( 'user_ID' );
+			$SQL->FROM( 'T_users' );
+			$users = $DB->get_col( $SQL->get() );
+
+			if( count( $users ) < 2 )
+			{	// No users
+				$Messages->add( T_('At least two users must exist in DB to create the messages'), 'error' );
+				$action = 'show_create_messages';
+				break;
+			}
+
+			$count_threads = 0;
+			$count_messages = 0;
+			for( $l = 0; $l < $num_loops; $l++ )
+			{
+				$user_links = array();
+				foreach( $users as $from_user_ID )
+				{
+					foreach( $users as $to_user_ID )
+					{
+						if( $from_user_ID == $to_user_ID || isset( $user_links[ (string) $from_user_ID.'-'.$to_user_ID ] ) )
+						{
+							continue;
+						}
+
+						$user_links[ $from_user_ID.'-'.$to_user_ID ] = 1;
+						// Insert thread
+						$DB->query( 'INSERT INTO T_messaging__thread ( thrd_title, thrd_datemodified )
+							VALUES ( '.$DB->quote( generate_random_key( 16 ) ).', '.$DB->quote( date( 'Y-m-d H:i:s' ) ).' )' );
+
+						$thread_ID = $DB->insert_id;
+						$count_threads++;
+
+						for( $m = 0; $m < $num_messages; $m++ )
+						{
+							$msg_text = '';
+							for( $w = 0; $w < $num_words; $w++ )
+							{
+								$msg_text .= generate_random_key( 8 ).' ';
+							}
+							$message_user_ID = $m % 2 == 0 ? $from_user_ID : $to_user_ID;
+							// Insert message
+							$DB->query( 'INSERT INTO T_messaging__message ( msg_author_user_ID , msg_datetime, msg_thread_ID, msg_text )
+								VALUES ( '.$DB->quote( $message_user_ID ).', '.$DB->quote( date( 'Y-m-d H:i:s' ) ).', '.$DB->quote( $thread_ID ).', '.$DB->quote( $msg_text ).' )' );
+							$count_messages++;
+						}
+
+						// Insert link for thread & user
+						$DB->query( 'INSERT INTO T_messaging__threadstatus ( tsta_thread_ID , tsta_user_ID, tsta_first_unread_msg_ID )
+							VALUES ( '.$DB->quote( $thread_ID ).', '.$DB->quote( $from_user_ID ).', NULL ),
+								     ( '.$DB->quote( $thread_ID ).', '.$DB->quote( $to_user_ID ).', NULL )' );
+					}
+				}
+
+				/** Create one conversation between all users ( limit by $max_users ) **/
+
+				// Insert thread
+				$DB->query( 'INSERT INTO T_messaging__thread ( thrd_title, thrd_datemodified )
+					VALUES ( '.$DB->quote( generate_random_key( 16 ) ).', '.$DB->quote( date( 'Y-m-d H:i:s' ) ).' )' );
+
+				$thread_ID = $DB->insert_id;
+				$count_threads++;
+
+				$user_number = 0;
+				for( $m = 0; $m < $num_messages; $m++ )
+				{
+					$msg_text = '';
+					for( $w = 0; $w < $num_words; $w++ )
+					{
+						$msg_text .= generate_random_key( 8 ).' ';
+					}
+					// Insert message
+					$DB->query( 'INSERT INTO T_messaging__message ( msg_author_user_ID , msg_datetime, msg_thread_ID, msg_text )
+						VALUES ( '.$DB->quote( $users[ $user_number ] ).', '.$DB->quote( date( 'Y-m-d H:i:s' ) ).', '.$DB->quote( $thread_ID ).', '.$DB->quote( $msg_text ).' )' );
+					$count_messages++;
+					$user_number++;
+					if( $user_number == count( $users ) || $user_number == $max_users - 1 )
+					{	// Reset user number to start of the list
+						$user_number = 0;
+					}
+				}
+
+				// Insert the links between thread & users
+				$threadstatuses = array();
+				foreach( $users as $u => $user_ID )
+				{
+					$threadstatuses[] = '( '.$DB->quote( $thread_ID ).', '.$DB->quote( $user_ID ).', NULL )';
+					if( $u == $max_users - 1 )
+					{	// limit by max users in one thread
+						break;
+					}
+				}
+				$DB->query( 'INSERT INTO T_messaging__threadstatus ( tsta_thread_ID , tsta_user_ID, tsta_first_unread_msg_ID )
+					VALUES '.implode( ', ', $threadstatuses ) );
+			}
+
+			$Messages->add( sprintf( T_('%d threads and %d messages have been created.'), $count_threads, $count_messages ), 'success' );
+			break;
 
 	}
 }
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('Tools'), '?ctrl=crontab' );
-$AdminUI->breadcrumbpath_add( T_('Miscellaneous'), '?ctrl=tools' );
+$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system' );
+$AdminUI->breadcrumbpath_add( T_('Maintenance'), '?ctrl=tools' );
+switch( $tab3 )
+{
+	case 'import':
+		$AdminUI->breadcrumbpath_add( T_('Import'), '?ctrl=tools&amp;tab3=import' );
+		break;
+
+	case 'test':
+		$AdminUI->breadcrumbpath_add( T_('Testing'), '?ctrl=tools&amp;tab3=import' );
+		break;
+
+	case 'tools':
+	default:
+		$AdminUI->breadcrumbpath_add( T_('Tools'), '?ctrl=tools' );
+		break;
+}
 
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -810,14 +446,44 @@ if( empty($tab) )
 		case 'show_create_posts':
 			$AdminUI->disp_view( 'tools/views/_create_posts.form.php' );
 			break;
+			break;
+
+		case 'show_create_users':
+			$AdminUI->disp_view( 'tools/views/_create_users.form.php' );
+			break;
 
 		case 'show_create_test_hit':
 			$AdminUI->disp_view( 'tools/views/_create_test_hit.form.php' );
 			break;
 
+		case 'show_create_messages':
+			// Get count users
+			$SQL = new SQL();
+			$SQL->SELECT( 'COUNT( user_ID )' );
+			$SQL->FROM( 'T_users' );
+			$users_count = $DB->get_var( $SQL->get() );
+			$threads_count = $users_count * $users_count - $users_count + 1;
+
+			$AdminUI->disp_view( 'tools/views/_create_messages.form.php' );
+			break;
+
 
 		default:
-			$AdminUI->disp_view( 'tools/views/_misc_tools.view.php' );
+			switch( $tab3 )
+			{
+				case 'import':
+					$AdminUI->disp_view( 'tools/views/_misc_import.view.php' );
+					break;
+
+				case 'test':
+					$AdminUI->disp_view( 'tools/views/_misc_test.view.php' );
+					break;
+
+				case 'tools':
+				default:
+					$AdminUI->disp_view( 'tools/views/_misc_tools.view.php' );
+					break;
+			}
 			break;
 	}
 }
@@ -831,8 +497,7 @@ elseif( $tab_Plugin )
 
 	<?php
 	echo $tab_Plugin->get_edit_settings_link()
-		.' '.$tab_Plugin->get_help_link('$help_url')
-		.' '.$tab_Plugin->get_help_link('$readme');
+		.' '.$tab_Plugin->get_help_link('$help_url');
 	?>
 
 	</div>
@@ -850,176 +515,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.56  2011/10/21 07:33:30  efy-vitalij
- * add call load_funcs('sessions/model/_hitlog.funcs.php')
- *
- * Revision 1.55  2011/10/12 11:23:18  efy-vitalij
- * add rss and robot hits generation
- *
- * Revision 1.54  2011/10/10 19:48:32  fplanque
- * i18n & login display cleaup
- *
- * Revision 1.53  2011/10/05 13:42:12  efy-vitalij
- * change fake statistic generator
- *
- * Revision 1.52  2011/10/04 09:47:17  efy-vitalij
- * remake hits generator to HIT class
- *
- * Revision 1.51  2011/10/03 12:36:56  efy-vitalij
- * fix random hits generator
- *
- * Revision 1.50  2011/09/30 09:13:51  efy-vitalij
- * fixed fake internal search links
- *
- * Revision 1.49  2011/09/29 12:35:58  efy-vitalij
- * add anonymous users and fake search links
- *
- * Revision 1.48  2011/09/29 06:22:36  efy-vitalij
- * add config params to statistic generator form
- *
- * Revision 1.47  2011/09/28 09:05:58  efy-vitalij
- * add session functional to  statistical data generator
- *
- * Revision 1.46  2011/09/27 13:11:29  efy-vitalij
- * generate sample hit data
- *
- * Revision 1.45  2011/09/26 15:38:08  efy-vitalij
- * add test hit information
- *
- * Revision 1.44  2011/09/05 14:17:26  sam2kb
- * Refactor antispam controller
- *
- * Revision 1.43  2011/09/04 22:13:21  fplanque
- * copyright 2011
- *
- * Revision 1.42  2011/09/04 21:32:17  fplanque
- * minor MFB 4-1
- *
- * Revision 1.41  2011/06/15 07:38:13  sam2kb
- * Refactor spam comments and hits removal actions
- *
- * Revision 1.40  2011/06/14 06:05:18  sam2kb
- * Check and remove all comments and hits mathing antispam blacklist
- *
- * Revision 1.39  2011/03/15 09:34:06  efy-asimo
- * have checkboxes for enabling caching in new blogs
- * refactorize cache create/enable/disable
- *
- * Revision 1.38  2011/03/03 12:50:57  efy-asimo
- * tool to find and delete orphan comment attachment files
- *
- * Revision 1.37  2010/12/08 13:55:37  efy-asimo
- * Create Sample comments - fix
- *
- * Revision 1.36  2010/12/06 14:27:57  efy-asimo
- * Generate sample posts tool
- *
- * Revision 1.35  2010/11/12 15:13:31  efy-asimo
- * MFB:
- * Tool 1: "Find all broken posts that have no matching category"
- * Tool 2: "Find all broken slugs that have no matching target post"
- * Tool 3: "Create sample comments for testing moderation"
- *
- * Revision 1.34  2010/11/04 03:16:10  sam2kb
- * Display PHP info in a pop-up window
- *
- * Revision 1.33  2010/07/28 07:58:53  efy-asimo
- * Add where condition to recreate slugs tool query
- *
- * Revision 1.32  2010/07/26 07:24:27  efy-asimo
- * Tools recreate item slugs (change description + fix notice)
- *
- * Revision 1.31  2010/07/26 06:52:27  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.30  2010/06/15 21:33:24  blueyed
- * Fix patch failure.
- *
- * Revision 1.29  2010/06/15 21:20:37  blueyed
- * Add tools action to remove obsolete/unused tags.
- *
- * Revision 1.28  2010/05/24 21:27:58  sam2kb
- * Fixed some translated strings
- *
- * Revision 1.27  2010/05/02 00:15:07  blueyed
- * cleanup
- *
- * Revision 1.26  2010/05/02 00:14:07  blueyed
- * Add recreate_itemslugs tool to re-generate slugs for all items.
- *
- * Revision 1.25  2010/03/27 19:57:30  blueyed
- * Add delete_cachefolders function and use it in the Tools Misc actions and with the watermark plugin. The latter will also remove caches when it gets enabled or disabled.
- *
- * Revision 1.24  2010/03/12 10:52:56  efy-asimo
- * Set EvoCache  folder names - task
- *
- * Revision 1.23  2010/02/08 17:54:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.22  2010/01/14 21:30:31  blueyed
- * Make deleting .evocache folders far less verbose.
- *
- * Revision 1.21  2010/01/03 18:07:37  fplanque
- * crumbs
- *
- * Revision 1.20  2009/12/06 22:55:20  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.19  2009/11/25 19:53:58  blueyed
- * Fix 'Optimize database tables' SQL: quote DB name.
- *
- * Revision 1.18  2009/11/25 00:54:26  blueyed
- * todo
- *
- * Revision 1.17  2009/11/12 03:54:17  fplanque
- * wording/doc/cleanup
- *
- * Revision 1.16  2009/10/16 18:41:47  tblue246
- * Cleanup/doc
- *
- * Revision 1.15  2009/10/02 14:17:34  tblue246
- * minor/doc
- *
- * Revision 1.13  2009/10/02 13:28:03  sam2kb
- * Backup b2evo database from Tools > Misc
- *
- * Revision 1.12  2009/10/01 16:19:14  sam2kb
- * minor
- *
- * Revision 1.11  2009/10/01 14:58:44  sam2kb
- * Delete page and thumbnails cache
- *
- * Revision 1.10  2009/10/01 13:06:03  tblue246
- * Fix for backward compatibility with MySQL versions lower than 4.1.2.
- *
- * Revision 1.9  2009/10/01 12:57:18  tblue246
- * Tools -> Optimize DB: Drop substr() check for table prefix and modify the SQL query to only return appropriate tables instead.
- *
- * Revision 1.8  2009/09/30 19:48:38  tblue246
- * Tools -> Optimize tables: Do not use preg_match() to check table prefix but a simple substr().
- *
- * Revision 1.7  2009/09/30 18:00:19  sam2kb
- * Optimize b2evo tables from Tools > Misc
- *
- * Revision 1.6  2009/03/08 23:57:46  fplanque
- * 2009
- *
- * Revision 1.5  2008/07/11 23:10:01  blueyed
- * s/insctructions/instructions/g
- *
- * Revision 1.4  2008/01/21 09:35:35  fplanque
- * (c) 2008
- *
- * Revision 1.3  2007/10/09 01:18:12  fplanque
- * Hari's WordPress importer
- *
- * Revision 1.2  2007/09/04 14:57:07  fplanque
- * interface cleanup
- *
- * Revision 1.1  2007/06/25 11:01:42  fplanque
- * MODULES (refactored MVC)
+ * Revision 1.58  2013/11/06 08:04:54  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

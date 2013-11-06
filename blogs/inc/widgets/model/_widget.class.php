@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -240,7 +240,19 @@ class ComponentWidget extends DataObject
 	 */
 	function get_param_definitions( $params )
 	{
-		$r = array(
+
+		$r = array();
+
+		if( $this->type == 'plugin' )
+		{
+			// Make sure Plugin is loaded:
+			if( $this->get_Plugin() )
+			{
+				$r = $this->Plugin->get_widget_param_definitions( $params );
+			}
+		}
+
+		$r_standart = array(
 				'widget_css_class' => array(
 					'label' => '<span class="dimmed">'.T_( 'CSS Class' ).'</span>',
 					'size' => 20,
@@ -259,15 +271,7 @@ class ComponentWidget extends DataObject
 				),
 			);
 
-		if( $this->type == 'plugin' )
-		{
-			// Make sure Plugin is loaded:
-			if( $this->get_Plugin() )
-			{
-				$r = array_merge( $r, $this->Plugin->get_widget_param_definitions( $params ) );
-			}
-		}
-		return $r;
+		return array_merge($r,$r_standart);;
 	}
 
 
@@ -340,6 +344,14 @@ class ComponentWidget extends DataObject
 
 
 	/**
+	 * Request all required css and js files for this widget
+	 */
+	function request_required_files()
+	{
+	}
+
+
+	/**
 	 * Prepare display params
 	 *
 	 * @todo Document default params and default values.
@@ -397,6 +409,8 @@ class ComponentWidget extends DataObject
 					'item_selected_start' => '<li class="selected">',
 					'item_selected_end' => '</li>',
 					'item_selected_text' => '%s',
+					'item_last_start' => '<li class="last">',
+					'item_last_end' => '</li>',
 					'grid_start' => '<table cellspacing="1" class="widget_grid">',
 					'grid_end' => '</table>',
 					'grid_nb_cols' => 2,
@@ -599,7 +613,7 @@ class ComponentWidget extends DataObject
 	 *
 	 * @param array MUST contain at least the basic display params
 	 */
-	function disp_coll_list( $filter = 'public' )
+	function disp_coll_list( $filter = 'public', $order_by = 'ID', $order_dir = 'ASC' )
 	{
 		/**
 		 * @var Blog
@@ -617,11 +631,11 @@ class ComponentWidget extends DataObject
 
 		if( $filter == 'owner' )
 		{	// Load blogs of same owner
-			$blog_array = $BlogCache->load_owner_blogs( $Blog->owner_user_ID, 'ID' );
+			$blog_array = $BlogCache->load_owner_blogs( $Blog->owner_user_ID, $order_by, $order_dir );
 		}
 		else
 		{	// Load all public blogs
-			$blog_array = $BlogCache->load_public( 'ID' );
+			$blog_array = $BlogCache->load_public( $order_by, $order_dir );
 		}
 
 		// 3.3? if( $this->disp_params['list_type'] == 'list' )
@@ -749,164 +763,8 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
- * Revision 1.81  2011/09/07 18:25:11  fplanque
- * widget & blockcache fixes
+ * Revision 1.83  2013/11/06 08:05:09  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.79.4.1  2011/09/04 22:13:53  fplanque
- * copyright 2011
- *
- * Revision 1.79  2011/01/10 04:45:20  sam2kb
- * Option to return widget title instead of displaying it
- *
- * Revision 1.78  2010/07/26 06:52:27  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.77  2010/05/13 19:13:10  blueyed
- * doc
- *
- * Revision 1.76  2010/04/22 22:36:00  blueyed
- * doc/todo
- *
- * Revision 1.75  2010/02/08 17:54:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.74  2009/12/22 08:02:11  fplanque
- * doc
- *
- * Revision 1.73  2009/12/22 03:31:10  blueyed
- * todo about cachable block handling
- *
- * Revision 1.72  2009/12/06 18:07:43  fplanque
- * Fix simplified list widgets.
- *
- * Revision 1.71  2009/12/01 04:19:25  fplanque
- * even more invalidation dimensions
- *
- * Revision 1.70  2009/12/01 03:45:37  fplanque
- * multi dimensional invalidation
- *
- * Revision 1.69  2009/11/30 23:27:13  fplanque
- * added a dimension to cache invalidation
- *
- * Revision 1.68  2009/11/30 23:16:24  fplanque
- * basic cache invalidation is working now
- *
- * Revision 1.67  2009/11/30 04:31:38  fplanque
- * BlockCache Proof Of Concept
- *
- * Revision 1.66  2009/10/03 21:00:50  tblue246
- * Bugfixes
- *
- * Revision 1.65  2009/09/26 12:00:44  tblue246
- * Minor/coding style
- *
- * Revision 1.64  2009/09/25 07:33:15  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.63  2009/08/30 17:27:03  fplanque
- * better NULL param handling all over the app
- *
- * Revision 1.62  2009/08/06 14:55:45  fplanque
- * doc
- *
- * Revision 1.61  2009/08/03 13:19:11  tblue246
- * Fixed http://forums.b2evolution.net//viewtopic.php?p=94778
- *
- * Revision 1.60  2009/07/02 21:50:13  fplanque
- * commented out unfinished code
- *
- * Revision 1.59  2009/06/18 07:36:06  yabs
- * bugfix : $type is already a param ;)
- *
- * Revision 1.58  2009/05/28 06:49:05  sam2kb
- * Blog list widget can be either a "regular list" or a "select menu"
- * See http://forums.b2evolution.net/viewtopic.php?t=18794
- *
- * Revision 1.57  2009/04/02 22:55:50  blueyed
- * ComponentWidget::disp_coll_list: add 'item_text' and 'item_selected_text' params, where %s gets replaced by theshort name. ('%s' being the default)
- *
- * Revision 1.56  2009/03/15 22:48:16  fplanque
- * refactoring... final step :)
- *
- * Revision 1.55  2009/03/15 20:35:18  fplanque
- * Universal Item List proof of concept
- *
- * Revision 1.54  2009/03/14 03:28:00  fplanque
- * tiny cleanup
- *
- * Revision 1.53  2009/03/14 03:02:56  fplanque
- * Moving towards an universal item list widget, step 1
- *
- * Revision 1.52  2009/03/13 02:32:07  fplanque
- * Cleaned up widgets.
- * Removed stupid widget_name param.
- *
- * Revision 1.51  2009/03/13 00:54:38  fplanque
- * calling it "sidebar links"
- *
- * Revision 1.50  2009/03/08 23:57:46  fplanque
- * 2009
- *
- * Revision 1.49  2009/03/04 01:19:41  fplanque
- * doc
- *
- * Revision 1.48  2009/02/25 17:18:03  waltercruz
- * Linkroll stuff, take #2
- *
- * Revision 1.47  2009/02/23 08:14:16  yabs
- * Added check for excerpts
- *
- * Revision 1.46  2009/02/22 23:40:09  fplanque
- * dirty links widget :/
- *
- * Revision 1.45  2009/02/22 14:42:03  waltercruz
- * A basic implementation that merges disp_cat_item_list2(links) and disp_cat_item_list(linkblog). Will delete disp_cat_item_list2 as soon fplanque says that the merge it's ok
- *
- * Revision 1.44  2009/02/22 14:15:48  waltercruz
- * updating docs
- *
- * Revision 1.43  2009/02/21 22:22:23  fplanque
- * eeeeeeek!
- *
- * Revision 1.42  2009/02/07 11:09:00  yabs
- * extra settings for linkblog
- *
- * Revision 1.41  2009/02/05 21:33:34  tblue246
- * Allow the user to enable/disable widgets.
- * Todo:
- * 	* Fix CSS for the widget state bullet @ JS widget UI.
- * 	* Maybe find a better solution than modifying get_Cache() to get only enabled widgets... :/
- * 	* Buffer JS requests when toggling the state of a widget??
- *
- * Revision 1.40  2009/01/24 00:43:25  waltercruz
- * bugfix
- *
- * Revision 1.39  2009/01/24 00:29:27  waltercruz
- * Implementing links in the blog itself, not in a linkblog, first attempt
- *
- * Revision 1.38  2008/09/24 08:44:12  fplanque
- * Fixed and normalized order params for widgets (Comments not done yet)
- *
- * Revision 1.37  2008/09/23 09:04:33  fplanque
- * moved media index to a widget
- *
- * Revision 1.36  2008/06/30 20:46:05  blueyed
- * Fix indent
- *
- * Revision 1.35  2008/04/24 02:01:04  fplanque
- * experimental
- *
- * Revision 1.34  2008/02/08 22:24:46  fplanque
- * bugfixes
- *
- * Revision 1.33  2008/01/21 09:35:36  fplanque
- * (c) 2008
- *
- * Revision 1.32  2008/01/19 14:17:27  yabs
- * bugfix : http://forums.b2evolution.net/viewtopic.php?t=13868
- *
- * Revision 1.31  2008/01/12 18:21:50  blueyed
- *  - use $timestamp_min, $timestamp_max for ItemListLight instances (fixes displaying of posts from the future in coll_post_list widget
- * - typo, todo, fix indent
  */
 ?>

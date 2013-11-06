@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -126,24 +126,10 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 		$Form->checkbox_input( 'cache_enabled_widgets', $edited_Blog->get_setting('cache_enabled_widgets'), T_('Enable widget cache'), array( 'note'=>T_('Cache rendered widgets') ) );
 	$Form->end_fieldset();
 
-	$Form->begin_fieldset( T_('Login').' ['.T_('Admin').']'.get_manual_link('collection_login_settings') );
+	$Form->begin_fieldset( T_('In-skin Actions').' ['.T_('Admin').']'.get_manual_link('in_skin_action_settings') );
 		$Form->checkbox_input( 'in_skin_login', $edited_Blog->get_setting( 'in_skin_login' ), T_( 'In-skin login' ), array( 'note' => T_( 'Use in-skin login form every time it\'s possible' ) ) );
 		$Form->checkbox_input( 'in_skin_editing', $edited_Blog->get_setting( 'in_skin_editing' ), T_( 'In-skin editing' ) );
 	$Form->end_fieldset();
-
-	$Form->begin_fieldset( '['. T_('Deprecated'). '] '.T_('Static file generation').' ['.T_('Admin').']'.get_manual_link('static_file_generation') );
-		$Form->text_input( 'source_file', $edited_Blog->get_setting( 'source_file' ), 25, T_('Source file'),
-												T_('.php (stub) file used to generate the static homepage.'),
-												array( 'input_prefix' => "<code>$basepath</code>", 'maxlength' => 255 ) );
-		$Form->text_input( 'static_file', $edited_Blog->get_setting( 'static_file' ), 25, T_('Destination file'),
-												T_('.html file that will be created.'),
-												array( 'input_prefix' => "<code>$basepath</code>", 'maxlength' => 255 ) );
-		if( $current_User->check_perm( 'blog_genstatic', 'any', false, $edited_Blog->ID ) )
-		{
-			$Form->info( T_('Static page'), '<a href="'.$dispatcher.'?ctrl=collections&amp;action=GenStatic&amp;blog='.$edited_Blog->ID.'&amp;redir_after_genstatic='.rawurlencode(regenerate_url( '', '', '', '&' )).'">'.T_('Generate now!').'</a>' );
-		}
-	$Form->end_fieldset();
-
 
 	$Form->begin_fieldset( T_('Media directory location').' ['.T_('Admin').']'.get_manual_link('media_directory_location') );
 	global $media_path;
@@ -207,6 +193,10 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	$Form->begin_fieldset( T_('Skin and style').' ['.T_('Admin').']' );
 		$Form->checkbox( 'blog_allowblogcss', $edited_Blog->get( 'allowblogcss' ), T_('Allow customized blog CSS file'), T_('You will be able to customize the blog\'s skin stylesheet with a file named style.css in the blog\'s media file folder.') );
 		$Form->checkbox( 'blog_allowusercss', $edited_Blog->get( 'allowusercss' ), T_('Allow user customized CSS file for this blog'), T_('Users will be able to customize the blog and skin stylesheets with a file named style.css in their personal file folder.') );
+		$Form->textarea( 'blog_head_includes', $edited_Blog->get_setting( 'head_includes' ), 5, T_('Custom meta tag/css section (before &lt;/head&gt;)'),
+			T_('Add custom meta tags and/or css styles to the &lt;head&gt; section. Example use: website verification, Google+, favicon image...'), 50, 'large' );
+		$Form->textarea( 'blog_footer_includes', $edited_Blog->get_setting( 'footer_includes' ), 5, T_('Custom javascript section (before &lt;/body&gt;)'),
+			T_('Add custom javascript before the closing &lt;/body&gt; tag in order to avoid any issues with page loading delays for visitors with slow connection speeds.<br />Example use: tracking scripts, javascript libraries...'), 50, 'large' );
 	$Form->end_fieldset();
 
 }
@@ -244,142 +234,8 @@ $Form->end_form( array(
 
 /*
  * $Log$
- * Revision 1.39  2011/10/11 18:26:10  efy-yurybakh
- * In skin posting (beta)
- *
- * Revision 1.38  2011/10/10 19:48:31  fplanque
- * i18n & login display cleaup
- *
- * Revision 1.37  2011/10/05 12:05:02  efy-yurybakh
- * Blog settings > features tab refactoring
- *
- * Revision 1.36  2011/10/04 08:39:30  efy-asimo
- * Comment and message forms save/reload content in case of error
- *
- * Revision 1.35  2011/09/04 22:13:14  fplanque
- * copyright 2011
- *
- * Revision 1.34  2011/09/04 21:32:18  fplanque
- * minor MFB 4-1
- *
- * Revision 1.33  2011/06/29 13:14:01  efy-asimo
- * Use ajax to display comment and contact forms
- *
- * Revision 1.32  2011/05/05 20:18:00  sam2kb
- * More replacement tags for item footer
- *
- * Revision 1.31  2011/03/24 15:15:05  efy-asimo
- * in-skin login - feature
- *
- * Revision 1.30  2010/07/26 06:52:16  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.29  2010/07/06 08:17:39  efy-asimo
- * Move "Multiple authors" block to Blog setings advanced tab. Fix validating urlname when user has no blog_admin permission.
- *
- * Revision 1.28  2010/03/01 07:52:30  efy-asimo
- * Set manual links to lowercase
- *
- * Revision 1.27  2010/02/14 14:18:39  efy-asimo
- * insert manual links
- *
- * Revision 1.26  2010/02/08 17:52:09  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.25  2010/01/30 18:55:21  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.24  2010/01/03 13:45:36  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.23  2009/12/07 20:07:21  leeturner2701
- * Update the help text on the Blog Aggregation field to say you can use a * to aggregate all blogs
- *
- * Revision 1.22  2009/11/30 04:31:38  fplanque
- * BlockCache Proof Of Concept
- *
- * Revision 1.21  2009/07/06 23:52:24  sam2kb
- * Hardcoded "admin.php" replaced with $dispatcher
- *
- * Revision 1.20  2009/07/04 15:58:26  tblue246
- * Translation fixes and update of German translation
- *
- * Revision 1.19  2009/07/01 23:39:55  fplanque
- * UI adjustments
- *
- * Revision 1.18  2009/06/22 15:08:19  waltercruz
- * Informing the original feed url to the user
- *
- * Revision 1.17  2009/05/19 15:40:54  waltercruz
- * Little i18n fix
- *
- * Revision 1.16  2009/04/24 14:03:25  waltercruz
- * Fixing the atom and rss redirect lengths
- *
- * Revision 1.15  2009/04/20 14:09:18  waltercruz
- * Increasing the length of feed redirector URL
- *
- * Revision 1.14  2009/03/08 23:57:42  fplanque
- * 2009
- *
- * Revision 1.13  2008/09/27 00:48:32  fplanque
- * caching step 0.
- *
- * Revision 1.12  2008/05/10 23:41:32  fplanque
- * cleanup of external feed providers
- *
- * Revision 1.11  2008/04/30 18:32:52  waltercruz
- * External feeds
- *
- * Revision 1.10  2008/04/19 15:14:35  waltercruz
- * Feedburner
- *
- * Revision 1.9  2008/04/04 16:02:12  fplanque
- * uncool feature about limiting credits
- *
- * Revision 1.8  2008/01/21 09:35:26  fplanque
- * (c) 2008
- *
- * Revision 1.7  2008/01/17 14:38:30  fplanque
- * Item Footer template tag
- *
- * Revision 1.6  2008/01/17 00:12:42  blueyed
- * trans: "Ping " => "Ping %s"
- *
- * Revision 1.5  2008/01/15 08:19:40  fplanque
- * blog footer text tag
- *
- * Revision 1.4  2007/12/23 16:16:17  fplanque
- * Wording improvements
- *
- * Revision 1.3  2007/11/24 17:24:50  blueyed
- * Add $media_path
- *
- * Revision 1.2  2007/10/08 08:31:59  fplanque
- * nicer forms
- *
- * Revision 1.1  2007/06/25 10:59:34  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.20  2007/05/29 01:17:20  fplanque
- * advanced admin blog settings are now restricted by a special permission
- *
- * Revision 1.19  2007/05/28 01:35:23  fplanque
- * fixed static page generation
- *
- * Revision 1.18  2007/04/26 00:11:05  fplanque
- * (c) 2007
- *
- * Revision 1.17  2006/12/17 23:42:38  fplanque
- * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
- * Look into Advanced Settings for the aggregating blog.
- * There may be side effects and new bugs created by this. Please report them :]
- *
- * Revision 1.16  2006/12/17 02:42:21  fplanque
- * streamlined access to blog settings
- *
- * Revision 1.15  2006/12/16 01:30:47  fplanque
- * Setting to allow/disable email subscriptions on a per blog basis
+ * Revision 1.41  2013/11/06 08:03:57  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

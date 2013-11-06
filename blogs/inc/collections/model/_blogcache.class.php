@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -187,25 +187,64 @@ class BlogCache extends DataObjectCache
 
 
 	/**
+	 * Load the cache **extensively**
+	 */
+	function load_all( $order_by = '', $order_dir = '' )
+	{
+		global $Settings;
+
+		if( $order_by == '' )
+		{	// Use default value from settings
+			$order_by = $Settings->get('blogs_order_by');
+		}
+
+		if( $order_dir == '' )
+		{	// Use default value from settings
+			$order_dir = $Settings->get('blogs_order_dir');
+		}
+
+		// Save order
+		$saved_order = $this->order_by;
+
+		$this->order_by = gen_order_clause( $order_by, $order_dir, $this->dbprefix, $this->dbIDname );
+
+		parent::load_all();
+
+		// Restore
+		$this->order_by = $saved_order;
+	}
+
+
+	/**
 	 * Load a list of public blogs into the cache
 	 *
 	 * @param string
 	 * @return array of IDs
 	 */
-	function load_public( $order_by = 'ID' )
+	function load_public( $order_by = '', $order_dir = '' )
 	{
-		global $DB, $Debuglog;
+		global $DB, $Settings, $Debuglog;
 
 		$Debuglog->add( "Loading <strong>$this->objtype(public)</strong> into cache", 'dataobjects' );
 
-		$sql = "SELECT *
-		          FROM {$this->dbtablename}
-		         WHERE blog_in_bloglist <> 0
-		         ORDER BY {$this->dbprefix}{$order_by}";
+		if( $order_by == '' )
+		{	// Use default value from settings
+			$order_by = $Settings->get('blogs_order_by');
+		}
 
-		foreach( $DB->get_results( $sql, OBJECT, 'Load public blog list' ) as $row )
-		{
-			// Instantiate a custom object
+		if( $order_dir == '' )
+		{	// Use default value from settings
+			$order_dir = $Settings->get('blogs_order_dir');
+		}
+
+		$SQL = new SQL();
+		$SQL->SELECT( '*' );
+		$SQL->FROM( $this->dbtablename );
+		$SQL->WHERE( 'blog_in_bloglist <> 0' );
+		$SQL->ORDER_BY( gen_order_clause( $order_by, $order_dir, 'blog_', 'blog_ID' ) );
+
+		foreach( $DB->get_results( $SQL->get(), OBJECT, 'Load public blog list' ) as $row )
+		{	// Instantiate a custom object
 			$this->instantiate( $row );
 		}
 
@@ -220,20 +259,30 @@ class BlogCache extends DataObjectCache
 	 * @param string
 	 * @return array of IDs
 	 */
-	function load_owner_blogs( $owner_ID, $order_by = 'ID' )
+	function load_owner_blogs( $owner_ID, $order_by = '', $order_dir = '' )
 	{
-		global $DB, $Debuglog;
+		global $DB, $Settings, $Debuglog;
 
 		$Debuglog->add( "Loading <strong>$this->objtype(owner={$owner_ID})</strong> into cache", 'dataobjects' );
 
-		$sql = "SELECT *
-		          FROM {$this->dbtablename}
-		         WHERE blog_owner_user_ID = {$owner_ID}
-		         ORDER BY {$this->dbprefix}{$order_by}";
+		if( $order_by == '' )
+		{	// Use default value from settings
+			$order_by = $Settings->get('blogs_order_by');
+		}
 
-		foreach( $DB->get_results( $sql, OBJECT, 'Load owner blog list' ) as $row )
-		{
-			// Instantiate a custom object
+		if( $order_dir == '' )
+		{	// Use default value from settings
+			$order_dir = $Settings->get('blogs_order_dir');
+		}
+
+		$SQL = new SQL();
+		$SQL->SELECT( '*' );
+		$SQL->FROM( $this->dbtablename );
+		$SQL->WHERE( 'blog_owner_user_ID = '.$DB->quote($owner_ID) );
+		$SQL->ORDER_BY( gen_order_clause( $order_by, $order_dir, 'blog_', 'blog_ID' ) );
+
+		foreach( $DB->get_results( $SQL->get(), OBJECT, 'Load owner blog list' ) as $row )
+		{	// Instantiate a custom object
 			$this->instantiate( $row );
 		}
 
@@ -249,11 +298,21 @@ class BlogCache extends DataObjectCache
 	 * @param integer user ID
 	 * @return array The blog IDs
 	 */
-	function load_user_blogs( $permname = 'blog_ismember', $permlevel = 'view', $user_ID = NULL, $order_by = 'ID', $limit = NULL )
+	function load_user_blogs( $permname = 'blog_ismember', $permlevel = 'view', $user_ID = NULL, $order_by = '', $order_dir = '', $limit = NULL )
 	{
-		global $DB, $Debuglog;
+		global $DB, $Settings, $Debuglog;
 
 		$Debuglog->add( "Loading <strong>$this->objtype(permission: $permname)</strong> into cache", 'dataobjects' );
+
+		if( $order_by == '' )
+		{	// Use default value from settings
+			$order_by = $Settings->get('blogs_order_by');
+		}
+
+		if( $order_dir == '' )
+		{	// Use default value from settings
+			$order_dir = $Settings->get('blogs_order_dir');
+		}
 
 		if( is_null($user_ID) )
 		{
@@ -272,7 +331,7 @@ class BlogCache extends DataObjectCache
 		// First check if we have a global access perm:
  		if( $Group->check_perm( 'blogs', $permlevel ) )
 		{ // If group grants a global permission:
-			$this->load_all();
+			$this->load_all( $order_by, $order_dir );
 			return $this->get_ID_array();
 		}
 
@@ -305,15 +364,9 @@ class BlogCache extends DataObjectCache
 				break;
 
 			case 'blog_comments':
-				// user needs to have permission for at least one kind of comments (published, draft, deprecated)
-				$sql .= "OR bloguser_perm_own_cmts <> 0
-						OR bloguser_perm_draft_cmts <> 0
-						OR bloguser_perm_publ_cmts <> 0
-						OR bloguser_perm_depr_cmts <> 0
-						OR bloggroup_perm_own_cmts <> 0
-						OR bloggroup_perm_draft_cmts <> 0
-						OR bloggroup_perm_publ_cmts <> 0
-						OR bloggroup_perm_depr_cmts <> 0";
+				// user needs to have permission for at least one kind of comments
+				$sql .= "OR bloguser_perm_cmtstatuses <> ''
+						OR bloggroup_perm_cmtstatuses <> ''";
 				break;
 
 			case 'stats':
@@ -331,7 +384,7 @@ class BlogCache extends DataObjectCache
 				debug_die( 'BlogCache::load_user_blogs() : Unsupported perm ['.$permname.']!' );
 		}
 
-		$sql .= " ORDER BY {$this->dbprefix}{$order_by}";
+		$sql .= " ORDER BY ".gen_order_clause( $order_by, $order_dir, $this->dbprefix, $this->dbIDname );
 
 		if( $limit )
 		{
@@ -355,6 +408,8 @@ class BlogCache extends DataObjectCache
 	 *
 	 * @param integer selected ID
 	 * @param boolean provide a choice for "none" with ID 0
+	 * @param string Callback method name
+	 * @return string HTML tags <option>
 	 */
 	function get_option_list( $default = 0, $allow_none = false, $method = 'get_name' )
 	{
@@ -363,97 +418,46 @@ class BlogCache extends DataObjectCache
 
 		return parent::get_option_list( $default, $allow_none, $method );
 	}
+
+
+	/**
+	 * Returns form option list with cache contents
+	 *
+	 * Loads the blogs with forums type!
+	 *
+	 * @param integer selected ID
+	 * @param boolean provide a choice for "none" with ID 0
+	 * @param string Callback method name
+	 * @return string HTML tags <option>
+	 */
+	function get_option_list_forums( $default = 0, $allow_none = false, $method = 'get_name' )
+	{
+		// Load only blogs with type 'forum'
+		$this->load_where( 'blog_type = "forum"' );
+
+		return parent::get_option_list( $default, $allow_none, $method );
+	}
+
+
+	/**
+	 * Returns form option list with cache contents
+	 *
+	 * @param integer selected ID
+	 * @param boolean provide a choice for "none" with ID 0
+	 * @param string Callback method name
+	 * @return string HTML tags <option>
+	 */
+	function get_option_list_parent( $default = 0, $allow_none = false, $method = 'get_name' )
+	{
+		return parent::get_option_list( $default, $allow_none, $method );
+	}
 }
 
 
 /*
  * $Log$
- * Revision 1.16  2011/10/23 09:19:42  efy-yurybakh
- * Implement new permission for comment editing
+ * Revision 1.18  2013/11/06 08:03:57  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.15  2011/09/04 22:13:14  fplanque
- * copyright 2011
- *
- * Revision 1.14  2010/07/26 06:52:15  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.13  2010/06/01 11:33:19  efy-asimo
- * Split blog_comments advanced permission (published, deprecated, draft)
- * Use this new permissions (Antispam tool,when edit/delete comments)
- *
- * Revision 1.12  2010/02/08 17:52:09  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.11  2009/09/26 12:00:42  tblue246
- * Minor/coding style
- *
- * Revision 1.10  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.9  2009/09/14 12:43:05  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.8  2009/09/05 18:17:40  tblue246
- * DataObjectCache/BlogCache::get_option_list(): Back again... Allow custom value for "None" option and use 0 for BlogCache.
- *
- * Revision 1.6  2009/09/03 15:51:52  tblue246
- * Doc, "refix", use "0" instead of an empty string for the "No blog" option.
- *
- * Revision 1.5  2009/03/08 23:57:42  fplanque
- * 2009
- *
- * Revision 1.4  2008/03/04 22:27:43  blueyed
- * MFB: Fix SQL injection through requested URL (commented out?!); fix indent
- *
- * Revision 1.3  2008/01/21 09:35:26  fplanque
- * (c) 2008
- *
- * Revision 1.2  2007/12/20 12:01:56  yabs
- * bug fix
- *
- * Revision 1.1  2007/06/25 10:59:32  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.25  2007/05/31 03:02:23  fplanque
- * Advanced perms now disabled by default (simpler interface).
- * Except when upgrading.
- * Enable advanced perms in blog settings -> features
- *
- * Revision 1.24  2007/05/30 01:18:56  fplanque
- * blog owner gets all permissions except advanced/admin settings
- *
- * Revision 1.23  2007/05/29 01:17:20  fplanque
- * advanced admin blog settings are now restricted by a special permission
- *
- * Revision 1.22  2007/05/09 01:58:57  fplanque
- * Widget to display other blogs from same owner
- *
- * Revision 1.21  2007/05/09 01:00:24  fplanque
- * optimized querying for blog lists
- *
- * Revision 1.20  2007/04/26 00:11:05  fplanque
- * (c) 2007
- *
- * Revision 1.19  2007/03/25 15:07:38  fplanque
- * multiblog fixes
- *
- * Revision 1.18  2006/12/17 23:44:35  fplanque
- * minor cleanup
- *
- * Revision 1.17  2006/12/07 23:13:10  fplanque
- * @var needs to have only one argument: the variable type
- * Otherwise, I can't code!
- *
- * Revision 1.16  2006/12/06 18:04:23  fplanque
- * doc
- *
- * Revision 1.15  2006/12/05 01:35:27  blueyed
- * Hooray for less complexity and the 8th param for DataObjectCache()
- *
- * Revision 1.14  2006/12/05 00:34:39  blueyed
- * Implemented custom "None" option text in DataObjectCache; Added for $ItemStatusCache, $GroupCache, UserCache and BlogCache; Added custom text for Item::priority_options()
- *
- * Revision 1.13  2006/11/24 18:27:23  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

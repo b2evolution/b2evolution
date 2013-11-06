@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -44,7 +44,9 @@ param( 'user_ID', 'integer', NULL );	// Note: should NOT be memorized (would kil
 
 param_action( 'list' );
 
-$AdminUI->set_path( 'users', 'users' );
+$tab = param( 'tab', 'string', '' );
+
+$AdminUI->set_path( 'users', $tab == 'stats' ? 'stats' : 'users' );
 
 if( !$current_User->check_perm( 'users', 'view' ) )
 { // User has no permissions to view: he can only edit his profile
@@ -98,20 +100,17 @@ if( ! is_null($user_ID) )
 			$Messages->add( T_('You have no permission to edit other users!'), 'error' );
 			header_redirect( regenerate_url( 'ctrl,action', 'ctrl=user&amp;action=view&amp;user_ID='.$user_ID ) );
 		}
-		elseif( $demo_mode )
-		{ // Demo mode restrictions: admin/demouser cannot be edited
-			if( $edited_User->ID == 1 || $edited_User->login == 'demouser' )
-			{
-				$Messages->add( T_('You cannot edit the admin and demouser profile in demo mode!'), 'error' );
+		elseif( $demo_mode && $edited_User->ID <= 3 )
+		{ // Demo mode restrictions: users created by install process cannot be edited
+			$Messages->add( T_('You cannot edit the admin and demo users profile in demo mode!'), 'error' );
 
-				if( strpos( $action, 'delete_' ) === 0 || $action == 'promote' )
-				{ // Fallback to list/view action
-					$action = 'list';
-				}
-				else
-				{
-					header_redirect( regenerate_url( 'ctrl,action', 'ctrl=user&amp;action=view&amp;user_ID='.$user_ID ) );
-				}
+			if( strpos( $action, 'delete_' ) === 0 || $action == 'promote' )
+			{ // Fallback to list/view action
+				$action = 'list';
+			}
+			else
+			{
+				header_redirect( regenerate_url( 'ctrl,action', 'ctrl=user&amp;action=view&amp;user_ID='.$user_ID ) );
 			}
 		}
 	}
@@ -203,10 +202,20 @@ if( !$Messages->has_errors() )
 					$msg = sprintf( T_('User &laquo;%s&raquo; deleted.'), $edited_User->dget( 'login' ) );
 				}
 
+				$deleted_user_ID = $edited_User->ID;
+				$deleted_user_email = $edited_User->get( 'email' );
 				$edited_User->dbdelete( $Messages );
 				unset($edited_User);
 				forget_param('user_ID');
 				$Messages->add( $msg, 'success' );
+
+				// Find other users with the same email address
+				$message_same_email_users = find_users_with_same_email( $deleted_user_ID, $deleted_user_email, T_('Note: the same email address (%s) is still in use by: %s') );
+				if( $message_same_email_users !== false )
+				{
+					$Messages->add( $message_same_email_users, 'note' );
+				}
+
 				$action = 'list';
 				// Redirect so that a reload doesn't write to the DB twice:
 				header_redirect( '?ctrl=users', 303 ); // Will EXIT
@@ -225,7 +234,7 @@ if( !$Messages->has_errors() )
 				}
 
 				if( ! $edited_User->check_delete( $msg ) )
-				{	// There are restrictions:
+				{ // There are restrictions:
 					$action = 'view';
 				}
 			}
@@ -268,9 +277,41 @@ if( !$Messages->has_errors() )
 			$action = 'edit';
 
 			break;
+
+		case 'search':
+			// Quick search
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+
+			param( 'user_search', 'string', '' );
+			set_param( 'keywords', $user_search );
+			set_param( 'filter', 'new' );
+
+			load_class( 'users/model/_userlist.class.php', 'UserList' );
+			$UserList = new UserList( 'admin', $UserSettings->get('results_per_page'), 'users_', true, false, true, false );
+			$UserList->load_from_Request();
+			// Make query to get a count of users
+			$UserList->query();
+
+			if( $UserList->total_rows == 1 )
+			{	// If we find only one user by quick search we do a redirect to user's edit page
+				$User = $UserList->rows[0];
+				if( !empty( $User ) )
+				{
+					header_redirect( '?ctrl=user&user_tab=profile&user_ID='.$User->user_ID );
+				}
+			}
+
+			// Unset the filter to avoid the step 1 in the function $UserList->query() on the users list
+			set_param( 'filter', '' );
+
+			break;
 	}
 }
 
+// require css for jQuery UI
+require_css( $rsc_url.'css/jquery/smoothness/jquery-ui.css' );
 
 // We might delegate to this action from above:
 /*if( $action == 'edit' )
@@ -282,6 +323,19 @@ if( !$Messages->has_errors() )
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
 $AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
+if( $tab == 'stats' )
+{	// Users stats
+	$AdminUI->breadcrumbpath_add( T_('Stats'), '?ctrl=users&amp;tab=stats' );
+}
+else
+{	// Users list
+	$AdminUI->breadcrumbpath_add( T_('List'), '?ctrl=users' );
+	$AdminUI->top_block = get_user_quick_search_form();
+	if( $current_User->check_perm( 'users', 'edit', false ) )
+	{	// Include to edit user level
+		require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+	}
+}
 
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -300,6 +354,8 @@ switch( $action )
 		break;
 
 	case 'delete':
+		$deltype = param( 'deltype', 'string', '' ); // spammer
+
 		$AdminUI->disp_payload_begin();
 
 		// We need to ask for confirmation:
@@ -313,7 +369,21 @@ switch( $action )
 			$msg = sprintf( T_('Delete user &laquo;%s&raquo;?'), $edited_User->dget( 'login' ) );
 		}
 
-		$edited_User->confirm_delete( $msg, 'user', $action, get_memorized( 'action' ) );
+		$confirm_messages = array();
+		if( $deltype != 'spammer' )
+		{ // Display this note for standard deleting
+			$confirm_messages[] = array( T_('Note: this will not automatically delete private messages sent/received by this user. However, this will delete any new orphan private messages (which no longer have any existing sender or recipient).'), 'note' );
+			$confirm_messages[] = array( T_('Note: this will not delete comments made by this user. Instead it will transform them from member to visitor comments.'), 'note' );
+		}
+
+		// Find other users with the same email address
+		$message_same_email_users = find_users_with_same_email( $edited_User->ID, $edited_User->get( 'email' ), T_('Note: this user has the same email address (%s) as: %s') );
+		if( $message_same_email_users !== false )
+		{
+			$confirm_messages[] = array( $message_same_email_users, 'note' );
+		}
+
+		$edited_User->confirm_delete( $msg, 'user', $action, get_memorized( 'action' ), $confirm_messages );
 
 		// Display user identity form:
 		$AdminUI->disp_view( 'users/views/_user_identity.form.php' );
@@ -325,7 +395,14 @@ switch( $action )
 		// Display user list:
 		// NOTE: we don't want this (potentially very long) list to be displayed again and again)
 		$AdminUI->disp_payload_begin();
-		$AdminUI->disp_view( 'users/views/_user_list.view.php' );
+		if( $tab == 'stats' )
+		{
+			$AdminUI->disp_view( 'users/views/_user_stats.view.php' );
+		}
+		else
+		{
+			$AdminUI->disp_view( 'users/views/_user_list.view.php' );
+		}
 		$AdminUI->disp_payload_end();
 }
 
@@ -335,219 +412,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.54  2011/09/04 22:13:21  fplanque
- * copyright 2011
+ * Revision 1.56  2013/11/06 08:04:55  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.53  2011/09/04 21:32:17  fplanque
- * minor MFB 4-1
- *
- * Revision 1.52  2011/08/25 06:00:32  efy-james
- * Modification on delete user page
- *
- * Revision 1.51  2010/11/25 15:16:35  efy-asimo
- * refactor $Messages
- *
- * Revision 1.50  2010/11/24 14:55:30  efy-asimo
- * Add user gender
- *
- * Revision 1.49  2010/02/08 17:54:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.48  2010/01/16 14:27:04  efy-yury
- * crumbs, fadeouts, redirect, action_icon
- *
- * Revision 1.47  2010/01/03 12:03:17  fplanque
- * More crumbs...
- *
- * Revision 1.46  2009/12/06 22:55:19  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.45  2009/12/04 23:27:49  fplanque
- * cleanup Expires: header handling
- *
- * Revision 1.44  2009/11/21 13:31:59  efy-maxim
- * 1. users controller has been refactored to users and user controllers
- * 2. avatar tab
- * 3. jQuery to show/hide custom duration
- *
- * Revision 1.43  2009/11/12 00:46:33  fplanque
- * doc/minor/handle demo mode
- *
- * Revision 1.42  2009/10/28 13:41:57  efy-maxim
- * default multiple sessions settings
- *
- * Revision 1.41  2009/10/28 10:56:34  efy-maxim
- * param_duration
- *
- * Revision 1.40  2009/10/28 10:02:42  efy-maxim
- * rename some php files
- *
- * Revision 1.39  2009/10/27 16:43:34  efy-maxim
- * custom session timeout
- *
- * Revision 1.38  2009/10/26 12:59:36  efy-maxim
- * users management
- *
- * Revision 1.37  2009/10/25 21:33:06  efy-maxim
- * nickname setting
- *
- * Revision 1.36  2009/10/25 20:39:09  efy-maxim
- * multiple sessions
- *
- * Revision 1.35  2009/10/25 15:22:46  efy-maxim
- * user - identity, password, preferences tabs
- *
- * Revision 1.34  2009/09/26 12:00:43  tblue246
- * Minor/coding style
- *
- * Revision 1.33  2009/09/25 07:33:14  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.32  2009/09/24 20:45:47  fplanque
- * no message
- *
- * Revision 1.31  2009/09/23 19:23:02  efy-bogdan
- * Cleanup users.ctrl.php
- *
- * Revision 1.30  2009/09/23 13:32:20  efy-bogdan
- * Separate controller added for groups
- *
- * Revision 1.29  2009/09/23 07:17:14  efy-bogdan
- *  load_from_Request added to Group class
- *
- * Revision 1.28  2009/09/22 07:07:24  efy-bogdan
- * user.ctrl.php cleanup
- *
- * Revision 1.27  2009/09/19 01:04:06  fplanque
- * button to remove an avatar from an user profile
- *
- * Revision 1.26  2009/09/13 12:25:34  efy-maxim
- * Messaging permissions have been added to:
- * 1. Upgrader
- * 2. Group class
- * 3. Edit Group form
- *
- * Revision 1.25  2009/09/11 18:34:06  fplanque
- * userfields editing module.
- * needs further cleanup but I think it works.
- *
- * Revision 1.24  2009/09/07 23:35:50  fplanque
- * cleanup
- *
- * Revision 1.23  2009/09/07 14:26:49  efy-maxim
- * Country field has been added to User form (but without updater)
- *
- * Revision 1.22  2009/08/30 19:54:22  fplanque
- * less translation messgaes for infrequent errors
- *
- * Revision 1.21  2009/05/31 12:36:04  tblue246
- * minor
- *
- * Revision 1.20  2009/05/31 11:37:34  tblue246
- * doc
- *
- * Revision 1.19  2009/05/31 05:16:44  sam2kb
- * This was probably the oldest bug ;)
- *
- * Revision 1.18  2009/05/26 19:31:59  fplanque
- * Plugins can now have Settings that are specific to each blog.
- *
- * Revision 1.17  2009/03/22 17:20:32  fplanque
- * I think I forgot that earlier
- *
- * Revision 1.15  2009/03/20 03:38:04  fplanque
- * rollback -- http://forums.b2evolution.net/viewtopic.php?t=18269
- *
- * Revision 1.12  2009/03/08 23:57:46  fplanque
- * 2009
- *
- * Revision 1.11  2009/02/01 16:52:29  tblue246
- * Don't display the user's full name if it isn't set when deleting users. Fixes: http://forums.b2evolution.net/viewtopic.php?t=17822
- *
- * Revision 1.10  2009/01/13 23:45:59  fplanque
- * User fields proof of concept
- *
- * Revision 1.9  2008/04/12 19:56:56  fplanque
- * bugfix
- *
- * Revision 1.8  2008/01/21 09:35:35  fplanque
- * (c) 2008
- *
- * Revision 1.7  2008/01/20 18:20:28  fplanque
- * Antispam per group setting
- *
- * Revision 1.6  2008/01/20 15:31:12  fplanque
- * configurable validation/security rules
- *
- * Revision 1.5  2008/01/19 15:45:29  fplanque
- * refactoring
- *
- * Revision 1.4  2008/01/19 10:57:11  fplanque
- * Splitting XHTML checking by group and interface
- *
- * Revision 1.3  2007/09/03 23:47:37  blueyed
- * Use singleton Plugins_admin
- *
- * Revision 1.2  2007/07/09 20:11:53  fplanque
- * admin skin switcher
- *
- * Revision 1.1  2007/06/25 11:01:44  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.51  2007/06/19 20:41:11  fplanque
- * renamed generic functions to autoform_*
- *
- * Revision 1.50  2007/06/19 18:47:27  fplanque
- * Nuked unnecessary Param (or I'm missing something badly :/)
- *
- * Revision 1.49  2007/05/26 22:21:32  blueyed
- * Made $limit for Results configurable per user
- *
- * Revision 1.48  2007/04/26 00:11:15  fplanque
- * (c) 2007
- *
- * Revision 1.47  2007/03/08 00:46:17  blueyed
- * Fixed check for disallowing demouser-group-changes in demomode
- *
- * Revision 1.46  2007/02/21 22:21:30  blueyed
- * "Multiple sessions" user setting
- *
- * Revision 1.45  2007/02/21 21:17:20  blueyed
- * When resetting values to defaults, just delete all of them (defaults).
- *
- * Revision 1.44  2006/12/06 22:30:07  fplanque
- * Fixed this use case:
- * Users cannot register themselves.
- * Admin creates users that are validated by default. (they don't have to validate)
- * Admin can invalidate a user. (his email, address actually)
- *
- * Revision 1.43  2006/12/05 02:54:37  blueyed
- * Go to user profile after resetting to defaults; fixed handling of action in case of redirecting
- *
- * Revision 1.42  2006/12/03 19:01:57  blueyed
- * doc
- *
- * Revision 1.41  2006/12/03 16:37:14  fplanque
- * doc
- *
- * Revision 1.40  2006/11/24 18:27:23  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.39  2006/11/24 18:06:02  blueyed
- * Handle saving of $Messages centrally in header_redirect()
- *
- * Revision 1.38  2006/11/15 21:14:04  blueyed
- * "Restore defaults" in user profile
- *
- * Revision 1.37  2006/11/13 20:49:52  fplanque
- * doc/cleanup :/
- *
- * Revision 1.36  2006/11/09 23:40:57  blueyed
- * Fixed Plugin UserSettings array type editing; Added jquery and use it for AJAHifying Plugin (User)Settings editing of array types
- *
- * Revision 1.35  2006/10/30 19:00:36  blueyed
- * Lazy-loading of Plugin (User)Settings for PHP5 through overloading
  */
 ?>

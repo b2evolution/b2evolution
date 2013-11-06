@@ -15,9 +15,10 @@ Author URI: http://www.ndesign-studio.com
     - You may modify, translate or distribute
 
 */
-@import url(../../rsc/css/basic.css);	/* Import basic styles */
-@import url("../../rsc/css/blog_base.css");	/* Default styles for the blog navigation */
-@import url("../../rsc/css/item_base.css");	/* Default styles for the post CONTENT */
+
+textarea, input, select, option, optgroup, ul.ui-autocomplete, li.token-input-token-facebook, div.token-input-dropdown-facebook {
+	font: 13.3px Arial,Helvetica,sans-serif;
+}
 
 div#skin_wrapper {
 	font: 75%/150% "Trebuchet MS", Tahoma, Arial;
@@ -155,7 +156,7 @@ div#page_top li a.selected {
 }
 #nav li {
 	float: left;
-	margin-left: 5px;
+	margin: 5px 0 0 5px;
 }
 #nav .current_page_item a, #nav .current_page_item a:visited{
 	color: #000000;
@@ -236,14 +237,14 @@ div.featured_post {
 	padding-top: 10px;
 }
 .post-cat {
-	background: url(img/mini-category.gif) no-repeat;
+	background: url(img/icons.png) 0 -12px no-repeat;
 	padding-left: 20px;
 	float:left;
 	font-size: 95%;
 	color: #999999;
 }
 .post-comments {
-	background: url(img/mini-comments.gif) no-repeat;
+	background: url(img/icons.png) no-repeat 0 -28px;
 	padding-left: 20px;
 	float: right;
 	font-size: 95%;
@@ -421,13 +422,17 @@ div.featured_post {
 /*blogroll */
 ul.list-blogroll li,
 li.widget_core_linkblog ul li ul li{
-	background: url(img/mini-blogroll.gif) no-repeat  !important;
+	background: url(img/icons.png) no-repeat 0 6px !important;
 	padding-left: 16px !important;
 }
 /*category widget */
 ul.list-cat li, li.widget_categories li,
-li.widget_core_coll_category_list ul li{
-	background: url(img/mini-category.gif) no-repeat  !important;
+li.widget_core_coll_category_list ul li ul li{
+	padding-left: 20px !important;
+}
+ul.list-cat li a, li.widget_categories li a,
+li.widget_core_coll_category_list ul li a{
+	background: url(img/icons.png) no-repeat 0 -12px  !important;
 	padding-left: 20px !important;
 }
 /*archives widget */
@@ -472,8 +477,8 @@ form.search p {
 #searchform .SearchField,
 .search .SearchField {
 	border:1px solid #203346;
-	width: 135px;
-	height: 22px;
+	width: 155px;
+	height: 20px;
 	padding: 4px 5px 0px 5px;
 	border: 1px solid #bed881;
 	background: #fff;
@@ -489,7 +494,11 @@ form.search p {
 	height: 26px;
 	font: bold 12px Arial, Helvetica, sans-serif;
 	color: #FFFFFF;
-	vertical-align: middle;
+	top: -1px;
+	position: relative;
+}
+div.compact_search_form input.search_field {
+	width: 137px;
 }
 
 /* footer area */
@@ -534,7 +543,7 @@ div.footer_widget ul {
 }
 
 #footer div.widget_core_coll_comment_list ul li {
-	background: url(img/mini-footer-comments.gif) no-repeat;
+	background: url(img/icons.png) no-repeat 0 -44px;
 	padding: 0px 0px 10px 20px;
 }
 
@@ -547,7 +556,7 @@ div.footer_widget ul {
 }
 #footer div.widget_core_coll_page_list ul li,
 #footer div.widget_core_coll_post_list ul li {
-	background: url(img/mini-footer-post.gif) no-repeat;
+	background: url(img/icons.png) no-repeat 0 -121px;
 	padding: 0px 0px 10px 20px;
 	font-size: 107%;
 	line-height: 135%;
@@ -570,13 +579,13 @@ div.footer_widget ul {
 	color: #048db4;
 }
 .rss {
-	background: url(img/mini-rss.gif) no-repeat left center;
+	background: url(img/icons.png) no-repeat 0 -82px;
 	padding-left: 18px;
 	padding-bottom: 2px;
 	margin-left: 8px;
 }
 .loginout {
-	background: url(img/mini-loginout.gif) no-repeat left center;
+	background: url(img/icons.png) no-repeat 0 -66px;
 	padding-left: 18px;
 	padding-bottom: 2px;
 	margin-left: 8px;
@@ -618,4 +627,40 @@ hr.clear {
 div.bText {
 	clear: both;
 	padding-top: 10px;
+}
+
+textarea#msg_text {
+	width: 100%;
+}
+
+/* jQuery Tokeninput plugin */
+div.input ul.token-input-list-facebook {
+	width: 325px;
+	background: #F1FEDB;
+	border: 1px solid #BDD77F;
+}
+div.input ul.token-input-list-facebook input[type="text"]:focus {
+	background: transparent;
+}
+#ffield_item_tags ul.token-input-list-facebook {
+	background: #FFF;
+	border-color: #C0C0C0;
+}
+
+/* Not published comments display */
+#styled_content_block .commentlist .status_draft,
+#styled_content_block .commentlist .status_review,
+#styled_content_block .commentlist .status_community,
+#styled_content_block .commentlist .status_protected,
+#styled_content_block .commentlist .status_private {
+	top: -5px;
+	left: 10px;
+}
+/* Not published posts display */
+#styled_content_block .post-title .status_draft,
+#styled_content_block .post-title .status_review,
+#styled_content_block .post-title .status_community,
+#styled_content_block .post-title .status_protected,
+#styled_content_block .post-title .status_private {
+	top: 27px;
 }

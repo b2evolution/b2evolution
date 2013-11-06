@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -50,6 +50,12 @@ global $edited_Blog;
 </script>
 <?php
 
+// This warning is used for 'Trackbacks' and 'New feedback status'
+$spammers_warning = '<span class="red"$attrs$>'.get_icon( 'warning_yellow' ).' '.T_('Warning: this makes your site a preferred target for spammers!').'<br /></span>';
+
+// Permission to edit advanced admin settings
+$perm_blog_admin = $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID );
+
 $Form = new Form( NULL, 'coll_comments_checkchanges' );
 
 $Form->begin_form( 'fform' );
@@ -85,6 +91,9 @@ $Form->begin_fieldset( T_('Feedback options') );
 
 	$Form->checkbox( 'allow_anon_url', $edited_Blog->get_setting( 'allow_anon_url' ), T_('Anonymous URLs'), T_('Allow anonymous commenters to submit an URL') );
 
+	$Form->checkbox( 'allow_html_comment', $edited_Blog->get_setting( 'allow_html_comment' ),
+						T_( 'Allow HTML' ), T_( 'Check to allow HTML in comments.' ).' ('.T_('HTML code will pass several sanitization filters.').')' );
+
 	$any_option = array( 'any', T_('Any user'), T_('Including anonymous users'), '' );
 	$registered_option = array( 'registered', T_('Registered users only'),  '', '' );
 	$member_option = array( 'member', T_('Members only'), T_('Users have to be members of this blog'), '' );
@@ -93,31 +102,42 @@ $Form->begin_fieldset( T_('Feedback options') );
 						array(  $any_option, $registered_option, $member_option, $never_option,
 						), T_('Allow attachments from'), true );
 
+	$max_attachments_params = array();
+	if( $edited_Blog->get_setting( 'allow_attachments' ) == 'any' )
+	{	// Disable field "Max # of attachments" when Allow attachments from Any user
+		$max_attachments_params['disabled'] = 'disabled';
+	}
+	$Form->text_input( 'max_attachments', $edited_Blog->get_setting( 'max_attachments' ), 10, T_('Max # of attachments per User per Post'), T_('(leave empty for no limit)'), $max_attachments_params );
+
 	$Form->radio( 'allow_rating_items', $edited_Blog->get_setting( 'allow_rating_items' ),
 						array( $any_option, $registered_option, $member_option, $never_option,
 						), T_('Allow star ratings from'), true );
 
 	$Form->checkbox( 'allow_rating_comment_helpfulness', $edited_Blog->get_setting( 'allow_rating_comment_helpfulness' ), T_('Allow helpful/not helpful'), T_("Allow users to say if a comment was helpful or not.") );
 
-	$Form->checkbox( 'blog_allowtrackbacks', $edited_Blog->get( 'allowtrackbacks' ), T_('Trackbacks'), T_("Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.") );
+	if( $perm_blog_admin || $edited_Blog->get( 'allowtrackbacks' ) )
+	{ // Only admin can turn ON this setting
+		$trackbacks_warning_attrs = ' id="trackbacks_warning" style="display:'.( $edited_Blog->get( 'allowtrackbacks' ) ? 'inline' : 'none' ).'"';
+		$trackbacks_warning = str_replace( '$attrs$', $trackbacks_warning_attrs, $spammers_warning );
+		$trackbacks_title = !$edited_Blog->get( 'allowtrackbacks' ) ? ' ['.T_('Admin').']' : '';
+		$Form->checkbox( 'blog_allowtrackbacks', $edited_Blog->get( 'allowtrackbacks' ), T_('Trackbacks').$trackbacks_title, $trackbacks_warning.T_('Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.') );
+	}
 
 	$Form->radio( 'comments_orderdir', $edited_Blog->get_setting('comments_orderdir'),
 						array(	array( 'ASC', T_('Chronologic') ),
 								array ('DESC', T_('Reverse') ),
 						), T_('Display order'), true );
 
-	$Form->checkbox( 'paged_comments', $edited_Blog->get_setting( 'paged_comments' ), T_( 'Paged comments' ), T_( 'Check to enable paged comments on the public pages.' ) );
+	$Form->checkbox( 'threaded_comments', $edited_Blog->get_setting( 'threaded_comments' ), T_('Threaded comments'), T_('Check to enable hierarchical threads of comments.') );
+
+	$paged_comments_disabled = (boolean) $edited_Blog->get_setting( 'threaded_comments' );
+	$Form->checkbox( 'paged_comments', $edited_Blog->get_setting( 'paged_comments' ), T_( 'Paged comments' ), T_( 'Check to enable paged comments on the public pages.' ), '', 1, $paged_comments_disabled );
 
 	$Form->text( 'comments_per_page', $edited_Blog->get_setting('comments_per_page'), 4, T_('Comments/Page'),  T_('How many comments do you want to display on one page?'), 4 );
 
-	global $default_avatar;
-	$Form->radio( 'default_gravatar', $edited_Blog->get_setting('default_gravatar'),
-						array(	array( 'b2evo', T_('Default image'), $default_avatar ),
-								array ('', 'Gravatar' ),
-								array ('identicon', 'Identicon' ),
-								array ('monsterid', 'Monsterid' ),
-								array ('wavatar', 'Wavatar' ),
-						), T_('Default gravatars'), true, T_('Gravatar users can choose to set up a unique icon for themselves, and if they don\'t, they will be assigned a default image.') );
+	$Form->checkbox( 'comments_avatars', $edited_Blog->get_setting( 'comments_avatars' ), T_('Display profile pictures'), T_('Display profile pictures/avatars for comments.') );
+
+	$Form->checkbox( 'comments_latest', $edited_Blog->get_setting( 'comments_latest' ), T_('Latest comments'), T_('Check to enable viewing of the latest comments') );
 
 	echo '</div>';
 
@@ -142,15 +162,24 @@ $Form->end_fieldset();
 modules_call_method( 'display_collection_comments', array( 'Form' => & $Form, 'edited_Blog' => & $edited_Blog ) );
 
 $Form->begin_fieldset( T_('Comment moderation') );
-	$status_options = array(
-			'draft'      => T_('Draft'),
-			'published'  => T_('Published'),
-			'deprecated' => T_('Deprecated')
-		);
-	// put this on feedback details container, this way it won't be displayed if comment posting is not allowed  
+	$newstatus_warning_attrs = ' id="newstatus_warning" style="display:'.( $edited_Blog->get_setting('new_feedback_status') == 'published' ? 'inline' : 'none' ).'"';
+	$newstatus_warning = str_replace( '$attrs$', $newstatus_warning_attrs, $spammers_warning );
+	$status_options = get_visibility_statuses( '', array( 'redirected', 'trash' ) );
+	if( $edited_Blog->get_setting('new_feedback_status') != 'published' )
+	{
+		if( $perm_blog_admin )
+		{ // Only admin can set this setting to 'Public'
+			$status_options['published'] .= ' ['.T_('Admin').']';
+		}
+		else
+		{ // Remove published status for non-admin users
+			unset( $status_options['published'] );
+		}
+	}
+	// put this on feedback details container, this way it won't be displayed if comment posting is not allowed
 	echo '<div class="feedback_details_container">';
 	$Form->select_input_array( 'new_feedback_status', $edited_Blog->get_setting('new_feedback_status'), $status_options,
-				T_('New feedback status'), T_('This status will be assigned to new comments/trackbacks from non moderators (unless overriden by plugins).') );
+				T_('New feedback status'), $newstatus_warning.T_('This status will be assigned to new comments/trackbacks from non moderators (unless overriden by plugins).') );
 	echo '</div>';
 
 	$Form->radio( 'comment_quick_moderation', $edited_Blog->get_setting( 'comment_quick_moderation' ),
@@ -189,15 +218,72 @@ $Form->end_form( array(
 
 ?>
 <script type="text/javascript">
-	jQuery( '#paged_comments' ).click( function()
-	{
-		if ( $('#paged_comments').is(':checked') )
+	var paged_comments_is_checked = jQuery( '#paged_comments' ).is( ':checked' );
+	jQuery( '#threaded_comments' ).click( function()
+	{ // Disable checkbox "Paged comments" if "Threaded comments" is ON
+		if( jQuery( this ).is( ':checked' ) )
 		{
-			$('#comments_per_page').val('20');
+			jQuery( '#paged_comments' ).attr( 'disabled', 'disabled' );
+			paged_comments_is_checked = jQuery( '#paged_comments' ).is( ':checked' );
+			jQuery( '#paged_comments' ).removeAttr( 'checked' );
+			jQuery( '#comments_per_page' ).val( '1000' );
 		}
 		else
 		{
-			$('#comments_per_page').val('1000');
+			jQuery( '#paged_comments' ).removeAttr( 'disabled' );
+			if( paged_comments_is_checked )
+			{
+				jQuery( '#paged_comments' ).attr( 'checked', 'checked' );
+				jQuery( '#comments_per_page' ).val( '20' );
+			}
+		}
+	} );
+
+	jQuery( '#paged_comments' ).click( function()
+	{
+		if( jQuery( this ).is( ':checked' ) )
+		{
+			jQuery( '#comments_per_page' ).val( '20' );
+		}
+		else
+		{
+			jQuery( '#comments_per_page' ).val( '1000' );
+		}
+	} );
+
+	jQuery( 'input[name=allow_attachments]' ).click( function()
+	{	// Disable field "Max # of attachments" when Allow attachments from Any user
+		if( jQuery( this ).val() == 'any' )
+		{
+			jQuery( '#max_attachments' ).attr( 'disabled', 'disabled' );
+		}
+		else
+		{
+			jQuery( '#max_attachments' ).removeAttr( 'disabled' );
+		}
+	} );
+	
+	jQuery( '#blog_allowtrackbacks' ).click( function()
+	{ // Show/Hide warning for 'Trackbacks'
+		if( jQuery( this ).is( ':checked' ) )
+		{
+			jQuery( '#trackbacks_warning' ).css( 'display', 'inline' );
+		}
+		else
+		{
+			jQuery( '#trackbacks_warning' ).hide();
+		}
+	} );
+
+	jQuery( '#new_feedback_status' ).change( function()
+	{ // Show/Hide warning for 'New feedback status'
+		if( jQuery( this ).val() == 'published' )
+		{
+			jQuery( '#newstatus_warning' ).css( 'display', 'inline' );
+		}
+		else
+		{
+			jQuery( '#newstatus_warning' ).hide();
 		}
 	} );
 </script>
@@ -206,30 +292,8 @@ $Form->end_form( array(
 
 /*
  * $Log$
- * Revision 1.8  2011/10/21 07:10:47  efy-asimo
- * Comment quick moderation option
- *
- * Revision 1.7  2011/10/17 15:32:47  efy-yurybakh
- * Let people create an account just after posting a comment
- *
- * Revision 1.6  2011/10/17 15:10:29  efy-yurybakh
- * If there is an email address in a comment, do not allow posting the comment
- *
- * Revision 1.5  2011/10/05 12:05:02  efy-yurybakh
- * Blog settings > features tab refactoring
- *
- * Revision 1.4  2011/10/03 17:13:04  efy-yurybakh
- * review fp>yura comments
- *
- * Revision 1.3  2011/09/30 13:03:20  fplanque
- * doc
- *
- * Revision 1.2  2011/09/30 04:56:39  efy-yurybakh
- * RSS feed settings
- *
- * Revision 1.1  2011/09/28 12:09:53  efy-yurybakh
- * "comment was helpful" votes (new tab "comments")
- *
+ * Revision 1.10  2013/11/06 08:03:58  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

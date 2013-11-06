@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -55,6 +55,8 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 									$edited_Skin->type,
 									 array(
 													array( 'normal', T_( 'Normal' ), T_( 'Normal skin for general browsing' ) ),
+													array( 'mobile', T_( 'Mobile' ), T_( 'Mobile skin for mobile phones browsers' ) ),
+													array( 'tablet', T_( 'Tablet' ), T_( 'Tablet skin for tablet browsers' ) ),
 													array( 'feed', T_( 'XML Feed' ), T_( 'Special system skin for XML feeds like RSS and Atom' ) ),
 													array( 'sitemap', T_( 'XML Sitemap' ), T_( 'Special system skin for XML sitemaps' ) ),
 												),
@@ -80,48 +82,8 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
- * Revision 1.11  2011/09/04 22:13:20  fplanque
- * copyright 2011
+ * Revision 1.13  2013/11/06 08:04:46  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.10  2010/02/26 15:52:20  efy-asimo
- * combine skin and skin settings tab into one single tab
- *
- * Revision 1.9  2010/02/08 17:54:43  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.8  2010/01/30 18:55:34  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.7  2010/01/03 13:45:37  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.6  2009/09/26 13:41:54  tblue246
- * If XML feeds are disabled for a blog, still allow accessing "sitemap" skins.
- *
- * Revision 1.5  2009/05/23 20:20:18  fplanque
- * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
- *
- * Revision 1.4  2009/03/08 23:57:46  fplanque
- * 2009
- *
- * Revision 1.3  2008/01/21 09:35:35  fplanque
- * (c) 2008
- *
- * Revision 1.2  2007/09/03 20:07:50  blueyed
- * Fixed display of empty container lists in "Skins install" detail form
- *
- * Revision 1.1  2007/06/25 11:01:36  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.3  2007/04/26 00:11:05  fplanque
- * (c) 2007
- *
- * Revision 1.2  2007/01/07 23:38:20  fplanque
- * discovery of skin containers
- *
- * Revision 1.1  2007/01/07 05:32:11  fplanque
- * added some more DB skin handling (install+uninstall+edit properties ok)
- * still useless though :P
- * next step: discover containers in installed skins
  */
 ?>

@@ -50,20 +50,20 @@ function resetstatus()
  */
 function pop_up_window( href, target, width, height, params )
 {
- 	if( typeof(width) == 'undefined' )
- 	{
+	if( typeof(width) == 'undefined' )
+	{
 		width = 750;
 	}
 
- 	if( typeof(height) == 'undefined' )
- 	{
+	if( typeof(height) == 'undefined' )
+	{
 		height = 550;
 	}
 
 	var left = (screen.width - width) / 2;
 	var top = (screen.height - height) / 2;
 
- 	if( typeof(params) == 'undefined' )
+	if( typeof(params) == 'undefined' )
 	{
 		params = 'scrollbars=yes, status=yes, resizable=yes, menubar=yes';
 	}
@@ -147,16 +147,14 @@ function toggle_clickopen( id, hide, displayVisible )
 	{
 		clickdiv.style.display = 'none';
 		clickimg.style.backgroundPosition = bgxy_expand;
-
-		return false;
 	}
 	else
 	{
 		clickdiv.style.display = displayVisible;
 		clickimg.style.backgroundPosition = bgxy_collapse;
-
-		return false;
 	}
+
+	return false;
 }
 
 
@@ -198,8 +196,18 @@ function textarea_wrap_selection( myField, before, after, replace, target_docume
 		&& ( typeof window.opener != "undefined" )
 		&& window.opener.b2evo_Callbacks
 		&& ( typeof window.opener.b2evo_Callbacks != "undefined" ) )
-	{ // callback in parent document (e.g. "Files" popup)
+	{ // callback in opener document (e.g. "Files" popup)
 		if( window.opener.b2evo_Callbacks.trigger_callback( "wrap_selection_for_"+myField.id, hook_params ) )
+		{
+			return;
+		}
+	}
+	if( window.parent
+		&& ( typeof window.parent != "undefined" )
+		&& window.parent.b2evo_Callbacks
+		&& ( typeof window.parent.b2evo_Callbacks != "undefined" ) )
+	{	// callback in parent document (e.g. "Links" iframe)
+		if( window.parent.b2evo_Callbacks.trigger_callback( "wrap_selection_for_"+myField.id, hook_params ) )
 		{
 			return;
 		}
@@ -294,78 +302,16 @@ function toggle_filter_area( filter_name )
 	{	// Hide/collapse filters:
 		clickdiv.style.display = 'none';
 		clickimg.style.backgroundPosition = bgxy_expand;
-		asyncRequest( htsrv_url+'async.php?collapse='+filter_name );
+		jQuery.post( htsrv_url+'anon_async.php?action=collapse_filter&target='+filter_name );
 	}
 	else
 	{	// Show/expand filters
 		clickdiv.style.display = 'block';
 		clickimg.style.backgroundPosition = bgxy_collapse;
-		asyncRequest( htsrv_url+'async.php?expand='+filter_name );
+		jQuery.post( htsrv_url+'anon_async.php?action=expand_filter&target='+filter_name );
 	}
 
 	return false;
-}
-
-
-/**
- * "AJAX" wrapper
- *
- * What this really is actually, is just a function to perform an asynchronous Request to the server.
- * There is no need to have any XML involved.
- *
- * @obsolete Use jQuery instead
- * @param string url urlencoded
- */
-function asyncRequest( url )
-{
-	if (window.XMLHttpRequest)
-	{ // browser has native support for XMLHttpRequest object
-		req = new XMLHttpRequest();
-	}
-	else if (window.ActiveXObject)
-	{ // try XMLHTTP ActiveX (Internet Explorer) version
-		req = new ActiveXObject("Microsoft.XMLHTTP");
-	}
-
-	if(req)
-	{
-		swapSection( '...' );
-		//req.onreadystatechange = responseHandler;
-    req.onreadystatechange = asyncResponseHandler;
-		req.open( 'GET', url, true );
-		req.setRequestHeader("content-type","application/x-www-form-urlencoded");
-		req.send('dummy');
-	}
-	else
-	{
-		swapSection('Your browser does not seem to support XMLHttpRequest.');
-	}
-
-	return false;
-}
-
-function asyncResponseHandler()
-{
-	if( req.readyState == 4 )
-	{	// Request has been loaded (readyState = 4)
-		if( req.status == 200 )
-		{	// Status is 200 OK:
-			swapSection( req.responseText );
-		}
-		else
-		{
-			swapSection("There was a problem retrieving the XML data:\n" + req.statusText);
-		}
-	}
-}
-
-function swapSection( data )
-{
-	var swappableSection = document.getElementById('asyncResponse');
-	if( swappableSection )
-	{
-		swappableSection.innerHTML = data;
-	}
 }
 
 

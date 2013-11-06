@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -37,7 +37,7 @@ global $current_User;
 
 global $dispatcher;
 
-global $collections_Module;
+global $collections_Module, $DB;
 param_action();
 
 // Do we have permission to view all stats (aggregated stats) ?
@@ -47,10 +47,6 @@ $perm_view_all = $current_User->check_perm( 'stats', 'view' );
 memorize_param( 'blog', 'integer', -1 );
 
 $tab = param( 'tab', 'string', 'summary', true );
-if( $tab == 'sessions' && (!$perm_view_all || $blog != 0) )
-{	// Sessions tab is not narrowed down to blog level:
-	$tab = 'summary';
-}
 $tab3 = param( 'tab3', 'string', '', true );
 
 param( 'action', 'string' );
@@ -102,6 +98,11 @@ if( ($tab=='refsearches') && ($tab3=='intsearches') )
 else
 {
 
+if ($tab == 'domains' && $current_User->check_perm( 'stats', 'edit' ))
+{
+	require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+}
+
 if( $blog == 0 )
 {
 	if( (!$perm_view_all) && isset($collections_Module) )
@@ -133,23 +134,6 @@ switch( $action )
 		break;
 
 
-	case 'delete': // DELETE A HIT
-		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
-
-		param( 'hit_ID', 'integer', true ); // Required!
-
-		if( Hitlist::delete( $hit_ID ) )
-		{
-			$Messages->add( sprintf( T_('Deleted hit #%d.'), $hit_ID ), 'success' );
-		}
-		else
-		{
-			$Messages->add( sprintf( T_('Could not delete hit #%d.'), $hit_ID ), 'note' );
-		}
-		break;
-
-
 	case 'prune': // PRUNE hits for a certain date
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'stats' );
@@ -170,24 +154,30 @@ switch( $action )
 		header_redirect( '?ctrl=stats', 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
+
+	case 'reset_counters':
+
+		$current_User->check_perm( 'stats', 'edit', true );
+
+		$sql = 'UPDATE T_track__keyphrase
+				SET keyp_count_refered_searches = 0,
+					keyp_count_internal_searches = 0';
+		$DB->query( $sql, ' Reset keyphrases counters' );
+		break;
+
 }
 }
 
-
-if( $tab != 'sessions' )
-{ // no need to show blogs list while displaying sessions
-
-	if( isset($collections_Module) )
-	{ // Display list of blogs:
-		if( $perm_view_all )
-		{
-			$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ), T_('All'),
-							$dispatcher.'?ctrl=stats&amp;tab='.$tab.'&amp;tab3='.$tab3.'&amp;blog=0' );
-		}
-		else
-		{	// No permission to view aggregated stats:
-			$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ) );
-		}
+if( isset($collections_Module) )
+{ // Display list of blogs:
+	if( $perm_view_all )
+	{
+		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ), T_('All'),
+						$dispatcher.'?ctrl=stats&amp;tab='.$tab.'&amp;tab3='.$tab3.'&amp;blog=0' );
+	}
+	else
+	{	// No permission to view aggregated stats:
+		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ) );
 	}
 }
 
@@ -231,7 +221,7 @@ switch( $tab )
 	case 'hits':
 		$AdminUI->breadcrumbpath_add( T_('Analytics'), '?ctrl=stats&amp;blog=$blog$' );
 		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
-		$AdminUI->breadcrumbpath_add( T_('Direct hits'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab );
+		$AdminUI->breadcrumbpath_add( T_('All Hits'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab );
 		break;
 
 	case 'referers':
@@ -262,34 +252,12 @@ switch( $tab )
 				$AdminUI->breadcrumbpath_add( T_('Top search engines'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab.'&amp;tab3='.$tab3 );
 				break;
 				
-			case 'intsearches':
-				$AdminUI->breadcrumbpath_add( T_('Internal searches'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab.'&amp;tab3='.$tab3 );
-				break;
 		}
 		break;
 
 	case 'domains':
 		$AdminUI->breadcrumbpath_add( T_('Analytics'), '?ctrl=stats&amp;blog=$blog$' );
 		$AdminUI->breadcrumbpath_add( T_('Referring domains'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab );
-		break;
-
-	case 'sessions':
-		$AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
-		$AdminUI->breadcrumbpath_add( T_('Sessions'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab );
-		if( empty($tab3) )
-		{
-			$tab3 = 'login';
-		}
-		switch( $tab3 )
-		{
-			case 'login':
-				$AdminUI->breadcrumbpath_add( T_('Session by user'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab.'&amp;tab3='.$tab3 );
-				break;
-			case 'sessid':
-				// fp> TODO: include username in path if we have one
-				$AdminUI->breadcrumbpath_add( T_('Recent sessions'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab.'&amp;tab3='.$tab3 );
-				break;
-		}
 		break;
 
 	case 'goals':
@@ -305,18 +273,11 @@ switch( $tab )
 
 }
 
-if( $tab == 'sessions' )
-{ // Show this sub-tab in Users tab
-	$AdminUI->set_path( 'users', $tab, $tab3 );
-	$AdminUI->title = T_('Stats');
-}
-else
-{
-	$AdminUI->set_path( 'stats', $tab, $tab3 );
-	$AdminUI->title = T_('Stats');
-}
+$AdminUI->set_path( 'stats', $tab, $tab3 );
 
-if( ( $tab3 == 'keywords' ) || ( $tab == 'goals' && $tab3 == 'hits' ) )
+if( in_array( $tab , array( 'hits', 'other', 'referers' ) ) ||
+    ( $tab == 'refsearches' && in_array( $tab3 , array( 'hits', 'keywords' ) ) ) ||
+    ( $tab == 'goals' && $tab3 == 'hits' ) )
 { // Load the data picker style for _stats_search_keywords.view.php and _stats_goalhits.view.php
 	require_css( 'ui.datepicker.css' );
 }
@@ -403,19 +364,10 @@ switch( $AdminUI->get_path(1) )
 		break;
 
 	case 'other':
-		// Display VIEW:
-		$AdminUI->disp_view( 'sessions/views/_stats_direct.view.php' );
-		break;
-
 	case 'hits':
-		// Display VIEW:
-		$AdminUI->disp_view( 'sessions/views/_stats_all_hits.view.php' );
-		break;
-
-
 	case 'referers':
-		// Display VIEW:
-		$AdminUI->disp_view( 'sessions/views/_stats_referers.view.php' );
+		// Display hits results table:
+		hits_results_block();
 		break;
 
 	case 'refsearches':
@@ -423,7 +375,8 @@ switch( $AdminUI->get_path(1) )
 		switch( $tab3 )
 		{
 			case 'hits':
-				$AdminUI->disp_view( 'sessions/views/_stats_refsearches.view.php' );
+				// Display hits results table:
+				hits_results_block();
 				break;
 
 			case 'keywords':
@@ -443,18 +396,6 @@ switch( $AdminUI->get_path(1) )
 	case 'domains':
 		// Display VIEW:
 		$AdminUI->disp_view( 'sessions/views/_stats_refdomains.view.php' );
-		break;
-
-	case 'sessions':
-		// Display VIEW:
-		switch( $tab3 )
-		{
-			case 'sessid':
-				$AdminUI->disp_view( 'sessions/views/_stats_sessions_list.view.php' );
-				break;
-			case 'login':
-				$AdminUI->disp_view( 'sessions/views/_stats_sessions.view.php' );
-		}
 		break;
 
 	case 'goals':
@@ -478,127 +419,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.35  2011/10/13 05:47:24  efy-asimo
- * Remove old permission check from session Module
+ * Revision 1.37  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.34  2011/10/10 19:48:31  fplanque
- * i18n & login display cleaup
- *
- * Revision 1.33  2011/09/30 06:25:24  efy-vitalij
- * Remove Hits tab from User Sessions
- *
- * Revision 1.32  2011/09/29 09:18:19  efy-vitalij
- * add tab hits
- *
- * Revision 1.31  2011/09/14 21:04:06  fplanque
- * cleanup
- *
- * Revision 1.30  2011/09/09 23:05:08  lxndral
- * Search for "fp>al" in code to find my comments and please make requested changed
- *
- * Revision 1.29  2011/09/09 21:48:51  fplanque
- * indenting cleanp
- *
- * Revision 1.28  2011/09/09 21:45:57  fplanque
- * doc
- *
- * Revision 1.27  2011/09/07 12:00:20  lxndral
- * internal searches update
- *
- * Revision 1.26  2011/09/04 22:13:18  fplanque
- * copyright 2011
- *
- * Revision 1.25  2010/10/22 15:09:57  efy-asimo
- * Remove autoloading datepciker css, instead load before every usage, also remove jquery-ui.css load
- *
- * Revision 1.24  2010/02/08 17:53:55  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.23  2010/01/16 12:47:37  efy-yury
- * update stats: crumbs and redirect
- *
- * Revision 1.22  2009/12/12 01:13:08  fplanque
- * A little progress on breadcrumbs on menu structures alltogether...
- *
- * Revision 1.21  2009/12/08 22:38:13  fplanque
- * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
- *
- * Revision 1.20  2009/12/06 22:55:21  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.19  2009/09/26 12:00:43  tblue246
- * Minor/coding style
- *
- * Revision 1.18  2009/09/25 07:33:14  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.17  2009/09/20 00:27:08  fplanque
- * cleanup/doc/simplified
- *
- * Revision 1.16  2009/09/19 21:49:03  efy-sergey
- * Moved Stats>User Sessions tab to Users>Sessions
- *
- * Revision 1.15  2009/09/14 11:24:02  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.14  2009/08/30 00:30:52  fplanque
- * increased modularity
- *
- * Revision 1.13  2009/07/06 23:52:25  sam2kb
- * Hardcoded "admin.php" replaced with $dispatcher
- *
- * Revision 1.12  2009/05/16 00:31:45  fplanque
- * AFAICS this only appears in the title tag
- *
- * Revision 1.11  2009/04/12 09:29:47  tblue246
- * minor
- *
- * Revision 1.10  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.9  2008/05/26 19:30:33  fplanque
- * enhanced analytics
- *
- * Revision 1.8  2008/05/10 22:59:10  fplanque
- * keyphrase logging
- *
- * Revision 1.7  2008/04/17 11:53:19  fplanque
- * Goal editing
- *
- * Revision 1.6  2008/03/20 14:20:52  fplanque
- * no message
- *
- * Revision 1.5  2008/02/19 11:11:18  fplanque
- * no message
- *
- * Revision 1.4  2008/01/21 09:35:32  fplanque
- * (c) 2008
- *
- * Revision 1.3  2008/01/05 02:28:17  fplanque
- * enhanced blog selector (bloglist_buttons)
- *
- * Revision 1.2  2007/09/19 09:41:57  yabs
- * minor bug fix
- *
- * Revision 1.1  2007/06/25 11:00:56  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.37  2007/05/13 18:49:55  fplanque
- * made autoselect_blog() more robust under PHP4
- *
- * Revision 1.36  2007/04/26 00:11:16  fplanque
- * (c) 2007
- *
- * Revision 1.35  2007/03/20 09:55:06  fplanque
- * Letting boggers view their own stats.
- * + Letthing admins view the aggregate by default.
- *
- * Revision 1.33  2007/03/02 01:36:51  fplanque
- * small fixes
- *
- * Revision 1.32  2006/12/07 23:21:00  fplanque
- * dashboard blog switching
  */
 ?>

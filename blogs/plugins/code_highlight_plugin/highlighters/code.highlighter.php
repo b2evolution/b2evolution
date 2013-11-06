@@ -4,7 +4,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2007 by Yabba/Scott - {@link http://astonishme.co.uk/contact/}.
  *
  * {@internal License choice
@@ -90,42 +90,8 @@ class am_code_highlighter
 
 /*
  * $Log$
- * Revision 1.12  2011/09/04 22:13:23  fplanque
- * copyright 2011
- *
- * Revision 1.11  2010/02/08 17:56:01  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.10  2009/03/08 23:57:49  fplanque
- * 2009
- *
- * Revision 1.9  2009/01/25 23:13:55  blueyed
- * Fix CVS log section, which is not phpdoc
- *
- * Revision 1.8  2008/01/21 09:35:42  fplanque
- * (c) 2008
- *
- * Revision 1.7  2007/07/03 10:44:23  yabs
- * minor change
- *
- * Revision 1.6  2007/06/26 02:40:54  fplanque
- * security checks
- *
- * Revision 1.5  2007/06/20 21:33:23  blueyed
- * fixed doc
- *
- * Revision 1.4  2007/06/20 19:16:36  blueyed
- * Fixed doc
- *
- * Revision 1.3  2007/06/17 13:28:22  blueyed
- * Fixed doc
- *
- * Revision 1.2  2007/05/04 20:43:08  fplanque
- * MFB
- *
- * Revision 1.1.2.3  2007/04/23 11:59:58  yabs
- * removed "extend Plugins"
- *
+ * Revision 1.13  2013/11/06 08:05:22  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

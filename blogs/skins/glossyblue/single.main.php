@@ -72,6 +72,7 @@ skin_include( '_body_header.inc.php' );
 // Display message if no post:
 display_if_empty();
 
+echo '<div id="styled_content_block">'; // Beginning of posts display
 while( $Item = & mainlist_get_item() )
 {	// For each blog post, do everything below up to the closing curly brace "}"
 	?>
@@ -95,7 +96,17 @@ while( $Item = & mainlist_get_item() )
 					)); ?></span>
 		</div>
 		<div class="post-title">
-			<h2><?php $Item->title(); ?></h2>
+			<?php
+			if( $Item->status != 'published' )
+			{
+				$Item->status( array( 'format' => 'styled' ) );
+			}
+			?>
+			<h2><?php
+				$Item->title( array(
+					'link_type' => 'permalink'
+					) );
+			?></h2>
 		<span class="post-cat"><?php
 				$Item->categories( array(
 					'before'          => '',
@@ -163,6 +174,7 @@ while( $Item = & mainlist_get_item() )
 	<?php
 	locale_restore_previous();	// Restore previous locale (Blog locale)
 }
+echo '</div>'; // End of posts display
 ?>
 
 </div>

@@ -31,7 +31,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $Settings, $DB, $result_message, $default_locale, $current_charset;
+global $Settings, $DB, $result_message;
 global $pbm_item_files, $pbm_messages, $pbm_items, $post_cntr, $del_cntr, $is_cron_mode;
 
 // Are we in cron job mode?
@@ -51,13 +51,6 @@ if( ! extension_loaded('imap') )
 	return 2; // error
 }
 
-// Make sure current locale is set
-locale_overwritefromDB();
-locale_activate( $default_locale );
-
-// Set encoding for MySQL connection:
-$DB->set_connection_charset( $current_charset );
-
 load_funcs( '_core/_param.funcs.php' );
 load_class( 'items/model/_itemlist.class.php', 'ItemList' );
 load_class( '_ext/mime_parser/rfc822_addresses.php', 'rfc822_addresses_class' );
@@ -70,7 +63,7 @@ if( isset($GLOBALS['files_Module']) )
 
 if( $Settings->get('eblog_test_mode') )
 {
-	pbm_msg( T_('This is just a test run. Nothing will be posted to the database nor will your inbox be altered'), true );
+	pbm_msg( T_('This is just a test run. Nothing will be posted to the database nor will your inbox be altered.'), true );
 }
 
 if( ! $mbox = pbm_connect() )
@@ -107,20 +100,21 @@ if( $post_cntr > 0 )
 	pbm_msg( sprintf( T_('New posts created: %d'), $post_cntr ), true );
 
 	$subject = T_('Post by email report');
-	foreach( $pbm_items as $User )
+	foreach( $pbm_items as $Items )
 	{	// Send report to post author
-		$msg = T_('You just created the following posts:')."\n\n";
-		$to = $to_name = '';
-		foreach( $User as $Item )
+		$to_user_ID = 0;
+		foreach( $Items as $Item )
 		{
-			if( $to == '' )
-			{	// Get author name and email
-				$to = $Item->Author->get('email');
-				$to_name = $Item->Author->get_preferred_name();
+			if( $to_user_ID == 0 )
+			{	// Get author ID
+				$to_user_ID = $Item->Author->ID;
+				break;
 			}
-			$msg .= format_to_output($Item->title)."\n".$Item->get_permanent_url()."\n\n";
 		}
-		send_mail( $to, $to_name, $subject, $msg );
+		$email_template_params = array(
+				'Items' => $Items
+			);
+		send_mail_to_User( $to_user_ID, $subject, 'post_by_email_report', $email_template_params );
 	}
 
 	// sam2kb> TODO: Send detailed report to blog owner
@@ -132,12 +126,8 @@ return 1; // success
 
 /*
  * $Log$
- * Revision 1.2  2011/10/18 07:28:12  sam2kb
- * Post by Email fixes
- *
- * Revision 1.1  2011/10/17 20:16:52  sam2kb
- * Post by Email converted into internal scheduled job
- *
+ * Revision 1.4  2013/11/06 08:04:07  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

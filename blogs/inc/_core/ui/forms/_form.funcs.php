@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -275,36 +275,59 @@ function form_formstart( $action, $class = '', $name = '', $method = 'get', $id 
 	}
 }
 
+
+/**
+ * Builds a textarea field.
+ *
+ * @deprecated Deprecated by (@link Form::textarea_input())
+ *
+ * @param string the name of the input field
+ * @param string initial value
+ * @param integer rows of the textarea field
+ * @param string label displayed in front of the field
+ * @param array params
+ */
+function form_textarea( $field_name, $field_value, $field_rows, $field_label, $field_params = array() )
+{
+
+	$textarea_rows = '';
+	if( !empty( $field_rows ) )
+	{
+		$textarea_rows = ' rows="'.$field_rows.'"';
+	}
+
+	$textarea_cols = '';
+	if( !empty( $field_params['cols'] ) )
+	{
+		$textarea_cols = ' cols="'.$field_params['cols'].'"';
+	}
+
+	$textarea_class = '';
+	if( !empty( $field_params['class'] ) )
+	{
+		$textarea_class = ' class="'.$field_params['class'].'"';
+	}
+
+	$r = "<fieldset>\n"
+			.'<div class="label"><label for="'.$field_name.'">'.$field_label.":</label></div>\n"
+			.'<div class="input"><textarea name="'.$field_name.'" id="'.$field_name.'"'.$textarea_rows.$textarea_cols.$textarea_class.'>'
+			.format_to_output($field_value, 'formvalue')
+			.'</textarea>'."\n";
+
+	if( !empty( $field_params['note'] ) )
+	{
+		$r .= '<span class="notes">'.$field_params['note'].'</span>';
+	}
+
+	$r .= "</div>\n</fieldset>\n\n";
+
+	echo $r;
+}
+
 /*
  * $Log$
- * Revision 1.8  2011/09/04 22:13:13  fplanque
- * copyright 2011
+ * Revision 1.10  2013/11/06 08:03:48  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.7  2010/02/08 17:52:01  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.6  2009/09/08 13:51:00  tblue246
- * phpdoc fixes
- *
- * Revision 1.5  2009/03/08 23:57:41  fplanque
- * 2009
- *
- * Revision 1.4  2009/02/02 13:53:44  tblue246
- * form_info() is still used by gettext/staticfiles.php (grep or ack is useful here).
- *
- * Revision 1.3  2009/02/02 12:51:08  waltercruz
- * Removing deprecated form functions
- *
- * Revision 1.2  2008/01/21 09:35:24  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 10:59:02  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.8  2007/04/26 00:11:07  fplanque
- * (c) 2007
- *
- * Revision 1.7  2006/11/24 18:27:27  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

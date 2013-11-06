@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -44,6 +44,8 @@ global $dispatcher;
 
 global $collections_Module;
 
+global $baseurl;
+
 $Form = new Form( NULL, 'settings_checkchanges' );
 $Form->begin_form( 'fform', '',
 	// enable all form elements on submit (so values get sent):
@@ -69,13 +71,92 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Email validation') );
+$Form->begin_fieldset( T_('Default user settings') );
 
-	$Form->checkbox( 'newusers_mustvalidate', $Settings->get('newusers_mustvalidate'), T_('New users must validate email'), T_('Check to require users to validate their email by clicking a link sent to them.' ) );
+	$messaging_options = array( array( 'enable_PM', 1, T_( 'private messages on this site.' ), $Settings->get( 'def_enable_PM' ) ) );
+	if( $Settings->get( 'emails_msgform' ) != 'never' )
+	{
+		$messaging_options[] = array( 'enable_email', 1, T_( 'emails through a message form that will NOT reveal my email address.' ), $Settings->get( 'def_enable_email' ) );
+	}
+	$Form->checklist( $messaging_options, 'default_user_msgform', T_( 'Other users can send me' ) );
 
-	$Form->checkbox( 'newusers_revalidate_emailchg', $Settings->get('newusers_revalidate_emailchg'), T_('Validate email changes'), T_('Check to require users to re-validate when they change their email address.' ) );
+	$notify_options = array(
+		array( 'notify_messages', 1, T_( 'I receive a private message.' ),  $Settings->get( 'def_notify_messages' ) ),
+		array( 'notify_unread_messages', 1, T_( 'I have unread private messages for more than 24 hours.' ),  $Settings->get( 'def_notify_unread_messages' ), false, T_( 'This notification is sent only once every 3 days.' ) ),
+		array( 'notify_published_comments', 1, T_( 'a comment is published on one of <strong>my</strong> posts.' ), $Settings->get( 'def_notify_published_comments' ) ),
+		array( 'notify_comment_moderation', 1, T_( 'a comment is posted in a blog where I am a moderator.' ), $Settings->get( 'def_notify_comment_moderation' ) ),
+	);
+	$Form->checklist( $notify_options, 'default_user_notification', T_( 'Notify me by email whenever' ) );
 
-	$Form->checkbox( 'newusers_findcomments', $Settings->get('newusers_findcomments'), T_('Find old comments'), T_('After each email validation, find comments left by the user based on the email address and attach them to the user account.' ) );
+	$newsletter_options = array(
+		array( 'newsletter_news', 1, T_( 'Send me news about this site.' ).' <span class="note">'.T_('Each message contains an easy 1 click unsubscribe link.').'</span>', $Settings->get( 'def_newsletter_news' ) ),
+		array( 'newsletter_ads', 1, T_( 'I want to receive ADs that may be relevant to my interests.' ), $Settings->get( 'def_newsletter_ads' ) )
+	);
+	$Form->checklist( $newsletter_options, 'default_user_newsletter', T_( 'Newsletter' ) );
+
+	$Form->text_input( 'notification_email_limit', $Settings->get( 'def_notification_email_limit' ), 3, T_( 'Limit notification emails to' ), T_( 'emails per day' ), array( 'maxlength' => 3, 'required' => true ) );
+	$Form->text_input( 'newsletter_limit', $Settings->get( 'def_newsletter_limit' ), 3, T_( 'Limit newsletters to' ), T_( 'emails per day' ), array( 'maxlength' => 3, 'required' => true ) );
+
+$Form->end_fieldset();
+
+// --------------------------------------------
+
+$Form->begin_fieldset( T_('Account activation'), array( 'id' => 'account_activation' ) );
+
+	$Form->checkbox( 'newusers_mustvalidate', $Settings->get('newusers_mustvalidate'), T_('New users must activate by email'), T_('Check to require users to activate their account by clicking a link sent to them via email.' ) );
+
+	$Form->checkbox( 'newusers_revalidate_emailchg', $Settings->get('newusers_revalidate_emailchg'), T_('Reactivate after email change'), T_('Check to require users to re-activate their account when they change their email address.' ) );
+
+	$Form->radio( 'validation_process', $Settings->get( 'validation_process' ), array(
+					array( 'secure', T_( 'Secure account activation process' ), T_( 'Users must validate their account in the same session. Prevents activation of an account by someone else if an incorrect email address is entered. No reminder emails can be sent.' ) ),
+					array( 'easy', T_( 'Easy account activation process' ), T_( 'Allows to send reminder emails to unregistered accounts.' ) ) 
+				), T_( 'Activation process' ), true );
+
+	$Form->duration_input( 'activate_requests_limit', $Settings->get( 'activate_requests_limit' ), T_('Limit activation email requests to'), 'minutes', 'minutes', array( 'minutes_step' => 5, 'required' => true, 'note' => T_('Only one activation email can be sent to the same email address in every given minutes.') ) );
+
+	$Form->checkbox( 'newusers_findcomments', $Settings->get('newusers_findcomments'), T_('Find old comments'), T_('After each activation, find comments left by the user based on the validated email address and attach them to the user account.' ) );
+
+	if( $Settings->get( 'after_email_validation' ) == 'return_to_original' )
+	{ // return to original url
+		$after_email_validation = 'return_to_original';
+		$after_validation_url = $baseurl;
+	}
+	else
+	{ // set specific URL
+		$after_email_validation = 'specific_url';
+		$after_validation_url = $Settings->get( 'after_email_validation' );
+	}
+	$Form->radio( 'after_email_validation', $after_email_validation, array(
+					array( 'return_to_original', T_( 'Return to original page' ) ),
+					array( 'specific_url', T_( 'Go to specific URL' ).':', '',
+						'<input type="text" id="specific_after_validation_url" class="form_text_input" name="specific_after_validation_url" size="50" maxlength="120" value="'
+						.format_to_output( $after_validation_url, 'formvalue' ).'"
+						onfocus="document.getElementsByName(\'after_email_validation\')[1].checked=true;" />' )
+				), T_( 'After email activation' ), true );
+
+$Form->end_fieldset();
+
+// --------------------------------------------
+
+$Form->begin_fieldset( T_( 'Other settings' ) );
+
+	if( $Settings->get( 'after_registration' ) == 'return_to_original' )
+	{ // return to original url
+		$after_registration = 'return_to_original';
+		$after_registration_url = url_add_param( $baseurl, 'disp=profile' );
+	}
+	else
+	{ // set specific URL
+		$after_registration = 'specific_url';
+		$after_registration_url = $Settings->get( 'after_registration' );
+	}
+	$Form->radio( 'after_registration', $after_registration, array(
+					array( 'return_to_original', T_( 'Return to original page' ) ),
+					array( 'specific_url', T_( 'Go to specific URL' ).':', '',
+						'<input type="text" id="specific_after_registration_url" class="form_text_input" name="specific_after_registration_url" size="50" maxlength="120" value="'
+						.format_to_output( $after_registration_url, 'formvalue' ).'"
+						onfocus="document.getElementsByName(\'after_registration\')[1].checked=true;" />' )
+				), T_( 'After registration' ), true );
 
 $Form->end_fieldset();
 
@@ -89,6 +170,8 @@ $Form->begin_fieldset( T_('Security options') );
 
 	$Form->checkbox_input( 'passwd_special', (bool)$Settings->get('passwd_special'), T_('Require specials characters'), array( 'note'=>T_('Check to require at least 1 special character (not a letter nor a digit).')) );
 
+	$Form->checkbox_input( 'strict_logins', (bool)$Settings->get('strict_logins'), T_('Require strict logins'), array( 'note'=>sprintf( T_('Check to require only plain ACSII characters in user logins. Uncheck to allow any characters and symbols. The following characters are never allowed for security reasons: %s'), '\', ", >, <, @') ) );
+
 $Form->end_fieldset();
 
 // --------------------------------------------
@@ -96,6 +179,8 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Other options') );
 
 	$Form->checkbox_input( 'registration_require_country', $Settings->get('registration_require_country'), T_('Require country'), array( 'note'=>T_('New users will have to specify their country in order to register.') ) );
+
+	$Form->checkbox_input( 'registration_require_firstname', $Settings->get('registration_require_firstname'), T_('Require first name'), array( 'note'=>T_('New users will have to specify their first name in order to register.') ) );
 
 	$Form->checkbox_input( 'registration_ask_locale', $Settings->get('registration_ask_locale'), T_('Ask for language'), array( 'note'=>T_('New users will be prompted for their preferred language/locale.') ) );
 
@@ -117,59 +202,8 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 
 /*
  * $Log$
- * Revision 1.18  2011/10/17 17:53:11  efy-yurybakh
- * Detect previous comments after email validation
- *
- * Revision 1.17  2011/10/04 13:06:26  efy-yurybakh
- * Additional Display settings
- *
- * Revision 1.16  2011/10/03 10:07:06  efy-yurybakh
- * bubbletips & identity_links cleanup
- *
- * Revision 1.15  2011/09/26 14:49:58  efy-yurybakh
- * colored usernames
- *
- * Revision 1.14  2011/09/10 22:48:41  fplanque
- * doc
- *
- * Revision 1.13  2011/09/06 16:25:18  efy-james
- * Require special chars in password
- *
- * Revision 1.12  2011/06/14 13:33:56  efy-asimo
- * in-skin register
- *
- * Revision 1.11  2010/11/24 14:55:30  efy-asimo
- * Add user gender
- *
- * Revision 1.10  2010/05/07 08:07:14  efy-asimo
- * Permissions check update (User tab, Global Settings tab) - bugfix
- *
- * Revision 1.9  2010/01/03 17:45:21  fplanque
- * crumbs & stuff
- *
- * Revision 1.8  2010/01/03 13:45:37  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.7  2009/11/12 00:46:34  fplanque
- * doc/minor/handle demo mode
- *
- * Revision 1.6  2009/09/25 07:33:15  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.5  2009/09/16 05:35:49  efy-bogdan
- * Require country checkbox added
- *
- * Revision 1.4  2009/09/15 09:20:50  efy-bogdan
- * Moved the "email validation" and the "security options" blocks to the Users -> Registration tab
- *
- * Revision 1.3  2009/09/15 02:43:35  fplanque
- * doc
- *
- * Revision 1.2  2009/09/15 01:39:16  fplanque
- * minor
- *
- * Revision 1.1  2009/09/14 12:01:00  efy-bogdan
- * User Registration tab
+ * Revision 1.20  2013/11/06 08:05:03  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

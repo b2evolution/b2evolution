@@ -4,7 +4,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -50,7 +50,7 @@ class calendar_plugin extends Plugin
 	var $name;
 	var $code = 'evo_Calr';
 	var $priority = 20;
-	var $version = '3.0';
+	var $version = '5.0.0';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 
@@ -167,6 +167,7 @@ class calendar_plugin extends Plugin
 		global $author, $assgn, $status, $types;
 		global $m, $w, $dstart;
 		global $s, $sentence, $exact;
+		global $posttypes_specialtypes;
 
 		/**
 		 * Default params:
@@ -269,8 +270,8 @@ class calendar_plugin extends Plugin
 			// - - - + * * if a month is specified in the querystring, load that month:
 			$Calendar->ItemQuery->where_datestart( /* NO m */'', /* NO w */'', '', '', $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
 
-			// Exclude pages and intros:
-			$Calendar->ItemQuery->where_types( '-1000,1500,1520,1530,1570,1600' );
+			// Exclude pages and intros and sidebar stuff:
+			$Calendar->ItemQuery->where_types( '-'.implode(',',$posttypes_specialtypes) );
 		}
 
 		// DISPLAY:
@@ -1147,108 +1148,8 @@ class Calendar
 
 /*
  * $Log$
- * Revision 1.61  2011/10/06 11:49:47  efy-yurybakh
- * Replace all timestamp_min & timestamp_max with Blog's methods
+ * Revision 1.63  2013/11/06 08:05:22  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.60  2011/09/04 22:13:23  fplanque
- * copyright 2011
- *
- * Revision 1.59  2010/02/08 17:55:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.58  2010/01/30 18:55:36  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.57  2009/06/24 18:47:54  tblue246
- * Make widget plugin names translatable
- *
- * Revision 1.56  2009/05/18 03:59:39  fplanque
- * minor/doc
- *
- * Revision 1.55  2009/03/31 20:24:30  blueyed
- * Beautify code.
- *
- * Revision 1.54  2009/03/08 23:57:47  fplanque
- * 2009
- *
- * Revision 1.53  2009/02/23 05:03:07  sam2kb
- * Removed duplicate code
- *
- * Revision 1.52  2009/01/21 22:36:35  fplanque
- * Cleaner handling of pages and intros in calendar and archives plugins
- *
- * Revision 1.51  2008/03/31 00:27:11  blueyed
- * Nuke unused  global statements; use global  in loop instead of getter
- *
- * Revision 1.50  2008/03/30 14:56:50  fplanque
- * DST fix
- *
- * Revision 1.49  2008/01/21 09:35:41  fplanque
- * (c) 2008
- *
- * Revision 1.48  2007/11/29 21:52:22  fplanque
- * minor
- *
- * Revision 1.47  2007/11/25 18:20:38  fplanque
- * additional SEO settings
- *
- * Revision 1.46  2007/10/09 02:10:50  fplanque
- * URL fixes
- *
- * Revision 1.45  2007/07/01 03:58:08  fplanque
- * cat_array cleanup/debug
- *
- * Revision 1.44  2007/06/23 22:06:47  fplanque
- * CSS cleanup
- *
- * Revision 1.43  2007/06/20 21:42:15  fplanque
- * implemented working widget/plugin params
- *
- * Revision 1.42  2007/05/14 02:43:06  fplanque
- * Started renaming tables. There probably won't be a better time than 2.0.
- *
- * Revision 1.41  2007/04/26 00:11:04  fplanque
- * (c) 2007
- *
- * Revision 1.40  2007/03/29 10:35:40  fplanque
- * fix
- *
- * Revision 1.39  2007/03/25 10:20:02  fplanque
- * cleaned up archive urls
- *
- * Revision 1.38  2007/03/18 16:54:37  waltercruz
- * Changing the MySQL date functions to the standart (EXTRACT) ones and killing ORDER BY in monthly and year calendar.
- *
- * Revision 1.37  2007/02/06 12:49:39  waltercruz
- * Changing the date queries to the EXTRACT syntax
- *
- * Revision 1.36  2007/01/14 01:31:51  fplanque
- * do not display title by default (bloated)
- *
- * Revision 1.35  2007/01/13 18:36:24  fplanque
- * renamed "Skin Tag" plugins into "Widget" plugins
- * but otherwise they remain basically the same & compatible
- *
- * Revision 1.34  2006/12/26 03:19:12  fplanque
- * assigned a few significant plugin groups
- *
- * Revision 1.33  2006/12/07 23:13:14  fplanque
- * @var needs to have only one argument: the variable type
- * Otherwise, I can't code!
- *
- * Revision 1.32  2006/11/24 18:27:27  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.31  2006/11/03 18:22:26  fplanque
- * no message
- *
- * Revision 1.30  2006/10/29 14:52:56  blueyed
- * Fixed bug with daylight saving time, which displayed days twice
- *
- * Revision 1.29  2006/10/14 19:07:17  blueyed
- * Removed TODO
- *
- * Revision 1.28  2006/10/14 19:05:39  blueyed
- * Fixed "mktime() expects parameter 4 to be long, string given" warning; doc
  */
 ?>

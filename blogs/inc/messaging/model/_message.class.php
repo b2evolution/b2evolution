@@ -3,7 +3,7 @@
  * This file is part of b2evolution - {@link http://b2evolution.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -45,6 +45,13 @@ class Message extends DataObject
 	var $author_user_ID;
 	var $author_name = '';
 	var $datetime = '';
+
+	/**
+	 * The content of the message
+	 * WARNING: It may contains MALICIOUS HTML and javascript snippets. They must ALWAYS be ESCAPED prior to display!
+	 * 
+	 * @var string
+	 */
 	var $text = '';
 
 	/**
@@ -89,8 +96,8 @@ class Message extends DataObject
 		$new_thread = empty($this->thread_ID);
 
 		// Text
-
-		param( 'msg_text', 'text');
+		// WARNING: the messages may contain MALICIOUS HTML and javascript snippets. They must ALWAYS be ESCAPED prior to display!
+		param( 'msg_text', 'html' );
 		if( ! $new_thread )
 		{
 			param_check_not_empty( 'msg_text' );
@@ -101,6 +108,11 @@ class Message extends DataObject
 		if( $new_thread )
 		{
 			$this->Thread->load_from_Request();
+		}
+		else
+		{ // this is a reply to an existing conversation, check if current User is allowed to reply
+			$this->get_Thread();
+			$this->Thread->check_allow_reply();
 		}
 
 		return ! param_errors_detected();
@@ -218,12 +230,20 @@ class Message extends DataObject
 
 				$DB->query( $sql, 'Insert thread statuses' );
 
-				if( $this->dbupdate_last_contact_datetime() )
+				// check if contact pairs between sender and recipients exists
+				$recipient_list = $this->Thread->load_recipients();
+				// remove author user from recipient list
+				$recipient_list = array_diff( $recipient_list, array( $this->author_user_ID ) );
+				// insert missing contact pairs if required
+				if( $this->dbinsert_contacts( $recipient_list ) )
 				{
-					$DB->commit();
+					if( $this->dbupdate_last_contact_datetime() )
+					{
+						$DB->commit();
 
-					$this->send_email_notifications( false );
-					return true;
+						$this->send_email_notifications( false );
+						return true;
+					}
 				}
 			}
 		}
@@ -267,7 +287,6 @@ class Message extends DataObject
 		global $DB, $localtimenow;
 
 		// select contacts of the current user
-
 		$SQL = new SQL();
 
 		$SQL->SELECT( 'mct_to_user_ID' );
@@ -283,7 +302,23 @@ class Message extends DataObject
 		// get users/recipients which are not in contact list
 		$contact_list = array_diff( $recipients, $contact_list );
 
-		if( !empty( $contact_list ) )
+		// select users who have author User on their contact list
+		$SQL = new SQL();
+
+		$SQL->SELECT( 'mct_from_user_ID' );
+		$SQL->FROM( 'T_messaging__contact' );
+		$SQL->WHERE( 'mct_to_user_ID = '.$this->author_user_ID );
+
+		$reverse_contact_list = array();
+		foreach( $DB->get_results( $SQL->get() ) as $row )
+		{
+			$reverse_contact_list[] = $row->mct_from_user_ID;
+		}
+
+		// get users/recipients which are not in reverse contact list
+		$reverse_contact_list = array_diff( $recipients, $reverse_contact_list );
+
+		if( !empty( $contact_list ) || !empty( $reverse_contact_list ) )
 		{	// insert users/recipients which are not in contact list
 
 			$sql = 'INSERT INTO T_messaging__contact (mct_from_user_ID, mct_to_user_ID, mct_last_contact_datetime)
@@ -295,6 +330,9 @@ class Message extends DataObject
 			foreach ( $contact_list as $contact_ID )
 			{
 				$statements[] = ' ('.$this->author_user_ID.', '.$contact_ID.', \''.$datetime.'\')';
+			}
+			foreach ( $reverse_contact_list as $contact_ID )
+			{
 				$statements[] = ' ('.$contact_ID.', '.$this->author_user_ID.', \''.$datetime.'\')';
 			}
 			$sql .= implode( ', ', $statements );
@@ -350,6 +388,14 @@ class Message extends DataObject
 	{
 		$new_Message = new Message();
 		$new_Message->set( 'text', $message->text );
+		if( !empty( $message->author_user_ID ) )
+		{
+			$new_Message->set( 'author_user_ID', $message->author_user_ID );
+		}
+		if( !empty( $message->creator_user_ID ) )
+		{
+			$new_Message->creator_user_ID = $message->creator_user_ID;
+		}
 
 		$new_Thread = new Thread();
 		$new_Thread->set( 'title', $message->Thread->title );
@@ -371,12 +417,21 @@ class Message extends DataObject
 
 		if( $this->ID == 0 ) debug_die( 'Non persistant object cannot be deleted!' );
 
+		// Remember ID, because parent method resets it to 0
+		$thread_ID = $this->thread_ID;
+
 		$DB->begin();
 
-		// UPDATE Statuses
+		// UPDATE last unread msg_ID on this thread statuses from this message ID to the next message ID or NULL if there is no next message
 		$DB->query( 'UPDATE T_messaging__threadstatus
-						SET tsta_first_unread_msg_ID = NULL
-						WHERE tsta_first_unread_msg_ID='.$this->ID );
+						SET tsta_first_unread_msg_ID =
+							( SELECT msg_ID
+								FROM T_messaging__message
+								WHERE msg_thread_ID = '.$thread_ID.' AND msg_datetime > '.$DB->quote( $this->datetime ).'
+								ORDER BY msg_datetime ASC
+								LIMIT 1
+							)
+						WHERE tsta_first_unread_msg_ID = '.$this->ID );
 
 		// Delete Message
 		if( ! parent::dbdelete() )
@@ -384,6 +439,21 @@ class Message extends DataObject
 			$DB->rollback();
 
 			return false;
+		}
+
+		// Get a count of the messages in the current thread
+		$SQL = new SQL();
+		$SQL->SELECT( 'COUNT( msg_ID )' );
+		$SQL->FROM( $this->dbtablename );
+		$SQL->WHERE( 'msg_thread_ID = '.$DB->quote( $thread_ID ) );
+		$msg_count = $DB->get_var( $SQL->get() );
+
+		if( $msg_count == 0 )
+		{	// Last message was deleted from thread now, We should also delete this thread
+			load_class( 'messaging/model/_thread.class.php', 'Thread' );
+			$ThreadCache = & get_ThreadCache();
+			$Thread = & $ThreadCache->get_by_ID( $thread_ID );
+			$Thread->dbdelete();
 		}
 
 		$DB->commit();
@@ -409,111 +479,83 @@ class Message extends DataObject
 	 * Send email notification to recipients on new thread or new message event.
 	 *
 	 * @param boolean true if new thread, false if new message in the current thread
-	 * @return boolean True if all messages could be sent, false if at least one error occurred.
+	 * @return boolean True if all messages could be sent, false otherwise.
 	 */
 	function send_email_notifications( $new_thread = true )
 	{
 		global $DB, $current_User, $admin_url, $baseurl, $app_name;
-		global $UserSettings, $Settings;
+		global $Settings, $UserSettings, $servertimenow;
 
 		// Select recipients of the current thread:
 		$SQL = new SQL();
-		$SQL->SELECT( 'u.user_login, u.user_email, u.user_nickname, u.user_firstname, us.uset_value as notify_messages' );
+		$SQL->SELECT( 'u.user_ID, us.uset_value as notify_messages' );
 		$SQL->FROM( 'T_messaging__threadstatus ts
 						INNER JOIN T_messaging__contact c
 							ON ts.tsta_user_ID = c.mct_to_user_ID AND c.mct_from_user_ID = '.$this->author_user_ID.' AND c.mct_blocked = 0
-						LEFT OUTER JOIN T_users u
+						INNER JOIN T_users u
 							ON ts.tsta_user_ID = u.user_ID
 						LEFT OUTER JOIN T_users__usersettings us ON u.user_ID = us.uset_user_ID AND us.uset_name = "notify_messages"' );
 		$SQL->WHERE( 'ts.tsta_thread_ID = '.$this->Thread->ID.' AND ts.tsta_user_ID <> '.$this->author_user_ID );
 
-		// Construct message subject and body:
-		$salutation = T_( 'Hello %s !')."\n\n";
-
-		$body = '';
+		$thrd_recipients = $DB->get_assoc( $SQL->get() );
 
 		// set message link:
-		$messages_link_to = $Settings->get( 'messages_link_to' );
-		if( $messages_link_to == 'admin' )
-		{
-			$message_link = $admin_url.'?ctrl=messages&thrd_ID='.$this->Thread->ID;
-      $prefs_link = $admin_url.'?ctrl=user&user_tab=userprefs'; // TODO: make this work in admin
-		}
-		else
-		{
-			$BlogCache = & get_BlogCache();
-      /**
-      * @var Blog
-      */
-			$link_to_Blog = $BlogCache->get_by_ID( $messages_link_to, false, false );
-			if( $link_to_Blog )
-			{
-				$message_link = url_add_param( $link_to_Blog->gen_blogurl(), 'disp=messages&thrd_ID='.$this->Thread->ID );
-        $prefs_link =  url_add_param( $link_to_Blog->gen_blogurl(), 'disp=userprefs' );
-			}
-			else
-			{
-				$message_link = $admin_url.'?ctrl=messages&thrd_ID='.$this->Thread->ID;
-        $prefs_link = $admin_url.'?ctrl=user&user_tab=userprefs'; // TODO: make this work in admin
-      }
-		}
+		list( $message_link, $prefs_link ) = get_messages_link_to( $this->thread_ID );
 
-
+		// Construct message subject and body:
 		if( $new_thread )
 		{
 			$subject = sprintf( T_( '%s just sent you a new message!' ), $current_User->login );
-
-			$body .= sprintf( T_( '%s just sent you a message with the title "%s".' ), $current_User->login, $this->Thread->title );
-			$body .= "\n\n";
-			$body .= sprintf( T_( 'To read the full message, click here: %s' ), $message_link );
+		}
+		elseif( count( $thrd_recipients ) == 1 )
+		{
+			$subject = sprintf( T_( '%s just replied to your message!' ), $current_User->login );
 		}
 		else
 		{
-			$subject = sprintf( T_( '%s just replied to your message!' ), $current_User->login );
-
-			$body .= sprintf( T_( '%s just replied to your message in the "%s" conversation. ' ), $current_User->login, $this->Thread->title );
-			$body .= "\n\n";
-			$body .= sprintf( T_( 'To read the full message, click here: %s' ), $message_link );
+			$subject = sprintf( T_( '%s just replied to a conversation you are involved in!' ), $current_User->login );
 		}
 
-		$body .= "\n\n-- \n";
+		// Get other unread threads
+		$other_unread_threads = get_users_unread_threads( array_keys( $thrd_recipients ), $this->thread_ID );
 
-		$body .= sprintf( T_( 'This message was automatically generated by %s running on %s.' ), $app_name, $baseurl )
-			."\n".T_( 'Please do not reply to this email.' )
-      ."\n".sprintf( T_('To edit your email notification preferences, click here: %s'), $prefs_link )."\n";
-
-    $footer = T_( 'Your login is: %s' );
+		// Load all users who will be notified
+		$UserCache = & get_UserCache();
+		$UserCache->load_list( array_keys( $thrd_recipients ) );
 
 		// Send email notifications:
 		$ret = true;
-		foreach( $DB->get_results( $SQL->get() ) as $row )
+		$def_notify_messages = $Settings->get( 'def_notify_messages' );
+		foreach( $thrd_recipients as $recipient_ID => $notify_messages )
 		{
-			$notify_messages = ( isset( $row->notify_messages ) ) ? $row->notify_messages : $UserSettings->get_default( 'notify_messages' );
-			if( $notify_messages )
+			if( $notify_messages || ( empty( $notify_messages ) && $def_notify_messages ) )
 			{
-				$name = get_prefered_name( $row->user_nickname, $row->user_firstname, $row->user_login );
-				$body = sprintf( $salutation, $name ).$body.sprintf( $footer, $row->user_login );
-				$ret = send_mail( $row->user_email, $row->user_login, $subject, $body );
+				// send mail to recipients who needs to be notified. recipients are already loaded into the UserCache
+				// Note: Note activated users won't get notification email
+				$email_template_params = array(
+						'recipient_ID'         => $recipient_ID,
+						'new_thread'           => $new_thread,
+						'thrd_recipients'      => $thrd_recipients,
+						'Message'              => $this,
+						'message_link'         => $message_link,
+						'UserCache'            => $UserCache,
+						'other_unread_threads' => $other_unread_threads[$recipient_ID],
+						'prefs_link'           => $prefs_link,
+					);
+				if( send_mail_to_User( $recipient_ID, $subject, 'notify_message', $email_template_params ) )
+				{ // email sent successful, update las_unread_message_reminder timestamp, because the notification contains all unread messages
+					$UserSettings->set( 'last_unread_messages_reminder', date2mysql( $servertimenow ), $recipient_ID );
+				}
+				else
+				{ // message was not sent
+					$ret = false;
+				}
 			}
 		}
-
+		// update reminder timestamp changes
+		$UserSettings->dbupdate();
 		return $ret;
 	}
 }
 
-/*
- * $Log$
- * Revision 1.29  2011/10/11 02:05:41  fplanque
- * i18n/wording cleanup
- *
- * Revision 1.28  2011/10/06 06:18:29  efy-asimo
- * Add messages link to settings
- * Update messaging notifications
- *
- * Revision 1.27  2011/08/18 11:41:51  efy-asimo
- * Send all emails from noreply and email contents review
- *
- * Revision 1.26  2011/07/04 12:26:54  efy-asimo
- * Notification emails content - fix
- */
 ?>

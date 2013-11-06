@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -290,50 +290,8 @@ class Timer_noop
 
 /*
  * $Log$
- * Revision 1.13  2011/09/07 18:25:11  fplanque
- * widget & blockcache fixes
+ * Revision 1.14  2013/11/06 08:03:47  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.12  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.11  2011/06/15 20:27:41  sam2kb
- * minor
- *
- * Revision 1.10  2010/07/26 06:52:15  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.9  2010/04/28 20:43:52  blueyed
- * Timer: add warning to Debuglog when trying to pause already paused cat.
- *
- * Revision 1.8  2010/04/28 20:41:10  blueyed
- * Timer: fix indenting when pause gets called several times / recursivly (and it was already paused).
- *
- * Revision 1.7  2010/04/27 19:43:24  blueyed
- * Timer: indent debuglog messages according to their nesting. Also log relative time since resuming when pausing.
- *
- * Revision 1.6  2010/02/08 17:51:48  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.5  2009/11/30 00:22:04  fplanque
- * clean up debug info
- * show more timers in view of block caching
- *
- * Revision 1.4  2009/09/20 16:55:14  blueyed
- * Performance boost: add Timer_noop class and use it when not in debug mode.
- *
- * Revision 1.3  2009/03/08 23:57:40  fplanque
- * 2009
- *
- * Revision 1.2  2008/01/21 09:35:24  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 10:58:55  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.6  2007/04/26 00:11:08  fplanque
- * (c) 2007
- *
- * Revision 1.5  2006/11/24 18:27:27  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

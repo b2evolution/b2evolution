@@ -86,6 +86,7 @@ if( $Item = & get_featured_Item() )
 // Display message if no post:
 display_if_empty();
 
+echo '<div id="styled_content_block">'; // Beginning of posts display
 while( $Item = & mainlist_get_item() )
 {	// For each blog post:
 	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
@@ -95,6 +96,7 @@ while( $Item = & mainlist_get_item() )
 		) );
 	// ----------------------------END ITEM BLOCK  ----------------------------
 }
+echo '</div>'; // End of posts display
 ?>
 
 <?php
@@ -102,8 +104,8 @@ while( $Item = & mainlist_get_item() )
 	mainlist_page_links( array(
 			'block_start' => '<div class="navigation">',
 			'block_end' => '</div>',
-   		'prev_text' => '&lt;&lt;',
-   		'next_text' => '&gt;&gt;',
+			'prev_text' => '&lt;&lt;',
+			'next_text' => '&gt;&gt;',
 		) );
 	// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 ?>

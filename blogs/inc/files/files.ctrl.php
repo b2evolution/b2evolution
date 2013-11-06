@@ -12,7 +12,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -91,14 +91,16 @@ else
 /*
  * Load linkable objects:
  */
-if( param( 'item_ID', 'integer', NULL, true, false, false ) )
-{ // Load Requested iem:
-	$ItemCache = & get_ItemCache();
-	if( ($edited_Item = & $ItemCache->get_by_ID( $item_ID, false )) === false )
-	{	// We could not find the contact to link:
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Item') ), 'error' );
-		forget_param( 'item_ID' );
-		unset( $item_ID );
+if( param( 'link_type', 'string', NULL, true, false, false ) && param( 'link_object_ID', 'integer', NULL, true, false, false ) )
+{ // Load Requested LinkOwner object:
+	$LinkOwner = get_link_owner( $link_type, $link_object_ID );
+	if( empty( $LinkOwner ) )
+	{ // We could not find the owner object to link:
+		$Messages->add( T_('Requested object does not exist any longer.'), 'error' );
+		forget_param( 'link_type' );
+		forget_param( 'link_object_ID' );
+		unset( $link_type );
+		unset( $link_object_ID );
 	}
 }
 
@@ -188,12 +190,12 @@ elseif( !empty($edited_User) )
 		$path = dirname( $avatar_File->get_rdfs_rel_path() ).'/';
 	}
 }
-elseif( !empty($edited_Item) )
+elseif( !empty($LinkOwner) )
 {	// We have a post, check if it already has a linked file in a particular root, in which case we want to use that root!
 	// This is useful when clicking "attach files" from the post edit screen: it takes you to the root where you have
 	// already attached files from. Otherwise the next block below will default to the Blog's fileroot.
 	// Get list of attached files:
-	if( $FileList = $edited_Item->get_attachment_FileList( 1 ) )
+	if( $FileList = $LinkOwner->get_attachment_FileList( 1 ) )
 	{	// Get first file:
 		/**
 		 * @var File
@@ -447,7 +449,7 @@ switch( $action )
 			break;
 		}
 
-		if( !	param( 'create_name', 'string', '' ) )
+		if( ! param( 'create_name', 'string', '' ) )
 		{ // No name was supplied:
 			$Messages->add( T_('Cannot create a file without name.'), 'error' );
 			break;
@@ -540,18 +542,14 @@ switch( $action )
 		param( 'file_content', 'html', '', false );
 
 
-    $fpath = $edited_File->get_full_path();
-    if( file_exists($fpath) && ! is_writeable($fpath) ) {
-    	$Messages->add( sprintf('The file &laquo;%s&raquo; is not writable.', rel_path_to_base($fpath)), 'error' );
-    	break;
-    }
+		$fpath = $edited_File->get_full_path();
+		if( file_exists($fpath) && ! is_writeable($fpath) ) {
+			$Messages->add( sprintf('The file &laquo;%s&raquo; is not writable.', rel_path_to_base($fpath)), 'error' );
+			break;
+		}
 
-    # TODO: dh> just use file_put_contents
-    $fh = fopen( $fpath, 'w+');
-		if( $fh )
+		if( save_to_file( $file_content, $fpath, 'w+' ) )
 		{
-			fwrite( $fh, $file_content );
-			fclose( $fh );
 			$Messages->add( sprintf( T_( 'The file &laquo;%s&raquo; has been updated.' ), $edited_File->dget('name') ), 'success' );
 		}
 		else
@@ -838,7 +836,7 @@ switch( $action )
 		}
 		break;
 
-	
+
 	case 'make_post':
 		// TODO: We don't need the Filelist, move UP!
 		// Make posts with selected images:
@@ -903,33 +901,35 @@ switch( $action )
 				}
 				$edited_Item->set( 'title', $title );
 
-				$DB->begin();
+				$DB->begin( 'SERIALIZABLE' );
 
 				// INSERT NEW POST INTO DB:
-				$edited_Item->dbinsert();
+				if( $edited_Item->dbinsert() )
+				{
+					$order = 1;
+					$LinkOwner = new LinkItem( $edited_Item );
+					do
+					{ // LOOP through files:
+						// echo '<br>file meta: '.$l_File->meta;
+						if(	$l_File->meta == 'notfound' )
+						{	// That file has no meta data yet, create it now!
+							$l_File->dbsave();
+						}
 
-				$order = 1;
-				do
-				{	// LOOP through files:
-					// echo '<br>file meta: '.$l_File->meta;
-					if(	$l_File->meta == 'notfound' )
-					{	// That file has no meta data yet, create it now!
-						$l_File->dbsave();
-					}
+						// Let's make the link!
+						$LinkOwner->add_link( $l_File->ID, 'teaser', $order++ );
 
-					// Let's make the link!
-					$edited_Link = new Link();
-					$edited_Link->set( 'itm_ID', $edited_Item->ID );
-					$edited_Link->set( 'file_ID', $l_File->ID );
-					$edited_Link->set( 'position', 'teaser' );
-					$edited_Link->set( 'order', $order++ );
-					$edited_Link->dbinsert();
+						$Messages->add( sprintf( T_('&laquo;%s&raquo; has been attached.'), $l_File->dget('name') ), 'success' );
 
-					$Messages->add( sprintf( T_('&laquo;%s&raquo; has been attached.'), $l_File->dget('name') ), 'success' );
+					} while( $l_File = & $selected_Filelist->get_next() );
 
-				} while( $l_File = & $selected_Filelist->get_next() );
-
-				$DB->commit();
+					$DB->commit();
+				}
+				else
+				{
+					$Messages->add( T_('Couldn\'t create the new post'), 'error' );
+					$DB->rollback();
+				}
 
 				header_redirect( $dispatcher.'?ctrl=items&action=edit&p='.$edited_Item->ID );	// Will save $Messages
 				break;
@@ -1073,14 +1073,14 @@ switch( $action )
 
 		// Link File to User:
 		if( ! isset($edited_User) )
- 		{	// No User to link to
+		{	// No User to link to
 			$fm_mode = NULL;	// not really needed but just  n case...
 			break;
 		}
 
 		// Permission HAS been checked on top of controller!
 
- 		// Get the file we want to link:
+		// Get the file we want to link:
 		if( !$selected_Filelist->count() )
 		{
 			$Messages->add( T_('Nothing selected.'), 'error' );
@@ -1091,8 +1091,22 @@ switch( $action )
 		// Load meta data AND MAKE SURE IT IS CREATED IN DB:
 		$edited_File->load_meta( true );
 
+		// Check a file for min size
+		$min_size = $Settings->get( 'min_picture_size' );
+		$image_sizes = $edited_File->get_image_size( 'widthheight' );
+		if( $image_sizes[0] < $min_size || $image_sizes[1] < $min_size )
+		{	// Don't use this file as profile picture because it has small sizes
+			$Messages->add( sprintf( T_( 'Your profile picture must have a minimum size of %dx%d pixels.' ), $min_size, $min_size ), 'error' );
+			break;
+		}
+
+		// Link file to user
+		$LinkOwner = get_link_owner( 'user', $edited_User->ID );
+		$edited_File->link_to_Object( $LinkOwner );
 		// Assign avatar:
 		$edited_User->set( 'avatar_file_ID', $edited_File->ID );
+		// update profileupdate_date, because a publicly visible user property was changed
+		$edited_User->set_profileupdate_date();
 		// Save to DB:
  		$edited_User->dbupdate();
 
@@ -1127,7 +1141,7 @@ switch( $action )
 	case 'link':
 	case 'link_inpost':	// In the context of a post
 		// TODO: We don't need the Filelist, move UP!
-		// Link File to Item
+		// Link File to a LinkOwner
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'file' );
@@ -1135,16 +1149,16 @@ switch( $action )
 		// Note: we are not modifying any file here, we're just linking it
 		// we only need read perm on file, but we'll need write perm on destination object (to be checked below)
 
-		if( ! isset($edited_Item) )
- 		{	// No Item to link to - end link_item mode.
+		if( ! isset( $LinkOwner ) )
+		{	// No Owner to link to - end link_object mode.
 			$fm_mode = NULL;
 			break;
 		}
 
 		// Check item EDIT permissions:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		$LinkOwner->check_perm( 'edit', true );
 
- 		// Get the file we want to link:
+		// Get the file we want to link:
 		if( !$selected_Filelist->count() )
 		{
 			$Messages->add( T_('Nothing selected.'), 'error' );
@@ -1154,7 +1168,7 @@ switch( $action )
 		$files_count = $selected_Filelist->count();
 		while( $edited_File = & $selected_Filelist->get_next() )
 		{	// Let's make the link!
-			$edited_File->link_to_Item($edited_Item);
+			$edited_File->link_to_Object( $LinkOwner );
 
 			// Reset LinkCache to autoincrement link_order
 			if( $files_count > 1 ) unset($GLOBALS['LinkCache']);
@@ -1163,56 +1177,20 @@ switch( $action )
 		// Forget selected files
 		if( $files_count > 1 ) $fm_selected = NULL;
 
-		$Messages->add( T_('Selected files have been linked to item.'), 'success' );
+		$Messages->add( $LinkOwner->T_( 'Selected files have been linked to owner.' ), 'success' );
 
 		// In case the mode had been closed, reopen it:
-		$fm_mode = 'link_item';
-
+		$fm_mode = 'link_object';
 
 		// REDIRECT / EXIT
 		if( $action == 'link_inpost' )
 		{
- 			header_redirect( $admin_url.'?ctrl=items&action=edit_links&mode=iframe&item_ID='.$edited_Item->ID );
+			header_redirect( $admin_url.'?ctrl=links&link_type='.$LinkOwner->type.'&action=edit_links&mode=iframe&link_object_ID='.$LinkOwner->get_ID() );
 		}
 		else
 		{
- 			header_redirect( regenerate_url( '', '', '', '&' ) );
+			header_redirect( regenerate_url( '', '', '', '&' ) );
 		}
-		break;
-
-
-	case 'unlink':
-		// TODO: We don't need the Filelist, move UP!
-		// Unlink File from Item (or other object if extended):
-
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'link' );
-
-		// Note: we are not modifying any file here, we're just linking it
-		// we only need read perm on file, but we'll need write perm on destination object (to be checked below)
-
-		if( !isset( $edited_Link ) )
-		{
-			$action = 'list';
-			break;
-		}
-
-		// get Item (or other object) from Link to check perm
-		$edited_Item = & $edited_Link->Item;
-
-		// Check that we have permission to edit item:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
-
-		// Delete from DB:
-		$msg = sprintf( T_('Link from &laquo;%s&raquo; deleted.'), $edited_Link->Item->dget('title') );
-		$edited_Link->dbdelete( true );
-		unset( $edited_Link );
-		forget_param( 'link_ID' );
-
-		$Messages->add( $msg, 'success' );
-		$action = 'list';
-		// REDIRECT / EXIT
- 		header_redirect( regenerate_url( '', '', '', '&' ) );
 		break;
 
 
@@ -1570,18 +1548,20 @@ switch( $fm_mode )
 		break;
 
 
-	case 'link_item':
-		// We want to link file(s) to an item:
-
+	case 'link_object':
+		// We want to link file(s) to an object or view linked files to an object:
 		// TODO: maybe this should not be a mode and maybe we should handle linking as soon as we have an $edited_Item ...
 
-		if( !isset($edited_Item) )
-		{ // No Item to link to...
+		// Add JavaScript to handle links modifications.
+		require_js( 'links.js' );
+
+		if( !isset( $LinkOwner ) )
+		{ // No Object to link to...
 			$fm_mode = NULL;
 			break;
 		}
 
-		// TODO: check EDIT permissions!
+		$LinkOwner->check_perm( 'view', true );
 		break;
 
 }
@@ -1589,7 +1569,7 @@ switch( $fm_mode )
 
 // fp> TODO: this here is a bit sketchy since we have Blog & fileroot not necessarilly in sync. Needs investigation / propositions.
 // Note: having both allows to post from any media dir into any blog.
-$AdminUI->breadcrumbpath_init();
+$AdminUI->breadcrumbpath_init( false );
 $AdminUI->breadcrumbpath_add( T_('Files'), '?ctrl=files&amp;blog=$blog$' );
 if( !isset($Blog) || $fm_FileRoot->type != 'collection' || $fm_FileRoot->in_type_ID != $Blog->ID )
 {	// Display only if we're not browsing our home blog
@@ -1597,6 +1577,9 @@ if( !isset($Blog) || $fm_FileRoot->type != 'collection' || $fm_FileRoot->in_type
 			(isset($Blog) && $fm_FileRoot->type == 'collection') ? sprintf( T_('You are ready to post files from %s into %s...'),
 			$fm_FileRoot->name, $Blog->get('shortname') ) : '' );
 }
+
+// require colorbox js
+require_js_helper( 'colorbox' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -1705,7 +1688,7 @@ switch( $fm_mode )
 		$AdminUI->disp_view( 'files/views/_file_copy_move.form.php' );
 		break;
 
-	case 'link_item':
+	case 'link_object':
 		// Links dialog:
 		$AdminUI->disp_view( 'files/views/_file_links.view.php' );
 		break;
@@ -1728,191 +1711,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.82  2011/09/13 23:25:54  lxndral
- * creating posts from images update
+ * Revision 1.84  2013/11/06 08:04:08  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.81  2011/09/10 02:09:09  fplanque
- * doc
- *
- * Revision 1.80  2011/09/08 22:13:48  lxndral
- * pick category when creating posts from images
- *
- * Revision 1.79  2011/09/06 00:54:38  fplanque
- * i18n update
- *
- * Revision 1.78  2011/09/04 22:13:15  fplanque
- * copyright 2011
- *
- * Revision 1.77  2011/04/05 12:41:39  efy-asimo
- * file perms check and file delete - fix
- *
- * Revision 1.76  2011/03/02 11:04:22  efy-asimo
- * Refactor file uploads for future use
- *
- * Revision 1.75  2011/01/19 14:33:42  efy-asimo
- * Missing $ - fix
- *
- * Revision 1.74  2011/01/18 16:23:02  efy-asimo
- * add shared_root perm and refactor file perms - part1
- *
- * Revision 1.73  2010/11/25 15:16:34  efy-asimo
- * refactor $Messages
- *
- * Revision 1.72  2010/11/03 19:44:15  sam2kb
- * Increased modularity - files_Module
- * Todo:
- * - split core functions from _file.funcs.php
- * - check mtimport.ctrl.php and wpimport.ctrl.php
- * - do not create demo Photoblog and posts with images (Blog A)
- *
- * Revision 1.71  2010/07/26 06:52:16  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.70  2010/04/02 07:27:11  efy-asimo
- * cache folders rename and Filelist navigation - fix
- *
- * Revision 1.69  2010/03/31 00:01:17  blueyed
- * Improve handling of non-writable file (update_file).
- *
- * Revision 1.68  2010/03/30 23:24:12  blueyed
- * whitespace
- *
- * Revision 1.67  2010/03/28 17:08:09  fplanque
- * minor
- *
- * Revision 1.66  2010/03/19 09:48:57  efy-asimo
- * file deleting restrictions - task
- *
- * Revision 1.65  2010/03/18 06:20:44  sam2kb
- * minor
- *
- * Revision 1.64  2010/03/18 06:14:33  sam2kb
- * Link multiple files to item
- *
- * Revision 1.63  2010/03/15 10:23:18  efy-asimo
- * Fix check_rename warning
- *
- * Revision 1.62  2010/03/05 13:30:35  fplanque
- * cleanup/wording
- *
- * Revision 1.61  2010/02/08 17:52:14  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.60  2010/01/30 18:55:24  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.59  2010/01/30 09:55:28  efy-asimo
- * return to the properties form after file rename error + user transaction during file rename
- *
- * Revision 1.58  2010/01/28 03:42:18  fplanque
- * minor
- *
- * Revision 1.57  2010/01/25 18:18:28  efy-yury
- * add : crumbs
- *
- * Revision 1.56  2010/01/23 12:37:30  efy-asimo
- * add check_rename function
- *
- * Revision 1.55  2010/01/23 11:45:11  efy-yury
- * add: crumbs
- *
- * Revision 1.54  2010/01/23 00:18:05  fplanque
- * no message
- *
- * Revision 1.53  2010/01/22 20:20:18  efy-asimo
- * Remove File manager rename file
- *
- * Revision 1.52  2010/01/19 21:10:24  efy-yury
- * update: crumbs
- *
- * Revision 1.51  2010/01/17 04:14:42  fplanque
- * minor / fixes
- *
- * Revision 1.50  2010/01/16 22:37:44  blueyed
- * make_post/make_posts: do not limit to images only.
- *
- * Revision 1.49  2010/01/16 22:35:49  blueyed
- * typo
- *
- * Revision 1.48  2010/01/16 22:34:39  blueyed
- * Fix missing order in make_post and make_posts actions.
- *
- * Revision 1.47  2010/01/16 22:27:08  blueyed
- * Fix missing position in make_post and make_posts actions.
- *
- * Revision 1.46  2010/01/16 22:23:35  blueyed
- * typo
- *
- * Revision 1.45  2010/01/16 14:27:03  efy-yury
- * crumbs, fadeouts, redirect, action_icon
- *
- * Revision 1.44  2009/12/06 22:55:18  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.43  2009/11/21 13:31:58  efy-maxim
- * 1. users controller has been refactored to users and user controllers
- * 2. avatar tab
- * 3. jQuery to show/hide custom duration
- *
- * Revision 1.42  2009/10/11 02:29:01  blueyed
- * Use API
- *
- * Revision 1.41  2009/10/10 23:33:17  blueyed
- * typos
- *
- * Revision 1.40  2009/10/07 23:43:25  fplanque
- * doc
- *
- * Revision 1.39  2009/09/29 20:17:05  efy-maxim
- * linkctrl & linkdata parameters
- *
- * Revision 1.38  2009/09/29 03:14:22  fplanque
- * doc
- *
- * Revision 1.37  2009/09/26 15:18:12  efy-maxim
- * temporary solution for file/image types
- *
- * Revision 1.36  2009/09/26 12:00:42  tblue246
- * Minor/coding style
- *
- * Revision 1.35  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.34  2009/09/15 19:31:55  fplanque
- * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
- * PHP 4 compatible. Even better on PHP 5.
- * I may have broken a few things. Sorry. This is pretty hard to do in one swoop without any glitch.
- * Thanks for fixing or reporting if you spot issues.
- *
- * Revision 1.33  2009/09/14 13:01:31  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.32  2009/08/30 22:25:08  blueyed
- * note/todo
- *
- * Revision 1.31  2009/08/30 19:54:24  fplanque
- * less translation messgaes for infrequent errors
- *
- * Revision 1.30  2009/08/29 12:23:56  tblue246
- * - SECURITY:
- * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.
- * 	- files.ctrl.php: Removed redundant calls to User::check_perm().
- * 	- XML-RPC APIs: Added missing permission checks.
- * 	- items.ctrl.php: Check permission to edit item with current status (also checks user levels) for update actions.
- * - XML-RPC client: Re-added check for zlib support (removed by update).
- * - XML-RPC APIs: Corrected method signatures (return type).
- * - Localization:
- * 	- Fixed wrong permission description in blog user/group permissions screen.
- * 	- Removed wrong TRANS comment
- * 	- de-DE: Fixed bad translation strings (double quotes + HTML attribute = mess).
- * - File upload:
- * 	- Suppress warnings generated by move_uploaded_file().
- * 	- File browser: Hide link to upload screen if no upload permission.
- * - Further code optimizations.
- *
- * Revision 1.29  2009/07/06 23:52:24  sam2kb
- * Hardcoded "admin.php" replaced with $dispatcher
  */
 ?>

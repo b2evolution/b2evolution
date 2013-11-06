@@ -40,8 +40,8 @@ class _sitemap_Skin extends Skin
 
 /*
  * $Log$
- * Revision 1.1  2009/09/26 13:41:55  tblue246
- * If XML feeds are disabled for a blog, still allow accessing "sitemap" skins.
+ * Revision 1.2  2013/11/06 08:05:43  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

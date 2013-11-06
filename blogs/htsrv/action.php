@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -33,11 +33,8 @@ require_once $inc_path.'_main.inc.php';
 
 global $Session, $modules;
 
-// Module param must exists
-$module_name = param( 'module', 'string', true );
-
-// Check that this action request is not a CSRF hacked request:
-$Session->assert_received_crumb( $module_name.'_action' );
+// Module name param must exists
+$module_name = param( 'mname', 'string', true );
 
 foreach( $modules as $module )
 {
@@ -57,11 +54,8 @@ header_redirect();
 
 /*
  * $Log$
- * Revision 1.2  2011/10/19 03:22:31  fplanque
- * doc
- *
- * Revision 1.1  2011/10/18 09:14:34  efy-asimo
- * Ability to display different module forms and handle module actions  inside the module
+ * Revision 1.4  2013/11/06 08:03:44  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

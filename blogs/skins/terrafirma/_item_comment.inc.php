@@ -30,6 +30,11 @@ $Comment = & $params['Comment'];
 ?>
 	<div class="bCommentTitle">
 	<?php
+		if( $Comment->status != 'published' )
+		{
+			$Comment->status( 'styled' );
+		}
+
 		if( !empty($Comment->author_user_ID) && $Comment->author_user_ID == $Item->Author->ID )
 		{	// This comment was posted by the author
 			// Di special color?
@@ -80,18 +85,21 @@ $Comment = & $params['Comment'];
 	<em>on <?php $Comment->date() ?> at <?php $Comment->time( 'H:i' ) ?>
 
 	<?php
-		$Comment->edit_link( ' &nbsp; ', ' ', '#', '#', '' ); /* Link to backoffice for editing */
-		$Comment->delete_link( ' &nbsp; ', ' ', '#', '#', '' ); /* Link to backoffice for deleting */
+		$comment_Item = & $Comment->get_Item();
+		$Comment->edit_link( ' &nbsp; ', ' ', '#', '#', '', '&amp;', true, rawurlencode( $Comment->get_permanent_url() ) ); /* Link for editing */
+		$Comment->delete_link( ' &nbsp; ', ' ', '#', '#', '', false, '&amp;', true, false, '#', rawurlencode( $comment_Item->get_permanent_url() ) ); /* Link for deleting */
 	?>
 	</em>
 
-	<?php $Comment->rating();
+	<?php
+		$Comment->rating();
 	?>
 	</div>
 	<div class="bCommentText">
 		<?php
 			$Comment->content();
 		?>
+		<?php $Comment->reply_link( '<br />' ); /* Link for replying to the Comment */ ?>
 	</div>
 <?php
   echo $params['comment_end'];

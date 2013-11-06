@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -80,46 +80,8 @@ else
 
 /*
  * $Log$
- * Revision 1.12  2011/09/04 22:13:21  fplanque
- * copyright 2011
+ * Revision 1.13  2013/11/06 08:05:09  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.11  2010/02/08 17:54:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.10  2010/01/30 18:55:35  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.9  2010/01/03 13:45:38  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.8  2009/03/08 23:57:46  fplanque
- * 2009
- *
- * Revision 1.7  2008/07/03 09:53:08  yabs
- * widget UI
- *
- * Revision 1.6  2008/01/21 09:35:37  fplanque
- * (c) 2008
- *
- * Revision 1.5  2008/01/06 17:52:50  fplanque
- * minor/doc
- *
- * Revision 1.4  2008/01/06 15:35:54  blueyed
- * doc, todo
- *
- * Revision 1.3  2007/12/22 19:53:19  yabs
- * cleanup from adding core params
- *
- * Revision 1.2  2007/12/22 16:57:01  yabs
- * adding core parameters for css id/classname and widget list title
- *
- * Revision 1.1  2007/06/25 11:01:59  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.2  2007/06/19 20:42:53  fplanque
- * basic demo of widget params handled by autoform_*
- *
- * Revision 1.1  2007/06/19 00:03:26  fplanque
- * doc / trying to make sense of automatic settings forms generation.
  */
 ?>

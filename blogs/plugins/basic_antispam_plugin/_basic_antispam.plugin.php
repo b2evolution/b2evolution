@@ -4,7 +4,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -50,7 +50,7 @@ class basic_antispam_plugin extends Plugin
 	var $name = 'Basic Antispam';
 	var $code = '';
 	var $priority = 60;
-	var $version = '4.1.1';
+	var $version = '5.0.0';
 	var $author = 'The b2evo Group';
 	var $group = 'antispam';
 	var $number_of_installs = 1;
@@ -94,6 +94,12 @@ class basic_antispam_plugin extends Plugin
 					'label' => T_('Remove repetitive characters'),
 					'note'=>T_('Remove repetitive characters in name and content. The string like "Thaaaaaaaaaanks!" becomes "Thaaanks!".'),
 					'defaultvalue' => 0,
+				),
+				'block_common_spam' => array(
+					'type' => 'checkbox',
+					'label' => T_('Block common spam comments'),
+					'note'=>T_('Block comments with both "[link=" and "[url=" tags.'),
+					'defaultvalue' => 1,
 				),
 				'nofollow_for_hours' => array(
 					'type' => 'integer',
@@ -205,6 +211,14 @@ class basic_antispam_plugin extends Plugin
 		if( $this->is_duplicate_comment( $params['Comment'] ) )
 		{
 			$this->msg( T_('The comment seems to be a duplicate.'), 'error' );
+		}
+
+		if( $this->Settings->get('block_common_spam') && preg_match_all( '~\[(link|url)=~', $params['Comment']->content, $m ) )
+		{	// Block common bbcode spam comments with both [url= and [link= tags
+			if( !empty($m[1]) && count($m[1]) > 1 )
+			{
+				$this->msg( T_('Your comment was rejected because it appeared to be spam.'), 'error' );
+			}
 		}
 	}
 
@@ -573,6 +587,11 @@ class basic_antispam_plugin extends Plugin
 			return false;
 		}
 
+		if( $Comment->content == '' )
+		{ // User may has many comments with empty content but with attachment pictures
+			return false;
+		}
+
 		$sql = '
 				SELECT comment_ID
 				  FROM T_comments
@@ -626,148 +645,8 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
- * Revision 1.45  2011/09/11 22:23:48  sam2kb
- * Fix for http://forums.b2evolution.net/viewtopic.php?t=21936
- *
- * Revision 1.44  2011/09/04 22:13:23  fplanque
- * copyright 2011
- *
- * Revision 1.43  2011/09/04 21:32:18  fplanque
- * minor MFB 4-1
- *
- * Revision 1.42  2011/03/02 09:45:59  efy-asimo
- * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
- *
- * Revision 1.41  2011/02/10 23:07:21  fplanque
- * minor/doc
- *
- * Revision 1.40  2011/01/18 00:56:48  sam2kb
- * Revert wrong fix for "makelink" notice.
- *
- * Revision 1.39  2010/12/10 21:03:29  sam2kb
- * Version bump
- *
- * Revision 1.38  2010/12/10 21:00:39  sam2kb
- * More antispam options
- *
- * Revision 1.37  2010/02/08 17:56:01  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.36  2009/03/08 23:57:49  fplanque
- * 2009
- *
- * Revision 1.35  2009/02/26 23:33:46  blueyed
- * Update IDNA library to 0.6.2 (includes at least a fix for mbstring.func_overload).
- * Since it is PHP5 only, PHP4 won't benefit from it.
- * Add wrapper idna_encode() and idna_decode() to url.funcs to handle loading
- * of the PHP5 or PHP4 class.
- * Move test.
- *
- * Revision 1.34  2009/02/26 22:16:54  blueyed
- * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
- *
- * Revision 1.33  2008/09/13 10:22:59  fplanque
- * removed superfluous conf variable
- *
- * Revision 1.32  2008/05/03 23:58:41  blueyed
- * basic_antispam_plugin: is_referer_linking_us(): make parse_url silent and return false in case of error
- *
- * Revision 1.31  2008/01/21 09:35:41  fplanque
- * (c) 2008
- *
- * Revision 1.30  2007/06/25 11:02:32  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.29  2007/04/26 00:11:05  fplanque
- * (c) 2007
- *
- * Revision 1.28  2007/04/20 02:53:13  fplanque
- * limited number of installs
- *
- * Revision 1.27  2007/01/30 19:55:04  blueyed
- * Return explictly true in PluginVersionChanged
- *
- * Revision 1.26  2006/12/26 03:19:12  fplanque
- * assigned a few significant plugin groups
- *
- * Revision 1.25  2006/12/21 16:14:25  blueyed
- * Basic Antispam Plugin:
- * - Use fsockopen instead of url fopen to get refering page contents
- * - Removed "check_url_trackbacks" setting: it has been unreliable and is against the trackback specs anyway. This is what pingbacks are for.
- * - Convert charset of the refering page contents, if we have a decoded/utf-8 encoded IDN
- * - Some improvements to matching pattern
- *
- * Revision 1.24  2006/11/24 18:27:27  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.23  2006/07/10 20:19:31  blueyed
- * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
- *
- * Revision 1.22  2006/07/07 21:26:49  blueyed
- * Bumped to 1.9-dev
- *
- * Revision 1.21  2006/07/07 19:28:32  blueyed
- * Trans fix. "%" would need to be escaped.. :/
- *
- * Revision 1.20  2006/06/22 19:47:06  blueyed
- * "Block spam referers" as global option
- *
- * Revision 1.19  2006/06/16 21:30:57  fplanque
- * Started clean numbering of plugin versions (feel free do add dots...)
- *
- * Revision 1.18  2006/06/05 17:45:06  blueyed
- * Disable events at settings time, according to Settings checkboxes.
- *
- * Revision 1.17  2006/06/01 18:36:10  fplanque
- * no message
- *
- * Revision 1.16  2006/05/30 21:25:27  blueyed
- * todo-question
- *
- * Revision 1.15  2006/05/30 20:32:57  blueyed
- * Lazy-instantiate "expensive" properties of Comment and Item.
- *
- * Revision 1.14  2006/05/30 19:39:56  fplanque
- * plugin cleanup
- *
- * Revision 1.13  2006/05/30 00:18:29  blueyed
- * http://dev.b2evolution.net/todo.php?p=87686
- *
- * Revision 1.12  2006/05/29 21:13:19  fplanque
- * no message
- *
- * Revision 1.11  2006/05/29 21:03:07  fplanque
- * Also count links if < tags have been filtered before!
- *
- * Revision 1.10  2006/05/20 01:56:07  blueyed
- * ItemCanComment hook; "disable anonymous feedback" through basic antispam plugin
- *
- * Revision 1.9  2006/05/14 16:30:37  blueyed
- * SQL error fixed with empty visitor comments
- *
- * Revision 1.8  2006/05/12 21:35:24  blueyed
- * Apply karma by number of links in a comment. Note: currently the default is to not allow A tags in comments!
- *
- * Revision 1.7  2006/05/02 22:43:39  blueyed
- * typo
- *
- * Revision 1.6  2006/05/02 15:32:01  blueyed
- * Moved blocking of "spam referers" into basic antispam plugin: does not block backoffice requests in general and can be easily get disabled.
- *
- * Revision 1.5  2006/05/02 04:36:25  blueyed
- * Spam karma changed (-100..100 instead of abs/max); Spam weight for plugins; publish/delete threshold
- *
- * Revision 1.4  2006/05/02 01:27:55  blueyed
- * Moved nofollow handling to basic antispam plugin; added Filter events to Comment class
- *
- * Revision 1.3  2006/05/01 05:20:38  blueyed
- * Check for duplicate content in comments/trackback.
- *
- * Revision 1.2  2006/05/01 04:25:07  blueyed
- * Normalization
- *
- * Revision 1.1  2006/04/29 23:11:23  blueyed
- * Added basic_antispam_plugin; Moved double-check-referers there; added check, if trackback links to us
+ * Revision 1.47  2013/11/06 08:05:22  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

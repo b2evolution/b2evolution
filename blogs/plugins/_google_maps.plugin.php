@@ -8,7 +8,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -30,7 +30,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Google Maps Plugin
  *
- * 
+ *
  *
  * @package plugins
  */
@@ -43,7 +43,7 @@ class google_maps_plugin extends Plugin
 	var $name = 'Google Maps';
 	var $code = 'evo_Gmaps';
 	var $priority = 50;
-	var $version = '1.0';
+	var $version = '5.0.0';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
@@ -52,6 +52,7 @@ class google_maps_plugin extends Plugin
 	 */
 	var $number_of_installs = 1;
 	var $group = 'widget';
+	var $number_of_widgets ;
 
 
 	/**
@@ -80,21 +81,11 @@ class google_maps_plugin extends Plugin
 	function GetDefaultSettings( & $params )
 	{
 		$r = array(
-			'width' => array(
-				'label' => 'Widget width(px)',
-				'defaultvalue' => '',
-				'note' => '100% width if left empty',
-				),
-			'height_front' => array(
-				'label' => 'Map height on page (px)',
-				'defaultvalue' => '300',
-				'note' => '',
-				'valid_range' => array( 'min'=>1)),
 			'height_back' => array(
-				'label' => 'Map height on edit post page (px)',
+				'label' => 'Map height on edit post page',
 				'defaultvalue' => '300',
 				'note' => '',
-				'valid_range' => array( 'min'=>1)),
+				),
 			'map_type' => array(
 				'label' => T_( 'Map default view ' ),
 				'type' => 'radio',
@@ -106,6 +97,42 @@ class google_maps_plugin extends Plugin
 		return $r;
 	}
 
+
+		/**
+	 * Get definitions for widget editable params
+	 *
+	 * @see Plugin::get_widget_param_definitions()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_widget_param_definitions( $params )
+	{
+		$r = array(
+			'map_title' => array(
+				'label' => 'Widget title',
+				'defaultvalue' => 'Google maps Widget',
+				'note' => T_('Widget title'),
+				'set_for_plugin' => true,
+				),
+			'width' => array(
+				'label' => 'Map width on page',
+				'defaultvalue' => '',
+				'note' => T_('100% width if left empty'),
+				),
+			'height_front' => array(
+				'label' => T_('Map height on page'),
+				'defaultvalue' => '300px',
+				'note' => '',
+			),
+			'map_type' => array(
+				'label' => T_( 'Map default view ' ),
+				'type' => 'radio',
+				'options' => array( array('map', T_( 'Map' )), array('satellite',T_( 'Satellite' ))),
+				'defaultvalue' => 'map',
+				'note' => ''),
+
+			);
+		return $r;
+	}
 
 	/**
 	 * User settings.
@@ -120,65 +147,171 @@ class google_maps_plugin extends Plugin
 		return array();
 	}
 
+	
+	/**
+	 *  Add 'px' to display param if need.
+	 *
+	 * @param mixed display param
+	 * @return string
+	 */
+	function display_param($param)
+	{
+		if ( ! empty ($param) )
+		{
+			if( ! preg_match("/\D{1,}$/", $param) )
+			{
+				$param = $param.'px';
+			}
+		}
+		else
+		{
+			$param = '100%';
+		}
+		return  $param;
+	}
 
 	/**
 	 * @see Plugin::AdminDisplayItemFormFieldset()
 	 */
 	function AdminDisplayItemFormFieldset( & $params )
 	{
-		global $Blog;
+		global $Blog, $DB;
 
-		$params['Form']->begin_fieldset( 'Google Maps plugin' );
+		// fp>vitaliy : make thhis title configurable per blog . default shoul dbe as below.
+		$plugin_title = $this->Settings->get( 'map_title_coll'.$Blog->ID );
+		$plugin_title = empty( $plugin_title ) ? T_( 'Google Maps plugin' ) : $plugin_title;
+		$params['Form']->begin_fieldset( $plugin_title );
 
-		$field_name1 = strtolower($Blog->get_setting('custom_double3'));
-		$field_name2 = strtolower($Blog->get_setting('custom_double4'));
-
-		if ($field_name1 != 'latitude' || $field_name2 != 'longitude')
+		if( !$Blog->get_setting( 'show_location_coordinates' ) )
 		{
-		  echo T_('You must configure the following custom fields (double3 as Latitude, double4 as Longitude )
-      so the Google Maps plugin can save its coordinates.');
-		$params['Form']->end_fieldset();
-		return;
+			echo T_('You must turn on the "Show location coordinates" setting in Blog settings Post Features tab so the Google Maps plugin can save its coordinates.');
+			$params['Form']->end_fieldset();
+			return;
 		}
 
+		$params['Form']->switch_layout( 'linespan' );
 
 		$Item = $params['Item'];
-		require_js( '#jqueryUI#');
-		$params['Form']->hidden( 'google_map_zoom', '', array('id' => 'google_map_zoom'));
-		$params['Form']->text_input( 'address', '', 50, 'Input adress', '', array('maxlength'=>500, 'id' =>'searchbox'));
-		$params['Form']->button(array ('id' => 'locate_on_map', 'type' =>'button', 'value' => 'Locate on map') );
+		require_js( '#jqueryUI#' );
 
-		$lat = $Item->get('double3');
-		$lng = $Item->get('double4');
+		$lat = $Item->get_setting('latitude');
+		$lng = $Item->get_setting('longitude');
+		$zoom = $Item->get_setting('map_zoom');
+		$map_type = $Item->get_setting('map_type');
 
-		$height = (int)$this->Settings->get('height_back');
-		$height = 'height:'.$height.'px';
+		$city_ID = $Item->get('city_ID');
+		$subrg_ID = $Item->get('subrg_ID');
+		$rgn_ID = $Item->get('rgn_ID');
+		$ctry_ID = $Item->get('ctry_ID');
 
+		$search_location = '';
+
+		if (empty( $lat ) && empty( $lng ) )
+		{	// post location not set
+
+			if ( ! empty ( $city_ID ) )
+			{
+				$query = '
+					SELECT city_name
+					FROM T_regional__city
+					WHERE city_ID  = '.$DB->quote( $city_ID );
+
+				$text = $DB->get_var($query);
+				$search_location .= "$text";
+			}
+
+			if ( ! empty ( $subrg_ID ) )
+			{
+				$query = '
+					SELECT subrg_name
+					FROM T_regional__subregion
+					WHERE subrg_ID  = '.$DB->quote( $subrg_ID );
+
+				$text = $DB->get_var($query);
+				if ( empty ( $search_location ) )
+				{
+					$search_location .= "$text";
+				}
+				else
+				{
+					$search_location .= ", $text";
+				}
+			}
+
+			if ( ! empty ( $rgn_ID ) )
+			{
+				$query = '
+					SELECT rgn_name
+					FROM T_regional__region
+					WHERE rgn_ID = '.$DB->quote( $rgn_ID );
+
+				$text = $DB->get_var($query);
+				if ( empty ( $search_location ) )
+				{
+					$search_location .= "$text";
+				}
+				else
+				{
+					$search_location .= ", $text";
+				}
+			}
+
+			if ( ! empty ( $ctry_ID ) )
+			{
+				$query = '
+					SELECT ctry_name
+					FROM T_regional__country
+					WHERE ctry_ID = '.$DB->quote( $ctry_ID );
+
+				$text = $DB->get_var($query);
+				if ( empty ( $search_location ) )
+				{
+					$search_location .= "$text";
+				}
+				else
+				{
+					$search_location .= ", $text";
+				}
+			}
+
+		}
+
+		if( empty( $zoom ) )
+		{
+			$zoom = 17;
+		}
+
+		if( empty( $map_type ) )
+		{
+			$map_type = (string)$this->Settings->get('map_type');
+		}
+
+		$params['Form']->hidden( 'google_map_zoom', $zoom, array('id' => 'google_map_zoom'));
+		$params['Form']->hidden( 'google_map_type', $map_type, array('id' => 'google_map_type'));
+		$params['Form']->text_input( 'address', $search_location, 40, '<strong>1. </strong>'.T_('<b>Search for an address</b> (may be approximate)'), '', array('maxlength'=>500, 'id' =>'searchbox'));
+		$params['Form']->button(array ('id' => 'locate_on_map', 'type' =>'button', 'value' => T_('Locate on map') ) );
+
+		$height = $this->display_param($this->Settings->get('height_back'));
+		$height = 'height:'.$height;
+
+		echo '<div style="margin-top:1ex"><strong>2. '.T_('Drag the pin to the exact location you want:').'</strong></div>';
 
 	?>
 	<div id="map_canvas" style="width:100%; <?php echo $height; ?>; margin: 5px 0px;"></div>
 	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
 	<script type="text/javascript">
+	var post_position = 0;
 	<?php
-	if (!empty($lat) && !empty($lng))
-	{
-		?>
-		var latlng = new google.maps.LatLng(<?php echo $lat; ?>, <?php echo $lng;?>);
-		<?php
-	}
-	else
-	{
-		?>
-		var latlng = new google.maps.LatLng(48.856614, 2.3522219000000177);
-		<?php
-	}
-
-	$map_type = (string)$this->Settings->get('map_type');
 	switch ($map_type)
 	{
 		case 'satellite':
 			?>
 			var mapTypeId = google.maps.MapTypeId.SATELLITE;
+			<?php
+			break;
+		case 'hybrid':
+			?>
+			var mapTypeId = google.maps.MapTypeId.HYBRID;
 			<?php
 			break;
 		default:
@@ -187,7 +320,63 @@ class google_maps_plugin extends Plugin
 			<?php
 			break;
 	}
+	
+	if (!empty( $lat ) || !empty( $lng ) )
+	{
+		?>
+		var latlng = new google.maps.LatLng(<?php echo $lat; ?>, <?php echo $lng;?>);
+		var zoom = <?php echo $zoom; ?>;
+		var post_position = 1; // position is set
+		<?php
+	}
+	else
+	{
+		?>
+		var latlng = new google.maps.LatLng(48.856614, 2.3522219000000177);
+		var zoom = 11;
+		<?php
+		if ( !empty ( $search_location ) )
+		{
+			?>
+
+			var geocoder = new google.maps.Geocoder();
+			geocoder.geocode( {'address': '<?php echo $search_location; ?>'}, function(results, status)
+			{
+				if (status == google.maps.GeocoderStatus.OK)
+				{
+					var searchLoc = results[0].geometry.location;
+					var bounds = results[0].geometry.bounds;
+					if (bounds != null)
+					{
+						map.fitBounds(bounds);
+					}
+					else
+					{
+						map.setCenter(searchLoc);
+					}
+
+					if (marker != null)
+					{
+						marker.setMap(null);
+					}
+
+					marker = new google.maps.Marker({
+						position: searchLoc,
+						map: map,
+						title:"Position",
+						draggable: true
+						});
+					marker_dragend(marker, map);
+				}
+			});
+
+			<?php
+
+		}
+	}
 	?>
+
+
 	var mapTypes = new Array();
 	mapTypes.push(google.maps.MapTypeId.HYBRID);
 	mapTypes.push(google.maps.MapTypeId.ROADMAP);
@@ -196,7 +385,7 @@ class google_maps_plugin extends Plugin
 
 
 	var myOptions = {
-		  zoom: 11,
+		  zoom: zoom,
 		  center: latlng,
 		  mapTypeId: mapTypeId,
 		  scrollwheel : false,
@@ -209,9 +398,6 @@ class google_maps_plugin extends Plugin
 
 	var map = new google.maps.Map(document.getElementById("map_canvas"),
 			myOptions);
-
-//	var traffic = new google.maps.TrafficLayer();
-//	traffic.setMap(map);
 
 	var marker = new google.maps.Marker({
 		position: latlng,
@@ -253,11 +439,11 @@ class google_maps_plugin extends Plugin
 	google.maps.event.addListener(marker, 'dragend', function()
 	{
 		map.setCenter(marker.getPosition());
-		jQuery('input[name=item_double3]').val(marker.getPosition().lat());
+		jQuery('input[name=item_latitude]').val(marker.getPosition().lat());
 
 
 
-		jQuery('input[name=item_double4]').val(marker.getPosition().lng());
+		jQuery('input[name=item_longitude]').val(marker.getPosition().lng());
 
 		geocoder.geocode({'latLng': marker.getPosition()}, function(region_res, region_status)
 		{
@@ -283,6 +469,10 @@ class google_maps_plugin extends Plugin
 	google.maps.event.addListener(map, 'zoom_changed', function()
 	{
 		jQuery('#google_map_zoom').val(map.getZoom());
+	});
+	google.maps.event.addListener(map, 'maptypeid_changed', function()
+	{
+		jQuery('#google_map_type').val(map.getMapTypeId());
 	});
 	google.maps.event.addListener(map, 'click', function(event)
 	{
@@ -314,8 +504,8 @@ class google_maps_plugin extends Plugin
 		});
 
 		map.setCenter(marker.getPosition());
-		jQuery('input[name=item_double3]').val(event.latLng.lat());
-		jQuery('input[name=item_double4]').val(event.latLng.lng());
+		jQuery('input[name=item_latitude]').val(event.latLng.lat());
+		jQuery('input[name=item_longitude]').val(event.latLng.lng());
 
 		marker_dragend(marker, map);
 	});
@@ -413,9 +603,10 @@ function locate()
 			map.setCenter(searchLoc);
 		}
 		marker_dragend(marker, map);
-		jQuery('input[name=item_double3]').val(searchLoc.lat());
-		jQuery('input[name=item_double4]').val(searchLoc.lng());
+		jQuery('input[name=item_latitude]').val(searchLoc.lat());
+		jQuery('input[name=item_longitude]').val(searchLoc.lng());
 		jQuery('#google_map_zoom').val(map.getZoom());
+		jQuery('#google_map_type').val(map.getMapTypeId());
 	}
 
 }
@@ -429,10 +620,203 @@ function locate()
 
 	});
 
-	jQuery('#locate_on_map').click(locate);
+	jQuery('#locate_on_map').click( locate );
+
+	function post_location_change( adress )
+	{
+		if ( adress == '')
+		{
+			adress = 'Paris, France';
+		}
+			jQuery('#searchbox').val(adress);
+			geocoder.geocode( {'address': adress}, function(results, status)
+			{
+				if (status == google.maps.GeocoderStatus.OK)
+				{
+					var searchLoc = results[0].geometry.location;
+					var bounds = results[0].geometry.bounds;
+					if (bounds != null)
+					{
+						map.fitBounds(bounds);
+					}
+					else
+					{
+						map.setCenter(searchLoc);
+					}
+					if (marker != null)
+					{
+						marker.setMap(null);
+					}
+					marker = new google.maps.Marker({
+						position: searchLoc,
+						map: map,
+						title:"Position",
+						draggable: true
+						});
+					marker_dragend(marker, map);
+				}
+			});
+
+	}
+
+	jQuery(document).ready( function(){
+		if ( post_position == 0 )
+		{
+			jQuery('#item_ctry_ID').change(function(){
+				var adress = '';
+				var text =  jQuery('#item_city_ID option:selected').text();
+
+				if (text != 'Unknown')
+				{
+					if (adress == '')
+					{
+						adress = adress + text;
+					}
+					else 
+					{
+						adress = adress + ', ' + text;
+					}
+				}
+
+				text =  jQuery('#item_subrg_ID option:selected').text();
+				if (text != 'Unknown')
+				{
+					if (adress == '')
+					{
+						adress = adress + text;
+					}
+					else
+					{
+						adress = adress + ', ' + text;
+					}
+				}
+
+				text =  jQuery('#item_rgn_ID option:selected').text();
+				if (text != 'Unknown')
+				{
+					if (adress == '')
+					{
+						adress = adress + text;
+					}
+					else
+					{
+						adress = adress + ', ' + text;
+					}
+				}
+
+				text =  jQuery('#item_ctry_ID option:selected').text();
+				if (text != 'Unknown')
+				{
+					if (adress == '')
+					{
+						adress = adress + text;
+					}
+					else 
+					{
+						adress = adress + ', ' + text;
+					}
+				}
+
+			post_location_change( adress );
+			});
+
+			jQuery('#item_subrg_ID').change(function(){
+				var adress = '';
+				text =  jQuery('#item_subrg_ID option:selected').text();
+				if (text != 'Unknown')
+				{
+					if (adress == '')
+					{
+						adress = adress + text;
+					}
+					else
+					{
+						adress = adress + ', ' + text;
+					}
+				}
+
+				text =  jQuery('#item_rgn_ID option:selected').text();
+				if (text != 'Unknown')
+				{
+					if (adress == '')
+					{
+						adress = adress + text;
+					}
+					else
+					{
+						adress = adress + ', ' + text;
+					}
+				}
+
+				text =  jQuery('#item_ctry_ID option:selected').text();
+				if (text != 'Unknown')
+				{
+					if (adress == '')
+					{
+						adress = adress + text;
+					}
+					else
+					{
+						adress = adress + ', ' + text;
+					}
+				}
+				post_location_change( adress );
+				});
+
+			jQuery('#item_rgn_ID').change(function(){
+				var adress = '';
+				text =  jQuery('#item_rgn_ID option:selected').text();
+				if (text != 'Unknown')
+				{
+					if (adress == '')
+					{
+						adress = adress + text;
+					}
+					else
+					{
+						adress = adress + ', ' + text;
+					}
+				}
+
+				text =  jQuery('#item_ctry_ID option:selected').text();
+				if (text != 'Unknown')
+				{
+					if (adress == '')
+					{
+						adress = adress + text;
+					}
+					else
+					{
+						adress = adress + ', ' + text;
+					}
+				}
+				post_location_change( adress );
+				});
+
+			jQuery('#item_ctry_ID').change(function(){
+				var adress = '';
+				text =  jQuery('#item_ctry_ID option:selected').text();
+				if (text != 'Unknown')
+				{
+					if (adress == '')
+					{
+						adress = adress + text;
+					}
+					else
+					{
+						adress = adress + ', ' + text;
+					}
+				}
+				post_location_change( adress );
+				});
+			}
+
+		});
 	</script>
 
 	<?php
+		$params['Form']->switch_layout( NULL );
+
 		$params['Form']->end_fieldset();
 	}
 
@@ -448,94 +832,90 @@ function locate()
 	 */
 	function SkinBeginHtmlHead()
 	{
-		require_js( '#jquery#');
+		require_js( '#jquery#', 'blog' );
 	}
 
 	function SkinTag( $params )
 	{
 		global $Item;
-
 		global $Blog;
 
-		$field_name1 = strtolower($Blog->get_setting('custom_double3'));
-		$field_name2 = strtolower($Blog->get_setting('custom_double4'));
+		$this->number_of_widgets += 1;
 
-		if ($field_name1 != 'latitude' || $field_name2 != 'longitude')
+		if( !$Blog->get_setting( 'show_location_coordinates' ) )
 		{
 			return;
 		}
 
-		$lat = $Item->get('double3');
-		$lng = $Item->get('double4');
-		if (empty($lat) && empty($lng))
+		if( !empty( $Item ) )
 		{
-			return;
+			$lat = $Item->get_setting('latitude');
+			$lng = $Item->get_setting('longitude');
+			if (empty($lat) && empty($lng))
+			{
+				return;
+			}
 		}
+		else
+		{
+			$lat = 0;
+			$lng = 0;
+		}
+		$width = $this->display_param($this->get_widget_setting('width', $params));
+		$width = 'width:'.$width;
 
-		 $width = (int)$this->Settings->get('width');
-		 if (empty($width))
-		 {
-			$width = 'width:100%';
-		 }
-		 else
-		 {
-			$width = 'width:'.$width.'px';
-		 }
-
-		 $height = (int)$this->Settings->get('height_front');
-		 $height = 'height:'.$height.'px';
-
+		$height = $this->display_param($this->get_widget_setting('height_front', $params));
+		$height = 'height:'.$height;
 
 		?>
-		<div id="map_canvas" style="<?php echo $width; ?>; <?php echo $height; ?>; margin: 5px 5px 5px 5px;"></div>
+		<div class="map_title"><?php echo $this->get_widget_setting('map_title_coll'.$Blog->ID, $params); ?></div>
+		<div class="map_canvas" id="map_canvas<?php echo $this->number_of_widgets; ?>" style="<?php echo $width; ?>; <?php echo $height; ?>; margin: 5px 5px 5px 5px;"></div>
 		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
 		<script type="text/javascript">
-	<?php
-	$map_type = (string)$this->Settings->get('map_type');
-	switch ($map_type)
-	{
-		case 'satellite':
-			?>
-			var mapTypeId = google.maps.MapTypeId.SATELLITE;
-			<?php
-			break;
-		default:
-			?>
-			var mapTypeId = google.maps.MapTypeId.ROADMAP;
-			<?php
-			break;
-	}
-	?>
-		var latlng = new google.maps.LatLng(<?php echo $lat; ?>, <?php echo $lng;?>);
-		var mapTypes = new Array();
-		mapTypes.push(google.maps.MapTypeId.HYBRID);
-		mapTypes.push(google.maps.MapTypeId.ROADMAP);
-		mapTypes.push(google.maps.MapTypeId.SATELLITE);
-		mapTypes.push(google.maps.MapTypeId.TERRAIN);
-
-		var myOptions = {
-			  zoom: 17,
-			  center: latlng,
-			  mapTypeId: mapTypeId,
-			  scrollwheel: false,
-			  mapTypeControlOptions:
-				  {
-				   style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
-				   mapTypeIds: mapTypes
-				  }
-			};
-		var map = new google.maps.Map(document.getElementById("map_canvas"),
-				myOptions);
-		var marker = new google.maps.Marker({
-			position: latlng,
-			map: map,
-			title:"Position"
-			});
-
-		</script>
 		<?php
-	}
+		$map_type = (string)$this->get_widget_setting('map_type', $params);
+		switch ($map_type)
+		{
+			case 'satellite':
+				?>
+				var mapTypeId = google.maps.MapTypeId.SATELLITE;
+				<?php
+				break;
+			default:
+				?>
+				var mapTypeId = google.maps.MapTypeId.ROADMAP;
+				<?php
+				break;
+		}
+		?>
+			var latlng = new google.maps.LatLng(<?php echo $lat; ?>, <?php echo $lng;?>);
+			var mapTypes = new Array();
+			mapTypes.push(google.maps.MapTypeId.HYBRID);
+			mapTypes.push(google.maps.MapTypeId.ROADMAP);
+			mapTypes.push(google.maps.MapTypeId.SATELLITE);
+			mapTypes.push(google.maps.MapTypeId.TERRAIN);
 
+			var myOptions = {
+				  zoom: 17,
+				  center: latlng,
+				  mapTypeId: mapTypeId,
+				  scrollwheel: false,
+				  mapTypeControlOptions:
+					  {
+					   style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+					   mapTypeIds: mapTypes
+					  }
+				};
+			var map<?php echo $this->number_of_widgets; ?> = new google.maps.Map(document.getElementById("map_canvas<?php echo $this->number_of_widgets; ?>"),
+					myOptions);
+			var marker<?php echo $this->number_of_widgets; ?> = new google.maps.Marker({
+				position: latlng,
+				map: map<?php echo $this->number_of_widgets; ?>,
+				title:"Position"
+				});
+			</script>
+			<?php
+	}
 
 	/**
 	 * Event handler: Called when the plugin has been installed.
@@ -543,7 +923,7 @@ function locate()
 	 */
 	function AfterInstall()
 	{
-		$this->msg( 'Google Maps plugin sucessfully installed.' );
+		$this->msg( T_('Google Maps plugin sucessfully installed.') );
 	}
 
 
@@ -553,39 +933,15 @@ function locate()
 	 */
 	function BeforeUninstall()
 	{
-		$this->msg( 'Google Maps plugin sucessfully un-installed.' );
+		$this->msg( T_('Google Maps plugin sucessfully un-installed.') );
 		return true;
 	}
 
 }
 /*
  * $Log$
- * Revision 1.11  2011/10/14 07:38:12  efy-vitalij
- * change displaying of map style
- *
- * Revision 1.10  2011/10/13 07:05:34  efy-vitalij
- * add DisplayItemFormFieldset
- *
- * Revision 1.9  2011/10/12 12:43:34  efy-vitalij
- * fix bug
- *
- * Revision 1.8  2011/10/12 02:23:52  fplanque
- * minor
- *
- * Revision 1.7  2011/10/11 11:34:35  efy-vitalij
- * add gmaps plugin functional
- *
- * Revision 1.6  2011/10/10 11:39:52  efy-vitalij
- * add gmaps plugin functional
- *
- * Revision 1.5  2011/10/10 10:37:00  efy-vitalij
- * add gmaps plugin functional
- *
- * Revision 1.4  2011/10/07 15:08:57  efy-vitalij
- * change widget display zoom
- *
- * Revision 1.3  2011/10/07 14:35:36  efy-vitalij
- * remake google maps plugin
+ * Revision 1.13  2013/11/06 08:05:22  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

@@ -6,7 +6,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -37,7 +37,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 load_class( '_core/ui/results/_results.class.php', 'Results' );
-
+load_class( '/items/model/_itemlistlight.class.php', 'ItemListLight' );
 
 
 /**
@@ -55,7 +55,7 @@ class archives_plugin extends Plugin
 	var $name;
 	var $code = 'evo_Arch';
 	var $priority = 50;
-	var $version = '3.2';
+	var $version = '5.0.0';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 
@@ -301,7 +301,7 @@ class archives_plugin extends Plugin
 		return true;
 	}
 
-	
+
   /**
    * Get definitions for widget specific editable params
    *
@@ -371,6 +371,7 @@ class ArchiveList extends Results
 		global $show_statuses;
 		global $author, $assgn, $status, $types;
 		global $s, $sentence, $exact;
+		global $posttypes_specialtypes;
 
 		$this->dbtable = $dbtable;
 		$this->dbprefix = $dbprefix;
@@ -434,7 +435,7 @@ class ArchiveList extends Results
 			$this->ItemQuery->where_datestart( '', '', '', '', $timestamp_min, $timestamp_max );
 
 			// Include all types except pages, intros and sidebar links:
-			$this->ItemQuery->where_types( '-1000,1500,1520,1530,1570,1600,3000' );
+			$this->ItemQuery->where_types( '-'.implode(',',$posttypes_specialtypes) );
 		}
 
 
@@ -482,9 +483,9 @@ class ArchiveList extends Results
 				$this->count_total_rows();
 				$archives_list = new ItemListLight( $Blog , $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $this->total_rows );
 				$archives_list->set_filters( array(
-				'visibility_array' => array( 'published' ),  // We only want to advertised published items
-				'types' => '-1000,1500,1520,1530,1570,1600,3000',	// Include all types except pages, intros and sidebar links:
-	) );
+						'visibility_array' => array( 'published' ),  // We only want to advertised published items
+						'types' =>  '-'.implode(',',$posttypes_specialtypes),	// Include all types except pages, intros and sidebar links
+					) );
 
 				if($sort_order == 'title')
 				{
@@ -492,7 +493,7 @@ class ArchiveList extends Results
 					'orderby' => 'title',
 					'order' => 'ASC') );
 				}
-			
+
 				$archives_list->query();
 				$this->rows = array();
 				while ($Item = $archives_list->get_item())
@@ -510,7 +511,7 @@ class ArchiveList extends Results
 		// See http://forums.b2evolution.net/viewtopic.php?p=42529#42529
 		if( in_array($this->archive_mode, array('monthly', 'daily', 'weekly')) )
 		{
-			$sql_version = $DB->get_var('SELECT VERSION()'); // fp> TODO: $DB->get_mysql_version()
+			$sql_version = $DB->get_version();
 			if( version_compare($sql_version, '4', '>') )
 			{
 				$sql = 'SELECT SQL_CALC_FOUND_ROWS '.substr( $sql, 7 ); // "SQL_CALC_FOUND_ROWS" available since MySQL 4
@@ -639,227 +640,8 @@ class ArchiveList extends Results
 
 /*
  * $Log$
- * Revision 1.66  2011/10/17 22:00:31  fplanque
- * cleanup
- *
- * Revision 1.65  2011/10/07 07:22:59  efy-yurybakh
- * Replace all timestamp_min & timestamp_max with Blog's methods
- *
- * Revision 1.64  2011/10/06 11:49:47  efy-yurybakh
- * Replace all timestamp_min & timestamp_max with Blog's methods
- *
- * Revision 1.63  2011/09/04 22:13:23  fplanque
- * copyright 2011
- *
- * Revision 1.62  2010/02/08 17:55:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.61  2010/01/30 18:55:36  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.60  2009/09/14 14:10:46  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.59  2009/09/14 10:45:39  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.58  2009/09/01 02:58:02  waltercruz
- * A better fix
- *
- * Revision 1.57  2009/09/01 01:25:43  waltercruz
- * Trying to fix the limit bug, but I think that there's still something stra nge
- *
- * Revision 1.56  2009/08/27 11:54:40  tblue246
- * General blog settings: Added default value for archives_sort_order
- *
- * Revision 1.55  2009/08/10 17:15:25  waltercruz
- * Adding permalinks on postbypost archive mode and adding a button to set the sort order on postbypost mode
- *
- * Revision 1.54  2009/08/03 13:30:15  tblue246
- * Make title of Archives widget editable. Fixes http://forums.b2evolution.net//viewtopic.php?p=94788
- *
- * Revision 1.53  2009/07/05 16:39:10  sam2kb
- * "Limit" to "Max items"
- *
- * Revision 1.52  2009/07/04 22:47:47  tblue246
- * Archives widget: Do not display sidebar links
- *
- * Revision 1.51  2009/06/24 18:47:54  tblue246
- * Make widget plugin names translatable
- *
- * Revision 1.50  2009/05/26 22:18:23  fplanque
- * fix limit (and make it configurable)
- *
- * Revision 1.49  2009/03/08 23:57:47  fplanque
- * 2009
- *
- * Revision 1.48  2009/02/26 22:16:54  blueyed
- * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
- *
- * Revision 1.47  2009/01/21 22:36:35  fplanque
- * Cleaner handling of pages and intros in calendar and archives plugins
- *
- * Revision 1.46  2008/01/21 09:35:38  fplanque
- * (c) 2008
- *
- * Revision 1.45  2007/11/29 21:52:22  fplanque
- * minor
- *
- * Revision 1.44  2007/11/25 18:20:37  fplanque
- * additional SEO settings
- *
- * Revision 1.43  2007/06/25 11:02:31  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.42  2007/05/14 02:43:06  fplanque
- * Started renaming tables. There probably won't be a better time than 2.0.
- *
- * Revision 1.41  2007/05/07 18:03:27  fplanque
- * cleaned up skin code a little
- *
- * Revision 1.40  2007/05/04 01:55:59  waltercruz
- * Changing the MySQL date functions to the standart ones.
- * Adding a sort_order parameter to archives plugins, to be used in postbypost mode, with two options: date (posts sorted by date DESC) and title (posts sorted by title ASC).
- *
- * Revision 1.39  2007/04/26 00:11:04  fplanque
- * (c) 2007
- *
- * Revision 1.38  2007/03/25 10:20:02  fplanque
- * cleaned up archive urls
- *
- * Revision 1.37  2007/01/13 18:36:24  fplanque
- * renamed "Skin Tag" plugins into "Widget" plugins
- * but otherwise they remain basically the same & compatible
- *
- * Revision 1.36  2007/01/13 16:55:00  blueyed
- * Removed $DB member of Results class and use global $DB instead
- *
- * Revision 1.35  2006/12/26 03:19:12  fplanque
- * assigned a few significant plugin groups
- *
- * Revision 1.34  2006/12/04 19:41:11  fplanque
- * Each blog can now have its own "archive mode" settings
- *
- * Revision 1.33  2006/11/24 18:27:27  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.32  2006/11/02 19:49:22  fplanque
- * no message
- *
- * Revision 1.31  2006/10/26 19:04:07  blueyed
- * Make the SQL fix work..
- *
- * Revision 1.30  2006/10/25 22:27:44  blueyed
- * Fix for MySQL bug
- *
- * Revision 1.29  2006/09/10 20:59:19  fplanque
- * extended extra path info setting
- *
- * Revision 1.28  2006/08/29 00:26:11  fplanque
- * Massive changes rolling in ItemList2.
- * This is somehow the meat of version 2.0.
- * This branch has gone officially unstable at this point! :>
- *
- * Revision 1.27  2006/07/10 20:19:30  blueyed
- * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
- *
- * Revision 1.26  2006/07/08 12:33:50  blueyed
- * Fixed regression with Results' class adding an additional ORDER column to ItemList2's query
- *
- * Revision 1.25  2006/07/07 21:26:49  blueyed
- * Bumped to 1.9-dev
- *
- * Revision 1.24  2006/06/20 00:53:07  blueyed
- * require results class (through global)!
- *
- * Revision 1.23  2006/06/20 00:38:42  blueyed
- * require results class!
- *
- * Revision 1.22  2006/06/16 21:30:57  fplanque
- * Started clean numbering of plugin versions (feel free do add dots...)
- *
- * Revision 1.21  2006/05/30 19:39:55  fplanque
- * plugin cleanup
- *
- * Revision 1.20  2006/04/19 20:14:03  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.19  2006/03/12 23:09:27  fplanque
- * doc cleanup
- *
- * Revision 1.18  2006/02/05 19:04:49  blueyed
- * doc fixes
- *
- * Revision 1.17  2006/02/05 14:07:18  blueyed
- * Fixed 'postbypost' archive mode.
- *
- * Revision 1.16  2006/01/04 20:34:51  fplanque
- * allow filtering on extra statuses
- *
- * Revision 1.15  2005/12/22 23:13:40  blueyed
- * Plugins' API changed and handling optimized
- *
- * Revision 1.14  2005/12/12 19:22:04  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.13  2005/11/01 17:47:37  yabs
- * minor corrections to postbypost
- *
- * Revision 1.12  2005/10/03 18:10:08  fplanque
- * renamed post_ID field
- *
- * Revision 1.11  2005/09/14 19:23:45  fplanque
- * doc
- *
- * Revision 1.10  2005/09/06 19:38:29  fplanque
- * bugfixes
- *
- * Revision 1.9  2005/09/06 17:14:12  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.8  2005/09/01 17:11:46  fplanque
- * no message
- *
- *
- * Merged in the contents of _archivelist.class.php; history below:
- *
- * Revision 1.11  2005/06/10 18:25:43  fplanque
- * refactoring
- *
- * Revision 1.10  2005/05/24 15:26:52  fplanque
- * cleanup
- *
- * Revision 1.9  2005/03/08 20:32:07  fplanque
- * small fixes; slightly enhanced WEEK() handling
- *
- * Revision 1.8  2005/03/07 17:36:10  fplanque
- * made more generic
- *
- * Revision 1.7  2005/02/28 09:06:32  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.6  2005/01/03 15:17:52  fplanque
- * no message
- *
- * Revision 1.5  2004/12/27 18:37:58  fplanque
- * changed class inheritence
- *
- * Changed parent to Results!!
- *
- * Revision 1.4  2004/12/13 21:29:58  fplanque
- * refactoring
- *
- * Revision 1.3  2004/11/09 00:25:11  blueyed
- * minor translation changes (+MySQL spelling :/)
- *
- * Revision 1.2  2004/10/14 18:31:24  blueyed
- * granting copyright
- *
- * Revision 1.1  2004/10/13 22:46:32  fplanque
- * renamed [b2]evocore/*
- *
- * Revision 1.19  2004/10/11 19:02:04  fplanque
- * Edited code documentation.
+ * Revision 1.68  2013/11/06 08:05:21  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

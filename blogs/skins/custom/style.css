@@ -1,15 +1,14 @@
 /* Designed by François PLANQUE - http://fplanque.net/ */
 
-@import url("../../rsc/css/basic.css");	/* Import basic styles */
-@import url("../../rsc/css/blog_base.css");	/* Default styles for the blog navigation */
-@import url("../../rsc/css/item_base.css");	/* Default styles for the post CONTENT */
-
 body {
 	background: #fff url(img/bg.png) repeat-y 50% 0;
 	padding: 0px;
 	margin: 0px;
 	color: #000;
 	font: 84% Arial, Helvetica, sans-serif;
+}
+textarea, input, select, option, optgroup, ul.ui-autocomplete, li.token-input-token-facebook, div.token-input-dropdown-facebook {
+	font: 13.43px Arial, Helvetica, sans-serif;
 }
 
 a {
@@ -220,7 +219,7 @@ div.action_messages {
 	color: #999;
 	margin: 2ex 0 1ex 0;
 }
-.bTitle {
+.bTitle, .bTitle.linked a {
 	color: #78a;
 	margin: 1ex 0;
 }
@@ -310,13 +309,13 @@ input.preview:hover {
 	color: #aaa;
 	font-size: 84%;
 }
-input.SearchField
+div.compact_search_form input.SearchField
 {
 	background-color: #eee;
 	border: 1px solid #ccc;
 	padding: .5ex;
-	width: 96%;
-	margin: 0ex;
+	width: 189px;
+	margin: 0 3px 0 0;
 }
 
 /* Special SideItems: */
@@ -363,4 +362,32 @@ th.bCalendarHeaderCell {
 div.featured_post {
 	margin: 0 2ex;
 	padding: 0 1ex;
+}
+
+textarea#msg_text {
+	width: 100%;
+}
+
+/* jQuery Tokeninput plugin */
+div.input ul.token-input-list-facebook {
+	width: 319px;
+}
+
+/* Not published comments display */
+#styled_content_block .bComment .status_draft,
+#styled_content_block .bComment .status_review,
+#styled_content_block .bComment .status_community,
+#styled_content_block .bComment .status_protected,
+#styled_content_block .bComment .status_private {
+	top: 0px;
+	left: 13px;
+}
+/* Not published posts display */
+#styled_content_block .bSmallHead .status_draft,
+#styled_content_block .bSmallHead .status_review,
+#styled_content_block .bSmallHead .status_community,
+#styled_content_block .bSmallHead .status_protected,
+#styled_content_block .bSmallHead .status_private {
+	top: -13px;
+	left: 5px;
 }

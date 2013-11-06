@@ -63,9 +63,9 @@ if( $debug == 'pwd' )
 	// Disabled until we find a reason to enable:
 	$debug = 0;
 
-	if( !empty($debug_pwd) )
+	if( !empty( $debug_pwd ) )
 	{	// We have configured a password that could enable debug mode:
-		if( isset($_GET['debug']) )
+		if( isset( $_GET['debug'] ) )
 		{	// We have submitted a ?debug=password
 			if( $_GET['debug'] == $debug_pwd )
 			{	// Password matches
@@ -77,11 +77,59 @@ if( $debug == 'pwd' )
 				setcookie( 'debug', '', $cookie_expired, $cookie_path, $cookie_domain );
 			}
 		}
-		elseif( !empty($_COOKIE['debug'])	&& $_COOKIE['debug'] == $debug_pwd )
+		elseif( !empty( $_COOKIE['debug'] ) && $_COOKIE['debug'] == $debug_pwd )
 		{	// We have a cookie with the correct debug password:
 			$debug = 1;
 		}
 	}
+}
+
+// Handle debug jslog cookie:
+if( $debug_jslog == 'pwd' )
+{	// Debug *can* be enabled/disabled by cookie:
+
+	// Disabled until we find a reason to enable:
+	$debug_jslog = 0;
+
+	if( !empty( $debug_pwd ) )
+	{	// We have configured a password that could enable debug mode:
+		if( isset( $_GET['jslog'] ) )
+		{	// We have submitted a ?jslog=password
+			if( $_GET['jslog'] == $debug_pwd )
+			{	// Password matches
+				$debug_jslog = 1;
+				setcookie( 'jslog', $debug_pwd, 0, '/' );
+			}
+			else
+			{	// Password doesn't match: turn off debug mode:
+				setcookie( 'jslog', '', $cookie_expired, '/' );
+				if( !empty( $_COOKIE['jslog_style'] ) )
+				{	// Change the saved styles to hide jslog
+					$_COOKIE['jslog_style'] = str_replace( 'display: block', 'display: none', $_COOKIE['jslog_style'] );
+					setcookie( 'jslog_style', $_COOKIE['jslog_style'], 0, '/' );
+				}
+			}
+		}
+		elseif( !empty( $_COOKIE['jslog'] ) && $_COOKIE['jslog'] == $debug_pwd )
+		{	// We have a cookie with the correct debug password:
+			$debug_jslog = 1;
+			if( !empty( $_COOKIE['jslog_style'] ) )
+			{	// Change the saved styles to show jslog
+				$_COOKIE['jslog_style'] = str_replace( 'display: none', 'display: block', $_COOKIE['jslog_style'] );
+				setcookie( 'jslog_style', $_COOKIE['jslog_style'], 0, '/' );
+			}
+		}
+	}
+}
+
+// Check compatibility. Server PHP version can't be lower then the application required PHP version.
+$php_version = phpversion();
+if( version_compare( $php_version, $required_php_version[ 'application' ], '<' ) )
+{
+	$compat = sprintf( 'You cannot use %1$s %2$s on this server because it requires PHP version %3$s or higher. You are running version %4$s.',
+				$app_name, $app_version, $required_php_version[ 'application' ], $php_version );
+
+	die('<h1>Insufficient Requirements</h1><p>'.$compat.'</p>');
 }
 
 // STUFF THAT SHOULD BE INITIALIZED (to avoid param injection on badly configured PHP)
@@ -90,62 +138,8 @@ $use_session = true;
 
 /*
  * $Log$
- * Revision 1.64  2010/09/29 13:19:02  efy-asimo
- * Twitter user unlink, and twitter config params move to plugin
- *
- * Revision 1.63  2010/08/24 08:20:19  efy-asimo
- * twitter plugin oAuth
- *
- * Revision 1.62  2009/12/22 09:03:19  fplanque
- * lose debug cookie when closing browser
- *
- * Revision 1.61  2009/12/11 23:01:19  fplanque
- * Reverted debug pwd changes.
- * As said before, hashing a cookie does not improve security. You can still steal the cookie.
- * Also requiring 2 params make it more painful to use.
- * Add a different password for debug level 2 if you really need it, but I think it's fine if you cannot turn on level 2 through the URL.
- *
- * Revision 1.60  2009/12/10 20:46:02  blueyed
- * debug_pwd: extra param for the password, which allows setting debug=2, too. Also, hash the cookie value for some more security.
- *
- * Revision 1.59  2009/12/08 20:08:48  fplanque
- * oops
- *
- * Revision 1.58  2009/12/02 00:05:29  fplanque
- * Debug mode can be turned on & off through the URL with a password
- *
- * Revision 1.57  2009/11/20 23:56:41  fplanque
- * minor  + doc
- *
- * Revision 1.56  2009/10/18 00:22:12  fplanque
- * doc/maintenance mode
- *
- * Revision 1.55  2009/09/15 19:31:55  fplanque
- * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
- * PHP 4 compatible. Even better on PHP 5.
- * I may have broken a few things. Sorry. This is pretty hard to do in one swoop without any glitch.
- * Thanks for fixing or reporting if you spot issues.
- *
- * Revision 1.54  2009/07/02 15:43:55  fplanque
- * B2evolution no longer ships with _basic_config.php .
- * It ships with _basic_config.template.php instead.
- * That way, uploading a new release never overwrites the previous base config.
- * The installer now creates  _basic_config.php based on _basic_config.template.php + entered form values.
- *
- * Revision 1.53  2009/01/25 19:09:32  blueyed
- * phpdoc fixes
- *
- * Revision 1.52  2008/04/06 19:19:30  fplanque
- * Started moving some intelligence to the Modules.
- * 1) Moved menu structure out of the AdminUI class.
- * It is part of the app structure, not the UI. Up to this point at least.
- * Note: individual Admin skins can still override the whole menu.
- * 2) Moved DB schema to the modules. This will be reused outside
- * of install for integrity checks and backup.
- * 3) cleaned up config files
- *
- * Revision 1.51  2006/11/26 01:42:08  fplanque
- * doc
+ * Revision 1.66  2013/11/06 08:03:44  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

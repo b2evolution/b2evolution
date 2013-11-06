@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -42,14 +42,23 @@ global $current_User, $admin_url;
 
 $CommentList->query();
 
+// Dispay a form to mass delete the comments:
+display_comment_mass_delete( $CommentList );
+
 $block_item_Widget = new Widget( 'block_item' );
+
+if( check_comment_mass_delete( $CommentList ) )
+{	// A form for mass deleting is availabl, Display link
+	$block_item_Widget->global_icon( T_('Delete all comments!'), 'delete', regenerate_url( 'action', 'action=mass_delete' ), T_('Mass delete...'), 3, 3 );
+}
 
 if( $CommentList->is_filtered() )
 {	// List is filtered, offer option to reset filters:
 	$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=comments&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 3, 3 );
 }
 $emptytrash_link = '';
-$opentrash_link = '';
+// Display recycle bin placeholder, because users may have rights to recycle particular comments
+$opentrash_link = '<span id="recycle_bin" class="floatright"></span>';
 if( $current_User->check_perm( 'blogs', 'editall' ) )
 {
 	if( $CommentList->is_trashfilter() )
@@ -73,8 +82,8 @@ $display_params = array(
 					'header_text_single' => T_('1 page'),
 				'header_end' => '</div>',
 				'footer_start' => '',
-					'footer_text' => '<div class="NavBar center"><strong>'.T_('Pages').'</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$</div>',
-					'footer_text_single' => '',
+					'footer_text' => '<div class="NavBar center"><strong>'.T_('Pages').'</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$<br />$page_size$</div>',
+					'footer_text_single' => '<div class="NavBar center">$page_size$</div>',
 						'prev_text' => T_('Previous'),
 						'next_text' => T_('Next'),
 						'list_prev_text' => T_('...'),
@@ -107,49 +116,8 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
- * Revision 1.14  2011/09/04 22:13:15  fplanque
- * copyright 2011
+ * Revision 1.16  2013/11/06 08:04:07  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.13  2011/02/25 22:04:09  fplanque
- * minor / UI cleanup
- *
- * Revision 1.12  2011/02/24 07:42:27  efy-asimo
- * Change trashcan to Recycle bin
- *
- * Revision 1.11  2011/02/14 14:13:24  efy-asimo
- * Comments trash status
- *
- * Revision 1.10  2010/08/05 08:04:12  efy-asimo
- * Ajaxify comments on itemList FullView and commentList FullView pages
- *
- * Revision 1.9  2010/05/10 14:26:17  efy-asimo
- * Paged Comments & filtering & add comments listview
- *
- * Revision 1.8  2010/03/15 17:12:11  efy-asimo
- * Add filters to Comment page
- *
- * Revision 1.7  2010/02/08 17:52:13  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.6  2010/01/30 18:55:22  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.5  2009/03/08 23:57:42  fplanque
- * 2009
- *
- * Revision 1.4  2008/01/21 09:35:27  fplanque
- * (c) 2008
- *
- * Revision 1.3  2007/11/03 21:04:26  fplanque
- * skin cleanup
- *
- * Revision 1.2  2007/09/03 18:32:50  fplanque
- * enhanced dashboard / comment moderation
- *
- * Revision 1.1  2007/06/25 10:59:42  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.13  2007/04/26 00:11:06  fplanque
- * (c) 2007
  */
 ?>

@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -113,42 +113,8 @@ class IconLegend
 
 /*
  * $Log$
- * Revision 1.6  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.5  2010/02/08 17:51:57  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.4  2009/03/08 23:57:41  fplanque
- * 2009
- *
- * Revision 1.3  2009/02/19 03:54:44  blueyed
- * Optimize: move instantiation of $IconLegend (and $UserSettings query) out of main.inc.php, into get_IconLegend. TODO: test if it works with PHP4, or if it needs assignment by reference. Will do so on the test server.
- *
- * Revision 1.2  2008/01/21 09:35:24  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 10:59:01  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.9  2007/04/26 00:11:08  fplanque
- * (c) 2007
- *
- * Revision 1.8  2006/12/07 23:13:13  fplanque
- * @var needs to have only one argument: the variable type
- * Otherwise, I can't code!
- *
- * Revision 1.7  2006/11/30 22:34:15  fplanque
- * bleh
- *
- * Revision 1.6  2006/11/28 01:02:53  fplanque
- * minor
- *
- * Revision 1.5  2006/11/26 02:30:39  fplanque
- * doc / todo
- *
- * Revision 1.4  2006/11/26 01:42:10  fplanque
- * doc
+ * Revision 1.7  2013/11/06 08:03:47  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

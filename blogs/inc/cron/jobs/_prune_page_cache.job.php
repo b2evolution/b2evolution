@@ -20,8 +20,8 @@ return 100;
 
 /*
  * $Log$
- * Revision 1.3  2010/07/26 06:52:16  efy-asimo
- * MFB v-4-0
+ * Revision 1.4  2013/11/06 08:04:07  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

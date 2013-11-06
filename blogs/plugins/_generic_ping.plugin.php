@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -45,14 +45,13 @@ class generic_ping_plugin extends Plugin
 	 */
 	var $code = '';
 	var $priority = 50;
-	var $version = '1.9-dev';
+	var $version = '5.0.0';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
 	/*
 	 * These variables MAY be overriden.
 	 */
-	var $apply_rendering = 'never';
 	var $group = 'ping';
 
 
@@ -219,38 +218,8 @@ class generic_ping_plugin extends Plugin
 
 /*
  * $Log$
- * Revision 1.11  2011/09/04 22:13:23  fplanque
- * copyright 2011
- *
- * Revision 1.10  2010/02/08 17:55:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.9  2009/03/08 23:57:47  fplanque
- * 2009
- *
- * Revision 1.8  2008/01/21 09:35:41  fplanque
- * (c) 2008
- *
- * Revision 1.7  2007/06/16 20:23:21  blueyed
- * Added "ping_service_extended" setting to use weblogUpdates.extendedPing
- *
- * Revision 1.6  2007/04/26 00:11:04  fplanque
- * (c) 2007
- *
- * Revision 1.5  2007/01/20 23:48:10  blueyed
- * Changed plugin default URL to manual.b2evolution.net/classname_plugin
- *
- * Revision 1.4  2006/11/24 18:27:27  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.3  2006/10/30 19:00:37  blueyed
- * Lazy-loading of Plugin (User)Settings for PHP5 through overloading
- *
- * Revision 1.2  2006/10/11 17:21:09  blueyed
- * Fixes
- *
- * Revision 1.1  2006/10/05 01:19:11  blueyed
- * Initial import of generic ping plugin.
+ * Revision 1.13  2013/11/06 08:05:22  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

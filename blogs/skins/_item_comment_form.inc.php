@@ -6,17 +6,18 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $cookie_name, $cookie_email, $cookie_url;
-global $comment_allowed_tags, $comments_use_autobr;
+global $comment_allowed_tags;
 global $comment_cookies, $comment_allow_msgform;
+global $checked_attachments; // Set this var as global to use it in the method $Item->can_attach()
 global $PageCache;
-global $Blog;
+global $Blog, $dummy_fields;
 
 // Default params:
 $params = array_merge( array(
@@ -24,25 +25,37 @@ $params = array_merge( array(
 		'form_title_start'     => '<h3>',
 		'form_title_end'       => '</h3>',
 		'form_title_text'      => T_('Leave a comment'),
+		'form_comment_text'    => T_('Comment text'),
+		'form_submit_text'     => T_('Send comment'),
+		'form_params'          => array(), // Use to change a structre of form, i.e. fieldstart, fieldend and etc.
 		'policy_text'          => '',
 		'textarea_lines'       => 10,
 		'default_text'         => '',
+		'preview_block_start'  => '',
 		'preview_start'        => '<div class="bComment" id="comment_preview">',
 		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
 		'preview_end'          => '</div>',
+		'preview_block_end'    => '',
 		'before_comment_error' => '<p><em>',
+		'comment_closed_text'  => '#',
 		'after_comment_error'  => '</em></p>',
 		'before_comment_form'  => '',
 		'after_comment_form'   => '',
+		'form_comment_redirect_to' => $Item->get_feedback_url( $disp == 'feedback-popup', '&' ),
 	), $params );
 
+$comment_reply_ID = param( 'reply_ID', 'integer', 0 );
+
 $email_is_detected = false; // Used when comment contains an email strings
+
+// Consider comment attachments list empty
+$comment_attachments = '';
 
 /*
  * Comment form:
  */
 $section_title = $params['form_title_start'].$params['form_title_text'].$params['form_title_end'];
-if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_error'], $params['after_comment_error'], '#', '#', $section_title ) )
+if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_error'], $params['after_comment_error'], '#', $params['comment_closed_text'], $section_title, $params ) )
 { // We want to display the comments form and the item can be commented on:
 
 	echo $params['before_comment_form'];
@@ -64,23 +77,35 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 				$email_is_detected = true;
 			}
 
-			// ------------------ PREVIEW COMMENT INCLUDED HERE ------------------
-			skin_include( $params['comment_template'], array(
-					'Comment'              => & $Comment,
-					'comment_start'        => $Comment->email_is_detected ? $params['comment_error_start'] : $params['preview_start'],
-					'comment_end'          => $Comment->email_is_detected ? $params['comment_error_end'] : $params['preview_end'],
-				) );
-			// Note: You can customize the default item feedback by copying the generic
-			// /skins/_item_comment.inc.php file into the current skin folder.
-			// ---------------------- END OF PREVIEW COMMENT ---------------------
+			if( !$Blog->get_setting( 'threaded_comments' ) )
+			{
+				// ------------------ PREVIEW COMMENT INCLUDED HERE ------------------
+				skin_include( $params['comment_template'], array(
+						'Comment'              => & $Comment,
+						'comment_block_start'  => $Comment->email_is_detected ? '' : $params['preview_block_start'],
+						'comment_start'        => $Comment->email_is_detected ? $params['comment_error_start'] : $params['preview_start'],
+						'comment_end'          => $Comment->email_is_detected ? $params['comment_error_end'] : $params['preview_end'],
+						'comment_block_end'    => $Comment->email_is_detected ? '' : $params['preview_block_end'],
+					) );
+				// Note: You can customize the default item feedback by copying the generic
+				// /skins/_item_comment.inc.php file into the current skin folder.
+				// ---------------------- END OF PREVIEW COMMENT ---------------------
+			}
 
 			// Form fields:
 			$comment_content = $Comment->original_content;
+			// comment_attachments contains all file IDs that have been attached
 			$comment_attachments = $Comment->preview_attachments;
+			// checked_attachments contains all attachment file IDs which checkbox was checked in
+			$checked_attachments = $Comment->checked_attachments;
 			// for visitors:
 			$comment_author = $Comment->author;
 			$comment_author_email = $Comment->author_email;
 			$comment_author_url = $Comment->author_url;
+
+			// Display error messages again after preview of comment
+			global $Messages;
+			$Messages->display();
 		}
 
 		// delete any preview comment from session data:
@@ -117,7 +142,10 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 			$comment_author = $Comment->author;
 			$comment_author_email = $Comment->author_email;
 			$comment_author_url = $Comment->author_url;
+			// comment_attachments contains all file IDs that have been attached
 			$comment_attachments = $Comment->preview_attachments;
+			// checked_attachments contains all attachment file IDs which checkbox was checked in
+			$checked_attachments = $Comment->checked_attachments;
 		}
 	}
 
@@ -141,61 +169,25 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 	echo $params['form_title_text'];
 	echo $params['form_title_end'];
 
-
+/*
 	echo '<script type="text/javascript">
-/* <![CDATA[ */
+/* <![CDATA[ *
 function validateCommentForm(form)
 {
-	if( form.p.value.replace(/^\s+|\s+$/g,"").length == 0 )
+	if( form.'.$dummy_fields['content'].'.value.replace(/^\s+|\s+$/g,"").length == 0 )
 	{
 		alert("'.TS_('Please do not send empty comments.').'");
 		return false;
 	}
 }
+/* ]]> *
+</script>';*/
 
-function fadeIn( id, color )
-{
-	var bg_color = jQuery("#" + id).css( "backgroundColor" );
-	jQuery("#" + id).animate({ backgroundColor: color }, 200).animate({ backgroundColor: bg_color }, 200);
-}
-
-// Set comments vote
-function setCommentVote( id, type, vote )
-{
-	var divid = "vote_helpful_" + id;
-	switch(vote)
-	{
-		case "no":
-			fadeIn(divid, "#ffc9c9");
-			break;
-		case "yes":
-			fadeIn(divid, "#bcffb5");
-			break;
-	};
-
-	$.ajax({
-	type: "POST",
-	url: "'.$htsrv_url.'anon_async.php",
-	data:
-		{ "blogid": "'.$Blog->ID.'",
-			"commentid": id,
-			"type": type,
-			"vote": vote,
-			"action": "set_comment_vote",
-			"crumb_comment": "'.get_crumb('comment').'",
-		},
-	success: function(result)
-		{
-			$("#vote_"+type+"_"+id).after( result );
-			$("#vote_"+type+"_"+id).remove();
-		}
-	});
-}
-/* ]]> */
-</script>';
-	
 	$Form = new Form( $samedomain_htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID, 'post', NULL, 'multipart/form-data' );
-	$Form->begin_form( 'bComment', '', array( 'target' => '_self', 'onsubmit' => 'return validateCommentForm(this);' ) );
+
+	$Form->switch_template_parts( $params['form_params'] );
+
+	$Form->begin_form( 'bComment', '', array( 'target' => '_self'/*, 'onsubmit' => 'return validateCommentForm(this);'*/ ) );
 
 	// TODO: dh> a plugin hook would be useful here to add something to the top of the Form.
 	//           Actually, the best would be, if the $Form object could be changed by a plugin
@@ -203,6 +195,13 @@ function setCommentVote( id, type, vote )
 
 	$Form->add_crumb( 'comment' );
 	$Form->hidden( 'comment_post_ID', $Item->ID );
+	if( !empty( $comment_reply_ID ) )
+	{
+		$Form->hidden( 'reply_ID', $comment_reply_ID );
+
+		// Link to scroll back up to replying comment
+		echo '<a href="'.url_add_param( $Item->get_permanent_url(), 'reply_ID='.$comment_reply_ID.'&amp;redir=no' ).'#c'.$comment_reply_ID.'" class="comment_reply_current" rel="'.$comment_reply_ID.'">'.T_('You are currently replying to a specific comment').'</a>';
+	}
 	$Form->hidden( 'redirect_to',
 			// Make sure we get back to the right page (on the right domain)
 			// fp> TODO: check if we can use the permalink instead but we must check that application wide,
@@ -210,25 +209,30 @@ function setCommentVote( id, type, vote )
 			// url_rel_to_same_host(regenerate_url( '', '', $Blog->get('blogurl'), '&' ), $htsrv_url)
 			// fp> what we need is a regenerate_url that will work in permalinks
 			// fp> below is a simpler approach:
-			$Item->get_feedback_url( $disp == 'feedback-popup', '&' )
+			$params['form_comment_redirect_to']
 		);
 
-	if( is_logged_in() )
-	{ // User is logged in:
+	if( check_user_status( 'is_validated' ) )
+	{ // User is logged in and activated:
 		$Form->info_field( T_('User'), '<strong>'.$current_User->get_identity_link( array( 'link_text' => 'text' ) ).'</strong>'
 			.' '.get_user_profile_link( ' [', ']', T_('Edit profile') ) );
 	}
 	else
-	{ // User is not logged in:
+	{ // User is not logged in or not activated:
+		if( is_logged_in() && empty( $comment_author ) && empty( $comment_author_email ) )
+		{
+			$comment_author = $current_User->login;
+			$comment_author_email = $current_User->email;
+		}
 		// Note: we use funky field names to defeat the most basic guestbook spam bots
-		$Form->text( 'u', $comment_author, 40, T_('Name'), '', 100, 'bComment' );
+		$Form->text( $dummy_fields[ 'name' ], $comment_author, 40, T_('Name'), '', 100, 'bComment' );
 
-		$Form->text( 'i', $comment_author_email, 40, T_('Email'), '<br />'.T_('Your email address will <strong>not</strong> be revealed on this site.'), 100, 'bComment' );
+		$Form->text( $dummy_fields[ 'email' ], $comment_author_email, 40, T_('Email'), '<br />'.T_('Your email address will <strong>not</strong> be revealed on this site.'), 100, 'bComment' );
 
 		$Item->load_Blog();
 		if( $Item->Blog->get_setting( 'allow_anon_url' ) )
 		{
-			$Form->text( 'o', $comment_author_url, 40, T_('Website'), '<br />'.T_('Your URL will be displayed.'), 100, 'bComment' );
+			$Form->text( $dummy_fields[ 'url' ], $comment_author_url, 40, T_('Website'), '<br />'.T_('Your URL will be displayed.'), 100, 'bComment' );
 		}
 	}
 
@@ -246,39 +250,50 @@ function setCommentVote( id, type, vote )
 
 	echo '<div class="comment_toolbars">';
 	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'DisplayCommentToolbar', array() );
+	$Plugins->trigger_event( 'DisplayCommentToolbar', array( 'Comment' => & $Comment, 'Item' => & $Item ) );
 	echo '</div>';
 
 	// Message field:
 	$note = '';
 	// $note = T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags));
-	$Form->textarea( 'p', $comment_content, $params['textarea_lines'], T_('Comment text'), $note, 38, 'bComment' );
+	$Form->textarea( $dummy_fields[ 'content' ], $comment_content, $params['textarea_lines'], $params['form_comment_text'], $note, 38, 'bComment' );
 
 	// set b2evoCanvas for plugins
-	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "p" );</script>';
+	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';
 
 	// Attach files:
-	if( $Item->can_attach() )
-	{
-		if( !isset( $comment_attachments ) )
+	if( !empty( $comment_attachments ) )
+	{	// display already attached files checkboxes
+		$FileCache = & get_FileCache();
+		$attachments = explode( ',', $comment_attachments );
+		$final_attachments = explode( ',', $checked_attachments );
+		// create attachments checklist
+		$list_options = array();
+		foreach( $attachments as $attachment_ID )
 		{
-			$comment_attachments = '';
+			$attachment_File = $FileCache->get_by_ID( $attachment_ID, false );
+			if( $attachment_File )
+			{
+				// checkbox should be checked only if the corresponding file id is in the final attachments array
+				$checked = in_array( $attachment_ID, $final_attachments );
+				$list_options[] = array( 'preview_attachment'.$attachment_ID, 1, '', $checked, false, $attachment_File->get( 'name' ) );
+			}
 		}
+		if( !empty( $list_options ) )
+		{	// display list
+			$Form->checklist( $list_options, 'comment_attachments', T_( 'Attached files' ) );
+		}
+		// memorize all attachments ids
 		$Form->hidden( 'preview_attachments', $comment_attachments );
-		$Form->input_field( array( 'label' => T_('Attach files'), 'note' => '<br />'.get_upload_restriction(), 'name' => 'uploadfile[]', 'type' => 'file', 'size' => '30' ) );
+	}
+	if( $Item->can_attach() )
+	{	// Display attach file input field
+		$Form->input_field( array( 'label' => T_('Attach files'), 'note' => '<br />'.get_upload_restriction(), 'name' => 'uploadfile[]', 'type' => 'file' ) );
 	}
 
 	$comment_options = array();
 
-	if( substr($comments_use_autobr,0,4) == 'opt-')
-	{
-		$comment_options[] = '<label><input type="checkbox" class="checkbox" name="comment_autobr" tabindex="6"'
-													.( ($comments_use_autobr == 'opt-out') ? ' checked="checked"' : '' )
-													.' value="1" /> '.T_('Auto-BR').'</label>'
-													.' <span class="note">('.T_('Line breaks become &lt;br /&gt;').')</span>';
-	}
-
-	if( ! is_logged_in() )
+	if( ! is_logged_in( false ) )
 	{ // User is not logged in:
 		$comment_options[] = '<label><input type="checkbox" class="checkbox" name="comment_cookies" tabindex="7"'
 													.( $comment_cookies ? ' checked="checked"' : '' ).' value="1" /> '.T_('Remember me').'</label>'
@@ -308,13 +323,24 @@ function setCommentVote( id, type, vote )
 		echo $Form->end_field();
 	}
 
+	// Display renderers
+	$comment_renderer_checkboxes = $Plugins->get_renderer_checkboxes( array( 'default' ), array( 'Blog' => & $Blog, 'setting_name' => 'coll_apply_comment_rendering' ) );
+	if( !empty( $comment_renderer_checkboxes ) )
+	{
+		$Form->begin_fieldset();
+		echo '<div class="label">'.T_('Text Renderers').':</div>';
+		echo '<div class="input">'.$comment_renderer_checkboxes.'</div>';
+		$Form->end_fieldset();
+	}
+
 	$Plugins->trigger_event( 'DisplayCommentFormFieldset', array( 'Form' => & $Form, 'Item' => & $Item ) );
 
 	$Form->begin_fieldset();
 		echo '<div class="input">';
 
-		$Form->button_input( array( 'name' => 'submit_comment_post_'.$Item->ID.'[save]', 'class' => 'submit', 'value' => T_('Send comment'), 'tabindex' => 10 ) );
-		$Form->button_input( array( 'name' => 'submit_comment_post_'.$Item->ID.'[preview]', 'class' => 'preview', 'value' => T_('Preview'), 'tabindex' => 9 ) );
+		$preview_text = ( $Item->can_attach() ) ? T_('Preview/Add file') : T_('Preview');
+		$Form->button_input( array( 'name' => 'submit_comment_post_'.$Item->ID.'[save]', 'class' => 'submit', 'value' => $params['form_submit_text'], 'tabindex' => 10 ) );
+		$Form->button_input( array( 'name' => 'submit_comment_post_'.$Item->ID.'[preview]', 'class' => 'preview', 'value' => $preview_text, 'tabindex' => 9 ) );
 
 		$Plugins->trigger_event( 'DisplayCommentFormButton', array( 'Form' => & $Form, 'Item' => & $Item ) );
 
@@ -328,120 +354,13 @@ function setCommentVote( id, type, vote )
 	$Form->end_form();
 
 	echo $params['after_comment_form'];
+
+	echo_comment_reply_js( $Item );
 }
-
-
 /*
  * $Log$
- * Revision 1.36  2011/10/17 15:10:30  efy-yurybakh
- * If there is an email address in a comment, do not allow posting the comment
- *
- * Revision 1.35  2011/10/04 08:39:30  efy-asimo
- * Comment and message forms save/reload content in case of error
- *
- * Revision 1.34  2011/10/03 17:13:04  efy-yurybakh
- * review fp>yura comments
- *
- * Revision 1.33  2011/10/03 15:58:18  efy-yurybakh
- * Add User::get_identity_link() everywhere
- *
- * Revision 1.32  2011/10/03 07:02:22  efy-yurybakh
- * bubbletips & identity_links cleanup
- *
- * Revision 1.31  2011/09/29 16:42:19  efy-yurybakh
- * colored login
- *
- * Revision 1.30  2011/09/29 10:19:40  efy-yurybakh
- * background color for voting for spam
- *
- * Revision 1.29  2011/09/28 16:15:56  efy-yurybakh
- * "comment was helpful" votes
- *
- * Revision 1.28  2011/09/26 14:53:27  efy-asimo
- * Login problems with multidomain installs - fix
- * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
- *
- * Revision 1.27  2011/09/18 00:58:44  fplanque
- * forms cleanup
- *
- * Revision 1.26  2011/09/17 02:31:58  fplanque
- * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
- *
- * Revision 1.25  2011/09/06 03:25:41  fplanque
- * i18n update
- *
- * Revision 1.24  2011/09/04 22:13:24  fplanque
- * copyright 2011
- *
- * Revision 1.23  2011/08/25 05:40:57  efy-asimo
- * Allow comments for "Members only" - display disabled comment form
- *
- * Revision 1.22  2011/06/29 13:14:01  efy-asimo
- * Use ajax to display comment and contact forms
- *
- * Revision 1.21  2011/03/03 12:47:29  efy-asimo
- * comments attachments
- *
- * Revision 1.20  2011/03/02 09:45:59  efy-asimo
- * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
- *
- * Revision 1.19  2010/06/07 19:05:58  sam2kb
- * Added missing params
- *
- * Revision 1.18  2010/03/24 02:56:28  sam2kb
- * JS comment form validation, checks if text area is empty
- *
- * Revision 1.17  2010/02/08 17:56:12  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.16  2010/01/30 18:55:37  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.15  2010/01/03 13:45:37  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.14  2009/11/21 17:33:05  sam2kb
- * Configurable form title text
- *
- * Revision 1.13  2009/05/20 13:56:57  fplanque
- * Huh? Textarea is styled wide with CSS. On non CSS supporting browsers you don't want it to be larger than the screen might be.
- *
- * Revision 1.12  2009/05/20 13:53:51  fplanque
- * Return to a clean url after posting a comment
- *
- * Revision 1.11  2009/05/19 19:08:35  blueyed
- * Make comment textarea wider (40 cols => 80 cols). This provides a better editing experience - most users do not have Vimperator installed to work around such a small textarea (RTE enabling is another thing) ;)
- *
- * Revision 1.10  2009/03/08 23:57:56  fplanque
- * 2009
- *
- * Revision 1.9  2008/09/28 08:06:09  fplanque
- * Refactoring / extended page level caching
- *
- * Revision 1.8  2008/09/27 08:14:02  fplanque
- * page level caching
- *
- * Revision 1.7  2008/07/07 05:59:26  fplanque
- * minor / doc / rollback of overzealous indetation "fixes"
- *
- * Revision 1.6  2008/06/22 18:19:24  blueyed
- * - "Remember me" checked, if name, url or email has been remembered before
- * - Fix indent
- *
- * Revision 1.5  2008/02/11 23:46:35  fplanque
- * cleanup
- *
- * Revision 1.4  2008/02/05 01:52:37  fplanque
- * enhanced comment form
- *
- * Revision 1.3  2008/01/21 09:35:42  fplanque
- * (c) 2008
- *
- * Revision 1.2  2008/01/19 14:53:06  yabs
- * bugfix : checkboxes remember settings after preview
- *
- * Revision 1.1  2007/12/22 16:41:05  fplanque
- * Modular feedback template.
+ * Revision 1.38  2013/11/06 08:05:36  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

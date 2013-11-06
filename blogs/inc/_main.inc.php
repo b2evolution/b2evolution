@@ -8,7 +8,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -33,12 +33,6 @@
  *
  * @package evocore
  *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois PLANQUE
- * @author blueyed: Daniel HAHLER
- * @author mfollett: Matt FOLLETT
- * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
- *
  * @version $Id$
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
@@ -61,23 +55,24 @@ if( defined( 'EVO_MAIN_INIT' ) )
 define( 'EVO_MAIN_INIT', true );
 
 
-// Initialize the most basic stuff
+// == 1. Initialize the most basic stuff: ==
 require dirname(__FILE__).'/_init_base.inc.php';
 
 
 if( $use_db )
 {
-	// Initialize DB connection
+	// == 2. Initialize DB connection: ==
 	require dirname(__FILE__).'/_init_db.inc.php';
 
 
+	// == 3. Initialize Modules: ==
 	// Let the modules load/register what they need:
 	$Timer->resume('init modules');
 	modules_call_method( 'init' );
 	$Timer->pause( 'init modules' );
 
 
-	// Initialize Plugins
+	// == 4. Initialize Plugins: ==
 	// At this point, the first hook is "SessionLoaded"
 	// The dnsbl_antispam plugin is an example that uses this to check the user's IP against a list of DNS blacklists.
 	load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
@@ -86,115 +81,33 @@ if( $use_db )
 	 */
 	$Plugins = new Plugins();
 
+	// This is the earliest event you can use
+	$Plugins->trigger_event( 'AfterPluginsInit' );
 
-	// Initialize WWW HIT
+	// == 5. Initialize WWW HIT: ==
 	if( ! $is_cli )
 	{
 		require dirname(__FILE__).'/_init_hit.inc.php';
 	}
+
+	$Plugins->trigger_event( 'AfterMainInit' );
 }
 
-// Load hacks file if it exists (DEPRECATED):
-if( $use_hacks && file_exists($conf_path.'hacks.php') )
-{
-	$Timer->resume( 'hacks.php' );
-	include_once $conf_path.'hacks.php';
-	$Timer->pause( 'hacks.php' );
-}
+// == 6. Initialize Additional Variables: ==
 
-
-/*
- * $Log$
- * Revision 1.139  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.138  2010/02/08 17:51:25  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.137  2009/12/07 17:32:51  blueyed
- * fix typos
- *
- * Revision 1.136  2009/12/06 05:20:36  fplanque
- * Violent refactoring for _main.inc.php
- * Sorry for potential side effects.
- * This needed to be done badly -- for clarity!
- *
- * Revision 1.135  2009/12/06 03:24:11  fplanque
- * minor/doc/fixes
- *
- * Revision 1.134  2009/12/04 23:27:50  fplanque
- * cleanup Expires: header handling
- *
- * Revision 1.133  2009/12/02 00:05:52  fplanque
- * no message
- *
- * Revision 1.132  2009/11/30 00:22:04  fplanque
- * clean up debug info
- * show more timers in view of block caching
- *
- * Revision 1.131  2009/11/23 18:41:17  fplanque
- * Make sure we are calling the right page (on the right domain) to make sure that session cookie goes through
- *
- * Revision 1.130  2009/11/20 23:56:39  fplanque
- * minor  + doc
- *
- * Revision 1.129  2009/09/29 03:47:06  fplanque
- * doc
- *
- * Revision 1.128  2009/09/28 23:57:31  blueyed
- * if locale_from_get is used, set redir=no
- *
- * Revision 1.127  2009/09/26 13:50:28  tblue246
- * MFH: Reverting fix for timezone warnings, let users fix their errors themselves.
- *
- * Revision 1.126  2009/09/26 12:00:42  tblue246
- * Minor/coding style
- *
- * Revision 1.125  2009/09/25 21:52:03  tblue246
- * - Suppress PHP warning ("It is not safe to rely on the system's timezone settings. [...]").
- * - Doc about odd PHP behaviour regarding error reporting settings.
- *
- * Revision 1.124  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.123  2009/09/20 16:55:14  blueyed
- * Performance boost: add Timer_noop class and use it when not in debug mode.
- *
- * Revision 1.122  2009/09/20 16:21:17  blueyed
- * If locale gets set from REQUEST (locale_from_get), do not override it from user settings.
- *
- * Revision 1.121  2009/09/16 00:48:50  fplanque
- * getting a bit more serious with modules
- *
- * Revision 1.120  2009/09/16 00:25:41  fplanque
- * rollback of stuff that doesn't make any sense at all!!!
- *
- * Revision 1.118  2009/09/15 19:31:54  fplanque
- * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
- * PHP 4 compatible. Even better on PHP 5.
- * I may have broken a few things. Sorry. This is pretty hard to do in one swoop without any glitch.
- * Thanks for fixing or reporting if you spot issues.
- *
- * Revision 1.117  2009/09/14 12:26:53  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.116  2009/09/08 19:17:59  fplanque
- * reverted change that broke user registration
- *
- * Revision 1.115  2009/08/30 18:52:11  tblue246
- * Removed checking of unused variable
- *
- * Revision 1.114  2009/08/23 00:25:27  sam2kb
- * Never use locale from HTTP_ACCEPT nor locale from REQUEST when we set DB connection charset
- *
- * Revision 1.113  2009/08/12 12:01:49  sam2kb
- * doc
- *
- * Revision 1.112  2009/08/06 15:11:15  fplanque
- * doc
- *
- * Revision 1.111  2009/07/28 23:51:08  sam2kb
- * Do locale selection and set DB connection charset as early as possible
- * in order to get results in the right encoding
- */
+// fp> TODO: the following was in _vars.inc -- temporaily here, b2evolution stuff needs to move out of evoCORE.
+// dummy var for backward compatibility with versions < 2.4.1 -- prevents "Undefined variable"
+$credit_links = array();
+$francois_links = array( 'fr' => array( 'http://fplanque.net/', array( array( 78, 'Fran&ccedil;ois'),  array( 100, 'Francois') ) ),
+													'' => array( 'http://fplanque.com/', array( array( 78, 'Fran&ccedil;ois'),  array( 100, 'Francois') ) )
+												);
+$fplanque_links = array( 'fr' => array( 'http://fplanque.net/', array( array( 78, 'Fran&ccedil;ois Planque'),  array( 100, 'Francois Planque') ) ),
+													'' => array( 'http://fplanque.com/', array( array( 78, 'Fran&ccedil;ois Planque'),  array( 100, 'Francois Planque') ) )
+												);
+$skin_links = array( '' => array( 'http://skinfaktory.com/', array( array( 15, 'b2evo skin'), array( 20, 'b2evo skins'), array( 35, 'b2evolution skin'), array( 40, 'b2evolution skins'), array( 55, 'Blog skin'), array( 60, 'Blog skins'), array( 75, 'Blog theme'),array( 80, 'Blog themes'), array( 95, 'Blog template'), array( 100, 'Blog templates') ) ),
+												);
+$skinfaktory_links = array( '' => array( array( 73, 'http://evofactory.com/', array( array( 61, 'Evo Factory'), array( 68, 'EvoFactory'), array( 73, 'Evofactory') ) ),
+														             array( 100, 'http://skinfaktory.com/', array( array( 92, 'Skin Faktory'), array( 97, 'SkinFaktory'), array( 99, 'Skin Factory'), array( 100, 'SkinFactory') ) ),
+																				)
+												);
 ?>

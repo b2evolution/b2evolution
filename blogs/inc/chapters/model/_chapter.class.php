@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -50,6 +50,8 @@ class Chapter extends GenericCategory
 	var $urlname;
 	var $description;
 	var $order;
+	var $meta;
+	var $lock;
 
 	/**
 	 * Lazy filled
@@ -68,6 +70,15 @@ class Chapter extends GenericCategory
 		// Call parent constructor:
 		parent::GenericCategory( 'T_categories', 'cat_', 'cat_ID', $db_row );
 
+		/**
+		 * Delete restrictions
+		 */
+		$this->delete_restrictions = array(
+				array( 'table'=>'T_categories', 'fk'=>'cat_parent_ID', 'msg'=>T_('%d sub categories') ),
+				array( 'table'=>'T_items__item', 'fk'=>'post_main_cat_ID', 'msg'=>T_('%d posts within category through main cat') ),
+				array( 'table'=>'T_postcats', 'fk'=>'postcat_cat_ID', 'msg'=>T_('%d posts within category through extra cat') ),
+			);
+
 		if( is_null($db_row) )
 		{	// We are creating an object here:
 			$this->set( 'blog_ID', $subset_ID );
@@ -78,6 +89,8 @@ class Chapter extends GenericCategory
 			$this->urlname = $db_row->cat_urlname;
 			$this->description = $db_row->cat_description;
 			$this->order = $db_row->cat_order;
+			$this->meta = $db_row->cat_meta;
+			$this->lock = $db_row->cat_lock;
 		}
 	}
 
@@ -107,6 +120,22 @@ class Chapter extends GenericCategory
 			$this->set_from_Request( 'order' );
 		}
 
+		// Meta category
+		$cat_meta = param( 'cat_meta', 'integer', 0 );
+		if( $this->has_posts() && $cat_meta )
+		{	// Display error message if we want make the meta category from category with posts
+			global $Messages;
+			$Messages->add( T_('This category cannot be set as meta category. You must remove the posts it contains first.') );
+		}
+		else
+		{	// Save the category as 'Meta' only if it has no posts
+			$this->set_from_Request( 'meta' );
+		}
+
+		// Locked category
+		param( 'cat_lock', 'integer', 0 );
+		$this->set_from_Request( 'lock' );
+
 		return ! param_errors_detected();
 	}
 
@@ -125,7 +154,7 @@ class Chapter extends GenericCategory
 			else
 			{
 				$ChapterCache = & get_ChapterCache();
-				$this->parent_Chapter = & $ChapterCache->get_by_ID( $this->parent_ID );
+				$this->parent_Chapter = & $ChapterCache->get_by_ID( $this->parent_ID, false );
 			}
 		}
 
@@ -226,7 +255,6 @@ class Chapter extends GenericCategory
 		return $r;
 	}
 
-
 	/**
 	 * Get the Blog object for the Chapter.
 	 *
@@ -304,76 +332,41 @@ class Chapter extends GenericCategory
 
 		return $r;
 	}
+
+
+	/**
+	 * Check if this category has at least one post
+	 *
+	 * @return boolean 
+	 */
+	function has_posts()
+	{
+		global $DB;
+
+		if( $this->ID == 0 )
+		{	// New category has no posts
+			return false;
+		}
+
+		if( !isset( $this->count_posts ) )
+		{
+			$SQL = new SQL();
+			$SQL->SELECT( 'COUNT( postcat_post_ID )' );
+			$SQL->FROM( 'T_postcats' );
+			$SQL->WHERE( 'postcat_cat_ID = '.$DB->quote( $this->ID ) );
+			$count_posts = $DB->get_var( $SQL->get() );
+			$this->count_posts = $count_posts;
+		}
+
+		return ( $this->count_posts > 0 );
+	}
 }
 
 
 /*
  * $Log$
- * Revision 1.17  2011/09/04 22:13:13  fplanque
- * copyright 2011
+ * Revision 1.19  2013/11/06 08:03:57  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.16  2010/02/08 17:52:07  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.15  2009/10/04 20:36:04  blueyed
- * Add missing load_funcs
- *
- * Revision 1.14  2009/09/26 12:00:42  tblue246
- * Minor/coding style
- *
- * Revision 1.13  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.12  2009/09/14 12:26:25  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.11  2009/03/08 23:57:41  fplanque
- * 2009
- *
- * Revision 1.10  2009/01/28 21:23:22  fplanque
- * Manual ordering of categories
- *
- * Revision 1.9  2008/12/28 23:35:51  fplanque
- * Autogeneration of category/chapter slugs(url names)
- *
- * Revision 1.8  2008/01/21 09:35:26  fplanque
- * (c) 2008
- *
- * Revision 1.7  2008/01/07 02:53:27  fplanque
- * cleaner tag urls
- *
- * Revision 1.6  2007/11/25 14:28:17  fplanque
- * additional SEO settings
- *
- * Revision 1.5  2007/10/06 21:17:25  fplanque
- * cleanup
- *
- * Revision 1.4  2007/10/01 13:41:06  waltercruz
- * Category prefix, trying to make the code more b2evo style
- *
- * Revision 1.3  2007/09/29 01:50:49  fplanque
- * temporary rollback; waiting for new version
- *
- * Revision 1.1  2007/06/25 10:59:25  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.10  2007/05/09 00:54:45  fplanque
- * Attempt to normalize all URLs before adding params
- *
- * Revision 1.9  2007/04/26 00:11:06  fplanque
- * (c) 2007
- *
- * Revision 1.8  2007/03/02 00:44:43  fplanque
- * various small fixes
- *
- * Revision 1.7  2007/01/15 00:38:06  fplanque
- * pepped up "new blog" creation a little. To be continued.
- *
- * Revision 1.6  2006/12/11 00:32:26  fplanque
- * allow_moving_chapters stting moved to UI
- * chapters are now called categories in the UI
- *
- * Revision 1.5  2006/11/24 18:27:23  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

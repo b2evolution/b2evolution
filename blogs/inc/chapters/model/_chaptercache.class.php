@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -49,14 +49,16 @@ class ChapterCache extends GenericCategoryCache
 
 		if( $Settings->get('chapter_ordering') == 'manual' )
 		{	// Manual order
-			$order_by = 'cat_order';
+			$select_temp_order = 'IF( cat_order IS NULL, 999999999, cat_order ) AS temp_order';
+			$order_by = 'temp_order';
 		}
 		else
 		{	// Alphabetic order
+			$select_temp_order = '';
 			$order_by = 'cat_name';
 		}
 
-		parent::GenericCategoryCache( 'Chapter', false, 'T_categories', 'cat_', 'cat_ID', 'cat_name', 'blog_ID', $order_by );
+		parent::GenericCategoryCache( 'Chapter', false, 'T_categories', 'cat_', 'cat_ID', 'cat_name', 'blog_ID', $order_by, NULL, '', $select_temp_order );
 	}
 
 
@@ -189,13 +191,40 @@ class ChapterCache extends GenericCategoryCache
 	}
 
 
+	/**
+	 * Load a list of chapter referenced by their urlname into the cache
+	 *
+	 * @param array of urlnames of Chapters to load
+	 */
+	function load_urlname_array( $req_array )
+	{
+		global $DB, $Debuglog;
+
+		$req_list = $DB->quote( $req_array );
+		$Debuglog->add( "Loading <strong>$this->objtype($req_list)</strong> into cache", 'dataobjects' );
+		$sql = "SELECT * FROM $this->dbtablename WHERE cat_urlname IN ( $req_list )";
+		$dbIDname = $this->dbIDname;
+		$objtype = $this->objtype;
+		foreach( $DB->get_results( $sql ) as $row )
+		{
+			$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
+
+			// put into index:
+			$this->urlname_index[$row->cat_urlname] = & $this->cache[ $row->$dbIDname ];
+
+			$Debuglog->add( "Cached <strong>$this->objtype($row->cat_urlname)</strong>" );
+		}
+	}
+
+
 
 	/**
 	 * Load a keyed subset of the cache
 	 *
  	 * @param integer|NULL NULL for all subsets
+ 	 * @param string Force 'order by' setting ('manual' = 'ORDER BY cat_order')
 	 */
-	function load_subset( $subset_ID )
+	function load_subset( $subset_ID, $force_order_by = '' )
 	{
 		global $DB, $Debuglog, $Settings;
 
@@ -208,17 +237,20 @@ class ChapterCache extends GenericCategoryCache
 		$this->clear( true );
 
 		$Debuglog->add( 'ChapterCache - Loading <strong>chapters('.$subset_ID.')</strong> into cache', 'dataobjects' );
-		$sql = 'SELECT *
-							FROM T_categories
-						 WHERE cat_blog_ID = '.$subset_ID;
-		if( $Settings->get('chapter_ordering') == 'manual' )
+		if( $Settings->get('chapter_ordering') == 'manual' || $force_order_by == 'manual' )
 		{	// Manual order
-			$sql .= ' ORDER BY cat_order';
+			$select_temp_order = ', IF( cat_order IS NULL, 999999999, cat_order ) AS temp_order';
+			$sql_order = ' ORDER BY temp_order';
 		}
 		else
 		{	// Alphabetic order
-			$sql .= ' ORDER BY cat_name';
+			$select_temp_order = '';
+			$sql_order = ' ORDER BY cat_name';
 		}
+		$sql = 'SELECT *'.$select_temp_order.'
+							FROM T_categories
+						 WHERE cat_blog_ID = '.$subset_ID
+						.$sql_order;
 
 		foreach( $DB->get_results( $sql, OBJECT, 'Loading chapters('.$subset_ID.') into cache' ) as $row )
 		{
@@ -318,52 +350,8 @@ class ChapterCache extends GenericCategoryCache
 
 /*
  * $Log$
- * Revision 1.12  2011/09/04 22:13:13  fplanque
- * copyright 2011
+ * Revision 1.14  2013/11/06 08:03:57  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.11  2010/07/12 09:09:30  efy-asimo
- * Fix notice, when creating new category
- *
- * Revision 1.10  2010/02/08 17:52:07  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.9  2010/01/30 18:55:20  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.8  2009/09/14 12:29:35  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.7  2009/03/08 23:57:41  fplanque
- * 2009
- *
- * Revision 1.6  2009/03/03 20:34:52  blueyed
- * doc
- *
- * Revision 1.5  2009/01/28 21:23:22  fplanque
- * Manual ordering of categories
- *
- * Revision 1.4  2008/12/28 19:00:14  fplanque
- * Fixed multiple category parent/child recursion issues. It should no longer be possible to "lose" categories by creating loops.
- *
- * Revision 1.3  2008/09/27 07:54:33  fplanque
- * minor
- *
- * Revision 1.2  2008/01/21 09:35:26  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 10:59:26  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.10  2007/04/26 00:11:06  fplanque
- * (c) 2007
- *
- * Revision 1.9  2006/12/10 01:52:27  fplanque
- * old cats are now officially dead :>
- *
- * Revision 1.8  2006/11/24 18:27:23  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.7  2006/11/22 21:53:23  blueyed
- * doc
  */
 ?>

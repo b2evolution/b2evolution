@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -53,15 +53,17 @@ class Country extends DataObject
 	function Country( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_country', 'ctry_', 'ctry_ID' );
+		parent::DataObject( 'T_regional__country', 'ctry_', 'ctry_ID' );
 
 		$this->delete_restrictions = array(
 				array( 'table'=>'T_users', 'fk'=>'user_ctry_ID', 'msg'=>T_('%d related users') ),
+				array( 'table'=>'T_regional__region', 'fk'=>'rgn_ctry_ID', 'msg'=>T_('%d related regions') ),
+				array( 'table'=>'T_regional__city', 'fk'=>'city_ctry_ID', 'msg'=>T_('%d related cities') ),
 			);
 
-  		$this->delete_cascades = array();
+		$this->delete_cascades = array();
 
- 		if( $db_row )
+		if( $db_row )
 		{
 			$this->ID            = $db_row->ctry_ID;
 			$this->code          = $db_row->ctry_code;
@@ -90,7 +92,7 @@ class Country extends DataObject
 
 		// Currency Id
 		param( 'ctry_curr_ID', 'integer' );
-		param_check_number( 'ctry_curr_ID', 'Please select a currency' );
+		param_check_number( 'ctry_curr_ID', T_('Please select a currency') );
 		$this->set_from_Request( 'curr_ID', 'ctry_curr_ID', true );
 
 		return ! param_errors_detected();
@@ -147,34 +149,8 @@ class Country extends DataObject
 
 /*
  * $Log$
- * Revision 1.18  2011/09/23 11:49:48  efy-vitalij
- * fix country enable/prefer bug, add preferred property to Country class
- *
- * Revision 1.17  2011/09/06 00:54:38  fplanque
- * i18n update
- *
- * Revision 1.16  2009/09/29 03:14:22  fplanque
- * doc
- *
- * Revision 1.15  2009/09/28 20:55:00  efy-khurram
- * Implemented support for enabling disabling countries.
- *
- * Revision 1.14  2009/09/20 20:07:18  blueyed
- *  - DataObject::dbexists quotes always
- *  - phpdoc fixes
- *  - style fixes
- *
- * Revision 1.13  2009/09/14 13:31:35  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.12  2009/09/12 12:53:44  tblue246
- * Country class: Call load_class() with $classname parameter
- *
- * Revision 1.11  2009/09/12 10:40:40  tblue246
- * Fixed wrong pathname
- *
- * Revision 1.9  2009/09/10 18:24:07  fplanque
- * doc
+ * Revision 1.20  2013/11/06 08:04:36  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

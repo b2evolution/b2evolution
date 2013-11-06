@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -61,20 +61,143 @@ class user_tools_Widget extends ComponentWidget
 				'size' => 40,
 				'defaultvalue' => T_('User tools'),
 			),
-			
-			'user_login_link_show' => array(
-				'label' => T_( 'Login link'),
+			// Write new post - disp=edit
+			'user_postnew_link_show' => array(
+				'label' => T_( 'Write a new post link'),
 				'note' => T_( 'Show link' ),
 				'type' => 'checkbox',
 				'defaultvalue' => 1,
 			),
-			'user_login_link' => array(
+			'user_postnew_link' => array(
 				'size' => 30,
 				'note' => T_( 'Link text to display' ),
 				'type' => 'text',
-				'defaultvalue' => /* TRANS: with tailing space = action to log in */ T_( 'Login ' ),
+				'defaultvalue' => T_( 'Write a new post...' ),
 			),
-			
+			// Messaging - disp=threads
+			'user_messaging_link_show' => array(
+				'label' => T_( 'Messaging area link'),
+				'note' => T_( 'Show link' ),
+				'type' => 'checkbox',
+				'defaultvalue' => 1,
+			),
+			'show_badge' => array(
+				'label' => T_( 'Show Badge' ),
+				'note' => T_( 'Show a badge with the count of unread messages.' ),
+				'type' => 'checkbox',
+				'defaultvalue' => true,
+			),
+			'user_messaging_link' => array(
+				'size' => 30,
+				'note' => T_( 'Link text to display' ),
+				'type' => 'text',
+				'defaultvalue' => T_( 'My messages' ),
+			),
+			// Contacts - disp=contacts
+			'user_contacts_link_show' => array(
+				'label' => T_( 'Contacts link'),
+				'note' => T_( 'Show link' ),
+				'type' => 'checkbox',
+				'defaultvalue' => 1,
+			),
+			'user_contacts_link' => array(
+				'size' => 30,
+				'note' => T_( 'Link text to display' ),
+				'type' => 'text',
+				'defaultvalue' => T_( 'My contacts' ),
+			),
+			// See profile - disp=user
+			'user_view_link_show' => array(
+				'label' => T_( 'See profile link'),
+				'note' => T_( 'Show link' ),
+				'type' => 'checkbox',
+				'defaultvalue' => 1,
+			),
+			'user_view_link' => array(
+				'size' => 30,
+				'note' => T_( 'Link text to display' ),
+				'type' => 'text',
+				'defaultvalue' => T_( 'My profile' ),
+			),
+			// Edit profile - disp=profile
+			'user_profile_link_show' => array(
+				'label' => T_( 'Edit profile link'),
+				'note' => T_( 'Show link' ),
+				'type' => 'checkbox',
+				'defaultvalue' => 1,
+			),
+			'user_profile_link' => array(
+				'size' => 30,
+				'note' => T_( 'Link text to display' ),
+				'type' => 'text',
+				'defaultvalue' => T_( 'Edit my profile' ),
+			),
+			// Edit picture - disp=avatar
+			'user_picture_link_show' => array(
+				'label' => T_( 'Edit profile picture link'),
+				'note' => T_( 'Show link' ),
+				'type' => 'checkbox',
+				'defaultvalue' => 1,
+			),
+			'user_picture_link' => array(
+				'size' => 30,
+				'note' => T_( 'Link text to display' ),
+				'type' => 'text',
+				'defaultvalue' => T_( 'Change my picture' ),
+			),
+			// Edit password - disp=pwdchange
+			'user_password_link_show' => array(
+				'label' => T_( 'Edit password link'),
+				'note' => T_( 'Show link' ),
+				'type' => 'checkbox',
+				'defaultvalue' => 0,
+			),
+			'user_password_link' => array(
+				'size' => 30,
+				'note' => T_( 'Link text to display' ),
+				'type' => 'text',
+				'defaultvalue' => T_( 'Change my password' ),
+			),
+			// Edit preferences - disp=userprefs
+			'user_preferences_link_show' => array(
+				'label' => T_( 'Edit preferences link'),
+				'note' => T_( 'Show link' ),
+				'type' => 'checkbox',
+				'defaultvalue' => 0,
+			),
+			'user_preferences_link' => array(
+				'size' => 30,
+				'note' => T_( 'Link text to display' ),
+				'type' => 'text',
+				'defaultvalue' => T_( 'Change my preferences' ),
+			),
+			// Edit notifications - disp=subs
+			'user_subs_link_show' => array(
+				'label' => T_( 'Edit notifications link'),
+				'note' => T_( 'Show link' ),
+				'type' => 'checkbox',
+				'defaultvalue' => 0,
+			),
+			'user_subs_link' => array(
+				'size' => 30,
+				'note' => T_( 'Link text to display' ),
+				'type' => 'text',
+				'defaultvalue' => T_( 'Notifications &amp; Subscriptions' ),
+			),
+			// Admin
+			'user_admin_link_show' => array(
+				'label' => T_( 'Admin link'),
+				'note' => T_( 'Show link' ),
+				'type' => 'checkbox',
+				'defaultvalue' => 1,
+			),
+			'user_admin_link' => array(
+				'size' => 30,
+				'note' => T_( 'Link text to display' ),
+				'type' => 'text',
+				'defaultvalue' => T_( 'Admin area' ),
+			),
+			// Logout
 			'user_logout_link_show' => array(
 				'label' => T_( 'Logout link'),
 				'note' => T_( 'Show link' ),
@@ -86,71 +209,6 @@ class user_tools_Widget extends ComponentWidget
 				'note' => T_( 'Link text to display' ),
 				'type' => 'text',
 				'defaultvalue' => T_( 'Logout' ),
-			),
-			
-			'user_profile_link_show' => array(
-				'label' => T_( 'Profile link'),
-				'note' => T_( 'Show link' ),
-				'type' => 'checkbox',
-				'defaultvalue' => 1,
-			),
-			'user_profile_link' => array(
-				'size' => 30,
-				'note' => T_( 'Link text to display' ),
-				'type' => 'text',
-				'defaultvalue' => T_( 'Profile' ),
-			),
-			
-			'user_subs_link_show' => array(
-				'label' => T_( 'Subscriptions link'),
-				'note' => T_( 'Show link' ),
-				'type' => 'checkbox',
-				'defaultvalue' => 1,
-			),
-			'user_subs_link' => array(
-				'size' => 30,
-				'note' => T_( 'Link text to display' ),
-				'type' => 'text',
-				'defaultvalue' => T_( 'Subscriptions' ),
-			),
-			
-			'user_admin_link_show' => array(
-				'label' => T_( 'Admin link'),
-				'note' => T_( 'Show link' ),
-				'type' => 'checkbox',
-				'defaultvalue' => 1,
-			),
-			'user_admin_link' => array(
-				'size' => 30,
-				'note' => T_( 'Link text to display' ),
-				'type' => 'text',
-				'defaultvalue' => T_( 'Admin' ),
-			),
-			
-			'user_register_link_show' => array(
-				'label' => T_( 'Register link'),
-				'note' => T_( 'Show link' ),
-				'type' => 'checkbox',
-				'defaultvalue' => 1,
-			),
-			'user_register_link' => array(
-				'size' => 30,
-				'note' => T_( 'Link text to display' ),
-				'type' => 'text',
-				'defaultvalue' => T_( 'Register' ),
-			),
-
-			'user_postnew_link_show' => array(
-				'label' => T_( 'Write a new post link'),
-				'note' => T_( 'Show link' ),
-				'type' => 'checkbox',
-				'defaultvalue' => 1,
-			),
-			'user_postnew_link' => array(
-				'size' => 30,
-				'note' => T_( 'Link text to display' ),
-				'type' => 'text',
-				'defaultvalue' => T_( 'Write a new post' ),
 			),
 		), parent::get_param_definitions( $params )	);
 
@@ -191,44 +249,80 @@ class user_tools_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		$this->init_display( $params );
+		if( !is_logged_in() )
+		{	// Only logged in users can see this tools panel
+			return false;
+		}
+
+		$this->init_display( $params ); // just in case it hasn't been done before
+
+		$this->disp_params['item_start'] .= '<strong>';
+		$this->disp_params['item_end'] .= '</strong>';
+
+		$tools_links = '';
+		if( $this->get_param('user_postnew_link_show') )
+		{	// Write new post - disp=edit
+			$tools_links .= get_item_new_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_postnew_link' ] );
+		}
+		if( $this->get_param('user_messaging_link_show') )
+		{	// Messaging - disp=threads
+			$tools_links .= get_user_messaging_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_messaging_link' ], $this->disp_params[ 'user_messaging_link' ], $this->disp_params[ 'show_badge' ] );
+		}
+		if( $this->get_param('user_contacts_link_show') )
+		{	// Contacts - disp=contacts
+			$tools_links .= get_user_contacts_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_contacts_link' ], $this->disp_params[ 'user_contacts_link' ] );
+		}
+		if( $this->get_param('user_view_link_show') )
+		{	// See profile - disp=user
+			$tools_links .= get_user_tab_link( 'user', $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_view_link' ], $this->disp_params[ 'user_view_link' ] );
+		}
+		if( $this->get_param('user_profile_link_show') )
+		{	// Edit profile - disp=profile
+			$tools_links .= get_user_profile_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_profile_link' ], $this->disp_params[ 'user_profile_link' ] );
+		}
+		if( $this->get_param('user_picture_link_show') )
+		{	// Edit picture - disp=avatar
+			$tools_links .= get_user_tab_link( 'avatar', $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_picture_link' ], $this->disp_params[ 'user_picture_link' ] );
+		}
+		if( $this->get_param('user_password_link_show') )
+		{	// Edit password - disp=pwdchange
+			$tools_links .= get_user_tab_link( 'pwdchange', $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_password_link' ], $this->disp_params[ 'user_password_link' ] );
+		}
+		if( $this->get_param('user_preferences_link_show') )
+		{	// Edit preferences - disp=userprefs
+			$tools_links .= get_user_tab_link( 'userprefs', $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_preferences_link' ], $this->disp_params[ 'user_preferences_link' ] );
+		}
+		if( $this->get_param('user_subs_link_show') )
+		{	// Edit notifications - disp=subs
+			$tools_links .= get_user_subs_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_subs_link' ], $this->disp_params[ 'user_subs_link' ] );
+		}
+		if( $this->get_param('user_admin_link_show') )
+		{	// Admin
+			$tools_links .= get_user_admin_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_admin_link' ] );
+		}
+		if( $this->get_param('user_logout_link_show') )
+		{	// Logout
+			$tools_links .= get_user_logout_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_logout_link' ] );
+		}
+
+		if( empty( $tools_links ) )
+		{	// No available links to display
+			return false;
+		}
 
 		// User tools:
 		echo $this->disp_params['block_start'];
 
-		echo $this->disp_params['block_title_start'];
-		echo $this->disp_params['title'];
-		echo $this->disp_params['block_title_end'];
+		if( !empty( $this->disp_params['title'] ) )
+		{	// Display title
+			echo $this->disp_params['block_title_start'];
+			echo $this->disp_params['title'];
+			echo $this->disp_params['block_title_end'];
+		}
 
 		echo $this->disp_params['list_start'];
-		if ( $this->get_param('user_login_link_show') ) 
-		{
-			user_login_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_login_link' ] );
-		}
-		if ( $this->get_param('user_register_link_show') ) 
-		{
-			user_register_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_register_link' ], '#', false, 'user tools widget' );
-		}
-		if ( $this->get_param('user_admin_link_show') ) 
-		{
-			user_admin_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_admin_link' ] );
-		}
-		if ( $this->get_param('user_profile_link_show') ) 
-		{
-			user_profile_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_profile_link' ] );
-		}
-		if ( $this->get_param('user_subs_link_show') ) 
-		{
-			user_subs_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_subs_link' ] );
-		}
-		if ( $this->get_param('user_postnew_link_show') ) 
-		{
-			item_new_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_postnew_link' ] );
-		}
-		if ( $this->get_param('user_logout_link_show') ) 
-		{
-			user_logout_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_logout_link' ] );
-		}
+
+		echo $tools_links;
 
 		if( isset($this->BlockCache) )
 		{	// Do NOT cache because some of these links are using a redirect_to param, which makes it page dependent.
@@ -266,63 +360,8 @@ class user_tools_Widget extends ComponentWidget
 
 /*
  * $Log$
- * Revision 1.17  2011/10/13 15:49:43  efy-yurybakh
- * In skin posting (changes)
- *
- * Revision 1.16  2011/09/14 21:04:06  fplanque
- * cleanup
- *
- * Revision 1.15  2011/09/13 22:18:23  lxndral
- * User tools plugin update :: checkboxes for links
- *
- * Revision 1.14  2011/09/08 23:29:27  fplanque
- * More blockcache/widget fixes around login/register links.
- *
- * Revision 1.13  2011/09/07 18:25:11  fplanque
- * widget & blockcache fixes
- *
- * Revision 1.12  2011/09/04 22:13:21  fplanque
- * copyright 2011
- *
- * Revision 1.11  2010/11/06 04:22:18  fplanque
- * minor
- *
- * Revision 1.10  2010/02/08 17:54:48  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.9  2009/09/14 13:54:13  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.8  2009/09/12 11:03:13  efy-arrin
- * Included the ClassName in the loadclass() with proper UpperCase
- *
- * Revision 1.7  2009/09/10 13:44:57  tblue246
- * Translation fixes/update
- *
- * Revision 1.6  2009/03/13 02:32:07  fplanque
- * Cleaned up widgets.
- * Removed stupid widget_name param.
- *
- * Revision 1.5  2009/03/08 23:57:46  fplanque
- * 2009
- *
- * Revision 1.4  2009/02/23 05:06:24  sam2kb
- * Fixed hard-coded widget title
- *
- * Revision 1.3  2008/01/21 09:35:37  fplanque
- * (c) 2008
- *
- * Revision 1.2  2007/12/25 16:39:35  yabs
- * adding params
- *
- * Revision 1.1  2007/06/25 11:02:27  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.2  2007/06/20 21:42:14  fplanque
- * implemented working widget/plugin params
- *
- * Revision 1.1  2007/06/18 21:25:48  fplanque
- * one class per core widget
+ * Revision 1.19  2013/11/06 08:05:10  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

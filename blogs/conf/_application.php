@@ -15,13 +15,13 @@ $app_shortname = 'b2evo';
  * Note: This has to be compatible with {@link http://us2.php.net/en/version-compare}.
  * @global string
  */
-$app_version = '4.2.0-beta';
+$app_version = '5.0.1-alpha-5';
 
 /**
  * Release date (ISO)
  * @global string
  */
-$app_date = '2011-10-18';
+$app_date = '2013-02-21';
 
 /**
  * This is used to check if the database is up to date.
@@ -31,19 +31,31 @@ $app_date = '2011-10-18';
  *
  * {@internal Before changing this in CVS, it should be discussed! }}
  */
-$new_db_version = 10400;
+
+$new_db_version = 11100;
+
+/**
+ * Minimum PHP version required for b2evolution to function properly. It will contain each module own minimum PHP version as well.
+ * @global array
+ */
+$required_php_version = array( 'application' => '5.0' );
+
+/**
+ * Minimum MYSQL version required for b2evolution to function properly. It will contain each module own minimum MYSQL version as well.
+ * @global array
+ */
+$required_mysql_version = array( 'application' => '4.1' );
 
 /**
  * Is displayed on the login screen:
  */
-$app_footer_text = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolution's website")
-		.'"><strong>b2evolution '.$app_version.'</strong></a>
+$app_footer_text = '<a href="http://b2evolution.net/" title="visit b2evolution\'s website"><strong>b2evolution '.$app_version.'</strong></a>
 		&ndash;
-		<a href="http://b2evolution.net/about/license.html" class="nobr">'.T_('GPL License').'</a>';
+		<a href="http://b2evolution.net/about/license.html" class="nobr">GPL License</a>';
 
 $copyright_text ='<span class="nobr">&copy;2001-2002 by Michel V &amp; others</span>
 		&ndash;
-		<span class="nobr">&copy;2003-2011 by <a href="http://fplanque.net/">Fran&ccedil;ois</a> <a href="http://fplanque.com/">Planque</a> &amp; <a href="http://b2evolution.net/dev/authors.html">others</a>.</span>';
+		<span class="nobr">&copy;2003-2013 by <a href="http://fplanque.net/">Fran&ccedil;ois</a> <a href="http://fplanque.com/">Planque</a> &amp; <a href="http://b2evolution.net/dev/authors.html">others</a>.</span>';
 
 /**
  * Modules to load
@@ -60,7 +72,7 @@ $modules = array(
 		'collections',  // TODO: installer won't work without this module
 		'files',
 		'sessions',
-    'messaging',		// Experimental
+		'messaging',	// Experimental
 		'maintenance',	// Experimental
 	);
 ?>

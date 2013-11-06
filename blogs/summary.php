@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage noskin
@@ -35,6 +35,13 @@ if( ! $PageCache->check() )
 	// --------------------- PAGE LEVEL CACHING SUPPORT ---------------------
 
 
+// Add CSS:
+require_css( 'basic_styles.css', 'rsc_url' ); // the REAL basic styles
+require_css( 'basic.css', 'rsc_url' ); // Basic styles
+require_css( 'blog_base.css', 'rsc_url' ); // Default styles for the blog navigation
+require_css( 'item_base.css', 'rsc_url' ); // Default styles for the post CONTENT
+require_css( 'fp02.css', 'rsc_url' );
+
 add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
 
 headers_content_mightcache( 'text/html' );		// In most situations, you do NOT want to cache dynamic content!
@@ -45,7 +52,6 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 <!-- InstanceBeginEditable name="doctitle" -->
 <title><?php echo T_('Summary Demo'); ?></title>
 <!-- InstanceEndEditable -->
-<link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
 <!-- InstanceBeginEditable name="head" -->
 <?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 <!-- InstanceEndEditable -->
@@ -57,7 +63,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 	require $skins_path.'_toolbar.inc.php';
 	// ------------------------------- END OF TOOLBAR --------------------------------
 	echo "\n";
-	if( is_logged_in() )
+	if( show_toolbar() )
 	{
 		echo '<div id="skin_wrapper" class="skin_wrapper_loggedin">';
 	}
@@ -111,7 +117,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 
 	$BlogCache = & get_BlogCache();
 
-	$blog_array = $BlogCache->load_public( 'ID' );
+	$blog_array = $BlogCache->load_public();
 
 	foreach( $blog_array as $blog )
 	{	// Loop through all public blogs:

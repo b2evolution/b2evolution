@@ -8,7 +8,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -24,7 +24,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $Session, $modules;
 
 // get requested module name
-$module_name = param( 'module', 'string', true );
+$module_name = param( 'mname', 'string', true );
 
 foreach( $modules as $module )
 {
@@ -32,7 +32,7 @@ foreach( $modules as $module )
 	{ // the requested module was founded
 		$Module = & $GLOBALS[$module.'_Module'];
 		if( method_exists( $Module, 'display_form' ) )
-		{	// Module has handle_htsrv_action function, we can call it
+		{	// Module has display_form function, we can call it
 			$Module->display_form();
 			break;
 		}
@@ -42,8 +42,8 @@ foreach( $modules as $module )
 
 /*
  * $Log$
- * Revision 1.1  2011/10/18 09:14:34  efy-asimo
- * Ability to display different module forms and handle module actions  inside the module
+ * Revision 1.3  2013/11/06 08:05:36  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

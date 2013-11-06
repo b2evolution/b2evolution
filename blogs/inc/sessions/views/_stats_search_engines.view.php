@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -72,20 +72,8 @@ if( count( $res_stats ) )
 
 /*
  * $Log$
- * Revision 1.5  2011/09/04 22:13:18  fplanque
- * copyright 2011
- *
- * Revision 1.4  2010/02/08 17:53:55  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.3  2009/04/11 23:45:47  tblue246
- * Fix translation problems
- *
- * Revision 1.2  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.1  2008/05/26 19:30:38  fplanque
- * enhanced analytics
+ * Revision 1.6  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

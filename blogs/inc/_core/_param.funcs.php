@@ -13,7 +13,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -164,6 +164,19 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 				if( isset($Debuglog) ) $Debuglog->add( 'param(-): <strong>'.$var.'</strong> as RAW Unsecure HTML', 'params' );
 				break;
 
+			case 'htmlspecialchars':
+				if( ! is_scalar($GLOBALS[$var]) )
+				{ // This happens if someone uses "foo[]=x" where "foo" is expected as string
+					debug_die( 'param(-): <strong>'.$var.'</strong> is not scalar!' );
+				}
+
+				// convert all html to special characters:
+				$GLOBALS[$var] = trim( htmlspecialchars( $GLOBALS[$var] ) );
+				// cross-platform newlines:
+				$GLOBALS[$var] = preg_replace( "~(\r\n|\r)~", "\n", $GLOBALS[$var] );
+				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as text with html special chars', 'params' );
+				break;
+
 			case 'text':
 				if( ! is_scalar($GLOBALS[$var]) )
 				{ // This happens if someone uses "foo[]=x" where "foo" is expected as string
@@ -275,7 +288,7 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 
 					// Change the variable type:
 					settype( $GLOBALS[$var], $type );
-					if( isset($Debuglog) ) $Debuglog->add( 'param(-): <strong>'.$var.'</strong> typed to '.$type.', new value='.$GLOBALS[$var], 'params' );
+					if( isset($Debuglog) ) $Debuglog->add( 'param(-): <strong>'.var_export($var, true).'</strong> typed to '.$type.', new value='.var_export($GLOBALS[$var], true), 'params' );
 				}
 		}
 	}
@@ -454,6 +467,43 @@ function param_check_number( $var, $err_msg, $required = false )
 
 
 /**
+ * Check for interval params
+ *
+ * @param string Min param name
+ * @param string Max param name
+ * @param string error message if value is NOT a number
+ * @param string error message if min value greater than max
+ * @return boolean true if OK
+ */
+function param_check_interval( $var_min, $var_max, $err_msg_number, $err_msg_compare, $required = false )
+{
+	$result_min = param_validate( $var_min, 'check_is_number', $required, $err_msg_number );
+	$result_max = param_validate( $var_max, 'check_is_number', $required, $err_msg_number );
+	$result_compare = true;
+
+	if( $result_min && $result_max )
+	{
+		if( empty( $GLOBALS[$var_min] ) && !empty( $GLOBALS[$var_max] ) )
+		{	// Get min value from max value
+			$GLOBALS[$var_min] = $GLOBALS[$var_max];
+		}
+		if( !empty( $GLOBALS[$var_min] ) && empty( $GLOBALS[$var_max] ) )
+		{	// Get max value from min value
+			$GLOBALS[$var_max] = $GLOBALS[$var_min];
+		}
+
+		$result_compare = $GLOBALS[$var_min] <= $GLOBALS[$var_max];
+		if( !$result_compare )
+		{	// Min value greater than max
+			param_error( $var_min, $err_msg_compare );
+		}
+	}
+
+	return $result_min && $result_max && $result_compare;
+}
+
+
+/**
  * Checks if the param is an integer (no float, e.g. 3.14).
  *
  * @param string number to check
@@ -567,28 +617,34 @@ function check_is_email( $email )
  * Check if the value is a valid login (in terms of allowed chars)
  *
  * @param string param name
- * @param string regexp
- * @param string error message
- * @param string|NULL error message for form field ($err_msg gets used if === NULL).
  * @return boolean true if OK
  */
 function param_check_valid_login( $var )
 {
+	global $Settings;
+
 	if( empty( $GLOBALS[$var] ) )
 	{ // empty variable is OK
 		return T_('Please choose a username.' );
 	}
 
-	// WARNING: allowing ' or " or > or < will open security issues!
-	// WARNING: allowing special chars like latin 1 accented chars ( \xDF-\xF6\xF8-\xFF ) will create issues with
-	// user media directory names (tested on Max OS X) -- Do no allow any of this until we have a clean & safe media dir name generator.
-	// NOTE: allowing @ will make some "average" users use their email address (not good for their spam health)
-	// NOTE: in some places usernames are typed in by other users (messaging) or admins.
-	// Having cryptic logins with hard to type letters is a PITA.
-	if( ! preg_match( '~^[A-Za-z0-9_.]*$~', $GLOBALS[$var] ) )
+	$check = is_valid_login($GLOBALS[$var]);
+
+	if( ! $check || $check === 'usr' )
 	{
-		param_error( $var, T_('Logins can only contain letters, digits and the following characters: _ .') );
-		// fp> TODO: check why a dash '-' prevents renaming the fileroot
+		if( $check === 'usr' )
+		{	// Special case, the login is valid however we forbid it's usage.
+			$msg = T_('Logins cannot start with "usr_", this prefix is reserved for system use.');
+		}
+		elseif( $Settings->get('strict_logins') )
+		{
+			$msg = T_('Logins can only contain letters, digits and the following characters: _ .');
+		}
+		else
+		{
+			$msg = sprintf( T_('Logins cannot contain whitespace and the following characters: %s'), '\', ", >, <, @' );
+		}
+		param_error( $var, $msg );
 		return false;
 	}
 	return true;
@@ -634,7 +690,27 @@ function param_check_url( $var, $context, $field_err_msg = NULL )
 
 	$Group = $current_User->get_Group();
 
-	if( $error_detail = validate_url( $GLOBALS[$var], $context, ! $Group->perm_bypass_antispam ) )
+	if( strpos( $var, '[' ) !== false )
+	{	// Variable is array, for example 'input_name[group_name][123][]'
+		// We should get a value from $GLOBALS[input_name][group_name][123][0]
+		$var_array = explode( '[', $var );
+		$url_value = $GLOBALS;
+		foreach( $var_array as $var_item )
+		{
+			$var_item = str_replace( ']', '', $var_item);
+			if( empty( $var_item ) )
+			{	// Case for []
+				$var_item = '0';
+			}
+			$url_value = $url_value[$var_item];
+		}
+	}
+	else
+	{	// Variable with simple name
+		$url_value = $GLOBALS[$var];
+	}
+
+	if( $error_detail = validate_url( $url_value, $context, ! $Group->perm_bypass_antispam ) )
 	{
 		param_error( $var, /* TRANS: %s contains error details */ sprintf( T_('Supplied URL is invalid. (%s)'), $error_detail ), $field_err_msg );
 		return false;
@@ -1385,8 +1461,8 @@ function memorize_param( $var, $type, $default, $value = NULL )
 		$global_param_list = array();
 	}
 
-	$Debuglog->add( "memorize_param: $var $type default=$default".(is_null($value) ? '' : " value=$value"), 'params');
-	// echo "<br>memorize_param: $var $type default=$default".(is_null($value) ? '' : " value=$value");
+	$Debuglog->add( 'memorize_param: '.var_export($var, true).' '.var_export($type, true).' default='.var_export($default, true).
+				( is_null($value) ? '' : ' value='.var_export($value, true) ), 'params' );
 
 	$global_param_list[$var] = array( 'type' => $type, 'default' => (($default===true) ? NULL : $default) );
 
@@ -1788,11 +1864,11 @@ function param_html( $var, $default = '', $memorize = false, $err_msg )
  * @param string error message
  * @return boolean|string
  */
-function param_check_html( $var, $err_msg = '#', $field_err_msg = '#', $autobr = 0 )
+function param_check_html( $var, $err_msg = '#', $field_err_msg = '#' )
 {
 	global $Messages;
 
-	$altered_html = check_html_sanity( $GLOBALS[$var], 'posting', $autobr );
+	$altered_html = check_html_sanity( $GLOBALS[$var], 'posting' );
 
  	if( $altered_html === false )
 	{	// We have errors, do not keep sanitization attemps:
@@ -1824,11 +1900,20 @@ function param_check_html( $var, $err_msg = '#', $field_err_msg = '#', $autobr =
 function param_check_gender( $var, $required = false )
 {
 	if( empty( $GLOBALS[$var] ) )
-	{ // empty is OK if not required:
+	{	// empty is OK if not required:
+		global $current_User;
 		if( $required )
 		{
-			param_error( $var, T_( 'Please select a gender.' ) );
-			return false;
+			if( $current_User->check_perm( 'users', 'edit' ) )
+			{	// Display a note message if user can edit all users
+				param_add_message_to_Log( $var, T_('Please select a gender.'), 'note' );
+				return true;
+			}
+			else
+			{	// Display an error message
+				param_error( $var, T_( 'Please select a gender.' ) );
+				return false;
+			}
 		}
 		return true;
 	}
@@ -1847,11 +1932,11 @@ function param_check_gender( $var, $required = false )
 /**
  * DEPRECATED Stub for plugin compatibility:
  */
-function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NULL )
+function format_to_post( $content, $is_comment = 0, $encoding = NULL )
 {
 	global $current_User;
 
-	$ret = check_html_sanity( $content, ( $is_comment ? 'commenting' : 'posting' ), $autobr, $current_User, $encoding );
+	$ret = check_html_sanity( $content, ( $is_comment ? 'commenting' : 'posting' ), $current_User, $encoding );
 	if( $ret === false )
 	{	// ERROR
 		return $content;
@@ -1878,12 +1963,11 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NUL
  *
  * @param string The content to format
  * @param string
- * @param integer Create automated <br /> tags?
  * @param User User (used for "posting" and "xmlrpc_posting" context). Default: $current_User
  * @param string Encoding (used for XHTML_Validator only!); defaults to $io_charset
  * @return boolean|string
  */
-function check_html_sanity( $content, $context = 'posting', $autobr = false, $User = NULL, $encoding = NULL )
+function check_html_sanity( $content, $context = 'posting', $User = NULL, $encoding = NULL )
 {
 	global $use_balanceTags, $admin_url;
 	global $io_charset, $use_xhtmlvalidation_for_comments, $comment_allowed_tags, $comments_allow_css_tweaks;
@@ -1957,13 +2041,6 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $Us
 
 		$Messages->add(	$errmsg, 'error' );
 		$error = true;
-	}
-
-	if( $autobr )
-	{ // Auto <br />:
-		// may put brs in the middle of multiline tags...
-		// TODO: this may create "<br />" tags in "<UL>" (outside of <LI>) and make the HTML invalid! -> use autoP pugin?
-		$content = autobrize( $content );
 	}
 
 	$content = trim( $content );
@@ -2046,7 +2123,7 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $Us
 				&& $User->check_perm( 'users', 'edit', false ) )
 		{
 			$Messages->add( sprintf( T_('(Note: To get rid of the above validation warnings, you can deactivate unwanted validation rules in your <a %s>Group settings</a>.)'),
-										'href="'.$admin_url.'?ctrl=users&amp;grp_ID='.$Group->ID.'"' ), 'error' );
+										'href="'.$admin_url.'?ctrl=groups&amp;grp_ID='.$Group->ID.'"' ), 'error' );
 		}
 		return false;
 	}
@@ -2183,257 +2260,8 @@ function isset_param( $var )
 
 /*
  * $Log$
- * Revision 1.77  2012/11/22 10:52:09  efy-asimo
- * Fix XSS vulnerability
+ * Revision 1.79  2013/11/06 08:03:47  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.76  2011/10/03 16:36:54  fplanque
- * Next time anyone wants to life restrictions on login, you'd better make a strong case about how thoroughly you tested this!
- *
- * Revision 1.75  2011/10/01 23:01:48  fplanque
- * better be safe than sorry on logins!
- *
- * Revision 1.74  2011/09/23 22:37:09  fplanque
- * minor / doc
- *
- * Revision 1.73  2011/09/23 12:07:00  efy-vitalij
- * change validation messages in param_check_passwords
- *
- * Revision 1.72  2011/09/19 22:16:00  fplanque
- * Minot/i18n
- *
- * Revision 1.71  2011/09/12 07:50:57  efy-asimo
- * User gender validation
- *
- * Revision 1.70  2011/09/07 00:28:26  sam2kb
- * Replace non-ASCII character in regular expressions with ~
- *
- * Revision 1.69  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.68  2011/03/16 01:30:54  fplanque
- * fix for http://forums.b2evolution.net/viewtopic.php?p=107882
- *
- * Revision 1.67  2011/02/15 06:13:49  sam2kb
- * strlen replaced with evo_strlen to support utf-8 logins and domain names
- *
- * Revision 1.66  2010/11/25 15:16:34  efy-asimo
- * refactor $Messages
- *
- * Revision 1.65  2010/07/26 06:52:15  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.64  2010/04/22 18:57:35  blueyed
- * param_action: prefer actionArray, if it is being POSTed. Bug: when posting to a action=foo url, the action from actionArray would get ignored. Pretty nasty with the items controller. This either slipped in recently, or (my) nginx (setup) behaves different from my apache "stack".
- *
- * Revision 1.63  2010/03/19 01:31:44  blueyed
- * check_html_sanity: add User param, defaulting to current User. This is required if posting User is not logged in (e.g. commenting via OpenID, but logged out).
- *
- * Revision 1.62  2010/03/18 16:20:16  efy-asimo
- * bug about custom fields - fix
- *
- * Revision 1.61  2010/02/08 17:51:30  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.60  2010/02/04 20:37:18  blueyed
- * Fix parse error.
- *
- * Revision 1.59  2010/02/04 19:23:09  blueyed
- * trans fixes: punctuation.
- *
- * Revision 1.58  2010/01/30 18:55:16  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.57  2009/12/01 21:05:10  blueyed
- * balance_tags: handle tags spanning multiple lines
- *
- * Revision 1.56  2009/12/01 13:40:32  efy-maxim
- * rename is_login to user_exists function
- *
- * Revision 1.55  2009/11/30 23:05:30  blueyed
- * Remove dependency on Settings global out of _param.funcs. Adds min length param to param_check_passwords. Add tests.
- *
- * Revision 1.54  2009/11/30 00:22:04  fplanque
- * clean up debug info
- * show more timers in view of block caching
- *
- * Revision 1.53  2009/11/22 20:29:38  fplanque
- * minor/doc
- *
- * Revision 1.52  2009/11/22 18:52:20  efy-maxim
- * change owner; is login
- *
- * Revision 1.51  2009/10/28 10:56:32  efy-maxim
- * param_duration
- *
- * Revision 1.50  2009/10/25 23:08:00  blueyed
- * regenerate_url: split set params by ampersand, and remove any trailing question mark: allows passing QUERY_STRING
- *
- * Revision 1.49  2009/10/11 09:09:04  efy-maxim
- * Check_is functions have been moved to to params.funcs
- *
- * Revision 1.48  2009/10/04 12:20:21  efy-maxim
- * 1. validate has been renamed to param_validate
- * 2. check recipients list in load_recipients function in Thread class
- *
- * Revision 1.47  2009/09/28 22:56:36  blueyed
- * get_param_urlencoded: drop force_type param, which is not required AFAICS
- *
- * Revision 1.46  2009/09/28 20:02:41  tblue246
- * param()/$type parameter: Deprecate "" value in favor of (newly added) "raw".
- *
- * Revision 1.45  2009/09/27 13:12:53  blueyed
- * Add get_param_urlencoded: use it in regenerate_url and add functionality to pass array of params to url_add_param
- *
- * Revision 1.44  2009/09/27 12:55:46  blueyed
- * typo
- *
- * Revision 1.43  2009/09/24 19:48:30  efy-maxim
- * validators
- *
- * Revision 1.42  2009/09/20 19:47:07  blueyed
- * Add post_excerpt_autogenerated field.
- * "text" params get unified newlines now and "excerpt" is a text param.
- * This is required for detecting if it has been changed really.
- * If something is wrong about this, please make sure that an unchanged
- * excerpt won't update the one in DB (when posting the item form).
- *
- * Revision 1.41  2009/09/14 11:41:23  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.40  2009/09/05 17:57:55  fplanque
- * support for multiline/text fields
- *
- * Revision 1.39  2009/09/04 19:00:04  efy-maxim
- * currency/country codes validators have been improved using param_check_regexp() function
- *
- * Revision 1.38  2009/09/03 23:52:34  fplanque
- * minor
- *
- * Revision 1.37  2009/09/03 18:29:28  efy-maxim
- * currency/country code validators
- *
- * Revision 1.36  2009/08/30 17:27:02  fplanque
- * better NULL param handling all over the app
- *
- * Revision 1.35  2009/08/30 00:34:40  fplanque
- * fix
- *
- * Revision 1.34  2009/07/24 20:22:44  blueyed
- * Fix doc
- *
- * Revision 1.33  2009/06/29 02:14:04  fplanque
- * no message
- *
- * Revision 1.32  2009/06/07 20:06:45  blueyed
- * param: default for array is array(), match whole string for date formats, doc
- *
- * Revision 1.31  2009/05/31 16:53:26  waltercruz
- * Trying to avoid some warnings whan date format of locale allows dates like that: 29-05-31 13:26:00 (possible when dateformat from locale is empty)
- *
- * Revision 1.30  2009/05/15 14:02:36  sam2kb
- * <input /> is a self-closing tag and doesn't need any evo help ;)
- * See http://forums.b2evolution.net/viewtopic.php?p=90791#90791
- *
- * Revision 1.29  2009/04/14 21:14:53  blueyed
- * doc
- *
- * Revision 1.28  2009/04/14 01:17:28  fplanque
- * better handling of colselect
- *
- * Revision 1.27  2009/03/13 00:52:38  fplanque
- * debug stuff
- *
- * Revision 1.26  2009/03/08 23:57:39  fplanque
- * 2009
- *
- * Revision 1.25  2008/12/15 22:26:55  blueyed
- * doc
- *
- * Revision 1.24  2008/10/03 15:32:19  blueyed
- * todo/doc about param('string') removing newlines
- *
- * Revision 1.23  2008/05/26 19:25:41  fplanque
- * minor
- *
- * Revision 1.22  2008/05/06 23:26:56  fplanque
- * doc
- *
- * Revision 1.20  2008/04/17 11:53:16  fplanque
- * Goal editing
- *
- * Revision 1.19  2008/04/09 14:50:35  fplanque
- * bugfix
- *
- * Revision 1.18  2008/03/16 14:19:38  fplanque
- * no message
- *
- * Revision 1.17  2008/02/16 00:21:34  blueyed
- * Fix fatal error if there are validation errors from not-logged-in users, patch by Travis (LP: #192259)
- *
- * Revision 1.16  2008/02/09 16:19:31  fplanque
- * fixed commenting bugs
- *
- * Revision 1.15  2008/01/22 14:20:21  fplanque
- * anonymous comments fix.
- *
- * Revision 1.14  2008/01/21 09:35:23  fplanque
- * (c) 2008
- *
- * Revision 1.13  2008/01/20 18:20:26  fplanque
- * Antispam per group setting
- *
- * Revision 1.12  2008/01/20 15:31:12  fplanque
- * configurable validation/security rules
- *
- * Revision 1.11  2008/01/19 18:35:08  fplanque
- * javascript checking config
- *
- * Revision 1.10  2008/01/19 18:24:24  fplanque
- * antispam checking refactored
- *
- * Revision 1.9  2008/01/19 15:45:28  fplanque
- * refactoring
- *
- * Revision 1.8  2008/01/19 10:57:11  fplanque
- * Splitting XHTML checking by group and interface
- *
- * Revision 1.7  2008/01/18 15:53:42  fplanque
- * Ninja refactoring
- *
- * Revision 1.6  2007/11/30 23:24:16  fplanque
- * support for clsid again
- *
- * Revision 1.5  2007/11/01 19:52:46  fplanque
- * better comment forms
- *
- * Revision 1.4  2007/09/22 19:23:56  fplanque
- * various fixes & enhancements
- *
- * Revision 1.3  2007/09/04 19:48:33  fplanque
- * small fixes
- *
- * Revision 1.2  2007/06/29 00:24:43  fplanque
- * $cat_array cleanup tentative
- *
- * Revision 1.1  2007/06/25 10:58:53  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.40  2007/06/17 23:39:59  blueyed
- * Fixed remove_magic_quotes()
- *
- * Revision 1.39  2007/05/28 01:33:22  fplanque
- * permissions/fixes
- *
- * Revision 1.38  2007/05/20 01:02:32  fplanque
- * magic quotes fix
- *
- * Revision 1.37  2007/05/13 18:36:52  blueyed
- * param_check_date(): Allow multiple whitespaces
- *
- * Revision 1.36  2007/05/09 00:54:44  fplanque
- * Attempt to normalize all URLs before adding params
- *
- * Revision 1.35  2007/04/26 00:11:08  fplanque
- * (c) 2007
  */
 ?>

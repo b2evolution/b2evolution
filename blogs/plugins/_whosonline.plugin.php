@@ -4,7 +4,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -49,7 +49,7 @@ class whosonline_plugin extends Plugin
 	var $name;
 	var $code = 'evo_WhosOnline';
 	var $priority = 96;
-	var $version = '2.0';
+	var $version = '5.0.0';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 
@@ -102,10 +102,10 @@ class whosonline_plugin extends Plugin
 	 */
 	function SkinTag( $params )
 	{
-		global $generating_static, $Plugins;
+		global $Plugins;
 
-		if( ! empty($generating_static) || $Plugins->trigger_event_first_true('CacheIsCollectingContent') )
-		{ // We're not generating static pages nor is a caching plugin collecting the content, so we can display this block
+		if( $Plugins->trigger_event_first_true('CacheIsCollectingContent') )
+		{ // A caching plugin collecting the content
 			return false;
 		}
 
@@ -188,7 +188,7 @@ class OnlineSessions
 		{
 			return true;
 		}
-		global $DB, $localtimenow;
+		global $DB, $UserSettings, $localtimenow;
 
 		$this->_count_guests = 0;
 		$this->_registered_Users = array();
@@ -199,21 +199,24 @@ class OnlineSessions
 
 		// We get all sessions that have been seen in $timeout_YMD and that have a session key.
 		// NOTE: we do not use DISTINCT here, because guest users are all "NULL".
-		foreach( $DB->get_results( "
+		$online_user_ids = $DB->get_col( "
 			SELECT SQL_NO_CACHE sess_user_ID
 			  FROM T_sessions INNER JOIN T_hitlog ON sess_ID = hit_sess_ID
-			 WHERE sess_lastseen > '".$timeout_YMD."'
+			 WHERE sess_lastseen_ts > '".$timeout_YMD."'
 			   AND sess_key IS NOT NULL
 			   AND hit_agent_type = 'browser'
-			 GROUP BY sess_ID", OBJECT, 'Sessions: get list of relevant users.' ) as $row )
+			 GROUP BY sess_ID", 0, 'Sessions: get list of relevant users.' );
+		$registered_online_user_ids = array_diff( $online_user_ids, array( NULL ) );
+		// load all online users into the cache because we need information ( login, avatar ) about them
+		$UserCache->load_list( $registered_online_user_ids );
+		foreach( $online_user_ids as $user_ID )
 		{
-			if( !empty( $row->sess_user_ID )
-					&& ( $User = & $UserCache->get_by_ID( $row->sess_user_ID ) ) )
+			if( !empty( $user_ID ) && ( $User = & $UserCache->get_by_ID( $user_ID, false ) ) )
 			{
 				// assign by ID so that each user is only counted once (he could use multiple user agents at the same time)
-				$this->_registered_Users[ $User->ID ] = & $User;
+				$this->_registered_Users[ $user_ID ] = & $User;
 
-				if( !$User->showonline )
+				if( $UserSettings->get( 'show_online', $User->ID ) )
 				{
 					$this->_count_guests++;
 				}
@@ -268,9 +271,7 @@ class OnlineSessions
 	 */
 	function display_online_users( $params )
 	{
-		global $DB, $Blog;
-		global $generating_static;
-		if( isset($generating_static) ) { return; }
+		global $DB, $Blog, $UserSettings;
 
 		if( !isset($this->_registered_Users) )
 		{
@@ -282,7 +283,7 @@ class OnlineSessions
 
 		foreach( $this->_registered_Users as $User )
 		{
-			if( $User->showonline )
+			if( $UserSettings->get( 'show_online', $User->ID ) )
 			{
 				if( empty($r) )
 				{ // first user
@@ -313,9 +314,6 @@ class OnlineSessions
 	 */
 	function display_online_guests( $params )
 	{
-		global $generating_static;
-		if( isset($generating_static) ) { return; }
-
 		if( !isset($this->_count_guests) )
 		{
 			$this->init();
@@ -335,61 +333,8 @@ class OnlineSessions
 
 /*
  * $Log$
- * Revision 1.14  2011/09/04 22:13:23  fplanque
- * copyright 2011
+ * Revision 1.16  2013/11/06 08:05:22  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.13  2010/02/08 17:55:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.12  2010/01/30 18:55:36  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.11  2009/12/20 22:12:19  fplanque
- * doc
- *
- * Revision 1.10  2009/12/18 23:49:47  blueyed
- * Who is online plugin: only select browser agent types
- *
- * Revision 1.9  2009/09/26 12:00:44  tblue246
- * Minor/coding style
- *
- * Revision 1.8  2009/09/25 07:33:31  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.7  2009/09/13 21:27:20  blueyed
- * SQL_NO_CACHE for SELECT queries using T_sessions
- *
- * Revision 1.6  2009/07/04 17:43:13  tblue246
- * Made $timeout_online_user a widget setting
- *
- * Revision 1.5  2009/06/24 18:47:54  tblue246
- * Make widget plugin names translatable
- *
- * Revision 1.4  2009/03/08 23:57:48  fplanque
- * 2009
- *
- * Revision 1.3  2008/01/21 09:35:41  fplanque
- * (c) 2008
- *
- * Revision 1.2  2007/06/20 23:36:06  fplanque
- * cleanup
- *
- * Revision 1.1  2007/06/20 23:12:51  fplanque
- * "Who's online" moved to a plugin
- *
- * Revision 1.13  2007/06/11 22:01:53  blueyed
- * doc fixes
- *
- * Revision 1.12  2007/04/26 00:11:11  fplanque
- * (c) 2007
- *
- * Revision 1.11  2007/02/05 13:29:09  waltercruz
- * Changing double quotes to single quotes
- *
- * Revision 1.10  2006/12/17 23:44:35  fplanque
- * minor cleanup
- *
- * Revision 1.9  2006/11/24 18:27:24  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

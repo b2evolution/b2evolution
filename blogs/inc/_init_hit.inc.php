@@ -1,17 +1,11 @@
 <?php
-// This is for www only. You don't want to include this when runnignin CLI (command line) mode
 /**
- * This file initializes everything BUT the blog!
- *
- * It is useful when you want to do very customized templates!
- * It is also called by more complete initializers.
+ * This is for www only. You don't want to include this when runnignin CLI (command line) mode
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
- * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
- * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -22,23 +16,7 @@
  *   - Mozilla Public License 1.1 (MPL) - http://www.opensource.org/licenses/mozilla1.1.php
  * }}
  *
- * {@internal Open Source relicensing agreement:
- * Daniel HAHLER grants Francois PLANQUE the right to license
- * Daniel HAHLER's contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- *
- * Matt FOLLETT grants Francois PLANQUE the right to license
- * Matt FOLLETT's contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * }}
- *
  * @package evocore
- *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois PLANQUE
- * @author blueyed: Daniel HAHLER
- * @author mfollett: Matt FOLLETT
- * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
  * @version $Id$
  */
@@ -67,9 +45,9 @@ $content_type_header = NULL;
 $http_response_code = 200;
 
 /**
- * @global integer ID of featured post that is being displayed (will become an array() in the future) -- needed so we can filter it out of normal post flow
+ * @global array IDs of featured posts that are being displayed -- needed so we can filter it out of normal post flow
  */
-$featured_displayed_item_ID = NULL;
+$featured_displayed_item_IDs = array();
 
 // Initialize some variables for template functions
 $required_js = array();
@@ -214,78 +192,27 @@ if( $use_session )
 	require dirname(__FILE__).'/_init_session.inc.php';
 }
 
-
+if( is_logged_in() )
+{
+	$timeout_online = $Settings->get( 'timeout_online' );
+	if( empty( $current_User->lastseen_ts ) || ( $current_User->lastseen_ts < date2mysql( $localtimenow - $timeout_online ) ) )
+	{
+		$current_User->set( 'lastseen_ts', date2mysql( $localtimenow ) );
+		$current_User->dbupdate();
+	}
+}
 
 $Timer->resume( '_init_hit' );
 
 // Init charset handling:
 init_charsets( $current_charset );
 
-
-// fp> TODO: the following was in _vars.inc -- temporaily here, b2evolution stuff needs to move out of evoCORE.
-
-// dummy var for backward compatibility with versions < 2.4.1 -- prevents "Undefined variable"
-$credit_links = array();
-
-$francois_links = array( 'fr' => array( 'http://fplanque.net/', array( array( 78, 'Fran&ccedil;ois'),  array( 100, 'Francois') ) ),
-													'' => array( 'http://fplanque.com/', array( array( 78, 'Fran&ccedil;ois'),  array( 100, 'Francois') ) )
-												);
-
-$fplanque_links = array( 'fr' => array( 'http://fplanque.net/', array( array( 78, 'Fran&ccedil;ois Planque'),  array( 100, 'Francois Planque') ) ),
-													'' => array( 'http://fplanque.com/', array( array( 78, 'Fran&ccedil;ois Planque'),  array( 100, 'Francois Planque') ) )
-												);
-
-$skin_links = array( '' => array( 'http://skinfaktory.com/', array( array( 15, 'b2evo skin'), array( 20, 'b2evo skins'), array( 35, 'b2evolution skin'), array( 40, 'b2evolution skins'), array( 55, 'Blog skin'), array( 60, 'Blog skins'), array( 75, 'Blog theme'),array( 80, 'Blog themes'), array( 95, 'Blog template'), array( 100, 'Blog templates') ) ),
-												);
-
-$skinfaktory_links = array( '' => array( array( 73, 'http://evofactory.com/', array( array( 61, 'Evo Factory'), array( 68, 'EvoFactory'), array( 73, 'Evofactory') ) ),
-														             array( 100, 'http://skinfaktory.com/', array( array( 92, 'Skin Faktory'), array( 97, 'SkinFaktory'), array( 99, 'Skin Factory'), array( 100, 'SkinFactory') ) ),
-																				)
-												);
-
 $Timer->pause( '_init_hit' );
 
 /*
  * $Log$
- * Revision 1.12  2011/09/26 14:53:27  efy-asimo
- * Login problems with multidomain installs - fix
- * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
- *
- * Revision 1.11  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.10  2011/09/04 21:32:17  fplanque
- * minor MFB 4-1
- *
- * Revision 1.9  2011/03/01 18:29:47  sam2kb
- * Better pagenow handling
- * Fixes this http://forums.b2evolution.net//viewtopic.php?t=21671
- *
- * Revision 1.8  2011/01/11 17:48:49  sam2kb
- * Allow filenames with dots and uppercase PHP extension
- *
- * Revision 1.7  2010/10/24 02:52:09  sam2kb
- * Check if $_SERVER['HTTP_HOST'] is set before using it
- *
- * Revision 1.6  2010/07/26 06:52:15  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.5  2010/05/13 18:52:04  blueyed
- * doc
- *
- * Revision 1.4  2010/04/19 17:00:13  blueyed
- * Make locale_from_get work again.
- *
- * Revision 1.3  2010/02/08 17:51:25  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.2  2009/12/22 08:45:44  fplanque
- * fix install
- *
- * Revision 1.1  2009/12/06 05:20:36  fplanque
- * Violent refactoring for _main.inc.php
- * Sorry for potential side effects.
- * This needed to be done badly -- for clarity!
+ * Revision 1.14  2013/11/06 08:03:47  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

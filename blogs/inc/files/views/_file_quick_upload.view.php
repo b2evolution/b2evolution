@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -39,7 +39,7 @@ global $Settings;
 
 global $htsrv_url;
 
-global $ads_list_path, $fm_FileRoot;
+global $ads_list_path, $fm_FileRoot, $tab3;
 
 global $Hit, $Messages;
 
@@ -49,7 +49,7 @@ $Form = new Form( NULL, 'fm_upload_checkchanges', 'post' );
 $Form->begin_form( 'fform' );
 $Form->add_crumb( 'file' );
 $Form->hidden_ctrl();
-$Form->hidden( 'tab3', 'quick' );
+$Form->hidden( 'tab3_onsubmit', $tab3 );
 
 $Widget = new Widget( 'file_browser' );
 $Widget->global_icon( T_('Quit upload mode!'), 'close', regenerate_url( 'ctrl,fm_mode', 'ctrl=files' ) );
@@ -68,9 +68,7 @@ echo '<tbody>';
 
 	// Display quick upload
 	echo '<td id="fm_files">';
-	//echo '<div id="upload_queue"></div>';
-	//echo '<input id="quickupload" type="file" multiple="multiple" />';
-	
+
 	?>
 	<div id="file-uploader" style="width: 100%;">
 		<noscript>
@@ -81,29 +79,22 @@ echo '<tbody>';
 	echo '<input id="saveBtn" type="submit" style="display: none;" name="saveBtn" value="'.T_('Save modified files'),'" class="ActionButton" />';
 
 	$root_and_path = $fm_FileRoot->ID.'::';
-	$quick_upload_url = $htsrv_url.'quick_upload_new.php?upload=true';
+	$quick_upload_url = $htsrv_url.'quick_upload.php?upload=true';
 
 	if ($Hit->is_firefox() || $Hit->is_chrome())
 	{
-		$button_text = T_('Drag & Drop files to upload here <br> <span> or click to manually select files </span>');
+		$button_text = T_('Drag & Drop files to upload here <br /><span>or click to manually select files...</span>');
 	}
 	else
 	{
-		$button_text = T_('Click to manually select files');
+		$button_text = T_('Click to manually select files...');
 	}
-
-
 	?>
 	<script type="text/javascript">
 
 
 		var url = <?php echo '"'.$quick_upload_url.'&'.url_crumb( 'file' ).'"'; ?>;
 		var root_and_path = '<?php echo $root_and_path ?>';
-		var uploading_text = <?php echo '"'.T_( 'Uploading' ).'"'; ?>;
-		var incompatible_browser = <?php echo '"'.T_( 'Your browser does not support XMLHttpRequest technology! Please use the standard upload instead.' ).'"'; ?>;
-		var maxsize = <?php echo $Settings->get( 'upload_maxkb' )*1024; ?>;
-		var size_error = <?php echo '"<span class=\"result_error\">'.T_('The file is too large: %1 but the maximum allowed is %2.').'</span>"'; ?>;
-		var ok_text =  <?php echo '"'.T_( 'OK' ).'"'; ?>;
 		var button_text = <?php echo '"'.$button_text.'"';?>;
 
 		jQuery( '#fm_dirtree input[type=radio]' ).click( function()
@@ -114,20 +105,23 @@ echo '<tbody>';
 		} );
 
         jQuery(document).ready( function(){
+
 				uploader = new qq.FileUploader({
                 element: document.getElementById('file-uploader'),
                 action: url,
                 debug: true,
-				sizeLimit: maxsize,
+				//sizeLimit: maxsize,
 				onComplete: function(id, fileName, responseJSON){
 					var container = jQuery(uploader._getItemByFileId(id));
-					if (responseJSON.success.status == undefined)
+
+					var text =  base64_decode(responseJSON.success.text);
+					if (responseJSON.success.specialchars == 1)
 					{
-						var text = htmlspecialchars_decode(responseJSON.success);
+						text = htmlspecialchars_decode(text);
 					}
-					else
+
+					if (responseJSON.success.status != undefined && responseJSON.success.status == 'rename')
 					{
-						var text = htmlspecialchars_decode(responseJSON.success.text);
 						jQuery('#saveBtn').show();
 					}
 					container.append(text);
@@ -155,12 +149,21 @@ echo '<tbody>';
 
 
 				params: {
-				root_and_path: root_and_path
+				root_and_path: jQuery( '#fm_dirtree input[type=radio]:checked' ).val()
 				}
             });
         });
 	</script>
 	<?php
+
+	if (!($Hit->is_firefox() || $Hit->is_chrome()))
+	{
+		echo ('<p class = "note"> '. T_('Your browser does not support full upload functionality: You can only upload files one by one and you cannot use Drag & Drop.' ).'</p>');
+	}
+	else
+	{
+		echo ('<p class = "note"> '. T_('Your browser supports full upload functionality.').'</p>');
+	}
 
 	echo '</td>';
 	echo '</tr>';
@@ -176,30 +179,8 @@ $this->disp_payload_end();
 
 /*
  * $Log$
- * Revision 1.8  2011/10/24 08:52:08  efy-vitalij
- * changed upload functions
- *
- * Revision 1.7  2011/10/20 11:37:50  efy-vitalij
- * made changes for new uploader
- *
- * Revision 1.6  2011/10/19 14:41:07  efy-vitalij
- * made changes for new uploader
- *
- * Revision 1.5  2011/09/19 22:16:00  fplanque
- * Minot/i18n
- *
- * Revision 1.4  2011/09/06 20:23:54  sam2kb
- * MFB
- *
- * Revision 1.3  2011/09/04 22:13:16  fplanque
- * copyright 2011
- *
- * Revision 1.2  2011/05/06 07:04:46  efy-asimo
- * multiupload ui update
- *
- * Revision 1.1  2011/04/28 14:07:58  efy-asimo
- * multiple file upload
+ * Revision 1.10  2013/11/06 08:04:15  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>
-	

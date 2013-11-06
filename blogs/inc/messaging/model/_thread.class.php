@@ -3,7 +3,7 @@
  * This file is part of b2evolution - {@link http://b2evolution.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -51,14 +51,6 @@ class Thread extends DataObject
 
 
 	/**
-	 * Unblocked contacts IDs lazy filled
-	 *
-	 * @var array
-	 */
-	var $contacts_list;
-
-
-	/**
 	 * Constructor
 	 * @param db_row database row
 	 */
@@ -68,13 +60,99 @@ class Thread extends DataObject
 		parent::DataObject( 'T_messaging__thread', 'thrd_', 'thrd_ID', 'datemodified' );
 
 		$this->delete_restrictions = array();
-  		$this->delete_cascades = array();
+		$this->delete_cascades = array();
 
- 		if( $db_row != NULL )
+		if( $db_row != NULL )
 		{
 			$this->ID           = $db_row->thrd_ID;
 			$this->title        = $db_row->thrd_title;
 			$this->datemodified = $db_row->thrd_datemodified;
+		}
+		else
+		{	// New Thread
+			global $Session;
+
+			// check if there is unsaved Thread object stored in Session
+			$unsaved_Thread = $Session->get( 'core.unsaved_Thread' );
+			if( !empty( $unsaved_Thread ) )
+			{	// unsaved thread exists, delete it from Session
+				$Session->delete( 'core.unsaved_Thread' );
+				$this->title = $unsaved_Thread['title'];
+				$this->text = $unsaved_Thread['text'];
+			}
+
+			$logins = array();
+
+			$user_login = param( 'user_login', 'string', '' );
+			if( !empty( $user_login ) )
+			{	// Set recipient list from $user_login
+				$logins[] = $user_login;
+			}
+			else
+			{	// Set recipients from Contacts form
+				global $DB, $current_User;
+
+				$recipients = param( 'recipients', 'string', '' );
+				$group_ID = param( 'group_ID', 'integer', 0 );
+
+				if( !empty( $recipients ) )
+				{	// Selected users
+					$recipients = explode( ',', $recipients );
+					foreach( $recipients as $r => $recipient )
+					{
+						if( (int)trim( $recipient ) == 0 )
+						{	// remove bad data
+							unset( $recipients[$r] );
+						}
+					}
+					if( count( $recipients ) > 0 )
+					{
+						$SQL = new SQL();
+						$SQL->SELECT( 'user_ID, user_login' );
+						$SQL->FROM( 'T_messaging__contact' );
+						$SQL->FROM_add( 'LEFT JOIN T_users ON mct_to_user_ID = user_ID' );
+						$SQL->WHERE( 'mct_from_user_ID = '.$current_User->ID );
+						$SQL->WHERE_and( 'mct_to_user_ID IN ('.implode( ',', $recipients ).')' );
+						// asimo> If A user block B user it means that A user doesn't want to receive private message from B,
+						// but A user still should be able to send a message to B.
+						//$SQL->WHERE_and( 'mct_blocked = 0' );
+						$SQL->ORDER_BY( 'user_login' );
+
+						$logins = $DB->get_assoc( $SQL->get() );
+					}
+				}
+				else if( $group_ID > 0 )
+				{	// All users from one group
+					$SQL = new SQL();
+					$SQL->SELECT( 'user_ID, user_login' );
+					$SQL->FROM( 'T_messaging__contact_groupusers' );
+					$SQL->FROM_add( 'LEFT JOIN T_users ON cgu_user_ID = user_ID' );
+					$SQL->FROM_add( 'LEFT JOIN T_messaging__contact_groups ON cgu_cgr_ID = cgr_ID' );
+					$SQL->FROM_add( 'LEFT JOIN T_messaging__contact ON mct_from_user_ID = cgr_user_ID AND mct_to_user_ID = user_ID' );
+					$SQL->WHERE( 'cgr_user_ID = '.$current_User->ID );
+					$SQL->WHERE_and( 'cgr_ID = '.$DB->quote( $group_ID ) );
+					// asimo> If A user block B user it means that A user doesn't want to receive private message from B,
+					// but A user still should be able to send a message to B.
+					//$SQL->WHERE_and( 'mct_blocked = 0' );
+					$SQL->ORDER_BY( 'user_login' );
+
+					$logins = $DB->get_assoc( $SQL->get() );
+				}
+			}
+
+			$this->recipients = implode( ', ', $logins );
+
+			if( !empty( $logins ) )
+			{	// Set this var to initialize the preselected users for fbautocomplete jQuery plugin
+				global $recipients_selected;
+				foreach( $logins as $user_ID => $user_login )
+				{
+					$recipients_selected[] = array(
+						'id'    => $user_ID,
+						'title' => $user_login
+					);
+				}
+			}
 		}
 	}
 
@@ -85,10 +163,10 @@ class Thread extends DataObject
 	 */
 	function load_from_Request()
 	{
-		global $thrd_recipients;
+		global $thrd_recipients, $thrd_recipients_array;
 
 		// Resipients
-		$this->set_string_from_param( 'recipients', true );
+		$this->set_string_from_param( 'recipients', empty( $thrd_recipients_array ) ? true : false );
 
 		// Title
 		param( 'thrd_title', 'string' );
@@ -98,7 +176,7 @@ class Thread extends DataObject
 		// Message
 		param_check_not_empty( 'msg_text', T_('Please enter a message') );
 
-		$this->param_check__recipients( 'thrd_recipients', $thrd_recipients );
+		$this->param_check__recipients( 'thrd_recipients', $thrd_recipients, $thrd_recipients_array );
 
 		return ! param_errors_detected();
 	}
@@ -131,21 +209,31 @@ class Thread extends DataObject
 	/**
 	 * Check if recipients available in database
 	 *
-	 * @param string recipients
+	 * @param string Input name
+	 * @param string Recipients logins separated with comma (Used for browsers without JavaScript)
+	 * @param string Recipients logins in array format (Used with jQuery plugin fbautocomplete)
+	 * @return boolean true if all recipients allow the current User to contact them, false otherwise
 	 */
-	function param_check__recipients ( $var, $recipients )
+	function param_check__recipients( $var, $recipients, $recipients_array )
 	{
-		global $DB, $current_User;
+		global $DB, $current_User, $UserSettings, $Messages;
 
-		// split recipients into array using comma separator
-		$recipients_list = array();
-		$recipients = trim( str_replace( ',', ' ', $recipients ) );
-		foreach( explode(' ', $recipients) as $recipient )
-		{
-			$login = trim($recipient);
-			if( ! empty( $login ) )
+		if( !empty( $recipients_array ) )
+		{	// These data is created by jQuery plugin fbautocomplete
+			$recipients_list = $recipients_array['title'];
+		}
+		else
+		{	// For browsers without JavaScript
+			// split recipients into array using comma separator
+			$recipients_list = array();
+			$recipients = trim( str_replace( ',', ' ', $recipients ) );
+			foreach( explode(' ', $recipients) as $recipient )
 			{
-				$recipients_list[] = evo_strtolower( $login );
+				$login = trim($recipient);
+				if( ! empty( $login ) )
+				{
+					$recipients_list[] = evo_strtolower( $login );
+				}
 			}
 		}
 
@@ -159,27 +247,57 @@ class Thread extends DataObject
 			$error_msg = sprintf( T_( 'You cannot send threads to yourself: %s' ), $current_User->login );
 		}
 
-		// select all users from database
-		$db_users_list = array();
-		foreach( $DB->get_results( 'SELECT user_ID, user_login
-									FROM T_users') as $row )
-		{
-			$db_users_list[$row->user_login] = $row->user_ID;
-		}
+		// load recipient User objects
+		$UserCache = & get_UserCache();
+		$UserCache->load_where( 'user_login IN ( "'.implode( '","', $recipients_list ).'" )' );
 
 		// check are recipients available in database
 		$this->recipients_list = array();
 		$unavailable_recipients_list = array();
+		$closed_recipients_list = array();
+		$status_restricted_recipients = array();
+		$recipients_without_perm = array();
+		$recipients_restricted_pm = array();
+		// check if recipient user enable private messages only if sender user doesn't have 'delete' messaging permission
+		$check_enable_pm = !$current_User->check_perm( 'perm_messaging', 'delete' );
 		foreach( $recipients_list as $recipient )
 		{
-			if ( array_key_exists( $recipient, $db_users_list ) )
-			{
-				$this->recipients_list[] = $db_users_list[$recipient];
-			}
-			else
-			{
+			$recipient_User = $UserCache->get_by_login( $recipient, false );
+			if( $recipient_User === false )
+			{ // user doesn't exists
 				$unavailable_recipients_list[] = $recipient;
+				continue;
 			}
+
+			if( !$recipient_User->check_status( 'can_receive_pm' ) )
+			{ // user status restrict to receive private messages
+				if( $recipient_User->check_status( 'is_closed' ) )
+				{ // user account was closed
+					$closed_recipients_list[] = $recipient;
+					continue;
+				}
+
+				$status_restricted_recipients[] = $recipient;
+				continue;
+			}
+
+			if( !$recipient_User->check_perm( 'perm_messaging', 'reply' ) )
+			{ // user doesn't have permission to read private messages
+				$recipients_without_perm[] = $recipient;
+				continue;
+			}
+
+			if( !$UserSettings->get( 'enable_PM', $recipient_User->ID ) )
+			{ // recipient doesn't want to receive private messages
+				$recipients_restricted_pm[] = $recipient;
+				if( $check_enable_pm )
+				{ // sender is not a user with delete ( "admin" ) messaging permission, so this user can't be in the recipients list
+					continue;
+				}
+			}
+
+			// recipient is correct, add to recipient list
+			$this->recipients_list[] = $recipient_User->ID;
 		}
 
 		if ( count( $unavailable_recipients_list ) > 0 )
@@ -188,13 +306,90 @@ class Thread extends DataObject
 			{
 				$error_msg .= '<br />';
 			}
-
 			$error_msg .= sprintf( 'The following users were not found: %s', implode( ', ', $unavailable_recipients_list ) );
+		}
+
+		if ( count( $closed_recipients_list ) > 0 )
+		{
+			if ( ! empty( $error_msg ) )
+			{
+				$error_msg .= '<br />';
+			}
+			$error_msg .= sprintf( 'The following users no longer exist: %s', implode( ', ', $closed_recipients_list ) );
+		}
+
+		if ( count( $status_restricted_recipients ) > 0 )
+		{
+			if ( ! empty( $error_msg ) )
+			{
+				$error_msg .= '<br />';
+			}
+			$error_msg .= sprintf( 'The following users status currently does not permit to receive private messages: %s', implode( ', ', $status_restricted_recipients ) );
+		}
+
+		if ( count( $recipients_without_perm ) > 0 )
+		{
+			if ( ! empty( $error_msg ) )
+			{
+				$error_msg .= '<br />';
+			}
+			$error_msg .= sprintf( 'The following users have no permission to read private messages: %s', implode( ', ', $recipients_without_perm ) );
+		}
+
+		$restricted_pm_count = count( $recipients_restricted_pm );
+		if ( $restricted_pm_count > 0 )
+		{ // there is at least one recipient who doesn't want to receive private messages
+			if( $check_enable_pm )
+			{ // sender is not a user with delete ( "admin" ) messaging permission, so this user can't be in the recipients list
+				if ( ! empty( $error_msg ) )
+				{
+					$error_msg .= '<br />';
+				}
+				$error_msg .= sprintf( 'The following users don\'t want to receive private messages: %s', implode( ', ', $recipients_restricted_pm ) );
+			}
+			else
+			{ // send is an admin
+				$manual_link = get_manual_link( 'messaging', T_( 'See manual' ).'.' );
+				if( $restricted_pm_count > 1 )
+				{ // more then one recipient don't want to receive private messages
+					$note = sprintf( T_( 'Users &laquo;%s&raquo; do not allow receiving private messages. Message has been sent anyway because you are an administrator.' ), implode( ', ', $recipients_restricted_pm ) );
+				}
+				else
+				{ // one recipient doesn't want to receive private messages
+					$note = sprintf( T_( 'User &laquo;%s&raquo; does not allow receiving private messages. Message has been sent anyway because you are an administrator.' ), $recipients_restricted_pm[0] );
+				}
+				// add note
+				$Messages->add( $note.$manual_link, 'note' );
+			}
+		}
+
+		// Here we select those recipients who has blocked the sender. Note that users with 'delete' messaging permission can't be blocked!
+		$blocked_contacts = check_blocked_contacts( $this->recipients_list );
+		if( !empty( $blocked_contacts ) )
+		{ // There is at least one blocked recipient
+			if ( ! empty( $error_msg ) )
+			{
+				$error_msg .= '<br />';
+			}
+			$error_msg .= T_( 'The following users don\'t want you to contact them at this time: ' ).' '.implode( ', ', $blocked_contacts );
+		}
+
+		if( empty( $error_msg ) )
+		{ // no errors yet
+			$recipients_count = count( $recipients_list );
+			if( ( $recipients_count > 1 ) && ( param( 'thrdtype', 'string', 'discussion' ) != 'discussion' ) )
+			{ // user want's to send more then one individual messages, check if is allowed
+				list( $max_new_threads, $new_threads_count ) = get_todays_thread_settings();
+				if( ( !empty( $max_new_threads ) ) && ( ( $max_new_threads - $new_threads_count ) < $recipients_count ) )
+				{ // user has a create thread limit, and recipients number exceed that limit
+					$error_msg .= '<br />';
+					$error_msg .= sprintf( T_( 'You are unable to send %d individual messages, because it exceeds your remaining daily limit of %d.' ), $recipients_count, $max_new_threads - $new_threads_count );
+				}
+			}
 		}
 
 		if( ! empty( $error_msg ) )
 		{	// show error
-
 			param_error( $var, $error_msg );
 			return false;
 		}
@@ -243,7 +438,7 @@ class Thread extends DataObject
 	{
 		global $DB;
 
-		if( empty( $this->recipients_list ) )
+		if( empty( $this->recipients_list ) && ( !empty( $this->ID ) ) )
 		{
 			$SQL = new SQL();
 			$SQL->SELECT( 'tsta_user_ID' );
@@ -258,39 +453,6 @@ class Thread extends DataObject
 		}
 
 		return $this->recipients_list;
-	}
-
-
-	/**
-	 * Load all of the non blocked contacts of current thread
-
-	 * @return contacts
-	 */
-	function load_contacts()
-	{
-		global $DB, $current_User;
-
-		if( empty( $this->contacts_list ) )
-		{
-			$SQL = new SQL();
-			$SQL->SELECT( 'u.user_ID' );
-			$SQL->FROM( 'T_messaging__threadstatus ts
-							INNER JOIN T_messaging__contact mc
-								ON ts.tsta_user_ID = mc.mct_from_user_ID
-								AND mc.mct_to_user_ID = '.$current_User->ID.'
-								AND mc.mct_blocked = 0
-							LEFT OUTER JOIN T_users u
-								ON ts.tsta_user_ID = u.user_ID' );
-			$SQL->WHERE( 'ts.tsta_user_ID <> '.$current_User->ID );
-			$SQL->WHERE_and( 'ts.tsta_thread_ID ='.$this->ID );
-
-			foreach( $DB->get_results( $SQL->get() ) as $row )
-			{
-				$this->contacts_list[] = $row->user_ID;
-			}
-		}
-
-		return $this->contacts_list;
 	}
 
 
@@ -311,80 +473,93 @@ class Thread extends DataObject
 	 * Check if user is recipient of the current thread
 	 *
 	 * @param user ID
-	 * @return true is user is recipient, instead false
+	 * @return boolean true if user is recipient, false otherwise
 	 */
 	function check_thread_recipient( $user_ID )
 	{
 		$this->load_recipients();
 		return in_array( $user_ID, $this->recipients_list );
 	}
+
+
+	/**
+	 * Check if current User is allowed to reply on this thread.
+	 * Users are allowed to reply only to those threads where they are involved and there is at least one user between the recipients who didn't block the User.
+	 * Note: Currently it doesn't matter if the sender is in the recipients user's contact list or not except in that case when the sender is blocked.
+	 *
+	 * @return boolean true if current User is allowed, false otherwise
+	 */
+	function check_allow_reply()
+	{
+		global $DB, $current_User;
+
+		// load thread recipients
+		$this->load_recipients();
+
+		// check if user is involved in recipients list
+		if( ! $this->check_thread_recipient( $current_User->ID ) )
+		{ // Deny to write a new reply for not involved users
+			// asimo> We may call debug_die() here because this is not a correct state of the application
+			param_error( '', T_('You cannot post a message in a thread you\'re not involved in.') );
+			return false;
+		}
+
+		// check if all of the recipients are closed
+		$UserCache = & get_UserCache();
+		$UserCache->load_where( 'user_ID IN ( '.implode( ',', $this->recipients_list ).' )' );
+		$all_closed = true;
+		foreach( $this->recipients_list as $recipient_ID )
+		{
+			if( $recipient_ID == $current_User->ID )
+			{ // skip current User
+				continue;
+			}
+			$recipient_User = $UserCache->get_by_ID( $recipient_ID, false );
+			if( $recipient_User && $recipient_User->check_status( 'can_receive_pm' ) )
+			{ // this recipient exists and status allows to receive private messages
+				$all_closed = false;
+				break;
+			}
+		}
+		if( $all_closed )
+		{ // all recipients are closed or deleted
+			param_error( '', T_( 'You cannot reply because all the other users involved in this conversation have closed their account.' ) );
+			return false;
+		}
+
+		if( $current_User->check_perm( 'perm_messaging', 'delete' ) )
+		{ // users with delete permission are always able to reply to a conversation where they are involved
+			return true;
+		}
+
+		$SQL = new SQL();
+
+		$SQL->SELECT( 'count( ts.tsta_user_ID )' );
+		$SQL->FROM( 'T_messaging__threadstatus ts
+								LEFT JOIN T_messaging__contact mc ON ts.tsta_user_ID = mc.mct_from_user_ID
+											AND mc.mct_to_user_ID = '.$current_User->ID );
+		// don't select current User
+		$SQL->WHERE( 'ts.tsta_user_ID <> '.$current_User->ID );
+		// restrict to the given thread
+		$SQL->WHERE_and( 'ts.tsta_thread_ID ='.$this->ID );
+		// sender is not blocked or is not present in all recipient's contact list
+		$SQL->WHERE_and( '( mc.mct_blocked IS NULL OR mc.mct_blocked = 0 )' );
+
+		if( $DB->get_var( $SQL->get(), 0, NULL, 'Count all users whou are involved in the given thread but not the current User and didn\'t block the current User' ) > 0 )
+		{ // there is at least one recipient who accept the reply
+			return true;
+		}
+
+		// all recipients have blocked the current User
+		param_error( '', T_( 'The recipient(s) do not want you to contact them at this time.' ) );
+		return false;
+	}
 }
 
 /*
  * $Log$
- * Revision 1.21  2011/10/03 12:00:33  efy-yurybakh
- * Small messaging UI design changes
- *
- * Revision 1.20  2011/02/15 05:31:53  sam2kb
- * evo_strtolower mbstring wrapper for strtolower function
- *
- * Revision 1.19  2010/01/30 18:55:32  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.18  2009/10/10 10:45:43  efy-maxim
- * messaging module - @action_icon()@
- *
- * Revision 1.17  2009/10/04 12:20:22  efy-maxim
- * 1. validate has been renamed to param_validate
- * 2. check recipients list in load_recipients function in Thread class
- *
- * Revision 1.16  2009/09/20 00:27:08  fplanque
- * cleanup/doc/simplified
- *
- * Revision 1.15  2009/09/19 20:31:38  efy-maxim
- * 'Reply' permission : SQL queries to check permission ; Block/Unblock functionality; Error messages on insert thread/message
- *
- * Revision 1.14  2009/09/19 11:29:05  efy-maxim
- * Refactoring
- *
- * Revision 1.13  2009/09/16 09:15:32  efy-maxim
- * Messaging module improvements
- *
- * Revision 1.12  2009/09/15 19:31:55  fplanque
- * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
- * PHP 4 compatible. Even better on PHP 5.
- * I may have broken a few things. Sorry. This is pretty hard to do in one swoop without any glitch.
- * Thanks for fixing or reporting if you spot issues.
- *
- * Revision 1.11  2009/09/15 16:46:21  efy-maxim
- * 1. Avatar in Messages List has been added
- * 2. Duplicated recipients issue has been fixed
- *
- * Revision 1.10  2009/09/15 11:20:03  efy-maxim
- * Group discussion vs Individual messages
- *
- * Revision 1.9  2009/09/14 18:37:07  fplanque
- * doc/cleanup/minor
- *
- * Revision 1.8  2009/09/14 15:18:00  efy-maxim
- * 1. Recipients can be separated by commas or spaces.
- * 2. Message list: author, full name date in the first column.
- * 3. Message list: message in the second column
- *
- * Revision 1.7  2009/09/14 13:52:07  tblue246
- * Translation fixes; removed now pointless doc comment.
- *
- * Revision 1.6  2009/09/14 13:20:56  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.5  2009/09/14 10:33:20  efy-maxim
- * messagin module improvements
- *
- * Revision 1.4  2009/09/12 18:44:11  efy-maxim
- * Messaging module improvements
- *
- * Revision 1.3  2009/09/10 18:24:07  fplanque
- * doc
+ * Revision 1.23  2013/11/06 08:04:25  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

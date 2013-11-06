@@ -2,10 +2,10 @@
 /**
  * Initialize everything:
  */
+require_once dirname(__FILE__).'/../conf/_config.php';
+require_once $inc_path.'/_main.inc.php';
 
-require_once dirname(dirname(__FILE__)).'/conf/_config.php';
-
-require_once dirname(dirname(__FILE__)).'/inc/_main.inc.php';
+global $UserSettings;
 
 param( 'type', 'string', true );
 param( 'user_ID', 'integer', true );
@@ -32,7 +32,8 @@ if( $key != md5( $user_ID.$edited_User->get( 'unsubscribe_key' ) ) )
 
 switch( $type )
 {
-	case 'collection':
+	case 'coll_comment':
+	case 'coll_post':
 		// unsubscribe from blog
 		if( $coll_ID == 0 )
 		{
@@ -40,7 +41,8 @@ switch( $type )
 			exit;
 		}
 
-		$DB->query( 'UPDATE T_subscriptions SET sub_comments = 0
+		$subscription_name = ( ( $type == 'coll_comment' ) ? 'sub_comments' : 'sub_items' );
+		$DB->query( 'UPDATE T_subscriptions SET '.$subscription_name.' = 0
 						WHERE sub_user_ID = '.$user_ID.' AND sub_coll_ID = '.$coll_ID );
 		break;
 
@@ -58,8 +60,74 @@ switch( $type )
 
 	case 'creator':
 		// unsubscribe from the user own posts
-		$edited_User->set( 'notify', 0 );
-		$edited_User->dbupdate();
+		$UserSettings->set( 'notify_published_comments', '0', $edited_User->ID );
+		$UserSettings->dbupdate();
+		break;
+
+	case 'moderator':
+		// unsubscribe from moderation notifications
+		$UserSettings->set( 'notify_comment_moderation', '0', $edited_User->ID );
+		$UserSettings->dbupdate();
+		break;
+
+	case 'unread_msg':
+		// unsubscribe from unread messages reminder
+		$UserSettings->set( 'notify_unread_messages', '0', $edited_User->ID );
+		$UserSettings->dbupdate();
+		break;
+
+	case 'new_msg':
+		// unsubscribe from new messages notification
+		$UserSettings->set( 'notify_messages', '0', $edited_User->ID );
+		$UserSettings->dbupdate();
+		break;
+
+	case 'account_activation':
+		// unsubscribe from account activation reminder
+		$UserSettings->set( 'send_activation_reminder', '0', $edited_User->ID );
+		$UserSettings->dbupdate();
+		break;
+
+	case 'newsletter':
+		// unsubscribe from newsletter
+		$UserSettings->set( 'newsletter_news', '0', $edited_User->ID );
+		$UserSettings->dbupdate();
+		break;
+
+	case 'user_registration':
+		// unsubscribe from new user registration notifications
+		$UserSettings->set( 'notify_new_user_registration', '0', $edited_User->ID );
+		$UserSettings->dbupdate();
+		break;
+
+	case 'account_activated':
+		// unsubscribe from account activated notifications
+		$UserSettings->set( 'notify_activated_account', '0', $edited_User->ID );
+		$UserSettings->dbupdate();
+		break;
+
+	case 'account_closed':
+		// unsubscribe from account closed notifications
+		$UserSettings->set( 'notify_closed_account', '0', $edited_User->ID );
+		$UserSettings->dbupdate();
+		break;
+
+	case 'account_reported':
+		// unsubscribe from account reported notifications
+		$UserSettings->set( 'notify_reported_account', '0', $edited_User->ID );
+		$UserSettings->dbupdate();
+		break;
+
+	case 'msgform':
+		// turn off allow emails through b2evo message forms
+		$UserSettings->set( 'enable_email', '0', $edited_User->ID );
+		$UserSettings->dbupdate();
+		break;
+
+	case 'cronjob_error':
+		// unsubscribe from cron job error notifications
+		$UserSettings->set( 'notify_cronjob_error', '0', $edited_User->ID );
+		$UserSettings->dbupdate();
 		break;
 }
 
@@ -68,17 +136,8 @@ exit;
 
 /*
  * $Log$
- * Revision 1.4  2011/09/06 17:13:06  sam2kb
- * minor/typo
- *
- * Revision 1.3  2011/09/05 23:00:24  fplanque
- * minor/doc/cleanup/i18n
- *
- * Revision 1.2  2011/09/05 15:54:33  sam2kb
- * minor
- *
- * Revision 1.1  2011/05/19 17:47:07  efy-asimo
- * register for updates on a specific blog post
+ * Revision 1.6  2013/11/06 08:03:44  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -25,81 +25,67 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $localtimenow, $cron_job_names;
+global $localtimenow, $cron_job_names, $edited_Cronjob;
+
+// Determine if we are creating or updating...
+global $action;
+$creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'cronjob' );
 
 $Form->global_icon( T_('Cancel!'), 'close', regenerate_url( 'action' ) );
 
-$Form->begin_form( 'fform', T_('New scheduled job') );
+$Form->begin_form( 'fform', $creating ? T_('New scheduled job') : T_('Edit scheduled job') );
 
 	$Form->add_crumb( 'crontask' );
 	$Form->hiddens_by_key( get_memorized( 'action' ) );
-	$Form->hidden( 'action', 'create' );
+	$Form->hidden( 'action', $creating ? 'create' : 'update' );
 
 	$Form->begin_fieldset( T_('Job details').get_manual_link('scheduler_job_form') );
 
-		$Form->select_input_array( 'cjob_type', NULL, $cron_job_names, T_('Job type') );
+		if( $creating && $action != 'copy' )
+		{	// New cronjob
+			$Form->select_input_array( 'cjob_type', get_param( 'cjob_type' ), $cron_job_names, T_('Job type') );
+		}
+		else
+		{	// Edit cronjob
+			if( $action == 'edit' )
+			{
+				$Form->info( T_('Job #'), $edited_Cronjob->ID );
+			}
 
-		$Form->date_input( 'cjob_date', date2mysql( $localtimenow ), T_('Schedule date'), array(
+			$Form->text_input( 'cjob_name', $edited_Cronjob->name, 25, T_('Job name'), '', array( 'maxlength' => 255, 'required' => true ) );
+		}
+
+		$Form->date_input( 'cjob_date', date2mysql( $edited_Cronjob->start_timestamp ), T_('Schedule date'), array(
 							 'required' => true ) );
 
-		$Form->time_input( 'cjob_time', date2mysql( $localtimenow ), T_('Schedule time'), array(
+		$Form->time_input( 'cjob_time', date2mysql( $edited_Cronjob->start_timestamp ), T_('Schedule time'), array(
 							 'required' => true ) );
 
-		$Form->duration_input( 'cjob_repeat_after', 0, T_('Repeat every'), 'days', 'minutes', array( 'minutes_step' => 1 ) );
+		$Form->duration_input( 'cjob_repeat_after', $edited_Cronjob->repeat_after, T_('Repeat every'), 'days', 'minutes', array( 'minutes_step' => 1 ) );
 
 	$Form->end_fieldset();
 
+	if( !$creating )
+	{	// We can edit only pending cron jobs, Show this field just for info
+		$Form->begin_fieldset( T_('Execution details').get_manual_link('scheduler_execution_info') );
+
+			$Form->info( T_('Status'), 'pending' );
+
+		$Form->end_fieldset();
+	}
+
 $Form->end_form( array(
-			array( 'submit', 'submit', T_('Create'), 'SaveButton' ),
+			array( 'submit', 'submit', $creating ? T_('Create') : T_('Update'), 'SaveButton' ),
 			array( 'reset', '', T_('Reset'), 'ResetButton' ),
 		) );
 
 
 /*
  * $Log$
- * Revision 1.9  2011/09/04 22:13:15  fplanque
- * copyright 2011
- *
- * Revision 1.8  2010/02/08 17:52:14  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.7  2010/01/30 18:55:22  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.6  2010/01/03 13:45:38  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.5  2009/10/28 09:39:52  efy-maxim
- * position of arguments of duration_input function have been changed
- *
- * Revision 1.4  2009/03/08 23:57:42  fplanque
- * 2009
- *
- * Revision 1.3  2008/01/21 09:35:28  fplanque
- * (c) 2008
- *
- * Revision 1.2  2007/09/12 21:00:31  fplanque
- * UI improvements
- *
- * Revision 1.1  2007/06/25 10:59:48  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.5  2007/04/26 00:11:09  fplanque
- * (c) 2007
- *
- * Revision 1.4  2007/01/23 08:57:36  fplanque
- * decrap!
- *
- * Revision 1.3  2006/11/24 18:27:25  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.2  2006/07/01 23:47:42  fplanque
- * fixed dirty bug
- *
- * Revision 1.1  2006/06/26 23:09:34  fplanque
- * Really working cronjob environment :)
+ * Revision 1.11  2013/11/06 08:04:07  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

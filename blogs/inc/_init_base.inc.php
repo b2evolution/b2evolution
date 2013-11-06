@@ -8,7 +8,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -114,9 +114,15 @@ require_once $inc_path.'_core/_class'.floor(PHP_VERSION).'.funcs.php';
 
 
 /**
+ * Locale related functions
+ */
+require_once $inc_path.'locales/_locale.funcs.php';
+
+
+/**
  * Miscellaneous functions
  */
-require_once $inc_path.'/_core/_misc.funcs.php';
+require_once $inc_path.'_core/_misc.funcs.php';
 
 
 /**
@@ -244,17 +250,6 @@ $month_abbrev['11'] = NT_('Nov');
 // TRANS: abbrev. for December
 $month_abbrev['12'] = NT_('Dec');
 
-// the post statuses:
-$post_statuses = array (
-	'published' => NT_('Published'),
-	'deprecated' => NT_('Deprecated'),
-	'redirected' => NT_('Redirected'),
-	'protected' => NT_('Protected'),
-	'private' => NT_('Private'),
-	'draft' => NT_('Draft'),
-	'trash' => NT_('Recycled'),
-);
-
 
 /**
  * IDs of items for which we should increment the view count on shutdown
@@ -280,28 +275,8 @@ $Timer->pause( '_init_base' );
 
 /*
  * $Log$
- * Revision 1.7  2011/09/06 00:54:38  fplanque
- * i18n update
- *
- * Revision 1.6  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.5  2011/02/14 14:13:24  efy-asimo
- * Comments trash status
- *
- * Revision 1.4  2010/05/02 19:03:05  fplanque
- * Made poor init a little less poor...
- *
- * Revision 1.3  2010/02/08 17:51:25  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.2  2009/12/07 17:41:20  blueyed
- * whitespace
- *
- * Revision 1.1  2009/12/06 05:20:36  fplanque
- * Violent refactoring for _main.inc.php
- * Sorry for potential side effects.
- * This needed to be done badly -- for clarity!
+ * Revision 1.9  2013/11/06 08:03:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

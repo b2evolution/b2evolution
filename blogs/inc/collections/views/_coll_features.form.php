@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -36,7 +36,7 @@ $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'features' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
-$Form->begin_fieldset( T_('Post list') );
+$Form->begin_fieldset( T_('Post list').get_manual_link('item-list-features') );
   $Form->select_input_array( 'orderby', $edited_Blog->get_setting('orderby'), get_available_sort_options(), T_('Order by'), T_('Default ordering of posts.') );
   $Form->select_input_array( 'orderdir', $edited_Blog->get_setting('orderdir'), array(
                         'ASC'  => T_('Ascending'),
@@ -65,14 +65,28 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Post options').get_manual_link('blog_features_settings') );
+	$Form->select_input_array( 'default_post_status', $edited_Blog->get_setting('default_post_status'), get_visibility_statuses('notes-string'), T_('Default status'), T_('Default status for new posts') );
+
 	$Form->radio( 'require_title', $edited_Blog->get_setting('require_title'),
 								array(  array( 'required', T_('Always'), T_('The blogger must provide a title') ),
 												array( 'optional', T_('Optional'), T_('The blogger can leave the title field empty') ),
 												array( 'none', T_('Never'), T_('No title field') ),
 											), T_('Post titles'), true );
 
-	$Form->checkbox( 'enable_goto_blog', $edited_Blog->get_setting( 'enable_goto_blog' ),
-						T_( 'View blog after publishing' ), T_( 'Check this to automatically view the blog after publishing a post.' ) );
+	$Form->checkbox( 'allow_html_post', $edited_Blog->get_setting( 'allow_html_post' ),
+						T_( 'Allow HTML' ), T_( 'Check to allow HTML in posts.' ).' ('.T_('HTML code will pass several sanitization filters.').')' );
+
+	$Form->radio( 'enable_goto_blog', $edited_Blog->get_setting( 'enable_goto_blog' ),
+		array( array( 'no', T_( 'No' ), T_( 'Check this to view list of the posts.' ) ),
+			array( 'blog', T_( 'View home page' ), T_( 'Check this to automatically view the blog after publishing a post.' ) ),
+			array( 'post', T_( 'View new post' ), T_( 'Check this to automatically view the post page.' ) ), ),
+			T_( 'View blog after publishing' ), true );
+
+	$Form->radio( 'editing_goto_blog', $edited_Blog->get_setting( 'editing_goto_blog' ),
+		array( array( 'no', T_( 'No' ), T_( 'Check this to view list of the posts.' ) ),
+			array( 'blog', T_( 'View home page' ), T_( 'Check this to automatically view the blog after editing a post.' ) ),
+			array( 'post', T_( 'View edited post' ), T_( 'Check this to automatically view the post page.' ) ), ),
+			T_( 'View blog after editing' ), true );
 
 	// FP> TODO:
 	// -post_url  always('required')|optional|never
@@ -86,13 +100,36 @@ $Form->begin_fieldset( T_('Post options').get_manual_link('blog_features_setting
 			array( 'no_cat_post', T_('Don\'t allow category selections'), T_('(Main cat will be assigned automatically)') ) ),
 			T_('Post category options'), true );
 
+	$Form->radio( 'post_navigation', $edited_Blog->get_setting('post_navigation'),
+		array( array( 'same_blog', T_('same blog') ),
+			array( 'same_category', T_('same category') ),
+			array( 'same_author', T_('same author') ) ),
+			T_('Default post by post navigation should stay in'), true, T_( 'Skins may override this setting!') );
+
+	$location_options = array(
+			array( 'optional', T_('Optional') ),
+			array( 'required', T_('Required') ),
+			array( 'hidden', T_('Hidden') )
+		);
+
+	$Form->radio( 'location_country', $edited_Blog->get_setting( 'location_country' ), $location_options, T_('Country') );
+
+	$Form->radio( 'location_region', $edited_Blog->get_setting( 'location_region' ), $location_options, T_('Region') );
+
+	$Form->radio( 'location_subregion', $edited_Blog->get_setting( 'location_subregion' ), $location_options, T_('Sub-region') );
+
+	$Form->radio( 'location_city', $edited_Blog->get_setting( 'location_city' ), $location_options, T_('City') );
+
+	$Form->checkbox( 'show_location_coordinates', $edited_Blog->get_setting( 'show_location_coordinates' ),
+						T_( 'Show location coordinates' ), T_( 'Check this to be able to set the location coordinates and view on map.' ) );
+
 $Form->end_fieldset();
 
 // display features settings provided by optional modules:
 // echo 'modules';
 modules_call_method( 'display_collection_features', array( 'Form' => & $Form, 'edited_Blog' => & $edited_Blog ) );
 
-$Form->begin_fieldset( T_('RSS/Atom feeds') );
+$Form->begin_fieldset( T_('RSS/Atom feeds').get_manual_link('item-feeds-features') );
 	$Form->radio( 'feed_content', $edited_Blog->get_setting('feed_content'),
 								array(  array( 'none', T_('No feeds') ),
 												array( 'title', T_('Titles only') ),
@@ -112,27 +149,54 @@ $Form->begin_fieldset( T_('RSS/Atom feeds') );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Custom field names') );
-	$notes = array(
-			T_('Ex: Price'),
-			T_('Ex: Weight'),
-			T_('Ex: Latitude or Length'),
-			T_('Ex: Longitude or Width'),
-			T_('Ex: Altitude or Height'),
-		);
-	for( $i = 1 ; $i <= 5; $i++ )
-	{
-		$Form->text( 'custom_double'.$i, $edited_Blog->get_setting('custom_double'.$i), 20, T_('(numeric)').' double'.$i, $notes[$i-1], 40 );
-	}
+$Form->begin_fieldset( T_('Custom fields').get_manual_link('item-custom-fields') );
+	$custom_field_types = array(
+			'double' => array( 'label' => T_('Numeric'), 'title' => T_('Add new numeric custom field'), 'note' => T_('Ex: Price, Weight, Length... &ndash; will be stored as a double floating point number.'), 'size' => 20, 'maxlength' => 40 ),
+			'varchar' => array( 'label' => T_('String'), 'title' => T_('Add new text custom field'), 'note' => T_('Ex: Color, Fabric... &ndash; will be stored as a varchar() field.'), 'size' => 30, 'maxlength' => 60 )
+	);
 
-	$notes = array(
-			T_('Ex: Color'),
-			T_('Ex: Fabric'),
-			T_('Leave empty if not needed'),
-		);
-	for( $i = 1 ; $i <= 3; $i++ )
+	foreach( $custom_field_types as $type => $data )
 	{
-		$Form->text( 'custom_varchar'.$i, $edited_Blog->get_setting('custom_varchar'.$i), 30, T_('(text)').' varchar'.$i, $notes[$i-1], 60 );
+		echo '<div id="custom_'.$type.'_field_list">';
+		// dispaly hidden count_custom_type value and increase after a new field was added
+		$count_custom_field = $edited_Blog->get_setting( 'count_custom_'.$type );
+		echo '<input type="hidden" name="count_custom_'.$type.'" value='.$count_custom_field.' />';
+		$deleted_custom_fields = param( 'deleted_custom_'.$type, 'string', '' );
+		echo '<input type="hidden" name="deleted_custom_'.$type.'" value="'.$deleted_custom_fields.'" />';
+		for( $i = 1 ; $i <= $count_custom_field; $i++ )
+		{ // dispaly all existing custom field name
+			$field_id_suffix = 'custom_'.$type.'_'.$i;
+			$custom_guid = $edited_Blog->get_setting( 'custom_'.$type.$i );
+			if( !empty( $deleted_custom_fields ) && ( strpos( $deleted_custom_fields, $custom_guid ) !== false ) )
+			{
+				continue;
+			}
+			$action_delete = get_icon( 'xross', 'imgtag', array( 'id' => 'delete_'.$field_id_suffix, 'style' => 'cursor:pointer', 'title' => T_('Delete custom field') ) );
+			$custom_field_name = $edited_Blog->get_setting( 'custom_fname_'.$custom_guid );
+			$custom_field_value = $edited_Blog->get_setting( 'custom_'.$type.'_'.$custom_guid );
+			$custom_field_value_class = '';
+			$custom_field_name_class = '';
+			if( empty( $custom_field_value ) )
+			{ // When user saves new field without name
+				$custom_field_value = get_param( $field_id_suffix );
+				$custom_field_value_class = 'new_custom_field_title';
+				$custom_field_name_class = 'field_error';
+			}
+			echo '<input type="hidden" name="custom_'.$type.'_guid'.$i.'" value="'.$custom_guid.'" />';
+			$custom_field_name = ' '.T_('Name').' <input type="text" name="custom_'.$type.'_fname'.$i.'" value="'.$custom_field_name.'" class="form_text_input custom_field_name '.$custom_field_name_class.'" maxlength="36" />';
+			$Form->text_input( $field_id_suffix, $custom_field_value, $data[ 'size' ], $data[ 'label' ], $action_delete, array(
+					'maxlength'    => $data[ 'maxlength' ],
+					'input_prefix' => T_('Title').' ',
+					'input_suffix' => $custom_field_name,
+					'class'        => $custom_field_value_class,
+				) );
+		}
+		echo '</div>';
+		// display link to create new custom field
+		echo '<div class="input">';
+		echo '<a onclick="return false;" href="#" id="add_new_'.$type.'_custom_field">'.$data[ 'title' ].'</a>';
+		echo '<span class="notes"> ( '.$data[ 'note' ].' )</span>';
+		echo '</div>';
 	}
 $Form->end_fieldset();
 
@@ -141,61 +205,91 @@ $Form->end_form( array(
 	array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
 	array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
-?>
-<?php
 
+load_funcs( 'regional/model/_regional.funcs.php' );
+echo_regional_required_js( 'location_' );
+
+?>
+
+<script type="text/javascript">
+	function guidGenerator() {
+		var S4 = function() {
+			return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+		};
+		return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4());
+	}
+
+	jQuery( '#add_new_double_custom_field' ).click( function()
+	{
+		var count_custom_double = jQuery( 'input[name=count_custom_double]' ).attr( 'value' );
+		count_custom_double++;
+		var custom_guid = guidGenerator();
+		jQuery( '#custom_double_field_list' ).append( '<fieldset id="ffield_custom_double_' + count_custom_double + '">' +
+				'<input type="hidden" name="custom_double_guid' + count_custom_double + '" value="' + custom_guid + '" />' +
+				'<div class="label"><label for="custom_double_' + count_custom_double + '"><?php echo TS_('Numeric'); ?>:</label></div>' +
+				'<div class="input">' +
+					'Title <input type="text" id="custom_double_' + count_custom_double + '" name="custom_double_' + count_custom_double + '" class="form_text_input new_custom_field_title" size="20" maxlength="60" />' +
+					' Name <input type="text" name="custom_double_fname' + count_custom_double + '" value="" class="form_text_input custom_field_name" maxlength="36" />' +
+				'</div></fieldset>' );
+		jQuery( 'input[name=count_custom_double]' ).attr( 'value', count_custom_double );
+	} );
+
+	jQuery( '#add_new_varchar_custom_field' ).click( function()
+	{
+		var count_custom_varchar = jQuery( 'input[name=count_custom_varchar]' ).attr( 'value' );
+		count_custom_varchar++;
+		var custom_guid = guidGenerator();
+		jQuery( '#custom_varchar_field_list' ).append( '<fieldset id="ffield_custom_string' + count_custom_varchar + '">' +
+				'<input type="hidden" name="custom_varchar_guid' + count_custom_varchar + '" value="' + custom_guid + '" />' +
+				'<div class="label"><label for="custom_varchar_' + count_custom_varchar + '"><?php echo TS_('String'); ?>:</label></div>' +
+				'<div class="input">' +
+					'Title <input type="text" id="custom_varchar_' + count_custom_varchar + '" name="custom_varchar_' + count_custom_varchar + '" class="form_text_input new_custom_field_title" size="30" maxlength="40" />' +
+					' Name <input type="text" name="custom_varchar_fname' + count_custom_varchar + '" value="" class="form_text_input custom_field_name" maxlength="36" />' +
+				'</div></fieldset>' );
+		jQuery( 'input[name=count_custom_varchar]' ).attr( 'value', count_custom_varchar );
+	} );
+
+	jQuery( '[id^="delete_custom_"]' ).click( function()
+	{
+		if( confirm( '<?php echo TS_('Are you sure want to delete this custom field?\nThe update will be performed when you will click on the \'Save changes!\' button.'); ?>' ) )
+		{ // Delete custom field only from html form, This field will be removed after saving of changes
+			var delete_action_id = jQuery( this ).attr('id');
+			var field_parts = delete_action_id.split( '_' );
+			var field_type = field_parts[2];
+			var field_index = field_parts[3];
+			var field_guid = jQuery( '[name="custom_' + field_type + '_guid' + field_index + '"]' ).val();
+			var deleted_fields = '[name="deleted_custom_' + field_type + '"]';
+			var deleted_fields_value = jQuery( deleted_fields ).val();
+			if( deleted_fields_value )
+			{
+				deleted_fields_value = deleted_fields_value + ',';
+			}
+			jQuery( deleted_fields ).val( deleted_fields_value + field_guid );
+			jQuery( '#ffield_custom_' + field_type + '_' + field_index ).remove();
+		}
+	} );
+
+	jQuery( document ).on( 'keyup', '.new_custom_field_title', function()
+	{ // Prefill new field name
+		jQuery( this ).parent().find( '.custom_field_name' ).val( parse_custom_field_name( jQuery( this ).val() ) );
+	} );
+
+	jQuery( document ).on( 'blur', '.custom_field_name', function()
+	{ // Remove incorrect chars from field name on blur event
+		jQuery( this ).val( parse_custom_field_name( jQuery( this ).val() ) );
+	} );
+
+	function parse_custom_field_name( field_name )
+	{
+		return field_name.substr( 0, 36 ).replace( /[^a-z0-9\-_]/ig, '_' ).toLowerCase();
+	}
+</script>
+<?php
 
 /*
  * $Log$
- * Revision 1.55  2011/10/05 21:13:45  fplanque
- * no message
+ * Revision 1.57  2013/11/06 08:03:58  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.54  2011/10/05 13:49:07  efy-yurybakh
- * Add settings for a $timestamp_min & $timestamp_max
- *
- * Revision 1.53  2011/10/05 12:05:02  efy-yurybakh
- * Blog settings > features tab refactoring
- *
- * Revision 1.52  2011/09/30 13:03:20  fplanque
- * doc
- *
- * Revision 1.51  2011/09/30 08:22:18  efy-asimo
- * Events update
- *
- * Revision 1.50  2011/09/30 04:56:39  efy-yurybakh
- * RSS feed settings
- *
- * Revision 1.49  2011/09/28 12:09:53  efy-yurybakh
- * "comment was helpful" votes (new tab "comments")
- *
- * Revision 1.48  2011/09/27 08:55:15  efy-asimo
- * Display module features in different fieldset
- *
- * Revision 1.47  2011/09/08 05:22:40  efy-asimo
- * Remove item attending and add item settings
- *
- * Revision 1.46  2011/09/06 00:54:38  fplanque
- * i18n update
- *
- * Revision 1.45  2011/09/04 22:13:14  fplanque
- * copyright 2011
- *
- * Revision 1.44  2011/08/26 07:40:13  efy-asimo
- * Setting to show comment to "Members only"
- *
- * Revision 1.43  2011/08/23 21:42:24  fplanque
- * doc
- *
- * Revision 1.42  2011/05/25 14:59:33  efy-asimo
- * Post attending
- *
- * Revision 1.41  2011/05/23 02:20:07  sam2kb
- * Option to display excerpts in comment feeds, or disable feeds completely
- *
- * Revision 1.40  2011/05/19 17:47:07  efy-asimo
- * register for updates on a specific blog post
- *
- * Revision 1.39  2011/03/02 09:45:59  efy-asimo
- * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
  */
 ?>

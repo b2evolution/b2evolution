@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -55,36 +55,18 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		if( param( 'default_blog_ID', 'integer', NULL ) !== NULL )
+		// Lock system
+		if( $current_User->check_perm( 'users', 'edit' ) )
 		{
-			$Settings->set( 'default_blog_ID', $default_blog_ID );
+			$system_lock = param( 'system_lock', 'integer', 0 );
+			if( $Settings->get( 'system_lock' ) && ( ! $system_lock ) && ( ! $Messages->has_errors() ) && ( 1 == $Messages->count() ) )
+			{ // System lock was turned off and there was no error, remove the warning about the system lock
+				$Messages->clear();
+			}
+			$Settings->set( 'system_lock', $system_lock );
 		}
 
-		// Session timeout
-		$timeout_sessions = param_duration( 'timeout_sessions' );
-
-		if( $timeout_sessions < 300 )
-		{ // lower than 5 minutes: not allowed
-			param_error( 'timeout_sessions', sprintf( T_( 'You cannot set a session timeout below %d seconds.' ), 300 ) );
-		}
-		elseif( $timeout_sessions < 86400 )
-		{ // lower than 1 day: notice/warning
-			$Messages->add( sprintf( T_( 'Warning: your session timeout is just %d seconds. Your users may have to re-login often!' ), $timeout_sessions ), 'note' );
-		}
-		$Settings->set( 'timeout_sessions', $timeout_sessions );
-
-		// Reload page timeout
-		$reloadpage_timeout = param_duration( 'reloadpage_timeout' );
-
-		if( $reloadpage_timeout > 99999 )
-		{
-			param_error( 'reloadpage_timeout', sprintf( T_( 'Reload-page timeout must be between %d and %d seconds.' ), 0, 99999 ) );
-		}
-		$Settings->set( 'reloadpage_timeout', $reloadpage_timeout );
-
-		// Smart hit count
-		$Settings->set( 'smart_hit_count', param( 'smart_hit_count', 'integer', 0 ) );
-
+		// General cache
 		$new_cache_status = param( 'general_cache_enabled', 'integer', 0 );
 		if( ! $Messages->has_errors() )
 		{
@@ -97,8 +79,24 @@ switch( $action )
 			}
 		}
 
-		$Settings->set( 'newblog_cache_enabled', param( 'newblog_cache_enabled', 'integer', 0 ) );
-		$Settings->set( 'newblog_cache_enabled_widget', param( 'newblog_cache_enabled_widget', 'integer', 0 ) );
+		// fp> Restore defaults has been removed because it's extra maintenance work and no real benefit to the user.
+
+		// Online help
+		param( 'webhelp_enabled', 'integer', 0 );
+		$Settings->set( 'webhelp_enabled', $webhelp_enabled );
+
+		// Hit & Session logs
+		$Settings->set( 'log_public_hits', param( 'log_public_hits', 'integer', 0 ) );
+		$Settings->set( 'log_admin_hits', param( 'log_admin_hits', 'integer', 0 ) );
+		$Settings->set( 'log_spam_hits', param( 'log_spam_hits', 'integer', 0 ) );
+
+		param( 'auto_prune_stats_mode', 'string', true );
+		$Settings->set( 'auto_prune_stats_mode',  get_param('auto_prune_stats_mode') );
+
+		// TODO: offer to set-up cron job if mode == 'cron' and to remove cron job if mode != 'cron'
+
+		param( 'auto_prune_stats', 'integer', $Settings->get_default('auto_prune_stats'), false, false, true, false );
+		$Settings->set( 'auto_prune_stats', get_param('auto_prune_stats') );
 
 		if( ! $Messages->has_errors() )
 		{
@@ -109,11 +107,42 @@ switch( $action )
 			// We have EXITed already at this point!!
 		}
 		break;
+
+	case 'update_tools':
+		// UPDATE general settings from tools:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'globalsettings' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		// Lock system
+		if( $current_User->check_perm( 'users', 'edit' ) )
+		{
+			$system_lock = param( 'system_lock', 'integer', 0 );
+			if( $Settings->get( 'system_lock' ) && ( ! $system_lock ) && ( ! $Messages->has_errors() ) && ( 1 == $Messages->count() ) )
+			{ // System lock was turned off and there was no error, remove the warning about the system lock
+				$Messages->clear();
+			}
+			$Settings->set( 'system_lock', $system_lock );
+		}
+
+		if( ! $Messages->has_errors() )
+		{
+			$Settings->dbupdate();
+			$Messages->add( T_('General settings updated.'), 'success' );
+		}
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=tools', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
 }
 
 
-$AdminUI->breadcrumbpath_init();
-$AdminUI->breadcrumbpath_add( T_('Global settings'), '?ctrl=settings',
+$AdminUI->breadcrumbpath_init( false );
+$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system',
 		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
 $AdminUI->breadcrumbpath_add( T_('General'), '?ctrl=gensettings' );
 
@@ -139,92 +168,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.31  2011/10/07 01:52:12  fplanque
- * more fixes
+ * Revision 1.33  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.30  2011/09/13 15:31:34  fplanque
- * Enhanced back-office navigation.
- *
- * Revision 1.29  2011/09/06 20:48:54  sam2kb
- * No new line at end of file
- *
- * Revision 1.28  2011/09/04 22:13:20  fplanque
- * copyright 2011
- *
- * Revision 1.27  2011/09/04 21:32:18  fplanque
- * minor MFB 4-1
- *
- * Revision 1.26  2011/08/12 08:29:00  efy-asimo
- * Post view count - fix, and crazy view counting option
- *
- * Revision 1.25  2011/03/15 09:34:05  efy-asimo
- * have checkboxes for enabling caching in new blogs
- * refactorize cache create/enable/disable
- *
- * Revision 1.24  2010/11/25 15:16:35  efy-asimo
- * refactor $Messages
- *
- * Revision 1.23  2010/06/24 07:03:11  efy-asimo
- * move the cross posting options to the bottom of teh Features tab & fix error message after moving post
- *
- * Revision 1.22  2010/05/22 12:22:49  efy-asimo
- * move $allow_cross_posting in the backoffice
- *
- * Revision 1.21  2010/02/08 17:53:55  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.20  2010/01/30 18:55:34  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.19  2010/01/02 21:11:59  fplanque
- * fat reduction / cleanup
- *
- * Revision 1.18  2009/12/06 22:55:21  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.17  2009/10/28 10:56:34  efy-maxim
- * param_duration
- *
- * Revision 1.16  2009/10/27 23:06:46  fplanque
- * doc
- *
- * Revision 1.15  2009/10/27 13:27:49  efy-maxim
- * 1. months and seconds fields in duration field
- * 2. duration fields instead simple text fields
- *
- * Revision 1.14  2009/09/26 12:00:43  tblue246
- * Minor/coding style
- *
- * Revision 1.13  2009/09/16 05:35:47  efy-bogdan
- * Require country checkbox added
- *
- * Revision 1.12  2009/09/15 22:33:20  efy-bogdan
- * Require country checkbox added
- *
- * Revision 1.11  2009/09/15 09:20:47  efy-bogdan
- * Moved the "email validation" and the "security options" blocks to the Users -> Registration tab
- *
- * Revision 1.10  2009/09/14 13:41:44  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.9  2009/09/14 11:54:21  efy-bogdan
- * Moved Default user permissions under a new tab
- *
- * Revision 1.8  2009/09/03 15:51:52  tblue246
- * Doc, "refix", use "0" instead of an empty string for the "No blog" option.
- *
- * Revision 1.7  2009/09/02 23:27:20  fplanque
- * != works, doesn't it?
- * Tblue> No, it does _not_. If you select "No blog", the setting does
- * not get set to 0 because comparing 0 and NULL using the != operator
- * gives false.
- *
- * Revision 1.6  2009/09/02 18:01:51  tblue246
- * minor
- *
- * Revision 1.5  2009/09/02 17:47:25  fplanque
- * doc/minor
  */
 ?>

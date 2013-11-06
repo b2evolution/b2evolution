@@ -7,7 +7,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -134,6 +134,14 @@ class AdminUI_general extends Menu
 	 */
 	var $breadcrumbpath = array();
 
+
+	/**
+	 * Titles of bread crumb paths
+	 *
+	 * Used to build a html <title> tag
+	 */
+	var $breadcrumb_titles = array();
+
 	/**
 	 * Constructor.
 	 */
@@ -196,6 +204,7 @@ class AdminUI_general extends Menu
 		}
 
 		$this->breadcrumbpath[] = $html;
+		$this->breadcrumb_titles[] = strip_tags( $text );
 	}
 
 
@@ -205,7 +214,7 @@ class AdminUI_general extends Menu
 
 		if( $count = count($this->breadcrumbpath) )
 		{
-			$r = '<div class="breadcrumbpath">&bull; <strong>You are here:</strong> ';
+			$r = '<div class="breadcrumbpath">&bull; <strong>'.T_('You are here').':</strong> ';
 
 			for( $i=0; $i<$count-1; $i++ )
 			{
@@ -251,18 +260,23 @@ class AdminUI_general extends Menu
 	 */
 	function get_title( $reversedDefault = false )
 	{
-		if( isset($this->title) )
-		{ // Explicit title has been set:
+		if( isset( $this->title ) )
+		{	// Explicit title has been set:
 			return $this->title;
 		}
 		else
-		{ // Fallback: implode title/text properties of the path
-			$titles = $this->get_properties_for_path( $this->path, array( 'title', 'text' ) );
+		{	// Fallback: implode title/text properties of the path
+			/*$titles = $this->get_properties_for_path( $this->path, array( 'title', 'text' ) );
 			if( $reversedDefault )
 			{ // We have asked for reverse order of the path elements:
 				$titles = array_reverse($titles);
+			}*/
+			$titles = $this->breadcrumb_titles;
+			if( count( $titles ) > 1 )
+			{	// Remove 'Dashboard' text from the title
+				array_shift( $titles );
 			}
-			return implode( $this->pathSeparator, $titles );
+			return implode( ' &gt; ', $titles );
 		}
 	}
 
@@ -320,7 +334,7 @@ class AdminUI_general extends Menu
 		global $app_shortname;
 
 		if( $htmltitle = $this->get_prop_for_node( $this->path, array( 'htmltitle' ) ) )
-		{ // Explicit htmltitle set:
+		{	// Explicit htmltitle set:
 			$r = $htmltitle;
 		}
 		else
@@ -419,6 +433,11 @@ class AdminUI_general extends Menu
 	 */
 	function disp_html_head()
 	{
+		if( is_ajax_content() )
+		{	// Don't display this content on AJAX request
+			return;
+		}
+
 		global $adminskins_path;
 		require $adminskins_path.'_html_header.inc.php';
 	}
@@ -433,6 +452,11 @@ class AdminUI_general extends Menu
 	 */
 	function disp_body_top( $display_messages = true )
 	{
+		if( is_ajax_content() )
+		{	// Don't display this content on AJAX request
+			return;
+		}
+
 		global $skins_path, $mode;
 
 		/**
@@ -486,6 +510,11 @@ class AdminUI_general extends Menu
 	 */
 	function disp_global_footer()
 	{
+		if( is_ajax_content() )
+		{	// Don't display this content on AJAX request
+			return;
+		}
+
 		global $adminskins_path, $mode;
 
 		require $adminskins_path.'_html_footer.inc.php';
@@ -502,6 +531,11 @@ class AdminUI_general extends Menu
 	 */
 	function disp_payload_begin()
 	{
+		if( is_ajax_content() )
+		{	// Don't display this content on AJAX request
+			return;
+		}
+
 		global $Plugins;
 
 		if( empty($this->displayed_sub_begin) )
@@ -542,6 +576,11 @@ class AdminUI_general extends Menu
 	 */
 	function disp_payload_end()
 	{
+		if( is_ajax_content() )
+		{	// Don't display this content on AJAX request
+			return;
+		}
+
 		if( empty($this->displayed_sub_end) )
 		{
 			$name = 'sub';
@@ -774,7 +813,7 @@ class AdminUI_general extends Menu
 							."\n<li><!-- Yes, this empty UL is needed! It's a DOUBLE hack for correct CSS display --></li>"
 							// TODO: this hack MAY NOT be needed when not using pixels instead of decimal ems or exs in the CSS
 							."\n</ul>"
-							."\n".'<div class="panelblocktabs">'
+							."\n".'<div class="panelblocktabs">$top_block$'
 							."\n".'<ul class="tabs">',
 						'after' => "</ul>\n"
 							.'<span style="float:right">$global_icons$</span>'
@@ -792,7 +831,7 @@ class AdminUI_general extends Menu
 			case 'menu3':
 				// level 3 submenu:
 				return array(
-							'before' => '<div class="menu3">&raquo;',
+							'before' => '<div class="menu3">',
 							'after' => '</div>',
 							'empty' => '',
 							'beforeEach' => '<span class="option3">',
@@ -831,29 +870,26 @@ class AdminUI_general extends Menu
 				return array(
 					'page_url' => '', // All generated links will refer to the current page
 					'before' => '<div class="results">',
+					'content_start' => '<div id="$prefix$ajax_content">',
 					'header_start' => '<div class="results_nav">',
 						'header_text' => '<strong>'.T_('Pages').'</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$',
 						'header_text_single' => '',
 					'header_end' => '</div>',
-					'list_start' => '<table class="grouped" cellspacing="0">'."\n\n",
+					'head_title' => '<div class="table_title"><span style="float:right">$global_icons$</span>$title$</div>'."\n",
+					'filters_start' => '<div class="filters">',
+					'filters_end' => '</div>',
+					'list_start' => '<div class="table_scroll">'."\n"
+					               .'<table class="grouped" cellspacing="0">'."\n",
 						'head_start' => "<thead>\n",
-							'head_title' => '<tr><th colspan="$nb_cols$" class="title"><span style="float:right">$global_icons$</span>$title$</th>'
-							                ."\n</tr>\n",
-							'filters_start' => '<tr class="filters"><td colspan="$nb_cols$">',
-							'filters_end' => '</td></tr>',
 							'line_start_head' => '<tr>',  // TODO: fusionner avec colhead_start_first; mettre a jour admin_UI_general; utiliser colspan="$headspan$"
 							'colhead_start' => '<th $class_attrib$>',
 							'colhead_start_first' => '<th class="firstcol $class$">',
 							'colhead_start_last' => '<th class="lastcol $class$">',
 							'colhead_end' => "</th>\n",
-							'sort_asc_off' => '<img src="../admin/img/grey_arrow_up.gif" alt="A" title="'.T_('Ascending order')
-							                    .'" height="12" width="11" />',
-							'sort_asc_on' => '<img src="../admin/img/black_arrow_up.gif" alt="A" title="'.T_('Ascending order')
-							                    .'" height="12" width="11" />',
-							'sort_desc_off' => '<img src="../admin/img/grey_arrow_down.gif" alt="D" title="'.T_('Descending order')
-							                    .'" height="12" width="11" />',
-							'sort_desc_on' => '<img src="../admin/img/black_arrow_down.gif" alt="D" title="'.T_('Descending order')
-							                    .'" height="12" width="11" />',
+							'sort_asc_off' => get_icon( 'sort_asc_off' ),
+							'sort_asc_on' => get_icon( 'sort_asc_on' ),
+							'sort_desc_off' => get_icon( 'sort_desc_off' ),
+							'sort_desc_on' => get_icon( 'sort_desc_on' ),
 							'basic_sort_off' => '',
 							'basic_sort_asc' => get_icon( 'ascending' ),
 							'basic_sort_desc' => get_icon( 'descending' ),
@@ -886,13 +922,13 @@ class AdminUI_general extends Menu
 							'total_col_start_last' => '<td class="lastcol $class$">',
 							'total_col_end' => "</td>\n",
 						'total_line_end' => "</tr>\n\n",
-					'list_end' => "</table>\n\n",
-					'footer_start' => '<div class="results_nav">',
-					'footer_text' => '<strong>'.T_('Pages').'</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$'
+					'list_end' => "</table></div>\n\n",
+					'footer_start' => '<div class="results_nav nav_footer">',
+					'footer_text' => '<strong>'.T_('Pages').'</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$<br />$page_size$'
 					                  /* T_('Page $scroll_list$ out of $total_pages$   $prev$ | $next$<br />'. */
 					                  /* '<strong>$total_pages$ Pages</strong> : $prev$ $list$ $next$' */
 					                  /* .' <br />$first$  $list_prev$  $list$  $list_next$  $last$ :: $prev$ | $next$') */,
-					'footer_text_single' => '',
+					'footer_text_single' => '$page_size$',
 					'footer_text_no_limit' => '', // Text if theres no LIMIT and therefor only one page anyway
 						'prev_text' => T_('Previous'),
 						'next_text' => T_('Next'),
@@ -903,11 +939,10 @@ class AdminUI_general extends Menu
 						'list_span' => 11,
 						'scroll_list_range' => 5,
 					'footer_end' => "</div>\n\n",
-					'no_results_start' => '<table class="grouped" cellspacing="0">'."\n\n"
-								                .'<tr><th class="title"><span style="float:right">$global_icons$</span>'
-								                .'$title$</th></tr>'."\n",
+					'no_results_start' => '<table class="grouped" cellspacing="0">'."\n",
 					'no_results_end'   => '<tr class="lastline"><td class="firstcol lastcol">$no_results$</td></tr>'
 								                .'</table>'."\n\n",
+				'content_end' => '</div>',
 				'after' => '</div>',
 				'sort_type' => 'basic'
 				);
@@ -931,14 +966,10 @@ class AdminUI_general extends Menu
 							'colhead_start_first' => '<th class="firstcol $class$">',
 							'colhead_start_last' => '<th class="lastcol $class$">',
 							'colhead_end' => "</th>\n",
-							'sort_asc_off' => '<img src="../admin/img/grey_arrow_up.gif" alt="A" title="'.T_('Ascending order')
-							                    .'" height="12" width="11" />',
-							'sort_asc_on' => '<img src="../admin/img/black_arrow_up.gif" alt="A" title="'.T_('Ascending order')
-							                    .'" height="12" width="11" />',
-							'sort_desc_off' => '<img src="../admin/img/grey_arrow_down.gif" alt="D" title="'.T_('Descending order')
-							                    .'" height="12" width="11" />',
-							'sort_desc_on' => '<img src="../admin/img/black_arrow_down.gif" alt="D" title="'.T_('Descending order')
-							                    .'" height="12" width="11" />',
+							'sort_asc_off' => get_icon( 'sort_asc_off' ),
+							'sort_asc_on' => get_icon( 'sort_asc_on' ),
+							'sort_desc_off' => get_icon( 'sort_desc_off' ),
+							'sort_desc_on' => get_icon( 'sort_desc_on' ),
 							'basic_sort_off' => '',
 							'basic_sort_asc' => get_icon( 'ascending' ),
 							'basic_sort_desc' => get_icon( 'descending' ),
@@ -1003,6 +1034,9 @@ class AdminUI_general extends Menu
 					'formstart' => '',
 					'title_fmt' => '$title$'."\n", // TODO: icons
 					'no_title_fmt' => '',          //           "
+					'fieldset_begin' => '<fieldset $fieldset_attribs$>'."\n"
+															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
+					'fieldset_end' => '</fieldset>'."\n",
 					'fieldstart' => '<span class="block" $ID$>',
 					'labelstart' => '',
 					'labelend' => "\n",
@@ -1049,7 +1083,7 @@ class AdminUI_general extends Menu
 			case 'block_item':
 			case 'dash_item':
 				return array(
-					'block_start' => '<div class="block_item"><h3><span style="float:right">$global_icons$</span>$title$</h3>',
+					'block_start' => '<div class="block_item" id="styled_content_block"><h3><span style="float:right">$global_icons$</span>$title$</h3>',
 					'block_end' => '</div>',
 				);
 
@@ -1407,199 +1441,8 @@ class AdminUI_general extends Menu
 
 /*
  * $Log$
- * Revision 1.118  2011/09/24 07:31:47  efy-yurybakh
- * delete children objects from T_comments__votes
+ * Revision 1.120  2013/11/06 08:05:49  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.117  2011/09/24 06:00:03  efy-yurybakh
- * star rating plugin (backoffice)
- *
- * Revision 1.116  2011/09/22 08:55:00  efy-asimo
- * Login problems with multidomain installs - fix
- *
- * Revision 1.115  2011/09/07 00:28:27  sam2kb
- * Replace non-ASCII character in regular expressions with ~
- *
- * Revision 1.114  2011/09/04 22:13:25  fplanque
- * copyright 2011
- *
- * Revision 1.113  2011/02/15 15:37:00  efy-asimo
- * Change access to admin permission
- *
- * Revision 1.112  2010/11/25 15:16:35  efy-asimo
- * refactor $Messages
- *
- * Revision 1.111  2010/11/22 13:44:33  efy-asimo
- * Admin skin preferences update
- *
- * Revision 1.110  2010/11/18 13:56:06  efy-asimo
- * admin skin preferences
- *
- * Revision 1.109  2010/05/06 18:59:31  blueyed
- * Admin: skin: base: add div.fieldset_wrapper_ID to 'Form' fieldset_begin (consistent with chicago skin).
- *
- * Revision 1.108  2010/02/08 17:56:45  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.107  2009/12/12 01:13:07  fplanque
- * A little progress on breadcrumbs on menu structures alltogether...
- *
- * Revision 1.106  2009/12/11 03:01:13  fplanque
- * breadcrumbs improved
- *
- * Revision 1.105  2009/12/06 22:55:18  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.104  2009/11/22 18:20:11  fplanque
- * Dashboard CSS enhancements
- *
- * Revision 1.103  2009/11/22 16:05:39  tblue246
- * minor/doc
- *
- * Revision 1.102  2009/10/27 22:40:21  fplanque
- * removed UGLY UGLY UGLY messages from iframe
- *
- * Revision 1.101  2009/10/12 23:03:32  blueyed
- * Fix displaying of Messages in $mode windows (e.g. file uploads) and enable
- * them in the attachment iframe.
- *
- * Revision 1.100  2009/09/26 12:00:44  tblue246
- * Minor/coding style
- *
- * Revision 1.99  2009/09/25 07:33:31  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.98  2009/09/19 23:09:02  blueyed
- * Improve usability by adding the short app_name at the end of html title.
- *
- * Revision 1.97  2009/09/14 14:12:21  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.96  2009/08/30 00:30:52  fplanque
- * increased modularity
- *
- * Revision 1.95  2009/04/21 19:19:49  blueyed
- * doc/normalization
- *
- * Revision 1.94  2009/04/13 20:51:03  fplanque
- * long overdue cleanup of "no results" display: putting filter sback in right position
- *
- * Revision 1.93  2009/03/23 04:09:43  fplanque
- * Best. Evobar. Menu. Ever.
- * menu is now extensible by plugins
- *
- * Revision 1.92  2009/03/08 23:57:56  fplanque
- * 2009
- *
- * Revision 1.91  2009/03/08 22:52:37  fplanque
- * Partial rollback because I'm not sure mod is PHP4 compatible
- *
- * Revision 1.90  2009/03/07 21:32:52  blueyed
- * Fix doc and indent.
- *
- * Revision 1.89  2009/03/04 00:10:43  blueyed
- * Make Hit constructor more lazy.
- *  - Move referer_dom_ID generation/fetching to own method
- *  - wrap Debuglog additons with "debug"
- *  - Conditionally call detect_useragent, if required. Move
- *    vars to methods for this
- *  - get_user_agent alone does not require detect_useragent
- * Feel free to revert it (since it changed all the is_foo vars
- * to methods - PHP5 would allow to use __get to handle legacy
- * access to those vars however), but please consider also
- * removing this stuff from HTML classnames, since that is kind
- * of disturbing/unreliable by itself).
- *
- * Revision 1.88  2009/02/26 22:16:54  blueyed
- * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
- *
- * Revision 1.87  2009/02/26 00:35:26  blueyed
- * Cleanup: moving modules_call_method where it gets used (only)
- *
- * Revision 1.86  2008/04/14 19:50:51  fplanque
- * enhanced attachments handling in post edit mode
- *
- * Revision 1.85  2008/04/13 20:40:05  fplanque
- * enhanced handlign of files attached to items
- *
- * Revision 1.84  2008/04/06 19:19:30  fplanque
- * Started moving some intelligence to the Modules.
- * 1) Moved menu structure out of the AdminUI class.
- * It is part of the app structure, not the UI. Up to this point at least.
- * Note: individual Admin skins can still override the whole menu.
- * 2) Moved DB schema to the modules. This will be reused outside
- * of install for integrity checks and backup.
- * 3) cleaned up config files
- *
- * Revision 1.83  2008/03/20 14:20:51  fplanque
- * no message
- *
- * Revision 1.82  2008/02/19 11:11:23  fplanque
- * no message
- *
- * Revision 1.81  2008/02/13 06:56:48  fplanque
- * moved blog selector to the left
- *
- * Revision 1.80  2008/01/23 18:28:05  fplanque
- * fixes
- *
- * Revision 1.79  2008/01/22 14:31:06  fplanque
- * minor
- *
- * Revision 1.78  2008/01/21 18:16:54  personman2
- * Different chart bg colors for each admin skin
- *
- * Revision 1.77  2008/01/21 16:46:16  fplanque
- * WARN that IE6 is crap!
- *
- * Revision 1.76  2008/01/21 15:02:01  fplanque
- * fixed evobar
- *
- * Revision 1.75  2008/01/21 09:35:43  fplanque
- * (c) 2008
- *
- * Revision 1.74  2008/01/05 02:28:17  fplanque
- * enhanced blog selector (bloglist_buttons)
- *
- * Revision 1.73  2007/11/22 14:16:43  fplanque
- * antispam / banning cleanup
- *
- * Revision 1.72  2007/11/02 02:37:37  fplanque
- * refactored blog settings / UI
- *
- * Revision 1.71  2007/09/29 03:08:24  fplanque
- * a little cleanup of the form class, hopefully fixing the plugin screen
- *
- * Revision 1.70  2007/09/28 09:28:36  fplanque
- * per blog advanced SEO settings
- *
- * Revision 1.69  2007/09/26 21:53:23  fplanque
- * file manager / file linking enhancements
- *
- * Revision 1.68  2007/09/18 00:00:59  fplanque
- * firefox mac specific forms
- *
- * Revision 1.67  2007/09/17 01:36:39  fplanque
- * look 'ma: just spent 5 hours on a smooth sized footer logo :P
- *
- * Revision 1.66  2007/09/11 08:21:29  yabs
- * minor bug fix
- *
- * Revision 1.65  2007/09/05 00:06:03  fplanque
- * no message
- *
- * Revision 1.64  2007/09/03 16:44:28  fplanque
- * chicago admin skin
- *
- * Revision 1.63  2007/07/16 02:53:04  fplanque
- * checking in mods needed by the chicago adminskin,
- * so that incompatibilities with legacy & evo can be detected early.
- *
- * Revision 1.62  2007/07/09 23:03:04  fplanque
- * cleanup of admin skins; especially evo
- *
- * Revision 1.61  2007/07/09 21:24:11  fplanque
- * cleanup of admin page top
  */
 ?>

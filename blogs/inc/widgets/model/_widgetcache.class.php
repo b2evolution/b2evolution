@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -165,79 +165,8 @@ class WidgetCache extends DataObjectCache
 
 /*
  * $Log$
- * Revision 1.14  2011/09/04 22:13:21  fplanque
- * copyright 2011
+ * Revision 1.15  2013/11/06 08:05:09  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.13  2010/11/06 04:22:18  fplanque
- * minor
- *
- * Revision 1.12  2010/11/03 19:44:15  sam2kb
- * Increased modularity - files_Module
- * Todo:
- * - split core functions from _file.funcs.php
- * - check mtimport.ctrl.php and wpimport.ctrl.php
- * - do not create demo Photoblog and posts with images (Blog A)
- *
- * Revision 1.11  2010/02/26 21:27:37  fplanque
- * rollback - did not seem right
- *
- * Revision 1.10  2010/02/08 17:54:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.9  2010/01/30 18:55:35  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.8  2009/09/14 13:53:32  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.7  2009/09/12 11:02:23  efy-arrin
- * Included the ClassName in the loadclass() with proper UpperCase
- *
- * Revision 1.6  2009/03/08 23:57:46  fplanque
- * 2009
- *
- * Revision 1.5  2009/03/06 16:40:26  blueyed
- * Fix path check/inclusion of widget classes.
- *
- * Revision 1.4  2009/03/05 23:38:53  blueyed
- * Merge autoload branch (lp:~blueyed/b2evolution/autoload) into CVS HEAD.
- *
- * Revision 1.3  2009/02/05 21:33:34  tblue246
- * Allow the user to enable/disable widgets.
- * Todo:
- * 	* Fix CSS for the widget state bullet @ JS widget UI.
- * 	* Maybe find a better solution than modifying get_Cache() to get only enabled widgets... :/
- * 	* Buffer JS requests when toggling the state of a widget??
- *
- * Revision 1.2  2008/01/21 09:35:36  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 11:01:57  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.3  2007/06/20 21:42:13  fplanque
- * implemented working widget/plugin params
- *
- * Revision 1.2  2007/06/20 14:25:00  fplanque
- * fixes
- *
- * Revision 1.1  2007/06/18 21:25:48  fplanque
- * one class per core widget
- *
- * Revision 1.5  2007/04/26 00:11:06  fplanque
- * (c) 2007
- *
- * Revision 1.4  2007/03/26 17:12:40  fplanque
- * allow moving of widgets
- *
- * Revision 1.3  2007/02/26 03:19:40  fplanque
- * hum... I cannot reproduce the old bug anymore :/
- *
- * Revision 1.2  2007/02/10 18:37:16  blueyed
- * doc/todo
- *
- * Revision 1.1  2007/01/11 20:44:19  fplanque
- * skin containers proof of concept
- * (no params handling yet though)
  */
 ?>

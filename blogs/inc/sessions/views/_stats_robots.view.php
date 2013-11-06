@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -174,77 +174,8 @@ $Results->display();
 
 /*
  * $Log$
- * Revision 1.17  2011/10/03 10:41:25  efy-vitalij
- * add colors to statistic
+ * Revision 1.18  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.16  2011/09/04 22:13:18  fplanque
- * copyright 2011
- *
- * Revision 1.15  2010/02/08 17:53:55  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.14  2010/01/30 18:55:34  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.13  2009/12/08 22:38:13  fplanque
- * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
- *
- * Revision 1.12  2009/12/06 22:55:20  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.11  2009/10/03 20:43:40  tblue246
- * Commit message cleanup...
- *
- * Revision 1.10  2009/10/03 20:07:51  tblue246
- * - Hit::detect_user_agent():
- * 	- Try to use get_browser() to get platform information or detect robots if "normal" detection failed.
- * 	- Use Skin::type to detect RSS readers.
- * - Removed unneeded functions.
- * - translate_user_agent(): Use get_browser() if translation failed.
- *
- * Revision 1.9  2009/09/25 13:09:36  efy-vyacheslav
- * Using the SQL class to prepare queries
- *
- * Revision 1.8  2009/09/13 21:26:50  blueyed
- * SQL_NO_CACHE for SELECT queries using T_hitlog
- *
- * Revision 1.7  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.6  2009/02/27 22:57:26  blueyed
- * Use load_funcs for swfcharts, and especially only include it when needed (in the stats controllers only, not main.inc)
- *
- * Revision 1.5  2008/02/14 05:45:38  fplanque
- * cleaned up stats
- *
- * Revision 1.4  2008/02/14 02:19:53  fplanque
- * cleaned up stats
- *
- * Revision 1.3  2008/01/21 18:16:33  personman2
- * Different chart bg colors for each admin skin
- *
- * Revision 1.2  2008/01/21 09:35:34  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 11:01:06  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.7  2007/04/26 00:11:13  fplanque
- * (c) 2007
- *
- * Revision 1.6  2007/03/20 09:53:26  fplanque
- * Letting boggers view their own stats.
- * + Letthing admins view the aggregate by default.
- *
- * Revision 1.5  2007/02/10 17:55:25  waltercruz
- * Changing double quotes to single quotes and the MySQL date functions to the standart ones
- *
- * Revision 1.4  2006/11/26 23:40:34  blueyed
- * trans
- *
- * Revision 1.3  2006/11/26 01:42:10  fplanque
- * doc
  */
 ?>

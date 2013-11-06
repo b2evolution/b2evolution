@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -67,10 +67,6 @@ class CommentQuery extends SQL
 		$this->dbIDname = $dbIDname;
 
 		$this->FROM( $this->dbtablename );
-
-		# Add constraints to only include comments on items visible for the current User!
-		$this->FROM_add('INNER JOIN T_items__item ON post_ID = comment_post_ID');
-		$this->WHERE_and(statuses_where_clause());
 	}
 
 
@@ -186,7 +182,7 @@ class CommentQuery extends SQL
 
 		$ItemQuery = new ItemQuery( $dbtable, $dbprefix, $dbIDname );
 		$ItemQuery->where_datestart( '', '', '', '', $timestamp_min, $timestamp_max );
-		
+
 		$this->WHERE_and( $ItemQuery->get_where( '' ) );
 	}
 
@@ -306,18 +302,9 @@ class CommentQuery extends SQL
 			return;
 		}
 
-		if( substr( $author_IP, 0, 1 ) == '-' )
-		{	// List starts with MINUS sign:
-			$eq = 'NOT IN';
-			$author_IP_list = substr( $author_IP, 1 );
-		}
-		else
-		{
-			$eq = 'IN';
-			$author_IP_list = $author_IP;
-		}
+		global $DB;
 
-		$this->WHERE_and( $this->dbprefix.'author_IP '.$eq.' ('.$author_IP_list.')' );
+		$this->WHERE_and( $this->dbprefix.'author_IP LIKE '.$DB->quote( $author_IP ) );
 	}
 
 
@@ -380,21 +367,30 @@ class CommentQuery extends SQL
 	 */
 	function where_statuses( $show_statuses )
 	{
+		global $blog;
+
 		if( empty( $show_statuses ) )
 		{ // initialize if emty
-			$show_statuses = array( 'published', 'draft', 'deprecated' );
+			$show_statuses = get_visibility_statuses( 'keys', array( 'trash', 'redirected' ) );
 		}
 		$this->show_statuses = $show_statuses;
 
-		$list = '';
-		$sep = '';
-		foreach( $show_statuses as $status )
-		{
-			$list .= $sep.'\''.$status.'\'';
-			$sep = ',';
+		if( $blog )
+		{ // show not published comments corresponding to the given blog perms
+			$this->WHERE_and( statuses_where_clause( $this->show_statuses, $this->dbprefix, $blog, 'blog_comment!' ) );
 		}
+		else
+		{
+			$list = '';
+			$sep = '';
+			foreach( $show_statuses as $status )
+			{
+				$list .= $sep.'\''.$status.'\'';
+				$sep = ',';
+			}
 
-		$this->WHERE_and( $this->dbprefix.'status IN ('.$list.')' );
+			$this->WHERE_and( $this->dbprefix.'status IN ('.$list.')' );
+		}
 	}
 
 
@@ -507,19 +503,39 @@ class CommentQuery extends SQL
 		$this->WHERE_and( $Blog->get_sql_where_aggregate_coll_IDs('othercats.cat_blog_ID') );
 	}
 
+
+	/**
+	 * Restrict to show or hide active/expired comments ( ecpired comments are older then the post expiry delay value )
+	 * By default only active comments will be allowed
+	 * 
+	 * @param array expiry statuses to show
+	 */
+	function expiry_restrict( $expiry_statuses )
+	{
+		global $localtimenow, $DB;
+
+		$show_active = empty( $expiry_statuses ) || in_array( 'active', $expiry_statuses );
+		$show_expired = !empty( $expiry_statuses ) && in_array( 'expired', $expiry_statuses );
+
+		if( !$show_expired )
+		{
+			$this->FROM_add( 'LEFT JOIN T_items__item_settings as expiry_setting ON iset_item_ID = comment_post_ID AND iset_name = "post_expiry_delay"' );
+			$this->WHERE_and( 'expiry_setting.iset_value IS NULL OR expiry_setting.iset_value = "" OR TIMESTAMPDIFF(SECOND, comment_date, '.$DB->quote( date2mysql( $localtimenow ) ).') < expiry_setting.iset_value' );
+		}
+		elseif( !$show_active )
+		{
+			$this->FROM_add( 'LEFT JOIN T_items__item_settings as expiry_setting ON iset_item_ID = comment_post_ID AND iset_name = "post_expiry_delay"' );
+			$this->WHERE_and( 'expiry_setting.iset_value IS NOT NULL AND expiry_setting.iset_value <> "" AND TIMESTAMPDIFF(SECOND, comment_date, '.$DB->quote( date2mysql( $localtimenow ) ).') >= expiry_setting.iset_value' );
+		}
+	}
+
 }
 
 
 /*
  * $Log$
- * Revision 1.9  2011/10/07 07:22:59  efy-yurybakh
- * Replace all timestamp_min & timestamp_max with Blog's methods
- *
- * Revision 1.8  2011/09/04 22:13:15  fplanque
- * copyright 2011
- *
- * Revision 1.7  2010/07/26 06:52:16  efy-asimo
- * MFB v-4-0
+ * Revision 1.11  2013/11/06 08:03:58  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

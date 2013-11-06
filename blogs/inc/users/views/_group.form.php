@@ -7,7 +7,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -63,19 +63,19 @@ global $action;
 			jQuery('#edited_grp_perm_shared_root_radio_4').attr('disabled', 'disabled');
 			break;
 		case "view":
-			jQuery('#edited_grp_perm_shared_root_radio_2').attr('disabled', '');
+			jQuery('#edited_grp_perm_shared_root_radio_2').removeAttr('disabled');
 			jQuery('#edited_grp_perm_shared_root_radio_3').attr('disabled', 'disabled');
 			jQuery('#edited_grp_perm_shared_root_radio_4').attr('disabled', 'disabled');
 			break;
 		case "add":
-			jQuery('#edited_grp_perm_shared_root_radio_2').attr('disabled', '');
-			jQuery('#edited_grp_perm_shared_root_radio_3').attr('disabled', '');
+			jQuery('#edited_grp_perm_shared_root_radio_2').removeAttr('disabled');
+			jQuery('#edited_grp_perm_shared_root_radio_3').removeAttr('disabled');
 			jQuery('#edited_grp_perm_shared_root_radio_4').attr('disabled', 'disabled');
 			break;
 		default:
-			jQuery('#edited_grp_perm_shared_root_radio_2').attr('disabled', '');
-			jQuery('#edited_grp_perm_shared_root_radio_3').attr('disabled', '');
-			jQuery('#edited_grp_perm_shared_root_radio_4').attr('disabled', '');
+			jQuery('#edited_grp_perm_shared_root_radio_2').removeAttr('disabled');
+			jQuery('#edited_grp_perm_shared_root_radio_3').removeAttr('disabled');
+			jQuery('#edited_grp_perm_shared_root_radio_4').removeAttr('disabled');
 		}
 	}
 </script>
@@ -128,6 +128,10 @@ function display_pluggable_permissions( &$Form, $perm_block )
 						case 'info':
 							$Form->info( $perm['label'], $perm['info'] );
 						break;
+
+						case 'text_input':
+							$Form->text_input( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name], 5, $perm['label'], $perm['note'], array( 'maxlength' => $perm['maxlength'] ) );
+						break;
 					}
 				}
 			}
@@ -137,7 +141,7 @@ function display_pluggable_permissions( &$Form, $perm_block )
 
 $Form = new Form( NULL, 'group_checkchanges' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'ctrl,grp_ID,action', 'ctrl=users' ) );
+$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'ctrl,grp_ID,action', 'ctrl=groups' ) );
 
 if( $edited_Group->ID == 0 )
 {
@@ -227,26 +231,23 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('System admin permissions').get_manual_link('group_properties_system_permissions') );
 
-	display_pluggable_permissions( $Form, 'core');
-
-	if( $edited_Group->ID != 1 )
-	{	// Groups others than #1 can be prevented from editing users
-		$Form->radio( 'edited_grp_perm_users', $edited_Group->get('perm_users'),
-				array(	$perm_none_option,
-								$perm_view_option,
-								$perm_edit_option
-							), T_('Users & Groups') );
-	}
-	else
-	{	// Group #1 always has user management right:
-		$Form->info( T_('Users & Groups'), T_('Full Access') );
-	}
-
-	// asimo>After perm_users will be converted to pluggable permission 'core2' can be changed to 'core' 
-	display_pluggable_permissions( $Form, 'core2' );
-
 	// Display pluggable permissions:
+	display_pluggable_permissions( $Form, 'core' );
+
+	// show Settings children permissions only if this user group has at least "View details" rights on global System Settings
+	echo '<div id="perm_options_children"'.( $edited_Group->check_perm( 'options', 'view' ) ? '' : ' style="display:none"' ).'>';
+	display_pluggable_permissions( $Form, 'core2' );
 	display_pluggable_permissions( $Form, 'system' );
+	echo '</div>';
+
+	display_pluggable_permissions( $Form, 'core3' );
+
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_( 'Notification options') );
+
+	// Display pluggale notification options
+	display_pluggable_permissions( $Form, 'notifications');
 
 $Form->end_fieldset();
 
@@ -262,132 +263,29 @@ $Form->end_form();
 // set shared root permission availability, when form was loaded and when file perms was changed
 ?>
 <script type="text/javascript">
-		file_perm_changed();
-		jQuery( '[name="edited_grp_perm_files"]' ).click(function() {
-			file_perm_changed();
-		});
+file_perm_changed();
+jQuery( '[name="edited_grp_perm_files"]' ).click( function() {
+	file_perm_changed();
+} );
+
+jQuery( 'input[name=edited_grp_perm_options]' ).click( function()
+{	// Show/Hide the children permissions of the Settings permission
+	if( jQuery( this ).val() == 'none' )
+	{
+		jQuery( 'div#perm_options_children' ).hide();
+	}
+	else
+	{
+		jQuery( 'div#perm_options_children' ).show();
+	}
+} );
 </script>
 <?php
 
 /*
  * $Log$
- * Revision 1.32  2011/09/04 22:13:21  fplanque
- * copyright 2011
+ * Revision 1.34  2013/11/06 08:05:03  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.31  2011/02/15 15:37:00  efy-asimo
- * Change access to admin permission
- *
- * Revision 1.30  2011/01/18 16:23:03  efy-asimo
- * add shared_root perm and refactor file perms - part1
- *
- * Revision 1.29  2010/10/15 13:10:09  efy-asimo
- * Convert group permissions to pluggable permissions - part1
- *
- * Revision 1.28  2010/05/07 08:07:14  efy-asimo
- * Permissions check update (User tab, Global Settings tab) - bugfix
- *
- * Revision 1.27  2010/04/23 09:39:44  efy-asimo
- * "SEO setting" for help link and Groups slugs permission implementation
- *
- * Revision 1.26  2010/04/08 10:35:23  efy-asimo
- * Allow users to create a new blog for themselves - task
- *
- * Revision 1.25  2010/02/28 22:41:00  fplanque
- * Permission to use XML-RPC APIs can now be granted/denied on a group basis
- *
- * Revision 1.24  2010/02/08 17:54:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.23  2010/01/30 18:55:35  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.22  2010/01/03 13:45:37  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.21  2009/12/06 22:55:22  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.20  2009/11/12 03:54:17  fplanque
- * wording/doc/cleanup
- *
- * Revision 1.19  2009/10/28 14:55:12  efy-maxim
- * pluggable permissions separated by blocks in group form
- *
- * Revision 1.18  2009/10/27 23:06:46  fplanque
- * doc
- *
- * Revision 1.17  2009/10/08 20:05:52  efy-maxim
- * Modular/Pluggable Permissions
- *
- * Revision 1.16  2009/09/25 20:26:26  fplanque
- * fixes/doc
- *
- * Revision 1.15  2009/09/25 14:18:22  tblue246
- * Reverting accidental commits
- *
- * Revision 1.13  2009/09/23 13:32:21  efy-bogdan
- * Separate controller added for groups
- *
- * Revision 1.12  2009/09/18 14:22:11  efy-maxim
- * 1. 'reply' permission in group form
- * 2. functionality to store and update contacts
- * 3. fix in misc functions
- *
- * Revision 1.11  2009/09/13 12:25:34  efy-maxim
- * Messaging permissions have been added to:
- * 1. Upgrader
- * 2. Group class
- * 3. Edit Group form
- *
- * Revision 1.10  2009/07/08 22:42:15  fplanque
- * wording for newbies
- *
- * Revision 1.9  2009/03/22 16:15:06  fplanque
- * Reverted fugky hack where all possible combiantions pose as a "level"
- * Use one checkbox per attributes class/style/id
- *
- * Revision 1.7  2009/03/21 22:55:15  fplanque
- * Adding TinyMCE -- lowfat version
- *
- * Revision 1.6  2009/03/08 23:57:46  fplanque
- * 2009
- *
- * Revision 1.5  2008/01/21 09:35:36  fplanque
- * (c) 2008
- *
- * Revision 1.4  2008/01/20 18:20:25  fplanque
- * Antispam per group setting
- *
- * Revision 1.3  2008/01/20 15:31:12  fplanque
- * configurable validation/security rules
- *
- * Revision 1.2  2008/01/19 10:57:10  fplanque
- * Splitting XHTML checking by group and interface
- *
- * Revision 1.1  2007/06/25 11:01:50  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.11  2007/04/26 00:11:13  fplanque
- * (c) 2007
- *
- * Revision 1.10  2007/03/20 09:53:26  fplanque
- * Letting boggers view their own stats.
- * + Letthing admins view the aggregate by default.
- *
- * Revision 1.9  2007/01/23 04:20:31  fplanque
- * wording
- *
- * Revision 1.8  2006/12/17 23:42:39  fplanque
- * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
- * Look into Advanced Settings for the aggregating blog.
- * There may be side effects and new bugs created by this. Please report them :]
- *
- * Revision 1.7  2006/12/07 16:06:24  fplanque
- * prepared new file editing permission
- *
- * Revision 1.6  2006/11/24 18:27:26  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

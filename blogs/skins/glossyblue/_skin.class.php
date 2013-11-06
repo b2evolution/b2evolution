@@ -83,6 +83,12 @@ class glossyblue_Skin extends Skin
 		// call parent:
 		parent::display_init();
 
+		// Add CSS:
+		require_css( 'basic_styles.css', 'blog' ); // the REAL basic styles
+		require_css( 'basic.css', 'blog' ); // Basic styles
+		require_css( 'blog_base.css', 'blog' ); // Default styles for the blog navigation
+		require_css( 'item_base.css', 'blog' ); // Default styles for the post CONTENT
+
 		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
 		if($this->get_setting("colorbox")) 
 		{
@@ -93,17 +99,8 @@ class glossyblue_Skin extends Skin
 
 /*
  * $Log$
- * Revision 1.7  2011/10/03 10:07:06  efy-yurybakh
- * bubbletips & identity_links cleanup
- *
- * Revision 1.6  2011/09/29 12:22:24  efy-yurybakh
- * skin param for bubbletip
- *
- * Revision 1.5  2011/09/17 02:31:58  fplanque
- * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
- *
- * Revision 1.4  2011/09/14 20:19:48  fplanque
- * cleanup
+ * Revision 1.9  2013/11/06 08:05:44  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

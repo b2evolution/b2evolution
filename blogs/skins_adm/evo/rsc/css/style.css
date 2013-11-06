@@ -8,12 +8,6 @@
  * @package admin
  */
 
-@import url("../../../../rsc/css/basic.css");            /* Import basic styles */
-@import url("../../../../rsc/css/results.css");          /* Import results/tables styles */
-@import url("../../../../rsc/css/item_base.css");   /* TODO: remove when skins have params */
-@import url("../../../../rsc/css/fileman.css");     /* TODO: move to appropriate controller - Import filemanager styles */
-@import url("../../../../rsc/css/admin.global.css");     /* Import basic admin styles */
-
 body {
 	margin: 0;
 	background-color: #fff;
@@ -22,6 +16,9 @@ body {
 	font-size: 84%;
 	background-image: url(../img/leftfade.png);
 	background-repeat: repeat-y;
+}
+textarea, input, select, option, optgroup, ul.ui-autocomplete, div.input li.token-input-token-facebook, body div.token-input-dropdown-facebook {
+	font: 13.43px Verdana, Geneva, Arial, Helvetica, sans-serif;
 }
 
 /* Titles */
@@ -411,7 +408,7 @@ div.tabbedpanelblock {
 	border: 1px solid #929292;
 	border-top: none;
 	background-color: #fbfbfb;
-	padding: 1ex 1em 1ex 1em;
+	padding: 4px 1em 1ex 1em;
 	margin: 0 1em 2ex 1em;
 }
 div.tabbedpanelblock fieldset {
@@ -501,6 +498,33 @@ div.bPostpublished {
 .bPostpublished span.Status {
 	color: #0b0;
 }
+
+div.bPostcommunity {
+	border: 1px solid #2E8BB9;
+	background-color: #fff;
+}
+.bPostcommunity > div.bSmallHead /* Direct child only */
+{
+	border-bottom: 1px solid #2E8BB9;
+}
+.bPostcommunity span.bStatus,
+.status_community {
+	color: #2E8BB9;
+}
+
+div.bPostreview {
+	border: 1px solid #CC0099;
+	background-color: #fff;
+}
+.bPostreview > div.bSmallHead /* Direct child only */
+{
+	border-bottom: 1px solid #CC0099;
+}
+.bPostreview span.bStatus,
+.status_review {
+	color: #CC0099;
+}
+
 .bPostprotected {
 	border: 1px solid #fc9;
 	background-color: #fff;
@@ -547,6 +571,30 @@ div.bPostpublished {
 .bPostdeprecated > div.bSmallHead /* Direct child only */
 {
 	border-bottom: 1px dashed #000;
+}
+
+.bPostredirected {
+	border: 1px solid #639;
+	background-color: #dcf;
+}
+.bPostredirected span.bStatus,
+.status_redirected {
+	color: #639;
+	background-color: #c0b0e0;
+}
+.bPostredirected > div.bSmallHead /* Direct child only */
+{
+	background-color: #c0b0e0;
+	border-bottom: 1px solid #639;
+}
+.bPostredirected div.bSmallPrint {
+	border-top: 1px solid #639;
+}
+.bPostredirected div.PostActionsArea {
+	border: 1px solid #639;
+	border-left: none;
+	border-right: none;
+	background-color: #c0b0e0;
 }
 
 .bContent,
@@ -693,4 +741,52 @@ div.edit_actions {
 span.checkall,
 th.checkright {
 	font-size: 84%;
+}
+
+/* jQuery Tokeninput plugin */
+div.input ul.token-input-list-facebook {
+	width: 98%;
+	background: #F6F6F6;
+	border: 1px solid #AAAAAA;
+	padding: 1px 4px;
+}
+div#ffield_item_tags ul.token-input-list-facebook {
+	width: 100%;
+}
+#itemform_adv_props ul.token-input-list-facebook {
+	width: 100%;
+	padding: 0 1px;
+	margin: 1px;
+}
+
+ul.widget_container {
+	border-color: #BBB;
+}
+.widget_container li.ui-droppable.even {
+	background: #EEE;
+}
+.widget_container li.ui-droppable.odd {
+	background: #DDD;
+}
+
+.quick_search_form {
+	float: right;
+	margin: -6px -1px 0 0;
+}
+
+/* Statuses of posts & comments display */
+#styled_content_block .status_draft,
+#styled_content_block .status_review,
+#styled_content_block .status_community,
+#styled_content_block .status_protected,
+#styled_content_block .status_private,
+#styled_content_block .status_published,
+#styled_content_block .status_deprecated,
+#styled_content_block .status_redirected {
+	top: -7px;
+	left: 7px;
+}
+span.note.status_draft span {
+	color: #fff;
+	background-color: #FF9966;
 }

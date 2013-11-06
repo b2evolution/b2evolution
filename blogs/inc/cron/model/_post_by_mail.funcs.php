@@ -5,7 +5,7 @@
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author Stephan Knauss
@@ -49,6 +49,12 @@ function pbm_msg( $message, $cron = false )
  */
 function pbm_connect()
 {
+	if( !extension_loaded( 'imap' ) )
+	{	// Exit here if imap extension is not loaded
+		pbm_msg('<b class="red">IMAP extension is NOT loaded!</b>');
+		return false;
+	}
+
 	global $Settings;
 
 	$host = $Settings->get('eblog_server_host').':'.$Settings->get('eblog_server_port');
@@ -264,8 +270,6 @@ function pbm_process_messages( & $mbox, $limit )
 			pbm_msg('Message type: TEXT');
 			pbm_msg('Message body: <pre style="font-size:10px">'.htmlspecialchars($strbody).'</pre>');
 
-			$do_auto_br = $Settings->get('AutoBR');
-
 			// Process body. First fix different line-endings (dos, mac, unix), remove double newlines
 			$content = str_replace( array("\r", "\n\n"), "\n", trim($strbody) );
 
@@ -285,9 +289,6 @@ function pbm_process_messages( & $mbox, $limit )
 		else
 		{	// HTML message
 			pbm_msg('Message type: HTML');
-
-			// No auto <BR> in HTML mode
-			$do_auto_br = false;
 
 			if( ($parsed_message = pbm_prepare_html_message( $html_body )) === false )
 			{	// No 'auth' tag provided, skip to the next message
@@ -429,9 +430,25 @@ function pbm_process_messages( & $mbox, $limit )
 		}
 
 		// CHECK and FORMAT content
+		global $Plugins;
+		$renderer_params = array( 'Blog' => & $pbmBlog, 'setting_name' => 'coll_apply_rendering' );
+		$renderers = $Plugins->validate_renderer_list( $Settings->get('eblog_renderers'), $renderer_params );
+
+		pbm_msg( 'Applying the following text renderers: '.implode( ', ', $renderers ) );
+
+		// Do some optional filtering on the content
+		// Typically stuff that will help the content to validate
+		// Useful for code display
+		// Will probably be used for validation also
+		$Plugins_admin = & get_Plugins_admin();
+		$params = array( 'object_type' => 'Item', 'object_Blog' => & $pbmBlog );
+		$Plugins_admin->filter_contents( $post_title /* by ref */, $content /* by ref */, $renderers, $params );
+
+		pbm_msg('Filtered post content: <pre style="font-size:10px">'.htmlspecialchars($content).'</pre>');
+		
 		$context = $Settings->get('eblog_html_tag_limit') ? 'commenting' : 'posting';
-		$post_title = check_html_sanity( trim($post_title), $context, false, $pbmUser );
-		$content = check_html_sanity( trim($content), $context, $do_auto_br, $pbmUser );
+		$post_title = check_html_sanity( $post_title, $context, $pbmUser );
+		$content = check_html_sanity( $content, $context, $pbmUser );
 
 		global $Messages;
 		if( $Messages->has_errors() )
@@ -474,9 +491,10 @@ function pbm_process_messages( & $mbox, $limit )
 			$edited_Item->set( 'extra_cat_IDs', $extra_cat_IDs );
 			$edited_Item->set( 'status', $post_status );
 			$edited_Item->set( 'locale', $pbmUser->locale );
+			$edited_Item->set( 'renderers', $renderers );
 
 			// INSERT INTO DB:
-			$edited_Item->dbinsert();
+			$edited_Item->dbinsert( 'through_email' );
 
 			pbm_msg( sprintf('Item created?: '.(isset($edited_Item->ID) ? 'yes' : 'no') ) );
 
@@ -526,6 +544,9 @@ function pbm_process_messages( & $mbox, $limit )
 			++$del_cntr;
 		}
 	}
+
+	// Expunge messages marked for deletion
+	imap_expunge($mbox);
 
 	return true;
 }
@@ -638,10 +659,9 @@ function pbm_process_attachments( & $content, $mailAttachments, $mediadir, $medi
 			$filename = 'upload_'.uniqid().'.'.$attachment['SubType'];
 			pbm_msg( sprintf('Attachment without name. Using "%s".', htmlspecialchars($filename)) );
 		}
-		$filename = preg_replace( '/[^a-z0-9\-_.]/', '-', $filename );
 
 		// Check valid filename/extension: (includes check for locked filenames)
-		if( $error_filename = validate_filename( $filename ) )
+		if( $error_filename = process_filename( $filename, true ) )
 		{
 			pbm_msg('Invalid filename: '.$error_filename);
 			continue;
@@ -854,11 +874,8 @@ function pbm_tempdir( $dir, $prefix = 'tmp', $mode = 0700 )
 
 /*
  * $Log$
- * Revision 1.2  2011/10/18 07:28:12  sam2kb
- * Post by Email fixes
- *
- * Revision 1.1  2011/10/17 20:16:52  sam2kb
- * Post by Email converted into internal scheduled job
+ * Revision 1.4  2013/11/06 08:04:07  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

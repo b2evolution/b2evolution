@@ -32,7 +32,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	<?php
 
 	// Check if user is logged in and is in group #1 (admins)
-	if( !is_logged_in() || $current_User->Group->ID != 1 )
+	if( !is_logged_in( false ) || $current_User->Group->ID != 1 )
 	{	// login failed
 		debug_die( 'You must login with an administrator (group #1) account.' );
 	}
@@ -541,7 +541,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			{
 				// Import the user
 				$query = 'INSERT INTO '.$b2.'users (user_ID, user_login, user_pass, user_firstname, user_nickname, user_email,
-																						user_url, dateYMDhour, user_validated, user_grp_ID)
+																						user_url, user_created_datetime, user_validated, user_grp_ID)
 									VALUES ("'.$a_user['id'].'", "'.$a_user['login'].'", "'.$a_user['password'].'", "'
 														.$a_user['firstname'].'", "'.$a_user['nickname'].'", "'.$a_user['email']
 														.'", "'.$a_user['url'].'", "'.fix_date($a_user['date']).'", "1", "4");';
@@ -577,20 +577,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <?php
 /*
  * $Log$
- * Revision 1.11  2011/06/15 06:29:44  sam2kb
- * Relocate "set_max_execution_time" function
- *
- * Revision 1.10  2011/02/15 05:31:53  sam2kb
- * evo_strtolower mbstring wrapper for strtolower function
- *
- * Revision 1.9  2009/07/09 12:12:49  tblue246
- * a) RegExp delimiter *is* needed. b) Removed uppercase A-Z range and made RegExp case-insensitive.
- *
- * Revision 1.8  2009/07/09 05:07:08  sam2kb
- * minor
- *
- * Revision 1.7  2009/07/09 00:11:19  fplanque
- * minor
+ * Revision 1.13  2013/11/06 08:04:54  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

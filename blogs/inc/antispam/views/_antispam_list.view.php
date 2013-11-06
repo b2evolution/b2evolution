@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -23,8 +23,10 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-echo '<a href="?ctrl=set_antispam" style="float: right;"><strong>'.T_('Antispam settings').' &raquo;</strong></a>';
-echo '<h2>'.T_('Antispam blacklist').'</h2>';
+if( get_param('display_mode') == 'js' )
+{	// This is an Ajax response
+	echo '<h2>'.T_('Antispam blacklist').'</h2>';
+}
 
 // ADD KEYWORD FORM:
 if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) // TODO: check for 'add' here once it's mature.
@@ -179,47 +181,8 @@ $Results->display();
 
 /*
  * $Log$
- * Revision 1.11  2011/09/04 22:13:13  fplanque
- * copyright 2011
+ * Revision 1.13  2013/11/06 08:03:48  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.10  2010/02/08 17:52:06  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.9  2010/01/30 18:55:20  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.8  2010/01/16 14:27:03  efy-yury
- * crumbs, fadeouts, redirect, action_icon
- *
- * Revision 1.7  2010/01/03 17:56:05  fplanque
- * crumbs & stuff
- *
- * Revision 1.6  2009/09/25 20:26:27  fplanque
- * fixes/doc
- *
- * Revision 1.5  2009/09/25 13:06:09  efy-vyacheslav
- * Using the SQL class to prepare queries
- *
- * Revision 1.4  2009/03/08 23:57:41  fplanque
- * 2009
- *
- * Revision 1.3  2008/01/21 09:35:25  fplanque
- * (c) 2008
- *
- * Revision 1.2  2007/11/22 14:16:43  fplanque
- * antispam / banning cleanup
- *
- * Revision 1.1  2007/09/04 14:56:19  fplanque
- * antispam cleanup
- *
- * Revision 1.1  2007/06/25 10:59:22  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.7  2007/04/26 00:11:05  fplanque
- * (c) 2007
- *
- * Revision 1.6  2006/12/07 23:13:12  fplanque
- * @var needs to have only one argument: the variable type
- * Otherwise, I can't code!
  */
 ?>

@@ -12,16 +12,6 @@
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 /**
- * No Translation. Does nothing.
- *
- * Nevertheless, the string will be extracted by the gettext tools
- */
-function NT_( $string )
-{
-	return $string;
-}
-
-/**
  * Display debugging informations?
  *
  * 0 = no
@@ -32,11 +22,15 @@ function NT_( $string )
  * @global integer
  */
 $debug = 'pwd';
+$debug_jslog = 'pwd';
 
 /**
  * When $debug is 'pwd' and you set a /password/ below,
  * you can turn on debugging at any time by adding ?debug=YOUR_PASSWORD to your url.
  * You can turn off by adding just ?debug
+ *
+ * You can ALSO turn on debugging of JavaScript(AJAX Requests) by adding ?jslog=YOUR_PASSWORD to your url.
+ * You can turn off by adding just ?jslog
  *
  * @var string
  */
@@ -45,26 +39,23 @@ $debug_pwd = '';
 
 // Most of the time you'll want to see all errors, including notices:
 // b2evo should run notice free! (plugins too!)
-if( ! defined( 'E_DEPRECATED' ) )
-{
-	error_reporting( E_ALL );
+if( version_compare( phpversion(), '5.3', '>=' ) )
+{	// sam2kb> Disable E_STRICT messages on PHP > 5.3, there are numerous E_STRICT warnings displayed throughout the app
+	error_reporting( E_ALL & ~E_STRICT );
 }
 else
-{	// Hopefully temporary fix for PHP >= v5.3 (Assigning the return value of new by reference is deprecated)
-	// Tblue> This doesn't work properly on PHP 5.3... For some reason, you have to set error_reporting to
-	// the desired value in php.ini -- error_reporting() and even ini_set() fail.
-	// fp> feel free to fix all deprecated constructs in HEAD.
-	error_reporting( E_ALL & ~E_DEPRECATED );
+{
+	error_reporting( E_ALL );
 }
 
 // To help debugging severe errors, you'll probably want PHP to display the errors on screen.
 // In this case, uncomment the following line:
 // ini_set( 'display_errors', 'on' );
 
-// If you get blank pages, PHP may be crashing because it doesn't have enough memory.
+// If you get blank pages or missing thumbnail images, PHP may be crashing because it doesn't have enough memory.
 // The default is 8 MB (in PHP < 5.2) and 128 MB (in PHP > 5.2)
 // Try uncommmenting the following line:
-// ini_set( 'memory_limit', '32M' );
+// ini_set( 'memory_limit', '128M' );
 
 
 /**
@@ -104,6 +95,11 @@ $thumbnail_sizes = array(
 			'crop-48x48' => array( 'crop', 48, 48, 85 ),
 			'crop-32x32' => array( 'crop', 32, 32, 85 ),
 			'crop-15x15' => array( 'crop', 15, 15, 85 ),
+			'crop-top-80x80' => array( 'crop-top', 80, 80, 85 ),
+			'crop-top-64x64' => array( 'crop-top', 64, 64, 85 ),
+			'crop-top-48x48' => array( 'crop-top', 48, 48, 85 ),
+			'crop-top-32x32' => array( 'crop-top', 32, 32, 85 ),
+			'crop-top-15x15' => array( 'crop-top', 15, 15, 85 ),
 	);
 
 
@@ -218,22 +214,6 @@ $basedomain = preg_replace( '/^( .* \. )? (.+? \. .+? )$/xi', '$2', $basehost );
 $instance_name = 'b2evo'; // MUST BE A SINGLE WORD! NO SPACES!!
 
 
-/**
- * Default email address for sending notifications (comments, trackbacks,
- * user registrations...).
- *
- * Set a custom address like this:
- * <code>$notify_from = 'b2evolution@your_server.com';</code>
- *
- * Alternatively you can use this automated address generation (which removes "www." from
- * the beginning of $basehost):
- * <code>$notify_from = $instance_name.'@'.preg_replace( '/^www\./i', '', $basehost );</code>
- *
- * @global string Default: $instance_name.'@'.$basehost;
- */
-$notify_from = $instance_name.'-noreply@'.preg_replace( '/^www\./i', '', $basehost );
-
-
 // ** DB options **
 
 /**
@@ -313,11 +293,11 @@ if( strpos($basehost, '.') === false )
 	$cookie_domain = '';
 }
 elseif( preg_match( '~^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$~i', $basehost ) )
-{	// Use the basehost as it is:
+{	// The basehost is an IP address, use the basehost as it is:
 	$cookie_domain = $basehost;
 }
 else
-{
+{	// Keep the part of the basehost after the www. :
 	$cookie_domain = preg_replace( '/^(www\. )? (.+)$/xi', '.$2', $basehost );
 
 	// When hosting multiple domains (not just subdomains) on a single instance of b2evo,
@@ -382,6 +362,24 @@ $crumb_expires = 7200;
  * @global int $pagecache_max_age
  */
 $pagecache_max_age = 900;
+
+
+/**
+ * Dummy field names to obfuscate spamboots
+ * 
+ * We use funky field names to defeat the most basic spambots in the front office public forms
+ */
+$dummy_fields = array(
+	'login' => 'x',
+	'pwd' => 'q',
+	'pass1' => 'm',
+	'pass2' => 'c',
+	'email' => 'u',
+	'name' => 'i',
+	'url' => 'h',
+	'subject' => 'd',
+	'content' => 'g'
+);
 
 
 // ** Location of the b2evolution subdirectories **
@@ -474,6 +472,14 @@ $rsc_uri = $basesubpath.$rsc_subdir;
 $skins_subdir = 'skins/';                // Subdirectory relative to base
 $skins_path = $basepath.$skins_subdir;   // You should not need to change this
 $skins_url = $baseurl.$skins_subdir;     // You should not need to change this
+
+/**
+ * Location of the email skins folder.
+ * @global string $emailskins_subdir
+ */
+$emailskins_subdir = 'skins_email/';                // Subdirectory relative to base
+$emailskins_path = $basepath.$emailskins_subdir;   // You should not need to change this
+$emailskins_url = $baseurl.$emailskins_subdir;     // You should not need to change this
 
 
 /**
@@ -614,14 +620,6 @@ $cross_post_nav_in_same_blog = true;
 
 
 /**
- * Login error message
- * @todo fp>asimo move this to somewhere else; this is NOT configuration
- * @global string
- */
-$login_error = '';
-
-
-/**
  * File extensions that the admin will not be able to enable in the Settings
  */
 $force_upload_forbiddenext = array( 'cgi', 'exe', 'htaccess', 'htpasswd', 'php', 'php3', 'php4', 'php5', 'php6', 'phtml', 'pl', 'vbs' );
@@ -629,7 +627,7 @@ $force_upload_forbiddenext = array( 'cgi', 'exe', 'htaccess', 'htpasswd', 'php',
 /**
  * Admin can configure max file upload size, but he won't be able to set it higher than this "max max" value.
  */
-$upload_maxmaxkb = 10000;
+$upload_maxmaxkb = 32000;
 
 /**
  * The admin can configure the regexp for valid file names in the Settings interface

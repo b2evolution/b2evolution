@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -131,34 +131,8 @@ class FileCache extends DataObjectCache
 
 /*
  * $Log$
- * Revision 1.6  2011/09/04 22:13:15  fplanque
- * copyright 2011
+ * Revision 1.7  2013/11/06 08:04:08  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.5  2010/02/08 17:52:18  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.4  2009/09/14 13:04:53  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.3  2009/03/08 23:57:43  fplanque
- * 2009
- *
- * Revision 1.2  2008/01/21 09:35:28  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 10:59:54  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.7  2007/04/26 00:11:10  fplanque
- * (c) 2007
- *
- * Revision 1.6  2007/01/25 05:09:53  fplanque
- * bugfix
- *
- * Revision 1.5  2006/12/07 20:03:32  fplanque
- * Woohoo! File editing... means all skin editing.
- *
- * Revision 1.4  2006/11/24 18:27:24  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

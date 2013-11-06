@@ -42,6 +42,8 @@ $AdminUI->set_coll_list_params( 'blog_ismember', 'view', array(), T_('Global'), 
 $AdminUI->set_path( 'dashboard' );
 
 require_js( 'communication.js' ); // auto requires jQuery
+// Load the appropriate blog navigation styles (including calendar, comment forms...):
+require_css( $rsc_url.'css/blog_base.css' ); // Default styles for the blog navigation
 
 $AdminUI->breadcrumbpath_init();
 
@@ -53,8 +55,11 @@ $AdminUI->disp_body_top();
 
 if( $blog )
 {	// We want to look at a specific blog:
-	// Begin payload block:
 
+	// load dashboard functions
+	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
+
+	// Begin payload block:
 	// This div is to know where to display the message after overlay close:
 	echo '<div class="first_payload_block">'."\n";
 
@@ -70,9 +75,15 @@ if( $blog )
 
 	$nb_blocks_displayed = 0;
 
-	$user_draftc_perm = $current_User->check_perm( 'blog_draft_comments', 'edit', false, $blog );
+	$dashboard_statuses = get_visibility_statuses( 'dashboard' );
 
-	if( $user_draftc_perm )
+	$user_perm_moderate_cmt = false;
+	foreach( $dashboard_statuses as $status )
+	{
+		$user_perm_moderate_cmt = $user_perm_moderate_cmt || $current_User->check_perm( 'blog_comment!'.$status, 'edit', false, $blog );
+	}
+
+	if( $user_perm_moderate_cmt )
 	{
 		/*
 		 * COMMENTS:
@@ -82,17 +93,24 @@ if( $blog )
 		// Filter list:
 		$CommentList->set_filters( array(
 				'types' => array( 'comment','trackback','pingback' ),
-				'statuses' => array ( 'draft' ),
+				'statuses' => $dashboard_statuses,
 				'order' => 'DESC',
 				'comments' => 5,
 			) );
+
+		// Set param prefix for URLs
+		$param_prefix = 'cmnt_fullview_';
+		if( !empty( $CommentList->param_prefix ) )
+		{
+			$param_prefix = $CommentList->param_prefix;
+		}
 
 		// Get ready for display (runs the query):
 		$CommentList->display_init();
 	}
 
-	if( $user_draftc_perm && $CommentList->result_num_rows )
-	{	// We have drafts
+	if( $user_perm_moderate_cmt && $CommentList->result_num_rows )
+	{	// We have comments awaiting moderation
 
 		global $htsrv_url;
 
@@ -106,33 +124,33 @@ if( $blog )
 			// Process result after publish/deprecate/delete action has been completed
 			function processResult(result, modifiedlist)
 			{
-				$('#comments_container').html(result);
+				jQuery('#comments_container').html(result);
 				for(var id in modifiedlist)
 				{
 					switch(modifiedlist[id])
 					{
 						case 'published':
-							fadeIn(id, '#339900');
+							jQuery('#' + id).css( 'backgroundColor', '#339900' );
 							break;
 						case 'deprecated':
-							fadeIn(id, '#656565');
+							jQuery('#' + id).css( 'backgroundColor', '#656565' );
 							break;
 						case 'deleted':
-							fadeIn(id, '#fcc');
+							jQuery('#' + id).css( 'backgroundColor', '#fcc' );
 							break;
-					};
+					}
 				}
 
-				var comments_number = $('#new_badge').val();
+				var comments_number = jQuery('#new_badge').val();
 				if(comments_number == '0')
 				{
 					var options = {};
-					$('#comments_block').effect('blind', options, 200);
-					$('#comments_block').remove();
+					jQuery('#comments_block').effect('blind', options, 200);
+					jQuery('#comments_block').remove();
 				}
 				else
 				{
-					$('#badge').text(comments_number);
+					jQuery('#badge').text(comments_number);
 				}
 			}
 
@@ -152,7 +170,7 @@ if( $blog )
 
 				modifieds[divid] = status;
 
-				$.ajax({
+				jQuery.ajax({
 				type: 'POST',
 				url: '<?php echo $htsrv_url; ?>async.php',
 				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&status=' + status + '&action=set_comment_status&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
@@ -160,29 +178,40 @@ if( $blog )
 					{
 						// var divid = 'comment_' + id;
 						delete modifieds[divid];
-						processResult(result, modifieds);
+						processResult( ajax_debug_clear( result ), modifieds);
 					}
 				});
 			}
 
+			// Display voting tool when JS is enable
+			jQuery( 'document' ).ready( function() { jQuery( '.vote_spam' ).show(); } );
 			// Set comments vote
 			function setCommentVote(id, type, vote)
 			{
 				var divid = 'comment_' + id;
+				var highlight_class = '';
+				var color = '';
 				switch(vote)
 				{
 					case 'spam':
-						fadeIn(divid, '#ffc9c9');
+						color = fadeIn(divid, '#ffc9c9');
+						highlight_class = 'roundbutton_red';
 						break;
 					case 'notsure':
-						fadeIn(divid, '#bbbbbb');
+						color = fadeIn(divid, '#bbbbbb');
 						break;
 					case 'ok':
-						fadeIn(divid, '#bcffb5');
+						color = fadeIn(divid, '#bcffb5');
+						highlight_class = 'roundbutton_green';
 						break;
 				};
 
-				$.ajax({
+				if( highlight_class != '' )
+				{
+					jQuery( '#vote_'+type+'_'+id ).find( 'a.roundbutton, span.roundbutton' ).addClass( highlight_class );
+				}
+
+				jQuery.ajax({
 				type: 'POST',
 				url: '<?php echo $htsrv_url; ?>anon_async.php',
 				data:
@@ -195,8 +224,12 @@ if( $blog )
 					},
 				success: function(result)
 					{
-						$('#vote_'+type+'_'+id).after( result );
-						$('#vote_'+type+'_'+id).remove();
+						if( color != '' )
+						{ // Revert back color
+							fadeIn( divid, color );
+						}
+						jQuery('#vote_'+type+'_'+id).after( ajax_debug_clear( result ) );
+						jQuery('#vote_'+type+'_'+id).remove();
 					}
 				});
 			}
@@ -209,7 +242,7 @@ if( $blog )
 
 				modifieds[divid] = 'deleted';
 
-				$.ajax({
+				jQuery.ajax({
 				type: 'POST',
 				url: '<?php echo $htsrv_url; ?>async.php',
 				data: 'action=get_opentrash_link&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
@@ -218,20 +251,20 @@ if( $blog )
 						var recycle_bin = jQuery('#recycle_bin');
 						if( recycle_bin.length )
 						{
-							recycle_bin.replaceWith( result );
+							recycle_bin.replaceWith( ajax_debug_clear( result ) );
 						}
 					}
 				});
 
-				$.ajax({
+				jQuery.ajax({
 				type: 'POST',
 				url: '<?php echo $htsrv_url; ?>async.php',
 				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&action=delete_comment&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
 				success: function(result)
 					{
-						jQuery('#' + divid).effect('transfer', { to: $('#recycle_bin') }, 700, function() {
+						jQuery('#' + divid).effect('transfer', { to: jQuery('#recycle_bin') }, 700, function() {
 							delete modifieds[divid];
-							processResult(result, modifieds);
+							processResult( ajax_debug_clear( result ), modifieds);
 						});
 					}
 				});
@@ -241,7 +274,8 @@ if( $blog )
 			function fadeIn(id, color)
 			{
 				var bg_color = jQuery('#' + id).css( 'backgroundColor' );
-				jQuery('#' + id).animate({ backgroundColor: color }, 200).animate({ backgroundColor: bg_color }, 200);
+				jQuery('#' + id).animate({ backgroundColor: color }, 200);
+				return bg_color;
 			}
 
 			// Delete comment author_url
@@ -250,11 +284,11 @@ if( $blog )
 				var divid = 'commenturl_' + id;
 				fadeIn(divid, '#fcc');
 
-				$.ajax({
+				jQuery.ajax({
 					type: 'POST',
 					url: '<?php echo $htsrv_url; ?>async.php',
 					data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&action=delete_comment_url' + '&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
-					success: function(result) { $('#' + divid).remove(); }
+					success: function(result) { jQuery('#' + divid).remove(); }
 				});
 			}
 
@@ -296,7 +330,9 @@ if( $blog )
 			// Ban comment url
 			function ban_url(authorurl)
 			{
-				$.ajax({
+				<?php global $rsc_url; ?>
+				antispamSettings( '<img src="<?php echo $rsc_url; ?>img/ajax-loader2.gif" alt="<?php echo T_('Loading...'); ?>" title="<?php echo T_('Loading...'); ?>" style="display:block;margin:auto;position:absolute;top:0;bottom:0;left:0;right:0;" />' );
+				jQuery.ajax({
 					type: 'POST',
 					url: '<?php echo $admin_url; ?>',
 					data: 'ctrl=antispam&action=ban&display_mode=js&mode=iframe&request=checkban&keyword=' + authorurl +
@@ -313,7 +349,7 @@ if( $blog )
 			{
 				var parameters = jQuery( '#antispam_add' ).serialize();
 
-				$.ajax({
+				jQuery.ajax({
 					type: 'POST',
 					url: '<?php echo $admin_url; ?>',
 					data: 'action=ban&display_mode=js&mode=iframe&request=checkban&' + parameters,
@@ -335,33 +371,33 @@ if( $blog )
 					fadeIn(divid, '#fcc');
 				}
 
-				$.ajax({
+				jQuery.ajax({
 					type: 'POST',
 					url: '<?php echo $htsrv_url; ?>async.php',
 					data: 'blogid=' + <?php echo $Blog->ID; ?> + '&action=refresh_comments&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
 					success: function(result)
 					{
-						processResult(result, modifieds);
+						processResult( ajax_debug_clear( result ), modifieds);
 					}
 				});
 			}
 
 			function startRefreshComments()
 			{
-				$('#comments_container').slideUp('fast', refreshComments());
+				jQuery('#comments_container').slideUp('fast', refreshComments());
 			}
 
 			// Absolute refresh comment list
 			function refreshComments()
 			{
-				$.ajax({
+				jQuery.ajax({
 					type: 'POST',
 					url: '<?php echo $htsrv_url; ?>async.php',
 					data: 'blogid=' + <?php echo $Blog->ID; ?> + '&action=refresh_comments&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
 					success: function(result)
 					{
-						processResult(result, modifieds);
-						$('#comments_container').slideDown('fast');
+						processResult( ajax_debug_clear( result ), modifieds);
+						jQuery('#comments_container').slideDown('fast');
 					}
 				});
 			}
@@ -375,91 +411,39 @@ if( $blog )
 		$opentrash_link = get_opentrash_link();
 		$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', 'javascript:startRefreshComments()' ).'</span> ';
 
+		$show_statuses_param = $param_prefix.'show_statuses[]='.implode( '&amp;'.$param_prefix.'show_statuses[]=', $dashboard_statuses );
 		$block_item_Widget->title = $refresh_link.$opentrash_link.T_('Comments awaiting moderation').
-			' <a href="'.$admin_url.'?ctrl=comments&amp;show_statuses[]=draft'.'">'.
-			'<span id="badge" class="badge">'.get_comments_awaiting_moderation_number( $Blog->ID ).'</span></a>';
+			' <a href="'.$admin_url.'?ctrl=comments&amp;'.$show_statuses_param.'" style="text-decoration:none">'.
+			'<span id="badge" class="badge">'.$CommentList->total_rows.'</span></a>';
 
+		echo '<div id="styled_content_block">';
 		echo '<div id="comments_block">';
 
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 
 		echo '<div id="comments_container">';
 
-		load_funcs( 'dashboard/model/_dashboard.funcs.php' );
 		// GET COMMENTS AWAITING MODERATION (the code generation is shared with the AJAX callback):
-		show_comments_awaiting_moderation( $Blog->ID );
+		show_comments_awaiting_moderation( $Blog->ID, $CommentList );
 
 		echo '</div>';
 
 		$block_item_Widget->disp_template_raw( 'block_end' );
 
+		echo '</div>';
 		echo '</div>';
 	}
 
 	/*
-	 * RECENT DRAFTS
+	 * RECENT POSTS awaiting moderation
 	 */
-	// Create empty List:
-	$ItemList = new ItemList2( $Blog, NULL, NULL );
-
-	// Filter list:
-	$ItemList->set_filters( array(
-			'visibility_array' => array( 'draft' ),
-			'orderby' => 'datemodified',
-			'order' => 'DESC',
-			'posts' => 5,
-		) );
-
-	// Get ready for display (runs the query):
-	$ItemList->display_init();
-
-	if( $ItemList->result_num_rows )
-	{	// We have drafts
-
-		$nb_blocks_displayed++;
-
-		$block_item_Widget->title = T_('Recent drafts');
-		$block_item_Widget->disp_template_replaced( 'block_start' );
-
-		while( $Item = & $ItemList->get_item() )
-		{
-			echo '<div class="dashboard_post dashboard_post_'.($ItemList->current_idx % 2 ? 'even' : 'odd' ).'" lang="'.$Item->get('locale').'">';
-			// We don't switch locales in the backoffice, since we use the user pref anyway
-			// Load item's creator user:
-			$Item->get_creator_User();
-
-			echo '<div class="dashboard_float_actions">';
-			$Item->edit_link( array( // Link to backoffice for editing
-					'before'    => ' ',
-					'after'     => ' ',
-					'class'     => 'ActionButton'
-				) );
-			$Item->publish_link( '', '', '#', '#', 'PublishButton' );
-			echo '<img src="'.$rsc_url.'/img/blank.gif" alt="" />';
-			echo '</div>';
-
-			echo '<h3 class="dashboard_post_title">';
-			$item_title = $Item->dget('title');
-			if( ! strlen($item_title) )
-			{
-				$item_title = '['.format_to_output(T_('No title')).']';
-			}
-			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$item_title.'</a>';
-			echo ' <span class="dashboard_post_details">';
-			$Item->status( array(
-					'before' => '<div class="floatright"><span class="status_'.$Item->status.'">',
-					'after'  => '</span></div>',
-				) );
-			echo '</span>';
-			echo '</h3>';
-
-			echo '</div>';
-
+	foreach( $dashboard_statuses as $status )
+	{ // go through all statuses
+		if( display_posts_awaiting_moderation( $status, $block_item_Widget ) )
+		{ // a block was dispalyed for this status
+			$nb_blocks_displayed++;
 		}
-
-		$block_item_Widget->disp_template_raw( 'block_end' );
 	}
-
 
 	/*
 	 * RECENTLY EDITED
@@ -469,7 +453,7 @@ if( $blog )
 
 	// Filter list:
 	$ItemList->set_filters( array(
-			'visibility_array' => array( 'published', 'protected', 'private', 'deprecated', 'redirected' ),
+			'visibility_array' => get_visibility_statuses( 'keys', array('trash') ),
 			'orderby' => 'datemodified',
 			'order' => 'DESC',
 			'posts' => 5,
@@ -583,22 +567,23 @@ if( $blog )
 
 	echo '<div class="dashboard_sidebar">';
 	echo '<ul>';
-		echo '<li><a href="'.$dispatcher.'?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'">'.T_('Write a new post').' &raquo;</a></li>';
+		if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+		{
+			echo '<li><a href="'.$dispatcher.'?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'">'.T_('Write a new post').' &raquo;</a></li>';
+		}
 
  		echo '<li>'.T_('Browse').':<ul>';
 		echo '<li><a href="'.$dispatcher.'?ctrl=items&tab=full&filter=restore&blog='.$Blog->ID.'">'.T_('Posts (full)').' &raquo;</a></li>';
 		echo '<li><a href="'.$dispatcher.'?ctrl=items&tab=list&filter=restore&blog='.$Blog->ID.'">'.T_('Posts (list)').' &raquo;</a></li>';
-		echo '<li><a href="'.$dispatcher.'?ctrl=comments&amp;filter=restore&amp;blog='.$Blog->ID.'">'.T_('Comments').' &raquo;</a></li>';
+		if( $current_User->check_perm( 'blog_comments', 'edit', false, $Blog->ID ) )
+		{
+			echo '<li><a href="'.$dispatcher.'?ctrl=comments&amp;filter=restore&amp;blog='.$Blog->ID.'">'.T_('Comments').' &raquo;</a></li>';
+		}
 		echo '</ul></li>';
 
 		if( $current_User->check_perm( 'blog_cats', '', false, $Blog->ID ) )
 		{
 			echo '<li><a href="'.$dispatcher.'?ctrl=chapters&blog='.$Blog->ID.'">'.T_('Edit categories').' &raquo;</a></li>';
-		}
-
-		if( $current_User->check_perm( 'blog_genstatic', 'any', false, $Blog->ID ) )
-		{
-			echo '<li><a href="'.$dispatcher.'?ctrl=collections&amp;action=GenStatic&amp;blog='.$Blog->ID.'&amp;redir_after_genstatic='.rawurlencode(regenerate_url( '', '', '', '&' )).'">'.T_('Generate static page!').'</a></li>';
 		}
 
  		echo '<li><a href="'.$Blog->get('url').'">'.T_('View this blog').'</a></li>';
@@ -663,6 +648,12 @@ else
 
 if( $current_User->check_perm( 'options', 'edit' ) )
 {	// We have some serious admin privilege:
+
+	/**
+	 * @var AbstractSettings
+	 */
+	global $global_Cache;
+
 	// Begin payload block:
 	$AdminUI->disp_payload_begin();
 
@@ -686,10 +677,6 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 		// Display info & error messages
 		echo $Messages->display( NULL, NULL, false, 'action_messages' );
 
-		/**
-		 * @var AbstractSettings
-		 */
-		global $global_Cache;
 		$version_status_msg = $global_Cache->get( 'version_status_msg' );
 		if( !empty($version_status_msg) )
 		{	// We have managed to get updates (right now or in the past):
@@ -722,24 +709,25 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	 */
 	$side_item_Widget = new Widget( 'side_item' );
 
-	$side_item_Widget->title = T_('Administrative tasks');
+	$side_item_Widget->title = T_('System stats');
 	$side_item_Widget->disp_template_replaced( 'block_start' );
 
 	echo '<div class="dashboard_sidebar">';
 	echo '<ul>';
-		if( $current_User->check_perm( 'users', 'edit' ) )
-		{
-			echo '<li><a href="'.$dispatcher.'?ctrl=user&amp;user_tab=profile&amp;action=new">'.T_('Create new user').' &raquo;</a></li>';
-		}
-		if( $current_User->check_perm( 'blogs', 'create' ) )
-		{
-			echo '<li><a href="'.$dispatcher.'?ctrl=collections&amp;action=new">'.T_('Create new blog').' &raquo;</a></li>';
-		}
-		echo '<li><a href="'.$dispatcher.'?ctrl=skins">'.T_('Install a skin').' &raquo;</a></li>';
-		echo '<li><a href="'.$dispatcher.'?ctrl=plugins">'.T_('Install a plugin').' &raquo;</a></li>';
-		// TODO: remember system date check and only remind every 3 months
-		echo '<li><a href="'.$dispatcher.'?ctrl=system">'.T_('Check system &amp; security').' &raquo;</a></li>';
-		echo '<li><a href="'.$baseurl.'default.php">'.T_('View default page').' &raquo;</a></li>';
+		echo '<li>'.sprintf( T_('%s Users'), get_table_count( 'T_users' ) ).'</li>';
+		echo '<li>'.sprintf( T_('%s Blogs'), get_table_count( 'T_blogs' ) ).'</li>';
+		echo '<li>'.sprintf( T_('%s Posts'), $post_all_counter = (int)get_table_count( 'T_items__item' ) ).'</li>';
+		echo '<ul>';
+			echo '<li>'.sprintf( T_('%s on web'), $post_through_admin = (int)$global_Cache->get( 'post_through_admin' ) ).'</li>';
+			echo '<li>'.sprintf( T_('%s by XMLRPC'), $post_through_xmlrpc = (int)$global_Cache->get( 'post_through_xmlrpc' ) ).'</li>';
+			echo '<li>'.sprintf( T_('%s by email'), $post_through_email = (int)$global_Cache->get( 'post_through_email' ) ).'</li>';
+			echo '<li>'.sprintf( T_('%s unknown'), $post_all_counter - $post_through_admin - $post_through_xmlrpc - $post_through_email ).'</li>';
+		echo '</ul>';
+		echo '<li>'.sprintf( T_('%s Slugs'), get_table_count( 'T_slug' ) ).'</li>';
+		echo '<li>'.sprintf( T_('%s Comments'), get_table_count( 'T_comments' ) ).'</li>';
+		echo '<li>'.sprintf( T_('%s Files'), get_table_count( 'T_files' ) ).'</li>';
+		echo '<li>'.sprintf( T_('%s Conversations'), get_table_count( 'T_messaging__thread' ) ).'</li>';
+		echo '<li>'.sprintf( T_('%s Messages'), get_table_count( 'T_messaging__message' ) ).'</li>';
 	echo '</ul>';
 	echo '</div>';
 
@@ -749,9 +737,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	 * DashboardAdminSide to be added here (anyone?)
 	 */
 
- 	echo '</td></tr></table>';
+	echo '</td></tr></table>';
 
- 	// End payload block:
+	// End payload block:
 	$AdminUI->disp_payload_end();
 }
 
@@ -760,334 +748,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.84  2011/09/29 10:19:40  efy-yurybakh
- * background color for voting for spam
- *
- * Revision 1.83  2011/09/28 16:15:56  efy-yurybakh
- * "comment was helpful" votes
- *
- * Revision 1.82  2011/09/28 09:59:43  efy-yurybakh
- * add missing rel="lightbox" in front office
- *
- * Revision 1.81  2011/09/25 03:54:21  efy-yurybakh
- * Add spam voting to dashboard
- *
- * Revision 1.80  2011/09/04 20:17:54  fplanque
- * cleanup
- *
- * Revision 1.79  2011/08/25 21:37:23  fplanque
- * styles
- *
- * Revision 1.78  2011/05/23 02:20:07  sam2kb
- * Option to display excerpts in comment feeds, or disable feeds completely
- *
- * Revision 1.77  2011/05/11 07:11:51  efy-asimo
- * User settings update
- *
- * Revision 1.76  2011/03/16 13:34:53  efy-asimo
- * animate comment delete
- *
- * Revision 1.75  2011/02/24 07:42:27  efy-asimo
- * Change trashcan to Recycle bin
- *
- * Revision 1.74  2011/02/14 14:13:24  efy-asimo
- * Comments trash status
- *
- * Revision 1.73  2011/02/10 23:07:21  fplanque
- * minor/doc
- *
- * Revision 1.72  2010/11/25 15:16:34  efy-asimo
- * refactor $Messages
- *
- * Revision 1.71  2010/10/18 15:36:35  efy-asimo
- * close antispam overlay on escape key
- *
- * Revision 1.70  2010/09/20 13:00:44  efy-asimo
- * dashboard ajax calls - fix
- *
- * Revision 1.66.2.3  2010/07/03 20:36:53  fplanque
- * minor fix
- *
- * Revision 1.68  2010/06/23 09:30:55  efy-asimo
- * Comments display and Antispam ban form modifications
- *
- * Revision 1.67  2010/06/01 11:33:19  efy-asimo
- * Split blog_comments advanced permission (published, deprecated, draft)
- * Use this new permissions (Antispam tool,when edit/delete comments)
- *
- * Revision 1.66  2010/05/10 14:26:17  efy-asimo
- * Paged Comments & filtering & add comments listview
- *
- * Revision 1.65  2010/04/16 11:36:54  efy-asimo
- * make the red badge clickable on the dashboard
- *
- * Revision 1.64  2010/03/11 10:34:59  efy-asimo
- * Rewrite CommentList to CommentList2 task
- *
- * Revision 1.63  2010/03/08 21:06:31  fplanque
- * minor/doc
- *
- * Revision 1.62  2010/03/06 12:58:13  efy-asimo
- * fix refresh after ban url
- *
- * Revision 1.61  2010/03/05 16:00:16  efy-asimo
- * collapse/expand comment list before/after refresh
- *
- * Revision 1.60  2010/03/05 09:22:26  efy-asimo
- * modify refresh comments visual effect on dashboard
- *
- * Revision 1.59  2010/03/02 12:37:23  efy-asimo
- * remove show_comments_awaiting_moderation function from _misc_funcs.php to _dashboard.func.php
- *
- * Revision 1.58  2010/03/02 11:59:17  efy-asimo
- * refresh icon for dashboard comment list
- *
- * Revision 1.57  2010/02/28 23:38:38  fplanque
- * minor changes
- *
- * Revision 1.56  2010/02/26 15:52:20  efy-asimo
- * combine skin and skin settings tab into one single tab
- *
- * Revision 1.55  2010/02/26 08:34:34  efy-asimo
- * dashboard -> ban icon should be javascripted task
- *
- * Revision 1.54  2010/01/31 17:40:04  efy-asimo
- * delete url from comments in dashboard and comments form
- *
- * Revision 1.53  2010/01/30 18:55:23  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.52  2010/01/29 17:21:38  efy-yury
- * add: crumbs in ajax calls
- *
- * Revision 1.51  2010/01/12 15:56:11  fplanque
- * crumbs
- *
- * Revision 1.50  2009/12/13 17:08:52  efy-maxim
- * ajax - smooth comments disappearing
- *
- * Revision 1.49  2009/12/12 19:14:09  fplanque
- * made avatars optional + fixes on img props
- *
- * Revision 1.48  2009/12/10 21:32:47  efy-maxim
- * 1. single ajax call
- * 2. comments of protected post fix
- *
- * Revision 1.47  2009/12/06 22:55:22  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.46  2009/12/03 11:38:37  efy-maxim
- * ajax calls have been improved
- *
- * Revision 1.45  2009/11/26 10:30:58  efy-maxim
- * ajax actions have been moved to async.php
- *
- * Revision 1.44  2009/11/25 16:05:02  efy-maxim
- * comments awaiting moderation improvements
- *
- * Revision 1.43  2009/11/25 01:33:37  blueyed
- * Dashboard: display 'no title' if there is an empty title.
- *
- * Revision 1.42  2009/11/24 22:09:24  efy-maxim
- * dashboard comments - ajax
- *
- * Revision 1.41  2009/11/22 20:05:12  fplanque
- * highlight statuses on dashboard
- *
- * Revision 1.40  2009/11/22 18:20:10  fplanque
- * Dashboard CSS enhancements
- *
- * Revision 1.39  2009/11/21 13:31:58  efy-maxim
- * 1. users controller has been refactored to users and user controllers
- * 2. avatar tab
- * 3. jQuery to show/hide custom duration
- *
- * Revision 1.38  2009/11/15 19:05:45  fplanque
- * no message
- *
- * Revision 1.37  2009/11/11 03:24:52  fplanque
- * misc/cleanup
- *
- * Revision 1.36  2009/10/28 13:45:47  tblue246
- * Do not display evonet updates if disabled by admin
- *
- * Revision 1.35  2009/10/12 22:11:28  blueyed
- * Fix blank.gif some: use conditional comments, where marked as being required for IE. Add ALT tags and close tags.
- *
- * Revision 1.34  2009/10/11 03:00:10  blueyed
- * Add "position" and "order" properties to attachments.
- * Position can be "teaser" or "aftermore" for now.
- * Order defines the sorting of attachments.
- * Needs testing and refinement. Upgrade might work already, be careful!
- *
- * Revision 1.33  2009/09/20 02:08:52  fplanque
- * badge demo
- *
- * Revision 1.32  2009/09/14 12:54:17  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.31  2009/07/06 23:52:24  sam2kb
- * Hardcoded "admin.php" replaced with $dispatcher
- *
- * Revision 1.30  2009/07/06 06:16:11  sam2kb
- * minor
- *
- * Revision 1.29  2009/02/25 22:17:53  blueyed
- * ItemLight: lazily load blog_ID and main_Chapter.
- * There is more, but I do not want to skim the diff again, after
- * "cvs ci" failed due to broken pipe.
- *
- * Revision 1.28  2008/12/18 00:34:13  blueyed
- * - Add Comment::get_author() and make Comment::author() use it
- * - Add Comment::get_title() and use it in Dashboard and Admin comment list
- *
- * Revision 1.27  2008/09/15 03:10:40  fplanque
- * simplified updates
- *
- * Revision 1.26  2008/09/13 11:07:43  fplanque
- * speed up display of dashboard on first login of the day
- *
- * Revision 1.25  2008/04/15 21:53:31  fplanque
- * minor
- *
- * Revision 1.24  2008/03/31 00:27:49  fplanque
- * Enhanced comment moderation
- *
- * Revision 1.23  2008/03/15 19:07:25  fplanque
- * no message
- *
- * Revision 1.22  2008/02/05 01:51:54  fplanque
- * minors
- *
- * Revision 1.21  2008/01/14 07:22:08  fplanque
- * Refactoring
- *
- * Revision 1.20  2008/01/11 19:18:30  fplanque
- * bugfixes
- *
- * Revision 1.19  2008/01/05 02:28:17  fplanque
- * enhanced blog selector (bloglist_buttons)
- *
- * Revision 1.18  2007/12/27 21:40:31  fplanque
- * improved default page
- *
- * Revision 1.17  2007/11/28 17:29:45  fplanque
- * Support for getting updates from b2evolution.net
- *
- * Revision 1.16  2007/11/04 21:22:25  fplanque
- * version bump
- *
- * Revision 1.15  2007/11/03 23:54:39  fplanque
- * skin cleanup continued
- *
- * Revision 1.14  2007/11/03 21:04:26  fplanque
- * skin cleanup
- *
- * Revision 1.13  2007/11/02 02:47:06  fplanque
- * refactored blog settings / UI
- *
- * Revision 1.12  2007/09/12 01:18:32  fplanque
- * translation updates
- *
- * Revision 1.11  2007/09/10 14:53:35  fplanque
- * doc
- *
- * Revision 1.10  2007/09/08 20:23:04  fplanque
- * action icons / wording
- *
- * Revision 1.9  2007/09/07 21:11:11  fplanque
- * superstylin' (not even close)
- *
- * Revision 1.8  2007/09/07 20:11:40  fplanque
- * minor
- *
- * Revision 1.7  2007/09/04 22:16:33  fplanque
- * in context editing of posts
- *
- * Revision 1.6  2007/09/04 19:50:04  fplanque
- * dashboard cleanup
- *
- * Revision 1.5  2007/09/04 15:36:07  fplanque
- * minor
- *
- * Revision 1.4  2007/09/03 18:32:50  fplanque
- * enhanced dashboard / comment moderation
- *
- * Revision 1.3  2007/09/03 16:44:31  fplanque
- * chicago admin skin
- *
- * Revision 1.2  2007/06/30 20:37:37  fplanque
- * UI changes
- *
- * Revision 1.1  2007/06/25 10:59:50  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.21  2007/06/22 23:46:43  fplanque
- * bug fixes
- *
- * Revision 1.20  2007/06/13 23:29:03  fplanque
- * minor
- *
- * Revision 1.19  2007/06/13 20:56:02  fplanque
- * minor
- *
- * Revision 1.18  2007/05/09 01:01:29  fplanque
- * permissions cleanup
- *
- * Revision 1.17  2007/04/26 00:11:15  fplanque
- * (c) 2007
- *
- * Revision 1.16  2007/03/11 23:57:07  fplanque
- * item editing: allow setting to 'redirected' status
- *
- * Revision 1.15  2007/03/05 04:48:15  fplanque
- * IE crap
- *
- * Revision 1.14  2007/03/05 02:13:25  fplanque
- * improved dashboard
- *
- * Revision 1.13  2007/01/28 23:31:57  blueyed
- * todo
- *
- * Revision 1.12  2007/01/19 08:20:57  fplanque
- * bugfix
- *
- * Revision 1.11  2007/01/14 22:43:29  fplanque
- * handled blog view perms.
- *
- * Revision 1.10  2006/12/17 02:42:22  fplanque
- * streamlined access to blog settings
- *
- * Revision 1.9  2006/12/15 22:53:26  fplanque
- * cleanup
- *
- * Revision 1.8  2006/12/12 21:19:31  fplanque
- * UI fixes
- *
- * Revision 1.7  2006/12/12 02:53:56  fplanque
- * Activated new item/comments controllers + new editing navigation
- * Some things are unfinished yet. Other things may need more testing.
- *
- * Revision 1.6  2006/12/11 17:26:21  fplanque
- * some cross-linking
- *
- * Revision 1.5  2006/12/09 02:01:48  fplanque
- * temporary / minor
- *
- * Revision 1.4  2006/12/07 23:59:31  fplanque
- * basic dashboard stuff
- *
- * Revision 1.3  2006/12/07 23:21:00  fplanque
- * dashboard blog switching
- *
- * Revision 1.2  2006/12/07 23:13:10  fplanque
- * @var needs to have only one argument: the variable type
- * Otherwise, I can't code!
- *
- * Revision 1.1  2006/12/07 22:29:26  fplanque
- * reorganized menus / basic dashboard
+ * Revision 1.86  2013/11/06 08:04:07  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

@@ -4,7 +4,7 @@
  *
  * This file is not meant to be called directly.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evocore
  *
@@ -15,23 +15,19 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog;
+global $blog, $action, $disp, $rsc_url, $Settings, $rsc_path, $transmit_hashed_password, $dummy_fields;
 
-$login = param( 'login', 'string', '' );
-$action = param( 'action', 'string', '' );
-$email = param( 'email', 'string', '' );
-$redirect_to = param( 'redirect_to', 'string', '' );
-
-if( is_logged_in() && ( $action != 'req_validatemail' ) )
+if( is_logged_in() )
 { // already logged in
 	echo '<p>'.T_('You are already logged in').'</p>';
 	return;
 }
 
-if( $action == 'req_login' )
-{
-	$login_required = true;
-}
+$login = param( $dummy_fields[ 'login' ], 'string', '' );
+$action = param( 'action', 'string', '' );
+$redirect_to = param( 'redirect_to', 'string', '' );
+$source = param( 'source', 'string', 'inskin login form' );
+$login_required = ( $action == 'req_login' );
 
 global $admin_url, $ReqHost, $secure_htsrv_url;
 
@@ -40,175 +36,28 @@ if( !isset( $redirect_to ) )
 	$redirect_to = regenerate_url( 'disp' );
 }
 
-if( $action != 'req_validatemail' )
-{ // -----------------------------------------------------------------------------------------------------------------
+$params = array(
+	'source' => $source,
+	'login_required' => $login_required,
+	'redirect_to' => $redirect_to,
+	'login' => $login,
+	'action' => $action,
+	'transmit_hashed_password' => $transmit_hashed_password,
+);
 
-	if( empty($login_required)
-		&& $action != 'req_validatemail'
-		&& strpos($redirect_to, $admin_url) !== 0
-		&& strpos($ReqHost.$redirect_to, $admin_url ) !== 0 )
-	{ // No login required, allow to pass through
-		// TODO: dh> validate redirect_to param?!
-		$links[] = '<a href="'.htmlspecialchars(url_rel_to_same_host($redirect_to, $ReqHost)).'">'
-		./* Gets displayed as link to the location on the login form if no login is required */ T_('Abort login!').'</a>';
-	}
+display_login_form( $params );
 
-	if( is_logged_in() )
-	{ // if we arrive here, but are logged in, provide an option to logout (e.g. during the email
-		// validation procedure)
-		$links[] = get_user_logout_link();
-	}
+echo '<div class="notes" style="margin: 1em"><a href="'.$secure_htsrv_url.'login.php?source='.rawurlencode($source).'&redirect_to='.$redirect_to.'">'.T_( 'Use standard login form instead').' &raquo;</a></div>';
 
-	if( !empty($links) )
-	{
-		echo '<div style="float:right; margin: 0 1em">'.implode( $links, ' &middot; ' ).'</div>
-		<div class="clear"></div>';
-	}
+echo '<div class="form_footer_notes">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
 
-	$Form = new Form( '', 'login_form', 'post' );
-
-	$Form->begin_form( 'bComment' );
-
-  $Form->add_crumb( 'loginform' );
-  $source = param( 'source', 'string', 'inskin login form' );
-  $Form->hidden( 'source', $source );
-	$Form->hidden( 'redirect_to', $redirect_to );
-	$Form->hidden( 'inskin', true );
-
-	$Form->begin_field();
-	$Form->text_input( 'login', $login, 18, T_('Login'), '<br />'.T_('Type your username, <b>not</b> your email address.'),
-					array( 'maxlength' => 20, 'class' => 'input_text', 'required'=>true ) );
-	$Form->end_field();
-
-	$pwd_note = '<a href="'.$secure_htsrv_url.'login.php?action=lostpassword&amp;redirect_to='
-		.rawurlencode( url_rel_to_same_host($redirect_to, $secure_htsrv_url) );
-	if( !empty($login) )
-	{
-		$pwd_note .= '&amp;login='.rawurlencode($login);
-	}
-	$pwd_note .= '">'.T_('Lost password ?').'</a>';
-
-	$Form->begin_field();
-	$Form->password_input( 'pwd', '', 18, T_('Password'), array( 'note'=>$pwd_note, 'maxlength' => 70, 'class' => 'input_text', 'required'=>true ) );
-	$Form->end_field();
-
-	// Allow a plugin to add fields/payload
-	$Plugins->trigger_event( 'DisplayLoginFormFieldset', array( 'Form' => & $Form ) );
-
-	// Submit button:
-	$submit_button = array( array( 'name'=>'login_action[login]', 'value'=>T_('Log in!'), 'class'=>'search', 'style'=>'font-size: 120%' ) );
-
-	$Form->buttons_input($submit_button);
-
-	echo '<div class="login_actions" style="text-align:right; margin: 1em 0 1ex">';
-	echo get_user_register_link( '<strong>', '</strong>', T_('No account yet? Register here').' &raquo;', '#', true /*disp_when_logged_in*/, $redirect_to, $source );
-	echo '</div>';
-
-	$Form->end_form();
-
-	echo '<div class="notes" style="margin: 1em"><a href="'.$secure_htsrv_url.'login.php?source='.rawurlencode($source).'redirect_to='.$redirect_to.'">'.T_( 'Use standard login form instead').' &raquo;</a></div>';
-
-  echo '<div class="form_footer_notes">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
-
-	echo '<div class="clear"></div>';
-}
-else
-{	// -----------------------------------------------------------------------------------------------------------------
-
-	$Form = new Form( $secure_htsrv_url.'login.php', 'login_form', 'post' );
-
-	$Form->begin_form( 'bComment' );
-
-	$Form->add_crumb( 'validateform' );
-	$Form->hidden( 'action', 'req_validatemail');
-	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $secure_htsrv_url) );
-	$Form->hidden( 'inskin', true );
-	if( isset( $blog ) )
-	{
-		$Form->hidden( 'blog', $blog );
-	}
-	$Form->hidden( 'req_validatemail_submit', 1 ); // to know if the form has been submitted
-
-	$Form->begin_fieldset();
-
-	echo '<ol>';
-	echo '<li>'.T_('Please confirm your email address below.').'</li>';
-	echo '<li>'.T_('An email will be sent to this address immediately.').'</li>';
-	echo '<li>'.T_('As soon as you receive the email, click on the link therein to activate your account.').'</li>';
-	echo '</ol>';
-
-	$Form->text_input( 'email', $email, 50, T_('Email'), '', array( 'maxlength'=>255, 'class'=>'input_text', 'required'=>true ) );
-	$Form->end_fieldset();
-
-	// Submit button:
-	$submit_button = array( array( 'name'=>'submit', 'value'=>T_('Send me an email now'), 'class'=>'submit' ) );
-
-	$Form->buttons_input($submit_button);
-	$Form->end_form();
-}
+echo '<div class="clear"></div>';
 
 
 /*
  * $Log$
- * Revision 1.21  2011/10/10 20:46:39  fplanque
- * registration source tracking
- *
- * Revision 1.20  2011/10/10 19:48:31  fplanque
- * i18n & login display cleaup
- *
- * Revision 1.19  2011/09/26 14:53:27  efy-asimo
- * Login problems with multidomain installs - fix
- * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
- *
- * Revision 1.18  2011/09/19 22:15:59  fplanque
- * Minot/i18n
- *
- * Revision 1.17  2011/09/18 00:58:44  fplanque
- * forms cleanup
- *
- * Revision 1.16  2011/09/17 02:31:58  fplanque
- * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
- *
- * Revision 1.15  2011/09/13 08:32:30  efy-asimo
- * Add crumb check for login and register
- * Never cache in-skin login and register
- * Fix page caching
- *
- * Revision 1.14  2011/09/10 00:57:23  fplanque
- * doc
- *
- * Revision 1.13  2011/09/08 23:29:27  fplanque
- * More blockcache/widget fixes around login/register links.
- *
- * Revision 1.12  2011/09/07 23:34:09  fplanque
- * i18n update
- *
- * Revision 1.11  2011/09/07 22:44:41  fplanque
- * UI cleanup
- *
- * Revision 1.10  2011/09/05 18:11:43  sam2kb
- * No break in tranlsated text
- *
- * Revision 1.9  2011/09/04 22:13:24  fplanque
- * copyright 2011
- *
- * Revision 1.8  2011/08/29 09:32:22  efy-james
- * Add ip on login form
- *
- * Revision 1.7  2011/06/14 20:20:44  sam2kb
- * Display message if a user is already logged in
- *
- * Revision 1.6  2011/06/14 13:33:56  efy-asimo
- * in-skin register
- *
- * Revision 1.5  2011/03/24 15:15:05  efy-asimo
- * in-skin login - feature
- *
- * Revision 1.4  2010/11/25 15:16:35  efy-asimo
- * refactor $Messages
- *
- * Revision 1.3  2010/07/26 06:52:27  efy-asimo
- * MFB v-4-0
+ * Revision 1.23  2013/11/06 08:05:36  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

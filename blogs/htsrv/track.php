@@ -4,7 +4,7 @@
  *
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -106,41 +106,8 @@ $DB->query( $sql );
 
 /*
  * $Log$
- * Revision 1.12  2011/10/21 07:08:13  efy-vitalij
- * changed function header_http_response
- *
- * Revision 1.11  2011/10/14 10:16:07  efy-vitalij
- * add function header_http_response
- *
- * Revision 1.10  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.9  2010/02/08 17:51:16  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.8  2009/10/12 22:08:15  blueyed
- * Track: send nocache headers as per todo.
- *
- * Revision 1.7  2009/07/09 00:11:18  fplanque
- * minor
- *
- * Revision 1.6  2009/07/07 23:09:26  blueyed
- * doc
- *
- * Revision 1.5  2009/07/01 23:30:26  fplanque
- * doc
- *
- * Revision 1.4  2009/05/28 19:36:07  blueyed
- * todos
- *
- * Revision 1.3  2009/05/25 19:40:53  tblue246
- * Use str_repeat() instead of str_pad()
- *
- * Revision 1.2  2009/05/25 19:37:50  tblue246
- * Doc/question
- *
- * Revision 1.1  2009/05/25 19:11:58  fplanque
- * Added goal tracke
+ * Revision 1.13  2013/11/06 08:03:44  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

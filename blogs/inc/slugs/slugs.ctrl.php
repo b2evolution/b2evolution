@@ -5,7 +5,7 @@
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -26,7 +26,7 @@ global $current_User;
 // Check minimum permission:
 $current_User->check_perm( 'slugs', 'view', true );
 
-$AdminUI->set_path( 'tools', 'slugs' );
+$AdminUI->set_path( 'options', 'slugs' );
 
 param_action( 'list' );
 
@@ -144,6 +144,11 @@ switch( $action )
 		break;
 }
 
+
+$AdminUI->breadcrumbpath_init( false );
+$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system' );
+$AdminUI->breadcrumbpath_add( T_('Slugs'), '?ctrl=slugs' );
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -187,11 +192,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.7  2011/09/04 22:13:20  fplanque
- * copyright 2011
- *
- * Revision 1.6  2010/07/26 06:52:27  efy-asimo
- * MFB v-4-0
+ * Revision 1.9  2013/11/06 08:04:53  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

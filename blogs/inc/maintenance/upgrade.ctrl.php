@@ -5,7 +5,7 @@
  * This file is part of b2evolution - {@link http://b2evolution.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -40,14 +40,15 @@ global $basepath, $upgrade_path, $install_path;
 $current_User->check_perm( 'perm_maintenance', 'upgrade', true );
 
 // Set options path:
-$AdminUI->set_path( 'tools', 'upgrade' );
+$AdminUI->set_path( 'options', 'misc', 'upgrade' );
 
 // Get action parameter from request:
 param_action();
 
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('Tools'), '?ctrl=crontab' );
+$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system' );
+$AdminUI->breadcrumbpath_add( T_('Maintenance'), '?ctrl=tools' );
 $AdminUI->breadcrumbpath_add( T_('Upgrade'), '?ctrl=upgrade' );
 
 
@@ -142,25 +143,17 @@ switch( $action )
 			// Downloading
 			$file_contents = fetch_remote_page( $download_url, $info, 1800 );
 
-			if( $file_contents !== false )
+			if( empty($file_contents) )
 			{
-				$upgrade_file_handle = fopen( $upgrade_file, 'w' );
-				if( $upgrade_file_handle !== false )
-				{
-					if( ! fwrite( $upgrade_file_handle, $file_contents ) )
-					{
-						echo '<p style="color:red">'.sprintf( T_( 'Unable to download package from &laquo;%s&raquo;' ), $download_url ).'</p>';
-						flush();
+				echo '<p style="color:red">'.sprintf( T_( 'Unable to download package from &laquo;%s&raquo;' ), $download_url ).'</p>';
+				flush();
+			}
+			elseif( ! save_to_file( $file_contents, $upgrade_file, 'w' ) )
+			{
+				echo '<p style="color:red">'.sprintf( T_( 'Unable to create &laquo;%s&raquo file;' ), $upgrade_file ).'</p>';
+				flush();
 
-						@unlink( $upgrade_file );
-					}
-					fclose( $upgrade_file_handle );
-				}
-				else
-				{
-					echo '<p style="color:red">'.sprintf( T_( 'Unable to create &laquo;%s&raquo file;' ), $upgrade_file ).'</p>';
-					flush();
-				}
+				@unlink( $upgrade_file );
 			}
 		}
 
@@ -332,62 +325,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.14  2011/10/03 17:59:59  fplanque
- * demo mode
- *
- * Revision 1.13  2011/02/10 23:07:21  fplanque
- * minor/doc
- *
- * Revision 1.12  2010/11/25 15:16:35  efy-asimo
- * refactor $Messages
- *
- * Revision 1.10.2.5  2010/07/23 09:33:05  efy-asimo
- * Item slug update - fix, and use b2evo's generic download mechanism in upgrade.ctrl.php
- *
- * Revision 1.10.2.4  2010/07/14 16:13:16  fplanque
- * cmeanup upgrade process (2nd checkin?)
- *
- * Revision 1.10.2.3  2010/07/13 14:44:03  fplanque
- * cleanup uprade process
- *
- * Revision 1.10.2.2  2010/07/13 13:12:47  fplanque
- * Throw out some warnings
- *
- * Revision 1.10.2.1  2010/07/13 13:06:29  fplanque
- * Backup messages
- *
- * Revision 1.10  2010/01/30 18:55:32  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.9  2009/12/06 22:55:18  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.8  2009/11/19 12:10:53  efy-maxim
- * Force 'upgrade' for debug mode
- *
- * Revision 1.7  2009/11/19 10:24:48  efy-maxim
- * maintenance module - 'Upgrade Database' button support.
- *
- * Revision 1.6  2009/11/18 21:54:25  efy-maxim
- * compatibility fix for PHP4
- *
- * Revision 1.5  2009/11/15 19:44:02  fplanque
- * minor
- *
- * Revision 1.4  2009/10/22 10:52:57  efy-maxim
- * upgrade - messages
- *
- * Revision 1.3  2009/10/21 14:27:39  efy-maxim
- * upgrade
- *
- * Revision 1.2  2009/10/20 14:38:54  efy-maxim
- * maintenance modulde: downloading - unpacking - verifying destination files - backing up - copying new files - upgrade database using regular script (Warning: it is very unstable version! Please, don't use maintenance modulde, because it can affect your data )
- *
- * Revision 1.1  2009/10/18 20:15:51  efy-maxim
- * 1. backup, upgrade have been moved to maintenance module
- * 2. maintenance module permissions
+ * Revision 1.16  2013/11/06 08:04:25  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

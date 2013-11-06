@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -175,53 +175,8 @@ class FileRootCache
 
 /*
  * $Log$
- * Revision 1.11  2011/09/04 22:13:15  fplanque
- * copyright 2011
+ * Revision 1.12  2013/11/06 08:04:08  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.10  2011/01/12 12:56:05  efy-asimo
- * rename user private file root when changing the login of the user - fix
- *
- * Revision 1.9  2010/02/08 17:52:18  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.8  2009/09/26 12:00:42  tblue246
- * Minor/coding style
- *
- * Revision 1.7  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.6  2009/09/14 13:04:53  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.5  2009/08/30 00:30:52  fplanque
- * increased modularity
- *
- * Revision 1.4  2009/03/08 23:57:43  fplanque
- * 2009
- *
- * Revision 1.3  2008/09/23 06:18:38  fplanque
- * File manager now supports a shared directory (/media/shared/global/)
- *
- * Revision 1.2  2008/01/21 09:35:29  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 10:59:56  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.9  2007/05/09 01:01:32  fplanque
- * permissions cleanup
- *
- * Revision 1.8  2007/04/26 00:11:10  fplanque
- * (c) 2007
- *
- * Revision 1.7  2006/12/07 23:13:10  fplanque
- * @var needs to have only one argument: the variable type
- * Otherwise, I can't code!
- *
- * Revision 1.6  2006/12/07 15:23:42  fplanque
- * filemanager enhanced, refactored, extended to skins directory
- *
- * Revision 1.5  2006/11/24 18:27:24  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

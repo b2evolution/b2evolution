@@ -7,7 +7,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -568,39 +568,8 @@ $comments_allowed_attributes = array
 
 /*
  * $Log$
- * Revision 1.12  2011/10/14 18:44:12  sam2kb
- * Allow 'name' attribute in <a> tags
- *
- * Revision 1.11  2011/09/04 22:13:21  fplanque
- * copyright 2011
- *
- * Revision 1.10  2010/02/08 17:55:17  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.9  2009/07/19 22:36:15  fplanque
- * more attribs
- *
- * Revision 1.8  2009/03/22 16:15:07  fplanque
- * Reverted fugky hack where all possible combiantions pose as a "level"
- * Use one checkbox per attributes class/style/id
- *
- * Revision 1.6  2009/03/21 22:55:15  fplanque
- * Adding TinyMCE -- lowfat version
- *
- * Revision 1.5  2009/03/08 23:57:46  fplanque
- * 2009
- *
- * Revision 1.4  2008/12/28 22:16:30  fplanque
- * broader support of embedded players
- *
- * Revision 1.3  2008/02/08 22:24:46  fplanque
- * bugfixes
- *
- * Revision 1.2  2008/01/23 16:44:27  fplanque
- * minor
- *
- * Revision 1.1  2008/01/21 17:30:31  fplanque
- * missing file
+ * Revision 1.13  2013/11/06 08:05:10  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

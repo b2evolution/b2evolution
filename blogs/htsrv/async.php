@@ -8,7 +8,7 @@
  * fp> TODO: it would be better to have the code for the actions below part of the controllers they belong to.
  * This would require some refectoring but would be better for maintenance and code clarity.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -43,6 +43,11 @@ require_once dirname(__FILE__).'/../conf/_config.php';
  */
 require_once $inc_path.'_main.inc.php';
 
+// create global $blog variable
+global $blog;
+// Init $blog with NULL to avoid injections, it will get the correct value from param where it is required
+$blog = NULL;
+
 param( 'action', 'string', '' );
 
 // Check global permission:
@@ -51,14 +56,28 @@ if( empty($current_User) || ! $current_User->check_perm( 'admin', 'restricted' )
 	require $adminskins_path.'_access_denied.main.php';
 }
 
-
 // Make sure the async responses are never cached:
 header_nocache();
 header_content_type( 'text/html', $io_charset );
 
+// Save current debug values
+$current_debug = $debug;
+$current_debug_jslog = $debug_jslog;
+
 // Do not append Debuglog to response!
 $debug = false;
 
+// Do not append Debug JSlog to response!
+$debug_jslog = false;
+
+// Init AJAX log
+$Ajaxlog = new Log();
+
+$Ajaxlog->add( sprintf( T_('action: %s'), $action ), 'note' );
+
+$incorrect_action = false;
+
+$add_response_end_comment = true;
 
 // fp> Does the following have an HTTP fallback when Javascript/AJ is not available?
 // dh> yes, but not through this file..
@@ -69,7 +88,12 @@ $debug = false;
 switch( $action )
 {
 	case 'add_plugin_sett_set':
-		// Add a Plugin(User)Settings set (for "array" type settings):
+		// Dislay a new Plugin(User)Settings set ( it's used only from plugins with "array" type settings):
+
+		// This does not require CSRF because it doesn't update the db, it only displays a new block of empty plugin setting fields
+
+		// Check permission to view plugin settings:
+		$current_User->check_perm( 'options', 'view', true );
 
 		param( 'plugin_ID', 'integer', true );
 
@@ -91,47 +115,53 @@ switch( $action )
 		// Init the new setting set:
 		_set_setting_by_path( $Plugin, $set_type, $set_path, array() );
 
+		// Get the new plugin setting set and display it with a fake Form
 		$r = get_plugin_settings_node_by_path( $Plugin, $set_type, $set_path, /* create: */ false );
 
-		$Form = new Form(); // fake Form
+		$Form = new Form(); // fake Form to display plugin setting
 		autoform_display_field( $set_path, $r['set_meta'], $Form, $set_type, $Plugin, NULL, $r['set_node'] );
-		exit(0);
+		break;
 
-	case 'del_plugin_sett_set':
-		// TODO: may use validation here..
-		echo 'OK';
-		exit(0);
-
-	case 'admin_blogperms_set_layout':
-		// Save blog permission tab layout into user settings. This gets called on JS-toggling.
-		$UserSettings->param_Request( 'layout', 'blogperms_layout', 'string', $debug ? 'all' : 'default' );  // table layout mode
-		exit(0);
-
-	case 'set_item_link_position':
+	case 'set_object_link_position':
+		// Change a position of a link on the edit item screen (fieldset "Images & Attachments")
 
 		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'itemlink' );
+		$Session->assert_received_crumb( 'link' );
+
+		// Check item/comment edit permission below after we have the $LinkOwner object ( we call LinkOwner->check_perm ... )
 
 		param('link_ID', 'integer', true);
 		param('link_position', 'string', true);
 
 		$LinkCache = & get_LinkCache();
-		$Link = & $LinkCache->get_by_ID($link_ID);
+		if( ( $Link = & $LinkCache->get_by_ID( $link_ID ) ) === false )
+		{	// Bad request with incorrect link ID
+			echo '';
+			exit(0);
+		}
+		$LinkOwner = & $Link->get_LinkOwner();
 
-		if( $Link->set('position', $link_position)
-			&& $Link->dbupdate() )
-		{
+		// Check permission:
+		$LinkOwner->check_perm( 'edit', true );
+
+		if( $Link->set( 'position', $link_position ) && $Link->dbupdate() )
+		{	// update was successful
 			echo 'OK';
+
+			// Update last touched date of Item
+			$LinkOwner->item_update_last_touched_date();
 		}
 		else
-		{ // return the current value on failure
-			echo $Link->get('position');
+		{	// return the current value on failure
+			echo $Link->get( 'position' );
 		}
-		exit(0);
+		break;
 
 	case 'get_login_list':
-		// fp> TODO: is there a permission to just 'view' users? It would be appropriate here
-		$current_User->check_perm( 'users', 'edit', true );
+		// Get users login list for username form field hintbox.
+
+		// current user must have at least view permission to see users login
+		$current_User->check_perm( 'users', 'view', true );
 
 		$text = trim( urldecode( param( 'q', 'string', '' ) ) );
 
@@ -163,39 +193,40 @@ switch( $action )
 			echo implode( "\n", $DB->get_col($SQL->get()) );
 		}
 
-		exit(0);
+		// don't show ajax response end comment, because the result will be processed with jquery hintbox
+		$add_response_end_comment = false;
+		break;
 
 	case 'get_opentrash_link':
-		// Used to show recycle bin
+		// Used to get a link 'Open recycle bin' in order to show it in the header of comments list
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
 
 		echo get_opentrash_link( true, true );
-		exit(0);
+		break;
 
 	case 'set_comment_status':
-		// Used for quick moderation of comments
+		// Used for quick moderation of comments in dashboard, item list full view and comment list screens
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
 
-		global $blog;
+		// Check comment moderate permission below after we have the $edited_Comment object
 
+		$is_admin_page = true;
 		$blog = param( 'blogid', 'integer' );
 		$moderation = param( 'moderation', 'string', NULL );
+		$status = param( 'status', 'string' );
+		$limit = param( 'limit', 'integer', 0 );
 		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ), false );
 		if( $edited_Comment !== false )
-		{ // The comment still exists
+		{	// The comment still exists
+			// Check permission:
+			$current_User->check_perm( 'comment!'.$status, 'moderate', true, $edited_Comment );
+
 			$redirect_to = param( 'redirect_to', 'string', NULL );
 
-			$edited_Comment_Item = & $edited_Comment->get_Item();
-			if( ! $current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', false, $blog ) &&
-					! $current_User->check_perm( 'blog_own_comments', '', false, $edited_Comment_Item ) )
-			{	// All permissions are denied
-				$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
-				$current_User->check_perm( 'blog_own_comments', '', true, $edited_Comment_Item );
-			}
-
-			$status = param( 'status', 'string' );
 			$edited_Comment->set( 'status', $status );
 			// Comment moderation is done, handle moderation "secret"
 			$edited_Comment->handle_qm_secret();
@@ -219,11 +250,19 @@ switch( $action )
 				$status_list = explode( ',', $statuses );
 				if( $status_list == NULL )
 				{
-					$status_list = array( 'published', 'draft', 'deprecated' );
+					$status_list = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
 				}
 
-				echo_item_comments( $blog, $item_ID, $status_list, $currentpage );
-				exit(0);
+				// In case of comments_fullview we must set a filterset name to be abble to restore filterset.
+				// If $moderation is not NULL, then this requests came from the comments_fullview
+				// TODO: asimo> This should be handled with a better solution
+				$filterset_name = ( $item_ID > 0 ) ? '' : 'fullview';
+				if( $limit == 0 )
+				{
+					$limit = $UserSettings->get( 'results_per_page' ); 
+				}
+				echo_item_comments( $blog, $item_ID, $status_list, $currentpage, $limit, array(), $filterset_name );
+				break;
 			}
 		}
 
@@ -232,58 +271,53 @@ switch( $action )
 			get_comments_awaiting_moderation( $blog );
 		}
 
-		exit(0);
+		break;
 
 	case 'delete_comment':
+		// Delete a comment from dashboard screen
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
 
-		global $blog;
+		// Check comment moderate permission below after we have the $edited_Comment objects
 
+		$is_admin_page = true;
 		$blog = param( 'blogid', 'integer' );
 		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ), false );
 		if( $edited_Comment !== false )
-		{ // The comment still exists
-			$edited_Comment_Item = & $edited_Comment->get_Item();
-			if( ! $current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', false, $blog ) &&
-					! $current_User->check_perm( 'blog_own_comments', '', false, $edited_Comment_Item ) )
-			{	// All permissions are denied
-				$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
-				$current_User->check_perm( 'blog_own_comments', '', true, $edited_Comment_Item );
-			}
+		{	// The comment still exists
+			// Check permission:
+			$current_User->check_perm( 'comment!CURSTATUS', 'delete', true, $edited_Comment );
 
 			$edited_Comment->dbdelete();
 		}
 
 		get_comments_awaiting_moderation( $blog );
-		exit(0);
+		break;
 
 	case 'delete_comments':
+		// Delete the comments from the list on dashboard, on comments full text view screen or on a view item screen
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
 
-		global $blog;
+		// Check comment moderate permission below after we have the $edited_Comment objects
 
+		$is_admin_page = true;
 		$blog = param( 'blogid', 'integer' );
 		$commentIds = param( 'commentIds', 'array' );
 		$statuses = param( 'statuses', 'string', NULL );
 		$item_ID = param( 'itemid', 'integer' );
 		$currentpage = param( 'currentpage', 'integer', 1 );
+		$limit = param( 'limit', 'integer', 0 );
 
 		foreach( $commentIds as $commentID )
 		{
 			$edited_Comment = & Comment_get_by_ID( $commentID, false );
 			if( $edited_Comment !== false )
 			{ // The comment still exists
-				$edited_Comment_Item = & $edited_Comment->get_Item();
-				if( ! $current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', false, $blog ) &&
-						! $current_User->check_perm( 'blog_own_comments', '', false, $edited_Comment_Item ) )
-				{	// All permissions are denied
-					$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
-					$current_User->check_perm( 'blog_own_comments', '', true, $edited_Comment_Item );
-				}
+				// Check permission:
+				$current_User->check_perm( 'comment!CURSTATUS', 'delete', true, $edited_Comment );
 
 				$edited_Comment->dbdelete();
 			}
@@ -296,94 +330,219 @@ switch( $action )
 		$status_list = explode( ',', $statuses );
 		if( $status_list == NULL )
 		{
-			$status_list = array( 'published', 'draft', 'deprecated' );
+			$status_list = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
 		}
 
-		echo_item_comments( $blog, $item_ID, $status_list, $currentpage );
-		exit(0);
+		// In case of comments_fullview we must set a filterset name to be abble to restore filterset.
+		// If $item_ID is not valid, then this requests came from the comments_fullview
+		// TODO: asimo> This should be handled with a better solution
+		$filterset_name = /*'';*/( $item_ID > 0 ) ? '' : 'fullview';
+		if( $limit == 0 )
+		{
+			$limit = $UserSettings->get( 'results_per_page' ); 
+		}
+		echo_item_comments( $blog, $item_ID, $status_list, $currentpage, $limit, array(), $filterset_name );
+		break;
 
 	case 'delete_comment_url':
 		// Delete spam URL from a comment directly in the dashboard - comment remains otherwise untouched
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
 
-		global $blog;
+		// Check comment edit permission below after we have the $edited_Comment object
 
 		$blog = param( 'blogid', 'integer' );
 		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ), false );
 		if( $edited_Comment !== false && $edited_Comment->author_url != NULL )
-		{ // The comment still exists
-			$edited_Comment_Item = & $edited_Comment->get_Item();
-			if( ! $current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', false, $blog ) &&
-					! $current_User->check_perm( 'blog_own_comments', '', false, $edited_Comment_Item ) )
-			{	// All permissions are denied
-				$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
-				$current_User->check_perm( 'blog_own_comments', '', true, $edited_Comment_Item );
-			}
+		{	// The comment still exists
+			// Check permission:
+			$current_User->check_perm( 'comment!CURSTATUS', 'edit', true, $edited_Comment );
 
 			$edited_Comment->set( 'author_url', NULL );
 			$edited_Comment->dbupdate();
 		}
 
-		exit(0);
+		break;
 
 	case 'refresh_comments':
+		// Refresh the comments list on dashboard by clicking on the refresh icon or after ban url
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
 
-		global $blog;
-
+		$is_admin_page = true;
 		$blog = param( 'blogid', 'integer' );
+		// Check minimum permissions ( The comment specific permissions are checked when displaying the comments )
+		$current_User->check_perm( 'blog_ismember', 'view', true, $blog );
 
 		get_comments_awaiting_moderation( $blog );
-		exit(0);
+		break;
 
 	case 'refresh_item_comments':
-		// refresh all item comments, or refresh all blog comments, if param itemid = -1
+		// Refresh item comments on the item view screen, or refresh all blog comments on comments view, if param itemid = -1
+		// A refresh is used on the actions:
+		// 1) click on the refresh icon.
+		// 2) limit by selected status(radioboxes 'Draft', 'Published', 'All comments').
+		// 3) ban by url of a comment
+
 		load_funcs( 'items/model/_item.funcs.php' );
 
+		$is_admin_page = true;
 		$blog = param( 'blogid', 'integer' );
 		$item_ID = param( 'itemid', 'integer', NULL );
 		$statuses = param( 'statuses', 'string', NULL );
 		$currentpage = param( 'currentpage', 'string', 1 );
 
-		//$statuses = init_show_comments();
+		// Check minimum permissions ( The comment specific permissions are checked when displaying the comments )
+		$current_User->check_perm( 'blog_ismember', 'view', true, $blog );
+
 		if( strlen($statuses) > 2 )
 		{
 			$statuses = substr( $statuses, 1, strlen($statuses) - 2 );
 		}
 		$status_list = explode( ',', $statuses );
 		if( $status_list == NULL )
-		{
-			$status_list = array( 'published', 'draft', 'deprecated' );
+		{ // init statuses
+			$status_list = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
 		}
 
 		echo_item_comments( $blog, $item_ID, $status_list, $currentpage );
-		exit(0);
+		break;
 
 	case 'get_tags':
-		// Get list of tags, where $term matches at the beginning or anywhere (sorted)
+		// Get list of item tags, where $term is part of the tag name (sorted)
 		// To be used for Tag autocompletion
-		$Session->assert_received_crumb( 'item' ); // via item forms
+
+		// Crumb check and permission check are not required because this won't modify anything and it returns public info
 
 		$term = param('term', 'string');
 
-		echo json_encode( $DB->get_col('
-			(
-			SELECT tag_name
-			  FROM T_items__tag
-			 WHERE tag_name LIKE '.$DB->quote($term.'%').'
-			 ORDER BY tag_name
-			) UNION (
-			SELECT tag_name
+		$tags = $DB->get_results( '
+			SELECT tag_name AS id, tag_name AS title
 			  FROM T_items__tag
 			 WHERE tag_name LIKE '.$DB->quote('%'.$term.'%').'
-			 ORDER BY tag_name
-			)') );
+			 ORDER BY tag_name' );
+
+		// Check if current term is not an existing tag
+		$term_is_new_tag = true;
+		foreach( $tags as $tag )
+		{
+			if( $tag->title == $term )
+			{ // Current term is an existing tag
+				$term_is_new_tag = false;
+			}
+		}
+		if( $term_is_new_tag )
+		{	// Add current term in the beginning of the tags list
+			array_unshift( $tags, array( 'id' => $term, 'title' => $term ) );
+		}
+
+		echo evo_json_encode( $tags );
 		exit(0);
+
+	case 'dom_type_edit':
+		// Update type of a reffering domain from list screen by clicking on the type column
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'domtype' );
+
+		// Check permission:
+		$current_User->check_perm( 'stats', 'edit', true );
+
+		load_funcs('sessions/model/_hitlog.funcs.php');
+
+		$dom_type = param( 'new_dom_type', 'string' );
+		$dom_name = param( 'dom_name', 'string' );
+
+		$DB->query( 'UPDATE T_basedomains
+						SET dom_type = '.$DB->quote($dom_type).'
+						WHERE dom_name =' . $DB->quote($dom_name));
+		echo '<a href="#" rel="'.$dom_type.'">'.stats_dom_type_title( $dom_type ).'</a>';
+		break;
+
+	case 'iprange_status_edit':
+		// Update status of IP range from list screen by clicking on the status column
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'iprange' );
+
+		// Check permission:
+		$current_User->check_perm( 'spamblacklist', 'edit', true );
+
+		$new_status = param( 'new_status', 'string' );
+		$iprange_ID = param( 'iprange_ID', 'integer', true );
+
+		$DB->query( 'UPDATE T_antispam__iprange
+						SET aipr_status = '.( empty( $new_status ) ? 'NULL' : $DB->quote( $new_status ) ).'
+						WHERE aipr_ID =' . $DB->quote( $iprange_ID ) );
+		echo '<a href="#" rel="'.$new_status.'" color="'.aipr_status_color( $new_status ).'">'.aipr_status_title( $new_status ).'</a>';
+		break;
+
+	case 'emblk_status_edit':
+		// Update blocked status of email address
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'emblkstatus' );
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
+
+		$new_status = param( 'new_status', 'string' );
+		$emblk_ID = param( 'emblk_ID', 'integer', true );
+
+		load_funcs('tools/model/_email.funcs.php');
+
+		$DB->query( 'UPDATE T_email__blocked
+						SET emblk_status = '.( empty( $new_status ) ? 'NULL' : $DB->quote( $new_status ) ).'
+						WHERE emblk_ID =' . $DB->quote( $emblk_ID ) );
+		echo '<a href="#" rel="'.$new_status.'" color="'.emblk_get_status_color( $new_status ).'">'.emblk_get_status_title( $new_status ).'</a>';
+		break;
+
+	case 'user_level_edit':
+		// Update level of an user from list screen by clicking on the level column
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'userlevel' );
+
+		// Check permission:
+		$current_User->check_perm( 'users', 'edit', true );
+
+		$user_level = param( 'new_user_level', 'integer' );
+		$user_ID = param( 'user_ID', 'string' );
+
+		$UserCache = & get_UserCache();
+		if( $User = & $UserCache->get_by_ID( $user_ID, false ) )
+		{
+			$User->set( 'level', $user_level );
+			$User->dbupdate();
+			echo '<a href="#" rel="'.$user_level.'">'.$user_level.'</a>';
+		}
+		break;
+
+	default:
+		$incorrect_action = true;
+		break;
 }
 
+if( !$incorrect_action )
+{
+	if( $current_debug || $current_debug_jslog )
+	{	// debug is ON
+		$Ajaxlog->display( NULL, NULL, true, 'all',
+						array(
+								'error' => array( 'class' => 'jslog_error', 'divClass' => false ),
+								'note'  => array( 'class' => 'jslog_note',  'divClass' => false ),
+							), 'ul', 'jslog' );
+	}
+
+	if( $add_response_end_comment )
+	{ // add ajax response end comment
+		echo '<!-- Ajax response end -->';
+	}
+
+	exit(0);
+}
 
 /**
  * Get comments awaiting moderation
@@ -395,262 +554,13 @@ function get_comments_awaiting_moderation( $blog_ID )
 	$limit = 5;
 
 	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
-	show_comments_awaiting_moderation( $blog_ID, $limit, array(), false );
+	show_comments_awaiting_moderation( $blog_ID, NULL, $limit, array(), false );
 }
-
-
-/**
- * Call the handler/dispatcher (it is a common handler for asynchronous calls -- both AJax calls and HTTP GET fallbacks)
- */
-require_once $inc_path.'_async.inc.php';
-
-
-// Debug info:
-echo '-expand='.$expand;
-echo '-collapse='.$collapse;
 
 /*
  * $Log$
- * Revision 1.79  2011/10/23 09:19:41  efy-yurybakh
- * Implement new permission for comment editing
- *
- * Revision 1.78  2011/10/21 07:10:47  efy-asimo
- * Comment quick moderation option
- *
- * Revision 1.77  2011/10/12 13:34:36  efy-asimo
- * Delete comment secret on comment update
- *
- * Revision 1.76  2011/09/28 16:15:56  efy-yurybakh
- * "comment was helpful" votes
- *
- * Revision 1.75  2011/09/28 09:22:34  efy-yurybakh
- * "comment is spam" vote (avatar blinks)
- *
- * Revision 1.74  2011/09/27 13:30:13  efy-yurybakh
- * spam vote checkbox
- *
- * Revision 1.73  2011/09/25 08:22:46  efy-yurybakh
- * Implement new permission for spam voting
- *
- * Revision 1.72  2011/09/24 13:27:36  efy-yurybakh
- * Change voting buttons
- *
- * Revision 1.71  2011/09/23 06:25:47  efy-yurybakh
- * "comment is spam" vote
- *
- * Revision 1.70  2011/09/22 16:58:34  efy-yurybakh
- * "comment is spam" vote
- *
- * Revision 1.69  2011/09/21 13:01:04  efy-yurybakh
- * feature "Was this comment helpful?"
- *
- * Revision 1.68  2011/09/07 05:15:47  sam2kb
- * Create json_encode function if it does not exist ( PHP < 5.2.0 )
- *
- * Revision 1.67  2011/09/04 22:13:12  fplanque
- * copyright 2011
- *
- * Revision 1.66  2011/05/19 17:47:07  efy-asimo
- * register for updates on a specific blog post
- *
- * Revision 1.65  2011/03/16 13:34:53  efy-asimo
- * animate comment delete
- *
- * Revision 1.64  2011/02/23 20:12:55  fplanque
- * minor/doc
- *
- * Revision 1.63  2011/02/15 15:36:59  efy-asimo
- * Change access to admin permission
- *
- * Revision 1.62  2010/12/14 15:29:37  efy-asimo
- * comment moderation with ajax - fix
- *
- * Revision 1.61  2010/10/19 13:31:31  efy-asimo
- * Ajax comment moderation - fix
- *
- * Revision 1.60  2010/10/18 23:47:46  sam2kb
- * doc
- *
- * Revision 1.59  2010/10/17 23:12:57  sam2kb
- * Correctly decode utf-8 logins
- *
- * Revision 1.58  2010/10/05 15:33:15  efy-asimo
- * Ajax comment moderation - fix locale changes
- *
- * Revision 1.57  2010/09/28 13:03:16  efy-asimo
- * Paged comments on item full view
- *
- * Revision 1.56  2010/09/20 13:00:44  efy-asimo
- * dashboard ajax calls - fix
- *
- * Revision 1.55  2010/08/05 08:04:12  efy-asimo
- * Ajaxify comments on itemList FullView and commentList FullView pages
- *
- * Revision 1.54  2010/06/15 20:02:42  blueyed
- * async.php: add get_tags callback, to be used for tags auto completion.
- *
- * Revision 1.53  2010/06/15 19:54:28  blueyed
- * async.php: simplify get_login_list
- *
- * Revision 1.52  2010/06/01 11:33:19  efy-asimo
- * Split blog_comments advanced permission (published, deprecated, draft)
- * Use this new permissions (Antispam tool,when edit/delete comments)
- *
- * Revision 1.51  2010/03/11 10:34:21  efy-asimo
- * Rewrite CommentList to CommentList2 task
- *
- * Revision 1.50  2010/03/02 12:37:08  efy-asimo
- * remove show_comments_awaiting_moderation function from _misc_funcs.php to _dashboard.func.php
- *
- * Revision 1.49  2010/02/28 23:38:38  fplanque
- * minor changes
- *
- * Revision 1.48  2010/02/26 21:23:52  fplanque
- * rollback - did not seem right
- *
- * Revision 1.47  2010/02/26 08:34:33  efy-asimo
- * dashboard -> ban icon should be javascripted task
- *
- * Revision 1.46  2010/02/09 17:20:33  efy-yury
- * &new -> new
- *
- * Revision 1.45  2010/02/08 17:50:53  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.44  2010/01/31 17:39:41  efy-asimo
- * delete url from comments in dashboard and comments form
- *
- * Revision 1.43  2010/01/30 10:29:05  efy-yury
- * add: crumbs
- *
- * Revision 1.42  2010/01/30 03:40:11  fplanque
- * minor
- *
- * Revision 1.41  2010/01/29 17:21:37  efy-yury
- * add: crumbs in ajax calls
- *
- * Revision 1.40  2009/12/10 21:32:47  efy-maxim
- * 1. single ajax call
- * 2. comments of protected post fix
- *
- * Revision 1.39  2009/12/04 23:27:49  fplanque
- * cleanup Expires: header handling
- *
- * Revision 1.38  2009/12/03 11:38:37  efy-maxim
- * ajax calls have been improved
- *
- * Revision 1.37  2009/12/02 00:05:52  fplanque
- * no message
- *
- * Revision 1.36  2009/12/01 13:56:57  efy-maxim
- * check permissions
- *
- * Revision 1.35  2009/11/30 00:22:04  fplanque
- * clean up debug info
- * show more timers in view of block caching
- *
- * Revision 1.34  2009/11/27 12:29:04  efy-maxim
- * drop down
- *
- * Revision 1.33  2009/11/26 10:30:52  efy-maxim
- * ajax actions have been moved to async.php
- *
- * Revision 1.32  2009/10/17 14:49:46  fplanque
- * doc
- *
- * Revision 1.31  2009/10/11 03:00:10  blueyed
- * Add "position" and "order" properties to attachments.
- * Position can be "teaser" or "aftermore" for now.
- * Order defines the sorting of attachments.
- * Needs testing and refinement. Upgrade might work already, be careful!
- *
- * Revision 1.30  2009/09/25 07:32:51  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.29  2009/03/08 23:57:35  fplanque
- * 2009
- *
- * Revision 1.28  2008/09/28 08:06:03  fplanque
- * Refactoring / extended page level caching
- *
- * Revision 1.27  2008/02/19 11:11:16  fplanque
- * no message
- *
- * Revision 1.26  2008/01/21 09:35:23  fplanque
- * (c) 2008
- *
- * Revision 1.25  2007/12/23 20:10:49  fplanque
- * removed suspects
- *
- * Revision 1.24  2007/06/25 10:58:49  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.23  2007/06/19 20:41:10  fplanque
- * renamed generic functions to autoform_*
- *
- * Revision 1.22  2007/06/19 00:03:27  fplanque
- * doc / trying to make sense of automatic settings forms generation.
- *
- * Revision 1.21  2007/04/26 00:11:14  fplanque
- * (c) 2007
- *
- * Revision 1.20  2006/12/06 23:32:34  fplanque
- * Rollback to Daniel's most reliable password hashing design. (which is not the last one)
- * This not only strengthens the login by providing less failure points, it also:
- * - Fixes the login in IE7
- * - Removes the double "do you want to memorize this password' in FF.
- *
- * Revision 1.19  2006/12/05 01:04:03  blueyed
- * Fixed add_plugin_sett_set AJAX callback
- *
- * Revision 1.18  2006/12/04 00:18:52  fplanque
- * keeping the login hashing
- *
- * Revision 1.15  2006/12/03 18:18:17  blueyed
- * doc
- *
- * Revision 1.14  2006/12/02 22:57:37  fplanque
- * Not releasable. Discussion by email.
- *
- * Revision 1.13  2006/11/29 03:25:53  blueyed
- * Enhanced password hashing during login: get the password salt through async request + cleanup
- *
- * Revision 1.12  2006/11/28 01:10:46  blueyed
- * doc/discussion
- *
- * Revision 1.11  2006/11/28 00:47:16  fplanque
- * doc
- *
- * Revision 1.10  2006/11/24 18:27:22  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.9  2006/11/18 01:27:39  blueyed
- * Always include jQuery in backoffice (it gets cached and can now be used anywhere freely); Update $UserSettings from (blogperms_)toggle_layout (this and related JS moved out of _menutop.php)
- *
- * Revision 1.8  2006/11/16 23:43:39  blueyed
- * - "key" entry for array-type Plugin(User)Settings can define an input field for the key of the settings entry
- * - cleanup
- *
- * Revision 1.7  2006/11/15 22:03:17  blueyed
- * Use Plugins_admin, because a Plugin might be disabled, when editing its settings
- *
- * Revision 1.6  2006/11/10 16:37:30  blueyed
- * Send charset
- *
- * Revision 1.5  2006/11/09 23:40:57  blueyed
- * Fixed Plugin UserSettings array type editing; Added jquery and use it for AJAHifying Plugin (User)Settings editing of array types
- *
- * Revision 1.4  2006/11/02 18:14:59  fplanque
- * normalized
- *
- * Revision 1.3  2006/11/02 02:04:08  blueyed
- * QUESTION
- *
- * Revision 1.2  2006/10/14 04:43:55  blueyed
- * MFB: E_FATAL for anon user
- *
- * Revision 1.1  2006/06/01 19:06:27  fplanque
- * a taste of Ajax in the framework
+ * Revision 1.81  2013/11/06 08:03:44  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

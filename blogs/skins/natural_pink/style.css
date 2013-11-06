@@ -1,9 +1,5 @@
 /* Designed by Francois PLANQUE - http://fplanque.net/ */
 
-@import url("../../rsc/css/basic.css");	/* Import basic styles */
-@import url("../../rsc/css/blog_base.css");	/* Default styles for the blog navigation */
-@import url("../../rsc/css/item_base.css");	/* Default styles for the post CONTENT */
-
 /*
  * Main page construct:
  */
@@ -11,6 +7,10 @@ body {
 	background: #eee url(rsc/img/bg.gif) repeat fixed center;
 	color: #000;
 	font-family: Georgia, "Times New Roman", Times, serif;
+}
+
+textarea, input, select, option, optgroup, ul.ui-autocomplete, li.token-input-token-facebook, div.token-input-dropdown-facebook {
+	font: 13.43px Georgia, "Times New Roman", Times, serif;
 }
 
 div.wrapper
@@ -179,7 +179,7 @@ div.separator {
 	font-size: 78%;
 	margin: 2ex 0 1ex 0;
 }
-.bTitle {
+.bTitle, .bTitle.linked a {
 	color: #000;
 	margin: 1ex 0;
 }
@@ -243,13 +243,12 @@ select.bComment		/* Used by the profile form */
 	color: #aaa;
 	font-size: 84%;
 }
-input.SearchField
+div.compact_search_form input.SearchField
 {
-	background-color: #eee;
+	background-color: #fff0f8;
 	border: 1px solid #ccc;
 	padding: .5ex;
-	width: 96%;
-	margin: 0ex;
+	width: 150px;
 }
 
 /* Special SideItems: */
@@ -303,8 +302,7 @@ form.bComment fieldset div.info
 	font-size: 84%;
 }
 textarea.bComment,
-input.bComment,
-input.SearchField {
+input.bComment {
 	background-color: #fff0f8;
 }
 
@@ -312,4 +310,26 @@ input.SearchField {
 div.featured_post {
 	margin: 1ex 1ex 1ex 1em;
 	padding: 0 1ex;
+}
+
+textarea#msg_text {
+	width: 100%;
+}
+
+/* Not published comments display */
+#styled_content_block .bComment .status_draft,
+#styled_content_block .bComment .status_review,
+#styled_content_block .bComment .status_community,
+#styled_content_block .bComment .status_protected,
+#styled_content_block .bComment .status_private {
+	top: 0px;
+	left: 16px;
+}
+/* Not published posts display */
+#styled_content_block .bSmallHead .status_draft,
+#styled_content_block .bSmallHead .status_review,
+#styled_content_block .bSmallHead .status_community,
+#styled_content_block .bSmallHead .status_protected,
+#styled_content_block .bSmallHead .status_private {
+	left: 19px;
 }

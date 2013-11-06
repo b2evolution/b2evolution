@@ -17,8 +17,7 @@ class texturize_plugin extends Plugin
 	var $code = 'b2WPTxrz';
 	var $name = 'Texturize';
 	var $priority = 90;
-	var $version = '2.2-dev';
-	var $apply_rendering = 'opt-in';
+	var $version = '5.0.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -38,6 +37,22 @@ class texturize_plugin extends Plugin
 			<li>-- to &#8211;</li>
 			<li>... to &#8230;</li>
 		</ul>' );
+	}
+
+
+	/**
+	 * Define here default collection/blog settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::get_coll_setting_definitions()}.
+	 */
+	function get_coll_setting_definitions( & $params )
+	{
+		$default_params = array_merge( $params, array(
+				'default_post_rendering' => 'opt-in',
+				'default_comment_rendering' => 'stealth',
+			) );
+		return parent::get_coll_setting_definitions( $default_params );
 	}
 
 
@@ -127,38 +142,8 @@ class texturize_plugin extends Plugin
 
 /*
  * $Log$
- * Revision 1.17  2007/12/22 21:02:50  fplanque
- * minor
- *
- * Revision 1.16  2007/05/04 20:43:08  fplanque
- * MFB
- *
- * Revision 1.13.2.3.2.3  2007/04/24 11:44:42  yabs
- * minor doc, renamed test function
- *
- * Revision 1.13.2.3.2.2  2007/04/22 16:44:46  yabs
- * testing - ignores code/pre blocks
- *
- * Revision 1.13.2.3.2.1  2007/04/20 02:52:01  fplanque
- * limited number of installs
- *
- * Revision 1.14  2006/12/26 03:19:12  fplanque
- * assigned a few significant plugin groups
- *
- * Revision 1.13  2006/07/10 20:19:30  blueyed
- * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
- *
- * Revision 1.12  2006/07/07 21:26:49  blueyed
- * Bumped to 1.9-dev
- *
- * Revision 1.11  2006/06/16 21:30:57  fplanque
- * Started clean numbering of plugin versions (feel free do add dots...)
- *
- * Revision 1.10  2006/05/30 19:39:55  fplanque
- * plugin cleanup
- *
- * Revision 1.9  2006/04/11 21:22:26  fplanque
- * partial cleanup
+ * Revision 1.19  2013/11/06 08:05:22  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

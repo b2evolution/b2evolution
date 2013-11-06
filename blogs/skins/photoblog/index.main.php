@@ -23,10 +23,16 @@ if( version_compare( $app_version, '3.0' ) < 0 )
 // Do inits depending on current $disp:
 skin_init( $disp );
 
-require_js( 'functions.js' );	// for opening popup window (comments)
+require_js( 'functions.js', 'blog' );	// for opening popup window (comments)
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
-skin_include( '_html_header.inc.php' );
+skin_include( '_html_header.inc.php', array(
+		'auto_pilot'      => 'seo_title',
+		'arcdir_text'     => T_('Index'),
+		'catdir_text'     => T_('Albums'),
+		'category_text'   => T_('Album').': ',
+		'categories_text' => T_('Albums').': ',
+	) );
 // Note: You can customize the default HTML header by copying the
 // _html_header.inc.php file into the current skin folder.
 // -------------------------------- END OF HEADER --------------------------------
@@ -91,10 +97,10 @@ skin_include( '_html_header.inc.php' );
 				'block_start' => '<div class="nav_right">',
 				'block_end' => '</div>',
 				'links_format' => '$next$ $prev$',
-				'prev_text' => '<img src="img/prev.gif" width="29" height="29" alt="'.T_('Previous').'" title="'.T_('Previous').'" />',
-				'next_text' => '<img src="img/next.gif" width="29" height="29" alt="'.T_('Next').'" title="'.T_('Next').'" />',
+				'prev_text' => '<span class="pb_icon prev" title="'.T_('Previous').'"></span>',
+				'next_text' => '<span class="pb_icon next" title="'.T_('Next').'"></span>',
 				'no_prev_text' => '',
-				'no_next_text' => '<img src="'.$rsc_url.'/img/blank.gif" width="29" height="29" alt="" class="no_nav" />',
+				'no_next_text' => get_icon( 'pixel', 'imgtag', array( 'size' => array( 29, 29 ), 'xy' => array( 13, 13 ), 'class' => 'no_nav' ) ),
 			) );
 		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 	?>
@@ -105,11 +111,11 @@ skin_include( '_html_header.inc.php' );
 				'template' => '$next$$prev$',
 				'block_start' => '<div class="nav_right">',
 				'next_start'  => '',
-				'next_text' => '<img src="img/next.gif" width="29" height="29" alt="'.T_('Next').'" title="'.T_('Next').'" />',
-				'next_no_item' => '<img src="'.$rsc_url.'/img/blank.gif" width="29" height="29" alt="" class="no_nav" />',
+				'next_text' => '<span class="pb_icon next" title="'.T_('Next').'"></span>',
+				'next_no_item' => get_icon( 'pixel', 'imgtag', array( 'size' => array( 29, 29 ), 'xy' => array( 13, 13 ), 'class' => 'no_nav' ) ),
 				'next_end'    => ' ',
 				'prev_start'  => '',
-				'prev_text' => '<img src="img/prev.gif" width="29" height="29" alt="'.T_('Previous').'" title="'.T_('Previous').'" />',
+				'prev_text' => '<span class="pb_icon prev" title="'.T_('Previous').'"></span>',
 				'prev_no_item' => '',
 				'prev_end'    => '',
 				'block_end'   => '</div>',
@@ -154,6 +160,7 @@ skin_include( '_html_header.inc.php' );
 	// Display message if no post:
 	display_if_empty();
 
+	echo '<div id="styled_content_block">'; // Beginning of posts display
 	while( $Item = & mainlist_get_item() )
 	{	// For each blog post:
 		// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
@@ -162,6 +169,7 @@ skin_include( '_html_header.inc.php' );
 			) );
 		// ----------------------------END ITEM BLOCK  ----------------------------
 	} // ---------------------------------- END OF POSTS ------------------------------------
+	echo '</div>'; // End of posts display
 	?>
 
 

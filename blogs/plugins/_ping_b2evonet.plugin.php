@@ -8,7 +8,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -48,13 +48,12 @@ class ping_b2evonet_plugin extends Plugin
 	 */
 	var $code = 'ping_b2evonet';
 	var $priority = 50;
-	var $version = '2.4.2.1';
+	var $version = '5.0.0';
 	var $author = 'The b2evo Group';
 
 	/*
 	 * These variables MAY be overriden.
 	 */
-	var $apply_rendering = 'never';
 	var $group = 'ping';
 	var $number_of_installs = 1;
 
@@ -110,44 +109,8 @@ class ping_b2evonet_plugin extends Plugin
 
 /*
  * $Log$
- * Revision 1.13  2011/09/04 22:13:23  fplanque
- * copyright 2011
- *
- * Revision 1.12  2010/02/08 17:55:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.11  2009/03/08 23:57:47  fplanque
- * 2009
- *
- * Revision 1.10  2008/05/10 22:48:30  fplanque
- * minor
- *
- * Revision 1.9  2008/05/10 21:30:39  fplanque
- * better UTF-8 handling
- *
- * Revision 1.8  2008/04/09 15:33:36  fplanque
- * ping antispam - part 1
- *
- * Revision 1.7  2008/01/21 09:35:41  fplanque
- * (c) 2008
- *
- * Revision 1.6  2007/09/11 20:57:51  fplanque
- * minor fixes
- *
- * Revision 1.5  2007/04/26 00:11:04  fplanque
- * (c) 2007
- *
- * Revision 1.4  2007/04/20 02:53:13  fplanque
- * limited number of installs
- *
- * Revision 1.3  2006/11/24 18:27:27  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.2  2006/10/11 17:21:09  blueyed
- * Fixes
- *
- * Revision 1.1  2006/10/01 22:26:48  blueyed
- * Initial import of ping plugins.
+ * Revision 1.15  2013/11/06 08:05:22  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -34,8 +34,8 @@ global $ItemList;
 global $Item;
 
 global $action, $dispatcher, $blog, $posts, $poststart, $postend, $ReqURI;
-global $edit_item_url, $delete_item_url, $htsrv_url, $p;
-global $comment_allowed_tags, $comments_use_autobr;
+global $edit_item_url, $delete_item_url, $htsrv_url, $p, $dummy_fields;
+global $comment_allowed_tags;
 
 if( $highlight = param( 'highlight', 'integer', NULL ) )
 {	// There are lines we want to highlight:
@@ -72,9 +72,12 @@ else
 		$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 3, 3 );
 	}
 
-	$block_item_Widget->global_icon( T_('Create multiple posts...'), 'new', '?ctrl=items&amp;action=new_mass&amp;blog='.$blog, T_('Mass create').' &raquo;', 3, 4 );
-	$block_item_Widget->global_icon( T_('Mass edit the current post list...'), '', '?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$blog.'&amp;redirect_to='.regenerate_url( 'action', '', '', '&'), T_('Mass edit').' &raquo;', 3, 4 );
-	$block_item_Widget->global_icon( T_('Write a new post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$blog, T_('New post').' &raquo;', 3, 4 );
+	if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+	{
+		$block_item_Widget->global_icon( T_('Create multiple posts...'), 'new', '?ctrl=items&amp;action=new_mass&amp;blog='.$blog, T_('Mass create').' &raquo;', 3, 4 );
+		$block_item_Widget->global_icon( T_('Mass edit the current post list...'), '', '?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$blog.'&amp;redirect_to='.regenerate_url( 'action', '', '', '&'), T_('Mass edit').' &raquo;', 3, 4 );
+		$block_item_Widget->global_icon( T_('Write a new post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$blog, T_('New post').' &raquo;', 3, 4 );
+	}
 }
 
 $block_item_Widget->disp_template_replaced( 'block_start' );
@@ -90,7 +93,8 @@ if( $action == 'view' )
 					'header_end' => '',
 					'footer_start' => '',
 						'footer_text_single' => '',
-					'footer_end' => ''
+					'footer_end' => '',
+					'disp_rating_summary'  => true,
 				);
 }
 else
@@ -105,8 +109,8 @@ else
 						'header_text_single' => T_('1 page'),
 					'header_end' => '</div>',
 					'footer_start' => '',
-						'footer_text' => '<div class="NavBar center"><strong>'.T_('Pages').'</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$</div>',
-						'footer_text_single' => '',
+						'footer_text' => '<div class="NavBar center"><strong>'.T_('Pages').'</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$<br />$page_size$</div>',
+						'footer_text_single' => '<div class="NavBar center">$page_size$</div>',
 							'prev_text' => T_('Previous'),
 							'next_text' => T_('Next'),
 							'list_prev_text' => T_('...'),
@@ -183,7 +187,23 @@ while( $Item = & $ItemList->get_item() )
 
 				echo '<div class="bSmallHeadRight"><span class="bViews">';
 				$Item->views();
-				echo '</span></div>';
+				echo '</span>';
+				$Item->permanent_link( array(
+						'before' => '<br />',
+						'text'   => '#text#'
+					) );
+				// Item slug control:
+				$Item->tinyurl_link( array(
+						'before' => ' - '.T_('Short').': ',
+						'after'  => ''
+					) );
+				global $admin_url;
+				if( $current_User->check_perm( 'slugs', 'view' ) )
+				{ // user has permission to view slugs:
+					echo '&nbsp;'.action_icon( T_('Edit slugs...'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID,
+						NULL, NULL, NULL, array( 'class' => 'small' ) );
+				}
+				echo '</div>';
 
 				echo '<br />';
 
@@ -194,11 +214,13 @@ while( $Item = & $ItemList->get_item() )
 					'include_other'   => true,
 					'include_external'=> true,
 					'link_categories' => false,
+					'show_locked'     => true,
 				) );
 			?>
 		</div>
 
 		<div class="bContent">
+			<?php $Item->status( array( 'format' => 'styled' ) ); ?>
 			<!-- TODO: Tblue> Do not display link if item does not get displayed in the frontend (e. g. not published). -->
 			<h3 class="bTitle"><?php $Item->title( array( 'target_blog' => '' )) ?></h3>
 
@@ -218,7 +240,7 @@ while( $Item = & $ItemList->get_item() )
 
 			<div class="bText">
 				<?php
-					// Uncomment this in case you wnt to count view in backoffice:
+					// Uncomment this if you want to count views in backoffice:
 					/*
 					$Item->count_view( array(
 							'allow_multiple_counts_per_page' => false,
@@ -227,8 +249,13 @@ while( $Item = & $ItemList->get_item() )
 
 					// Display CONTENT:
 					$Item->content_teaser( array(
-							'before'      => '',
-							'after'       => '',
+							'before'              => '',
+							'after'               => '',
+							'before_image'        => '<div class="image_block">',
+							'before_image_legend' => '<div class="image_legend">',
+							'after_image_legend'  =>  '</div>',
+							'after_image'         => '</div>',
+							'image_size'          => 'fit-320x320',
 						) );
 					$Item->more_link();
 					$Item->content_extension( array(
@@ -237,7 +264,9 @@ while( $Item = & $ItemList->get_item() )
 						) );
 
 					// Links to post pages (for multipage posts):
-					$Item->page_links( '<p class="right">'.T_('Pages:').' ', '</p>', ' &middot; ' );
+					$Item->page_links( array(
+							'separator' => ' &middot; ',
+						) );
 				?>
 			</div>
 
@@ -255,54 +284,63 @@ while( $Item = & $ItemList->get_item() )
 
 		<div class="PostActionsArea">
 			<?php
-			$Item->permanent_link( array(
-					'class' => 'permalink_right',
-				) );
 
-			// Item slug control:
-			$Item->tinyurl_link( array( 'class' => 'small', 'style' => 'float: right' ) );
-			global $admin_url;
-			if( $current_User->check_perm( 'slugs', 'view' ) )
-			{ // user has permission to view slugs:
-				echo action_icon( 'Edit slugs...', 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID,
-					NULL, NULL, NULL, array( 'class' => 'small', 'style' => 'float: right' ) );
+			echo '<span class="roundbutton_group">';
+			if( $action != 'view' )
+			{
+				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="roundbutton_text">'.get_icon( 'magnifier' ).T_('View').'</a>';
 			}
-
-			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="ActionButton">'.T_('View...').'</a>';
-
-			// Display edit button if current user has the rights:
-			$Item->edit_link( array( // Link to backoffice for editing
-					'before'    => ' ',
-					'after'     => ' ',
-					'class'     => 'ActionButton'
-				) );
 
 			if( isset($GLOBALS['files_Module']) && $current_User->check_perm( 'files', 'view' ) )
 			{
-				echo '<a href="'.url_add_param( $Blog->get_filemanager_link(), 'fm_mode=link_item&amp;item_ID='.$Item->ID )
-							.'" class="ActionButton">'.get_icon( 'folder', 'imgtag' ).' '.T_('Files...').'</a>';
+				echo '<a href="'.url_add_param( $Blog->get_filemanager_link(), 'fm_mode=link_object&amp;link_type=item&amp;link_object_ID='.$Item->ID )
+							.'" class="roundbutton_text">'.get_icon( 'folder' ).T_('Files').'</a>';
 			}
-
-			// Display publish NOW button if current user has the rights:
-			$Item->publish_link( ' ', ' ', '#', '#', 'PublishButton');
-
-			// Display deprecate button if current user has the rights:
-			$Item->deprecate_link( ' ', ' ', '#', '#', 'DeleteButton');
-
-			// Display delete button if current user has the rights:
-			$Item->delete_link( ' ', ' ', '#', '#', 'DeleteButton', false );
 
 			if( $Blog->get_setting( 'allow_comments' ) != 'never' )
 			{
-				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'#comments" class="ActionButton">';
+				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'#comments" class="roundbutton_text">';
 				// TRANS: Link to comments for current post
-				comments_number(T_('no comment'), T_('1 comment'), T_('%d comments'), $Item->ID );
+				$comments_number = generic_ctp_number( $Item->ID, 'comments', 'total' );
+				echo get_icon( $comments_number > 0 ? 'comments' : 'nocomment' );
+				comments_number( T_('no comment'), T_('1 comment'), T_('%d comments'), $Item->ID );
 				load_funcs('comments/_trackback.funcs.php'); // TODO: use newer call below
 				trackback_number('', ' &middot; '.T_('1 Trackback'), ' &middot; '.T_('%d Trackbacks'), $Item->ID);
 				echo '</a>';
-			} ?>
+			}
+			echo '</span>';
 
-   		<div class="clear"></div>
+			echo '<span class="roundbutton_group">';
+			// Display edit button if current user has the rights:
+			$Item->edit_link( array( // Link to backoffice for editing
+					'before' => ' ',
+					'after'  => '',
+					'class'  => 'roundbutton_text'
+				) );
+
+			// Display copy button if current user has the rights:
+			$Item->copy_link( array( // Link to backoffice for coping
+					'before' => '',
+					'after'  => ' ',
+					'text'   => '#icon#',
+					'class'  => 'roundbutton'
+				) );
+			echo '</span>';
+
+			echo '<span class="roundbutton_group">';
+			// Display publish NOW button if current user has the rights:
+			$Item->publish_link( ' ', '', '#', '#', 'roundbutton_text' );
+
+			// Display deprecate button if current user has the rights:
+			$Item->deprecate_link( '', '', '#', '#', 'roundbutton_text' );
+
+			// Display delete button if current user has the rights:
+			$Item->delete_link( '', ' ', '#', '#', 'roundbutton_text', false );
+			echo '</span>';
+
+			?>
+
+			<div class="clear"></div>
 		</div>
 
 		<?php
@@ -320,9 +358,9 @@ while( $Item = & $ItemList->get_item() )
 				 * Needed by file display funcs
 				 * @var Item
 				 */
-				global $edited_Item;
-				$edited_Item = $Item;	// COPY or it will be out of scope for display funcs
-				require dirname(__FILE__).'/inc/_item_links.inc.php';
+				global $LinkOwner;
+				$LinkOwner = new LinkItem( $Item );
+				require $inc_path.'links/views/_link_list.inc.php';
 				echo '</div>';
 			}
 
@@ -340,7 +378,7 @@ while( $Item = & $ItemList->get_item() )
 			}
 			else
 			{ // show all comments
-				$statuses = array( 'published', 'draft', 'deprecated' );
+				$statuses = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
 				$show_comments = 'all';
 				param( 'comments_number', 'integer', $total_comments_number );
 			}
@@ -371,13 +409,21 @@ while( $Item = & $ItemList->get_item() )
 			<a id="comments"></a>
 			<h4>
 			<?php 
-				echo T_('Comments'), ', ', T_('Trackbacks'), ', ', T_('Pingbacks').' ('.$CommentList->total_rows.')';
+				echo T_('Comments'), ', ', T_('Trackbacks'), ', ', T_('Pingbacks').' ('.generic_ctp_number( $Item->ID, 'feedbacks', 'total' ).')';
 				$opentrash_link = get_opentrash_link();
 				$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', 'javascript:startRefreshComments('.$Item->ID.')' ).'</span> ';
 				echo $refresh_link.$opentrash_link;
 			?>:</h4>
-            
-            
+			<?php
+
+			if( $display_params['disp_rating_summary'] )
+			{	// Display a ratings summary
+				echo '<h3>'.$Item->get_feedback_title( 'comments', '#', '#', '#', 'total' ).'</h3>';
+				echo $Item->get_rating_summary();
+				echo '<br />';
+			}
+
+			?>
 			<div class="tile"><label><?php echo T_('Show').':' ?></label></div>
 			<div class="tile">
 				<input type="radio" name="show_comments" value="draft" id="only_draft" class="radio" <?php if( $show_comments == 'draft' ) echo 'checked="checked" '?> />
@@ -431,12 +477,10 @@ while( $Item = & $ItemList->get_item() )
 						</div>
 				</fieldset>
 			<?php
-			$Form->textarea( 'p', '', 12, T_('Comment text'), '', 40, 'bComment' );
+			$Form->textarea( $dummy_fields[ 'content' ], '', 12, T_('Comment text'), '', 40, 'bComment' );
 
-			if(substr($comments_use_autobr,0,4) == 'opt-')
-			{
-				$Form->checkbox( 'comment_autobr', 1, T_('Auto-BR'), T_('(Line breaks become &lt;br&gt;)'), 'checkbox' );
-			}
+			global $Plugins;
+			$Form->info( T_('Text Renderers'), $Plugins->get_renderer_checkboxes( array( 'default') , array( 'Blog' => & $Blog, 'setting_name' => 'coll_apply_comment_rendering' ) ) );
 
 			$Form->buttons_input( array(array('name'=>'submit', 'value'=>T_('Send comment'), 'class'=>'SaveButton' )) );
 			?>
@@ -467,227 +511,8 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
- * Revision 1.55  2011/10/03 15:58:17  efy-yurybakh
- * Add User::get_identity_link() everywhere
+ * Revision 1.57  2013/11/06 08:04:24  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.54  2011/10/03 12:10:28  efy-yurybakh
- * bubbletips & identity_links cleanup
- *
- * Revision 1.53  2011/10/03 07:02:21  efy-yurybakh
- * bubbletips & identity_links cleanup
- *
- * Revision 1.52  2011/09/29 16:42:19  efy-yurybakh
- * colored login
- *
- * Revision 1.51  2011/09/04 22:13:17  fplanque
- * copyright 2011
- *
- * Revision 1.50  2011/03/02 09:45:59  efy-asimo
- * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
- *
- * Revision 1.49  2011/02/24 07:42:27  efy-asimo
- * Change trashcan to Recycle bin
- *
- * Revision 1.48  2011/02/14 14:13:24  efy-asimo
- * Comments trash status
- *
- * Revision 1.47  2011/02/10 23:07:21  fplanque
- * minor/doc
- *
- * Revision 1.46  2011/01/18 16:23:03  efy-asimo
- * add shared_root perm and refactor file perms - part1
- *
- * Revision 1.45  2010/11/03 19:44:15  sam2kb
- * Increased modularity - files_Module
- * Todo:
- * - split core functions from _file.funcs.php
- * - check mtimport.ctrl.php and wpimport.ctrl.php
- * - do not create demo Photoblog and posts with images (Blog A)
- *
- * Revision 1.44  2010/10/19 01:42:16  sam2kb
- * Added feedbacks counter
- *
- * Revision 1.43  2010/09/29 14:53:50  efy-asimo
- * Item full view comment list - fix
- *
- * Revision 1.42  2010/09/28 13:03:16  efy-asimo
- * Paged comments on item full view
- *
- * Revision 1.41  2010/09/21 11:47:21  efy-asimo
- * Add 'Published ' radio comment filter to item list full view
- *
- * Revision 1.40  2010/09/15 13:04:06  efy-asimo
- * Cross post navigatation
- *
- * Revision 1.39  2010/08/05 08:04:12  efy-asimo
- * Ajaxify comments on itemList FullView and commentList FullView pages
- *
- * Revision 1.38  2010/07/26 06:52:16  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.37  2010/06/23 09:30:55  efy-asimo
- * Comments display and Antispam ban form modifications
- *
- * Revision 1.36  2010/06/01 11:33:20  efy-asimo
- * Split blog_comments advanced permission (published, deprecated, draft)
- * Use this new permissions (Antispam tool,when edit/delete comments)
- *
- * Revision 1.35  2010/05/11 11:20:13  efy-asimo
- * Slugs table view modificaitons
- *
- * Revision 1.34  2010/04/23 09:39:44  efy-asimo
- * "SEO setting" for help link and Groups slugs permission implementation
- *
- * Revision 1.33  2010/04/12 09:41:36  efy-asimo
- * private URL shortener - task
- *
- * Revision 1.32  2010/03/18 09:42:09  efy-asimo
- * mass edit posts - task
- *
- * Revision 1.31  2010/03/11 10:35:05  efy-asimo
- * Rewrite CommentList to CommentList2 task
- *
- * Revision 1.30  2010/02/08 17:53:19  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.29  2010/01/30 18:55:31  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.28  2010/01/19 21:10:28  efy-yury
- * update: crumbs
- *
- * Revision 1.27  2010/01/17 16:15:22  sam2kb
- * Localization clean-up
- *
- * Revision 1.26  2010/01/03 13:45:36  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.25  2009/11/11 03:24:52  fplanque
- * misc/cleanup
- *
- * Revision 1.24  2009/10/18 11:29:43  efy-maxim
- * 1. mass create in 'All' tab; 2. "Text Renderers" and "Comments"
- *
- * Revision 1.23  2009/10/11 03:00:11  blueyed
- * Add "position" and "order" properties to attachments.
- * Position can be "teaser" or "aftermore" for now.
- * Order defines the sorting of attachments.
- * Needs testing and refinement. Upgrade might work already, be careful!
- *
- * Revision 1.22  2009/09/19 13:59:45  tblue246
- * Doc
- *
- * Revision 1.21  2009/05/28 20:21:27  blueyed
- * Streamline code to display form buttons.
- *
- * Revision 1.20  2009/04/28 19:19:33  blueyed
- * Full item list: do not display workflow properties, if not activated for this blog.
- *
- * Revision 1.19  2009/04/28 19:10:06  blueyed
- * trans fix, simplification. might want to use %s here?
- *
- * Revision 1.18  2009/03/08 23:57:44  fplanque
- * 2009
- *
- * Revision 1.17  2009/01/27 22:54:01  fplanque
- * commenting cleanup
- *
- * Revision 1.16  2009/01/21 22:26:26  fplanque
- * Added tabs to post browsing admin screen All/Posts/Pages/Intros/Podcasts/Comments
- *
- * Revision 1.15  2008/04/14 19:50:51  fplanque
- * enhanced attachments handling in post edit mode
- *
- * Revision 1.14  2008/02/09 02:56:00  fplanque
- * explicit order by field
- *
- * Revision 1.13  2008/01/23 17:55:01  fplanque
- * fix
- *
- * Revision 1.12  2008/01/23 12:51:20  fplanque
- * posts now have divs with IDs
- *
- * Revision 1.11  2008/01/21 09:35:31  fplanque
- * (c) 2008
- *
- * Revision 1.10  2007/11/24 21:24:14  fplanque
- * display tags in backoffice
- *
- * Revision 1.9  2007/11/04 01:10:57  fplanque
- * skin cleanup continued
- *
- * Revision 1.8  2007/11/03 23:54:39  fplanque
- * skin cleanup continued
- *
- * Revision 1.7  2007/11/03 21:04:27  fplanque
- * skin cleanup
- *
- * Revision 1.6  2007/11/03 04:56:03  fplanque
- * permalink / title links cleanup
- *
- * Revision 1.5  2007/09/26 20:26:36  fplanque
- * improved ItemList filters
- *
- * Revision 1.4  2007/09/08 20:23:04  fplanque
- * action icons / wording
- *
- * Revision 1.3  2007/09/07 21:11:10  fplanque
- * superstylin' (not even close)
- *
- * Revision 1.2  2007/09/03 19:36:06  fplanque
- * chicago admin skin
- *
- * Revision 1.1  2007/06/25 11:00:30  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.36  2007/04/26 00:11:06  fplanque
- * (c) 2007
- *
- * Revision 1.35  2007/03/21 02:21:37  fplanque
- * item controller: highlight current (step 2)
- *
- * Revision 1.34  2007/03/21 01:44:51  fplanque
- * item controller: better return to current filterset - step 1
- *
- * Revision 1.33  2007/03/06 12:18:09  fplanque
- * got rid of dirty Item::content()
- * Advantage: the more link is now independant. it can be put werever people want it
- *
- * Revision 1.32  2007/03/05 02:12:56  fplanque
- * minor
- *
- * Revision 1.31  2007/01/19 10:57:46  fplanque
- * UI
- *
- * Revision 1.30  2007/01/19 10:45:42  fplanque
- * images everywhere :D
- * At this point the photoblogging code can be considered operational.
- *
- * Revision 1.29  2006/12/17 23:42:39  fplanque
- * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
- * Look into Advanced Settings for the aggregating blog.
- * There may be side effects and new bugs created by this. Please report them :]
- *
- * Revision 1.28  2006/12/12 21:19:31  fplanque
- * UI fixes
- *
- * Revision 1.27  2006/12/12 19:39:07  fplanque
- * enhanced file links / permissions
- *
- * Revision 1.26  2006/12/12 02:53:57  fplanque
- * Activated new item/comments controllers + new editing navigation
- * Some things are unfinished yet. Other things may need more testing.
- *
- * Revision 1.25  2006/12/07 22:29:26  fplanque
- * reorganized menus / basic dashboard
- *
- * Revision 1.24  2006/12/04 18:16:51  fplanque
- * Each blog can now have its own "number of page/days to display" settings
- *
- * Revision 1.23  2006/11/27 19:14:14  fplanque
- * i18n
- *
- * Revision 1.22  2006/10/23 22:19:03  blueyed
- * Fixed/unified encoding of redirect_to param. Use just rawurlencode() and no funky &amp; replacements
  */
 ?>

@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -46,6 +46,15 @@ class FilteredResults extends Results
 	 */
 	var $filters = array();
 
+	/**
+	* Constructor
+	* 
+	* @param string Filterset name
+	*/
+	function FilteredResults( $filterset_name )
+	{
+		$this->filterset_name = $filterset_name;
+	}
 
 	/**
 	 * Check if the Result set is filtered or not
@@ -121,6 +130,113 @@ class FilteredResults extends Results
 			}
 		}
 	}
+
+
+	/**
+	 * Set default filter values we always want to use if not individually specified otherwise:
+	 *
+	 * @param array default filters to be merged with the class defaults
+	 * @param array default filters for each preset, to be merged with general default filters if the preset is used
+	 */
+	function set_default_filters( $default_filters, $preset_filters = array() )
+	{
+		$this->default_filters = array_merge( $this->default_filters, $default_filters );
+		$this->preset_filters = $preset_filters;
+	}
+
+
+	/**
+	 * Activate preset default filters if necessary
+	 *
+	 */
+	function activate_preset_filters()
+	{
+		if( empty( $this->filters['filter_preset'] ) )
+		{ // No filter preset, there are no additional defaults to use:
+			return;
+		}
+
+		// Override general defaults with the specific defaults for the preset:
+		$this->default_filters = array_merge( $this->default_filters, $this->preset_filters[$this->filters['filter_preset']] );
+
+		// Save the name of the preset in order for is_filtered() to work properly:
+		$this->default_filters['filter_preset'] = $this->filters['filter_preset'];
+	}
+
+
+	/**
+	 * Save current filterset to session.
+	 */
+	function save_filterset()
+	{
+		/**
+		 * @var Session
+		 */
+		global $Session, $Debuglog, $localtimenow;
+
+		$Debuglog->add( 'Saving filterset <strong>'.$this->filterset_name.'</strong>', 'filters' );
+
+		$Session->set( $this->filterset_name, $this->filters );
+		$Session->set( $this->filterset_name.'_refresh_time', floor( $localtimenow / 3600 ) * 3600 );
+	}
+
+
+	/**
+	 * Load previously saved filterset from session.
+	 *
+	 * @return boolean true if we could restore something
+	 */
+	function restore_filterset()
+	{
+		/**
+		 * @var Session
+		 */
+			global $Session;
+		/**
+		 * @var Request
+		 */
+
+		global $Debuglog;
+
+		$filters = $Session->get( $this->filterset_name );
+
+		/*
+		fp> 2007-09-26> even if there are no filters, we need to "set" them in order to set global variables like $show_statuses
+		if( empty($filters) )
+		{ // We have no saved filters:
+			return false;
+		}
+		*/
+
+		if( empty($filters) )
+		{ // set_filters() expects array
+			$filters = array();
+		}
+
+		$Debuglog->add( 'Restoring filterset <strong>'.$this->filterset_name.'</strong>', 'filters' );
+
+		// Restore filters:
+		$this->set_filters( $filters );
+
+		return true;
+	}
+
+
+	/**
+	 * Set/Activate filterset.
+	 *
+	 * @param array
+	 */
+	function set_filters( $filters )
+	{
+		if( !empty( $filters ) )
+		{ // Activate the filterset (fallback to default filter when a value is not set):
+			$this->filters = array_merge( $this->default_filters, $filters );
+		}
+
+		// Activate preset filters if necessary:
+		$this->activate_preset_filters();
+	}
 }
 
 
@@ -178,6 +294,45 @@ class DataObjectList2 extends FilteredResults
 	function & get_by_idx( $idx )
 	{
 		return $this->Cache->instantiate( $this->rows[$idx] ); // pass by reference: creates $rows[$idx]!
+	}
+
+
+	/**
+	 * Instantiate an object for requested row by field and cache it:
+	 *
+	 * @param string DB field name
+	 * @param string Value
+	 * @return object
+	 */
+	function & get_by_field( $field_name, $field_value )
+	{
+		$obj_ID = 0;
+		$null_Obj = NULL;
+
+		foreach( $this->rows as $row )
+		{	// Find object ID by field value
+			if( $row->$field_name == $field_value )
+			{
+				$obj_ID = $row->{$this->ID_col};
+				break;
+			}
+		}
+
+		if( $obj_ID == 0 )
+		{	// No object ID found, Exit here
+			return $null_Obj;
+		}
+
+		$this->restart();
+		while( $Obj = & $this->get_next() )
+		{	// Find Object by ID
+			if( $Obj->ID == $obj_ID )
+			{
+				return $Obj;
+			}
+		}
+
+		return $null_Obj;
 	}
 
 
@@ -336,61 +491,8 @@ class DataObjectList2 extends FilteredResults
 
 /*
  * $Log$
- * Revision 1.15  2011/09/04 22:13:13  fplanque
- * copyright 2011
+ * Revision 1.17  2013/11/06 08:03:47  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.14  2010/02/08 17:51:50  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.13  2009/12/01 20:58:27  blueyed
- * doc, indent
- *
- * Revision 1.12  2009/11/30 22:56:09  blueyed
- * typo
- *
- * Revision 1.11  2009/09/14 10:38:23  efy-arrin
- * Include the ClassName in the load_class() with proper UpperCase
- *
- * Revision 1.10  2009/08/30 19:54:25  fplanque
- * less translation messgaes for infrequent errors
- *
- * Revision 1.9  2009/08/30 00:30:52  fplanque
- * increased modularity
- *
- * Revision 1.8  2009/03/08 23:57:40  fplanque
- * 2009
- *
- * Revision 1.7  2009/02/26 22:16:54  blueyed
- * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
- *
- * Revision 1.6  2008/01/21 09:35:24  fplanque
- * (c) 2008
- *
- * Revision 1.5  2007/11/25 19:47:15  fplanque
- * cleaned up photo/media index a little bit
- *
- * Revision 1.4  2007/11/25 14:28:17  fplanque
- * additional SEO settings
- *
- * Revision 1.3  2007/09/28 09:28:36  fplanque
- * per blog advanced SEO settings
- *
- * Revision 1.2  2007/09/23 18:57:15  fplanque
- * filter handling fixes
- *
- * Revision 1.1  2007/06/25 10:58:57  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.10  2007/06/11 22:01:52  blueyed
- * doc fixes
- *
- * Revision 1.9  2007/05/26 22:21:32  blueyed
- * Made $limit for Results configurable per user
- *
- * Revision 1.8  2007/04/26 00:11:09  fplanque
- * (c) 2007
- *
- * Revision 1.7  2006/11/24 18:27:24  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

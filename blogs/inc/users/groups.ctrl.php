@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -36,7 +36,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $AdminUI;
 
-$AdminUI->set_path( 'users', 'users' );
+$AdminUI->set_path( 'users', 'groups' );
 
 param_action('list');
 
@@ -103,16 +103,10 @@ if( $grp_ID !== NULL )
 			$Messages->add( T_('You have no permission to edit groups!'), 'error' );
 			$action = 'view';
 		}
-		elseif( $demo_mode  )
-		{ // Additional checks for demo mode: no changes to admin's and demouser's group allowed
-			$admin_User = & $UserCache->get_by_ID(1);
-			$demo_User = & $UserCache->get_by_login('demouser');
-			if( $edited_Group->ID == $admin_User->Group->ID
-					|| $edited_Group->ID == $demo_User->group_ID )
-			{
-				$Messages->add( T_('You cannot edit the groups of user &laquo;admin&raquo; or &laquo;demouser&raquo; in demo mode!'), 'error' );
-				$action = 'view';
-			}
+		elseif( $demo_mode && ( $edited_Group->ID <= 4 ) && ( $edited_Group->ID > 0 ) )
+		{ // Demo mode restrictions: groups created by install process cannot be edited
+			$Messages->add( T_('You cannot edit the default groups in demo mode!'), 'error' );
+			$action = 'view';
 		}
 	}
 }
@@ -157,12 +151,7 @@ switch ( $action )
 			{
 				param_error( 'edited_grp_name',
 					sprintf( T_('This group name already exists! Do you want to <a %s>edit the existing group</a>?'),
-						'href="?ctrl=users&amp;grp_ID='.$q.'"' ) );
-			}
-
-			if( $edited_Group->ID != 1 )
-			{ // Groups others than #1 can be prevented from logging in or editing users
-				$edited_Group->set( 'perm_users', param( 'edited_grp_perm_users', 'string', true ) );
+						'href="?ctrl=groups&amp;action=edit&amp;grp_ID='.$q.'"' ) );
 			}
 		}
 
@@ -187,7 +176,7 @@ switch ( $action )
 		$GroupCache->add( $edited_Group );
 
 		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( '?ctrl=users', 303 ); // Will EXIT
+		header_redirect( '?ctrl=groups', 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 
@@ -226,7 +215,7 @@ switch ( $action )
 			$Messages->add( $msg, 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=users', 303 ); // Will EXIT
+			header_redirect( '?ctrl=groups', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		else
@@ -242,8 +231,19 @@ switch ( $action )
 
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('User groups'), '?ctrl=users' );
-$AdminUI->breadcrumbpath_add( $edited_Group->dget('name'), '?ctrl=groups&amp;group_ID='.$edited_Group->ID );
+$AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
+$AdminUI->breadcrumbpath_add( T_('User groups'), '?ctrl=groups' );
+if( !empty( $edited_Group ) )
+{
+	if( $edited_Group->ID > 0 )
+	{	// Edit group
+		$AdminUI->breadcrumbpath_add( $edited_Group->dget('name'), '?ctrl=groups&amp;action=edit&amp;grp_ID='.$edited_Group->ID );
+	}
+	else
+	{	// New group
+		$AdminUI->breadcrumbpath_add( $edited_Group->dget('name'), '?ctrl=groups&amp;action=new' );
+	}
+}
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -257,6 +257,10 @@ $AdminUI->disp_payload_begin();
 // Display VIEW:
 switch( $action )
 {
+	case 'new':
+	case 'edit':
+		$AdminUI->disp_view( 'users/views/_group.form.php' );
+		break;
 	case 'nil':
 		// Do nothing
 		break;
@@ -266,7 +270,7 @@ switch( $action )
 					sprintf( T_('Delete group &laquo;%s&raquo;?'), $edited_Group->dget( 'name' ) ),
 					'group', $action, get_memorized( 'action' ) );
 	default:
-		$AdminUI->disp_view( 'users/views/_group.form.php' );
+		$AdminUI->disp_view( 'users/views/_group.view.php' );
 }
 
 // End payload block:
@@ -277,38 +281,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.11  2011/02/15 15:37:00  efy-asimo
- * Change access to admin permission
- *
- * Revision 1.10  2010/11/25 15:16:35  efy-asimo
- * refactor $Messages
- *
- * Revision 1.9  2010/05/07 08:07:14  efy-asimo
- * Permissions check update (User tab, Global Settings tab) - bugfix
- *
- * Revision 1.8  2010/01/30 18:55:35  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.7  2010/01/03 17:45:21  fplanque
- * crumbs & stuff
- *
- * Revision 1.6  2010/01/03 12:03:17  fplanque
- * More crumbs...
- *
- * Revision 1.5  2009/12/06 22:55:19  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.4  2009/09/26 12:00:43  tblue246
- * Minor/coding style
- *
- * Revision 1.3  2009/09/25 07:33:14  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.2  2009/09/24 21:05:38  fplanque
- * no message
- *
+ * Revision 1.13  2013/11/06 08:04:55  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

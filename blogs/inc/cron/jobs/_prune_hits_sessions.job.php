@@ -29,29 +29,8 @@ return 100;
 
 /*
  * $Log$
- * Revision 1.7  2011/09/10 02:09:09  fplanque
- * doc
- *
- * Revision 1.6  2011/09/09 23:05:08  lxndral
- * Search for "fp>al" in code to find my comments and please make requested changed
- *
- * Revision 1.5  2011/09/09 21:53:55  fplanque
- * doc
- *
- * Revision 1.4  2011/09/08 17:59:59  lxndral
- * Prune for internal searches
- *
- * Revision 1.3  2009/09/14 12:53:16  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.2  2009/09/14 11:27:40  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.1  2007/06/25 10:59:46  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.1  2006/07/06 19:59:08  fplanque
- * better logs, better stats, better pruning
+ * Revision 1.8  2013/11/06 08:04:07  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

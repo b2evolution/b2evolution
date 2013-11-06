@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -243,7 +243,7 @@ class Slug extends DataObject
 				// TODO: dh> should use ItemCache altogether
 				// was: $object_query = 'SELECT post_ID, post_title FROM T_items__item WHERE '.$fk.' = '.$this->ID;
 				$ItemCache = & get_ItemCache();
-				return $ItemCache->get_by_ID( $this->itm_ID, false );
+				return $ItemCache->get_by_ID( $this->itm_ID, false, false );
 
 			case 'help':
 				return false;
@@ -289,23 +289,8 @@ class Slug extends DataObject
 
 /*
  * $Log$
- * Revision 1.15  2011/09/04 22:13:20  fplanque
- * copyright 2011
- *
- * Revision 1.14  2010/11/25 15:16:35  efy-asimo
- * refactor $Messages
- *
- * Revision 1.13  2010/10/19 02:00:54  fplanque
- * MFB
- *
- * Revision 1.10.2.4  2010/10/19 00:33:16  fplanque
- * enhanced slug manager
- *
- * Revision 1.10.2.3  2010/07/14 09:05:19  efy-asimo
- * todo fp>asimo modifications
- *
- * Revision 1.10.2.2  2010/07/13 00:57:50  fplanque
- * doc
+ * Revision 1.17  2013/11/06 08:04:53  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

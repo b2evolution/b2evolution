@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -56,6 +56,24 @@ $Form->begin_form( 'fform', '',
 		load_funcs( 'files/model/_image.funcs.php' );
 		$params['force_keys_as_values'] = true;
 	}
+
+// --------------------------------------------
+
+$Form->begin_fieldset( T_('Profile pictures') );
+
+	$Form->checkbox_input( 'use_gravatar', $Settings->get('use_gravatar'), T_('Use gravatar'), array( 'note' => T_('Fall back to Gravatar if a user has not uploaded a profile picture.') ) );
+
+	global $default_avatar;
+	$Form->radio( 'default_gravatar', $Settings->get('default_gravatar'),
+		array( array( 'b2evo', T_('Default image'), $default_avatar ),
+					array( '', 'Gravatar' ),
+					array( 'identicon', 'Identicon' ),
+					array( 'monsterid', 'Monsterid' ),
+					array( 'wavatar', 'Wavatar' ),
+					array( 'retro', 'Retro' ),
+		), T_('Default gravatars'), true, T_('Gravatar users can choose to set up a unique icon for themselves, and if they don\'t, they will be assigned a default image.') );
+
+$Form->end_fieldset();
 
 // --------------------------------------------
 
@@ -128,16 +146,8 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 
 /*
  * $Log$
- * Revision 1.4  2011/10/11 06:38:50  efy-asimo
- * Add corresponding error messages when login required
+ * Revision 1.5  2013/11/06 08:05:03  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.3  2011/10/07 02:55:38  fplanque
- * doc
- *
- * Revision 1.2  2011/10/05 17:44:24  efy-yurybakh
- * Checks for disp=user & users
- *
- * Revision 1.1  2011/10/04 13:06:26  efy-yurybakh
- * Additional Display settings
  */
 ?>

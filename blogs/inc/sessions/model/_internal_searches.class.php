@@ -149,22 +149,8 @@ class InternalSearches extends DataObject
 
 /*
  * $Log$
- * Revision 1.5  2011/09/09 23:05:08  lxndral
- * Search for "fp>al" in code to find my comments and please make requested changed
- *
- * Revision 1.4  2011/09/09 21:53:55  fplanque
- * doc
- *
- * Revision 1.3  2011/09/08 17:59:59  lxndral
- * Prune for internal searches
- *
- * Revision 1.2  2011/09/08 11:04:04  lxndral
- * fix for internal searches
- *
- * Revision 1.1  2011/09/07 12:00:20  lxndral
- * internal searches update
- *
- * Revision 1.0  2011/09/05 20:07:19  alexader
+ * Revision 1.6  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

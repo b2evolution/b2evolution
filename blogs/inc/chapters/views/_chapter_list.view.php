@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -70,6 +70,7 @@ function cat_line( $Chapter, $level )
 
 	$line_class = $line_class == 'even' ? 'odd' : 'even';
 
+	// ID
 	$r = '<tr id="tr-'.$Chapter->ID.'"class="'.$line_class.
 					' chapter_parent_'.( $Chapter->parent_ID ? $Chapter->parent_ID : '0' ).
 					// Fadeout?
@@ -78,19 +79,20 @@ function cat_line( $Chapter, $level )
 						$Chapter->ID.'
 				</td>';
 
-	$makedef_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=make_default&amp;'.url_crumb('element') );
-	$makedef_title = format_to_output( T_('Click to make this the default category'), 'htmlattr' );
-
+	// Default
 	if( $current_default_cat_ID == $Chapter->ID )
 	{
-		$makedef_icon = 'enabled';
+		$makedef_icon = get_icon( 'enabled', 'imgtag', array( 'title' => format_to_output( T_( 'This is default category' ), 'htmlattr' ) ) );
 	}
 	else
 	{
-		$makedef_icon = 'disabled';
+		$makedef_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=make_default&amp;'.url_crumb('element') );
+		$makedef_title = format_to_output( T_('Click to make this the default category'), 'htmlattr' );
+		$makedef_icon = '<a href="'.$makedef_url.'" title="'.$makedef_title.'">'.get_icon( 'disabled', 'imgtag', array( 'title' => $makedef_title ) ).'</a>';
 	}
-	$r .= '<td class="center"><a href="'.$makedef_url.'" title="'.$makedef_title.'">'.get_icon($makedef_icon, 'imgtag').'</a></td>';
+	$r .= '<td class="center">'.$makedef_icon.'</td>';
 
+	// Name
 	if( $permission_to_edit )
 	{	// We have permission permission to edit:
 		$edit_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=edit' );
@@ -105,14 +107,53 @@ function cat_line( $Chapter, $level )
 					 </td>';
 	}
 
+	// URL "slug"
 	$edit_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=edit' );
 	$r .= '<td><a href="'.htmlspecialchars($Chapter->get_permanent_url()).'">'.$Chapter->dget('urlname').'</a></td>';
 
+	// Order
 	if( $Settings->get('chapter_ordering') == 'manual' )
 	{
 		$r .= '<td class="center">'.$Chapter->dget('order').'</td>';
 	}
 
+	if( $permission_to_edit )
+	{	// We have permission permission to edit, so display these columns:
+
+		if( $Chapter->meta )
+		{
+			$makemeta_icon = 'enabled';
+			$makemeta_title = format_to_output( T_('Click to revert this from meta category'), 'htmlattr' );
+			$action = 'unset_meta';
+		}
+		else
+		{
+			$makemeta_icon = 'disabled';
+			$makemeta_title = format_to_output( T_('Click to make this as meta category'), 'htmlattr' );
+			$action = 'set_meta';
+		}
+		// Meta
+		$makemeta_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action='.$action.'&amp;'.url_crumb('element') );
+		$r .= '<td class="center"><a href="'.$makemeta_url.'" title="'.$makemeta_title.'">'.get_icon( $makemeta_icon, 'imgtag', array( 'title' => $makemeta_title ) ).'</a></td>';
+
+		// Lock
+		if( $Chapter->lock )
+		{
+			$makelock_icon = 'file_not_allowed';
+			$makelock_title = format_to_output( T_('Unlock category'), 'htmlattr' );
+			$action = 'unlock';
+		}
+		else
+		{
+			$makelock_icon = 'file_allowed';
+			$makelock_title = format_to_output( T_('Lock category'), 'htmlattr' );
+			$action = 'lock';
+		}
+		$makelock_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action='.$action.'&amp;'.url_crumb('element') );
+		$r .= '<td class="center"><a href="'.$makelock_url.'" title="'.$makelock_title.'">'.get_icon( $makelock_icon, 'imgtag', array( 'title' => $makelock_title ) ).'</a></td>';
+	}
+
+	// Posts
 	if( isset($number_of_posts_in_cat[$Chapter->ID]) )
 	{
 		$r .= '<td class="center">'.(int)$number_of_posts_in_cat[$Chapter->ID].'</td>';
@@ -122,10 +163,10 @@ function cat_line( $Chapter, $level )
 		$r .= '<td class="center"> - </td>';
 	}
 
+	// Actions
 	$r .= '<td class="lastcol shrinkwrap">';
 	if( $permission_to_edit )
 	{	// We have permission permission to edit, so display action column:
-		$r .= '<a href="'.$makedef_url.'" title="'.$makedef_title.'">'.get_icon('activate', 'imgtag').'</a>';
 		$r .= action_icon( T_('Edit...'), 'edit', $edit_url );
 		if( $Settings->get('allow_moving_chapters') )
 		{ // If moving cats between blogs is allowed:
@@ -212,6 +253,18 @@ if( $Settings->get('chapter_ordering') == 'manual' )
 							'th_class' => 'shrinkwrap',
 						);
 }
+if( $permission_to_edit )
+{	// We have permission permission to edit, so display these columns:
+	$Table->cols[] = array(
+						'th' => T_('Meta'),
+						'th_class' => 'shrinkwrap',
+					);
+
+	$Table->cols[] = array(
+						'th' => T_('Lock'),
+						'th_class' => 'shrinkwrap',
+					);
+}
 
 // TODO: dh> would be useful to sort by this
 $Table->cols[] = array(
@@ -238,17 +291,21 @@ $Table->display_init( NULL, $result_fadeout );
 
 // add an id for jquery to hook into
 // TODO: fp> Awfully dirty. This should be handled by the Table object
-$Table->params['head_title'] = str_replace( '<table', '<table id="chapter_list"', $Table->params['head_title'] );
-
-$Table->display_list_start();
+$Table->params['list_start'] = str_replace( '<table', '<table id="chapter_list"', $Table->params['list_start'] );
 
 $Table->display_head();
 
-$Table->display_body_start();
+echo $Table->params['content_start'];
 
-echo $GenericCategoryCache->recurse( $callbacks, $subset_ID );
+$Table->display_list_start();
 
-$Table->display_body_end();
+	$Table->display_col_headers();
+
+	$Table->display_body_start();
+
+	echo $GenericCategoryCache->recurse( $callbacks, $subset_ID );
+
+	$Table->display_body_end();
 
 $Table->display_list_end();
 
@@ -258,138 +315,21 @@ echo '<p class="note">'.T_('<strong>Note:</strong> Deleting a category does not 
 */
 
 global $Settings, $dispatcher;
-if( ! $Settings->get('allow_moving_chapters') )
-{	// TODO: check perm
-	echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Moving categories across blogs is currently disabled in the %sglobal settings%s.'), '<a href="'.$dispatcher.'?ctrl=features#categories">', '</a>' ).'</p> ';
-}
 
-echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categories is currently set to %s in the %sglobal settings%s.'),
-	$Settings->get('chapter_ordering') == 'manual' ? /* TRANS: Manual here = "by hand" */ T_('Manual ') : T_('Alphabetical'), '<a href="'.$dispatcher.'?ctrl=features#categories">', '</a>' ).'</p> ';
+echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categories is currently set to %s in the %sblogs settings%s.'),
+	$Settings->get('chapter_ordering') == 'manual' ? /* TRANS: Manual here = "by hand" */ T_('Manual ') : T_('Alphabetical'), '<a href="'.$dispatcher.'?ctrl=collections&tab=settings#categories">', '</a>' ).'</p> ';
+
+if( ! $Settings->get('allow_moving_chapters') )
+{ // TODO: check perm
+	echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Moving categories across blogs is currently disabled in the %sblogs settings%s.'), '<a href="'.$dispatcher.'?ctrl=collections&tab=settings#categories">', '</a>' ).'</p> ';
+}
 
 //Flush fadeout
 $Session->delete( 'fadeout_array');
 /*
  * $Log$
- * Revision 1.31  2011/09/04 22:13:13  fplanque
- * copyright 2011
+ * Revision 1.33  2013/11/06 08:03:57  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.30  2011/01/02 02:25:33  sam2kb
- * Fixed http://forums.b2evolution.net/viewtopic.php?t=21653
- *
- * Revision 1.29  2011/01/02 02:20:25  sam2kb
- * typo: explicitely => explicitly
- *
- * Revision 1.28  2010/10/19 02:00:53  fplanque
- * MFB
- *
- * Revision 1.27  2010/10/16 22:04:28  sam2kb
- * Fixed hard-coded table prefix
- *
- * Revision 1.26  2010/07/26 06:52:15  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.25.2.1  2010/07/06 00:24:37  fplanque
- * I believe the code for # of posts was unnecessarily complex.
- *
- * Revision 1.25  2010/05/24 19:13:44  sam2kb
- * Properly encode "title" text
- *
- * Revision 1.24  2010/05/18 07:08:51  efy-asimo
- * Notice in chapter_list_view - fix
- *
- * Revision 1.23  2010/04/30 20:37:10  blueyed
- * Add "Number of posts" column to chapter view. This is useful to get an overview about how often a category is being used.
- *
- * Revision 1.22  2010/02/08 17:52:07  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.21  2010/01/30 18:55:20  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.20  2010/01/13 19:19:47  efy-yury
- * update cahpters: crumbs, fadeouts, redirect, action_icon
- *
- * Revision 1.19  2010/01/03 13:10:58  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.18  2009/07/06 23:52:24  sam2kb
- * Hardcoded "admin.php" replaced with $dispatcher
- *
- * Revision 1.17  2009/05/10 00:34:26  fplanque
- * better TRANS fix
- *
- * Revision 1.16  2009/04/28 19:52:39  blueyed
- * trans fix
- *
- * Revision 1.15  2009/04/13 11:33:33  tblue246
- * Fix translation conflict
- *
- * Revision 1.14  2009/03/08 23:57:42  fplanque
- * 2009
- *
- * Revision 1.13  2009/02/21 22:46:24  fplanque
- * ok I tried creating 10 categories in a row and I went nuts without the extra "add here" icon.
- *
- * Revision 1.12  2009/02/18 17:03:40  yabs
- * minor
- *
- * Revision 1.11  2009/02/18 10:15:47  yabs
- * Adding drag n drop hooks
- *
- * Revision 1.10  2009/02/13 13:58:41  waltercruz
- * Trying to clean (a bit) our UI
- *
- * Revision 1.9  2009/01/28 22:34:21  fplanque
- * Default cat for each blog can now be chosen explicitly
- *
- * Revision 1.8  2009/01/28 21:23:22  fplanque
- * Manual ordering of categories
- *
- * Revision 1.7  2008/12/28 22:55:55  fplanque
- * increase blog name max length to 255 chars
- *
- * Revision 1.6  2008/01/21 09:35:26  fplanque
- * (c) 2008
- *
- * Revision 1.5  2007/09/08 20:23:03  fplanque
- * action icons / wording
- *
- * Revision 1.4  2007/09/08 18:21:13  blueyed
- * isset() check for $result_fadeout[$GenericCategoryCache->dbIDname], failed for "cat_ID" in chapters controller
- *
- * Revision 1.3  2007/09/04 13:47:48  fplanque
- * fixed fadeout
- *
- * Revision 1.2  2007/09/04 13:23:18  fplanque
- * Fixed display for category screen.
- *
- * Revision 1.1  2007/06/25 10:59:27  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.10  2007/04/26 00:11:05  fplanque
- * (c) 2007
- *
- * Revision 1.9  2007/01/07 05:28:15  fplanque
- * i18n wording
- *
- * Revision 1.8  2006/12/11 00:32:26  fplanque
- * allow_moving_chapters stting moved to UI
- * chapters are now called categories in the UI
- *
- * Revision 1.7  2006/12/10 02:07:09  fplanque
- * doc
- *
- * Revision 1.6  2006/12/10 01:52:27  fplanque
- * old cats are now officially dead :>
- *
- * Revision 1.5  2006/12/09 17:59:34  fplanque
- * started "moving chapters accross blogs" feature
- *
- * Revision 1.4  2006/12/09 02:37:44  fplanque
- * Prevent user from creating loops in the chapter tree
- * (still needs a check before writing to DB though)
- *
- * Revision 1.3  2006/11/24 18:27:25  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

@@ -3,7 +3,7 @@
  * This file is part of b2evolution - {@link http://b2evolution.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -25,6 +25,16 @@
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 /**
+ * Minimum PHP version required for messaging module to function properly
+ */
+$required_php_version[ 'messaging' ] = '5.0';
+
+/**
+ * Minimum MYSQL version required for messaging module to function properly
+ */
+$required_mysql_version[ 'messaging' ] = '4.1';
+
+/**
  * Aliases for table names:
  *
  * (You should not need to change them.
@@ -35,6 +45,8 @@ $db_config['aliases']['T_messaging__thread'] = $tableprefix.'messaging__thread';
 $db_config['aliases']['T_messaging__message'] = $tableprefix.'messaging__message';
 $db_config['aliases']['T_messaging__threadstatus'] = $tableprefix.'messaging__threadstatus';
 $db_config['aliases']['T_messaging__contact'] = $tableprefix.'messaging__contact';
+$db_config['aliases']['T_messaging__contact_groups'] = $tableprefix.'messaging__contact_groups';
+$db_config['aliases']['T_messaging__contact_groupusers'] = $tableprefix.'messaging__contact_groupusers';
 
 /**
  * Controller mappings.
@@ -69,6 +81,7 @@ function & get_MessageCache()
 
 	if( ! isset( $MessageCache ) )
 	{	// Cache doesn't exist yet:
+		load_class( 'messaging/model/_message.class.php', 'Message' );
 		$MessageCache = new DataObjectCache( 'Message', false, 'T_messaging__message', 'msg_', 'msg_ID' );
 	}
 
@@ -87,6 +100,7 @@ function & get_ThreadCache()
 
 	if( ! isset( $ThreadCache ) )
 	{	// Cache doesn't exist yet:
+		load_class( 'messaging/model/_thread.class.php', 'Thread' );
 		$ThreadCache = new DataObjectCache( 'Thread', false, 'T_messaging__thread', 'thrd_', 'thrd_ID', 'thrd_title' );
 	}
 
@@ -110,6 +124,8 @@ class messaging_Module extends Module
 	 */
 	function init()
 	{
+		$this->check_required_php_version( 'messaging' );
+
 		load_funcs( 'messaging/model/_messaging.funcs.php' );
 	}
 
@@ -126,22 +142,27 @@ class messaging_Module extends Module
 		{
 			case 1: // Administrators group ID equals 1
 				global $test_install_all_features;
-				$permname = $test_install_all_features ? 'abuse' : 'delete';
+				$perm_messaging = $test_install_all_features ? 'abuse' : 'delete';
+				$max_new_threads = ''; // empty = no limit
 				break;
-			case 2: // Privileged Bloggers group equals 2
-				$permname = 'write';
+			case 2: // Moderators group equals 2
+			case 3: // Trusted users group ID equals 3
+				$perm_messaging = 'write';
+				$max_new_threads = '10';
 				break;
-			case 3: // Bloggers group ID equals 3
-				$permname = 'reply';
+			case 4: // Normal users group ID equals 4
+				$perm_messaging = 'write';
+				$max_new_threads = '3';
 				break;
 			default: // Other groups
-				$permname = 'none';
+				$perm_messaging = 'reply';
+				$max_new_threads = '5';
 				break;
 		}
 
 		// We can return as many default permissions as we want:
 		// e.g. array ( permission_name => permission_value, ... , ... )
-		return $permissions = array( 'perm_messaging' => $permname );
+		return $permissions = array( 'perm_messaging' => $perm_messaging, 'max_new_threads' => $max_new_threads );
 	}
 
 
@@ -169,7 +190,15 @@ class messaging_Module extends Module
 						array( 'reply', T_( 'Read & Send messages to people in contacts list only (except for blocked contacts)' ), '' ),
 						array( 'write', T_( 'Read & Send messages to anyone (except for blocked contacts)' ), '' ),
 						array( 'delete', T_( 'Read, Send & Delete any messages (including for blocked contacts)' ), '' ),
-						array( 'abuse', T_( 'Abuse Management' ), '' )  ) ) );
+						array( 'abuse', T_( 'Abuse Management' ), '' )  ) ),
+			'max_new_threads' => array(
+				'label' => T_( 'Maximum number of new threads per day' ),
+				'group_func' => 'get_group_settings',
+				'perm_block' => 'additional',
+				'perm_type' => 'text_input',
+				'note' => T_( 'Leave empty for no limit' ),
+				'maxlength' => 5 ),
+		);
 		// We can return as many permissions as we want.
 		// In other words, one module can return many pluggable permissions.
 		return $permissions;
@@ -251,6 +280,15 @@ class messaging_Module extends Module
 
 
 	/**
+	 * Get pluggable group settings value
+	 */
+	function get_group_settings( $permname, $permvalue, $permtarget )
+	{
+		return $permvalue;
+	}
+
+
+	/**
 	 * Build the evobar menu
 	 */
 	function build_evobar_menu()
@@ -261,36 +299,18 @@ class messaging_Module extends Module
 		global $current_User;
 		global $unread_messages_count;
 
-		if( !$current_User->check_perm( 'admin', 'restricted' ) )
-		{
-			return;
-		}
-
 		$entries = array();
 
 		if( $current_User->check_perm( 'perm_messaging', 'reply' ) )
 		{
 			$entries['messaging'] = array(
 				'text' => T_('Messages'),
-				'href' => get_messaging_url(),
+				'href' => get_dispctrl_url( 'threads' ),
 				'style' => 'padding: 3px 1ex;',
 			);
 
 			// Count unread messages for current user
-			$SQL = new SQL();
-
-			$SQL->SELECT( 'COUNT(*)' );
-
-			$SQL->FROM( 'T_messaging__threadstatus ts
-							LEFT OUTER JOIN T_messaging__message mu
-								ON ts.tsta_first_unread_msg_ID = mu.msg_ID
-							INNER JOIN T_messaging__message mm
-								ON ts.tsta_thread_ID = mm.msg_thread_ID
-								AND mm.msg_datetime >= mu.msg_datetime' );
-
-			$SQL->WHERE( 'ts.tsta_first_unread_msg_ID IS NOT NULL AND ts.tsta_user_ID = '.$current_User->ID );
-
-			$unread_messages_count = $DB->get_var( $SQL->get() );
+			$unread_messages_count = get_unread_messages_count();
 			if( $unread_messages_count > 0 )
 			{
 				$entries['messaging']['text'] = '<b>'.T_('Messages').' <span class="badge">'.$unread_messages_count.'</span></b>';
@@ -332,8 +352,215 @@ class messaging_Module extends Module
 						'href' => $dispatcher.'?ctrl=threads',
 						'entries' => get_messaging_sub_entries( true )
 					),
-				) );
+				), 'users' );
 		}
+	}
+
+
+	/**
+	 * Handle messaging module htsrv actions
+	 */
+	function handle_htsrv_action()
+	{
+		global $current_User, $Blog, $Session, $Messages, $samedomain_htsrv_url;
+
+		// Init objects we want to work on.
+		$action = param_action( true, true );
+		$disp = param( 'disp', '/^[a-z0-9\-_]+$/', 'threads' );
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'messaging_'.$disp );
+
+		// Load classes
+		load_class( 'messaging/model/_thread.class.php', 'Thread' );
+		load_class( 'messaging/model/_message.class.php', 'Message' );
+
+		if( !is_logged_in() )
+		{ // user must be logged in
+			debug_die( 'User must be logged in to proceed with messaging updates!' );
+		}
+
+		// Check permission:
+		$current_User->check_perm( 'perm_messaging', 'reply', true );
+
+		// set where to redirect
+		$redirect_to = param( 'redirect_to', 'string', NULL );
+		if( empty( $redirect_to ) )
+		{
+			if( isset( $Blog ) )
+			{
+				$redirect_to = url_add_param( $Blog->gen_baseurl(), 'disp='.$disp );
+			}
+			else
+			{
+				$redirect_to = url_add_param( $baseurl, 'disp='.$disp );
+			}
+		}
+
+		if( ( $disp != 'contacts' ) && ( $thrd_ID = param( 'thrd_ID', 'integer', '', true ) ) )
+		{// Load thread from cache:
+			$ThreadCache = & get_ThreadCache();
+			if( ($edited_Thread = & $ThreadCache->get_by_ID( $thrd_ID, false )) === false )
+			{	unset( $edited_Thread );
+				forget_param( 'thrd_ID' );
+				$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Thread') ), 'error' );
+				$action = 'nil';
+			}
+		}
+
+		switch( $disp )
+		{
+			// threads action
+			case 'threads':
+				if( $action != 'create' )
+				{ // Make sure we got a thrd_ID:
+					param( 'thrd_ID', 'integer', true );
+				}
+
+				switch( $action )
+				{
+					case 'create': // create thread
+						// check if create new thread is allowed
+						if( check_create_thread_limit() )
+						{ // max new threads limit reached, don't allow to create new thread
+							debug_die( 'Invalid request, new conversation limit already reached!' );
+						}
+
+						if( !create_new_thread() )
+						{ // unsuccessful new thread creation
+							global $edited_Thread, $edited_Message, $thrd_recipients, $thrd_recipients_array;
+
+							$redirect_to .= '&action=new';
+							// save new message and thread params into the Session to not lose the content
+							$unsaved_message_params = array();
+							$unsaved_message_params[ 'subject' ] = $edited_Thread->title;
+							$unsaved_message_params[ 'message' ] = $edited_Message->text;
+							$unsaved_message_params[ 'thrdtype' ] = param( 'thrdtype', 'string', 'individual' );  // alternative: discussion
+							$unsaved_message_params[ 'thrd_recipients' ] = $thrd_recipients;
+							$unsaved_message_params[ 'thrd_recipients_array' ] = $thrd_recipients_array;
+							save_message_params_to_session( $unsaved_message_params );
+						}
+						break;
+
+					case 'delete': // delete thread
+						// Check permission:
+						$current_User->check_perm( 'perm_messaging', 'delete', true );
+
+						$confirmed = param( 'confirmed', 'integer', 0 );
+						if( $confirmed )
+						{
+							$msg = sprintf( T_('Thread &laquo;%s&raquo; deleted.'), $edited_Thread->dget('title') );
+							$edited_Thread->dbdelete( true );
+							unset( $edited_Thread );
+							forget_param( 'thrd_ID' );
+							$Messages->add( $msg, 'success' );
+						}
+						else
+						{
+							$delete_url = $samedomain_htsrv_url.'action.php?mname=messaging&thrd_ID='.$edited_Thread->ID.'&action=delete&confirmed=1&redirect_to='.$redirect_to.'&'.url_crumb( 'messaging_threads' );
+							$ok_button = '<span class="linkbutton"><a href="'.$delete_url.'">'.T_( 'I am sure!' ).'!</a></span>';
+							$cancel_button = '<span class="linkbutton"><a href="'.$redirect_to.'">CANCEL</a></span>';
+							$msg = sprintf( T_( 'You are about to delete all messages in the conversation &laquo;%s&raquo;.' ), $edited_Thread->dget('title') );
+							$msg .= '<br />'.T_( 'This CANNOT be undone!').'<br />'.T_( 'Are you sure?' ).'<br /><br />'.$ok_button."\t".$cancel_button;
+							$Messages->add( $msg, 'error' );
+						}
+						break;
+
+					case 'leave': // user wants to leave the thread
+						leave_thread( $edited_Thread->ID, $current_User->ID, false );
+
+						$Messages->add( sprintf( T_( 'You have successfuly left the &laquo;%s&raquo; conversation!' ), $edited_Thread->get( 'title' ) ), 'success' );
+						break;
+
+					case 'close': // close the thread
+					case 'close_and_block': // close the thread and block contact
+						leave_thread( $edited_Thread->ID, $current_User->ID, true );
+
+						// user has closed this conversation because there was only one other user involved
+						$Messages->add( sprintf( T_( 'You have successfuly closed the &laquo;%s&raquo; conversation!' ), $edited_Thread->get( 'title' ) ), 'success' );
+						if( $action == 'close_and_block' )
+						{ // user also wants to block contact with the other user involved in this thread
+							$block_user_ID = param( 'block_ID', 'integer', true );
+							$UserCache = & get_UserCache();
+							$blocked_User = $UserCache->get_by_ID( $block_user_ID );
+
+							set_contact_blocked( $block_user_ID, true );
+							$Messages->add( sprintf( T_( '&laquo;%s&raquo; was blocked.' ), $blocked_User->get( 'login' ) ), 'success' );
+						}
+						break;
+				}
+				break; // break from threads action switch
+
+			// contacts action
+			case 'contacts':
+				$user_ID = param( 'user_ID', 'string', true );
+
+				if( ( $action != 'block' ) && ( $action != 'unblock' ) )
+				{ // only block or unblock is valid
+					debug_die( "Invalid action param" );
+				}
+				set_contact_blocked( $user_ID, ( ( $action == 'block' ) ? 1 : 0 ) );
+				$redirect_to = str_replace( '&amp;', '&', $redirect_to );
+				break;
+
+			// messages action
+			case 'messages':
+				if( $action == 'create' )
+				{ // create new message
+					create_new_message( $thrd_ID );
+				}
+				elseif( $action == 'delete' )
+				{
+					// Check permission:
+					$current_User->check_perm( 'perm_messaging', 'delete', true );
+
+					$msg_ID = param( 'msg_ID', 'integer', true );
+					$MessageCache = & get_MessageCache();
+					if( ($edited_Message = & $MessageCache->get_by_ID( $msg_ID, false )) === false )
+					{
+						$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Message') ), 'error' );
+						break;
+					}
+
+					$confirmed = param( 'confirmed', 'integer', 0 );
+					if( $confirmed )
+					{ // delete message
+						$edited_Message->dbdelete();
+						unset( $edited_Message );
+						$Messages->add( T_('Message deleted.'), 'success' );
+					}
+					else
+					{
+						$delete_url = $samedomain_htsrv_url.'action.php?mname=messaging&disp=messages&thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete&confirmed=1';
+						$delete_url = url_add_param( $delete_url, 'redirect_to='.rawurlencode( $redirect_to ), '&' ).'&'.url_crumb( 'messaging_messages' );
+						$ok_button = '<span class="linkbutton"><a href="'.$delete_url.'">'.T_( 'I am sure!' ).'!</a></span>';
+						$cancel_button = '<span class="linkbutton"><a href="'.$redirect_to.'">CANCEL</a></span>';
+						$msg = T_('You are about to delete this message. ').'<br /> '.T_('This CANNOT be undone!').'<br />'.T_( 'Are you sure?' ).'<br /><br />'.$ok_button.$cancel_button;
+						$Messages->add( $msg, 'error' );
+					}
+				}
+				break;
+		}
+
+		header_redirect( $redirect_to ); // Will save $Messages into Session
+	}
+
+
+	/**
+	 * Get contacts list params
+	 */
+	function get_contacts_list_params()
+	{
+		global $module_contacts_list_params;
+
+		if( !isset( $module_contacts_list_params ) )
+		{	// Initialize this array first time
+			$module_contacts_list_params = array();
+		}
+
+		$module_contacts_list_params['title_selected'] = T_('Send a message to all selected contacts');
+		$module_contacts_list_params['title_group'] = T_('Send a message to all %d contacts in the &laquo;%s&raquo; group');
+		$module_contacts_list_params['recipients_link'] = get_dispctrl_url( 'threads', 'action=new' );
 	}
 }
 
@@ -341,79 +568,8 @@ $messaging_Module = new messaging_Module();
 
 /*
  * $Log$
- * Revision 1.23  2011/10/14 19:02:14  efy-yurybakh
- * Messaging Abuse Management
- *
- * Revision 1.22  2011/10/06 06:18:29  efy-asimo
- * Add messages link to settings
- * Update messaging notifications
- *
- * Revision 1.21  2011/08/11 09:05:09  efy-asimo
- * Messaging in front office
- *
- * Revision 1.20  2011/02/15 15:37:00  efy-asimo
- * Change access to admin permission
- *
- * Revision 1.19  2010/01/30 18:55:32  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.18  2009/10/28 14:55:11  efy-maxim
- * pluggable permissions separated by blocks in group form
- *
- * Revision 1.17  2009/10/19 07:04:20  efy-maxim
- * code formatting
- *
- * Revision 1.16  2009/10/09 05:27:55  efy-maxim
- * pluggable permission - fix comment
- *
- * Revision 1.15  2009/10/08 20:05:52  efy-maxim
- * Modular/Pluggable Permissions
- *
- * Revision 1.14  2009/09/21 03:14:35  fplanque
- * modularized a little more
- *
- * Revision 1.13  2009/09/19 11:29:05  efy-maxim
- * Refactoring
- *
- * Revision 1.12  2009/09/18 16:16:50  efy-maxim
- * comments tab in messaging module
- *
- * Revision 1.11  2009/09/18 14:22:11  efy-maxim
- * 1. 'reply' permission in group form
- * 2. functionality to store and update contacts
- * 3. fix in misc functions
- *
- * Revision 1.10  2009/09/16 15:14:47  efy-maxim
- * badge for unread message number
- *
- * Revision 1.9  2009/09/16 09:15:32  efy-maxim
- * Messaging module improvements
- *
- * Revision 1.8  2009/09/16 00:48:50  fplanque
- * getting a bit more serious with modules
- *
- * Revision 1.7  2009/09/15 20:39:00  tblue246
- * Hide "Message" button on evoBar if no sufficient permissions; style
- *
- * Revision 1.6  2009/09/15 20:05:06  efy-maxim
- * 1. Red badge for messages in the right menu
- * 2. Insert menu entries method in menu class
- *
- * Revision 1.5  2009/09/15 19:31:55  fplanque
- * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
- * PHP 4 compatible. Even better on PHP 5.
- * I may have broken a few things. Sorry. This is pretty hard to do in one swoop without any glitch.
- * Thanks for fixing or reporting if you spot issues.
- *
- * Revision 1.4  2009/09/14 07:31:43  efy-maxim
- * 1. Messaging permissions have been fully implemented
- * 2. Messaging has been added to evo bar menu
- *
- * Revision 1.3  2009/09/12 18:44:11  efy-maxim
- * Messaging module improvements
- *
- * Revision 1.2  2009/09/10 18:24:07  fplanque
- * doc
+ * Revision 1.25  2013/11/06 08:04:25  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

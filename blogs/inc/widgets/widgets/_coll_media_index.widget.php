@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -58,12 +58,28 @@ class coll_media_index_Widget extends ComponentWidget
 	{
 		load_funcs( 'files/model/_image.funcs.php' );
 
+		/**
+		 * @var ItemTypeCache
+		 */
+		$ItemTypeCache = & get_ItemTypeCache();
+		$item_type_options =
+			array(
+				''  => T_('All'),
+			) + $ItemTypeCache->get_option_array() ;
+
 		$r = array_merge( array(
 			'title' => array(
 				'label' => T_('Block title'),
 				'note' => T_( 'Title to display in your skin.' ),
 				'size' => 40,
 				'defaultvalue' => T_('Recent photos'),
+			),
+			'item_type' => array(
+				'label' => T_('Item type'),
+				'note' => T_('What kind of items do you want to list?'),
+				'type' => 'select',
+				'options' => $item_type_options,
+				'defaultvalue' => '1',
 			),
 			'thumb_size' => array(
 				'label' => T_('Thumbnail size'),
@@ -78,6 +94,12 @@ class coll_media_index_Widget extends ComponentWidget
 				'type' => 'select',
 				'options' => array( 'grid' => T_( 'Grid' ), 'list' => T_( 'List' ) ),
 				'defaultvalue' => 'grid',
+			),
+			'disp_image_title' => array(
+				'label' => T_( 'Display image title' ),
+				'note' => T_( 'Check this to display image title. This falls back to post title if image title is not set.' ),
+				'type' => 'checkbox',
+				'defaultvalue' => false,
 			),
 			'grid_nb_cols' => array(
 				'label' => T_( 'Columns' ),
@@ -186,6 +208,10 @@ class coll_media_index_Widget extends ComponentWidget
 		$SQL->WHERE( 'cat_blog_ID IN ('.$list_blogs.')' ); // fp> TODO: want to restrict on images :]
 		$SQL->WHERE_and( 'post_status = "published"' );	// TODO: this is a dirty hack. More should be shown.
 		$SQL->WHERE_and( 'post_datestart <= \''.remove_seconds( $localtimenow ).'\'' );
+		if( !empty( $this->disp_params[ 'item_type' ] ) )
+		{ // Get items only with specified type
+			$SQL->WHERE_and( 'post_ptyp_ID = \''.(int)$this->disp_params[ 'item_type' ].'\'' );
+		}
 		$SQL->GROUP_BY( 'link_ID' );
 		$SQL->LIMIT( $this->disp_params[ 'limit' ]*4 ); // fp> TODO: because we have no way of getting images only, we get 4 times more data than requested and hope that 25% at least will be images :/
 		$SQL->ORDER_BY(	gen_order_clause( $this->disp_params['order_by'], $this->disp_params['order_dir'],
@@ -240,8 +266,13 @@ class coll_media_index_Widget extends ComponentWidget
 
 			$r .= '<a href="'.$ItemLight->get_permanent_url().'">';
 			// Generate the IMG THUMBNAIL tag with all the alt, title and desc if available
-			$r .= $File->get_thumb_imgtag( $this->disp_params['thumb_size'] );
+			$r .= $File->get_thumb_imgtag( $this->disp_params['thumb_size'], '', '', $ItemLight->title );
 			$r .= '</a>';
+			if( $this->disp_params[ 'disp_image_title' ] )
+			{
+				$title = ($File->get('title')) ? $this->get('title') : $ItemLight->title;
+				$r .= '<span class="note">'.$title.'</span>';
+			}
 
 			++$count;
 
@@ -266,7 +297,7 @@ class coll_media_index_Widget extends ComponentWidget
 
 		// Display title if requested
 		$this->disp_title();
-		
+
 		if( $layout == 'grid' )
 		{
 			echo $this->disp_params[ 'grid_start' ];
@@ -275,7 +306,7 @@ class coll_media_index_Widget extends ComponentWidget
 		{
 			echo $this->disp_params[ 'list_start' ];
 		}
-		
+
 		echo $r;
 
 		if( $layout == 'grid' )
@@ -301,100 +332,8 @@ class coll_media_index_Widget extends ComponentWidget
 
 /*
  * $Log$
- * Revision 1.25  2011/09/04 22:13:21  fplanque
- * copyright 2011
- *
- * Revision 1.24  2011/01/10 05:08:55  sam2kb
- * Don't display widget title if no images found
- *
- * Revision 1.23  2010/04/12 09:41:36  efy-asimo
- * private URL shortener - task
- *
- * Revision 1.22  2010/02/08 17:54:48  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.21  2010/01/30 18:55:36  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.20  2010/01/27 15:20:08  efy-asimo
- * Change select list to radio button
- *
- * Revision 1.19  2009/12/23 01:38:46  fplanque
- * one server was missing this...
- *
- * Revision 1.18  2009/12/13 02:28:36  fplanque
- * dirty fix / better than nothing
- *
- * Revision 1.17  2009/11/30 04:31:38  fplanque
- * BlockCache Proof Of Concept
- *
- * Revision 1.16  2009/09/27 15:59:13  tblue246
- * Photo index widget: Allow specifying multiple blogs
- *
- * Revision 1.15  2009/09/26 12:00:44  tblue246
- * Minor/coding style
- *
- * Revision 1.14  2009/09/25 07:33:31  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.13  2009/09/19 13:02:51  tblue246
- * Media index: Do not show images from posts in the future, fixes: http://forums.b2evolution.net/viewtopic.php?t=19659
- *
- * Revision 1.12  2009/09/14 13:54:13  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.11  2009/09/12 11:03:13  efy-arrin
- * Included the ClassName in the loadclass() with proper UpperCase
- *
- * Revision 1.10  2009/08/27 13:15:28  tblue246
- * Removed left over pre_dump()...
- *
- * Revision 1.9  2009/08/27 13:13:54  tblue246
- * - Doc/todo
- * - Minor bugfix
- *
- * Revision 1.8  2009/07/07 04:52:54  sam2kb
- * Made some strings translatable
- *
- * Revision 1.7  2009/03/31 18:28:25  tblue246
- * Fixing http://forums.b2evolution.net/viewtopic.php?t=18387
- *
- * Revision 1.6  2009/03/13 02:32:07  fplanque
- * Cleaned up widgets.
- * Removed stupid widget_name param.
- *
- * Revision 1.5  2009/03/08 23:57:46  fplanque
- * 2009
- *
- * Revision 1.4  2009/02/08 11:31:56  yabs
- * Minor
- *
- * Revision 1.3  2008/09/29 08:30:36  fplanque
- * Avatar support
- *
- * Revision 1.2  2008/09/24 08:44:11  fplanque
- * Fixed and normalized order params for widgets (Comments not done yet)
- *
- * Revision 1.1  2008/09/23 09:04:33  fplanque
- * moved media index to a widget
- *
- * Revision 1.7  2008/05/06 23:35:47  fplanque
- * The correct way to add linebreaks to widgets is to add them to $disp_params when the container is called, right after the array_merge with defaults.
- *
- * Revision 1.5  2008/01/21 09:35:37  fplanque
- * (c) 2008
- *
- * Revision 1.4  2007/12/26 23:12:48  yabs
- * changing RANDOM to RAND
- *
- * Revision 1.3  2007/12/26 20:04:54  fplanque
- * minor
- *
- * Revision 1.2  2007/12/24 12:05:31  yabs
- * bugfix "order" is a reserved name, used by wi_order
- *
- * Revision 1.1  2007/12/24 11:02:42  yabs
- * added to cvs
+ * Revision 1.27  2013/11/06 08:05:09  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

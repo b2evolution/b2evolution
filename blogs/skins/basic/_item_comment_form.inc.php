@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage basic
@@ -14,8 +14,10 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $cookie_name, $cookie_email, $cookie_url;
-global $comment_allowed_tags, $comments_use_autobr;
-global $comment_cookies, $comment_allow_msgform;
+global $comment_allowed_tags;
+global $comment_cookies, $comment_allow_msgform, $dummy_fields;
+
+$comment_reply_ID = param( 'reply_ID', 'integer', 0 );
 
 ?>
 <h4><?php echo T_('Leave a comment') ?>:</h4>
@@ -39,12 +41,18 @@ global $comment_cookies, $comment_allow_msgform;
 ?>
 
 <!-- form to add a comment -->
-<form action="<?php echo $htsrv_url ?>comment_post.php" method="post">
+<form action="<?php echo $htsrv_url ?>comment_post.php" method="post" id="bComment_form_id_<?php echo $Item->ID ?>">
 
 	<input type="hidden" name="comment_post_ID" value="<?php echo $Item->ID() ?>" />
 	<input type="hidden" name="redirect_to" value="<?php echo $Item->get_feedback_url( $disp == 'feedback-popup', '&' ) ?>" />
 	<input type="hidden" name="crumb_comment" value="<?php echo get_crumb( 'comment' ) ?>" />
-
+	<?php
+		if( !empty( $comment_reply_ID ) )
+		{
+	?>
+	<input type="hidden" name="reply_ID" value="<?php echo $comment_reply_ID ?>" />
+	<a href="<?php echo url_add_param( $Item->get_permanent_url(), 'reply_ID='.$comment_reply_ID.'&amp;redir=no' ).'#c'.$comment_reply_ID ?>"><?php echo T_('You are currently replying to a specific comment') ?></a>
+	<?php } ?>
 <table>
 	<?php
 	if( is_logged_in() )
@@ -60,23 +68,23 @@ global $comment_cookies, $comment_allow_msgform;
 		<?php
 	}
 	else
-	{ // User is not loggued in:
+	{ // User is not logged in:
 		?>
 		<tr valign="top" bgcolor="#eeeeee">
 			<td align="right"><label for="author"><strong><?php echo T_('Name') ?>:</strong></label></td>
-			<td align="left"><input type="text" name="u" id="author" value="<?php echo $comment_author ?>" size="40" tabindex="1" /></td>
+			<td align="left"><input type="text" name="<?php echo $dummy_fields[ 'name' ] ?>" id="author" value="<?php echo $comment_author ?>" size="40" tabindex="1" /></td>
 		</tr>
 
 		<tr valign="top" bgcolor="#eeeeee">
 			<td align="right"><label for="email"><strong><?php echo T_('Email') ?>:</strong></label></td>
-			<td align="left"><input type="text" name="i" id="email" value="<?php echo $comment_author_email ?>" size="40" tabindex="2" /><br />
+			<td align="left"><input type="text" name="<?php echo $dummy_fields[ 'email' ] ?>" id="email" value="<?php echo $comment_author_email ?>" size="40" tabindex="2" /><br />
 				<small><?php echo T_('Your email address will <strong>not</strong> be displayed on this site.') ?></small>
 			</td>
 		</tr>
 
 		<tr valign="top" bgcolor="#eeeeee">
 			<td align="right"><label for="url"><strong><?php echo T_('Site/Url') ?>:</strong></label></td>
-			<td align="left"><input type="text" name="o" id="url" value="<?php echo $comment_author_url ?>" size="40" tabindex="3" /><br />
+			<td align="left"><input type="text" name="<?php echo $dummy_fields[ 'url' ] ?>" id="url" value="<?php echo $comment_author_url ?>" size="40" tabindex="3" /><br />
 				<small><?php echo T_('Your URL will be displayed.') ?></small>
 			</td>
 		</tr>
@@ -86,19 +94,16 @@ global $comment_cookies, $comment_allow_msgform;
 
 	<tr valign="top" bgcolor="#eeeeee">
 		<td align="right"><label for="comment"><strong><?php echo T_('Comment text') ?>:</strong></label></td>
-		<td align="left" width="450"><textarea cols="50" rows="12" name="p" id="comment" tabindex="4"><?php echo $comment_text ?></textarea><br />
+		<td align="left" width="450"><textarea cols="50" rows="12" name="<?php echo $dummy_fields[ 'content' ] ?>" id="comment" tabindex="4"><?php echo $comment_text ?></textarea><br />
 			<small><?php echo T_('Allowed XHTML tags'), ': ', htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)) ?></small>
 		</td>
 	</tr>
 
+	<?php if( ! is_logged_in() ) { ?>
 	<tr valign="top" bgcolor="#eeeeee">
 		<td align="right"><strong><?php echo T_('Options') ?>:</strong></td>
 		<td align="left">
-
-		<?php if(substr($comments_use_autobr,0,4) == 'opt-') { ?>
-			<input type="checkbox" name="comment_autobr" value="1" <?php if($comments_use_autobr == 'opt-out') echo ' checked="checked"' ?> tabindex="6" id="comment_autobr" /> <label for="comment_autobr"><strong><?php echo T_('Auto-BR') ?></strong></label> <small>(<?php echo T_('Line breaks become &lt;br /&gt;') ?>)</small><br />
-		<?php }
-		if( ! is_logged_in() )
+		<?php if( ! is_logged_in() )
 		{ // User is not logged in:
 			?>
 			<input type="checkbox" name="comment_cookies" value="1" checked="checked" tabindex="7" id="comment_cookies" /> <label for="comment_cookies"><strong><?php echo T_('Remember me') ?></strong></label> <small><?php echo T_('(Set cookies for name, email &amp; url)') ?></small>
@@ -106,6 +111,7 @@ global $comment_cookies, $comment_allow_msgform;
 		} ?>
 		</td>
 	</tr>
+	<?php } ?>
 
 	<tr valign="top" bgcolor="#eeeeee">
 		<td colspan="2" align="center">
@@ -115,3 +121,6 @@ global $comment_cookies, $comment_allow_msgform;
 </table>
 
 </form>
+<?php
+	echo_comment_reply_js( $Item );
+?>

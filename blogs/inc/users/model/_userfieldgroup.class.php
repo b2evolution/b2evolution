@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -41,6 +41,7 @@ load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
 class UserfieldGroup extends DataObject
 {
 	var $name = '';
+	var $order = '';
 
 	/**
 	 * Constructor
@@ -62,6 +63,7 @@ class UserfieldGroup extends DataObject
 		{
 			$this->ID   = $db_row->ufgp_ID;
 			$this->name = $db_row->ufgp_name;
+			$this->order = $db_row->ufgp_order;
 		}
 		else
 		{	// Create a new user field group:
@@ -78,6 +80,10 @@ class UserfieldGroup extends DataObject
 		// Name
 		param_string_not_empty( 'ufgp_name', T_('Please enter a group name.') );
 		$this->set_from_Request( 'name' );
+
+		// Order
+		param_string_not_empty( 'ufgp_order', T_('Please enter an order number.') );
+		$this->set_from_Request( 'order' );
 
 		return ! param_errors_detected();
 	}
@@ -124,7 +130,7 @@ class UserfieldGroup extends DataObject
 
 		return $DB->get_var( $sql );
 
-		return parent::dbexists('ufdf_ID', $this->ID);
+		return parent::dbexists('ufgp_ID', $this->ID);
 	}
 }
 

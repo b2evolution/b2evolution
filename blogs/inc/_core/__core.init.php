@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -35,6 +35,17 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 $default_ctrl = 'settings';
 
 /**
+ * Minimum PHP version required for _core module to function properly.
+ * This value can't be higher then the application required php version.
+ */
+$required_php_version[ '_core' ] = '5.0';
+
+/**
+ * Minimum MYSQL version required for _core module to function properly.
+ */
+$required_mysql_version[ '_core' ] = '4.1';
+
+/**
  * Aliases for table names:
  *
  * (You should not need to change them.
@@ -42,26 +53,36 @@ $default_ctrl = 'settings';
  *  change {@link $tableprefix} in _basic_config.php)
  */
 $db_config['aliases'] = array(
-		'T_antispam'              => $tableprefix.'antispam',
-		'T_cron__log'             => $tableprefix.'cron__log',
-		'T_cron__task'            => $tableprefix.'cron__task',
-		'T_country'               => $tableprefix.'country',
-		'T_currency'              => $tableprefix.'currency',
-		'T_groups'                => $tableprefix.'groups',
-		'T_groups__groupsettings' => $tableprefix.'groups__groupsettings',
-		'T_global__cache'         => $tableprefix.'global__cache',
-		'T_locales'               => $tableprefix.'locales',
-		'T_plugins'               => $tableprefix.'plugins',
-		'T_pluginevents'          => $tableprefix.'pluginevents',
-		'T_pluginsettings'        => $tableprefix.'pluginsettings',
-		'T_pluginusersettings'    => $tableprefix.'pluginusersettings',
-		'T_settings'              => $tableprefix.'settings',
-		'T_users'                 => $tableprefix.'users',
-		'T_users__fielddefs'      => $tableprefix.'users__fielddefs',
-		'T_users__fieldgroups'    => $tableprefix.'users__fieldgroups',
-		'T_users__fields'         => $tableprefix.'users__fields',
-		'T_users__usersettings'   => $tableprefix.'users__usersettings',
-		'T_slug'                  => $tableprefix.'slug',
+		'T_antispam'               => $tableprefix.'antispam',
+		'T_antispam__iprange'      => $tableprefix.'antispam__iprange',
+		'T_cron__log'              => $tableprefix.'cron__log',
+		'T_cron__task'             => $tableprefix.'cron__task',
+		'T_regional__country'      => $tableprefix.'regional__country',
+		'T_regional__region'       => $tableprefix.'regional__region',
+		'T_regional__subregion'    => $tableprefix.'regional__subregion',
+		'T_regional__city'         => $tableprefix.'regional__city',
+		'T_regional__currency'     => $tableprefix.'regional__currency',
+		'T_groups'                 => $tableprefix.'groups',
+		'T_groups__groupsettings'  => $tableprefix.'groups__groupsettings',
+		'T_global__cache'          => $tableprefix.'global__cache',
+		'T_i18n_original_string'   => $tableprefix.'i18n_original_string',
+		'T_i18n_translated_string' => $tableprefix.'i18n_translated_string',
+		'T_locales'                => $tableprefix.'locales',
+		'T_plugins'                => $tableprefix.'plugins',
+		'T_pluginevents'           => $tableprefix.'pluginevents',
+		'T_pluginsettings'         => $tableprefix.'pluginsettings',
+		'T_pluginusersettings'     => $tableprefix.'pluginusersettings',
+		'T_settings'               => $tableprefix.'settings',
+		'T_users'                  => $tableprefix.'users',
+		'T_users__fielddefs'       => $tableprefix.'users__fielddefs',
+		'T_users__fieldgroups'     => $tableprefix.'users__fieldgroups',
+		'T_users__fields'          => $tableprefix.'users__fields',
+		'T_users__reports'         => $tableprefix.'users__reports',
+		'T_users__usersettings'    => $tableprefix.'users__usersettings',
+		'T_slug'                   => $tableprefix.'slug',
+		'T_email__log'             => $tableprefix.'email__log',
+		'T_email__returns'         => $tableprefix.'email__returns',
+		'T_email__blocked'         => $tableprefix.'email__blocked',
 	);
 
 
@@ -82,10 +103,15 @@ $db_config['aliases'] = array(
 $ctrl_mappings = array(
 		'antispam'         => 'antispam/antispam.ctrl.php',
 		'crontab'          => 'cron/cronjobs.ctrl.php',
+		'regional'         => 'regional/regional_dispatch.ctrl.php',
+		'time'             => 'regional/time.ctrl.php',
 		'countries'        => 'regional/countries.ctrl.php',
+		'regions'          => 'regional/regions.ctrl.php',
+		'subregions'       => 'regional/subregions.ctrl.php',
+		'cities'           => 'regional/cities.ctrl.php',
 		'currencies'       => 'regional/currencies.ctrl.php',
-		'features'         => 'settings/features.ctrl.php',
 		'locales'          => 'locales/locales.ctrl.php',
+		'translation'      => 'locales/translation.ctrl.php',
 		'plugins'          => 'plugins/plugins.ctrl.php',
 		'gensettings'      => 'settings/settings.ctrl.php',
 		'remotepublish'    => 'settings/remotepublish.ctrl.php',
@@ -102,25 +128,87 @@ $ctrl_mappings = array(
 		'groups'           => 'users/groups.ctrl.php',
 		'upload'           => 'files/upload.ctrl.php',
 		'slugs'            => 'slugs/slugs.ctrl.php',
+		'email'            => 'tools/email.ctrl.php',
+		'newsletter'       => 'newsletter/newsletter.ctrl.php',
 	);
 
 
 /**
  * Get the CountryCache
  *
+ * @param string The text that gets used for the "None" option in the objects options list (Default: T_('Unknown')).
  * @return CountryCache
  */
-function & get_CountryCache()
+function & get_CountryCache( $allow_none_text = NULL )
 {
 	global $CountryCache;
 
 	if( ! isset( $CountryCache ) )
 	{	// Cache doesn't exist yet:
-		$CountryCache = new DataObjectCache( 'Country', true, 'T_country', 'ctry_', 'ctry_ID', 'ctry_code', 'ctry_name', T_('Unknown') );
+		if( ! isset( $allow_none_text ) )
+		{
+			$allow_none_text = T_('Unknown');
+		}
+		$CountryCache = new DataObjectCache( 'Country', true, 'T_regional__country', 'ctry_', 'ctry_ID', 'ctry_code', 'ctry_name', $allow_none_text );
 	}
 
 	return $CountryCache;
 }
+
+
+/**
+ * Get the RegionCache
+ *
+ * @return RegionCache
+ */
+function & get_RegionCache()
+{
+	global $RegionCache;
+
+	if( ! isset( $RegionCache ) )
+	{	// Cache doesn't exist yet:
+		$RegionCache = new DataObjectCache( 'Region', false, 'T_regional__region', 'rgn_', 'rgn_ID', 'rgn_name', 'rgn_name', T_('Unknown') );
+	}
+
+	return $RegionCache;
+}
+
+
+/**
+ * Get the SubregionCache
+ *
+ * @return SubregionCache
+ */
+function & get_SubregionCache()
+{
+	global $SubregionCache;
+
+	if( ! isset( $SubregionCache ) )
+	{	// Cache doesn't exist yet:
+		$SubregionCache = new DataObjectCache( 'Subregion', false, 'T_regional__subregion', 'subrg_', 'subrg_ID', 'subrg_name', 'subrg_name', T_('Unknown') );
+	}
+
+	return $SubregionCache;
+}
+
+
+/**
+ * Get the CityCache
+ *
+ * @return CityCache
+ */
+function & get_CityCache()
+{
+	global $CityCache;
+
+	if( ! isset( $CityCache ) )
+	{	// Cache doesn't exist yet:
+		$CityCache = new DataObjectCache( 'City', false, 'T_regional__city', 'city_', 'city_ID', 'city_name', 'city_name', T_('Unknown') );
+	}
+
+	return $CityCache;
+}
+
 
 /**
  * Get the CurrencyCache
@@ -133,7 +221,7 @@ function & get_CurrencyCache()
 
 	if( ! isset( $CurrencyCache ) )
 	{	// Cache doesn't exist yet:
-		$CurrencyCache = new DataObjectCache( 'Currency', true, 'T_currency', 'curr_', 'curr_ID', 'curr_code', 'curr_code');
+		$CurrencyCache = new DataObjectCache( 'Currency', true, 'T_regional__currency', 'curr_', 'curr_ID', 'curr_code', 'curr_code');
 	}
 
 	return $CurrencyCache;
@@ -252,6 +340,62 @@ function & get_SlugCache()
 
 
 /**
+ * Get the IPRangeCache
+ *
+ * @return IPRangeCache
+ */
+function & get_IPRangeCache()
+{
+	global $IPRangeCache;
+
+	if( ! isset( $IPRangeCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'antispam/model/_iprangecache.class.php', 'IPRangeCache' );
+		$IPRangeCache = new IPRangeCache();
+	}
+
+	return $IPRangeCache;
+}
+
+
+/**
+ * Get the EmailBlockedCache
+ *
+ * @return EmailBlockedCache
+ */
+function & get_EmailBlockedCache()
+{
+	global $EmailBlockedCache;
+
+	if( ! isset( $EmailBlockedCache ) )
+	{	// Cache doesn't exist yet:
+		$EmailBlockedCache = new DataObjectCache( 'EmailBlocked', false, 'T_email__blocked', 'emblk_', 'emblk_ID', 'emblk_address' );
+	}
+
+	return $EmailBlockedCache;
+}
+
+
+/**
+ * Get the CronjobCache
+ *
+ * @return CronjobCache
+ */
+function & get_CronjobCache()
+{
+	global $CronjobCache;
+
+	if( ! isset( $CronjobCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'cron/model/_cronjob.class.php', 'Cronjob' );
+		$CronjobCache = new DataObjectCache( 'Cronjob', false, 'T_cron__task', 'ctsk_', 'ctsk_ID', 'ctsk_name', 'ctsk_name', T_('Unknown') );
+	}
+
+	return $CronjobCache;
+}
+
+
+/**
  * _core_Module definition
  */
 class _core_Module extends Module
@@ -267,6 +411,8 @@ class _core_Module extends Module
 	 */
 	function init()
 	{
+		$this->check_required_php_version( '_core' );
+
 		load_class( '_core/model/dataobjects/_dataobjectcache.class.php', 'DataObjectCache' );
 		load_class( 'generic/model/_genericelement.class.php', 'GenericElement' );
 		load_class( 'generic/model/_genericcache.class.php', 'GenericCache' );
@@ -278,6 +424,7 @@ class _core_Module extends Module
 		load_class( '_core/ui/results/_results.class.php', 'Results' );
 		load_class( '_core/model/_blockcache.class.php', 'BlockCache' );
 		load_class( 'slugs/model/_slug.class.php', 'Slug' );
+		load_class( 'antispam/model/_iprange.class.php', 'IPRange' );
 	}
 
 
@@ -293,35 +440,58 @@ class _core_Module extends Module
 		{
 			case 1:		// Administrators (group ID 1) have permission by default:
 				$permadmin = 'normal';
+				$permusers = 'edit';
+				$permoptions = 'edit';
 				$permspam = 'edit';
 				$permslugs = 'edit';
 				$permtemplates = 'allowed';
-				$permoptions = 'edit';
+				$permemails = 'edit';
+				$def_notification = 'full';
 				break;
 
 			case 2:		// Privileged bloggers (group ID 2) have permission by default:
 				$permadmin = 'normal';
+				$permusers = 'view';
+				$permoptions = 'view';
 				$permspam = 'edit';
 				$permslugs = 'none';
 				$permtemplates = 'denied';
-				$permoptions = 'view';
+				$permemails = 'view';
+				$def_notification = 'short';
 				break;
 
 			case 3:		// Bloggers (group ID 3) have permission by default:
 				$permadmin = 'normal';
+				$permusers = 'none';
+				$permoptions = 'none';
 				$permspam = 'view';
 				$permslugs = 'none';
 				$permtemplates = 'denied';
+				$permemails = 'none';
+				$def_notification = 'short';
+				break;
+
+			case 5:		// Spam/Suspect  (group ID 5) have permission by default:
+				$permadmin = 'no_toolbar';
+				$permusers = 'none';
 				$permoptions = 'none';
+				$permspam = 'none';
+				$permslugs = 'none';
+				$permtemplates = 'denied';
+				$permemails = 'none';
+				$def_notification = 'short';
 				break;
 
 			default:
 				// Other groups have no permission by default
 				$permadmin = 'none';
+				$permusers = 'none';
+				$permoptions = 'none';
 				$permspam = 'none';
 				$permslugs = 'none';
 				$permtemplates = 'denied';
-				$permoptions = 'none';
+				$permemails = 'none';
+				$def_notification = 'short';
 				break;
 		}
 
@@ -329,10 +499,17 @@ class _core_Module extends Module
 		// e.g. array ( permission_name => permission_value, ... , ... )
 		return $permissions = array(
 			'perm_admin' => $permadmin,
+			'perm_users' => $permusers,
+			'perm_options' => $permoptions,
 			'perm_spamblacklist' => $permspam,
 			'perm_slugs' => $permslugs,
 			'perm_templates' => $permtemplates,
-			'perm_options' => $permoptions );
+			'perm_emails' => $permemails,
+			'pm_notif' => $def_notification,
+			'comment_subscription_notif' => $def_notification,
+			'comment_moderation_notif' => $def_notification,
+			'post_subscription_notif' => $def_notification,
+		 );
 	}
 
 
@@ -363,6 +540,12 @@ class _core_Module extends Module
 				'perm_type' => 'info',
 				'info' => T_( 'Visible link' ),
 			);
+			$perm_users_values = array(
+				'label' => T_( 'Users & Groups' ),
+				'perm_block' => 'core',
+				'perm_type' => 'info',
+				'info' => T_( 'Full Access' ),
+			);
 		}
 		else
 		{
@@ -372,21 +555,53 @@ class _core_Module extends Module
 				'group_func' => 'check_admin_group_perm',
 				'perm_block' => 'core_general',
 				'options'  => array(
+					array( 'no_toolbar', T_( 'No Toolbar' ) ),
 					$none_option,
 					array( 'restricted', T_( 'Restricted' ) ),
 					array( 'normal', T_( 'Normal' ) ) ),
 				'perm_type' => 'radiobox',
 				'field_lines' => false,
 			);
+			$perm_users_values = array(
+				'label' => T_('Users & Groups'),
+				'user_func'  => 'check_core_user_perm',
+				'group_func' => 'check_core_group_perm',
+				'perm_block' => 'core',
+				'options'  => array( $none_option, $view_details, $edit_option ),
+				'perm_type' => 'radiobox',
+				'field_lines' => false,
+			);
 		}
+
+		$notification_options = array(
+				array( 'short', T_( 'Short' ) ),
+				array( 'full', T_( 'Full text' ) ) );
+		$notifications_array = array(
+				'group_func' => 'check_notification',
+				'perm_block' => 'notifications',
+				'options' => $notification_options,
+				'perm_type' => 'radiobox',
+				'field_note' => T_( 'Selecting "Full text" may generate email containing unwanted spam.' ),
+				'field_lines' => false,
+		);
 
 		$permissions = array(
 			'perm_admin' => $perm_admin_values,
+			'perm_users' => $perm_users_values,
+			'perm_options' => array(
+				'label' => T_('Settings'),
+				'user_func'  => 'check_core_user_perm',
+				'group_func' => 'check_core_group_perm',
+				'perm_block' => 'core',
+				'options'  => array( $none_option, $view_details, $edit_option ),
+				'perm_type' => 'radiobox',
+				'field_lines' => false,
+				),
 			'perm_spamblacklist' => array(
 				'label' => T_( 'Antispam' ),
 				'user_func'  => 'check_core_user_perm',
 				'group_func' => 'check_core_group_perm',
-				'perm_block' => 'core',
+				'perm_block' => 'core2',
 				'options'  => array( $none_option, $view_option, $full_option ),
 				'perm_type' => 'radiobox',
 				'field_lines' => false,
@@ -395,21 +610,13 @@ class _core_Module extends Module
 				'label' => T_('Slug manager'),
 				'user_func'  => 'check_core_user_perm',
 				'group_func' => 'check_core_group_perm',
-				'perm_block' => 'core',
+				'perm_block' => 'core2',
 				'options'  => array( $none_option, $view_option, $full_option ),
 				'perm_type' => 'radiobox',
 				'field_lines' => false,
 				),
-			'perm_templates' => array(
-				'label' => T_('Skins'),
-				'user_func'  => 'check_template_user_perm',
-				'group_func' => 'check_template_group_perm',
-				'perm_block' => 'core',
-				'perm_type' => 'checkbox',
-				'note' => T_( 'Check to allow access to skin files.' ),
-				),
-			'perm_options' => array(
-				'label' => T_('Settings'),
+			'perm_emails' => array(
+				'label' => T_('Email management'),
 				'user_func'  => 'check_core_user_perm',
 				'group_func' => 'check_core_group_perm',
 				'perm_block' => 'core2',
@@ -417,7 +624,26 @@ class _core_Module extends Module
 				'perm_type' => 'radiobox',
 				'field_lines' => false,
 				),
-			// put here perm_options with perm_block 'core1'
+			'perm_templates' => array(
+				'label' => T_('Skins'),
+				'user_func'  => 'check_template_user_perm',
+				'group_func' => 'check_template_group_perm',
+				'perm_block' => 'core3',
+				'perm_type' => 'checkbox',
+				'note' => T_( 'Check to allow access to skin files.' ),
+				),
+			'pm_notif' => array_merge( 
+				array( 'label' => T_( 'New Private Message notifications' ) ), $notifications_array
+				),
+			'comment_subscription_notif' => array_merge(
+				array( 'label' => T_( 'New Comment subscription notifications' ) ), $notifications_array
+				),
+			'comment_moderation_notif' => array_merge(
+				array( 'label' => T_( 'New Comment moderation notifications' ) ), $notifications_array
+				),
+			'post_subscription_notif' => array_merge(
+				array( 'label' => T_( 'New Post subscription notifications' ) ), $notifications_array
+				),
 			);
 		return $permissions;
 	}
@@ -442,6 +668,14 @@ class _core_Module extends Module
 			case 'restricted':
 				if( $permlevel == 'restricted' || $permlevel == 'any' )
 				{
+					$perm = true;
+					break;
+				}
+
+			case 'none':
+				// display toolbar check
+				if( $permlevel == 'toolbar' )
+				{ // Even in case of No Access the toolbar must be displayed
 					$perm = true;
 					break;
 				}
@@ -508,6 +742,15 @@ class _core_Module extends Module
 	}
 
 	/**
+	 * Check notification setting
+	 */
+	function check_notification( $permlevel, $permvalue, $permtarget )
+	{
+		// Check if user should receive full text notification or not. In every other case short notificaiton must be sent.
+		return $permvalue == 'full';
+	}
+
+	/**
 	 * Build teh evobar menu
 	 */
 	function build_evobar_menu()
@@ -554,7 +797,7 @@ class _core_Module extends Module
 						'disabled' => true,
 					),
 				'tools' => array(
-						'text' => T_('System'),
+						'text' => T_('More'),
 						'disabled' => true,
 					),
 			);
@@ -567,10 +810,18 @@ class _core_Module extends Module
 						'href' => $home_url,
 						'title' => T_('See the home page'),
 					),
-				'tools' => array(
-						'text' => T_('System'),
-						'disabled' => true,
-					),
+			);
+			if( $current_User->check_perm( 'blogs', 'create' ) )
+			{
+				$entries[ 'blog' ] = array(
+					'text' => T_('Blog'),
+					'title' => T_('No blog is currently selected'),
+					'disabled' => true,
+				);
+			}
+			$entries[ 'tools' ] = array(
+				'text' => T_('More'),
+				'disabled' => true,
 			);
 		}
 
@@ -588,32 +839,44 @@ class _core_Module extends Module
 				$entries['see']['title'] = T_('See the public view of this blog');
 			}
 
-			if( $perm_admin_normal )
-			{
-				if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
-				{	// We have permission to add a post with at least one status:
-					if( $Blog->get_setting( 'in_skin_editing' ) && ! is_admin_page() )
-					{	// We have a mode 'In-skin editing' for the current Blog
-						$entries['write']['href'] = url_add_param( $Blog->get( 'url' ), 'disp=edit' );
+			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+			{ // We have permission to add a post with at least one status:
+				$write_item_url = $Blog->get_write_item_url();
+				if( $write_item_url )
+				{ // write item URL is not empty, so it's sure that user can create new post
+					if( !$perm_admin_normal )
+					{
+						$entries[ 'write' ] = array(
+							'text' => T_('Write'),
+						);
 					}
-					else
-					{	// Edit a post from Back-office
-						$entries['write']['href'] = $admin_url.'?ctrl=items&amp;action=new&amp;blog='.$Blog->ID;
-					}
+					$entries['write']['href'] = $write_item_url;
 					$entries['write']['disabled'] = false;
 					$entries['write']['title'] = T_('Write a new post into this blog');
 				}
-				else
-				{
+			}
+
+			if( $perm_admin_normal )
+			{
+				if( empty( $write_item_url) )
+				{ // Display restricted message on this blog
 					$entries['write']['title'] = T_('You don\'t have permission to post into this blog');
 				}
 
-
 				// BLOG MENU:
-	 			$items_url = $admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=restore';
+				$items_url = $admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=restore';
 				$entries['blog']['href'] = $items_url;
 				$entries['blog']['disabled'] = false;
 				$entries['blog']['title'] = T_('Manage this blog');
+
+				if( $Blog->get( 'type' ) == 'manual' )
+				{ // Manual Pages
+					$entries['blog']['entries']['manual'] = array(
+									'text' => T_('Manual Pages').'&hellip;',
+									'href' => $items_url.'&amp;tab=manual',
+								);
+				}
+
 				$entries['blog']['entries']['posts'] = array(
 								'text' => T_('Posts').'&hellip;',
 								'href' => $items_url,
@@ -652,9 +915,55 @@ class _core_Module extends Module
 						);
 					}
 					$entries['blog']['entries']['general'] = array(
-								'text' => T_('Blog settings').'&hellip;',
+								'text' => T_('Blog settings'),
 								'href' => $admin_url.'?ctrl=coll_settings'.$blog_param,
+								'entries' => array(
+									'general' => array(
+										'text' => T_('General').'&hellip;',
+										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=general'.$blog_param,
+									),
+									'features' => array(
+										'text' => T_('Features').'&hellip;',
+										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=features'.$blog_param,
+									),
+									'skin' => array(
+										'text' => T_('Skin').'&hellip;',
+										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin'.$blog_param,
+									),
+									'plugin_settings' => array(
+										'text' => T_('Plugin settings').'&hellip;',
+										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=plugin_settings'.$blog_param,
+									),
+									'widgets' => array(
+										'text' => T_('Widgets').'&hellip;',
+										'href' => $admin_url.'?ctrl=widgets'.$blog_param,
+									),
+									'urls' => array(
+										'text' => T_('URLs').'&hellip;',
+										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=urls'.$blog_param,
+									),
+									'seo' => array(
+										'text' => T_('SEO').'&hellip;',
+										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=seo'.$blog_param,
+									),
+									'advanced' => array(
+										'text' => T_('Advanced').'&hellip;',
+										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=advanced'.$blog_param,
+									),
+								)
 						);
+
+						if( $Blog && $Blog->advanced_perms )
+						{
+							$entries['blog']['entries']['general']['entries']['userperms'] = array(
+								'text' => T_('User perms').'&hellip;',
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=perm'.$blog_param,
+							);
+							$entries['blog']['entries']['general']['entries']['groupperms'] = array(
+								'text' => T_('Group perms').'&hellip;',
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=permgroup'.$blog_param,
+							);
+						}
 				}
 			}
 		}
@@ -696,11 +1005,21 @@ class _core_Module extends Module
 					);
 			}
 
+			if( $current_User->check_perm( 'perm_messaging', 'reply' ) )
+			{	// Messaging:
+				$entries['tools']['disabled'] = false;
+				$entries['tools']['entries']['messaging'] = array(
+						'text' => T_('Messaging').'&hellip;',
+						'href' => get_dispctrl_url( 'threads' ),
+					);
+			}
+
 			// PLACE HOLDER FOR FILES MODULE:
 			$entries['tools']['entries']['files'] = NULL;
 
 			$perm_spam = $current_User->check_perm( 'spamblacklist', 'view' );
 			$perm_options = $current_User->check_perm( 'options', 'view' );
+			$perm_emails = $current_User->check_perm( 'emails', 'view' );
 			$perm_slugs = $current_User->check_perm( 'slugs', 'view' );
 			$perm_maintenance = $current_User->check_perm( 'perm_maintenance', 'upgrade' );
 
@@ -711,77 +1030,157 @@ class _core_Module extends Module
 						'separator' => true,
 					);
 
-				if( $perm_spam )
+				if( $perm_options )
 				{
-					$entries['tools']['entries']['antispam'] = array(
-							'text' => T_('Antispam').'&hellip;',
-							'href' => $admin_url.'?ctrl=antispam',
+					$entries['tools']['entries']['status'] = array(
+							'text' => T_('System status').'&hellip;',
+							'href' => $admin_url.'?ctrl=system',
 						);
 				}
 
 				if( $perm_options )
 				{
-						$entries['tools']['entries']['status'] = array(
-									'text' => T_('System status').'&hellip;',
-									'href' => $admin_url.'?ctrl=system',
+						$entries['tools']['entries']['crontab'] = array(
+									'text' => T_('Scheduler').'&hellip;',
+									'href' => $admin_url.'?ctrl=crontab',
 								);
 				}
 
-				if( $perm_options || $perm_slugs || $perm_maintenance )
+				if( $perm_spam )
 				{
-					$entries['tools']['entries']['tools'] = array(
-							'text' => T_('More tools'),
+					$entries['tools']['entries']['antispam'] = array(
+							'text' => T_('Antispam'),
+							'href' => $admin_url.'?ctrl=antispam',
+							'entries' => array(
+									'blacklist' => array(
+										'text' => T_('Blacklist').'&hellip;',
+										'href' => $admin_url.'?ctrl=antispam' )
+								)
 						);
 
 					if( $perm_options )
-					{
-							$entries['tools']['entries']['tools']['entries']['crontab'] = array(
-										'text' => T_('Scheduler').'&hellip;',
-										'href' => $admin_url.'?ctrl=crontab',
-									);
-							$entries['tools']['entries']['tools']['entries']['misc'] = array(
-										'text' => T_('Misc tools').'&hellip;',
-										'href' => $admin_url.'?ctrl=tools',
-									);
-					}
+					{	// If we have access to options, then we add a submenu:
+						$entries['tools']['entries']['antispam']['entries']['settings'] = array(
+								'text' => T_('Settings').'&hellip;',
+								'href' => $admin_url.'?ctrl=antispam&amp;tab3=settings' );
 
-					if( $perm_slugs )
-					{
-							$entries['tools']['entries']['tools']['entries']['slugs'] = array(
-										'text' => T_('Slugs').'&hellip;',
-										'href' => $admin_url.'?ctrl=slugs',
-									);
+						if( $current_User->check_perm( 'options', 'edit' ) )
+						{
+							$entries['tools']['entries']['antispam']['entries']['tools'] = array(
+									'text' => T_('Tools').'&hellip;',
+									'href' => $admin_url.'?ctrl=antispam&amp;tab3=tools' );
+						}
+						$entries['tools']['entries']['antispam']['entries']['ipranges'] = array(
+								'text' => T_('IP Ranges').'&hellip;',
+								'href' => $admin_url.'?ctrl=antispam&amp;tab3=ipranges' );
 					}
+				}
 
-					if( $perm_maintenance )
-					{
-						$entries['tools']['entries']['tools']['entries']['backup'] = array(
-										'text' => T_('Backup').'&hellip;',
-										'href' => $admin_url.'?ctrl=backup',
-									);
-						$entries['tools']['entries']['tools']['entries']['upgrade'] = array(
-										'text' => T_('Upgrade').'&hellip;',
-										'href' => $admin_url.'?ctrl=upgrade',
-									);
-					}
+				if( $perm_emails )
+				{
+					$entries['tools']['entries']['email'] = array(
+							'text' => T_('Email'),
+							'href' => $admin_url.'?ctrl=email',
+							'entries' => array(
+								'sent' => array(
+									'text' => T_('Sent').'&hellip;',
+									'href' => $admin_url.'?ctrl=email' ),
+								'blocked' => array(
+									'text' => T_('Addresses').'&hellip;',
+									'href' => $admin_url.'?ctrl=email&amp;tab=blocked' ),
+								'return' => array(
+									'text' => T_('Return Path').'&hellip;',
+									'href' => $admin_url.'?ctrl=email&amp;tab=return' ),
+								'settings' => array(
+									'text' => T_('Settings').'&hellip;',
+									'href' => $admin_url.'?ctrl=email&amp;tab=settings' ),
+								)
+						);
+				}
+
+				if( $perm_slugs )
+				{
+					$entries['tools']['entries']['slugs'] = array(
+							'text' => T_('Slugs').'&hellip;',
+							'href' => $admin_url.'?ctrl=slugs'
+						);
 				}
 			}
 
 
 			if( $perm_options )
 			{	// Global settings:
-				$entries['tools']['disabled'] = false;
-				if( !empty($entries['tools']['entries']))
-				{
-					$entries['tools']['entries']['settings_sep'] = array(
-							'separator' => true,
-						);
-				}
-				$entries['tools']['entries']['settings'] = array(
-						'text' => T_('Global settings').'&hellip;',
-						'href' => $admin_url.'?ctrl=settings',
+				$entries['tools']['entries']['general'] = array(
+						'text' => T_('General').'&hellip;',
+						'href' => $admin_url.'?ctrl=gensettings',
+					);
+				$entries['tools']['entries']['regional'] = array(
+						'text' => T_('Regional'),
+						'href' => $admin_url.'?ctrl=regional',
+						'entries' => array(
+							'locales' => array(
+								'text' => T_('Locales').'&hellip;',
+								'href' => $admin_url.'?ctrl=locales' ),
+							'time' => array(
+								'text' => T_('Time').'&hellip;',
+								'href' => $admin_url.'?ctrl=time' ),
+							'countries' => array(
+								'text' => T_('Countries').'&hellip;',
+								'href' => $admin_url.'?ctrl=countries' ),
+							'regions' => array(
+								'text' => T_('Regions').'&hellip;',
+								'href' => $admin_url.'?ctrl=regions' ),
+							'subregions' => array(
+								'text' => T_('Sub-regions').'&hellip;',
+								'href' => $admin_url.'?ctrl=subregions' ),
+							'cities' => array(
+								'text' => T_('Cities').'&hellip;',
+								'href' => $admin_url.'?ctrl=cities' ),
+							'currencies' => array(
+								'text' => T_('Currencies').'&hellip;',
+								'href' => $admin_url.'?ctrl=currencies' ),
+						)
+					);
+				$entries['tools']['entries']['plugins'] = array(
+						'text' => T_('Plugins').'&hellip;',
+						'href' => $admin_url.'?ctrl=plugins',
+					);
+				$entries['tools']['entries']['remote'] = array(
+						'text' => T_('Remote publishing').'&hellip;',
+						'href' => $admin_url.'?ctrl=remotepublish',
+					);
+				$entries['tools']['entries']['maintenance'] = array(
+						'text' => T_('Maintenance'),
+						'href' => $admin_url.'?ctrl=tools',
+						'entries' => array(
+							'tools' => array(
+								'text' => T_('Tools').'&hellip;',
+								'href' => $admin_url.'?ctrl=tools' ),
+							'import' => array(
+								'text' => T_('Import').'&hellip;',
+								'href' => $admin_url.'?ctrl=tools&amp;tab3=import' ),
+							'test' => array(
+								'text' => T_('Testing').'&hellip;',
+								'href' => $admin_url.'?ctrl=tools&amp;tab3=test' ),
+							'backup' => array(
+								'text' => T_('Backup').'&hellip;',
+								'href' => $admin_url.'?ctrl=backup' ),
+							'upgrade' => array(
+								'text' => T_('Check for updates').'&hellip;',
+								'href' => $admin_url.'?ctrl=upgrade' ),
+							)
 					);
 			}
+		}
+
+		global $debug, $debug_jslog;
+		if( $debug || $debug_jslog )
+		{	// Show JS log menu if debug is enabled
+			$entries['jslog'] = array(
+				'text'  => T_('JS log'),
+				'title' => T_('JS log'),
+				'class' => 'jslog_switcher'
+			);
 		}
 
 		if( $entries !== NULL )
@@ -801,7 +1200,7 @@ class _core_Module extends Module
 
 		$entries = array(
 			'userprefs' => array(
-					'text' => $current_User->get_avatar_imgtag( 'crop-15x15', '', 'top' ).' <strong>'.$current_User->get_colored_name().'</strong>',
+					'text' => $current_User->get_avatar_imgtag( 'crop-top-15x15', '', 'top' ).' <strong>'.$current_User->get_colored_login().'</strong>',
 					'href' => get_user_profile_url(),
 					'entries' => array(
 						'profile' => array(
@@ -809,16 +1208,20 @@ class _core_Module extends Module
 								'href' => get_user_profile_url(),
 							),
 						'avatar' => array(
-								'text' => T_('Change your profile picture').'&hellip;',
+								'text' => T_('Your profile picture').'&hellip;',
 								'href' => get_user_avatar_url(),
 							),
 						'pwdchange' => array(
-								'text' => T_('Change your password').'&hellip;',
+								'text' => T_('Change password').'&hellip;',
 								'href' => get_user_pwdchange_url(),
 							),
 						'userprefs' => array(
-								'text' => T_('Set your preferences').'&hellip;',
+								'text' => T_('Preferences').'&hellip;',
 								'href' => get_user_preferences_url(),
+							),
+						'subs' => array(
+								'text' => T_('Notifications').'&hellip;',
+								'href' => get_user_subs_url(),
 							),
 						),
 				),
@@ -829,14 +1232,6 @@ class _core_Module extends Module
 					'class' => 'noborder',
 				),
 		);
-
-		if( $subs_url = get_user_subs_url() )
-		{
-			$entries['userprefs']['entries']['subscriptions'] = array(
-					'text' => T_('Email subscriptions').'&hellip;',
-					'href' => $subs_url,
-				);
-		}
 
 		// ADMIN SKINS:
 		if( $is_admin_page )
@@ -932,55 +1327,12 @@ class _core_Module extends Module
 		global $AdminUI;
 
 		$perm_admin_normal = $current_User->check_perm( 'admin', 'normal' );
+		$perm_options = $current_User->check_perm( 'options', 'view' );
+		$perm_users = $current_User->check_perm( 'users', 'view' );
 
-		if( $perm_admin_normal && $current_User->check_perm( 'options', 'view' ) )
-		{	// Permission to view settings:
-			$AdminUI->add_menu_entries( NULL, array(
-						'options' => array(
-							'text' => T_('Global settings'),
-							'href' => $dispatcher.'?ctrl=settings',
-							'entries' => array(
-								'general' => array(
-									'text' => T_('General'),
-									'href' => '?ctrl=gensettings' ),
-								'features' => array(
-									'text' => T_('Features'),
-									'href' => '?ctrl=features' ),
-								'regional' => array(
-									'text' => T_('Regional'),
-									'href' => '?ctrl=locales'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ),
-									'entries' => array(
-										'locales' => array(
-											'text' => T_('Locales, Time'),
-											'href' => '?ctrl=locales'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ) ),
-										'countries' => array(
-											'text' => T_('Countries'),
-											'href' => '?ctrl=countries' ),
-										'currencies' => array(
-											'text' => T_('Currencies'),
-											'href' => '?ctrl=currencies' ),
-										) ),
-								'plugins' => array(
-									'text' => T_('Plugins'),
-									'href' => '?ctrl=plugins'),
-								'remotepublish' => array(
-									'text' => T_('Remote Publishing'),
-									'href' => '?ctrl=remotepublish',
-									'entries' => array(
-										'eblog' => array(
-											'text' => T_('Post by Email'),
-											'href' => '?ctrl=remotepublish&amp;tab=eblog' ),
-										'xmlrpc' => array(
-											'text' => T_('XML-RPC'),
-											'href' => '?ctrl=remotepublish&amp;tab=xmlrpc' )
-										) ),
-							)
-						),
-					) );
-		}
-
-		if( $perm_admin_normal && $current_User->check_perm( 'users', 'view' ) )
-		{	// Permission to view users:
+		/**** Users | My profile ****/
+		if( $perm_admin_normal && $perm_users )
+		{ // Permission to view users:
 			$users_entries = array(
 						'text' => T_('Users'),
 						'title' => T_('User management'),
@@ -998,97 +1350,186 @@ class _core_Module extends Module
 						'href' => '?ctrl=user&amp;user_tab=profile&amp;user_ID='.$user_ID );
 		}
 
-		if( $perm_admin_normal && $current_User->check_perm( 'users', 'view' ) )
+		if( $perm_admin_normal && $perm_users )
 		{ // Has permission for viewing all users
 			// fp> the following submenu needs even further breakdown.
 			$users_entries['entries'] = array(
-							'users' => array(
-								'text' => T_('Users & Groups'),
-								'href' => '?ctrl=users'	),
+					'users' => array(
+						'text' => T_('Users'),
+						'href' => '?ctrl=users' ),
+					'stats' => array(
+						'text' => T_('Stats'),
+						'href' => '?ctrl=users&amp;tab=stats' ),
+					'groups' => array(
+						'text' => T_('User groups'),
+						'href' => '?ctrl=groups' ),
+					'usersettings' => array(
+						'text' => T_('User settings'),
+						'href' => '?ctrl=usersettings',
+						'entries' => array(
 							'usersettings' => array(
-								'text' => T_('User settings'),
-								'href' => '?ctrl=usersettings',
-								'entries' => array(
-									'usersettings' => array(
-										'text' => T_('User latitude'),
-										'href' => '?ctrl=usersettings' ),
-									'registration' => array(
-										'text' => T_('Registration'),
-										'href' => '?ctrl=registration' ),
-									'display' => array(
-										'text' => T_('Display'),
-										'href' => '?ctrl=display' ),
-									'userfields' => array(
-										'text' => T_('User fields'),
-										'href' => '?ctrl=userfields' ),
-									),
-								),
-							);
+								'text' => T_('Profiles'),
+								'href' => '?ctrl=usersettings' ),
+							'registration' => array(
+								'text' => T_('Registration'),
+								'href' => '?ctrl=registration' ),
+							'display' => array(
+								'text' => T_('Display'),
+								'href' => '?ctrl=display' ),
+							'userfields' => array(
+								'text' => T_('User fields'),
+								'href' => '?ctrl=userfields' ),
+							),
+						),
+				);
 		}
 
 		$AdminUI->add_menu_entries( NULL, array( 'users' => $users_entries ) );
 
-		$perm_options = $current_User->check_perm( 'options', 'view' );
-		$perm_spam = $current_User->check_perm( 'spamblacklist', 'view' );
-		$perm_slugs = $current_User->check_perm( 'slugs', 'view' );
-		if( $perm_admin_normal && ( $perm_options || $perm_spam || $perm_slugs ) )
-		{	// Permission to view tools, antispam or slugs.
-			$tools_entries = array( 'tools' => array(
-					'text' => T_('Tools'),
-					'entries' => array(),
-				) );
 
-			if( $perm_options )
-			{	// Permission to view settings:
-				// FP> This assumes that we don't let regular users access the tools, including plugin tools.
-				$tools_entries['tools']['href'] = '?ctrl=crontab';
-				$tools_entries['tools']['entries']['cron'] = array(
-									'text' => T_('Scheduler'),
-									'href' => '?ctrl=crontab' );
-				$tools_entries['tools']['entries']['system'] = array(
-									'text' => T_('System'),
-									'href' => '?ctrl=system' );
-			}
-			if( $perm_spam )
-			{	// Permission to view antispam:
-				if( !$perm_options )
-				{
-					$tools_entries['tools']['href'] = '?ctrl=antispam';
-				}
-				$tools_entries['tools']['entries']['antispam'] = array(
-									'text' => T_('Antispam'),
-									'href' => '?ctrl=antispam' );
+		/**** System ****/
+		if( $perm_admin_normal && $perm_options )
+		{	// Permission to view settings:
+			$AdminUI->add_menu_entries( NULL, array(
+						'options' => array(
+							'text' => T_('System'),
+							'href' => $dispatcher.'?ctrl=system'
+				) ) );
 
+			$perm_spam = $current_User->check_perm( 'spamblacklist', 'view' );
+			$perm_slugs = $current_User->check_perm( 'slugs', 'view' );
+			$perm_emails = $current_User->check_perm( 'emails', 'view' );
+			if( $perm_admin_normal && ( $perm_options || $perm_spam || $perm_slugs ) )
+			{	// Permission to view tools, antispam or slugs.
 				if( $perm_options )
-				{	// If we have access to options, then we add a submenu:
-					$tools_entries['tools']['entries']['antispam']['entries']['blacklist'] = array(
-											'text' => T_('Blacklist'),
-											'href' => '?ctrl=antispam' );
-
-					$tools_entries['tools']['entries']['antispam']['entries']['settings'] = array(
-											'text' => T_('Settings'),
-											'href' => '?ctrl=antispam&amp;tab3=settings' );
-
-					if( $current_User->check_perm( 'options', 'edit' ) )
+				{	// Permission to view settings:
+					// FP> This assumes that we don't let regular users access the tools, including plugin tools.
+					$AdminUI->add_menu_entries( 'options', array(
+						'system' => array(
+							'text' => T_('Status'),
+							'href' => '?ctrl=system' ),
+						'cron' => array(
+							'text' => T_('Scheduler'),
+							'href' => '?ctrl=crontab' ) ) );
+				}
+				if( $perm_spam )
+				{	// Permission to view antispam:
+					/*if( !$perm_options )
 					{
-						$tools_entries['tools']['entries']['antispam']['entries']['tools'] = array(
-												'text' => T_('Tools'),
-												'href' => '?ctrl=antispam&amp;tab3=tools' );
+						$tools_entries['tools']['href'] = '?ctrl=antispam';
+					}*/
+					$AdminUI->add_menu_entries( 'options', array(
+						'antispam' => array(
+							'text' => T_('Antispam'),
+							'href' => '?ctrl=antispam',
+							'entries' => array(
+								'blacklist' => array(
+									'text' => T_('Blacklist'),
+									'href' => '?ctrl=antispam' ) ) ) ) );
+
+					if( $perm_options )
+					{	// If we have access to options, then we add a submenu:
+						$AdminUI->add_menu_entries( array( 'options', 'antispam' ), array(
+							'settings' => array(
+								'text' => T_('Settings'),
+								'href' => '?ctrl=antispam&amp;tab3=settings' ) ) );
+
+						if( $current_User->check_perm( 'options', 'edit' ) )
+						{
+							$AdminUI->add_menu_entries( array( 'options', 'antispam' ), array(
+								'tools' => array(
+									'text' => T_('Tools'),
+									'href' => '?ctrl=antispam&amp;tab3=tools' ) ) );
+						}
+						$AdminUI->add_menu_entries( array( 'options', 'antispam' ), array(
+							'ipranges' => array(
+								'text' => T_('IP Ranges'),
+								'href' => '?ctrl=antispam&amp;tab3=ipranges' ) ) );
 					}
 				}
-			}
-			if( $perm_slugs )
-			{	// Permission to view slugs:
-				if( !$perm_options && !$perm_spam )
-				{
-					$tools_entries['tools']['href'] = '?ctrl=slugs';
+
+				if( $perm_emails )
+				{	// Permission to view email management:
+					$AdminUI->add_menu_entries( 'options', array('email' => array(
+									'text' => T_('Email'),
+									'href' => '?ctrl=email',
+									'entries' => array(
+										'sent' => array(
+											'text' => T_('Sent'),
+											'href' => '?ctrl=email' ),
+										'blocked' => array(
+											'text' => T_('Addresses'),
+											'href' => '?ctrl=email&amp;tab=blocked' ),
+										'return' => array(
+											'text' => T_('Return Path'),
+											'href' => '?ctrl=email&amp;tab=return' ),
+										'settings' => array(
+											'text' => T_('Settings'),
+											'href' => '?ctrl=email&amp;tab=settings' ),
+										) ) ) );
 				}
-				$tools_entries['tools']['entries']['slugs'] = array(
-									'text' => T_('Slugs'),
-									'href' => '?ctrl=slugs' );
+
+				if( $perm_slugs )
+				{	// Permission to view slugs:
+					/*if( !$perm_options && !$perm_spam )
+					{
+						$tools_entries['tools']['href'] = '?ctrl=slugs';
+					}*/
+					$AdminUI->add_menu_entries( 'options', array(
+						'slugs' => array(
+							'text' => T_('Slugs'),
+							'href' => '?ctrl=slugs' ) ) );
+				}
 			}
-			$AdminUI->add_menu_entries( NULL, $tools_entries );
+
+
+			$AdminUI->add_menu_entries( 'options', array(
+				'general' => array(
+					'text' => T_('General'),
+					'href' => '?ctrl=gensettings' ),
+				'regional' => array(
+					'text' => T_('Regional'),
+					'href' => '?ctrl=regional',
+					'entries' => array(
+						'locales' => array(
+							'text' => T_('Locales'),
+							'href' => '?ctrl=locales'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ) ),
+						'time' => array(
+							'text' => T_('Time'),
+							'href' => '?ctrl=time' ),
+						'countries' => array(
+							'text' => T_('Countries'),
+							'href' => '?ctrl=countries' ),
+						'regions' => array(
+							'text' => T_('Regions'),
+							'href' => '?ctrl=regions' ),
+						'subregions' => array(
+							'text' => T_('Sub-regions'),
+							'href' => '?ctrl=subregions' ),
+						'cities' => array(
+							'text' => T_('Cities'),
+							'href' => '?ctrl=cities' ),
+						'currencies' => array(
+							'text' => T_('Currencies'),
+							'href' => '?ctrl=currencies' ),
+						) ),
+				'plugins' => array(
+					'text' => T_('Plugins'),
+					'href' => '?ctrl=plugins'),
+				'remotepublish' => array(
+					'text' => T_('Remote Publishing'),
+					'href' => '?ctrl=remotepublish',
+					'entries' => array(
+						'eblog' => array(
+							'text' => T_('Post by Email'),
+							'href' => '?ctrl=remotepublish&amp;tab=eblog' ),
+						'xmlrpc' => array(
+							'text' => T_('XML-RPC'),
+							'href' => '?ctrl=remotepublish&amp;tab=xmlrpc' )
+					) ),
+			) );
 		}
+
 	}
 }
 
@@ -1097,321 +1538,8 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
- * Revision 1.94  2011/10/24 18:32:35  efy-yurybakh
- * Groups for user fields
- *
- * Revision 1.93  2011/10/18 00:04:45  fplanque
- * i18n update
- *
- * Revision 1.92  2011/10/17 20:14:24  sam2kb
- * Post by Email converted into internal scheduled job
- *
- * Revision 1.91  2011/10/12 16:09:16  efy-yurybakh
- * Regional settings menu refactoring
- *
- * Revision 1.90  2011/10/11 18:26:10  efy-yurybakh
- * In skin posting (beta)
- *
- * Revision 1.89  2011/10/10 20:04:09  fplanque
- * i18n cleanup
- *
- * Revision 1.88  2011/10/08 07:23:29  efy-yurybakh
- * In skin posting
- *
- * Revision 1.87  2011/10/07 00:40:23  fplanque
- * fix
- *
- * Revision 1.86  2011/10/04 13:06:26  efy-yurybakh
- * Additional Display settings
- *
- * Revision 1.85  2011/10/03 07:02:21  efy-yurybakh
- * bubbletips & identity_links cleanup
- *
- * Revision 1.84  2011/09/30 10:16:50  efy-yurybakh
- * Make a big sprite with all backoffice icons
- *
- * Revision 1.83  2011/09/29 16:42:18  efy-yurybakh
- * colored login
- *
- * Revision 1.82  2011/09/23 11:30:51  efy-yurybakh
- * Make a big sprite with all backoffice icons
- *
- * Revision 1.81  2011/09/22 07:43:43  efy-yurybakh
- * icons in a single sprite
- *
- * Revision 1.80  2011/09/15 08:58:45  efy-asimo
- * Change user tabs display
- *
- * Revision 1.79  2011/09/13 16:00:18  fplanque
- * Enhanced back-office navigation.
- *
- * Revision 1.78  2011/09/13 15:31:35  fplanque
- * Enhanced back-office navigation.
- *
- * Revision 1.77  2011/09/06 00:54:38  fplanque
- * i18n update
- *
- * Revision 1.76  2011/09/05 23:00:25  fplanque
- * minor/doc/cleanup/i18n
- *
- * Revision 1.75  2011/09/05 14:17:25  sam2kb
- * Refactor antispam controller
- *
- * Revision 1.74  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.73  2011/05/11 07:11:51  efy-asimo
- * User settings update
- *
- * Revision 1.72  2011/04/06 13:30:55  efy-asimo
- * Refactor profile display
- *
- * Revision 1.71  2011/02/23 21:45:18  fplanque
- * minor / cleanup
- *
- * Revision 1.70  2011/02/22 06:51:06  efy-asimo
- * Fix right menu
- *
- * Revision 1.69  2011/02/15 15:37:00  efy-asimo
- * Change access to admin permission
- *
- * Revision 1.68  2010/11/04 18:29:46  sam2kb
- * View personal blogs in user profile
- *
- * Revision 1.67  2010/11/03 19:44:14  sam2kb
- * Increased modularity - files_Module
- * Todo:
- * - split core functions from _file.funcs.php
- * - check mtimport.ctrl.php and wpimport.ctrl.php
- * - do not create demo Photoblog and posts with images (Blog A)
- *
- * Revision 1.66  2010/10/15 13:10:09  efy-asimo
- * Convert group permissions to pluggable permissions - part1
- *
- * Revision 1.65  2010/06/13 22:29:05  sam2kb
- * minor
- *
- * Revision 1.64  2010/06/01 11:33:19  efy-asimo
- * Split blog_comments advanced permission (published, deprecated, draft)
- * Use this new permissions (Antispam tool,when edit/delete comments)
- *
- * Revision 1.63  2010/05/10 14:26:17  efy-asimo
- * Paged Comments & filtering & add comments listview
- *
- * Revision 1.62  2010/04/23 09:39:44  efy-asimo
- * "SEO setting" for help link and Groups slugs permission implementation
- *
- * Revision 1.61  2010/03/29 12:25:30  efy-asimo
- * allow multiple slugs per post
- *
- * Revision 1.60  2010/02/26 15:52:20  efy-asimo
- * combine skin and skin settings tab into one single tab
- *
- * Revision 1.59  2010/02/08 17:51:26  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.58  2010/01/30 18:55:15  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.57  2010/01/10 23:24:09  fplanque
- * crumbs...
- *
- * Revision 1.56  2009/12/12 19:14:12  fplanque
- * made avatars optional + fixes on img props
- *
- * Revision 1.55  2009/12/06 22:55:21  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.54  2009/12/02 02:22:36  fplanque
- * add menu entry
- *
- * Revision 1.53  2009/11/30 23:16:24  fplanque
- * basic cache invalidation is working now
- *
- * Revision 1.52  2009/11/22 19:06:48  efy-maxim
- * show all user tabs
- *
- * Revision 1.51  2009/11/21 16:39:55  fplanque
- * fix / doc
- *
- * Revision 1.50  2009/11/21 13:31:57  efy-maxim
- * 1. users controller has been refactored to users and user controllers
- * 2. avatar tab
- * 3. jQuery to show/hide custom duration
- *
- * Revision 1.49  2009/11/15 20:01:09  fplanque
- * todo
- *
- * Revision 1.48  2009/11/11 03:24:49  fplanque
- * misc/cleanup
- *
- * Revision 1.46  2009/10/26 12:59:34  efy-maxim
- * users management
- *
- * Revision 1.45  2009/10/25 19:20:30  efy-maxim
- * users settings
- *
- * Revision 1.44  2009/10/25 18:43:35  efy-maxim
- * -action
- *
- * Revision 1.43  2009/10/25 15:22:42  efy-maxim
- * user - identity, password, preferences tabs
- *
- * Revision 1.42  2009/10/18 20:15:51  efy-maxim
- * 1. backup, upgrade have been moved to maintenance module
- * 2. maintenance module permissions
- *
- * Revision 1.41  2009/10/17 16:49:10  efy-maxim
- * upgrade
- *
- * Revision 1.40  2009/10/17 16:31:32  efy-maxim
- * Renamed: T_groupsettings to T_groups__groupsettings, T_usersettings to T_users__usersettings
- *
- * Revision 1.39  2009/10/17 15:56:45  efy-maxim
- * updates has been moved from backup to updates folder
- *
- * Revision 1.38  2009/10/17 14:12:22  efy-maxim
- * Upgrader prototype
- *
- * Revision 1.37  2009/10/16 18:18:11  efy-maxim
- * files and database backup
- *
- * Revision 1.36  2009/10/12 23:54:56  blueyed
- * Return to current page when changing admin skin (via regenerate_url)
- *
- * Revision 1.35  2009/10/08 20:05:51  efy-maxim
- * Modular/Pluggable Permissions
- *
- * Revision 1.34  2009/09/24 21:05:39  fplanque
- * no message
- *
- * Revision 1.33  2009/09/24 10:15:21  efy-bogdan
- * Separate controller added for groups
- *
- * Revision 1.32  2009/09/23 09:38:52  efy-bogdan
- * Added group controller to controllers array
- *
- * Revision 1.31  2009/09/21 03:14:35  fplanque
- * modularized a little more
- *
- * Revision 1.30  2009/09/16 00:48:50  fplanque
- * getting a bit more serious with modules
- *
- * Revision 1.29  2009/09/15 19:31:55  fplanque
- * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
- * PHP 4 compatible. Even better on PHP 5.
- * I may have broken a few things. Sorry. This is pretty hard to do in one swoop without any glitch.
- * Thanks for fixing or reporting if you spot issues.
- *
- * Revision 1.28  2009/09/14 18:37:07  fplanque
- * doc/cleanup/minor
- *
- * Revision 1.27  2009/09/14 11:54:21  efy-bogdan
- * Moved Default user permissions under a new tab
- *
- * Revision 1.26  2009/09/11 18:34:05  fplanque
- * userfields editing module.
- * needs further cleanup but I think it works.
- *
- * Revision 1.25  2009/09/10 13:01:30  efy-maxim
- * Messaging module - added initializer
- *
- * Revision 1.24  2009/09/10 12:13:33  efy-maxim
- * Messaging Module
- *
- * Revision 1.23  2009/09/03 14:08:24  fplanque
- * minor
- *
- * Revision 1.22  2009/09/03 10:43:37  efy-maxim
- * Countries tab in Global Settings section
- *
- * Revision 1.21  2009/09/02 17:47:26  fplanque
- * doc/minor
- *
- * Revision 1.20  2009/09/02 06:23:58  efy-maxim
- * Currencies Tab in Global Settings
- *
- * Revision 1.19  2009/08/30 00:30:52  fplanque
- * increased modularity
- *
- * Revision 1.18  2009/08/29 12:23:55  tblue246
- * - SECURITY:
- * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.
- * 	- files.ctrl.php: Removed redundant calls to User::check_perm().
- * 	- XML-RPC APIs: Added missing permission checks.
- * 	- items.ctrl.php: Check permission to edit item with current status (also checks user levels) for update actions.
- * - XML-RPC client: Re-added check for zlib support (removed by update).
- * - XML-RPC APIs: Corrected method signatures (return type).
- * - Localization:
- * 	- Fixed wrong permission description in blog user/group permissions screen.
- * 	- Removed wrong TRANS comment
- * 	- de-DE: Fixed bad translation strings (double quotes + HTML attribute = mess).
- * - File upload:
- * 	- Suppress warnings generated by move_uploaded_file().
- * 	- File browser: Hide link to upload screen if no upload permission.
- * - Further code optimizations.
- *
- * Revision 1.17  2009/07/06 23:52:24  sam2kb
- * Hardcoded "admin.php" replaced with $dispatcher
- *
- * Revision 1.16  2009/07/02 18:08:50  fplanque
- * minor
- *
- * Revision 1.15  2009/05/26 19:31:49  fplanque
- * Plugins can now have Settings that are specific to each blog.
- *
- * Revision 1.14  2009/05/26 18:41:46  blueyed
- * Rename "Plugins install" to "Plugins". Shorter and it includes setup, too.
- *
- * Revision 1.13  2009/05/23 22:49:10  fplanque
- * skin settings
- *
- * Revision 1.12  2009/05/15 19:08:00  fplanque
- * doc
- *
- * Revision 1.11  2009/04/11 13:52:03  tblue246
- * evobar: Do not display a border when hovering the time
- *
- * Revision 1.10  2009/03/23 22:19:43  fplanque
- * evobar right menu is now also customizable by plugins
- *
- * Revision 1.9  2009/03/23 18:27:48  waltercruz
- * Fixing warn when blog=0
- *
- * Revision 1.8  2009/03/23 04:09:43  fplanque
- * Best. Evobar. Menu. Ever.
- * menu is now extensible by plugins
- *
- * Revision 1.7  2009/03/08 23:57:38  fplanque
- * 2009
- *
- * Revision 1.6  2009/03/07 21:35:09  blueyed
- * doc
- *
- * Revision 1.5  2009/02/24 22:58:19  fplanque
- * Basic version history of post edits
- *
- * Revision 1.4  2008/10/06 01:55:06  fplanque
- * User fields proof of concept.
- * Needs UserFieldDef and UserFieldDefCache + editing of fields.
- * Does anyone want to take if from there?
- *
- * Revision 1.3  2008/10/03 22:00:47  blueyed
- * Indent fixes
- *
- * Revision 1.2  2008/05/10 22:59:09  fplanque
- * keyphrase logging
- *
- * Revision 1.1  2008/04/06 19:19:29  fplanque
- * Started moving some intelligence to the Modules.
- * 1) Moved menu structure out of the AdminUI class.
- * It is part of the app structure, not the UI. Up to this point at least.
- * Note: individual Admin skins can still override the whole menu.
- * 2) Moved DB schema to the modules. This will be reused outside
- * of install for integrity checks and backup.
- * 3) cleaned up config files
+ * Revision 1.96  2013/11/06 08:03:47  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

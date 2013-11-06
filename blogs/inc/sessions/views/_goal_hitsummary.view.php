@@ -5,7 +5,7 @@
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -73,13 +73,13 @@ $Table->cols[] = array(
  *
  * @param Form
  */
-function filter_hits( & $Form )
+function filter_goal_hitsummary( & $Form )
 {
 	$Form->checkbox_basic_input( 'final', get_param('final'), T_('Final') );
 	$Form->text_input( 'goal_name', get_param('goal_name'), 20, T_('Goal names starting with'), '', array( 'maxlength'=>50 ) );
 }
 $Table->filter_area = array(
-	'callback' => 'filter_hits',
+	'callback' => 'filter_goal_hitsummary',
 	'url_ignore' => 'final,goal_name',
 	'presets' => array(
 		'all' => array( T_('All'), '?ctrl=goals&amp;tab3=stats' ),
@@ -137,23 +137,8 @@ $Table->display_list_end();
 
 /*
  * $Log$
- * Revision 1.5  2011/09/04 22:13:18  fplanque
- * copyright 2011
- *
- * Revision 1.4  2010/02/08 17:53:55  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.3  2010/01/30 18:55:33  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.2  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.1  2008/04/24 01:56:08  fplanque
- * Goal hit summary
- *
- * Revision 1.1  2008/03/22 19:58:18  fplanque
- * missing views
+ * Revision 1.7  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

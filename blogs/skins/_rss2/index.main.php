@@ -225,9 +225,14 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 					), 'htmlfeed' );
 
 				$Item->content_teaser( array(
-						'disppage'    => 1,
-						'stripteaser' => false,
-						'format'      => 'htmlfeed',
+						'disppage'            => 1,
+						'stripteaser'         => false,
+						'format'              => 'htmlfeed',
+						'before_image'        => '<div>',
+						'before_image_legend' => '<div><i>',
+						'after_image_legend'  => '</i></div>',
+						'after_image'         => '</div>',
+						'image_size'          => 'fit-320x320',
 					) );
 
 				if( $feed_content == 'normal' )

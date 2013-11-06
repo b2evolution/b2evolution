@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -149,11 +149,8 @@ $Form->end_form( array( array( 'submit', 'actionArray[make_posts_from_files]', T
 	
 /*
  * $Log$
- * Revision 1.3  2011/09/23 01:29:05  fplanque
- * small changes
- *
- * Revision 1.2  2011/09/14 20:19:49  fplanque
- * cleanup
+ * Revision 1.4  2013/11/06 08:04:23  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

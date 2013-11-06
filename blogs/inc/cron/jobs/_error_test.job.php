@@ -14,11 +14,8 @@ return 100; /* Simulated error */
 
 /*
  * $Log$
- * Revision 1.1  2007/06/25 10:59:45  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.1  2006/06/26 23:09:34  fplanque
- * Really working cronjob environment :)
+ * Revision 1.2  2013/11/06 08:04:07  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

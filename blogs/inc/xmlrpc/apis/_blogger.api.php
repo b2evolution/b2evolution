@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @see http://manual.b2evolution.net/Blogger_API
  * @see http://www.blogger.com/developers/api/1_docs/
@@ -73,46 +73,21 @@ function blogger_newpost( $m )
 	$status = $publish ? 'published' : 'draft';
 	logIO("Publish: $publish -> Status: $status");
 
+	$title = xmlrpc_getposttitle( $content );
 	$cat_IDs = xmlrpc_getpostcategories( $content );
-	if( empty( $cat_IDs ) )
-	{ // There were no categories passed in the content:
-		if( ! $main_cat = $Blog->get_default_cat_ID() )
-		{	// No default category found for requested blog.
-			return xmlrpcs_resperror( 12 ); // User error 12
-		}
-		$cat_IDs = array( $main_cat );
-	}
-	else
-	{
-		$main_cat = $cat_IDs[0];
-	}
 
-	logIO( 'Current main cat: '.$main_cat );
-
-	// Check if category exists and can be used
-	if( ! xmlrpcs_check_cats( $main_cat, $Blog, $cat_IDs ) )
-	{	// Error
-		return xmlrpcs_resperror();
-	}
-
-	logIO( 'New main cat: '.$main_cat );
-
-	// CHECK PERMISSION: (we need perm on all categories, especially if they are in different blogs)
-	if( ! $current_User->check_perm( 'cats_post!'.$status, 'edit', false, $cat_IDs ) )
-	{	// Permission denied
-		return xmlrpcs_resperror( 3 );	// User error 3
-	}
-	logIO( 'Permission granted.' );
-
-	$post_date = date('Y-m-d H:i:s', (time() + $Settings->get('time_difference')));
-	// Extract <title> from content
-	$post_title = xmlrpc_getposttitle( $content );
-	// cleanup content from extra tags like <category> and <title>:
+	// Cleanup content from extra tags like <category> and <title>:
 	$content = xmlrpc_removepostdata( $content );
 
+	$params = array(
+			'title'		=> $title,
+			'content'	=> $content,
+			'cat_IDs'	=> $cat_IDs,
+			'status'	=> $status,
+		);
 
 	// COMPLETE VALIDATION & INSERT:
-	return xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_IDs, $status );
+	return xmlrpcs_new_item( $params, $Blog );
 }
 
 
@@ -154,7 +129,7 @@ function blogger_editpost($m)
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
-	
+
 	// GET POST:
 	/**
 	 * @var Item
@@ -178,47 +153,31 @@ function blogger_editpost($m)
 	$status = $publish ? 'published' : 'draft';
 	logIO("Publish: $publish -> Status: $status");
 
+	$title = xmlrpc_getposttitle( $content );
 	$cat_IDs = xmlrpc_getpostcategories( $content );
-	if( empty( $cat_IDs ) )
-	{ // There were no categories passed in the content:
-		$main_cat = $edited_Item->main_cat_ID;
-		$cat_IDs = array( $main_cat );
-	}
-	else
-	{
-		$main_cat = $cat_IDs[0];
-	}
 
-	// Check if category exists and can be used
-	$Blog = & $edited_Item->get_Blog();
-	if( ! xmlrpcs_check_cats( $main_cat, $Blog, $cat_IDs ) )
-	{	// Error
-		return xmlrpcs_resperror();
-	}
+	// Cleanup content from extra tags like <category> and <title>:
+	$content = xmlrpc_removepostdata( $content );
 
-	logIO( 'Main cat: '.$main_cat );
+	$params = array(
+			'title'		=> $title,
+			'content'	=> $content,
+			'cat_IDs'	=> $cat_IDs,
+			'status'	=> $status,
+		);
 
-	// CHECK PERMISSION: (we need perm on all categories, especially if they are in different blogs)
-	if( ! $current_User->check_perm( 'cats_post!'.$status, 'edit', false, $cat_IDs ) )
-	{	// Permission denied
-		return xmlrpcs_resperror( 3 );	// User error 3
-	}
-	logIO( 'Permission granted.' );
-
-	$post_date = NULL;
-	$post_title = xmlrpc_getposttitle($content);
-	$content = xmlrpc_removepostdata($content);
-
-
-	// COMPLETE VALIDATION & UPDATE:
-	return xmlrpcs_edit_item( $edited_Item, $post_title, $content, $post_date, $main_cat, $cat_IDs, $status );
+	// COMPLETE VALIDATION & INSERT:
+	return xmlrpcs_edit_item( $edited_Item, $params );
 }
 
 
 
 
 $bloggerdeletepost_doc = 'Deletes a post, blogger-api like';
-$bloggerdeletepost_sig = array(array($xmlrpcBoolean, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcBoolean));
+$bloggerdeletepost_sig = array(
+		array($xmlrpcBoolean, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcBoolean),
+		array($xmlrpcBoolean, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString),
+	);
 /**
  * blogger.deletePost deletes a given post.
  *
@@ -237,7 +196,22 @@ $bloggerdeletepost_sig = array(array($xmlrpcBoolean, $xmlrpcString, $xmlrpcStrin
  */
 function blogger_deletepost($m)
 {
-	return _mw_blogger_deletepost( $m );
+	// CHECK LOGIN:
+	if( ! $current_User = & xmlrpcs_login( $m, 2, 3 ) )
+	{	// Login failed, return (last) error:
+		return xmlrpcs_resperror();
+	}
+
+	// GET POST:
+	/**
+	 * @var Item
+	 */
+	if( ! $edited_Item = & xmlrpcs_get_Item( $m, 1 ) )
+	{	// Failed, return (last) error:
+		return xmlrpcs_resperror();
+	}
+
+	return xmlrpcs_delete_item( $edited_Item );
 }
 
 
@@ -467,7 +441,7 @@ function blogger_getrecentposts( $m )
 	{
 		logIO( 'Item:'.$Item->title.
 					' - Issued: '.$Item->issue_date.
-					' - Modified: '.$Item->mod_date );
+					' - Modified: '.$Item->datemodified );
 
 		$post_date = mysql2date('U', $Item->issue_date);
 		$post_date = gmdate('Ymd', $post_date).'T'.gmdate('H:i:s', $post_date);
@@ -533,88 +507,8 @@ $xmlrpc_procs['blogger.getRecentPosts'] = array(
 
 /*
  * $Log$
- * Revision 1.17  2011/09/04 22:13:23  fplanque
- * copyright 2011
- *
- * Revision 1.16  2010/02/28 13:42:07  efy-yury
- * move APIs permissions check in xmlrpcs_login func
- *
- * Revision 1.15  2010/02/26 16:18:52  efy-yury
- * add: permission "Can use APIs"
- *
- * Revision 1.14  2010/02/08 17:55:17  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.13  2010/01/30 18:55:36  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.12  2009/09/18 19:09:04  tblue246
- * XML-RPC: Check extracats in addition to maincat before calling check_perm(). Fixes debug_die()ing and sends an XML-RPC error instead.
- *
- * Revision 1.11  2009/09/14 13:56:13  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.10  2009/09/02 13:45:39  waltercruz
- * Fixing Undefined variable
- *
- * Revision 1.9  2009/09/01 16:44:57  waltercruz
- * Generic functions to avoid alias and allow enable/disabling of specific APIs on future
- *
- * Revision 1.8  2009/08/29 12:23:56  tblue246
- * - SECURITY:
- * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.
- * 	- files.ctrl.php: Removed redundant calls to User::check_perm().
- * 	- XML-RPC APIs: Added missing permission checks.
- * 	- items.ctrl.php: Check permission to edit item with current status (also checks user levels) for update actions.
- * - XML-RPC client: Re-added check for zlib support (removed by update).
- * - XML-RPC APIs: Corrected method signatures (return type).
- * - Localization:
- * 	- Fixed wrong permission description in blog user/group permissions screen.
- * 	- Removed wrong TRANS comment
- * 	- de-DE: Fixed bad translation strings (double quotes + HTML attribute = mess).
- * - File upload:
- * 	- Suppress warnings generated by move_uploaded_file().
- * 	- File browser: Hide link to upload screen if no upload permission.
- * - Further code optimizations.
- *
- * Revision 1.7  2009/08/27 16:01:34  tblue246
- * Replaced unnecessary double quotes with single quotes
- *
- * Revision 1.6  2009/03/08 23:57:46  fplanque
- * 2009
- *
- * Revision 1.5  2009/03/03 21:21:10  blueyed
- * Deprecate get_the_category_by_ID and replace its usage with ChapterCache
- * in core.
- *
- * Revision 1.4  2009/02/25 22:17:53  blueyed
- * ItemLight: lazily load blog_ID and main_Chapter.
- * There is more, but I do not want to skim the diff again, after
- * "cvs ci" failed due to broken pipe.
- *
- * Revision 1.3  2008/05/04 23:01:05  blueyed
- * fix fatal phpdoc errors
- *
- * Revision 1.2  2008/01/18 15:53:42  fplanque
- * Ninja refactoring
- *
- * Revision 1.1  2008/01/14 07:22:07  fplanque
- * Refactoring
- *
- * Revision 1.7  2008/01/13 19:43:26  fplanque
- * minor
- *
- * Revision 1.6  2008/01/13 04:07:12  fplanque
- * XML-RPC API debugging
- *
- * Revision 1.5  2008/01/13 03:12:06  fplanque
- * XML-RPC API debugging
- *
- * Revision 1.4  2008/01/12 22:51:11  fplanque
- * RSD support
- *
- * Revision 1.3  2008/01/12 08:06:15  fplanque
- * more xmlrpc tests
+ * Revision 1.19  2013/11/06 08:05:10  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

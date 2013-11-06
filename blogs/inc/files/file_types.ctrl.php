@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -58,9 +58,14 @@ if( isset($edited_Filetype) && ($edited_Filetype !== false) )
 																	'">'.$edited_Filetype->dget('name').'</a>&raquo;' );
 }
 
+if( $demo_mode && !empty($action) )
+{
+	$Messages->add( 'You cannot make any edits on this screen while in demo mode.', 'error' );
+	$action = '';
+}
+
 switch( $action )
 {
-
 	case 'new':
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
@@ -93,10 +98,10 @@ switch( $action )
 
 	case 'create':
 		// Insert new file type...:
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'filetype' );
-		
+
 		$edited_Filetype = new Filetype();
 
 		// Check permission:
@@ -132,7 +137,7 @@ switch( $action )
 
 	case 'update':
 		// Edit file type form...:
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'filetype' );
 
@@ -159,7 +164,7 @@ switch( $action )
 
 	case 'delete':
 		// Delete file type:
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'filetype' );
 
@@ -189,8 +194,8 @@ switch( $action )
 			}
 		}
 		break;
-
 }
+
 
 /**
  * We need make this call to build menu for all modules
@@ -203,7 +208,7 @@ $AdminUI->set_path( 'files', 'settings', 'filetypes' );
 
 // fp> TODO: this here is a bit sketchy since we have Blog & fileroot not necessarilly in sync. Needs investigation / propositions.
 // Note: having both allows to post from any media dir into any blog.
-$AdminUI->breadcrumbpath_init();
+$AdminUI->breadcrumbpath_init( false );
 $AdminUI->breadcrumbpath_add( T_('Files'), '?ctrl=files&amp;blog=$blog$' );
 $AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=fileset' );
 $AdminUI->breadcrumbpath_add( T_('File types'), '?ctrl=filetypes' );
@@ -258,61 +263,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.16  2011/09/04 22:13:15  fplanque
- * copyright 2011
- *
- * Revision 1.15  2010/07/13 07:10:15  efy-asimo
- * Group file settings and file types tabs into a single Settings tab, with a 3rd level selection
- *
- * Revision 1.14  2010/02/08 17:52:14  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.13  2010/01/30 18:55:24  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.12  2010/01/23 12:54:49  efy-yury
- * add: fadeouts
- *
- * Revision 1.11  2010/01/11 16:06:37  efy-yury
- * More crumbs
- *
- * Revision 1.10  2010/01/10 17:57:54  efy-yury
- * minor: replace $redirect_url on constant value
- *
- * Revision 1.9  2010/01/09 21:07:06  blueyed
- * fix typo
- *
- * Revision 1.8  2010/01/09 13:30:12  efy-yury
- * added redirect 303 for prevent dublicate sql executions
- *
- * Revision 1.7  2010/01/03 12:03:17  fplanque
- * More crumbs...
- *
- * Revision 1.6  2009/12/06 22:55:17  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.5  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.4  2009/08/30 19:54:24  fplanque
- * less translation messgaes for infrequent errors
- *
- * Revision 1.3  2009/03/08 23:57:42  fplanque
- * 2009
- *
- * Revision 1.2  2008/01/21 09:35:28  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 10:59:51  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.13  2007/04/26 00:11:13  fplanque
- * (c) 2007
- *
- * Revision 1.12  2006/11/26 01:42:08  fplanque
- * doc
+ * Revision 1.18  2013/11/06 08:04:08  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

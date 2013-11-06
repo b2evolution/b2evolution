@@ -1,15 +1,15 @@
 /* Designed by François PLANQUE - http://fplanque.net/ */
 
-@import url("../../rsc/css/basic.css");	/* Import basic styles */
-@import url("../../rsc/css/blog_base.css");	/* Default styles for the blog navigation */
-@import url("../../rsc/css/item_base.css");	/* Default styles for the post CONTENT */
-
 body {
 	background-color: #e8f2f5;
 	padding: 0;
 	margin: 0;
 	color: #666;
 	font: 84% Arial, Helvetica, sans-serif;
+}
+
+textarea, input, select, option, optgroup, ul.ui-autocomplete, li.token-input-token-facebook, div.token-input-dropdown-facebook {
+	font: 13.43px Arial,Helvetica,sans-serif;
 }
 
 a {
@@ -176,9 +176,8 @@ div.action_messages {
 	margin: 0 0 4ex;
 	padding: 0 0 0 30px;
 	/* background-color:#00FF33; */
-	background-image: url(img/arrow-right-big.gif);
-	background-repeat: no-repeat;
-	background-position: 5px 3px;	/* border: 1px solid #78a; */
+	background: url(img/icons.png) no-repeat 5px -36px;
+	/* border: 1px solid #78a; */
 }
 .bSmallHead {
 	padding: 5px 0 7px;
@@ -190,6 +189,9 @@ div.action_messages {
 	color: #000;
 	font-size: 150%;
 	margin: 0 0;
+}
+.bTitle.linked a {
+	color: #000;
 }
 .bText {
 	margin-top: 0px;
@@ -226,6 +228,7 @@ form.bComment {
 	border: 0;
 	margin: 0;
 	padding: 0;
+	clear: both;
 }
 
 input.bComment,
@@ -267,30 +270,30 @@ select.bComment  /* Used by the profile form */
 	font-variant:small-caps;
 }
 .bSideItem ul {
-	margin-left: 8px;
-	padding-left: 8px;
+	margin-left: 0;
+	padding-left: 0;
 	margin-top: 8px;
 	margin-bottom: 8px;
 	list-style-type:square;
 }
 .bSideItem ul ul{
-	margin-left: 8px;
-	padding-left: 8px;
 	margin-top: 0px;
 	margin-bottom: 0px;
 }
 
 .bSideItem li {
-	list-style-image: url(img/arrow-right-small.gif);
+	list-style: none;
 }
-
+.bSideItem li {
+	background: url(img/icons.png) no-repeat -18px 3px;
+	padding-left: 18px;
+}
 .bSideItem li a {
 	color: #666;
 }
 .bSideItem li a:hover {
 	color: #26aae8;
 }
-
 
 .dimmed
 {
@@ -304,14 +307,18 @@ form.search
 	margin-bottom: 0px;
 	margin: 1ex 0;
 }
-input.SearchField
+div.compact_search_form {
+	height: 22px;
+}
+div.compact_search_form input.SearchField, div.extended_search_form input.SearchField
 {
 	background-color: #fff;
 	border: 1px solid #26aae8;
 	padding: 2px;
-	width: 120px;
+	width: 124px;
 	height: 16px;
-	margin: 0ex;
+	margin: 0 3px 0 0;
+	float: left;
 }
 input.search_submit {
 	border: 0;
@@ -319,6 +326,9 @@ input.search_submit {
 	height: 22px;
 	background-image: url(img/search.gif);
 	color: #fff;
+	font-size: 0;
+	cursor: pointer;
+	float: left;
 }
 
 /* Calendar: */
@@ -361,14 +371,19 @@ ul.main_nav_links li {
 }
 
 /* Top menu */
+div.top_menu {
+	padding: 8px 0 50px 11px;
+}
 div.top_menu ul {
-	margin: 8px 0 30px 11px;
+	margin: 0;
 	padding: 0;
 	list-style-type:none;
 }
 div.top_menu li {
 	display: inline;
 	padding: 0 1em 0 0;
+	white-space: nowrap;
+	float: left;
 }
 div.top_menu a {
 	font-weight: bold;
@@ -384,4 +399,47 @@ div.top_menu a.selected {
 div.featured_post {
 	margin: 0 0 2ex 30px;
 	padding-bottom: 20px;
+}
+
+/* Icons */
+.mb_icon {
+	background: url(img/icons.png) no-repeat;
+	display: inline-block;
+}
+.mb_icon.envelope {
+	background-position: 0 -13px;
+	width: 13px;
+	height: 10px;
+	top: 2px;
+	position: relative;
+}
+.mb_icon.page {
+	background-position: 0 -24px;
+	width: 9px;
+	height: 12px;
+	top: 3px;
+	position: relative;
+}
+
+/* jQuery Tokeninput plugin */
+div.input ul.token-input-list-facebook {
+	width: 345px;
+}
+
+/* Not published comments display */
+#styled_content_block .bComment .status_draft,
+#styled_content_block .bComment .status_review,
+#styled_content_block .bComment .status_community,
+#styled_content_block .bComment .status_protected,
+#styled_content_block .bComment .status_private {
+	top: 0px;
+	left: 14px;
+}
+/* Not published posts display */
+#styled_content_block .bSmallHead .status_draft,
+#styled_content_block .bSmallHead .status_review,
+#styled_content_block .bSmallHead .status_community,
+#styled_content_block .bSmallHead .status_protected,
+#styled_content_block .bSmallHead .status_private {
+	top: 23px;
 }

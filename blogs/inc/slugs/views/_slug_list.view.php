@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -76,7 +76,7 @@ function filter_slugs( & $Form )
 }
 $Results->filter_area = array(
 	'callback' => 'filter_slugs',
-	'url_ignore' => 'slug_filter',
+	'url_ignore' => 'slug_filter,results_slug_page',
 	'presets' => array(
 		'all' => array( T_('All'), '?ctrl=slugs' ),
 		)
@@ -122,11 +122,17 @@ function get_target_ID( $Slug )
 	switch( $Slug->type )
 	{
 		case 'item':
-			return $Slug->itm_ID;
+			$r = $Slug->itm_ID;
+			break;
 
 		default:
-			return 'n.a.';
+			$r = 'n.a.';
 	}
+
+	if( is_null($r) )
+		$r = 'null';
+
+	return $r;
 }
 $Results->cols[] = array(
 			'th' => T_('Target'),
@@ -170,10 +176,10 @@ function get_target_coll( $Slug )
 					break;
 				// Other types permission check write here
 			}
-			
+
 			// permanent link to object
 			$coll = action_icon( T_('Permanent link to full entry'), 'permalink', $Slug->get_url_to_object( 'public_view' ) );
-			
+
 			if( $allow_edit )
 			{ // edit object link
 				$coll .= ' '.action_icon( sprintf( T_('Edit this %s...'), $Slug->get( 'type' ) ),
@@ -221,23 +227,8 @@ $Results->display();
 
 /*
  * $Log$
- * Revision 1.13  2011/09/04 22:13:20  fplanque
- * copyright 2011
- *
- * Revision 1.12  2010/10/27 03:39:13  sam2kb
- * Escape & quote SQL queries. Rearranged slugs list.
- *
- * Revision 1.11  2010/10/19 02:00:54  fplanque
- * MFB
- *
- * Revision 1.7.2.3  2010/10/19 00:33:16  fplanque
- * enhanced slug manager
- *
-* Revision 1.9  2010/07/28 08:15:36  efy-asimo
- * fix slug list view filtering
- *
- * Revision 1.7.2.2  2010/07/13 00:57:50  fplanque
- * doc
+ * Revision 1.15  2013/11/06 08:04:54  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

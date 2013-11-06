@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package htsrv
  *
@@ -15,9 +15,8 @@
 /**
  * Initialize everything:
  */
-require_once dirname(dirname(__FILE__)).'/conf/_config.php';
-
-require_once dirname(dirname(__FILE__)).'/inc/_main.inc.php';
+require_once dirname(__FILE__).'/../conf/_config.php';
+require_once $inc_path.'/_main.inc.php';
 
 param('cmt_ID', 'integer', '' );
 param('secret', 'string', '' );
@@ -226,37 +225,8 @@ else
 <?php
 /*
  * $Log$
- * Revision 1.18  2011/10/21 07:28:19  efy-asimo
- * Don't allow trash comments quick moderation
+ * Revision 1.20  2013/11/06 08:03:44  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.17  2011/10/21 07:10:47  efy-asimo
- * Comment quick moderation option
- *
- * Revision 1.16  2011/10/12 13:34:36  efy-asimo
- * Delete comment secret on comment update
- *
- * Revision 1.15  2011/10/12 00:34:09  fplanque
- * comment quick review, not just for drafts
- *
- * Revision 1.14  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.13  2011/05/19 17:47:07  efy-asimo
- * register for updates on a specific blog post
- *
- * Revision 1.12  2011/03/16 01:31:19  fplanque
- * minor
- *
- * Revision 1.11  2011/02/20 22:31:38  fplanque
- * minor / doc
- *
- * Revision 1.10  2010/11/09 16:29:14  sam2kb
- * Send content-type and no-cache headers
- *
- * Revision 1.9  2010/05/02 16:38:34  fplanque
- * minor
- *
- *
- * Created by efy-asimo
  */
 ?>

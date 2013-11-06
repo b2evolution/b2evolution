@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -72,7 +72,40 @@ global $AdminUI;
  */
 global $form_action;
 
+
+// Default params:
+$default_params = array(
+		'skin_form_params' => array(),
+	);
+
+if( isset( $params ) )
+{	// Merge with default params
+	$params = array_merge( $default_params, $params );
+}
+else
+{	// Use a default params
+	$params = $default_params;
+}
+
+// ------------------- PREV/NEXT USER LINKS -------------------
+user_prevnext_links( array(
+		'block_start'  => '<table class="prevnext_user"><tr>',
+		'prev_start'   => '<td width="33%">',
+		'prev_end'     => '</td>',
+		'prev_no_user' => '<td width="33%">&nbsp;</td>',
+		'back_start'   => '<td width="33%" class="back_users_list">',
+		'back_end'     => '</td>',
+		'next_start'   => '<td width="33%" class="right">',
+		'next_end'     => '</td>',
+		'next_no_user' => '<td width="33%">&nbsp;</td>',
+		'block_end'    => '</tr></table>',
+		'user_tab'     => 'userprefs'
+	) );
+// ------------- END OF PREV/NEXT USER LINKS -------------------
+
 $Form = new Form( $form_action, 'user_checkchanges' );
+
+$Form->switch_template_parts( $params['skin_form_params'] );
 
 if( !$user_profile_only )
 {
@@ -84,6 +117,7 @@ if( $is_admin )
 {
 	$form_title = get_usertab_header( $edited_User, 'userprefs', T_( 'Edit preferences' ) );
 	$form_class = 'fform';
+	$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
 }
 else
 {
@@ -100,37 +134,50 @@ $Form->begin_form( $form_class, $form_title );
 
 	$Form->hidden( 'user_ID', $edited_User->ID );
 	$Form->hidden( 'edited_user_login', $edited_User->login );
+	if( isset( $Blog ) )
+	{
+		$Form->hidden( 'blog', $Blog->ID );
+	}
 
-$Form->begin_fieldset( T_('Email communications') );
+$Form->begin_fieldset( T_('Communications').get_manual_link( 'user_preferences' ) );
 
-$email_fieldnote = '<a href="mailto:'.$edited_User->get('email').'">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
+$email_fieldnote = '<a href="mailto:'.$edited_User->get('email').'" class="roundbutton">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
 
 if( $action != 'view' )
 { // We can edit the values:
 	$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email'), $email_fieldnote, array( 'maxlength' => 100, 'required' => true ) );
-
-	$edited_User->get_Group();
-	$pm_disabled = ( ! $edited_User->Group->check_messaging_perm() );
-	$messaging_options = array(
-		array( 'PM', 1, T_( 'private messages on this site.' ), ( ( $edited_User->get( 'allow_msgform' ) % 2 == 1 ) && ( !$pm_disabled ) ), $pm_disabled ),
-		array( 'email', 2, T_( 'emails through a message form that will NOT reveal my email address.' ), $edited_User->get( 'allow_msgform' ) > 1 ) );
-	$Form->checklist( $messaging_options, 'edited_user_msgform', T_('Other users can send me') );
-
-  // User notification options/
-  if( $edited_User->check_perm( 'perm_messaging', 'reply' ) )
-  { // show messaging notification settings only if messaging is available for edited user
-    $notify_options[] = array( 'edited_user_notify_messages', 1, T_( 'I receive a private message.' ),  $UserSettings->get( 'notify_messages', $edited_User->ID ) );
-  }
-	$notify_options[] = array( 'edited_user_notify', 1, T_( 'a comment is published on one of <strong>my</strong> posts.' ), $edited_User->get( 'notify' ) );
-  $notify_options[] = array( 'edited_user_notify_moderation', 2, T_( 'a comment is awaiting moderation on one of <strong>my</strong> blogs.' ), $edited_User->get( 'notify_moderation' ) );
-	$Form->checklist( $notify_options, 'edited_user_notification', T_( 'Notify me by email whenever' ) );
+	$disabled = false;
 }
 else
 { // display only
 	$Form->info( T_('Email'), $edited_User->get('email'), $email_fieldnote );
-	$Form->info( T_('Message form'), ($edited_User->get('allow_msgform') ? T_('yes') : T_('no')) );
-	$Form->info( T_('Notifications'), ($edited_User->get('notify') ? T_('yes') : T_('no')) );
+	$disabled = true;
 }
+
+	$has_messaging_perm = $edited_User->check_perm( 'perm_messaging', 'reply', false );
+	$messaging_options = array(	array( 'PM', 1, T_( 'private messages on this site.' ), ( ( $UserSettings->get( 'enable_PM', $edited_User->ID ) ) && ( $has_messaging_perm ) ), !$has_messaging_perm || $disabled ) );
+	$emails_msgform = $Settings->get( 'emails_msgform' );
+	if( $emails_msgform == 'userset' )
+	{ // user can set
+		$messaging_options[] = array( 'email', 2, T_( 'emails through a message form that will NOT reveal my email address.' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $disabled );
+	}
+	elseif( ( $emails_msgform == 'adminset' ) && ( $current_User->check_perm( 'users', 'edit' ) ) )
+	{ // only administrator users can set and current User is in 'Administrators' group
+		$messaging_options[] = array( 'email', 2, T_( 'emails through a message form that will NOT reveal my email address. [Admin]' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $disabled );
+	}
+	$Form->checklist( $messaging_options, 'edited_user_msgform', T_('Other users can send me') );
+
+	$Form->radio_input( 'edited_user_email_format', $UserSettings->get( 'email_format',  $edited_User->ID ), array(
+				array(
+					'value'   => 'auto',
+					'label'   => T_('Automatic (HTML + Plain text)') ),
+				array(
+					'value'   => 'html',
+					'label'   => T_('HTML') ),
+				array(
+					'value'   => 'text',
+					'label'   => T_('Plain text') ),
+			), T_('Email format'), array( 'lines' => true ) );
 
 $Form->end_fieldset();
 
@@ -179,11 +226,12 @@ if( $action != 'view' )
 
 	// Session time out for the current user
 	$timeout_sessions = $UserSettings->get( 'timeout_sessions', $edited_User->ID );
+	$def_timeout_session = $Settings->get( 'timeout_sessions' );
 
 	if( empty( $timeout_sessions ) )
 	{
 		$timeout_sessions_selected = 'default';
-		$timeout_sessions = $Settings->get( 'timeout_sessions', $edited_User->ID );
+		$timeout_sessions = $def_timeout_session;
 	}
 	else
 	{
@@ -195,11 +243,12 @@ if( $action != 'view' )
 		$Form->radio_input( 'edited_user_timeout_sessions', $timeout_sessions_selected, array(
 					array(
 						'value'   => 'default',
-						'label'   => T_('use default duration'),
+						'label'   => T_('Use default duration.'),
+						'note'    => duration_format( $def_timeout_session ),
 						'onclick' => 'jQuery("#timeout_sessions_container").hide();' ),
 					array(
 						'value'   => 'custom',
-						'label'   => T_('use custom duration'),
+						'label'   => T_('Use custom duration...'),
 						'onclick' => 'jQuery("#timeout_sessions_container").show();' ),
 				), T_('Session timeout'), array( 'lines' => true ) );
 
@@ -221,12 +270,12 @@ if( $action != 'view' )
 		$Form->info( T_('Session timeout'), $timeout_sessions_selected );
 	}
 
-	$Form->checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show online'), T_('Check this to be displayed as online when visiting the site.') );
+	$Form->checkbox( 'edited_user_showonline', $UserSettings->get( 'show_online', $edited_User->ID ), T_('Show online'), T_('Check this to be displayed as online when visiting the site.') );
 }
 else
 { // display only
 	$Form->info( T_('Preferred locale'), $edited_User->get('locale'), T_('Preferred locale for admin interface, notifications, etc.') );
-	$Form->info( T_('Show online'), ($edited_User->get('showonline')) ? T_('yes') : T_('no') );
+	$Form->info( T_('Show online'), ( $UserSettings->get( 'show_online', $edited_User->ID ) ) ? T_('yes') : T_('no') );
 }
 
 $Form->end_fieldset();
@@ -247,89 +296,18 @@ if( $action != 'view' )
 	$Form->buttons( $action_buttons );
 }
 
+if( ( $current_User->ID == $edited_User->ID ) && isset( $Blog ) )
+{
+	$Form->info( '', '<a href="'.url_add_param( $Blog->gen_blogurl(), 'disp=closeaccount' ).'">'.T_( 'I want to close my account...' ).'</a>' );
+}
 
 $Form->end_form();
 
 
 /*
  * $Log$
- * Revision 1.25  2011/10/10 20:04:09  fplanque
- * i18n cleanup
- *
- * Revision 1.24  2011/10/07 00:40:01  fplanque
- * changed wording
- *
- * Revision 1.23  2011/10/06 06:18:29  efy-asimo
- * Add messages link to settings
- * Update messaging notifications
- *
- * Revision 1.22  2011/09/15 08:58:46  efy-asimo
- * Change user tabs display
- *
- * Revision 1.21  2011/09/12 06:41:06  efy-asimo
- * Change user edit forms titles
- *
- * Revision 1.20  2011/09/12 05:28:47  efy-asimo
- * User profile form refactoring
- *
- * Revision 1.19  2011/09/04 22:13:21  fplanque
- * copyright 2011
- *
- * Revision 1.18  2011/05/11 07:11:52  efy-asimo
- * User settings update
- *
- * Revision 1.17  2011/04/06 13:30:56  efy-asimo
- * Refactor profile display
- *
- * Revision 1.16  2011/02/23 21:45:18  fplanque
- * minor / cleanup
- *
- * Revision 1.15  2011/02/22 16:00:31  efy-asimo
- * fix deprecated warning
- *
- * Revision 1.14  2010/11/22 13:44:33  efy-asimo
- * Admin skin preferences update
- *
- * Revision 1.13  2010/11/18 13:56:06  efy-asimo
- * admin skin preferences
- *
- * Revision 1.12  2010/10/17 18:53:04  sam2kb
- * Added a link to delete edited user
- *
- * Revision 1.11  2010/08/24 08:20:19  efy-asimo
- * twitter plugin oAuth
- *
- * Revision 1.10  2010/03/01 07:52:51  efy-asimo
- * Set manual links to lowercase
- *
- * Revision 1.9  2010/02/14 14:18:39  efy-asimo
- * insert manual links
- *
- * Revision 1.8  2010/02/08 17:54:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.7  2010/01/03 17:45:21  fplanque
- * crumbs & stuff
- *
- * Revision 1.6  2010/01/03 13:45:37  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.5  2009/11/21 13:39:05  efy-maxim
- * 'Cancel editing' fix
- *
- * Revision 1.4  2009/11/21 13:31:59  efy-maxim
- * 1. users controller has been refactored to users and user controllers
- * 2. avatar tab
- * 3. jQuery to show/hide custom duration
- *
- * Revision 1.3  2009/10/28 15:11:55  efy-maxim
- * custom duration has been hidden for normal users
- *
- * Revision 1.2  2009/10/28 13:41:58  efy-maxim
- * default multiple sessions settings
- *
- * Revision 1.1  2009/10/28 10:02:42  efy-maxim
- * rename some php files
+ * Revision 1.27  2013/11/06 08:05:04  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

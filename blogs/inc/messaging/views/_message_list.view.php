@@ -3,7 +3,7 @@
  * This file is part of b2evolution - {@link http://b2evolution.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -37,7 +37,7 @@ if( !isset( $edited_Thread ) )
 	}
 }
 
-global $read_by_list;
+global $read_status_list, $leave_status_list;
 
 $creating = is_create_action( $action );
 
@@ -56,107 +56,55 @@ $params = array_merge( array(
 	'form_name' => 'messages_checkchanges',
 	'form_layout' => 'compact',
 	'redirect_to' => regenerate_url( 'action', '', '', '&' ),
-	'cols' => 80
+	'cols' => 80,
+	'skin_form_params' => array(),
 	), $params );
 
-if( $edited_Thread->check_thread_recipient( $current_User->ID ) )
-{	// Update message statuses
-	$DB->query( 'UPDATE T_messaging__threadstatus
-					SET tsta_first_unread_msg_ID = NULL
-					WHERE tsta_thread_ID = '.$edited_Thread->ID.'
-					AND tsta_user_ID = '.$current_User->ID );
-}
+// load Thread recipients
+$recipient_list = $edited_Thread->load_recipients();
+// load Thread recipient users into the UserCache
+$UserCache = & get_UserCache();
+$UserCache->load_list( $recipient_list );
 
-// Select all recipients
+// Select all recipients with their statuses
+$recipients_status_SQL = new SQL();
 
-$recipients_SQL = new SQL();
+$recipients_status_SQL->SELECT( 'tsta_user_ID as user_ID, tsta_first_unread_msg_ID, tsta_thread_leave_msg_ID' );
 
-$recipients_SQL->SELECT( 'GROUP_CONCAT(u.user_login ORDER BY u.user_login SEPARATOR \',\')' );
+$recipients_status_SQL->FROM( 'T_messaging__threadstatus' );
 
-$recipients_SQL->FROM( 'T_messaging__threadstatus mts
-								LEFT OUTER JOIN T_users u ON mts.tsta_user_ID = u.user_ID' );
+$recipients_status_SQL->WHERE( 'tsta_thread_ID = '.$edited_Thread->ID );
 
-$recipients_SQL->WHERE( 'mts.tsta_thread_ID = '.$edited_Thread->ID.'
-								AND mts.tsta_user_ID <> '.$current_User->ID );
-
-$recipients = explode( ',', $DB->get_var( $recipients_SQL->get() ) );
-
-// Select unread recipients
-
-$unread_recipients_SQL = new SQL();
-
-$unread_recipients_SQL->SELECT( 'mm.msg_ID, GROUP_CONCAT(uu.user_login ORDER BY uu.user_login SEPARATOR \',\') AS msg_unread' );
-
-$unread_recipients_SQL->FROM( 'T_messaging__message mm
-										LEFT OUTER JOIN T_messaging__threadstatus tsu ON mm.msg_ID = tsu.tsta_first_unread_msg_ID
-										LEFT OUTER JOIN T_users uu ON tsu.tsta_user_ID = uu.user_ID' );
-
-$unread_recipients_SQL->WHERE( 'mm.msg_thread_ID = '.$edited_Thread->ID );
-
-$unread_recipients_SQL->GROUP_BY( 'mm.msg_ID' );
-
-$unread_recipients_SQL->ORDER_BY( 'mm.msg_datetime' );
-
-$unread_recipients = array();
-
-// Create array for read by
-
-if( empty( $Blog ) )
-{	// Set avatar size for a case when blog is not defined
-	$avatar_size = 'crop-32x32';
-}
-else
-{	// Get avatar size from blog settings
-	$avatar_size = $Blog->get_setting('image_size_messaging');
-}
-
-foreach( $DB->get_results( $unread_recipients_SQL->get() ) as $row )
+$recipient_status_list = $DB->get_results( $recipients_status_SQL->get() );
+$read_status_list = array();
+$leave_status_list = array();
+foreach( $recipient_status_list as $row )
 {
-	if( !empty( $row->msg_unread ) )
-	{
-		$unread_recipients = array_merge( $unread_recipients, explode( ',', $row->msg_unread ) );
-	}
-
-	$read_recipiens = array_diff( $recipients, $unread_recipients );
-
-	asort( $read_recipiens );
-	asort( $unread_recipients );
-
-	$read_by = '';
-	if( !empty( $read_recipiens ) )
-	{
-		$read_by .= '<div>'.get_avatar_imgtags( $read_recipiens, true, false, $avatar_size, '', '', true, false );
-		if( !empty ( $unread_recipients ) )
-		{
-			$read_by .= '<br />';
-		}
-		$read_by .= '</div>';
-	}
-
-	if( !empty ( $unread_recipients ) )
-	{
-		$read_by .= '<div>'.get_avatar_imgtags( $unread_recipients, true, false, $avatar_size, '', '', false, false ).'</div>';
-	}
-
-	$read_by_list[$row->msg_ID] = $read_by ;
+	$read_status_list[ $row->user_ID ] = $row->tsta_first_unread_msg_ID;
+	$leave_status_list[ $row->user_ID ] = $row->tsta_thread_leave_msg_ID;
 }
-
+$is_recipient = $edited_Thread->check_thread_recipient( $current_User->ID );
+$leave_msg_ID = ( $is_recipient ? $leave_status_list[ $current_User->ID ] : NULL );
 
 // Create SELECT query:
-
 $select_SQL = new SQL();
 
-$select_SQL->SELECT( 	'mm.msg_ID, mm.msg_author_user_ID, mm.msg_thread_ID, mm.msg_datetime,
+$select_SQL->SELECT( 'mm.msg_ID, mm.msg_author_user_ID, mm.msg_thread_ID, mm.msg_datetime,
 						u.user_ID AS msg_user_ID, u.user_login AS msg_author,
 						u.user_firstname AS msg_firstname, u.user_lastname AS msg_lastname,
-						u.user_avatar_file_ID AS msg_user_avatar_ID, mm.msg_text' );
+						u.user_avatar_file_ID AS msg_user_avatar_ID,
+						mm.msg_text, '.$DB->quote( $edited_Thread->title ).' AS thread_title' );
 
 $select_SQL->FROM( 'T_messaging__message mm
 						LEFT OUTER JOIN T_users u ON u.user_ID = mm.msg_author_user_ID' );
 
 $select_SQL->WHERE( 'mm.msg_thread_ID = '.$edited_Thread->ID );
+if( !empty( $leave_msg_ID ) && ( !$perm_abuse_management ) )
+{
+	$select_SQL->WHERE_and( 'mm.msg_ID <= '.$leave_msg_ID );
+}
 
-$select_SQL->ORDER_BY( 'mm.msg_datetime' );
+$select_SQL->ORDER_BY( 'mm.msg_datetime DESC' );
 
 // Create COUNT query
 
@@ -206,7 +154,7 @@ function filter_messages( & $Form )
 $Results->filter_area = array(
 	'callback' => 'filter_messages',
 	'presets' => array(
-		'all' => array( T_('All'), get_messaging_url( 'messages' ).'&thrd_ID='.$edited_Thread->ID ),
+		'all' => array( T_('All'), get_dispctrl_url( 'messages', 'thrd_ID='.$edited_Thread->ID ) ),
 		)
 	);
 
@@ -214,19 +162,6 @@ $Results->filter_area = array(
  * Author col:
  */
 
-/**
- * Get user avatar
- *
- * @param integer user ID
- * @return string
- */
-function user_avatar( $user_ID )
-{
-	$UserCache = & get_UserCache();
-	$User = & $UserCache->get_by_ID( $user_ID );
-
-	return $User->get_avatar_imgtag( 'crop-80x80' );
-}
 /**
  * Create author cell for message list table
  *
@@ -237,73 +172,120 @@ function user_avatar( $user_ID )
  * @param integer avatar ID
  * @param string datetime
  */
-function author( $user_ID, $user_login, $user_first_name, $user_last_name, $user_avatar_ID, $datetime)
+function author( $user_ID, $datetime)
 {
-	$author = $user_login;
-
-	$avatar = user_avatar( $user_ID );
-
-	if( !empty( $avatar ) )
-	{
-		$author = $avatar.'<br /><b>'.$author.'</b>';
-	}
-
-	$full_name = '';
-
-	if( !empty( $user_first_name ) )
-	{
-		$full_name .= $user_first_name;
-	}
-
-	if( !empty( $user_last_name ) )
-	{
-		$full_name .= ' '.$user_last_name;
-	}
-
-	if( !empty( $full_name ) )
-	{
-		$author .= '<br /><b>'.$full_name.'</b>';
-	}
-
-	$identity_url = get_user_identity_url( $user_ID );
-
-	$UserCache = & get_UserCache();
-	$User = & $UserCache->get_by_ID( $user_ID );
-	$user_class = $User->get_gender_class();
-
-	if( empty( $identity_url ) )
-	{ // If current user doens't have an access to view profile page
-		$author = '<div class="'.$user_class.' center" rel="bubbletip_user_'.$user_ID.'">'.$author.'</div>';
-	}
-	else
-	{ // Current user can view the profile page
-		$link_title = T_( 'Show the user profile' );
-		$author = '<a href="'.$identity_url.'" title="'.$link_title.'" class="'.$user_class.' center overlay_link" style="display:block" rel="bubbletip_user_'.$user_ID.'">'.$author.'</a>';
-	}
-
-	return $author.'<span class="note">'.mysql2localedatetime( $datetime ).'</span>';
+	$author = get_user_avatar_styled( $user_ID, array( 'size' => 'crop-top-80x80' ) );
+	return $author.'<div class="note black">'.mysql2date( locale_datefmt().'<\b\r />'.str_replace( ':s', '', locale_timefmt() ), $datetime ).'</div>';
 }
 $Results->cols[] = array(
 		'th' => T_('Author'),
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'left top',
-		'td' => '%author( #msg_user_ID#, #msg_author#, #msg_firstname#, #msg_lastname#, #msg_user_avatar_ID#, #msg_datetime#)%'
+		'td_class' => 'center top',
+		'td' => '%author( #msg_user_ID#, #msg_datetime#)%'
 	);
 
+function format_msg_text( $msg_text, $thread_title )
+{
+	if( empty( $msg_text ) )
+	{
+		return format_to_output( $thread_title, 'htmlspecialchars' );
+	}
+
+	// WARNING: the messages may contain MALICIOUS HTML and javascript snippets. They must ALWAYS be ESCAPED prior to display!
+	$msg_text = htmlentities( $msg_text );
+
+	$msg_text = make_clickable( $msg_text );
+	$msg_text = preg_replace( '#<a #i', '<a rel="nofollow" target="_blank"', $msg_text );
+	$msg_text = nl2br( $msg_text );
+
+	return $msg_text;
+}
 /*
  * Message col
  */
 $Results->cols[] = array(
 		'th' => T_('Message'),
-		'td_class' => 'left top',
-		'td' => '~conditional( empty(#msg_text#), \''.format_to_output( $edited_Thread->title, 'htmlspecialchars' ).'\', \'%nl2br(#msg_text#)%\')~',
+		'td_class' => 'left top message_text',
+		'td' => '%format_msg_text( #msg_text#, #thread_title# )%',
 	);
 
 function get_read_by( $message_ID )
 {
-	global $read_by_list;
+	global $read_status_list, $leave_status_list, $Blog, $current_User, $perm_abuse_management;
 
-	return $read_by_list[$message_ID];
+	$UserCache = & get_UserCache();
+
+	if( empty( $Blog ) )
+	{	// Set avatar size for a case when blog is not defined
+		$avatar_size = 'crop-top-32x32';
+	}
+	else
+	{	// Get avatar size from blog settings
+		$avatar_size = $Blog->get_setting('image_size_messaging');
+	}
+
+	$read_recipients = array();
+	$unread_recipients = array();
+	foreach( $read_status_list as $user_ID => $first_unread_msg_ID )
+	{
+		if( $user_ID == $current_User->ID )
+		{ // Current user status: current user should not be displayed except in case of abuse management
+			if( $perm_abuse_management )
+			{ // current user has seen all received messages for sure, set first unread msg to NULL
+				$first_unread_msg_ID = NULL;
+			}
+			else
+			{ // not abuse management
+				continue;
+			}
+		}
+
+		$recipient_User = $UserCache->get_by_ID( $user_ID, false );
+		if( !$recipient_User )
+		{ // user not exists
+			continue;
+		}
+
+		$leave_msg_ID = $leave_status_list[ $user_ID ];
+		if( !empty( $leave_msg_ID ) && ( $leave_msg_ID < $message_ID ) )
+		{ // user has left the conversation and didn't receive this message
+			$left_recipients[] = $recipient_User->login;
+		}
+		elseif( empty( $first_unread_msg_ID ) || ( $first_unread_msg_ID > $message_ID ) )
+		{ // user has read all message from this thread or at least this message
+			// user didn't leave the conversation before this message
+			$read_recipients[] = $recipient_User->login;
+		}
+		else
+		{ // User didn't read this message, but didn't leave the conversation either
+			$unread_recipients[] = $recipient_User->login;
+		}
+	}
+
+	$read_by = '';
+	if( !empty( $read_recipients ) )
+	{ // There are users who have read this message
+		asort( $read_recipients );
+		$read_by .= '<div>'.get_avatar_imgtags( $read_recipients, true, false, $avatar_size, '', '', true, false );
+		if( !empty ( $unread_recipients ) )
+		{
+			$read_by .= '<br />';
+		}
+		$read_by .= '</div>';
+	}
+
+	if( !empty ( $unread_recipients ) )
+	{ // There are users who didn't read this message
+		asort( $unread_recipients );
+		$read_by .= '<div>'.get_avatar_imgtags( $unread_recipients, true, false, $avatar_size, '', '', false, false ).'</div>';
+	}
+
+	if( !empty ( $left_recipients ) )
+	{ // There are users who left the conversation before this message
+		asort( $left_recipients );
+		$read_by .= '<div>'.get_avatar_imgtags( $left_recipients, true, false, $avatar_size, '', '', 'left_message', false ).'</div>';
+	}
+	return $read_by;
 }
 
 $Results->cols[] = array(
@@ -323,14 +305,14 @@ function delete_action( $thrd_ID, $msg_ID )
 		{	// We are in Abuse Management
 			$tab = '&tab=abuse';
 		}
-		return action_icon( T_( 'Delete'), 'delete', regenerate_url( 'action', 'thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete'.$tab.'&'.url_crumb( 'message' ) ) );
+		return action_icon( T_( 'Delete'), 'delete', regenerate_url( 'action', 'thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete'.$tab.'&'.url_crumb( 'messaging_messages' ) ) );
 	}
 	else
 	{
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=messages&thrd_ID='.$thrd_ID );
-		$action_url = $samedomain_htsrv_url.'messaging.php?disp=messages&thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete';
+		$action_url = $samedomain_htsrv_url.'action.php?mname=messaging&disp=messages&thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete';
 		$action_url = url_add_param( $action_url, 'redirect_to='.rawurlencode( $redirect_to ), '&' );
-		return action_icon( T_( 'Delete'), 'delete', $action_url.'&'.url_crumb( 'message' ) );
+		return action_icon( T_( 'Delete'), 'delete', $action_url.'&'.url_crumb( 'messaging_messages' ) );
 	}
 }
 
@@ -344,181 +326,104 @@ if( $current_User->check_perm( 'perm_messaging', 'delete' ) && $Results->total_r
 						);
 }
 
-$Results->display( $display_params );
-
-echo '<div class="fieldset clear"></div>';
-
-if( $edited_Thread->check_thread_recipient( $current_User->ID ) )
-{	// Only involved in users can send a message
-	$Form = new Form( $params[ 'form_action' ], $params[ 'form_name' ], 'post', $params[ 'form_layout' ] );
-
-	$Form->begin_form( $params['form_class'], '' );
-
-		$Form->add_crumb( 'message' );
-		if( $perm_abuse_management )
-		{	// To back in the abuse management
-			memorize_param( 'tab', 'string', 'abuse' );
+if( $is_recipient )
+{ // Current user is involved in this thread, only involved users can send a message
+	// we had to check this because admin user can see all messages in 'Abuse management', but should not be able to reply
+	// get all available recipient in this thread
+	$available_recipients = array();
+	foreach( $recipient_list as $recipient_ID )
+	{
+		$recipient_User = & $UserCache->get_by_ID( $recipient_ID, false );
+		if( ( $recipient_ID != $current_User->ID ) && $recipient_User && !$recipient_User->check_status( 'is_closed' ) && empty( $leave_status_list[ $recipient_ID ] ) )
+		{
+			$available_recipients[ $recipient_ID ] = $recipient_User->login;
 		}
-		$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',msg_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
-		$Form->hidden( 'redirect_to', $params[ 'redirect_to' ] );
+	}
+	if( empty( $available_recipients ) )
+	{ // There are no other existing and not closed users who are still part of this conversation
+		echo '<span class="error">'.T_( 'You cannot reply because this conversation was closed.' ).'</span>';
+	}
+	elseif( !empty( $leave_msg_ID ) )
+	{ // Current user has already left this conversation
+		echo '<span class="error">'.T_( 'You cannot reply because you have already left this conversation.' ).'</span>';
+	}
+	else
+	{ // Current user is still part of this conversation, should be able to reply
+		$Form = new Form( $params[ 'form_action' ], $params[ 'form_name' ], 'post', $params[ 'form_layout' ] );
 
-		$Form->info_field(T_('Reply to'), get_avatar_imgtags( $recipients, true, true, 'crop-15x15', 'avatar_before_login mb1' ), array('required'=>true));
+		$Form->switch_template_parts( $params['skin_form_params'] );
 
-		$Form->textarea('msg_text', '', 10, T_('Message'), '', $params[ 'cols' ], '', true);
+		$Form->begin_form( $params['form_class'], '' );
 
-	$Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' ) ) );
+			$Form->add_crumb( 'messaging_messages' );
+			if( $perm_abuse_management )
+			{	// To back in the abuse management
+				memorize_param( 'tab', 'string', 'abuse' );
+			}
+			$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',msg_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
+			$Form->hidden( 'redirect_to', $params[ 'redirect_to' ] );
+
+			$Form->info_field(T_('Reply to'), get_avatar_imgtags( $available_recipients, true, true, 'crop-top-15x15', 'avatar_before_login mb1' ), array('required'=>true));
+
+			if( !empty( $closed_recipients ) )
+			{
+				$Form->info_field( '', T_( 'The other users involved in this conversation have closed their account.' ) );
+			}
+
+			$Form->textarea('msg_text', '', 10, T_('Message'), '', $params[ 'cols' ], '', true);
+
+		$Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' ) ) );
+	}
 }
+
+// Display Leave or Close conversation action if they are available
+if( $is_recipient && empty( $leave_msg_ID ) && ( count( $available_recipients ) > 0 ) )
+{ // user is recipient and didn't leave this conversation yet and this conversation is not closed
+	echo '<div class="fieldset">';
+	if( count( $available_recipients ) > 1 )
+	{ // there are more then one recipients
+		$leave_text = T_( 'I want to leave this conversation now!' );
+		$confirm_leave_text = TS_( 'If you leave this conversation,\\nother users can still continue the conversation\\nbut you will not receive their future replies.\\nAre you sure?' );
+		$leave_action = 'leave';
+	}
+	else
+	{ // only one recipient exists if the user leave the conversation then it will be closed.
+		$recipient_ID = key( $available_recipients );
+		$recipient_login = $available_recipients[$recipient_ID];
+		$leave_text = get_icon( 'stop', 'imgtag', array( 'style' => 'margin-right:5px' ) ).T_( 'I want to end this conversation now!' );
+		$block_text = get_icon( 'ban', 'imgtag', array( 'style' => 'margin:0 7px 2px 1px;vertical-align:middle;' ) ).sprintf( T_( 'I want to block %s from sending me any more messages!' ), $recipient_login );
+		$confirm_leave_text = T_( 'Are you sure you want to close this conversation?' );
+		$confirm_block_text = sprintf( TS_( 'This action will close this conversion\\nand will block %s from starting any new\\nconversation with you.\\n(You can see blocked users in your contacts list)\\nAre you sure you want to close and block?' ), $recipient_login );
+		$leave_action = 'close';
+	}
+	if( is_admin_page() )
+	{ // backoffice
+		$leave_url = '?ctrl=threads&thrd_ID='.$edited_Thread->ID.'&action='.$leave_action.'&'.url_crumb( 'messaging_threads' );
+		$close_and_block_url = '?ctrl=threads&thrd_ID='.$edited_Thread->ID.'&action=close_and_block&block_ID='.$recipient_ID.'&'.url_crumb( 'messaging_threads' );
+	}
+	else
+	{ // frontoffice
+		$leave_url = url_add_param( $params[ 'form_action' ], 'disp=threads&thrd_ID='.$edited_Thread->ID.'&action='.$leave_action.'&redirect_to='.rawurlencode( url_add_param( $Blog->gen_blogurl(), 'disp=threads', '&' ) ).'&'.url_crumb( 'messaging_threads' ) );
+		$close_and_block_url = url_add_param( $params[ 'form_action' ], 'disp=threads&thrd_ID='.$edited_Thread->ID.'&action=close_and_block&block_ID='.$recipient_ID.'&redirect_to='.rawurlencode( url_add_param( $Blog->gen_blogurl(), 'disp=threads', '&' ) ).'&'.url_crumb( 'messaging_threads' ) );
+	}
+	echo '<p>';
+	echo '<a href="'.$leave_url.'" onclick="return confirm( \''.$confirm_leave_text.'\' );">'.$leave_text.'</a>';
+	if( $leave_action == 'close' )
+	{ // user want's to close this conversation ( there is only one recipient )
+		echo '<br />';
+		echo '<a href="'.$close_and_block_url.'" onclick="return confirm( \''.$confirm_block_text.'\' );">'.$block_text.'</a>';
+	}
+	echo '</p>';
+	echo '</div>';
+}
+
+// Dispaly message list
+$Results->display( $display_params );
 
 /*
  * $Log$
- * Revision 1.49  2011/10/21 07:24:02  efy-yurybakh
- * Problems with messaging
- *
- * Revision 1.48  2011/10/17 18:33:53  efy-yurybakh
- * Messaging Abuse Management (don't allow posting in foreign threads)
- *
- * Revision 1.47  2011/10/15 07:15:02  efy-yurybakh
- * Messaging Abuse Management
- *
- * Revision 1.46  2011/10/14 19:02:14  efy-yurybakh
- * Messaging Abuse Management
- *
- * Revision 1.45  2011/10/13 16:02:14  efy-yurybakh
- * fix bug in the message list
- *
- * Revision 1.44  2011/10/08 01:27:05  fplanque
- * no message
- *
- * Revision 1.43  2011/10/08 01:12:16  fplanque
- * small changes
- *
- * Revision 1.42  2011/10/07 17:22:52  efy-yurybakh
- * user avatar display default
- *
- * Revision 1.41  2011/10/07 13:14:45  efy-yurybakh
- * Small messaging UI design changes (changed specs)
- *
- * Revision 1.40  2011/10/06 16:45:55  efy-yurybakh
- * small messaging UI design changes (additional email)
- *
- * Revision 1.39  2011/10/06 04:52:14  efy-asimo
- * fix
- *
- * Revision 1.38  2011/10/05 12:05:02  efy-yurybakh
- * Blog settings > features tab refactoring
- *
- * Revision 1.37  2011/10/03 12:00:33  efy-yurybakh
- * Small messaging UI design changes
- *
- * Revision 1.36  2011/09/27 07:45:58  efy-asimo
- * Front office messaging hot fixes
- *
- * Revision 1.35  2011/09/26 14:53:27  efy-asimo
- * Login problems with multidomain installs - fix
- * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
- *
- * Revision 1.34  2011/09/22 08:55:00  efy-asimo
- * Login problems with multidomain installs - fix
- *
- * Revision 1.33  2011/09/07 00:28:26  sam2kb
- * Replace non-ASCII character in regular expressions with ~
- *
- * Revision 1.32  2011/08/11 09:05:09  efy-asimo
- * Messaging in front office
- *
- * Revision 1.31  2011/05/11 07:11:51  efy-asimo
- * User settings update
- *
- * Revision 1.30  2011/02/15 15:37:00  efy-asimo
- * Change access to admin permission
- *
- * Revision 1.29  2011/02/10 23:07:21  fplanque
- * minor/doc
- *
- * Revision 1.28  2010/11/03 19:44:15  sam2kb
- * Increased modularity - files_Module
- * Todo:
- * - split core functions from _file.funcs.php
- * - check mtimport.ctrl.php and wpimport.ctrl.php
- * - do not create demo Photoblog and posts with images (Blog A)
- *
- * Revision 1.27  2010/01/30 18:55:32  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.26  2010/01/03 16:28:35  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.25  2009/12/07 23:07:34  blueyed
- * Whitespace.
- *
- * Revision 1.24  2009/11/21 13:31:59  efy-maxim
- * 1. users controller has been refactored to users and user controllers
- * 2. avatar tab
- * 3. jQuery to show/hide custom duration
- *
- * Revision 1.23  2009/10/11 12:15:51  efy-maxim
- * filter by author of the message and message text
- *
- * Revision 1.22  2009/10/10 10:45:44  efy-maxim
- * messaging module - @action_icon()@
- *
- * Revision 1.21  2009/10/08 20:05:52  efy-maxim
- * Modular/Pluggable Permissions
- *
- * Revision 1.20  2009/09/26 12:00:43  tblue246
- * Minor/coding style
- *
- * Revision 1.19  2009/09/25 07:32:53  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.18  2009/09/20 02:02:45  fplanque
- * fixed read/unread colors
- *
- * Revision 1.17  2009/09/18 10:38:31  efy-maxim
- * 15x15 icons next to login in messagin module
- *
- * Revision 1.16  2009/09/16 13:30:35  efy-maxim
- * A red close "X" on the right of the title bar of messages list
- *
- * Revision 1.15  2009/09/16 09:15:32  efy-maxim
- * Messaging module improvements
- *
- * Revision 1.14  2009/09/15 23:17:12  fplanque
- * minor
- *
- * Revision 1.13  2009/09/15 16:46:21  efy-maxim
- * 1. Avatar in Messages List has been added
- * 2. Duplicated recipients issue has been fixed
- *
- * Revision 1.12  2009/09/15 15:49:32  efy-maxim
- * "read by" column
- *
- * Revision 1.11  2009/09/14 19:33:02  efy-maxim
- * Some queries has been wrapped by SQL object
- *
- * Revision 1.10  2009/09/14 15:18:00  efy-maxim
- * 1. Recipients can be separated by commas or spaces.
- * 2. Message list: author, full name date in the first column.
- * 3. Message list: message in the second column
- *
- * Revision 1.9  2009/09/14 13:52:07  tblue246
- * Translation fixes; removed now pointless doc comment.
- *
- * Revision 1.8  2009/09/14 10:33:20  efy-maxim
- * messagin module improvements
- *
- * Revision 1.7  2009/09/14 07:31:43  efy-maxim
- * 1. Messaging permissions have been fully implemented
- * 2. Messaging has been added to evo bar menu
- *
- * Revision 1.6  2009/09/13 15:56:12  fplanque
- * minor
- *
- * Revision 1.5  2009/09/12 18:44:11  efy-maxim
- * Messaging module improvements
- *
- * Revision 1.4  2009/09/10 18:24:07  fplanque
- * doc
+ * Revision 1.51  2013/11/06 08:04:35  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

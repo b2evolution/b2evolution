@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -43,7 +43,7 @@ global $current_User;
  */
 global $Settings;
 
-global $rsc_subdir, $pagenow, $locales_path, $locales, $action, $edit_locale, $loc_transinfo, $template, $allow_po_extraction, $servertimenow, $allow_po_extraction;
+global $rsc_subdir, $conf_subdir, $pagenow, $locales_path, $locales, $action, $edit_locale, $loc_transinfo, $template, $allow_po_extraction;
 global $localtimenow;
 
 
@@ -53,7 +53,7 @@ if( $action == 'edit' )
 
 	$Form = new Form( $pagenow, 'loc_checkchanges' );
 
-	$Form->begin_form( 'fform', T_('Regional Settings') );
+	$Form->begin_form( 'fform' );
 
 	$Form->add_crumb( 'locales' );
 	$Form->hidden( 'ctrl', 'locales' );
@@ -81,8 +81,9 @@ if( $action == 'edit' )
 	{ // we need to remember this for updating locale
 		$Form->hidden( 'oldloc_locale', $newlocale );
 	}
+	$Form->hidden( 'newloc_transliteration_map', (isset($ltemplate['transliteration_map']) ? base64_encode(serialize($ltemplate['transliteration_map'])) : '') );
 
-	$Form->begin_fieldset();
+	$Form->begin_fieldset( T_('Locale settings') );
 	$Form->text( 'newloc_locale', $newlocale, 20, T_('Locale'), sprintf(T_('The first two letters should be a <a %s>ISO 639 language code</a>. The last two letters should be a <a %s>ISO 3166 country code</a>.'), 'href="http://www.gnu.org/software/gettext/manual/html_chapter/gettext_15.html#SEC221"', 'href="http://www.gnu.org/software/gettext/manual/html_chapter/gettext_16.html#SEC222"'), 20 );
 	$Form->checkbox( 'newloc_enabled', (isset($ltemplate['enabled']) && $ltemplate['enabled']), T_('Enabled'),	T_('Should this locale be available to users?') );
 	$Form->text( 'newloc_name', (isset($ltemplate['name']) ? $ltemplate['name'] : ''), 40, T_('Name'),
@@ -116,7 +117,7 @@ if( $action == 'edit' )
 	?>
 	<div class="panelinfo">
 		<h3><?php echo T_('Flags') ?></h3>
-		<p><?php printf(T_('The flags are stored in subdirectories of <code>%s</code>. Their filename is equal to the country part of the locale (characters 4-5); file extension is .gif .'), '/'.$rsc_subdir.'flags/'); ?></p>
+		<p><?php printf(T_('The flags are stored in the file <code>%s</code>. The config for background-position is located in the file %s and defined by array $country_flags_bg.'), '/'.$rsc_subdir.'icons/flags_sprite.png', '/'.$conf_subdir.'_locales.php'); ?></p>
 		<h3><?php echo T_('Date/Time Formats') ?></h3>
 		<p><?php echo T_('The following characters are recognized in the format strings:') ?></p>
 		<p>
@@ -163,50 +164,9 @@ if( $action == 'edit' )
 else
 { // show main form
 
-	// JavaScript function to calculate time difference: {{{
-	?>
-	<script type="text/javascript">
-
-	var server_Date = new Date();
-	server_Date.setTime( <?php echo $servertimenow.'000' ?> ); // milliseconds
-	var user_Date = new Date();
-
-	function calc_TimeDifference(min_dif) {
-		var ntd = user_Date.getTime() - server_Date.getTime();
-		ntd = ntd / 1000; // to seconds
-
-		ntd = ntd - 2; // assume that it takes 2 seconds from writing server_Date time into the source until the browser sets user_Date
-
-		var neg = ( ntd < 0 );
-		ntd = Math.abs(ntd);
-
-		var hours = Math.floor(ntd/3600);
-		var mins = Math.floor( (ntd%3600)/60 );
-		//var secs = Math.round( (ntd%3600)%60 );
-
-		//alert( server_Date+"\n"+user_Date+"\n"+ntd+"\nhours: "+hours+"\nmins: "+mins );
-
-		if( mins == 0 )
-		{
-			ntd = hours;
-		}
-		else
-		{
-			ntd = hours+':'+mins;
-		}
-
-		if( neg && ntd != '0' ) ntd = '-'+ntd;
-
-		// Apply the calculated time difference
-		document.getElementById('newtime_difference').value = ntd;
-	}
-	</script>
-
-	<?php // }}}
-
 	$Form = new Form( $pagenow, 'loc_checkchanges' );
 
-	$Form->begin_form( 'fform', T_('Regional Settings') );
+	$Form->begin_form( 'fform' );
 
 	$Form->add_crumb( 'locales' );
 	$Form->hidden( 'ctrl', 'locales' );
@@ -214,35 +174,6 @@ else
 	$Form->hidden( 'loc_transinfo', $loc_transinfo );
 
 	$Form->begin_fieldset( T_('Regional settings').get_manual_link('regional_settings') );
-
-	// Time difference:
-	$td_value = $Settings->get('time_difference');
-	$neg = ( $td_value < 0 );
-	$td_value = abs($td_value);
-	if( $td_value % 3600 != 0 )
-	{ // we have minutes
-		if( $td_value % 60 != 0 )
-		{ // we have seconds (hh:mm:ss)
-			$td_value = floor($td_value/3600).':'.sprintf( '%02d', ($td_value % 3600)/60 ).':'.sprintf( '%02d', ($td_value%60) );
-		}
-		else
-		{ // hh:mm
-			$td_value = floor($td_value/3600).':'.sprintf( '%02d', ($td_value % 3600)/60 );
-		}
-	}
-	else
-	{ // just full hours:
-		$td_value = $td_value/3600;
-	}
-
-	if($neg)
-	{
-		$td_value = '-'.$td_value;
-	}
-
-	$Form->text_input( 'newtime_difference', $td_value, 8 /* hh:mm:ss */, T_('Time difference'), sprintf( '['. T_('in hours, e.g. "1", "1:30" or "1.5"'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), '<span id="cur_servertime">'.date_i18n( locale_timefmt(), $servertimenow ).'</span>' )
-					.' <a href="#" onclick="calc_TimeDifference(); return false;">'.T_('Calculate time difference').'</a>',
-					array( 'maxlength'=> 8, 'required'=>true ) );
 
 	if( ! isset($locales[$Settings->get('default_locale')])
 		|| ! $locales[$Settings->get('default_locale')]['enabled'] )
@@ -261,7 +192,11 @@ else
 	echo '<p class="center">';
 	if( $loc_transinfo )
 	{
+		global $messages_pot_file_info;
+		$messages_pot_file_info = locale_file_po_info( $locales_path.'messages.pot' );
+
 		echo '<a href="'.$pagenow.'?ctrl=locales">' . T_('Hide translation info'), '</a><br />';
+		echo sprintf( T_('Number of strings in .POT file: %s'), $messages_pot_file_info['all'] ).'<br />';
 		if( $current_User->check_perm( 'options', 'edit' ) && !$allow_po_extraction )
 		{
 			echo '<span class="notes">';
@@ -323,6 +258,14 @@ else
 		<td class="firstcol left" title="<?php echo T_('Priority').': '.$locales[$lkey]['priority'].', '.T_('Charset').': '.$locales[$lkey]['charset'].', '.T_('Lang file').': '.$locales[$lkey]['messages'] ?>">
 			<?php
 			echo '<input type="hidden" name="loc_'.$i.'_locale" value="'.$lkey.'" />';
+
+			$transliteration_map = '';
+			if( isset($locales[$lkey]['transliteration_map']) && is_array($locales[$lkey]['transliteration_map']) )
+			{
+				$transliteration_map = base64_encode(serialize($locales[$lkey]['transliteration_map']));
+			}
+			echo '<input type="hidden" name="loc_'.$i.'_transliteration_map" value="'.$transliteration_map.'" />';
+
 			locale_flag( $lkey );
 			echo'
 			<strong>';
@@ -408,79 +351,18 @@ else
 			$po_file = $locales_path.$locales[$lkey]['messages'].'/LC_MESSAGES/messages.po';
 			if( ! is_file( $po_file ) )
 			{
-				echo '<td class="lastcol center" colspan="'.(2 + (int)($current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction)).'">'.T_('No language file...').'</td>';
+				echo '<td class="lastcol center" colspan="'.(2 + (int)($current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction)).'"><a href="?ctrl=translation&edit_locale='.$lkey.'">'.T_('No language file...').'</a></td>';
 			}
 			else
 			{	// File exists:
-				$lines = file( $po_file );
-
-				$lines[] = '';	// Adds a blank line at the end in order to ensure complete handling of the file
-				$all = 0;
-				$fuzzy = 0;
-				$this_fuzzy = false;
-				$untranslated=0;
-				$translated=0;
-				$status='-';
-				$matches = array();
-				foreach ($lines as $line)
-				{
-					// echo 'LINE:', $line, '<br />';
-					if(trim($line) == '' )
-					{	// Blank line, go back to base status:
-						if( $status == 't' )
-						{	// ** End of a translation ** :
-							if( $msgstr == '' )
-							{
-								$untranslated++;
-								// echo 'untranslated: ', $msgid, '<br />';
-							}
-							else
-							{
-								$translated++;
-							}
-							if( $msgid == '' && $this_fuzzy )
-							{	// It's OK if first line is fuzzy
-								$fuzzy--;
-							}
-							$msgid = '';
-							$msgstr = '';
-							$this_fuzzy = false;
-						}
-						$status = '-';
-					}
-					elseif( ($status=='-') && preg_match( '#^msgid "(.*)"#', $line, $matches))
-					{	// Encountered an original text
-						$status = 'o';
-						$msgid = $matches[1];
-						// echo 'original: "', $msgid, '"<br />';
-						$all++;
-					}
-					elseif( ($status=='o') && preg_match( '#^msgstr "(.*)"#', $line, $matches))
-					{	// Encountered a translated text
-						$status = 't';
-						$msgstr = $matches[1];
-						// echo 'translated: "', $msgstr, '"<br />';
-					}
-					elseif( preg_match( '#^"(.*)"#', $line, $matches))
-					{	// Encountered a followup line
-						if ($status=='o')
-							$msgid .= $matches[1];
-						elseif ($status=='t')
-							$msgstr .= $matches[1];
-					}
-					elseif(strpos($line,'#, fuzzy') === 0)
-					{
-						$this_fuzzy = true;
-						$fuzzy++;
-					}
-				}
+				$po_file_info = locale_file_po_info( $po_file, true );
 
 				// $all=$translated+$fuzzy+$untranslated;
-				echo "\n\t".'<td class="center">'.$all.'</td>';
+				echo "\n\t".'<td class="center">'.$po_file_info['all'].'</td>';
 
-				$percent_done = ($all > 0) ? round(($translated-$fuzzy/2)/$all*100) : 0;
-				$color = sprintf( '%02x%02x00', 255 - round($percent_done * 2.55), round($percent_done * 2.55) );
-				echo "\n\t<td class=\"center\" style=\"background-color:#". $color . "\">". $percent_done ." %</td>";
+				$percent_done = $po_file_info['percent'];
+				$color = sprintf( '%02x%02x00', 255 - round( $percent_done * 2.55 ), round( $percent_done * 2.55 ) );
+				echo "\n\t<td class=\"center\" style=\"background-color:#". $color . "\"><a href=\"?ctrl=translation&edit_locale=".$lkey."\">". $percent_done ." %</a></td>";
 
 			}
 
@@ -521,64 +403,8 @@ else
 
 /*
  * $Log$
- * Revision 1.14  2011/09/04 22:13:18  fplanque
- * copyright 2011
+ * Revision 1.16  2013/11/06 08:04:25  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.13  2010/03/01 07:52:40  efy-asimo
- * Set manual links to lowercase
- *
- * Revision 1.12  2010/02/14 14:18:39  efy-asimo
- * insert manual links
- *
- * Revision 1.11  2010/02/08 17:53:23  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.10  2010/01/30 18:55:32  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.9  2010/01/02 21:13:31  fplanque
- * demo of Crumbs in action urls (GET not POST).
- * Normalized code a little (not perfect).
- *
- * Revision 1.8  2009/07/11 18:30:10  tblue246
- * minor
- *
- * Revision 1.7  2009/07/11 17:33:02  waltercruz
- * Adding more instructions about language extraction
- *
- * Revision 1.6  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.5  2008/09/07 09:34:55  fplanque
- * Used reload icons instead of delete b/c it does not visually delete much
- *
- * Revision 1.4  2008/09/07 09:13:28  fplanque
- * Locale definitions are now included in language packs.
- * A bit experimental but it should work...
- *
- * Revision 1.3  2008/09/07 07:56:37  fplanque
- * Fixed select box warning
- *
- * Revision 1.2  2008/01/21 09:35:32  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 11:00:38  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.16  2007/04/26 00:11:12  fplanque
- * (c) 2007
- *
- * Revision 1.15  2006/12/09 01:55:36  fplanque
- * feel free to fill in some missing notes
- * hint: "login" does not need a note! :P
- *
- * Revision 1.14  2006/11/24 18:27:26  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.13  2006/11/15 00:35:14  blueyed
- * Fix
- *
- * Revision 1.12  2006/11/15 00:12:51  fplanque
- * doc
  */
 ?>

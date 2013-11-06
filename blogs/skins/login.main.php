@@ -1,0 +1,47 @@
+<?php
+/**
+ * This file is the template that includes required css files to display in-skin login form
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ *
+ * @package evoskins
+ *
+ * @version $Id$
+ */
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+global $Settings, $Plugins, $current_User;
+
+if( is_logged_in() )
+{ // User is already logged in
+	if( $current_User->check_status( 'can_be_validated' ) )
+	{ // account is not active yet, redirect to the account activation page
+		$Messages->add( T_( 'You are logged in but your account is not activated. You will find instructions about activating your account below:' ) );
+		header_redirect( get_activate_info_url(), 302 );
+		// will have exited
+	}
+
+	// User is already logged in, redirect to "redirect_to" page
+	$Messages->add( T_( 'You are already logged in.' ), 'note' );
+	$redirect_to = param( 'redirect_to', 'string', NULL );
+	if( empty( $redirect_to ) )
+	{
+		$redirect_to = regenerate_url( 'disp', '', '', '&' );
+	}
+	header_redirect( $redirect_to, 302 );
+	// will have exited
+}
+
+require_js( 'functions.js', 'blog' );
+
+$transmit_hashed_password = (bool)$Settings->get('js_passwd_hashing') && !(bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
+if( $transmit_hashed_password )
+{ // Include JS for client-side password hashing:
+	require_js( 'sha1_md5.js', 'blog' );
+}
+
+require $ads_current_skin_path.'index.main.php';
+
+?>

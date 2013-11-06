@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -89,6 +89,21 @@ class colls_list_public_Widget extends ComponentWidget
 					'note' => T_( 'This is the title to display, $icon$ will be replaced by the feed icon' ),
 					'defaultvalue' => T_('All blogs'),
 				),
+				'order_by' => array(
+					'label' => T_('Order by'),
+					'note' => T_('How to sort the blogs'),
+					'type' => 'select',
+					'options' => get_coll_sort_options(),
+					'defaultvalue' => 'ID',
+				),
+				'order_dir' => array(
+					'label' => T_('Direction'),
+					'note' => T_('How to sort the blogs'),
+					'type' => 'radio',
+					'options' => array( array( 'ASC', T_('Ascending') ),
+										array( 'DESC', T_('Descending') ) ),
+					'defaultvalue' => 'ASC',
+				),
 				/* 3.3? this is borked
 				'list_type' => array(
 					'label' => T_( 'Display type' ),
@@ -113,7 +128,7 @@ class colls_list_public_Widget extends ComponentWidget
 	{
 		$this->init_display( $params );
 
-		$this->disp_coll_list( 'public' );
+		$this->disp_coll_list( 'public', $this->disp_params['order_by'], $this->disp_params['order_dir'] );
 
 		return true;
 	}
@@ -138,55 +153,8 @@ class colls_list_public_Widget extends ComponentWidget
 
 /*
  * $Log$
- * Revision 1.13  2011/09/04 22:13:21  fplanque
- * copyright 2011
- *
- * Revision 1.12  2010/02/08 17:54:48  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.11  2009/12/22 03:30:24  blueyed
- * cleanup
- *
- * Revision 1.10  2009/12/01 04:19:25  fplanque
- * even more invalidation dimensions
- *
- * Revision 1.9  2009/09/14 13:54:13  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.8  2009/09/12 11:03:13  efy-arrin
- * Included the ClassName in the loadclass() with proper UpperCase
- *
- * Revision 1.7  2009/07/02 21:50:13  fplanque
- * commented out unfinished code
- *
- * Revision 1.6  2009/06/18 07:35:53  yabs
- * bugfix : $type is already a param ;)
- *
- * Revision 1.5  2009/05/28 06:49:06  sam2kb
- * Blog list widget can be either a "regular list" or a "select menu"
- * See http://forums.b2evolution.net/viewtopic.php?t=18794
- *
- * Revision 1.4  2009/03/13 02:32:07  fplanque
- * Cleaned up widgets.
- * Removed stupid widget_name param.
- *
- * Revision 1.3  2009/03/08 23:57:46  fplanque
- * 2009
- *
- * Revision 1.2  2008/01/21 09:35:37  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 11:02:24  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.3  2007/06/20 21:42:13  fplanque
- * implemented working widget/plugin params
- *
- * Revision 1.2  2007/06/20 14:25:00  fplanque
- * fixes
- *
- * Revision 1.1  2007/06/18 21:25:47  fplanque
- * one class per core widget
+ * Revision 1.15  2013/11/06 08:05:09  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

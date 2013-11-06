@@ -5,6 +5,7 @@
  * @(#) $Id$
  *
  */
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 define('MIME_PARSER_START',        1);
 define('MIME_PARSER_HEADER',       2);
@@ -296,7 +297,7 @@ class mime_parser_class
 {/metadocument}
 */
 	var $track_lines = 0;
-	
+
 /*
 {metadocument}
 	<variable>
@@ -873,7 +874,7 @@ class mime_parser_class
 		}
 		return($return_value);
 	}
-	
+
 	Function ParseBody($data, $end, $offset)
 	{
 		$success = $this->body_parser->Parse($data, $end);

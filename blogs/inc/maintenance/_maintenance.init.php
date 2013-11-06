@@ -1,7 +1,4 @@
 <?php
-
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
-
 /**
  * Controller mappings.
  *
@@ -16,6 +13,19 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  *
  * @global array
  */
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+
+
+/**
+ * Minimum PHP version required for maintenance module to function properly
+ */
+$required_php_version[ 'maintenance' ] = '5.0';
+
+/**
+ * Minimum MYSQL version required for maintenance module to function properly
+ */
+$required_mysql_version[ 'maintenance' ] = '4.1';
+
 $ctrl_mappings['backup'] = 'maintenance/backup.ctrl.php';
 $ctrl_mappings['upgrade'] = 'maintenance/upgrade.ctrl.php';
 
@@ -36,6 +46,8 @@ class maintenance_Module extends Module
 	 */
 	function init()
 	{
+		$this->check_required_php_version( 'maintenance' );
+
 		load_funcs( 'maintenance/model/_maintenance.funcs.php' );
 	}
 
@@ -164,8 +176,8 @@ class maintenance_Module extends Module
 
 		if( $current_User->check_perm( 'perm_maintenance', 'backup' ) )
 		{
-			// Display Backup tab in Tools menu
-			$AdminUI->add_menu_entries( 'tools', array(
+			// Display Backup tab in System -> Maintenance menu
+			$AdminUI->add_menu_entries( array( 'options', 'misc' ), array(
 									'backup' => array(
 									'text' => T_('Backup'),
 									'href' => '?ctrl=backup'	),
@@ -174,8 +186,8 @@ class maintenance_Module extends Module
 
 		if( $current_User->check_perm( 'perm_maintenance', 'upgrade' ) )
 		{
-			// Display Updates tab in Tools menu
-			$AdminUI->add_menu_entries( 'tools', array(
+			// Display Updates tab in System -> Maintenance menu
+			$AdminUI->add_menu_entries( array( 'options', 'misc' ), array(
 									'upgrade' => array(
 									'text' => T_('Check for updates'),
 									'href' => '?ctrl=upgrade'	),
@@ -189,24 +201,8 @@ $maintenance_Module = new maintenance_Module();
 
 /*
  * $Log$
- * Revision 1.6  2011/02/15 15:37:00  efy-asimo
- * Change access to admin permission
- *
- * Revision 1.5  2010/01/30 18:55:32  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.4  2009/10/28 14:55:11  efy-maxim
- * pluggable permissions separated by blocks in group form
- *
- * Revision 1.3  2009/10/27 18:21:52  fplanque
- * no message
- *
- * Revision 1.2  2009/10/19 07:04:20  efy-maxim
- * code formatting
- *
- * Revision 1.1  2009/10/18 20:15:51  efy-maxim
- * 1. backup, upgrade have been moved to maintenance module
- * 2. maintenance module permissions
+ * Revision 1.8  2013/11/06 08:04:25  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

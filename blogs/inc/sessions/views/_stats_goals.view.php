@@ -5,7 +5,7 @@
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -119,44 +119,8 @@ $Results->display();
 
 /*
  * $Log$
- * Revision 1.13  2011/09/07 22:44:40  fplanque
- * UI cleanup
- *
- * Revision 1.11  2011/09/04 22:13:18  fplanque
- * copyright 2011
- *
- * Revision 1.10  2010/02/08 17:53:55  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.9  2010/01/30 18:55:34  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.8  2009/12/08 00:07:23  blueyed
- * todo@fp
- *
- * Revision 1.7  2009/09/19 20:49:51  fplanque
- * Cleaner way of implementing permissions.
- *
- * Revision 1.6  2009/09/12 00:20:59  fplanque
- * search cleanup
- *
- * Revision 1.5  2009/08/30 20:58:10  tblue246
- * Goals ctrl: 1. Do not use localized messages to determine action. 2. Removed redundant "copy" action (always use "new" action with goal_ID).
- *
- * Revision 1.4  2009/05/16 00:28:31  fplanque
- * edit link
- *
- * Revision 1.3  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.2  2008/04/24 01:56:08  fplanque
- * Goal hit summary
- *
- * Revision 1.1  2008/04/17 11:53:22  fplanque
- * Goal editing
- *
- * Revision 1.1  2008/03/22 19:58:18  fplanque
- * missing views
+ * Revision 1.14  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

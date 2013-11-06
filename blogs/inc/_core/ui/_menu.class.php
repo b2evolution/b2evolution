@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -62,8 +62,9 @@ class Menu extends Widget
 	 *     DEPRECATED 'style': CSS style for this entry.
 	 *     DEPRECATED 'onclick': onclick property for this entry.
 	 *     DEPRECATED 'name': name attribute of the link/entry.
+	 * @param string Node name after which we should insert the menu entries, NULL - to insert to the end
 	 */
-	function add_menu_entries( $path, $new_entries )
+	function add_menu_entries( $path, $new_entries, $after_node = NULL )
 	{
 		// Get a reference to the node in the menu list.
 		$node = & $this->get_node_by_path( $path, true );
@@ -75,9 +76,36 @@ class Menu extends Widget
 		}
 		*/
 
-		foreach( $new_entries as $l_key => $l_new_entry )
-		{
-			$node['entries'][$l_key] = $l_new_entry;
+		$new_entires_are_inserted = false;
+
+		if( !is_null( $after_node ) )
+		{	// We should insert new entries after specific node
+			$new_node = $node;
+			$new_node['entries'] = array();
+			if( isset( $node['entries'] ) )
+			{
+				foreach( $node['entries'] as $node_key => $node_entry )
+				{
+					$new_node['entries'][ $node_key ] = $node_entry;
+					if( $node_key == $after_node )
+					{	// Insert new entires here after specific node
+						foreach( $new_entries as $l_key => $l_new_entry )
+						{
+							$new_node['entries'][$l_key] = $l_new_entry;
+						}
+						$new_entires_are_inserted = true;
+					}
+				}
+			}
+			$node = $new_node;
+		}
+
+		if( !$new_entires_are_inserted )
+		{	// Insert new entries to the end if they are still not inserted after specific node
+			foreach( $new_entries as $l_key => $l_new_entry )
+			{
+				$node['entries'][$l_key] = $l_new_entry;
+			}
 		}
 	}
 
@@ -403,65 +431,23 @@ class Menu extends Widget
 				debug_die( 'Unknown $name for Menu::get_template(): '.var_export($name, true) );
 		}
 	}
+
+
+	/**
+	 * Check if menu is empty or contains at least one entry
+	 * 
+	 * @return boolean true if the menu is not empty | false otherwise
+	 */
+	function has_entires()
+	{
+		return !empty( $this->_menus );
+	}
 }
 
 /*
  * $Log$
- * Revision 1.18  2011/09/13 15:31:35  fplanque
- * Enhanced back-office navigation.
- *
- * Revision 1.17  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.16  2010/02/08 17:51:57  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.15  2009/10/12 21:58:43  blueyed
- * toolbar/menu: wrap HR in DIV instead of A, to make HTML valid
- *
- * Revision 1.14  2009/09/20 11:59:46  efy-sergey
- * fixed insert_menu_entries_after to support path
- *
- * Revision 1.13  2009/09/16 12:30:03  efy-maxim
- * Send notification on new thread or new message event
- *
- * Revision 1.12  2009/09/16 09:15:31  efy-maxim
- * Messaging module improvements
- *
- * Revision 1.11  2009/09/15 23:17:12  fplanque
- * minor
- *
- * Revision 1.10  2009/09/15 20:05:05  efy-maxim
- * 1. Red badge for messages in the right menu
- * 2. Insert menu entries method in menu class
- *
- * Revision 1.9  2009/09/15 19:31:56  fplanque
- * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
- * PHP 4 compatible. Even better on PHP 5.
- * I may have broken a few things. Sorry. This is pretty hard to do in one swoop without any glitch.
- * Thanks for fixing or reporting if you spot issues.
- *
- * Revision 1.8  2009/09/14 10:56:06  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.7  2009/08/30 17:27:03  fplanque
- * better NULL param handling all over the app
- *
- * Revision 1.6  2009/03/23 22:19:45  fplanque
- * evobar right menu is now also customizable by plugins
- *
- * Revision 1.4  2009/03/23 12:38:21  tblue246
- * get_html_menu(): Also handle the case when $path is a string
- *
- * Revision 1.3  2009/03/23 12:21:31  fplanque
- * cleaner fix (I guess)
- *
- * Revision 1.2  2009/03/23 11:51:51  tblue246
- * Fixing array_merge() notices
- *
- * Revision 1.1  2009/03/23 04:09:43  fplanque
- * Best. Evobar. Menu. Ever.
- * menu is now extensible by plugins
+ * Revision 1.20  2013/11/06 08:03:47  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

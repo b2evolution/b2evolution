@@ -8,10 +8,14 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package install
  */
+
+
+// Turn off the output buffering to do the correct work of the function flush()
+@ini_set( 'output_buffering', 'off' );
 
 /**
  * include config and default functions:
@@ -36,6 +40,11 @@ if( ! $config_is_done )
 
 require_once $inc_path.'_core/_class'.floor(PHP_VERSION).'.funcs.php';
 require_once $inc_path.'_core/_misc.funcs.php';
+
+/**
+ * Load locale related functions
+ */
+require_once $inc_path.'locales/_locale.funcs.php';
 
 load_class( '_core/model/_log.class.php', 'Log');
 $Debuglog = new Log();
@@ -67,6 +76,7 @@ load_class( '/_core/model/db/_db.class.php', 'DB' );
 //load_funcs( '_core/ui/forms/_form.funcs.php' );
 load_class( '_core/model/_timer.class.php', 'Timer' );
 //load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
+load_funcs( '_core/_url.funcs.php' );
 
 
 require_once dirname(__FILE__).'/_functions_install.php';
@@ -80,6 +90,71 @@ modules_call_method( 'init' );
 
 
 param( 'action', 'string', 'default' );
+// check if we should try to connect to db if config is not done
+switch( $action )
+{
+	case 'evoupgrade':
+	case 'newdb':
+	case 'cafelogupgrade':
+	case 'deletedb':
+	case 'menu':
+	case 'localeinfo':
+		$try_db_connect = true;
+		break;
+	case 'start':
+	case 'conf':
+	case 'default':
+		$try_db_connect = false;
+		break;
+	default:
+		// set a valid action
+		$action = 'default';
+		$try_db_connect = false;
+		break;
+}
+
+$timestamp = time() - 120; // We start dates 2 minutes ago because their dates increase 1 second at a time and we want everything to be visible when the user watches the blogs right after install :P
+
+if( $config_is_done || $try_db_connect )
+{ // Connect to DB:
+
+	$tmp_evoconf_db = $db_config;
+
+	// We want a friendly message if we can't connect:
+	$tmp_evoconf_db['halt_on_error'] = false;
+	$tmp_evoconf_db['show_errors'] = false;
+
+	// Make sure we use the proper charset:
+	$tmp_evoconf_db['connection_charset'] = $evo_charset;
+
+	// CONNECT TO DB:
+	$DB = new DB( $tmp_evoconf_db );
+	unset($tmp_evoconf_db);
+
+	if( !$DB->error )
+	{ // restart conf
+		$DB->halt_on_error = true;  // From now on, halt on errors.
+		$DB->show_errors = true;    // From now on, show errors (they're helpful in case of errors!).
+
+		// Check MySQL version
+		$mysql_version = $DB->get_version();
+		foreach( $required_mysql_version as $key => $value )
+		{ // check required MySQL version for the whole application and for each module
+			if( version_compare( $mysql_version, $value, '<' ) )
+			{
+				if( $key == 'application' )
+				{
+					$error_message = sprintf( T_('The minimum requirement for this version of b2evolution is %s version %s but you are trying to use version %s!'), 'MySQL', $value, $mysql_version );
+				}
+				else
+				{
+					$error_message = sprintf( T_('The minimum requirement for %s module is %s version %s but you are trying to use version %s!'), $key, 'MySQL', $value, $mysql_version );
+				}
+				die( '<h1>Insufficient Requirements</h1><div class="error"><p class="error"><strong>'.$error_message.'</strong></p></div>');
+			}
+		}
+	}
+}
 
 // Load all available locale defintions:
 locales_load_available_defs();
@@ -90,7 +165,12 @@ if( preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,14})?/', $locale) )
 }
 else
 { // detect language
-	$default_locale = locale_from_httpaccept();
+	// try to check if db already exists and default locale is set on it
+	$default_locale = get_default_locale_from_db();
+	if( empty( $default_locale ) )
+	{ // db doesn't exists yet
+		$default_locale = locale_from_httpaccept();
+	}
 	// echo 'detected locale: ' . $default_locale. '<br />';
 }
 // Activate default locale:
@@ -101,9 +181,6 @@ if( ! locale_activate( $default_locale ) )
 }
 
 init_charsets( $current_charset );
-
-$timestamp = time() - 120; // We start dates 2 minutes ago because their dates increase 1 second at a time and we want everything to be visible when the user watches the blogs right after install :P
-
 
 switch( $action )
 {
@@ -130,13 +207,15 @@ switch( $action )
 	case 'conf':
 	case 'menu':
 	case 'localeinfo':
+	case 'default':
 		$title = '';
 		break;
-
-	default:
-		$action = 'default';
-		$title = '';
 }
+
+// Add CSS:
+require_css( 'basic_styles.css', 'rsc_url' ); // the REAL basic styles
+require_css( 'basic.css', 'rsc_url' ); // Basic styles
+require_css( 'evo_distrib_2.css', 'rsc_url' );
 
 header('Content-Type: text/html; charset='.$io_charset);
 header('Cache-Control: no-cache'); // no request to this page should get cached!
@@ -147,11 +226,12 @@ header('Cache-Control: no-cache'); // no request to this page should get cached!
 	<!-- InstanceBeginEditable name="doctitle" -->
 	<title><?php echo T_('b2evo installer').( $title ? ': '.$title : '' ) ?></title>
 	<!-- InstanceEndEditable -->
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset; ?>" />
 	<meta name="viewport" content="width = 750" />
 	<meta name="robots" content="noindex, follow" />
-	<link href="../rsc/css/evo_distrib_2.css" rel="stylesheet" type="text/css" />
+	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 	<!-- InstanceBeginEditable name="head" --><!-- InstanceEndEditable -->
-	<!-- InstanceParam name="lang" type="text" value="&lt;?php locale_lang() ?&gt;" --> 
+	<!-- InstanceParam name="lang" type="text" value="&lt;?php locale_lang() ?&gt;" -->
 </head>
 
 <body>
@@ -159,10 +239,10 @@ header('Cache-Control: no-cache'); // no request to this page should get cached!
 
 	<div class="wrapper1">
 	<div class="wrapper2">
-		<span class="version_top"><!-- InstanceBeginEditable name="Version" --><?php echo T_('Installer for version ').' '. $app_version ?><!-- InstanceEndEditable --></span>	
-	
+		<span class="version_top"><!-- InstanceBeginEditable name="Version" --><?php echo T_('Installer for version ').' '. $app_version ?><!-- InstanceEndEditable --></span>
+
 		<a href="http://b2evolution.net/" target="_blank"><img src="../rsc/img/distrib/b2evolution-logo.gif" alt="b2evolution" width="237" height="92" /></a>
-		
+
 		<div class="menu_top"><!-- InstanceBeginEditable name="MenuTop" -->
 			<span class="floatright"><?php echo T_('After install') ?>: <a href="../index.php"><?php echo T_('Blogs') ?></a> &middot;
 			<a href="../<?php echo $dispatcher ?>"><?php echo T_('Admin') ?></a>
@@ -171,55 +251,18 @@ header('Cache-Control: no-cache'); // no request to this page should get cached!
 		<a href="index.php?locale=<?php echo $default_locale ?>"><?php echo T_('Install menu') ?></a> &middot;
 		<a href="phpinfo.php"><?php echo T_('PHP info') ?></a>
 		<!-- InstanceEndEditable --></div>
-		
+
 		<!-- InstanceBeginEditable name="Main" -->
 <?php
 block_open();
 
 // echo $action;
 
-if( $config_is_done || (($action != 'start') && ($action != 'default') && ($action != 'conf')) )
-{ // Connect to DB:
-
-	$tmp_evoconf_db = $db_config;
-
-	// We want a friendly message if we can't connect:
-	$tmp_evoconf_db['halt_on_error'] = false;
-	$tmp_evoconf_db['show_errors'] = false;
-
-	// Make sure we use the proper charset:
-	$tmp_evoconf_db['connection_charset'] = $evo_charset;
-
-	// CONNECT TO DB:
-	$DB = new DB( $tmp_evoconf_db );
-	unset($tmp_evoconf_db);
-
-	if( $DB->error )
-	{ // restart conf
-		echo '<div class="error"><p class="error">'.T_('Check your database config settings below and update them if necessary...').'</p></div>';
-		display_base_config_recap();
-		$action = 'start';
-	}
-	else
-	{
-		$DB->halt_on_error = true;  // From now on, halt on errors.
-		$DB->show_errors = true;    // From now on, show errors (they're helpful in case of errors!).
-
-		// Check MySQL version
-		$mysql_version = $DB->get_var( 'SELECT VERSION()' );
-		list( $mysl_version_main, $mysl_version_minor ) = explode( '.', $mysql_version );
-		if( ($mysl_version_main * 100 + $mysl_version_minor) < 401 )
-		{
-			die( '<div class="error"><p class="error"><strong>'.sprintf(T_('The minimum requirement for this version of b2evolution is %s version %s but you are trying to use version %s!'), 'MySQL', '4.1', $mysql_version ).'</strong></p></div>');
-		}
-	}
-}
-
-// Check PHP version
-list( $version_main, $version_minor ) = explode( '.', phpversion() );
-if( ($version_main * 100 + $version_minor) < 401 )
-{
-	die( '<div class="error"><p class="error"><strong>'.sprintf(T_('The minimum requirement for this version of b2evolution is %s version %s but you are trying to use version %s!'), 'PHP', '4.1.0', phpversion() ).'</strong></p></div>');
+if( ( $config_is_done || $try_db_connect ) && ( $DB->error ) )
+{ // DB connect was unsuccessful, restart conf
+	echo '<div class="error"><p class="error">'.T_('Check your database config settings below and update them if necessary...').'</p></div>';
+	display_base_config_recap();
+	$action = 'start';
 }
 
 // Check other dependencies:
@@ -312,8 +355,18 @@ switch( $action )
 					'config_is_done = 1;',
 				), $conf );
 
-			$f = @fopen( $conf_filepath , 'w' );
-			if( $f == false )
+			// Write new contents:
+			if( save_to_file( $conf, $conf_filepath, 'w' ) )
+			{
+				printf( '<p>'.T_('Your configuration file [%s] has been successfully created.').'</p>', $conf_filepath );
+
+				$tableprefix = $conf_db_tableprefix;
+				$baseurl = $conf_baseurl;
+				$admin_email = $conf_admin_email;
+				$config_is_done = 1;
+				$action = 'menu';
+			}
+			else
 			{
 				?>
 				<h1><?php echo T_('Config file update') ?></h1>
@@ -347,19 +400,6 @@ switch( $action )
 				</blockquote>
 				<?php
 				break;
-			}
-			else
-			{ // Write new contents:
-				fwrite( $f, $conf );
-				fclose($f);
-
-				printf( '<p>'.T_('Your configuration file [%s] has been successfully created.').'</p>', $conf_filepath );
-
-				$tableprefix = $conf_db_tableprefix;
-				$baseurl = $conf_baseurl;
-				$admin_email = $conf_admin_email;
-				$config_is_done = 1;
-				$action = 'menu';
 			}
 		}
 		// ATTENTION: we continue here...
@@ -513,7 +553,7 @@ switch( $action )
 				{
 					?>
 					<p><input type="radio" name="action" id="deletedb" value="deletedb" />
-					<label for="deletedb"><strong><?php echo T_('Delete b2evolution tables')?></strong>:
+					<label for="deletedb"><strong><?php echo T_('Delete b2evolution tables &amp; cache files')?></strong>:
 					<?php echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution tables and data will be lost!!!</strong> Any non-b2evolution tables will remain untouched though.')?></label></p>
 
 					<p><input type="radio" name="action" id="start" value="start" />
@@ -613,7 +653,10 @@ switch( $action )
 		echo '<h2>'.T_('Checking files...').'</h2>';
 		flush();
 		// Check for .htaccess:
-		install_htaccess( false );
+		if( !install_htaccess( false ) )
+		{	// Exit installation here because the .htaccess file has the some errors
+			break;
+		}
 
 		// Here's the meat!
 		install_newdb();
@@ -634,7 +677,10 @@ switch( $action )
 		echo '<h2>'.T_('Checking files...').'</h2>';
 		flush();
 		// Check for .htaccess:
-		install_htaccess( true );
+		if( !install_htaccess( true ) )
+		{	// Exit installation here because the .htaccess file has the some errors
+			break;
+		}
 
 		echo '<h2>'.T_('Upgrading data in existing b2evolution database...').'</h2>';
 		flush();
@@ -721,6 +767,33 @@ switch( $action )
 				$DB->show_errors = $DB->halt_on_error = true;
 		*/
 
+		/* REMOVE PAGE CACHE */
+		load_class( '_core/model/_pagecache.class.php', 'PageCache' );
+
+		// Remove general page cache
+		$PageCache = new PageCache( NULL );
+		$PageCache->cache_delete();
+
+		// Skip if T_blogs table is already deleted. Note that db_delete() will not throw any errors on missing tables.
+		if( $DB->query('SHOW TABLES LIKE "T_blogs"') )
+		{	// Get all blogs
+			$blogs_SQL = new SQL();
+			$blogs_SQL->SELECT( 'blog_ID' );
+			$blogs_SQL->FROM( 'T_blogs' );
+			$blogs = $DB->get_col( $blogs_SQL->get() );
+
+			foreach( $blogs as $blog_ID )
+			{
+				$BlogCache = & get_BlogCache();
+				$Blog = $BlogCache->get_by_ID( $blog_ID );
+
+				// Remove page cache of current blog
+				$PageCache = new PageCache( $Blog );
+				$PageCache->cache_delete();
+			}
+		}
+
+		/* REMOVE DATABASE */
 		db_delete();
 		?>
 		<p><?php echo T_('Reset done!')?></p>
@@ -734,16 +807,16 @@ block_close();
 
 <!-- InstanceEndEditable -->
 	</div>
-		
+
 	<div class="body_fade_out">
-		
+
 	<div class="menu_bottom"><!-- InstanceBeginEditable name="MenuBottom" -->
 			<?php echo T_('Online resources') ?>: <a href="http://b2evolution.net/" target="_blank"><?php echo T_('Official website') ?></a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank"><?php echo T_('Find a host') ?></a> &bull; <a href="http://manual.b2evolution.net/" target="_blank"><?php echo T_('Manual') ?></a> &bull; <a href="http://forums.b2evolution.net/" target="_blank"><?php echo T_('Forums') ?></a>
 		<!-- InstanceEndEditable --></div>
 
-	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->Copyright &copy; 2003-2011 by Fran&ccedil;ois Planque &amp; others &middot; <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a>
+	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->Copyright &copy; 2003-2013 by Fran&ccedil;ois Planque &amp; others &middot; <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a>
 		<!-- InstanceEndEditable --></div>
-		
+
 	</div>
 	</div>
 
@@ -764,278 +837,8 @@ block_close();
 <?php
 /*
  * $Log$
- * Revision 1.203  2011/10/18 00:17:50  fplanque
- * rollback of unwanted scrollable window
+ * Revision 1.205  2013/11/06 08:05:19  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.200  2011/09/07 12:00:21  lxndral
- * internal searches update
- *
- * Revision 1.199  2011/09/04 22:13:23  fplanque
- * copyright 2011
- *
- * Revision 1.198  2010/03/16 13:59:00  efy-asimo
- * Install Database Password - bugfix
- *
- * Revision 1.197  2010/03/08 18:16:53  sam2kb
- * Added missing actions
- *
- * Revision 1.196  2010/03/04 18:02:55  fplanque
- * Cleaned up .htaccess install
- *
- * Revision 1.195  2010/02/08 17:55:42  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.194  2010/01/28 03:42:19  fplanque
- * minor
- *
- * Revision 1.193  2010/01/25 18:18:25  efy-asimo
- * .htaccess automatic install
- *
- * Revision 1.192  2010/01/21 22:49:10  blueyed
- * Installer: sanitize $action always. Add marker with the action done into the footer, used by the automatic installer.
- *
- * Revision 1.191  2009/12/22 08:45:44  fplanque
- * fix install
- *
- * Revision 1.190  2009/12/06 05:34:31  fplanque
- * Violent refactoring for _main.inc.php
- * Sorry for potential side effects.
- * This needed to be done badly -- for clarity!
- *
- * Revision 1.189  2009/11/30 00:22:05  fplanque
- * clean up debug info
- * show more timers in view of block caching
- *
- * Revision 1.188  2009/09/29 17:56:19  tblue246
- * minor
- *
- * Revision 1.187  2009/09/29 15:47:59  tblue246
- * Installer: Escape single quotes when writing config file
- *
- * Revision 1.186  2009/09/29 13:29:58  tblue246
- * Proper security fixes
- *
- * Revision 1.185  2009/09/29 03:38:34  fplanque
- * security rollback. NEVER EVER ALLOW UNFILTERED INPUTS. problem here: close password with single quote, then inject PHP, no less!!!
- *
- * Revision 1.184  2009/09/28 20:02:43  tblue246
- * param()/$type parameter: Deprecate "" value in favor of (newly added) "raw".
- *
- * Revision 1.183  2009/09/28 17:48:09  tblue246
- * Bugfix: Allow <> chars in DB password
- *
- * Revision 1.182  2009/09/16 01:33:36  fplanque
- * so noone complained about HEAD not (really) being installable?
- *
- * Revision 1.181  2009/09/14 14:31:16  waltercruz
- * minor fix
- *
- * Revision 1.180  2009/09/14 14:10:15  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.179  2009/07/16 17:14:22  fplanque
- * doc
- *
- * Revision 1.178  2009/07/16 17:09:54  fplanque
- * noindex doc
- * added info for noobs
- *
- * Revision 1.177  2009/07/15 11:58:16  tblue246
- * - Installer:
- * 	- Check if the selected locale could be activated and fallback to en-US if not.
- * 	- Commented out table prefix option, see mailing list/fplanque ("too complex for most newbies").
- * - Added _basic_config.php to conf/.cvsignore (will replace _config_TEST.php in the future).
- *
- * Revision 1.176  2009/07/14 23:24:04  sam2kb
- * activated table prefix fieldset
- *
- * Revision 1.175  2009/07/14 16:23:32  sam2kb
- * doc
- *
- * Revision 1.174  2009/07/14 15:48:00  fplanque
- * Thx to @slalaurette for finding this
- *
- * Revision 1.173  2009/07/13 19:17:09  tblue246
- * Fixed typos
- *
- * Revision 1.172  2009/07/12 18:41:58  fplanque
- * doc / help
- *
- * Revision 1.171  2009/07/11 19:43:35  tblue246
- * Translation fix
- *
- * Revision 1.170  2009/07/10 06:49:10  sam2kb
- * Made some strings translatable
- *
- * Revision 1.169  2009/07/09 23:45:43  fplanque
- * doc
- *
- * Revision 1.168  2009/07/09 23:23:41  fplanque
- * Check that DB supports proper charset before installing.
- *
- * Revision 1.167  2009/07/09 22:57:32  fplanque
- * Fixed init of connection_charset, especially during install.
- *
- * Revision 1.166  2009/07/06 23:52:25  sam2kb
- * Hardcoded "admin.php" replaced with $dispatcher
- *
- * Revision 1.165  2009/07/02 17:33:00  fplanque
- * only activate ONE locale at install time.
- *
- * Revision 1.164  2009/07/02 15:43:56  fplanque
- * B2evolution no longer ships with _basic_config.php .
- * It ships with _basic_config.template.php instead.
- * That way, uploading a new release never overwrites the previous base config.
- * The installer now creates  _basic_config.php based on _basic_config.template.php + entered form values.
- *
- * Revision 1.163  2009/07/02 14:53:07  fplanque
- * improved some more
- *
- * Revision 1.162  2009/07/02 13:41:38  fplanque
- * fix
- *
- * Revision 1.161  2009/07/02 13:35:23  fplanque
- * Improved installer -- language/locale selection moved to a place where it's visible!
- *
- * Revision 1.160  2009/03/08 23:57:47  fplanque
- * 2009
- *
- * Revision 1.159  2009/03/05 23:38:53  blueyed
- * Merge autoload branch (lp:~blueyed/b2evolution/autoload) into CVS HEAD.
- *
- * Revision 1.158  2009/02/28 18:45:11  fplanque
- * quick cleanup of the installer
- *
- * Revision 1.157  2009/02/27 22:25:16  blueyed
- * Fix inclusion of misc.funcs. Includes load_funcs now after all.
- *
- * Revision 1.156  2009/02/26 22:33:22  blueyed
- * Fix messup in last commit.
- *
- * Revision 1.155  2009/02/26 22:16:54  blueyed
- * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
- *
- * Revision 1.154  2009/02/17 16:00:25  blueyed
- * Fix doc
- *
- * Revision 1.153  2009/02/12 19:59:41  blueyed
- * - Install: define $localtimenow, so post_datemodified gets set correctly.
- * - Send Cache-Control: no-cache for install/index.php: should not get cached, e.g. when going back to "delete", it should delete!?
- * - indent fixes
- *
- * Revision 1.152  2009/01/28 21:39:10  fplanque
- * Fixed locale selection during install
- *
- * Revision 1.151  2009/01/22 23:26:45  blueyed
- * Fix install-myself test (and stuff around it). Move 'newdb' action from install/index.php to functions_install.php to call it the same as during real install.
- *
- * Revision 1.150  2008/12/22 01:56:54  fplanque
- * minor
- *
- * Revision 1.149  2008/10/05 09:59:30  tblue246
- * fixing log...
- *
- * Revision 1.148  2008/10/04 23:47:32  tblue246
- * reverting to rev 1.146
- *
- * Revision 1.147  2008/10/04 21:44:15  tblue246
- * Set a random $instance_name on installation.
- *
- * Revision 1.146  2008/09/27 00:05:54  fplanque
- * minor/version bump
- *
- * Revision 1.145  2008/09/15 11:01:15  fplanque
- * Installer now creates a demo photoblog
- *
- * Revision 1.144  2008/02/19 11:11:20  fplanque
- * no message
- *
- * Revision 1.143  2008/02/07 00:35:52  fplanque
- * cleaned up install
- *
- * Revision 1.142  2008/01/21 15:00:00  fplanque
- * let browser autodetect charset (russian utf8!!)
- *
- * Revision 1.141  2008/01/21 09:35:38  fplanque
- * (c) 2008
- *
- * Revision 1.140  2008/01/04 19:59:59  blueyed
- * Use relative path for locale flags; trim whitespace
- *
- * Revision 1.139  2007/10/08 21:31:23  fplanque
- * auto install doc
- *
- * Revision 1.138  2007/09/23 18:55:17  fplanque
- * attempting to debloat. The Log class is insane.
- *
- * Revision 1.137  2007/09/19 02:54:16  fplanque
- * bullet proof upgrade
- *
- * Revision 1.136  2007/07/14 02:44:22  fplanque
- * New default page design.
- *
- * Revision 1.135  2007/07/14 00:24:53  fplanque
- * New installer design.
- *
- * Revision 1.134  2007/07/01 18:47:11  fplanque
- * fixes
- *
- * Revision 1.133  2007/06/25 11:02:31  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.132  2007/06/24 18:28:55  fplanque
- * refactored skin install
- *
- * Revision 1.129  2007/06/12 21:00:02  blueyed
- * Added non-JS handling of deletedb confirmation
- *
- * Revision 1.128  2007/04/26 00:11:10  fplanque
- * (c) 2007
- *
- * Revision 1.127  2007/01/20 01:44:22  blueyed
- * typo
- *
- * Revision 1.126  2007/01/15 19:10:29  fplanque
- * install refactoring
- *
- * Revision 1.125  2007/01/15 18:48:44  fplanque
- * allow blank install.
- *
- * Revision 1.124  2007/01/15 03:53:24  fplanque
- * refactoring / simplified installer
- *
- * Revision 1.123  2007/01/14 03:47:53  fplanque
- * killed upgrade from b2/cafelog
- * (if people haven't upgraded yet, there's little chance they ever will,
- * no need to maintain this. We also provide an upgrade path with 1.x)
- *
- * Revision 1.122  2007/01/12 02:40:26  fplanque
- * widget default params proof of concept
- * (param customization to be done)
- *
- * Revision 1.121  2007/01/08 02:11:56  fplanque
- * Blogs now make use of installed skins
- * next step: make use of widgets inside of skins
- *
- * Revision 1.120  2006/11/30 06:13:23  blueyed
- * Moved Plugins::install() and sort() galore to Plugins_admin
- *
- * Revision 1.119  2006/11/30 05:43:40  blueyed
- * Moved Plugins::discover() to Plugins_admin::discover(); Renamed Plugins_no_DB to Plugins_admin_no_DB (and deriving from Plugins_admin)
- *
- * Revision 1.118  2006/11/14 00:47:32  fplanque
- * doc
- *
- * Revision 1.117  2006/10/31 04:44:00  blueyed
- * Fixed cafelogupgrade
- *
- * Revision 1.116  2006/10/27 20:11:24  blueyed
- * TODO
- *
- * Revision 1.115  2006/10/14 20:50:29  blueyed
- * Define EVO_IS_INSTALLING for /install/ and use it in Plugins to skip "dangerous" but unnecessary instantiating of other Plugins
- *
- * Revision 1.114  2006/10/01 15:23:28  blueyed
- * Fixed install
  */
 ?>

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package install
  */
@@ -166,7 +166,7 @@ function install_newdb()
 
 	if( $create_sample_contents )
 	{
-		global $Settings;
+		global $Settings, $test_install_all_features;
 
 		echo '<h2>'.T_('Installing sample contents...').'</h2>';
 		flush();
@@ -178,6 +178,12 @@ function install_newdb()
 		 * @var GeneralSettings
 		 */
 		$Settings = new GeneralSettings();
+
+		if( $test_install_all_features )
+		{	// Set manual ordering of categories
+			$Settings->set( 'chapter_ordering', 'manual' );
+			$Settings->dbupdate();
+		}
 
 		/**
 		 * @var UserCache
@@ -212,6 +218,7 @@ function install_newdb()
 function task_begin( $title )
 {
 	echo $title;
+	flush();
 }
 
 
@@ -222,7 +229,6 @@ function task_begin( $title )
 function task_end()
 {
 	echo "OK.<br />\n";
-	flush();
 }
 
 
@@ -244,6 +250,36 @@ function get_db_version()
 	else
 	{
 		$r = $DB->get_var( 'SELECT db_version FROM T_settings' );
+	}
+
+	$DB->restore_error_state();
+
+	return $r;
+}
+
+
+/**
+ * Get default locale from db
+ */
+function get_default_locale_from_db()
+{
+	global $DB;
+
+	if( empty( $DB ) )
+	{ // DB doesn't exists yet
+		return NULL;
+	}
+
+	$DB->save_error_state();
+	$DB->halt_on_error = false;
+	$DB->show_errors = false;
+	$DB->log_errors = false;
+
+	$r = NULL;
+
+	if( db_col_exists( 'T_settings', 'set_name' ) )
+	{
+		$r = $DB->get_var( 'SELECT set_value FROM T_settings WHERE set_name = "default_locale"' );
 	}
 
 	$DB->restore_error_state();
@@ -282,9 +318,9 @@ function db_col_exists( $table, $col_name )
  */
 function cleanup_comment_quotes()
 {
-  global $DB;
+	global $DB;
 
-	echo "Checking for extra quote escaping in comments... ";
+	task_begin( 'Checking for extra quote escaping in comments... ' );
 	$query = "SELECT comment_ID, comment_content
 							FROM T_comments
 						 WHERE comment_content LIKE '%\\\\\\\\\'%'
@@ -305,7 +341,7 @@ function cleanup_comment_quotes()
 			$DB->query( $query );
 		}
 	}
-	echo "OK.<br />\n";
+	task_end();
 
 }
 
@@ -348,6 +384,12 @@ function create_default_settings( $override = array() )
 	{
 		$defaults['gender_colored'] = 1;
 		$defaults['newusers_canregister'] = 1;
+		$defaults['registration_require_country'] = 1;
+		$defaults['registration_require_gender'] = 'required';
+		$defaults['location_country'] = 'required';
+		$defaults['location_region'] = 'required';
+		$defaults['location_subregion'] = 'required';
+		$defaults['location_city'] = 'required';
 	}
 
 	$settings = array_merge( array_keys($defaults), array_keys($override) );
@@ -365,11 +407,11 @@ function create_default_settings( $override = array() )
 		}
 	}
 
-	echo 'Creating default settings'.( count($override) ? ' (with '.count($override).' existing values)' : '' ).'... ';
+	task_begin( 'Creating default settings'.( count($override) ? ' (with '.count($override).' existing values)' : '' ).'... ' );
 	$DB->query(
 		"INSERT INTO T_settings (set_name, set_value)
 		VALUES ".implode( ', ', $insertvalues ) );
-	echo "OK.<br />\n";
+	task_end();
 }
 
 
@@ -380,7 +422,7 @@ function install_basic_skins()
 {
 	load_funcs( 'skins/_skin.funcs.php' );
 
-	echo 'Installing default skins... ';
+	task_begin( 'Installing default skins... ' );
 
 	// Note: Skin #1 will we used by Blog A
 	skin_install( 'evopress' );
@@ -394,6 +436,12 @@ function install_basic_skins()
 	// Note: Skin #4 will we used by Photoblog
 	skin_install( 'photoblog' );
 
+	// Note: Skin #5 will we used by Forums
+	skin_install( 'forums' );
+
+	// Note: Skin #6 will we used by Manual
+	skin_install( 'manual' );
+
 	skin_install( 'asevo' );
 	skin_install( 'custom' );
 	skin_install( 'dating_mood' );
@@ -404,11 +452,12 @@ function install_basic_skins()
 	skin_install( 'pixelgreen' );
 	skin_install( 'pluralism' );
 	skin_install( 'terrafirma' );
+	skin_install( 'touch' );
 	skin_install( 'vastitude' );
 	skin_install( '_atom' );
 	skin_install( '_rss2' );
 
-	echo "OK.<br />\n";
+	task_end();
 }
 
 
@@ -448,17 +497,16 @@ function install_basic_plugins( $old_db_version = 0 )
 		install_plugin( 'auto_p_plugin' );
 		install_plugin( 'autolinks_plugin' );
 		install_plugin( 'texturize_plugin' );
-		install_plugin( 'smilies_plugin' );
-		install_plugin( 'videoplug_plugin' );
+
 		// SkinTags:
 		install_plugin( 'calendar_plugin' );
 		install_plugin( 'archives_plugin' );
+	}
 
-		if ($test_install_all_features)
-		{
-			install_plugin( 'google_maps_plugin' );
-		}
-
+	if( $old_db_version < 9290 )
+	{
+		install_plugin( 'smilies_plugin' );
+		install_plugin( 'videoplug_plugin' );
 	}
 
 	if( $old_db_version < 9330 )
@@ -476,6 +524,30 @@ function install_basic_plugins( $old_db_version = 0 )
 	{ // Upgrade to 3.2.0
 		install_plugin( 'twitter_plugin' );
 	}
+
+	if( $old_db_version < 10300 )
+	{ // Upgrade to 5.0.0
+		install_plugin( 'flowplayer_plugin' );
+
+		if( $test_install_all_features )
+		{
+			install_plugin( 'google_maps_plugin' );
+		}
+	}
+
+	if( $old_db_version < 11000 )
+	{ // Upgrade to 5.0.0-alpha-4
+		install_plugin( 'captcha_qstn_plugin' );
+	}
+
+	if( $old_db_version < 11100 )
+	{ // Upgrade to 5.0.1-alpha-5
+		if( $test_install_all_features )
+		{
+			install_plugin( 'bbcode_plugin' );
+			install_plugin( 'code_highlight_plugin' );
+		}
+	}
 }
 
 
@@ -489,7 +561,7 @@ function install_plugin( $plugin )
 	 */
 	global $Plugins_admin;
 
-	echo 'Installing plugin: '.$plugin.'... ';
+	task_begin( 'Installing plugin: '.$plugin.'... ' );
 	$edit_Plugin = & $Plugins_admin->install( $plugin, 'broken' ); // "broken" by default, gets adjusted later
 	if( ! is_a( $edit_Plugin, 'Plugin' ) )
 	{
@@ -497,7 +569,8 @@ function install_plugin( $plugin )
 		return false;
 	}
 
-	// install_plugin_db_schema_action()
+	load_funcs('plugins/_plugin.funcs.php');
+	install_plugin_db_schema_action( $edit_Plugin, true );
 
 	// Try to enable plugin:
 	$enable_return = $edit_Plugin->BeforeEnable();
@@ -510,7 +583,7 @@ function install_plugin( $plugin )
 
 	$Plugins_admin->set_Plugin_status( $edit_Plugin, 'enabled' );
 
-	echo "OK.<br />\n";
+	task_end();
 	return true;
 }
 
@@ -527,12 +600,12 @@ function install_basic_widgets()
 
 	load_funcs( 'widgets/_widgets.funcs.php' );
 
-	$blog_ids = $DB->get_col( 'SELECT blog_ID FROM T_blogs' );
-	foreach( $blog_ids as $blog_id )
+	$blog_ids = $DB->get_assoc( 'SELECT blog_ID, blog_type FROM T_blogs' );
+	foreach( $blog_ids as $blog_id => $blog_type )
 	{
-		echo 'Installing default widgets for blog #'.$blog_id.'... ';
-		insert_basic_widgets( $blog_id, true );
-		echo "OK.<br />\n";
+		task_begin( 'Installing default widgets for blog #'.$blog_id.'... ' );
+		insert_basic_widgets( $blog_id, true, $blog_type );
+		task_end();
 	}
 
 }
@@ -560,7 +633,7 @@ function create_relations()
 {
 	global $DB;
 
-	echo 'Creating relations... ';
+	task_begin( 'Creating relations... ' );
 
 	$DB->query( 'alter table T_coll_user_perms
 								add constraint FK_bloguser_blog_ID
@@ -731,7 +804,7 @@ function create_relations()
 											on delete restrict
 											on update restrict' );
 
-	echo "OK.<br />\n";
+	task_end();
 }
 
 
@@ -768,20 +841,40 @@ function load_db_schema()
 /**
  * Install htaccess: Check if it works with the webserver, then install it for real.
  *
- * @return string error message
+ * @return boolean TRUE if no errors
  */
 function install_htaccess( $upgrade = false )
 {
 	echo '<p>Preparing to install .htaccess ... ';
 
+	$server = isset($_SERVER['SERVER_SOFTWARE']) ? $_SERVER['SERVER_SOFTWARE'] : '';
+	if( !empty($server) && preg_match('~(Nginx|Lighttpd|Microsoft-IIS)~i', $server) )
+	{	// Skip installation if this is not an Apache server
+		echo '<br /><b>.htaccess is not needed (not an Apache server)</b></p>';
+		return true;
+	}
+
 	$error_message = do_install_htaccess( $upgrade );
 
-	if( $error_message)
+	if( $error_message )
 	{
-		echo 'ERROR!<br/><b>'.$error_message.'</b><br />';
-		printf( T_('Everything should still work, but for optimization you should follow <a %s>these instructions</a>.'), 'href="http://manual.b2evolution.net/Tricky_stuff" target="_blank"');
+		$htignore = param( 'htignore', 'integer', 0 );
+
+		echo 'ERROR!<br/><b>'.$error_message.'</b>';
+
+		if( $htignore )
+		{	// Ignore errors with .htaccess file
+			return true;
+		}
+		else
+		{	// Some errors are existing with .htaccess file, Display a link to ignore the errors and continue instalation
+			echo '<p style="text-align:center;font-size:150%;font-weight:bold;margin-top:10px"><a href="'.$_SERVER['REQUEST_URI'].'&htignore=1">'.T_('Continue installation &raquo;').'</a></p>';
+			return false;
+		}
 	}
 	echo '</p>';
+
+	return true;
 }
 
 /**
@@ -803,13 +896,32 @@ function do_install_htaccess( $upgrade = false )
 			echo T_('Already installed.');
 			return ''; // all is well :)
 		}
-		return T_('You already have a file named .htaccess in your your base url folder.');
+
+		if( @file_exists( $basepath.'sample.htaccess' ) )
+		{
+			$content_htaccess = trim( file_get_contents( $basepath.'.htaccess' ) );
+			$content_sample_htaccess = trim( file_get_contents( $basepath.'sample.htaccess' ) );
+
+			if( $content_htaccess != $content_sample_htaccess )
+			{	// The .htaccess file has content that different from a sample file
+				$error_message = '<p class="red">'.T_('There is already a file called .htaccess at the blog root. If you don\'t specifically need this file, it is recommended that you delete it or rename it to old.htaccess before you continue. This will allow b2evolution to create a new .htaccess file that is optimized for best results.').'</p>';
+				$error_message .= T_('Here are the contents of the current .htaccess file:');
+				$error_message .= '<div style="overflow:auto"><pre>'.htmlspecialchars( $content_htaccess ).'</pre></div><br />';
+				$error_message .= sprintf( T_('Again, we recommend you remove this file before continuing. If you chose to keep it, b2evolution will probably still work, but for optimization you should follow <a %s>these instructions</a>.'), 'href="http://manual.b2evolution.net/Htaccess_file" target="_blank"');
+				return $error_message;
+			}
+			else
+			{
+				echo T_('Already installed.');
+				return '';
+			}
+		}
 	}
 
 	// Make sure we have a sample file to start with:
-	if( ! @file_exists($basepath.'sample.htaccess') )
+	if( ! @file_exists( $basepath.'sample.htaccess' ) )
 	{
-		return 'Can not find file [ sample.htaccess ] in your base url folder.';
+		return 'Cannot find file [ sample.htaccess ] in your base url folder.';
 	}
 
 	// Try to copy that file to the test folder:
@@ -858,310 +970,8 @@ function get_antispam_query()
 
 /*
  * $Log$
- * Revision 1.107  2011/10/18 00:17:50  fplanque
- * rollback of unwanted scrollable window
- *
- * Revision 1.106  2011/10/17 15:10:30  efy-yurybakh
- * If there is an email address in a comment, do not allow posting the comment
- *
- * Revision 1.105  2011/10/17 10:33:01  efy-vitalij
- * add google_maps plugin installation if $test_install_all_features = true
- *
- * Revision 1.104  2011/10/15 20:36:05  sam2kb
- * Display messages generated by installer in a scrollable window
- *
- * Revision 1.103  2011/09/29 11:29:30  efy-yurybakh
- * add $test_install_all_features
- *
- * Revision 1.102  2011/09/07 07:29:09  sam2kb
- * i18n update
- *
- * Revision 1.101  2011/09/04 22:13:23  fplanque
- * copyright 2011
- *
- * Revision 1.100  2011/08/31 21:42:10  sam2kb
- * minor
- *
- * Revision 1.99  2011/01/02 02:20:25  sam2kb
- * typo: explicitely => explicitly
- *
- * Revision 1.98  2010/12/08 12:57:16  efy-asimo
- * widgets default blog param - fix
- *
- * Revision 1.97  2010/12/06 23:02:50  fplanque
- * no message
- *
- * Revision 1.96  2010/10/19 02:00:54  fplanque
- * MFB
- *
- * Revision 1.94.2.2  2010/10/17 19:35:36  fplanque
- * fix
- *
- * Revision 1.95  2010/05/24 21:27:58  sam2kb
- * Fixed some translated strings
- *
- * Revision 1.94  2010/04/27 19:25:57  blueyed
- * Installer: fix for undefined host in db_config.
- *
- * Revision 1.93  2010/04/07 08:26:11  efy-asimo
- * Allow multiple slugs per post - update & fix
- *
- * Revision 1.92  2010/04/02 07:27:11  efy-asimo
- * cache folders rename and Filelist navigation - fix
- *
- * Revision 1.91  2010/03/22 23:50:55  fplanque
- * Fixed widget install factorization
- *
- * Revision 1.90  2010/03/04 18:02:50  fplanque
- * Cleaned up .htaccess install
- *
- * Revision 1.89  2010/03/03 18:56:50  fplanque
- * minor
- *
- * Revision 1.88  2010/02/18 06:59:37  efy-yury
- * localization of widgets create code
- *
- * Revision 1.87  2010/02/13 13:42:26  efy-yury
- * move get_antispam_query()
- *
- * Revision 1.86  2010/02/08 17:55:38  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.85  2010/02/06 23:10:50  sam2kb
- * minor
- *
- * Revision 1.84  2010/01/25 18:18:21  efy-asimo
- * .htaccess automatic install
- *
- * Revision 1.83  2009/12/20 21:05:08  fplanque
- * New default widget styles
- *
- * Revision 1.82  2009/12/14 03:59:51  fplanque
- * added 2 new skins
- *
- * Revision 1.81  2009/12/10 20:13:25  blueyed
- * Add log_errors property to DB and set it to false in get_db_version to not
- * log SQL errors which are expected during install.
- *
- * Revision 1.80  2009/10/17 16:31:33  efy-maxim
- * Renamed: T_groupsettings to T_groups__groupsettings, T_usersettings to T_users__usersettings
- *
- * Revision 1.79  2009/10/04 18:27:34  blueyed
- * Changed nb_of_basic_plugins to list of plugins (basic_plugins), and tell about differences on failure.
- *
- * Revision 1.78  2009/10/04 18:05:24  blueyed
- * rename nr_ to nb_
- *
- * Revision 1.77  2009/09/26 12:00:44  tblue246
- * Minor/coding style
- *
- * Revision 1.76  2009/09/25 07:33:31  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.75  2009/09/20 00:33:59  blueyed
- * Add widget to display avatar of collection/blog owner. Install it for all new blogs by default.
- *
- * Revision 1.74  2009/09/14 14:10:14  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.73  2009/09/13 22:34:59  blueyed
- * doc
- *
- * Revision 1.71  2009/07/19 21:00:19  fplanque
- * minor
- *
- * Revision 1.70  2009/07/16 21:36:26  blueyed
- * Comment debug code(?!)
- * fp> No, it makes sense to show what modules are being installed.
- * dh> I've seen it being displayed in (non-install) tests and thought that it should not get displayed there.
- *
- * Revision 1.69  2009/07/12 22:22:26  tblue246
- * Translation bugfix
- *
- * Revision 1.68  2009/07/12 18:41:58  fplanque
- * doc / help
- *
- * Revision 1.67  2009/07/10 19:48:02  fplanque
- * clean up a little bit
- *
- * Revision 1.66  2009/07/10 18:41:34  fplanque
- * do NOT hide password warning from developers.
- * They need to know what teh rest of the world sees.
- *
- * Revision 1.65  2009/07/10 06:48:46  sam2kb
- * Don't show the message about random password if $install_password is set.
- *
- * Revision 1.64  2009/07/07 23:17:31  sam2kb
- * Rolled back translation in serialized strings
- *
- * Revision 1.63  2009/07/07 04:52:54  sam2kb
- * Made some strings translatable
- *
- * Revision 1.62  2009/07/02 13:35:19  fplanque
- * Improved installer -- language/locale selection moved to a place where it's visible!
- *
- * Revision 1.61  2009/05/26 17:00:04  fplanque
- * added twitter plugin + better auto-install code for plugins in general
- *
- * Revision 1.60  2009/05/23 20:20:18  fplanque
- * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
- *
- * Revision 1.59  2009/03/24 23:57:07  blueyed
- * Fix error in PHP5 during upgrade, when existing plugins are using Plugin(User)Settings in PluginInit. This needs a global Plugins instance, which is a reference to Plugins_admin during installation now.
- *
- * Revision 1.58  2009/03/21 22:55:15  fplanque
- * Adding TinyMCE -- lowfat version
- *
- * Revision 1.57  2009/03/15 22:48:16  fplanque
- * refactoring... final step :)
- *
- * Revision 1.56  2009/03/08 23:57:47  fplanque
- * 2009
- *
- * Revision 1.55  2009/01/22 23:26:45  blueyed
- * Fix install-myself test (and stuff around it). Move 'newdb' action from install/index.php to functions_install.php to call it the same as during real install.
- *
- * Revision 1.54  2008/09/24 10:39:42  fplanque
- * no message
- *
- * Revision 1.53  2008/09/24 10:36:32  fplanque
- * create some imagy widgets
- *
- * Revision 1.52  2008/09/22 20:06:13  blueyed
- * doc
- *
- * Revision 1.51  2008/05/26 19:15:32  fplanque
- * glossyblue skin
- *
- * Revision 1.50  2008/04/27 02:33:43  fplanque
- * skins
- *
- * Revision 1.49  2008/04/15 20:30:48  fplanque
- * terrafirma minor
- *
- * Revision 1.48  2008/04/06 19:19:30  fplanque
- * Started moving some intelligence to the Modules.
- * 1) Moved menu structure out of the AdminUI class.
- * It is part of the app structure, not the UI. Up to this point at least.
- * Note: individual Admin skins can still override the whole menu.
- * 2) Moved DB schema to the modules. This will be reused outside
- * of install for integrity checks and backup.
- * 3) cleaned up config files
- *
- * Revision 1.47  2008/04/04 17:02:22  fplanque
- * cleanup of global settings
- *
- * Revision 1.46  2008/02/07 00:35:52  fplanque
- * cleaned up install
- *
- * Revision 1.45  2008/01/21 17:56:34  fplanque
- * no more code plugin by default
- *
- * Revision 1.44  2008/01/21 09:35:38  fplanque
- * (c) 2008
- *
- * Revision 1.43  2008/01/12 19:25:58  blueyed
- * - Fix install from < 0.8: Make function "cleanup_post_quotes" inline and fix table name
- * - Only check max_execution_time when > 0 (not disabled)
- *
- * Revision 1.42  2008/01/07 03:00:52  fplanque
- * minor
- *
- * Revision 1.41  2007/12/28 00:13:02  fplanque
- * no message
- *
- * Revision 1.40  2007/12/27 23:56:07  fplanque
- * Better out of the box experience
- *
- * Revision 1.39  2007/12/22 16:59:41  fplanque
- * Miami blue 2.x
- *
- * Revision 1.38  2007/10/08 21:30:19  fplanque
- * evocamp skin
- *
- * Revision 1.37  2007/10/08 08:32:56  fplanque
- * widget fixes
- *
- * Revision 1.36  2007/10/01 01:06:31  fplanque
- * Skin/template functions cleanup.
- *
- * Revision 1.35  2007/09/28 02:17:48  fplanque
- * Menu widgets
- *
- * Revision 1.34  2007/09/19 02:54:16  fplanque
- * bullet proof upgrade
- *
- * Revision 1.33  2007/09/08 23:46:38  fplanque
- * made evopress the new default skin
- *
- * Revision 1.32  2007/09/03 16:46:58  fplanque
- * minor
- *
- * Revision 1.31  2007/08/21 22:32:31  blueyed
- * Use get_Cache() for singleton $Plugins_admin instance. This fixes at least the installation of flickr_plugin.
- *
- * Revision 1.30  2007/07/01 18:49:40  fplanque
- * evopress skin (tentative)
- *
- * Revision 1.29  2007/07/01 03:55:04  fplanque
- * category plugin replaced by widget
- *
- * Revision 1.28  2007/06/25 11:02:30  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.27  2007/06/24 18:28:55  fplanque
- * refactored skin install
- *
- * Revision 1.26  2007/05/14 02:43:06  fplanque
- * Started renaming tables. There probably won't be a better time than 2.0.
- *
- * Revision 1.25  2007/05/13 20:44:52  fplanque
- * more pages support
- *
- * Revision 1.24  2007/05/09 01:58:57  fplanque
- * Widget to display other blogs from same owner
- *
- * Revision 1.23  2007/05/08 19:36:06  fplanque
- * automatic install of public blog list widget on new blogs
- *
- * Revision 1.22  2007/05/07 23:26:19  fplanque
- * public blog list as a widget
- *
- * Revision 1.21  2007/04/26 00:11:10  fplanque
- * (c) 2007
- *
- * Revision 1.20  2007/04/20 02:31:06  fplanque
- * more default plugins
- *
- * Revision 1.19  2007/01/19 09:31:04  fplanque
- * Provision for case sensitive file meta data handling
- *
- * Revision 1.18  2007/01/15 19:10:29  fplanque
- * install refactoring
- *
- * Revision 1.17  2006/11/17 01:46:16  fplanque
- * Fixed broken upgrade path.
- *
- * Revision 1.16  2006/11/01 00:24:07  blueyed
- * Fixed cafelog upgrade
- *
- * Revision 1.15  2006/09/08 15:35:36  blueyed
- * Completely nuked tokenizer dependency - removed commented out block
- *
- * Revision 1.14  2006/08/20 20:54:31  blueyed
- * Removed dependency on tokenizer. Quite a few people don't have it.. see http://forums.b2evolution.net//viewtopic.php?t=8664
- *
- * Revision 1.13  2006/07/04 17:32:30  fplanque
- * no message
- *
- * Revision 1.12  2006/06/19 20:59:38  fplanque
- * noone should die anonymously...
- *
- * Revision 1.11  2006/04/06 08:52:27  blueyed
- * Validate install "misc" requirements ("tokenizer" support for now)
- *
- * Revision 1.10  2005/12/30 18:08:24  fplanque
- * no message
+ * Revision 1.109  2013/11/06 08:05:19  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

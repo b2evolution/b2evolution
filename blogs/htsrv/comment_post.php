@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -30,11 +30,21 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
 
+// Stop a request from the blocked IP addresses
+antispam_block_ip();
+
 header( 'Content-Type: text/html; charset='.$io_charset );
+
+if( $Settings->get('system_lock') )
+{ // System is locked for maintenance, users cannot send a comment
+	$Messages->add( T_('You cannot leave a comment at this time because the system is under maintenance. Please try again in a few moments.'), 'error' );
+	header_redirect(); // Will save $Messages into Session
+}
 
 // Getting GET or POST parameters:
 param( 'comment_post_ID', 'integer', true ); // required
 param( 'redirect_to', 'string', '' );
+param( 'reply_ID', 'integer', 0 );
 
 
 $action = param_arrayindex( 'submit_comment_post_'.$comment_post_ID, 'save' );
@@ -42,20 +52,28 @@ $action = param_arrayindex( 'submit_comment_post_'.$comment_post_ID, 'save' );
 
 $ItemCache = & get_ItemCache();
 $commented_Item = & $ItemCache->get_by_ID( $comment_post_ID );
+// Make sure Blog is loaded
+$commented_Item->load_Blog();
+$blog = $commented_Item->Blog->ID;
 
 if( ! $commented_Item->can_comment( NULL ) )
 {
 	$Messages->add( T_('You cannot leave comments on this post!'), 'error' );
 }
 
+if( $commented_Item->Blog->get_setting( 'allow_html_comment' ) )
+{	// HTML is allowed for this comment
+	$text_format = 'html';
+}
+else
+{	// HTML is disallowed for this comment
+	$text_format = 'htmlspecialchars';
+}
+
 // Note: we use funky field names to defeat the most basic guestbook spam bots and/or their most basic authors
-$comment = param( 'p', 'html' );
+$comment = param( $dummy_fields[ 'content' ], $text_format );
 
-param( 'comment_autobr', 'integer', ($comments_use_autobr == 'always') ? 1 : 0 );
-$commented_Item->load_Blog(); // Make sure Blog is loaded (will be needed whether logged in or not)
-$blog = $commented_Item->Blog->ID;
-
-if( is_logged_in() )
+if( is_logged_in( false ) )
 {
 	/**
 	 * @var User
@@ -71,15 +89,14 @@ else
 {	// User is not logged in (registered users), we need some id info from him:
 	$User = NULL;
 	// Note: we use funky field names to defeat the most basic guestbook spam bots and/or their most basic authors
-	$author = param( 'u', 'string' );
-	$email = param( 'i', 'string' );
-	if( $commented_Item->Blog->get_setting( 'allow_anon_url' ) )
-	{
-		$url = param( 'o', 'string' );
-	}
-	else
-	{
-		$url = NULL;
+	$author = param( $dummy_fields[ 'name' ], 'string' );
+	$email = param( $dummy_fields[ 'email' ], 'string' );
+	$url = param( $dummy_fields[ 'url' ], 'string' );
+
+	if( $url != '' && ! $commented_Item->Blog->get_setting( 'allow_anon_url' ) )
+	{	// It's an automated/malicious submit and we want to reject it
+		// We don't want to waste resources displaying mice error messages or loading blog pages.
+		exit(0);
 	}
 	param( 'comment_cookies', 'integer', 0 );
 	param( 'comment_allow_msgform', 'integer', 0 ); // checkbox
@@ -105,7 +122,6 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 		'comment_post_ID' => $comment_post_ID,
 		'comment' => & $comment,
 		'original_comment' => & $original_comment,
-		'comment_autobr' => & $comment_autobr,
 		'action' => & $action,
 		'anon_name' => & $author,
 		'anon_email' => & $email,
@@ -126,7 +142,7 @@ $comments_email_is_detected = false;
 if( $User )
 {	// User is logged in (or provided, e.g. via OpenID plugin)
 	// Does user have permission to edit?
-	$perm_comment_edit = $User->check_perm( 'blog_published_comments', 'edit', false, $commented_Item->Blog->ID );
+	$perm_comment_edit = $User->check_perm( 'blog_comments', 'edit', false, $commented_Item->Blog->ID );
 }
 else
 {	// User is still not logged in
@@ -186,19 +202,12 @@ else
 }
 
 // CHECK and FORMAT content
-// TODO: AutoBR should really be a "comment renderer" (like with Items)
-// OLD stub: $comment = format_to_post( $comment, $comment_autobr, 1 ); // includes antispam
 $saved_comment = $comment;
 // Following call says "WARNING: this does *NOT* (necessarilly) make the HTML code safe.":
-$comment = check_html_sanity( $comment, $perm_comment_edit ? 'posting' : 'commenting', $comment_autobr, $User );
+$comment = check_html_sanity( $comment, $perm_comment_edit ? 'posting' : 'commenting', $User );
 if( $comment === false )
 {	// ERROR! Restore original comment for further editing:
 	$comment = $saved_comment;
-}
-
-if( empty($comment) )
-{ // comment should not be empty!
-	$Messages->add( T_('Please do not send empty comments.'), 'error' );
 }
 
 // Flood protection was here and SHOULD NOT have moved down!
@@ -207,6 +216,10 @@ if( empty($comment) )
  * Create comment object. Gets validated, before recording it into DB:
  */
 $Comment = new Comment();
+if( $reply_ID > 0 )
+{	// Set parent ID if this comment is reply to other comment
+	$Comment->set( 'in_reply_to_cmt_ID', $reply_ID );
+}
 $Comment->set( 'type', 'comment' );
 $Comment->set_Item( $commented_Item );
 if( $User )
@@ -229,14 +242,18 @@ $Comment->set( 'author_IP', $Hit->IP );
 $Comment->set( 'date', $now );
 $Comment->set( 'content', $comment );
 
-if( $perm_comment_edit )
-{	// User has perm to moderate comments, publish automatically:
-	$Comment->set( 'status', 'published' );
+// Renderers:
+if( param( 'renderers_displayed', 'integer', 0 ) )
+{ // use "renderers" value only if it has been displayed (may be empty)
+	global $Plugins;
+	$comment_renderers = param( 'renderers', 'array', array() );
+	$renderers = $Plugins->validate_renderer_list( $comment_renderers, array( 'Comment' => & $Comment ) );
+	$Comment->set_renderers( $renderers );
 }
-else
-{ // Assign default status for new comments:
-	$Comment->set( 'status', $commented_Item->Blog->get_setting('new_feedback_status') );
-}
+
+// Def status will be the highest publish status what the current User ( or anonymous user if there is no current user ) can post
+$def_status = get_highest_publish_status( 'comment', $commented_Item->Blog->ID, false );
+$Comment->set( 'status', $def_status );
 
 if( $action != 'preview' )
 {
@@ -270,8 +287,29 @@ if( $action != 'preview' )
 
 // get already attached file ids
 param( 'preview_attachments', 'string', '' );
+// finally checked attachments
+$checked_attachments = '';
+$checked_attachments_count = 0;
+if( !empty( $preview_attachments ) )
+{ // Get checked attachments. Some attachments was already unchecked, so needs to be separated.
+	$attachments = explode( ',', $preview_attachments );
+	foreach( $attachments as $attachment_ID )
+	{ // iterate through all attachments and select checked ones
+		if( ( $commented_Item->get_attachments_limit() === 'unlimit' || $checked_attachments_count < (int)$commented_Item->get_attachments_limit() ) &&
+		    param( 'preview_attachment'.$attachment_ID, 'integer', 0 ) )
+		{ // this attachment checkbox was checked in, so it needs to be attached
+			$checked_attachments = $checked_attachments.$attachment_ID.',';
+			$checked_attachments_count++;
+		}
+	}
+	if( !empty( $checked_attachments ) )
+	{ // cut the last comma
+		$checked_attachments = substr( $checked_attachments, 0, strlen( $checked_attachments ) - 1 );
+	}
+}
 
-if( $commented_Item->can_attach() && ( ( $action == 'preview' ) || $ok ) )
+if( $commented_Item->can_attach() && ( ( $action == 'preview' ) || $ok ) &&
+    !empty( $_FILES['uploadfile'] ) && !empty( $_FILES['uploadfile']['size'] ) && !empty( $_FILES['uploadfile']['size'][0] ) )
 { // attaching files is permitted
 	$FileRootCache = & get_FileRootCache();
 	if( is_logged_in() )
@@ -301,14 +339,31 @@ if( $commented_Item->can_attach() && ( ( $action == 'preview' ) || $ok ) )
 				if( empty( $preview_attachments ) )
 				{
 					$preview_attachments = $File->ID;//get_rdfp_rel_path();
+					// newly uploaded file must be checked by default
+					$checked_attachments = $File->ID;
 				}
 				else
 				{
 					$preview_attachments .= ','.$File->ID;//get_rdfp_rel_path();
+					// newly uploaded file must be checked by default
+					if( empty( $checked_attachments ) )
+					{
+						$checked_attachments = $File->ID;
+					}
+					else
+					{
+						$checked_attachments = $checked_attachments.','.$File->ID;
+					}
 				}
+				$checked_attachments_count++;
 			}
 		}
 	}
+}
+
+if( empty( $comment ) && $checked_attachments_count == 0 )
+{ // comment should not be empty!
+	$Messages->add( T_('Please do not send empty comments.'), 'error' );
 }
 
 
@@ -323,10 +378,17 @@ $Plugins->trigger_event('BeforeCommentFormInsert', array(
 /*
  * Display error messages:
  */
-if( $Messages->has_errors() )
+if( $Messages->has_errors() && $action != 'preview' )
 {
 	$Comment->set( 'preview_attachments', $preview_attachments );
+	$Comment->set( 'checked_attachments', $checked_attachments );
 	save_comment_to_session( $Comment );
+
+	if( !empty( $reply_ID ) )
+	{
+		$redirect_to = url_add_param( $redirect_to, 'reply_ID='.$reply_ID.'&redir=no', '&' );
+	}
+
 	header_redirect(); // 303 redirect
 	// exited here
 
@@ -356,8 +418,9 @@ if( $Messages->has_errors() )
 
 if( $action == 'preview' )
 { // set the Comment into user's session and redirect.
-	$Comment->set( 'original_content', $original_comment ); // used in the textarea input field again
+	$Comment->set( 'original_content', html_entity_decode( $original_comment ) ); // used in the textarea input field again
 	$Comment->set( 'preview_attachments', $preview_attachments ); // memorize attachments
+	$Comment->set( 'checked_attachments', $checked_attachments ); // memorize checked attachments
 	$Comment->set( 'email_is_detected', $comments_email_is_detected ); // used to change a style of the comment
 	$Session->set( 'core.preview_Comment', $Comment );
 	$Session->set( 'core.no_CachePageContent', 1 );
@@ -390,8 +453,13 @@ if( $action == 'preview' )
 
 	// Passthrough comment_cookies & comment_allow_msgform params:
 	// fp> moved this down here in order to keep return URLs clean whenever this is not needed.
-	$redirect_to = url_add_param($redirect_to, 'redir=no&comment_cookies='.$comment_cookies
-		.'&comment_allow_msgform='.$comment_allow_msgform, '&');
+	$redirect_to = url_add_param( $redirect_to, 'redir=no&comment_cookies='.$comment_cookies
+		.'&comment_allow_msgform='.$comment_allow_msgform, '&' );
+
+	if( !empty( $reply_ID ) )
+	{
+		$redirect_to = url_add_param( $redirect_to, 'reply_ID='.$reply_ID, '&' );
+	}
 
 	$redirect_to .= '#comment_preview';
 
@@ -413,16 +481,30 @@ if( !empty( $preview_attachments ) )
 {
 	global $DB;
 	$order = 1;
+	$FileCache = & get_FileCache();
 	$attachments = explode( ',', $preview_attachments );
+	$final_attachments = explode( ',', $checked_attachments );
 	$DB->begin();
 	foreach( $attachments as $file_ID )
 	{ // create links between comment and attached files
-		$edited_Link = new Link();
-		$edited_Link->set( 'cmt_ID', $Comment->ID );
-		$edited_Link->set( 'file_ID', $file_ID );
-		$edited_Link->set( 'position', 'aftermore' );
-		$edited_Link->set( 'order', $order );
-		$edited_Link->dbinsert();
+		if( in_array( $file_ID, $final_attachments ) )
+		{ // attachment checkbox was checked, create the link
+			$edited_Link = new Link();
+			$edited_Link->set( 'cmt_ID', $Comment->ID );
+			$edited_Link->set( 'file_ID', $file_ID );
+			$edited_Link->set( 'position', 'aftermore' );
+			$edited_Link->set( 'order', $order );
+			$edited_Link->dbinsert();
+			$order++;
+		}
+		else
+		{ // attachment checkbox was not checked, remove unused uploaded file
+			$unused_File = $FileCache->get_by_ID( $file_ID, false );
+			if( $unused_File )
+			{
+				$unused_File->unlink();
+			}
+		}
 	}
 	$DB->commit();
 }
@@ -485,19 +567,35 @@ if( $Comment->ID )
 
 
 	// Add a message, according to the comment's status:
-	if( $Comment->status == 'published' )
+	switch( $Comment->status )
 	{
-		$Messages->add( T_('Your comment has been submitted.'), 'success' );
-
-		// Append anchor to the redirect_to param, so the user sees his comment:
-		$redirect_to .= '#'.$Comment->get_anchor();
+		case 'published':
+			$success_message = T_('Your comment has been submitted.');
+			// Append anchor to the redirect_to param, so the user sees his comment:
+			$redirect_to .= '#'.$Comment->get_anchor();
+			break;
+		case 'community':
+			$success_message = T_('Your comment is now visible by the community.');
+			break;
+		case 'protected':
+			$success_message = T_('Your comment is now visible by the blog members.');
+			break;
+		case 'review':
+			if( is_logged_in() && $current_User->check_perm( 'blog_comment!review', 'create', false, $blog ) )
+			{
+				$success_message = T_('Your comment is now visible by moderators only (+You).');
+				break;
+			}
+		default:
+			$success_message = T_('Your comment has been submitted. It will appear once it has been approved.');
+			break;
 	}
-	else
-	{
-		$Messages->add( T_('Your comment has been submitted. It will appear once it has been approved.'), 'success' );
+	$Messages->add( $success_message, 'success' );
 
-		if( !is_logged_in() && $Settings->get( 'newusers_canregister' ) && $Comment->Item->Blog->get_setting( 'comments_register' ) )
-		{	// Redirect to the registration form
+	if( !is_logged_in() )
+	{
+		if( $Settings->get( 'newusers_canregister' ) && $Comment->Item->Blog->get_setting( 'comments_register' ) )
+		{ // Redirect to the registration form
 			$Messages->add( T_('ATTENTION: Create a user account now so that other users can contact you after reading your comment.'), 'error' );
 
 			$register_user = array(
@@ -508,10 +606,8 @@ if( $Comment->ID )
 
 			header_redirect( get_user_register_url( $Comment->Item->get_url( 'public_view' ), 'reg after comment' ) );
 		}
-	}
 
-	if( !is_logged_in() )
-	{ // Not logged in user. We want him to see his comment has not vanished if he checks back on the Item page
+		// Not logged in user. We want him to see his comment has not vanished if he checks back on the Item page
 		// before the cache has expired. Invalidate cache for that page:
 		// Note: this is approximative and may not cover all URLs where the user expects to see the comment...
 		// TODO: fp> solution: touch dates?
@@ -527,215 +623,8 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
- * Revision 1.158  2011/10/18 09:16:18  efy-yurybakh
- * If there is an email address in a comment, do not allow posting the comment (changes)
+ * Revision 1.160  2013/11/06 08:03:44  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.157  2011/10/17 23:30:53  fplanque
- * cleanup
- *
- * Revision 1.156  2011/10/17 17:02:28  efy-yurybakh
- * Let people create an account just after posting a comment
- *
- * Revision 1.155  2011/10/17 15:32:46  efy-yurybakh
- * Let people create an account just after posting a comment
- *
- * Revision 1.154  2011/10/17 15:10:29  efy-yurybakh
- * If there is an email address in a comment, do not allow posting the comment
- *
- * Revision 1.153  2011/10/04 08:42:18  efy-asimo
- * Remove unused code
- *
- * Revision 1.152  2011/10/04 08:39:29  efy-asimo
- * Comment and message forms save/reload content in case of error
- *
- * Revision 1.151  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.150  2011/09/04 21:32:17  fplanque
- * minor MFB 4-1
- *
- * Revision 1.149  2011/05/19 17:47:07  efy-asimo
- * register for updates on a specific blog post
- *
- * Revision 1.148  2011/03/16 01:31:19  fplanque
- * minor
- *
- * Revision 1.147  2011/03/03 12:47:29  efy-asimo
- * comments attachments
- *
- * Revision 1.146  2011/03/02 09:45:58  efy-asimo
- * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
- *
- * Revision 1.145  2010/11/25 15:16:34  efy-asimo
- * refactor $Messages
- *
- * Revision 1.144  2010/06/01 11:33:19  efy-asimo
- * Split blog_comments advanced permission (published, deprecated, draft)
- * Use this new permissions (Antispam tool,when edit/delete comments)
- *
- * Revision 1.143  2010/05/02 16:38:34  fplanque
- * minor
- *
- * Revision 1.142  2010/03/19 01:31:42  blueyed
- * check_html_sanity: add User param, defaulting to current User. This is required if posting User is not logged in (e.g. commenting via OpenID, but logged out).
- *
- * Revision 1.141  2010/03/18 22:53:38  blueyed
- * Fix param params
- *
- * Revision 1.140  2010/03/18 21:58:32  blueyed
- * comment_post.php: pass crumb_comment to CommentFormSent plugin hook and assert the valid crumb after this hook (required to fix OpenID).
- *
- * Revision 1.139  2010/02/08 17:50:53  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.138  2010/01/30 18:55:15  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.137  2010/01/19 21:10:18  efy-yury
- * update: crumbs
- *
- * Revision 1.136  2009/12/04 23:27:48  fplanque
- * cleanup Expires: header handling
- *
- * Revision 1.135  2009/09/26 12:00:42  tblue246
- * Minor/coding style
- *
- * Revision 1.134  2009/09/25 07:32:51  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.133  2009/09/14 14:03:02  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.132  2009/05/20 13:53:34  fplanque
- * Return to a clean url after posting a comment
- *
- * Revision 1.131  2009/03/08 23:57:36  fplanque
- * 2009
- *
- * Revision 1.130  2009/01/27 23:45:41  fplanque
- * theoretically this is a better implementation because the check_perm is supposed to check for perms on the currentblog here.
- * needs some more testing though.
- *
- * Revision 1.129  2009/01/27 22:54:01  fplanque
- * commenting cleanup
- *
- * Revision 1.128  2009/01/27 22:30:32  fplanque
- * Whoever has permission to *edit* comments will now have extended permissions on *new* comments too, including posting <a> tags.
- *
- * Revision 1.127  2008/09/29 08:22:47  fplanque
- * bugfix
- *
- * Revision 1.126  2008/09/28 08:06:03  fplanque
- * Refactoring / extended page level caching
- *
- * Revision 1.125  2008/09/27 07:54:33  fplanque
- * minor
- *
- * Revision 1.124  2008/06/26 21:21:12  blueyed
- * Fix indent
- *
- * Revision 1.123  2008/06/22 18:17:55  blueyed
- * comment_post: Passthrough comment_cookies & comment_allow_msgform params
- *
- * Revision 1.122  2008/06/22 17:50:51  blueyed
- * Use vars for cookie names; typo
- *
- * Revision 1.121  2008/02/19 11:11:16  fplanque
- * no message
- *
- * Revision 1.120  2008/01/21 09:35:23  fplanque
- * (c) 2008
- *
- * Revision 1.119  2008/01/19 18:24:25  fplanque
- * antispam checking refactored
- *
- * Revision 1.118  2008/01/19 15:45:29  fplanque
- * refactoring
- *
- * Revision 1.117  2008/01/19 10:57:11  fplanque
- * Splitting XHTML checking by group and interface
- *
- * Revision 1.116  2008/01/10 19:59:52  fplanque
- * reduced comment PITA
- *
- * Revision 1.115  2007/11/02 01:57:57  fplanque
- * comment ratings
- *
- * Revision 1.114  2007/11/01 19:52:47  fplanque
- * better comment forms
- *
- * Revision 1.113  2007/07/09 21:24:12  fplanque
- * cleanup of admin page top
- *
- * Revision 1.112  2007/06/23 22:04:17  fplanque
- * minor
- *
- * Revision 1.111  2007/05/20 20:54:49  fplanque
- * better comment moderation links
- *
- * Revision 1.110  2007/04/26 00:11:14  fplanque
- * (c) 2007
- *
- * Revision 1.109  2007/02/28 23:21:53  blueyed
- * Pass $original_comment to CommentFormSent and "action" to BeforeCommentFormInsert
- *
- * Revision 1.108  2007/02/22 22:14:14  blueyed
- * Improved CommentFormSent hook
- *
- * Revision 1.107  2007/02/21 23:52:26  fplanque
- * doc
- *
- * Revision 1.106  2007/02/13 01:30:31  blueyed
- * TODO: do not notify about not published comments / use "outbound_notifications_mode" setting for comments, too
- *
- * Revision 1.105  2007/02/03 18:52:15  fplanque
- * doc
- *
- * Revision 1.104  2007/01/28 23:58:46  blueyed
- * - Added hook CommentFormSent
- * - Re-ordered comment_post.php to: init, validate, process
- * - RegisterFormSent hook can now filter the form values in a clean way
- *
- * Revision 1.103  2007/01/25 00:59:49  blueyed
- * Do not pass "original_comment" in BeforeCommentFormInsert as a reference: makes no sense
- *
- * Revision 1.102  2007/01/21 23:26:31  fplanque
- * preserve "fail on spam" by default
- *
- * Revision 1.101  2007/01/21 22:51:17  blueyed
- * Security fix: tags have not been stripped
- *
- * Revision 1.100  2007/01/21 02:05:48  fplanque
- * cleanup
- *
- * Revision 1.99  2007/01/16 22:48:13  blueyed
- * Plugin hook TODO
- *
- * Revision 1.98  2006/12/26 00:08:30  fplanque
- * wording
- *
- * Revision 1.97  2006/12/03 04:34:44  fplanque
- * doc
- *
- * Revision 1.96  2006/12/03 02:01:19  blueyed
- * Removed unused $evo_html_headlines handling
- *
- * Revision 1.95  2006/12/03 01:58:27  blueyed
- * Renamed $admin_path_seprator to $admin_path_separator and AdminUI_general::pathSeperator to AdminUI::pathSeparator
- *
- * Revision 1.94  2006/11/26 02:30:38  fplanque
- * doc / todo
- *
- * Revision 1.93  2006/11/24 18:27:22  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.92  2006/11/24 18:06:02  blueyed
- * Handle saving of $Messages centrally in header_redirect()
- *
- * Revision 1.91  2006/11/16 01:59:14  fplanque
- * doc
- *
- * Revision 1.89  2006/10/30 13:48:56  blueyed
- * Fixed charset/HTML for comment-post page (errors)
  */
 ?>

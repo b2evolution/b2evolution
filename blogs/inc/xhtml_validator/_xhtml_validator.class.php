@@ -7,7 +7,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2003 by Nobuo SAKIYAMA - {@link http://www.sakichan.org/}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
@@ -340,61 +340,8 @@ class XHTML_Validator
 
 /*
  * $Log$
- * Revision 1.14  2011/09/04 22:13:21  fplanque
- * copyright 2011
+ * Revision 1.15  2013/11/06 08:05:10  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.13  2010/02/08 17:55:17  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.12  2009/09/11 20:16:33  blueyed
- * Load required funcs (when used from tests). Doc.
- *
- * Revision 1.11  2009/07/08 02:38:55  sam2kb
- * Replaced strlen & substr with their mbstring wrappers evo_strlen & evo_substr when needed
- *
- * Revision 1.10  2009/03/08 23:57:46  fplanque
- * 2009
- *
- * Revision 1.9  2008/01/21 09:35:37  fplanque
- * (c) 2008
- *
- * Revision 1.8  2008/01/20 18:20:27  fplanque
- * Antispam per group setting
- *
- * Revision 1.7  2008/01/20 15:31:12  fplanque
- * configurable validation/security rules
- *
- * Revision 1.6  2008/01/19 18:24:25  fplanque
- * antispam checking refactored
- *
- * Revision 1.5  2008/01/19 15:45:28  fplanque
- * refactoring
- *
- * Revision 1.4  2008/01/19 10:57:11  fplanque
- * Splitting XHTML checking by group and interface
- *
- * Revision 1.3  2008/01/18 15:53:42  fplanque
- * Ninja refactoring
- *
- * Revision 1.2  2007/09/13 02:37:22  fplanque
- * special cases
- *
- * Revision 1.1  2007/06/25 11:02:27  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.13  2007/04/26 00:11:07  fplanque
- * (c) 2007
- *
- * Revision 1.12  2006/11/27 02:29:53  blueyed
- * Committed test changes by accident. Test added for it as an exercise.
- *
- * Revision 1.11  2006/11/26 02:30:39  fplanque
- * doc / todo
- *
- * Revision 1.10  2006/11/06 22:56:53  blueyed
- * Added full(?) XHTML entities support to the html checker
- *
- * Revision 1.9  2006/11/04 21:44:59  blueyed
- * Include latin1 entities to let xml_parse() not choke on those
  */
 ?>

@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -39,7 +39,7 @@ $s = param( 's', 'string', '', true );
 //Create query
 $SQL = new SQL();
 $SQL->SELECT( '*' );
-$SQL->FROM( 'T_currency' );
+$SQL->FROM( 'T_regional__currency' );
 
 if( !empty($s) )
 {	// We want to filter on search keyword:
@@ -180,41 +180,8 @@ $Results->display();
 
 /*
  * $Log$
- * Revision 1.14  2011/09/22 13:03:11  efy-vitalij
- * add country pref column, clickable En column in countries and currencies results  tables
- *
- * Revision 1.13  2010/03/01 07:52:51  efy-asimo
- * Set manual links to lowercase
- *
- * Revision 1.12  2010/02/14 14:18:39  efy-asimo
- * insert manual links
- *
- * Revision 1.11  2010/01/17 04:14:44  fplanque
- * minor / fixes
- *
- * Revision 1.10  2010/01/16 14:16:32  efy-asimo
- * Currencies/Countries cosmetics and regenerate_url after Enable/Disable
- *
- * Revision 1.9  2010/01/15 17:27:33  efy-asimo
- * Global Settings > Currencies - Add Enable/Disable column
- *
- * Revision 1.8  2010/01/03 12:03:17  fplanque
- * More crumbs...
- *
- * Revision 1.7  2009/09/26 12:00:43  tblue246
- * Minor/coding style
- *
- * Revision 1.6  2009/09/25 07:33:14  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.5  2009/09/12 18:57:27  efy-sergey
- * Added a search field to the currency tables
- *
- * Revision 1.4  2009/09/12 18:52:05  efy-sergey
- * Changed query creation to using an SQL object
- *
- * Revision 1.3  2009/09/02 23:29:34  fplanque
- * doc
+ * Revision 1.16  2013/11/06 08:04:36  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

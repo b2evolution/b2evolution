@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -296,61 +296,8 @@ class BlockCache
 
 /*
  * $Log$
- * Revision 1.20  2011/09/09 22:01:05  fplanque
- * doc
- *
- * Revision 1.19  2011/09/07 18:25:11  fplanque
- * widget & blockcache fixes
- *
- * Revision 1.18  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.17  2010/04/22 20:56:11  blueyed
- *  - Move/Refactor BlockCache::cacheproviderstore/cacheproviderretrieve into get_from_mem_cache/set_to_mem_cache
- *  - Add unset_from_mem_cache
- *
- * Revision 1.14  2010/04/22 20:31:45  blueyed
- * cacheproviderstore/cacheproviderretrieve: add Debuglog entries when there's no backend available.
- * cacheproviderstore: move $ttl to function arguments.
- *
- * Revision 1.13  2010/04/22 20:29:53  blueyed
- * doc for cacheproviderstore/cacheproviderretrieve
- *
- * Revision 1.12  2010/04/22 20:29:04  blueyed
- * Fix eaccelerator implementation of cacheproviderstore (passing correct argument).
- *
- * Revision 1.11  2010/02/08 17:51:42  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.10  2009/12/22 08:02:12  fplanque
- * doc
- *
- * Revision 1.9  2009/12/22 03:43:10  blueyed
- * todo
- *
- * Revision 1.8  2009/12/22 02:56:35  blueyed
- * BlockCache: add support for xcache and eaccelerator
- *
- * Revision 1.7  2009/12/06 03:24:11  fplanque
- * minor/doc/fixes
- *
- * Revision 1.6  2009/12/01 04:19:25  fplanque
- * even more invalidation dimensions
- *
- * Revision 1.5  2009/12/01 03:33:19  fplanque
- * Improved handling of invalidation dates
- *
- * Revision 1.4  2009/12/01 02:04:45  fplanque
- * minor
- *
- * Revision 1.3  2009/12/01 01:33:21  blueyed
- * Fix install: wrap apc_*
- *
- * Revision 1.2  2009/11/30 23:16:24  fplanque
- * basic cache invalidation is working now
- *
- * Revision 1.1  2009/11/30 04:31:37  fplanque
- * BlockCache Proof Of Concept
+ * Revision 1.21  2013/11/06 08:03:47  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

@@ -14,7 +14,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -26,14 +26,17 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // Default params:
 $params = array_merge( array(
+		'Item'                 => NULL,
 		'disp_comments'        => true,
 		'disp_comment_form'    => true,
 		'disp_trackbacks'      => true,
 		'disp_trackback_url'   => true,
 		'disp_pingbacks'       => true,
+		'disp_section_title'   => true,
 		'disp_rating_summary'  => true,
 		'before_section_title' => '<h3>',
 		'after_section_title'  => '</h3>',
+		'comments_title_text'  => '',
 		'comment_list_start'   => "\n\n",
 		'comment_list_end'     => "\n\n",
 		'comment_start'        => '<div class="bComment">',
@@ -43,13 +46,25 @@ $params = array_merge( array(
 		'comment_error_start'  => '<div class="bComment" id="comment_error">',
 		'comment_error_end'    => '</div>',
 		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
-		'link_to'		           => 'userurl>userpage',		    // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
+		'link_to'              => 'userurl>userpage',		    // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		'form_title_start'     => '<h3>',
 		'form_title_end'       => '</h3>',
+		'disp_notification'    => true,
+		'notification_before'  => '<div class="comment_notification">',
+		'notification_text'    => T_( 'This is your post. You are receiving notifications when anyone comments on your posts.' ),
+		'notification_text2'   => T_( 'You will be notified by email when someone comments here.' ),
+		'notification_text3'   => T_( 'Notify me by email when someone comments here.' ),
+		'notification_after'   => '</div>',
+		'feed_title'           => '#',
 	), $params );
 
 
 global $c, $tb, $pb, $redir;
+
+if( !empty( $params['Item'] ) && is_object( $params['Item'] ) )
+{	// Set Item object from params
+	$Item = $params['Item'];
+}
 
 // ----------------- MODULES "Before Comments" EVENT -----------------
 modules_call_method( 'before_comments', $params );
@@ -64,7 +79,7 @@ if( $Item->can_see_comments( true ) )
 		$params['disp_comment_form'] = false;			// DO NOT Display the comments form if not requested
 	}
 
-	if( empty($tb) || !$Blog->get( 'allowtrackbacks' ) )
+	if( empty($tb) || !$Item->can_receive_pings() )
 	{	// Trackback not requested or not allowed
 		$params['disp_trackbacks'] = false;				// DO NOT Display the trackbacks if not requested
 		$params['disp_trackback_url'] = false;		// DO NOT Display the trackback URL if not requested
@@ -89,20 +104,24 @@ if( $Item->can_see_comments( true ) )
 	if( $params['disp_comments'] )
 	{	// We requested to display comments
 		if( $Item->can_see_comments() )
-		{ // User can see a comments
+		{	// User can see a comments
 			$type_list[] = 'comment';
-			if( $title = $Item->get_feedback_title( 'comments' ) )
+			if( !empty( $params['comments_title_text'] ) )
+			{
+				$disp_title[] = $params['comments_title_text'];
+			}
+			else if( $title = $Item->get_feedback_title( 'comments' ) )
 			{
 				$disp_title[] = $title;
 			}
 
 			if( $params['disp_rating_summary'] )
-			{ // We requested to display rating summary
+			{	// We requested to display rating summary
 				$rating_summary = $Item->get_rating_summary( $params );
 			}
 		}
 		else
-		{ // Use cannot see comments
+		{	// User cannot see comments
 			$params['disp_comments'] = false;
 		}
 		echo '<a id="comments"></a>';
@@ -149,7 +168,7 @@ if( $Item->can_see_comments( true ) )
 	{
 		if( empty($disp_title) )
 		{	// No title yet
-			if( $title = $Item->get_feedback_title( 'feedbacks', '', T_('Feedback awaiting moderation'), T_('Feedback awaiting moderation'), 'draft' ) )
+			if( $title = $Item->get_feedback_title( 'feedbacks', '', T_('Feedback awaiting moderation'), T_('Feedback awaiting moderation'), array( 'review', 'draft' ), false ) )
 			{ // We have some feedback awaiting moderation: we'll want to show that in the title
 				$disp_title[] = $title;
 			}
@@ -160,19 +179,24 @@ if( $Item->can_see_comments( true ) )
 			$disp_title[] = T_('No feedback yet');
 		}
 
-		echo $params['before_section_title'];
-		echo implode( ', ', $disp_title);
-		echo $params['after_section_title'];
+		if( $params['disp_section_title'] )
+		{	// Display title
+			echo $params['before_section_title'];
+			echo implode( ', ', $disp_title);
+			echo $params['after_section_title'];
+		}
 		echo $rating_summary;
 
-		$CommentList = new CommentList2( $Blog, $Blog->get_setting('comments_per_page'), 'CommentCache', 'c_' );
+		$comments_per_page = !$Blog->get_setting( 'threaded_comments' ) ? $Blog->get_setting( 'comments_per_page' ) : 1000;
+		$CommentList = new CommentList2( $Blog, $comments_per_page, 'CommentCache', 'c_' );
 
 		// Filter list:
 		$CommentList->set_default_filters( array(
 				'types' => $type_list,
-				'statuses' => array ( 'published' ),
+				'statuses' => get_inskin_statuses(),
 				'post_ID' => $Item->ID,
 				'order' => $Blog->get_setting( 'comments_orderdir' ),
+				'threaded_comments' => $Blog->get_setting( 'threaded_comments' ),
 			) );
 
 		$CommentList->load_from_Request();
@@ -191,6 +215,20 @@ if( $Item->can_see_comments( true ) )
 		}
 
 
+		if( $Blog->get_setting( 'threaded_comments' ) )
+		{	// Array to store the comment replies
+			global $CommentReplies;
+			$CommentReplies = array();
+
+			if( $Comment = $Session->get('core.preview_Comment') )
+			{	// Init PREVIEW comment
+				if( $Comment->item_ID == $Item->ID )
+				{
+					$CommentReplies[ $Comment->in_reply_to_cmt_ID ] = array( $Comment );
+				}
+			}
+		}
+
 		echo $params['comment_list_start'];
 		/**
 		 * @var Comment
@@ -198,17 +236,31 @@ if( $Item->can_see_comments( true ) )
 		while( $Comment = & $CommentList->get_next() )
 		{	// Loop through comments:
 
+			if( $Blog->get_setting( 'threaded_comments' ) && $Comment->in_reply_to_cmt_ID > 0 )
+			{	// Store the replies in a special array
+				if( !isset( $CommentReplies[ $Comment->in_reply_to_cmt_ID ] ) )
+				{
+					$CommentReplies[ $Comment->in_reply_to_cmt_ID ] = array();
+				}
+				$CommentReplies[ $Comment->in_reply_to_cmt_ID ][] = $Comment;
+				continue; // Skip dispay a comment reply here in order to dispay it after parent comment by function display_comment_replies()
+			}
+
 			// ------------------ COMMENT INCLUDED HERE ------------------
 			skin_include( $params['comment_template'], array(
 					'Comment'         => & $Comment,
-				  'comment_start'   => $params['comment_start'],
-				  'comment_end'     => $params['comment_end'],
-					'link_to'		      => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
+					'comment_start'   => $params['comment_start'],
+					'comment_end'     => $params['comment_end'],
+					'link_to'         => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 				) );
 			// Note: You can customize the default item feedback by copying the generic
 			// /skins/_item_comment.inc.php file into the current skin folder.
 			// ---------------------- END OF COMMENT ---------------------
 
+			if( $Blog->get_setting( 'threaded_comments' ) )
+			{	// Display the comment replies
+				display_comment_replies( $Comment->ID, $params );
+			}
 		}	// End of comment list loop.
 		echo $params['comment_list_end'];
 
@@ -229,16 +281,37 @@ if( $Item->can_see_comments( true ) )
 				T_('This post has 1 feedback awaiting moderation... %s'),
 				T_('This post has %d feedbacks awaiting moderation... %s') );
 		// _______________________________________________________________
-
-		// Display link for comments feed:
-		$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>' );
 	}
 }
+
+// ------------------ COMMENT FORM INCLUDED HERE ------------------
+if( $params['disp_comment_form'] )
+{
+	if( $Blog->get_ajax_form_enabled() )
+	{
+		$json_params = array(
+			'action' => 'get_comment_form',
+			'p' => $Item->ID,
+			'blog' => $Blog->ID,
+			'disp' => $disp,
+			'params' => $params );
+		display_ajax_form( $json_params );
+	}
+	else
+	{
+		skin_include( '_item_comment_form.inc.php', $params );
+	}
+	// Note: You can customize the default item feedback by copying the generic
+	// /skins/_item_comment_form.inc.php file into the current skin folder.
+}
+// ---------------------- END OF COMMENT FORM ---------------------
 
 // ----------- Register for item's comment notification -----------
 if( is_logged_in() && $Item->can_comment( NULL ) )
 {
 	global $DB, $htsrv_url;
+	global $UserSettings;
+
 	$not_subscribed = true;
 	$creator_User = $Item->get_creator_User();
 
@@ -254,236 +327,46 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 		}
 	}
 
-	if( $not_subscribed && ( $creator_User->ID == $current_User->ID ) && ( $current_User->get( 'notify' ) != 0 ) )
-	{
-		echo '<p>'.T_( 'This is your post. You are receiving notifications when anyone comments on your posts.' );
-		echo ' <a href="'.$Blog->get('subsurl').'">'.T_( 'Click here to manage your subscriptions.' ).'</a></p>';
-		$not_subscribed = false;
-	}
-	if( $not_subscribed && $Blog->get_setting( 'allow_item_subscriptions' ) )
-	{
-		if( get_user_isubscription( $current_User->ID, $Item->ID ) )
+	if( $params['disp_notification'] )
+	{	// Display notification link
+		echo $params['notification_before'];
+
+		$notification_icon = get_icon( 'notification' );
+
+		if( $not_subscribed && ( $creator_User->ID == $current_User->ID ) && ( $UserSettings->get( 'notify_published_comments', $current_User->ID ) != 0 ) )
 		{
-			echo '<p>'.T_( 'You will be notified by email when someone comments here.' );
-			echo ' <a href="'.$samedomain_htsrv_url.'isubs_update.php?p='.$Item->ID.'&amp;notify=0&amp;'.url_crumb( 'itemsubs' ).'">'.T_( 'Click here to unsubscribe.' ).'</a></p>';
+			echo '<p>'.$notification_icon.' <span>'.$params['notification_text'];
+			echo ' <a href="'.$Blog->get('subsurl').'">'.T_( 'Click here to manage your subscriptions.' ).'</a></span></p>';
+			$not_subscribed = false;
 		}
-		else
+		if( $not_subscribed && $Blog->get_setting( 'allow_item_subscriptions' ) )
 		{
-			echo '<p><a href="'.$samedomain_htsrv_url.'isubs_update.php?p='.$Item->ID.'&amp;notify=1&amp;'.url_crumb( 'itemsubs' ).'">'.T_( 'Notify me by email when someone comments here.' ).'</a></p>';
+			if( get_user_isubscription( $current_User->ID, $Item->ID ) )
+			{
+				echo '<p>'.$notification_icon.' <span>'.$params['notification_text2'];
+				echo ' <a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=0&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Click here to unsubscribe.' ).'</a></span></p>';
+			}
+			else
+			{
+				echo '<p>'.$notification_icon.' <span><a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=1&amp;'.url_crumb( 'collections_isubs_update' ).'">'.$params['notification_text3'].'</a></span></p>';
+			}
 		}
+
+		echo $params['notification_after'];
 	}
 }
 
-// ------------------ COMMENT FORM INCLUDED HERE ------------------
-if( $Blog->get_ajax_form_enabled() )
-{
-	$json_params = array(
-		'action' => 'get_comment_form',
-		'p' => $Item->ID,
-		'blog' => $Blog->ID,
-		'disp' => $disp,
-		'params' => $params );
-	display_ajax_form( $json_params );
-}
-else
-{
-	skin_include( '_item_comment_form.inc.php', $params );
-}
-// Note: You can customize the default item feedback by copying the generic
-// /skins/_item_comment_form.inc.php file into the current skin folder.
-// ---------------------- END OF COMMENT FORM ---------------------
 
+if( $Item->can_see_comments( true ) && ( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks'] ) )
+{	// user is allowed to see comments
+	// Display link for comments feed:
+	$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>', $params['feed_title'] );
+}
 
 /*
  * $Log$
- * Revision 1.50  2011/10/17 15:10:30  efy-yurybakh
- * If there is an email address in a comment, do not allow posting the comment
+ * Revision 1.52  2013/11/06 08:05:36  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.49  2011/10/04 08:39:30  efy-asimo
- * Comment and message forms save/reload content in case of error
- *
- * Revision 1.48  2011/10/01 23:45:19  fplanque
- * clean factorization
- *
- * Revision 1.47  2011/09/26 14:53:27  efy-asimo
- * Login problems with multidomain installs - fix
- * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
- *
- * Revision 1.46  2011/09/22 08:55:00  efy-asimo
- * Login problems with multidomain installs - fix
- *
- * Revision 1.45  2011/09/20 22:46:57  fplanque
- * doc
- *
- * Revision 1.44  2011/09/20 19:17:29  efy-yurybakh
- * star rating plugin (additional remarks)
- *
- * Revision 1.43  2011/09/20 18:56:55  efy-yurybakh
- * star rating plugin (additional remarks)
- *
- * Revision 1.42  2011/09/20 18:46:41  efy-yurybakh
- * star rating plugin (additional remarks)
- *
- * Revision 1.41  2011/09/20 15:38:17  efy-yurybakh
- * jQuery star rating plugin
- *
- * Revision 1.40  2011/09/17 02:31:58  fplanque
- * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
- *
- * Revision 1.39  2011/09/10 00:57:23  fplanque
- * doc
- *
- * Revision 1.38  2011/09/08 05:22:40  efy-asimo
- * Remove item attending and add item settings
- *
- * Revision 1.37  2011/09/04 22:13:24  fplanque
- * copyright 2011
- *
- * Revision 1.36  2011/09/04 20:17:55  fplanque
- * cleanup
- *
- * Revision 1.35  2011/08/26 07:40:13  efy-asimo
- * Setting to show comment to "Members only"
- *
- * Revision 1.34  2011/06/29 13:14:01  efy-asimo
- * Use ajax to display comment and contact forms
- *
- * Revision 1.33  2011/05/30 13:35:30  efy-asimo
- * Use table to display item attendants
- *
- * Revision 1.32  2011/05/25 14:59:34  efy-asimo
- * Post attending
- *
- * Revision 1.31  2011/05/23 02:20:07  sam2kb
- * Option to display excerpts in comment feeds, or disable feeds completely
- *
- * Revision 1.30  2011/05/19 17:47:07  efy-asimo
- * register for updates on a specific blog post
- *
- * Revision 1.29  2010/12/19 06:17:21  sam2kb
- * Fixed paged comments
- *
- * Revision 1.28  2010/11/07 18:50:45  fplanque
- * Added Comment::author2() with skins v2 style params.
- *
- * Revision 1.27  2010/10/13 14:07:56  efy-asimo
- * Optional paged comments in the front end
- *
- * Revision 1.26  2010/10/11 12:03:29  efy-asimo
- * Comments number on front office - fix
- *
- * Revision 1.25  2010/06/08 01:49:53  sam2kb
- * Paged comments in frontend
- *
- * Revision 1.24  2010/03/11 10:35:15  efy-asimo
- * Rewrite CommentList to CommentList2 task
- *
- * Revision 1.23  2010/02/08 17:56:12  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.22  2010/01/30 18:55:37  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.21  2009/09/28 23:58:16  blueyed
- * whitespace
- *
- * Revision 1.20  2009/08/27 12:24:27  tblue246
- * Added blog setting to display comments in ascending/descending order
- *
- * Revision 1.19  2009/07/02 18:08:53  fplanque
- * minor
- *
- * Revision 1.18  2009/07/02 09:37:15  leeturner2701
- * All default skins now fully support feeds being turned off
- *
- * Revision 1.17  2009/03/08 23:57:56  fplanque
- * 2009
- *
- * Revision 1.16  2008/06/30 20:51:03  blueyed
- * Fix indent
- *
- * Revision 1.15  2008/02/05 01:52:37  fplanque
- * enhanced comment form
- *
- * Revision 1.14  2008/01/21 09:35:42  fplanque
- * (c) 2008
- *
- * Revision 1.13  2007/12/22 16:41:05  fplanque
- * Modular feedback template.
- *
- * Revision 1.12  2007/12/18 23:51:33  fplanque
- * nofollow handling in comment urls
- *
- * Revision 1.11  2007/11/22 17:53:39  fplanque
- * filemanager display cleanup, especially in IE (not perfect)
- *
- * Revision 1.10  2007/11/03 21:04:28  fplanque
- * skin cleanup
- *
- * Revision 1.9  2007/11/02 01:55:57  fplanque
- * comment ratings
- *
- * Revision 1.8  2007/11/01 19:52:46  fplanque
- * better comment forms
- *
- * Revision 1.7  2007/09/28 02:18:10  fplanque
- * minor
- *
- * Revision 1.6  2007/09/26 21:54:00  fplanque
- * minor
- *
- * Revision 1.5  2007/09/16 22:07:06  fplanque
- * cleaned up feedback form
- *
- * Revision 1.4  2007/09/08 19:31:28  fplanque
- * cleanup of XML feeds for comments on individual posts.
- *
- * Revision 1.3  2007/06/24 22:26:34  fplanque
- * improved feedback template
- *
- * Revision 1.2  2007/06/24 01:05:31  fplanque
- * skin_include() now does all the template magic for skins 2.0.
- * .disp.php templates still need to be cleaned up.
- *
- * Revision 1.1  2007/06/23 22:09:30  fplanque
- * feedback and item content templates.
- * Interim check-in before massive changes ahead.
- *
- * Revision 1.91  2007/04/26 00:11:04  fplanque
- * (c) 2007
- *
- * Revision 1.90  2007/04/03 19:22:22  blueyed
- * Fixed WhiteSpace
- *
- * Revision 1.89  2007/03/18 01:39:55  fplanque
- * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
- * (more to come)
- *
- * Revision 1.88  2007/01/26 04:49:17  fplanque
- * cleanup
- *
- * Revision 1.87  2007/01/18 22:28:53  fplanque
- * no unnecessary complexity
- *
- * Revision 1.86  2007/01/16 22:53:38  blueyed
- * TODOs
- *
- * Revision 1.85  2006/12/28 23:20:40  fplanque
- * added plugin event for displaying comment form toolbars
- * used by smilies plugin
- *
- * Revision 1.84  2006/12/17 23:42:39  fplanque
- * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
- * Look into Advanced Settings for the aggregating blog.
- * There may be side effects and new bugs created by this. Please report them :]
- *
- * Revision 1.83  2006/11/20 22:15:30  blueyed
- * whitespace
- *
- * Revision 1.82  2006/10/23 22:19:03  blueyed
- * Fixed/unified encoding of redirect_to param. Use just rawurlencode() and no funky &amp; replacements
- *
- * Revision 1.81  2006/10/15 21:30:46  blueyed
- * Use url_rel_to_same_host() for redirect_to params.
  */
 ?>

@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005 by Jason Edgecombe.
  *
@@ -97,7 +97,6 @@ class Blog extends DataObject
 	var $allowtrackbacks = 0;
 	var $allowblogcss = 0;
 	var $allowusercss = 0;
-	var $skin_ID;
 	var $in_bloglist = 1;
 	var $UID;
 	var $media_location = 'default';
@@ -136,6 +135,11 @@ class Blog extends DataObject
 	 */
 	var $default_cat_ID;
 
+	/**
+	 * @var string Type of blog ( 'std', 'photo', 'group', 'forum', 'manual' )
+	 */
+	var $type;
+
 
 	/**
 	 * Constructor
@@ -170,7 +174,6 @@ class Blog extends DataObject
 			$this->owner_user_ID = 1; // DB default
 			$this->set( 'locale', $default_locale );
 			$this->set( 'access_type', 'extrapath' );
-			$this->skin_ID = 1;	// TODO: this is the DB default, but it will fail if skin #1 does not exist
 		}
 		else
 		{
@@ -192,13 +195,13 @@ class Blog extends DataObject
 			$this->allowtrackbacks = $db_row->blog_allowtrackbacks;
 			$this->allowblogcss = $db_row->blog_allowblogcss;
 			$this->allowusercss = $db_row->blog_allowusercss;
-			$this->skin_ID = $db_row->blog_skin_ID;
 			$this->in_bloglist = $db_row->blog_in_bloglist;
 			$this->media_location = $db_row->blog_media_location;
 			$this->media_subdir = $db_row->blog_media_subdir;
 			$this->media_fullpath = $db_row->blog_media_fullpath;
 			$this->media_url = $db_row->blog_media_url;
 			$this->UID = $db_row->blog_UID;
+			$this->type = $db_row->blog_type;
 		}
 
 		$Timer->pause( 'Blog constructor' );
@@ -213,6 +216,7 @@ class Blog extends DataObject
 		switch( $kind )
 		{
 			case 'photo':
+				$this->set( 'type', 'photo' );
 				$this->set( 'name', empty($name) ? T_('My photoblog') : $name );
 				$this->set( 'shortname', empty($shortname) ? T_('Photoblog') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'photo' : $urlname );
@@ -221,14 +225,43 @@ class Blog extends DataObject
 				break;
 
 			case 'group':
+				$this->set( 'type', 'group' );
 				$this->set( 'name', empty($name) ? T_('Our blog') : $name );
 				$this->set( 'shortname', empty($shortname) ? T_('Group') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'group' : $urlname );
 				$this->set_setting( 'use_workflow', 1 );
 				break;
 
+			case 'forum':
+				$this->set( 'type', 'forum' );
+				$this->set( 'name', empty($name) ? T_('My forum') : $name );
+				$this->set( 'shortname', empty($shortname) ? T_('Forum') : $shortname );
+				$this->set( 'urlname', empty($urlname) ? 'forum' : $urlname );
+				$this->set( 'advanced_perms', 1 );
+				$this->set_setting( 'post_navigation', 'same_category' );
+				$this->set_setting( 'allow_comments', 'registered' );
+				$this->set_setting( 'in_skin_editing', '1' );
+				$this->set_setting( 'posts_per_page', 30 );
+				$this->set_setting( 'allow_html_post', 0 );
+				$this->set_setting( 'allow_html_comment', 0 );
+				$this->set_setting( 'orderby', 'last_touched_ts' );
+				$this->set_setting( 'orderdir', 'DESC' );
+				$this->set_setting( 'enable_goto_blog', 'post' );
+				break;
+
+			case 'manual':
+				$this->set( 'type', 'manual' );
+				$this->set( 'name', empty($name) ? T_('Manual') : $name );
+				$this->set( 'shortname', empty($shortname) ? T_('Manual') : $shortname );
+				$this->set( 'urlname', empty($urlname) ? 'manual' : $urlname );
+				$this->set_setting( 'post_navigation', 'same_category' );
+				$this->set_setting( 'single_links', 'chapters' );
+				$this->set_setting( 'enable_goto_blog', 'post' );
+				break;
+
 			case 'std':
 			default:
+				$this->set( 'type', 'std' );
 				$this->set( 'name', empty($name) ? T_('My weblog') : $name );
 				$this->set( 'shortname', empty($shortname) ? T_('Blog') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'blog' : $urlname );
@@ -262,6 +295,10 @@ class Blog extends DataObject
 		 * @var User
 		 */
 		global $current_User;
+
+		// Load collection settings and clear update cascade array
+		$this->load_CollectionSettings();
+		$this->CollectionSettings->clear_update_cascade();
 
 		if( param( 'blog_name', 'string', NULL ) !== NULL )
 		{ // General params:
@@ -364,12 +401,20 @@ class Blog extends DataObject
 			$this->set_setting( 'single_links', get_param( 'single_links' ) );
 		}
 
-
-		if( param( 'blog_skin_ID', 'integer', NULL ) !== NULL )
+		if( param( 'normal_skin_ID', 'integer', NULL ) !== NULL )
 		{	// Default blog:
-			$this->set_from_Request( 'skin_ID' );
+			$this->set_setting( 'normal_skin_ID', get_param( 'normal_skin_ID' ) );
 		}
 
+		if( param( 'mobile_skin_ID', 'integer', NULL ) !== NULL )
+		{	// Default blog:
+			$this->set_setting( 'mobile_skin_ID', get_param( 'mobile_skin_ID' ) );
+		}
+
+		if( param( 'tablet_skin_ID', 'integer', NULL ) !== NULL )
+		{	// Default blog:
+			$this->set_setting( 'tablet_skin_ID', get_param( 'tablet_skin_ID' ) );
+		}
 
 		if( param( 'archives_sort_order', 'string', NULL ) !== NULL )
 		{
@@ -450,36 +495,25 @@ class Blog extends DataObject
 			$this->set_setting('ping_plugins', implode(',', $blog_ping_plugins));
 		}
 
-		if( in_array( 'cache', $groups ) )
-		{ // we want to load the cache params:
-			$this->set_setting( 'ajax_form_enabled', param( 'ajax_form_enabled', 'integer', 0 ) );
-			$this->set_setting( 'ajax_form_loggedin_enabled', param( 'ajax_form_loggedin_enabled', 'integer', 0 ) );
-			$this->set_setting( 'cache_enabled_widgets', param( 'cache_enabled_widgets', 'integer', 0 ) );
-		}
-
 		if( in_array( 'authors', $groups ) )
 		{ // we want to load the multiple authors params
 			$this->set( 'advanced_perms',  param( 'advanced_perms', 'integer', 0 ) );
 			$this->set_setting( 'use_workflow',  param( 'blog_use_workflow', 'integer', 0 ) );
 		}
 
-		if( in_array( 'login', $groups ) )
-		{ // we want to load the login params:
-			$this->set_setting( 'in_skin_login', param( 'in_skin_login', 'integer', 0 ) );
-			$this->set_setting( 'in_skin_editing', param( 'in_skin_editing', 'integer', 0 ) );
-		}
-
-		if( in_array( 'styles', $groups ) )
-		{ // we want to load the styles params:
-			$this->set( 'allowblogcss', param( 'blog_allowblogcss', 'integer', 0 ) );
-			$this->set( 'allowusercss', param( 'blog_allowusercss', 'integer', 0 ) );
-		}
-
 		if( in_array( 'features', $groups ) )
 		{ // we want to load the workflow checkboxes:
-			$this->set_setting( 'enable_goto_blog', param( 'enable_goto_blog', 'integer', 0 ) );
+			$this->set_setting( 'allow_html_post', param( 'allow_html_post', 'integer', 0 ) );
+
+			$this->set_setting( 'enable_goto_blog', param( 'enable_goto_blog', 'string', NULL ) );
+
+			$this->set_setting( 'editing_goto_blog', param( 'editing_goto_blog', 'string', NULL ) );
+
+			$this->set_setting( 'default_post_status', param( 'default_post_status', 'string', NULL ) );
 
 			$this->set_setting( 'post_categories', param( 'post_categories', 'string', NULL ) );
+
+			$this->set_setting( 'post_navigation', param( 'post_navigation', 'string', NULL ) );
 
 			// Show x days or x posts?:
 			$this->set_setting( 'what_to_show', param( 'what_to_show', 'string', '' ) );
@@ -495,6 +529,33 @@ class Blog extends DataObject
 			$this->set_setting( 'timestamp_min_duration', param_duration( 'timestamp_min_duration' ) );
 			$this->set_setting( 'timestamp_max', param( 'timestamp_max', 'string', '' ) );
 			$this->set_setting( 'timestamp_max_duration', param_duration( 'timestamp_max_duration' ) );
+
+			// Location
+			$location_country = param( 'location_country', 'string', 'hidden' );
+			$location_region = param( 'location_region', 'string', 'hidden' );
+			$location_subregion = param( 'location_subregion', 'string', 'hidden' );
+			$location_city = param( 'location_city', 'string', 'hidden' );
+
+			if( $location_city == 'required' )
+			{	// If city is required - all location fields also are required
+				$location_country = $location_region = $location_subregion = 'required';
+			}
+			else if( $location_subregion == 'required' )
+			{	// If subregion is required - country & region fields also are required
+				$location_country = $location_region = 'required';
+			}
+			else if( $location_region == 'required' )
+			{	// If region is required - country field also is required
+				$location_country = 'required';
+			}
+
+			$this->set_setting( 'location_country', $location_country );
+			$this->set_setting( 'location_region', $location_region );
+			$this->set_setting( 'location_subregion', $location_subregion );
+			$this->set_setting( 'location_city', $location_city );
+
+			// Set to show Latitude & Longitude params for this blog items
+			$this->set_setting( 'show_location_coordinates', param( 'show_location_coordinates', 'integer', 0 ) );
 
 			// call modules update_collection_features on this blog
 			modules_call_method( 'update_collection_features', array( 'edited_Blog' => & $this ) );
@@ -528,22 +589,35 @@ class Blog extends DataObject
 		{ // Feedback options:
 			$this->set_setting( 'allow_comments', param( 'allow_comments', 'string', 'any' ) );
 			$this->set_setting( 'allow_view_comments', param( 'allow_view_comments', 'string', 'any' ) );
-			$this->set_setting( 'new_feedback_status', param( 'new_feedback_status', 'string', 'draft' ) );
+			$new_feedback_status = param( 'new_feedback_status', 'string', 'draft' );
+			if( $new_feedback_status != $this->get_setting( 'new_feedback_status' ) && ( $new_feedback_status != 'published' || $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ) )
+			{ // Only admin can set this setting to 'Public'
+				$this->set_setting( 'new_feedback_status', $new_feedback_status );
+			}
 			$this->set_setting( 'disable_comments_bypost', param( 'disable_comments_bypost', 'string', '0' ) );
 			$this->set_setting( 'allow_anon_url', param( 'allow_anon_url', 'string', '0' ) );
+			$this->set_setting( 'allow_html_comment', param( 'allow_html_comment', 'string', '0' ) );
 			$this->set_setting( 'allow_attachments', param( 'allow_attachments', 'string', 'registered' ) );
+			$this->set_setting( 'max_attachments', param( 'max_attachments', 'integer', '' ) );
 			$this->set_setting( 'allow_rating_items', param( 'allow_rating_items', 'string', 'never' ) );
 			$this->set_setting( 'allow_rating_comment_helpfulness', param( 'allow_rating_comment_helpfulness', 'string', '0' ) );
-			$this->set( 'allowtrackbacks', param( 'blog_allowtrackbacks', 'integer', 0 ) );
+			$blog_allowtrackbacks = param( 'blog_allowtrackbacks', 'integer', 0 );
+			if( $blog_allowtrackbacks != $this->get( 'allowtrackbacks' ) && ( $blog_allowtrackbacks == 0 || $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ) )
+			{ // Only admin can turn ON this setting
+				$this->set( 'allowtrackbacks', $blog_allowtrackbacks );
+			}
 			$this->set_setting( 'comments_orderdir', param( 'comments_orderdir', '/^(?:ASC|DESC)$/', 'ASC' ) );
 
 			// call modules update_collection_comments on this blog
 			modules_call_method( 'update_collection_comments', array( 'edited_Blog' => & $this ) );
 
-			$this->set_setting( 'paged_comments', param( 'paged_comments', 'integer', 0 ) );
+			$threaded_comments = param( 'threaded_comments', 'integer', 0 );
+			$this->set_setting( 'threaded_comments', $threaded_comments );
+			$this->set_setting( 'paged_comments', $threaded_comments ? 0 : param( 'paged_comments', 'integer', 0 ) );
 			param_integer_range( 'comments_per_page', 1, 9999, T_('Comments per page must be between %d and %d.') );
 			$this->set_setting( 'comments_per_page', get_param( 'comments_per_page' ) );
-			$this->set_setting( 'default_gravatar',  param( 'default_gravatar', 'string', 'b2evo' ) );
+			$this->set_setting( 'comments_avatars', param( 'comments_avatars', 'integer', 0 ) );
+			$this->set_setting( 'comments_latest', param( 'comments_latest', 'integer', 0 ) );
 		}
 
 
@@ -581,17 +655,13 @@ class Blog extends DataObject
 			$this->set_setting( 'tags_meta_keywords', param( 'tags_meta_keywords', 'integer', 0 ) );
 		}
 
-
-		if( param( 'custom_double1', 'string', NULL ) !== NULL )
-		{	// Description:
-			for( $i = 1 ; $i <= 5; $i++ )
-			{
-				$this->set_setting( 'custom_double'.$i, param( 'custom_double'.$i, 'string', NULL ) );
-			}
-			for( $i = 1 ; $i <= 3; $i++ )
-			{
-				$this->set_setting( 'custom_varchar'.$i, param( 'custom_varchar'.$i, 'string', NULL ) );
-			}
+		// Load custom double & varchar fields
+		$custom_field_names = array();
+		$this->load_custom_fields( 'double', $update_cascade_query, $custom_field_names );
+		$this->load_custom_fields( 'varchar', $update_cascade_query, $custom_field_names );
+		if( !empty( $update_cascade_query ) )
+		{ // Some custom fields were deleted and these fields must be deleted from the item settings table also. Add required query.
+			$this->CollectionSettings->add_update_cascade( $update_cascade_query );
 		}
 
 
@@ -601,10 +671,41 @@ class Blog extends DataObject
 		if( $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
 		{	// We have permission to edit advanced admin settings:
 
+			if( in_array( 'cache', $groups ) )
+			{ // we want to load the cache params:
+				$this->set_setting( 'ajax_form_enabled', param( 'ajax_form_enabled', 'integer', 0 ) );
+				$this->set_setting( 'ajax_form_loggedin_enabled', param( 'ajax_form_loggedin_enabled', 'integer', 0 ) );
+				$this->set_setting( 'cache_enabled_widgets', param( 'cache_enabled_widgets', 'integer', 0 ) );
+			}
+
+			if( in_array( 'styles', $groups ) )
+			{ // we want to load the styles params:
+				$this->set( 'allowblogcss', param( 'blog_allowblogcss', 'integer', 0 ) );
+				$this->set( 'allowusercss', param( 'blog_allowusercss', 'integer', 0 ) );
+			}
+
+			if( in_array( 'login', $groups ) )
+			{ // we want to load the login params:
+				$this->set_setting( 'in_skin_login', param( 'in_skin_login', 'integer', 0 ) );
+				$this->set_setting( 'in_skin_editing', param( 'in_skin_editing', 'integer', 0 ) );
+			}
+
+			if( param( 'blog_head_includes', 'html', NULL ) !== NULL )
+			{	// HTML header includes:
+				param_check_html( 'blog_head_includes', T_('Invalid Custom meta section') );
+				$this->set_setting( 'head_includes', get_param( 'blog_head_includes' ) );
+			}
+
+			if( param( 'blog_footer_includes', 'html', NULL ) !== NULL )
+			{	// HTML header includes:
+				param_check_html( 'blog_footer_includes', T_('Invalid Custom javascript section') );
+				$this->set_setting( 'footer_includes', get_param( 'blog_footer_includes' ) );
+			}
+
 			if( param( 'owner_login', 'string', NULL ) !== NULL )
 			{ // Permissions:
 				$UserCache = & get_UserCache();
-				$owner_User = & $UserCache->get_by_login( get_param('owner_login'), false, false );
+				$owner_User = & $UserCache->get_by_login( get_param('owner_login') );
 				if( empty( $owner_User ) )
 				{
 					param_error( 'owner_login', sprintf( T_('User &laquo;%s&raquo; does not exist!'), get_param('owner_login') ) );
@@ -694,12 +795,6 @@ class Blog extends DataObject
 				$this->set_setting( 'aggregate_coll_IDs', $aggregate_coll_IDs );
 			}
 
-			if( param( 'source_file', 'string', NULL ) !== NULL )
-			{	// Static file:
-				$this->set_setting( 'source_file', get_param( 'source_file' ) );
-				$this->set_setting( 'static_file', param( 'static_file', 'string', '' ) );
-			}
-
 
 			if( param( 'blog_media_location',  'string', NULL ) !== NULL )
 			{	// Media files location:
@@ -761,6 +856,84 @@ class Blog extends DataObject
 		}
 
 		return ! param_errors_detected();
+	}
+
+
+	/**
+	 * Load blog custom fields setting
+	 * 
+	 * @param string custom field types
+	 * @param string query to remove deleted custom field settings from items
+	 * @param array Field names array is used to check the diplicates
+	 */
+	function load_custom_fields( $type, & $update_cascade_query, & $field_names )
+	{
+		global $DB, $Messages;
+
+		$empty_title_error = false; // use this to display empty title fields error message only ones
+		$real_custom_field_count = 0; // custom fields count after update
+		$custom_field_count = param( 'count_custom_'.$type, 'integer', 0 ); // all custom fields count ( contains even deleted fields )
+		$deleted_custom_fields = explode( ',', param( 'deleted_custom_'.$type, 'string', '' ) );
+
+		// Update custom fields
+		for( $i = 1 ; $i <= $custom_field_count; $i++ )
+		{
+			$custom_field_guid = param( 'custom_'.$type.'_guid'.$i, '/^[a-z0-9\-_]+$/', NULL );
+			if( in_array( $custom_field_guid, $deleted_custom_fields ) )
+			{ // This field was deleted, don't neeed to update
+				continue;
+			}
+
+			$real_custom_field_count++;
+			$custom_field_value = param( 'custom_'.$type.'_'.$i, 'string', NULL );
+			$custom_field_name = param( 'custom_'.$type.'_fname'.$i, '/^[a-z0-9\-_]+$/', NULL );
+			if( empty( $custom_field_value ) )
+			{ // Field title can't be emtpy
+				if( !$empty_title_error )
+				{ // This message was not displayed yet
+					$Messages->add( T_('Custom field titles can\'t be empty!') );
+					$empty_title_error = true;
+				}
+			}
+			elseif( empty( $custom_field_name ) )
+			{ // Field identical name can't be emtpy
+				$Messages->add( sprintf( T_('Please enter name for custom field "%s"'), $custom_field_value ) );
+			}
+			elseif( in_array( $custom_field_name, $field_names ) )
+			{ // Field name must be identical
+				$Messages->add( sprintf( T_('The field name "%s" is not identical, please use another.'), $custom_field_value ) );
+			}
+			else
+			{ // Add new identical field name
+				$field_names[] = $custom_field_name;
+			}
+			// Update field settings
+			$this->set_setting( 'custom_'.$type.$real_custom_field_count, $custom_field_guid );
+			$this->set_setting( 'custom_'.$type.'_'.$custom_field_guid, $custom_field_value );
+			$this->set_setting( 'custom_fname_'.$custom_field_guid, $custom_field_name );
+		}
+
+		// get custom field count from db
+		$db_custom_field_count = $this->get_setting( 'count_custom_'.$type );
+		for( $i = $real_custom_field_count + 1 ; $i <= $db_custom_field_count; $i++ )
+		{ // delete not wanted settings by index
+			$this->delete_setting( 'custom_'.$type.$i );
+		}
+		foreach( $deleted_custom_fields as $delted_field_guid )
+		{ // delete not wanted settings by guid
+			if( empty( $update_cascade_query ) )
+			{
+				$update_cascade_query = 'DELETE FROM T_items__item_settings WHERE iset_name = "custom_'.$type.'_'.$delted_field_guid.'"';
+			}
+			else
+			{
+				$update_cascade_query .= ' OR iset_name = "custom_'.$type.'_'.$delted_field_guid.'"';
+			}
+			$this->delete_setting( 'custom_fname_'.$delted_field_guid );
+			$this->delete_setting( 'custom_'.$type.'_'.$delted_field_guid );
+		}
+		// update number of custom fields
+		$this->set_setting( 'count_custom_'.$type, $real_custom_field_count );
 	}
 
 
@@ -837,16 +1010,6 @@ class Blog extends DataObject
 	{
 		global $baseurl, $basedomain, $Settings;
 
-		if( $type == 'static' )
-		{ // We want the static page, there is no access type option here:
-			debug_die( 'static page currently not supported' );
-		}
-
-		if( $type == 'dynamic' )
-		{ // We want to force a dynamic page
-			debug_die( 'dynamic page currently not supported' );
-		}
-
 		switch( $this->access_type )
 		{
 			case 'default':
@@ -871,7 +1034,7 @@ class Blog extends DataObject
 				return $baseurl.$this->siteurl;
 
 			case 'subdom':
-				return 'http://'.$this->urlname.'.'.$basedomain.'/';
+				return preg_replace( '#(https?://)#i', '$1'.$this->urlname.'.', $baseurl );
 
 			case 'absolute':
 				return $this->siteurl;
@@ -905,7 +1068,7 @@ class Blog extends DataObject
 				break;
 
 			case 'subdom':
-				return 'http://'.$this->urlname.'.'.$basedomain.'/';
+				return preg_replace( '#(https?://)#i', '$1'.$this->urlname.'.', $baseurl );
 
 			case 'absolute':
 				$url = $this->siteurl;
@@ -1377,13 +1540,13 @@ class Blog extends DataObject
 	/**
 	 * Generate a tag url on this blog
 	 */
-	function gen_tag_url( $tag, $paged = 1, $glue = '&amp;' )
+	function gen_tag_url( $tag, $paged = 1, $glue = '&' )
 	{
 		$link_type = $this->get_setting( 'tag_links' );
 		switch( $link_type )
 		{
 			case 'param':
-				$r = url_add_param( $this->gen_blogurl(), 'tag='.urlencode( $tag ) );
+				$r = url_add_param( $this->gen_blogurl(), 'tag='.urlencode( $tag ), $glue );
 
 				$tag_posts_per_page = $this->get_setting( 'tag_posts_per_page' );
 				if( !empty($tag_posts_per_page) && $tag_posts_per_page != $this->get_setting( 'posts_per_page' ) )
@@ -1474,23 +1637,27 @@ class Blog extends DataObject
 
 		if( empty( $status ) )
 		{
-			$status = 'draft';
+			$status = $this->get_setting('default_post_status');
 		}
-		if( ! $current_User->check_perm( 'blog_post!'.$status, 'edit', false, $this->ID ) )
+		if( ! $current_User->check_perm( 'blog_post!'.$status, 'create', false, $this->ID ) )
 		{ // We need to find another one:
 			$status = NULL;
 
-			if( $current_User->check_perm( 'blog_post!published', 'edit', false, $this->ID ) )
+			if( $current_User->check_perm( 'blog_post!published', 'create', false, $this->ID ) )
 				$status = 'published';
-			elseif( $current_User->check_perm( 'blog_post!protected', 'edit', false, $this->ID ) )
+			elseif( $current_User->check_perm( 'blog_post!community', 'create', false, $this->ID ) )
+				$status = 'community';
+			elseif( $current_User->check_perm( 'blog_post!protected', 'create', false, $this->ID ) )
 				$status = 'protected';
-			elseif( $current_User->check_perm( 'blog_post!private', 'edit', false, $this->ID ) )
+			elseif( $current_User->check_perm( 'blog_post!private', 'create', false, $this->ID ) )
 				$status = 'private';
-			elseif( $current_User->check_perm( 'blog_post!draft', 'edit', false, $this->ID ) )
+			elseif( $current_User->check_perm( 'blog_post!review', 'create', false, $this->ID ) )
+				$status = 'review';
+			elseif( $current_User->check_perm( 'blog_post!draft', 'create', false, $this->ID ) )
 				$status = 'draft';
-			elseif( $current_User->check_perm( 'blog_post!deprecated', 'edit', false, $this->ID ) )
+			elseif( $current_User->check_perm( 'blog_post!deprecated', 'create', false, $this->ID ) )
 				$status = 'deprecated';
-			elseif( $current_User->check_perm( 'blog_post!redirected', 'edit', false, $this->ID ) )
+			elseif( $current_User->check_perm( 'blog_post!redirected', 'create', false, $this->ID ) )
 				$status = 'redirected';
 		}
 		return $status;
@@ -1522,18 +1689,21 @@ class Blog extends DataObject
 
 		if( empty( $this->default_cat_ID ) )
 		{	// If the previous query has returned NULL
-			$sql = 'SELECT cat_ID
-			          FROM T_categories
-			         WHERE cat_blog_ID = '.$this->ID;
 			if( $Settings->get('chapter_ordering') == 'manual' )
 			{	// Manual order
-				$sql .= ' ORDER BY cat_order';
+				$select_temp_order = ', IF( cat_order IS NULL, 999999999, cat_order ) AS temp_order';
+				$sql_order = ' ORDER BY temp_order';
 			}
 			else
 			{	// Alphabetic order
-				$sql .= ' ORDER BY cat_name';
+				$select_temp_order = '';
+				$sql_order = ' ORDER BY cat_name';
 			}
-			$sql .= ' LIMIT 1';
+			$sql = 'SELECT cat_ID'.$select_temp_order.'
+			          FROM T_categories
+			         WHERE cat_blog_ID = '.$this->ID
+			         .$sql_order
+			         .' LIMIT 1';
 
 			$this->default_cat_ID = $DB->get_var( $sql, 0, 0, 'Get default category' );
 		}
@@ -1554,7 +1724,7 @@ class Blog extends DataObject
 	 */
 	function get_media_dir( $create = true )
 	{
-		global $media_path, $Messages, $Settings, $Debuglog;
+		global $media_path, $current_User, $Messages, $Settings, $Debuglog;
 
 		if( ! $Settings->get( 'fm_enable_roots_blog' ) )
 		{ // User directories are disabled:
@@ -1585,12 +1755,15 @@ class Blog extends DataObject
 		// TODO: use a File object here (to access perms, ..), using FileCache::get_by_root_and_path().
 		if( $create && ! is_dir( $mediadir ) )
 		{
+			// Display absolute path to blog admin and relative path to everyone else
+			$msg_mediadir_path = $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ? $mediadir : rel_path_to_base($mediadir);
+
 			// TODO: Link to some help page(s) with errors!
 			if( ! is_writable( dirname($mediadir) ) )
 			{ // add error
 				if( is_admin_page() )
 				{
-					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), rel_path_to_base($mediadir) )
+					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), $msg_mediadir_path )
 								.get_manual_link('media_file_permission_errors'), 'error' );
 				}
 				return false;
@@ -1599,7 +1772,7 @@ class Blog extends DataObject
 			{ // add error
 				if( is_admin_page() )
 				{
-					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created."), rel_path_to_base($mediadir) )
+					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created."), $msg_mediadir_path )
 								.get_manual_link('directory_creation_error'), 'error' );
 				}
 				return false;
@@ -1613,7 +1786,7 @@ class Blog extends DataObject
 				}
 				if( is_admin_page() )
 				{
-					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; has been created with permissions %s."), rel_path_to_base($mediadir), substr( sprintf('%o', fileperms($mediadir)), -3 ) ), 'success' );
+					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; has been created with permissions %s."), $msg_mediadir_path, substr( sprintf('%o', fileperms($mediadir)), -3 ) ), 'success' );
 				}
 			}
 		}
@@ -1664,10 +1837,10 @@ class Blog extends DataObject
 	 */
 	function get_filemanager_link()
 	{
-		global $dispatcher;
+		global $admin_url;
 
 		load_class( '/files/model/_fileroot.class.php', 'FileRoot' );
-		return $dispatcher.'?ctrl=files&amp;root='.FileRoot::gen_ID( 'collection', $this->ID );
+		return $admin_url.'?ctrl=files&amp;root='.FileRoot::gen_ID( 'collection', $this->ID );
 	}
 
 
@@ -1742,7 +1915,7 @@ class Blog extends DataObject
 				$owner = $owner_User->get( 'fullname' );
 				if( empty($owner) )
 				{
-					$owner = $owner_User->get_colored_name();
+					$owner = $owner_User->get_preferred_name();
 				}
 				return $owner;
 
@@ -1768,20 +1941,6 @@ class Blog extends DataObject
 			case 'link':  		// Deprecated
 			case 'url':
 				return $this->gen_blogurl( 'default' );
-
-			case 'dynurl':
-				return $this->gen_blogurl( 'dynamic' );
-
-			case 'staticurl':
-				return $this->gen_blogurl( 'static' );
-
-			case 'dynfilepath':
-				// Source file for static page:
-				return $basepath.$this->get_setting('source_file');
-
-			case 'staticfilepath':
-				// Destiantion file for static page:
-				return $basepath.$this->get_setting('static_file');
 
 			case 'baseurl':
 				return $this->gen_baseurl();
@@ -1823,7 +1982,7 @@ class Blog extends DataObject
 				return url_add_param( $this->gen_blogurl(), 'disp=login' );
 
 			case 'subsurl':
-				return url_add_param( $this->gen_blogurl(), 'disp=subs' );
+				return url_add_param( $this->gen_blogurl(), 'disp=subs#subs' );
 
 			case 'helpurl':
 				if( $this->get_setting( 'help_link' ) == 'slug' )
@@ -1834,6 +1993,9 @@ class Blog extends DataObject
 				{
 					return url_add_param( $this->gen_blogurl(), 'disp=help' );
 				}
+
+			case 'skin_ID':
+				return $this->get_skin_ID();
 
 			case 'description':			// RSS wording
 			case 'shortdesc':
@@ -1911,13 +2073,71 @@ class Blog extends DataObject
  	/**
 	 * Get a setting.
 	 *
+	 * @param string setting name
+	 * @param boolean true to return param's real value
 	 * @return string|false|NULL value as string on success; NULL if not found; false in case of error
 	 */
-	function get_setting( $parname )
+	function get_setting( $parname, $real_value = false )
+	{
+		global $Settings;
+
+		$this->load_CollectionSettings();
+
+		$result = $this->CollectionSettings->get( $this->ID, $parname );
+
+		switch( $parname )
+		{
+			case 'normal_skin_ID':
+				if( $result == NULL )
+				{ // Try to get default from the global settings
+					$result = $Settings->get( 'def_'.$parname );
+				}
+				break;
+
+			case 'mobile_skin_ID':
+			case 'tablet_skin_ID':
+				if( $result == NULL )
+				{ // Try to get default from the global settings
+					$result = $Settings->get( 'def_'.$parname );
+				}
+				if( ( $result === '0' ) && ! $real_value )
+				{ // 0 value means that use the same as normal case
+					$result = $this->get_setting( 'normal_skin_ID' );
+				}
+				break;
+		}
+
+		return $result;
+	}
+
+
+ 	/**
+	 * Get a ready-to-display setting from the DB settings table.
+	 *
+	 * Same as disp but don't echo
+	 *
+	 * @param string Name of setting
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function dget_setting( $parname, $format = 'htmlbody' )
 	{
 		$this->load_CollectionSettings();
 
-		return $this->CollectionSettings->get( $this->ID, $parname );
+		return format_to_output( $this->CollectionSettings->get( $this->ID, $parname ), $format );
+	}
+
+
+ 	/**
+	 * Display a setting from the DB settings table.
+	 *
+	 * @param string Name of setting
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function disp_setting( $parname, $format = 'htmlbody' )
+	{
+		$this->load_CollectionSettings();
+
+		echo format_to_output( $this->CollectionSettings->get( $this->ID, $parname ), $format );
 	}
 
 
@@ -2006,10 +2226,12 @@ class Blog extends DataObject
 
 	/**
 	 * Create a new blog...
+	 *
+	 * @param string Kind of blog ( 'std', 'photo', 'group', 'forum' )
 	 */
-	function create()
+	function create( $kind = '' )
 	{
-		global $DB, $Messages, $basepath, $current_User, $Settings;
+		global $DB, $Messages, $basepath, $admin_url, $current_User, $Settings;
 		$DB->begin();
 
 		// DB INSERT
@@ -2036,15 +2258,49 @@ class Blog extends DataObject
 		// Note: The owner of teh blog has permissions just by the sole fact he is registered as the owner.
 		if( $current_User != NULL )
 		{ // Proceed insertions:
+			$perm_statuses = "'review,draft,private,protected,deprecated,community,published'";
 			$DB->query( "
 					INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 						bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_edit_ts,
-						bloguser_perm_own_cmts, bloguser_perm_vote_spam_cmts, bloguser_perm_draft_cmts, bloguser_perm_publ_cmts, bloguser_perm_depr_cmts,
+						bloguser_perm_recycle_owncmts, bloguser_perm_vote_spam_cmts, bloguser_perm_cmtstatuses,
 						bloguser_perm_cats, bloguser_perm_properties,
 						bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change )
 					VALUES ( $this->ID, $current_User->ID, 1,
-						'published,protected,private,draft,deprecated', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 )" );
+						$perm_statuses, 1, 1, 1, 1, $perm_statuses, 1, 1, 1, 1, 1 )" );
 		}
+
+		/*
+		if( $kind == 'forum' )
+		{	// Set default group permissions for the Forum blog
+			$GroupCache = & get_GroupCache();
+			$groups_permissions = array();
+			if( $GroupCache->get_by_ID( 1, false ) )
+			{	// Check if "Administrators" group still exists
+				$groups_permissions[ 'admins' ] = "( $this->ID, 1, 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 )";
+			}
+			if( $GroupCache->get_by_ID( 2, false ) )
+			{	// Check if "Moderators" group still exists
+				$groups_permissions[ 'privileged' ] = "( $this->ID, 2, 1, 'published,deprecated,protected,private,draft', 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1 )";
+			}
+			if( $GroupCache->get_by_ID( 3, false ) )
+			{	// Check if "Bloggers" group still exists
+				$groups_permissions[ 'bloggers' ] = "( $this->ID, 3, 1, 'published,deprecated,protected,private,draft', 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0 )";
+			}
+			if( $GroupCache->get_by_ID( 4, false ) )
+			{	// Check if "Basic Users" group still exists
+				$groups_permissions[ 'users' ] = "( $this->ID, 4, 1, 'published', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 )";
+			}
+			if( $GroupCache->get_by_ID( 5, false ) )
+			{	// Check if "Spam/Suspect Users" group still exists
+				$groups_permissions[ 'spam' ] = "( $this->ID, 5, 1, 'published,deprecated,protected,private,draft', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 )";
+			}
+			$DB->query( 'INSERT INTO T_coll_group_perms( bloggroup_blog_ID, bloggroup_group_ID, bloggroup_ismember,
+					bloggroup_perm_poststatuses, bloggroup_perm_delpost, bloggroup_perm_edit_ts,
+					bloggroup_perm_recycle_owncmts, bloggroup_perm_vote_spam_cmts, bloggroup_perm_draft_cmts, bloggroup_perm_publ_cmts, bloggroup_perm_depr_cmts,
+					bloggroup_perm_cats, bloggroup_perm_properties,
+					bloggroup_perm_media_upload, bloggroup_perm_media_browse, bloggroup_perm_media_change )
+				VALUES '.implode( ',', $groups_permissions ) );
+		}*/
 
 		// Create default category:
 		load_class( 'chapters/model/_chapter.class.php', 'Chapter' );
@@ -2059,7 +2315,7 @@ class Blog extends DataObject
 
 		// ADD DEFAULT WIDGETS:
 		load_funcs( 'widgets/_widgets.funcs.php' );
-		insert_basic_widgets( $this->ID );
+		insert_basic_widgets( $this->ID, false, $kind );
 
 		$Messages->add( T_('Default widgets have been set-up for this blog.'), 'success' );
 
@@ -2076,6 +2332,11 @@ class Blog extends DataObject
 			}
 		}
 		$this->set_setting( 'cache_enabled_widgets', $Settings->get( 'newblog_cache_enabled_widget' ) );
+
+		if( $this->get( 'advanced_perms' ) )
+		{	// Display this warning if blog has the enabled advanced perms be default
+			$Messages->add( sprintf(T_('ATTENTION: go to the <a %s>advanced group permissions for this blog/forum</a> in order to allow some user groups to post new topics into this forum.'), 'href='.$admin_url.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$this->ID ), 'warning' );
+		}
 
 		// Commit changes in cache:
 		$BlogCache = & get_BlogCache();
@@ -2096,7 +2357,7 @@ class Blog extends DataObject
 
 		// if this blog settings was modified we need to invalidate this blog's page caches
 		// this way all existing cached page on this blog will be regenerated during next display
-		// TODO: Ideally we want to detect if the changes are minor/irrelevant to caching and not invalidate the page cache if not necessary. 
+		// TODO: Ideally we want to detect if the changes are minor/irrelevant to caching and not invalidate the page cache if not necessary.
 		// In case of doubt (and for unknown changes), it's better to invalidate.
 		$this->set_setting( 'last_invalidation_timestamp', $servertimenow );
 
@@ -2126,10 +2387,9 @@ class Blog extends DataObject
 	 *
 	 * Includes WAY TOO MANY requests because we try to be compatible with MySQL 3.23, bleh!
 	 *
-	 * @param boolean true if you want to try to delete the static file
 	 * @param boolean true if you want to echo progress
 	 */
-	function dbdelete($delete_static_file = false, $echo = false )
+	function dbdelete( $echo = false )
 	{
 		global $DB, $Messages, $Plugins;
 
@@ -2180,15 +2440,44 @@ class Blog extends DataObject
 
 				// Delete comments
 				if( $echo ) echo '<br />Deleting comments on blog\'s posts... ';
-				$ret = $DB->query( "DELETE FROM T_comments
-														WHERE comment_post_ID IN ($post_list)" );
+				$comments_list = implode( ',', $DB->get_col( "
+						SELECT comment_ID
+						  FROM T_comments
+						 WHERE comment_post_ID IN ($post_list)" ) );
+				if( !empty( $comments_list ) )
+				{	// Delete the comments & dependencies
+					$DB->query( "DELETE FROM T_comments__votes
+												WHERE cmvt_cmt_ID IN ($comments_list)" );
+					$ret = $DB->query( "DELETE FROM T_comments
+															WHERE comment_post_ID IN ($post_list)" );
+				}
+				else
+				{	// No comments in this blog
+					$ret = 0;
+				}
 				if( $echo ) printf( '(%d rows)', $ret );
 				$Messages->add( T_('Deleted comments on blog\'s posts'), 'success' );
 
 
 				// Delete posts
 				if( $echo ) echo '<br />Deleting blog\'s posts... ';
-				$ret = $DB->query(	"DELETE FROM T_items__item
+				$DB->query( "DELETE FROM T_items__itemtag
+											WHERE itag_itm_ID IN ($post_list)" );
+				$DB->query( "DELETE FROM T_items__item_settings
+											WHERE iset_item_ID IN ($post_list)" );
+				$DB->query( "DELETE FROM T_items__prerendering
+											WHERE itpr_itm_ID IN ($post_list)" );
+				$DB->query( "DELETE FROM T_items__status
+											WHERE pst_ID IN ($post_list)" );
+				$DB->query( "DELETE FROM T_items__subscriptions
+											WHERE isub_item_ID IN ($post_list)" );
+				$DB->query( "DELETE FROM T_items__version
+											WHERE iver_itm_ID IN ($post_list)" );
+				$DB->query( "DELETE FROM T_links
+											WHERE link_itm_ID IN ($post_list)" );
+				$DB->query( "DELETE FROM T_slug
+											WHERE slug_itm_ID IN ($post_list)" );
+				$ret = $DB->query( "DELETE FROM T_items__item
 															WHERE post_ID IN ($post_list)" );
 				if( $echo ) printf( '(%d rows)', $ret );
 				$Messages->add( T_('Deleted blog\'s posts'), 'success' );
@@ -2203,28 +2492,6 @@ class Blog extends DataObject
 			$Messages->add( T_('Deleted blog\'s categories'), 'success' );
 
 		} // / are there cats?
-
-
-		if( $delete_static_file )
-		{ // Delete static file
-			if( $echo ) echo '<br />Trying to delete static file... ';
-			if( ! @unlink( $this->get('staticfilepath') ) )
-			{
-				if( $echo )
-				{
-					echo '<span class="error">';
-					printf(	T_('ERROR! Could not delete! You will have to delete the file [%s] by hand.'),
-									$this->get('staticfilepath') );
-					echo '</span>';
-				}
-				$Messages->add( sprintf( T_('Could not delete static file [%s]'), $this->get('staticfilepath') ), 'error' );
-			}
-			else
-			{
-				if( $echo ) echo 'OK.';
-				$Messages->add( T_('Deleted blog\'s static file'), 'success' );
-			}
-		}
 
 		// Delete the blog cache folder - try to delete even if cache is disabled
 		load_class( '_core/model/_pagecache.class.php', 'PageCache' );
@@ -2332,6 +2599,32 @@ class Blog extends DataObject
 	{
 		return strmaxlen( $this->get_name(), $maxlen, NULL, 'raw' );
 	}
+
+
+	/*
+	 * Get the blog skin ID which correspond to the current session device
+	 * 
+	 * @return integer skin ID
+	 */
+	function get_skin_ID()
+	{
+		global $Session;
+
+		if( !empty( $Session ) )
+		{
+			if( $Session->is_mobile_session() )
+			{
+				return $this->get_setting( 'mobile_skin_ID' );
+			}
+			if( $Session->is_tablet_session() )
+			{
+				return $this->get_setting( 'tablet_skin_ID' );
+			}
+		}
+
+		return $this->get_setting( 'normal_skin_ID' );
+	}
+
 
 	/**
 	 * Resolve user ID of owner
@@ -2519,7 +2812,7 @@ class Blog extends DataObject
 
 	/**
 	 * Get the corresponding ajax form enabled setting
-	 * 
+	 *
 	 * @return boolean true if ajax form is enabled, false otherwise
 	 */
 	function get_ajax_form_enabled()
@@ -2584,690 +2877,145 @@ class Blog extends DataObject
 
 		return $timestamp_value;
 	}
+
+
+	/**
+	 * Get url to write a new Post
+	 *
+	 * @param integer Category ID
+	 * @param string Post title
+	 * @param string Post urltitle
+	 * @return string Url to write a new Post
+	 */
+	function get_write_item_url( $cat_ID = 0, $post_title = '', $post_urltitle = '' )
+	{
+		$url = '';
+
+		if( is_logged_in( false ) )
+		{	// Only logged in and activated users can write a Post
+			global $current_User;
+
+			$ChapterCache = & get_ChapterCache();
+			$selected_Chapter = $ChapterCache->get_by_ID( $cat_ID, false, false );
+			if( $selected_Chapter && $selected_Chapter->lock )
+			{ // This category is locked, don't allow to create new post with this cat
+				return '';
+			}
+			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $this->ID ) )
+			{	// We have permission to add a post with at least one status:
+				if( $this->get_setting( 'in_skin_editing' ) && ! is_admin_page() )
+				{	// We have a mode 'In-skin editing' for the current Blog
+					// User must have a permission to publish a post in this blog
+					$cat_url_param = '';
+					if( $cat_ID > 0 )
+					{	// Link to create a Item with predefined category
+						$cat_url_param = '&amp;cat='.$cat_ID;
+					}
+					$url = url_add_param( $this->get( 'url' ), 'disp=edit'.$cat_url_param );
+				}
+				elseif( $current_User->check_perm( 'admin', 'restricted' ) )
+				{	// Edit a post from Back-office
+					global $admin_url;
+					$url = $admin_url.'?ctrl=items&amp;action=new&amp;blog='.$this->ID;
+					if( !empty( $cat_ID ) )
+					{	// Add category param to preselect category on the form
+						$url = url_add_param( $url, 'cat='.$cat_ID );
+					}
+				}
+
+				if( !empty( $post_title ) )
+				{	// Append a post title
+					$url = url_add_param( $url, 'post_title='.$post_title );
+				}
+				if( !empty( $post_urltitle ) )
+				{	// Append a post urltitle
+					$url = url_add_param( $url, 'post_urltitle='.$post_urltitle );
+				}
+			}
+		}
+
+		return $url;
+	}
+
+
+	/**
+	 * Get url to create a new Chapter
+	 *
+	 * @param integer Parent category ID
+	 * @return string Url to create a new Chapter
+	 */
+	function get_create_chapter_url( $cat_ID = 0 )
+	{
+		$url = '';
+
+		if( is_logged_in( false ) )
+		{	// Only logged in and activated users can write a Post
+			global $current_User;
+
+			if( $current_User->check_perm( 'admin', 'restricted' ) &&
+			    $current_User->check_perm( 'blog_cats', 'edit', false, $this->ID ) )
+			{	// Check permissions to create a new chapter in this blog
+				global $admin_url;
+				$url = $admin_url.'?ctrl=chapters&amp;action=new&amp;blog='.$this->ID;
+				if( !empty( $cat_ID ) )
+				{	// Add category param to preselect category on the form
+					$url = url_add_param( $url, 'cat_parent_ID='.$cat_ID );
+				}
+			}
+		}
+
+		return $url;
+	}
+
+
+	/**
+	 * Country is visible for defining
+	 *
+	 * @return boolean TRUE if users can define a country for posts of current blog
+	 */
+	function country_visible()
+	{
+		return $this->get_setting( 'location_country' ) != 'hidden' || $this->region_visible();
+	}
+
+
+	/**
+	 * Region is visible for defining
+	 *
+	 * @return boolean TRUE if users can define a region for posts of current blog
+	 */
+	function region_visible()
+	{
+		return $this->get_setting( 'location_region' ) != 'hidden' || $this->subregion_visible();
+	}
+
+
+	/**
+	 * Subregion is visible for defining
+	 *
+	 * @return boolean TRUE if users can define a subregion for posts of current blog
+	 */
+	function subregion_visible()
+	{
+		return $this->get_setting( 'location_subregion' ) != 'hidden' || $this->city_visible();
+	}
+
+
+	/**
+	 * City is visible for defining
+	 *
+	 * @return boolean TRUE if users can define a city for posts of current blog
+	 */
+	function city_visible()
+	{
+		return $this->get_setting( 'location_city' ) != 'hidden';
+	}
 }
 
 /*
  * $Log$
- * Revision 1.165  2011/10/23 09:19:42  efy-yurybakh
- * Implement new permission for comment editing
+ * Revision 1.167  2013/11/06 08:03:57  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.164  2011/10/21 07:10:47  efy-asimo
- * Comment quick moderation option
- *
- * Revision 1.163  2011/10/21 04:57:45  efy-asimo
- * doc
- *
- * Revision 1.162  2011/10/20 16:32:57  efy-asimo
- * Invalidate PageCaches after specific settings update
- *
- * Revision 1.161  2011/10/17 15:32:46  efy-yurybakh
- * Let people create an account just after posting a comment
- *
- * Revision 1.160  2011/10/17 15:10:29  efy-yurybakh
- * If there is an email address in a comment, do not allow posting the comment
- *
- * Revision 1.159  2011/10/11 18:26:10  efy-yurybakh
- * In skin posting (beta)
- *
- * Revision 1.158  2011/10/07 07:22:59  efy-yurybakh
- * Replace all timestamp_min & timestamp_max with Blog's methods
- *
- * Revision 1.157  2011/10/06 11:49:47  efy-yurybakh
- * Replace all timestamp_min & timestamp_max with Blog's methods
- *
- * Revision 1.156  2011/10/05 19:12:39  efy-yurybakh
- * Checks for disp=user & users
- *
- * Revision 1.155  2011/10/05 17:58:53  efy-yurybakh
- * change the default profile picture sizes
- *
- * Revision 1.154  2011/10/05 13:49:07  efy-yurybakh
- * Add settings for a $timestamp_min & $timestamp_max
- *
- * Revision 1.153  2011/10/05 12:05:02  efy-yurybakh
- * Blog settings > features tab refactoring
- *
- * Revision 1.152  2011/10/04 08:39:30  efy-asimo
- * Comment and message forms save/reload content in case of error
- *
- * Revision 1.151  2011/10/03 17:13:04  efy-yurybakh
- * review fp>yura comments
- *
- * Revision 1.150  2011/10/03 07:02:21  efy-yurybakh
- * bubbletips & identity_links cleanup
- *
- * Revision 1.149  2011/10/01 09:01:25  efy-asimo
- * Fix 'Include in public blog list' blog setting update
- *
- * Revision 1.148  2011/09/30 13:03:19  fplanque
- * doc
- *
- * Revision 1.147  2011/09/30 08:22:18  efy-asimo
- * Events update
- *
- * Revision 1.146  2011/09/30 04:56:39  efy-yurybakh
- * RSS feed settings
- *
- * Revision 1.145  2011/09/29 16:42:19  efy-yurybakh
- * colored login
- *
- * Revision 1.144  2011/09/28 12:09:53  efy-yurybakh
- * "comment was helpful" votes (new tab "comments")
- *
- * Revision 1.143  2011/09/27 13:30:14  efy-yurybakh
- * spam vote checkbox
- *
- * Revision 1.142  2011/09/25 07:06:21  efy-yurybakh
- * Implement new permission for spam voting
- *
- * Revision 1.141  2011/09/21 22:08:04  sam2kb
- * minor/cleanup
- *
- * Revision 1.140  2011/09/17 02:31:58  fplanque
- * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
- *
- * Revision 1.139  2011/09/08 05:22:40  efy-asimo
- * Remove item attending and add item settings
- *
- * Revision 1.138  2011/09/04 22:13:14  fplanque
- * copyright 2011
- *
- * Revision 1.137  2011/08/26 07:40:13  efy-asimo
- * Setting to show comment to "Members only"
- *
- * Revision 1.136  2011/07/12 23:47:31  sam2kb
- * Sanitize input ID list
- *
- * Revision 1.135  2011/06/29 13:14:01  efy-asimo
- * Use ajax to display comment and contact forms
- *
- * Revision 1.134  2011/06/15 06:29:44  sam2kb
- * Relocate "set_max_execution_time" function
- *
- * Revision 1.133  2011/05/25 14:59:33  efy-asimo
- * Post attending
- *
- * Revision 1.132  2011/05/23 02:20:07  sam2kb
- * Option to display excerpts in comment feeds, or disable feeds completely
- *
- * Revision 1.131  2011/05/19 17:47:07  efy-asimo
- * register for updates on a specific blog post
- *
- * Revision 1.130  2011/03/24 15:15:05  efy-asimo
- * in-skin login - feature
- *
- * Revision 1.129  2011/03/15 09:34:05  efy-asimo
- * have checkboxes for enabling caching in new blogs
- * refactorize cache create/enable/disable
- *
- * Revision 1.128  2011/03/02 09:45:58  efy-asimo
- * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
- *
- * Revision 1.127  2011/02/15 05:31:53  sam2kb
- * evo_strtolower mbstring wrapper for strtolower function
- *
- * Revision 1.126  2011/02/10 23:07:21  fplanque
- * minor/doc
- *
- * Revision 1.125  2011/01/06 14:31:47  efy-asimo
- * advanced blog permissions:
- *  - add blog_edit_ts permission
- *  - make the display more compact
- *
- * Revision 1.124  2011/01/02 02:20:25  sam2kb
- * typo: explicitely => explicitly
- *
- * Revision 1.123  2010/11/02 02:30:32  sam2kb
- * Do not set invalid blog_urlname, otherwise evobar displays broken blog links
- *
- * Revision 1.122  2010/10/19 02:00:53  fplanque
- * allow blog deletion to take a long time...
- *
- * Revision 1.121  2010/10/13 14:07:55  efy-asimo
- * Optional paged comments in the front end
- *
- * Revision 1.120  2010/09/29 13:19:02  efy-asimo
- * Twitter user unlink, and twitter config params move to plugin
- *
- * Revision 1.119  2010/07/26 06:52:15  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.118  2010/07/12 09:07:37  efy-asimo
- * rename get_msgform_settings() to get_msgform_possibility
- *
- * Revision 1.117  2010/07/06 08:17:39  efy-asimo
- * Move "Multiple authors" block to Blog setings advanced tab. Fix validating urlname when user has no blog_admin permission.
- *
- * Revision 1.116  2010/07/05 08:40:13  efy-asimo
- * Factorize Blog::create() function, and change default blog url to "extrapath"
- *
- * Revision 1.115  2010/07/02 08:14:19  efy-asimo
- * Messaging redirect modification and "new user get a new blog" fix
- *
- * Revision 1.114  2010/06/08 22:29:25  sam2kb
- * Per blog settings for different default gravatar types
- *
- * Revision 1.113  2010/06/08 01:49:53  sam2kb
- * Paged comments in frontend
- *
- * Revision 1.112  2010/06/01 11:33:19  efy-asimo
- * Split blog_comments advanced permission (published, deprecated, draft)
- * Use this new permissions (Antispam tool,when edit/delete comments)
- *
- * Revision 1.111  2010/06/01 02:44:44  sam2kb
- * New hooks added: GetCollectionKinds and InitCollectionKinds.
- * Use them to define new and override existing presets for new blogs.
- * See http://forums.b2evolution.net/viewtopic.php?t=21015
- *
- * Revision 1.110  2010/05/22 12:22:49  efy-asimo
- * move $allow_cross_posting in the backoffice
- *
- * Revision 1.109  2010/04/23 09:39:44  efy-asimo
- * "SEO setting" for help link and Groups slugs permission implementation
- *
- * Revision 1.108  2010/04/16 10:42:10  efy-asimo
- * users messages options- send private messages to users from front-office - task
- *
- * Revision 1.107  2010/04/14 23:01:09  blueyed
- * doc
- *
- * Revision 1.106  2010/04/12 15:14:25  efy-asimo
- * resolver bug - fix
- *
- * Revision 1.105  2010/04/08 21:02:43  waltercruz
- * Tags as meta-description fallback
- *
- * Revision 1.104  2010/04/08 10:35:23  efy-asimo
- * Allow users to create a new blog for themselves - task
- *
- * Revision 1.103  2010/03/10 15:06:31  efy-asimo
- * Delete blog cache entry if blog is deleted
- *
- * Revision 1.102  2010/02/08 17:52:07  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.101  2010/02/06 11:48:31  efy-yury
- * add checkbox 'go to blog after posting' in blog settings
- *
- * Revision 1.100  2010/01/20 20:08:29  efy-asimo
- * Countries&Currencies redirect fix + RSS/Atom feeds image size select list
- *
- * Revision 1.99  2010/01/03 12:36:15  fplanque
- * Renamed hooks
- *
- * Revision 1.98  2010/01/02 20:11:07  sam2kb
- * Added new hooks: AfterBlogInsert, AfterBlogUpdate, AfterBlogDelete
- *
- * Revision 1.97  2010/01/01 20:37:43  fplanque
- * help disp
- *
- * Revision 1.96  2009/12/22 23:13:38  fplanque
- * Skins v4, step 1:
- * Added new disp modes
- * Hooks for plugin disp modes
- * Enhanced menu widgets (BIG TIME! :)
- *
- * Revision 1.95  2009/12/22 03:30:25  blueyed
- * cleanup
- *
- * Revision 1.94  2009/12/15 06:24:25  fplanque
- * no message
- *
- * Revision 1.93  2009/12/01 04:19:25  fplanque
- * even more invalidation dimensions
- *
- * Revision 1.92  2009/12/01 03:45:37  fplanque
- * multi dimensional invalidation
- *
- * Revision 1.91  2009/11/30 23:16:24  fplanque
- * basic cache invalidation is working now
- *
- * Revision 1.90  2009/11/30 04:31:38  fplanque
- * BlockCache Proof Of Concept
- *
- * Revision 1.89  2009/11/30 00:22:04  fplanque
- * clean up debug info
- * show more timers in view of block caching
- *
- * Revision 1.88  2009/09/30 00:38:13  sam2kb
- * Space is not needed before get_field_attribs_as_string()
- *
- * Revision 1.87  2009/09/29 16:56:11  tblue246
- * Added setting to disable sitemaps skins
- *
- * Revision 1.86  2009/09/29 02:52:20  fplanque
- * doc
- *
- * Revision 1.85  2009/09/27 12:57:29  blueyed
- * strmaxlen: add format param, which is used on the (possibly) cropped string.
- *
- * Revision 1.84  2009/09/27 12:27:45  blueyed
- * Small optimization
- *
- * Revision 1.83  2009/09/26 20:40:05  blueyed
- * Keep a single instance of CollectionSettings across all blogs.
- *
- * Revision 1.82  2009/09/26 20:37:48  blueyed
- * Minor: fix pattern delimiters, to not cause charset issues.
- *
- * Revision 1.81  2009/09/26 12:00:42  tblue246
- * Minor/coding style
- *
- * Revision 1.80  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.79  2009/09/14 12:43:04  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.78  2009/09/13 21:33:14  blueyed
- * doc fix
- *
- * Revision 1.77  2009/09/11 19:57:01  fplanque
- * updates awall style
- *
- * Revision 1.76  2009/08/30 17:27:03  fplanque
- * better NULL param handling all over the app
- *
- * Revision 1.75  2009/08/27 12:24:27  tblue246
- * Added blog setting to display comments in ascending/descending order
- *
- * Revision 1.74  2009/08/13 00:41:47  sam2kb
- * Sanitize aggregate_coll_IDs list
- *
- * Revision 1.73  2009/08/10 17:15:24  waltercruz
- * Adding permalinks on postbypost archive mode and adding a button to set the sort order on postbypost mode
- *
- * Revision 1.72  2009/07/14 10:55:03  tblue246
- * Bugfix: Remember requested page number when redirecting to a canonical chapter URL
- *
- * Revision 1.71  2009/07/06 23:52:24  sam2kb
- * Hardcoded "admin.php" replaced with $dispatcher
- *
- * Revision 1.70  2009/07/02 00:25:03  fplanque
- * rollback
- *
- * Revision 1.69  2009/06/29 09:35:22  yabs
- * changed to $owner$ replacement to users preferred name
- *
- * Revision 1.68  2009/06/29 02:14:04  fplanque
- * no message
- *
- * Revision 1.67  2009/06/13 20:09:24  tblue246
- * Fixed stupid bug: Blog settings SEO tab - number of posts on tag pages got not set and could not be reset; latter also applied for the chapter_posts_per_page setting. Ref: http://forums.b2evolution.net/viewtopic.php?t=18935
- *
- * Revision 1.66  2009/05/27 14:46:33  waltercruz
- * Using categories description as meta-description for categories pages
- *
- * Revision 1.65  2009/05/23 20:20:18  fplanque
- * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
- *
- * Revision 1.64  2009/05/21 12:34:39  fplanque
- * Options to select how much content to display (excerpt|teaser|normal) on different types of pages.
- *
- * Revision 1.63  2009/05/20 18:27:09  fplanque
- * canonical support for date archives
- *
- * Revision 1.62  2009/05/20 12:58:16  fplanque
- * Homepage: option to 301 redirect to canonical homepage.
- * Option to support rel="canonical" instead of or when 301 redirect cannot be used.
- *
- * Revision 1.61  2009/05/17 19:51:10  fplanque
- * minor/doc
- *
- * Revision 1.60  2009/04/23 19:51:40  blueyed
- * Add Blog::get_tag_link, use it where appropriate.
- *
- * Revision 1.59  2009/04/22 23:32:39  blueyed
- * Fix switch in gen_tag_url
- *
- * Revision 1.58  2009/04/22 22:46:33  blueyed
- * Add support for rel=tag in tag URLs. This adds a new tag_links mode 'prefix-only', which requires a prefix (default: tag) and uses no suffix (dash/colon/semicolon). Also adds more JS juice and cleans up/normalized previously existing JS. Not much tested, but implemented as discussed on ML.
- *
- * Revision 1.57  2009/03/26 22:23:36  blueyed
- * Fix doc
- *
- * Revision 1.56  2009/03/21 00:38:15  waltercruz
- * Addind SEO setting for excerpts as meta description
- *
- * Revision 1.55  2009/03/08 23:57:42  fplanque
- * 2009
- *
- * Revision 1.54  2009/01/28 22:47:41  fplanque
- * bugfix
- *
- * Revision 1.53  2009/01/28 22:34:21  fplanque
- * Default cat for each blog can now be chosen explicitly
- *
- * Revision 1.52  2009/01/23 17:23:09  fplanque
- * doc/minor
- *
- * Revision 1.51  2009/01/23 00:05:24  blueyed
- * Add Blog::get_sql_where_aggregate_coll_IDs, which adds support for '*' in list of aggregated blogs.
- *
- * Revision 1.50  2009/01/21 21:44:35  blueyed
- * TODO to add something like create_media_dir
- *
- * Revision 1.49  2008/12/28 22:48:12  fplanque
- * increase blog name max length to 255 chars
- *
- * Revision 1.47  2008/09/28 08:06:07  fplanque
- * Refactoring / extended page level caching
- *
- * Revision 1.46  2008/09/27 08:14:02  fplanque
- * page level caching
- *
- * Revision 1.45  2008/09/27 00:48:32  fplanque
- * caching step 0.
- *
- * Revision 1.44  2008/09/15 11:01:06  fplanque
- * Installer now creates a demo photoblog
- *
- * Revision 1.43  2008/09/09 06:03:30  fplanque
- * More tag URL options
- * Enhanced URL resolution for categories and tags
- *
- * Revision 1.42  2008/06/30 23:47:04  blueyed
- * require_title setting for Blogs, defaulting to 'required'. This makes the title field now a requirement (by default), since it often gets forgotten when posting first (and then the urltitle is ugly already)
- *
- * Revision 1.41  2008/05/31 22:29:07  blueyed
- * indent, doc
- *
- * Revision 1.40  2008/05/10 23:41:31  fplanque
- * cleanup of external feed providers
- *
- * Revision 1.39  2008/05/05 18:50:07  waltercruz
- * URL validation of external feeds
- *
- * Revision 1.38  2008/04/30 18:35:05  waltercruz
- * Temporary fix
- *
- * Revision 1.37  2008/04/26 22:20:44  fplanque
- * Improved compatibility with older skins.
- *
- * Revision 1.36  2008/04/19 15:11:42  waltercruz
- * Feednurner
- *
- * Revision 1.35  2008/04/04 17:02:22  fplanque
- * cleanup of global settings
- *
- * Revision 1.34  2008/04/04 16:02:10  fplanque
- * uncool feature about limiting credits
- *
- * Revision 1.33  2008/03/21 19:42:44  fplanque
- * enhanced 404 handling
- *
- * Revision 1.32  2008/02/09 20:14:14  fplanque
- * custom fields management
- *
- * Revision 1.31  2008/01/21 09:35:26  fplanque
- * (c) 2008
- *
- * Revision 1.30  2008/01/18 15:53:42  fplanque
- * Ninja refactoring
- *
- * Revision 1.29  2008/01/17 20:47:58  fplanque
- * deprecated linkblog_ID blog param
- *
- * Revision 1.28  2008/01/17 18:10:09  fplanque
- * deprecated linkblog_ID blog param
- *
- * Revision 1.27  2008/01/17 14:38:30  fplanque
- * Item Footer template tag
- *
- * Revision 1.26  2008/01/15 08:19:36  fplanque
- * blog footer text tag
- *
- * Revision 1.25  2008/01/07 02:53:26  fplanque
- * cleaner tag urls
- *
- * Revision 1.24  2008/01/06 18:47:08  fplanque
- * enhanced system checks
- *
- * Revision 1.23  2008/01/05 17:54:43  fplanque
- * UI/help improvements
- *
- * Revision 1.22  2007/12/27 01:58:48  fplanque
- * additional SEO
- *
- * Revision 1.21  2007/11/27 02:37:09  blueyed
- * Use canonical path when checking if path is inside of media_path!
- *
- * Revision 1.20  2007/11/25 19:47:15  fplanque
- * cleaned up photo/media index a little bit
- *
- * Revision 1.19  2007/11/25 18:20:38  fplanque
- * additional SEO settings
- *
- * Revision 1.18  2007/11/25 14:28:17  fplanque
- * additional SEO settings
- *
- * Revision 1.17  2007/11/24 21:41:12  fplanque
- * additional SEO settings
- *
- * Revision 1.16  2007/11/24 18:35:55  blueyed
- * - demo_mode: Blog media directories can only be configured to be inside of {@link $media_path}
- * - check that blog media subdirs are valid (sub)directories
- *
- * Revision 1.15  2007/11/24 17:24:50  blueyed
- * Add $media_path
- *
- * Revision 1.14  2007/11/04 17:55:12  fplanque
- * More cleanup
- *
- * Revision 1.13  2007/11/04 01:10:57  fplanque
- * skin cleanup continued
- *
- * Revision 1.12  2007/11/03 04:56:03  fplanque
- * permalink / title links cleanup
- *
- * Revision 1.11  2007/11/02 01:44:29  fplanque
- * comment ratings
- *
- * Revision 1.10  2007/10/09 02:10:50  fplanque
- * URL fixes
- *
- * Revision 1.9  2007/10/06 21:17:25  fplanque
- * cleanup
- *
- * Revision 1.8  2007/10/05 00:09:23  blueyed
- * Nuked unnecessary global statement
- *
- * Revision 1.7  2007/10/01 13:41:07  waltercruz
- * Category prefix, trying to make the code more b2evo style
- *
- * Revision 1.6  2007/09/29 01:50:50  fplanque
- * temporary rollback; waiting for new version
- *
- * Revision 1.5  2007/09/28 09:28:36  fplanque
- * per blog advanced SEO settings
- *
- * Revision 1.4  2007/09/28 02:25:00  fplanque
- * Menu widgets
- *
- * Revision 1.2  2007/09/10 13:24:13  waltercruz
- * Mispelled word correction
- *
- * Revision 1.1  2007/06/25 10:59:31  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.85  2007/05/31 03:02:22  fplanque
- * Advanced perms now disabled by default (simpler interface).
- * Except when upgrading.
- * Enable advanced perms in blog settings -> features
- *
- * Revision 1.84  2007/05/30 01:18:56  fplanque
- * blog owner gets all permissions except advanced/admin settings
- *
- * Revision 1.83  2007/05/29 01:17:19  fplanque
- * advanced admin blog settings are now restricted by a special permission
- *
- * Revision 1.82  2007/05/28 15:18:30  fplanque
- * cleanup
- *
- * Revision 1.81  2007/05/28 01:35:22  fplanque
- * fixed static page generation
- *
- * Revision 1.80  2007/05/14 02:43:04  fplanque
- * Started renaming tables. There probably won't be a better time than 2.0.
- *
- * Revision 1.79  2007/05/13 22:53:31  fplanque
- * allow feeds restricted to post excerpts
- *
- * Revision 1.78  2007/05/09 00:58:54  fplanque
- * massive cleanup of old functions
- *
- * Revision 1.77  2007/05/08 00:54:31  fplanque
- * public blog list as a widget
- *
- * Revision 1.76  2007/04/26 00:11:05  fplanque
- * (c) 2007
- *
- * Revision 1.75  2007/04/25 18:47:41  fplanque
- * MFB 1.10: groovy links
- *
- * Revision 1.74  2007/03/25 15:18:57  fplanque
- * cleanup
- *
- * Revision 1.73  2007/03/25 15:07:38  fplanque
- * multiblog fixes
- *
- * Revision 1.72  2007/03/25 13:20:52  fplanque
- * cleaned up blog base urls
- * needs extensive testing...
- *
- * Revision 1.71  2007/03/25 10:20:02  fplanque
- * cleaned up archive urls
- *
- * Revision 1.70  2007/03/24 20:41:16  fplanque
- * Refactored a lot of the link junk.
- * Made options blog specific.
- * Some junk still needs to be cleaned out. Will do asap.
- *
- * Revision 1.69  2007/03/11 23:57:06  fplanque
- * item editing: allow setting to 'redirected' status
- *
- * Revision 1.68  2007/03/08 00:17:42  blueyed
- * More info in assertion for "baseurlroot" and "basehost" and more strict pattern
- *
- * Revision 1.67  2007/03/04 21:42:49  fplanque
- * category directory / albums
- *
- * Revision 1.66  2007/03/02 00:44:43  fplanque
- * various small fixes
- *
- * Revision 1.65  2007/02/25 01:31:34  fplanque
- * minor
- *
- * Revision 1.64  2007/02/17 21:12:14  blueyed
- * Removed magic in Plugin::get_htsrv_url() which used the blog url and assumed that "htsrv" was available in there
- *
- * Revision 1.63  2007/01/23 09:25:40  fplanque
- * Configurable sort order.
- *
- * Revision 1.62  2007/01/23 08:07:16  fplanque
- * Fixed blog URLs including urlnames
- *
- * Revision 1.61  2007/01/23 07:31:22  fplanque
- * "fixed" as per todo
- *
- * Revision 1.60  2007/01/23 05:30:20  fplanque
- * "Contact the owner"
- *
- * Revision 1.59  2007/01/23 04:19:50  fplanque
- * handling of blog owners
- *
- * Revision 1.58  2007/01/23 03:45:56  fplanque
- * bugfix
- *
- * Revision 1.57  2007/01/16 00:44:42  fplanque
- * don't use $admin_email in  the app
- *
- * Revision 1.56  2007/01/15 19:28:39  blueyed
- * doc
- *
- * Revision 1.55  2007/01/15 03:54:36  fplanque
- * pepped up new blog creation a little more
- *
- * Revision 1.54  2007/01/15 00:38:06  fplanque
- * pepped up "new blog" creation a little. To be continued.
- *
- * Revision 1.53  2007/01/14 01:33:34  fplanque
- * losely restrict to *installed* XML feed skins
- *
- * Revision 1.52  2007/01/08 02:11:55  fplanque
- * Blogs now make use of installed skins
- * next step: make use of widgets inside of skins
- *
- * Revision 1.51  2006/12/23 23:37:35  fplanque
- * refactoring / Blog::get_default_cat_ID()
- *
- * Revision 1.50  2006/12/23 23:15:19  fplanque
- * refactoring / Blog::get_allowed_item_status()
- *
- * Revision 1.49  2006/12/22 00:50:33  fplanque
- * improved path cleaning
- *
- * Revision 1.48  2006/12/21 22:25:43  fplanque
- * Removed restricting constraint. (It may have been good for hiding a bug, but it restricts the purpose)
- *
- * Revision 1.47  2006/12/19 21:40:17  blueyed
- * Test if baseurl is valid by testing if "htsrv/" is accessible below it; see http://forums.b2evolution.net/viewtopic.php?p=48707#48707 et seqq.
- *
- * Revision 1.46  2006/12/17 23:42:38  fplanque
- * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
- * Look into Advanced Settings for the aggregating blog.
- * There may be side effects and new bugs created by this. Please report them :]
- *
- * Revision 1.45  2006/12/16 01:30:46  fplanque
- * Setting to allow/disable email subscriptions on a per blog basis
- *
- * Revision 1.44  2006/12/14 21:41:15  fplanque
- * Allow different number of items in feeds than on site
- *
- * Revision 1.43  2006/12/14 00:01:49  fplanque
- * land in correct collection when opening FM from an Item
- *
- * Revision 1.42  2006/12/13 18:23:36  blueyed
- * doc
- *
- * Revision 1.41  2006/12/10 23:56:26  fplanque
- * Worfklow stuff is now hidden by default and can be enabled on a per blog basis.
- *
- * Revision 1.40  2006/12/07 23:13:10  fplanque
- * @var needs to have only one argument: the variable type
- * Otherwise, I can't code!
- *
- * Revision 1.39  2006/12/04 23:49:49  blueyed
- * Normalized: setMediaUrl() => set_media_url(); setMediaFullPath() => set_media_fullpath(); setMediaSubDir() => set_media_subdir()
- *
- * Revision 1.38  2006/12/04 21:25:18  fplanque
- * removed user skin switching
- *
- * Revision 1.37  2006/12/04 19:41:11  fplanque
- * Each blog can now have its own "archive mode" settings
- *
- * Revision 1.36  2006/12/04 18:16:50  fplanque
- * Each blog can now have its own "number of page/days to display" settings
- *
- * Revision 1.35  2006/11/28 00:33:01  blueyed
- * Removed DB::compString() (never used) and DB::get_list() (just a macro and better to have in the 4 used places directly; Cleanup/normalization; no extended regexp, when not needed!
- *
- * Revision 1.34  2006/11/24 18:27:23  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.33  2006/11/13 20:49:52  fplanque
- * doc/cleanup :/
- *
- * Revision 1.32  2006/10/23 22:19:02  blueyed
- * Fixed/unified encoding of redirect_to param. Use just rawurlencode() and no funky &amp; replacements
- *
- * Revision 1.31  2006/10/14 04:43:35  blueyed
- * Removed last allowpingbacks references
- *
- * Revision 1.30  2006/10/10 23:24:41  blueyed
- * Fixed duplication of ping plugins from hidden values
- *
- * Revision 1.29  2006/10/01 22:11:42  blueyed
- * Ping services as plugins.
  */
 ?>

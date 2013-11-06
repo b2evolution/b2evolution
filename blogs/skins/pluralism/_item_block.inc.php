@@ -46,6 +46,10 @@ $params = array_merge( array(
 <h2 class="title"><?php $Item->title(); ?></h2>
 
 <?php
+	if( $Item->status != 'published' )
+	{
+		$Item->status( array( 'format' => 'styled' ) );
+	}
 
 	if( ! $Item->is_intro() )
 	{	// Display only if we're not displaying an intro post:

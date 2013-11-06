@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -29,7 +29,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $UserSettings->param_Request( 'tab', 'pref_glob_settings_tab', 'string', 'gensettings', true /* memorize */, true /* force */ );
 
 // Avoid infernal loop:
-if( $tab == 'settings' )
+if( $tab == 'settings' || $tab == 'skins' )
 {
 	$ctrl = 'gensettings';
 }
@@ -47,10 +47,4 @@ if( !isset($ctrl_mappings[$ctrl]) )
 // Call the requested controller:
 require $inc_path.$ctrl_mappings[$ctrl];
 
-/*
- * $Log$
- * Revision 1.2  2011/09/14 13:43:09  fplanque
- * no message
- *
- */
 ?>

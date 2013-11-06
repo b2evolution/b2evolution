@@ -40,10 +40,19 @@ $params = array_merge( array(
 		'after_comment_error'  => '</em></p>',
 		'before_comment_form'  => '',
 		'after_comment_form'   => '',
+		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
+		'comment_start'        => '<li>',
+		'comment_end'          => '</li>',
+		'notification_before'  => '<div class="comment_notification">',
+		'notification_text'    => T_( 'This is your post. You are receiving notifications when anyone comments on your posts.' ),
+		'notification_text2'   => T_( 'You will be notified by email when someone comments here.' ),
+		'notification_text3'   => T_( 'Notify me by email when someone comments here.' ),
+		'notification_after'   => '</div>',
+		'feed_title'           => '#',
 	), $params );
 
 
-global $c, $tb, $pb, $redir, $comment_allowed_tags, $comments_use_autobr;
+global $c, $tb, $pb, $redir, $comment_allowed_tags;
 
 global $cookie_name, $cookie_email, $cookie_url;
 
@@ -56,7 +65,7 @@ if( $Item->can_see_comments( true ) )
 		$params['disp_comment_form'] = false;			// DO NOT Display the comments form if not requested
 	}
 
-	if( empty($tb) || !$Blog->get( 'allowtrackbacks' ) )
+	if( empty($tb) || !$Item->can_receive_pings() )
 	{	// Trackback not requested or not allowed
 		$params['disp_trackbacks'] = false;				// DO NOT Display the trackbacks if not requested
 		$params['disp_trackback_url'] = false;		// DO NOT Display the trackback URL if not requested
@@ -135,7 +144,7 @@ if( $Item->can_see_comments( true ) )
 	{
 		if( empty($disp_title) )
 		{	// No title yet
-			if( $title = $Item->get_feedback_title( 'feedbacks', '', T_('Feedback awaiting moderation'), T_('Feedback awaiting moderation'), 'draft' ) )
+			if( $title = $Item->get_feedback_title( 'feedbacks', '', T_('Feedback awaiting moderation'), T_('Feedback awaiting moderation'), array( 'review', 'draft' ), false ) )
 			{ // We have some feedback awaiting moderation: we'll want to show that in the title
 				$disp_title[] = $title;
 			}
@@ -150,14 +159,16 @@ if( $Item->can_see_comments( true ) )
 		echo implode( ', ', $disp_title);
 		echo $params['after_section_title'];
 
-		$CommentList = new CommentList2( $Blog, $Blog->get_setting('comments_per_page'), 'CommentCache', 'c_' );
+		$comments_per_page = !$Blog->get_setting( 'threaded_comments' ) ? $Blog->get_setting( 'comments_per_page' ) : 1000;
+		$CommentList = new CommentList2( $Blog, $comments_per_page, 'CommentCache', 'c_' );
 
 		// Filter list:
 		$CommentList->set_default_filters( array(
 				'types' => $type_list,
-				'statuses' => array ( 'published' ),
+				'statuses' => NULL,
 				'post_ID' => $Item->ID,
 				'order' => $Blog->get_setting( 'comments_orderdir' ),
+				'threaded_comments' => $Blog->get_setting( 'threaded_comments' ),
 			) );
 
 		$CommentList->load_from_Request();
@@ -174,69 +185,58 @@ if( $Item->can_see_comments( true ) )
 					'page_url' => url_add_tail( $Item->get_permanent_url(), '#comments' ),
 				) );
 		}
+
+
+		if( $Blog->get_setting( 'threaded_comments' ) )
+		{	// Array to store the comment replies
+			global $CommentReplies;
+			$CommentReplies = array();
+
+			if( $Comment = $Session->get('core.preview_Comment') )
+			{	// Init PREVIEW comment
+				if( $Comment->item_ID == $Item->ID )
+				{
+					$CommentReplies[ $Comment->in_reply_to_cmt_ID ] = array( $Comment );
+				}
+			}
+		}
 	?>
 
 	<ol class="commentlist">
 	<?php
 		/* This variable is for alternating comment background */
-			$oddcomment = 'alt';
+		global $glossyblue_oddcomment;
+		$glossyblue_oddcomment = 'alt';
 		/**
 		 * @var Comment
 		 */
 		while( $Comment = & $CommentList->get_next() )
 		{	// Loop through comments:
-			?>
-			<!-- ========== START of a COMMENT/TB/PB ========== -->
 
-			<li id="comment-<?php $Comment->ID(); ?>" class="<?php echo $oddcomment; ?>"><?php $Comment->anchor() ?>
+			if( $Blog->get_setting( 'threaded_comments' ) && $Comment->in_reply_to_cmt_ID > 0 )
+			{	// Store the replies in a special array
+				if( !isset( $CommentReplies[ $Comment->in_reply_to_cmt_ID ] ) )
+				{
+					$CommentReplies[ $Comment->in_reply_to_cmt_ID ] = array();
+				}
+				$CommentReplies[ $Comment->in_reply_to_cmt_ID ][] = $Comment;
+				continue; // Skip dispay a comment reply here in order to dispay it after parent comment by function display_comment_replies()
+			}
 
-				<?php
-					switch( $Comment->get( 'type' ) )
-					{
-						case 'comment': // Display a comment:
-							$Comment->permanent_link( array(
-								'before'    => '',
-								'after'     => ' ',
-								'text' => '&#167; ',
-								'nofollow' => true,
-							) );
-							$Comment->author('','','','&#174;','htmlbody',true);
-							$Comment->msgform_link( $Blog->get('msgformurl') );
+			// ------------------ COMMENT INCLUDED HERE ------------------
+			skin_include( $params['comment_template'], array(
+					'Comment'         => & $Comment,
+					'comment_start'   => '<li id="comment-'.$Comment->ID.'" class="">',
+					'comment_end'     => $params['comment_end'],
+				) );
+			// ---------------------- END OF COMMENT ---------------------
 
-							echo ' '.T_('said on :').' <small class="commentmetadata">';
-							$Comment->date() ?> @ <?php $Comment->time( 'H:i' ); $Comment->edit_link( '','',get_icon( 'edit' ) ); $Comment->delete_link( '','',get_icon( 'delete' ) ); echo '</small>';
-							break;
+			if( $Blog->get_setting( 'threaded_comments' ) )
+			{	// Display the comment replies
+				$params['comment_start'] = '<li id="comment-'.$Comment->ID.'" class="">';
+				display_comment_replies( $Comment->ID, $params );
+			}
 
-						case 'trackback': // Display a trackback:
-							$Comment->permanent_link( T_('Trackback') );
-							echo ' '.T_('from:').' ';
-							$Comment->author( '', '#', '', '#', 'htmlbody', true );
-							break;
-
-						case 'pingback': // Display a pingback:
-							$Comment->permanent_link( T_('Pingback') );
-							echo ' '.T_('from:').' ';
-							$Comment->author( '', '#', '', '#', 'htmlbody', true );
-							break;
-					}
-				?>
-
-				<?php $Comment->rating(); ?>
-				<div class="bCommentText">
-					<?php $Comment->content() ?>
-				</div>
-				<div class="bCommentSmallPrint">
-
-
-
-				</div>
-			</li>
-			<?php /* Changes every other comment to a different class */
-			if ('alt' == $oddcomment) $oddcomment = '';
-			else $oddcomment = 'alt';
-		?>
-			<!-- ========== END of a COMMENT/TB/PB ========== -->
-			<?php
 		}	// End of comment list loop.
 	?>
 	</ol><?php
@@ -255,11 +255,6 @@ if( $Item->can_see_comments( true ) )
 		$Item->feedback_moderation( 'feedbacks', '<div class="moderation_msg"><p>', '</p></div>', '',
 				T_('This post has 1 feedback awaiting moderation... %s'),
 				T_('This post has %d feedbacks awaiting moderation... %s') );
-
-		// _______________________________________________________________
-
-		// Display link for comments feed:
-		$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>' );
 	}
 
 		// _______________________________________________________________
@@ -283,4 +278,58 @@ else
 }
 // ---------------------- END OF COMMENT FORM ---------------------
 
+
+// ----------- Register for item's comment notification -----------
+if( is_logged_in() && $Item->can_comment( NULL ) )
+{
+	global $DB, $htsrv_url;
+	global $UserSettings;
+
+	$not_subscribed = true;
+	$creator_User = $Item->get_creator_User();
+
+	if( $Blog->get_setting( 'allow_subscriptions' ) )
+	{
+		$sql = 'SELECT count( sub_user_ID ) FROM T_subscriptions
+					WHERE sub_user_ID = '.$current_User->ID.' AND sub_coll_ID = '.$Blog->ID.' AND sub_comments <> 0';
+		if( $DB->get_var( $sql ) > 0 )
+		{
+			echo '<p>'.T_( 'You are receiving notifications when anyone comments on any post.' );
+			echo ' <a href="'.$Blog->get('subsurl').'">'.T_( 'Click here to manage your subscriptions.' ).'</a></p>';
+			$not_subscribed = false;
+		}
+	}
+
+	echo $params['notification_before'];
+
+	$notification_icon = get_icon( 'notification' );
+
+	if( $not_subscribed && ( $creator_User->ID == $current_User->ID ) && ( $UserSettings->get( 'notify_published_comments', $current_User->ID ) != 0 ) )
+	{
+		echo '<p>'.$notification_icon.' <span>'.$params['notification_text'];
+		echo ' <a href="'.$Blog->get('subsurl').'">'.T_( 'Click here to manage your subscriptions.' ).'</a></span></p>';
+		$not_subscribed = false;
+	}
+	if( $not_subscribed && $Blog->get_setting( 'allow_item_subscriptions' ) )
+	{
+		if( get_user_isubscription( $current_User->ID, $Item->ID ) )
+		{
+			echo '<p>'.$notification_icon.' <span>'.$params['notification_text2'];
+			echo ' <a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=0&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Click here to unsubscribe.' ).'</a></span></p>';
+		}
+		else
+		{
+			echo '<p>'.$notification_icon.' <span><a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=1&amp;'.url_crumb( 'collections_isubs_update' ).'">'.$params['notification_text3'].'</a></span></p>';
+		}
+	}
+
+	echo $params['notification_after'];
+}
+
+
+if( $Item->can_see_comments( true ) && ( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks'] ) )
+{	// user is allowed to see comments
+	// Display link for comments feed:
+	$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>', $params['feed_title'] );
+}
 ?>

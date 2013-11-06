@@ -26,8 +26,8 @@ header('Content-Type: text/html; charset=iso-8859-1'); // no translation
  	exit(0);
 /*
  * $Log$
- * Revision 1.4  2011/10/21 06:53:32  efy-vitalij
- * added function header_http_response
+ * Revision 1.5  2013/11/06 08:05:36  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

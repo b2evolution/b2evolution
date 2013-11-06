@@ -1,11 +1,11 @@
 <?php
 /**
- * This file display the broken slugs that have no matching target post
+ * This file display the broken post that have no matching category
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -21,21 +21,21 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 $SQL = new SQL();
 
-$SQL->SELECT( 'post_ID, post_title, post_canonical_slug_ID' );
+$SQL->SELECT( 'post_ID, post_title, post_main_cat_ID, post_canonical_slug_ID' );
 $SQL->FROM( 'T_items__item' );
-$SQL->WHERE( 'post_canonical_slug_ID NOT IN (SELECT slug_ID FROM T_slug )' );
+$SQL->WHERE( 'post_main_cat_ID NOT IN (SELECT cat_ID FROM T_categories )' );
 
-$Results = new Results( $SQL->get() );
+$Results = new Results( $SQL->get(), 'broken_posts_' );
 
-$Results->title = T_( 'Broken posts' );
+$Results->title = T_( 'Broken items with no matching category' );
 $Results->global_icon( T_('Cancel!'), 'close', regenerate_url( 'action' ) );
 
 $Results->cols[] = array(
 	'th' => T_('Item ID'),
 	'th_class' => 'shrinkwrap',
+	'td_class' => 'small center',
 	'order' => 'post_ID',
 	'td' => '$post_ID$',
-	'td_class' => 'small',
 );
 
 $Results->cols[] = array(
@@ -43,18 +43,27 @@ $Results->cols[] = array(
 	'th_class' => 'nowrap',
 	'order' => 'post_title',
 	'td' => '$post_title$',
-	'td_class' => 'small center',
-);
-
-$Results->cols[] = array(
-	'th' => T_('Slug ID'),
-	'th_class' => 'shrinkwrap',
-	'order' => 'post_canonical_slug_ID',
-	'td' => '$post_canonical_slug_ID$',
 	'td_class' => 'small',
 );
 
-$Results->display();
+$Results->cols[] = array(
+	'th' => T_('Main Cat ID'),
+	'th_class' => 'shrinkwrap',
+	'order' => 'post_main_cat_ID',
+	'td' => '$post_main_cat_ID$',
+	'td_class' => 'small center',
+);
+$Results->cols[] = array(
+	'th' => T_('Canoncical Slug ID'),
+	'th_class' => 'shrinkwrap',
+	'order' => 'post_canonical_slug_ID',
+	'td' => '$post_canonical_slug_ID$',
+	'td_class' => 'small center',
+);
+
+$Results->display( array(
+		'page_url' => regenerate_url( 'blog,ctrl,action,results_'.$Results->param_prefix.'page', 'action='.param_action().'&amp;'.url_crumb( 'tools' ) )
+	) );
 
 if( ( $current_User->check_perm('options', 'edit', true) ) && ( $Results->get_num_rows() ) )
 { // display Delete link
@@ -64,14 +73,8 @@ if( ( $current_User->check_perm('options', 'edit', true) ) && ( $Results->get_nu
 
 /*
  * $Log$
- * Revision 1.3  2011/09/04 22:13:21  fplanque
- * copyright 2011
- *
- * Revision 1.2  2010/11/12 15:13:31  efy-asimo
- * MFB:
- * Tool 1: "Find all broken posts that have no matching category"
- * Tool 2: "Find all broken slugs that have no matching target post"
- * Tool 3: "Create sample comments for testing moderation"
+ * Revision 1.5  2013/11/06 08:04:54  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

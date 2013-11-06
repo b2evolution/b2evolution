@@ -319,29 +319,8 @@ function next_posts_link( $link_text = 'Next' )
 
 /*
  * $Log$
- * Revision 1.7  2010/10/19 02:00:54  fplanque
- * MFB
- *
- * Revision 1.6.8.1  2010/07/18 18:06:18  fplanque
- * no message
- *
- * Revision 1.6  2008/09/27 00:05:55  fplanque
- * minor/version bump
- *
- * Revision 1.5  2008/01/07 02:53:27  fplanque
- * cleaner tag urls
- *
- * Revision 1.4  2007/12/22 16:41:05  fplanque
- * Modular feedback template.
- *
- * Revision 1.3  2007/12/21 21:52:38  fplanque
- * improved WP tags
- *
- * Revision 1.2  2007/12/20 22:59:51  fplanque
- * more WP tags
- *
- * Revision 1.1  2007/12/19 18:41:34  fplanque
- * WordPress compatibility layer
+ * Revision 1.8  2013/11/06 08:05:36  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

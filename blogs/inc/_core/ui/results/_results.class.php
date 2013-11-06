@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -212,6 +212,7 @@ class Results extends Table
 	 */
 	var $page_param;
 	var $order_param;
+	var $limit_param;
 
 	/**
 	 * List of sortable fields
@@ -248,22 +249,20 @@ class Results extends Table
 	 * @param string default ordering of columns (special syntax) if not specified in the URL params
 	 *               example: -A-- will sort in ascending order on 2nd column
 	 *               example: ---D will sort in descending order on 4th column
-	 * @param integer number of lines displayed on one page (0 to disable paging; null to use $UserSettings/results_per_page)
+	 * @param integer Default number of lines displayed on one page (0 to disable paging; null to use $UserSettings/results_per_page)
 	 * @param string SQL to get the total count of results
 	 * @param boolean
 	 * @param string|integer SQL query used to count the total # of rows
 	 * 												- if integer, we'll use that as the count
 	 * 												- if NULL, we'll try to COUNT(*) by ourselves
 	 */
-	function Results( $sql, $param_prefix = '', $default_order = '', $limit = NULL, $count_sql = NULL, $init_page = true )
+	function Results( $sql, $param_prefix = '', $default_order = '', $default_limit = NULL, $count_sql = NULL, $init_page = true )
 	{
-		global $UserSettings;
-
 		parent::Table( NULL, $param_prefix );
 
 		$this->sql = $sql;
 
-		$this->limit = is_null($limit) ? $UserSettings->get('results_per_page') : $limit;
+		$this->init_limit_param( $default_limit );
 
 		// Count total rows:
 		// TODO: check if this can be done later instead
@@ -271,14 +270,112 @@ class Results extends Table
 
 		if( $init_page )
 		{	// attribution of a page number
-			$this->page_param = 'results_'.$param_prefix.'page';
+			$this->page_param = 'results_'.$this->param_prefix.'page';
 			$page = param( $this->page_param, 'integer', 1, true );
 			$this->page = min( $page, $this->total_pages );
 		}
 
+		$this->init_order_param( $default_order );
+	}
+
+
+	/**
+	 * Initialize the limit param
+	 *
+	 * @param integer Default number of lines displayed on one page (0 to disable paging; null to use $UserSettings/results_per_page)
+	 */
+	function init_limit_param( $default_limit )
+	{
+		global $UserSettings;
+
+		if( empty( $UserSettings ) )
+		{
+			$UserSettings = new UserSettings();
+		}
+
+		// attribution of a limit number
+		$this->limit_param = 'results_'.$this->param_prefix.'per_page';
+		$this->limit = param( $this->limit_param, 'integer', -1, true );
+		if( !empty( $this->param_prefix ) &&
+		    $this->limit > -1 &&
+		    $this->limit != (int)$UserSettings->get( $this->limit_param ) )
+		{	// Change a limit number in DB for current user and current list
+			if( $this->limit == $UserSettings->get( 'results_per_page' ) || $this->limit == 0 )
+			{	// Delete a limit number for current list if it equals a default value
+				$UserSettings->delete( $this->limit_param );
+				$this->limit = $UserSettings->get( 'results_per_page' );
+			}
+			else
+			{	// Set a new value of limit number current list
+				$UserSettings->set( $this->limit_param, $this->limit );
+			}
+			$UserSettings->dbupdate();
+		}
+
+		if( !empty( $this->param_prefix ) && $this->limit == -1 )
+		{	// Set a limit number from DB
+			if( $UserSettings->get( $this->limit_param ) > 0 )
+			{	// Set a value for current list if it was already defined
+				$this->limit = $UserSettings->get( $this->limit_param );
+			}
+		}
+
+		if( $this->limit == -1 || empty( $this->limit ) )
+		{	// Set a default value
+			$this->limit = is_null( $default_limit ) ? $UserSettings->get( 'results_per_page' ) : $default_limit;
+		}
+	}
+
+
+	/**
+	 * Initialize the order param
+	 *
+	 * @param string default ordering of columns (special syntax) if not specified in the URL params
+	 *               example: -A-- will sort in ascending order on 2nd column
+	 *               example: ---D will sort in descending order on 4th column
+	 */
+	function init_order_param( $default_order )
+	{
+		global $UserSettings;
+
+		if( empty( $UserSettings ) )
+		{
+			$UserSettings = new UserSettings();
+		}
+
 		// attribution of an order type
-		$this->order_param = 'results_'.$param_prefix.'order';
-		$this->order = param( $this->order_param, 'string', $default_order, true );
+		$this->order_param = 'results_'.$this->param_prefix.'order';
+		$this->order = param( $this->order_param, 'string', '', true );
+		// remove symbols '-' from the end
+		$this->order = preg_replace( '/(-*[AD]+)(-*)/i', '$1', $this->order );
+
+		if( !empty( $this->param_prefix ) &&
+		    !empty( $this->order ) &&
+		    $this->order != $UserSettings->get( $this->order_param ) )
+		{	// Change an order param in DB for current user and current list
+			if( $this->order == $default_order )
+			{	// Delete an order param for current list if it is a default value
+				$UserSettings->delete( $this->order_param );
+			}
+			else
+			{	// Set a new value of an order param for current list
+				$UserSettings->set( $this->order_param, $this->order );
+			}
+			$UserSettings->dbupdate();
+		}
+
+		if( !empty( $this->param_prefix ) && empty( $this->order ) )
+		{	// Set an order param from DB
+			if( $UserSettings->get( $this->order_param ) != '' )
+			{	// Set a value for current list if it was already defined
+				$this->order = $UserSettings->get( $this->order_param );
+			}
+		}
+
+		if( empty( $this->order ) )
+		{	// Set a default value
+			$this->order = $default_order;
+		}
 	}
 
 
@@ -341,6 +438,11 @@ class Results extends Table
 		global $DB, $Debuglog;
 		if( !is_null( $this->rows ) )
 		{ // Query has already executed:
+			return;
+		}
+
+		if( empty( $this->sql ) )
+		{ // the sql query is empty so we can't process it
 			return;
 		}
 
@@ -604,10 +706,14 @@ class Results extends Table
 		if( is_null( $this->page_ID_array ) )
 		{
 			$this->page_ID_array = array();
-
-			foreach( $this->rows as $row )
-			{ // For each row/line:
-				$this->page_ID_array[] = $row->{$this->ID_col};
+			// pre_dump( $this );
+			if( $this->result_num_rows )
+			{	// We have some rows to explore.
+				// Fp> note: I don't understand why we can sometimes have: $this->rows = array{ [0]=>  NULL }  (found in Manual skin intro post testing)
+				foreach( $this->rows as $row )
+				{ // For each row/line:
+					$this->page_ID_array[] = $row->{$this->ID_col};
+				}
 			}
 		}
 
@@ -761,19 +867,31 @@ class Results extends Table
 		echo $this->params['before'];
 
 			if( $this->total_pages == 0 )
-			{ // There are no results! Nothing to display!
+			{	// There are no results! Nothing to display!
+
+				// TITLE / FILTERS:
+				$this->display_head();
+
+				// START OF AJAX CONTENT:
+				echo $this->replace_vars( $this->params['content_start'] );
 
 				// START OF LIST/TABLE:
 				$this->display_list_start();
 
-				// DISPLAY FILTERS:
-				$this->display_filters();
-
 				// END OF LIST/TABLE:
 				$this->display_list_end();
+
+				// END OF AJAX CONTENT:
+				echo $this->params['content_end'];
 			}
 			else
 			{	// We have rows to display:
+
+				// TITLE / FILTERS:
+				$this->display_head();
+
+				// START OF AJAX CONTENT:
+				echo $this->replace_vars( $this->params['content_start'] );
 
 				// GLOBAL (NAV) HEADER:
 				$this->display_nav( 'header' );
@@ -781,8 +899,8 @@ class Results extends Table
 				// START OF LIST/TABLE:
 				$this->display_list_start();
 
-					// TITLE / FILTERS / COLUMN HEADERS:
-					$this->display_head();
+					// DISPLAY COLUMN HEADERS:
+					$this->display_col_headers();
 
 					// GROUP & DATA ROWS:
 					$this->display_body();
@@ -798,6 +916,9 @@ class Results extends Table
 
 				// GLOBAL (NAV) FOOTER:
 				$this->display_nav( 'footer' );
+
+				// END OF AJAX CONTENT:
+				echo $this->params['content_end'];
 			}
 
 		echo $this->params['after'];
@@ -1014,7 +1135,16 @@ class Results extends Table
 			{ // For each column:
 
 				// COL START:
-				$this->display_col_start();
+				if ( ! empty($col['extra']) )
+				{
+					// array of extra params $col['extra']
+					$this->display_col_start( $col['extra'] );
+				}
+				else
+				{
+					$this->display_col_start();
+				}
+
 
 				// Contents to output:
 				$output = $this->parse_col_content( $col['td'] );
@@ -1059,6 +1189,7 @@ class Results extends Table
 		if( $total_enable )
 		{ // We have to dispaly a totals line
 
+			echo $this->params['tfoot_start'];
 			// <tr>
 			echo $this->params['total_line_start'];
 
@@ -1114,6 +1245,7 @@ class Results extends Table
 			}
 			// </tr>
 			echo $this->params['total_line_end'];
+			echo $this->params['tfoot_end'];
 		}
 	}
 
@@ -1177,22 +1309,27 @@ class Results extends Table
 	 */
 	function display_nav( $template )
 	{
-		echo $this->params[$template.'_start'];
-
 		if( empty($this->limit) && isset($this->params[$template.'_text_no_limit']) )
 		{	// No LIMIT (there's always only one page)
-			echo $this->params[$template.'_text_no_limit'];
+			$navigation = $this->params[$template.'_text_no_limit'];
 		}
 		elseif( ( $this->total_pages <= 1 ) )
 		{	// Single page (we probably don't want to show navigation in this case)
-			echo $this->params[$template.'_text_single'];
+			$navigation = $this->replace_vars( $this->params[$template.'_text_single'] );
 		}
 		else
 		{	// Several pages
-			echo $this->replace_vars( $this->params[$template.'_text'] );
+			$navigation = $this->replace_vars( $this->params[$template.'_text'] );
 		}
 
-		echo $this->params[$template.'_end'];
+		if( !empty( $navigation ) )
+		{	// Display navigation
+			echo $this->params[$template.'_start'];
+
+			echo $navigation;
+
+			echo $this->params[$template.'_end'];
+		}
 	}
 
 
@@ -1282,6 +1419,27 @@ class Results extends Table
 	{
 		if( is_null( $this->order_field_list ) )
 		{ // Order list is not defined yet
+			if( ( !empty( $this->order ) ) && ( !empty( $this->cols ) ) && ( substr( $this->order, 0, 1 ) == '/' ) )
+			{ // order is set in format '/order_field_name/A' or '/order_field_name/D'
+				$order_parts = explode( '/', $this->order );
+				$this->order = '';
+				if( ( count( $order_parts ) == 3 ) && ( ( $order_parts[2] == 'A' ) || ( $order_parts[2] == 'D' ) ) )
+				{
+					foreach( $this->cols as $col )
+					{ // iterate thrugh columns and find matching column name
+						if( isset( $col['order'] ) && ( $col['order'] == $order_parts[1] ) )
+						{ // we have found the requested orderable column
+							$this->order .= $order_parts[2];
+							break;
+						}
+						else
+						{
+							$this->order .= '-';
+						}
+					}
+				}
+			}
+
 			if( empty( $this->order ) )
 			{ // We have no user provided order:
 				if( empty( $this->cols ) )
@@ -1301,11 +1459,6 @@ class Results extends Table
 					{
 						$this->order .= '-';
 					}
-				}
-
-				if( empty( $this->cols ) )
-				{	// We did not find any column to order on...
-					return '';
 				}
 			}
 
@@ -1385,7 +1538,7 @@ class Results extends Table
 	 *
 	 * This is one of the key functions to look at when you want to use the Results class.
 	 * - $var$
-	 * - ï¿½varï¿½
+	 * - £var£
 	 * - #var#
 	 * - {row}
 	 * - %func()%
@@ -1396,9 +1549,9 @@ class Results extends Table
 		// Make variable substitution for STRINGS:
 		$content = preg_replace( '#\$ (\w+) \$#ix', "'.format_to_output(\$row->$1).'", $content );
 		// Make variable substitution for URL STRINGS:
-		$content = preg_replace( '#\ï¿½ (\w+) \ï¿½#ix', "'.format_to_output(\$row->$1, 'urlencoded').'", $content );
+		$content = preg_replace( '#\£ (\w+) \£#ix', "'.format_to_output(\$row->$1, 'urlencoded').'", $content );
 		// Make variable substitution for escaped strings:
-		$content = preg_replace( '#ï¿½ (\w+) ï¿½#ix', "'.htmlentities(\$row->$1).'", $content );
+		$content = preg_replace( '#² (\w+) ²#ix', "'.htmlentities(\$row->$1).'", $content );
 		// Make variable substitution for RAWS:
 		$content = preg_replace( '!\# (\w+) \#!ix', "\$row->$1", $content );
 		// Make variable substitution for full ROW:
@@ -1413,7 +1566,7 @@ class Results extends Table
 		$content = preg_replace( '#~ (.+?) ~#ix', "'.$1.'", $content );
 
 		// @deprecated by ~func()~. Left here for backward compatibility only, to be removed in future versions.
-		$content = preg_replace( '#ï¿½ (.+?) ï¿½#ix', "'.$1.'", $content );
+		$content = preg_replace( '#¤ (.+?) ¤#ix', "'.$1.'", $content );
 
 		// Make callback function move_icons for orderable lists // dh> what does it do?
 		$content = str_replace( '{move}', "'.\$this->move_icons().'", $content );
@@ -1597,6 +1750,14 @@ class Results extends Table
 				//inits the link to next page range
 				return $this->display_next( $this->params['page_url'] );
 
+			case 'page_size' :
+				//inits the list to select page size
+				return $this->display_page_size( $this->params['page_url'] );
+
+			case 'prefix' :
+				//prefix
+				return $this->param_prefix;
+
 			default :
 				return parent::replace_callback( $matches );
 		}
@@ -1697,6 +1858,60 @@ class Results extends Table
 			return '<a href="'.regenerate_url( $this->page_param,$this->page_param.'='.$page_no, $page_url ).'">'
 								.$this->params['list_next_text'].'</a>';
 		}
+	}
+
+
+	/**
+	 * returns a list to select page size
+	 */
+	function display_page_size( $page_url = '' )
+	{
+		// Don't allow to change a page size:
+		if( $this->total_rows <= 10 || // if total number of rows is always less then min page size
+		    empty( $this->param_prefix ) ) // the lists without defined param_prefix
+		{
+			return;
+		}
+
+		$page_size_options = array(
+				'10' => sprintf( T_('%s lines'), '10' ),
+				'20' => sprintf( T_('%s lines'), '20' ),
+				'30' => sprintf( T_('%s lines'), '30' ),
+				'40' => sprintf( T_('%s lines'), '40' ),
+				'50' => sprintf( T_('%s lines'), '50' ),
+				'100' => sprintf( T_('%s lines'), '100' ),
+				'200' => sprintf( T_('%s lines'), '200' ),
+				'500' => sprintf( T_('%s lines'), '500' ),
+			);
+
+		$default_page_size_value = '0';
+		if( is_logged_in() )
+		{	// Get default page size for current user
+			global $UserSettings;
+
+			$default_page_size_value = $UserSettings->get( 'results_per_page' );
+			$default_page_size_option = array( '0' => sprintf( T_('Default (%s lines)'), $default_page_size_value ) );
+			$page_size_options = $default_page_size_option + $page_size_options;
+		}
+
+		$html = '<small>';
+		$html .= T_('Lines per page:');
+
+		$html .= ' <select name="'.$this->limit_param.'" onchange="location.href=\''.regenerate_url( $this->page_param.','.$this->limit_param, $this->limit_param, $page_url ).'=\'+this.value">';
+		foreach( $page_size_options as $value => $name )
+		{
+			$selected = '';
+			if( $this->limit == $value && $value != $default_page_size_value )
+			{
+				$selected = ' selected="selected"';
+			}
+			$html .= '<option value="'.$value.'"'.$selected.'>'.$name.'</option>';
+		}
+		$html .= '</select>';
+
+		$html .= '</small>';
+
+		return $html;
 	}
 
 
@@ -1853,226 +2068,8 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
- * Revision 1.44  2011/10/06 07:33:06  efy-vitalij
- * remove function parse_class_content()
+ * Revision 1.46  2013/11/06 08:03:48  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.43  2011/10/05 08:52:31  efy-vitalij
- * fix function parse_class_content()
- *
- * Revision 1.42  2011/10/05 08:07:16  efy-vitalij
- * add function parse_class_content
- *
- * Revision 1.41  2011/09/10 22:03:45  fplanque
- * doc
- *
- * Revision 1.40  2011/09/10 13:22:22  sam2kb
- * doc
- *
- * Revision 1.39  2011/09/10 02:09:09  fplanque
- * doc
- *
- * Revision 1.38  2011/09/09 19:46:22  sam2kb
- * doc
- *
- * Revision 1.37  2011/09/07 00:28:26  sam2kb
- * Replace non-ASCII character in regular expressions with ~
- *
- * Revision 1.36  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.35  2011/01/02 18:47:38  sam2kb
- * typo: diplayed => displayed
- *
- * Revision 1.34  2010/10/25 00:43:15  sam2kb
- * Point order links to "page_url", similar to prev/next links
- *
- * Revision 1.33  2010/04/27 20:22:06  blueyed
- * doc
- *
- * Revision 1.32  2010/02/08 17:52:01  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.31  2009/11/30 00:22:04  fplanque
- * clean up debug info
- * show more timers in view of block caching
- *
- * Revision 1.30  2009/10/11 03:00:10  blueyed
- * Add "position" and "order" properties to attachments.
- * Position can be "teaser" or "aftermore" for now.
- * Order defines the sorting of attachments.
- * Needs testing and refinement. Upgrade might work already, be careful!
- *
- * Revision 1.29  2009/09/29 00:00:16  blueyed
- * Finish r8131: sort NULL hit_serprank values _always_ to the end.
- *
- * Revision 1.28  2009/09/15 19:31:55  fplanque
- * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
- * PHP 4 compatible. Even better on PHP 5.
- * I may have broken a few things. Sorry. This is pretty hard to do in one swoop without any glitch.
- * Thanks for fixing or reporting if you spot issues.
- *
- * Revision 1.27  2009/09/14 18:37:07  fplanque
- * doc/cleanup/minor
- *
- * Revision 1.26  2009/09/13 21:28:25  blueyed
- * doc/todo
- *
- * Revision 1.25  2009/07/02 23:59:33  fplanque
- * Don't display ... when not needed.
- * Clicking on ... now brings you to the middle of the interval.
- *
- * Revision 1.24  2009/04/13 20:51:03  fplanque
- * long overdue cleanup of "no results" display: putting filter sback in right position
- *
- * Revision 1.23  2009/03/08 23:57:41  fplanque
- * 2009
- *
- * Revision 1.22  2009/02/26 22:16:54  blueyed
- * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
- *
- * Revision 1.21  2009/01/21 18:23:26  fplanque
- * Featured posts and Intro posts
- *
- * Revision 1.20  2008/12/27 21:09:28  fplanque
- * minor
- *
- * Revision 1.19  2008/12/10 00:04:31  blueyed
- * Fix whitespace
- *
- * Revision 1.18  2008/12/05 23:57:25  tblue246
- * Results class: Added support for callback sorting when a LIMIT is set.
- *
- * Revision 1.17  2008/10/05 06:28:32  fplanque
- * no message
- *
- * Revision 1.16  2008/10/04 19:12:14  tblue246
- * display_body(): don't strip <input> tag from column content (again). if there really is a problem with this fix, please rollback and add a comment describing the the problem.
- *
- * Revision 1.15  2008/09/28 12:11:12  tblue246
- * display_body(): comment on strip_tags() issue
- *
- * Revision 1.14  2008/09/28 05:05:07  fplanque
- * minor
- *
- * Revision 1.13  2008/09/26 19:25:43  tblue246
- * display_body(): do not strip <input> from row contents
- *
- * Revision 1.12  2008/05/26 19:24:55  fplanque
- * allow pre-counting
- *
- * Revision 1.11  2008/05/11 22:20:32  fplanque
- * fix
- *
- * Revision 1.10  2008/05/10 23:53:46  fplanque
- * fix
- *
- * Revision 1.9  2008/05/10 23:00:18  fplanque
- * add nbsps for IE to draw cell borders
- *
- * Revision 1.8  2008/04/24 01:56:08  fplanque
- * Goal hit summary
- *
- * Revision 1.7  2008/01/21 09:35:25  fplanque
- * (c) 2008
- *
- * Revision 1.6  2007/11/25 14:28:17  fplanque
- * additional SEO settings
- *
- * Revision 1.5  2007/11/24 21:41:12  fplanque
- * additional SEO settings
- *
- * Revision 1.4  2007/11/03 21:04:26  fplanque
- * skin cleanup
- *
- * Revision 1.3  2007/09/22 22:11:18  fplanque
- * minor
- *
- * Revision 1.2  2007/07/24 23:29:25  blueyed
- * todo
- *
- * Revision 1.1  2007/06/25 10:59:03  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.56  2007/06/24 22:19:18  fplanque
- * minor
- *
- * Revision 1.55  2007/06/20 23:00:14  blueyed
- * doc fixes
- *
- * Revision 1.54  2007/06/19 23:15:08  blueyed
- * doc fixes
- *
- * Revision 1.53  2007/05/26 22:21:32  blueyed
- * Made $limit for Results configurable per user
- *
- * Revision 1.52  2007/04/26 00:11:08  fplanque
- * (c) 2007
- *
- * Revision 1.51  2007/03/19 21:56:45  fplanque
- * minor
- *
- * Revision 1.50  2007/03/19 21:15:57  blueyed
- * todo for api change of Results $limit param
- *
- * Revision 1.49  2007/02/16 17:29:14  waltercruz
- * A more tricky regexp is needed to handle tre FROM part with the EXTRACT syntax
- *
- * Revision 1.48  2007/01/23 22:08:49  fplanque
- * cleanup
- *
- * Revision 1.47  2007/01/14 22:06:48  fplanque
- * support for customized 'no results' messages
- *
- * Revision 1.46  2007/01/14 17:32:41  blueyed
- * Always replace/remove "$colspan_attrib$"
- *
- * Revision 1.45  2007/01/14 03:00:02  blueyed
- * typo and use $this->params['grp_line_end'] instead of '</tr>'
- *
- * Revision 1.44  2007/01/13 22:28:12  fplanque
- * doc
- *
- * Revision 1.43  2007/01/13 19:19:24  blueyed
- * Grouping by object properties
- *
- * Revision 1.42  2007/01/13 16:55:00  blueyed
- * Removed $DB member of Results class and use global $DB instead
- *
- * Revision 1.41  2007/01/13 16:41:51  blueyed
- * doc
- *
- * Revision 1.40  2007/01/11 21:06:05  fplanque
- * bugfix
- *
- * Revision 1.39  2007/01/11 02:25:06  fplanque
- * refactoring of Table displays
- * body / line / col / fadeout
- *
- * Revision 1.38  2007/01/08 23:44:19  fplanque
- * inserted Table widget
- * WARNING: this has nothing to do with ComponentWidgets...
- * (except that I'm gonna need the Table Widget when handling the ComponentWidgets :>
- *
- * Revision 1.37  2007/01/07 05:27:41  fplanque
- * extended fadeout, but still not fixed everywhere
- *
- * Revision 1.36  2006/12/14 19:15:53  fplanque
- * minor fix
- *
- * Revision 1.35  2006/12/07 23:13:13  fplanque
- * @var needs to have only one argument: the variable type
- * Otherwise, I can't code!
- *
- * Revision 1.34  2006/11/24 18:27:27  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.33  2006/11/14 00:47:32  fplanque
- * doc
- *
- * Revision 1.32  2006/11/01 12:20:24  blueyed
- * doc/todo
- *
- * Revision 1.31  2006/10/06 20:52:23  blueyed
- * Small fix, doc todo
  */
 ?>

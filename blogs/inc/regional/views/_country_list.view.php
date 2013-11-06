@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -33,6 +33,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 load_class( 'regional/model/_currency.class.php', 'Currency' );
+load_funcs( 'regional/model/_regional.funcs.php' );
 
 global $dispatcher;
 
@@ -42,8 +43,9 @@ $s = param( 's', 'string', '', true );
 // Create query
 $SQL = new SQL();
 $SQL->SELECT( 'ctry_ID, ctry_code, ctry_name, curr_shortcut, curr_code, ctry_enabled, ctry_preferred' );
-$SQL->FROM( 'T_country	LEFT JOIN T_currency ON ctry_curr_ID=curr_ID' );
-$SQL->ORDER_BY('*, ctry_code ASC');
+$SQL->FROM( 'T_regional__country' );
+$SQL->FROM_add( 'LEFT JOIN T_regional__currency ON ctry_curr_ID=curr_ID' );
+$SQL->ORDER_BY( '*, ctry_code ASC' );
 
 if( !empty($s) )
 {	// We want to filter on search keyword:
@@ -54,7 +56,7 @@ if( !empty($s) )
 // Create result set:
 $Results = new Results( $SQL->get(), 'ctry_', '-D' );
 
-$Results->title = T_('Countries list').get_manual_link('countries_list');
+$Results->title = T_('Countries').get_manual_link('countries_list');
 
 /*
  * STATUS TD:
@@ -145,60 +147,15 @@ $Results->cols[] = array(
 						'td' => '<strong>$ctry_code$</strong>',
 					);
 
-/**
- * Template function: Display country flag
- *
- * @todo factor with locale_flag()
- *
- * @param string country code to use
- * @param string country name to use
- * @param string collection name (subdir of img/flags)
- * @param string name of class for IMG tag
- * @param string deprecated HTML align attribute
- * @param boolean to echo or not
- * @param mixed use absolute url (===true) or path to flags directory
- */
-function country_flag( $country_code, $country_name, $collection = 'w16px', $class = 'flag', $align = '', $disp = true, $absoluteurl = true )
-{
-	global $rsc_path, $rsc_url;
-
-	if( ! is_file( $rsc_path.'flags/'.$collection.'/'.$country_code.'.gif') )
-	{ // File does not exist
-		$country_code = 'default';
-	}
-
-	if( $absoluteurl !== true )
-	{
-		$iurl = $absoluteurl;
-	}
-	else
-	{
-		$iurl = $rsc_url.'flags';
-	}
-
-	$r = '<img src="'.$iurl.'/'.$collection.'/'.$country_code.'.gif" alt="' .
-				$country_name .
-				'"';
-	if( !empty( $class ) ) $r .= ' class="'.$class.'"';
-	if( !empty( $align ) ) $r .= ' align="'.$align.'"';
-	$r .= ' /> ';
-
-	if( $disp )
-		echo $r;   // echo it
-	else
-		return $r; // return it
-
-}
-
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
 							'th' => T_('Name'),
 							'order' => 'ctry_name',
-										'td' => '<a href="?ctrl=countries&amp;ctry_ID=$ctry_ID$&amp;action=edit" title="'.T_('Edit this country...')
-											.'">%country_flag( #ctry_code#, #ctry_name# )%
-								<strong>$ctry_name$</strong></a>',
+							'td' => '<a href="?ctrl=countries&amp;ctry_ID=$ctry_ID$&amp;action=edit" title="'.T_('Edit this country...').'">
+									%country_flag( #ctry_code#, #ctry_name# )% <strong>$ctry_name$</strong>
+								</a>',
 						);
 }
 else
@@ -206,10 +163,36 @@ else
 	$Results->cols[] = array(
 							'th' => T_('Name'),
 							'order' => 'ctry_name',
-							'td' => '%country_flag( #ctry_code#, #ctry_name# )%  $ctry_name$',
+							'td' => '%country_flag( #ctry_code#, #ctry_name# )% $ctry_name$',
 						);
 
 }
+
+function country_regions_count( $country_ID )
+{
+	global $DB, $admin_url;
+	
+	$regions_count = $DB->get_var( '
+		SELECT COUNT(rgn_ID)
+		  FROM T_regional__region
+		 WHERE rgn_ctry_ID = "'.$country_ID.'"' );
+	
+	if( $regions_count > 0 )
+	{
+		$regions_count = '<a href="'.$admin_url.'?ctrl=regions&amp;c='.$country_ID.'">'.$regions_count.'</a>';
+	}
+
+	return $regions_count;
+}
+
+$Results->cols[] = array(
+						'th' => T_('Regions'),
+						'td_class' => 'center',
+						'td' => '%country_regions_count( #ctry_ID# )%',
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap'
+					);
+
 $Results->cols[] = array(
 						'th' => T_('Default Currency'),
 						'td_class' => 'center',
@@ -261,71 +244,8 @@ $Results->display();
 
 /*
  * $Log$
- * Revision 1.26  2011/10/10 19:48:32  fplanque
- * i18n & login display cleaup
- *
- * Revision 1.25  2011/09/27 13:09:05  efy-vitalij
- * fixed default Pref column sorting
- *
- * Revision 1.24  2011/09/27 07:18:14  efy-vitalij
- * add default order by ctry_code
- *
- * Revision 1.23  2011/09/26 09:02:23  efy-vitalij
- * changed default sort column and name to Pref
- *
- * Revision 1.22  2011/09/23 14:23:43  fplanque
- * no message
- *
- * Revision 1.21  2011/09/22 13:03:11  efy-vitalij
- * add country pref column, clickable En column in countries and currencies results  tables
- *
- * Revision 1.20  2010/03/01 07:52:51  efy-asimo
- * Set manual links to lowercase
- *
- * Revision 1.19  2010/02/14 14:18:39  efy-asimo
- * insert manual links
- *
- * Revision 1.18  2010/01/30 18:55:33  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.17  2010/01/16 14:16:32  efy-asimo
- * Currencies/Countries cosmetics and regenerate_url after Enable/Disable
- *
- * Revision 1.16  2010/01/03 12:03:17  fplanque
- * More crumbs...
- *
- * Revision 1.15  2009/09/29 03:14:22  fplanque
- * doc
- *
- * Revision 1.14  2009/09/28 20:55:00  efy-khurram
- * Implemented support for enabling disabling countries.
- *
- * Revision 1.13  2009/09/16 00:26:03  fplanque
- * no message
- *
- * Revision 1.12  2009/09/15 16:25:24  efy-sasha
- * *** empty log message ***
- *
- * Revision 1.11  2009/09/14 22:18:27  fplanque
- * tssss.... cleaned up ith proper merge.
- *
- * Revision 1.10  2009/09/14 18:32:51  efy-sasha
- * *** empty log message ***
- *
- * Revision 1.9  2009/09/12 18:44:03  efy-sergey
- * Added a search field to the countries tables
- *
- * Revision 1.8  2009/09/12 18:18:02  efy-sergey
- * Changed query creation to using an SQL object
- *
- * Revision 1.7  2009/09/12 00:21:02  fplanque
- * search cleanup
- *
- * Revision 1.6  2009/09/11 11:19:03  efy-sergey
- * Displaying currency code
- *
- * Revision 1.5  2009/09/10 19:14:08  tblue246
- * Re-added CVS log block; coding style.
+ * Revision 1.28  2013/11/06 08:04:36  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

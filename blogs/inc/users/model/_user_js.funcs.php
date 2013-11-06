@@ -1,0 +1,111 @@
+<?php
+
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+?>
+
+<script type="text/javascript">
+/**
+ * Init autocomplete event for Specific criteria input
+ */
+function userfield_criteria_autocomplete( obj_this )
+{
+	if( obj_this.find( 'option:selected[rel=suggest]' ).length > 0 )
+	{	// Selected field type can be suggested with values
+		var field_type_id = obj_this.val();
+		obj_this.next().find( 'input' ).autocomplete({
+			source: function(request, response) {
+				jQuery.getJSON( htsrv_url + 'anon_async.php?action=get_user_field_autocomplete', {
+					term: request.term, attr_id: field_type_id
+				}, response);
+			},
+		});
+	}
+	else
+	{	// Destroy autocomplete event from previous binding
+		obj_this.next().find( 'input' ).autocomplete( 'destroy' );
+	}
+}
+
+jQuery( document ).on( 'change', 'select[id^=criteria_type]', function()
+{
+	userfield_criteria_autocomplete( jQuery( this ) );
+} );
+
+if( jQuery( 'select[id^=criteria_type]:first' ).val() == '' )
+{	// Pre-select a random option
+	var count_options = parseInt( jQuery( 'select[id^=criteria_type]:first option' ).length );
+	var index = Math.ceil( Math.random() * count_options );
+	if( index == count_options )
+	{	// Exclude empty value
+		index = 1;
+	}
+	jQuery( 'select[id^=criteria_type]:first option:eq(' + index + ')' ).attr( 'selected', 'selected' );
+}
+
+for(var c = 0; c < jQuery( 'select[id^=criteria_type]' ).length; c++ )
+{	// Bind autocomplete event for each Specific criteria
+	userfield_criteria_autocomplete( jQuery( 'select[id^=criteria_type]:eq(' + c + ')' ) );
+}
+
+jQuery( document ).on( 'click', 'span[rel=add_criteria]', function()
+{	// Add new criteria to search
+	obj_this = jQuery( this ).parent().parent();
+	jQuery.ajax({
+	type: 'POST',
+	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+	data: 'action=get_userfields_criteria',
+	success: function( result )
+		{	// Display fieldset of new Specific criteria
+			obj_this.after( ajax_debug_clear( result ) );
+
+			// Preselect a random option
+			obj_new = obj_this.next().next();
+			var count_options = parseInt( obj_new.find( 'option' ).length );
+			var index = Math.ceil( Math.random() * count_options );
+			if( index == count_options )
+			{	// Exclude empty value
+				index = 1;
+			}
+			obj_new.find( 'option:eq(' + index + ')' ).attr( 'selected', 'selected' );
+
+			// Bind auto complete event to the new select
+			userfield_criteria_autocomplete( obj_new.find( 'select' ) );
+		}
+	});
+} );
+
+<?php
+global $current_User;
+if( is_admin_page() && is_logged_in() && $current_User->check_perm( 'users', 'edit', false ) )
+{	// If user can edit the users - Init js to edit user level by AJAX
+?>
+jQuery(document).ready( function()
+{
+	jQuery('.user_level_edit').editable( htsrv_url+'async.php?action=user_level_edit&<?php echo url_crumb( 'userlevel' )?>',
+	{
+		data : function(value, settings){
+				value = ajax_debug_clear( value );
+				var re = /rel="(.*)"/;
+				var result = value.match(re);
+				return {'0':'0','1':'1','2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9','10':'10', 'selected' : result[1]}
+			},
+		type     : 'select',
+		name     : 'new_user_level',
+		tooltip  : '<?php echo TS_('Click to edit'); ?>',
+		event    : 'click',
+		callback : function (settings, original){
+				evoFadeSuccess(this);
+			},
+		onsubmit: function(settings, original) {},
+		submitdata : function(value, settings) {
+				var user_ID =  jQuery(':first',jQuery(this).parent()).text();
+				return {user_ID: user_ID}
+			},
+		onerror : function(settings, original, xhr) {
+				evoFadeFailure(original);
+			}
+	} );
+});
+<?php } ?>
+</script>

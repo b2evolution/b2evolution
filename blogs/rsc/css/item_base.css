@@ -6,8 +6,6 @@
  * but this is ALSO included in the backoffice when viewing/editing posts.
  */
 
-@import url("basic_styles.css");	/* Import the REAL basic styles */
-
 blockquote {
 	border: 2px dotted #ccc;
 	background-color: #eee;
@@ -20,14 +18,32 @@ pre {
 }
 
 div.codeblock {
-	background-color: #eee;
-	border: 1px dotted #aaa;
-	margin: 1ex;
-	padding: 1ex;
+	background-color: #FBFAF9;
+	border: 1px solid #CCCCCC;
+	border-radius: 2px 2px 2px 2px;
+	box-shadow: 0 0 5px #CCCCCC inset;
+	margin: 1ex 0;
+	padding: 6px;
 	overflow: auto;
+}
+div.codeblock_with_title {
+	margin-top: 0;
 }
 div.codeblock pre {
 	margin: 0;
+}
+p.codeblock_title,
+.bText p.codeblock_title {
+	font-family: Verdana, sans-serif;
+	letter-spacing: 110%;
+	line-height: 95%;
+	font-weight:bold;
+	font-size: 72%;
+	color: #ABAAA9;
+	margin: 1ex 3px 0;
+}
+div.codeblock > p {
+	display: none;
 }
 
 div.videoblock {
@@ -39,7 +55,6 @@ div.videoblock {
 div.podplayer {
 	margin: 1em 0;
 }
-
 
 .bMore {
 	text-align: left;

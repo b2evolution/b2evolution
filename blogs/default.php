@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage noskin
@@ -38,6 +38,11 @@ if( ! $PageCache->check() )
 	// --------------------- PAGE LEVEL CACHING SUPPORT ---------------------
 
 
+// Add CSS:
+require_css( 'basic_styles.css', 'rsc_url' ); // the REAL basic styles
+require_css( 'basic.css', 'rsc_url' ); // Basic styles
+require_css( 'evo_distrib_2.css', 'rsc_url' );
+
 headers_content_mightcache( 'text/html' );		// In most situations, you do NOT want to cache dynamic content!
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -48,7 +53,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 	<!-- InstanceEndEditable -->
 	<meta name="viewport" content="width = 750" />
 	<meta name="robots" content="noindex, follow" />
-	<link href="rsc/css/evo_distrib_2.css" rel="stylesheet" type="text/css" />
+	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 	<!-- InstanceBeginEditable name="head" -->
 	<base href="<?php echo $baseurl ?>" />
 	<!-- InstanceEndEditable -->
@@ -63,7 +68,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 	// ------------------------------- END OF TOOLBAR --------------------------------
 
 	echo "\n";
-	if( is_logged_in() )
+	if( show_toolbar() )
 	{
 		echo '<div id="skin_wrapper" class="skin_wrapper_loggedin">';
 	}

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -21,14 +21,14 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+// Memorize this as the last "tab" used in the Blog Settings:
+$UserSettings->set( 'pref_coll_settings_tab', 'manage_skins' );
+$UserSettings->dbupdate();
+
 load_funcs( 'skins/_skin.funcs.php' );
 
 // Check permission to display:
 $current_User->check_perm( 'options', 'view', true );
-
-// Memorize this as the last "tab" used in the Blog Settings:
-$UserSettings->set( 'pref_glob_settings_tab', $ctrl );
-$UserSettings->dbupdate();
 
 
 param( 'action', 'string', 'list' );
@@ -74,7 +74,7 @@ switch( $action )
 		$Messages->add( T_('Skin has been installed.'), 'success' );
 
 		// We want to highlight the edited object on next list display:
- 		$Session->set( 'fadeout_array', array( 'skin_ID' => array($edited_Skin->ID) ) );
+		$Session->set( 'fadeout_array', array( 'skin_ID' => array($edited_Skin->ID) ) );
 
 		// PREVENT RELOAD & Switch to list mode:
 		header_redirect( $redirect_to );
@@ -101,7 +101,7 @@ switch( $action )
 			$Messages->add( T_('Skin properties updated.'), 'success' );
 
 			// We want to highlight the edited object on next list display:
- 			$Session->set( 'fadeout_array', array( 'skin_ID' => array($edited_Skin->ID) ) );
+			$Session->set( 'fadeout_array', array( 'skin_ID' => array($edited_Skin->ID) ) );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $redirect_to, 303 ); // Will EXIT
@@ -199,12 +199,20 @@ switch( $action )
 }
 
 
-$AdminUI->set_path( 'options', 'skins' );
+$AdminUI->set_path( 'blogs', 'skin', 'manage_skins' );
+
+
+/**
+ * Display page header, menus & messages:
+ */
+$AdminUI->set_coll_list_params( 'blog_properties', 'edit',
+											array( 'ctrl' => 'skins' ),
+											T_('All'), '?ctrl=collections&amp;blog=0' );
 
 
 $AdminUI->breadcrumbpath_init();
-$AdminUI->breadcrumbpath_add( T_('Global settings'), '?ctrl=settings',
-		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
+$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=coll_settings&amp;blog=$blog$' );
+$AdminUI->breadcrumbpath_add( T_('Skin'), '?ctrl=coll_settings&amp;tab=skin&amp;blog=$blog$' );
 $AdminUI->breadcrumbpath_add( T_('Skin configuration'), '?ctrl=skins' );
 
 
@@ -252,106 +260,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.22  2011/09/13 15:31:34  fplanque
- * Enhanced back-office navigation.
- *
- * Revision 1.21  2011/09/12 16:43:35  lxndral
- * skins colorbox fix
- *
- * Revision 1.20  2011/09/10 22:48:41  fplanque
- * doc
- *
- * Revision 1.19  2011/09/08 13:42:36  lxndral
- * Add _skins.class.php to all skins  (Easy task)
- *
- * Revision 1.18  2011/09/04 22:13:20  fplanque
- * copyright 2011
- *
- * Revision 1.17  2011/09/04 20:17:54  fplanque
- * cleanup
- *
- * Revision 1.16  2011/06/06 21:22:31  sam2kb
- * New action: load default skin settings
- *
- * Revision 1.15  2010/02/26 22:15:48  fplanque
- * whitespace/doc/minor
- *
- * Revision 1.14  2010/02/26 15:52:20  efy-asimo
- * combine skin and skin settings tab into one single tab
- *
- * Revision 1.13  2010/02/08 17:53:55  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.12  2010/01/09 17:46:04  fplanque
- * minor
- *
- * Revision 1.11  2010/01/09 13:30:12  efy-yury
- * added redirect 303 for prevent dublicate sql executions
- *
- * Revision 1.10  2010/01/03 17:45:21  fplanque
- * crumbs & stuff
- *
- * Revision 1.9  2010/01/03 12:03:18  fplanque
- * More crumbs...
- *
- * Revision 1.8  2009/12/06 22:55:22  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.7  2009/09/26 12:00:43  tblue246
- * Minor/coding style
- *
- * Revision 1.6  2009/09/25 07:33:14  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.5  2009/05/23 20:20:18  fplanque
- * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
- *
- * Revision 1.4  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.3  2008/01/21 09:35:34  fplanque
- * (c) 2008
- *
- * Revision 1.2  2007/09/29 03:42:13  fplanque
- * skin install UI improvements
- *
- * Revision 1.1  2007/06/25 11:01:31  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.10  2007/06/24 18:28:56  fplanque
- * refactored skin install
- *
- * Revision 1.9  2007/04/26 00:11:15  fplanque
- * (c) 2007
- *
- * Revision 1.8  2007/01/23 21:45:26  fplanque
- * "enforce" foreign keys
- *
- * Revision 1.7  2007/01/09 00:55:16  blueyed
- * fixed typo(s)
- *
- * Revision 1.6  2007/01/08 02:11:56  fplanque
- * Blogs now make use of installed skins
- * next step: make use of widgets inside of skins
- *
- * Revision 1.5  2007/01/07 23:38:21  fplanque
- * discovery of skin containers
- *
- * Revision 1.4  2007/01/07 19:40:18  fplanque
- * discover skin containers
- *
- * Revision 1.3  2007/01/07 05:32:12  fplanque
- * added some more DB skin handling (install+uninstall+edit properties ok)
- * still useless though :P
- * next step: discover containers in installed skins
- *
- * Revision 1.2  2006/12/29 01:10:06  fplanque
- * basic skin registering
- *
- * Revision 1.1  2006/12/05 05:41:42  fplanque
- * created playground for skin management
+ * Revision 1.24  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

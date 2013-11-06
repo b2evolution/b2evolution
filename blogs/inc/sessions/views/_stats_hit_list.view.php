@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -94,7 +94,7 @@ $Results->title = T_('Recent hits');
  *
  * @param Form
  */
-function filter_hits( & $Form )
+function filter_hits_list( & $Form )
 {
 	$Form->checkbox_basic_input( 'exclude', get_param('exclude'), T_('Exclude').' &mdash; ' );
 	$Form->text_input( 'sess_ID', get_param('sess_ID'), 15, T_('Session ID'), '', array( 'maxlength'=>20 ) );
@@ -121,7 +121,7 @@ function filter_hits( & $Form )
 	$Form->select_input_array( 'agent_type', get_param('agent_type'), $field_options, 'Agent type', '', array('force_keys_as_values' => true) );
 }
 $Results->filter_area = array(
-	'callback' => 'filter_hits',
+	'callback' => 'filter_hits_list',
 	'url_ignore' => 'results_hits_page,exclude,sess_ID,remote_IP',
 	'presets' => array(
 		'all' => array( T_('All'), '?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0' ),
@@ -227,60 +227,8 @@ $Results->display();
 
 /*
  * $Log$
- * Revision 1.18  2011/09/30 06:25:24  efy-vitalij
- * Remove Hits tab from User Sessions
- *
- * Revision 1.17  2011/09/29 09:27:32  efy-vitalij
- * add referer type and agent type filters and add direct hits filter link
- *
- * Revision 1.16  2011/09/23 22:37:09  fplanque
- * minor / doc
- *
- * Revision 1.15  2011/09/23 07:41:57  efy-asimo
- * Unified usernames everywhere in the app - first part
- *
- * Revision 1.14  2011/09/04 22:13:18  fplanque
- * copyright 2011
- *
- * Revision 1.13  2010/02/08 17:53:55  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.12  2010/01/30 18:55:34  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.11  2009/12/08 22:38:13  fplanque
- * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
- *
- * Revision 1.10  2009/09/25 20:26:26  fplanque
- * fixes/doc
- *
- * Revision 1.9  2009/09/25 13:09:36  efy-vyacheslav
- * Using the SQL class to prepare queries
- *
- * Revision 1.8  2009/09/20 00:27:08  fplanque
- * cleanup/doc/simplified
- *
- * Revision 1.7  2009/09/13 21:26:50  blueyed
- * SQL_NO_CACHE for SELECT queries using T_hitlog
- *
- * Revision 1.6  2009/07/09 00:11:18  fplanque
- * minor
- *
- * Revision 1.5  2009/07/08 01:45:48  sam2kb
- * Added param $length to stats_search_keywords()
- * Changed keywords length for better accessibility on low resolution screens
- *
- * Revision 1.4  2009/05/10 00:28:51  fplanque
- * serp rank logging
- *
- * Revision 1.3  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.2  2008/05/10 22:59:10  fplanque
- * keyphrase logging
- *
- * Revision 1.1  2008/03/22 19:58:18  fplanque
- * missing views
+ * Revision 1.20  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

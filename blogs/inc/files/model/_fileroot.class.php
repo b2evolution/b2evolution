@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -165,7 +165,7 @@ class FileRoot
 				{ // Skins root is disabled:
 					$Debuglog->add( 'Attempt to access skins dir, but this feature is globally disabled', 'files' );
 				}
-				elseif( ! $current_User->check_perm( 'templates' ) )
+				elseif( empty( $current_User ) || ( ! $current_User->check_perm( 'templates' ) ) )
 				{	// No perm to access templates:
 					$Debuglog->add( 'Attempt to access skins dir, but no permission', 'files' );
 				}
@@ -186,7 +186,7 @@ class FileRoot
 				return;
 		}
 
-		debug_die( "Root_type=$root_type not supported" );
+		debug_die( "Invalid root type" );
 	}
 
 
@@ -210,6 +210,11 @@ class FileRoot
 	 */
 	function gen_ID( $root_type, $root_in_type_ID )
 	{
+		if( !is_number( $root_in_type_ID ) )
+		{
+			debug_die( "Invalid root type ID" );
+		}
+
 		switch( $root_type )
 		{
 			case 'user':
@@ -219,7 +224,7 @@ class FileRoot
 				return $root_type.'_'.$root_in_type_ID;
 		}
 
-		debug_die( "Root_type=$root_type not supported" );
+		debug_die( "Invalid root type" );
 	}
 
 }
@@ -227,71 +232,8 @@ class FileRoot
 
 /*
  * $Log$
- * Revision 1.15  2011/09/17 02:31:59  fplanque
- * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
+ * Revision 1.17  2013/11/06 08:04:08  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.14  2011/09/04 22:13:15  fplanque
- * copyright 2011
- *
- * Revision 1.13  2010/11/07 04:42:33  sam2kb
- * Do not halt on error when the object a file belongs to is deleted
- *
- * Revision 1.12  2010/02/08 17:52:18  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.11  2009/09/26 12:00:42  tblue246
- * Minor/coding style
- *
- * Revision 1.10  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.9  2009/09/05 19:16:05  tblue246
- * Correct (?) if condition.
- *
- * Revision 1.8  2009/08/31 16:56:10  fplanque
- * if-conditions did not seem right
- *
- * Revision 1.7  2009/08/22 15:27:38  tblue246
- * - FileRoot::FileRoot():
- * 	- Only try to create shared dir if enabled.
- * - Hit::extract_serprank_from_referer():
- * 	- Do not explode() $ref string, but use a (dynamically generated) RegExp instead. Tested and should work.
- *
- * Revision 1.6  2009/08/17 05:50:33  sam2kb
- * Create shared/global/  directories if not exist yet
- * See http://forums.b2evolution.net/viewtopic.php?t=19411
- *
- * Revision 1.5  2009/03/08 23:57:43  fplanque
- * 2009
- *
- * Revision 1.4  2008/09/23 06:18:37  fplanque
- * File manager now supports a shared directory (/media/shared/global/)
- *
- * Revision 1.3  2008/01/21 09:35:29  fplanque
- * (c) 2008
- *
- * Revision 1.2  2007/11/01 04:31:25  fplanque
- * Better root browsing (roots are groupes by type + only one root is shown at a time)
- *
- * Revision 1.1  2007/06/25 10:59:56  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.14  2007/04/26 00:11:10  fplanque
- * (c) 2007
- *
- * Revision 1.13  2007/02/11 15:16:49  fplanque
- * doc
- *
- * Revision 1.11  2006/12/10 03:04:16  blueyed
- * TRANS note for "u" and "b"
- *
- * Revision 1.10  2006/12/08 01:53:18  fplanque
- * Added missing skin access switch
- *
- * Revision 1.9  2006/12/07 15:23:42  fplanque
- * filemanager enhanced, refactored, extended to skins directory
- *
- * Revision 1.8  2006/11/24 18:27:24  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

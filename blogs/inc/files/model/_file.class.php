@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -74,6 +74,12 @@ class File extends DataObject
 	 * @var string
 	 */
 	var $desc;
+
+	/**
+	 * Meta data: Hash value of file path
+	 * @var string
+	 */
+	var $hash;
 
 	/**
 	 * FileRoot of this file
@@ -235,8 +241,13 @@ class File extends DataObject
 		parent::DataObject( 'T_files', 'file_', 'file_ID', '', '', '', '' );
 
 		$this->delete_restrictions = array(
-				array( 'table'=>'T_links', 'fk'=>'link_file_ID', 'msg'=>T_('%d linked items') ),
+				array( 'table'=>'T_links', 'fk'=>'link_file_ID', 'field' => 'link_itm_ID', 'msg'=>T_('%d linked items') ),
+				array( 'table'=>'T_links', 'fk'=>'link_file_ID', 'field' => 'link_cmt_ID', 'msg'=>T_('%d linked comments') ),
 				array( 'table'=>'T_users', 'fk'=>'user_avatar_file_ID', 'msg'=>T_('%d linked users (profile pictures)') ),
+			);
+
+		$this->delete_cascades = array(
+				array( 'table'=>'T_files__vote', 'fk'=>'fvot_file_ID', 'msg'=>T_('%d votes') ),
 			);
 
 		// Memorize filepath:
@@ -297,6 +308,10 @@ class File extends DataObject
 				$this->title = $row->file_title;
 				$this->alt   = $row->file_alt;
 				$this->desc  = $row->file_desc;
+				if( isset( $row->file_hash ) )
+				{
+					$this->hash  = $row->file_hash;
+				}
 
 				// Store this in the FileCache:
 				$FileCache = & get_FileCache();
@@ -1010,6 +1025,10 @@ class File extends DataObject
 	 * @param string
 	 * @param string
 	 * @param string rel attribute of link, usefull for jQuery libraries selecting on rel='...', e-g: lighbox
+	 * @param string image class
+	 * @param string image align
+	 * @param string image rel
+	 * @param string image caption/description
 	 */
 	function get_tag( $before_image = '<div class="image_block">',
 	                  $before_image_legend = '<div class="image_legend">', // can be NULL
@@ -1019,7 +1038,10 @@ class File extends DataObject
 	                  $image_link_to = 'original',
 	                  $image_link_title = '',	// can be text or #title# or #desc#
 	                  $image_link_rel = '',
-	                  $image_class = '' )
+	                  $image_class = '',
+	                  $image_align = '',
+	                  $image_alt = '',
+	                  $image_desc = '#' )
 	{
 		if( $this->is_dir() )
 		{	// We can't reference a directory
@@ -1037,7 +1059,19 @@ class File extends DataObject
 				$image_class = ' class="'.$image_class.'"';
 			}
 
-			$img = '<img'.get_field_attribs_as_string($this->get_img_attribs($size_name)).$image_class.' />';
+			if( $image_align != '' )
+			{
+				$image_align =' align="'.$image_align.'"';
+			}
+
+			$img_attribs = $this->get_img_attribs($size_name);
+
+			if( $img_attribs['alt'] == '' )
+			{
+				$img_attribs['alt'] = $image_alt;
+			}
+
+			$img = '<img'.get_field_attribs_as_string($img_attribs).$image_class.$image_align.' />';
 
 			if( $image_link_to == 'original' )
 			{	// special case
@@ -1060,15 +1094,19 @@ class File extends DataObject
 				{
 					$a .= ' rel="'.htmlspecialchars($image_link_rel).'"';
 				}
+				$a .= ' id="f'.$this->ID.'"';
 				$img = $a.'>'.$img.'</a>';
 			}
 			$r .= $img;
 
-			$desc = $this->dget('desc');
-			if( !empty($desc) && !is_null($before_image_legend) )
+			if( $image_desc == '#' )
+			{
+				$image_desc = $this->dget('desc');
+			}
+			if( !empty( $image_desc ) && !is_null( $before_image_legend ) )
 			{
 				$r .= $before_image_legend
-							.$this->dget('desc')		// If this needs to be changed, please document.
+							.$image_desc		// If this needs to be changed, please document.
 							.$after_image_legend;
 			}
 			$r .= $after_image;
@@ -1083,6 +1121,181 @@ class File extends DataObject
 		}
 
 		return $r;
+	}
+
+
+	/*
+	 * Get gallery for code for a directory
+	 *
+	 * @param array of params
+	 * @return string gallery HTML code
+	 */
+	function get_gallery( $params )
+	{
+		$params = array_merge( array(
+				'before_gallery'        => '<div class="bGallery">',
+				'after_gallery'         => '</div>',
+				'gallery_image_size'    => 'crop-80x80',
+				'gallery_image_limit'   => 1000,
+				'gallery_colls'         => 5,
+				'gallery_order'			=> '', // 'ASC', 'DESC', 'RAND'
+			), $params );
+
+		if( ! $this->is_dir() )
+		{	// Not a directory
+			return '';
+		}
+		if( ! $FileList = $this->get_gallery_images( $params['gallery_image_limit'], $params['gallery_order'] ) )
+		{	// No images in this directory
+			return '';
+		}
+
+		$r = $params['before_gallery'];
+		$r .= '<table cellpadding="0" cellspacing="3" border="0" class="image_index">';
+
+		$count = 0;
+		foreach( $FileList as $l_File )
+		{
+			// We're linking to the original image, let lighbox (or clone) quick in:
+			$link_title = '#title#'; // This title will be used by lightbox (colorbox for instance)
+			$link_rel = 'lightbox[g'.$this->ID.']'; // Make one "gallery" per directory.
+
+			$img_tag = $l_File->get_tag( '', NULL, '', '', $params['gallery_image_size'], 'original', $link_title, $link_rel );
+
+			if( $count % $params['gallery_colls'] == 0 ) $r .= "\n<tr>";
+			$count++;
+			$r .= "\n\t".'<td valign="top">';
+			// ======================================
+			// Individual table cell
+
+			$r .= '<div class="bGallery-thumbnail">'.$img_tag.'</div>';
+
+			// ======================================
+			$r .= '</td>';
+			if( $count % $params['gallery_colls'] == 0 ) $r .= "\n</tr>";
+		}
+		if( $count && ( $count % $params['gallery_colls'] != 0 ) ) $r .= "\n</tr>";
+
+		$r .= '</table>';
+		$r .= $params['after_gallery'];
+
+		return $r;
+	}
+
+
+	/*
+	 * Get all images in a directory (no recursion)
+	 *
+	 * @param integer how many images to return
+	 * @param string filenames order ASC DESC RAND or empty string
+	 * @return array of instantiated File objects or false
+	 */
+	function get_gallery_images( $limit = 1000, $order = '' )
+	{
+		if( $filenames = $this->get_directory_files('relative') )
+		{
+			$FileCache = & get_FileCache();
+
+			switch( strtoupper($order) )
+			{
+				case 'ASC':
+					sort($filenames);
+					break;
+
+				case 'DESC':
+					rsort($filenames);
+					break;
+
+				case 'RAND':
+					shuffle($filenames);
+					break;
+			}
+
+			$i = 1;
+			foreach( $filenames as $filename )
+			{
+				if( $i > $limit )
+				{	// We've got enough images
+					break;
+				}
+
+				/*
+				sam2kb> TODO: we may need to filter files by extension first, it doesn't make sence
+						to query the database for every single .txt or .zip file.
+						The best solution would be to have file MIME type field in DB
+				*/
+				$l_File = & $FileCache->get_by_root_and_path( $this->_FileRoot->type, $this->_FileRoot->in_type_ID, $filename );
+				$l_File->load_meta();
+
+				if( ! $l_File->is_image() )
+				{	// Not an image
+					continue;
+				}
+				$Files[] = $l_File;
+
+				$i++;
+			}
+			if( !empty($Files) )
+			{
+				return $Files;
+			}
+		}
+		return false;
+	}
+
+
+	/*
+	 * Get all files in a directory (no recursion)
+	 *
+	 * @param string what part of file name to return
+	 *		'basename' return file name only e.g. 'bus-stop-ahead.jpg'
+	 * 		'ralative' file path relative to '_adfp_full_path' e.g. 'monument-valley/bus-stop-ahead.jpg'
+	 *		'absolute' full file path e.g. '/home/user/html/media/shared/global/monument-valley/bus-stop-ahead.jpg'
+	 * @return array of files
+	 */
+	function get_directory_files( $path_type = 'relative' )
+	{
+		global $Settings;
+
+		$path = trailing_slash( $this->_adfp_full_path );
+
+		if( $dir = @opendir($path) )
+		{	// Scan directory and list all files
+			$filenames = array();
+			while( ($file = readdir($dir)) !== false )
+			{
+				if( $file == '.' || $file == '..' || $file == $Settings->get('evocache_foldername') )
+				{	// Invalid file
+					continue;
+				}
+
+				// sam2kb> TODO: Do we need to process directories recursively?
+				if( ! is_dir($path.$file) )
+				{
+					switch( $path_type )
+					{
+						case 'basename':
+							$filenames[] = $file;
+							break;
+
+						case 'relative':
+							$filenames[] = trailing_slash($this->_rdfp_rel_path).$file;
+							break;
+
+						case 'absolute':
+							$filenames[] = $path.$file;
+							break;
+					}
+				}
+			}
+			closedir($dir);
+
+			if( !empty($filenames) )
+			{
+				return $filenames;
+			}
+		}
+		return false;
 	}
 
 
@@ -1470,6 +1683,10 @@ class File extends DataObject
 		$this->set_param( 'root_type', 'string', $this->_FileRoot->type );
 		$this->set_param( 'root_ID', 'number', $this->_FileRoot->in_type_ID );
 		$this->set_param( 'path', 'string', $this->_rdfp_rel_path );
+		if( ! $this->is_dir() )
+		{ // create hash value only for files but not for folders
+			$this->set_param( 'hash', 'string', md5_file( $this->get_full_path() ) );
+		}
 
 		// Let parent do the insert:
 		$r = parent::dbinsert();
@@ -1493,8 +1710,33 @@ class File extends DataObject
 			debug_die( 'cannot update File if meta data has not been checked before' );
 		}
 
+		global $DB;
+
+		$DB->begin();
+
 		// Let parent do the update:
-		return parent::dbupdate();
+		if( ( $r = parent::dbupdate() ) !== false )
+		{
+			// Update field 'last_touched_ts' of each item that has a link with this edited file
+			$LinkCache = & get_LinkCache();
+			$links = $LinkCache->get_by_file_ID( $this->ID );
+			foreach( $links as $Link )
+			{
+				$LinkOwner = & $Link->get_LinkOwner();
+				if( $LinkOwner != NULL )
+				{
+					$LinkOwner->item_update_last_touched_date();
+				}
+			}
+
+			$DB->commit();
+		}
+		else
+		{
+			$DB->rollback();
+		}
+
+		return $r;
 	}
 
 
@@ -1598,13 +1840,14 @@ class File extends DataObject
 	/**
 	 * Get link to edit linked file.
 	 *
-	 * @param integer ID of item to link to => will open the FM in link mode
+	 * @param string link type ( item, comment )
+	 * @param integer ID of the object to link to => will open the FM in link mode
 	 * @param string link text
 	 * @param string link title
 	 * @param string text to display if access denied
 	 * @param string page url for the edit action
 	 */
-	function get_linkedit_link( $link_itm_ID = NULL, $text = NULL, $title = NULL, $no_access_text = NULL,
+	function get_linkedit_link( $link_type = NULL, $link_obj_ID = NULL, $text = NULL, $title = NULL, $no_access_text = NULL,
 											$actionurl = '#', $target = '' )
 	{
 		global $dispatcher;
@@ -1630,7 +1873,7 @@ class File extends DataObject
 			$no_access_text = $text;
 		}
 
-		$url = $this->get_linkedit_url( $link_itm_ID, $actionurl );
+		$url = $this->get_linkedit_url( $link_type, $link_obj_ID, $actionurl );
 
 		if( !empty($target) )
 		{
@@ -1642,10 +1885,13 @@ class File extends DataObject
 
 
 	/**
-	 * @param integer ID of item to link to => will open the FM in link mode
+	 * Get link edit url for a link object
+	 *
+	 * @param string link type ( item, comment )
+	 * @param integer ID of link object to link to => will open the FM in link mode
 	 * @return string
 	 */
-	function get_linkedit_url( $link_itm_ID = NULL, $actionurl = '#' )
+	function get_linkedit_url( $link_type = NULL, $link_obj_ID = NULL, $actionurl = '#' )
 	{
 		global $dispatcher;
 
@@ -1665,9 +1911,9 @@ class File extends DataObject
 
 		$url_params = 'root='.$this->_FileRoot->ID.'&amp;path='.$rdfp_path.'/';
 
-		if( ! is_null($link_itm_ID) )
+		if( ! is_null($link_obj_ID) )
 		{	// We want to open the filemanager in link mode:
-			$url_params .= '&amp;fm_mode=link_item&amp;item_ID='.$link_itm_ID;
+			$url_params .= '&amp;fm_mode=link_object&amp;link_type='.$link_type.'&amp;link_object_ID='.$link_obj_ID;
 		}
 
 		// Add param to make the file list highlight this (via JS).
@@ -1735,7 +1981,7 @@ class File extends DataObject
 	 * Generate the IMG THUMBNAIL tag with all the alt & title if available.
 	 * @return string
 	 */
-	function get_thumb_imgtag( $size_name = 'fit-80x80', $class = '', $align = '' )
+	function get_thumb_imgtag( $size_name = 'fit-80x80', $class = '', $align = '', $title = '' )
 	{
 		global $use_strict;
 
@@ -1744,7 +1990,7 @@ class File extends DataObject
 			return '';
 		}
 
-		$img_attribs = $this->get_img_attribs($size_name);
+		$img_attribs = $this->get_img_attribs($size_name, $title);
 		// pre_dump( $img_attribs );
 
 		if( $class )
@@ -1817,20 +2063,28 @@ class File extends DataObject
 	 * Displays a preview thumbnail which is clickable and opens a view popup
 	 *
 	 * @param string what do do with files that are not images? 'fulltype'
+	 * @param boolean TRUE - to init colorbox plugin for images
 	 * @return string HTML to display
 	 */
-	function get_preview_thumb( $format_for_non_images = '' )
+	function get_preview_thumb( $format_for_non_images = '', $preview_image = false )
 	{
 		if( $this->is_image() )
 		{	// Ok, it's an image:
 			$type = $this->get_type();
 			$img_attribs = $this->get_img_attribs( 'fit-80x80', $type, $type );
-			$img = '<img'.get_field_attribs_as_string($img_attribs).' />';
+			$img = '<img'.get_field_attribs_as_string( $img_attribs ).' />';
 
-			// Get link to view the file (fallback to no view link - just the img):
-			$link = $this->get_view_link( $img );
+			if( $preview_image )
+			{	// Create link to preview image by colorbox plugin
+				$link = '<a href="'.$this->get_url().'" rel="lightbox" id="f'.$this->ID.'">'.$img.'</a>';
+			}
+			else
+			{	// Get link to view the file (fallback to no view link - just the img):
+				$link = $this->get_view_link( $img );
+			}
+
 			if( ! $link )
-			{ // no view link available:
+			{	// no view link available:
 				$link = $img;
 			}
 
@@ -1965,6 +2219,8 @@ class File extends DataObject
 			  'mimetype' => & $thumb_mimetype,
 			  'quality' => & $thumb_quality,
 			  'File' => & $this,
+			  'root_type' => $this->_FileRoot->type,
+			  'root_type_ID' => $this->_FileRoot->in_type_ID,
 		  ) );
 
 		$af_thumb_path = $this->get_af_thumb_path( $size_name, $thumb_mimetype, true );
@@ -1987,6 +2243,8 @@ class File extends DataObject
 	 */
 	function output_cached_thumb( $size_name, $thumb_mimetype, $mtime = NULL )
 	{
+		global $servertimenow;
+
 		$af_thumb_path = $this->get_af_thumb_path( $size_name, $thumb_mimetype, false );
 		//pre_dump($af_thumb_path);
 		if( $af_thumb_path[0] != '!' )
@@ -2004,10 +2262,13 @@ class File extends DataObject
 
 			header('Content-Type: '.$thumb_mimetype );
 			header('Content-Length: '.filesize( $af_thumb_path ) );
+			header('Last-Modified: ' . date("r",$this->get_lastmod_ts()));
 
 			// dh> if( $mtime && $mtime == $this->get_lastmod_ts() )
 			// fp> I don't think mtime changes anything to the cacheability of the data
-			header_noexpire(); // Static image
+			//header_noexpire(); // Static image
+			// attila> set expires on 30 days
+			header('Expires: ' . date("r", $servertimenow + 2592000/* 60*60*24*30 = 30 days */ ));
 
 			// Output the content of the file
 			readfile( $af_thumb_path );
@@ -2019,45 +2280,26 @@ class File extends DataObject
 
 
 	/**
-	 * @param Item
+	 * @param LinkOwner
 	 */
-	function link_to_Item( & $edited_Item )
+	function link_to_Object( & $LinkOwner )
 	{
 		global $DB;
 
 		// Automatically determine default position.
 		// First image becomes "teaser", otherwise "aftermore".
-		$LinkCache = & get_LinkCache();
-		$existing_Links = $LinkCache->get_by_item_ID($edited_Item->ID);
 
 		$order = 1;
-
-		if( $existing_Links )
-		{
-			$position = NULL;
-			$last_Link = array_pop($existing_Links);
-			$last_File = & $last_Link->get_File();
-
-			if( $last_File && $this->is_image() && $last_File->is_image() && ! count($existing_Links) )
-			{ // there's only one image attached yet, the second becomes "aftermore"
-				$position = 'aftermore';
-			}
-			else
-			{ // default: use position of previous link/attachment
-				$position = $last_Link->get('position');
-			}
-
-			// Re-add popped link.
-			$existing_Links[] = $last_Link;
-		}
-		else
-		{ // no attachment yet
-			$position = $this->is_image() ? 'teaser' : 'aftermore';
-		}
+		$position =  $LinkOwner->get_default_position( $this->is_image() );
+		$existing_Links = & $LinkOwner->get_Links();
 
 		// Find highest order
 		foreach( $existing_Links as $loop_Link )
 		{
+			if( $loop_Link->file_ID == $this->ID )
+			{ // The file is already linked to this owner
+				return;
+			}
 			$existing_order = $loop_Link->get('order');
 			if( $existing_order >= $order )
 				$order = $existing_order+1;
@@ -2068,15 +2310,10 @@ class File extends DataObject
 		// Load meta data AND MAKE SURE IT IS CREATED IN DB:
 		$this->load_meta( true );
 
-		// Let's make the link!
-		$edited_Link = new Link();
-		$edited_Link->set( 'itm_ID', $edited_Item->ID );
-		$edited_Link->set( 'file_ID', $this->ID );
-		$edited_Link->set( 'position', $position );
-		$edited_Link->set( 'order', $order );
-		$edited_Link->dbinsert();
-
 		$DB->commit();
+
+		// Let's make the link!
+		$LinkOwner->add_link( $this->ID, $position, $order );
 	}
 
 
@@ -2095,19 +2332,41 @@ class File extends DataObject
 		switch( $restriction['table'] )
 		{ // can be restricted to different tables
 			case 'T_links':
-				$object_ID = 'post_ID';			// related table object ID
-				$object_name = 'post_title';	// related table object name
+				switch( $restriction['field'] )
+				{
+					case 'link_itm_ID': // Items
+						$object_ID = 'post_ID';			// related table object ID
+						$object_name = 'post_title';	// related table object name
 
-				// link to object
-				$link = '<a href="'.$admin_url.'?ctrl=items&action=edit&p=%d">%s</a>';
-				$object_query = 'SELECT post_ID, post_title FROM T_items__item'
-									.' WHERE post_ID IN'
-									.' (SELECT link_Itm_ID'
-									.' FROM '.$restriction['table']
-									.' WHERE '.$restriction['fk'].' = '.$this->ID.')';
-				break;
+						// link to object
+						$link = '<a href="'.$admin_url.'?ctrl=items&action=edit&p=%d">%s</a>';
+						$object_query = 'SELECT post_ID, post_title FROM T_items__item'
+											.' WHERE post_ID IN'
+											.' (SELECT '.$restriction['field']
+											.' FROM '.$restriction['table']
+											.' WHERE '.$restriction['fk'].' = '.$this->ID.')';
+						break;
 
-			case 'T_users':
+					case 'link_cmt_ID': // Comments
+						$object_ID = 'comment_ID';			// related table object ID
+						$object_name = 'comment_ID';	// related table object name
+
+						// link to object
+						$link = '<a href="'.$admin_url.'?ctrl=comments&action=edit&comment_ID=%d">'.T_('Comment ').'#%s</a>';
+						$object_query = 'SELECT comment_ID, comment_ID FROM T_comments'
+											.' WHERE comment_ID IN'
+											.' (SELECT '.$restriction['field']
+											.' FROM '.$restriction['table']
+											.' WHERE '.$restriction['fk'].' = '.$this->ID.')';
+						break;
+
+					default:
+						// not defined restriction
+						debug_die ( 'unhandled restriction field:' . htmlspecialchars ( $restriction['table'].' - '.$restriction['field'] ) );
+				}
+			break;
+
+			case 'T_users': // Users
 				$object_ID = 'user_ID';			// related table object ID
 				$object_name = 'user_login';	// related table object name
 
@@ -2136,399 +2395,41 @@ class File extends DataObject
 		// no restriction
 		return '';
 	}
+
+
+	/**
+	 * Get icon with link to go to file browser where this file is highlighted
+	 *
+	 * @return string Link
+	 */
+	function get_target_icon()
+	{
+		global $current_User;
+
+		$r = '';
+		if( $current_User->check_perm( 'files', 'view', false, $this->get_FileRoot() ) )
+		{	// Check permission
+			if( $this->is_dir() )
+			{	// Dir
+				$title = T_('Locate this directory!');
+			}
+			else
+			{	// File
+				$title = T_('Locate this file!');
+			}
+			$url = $this->get_linkedit_url();
+			$r .= '<a href="'.$url.'" title="'.$title.'">'.get_icon( 'locate', 'imgtag', array( 'title' => $title ) ).'</a> ';
+		}
+
+		return $r;
+	}
 }
 
 
 /*
  * $Log$
- * Revision 1.96  2011/09/27 17:53:59  efy-yurybakh
- * add missing rel="lightbox" in front office
+ * Revision 1.98  2013/11/06 08:04:08  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.95  2011/09/06 00:54:38  fplanque
- * i18n update
- *
- * Revision 1.94  2011/09/04 22:13:15  fplanque
- * copyright 2011
- *
- * Revision 1.93  2011/09/04 02:30:20  fplanque
- * colorbox integration (MIT license)
- *
- * Revision 1.92  2011/03/10 14:54:18  efy-asimo
- * Allow file types modification & add m4v file type
- *
- * Revision 1.91  2010/12/18 00:23:05  fplanque
- * minor stuff & fixes
- *
- * Revision 1.90  2010/11/25 15:16:34  efy-asimo
- * refactor $Messages
- *
- * Revision 1.89  2010/07/26 06:52:16  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.88  2010/07/16 08:39:25  efy-asimo
- * file rename_to and "replace existing file" - fix
- *
- * Revision 1.87  2010/03/28 17:08:08  fplanque
- * minor
- *
- * Revision 1.86  2010/03/19 09:48:57  efy-asimo
- * file deleting restrictions - task
- *
- * Revision 1.85  2010/03/14 06:36:56  sam2kb
- * New plugin hooks: BeforeThumbCreate, AfterFileUpload
- *
- * Revision 1.84  2010/03/12 10:52:53  efy-asimo
- * Set EvoCache  folder names - task
- *
- * Revision 1.83  2010/03/08 21:06:27  fplanque
- * minor/doc
- *
- * Revision 1.82  2010/03/06 12:53:40  efy-asimo
- * Replace existing file bugfix
- *
- * Revision 1.81  2010/03/05 13:38:31  fplanque
- * doc/todo
- *
- * Revision 1.80  2010/02/08 17:52:15  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.79  2010/01/30 18:55:25  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.78  2010/01/30 09:55:34  efy-asimo
- * return to the properties form after file rename error + user transaction during file rename
- *
- * Revision 1.77  2010/01/24 14:47:25  efy-asimo
- * Update file paths after folder rename
- *
- * Revision 1.76  2009/12/12 19:14:10  fplanque
- * made avatars optional + fixes on img props
- *
- * Revision 1.75  2009/12/06 22:55:20  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.74  2009/12/04 23:27:50  fplanque
- * cleanup Expires: header handling
- *
- * Revision 1.73  2009/12/02 01:00:07  fplanque
- * header_nocache & header_noexpire
- *
- * Revision 1.72  2009/11/30 00:22:05  fplanque
- * clean up debug info
- * show more timers in view of block caching
- *
- * Revision 1.70  2009/11/11 20:16:14  fplanque
- * doc
- *
- * Revision 1.69  2009/11/11 19:12:56  fplanque
- * Inproved actions after uploaded
- *
- * Revision 1.68  2009/10/13 22:36:01  blueyed
- * Highlight files and directories in the filemanager when opened via 'Locate this' link. Adds scrollTo jQuery plugin.
- *
- * Revision 1.67  2009/10/12 21:32:13  blueyed
- * File: get_tag: use get_img_attribs; get_img_attribs: always use empty alt, if nothing else is provided.
- *
- * Revision 1.66  2009/10/12 18:54:18  blueyed
- * link_to_Item: Fix off-by-one error with order generation
- *
- * Revision 1.65  2009/10/11 03:12:53  blueyed
- * Properly init order of new links.
- *
- * Revision 1.64  2009/10/11 03:06:26  blueyed
- * Fix install
- *
- * Revision 1.63  2009/10/11 03:00:10  blueyed
- * Add "position" and "order" properties to attachments.
- * Position can be "teaser" or "aftermore" for now.
- * Order defines the sorting of attachments.
- * Needs testing and refinement. Upgrade might work already, be careful!
- *
- * Revision 1.62  2009/10/07 23:43:25  fplanque
- * doc
- *
- * Revision 1.61  2009/10/05 23:21:32  blueyed
- * todo/question
- *
- * Revision 1.60  2009/09/30 20:04:43  blueyed
- * Add mtime param to results from get_url, too.
- *
- * Revision 1.59  2009/09/30 17:39:51  blueyed
- * Add mtime param to .evocache files. This allows to cache them to the max on the client.
- *
- * Revision 1.58  2009/09/30 00:38:15  sam2kb
- * Space is not needed before get_field_attribs_as_string()
- *
- * Revision 1.57  2009/09/27 21:00:54  blueyed
- * get_img_attribs: fix default for size_name, allow passing of title and alt. get_preview_thumb uses it now, too, which adds width/height params to the icons in the file manager.
- *
- * Revision 1.56  2009/09/26 12:00:42  tblue246
- * Minor/coding style
- *
- * Revision 1.55  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.54  2009/09/20 23:54:24  blueyed
- * File::output_cached_thumb handles mtime param, and uses it to send a
- * far in the future Expires header.
- * mtime param gets forwarded from getfile.php.
- * This makes browsers finally cache files served through getfile.php.
- *
- * Revision 1.53  2009/09/20 16:55:57  tblue246
- * Prevent PHP error
- *
- * Revision 1.52  2009/09/20 13:45:19  blueyed
- * Re-add get_img_attribs, fix class issue and use it where it has been factored out, too.
- *
- * Revision 1.51  2009/09/20 01:28:35  fplanque
- * reverted broken stuff (first bug: the class is no longer added to img, I tried to fixed that and entered a rathole with no end)
- * dh> the problem has been just that get_img_attribs was called again, and not just once. Fixed.
- *
- * Revision 1.50  2009/09/20 00:19:31  blueyed
- * Add width/height attribs to get_thumb_imgtag generated images. Refactor used method into get_img_attribs.
- *
- * Revision 1.49  2009/09/16 21:23:09  blueyed
- * File class derives from DataObject. Load this.
- *
- * Revision 1.48  2009/09/16 20:33:40  tblue246
- * Fix fatal error ("unsupported operand types").
- *
- * Revision 1.47  2009/09/11 19:36:58  blueyed
- * File::get_tag: fix width/height attribs for "original" size and add the attribs for thumbs, using "widthheight_assoc"
- *
- * Revision 1.46  2009/09/09 19:05:39  blueyed
- * is_audio: fix doc, add oga to audio file extensions.
- *
- * Revision 1.45  2009/09/08 13:51:01  tblue246
- * phpdoc fixes
- *
- * Revision 1.44  2009/09/04 17:07:18  waltercruz
- * Showing a player when the attachment is a mp3
- *
- * Revision 1.43  2009/08/31 19:19:24  blueyed
- * File::get_tag: use title for alt tag, if the latter info is not provided. Refactor it using get_field_attribs_as_string.
- *
- * Revision 1.42  2009/08/06 14:55:45  fplanque
- * doc
- *
- * Revision 1.41  2009/07/31 00:17:20  blueyed
- * Move File::thumbnail to getfile.php, where it gets used exclusively. ACKed by FP.
- *
- * Revision 1.40  2009/07/31 00:14:00  blueyed
- * File class: indent, minor
- *
- * Revision 1.39  2009/07/19 21:00:19  fplanque
- * minor
- *
- * Revision 1.38  2009/07/18 18:43:50  tblue246
- * DataObject::set_param() does not accept "integer" as the 2nd param (has to be "number").
- *
- * Revision 1.37  2009/07/16 13:55:35  tblue246
- * - Do not allow modification of "Post" post type (ID 1).
- * - When deleting files, check for linked users.
- *
- * Revision 1.36  2009/07/06 23:52:24  sam2kb
- * Hardcoded "admin.php" replaced with $dispatcher
- *
- * Revision 1.35  2009/05/25 19:47:45  fplanque
- * better linking of files
- *
- * Revision 1.34  2009/05/20 17:26:22  yabs
- * minor bug fixes
- *
- * Revision 1.33  2009/05/19 14:34:31  fplanque
- * Category, tag, archive and serahc page snow only display post excerpts by default. (Requires a 3.x skin; otherwise the skin will display full posts as before). This can be controlled with the ''content_mode'' param in the skin tags.
- *
- * Revision 1.32  2009/03/26 22:45:29  blueyed
- * File class: handle invalid Fileroot more gracefully, without throwing E_NOTICEs. This happened when disabling user media dirs and the avatar thingy kicked in. See http://forums.b2evolution.net/viewtopic.php?p=89531#89531
- *
- * Revision 1.31  2009/03/26 22:23:36  blueyed
- * Fix doc
- *
- * Revision 1.30  2009/03/08 23:57:42  fplanque
- * 2009
- *
- * Revision 1.29  2009/02/19 04:48:13  blueyed
- * Lazy-instantiate Filetype of a file, moved to get_Filetype. Bugfix: unset Filetype if name changes.
- *
- * Revision 1.28  2009/02/10 23:28:59  blueyed
- * Add mtime-Expires caching to getfile.php.
- *  - getfile.php links have a mtime param to make the URLs unique
- *  - Add File::get_getfile_url
- *  - getfile.php sends "Expires: 'in 10 years'" (not for thumbs yet, see
- *    TODO)
- *
- * Revision 1.27  2009/02/10 22:38:57  blueyed
- *  - Handle more File properties in File class lazily.
- *  - Cleanup recursive size handling:
- *    - Add Filelist::get_File_size
- *    - Add Filelist::get_File_size_formatted
- *    - Add File::_recursive_size/get_recursive_size
- *    - Drop File::setSize
- *    - get_dirsize_recursive: includes size of directories (e.g. 4kb here)
- *
- * Revision 1.26  2009/02/10 21:27:59  blueyed
- * File: invalidate _lastmod_ts in load_properties, where it has been set before
- *
- * Revision 1.25  2009/02/10 21:23:43  blueyed
- * File: lazy-fill _lastmod_ts through getter
- *
- * Revision 1.24  2009/02/10 21:11:24  blueyed
- * typo, indent
- *
- * Revision 1.23  2009/02/10 21:08:50  blueyed
- * doc, indent
- *
- * Revision 1.22  2009/02/07 10:10:26  yabs
- * Validation
- *
- * Revision 1.21  2009/01/19 21:50:47  fplanque
- * minor
- *
- * Revision 1.20  2009/01/17 21:16:25  blueyed
- * Add return value to File::thumbnail
- *
- * Revision 1.19  2008/12/27 20:06:27  fplanque
- * rollback ( changes don't make sense to me )
- *
- * Revision 1.18  2008/11/03 21:01:56  blueyed
- * get_af_thumb_path(): Fix notice for files without Filetype
- * fp> How do we generate a thumbnail for a file with no filetype? How do we know what kind of thumbnail to generate?
- *
- * Revision 1.17  2008/10/15 22:57:14  blueyed
- * Drop support for 'clean save as'. It should be done by sending the right headers instead.
- * fp> Sorry, can't drop that if you don't replace it with alternative.
- *
- * Revision 1.16  2008/10/15 22:55:26  blueyed
- * todo/bug
- *
- * Revision 1.15  2008/10/15 22:07:54  blueyed
- * todo/bug
- *
- * Revision 1.14  2008/10/07 16:59:59  blueyed
- * todo/bug/notice
- *
- * Revision 1.13  2008/09/29 08:30:36  fplanque
- * Avatar support
- *
- * Revision 1.12  2008/09/24 08:35:11  fplanque
- * Support of "cropped" thumbnails (the image will always fill the whole thumbnail area)
- * Thumbnail sizes can be configured in /conf/_advanced.php
- *
- * Revision 1.11  2008/09/23 09:04:33  fplanque
- * moved media index to a widget
- *
- * Revision 1.10  2008/09/15 11:01:09  fplanque
- * Installer now creates a demo photoblog
- *
- * Revision 1.9  2008/07/11 23:13:05  blueyed
- * Fix possible E_NOTICE for files without Filetype in File::is_editable
- *
- * Revision 1.8  2008/05/26 19:22:00  fplanque
- * fixes
- *
- * Revision 1.7  2008/04/14 19:50:51  fplanque
- * enhanced attachments handling in post edit mode
- *
- * Revision 1.6  2008/04/14 17:52:07  fplanque
- * link images to original by default
- *
- * Revision 1.5  2008/04/13 20:40:06  fplanque
- * enhanced handlign of files attached to items
- *
- * Revision 1.4  2008/01/21 09:35:28  fplanque
- * (c) 2008
- *
- * Revision 1.3  2008/01/06 04:23:49  fplanque
- * thumbnail enhancement
- *
- * Revision 1.2  2007/11/29 00:07:19  blueyed
- * Fallback to uid/gid for file owner/group, if name is unknown
- *
- * Revision 1.1  2007/06/25 10:59:54  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.45  2007/06/23 22:05:16  fplanque
- * fixes
- *
- * Revision 1.44  2007/06/18 20:59:02  fplanque
- * minor
- *
- * Revision 1.43  2007/04/26 00:11:10  fplanque
- * (c) 2007
- *
- * Revision 1.42  2007/03/20 07:43:44  fplanque
- * .evocache cleanup triggers
- *
- * Revision 1.41  2007/03/05 02:13:26  fplanque
- * improved dashboard
- *
- * Revision 1.40  2007/02/10 18:03:03  waltercruz
- * Changing double quotes to single quotes
- *
- * Revision 1.39  2007/01/26 02:12:06  fplanque
- * cleaner popup windows
- *
- * Revision 1.38  2007/01/25 03:37:14  fplanque
- * made bytesreadable() really readable for average people.
- *
- * Revision 1.37  2007/01/25 03:17:00  fplanque
- * visual cleanup for average users
- * geeky stuff preserved as options
- *
- * Revision 1.36  2007/01/24 05:57:55  fplanque
- * cleanup / settings
- *
- * Revision 1.35  2007/01/19 10:45:42  fplanque
- * images everywhere :D
- * At this point the photoblogging code can be considered operational.
- *
- * Revision 1.34  2007/01/19 09:31:05  fplanque
- * Provision for case sensitive file meta data handling
- *
- * Revision 1.33  2007/01/19 08:20:36  fplanque
- * Addressed resized image quality.
- *
- * Revision 1.32  2007/01/15 20:48:20  fplanque
- * constrained photoblog image size
- * TODO: sharpness issue
- *
- * Revision 1.31  2006/12/23 22:53:10  fplanque
- * extra security
- *
- * Revision 1.30  2006/12/14 01:46:29  fplanque
- * refactoring / factorized image preview display
- *
- * Revision 1.29  2006/12/14 00:33:53  fplanque
- * thumbnails & previews everywhere.
- * this is getting good :D
- *
- * Revision 1.28  2006/12/13 22:26:27  fplanque
- * This has reached the point of a functional eternal cache.
- * TODO: handle cache on delete, upload/overwrite, rename, move, copy.
- *
- * Revision 1.27  2006/12/13 21:23:56  fplanque
- * .evocache folders / saving of thumbnails
- *
- * Revision 1.26  2006/12/13 20:10:30  fplanque
- * object responsibility delegation?
- *
- * Revision 1.25  2006/12/13 03:08:28  fplanque
- * thumbnail implementation design demo
- *
- * Revision 1.24  2006/12/07 23:13:10  fplanque
- * @var needs to have only one argument: the variable type
- * Otherwise, I can't code!
- *
- * Revision 1.23  2006/12/07 20:03:32  fplanque
- * Woohoo! File editing... means all skin editing.
- *
- * Revision 1.22  2006/11/24 18:27:24  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.21  2006/11/19 23:43:04  blueyed
- * Optimized icon and $IconLegend handling
  */
 ?>

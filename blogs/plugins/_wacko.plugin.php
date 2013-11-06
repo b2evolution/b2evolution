@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  * @ignore
@@ -22,11 +22,11 @@ class wacko_plugin extends Plugin
 	var $code = 'b2evWcko';
 	var $name = 'Wacko formatting';
 	var $priority = 30;
-	var $version = '1.9-dev';
-	var $apply_rendering = 'opt-in';
+	var $version = '5.0.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
+	var $help_url = 'http://b2evolution.net/man/technical-reference/renderer-plugins/wacko-plugin';
 	var $number_of_installs = 1;
 
 	/**
@@ -84,6 +84,19 @@ class wacko_plugin extends Plugin
 
 
 	/**
+	 * Define here default collection/blog settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::get_coll_setting_definitions()}.
+	 */
+	function get_coll_setting_definitions( & $params )
+	{
+		$default_params = array_merge( $params, array( 'default_post_rendering' => 'opt-in' ) );
+		return parent::get_coll_setting_definitions( $default_params );
+	}
+
+
+	/**
 	 * Perform rendering
 	 *
 	 * @param array Associative array of parameters
@@ -95,14 +108,38 @@ class wacko_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		$content = preg_replace( $this->search, $this->replace, $content );
+		$content = replace_content_outcode( $this->search, $this->replace, $content );
 
 		// Find bullet lists
+		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false )
+		{	// Call replace_content() on everything outside code/pre:
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				array( $this, 'find_bullet_lists' ) );
+		}
+		else
+		{	// No code/pre blocks, replace on the whole thing
+			$content = $this->find_bullet_lists( $content );
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Find bullet lists
+	 *
+	 * @param string Content
+	 * @return string Content
+	 */
+	function find_bullet_lists( $content )
+	{
 		$lines = explode( "\n", $content );
+		$lines_count = count( $lines );
 		$lists = array();
 		$current_depth = 0;
 		$content = '';
-		foreach( $lines as $line )
+		foreach( $lines as $l => $line )
 		{
 			if( ! preg_match( '#^ /s $#xm', $line ) )
 			{	 // If not blank line
@@ -157,7 +194,11 @@ class wacko_plugin extends Plugin
 					$current_depth = 0;
 				}
 
-				$content .= $line."\n";
+				$content .= $line;
+				if( $l < $lines_count - 1 )
+				{	// Don't append a newline at the end, because it will create an unnecessary newline that didn't exist in source content
+					$content .= "\n";
+				}
 
 			}
 		}
@@ -167,51 +208,15 @@ class wacko_plugin extends Plugin
 			$content .= '</'.implode( ">\n</", $lists ).">\n";
 		}
 
-		return true;
+		return $content;
 	}
 }
 
 
 /*
  * $Log$
- * Revision 1.20  2011/09/04 22:13:23  fplanque
- * copyright 2011
- *
- * Revision 1.19  2010/02/08 17:55:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.18  2009/03/08 23:57:48  fplanque
- * 2009
- *
- * Revision 1.17  2008/01/21 09:35:41  fplanque
- * (c) 2008
- *
- * Revision 1.16  2007/04/26 00:11:04  fplanque
- * (c) 2007
- *
- * Revision 1.15  2007/04/20 02:53:13  fplanque
- * limited number of installs
- *
- * Revision 1.14  2006/12/26 03:19:12  fplanque
- * assigned a few significant plugin groups
- *
- * Revision 1.13  2006/07/10 20:19:30  blueyed
- * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
- *
- * Revision 1.12  2006/07/07 21:26:49  blueyed
- * Bumped to 1.9-dev
- *
- * Revision 1.11  2006/07/03 21:04:51  fplanque
- * translation cleanup
- *
- * Revision 1.10  2006/06/16 21:30:57  fplanque
- * Started clean numbering of plugin versions (feel free do add dots...)
- *
- * Revision 1.9  2006/05/30 19:39:56  fplanque
- * plugin cleanup
- *
- * Revision 1.8  2006/04/11 21:22:26  fplanque
- * partial cleanup
+ * Revision 1.22  2013/11/06 08:05:22  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

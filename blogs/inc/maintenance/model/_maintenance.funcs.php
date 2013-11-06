@@ -45,7 +45,7 @@ function check_version( $new_version_dir )
  * @param boolean true if maintenance mode need to be enabled
  * @param string maintenance mode message
  */
-function switch_maintenance_mode( $enable, $msg = '' )
+function switch_maintenance_mode( $enable, $msg = '', $silent = false )
 {
 	global $conf_path;
 
@@ -56,48 +56,37 @@ function switch_maintenance_mode( $enable, $msg = '' )
 		echo '<p>'.T_('Switching to maintenance mode...').'</p>';
 		flush();
 
-		$f = @fopen( $conf_path.$maintenance_mode_file , 'w+' );
-		if( $f == false )
+		$content = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<title>Site temporarily down for maintenance.</title>
+</head>
+<body>
+<h1>503 Service Unavailable</h1>
+<p>'.$msg.'</p>
+<hr />
+<p>Site administrators: please view the source of this page for details.</p>
+<!--
+If you need to manually put b2evolution out of maintenance mode, delete or rename the file /conf/maintenance.html
+-->
+</body>
+</html>';
+
+		if( ! save_to_file( $content, $conf_path.$maintenance_mode_file, 'w+' ) )
 		{	// Maintenance file has not been created
 			echo '<p style="color:red">'.sprintf( T_( 'Unable to switch maintenance mode. Maintenance file can\'t be created: &laquo;%s&raquo;' ), $maintenance_mode_file ).'</p>';
     		flush();
 
 			return false;
 		}
-		else
-		{	// Write content
-			fwrite( $f, '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-	<title>Site temporarily down for maintenance.</title>
-</head>
-
-<body>
-
-<h1>503 Service Unavailable</h1>
-
-<p>'.$msg.'</p>
-
-<hr />
-
-<p>Site administrators: please view the source of this page for details.</p>
-
-<!--
-
-If you need to manually put b2evolution out of maintenance mode, delete or rename the file /conf/maintenance.html
-
--->
-
-</body>
-
-</html>' );
-			fclose($f);
-		}
 	}
 	else
 	{	// Delete maintenance file
-		echo '<p>'.T_('Switching out of maintenance mode...').'</p>';
+		if( ! $silent )
+		{
+			echo '<p>'.T_('Switching out of maintenance mode...').'</p>';
+		}
 		@unlink( $conf_path.$maintenance_mode_file );
 	}
 
@@ -135,18 +124,17 @@ function prepare_maintenance_dir( $dir_name, $deny_access = true )
 
 		if( !file_exists( $htaccess_name ) )
 		{	// We can create .htaccess file
-			$f = @fopen( $htaccess_name , 'w+' );
-			if( $f == false )
+			if( ! save_to_file( 'deny from all', $htaccess_name, 'w' ) )
 			{
 				echo '<p style="color:red">'.sprintf( T_( 'Unable to create &laquo;%s&raquo; file in directory.' ), $htaccess_name ).'</p>';
 				flush();
 
 				return false;
 			}
-			else
-			{	// Write content
-				fwrite( $f, 'deny from all' );
-				fclose($f);
+
+			if( ! file_exists($dir_name.'index.html') )
+			{	// Create index.html to disable directory browsing
+				save_to_file( '', $dir_name.'index.html', 'w' );
 			}
 		}
 
@@ -295,8 +283,13 @@ function get_upgrade_action( $download_url )
 
 	if( file_exists( $upgrade_path ) )
 	{
+		$filename_params = array(
+				'inc_files'	=> false,
+				'recurse'	=> false,
+				'basename'	=> true,
+			);
 		// Search if there is unpacked version in '_upgrade' directory
-		foreach( get_filenames( $upgrade_path, false, true, true, false, true ) as $dir_name )
+		foreach( get_filenames( $upgrade_path, $filename_params ) as $dir_name )
 		{
 			if( strpos( $dir_name, $version_name ) === 0 )
 			{
@@ -318,8 +311,13 @@ function get_upgrade_action( $download_url )
 			}
 		}
 
+		$filename_params = array(
+				'inc_dirs'	=> false,
+				'recurse'	=> false,
+				'basename'	=> true,
+			);
 		// Search if there is packed version in '_upgrade' directory
-		foreach( get_filenames( $upgrade_path, true, false, true, false, true ) as $file_name )
+		foreach( get_filenames( $upgrade_path, $filename_params ) as $file_name )
 		{
 			if( strpos( $file_name, $version_name ) === 0 )
 			{
@@ -364,48 +362,8 @@ function aliases_to_tables( $aliases )
 
 /*
  * $Log$
- * Revision 1.12  2011/10/12 00:49:34  fplanque
- * Stop panic attacks
- *
- * Revision 1.11  2011/06/15 06:29:44  sam2kb
- * Relocate "set_max_execution_time" function
- *
- * Revision 1.10  2011/02/10 23:07:21  fplanque
- * minor/doc
- *
- * Revision 1.8.2.3  2010/07/14 16:13:16  fplanque
- * cmeanup upgrade process (2nd checkin?)
- *
- * Revision 1.8.2.2  2010/07/13 14:44:03  fplanque
- * cleanup uprade process
- *
- * Revision 1.8.2.1  2010/07/13 13:06:29  fplanque
- * Backup messages
- *
- * Revision 1.8  2010/02/04 19:29:53  blueyed
- * wording
- *
- * Revision 1.7  2010/01/17 16:15:24  sam2kb
- * Localization clean-up
- *
- * Revision 1.6  2009/11/22 19:15:34  efy-maxim
- * load class
- *
- * Revision 1.5  2009/11/19 12:10:51  efy-maxim
- * Force 'upgrade' for debug mode
- *
- * Revision 1.4  2009/11/18 21:54:25  efy-maxim
- * compatibility fix for PHP4
- *
- * Revision 1.3  2009/10/21 14:27:39  efy-maxim
- * upgrade
- *
- * Revision 1.2  2009/10/20 14:38:54  efy-maxim
- * maintenance modulde: downloading - unpacking - verifying destination files - backing up - copying new files - upgrade database using regular script (Warning: it is very unstable version! Please, don't use maintenance modulde, because it can affect your data )
- *
- * Revision 1.1  2009/10/18 20:15:51  efy-maxim
- * 1. backup, upgrade have been moved to maintenance module
- * 2. maintenance module permissions
+ * Revision 1.14  2013/11/06 08:04:25  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

@@ -35,12 +35,35 @@ if( param( 'thrd_ID', 'integer', '', true) )
 	}
 }
 
-// Preload users to show theirs avatars
-load_messaging_threads_recipients( $current_User->ID );
+// check params
+switch( $action )
+{
+	case 'create':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'messaging_threads' );
+		break;
+	case 'delete':
+	case 'leave':
+	case 'close':
+	case 'close_and_block':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'messaging_threads' );
 
+		// Make sure we got a thrd_ID:
+		param( 'thrd_ID', 'integer', true );
+		break;
+}
+
+// handle action
 switch( $action )
 {
 	case 'new':
+		if( check_create_thread_limit( true ) )
+		{ // user has already reached his limit, don't allow to create new thread
+			$action = '';
+			break;
+		}
+
 		if( ! isset($edited_Message) )
 		{	// We don't have a model to use, start with blank object:
 			$edited_Thread = new Thread();
@@ -54,12 +77,17 @@ switch( $action )
 		}
 		$edited_Message->Thread = & $edited_Thread;
 
+		init_tokeninput_js();
+
 		break;
 
 	case 'create': // Record new thread
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'thread' );
+		if( check_create_thread_limit() )
+		{ // max new threads limit reached, don't allow to create new thread
+			debug_die( 'Invalid request, new conversation limit already reached!' );
+		}
 
+		// the create_new_thread() funciton will create required Thread and Message objects
 		if( create_new_thread() )
 		{ // new thread has been created successful
 			// Redirect so that a reload doesn't write to the DB twice:
@@ -67,22 +95,13 @@ switch( $action )
 			// We have EXITed already at this point!!
 		}
 
-		// Couldn't create the new Thread, reset variables to create another. 
-		$edited_Thread = new Thread();
-		$edited_Message = new Message();
-		$edited_Message->Thread = & $edited_Thread;
+		init_tokeninput_js();
+
 		break;
 
-	case 'delete':
-		// Delete thread:
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'thread' );
-
+	case 'delete': // Delete thread:
 		// Check permission:
 		$current_User->check_perm( 'perm_messaging', 'delete', true );
-
-		// Make sure we got an thrd_ID:
-		param( 'thrd_ID', 'integer', true );
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
@@ -94,22 +113,44 @@ switch( $action )
 			forget_param( 'msg_ID' );
 			$Messages->add( $msg, 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=threads', 303 ); // Will EXIT
+			$redirect_to = param( 'redirect_to', 'string', '?ctrl=threads' );
+			header_redirect( $redirect_to, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		else
-		{	// not confirmed, Check for restrictions:
+		{ // not confirmed, Check for restrictions:
 			if( ! $edited_Thread->check_delete( sprintf( T_('Cannot delete thread &laquo;%s&raquo;'), $edited_Thread->dget('title') ) ) )
-			{	// There are restrictions:
+			{ // There are restrictions:
 				$action = 'view';
 			}
 		}
 		break;
 
+	case 'leave': // Leave thread:
+		leave_thread( $edited_Thread->ID, $current_User->ID, false );
+
+		$Messages->add( sprintf( T_( 'You have successfuly left the &laquo;%s&raquo; conversation!' ), $edited_Thread->get( 'title' ) ), 'success' );
+		break;
+
+	case 'close': // Close thread:
+	case 'close_and_block': // Close thread and block contact:
+		leave_thread( $edited_Thread->ID, $current_User->ID, true );
+
+		$Messages->add( sprintf( T_( 'You have successfuly closed the &laquo;%s&raquo; conversation!' ), $edited_Thread->get( 'title' ) ), 'success' );
+		if( $action == 'close_and_block' )
+		{ // also block the given contact
+			$block_user_ID = param( 'block_ID', 'integer', true );
+			$UserCache = & get_UserCache();
+			$blocked_User = $UserCache->get_by_ID( $block_user_ID );
+
+			set_contact_blocked( $block_user_ID, true );
+			$Messages->add( sprintf( T_( '&laquo;%s&raquo; was blocked.' ), $blocked_User->get( 'login' ) ), 'success' );
+		}
+		break;
 }
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('Messages'), '?ctrl=threads' );
+$AdminUI->breadcrumbpath_add( T_('Messaging'), '?ctrl=threads' );
 $AdminUI->breadcrumbpath_add( T_('Conversations'), '?ctrl=threads' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -133,7 +174,7 @@ switch( $action )
 		// We need to ask for confirmation:
 		$edited_Thread->confirm_delete(
 				sprintf( T_('Delete thread &laquo;%s&raquo;?'), $edited_Thread->dget('title') ),
-				'thread', $action, get_memorized( 'action' ) );
+				'messaging_threads', $action, get_memorized( 'action' ) );
 		$AdminUI->disp_view( 'messaging/views/_thread_list.view.php' );
 		break;
 
@@ -159,55 +200,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.20  2011/10/15 07:15:02  efy-yurybakh
- * Messaging Abuse Management
- *
- * Revision 1.19  2011/10/14 19:02:14  efy-yurybakh
- * Messaging Abuse Management
- *
- * Revision 1.18  2011/10/07 05:43:45  efy-asimo
- * Check messaging availability before display
- *
- * Revision 1.17  2011/08/11 09:05:09  efy-asimo
- * Messaging in front office
- *
- * Revision 1.16  2010/01/30 18:55:32  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.15  2010/01/15 16:57:38  efy-yury
- * update messaging: crumbs
- *
- * Revision 1.14  2010/01/03 12:03:17  fplanque
- * More crumbs...
- *
- * Revision 1.13  2009/12/06 22:55:20  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.12  2009/10/08 20:05:52  efy-maxim
- * Modular/Pluggable Permissions
- *
- * Revision 1.11  2009/09/26 12:00:43  tblue246
- * Minor/coding style
- *
- * Revision 1.10  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.9  2009/09/19 20:31:38  efy-maxim
- * 'Reply' permission : SQL queries to check permission ; Block/Unblock functionality; Error messages on insert thread/message
- *
- * Revision 1.8  2009/09/19 11:29:05  efy-maxim
- * Refactoring
- *
- * Revision 1.7  2009/09/18 16:16:50  efy-maxim
- * comments tab in messaging module
- *
- * Revision 1.6  2009/09/18 10:38:31  efy-maxim
- * 15x15 icons next to login in messagin module
- *
- * Revision 1.5  2009/09/16 22:03:40  fplanque
- * doc
+ * Revision 1.22  2013/11/06 08:04:25  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

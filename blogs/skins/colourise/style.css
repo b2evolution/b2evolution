@@ -1,10 +1,3 @@
-@import url(../../rsc/css/basic.css);	/* Import basic styles */
-@import url(../../rsc/css/img.css);	/* Import standard image styles */
-@import url(../../rsc/css/blog_elements.css);	/* Import standard blog elements styles */
-@import url(../../rsc/css/forms.css);	/* Import default form styles */
-@import url(../../rsc/css/comments.css);	/* Import default comment styles */
-
- 
 /* ----------------------------------------------
    HTML ELEMENTS
 ------------------------------------------------- */ 
@@ -861,4 +854,33 @@ div.log_container div.log_error, div.action_messages div.log_error, div.error, t
 	background:#1A1A1A none repeat scroll 0 0;
 	border:1px solid #DD9999;
 	color:#EE0000;
+}
+
+div.input input, ul.ui-autocomplete {
+	font: 11px Verdana,Tahoma,sans-serif;
+}
+
+/* jQuery Tokeninput plugin */
+div.input ul.token-input-list-facebook {
+	width: 401px;
+	padding: 3px 0;
+	background: #0C0C0C;
+	border: 1px solid #1C1C1C;
+}
+
+table.rating_summary tr {
+	height: auto;
+}
+table.rating_summary th {
+	height: auto;
+	border: 0;
+}
+
+/* Not published comments display */
+#styled_content_block .bComment .status_draft,
+#styled_content_block .bComment .status_review,
+#styled_content_block .bComment .status_community,
+#styled_content_block .bComment .status_protected,
+#styled_content_block .bComment .status_private {
+	left: 6px;
 }

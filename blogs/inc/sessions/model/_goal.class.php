@@ -47,8 +47,7 @@ class Goal extends DataObject
 				array( 'table'=>'T_track__goalhit', 'fk'=>'ghit_goal_ID', 'msg'=>T_('%d related goal hits') ),
 			);
 
-  	$this->delete_cascades = array(
-			);
+		$this->delete_cascades = array();
 
  		if( $db_row )
 		{
@@ -174,37 +173,8 @@ class Goal extends DataObject
 
 /*
  * $Log$
- * Revision 1.11  2011/09/07 22:44:41  fplanque
- * UI cleanup
- *
- * Revision 1.9  2009/09/20 20:07:19  blueyed
- *  - DataObject::dbexists quotes always
- *  - phpdoc fixes
- *  - style fixes
- *
- * Revision 1.8  2009/09/19 20:49:51  fplanque
- * Cleaner way of implementing permissions.
- *
- * Revision 1.7  2009/09/14 13:38:10  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.6  2009/09/02 22:50:50  efy-maxim
- * Clean error message for currency/goal already exists
- *
- * Revision 1.5  2009/08/30 17:27:03  fplanque
- * better NULL param handling all over the app
- *
- * Revision 1.4  2009/08/30 14:00:53  fplanque
- * simpler form processing
- *
- * Revision 1.3  2009/08/30 00:30:52  fplanque
- * increased modularity
- *
- * Revision 1.2  2008/05/26 19:26:32  fplanque
- * minor
- *
- * Revision 1.1  2008/04/20 13:13:36  fplanque
- * no message
+ * Revision 1.13  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

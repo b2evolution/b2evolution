@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -46,8 +46,21 @@ class AdminUI extends AdminUI_general
 	 */
 	function init_templates()
 	{
+		global $Hit;
 		// This is included before controller specifc require_css() calls:
+		require_css( 'basic_styles.css', 'rsc_url' ); // the REAL basic styles
+		require_css( 'basic.css', 'rsc_url' ); // Basic styles
+		require_css( 'results.css', 'rsc_url' ); // Results/tables styles
+		require_css( 'item_base.css', 'rsc_url' ); // Default styles for the post CONTENT
+		require_css( 'fileman.css', 'rsc_url' ); // Filemanager styles
+		require_css( 'admin.global.css', 'rsc_url' ); // Basic admin styles
 		require_css( 'skins_adm/evo/rsc/css/style.css', true );
+
+		if ( $Hit->is_IE() )
+		{
+			require_css( 'admin_global_ie.css', 'rsc_url' );
+		}
+
 		require_js( '#jquery#', 'rsc_url' );
 		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
 	}
@@ -102,7 +115,7 @@ class AdminUI extends AdminUI_general
 
 		$r .= "</div>\n";	// Close right col.
 
-		$r .= '<img src="'.$rsc_url.'/img/blank.gif" width="1" height="1" alt="" />';
+		$r .= get_icon( 'pixel' );
 
 		return $r;
 	}
@@ -185,59 +198,8 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
- * Revision 1.41  2011/09/24 07:31:47  efy-yurybakh
- * delete children objects from T_comments__votes
- *
- * Revision 1.40  2011/09/24 06:00:03  efy-yurybakh
- * star rating plugin (backoffice)
- *
- * Revision 1.39  2011/09/04 22:13:25  fplanque
- * copyright 2011
- *
- * Revision 1.38  2010/11/25 15:16:35  efy-asimo
- * refactor $Messages
- *
- * Revision 1.37  2010/02/08 17:56:48  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.36  2009/10/12 23:56:27  blueyed
- * Cleanup of messages handling, forgot to commit this.
- *
- * Revision 1.35  2009/10/12 22:11:28  blueyed
- * Fix blank.gif some: use conditional comments, where marked as being required for IE. Add ALT tags and close tags.
- *
- * Revision 1.34  2009/08/31 17:21:32  fplanque
- * minor
- *
- * Revision 1.33  2009/05/18 02:59:16  fplanque
- * Skins can now have an item.css file to specify content formats. Used in TinyMCE.
- * Note there are temporarily too many CSS files.
- * Two ways of solving is: smart resource bundles and/or merge files that have only marginal benefit in being separate
- *
- * Revision 1.32  2009/04/21 19:19:50  blueyed
- * doc/normalization
- *
- * Revision 1.31  2009/03/08 23:57:58  fplanque
- * 2009
- *
- * Revision 1.30  2009/03/07 21:35:03  blueyed
- * Fix indent, nuke globals.
- *
- * Revision 1.29  2009/01/01 02:19:26  blueyed
- * fix RECOMMIT
- *
- * Revision 1.28  2009/01/01 02:18:25  blueyed
- * RECOMMIT (1.26): Drop CSS title 'Blue', which is not required/used for skins_adm/evo/rsc/css/style.css
- *
- * Revision 1.27  2008/12/30 23:00:41  fplanque
- * Major waste of time rolling back broken black magic! :(
- * 1) It was breaking the backoffice as soon as $admin_url was not a direct child of $baseurl.
- * 2) relying on dynamic argument decoding for backward comaptibility is totally unmaintainable and unreliable
- * 3) function names with () in log break searches big time
- * 4) complexity with no purpose (at least as it was)
- *
- * Revision 1.24  2008/01/22 14:31:06  fplanque
- * minor
+ * Revision 1.43  2013/11/06 08:05:52  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

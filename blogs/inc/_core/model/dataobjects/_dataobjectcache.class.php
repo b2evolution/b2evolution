@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -96,7 +96,16 @@ class DataObjectCache
 	 * @var string SQL name field (not necessarily with the object).
 	 */
 	var $name_field;
+
+	/**
+	 * @var string SQL ORDER BY.
+	 */
 	var $order_by;
+
+	/**
+	 * @var string SQL additional SELECT fields.
+	 */
+	var $select;
 
 	/**
 	 * The text that gets used for the "None" option in the objects options list.
@@ -134,8 +143,9 @@ class DataObjectCache
 	 * @param string field names or NULL to use name field
 	 * @param string The text that gets used for the "None" option in the objects options list (Default: T_('None')).
 	 * @param mixed  The value that gets used for the "None" option in the objects options list.
+	 * @param string Additional part for SELECT clause of sql query
 	 */
-	function DataObjectCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname, $name_field = NULL, $order_by = '', $allow_none_text = NULL, $allow_none_value = '' )
+	function DataObjectCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname, $name_field = NULL, $order_by = '', $allow_none_text = NULL, $allow_none_value = '', $select = '' )
 	{
 		$this->objtype = $objtype;
 		$this->load_all = $load_all;
@@ -144,6 +154,7 @@ class DataObjectCache
 		$this->dbIDname = $dbIDname;
 		$this->name_field = $name_field;
 		$this->none_option_value = $allow_none_value;
+		$this->select = $select;
 
 		if( empty( $order_by ) )
 		{
@@ -292,8 +303,13 @@ class DataObjectCache
 	 */
 	function get_SQL_object($title = NULL)
 	{
+		$select = '';
+		if( !empty( $this->select ) )
+		{	// Additional select fields
+			$select = ', '.$this->select;
+		}
 		$SQL = new SQL( $title );
-		$SQL->SELECT( '*' );
+		$SQL->SELECT( '*'.$select );
 		$SQL->FROM( $this->dbtablename );
 		$SQL->ORDER_BY( $this->order_by );
 		return $SQL;
@@ -694,6 +710,17 @@ class DataObjectCache
 		# 	unset($this->ID_array[$k]);
 		$this->ID_array = NULL;
 		unset( $this->cache[$req_ID] );
+		// remove Obj with req_ID from DataObject_array
+		$remove_index = 0;
+		foreach( $this->DataObject_array as $DataObject )
+		{
+			if( $DataObject->ID == $req_ID )
+			{
+				break;
+			}
+			$remove_index++;
+		}
+		unset( $this->DataObject_array[$remove_index] );
 	}
 
 
@@ -832,10 +859,7 @@ class DataObjectCache
 			{  // if the country is preferred we add it to selected array.
 				$pref_countries[] = $loop_Obj;
 			}
-			else
-			{ // If it is not preferred it will get here $rest_countries
 			$rest_countries[] = $loop_Obj;
-			}
 
 		}
 
@@ -927,145 +951,8 @@ class DataObjectCache
 
 /*
  * $Log$
- * Revision 1.32  2011/10/19 15:19:01  efy-vitalij
- * added comments to get_group_country_option_list function
+ * Revision 1.34  2013/11/06 08:03:47  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.31  2011/10/19 03:22:31  fplanque
- * doc
- *
- * Revision 1.30  2011/10/11 02:05:41  fplanque
- * i18n/wording cleanup
- *
- * Revision 1.29  2011/09/23 18:02:10  fplanque
- * minor
- *
- * Revision 1.28  2011/09/23 12:09:50  efy-vitalij
- * add get_group_country_option_list function for generation countries select list with groups
- *
- * Revision 1.27  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.26  2010/07/26 06:52:15  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.25  2010/05/02 00:11:09  blueyed
- * DataObjectCache: add cache_name, to cache results for/from get_by_name.
- *
- * Revision 1.24  2010/03/12 00:17:08  blueyed
- * Support list of defaults for get_option_list. Patch by yabs.
- *
- * Revision 1.23  2010/02/26 17:25:20  fplanque
- * This one did look like a massive replace side-effect. Am I mistaken?
- *
- * Revision 1.22  2010/02/08 17:51:50  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.21  2010/01/30 18:55:16  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.20  2009/12/11 23:18:23  fplanque
- * doc
- *
- * Revision 1.19  2009/12/06 22:20:29  blueyed
- * DataObjectCache:
- *  - Fix get_next to return first element on first call
- *  - use SQL object internally, which makes it easy to extend
- *  - cache ID_array (from get_ID_array)
- *  - adds new methods: load_by_sql, load_where, get_SQL_object, get_list,
- *    rewind
- *  - Add test for get_next
- *
- * Revision 1.18  2009/12/01 20:53:39  blueyed
- * indent
- *
- * Revision 1.17  2009/12/01 02:04:45  fplanque
- * minor
- *
- * Revision 1.16  2009/11/30 22:59:32  blueyed
- * DataObjectCache: Add instantiate_list. load_list: remove already loaded objects from SQL query.
- *
- * Revision 1.15  2009/11/30 00:22:04  fplanque
- * clean up debug info
- * show more timers in view of block caching
- *
- * Revision 1.14  2009/10/19 21:50:36  blueyed
- * doc
- *
- * Revision 1.13  2009/09/20 13:46:47  blueyed
- * doc
- *
- * Revision 1.12  2009/09/05 18:17:40  tblue246
- * DataObjectCache/BlogCache::get_option_list(): Back again... Allow custom value for "None" option and use 0 for BlogCache.
- *
- * Revision 1.10  2009/09/03 15:51:51  tblue246
- * Doc, "refix", use "0" instead of an empty string for the "No blog" option.
- *
- * Revision 1.9  2009/03/15 20:35:18  fplanque
- * Universal Item List proof of concept
- *
- * Revision 1.8  2009/03/08 23:57:40  fplanque
- * 2009
- *
- * Revision 1.7  2009/01/25 14:05:08  tblue246
- * DataObjectCache::load_list(): Allow loading all objects except those given
- *
- * Revision 1.6  2009/01/23 22:08:12  tblue246
- * - Filter reserved post types from dropdown box on the post form (expert tab).
- * - Indent/doc fixes
- * - Do not check whether a post title is required when only e. g. switching tabs.
- *
- * Revision 1.5  2008/12/22 01:56:54  fplanque
- * minor
- *
- * Revision 1.4  2008/09/28 05:05:07  fplanque
- * minor
- *
- * Revision 1.3  2008/09/26 19:02:30  tblue246
- * Do not instantiate NULL "objects" in the cache (fixes http://forums.b2evolution.net/viewtopic.php?t=15973)
- *
- * Revision 1.2  2008/01/21 09:35:24  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 10:58:56  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.31  2007/05/09 01:00:39  fplanque
- * minor
- *
- * Revision 1.30  2007/04/26 00:11:09  fplanque
- * (c) 2007
- *
- * Revision 1.29  2007/02/12 15:42:40  fplanque
- * public interface for looping over a cache
- *
- * Revision 1.28  2006/12/29 01:10:06  fplanque
- * basic skin registering
- *
- * Revision 1.27  2006/12/24 01:09:55  fplanque
- * Rollback. Non geeks do not know how to use select multiple.
- * Checkbox lists should be used instead.
- * The core does. There is not reason for plugins not to do so also.
- *
- * Revision 1.24  2006/12/12 02:53:56  fplanque
- * Activated new item/comments controllers + new editing navigation
- * Some things are unfinished yet. Other things may need more testing.
- *
- * Revision 1.23  2006/12/05 01:35:27  blueyed
- * Hooray for less complexity and the 8th param for DataObjectCache()
- *
- * Revision 1.22  2006/12/05 00:59:46  fplanque
- * doc
- *
- * Revision 1.21  2006/12/05 00:34:39  blueyed
- * Implemented custom "None" option text in DataObjectCache; Added for $ItemStatusCache, $GroupCache, UserCache and BlogCache; Added custom text for Item::priority_options()
- *
- * Revision 1.20  2006/11/24 18:27:24  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.19  2006/11/10 20:14:42  blueyed
- * TODO
- *
- * Revision 1.18  2006/10/13 09:58:53  blueyed
- * Removed bogus unset()
  */
 ?>

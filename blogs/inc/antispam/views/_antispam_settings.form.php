@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -43,9 +43,7 @@ global $Plugins;
 
 $Form = new Form( NULL, 'antispam_checkchanges' );
 
-$Form->global_icon( T_('Antispam blacklist').' &raquo;', NULL, '?ctrl=antispam', NULL, 0, 5 );
-
-$Form->begin_form( 'fform', T_('Antispam Settings') );
+$Form->begin_form( 'fform' );
 
 $Form->add_crumb( 'antispam' );
 $Form->hiddens_by_key( get_memorized() );
@@ -98,37 +96,8 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
- * Revision 1.8  2011/09/04 22:13:13  fplanque
- * copyright 2011
+ * Revision 1.10  2013/11/06 08:03:48  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.7  2010/02/14 14:18:39  efy-asimo
- * insert manual links
- *
- * Revision 1.6  2010/02/08 17:52:06  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.5  2010/01/02 21:12:27  fplanque
- * fat reduction / cleanup
- *
- * Revision 1.4  2009/03/08 23:57:41  fplanque
- * 2009
- *
- * Revision 1.3  2008/04/04 17:02:21  fplanque
- * cleanup of global settings
- *
- * Revision 1.2  2008/01/21 09:35:25  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/09/04 14:56:20  fplanque
- * antispam cleanup
- *
- * Revision 1.1  2007/06/25 10:59:23  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.7  2007/04/26 00:11:12  fplanque
- * (c) 2007
- *
- * Revision 1.6  2006/11/24 18:27:26  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

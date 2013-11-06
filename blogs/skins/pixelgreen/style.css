@@ -6,9 +6,6 @@
    VERSION:          1.2
 	LAST MODIFIED:    June-05-2007
  *******************************************/
-@import url("../../rsc/css/basic.css");	/* Import basic styles */
-@import url("../../rsc/css/blog_base.css");	/* Default styles for the blog navigation */
-@import url("../../rsc/css/item_base.css");	/* Default styles for the post CONTENT */
 
 /********************************************
    HTML ELEMENTS
@@ -58,13 +55,11 @@ img.float-left {
 
 div.codeblock {
   margin: 1ex 2ex 1ex 3ex;
-  padding: 10px;
   text-align: left;
   overflow: auto;
   font: 500 1em/1.5em 'Lucida Console', 'courier new', monospace;
   /* white-space: pre; */
   background: #FAFAFA;
-  border: 1px solid #f2f2f2;
   border-left: 3px solid #72A545;
 }
 acronym {
@@ -118,7 +113,7 @@ form.search {
 }
 form.search p { margin:0; padding: 0; }
 form.search input.SearchField {
-	width: 195px;
+	width: 160px;
 	color: #333;
 	height: 20px;
 	padding: 2px;
@@ -297,8 +292,17 @@ div.top_menu ul {
 	border-bottom: 1px solid #f2f2f2;
 	font: normal 1.5em 'Trebuchet MS', Tahoma, Sans-serif;
 }
+#main h3.bTitle.linked a {
+	color: #555555;
+}
+#main ul {
+	padding-left: 4px;
+	margin-left: 4px;
+}
 #main ul li {
-	list-style-image: url('img/bullet.gif');
+	list-style: none;
+	background: url(img/icons.gif) no-repeat 0 -33px;
+	padding-left: 17px;
 }
 
 .post {
@@ -318,16 +322,15 @@ div.top_menu ul {
   margin: 3px;
 }
 .post .post-footer .date {
-	background: url('img/clock.gif') no-repeat 0 center;
-	padding-left: 20px; margin: 0 10px 0 5px;
+	background: url('img/icons.gif') no-repeat 3px 1px;
+	padding-left: 22px;
 }
 .post .post-footer .comments {
-	background: url('img/comment.gif') no-repeat 0 center;
-	padding-left: 20px; margin: 0 10px 0 5px;
+	background: url('img/icons.gif') no-repeat 0 -15px;
+	padding-left: 19px; margin: 0 2px 0 2px;
 }
-.post .post-footer .readmore {
-	background: url('img/page.gif') no-repeat 0 center;
-	padding-left: 20px; margin: 0 10px 0 5px;
+.post .post-footer .comments a {
+	background: none;
 }
 
 /* footer */
@@ -393,3 +396,51 @@ td.bCalendarCell, td.bCalendarLinkPost, td.bCalendarEmptyCell {
   width: 5.5ex;
 }
 
+div.input input, ul.ui-autocomplete {
+	font: 12px "Trebuchet MS",Tahoma,sans-serif;
+}
+
+div.item_location {
+	margin: 1ex 15px;
+}
+.item_custom_fields {
+	margin-left: 15px;
+}
+
+form#login_form {
+	background: none;
+	border: none;
+}
+
+/* jQuery Tokeninput plugin */
+#main div.input ul.token-input-list-facebook {
+	width: 360px;
+	margin: 0;
+	border-color: #EEEEEE;
+	background-color: #FFF;
+}
+#main div.input ul.token-input-list-facebook li {
+	background: none;
+	padding-left: 3px;
+}
+#main div.input ul.token-input-list-facebook li.token-input-token-facebook {
+	background-color: #EFF2F7;
+}
+
+/* Not published comments display */
+#styled_content_block .bComment .status_draft,
+#styled_content_block .bComment .status_review,
+#styled_content_block .bComment .status_community,
+#styled_content_block .bComment .status_protected,
+#styled_content_block .bComment .status_private {
+	top: 0px;
+	left: 11px;
+}
+/* Not published posts display */
+#styled_content_block .bTitle .status_draft,
+#styled_content_block .bTitle .status_review,
+#styled_content_block .bTitle .status_community,
+#styled_content_block .bTitle .status_protected,
+#styled_content_block .bTitle .status_private {
+	top: 24px;
+}

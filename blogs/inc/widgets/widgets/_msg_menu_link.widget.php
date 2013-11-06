@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -106,6 +106,13 @@ class msg_menu_link_Widget extends ComponentWidget
 					'options' => $msg_menu_link_widget_link_types,
 					'defaultvalue' => 'messages',
 				),
+				'link_text' => array(
+					'label' => T_( 'Link text' ),
+					'note' => T_('Text to use for the link (leave empty for default).'),
+					'type' => 'text',
+					'size' => 20,
+					'defaultvalue' => '',
+				),
 				'show_to' => array(
 					'label' => T_( 'Show to' ),
 					'note' => '',
@@ -165,16 +172,21 @@ class msg_menu_link_Widget extends ComponentWidget
 		switch(	$this->disp_params[ 'link_type' ] )
 		{
 			case 'messages':
-				$url = get_messaging_url( 'threads' );
+				$url = get_dispctrl_url( 'threads' );
 				$text = T_( 'Messages' );
 				break;
 
 			case 'contacts':
-				$url = get_messaging_url( 'contacts' );
+				$url = get_dispctrl_url( 'contacts' );
 				$text = T_( 'Contacts' );
 				// set show badge to 0, this way make sure badge won't be displayed
 				$this->disp_params[ 'show_badge' ] = 0;
 				break;
+		}
+
+		if( !empty( $this->disp_params[ 'link_text' ] ) )
+		{
+			$text = $this->disp_params[ 'link_text' ];
 		}
 
 		if( ( $this->disp_params[ 'show_badge' ] ) && ( $unread_messages_count > 0 ) )
@@ -190,7 +202,7 @@ class msg_menu_link_Widget extends ComponentWidget
 		echo $this->disp_params['list_start'];
 
 		echo $this->disp_params['item_start'];
-		echo '<a href="'.$url.'">'.$text.'</a>'.$badge;
+		echo '<a href="'.$url.'">'.$text.$badge.'</a>';
 		echo $this->disp_params['item_end'];
 
 		echo $this->disp_params['list_end'];
@@ -202,10 +214,8 @@ class msg_menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
- * Revision 1.2  2011/10/19 03:51:20  fplanque
- * minor
- *
- * Revision 1.1  2011/10/11 05:52:15  efy-asimo
- * Messages menu link widget
+ * Revision 1.4  2013/11/06 08:05:09  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
+?>

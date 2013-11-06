@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -120,13 +120,15 @@ class Hitlist
 		 */
 		global $DB;
 		global $Debuglog, $Settings, $localtimenow;
-		global $Plugins;
+		global $Plugins, $Messages;
 
 		// Prune when $localtime is a NEW day (which will be the 1st request after midnight):
 		$last_prune = $Settings->get( 'auto_prune_stats_done' );
 		if( $last_prune >= date('Y-m-d', $localtimenow) && $last_prune <= date('Y-m-d', $localtimenow+86400) )
 		{ // Already pruned today (and not more than one day in the future -- which typically never happens)
-			return T_('Pruning has already been done today');
+			$message = T_('Pruning has already been done today');
+			$Messages->add( $message, 'error' );
+			return $message;
 		}
 
 		$time_prune_before = ($localtimenow - ($Settings->get('auto_prune_stats') * 86400)); // 1 day = 86400 seconds
@@ -136,7 +138,7 @@ class Hitlist
 			WHERE hit_datetime < '".date('Y-m-d', $time_prune_before)."'", 'Autopruning hit log' );
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_hitlog.', 'request' );
 
-		// Prune for internal searches
+/*		// Prune for internal searches
 		$rows_affected = $DB->query( "
 			DELETE FROM T_logs__internal_searches 
 			WHERE isrch_hit_ID not in 
@@ -148,7 +150,7 @@ class Hitlist
 		// Optimizing tables
 		// fp> TODO see if we want to do this here
 		$DB->query('OPTIMIZE TABLE T_logs__internal_searches');
-		
+*/
 		
 		// Prune sessions that have timed out and are older than auto_prune_stats
 		$sess_prune_before = ($localtimenow - $Settings->get( 'timeout_sessions' ));
@@ -156,7 +158,7 @@ class Hitlist
 		// allow plugins to prune session based data
 		$Plugins->trigger_event( 'BeforeSessionsDelete', $temp_array = array( 'cutoff_timestamp' => $smaller_time ) );
 
-		$rows_affected = $DB->query( 'DELETE FROM T_sessions WHERE sess_lastseen < '.$DB->quote(date('Y-m-d H:i:s', $smaller_time)), 'Autoprune sessions' );
+		$rows_affected = $DB->query( 'DELETE FROM T_sessions WHERE sess_lastseen_ts < '.$DB->quote(date('Y-m-d H:i:s', $smaller_time)), 'Autoprune sessions' );
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_sessions.', 'request' );
 
 		// Prune non-referrered basedomains (where the according hits got deleted)
@@ -179,74 +181,15 @@ class Hitlist
 		$Settings->set( 'auto_prune_stats_done', date('Y-m-d H:i:s', $localtimenow) ); // save exact datetime
 		$Settings->dbupdate();
 
+		$Messages->add( T_('The old hits & sessions have been pruned.'), 'success' );
 		return ''; /* ok */
 	}
 }
 
 /*
  * $Log$
- * Revision 1.27  2011/09/14 20:19:49  fplanque
- * cleanup
+ * Revision 1.29  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.26  2011/09/12 16:44:33  lxndral
- * internal searches fix
- *
- * Revision 1.25  2011/09/10 22:03:45  fplanque
- * doc
- *
- * Revision 1.24  2011/09/09 23:05:08  lxndral
- * Search for "fp>al" in code to find my comments and please make requested changed
- *
- * Revision 1.23  2011/09/04 22:13:18  fplanque
- * copyright 2011
- *
- * Revision 1.22  2010/02/08 17:53:55  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.21  2009/12/08 22:38:13  fplanque
- * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
- *
- * Revision 1.20  2009/11/30 00:22:05  fplanque
- * clean up debug info
- * show more timers in view of block caching
- *
- * Revision 1.19  2009/11/15 19:05:43  fplanque
- * no message
- *
- * Revision 1.18  2009/11/11 23:32:27  blueyed
- * Hitlist::dbprune: also prune if last prune is more than 1 day in the future.
- *
- * Revision 1.17  2009/09/19 12:57:20  blueyed
- * Hitlist: Optimize tables after pruning entries.
- *
- * Revision 1.16  2009/09/19 12:52:54  blueyed
- * Remove obsolete entries from T_ user agents when pruning hitlog info.
- *
- * Revision 1.15  2009/09/14 18:37:07  fplanque
- * doc/cleanup/minor
- *
- * Revision 1.14  2009/09/13 21:26:50  blueyed
- * SQL_NO_CACHE for SELECT queries using T_hitlog
- *
- * Revision 1.13  2009/07/06 22:55:11  fplanque
- * minor
- *
- * Revision 1.12  2009/07/06 12:44:59  yabs
- * Modifying BeforeSessionsDelete behaviour
- *
- * Revision 1.11  2009/07/05 00:50:29  fplanque
- * no message
- *
- * Revision 1.10  2009/07/04 08:01:49  yabs
- * doc
- *
- * Revision 1.9  2009/07/04 01:52:51  fplanque
- * doc
- *
- * Revision 1.8  2009/07/02 22:01:15  blueyed
- * Fix BeforeSessionsDelete: add it to base plugin class, test plugin and implement FPs requirements.
- *
- * Revision 1.7  2009/07/02 00:01:50  fplanque
- * needs optimization.
  */
 ?>

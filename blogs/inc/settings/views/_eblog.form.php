@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -23,7 +23,7 @@ global $current_User;
  */
 global $Settings;
 
-global $baseurl, $eblog_test_output, $comment_allowed_tags;
+global $Plugins, $baseurl, $eblog_test_output, $eblog_saved_test_mode_value, $comment_allowed_tags;
 
 
 $Form = new Form( NULL, 'remotepublish_checkchanges' );
@@ -59,10 +59,20 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('General settings').get_manual_link('blog_by_email') );
 
-	$Form->checkbox_input( 'eblog_enabled', $Settings->get('eblog_enabled'), T_('Enable Post by email'),
-		array( 'note' => sprintf(T_('Note: This feature needs the php_imap extension (currently %s).' ), extension_loaded('imap') ? T_('loaded') : T_('NOT loaded')) ) );
+	if( extension_loaded( 'imap' ) )
+	{
+		$imap_extenssion_status = T_('(INSTALLED)');
+	}
+	else
+	{
+		$imap_extenssion_status = '<b class="red">'.T_('(NOT INSTALLED)').'</b>';
+	}
 
-	$Form->checkbox_input( 'eblog_test_mode', $Settings->get('eblog_test_mode'), T_('Test Mode'),
+	$Form->checkbox_input( 'eblog_enabled', $Settings->get('eblog_enabled'), T_('Enable Post by email'),
+		array( 'note' => sprintf(T_('Note: This feature needs the php_imap extension %s.' ), $imap_extenssion_status) ) );
+
+	$eblog_test_mode_value = isset($eblog_saved_test_mode_value) ? $eblog_saved_test_mode_value : $Settings->get('eblog_test_mode');
+	$Form->checkbox_input( 'eblog_test_mode', $eblog_test_mode_value, T_('Test Mode'),
 				array( 'note' => T_('Check to run Post by Email in test mode. Nothing will be posted to the database nor will your inbox be altered.' ) ) );
 
 	// sam2kb> TODO: javascript to preset default eblog_server_port when eblog_method and/or eblog_encrypt change
@@ -89,7 +99,7 @@ $Form->begin_fieldset( T_('General settings').get_manual_link('blog_by_email') )
 				T_('Password'), array( 'maxlength' => 255, 'note' => T_('Password for authenticating on your mail server.') ) );
 
 	$Form->checkbox( 'eblog_delete_emails', $Settings->get('eblog_delete_emails'), T_('Delete processed emails'),
-				T_('Check this if you want processed messages to be deleted form server after successfull posting.') );
+				T_('Check this if you want processed messages to be deleted form server after successful processing.') );
 
 $Form->end_fieldset();
 
@@ -107,15 +117,18 @@ $Form->begin_fieldset( T_('Posting settings') );
 	$Form->checkbox( 'eblog_add_imgtag', $Settings->get('eblog_add_imgtag'), T_('Add &lt;img&gt; tags'),
 				T_('Display image attachments using &lt;img&gt; tags (instead of linking them through file manager).') );
 
-	$Form->checkbox( 'eblog_autobr', $Settings->get('eblog_autobr'), T_('Auto-BR'),
-				T_('Add &lt;br /&gt; tags at line endings. This setting is for <b>plain text</b> messages only.') );
-
 	$Form->text_input( 'eblog_subject_prefix', $Settings->get('eblog_subject_prefix'), 15,
 				T_('Subject Prefix'), T_('Email subject must start with this prefix to be imported, messages that don\'t have this tag will be skipped.'), array( 'maxlength' => 255 ) );
 
 	$Form->text_input( 'eblog_body_terminator', $Settings->get('eblog_body_terminator'), 15,
 				T_('Body Terminator'), T_('Starting from this string, everything will be ignored, including this string.').
 				'<br />'.T_('You can use this to remove signature from message body.'), array( 'maxlength' => 255 ) );
+
+	/* Automatically select a blog from where get plugins collection settings ( current_User should be able to create post on the selected blog )*/
+	$autoselect_blog = autoselect_blog( 'blog_post_statuses', 'edit' );
+	$BlogCache = & get_BlogCache();
+	$setting_Blog = & $BlogCache->get_by_ID( $autoselect_blog );
+	$Form->info( T_('Text Renderers'), $Plugins->get_renderer_checkboxes( $Settings->get('eblog_renderers'), array( 'name_prefix' => 'eblog_', 'Blog' => & $setting_Blog ) ) );
 
 $Form->end_fieldset();
 
@@ -142,11 +155,8 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
- * Revision 1.2  2011/10/18 07:28:12  sam2kb
- * Post by Email fixes
- *
- * Revision 1.1  2011/10/17 20:16:52  sam2kb
- * Post by Email converted into internal scheduled job
+ * Revision 1.4  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

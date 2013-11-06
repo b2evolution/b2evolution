@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -52,6 +52,13 @@ $params = array_merge( array(
 		'excerpt_image_limit'      => 1,
 		'excerpt_image_link_to'    => 'single',
 
+		'before_gallery'           => '<div class="bGallery">',
+		'after_gallery'            => '</div>',
+		'gallery_image_size'       => 'crop-80x80',
+		'gallery_image_limit'      => 1000,
+		'gallery_colls'            => 5,
+		'gallery_order'            => '', // Can be 'ASC', 'DESC', 'RAND' or empty
+
 		'before_url_link'          => '<p class="post_link">'.T_('Link:').' ',
 		'after_url_link'           => '</p>',
 		'url_link_text_template'   => '$url$', // If evaluates to empty, nothing will be displayed (except player if podcast)
@@ -74,6 +81,10 @@ $params = array_merge( array(
 		'page_links_start'         => '<p class="right">'.T_('Pages:').' ',
 		'page_links_end'           => '</p>',
 		'page_links_separator'     => '&middot; ',
+		'page_links_single'        => '',
+		'page_links_current_page'  => '#',
+		'page_links_pagelink'      => '%d',
+		'page_links_url'           => '',
 
 		'footer_text_mode'         => '#', // 'single', 'xml' or empty. Will detect 'single' from $disp automatically.
 		'footer_text_start'        => '<div class="item_footer">',
@@ -95,6 +106,7 @@ if( $content_mode == 'auto' )
 	switch( $disp_detail )
 	{
 		case 'posts-cat':
+		case 'posts-subcat':
 			$content_mode = $Blog->get_setting('chapter_content');
 			break;
 
@@ -137,6 +149,12 @@ switch( $content_mode )
 					'image_size'          => $params['excerpt_image_size'],
 					'limit'               => $params['excerpt_image_limit'],
 					'image_link_to'       => $params['excerpt_image_link_to'],
+					'before_gallery'      => $params['before_gallery'],
+					'after_gallery'       => $params['after_gallery'],
+					'gallery_image_size'  => $params['gallery_image_size'],
+					'gallery_image_limit' => $params['gallery_image_limit'],
+					'gallery_colls'       => $params['gallery_colls'],
+					'gallery_order'       => $params['gallery_order'],
 					'restrict_to_image_position' => 'teaser', // Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
 				) );
 		}
@@ -177,6 +195,12 @@ switch( $content_mode )
 					'image_size'          => $params['image_size'],
 					'limit'               => $params['image_limit'],
 					'image_link_to'       => $params['image_link_to'],
+					'before_gallery'      => $params['before_gallery'],
+					'after_gallery'       => $params['after_gallery'],
+					'gallery_image_size'  => $params['gallery_image_size'],
+					'gallery_image_limit' => $params['gallery_image_limit'],
+					'gallery_colls'       => $params['gallery_colls'],
+					'gallery_order'       => $params['gallery_order'],
 					// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
 					'restrict_to_image_position' => 'teaser',
 				) );
@@ -198,8 +222,15 @@ switch( $content_mode )
 
 			// Display CONTENT:
 			$Item->content_teaser( array(
-					'before'      => $params['before_content_teaser'],
-					'after'       => $params['after_content_teaser'],
+					'before'              => $params['before_content_teaser'],
+					'after'               => $params['after_content_teaser'],
+					'before_image'        => $params['before_image'],
+					'before_image_legend' => $params['before_image_legend'],
+					'after_image_legend'  => $params['after_image_legend'],
+					'after_image'         => $params['after_image'],
+					'image_size'          => $params['image_size'],
+					'limit'               => $params['image_limit'],
+					'image_link_to'       => $params['image_link_to'],
 				) );
 
 			$Item->more_link( array(
@@ -224,6 +255,12 @@ switch( $content_mode )
 						'image_size'          => $params['image_size'],
 						'limit'               => $params['image_limit'],
 						'image_link_to'       => $params['image_link_to'],
+						'before_gallery'      => $params['before_gallery'],
+						'after_gallery'       => $params['after_gallery'],
+						'gallery_image_size'  => $params['gallery_image_size'],
+						'gallery_image_limit' => $params['gallery_image_limit'],
+						'gallery_colls'       => $params['gallery_colls'],
+						'gallery_order'       => $params['gallery_order'],
 						// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
 						'restrict_to_image_position' => 'aftermore',
 					) );
@@ -236,7 +273,15 @@ switch( $content_mode )
 				) );
 
 			// Links to post pages (for multipage posts):
-			$Item->page_links( $params['page_links_start'], $params['page_links_end'], $params['page_links_separator'] );
+			$Item->page_links( array(
+					'before'      => $params['page_links_start'],
+					'after'       => $params['page_links_end'],
+					'separator'   => $params['page_links_separator'],
+					'single'      => $params['page_links_single'],
+					'current_page'=> $params['page_links_current_page'],
+					'pagelink'    => $params['page_links_pagelink'],
+					'url'         => $params['page_links_url'],
+				) );
 
 			// Display Item footer text (text can be edited in Blog Settings):
 			$Item->footer( array(
@@ -262,153 +307,21 @@ switch( $content_mode )
 				) );
 		}
 
+		// Display location info
+		$Item->location( '<div class="item_location"><strong>'.T_('Location').': </strong>', '</div>' );
+
+		if( $disp == 'single' )
+		{	// Display custom fields
+			$Item->custom_fields();
+		}
+
 		echo $params['content_end_full'];
 
 }
 /*
  * $Log$
- * Revision 1.43  2011/09/23 22:37:09  fplanque
- * minor / doc
- *
- * Revision 1.42  2011/09/21 06:42:11  sam2kb
- * code clean up + more params
- *
- * Revision 1.41  2011/09/19 17:47:17  fplanque
- * doc
- *
- * Revision 1.40  2011/09/17 23:38:56  sam2kb
- * doc
- *
- * Revision 1.39  2011/09/17 21:14:47  fplanque
- * doc
- *
- * Revision 1.38  2011/09/04 22:13:24  fplanque
- * copyright 2011
- *
- * Revision 1.37  2011/07/28 02:55:07  sam2kb
- * minor
- *
- * Revision 1.36  2011/07/28 02:53:00  sam2kb
- * Added "link_to" param to more link
- *
- * Revision 1.35  2011/06/09 00:11:48  sam2kb
- * Added missing params to $Item->images
- *
- * Revision 1.34  2010/12/18 00:23:05  fplanque
- * minor stuff & fixes
- *
- * Revision 1.33  2010/04/22 18:55:20  blueyed
- * An attempt to save views during shutdown.
- *
- * Revision 1.32  2010/03/14 21:38:22  sam2kb
- * minor
- *
- * Revision 1.31  2010/02/08 17:56:12  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.30  2010/01/31 19:23:43  blueyed
- * Item::has_content_parts: return true also if there are images with 'aftermore' position. This avoids having to add a MORE separator into an image-only post.
- *
- * Revision 1.29  2010/01/19 19:38:33  fplanque
- * minor
- *
- * Revision 1.28  2010/01/18 08:06:30  sam2kb
- * ~file renamed to ~attach
- *
- * Revision 1.27  2009/12/24 02:43:32  sam2kb
- * Added 'image_link_to' param to images()
- * See http://forums.b2evolution.net//viewtopic.php?t=20140
- *
- * Revision 1.26  2009/12/11 22:55:33  fplanque
- * Changing default of "Follow up:" to "..."
- *
- * Revision 1.25  2009/11/11 03:24:51  fplanque
- * misc/cleanup
- *
- * Revision 1.24  2009/11/10 02:44:38  fplanque
- * no message
- *
- * Revision 1.23  2009/11/04 04:34:16  sam2kb
- * Llimit the number of linked images displayed in excerpt and full modes
- *
- * Revision 1.22  2009/10/25 21:55:21  blueyed
- * Display attached images only once, if they are positioned as 'aftermore' and there is no 'more'.
- *
- * Revision 1.21  2009/10/11 03:00:11  blueyed
- * Add "position" and "order" properties to attachments.
- * Position can be "teaser" or "aftermore" for now.
- * Order defines the sorting of attachments.
- * Needs testing and refinement. Upgrade might work already, be careful!
- *
- * Revision 1.20  2009/10/10 20:10:34  blueyed
- * Some refactoring in Item class.
- * Add get_content_parts, has_content_parts and hidden_teaser.
- * Apart from making the code more readable, this allows for more
- * abstraction in the future, e.g. not storing this in the posts itself.
- *
- * This takes us to the "do not display linked files with teaser" feature:
- * Attached images and files are not displayed with teasers anymore, but
- * only with the full post.
- *
- * Revision 1.19  2009/09/28 23:58:16  blueyed
- * whitespace
- *
- * Revision 1.18  2009/09/11 18:29:26  blueyed
- * Fix indent
- *
- * Revision 1.17  2009/05/22 06:35:58  sam2kb
- * minor
- *
- * Revision 1.16  2009/05/21 13:05:59  fplanque
- * doc + moved attachments below post in skins
- *
- * Revision 1.15  2009/05/21 12:34:39  fplanque
- * Options to select how much content to display (excerpt|teaser|normal) on different types of pages.
- *
- * Revision 1.14  2009/05/21 04:53:37  sam2kb
- * Display a list of files attached to post
- * See http://forums.b2evolution.net/viewtopic.php?t=18749
- *
- * Revision 1.13  2009/05/19 14:34:32  fplanque
- * Category, tag, archive and serahc page snow only display post excerpts by default. (Requires a 3.x skin; otherwise the skin will display full posts as before). This can be controlled with the ''content_mode'' param in the skin tags.
- *
- * Revision 1.12  2009/03/08 23:57:56  fplanque
- * 2009
- *
- * Revision 1.11  2009/01/21 23:30:12  fplanque
- * feature/intro posts display adjustments
- *
- * Revision 1.10  2008/09/15 10:44:17  fplanque
- * skin cleanup
- *
- * Revision 1.9  2008/05/26 19:22:07  fplanque
- * fixes
- *
- * Revision 1.8  2008/01/21 09:35:42  fplanque
- * (c) 2008
- *
- * Revision 1.7  2008/01/17 14:38:32  fplanque
- * Item Footer template tag
- *
- * Revision 1.6  2008/01/08 03:31:51  fplanque
- * podcast support
- *
- * Revision 1.5  2007/11/29 20:53:45  fplanque
- * Fixed missing url link in basically all skins ...
- *
- * Revision 1.4  2007/11/04 01:10:57  fplanque
- * skin cleanup continued
- *
- * Revision 1.3  2007/09/28 02:18:10  fplanque
- * minor
- *
- * Revision 1.2  2007/06/24 01:05:31  fplanque
- * skin_include() now does all the template magic for skins 2.0.
- * .disp.php templates still need to be cleaned up.
- *
- * Revision 1.1  2007/06/23 22:09:29  fplanque
- * feedback and item content templates.
- * Interim check-in before massive changes ahead.
+ * Revision 1.45  2013/11/06 08:05:36  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

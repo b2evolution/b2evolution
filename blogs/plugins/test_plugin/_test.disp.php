@@ -7,7 +7,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * @copyright (c)2009 by Yabba - {@link http://innervisiosn.org.uk/}.
  *
  * @license GNU General Public License 2 (GPL) - http://www.opensource.org/licenses/gpl-license.php
@@ -26,11 +26,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <?php
 /*
  * $Log$
- * Revision 1.2  2009/07/02 21:57:39  fplanque
- * no message
- *
- * Revision 1.1  2009/06/14 07:11:25  yabs
- * adding custom disp mode example
+ * Revision 1.3  2013/11/06 08:05:23  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

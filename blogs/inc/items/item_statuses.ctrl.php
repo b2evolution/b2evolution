@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -96,37 +96,8 @@ require $inc_path.'generic/inc/_generic_listeditor.php';
 
 /*
  * $Log$
- * Revision 1.11  2011/09/04 22:13:17  fplanque
- * copyright 2011
- *
- * Revision 1.10  2010/02/08 17:53:05  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.9  2010/01/30 18:55:28  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.8  2010/01/19 21:10:28  efy-yury
- * update: crumbs
- *
- * Revision 1.6  2009/12/12 01:13:08  fplanque
- * A little progress on breadcrumbs on menu structures alltogether...
- *
- * Revision 1.5  2009/12/06 22:55:16  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.4  2009/09/24 13:50:32  efy-sergey
- * Moved the Global Settings>Post types & Post statuses tabs to "Posts / Comments > Settings > Post types & Post statuses"
- *
- * Revision 1.3  2009/03/08 23:57:43  fplanque
- * 2009
- *
- * Revision 1.2  2008/01/21 09:35:31  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 11:00:23  fplanque
- * MODULES (refactored MVC)
+ * Revision 1.12  2013/11/06 08:04:15  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

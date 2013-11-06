@@ -74,6 +74,7 @@ if( version_compare( $app_version, '2.4.1' ) < 0 )
 	// Display message if no post:
 	display_if_empty();
 
+	echo '<div id="styled_content_block">'; // Beginning of posts display
 	while( $Item = & mainlist_get_item() )
 	{	// For each blog post:
 		// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
@@ -83,6 +84,7 @@ if( version_compare( $app_version, '2.4.1' ) < 0 )
 			) );
 		// ----------------------------END ITEM BLOCK  ----------------------------
 	}
+	echo '</div>'; // End of posts display
 
 	// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 	mainlist_page_links( array(

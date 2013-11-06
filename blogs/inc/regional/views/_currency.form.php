@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -42,7 +42,7 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'currency_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Delete this currency!'), 'delete', regenerate_url( 'action', 'action=delete' ) );
+$Form->global_icon( T_('Delete this currency!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('currency') ) );
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', $creating ?  T_('New currency') : T_('Currency') );
@@ -71,20 +71,8 @@ else
 
 /*
  * $Log$
- * Revision 1.7  2010/01/30 18:55:33  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.6  2010/01/03 12:03:17  fplanque
- * More crumbs...
- *
- * Revision 1.5  2009/09/03 23:52:34  fplanque
- * minor
- *
- * Revision 1.4  2009/09/03 18:29:29  efy-maxim
- * currency/country code validators
- *
- * Revision 1.3  2009/09/02 23:29:34  fplanque
- * doc
+ * Revision 1.9  2013/11/06 08:04:36  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

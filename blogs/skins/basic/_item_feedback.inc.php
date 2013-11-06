@@ -19,8 +19,15 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+// Default params:
+$params = array_merge( array(
+		'comment_start'        => '<div>',
+		'comment_end'          => '</div>',
+		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
+	), $params );
+
+
 global $c, $cookie_name, $cookie_email, $cookie_url, $comment_allowed_tags;
-global $comments_use_autobr;
 
 // Display filters:
 // You can change these and call this template multiple time if you want to separate comments from trackbacks
@@ -38,7 +45,7 @@ if( empty($c) )
 	$disp_comment_form = 0;			// DO NOT Display the comments form if not requested
 }
 
-if( empty($tb) || (!$Blog->get( 'allowtrackbacks' )) )
+if( empty($tb) || !$Item->can_receive_pings() )
 {	// Trackback not requested or not allowed
 	$disp_trackbacks = 0;				// DO NOT Display the trackbacks if not requested
 	$disp_trackback_url = 0;		// DO NOT Display the trackback URL if not requested
@@ -114,14 +121,16 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks )
 <h4><?php echo implode( ", ", $disp_title) ?>:</h4>
 
 <?php
-$CommentList = new CommentList2( $Blog );
+$comments_per_page = !$Blog->get_setting( 'threaded_comments' ) ? $Blog->get_setting( 'comments_per_page' ) : 1000;
+$CommentList = new CommentList2( $Blog, $comments_per_page );
 
 // Filter list:
 $CommentList->set_filters( array(
 		'types' => $type_list,
-		'statuses' => array ( 'published' ),
+		'statuses' => get_inskin_statuses(),
 		'post_ID' => $Item->ID,
 		'order' => $Blog->get_setting( 'comments_orderdir' ),
+		'threaded_comments' => $Blog->get_setting( 'threaded_comments' ),
 	) );
 
 // Get ready for display (runs the query):
@@ -132,41 +141,38 @@ $CommentList->display_if_empty( array(
 				T_('No %s for this post yet...'), implode( "/", $disp_title) ),
 	 ) );
 
+
+if( $Blog->get_setting( 'threaded_comments' ) )
+{	// Array to store the comment replies
+	global $CommentReplies;
+	$CommentReplies = array();
+}
+
 while( $Comment = & $CommentList->get_next() )
 {	// Loop through comments:
-	?>
-	<!-- ========== START of a COMMENT/TB/PB ========== -->
-	<?php $Comment->anchor() ?>
-	<h5>
-	<?php
-		switch( $Comment->get( 'type' ) )
+
+	if( $Blog->get_setting( 'threaded_comments' ) && $Comment->in_reply_to_cmt_ID > 0 )
+	{	// Store the replies in a special array
+		if( !isset( $CommentReplies[ $Comment->in_reply_to_cmt_ID ] ) )
 		{
-			case 'comment': // Display a comment:
-				echo T_('Comment from:') ?>
-				<?php $Comment->author() ?>
-				<?php $Comment->author_url( '', ' &middot; ', '' ) ?>
-				<?php break;
-
-			case 'trackback': // Display a trackback:
-				echo T_('Trackback from:') ?>
-				<?php $Comment->author( '', '#', '', '#', 'htmlbody', true ) ?>
-				<?php break;
-
-			case 'pingback': // Display a pingback:
-				echo T_('Pingback from:') ?>
-				<?php $Comment->author( '', '#', '', '#', 'htmlbody', true ) ?>
-				<?php break;
+			$CommentReplies[ $Comment->in_reply_to_cmt_ID ] = array();
 		}
+		$CommentReplies[ $Comment->in_reply_to_cmt_ID ][] = $Comment;
+		continue; // Skip dispay a comment reply here in order to dispay it after parent comment by function display_comment_replies()
+	}
 
-		$Comment->edit_link( ' &middot; ' ) // Link to backoffice for editing
-	?>
-	</h5>
-	<blockquote>
-		<small><?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?></small>
-		<div><?php $Comment->content() ?></div>
-	</blockquote>
-	<!-- ========== END of a COMMENT/TB/PB ========== -->
-	<?php
+	// ------------------ COMMENT INCLUDED HERE ------------------
+	skin_include( $params['comment_template'], array(
+			'Comment'         => & $Comment,
+			'comment_start'   => $params['comment_start'],
+			'comment_end'     => $params['comment_end'],
+		) );
+	// ---------------------- END OF COMMENT ---------------------
+
+	if( $Blog->get_setting( 'threaded_comments' ) )
+	{	// Display the comment replies
+		display_comment_replies( $Comment->ID, $params );
+	}
 }
 }
 

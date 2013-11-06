@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -69,6 +69,9 @@ class GeneralSettings extends AbstractSettings
 		'auto_prune_stats' => '15',         // days (T_hitlog and T_sessions)
 
 		'outbound_notifications_mode' => 'immediate', // 'immediate' is the safest mode for average installs (may be "off", "immediate" or "cron")
+		'notification_sender_email' => '', // notification emails will be sent from this email. The real default value is set in the constructor.
+		'notification_return_path' => '', // erroneous emails will be sent to this email address. The real default value is set in the constructor.
+		'notification_sender_name' => 'b2evo mailer', // notification emails will be sent with this sender name
 
 		'fm_enable_create_dir' => '1',
 		'fm_enable_create_file' => '1',
@@ -83,30 +86,63 @@ class GeneralSettings extends AbstractSettings
 		'fm_default_chmod_file' => '664',
 		'fm_default_chmod_dir' => '775',
 
+		// Image options
+		'exif_orientation' => '1',
+		'fm_resize_enable' => '1',
+		'fm_resize_width' => '1980',
+		'fm_resize_height' => '1080',
+
 		'newusers_canregister' => '0',
 		'newusers_mustvalidate' => '1',
-		'newusers_revalidate_emailchg' => '0',
+		'newusers_revalidate_emailchg' => '1',
+		'validation_process' => 'easy',
+		'activate_requests_limit' => '300', // Only one activation email can be sent to the same email address in the given interval ( value is in seconds )
 		'newusers_findcomments' => '1',
+		'after_email_validation' => 'return_to_original', // where to redirect after account activation. Values: return_to_original, or the previously set specific url
+		'after_registration' => 'return_to_original', // where to redirect after new user registration. Values: return_to_original redirect_to url, or return to the previously set specific url
 		'newusers_level' => '1',
 		'registration_require_gender' => 'optional',
 		'registration_ask_locale' => '0',
 
+		// Default user settings
+		'def_enable_PM' => '1',
+		'def_enable_email' => '0',
+		'def_notify_messages' => '1',
+		'def_notify_unread_messages' => '1',
+		'def_notify_published_comments' => '1',
+		'def_notify_comment_moderation' => '0',
+		'def_newsletter_news' => '1',
+		'def_newsletter_ads' => '0',
+		'def_notification_email_limit' => '3',
+		'def_newsletter_limit' => '1',
+
 		'allow_avatars' => 1,
+		'min_picture_size' => 160, // minimum profile picture dimensions in pixels (width and height)
 		'messages_link_to' => 'admin',		// message link on the notification email should link to the admin or to a blog
+
+		// Welcome private message
+		'welcomepm_enabled' => 0,
+		'welcomepm_from'    => 'admin',	// User login
+		'welcomepm_title'   => 'Welcome to our community!',
+		'welcomepm_message' => '',
 
 		'regexp_filename' => '^[a-zA-Z0-9\-_. ]+$', // TODO: accept (spaces and) special chars / do full testing on this
 		'regexp_dirname' => '^[a-zA-Z0-9\-_]+$', // TODO: accept spaces and special chars / do full testing on this
 		'reloadpage_timeout' => '300',
-		'smart_hit_count' => '0',
+		'smart_view_count' => '0',
 		'time_difference' => '0',
-		'timeout_sessions' => '604800',     // seconds (604800 == 7 days)
+		'timeout_sessions' => '604800',             // seconds (604800 == 7 days)
+		'timeout_online' => '1200',                 // seconds (1200 == 20 minutes)
 		'upload_enabled' => '1',
 		'upload_maxkb' => '10000',					// 10 MB
 		'evocache_foldername' => '.evocache',
+		'blogs_order_by' => 'ID',					// blogs order in backoffice menu and other places
+		'blogs_order_dir' => 'ASC',					// blogs order direction in backoffice menu and other places
 
 		'user_minpwdlen' => '5',
 		'js_passwd_hashing' => '1',					// Use JS password hashing by default
 		'passwd_special' => '0',					// Do not require a special character in password by default
+		'strict_logins' => 1,						// Allow only plain ACSII characters in user login
 
 		'webhelp_enabled' => '1',
 
@@ -116,30 +152,126 @@ class GeneralSettings extends AbstractSettings
 		'cross_posting' => 0,						// Allow additional categories from other blogs
 		'cross_posting_blog' => 0,					// Allow to choose main category from another blog
 
+		'subscribe_new_blogs' => 'public', // Subscribing to new blogs: 'page', 'public', 'all'
+
+		'system_lock' => 0,
 		'general_cache_enabled' => 0,
 		'newblog_cache_enabled' => 0,
 		'newblog_cache_enabled_widget' => 0,
 
+		//Default blogs skin setting
+		'def_normal_skin_ID' => '1',                // Default normal skin ID
+		'def_mobile_skin_ID' => '0',                // 0 means same as normal skin
+		'def_tablet_skin_ID' => '0',                // 0 means same as normal skin
+
 		// Post by Email
 		'eblog_enabled' => 0,
-		'eblog_method' => 'pop3',
+		'eblog_method' => 'imap',
 		'eblog_encrypt' => 'none',
-		'eblog_server_port' => 110,
+		'eblog_server_port' => 143,
 		'eblog_default_category' => 1,
 		'eblog_add_imgtag' => 0,
 		'eblog_body_terminator' => '___',
 		'eblog_subject_prefix' => 'blog:',
-		'eblog_autobr' => 0,
 		'eblog_html_tag_limit' => 1,
 		'eblog_delete_emails' => 1,
+		'eblog_renderers' => array('default'),
+
+		// Returned Emails
+		'repath_enabled' => 0,
+		'repath_method' => 'imap',
+		'repath_encrypt' => 'none',
+		'repath_server_port' => 143,
+		'repath_subject' => 'Returned mail:
+Mail delivery failed:
+Undelivered Mail Returned to Sender
+Delivery Status Notification (Failure)
+delayed 24 hours
+delayed 48 hours
+delayed 72 hours
+failure notice',
+		'repath_body_terminator' => '---------- Forwarded message ----------
+------ This is a copy of the message, including all the headers. ------
+----- Transcript of session follows -----
+Reporting-MTA:
+--- Below this line is a copy of the message.',
+		'repath_errtype' => 'C ^101
+C ^111
+T ^421
+T ^431
+T ^432
+T ^441
+T ^450
+T ^452
+C ^500
+C ^501
+C ^502
+C ^503
+C ^504
+T ^512
+T ^523
+P ^510
+P ^511
+S ^541
+S ^550[ \-]5\.4\.1
+P ^550([ \-]5\.1\.1)?
+C ^551
+S DNSBL
+S Blacklist
+S reputation
+S client host .* blocked
+S verification failed
+S verify failed
+S policy reasons
+S not authorized
+S refused
+S spammer
+S DYN:T1
+S (CON:B1)
+T currently suspended
+T temporarily disabled
+T unrouteable address
+T Mailbox is inactive
+T over quota
+T account has been disabled
+T timeout exceeded
+T quota exceeded
+T Delivery attempts will continue
+P is unavailable
+P not available
+P user doesn\'t have a .+ account
+P invalid recipient
+P does not like recipient
+P not our customer
+P no such user
+P addressee unknown
+P address rejected
+P permanent delivery error
+P permanent error
+P mailbox unavailable
+P no mailbox here by that name
+P mailbox has been blocked
+C relay denied
+C relaying denied
+C message size exceeds',
 
 		'general_xmlrpc' => 1,
 		'xmlrpc_default_title' => '',				// default title for posts created throgh blogger api
 
-		'nickname_editing' => 'edited-user',		// "never" - Never allow; "default-no" - Let users decide, default to "no" for new users; "default-yes" - Let users decide, default to "yes" for new users; "always" - Always allow
-		'multiple_sessions' => 'userset_default_no', // multiple sessions settings -- overriden for demo mode in contructor
+		'nickname_editing'   => 'edited-user',		// "never" - Never allow; "default-no" - Let users decide, default to "no" for new users; "default-yes" - Let users decide, default to "yes" for new users; "always" - Always allow
+		'firstname_editing'  => 'edited-user',		// "edited-user" - Can be edited by user; "edited-admin" - Can be edited by admins only, "hidden" - Hidden for all
+		'lastname_editing'   => 'edited-user',		// "edited-user" - Can be edited by user; "edited-admin" - Can be edited by admins only, "hidden" - Hidden for all
+		'location_country'   => 'optional', // Editing mode of country for user:   "optional" | "required" | "hidden"
+		'location_region'    => 'optional', // Editing mode of region for user:    "optional" | "required" | "hidden"
+		'location_subregion' => 'optional', // Editing mode of subregion for user: "optional" | "required" | "hidden"
+		'location_city'      => 'optional', // Editing mode of city for user:      "optional" | "required" | "hidden"
+		'minimum_age'        => '13', // Minimum age for user forms
+		'multiple_sessions'  => 'userset_default_no', // multiple sessions settings -- overriden for demo mode in contructor
+		'emails_msgform'     => 'adminset', // Receiving emails through a message form is allowed: "never" | "adminset" | "userset"
 
 	// Display options:
+		'use_gravatar' => 1, // Use gravatar if a user has not uploaded a profile picture
+		'default_gravatar' => 'b2evo', // Gravatar type: 'b2evo', '', 'identicon', 'monsterid', 'wavatar', 'retro'
 		'bubbletip' => 1, // Display bubletips in the Back-office
 		'bubbletip_size_admin' => 'fit-160x160', // Avatar size in the bubbletip in the Back-office
 		'bubbletip_size_front' => 'fit-160x160', // Avatar size in the bubbletip in the Front-office
@@ -167,7 +299,7 @@ class GeneralSettings extends AbstractSettings
 	 */
 	function GeneralSettings()
 	{
-		global $new_db_version, $DB, $demo_mode;
+		global $new_db_version, $DB, $demo_mode, $instance_name, $basehost;
 
 		$save_DB_show_errors = $DB->show_errors;
 		$save_DB_halt_on_error = $DB->halt_on_error;
@@ -202,6 +334,10 @@ class GeneralSettings extends AbstractSettings
 		{ // Demo mode requires to allow multiple concurrent sessions:
 			$this->_defaults['multiple_sessions'] = 'always';
 		}
+
+		// set those defaults which needs some global variables
+		$this->_defaults['notification_sender_email'] = $instance_name.'-noreply@'.preg_replace( '/^www\./i', '', $basehost );
+		$this->_defaults['notification_return_path'] = $instance_name.'-return@'.preg_replace( '/^www\./i', '', $basehost );
 	}
 
 
@@ -236,7 +372,7 @@ class GeneralSettings extends AbstractSettings
 		{
 			return parent::get( $parname );
 		}
-		
+
 		switch($parname)
 		{
 			case 'allow_avatars':
@@ -258,197 +394,8 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
- * Revision 1.46  2011/10/20 16:32:57  efy-asimo
- * Invalidate PageCaches after specific settings update
+ * Revision 1.48  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.45  2011/10/17 20:14:24  sam2kb
- * Post by Email converted into internal scheduled job
- *
- * Revision 1.44  2011/10/17 17:53:11  efy-yurybakh
- * Detect previous comments after email validation
- *
- * Revision 1.43  2011/10/11 06:38:50  efy-asimo
- * Add corresponding error messages when login required
- *
- * Revision 1.42  2011/10/06 06:18:29  efy-asimo
- * Add messages link to settings
- * Update messaging notifications
- *
- * Revision 1.41  2011/10/05 17:44:23  efy-yurybakh
- * Checks for disp=user & users
- *
- * Revision 1.40  2011/10/04 13:06:26  efy-yurybakh
- * Additional Display settings
- *
- * Revision 1.39  2011/09/10 21:37:53  fplanque
- * minor
- *
- * Revision 1.38  2011/09/06 16:25:17  efy-james
- * Require special chars in password
- *
- * Revision 1.37  2011/09/04 22:13:20  fplanque
- * copyright 2011
- *
- * Revision 1.36  2011/08/12 08:29:00  efy-asimo
- * Post view count - fix, and crazy view counting option
- *
- * Revision 1.35  2011/06/14 13:33:55  efy-asimo
- * in-skin register
- *
- * Revision 1.34  2011/03/15 09:34:05  efy-asimo
- * have checkboxes for enabling caching in new blogs
- * refactorize cache create/enable/disable
- *
- * Revision 1.33  2010/11/24 14:55:30  efy-asimo
- * Add user gender
- *
- * Revision 1.32  2010/11/03 19:44:15  sam2kb
- * Increased modularity - files_Module
- * Todo:
- * - split core functions from _file.funcs.php
- * - check mtimport.ctrl.php and wpimport.ctrl.php
- * - do not create demo Photoblog and posts with images (Blog A)
- *
- * Revision 1.31  2010/05/22 12:22:49  efy-asimo
- * move $allow_cross_posting in the backoffice
- *
- * Revision 1.30  2010/03/28 17:27:15  fplanque
- * changed upload default max kb
- *
- * Revision 1.29  2010/03/12 10:52:56  efy-asimo
- * Set EvoCache  folder names - task
- *
- * Revision 1.28  2010/02/08 17:53:55  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.27  2009/12/12 19:14:13  fplanque
- * made avatars optional + fixes on img props
- *
- * Revision 1.26  2009/12/06 22:55:21  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.25  2009/11/12 00:46:34  fplanque
- * doc/minor/handle demo mode
- *
- * Revision 1.24  2009/10/28 13:41:56  efy-maxim
- * default multiple sessions settings
- *
- * Revision 1.23  2009/10/26 12:59:36  efy-maxim
- * users management
- *
- * Revision 1.22  2009/10/25 19:24:51  efy-maxim
- * multiple_sessions param
- *
- * Revision 1.21  2009/10/25 19:20:30  efy-maxim
- * users settings
- *
- * Revision 1.20  2009/09/14 13:42:12  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.19  2009/09/02 13:47:32  waltercruz
- * Setting the default title fot posts created through blogger API
- *
- * Revision 1.18  2009/08/31 15:56:39  waltercruz
- * Adding setting to enable/disable xmlrc
- *
- * Revision 1.17  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.16  2009/02/22 16:55:27  blueyed
- * Add GeneralSettings::get_public_key_salt
- *
- * Revision 1.15  2009/01/28 21:23:23  fplanque
- * Manual ordering of categories
- *
- * Revision 1.14  2008/10/06 18:11:58  tblue246
- * Further blog by email fixes
- *
- * Revision 1.13  2008/10/06 11:02:27  tblue246
- * Blog by mail now supports POP3 & IMAP, SSL & TLS
- *
- * Revision 1.12  2008/10/05 10:55:46  tblue246
- * Blog by mail: We've only one working method => removed the drop-down box and added automatical change to pop3a.
- * The default value for this setting was in the wrong file, moved.
- *
- * Revision 1.11  2008/09/28 08:06:07  fplanque
- * Refactoring / extended page level caching
- *
- * Revision 1.10  2008/09/23 06:18:38  fplanque
- * File manager now supports a shared directory (/media/shared/global/)
- *
- * Revision 1.9  2008/04/04 17:02:22  fplanque
- * cleanup of global settings
- *
- * Revision 1.8  2008/02/19 11:11:19  fplanque
- * no message
- *
- * Revision 1.7  2008/01/21 09:35:34  fplanque
- * (c) 2008
- *
- * Revision 1.6  2007/11/28 17:29:44  fplanque
- * Support for getting updates from b2evolution.net
- *
- * Revision 1.5  2007/11/03 04:57:51  fplanque
- * no message
- *
- * Revision 1.4  2007/11/01 19:50:39  fplanque
- * minor
- *
- * Revision 1.3  2007/09/03 16:44:28  fplanque
- * chicago admin skin
- *
- * Revision 1.2  2007/07/01 18:47:11  fplanque
- * fixes
- *
- * Revision 1.1  2007/06/25 11:01:21  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.33  2007/05/26 21:30:54  blueyed
- * Allow spaces in filenames by default
- *
- * Revision 1.32  2007/04/26 00:11:02  fplanque
- * (c) 2007
- *
- * Revision 1.31  2007/04/10 17:55:09  fplanque
- * minor
- *
- * Revision 1.30  2007/03/25 13:20:52  fplanque
- * cleaned up blog base urls
- * needs extensive testing...
- *
- * Revision 1.29  2007/03/24 20:41:16  fplanque
- * Refactored a lot of the link junk.
- * Made options blog specific.
- * Some junk still needs to be cleaned out. Will do asap.
- *
- * Revision 1.28  2006/12/15 22:54:14  fplanque
- * allow disabling of password hashing
- *
- * Revision 1.27  2006/12/11 00:32:26  fplanque
- * allow_moving_chapters stting moved to UI
- * chapters are now called categories in the UI
- *
- * Revision 1.26  2006/12/07 15:23:42  fplanque
- * filemanager enhanced, refactored, extended to skins directory
- *
- * Revision 1.25  2006/12/07 00:55:52  fplanque
- * reorganized some settings
- *
- * Revision 1.24  2006/12/04 19:41:11  fplanque
- * Each blog can now have its own "archive mode" settings
- *
- * Revision 1.23  2006/12/04 18:16:50  fplanque
- * Each blog can now have its own "number of page/days to display" settings
- *
- * Revision 1.22  2006/11/24 18:27:25  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.21  2006/11/09 23:11:44  blueyed
- * Made chmod settings editable
- *
- * Revision 1.20  2006/10/06 21:03:06  blueyed
- * Removed deprecated/unused "upload_allowedext" Setting, which restricted file extensions during upload though!
  */
 ?>

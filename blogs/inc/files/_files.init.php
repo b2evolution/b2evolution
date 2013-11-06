@@ -2,13 +2,23 @@
 /**
  * This is the init file for the files module
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
  * @version $Id$
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+
+/**
+ * Minimum PHP version required for files module to function properly
+ */
+$required_php_version[ 'files' ] = '5.0';
+
+/**
+ * Minimum MYSQL version required for files module to function properly
+ */
+$required_mysql_version[ 'files' ] = '4.1';
 
 /**
  * Aliases for table names:
@@ -20,6 +30,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_files'               => $tableprefix.'files',
 		'T_filetypes'           => $tableprefix.'filetypes',
+		'T_files__vote'         => $tableprefix.'files__vote',
 	) );
 
 /**
@@ -40,6 +51,7 @@ $ctrl_mappings = array_merge( $ctrl_mappings, array(
 		'files'        => 'files/files.ctrl.php',
 		'fileset'      => 'files/file_settings.ctrl.php',
 		'filetypes'    => 'files/file_types.ctrl.php',
+		'filemod'      => 'files/file_moderation.ctrl.php',
 	) );
 
 
@@ -115,6 +127,8 @@ class files_Module extends Module
 	 */
 	function init()
 	{
+		$this->check_required_php_version( 'files' );
+
 		load_class( 'files/model/_file.class.php', 'File' );
 		load_class( 'files/model/_filetype.class.php', 'FileType' );
 		load_class( 'files/model/_filetypecache.class.php', 'FileTypeCache' );
@@ -420,7 +434,7 @@ $files_Module = new files_Module();
 
 
 /*
- * $Log$
+ * _files.init.php,v
  * Revision 1.16  2011/09/13 15:31:35  fplanque
  * Enhanced back-office navigation.
  *

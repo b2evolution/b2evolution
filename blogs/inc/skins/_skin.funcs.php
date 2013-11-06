@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -28,7 +28,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 // DEBUG: (Turn switch on or off to log debug info for specified category)
-$GLOBALS['debug_skins'] = false;
+$GLOBALS['debug_skins'] = true;
 
 
 /**
@@ -77,6 +77,8 @@ function skin_init( $disp )
 
 	global $Timer;
 
+	global $Messages, $PageCache;
+
 	$Timer->resume( 'skin_init' );
 
 	if( empty($disp_detail) )
@@ -100,6 +102,13 @@ function skin_init( $disp )
 			// Note: even if we request the same post as $Item above, the following will do more restrictions (dates, etc.)
 			// Init the MainList object:
 			init_MainList( $Blog->get_setting('posts_per_page') );
+
+			// Init post navigation
+			$post_navigation = $Skin->get_post_navigation();
+			if( empty( $post_navigation ) )
+			{
+				$post_navigation = $Blog->get_setting( 'post_navigation' );
+			}
 			break;
 	}
 
@@ -112,6 +121,8 @@ function skin_init( $disp )
 		case 'page':
 			init_ajax_forms(); // auto requires jQuery
 			init_ratings_js();
+			init_voting_comment_js();
+			init_scrollwide_js(); // Add jQuery Wide Scroll plugin
 
 			if( $disp == 'single' )
 			{
@@ -142,10 +153,33 @@ function skin_init( $disp )
 				{	// A certain post page has been requested, keep only this param and discard all others:
 					$canonical_url = url_add_param( $canonical_url, $page_param[1], '&' );
 				}
+				if( preg_match( '|[&?](mode=quote&[qcp]+=\d+)|', $ReqURI, $page_param ) )
+				{	// A quote of comment/post, keep only these params and discard all others:
+					$canonical_url = url_add_param( $canonical_url, $page_param[1], '&' );
+				}
 
-				if( ! is_same_url( $ReqURL, $canonical_url) )
+				if( ! is_same_url( $ReqURL, $canonical_url ) )
 				{	// The requested URL does not look like the canonical URL for this post...
-					if( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' && ( ! $Item->check_cross_post_nav( 'auto', $Blog->ID ) ) )
+					// url difference was resolved
+					$url_resolved = false;
+					// Check if the difference is because of an allowed post navigation param
+					if( preg_match( '|[&?]cat=(\d+)|', $ReqURI, $cat_param ) )
+					{ // A category post navigation param is set
+						$extended_url = '';
+						if( ( $post_navigation == 'same_category' ) && ( isset( $cat_param[1] ) ) )
+						{ // navigatie through posts from the same category
+							$category_ids = postcats_get_byID( $Item->ID );
+							if( in_array($cat_param[1], $category_ids ) )
+							{ // cat param is one of this Item categories
+								$extended_url = $Item->add_navigation_param( $canonical_url, $post_navigation, $cat_param[1], '&' );
+								// Set MainList navigation target to the requested category
+								$MainList->nav_target = $cat_param[1];
+							}
+						}
+						$url_resolved = is_same_url( $ReqURL, $extended_url );
+					}
+
+					if( !$url_resolved && $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' && ( ! $Item->check_cross_post_nav( 'auto', $Blog->ID ) ) )
 					{	// REDIRECT TO THE CANONICAL URL:
 						$Debuglog->add( 'Redirecting to canonical URL ['.$canonical_url.'].' );
 						header_redirect( $canonical_url, true );
@@ -165,9 +199,10 @@ function skin_init( $disp )
 			break;
 
 		case 'posts':
-			init_ajax_forms(); // auto requires jQuery
+			init_ajax_forms( 'blog' ); // auto requires jQuery
+			init_scrollwide_js( 'blog' ); // Add jQuery Wide Scroll plugin
 			// fp> if we add this here, we have to exetnd the inner if()
-			// init_ratings_js();
+			// init_ratings_js( 'blog' );
 
 			// Get list of active filters:
 			$active_filters = $MainList->get_active_filters();
@@ -197,7 +232,7 @@ function skin_init( $disp )
 					if( empty( $catsel ) && preg_match( '~[0-9]+~', $cat ) )
 					{	// We are on a single cat page:
 						// NOTE: we must have selected EXACTLY ONE CATEGORY through the cat parameter
-						// BUT: - this can resolved to including children
+						// BUT: - this can resolve to including children
 						//      - selecting exactly one cat through catsel[] is NOT OK since not equivalent (will exclude children)
 						// echo 'SINGLE CAT PAGE';
 						if( ( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
@@ -211,8 +246,14 @@ function skin_init( $disp )
 								 */
 								$Chapter = & $ChapterCache->get_by_ID( $MainList->filters['cat_array'][0], false );
 							}
+
 							if( $Chapter )
 							{
+								if( $Chapter->parent_ID )
+								{	// This is a sub-category page (i-e: not a level 1 category)
+									$disp_detail = 'posts-subcat';
+								}
+
 								$canonical_url = $Chapter->get_permanent_url( NULL, NULL, $MainList->get_active_filter('page'), NULL, '&' );
 								if( ! is_same_url($ReqURL, $canonical_url) )
 								{	// fp> TODO: we're going to lose the additional params, it would be better to keep them...
@@ -222,11 +263,16 @@ function skin_init( $disp )
 										header_redirect( $canonical_url, true );
 									}
 									else
-									{	// Use rel="canoncial":
+									{	// Use rel="canonical":
 										add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 									}
 								}
 							}
+						}
+
+						if( $post_navigation == 'same_category' )
+						{ // Category is set and post navigation should go through the same category, set navigation target param
+							$MainList->nav_target = $cat;
 						}
 					}
 				}
@@ -358,7 +404,7 @@ function skin_init( $disp )
 			break;
 
 		case 'msgform':
-			init_ajax_forms(); // auto requires jQuery
+			init_ajax_forms( 'blog' ); // auto requires jQuery
 
 			$seo_page_type = 'Contact form';
 			if( $Blog->get_setting( $disp.'_noindex' ) )
@@ -370,6 +416,7 @@ function skin_init( $disp )
 		case 'messages':
 		case 'contacts':
 		case 'threads':
+			init_results_js( 'blog' ); // Add functions to work with Results tables
 			// just in case some robot would be logged in:
 			$seo_page_type = 'Messaging module';
 			$robots_index = false;
@@ -385,9 +432,15 @@ function skin_init( $disp )
 			$robots_index = false;
 			break;
 
+		case 'lostpassword':
+			$seo_page_type = 'Lost password form';
+			$robots_index = false;
+			break;
+
 		case 'profile':
 			global $rsc_url;
 			require_css( $rsc_url.'css/jquery/smoothness/jquery-ui.css' );
+			init_userfields_js( 'blog' );
 		case 'avatar':
 		case 'pwdchange':
 		case 'userprefs':
@@ -402,17 +455,146 @@ function skin_init( $disp )
 		case 'users':
 			$seo_page_type = 'Users list';
 			$robots_index = false;
+			global $rsc_url;
+			require_css( $rsc_url.'css/jquery/smoothness/jquery-ui.css' );
+			init_results_js( 'blog' ); // Add functions to work with Results tables
 			break;
 
 		case 'user':
 			$seo_page_type = 'User display';
+			if( is_logged_in() )
+			{	// Used for combo_box contacts groups
+				require_js( 'form_extensions.js', 'blog' );
+			}
 			break;
 
 		case 'edit':
-			init_datepicker_js();
-			require_js( 'admin.js' );
-			init_inskin_editing();
+			init_datepicker_js( 'blog' );
+			require_js( 'admin.js', 'blog' );
+			init_inskin_editing( 'blog' );
+			init_plugins_js( 'blog' );
 			break;
+
+		case 'edit_comment':
+			init_plugins_js( 'blog' );
+			break;
+
+		case 'useritems':
+		case 'usercomments':
+			global $inc_path, $display_params, $viewed_User;
+
+			// get user_ID because we want it in redirect_to in case we need to ask for login.
+			$user_ID = param( 'user_ID', 'integer', true, true );
+			if( empty( $user_ID ) )
+			{
+				bad_request_die( sprintf( T_('Parameter &laquo;%s&raquo; is required!'), 'user_ID' ) );
+			}
+			// set where to redirect in case of error
+			$error_redirect_to = empty( $Blog ) ? $baseurl : $Blog->gen_blogurl();
+
+			if( !is_logged_in() )
+			{ // Redirect to the login page if not logged in and allow anonymous user setting is OFF
+				$Messages->add( T_('You must log in to view this user profile.') );
+				header_redirect( get_login_url( 'cannot see user' ), 302 );
+				// will have exited
+			}
+
+			if( is_logged_in() && ( !check_user_status( 'can_view_user', $user_ID ) ) )
+			{ // user is logged in, but his/her status doesn't permit to view user profile
+				if( check_user_status( 'can_be_validated' ) )
+				{ // user is logged in but his/her account is not active yet
+					// Redirect to the account activation page
+					$Messages->add( T_('You must activate your account before you can view this user profile. <b>See below:</b>') );
+					header_redirect( get_activate_info_url(), 302 );
+					// will have exited
+				}
+
+				$Messages->add( T_('Your account status currently does not permit to view this user profile.') );
+				header_redirect( $error_redirect_to, 302 );
+				// will have exited
+			}
+
+			if( !empty( $user_ID ) )
+			{
+				$UserCache = & get_UserCache();
+				$viewed_User = $UserCache->get_by_ID( $user_ID, false );
+
+				if( empty( $viewed_User ) )
+				{
+					$Messages->add( T_('The requested user does not exist!') );
+					header_redirect( $error_redirect_to );
+					// will have exited
+				}
+
+				if( $viewed_User->check_status( 'is_closed' ) )
+				{
+					$Messages->add( T_('The requested user account is closed!') );
+					header_redirect( $error_redirect_to );
+					// will have exited
+				}
+			}
+
+			// Require results.css to display thread query results in a table
+			require_css( 'results.css' ); // Results/tables styles
+
+			// Require functions.js to show/hide a panel with filters
+			require_js( 'functions.js', 'blog' );
+			// Include this file to expand/collapse the filters panel when JavaScript is disabled
+			require_once $inc_path.'_filters.inc.php';
+
+			$display_params = !empty( $Skin ) ? $Skin->get_template( 'Results' ) : NULL;
+
+			if( $disp == 'useritems' )
+			{ // Init items list
+				global $user_ItemList;
+
+				$param_prefix = 'useritems_';
+				$page = param( $param_prefix.'paged', 'integer', 1 );
+				$orderby = param( $param_prefix.'orderby', 'string', $Blog->get_setting('orderby') );
+				$order = param( $param_prefix.'order', 'string', $Blog->get_setting('orderdir') );
+				$useritems_Blog = NULL;
+				$user_ItemList = new ItemList2( $useritems_Blog, NULL, NULL, NULL, 'ItemCache', $param_prefix );
+				$user_ItemList->load_from_Request();
+				$user_ItemList->set_filters( array(
+						'page'          => $page,
+						'authors'       => $user_ID,
+						'orderby'       => str_replace( $param_prefix, '', $orderby ),
+						'order'         => str_replace( $param_prefix, '', $order ),
+					) );
+				$user_ItemList->query();
+			}
+			else // $disp == 'usercomments'
+			{ // Init comments list
+				global $user_CommentList;
+
+				$param_prefix = 'usercmts_';
+				$page = param( $param_prefix.'paged', 'integer', 1 );
+				$orderby = param( $param_prefix.'orderby', 'string', 'date' );
+				$order = param( $param_prefix.'order', 'string', $Blog->get_setting('orderdir') );
+
+				$user_CommentList = new CommentList2( NULL, NULL, 'CommentCache', $param_prefix );
+				$user_CommentList->load_from_Request();
+				$user_CommentList->set_filters( array(
+						'page'          => $page,
+						'author_IDs'    => $user_ID,
+						'orderby'       => str_replace( $param_prefix, '', $orderby ),
+						'order'         => str_replace( $param_prefix, '', $order ),
+					) );
+				$user_CommentList->query();
+			}
+			break;
+
+		case 'comments':
+			if( !$Blog->get_setting( 'comments_latest' ) )
+			{ // If latest comments page is disabled - Display 404 page with error message
+				$Messages->add( T_('This feature is disabled.'), 'error' );
+				global $disp;
+				$disp = '404';
+			}
+			else
+			{
+				break;
+			}
 
 		case '404':
 			// We have a 404 unresolved content error
@@ -424,11 +606,27 @@ function skin_init( $disp )
 			break;
 	}
 
+	if( !empty( $_SERVER['HTTP_USER_AGENT'] ) )
+	{	// Detect IE browser version
+		preg_match( '/msie (\d)/i', $_SERVER['HTTP_USER_AGENT'], $browser_ie );
+		if( count( $browser_ie ) == 2 && $browser_ie[1] < 7 )
+		{	// IE < 7
+			require_css( 'ie6.css', 'relative' );
+			$Messages->add( T_('Your web browser is too old. For this site to work correctly, we recommend you use a more recent browser.'), 'note' );
+		}
+	}
+
 	// dummy var for backward compatibility with versions < 2.4.1 -- prevents "Undefined variable"
 	global $global_Cache, $credit_links;
 	$credit_links = $global_Cache->get( 'creds' );
 
 	$Timer->pause( 'skin_init' );
+
+	// Check if user is logged in with a not active account, and display an error message if required
+	check_allow_disp( $disp );
+
+	// initialize Blog enabled widgets, before displaying anything
+	init_blog_widgets( $Blog->ID );
 
 	// Initialize displaying....
 	$Timer->start( 'Skin:display_init' );
@@ -438,6 +636,40 @@ function skin_init( $disp )
 	// Send default headers:
 	// See comments inside of this function:
 	headers_content_mightcache( 'text/html' );		// In most situations, you do NOT want to cache dynamic content!
+	// Never allow Messages to be cached!
+	if( $Messages->count() && ( !empty( $PageCache ) ) )
+	{ // Abort PageCache collect
+		$PageCache->abort_collect();
+	}
+}
+
+
+/**
+ * Initialize skin for AJAX request
+ *
+ * @param string Skin name
+ * @param string What are we going to display. Most of the time the global $disp should be passed.
+ */
+function skin_init_ajax( $skin_name, $disp )
+{
+	if( is_ajax_content() )
+	{	// AJAX request
+		if( empty( $skin_name ) )
+		{	// Don't initialize without skin name
+			return false;
+		}
+
+		global $ads_current_skin_path, $skins_path;
+
+		// Init path for current skin
+		$ads_current_skin_path = $skins_path.$skin_name.'/';
+
+		// This is the main template; it may be used to display very different things.
+		// Do inits depending on current $disp:
+		skin_init( $disp );
+	}
+
+	return true;
 }
 
 
@@ -459,6 +691,11 @@ function is_default_page()
  */
 function skin_include( $template_name, $params = array() )
 {
+	if( is_ajax_content( $template_name ) )
+	{	// When we request ajax content for results table we need to hide wrapper data (header, footer & etc)
+		return;
+	}
+
 	global $skins_path, $ads_current_skin_path, $disp;
 
 	// Globals that may be needed by the template:
@@ -468,7 +705,10 @@ function skin_include( $template_name, $params = array() )
 	global $skin_url, $htsrv_url, $htsrv_url_sensitive;
 	global $samedomain_htsrv_url, $secure_htsrv_url;
 	global $credit_links, $skin_links, $francois_links, $fplanque_links, $skinfaktory_links;
-
+	/**
+	* @var Log
+	*/
+	global $Debuglog;
 	global $Timer;
 
 	$timer_name = 'skin_include('.$template_name.')';
@@ -488,6 +728,8 @@ function skin_include( $template_name, $params = array() )
 				'disp_help'           => '_help.disp.php',
 				'disp_login'          => '_login.disp.php',
 				'disp_register'       => '_register.disp.php',
+				'disp_activateinfo'   => '_activateinfo.disp.php',
+				'disp_lostpassword'   => '_lostpassword.disp.php',
 				'disp_mediaidx'       => '_mediaidx.disp.php',
 				'disp_msgform'        => '_msgform.disp.php',
 				'disp_threads'        => '_threads.disp.php',
@@ -500,14 +742,18 @@ function skin_include( $template_name, $params = array() )
 				'disp_avatar'         => '_profile.disp.php',
 				'disp_pwdchange'      => '_profile.disp.php',
 				'disp_userprefs'      => '_profile.disp.php',
+				'disp_subs'           => '_profile.disp.php',
 				'disp_search'         => '_search.disp.php',
 				'disp_single'         => '_single.disp.php',
 				'disp_sitemap'        => '_sitemap.disp.php',
-				'disp_subs'           => '_subs.disp.php',
 				'disp_user'           => '_user.disp.php',
 				'disp_users'          => '_users.disp.php',
 				'disp_edit'           => '_edit.disp.php',
+				'disp_edit_comment'   => '_edit_comment.disp.php',
+				'disp_closeaccount'   => '_closeaccount.disp.php',
 				'disp_module_form'    => '_module_form.disp.php',
+				'disp_useritems'      => '_useritems.disp.php',
+				'disp_usercomments'   => '_usercomments.disp.php',
 			);
 
 		// Add plugin disp handlers:
@@ -530,9 +776,11 @@ function skin_include( $template_name, $params = array() )
 
 		if( !isset( $disp_handlers['disp_'.$disp] ) )
 		{
-			printf( '<div class="skin_error">Unhandled disp type [%s]</div>',  htmlspecialchars( $disp ) );
+			global $Messages;
+			$Messages->add( sprintf( 'Unhandled disp type [%s]', htmlspecialchars( $disp ) ) );
+			$Messages->display();
 			$Timer->pause( $timer_name );
-			return;
+			$disp = '404';
 		}
 
 		$template_name = $disp_handlers['disp_'.$disp];
@@ -557,7 +805,7 @@ function skin_include( $template_name, $params = array() )
 
 	elseif( file_exists( $ads_current_skin_path.$template_name ) )
 	{	// The skin has a customized handler, use that one instead:
-		global $Debuglog;
+
 		$file = $ads_current_skin_path.$template_name;
 		$Debuglog->add('skin_include ('.($Item ? 'Item #'.$Item->ID : '-').'): '.rel_path_to_base($file), 'skins');
 		require $file;
@@ -640,7 +888,7 @@ function skin_description_tag()
 			$r = $Blog->get('shortdesc');
 		}
 	}
-	elseif( $disp_detail == 'posts-cat' )
+	elseif( $disp_detail == 'posts-cat' || $disp_detail == 'posts-subcat' )
 	{
 		if( $Blog->get_setting( 'categories_meta_description') )
 		{
@@ -697,7 +945,7 @@ function skin_keywords_tag()
 			return;
 		}
 
-		$r = $Item->get_metakeywords();
+		$r = $Item->get_custom_headers();
 
 
 		if( empty( $r ) && $Blog->get_setting( 'tags_meta_keywords' ) )
@@ -946,370 +1194,81 @@ function skin_installed( $name )
 }
 
 
+/**
+ * Display a blog skin setting fieldset which can be normal, mobile or tablet ( used on _coll_skin_settings.form.php )
+ *
+ * @param object Form
+ * @param integer skin ID
+ * @param array display params
+ */
+function display_skin_fieldset( & $Form, $skin_ID, $display_params )
+{
+	$Form->begin_fieldset( $display_params[ 'fieldset_title' ].get_manual_link('blog_skin_settings').' '.$display_params[ 'fieldset_links' ] );
+
+	if( !$skin_ID )
+	{ // The skin ID is empty use the same as normal skin ID
+		echo '<div style="font-weight:bold;padding:0.5ex;">'.T_('Same as normal skin.').'</div>';
+	}
+	else
+	{
+		$SkinCache = & get_SkinCache();
+		$edited_Skin = $SkinCache->get_by_ID( $skin_ID );
+
+		echo '<div style="float:left;width:30%">';
+		$disp_params = array( 'skinshot_class' => 'coll_settings_skinshot' );
+		Skin::disp_skinshot( $edited_Skin->folder, $edited_Skin->name, $disp_params );
+
+		$Form->info( T_('Skin name'), $edited_Skin->name );
+
+		if( isset($edited_Skin->version) )
+		{
+				$Form->info( T_('Skin version'), $edited_Skin->version );
+		}
+
+		$Form->info( T_('Skin type'), $edited_Skin->type );
+
+		if( $skin_containers = $edited_Skin->get_containers() )
+		{
+			$container_ul = '<ul><li>'.implode( '</li><li>', $skin_containers ).'</li></ul>';
+		}
+		else
+		{
+			$container_ul = '-';
+		}
+		$Form->info( T_('Containers'), $container_ul );
+
+		echo '</div>';
+		echo '<div style="margin-left:30%">';
+
+		$skin_params = $edited_Skin->get_param_definitions( $tmp_params = array('for_editing'=>true) );
+
+		if( empty($skin_params) )
+		{	// Advertise this feature!!
+			echo '<p>'.T_('This skin does not provide any configurable settings.').'</p>';
+		}
+		else
+		{
+			load_funcs( 'plugins/_plugin.funcs.php' );
+
+			// Loop through all widget params:
+			foreach( $skin_params as $l_name => $l_meta )
+			{
+				// Display field:
+				autoform_display_field( $l_name, $l_meta, $Form, 'Skin', $edited_Skin );
+			}
+		}
+
+		echo '</div>';
+	}
+
+	$Form->end_fieldset();
+}
+
+
 /*
  * $Log$
- * Revision 1.120  2012/11/21 19:31:53  efy-asimo
- * Fix XSS vulnerability
+ * Revision 1.122  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.119  2011/10/22 07:38:39  efy-yurybakh
- * Add a suggestion AJAX script to userfields
- *
- * Revision 1.118  2011/10/21 07:04:51  efy-vitalij
- * changed function header_http_response
- *
- * Revision 1.117  2011/10/18 09:14:34  efy-asimo
- * Ability to display different module forms and handle module actions  inside the module
- *
- * Revision 1.116  2011/10/14 10:14:15  efy-vitalij
- * add function header_http_response
- *
- * Revision 1.115  2011/10/12 11:23:31  efy-yurybakh
- * In skin posting (beta)
- *
- * Revision 1.114  2011/10/11 18:26:10  efy-yurybakh
- * In skin posting (beta)
- *
- * Revision 1.113  2011/10/11 06:42:42  efy-asimo
- * Remove unnecessary check
- *
- * Revision 1.112  2011/10/10 20:46:39  fplanque
- * registration source tracking
- *
- * Revision 1.111  2011/10/07 06:12:22  efy-asimo
- * Check users availability before display
- *
- * Revision 1.110  2011/10/07 05:43:45  efy-asimo
- * Check messaging availability before display
- *
- * Revision 1.109  2011/10/05 19:19:00  fplanque
- * redirects for anonymous users
- *
- * Revision 1.108  2011/10/05 19:12:39  efy-yurybakh
- * Checks for disp=user & users
- *
- * Revision 1.107  2011/10/05 17:44:23  efy-yurybakh
- * Checks for disp=user & users
- *
- * Revision 1.106  2011/09/30 12:24:56  efy-yurybakh
- * User directory
- *
- * Revision 1.105  2011/09/26 14:53:27  efy-asimo
- * Login problems with multidomain installs - fix
- * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
- *
- * Revision 1.104  2011/09/20 22:46:57  fplanque
- * doc
- *
- * Revision 1.103  2011/09/20 18:46:41  efy-yurybakh
- * star rating plugin (additional remarks)
- *
- * Revision 1.102  2011/09/18 00:56:34  sam2kb
- * init_ajax_forms() registers headlines required by AJAX forms
- *
- * Revision 1.101  2011/09/17 22:39:46  sam2kb
- * doc
- *
- * Revision 1.100  2011/09/17 21:14:47  fplanque
- * doc
- *
- * Revision 1.99  2011/09/17 02:32:00  fplanque
- * Unless I screwed up with merges, this update is for making all included files in a blog use the same domain as that blog.
- *
- * Revision 1.98  2011/09/14 21:04:06  fplanque
- * cleanup
- *
- * Revision 1.97  2011/09/13 08:32:30  efy-asimo
- * Add crumb check for login and register
- * Never cache in-skin login and register
- * Fix page caching
- *
- * Revision 1.96  2011/09/10 22:48:41  fplanque
- * doc
- *
- * Revision 1.95  2011/09/07 04:56:23  sam2kb
- * Add missing communication.js to "posts" disp type
- *
- * Revision 1.94  2011/09/07 00:28:26  sam2kb
- * Replace non-ASCII character in regular expressions with ~
- *
- * Revision 1.93  2011/09/04 22:13:20  fplanque
- * copyright 2011
- *
- * Revision 1.92  2011/08/11 09:05:09  efy-asimo
- * Messaging in front office
- *
- * Revision 1.91  2011/06/29 13:14:01  efy-asimo
- * Use ajax to display comment and contact forms
- *
- * Revision 1.90  2011/06/14 13:33:55  efy-asimo
- * in-skin register
- *
- * Revision 1.89  2011/05/09 06:38:18  efy-asimo
- * Simple avatar modification update
- *
- * Revision 1.88  2011/03/24 15:15:05  efy-asimo
- * in-skin login - feature
- *
- * Revision 1.87  2011/03/04 08:20:45  efy-asimo
- * Simple avatar upload in the front office
- *
- * Revision 1.86  2010/10/18 12:02:26  efy-asimo
- * tiny url links - fix
- *
- * Revision 1.85  2010/09/15 13:04:06  efy-asimo
- * Cross post navigatation
- *
- * Revision 1.84  2010/04/08 21:02:43  waltercruz
- * Tags as meta-description fallback
- *
- * Revision 1.83  2010/02/08 17:53:55  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.82  2010/01/01 20:37:43  fplanque
- * help disp
- *
- * Revision 1.81  2009/12/22 23:13:38  fplanque
- * Skins v4, step 1:
- * Added new disp modes
- * Hooks for plugin disp modes
- * Enhanced menu widgets (BIG TIME! :)
- *
- * Revision 1.80  2009/12/22 08:53:34  fplanque
- * global $ReqURL
- *
- * Revision 1.79  2009/12/04 23:27:50  fplanque
- * cleanup Expires: header handling
- *
- * Revision 1.78  2009/11/30 00:22:05  fplanque
- * clean up debug info
- * show more timers in view of block caching
- *
- * Revision 1.77  2009/11/23 00:09:06  sam2kb
- * Replace line breaks with single space in meta description
- *
- * Revision 1.76  2009/09/26 12:00:43  tblue246
- * Minor/coding style
- *
- * Revision 1.75  2009/09/25 22:04:39  tblue246
- * Bugfix
- *
- * Revision 1.74  2009/09/25 07:33:14  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.73  2009/09/12 20:51:58  tblue246
- * phpdoc fixes
- *
- * Revision 1.72  2009/08/03 12:02:40  tblue246
- * Keep only page param when redirecting to canonical post URL
- *
- * Revision 1.71  2009/07/19 14:34:43  fplanque
- * doc
- *
- * Revision 1.70  2009/07/17 11:44:27  tblue246
- * Crop params before comparing requested post URL and canonical post URL. Fixes http://forums.b2evolution.net//viewtopic.php?t=19200
- *
- * Revision 1.69  2009/07/14 10:55:03  tblue246
- * Bugfix: Remember requested page number when redirecting to a canonical chapter URL
- *
- * Revision 1.68  2009/07/12 19:12:51  fplanque
- * doc
- *
- * Revision 1.67  2009/07/08 14:19:59  yabs
- * doc
- *
- * Revision 1.66  2009/07/06 22:55:11  fplanque
- * minor
- *
- * Revision 1.65  2009/07/06 13:00:07  yabs
- * doc
- *
- * Revision 1.64  2009/07/04 22:48:04  tblue246
- * Fix fatal PHP error
- *
- * Revision 1.63  2009/07/04 01:52:51  fplanque
- * doc
- *
- * Revision 1.62  2009/07/02 22:17:05  yabs
- * <answer>sorry for the delay</answer>
- *
- * Revision 1.61  2009/07/02 21:33:45  fplanque
- * doc / waiting for answer
- *
- * Revision 1.60  2009/07/02 00:46:46  fplanque
- * doc.
- *
- * Revision 1.59  2009/06/29 09:33:34  yabs
- * changed plugin disp handling
- *
- * Revision 1.58  2009/06/28 23:55:32  fplanque
- * Item specific description has priority.
- * If none provided, fall back to excerpt.
- * Never include duplicate general description.
- * Also added TODO for keywords to have a fallback to tags.
- *
- * Revision 1.57  2009/06/20 17:19:35  leeturner2701
- * meta desc and meta keywords per blog post
- *
- * Revision 1.56  2009/06/14 06:50:29  yabs
- * code improvement for plugin custom disp modes
- *
- * Revision 1.55  2009/06/07 14:24:17  yabs
- * enabling plugin disp types
- *
- * Revision 1.54  2009/05/30 15:35:31  tblue246
- * - Fixed wrong $seo_page_type contents
- * - Fixed PHP notice when previewing a post
- *
- * Revision 1.53  2009/05/28 22:47:10  blueyed
- * skin_include: add info about the used file to Debuglog
- *
- * Revision 1.52  2009/05/27 14:46:33  waltercruz
- * Using categories description as meta-description for categories pages
- *
- * Revision 1.51  2009/05/25 19:39:50  fplanque
- * bugfix
- *
- * Revision 1.50  2009/05/24 21:14:38  fplanque
- * _skin.class.php can now provide skin specific settings.
- * Demo: the custom skin has configurable header colors.
- * The settings can be changed through Blog Settings > Skin Settings.
- * Anyone is welcome to extend those settings for any skin you like.
- *
- * Revision 1.49  2009/05/23 20:20:18  fplanque
- * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
- *
- * Revision 1.48  2009/05/20 18:27:09  fplanque
- * canonical support for date archives
- *
- * Revision 1.47  2009/05/20 12:58:17  fplanque
- * Homepage: option to 301 redirect to canonical homepage.
- * Option to support rel="canonical" instead of or when 301 redirect cannot be used.
- *
- * Revision 1.46  2009/05/19 14:34:32  fplanque
- * Category, tag, archive and serahc page snow only display post excerpts by default. (Requires a 3.x skin; otherwise the skin will display full posts as before). This can be controlled with the ''content_mode'' param in the skin tags.
- *
- * Revision 1.45  2009/03/23 12:19:20  tblue246
- * (temp)skin param: Allow plugin-provided skins
- *
- * Revision 1.44  2009/03/22 17:19:37  fplanque
- * better intro posts handling
- *
- * Revision 1.43  2009/03/22 16:12:03  fplanque
- * minor
- *
- * Revision 1.42  2009/03/21 00:38:15  waltercruz
- * Addind SEO setting for excerpts as meta description
- *
- * Revision 1.41  2009/03/20 03:41:02  fplanque
- * todo
- *
- * Revision 1.40  2009/03/16 16:00:27  waltercruz
- * Auto meta description
- *
- * Revision 1.39  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.38  2009/03/06 16:40:26  blueyed
- * Fix path check/inclusion of widget classes.
- *
- * Revision 1.37  2009/03/05 23:38:53  blueyed
- * Merge autoload branch (lp:~blueyed/b2evolution/autoload) into CVS HEAD.
- *
- * Revision 1.36  2008/12/20 22:36:33  blueyed
- * Add is_same_url() to compare URLs without taking case of urlencoded parts into account. This is required to prevent infinite redirects in the handling of canonical URLs.
- *
- * Revision 1.35  2008/11/07 23:12:47  tblue246
- * minor
- *
- * Revision 1.34  2008/10/12 18:07:17  blueyed
- * s/canoncical_url/canonical_url/g
- *
- * Revision 1.33  2008/09/28 08:06:08  fplanque
- * Refactoring / extended page level caching
- *
- * Revision 1.32  2008/09/27 07:54:34  fplanque
- * minor
- *
- * Revision 1.31  2008/05/11 01:09:42  fplanque
- * always output charset header + meta
- *
- * Revision 1.30  2008/04/26 22:20:45  fplanque
- * Improved compatibility with older skins.
- *
- * Revision 1.29  2008/04/13 23:38:53  fplanque
- * Basic public user profiles
- *
- * Revision 1.28  2008/04/04 23:56:02  fplanque
- * avoid duplicate content in meta tags
- *
- * Revision 1.27  2008/03/21 19:42:44  fplanque
- * enhanced 404 handling
- *
- * Revision 1.26  2008/03/21 17:41:56  fplanque
- * custom 404 pages
- *
- * Revision 1.25  2008/02/25 19:49:04  blueyed
- * Fix E_FATAL for invalid category ID and "canonical_cat_urls"; fix indenting
- *
- * Revision 1.24  2008/01/21 09:35:34  fplanque
- * (c) 2008
- *
- * Revision 1.23  2008/01/07 02:53:27  fplanque
- * cleaner tag urls
- *
- * Revision 1.22  2007/12/22 00:19:27  blueyed
- * - add debuglog to skin_init
- * - fix indent
- *
- * Revision 1.21  2007/12/20 22:59:34  fplanque
- * TagCloud widget prototype
- *
- * Revision 1.20  2007/12/16 21:53:15  blueyed
- * skin_base_tag: globalize baseurl, if used
- *
- * Revision 1.19  2007/11/29 19:29:22  fplanque
- * normalized skin filenames
- *
- * Revision 1.18  2007/11/25 19:47:15  fplanque
- * cleaned up photo/media index a little bit
- *
- * Revision 1.17  2007/11/25 18:20:38  fplanque
- * additional SEO settings
- *
- * Revision 1.16  2007/11/25 14:28:18  fplanque
- * additional SEO settings
- *
- * Revision 1.15  2007/11/24 21:41:12  fplanque
- * additional SEO settings
- *
- * Revision 1.14  2007/11/02 02:41:25  fplanque
- * refactored blog settings / UI
- *
- * Revision 1.13  2007/10/12 05:26:59  fplanque
- * global $DB has been added to _subscriptions already and its use should not be encouraged. Therefore I don't want it available by default. _subs.disp.php should be cleaned up at some point.
- *
- * Revision 1.11  2007/10/09 02:10:50  fplanque
- * URL fixes
- *
- * Revision 1.10  2007/10/06 21:31:40  fplanque
- * Category redirector fix
- *
- * Revision 1.9  2007/10/01 13:37:28  fplanque
- * fix
- *
- * Revision 1.8  2007/10/01 08:03:57  yabs
- * minor fix
- *
- * Revision 1.7  2007/10/01 01:06:31  fplanque
- * Skin/template functions cleanup.
- *
- * Revision 1.6  2007/09/28 09:28:36  fplanque
- * per blog advanced SEO settings
- *
- * Revision 1.5  2007/09/11 23:10:39  fplanque
- * translation updates
- *
- * Revision 1.4  2007/09/11 21:07:09  fplanque
- * minor fixes
  */
 ?>

@@ -21,6 +21,14 @@ if( empty( $Blog ) )
 
 $post_ID = param ( 'post_ID', 'integer', 0 );
 
+/**
+ * Basic security checks:
+ */
+if( ! is_logged_in() )
+{ // must be logged in!
+	bad_request_die( T_('You are not logged in.') );
+}
+// check if user can edit this post
 check_item_perm_edit( $post_ID );
 
 $action = param_action();
@@ -28,6 +36,17 @@ $action = param_action();
 if( !empty( $action ) && $action != 'new' )
 { // Check that this action request is not a CSRF hacked request:
 	$Session->assert_received_crumb( 'item' );
+}
+
+//$post_status = NULL;
+if( ( $action == 'create_publish' ) || ( $action == 'update_publish' ) )
+{
+	$post_status = load_publish_status( $action == 'create_publish' );
+	$action = substr( $action, 0, 6 );
+}
+else
+{
+	$post_status = param( 'post_status', 'string', 'published' );
 }
 
 switch( $action )
@@ -66,7 +85,7 @@ switch( $action )
 		// Also used by bookmarklet
 		$edited_Item->load_from_Request( true ); // needs Blog set
 
-		$edited_Item->status = param( 'post_status', 'string', NULL );		// 'published' or 'draft' or ...
+		$edited_Item->status = $post_status;		// 'published' or 'draft' or ...
 		// We know we can use at least one status,
 		// but we need to make sure the requested/default one is ok:
 		$edited_Item->status = $Blog->get_allowed_item_status ( $edited_Item->status );
@@ -97,7 +116,7 @@ switch( $action )
 		// Check permission based on DB status:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
-		$edited_Item->status = param( 'post_status', 'string', NULL );		// 'published' or 'draft' or ...
+		$edited_Item->status = $post_status;		// 'published' or 'draft' or ...
 		// We know we can use at least one status,
 		// but we need to make sure the requested/default one is ok:
 		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status );
@@ -128,14 +147,11 @@ switch( $action )
 	case 'create': // Create a new post
 		$exit_after_save = ( $action != 'create_edit' );
 
-		// We need early decoding of these in order to check permissions:
-		$post_status = param( 'post_status', 'string', 'published' );
-		
 		// Check if new category was started to create. If yes check if it is valid.
 		check_categories ( $post_category, $post_extracats );
-		
+
 		// Check permission on statuses:
-		$current_User->check_perm( 'cats_post!'.$post_status, 'edit', true, $post_extracats );
+		$current_User->check_perm( 'cats_post!'.$post_status, 'create', true, $post_extracats );
 		// Check permission on post type:
 		check_perm_posttype( $post_extracats );
 
@@ -144,15 +160,15 @@ switch( $action )
 		$edited_Item = new Item();
 
 		// Set the params we already got:
-		$edited_Item->set( 'status', 'published' );
+		$edited_Item->set( 'status', $post_status );
 		$edited_Item->set( 'main_cat_ID', $post_category );
 		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 
 		// Set object params:
 		$edited_Item->load_from_Request( /* editing? */ ($action == 'create_edit'), /* creating? */ true );
-		
+
 		$Plugins->trigger_event ( 'AdminBeforeItemEditCreate', array ('Item' => & $edited_Item ) );
-		
+
 		if( !empty( $mass_create ) )
 		{	// ------ MASS CREATE ------
 			$Items = & create_multiple_posts( $edited_Item, param( 'paragraphs_linebreak', 'boolean', 0 ) );
@@ -230,40 +246,34 @@ switch( $action )
 		// Check edit permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
-		// We need early decoding of these in order to check permissions:
-		param( 'post_status', 'string', 'published' );
-		
 		// Check if new category was started to create.  If yes check if it is valid.
 		$isset_category = check_categories ( $post_category, $post_extracats );
-		
+
 		// Check permission on statuses:
 		$current_User->check_perm( 'cats_post!'.$post_status, 'edit', true, $post_extracats );
 		// Check permission on post type:
 		check_perm_posttype( $post_extracats );
 
-		// Is this post already published?
-		$was_published = $edited_Item->status == 'published';
-
 		// UPDATE POST:
 		// Set the params we already got:
 		$edited_Item->set ( 'status', $post_status );
-		
+
 		if( $isset_category )
 		{ // we change the categories only if the check was succesfull
 			$edited_Item->set ( 'main_cat_ID', $post_category );
 			$edited_Item->set ( 'extra_cat_IDs', $post_extracats );
 		}
-		
+
 		// Set object params:
 		$edited_Item->load_from_Request( false );
 
 		$Plugins->trigger_event( 'AdminBeforeItemEditUpdate', array( 'Item' => & $edited_Item ) );
 
- 		// Params we need for tab switching (in case of error or if we save&edit)
+		// Params we need for tab switching (in case of error or if we save&edit)
 		$tab_switch_params = 'p='.$edited_Item->ID;
 
 		if( $Messages->has_errors() )
-		{	// There have been some validation errors:
+		{ // There have been some validation errors:
 			break;
 		}
 
@@ -290,14 +300,30 @@ switch( $action )
 
 		$Messages->add( T_('Post has been updated.'), 'success' );
 
-		if( ! in_array( $post_status, array( 'published', 'protected', 'private' ) ) )
-		{	// If post is not published we show it in the Back-office
+		$inskin_statuses = get_inskin_statuses();
+		if( ! in_array( $post_status, $inskin_statuses ) )
+		{ // If post is not published we show it in the Back-office
 			$edited_Item->load_Blog();
-			$redirect_to =  url_add_param( $admin_url, 'ctrl=items&blog='.$edited_Item->Blog->ID.'&p='.$edited_Item->ID, '&' );
+			if( $post_status == 'redirected' )
+			{ // If a post is in "Redirected" status - redirect to homepage of the blog
+				$redirect_to = $edited_Item->Blog->gen_baseurl();
+			}
+			else
+			{ // Redirect to view post in the Back-office
+				$redirect_to = url_add_param( $admin_url, 'ctrl=items&blog='.$edited_Item->Blog->ID.'&p='.$edited_Item->ID, '&' );
+			}
 		}
 		else
-		{	// User can see this post in the Front-office
-			$redirect_to = $edited_Item->get_tinyurl();
+		{ // User can see this post in the Front-office
+			if( $edited_Item->ptyp_ID == 1520 )
+			{ // If post is category intro we should redirect to page of that category
+				$main_Chapter = & $edited_Item->get_main_Chapter();
+				$redirect_to = $main_Chapter->get_permanent_url();
+			}
+			else
+			{ // Redirect to post permanent url for all other posts
+				$redirect_to = $edited_Item->get_permanent_url();
+			}
 		}
 
 		// REDIRECT / EXIT
@@ -306,9 +332,16 @@ switch( $action )
 		break;
 }
 
+// Require datapicker.css
+require_css( 'ui.datepicker.css' );
+// Require results.css to display attachments as a result table
+require_css( 'results.css' );
+
+init_tokeninput_js();
+
 // Display a 'In-skin editing' form
 $SkinCache = & get_SkinCache();
-$Skin = & $SkinCache->get_by_ID( $Blog->skin_ID );
+$Skin = & $SkinCache->get_by_ID( $Blog->get_skin_ID() );
 $skin = $Skin->folder;
 $disp = 'edit';
 $ads_current_skin_path = $skins_path.$skin.'/';
@@ -316,19 +349,8 @@ require $ads_current_skin_path.'index.main.php';
 
 /*
  * $Log$
- * Revision 1.5  2011/10/17 00:20:39  fplanque
- * minor
+ * Revision 1.7  2013/11/06 08:03:44  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.4  2011/10/13 11:40:09  efy-yurybakh
- * In skin posting (permission)
- *
- * Revision 1.3  2011/10/12 13:54:36  efy-yurybakh
- * In skin posting
- *
- * Revision 1.2  2011/10/12 11:23:31  efy-yurybakh
- * In skin posting (beta)
- *
- * Revision 1.1  2011/10/11 18:26:11  efy-yurybakh
- * In skin posting (beta)
  */
 ?>

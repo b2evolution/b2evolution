@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -184,7 +184,7 @@ global $fm_FileRoot;
 	$Form->hidden_ctrl();
 	$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 ); // Just a hint for the browser.
 	$Form->hidden( 'upload_quickmode', $upload_quickmode );
-	$Form->hidden( 'tab3', $tab3 );
+	$Form->hidden( 'tab3_onsubmit', $tab3 );
 	$Form->hiddens_by_key( get_memorized() );
 
 	$Widget = new Widget( 'file_browser' );
@@ -343,9 +343,9 @@ global $fm_FileRoot;
 					{
 						jQuery(this).prevAll("[type=radio]").eq(0).attr("checked", "checked")
 					}
-					jQuery(".upload_file").live("click", handler);
-					jQuery(".upload_file").live("keyup", handler);
-					jQuery(".upload_file").live("change", handler);
+					jQuery( document ).on("click", ".upload_file", handler);
+					jQuery( document ).on("keyup", ".upload_file", handler);
+					jQuery( document ).on("change", ".upload_file", handler);
 				})();
 				var evo_upload_fields_count = jQuery("#uploadfileinputs li").length-1;
 			</script>
@@ -380,97 +380,8 @@ $this->disp_payload_end();
 
 /*
  * $Log$
- * Revision 1.24  2011/09/04 22:13:16  fplanque
- * copyright 2011
+ * Revision 1.26  2013/11/06 08:04:15  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.23  2011/04/28 14:07:58  efy-asimo
- * multiple file upload
- *
- * Revision 1.22  2011/03/02 11:04:22  efy-asimo
- * Refactor file uploads for future use
- *
- * Revision 1.21  2011/01/18 16:23:03  efy-asimo
- * add shared_root perm and refactor file perms - part1
- *
- * Revision 1.20  2010/10/27 14:56:42  efy-asimo
- * when replacing a file, keep a backup
- *
- * Revision 1.19  2010/07/26 06:52:16  efy-asimo
- * MFB v-4-0
- *
- * Revision 1.18  2010/04/19 17:07:14  blueyed
- * upload form: display a single input fieldset only.
- *
- * Revision 1.17  2010/04/19 17:06:23  blueyed
- * doc/indent
- *
- * Revision 1.16  2010/03/05 13:30:36  fplanque
- * cleanup/wording
- *
- * Revision 1.15  2010/02/17 12:59:59  efy-asimo
- * Replace existing file task
- *
- * Revision 1.14  2010/02/08 17:53:02  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.13  2010/01/30 18:55:27  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.12  2010/01/03 13:45:36  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.11  2009/12/06 22:55:21  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.10  2009/11/11 20:44:54  fplanque
- * minor/cleanup
- *
- * Revision 1.9  2009/10/29 22:17:22  blueyed
- * Filemanager upload: add "Upload by URL" fields. Cleanup/rewrite some JS on the go.
- *
- * Revision 1.8  2009/03/08 23:57:43  fplanque
- * 2009
- *
- * Revision 1.7  2008/01/21 09:35:30  fplanque
- * (c) 2008
- *
- * Revision 1.6  2008/01/06 05:16:33  fplanque
- * enhanced upload
- *
- * Revision 1.5  2008/01/05 02:26:06  fplanque
- * doc
- *
- * Revision 1.4  2007/11/22 17:53:39  fplanque
- * filemanager display cleanup, especially in IE (not perfect)
- *
- * Revision 1.3  2007/11/01 05:27:31  fplanque
- * Upload screen refactoring - step 1
- *
- * Revision 1.2  2007/09/23 18:55:16  fplanque
- * attempting to debloat. The Log class is insane.
- *
- * Revision 1.1  2007/06/25 11:00:05  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.11  2007/04/26 00:11:10  fplanque
- * (c) 2007
- *
- * Revision 1.10  2007/02/22 20:19:28  blueyed
- * todo for "accept" attrib in file input
- *
- * Revision 1.9  2007/01/24 13:44:56  fplanque
- * cleaned up upload
- *
- * Revision 1.8  2006/12/22 00:17:05  fplanque
- * got rid of dirty globals
- * some refactoring
- *
- * Revision 1.7  2006/11/24 18:27:25  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.6  2006/10/06 21:03:07  blueyed
- * Removed deprecated/unused "upload_allowedext" Setting, which restricted file extensions during upload though!
  */
 ?>

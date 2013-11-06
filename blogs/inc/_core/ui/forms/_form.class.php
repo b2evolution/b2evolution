@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004 by PROGIDISTRI - {@link http://progidistri.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
@@ -144,6 +144,13 @@ class Form extends Widget
 
 
 	/**
+	 * Indicates if the form is ended
+	 * @var boolean
+	 */
+	var $_form_ended = false;
+
+
+	/**
 	 * Constructor
 	 *
 	 * @param string the action destination of the form (NULL for pagenow)
@@ -248,26 +255,26 @@ class Form extends Widget
 			if( count($this->saved_layouts) )
 			{
 				$this->layout = array_shift($this->saved_layouts);
-				// Temporary hack:
-				$template = array_shift($this->saved_templates);
+				$template = $this->saved_templates[0];
 				if( !empty($template ) )
 				{
-					//pre_dump($template);
-					$this->template =     $template;
-					$this->formstart =    $template['formstart'];
-					$this->title_fmt =    $template['title_fmt'];
-					$this->no_title_fmt = $template['no_title_fmt'];
-					$this->fieldstart =   $template['fieldstart'];
-					$this->labelstart =   $template['labelstart'];
-					$this->labelend =     $template['labelend'];
-					$this->labelempty =   $template['labelempty'];
-					$this->inputstart =   $template['inputstart'];
-					$this->infostart =    $template['infostart'];
-					$this->inputend =     $template['inputend'];
-					$this->fieldend =     $template['fieldend'];
-					$this->buttonsstart = $template['buttonsstart'];
-					$this->buttonsend =   $template['buttonsend'];
-					$this->formend =      $template['formend'];
+					$this->template       = $template;
+					$this->formstart      = $template['formstart'];
+					$this->title_fmt      = $template['title_fmt'];
+					$this->no_title_fmt   = $template['no_title_fmt'];
+					$this->fieldset_begin = $template['fieldset_begin'];
+					$this->fieldset_end   = $template['fieldset_end'];
+					$this->fieldstart     = $template['fieldstart'];
+					$this->labelstart     = $template['labelstart'];
+					$this->labelend       = $template['labelend'];
+					$this->labelempty     = $template['labelempty'];
+					$this->inputstart     = $template['inputstart'];
+					$this->infostart      = $template['infostart'];
+					$this->inputend       = $template['inputend'];
+					$this->fieldend       = $template['fieldend'];
+					$this->buttonsstart   = $template['buttonsstart'];
+					$this->buttonsend     = $template['buttonsend'];
+					$this->formend        = $template['formend'];
 				}
 			}
 		}
@@ -285,6 +292,9 @@ class Form extends Widget
 															.'<span class="right_icons">$global_icons$</span>'
 															.'$title$</div></th></tr>'."\n";
 					$this->no_title_fmt = '<tr><th colspan="2"><span class="right_icons">$global_icons$</span></th></tr>'."\n";
+					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
+															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
+					$this->fieldset_end = '</fieldset>'."\n";
 					$this->fieldstart = '<tr$ID$>'."\n";
 					$this->labelstart = '<td class="label">';
 					$this->labelend = "</td>\n";
@@ -302,6 +312,9 @@ class Form extends Widget
 					$this->formstart = '<div>';// required before (no_)title_fmt for validation
 					$this->title_fmt = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
 					$this->no_title_fmt = '<span style="float:right">$global_icons$</span>'."\n";
+					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
+															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
+					$this->fieldset_end = '</fieldset>'."\n";
 					$this->fieldstart = '<fieldset$ID$>'."\n";
 					$this->labelstart = '<div class="label">';
 					$this->labelend = "</div>\n";
@@ -319,6 +332,9 @@ class Form extends Widget
 					$this->formstart = '<div>';// required before (no_)title_fmt for validation
 					$this->title_fmt = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
 					$this->no_title_fmt = '<span style="float:right">$global_icons$</span>'."\n";
+					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
+															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
+					$this->fieldset_end = '</fieldset>'."\n";
 					$this->fieldstart = '<fieldset$ID$>'."\n";
 					$this->labelstart = '<div class="label">';
 					$this->labelend = "</div>\n";
@@ -336,6 +352,9 @@ class Form extends Widget
 					$this->formstart = '';
 					$this->title_fmt = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
 					$this->no_title_fmt = '<span style="float:right">$global_icons$</span>&nbsp;'."\n";
+					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
+															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
+					$this->fieldset_end = '</fieldset>'."\n";
 					$this->fieldstart = '<div class="tile"$ID$>';
 					$this->labelstart = '<strong>';
 					$this->labelend = "</strong>\n";
@@ -353,6 +372,9 @@ class Form extends Widget
 					$this->formstart = '';
 					$this->title_fmt = '$title$'."\n"; // TODO: icons
 					$this->no_title_fmt = '';          //           "
+					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
+															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
+					$this->fieldset_end = '</fieldset>'."\n";
 					$this->fieldstart = '<span class="block"$ID$>';
 					$this->labelstart = '';
 					$this->labelend = "\n";
@@ -371,6 +393,9 @@ class Form extends Widget
 					$this->formstart = '';
 					$this->title_fmt = '$title$'."\n"; // TODO: icons
 					$this->no_title_fmt = '';          //           "
+					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
+															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
+					$this->fieldset_end = '</fieldset>'."\n";
 					$this->fieldstart = ''; // fp> shall we still use $ID$ here ?
 					$this->labelstart = '';
 					$this->labelend = "\n";
@@ -384,6 +409,39 @@ class Form extends Widget
 					$this->formend = '';
 			}
 
+		}
+	}
+
+
+	/**
+	 * Set a parts of form from array
+	 *
+	 * @param array:
+	 *    formstart
+	 *    title_fmt
+	 *    no_title_fmt
+	 *    fieldset_begin
+	 *    fieldset_end
+	 *    fieldstart
+	 *    labelstart
+	 *    labelend
+	 *    labelempty
+	 *    inputstart
+	 *    infostart
+	 *    inputend
+	 *    fieldend
+	 *    buttonsstart
+	 *    buttonsend
+	 *    formend
+	 */
+	function switch_template_parts( $parts )
+	{
+		if( is_array( $parts ) && count( $parts ) > 0 )
+		{	// Change a default form params from defined vars on current skin
+			foreach( $parts as $part => $value )
+			{
+				$this->$part = $value;
+			}
 		}
 	}
 
@@ -511,8 +569,7 @@ class Form extends Widget
 					unset( $field_params['legend_params'] );
 				}
 
-				$r = str_replace( '$fieldset_attribs$', get_field_attribs_as_string($field_params), $this->template['fieldset_begin'] );
-				// $r = '<fieldset'.get_field_attribs_as_string($field_params).'>'."\n";
+				$r = str_replace( '$fieldset_attribs$', get_field_attribs_as_string($field_params), $this->fieldset_begin );
 
 				$r = str_replace( '$fieldset_title$', $title, $r );
 				if( isset($field_params['id']) )
@@ -554,7 +611,7 @@ class Form extends Widget
 				break;
 
 			default:
-				$r = $this->template['fieldset_end'];
+				$r = $this->fieldset_end;
 				$this->_opentags['fieldset']--;
 		}
 
@@ -751,7 +808,7 @@ class Form extends Widget
 		// dh> TODO: should probably also get ported to use jquery.ui.autocomplete (or its successor)
 		global $rsc_url;
 		$r .= '<script type="text/javascript" src="'.$rsc_url.'js/jquery/jquery.hintbox.min.js"></script>';
-		$r .= '<script type="text/javascript">$("<link>").appendTo("head").attr({
+		$r .= '<script type="text/javascript">jQuery("<link>").appendTo("head").attr({
 			rel: "stylesheet",
 			type: "text/css",
 			href: "'.$rsc_url.'css/jquery/jquery.hintbox.css"
@@ -940,7 +997,14 @@ class Form extends Widget
 			$field_params['note'] = '('.$field_format.')';
 		}
 
-		$field_size = strlen($field_format);
+		if( ! isset($field_params['size']) )
+		{
+			$field_size = strlen($field_format);
+		}
+		else
+		{
+			$field_size = $field_params['size'];
+		}
 
 		// Get time part of datetime:
 		$field_value = substr( $field_value, 11, $field_size );
@@ -1429,6 +1493,10 @@ class Form extends Widget
 			$bozo_start_modified = true;
 			unset( $form_params['bozo_start_modified'] );
 		}
+		unset( $form_params['disp_edit_categories'] );
+		unset( $form_params['edit_form_params'] );
+		unset( $form_params['skin_form_params'] );
+
 		$r = "\n\n<form".get_field_attribs_as_string($form_params).">\n";
 
 		// $r .= '<div>'; // for XHTML (dh> removed 'style="display:inline"' because it's buggy with FireFox 1.0.x, at least at the "Write" admin page; see http://forums.b2evolution.net/viewtopic.php?t=10130)
@@ -1502,6 +1570,11 @@ class Form extends Widget
 	 */
 	function end_form( $buttons = array() )
 	{
+		if( $this->_form_ended )
+		{	// The form is already ended
+			return;
+		}
+
 		$r = '';
 		if( !empty( $buttons ) )
 		{
@@ -1565,6 +1638,7 @@ class Form extends Widget
 
 		// Reset (in case we re-use begin_form! NOTE: DO NOT REUSE begin_form, it's against the spec.)
 		$this->hiddens = array();
+		$this->_form_ended = true;
 
 		return $this->display_or_return( $r );
 	}
@@ -1590,13 +1664,18 @@ class Form extends Widget
 	 * @param boolean true add a surround_check span, used by check_all mouseover
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function checklist( $options, $field_name, $field_label, $required = false, $add_highlight_spans = false )
+	function checklist( $options, $field_name, $field_label, $required = false, $add_highlight_spans = false, $field_params = array() )
 	{
-		$field_params = array();
-		$field_params['type'] = 'checkbox';
+		$field_params = array_merge( array(
+				'type' => 'checkbox',
+				'input_prefix' => '',
+				'input_suffix' => '',
+			), $field_params );
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
 		$r = $this->begin_field( $field_name, $field_label );
+
+		$r .= $field_params['input_prefix'];
 
 		foreach( $options as $option )
 		{ //loop to construct the list of 'input' tags
@@ -1655,6 +1734,8 @@ class Form extends Widget
 			}
 			$r .= "<br />\n";
 		}
+
+		$r .= $field_params['input_suffix'];
 
 		$r .= $this->end_field();
 
@@ -2078,6 +2159,17 @@ class Form extends Widget
 		}
 		unset($field_params['required']); // already handled above, do not pass to handle_common_params()
 
+		// Set size param for input with new value
+		if( isset( $field_params['new_field_size'] ) )
+		{
+			$new_field_size = $field_params['new_field_size'];
+		}
+		else
+		{
+			$new_field_size = 30;
+		}
+		unset( $field_params['new_field_size'] );
+
 		// Set onchange event on the select, when the select changes, we check the value to display or hide an input text after it
 		$field_params['onchange']= 'check_combo( this.id, this.options[this.selectedIndex].value, "'.$input_class.'")';
 
@@ -2096,7 +2188,7 @@ class Form extends Widget
 			 .$field_options
 			 ."</select>\n";
 
-		if( $field_options == $option_new  || $input_class == 'field_error' || !$field_value )
+		if( $field_options == $option_new  || $input_class == 'field_error' || $field_value != '' )
 		{	// The list is empty or there is an error on the combo or no field value, so we have to display the input text:
 			$visible = 'inline';
 		}
@@ -2105,7 +2197,7 @@ class Form extends Widget
 			$visible = 'none' ;
 		}
 
-		$r .= '<input type="text" id="'.$field_name.'_combo" name="'.$field_name.'_combo" size="30" class="'.$input_class.'" style="display:'.$visible.'">';
+		$r .= '<input type="text" id="'.$field_name.'_combo" name="'.$field_name.'_combo" size="'.$new_field_size.'" class="'.$input_class.'" style="display:'.$visible.'" value="'.$field_value.'" />';
 
 		if( $visible == 'none' )
 		{ // The input text is hidden, so if no javascript activated, we always display input text:
@@ -2172,14 +2264,14 @@ class Form extends Widget
 		$r = $this->begin_field()
 			// NOTE: The following pixel is needed to avoid the dity IE textarea expansion bug
 			// see http://fplanque.net/2003/Articles/iecsstextarea/index.html
-			.'<img src="'.$rsc_url.'img/blank.gif" width="1" height="1" alt="" />'
+			.get_icon( 'pixel' )
 			.'<textarea'
 			.get_field_attribs_as_string( $field_params )
 			.' rows="'.$field_rows.'">'
 			.format_to_output( $field_value, $format_value )
 			.'</textarea>'
 			// NOTE: this one is for compensating the previous pixel in case of center aligns.
-			.'<img src="'.$rsc_url.'img/blank.gif" width="1" height="1" alt="" />'
+			.get_icon( 'pixel' )
 			.$this->end_field();
 
 		return $this->display_or_return( $r );
@@ -2253,13 +2345,17 @@ class Form extends Widget
 
 		// Start the new form field and inject an automatic DOM id
 		// This is useful to show/hide the whole field by JS.
-		if( !empty(	$this->_common_params['id'] ) )
+		if( !empty( $this->_common_params['id'] ) )
 		{
 			$ffield_id = ' id="ffield_'.$this->_common_params['id'].'" ';
 		}
 		else
 		{	// No ID in case there's no id/name given for a field.
 			$ffield_id = '';
+		}
+		if( !empty( $field_params['class'] ) )
+		{	// Add class attribute
+			$ffield_id .= ' class="'.$field_params['class'].'"';
 		}
 		$r = str_replace( '$ID$', $ffield_id, $this->fieldstart );
 
@@ -2806,9 +2902,10 @@ class Form extends Widget
 	 * @param string label
 	 * @param boolean options on seperate lines (DIVs)
 	 * @param string notes
+	 * @param boolean required
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function radio( $field_name, $field_value, $field_options, $field_label, $field_lines = false, $field_note = '' )
+	function radio( $field_name, $field_value, $field_options, $field_label, $field_lines = false, $field_note = '', $field_required = false )
 	{
 		$new_field_options = array();
 
@@ -2839,8 +2936,56 @@ class Form extends Widget
 		}
 
 		$field_params = array( 'lines' => $field_lines, 'note' => $field_note );
+		if( $field_required )
+		{	// Field is required
+			$field_params['required'] = true;
+		}
 
 		return $this->radio_input( $field_name, $field_value, $new_field_options, $field_label, $field_params );
+	}
+
+
+	/**
+	 * Builds an interval input fields.
+	 *
+	 * @param string The name of the input field "From". This gets used for id also, if no id given in $field_params.
+	 * @param string Initial value "From"
+	 * @param string The name of the input field "To". This gets used for id also, if no id given in $field_params.
+	 * @param string Initial value "To"
+	 * @param integer Size of the input field
+	 * @param string Label displayed with the field
+	 * @param string "help" note (Should provide something useful, otherwise leave it empty)
+	 * @param array Extended attributes/params.
+	 *                 - 'maxlength': if not set, $field_size gets used (use '' to disable it)
+	 *                 - 'class': the CSS class to use for the <input> element
+	 *                 - 'type': 'text', 'password' (defaults to 'text')
+	 *                 - 'force_to': 'UpperCase' (JS onchange handler)
+	 *                 - NOTE: any other attributes will be used as is (onchange, onkeyup, id, ..).
+	 * @return true|string true (if output) or the generated HTML if not outputting
+	 */
+	function interval( $field_name_from, $field_value_from, $field_name_to, $field_value_to, $field_size, $field_label, $field_note = '', $field_params = array() )
+	{
+		$save_output = $this->output;
+		$save_params = array(
+			'labelempty' => $this->labelempty,
+			'fieldstart' => $this->fieldstart,
+			'fieldend' => $this->fieldend,
+			'inputstart' => $this->inputstart,
+			'inputend' => $this->inputend,
+		);
+
+		// clear form params
+		$this->switch_template_parts( array_fill_keys( array_keys( $save_params ), '' ) );
+		$this->output = false;
+
+		// Field "From"
+		$field_params['input_suffix'] = T_(' to ').$this->text_input( $field_name_to, $field_value_to, $field_size, '', '', $field_params );
+
+		// return saved params
+		$this->output = $save_output;
+		$this->switch_template_parts( $save_params );
+
+		return $this->text_input( $field_name_from, $field_value_from, $field_size, $field_label, $field_note, $field_params );
 	}
 
 
@@ -2968,7 +3113,7 @@ class Form extends Widget
 			if( isset( $this->_common_params['clickable_label'] ) && ! $this->_common_params['clickable_label'] )
 			{	// Not set if this method is invoked by ::begin_field()
 
-				if( isset($this->_common_params['required']) )
+				if( ! empty( $this->_common_params['required'] ) )
 				{
 					$r .= '<span class="label_field_required">*</span>';
 				}
@@ -2978,12 +3123,12 @@ class Form extends Widget
 			else
 			{
 				$r .= '<label'
-					.( !empty($this->_common_params['id'])
+					.( ! empty( $this->_common_params['id'] )
 						? ' for="'.format_to_output( $this->_common_params['id'], 'htmlattr' ).'"'
 						: '' )
 					.'>';
 
-					if( isset($this->_common_params['required']) )
+					if( ! empty( $this->_common_params['required'] ) )
 					{
 						$r .= '<span class="label_field_required">*</span>';
 					}
@@ -3176,446 +3321,8 @@ class Form extends Widget
 
 /*
  * $Log$
- * Revision 1.97  2011/10/19 14:57:22  efy-vitalij
- * add comments to a select_country function
+ * Revision 1.99  2013/11/06 08:03:47  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.96  2011/10/03 10:45:14  efy-vitalij
- * add background color parm to select_input_array()
- *
- * Revision 1.95  2011/09/27 17:31:19  efy-yurybakh
- * User additional info fields
- *
- * Revision 1.94  2011/09/27 07:45:58  efy-asimo
- * Front office messaging hot fixes
- *
- * Revision 1.93  2011/09/26 08:55:24  efy-vitalij
- * add function select_country() _form.class.php
- *
- * Revision 1.92  2011/09/18 00:58:44  fplanque
- * forms cleanup
- *
- * Revision 1.91  2011/09/10 19:41:53  fplanque
- * fixing http://forums.b2evolution.net/viewtopic.php?t=22443
- *
- * Revision 1.90  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.89  2010/06/19 01:09:31  blueyed
- * Improve jQuery hintbox integration.
- *
- *  - Load js/css in form class method
- *  - Use JS to load the CSS, since LINK is not valid in HTML BODY
- *  - Remove disableEnterKey onkeypress: handled properly by
- *    hintbox (patch sent upstream). This allows form submission from
- * 	 the input field now again.
- *  - Add proper CSS class to input field. This makes the "loading"
- *    background image not appear anymore, but that depends on the
- * 	 admin skin.
- *
- * Revision 1.88  2010/06/18 23:56:02  blueyed
- * todo
- *
- * Revision 1.87  2010/06/18 23:48:54  blueyed
- * minor hintbox cleanup.
- *
- * Revision 1.86  2010/05/06 09:24:13  efy-asimo
- * Messaging options - fix
- *
- * Revision 1.85  2010/04/12 19:51:08  blueyed
- * Form::textarea_input: field_params: Add format_value param.
- *
- * Revision 1.84  2010/04/12 19:50:35  blueyed
- * Form::textarea_input: field_params: simplify default param handling. Fix doc.
- *
- * Revision 1.83  2010/04/08 18:28:02  blueyed
- * crumb refactoring: add get_crumb
- *
- * Revision 1.82  2010/03/31 00:00:13  blueyed
- * whitespace
- *
- * Revision 1.81  2010/02/08 17:51:58  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.80  2010/01/03 11:46:11  fplanque
- * fixed delte confirmations display
- * (thanks to whoever broke that years ago and never fixed it!)
- *
- * Revision 1.79  2010/01/02 17:24:31  fplanque
- * Crumbs - Proof of concept
- *
- * Revision 1.78  2009/12/01 14:46:51  efy-maxim
- * disable enter key to submit form
- *
- * Revision 1.77  2009/11/30 00:22:04  fplanque
- * clean up debug info
- * show more timers in view of block caching
- *
- * Revision 1.76  2009/11/28 16:42:05  efy-maxim
- * field name fix
- *
- * Revision 1.75  2009/11/27 12:29:05  efy-maxim
- * drop down
- *
- * Revision 1.74  2009/11/26 16:00:44  efy-maxim
- * autocomplete-off
- *
- * Revision 1.73  2009/11/26 10:30:56  efy-maxim
- * ajax actions have been moved to async.php
- *
- * Revision 1.72  2009/11/23 21:50:32  efy-maxim
- * ajax dropdown
- *
- * Revision 1.71  2009/11/22 18:52:20  efy-maxim
- * change owner; is login
- *
- * Revision 1.70  2009/11/20 23:56:36  fplanque
- * minor  + doc
- *
- * Revision 1.69  2009/11/20 09:06:05  efy-maxim
- * change owner
- *
- * Revision 1.68  2009/10/28 09:39:50  efy-maxim
- * position of arguments of duration_input function have been changed
- *
- * Revision 1.67  2009/10/27 21:57:44  fplanque
- * minor/doc
- *
- * Revision 1.66  2009/10/27 13:27:45  efy-maxim
- * 1. months and seconds fields in duration field
- * 2. duration fields instead simple text fields
- *
- * Revision 1.65  2009/10/25 23:11:19  blueyed
- * doc
- *
- * Revision 1.64  2009/10/11 02:32:48  blueyed
- * doc
- *
- * Revision 1.63  2009/09/15 19:31:55  fplanque
- * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
- * PHP 4 compatible. Even better on PHP 5.
- * I may have broken a few things. Sorry. This is pretty hard to do in one swoop without any glitch.
- * Thanks for fixing or reporting if you spot issues.
- *
- * Revision 1.62  2009/09/14 10:56:36  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.61  2009/09/13 21:27:57  blueyed
- * Form::time_input: fix field_size and crop value according to format.
- *
- * Revision 1.60  2009/09/12 18:44:11  efy-maxim
- * Messaging module improvements
- *
- * Revision 1.59  2009/09/04 16:10:31  tblue246
- * Fix PHP notice (discovered by waltercruz)
- *
- * Revision 1.58  2009/09/02 18:08:03  tblue246
- * Bugfix
- *
- * Revision 1.57  2009/08/30 00:42:11  fplanque
- * fixed user form
- *
- * Revision 1.56  2009/07/01 23:34:21  fplanque
- * made $id$ more predictable
- *
- * Revision 1.55  2009/06/09 12:00:30  yabs
- * bug fix
- *
- * Revision 1.54  2009/06/09 07:41:05  yabs
- * added replacement vars for class && id for fieldset_begin()
- *
- * Revision 1.53  2009/05/28 20:24:01  blueyed
- * fix doc
- *
- * Revision 1.52  2009/05/26 19:31:54  fplanque
- * Plugins can now have Settings that are specific to each blog.
- *
- * Revision 1.51  2009/05/26 18:26:29  blueyed
- * doc
- *
- * Revision 1.50  2009/05/26 18:25:30  blueyed
- * Form: date_input: in case of malformed date: Keep original value, but strip off the time part (if any)
- *
- * Revision 1.49  2009/05/26 18:24:00  blueyed
- * Form: hiddens_by_key: merge included_input_field_names always.
- *
- * Revision 1.48  2009/05/20 12:58:14  fplanque
- * Homepage: option to 301 redirect to canonical homepage.
- * Option to support rel="canonical" instead of or when 301 redirect cannot be used.
- *
- * Revision 1.47  2009/05/15 19:08:00  fplanque
- * doc
- *
- * Revision 1.46  2009/05/15 18:50:03  blueyed
- * Form class:
- *  - do not extract params from action_url into hiddens for POST
- *  - actually remove "converted" params from action_url
- *  - make this work for action_url starting with "?", too
- *  - do not move params from action_url to params, if they get used in fields
- *  - doc fix
- *
- * Revision 1.45  2009/05/08 20:22:47  blueyed
- * Revert r1.44, not more readable. ACKed by tblue246.
- *
- * Revision 1.43  2009/05/05 22:35:10  blueyed
- * Form: - get_input_element: add support for 'format_to_output'=false, useful for values in buttons.
- *  - included_input_field_names: remember used input field names and exclude those by default in hiddens_by_key (useful if you use _POST there)
- *  - accept iso dates in date_input, if there are errors (which may come from a custom param_error call)
- *  - doc
- *
- * Revision 1.42  2009/04/28 19:54:41  blueyed
- * Form::date_input: use the input if date conversion failed
- *
- * Revision 1.41  2009/03/13 01:26:22  blueyed
- * Form: date_input: re-add js_date_format calculation for input field length. Removed by afwas in r6525 (CVS 1.31), and ACKed to re-add it.
- *
- * Revision 1.40  2009/03/13 01:25:48  blueyed
- * Form: remove params from form_action, also for POST now.
- *
- * Revision 1.39  2009/03/09 10:02:33  afwas
- * Bugfix: add missing argument.
- *
- * Revision 1.38  2009/03/08 23:57:41  fplanque
- * 2009
- *
- * Revision 1.37  2009/03/03 00:54:24  fplanque
- * self:: does not work on PHP4 !!
- *
- * Revision 1.36  2009/03/02 23:46:36  blueyed
- * Add Form::get_select_options_string as static method for the common task to build an option list only. Extracted out of select_input_array.
- *
- * Revision 1.35  2009/02/26 22:16:54  blueyed
- * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
- *
- * Revision 1.34  2009/02/21 23:10:43  fplanque
- * Minor
- *
- * Revision 1.33  2009/02/07 10:11:07  yabs
- * Quick and dirty required fields, will tidy up after more testing
- *
- * Revision 1.32  2009/01/23 22:56:35  afwas
- * Ooops, left an old variable $js_fate_format.
- *
- * Revision 1.31  2009/01/23 22:36:19  afwas
- * Remove javaScript popup calendar to be replaced with jQuery datepicker.
- *
- * Revision 1.30  2009/01/13 22:51:28  fplanque
- * rollback / normalized / MFB
- *
- * Revision 1.29  2009/01/08 16:20:57  blueyed
- * Form class: if $form_action contains GET params, add those as hidden inputs for $form_action==get (since browsers discard them otherwise).
- *
- * Revision 1.28  2008/09/07 07:56:37  fplanque
- * Fixed select box warning
- *
- * Revision 1.27  2008/02/13 11:33:42  blueyed
- * Explicitly call jQuery(), not the shortcut ($())
- *
- * Revision 1.26  2008/02/09 20:12:36  fplanque
- * note control for time field
- *
- * Revision 1.25  2008/02/09 02:56:00  fplanque
- * explicit order by field
- *
- * Revision 1.24  2008/01/21 09:35:24  fplanque
- * (c) 2008
- *
- * Revision 1.23  2007/12/26 17:42:31  yabs
- * bugfix ( http://forums.b2evolution.net/viewtopic.php?t=13649 )
- *
- * Revision 1.22  2007/12/09 21:24:13  blueyed
- * empty LEGEND display fix for FF2
- *
- * Revision 1.21  2007/12/09 21:17:26  blueyed
- * Display fix for IE6, which needs the DIV.label for buttonsstart
- *
- * Revision 1.20  2007/12/09 03:22:22  blueyed
- * Fix "Fatal error: Call to a member function get_template() on a non-object in /blogs/inc/_core/ui/forms/_form.class.php on line 189", when using an "inline" form where AdminUI is not available; this is the reason why the "Add an OpenID to your user profile" page fails for b2evo 2.2
- *
- * Revision 1.19  2007/11/27 10:43:10  yabs
- * validation
- *
- * Revision 1.18  2007/11/22 15:24:54  fplanque
- * fix
- *
- * Revision 1.17  2007/11/22 14:16:43  fplanque
- * antispam / banning cleanup
- *
- * Revision 1.16  2007/11/02 02:39:57  fplanque
- * refactored blog settings / UI
- *
- * Revision 1.15  2007/11/01 19:52:46  fplanque
- * better comment forms
- *
- * Revision 1.14  2007/10/29 01:24:49  fplanque
- * no message
- *
- * Revision 1.13  2007/10/10 10:52:26  yabs
- * validation - linsepan/blockspan/default are probably still invalid
- *
- * Revision 1.12  2007/10/08 08:31:59  fplanque
- * nicer forms
- *
- * Revision 1.11  2007/10/06 21:04:15  fplanque
- * temporary fix
- *
- * Revision 1.10  2007/09/30 05:00:45  fplanque
- * fixes
- *
- * Revision 1.9  2007/09/29 11:18:35  yabs
- * minor bug fix
- *
- * There's still a problem with the login form that needs fixing
- *
- * Revision 1.8  2007/09/29 09:48:55  yabs
- * minor bug fixes
- *
- * Revision 1.7  2007/09/29 03:08:24  fplanque
- * a little cleanup of the form class, hopefully fixing the plugin screen
- *
- * Revision 1.6  2007/09/12 21:00:30  fplanque
- * UI improvements
- *
- * Revision 1.5  2007/09/11 08:23:44  yabs
- * minor bug fix
- *
- * Revision 1.4  2007/09/07 20:11:18  fplanque
- * Better category selector
- *
- * Revision 1.3  2007/09/03 16:44:28  fplanque
- * chicago admin skin
- *
- * Revision 1.2  2007/09/02 19:23:42  blueyed
- * doc
- *
- * Revision 1.1  2007/06/25 10:59:01  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.82  2007/05/23 09:17:04  blueyed
- * Support for stacking in Form::switch_layout()
- *
- * Revision 1.81  2007/05/15 14:57:24  blueyed
- * Fix for Form::select_input_array() "selected"-Handling (cast values to string when comparing)
- *
- * Revision 1.80  2007/04/26 00:11:07  fplanque
- * (c) 2007
- *
- * Revision 1.79  2007/04/23 15:06:28  blueyed
- * radio_input(): Respect "lines" param for "note_format" default value
- *
- * Revision 1.78  2007/04/20 03:01:12  fplanque
- * doc
- *
- * Revision 1.77  2007/04/16 15:49:59  blueyed
- * Minor fixes:
- *  - allow "0" as label
-fp> once again this should not be documented in the changelog but at the right place in the code
-fp> someday it will just get "cleaned up" -> broken again for lack of a comment. Don't complain then...
- *  - format-to-output label
- *
- * Revision 1.76  2007/04/16 15:46:10  blueyed
- * Fixed $labelempty for IE6 and "fieldset" layout
- *
- * Revision 1.75  2007/03/23 14:47:48  blueyed
- *  - Display both "required" and "error" states in checklist() and through handle_common_params()
- * - "force_keys_as_values" param for select_input_array() (Props A. Becker)
- * - cleanup, minor fixes
- *
- * Revision 1.74  2007/03/23 14:33:23  blueyed
- * Re-added $field_params for hidden(), which is needed, e.g. when adding an id to a hidden form element.
- *
- * Revision 1.73  2007/03/21 01:44:51  fplanque
- * item controller: better return to current filterset - step 1
- *
- * Revision 1.72  2007/03/11 21:29:09  fplanque
- * cleanup
- *
- * Revision 1.71  2007/03/09 15:39:56  blueyed
- * radio_input(): Use "checked" param for $field_options if given
- *
- * Revision 1.70  2007/03/09 15:18:52  blueyed
- * Removed bloated "params" usage in Form::radio_input() for $field_options. Now the attribs/params for each radio input are directly in the $field_options entry instead.
- *
- * Revision 1.69  2007/02/11 15:00:15  fplanque
- * keeping JS abstraction.
- *
- * Revision 1.67  2007/01/24 06:43:25  fplanque
- * fix
- *
- * Revision 1.66  2007/01/23 08:57:36  fplanque
- * decrap!
- *
- * Revision 1.65  2007/01/07 05:25:09  fplanque
- * "fixed" regression :/
- *
- * Revision 1.64  2006/12/22 22:22:20  blueyed
- * Unset "maxlength" field_param in textarea_input(): not a html attrib
- *
- * Revision 1.63  2006/12/13 19:34:25  fplanque
- * doc
- *
- * Revision 1.62  2006/12/13 18:00:35  blueyed
- * Allow "0" as note (again) + avoid unnecessary negation
- *
- * Revision 1.61  2006/12/10 23:17:10  fplanque
- * oops
- *
- * Revision 1.60  2006/12/10 22:17:04  fplanque
- * added note support to select_input
- *
- * Revision 1.59  2006/12/10 12:42:40  blueyed
- * "maxlength" handling for textarea fields through javascript
- *
- * Revision 1.58  2006/12/09 01:55:36  fplanque
- * feel free to fill in some missing notes
- * hint: "login" does not need a note! :P
- *
- * Revision 1.57  2006/12/08 02:08:01  uid156866
- * MFH: Fixed "Write" page/tab for Firefox 1.0.x
- *
- * Revision 1.56  2006/12/07 23:13:13  fplanque
- * @var needs to have only one argument: the variable type
- * Otherwise, I can't code!
- *
- * Revision 1.55  2006/12/06 19:12:11  fplanque
- * not all comments are something "TO DO". Some really just are "comments"
- *
- * Revision 1.54  2006/12/06 18:48:20  blueyed
- * doc
- *
- * Revision 1.53  2006/12/06 18:06:18  fplanque
- * an experiment with JS hiding/showing form parts
- *
- * Revision 1.52  2006/11/24 18:27:27  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.51  2006/11/19 22:17:42  fplanque
- * minor / doc
- *
- * Revision 1.50  2006/11/19 15:52:27  blueyed
- * Fixed E_NOTICE with Form::hidden
- *
- * Revision 1.49  2006/11/18 17:58:57  blueyed
- * added DIV.inline and use it additionally for span.line replacement
- *
- * Revision 1.48  2006/11/16 23:48:56  blueyed
- * Use div.line instead of span.line as element wrapper for XHTML validity
- *
- * Revision 1.47  2006/11/16 20:03:25  blueyed
- * Cleanup; added $infoend support
- *
- * Revision 1.46  2006/11/16 01:49:40  fplanque
- * doc
- *
- * Revision 1.45  2006/11/08 17:47:55  blueyed
- * Extra classes 'form_text_input' and 'form_textarea_input' to enable IE6 CSS selection
- *
- * Revision 1.44  2006/11/05 20:13:57  fplanque
- * minor
- *
- * Revision 1.43  2006/11/03 14:25:24  blueyed
- * Made Form::get_valid_id() static
- *
- * Revision 1.42  2006/10/14 16:07:54  blueyed
- * Overwrite previous added hidden fields (by default), when adding hidden inputs.
  */
 ?>

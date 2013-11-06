@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -187,46 +187,8 @@ class SkinCache extends DataObjectCache
 
 /*
  * $Log$
- * Revision 1.9  2011/09/04 22:13:20  fplanque
- * copyright 2011
+ * Revision 1.10  2013/11/06 08:04:45  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.8  2010/02/26 21:24:09  fplanque
- * rollback - did not seem right
- *
- * Revision 1.7  2010/02/08 17:54:42  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.6  2010/01/30 18:55:34  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.5  2009/09/14 13:42:44  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.4  2009/05/23 20:20:18  fplanque
- * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
- *
- * Revision 1.3  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.2  2008/01/21 09:35:35  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 11:01:34  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.5  2007/04/26 00:11:12  fplanque
- * (c) 2007
- *
- * Revision 1.4  2007/01/14 01:33:34  fplanque
- * losely restrict to *installed* XML feed skins
- *
- * Revision 1.3  2007/01/11 20:42:37  fplanque
- * no message
- *
- * Revision 1.2  2007/01/07 23:38:20  fplanque
- * discovery of skin containers
- *
- * Revision 1.1  2006/12/29 01:10:06  fplanque
- * basic skin registering
  */
 ?>

@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -57,6 +57,8 @@ $Form->begin_form( 'fform', $creating ?  T_('New user field group') : T_('User f
 
 	$Form->text_input( 'ufgp_name', $edited_UserfieldGroup->name, 50, T_('Name'), '', array( 'maxlength'=> 255, 'required'=>true ) );
 
+	$Form->text_input( 'ufgp_order', $edited_UserfieldGroup->order, 50, T_('Order number'), '', array( 'maxlength'=> 11, 'required'=>true ) );
+
 if( $creating )
 {
 	$Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'SaveButton' ),
@@ -72,9 +74,8 @@ else
 
 /*
  * $Log$
- * Revision 1.1  2011/10/24 18:32:35  efy-yurybakh
- * Groups for user fields
- *
+ * Revision 1.3  2013/11/06 08:05:04  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

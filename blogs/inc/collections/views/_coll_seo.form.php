@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -318,10 +318,17 @@ $Form->begin_fieldset( T_('Tag pages').get_manual_link('tag_pages_seo'), array('
 // Javascript juice for the tag fields.
 ?>
 <script type="text/javascript">
-jQuery("#tag_links_fieldset input[type=radio]").click( function()
+jQuery("#tag_links_fieldset input[name=tag_links][type=radio]").click( function()
 {
 	// Disable tag_prefix, if "param" is used. fp> TODO: visual feedback that this is disabled
-	jQuery('#tag_prefix').attr("disabled", this.value == 'param' ? "disabled" : "");
+	if( jQuery( this ).val() == 'param' )
+	{
+		jQuery('#tag_prefix').attr("disabled", "disabled");
+	}
+	else
+	{
+		jQuery('#tag_prefix').removeAttr("disabled");
+	}
 	// Disable tag_rel_attrib, if "prefix-only" is not used.
 	jQuery('#tag_rel_attrib').attr("disabled", this.value == 'prefix-only' ? "" : "disabled");
 
@@ -391,120 +398,8 @@ echo '<p class="note right">SEO portraits kindly provided by <a href="http://www
 
 /*
  * $Log$
- * Revision 1.32  2011/09/04 22:13:14  fplanque
- * copyright 2011
- *
- * Revision 1.31  2010/04/23 09:39:44  efy-asimo
- * "SEO setting" for help link and Groups slugs permission implementation
- *
- * Revision 1.30  2010/04/08 21:02:43  waltercruz
- * Tags as meta-description fallback
- *
- * Revision 1.29  2010/02/08 17:52:09  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.28  2010/01/30 18:55:21  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.27  2010/01/03 13:45:36  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.26  2009/07/23 15:39:22  waltercruz
- * Improving message
- *
- * Revision 1.25  2009/05/27 14:46:33  waltercruz
- * Using categories description as meta-description for categories pages
- *
- * Revision 1.24  2009/05/21 12:34:39  fplanque
- * Options to select how much content to display (excerpt|teaser|normal) on different types of pages.
- *
- * Revision 1.23  2009/05/20 18:27:09  fplanque
- * canonical support for date archives
- *
- * Revision 1.22  2009/05/20 12:58:17  fplanque
- * Homepage: option to 301 redirect to canonical homepage.
- * Option to support rel="canonical" instead of or when 301 redirect cannot be used.
- *
- * Revision 1.21  2009/05/17 19:51:10  fplanque
- * minor/doc
- *
- * Revision 1.20  2009/04/22 22:46:33  blueyed
- * Add support for rel=tag in tag URLs. This adds a new tag_links mode 'prefix-only', which requires a prefix (default: tag) and uses no suffix (dash/colon/semicolon). Also adds more JS juice and cleans up/normalized previously existing JS. Not much tested, but implemented as discussed on ML.
- *
- * Revision 1.19  2009/04/22 20:27:17  blueyed
- * Fix hiding of 'Prefix' box for 'Tag page URLs' select. Use jQuery for easy hide-on-init.
- *
- * Revision 1.18  2009/03/22 16:12:02  fplanque
- * minor
- *
- * Revision 1.17  2009/03/21 00:38:15  waltercruz
- * Addind SEO setting for excerpts as meta description
- *
- * Revision 1.16  2009/03/17 02:00:26  waltercruz
- * blogs/inc/_blog_main.inc.php
- *
- * Revision 1.15  2009/03/15 02:16:35  fplanque
- * auto link option for titles
- *
- * Revision 1.14  2009/03/08 23:57:42  fplanque
- * 2009
- *
- * Revision 1.13  2008/09/09 06:03:30  fplanque
- * More tag URL options
- * Enhanced URL resolution for categories and tags
- *
- * Revision 1.12  2008/03/21 19:42:44  fplanque
- * enhanced 404 handling
- *
- * Revision 1.11  2008/01/21 09:35:27  fplanque
- * (c) 2008
- *
- * Revision 1.10  2008/01/20 20:26:03  slamp
- * typo canoncial -> canonical
- *
- * Revision 1.9  2008/01/07 02:53:27  fplanque
- * cleaner tag urls
- *
- * Revision 1.8  2007/12/27 18:20:00  fplanque
- * cosmetics
- *
- * Revision 1.7  2007/12/27 01:58:48  fplanque
- * additional SEO
- *
- * Revision 1.6  2007/11/29 21:23:35  fplanque
- * Changed wording.
- *
- * Revision 1.5  2007/11/25 18:20:38  fplanque
- * additional SEO settings
- *
- * Revision 1.4  2007/11/24 21:41:12  fplanque
- * additional SEO settings
- *
- * Revision 1.3  2007/11/03 04:56:03  fplanque
- * permalink / title links cleanup
- *
- * Revision 1.2  2007/09/29 03:42:12  fplanque
- * skin install UI improvements
- *
- * Revision 1.1  2007/09/28 09:28:36  fplanque
- * per blog advanced SEO settings
- *
- * Revision 1.1  2007/06/25 10:59:35  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.4  2007/05/31 03:02:23  fplanque
- * Advanced perms now disabled by default (simpler interface).
- * Except when upgrading.
- * Enable advanced perms in blog settings -> features
- *
- * Revision 1.3  2007/05/13 22:53:31  fplanque
- * allow feeds restricted to post excerpts
- *
- * Revision 1.2  2007/04/26 00:11:05  fplanque
- * (c) 2007
- *
- * Revision 1.1  2006/12/16 01:30:47  fplanque
- * Setting to allow/disable email subscriptions on a per blog basis
+ * Revision 1.34  2013/11/06 08:03:58  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

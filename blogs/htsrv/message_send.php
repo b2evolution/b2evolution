@@ -1,6 +1,6 @@
 <?php
 /**
- * This file sends an email or a private message to the user! 
+ * This file sends an email to the user!
  * It's used to handle the contact form send message action. Even visitors are able to send emails.
  *
  * It's the form action for {@link _msgform.disp.php}.
@@ -8,7 +8,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -40,71 +40,23 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
 
-global $Session;
+global $Session, $Settings, $admin_url, $baseurl, $dummy_fields;
 
 header( 'Content-Type: text/html; charset='.$io_charset );
 
 // Check that this action request is not a CSRF hacked request:
 $Session->assert_received_crumb( 'newmessage' );
 
+if( $Settings->get('system_lock') )
+{ // System is locked for maintenance, users cannot send a message
+	$Messages->add( T_('You cannot send a message at this time because the system is under maintenance. Please try again in a few moments.'), 'error' );
+	header_redirect(); // Will save $Messages into Session
+}
+
 // TODO: Flood protection (Use Hit class to prevent mass mailings to members..)
 
-// --------------------------------------------------
-// TODO: fp> v2.0: this bloats this file. MOVE to msg_remove.php or sth alike
-if( param( 'optout_cmt_email', 'string', '' ) )
-{ // an anonymous commentator wants to opt-out from receiving mails through a message form:
-
-	if( param( 'req_ID', 'string', '' ) )
-	{ // clicked on link from e-mail
-		if( $req_ID == $Session->get( 'core.msgform.optout_cmt_reqID' )
-		    && $optout_cmt_email == $Session->get( 'core.msgform.optout_cmt_email' ) )
-		{
-			$DB->query( '
-				UPDATE T_comments
-				   SET comment_allow_msgform = 0
-				 WHERE comment_author_email = '.$DB->quote($optout_cmt_email) );
-
-			$Messages->add( T_('All your comments have been marked not to allow emailing you through a message form.'), 'success' );
-
-			$Session->delete('core.msgform.optout_cmt_email');
-		}
-		else
-		{
-			$Messages->add( T_('The request not to receive emails through a message form for your comments failed.'), 'error' );
-		}
-
-		$Messages->display();
-		exit(0);
-	}
-
-	$req_ID = generate_random_key(32);
-
-	$message = sprintf( T_("We have received a request that you do not want to receive emails through\na message form on your comments anymore.\n\nTo confirm that this request is from you, please click on the following link:") )
-		."\n\n"
-		.$samedomain_htsrv_url.'message_send.php?optout_cmt_email='.$optout_cmt_email.'&req_ID='.$req_ID
-		."\n\n"
-		.T_('Please note:')
-		.' '.T_('For security reasons the link is only valid for your current session (by means of your session cookie).')
-		."\n\n"
-		.T_('If it was not you that requested this, simply ignore this mail.');
-
-	if( send_mail( $optout_cmt_email, NULL, T_('Confirm opt-out for emails through message form'), $message ) )
-	{
-		echo T_('An email has been sent to you, with a link to confirm your request not to receive emails through the comments you have made on this blog.');
-		$Session->set( 'core.msgform.optout_cmt_email', $optout_cmt_email );
-		$Session->set( 'core.msgform.optout_cmt_reqID', $req_ID );
-	}
-	else
-	{
-		$Messages->add( T_('Sorry, could not send email.')
-					.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
-	}
-
-	exit(0);
-}
-// END OF BLOCK TO BE MOVED
-// --------------------------------------------------
-
+// Get rediredt_to param
+$redirect_to = param( 'redirect_to', 'string', '' );
 
 // Getting GET or POST parameters:
 param( 'blog', 'integer', '' );
@@ -112,10 +64,10 @@ param( 'recipient_id', 'integer', '' );
 param( 'post_id', 'integer', '' );
 param( 'comment_id', 'integer', '' );
 // Note: we use funky field names in order to defeat the most basic guestbook spam bots:
-$sender_name = param( 'd', 'string', '' );
-$sender_address = param( 'f', 'string', '' );
-$subject = param( 'g', 'string', '' );
-$message = param( 'h', 'html', '' );	// We accept html but we will NEVER display it
+$sender_name = param( $dummy_fields[ 'name' ], 'string', '' );
+$sender_address = param( $dummy_fields[ 'email' ], 'string', '' );
+$subject = param( $dummy_fields[ 'subject' ], 'string', '' );
+$message = param( $dummy_fields[ 'content' ], 'html', '' );	// We accept html but we will NEVER display it
 // save the message original content
 $original_content = $message;
 
@@ -179,21 +131,18 @@ if( ! empty( $recipient_id ) )
 		debug_die( 'Invalid recipient!' );
 	}
 
-	$recipient_name = trim($recipient_User->get('preferredname'));
-	$recipient_address = $recipient_User->get('email');
-
 	// Change the locale so the email is in the recipients language
 	locale_temp_switch($recipient_User->locale);
 }
 elseif( ! empty( $comment_id ) )
 { // Get the email address for the recipient if a visiting commenter.
+	$CommentCache = & get_CommentCache();
+	$Comment = $CommentCache->get_by_ID( $comment_id );
 
-	// Load comment from DB:
-	$row = $DB->get_row(
-		'SELECT *
-		   FROM T_comments
-		  WHERE comment_ID = '.$comment_id );
-	$Comment = new Comment( $row );
+	if( empty( $Comment ) )
+	{
+		debug_die( 'Invalid request, comment doesn\'t exists!' );
+	}
 
 	if( $recipient_User = & $Comment->get_author_User() )
 	{ // Comment is from a registered user:
@@ -209,326 +158,161 @@ elseif( ! empty( $comment_id ) )
 	}
 	else
 	{
-		$allow_msgform = 'email';
+		$recipient_name = $Comment->get_author_name();
+		$recipient_address = $Comment->get_author_email();
 	}
-
-	$recipient_name = trim($Comment->get_author_name());
-	$recipient_address = $Comment->get_author_email();
 
 	// We don't know the recipient's language - Change the locale so the email is in the blog's language:
 	locale_temp_switch($Blog->locale);
 }
 
-if( $allow_msgform == 'email' )
+if( empty($sender_name) )
 {
-	if( empty($sender_name) )
-	{
-		$Messages->add( T_('Please fill in your name.'), 'error' );
-	}
-	if( empty($sender_address) )
-	{
-		$Messages->add( T_('Please fill in your email.'), 'error' );
-	}
-	elseif( !is_email($sender_address) || antispam_check( $sender_address ) ) // TODO: dh> using antispam_check() here might not allow valid users to contact the admin in case of problems due to the antispam list itself.. :/
-	{
-		$Messages->add( T_('Supplied email address is invalid.'), 'error' );
-	}
+	$Messages->add( T_('Please fill in your name.'), 'error' );
+}
+if( empty($sender_address) )
+{
+	$Messages->add( T_('Please fill in your email.'), 'error' );
+}
+elseif( !is_email($sender_address) || antispam_check( $sender_address ) ) // TODO: dh> using antispam_check() here might not allow valid users to contact the admin in case of problems due to the antispam list itself.. :/
+{
+	$Messages->add( T_('Supplied email address is invalid.'), 'error' );
+}
 
-	if( empty($recipient_address) )
-	{ // should be prevented by UI
-		debug_die( 'No recipient specified!' );
-	}
+if( empty( $recipient_User ) && empty( $recipient_address ) )
+{ // should be prevented by UI
+	debug_die( 'No recipient specified!' );
+}
 
-	// opt-out links:
-	if( $recipient_User )
-	{ // Member:
+// opt-out links:
+if( $recipient_User )
+{ // Member:
+	if( $Settings->get( 'emails_msgform' ) == 'userset' )
+	{ // user can allow/deny to receive emails
+		$edit_preferences_url = NULL;
 		if( !empty( $Blog ) )
-		{
-			$message_footer .= T_("You can edit your profile to not receive emails through a form:")
-				."\n".url_add_param( str_replace( '&amp;', '&', $Blog->get('url') ), 'disp=profile', '&' );
+		{ // go to blog
+			$edit_preferences_url = url_add_param( str_replace( '&amp;', '&', $Blog->gen_blogurl() ), 'disp=userprefs', '&' );
 		}
-		// TODO: else go to admin
+		elseif( $recipient_User->check_perm( 'admin', 'restricted' ) )
+		{ // go to admin
+			$edit_preferences_url = $admin_url.'?ctrl=user&user_tab=userprefs&user_ID='.$recipient_User->ID;
+		}
+		if( !empty( $edit_preferences_url ) )
+		{ // add edit preferences link
+			$message_footer .= T_("You can edit your profile to not receive emails through a form:")."\n".$edit_preferences_url."\n";
+		}
 	}
-	elseif( $Comment )
-	{ // Visitor:
-		$message_footer .= T_("Click on the following link to not receive e-mails on your comments\nfor this e-mail address anymore:")
-			."\n".$samedomain_htsrv_url.'message_send.php?optout_cmt_email='.rawurlencode($Comment->author_email);
+	// Add quick unsubcribe link so users can deny receiving emails through b2evo message form in any circumstances
+	$message_footer .= T_( 'If you don\'t want to receive any more emails through a message form, click here' ).':'
+		."\n".$htsrv_url.'quick_unsubscribe.php?type=msgform&user_ID=$user_ID$&key=$unsubscribe_key$';
+}
+elseif( $Comment )
+{ // Visitor:
+	$message_footer .= T_("Click on the following link to not receive e-mails on your comments\nfor this e-mail address anymore:")
+		."\n".$samedomain_htsrv_url.'anon_unsubscribe.php?type=comment&c='.$Comment->ID.'&anon_email='.rawurlencode($Comment->author_email);
+}
+
+
+// Trigger event: a Plugin could add a $category="error" message here..
+$Plugins->trigger_event( 'MessageFormSent', array(
+	'recipient_ID' => $recipient_id,
+	'item_ID' => $post_id,
+	'comment_ID' => $comment_id,
+	'subject' => & $subject,
+	'message' => & $message,
+	'message_footer' => & $message_footer,
+	'Blog' => & $Blog,
+	'sender_name' => & $sender_name,
+	'sender_email' => & $sender_address,
+	) );
+
+
+$success_message = ( !$Messages->has_errors() );
+if( $success_message )
+{ // no errors, try to send the message
+	$email_template_params = array(
+			'sender_name'    => $sender_name,
+			'sender_address' => $sender_address,
+			'message_footer' => $message_footer,
+			'Blog'           => $Blog,
+			'message'        => $message,
+		);
+
+	if( empty( $recipient_User ) )
+	{ // Send mail to visitor
+		// Get a message text from template file
+		$message = mail_template( 'message_sent', 'text', $email_template_params );
+		$success_message = send_mail( $recipient_address, $recipient_name, $subject, $message, NULL, NULL, array( 'Reply-To' => $sender_address ) );
+	}
+	else
+	{ // Send mail to registered user
+		$success_message = send_mail_to_User( $recipient_User->ID, $subject, 'message_sent', $email_template_params, false, array( 'Reply-To' => $sender_address ) );
 	}
 
-
-	// Trigger event: a Plugin could add a $category="error" message here..
-	$Plugins->trigger_event( 'MessageFormSent', array(
-		'recipient_ID' => & $recipient_id,
-		'item_ID' => $post_id,
-		'comment_ID' => $comment_id,
-		'subject' => & $subject,
-		'message' => & $message,
-		'message_footer' => & $message_footer,
-		'Blog' => & $Blog,
-		'sender_name' => & $sender_name,
-		'sender_email' => & $sender_address,
-		) );
-
-
-	$success_message = ( !$Messages->has_errors() );
-	if( $success_message )
-	{ // no errors, try to send the message
-		// show sender name
-		$message_header = $sender_name." has sent you this message:\n\n";
-
-		// show sender email address
-		$message_footer = sprintf( T_( 'By replying, your email will go directly to %s.' ), $sender_address )."\n\n".$message_footer;
-
-		if( !empty( $Blog ) )
+	if( !$success_message )
+	{ // could not send email
+		if( $demo_mode )
 		{
-			$message = $message
-				."\n\n-- \n"
-				.sprintf( T_('This message was sent via the messaging system on %s.'), $Blog->name )."\n"
-				.$Blog->get('url')."\n\n"
-				.$message_footer;
+			$Messages->add( T_('Sorry, could not send email. Sending email in demo mode is disabled.' ), 'error' );
 		}
 		else
-		{
-			$message = $message
-				."\n\n-- \n"
-				.sprintf( T_('This message was sent via the messaging system on %s.'), $baseurl )."\n\n"
-				.$message_footer;
-		}
-
-		 // Send mail
-		$success_message = send_mail( $recipient_address, $recipient_name, $subject, $message, $notify_from, NULL, array( 'Reply-To' => $sender_address ) );
-		if( !$success_message )
 		{
 			$Messages->add( T_('Sorry, could not send email.')
 				.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
 		}
 	}
 }
-elseif( ! $Messages->has_errors() )
-{ // There were no errors, Send private message
-	load_funcs( 'messaging/model/_messaging.funcs.php' );
-	if( isset( $recipient_User ) )
-	{
-		$success_message = send_private_message( $recipient_User->get( 'login' ), $subject, $message );
-		if( !$success_message )
-		{
-			$Messages->add( T_('Sorry, could not send your message.'), 'error' );
-		}
-	}
-}
-else
-{ // message param error
-	$success_message = false;
-}
 
 
 // Plugins should cleanup their temporary data here:
-$Plugins->trigger_event( 'MessageFormSentCleanup' );
+$Plugins->trigger_event( 'MessageFormSentCleanup', array(
+		'success_message' => $success_message,
+	) );
 
 
 // restore the locale to the blog visitor language
 locale_restore_previous();
 
+if( empty( $redirect_to ) && empty( $Blog ) )
+{
+	$redirect_to = $baseurl;
+}
 if( $success_message )
 {
 	// Never say to whom we sent the email -- prevent user enumeration.
 	$Messages->add( T_('Your message has been sent.'), 'success' );
-	if( $allow_msgform == 'PM' )
+	if( empty( $redirect_to ) )
 	{
-		header_redirect(  url_add_param( $Blog->gen_blogurl(), 'disp=threads' ) );
-		// exited here
+		$redirect_to = $Blog->gen_blogurl();
+		if( !empty( $recipient_User ) )
+		{
+			$redirect_to = url_add_param( $redirect_to, 'disp=msgform&recipient_id='.$recipient_User->ID );
+		}
 	}
-}
-else
-{ // unsuccessful message send, save message params into the Session to not lose the content
-	$unsaved_message_params = array();
-	$unsaved_message_params[ 'sender_name' ] = $sender_name;
-	$unsaved_message_params[ 'sender_address' ] = $sender_address;
-	$unsaved_message_params[ 'subject' ] = $subject;
-	$unsaved_message_params[ 'message' ] = $original_content;
-	save_message_params_to_session( $unsaved_message_params );
-
-	header_redirect( url_add_param( $Blog->gen_blogurl(), 'disp=msgform&recipient_id='.$recipient_id ) );
-	//exited here
+	header_redirect( $redirect_to );
+	// exited here
 }
 
-// redirect Will save $Messages into Session:
-header_redirect(); // exits!
+// unsuccessful message send, save message params into the Session to not lose the content
+$unsaved_message_params = array();
+$unsaved_message_params[ 'sender_name' ] = $sender_name;
+$unsaved_message_params[ 'sender_address' ] = $sender_address;
+$unsaved_message_params[ 'subject' ] = $subject;
+$unsaved_message_params[ 'message' ] = $original_content;
+save_message_params_to_session( $unsaved_message_params );
 
+if( empty( $redirect_to ) )
+{
+	$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=msgform&recipient_id='.$recipient_id );
+}
+header_redirect( $redirect_to );
+//exited here
 
 /*
  * $Log$
- * Revision 1.82  2011/10/10 19:48:31  fplanque
- * i18n & login display cleaup
- *
- * Revision 1.81  2011/10/06 06:18:29  efy-asimo
- * Add messages link to settings
- * Update messaging notifications
- *
- * Revision 1.80  2011/10/04 08:39:29  efy-asimo
- * Comment and message forms save/reload content in case of error
- *
- * Revision 1.79  2011/10/01 07:16:25  efy-asimo
- * Fix message send - update
- *
- * Revision 1.78  2011/10/01 07:09:13  efy-asimo
- * Fix message send
- *
- * Revision 1.77  2011/09/30 07:38:58  efy-yurybakh
- * bubbletip for anonymous comments
- *
- * Revision 1.76  2011/09/26 14:53:27  efy-asimo
- * Login problems with multidomain installs - fix
- * Insert globals: samedomain_htsrv_url, secure_htsrv_url;
- *
- * Revision 1.75  2011/09/04 22:13:13  fplanque
- * copyright 2011
- *
- * Revision 1.74  2011/08/18 11:41:51  efy-asimo
- * Send all emails from noreply and email contents review
- *
- * Revision 1.73  2011/08/11 09:05:08  efy-asimo
- * Messaging in front office
- *
- * Revision 1.72  2010/11/25 15:16:34  efy-asimo
- * refactor $Messages
- *
- * Revision 1.71  2010/07/14 09:06:14  efy-asimo
- * todo fp>asimo modifications
- *
- * Revision 1.70  2010/07/12 09:07:37  efy-asimo
- * rename get_msgform_settings() to get_msgform_possibility
- *
- * Revision 1.69  2010/04/23 11:37:57  efy-asimo
- * send messages - fix
- *
- * Revision 1.68  2010/04/16 10:42:10  efy-asimo
- * users messages options- send private messages to users from front-office - task
- *
- * Revision 1.67  2010/02/08 17:51:14  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.66  2010/01/30 18:55:15  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.65  2010/01/27 02:46:22  sam2kb
- * minor/typo
- *
- * Revision 1.64  2010/01/25 18:18:21  efy-yury
- * add : crumbs
- *
- * Revision 1.63  2009/12/04 23:27:49  fplanque
- * cleanup Expires: header handling
- *
- * Revision 1.62  2009/09/26 12:00:42  tblue246
- * Minor/coding style
- *
- * Revision 1.61  2009/09/25 07:32:51  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.60  2009/03/08 23:57:36  fplanque
- * 2009
- *
- * Revision 1.59  2008/04/13 15:15:59  fplanque
- * attempt to fix email headers for non latin charsets
- *
- * Revision 1.57  2008/02/19 11:11:16  fplanque
- * no message
- *
- * Revision 1.56  2008/01/21 09:35:23  fplanque
- * (c) 2008
- *
- * Revision 1.55  2007/11/29 19:29:22  fplanque
- * normalized skin filenames
- *
- * Revision 1.54  2007/04/26 00:11:14  fplanque
- * (c) 2007
- *
- * Revision 1.53  2007/04/10 16:59:10  fplanque
- * fixed antispam on message form
- *
- * Revision 1.52  2007/03/09 10:07:53  yabs
- * Added antispam check
- *
- * Revision 1.51  2007/02/03 20:25:37  blueyed
- * Added "sender_name", "sender_email" and "subject" params to MessageFormSent
- *
- * Revision 1.50  2007/02/03 19:49:36  blueyed
- * Added "Blog" param to MessageFormSent hook
- *
- * Revision 1.49  2007/01/23 05:30:21  fplanque
- * "Contact the owner"
- *
- * Revision 1.48  2006/12/12 02:53:56  fplanque
- * Activated new item/comments controllers + new editing navigation
- * Some things are unfinished yet. Other things may need more testing.
- *
- * Revision 1.47  2006/11/26 02:30:38  fplanque
- * doc / todo
- *
- * Revision 1.46  2006/11/24 18:27:22  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.45  2006/11/24 18:06:02  blueyed
- * Handle saving of $Messages centrally in header_redirect()
- *
- * Revision 1.44  2006/11/23 01:44:24  fplanque
- * finalized standalone messaging
- * changed block order so that $Blog gets initalized
- *
- * Revision 1.43  2006/11/22 19:20:51  blueyed
- * Output charset header
- *
- * Revision 1.42  2006/11/22 19:12:22  blueyed
- * Normalized. TODO about merge error
- *
- * Revision 1.41  2006/11/22 01:20:33  fplanque
- * contact the admin feature
- *
- * Revision 1.40  2006/11/20 22:21:46  blueyed
- * Fixed typo
- *
- * Revision 1.39  2006/11/15 00:09:16  blueyed
- * Use the blog locale when sending e-mails to non-members - instead of the one from the visitor
- *
- * Revision 1.38  2006/11/14 21:12:55  blueyed
- * doc
- *
- * Revision 1.37  2006/09/10 18:14:24  blueyed
- * Do report error, if sending email fails in message_send.php (msgform and opt-out)
- *
- * Revision 1.36  2006/08/21 00:03:12  fplanque
- * obsoleted some dirty old thing
- *
- * Revision 1.35  2006/08/19 07:56:29  fplanque
- * Moved a lot of stuff out of the automatic instanciation in _main.inc
- *
- * Revision 1.34  2006/06/16 20:34:19  fplanque
- * basic spambot defeating
- *
- * Revision 1.33  2006/05/30 20:32:56  blueyed
- * Lazy-instantiate "expensive" properties of Comment and Item.
- *
- * Revision 1.31  2006/05/04 14:28:15  blueyed
- * Fix/enhanced
- *
- * Revision 1.30  2006/04/20 22:24:07  blueyed
- * plugin hooks cleanup
- *
- * Revision 1.29  2006/04/20 16:31:29  fplanque
- * comment moderation (finished for 1.8)
- *
- * Revision 1.28  2006/04/20 12:15:32  fplanque
- * no message
- *
- * Revision 1.27  2006/04/19 23:50:39  blueyed
- * Normalized Messages handling (error displaying and transport in Session)
- *
- * Revision 1.26  2006/04/19 20:13:48  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.25  2006/04/11 21:22:25  fplanque
- * partial cleanup
+ * Revision 1.84  2013/11/06 08:03:44  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

@@ -3,7 +3,7 @@
  * This file is part of b2evolution - {@link http://b2evolution.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -38,7 +38,7 @@ global $current_User;
 // Check minimum permission:
 if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
 {
-	$Messages->add( T_('Sorry, you are not allowed to view messages!') );
+	$Messages->add( T_('You are not allowed to view messages.') );
 	header_redirect( $admin_url );
 }
 
@@ -112,16 +112,10 @@ switch( $action )
 {
 	case 'create': // Record new message
 		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'message' );
+		$Session->assert_received_crumb( 'messaging_messages' );
 
-		if( ! $edited_Thread->check_thread_recipient( $current_User->ID ) )
-		{	// Deny to write a new message for not involved in users
-			$Messages->add( T_('You cannot post a message in a thread you\'re not involved in.'), 'error' );
-			header_redirect( '?ctrl=messages&thrd_ID='.$thrd_ID.$param_tab, 303 ); // Will EXIT
-		}
-
-		$non_blocked_contacts = $edited_Thread->load_contacts();
-		if( create_new_message( $thrd_ID, !empty( $non_blocked_contacts ) ) )
+		// Try to create the new message
+		if( create_new_message( $thrd_ID ) )
 		{
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=messages&thrd_ID='.$thrd_ID.$param_tab, 303 ); // Will EXIT
@@ -133,7 +127,7 @@ switch( $action )
 		// Delete message:
 
 		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'message' );
+		$Session->assert_received_crumb( 'messaging_messages' );
 
 		// Check permission:
 		$current_User->check_perm( 'perm_messaging', 'delete', true );
@@ -159,6 +153,19 @@ switch( $action )
 				$action = 'view';
 			}
 		}
+		break;
+
+	default:
+		// View messages, this not require crumb check
+
+		if( empty( $edited_Thread ) )
+		{ // there are no thread what to show
+			break;
+		}
+
+		// Mark this edited Thread as read by current User, because all messages will be displayed
+		// No need to check permission because if the given user is not part of the thread the update won't modify anything.
+		mark_as_read_by_user( $edited_Thread->ID, $current_User->ID );
 		break;
 
 }
@@ -200,7 +207,7 @@ switch( $action )
 		}
 		// We need to ask for confirmation:
 		$edited_Message->confirm_delete( T_('Delete message?'),
-				'message', $action, get_memorized( 'action' ) );
+				'messaging_messages', $action, get_memorized( 'action' ) );
 	default:
 		// No specific request, list all messages:
 		// Cleanup context:
@@ -218,77 +225,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.25  2011/10/18 17:10:25  efy-yurybakh
- * translation
- *
- * Revision 1.24  2011/10/18 00:04:45  fplanque
- * i18n update
- *
- * Revision 1.23  2011/10/17 18:33:53  efy-yurybakh
- * Messaging Abuse Management (don't allow posting in foreign threads)
- *
- * Revision 1.22  2011/10/15 07:15:02  efy-yurybakh
- * Messaging Abuse Management
- *
- * Revision 1.21  2011/10/14 19:02:14  efy-yurybakh
- * Messaging Abuse Management
- *
- * Revision 1.20  2011/10/13 18:08:16  efy-yurybakh
- * fix bug in the message list
- *
- * Revision 1.19  2011/10/07 05:43:45  efy-asimo
- * Check messaging availability before display
- *
- * Revision 1.18  2011/08/11 09:05:09  efy-asimo
- * Messaging in front office
- *
- * Revision 1.17  2010/01/30 18:55:32  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.16  2010/01/15 16:57:38  efy-yury
- * update messaging: crumbs
- *
- * Revision 1.15  2010/01/03 12:03:17  fplanque
- * More crumbs...
- *
- * Revision 1.14  2009/12/06 22:55:20  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.13  2009/10/08 20:05:52  efy-maxim
- * Modular/Pluggable Permissions
- *
- * Revision 1.12  2009/09/26 12:00:43  tblue246
- * Minor/coding style
- *
- * Revision 1.11  2009/09/25 07:32:52  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.10  2009/09/19 20:31:38  efy-maxim
- * 'Reply' permission : SQL queries to check permission ; Block/Unblock functionality; Error messages on insert thread/message
- *
- * Revision 1.9  2009/09/19 11:29:05  efy-maxim
- * Refactoring
- *
- * Revision 1.8  2009/09/18 16:16:50  efy-maxim
- * comments tab in messaging module
- *
- * Revision 1.7  2009/09/18 10:38:31  efy-maxim
- * 15x15 icons next to login in messagin module
- *
- * Revision 1.6  2009/09/18 06:14:33  efy-maxim
- * fix for very very bad security issue
- *
- * Revision 1.5  2009/09/14 07:31:43  efy-maxim
- * 1. Messaging permissions have been fully implemented
- * 2. Messaging has been added to evo bar menu
- *
- * Revision 1.4  2009/09/12 18:44:11  efy-maxim
- * Messaging module improvements
- *
- * Revision 1.3  2009/09/10 18:24:07  fplanque
- * doc
+ * Revision 1.27  2013/11/06 08:04:25  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

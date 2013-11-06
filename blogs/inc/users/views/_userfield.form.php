@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -51,40 +51,31 @@ $Form->begin_form( 'fform', $creating ?  T_('New user field') : T_('User field')
 
 	$Form->add_crumb( 'userfield' );
 
-	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',ufdf_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
-
-	if( $creating )
-	{
-		$Form->text_input( 'new_ufdf_ID', '', 8, T_('ID'), '', array( 'maxlength'=> 10, 'required'=>true ) );
-	}
-	else
-	{
-		$Form->hidden( 'ufdf_ID', $edited_Userfield->ID );
-	}
+	$Form->hiddens_by_key( get_memorized( 'action' ) ); // (this allows to come back to the right list order & page)
 
 	$Form->select_input_array( 'ufdf_ufgp_ID', $edited_Userfield->group_ID, $edited_Userfield->get_groups(),
 		T_('Group'), '', array( 'required' => true, 'force_keys_as_values' => true ) );
 
-	$Form->select_input_array( 'ufdf_type', $edited_Userfield->type, $edited_Userfield->get_types(),
-		T_('Type'), '', array( 'required' => true ) );
+	$Form->text_input( 'ufdf_name', $edited_Userfield->name, 50, T_('Field name'), '', array( 'maxlength'=> 255, 'required'=>true ) );
 
-	$Form->text_input( 'ufdf_name', $edited_Userfield->name, 50, T_('Name'), '', array( 'maxlength'=> 255, 'required'=>true ) );
+	$Form->select_input_array( 'ufdf_type', $edited_Userfield->type, $edited_Userfield->get_types(),
+		T_('Field type'), '', array( 'required' => true ) );
 
 	// Show this textarea only for field type with "Option list"
 	echo '<div id="div_ufdf_options"'. ( $edited_Userfield->type != 'list' ? ' style="display:none"' : '' ) .'>';
 	$Form->textarea_input( 'ufdf_options', $edited_Userfield->options, 10, T_('Options'), array( 'required' => true, 'note' => T_('Enter one option per line') ) );
 	echo '</div>';
 
-	if( $edited_Userfield->required )
-	{
-		$Form->radio_input( 'ufdf_required', $edited_Userfield->required, $edited_Userfield->get_requireds(), T_('Required?'), array( 'required'=>true ) );
-	}
-	else
-	{
-		$Form->radio_input( 'ufdf_required', 'optional', $edited_Userfield->get_requireds(), T_('Required?'), array( 'required'=>true ) );
-	}
+	// Suggest values only for field type with "Single word"
+	echo '<div id="div_ufdf_suggest"'. ( $edited_Userfield->type != 'word' ? ' style="display:none"' : '' ) .'>';
+	$Form->checkbox_input( 'ufdf_suggest', $edited_Userfield->suggest, T_('Suggest values') );
+	echo '</div>';
 
-	$Form->checkbox( 'ufdf_duplicated', $edited_Userfield->get('duplicated'), T_('Duplicated?'), T_('User can add a several instances of this field type') );
+	$Form->radio_input( 'ufdf_duplicated', $edited_Userfield->duplicated, $edited_Userfield->get_duplicateds(), T_('Multiple values'), array( 'required'=>true, 'lines'=>true ) );
+
+	$Form->radio_input( 'ufdf_required', $edited_Userfield->required, $edited_Userfield->get_requireds(), T_('Required?'), array( 'required'=>true ) );
+
+	$Form->textarea_input( 'ufdf_bubbletip', $edited_Userfield->bubbletip, 5, T_('Bubbletip text') );
 
 if( $creating )
 {
@@ -110,38 +101,23 @@ else
 		{
 			jQuery( '#div_ufdf_options' ).hide();
 		}
+		// Suggest values only for field type with "Single word"
+		if( jQuery( this ).val() == 'word' )
+		{
+			jQuery( '#div_ufdf_suggest' ).show();
+		}
+		else
+		{
+			jQuery( '#div_ufdf_suggest' ).hide();
+		}
 	} );
 </script>
 <?php
 
 /*
  * $Log$
- * Revision 1.12  2011/10/24 18:32:35  efy-yurybakh
- * Groups for user fields
- *
- * Revision 1.11  2011/10/20 12:14:55  efy-yurybakh
- * Allow/disabled multiple instances of same field
- *
- * Revision 1.10  2011/10/18 12:28:13  efy-yurybakh
- * Info fields: select lists - give list of configurable options
- *
- * Revision 1.9  2011/09/10 22:48:41  fplanque
- * doc
- *
- * Revision 1.8  2011/08/29 08:51:14  efy-james
- * Default / mandatory additional fields
- *
- * Revision 1.7  2010/01/03 17:45:21  fplanque
- * crumbs & stuff
- *
- * Revision 1.6  2010/01/03 13:45:37  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.5  2009/09/17 00:55:24  fplanque
- * fix
- *
- * Revision 1.4  2009/09/16 18:19:05  fplanque
- * Readded with -kkv option
+ * Revision 1.14  2013/11/06 08:05:04  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

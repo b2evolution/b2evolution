@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -54,6 +54,8 @@ class coll_item_list_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		load_funcs( 'files/model/_image.funcs.php' );
+
 		/**
 		 * @var ItemTypeCache
 		 */
@@ -83,6 +85,13 @@ class coll_item_list_Widget extends ComponentWidget
 					'type' => 'select',
 					'options' => $item_type_options,
 					'defaultvalue' => '#',
+				),
+				'thumb_size' => array(
+					'label' => T_('Thumbnail size'),
+					'note' => T_('Cropping and sizing of thumbnails'),
+					'type' => 'select',
+					'options' => get_available_thumb_sizes(),
+					'defaultvalue' => 'crop-80x80',
 				),
 				'follow_mainlist' => array(
 					'label' => T_('Follow Main List'),
@@ -133,9 +142,37 @@ class coll_item_list_Widget extends ComponentWidget
 					'size' => 4,
 					'defaultvalue' => 20,
 				),
+				'disp_title' => array(
+					'label' => T_( 'Titles' ),
+					'note' => T_( 'Display title.' ),
+					'type' => 'checkbox',
+					'defaultvalue' => true,
+				),
 				'item_title_link_type' => array(
 					'label' => T_('Link titles'),
 					'note' => T_('Where should titles be linked to?'),
+					'type' => 'select',
+					'options' => array(
+							'auto'        => T_('Automatic'),
+							'permalink'   => T_('Item permalink'),
+							'linkto_url'  => T_('Item URL'),
+							'none'        => T_('Nowhere'),
+						),
+					'defaultvalue' => 'auto',
+				),
+				'attached_pics' => array(
+					'label' => T_('Attached pictures'),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array(
+							array( 'none', T_('None') ), 
+							array( 'first', T_('Display first') ), 
+							array( 'all', T_('Display all') ) ),
+					'defaultvalue' => 'none',
+				),
+				'item_pic_link_type' => array(
+					'label' => T_('Link pictures'),
+					'note' => T_('Where should pictures be linked to?'),
 					'type' => 'select',
 					'options' => array(
 							'auto'        => T_('Automatic'),
@@ -321,7 +358,24 @@ class coll_item_list_Widget extends ComponentWidget
 			return;
 		}
 
-		echo $this->disp_params['block_start'];
+		// Start to capture display content here in order to solve the issue to don't display empty widget
+		ob_start();
+		// This variable used to display widget. Will be set to true when content is displayed
+		$content_is_displayed = false;
+
+		if( !$this->disp_params['disp_title'] && in_array( $this->disp_params[ 'attached_pics' ], array( 'first', 'all' ) ) )
+		{ // Don't display bullets when we show only the pictures
+			$block_css_class = 'nobullets';
+		}
+
+		if( empty( $block_css_class ) )
+		{
+			echo $this->disp_params['block_start'];
+		}
+		else
+		{ // Additional class for widget block
+			echo preg_replace( '/ class="([^"]+)"/', ' class="$1 '.$block_css_class.'"', $this->disp_params['block_start'] );
+		}
 
 		$title = sprintf( ( $this->disp_params[ 'title_link' ] ? '<a href="'.$listBlog->gen_blogurl().'" rel="nofollow">%s</a>' : '%s' ), $this->disp_params[ 'title' ] );
 		$this->disp_title( $title );
@@ -344,7 +398,7 @@ class coll_item_list_Widget extends ComponentWidget
 
 				while( $Item = & $ItemList->get_item() )
 				{	// Display contents of the Item depending on widget params:
-					$this->disp_contents( $Item );
+					$content_is_displayed = $this->disp_contents( $Item ) || $content_is_displayed;
 				}
 
 				// Close cat
@@ -359,7 +413,7 @@ class coll_item_list_Widget extends ComponentWidget
 			 */
 			while( $Item = & $ItemList->get_item() )
 			{ // Display contents of the Item depending on widget params:
-				$this->disp_contents( $Item );
+				$content_is_displayed = $this->disp_contents( $Item ) || $content_is_displayed;
 			}
 		}
 
@@ -371,6 +425,15 @@ class coll_item_list_Widget extends ComponentWidget
 		echo $this->disp_params['list_end'];
 
 		echo $this->disp_params['block_end'];
+
+		if( $content_is_displayed )
+		{ // Some content is displayed, Print out widget
+			ob_end_flush();
+		}
+		else
+		{ // No content, Don't display widget
+			ob_end_clean();
+		}
 	}
 
 
@@ -378,14 +441,26 @@ class coll_item_list_Widget extends ComponentWidget
 	 * Support function for above
 	 *
 	 * @param Item
+	 * @return boolean TRUE - if content is displayed
 	 */
 	function disp_contents( & $Item )
 	{
+		// Check if only the title was displayed before the first picture
+		$displayed_only_title = false;
+
+		// Set this var to TRUE when some content(title, excerpt or picture) is displayed
+		$content_is_displayed = false;
+
 		echo $this->disp_params['item_start'];
 
-		$Item->title( array(
-				'link_type' => $this->disp_params['item_title_link_type'],
-			) );
+		if( $this->disp_params[ 'disp_title' ] )
+		{	// Display title
+			$Item->title( array(
+					'link_type' => $this->disp_params['item_title_link_type'],
+				) );
+			$displayed_only_title = true;
+			$content_is_displayed = true;
+		}
 
 		if( $this->disp_params[ 'disp_excerpt' ] )
 		{
@@ -393,6 +468,8 @@ class coll_item_list_Widget extends ComponentWidget
 			if( !empty($excerpt) )
 			{	// Note: Excerpts are plain text -- no html (at least for now)
 				echo '<div class="item_excerpt">'.$excerpt.'</div>';
+				$displayed_only_title = false;
+				$content_is_displayed = true;
 			}
 		}
 
@@ -408,6 +485,8 @@ class coll_item_list_Widget extends ComponentWidget
 					 ) );
 			}
 			echo '<div class="item_content">'.$content.'</div>';
+			$displayed_only_title = false;
+			$content_is_displayed = true;
 
 			/* fp> does that really make sense?
 				we're no longer in a linkblog/linkroll use case here, are we?
@@ -419,7 +498,54 @@ class coll_item_list_Widget extends ComponentWidget
 				*/
 		}
 
+		if( in_array( $this->disp_params[ 'attached_pics' ], array( 'first', 'all' ) ) )
+		{	// Display attached pictures
+			$picture_limit = $this->disp_params[ 'attached_pics' ] == 'first' ? 1 : 1000;
+			$LinkOnwer = new LinkItem( $Item );
+			if( $FileList = $LinkOnwer->get_attachment_FileList( $picture_limit ) )
+			{	// Get list of attached files
+				while( $File = & $FileList->get_next() )
+				{
+					if( $File->is_image() )
+					{	// Get only images
+						switch( $this->disp_params[ 'item_pic_link_type' ] )
+						{	// Set url for picture link
+							case 'none':
+								$pic_url = NULL;
+								break;
+
+							case 'permalink':
+								$pic_url = $Item->get_permanent_url();
+								break;
+
+							case 'linkto_url':
+								$pic_url = $Item->url;
+								break;
+
+							case 'auto':
+							default:
+								$pic_url = ( empty( $Item->url ) ? $Item->get_permanent_url() : $Item->url );
+								break;
+						}
+
+						if( $displayed_only_title )
+						{ // If only the title was displayed - Insert new line before the first picture
+							echo '<br />';
+							$displayed_only_title = false;
+						}
+
+						// Print attached picture
+						echo $File->get_tag( '', '', '', '', $this->disp_params['thumb_size'], $pic_url );
+
+						$content_is_displayed = true;
+					}
+				}
+			}
+		}
+
 		echo $this->disp_params['item_end'];
+
+		return $content_is_displayed;
 	}
 
 
@@ -440,110 +566,10 @@ class coll_item_list_Widget extends ComponentWidget
 	}
 }
 
-
 /*
  * $Log$
- * Revision 1.34  2011/10/06 11:49:47  efy-yurybakh
- * Replace all timestamp_min & timestamp_max with Blog's methods
- *
- * Revision 1.33  2011/09/04 22:13:21  fplanque
- * copyright 2011
- *
- * Revision 1.32  2011/07/12 23:15:34  sam2kb
- * Sanitize input ID list
- *
- * Revision 1.31  2011/05/31 14:20:27  efy-asimo
- * paged nav on ?disp=postidx
- *
- * Revision 1.30  2010/06/07 19:00:17  sam2kb
- * Exclude current Item from related posts list
- *
- * Revision 1.29  2010/02/08 17:54:48  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.28  2010/01/30 18:55:36  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.27  2010/01/27 15:20:08  efy-asimo
- * Change select list to radio button
- *
- * Revision 1.26  2010/01/26 15:49:35  efy-asimo
- * Widget param type radio
- *
- * Revision 1.25  2009/12/22 23:13:39  fplanque
- * Skins v4, step 1:
- * Added new disp modes
- * Hooks for plugin disp modes
- * Enhanced menu widgets (BIG TIME! :)
- *
- * Revision 1.24  2009/12/22 03:30:24  blueyed
- * cleanup
- *
- * Revision 1.23  2009/12/20 23:15:00  fplanque
- * rollback broken stuff
- *
- * Revision 1.22  2009/12/13 02:41:11  sam2kb
- * Link to categories in chapter mode
- *
- * Revision 1.21  2009/12/13 00:05:37  sam2kb
- * Restrict to categories fix
- *
- * Revision 1.20  2009/12/12 23:51:53  sam2kb
- * Restrict ItemList to selected categories
- *
- * Revision 1.19  2009/12/01 04:19:25  fplanque
- * even more invalidation dimensions
- *
- * Revision 1.18  2009/12/01 03:45:37  fplanque
- * multi dimensional invalidation
- *
- * Revision 1.17  2009/11/30 04:31:38  fplanque
- * BlockCache Proof Of Concept
- *
- * Revision 1.16  2009/09/25 07:33:31  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.15  2009/09/16 20:27:26  tblue246
- * Fix fatal error
- *
- * Revision 1.14  2009/09/14 13:54:13  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.13  2009/09/12 11:03:13  efy-arrin
- * Included the ClassName in the loadclass() with proper UpperCase
- *
- * Revision 1.12  2009/09/05 18:34:48  fplanque
- * minor
- *
- * Revision 1.11  2009/09/04 13:30:26  tblue246
- * Doc
- *
- * Revision 1.10  2009/09/03 23:52:35  fplanque
- * minor
- *
- * Revision 1.9  2009/09/03 15:04:23  waltercruz
- * Fixing universal item list. array_merge won't work here
- *
- * Revision 1.8  2009/07/05 16:39:10  sam2kb
- * "Limit" to "Max items"
- *
- * Revision 1.7  2009/07/04 00:54:53  fplanque
- * bugfix: linkblog cannot make proper groups if posts are not ordered by cat
- *
- * Revision 1.6  2009/03/20 22:44:04  fplanque
- * Related Items -- Proof of Concept
- *
- * Revision 1.4  2009/03/15 23:09:09  blueyed
- * coll_item_list_widget: fix order as per todo
- *
- * Revision 1.3  2009/03/15 22:48:16  fplanque
- * refactoring... final step :)
- *
- * Revision 1.2  2009/03/15 21:40:23  fplanque
- * killer factoring
- *
- * Revision 1.1  2009/03/15 20:35:18  fplanque
- * Universal Item List proof of concept
+ * Revision 1.36  2013/11/06 08:05:09  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

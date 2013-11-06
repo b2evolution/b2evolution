@@ -16,7 +16,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Credits go to the WordPress team (@link http://wordpress.org), where I got the basic
  * import-mt.php script with most of the core functions. Thank you!
@@ -117,7 +117,7 @@ if( ! isset($config_is_done) || ! $config_is_done )
 
 
 // Check if user is logged in and is in group #1 (admins)
-if( !is_logged_in() || $current_User->Group->ID != 1 )
+if( !is_logged_in( false ) || $current_User->Group->ID != 1 )
 {	// login failed
 	debug_die( 'You must login with an administrator (group #1) account.' );
 }
@@ -386,9 +386,13 @@ param( 'import_mode', 'string', 'normal' );
 
 			if( $import_mode != 'easy' )
 			{ // we'll use 'default' when importing
+				// Autoselect a blog from where to get renderer settings
+				$autoselect_blog = autoselect_blog( 'blog_post_statuses', 'edit' );
+				$BlogCache = & get_BlogCache();
+				$setting_Blog = & $BlogCache->get_by_ID( $autoselect_blog );
 				?>
 				<div class="label">Renderers:</div>
-				<div class="input"><?php renderer_list() ?></div>
+				<div class="input"><?php renderer_list( $setting_Blog ) ?></div>
 			<?php } ?>
 		</fieldset>
 
@@ -609,7 +613,13 @@ param( 'import_mode', 'string', 'normal' );
 		else
 		{
 			global $Plugins;
-			$default_renderers = $Plugins->validate_renderer_list( array('default') );
+			// Autoselect a blog to validate renderer list
+			$autoselect_blog = autoselect_blog( 'blog_post_statuses', 'edit' );
+			$BlogCache = & get_BlogCache();
+			$setting_Blog = & $BlogCache->get_by_ID( $autoselect_blog );
+
+			$renderer_params = isset( $setting_Blog ) ? array( 'Blog' => & $setting_Blog, 'setting_name' => 'coll_apply_rendering' ) : array();
+			$default_renderers = $Plugins->validate_renderer_list( array('default'), $renderer_params );
 			$autop = 1;
 		}
 
@@ -1075,10 +1085,10 @@ param( 'import_mode', 'string', 'normal' );
 						{
 							$DB->query( "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author_ID, comment_author,
 																										comment_author_email, comment_author_url, comment_author_IP,
-																										comment_date, comment_content)
+																										comment_date, comment_content, comment_renderers )
 												VALUES( $post_ID, 'comment', NULL, ".$DB->quote($comment_author).",
 																".$DB->quote($comment_email).",	".$DB->quote($comment_url).",
-																".$DB->quote($comment_ip).", '$comment_date', ".$DB->quote($comment_content)." )" );
+																".$DB->quote($comment_ip).", '$comment_date', ".$DB->quote($comment_content).", 'default' )" );
 						}
 
 						$message .= '<li>Comment from '.$comment_author.' added.</li>';
@@ -1122,10 +1132,10 @@ param( 'import_mode', 'string', 'normal' );
 						{
 							$DB->query( "INSERT INTO T_comments
 								(comment_post_ID, comment_type, comment_author, comment_author_email, comment_author_url,
-								comment_author_IP, comment_date, comment_content )
+								comment_author_IP, comment_date, comment_content, comment_renderers )
 								VALUES
 								($post_ID, 'trackback', ".$DB->quote($comment_author).", ".$DB->quote($comment_email).", ".$DB->quote($comment_url).",
-								".$DB->quote($comment_ip).", ".$DB->quote($comment_date).", ".$DB->quote($comment_content)." )" );
+								".$DB->quote($comment_ip).", ".$DB->quote($comment_date).", ".$DB->quote($comment_content).", 'default' )" );
 						}
 						$message .= '<li>Trackback from '.$comment_url.' added.</li>';
 						$count_trackbackscreated++;
@@ -1494,7 +1504,7 @@ function import_data_extract_authors_cats()
 /**
  * Outputs a list of available renderers (not necessarily installed).
  */
-function renderer_list()
+function renderer_list( & $Blog )
 {
 	global $renderers;
 
@@ -1510,8 +1520,10 @@ function renderer_list()
 		{ // No unique code!
 			continue;
 		}
-		if( $loop_RendererPlugin->apply_rendering == 'stealth'
-			|| $loop_RendererPlugin->apply_rendering == 'never' )
+
+		$apply_rendering = $loop_RendererPlugin->get_coll_setting( 'coll_apply_rendering', $Blog );
+		if( $apply_rendering == 'stealth'
+			|| $apply_rendering == 'never' )
 		{	// This is not an option.
 			continue;
 		}
@@ -1536,7 +1548,7 @@ function renderer_list()
 			<input type="checkbox" class="checkbox" name="renderers[]"
 				value="<?php echo $loop_RendererPlugin->code ?>" id="<?php echo $loop_RendererPlugin->code ?>"
 				<?php
-				switch( $loop_RendererPlugin->apply_rendering )
+				switch( $apply_rendering )
 				{
 					case 'always':
 						// echo 'FORCED';
@@ -1670,103 +1682,8 @@ function tidypostdata( $string )
 
 /*
  * $Log$
- * Revision 1.23  2011/09/07 00:28:26  sam2kb
- * Replace non-ASCII character in regular expressions with ~
+ * Revision 1.25  2013/11/06 08:04:54  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.22  2011/09/04 22:13:20  fplanque
- * copyright 2011
- *
- * Revision 1.21  2011/06/15 06:29:44  sam2kb
- * Relocate "set_max_execution_time" function
- *
- * Revision 1.20  2011/02/15 05:31:53  sam2kb
- * evo_strtolower mbstring wrapper for strtolower function
- *
- * Revision 1.19  2010/05/22 12:22:49  efy-asimo
- * move $allow_cross_posting in the backoffice
- *
- * Revision 1.18  2010/02/08 17:54:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.17  2010/01/30 18:55:35  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.16  2009/09/26 12:00:43  tblue246
- * Minor/coding style
- *
- * Revision 1.15  2009/09/25 07:33:14  efy-cantor
- * replace get_cache to get_*cache
- *
- * Revision 1.14  2009/09/14 13:43:38  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.13  2009/09/05 21:37:31  tblue246
- * More $dispatcher fixes
- *
- * Revision 1.12  2009/09/05 21:28:07  tblue246
- * Fixed PHP notice
- *
- * Revision 1.11  2009/07/06 23:52:25  sam2kb
- * Hardcoded "admin.php" replaced with $dispatcher
- *
- * Revision 1.10  2009/03/08 23:57:46  fplanque
- * 2009
- *
- * Revision 1.9  2009/03/03 21:21:09  blueyed
- * Deprecate get_the_category_by_ID and replace its usage with ChapterCache
- * in core.
- *
- * Revision 1.8  2009/02/27 20:25:08  blueyed
- * Move Plugins_admin::validate_renderer_list back to Plugins, since it gets used for displaying items and saves (at least) a load_plugins_table call/query
- *
- * Revision 1.7  2008/12/28 19:02:19  fplanque
- * minor
- *
- * Revision 1.6  2008/06/09 20:11:41  slamp
- * Add a test to avoid warning when importing file with 0 bytes of data
- *
- * Revision 1.5  2008/02/19 11:11:19  fplanque
- * no message
- *
- * Revision 1.4  2008/01/21 09:35:35  fplanque
- * (c) 2008
- *
- * Revision 1.3  2007/10/09 01:18:12  fplanque
- * Hari's WordPress importer
- *
- * Revision 1.2  2007/09/11 21:43:48  fplanque
- * fixed MT importer
- *
- * Revision 1.1  2007/06/25 11:01:40  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.33  2007/05/14 02:43:04  fplanque
- * Started renaming tables. There probably won't be a better time than 2.0.
- *
- * Revision 1.32  2007/05/09 00:58:54  fplanque
- * massive cleanup of old functions
- *
- * Revision 1.31  2007/04/26 00:11:15  fplanque
- * (c) 2007
- *
- * Revision 1.30  2006/12/28 15:44:31  fplanque
- * login refactoring / simplified
- *
- * Revision 1.29  2006/12/17 23:42:38  fplanque
- * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
- * Look into Advanced Settings for the aggregating blog.
- * There may be side effects and new bugs created by this. Please report them :]
- *
- * Revision 1.28  2006/12/03 18:22:58  blueyed
- * Nuked deprecated fileupload globals
- *
- * Revision 1.27  2006/12/01 20:04:31  blueyed
- * Renamed Plugins_admin::validate_list() to validate_renderer_list()
- *
- * Revision 1.26  2006/12/01 19:46:42  blueyed
- * Moved Plugins::validate_list() to Plugins_admin class; added stub in Plugins, because at least the starrating_plugin uses it
- *
- * Revision 1.25  2006/11/26 01:42:08  fplanque
- * doc
  */
 ?>

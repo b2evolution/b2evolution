@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package xmlsrv
  *
@@ -19,6 +19,12 @@
 /**
  * Initialize everything:
  */
+
+if( isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] !== 'POST' )
+{
+	header('Content-Type: text/plain');
+	die('XML-RPC server accepts POST requests only.');
+}
 
 // Disable Cookies
 $_COOKIE = array();
@@ -82,56 +88,8 @@ $s->service();
 
 /*
  * $Log$
- * Revision 1.158  2011/09/04 22:13:25  fplanque
- * copyright 2011
- *
- * Revision 1.157  2010/02/08 17:57:13  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.156  2010/01/30 18:55:40  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.155  2009/09/18 19:27:08  tblue246
- * Minor/doc
- *
- * Revision 1.154  2009/08/31 18:07:06  waltercruz
- * Support to wordpress aliases to metaweblog APIS
- *
- * Revision 1.153  2009/08/31 16:47:55  tblue246
- * Use error 17 (Internal server error) for error response if XML-RPC cannot be used (error/disabled by admin)
- *
- * Revision 1.152  2009/08/31 16:32:26  tblue246
- * Check whether XML-RPC is enabled in xmlsrv/xmlrpc.php
- *
- * Revision 1.151  2009/08/30 15:13:28  tblue246
- * minor/doc
- *
- * Revision 1.150  2009/08/29 19:46:41  tblue246
- * XML-RPC: Revert previous commit and auto-detect response encoding. Props to: waltercruz
- *
- * Revision 1.149  2009/03/08 23:58:16  fplanque
- * 2009
- *
- * Revision 1.148  2008/01/21 09:35:44  fplanque
- * (c) 2008
- *
- * Revision 1.147  2008/01/18 15:53:42  fplanque
- * Ninja refactoring
- *
- * Revision 1.146  2008/01/14 07:22:08  fplanque
- * Refactoring
- *
- * Revision 1.145  2008/01/12 22:51:11  fplanque
- * RSD support
- *
- * Revision 1.144  2008/01/12 08:06:15  fplanque
- * more xmlrpc tests
- *
- * Revision 1.143  2008/01/12 02:13:44  fplanque
- * XML-RPC debugging
- *
- * Revision 1.142  2008/01/12 00:03:44  fplanque
- * refact of XML-RPC
+ * Revision 1.160  2013/11/06 08:05:53  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

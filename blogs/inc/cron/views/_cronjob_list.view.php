@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -64,7 +64,7 @@ if( $ctst_finished )
 }
 $SQL->ORDER_BY( '*, ctsk_ID' );
 
-$Results = new Results( $SQL->get(), 'crontab_', '-A' );
+$Results = new Results( $SQL->get(), 'crontab_', '-D' );
 
 $Results->title = T_('Scheduled jobs').get_manual_link('scheduler');
 
@@ -119,7 +119,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 						'th' => T_('Name'),
 						'order' => 'ctsk_name',
-						'td' => '<a href="%regenerate_url(\'action,cjob_ID\',\'action=view&amp;cjob_ID=$ctsk_ID$\')%">$ctsk_name$</a>',
+						'td' => '<a href="%regenerate_url(\'action,cjob_ID\',\'action=view&amp;cjob_ID=$ctsk_ID$\')%">$ctsk_name$</a>%get_manual_link( #ctsk_name# )%',
 					);
 
 $Results->cols[] = array(
@@ -127,25 +127,38 @@ $Results->cols[] = array(
 						'order' => 'status',
 						'td_class' => 'shrinkwrap cron_$status$',
 						'td' => '$status$',
+						'extra' => array ( 'style' => 'background-color: %cron_status_color( "#status#" )%;', 'format_to_output' => false )
 					);
 
 $Results->cols[] = array(
 						'th' => T_('Repeat'),
 						'order' => 'ctsk_repeat_after',
 						'td_class' => 'shrinkwrap',
-						'td' => '$ctsk_repeat_after$',
+						'td' => '%seconds_to_period( #ctsk_repeat_after# )%',
 					);
 
 function crontab_actions( $ctsk_ID, $status )
 {
-	global $current_User;
+	global $current_User, $admin_url;
 
 	$col = '';
 
-	if( $status != 'started' && $current_User->check_perm( 'options', 'edit', false, NULL ) )
+	if( $current_User->check_perm( 'options', 'edit', false, NULL ) )
 	{	// User can edit options:
-    $col = action_icon( T_('Delete this job!'), 'delete',
-												regenerate_url( 'action', 'ctsk_ID='.$ctsk_ID.'&amp;action=delete&amp;'.url_crumb('crontask') ) );
+		if( $status == 'pending' )
+		{	// Icon for edit action
+			$col .= action_icon( T_('Edit this job'), 'edit', $admin_url.'?ctrl=crontab&amp;action=edit&amp;ctsk_ID='.$ctsk_ID );
+		}
+		elseif( $status == 'error' )
+		{	// Icon for copy action
+			$col .= action_icon( T_('Duplicate this job'), 'copy', $admin_url.'?ctrl=crontab&amp;action=copy&amp;ctsk_ID='.$ctsk_ID );
+		}
+
+		if( $status != 'started' )
+		{	// Icon for delete action
+			$col .= action_icon( T_('Delete this job!'), 'delete',
+													regenerate_url( 'action', 'ctsk_ID='.$ctsk_ID.'&amp;action=delete&amp;'.url_crumb('crontask') ) );
+		}
 	}
 
 	return $col;
@@ -168,65 +181,8 @@ echo '<p>[<a href="'.$cron_url.'cron_exec.php" onclick="return pop_up_window( \'
 
 /*
  * $Log$
- * Revision 1.10  2011/09/06 20:48:54  sam2kb
- * No new line at end of file
- *
- * Revision 1.9  2011/09/04 22:13:15  fplanque
- * copyright 2011
- *
- * Revision 1.8  2010/02/08 17:52:14  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.7  2010/01/30 18:55:23  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.6  2010/01/03 13:10:57  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.5  2009/03/08 23:57:42  fplanque
- * 2009
- *
- * Revision 1.4  2008/01/21 09:35:28  fplanque
- * (c) 2008
- *
- * Revision 1.3  2007/09/12 21:00:31  fplanque
- * UI improvements
- *
- * Revision 1.2  2007/09/08 20:23:03  fplanque
- * action icons / wording
- *
- * Revision 1.1  2007/06/25 10:59:49  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.10  2007/04/26 00:11:09  fplanque
- * (c) 2007
- *
- * Revision 1.9  2007/01/26 02:12:06  fplanque
- * cleaner popup windows
- *
- * Revision 1.8  2007/01/07 18:42:35  fplanque
- * cleaned up reload/refresh icons & links
- *
- * Revision 1.7  2006/11/24 18:27:25  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.6  2006/07/05 22:13:10  blueyed
- * trans consistency
- *
- * Revision 1.5  2006/07/05 18:26:33  fplanque
- * no message
- *
- * Revision 1.4  2006/06/26 23:09:34  fplanque
- * Really working cronjob environment :)
- *
- * Revision 1.3  2006/06/16 21:32:02  fplanque
- * no message
- *
- * Revision 1.2  2006/06/13 21:52:44  blueyed
- * Added files from 1.8 branch
- *
- * Revision 1.1.2.1  2006/06/12 20:00:39  fplanque
- * one too many massive syncs...
+ * Revision 1.12  2013/11/06 08:04:07  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

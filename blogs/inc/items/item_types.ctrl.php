@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -321,80 +321,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.18  2011/09/04 22:13:17  fplanque
- * copyright 2011
+ * Revision 1.19  2013/11/06 08:04:15  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.17  2010/02/08 17:53:05  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.16  2010/01/30 18:55:28  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.15  2010/01/19 19:38:44  fplanque
- * minor
- *
- * Revision 1.14  2010/01/18 20:13:55  efy-yury
- * update items: crumbs
- *
- * Revision 1.13  2010/01/17 16:15:16  sam2kb
- * Localization clean-up
- *
- * Revision 1.12  2010/01/03 12:03:18  fplanque
- * More crumbs...
- *
- * Revision 1.11  2009/12/12 01:13:08  fplanque
- * A little progress on breadcrumbs on menu structures alltogether...
- *
- * Revision 1.10  2009/12/06 22:55:16  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.9  2009/09/29 18:44:00  fplanque
- * doc
- *
- * Revision 1.8  2009/09/26 12:00:42  tblue246
- * Minor/coding style
- *
- * Revision 1.7  2009/09/25 11:36:44  efy-sergey
- * Replaced "simple list" manager for Post types. Also allow to edit ID for Item types
- *
- * Revision 1.6  2009/09/24 13:50:32  efy-sergey
- * Moved the Global Settings>Post types & Post statuses tabs to "Posts / Comments > Settings > Post types & Post statuses"
- *
- * Revision 1.5  2009/03/08 23:57:43  fplanque
- * 2009
- *
- * Revision 1.4  2009/01/23 22:08:12  tblue246
- * - Filter reserved post types from dropdown box on the post form (expert tab).
- * - Indent/doc fixes
- * - Do not check whether a post title is required when only e. g. switching tabs.
- *
- * Revision 1.3  2009/01/21 18:23:26  fplanque
- * Featured posts and Intro posts
- *
- * Revision 1.2  2008/01/21 09:35:31  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 11:00:23  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.11  2007/05/14 02:43:04  fplanque
- * Started renaming tables. There probably won't be a better time than 2.0.
- *
- * Revision 1.10  2007/05/13 20:44:52  fplanque
- * more pages support
- *
- * Revision 1.9  2007/04/26 00:11:12  fplanque
- * (c) 2007
- *
- * Revision 1.8  2007/03/26 12:59:18  fplanque
- * basic pages support
- *
- * Revision 1.7  2007/03/26 09:34:16  fplanque
- * removed deprecated list editor
- *
- * Revision 1.6  2006/11/26 01:42:09  fplanque
- * doc
  */
 ?>

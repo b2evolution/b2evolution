@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -22,7 +22,7 @@ class quicktags_plugin extends Plugin
 	var $code = 'b2evQTag';
 	var $name = 'Quick Tags';
 	var $priority = 30;
-	var $version = '2.4.1';
+	var $version = '5.0.0';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -47,9 +47,17 @@ class quicktags_plugin extends Plugin
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
-		global $Hit;
+		global $Hit, $Blog;
 
-		$simple = ( $params['edit_layout'] == 'simple' );
+		if( !empty( $Blog ) )
+		{
+			if( !$Blog->get_setting( 'allow_html_post' ) )
+			{	// Only when HTML is allowed in post
+				return false;
+			}
+		}
+
+		$simple = ( $params['edit_layout'] == 'simple' || $params['edit_layout'] == 'inskin' );
 
 		if( $Hit->is_lynx() )
 		{ // let's deactivate quicktags on Lynx, because they don't work there.
@@ -412,103 +420,8 @@ class quicktags_plugin extends Plugin
 
 /*
  * $Log$
- * Revision 1.38  2011/09/04 22:13:23  fplanque
- * copyright 2011
- *
- * Revision 1.37  2011/08/24 14:29:49  efy-james
- * Add checkbox for no teaser
- *
- * Revision 1.36  2010/02/08 17:55:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.35  2009/03/21 23:00:21  fplanque
- * minor
- *
- * Revision 1.34  2009/03/08 23:57:47  fplanque
- * 2009
- *
- * Revision 1.33  2009/03/04 00:10:42  blueyed
- * Make Hit constructor more lazy.
- *  - Move referer_dom_ID generation/fetching to own method
- *  - wrap Debuglog additons with "debug"
- *  - Conditionally call detect_useragent, if required. Move
- *    vars to methods for this
- *  - get_user_agent alone does not require detect_useragent
- * Feel free to revert it (since it changed all the is_foo vars
- * to methods - PHP5 would allow to use __get to handle legacy
- * access to those vars however), but please consider also
- * removing this stuff from HTML classnames, since that is kind
- * of disturbing/unreliable by itself).
- *
- * Revision 1.32  2008/02/13 07:26:23  fplanque
- * quicktags in simple mode
- *
- * Revision 1.31  2008/01/21 09:35:41  fplanque
- * (c) 2008
- *
- * Revision 1.30  2007/09/17 20:04:40  fplanque
- * UI improvements
- *
- * Revision 1.29  2007/09/03 16:46:58  fplanque
- * minor
- *
- * Revision 1.28  2007/06/29 23:12:18  blueyed
- * todo
- *
- * Revision 1.27  2007/06/29 23:10:01  blueyed
- * - Cleaned up code duplication in b2evoInsertTag()
- * - Added get_selected_text_for_ID-JS callback
- *
- * Revision 1.26  2007/04/26 00:11:04  fplanque
- * (c) 2007
- *
- * Revision 1.25  2007/04/20 01:42:32  fplanque
- * removed excess javascript
- *
- * Revision 1.24  2006/09/23 15:06:03  blueyed
- * Javascript fixes: use CDATA
- *
- * Revision 1.23  2006/07/16 23:04:05  fplanque
- * Most plugins should keep as quiet as possible in simple mode.
- * Smilies are about the only thing simple enough for simple mode.
- *
- * Revision 1.22  2006/07/12 21:13:17  blueyed
- * Javascript callback handler (e.g., for interaction of WYSIWYG editors with toolbar plugins)
- *
- * Revision 1.21  2006/07/10 20:19:30  blueyed
- * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
- *
- * Revision 1.20  2006/07/07 21:26:49  blueyed
- * Bumped to 1.9-dev
- *
- * Revision 1.19  2006/07/06 19:56:29  fplanque
- * no message
- *
- * Revision 1.18  2006/06/26 23:10:24  fplanque
- * minor / doc
- *
- * Revision 1.17  2006/06/24 05:19:39  smpdawg
- * Fixed various javascript warnings and errors.
- * Spelling corrections.
- * Fixed PHP warnings.
- *
- * Revision 1.16  2006/06/16 21:30:57  fplanque
- * Started clean numbering of plugin versions (feel free do add dots...)
- *
- * Revision 1.15  2006/05/30 20:31:18  blueyed
- * typo
- *
- * Revision 1.14  2006/05/30 19:39:55  fplanque
- * plugin cleanup
- *
- * Revision 1.13  2006/03/12 23:09:28  fplanque
- * doc cleanup
- *
- * Revision 1.12  2005/12/22 23:13:40  blueyed
- * Plugins' API changed and handling optimized
- *
- * Revision 1.11  2005/11/21 18:16:29  fplanque
- * okay, a TWO liner :P
+ * Revision 1.40  2013/11/06 08:05:22  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

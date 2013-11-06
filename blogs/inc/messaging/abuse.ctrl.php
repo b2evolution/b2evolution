@@ -42,15 +42,12 @@ if( param( 'thrd_ID', 'integer', '', true) )
 	}
 }
 
-// Preload users to show theirs avatars
-load_messaging_threads_recipients( $current_User->ID );
-
 switch( $action )
 {
 	case 'delete':
 		// Delete thread:
 		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'thread' );
+		$Session->assert_received_crumb( 'messaging_threads' );
 
 		// Check permission:
 		$current_User->check_perm( 'perm_messaging', 'delete', true );
@@ -83,7 +80,7 @@ switch( $action )
 }
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('Messages'), '?ctrl=threads' );
+$AdminUI->breadcrumbpath_add( T_('Messaging'), '?ctrl=threads' );
 $AdminUI->breadcrumbpath_add( T_('Abuse Management'), '?ctrl=abuse' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -107,7 +104,7 @@ switch( $action )
 		// We need to ask for confirmation:
 		$edited_Thread->confirm_delete(
 				sprintf( T_('Delete thread &laquo;%s&raquo;?'), $edited_Thread->dget('title') ),
-				'thread', $action, get_memorized( 'action' ) );
+				'messaging_threads', $action, get_memorized( 'action' ) );
 		$AdminUI->disp_view( 'messaging/views/_thread_list.view.php' );
 		break;
 
@@ -128,10 +125,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.2  2011/10/17 00:20:38  fplanque
- * minor
+ * Revision 1.4  2013/11/06 08:04:25  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.1  2011/10/14 19:02:14  efy-yurybakh
- * Messaging Abuse Management
  */
 ?>

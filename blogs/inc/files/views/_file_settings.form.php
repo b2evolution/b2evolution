@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -227,6 +227,19 @@ $Form->begin_fieldset( T_('Advanced options'), array( 'id' => 'ffset_fileadvance
 
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('Image options') );
+
+	$Form->checkbox( 'exif_orientation', $Settings->get( 'exif_orientation' ), T_('Use EXIF info in photos'), T_('Use orientation tag to automatically rotate thumbnails to upright position.') );
+
+	$resize_input_suffix = ' '.T_('Fit to').' ';
+	$resize_input_suffix .= '<input type="text" id="fm_resize_width" name="fm_resize_width" class="form_text_input" size="4" maxlength="4" value="'.$Settings->get( 'fm_resize_width' ).'" />';
+	$resize_input_suffix .= ' x ';
+	$resize_input_suffix .= '<input type="text" id="fm_resize_height" name="fm_resize_height" class="form_text_input" size="4" maxlength="4" value="'.$Settings->get( 'fm_resize_height' ).'" />';
+	$resize_input_suffix .= ' '.T_('pixels').' ';
+	$Form->checkbox_input( 'fm_resize_enable', $Settings->get( 'fm_resize_enable' ), T_('Resize large images after upload'), array( 'input_suffix' => $resize_input_suffix ) );
+
+$Form->end_fieldset();
+
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Form->buttons( array(
@@ -247,89 +260,8 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 
 /*
  * $Log$
- * Revision 1.17  2011/09/04 22:13:16  fplanque
- * copyright 2011
+ * Revision 1.19  2013/11/06 08:04:15  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.16  2010/11/03 19:44:15  sam2kb
- * Increased modularity - files_Module
- * Todo:
- * - split core functions from _file.funcs.php
- * - check mtimport.ctrl.php and wpimport.ctrl.php
- * - do not create demo Photoblog and posts with images (Blog A)
- *
- * Revision 1.15  2010/03/28 17:08:08  fplanque
- * minor
- *
- * Revision 1.14  2010/03/12 10:52:56  efy-asimo
- * Set EvoCache  folder names - task
- *
- * Revision 1.13  2010/03/01 07:52:34  efy-asimo
- * Set manual links to lowercase
- *
- * Revision 1.12  2010/02/14 14:18:39  efy-asimo
- * insert manual links
- *
- * Revision 1.11  2010/02/08 17:53:02  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.10  2010/01/03 13:45:36  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.9  2009/12/08 23:42:03  fplanque
- * minor
- *
- * Revision 1.8  2009/12/06 22:55:21  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.7  2009/08/06 15:02:48  fplanque
- * minor
- *
- * Revision 1.6  2009/07/29 21:06:17  blueyed
- * Make upload_maxkb settings note more verbose about the involved PHP settings
- *
- * Revision 1.5  2009/03/08 23:57:43  fplanque
- * 2009
- *
- * Revision 1.4  2008/09/23 06:18:38  fplanque
- * File manager now supports a shared directory (/media/shared/global/)
- *
- * Revision 1.3  2008/02/13 11:33:53  blueyed
- * Explicitly call jQuery(), not the shortcut ($())
- *
- * Revision 1.2  2008/01/21 09:35:30  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 11:00:05  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.15  2007/04/26 00:11:10  fplanque
- * (c) 2007
- *
- * Revision 1.14  2006/12/10 01:53:39  blueyed
- * Mention value of $upload_maxmaxkb
- *
- * Revision 1.13  2006/12/10 01:47:11  blueyed
- * Note about $upload_maxmaxkb limit
- *
- * Revision 1.12  2006/12/09 01:55:36  fplanque
- * feel free to fill in some missing notes
- * hint: "login" does not need a note! :P
- *
- * Revision 1.11  2006/12/07 15:23:42  fplanque
- * filemanager enhanced, refactored, extended to skins directory
- *
- * Revision 1.10  2006/12/06 21:22:49  fplanque
- * the jQuery tentative and more
- *
- * Revision 1.9  2006/12/06 18:06:18  fplanque
- * an experiment with JS hiding/showing form parts
- *
- * Revision 1.8  2006/11/28 01:40:13  fplanque
- * wording
- *
- * Revision 1.7  2006/11/26 01:42:09  fplanque
- * doc
  */
 ?>

@@ -5,10 +5,6 @@
  * Based on terrafirme3.5 by Sadish Bala - http://wpthemepark.com
  */
 
-@import url("../../rsc/css/basic.css");	/* Import basic styles */
-@import url("../../rsc/css/blog_base.css");	/* Default styles for the blog navigation */
-@import url("../../rsc/css/item_base.css");	/* Default styles for the post CONTENT */
-
 *
 {
 	padding: 0;
@@ -187,6 +183,8 @@ h1,h2,h3,h4,h5,h6
 {
 	margin:0;
 	padding:0;
+	float: left;
+	max-width: 500px;
 }
 
 .top_menu ul li
@@ -195,6 +193,8 @@ h1,h2,h3,h4,h5,h6
 	line-height: 52px;
 	padding-left: 3px;
 	margin:0 10px 0 0;
+	float: left;
+	white-space: nowrap;
 }
 
 .top_menu ul li a
@@ -222,15 +222,14 @@ h1,h2,h3,h4,h5,h6
 	font-family:Tahoma, Georgia, Arial, Verdana, Serif;
 	text-transform:none;
 	float:right;
-	margin:-50px 0 0 0;
 }
 
-.SearchField
+div.compact_search_form input.SearchField
 {
 	padding:2px;
 	margin-bottom: 5px;
 	background:#F9F9F7;
-	width: 172px;
+	width: 142px;
 	border: 1px solid #ccc;
 }
 
@@ -275,17 +274,20 @@ h3.bTitle {
 {
 	border-bottom:#656551 1px solid;
 }
-.bPosts ul
-{
-    margin:1em;
-    padding:0 1em;
-    list-style-image:url('img/bullet.gif');
+.bPosts ul {
+	margin:1em 1em 1em 9px;
+	padding:0 1em 0 0;
+	list-style: none;
+}
+.bPosts .content_full ul li {
+	background: url(img/icons.gif) no-repeat -4px -60px;
+	padding-left: 13px;
 }
 .bPosts ol
 {
-    list-style-type:decimal;
-    margin:1em;
-    padding:0 1em;
+	list-style-type:decimal;
+	margin:1em;
+	padding:0 1em;
 }
 .bPosts .entry
 {
@@ -314,12 +316,12 @@ margin-bottom: 30px;
 }
 .bPosts .bPost .date em.user
 {
-	background:url('img/user.png') no-repeat left top;
+	background:url('img/icons.gif') no-repeat 0 -48px;
 	padding-left:15px;
 }
 .bPosts .bPost .date em.bPostdate
 {
-	background:url('img/date.gif') no-repeat left top;
+	background:url('img/icons.gif') no-repeat 0 -32px;
 	padding-left:17px;
 }
 .bPosts .bPost .entry
@@ -350,14 +352,14 @@ margin-bottom: 0;
 
 .bPosts .bPost .bSmallPrint ul li.comments
 {
-	background-image: url('img/a36.gif');
+	background: url('img/icons.gif') no-repeat 0 3px;
 	color:#999;
 	margin-left: 20px;
 }
 
 .bPosts .bPost .bSmallPrint ul li.readmore
 {
-	background-image: url('img/a38.gif');
+	background: url('img/icons.gif') no-repeat 2px -13px;
 	color:#999;
 	margin-left: 20px;
 }
@@ -426,9 +428,14 @@ div.bSideItem div.notes {
 }
 .bSideBar ul ul
 {
-	list-style-image:url('img/arrow.gif');
-	padding: 0 0 0 15px;
-	margin:0;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+.bSideBar ul ul li
+{
+	background: url(img/icons.gif) no-repeat 3px -74px;
+	padding-left: 15px;
 }
 .bSideBar a
 {
@@ -630,7 +637,6 @@ div.moderation_msg
 
 div.feedback_feed_msg {
 	margin: 2em 2ex;
-	text-align: right;
 }
 
 #bCalendarToday {
@@ -663,4 +669,38 @@ div.PageTop a.selected:hover {
 
 div.featured_post {
 	padding: 8px 8px 0 8px;
+}
+
+div.input input, .ui-autocomplete {
+	font: 11.2px verdana,arial,serif;
+}
+
+/* jQuery Tokeninput plugin */
+div.input ul.token-input-list-facebook {
+	width: 305px;
+	margin: 0;
+	border: 1px solid #CCC;
+	background: #F9F9F7;
+}
+#ffield_item_tags ul.token-input-list-facebook {
+	width: 96%;
+	margin-left: 4px;
+}
+
+/* Not published posts display */
+#styled_content_block .bPost .status_draft,
+#styled_content_block .bPost .status_review,
+#styled_content_block .bPost .status_community,
+#styled_content_block .bPost .status_protected,
+#styled_content_block .bPost .status_private {
+	top: -20px;
+}
+/* Not published comments display */
+#styled_content_block .bComment .status_draft,
+#styled_content_block .bComment .status_review,
+#styled_content_block .bComment .status_community,
+#styled_content_block .bComment .status_protected,
+#styled_content_block .bComment .status_private {
+	top: -12px;
+	left: 6px;
 }

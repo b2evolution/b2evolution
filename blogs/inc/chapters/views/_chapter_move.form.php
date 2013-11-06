@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -68,52 +68,8 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
- * Revision 1.8  2011/09/04 22:13:13  fplanque
- * copyright 2011
+ * Revision 1.9  2013/11/06 08:03:57  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.7  2010/04/30 20:36:20  blueyed
- * Nuke unused global
- *
- * Revision 1.6  2010/02/08 17:52:07  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.5  2010/01/30 18:55:20  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.4  2010/01/03 13:45:38  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.3  2009/03/08 23:57:42  fplanque
- * 2009
- *
- * Revision 1.2  2008/01/21 09:35:26  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 10:59:28  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.4  2007/04/26 00:11:05  fplanque
- * (c) 2007
- *
- * Revision 1.3  2006/12/11 00:32:26  fplanque
- * allow_moving_chapters stting moved to UI
- * chapters are now called categories in the UI
- *
- * Revision 1.2  2006/12/10 22:28:33  fplanque
- * improved moving chapters a little bit
- *
- * Revision 1.1  2006/12/09 17:59:34  fplanque
- * started "moving chapters accross blogs" feature
- *
- * Revision 1.5  2006/12/09 02:37:44  fplanque
- * Prevent user from creating loops in the chapter tree
- * (still needs a check before writing to DB though)
- *
- * Revision 1.4  2006/12/09 01:55:36  fplanque
- * feel free to fill in some missing notes
- * hint: "login" does not need a note! :P
- *
- * Revision 1.3  2006/11/24 18:27:25  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

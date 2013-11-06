@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -163,72 +163,28 @@ class coll_tag_cloud_Widget extends ComponentWidget
 	{
 		$this->init_display( $params );
 
-		global $Blog;
+		global $blog;
 
 		// Get a list of quoted blog IDs
-		$blog_ids = sanitize_id_list($this->disp_params['blog_ids'], false, true);
+		$blog_ids = sanitize_id_list($this->disp_params['blog_ids'], true);
 
-		if( empty($Blog) && empty($blog_ids) )
+		if( empty($blog) && empty($blog_ids) )
 		{	// Nothing to display
 			return;
 		}
-
-		global $DB, $localtimenow;
-
-		$BlogCache = & get_BlogCache();
-
-// fp> verrry dirty and params; TODO: clean up
-// dh> oddly, this appears to not get cached by the query cache. Have experimented a bit, but not found the reason.
-//     It worked locally somehow, but not live.
-//     This takes up to ~50% (but more likely 15%) off the total SQL time. With the query being cached, it would be far better.
-
-		if( !empty($blog_ids) )
-		{
-			$where_cats = 'cat_blog_ID IN ('.$blog_ids.')';
-		}
-		else
-		{	// get list of relevant blogs
-			$where_cats = trim($Blog->get_sql_where_aggregate_coll_IDs('cat_blog_ID'));
+		elseif( empty($blog_ids) )
+		{	// Use current Blog
+			$blog_ids = $blog;
 		}
 
-		// build query, only joining categories, if not using all.
-		$sql = "SELECT LOWER(tag_name) AS tag_name, post_datestart, COUNT(DISTINCT itag_itm_ID) AS tag_count, cat_blog_ID
-			  FROM T_items__tag INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID";
-		if( $where_cats != '1' )
-		{ // we have to join the cats
-			$sql .= "
-			 INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID
-			 INNER JOIN T_categories ON postcat_cat_ID = cat_ID";
-		}
-		$sql .= "
-			 INNER JOIN T_items__item ON itag_itm_ID = post_ID
-			 WHERE $where_cats
-			   AND post_status = 'published' AND post_datestart < '".remove_seconds($localtimenow)."'";
-		
-		if( $this->disp_params['filter_list'] )
-		{	// Filter tags
-			$filter_list = explode( ',', $this->disp_params['filter_list'] ) ;
-			
-			$filter_tags = array();
-			foreach( $filter_list as $l_tag )
-			{
-				$filter_tags[] = '"'.$DB->escape(trim($l_tag)).'"';
-			}
-			
-			$sql .= ' AND tag_name NOT IN ('.implode(', ', $filter_tags).')';
-		}
-		
-		$sql .= "
-			 GROUP BY tag_name
-			 ORDER BY tag_count DESC
-			 LIMIT ".$this->disp_params['max_tags'];
-
-		$results = $DB->get_results( $sql, OBJECT, 'Get tags' );
+		$results = get_tags( $blog_ids, $this->disp_params['max_tags'], $this->disp_params['filter_list'], true );
 
 		if( empty($results) )
 		{	// No tags!
 			return;
 		}
+
+		$BlogCache = & get_BlogCache();
 
 		$max_count = $results[0]->tag_count;
 		$min_count = $results[count($results)-1]->tag_count;
@@ -267,7 +223,7 @@ class coll_tag_cloud_Widget extends ComponentWidget
 			$l_Blog = $BlogCache->get_by_id( $row->cat_blog_ID );
 			echo $l_Blog->get_tag_link( $row->tag_name, $tag_name_disp, array(
 				'style' => 'font-size:'.$size.'pt;',
-				'title' => sprintf( T_('%d posts'), $row->tag_count ) ) ); // TODO: dh> improve title, along "Display items tagged as «%s»"
+				'title' => sprintf( T_('Display posts tagged with &laquo;%s&raquo;'), $row->tag_name ) ) );
 			$count++;
 		}
 		echo $this->disp_params['tag_cloud_end'];
@@ -310,118 +266,8 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 /*
  * $Log$
- * Revision 1.34  2011/09/04 22:13:21  fplanque
- * copyright 2011
- *
- * Revision 1.33  2011/07/12 23:13:11  sam2kb
- * minor
- *
- * Revision 1.32  2011/07/12 22:10:35  sam2kb
- * Option to display tags from several blogs
- *
- * Revision 1.31  2010/04/22 19:41:01  blueyed
- * doc
- *
- * Revision 1.30  2010/04/22 18:56:55  blueyed
- * Save one byte per tag link. Todo.
- *
- * Revision 1.29  2010/02/08 17:54:48  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.28  2010/01/08 22:24:18  blueyed
- * tagcloud widget: Trans fix.
- *
- * Revision 1.27  2010/01/08 20:21:17  sam2kb
- * Filter unwanted tags
- *
- * Revision 1.26  2009/12/22 08:02:12  fplanque
- * doc
- *
- * Revision 1.25  2009/12/22 03:31:37  blueyed
- * todo about tag widget block cache keys
- *
- * Revision 1.24  2009/10/28 13:39:07  waltercruz
- * Random order to tag cloud widget
- *
- * Revision 1.23  2009/09/14 13:54:13  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.22  2009/09/13 21:33:44  blueyed
- * coll_tag_cloud_Widget: optimizing tag query a bit. doc.
- *
- * Revision 1.21  2009/09/13 21:29:22  blueyed
- * MySQL query cache optimization: remove information about seconds from post_datestart and item_issue_date.
- *
- * Revision 1.20  2009/09/12 11:03:13  efy-arrin
- * Included the ClassName in the loadclass() with proper UpperCase
- *
- * Revision 1.19  2009/04/23 19:51:40  blueyed
- * Add Blog::get_tag_link, use it where appropriate.
- *
- * Revision 1.18  2009/03/13 02:32:07  fplanque
- * Cleaned up widgets.
- * Removed stupid widget_name param.
- *
- * Revision 1.17  2009/03/08 23:57:46  fplanque
- * 2009
- *
- * Revision 1.16  2009/01/23 00:10:45  blueyed
- * coll_tag_cloud.widget: quote tags with spaces in them
- *
- * Revision 1.15  2009/01/23 00:09:41  blueyed
- * coll_tag_cloud_Widget:
- *  - fix E_FATAL, when included twice (tag_cloud_cmp function would get
- *    defined twice)
- *  - Simplify tag_cloud_cmp by using strcasecmp
- *
- * Revision 1.14  2009/01/23 00:05:25  blueyed
- * Add Blog::get_sql_where_aggregate_coll_IDs, which adds support for '*' in list of aggregated blogs.
- *
- * Revision 1.13  2009/01/13 22:51:29  fplanque
- * rollback / normalized / MFB
- *
- * Revision 1.12  2008/09/09 06:03:31  fplanque
- * More tag URL options
- * Enhanced URL resolution for categories and tags
- *
- * Revision 1.11  2008/07/17 02:03:23  afwas
- * Bug fix in DB query. Won't show tags from not published posts and future posts. Also will no longer show tags twice.
- *
- * Revision 1.10  2008/05/06 23:35:47  fplanque
- * The correct way to add linebreaks to widgets is to add them to $disp_params when the container is called, right after the array_merge with defaults.
- *
- * Revision 1.8  2008/01/21 09:35:37  fplanque
- * (c) 2008
- *
- * Revision 1.7  2007/12/23 17:47:59  fplanque
- * fixes
- *
- * Revision 1.6  2007/12/23 16:16:18  fplanque
- * Wording improvements
- *
- * Revision 1.5  2007/12/23 14:14:25  fplanque
- * Enhanced widget name display
- *
- * Revision 1.4  2007/12/22 19:55:00  yabs
- * cleanup from adding core params
- *
- * Revision 1.3  2007/12/22 17:19:35  fplanque
- * bugfix
- *
- * Revision 1.2  2007/12/21 21:50:28  fplanque
- * tag cloud sizing
- *
- * Revision 1.1  2007/12/20 22:59:34  fplanque
- * TagCloud widget prototype
- *
- * Revision 1.1  2007/06/25 11:02:18  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.2  2007/06/20 21:42:13  fplanque
- * implemented working widget/plugin params
- *
- * Revision 1.1  2007/06/18 21:25:47  fplanque
- * one class per core widget
+ * Revision 1.36  2013/11/06 08:05:09  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>

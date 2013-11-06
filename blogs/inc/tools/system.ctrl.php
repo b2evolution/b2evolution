@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * {@internal License choice
@@ -38,12 +38,12 @@ load_funcs( 'tools/model/_system.funcs.php' );
 // Check minimum permission:
 $current_User->check_perm( 'options', 'view', true );
 
-$AdminUI->set_path( 'tools', 'system' );
+$AdminUI->set_path( 'options', 'system' );
 
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('Tools'), '?ctrl=crontab' );
-$AdminUI->breadcrumbpath_add( T_('System status'), '?ctrl=system' );
+$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system' );
+$AdminUI->breadcrumbpath_add( T_('Status'), '?ctrl=system' );
 
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -288,13 +288,13 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 
 // Version:
 init_system_check( T_( 'MySQL version' ), $DB->version_long );
-if( version_compare( $system_stats['db_version'], '4.0' ) < 0 )
+if( version_compare( $system_stats['db_version'], $required_mysql_version['application'] ) < 0 )
 {
-	disp_system_check( 'error', T_('This version is too old. The minimum recommended MySQL version is 4.1.') );
+	disp_system_check( 'error', sprintf( T_('This version is too old. The minimum recommended MySQL version is %s.'), $required_mysql_version['application'] ) );
 }
-elseif( version_compare( $system_stats['db_version'], '4.1' ) < 0 )
+elseif( version_compare( $system_stats['db_version'], '4.3' ) < 0 )
 {
-	disp_system_check( 'warning', T_('This version is not guaranteed to work. The minimum recommended MySQL version is 4.1.') );
+	disp_system_check( 'warning', T_('This version is old. b2evolution may run but some features may fail. You should ask your host to upgrade MySQL before running b2evolution.') );
 }
 else
 {
@@ -339,11 +339,11 @@ $phpinfo_url = '?ctrl=tools&amp;action=view_phpinfo&amp;'.url_crumb('tools');
 $phpinfo_link = action_icon( T_('View PHP info'), 'info', $phpinfo_url, '', 5, '', array( 'target'=>'_blank', 'onclick'=>'return pop_up_window( \''.$phpinfo_url.'\', \'phpinfo\', 650 )' ) );
 init_system_check( 'PHP version', $system_stats['php_version'].' '.$phpinfo_link );
 
-if( version_compare( $system_stats['php_version'], '4.1', '<' ) )
+if( version_compare( $system_stats['php_version'], $required_php_version['application'], '<' ) )
 {
 	disp_system_check( 'error', T_('This version is too old. b2evolution will not run correctly. You must ask your host to upgrade PHP before you can run b2evolution.') );
 }
-elseif( version_compare( $system_stats['php_version'], '4.3', '<' ) )
+elseif( version_compare( $system_stats['php_version'], '5.2', '<' ) )
 {
 	disp_system_check( 'warning', T_('This version is old. b2evolution may run but some features may fail. You should ask your host to upgrade PHP before running b2evolution.') );
 }
@@ -466,6 +466,35 @@ else
 	}
 }
 
+// Maximum execution time of each script
+$max_execution_time = system_check_max_execution_time();
+if( empty( $max_execution_time ) )
+{
+	init_system_check( 'PHP max_execution_time', T_('Unlimited') );
+	disp_system_check( 'ok' );
+}
+else
+{
+	init_system_check( 'PHP max_execution_time', sprintf( T_('%s seconds'), $max_execution_time ) );
+	if( $max_execution_time <= 5 * 60 )
+	{
+		disp_system_check( 'error' );
+	}
+	elseif( $max_execution_time > 5 * 60 )
+	{
+		disp_system_check( 'warning' );
+	}
+}
+if( $max_execution_time < 600 )
+{ // Force max_execution_time to 10 minutes
+	$result = ini_set( 'max_execution_time', 600 );
+	if( $result !== false )
+	{
+		$max_execution_time = system_check_max_execution_time();
+		init_system_check( 'PHP forced max_execution_time', sprintf( T_('%s seconds'), $max_execution_time ) );
+		disp_system_check( 'warning' );
+	}
+}
 
 // mbstring extension
 init_system_check( 'PHP mbstring extension', extension_loaded('mbstring') ?  T_('Loaded') : T_('Not loaded') );
@@ -498,14 +527,14 @@ $imap_loaded = extension_loaded( 'imap' );
 init_system_check( 'PHP IMAP extension', $imap_loaded ? T_( 'Loaded' ) : T_( 'Not loaded' ) );
 if ( ! $imap_loaded )
 {
-	disp_system_check( 'warning', T_( 'You will not be able to use the Post by Email feature of b2evolution. Enable the IMAP extension in your php.ini file or ask your hosting provider about it.' ) );
+	disp_system_check( 'warning', T_( 'You will not be able to use the Post by Email feature and the Return Path email processing of b2evolution. Enable the IMAP extension in your php.ini file or ask your hosting provider about it.' ) );
 }
 else
 {
 	disp_system_check( 'ok' );
 }
 
-// APC extension
+// Opcode cache
 $opcode_cache = get_active_opcode_cache();
 init_system_check( 'PHP opcode cache', $opcode_cache );
 if( $opcode_cache == 'none' )
@@ -609,15 +638,21 @@ else
 $block_item_Widget->disp_template_raw( 'block_end' );
 
 
+/*
+ * Info pages
+ */
+$block_item_Widget->title = T_('Info pages');
+$block_item_Widget->disp_template_replaced( 'block_start' );
 
-// TODO: dh> memory_limit!
+init_system_check( 'Default page:', '<a href="'.$baseurl.'default.php">'.$baseurl.'default.php</a>' );
+disp_system_check( 'note' );
+
+$block_item_Widget->disp_template_raw( 'block_end' );
+
 // TODO: dh> output_buffering (recommend off)
 // TODO: dh> session.auto_start (recommend off)
 // TODO: dh> How to change ini settings in .htaccess (for mod_php), link to manual
 // fp> all good ideas :)
-// fp> MySQL version
-// TODO: dh> link to phpinfo()? It's included in the /install/ folder, but that is supposed to be deleted
-// fp> we can just include it a second time as an 'action' here.
 // TODO: dh> submit the report into a central database
 // fp>yope, with a Globally unique identifier in order to avoid duplicates.
 
@@ -632,181 +667,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.40  2011/10/17 20:14:24  sam2kb
- * Post by Email converted into internal scheduled job
+ * Revision 1.42  2013/11/06 08:04:54  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
- * Revision 1.39  2011/09/13 16:00:18  fplanque
- * Enhanced back-office navigation.
- *
- * Revision 1.38  2011/09/11 19:41:27  fplanque
- * Added some system stats.
- *
- * Revision 1.37  2011/09/06 00:54:38  fplanque
- * i18n update
- *
- * Revision 1.35.2.2  2011/09/06 00:42:51  fplanque
- * i18n update
- *
- * Revision 1.35.2.1  2011/09/04 22:13:52  fplanque
- * copyright 2011
- *
- * Revision 1.35  2011/03/15 09:34:06  efy-asimo
- * have checkboxes for enabling caching in new blogs
- * refactorize cache create/enable/disable
- *
- * Revision 1.34  2011/02/25 21:52:14  fplanque
- * partial rollback. install folder needs to be removed completely for max safety. There is no in between "ok" state.
- *
- * Revision 1.32  2010/11/25 15:16:35  efy-asimo
- * refactor $Messages
- *
- * Revision 1.31  2010/11/04 03:16:10  sam2kb
- * Display PHP info in a pop-up window
- *
- * Revision 1.30  2010/04/22 20:45:09  blueyed
- * Fix typo with "PHP opcode cache" message
- *
- * Revision 1.29  2010/03/23 03:16:40  sam2kb
- * Added info about GD FreeType Support
- *
- * Revision 1.28  2010/02/08 17:54:47  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.27  2010/02/04 19:37:13  blueyed
- * trans cleanup
- *
- * Revision 1.26  2010/01/30 18:55:35  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.25  2010/01/03 12:39:08  fplanque
- * no message
- *
- * Revision 1.24  2009/12/24 12:32:07  waltercruz
- * Minor
- *
- * Revision 1.23  2009/12/06 22:55:20  fplanque
- * Started breadcrumbs feature in admin.
- * Work in progress. Help welcome ;)
- * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.22  2009/11/30 01:08:27  fplanque
- * extended system optimization checks
- *
- * Revision 1.21  2009/09/26 18:58:18  tblue246
- * GD info fix for PHP 5.3
- *
- * Revision 1.20  2009/04/13 14:50:22  tblue246
- * Typo, bugfix
- *
- * Revision 1.19  2009/04/12 20:15:38  tblue246
- * Make more strings available for translation
- *
- * Revision 1.18  2009/04/11 15:19:28  tblue246
- * typo
- *
- * Revision 1.17  2009/03/24 20:05:59  waltercruz
- * mispelled word
- *
- * Revision 1.16  2009/03/08 23:57:46  fplanque
- * 2009
- *
- * Revision 1.15  2009/02/23 14:07:23  afwas
- * Minor
- *
- * Revision 1.14  2009/02/21 23:10:43  fplanque
- * Minor
- *
- * Revision 1.13  2009/01/24 21:49:45  tblue246
- * Add a check for the PHP IMAP extension which is needed by the Blog by email feature.
- *
- * Revision 1.12  2008/09/27 00:05:54  fplanque
- * minor/version bump
- *
- * Revision 1.11  2008/04/24 22:06:00  fplanque
- * factorized system checks
- *
- * Revision 1.10  2008/03/24 03:12:36  blueyed
- * Add TODO
- *
- * Revision 1.9  2008/02/07 00:36:28  fplanque
- * added mbstrings check
- *
- * Revision 1.8  2008/01/21 09:35:35  fplanque
- * (c) 2008
- *
- * Revision 1.7  2008/01/06 18:47:08  fplanque
- * enhanced system checks
- *
- * Revision 1.6  2008/01/06 17:52:50  fplanque
- * minor/doc
- *
- * Revision 1.5  2008/01/05 22:02:55  blueyed
- * Add info about process user and her group
- *
- * Revision 1.4  2007/10/06 21:31:51  fplanque
- * minor
- *
- * Revision 1.3  2007/10/01 19:02:23  fplanque
- * MySQL version check
- *
- * Revision 1.2  2007/09/04 15:29:16  fplanque
- * interface cleanup
- *
- * Revision 1.1  2007/06/25 11:01:42  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.17  2007/05/20 01:02:32  fplanque
- * magic quotes fix
- *
- * Revision 1.16  2007/04/26 00:11:15  fplanque
- * (c) 2007
- *
- * Revision 1.15  2007/03/04 20:14:16  fplanque
- * GMT date now in system checks
- *
- * Revision 1.14  2007/02/22 19:08:31  fplanque
- * file/memory size checks (not fully tested)
- *
- * Revision 1.13  2006/12/21 21:50:32  fplanque
- * removed rant
- *
- * Revision 1.11  2006/12/13 03:08:28  fplanque
- * thumbnail implementation design demo
- *
- * Revision 1.10  2006/12/13 00:57:18  fplanque
- * GD... just for fun ;)
- *
- * Revision 1.9  2006/12/07 23:21:00  fplanque
- * dashboard blog switching
- *
- * Revision 1.8  2006/12/07 23:16:08  blueyed
- * doc: we want no remote file opening anymore?!
- *
- * Revision 1.7  2006/12/06 23:38:45  fplanque
- * doc
- *
- * Revision 1.6  2006/12/06 22:51:41  blueyed
- * doc
- *
- * Revision 1.5  2006/12/05 15:15:56  fplanque
- * more tests
- *
- * Revision 1.4  2006/12/05 12:26:39  blueyed
- * Test for "SET NAMES utf8"
- *
- * Revision 1.3  2006/12/05 12:11:14  blueyed
- * Some more checks and todos
- *
- * Revision 1.2  2006/12/05 11:30:26  fplanque
- * presentation
- *
- * Revision 1.1  2006/12/05 10:20:18  fplanque
- * A few basic systems checks
- *
- * Revision 1.15  2006/12/05 04:27:49  fplanque
- * moved scheduler to Tools (temporary until UI redesign)
- *
- * Revision 1.14  2006/11/26 01:42:08  fplanque
- * doc
  */
 ?>

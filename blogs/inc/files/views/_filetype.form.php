@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2011 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -65,7 +65,7 @@ $Form->begin_form( 'fform', $creating ?  T_('New file type') : T_('File type') )
 
 	$Form->text_input( 'ftyp_mimetype', $edited_Filetype->mimetype, 40, T_('Mime type'), sprintf('E.g. &laquo;%s&raquo;', 'text/html'), array( 'maxlength'=> 80, 'required'=>true ) );
 
-	$Form->text( 'ftyp_icon', $edited_Filetype->icon, 20, T_('Icon'), sprintf( /* TRANS: %s is a filesystem path */T_('File name of the icon, must be in %s.'), rel_path_to_base($rsc_path.'icons/fileicons/') ), 40 );
+	$Form->select_input_array( 'ftyp_icon', $edited_Filetype->icon, get_available_filetype_icons(), T_('Icon') );
 
 	$Form->radio( 'ftyp_viewtype',
 								$edited_Filetype->viewtype,
@@ -116,32 +116,8 @@ else
 
 /*
  * $Log$
- * Revision 1.9  2011/09/04 22:13:16  fplanque
- * copyright 2011
- *
- * Revision 1.8  2011/03/10 14:54:18  efy-asimo
- * Allow file types modification & add m4v file type
- *
- * Revision 1.7  2010/02/08 17:53:02  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.6  2010/01/30 18:55:27  blueyed
- * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
- *
- * Revision 1.5  2010/01/03 13:45:36  fplanque
- * set some crumbs (needs checking)
- *
- * Revision 1.4  2009/03/08 23:57:43  fplanque
- * 2009
- *
- * Revision 1.3  2008/01/21 09:35:30  fplanque
- * (c) 2008
- *
- * Revision 1.2  2007/10/08 08:31:59  fplanque
- * nicer forms
- *
- * Revision 1.1  2007/06/25 11:00:08  fplanque
- * MODULES (refactored MVC)
+ * Revision 1.11  2013/11/06 08:04:15  efy-asimo
+ * Update to version 5.0.1-alpha-5
  *
  */
 ?>
