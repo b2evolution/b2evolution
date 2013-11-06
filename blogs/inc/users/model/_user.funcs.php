@@ -959,7 +959,7 @@ function get_user_settings_url( $user_tab, $user_ID = NULL )
 		$is_admin_tab = false;
 	}
 
-	if( ( !$is_admin_tab ) && ( ! in_array( $user_tab, array( 'profile', 'user', 'avatar', 'pwdchange', 'userprefs', 'subs' ) ) ) )
+	if( ( !$is_admin_tab ) && ( ! in_array( $user_tab, array( 'profile', 'user', 'avatar', 'pwdchange', 'userprefs', 'subs', 'report' ) ) ) )
 	{
 		debug_die( 'Not supported user tab!' );
 	}
@@ -975,8 +975,7 @@ function get_user_settings_url( $user_tab, $user_ID = NULL )
 		{
 			return NULL;
 		}
-		$current_User->get_Group();
-		if( ( $user_tab == 'admin' ) && ( $current_User->Group->ID != 1 ) )
+		if( ( $user_tab == 'admin' ) && ( $current_User->grp_ID != 1 ) )
 		{
 			$user_tab = 'profile';
 		}
@@ -1670,7 +1669,6 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 				'blog_del_post' => '0',
 				'blog_edit_ts' => '0',
 				'blog_edit_cmt' => 'no',
-				'blog_comments' => '0',
 				'blog_del_cmts' => '0',
 				'blog_recycle_owncmts' => '0',
 				'blog_vote_spam_comments' => '0',
@@ -1891,7 +1889,7 @@ function check_blog_advanced_perm( & $blog_perms, $user_ID, $permname, $permleve
 
 	if( $perm && $permlevel == 'moderate' && empty( $creator_user_ID ) )
 	{ // check moderator rights
-		return in_array( $blog_perms[$edit_permname], array( 'lt', 'le', 'all' ) );
+		return in_array( $blog_perms[$edit_permname], array( 'anon', 'lt', 'le', 'all' ) );
 	}
 
 	return $perm;
@@ -1907,19 +1905,35 @@ function check_blog_advanced_perm( & $blog_perms, $user_ID, $permname, $permleve
  */
 function echo_user_actions( $Widget, $edited_User, $action )
 {
-	global $current_User;
+	global $current_User, $admin_url;
 
 	if( $edited_User->ID != 0 )
 	{ // show these actions only if user already exists
+		if( $current_User->ID != $edited_User->ID && $current_User->check_status( 'can_report_user' ) )
+		{
+			global $user_tab;
+			// get current User report from edited User
+			$current_report = get_report_from( $edited_User->ID );
+			if( $current_report == NULL )
+			{ // Current user has no report for this user yet
+				$report_text_title = $report_text = T_('Report User');
+			}
+			else
+			{ // Current user already reported about this user
+				$report_text_title = $report_text = T_('You have reported this user');
+				$report_text = '<span class="red">'.$report_text.'</span>';
+			}
+			$Widget->global_icon( $report_text_title, 'warning_yellow', $admin_url.'?ctrl=user&amp;user_tab=report&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.$report_text, 3, 4, array( 'onclick' => 'return user_report( '.$edited_User->ID.', \''.$user_tab.'\')' ) );
+		}
 		if( ( $current_User->check_perm( 'users', 'edit', false ) ) && ( $current_User->ID != $edited_User->ID )
 			&& ( $edited_User->ID != 1 ) )
 		{
-			$Widget->global_icon( T_('Delete this user!'), 'delete', '?ctrl=users&amp;action=delete&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete'), 3, 4  );
-			$Widget->global_icon( T_('Delete this user as spammer!'), 'delete', '?ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete spammer'), 3, 4  );
+			$Widget->global_icon( T_('Delete this user!'), 'delete', $admin_url.'?ctrl=users&amp;action=delete&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete'), 3, 4  );
+			$Widget->global_icon( T_('Delete this user as spammer!'), 'delete', $admin_url.'?ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete spammer'), 3, 4  );
 		}
 		if( $edited_User->get_msgform_possibility( $current_User ) )
 		{
-			$Widget->global_icon( T_('Compose message'), 'comments', '?ctrl=threads&action=new&user_login='.$edited_User->login );
+			$Widget->global_icon( T_('Compose message'), 'comments', $admin_url.'?ctrl=threads&action=new&user_login='.$edited_User->login );
 		}
 	}
 
@@ -2357,7 +2371,7 @@ function callback_options_user_new_fields( $value = 0 )
 		global $user_fields_empty_name;
 		$empty_name = isset( $user_fields_empty_name ) ? $user_fields_empty_name : T_('Add field...');
 
-		$field_options .= '<option value="">'.$empty_name.'</option>';
+		$field_options .= '<option value="0">'.$empty_name.'</option>';
 		$current_group_ID = 0;
 		foreach( $userfielddefs as $f => $fielddef )
 		{
@@ -2408,7 +2422,7 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 	global $action;
 
 	// Array contains values of the new fields from the request
-	$uf_new_fields = param( 'uf_'.$new_field_name, 'array' );
+	$uf_new_fields = param( 'uf_'.$new_field_name, 'array/array/string' );
 
 	// Type of the new field
 	global $new_field_type;
@@ -2569,6 +2583,8 @@ function callback_filter_userlist( & $Form )
 		if( $current_User->check_perm( 'users', 'edit' ) )
 		{ // Show "Reported users" filter only for users with edit user permission
 			$Form->checkbox( 'reported', get_param('reported'), T_('Reported users') );
+			$Form->checkbox( 'custom_sender_email', get_param('custom_sender_email'), T_('Users with custom sender address') );
+			$Form->checkbox( 'custom_sender_name', get_param('custom_sender_name'), T_('Users with custom sender name') );
 		}
 
 		$Form->select_input_array( 'account_status', get_param('account_status'), get_user_statuses( T_('All') ), T_('Account status') );
@@ -2616,8 +2632,8 @@ function callback_filter_userlist( & $Form )
 	$Form->interval( 'age_min', get_param('age_min'), 'age_max', get_param('age_max'), 3, T_('Age group') );
 	echo '<br />';
 
-	$criteria_types = param( 'criteria_type', 'array' );
-	$criteria_values = param( 'criteria_value', 'array' );
+	$criteria_types = param( 'criteria_type', 'array/integer' );
+	$criteria_values = param( 'criteria_value', 'array/string' );
 
 	if( count( $criteria_types ) == 0 )
 	{	// Init one criteria fieldset for first time
@@ -2862,6 +2878,23 @@ function find_logins_with_reserved_prefix()
 
 
 /**
+ * Count those users who have custom setting which is different then the general
+ *
+ * @param string setting name
+ * @param string general setting value
+ * @return integer the number of users with custom settings
+ */
+function count_users_with_custom_setting( $setting_name, $general_value )
+{
+	global $DB;
+
+	return $DB->get_var( 'SELECT count( uset_user_ID )
+		FROM T_users__usersettings
+		WHERE uset_name = '.$DB->quote( $setting_name ).' AND uset_value != '.$DB->quote( $general_value ) );
+}
+
+
+/**
  * Get user reports available statuses
  *
  * @return array with status key and status text
@@ -2962,7 +2995,7 @@ function add_report_from( $user_ID, $status, $info )
 							'email'          => $reported_User->email,
 							'report_status'  => get_report_status_text( $status ),
 							'report_info'    => $info,
-							'user_ID' 		 => $user_ID,
+							'user_ID'        => $user_ID,
 							'reported_by'    => $current_User->login,
 						);
 		// send notificaiton ( it will be send to only those users who want to receive this kind of notifications )
@@ -3012,7 +3045,7 @@ function get_user_quick_search_form( $params = array() )
 
 	$r .= $Form->begin_form();
 
-	$Form->hidden_ctrl();
+	$Form->hidden( 'ctrl', 'users' );
 	$Form->add_crumb( 'user' );
 
 	$r .= $Form->text_input( 'user_search', '', 15, $params['title'], '', array( 'maxlength' => 100 ) );
@@ -3288,6 +3321,154 @@ function find_users_with_same_email( $user_ID, $user_email, $message )
 
 
 /**
+ * Initialize JavaScript for AJAX loading of popup window to report user
+ */
+function echo_user_report_js()
+{
+	global $rsc_url, $admin_url;
+?>
+<script type="text/javascript">
+function user_report( user_ID, user_tab_from )
+{
+	userReportForm( '<img src="<?php echo $rsc_url; ?>img/ajax-loader2.gif" alt="<?php echo T_('Loading...'); ?>" title="<?php echo T_('Loading...'); ?>" style="display:block;margin:auto;position:absolute;top:0;bottom:0;left:0;right:0;" />', '680px' );
+	jQuery.ajax(
+	{
+		type: 'POST',
+		url: '<?php echo $admin_url; ?>',
+		data:
+		{
+			'ctrl': 'user',
+			'user_tab': 'report',
+			'user_tab_from': user_tab_from,
+			'user_ID': user_ID,
+			'display_mode': 'js',
+			'crumb_user': '<?php echo get_crumb('user'); ?>',
+		},
+		success: function(result)
+		{
+			userReportForm( result, '680px' );
+		}
+	} );
+	return false;
+}
+
+/*
+ * This is called when we get the response from the server:
+ */
+function userReportForm( the_html, width )
+{
+	if( typeof width == 'undefined' )
+	{
+		width = '560px';
+	}
+
+	// add placeholder for antispam settings form:
+	jQuery( 'body' ).append( '<div id="screen_mask" onclick="closeUserReportForm()"></div><div id="overlay_page" style="width:' + width + '"></div>' );
+	var evobar_height = jQuery( '#evo_toolbar' ).height();
+	jQuery( '#screen_mask' ).css({ top: evobar_height });
+	jQuery( '#screen_mask' ).fadeTo(1,0.5).fadeIn(200);
+	jQuery( '#overlay_page' ).html( the_html ).addClass( 'overlay_page_active_transparent' );
+	jQuery( '#close_button' ).bind( 'click', closeUserReportForm );
+
+	// Close antispam popup if Escape key is pressed:
+	var keycode_esc = 27;
+	jQuery(document).keyup(function(e)
+	{
+		if( e.keyCode == keycode_esc )
+		{
+			closeUserReportForm();
+		}
+	} );
+}
+
+// This is called to close the antispam ban overlay page
+function closeUserReportForm()
+{
+	jQuery( '#overlay_page' ).hide();
+	jQuery( '.action_messages').remove();
+	jQuery( '#server_messages' ).insertBefore( '.first_payload_block' );
+	jQuery( '#overlay_page' ).remove();
+	jQuery( '#screen_mask' ).remove();
+	return false;
+}
+</script>
+<?php
+}
+
+
+/**
+ * Display user report form
+ *
+ * @param array Params
+ */
+function user_report_form( $params = array() )
+{
+	global $current_User;
+
+	$params = array_merge( array(
+			'Form'       => NULL,
+			'user_ID'    => 0,
+			'crumb_name' => '',
+			'cancel_url' => '',
+		), $params );
+
+	if( ! is_logged_in() || $current_User->ID == $params['user_ID'] || ! $current_User->check_status( 'can_report_user' ) )
+	{ // Current user must be logged in, cannot report own account, and must has a permission to report
+		return;
+	}
+
+	$Form = & $params['Form'];
+
+	$Form->add_crumb( $params['crumb_name'] );
+	$Form->hidden( 'user_ID', $params['user_ID'] );
+
+	$report_options = array_merge( array( 'none' => '' ), get_report_statuses() );
+
+	$Form->custom_content( '<p><strong>'.get_icon('warning_yellow').' '.T_( 'If you have an issue with this user, you can report it here:' ).'</strong></p>' );
+
+	// get current User report from edited User
+	$current_report = get_report_from( $params['user_ID'] );
+
+	if( $current_report == NULL )
+	{ // currentUser didn't add any report from this user yet
+		$report_content = '<select id="report_user_status" name="report_user_status">';
+		foreach( $report_options as $option => $option_label )
+		{ // add select option, none must be selected
+			$report_content .= '<option '.( ( $option == 'none' ) ? 'selected="selected" ' : '' ).'value="'.$option.'">'.$option_label.'</option>';
+		}
+		$report_content .= '</select><div id="report_info" style="width:100%;"></div>';
+
+		$info_content = '<div><span>'.T_('You can provide additional information below').':</span></div>';
+		$info_content .= '<table style="width:100%;"><td style="width:99%;background-color:inherit;"><textarea id="report_info_content" name="report_info_content" class="form_textarea_input" style="width:100%;" rows="2" maxlength="240"></textarea></td>';
+		$info_content .= '<td style="vertical-align:top;background-color:inherit;"><input type="submit" class="SaveButton" style="color:red;margin-left:2px;" value="'.T_('Report this user now!').'" name="actionArray[report_user]" /></td></table>';
+		$report_content .= '<script type="text/javascript">
+			var info_content = \''.$info_content.'\';
+			jQuery("#report_user_status").change( function() {
+				var report_info = jQuery("#report_info");
+				var value = jQuery(this).val();
+				if( value == "none" )
+				{
+					report_info.html("");
+				}
+				else if( report_info.is(":empty") )
+				{
+					report_info.html( info_content );
+				}
+			});
+			</script>';
+		$report_content .= '<noscript>'.$info_content.'</noscript>';
+		$Form->info( T_('Report NOW'), $report_content );
+	}
+	else
+	{
+		$report_content = T_('You have reported this user on %s as "%s" with the additional info "%s" - <a %s>Cancel report</a>');
+		$report_content = sprintf( $report_content, mysql2localedatetime( $current_report[ 'date' ] ), $report_options[ $current_report[ 'status' ] ], $current_report[ 'info' ], 'href="'.$params['cancel_url'].'"' );
+		$Form->info( T_('Already reported'), $report_content );
+	}
+}
+
+
+/**
  * Display user's reposts results table
  *
  * @param array Params
@@ -3423,7 +3604,7 @@ function user_reports_results( & $reports_Results, $params = array() )
 function get_report_status_text( $status )
 {
 	$statuses = get_report_statuses();
-	return $statuses[ $status ];
+	return isset( $statuses[ $status ] ) ? $statuses[ $status ] : '';
 }
 
 /**

@@ -68,7 +68,7 @@ while( $loop_Plugin = & $Plugins->get_next() )
 	ob_start();
 
 	$priority_link = '<a href="'.$loop_Plugin->get_edit_settings_url().'#ffield_edited_plugin_code">'.$loop_Plugin->priority.'</a>';
-	$Form->begin_fieldset( $loop_Plugin->name.' ('.T_('Priority').': '.$priority_link.')'.get_manual_link('blog_plugin_settings') );
+	$Form->begin_fieldset( $loop_Plugin->name.' '.$loop_Plugin->get_help_link('$help_url').' ('.T_('Priority').': '.$priority_link.')'.get_manual_link('blog_plugin_settings') );
 
 	ob_start();
 
@@ -111,10 +111,4 @@ else
 	$Form->end_form();
 }
 
-/*
- * $Log$
- * Revision 1.12  2013/11/06 08:03:58  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

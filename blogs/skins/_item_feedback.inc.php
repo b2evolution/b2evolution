@@ -64,6 +64,8 @@ global $c, $tb, $pb, $redir;
 if( !empty( $params['Item'] ) && is_object( $params['Item'] ) )
 {	// Set Item object from params
 	$Item = $params['Item'];
+	// Unset params Item object because the params array should be json encodable and we must avoid recursions. We already have the Item for further use.
+	unset( $params['Item'] );
 }
 
 // ----------------- MODULES "Before Comments" EVENT -----------------
@@ -357,16 +359,10 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 }
 
 
-if( $Item->can_see_comments( true ) && ( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks'] ) )
+if( $Item->can_see_comments( false ) && ( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks'] ) )
 {	// user is allowed to see comments
 	// Display link for comments feed:
 	$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>', $params['feed_title'] );
 }
 
-/*
- * $Log$
- * Revision 1.52  2013/11/06 08:05:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

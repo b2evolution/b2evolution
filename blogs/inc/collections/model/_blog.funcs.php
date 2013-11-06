@@ -504,6 +504,32 @@ function init_requested_blog()
 
 
 /**
+ * Activate the blog locale and the corresponding charset
+ *
+ * @param integer the blog Id
+ */
+function activate_blog_locale( $blog )
+{
+	global $current_charset;
+
+	if( empty( $blog ) || ( $blog <= 0 ) )
+	{ // $blog is not a valid blog ID
+		return;
+	}
+
+	$BlogCache = & get_BlogCache();
+	$Blog = $BlogCache->get_by_ID( $blog, false, false );
+	if( !empty( $Blog ) )
+	{ // Activate the blog locale
+		locale_activate( $Blog->get('locale') );
+
+		// Re-Init charset handling, in case current_charset has changed:
+		init_charsets( $current_charset );
+	};
+}
+
+
+/**
  * Initialize blog enabled widgets. It will call every enabled widget request_required_files() function.
  *
  * @param integer blog ID
@@ -618,7 +644,8 @@ function check_allow_disp( $disp )
 
 
 /**
- * Get the highest public status and action button lable of a new post or comment in the given blog what the current User may create.
+ * Get the highest public status and action button label of a new post or comment in the given blog what the current User may create.
+ * We assume here that the User should be able to create a post/comment with at least the lowest level status.
  *
  * @param string 'post' or 'comment'
  * @param integer blog ID
@@ -637,34 +664,38 @@ function get_highest_publish_status( $type, $blog, $with_label = true )
 	$BlogCache = & get_BlogCache();
 	$requested_Blog = $BlogCache->get_by_ID( $blog );
 	$default_status = ( $type == 'post' ) ? $requested_Blog->get_setting( 'default_post_status' ) : $requested_Blog->get_setting( 'new_feedback_status' );
-	$status = array( $default_status, '' );
 
 	if( empty( $current_User ) || ( ( !$requested_Blog->get( 'advanced_perms' ) ) && ( !$current_User->check_perm_blog_global( $blog, 'editall' ) ) ) )
-	{ // creator User is not set or collection advanced perms are not enabled and user has no global perms on the given blog, set status to the default status
-		return ( $with_label ? $status : $default_status );
+	{ // current User is not set or collection advanced perms are not enabled and user has no global perms on the given blog, set status to the default status
+		return ( $with_label ? array( $default_status, '' ) : $default_status );
 	}
 
 	$status_order = get_visibility_statuses( 'ordered-array' );
 	$highest_index = count( $status_order ) - 1;
+	$default_status_label = '';
 	$result = false;
 	for( $index = $highest_index; $index > 0; $index-- )
 	{
 		$curr_status = $status_order[$index][0];
+		if( $curr_status == $default_status )
+		{ // Set default status label for later use
+			$default_status_label =  $status_order[$index][1];
+		}
 		if( $current_User->check_perm( 'blog_'.$type.'!'.$curr_status, 'create', false, $blog ) )
-		{ // the highest publish status has be found
+		{ // The highest available publish status has been found
 			$result = array( $curr_status, $status_order[$index][1] );
 			break;
 		}
 	}
 
 	if( !$result )
-	{ // there are no available public status
+	{ // There are no available public status
 		if( $current_User->check_perm( 'blog_'.$type.'!private', 'create', false, $blog ) )
-		{ // check private status 
+		{ // Check private status
 			$result = array( 'private', T_('Make private!') );
 		}
 		else
-		{ // Only draft is allowed
+		{ // None of the statuses were allowed avove the 'draft' status, so we return the lowest level status.
 			$result = array( 'draft', '' );
 		}
 	}
@@ -859,7 +890,7 @@ function get_visibility_statuses( $format = '', $exclude = array('trash') )
 			);
 			break;
 
-		case 'dashboard':
+		case 'moderation': // these statuses may need moderation
 			$r = array( 'community', 'protected', 'review', 'draft' );
 			return $r;
 
@@ -945,7 +976,7 @@ function compare_visibility_status( $first_status, $second_status )
 
 /**
  * Get restricted visibility statuses for the current User in the given blog in back office
- * 
+ *
  * @param integer blog ID
  * @param string permission prefix: 'blog_post!' or 'blog_comment!'
  * @param string permlevel: 'view'/'edit' depending on where we would like to use it

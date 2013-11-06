@@ -138,6 +138,13 @@ if( is_logged_in() && $current_User->get('locale') != $current_locale && ! $loca
 	{
 		$Debuglog->add( 'Login: locale from user profile could not be activated: '.$current_User->get('locale'), 'locale' );
 	}
+	// Init charset based on the selected locale
+	if( init_charsets( $current_charset ) )
+	{ // Charset was changed reload current User from db to make sure that all of it's data is in the current charset
+		$UserCache = & get_UserCache();
+		$UserCache->clear();
+		$current_User = & $UserCache->get_by_ID( $current_User->ID );
+	}
 }
 
 

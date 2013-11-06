@@ -44,8 +44,25 @@ class autolinks_plugin extends Plugin
 
 	var $already_linked_array;
 
+	/**
+	 * Previous word from the text during the make clickable process
+	 *
+	 * @var string
+	 */
 	var $previous_word = null;
-	
+	/**
+	 * Previous word in lower case format
+	 *
+	 * @var string
+	 */
+	var $previous_lword = null;
+	/**
+	 * Shows if the previous word was already used/converted to a link
+	 *
+	 * @var boolean
+	 */
+	var $previous_used = false;
+
 	var $already_linked_usernames;
 
 	/**
@@ -399,17 +416,27 @@ class autolinks_plugin extends Plugin
 			$regexp_modifier = 'u';
 		}
 
+		// Previous word in lower case format
 		$this->previous_lword = null;
+		// Previous word was already used/converted to a link
+		$this->previous_used = false;
 
 		// Optimization: Check if the text contains words from the replacement links strings, and call replace callback only if there is at least one word which needs to be replaced.
-		$text_words = explode( ' ', strtolower( $text ) );
+		$text_words = explode( ' ', evo_strtolower( $text ) );
+		foreach( $text_words as $text_word )
+		{ // Trim the signs [({/ from start and the signs ])}/.,:;!? from end of each word
+			$clear_word = preg_replace( '#^[\[\({/]?([@\p{L}0-9_\-\.]{3,})[\.,:;!\?\]\)}/]?$#i', '$1', $text_word );
+			if( $clear_word != $text_word )
+			{ // Append a clear word to array if word has the punctuation signs
+				$text_words[] = $clear_word;
+			}
+		}
+		// Check if a content has at least one definition to make an url from word
 		$text_contains_replacement = ( count( array_intersect( $text_words, array_keys( $this->replacement_link_array ) ) ) > 0 );
 		if( $text_contains_replacement )
 		{ // Find word with 3 characters at least:
-			$text = preg_replace_callback( '/(^|\s|[(),;])([@\p{L}0-9_\-]{3,})/i'.$regexp_modifier, array( & $this, 'replace_callback' ), $text );
+			$text = preg_replace_callback( '#(^|\s|[(),;\[{/])([@\p{L}0-9_\-\.]{3,})([\.,:;!\?\]\)}/]?)#i'.$regexp_modifier, array( & $this, 'replace_callback' ), $text );
 		}
-
-		// pre_dump($text);
 
 		// Cleanup words to be deleted:
 		$text = preg_replace( '/[@\p{L}0-9_\-]+\s*==!#DEL#!==/i'.$regexp_modifier, '', $text );
@@ -420,6 +447,11 @@ class autolinks_plugin extends Plugin
 
 	/**
 	 * This is the 2nd level of callback!!
+	 *
+	 * @param array The matches of regexp:
+	 *     1 => punctuation signs before word
+	 *     2 => a clear word without punctuation signs
+	 *     3 => punctuation signs after word
 	 */
 	function replace_callback( $matches )
 	{
@@ -431,51 +463,66 @@ class autolinks_plugin extends Plugin
 			$link_attrs .= ' rel="nofollow"';
 		}
 
-		$sign = $matches[1];
+		$before_word = $matches[1];
 		$word = $matches[2];
-		$lword = evo_strtolower($word);
-		$r = $sign.$word;
+		$after_word = $matches[3];
+		if( substr( $word, -1 ) == '.' )
+		{ // If word has a dot in the end
+			$word = substr( $word, 0, -1 );
+			$after_word = '.'.$after_word;
+		}
+		$lword = evo_strtolower( $word );
+		$r = $before_word.$word.$after_word;
 
-		if( isset( $this->replacement_link_array[$lword] ) )
-		{
-			$previous = $this->replacement_link_array[$lword][0];
-			$url = 'http://'.$this->replacement_link_array[$lword][1];
-
-			// pre_dump( $this->already_linked_array );
+		if( isset( $this->replacement_link_array[ $lword ] ) )
+		{ // There is an autolink definition with the current word
+			// An optional previous required word (allows to create groups of 2 words)
+			$previous = $this->replacement_link_array[ $lword ][0];
+			// Url for current word
+			$url = 'http://'.$this->replacement_link_array[ $lword ][1];
 
 			if( in_array( $url, $this->already_linked_array ) || in_array( $lword, $this->already_linked_usernames ) )
-			{	// Do not repeat link to same destination:
+			{ // Do not repeat link to same destination:
 				// pre_dump( 'already linked:'. $url );
-				// save previous word
-				$this->previous_word = $word;
-				$this->previous_lword = $lword;
+				// save previous word in original and lower case format with the after word signs
+				$this->previous_word = $word.$after_word;
+				$this->previous_lword = $lword.$after_word;
+				$this->previous_used = false;
 				return $r;
 			}
 
-			if( !empty($previous) )
-			{
-				if( $this->previous_lword != $previous )
-				{	// We do not have the required previous word
+			if( !empty( $previous ) )
+			{ // This definitions is a group of two word separated with space
+				if( $this->previous_used || ( $this->previous_lword != $previous ) )
+				{ // We do not have the required previous word or it was already used to another autolink definition
 					// pre_dump( 'previous word does not match', $this->previous_lword, $previous );
-					// save previous word
-					$this->previous_word = $word;
-					$this->previous_lword = $lword;
+					// save previous word in original and lower case format with the after word signs
+					$this->previous_word = $word.$after_word;
+					$this->previous_lword = $lword.$after_word;
+					$this->previous_used = false;
 					return $r;
 				}
-				$r = '==!#DEL#!==<a href="'.$url.'"'.$link_attrs.'>'.$this->previous_word.' '.$word.'</a>';
+				$r = '==!#DEL#!==<a href="'.$url.'"'.$link_attrs.'>'.$this->previous_word.' '.$word.'</a>'.$after_word;
 			}
 			else
-			{
-				$r = $sign.'<a href="'.$url.'"'.$link_attrs.'>'.$word.'</a>';
+			{ // Single word
+				$r = $before_word.'<a href="'.$url.'"'.$link_attrs.'>'.$word.'</a>'.$after_word;
 			}
 
 			// Make sure we don't link to same destination twice in the same text/post:
 			$this->already_linked_array[] = $url;
-			// pre_dump( $this->already_linked_array );
+			// Mark that the previous word was already converted to a link
+			$this->previous_used = true;
+		}
+		else
+		{ // Mark that the previous word was NOT converted to a link
+			$this->previous_used = false;
 		}
 
-		$this->previous_word = $word;
-		$this->previous_lword = $lword;
+		// save previous word in original and lower case format with the after word signs
+		// Note: after_word signs are important to be saved because in case of autlink definitions with two words the first word must have exact matching at the end!
+		$this->previous_word = $word.$after_word;
+		$this->previous_lword = $lword.$after_word;
 
 		return $r;
 	}
@@ -557,11 +604,4 @@ class autolinks_plugin extends Plugin
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.33  2013/11/06 08:05:22  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

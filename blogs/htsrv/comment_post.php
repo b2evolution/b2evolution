@@ -33,6 +33,28 @@ require_once $inc_path.'_main.inc.php';
 // Stop a request from the blocked IP addresses
 antispam_block_ip();
 
+// Getting GET or POST parameters:
+param( 'comment_post_ID', 'integer', true ); // required
+param( 'redirect_to', 'string', '' );
+param( 'reply_ID', 'integer', 0 );
+
+$action = param_arrayindex( 'submit_comment_post_'.$comment_post_ID, 'save' );
+
+$ItemCache = & get_ItemCache();
+$commented_Item = & $ItemCache->get_by_ID( $comment_post_ID );
+// Make sure Blog is loaded
+$commented_Item->load_Blog();
+$blog = $commented_Item->Blog->ID;
+
+// Re-Init charset handling, in case current_charset has changed:
+locale_activate( $commented_Item->Blog->get('locale') );
+
+if( init_charsets( $current_charset ) )
+{ // Reload Blog(s) (for encoding of name, tagline etc):
+	$BlogCache->clear();
+	$commented_Item->load_Blog();
+}
+
 header( 'Content-Type: text/html; charset='.$io_charset );
 
 if( $Settings->get('system_lock') )
@@ -41,24 +63,11 @@ if( $Settings->get('system_lock') )
 	header_redirect(); // Will save $Messages into Session
 }
 
-// Getting GET or POST parameters:
-param( 'comment_post_ID', 'integer', true ); // required
-param( 'redirect_to', 'string', '' );
-param( 'reply_ID', 'integer', 0 );
-
-
-$action = param_arrayindex( 'submit_comment_post_'.$comment_post_ID, 'save' );
-
-
-$ItemCache = & get_ItemCache();
-$commented_Item = & $ItemCache->get_by_ID( $comment_post_ID );
-// Make sure Blog is loaded
-$commented_Item->load_Blog();
-$blog = $commented_Item->Blog->ID;
-
 if( ! $commented_Item->can_comment( NULL ) )
 {
 	$Messages->add( T_('You cannot leave comments on this post!'), 'error' );
+
+	header_redirect(); // Will save $Messages into Session
 }
 
 if( $commented_Item->Blog->get_setting( 'allow_html_comment' ) )
@@ -94,8 +103,7 @@ else
 	$url = param( $dummy_fields[ 'url' ], 'string' );
 
 	if( $url != '' && ! $commented_Item->Blog->get_setting( 'allow_anon_url' ) )
-	{	// It's an automated/malicious submit and we want to reject it
-		// We don't want to waste resources displaying mice error messages or loading blog pages.
+	{	// It's an automated/malicious submit and we want to reject it the hard way
 		exit(0);
 	}
 	param( 'comment_cookies', 'integer', 0 );
@@ -246,7 +254,7 @@ $Comment->set( 'content', $comment );
 if( param( 'renderers_displayed', 'integer', 0 ) )
 { // use "renderers" value only if it has been displayed (may be empty)
 	global $Plugins;
-	$comment_renderers = param( 'renderers', 'array', array() );
+	$comment_renderers = param( 'renderers', 'array/string', array() );
 	$renderers = $Plugins->validate_renderer_list( $comment_renderers, array( 'Comment' => & $Comment ) );
 	$Comment->set_renderers( $renderers );
 }
@@ -422,6 +430,8 @@ if( $action == 'preview' )
 	$Comment->set( 'preview_attachments', $preview_attachments ); // memorize attachments
 	$Comment->set( 'checked_attachments', $checked_attachments ); // memorize checked attachments
 	$Comment->set( 'email_is_detected', $comments_email_is_detected ); // used to change a style of the comment
+	// Set Comment Item object to NULL, so this way the Item object won't be serialized, but the item_ID is still set
+	$Comment->Item = NULL;
 	$Session->set( 'core.preview_Comment', $Comment );
 	$Session->set( 'core.no_CachePageContent', 1 );
 	$Session->dbsave();
@@ -563,7 +573,8 @@ if( $Comment->ID )
 	// asimo> this handle moderators and general users as well and use "outbound_notifications_mode" in case of general users
 	// Moderators will get emails about every new comment
 	// Subscribed user will only get emails about new published comments
-	$Comment->handle_notifications( true );
+	$executed_by_userid = is_logged_in() ? $current_User->ID : NULL;
+	$Comment->handle_notifications( true, $executed_by_userid );
 
 
 	// Add a message, according to the comment's status:
@@ -620,11 +631,4 @@ if( $Comment->ID )
 
 header_redirect(); // Will save $Messages into Session
 
-
-/*
- * $Log$
- * Revision 1.160  2013/11/06 08:03:44  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

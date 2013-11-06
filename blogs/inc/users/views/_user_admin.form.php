@@ -32,11 +32,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var instance of User class
  */
-global $edited_User, $UserSettings, $Plugins;
+global $edited_User, $UserSettings, $Settings, $Plugins;
 
 global $current_User;
 
-global $servertimenow;
+global $servertimenow, $admin_url;
 
 if( !$current_User->check_perm( 'users', 'edit' ) )
 { // Check permission:
@@ -89,7 +89,7 @@ $level_fieldnote = '[0 - 10]';
 
 if( $edited_User->ID == 1 )
 {	// This is Admin user
-	echo '<input type="hidden" name="edited_user_grp_ID" value="'.$edited_User->Group->ID.'" />';
+	echo '<input type="hidden" name="edited_user_grp_ID" value="'.$edited_User->grp_ID.'" />';
 	$Form->info( T_('Account status'), T_( 'Autoactivated' ) );
 	$Form->info( T_('User group'), $edited_User->Group->dget('name') );
 
@@ -100,7 +100,7 @@ else
 	$status_icon = '<div id="user_status_icon">'.$user_status_icons[ $edited_User->get( 'status' ) ].'</div>';
 	$Form->select_input_array( 'edited_user_status', $edited_User->get( 'status' ), get_user_statuses(), T_( 'Account status' ), '', array( 'field_suffix' => $status_icon ) );
 	$GroupCache = & get_GroupCache();
-	$Form->select_object( 'edited_user_grp_ID', $edited_User->Group->ID, $GroupCache, T_('User group') );
+	$Form->select_object( 'edited_user_grp_ID', $edited_User->grp_ID, $GroupCache, T_('User group') );
 
 	$Form->text_input( 'edited_user_level', $edited_User->get('level'), 2, T_('User level'), $level_fieldnote, array( 'required' => true ) );
 }
@@ -126,8 +126,34 @@ $Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
 	$Form->select_input_array( 'edited_email_status', $email_status, emblk_get_status_titles(), T_('Email status'), '', array( 'force_keys_as_values' => true, 'background_color' => emblk_get_status_colors(), 'field_suffix' => $email_status_icon ) );
 
 	global $UserSettings;
-	$Form->text_input( 'notification_sender_email', $UserSettings->get( 'notification_sender_email', $edited_User->ID ), 50, T_( 'Sender email address' ) );
-	$Form->text_input( 'notification_sender_name', $UserSettings->get( 'notification_sender_name', $edited_User->ID ), 50, T_( 'Sender name' ) );
+
+	// Display notification sender email adderss setting
+	$default_notification_sender_email = $Settings->get( 'notification_sender_email' );
+	$notifcation_sender_email = $UserSettings->get( 'notification_sender_email', $edited_User->ID );
+	$notifcation_sender_email_note = '';
+	if( empty( $notifcation_sender_email ) )
+	{
+		$notifcation_sender_email_note = T_('Will use the default sender address which is:').' '.$default_notification_sender_email;
+	}
+	elseif( $default_notification_sender_email != $notifcation_sender_email )
+	{
+		$notifcation_sender_email_note = '(!) '.T_('This is different from the new sender address which is currently:').' '.$default_notification_sender_email;
+	}
+	$Form->text_input( 'notification_sender_email', $notifcation_sender_email, 50, T_( 'Sender email address' ), $notifcation_sender_email_note );
+
+	// Display notification sender name setting
+	$default_notification_sender_name = $Settings->get( 'notification_sender_name' );
+	$notification_sender_name = $UserSettings->get( 'notification_sender_name', $edited_User->ID );
+	$notifcation_sender_name_note = '';
+	if( empty( $notification_sender_name ) )
+	{
+		$notifcation_sender_name_note = T_('Will use the default sender name which is:').' '.$default_notification_sender_name;
+	}
+	elseif( $default_notification_sender_name != $notification_sender_name )
+	{
+		$notifcation_sender_name_note = '(!) '.T_('This is different from the new sender name which is currently:').' '.$default_notification_sender_name;
+	}
+	$Form->text_input( 'notification_sender_name', $notification_sender_name, 50, T_( 'Sender name' ), $notifcation_sender_name_note );
 
 	// Display user account activation info ( Last/Next activate account email )
 	$account_activation_info = get_account_activation_info( $edited_User );
@@ -201,7 +227,7 @@ $Form->begin_fieldset( T_('Usage info').get_manual_link('user-admin-usage') );
 	$blogs_owned = $edited_User->get_num_blogs();
 	if( $blogs_owned > 0 )
 	{
-		$blogs_owned .= ' - <a href="'.$activity_tab_url.'#owned_blogs_result" class="roundbutton middle" title="'.format_to_output( T_('View blogs...'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('View blogs...') ) ).'</a>';
+		$blogs_owned .= ' - <a href="'.$activity_tab_url.'#owned_blogs_result" class="roundbutton middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
 	}
 	$Form->info_field( T_('Blogs owned'), $blogs_owned );
 
@@ -209,7 +235,7 @@ $Form->begin_fieldset( T_('Usage info').get_manual_link('user-admin-usage') );
 	$posts_created = $edited_User->get_num_posts();
 	if( $posts_created > 0 )
 	{
-		$posts_created .= ' - <a href="'.$activity_tab_url.'#created_posts_result" class="roundbutton middle" title="'.format_to_output( T_('View posts...'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('View posts...') ) ).'</a>';
+		$posts_created .= ' - <a href="'.$activity_tab_url.'#created_posts_result" class="roundbutton middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
 	}
 	$Form->info_field( T_('Posts created'), $posts_created );
 
@@ -217,16 +243,16 @@ $Form->begin_fieldset( T_('Usage info').get_manual_link('user-admin-usage') );
 	$posts_edited = $edited_User->get_num_edited_posts();
 	if( $posts_edited > 0 )
 	{
-		$posts_edited .= ' - <a href="'.$activity_tab_url.'#edited_posts_result" class="roundbutton middle" title="'.format_to_output( T_('View posts...'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('View posts...') ) ).'</a>';
+		$posts_edited .= ' - <a href="'.$activity_tab_url.'#edited_posts_result" class="roundbutton middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
 	}
 	$Form->info_field( T_('Posts edited'), $posts_edited );
 
 	// Number of comments created by the edited User
-	flush(); // The following might take a while on systems with many comments
+	evo_flush(); // The following might take a while on systems with many comments
 	$comments_created = $edited_User->get_num_comments();
 	if( $comments_created > 0 )
 	{
-		$comments_created .= ' - <a href="'.$activity_tab_url.'#comments_result" class="roundbutton middle" title="'.format_to_output( T_('View comments...'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('View comments...') ) ).'</a>';
+		$comments_created .= ' - <a href="'.$activity_tab_url.'#comments_result" class="roundbutton middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
 	}
 	$Form->info_field( T_('Comments'), $comments_created );
 
@@ -237,14 +263,18 @@ $Form->begin_fieldset( T_('Usage info').get_manual_link('user-admin-usage') );
 	$messages_sent = $edited_User->get_num_messages( 'sent' );
 	if( $messages_sent > 0 )
 	{
-		$messages_sent .= ' - <a href="'.$activity_tab_url.'#threads_result" class="roundbutton middle" title="'.format_to_output( T_('View messages...'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('View messages...') ) ).'</a>';
+		$messages_sent .= ' - <a href="'.$activity_tab_url.'#threads_result" class="roundbutton middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
 		if( $current_User->check_perm( 'perm_messaging', 'abuse' ) )
 		{
-			$messages_sent .= ' - <a href="?ctrl=abuse&amp;colselect_submit=Filter+list&amp;u='.$edited_User->login.'">'.T_('Go to abuse management').' &raquo;</a>';
+			$messages_sent .= ' - <a href="'.$admin_url.'?ctrl=abuse&amp;colselect_submit=Filter+list&amp;u='.$edited_User->login.'">'.T_('Go to abuse management').' &raquo;</a>';
 		}
 	}
-	$messages_received = $edited_User->get_num_messages( 'received' );
 	$Form->info_field( T_('# of private messages sent'), $messages_sent );
+	$messages_received = $edited_User->get_num_messages( 'received' );
+	if( $messages_received > 0 && $current_User->check_perm( 'perm_messaging', 'abuse' ) )
+	{
+		$messages_received .= ' - <a href="'.$admin_url.'?ctrl=abuse&amp;colselect_submit=Filter+list&amp;u='.$edited_User->login.'" class="roundbutton middle" title="'.format_to_output( T_('Go to abuse management'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to abuse management') ) ).'</a>';
+	}
 	$Form->info_field( T_('# of private messages received'), $messages_received );
 
 	$edited_user_lastseen = $edited_User->get( 'lastseen_ts' );
@@ -288,7 +318,7 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 	}
 	$Form->info_field( T_('IP range'), $iprange_name );
 	$email_status_icon = '<div id="iprange_status_icon">'.aipr_status_icon( $iprange_status ).'</div>';
-	$Form->select_input_array( 'edited_iprange_status', $iprange_status, aipr_status_titles( empty( $iprange_status ) ? true : false ), T_( 'IP range status' ), '', array( 'force_keys_as_values' => true, 'background_color' => aipr_status_colors(), 'field_suffix' => $email_status_icon ) );
+	$Form->select_input_array( 'edited_iprange_status', $iprange_status, aipr_status_titles( true ), T_( 'IP range status' ), '', array( 'force_keys_as_values' => true, 'background_color' => aipr_status_colors(), 'field_suffix' => $email_status_icon ) );
 
 	$Form->info_field( T_('From Country'), $from_country, array( 'field_suffix' => $user_from_country_suffix ) );
 	$Form->info_field( T_('From Domain'), format_to_output( $UserSettings->get( 'user_domain', $edited_User->ID ) ) );
@@ -424,12 +454,3 @@ jQuery( '#edited_iprange_status' ).change( function()
 	}
 } );
 </script>
-<?php
-
-/*
- * $Log$
- * Revision 1.10  2013/11/06 09:09:09  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
-?>

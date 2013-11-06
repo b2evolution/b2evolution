@@ -1,10 +1,10 @@
 <?php
-
 /*
 * Abraham Williams (abraham@abrah.am) http://abrah.am
 *
 * The first PHP Library to support OAuth for Twitter's REST API.
 */
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /* Load OAuth lib. You can find it at http://oauth.net */
 require_once('oauth.php');
@@ -18,7 +18,7 @@ class TwitterOAuth {
   /* Contains the last API call. */
   public $url;
   /* Set up the API root URL. */
-  public $host = "https://api.twitter.com/1/";
+  public $host = "https://api.twitter.com/1.1/";
   /* Set timeout default. */
   public $timeout = 30;
   /* Set connect timeout. */
@@ -153,7 +153,7 @@ class TwitterOAuth {
     }
     return $response;
   }
-  
+
   /**
 * POST wrapper for oAuthRequest.
 */

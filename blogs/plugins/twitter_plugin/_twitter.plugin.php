@@ -301,7 +301,7 @@ class twitter_plugin extends Plugin
 		$connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $oauth_token, $oauth_token_secret );
 		// get linked user account
 		$account = $connection->get('account/verify_credentials');
-		if( empty($account->error) )
+		if( empty( $account->errors ) )
 		{
 			return $account->screen_name;
 		}
@@ -623,10 +623,4 @@ class twitter_plugin extends Plugin
 	}
 }
 
-/*
- * $Log$
- * Revision 1.35  2013/11/06 08:05:35  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

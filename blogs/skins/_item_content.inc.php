@@ -123,6 +123,11 @@ if( $content_mode == 'auto' )
 			$content_mode = $Blog->get_setting('filtered_content');
 			break;
 
+		case 'single':
+		case 'page':
+			$content_mode = 'full';
+			break;
+
 		case 'posts-default':  // home page 1
 		case 'posts-next':     // next page 2, 3, etc
 		default:
@@ -318,10 +323,4 @@ switch( $content_mode )
 		echo $params['content_end_full'];
 
 }
-/*
- * $Log$
- * Revision 1.45  2013/11/06 08:05:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

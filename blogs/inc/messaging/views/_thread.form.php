@@ -32,6 +32,8 @@ global $edited_Thread;
 
 global $DB, $action;
 
+global $Blog;
+
 $creating = is_create_action( $action );
 
 if( !isset( $params ) )
@@ -65,6 +67,11 @@ $Form->begin_form( $params['form_class'], $params['form_title'], array( 'onsubmi
 	$Form->add_crumb( 'messaging_threads' );
 	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',msg_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 	$Form->hidden( 'redirect_to', $params[ 'redirect_to' ] );
+	if( !empty( $Blog ) )
+	{ // Set blog as hidden param, because we may need the blog locale after submit
+		// This issues should be solved differently
+		$Form->hidden( 'blog', $Blog->ID );
+	}
 
 if( $params['allow_select_recipients'] )
 {	// User can select recipients
@@ -145,7 +152,7 @@ jQuery( '#thrd_recipients' ).tokenInput(
 			return '<li>' +
 					item.picture +
 					'<div>' +
-						title + 
+						title +
 					'</div><span></span>' +
 				'</li>';
 		},
@@ -194,11 +201,4 @@ function check_form_thread()
 </script>
 <?php
 }
-
-/*
- * $Log$
- * Revision 1.21  2013/11/06 08:04:35  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

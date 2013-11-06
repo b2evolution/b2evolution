@@ -43,7 +43,7 @@ global $current_User;
  */
 global $Settings;
 
-global $baseurl;
+global $baseurl, $admin_url;
 
 global $repath_test_output, $action;
 
@@ -138,8 +138,36 @@ $Form->begin_fieldset( T_('Settings to decode the returned emails').get_manual_l
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_( 'Email notifications' ).get_manual_link( 'email-notification-settings' ) );
-	$Form->text_input( 'notification_sender_email', $Settings->get( 'notification_sender_email' ), 50, T_( 'Sender email address' ), '', array( 'maxlength' => 127, 'required' => true ) );
-	$Form->text_input( 'notification_sender_name', $Settings->get( 'notification_sender_name' ), 50, T_( 'Sender name' ), '', array( 'maxlength' => 127, 'required' => true ) );
+	// Set notes for notifications sender settings which shows the users custom settings information
+	$notification_sender_email_note = '';
+	$notification_sender_name_note = '';
+	if( $current_User->check_perm( 'users', 'edit' ) )
+	{ // Show infomration and action buttons only for users with edit users permission
+		$users_url = url_add_param( $admin_url, 'ctrl=users&filter=new', '&' );
+		$redirect_to = rawurlencode( regenerate_url( '', '', '', '&' ) );
+		$remove_customization_url = url_add_param( $admin_url, 'ctrl=users&action=remove_sender_customization&'.url_crumb( 'users' ), '&' );
+		$remove_customization = ' - <a href="%s" class="ActionButton" style="float:none">'.T_('remove customizations').'</a>';
+
+		$notification_sender_email = $Settings->get( 'notification_sender_email' );
+		$custom_sender_email_count = count_users_with_custom_setting( 'notification_sender_email', $notification_sender_email );
+		if( $custom_sender_email_count > 0 )
+		{ // There are users with custom sender email settings
+			$sender_email_remove_customization = sprintf( $remove_customization, url_add_param( $remove_customization_url, 'type=sender_email&redirect_to='.$redirect_to, '&' ) );
+			$notification_sender_email_note = '(!) '.sprintf( T_('<a href="%s">%d users</a> have different custom address'), url_add_param( $users_url, 'custom_sender_email=1', '&' ), $custom_sender_email_count ).$sender_email_remove_customization;
+		}
+
+		$notification_sender_name = $Settings->get( 'notification_sender_name' );
+		$custom_sender_name_count = count_users_with_custom_setting( 'notification_sender_name', $notification_sender_name );
+		if( $custom_sender_name_count > 0 )
+		{ // There are users with custom sender name settings
+			$sender_name_remove_customization = sprintf( $remove_customization, url_add_param( $remove_customization_url, 'type=sender_name&redirect_to='.$redirect_to, '&' ) );
+			$notification_sender_name_note = '(!) '.sprintf( T_('<a href="%s">%d users</a> have different custom name'), url_add_param( $users_url, 'custom_sender_name=1', '&' ), $custom_sender_name_count ).$sender_name_remove_customization;
+		}
+	}
+
+	// Display settings input fields
+	$Form->text_input( 'notification_sender_email', $Settings->get( 'notification_sender_email' ), 50, T_( 'Sender email address' ), $notification_sender_email_note, array( 'maxlength' => 127, 'required' => true ) );
+	$Form->text_input( 'notification_sender_name', $Settings->get( 'notification_sender_name' ), 50, T_( 'Sender name' ), $notification_sender_name_note, array( 'maxlength' => 127, 'required' => true ) );
 	$Form->text_input( 'notification_return_path', $Settings->get( 'notification_return_path' ), 50, T_( 'Return path' ), '', array( 'maxlength' => 127, 'required' => true ) );
 	$Form->text_input( 'notification_short_name', $Settings->get( 'notification_short_name' ), 50, T_( 'Short site name' ), '', array( 'maxlength' => 127, 'required' => true ) );
 	$Form->text_input( 'notification_long_name', $Settings->get( 'notification_long_name' ), 50, T_( 'Long site name' ), '', array( 'maxlength' => 255 ) );
@@ -154,11 +182,4 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 		) );
 }
 
-
-/*
- * $Log$
- * Revision 1.3  2013/11/06 09:08:59  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

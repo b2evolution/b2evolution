@@ -185,6 +185,8 @@ class PageCache
 	 */
 	function cache_create( $clear = true )
 	{
+		global $cache_path;
+
 		// Create by using the filemanager's default chmod. TODO> we may not want to make these publicly readable
 		if( ! mkdir_r( $this->ads_collcache_path, NULL ) )
 		{
@@ -192,12 +194,15 @@ class PageCache
 		}
 
 		if( $clear )
-		{	// Clear contents of folder, if any:
+		{ // Clear contents of folder, if any:
 			cleardir_r( $this->ads_collcache_path );
 		}
 
 		// Create htaccess file with deny rules
-		create_htaccess_deny( $this->ads_collcache_path );
+		if( ! create_htaccess_deny( $cache_path ) )
+		{
+			return false;
+		}
 
 		return true;
 	}
@@ -613,8 +618,8 @@ class PageCache
 		$file_name = basename($file_path);
 
 		// Note: index.html pages are in the cache to hide the contents from browsers in case the webserver whould should a listing
-		if( ( $file_name == 'index.html' ) || ( substr( $file_name, 0, 1 ) == '.' ) )
-		{ // this file is index.html or it is hidden, should not delete it.
+		if( ( $file_name == 'index.html' ) || ( substr( $file_name, 0, 1 ) == '.' ) || ( $file_name == 'sample.htaccess' ) )
+		{ // this file is index.html or sample.htaccess or it is hidden, should not delete it.
 			return false;
 		}
 
@@ -704,11 +709,4 @@ class PageCache
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.41  2013/11/06 09:08:46  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

@@ -3052,7 +3052,7 @@ class Plugin
 	{
 		if( empty( $this->help_url ) )
 		{
-			return 'http://b2evolution.net/man/'.strtoupper($this->classname[0]).substr($this->classname,1);
+			return 'http://b2evolution.net/man/'.strtolower( str_replace( '_', '-', $this->classname ) );
 		}
 		else
 		{
@@ -3319,23 +3319,17 @@ class Plugin
 
 
 	/**
-	 * This method should return an array that used as additional columns
+	 * This method initializes an array that used as additional columns
 	 *   for the results table in the BackOffice
 	 *
 	 * @param array Associative array of parameters
-	 * @return array Columns
+	 *   'table'   - Special name that used to know what plugin must use current table
+	 *   'column'  - DB field which contains IP address
+	 *   'Results' - Object
 	 */
 	function GetAdditionalColumnsTable( & $params  )
 	{
-		return false;
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.56  2013/11/06 09:08:58  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

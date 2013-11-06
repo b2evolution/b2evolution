@@ -228,6 +228,30 @@ class UserQuery extends SQL
 
 
 	/**
+	 * Restrict to users with custom notifcation sender settings
+	 *
+	 * @param boolean with custom sender email
+	 * @param boolean with custom sender name
+	 */
+	function where_custom_sender( $custom_sender_email, $custom_sender_name )
+	{
+		global $DB, $Settings;
+
+		if( $custom_sender_email )
+		{ // restrict to users with custom notification sender email address
+			$this->FROM_add( ' LEFT JOIN T_users__usersettings as custom_sender_email ON custom_sender_email.uset_user_ID = user_ID AND custom_sender_email.uset_name = "notification_sender_email"' );
+			$this->WHERE_and( 'custom_sender_email.uset_value IS NOT NULL AND custom_sender_email.uset_value <> '.$DB->quote( $Settings->get( 'notification_sender_email' ) ) );
+		}
+
+		if( $custom_sender_name )
+		{ // restrict to users with custom notification sender name
+			$this->FROM_add( ' LEFT JOIN T_users__usersettings as custom_sender_name ON custom_sender_name.uset_user_ID = user_ID AND custom_sender_name.uset_name = "notification_sender_name"' );
+			$this->WHERE_and( 'custom_sender_name.uset_value IS NOT NULL AND custom_sender_name.uset_value <> '.$DB->quote( $Settings->get( 'notification_sender_name' ) ) );
+		}
+	}
+
+
+	/**
 	 * Restrict with user group
 	 *
 	 * @param integer User group ID
@@ -336,11 +360,4 @@ class UserQuery extends SQL
 
 }
 
-
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:05:03  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

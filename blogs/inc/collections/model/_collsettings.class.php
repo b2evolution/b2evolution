@@ -70,9 +70,12 @@ class CollectionSettings extends AbstractSettings
 			'count_custom_double' => 0,
 			'count_custom_varchar' => 0,
 			'show_location_coordinates' => 0,
+			'tags_meta_keywords' => 1,
+			'slug_limit' => 5,
 
 		// Comment settings:
-			'new_feedback_status' => 'review',			// 'published', 'community', 'protected', 'private', 'review', 'draft' or 'deprecated'
+			// 'new_feedback_status' => 'review',		// Default status for new anonymous comments: 'published', 'community', 'protected', 'private', 'review', 'draft' or 'deprecated'. We don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
+			// 'moderation_statuses' => NULL,			// Possible values are a list of statuses from: 'community', 'protected', 'review', 'draft', but we don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
 			'allow_comments' => 'any',
 			'allow_view_comments' => 'any',				// 'any', 'registered', 'member', 'moderator'
 			'disable_comments_bypost' => '1',
@@ -109,16 +112,17 @@ class CollectionSettings extends AbstractSettings
 			'canonical_cat_urls' => 1,					// Redirect categories to their canonical URL?
 			'relcanonical_cat_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'chapter_content'   => 'excerpt',
-			'chapter_posts_per_page' => NULL,
+			'chapter_posts_per_page' => 100,
 			'chapter_noindex'   => '1',					// META NOINDEX on Category pages
 			'category_prefix'   => '',
+			'categories_meta_description' => 1,
 
 		// Tag page settings:
 			'tag_links'  => 'colon',					// 'param', 'semicolon' -- fp> we want this changed to prefix only for new blogs only
 			'canonical_tag_urls' => 1,					// Redirect tag pages to their canonical Url?
 			'relcanonical_tag_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'tag_content'       => 'excerpt',
-			'tag_posts_per_page' => NULL,
+			'tag_posts_per_page' => 100,
 			'tag_noindex' => '1',				      	// META NOINDEX on Tag pages
 			'tag_prefix' => '',							// fp> fp> we want this changed to prefix only for new blogs only
 			'tag_rel_attrib' => 1,						// rel="tag" attribute for tag links (http://microformats.org/wiki/rel-tag) -- valid only in prefix-only mode
@@ -167,7 +171,7 @@ class CollectionSettings extends AbstractSettings
 			'max_footer_credits' => 3,
 			'enable_goto_blog' => 'blog',  // 'no' - No redirect, 'blog' - Go to blog after publishing post, 'post' - Redirect to permanent post url
 			'editing_goto_blog' => 'post', // 'no' - No redirect, 'blog' - Go to blog after editing post, 'post' - Redirect to permanent post url
-			'default_post_status' => 'review',			// Default status for new posts ("published", "community", "protected", "private", "review", "draft", "deprecated", "redirected")
+			// 'default_post_status' => 'draft',		// Default status for new posts ("published", "community", "protected", "private", "review", "draft", "deprecated", "redirected"). We don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
 			'post_categories' => 'main_extra_cat_post', // Post category setting
 			'post_navigation' => 'same_blog',           // Default post by post navigation should stay in the same blog, category or author
 			'blog_head_includes' => '',
@@ -195,9 +199,9 @@ class CollectionSettings extends AbstractSettings
 
 	/**
 	 *  Configurable default settings
-	 *  
+	 *
 	 *  These settings default is defined in general settings
-	 *  
+	 *
 	 *  Skin settings:
 	 *  'normal_skin_ID' => NULL,
 	 *  'mobile_skin_ID' => NULL,
@@ -208,9 +212,9 @@ class CollectionSettings extends AbstractSettings
 	/**
 	 * When custom fields are changed it may require other updates on different tables.
 	 * These changes must be processed only if the collection settings were also saved.
-	 * 
+	 *
 	 * @access private
-	 * 
+	 *
 	 * @var array which contains update/delete queries
 	 */
 	var $update_cascade = array();
@@ -246,7 +250,7 @@ class CollectionSettings extends AbstractSettings
 
 	/**
 	 * Commit changed settings to DB.
-	 * 
+	 *
 	 * @return boolean true, if settings have been updated; false otherwise
 	 */
 	function dbupdate()
@@ -276,7 +280,7 @@ class CollectionSettings extends AbstractSettings
 
 	/**
 	 * Add an update/delete query which must be processed if collection settings will be updated
-	 * 
+	 *
 	 * @param string query
 	 */
 	function add_update_cascade( $query )
@@ -298,11 +302,4 @@ class CollectionSettings extends AbstractSettings
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.77  2013/11/06 08:03:57  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

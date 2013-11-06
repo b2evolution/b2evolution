@@ -226,11 +226,17 @@ div.pageTop a.selected:hover {
 	color: #DD6900;
 }
 .bForums th{
-	background: #006699 url(img/cellpic3.gif) repeat-x 0 0;
+	border-top: 3px solid #418aaf;
+	background:-webkit-linear-gradient(top, #03699c, #3a95c2);
+	background:-moz-linear-gradient(top, #03699c, #3a95c2);
+	background:-o-linear-gradient(top, #03699c, #3a95c2);
+	background: -ms-linear-gradient(top, #03699c, #3a95c2);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#03699c', endColorstr='#3a95c2');
+	position: relative;/* To make a border visible in IE */
 	color: #FFA34F;
 	font-size: 11px;
 	font-weight: bold;
-	height: 28px;
+	height: 25px;
 }
 .bForums td{
 	background-color: #EFEFEF;
@@ -266,9 +272,17 @@ td.InResponseTo h3 {
 	margin: 4px;
 	color: #000;
 }
-.bForums tr.top td{
-	background: #D1D7DC url(img/cellpic1.gif) repeat-x 0 0;
-	height: 29px;
+.bForums tr.top td,
+.sidebar_block .sidebar_title,
+.meta_category th {
+	background:-webkit-linear-gradient(top, #c7d0d7, #e0e5e9);
+	background:-moz-linear-gradient(top, #c7d0d7, #e0e5e9);
+	background:-o-linear-gradient(top, #c7d0d7, #e0e5e9);
+	background: -ms-linear-gradient(top, #c7d0d7, #e0e5e9);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#c7d0d7', endColorstr='#e0e5e9');
+	border-bottom: 4px solid #c7d0d7;
+	position: relative;/* To make a border visible in IE */
+	height: 21px;
 	vertical-align: middle;
 	color: #006699;
 	font-size: 12px;
@@ -287,8 +301,10 @@ td.InResponseTo h3 {
 }
 .bForums tr td .quote_author {
 	display: block;
-	margin: 0 auto;
+	margin: 0 auto -10px;
 	width: 90%;
+	position: relative;
+	left: -1ex;
 }
 .bForums tr td blockquote {
 	background-color: #FAFAFA;
@@ -298,7 +314,7 @@ td.InResponseTo h3 {
 	font-size: 11px;
 	line-height: 125%;
 	width: 90%;
-	margin: 0 auto 10px;
+	margin: 12px auto;
 }
 .bForums tr.separator td{
 	background: #D1D7DC;
@@ -433,19 +449,17 @@ select.bComment  /* Used by the profile form */
 	padding: 1px;
 }
 .sidebar_block .sidebar_title {
-	background: url("img/cellpic1.gif") repeat-x scroll 0 0 #D1D7DC;
-	color: #006699;
-	font-size: 12px;
-	font-weight: bold;
-	height: 24px;
-	padding: 5px 2px 0 2px;
+	padding: 0 2px 5px;
+	line-height: 28px;
 }
 .sidebar_block.widget_core_coll_xml_feeds {
 	padding: 2px;
 }
 .sidebar_block.widget_core_coll_xml_feeds .sidebar_title {
 	background: none;
+	border: none;
 	height: auto;
+	line-height: 12px;
 	float: left;
 	padding: 0;
 	font-size: 11px;
@@ -665,10 +679,9 @@ td ul.token-input-list-facebook {
 }
 
 .meta_category th {
-	background: #D1D7DC url("img/cellpic1.gif");
-	height: 28px;
 	text-align: left;
 	letter-spacing: 1px;
+	border-top: none;
 }
 .meta_category td {
 	background: #FFFFFF url("img/cellpic2.jpg") repeat-y;
@@ -904,4 +917,64 @@ td.custom_content {
 td.custom_content p {
 	text-align: left;
 	margin: 2px 0;
+}
+
+/* Forum icons */
+.ficon {
+	background: url(img/icons.gif) no-repeat;
+	display: inline-block;
+}
+.ficon.newTopic {
+	background-position: 0 0;
+	width: 82px;
+	height: 25px;
+}
+.ficon.postReply {
+	background-position: 0 -25px;
+	width: 82px;
+	height: 25px;
+}
+.ficon.locked {
+	background-position: 0 -50px;
+	width: 82px;
+	height: 25px;
+}
+.ficon.catBig {
+	background-position: -82px 0;
+	width: 26px;
+	height: 25px;
+	margin: 0 10px;
+}
+.ficon.catBigLocked {
+	background-position: -82px -25px;
+	width: 26px;
+	height: 25px;
+	margin: 0 10px;
+}
+.ficon.topic {
+	background-position: -108px 0;
+	width: 19px;
+	height: 18px;
+}
+.ficon.topicLocked {
+	background-position: -108px -18px;
+	width: 19px;
+	height: 18px;
+}
+.ficon.topicSticky {
+	background-position: -108px -36px;
+	width: 19px;
+	height: 18px;
+}
+.ficon.latestReply {
+	background-position: -82px -50px;
+	width: 16px;
+	height: 9px;
+	margin: 0 1px;
+}
+.ficon.minipost {
+	background-position: -91px -50px;
+	width: 7px;
+	height: 9px;
+	margin: 0 3px 0 2px;
 }

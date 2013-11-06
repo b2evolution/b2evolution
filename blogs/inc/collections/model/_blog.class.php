@@ -401,6 +401,11 @@ class Blog extends DataObject
 			$this->set_setting( 'single_links', get_param( 'single_links' ) );
 		}
 
+		if( param( 'slug_limit', 'integer', NULL ) !== NULL )
+		{ // Limit slug length:
+			$this->set_setting( 'slug_limit', get_param( 'slug_limit' ) );
+		}
+
 		if( param( 'normal_skin_ID', 'integer', NULL ) !== NULL )
 		{	// Default blog:
 			$this->set_setting( 'normal_skin_ID', get_param( 'normal_skin_ID' ) );
@@ -490,7 +495,7 @@ class Blog extends DataObject
 
 		if( in_array( 'pings', $groups ) )
 		{ // we want to load the ping checkboxes:
-			$blog_ping_plugins = param( 'blog_ping_plugins', 'array', array() );
+			$blog_ping_plugins = param( 'blog_ping_plugins', 'array/string', array() );
 			$blog_ping_plugins = array_unique($blog_ping_plugins);
 			$this->set_setting('ping_plugins', implode(',', $blog_ping_plugins));
 		}
@@ -563,6 +568,18 @@ class Blog extends DataObject
 
 		if( in_array( 'comments', $groups ) )
 		{ // we want to load the workflow checkboxes:
+			// load moderation statuses
+			$moderation_statuses = get_visibility_statuses( 'moderation' );
+			$blog_moderation_statuses = array();
+			foreach( $moderation_statuses as $status )
+			{
+				if( param( 'notif_'.$status, 'integer', 0 ) )
+				{
+					$blog_moderation_statuses[] = $status;
+				}
+			}
+			$this->set_setting( 'moderation_statuses', implode( ',', $blog_moderation_statuses ) );
+
 			$this->set_setting( 'comment_quick_moderation',  param( 'comment_quick_moderation', 'string', 'expire' ) );
 			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
 			$this->set_setting( 'comments_detect_email', param( 'comments_detect_email', 'integer', 0 ) );
@@ -600,6 +617,7 @@ class Blog extends DataObject
 			$this->set_setting( 'allow_attachments', param( 'allow_attachments', 'string', 'registered' ) );
 			$this->set_setting( 'max_attachments', param( 'max_attachments', 'integer', '' ) );
 			$this->set_setting( 'allow_rating_items', param( 'allow_rating_items', 'string', 'never' ) );
+			$this->set_setting( 'rating_question', param( 'rating_question', 'text' ) );
 			$this->set_setting( 'allow_rating_comment_helpfulness', param( 'allow_rating_comment_helpfulness', 'string', '0' ) );
 			$blog_allowtrackbacks = param( 'blog_allowtrackbacks', 'integer', 0 );
 			if( $blog_allowtrackbacks != $this->get( 'allowtrackbacks' ) && ( $blog_allowtrackbacks == 0 || $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ) )
@@ -861,7 +879,7 @@ class Blog extends DataObject
 
 	/**
 	 * Load blog custom fields setting
-	 * 
+	 *
 	 * @param string custom field types
 	 * @param string query to remove deleted custom field settings from items
 	 * @param array Field names array is used to check the diplicates
@@ -1177,231 +1195,6 @@ class Blog extends DataObject
 		global $xmlsrv_subdir;
 
 		return $this->get_basepath_url().$xmlsrv_subdir;
-	}
-
-
-	/**
-	 * Load presets
-	 *
-	 * @param string
-	 */
-	function load_presets( $set_name )
-	{
-		switch( $set_name )
-		{
-			case 'awall':
-				$this->set_setting( 'archive_links', 'extrapath' );
-				$this->set_setting( 'archive_posts_per_page', NULL );
-				$this->set_setting( 'chapter_links', 'chapters' );
-				$this->set_setting( 'chapter_posts_per_page', NULL );
-				$this->set_setting( 'tag_posts_per_page', NULL );
-				$this->set_setting( 'tag_links', 'colon' );
-				$this->set_setting( 'single_links', 'short' );
-
-				$this->set_setting( 'canonical_homepage', 1 );
-				$this->set_setting( 'relcanonical_homepage', 1 );
-				$this->set_setting( 'canonical_item_urls', 1 );
-				$this->set_setting( 'relcanonical_item_urls', 1 );
-				$this->set_setting( 'canonical_archive_urls', 1 );
-				$this->set_setting( 'relcanonical_archive_urls', 1 );
-				$this->set_setting( 'canonical_cat_urls', 1 );
-				$this->set_setting( 'relcanonical_cat_urls', 1 );
-				$this->set_setting( 'canonical_tag_urls', 1 );
-				$this->set_setting( 'relcanonical_tag_urls', 1 );
-
-				$this->set_setting( 'category_prefix', '' );
-				$this->set_setting( 'tag_prefix', '' );
-
-				$this->set_setting( 'default_noindex', 0 );
-				$this->set_setting( 'paged_noindex', 1 );
-				$this->set_setting( 'paged_nofollowto', 0 );
-				$this->set_setting( 'archive_noindex', 1 );
-				$this->set_setting( 'archive_nofollowto', 0 );
-				$this->set_setting( 'chapter_noindex', 0 );
-				$this->set_setting( 'tag_noindex', 0 );
-				$this->set_setting( 'filtered_noindex', 1 ); // temporary
-
-				$this->set_setting( 'arcdir_noindex', 1 );
-				$this->set_setting( 'catdir_noindex', 0 );
-				$this->set_setting( 'feedback-popup_noindex', 1 );
-				$this->set_setting( 'msgform_noindex', 1 );
-				$this->set_setting( 'special_noindex', 1 ); // temporary
-
-				$this->set_setting( 'permalinks', 'single' );
-				$this->set_setting( 'title_link_type', 'permalink' );
-				break;
-
-			case 'abeal':
-				$this->set_setting( 'archive_links', 'extrapath' );
-				$this->set_setting( 'archive_posts_per_page', 10 );
-				$this->set_setting( 'chapter_links', 'subchap' );
-				$this->set_setting( 'chapter_posts_per_page', 10 );
-				$this->set_setting( 'tag_posts_per_page', 10 );
-				$this->set_setting( 'tag_links', 'colon' );
-				$this->set_setting( 'single_links', 'short' );
-
-				$this->set_setting( 'canonical_homepage', 1 );
-				$this->set_setting( 'relcanonical_homepage', 1 );
-				$this->set_setting( 'canonical_item_urls', 1 );
-				$this->set_setting( 'relcanonical_item_urls', 1 );
-				$this->set_setting( 'canonical_archive_urls', 1 );
-				$this->set_setting( 'relcanonical_archive_urls', 1 );
-				$this->set_setting( 'canonical_cat_urls', 1 );
-				$this->set_setting( 'relcanonical_cat_urls', 1 );
-				$this->set_setting( 'canonical_tag_urls', 1 );
-				$this->set_setting( 'relcanonical_tag_urls', 1 );
-
-				$this->set_setting( 'category_prefix', '' );
-				$this->set_setting( 'tag_prefix', '' );
-
-				$this->set_setting( 'default_noindex', 0 );
-				$this->set_setting( 'paged_noindex', 1 );
-				$this->set_setting( 'paged_nofollowto', 0 );
-				$this->set_setting( 'archive_noindex', 1 );
-				$this->set_setting( 'archive_nofollowto', 0 );
-				$this->set_setting( 'chapter_noindex', 1 );
-				$this->set_setting( 'tag_noindex', 1 );
-				$this->set_setting( 'filtered_noindex', 1 ); // temporary
-
-				$this->set_setting( 'arcdir_noindex', 0 );
-				$this->set_setting( 'catdir_noindex', 0 );
-				$this->set_setting( 'feedback-popup_noindex', 0 );
-				$this->set_setting( 'msgform_noindex', 1 );
-				$this->set_setting( 'special_noindex', 1 ); // temporary
-
-				$this->set_setting( 'permalinks', 'single' );
-				$this->set_setting( 'title_link_type', 'permalink' );
-				break;
-
-			case 'mgray':
-				$this->set_setting( 'archive_links', 'extrapath' );
-				$this->set_setting( 'archive_posts_per_page', 20 );
-				$this->set_setting( 'chapter_links', 'chapters' );
-				$this->set_setting( 'chapter_posts_per_page', 20 );
-				$this->set_setting( 'tag_posts_per_page', 20 );
-				$this->set_setting( 'tag_links', 'colon' );
-				$this->set_setting( 'single_links', 'chapters' );
-
-				$this->set_setting( 'canonical_homepage', 1 );
-				$this->set_setting( 'relcanonical_homepage', 1 );
-				$this->set_setting( 'canonical_item_urls', 1 );
-				$this->set_setting( 'relcanonical_item_urls', 1 );
-				$this->set_setting( 'canonical_archive_urls', 1 );
-				$this->set_setting( 'relcanonical_archive_urls', 1 );
-				$this->set_setting( 'canonical_cat_urls', 1 );
-				$this->set_setting( 'relcanonical_cat_urls', 1 );
-				$this->set_setting( 'canonical_tag_urls', 1 );
-				$this->set_setting( 'relcanonical_tag_urls', 1 );
-
-				$this->set_setting( 'category_prefix', '' );
-				$this->set_setting( 'tag_prefix', '' );
-
-				$this->set_setting( 'default_noindex', 0 );
-				$this->set_setting( 'paged_noindex', 1 );
-				$this->set_setting( 'paged_nofollowto', 0 );
-				$this->set_setting( 'archive_noindex', 1 );
-				$this->set_setting( 'archive_nofollowto', 0 );
-				$this->set_setting( 'chapter_noindex', 0 );
-				$this->set_setting( 'tag_noindex', 1 );
-				$this->set_setting( 'filtered_noindex', 1 ); // temporary
-
-				$this->set_setting( 'arcdir_noindex', 1 );
-				$this->set_setting( 'catdir_noindex', 0 );
-				$this->set_setting( 'feedback-popup_noindex', 1 );
-				$this->set_setting( 'msgform_noindex', 1 );
-				$this->set_setting( 'special_noindex', 1 ); // temporary
-
-				$this->set_setting( 'permalinks', 'single' );
-				$this->set_setting( 'title_link_type', 'permalink' );
-				break;
-
-			case 'rfishkin':
-				$this->set_setting( 'archive_links', 'extrapath' );
-				$this->set_setting( 'archive_posts_per_page', 75 );
-				$this->set_setting( 'chapter_links', 'chapters' );
-				$this->set_setting( 'chapter_posts_per_page', 75 );
-				$this->set_setting( 'tag_posts_per_page', 75 );
-				$this->set_setting( 'tag_links', 'colon' );
-				$this->set_setting( 'single_links', 'short' );
-
-				$this->set_setting( 'canonical_homepage', 1 );
-				$this->set_setting( 'relcanonical_homepage', 1 );
-				$this->set_setting( 'canonical_item_urls', 1 );
-				$this->set_setting( 'relcanonical_item_urls', 1 );
-				$this->set_setting( 'canonical_archive_urls', 1 );
-				$this->set_setting( 'relcanonical_archive_urls', 1 );
-				$this->set_setting( 'canonical_cat_urls', 1 );
-				$this->set_setting( 'relcanonical_cat_urls', 1 );
-				$this->set_setting( 'canonical_tag_urls', 1 );
-				$this->set_setting( 'relcanonical_tag_urls', 1 );
-
-				$this->set_setting( 'category_prefix', '' );
-				$this->set_setting( 'tag_prefix', '' );
-
-				$this->set_setting( 'default_noindex', 0 );
-				$this->set_setting( 'paged_noindex', 1 );
-				$this->set_setting( 'paged_nofollowto', 1 );
-				$this->set_setting( 'archive_noindex', 1 );
-				$this->set_setting( 'archive_nofollowto', 1 );
-				$this->set_setting( 'chapter_noindex', 0 );
-				$this->set_setting( 'tag_noindex', 0 );
-				$this->set_setting( 'filtered_noindex', 1 ); // temporary
-
-				$this->set_setting( 'arcdir_noindex', 1 );
-				$this->set_setting( 'catdir_noindex', 1 );
-				$this->set_setting( 'feedback-popup_noindex', 0 );
-				$this->set_setting( 'msgform_noindex', 1 );
-				$this->set_setting( 'special_noindex', 1 ); // temporary
-
-				$this->set_setting( 'permalinks', 'single' );
-				$this->set_setting( 'title_link_type', 'permalink' );
-
-				$this->set_setting( 'excerpts_meta_description', '1' );
-				$this->set_setting( '404_response', '301' );
-				break;
-
-			case 'sspencer':
-				$this->set_setting( 'archive_links', 'extrapath' );
-				$this->set_setting( 'archive_posts_per_page', 10 );
-				$this->set_setting( 'chapter_links', 'chapters' );
-				$this->set_setting( 'chapter_posts_per_page', 10 );
-				$this->set_setting( 'tag_posts_per_page', 10 );
-				$this->set_setting( 'tag_links', 'colon' );
-				$this->set_setting( 'single_links', 'chapters' );
-
-				$this->set_setting( 'canonical_homepage', 1 );
-				$this->set_setting( 'relcanonical_homepage', 1 );
-				$this->set_setting( 'canonical_item_urls', 1 );
-				$this->set_setting( 'relcanonical_item_urls', 1 );
-				$this->set_setting( 'canonical_archive_urls', 1 );
-				$this->set_setting( 'relcanonical_archive_urls', 1 );
-				$this->set_setting( 'canonical_cat_urls', 1 );
-				$this->set_setting( 'relcanonical_cat_urls', 1 );
-				$this->set_setting( 'canonical_tag_urls', 1 );
-				$this->set_setting( 'relcanonical_tag_urls', 1 );
-
-				$this->set_setting( 'category_prefix', 'category' );
-				$this->set_setting( 'tag_prefix', 'tag' );
-
-				$this->set_setting( 'default_noindex', 0 );
-				$this->set_setting( 'paged_noindex', 1 );
-				$this->set_setting( 'paged_nofollowto', 1 );
-				$this->set_setting( 'archive_noindex', 1 );
-				$this->set_setting( 'archive_nofollowto', 1 );
-				$this->set_setting( 'chapter_noindex', 0 );
-				$this->set_setting( 'tag_noindex', 0 );
-				$this->set_setting( 'filtered_noindex', 1 ); // temporary
-
-				$this->set_setting( 'arcdir_noindex', 1 );
-				$this->set_setting( 'catdir_noindex', 0 );
-				$this->set_setting( 'feedback-popup_noindex', 1 );
-				$this->set_setting( 'msgform_noindex', 1 );
-				$this->set_setting( 'special_noindex', 1 ); // temporary
-
-				$this->set_setting( 'permalinks', 'single' );
-				$this->set_setting( 'title_link_type', 'permalink' );
-				break;
-		}
 	}
 
 
@@ -1816,7 +1609,7 @@ class Blog extends DataObject
 				return $this->get_local_media_url().'blogs/'.$this->urlname.'/';
 
 			case 'subdir':
-				return $this->get_local_media_url().$media_url.$this->media_subdir;
+				return $this->get_local_media_url().$this->media_subdir;
 				break;
 
 			case 'custom':
@@ -2070,6 +1863,26 @@ class Blog extends DataObject
 	}
 
 
+	/**
+	 * Get warning message about the enabled advanced perms for those cases when we grant some permission for anonymous users which can be restricted for logged in users
+	 *
+	 * @return mixed NULL if advanced perms are not enabled in this blog, the warning message otherwise
+	 */
+	function get_advanced_perms_warning()
+	{
+		global $admin_url;
+
+		if( $this->get( 'advanced_perms' ) )
+		{
+			$warning = T_('ATTENTION: advanced <a href="%s">user</a> & <a href="%s">group</a> permissions are enabled and some logged in users may have less permissions than anonymous users.');
+			$advanced_perm_url = url_add_param( $admin_url, 'ctrl=coll_settings&amp;blog='.$this->ID.'&amp;tab=' );
+			return ' <span class="warning">'.sprintf( $warning, $advanced_perm_url.'perm', $advanced_perm_url.'permgroup' ).'</span>';
+		}
+
+		return NULL;
+	}
+
+
  	/**
 	 * Get a setting.
 	 *
@@ -2103,6 +1916,22 @@ class Blog extends DataObject
 				if( ( $result === '0' ) && ! $real_value )
 				{ // 0 value means that use the same as normal case
 					$result = $this->get_setting( 'normal_skin_ID' );
+				}
+				break;
+
+			case 'moderation_statuses':
+				if( $result == NULL )
+				{ // moderation_statuses was not set yet, set the default value, which depends from the blog type
+					$default = 'review,draft';
+					$result = ( $this->type == 'forum' ) ? 'community,protected,'.$default : $default;
+				}
+				break;
+
+			case 'default_post_status':
+			case 'new_feedback_status':
+				if( $result == NULL )
+				{ // Default post/comment status was not set yet, use a default value corresponding to the blog type
+					$result = ( $this->type == 'forum' ) ? 'review' : 'draft';
 				}
 				break;
 		}
@@ -2603,7 +2432,7 @@ class Blog extends DataObject
 
 	/*
 	 * Get the blog skin ID which correspond to the current session device
-	 * 
+	 *
 	 * @return integer skin ID
 	 */
 	function get_skin_ID()
@@ -3017,10 +2846,4 @@ class Blog extends DataObject
 	}
 }
 
-/*
- * $Log$
- * Revision 1.168  2013/11/06 09:08:47  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

@@ -554,10 +554,6 @@ class Item extends ItemLight
 			}
 		}
 
-		if( param( 'post_title', 'string', NULL ) !== NULL ) {
-			$this->set_from_Request( 'title' );
-		}
-
 		if( param( 'post_urltitle', 'string', NULL ) !== NULL ) {
 			$this->set_from_Request( 'urltitle' );
 		}
@@ -663,7 +659,7 @@ class Item extends ItemLight
 		if( param( 'renderers_displayed', 'integer', 0 ) )
 		{ // use "renderers" value only if it has been displayed (may be empty)
 			global $Plugins;
-			$renderers = $Plugins->validate_renderer_list( param( 'renderers', 'array', array() ), array( 'Item' => & $this ) );
+			$renderers = $Plugins->validate_renderer_list( param( 'renderers', 'array/string', array() ), array( 'Item' => & $this ) );
 			$this->set( 'renderers', $renderers );
 		}
 		else
@@ -682,7 +678,8 @@ class Item extends ItemLight
 
 		if( param( 'content', $text_format, NULL ) !== NULL )
 		{
-			param( 'post_title', $text_format, NULL );
+			// Never allow html content on post titles
+			param( 'post_title', 'htmlspecialchars', NULL );
 
 			// Do some optional filtering on the content
 			// Typically stuff that will help the content to validate
@@ -1589,16 +1586,8 @@ class Item extends ItemLight
 		$output = array_shift( $this->get_content_parts($params) );
 
 		// Render Inline Images  [image:123:caption]  :
-		if( stristr( $output, '<code' ) !== false || stristr( $output, '<pre' ) !== false )
-		{	// Call $this->render_inline_images() on everything outside code/pre:
-			$output = callback_on_non_matching_blocks( $output,
-				'~<(code|pre)[^>]*>.*?</\1>~is',
-				array( $this, 'render_inline_images' ), array( $params ) );
-		}
-		else
-		{	// No code/pre blocks, replace on the whole thing
-			$output = $this->render_inline_images( $output, $params );
-		}
+		$params['check_code_block'] = true;
+		$output = $this->render_inline_images( $output, $params );
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
@@ -1709,6 +1698,10 @@ class Item extends ItemLight
 		// Output everything after <!-- more -->
 		array_shift($content_parts);
 		$output = implode('', $content_parts);
+
+		// Render Inline Images  [image:123:caption]  :
+		$params['check_code_block'] = true;
+		$output = $this->render_inline_images( $output, $params );
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
@@ -3016,20 +3009,7 @@ class Item extends ItemLight
 		else
 		{
 			$all_ratings_title = T_('Overall user ratings');
-			$delay_fields = get_duration_fields( $expiry_delay );
-			if( !empty( $delay_fields[ 'months' ] ) )
-			{
-				$title = sprintf( T_('Last %d months'), $delay_fields[ 'months' ] );
-			}
-			elseif( !empty( $delay_fields[ 'days' ] ) )
-			{
-				$title = sprintf( T_('Last %d days'), $delay_fields[ 'days' ] );
-			}
-			else
-			{
-				$title = sprintf( T_('Last %d hours'), $delay_fields[ 'hours' ] );
-			}
-			$result .= '<td><div><strong>'.$title.'</strong></div>';
+			$result .= '<td><div><strong>'.get_duration_title( $expiry_delay ).'</strong></div>';
 			$result .= $this->get_rating_table( $active_ratings, $params );
 			$result .= '</td>';
 			$result .= '<td width="2px"></td>';
@@ -3648,7 +3628,7 @@ class Item extends ItemLight
 
 	/**
 	 * Display next Publish/Restrict to link
-	 *  
+	 *
 	 * @param array link params
 	 * @param boolean true to display next publish status, and false to display next restrict status link
 	 * @return boolean true if link was displayed | false otherwise
@@ -3668,36 +3648,43 @@ class Item extends ItemLight
 				'glue'        => '&amp;',
 				'redirect_to' => '',
 				'post_navigation' => 'same_blog',
-				'nav_target' => NULL,
+				'nav_target'  => NULL,
 			), $params );
 
 		if( $publish )
 		{
 			$next_status_in_row = $this->get_next_status( true );
 			$action = 'publish';
-			if( empty( $params['before_text'] ) )
-			{
-				$params['before_text'] = get_icon( 'move_up_'.$next_status_in_row[2], 'imgtag', array( 'title' => '' ) );
-			}
+			$button_default_icon = 'move_up_'.$next_status_in_row[2];
 		}
 		else
 		{
 			$next_status_in_row =  $this->get_next_status( false );
 			$action = 'restrict';
-			if( empty( $params['before_text'] ) )
-			{
-				$params['before_text'] = get_icon( 'move_down_'.$next_status_in_row[2], 'imgtag', array( 'title' => '' ) );
-			}
+			$button_default_icon = 'move_down_'.$next_status_in_row[2];
 		}
 
 		if( $next_status_in_row === false )
-		{
+		{ // Next status is not allowed for current user
 			return false;
 		}
 
 		$next_status = $next_status_in_row[0];
 		$next_status_label = $next_status_in_row[1];
-		$text = ( $params['text' ] == '#' ) ? $next_status_label : $params['text'];
+
+		if( isset( $params['text_'.$next_status] ) )
+		{ // Set text from params for next status
+			$text = $params['text_'.$next_status];
+		}
+		elseif( $params['text' ] != '#' )
+		{ // Set text from params for any atatus
+			$text = $params['text'];
+		}
+		else
+		{ // Default text
+			$text = get_icon( $button_default_icon, 'imgtag', array( 'title' => '' ) ).' '.$next_status_label;
+		}
+
 		if( empty( $params['title'] ) )
 		{
 			$status_title = get_visibility_statuses( 'moderation-titles' );
@@ -3735,7 +3722,15 @@ class Item extends ItemLight
 		}
 
 		$r .= '" title="'.$params['title'].'"';
-		if( !empty( $params['class'] ) ) $r .= ' class="'.$params['class'].'"';
+		if( empty( $params['class_'.$next_status] ) )
+		{ // Set class for all statuses
+			$class = empty( $params['class'] ) ? '' : $params['class'];
+		}
+		else
+		{ // Set special class for next status
+			$class = $params['class_'.$next_status];
+		}
+		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
 		$r .= '>'.$params['before_text'].$text.$params['after_text'].'</a>';
 		$r .= $params['after'];
 
@@ -3915,11 +3910,7 @@ class Item extends ItemLight
 				break;
 
 			case 'styled':
-				$r .= '<div class="floatright">'
-				.'<span class="note status_'.$this->status.'">'
-				.'<span>'.format_to_output( $this->get('t_status') ).'</span>'
-				.'</span>'
-				.'</div>';
+				$r .= get_styled_status( $this->status, $this->get('t_status') );
 				break;
 
 			default:
@@ -4522,7 +4513,7 @@ class Item extends ItemLight
 			}
 
 			// save Item settings
-			if( $result && isset( $this->ItemSettings ) )
+			if( $result && isset( $this->ItemSettings ) && isset( $this->ItemSettings->cache[0] ) )
 			{
 				// update item ID in the ItemSettings cache
 				$this->ItemSettings->cache[$this->ID] = $this->ItemSettings->cache[0];
@@ -4582,6 +4573,71 @@ class Item extends ItemLight
 	}
 
 
+	/**
+	 * Insert new item in test mode, Use this function only in test tool to create very much items at one time
+	 * 
+	 * @return boolean true on success
+	 */
+	function dbinsert_test()
+	{
+		global $DB, $localtimenow;
+
+		$this->set_param( 'last_touched_ts', 'date', date( 'Y-m-d H:i:s', $localtimenow ) );
+
+		$DB->begin( 'SERIALIZABLE' );
+
+		if( $result = parent::dbinsert() )
+		{ // We could insert the item object..
+
+			if( ! is_null( $this->extra_cat_IDs ) )
+			{ // Insert new extracats:
+				$query = 'INSERT INTO T_postcats ( postcat_post_ID, postcat_cat_ID ) VALUES ';
+				foreach( $this->extra_cat_IDs as $extra_cat_ID )
+				{
+					$query .= '( '.$this->ID.', '.$extra_cat_ID.' ),';
+				}
+				$query = substr( $query, 0, strlen( $query ) - 1 );
+				$DB->query( $query, 'insert new extracats' );
+			}
+
+			// Create canonical slug with urltitle
+			$canonical_Slug = new Slug();
+			$canonical_Slug->set( 'title', $this->urltitle );
+			$canonical_Slug->set( 'type', 'item' );
+			$canonical_Slug->set( 'itm_ID', $this->ID );
+
+			// Create tiny slug:
+			$tiny_Slug = new Slug();
+			load_funcs( 'slugs/model/_slug.funcs.php' );
+			$tinyurl = getnext_tinyurl();
+			$tiny_Slug->set( 'title', $tinyurl );
+			$tiny_Slug->set( 'type', 'item' );
+			$tiny_Slug->set( 'itm_ID', $this->ID );
+
+			if( $result = ( $canonical_Slug->dbinsert() && $tiny_Slug->dbinsert() ) )
+			{
+				$this->set( 'canonical_slug_ID', $canonical_Slug->ID );
+				$this->set( 'tiny_slug_ID', $tiny_Slug->ID );
+				if( $result = parent::dbupdate() )
+				{ // save the last tinyurl
+					global $Settings;
+					$Settings->set( 'tinyurl', $tinyurl );
+					$Settings->dbupdate();
+				}
+			}
+		}
+
+		if( $result )
+		{ // The post and all related object was successfully created
+			$DB->commit();
+		}
+		else
+		{ // Some error occured the transaction needs to be rollbacked
+			$DB->rollback();
+		}
+
+		return $result;
+	}
 
 
 	/**
@@ -4614,9 +4670,9 @@ class Item extends ItemLight
 		// validate url title / slug
 		if( $update_slug )
 		{ // item canonical slug wasn't updated outside from this call, if it was changed or it wasn't set yet, we must update the slugs
-			if( empty($this->urltitle) || isset($this->dbchanges['post_urltitle'])  )
+			if( empty( $this->urltitle ) || isset( $this->dbchanges['post_urltitle'] )  )
 			{ // Url title has changed or is empty, we do need to update the slug:
-				$new_slugs = $this->update_slugs();
+				$edited_slugs = $this->update_slugs();
 			}
 		}
 
@@ -4656,7 +4712,7 @@ class Item extends ItemLight
 		}
 
 		if( $auto_track_modification && ( count( $dbchanges ) > 0 ) && ( !isset( $dbchanges['last_touched_ts'] ) ) )
-		{ // Update last_touched_ts field only if it wasn't updated yet and the datemodified will be updated for sure. 
+		{ // Update last_touched_ts field only if it wasn't updated yet and the datemodified will be updated for sure.
 			global $localtimenow;
 			$this->set_param( 'last_touched_ts', 'date', date('Y-m-d H:i:s',$localtimenow) );
 		}
@@ -4675,31 +4731,35 @@ class Item extends ItemLight
 			// Let's handle the slugs:
 			// TODO: dh> $result handling here feels wrong: when it's true already, it should not become false (add "|| $result"?)
 			// asimo>dh The result handling is in a transaction. If somehow the new slug creation fails, then the item insertion should rollback either
-			if( $result && !empty( $new_slugs ) )
-			{ // if we have created $new_slugs, we have to insert it into the database:
-				foreach( $new_slugs as $new_Slug )
+			if( $result && !empty( $edited_slugs ) )
+			{ // if we have new created $edited_slugs, we have to insert it into the database:
+				foreach( $edited_slugs as $edited_Slug )
 				{
-					$slug_result = $new_Slug->dbinsert();
+					if( $edited_Slug->ID == 0 )
+					{ // Insert only new created slugs
+						$edited_Slug->dbinsert();
+					}
 				}
-				if( $slug_result )
-				{ // new slug was inserted successful, update item canonical_slug_ID
-					$this->set( 'canonical_slug_ID', $new_slugs[0]->ID );
+				if( isset( $edited_slugs[0] ) && $edited_slugs[0]->ID > 0 )
+				{ // Make first slug from list as main slug for this item
+					$this->set( 'canonical_slug_ID', $edited_slugs[0]->ID );
+					$this->set( 'urltitle', $edited_slugs[0]->get( 'title' ) );
 					$result = parent::dbupdate();
 				}
 			}
 		}
 
-		if( $result )
-		{
+		if( $result === false )
+		{ // Update failed
+			$DB->rollback();
+		}
+		else
+		{ // Update was successful
 			$this->delete_prerendered_content();
 
 			$DB->commit();
 
 			$Plugins->trigger_event( 'AfterItemUpdate', $params = array( 'Item' => & $this, 'dbchanges' => $dbchanges ) );
-		}
-		else
-		{
-			$DB->rollback();
 		}
 
 		// Load the blog we're in:
@@ -4724,17 +4784,17 @@ class Item extends ItemLight
 	 * @private
 	 * @return array Slug objects
 	 */
-	function update_slugs($urltitle = NULL)
+	function update_slugs( $urltitle = NULL )
 	{
-		if( ! isset($urltitle) )
+		if( ! isset( $urltitle ) )
 		{
 			$urltitle = $this->urltitle;
 		}
 
 		// Split slugs by comma
-		$urltitles = array_reverse( explode( ',', $urltitle ) );
+		$urltitles = explode( ',', $urltitle );
 
-		$new_slugs = array();
+		$edited_slugs = array();
 		foreach( $urltitles as $urltitle )
 		{
 			$urltitle = trim( $urltitle );
@@ -4749,18 +4809,12 @@ class Item extends ItemLight
 			// Check if this slug was already used by this item or not.
 			// We need this check, because urltitle_validate() function will modify an existing urltitle only if it belongs to a different object
 			$SlugCache = & get_SlugCache();
-			$prev_Slug = $SlugCache->get_by_name($new_Slug->get('title'), false, false);
+			$prev_Slug = $SlugCache->get_by_name( $new_Slug->get('title'), false, false );
 			if( $prev_Slug )
 			{ // A slug with this title already exists. It must belong to the same item!
-				if( ( $prev_Slug->get('itm_ID') == $new_Slug->get('itm_ID') ) )
+				if( $prev_Slug->get('itm_ID') == $new_Slug->get('itm_ID') )
 				{
-					if( $this->get( 'canonical_slug_ID' ) != $prev_Slug->ID )
-					{ // urltitle was set to an existing slug, change canonical slug to this
-						$this->set( 'canonical_slug_ID', $prev_Slug->ID );
-					}
-					// we need to set the urltitle too, because the urltitle_validate() function may changed the given urltitle
-					$this->set( 'urltitle', $prev_Slug->get( 'title' ) );
-					// there is no need to create new slug, go to next slug
+					$edited_slugs[] = $prev_Slug;
 					continue;
 				}
 				else
@@ -4769,17 +4823,12 @@ class Item extends ItemLight
 				}
 			}
 			else
-			{	// No slug with such urltitle in DB, we can add this new one
-				$new_slugs[] = $new_Slug;
+			{ // No slug with such urltitle in DB, we can add this new one
+				$edited_slugs[] = $new_Slug;
 			}
 		}
 
-		if( count( $new_slugs ) > 0 )
-		{	// Set first entered slug as item urltitle
-			$this->set( 'urltitle', $new_Slug->get( 'title' ) );
-		}
-
-		return $new_slugs;
+		return $edited_slugs;
 	}
 
 
@@ -5088,11 +5137,21 @@ class Item extends ItemLight
 	 *
 	 * Includes notifications & pings
 	 *
+	 * @param boolean a new post was just created or it was called after an update
 	 * @param boolean give more info messages (we want to avoid that when we save & continue editing)
 	 */
-	function handle_post_processing( $verbose = true )
+	function handle_post_processing( $just_created, $verbose = true )
 	{
 		global $Settings, $Messages, $localtimenow, $posttypes_nopermanentURL;
+
+		if( $just_created )
+		{ // we must try to send moderation notifications for the newly created posts
+			$already_notified = $this->send_moderation_emails();
+		}
+		else
+		{ // Moderation notifications were not sent, so there are no already notified users 
+			$already_notified = NULL;
+		}
 
 		$notifications_mode = $Settings->get('outbound_notifications_mode');
 
@@ -5147,7 +5206,7 @@ class Item extends ItemLight
 			$this->send_outbound_pings( $verbose );
 
 			// Send email notifications now!
-			$this->send_email_notifications( false );
+			$this->send_email_notifications( false, $already_notified );
 
 			// Record that processing has been done:
 			$this->set( 'notifications_status', 'finished' );
@@ -5192,11 +5251,103 @@ class Item extends ItemLight
 
 
 	/**
+	 * Send post may need moderation notifications for those users who have rights to moderate this post, and would like to receive notifications
+	 *
+	 * @return array the notified user ids
+	 */
+	function send_moderation_emails()
+	{
+		global $Settings, $UserSettings, $DB;
+
+		// Select all users who are post moderators in this Item's blog
+		$blog_ID = $this->load_Blog();
+
+		$notify_condition = 'uset_value IS NOT NULL AND uset_value <> "0"';
+		if( $Settings->get( 'def_notify_post_moderation' ) )
+		{
+			$notify_condition = '( uset_value IS NULL OR ( '.$notify_condition.' ) )';
+		}
+
+		// Select user_ids with the corresponding item edit permission on this item's blog
+		$SQL = new SQL();
+		$SQL->SELECT( 'user_ID, IF( grp_perm_blogs = "editall" OR user_ID = blog_owner_user_ID, "all", IF( bloguser_perm_edit > bloggroup_perm_edit, bloguser_perm_edit, bloggroup_perm_edit ) ) as perm' );
+		$SQL->FROM( 'T_users' );
+		$SQL->FROM_add( 'LEFT JOIN T_blogs ON ( blog_ID = '.$this->blog_ID.' )' );
+		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0 AND user_ID = bloguser_user_ID AND bloguser_blog_ID = '.$this->blog_ID.' )' );
+		$SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0 AND user_grp_ID = bloggroup_group_ID AND bloggroup_blog_ID = '.$this->blog_ID.' )' );
+		$SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "notify_post_moderation"' );
+		$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
+		$SQL->WHERE( $notify_condition );
+		$SQL->WHERE_and( '( bloguser_perm_edit IS NOT NULL AND bloguser_perm_edit <> "no" AND bloguser_perm_edit <> "own" )
+				OR ( bloggroup_perm_edit IS NOT NULL AND bloggroup_perm_edit <> "no" AND bloggroup_perm_edit <> "own" )
+				OR ( grp_perm_blogs = "editall" ) OR ( user_ID = blog_owner_user_ID )' );
+
+		$post_moderators = $DB->get_assoc( $SQL->get() );
+
+		$post_creator_User = & $this->get_creator_User();
+		if( isset( $post_moderators[$post_creator_User->ID] ) )
+		{ // Don't notify the user who just created this Item
+			unset( $post_moderators[$post_creator_User->ID] );
+		}
+
+		if( empty( $post_moderators ) )
+		{ // There are no moderator users who would like to receive notificaitons
+			return NULL;
+		}
+
+		// Collect all notified User ID in this array
+		$notfied_Users = array();
+
+		$post_creator_level = $post_creator_User->level;
+		$UserCache = & get_UserCache();
+		$UserCache->load_list( array_keys( $post_moderators ) );
+
+		foreach( $post_moderators as $moderator_ID => $perm )
+		{
+			$moderator_User = $UserCache->get_by_ID( $moderator_ID );
+			if( ( $perm == 'lt' ) && ( $moderator_User->level <= $post_creator_level ) )
+			{ // User has no permission moderate this post
+				continue;
+			}
+			if( ( $perm == 'le' ) && ( $moderator_User->level < $post_creator_level ) )
+			{ // User has no permission moderate this post
+				continue;
+			}
+
+			$moderator_user_Group = $moderator_User->get_Group();
+			$notify_full = $moderator_user_Group->check_perm( 'post_moderation_notif', 'full' );
+
+			$email_template_params = array(
+				'locale'         => $moderator_User->locale,
+				'notify_full'    => $notify_full,
+				'Item'           => $this,
+				'recipient_User' => $moderator_User,
+				'notify_type'    => 'moderator',
+			);
+
+			locale_temp_switch( $moderator_User->locale );
+			$subject = T_('New post may need moderation:').' '.sprintf( T_('%s created a new post on "%s"'), $post_creator_User->login, $this->Blog->get('shortname') );
+			// Send the email
+			send_mail_to_User( $moderator_ID, $subject, 'post_new', $email_template_params, false, array( 'Reply-To' => $post_creator_User->email ) );
+			locale_restore_previous();
+
+			// A send notification email request to the user with $moderator_ID ID was processed
+			$notfied_Users[] = $moderator_ID;
+		}
+
+		return $notfied_Users;
+	}
+
+
+	/**
 	 * Send email notifications to subscribed users
 	 *
 	 * @todo fp>> shall we notify suscribers of blog were this is in extra-cat? blueyed>> IMHO yes.
+	 *
+	 * @param boolean Display notification messages or not
+	 * @param array Already notified user ids, or NULL if it is not the case
 	 */
-	function send_email_notifications( $display = true )
+	function send_email_notifications( $display = true, $already_notified = NULL )
 	{
 		global $DB, $admin_url, $baseurl, $debug, $Debuglog;
 
@@ -5213,12 +5364,15 @@ class Item extends ItemLight
 			echo '<h3>', T_('Notifying subscribed users...'), "</h3>\n";
 		}
 
+		// Create condition to not select already notified modertor users
+		$except_users_condition = empty( $already_notified ) ? '' : ' AND sub_user_ID NOT IN ( '.implode( ',', $already_notified ).' )';
+
 		// Get list of users who want to be notfied:
 		// TODO: also use extra cats/blogs??
 		$sql = 'SELECT DISTINCT sub_user_ID
 							FROM T_subscriptions
 						WHERE sub_coll_ID = '.$this->get_blog_ID().'
-							AND sub_items <> 0';
+							AND sub_items <> 0'.$except_users_condition;
 		$notify_users = $DB->get_col( $sql );
 
 		if( empty( $notify_users ) )
@@ -5246,7 +5400,12 @@ class Item extends ItemLight
 		$cache_by_locale = array();
 		foreach( $notify_users as $user_ID )
 		{
-			$notify_User = $UserCache->get_by_ID( $user_ID );
+			$notify_User = $UserCache->get_by_ID( $user_ID, false, false );
+			if( empty( $notify_User ) )
+			{ // skip invalid users
+				continue;
+			}
+
 			$notify_email = $notify_User->get( 'email' );
 			if( empty( $notify_email ) )
 			{ // skip users with empty email address
@@ -5272,6 +5431,7 @@ class Item extends ItemLight
 					'notify_full'    => $notify_full,
 					'Item'           => $this,
 					'recipient_User' => $notify_User,
+					'notify_type'    => 'subscription',
 				);
 
 			if( $display ) echo T_('Notifying:').$notify_email."<br />\n";
@@ -5573,21 +5733,25 @@ class Item extends ItemLight
 	 */
 	function get_tinyslug()
 	{
+		global $preview;
+
 		$tinyslug_ID = $this->tiny_slug_ID;
 		if( $tinyslug_ID != NULL )
 		{ // the tiny slug for this item was already created
 			$SlugCache = & get_SlugCache();
-			$Slug = & $SlugCache->get_by_ID($tinyslug_ID);
-			return $Slug->get( 'title' );
+			$Slug = & $SlugCache->get_by_ID( $tinyslug_ID, false, false );
+			return $Slug === false ? false : $Slug->get( 'title' );
 		}
-		else
+		elseif( ( $this->ID > 0 ) && ( ! $preview ) )
 		{ // create new tiny Slug for this item
-			$Slug = new Slug();
+			// Note: This may happen only in case of posts created before the tiny slug was introduced
+			global $DB;
 			load_funcs( 'slugs/model/_slug.funcs.php' );
+
+			$Slug = new Slug();
 			$Slug->set( 'title', getnext_tinyurl() );
 			$Slug->set( 'itm_ID', $this->ID );
 			$Slug->set( 'type', 'item' );
-			global $DB;
 			$DB->begin();
 			if( ! $Slug->dbinsert() )
 			{ // Slug dbinsert failed
@@ -5605,11 +5769,15 @@ class Item extends ItemLight
 			$DB->commit();
 
 			// update last tinyurl value on database
+			// Note: This doesn't have to be part of the above transaction, no problem if it doesn't succeed to update, or if override a previously updated value.
 			global $Settings;
 			$Settings->set( 'tinyurl', $Slug->get( 'title' ) );
+			$Settings->dbupdate();
 
 			return $Slug->get( 'title' );
 		}
+
+		return false;
 	}
 
 
@@ -5622,21 +5790,20 @@ class Item extends ItemLight
 	function get_slugs( $separator = ', ' )
 	{
 		if( empty( $this->ID ) )
-		{	// New creating Item
+		{ // New creating Item
 			return $this->get('urltitle');
 		}
 
 		global $DB;
-
 		$SQL = new SQL( 'Get slugs of the Item' );
-		$SQL->SELECT( 'slug_title' );
+		$SQL->SELECT( 'slug_title, IF( slug_ID = '.intval( $this->canonical_slug_ID ).', 0, slug_ID ) AS slug_order_num' );
 		$SQL->FROM( 'T_slug' );
 		$SQL->WHERE( 'slug_itm_ID = '.$DB->quote( $this->ID ) );
 		if( !empty( $this->tiny_slug_ID ) )
-		{	// Exclude tiny slug from list
+		{ // Exclude tiny slug from list
 			$SQL->WHERE_and( 'slug_ID != '.$DB->quote( $this->tiny_slug_ID ) );
 		}
-		$SQL->ORDER_BY( 'slug_ID DESC' );
+		$SQL->ORDER_BY( 'slug_order_num' );
 		$slugs = $DB->get_col( $SQL->get() );
 
 		return implode( $separator, $slugs );
@@ -6181,6 +6348,17 @@ class Item extends ItemLight
 	 */
 	function render_inline_images( $content, $params = array() )
 	{
+		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+		{ // Call $this->render_inline_images() on everything outside code/pre:
+			$params['check_code_block'] = false;
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				array( $this, 'render_inline_images' ), array( $params ) );
+			return $content;
+		}
+
+		// No code/pre blocks, replace on the whole thing
+
 		$params = array_merge( array(
 				'before'              => '<div>',
 				'before_image'        => '<div class="image_block">',
@@ -6269,11 +6447,4 @@ class Item extends ItemLight
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.271  2013/11/06 09:08:48  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

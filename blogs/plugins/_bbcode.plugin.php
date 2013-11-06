@@ -73,12 +73,12 @@ class bbcode_plugin extends Plugin
 [size] #\[size=([0-9]+?)](.+?)\[/size]#is
 [font] #\[font=([A-Za-z0-9 ;\-]+?)](.+?)\[/font]#is
  #\[quote(=?)](.+?)\[/quote]#is
- #\[quote=([^\]\#]*?)\#([a-z0-9]+)](.+?)\[/quote]#is
+ #\[quote=([^\]\#]*?)\#([cp][0-9]+)](.+?)\[/quote]#is
 [quote] #\[quote=([^\]]*?)](.+?)\[/quote]#is
 [list=1] #\[list=1](.+?)\[/list]#is
 [list=a] #\[list=a](.+?)\[/list]#is
 [list] #\[list](.+?)\[/list]#is
-[*] #\[\*](.+?)\n#is
+[*] #\[\*](.+?)(\n|\[/list\])#is
 [bg] !\[bg=(#?[A-Za-z0-9]+?)](.+?)\[/bg]!is',
 				),
 				'coll_post_replace_list' => array(
@@ -115,12 +115,12 @@ class bbcode_plugin extends Plugin
 [size] #\[size=([0-9]+?)](.+?)\[/size]#is
 [font] #\[font=([A-Za-z0-9 ;\-]+?)](.+?)\[/font]#is
  #\[quote(=?)](.+?)\[/quote]#is
- #\[quote=([^\]\#]*?)\#([a-z0-9]+)](.+?)\[/quote]#is
+ #\[quote=([^\]\#]*?)\#([cp][0-9]+)](.+?)\[/quote]#is
 [quote] #\[quote=([^\]]*?)](.+?)\[/quote]#is
 [list=1] #\[list=1](.+?)\[/list]#is
 [list=a] #\[list=a](.+?)\[/list]#is
 [list] #\[list](.+?)\[/list]#is
-[*] #\[\*](.+?)\n#is
+[*] #\[\*](.+?)(\n|\[/list\])#is
 [bg] !\[bg=(#?[A-Za-z0-9]+?)](.+?)\[/bg]!is',
 				),
 				'coll_comment_replace_list' => array(
@@ -709,11 +709,4 @@ class bbcode_plugin extends Plugin
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.26  2013/11/06 08:05:22  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -170,10 +170,10 @@ if( !$Messages->has_errors() )
 			/*
 			 * Delete user
 			 */
-			
+
 			// Check that this action request is not a CSRF hacked request:
 			$Session->assert_received_crumb( 'user' );
-			
+
 			if( !isset($edited_User) )
 				debug_die( 'no User set' );
 
@@ -315,6 +315,38 @@ if( !$Messages->has_errors() )
 			set_param( 'filter', '' );
 
 			break;
+
+		case 'remove_sender_customization':
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'users' );
+
+			// Check required permission
+			$current_User->check_perm( 'users', 'edit', true );
+
+			// get the type of the removable sender customization
+			$type = param( 'type', 'string', true );
+
+			// Set remove custom settings query
+			$remove_query = 'DELETE FROM T_users__usersettings WHERE uset_name = "%s" AND uset_value != %s';
+			if( $type == 'sender_email' )
+			{ // Remove custom sender emails
+				$DB->query( sprintf( $remove_query, 'notification_sender_email', $DB->quote( $Settings->get( 'notification_sender_email' ) ) ) );
+			}
+			elseif( $type == 'sender_name' )
+			{ // Remove custom sender names
+				$DB->query( sprintf( $remove_query, 'notification_sender_name', $DB->quote( $Settings->get( 'notification_sender_name' ) ) ) );
+			}
+			else
+			{ // The customization param is not valid
+				debug_die('Invalid remove sender customization action!');
+			}
+
+			$Messages->add( T_('Customizations have been removed!' ), 'success' );
+			$redirect_to = param( 'redirect_to', 'string', regenerate_url( 'action' ) );
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $redirect_to );
+			/* EXITED */
+			break;
 	}
 }
 
@@ -343,6 +375,7 @@ else
 	{	// Include to edit user level
 		require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 	}
+	load_funcs( 'regional/model/_regional.funcs.php' );
 }
 
 
@@ -418,10 +451,4 @@ switch( $action )
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-/*
- * $Log$
- * Revision 1.57  2013/11/06 09:09:08  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

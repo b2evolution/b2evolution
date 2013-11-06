@@ -1366,7 +1366,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			{
 				print "<PRE>\n---SENDING---\n" . htmlentities($op) . "\n---END---\n</PRE>";
 				// let the client see this now in case http times out...
-				flush();
+				evo_flush();
 			}
 
 			if($timeout>0)
@@ -1510,7 +1510,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			{
 				print "<PRE>\n---SENDING---\n" . htmlentities($payload) . "\n---END---\n</PRE>";
 				// let the client see this now in case http times out...
-				flush();
+				evo_flush();
 			}
 
 			if(!$keepalive || !$this->xmlrpc_curl_handle)
@@ -3780,10 +3780,4 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 		}
 	}
 
-/*
- * $Log$
- * Revision 1.14  2013/11/06 09:08:46  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

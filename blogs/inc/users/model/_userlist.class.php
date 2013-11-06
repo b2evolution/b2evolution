@@ -93,22 +93,24 @@ class UserList extends DataObjectList2
 
 		// Initialize the default filter set:
 		$this->set_default_filters( array(
-				'filter_preset'    => NULL,
-				'country'          => NULL,    // integer, Country ID
-				'region'           => NULL,    // integer, Region ID
-				'subregion'        => NULL,    // integer, Subregion ID
-				'city'             => NULL,    // integer, City ID
-				'keywords'         => NULL,    // string, Search words
-				'gender'           => NULL,    // string: 'M', 'F' or 'MF'
-				'status_activated' => NULL,    // string: 'activated'
-				'account_status'   => NULL,    // string: 'new', 'activated', 'autoactivated', 'emailchanged', 'deactivated', 'failedactivation', 'closed'
-				'reported'         => NULL,    // integer: 1 to show only reported users
-				'group'            => -1,      // string: User group ID, -1 = all groups but list is ungrouped, 0 - all groups with grouped list
-				'age_min'          => NULL,    // integer, Age min
-				'age_max'          => NULL,    // integer, Age max
-				'userfields'       => array(), // Format of item: array( 'type' => type_ID, 'value' => search_words )
-				'order'            => '-D',    // Order
-				'users'            => array(), // User IDs
+				'filter_preset'       => NULL,
+				'country'             => NULL,    // integer, Country ID
+				'region'              => NULL,    // integer, Region ID
+				'subregion'           => NULL,    // integer, Subregion ID
+				'city'                => NULL,    // integer, City ID
+				'keywords'            => NULL,    // string, Search words
+				'gender'              => NULL,    // string: 'M', 'F' or 'MF'
+				'status_activated'    => NULL,    // string: 'activated'
+				'account_status'      => NULL,    // string: 'new', 'activated', 'autoactivated', 'emailchanged', 'deactivated', 'failedactivation', 'closed'
+				'reported'            => NULL,    // integer: 1 to show only reported users
+				'custom_sender_email' => NULL,    // integer: 1 to show only users with custom notifcation sender email address
+				'custom_sender_name'  => NULL,    // integer: 1 to show only users with custom notifaction sender name
+				'group'               => -1,      // string: User group ID, -1 = all groups but list is ungrouped, 0 - all groups with grouped list
+				'age_min'             => NULL,    // integer, Age min
+				'age_max'             => NULL,    // integer, Age max
+				'userfields'          => array(), // Format of item: array( 'type' => type_ID, 'value' => search_words )
+				'order'               => '-D',    // Order
+				'users'               => array(), // User IDs
 		) );
 	}
 
@@ -177,6 +179,12 @@ class UserList extends DataObjectList2
 			 * Restrict by reported state ( was reported or not )
 			 */
 			memorize_param( 'reported', 'integer', $this->default_filters['reported'], $this->filters['reported'] );
+
+			/*
+			 * Restrict by custom sender email settings
+			 */
+			memorize_param( 'custom_sender_email', 'integer', $this->default_filters['custom_sender_email'], $this->filters['custom_sender_email'] );
+			memorize_param( 'custom_sender_name', 'integer', $this->default_filters['custom_sender_name'], $this->filters['custom_sender_name'] );
 
 			/*
 			 * Restrict by user group
@@ -318,6 +326,12 @@ class UserList extends DataObjectList2
 		$this->filters['reported'] = param( 'reported', 'integer', $this->default_filters['reported'], true );
 
 		/*
+		 * Restrict by custom sender email settings
+		 */
+		$this->filters['custom_sender_email'] = param( 'custom_sender_email', 'integer', $this->default_filters['custom_sender_email'], true );
+		$this->filters['custom_sender_name'] = param( 'custom_sender_name', 'integer', $this->default_filters['custom_sender_name'], true );
+
+		/*
 		 * Restrict by user group
 		 */
 		$this->filters['group'] = param( 'group', 'string', $this->default_filters['group'], true );
@@ -339,8 +353,8 @@ class UserList extends DataObjectList2
 		/*
 		 * Restrict by user fields
 		 */
-		$criteria_types = param( 'criteria_type', 'array', array(), true );
-		$criteria_values = param( 'criteria_value', 'array', array(), true );
+		$criteria_types = param( 'criteria_type', 'array/integer', array(), true );
+		$criteria_values = param( 'criteria_value', 'array/string', array(), true );
 		$userfields = array();
 		foreach( $criteria_types as $c => $type )
 		{
@@ -411,6 +425,7 @@ class UserList extends DataObjectList2
 		$this->UserQuery->where_status( $this->filters['status_activated'] );
 		$this->UserQuery->where_status( $this->filters['account_status'], true, true );
 		$this->UserQuery->where_reported( $this->filters['reported'] );
+		$this->UserQuery->where_custom_sender( $this->filters['custom_sender_email'], $this->filters['custom_sender_name'] );
 		$this->UserQuery->where_group( $this->filters['group'] );
 		$this->UserQuery->where_location( 'ctry', $this->filters['country'] );
 		$this->UserQuery->where_location( 'rgn', $this->filters['region'] );
@@ -702,6 +717,7 @@ class UserList extends DataObjectList2
 
 		// Force filter param to reset the previous filters
 		set_param( 'filter', 'new' );
+		$this->refresh_query = true;
 
 		foreach( $this->cols as $col_num => $col )
 		{	// Find a column number
@@ -724,10 +740,4 @@ class UserList extends DataObjectList2
 
 }
 
-/*
- * $Log$
- * Revision 1.3  2013/11/06 09:08:59  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

@@ -376,9 +376,18 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	$slug_changed = param( 'slug_changed' );
 	if( $slug_changed == 0 )
 	{ // this should only happen when the slug is auto generated
+		global $Blog;
+		if( isset( $Blog ) )
+		{ // Get max length of slug from current blog setting
+			$count_of_words = $Blog->get_setting('slug_limit');
+		}
+		if( empty( $count_of_words ) )
+		{ // Use 5 words to limit slug by default
+			$count_of_words = 5;
+		}
+
 		$title_words = array();
 		$title_words = explode( '-', $urltitle );
-		$count_of_words = 5;
 		if( count($title_words) > $count_of_words )
 		{
 			$urltitle = '';
@@ -581,7 +590,7 @@ function bpost_count_words( $str )
  * Note: This function must be called only from the statuses_where_clause()!
  *
  * @param array statuses to filter
- * @param string database status field column prefix 
+ * @param string database status field column prefix
  * @param integer the blog ID where to check allowed statuses
  * @param string the status permission prefix
  * @return string the condition
@@ -603,6 +612,10 @@ function get_allowed_statuses_condition( $statuses, $dbprefix, $req_blog, $perm_
 	{
 		switch( $status )
 		{
+			case 'published': // Published post/comments are always allowed
+				$allowed = true;
+				break;
+
 			case 'community': // It is always allowed for logged in users
 				$allowed = $is_logged_in;
 				break;
@@ -640,9 +653,19 @@ function get_allowed_statuses_condition( $statuses, $dbprefix, $req_blog, $perm_
 				// In front-office it is never allowed
 				break;
 
-			case 'published': // Published post/comments are always allowed
-			default: // Allow other statuses by default
-				$allowed = true;
+			case 'redirected': // In back-office it is always allowed for users who may create posts/comments with 'deprecated' status
+				$allowed = ( is_admin_page() && $current_User->check_perm( $perm_prefix.'redirected', 'create', false, $req_blog ) );
+				// In front-office it is never allowed
+				break;
+
+			case 'trash':
+				// Currently only users with global editall permissions are allowed to view/delete recycled comments
+				$allowed = ( ( $dbprefix == 'comment_' ) && is_admin_page() && $current_User->check_perm( 'blogs', 'editall' ) );
+				// In front-office it is never allowed
+				break;
+
+			default: // Allow other statuses are restricted. It is very important to keep this restricted because of SQL injections also, so we never allow a status what we don't know.
+				$allowed = false;
 		}
 
 		if( $allowed )
@@ -672,8 +695,8 @@ function get_allowed_statuses_condition( $statuses, $dbprefix, $req_blog, $perm_
  * @param string post/comment table db prefix
  * @param integer blog ID
  * @param string permission prefix: 'blog_post!' or 'blog_comment!'
- * @param boolean filter statuses by the current user perm and current page, by default is true. It should be false only e.g. when we have to count comments awaiting moderation. 
- * @return string statuses where condition 
+ * @param boolean filter statuses by the current user perm and current page, by default is true. It should be false only e.g. when we have to count comments awaiting moderation.
+ * @return string statuses where condition
  */
 function statuses_where_clause( $show_statuses = NULL, $dbprefix = 'post_', $req_blog = NULL, $perm_prefix = 'blog_post!', $filter_by_perm = true, $author_filter = NULL )
 {
@@ -703,7 +726,7 @@ function statuses_where_clause( $show_statuses = NULL, $dbprefix = 'post_', $req
 	}
 
 	if( is_logged_in( false ) )
-	{ // User is logged in and the account was activated 
+	{ // User is logged in and the account was activated
 		if( $current_User->check_perm( 'blogs', 'editall', false ) )
 		{ // User has permission to all blogs posts and comments, we don't have to check blog specific permissions.
 			$where[] = get_allowed_statuses_condition( $show_statuses, $dbprefix, NULL, $perm_prefix );
@@ -1790,7 +1813,7 @@ function & create_multiple_posts( & $Item, $linebreak = false )
 function check_categories( & $post_category, & $post_extracats )
 {
 	$post_category = param( 'post_category', 'integer', -1 );
-	$post_extracats = param( 'post_extracats', 'array', array() );
+	$post_extracats = param( 'post_extracats', 'array/integer', array() );
 	global $Messages, $Blog, $blog;
 
 	load_class( 'chapters/model/_chaptercache.class.php', 'ChapterCache' );
@@ -1942,7 +1965,7 @@ function check_categories_nosave( & $post_category, & $post_extracats )
 {
 	global $Blog;
 	$post_category = param( 'post_category', 'integer', $Blog->get_default_cat_ID() );
-	$post_extracats = param( 'post_extracats', 'array', array() );
+	$post_extracats = param( 'post_extracats', 'array/integer', array() );
 
 	if( ! $post_category )	// if category key is 0 => means it is a new category
 	{
@@ -2033,7 +2056,7 @@ function echo_show_comments_changed()
 {
 ?>
 	<script type="text/javascript">
-		jQuery( '[name |= show_comments]' ).change( function()
+		jQuery( '[name ^= show_comments]' ).change( function()
 		{
 			var item_id = jQuery('#comments_container').attr('value');
 			if( ! isDefined( item_id) )
@@ -2052,16 +2075,11 @@ function echo_show_comments_changed()
  */
 function echo_onchange_item_type_js()
 {
-	global $posttypes_perms;
+	global $posttypes_specialtypes;
 
-	$special_types = array();
-	foreach( $posttypes_perms as $permname => $posttypes )
-	{
-		$special_types = array_merge( $special_types, $posttypes );
-	}
 ?>
 	<script type="text/javascript">
-		var item_special_types = [<?php echo implode( ',', $special_types ) ?>];
+		var item_special_types = [<?php echo implode( ',', $posttypes_specialtypes ) ?>];
 		jQuery( '#item_typ_ID' ).change( function()
 		{
 			for( var i in item_special_types )
@@ -2082,14 +2100,15 @@ function echo_onchange_item_type_js()
 /**
  * Display CommentList with the given filters
  *
- * @param int blog
- * @param item item
- * @param array status filters
- * @param int limit
- * @param $comment_IDs
- * @param string comment IDs string to exclude from the list
+ * @param integer Blog ID
+ * @param integer Item ID
+ * @param array Status filters
+ * @param integer Limit
+ * @param array Comments IDs string to exclude from the list
+ * @param string Filterset name
+ * @param string Expiry status: 'all', 'active', 'expired'
  */
-function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage = 1, $limit = 20, $comment_IDs = array(), $filterset_name = '' )
+function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage = 1, $limit = 20, $comment_IDs = array(), $filterset_name = '', $expiry_status = 'active' )
 {
 	global $inc_path, $status_list, $Blog, $admin_url;
 
@@ -2108,6 +2127,15 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 	if( empty( $statuses ) )
 	{
 		$statuses = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
+	}
+
+	if( $expiry_status == 'all' )
+	{ // Display all comments
+		$expiry_statuses = array( 'active', 'expired' );
+	}
+	else
+	{ // Display active or expired comments
+		$expiry_statuses = array( $expiry_status );
 	}
 
 	// if item_ID == -1 then don't use item filter! display all comments from current blog
@@ -2134,6 +2162,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 		$CommentList->set_filters( array(
 			'types' => array( 'comment', 'trackback', 'pingback' ),
 			'statuses' => $statuses,
+			'expiry_statuses' => $expiry_statuses,
 			'comment_ID_list' => $exlude_ID_list,
 			'post_ID' => $item_ID,
 			'order' => 'ASC',//$order,
@@ -2206,12 +2235,8 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 		echo '<div>';
 
 		echo '<div class="bSmallHeadRight">';
-		echo T_('Visibility').': ';
-		echo '<span class="bStatus">';
-		$Comment->status();
-		echo '</span>';
 		$Comment->permanent_link( array(
-				'before' => '<br />',
+				'before' => '',
 				'text'   => '#text#'
 			) );
 		echo '</div>';
@@ -2276,6 +2301,12 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 
 		// Display deprecate button if current user has the rights:
 		$Comment->lower_link( $link_params );
+
+		$next_status_in_row = $Comment->get_next_status( false );
+		if( $next_status_in_row && $next_status_in_row[0] != 'deprecated' )
+		{ // Display deprecate button if current user has the rights:
+			$Comment->deprecate_link( '', '', get_icon( 'move_down_grey', 'imgtag', array( 'title' => '' ) ), '#', 'roundbutton', '&amp;', true, true );
+		}
 
 		// Display delete button if current user has the rights:
 		$Comment->delete_link( '', '', '#', '#', 'roundbutton_text', false, '&amp;', $save_context, true, '#', $redirect_to );
@@ -2926,7 +2957,7 @@ function items_manual_results_block( $params = array() )
 
 	// Flush fadeout
 	$Session->delete( 'fadeout_array');
-	
+
 	echo $Table->params['content_end'];
 
 	if( !is_ajax_content() )
@@ -3274,6 +3305,7 @@ function items_results( & $items_Results, $params = array() )
 	{	// Display History (i) column
 		$items_Results->cols[] = array(
 				'th' => /* TRANS: abbrev for info */ T_('i'),
+				'th_title' => T_('Item history information'),
 				'order' => $params['field_prefix'].'datemodified',
 				'default_dir' => 'D',
 				'th_class' => 'shrinkwrap',
@@ -3937,11 +3969,4 @@ function manual_display_post_row( $Item, $level, $params = array() )
  * New ( not display helper ) functions must be created above items_results function.
  */
 
-
-/*
- * $Log$
- * Revision 1.156  2013/11/06 09:08:48  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

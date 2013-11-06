@@ -152,11 +152,13 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 			set_param( 'mode', $params['comment_mode'] );
 			set_param( 'qc', $params['comment_qc'] );
 			set_param( 'qp', $params['comment_qp'] );
+			set_param( $dummy_fields[ 'content' ], $params[ $dummy_fields[ 'content' ] ] );
 		}
 
 		$mode = param( 'mode', 'string' );
 		if( $mode == 'quote' )
-		{	// Quote for comment/post
+		{ // Quote for comment/post
+			$comment_content = param( $dummy_fields[ 'content' ], 'html' );
 			$quoted_comment_ID = param( 'qc', 'integer', 0 );
 			$quoted_post_ID = param( 'qp', 'integer', 0 );
 			if( !empty( $quoted_comment_ID ) )
@@ -164,8 +166,14 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 				$CommentCache = & get_CommentCache();
 				$quoted_Comment = & $CommentCache->get_by_ID( $quoted_comment_ID, false );
 				$quoted_Item = $quoted_Comment->get_Item();
-				$quoted_User = $quoted_Comment->get_author_User();
-				$quoted_login = $quoted_User->login;
+				if( $quoted_User = $quoted_Comment->get_author_User() )
+				{ // User is registered
+					$quoted_login = $quoted_User->login;
+				}
+				else
+				{ // Anonymous user
+					$quoted_login = $quoted_Comment->get_author_name();
+				}
 				$quoted_content = $quoted_Comment->get( 'content' );
 				$quoted_ID = 'c'.$quoted_Comment->ID;
 			}
@@ -181,7 +189,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 			if( !empty( $quoted_Item ) )
 			{	// Format content for editing, if we were not already in editing...
 				$comment_title = '';
-				$comment_content = '[quote=@'.$quoted_login.'#'.$quoted_ID.']'.$quoted_content.'[/quote]';
+				$comment_content .= '[quote=@'.$quoted_login.'#'.$quoted_ID.']'.strip_tags($quoted_content).'[/quote]';
 
 				$Plugins_admin = & get_Plugins_admin();
 				$quoted_Item->load_Blog();
@@ -281,7 +289,7 @@ function validateCommentForm(form)
 	if( $Item->can_rate() )
 	{	// Comment rating:
 		echo $Form->begin_field( NULL, T_('Your vote'), true );
-		$Comment->rating_input();
+		$Comment->rating_input( array( 'item_ID' => $Item->ID ) );
 		echo $Form->end_field();
 	}
 
@@ -303,7 +311,7 @@ function validateCommentForm(form)
 	// Message field:
 	$note = '';
 	// $note = T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags));
-	$Form->textarea( $dummy_fields[ 'content' ], $comment_content, $params['textarea_lines'], $params['form_comment_text'], $note, 38, 'bComment' );
+	$Form->textarea( $dummy_fields[ 'content' ], htmlspecialchars_decode( $comment_content ), $params['textarea_lines'], $params['form_comment_text'], $note, 38, 'bComment' );
 	$Form->switch_template_parts( $params['form_params'] );
 
 	// Display renderers
@@ -403,11 +411,5 @@ function validateCommentForm(form)
 	echo_comment_reply_js( $Item );
 }
 
-echo_comment_vote_js();
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:05:44  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
+echo_comment_moderate_js();
 ?>

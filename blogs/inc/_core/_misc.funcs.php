@@ -1467,11 +1467,17 @@ function remove_seconds($timestamp, $format = 'Y-m-d H:i')
  * Convert from seconds to months, days, hours, minutes and seconds
  *
  * @param integer duration in seconds
- * @result array of [ months, days, hours, minutes, seconds ]
+ * @return array of [ years, months, days, hours, minutes, seconds ]
  */
 function get_duration_fields( $duration )
 {
 	$result = array();
+
+	$year_seconds = 31536000; // 1 year
+	$years = floor( $duration / $year_seconds );
+	$duration = $duration - $years * $year_seconds;
+	$result[ 'years' ] = $years;
+
 	$month_seconds = 2592000; // 1 month
 	$months = floor( $duration / $month_seconds );
 	$duration = $duration - $months * $month_seconds;
@@ -1494,6 +1500,53 @@ function get_duration_fields( $duration )
 
 	$result[ 'seconds' ] = $duration;
 	return $result;
+}
+
+
+/**
+ * Get a title of duration
+ *
+ * @param integer Duration in seconds
+ * @param array Titles
+ * @return string Duration title
+ */
+function get_duration_title( $duration, $titles = array() )
+{
+	$titles = array_merge( array(
+		'year'   => T_('Last %d years'),
+		'month'  => T_('Last %d months'),
+		'day'    => T_('Last %d days'),
+		'hour'   => T_('Last %d hours'),
+		'minute' => T_('Last %d minutes'),
+		'second' => T_('Last %d seconds'),
+		), $titles );
+
+	$delay_fields = get_duration_fields( $duration );
+
+	if( ! empty( $delay_fields[ 'years' ] ) )
+	{ // Years
+		return sprintf( $titles['year'], $delay_fields[ 'years' ] );
+	}
+	elseif( ! empty( $delay_fields[ 'months' ] ) )
+	{ // Months
+		return sprintf( $titles['month'], $delay_fields[ 'months' ] );
+	}
+	elseif( ! empty( $delay_fields[ 'days' ] ) )
+	{ // Days
+		return sprintf( $titles['day'], $delay_fields[ 'days' ] );
+	}
+	elseif( ! empty( $delay_fields[ 'hours' ] ) )
+	{ // Hours
+		return sprintf( $titles['hour'], $delay_fields[ 'hours' ] );
+	}
+	elseif( ! empty( $delay_fields[ 'minutes' ] ) )
+	{ // Minutes
+		return sprintf( $titles['minute'], $delay_fields[ 'minutes' ] );
+	}
+	else
+	{ // Seconds
+		return sprintf( $titles['second'], $delay_fields[ 'seconds' ] );
+	}
 }
 
 
@@ -2090,7 +2143,7 @@ function pre_dump( $var__var__var__var__ )
 		echo "</pre>\n";
 		ini_set('html_errors', $orig_html_errors);
 	}
-	flush();
+	evo_flush();
 	return true;
 }
 
@@ -2311,7 +2364,7 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 function debug_die( $additional_info = '', $params = array() )
 {
 	global $debug, $baseurl;
-	global $log_app_errors, $app_name, $is_cli;
+	global $log_app_errors, $app_name, $is_cli, $debug;
 
 	$params = array_merge( array(
 		'status' => '500 Internal Server Error',
@@ -2321,8 +2374,11 @@ function debug_die( $additional_info = '', $params = array() )
 	{ // Command line interface, e.g. in cron_exec.php:
 		echo '== '.T_('An unexpected error has occurred!')." ==\n";
 		echo T_('If this error persists, please report it to the administrator.')."\n";
-		echo T_('Additional information about this error:')."\n";
-		echo strip_tags( $additional_info )."\n\n";
+		if( $debug )
+		{	// Display additional info only in debug mode because it can reveal system info to hackers and greatly facilitate exploits
+			echo T_('Additional information about this error:')."\n";
+			echo strip_tags( $additional_info )."\n\n";
+		}
 	}
 	else
 	{
@@ -2345,8 +2401,15 @@ function debug_die( $additional_info = '', $params = array() )
 		if( ! empty( $additional_info ) )
 		{
 			echo '<div style="background-color: #ddd; padding: 1ex; margin-bottom: 1ex;">';
-			echo '<h3>'.T_('Additional information about this error:').'</h3>';
-			echo $additional_info;
+			if( $debug )
+			{	// Display additional info only in debug mode because it can reveal system info to hackers and greatly facilitate exploits
+				echo '<h3>'.T_('Additional information about this error:').'</h3>';
+				echo $additional_info;
+			}
+			else
+			{
+				echo '<p><i>Enable debugging to get additional information about this error.</i></p>';
+			}
 			echo '</div>';
 		}
 	}
@@ -2452,8 +2515,15 @@ function bad_request_die( $additional_info = '' )
 	if( !empty( $additional_info ) )
 	{
 		echo '<div style="background-color: #ddd; padding: 1ex; margin-bottom: 1ex;">';
-		echo '<h3>'.T_('Additional information about this error:').'</h3>';
-		echo $additional_info;
+		if( $debug )
+		{	// Display additional info only in debug mode because it can reveal system info to hackers and greatly facilitate exploits
+			echo '<h3>'.T_('Additional information about this error:').'</h3>';
+			echo $additional_info;
+		}
+		else
+		{
+			echo '<p><i>Enable debugging to get additional information about this error.</i></p>';
+		}
 		echo '</div>';
 	}
 
@@ -3055,6 +3125,8 @@ function user_get_notification_sender( $user_ID, $setting )
  */
 function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name = NULL, $headers = array(), $user_ID = NULL )
 {
+	global $servertimenow;
+
 	// Stop a request from the blocked IP addresses
 	antispam_block_ip();
 
@@ -3118,7 +3190,8 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	// Convert encoding of message (from internal encoding to the one of the message):
 	// fp> why do we actually convert to $current_charset?
 	// dh> I do not remember. Appears to make sense sending it unconverted in $evo_charset.
-	$message = convert_charset( $message, $current_charset, $evo_charset );
+	// asimo> converting the message creates wrong output, no need for conversion, however this needs further investigation
+	// $message = convert_charset( $message, $current_charset, $evo_charset );
 
 	if( !isset( $headers['Content-Type'] ) )
 	{	// Specify charset and content-type of email
@@ -3126,6 +3199,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	}
 	$headers['MIME-Version'] = '1.0';
 
+	$headers['Date'] = gmdate( 'r', $servertimenow );
 
 	// ADDITIONAL HEADERS:
 	$headers['X-Mailer'] = $app_name.' '.$app_version.' - PHP/'.phpversion();
@@ -5759,10 +5833,22 @@ function is_ajax_content( $template_name = '' )
 		!in_array( $template_name, $content_templates );
 }
 
-/*
- * $Log$
- * Revision 1.301  2013/11/06 09:08:46  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
+
+/**
+ * Get an error message text about file permissions
  */
+function get_file_permissions_message()
+{
+	return sprintf( T_( '(Please check UNIX file permissions on the parent folder. %s)' ), get_manual_link( 'file-permissions' ) );
+}
+
+
+/**
+ * Flush the output buffer
+ */
+function evo_flush()
+{
+	@ob_end_flush(); // This function helps to turn off output buffering on PHP 5.4.x
+	flush();
+}
 ?>

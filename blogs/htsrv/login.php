@@ -227,6 +227,8 @@ switch( $action )
 		$UserCache = & get_UserCache();
 		$forgetful_User = & $UserCache->get_by_login($login);
 
+		locale_temp_switch( $forgetful_User->locale );
+
 		if( ! $forgetful_User || empty($reqID) )
 		{ // This was not requested
 			$Messages->add( T_('Invalid password change request! Please try again...'), 'error' );
@@ -275,6 +277,9 @@ switch( $action )
 		{ // redirect to admin change password form
 			$changepwd_url = url_add_param( $admin_url, 'ctrl=user&user_tab=pwdchange&user_ID='.$forgetful_User->ID.'&reqID='.$reqID, '&' );
 		}
+
+		locale_restore_previous();
+
 		// redirect Will save $Messages into Session:
 		header_redirect( $changepwd_url ); // display user's change password tab
 		/* exited */
@@ -361,7 +366,7 @@ switch( $action )
 			// Validate provided reqID against the one stored in the user's session
 			$request_ids = $Session->get( 'core.validatemail.request_ids' );
 			if( ( ! is_array($request_ids) || ! in_array( $reqID, $request_ids ) )
-				&& ! ( isset($current_User) && $current_User->group_ID == 1 && $reqID == 1 /* admin users can validate themselves by a button click */ ) )
+				&& ! ( isset($current_User) && $current_User->grp_ID == 1 && $reqID == 1 /* admin users can validate themselves by a button click */ ) )
 			{
 				$Messages->add( T_('Invalid email address validation request!'), 'error' );
 				$action = 'req_validatemail';

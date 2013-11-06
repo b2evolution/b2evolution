@@ -63,6 +63,10 @@ param( 'blog', 'integer', '' );
 param( 'recipient_id', 'integer', '' );
 param( 'post_id', 'integer', '' );
 param( 'comment_id', 'integer', '' );
+
+// Activate the blog locale because all params were introduced with that locale
+activate_blog_locale( $blog );
+
 // Note: we use funky field names in order to defeat the most basic guestbook spam bots:
 $sender_name = param( $dummy_fields[ 'name' ], 'string', '' );
 $sender_address = param( $dummy_fields[ 'email' ], 'string', '' );
@@ -275,10 +279,4 @@ if( empty( $redirect_to ) )
 header_redirect( $redirect_to );
 //exited here
 
-/*
- * $Log$
- * Revision 1.85  2013/11/06 09:08:46  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

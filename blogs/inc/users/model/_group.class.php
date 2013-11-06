@@ -404,8 +404,34 @@ class Group extends DataObject
 			}
 		}
 
-		$user_ID = empty( $User ) ? NULL : $User->ID;
-		return check_blog_advanced_perm( $this->blog_post_statuses[$perm_target_blog], $user_ID, $permname, $permlevel, $perm_target );
+		$blog_perms = $this->blog_post_statuses[$perm_target_blog];
+		if( empty( $User ) )
+		{ // User is not set
+			$user_ID = NULL;
+		}
+		else
+		{ // User is set, advanced user perms must be loaded
+			$user_ID = $User->ID;
+			if( isset( $User->blog_post_statuses[$perm_target_blog] ) )
+			{ // Merge user advanced perms with group advanced perms
+				$edit_perms = array( 'no' => 0, 'own' => 1, 'anon' => 2, 'lt' => 3, 'le' => 4, 'all' => 5 );
+				foreach( $User->blog_post_statuses[$perm_target_blog] as $key => $value )
+				{ // For each collection advanced permission use the higher perm value between user and group perms
+					if( ( $key == 'blog_edit' ) || ( $key == 'blog_edit_cmt' ) )
+					{
+						if( $edit_perms[$value] > $edit_perms[$blog_perms[$key]] )
+						{ // Use collection user edit permission because it is greater than the collection group perm
+							$blog_perms[$key] = $value;
+						}
+					}
+					else
+					{ // Check user and group perm as well
+						$blog_perms[$key] = (int) $value | (int) $blog_perms[$key];
+					}
+				}
+			}
+		}
+		return check_blog_advanced_perm( $blog_perms, $user_ID, $permname, $permlevel, $perm_target );
 	}
 
 
@@ -478,10 +504,4 @@ class Group extends DataObject
 	}
 }
 
-/*
- * $Log$
- * Revision 1.53  2013/11/06 08:05:03  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

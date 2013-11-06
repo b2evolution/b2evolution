@@ -98,7 +98,7 @@ class User extends DataObject
 	 * The ID of the (primary, currently only) group of the user.
 	 * @var integer
 	 */
-	var $group_ID;
+	var $grp_ID;
 
 	/**
 	 * Reference to group
@@ -212,7 +212,9 @@ class User extends DataObject
 
 			if( isset( $Settings ) )
 			{ // Set Group for this user:
-				$this->group_ID = $Settings->get( 'newusers_grp_ID' );
+				$GroupCache = & get_GroupCache();
+				$new_user_Group = & $GroupCache->get_by_ID( $Settings->get( 'newusers_grp_ID' ) );
+				$this->set_Group( $new_user_Group );
 				// set status for this user
 				$this->set( 'status', $Settings->get('newusers_mustvalidate') ? 'new' : 'autoactivated' );
 			}
@@ -254,7 +256,7 @@ class User extends DataObject
 			$this->profileupdate_date = $db_row->user_profileupdate_date;
 
 			// Group for this user:
-			$this->group_ID = $db_row->user_grp_ID;
+			$this->grp_ID = $db_row->user_grp_ID;
 		}
 	}
 
@@ -382,7 +384,7 @@ class User extends DataObject
 					{	// Status was changed from blocked to another, we should decrease counter
 						$IPRange->set( 'block_count', $IPRange->block_count - 1 );
 					}
-					$IPRange->set( 'status', $edited_iprange_status );
+					$IPRange->set( 'status', $edited_iprange_status, true );
 					$IPRange->dbsave();
 				}
 			}
@@ -598,8 +600,8 @@ class User extends DataObject
 			// Duplicate fields:
 			if( $is_new_user )
 			{
-				$user_id = param( 'orig_user_ID', 'string', "" );
-				if ($user_id <> "")
+				$user_id = param( 'orig_user_ID', 'integer', 0 );
+				if( $user_id !== 0 )
 				{
 					$userfield_IDs = $DB->get_results( '
 								SELECT uf_ID, uf_ufdf_ID
@@ -617,8 +619,8 @@ class User extends DataObject
 				}
 			}
 
-			$uf_new_fields = param( 'uf_new', 'array' );	// Recommended & required fields (it still not saved in DB)
-			$uf_add_fields = param( 'uf_add', 'array' );	// Added fields
+			$uf_new_fields = param( 'uf_new', 'array/array/string' );	// Recommended & required fields (it still not saved in DB)
+			$uf_add_fields = param( 'uf_add', 'array/array/string' );	// Added fields
 
 			// Add a new field: (JS is not enabled)
 			if( $action == 'add_field' )
@@ -898,11 +900,20 @@ class User extends DataObject
 				{ // update 'notify_published_comments' only if user has at least one post or user has right to create new post
 					$UserSettings->set( 'notify_published_comments', param( 'edited_user_notify_publ_comments', 'integer', 0 ), $this->ID );
 				}
-				if( $this->check_role( 'moderator' ) )
-				{ // update 'notify_comment_moderation' only if user is moderator at least in one blog
-					$UserSettings->set( 'notify_comment_moderation', param( 'edited_user_notify_moderation', 'integer', 0 ), $this->ID );
+				$is_comment_moderator = $this->check_role( 'comment_moderator' );
+				if( $is_comment_moderator || $this->check_role( 'comment_editor' ) )
+				{ // update 'notify_comment_moderation' only if user is comment moderator/editor at least in one blog
+					$UserSettings->set( 'notify_comment_moderation', param( 'edited_user_notify_cmt_moderation', 'integer', 0 ), $this->ID );
 				}
-				if( $this->group_ID == 1 )
+				if( $is_comment_moderator )
+				{ // update 'send_cmt_moderation_reminder' only if user is comment moderator at least in one blog
+					$UserSettings->set( 'send_cmt_moderation_reminder', param( 'edited_user_send_cmt_moderation_reminder', 'integer', 0 ), $this->ID );
+				}
+				if( $this->check_role( 'post_moderator' ) )
+				{ // update 'notify_post_moderation' only if user is post moderator at least in one blog
+					$UserSettings->set( 'notify_post_moderation', param( 'edited_user_notify_post_moderation', 'integer', 0 ), $this->ID );
+				}
+				if( $this->grp_ID == 1 )
 				{
 					$UserSettings->set( 'send_activation_reminder', param( 'edited_user_send_activation_reminder', 'integer', 0 ), $this->ID );
 				}
@@ -1018,10 +1029,10 @@ class User extends DataObject
 			$UserSettings->set( 'focus_on_first_input', param( 'edited_user_focusonfirst', 'integer', 0 ), $this->ID );
 
 			// Results per page
-			$edited_user_results_per_page = param( 'edited_user_results_per_page', 'integer', NULL );
-			if( isset($edited_user_results_per_page) )
+			$edited_user_results_page_size = param( 'edited_user_results_page_size', 'integer', NULL );
+			if( isset( $edited_user_results_page_size ) )
 			{
-				$UserSettings->set( 'results_per_page', $edited_user_results_per_page, $this->ID );
+				$UserSettings->set( 'results_per_page', $edited_user_results_page_size, $this->ID );
 			}
 		}
 
@@ -1231,7 +1242,7 @@ class User extends DataObject
 				'after'          => ' ',
 				'format'         => 'htmlbody',
 				'link_to'        => 'userpage',
-				'link_text'      => 'avatar', // avatar | only_avatar | login
+				'link_text'      => 'avatar', // avatar | only_avatar | login | nickname
 				'link_rel'       => '',
 				'link_class'     => '',
 				'thumb_size'     => 'crop-top-15x15',
@@ -1264,10 +1275,17 @@ class User extends DataObject
 
 		$link_login = '';
 		if( $params['link_text'] != 'only_avatar' )
-		{	// Display login
-			$link_login = $this->login;
+		{ // Display login
+			if( $params['link_text'] == 'nickname' && ! empty( $this->nickname ) )
+			{ // Use nickname if it is defined
+				$link_login = $this->nickname;
+			}
+			else
+			{ // Use login
+				$link_login = $this->login;
+			}
 			if( $params['login_mask'] != '' )
-			{	// Apply login mask
+			{ // Apply login mask
 				$link_login = str_replace( '$login$', $link_login, $params['login_mask'] );
 			}
 		}
@@ -1496,7 +1514,7 @@ class User extends DataObject
 
 		if( $link_sessions && ( $num_sessions > 0 ) )
 		{
-			return $num_sessions.' - <a href="?ctrl=user&amp;user_ID='.$this->ID.'&amp;user_tab=sessions" class="roundbutton middle" title="'.format_to_output( T_('View sessions...'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('View sessions...') ) ).'</a>';
+			return $num_sessions.' - <a href="?ctrl=user&amp;user_ID='.$this->ID.'&amp;user_tab=sessions" class="roundbutton middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
 		}
 
 		return $num_sessions;
@@ -1851,12 +1869,10 @@ class User extends DataObject
 	 */
 	function set_Group( & $Group )
 	{
-		if( $Group !== $this->Group )
+		if( $this->grp_ID !== $Group->ID )
 		{
 			$this->Group = & $Group;
-
-			$this->dbchange( 'user_grp_ID', 'number', 'Group->get(\'ID\')' );
-
+			$this->set( 'grp_ID', $Group->ID );
 			return true;
 		}
 
@@ -1884,7 +1900,7 @@ class User extends DataObject
 		if( ! isset($this->Group) )
 		{
 			$GroupCache = & get_GroupCache();
-			$this->Group = & $GroupCache->get_by_ID($this->group_ID);
+			$this->Group = & $GroupCache->get_by_ID($this->grp_ID);
 		}
 		return $this->Group;
 	}
@@ -2525,15 +2541,38 @@ class User extends DataObject
 				$role_conditions = array( 'ismember' => array( 'IS NOT NULL', '<> 0' ) );
 				break;
 
-			case 'moderator':
-				// User is a moderator if has moderator rights at least in one blog
-
-				// asimo>TODO: The required permissions for moderator role must be documented and should be configurable. The permissions defined below are required by default.
-				// Moderator rights by default is that user has permission to create 'review' or 'draft' comments and has at least 'anon' comment edit permission
-				$required_perm_value = get_status_permvalue( 'draft' ) + get_status_permvalue( 'review' ); 
+			case 'comment_editor':
+				// User has permission to edit some other users comments at least in one status
 				$role_conditions = array(
-					'perm_edit_cmt' => array( 'IS NOT NULL', '<> "no"', '<> "own"' ), // user has at least 'anon' edit comment perm
-					'perm_cmtstatuses' => array( 'IS NOT NULL', '& '.$required_perm_value ) // user has 'review' and/or 'draft' comment statuses perm
+					'perm_edit_cmt' => array( 'IS NOT NULL', '<> "no"', '<> "own"' ),
+					'perm_cmtstatuses' => array( 'IS NOT NULL', '<> 0' )
+				);
+				break;
+
+			case 'comment_moderator':
+				// set comment moderator perm names
+				$edit_perm_name = 'perm_edit_cmt';
+				$statuses_perm_name = 'perm_cmtstatuses';
+			case 'post_moderator':
+				if( $rolename == 'post_moderator' )
+				{ // set post moderator perm names
+					$edit_perm_name = 'perm_edit';
+					$statuses_perm_name = 'perm_poststatuses';
+				}
+
+				// A moderator must have permissions to create post/comment with at least two statuses from moderation statuses + published status
+				$check_statuses = get_visibility_statuses( 'moderation' );
+				// Create addition of statuses perm values
+				$perms_value = get_status_permvalue( 'published' );
+				foreach( $check_statuses as $status )
+				{
+					$perms_value = $perms_value + get_status_permvalue( $status );
+				}
+
+				// Check if user has permission to edit other comments than his own and has create permission on at least two statuses defined above
+				$role_conditions = array(
+					$edit_perm_name => array( 'IS NOT NULL', '<> "no"', '<> "own"' ),
+					$statuses_perm_name => array( 'IS NOT NULL', 'BIT_COUNT( $perm_field$ & '.$perms_value.' ) > 1' )
 				);
 				break;
 
@@ -2551,7 +2590,14 @@ class User extends DataObject
 				$perm_field = $prefix.$perm_name;
 				foreach( $conditions as $condition )
 				{ // Check all defined conditions and join with 'AND' operator
-					$where_part .= '( '.$perm_field.' '.$condition.' ) AND ';
+					if( strpos( $condition, '$perm_field$' ) !== false )
+					{ // The $perm_filed must be replaced in the middle of the condition
+						$where_part .= '( '.str_replace( '$perm_field$', $perm_field, $condition ).' ) AND ';
+					}
+					else
+					{ // The $perm_filed must be added into the beginning of the condition
+						$where_part .= '( '.$perm_field.' '.$condition.' ) AND ';
+					}
 				}
 			}
 			// Remove the last ' AND ' from the end of this where clause part
@@ -2569,7 +2615,7 @@ class User extends DataObject
 		$SQL->SELECT( 'count( blog_ID )' );
 		$SQL->FROM( 'T_blogs' );
 		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0 AND blog_ID = bloguser_blog_ID AND bloguser_user_ID = '.$this->ID.' )' );
-		$SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0 AND blog_ID = bloggroup_blog_ID AND bloggroup_group_ID = '.$this->group_ID.' )' );
+		$SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0 AND blog_ID = bloggroup_blog_ID AND bloggroup_group_ID = '.$this->grp_ID.' )' );
 		$SQL->WHERE( 'blog_owner_user_ID = '.$this->ID );
 		$SQL->WHERE_or( $where_clause );
 
@@ -2684,9 +2730,10 @@ class User extends DataObject
 	 *
 	 * Triggers the plugin event AfterUserInsert.
 	 *
+	 * @param boolean TRUE to automatically create new blog if group has permission
 	 * @return boolean true on success
 	 */
-	function dbinsert()
+	function dbinsert( $create_auto_blog = true )
 	{
 		global $Plugins, $DB;
 
@@ -2710,7 +2757,7 @@ class User extends DataObject
 			$Plugins->trigger_event( 'AfterUserInsert', $params = array( 'User' => & $this ) );
 
 			$Group = & $this->get_Group();
-			if( $Group->check_perm( 'perm_getblog', 'allowed' ) )
+			if( $create_auto_blog && $Group->check_perm( 'perm_getblog', 'allowed' ) )
 			{ // automatically create new blog for this user
 				// TODO: sam2kb> Create a blog only when this user is validated!
 				$new_Blog = new Blog( NULL );
@@ -2776,6 +2823,7 @@ class User extends DataObject
 		{
 			foreach( $this->updated_fields as $uf_ID => $uf_val )
 			{
+				// Note the updated_fields key values must be integers, so don't need casting or DB->quote()
 				if( empty( $uf_val ) )
 				{	// Delete field:
 					$DB->query( 'DELETE FROM T_users__fields
@@ -2784,7 +2832,7 @@ class User extends DataObject
 				else
 				{	// Update field:
 					$DB->query( 'UPDATE T_users__fields
-													SET uf_varchar = '.$DB->quote($uf_val).'
+													SET uf_varchar = '.$DB->quote( $uf_val ).'
 												WHERE uf_ID = '.$uf_ID );
 				}
 			}
@@ -2883,6 +2931,19 @@ class User extends DataObject
 			{
 				$Log->add( 'No posts to delete.', 'note' );
 			}
+		}
+
+		// Get list of sessions that are going to be deleted
+		$sessions_SQL = new SQL();
+		$sessions_SQL->SELECT( 'sess_ID' );
+		$sessions_SQL->FROM( 'T_sessions' );
+		$sessions_SQL->WHERE( 'sess_user_ID = '.$this->ID );
+		$sessions_list = $DB->get_col( $sessions_SQL->get() );
+
+		if( !empty( $sessions_list ) )
+		{ // Delete all hit logs of this user
+			$DB->query( 'DELETE FROM T_hitlog
+					WHERE hit_sess_ID IN ( '.$DB->quote( $sessions_list ).' )' );
 		}
 
 		// delete user involved ophan threads
@@ -4021,8 +4082,8 @@ class User extends DataObject
 
 		$FileCache = & get_FileCache();
 		$File = $FileCache->get_by_ID( $file_ID );
-		if( $File->_FileRoot->type != 'user' || $File->_FileRoot->in_type_ID != $this->ID )
-		{	// don't allow use the pictures from other users
+		if( $File->_FileRoot->type == 'user' && $File->_FileRoot->in_type_ID != $this->ID )
+		{ // don't allow to use pictures from other users
 			$Messages->add( T_('Your profile picture could not be changed!'), 'error' );
 			return 'edit';
 		}
@@ -4252,6 +4313,8 @@ class User extends DataObject
 				{	// User already has the avatar
 					$Messages->add( T_('New picture has been uploaded.'), 'success' );
 				}
+				// Clear previous Links to load new uploaded file
+				$LinkOwner->clear_Links();
 				return true;
 			}
 			else
@@ -4358,7 +4421,7 @@ class User extends DataObject
 		$edited_Message->set( 'author_user_ID', $User->ID );
 		$edited_Message->creator_user_ID = $User->ID;
 		$edited_Message->set( 'text', $Settings->get( 'welcomepm_message' ) );
-		$edited_Message->dbinsert_individual();
+		$edited_Message->dbinsert_individual( $User );
 	}
 
 
@@ -4372,11 +4435,11 @@ class User extends DataObject
 		global $Settings, $UserSettings;
 
 		if( $force_update || $UserSettings->get( 'notification_sender_email', $this->ID ) == '' )
-		{	// Update sender's email
+		{ // Update sender's email
 			$UserSettings->set( 'notification_sender_email', $Settings->get( 'notification_sender_email' ), $this->ID );
 		}
-		if( $force_update || $UserSettings->get( 'notification_sender_name', $this->ID ) == '' )
-		{	// Update sender's name
+		if( $force_update || ( ( $UserSettings->get( 'notification_sender_name', $this->ID ) == '' ) && ( $Settings->get( 'notification_sender_name' ) != 'b2evo mailer' ) ) )
+		{ // Update sender's name if it was not set and the general settings has different value then the default
 			$UserSettings->set( 'notification_sender_name', $Settings->get( 'notification_sender_name' ), $this->ID );
 		}
 
@@ -4558,10 +4621,8 @@ class User extends DataObject
 		$deleted_Comments = $this->get_deleted_comments();
 
 		foreach( $deleted_Comments as $deleted_Comment )
-		{
-			$deleted_Comment->set( 'status', 'trash' );
-			// Delete from DB:
-			$deleted_Comment->dbdelete();
+		{ // Delete from DB
+			$deleted_Comment->dbdelete( true );
 		}
 
 		$DB->commit();
@@ -4766,10 +4827,4 @@ class User extends DataObject
 	}
 }
 
-/*
- * $Log$
- * Revision 1.173  2013/11/06 09:08:59  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

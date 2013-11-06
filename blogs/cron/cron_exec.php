@@ -23,7 +23,7 @@ require_once $inc_path .'_main.inc.php';
 
 if( $Settings->get( 'system_lock' ) )
 { // System is locked down for maintenance, Stop cron execution
-	echo 'Scheduled tasks cannot be executed at this time because the system is in maintenance lock.';
+	echo 'The site is locked for maintenance. All scheduled jobs are postponed. No job was executed.';
 	exit(0);
 }
 
@@ -94,7 +94,7 @@ if( $is_cli )
 }
 else
 { // This is a web request: (for testing purposes only. Not designed for production)
-	
+
 	// Make sure the response is never cached:
 	header_nocache();
 	header_content_type();
@@ -241,10 +241,4 @@ if( ! $is_cli )
 	<?php
 }
 
-/*
- * $Log$
- * Revision 1.26  2013/11/06 09:08:46  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

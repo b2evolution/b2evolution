@@ -19,6 +19,15 @@ if( empty( $Blog ) )
 	}
 }
 
+if( !empty( $Blog ) )
+{
+	// Activate Blog locale because the new item was created in-skin
+	locale_activate( $Blog->get('locale') );
+
+	// Re-Init charset handling, in case current_charset has changed:
+	init_charsets( $current_charset );
+}
+
 $post_ID = param ( 'post_ID', 'integer', 0 );
 
 /**
@@ -57,7 +66,7 @@ switch( $action )
 		$post_ID = param ( 'post_ID', 'integer', true, true );
 		$ItemCache = & get_ItemCache ();
 		$edited_Item = & $ItemCache->get_by_ID ( $post_ID );
-		
+
 		// Load the blog we're in:
 		$Blog = & $edited_Item->get_Blog();
 		set_working_blog( $Blog->ID );
@@ -89,16 +98,16 @@ switch( $action )
 		// We know we can use at least one status,
 		// but we need to make sure the requested/default one is ok:
 		$edited_Item->status = $Blog->get_allowed_item_status ( $edited_Item->status );
-		
+
 		// Check if new category was started to create. If yes then set up parameters for next page
 		check_categories_nosave ( $post_category, $post_extracats );
-		
+
 		$edited_Item->set ( 'main_cat_ID', $post_category );
 		if( $edited_Item->main_cat_ID && ( get_allow_cross_posting() < 2 ) && $edited_Item->get_blog_ID() != $blog )
 		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing:
 			$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
 		}
-		$post_extracats = param( 'post_extracats', 'array', $post_extracats );
+		$post_extracats = param( 'post_extracats', 'array/integer', $post_extracats );
 
 		param( 'item_tags', 'string', '' );
 
@@ -124,16 +133,16 @@ switch( $action )
 		// We use the request variables to fill the edit form, because we need to be able to pass those values
 		// from tab to tab via javascript when the editor wants to switch views...
 		$edited_Item->load_from_Request ( true ); // needs Blog set
-		
+
 		// Check if new category was started to create. If yes then set up parameters for next page
 		check_categories_nosave ( $post_category, $post_extracats );
-		
+
 		$edited_Item->set ( 'main_cat_ID', $post_category );
 		if( $edited_Item->main_cat_ID && ( get_allow_cross_posting() < 2 ) && $edited_Item->get_blog_ID() != $blog )
 		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing:
 			$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
 		}
-		$post_extracats = param( 'post_extracats', 'array', $post_extracats );
+		$post_extracats = param( 'post_extracats', 'array/integer', $post_extracats );
 
 		param( 'item_tags', 'string', '' );
 
@@ -224,7 +233,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( $exit_after_save );
+		$edited_Item->handle_post_processing( true, $exit_after_save );
 
 		$Messages->add( T_('Post has been created.'), 'success' );
 
@@ -296,7 +305,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( $exit_after_save );
+		$edited_Item->handle_post_processing( false, $exit_after_save );
 
 		$Messages->add( T_('Post has been updated.'), 'success' );
 
@@ -347,10 +356,4 @@ $disp = 'edit';
 $ads_current_skin_path = $skins_path.$skin.'/';
 require $ads_current_skin_path.'index.main.php';
 
-/*
- * $Log$
- * Revision 1.7  2013/11/06 08:03:44  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -64,7 +64,10 @@ $GLOBALS['debug_params'] = false;
  * - float, double
  * - string (strips (HTML-)Tags, trims whitespace)
  * - text like string but allows multiple lines
- * - array	(TODO:  array/integer  , array/array/string )
+ * - array/integer (elements of array must be integer)
+ * - array/string (strips (HTML-)Tags, trims whitespace of array's elements)
+ * - array/array/integer (two dimensional array and the elements must be integers)
+ * - array/array/string (strips (HTML-)Tags, trims whitespace of the two dimensional array's elements)
  * - html (does nothing, for now)
  * - raw (does nothing)
  * - '' (does nothing) -- DEPRECATED, use "raw" instead
@@ -117,7 +120,7 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 		}
 		elseif( $use_default )
 		{	// We haven't set any value yet and we really want one: use default:
-			if( $type == 'array' && $default === '' )
+			if( in_array( $type, array( 'array', 'array/integer', 'array/string', 'array/array/integer', 'array/array/string' ) ) && $default === '' )
 			{ // Change default '' into array() (otherwise there would be a notice with settype() below)
 				$default = array();
 			}
@@ -205,6 +208,70 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as string', 'params' );
 				break;
 
+			case 'array':
+			case 'array/integer':
+			case 'array/string':
+			case 'array/array/integer':
+			case 'array/array/string':
+				if( ! is_array( $GLOBALS[$var] ) )
+				{ // This param must be array
+					debug_die( 'param(-): <strong>'.$var.'</strong> is not array!' );
+				}
+
+				// Store current array in temp var for checking and preparing
+				$globals_var = $GLOBALS[$var];
+				// Check if the given array type is one dimensional array
+				$one_dimensional = ( ( $type == 'array' ) || ( $type == 'array/integer' ) || ( $type == 'array/string' ) );
+				// Check if the given array type should contains string elements
+				$contains_strings = ( ( $type == 'array/string' ) || ( $type == 'array/array/string' ) );
+				if( $one_dimensional )
+				{ // Convert to a two dimensional array to handle one and two dimensional arrays the same way
+					$globals_var = array( $globals_var );
+				}
+
+				foreach( $globals_var as $i => $var_array )
+				{
+					if( ! is_array( $var_array ) )
+					{ // This param must be array
+						// Note: In case of one dimensional array params this will never happen
+						debug_die( 'param(-): <strong>'.$var.'['.$i.']</strong> is not array!' );
+					}
+
+					foreach( $var_array as $j => $var_value )
+					{
+						if( $type != 'array' && ! is_scalar( $var_value ) )
+						{ // This happens if someone uses "foo[][]=x" where "foo[]" is expected as string
+							debug_die( 'param(-): element of array <strong>'.$var.'</strong> is not scalar!' );
+						}
+
+						if( $contains_strings )
+						{ // Prepare string elements of array
+							// Make sure the string is a single line
+							$var_value = preg_replace( '~\r|\n~', '', $var_value );
+							// strip out any html:
+							$globals_var[$i][$j] = trim( strip_tags( $var_value ) );
+						}
+					}
+				}
+
+				if( $one_dimensional )
+				{ // Extract real array from temp array
+					$globals_var = $globals_var[0];
+				}
+				// Restore current array with prepared data
+				$GLOBALS[$var] = $globals_var;
+
+				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as '.$type, 'params' );
+
+				if( $contains_strings || $type == 'array' )
+				{ // This is an array with string elements so it was processed. The array with integer elements must be checked with regexp, so we can't break in that case.
+					if( $GLOBALS[$var] === array() && ( $strict_typing === false ) && $use_default )
+					{ // We want to consider empty values as invalid and fall back to the default value:
+						$GLOBALS[$var] = $default;
+					}
+					break;
+				}
+
 			default:
 				if( substr( $type, 0, 1 ) == '/' )
 				{	// We want to match against a REGEXP:
@@ -265,6 +332,9 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 								$regexp = '/^(0|1|false|true)$/i';
 								break;
 
+							case 'array/integer':
+							case 'array/array/integer':
+								$type = 'array';
 							case 'integer':
 								$regexp = '/^(\+|-)?[0-9]+$/';
 								break;
@@ -277,12 +347,42 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 							// Note: other types are not tested here.
 						}
 						if( $strict_typing == 'allow_empty' && empty($GLOBALS[$var]) )
-						{	// We have an empty value and we accept it
+						{ // We have an empty value and we accept it
 							// ok..
 						}
-						elseif( !empty( $regexp ) && ( !is_scalar($GLOBALS[$var]) || !preg_match( $regexp, $GLOBALS[$var] ) ) )
-						{	// Value does not match!
-							bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
+						elseif( !empty( $regexp ) )
+						{
+							if( $type == 'array' )
+							{ // Check format of array elements
+								$globals_var = $GLOBALS[$var];
+								if( $one_dimensional )
+								{ // Convert to a two dimensional array to handle one and two dimensional arrays the same way
+									$globals_var = array( $globals_var );
+								}
+								// Loop through the two dimensional array content and make sure each element is an integer and also set the type
+								foreach( $globals_var as $i => $var_array )
+								{
+									foreach( $var_array as $j => $var_value )
+									{
+										if( !is_scalar( $var_value ) || !preg_match( $regexp, $var_value ) )
+										{ // Value of array item does not match!
+											bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
+										}
+										// Set the type of the array elements to integer
+										settype( $globals_var[$i][$j], 'integer' );
+									}
+								}
+								if( $one_dimensional )
+								{ // Extract real array from temp array
+									$globals_var = $globals_var[0];
+								}
+								// Restore current array with prepared data
+								$GLOBALS[$var] = $globals_var;
+							}
+							elseif( !is_scalar( $GLOBALS[$var] ) || !preg_match( $regexp, $GLOBALS[$var] ) )
+							{ // Value of scalar var does not match!
+								bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
+							}
 						}
 					}
 
@@ -1105,7 +1205,7 @@ function param_compile_cat_array( $restrict_to_blog = 0, $cat_default = NULL, $c
 	global $cat_array, $cat_modifier;
 
 	$cat = param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', $cat_default, true ); // List of cats to restrict to
-	$catsel = param( 'catsel', 'array', $catsel_default, true );  // Array of cats to restrict to
+	$catsel = param( 'catsel', 'array/integer', $catsel_default, true );  // Array of cats to restrict to
 
 	$cat_array = array();
 	$cat_modifier = '';
@@ -1866,9 +1966,10 @@ function param_html( $var, $default = '', $memorize = false, $err_msg )
  */
 function param_check_html( $var, $err_msg = '#', $field_err_msg = '#' )
 {
-	global $Messages;
+	global $Messages, $evo_charset;
 
-	$altered_html = check_html_sanity( $GLOBALS[$var], 'posting' );
+	// The param was already converted to the $evo_charset in the param() function, we need to use that charset!
+	$altered_html = check_html_sanity( $GLOBALS[$var], 'posting', NULL, $evo_charset );
 
  	if( $altered_html === false )
 	{	// We have errors, do not keep sanitization attemps:
@@ -2258,10 +2359,4 @@ function isset_param( $var )
 	return isset($_POST[$var]) || isset($_GET[$var]);
 }
 
-/*
- * $Log$
- * Revision 1.79  2013/11/06 08:03:47  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

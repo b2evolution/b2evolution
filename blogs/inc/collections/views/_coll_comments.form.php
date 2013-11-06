@@ -30,20 +30,13 @@ global $edited_Blog;
 	<!--
 	function show_hide_feedback_details(ob)
 	{
-		var fldset = jQuery( '.feedback_details_container' );
 		if( ob.value == 'never' )
 		{
-			for( i = 0; i < fldset.length; i++ )
-			{
-				fldset[i].style.display = 'none';
-			}
+			jQuery( '.feedback_details_container' ).hide();
 		}
 		else
 		{
-			for( i = 0; i < fldset.length; i++ )
-			{
-				fldset[i].style.display = '';
-			}
+			jQuery( '.feedback_details_container' ).show();
 		}
 	}
 	//-->
@@ -66,7 +59,8 @@ $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'comments' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
-$Form->begin_fieldset( T_('Feedback options') );
+$Form->begin_fieldset( T_('Comment viewing options') );
+
 	$Form->radio( 'allow_view_comments', $edited_Blog->get_setting( 'allow_view_comments' ),
 						array(  array( 'any', T_('Any user'), T_('Including anonymous users') ),
 								array( 'registered', T_('Registered users only') ),
@@ -74,9 +68,35 @@ $Form->begin_fieldset( T_('Feedback options') );
 								array( 'moderator', T_('Moderators & Admins only') ),
 					), T_('Comment viewing by'), true );
 
+	// put this on feedback details container, this way it won't be displayed if comment posting is not allowed
+	echo '<div class="feedback_details_container">';
+
+	$Form->radio( 'comments_orderdir', $edited_Blog->get_setting('comments_orderdir'),
+						array(	array( 'ASC', T_('Chronologic') ),
+								array ('DESC', T_('Reverse') ),
+						), T_('Display order'), true );
+
+	$Form->checkbox( 'threaded_comments', $edited_Blog->get_setting( 'threaded_comments' ), T_('Threaded comments'), T_('Check to enable hierarchical threads of comments.') );
+
+	$paged_comments_disabled = (boolean) $edited_Blog->get_setting( 'threaded_comments' );
+	$Form->checkbox( 'paged_comments', $edited_Blog->get_setting( 'paged_comments' ), T_( 'Paged comments' ), T_( 'Check to enable paged comments on the public pages.' ), '', 1, $paged_comments_disabled );
+
+	$Form->text( 'comments_per_page', $edited_Blog->get_setting('comments_per_page'), 4, T_('Comments/Page'),  T_('How many comments do you want to display on one page?'), 4 );
+
+	$Form->checkbox( 'comments_avatars', $edited_Blog->get_setting( 'comments_avatars' ), T_('Display profile pictures'), T_('Display profile pictures/avatars for comments.') );
+
+	$Form->checkbox( 'comments_latest', $edited_Blog->get_setting( 'comments_latest' ), T_('Latest comments'), T_('Check to enable viewing of the latest comments') );
+
+	echo '</div>';
+
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Feedback options') );
+
+	$advanced_perms_warning = $edited_Blog->get_advanced_perms_warning();
 	$Form->radio( 'allow_comments', $edited_Blog->get_setting( 'allow_comments' ),
 						array(  array( 'any', T_('Any user'), T_('Including anonymous users'),
-										'', 'onclick="show_hide_feedback_details(this);"'),
+										$advanced_perms_warning, 'onclick="show_hide_feedback_details(this);"'),
 								array( 'registered', T_('Registered users only'),  '',
 										'', 'onclick="show_hide_feedback_details(this);"'),
 								array( 'member', T_('Members only'),  T_( 'Users have to be members of this blog' ),
@@ -109,12 +129,6 @@ $Form->begin_fieldset( T_('Feedback options') );
 	}
 	$Form->text_input( 'max_attachments', $edited_Blog->get_setting( 'max_attachments' ), 10, T_('Max # of attachments per User per Post'), T_('(leave empty for no limit)'), $max_attachments_params );
 
-	$Form->radio( 'allow_rating_items', $edited_Blog->get_setting( 'allow_rating_items' ),
-						array( $any_option, $registered_option, $member_option, $never_option,
-						), T_('Allow star ratings from'), true );
-
-	$Form->checkbox( 'allow_rating_comment_helpfulness', $edited_Blog->get_setting( 'allow_rating_comment_helpfulness' ), T_('Allow helpful/not helpful'), T_("Allow users to say if a comment was helpful or not.") );
-
 	if( $perm_blog_admin || $edited_Blog->get( 'allowtrackbacks' ) )
 	{ // Only admin can turn ON this setting
 		$trackbacks_warning_attrs = ' id="trackbacks_warning" style="display:'.( $edited_Blog->get( 'allowtrackbacks' ) ? 'inline' : 'none' ).'"';
@@ -123,39 +137,32 @@ $Form->begin_fieldset( T_('Feedback options') );
 		$Form->checkbox( 'blog_allowtrackbacks', $edited_Blog->get( 'allowtrackbacks' ), T_('Trackbacks').$trackbacks_title, $trackbacks_warning.T_('Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.') );
 	}
 
-	$Form->radio( 'comments_orderdir', $edited_Blog->get_setting('comments_orderdir'),
-						array(	array( 'ASC', T_('Chronologic') ),
-								array ('DESC', T_('Reverse') ),
-						), T_('Display order'), true );
-
-	$Form->checkbox( 'threaded_comments', $edited_Blog->get_setting( 'threaded_comments' ), T_('Threaded comments'), T_('Check to enable hierarchical threads of comments.') );
-
-	$paged_comments_disabled = (boolean) $edited_Blog->get_setting( 'threaded_comments' );
-	$Form->checkbox( 'paged_comments', $edited_Blog->get_setting( 'paged_comments' ), T_( 'Paged comments' ), T_( 'Check to enable paged comments on the public pages.' ), '', 1, $paged_comments_disabled );
-
-	$Form->text( 'comments_per_page', $edited_Blog->get_setting('comments_per_page'), 4, T_('Comments/Page'),  T_('How many comments do you want to display on one page?'), 4 );
-
-	$Form->checkbox( 'comments_avatars', $edited_Blog->get_setting( 'comments_avatars' ), T_('Display profile pictures'), T_('Display profile pictures/avatars for comments.') );
-
-	$Form->checkbox( 'comments_latest', $edited_Blog->get_setting( 'comments_latest' ), T_('Latest comments'), T_('Check to enable viewing of the latest comments') );
-
 	echo '</div>';
 
 	if( $edited_Blog->get_setting( 'allow_comments' ) == 'never' )
 	{ ?>
 	<script type="text/javascript">
 		<!--
-		var fldset = jQuery( '.feedback_details_container' );
-		for( i = 0; i < fldset.length; i++ )
-		{
-			fldset[i].style.display = 'none';
-		}
+		jQuery( '.feedback_details_container' ).hide();
 		//-->
 	</script>
 	<?php
 	}
 
 $Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Voting options'), array( 'class' => 'feedback_details_container' ) );
+
+	$Form->radio( 'allow_rating_items', $edited_Blog->get_setting( 'allow_rating_items' ),
+						array( $any_option, $registered_option, $member_option, $never_option,
+						), T_('Allow star ratings from'), true );
+
+	$Form->textarea_input( 'rating_question', $edited_Blog->get_setting( 'rating_question' ), 3, T_('Star rating question'), array( 'class' => 'large' ) );
+
+	$Form->checkbox( 'allow_rating_comment_helpfulness', $edited_Blog->get_setting( 'allow_rating_comment_helpfulness' ), T_('Allow helpful/not helpful'), T_("Allow users to say if a comment was helpful or not.") );
+
+$Form->end_fieldset();
+
 
 // display comments settings provided by optional modules:
 // echo 'modules';
@@ -179,8 +186,21 @@ $Form->begin_fieldset( T_('Comment moderation') );
 	// put this on feedback details container, this way it won't be displayed if comment posting is not allowed
 	echo '<div class="feedback_details_container">';
 	$Form->select_input_array( 'new_feedback_status', $edited_Blog->get_setting('new_feedback_status'), $status_options,
-				T_('New feedback status'), $newstatus_warning.T_('This status will be assigned to new comments/trackbacks from non moderators (unless overriden by plugins).') );
+				T_('New feedback status'), $newstatus_warning.T_('Logged in users will get the highest possible status allowed by their permissions. Plugins may also override this default.') );
 	echo '</div>';
+
+	// Moderation statuses setting
+	$not_moderation_statuses = array_diff( get_visibility_statuses( 'keys', NULL ), get_visibility_statuses( 'moderation' ) );
+	// Get moderation statuses with status text
+	$moderation_statuses = get_visibility_statuses( '', $not_moderation_statuses );
+	$blog_moderation_statuses = $edited_Blog->get_setting( 'moderation_statuses' );
+	$checklist_options = array();
+	foreach( $moderation_statuses as $status => $status_text )
+	{ // Add a checklist option for each possible modeartion status
+		$is_checked = ( strpos( $blog_moderation_statuses, $status) !== false );
+		$checklist_options[] = array( 'notif_'.$status, 1, T_( $status_text ), $is_checked );
+	}
+	$Form->checklist( $checklist_options, 'moderation_statuses', T_('Comment moderation reminder statuses'), false, false, array( 'note' => 'Comments with the selected statuses will be notified on the "Send reminders about comments awaiting moderation" scheduled job.' ) );
 
 	$Form->radio( 'comment_quick_moderation', $edited_Blog->get_setting( 'comment_quick_moderation' ),
 					array(  array( 'never', T_('Never') ),
@@ -262,7 +282,7 @@ $Form->end_form( array(
 			jQuery( '#max_attachments' ).removeAttr( 'disabled' );
 		}
 	} );
-	
+
 	jQuery( '#blog_allowtrackbacks' ).click( function()
 	{ // Show/Hide warning for 'Trackbacks'
 		if( jQuery( this ).is( ':checked' ) )
@@ -287,13 +307,3 @@ $Form->end_form( array(
 		}
 	} );
 </script>
-<?php
-
-
-/*
- * $Log$
- * Revision 1.10  2013/11/06 08:03:58  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
-?>

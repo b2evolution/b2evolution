@@ -35,6 +35,8 @@ global $Session, $modules;
 
 // Module name param must exists
 $module_name = param( 'mname', 'string', true );
+$blog = param( 'blog', 'integer', 0 );
+activate_blog_locale( $blog );
 
 foreach( $modules as $module )
 {
@@ -52,10 +54,4 @@ foreach( $modules as $module )
 header_redirect();
 // exited
 
-/*
- * $Log$
- * Revision 1.4  2013/11/06 08:03:44  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

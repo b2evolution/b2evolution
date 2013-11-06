@@ -173,7 +173,7 @@ if( $action != 'view' )
 			'200' => sprintf( T_('%s lines'), '200' ),
 			'500' => sprintf( T_('%s lines'), '500' ),
 		);
-	$Form->select_input_array( 'edited_user_results_per_page', $UserSettings->get( 'results_per_page', $edited_User->ID ), $results_per_page_options, T_('Results per page'), T_('Number of rows displayed in results tables.'), array( 'force_keys_as_values' => true ) );
+	$Form->select_input_array( 'edited_user_results_page_size', $UserSettings->get( 'results_per_page', $edited_User->ID ), $results_per_page_options, T_('Results per page'), T_('Number of rows displayed in results tables.'), array( 'force_keys_as_values' => true ) );
 }
 else
 { // display only
@@ -263,11 +263,4 @@ $Form->end_form();
 // End payload block:
 $this->disp_payload_end();
 
-
-/*
- * $Log$
- * Revision 1.8  2013/11/06 08:05:04  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

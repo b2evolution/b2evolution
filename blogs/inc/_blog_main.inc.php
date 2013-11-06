@@ -95,6 +95,12 @@ if( init_charsets( $current_charset ) )
   $BlogCache->clear();
 
   $Blog = & $BlogCache->get_by_ID( $blog );
+  if( is_logged_in() )
+  { // We also need to reload the current User with the new final charset
+  	$UserCache = & get_UserCache();
+	$UserCache->clear();
+	$current_User = & $UserCache->get_by_ID( $current_User->ID );
+  }
 }
 
 
@@ -289,6 +295,7 @@ if( $resolve_extra_path )
 							{ // use blog default
 								$posts = $Blog->get_setting( 'posts_per_page' );
 							}
+							$disp = 'posts';
 						}
 					}
 					else
@@ -675,11 +682,4 @@ else
 	// We'll just return to the caller now... (if we have not used a skin, the caller should do the display after this)
 }
 
-
-/*
- * $Log$
- * Revision 1.180  2013/11/06 08:03:45  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -46,6 +46,9 @@ $action = param_action();
 $disp = param( 'user_tab', 'string', '' );
 $blog = param( 'blog', 'integer', 0 );
 
+// Activate the blog locale because all params were introduced with that locale
+activate_blog_locale( $blog );
+
 /**
  * Basic security checks:
  */
@@ -176,10 +179,4 @@ else
 	require $ads_current_skin_path.'index.main.php';
 }
 
-/*
- * $Log$
- * Revision 1.73  2013/11/06 08:03:44  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

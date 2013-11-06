@@ -175,24 +175,16 @@ class ItemLight extends DataObject
 
 
 	/**
-	 * Is this a Special post (Page, Intros, Podcast, Sidebar, Advertisement)
+	 * Is this a Special post (Page, Intros, Sidebar, Advertisement)
 	 *
 	 * @return boolean
 	 */
 	function is_special()
 	{
-		global $posttypes_perms;
+		global $posttypes_specialtypes;
 
-		foreach( $posttypes_perms as $permname => $posttypes )
-		{
-			if( in_array( $this->ptyp_ID, $posttypes ) )
-			{ // This post has special type
-				return true;
-			}
-		}
-
-		// No special post type
-		return false;
+		// Check if this post type is between the special post types
+		return in_array( $this->ptyp_ID, $posttypes_specialtypes );
 	}
 
 
@@ -266,12 +258,12 @@ class ItemLight extends DataObject
 				$permalink = url_add_tail( $blogurl, mysql2date('/Y/m/d/', $this->issue_date).$urltail );
 				break;
 
- 			case 'subchap':
+			case 'subchap':
 				$main_Chapter = & $this->get_main_Chapter();
 				$permalink = url_add_tail( $blogurl, '/'.$main_Chapter->urlname.'/'.$urltail );
 				break;
 
- 			case 'chapters':
+			case 'chapters':
 				$main_Chapter = & $this->get_main_Chapter();
 				$permalink = url_add_tail( $blogurl, '/'.$main_Chapter->get_url_path().$urltail );
 				break;
@@ -567,26 +559,56 @@ class ItemLight extends DataObject
 	/**
 	 * Get list of Chapter objects.
 	 *
+	 * sam2kb> TODO: Cache item cat IDs into Item::categories property instead of global $cache_postcats
+	 *
 	 * @return array of {@link Chapter chapters} (references)
 	 */
 	function get_Chapters()
 	{
-		global $cache_postcats;
+		global $DB, $preview, $postIDlist, $cache_postcats;
 
-		$ChapterCache = & get_ChapterCache();
+		if( $preview )
+		{	// Preview mode
+			global $extracats, $post_category;
 
-		// Load cache for category associations with current posts
-		// TODO: dh> This fails, if $postIDlist is not set! (e.g. in admin)
-		cat_load_postcats_cache();
-
-		if( isset($cache_postcats[$this->ID]) )
-		{ // dh> may not be set! (demo logs)
-			$categoryIDs = $cache_postcats[$this->ID];
+			param( 'extracats', 'array', array() );
+			if( !in_array( $post_category, $extracats ) )
+			{
+				$extracats[] = $post_category;
+			}
+			$categoryIDs = $extracats;
 		}
 		else
 		{
-			$categoryIDs = postcats_get_byID( $this->ID );
+			$search_post_ids = explode( ',', $postIDlist );
+			if( empty( $search_post_ids ) || !in_array( $this->ID, $search_post_ids ) )
+			{	// Load cats for current item
+				$categoryIDs = postcats_get_byID( $this->ID );
+			}
+			else
+			{	// Load cats for items list
+				if( ! isset($cache_postcats[$this->ID]) )
+				{	// Add to cache
+					$sql = "SELECT postcat_post_ID, postcat_cat_ID
+							FROM T_postcats
+							WHERE postcat_post_ID IN ($postIDlist)
+							ORDER BY postcat_post_ID, postcat_cat_ID";
+
+					foreach( $DB->get_results( $sql, ARRAY_A, 'Get categories for items' ) as $row )
+					{
+						$postcat_post_ID = $row['postcat_post_ID'];
+						if( ! isset( $cache_postcats[$postcat_post_ID] ) )
+						{
+							 $cache_postcats[$postcat_post_ID] = array();
+						}
+						$cache_postcats[$postcat_post_ID][] = $row['postcat_cat_ID'];
+					}
+				}
+				$categoryIDs = $cache_postcats[$this->ID];
+			}
 		}
+
+		$ChapterCache = & get_ChapterCache();
 
 		$chapters = array();
 		foreach( $categoryIDs as $cat_ID )
@@ -687,6 +709,7 @@ class ItemLight extends DataObject
 				}
 			}
 		}
+
 		return $this->main_Chapter;
 	}
 
@@ -1315,11 +1338,4 @@ class ItemLight extends DataObject
 
 }
 
-
-/*
- * $Log$
- * Revision 1.47  2013/11/06 09:08:48  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>
