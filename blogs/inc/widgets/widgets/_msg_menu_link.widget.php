@@ -146,6 +146,7 @@ class msg_menu_link_Widget extends ComponentWidget
 		global $Blog;
 
 		global $current_User, $unread_messages_count;
+		global $disp;
 
 		$this->init_display( $params );
 
@@ -169,11 +170,20 @@ class msg_menu_link_Widget extends ComponentWidget
 				debug_die( 'Invalid params!' );
 		}
 
+		// Default link class
+		$link_class = $this->disp_params['link_default_class'];
+
 		switch(	$this->disp_params[ 'link_type' ] )
 		{
 			case 'messages':
 				$url = get_dispctrl_url( 'threads' );
 				$text = T_( 'Messages' );
+				// Is this the current display?
+				if( $disp == 'threads' )
+				{	// The current page is currently displaying the messages:
+					// Let's display it as selected
+					$link_class = $this->disp_params['link_selected_class'];
+				}
 				break;
 
 			case 'contacts':
@@ -181,6 +191,12 @@ class msg_menu_link_Widget extends ComponentWidget
 				$text = T_( 'Contacts' );
 				// set show badge to 0, this way make sure badge won't be displayed
 				$this->disp_params[ 'show_badge' ] = 0;
+				// Is this the current display?
+				if( $disp == 'contacts' )
+				{	// The current page is currently displaying the contacts:
+					// Let's display it as selected
+					$link_class = $this->disp_params['link_selected_class'];
+				}
 				break;
 		}
 
@@ -202,7 +218,7 @@ class msg_menu_link_Widget extends ComponentWidget
 		echo $this->disp_params['list_start'];
 
 		echo $this->disp_params['item_start'];
-		echo '<a href="'.$url.'">'.$text.$badge.'</a>';
+		echo '<a href="'.$url.'" class="'.$link_class.'">'.$text.$badge.'</a>';
 		echo $this->disp_params['item_end'];
 
 		echo $this->disp_params['list_end'];
@@ -214,8 +230,8 @@ class msg_menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
- * Revision 1.4  2013/11/06 08:05:09  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.5  2013/11/06 09:09:09  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

@@ -403,6 +403,7 @@ class ComponentWidget extends DataObject
 					'item_start' => '<li>',
 					'item_end' => '</li>',
 					'link_default_class' => 'default',
+					'link_selected_class' => 'selected',
 					'item_text_start' => '',
 					'item_text_end' => '',
 					'item_text' => '%s',
@@ -420,7 +421,6 @@ class ComponentWidget extends DataObject
 					'grid_cellend' => '</td>',
 					'thumb_size' => 'crop-80x80',
 					// 'thumb_size' => 'fit-160x120',
-					'link_selected_class' => 'selected',
 					'link_type' => 'canonic',		// 'canonic' | 'context' (context will regenrate URL injecting/replacing a single filter)
 					'item_selected_text_start' => '',
 					'item_selected_text_end' => '',
@@ -763,8 +763,8 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
- * Revision 1.83  2013/11/06 08:05:09  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.84  2013/11/06 09:09:09  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

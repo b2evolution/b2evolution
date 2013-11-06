@@ -79,7 +79,7 @@ if( $num_file_results > 0 )
 
 $Results = new Results( $num_file_results ? $SQL->get() : NULL, 'fdupl_', $default_order, $UserSettings->get( 'results_per_page' ), $num_file_results );
 $Results->Cache = & get_FileCache();
-$Results->title = T_('Duplicated files');
+$Results->title = T_('Duplicate files');
 
 /*
  * Grouping params:
@@ -171,8 +171,8 @@ $Results->display();
 
 /*
  * $Log$
- * Revision 1.2  2013/11/06 08:04:15  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.3  2013/11/06 09:08:48  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

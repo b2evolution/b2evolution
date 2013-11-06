@@ -139,48 +139,6 @@ $Form->begin_form( $form_class, $form_title );
 		$Form->hidden( 'blog', $Blog->ID );
 	}
 
-$Form->begin_fieldset( T_('Communications').get_manual_link( 'user_preferences' ) );
-
-$email_fieldnote = '<a href="mailto:'.$edited_User->get('email').'" class="roundbutton">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
-
-if( $action != 'view' )
-{ // We can edit the values:
-	$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email'), $email_fieldnote, array( 'maxlength' => 100, 'required' => true ) );
-	$disabled = false;
-}
-else
-{ // display only
-	$Form->info( T_('Email'), $edited_User->get('email'), $email_fieldnote );
-	$disabled = true;
-}
-
-	$has_messaging_perm = $edited_User->check_perm( 'perm_messaging', 'reply', false );
-	$messaging_options = array(	array( 'PM', 1, T_( 'private messages on this site.' ), ( ( $UserSettings->get( 'enable_PM', $edited_User->ID ) ) && ( $has_messaging_perm ) ), !$has_messaging_perm || $disabled ) );
-	$emails_msgform = $Settings->get( 'emails_msgform' );
-	if( $emails_msgform == 'userset' )
-	{ // user can set
-		$messaging_options[] = array( 'email', 2, T_( 'emails through a message form that will NOT reveal my email address.' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $disabled );
-	}
-	elseif( ( $emails_msgform == 'adminset' ) && ( $current_User->check_perm( 'users', 'edit' ) ) )
-	{ // only administrator users can set and current User is in 'Administrators' group
-		$messaging_options[] = array( 'email', 2, T_( 'emails through a message form that will NOT reveal my email address. [Admin]' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $disabled );
-	}
-	$Form->checklist( $messaging_options, 'edited_user_msgform', T_('Other users can send me') );
-
-	$Form->radio_input( 'edited_user_email_format', $UserSettings->get( 'email_format',  $edited_User->ID ), array(
-				array(
-					'value'   => 'auto',
-					'label'   => T_('Automatic (HTML + Plain text)') ),
-				array(
-					'value'   => 'html',
-					'label'   => T_('HTML') ),
-				array(
-					'value'   => 'text',
-					'label'   => T_('Plain text') ),
-			), T_('Email format'), array( 'lines' => true ) );
-
-$Form->end_fieldset();
-
 	/***************  Preferences  **************/
 
 $Form->begin_fieldset( $is_admin ? T_('Other preferences').get_manual_link('user_preferences') : '', array( 'class'=>'fieldset clear' ) );
@@ -245,25 +203,22 @@ if( $action != 'view' )
 						'value'   => 'default',
 						'label'   => T_('Use default duration.'),
 						'note'    => duration_format( $def_timeout_session ),
-						'onclick' => 'jQuery("#timeout_sessions_container").hide();' ),
+						'onclick' => 'jQuery("[id$=timeout_sessions]").hide();' ),
 					array(
 						'value'   => 'custom',
 						'label'   => T_('Use custom duration...'),
-						'onclick' => 'jQuery("#timeout_sessions_container").show();' ),
+						'onclick' => 'jQuery("[id$=timeout_sessions]").show();' ),
 				), T_('Session timeout'), array( 'lines' => true ) );
 
 		// Note: jQuery is not used below ( display:none is used instead ),
 		// Note: because using jQuery leads to 'timeout_sessions_container' flash for 'default duration' on page load.
+		$fieldstart = $Form->fieldstart;
 		if( $timeout_sessions_selected == 'default' )
 		{
-			echo '<div id="timeout_sessions_container" style="display:none">';
-		}
-		else
-		{
-			echo '<div id="timeout_sessions_container">';
+			$Form->fieldstart = str_replace( '>', ' style="display:none">', $Form->fieldstart );
 		}
 		$Form->duration_input( 'timeout_sessions', $timeout_sessions, T_('Custom duration'), 'months', 'seconds', array( 'minutes_step' => 1 ) );
-		echo '</div>';
+		$Form->fieldstart = $fieldstart;
 	}
 	else
 	{
@@ -306,8 +261,8 @@ $Form->end_form();
 
 /*
  * $Log$
- * Revision 1.27  2013/11/06 08:05:04  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.28  2013/11/06 09:09:09  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

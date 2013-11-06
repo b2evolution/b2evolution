@@ -70,6 +70,8 @@ global $Blog;
  */
 global $DB;
 
+global $unread_messsage_reminder_threshold, $unread_message_reminder_delay, $activate_account_reminder_threshold;
+
 // Default params:
 $default_params = array(
 		'skin_form_params' => array(),
@@ -109,17 +111,19 @@ if( !$user_profile_only )
 	echo_user_actions( $Form, $edited_User, $action );
 }
 
-$is_admin = is_admin_page();
-if( $is_admin )
+$is_admin_page = is_admin_page();
+if( $is_admin_page )
 {
 	$form_title = get_usertab_header( $edited_User, 'subs', T_( 'Edit notifications' ) );
 	$form_class = 'fform';
 	$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
+	$checklist_params = array();
 }
 else
 {
 	$form_title = '';
 	$form_class = 'bComment';
+	$checklist_params = array( 'wide' => true );
 }
 
 $Form->begin_form( $form_class, $form_title );
@@ -147,26 +151,72 @@ else
 
 $has_messaging_perm = $edited_User->check_perm( 'perm_messaging', 'reply', false );
 
-$Form->begin_fieldset( T_('Email notifications') );
+$Form->begin_fieldset( T_('Email') );
+
+	$email_fieldnote = '<a href="mailto:'.$edited_User->get('email').'" class="roundbutton">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
+
+	if( $action != 'view' )
+	{ // We can edit the values:
+		$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email address'), $email_fieldnote, array( 'maxlength' => 100, 'required' => true ) );
+		$disabled = false;
+	}
+	else
+	{ // display only
+		$Form->info( T_('Email'), $edited_User->get('email'), $email_fieldnote );
+		$disabled = true;
+	}
+
+	$Form->radio_input( 'edited_user_email_format', $UserSettings->get( 'email_format',  $edited_User->ID ), array(
+				array(
+					'value'   => 'auto',
+					'label'   => T_('Automatic (HTML + Plain text)') ),
+				array(
+					'value'   => 'html',
+					'label'   => T_('HTML') ),
+				array(
+					'value'   => 'text',
+					'label'   => T_('Plain text') ),
+			), T_('Email format'), array( 'lines' => true ) );
+
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Communications') );
+
+	$has_messaging_perm = $edited_User->check_perm( 'perm_messaging', 'reply', false );
+	$messaging_options = array(	array( 'PM', 1, T_( 'private messages on this site.' ), ( ( $UserSettings->get( 'enable_PM', $edited_User->ID ) ) && ( $has_messaging_perm ) ), !$has_messaging_perm || $disabled ) );
+	$emails_msgform = $Settings->get( 'emails_msgform' );
+	if( $emails_msgform == 'userset' )
+	{ // user can set
+		$messaging_options[] = array( 'email', 2, T_( 'emails through a message form that will NOT reveal my email address.' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $disabled );
+	}
+	elseif( ( $emails_msgform == 'adminset' ) && ( $current_User->check_perm( 'users', 'edit' ) ) )
+	{ // only administrator users can set and current User is in 'Administrators' group
+		$messaging_options[] = array( 'email', 2, T_( 'emails through a message form that will NOT reveal my email address. [Admin]' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $disabled );
+	}
+	$Form->checklist( $messaging_options, 'edited_user_msgform', T_('Other users can send me'), false, false, $checklist_params );
+
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Notifications') );
 
 	// User notification options
 	$notify_options = array();
 	if( $has_messaging_perm )
 	{ // show messaging notification settings only if messaging is available for edited user
-		$notify_options[] = array( 'edited_user_notify_messages', 1, T_( 'I receive a private message.' ),  $UserSettings->get( 'notify_messages', $edited_User->ID ), $disabled );
-		$notify_options[] = array( 'edited_user_notify_unread_messages', 1, T_( 'I have unread private messages for more than 24 hours.' ),  $UserSettings->get( 'notify_unread_messages', $edited_User->ID ), $disabled, T_( 'This notification is sent only once every 3 days.' ) );
+		$notify_options[] = array( 'edited_user_notify_messages', 1, T_('I receive a private message.'),  $UserSettings->get( 'notify_messages', $edited_User->ID ), $disabled );
+		$notify_options[] = array( 'edited_user_notify_unread_messages', 1, sprintf( T_('I have unread private messages for more than %s.'), seconds_to_period( $unread_messsage_reminder_threshold ) ),  $UserSettings->get( 'notify_unread_messages', $edited_User->ID ), $disabled, sprintf( T_('This notification is sent only once every %s days.'), array_shift( $unread_message_reminder_delay ) ) );
 	}
 	if( $edited_User->check_role( 'post_owner' ) )
 	{ // user has at least one post or user has right to create new post
-		$notify_options[] = array( 'edited_user_notify_publ_comments', 1, T_( 'a comment is published on one of <strong>my</strong> posts.' ), $UserSettings->get( 'notify_published_comments', $edited_User->ID ), $disabled );
+		$notify_options[] = array( 'edited_user_notify_publ_comments', 1, T_('a comment is published on one of <strong>my</strong> posts.'), $UserSettings->get( 'notify_published_comments', $edited_User->ID ), $disabled );
 	}
 	if( $edited_User->check_role( 'moderator' ) )
-	{ // user is moderator at least in one blog
-		$notify_options[] = array( 'edited_user_notify_moderation', 1, T_( 'a comment is posted in a blog where I am a moderator.' ), $UserSettings->get( 'notify_comment_moderation', $edited_User->ID ), $disabled );
+	{ // edited user is moderator at least in one blog
+		$notify_options[] = array( 'edited_user_notify_moderation', 1, T_('a comment is posted in a blog where I am a moderator.'), $UserSettings->get( 'notify_comment_moderation', $edited_User->ID ), $disabled );
 	}
-	if( $edited_User->group_ID == 1 )
+	if( $current_User->check_perm( 'users', 'edit' ) )
 	{ // current User is an administrator
-		$notify_options[] = array( 'edited_user_send_activation_reminder', 1, T_( 'my account was deactivated or is not activated more than 24 hours. [Admin]' ), $UserSettings->get( 'send_activation_reminder', $edited_User->ID ) );
+		$notify_options[] = array( 'edited_user_send_activation_reminder', 1, sprintf( T_('my account was deactivated or is not activated for more than %s. [Admin]'), seconds_to_period( $activate_account_reminder_threshold ) ), $UserSettings->get( 'send_activation_reminder', $edited_User->ID ) );
 	}
 	if( $edited_User->check_perm( 'users', 'edit' ) )
 	{ // edited user has permission to edit all users, save notification preferences
@@ -181,17 +231,38 @@ $Form->begin_fieldset( T_('Email notifications') );
 	}
 	if( !empty( $notify_options ) )
 	{
-		$Form->checklist( $notify_options, 'edited_user_notification', T_( 'Notify me by email whenever' ) );
+		$Form->checklist( $notify_options, 'edited_user_notification', T_( 'Notify me by email whenever' ), false, false, $checklist_params );
 	}
+
+	// Limit notifications:
+	if( $is_admin_page )
+	{ // Back office view
+		$Form->text_input( 'edited_user_notification_email_limit', $UserSettings->get( 'notification_email_limit',  $edited_User->ID ), 3, T_( 'Limit notifications to' ), '', array( 'maxlength' => 3, 'required' => true, 'input_suffix' => ' <b>'.T_('emails per day').'</b>' ) );
+	}
+	else
+	{ // Front office view
+		$Form->text_input( 'edited_user_notification_email_limit', $UserSettings->get( 'notification_email_limit',  $edited_User->ID ), 3, T_( 'Limit notifications to %s emails per day' ), '', array( 'maxlength' => 3, 'required' => true, 'inline' => true ) );
+	}
+
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Newsletters') );
 
 	$newsletter_options = array(
 		array( 'edited_user_newsletter_news', 1, T_( 'Send me news about this site.' ).' <span class="note">'.T_('Each message contains an easy 1 click unsubscribe link.').'</span>', $UserSettings->get( 'newsletter_news',  $edited_User->ID ) ),
 		array( 'edited_user_newsletter_ads', 1, T_( 'I want to receive ADs that may be relevant to my interests.' ), $UserSettings->get( 'newsletter_ads',  $edited_User->ID ) )
 	);
-	$Form->checklist( $newsletter_options, 'edited_user_newsletter', T_( 'Newsletter' ) );
+	$Form->checklist( $newsletter_options, 'edited_user_newsletter', T_( 'Newsletter' ), false, false, $checklist_params );
 
-	$Form->text_input( 'edited_user_notification_email_limit', $UserSettings->get( 'notification_email_limit',  $edited_User->ID ), 3, T_( 'Limit notification emails to' ), T_( 'emails per day' ), array( 'maxlength' => 3, 'required' => true ) );
-	$Form->text_input( 'edited_user_newsletter_limit', $UserSettings->get( 'newsletter_limit',  $edited_User->ID ), 3, T_( 'Limit newsletters to' ), T_( 'emails per day' ), array( 'maxlength' => 3, 'required' => true ) );
+	// Limit newsletters:
+	if( $is_admin_page )
+	{ // Back office view
+		$Form->text_input( 'edited_user_newsletter_limit', $UserSettings->get( 'newsletter_limit',  $edited_User->ID ), 3, T_( 'Limit newsletters to' ), '', array( 'maxlength' => 3, 'required' => true, 'input_suffix' => ' <b>'.T_('emails per day').'</b>' ) );
+	}
+	else
+	{ // Front office view
+		$Form->text_input( 'edited_user_newsletter_limit', $UserSettings->get( 'newsletter_limit',  $edited_User->ID ), 3, T_( 'Limit newsletters to %s emails per day' ), '', array( 'maxlength' => 3, 'required' => true, 'inline' => true ) );
+	}
 
 $Form->end_fieldset();
 
@@ -222,7 +293,7 @@ $Form->begin_fieldset( T_('Blog subscriptions'), array( 'id' => 'subs' ) );
 
 		$Form->hidden( 'subs_blog_IDs', implode( ',', $subs_blog_IDs ) );
 
-if( is_admin_page() && $Settings->get( 'subscribe_new_blogs' ) == 'page' )
+if( $is_admin_page && $Settings->get( 'subscribe_new_blogs' ) == 'page' )
 {	// To subscribe from blog page only
 	$Form->info_field( '', T_('In order to subscribe to a new blog, go to the relevant blog and subscribe from there.'), array( 'class' => 'info_full' ) );
 }
@@ -269,13 +340,14 @@ else
 		}
 	}
 	else
-	{	// Display a form to subscribe on new blog
-		$Form->info_field( '', T_('Choose additional subscriptions:'), array( 'class' => 'info_full' ) );
+	{ // Display a form to subscribe on new blog
+		$Form->info_field( '', T_('Choose additional subscriptions').':', array( 'class' => 'info_full' ) );
+		$label_blogs_prefix = $label_blogs_suffix = '';
 
 		$Form->switch_layout( 'none' );
 		$Form->output = false;
 
-		$subscribe_blogs_select = $Form->select_input_object( 'subscribe_blog', param( 'subscribe_blog' , '', isset( $Blog ) ? $Blog->ID : 0 ), $BlogCache, '', array( 'object_callback' => 'get_option_list_parent' ) );
+		$subscribe_blogs_select = $Form->select_input_object( 'subscribe_blog', param( 'subscribe_blog' , '', isset( $Blog ) ? $Blog->ID : 0 ), $BlogCache, '', array( 'object_callback' => 'get_option_list_parent' ) ).'</span>';
 		$subscribe_blogs_button = $Form->button( array(
 			'name'  => 'actionArray[subscribe]',
 			'value' => T_('Subscribe'),
@@ -315,7 +387,7 @@ $Form->begin_fieldset( T_('Individual post subscriptions') );
 	}
 	else
 	{
-		$Form->info_field( '', T_( 'You are subscribed to be notified on all updates on the following posts' ), array( 'class' => 'info_full' ) );
+		$Form->info_field( '', T_( 'You are subscribed to be notified on all updates on the following posts' ).':', array( 'class' => 'info_full' ) );
 		$blog_name = NULL;
 		foreach( $individual_posts_subs as $row )
 		{
@@ -353,8 +425,8 @@ $Form->end_form();
 
 /*
  * $Log$
- * Revision 1.2  2013/11/06 08:05:04  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.3  2013/11/06 09:09:09  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

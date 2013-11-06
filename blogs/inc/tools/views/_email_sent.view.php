@@ -95,7 +95,7 @@ function filter_email_sent( & $Form )
 $Results->filter_area = array(
 	'callback' => 'filter_email_sent',
 	'presets' => array(
-		'all' => array( T_('All'), $admin_url.'?ctrl=email'),
+		'all' => array( T_('All'), $admin_url.'?ctrl=email&amp;tab=sent'),
 		)
 	);
 
@@ -143,7 +143,7 @@ function emlog_to( $emlog_ID, $emlog_to, $emlog_user_ID )
 	if( empty( $to ) )
 	{	// User is not defined
 		global $admin_url;
-		$to = '<a href="'.$admin_url.'?ctrl=email&amp;emlog_ID='.$emlog_ID.'">'.htmlspecialchars( $emlog_to ).$deleted_user_note.'</a>';
+		$to = '<a href="'.$admin_url.'?ctrl=email&amp;tab=sent&amp;emlog_ID='.$emlog_ID.'">'.htmlspecialchars( $emlog_to ).$deleted_user_note.'</a>';
 	}
 
 	return $to;
@@ -157,7 +157,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Subject'),
 		'order' => 'emlog_subject',
-		'td' => '<a href="'.$admin_url.'?ctrl=email&amp;emlog_ID=$emlog_ID$">%htmlspecialchars(#emlog_subject#)%</a>',
+		'td' => '<a href="'.$admin_url.'?ctrl=email&amp;tab=sent&amp;emlog_ID=$emlog_ID$">%htmlspecialchars(#emlog_subject#)%</a>',
 	);
 
 
@@ -167,8 +167,8 @@ $Results->display();
 
 /*
  * $Log$
- * Revision 1.2  2013/11/06 08:04:55  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.3  2013/11/06 09:08:59  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

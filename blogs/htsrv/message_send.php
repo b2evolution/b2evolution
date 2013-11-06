@@ -93,29 +93,14 @@ elseif( $antispam_on_message_form && antispam_check( $message ) )
 	$Messages->add( T_('The supplied message is invalid / appears to be spam.'), 'error' );
 }
 
-
-// Build message footer:
+// Getting current blog info:
 $BlogCache = & get_BlogCache();
-$message_footer = '';
-if( !empty( $comment_id ) )
+if( !empty( $comment_id ) || !empty( $post_id ) )
 {
-	// Getting current blog info:
 	$Blog = & $BlogCache->get_by_ID( $blog );	// Required
-	$message_footer .= T_('Message sent from your comment:') . "\n"
-		.url_add_param( $Blog->get('url'), 'p='.$post_id.'#'.$comment_id, '&' )
-		."\n\n";
-}
-elseif( !empty( $post_id ) )
-{
-	// Getting current blog info:
-	$Blog = & $BlogCache->get_by_ID( $blog );	// Required
-	$message_footer .= T_('Message sent from your post:') . "\n"
-		.url_add_param( $Blog->get('url'), 'p='.$post_id, '&' )
-		."\n\n";
 }
 else
 {
-	// Getting current blog info:
 	$Blog = & $BlogCache->get_by_ID( $blog, true, false );	// Optional
 }
 
@@ -130,9 +115,6 @@ if( ! empty( $recipient_id ) )
 	{ // should be prevented by UI
 		debug_die( 'Invalid recipient!' );
 	}
-
-	// Change the locale so the email is in the recipients language
-	locale_temp_switch($recipient_User->locale);
 }
 elseif( ! empty( $comment_id ) )
 { // Get the email address for the recipient if a visiting commenter.
@@ -161,9 +143,6 @@ elseif( ! empty( $comment_id ) )
 		$recipient_name = $Comment->get_author_name();
 		$recipient_address = $Comment->get_author_email();
 	}
-
-	// We don't know the recipient's language - Change the locale so the email is in the blog's language:
-	locale_temp_switch($Blog->locale);
 }
 
 if( empty($sender_name) )
@@ -187,32 +166,14 @@ if( empty( $recipient_User ) && empty( $recipient_address ) )
 // opt-out links:
 if( $recipient_User )
 { // Member:
-	if( $Settings->get( 'emails_msgform' ) == 'userset' )
-	{ // user can allow/deny to receive emails
-		$edit_preferences_url = NULL;
-		if( !empty( $Blog ) )
-		{ // go to blog
-			$edit_preferences_url = url_add_param( str_replace( '&amp;', '&', $Blog->gen_blogurl() ), 'disp=userprefs', '&' );
-		}
-		elseif( $recipient_User->check_perm( 'admin', 'restricted' ) )
-		{ // go to admin
-			$edit_preferences_url = $admin_url.'?ctrl=user&user_tab=userprefs&user_ID='.$recipient_User->ID;
-		}
-		if( !empty( $edit_preferences_url ) )
-		{ // add edit preferences link
-			$message_footer .= T_("You can edit your profile to not receive emails through a form:")."\n".$edit_preferences_url."\n";
-		}
-	}
-	// Add quick unsubcribe link so users can deny receiving emails through b2evo message form in any circumstances
-	$message_footer .= T_( 'If you don\'t want to receive any more emails through a message form, click here' ).':'
-		."\n".$htsrv_url.'quick_unsubscribe.php?type=msgform&user_ID=$user_ID$&key=$unsubscribe_key$';
+	// Change the locale so the email is in the recipients language
+	locale_temp_switch($recipient_User->locale);
 }
-elseif( $Comment )
+else
 { // Visitor:
-	$message_footer .= T_("Click on the following link to not receive e-mails on your comments\nfor this e-mail address anymore:")
-		."\n".$samedomain_htsrv_url.'anon_unsubscribe.php?type=comment&c='.$Comment->ID.'&anon_email='.rawurlencode($Comment->author_email);
+	// We don't know the recipient's language - Change the locale so the email is in the blog's language:
+	locale_temp_switch($Blog->locale);
 }
-
 
 // Trigger event: a Plugin could add a $category="error" message here..
 $Plugins->trigger_event( 'MessageFormSent', array(
@@ -221,7 +182,6 @@ $Plugins->trigger_event( 'MessageFormSent', array(
 	'comment_ID' => $comment_id,
 	'subject' => & $subject,
 	'message' => & $message,
-	'message_footer' => & $message_footer,
 	'Blog' => & $Blog,
 	'sender_name' => & $sender_name,
 	'sender_email' => & $sender_address,
@@ -234,27 +194,33 @@ if( $success_message )
 	$email_template_params = array(
 			'sender_name'    => $sender_name,
 			'sender_address' => $sender_address,
-			'message_footer' => $message_footer,
 			'Blog'           => $Blog,
 			'message'        => $message,
+			'comment_id'     => $comment_id,
+			'post_id'        => $post_id,
+			'recipient_User' => $recipient_User,
+			'Comment'        => $Comment,
 		);
 
 	if( empty( $recipient_User ) )
 	{ // Send mail to visitor
 		// Get a message text from template file
-		$message = mail_template( 'message_sent', 'text', $email_template_params );
+		$message = mail_template( 'contact_message_new', 'text', $email_template_params );
 		$success_message = send_mail( $recipient_address, $recipient_name, $subject, $message, NULL, NULL, array( 'Reply-To' => $sender_address ) );
 	}
 	else
 	{ // Send mail to registered user
-		$success_message = send_mail_to_User( $recipient_User->ID, $subject, 'message_sent', $email_template_params, false, array( 'Reply-To' => $sender_address ) );
+		$success_message = send_mail_to_User( $recipient_User->ID, $subject, 'contact_message_new', $email_template_params, false, array( 'Reply-To' => $sender_address ) );
 	}
+
+	// restore the locale to the blog visitor language, before we would display an error message
+	locale_restore_previous();
 
 	if( !$success_message )
 	{ // could not send email
 		if( $demo_mode )
 		{
-			$Messages->add( T_('Sorry, could not send email. Sending email in demo mode is disabled.' ), 'error' );
+			$Messages->add( 'Sorry, could not send email. Sending email in demo mode is disabled.', 'error' );
 		}
 		else
 		{
@@ -263,16 +229,16 @@ if( $success_message )
 		}
 	}
 }
+else
+{ // Restore the locale to the blog visitor language even in case of errors
+	locale_restore_previous();
+}
 
 
 // Plugins should cleanup their temporary data here:
 $Plugins->trigger_event( 'MessageFormSentCleanup', array(
 		'success_message' => $success_message,
 	) );
-
-
-// restore the locale to the blog visitor language
-locale_restore_previous();
 
 if( empty( $redirect_to ) && empty( $Blog ) )
 {
@@ -311,8 +277,8 @@ header_redirect( $redirect_to );
 
 /*
  * $Log$
- * Revision 1.84  2013/11/06 08:03:44  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.85  2013/11/06 09:08:46  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

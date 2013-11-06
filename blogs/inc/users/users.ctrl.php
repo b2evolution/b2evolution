@@ -190,6 +190,14 @@ if( !$Messages->has_errors() )
 				break;
 			}
 
+			if( param( 'deltype', 'string', '', true ) == 'spammer' )
+			{ // If we delete user as spammer we also should remove the comments and the messages
+				$edited_User->delete_cascades = array_merge( $edited_User->delete_cascades, array(
+						array( 'table'=>'T_comments', 'fk'=>'comment_author_ID', 'msg'=>T_('%d comments by this user') ),
+						array( 'table'=>'T_messaging__message', 'fk'=>'msg_author_user_ID', 'msg'=>T_('%d private messages sent by this user') ),
+					) );
+			}
+
 			$fullname = $edited_User->dget( 'fullname' );
 			if( param( 'confirm', 'integer', 0 ) )
 			{ // confirmed, Delete from DB:
@@ -289,7 +297,7 @@ if( !$Messages->has_errors() )
 			set_param( 'filter', 'new' );
 
 			load_class( 'users/model/_userlist.class.php', 'UserList' );
-			$UserList = new UserList( 'admin', $UserSettings->get('results_per_page'), 'users_', true, false, true, false );
+			$UserList = new UserList( 'admin', $UserSettings->get('results_per_page'), 'users_', array( 'join_city' => false ) );
 			$UserList->load_from_Request();
 			// Make query to get a count of users
 			$UserList->query();
@@ -412,8 +420,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.56  2013/11/06 08:04:55  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.57  2013/11/06 09:09:08  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

@@ -133,6 +133,62 @@ switch( $action )
 		break;
 }
 
+
+/**
+ * Get url to redirect after chapter editing
+ *
+ * @param string Redirect Page: 'front', 'manual', 'list'
+ * @param integer Parent ID
+ * @param integer Chapter ID
+ * @return string URL
+ */
+function get_chapter_redirect_url( $redirect_page, $parent_ID, $chapter_ID = 0 )
+{
+	global $admin_url, $blog;
+
+	if( $redirect_page == 'front' )
+	{ // Get Chapter for front page redirect
+		if( empty( $chapter_ID ) )
+		{ // Chapter ID is invalid, redirect to chapters list
+			$redirect_page = 'list';
+		}
+		else
+		{
+			$ChapterCache = & get_ChapterCache();
+			$Chapter = & $ChapterCache->get_by_ID( $chapter_ID, false, false );
+			if( $Chapter === false )
+			{ // Chapter doesn't exist anymore, redirect to chapters list
+				$redirect_page = 'list';
+			}
+		}
+	}
+
+	switch( $redirect_page )
+	{
+		case 'front':
+			// Redirect to front-office
+			$redirect_url = $Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' );
+			break;
+
+		case 'manual':
+			// Redirect to manual pages
+			$redirect_url = $admin_url.'?ctrl=items&blog='.$blog.'&tab=manual';
+			if( !empty( $parent_ID ) )
+			{ // Open parent category to display new created category
+				$redirect_url .= '&cat_ID='.$parent_ID;
+			}
+			break;
+
+		default: // 'list'
+			// Redirect to chapters list
+			$redirect_url = $admin_url.'?ctrl=chapters&blog='.$blog;
+			break;
+	}
+
+	return $redirect_url;
+}
+
+
 /**
  * Perform action:
  */
@@ -185,26 +241,15 @@ switch( $action )
 			// Insert in DB:
 			if( $edited_GenericCategory->dbinsert() !== false )
 			{
-				$Messages->add( T_('New category created.'), 'success' );
+				$Messages->add( T_('New chapter created.'), 'success' );
 				// Add the ID of the new element to the result fadeout
 				$result_fadeout[$edited_GenericCategory->dbIDname][] = $edited_GenericCategory->ID;
 				$action = 'list';
 				// We want to highlight the edited object on next list display:
 				$Session->set( 'fadeout_array', array($edited_GenericCategory->ID) );
 
-				if( param( 'redirect_page', 'string', '' ) == 'manual' )
-				{ // Redirect to manual pages
-					$redirect_to = $admin_url.'?ctrl=items&blog='.$blog.'&tab=manual';
-					if( !empty( $edited_GenericCategory->parent_ID ) )
-					{ // Open parent category to display new created category
-						$redirect_to .= '&cat_ID='.$edited_GenericCategory->parent_ID;
-					}
-				}
-				else
-				{ // Redirect to chapters list
-					$redirect_to = $admin_url.'?ctrl=chapters&blog='.$blog;
-				}
 				// Redirect so that a reload doesn't write to the DB twice:
+				$redirect_to = get_chapter_redirect_url( param( 'redirect_page', 'string', '' ), $edited_GenericCategory->parent_ID, $edited_GenericCategory->ID );
 				header_redirect( $redirect_to, 303 ); // Will EXIT
 				// We have EXITed already at this point!!
 			}
@@ -223,7 +268,7 @@ switch( $action )
 			// Update in DB:
 			if( $edited_GenericCategory->dbupdate() !== false )
 			{
-				$Messages->add( T_('Element updated.'), 'success' ); //ToDO change htis
+				$Messages->add( T_('Chapter updated.'), 'success' ); //ToDO change htis
 			}
 			// Add the ID of the updated element to the result fadeout
 			$result_fadeout[$edited_GenericCategory->dbIDname][] = $edited_GenericCategory->ID;
@@ -231,19 +276,8 @@ switch( $action )
 			// We want to highlight the edited object on next list display:
 			$Session->set( 'fadeout_array', array($edited_GenericCategory->ID));
 
-			if( param( 'redirect_page', 'string', '' ) == 'manual' )
-			{ // Redirect to manual pages
-				$redirect_to = $admin_url.'?ctrl=items&blog='.$blog.'&tab=manual';
-				if( !empty( $edited_GenericCategory->parent_ID ) )
-				{ // Open parent category to display new created category
-					$redirect_to .= '&cat_ID='.$edited_GenericCategory->parent_ID;
-				}
-			}
-			else
-			{ // Redirect to chapters list
-				$redirect_to = $admin_url.'?ctrl=chapters&blog='.$blog;
-			}
 			// Redirect so that a reload doesn't write to the DB twice:
+			$redirect_to = get_chapter_redirect_url( param( 'redirect_page', 'string', '' ), $edited_GenericCategory->parent_ID, $edited_GenericCategory->ID );
 			header_redirect( $redirect_to, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
@@ -315,26 +349,14 @@ switch( $action )
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
 			$parent_ID = $edited_GenericCategory->parent_ID;
-			$msg = sprintf( T_('Element &laquo;%s&raquo; deleted.'), $edited_GenericCategory->dget( 'name' ) );
+			$msg = sprintf( T_('Chapter &laquo;%s&raquo; deleted.'), $edited_GenericCategory->dget( 'name' ) );
 			$GenericCategoryCache->dbdelete_by_ID( $edited_GenericCategory->ID );
 			unset($edited_GenericCategory);
 			forget_param( $GenericCategoryCache->dbIDname );
 			$Messages->add( $msg, 'success' );
 
-			if( param( 'redirect_page', 'string', '' ) == 'manual' )
-			{ // Redirect to manual pages
-				$redirect_to = $admin_url.'?ctrl=items&blog='.$blog.'&tab=manual';
-				if( !empty( $parent_ID ) )
-				{ // Open parent category to display new created category
-					$redirect_to .= '&cat_ID='.$parent_ID;
-				}
-			}
-			else
-			{ // Redirect to chapters list
-				$redirect_to = $admin_url.'?ctrl=chapters&blog='.$blog;
-			}
-
 			// Redirect so that a reload doesn't write to the DB twice:
+			$redirect_to = get_chapter_redirect_url( param( 'redirect_page', 'string', '' ), $parent_ID );
 			header_redirect( $redirect_to, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
@@ -564,8 +586,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.26  2013/11/06 08:03:57  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.27  2013/11/06 09:08:47  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

@@ -61,7 +61,8 @@ jQuery( document ).ready( function()
 	{	// AJAX request is success, Add debug info into the list
 		var debug_ajax_date_end = new Date();
 
-		var data = jQuery( '<div>' + request.responseText + '</div>' );
+		var data = jQuery( document.createElement('div') );
+		data.html( request.responseText );
 		var jslog = data.find( 'div.jslog' );
 
 		var log = '<h4>Request #' + debug_ajax_request_number + ':</h4>';

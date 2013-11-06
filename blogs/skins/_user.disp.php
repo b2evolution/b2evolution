@@ -140,7 +140,7 @@ echo $avatar_imgtag;
 
 $ProfileForm->begin_fieldset( T_('Identity') );
 
-echo '<div class="profile_pictured_fieldsets">';
+	echo '<div class="profile_pictured_fieldsets">';
 
 	$login_note = '';
 	if( $is_logged_in && ( $User->ID == $current_User->ID ) && ( $User->check_status( 'can_be_validated' ) ) )
@@ -191,6 +191,27 @@ echo '<div class="profile_pictured_fieldsets">';
 		$ProfileForm->info( T_( 'My age group' ), sprintf( T_('from %d to %d years old'), $User->get('age_min'), $User->get('age_max') ) );
 	}
 
+	echo '</div>';
+
+	if( $is_logged_in && $current_User->check_status( 'can_view_user', $user_ID ) )
+	{ // Display other pictures, but only for logged in and activated users:
+		$user_avatars = $User->get_avatar_Files();
+		if( count( $user_avatars ) > 0 )
+		{
+			$info_content = '';
+			foreach( $user_avatars as $uFile )
+			{
+				$info_content .= $uFile->get_tag( '<div class="avatartag">', '', '', '</div>', 'crop-top-80x80', 'original', $User->login, 'lightbox[user]' );
+			}
+			$info_content .= '<div class="clear"></div>';
+			$ProfileForm->info( T_('Other pictures'), $info_content );
+		}
+	}
+
+$ProfileForm->end_fieldset();
+
+$ProfileForm->begin_fieldset( sprintf( T_('You and %s...'), $User->login ) );
+
 	$contacts = array();
 	if( $is_logged_in && ( $current_User->ID != $User->ID ) && ( $current_User->check_perm( 'perm_messaging', 'reply' ) ) )
 	{ // User is logged in, has messaging access permission and is not the same user as displayed user
@@ -221,24 +242,7 @@ echo '<div class="profile_pictured_fieldsets">';
 		$contacts[] = $User->get_no_msgform_reason();
 	}
 
-	$ProfileForm->info( T_('Contact'), implode( '<br />', $contacts ) );
-
-echo '</div>';
-
-	if( $is_logged_in && $current_User->check_status( 'can_view_user', $user_ID ) )
-	{ // Display other pictures, but only for logged in and activated users:
-		$user_avatars = $User->get_avatar_Files();
-		if( count( $user_avatars ) > 0 )
-		{
-			$info_content = '';
-			foreach( $user_avatars as $uFile )
-			{
-				$info_content .= $uFile->get_tag( '<div class="avatartag">', '', '', '</div>', 'crop-top-80x80', 'original', $User->login, 'lightbox[user]' );
-			}
-			$info_content .= '<div class="clear"></div>';
-			$ProfileForm->info( T_('Other pictures'), $info_content );
-		}
-	}
+	$ProfileForm->info( T_('Contact'), implode( '<div style="height:6px"> </div>', $contacts ) );
 
 	if( $is_logged_in && $current_User->check_status( 'can_edit_contacts' ) && $current_User->check_perm( 'perm_messaging', 'reply' ) )
 	{ // user is logged in, the account was activated and has the minimal messaging permission
@@ -255,11 +259,12 @@ echo '</div>';
 
 		if( !empty( $contacts_groups ) )
 		{	// Display contacts groups for current User
-			$ProfileForm->info( T_('This user is'), $contacts_groups );
+			$ProfileForm->custom_content( '<p><strong>'.T_( 'You can organize your contacts into groups. You can decide in which groups to put this user here:' ).'</strong></p>' );
+			$ProfileForm->info( sprintf( T_('%s is'), $User->login ), $contacts_groups );
 
 			// Form to create a new group
 			$ProfileForm->hidden( 'group_ID', 'new' );
-			$ProfileForm->text_input( 'group_ID_combo', param( 'group_ID_combo', 'string', '' ), 18, T_('Add to a NEW group'), '', array( 'field_suffix' => $button_add_group, 'maxlength' => 50 ) );
+			$ProfileForm->text_input( 'group_ID_combo', param( 'group_ID_combo', 'string', '' ), 18, T_('Create a new group'), '', array( 'field_suffix' => $button_add_group, 'maxlength' => 50 ) );
 		}
 		else if( $User->ID != $current_User->ID )
 		{	// Form to add this user into the group
@@ -274,9 +279,11 @@ echo '</div>';
 
 		$report_options = array_merge( array( 'none' => '' ), get_report_statuses() );
 
+		$ProfileForm->custom_content( '<p><strong>'.get_icon('warning_yellow').' '.T_( 'If you have an issue with this user, you can report it here:' ).'</strong></p>' );
+
 		// get current User report from edited User
 		$current_report = get_report_from( $User->ID );
-		$report_label = T_('Report this user');
+
 		if( $current_report == NULL )
 		{ // currentUser didn't add any report from this user yet
 			$report_content = '<select id="report_user_status" name="report_user_status">';
@@ -288,7 +295,7 @@ echo '</div>';
 
 			$info_content = '<div><span>'.T_('You can provide additional information below').':</span></div>';
 			$info_content .= '<table style="width:100%;"><td style="width:99%;background-color:inherit;"><textarea id="report_info_content" name="report_info_content" class="form_textarea_input" style="width:100%;" rows="2" maxlength="240"></textarea></td>';
-			$info_content .= '<td style="vertical-align:top;background-color:inherit;"><input type="submit" class="SaveButton" style="color:red;margin-left:2px;" value="Report this user now!" name="actionArray[report_user]" /></td></table>';
+			$info_content .= '<td style="vertical-align:top;background-color:inherit;"><input type="submit" class="SaveButton" style="color:red;margin-left:2px;" value="'.T_('Report this user now!').'" name="actionArray[report_user]" /></td></table>';
 			$report_content .= '<script type="text/javascript">
 				var info_content = \''.$info_content.'\';
 				jQuery("#report_user_status").change( function() {
@@ -304,14 +311,15 @@ echo '</div>';
 					}
 				});
 				</script>';
+				$ProfileForm->info( T_('Report NOW'), $report_content );
 		}
 		else
 		{
 			$report_content = T_('You have reported this user on %s as "%s" with the additional info "%s" - <a %s>Cancel report</a>');
 			$cancel_link = 'href="'.url_add_param( $Blog->get('url'), 'disp=contacts&amp;user_ID='.$User->ID.'&amp;action=remove_report&amp;'.url_crumb( 'messaging_contacts' ) ).'"';
 			$report_content = sprintf( $report_content, mysql2localedatetime( $current_report[ 'date' ] ), $report_options[ $current_report[ 'status' ] ], $current_report[ 'info' ], $cancel_link );
+			$ProfileForm->info( T_('Already reported'), $report_content );
 		}
-		$ProfileForm->info( $report_label, $report_content );
 	}
 
 $ProfileForm->end_fieldset();

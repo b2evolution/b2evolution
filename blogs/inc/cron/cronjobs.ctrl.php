@@ -28,7 +28,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_funcs( '/cron/_cron.funcs.php' );
+load_funcs( 'cron/_cron.funcs.php' );
 
 // Check minimum permission:
 $current_User->check_perm( 'options', 'view', true );
@@ -378,8 +378,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.17  2013/11/06 08:04:07  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.18  2013/11/06 09:08:47  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

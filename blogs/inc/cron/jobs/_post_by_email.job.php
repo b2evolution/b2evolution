@@ -99,7 +99,7 @@ if( $post_cntr > 0 )
 {
 	pbm_msg( sprintf( T_('New posts created: %d'), $post_cntr ), true );
 
-	$subject = T_('Post by email report');
+	$UserCache = & get_UserCache();
 	foreach( $pbm_items as $Items )
 	{	// Send report to post author
 		$to_user_ID = 0;
@@ -114,7 +114,11 @@ if( $post_cntr > 0 )
 		$email_template_params = array(
 				'Items' => $Items
 			);
-		send_mail_to_User( $to_user_ID, $subject, 'post_by_email_report', $email_template_params );
+		$to_User = $UserCache->get_by_ID( $to_user_ID );
+		// Change locale here to localize the email subject and content
+		locale_temp_switch( $to_User->get( 'locale' ) );
+		send_mail_to_User( $to_user_ID, T_('Post by email report'), 'post_by_email_report', $email_template_params );
+		locale_restore_previous();
 	}
 
 	// sam2kb> TODO: Send detailed report to blog owner
@@ -126,8 +130,8 @@ return 1; // success
 
 /*
  * $Log$
- * Revision 1.4  2013/11/06 08:04:07  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.5  2013/11/06 09:08:47  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

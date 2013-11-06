@@ -4326,7 +4326,7 @@ function upgrade_b2evo_tables()
 
 	// In some upgrade versions ( currently only in "i5" ) we would like to create profile pictures links from the user's files in the profile pictures folder
 	// To be able to do that we need an up to date database version, so we will create profile pictures after the ugrade script run successfully.
-	// Set this $create_profile_picture_links to true only in those upgrade block where it's required. 
+	// Set this $create_profile_picture_links to true only in those upgrade block where it's required.
 	$create_profile_picture_links = false;
 
 	if( $old_db_version < 11100 )
@@ -4398,6 +4398,8 @@ function upgrade_b2evo_tables()
 	}
 
 	// Update modules own b2evo tables
+	echo "Calling modules for individual upgrades...<br>\n";
+	flush();
 	modules_call_method( 'upgrade_b2evo_tables' );
 
 	// Just in case, make sure the db schema version is up to date at the end.
@@ -4406,26 +4408,23 @@ function upgrade_b2evo_tables()
 		set_upgrade_checkpoint( $new_db_version );
 	}
 
-
-	// Init Caches: (it should be possible to do this with each upgrade)
-	load_funcs('tools/model/_system.funcs.php');
-	// We're going to need some environment in order to init caches...
+	// We're going to need some environment in order to init caches and create profile picture links...
 	if( ! is_object( $Settings ) )
-	{
+	{ // create Settings object
 		load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
 		$Settings = new GeneralSettings();
 	}
 	if( ! is_object( $Plugins ) )
-	{
+	{ // create Plugins object
 		load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
 		$Plugins = new Plugins();
 	}
-	if( $create_profile_picture_links )
-	{ // Create links for all files from the users profile_pictures folder
-		create_profile_picture_links();
-	}
+
+	// Init Caches: (it should be possible to do this with each upgrade)
+	task_begin( '(Re-)Initializing caches...' );
+	load_funcs('tools/model/_system.funcs.php');
 	if( system_init_caches() )
-	{ // cache was initialized successful
+	{ // cache was initialized successfully
 		// Check all cache folders if exist and work properly. Try to repair cache folders if they aren't ready for operation.
 		system_check_caches();
 	}
@@ -4433,27 +4432,51 @@ function upgrade_b2evo_tables()
 	{
 		echo "<strong>".T_('The /cache folder could not be created/written to. b2evolution will still work but without caching, which will make it operate slower than optimal.')."</strong><br />\n";
 	}
+	task_end();
 
-	// Reload plugins after every upgrade, to detect even those changes on plugins which didn't require db modifications
-	$Plugins_admin = & get_Plugins_admin();
-	$Plugins_admin->reload_plugins();
+	// Check if profile picture links should be recreated. It won't be executed in each upgrade, but only in those cases when it is required.
+	// This requires an up to date database, and also $Plugins and $GeneralSettings objects must be initialized before this.
+	// Note: Check $create_profile_picture_links intialization and usage above to get more information.
+	if( $create_profile_picture_links )
+	{ // Create links for all files from the users profile_pictures folder
+		task_begin( 'Creating profile picture links...' );
+		create_profile_picture_links();
+		task_end();
+	}
 
 	// Invalidate all page caches after every upgrade.
 	// A new version of b2evolution may not use the same links to access special pages.
 	// We want to play it safe here so that people don't think that upgrading broke their blog!
+	task_begin( 'Invalidating all page caches to make sure they don\'t contain old action links...' );
 	invalidate_pagecaches();
+	task_end();
 
-	// Create default cron jobs (this can be done at each upgrade):
-	require_once dirname(__FILE__).'/_functions_create.php';
-	create_default_jobs( true );
+
+	// Reload plugins after every upgrade, to detect even those changes on plugins which didn't require db modifications
+	task_begin( 'Reloading installed plugins to make sure their config is up to date...' );
+	$Plugins_admin = & get_Plugins_admin();
+	$Plugins_admin->reload_plugins();
+	task_end();
+
 
 	// This has to be at the end because plugin install may fail if the DB schema is not current (matching Plugins class).
 	// Only new default plugins will be installed, based on $old_db_version.
 	// dh> NOTE: if this fails (e.g. fatal error in one of the plugins), it will not get repeated
+	task_begin( 'Installing new default plugins (if any)...' );
 	install_basic_plugins( $old_db_version );
+	task_end();
+
+
+	// Create default cron jobs (this can be done at each upgrade):
+	echo "Checking if some default cron jobs need to be installed...<br/>\n";
+	flush();
+	require_once dirname(__FILE__).'/_functions_create.php';
+	create_default_jobs( true );
+
 
 	// "Time running low" test: Check if the upgrade script elapsed time is close to the max execution time.
 	// Note: This should not really happen except the case when many plugins must be installed.
+	task_begin( 'Checking timing of upgrade...' );
 	$elapsed_time = time() - $script_start_time;
 	$max_exe_time = ini_get( 'max_execution_time' );
 	if( $max_exe_time && ( $elapsed_time > ( $max_exe_time - 20 ) ) )
@@ -4462,12 +4485,17 @@ function upgrade_b2evo_tables()
 		// Dirty temporary solution:
 		exit(0);
 	}
+	task_end();
+
 
 	/*
 	 * -----------------------------------------------
 	 * Check to make sure the DB schema is up to date:
 	 * -----------------------------------------------
 	 */
+	echo "Starting to check DB...<br/>\n";
+	flush();
+
 	$upgrade_db_deltas = array(); // This holds changes to make, if any (just all queries)
 
 	global $debug;
@@ -4577,11 +4605,4 @@ function upgrade_b2evo_tables()
 	return true;
 }
 
-
-/*
- * $Log$
- * Revision 1.434  2013/11/06 08:05:19  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

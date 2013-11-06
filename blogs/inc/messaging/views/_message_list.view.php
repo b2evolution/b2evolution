@@ -58,7 +58,30 @@ $params = array_merge( array(
 	'redirect_to' => regenerate_url( 'action', '', '', '&' ),
 	'cols' => 80,
 	'skin_form_params' => array(),
+	'display_navigation' => false,
+	'display_title' => false,
+	'messages_list_start' => '',
+	'messages_list_end' => '',
+	'messages_list_title' => $edited_Thread->title,
 	), $params );
+
+echo $params['messages_list_start'];
+
+if( $params['display_navigation'] )
+{	// Display navigation
+	echo '<div class="messages_navigation">'
+		.'<div class="floatleft">'
+			.'<a href="'.get_dispctrl_url( 'threads' ).'">&laquo; '.T_('Back to list').'</a>'
+		.'</div>'
+		.get_thread_prevnext_links( $edited_Thread->ID )
+		.'<div class="clear"></div>'
+	.'</div>';
+}
+
+if( $params['display_title'] )
+{	// Display title
+	echo '<h2>'.$edited_Thread->title.'</h2>';
+}
 
 // load Thread recipients
 $recipient_list = $edited_Thread->load_recipients();
@@ -134,7 +157,7 @@ $Results = new Results( $select_SQL->get(), 'msg_', '', 0, $count_SQL->get() );
 
 $Results->Cache = & get_MessageCache();
 
-$Results->title = $edited_Thread->title;
+$Results->title = $params['messages_list_title'];
 
 if( is_admin_page() )
 {
@@ -152,6 +175,7 @@ function filter_messages( & $Form )
 }
 
 $Results->filter_area = array(
+	'submit_title' => T_('Filter messages'),
 	'callback' => 'filter_messages',
 	'presets' => array(
 		'all' => array( T_('All'), get_dispctrl_url( 'messages', 'thrd_ID='.$edited_Thread->ID ) ),
@@ -379,7 +403,7 @@ if( $is_recipient )
 // Display Leave or Close conversation action if they are available
 if( $is_recipient && empty( $leave_msg_ID ) && ( count( $available_recipients ) > 0 ) )
 { // user is recipient and didn't leave this conversation yet and this conversation is not closed
-	echo '<div class="fieldset">';
+	echo '<div class="fieldset messages_list_actions">';
 	if( count( $available_recipients ) > 1 )
 	{ // there are more then one recipients
 		$leave_text = T_( 'I want to leave this conversation now!' );
@@ -420,10 +444,12 @@ if( $is_recipient && empty( $leave_msg_ID ) && ( count( $available_recipients ) 
 // Dispaly message list
 $Results->display( $display_params );
 
+echo $params['messages_list_end'];
+
 /*
  * $Log$
- * Revision 1.51  2013/11/06 08:04:35  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.52  2013/11/06 09:08:58  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

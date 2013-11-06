@@ -236,6 +236,10 @@ div.pageTop a.selected:hover {
 	background-color: #EFEFEF;
 	text-align: center;
 }
+.bForums td.row1{
+	width: 22%;
+	white-space: nowrap;
+}
 .bForums td.row2{
 	background-color: #DEE3E7;
 }
@@ -756,6 +760,9 @@ textarea#msg_text {
 td.message_text {
 	font-size: 12px;
 }
+.messages_list table.bForums td.row2 {
+	width: 90%;
+}
 
 #width_switcher {
 	display: none;
@@ -880,4 +887,21 @@ ul.legend a {
 }
 ul.legend span.note {
 	float: none;
+}
+form#user_checkchanges.bComment {
+	border: none;
+}
+form#user_checkchanges.bComment, form#user_checkchanges.bComment table.bForums {
+	margin-top: 0;
+}
+div.tabs div a {
+	background-color: #DEE3E7;
+	border-color: #036;
+}
+td.custom_content {
+	background-color: #DEE3E7;
+}
+td.custom_content p {
+	text-align: left;
+	margin: 2px 0;
 }

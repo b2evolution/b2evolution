@@ -472,9 +472,10 @@ function get_threads_recipients_sql( $thread_ID = 0 )
  * @param array required user id list
  * @param integer a thread ID that should be skipped from the result list. Leave it to NULL if you don't want to skip any thread.
  * @param string Threads format ( string | array )
+ * @param string User logins format ( text | html )
  * @return array ( user_ID -> (string or array) ) pairs, the string contains the users unread threads titles and their recipients list 
  */
-function get_users_unread_threads( $userid_list, $skip_thread_ID = NULL, $threads_format = 'string' )
+function get_users_unread_threads( $userid_list, $skip_thread_ID = NULL, $threads_format = 'string', $login_format = 'text' )
 {
 	global $DB;
 	$result = array();
@@ -522,7 +523,21 @@ function get_users_unread_threads( $userid_list, $skip_thread_ID = NULL, $thread
 		{
 			$thread_recipients[ $row->thread_ID ] = array();
 		}
-		$thread_recipients[$row->thread_ID][] = ( empty( $row->user_login ) ? 'Deleted user' : $row->user_login );
+		if( empty( $row->user_login ) )
+		{ // User was deleted
+			$thread_recipients[$row->thread_ID][] = 'Deleted user';
+		}
+		else
+		{ // User exists
+			if( $login_format == 'text' )
+			{ // Use simple login as text
+				$thread_recipients[$row->thread_ID][] = $row->user_login;
+			}
+			else // 'html'
+			{ // Use a colored login with avatar
+				$thread_recipients[$row->thread_ID][] = get_user_colored_login( $row->user_login );
+			}
+		}
 		if( !isset( $thread_titles[ $row->thread_ID ] ) )
 		{
 			$thread_titles[ $row->thread_ID ] = $row->thrd_title;
@@ -581,6 +596,7 @@ function get_threads_results( $params = array() )
 			'search_word' => '',               // Filter by this keyword
 			'search_user' => '',               // Filter by this user name
 			'show_closed_threads' => false,    // Show closed conversations
+			'only_sql' => false,               // TRUE - to return only SQL object, FALSE - Results object
 		), $params );
 
 
@@ -673,6 +689,11 @@ function get_threads_results( $params = array() )
 	if( !empty( $filter_sql ) )
 	{	// Filter
 		$count_SQL->WHERE_and( $filter_sql );
+	}
+
+	if( $params['only_sql'] )
+	{	// Return only SQL object
+		return $select_SQL;
 	}
 
 	// Create result set:
@@ -1374,6 +1395,127 @@ function get_unread_messages_count( $user_ID = 0 )
 
 
 /**
+ * Get the first ( oldest ) unread message of the user
+ * 
+ * @param integer user ID
+ * @return mixed NULL if the user doesn't have unread messages, or the oldest unread message datetime otherwise
+ */
+function get_first_unread_message_date( $user_ID )
+{
+	if( empty( $user_ID ) )
+	{	// Current user
+		if( !is_logged_in() )
+		{
+			return NULL;
+		}
+		global $current_User;
+		$user_ID = $current_User->ID;
+	}
+
+	global $DB;
+
+	$SQL = new SQL();
+	$SQL->SELECT( 'min( msg_datetime )' );
+	$SQL->FROM( 'T_messaging__threadstatus ts' );
+	$SQL->FROM_add( 'INNER JOIN T_messaging__message mu
+				ON ts.tsta_first_unread_msg_ID = mu.msg_ID' );
+	$SQL->WHERE( 'ts.tsta_first_unread_msg_ID IS NOT NULL' );
+	$SQL->WHERE_and( 'ts.tsta_thread_leave_msg_ID IS NULL OR ts.tsta_first_unread_msg_ID <= ts.tsta_thread_leave_msg_ID' );
+	$SQL->WHERE_and( 'ts.tsta_user_ID = '.$DB->quote( $user_ID ) );
+
+	return $DB->get_var( $SQL->get() );
+}
+
+
+/**
+ * Get next 'Unread message reminder' datetime information for the given user. This is used on the user admin settings form.
+ *
+ * @param integer user ID
+ * @result mixed string with the info field content if additional note is not required, and array( info, note ) otherwise
+ */
+function get_next_reminder_info( $user_ID )
+{
+	global $UserSettings, $DB, $servertimenow, $unread_message_reminder_delay, $unread_messsage_reminder_threshold;
+
+	if( ! $UserSettings->get( 'notify_unread_messages', $user_ID ) )
+	{ // The user doesn't want to recive unread messages reminders
+		return T_('This user doesn\'t want to receive notification emails about unread messages.');
+	}
+
+	$first_unread_message_date = get_first_unread_message_date( $user_ID );
+	if( empty( $first_unread_message_date ) )
+	{ // The user doesn't have unread messages
+		return T_('This user doesn\'t have unread messages.');
+	}
+
+	// We assume that reminder is not delayed because of the user was not logged in since too many days
+	$reminder_is_delayed = false;
+	$last_unread_messages_reminder = $UserSettings->get( 'last_unread_messages_reminder', $user_ID );
+	if( empty( $last_unread_messages_reminder ) )
+	{ // User didn't get new message notification or unread message reminder yet
+		// Set reminder issue timestamp to one day after the first unread message was received
+		$reminder_issue_ts = strtotime( '+1 day', strtotime( $first_unread_message_date ) );
+	}
+	else
+	{ // Count next unread message reminder date, this can be delayed if the edited User didn't logged in since many days
+		$UserCache = & get_UserCache();
+		$edited_User = & $UserCache->get_by_ID( $user_ID );
+		$lastseen_ts = strtotime( $edited_User->get( 'lastseen_ts' ) );
+		$days_since_lastseen = floor(( $servertimenow - $lastseen_ts )/(60*60*24));
+		// Presuppose that the User was not logged in since so many days, that should not get reminder any more
+		$dont_send_reminder = true;
+		// Get the number of delayed days for that case when we have to space out the notifications
+		foreach( $unread_message_reminder_delay as $lastseen => $delay )
+		{ // Get the corresponding number of delay for the edited User
+			if( $days_since_lastseen < $lastseen )
+			{ // We have found the correct delay value, reminders should be sent
+				$dont_send_reminder = false;
+				break;
+			}
+			// The reminder is delayed because the user was not logged in since more days then the first key of the delay array
+			$reminder_is_delayed = true;
+		}
+		if( $dont_send_reminder )
+		{ // User was not logged in since too long
+			return sprintf( T_('The user has not logged in for %d days, so we will not send him notifications any more'), $days_since_lastseen );
+		}
+
+		// Set reminder issue timestamp to x days after the last unread message notification date, where x is the delay from the configuration array
+		$reminder_issue_ts = strtotime( '+'.$delay.' day', strtotime( $last_unread_messages_reminder ) );
+	}
+
+	if( $reminder_issue_ts > $servertimenow )
+	{ // The next reminder issue date is in the future
+		$time_left = seconds_to_period( $reminder_issue_ts - $servertimenow );
+		$info = sprintf( T_('%s left before next notification - sent by "Send reminders about unread messages" scheduled job'), $time_left );
+	}
+	else
+	{ // The next reminder issue date was in the past
+		$time_since = seconds_to_period( $servertimenow - $reminder_issue_ts );
+		$info = sprintf( T_('next notification pending since %s - check the "Send reminders about unread messages" scheduled job'), $time_since );
+	}
+
+	if( $reminder_is_delayed )
+	{ // Reminder is delayed, add a note about this
+		$note = sprintf( T_('The user has not logged in for %d days, so we will space out notifications by %d days.'), $days_since_lastseen, $delay );
+	}
+	elseif( empty( $last_unread_messages_reminder ) )
+	{ // The user didn't get unread messages reminder emails before
+		$note = sprintf( T_('The user has never received a notification yet, so the first notification is sent with %s delay'), seconds_to_period( $unread_messsage_reminder_threshold ) );
+	}
+	else
+	{ // Reminder is not delayed
+		reset( $unread_message_reminder_delay );
+		$lasstseen_threshold = key( $unread_message_reminder_delay );
+		$delay = $unread_message_reminder_delay[$lasstseen_threshold];
+		$note = sprintf( T_('The user has logged in in the last %d days, so we will space out notifications by %d days.'), $lasstseen_threshold, $delay );
+	}
+
+	return array( $info, $note );
+}
+
+
+/**
  * Mark a thread as read by the given user.
  * 
  * @param integer thread ID
@@ -1445,6 +1587,104 @@ function delete_orphan_threads( $user_ID = NULL )
 
 	$DB->rollback();
 	return false;
+}
+
+
+/**
+ * Get ID of previous/next thread
+ *
+ * @param integer Current thread ID
+ * @param string Type of url ('prev', 'next')
+ * @return integer Thread ID
+ */
+function get_thread_prevnext_ID( $current_thread_ID, $type = 'prev' )
+{
+	global $thread_prevnext_ids_cache;
+
+	if( empty( $current_thread_ID ) )
+	{
+		return false;
+	}
+
+	if( !isset( $thread_prevnext_ids_cache ) )
+	{	// Initialize list with threads IDs
+		global $DB;
+
+		$threads_SQL = get_threads_results( array(
+				'only_sql' => true
+			) );
+
+		$threads_SQL->SELECT( 'thrd_ID' );
+		$thread_prevnext_ids_cache = $DB->get_col( $threads_SQL->get() );
+	}
+
+	$side_thread_i = ( $type == 'prev' ) ? 1 : -1;
+	foreach( $thread_prevnext_ids_cache as $t => $thread_ID )
+	{
+		if( isset( $thread_prevnext_ids_cache[ $t + $side_thread_i ] ) && $thread_prevnext_ids_cache[ $t + $side_thread_i ] == $current_thread_ID )
+		{	// This thread is previous/next for current thread
+			return $thread_ID;
+		}
+	}
+}
+
+
+/**
+ * Get the links for previous/next threads
+ *
+ * @param integer Current thread ID
+ * @param string Type of url ('prev', 'next')
+ * @return integer Thread ID
+ */
+function get_thread_prevnext_links( $current_thread_ID, $params = array() )
+{
+	$params = array_merge( array(
+			'before'        => '<div class="floatright">',
+			'after'         => '</div>',
+			'title_text'    => T_('Conversations').': ',
+			'separator'     => ' :: ',
+			'previous_text' => '&laquo; '.T_('Previous'),
+			'next_text'     => T_('Next').' &raquo;',
+		), $params );
+
+	$prev_thread_ID = get_thread_prevnext_ID( $current_thread_ID, 'prev' );
+	if( !empty( $prev_thread_ID ) )
+	{	// Link to previous thread
+		$prev_link = '<a href="'.get_dispctrl_url( 'messages', 'thrd_ID='.$prev_thread_ID ).'">'.$params['previous_text'].'</a>';
+	}
+
+	$next_thread_ID = get_thread_prevnext_ID( $current_thread_ID, 'next' );
+	if( !empty( $next_thread_ID ) )
+	{	// Link to previous thread
+		$next_link = '<a href="'.get_dispctrl_url( 'messages', 'thrd_ID='.$next_thread_ID ).'">'.$params['next_text'].'</a>';
+	}
+
+	if( empty( $prev_link ) && empty( $next_link ) )
+	{	// No found previous and next threads
+		return;
+	}
+
+	$r = $params['before'];
+	$r .= $params['title_text'];
+
+	if( !empty( $prev_link ) )
+	{
+		$r .= $prev_link;
+	}
+
+	if( !empty( $prev_link ) && !empty( $next_link ) )
+	{
+		$r .= $params['separator'];
+	}
+
+	if( !empty( $next_link ) )
+	{
+		$r .= $next_link;
+	}
+
+	$r .= $params['after'];
+
+	return $r;
 }
 
 
@@ -1805,8 +2045,8 @@ function col_thread_delete_action( $thread_ID )
 
 /*
  * $Log$
- * Revision 1.22  2013/11/06 08:04:25  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.23  2013/11/06 09:08:58  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

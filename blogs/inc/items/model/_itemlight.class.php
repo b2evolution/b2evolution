@@ -175,6 +175,28 @@ class ItemLight extends DataObject
 
 
 	/**
+	 * Is this a Special post (Page, Intros, Podcast, Sidebar, Advertisement)
+	 *
+	 * @return boolean
+	 */
+	function is_special()
+	{
+		global $posttypes_perms;
+
+		foreach( $posttypes_perms as $permname => $posttypes )
+		{
+			if( in_array( $this->ptyp_ID, $posttypes ) )
+			{ // This post has special type
+				return true;
+			}
+		}
+
+		// No special post type
+		return false;
+	}
+
+
+	/**
 	 * Is this an Intro post
 	 *
 	 * @return boolean
@@ -333,13 +355,17 @@ class ItemLight extends DataObject
 	 */
 	function get_permanent_url( $permalink_type = '', $blogurl = '', $glue = '&amp;' )
 	{
-		global $DB, $cacheweekly, $Settings, $posttypes_specialtypes, $posttypes_nopermanentURL;
+		global $DB, $cacheweekly, $Settings, $posttypes_specialtypes, $posttypes_nopermanentURL, $posttypes_catpermanentURL;
 
 		if( in_array( $this->ptyp_ID, $posttypes_specialtypes ) ) // page, intros, sidebar
 		{	// This is not an "in stream" post:
 			if( in_array( $this->ptyp_ID, $posttypes_nopermanentURL ) )
 			{	// This type of post is not allowed to have a permalink:
 				$permalink_type = 'none';
+			}
+			if( in_array( $this->ptyp_ID, $posttypes_catpermanentURL ) )
+			{	// This post has a permanent URL as url to main chapter:
+				$permalink_type = 'cat';
 			}
 			else
 			{ // allowed to have a permalink:
@@ -367,6 +393,11 @@ class ItemLight extends DataObject
 				// Link to blog home:
 				$this->get_Blog();
 				return $this->Blog->gen_blogurl();
+
+			case 'cat':
+				// Link to permanent url of main chapter:
+				$this->get_main_Chapter();
+				return $this->main_Chapter->get_permanent_url( NULL, $blogurl, 1, NULL, $glue );
 
 			case 'single':
 			default:
@@ -1287,8 +1318,8 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
- * Revision 1.46  2013/11/06 08:04:15  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.47  2013/11/06 09:08:48  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

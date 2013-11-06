@@ -33,7 +33,7 @@ if( !empty( $Skin ) ) {
 
 if( !is_logged_in() )
 {
-	debug_die( "User must be logged in to see this page." );
+	debug_die( 'User must be logged in to see this page.' );
 }
 
 // Check minimum permission:
@@ -46,7 +46,7 @@ if( !empty($thrd_ID) )
 	{	// Thread doesn't exists with this ID
 		unset( $edited_Thread );
 		forget_param( 'thrd_ID' );
-		$Messages->add( 'The requested thread does not exist any longer.', 'error' );
+		$Messages->add( T_('The requested thread does not exist any longer.'), 'error' );
 	}
 	else if( ! $edited_Thread->check_thread_recipient( $current_User->ID ) )
 	{	// Current user is not recipient of this thread
@@ -76,7 +76,12 @@ $params = array_merge( array(
 	'form_action' => $samedomain_htsrv_url.'action.php?mname=messaging',
 	'form_name' => '',
 	'form_layout' => NULL,
-	'cols' => 35
+	'cols' => 35,
+	'display_navigation' => true,
+	'display_title' => true,
+	'messages_list_start' => '<div class="messages_list">',
+	'messages_list_end' => '</div>',
+	'messages_list_title' => T_('Previous messages in this conversation'),
 	), $params );
 
 // Display messages list:
@@ -89,8 +94,8 @@ if( isset( $edited_Thread ) )
 
 /*
  * $Log$
- * Revision 1.12  2013/11/06 08:05:36  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.13  2013/11/06 09:09:14  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

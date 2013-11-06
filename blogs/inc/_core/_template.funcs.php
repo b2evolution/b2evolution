@@ -394,6 +394,8 @@ function get_request_title( $params = array() )
 			'edit_text_update'    => T_('Editing post'),
 			'edit_text_copy'      => T_('Duplicating post'),
 			'edit_comment_text'   => T_('Editing comment'),
+			'front_text'          => '',		// We don't want to display a special title on the front page
+			'posts_text'          => '#',
 			'useritems_text'      => T_('User posts'),
 			'usercomments_text'   => T_('User comments'),
 		), $params );
@@ -503,7 +505,10 @@ function get_request_title( $params = array() )
 				$ThreadCache = & get_ThreadCache();
 				if( $Thread = $ThreadCache->get_by_ID( $thrd_ID, false ) )
 				{	// Thread exists and we get a title
-					$r[] = $Thread->title;
+					if( $params['auto_pilot'] == 'seo_title' )
+					{	// Display thread title only for tag <title>
+						$r[] = $Thread->title;
+					}
 				}
 				else
 				{	// Bad request with not existing thread
@@ -1288,6 +1293,30 @@ function init_voting_comment_js( $relative_to = 'rsc_url' )
 
 
 /**
+ * Registers headlines for initialization of colorpicker inputs
+ */
+function init_colorpicker_js( $relative_to = 'rsc_url' )
+{
+	require_js( '#jquery#', $relative_to );
+	require_js( 'jquery/jquery.farbtastic.min.js', $relative_to );
+	require_css( 'jquery/farbtastic/farbtastic.css' );
+	add_js_headline( 'jQuery(document).ready( function() {
+		jQuery( "body" ).append( "<div id=\"colorpicker\"></div>" );
+		var farbtastic_colorpicker = jQuery.farbtastic( "#colorpicker" );
+		jQuery( ".form_color_input" )
+			.each( function () { farbtastic_colorpicker.linkTo( this ); } )
+			.blur( function () { jQuery( "#colorpicker" ).hide(); } )
+			.focus( function () {
+				farbtastic_colorpicker.linkTo( this );
+				jQuery( "#colorpicker" ).css( {
+					top: jQuery( this ).offset().top - 90,
+					left: jQuery( this ).offset().left + jQuery( this ).width() + 15,
+				} ).show();
+			} );
+	} );' );
+}
+
+/**
  * Outputs the collected HTML HEAD lines.
  * @see add_headline()
  * @return string
@@ -1634,6 +1663,55 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 
 /**
+ * Check if the array given as the first param contains recursion
+ *
+ * @param array what to check
+ * @param array contains object which were already seen
+ * @return boolean true if contains recursion false otherwise
+ */
+function is_recursive( array & $array, array & $alreadySeen = array() )
+{
+    static $uniqueObject;
+    if( !$uniqueObject )
+    {
+        $uniqueObject = new stdClass;
+    }
+
+    // Set main array as already seen
+    $alreadySeen[] = & $array;
+
+    foreach( $array as & $item )
+    { // for each item in array
+        if( !is_array( $item ) )
+        { // if not array, we don't have to check it
+            continue;
+        }
+
+        // put the unique object into the end of the array
+        $item[] = $uniqueObject;
+        $recursionDetected = false;
+        foreach( $alreadySeen as $candidate )
+        {
+            if( end( $candidate ) === $uniqueObject )
+            { // In the end of an already scanned array is the same unique Obect, this means that recursion was detected
+                $recursionDetected = true;
+                break;
+            }
+        }
+
+        array_pop( $item );
+
+        if( $recursionDetected || is_recursive( $item, $alreadySeen ) )
+        { // Check until recursion detected or there are not more arrays 
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+/**
  * Display a form (like comment or contact form) through an ajax call
  *
  * @param array params
@@ -1641,6 +1719,13 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 function display_ajax_form( $params )
 {
 	global $rsc_uri, $samedomain_htsrv_url, $ajax_form_number;
+
+	if( is_recursive( $params ) )
+	{ // The params array contains recursion, don't try to encode, display error message instead
+		// We don't use translation because this situation should not really happen ( Probably it happesn with some wrong skin )
+		echo '<p style="color:red;font-weight:bold">'.T_( 'This section can\'t be displayed because wrong params were created by the skin.' ).'</p>';
+		return;
+	}
 
 	if( empty( $ajax_form_number ) )
 	{	// Set number for ajax form to use unique ID for each new form
@@ -2048,7 +2133,7 @@ function display_activateinfo( $params )
 
 	echo '<ol start="1" class="expanded">';
 	$instruction =  sprintf( T_('Open your email account for %s and find a message we sent you on %s at %s with the following title:'), $user_email, $last_email_date, $last_email_time );
-	echo '<li>'.$instruction.'<br /><b>'.sprintf( T_('Validate your email address for "%s"'), $current_User->login ).'</b>';
+	echo '<li>'.$instruction.'<br /><b>'.sprintf( T_('Activate your account: %s'), $current_User->login ).'</b>';
 	$request_validation_url = 'href="'.regenerate_url( '', 'force_request=1&validate_required=true&redirect_to='.$params[ 'redirect_to' ] ).'"';
 	echo '<p>'.sprintf( T_('NOTE: If you don\'t find it, check your "Junk", "Spam" or "Unsolicited email" folders. If you really can\'t find it, <a %s>request a new activation email</a>.'), $request_validation_url ).'</p></li>';
 	echo '<li>'.sprintf( T_('Add us (%s) to your contacts to make sure you receive future email notifications, especially when someone sends you a private message.'), '<b><span class="nowrap">'.$notification_email.'</span></b>').'</li>';
@@ -2248,8 +2333,8 @@ function display_login_validator( $params = array() )
 
 /*
  * $Log$
- * Revision 1.121  2013/11/06 08:03:47  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.122  2013/11/06 09:08:46  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

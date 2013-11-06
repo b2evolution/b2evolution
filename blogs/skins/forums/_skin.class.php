@@ -46,38 +46,36 @@ class forums_Skin extends Skin
 	 */
 	function get_param_definitions( $params )
 	{
-		$color_valid_pattern = array( 'pattern'=>'~^(#([a-f0-9]{3}){1,2})?$~i',
-																	'error'=>T_('Invalid color code.') );
 		$r = array_merge( array(
 				'head_bg_color' => array(
 					'label' => T_('Header Background Color'),
 					'note' => T_('E-g: #ff0000 for red'),
 					'defaultvalue' => '#03699C',
-					'valid_pattern' => $color_valid_pattern,
+					'type' => 'color',
 				),
 				'head_text_color' => array(
 					'label' => T_('Header Text Color'),
 					'note' => T_('E-g: #00ff00 for green'),
 					'defaultvalue' => '#FFFFFF',
-					'valid_pattern' => $color_valid_pattern,
+					'type' => 'color',
 				),
 				'menu_bg_color' => array(
 					'label' => T_('Menu Background Color'),
 					'note' => T_('E-g: #ff0000 for red'),
 					'defaultvalue' => '#74b4d4',
-					'valid_pattern' => $color_valid_pattern,
+					'type' => 'color',
 				),
 				'menu_text_color' => array(
 					'label' => T_('Menu Text Color'),
 					'note' => T_('E-g: #00ff00 for green'),
 					'defaultvalue' => '#000000',
-					'valid_pattern' => $color_valid_pattern,
+					'type' => 'color',
 				),
 				'footer_bg_color' => array(
 					'label' => T_('Footer Background Color'),
 					'note' => T_('E-g: #0000ff for blue'),
 					'defaultvalue' => '#DEE3E7',
-					'valid_pattern' => $color_valid_pattern,
+					'type' => 'color',
 				),
 				'display_post_date' => array(
 					'label' => T_('Post date'),
@@ -245,36 +243,42 @@ class forums_Skin extends Skin
 
 		$post_button = '';
 
+		$chapter_is_locked = false;
+
 		$write_new_post_url = $Blog->get_write_item_url( $chapter_ID );
 		if( $write_new_post_url != '' )
-		{	// Display button to write a new post
+		{ // Display button to write a new post
 			$post_button = '<a href="'.$write_new_post_url.'"><img src="img/post.gif" alt="'.T_('Post new topic').'" title="'.T_('Post new topic').'" /></a>';
 		}
 		else
-		{	// If a creating of new post is unavailable
+		{ // If a creating of new post is unavailable
 			$ChapterCache = & get_ChapterCache();
 			$current_Chapter = $ChapterCache->get_by_ID( $chapter_ID, false, false );
 
 			if( $current_Chapter && $current_Chapter->lock )
-			{	// Display icon to inform that this forum is locked
+			{ // Display icon to inform that this forum is locked
 				$post_button = '<img src="img/reply-locked.gif " alt="'.T_('This forum is locked: you cannot post, reply to, or edit topics.').'" title="'.T_('This forum is locked: you cannot post, reply to, or edit topics.').'" />';
+				$chapter_is_locked = true;
 			}
 		}
 
 		if( !empty( $Item ) )
 		{
 			if( $Item->comment_status == 'closed' || $Item->comment_status == 'disabled' || $Item->is_locked() )
-			{	// Display icon to inform that this topic is locked for comments
-				$post_button .= ' <img src="img/reply-locked.gif" alt="'.T_('This topic is locked: you cannot edit posts or make replies.').'" title="'.T_('This topic is locked: you cannot edit posts or make replies.').'" />';
+			{ // Display icon to inform that this topic is locked for comments
+				if( !$chapter_is_locked )
+				{ // Display this button only when chapter is not locked, to avoid a duplicate button
+					$post_button .= ' <img src="img/reply-locked.gif" alt="'.T_('This topic is locked: you cannot edit posts or make replies.').'" title="'.T_('This topic is locked: you cannot edit posts or make replies.').'" />';
+				}
 			}
 			else
-			{	// Display button to post a reply
+			{ // Display button to post a reply
 				$post_button .= ' <a href="'.$Item->get_feedback_url().'#form_p'.$Item->ID.'"><img src="img/reply.gif" alt="'.T_('Reply to topic').'" title="'.T_('Reply to topic').'" /></a>';
 			}
 		}
 
 		if( !empty( $post_button ) )
-		{	// Display button
+		{ // Display button
 			echo '<div class="post_button">';
 			echo $post_button;
 			echo '</div>';
@@ -391,8 +395,8 @@ class forums_Skin extends Skin
 
 /*
  * $Log$
- * Revision 1.2  2013/11/06 08:05:44  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.3  2013/11/06 09:09:14  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

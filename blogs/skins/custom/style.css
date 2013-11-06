@@ -391,3 +391,7 @@ div.input ul.token-input-list-facebook {
 	top: -13px;
 	left: 5px;
 }
+
+div.tabs div a {
+	border-color: #999;
+}

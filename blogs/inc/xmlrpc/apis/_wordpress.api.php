@@ -85,7 +85,7 @@ function wp_getauthors($m)
 	}
 
 	load_class( 'users/model/_userlist.class.php', 'UserList' );
-	$UserList = new UserList( '', NULL, 'u_', false, false, false, false );
+	$UserList = new UserList( '', NULL, 'u_', array( 'join_group' => false, 'join_session' => false, 'join_country' => false, 'join_city' => false ) );
 
 	// Run the query:
 	$UserList->query();
@@ -1548,8 +1548,8 @@ $xmlrpc_procs['wp.getMediaLibrary'] = array( // TODO
 
 /*
  * $Log$
- * Revision 1.18  2013/11/06 08:05:10  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.19  2013/11/06 09:09:09  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

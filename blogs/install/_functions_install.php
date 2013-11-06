@@ -217,7 +217,7 @@ function install_newdb()
  */
 function task_begin( $title )
 {
-	echo $title;
+	echo $title."\n";
 	flush();
 }
 
@@ -907,7 +907,7 @@ function do_install_htaccess( $upgrade = false )
 				$error_message = '<p class="red">'.T_('There is already a file called .htaccess at the blog root. If you don\'t specifically need this file, it is recommended that you delete it or rename it to old.htaccess before you continue. This will allow b2evolution to create a new .htaccess file that is optimized for best results.').'</p>';
 				$error_message .= T_('Here are the contents of the current .htaccess file:');
 				$error_message .= '<div style="overflow:auto"><pre>'.htmlspecialchars( $content_htaccess ).'</pre></div><br />';
-				$error_message .= sprintf( T_('Again, we recommend you remove this file before continuing. If you chose to keep it, b2evolution will probably still work, but for optimization you should follow <a %s>these instructions</a>.'), 'href="http://manual.b2evolution.net/Htaccess_file" target="_blank"');
+				$error_message .= sprintf( T_('Again, we recommend you remove this file before continuing. If you chose to keep it, b2evolution will probably still work, but for optimization you should follow <a %s>these instructions</a>.'), 'href="http://b2evolution.net/man/htaccess-file" target="_blank"');
 				return $error_message;
 			}
 			else
@@ -968,10 +968,4 @@ function get_antispam_query()
 	return $r;
 }
 
-/*
- * $Log$
- * Revision 1.109  2013/11/06 08:05:19  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

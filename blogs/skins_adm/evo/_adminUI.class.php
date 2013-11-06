@@ -60,6 +60,10 @@ class AdminUI extends AdminUI_general
 		{
 			require_css( 'admin_global_ie.css', 'rsc_url' );
 		}
+		// CSS for IE9
+		add_headline( '<!--[if IE 9 ]>' );
+		require_css( 'ie9.css', 'rsc_url' );
+		add_headline( '<![endif]-->' );
 
 		require_js( '#jquery#', 'rsc_url' );
 		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
@@ -198,8 +202,8 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
- * Revision 1.43  2013/11/06 08:05:52  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.44  2013/11/06 09:09:29  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

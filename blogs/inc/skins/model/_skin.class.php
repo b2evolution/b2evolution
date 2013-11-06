@@ -162,6 +162,13 @@ class Skin extends DataObject
 		// Loop through all widget params:
 		foreach( $this->get_param_definitions( array('for_editing'=>true) ) as $parname => $parmeta )
 		{
+			if( isset( $parmeta['type'] ) && $parmeta['type'] == 'color' && empty( $parmeta['valid_pattern'] ) )
+			{ // Set default validation for color fields
+				$parmeta['valid_pattern'] = array(
+						'pattern' => '~^(#([a-f0-9]{3}){1,2})?$~i',
+						'error'   => T_('Invalid color code.')
+					);
+			}
 			autoform_set_param_from_request( $parname, $parmeta, $this, 'Skin' );
 		}
 	}
@@ -813,6 +820,8 @@ class Skin extends DataObject
 					'fieldend' => '</span>'.get_icon( 'pixel' )."\n",
 					'buttonsstart' => '',
 					'buttonsend' => "\n",
+					'customstart' => '',
+					'customend' => "\n",
 					'formend' => '',
 				);
 		}
@@ -824,8 +833,8 @@ class Skin extends DataObject
 
 /*
  * $Log$
- * Revision 1.37  2013/11/06 08:04:45  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.38  2013/11/06 09:08:59  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

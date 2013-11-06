@@ -33,6 +33,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 {
 	global $DB, $test_install_all_features;
+	global $events_blog_ID;
 
 	$default_blog_param = 's:7:"blog_ID";s:0:"";';
 	if( $initial_install )
@@ -164,7 +165,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		$DB->query( $widgets_insert_sql.implode( ', ', $widgets_insert_sql_rows ) );
 
 		/* Item Single */
-		if( ( $blog_id == 1 || $kind == 'manual' ) && $test_install_all_features )
+		if( ( $blog_id == 1 || ( !empty( $events_blog_ID ) && $blog_id == $events_blog_ID ) ) && $test_install_all_features )
 		{
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code)
 								VALUES( '.$blog_id.', "Item Single", 1, "plugin", "evo_Gmaps")' );
@@ -272,8 +273,8 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 /*
  * $Log$
- * Revision 1.15  2013/11/06 08:05:04  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.16  2013/11/06 09:09:09  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

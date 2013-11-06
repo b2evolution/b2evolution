@@ -695,6 +695,11 @@ class UserList extends DataObjectList2
 	{
 		global $Session;
 
+		if( empty( $this->cols ) )
+		{ // The columns are not defined yet, Exit here
+			return;
+		}
+
 		// Force filter param to reset the previous filters
 		set_param( 'filter', 'new' );
 
@@ -710,6 +715,7 @@ class UserList extends DataObjectList2
 
 		// Rewrite a previous order to new value
 		$this->filters['order'] = str_repeat( '-', $col_num ).$direction;
+		$this->order = $this->filters['order'];
 
 		// Save a new order
 		$Session->set( $this->filterset_name, $this->filters );
@@ -720,8 +726,8 @@ class UserList extends DataObjectList2
 
 /*
  * $Log$
- * Revision 1.2  2013/11/06 08:05:03  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.3  2013/11/06 09:08:59  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

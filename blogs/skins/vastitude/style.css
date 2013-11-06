@@ -197,6 +197,7 @@ h3.blogname {padding-bottom:5px;}
 
 .leftside form {padding:0; margin-left:0;}
 .leftside form.bComment, fieldset {border:none;}
+.leftside .messages_list form.bComment, fieldset {border: 1px solid #BBB;}
 
 div.bCommentTitle {background-color:#4b3528; margin:0px -10px; padding-left:10px; padding-bottom:5px; border-bottom:1px solid #9e7d55;}
 div.bCommentTitle img {vertical-align:middle;margin-left:5px;padding-bottom:2px;}
@@ -331,4 +332,20 @@ div.input ul.token-input-list-facebook {
 #styled_content_block .bSmallHead .status_protected,
 #styled_content_block .bSmallHead .status_private {
 	top: -40px;
+}
+
+form#user_checkchanges.bComment {
+	border-width: 1px;
+}
+div.tabs div a {
+	border-color: #D8C19A;
+	background-color: #2f2118;
+	color: #997340;
+}
+div.tabs div.selected a, div.tabs div:hover a {
+	background-color: transparent;
+	color: #D8C19A;
+}
+div.tabs div.selected a {
+	border-bottom-color: #895c46;
 }

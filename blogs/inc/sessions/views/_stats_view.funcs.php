@@ -46,7 +46,7 @@ function hits_results( & $Results, $params = array() )
 	$filter_presets['all'] = array( T_('All'), isset( $preset_filter_all_url ) ? $preset_filter_all_url : '?ctrl=stats&amp;tab=hits&amp;blog='.$blog );
 	if( !isset( $preset_referer_type ) )
 	{	// Show these presets only when referer type is not set
-		$filter_presets['all_but_curr'] = array( T_('All but current session'), '?ctrl=stats&amp;tab=hits&amp;blog='.$blog.'&amp;blog=0&amp;sess_ID='.$Session->ID.'&amp;exclude=1' );
+		$filter_presets['all_but_curr'] = array( T_('All but current session'), '?ctrl=stats&amp;tab=hits&amp;blog='.$blog.'&amp;sess_ID='.$Session->ID.'&amp;exclude=1' );
 		$filter_presets['direct_hits'] = array( T_('Direct hits'), '?ctrl=stats&amp;agent_type=browser&amp;tab=hits&amp;blog='.$blog.'&amp;referer_type=direct&amp;exclude=0' );
 		$filter_presets['refered_hits'] = array( T_('Refered hits'), '?ctrl=stats&amp;agent_type=browser&amp;tab=hits&amp;blog='.$blog.'&amp;referer_type=referer&amp;exclude=0' );
 	}
@@ -516,8 +516,8 @@ function hit_referer_type_color($hit_referer_type)
 }
 /*
  * $Log$
- * Revision 1.23  2013/11/06 08:04:45  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.24  2013/11/06 09:08:59  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

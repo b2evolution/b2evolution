@@ -67,6 +67,8 @@ function dbm_delete_pagecache()
 			{
 				$Messages->add( sprintf( T_('Could not delete blog %d cache: %s'), $l_blog, $cache_path.'c'.$l_blog ), 'error' );
 			}
+			// Create .htaccess file with deny rules
+			create_htaccess_deny( $cache_path.'c'.$l_blog.'/' );
 		}
 	}
 
@@ -513,12 +515,4 @@ function dbm_analyze_tables( $display_messages = true, $separate_tables = true )
 
 	return $analyze_results;
 }
-
-
-/*
- * $Log$
- * Revision 1.1  2013/11/06 08:04:54  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -97,7 +97,7 @@ class coll_item_list_Widget extends ComponentWidget
 					'label' => T_('Follow Main List'),
 					'note' => T_('Do you want to restrict to contents related to what is displayed in the main area?'),
 					'type' => 'radio',
-					'options' => array( array ('no', T_('No') ), 
+					'options' => array( array ('no', T_('No') ),
 										array ('tags', T_('By tags') ) ), // may be extended
 					'defaultvalue' => 'no',
 				),
@@ -117,7 +117,7 @@ class coll_item_list_Widget extends ComponentWidget
 					'label' => T_('Group by'),
 					'note' => T_('Do you want to group the Items?'),
 					'type' => 'radio',
-					'options' => array( array( 'none', T_('None') ), 
+					'options' => array( array( 'none', T_('None') ),
 										array( 'chapter', T_('By category/chapter') ) ),
 					'defaultvalue' => 'none',
 				),
@@ -132,7 +132,7 @@ class coll_item_list_Widget extends ComponentWidget
 					'label' => T_('Direction'),
 					'note' => T_('How to sort the items'),
 					'type' => 'radio',
-					'options' => array( array( 'ASC', T_('Ascending') ), 
+					'options' => array( array( 'ASC', T_('Ascending') ),
 										array( 'DESC', T_('Descending') ) ),
 					'defaultvalue' => 'DESC',
 				),
@@ -165,8 +165,8 @@ class coll_item_list_Widget extends ComponentWidget
 					'note' => '',
 					'type' => 'radio',
 					'options' => array(
-							array( 'none', T_('None') ), 
-							array( 'first', T_('Display first') ), 
+							array( 'none', T_('None') ),
+							array( 'first', T_('Display first') ),
 							array( 'all', T_('Display all') ) ),
 					'defaultvalue' => 'none',
 				),
@@ -315,7 +315,7 @@ class coll_item_list_Widget extends ComponentWidget
 			}
 
 			$filters['tags'] = implode(',',$all_tags);
-			
+
 			if( !empty($Item) )
 			{	// Exclude current Item
 				$filters['post_ID'] = '-'.$Item->ID;
@@ -443,7 +443,7 @@ class coll_item_list_Widget extends ComponentWidget
 	 * @param Item
 	 * @return boolean TRUE - if content is displayed
 	 */
-	function disp_contents( & $Item )
+	function disp_contents( & $disp_Item )
 	{
 		// Check if only the title was displayed before the first picture
 		$displayed_only_title = false;
@@ -453,10 +453,23 @@ class coll_item_list_Widget extends ComponentWidget
 
 		echo $this->disp_params['item_start'];
 
+		// Is this the current item?
+		global $disp, $Item;
+		if( !empty($Item) && $disp_Item->ID == $Item->ID )
+		{	// The current page is currently displaying the Item this link is pointing to
+			// Let's display it as selected
+			$link_class = $this->disp_params['link_selected_class'];
+		}
+		else
+		{	// Default link class
+			$link_class = $this->disp_params['link_default_class'];
+		}
+
 		if( $this->disp_params[ 'disp_title' ] )
 		{	// Display title
-			$Item->title( array(
-					'link_type' => $this->disp_params['item_title_link_type'],
+			$disp_Item->title( array(
+					'link_type'  => $this->disp_params['item_title_link_type'],
+					'link_class' => $link_class,
 				) );
 			$displayed_only_title = true;
 			$content_is_displayed = true;
@@ -464,7 +477,7 @@ class coll_item_list_Widget extends ComponentWidget
 
 		if( $this->disp_params[ 'disp_excerpt' ] )
 		{
-			$excerpt = $Item->dget( 'excerpt', 'htmlbody' );
+			$excerpt = $disp_Item->dget( 'excerpt', 'htmlbody' );
 			if( !empty($excerpt) )
 			{	// Note: Excerpts are plain text -- no html (at least for now)
 				echo '<div class="item_excerpt">'.$excerpt.'</div>';
@@ -475,12 +488,12 @@ class coll_item_list_Widget extends ComponentWidget
 
 		if( $this->disp_params['disp_teaser'] )
 		{ // we want to show some or all of the post content
-			$content = $Item->get_content_teaser( 1, false, 'htmlbody' );
+			$content = $disp_Item->get_content_teaser( 1, false, 'htmlbody' );
 
 			if( $words = $this->disp_params['disp_teaser_maxwords'] )
 			{ // limit number of words
 				$content = strmaxwords( $content, $words, array(
-						'continued_link' => $Item->get_permanent_url(),
+						'continued_link' => $disp_Item->get_permanent_url(),
 						'continued_text' => '&hellip;',
 					 ) );
 			}
@@ -490,7 +503,7 @@ class coll_item_list_Widget extends ComponentWidget
 
 			/* fp> does that really make sense?
 				we're no longer in a linkblog/linkroll use case here, are we?
-			$Item->more_link( array(
+			$disp_Item->more_link( array(
 					'before'    => '',
 					'after'     => '',
 					'link_text' => T_('more').' &raquo;',
@@ -501,7 +514,7 @@ class coll_item_list_Widget extends ComponentWidget
 		if( in_array( $this->disp_params[ 'attached_pics' ], array( 'first', 'all' ) ) )
 		{	// Display attached pictures
 			$picture_limit = $this->disp_params[ 'attached_pics' ] == 'first' ? 1 : 1000;
-			$LinkOnwer = new LinkItem( $Item );
+			$LinkOnwer = new LinkItem( $disp_Item );
 			if( $FileList = $LinkOnwer->get_attachment_FileList( $picture_limit ) )
 			{	// Get list of attached files
 				while( $File = & $FileList->get_next() )
@@ -515,16 +528,16 @@ class coll_item_list_Widget extends ComponentWidget
 								break;
 
 							case 'permalink':
-								$pic_url = $Item->get_permanent_url();
+								$pic_url = $disp_Item->get_permanent_url();
 								break;
 
 							case 'linkto_url':
-								$pic_url = $Item->url;
+								$pic_url = $disp_Item->url;
 								break;
 
 							case 'auto':
 							default:
-								$pic_url = ( empty( $Item->url ) ? $Item->get_permanent_url() : $Item->url );
+								$pic_url = ( empty( $disp_Item->url ) ? $disp_Item->get_permanent_url() : $disp_Item->url );
 								break;
 						}
 
@@ -568,8 +581,8 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
- * Revision 1.36  2013/11/06 08:05:09  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.37  2013/11/06 09:09:09  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

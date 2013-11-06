@@ -18,7 +18,7 @@ global $user_ID, $viewed_User, $display_params, $user_ItemList;
 // Default params:
 $params = array_merge( array(
 		'user_itemlist_title'      => T_('Posts created by %s'),
-		'user_itemlist_no_results' => T_('User has no own created posts'),
+		'user_itemlist_no_results' => T_('User has not created any posts'),
 	), $params );
 
 

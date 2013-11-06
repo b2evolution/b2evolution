@@ -46,38 +46,36 @@ class manual_Skin extends Skin
 	 */
 	function get_param_definitions( $params )
 	{
-		$color_valid_pattern = array( 'pattern'=>'~^(#([a-f0-9]{3}){1,2})?$~i',
-																	'error'=>T_('Invalid color code.') );
 		$r = array_merge( array(
 				'head_bg_color' => array(
 					'label' => T_('Header Background Color'),
 					'note' => T_('E-g: #ff0000 for red'),
 					'defaultvalue' => '#03699C',
-					'valid_pattern' => $color_valid_pattern,
+					'type' => 'color',
 				),
 				'head_text_color' => array(
 					'label' => T_('Header Text Color'),
 					'note' => T_('E-g: #00ff00 for green'),
 					'defaultvalue' => '#FFFFFF',
-					'valid_pattern' => $color_valid_pattern,
+					'type' => 'color',
 				),
 				'menu_bg_color' => array(
 					'label' => T_('Menu Background Color'),
 					'note' => T_('E-g: #ff0000 for red'),
 					'defaultvalue' => '#74b4d4',
-					'valid_pattern' => $color_valid_pattern,
+					'type' => 'color',
 				),
 				'menu_text_color' => array(
 					'label' => T_('Menu Text Color'),
 					'note' => T_('E-g: #00ff00 for green'),
 					'defaultvalue' => '#000000',
-					'valid_pattern' => $color_valid_pattern,
+					'type' => 'color',
 				),
 				'footer_bg_color' => array(
 					'label' => T_('Footer Background Color'),
 					'note' => T_('E-g: #0000ff for blue'),
 					'defaultvalue' => '#DEE3E7',
-					'valid_pattern' => $color_valid_pattern,
+					'type' => 'color',
 				),
 				'colorbox' => array(
 					'label' => T_('Colorbox Image Zoom'),

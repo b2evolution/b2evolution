@@ -1047,6 +1047,8 @@ class AdminUI_general extends Menu
 					'fieldend' => '</span>'.get_icon( 'pixel' )."\n",
 					'buttonsstart' => '',
 					'buttonsend' => "\n",
+					'customstart' => '',
+					'customend' => "\n",
 					'formend' => '',
 				);
 
@@ -1058,7 +1060,7 @@ class AdminUI_general extends Menu
 					'formstart' => '',
 					'title_fmt' => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
 					'no_title_fmt' => '<span style="float:right">$global_icons$</span>'."\n",
-					'fieldset_begin' => '<div class="fieldset_wrapper$class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$>'."\n"
+					'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$>'."\n"
 															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
 					'fieldset_end' => '</fieldset></div>'."\n",
 					'fieldstart' => '<fieldset $ID$>'."\n",
@@ -1071,6 +1073,8 @@ class AdminUI_general extends Menu
 					'fieldend' => "</fieldset>\n\n",
 					'buttonsstart' => '<fieldset><div class="input">',
 					'buttonsend' => "</div></fieldset>\n\n",
+					'customstart' => '<div class="custom_content">',
+					'customend' => "</div>\n",
 					'formend' => '',
 				);
 
@@ -1441,8 +1445,8 @@ class AdminUI_general extends Menu
 
 /*
  * $Log$
- * Revision 1.120  2013/11/06 08:05:49  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.121  2013/11/06 09:09:29  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

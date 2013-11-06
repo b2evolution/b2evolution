@@ -47,7 +47,7 @@ global $UserSettings;
  */
 global $DB;
 
-global $collections_Module, $admin_url;
+global $collections_Module, $admin_url, $action;
 
 if( !isset( $display_params ) )
 { // init display_params
@@ -76,12 +76,6 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 	$UserList->global_icon( T_('Create a new group...'), 'new', '?ctrl=groups&amp;action=new', T_('Add group').' &raquo;', 3, 4 );
 }
 
-
-global $action;
-if( $action == 'show_recent' )
-{	// Sort an users list by "Registered" field
-	$UserList->set_order( 'user_created_datetime' );
-}
 
 $UserList->set_default_filters( $default_filters );
 $UserList->load_from_Request();
@@ -427,6 +421,11 @@ else
 					);
 }
 
+if( $action == 'show_recent' )
+{ // Sort an users list by "Registered" field
+	$UserList->set_order( 'user_created_datetime' );
+}
+
 // Execute query
 $UserList->query();
 
@@ -473,8 +472,8 @@ load_funcs( 'users/model/_user_js.funcs.php' );
 
 /*
  * $Log$
- * Revision 1.46  2013/11/06 08:05:04  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.47  2013/11/06 09:09:09  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

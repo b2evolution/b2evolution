@@ -38,7 +38,7 @@ load_funcs('tools/model/_email.funcs.php');
 
 param_action();
 
-$tab = param( 'tab', 'string', 'sent', true );
+$tab = param( 'tab', 'string', 'blocked', true );
 
 param( 'action', 'string' );
 
@@ -82,6 +82,17 @@ switch( $action )
 		$sender_name = param( 'notification_sender_name', 'string', '' );
 		param_check_not_empty( 'notification_sender_name' );
 		$Settings->set( 'notification_sender_name',  $sender_name );
+
+		// Site short name
+		$short_name = param( 'notification_short_name', 'string', '' );
+		param_check_not_empty( 'notification_short_name' );
+		$Settings->set( 'notification_short_name',  $short_name );
+
+		// Site long name
+		$Settings->set( 'notification_long_name',  param( 'notification_long_name', 'string', '' ) );
+
+		// Site logo url
+		$Settings->set( 'notification_logo',  param( 'notification_logo', 'string', '' ) );
 
 		/** Settings to decode the returned emails **/
 		param( 'repath_enabled', 'boolean', 0 );
@@ -254,8 +265,7 @@ switch( $action )
 }
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system' );
-$AdminUI->breadcrumbpath_add( T_('Email'), '?ctrl=email' );
+$AdminUI->breadcrumbpath_add( T_('Emails'), '?ctrl=email' );
 
 switch( $tab )
 {
@@ -279,7 +289,7 @@ switch( $tab )
 		break;
 
 	case 'return':
-		$AdminUI->breadcrumbpath_add( T_('Return Path'), '?ctrl=email&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( T_('Returned'), '?ctrl=email&amp;tab='.$tab );
 		if( empty( $emret_ID ) )
 		{	// Init datepicker css on list page
 			require_css( 'ui.datepicker.css' );
@@ -291,7 +301,7 @@ switch( $tab )
 		break;
 }
 
-$AdminUI->set_path( 'options', 'email', $tab );
+$AdminUI->set_path( 'email', $tab );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -367,8 +377,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.2  2013/11/06 08:04:54  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.3  2013/11/06 09:08:59  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

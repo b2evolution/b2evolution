@@ -1,0 +1,79 @@
+<?php
+/**
+ * This is sent to ((Users)) and/or ((Moderators)) to notify them that a new post has been posted.
+ *
+ * For more info about email skins, see: http://b2evolution.net/man/themes-templates-skins/email-skins/
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ *
+ * @version $Id$
+ */
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+// ---------------------------- EMAIL HEADER INCLUDED HERE ----------------------------
+emailskin_include( '_email_header.inc.html.php', $params );
+// ------------------------------- END OF EMAIL HEADER --------------------------------
+
+global $admin_url, $baseurl, $htsrv_url;
+
+// Default params:
+$params = array_merge( array(
+		'locale'         => '',
+		'notify_full'    => '',
+		'Item'           => NULL,
+		'recipient_User' => NULL,
+	), $params );
+
+
+$recipient_User = $params['recipient_User'];
+$Item = $params['Item'];
+$Blog = & $Item->get_Blog();
+
+if( $params['notify_full'] )
+{	/* Full notification */
+	echo '<p>'.T_('Blog').': '.get_link_tag( $Blog->gen_blogurl(), $Blog->get('shortname') )."</p>\n";
+
+	echo '<p>'.T_('Author').': '.$Item->creator_User->get_colored_login( array( 'mask' => '$avatar$ $login$' ) ).' ('.$Item->creator_User->get('login').")</p>\n";
+
+	echo '<p>'.T_('Title').': '.$Item->get('title')."</p>\n";
+
+	// linked URL or "-" if empty:
+	echo '<p>'.T_('Url').': '.( empty( $Item->url ) ? '-' : get_link_tag( $Item->get('url') ) )."</p>\n";
+
+	// Content:
+	echo '<div class="email_ugc">'."\n";
+	echo '<p>'.nl2br( $Item->get('content') ).'</p>';
+	echo "</div>\n";
+
+}
+else
+{ /* Short notification */
+	echo '<p>'.sprintf( T_( '%s created a new post on %s with title %s.' ), $Item->creator_User->get_colored_login( array( 'mask' => '$avatar$ $login$' ) ), '<b>'.$Blog->get('shortname').'</b>', '<b>'.$Item->get('title').'</b>' )."</p>\n";
+}
+
+// Buttons:
+
+echo '<div class="buttons">'."\n";
+
+echo get_link_tag( $Item->get_permanent_url( '', '', '&' ), T_( 'View post' ), 'button_green' )."\n";
+
+if( $recipient_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+{ // User has permission to edit this post
+	echo get_link_tag( $admin_url.'?ctrl=items&blog='.$Item->get_blog_ID().'&p='.$Item->ID, T_('Edit post'), 'button_yellow' )."\n";
+}
+
+echo "</div>\n";
+
+
+
+// Footer vars:
+$params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notifications about new posts on this blog, click here:' )
+			.' <a href="'.$htsrv_url.'quick_unsubscribe.php?type=coll_post&user_ID=$user_ID$&coll_ID='.$Blog->ID.'&key=$unsubscribe_key$">'
+			.T_('instant unsubscribe').'</a>.';
+
+// ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
+emailskin_include( '_email_footer.inc.html.php', $params );
+// ------------------------------- END OF EMAIL FOOTER --------------------------------
+?>

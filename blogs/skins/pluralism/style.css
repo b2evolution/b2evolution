@@ -389,6 +389,9 @@ div.comment_notification p, div.feedback_feed_msg p {
 	text-align: center;
 	padding: 0 10px;
 }
+div.messages_list {
+	margin-top: 50px;
+}
 
 /* Not published comments display */
 #styled_content_block .bComment .status_draft,

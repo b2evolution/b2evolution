@@ -531,7 +531,9 @@ class Table extends Widget
 
 		$option_name = $this->param_prefix.'filters';
 
-		$this->display_option_area( $option_name, 'filter_area', T_('Filters'), T_('Filter list'), 'expanded' );
+		$submit_title = !empty( $this->filter_area['submit_title'] ) ? $this->filter_area['submit_title'] : T_('Filter list');
+
+		$this->display_option_area( $option_name, 'filter_area', T_('Filters'), $submit_title, 'expanded' );
 	}
 
 
@@ -1107,8 +1109,8 @@ class Table extends Widget
 
 /*
  * $Log$
- * Revision 1.26  2013/11/06 08:03:47  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.27  2013/11/06 09:08:46  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

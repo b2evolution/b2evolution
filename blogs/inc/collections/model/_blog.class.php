@@ -2885,9 +2885,10 @@ class Blog extends DataObject
 	 * @param integer Category ID
 	 * @param string Post title
 	 * @param string Post urltitle
+	 * @param string Post type
 	 * @return string Url to write a new Post
 	 */
-	function get_write_item_url( $cat_ID = 0, $post_title = '', $post_urltitle = '' )
+	function get_write_item_url( $cat_ID = 0, $post_title = '', $post_urltitle = '', $post_type = '' )
 	{
 		$url = '';
 
@@ -2924,12 +2925,16 @@ class Blog extends DataObject
 				}
 
 				if( !empty( $post_title ) )
-				{	// Append a post title
+				{ // Append a post title
 					$url = url_add_param( $url, 'post_title='.$post_title );
 				}
 				if( !empty( $post_urltitle ) )
-				{	// Append a post urltitle
+				{ // Append a post urltitle
 					$url = url_add_param( $url, 'post_urltitle='.$post_urltitle );
+				}
+				if( !empty( $post_type ) )
+				{ // Append a post type
+					$url = url_add_param( $url, 'post_type='.$post_type );
 				}
 			}
 		}
@@ -3014,8 +3019,8 @@ class Blog extends DataObject
 
 /*
  * $Log$
- * Revision 1.167  2013/11/06 08:03:57  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.168  2013/11/06 09:08:47  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

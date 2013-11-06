@@ -51,9 +51,6 @@ $CommentCache = & get_CommentCache();
  */
 $edited_Comment = & $CommentCache->get_by_ID( $comment_ID );
 
-// Load required functions ( we need to load here, because in CLI mode it is not loaded )
-load_funcs( '_core/_url.funcs.php' );
-
 // Send email notifications now!
 $edited_Comment->send_email_notifications( false, $except_moderators );
 
@@ -73,8 +70,8 @@ return 1; /* ok */
 
 /*
  * $Log$
- * Revision 1.3  2013/11/06 08:04:07  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.4  2013/11/06 09:08:47  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

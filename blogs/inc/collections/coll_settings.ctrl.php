@@ -178,8 +178,8 @@ switch( $action )
 						$edited_Blog->dbupdate();
 						$Messages->add( T_('The blog skin has been changed.')
 											.' <a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$edited_Blog->ID.'">'.T_('Edit...').'</a>', 'success' );
-						if( ( !$Session->is_mobile_session() && !$Session->is_tablet_session() && param( 'normal_skin_ID', 'integer', NULL ) !== NULL ) || 
-						    ( $Session->is_mobile_session() && param( 'mobile_skin_ID', 'integer', NULL ) !== NULL ) || 
+						if( ( !$Session->is_mobile_session() && !$Session->is_tablet_session() && param( 'normal_skin_ID', 'integer', NULL ) !== NULL ) ||
+						    ( $Session->is_mobile_session() && param( 'mobile_skin_ID', 'integer', NULL ) !== NULL ) ||
 						    ( $Session->is_tablet_session() && param( 'tablet_skin_ID', 'integer', NULL ) !== NULL ) )
 						{	// Redirect to blog home page if we change the skin for current device type
 							header_redirect( $edited_Blog->gen_blogurl() );
@@ -310,7 +310,7 @@ switch( $action )
 		$edited_Blog->init_by_kind( $type, $edited_Blog->get( 'name' ), $edited_Blog->get( 'shortname' ), $edited_Blog->get( 'urlname' ) );
 		$edited_Blog->dbupdate();
 
-		$Messages->add( T_('The blog type has been updated'), 'success' );
+		$Messages->add( T_('The collection type has been updated'), 'success' );
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( $update_redirect_url, 303 ); // Will EXIT
 
@@ -367,6 +367,7 @@ switch( $AdminUI->get_path(1) )
 		}
 		else
 		{
+			init_colorpicker_js();
 			$AdminUI->breadcrumbpath_add( T_('Settings for current skin'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 		}
 		break;
@@ -486,8 +487,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.46  2013/11/06 08:03:57  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.47  2013/11/06 09:08:47  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

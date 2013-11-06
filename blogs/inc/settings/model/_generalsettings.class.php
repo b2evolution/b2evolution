@@ -72,6 +72,9 @@ class GeneralSettings extends AbstractSettings
 		'notification_sender_email' => '', // notification emails will be sent from this email. The real default value is set in the constructor.
 		'notification_return_path' => '', // erroneous emails will be sent to this email address. The real default value is set in the constructor.
 		'notification_sender_name' => 'b2evo mailer', // notification emails will be sent with this sender name
+		'notification_short_name' => 'This site', // notification emails will use this as short site name
+		'notification_long_name' => '', // notification emails will use this as long site name
+		'notification_logo' => '', // notification emails will use this as url to site logo
 
 		'fm_enable_create_dir' => '1',
 		'fm_enable_create_file' => '1',
@@ -110,7 +113,7 @@ class GeneralSettings extends AbstractSettings
 		'def_notify_messages' => '1',
 		'def_notify_unread_messages' => '1',
 		'def_notify_published_comments' => '1',
-		'def_notify_comment_moderation' => '0',
+		'def_notify_comment_moderation' => '1',
 		'def_newsletter_news' => '1',
 		'def_newsletter_ads' => '0',
 		'def_notification_email_limit' => '3',
@@ -394,8 +397,8 @@ C message size exceeds',
 
 /*
  * $Log$
- * Revision 1.48  2013/11/06 08:04:45  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.49  2013/11/06 09:08:59  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

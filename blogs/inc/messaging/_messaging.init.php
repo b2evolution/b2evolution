@@ -294,16 +294,25 @@ class messaging_Module extends Module
 	function build_evobar_menu()
 	{
 		global $DB;
-		global $topright_Menu;
+		global $topleft_Menu, $topright_Menu;
 		global $admin_url;
 		global $current_User;
 		global $unread_messages_count;
 
-		$entries = array();
+		$left_entries = array();
+		$right_entries = array();
 
 		if( $current_User->check_perm( 'perm_messaging', 'reply' ) )
 		{
-			$entries['messaging'] = array(
+			// TODO: this is hackish and would require a proper function call
+			$topleft_Menu->_menus['entries']['tools']['disabled'] = false;
+
+			$left_entries['messaging'] = array(
+					'text' => T_('Messages').'&hellip;',
+					'href' => $admin_url.'?ctrl=threads',
+				);
+
+			$right_entries['messaging'] = array(
 				'text' => T_('Messages'),
 				'href' => get_dispctrl_url( 'threads' ),
 				'style' => 'padding: 3px 1ex;',
@@ -313,11 +322,12 @@ class messaging_Module extends Module
 			$unread_messages_count = get_unread_messages_count();
 			if( $unread_messages_count > 0 )
 			{
-				$entries['messaging']['text'] = '<b>'.T_('Messages').' <span class="badge">'.$unread_messages_count.'</span></b>';
+				$right_entries['messaging']['text'] = '<b>'.T_('Messages').' <span class="badge">'.$unread_messages_count.'</span></b>';
 			}
 		}
 
-		$topright_Menu->insert_menu_entries_after( 'userprefs', $entries );
+		$topleft_Menu->add_menu_entries( 'tools', $left_entries );
+		$topright_Menu->insert_menu_entries_after( 'userprefs', $right_entries );
 	}
 
 	/**
@@ -347,8 +357,8 @@ class messaging_Module extends Module
 		{	// Permission to view messaging:
 			$AdminUI->add_menu_entries( NULL, array(
 						'messaging' => array(
-						'text' => T_('Messaging'),
-						'title' => T_('Messaging'),
+						'text' => T_('Messages'),
+						'title' => T_('Messages'),
 						'href' => $dispatcher.'?ctrl=threads',
 						'entries' => get_messaging_sub_entries( true )
 					),
@@ -568,8 +578,8 @@ $messaging_Module = new messaging_Module();
 
 /*
  * $Log$
- * Revision 1.25  2013/11/06 08:04:25  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.26  2013/11/06 09:08:58  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

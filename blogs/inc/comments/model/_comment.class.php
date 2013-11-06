@@ -2042,12 +2042,14 @@ class Comment extends DataObject
 	 * Generate permalink to this comment.
 	 *
 	 * Note: This actually only returns the URL, to get a real link, use Comment::get_permanent_link()
+	 *
+	 * @param string glue between url params
 	 */
-	function get_permanent_url()
+	function get_permanent_url( $glue = '&amp;' )
 	{
 		$this->get_Item();
 
-		$post_permalink = $this->Item->get_single_url( 'auto' );
+		$post_permalink = $this->Item->get_single_url( 'auto', '', $glue );
 
 		return $post_permalink.'#'.$this->get_anchor();
 	}
@@ -2831,7 +2833,7 @@ class Comment extends DataObject
 		{ // Preprocess moderator list:
 			foreach( $moderators_to_notify as $moderator )
 			{
-				$notify_moderator = ( empty( $moderator->notify_moderation ) ) ? $Settings->get( 'def_notify_comment_moderation' ) : $moderator->notify_moderation;
+				$notify_moderator = ( is_null( $moderator->notify_moderation ) ) ? $Settings->get( 'def_notify_comment_moderation' ) : $moderator->notify_moderation;
 				if( $notify_moderator )
 				{ // add user to notify
 					$notify_users[$moderator->user_ID] = 'moderator';
@@ -2851,26 +2853,26 @@ class Comment extends DataObject
 			{ // Set except moderators condition. Exclude moderators who already got a notification email.
 				foreach( $moderators_to_notify as $moderator )
 				{
-					$notify_moderator = ( empty( $moderator->notify_moderation ) ) ? $Settings->get( 'def_notify_comment_moderation' ) : $moderator->notify_moderation;
+					$notify_moderator = ( is_null( $moderator->notify_moderation ) ) ? $Settings->get( 'def_notify_comment_moderation' ) : $moderator->notify_moderation;
 					if( $notify_moderator )
-					{ // select all moderators which notify moderation setting is turned on
-						$moderators[] = $moderator->user_email;
+					{ // select all moderators by ID which notify moderation setting is turned on
+						$moderators[] = $moderator->user_ID;
 					}
 				}
 				if( $UserSettings->get( 'notify_comment_moderation', $owner_User->ID ) && is_email( $owner_User->get( 'email' ) ) )
 				{ // add blog owner
-					$moderators[] = $owner_User->get( 'email' );
+					$moderators[] = $owner_User->ID;
 				}
 				if( ! empty( $moderators ) )
 				{
-					$except_condition = ' AND user_email NOT IN ( "'.implode( '", "', $moderators ).'" )';
+					$except_condition = ' AND user_ID NOT IN ( "'.implode( '", "', $moderators ).'" )';
 				}
 			}
 
 			// Check if we need to include the item creator user:
 			$creator_User = & $edited_Item->get_creator_User();
 			if( $UserSettings->get( 'notify_published_comments', $creator_User->ID ) && ( ! empty( $creator_User->email ) )
-				&& ( ! ( in_array( $creator_User->get( 'email' ), $moderators ) ) ) )
+				&& ( ! ( in_array( $creator_User->ID, $moderators ) ) ) )
 			{ // Post creator wants to be notified, and post author is not a moderator...
 				$notify_users[$creator_User->ID] = 'creator';
 			}
@@ -3030,7 +3032,7 @@ class Comment extends DataObject
 
 			if( $debug )
 			{
-				$notify_message = mail_template( 'notify_comment', 'text', $email_template_params );
+				$notify_message = mail_template( 'comment_new', 'text', $email_template_params );
 				$mail_dump = "Sending notification to $notify_email:<pre>Subject: $subject\n$notify_message</pre>";
 
 				if( $debug >= 2 )
@@ -3043,7 +3045,7 @@ class Comment extends DataObject
 
 			// Send the email:
 			// Note: Note activated users won't get notification email
-			send_mail_to_User( $notify_user_ID, $subject, 'notify_comment', $email_template_params, false, array( 'Reply-To' => $user_reply_to ) );
+			send_mail_to_User( $notify_user_ID, $subject, 'comment_new', $email_template_params, false, array( 'Reply-To' => $user_reply_to ) );
 
 			blocked_emails_memorize( $notify_User->email );
 
@@ -3399,8 +3401,8 @@ class Comment extends DataObject
 
 /*
  * $Log$
- * Revision 1.127  2013/11/06 08:03:58  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.128  2013/11/06 09:08:47  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

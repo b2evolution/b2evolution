@@ -505,52 +505,56 @@ class Message extends DataObject
 		// Construct message subject and body:
 		if( $new_thread )
 		{
-			$subject = sprintf( T_( '%s just sent you a new message!' ), $current_User->login );
+			$subject = NT_( '%s just sent you a new message!' );
 		}
 		elseif( count( $thrd_recipients ) == 1 )
 		{
-			$subject = sprintf( T_( '%s just replied to your message!' ), $current_User->login );
+			$subject = NT_( '%s just replied to your message!' );
 		}
 		else
 		{
-			$subject = sprintf( T_( '%s just replied to a conversation you are involved in!' ), $current_User->login );
+			$subject = NT_( '%s just replied to a conversation you are involved in!' );
 		}
 
 		// Get other unread threads
-		$other_unread_threads = get_users_unread_threads( array_keys( $thrd_recipients ), $this->thread_ID );
+		$other_unread_threads = get_users_unread_threads( array_keys( $thrd_recipients ), $this->thread_ID, 'array', 'html' );
 
 		// Load all users who will be notified
 		$UserCache = & get_UserCache();
 		$UserCache->load_list( array_keys( $thrd_recipients ) );
 
-		// Send email notifications:
+		// Send email notifications.
 		$ret = true;
 		$def_notify_messages = $Settings->get( 'def_notify_messages' );
 		foreach( $thrd_recipients as $recipient_ID => $notify_messages )
-		{
-			if( $notify_messages || ( empty( $notify_messages ) && $def_notify_messages ) )
-			{
-				// send mail to recipients who needs to be notified. recipients are already loaded into the UserCache
-				// Note: Note activated users won't get notification email
-				$email_template_params = array(
-						'recipient_ID'         => $recipient_ID,
-						'new_thread'           => $new_thread,
-						'thrd_recipients'      => $thrd_recipients,
-						'Message'              => $this,
-						'message_link'         => $message_link,
-						'UserCache'            => $UserCache,
-						'other_unread_threads' => $other_unread_threads[$recipient_ID],
-						'prefs_link'           => $prefs_link,
-					);
-				if( send_mail_to_User( $recipient_ID, $subject, 'notify_message', $email_template_params ) )
-				{ // email sent successful, update las_unread_message_reminder timestamp, because the notification contains all unread messages
-					$UserSettings->set( 'last_unread_messages_reminder', date2mysql( $servertimenow ), $recipient_ID );
-				}
-				else
-				{ // message was not sent
-					$ret = false;
-				}
+		{ // Send mail to recipients who needs to be notified. recipients are already loaded into the UserCache
+			if( !( $notify_messages || ( is_null( $notify_messages ) && $def_notify_messages ) ) )
+			{ // User should NOT be notified
+				continue;
 			}
+
+			$email_template_params = array(
+					'recipient_ID'         => $recipient_ID,
+					'new_thread'           => $new_thread,
+					'thrd_recipients'      => $thrd_recipients,
+					'Message'              => $this,
+					'message_link'         => $message_link,
+					'other_unread_threads' => $other_unread_threads[$recipient_ID],
+				);
+			$notify_User = $UserCache->get_by_ID( $recipient_ID );
+			// Change locale here to localize the email subject and content
+			locale_temp_switch( $notify_User->get( 'locale' ) );
+			$localized_subject = sprintf( T_( $subject ), $current_User->login );
+			// Note: Not activated users won't get notification email
+			if( send_mail_to_User( $recipient_ID, $localized_subject, 'private_message_new', $email_template_params ) )
+			{ // email sent successful, update las_unread_message_reminder timestamp, because the notification contains all unread messages
+				$UserSettings->set( 'last_unread_messages_reminder', date2mysql( $servertimenow ), $recipient_ID );
+			}
+			else
+			{ // message was not sent
+				$ret = false;
+			}
+			locale_restore_previous();
 		}
 		// update reminder timestamp changes
 		$UserSettings->dbupdate();

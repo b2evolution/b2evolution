@@ -553,7 +553,7 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	}
 
 	// disabled comment form
-	echo '<form class="bComment">';
+	echo '<form class="bComment" action="">';
 
 	echo '<div class="comment_posting_disabled_msg">';
 	if( $is_logged_in )
@@ -573,7 +573,7 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	echo $params['form_params']['fieldstart'];
 	echo $params['form_params']['labelstart'].$params['form_comment_text'].':'.$params['form_params']['labelend'];
 	echo $params['form_params']['inputstart'];
-	echo '<textarea id="p" class="bComment form_text_areainput" rows="5" name="p" cols="40" disabled="true">'.$disabled_text.'</textarea>';
+	echo '<textarea id="p" class="bComment form_text_areainput" rows="5" name="p" cols="40" disabled="disabled">'.$disabled_text.'</textarea>';
 	echo $params['form_params']['inputend'];
 	echo $params['form_params']['fieldend'];
 	echo $params['form_params']['fieldset_end'];
@@ -867,7 +867,7 @@ function comments_results_block( $params = array() )
 			'edited_User'          => NULL,
 			'results_param_prefix' => 'actv_comment_',
 			'results_title'        => T_('Comments posted by the user'),
-			'results_no_text'      => T_('User has no posted comments'),
+			'results_no_text'      => T_('User has not posted any comment yet'),
 		), $params );
 
 	if( !is_logged_in() )
@@ -1316,7 +1316,7 @@ function comment_edit_actions( $Comment )
 				$params['onclick'] = "return confirm('".TS_('You are about to delete this comment!\\nThis cannot be undone!')."')";
 			}
 			else
-			{ // Comment will be moved into the recycle bin 
+			{ // Comment will be moved into the recycle bin
 				$title = T_('Recycle this comment!');
 			}
 
@@ -1337,8 +1337,8 @@ function comment_edit_actions( $Comment )
 
 /*
  * $Log$
- * Revision 1.39  2013/11/06 08:03:58  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.40  2013/11/06 09:08:47  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

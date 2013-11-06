@@ -360,13 +360,107 @@ class Chapter extends GenericCategory
 
 		return ( $this->count_posts > 0 );
 	}
+
+
+	/**
+	 * Get URL to edit a chapter if user has edit rights.
+	 *
+	 * @param array Params:
+	 *  - 'redirect_page': redirect to page: 'front', 'manual', 'list'
+	 *  - 'glue' : Glue string between url params
+	 * @return string|FALSE URL
+	 */
+	function get_edit_url( $params = array() )
+	{
+		$params = array_merge( array(
+				'redirect_page' => '',
+				'glue'          => '&amp;',
+			), $params );
+
+		if( ! is_logged_in( false ) )
+		{ // User is not logged in
+			return false;
+		}
+
+		if( ! $this->ID )
+		{ // New chapter
+			return false;
+		}
+
+		global $current_User;
+
+		if( ! $current_User->check_perm( 'admin', 'restricted' ) ||
+		    ! $current_User->check_perm( 'blog_cats', '', false, $this->blog_ID ) )
+		{ // User has no right to edit this chapter
+			return false;
+		}
+
+		global $admin_url;
+		$url = $admin_url.'?ctrl=chapters'.$params['glue']
+			.'action=edit'.$params['glue']
+			.'cat_ID='.$this->ID.$params['glue']
+			.'blog='.$this->blog_ID;
+		if( !empty( $params['redirect_page'] ) )
+		{
+			$url .= $params['glue'].'redirect_page='.$params['redirect_page'];
+		}
+
+		return $url;
+	}
+
+
+	/**
+	 * Provide link to edit a chapter if user has edit rights
+	 *
+	 * @param array Params:
+	 *  - 'before': to display before link
+	 *  - 'after':    to display after link
+	 *  - 'text': link text
+	 *  - 'title': link title
+	 *  - 'class': CSS class name
+	 *  - 'redirect_page': redirect to page: 'front', 'manual', 'list'
+	 *  - 'glue' : Glue string between url params
+	 * @return string|FALSE Link tag
+	 */
+	function get_edit_link( $params = array() )
+	{
+		$edit_url = $this->get_edit_url( $params );
+		if( ! $edit_url )
+		{
+			return false;
+		}
+
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'        => '',
+				'after'         => '',
+				'text'          => '#',
+				'title'         => '#',
+				'class'         => '',
+				'redirect_page' => '',
+				'glue'          => '&amp;',
+			), $params );
+
+
+		if( $params['text'] == '#' ) $params['text'] = get_icon( 'edit' ).' '.T_('Edit...');
+		if( $params['title'] == '#' ) $params['title'] = T_('Edit this chapter...');
+
+		$r = $params['before'];
+		$r .= '<a href="'.$edit_url;
+		$r .= '" title="'.$params['title'].'"';
+		if( !empty( $params['class'] ) ) $r .= ' class="'.$params['class'].'"';
+		$r .=  '>'.$params['text'].'</a>';
+		$r .= $params['after'];
+
+		return $r;
+	}
 }
 
 
 /*
  * $Log$
- * Revision 1.19  2013/11/06 08:03:57  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.20  2013/11/06 09:08:47  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

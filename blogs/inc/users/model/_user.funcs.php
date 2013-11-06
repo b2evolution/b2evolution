@@ -149,6 +149,31 @@ function get_user_login_link( $before = '', $after = '', $link_text = '', $link_
 
 
 /**
+ * Get user's login with gender color
+ *
+ * @param string Login
+ * @param array Params
+ * @return string User's preferred name with gender color if this available
+ */
+function get_user_colored_login( $login, $params = array() )
+{
+	$params = array_merge( array(
+			'mask' => '$avatar$ $login$'
+		) );
+
+	$UserCache = & get_UserCache();
+	$User = & $UserCache->get_by_login( $login );
+	if( !$User )
+	{ // User doesn't exist by some reason, maybe it was deleted right now
+		// Return only login
+		return $login;
+	}
+
+	return $User->get_colored_login( $params );
+}
+
+
+/**
  * Get url to login
  *
  * @param string describe the source ina word or two, used for stats (search current calls to this function for examples)
@@ -254,29 +279,29 @@ function send_admin_notification( $subject, $template_name, $template_params )
 		), $template_params );
 
 	// Set default subject and permname:
-	$final_subject = T_( $subject ).': '.$template_params['login'];
+	$subject_suffix = ': '.$template_params['login'];
 	$perm_name = 'users';
 
 	switch( $template_name )
 	{
-		case 'registration':
+		case 'account_new':
 			$check_setting = 'notify_new_user_registration';
 			break;
 
-		case 'user_activated':
+		case 'account_activated':
 			$check_setting = 'notify_activated_account';
 			break;
 
-		case 'close_account':
+		case 'account_closed':
 			$check_setting = 'notify_closed_account';
 			break;
 
-		case 'user_reported':
+		case 'account_reported':
 			$check_setting = 'notify_reported_account';
 			break;
 
-		case 'cronjob_error':
-			$final_subject = T_( $subject );
+		case 'scheduled_task_error_report':
+			$subject_suffix = '';
 			$check_setting = 'notify_cronjob_error';
 			$perm_name = 'options';
 			break;
@@ -285,9 +310,15 @@ function send_admin_notification( $subject, $template_name, $template_params )
 			debug_die( 'Unhandled admin notification template!' );
 	}
 
-	if( empty($current_User) && $Session->has_User() )
+	if( empty( $current_User ) && !empty( $Session ) && $Session->has_User() )
 	{ // current_User is not set at the time of registration
 		$current_User = & $Session->get_User();
+	}
+
+	if( empty( $UserSettings ) )
+	{ // initialize UserSettings
+		load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
+		$UserSettings = new UserSettings();
 	}
 
 	// load users with edit all users permission
@@ -304,7 +335,8 @@ function send_admin_notification( $subject, $template_name, $template_params )
 		{ // this user must be notifed
 			locale_temp_switch( $User->get( 'locale' ) );
 			// send mail to user (using his local)
-			send_mail_to_User( $User->ID, $final_subject, $template_name, $template_params ); // ok, if this may fail
+			$localized_subject = T_( $subject ).$subject_suffix;
+			send_mail_to_User( $User->ID, $localized_subject, $template_name, $template_params ); // ok, if this may fail
 			locale_restore_previous();
 		}
 	}
@@ -1497,7 +1529,7 @@ function get_avatar_imgtag_default( $size = 'crop-top-15x15', $class = '', $alig
  * @param integer seconds
  * @return string
  */
-function duration_format( $duration )
+function duration_format( $duration, $show_seconds = true )
 {
 	$result = '';
 
@@ -1518,7 +1550,7 @@ function duration_format( $duration )
 	{
 		$result .= sprintf( T_( '%d minutes' ), $fields[ 'minutes' ] ).' ';
 	}
-	if( $fields[ 'seconds' ] > 0 )
+	if( $show_seconds && ( $fields[ 'seconds' ] > 0 ) )
 	{
 		$result .= sprintf( T_( '%d seconds' ),  $fields[ 'seconds' ] );
 	}
@@ -1536,7 +1568,7 @@ function duration_format( $duration )
 /**
  * Get the integer value of a status permission
  * The status permissions are stored as a set, and each status has an integer value also
- * 
+ *
  * @param string status
  * @return integer status perm value
  */
@@ -1574,7 +1606,7 @@ function get_status_permvalue( $status )
 
 /**
  * Load blog advanced User/Group permission
- * 
+ *
  * @param array the array what should be loaded with the permission values ( it should be the User or Group blog_post_statuses array )
  * @param integer the target blog ID
  * @param integer the target User or Group ID
@@ -1687,7 +1719,7 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 
 /**
  * Check blog advanced user/group permission
- * 
+ *
  * @param array blog user or group advanced permission settings
  * @param integer the user ID for whow we are checking the permission
  * @param string permission name
@@ -2059,59 +2091,6 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 
 
 /**
- * Get the account validation emails common message content
- */
-function get_validate_email_message( $user_locale, $user_status, $email_format = 'txt' )
-{
-	global $baseurl;
-
-	if( $email_format == 'html' )
-	{	// HTML
-		$newline = '<br />';
-		$baseurl_link = '<a href="'.$baseurl.'">'.$baseurl.'</a>';
-	}
-	else
-	{	// PLAIN TEXT
-		$newline = "\n";
-		$baseurl_link = $baseurl;
-	}
-
-	locale_temp_switch( $user_locale );
-	switch( $user_status )
-	{
-		case 'new':
-			$intro_text = sprintf( T_( 'You have recently registered a new account on %s .' ), $baseurl_link );
-			$activation_text = T_( 'Please activate this account by clicking on the following link:' );
-			break;
-		case 'emailchanged':
-			$intro_text = sprintf( T_( 'You have recently changed the email address associated with your account on %s .' ), $baseurl_link );
-			$activation_text = T_( 'Please reactivate this account by clicking on the following link:' );
-			break;
-		case 'deactivated':
-			$intro_text = sprintf( T_( 'Your account on %s needs to be reactivated.' ), $baseurl_link );
-			$activation_text = T_( 'Please reactivate this account by clicking on the following link:' );
-			break;
-		default:
-			$intro_text = sprintf( T_( 'Someone -- presumably you -- has registered an account on %s with your email address.' ), $baseurl_link );
-			$activation_text = T_( 'Please activate this account by clicking on the following link:' );
-			break;
-	}
-
-	$message = T_( 'Hello $login$ !' )
-		.$newline.$newline
-		.$intro_text
-		.$newline.$newline
-		.T_('Your login is: $login$').$newline
-		.T_('Your email is: $email$')
-		.$newline.$newline
-		.$activation_text.$newline;
-
-	locale_restore_previous();
-	return $message;
-}
-
-
-/**
  * Check if user can receive new email today with the given email type or the limit was already exceeded
  * This function will update the corresponding UserSettings but won't save it until the email is not sent
  *
@@ -2207,16 +2186,16 @@ function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_chang
 		{ // No subject for this locale generated yet:
 			locale_temp_switch( $notify_locale );
 
-			$cache_by_locale[$notify_locale]['subject'] = T_( 'Validate your email address for "$login$"!' );
+			$cache_by_locale[$notify_locale]['subject'] = T_( 'Activate your account: $login$' );
 
 			locale_restore_previous();
 		}
 
 		$email_template_params = array(
-				'locale'                    => $notify_locale,
-				'status'                    => $User->get( 'status' ),
-				'reminder_key'              => $reminder_key,
-				'is_reminder'               => $is_reminder
+				'locale'       => $notify_locale,
+				'status'       => $User->get( 'status' ),
+				'reminder_key' => $reminder_key,
+				'is_reminder'  => $is_reminder,
 			);
 
 		if( !empty( $already_received_messages[$User->ID] ) )
@@ -2227,7 +2206,7 @@ function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_chang
 		// Update notification sender's info from General settings
 		$User->update_sender( true );
 
-		if( send_mail_to_User( $User->ID, $cache_by_locale[$notify_locale]['subject'], 'validate_account_easy', $email_template_params, true ) )
+		if( send_mail_to_User( $User->ID, $cache_by_locale[$notify_locale]['subject'], 'account_activate', $email_template_params, true ) )
 		{ // save corresponding user settings right after the email was sent, to prevent not saving if an eroor occurs
 			$email_sent++;
 			// Set last remind activation email date and increase sent reminder emails number in UserSettings
@@ -2242,6 +2221,101 @@ function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_chang
 	}
 
 	return $email_sent;
+}
+
+
+/**
+ * Get account activation reminder informaton for the given user. This is used on the user admin settings form.
+ *
+ * @param $edited_User
+ * @return array of arrays with field label, info and note about the Last and Next account activation emails
+ */
+function get_account_activation_info( $edited_User )
+{
+	global $Settings, $UserSettings, $servertimenow, $activate_account_reminder_config;
+
+	$field_label = T_('Latest account activation email');
+	$can_be_validated = $edited_User->check_status( 'can_be_validated' );
+	if( ! $can_be_validated )
+	{
+		if( $edited_User->check_status( 'is_validated' ) )
+		{ // The user account is already activated
+			return array( array( $field_label, T_('Account is already activated') ) );
+		}
+
+		if( $edited_User->check_status( 'is_closed' ) )
+		{
+			return array( array( $field_label, T_('The account is closed, it cannot be activated') ) );
+		}
+
+		debug_die('Unhandled user account status!');
+	}
+
+	if( ! $UserSettings->get( 'send_activation_reminder', $edited_User->ID ) )
+	{ // The user doesn't want to receive account activation reminders
+		return array( array( $field_label, T_('This user doesn\'t want to receive account activation reminders') ) );
+	}
+
+	$field_note = '';
+	$is_secure_validation = ( $Settings->get( 'validation_process' ) != 'easy' );
+	if( $is_secure_validation )
+	{ // The easy validation process is not allowed, so account activation emails are sent only for request
+		$field_note = T_('Account validation process is secured, so account activation emails are sent only upon request');
+	}
+
+	$result = array();
+	$last_activation_email = $UserSettings->get( 'last_activation_email', $edited_User->ID );
+	if( empty( $last_activation_email ) )
+	{ // latest activation email date is not set because email was not sent yet ( it is possuble that there is some problem with the user email address )
+		$result[] = array( $field_label, T_('None yet'), $field_note );
+	}
+	else
+	{ // format last activation email date
+		$last_activation_email_info = format_to_output( $last_activation_email );
+		$result[] = array( $field_label, $last_activation_email_info, $field_note );
+	}
+
+	if( $is_secure_validation )
+	{ // When validation process is secure, then account activation email is not known, and this was already added as a note into the 'Last account activation email' field
+		return $result;
+	}
+
+	$field_label = T_('Next account activation reminder');
+	$number_of_max_reminders = ( count( $activate_account_reminder_config ) - 1 );
+	$activation_reminder_count = (int) $UserSettings->get( 'activation_reminder_count', $edited_User->ID );
+	$field_note = sprintf( T_('%d reminders were sent out of the maximum allowed of %d.'), $activation_reminder_count, $number_of_max_reminders );
+	// The validation process is easy, so reminders should be sent
+	$responsible_job_note = T_('Scheduled job responsible for reminders is "Send reminders about not activated accounts".');
+
+	if( $edited_User->status == 'failedactivation' )
+	{ // The user account status was changed to failed activation, this user won't be reminded again to activate the account
+		$result[] = array( $field_label, T_('Account activation has failed'), $field_note.' '.$responsible_job_note );
+	}
+	elseif( $activation_reminder_count >= $number_of_max_reminders )
+	{ // This is the case when the account status was not changed to failed activation yet, but the last reminder was sent
+		$result[] = array( $field_label, sprintf( T_('We already sent %d account activation reminders of the maximum allowed of %d, no more reminders will be sent'), $activation_reminder_count, $number_of_max_reminders ) );
+	}
+	elseif( empty( $last_activation_email ) )
+	{ // Account activation email was not sent at all. This can happen when some problem is with the user email
+		$result[] = array( $field_label, T_('At least one activation email should have been already sent. Check if the user email address is correct, and PHP is sending emails correctly'), $responsible_job_note );
+	}
+	else
+	{ // Activate account reminder email should be send to the user, set information when it should be done
+		$next_activation_email_ts = strtotime( '+'.$activate_account_reminder_config[$activation_reminder_count].' second', strtotime( $last_activation_email ) );
+		if( $next_activation_email_ts > $servertimenow )
+		{ // The next activation email issue date is in the future
+			$time_left = seconds_to_period( $next_activation_email_ts - $servertimenow );
+			$info = sprintf( T_('%s left before next notification').' - '.$field_note, $time_left );
+			$result[] = array( $field_label, $info, $responsible_job_note );
+		}
+		else
+		{ // The next reminder issue date was in the past
+			$time_since = seconds_to_period( $servertimenow - $next_activation_email_ts );
+			$info = sprintf( T_('next notification pending since %s - check the "Send reminders about not activated accounts" scheduled job'), $time_since );
+			$result[] = array( $field_label, $info, $field_note );
+		}
+	}
+	return $result;
 }
 
 
@@ -2776,7 +2850,7 @@ function get_user_status_icons( $display_text = false )
 
 /**
  * Get all user ID and login where user_login starts with the reserved 'usr_' prefix
- * 
+ *
  * @return array result list
  */
 function find_logins_with_reserved_prefix()
@@ -2789,7 +2863,7 @@ function find_logins_with_reserved_prefix()
 
 /**
  * Get user reports available statuses
- * 
+ *
  * @return array with status key and status text
  */
 function get_report_statuses()
@@ -2806,7 +2880,7 @@ function get_report_statuses()
 
 /**
  * Get current User report from the given user
- * 
+ *
  * @param integer user ID to get report from
  * @return array with report status, info and date. The return value is an empty array if current User didn't report the given user.
  */
@@ -2824,7 +2898,7 @@ function get_report_from( $user_ID )
 
 /**
  * Count reprots by status from the given user
- * 
+ *
  * @param integer user ID
  * @param boolean set false to get plain result array, or set true to get display format
  * @return mixed array if display format is true, string otherwise
@@ -2862,7 +2936,7 @@ function count_reports_from( $user_ID, $display_format = true )
 
 /**
  * Report a user
- * 
+ *
  * @param integer reported User ID
  * @param string reported user status (fake, guidelines, harass, spam, other )
  * @param string more info
@@ -2892,7 +2966,7 @@ function add_report_from( $user_ID, $status, $info )
 							'reported_by'    => $current_User->login,
 						);
 		// send notificaiton ( it will be send to only those users who want to receive this kind of notifications )
-		send_admin_notification( NT_('User account reported'), 'user_reported', $email_template_params );
+		send_admin_notification( NT_('User account reported'), 'account_reported', $email_template_params );
 	}
 
 	return $result;
@@ -2901,7 +2975,7 @@ function add_report_from( $user_ID, $status, $info )
 
 /**
  * Remove current User report from the given user
- * 
+ *
  * @param integer user ID
  * @return mixed 1 if report was removed, 0 if there was no report, false on failure
  */
@@ -2942,7 +3016,7 @@ function get_user_quick_search_form( $params = array() )
 	$Form->add_crumb( 'user' );
 
 	$r .= $Form->text_input( 'user_search', '', 15, $params['title'], '', array( 'maxlength' => 100 ) );
-	
+
 	$r .= $Form->submit_input( array(
 			'name'  => 'actionArray[search]',
 			'value' => $params['button']
@@ -3224,7 +3298,7 @@ function user_reports_results_block( $params = array() )
 	$params = array_merge( array(
 			'edited_User'          => NULL,
 			'results_param_prefix' => 'actv_reports_',
-			'results_title'        => T_('Reports from the user'),
+			'results_title'        => T_('This user profile has been reported by other users!'),
 			'results_no_text'      => T_('User was not reported yet.'),
 		), $params );
 
@@ -3355,13 +3429,5 @@ function get_report_status_text( $status )
 /**
  * Helper functions to display User's reports results.
  * New ( not display helper ) functions must be created above user_reports_results function
- */
-
-
-/*
- * $Log$
- * Revision 1.102  2013/11/06 08:05:03  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
  */
 ?>

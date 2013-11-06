@@ -25,7 +25,7 @@
  *
  * @package plugins
  *
- * @todo Add links to pages on manual.b2evolution.net, once they are "clean"/tiny
+ * @todo Add links to pages on b2evolution.net/man, once they are "clean"/tiny
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE - {@link http://fplanque.net/}
@@ -114,7 +114,7 @@ class Plugin
 	 *
 	 * This is for user info only.
 	 *
-	 * If empty, it defaults to 'http://manual.b2evolution.net/[plugin_classname]',
+	 * If empty, it defaults to 'http://b2evolution.net/man/[plugin_classname]',
 	 * where '[plugin_classname]' is the plugin's PHP class name (with first char uppercased).
 	 *
 	 * @var string
@@ -1809,7 +1809,6 @@ class Plugin
 	 *   - 'sender_email': The email address of the sender (by reference) (since 1.10.0)
 	 *   - 'subject': The subject of the message to be sent (by reference) (since 1.10.0)
 	 *   - 'message': The message to be sent (by reference)
-	 *   - 'message_footer': The footer of the message (by reference)
 	 *   - 'Blog': The blog, depending on the context (may be null) (by reference) (since 1.10.0)
 	 */
 	function MessageFormSent( & $params )
@@ -2612,7 +2611,7 @@ class Plugin
 	 * Translate a given string, in the Plugin's context.
 	 *
 	 * This means, that the translation is obtained from the Plugin's "locales" folder.
-	 * @link http://manual.b2evolution.net/Localization#Plugins
+	 * @link http://b2evolution.net/man/localization
 	 *
 	 * It uses the global/regular {@link T_()} function as a fallback.
 	 *
@@ -3053,7 +3052,7 @@ class Plugin
 	{
 		if( empty( $this->help_url ) )
 		{
-			return 'http://manual.b2evolution.net/'.strtoupper($this->classname[0]).substr($this->classname,1);
+			return 'http://b2evolution.net/man/'.strtoupper($this->classname[0]).substr($this->classname,1);
 		}
 		else
 		{
@@ -3335,8 +3334,8 @@ class Plugin
 
 /*
  * $Log$
- * Revision 1.55  2013/11/06 08:04:35  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.56  2013/11/06 09:08:58  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

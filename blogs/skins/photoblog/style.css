@@ -275,3 +275,15 @@ div.input ul.token-input-list-facebook {
 	top: -12px;
 	left: 12px;
 }
+
+div.tabs div a {
+	background-color: #333;
+	border-color: #999;
+	color: #AAA;
+}
+div.tabs div.selected a, div.tabs div a:hover {
+	background-color: #666;
+}
+div.tabs div.selected a {
+	border-bottom-color: #666;
+}

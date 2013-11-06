@@ -6,7 +6,7 @@
  * It will also rely on default includes for specific dispays (like the comment form).
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
- * {@link http://manual.b2evolution.net/Skins_2.0}
+ * {@link http://b2evolution.net/man/skin-structure}
  *
  * The main page template is used to display the blog when no specific page template is available
  * to handle the request (based on $disp).
@@ -61,8 +61,8 @@ skin_include( '_html_header.inc.php', array(
 	'catdir_text'       => T_('Forum'),
 	'category_text'     => T_('Forum').': ',
 	'comments_text'     => T_('Latest Replies'),
-	'useritems_text'    => T_('User topics'),
-	'usercomments_text' => T_('User replies'),
+	'useritems_text'    => T_('User\'s topics'),
+	'usercomments_text' => T_('User\'s replies'),
 ) );
 // Note: You can customize the default HTML header by copying the generic
 // /skins/_html_header.inc.php file into the current skin folder.
@@ -180,8 +180,8 @@ if( $disp == 'catdir' )
 				'categories_text'   => '',
 				'catdir_text'       => '',
 				'comments_text'     => T_('Latest Replies'),
-				'useritems_text'    => T_('User topics'),
-				'usercomments_text' => T_('User replies'),
+				'useritems_text'    => T_('User\'s topics'),
+				'usercomments_text' => T_('User\'s replies'),
 			) );
 		// ----------------------------- END OF REQUEST TITLE ----------------------------
 	?>
@@ -198,9 +198,9 @@ if( $disp == 'catdir' )
 					'formend'        => '</table>',
 					'fieldset_begin' => '<tr><th colspan="3" $fieldset_attribs$>$fieldset_title$',
 					'fieldset_end'   => '</th></tr>',
-					'fieldstart'     => '<tr>',
+					'fieldstart'     => '<tr $ID$>',
 					'fieldend'       => '</tr>',
-					'labelstart'     => '<td class="left">',
+					'labelstart'     => '<td class="row1 left">',
 					'labelend'       => '</td>',
 					'inputstart'     => '<td class="row2 left">',
 					'inputend'       => '</td>',
@@ -208,13 +208,19 @@ if( $disp == 'catdir' )
 					'infoend'        => '</td>',
 					'buttonsstart'   => '<tr><td colspan="2" class="buttons">',
 					'buttonsend'     => '</td></tr>',
+					'inline_labelstart' => '<td class="left" colspan="2">',
+					'inline_labelend'   => '</td>',
+					'inline_inputstart' => '',
+					'inline_inputend'   => '',
+					'customstart'       => '<tr><td colspan="2" class="custom_content">',
+					'customend'         => '</td></tr>',
 				),
 				'notify_my_text'              => T_( 'Notify me by email whenever a reply is published on one of <strong>my</strong> topics.' ),
 				'notify_moderator_text'       => T_( 'Notify me by email whenever a reply is posted in a forum where I am a moderator.' ),
 				'user_itemlist_title'         => T_('Topics created by %s'),
-				'user_itemlist_no_results'    => T_('User has no own created topics'),
+				'user_itemlist_no_results'    => T_('User has not created any topics'),
 				'user_commentlist_title'      => T_('Replies posted by %s'),
-				'user_commentlist_no_results' => T_('User has no posted replies'),
+				'user_commentlist_no_results' => T_('User has not posted any replies'),
 				'user_commentlist_col_post'   => T_('Reply on:'),
 		) );
 		// Note: you can customize any of the sub templates included here by

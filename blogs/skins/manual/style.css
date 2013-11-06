@@ -232,8 +232,19 @@ div.action_messages {
 .bTitle h1 {
 	float: left;
 }
+.bTitle h1 {
+	padding-top: 2px;
+}
 .bTitle a.roundbutton {
 	margin: 5px 0 0 30px;
+	float: left;
+}
+.bTitle .roundbutton_group {
+	float: left;
+	margin-left: 30px;
+}
+.bTitle .roundbutton_group a.roundbutton {
+	margin-left: 0;
 }
 .bTitle {
 	color: #000;
@@ -465,6 +476,7 @@ ul.posts_list h3 a.link {
 }
 ul.posts_list h3 {
 	float: left;
+	padding-top: 2px;
 }
 a.roundbutton {
 	text-decoration: none;

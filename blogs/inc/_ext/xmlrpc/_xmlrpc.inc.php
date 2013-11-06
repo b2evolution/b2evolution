@@ -3782,8 +3782,8 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 
 /*
  * $Log$
- * Revision 1.13  2013/11/06 08:03:48  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.14  2013/11/06 09:08:46  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

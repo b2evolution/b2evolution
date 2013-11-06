@@ -363,3 +363,10 @@ input#thrd_title {
 #styled_content_block .evo_post_head .status_private {
 	top: -4px;
 }
+
+div.tabs {
+	padding-left: 17px;
+}
+div.tabs div a {
+	padding: 5px 4px;
+}

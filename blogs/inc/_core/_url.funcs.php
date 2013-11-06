@@ -885,22 +885,28 @@ function get_dispctrl_url( $dispctrl, $params = '' )
  *
  * @param string Url
  * @param string Link Text
+ * @param string Link class
+ * @param integer Max length of url when url is used as link text
  * @return string HTML link tag
  */
-function get_link_tag( $url, $text = '' )
+function get_link_tag( $url, $text = '', $class='', $max_url_length = 50 )
 {
 	if( empty( $text ) )
-	{
+	{ // Link text is empty, Use url
 		$text = $url;
+		if( strlen( $text ) > $max_url_length )
+		{ // Crop url text
+			$text = substr( $text, 0, $max_url_length ).'&hellip;';
+		}
 	}
 
-	return '<a href="'.$url.'">'.$text.'</a>';
+	return '<a class="'.$class.'" href="'.str_replace('&amp;', '&', $url ).'">'.$text.'</a>';
 }
 
 /* {{{ Revision log:
  * $Log$
- * Revision 1.57  2013/11/06 08:03:47  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.58  2013/11/06 09:08:46  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

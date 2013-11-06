@@ -171,16 +171,7 @@ class User extends DataObject
 		$this->delete_cascades = array(
 				array( 'table'=>'T_users__usersettings', 'fk'=>'uset_user_ID', 'msg'=>T_('%d user settings on collections') ),
 				array( 'table'=>'T_sessions', 'fk'=>'sess_user_ID', 'msg'=>T_('%d sessions opened by this user') ),
-				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_user_ID', 'msg'=>T_('%d user permissions on blogs') )
-			);
-		if( param( 'deltype', 'string', '', true ) == 'spammer' )
-		{	// If we delete user as spammer we also should remove the comments
-			$this->delete_cascades = array_merge( $this->delete_cascades, array(
-					array( 'table'=>'T_comments', 'fk'=>'comment_author_ID', 'msg'=>T_('%d comments by this user') ),
-					array( 'table'=>'T_messaging__message', 'fk'=>'msg_author_user_ID', 'msg'=>T_('%d private messages sent by this user') ),
-				) );
-		}
-		$this->delete_cascades = array_merge( $this->delete_cascades, array(
+				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_user_ID', 'msg'=>T_('%d user permissions on blogs') ),
 				array( 'table'=>'T_comments__votes', 'fk'=>'cmvt_user_ID', 'msg'=>T_('%d user votes on comments') ),
 				array( 'table'=>'T_subscriptions', 'fk'=>'sub_user_ID', 'msg'=>T_('%d blog subscriptions') ),
 				array( 'table'=>'T_items__item', 'fk'=>'post_creator_user_ID', 'msg'=>T_('%d posts created by this user') ),
@@ -194,7 +185,7 @@ class User extends DataObject
 				array( 'table'=>'T_links', 'fk'=>'link_usr_ID', 'msg'=>T_('%d links to this user') ),
 				array( 'table'=>'T_links', 'fk'=>'link_creator_user_ID', 'msg'=>T_('%d links created by this user') ),
 				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition' => 'file_root_type = "user"', 'msg'=>T_('%d files from this user file root') ),
-			) );
+			);
 
 		if( $db_row == NULL )
 		{ // Setting those object properties, which are not "NULL" in DB (MySQL strict mode):
@@ -825,26 +816,6 @@ class User extends DataObject
 
 		if( $is_preferences_form )
 		{
-			// Email communication
-			$edited_user_email = param( 'edited_user_email', 'string', true );
-			param_check_not_empty( 'edited_user_email', T_('Please enter your e-mail address.') );
-			param_check_email( 'edited_user_email', true );
-			$this->set_email( $edited_user_email );
-
-			// set messaging options
-			if( $has_messaging_perm )
-			{
-				$UserSettings->set( 'enable_PM', param( 'PM', 'integer', 0 ), $this->ID );
-			}
-			$emails_msgform = $Settings->get( 'emails_msgform' );
-			if( ( $emails_msgform == 'userset' ) || ( ( $emails_msgform == 'adminset' ) && ( $current_User->check_perm( 'users', 'edit' ) ) ) )
-			{ // enable email option is displayed only if user can set or if admin can set and current User is an administrator
-				$UserSettings->set( 'enable_email', param( 'email', 'integer', 0 ), $this->ID );
-			}
-
-			// Email format
-			$UserSettings->set( 'email_format', param( 'edited_user_email_format', 'string', 'auto' ), $this->ID );
-
 			// Other preferences
 			param( 'edited_user_locale', 'string', true );
 			$this->set_from_Request('locale', 'edited_user_locale', true);
@@ -873,7 +844,7 @@ class User extends DataObject
 		if( $is_subscriptions_form )
 		{
 			if( $action == 'subscribe' )
-			{	// Do only subscribe to new blog (Don't update the user's settings from the same form)
+			{ // Do only subscribe to new blog (Don't update the user's settings from the same form)
 
 				// A selected blog to subscribe
 				$subscribe_blog_ID = param( 'subscribe_blog', 'integer', 0 );
@@ -883,19 +854,39 @@ class User extends DataObject
 
 				// Note: we do not check if subscriptions are allowed here, but we check at the time we're about to send something
 				if( $subscribe_blog_ID && ( $sub_items || $sub_comments ) )
-				{	// We need to record values:
+				{ // We need to record values:
 					$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
 					  VALUES ( '.$DB->quote( $subscribe_blog_ID ).', '.$DB->quote( $this->ID ).', '.$DB->quote( $sub_items ).', '.$DB->quote( $sub_comments ).' )' );
 
 					$Messages->add( T_('Subscriptions have been changed.'), 'success' );
 				}
 				else
-				{	// Display an error message to inform user about incorrect actions
+				{ // Display an error message to inform user about incorrect actions
 					$Messages->add( T_('Please select at least one setting to subscribe on the selected blog.'), 'error' );
 				}
 			}
 			else
-			{	// Update user's settings
+			{ // Update user's settings
+
+				// Email communication
+				$edited_user_email = param( 'edited_user_email', 'string', true );
+				param_check_not_empty( 'edited_user_email', T_('Please enter your e-mail address.') );
+				param_check_email( 'edited_user_email', true );
+				$this->set_email( $edited_user_email );
+
+				// set messaging options
+				if( $has_messaging_perm )
+				{
+					$UserSettings->set( 'enable_PM', param( 'PM', 'integer', 0 ), $this->ID );
+				}
+				$emails_msgform = $Settings->get( 'emails_msgform' );
+				if( ( $emails_msgform == 'userset' ) || ( ( $emails_msgform == 'adminset' ) && ( $current_User->check_perm( 'users', 'edit' ) ) ) )
+				{ // enable email option is displayed only if user can set or if admin can set and current User is an administrator
+					$UserSettings->set( 'enable_email', param( 'email', 'integer', 0 ), $this->ID );
+				}
+
+				// Email format
+				$UserSettings->set( 'email_format', param( 'edited_user_email_format', 'string', 'auto' ), $this->ID );
 
 				// set notification options
 				if( $has_messaging_perm )
@@ -1410,7 +1401,7 @@ class User extends DataObject
 
 	/**
 	 * Get the number of blogs owned by this user
-	 * 
+	 *
 	 * @return integer
 	 */
 	function get_num_blogs()
@@ -1545,7 +1536,7 @@ class User extends DataObject
 
 	/**
 	 * Get the number of other users posts which were edited by this user
-	 * 
+	 *
 	 * @return integer the number of edited posts
 	 */
 	function get_num_edited_posts()
@@ -2392,7 +2383,7 @@ class User extends DataObject
 
 	/**
 	 * Check if user has global perms on this blog
-	 * 
+	 *
 	 * @param integer blog ID
 	 * @param string permlevel
 	 * @return boolean true if user is the owner, or user group has some permission on all blogs
@@ -2507,36 +2498,82 @@ class User extends DataObject
 	 * Check if the user has the given role in any blog
 	 *
 	 * @param string role name, available values ( post_owner, moderator )
-	 * @return mixed NULL if the given roll name is not defined, true if the user has the given role, false otherwise
+	 * @return mixed NULL if the given roll name is not defined or there are no blogs, true if the user is super admin, 0 if the user doesn't have the given role, positive number otherwise
 	 */
 	function check_role( $rolename )
 	{
+		global $DB;
+
+		if( $this->check_perm( 'blogs', 'editall' ) )
+		{ // if user has global editall blogs permission then it has any kind of role in all blogs
+			return true;
+		}
+
 		switch( $rolename )
 		{
 			case 'post_owner':
 				// User is considerated as a post owner, if already has at least one post, or he has right to create posts
 				if( $this->get_num_posts() > 0 )
-				{
+				{ // User already has at least one post
 					return true;
 				}
-				$BlogCache = & get_BlogCache();
-				// get all blogs where user has right to create new posts
-				$createpost_on_blogs = $BlogCache->load_user_blogs( 'blog_post_statuses', 'edit', $this->ID );
-				return !empty( $createpost_on_blogs );
+				$role_conditions = array( 'perm_poststatuses' => array( 'IS NOT NULL', '<> ""' ) );
+				break;
+
 			case 'member':
 				// User has member role if is member of at least one blog
-				$BlogCache = & get_BlogCache();
-				$member_on_blogs = $BlogCache->load_user_blogs( 'blog_ismember', 'view', $this->ID );
-				return !empty( $member_on_blogs );
+				$role_conditions = array( 'ismember' => array( 'IS NOT NULL', '<> 0' ) );
+				break;
 
 			case 'moderator':
 				// User is a moderator if has moderator rights at least in one blog
-				$BlogCache = & get_BlogCache();
-				$moderator_on_blogs = $BlogCache->load_user_blogs( 'blog_comments', 'edit', $this->ID );
-				return !empty( $moderator_on_blogs );
+
+				// asimo>TODO: The required permissions for moderator role must be documented and should be configurable. The permissions defined below are required by default.
+				// Moderator rights by default is that user has permission to create 'review' or 'draft' comments and has at least 'anon' comment edit permission
+				$required_perm_value = get_status_permvalue( 'draft' ) + get_status_permvalue( 'review' ); 
+				$role_conditions = array(
+					'perm_edit_cmt' => array( 'IS NOT NULL', '<> "no"', '<> "own"' ), // user has at least 'anon' edit comment perm
+					'perm_cmtstatuses' => array( 'IS NOT NULL', '& '.$required_perm_value ) // user has 'review' and/or 'draft' comment statuses perm
+				);
+				break;
+
+			default: // roll with the given roll name is not defined
+				return NULL;
 		}
-		// roll with the given roll name is not defined
-		return NULL;
+
+		$where_clause = '';
+		$perm_prefixes = array( 'bloguser_', 'bloggroup_' );
+		foreach( $perm_prefixes as $prefix )
+		{ // Check requred perms on blogusers and bloggroups as well
+			$where_part = '';
+			foreach( $role_conditions as $perm_name => $conditions )
+			{ // Go through each required permission
+				$perm_field = $prefix.$perm_name;
+				foreach( $conditions as $condition )
+				{ // Check all defined conditions and join with 'AND' operator
+					$where_part .= '( '.$perm_field.' '.$condition.' ) AND ';
+				}
+			}
+			// Remove the last ' AND ' from the end of this where clause part
+			$where_part = substr( $where_part, 0, strlen( $where_part ) - 5 );
+			// Add the created conditions to the final where clause
+			$where_clause .= '( '.$where_part.' )';
+			if( $prefix != 'bloggroup_' )
+			{ // 'bloggroup_' perm check is the last, but everywhere else we need an 'OR' operator
+				$where_clause .= ' OR ';
+			}
+		}
+
+		// Count blog ids where this user has the required permissions for the given role
+		$SQL = new SQL();
+		$SQL->SELECT( 'count( blog_ID )' );
+		$SQL->FROM( 'T_blogs' );
+		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0 AND blog_ID = bloguser_blog_ID AND bloguser_user_ID = '.$this->ID.' )' );
+		$SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0 AND blog_ID = bloggroup_blog_ID AND bloggroup_group_ID = '.$this->group_ID.' )' );
+		$SQL->WHERE( 'blog_owner_user_ID = '.$this->ID );
+		$SQL->WHERE_or( $where_clause );
+
+		return $DB->get_var( $SQL->get(), 0, NULL, 'Check user role in all blogs' );
 	}
 
 
@@ -2958,13 +2995,15 @@ class User extends DataObject
 
 		$blog_param = ( empty( $blog ) ) ? '' : '&inskin=1&blog='.$blog;
 
+		// Change locale here to localize the email subject and content
+		locale_temp_switch( $this->get( 'locale' ) );
 		$email_template_params = array(
-				'locale'     => $this->get( 'locale' ),
 				'status'     => $this->status,
 				'blog_param' => $blog_param,
 				'request_id' => $request_id,
 			);
-		$r = send_mail_to_User( $this->ID, T_('Validate your email address for "$login$"!'), 'validate_account_secure', $email_template_params, true );
+		$r = send_mail_to_User( $this->ID, T_('Activate your account: $login$'), 'account_activate', $email_template_params, true );
+		locale_restore_previous();
 
 		if( $r )
 		{ // save request_id into Session
@@ -3023,7 +3062,7 @@ class User extends DataObject
 			'User' => $this,
 			'login' => $this->login, // this is required in the send_admin_notification
 		);
-		send_admin_notification( NT_('New user account activated'), 'user_activated', $email_template_params );
+		send_admin_notification( NT_('New user account activated'), 'account_activated', $email_template_params );
 	}
 
 
@@ -3793,7 +3832,7 @@ class User extends DataObject
 			if( ( $Settings->get( 'validation_process' ) != 'easy' ) && ( $current_User->ID != $this->ID ) )
 			{ // validation process is set to secure, we may send activation email only if this user is the current_User
 				$reg_settings_url = 'href="'.url_add_param( $admin_url, 'ctrl=registration' ).'#fieldset_wrapper_account_activation"';
-				$Messages->add( sprintf( T_( 'Because the Account Validation Process is set to <a %s>Secure</a>, the user will have to request a new validation email next time he tries to log in.' ), $reg_settings_url ), 'note' );
+				$Messages->add( sprintf( T_( 'Because the Account Activation Process is set to <a %s>Secure</a>, the user will have to request a new activation email next time he tries to log in.' ), $reg_settings_url ), 'note' );
 			}
 			else
 			{ // validation process is easy, send email with permanent activation link
@@ -3818,7 +3857,7 @@ class User extends DataObject
 				}
 				elseif( isset( $demo_mode ) && $demo_mode )
 				{
-					$Messages->add( T_('Could not send activation email. Sending emails is disabled in demo mode.' ), 'note' );
+					$Messages->add( 'Could not send activation email. Sending emails is disabled in demo mode.', 'note' );
 				}
 			}
 		}
@@ -3889,7 +3928,7 @@ class User extends DataObject
 							'user_ID' => $this->ID,
 							'closed_by_admin' => $current_User->login,
 						);
-					send_admin_notification( NT_('User account closed'), 'close_account', $email_template_params );
+					send_admin_notification( NT_('User account closed'), 'account_closed', $email_template_params );
 				}
 				return true;
 			}
@@ -3928,7 +3967,7 @@ class User extends DataObject
 							'login' => $this->login, // this is required in the send_admin_notification
 							'activated_by_admin' => $current_User->login,
 						);
-						send_admin_notification( NT_('New user account activated'), 'user_activated', $email_template_params );
+						send_admin_notification( NT_('New user account activated'), 'account_activated', $email_template_params );
 					}
 				}
 				return true;
@@ -4655,7 +4694,7 @@ class User extends DataObject
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'text' => T_( '%s from %s different users' ),
+				'text' => T_( '%s different users found %s posted %s helpful replies.' ),
 			), $params );
 
 		global $DB;
@@ -4689,7 +4728,7 @@ class User extends DataObject
 			$votes_count += $user_votes;
 		}
 
-		return sprintf( $params['text'], '<b>'.$votes_count.'</b>', '<b>'.$users_count.'</b>' );
+		return sprintf( $params['text'], '<b>'.$users_count.'</b>', $this->login, '<b>'.$votes_count.'</b>' );
 	}
 
 
@@ -4703,7 +4742,7 @@ class User extends DataObject
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'text' => T_( '%s reports' ),
+				'text' => T_( '%s successfully reported %s spams!' ),
 			), $params );
 
 		global $DB;
@@ -4723,14 +4762,14 @@ class User extends DataObject
 		$votes = $DB->get_var( 'SELECT SUM( cnt )
 			FROM ('.$comments_SQL->get().' UNION ALL '.$links_SQL->get().') AS tbl' );
 
-		return sprintf( $params['text'], '<b>'.$votes.'</b>' );
+		return sprintf( $params['text'], $this->login, '<b>'.$votes.'</b>' );
 	}
 }
 
 /*
  * $Log$
- * Revision 1.172  2013/11/06 08:05:03  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.173  2013/11/06 09:08:59  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

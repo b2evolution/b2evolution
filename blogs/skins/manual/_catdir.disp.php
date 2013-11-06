@@ -57,11 +57,32 @@ if( !empty( $cat ) )
 	$Item = $intro_Item;
 
 	if( empty( $Item ) || $Item->get( 'title' ) == '' )
-	{	// Display chapter title only if intro post has no title
+	{ // Display chapter title only if intro post has no title
 		$ChapterCache = & get_ChapterCache();
 		if( $curr_Chapter = & $ChapterCache->get_by_ID( $cat, false ) )
-		{	// Display category title
+		{ // Display category title
+			echo '<div class="bTitle linked">';
+
 			echo '<h1 class="page_title">'.$curr_Chapter->get( 'name' ).'</h1>';
+			echo '<div class="roundbutton_group">';
+			echo $curr_Chapter->get_edit_link( array(
+					'text'          => get_icon( 'edit' ).' '.T_('Edit Cat'),
+					'class'         => 'roundbutton roundbutton_text',
+					'redirect_page' => 'front',
+				) );
+
+			// Button to create a new page
+			$write_new_intro_url = $Blog->get_write_item_url( $cat, '', '', 'intro-cat' );
+			if( !empty( $write_new_intro_url ) )
+			{ // Display button to write a new intro
+				echo '<a href="'.$write_new_intro_url.'" class="roundbutton roundbutton_text">'
+						.get_icon( 'add' ).' '
+						.T_('Add Intro')
+					.'</a>';
+			}
+			echo '</div>';
+
+			echo '<div class="clear"></div></div>';
 		}
 	}
 

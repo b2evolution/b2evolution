@@ -56,7 +56,7 @@ $debug_jslog = false;
 // Init AJAX log
 $Ajaxlog = new Log();
 
-$Ajaxlog->add( sprintf( T_('action: %s'), $action ), 'note' );
+$Ajaxlog->add( sprintf( 'action: %s', $action ), 'note' );
 
 $params = param( 'params', 'array', array() );
 switch( $action )
@@ -367,9 +367,9 @@ switch( $action )
 		param( 'checked', 'integer', 0 );
 		param( 'redirect_to', 'string', '' );
 
-		$Ajaxlog->add( sprintf( T_('vote action: %s'), $vote_action ), 'note' );
-		$Ajaxlog->add( sprintf( T_('vote type: %s'), $vote_type ), 'note' );
-		$Ajaxlog->add( sprintf( T_('vote ID: %s'), $vote_ID ), 'note' );
+		$Ajaxlog->add( sprintf( 'vote action: %s', $vote_action ), 'note' );
+		$Ajaxlog->add( sprintf( 'vote type: %s', $vote_type ), 'note' );
+		$Ajaxlog->add( sprintf( 'vote ID: %s', $vote_ID ), 'note' );
 
 		$voting_form_params = array(
 				'vote_type' => $vote_type,
@@ -508,6 +508,12 @@ switch( $action )
 		}
 
 		$Form = new Form();
+		$Form->fieldstart = '#fieldstart#';
+		$Form->fieldend = '#fieldend#';
+		$Form->labelstart = '#labelstart#';
+		$Form->labelend = '#labelend#';
+		$Form->inputstart = '#inputstart#';
+		$Form->inputend = '#inputend#';
 
 		userfields_display( $userfields, $Form, 'add', false );
 
@@ -748,8 +754,14 @@ switch( $action )
 		$callback_function = param( 'callback_function', 'string', '' );
 		if( param( 'is_backoffice', 'integer', 0 ) )
 		{
-			global $current_User, $UserSettings;
+			global $current_User, $UserSettings, $is_admin_page;
 			$params = array( 'skin_type' => 'admin', 'skin_name' => $UserSettings->get( 'admin_skin', $current_User->ID ) );
+			$is_admin_page = true;
+
+			// Get the requested params and memorize it to make correct links for paging, ordering and etc.
+			param( 'ctrl', '/^[a-z0-9_]+$/', $default_ctrl, true );
+			param( 'blog', 'integer', NULL, true );
+			$ReqPath = $admin_url;
 		}
 		else
 		{
@@ -850,8 +862,8 @@ exit(0);
 
 /*
  * $Log$
- * Revision 1.31  2013/11/06 08:03:44  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.32  2013/11/06 09:08:46  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

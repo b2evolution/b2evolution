@@ -931,7 +931,7 @@ class _core_Module extends Module
 										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin'.$blog_param,
 									),
 									'plugin_settings' => array(
-										'text' => T_('Plugin settings').'&hellip;',
+										'text' => T_('Plugins').'&hellip;',
 										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=plugin_settings'.$blog_param,
 									),
 									'widgets' => array(
@@ -1005,14 +1005,8 @@ class _core_Module extends Module
 					);
 			}
 
-			if( $current_User->check_perm( 'perm_messaging', 'reply' ) )
-			{	// Messaging:
-				$entries['tools']['disabled'] = false;
-				$entries['tools']['entries']['messaging'] = array(
-						'text' => T_('Messaging').'&hellip;',
-						'href' => get_dispctrl_url( 'threads' ),
-					);
-			}
+			// PLACE HOLDER FOR MESSAGING MODULE:
+			$entries['tools']['entries']['messaging'] = NULL;
 
 			// PLACE HOLDER FOR FILES MODULE:
 			$entries['tools']['entries']['files'] = NULL;
@@ -1025,6 +1019,28 @@ class _core_Module extends Module
 
 			if( $perm_spam || $perm_options || $perm_slugs || $perm_maintenance )
 			{
+				if( $perm_emails )
+				{
+					$entries['tools']['entries']['email'] = array(
+							'text' => T_('Emails'),
+							'href' => $admin_url.'?ctrl=email',
+							'entries' => array(
+								'blocked' => array(
+									'text' => T_('Addresses').'&hellip;',
+									'href' => $admin_url.'?ctrl=email' ),
+								'sent' => array(
+									'text' => T_('Sent').'&hellip;',
+									'href' => $admin_url.'?ctrl=email&amp;tab=sent' ),
+								'return' => array(
+									'text' => T_('Returned').'&hellip;',
+									'href' => $admin_url.'?ctrl=email&amp;tab=return' ),
+								'settings' => array(
+									'text' => T_('Settings').'&hellip;',
+									'href' => $admin_url.'?ctrl=email&amp;tab=settings' ),
+								)
+						);
+				}
+
 				$entries['tools']['disabled'] = false;
 				$entries['tools']['entries']['tools_sep'] = array(
 						'separator' => true,
@@ -1074,28 +1090,6 @@ class _core_Module extends Module
 								'text' => T_('IP Ranges').'&hellip;',
 								'href' => $admin_url.'?ctrl=antispam&amp;tab3=ipranges' );
 					}
-				}
-
-				if( $perm_emails )
-				{
-					$entries['tools']['entries']['email'] = array(
-							'text' => T_('Email'),
-							'href' => $admin_url.'?ctrl=email',
-							'entries' => array(
-								'sent' => array(
-									'text' => T_('Sent').'&hellip;',
-									'href' => $admin_url.'?ctrl=email' ),
-								'blocked' => array(
-									'text' => T_('Addresses').'&hellip;',
-									'href' => $admin_url.'?ctrl=email&amp;tab=blocked' ),
-								'return' => array(
-									'text' => T_('Return Path').'&hellip;',
-									'href' => $admin_url.'?ctrl=email&amp;tab=return' ),
-								'settings' => array(
-									'text' => T_('Settings').'&hellip;',
-									'href' => $admin_url.'?ctrl=email&amp;tab=settings' ),
-								)
-						);
 				}
 
 				if( $perm_slugs )
@@ -1386,6 +1380,28 @@ class _core_Module extends Module
 
 		$AdminUI->add_menu_entries( NULL, array( 'users' => $users_entries ) );
 
+		/**** Emails ****/
+		$perm_emails = $current_User->check_perm( 'emails', 'view' );
+		if( $perm_admin_normal && $perm_options && $perm_emails )
+		{ // Permission to view email management:
+			$AdminUI->add_menu_entries( NULL, array( 'email' => array(
+					'text' => T_('Emails'),
+					'href' => '?ctrl=email',
+					'entries' => array(
+						'blocked' => array(
+							'text' => T_('Addresses'),
+							'href' => '?ctrl=email' ),
+						'sent' => array(
+							'text' => T_('Sent'),
+							'href' => '?ctrl=email&amp;tab=sent' ),
+						'return' => array(
+							'text' => T_('Returned'),
+							'href' => '?ctrl=email&amp;tab=return' ),
+						'settings' => array(
+							'text' => T_('Settings'),
+							'href' => '?ctrl=email&amp;tab=settings' ),
+						) ) ) );
+		}
 
 		/**** System ****/
 		if( $perm_admin_normal && $perm_options )
@@ -1398,7 +1414,7 @@ class _core_Module extends Module
 
 			$perm_spam = $current_User->check_perm( 'spamblacklist', 'view' );
 			$perm_slugs = $current_User->check_perm( 'slugs', 'view' );
-			$perm_emails = $current_User->check_perm( 'emails', 'view' );
+
 			if( $perm_admin_normal && ( $perm_options || $perm_spam || $perm_slugs ) )
 			{	// Permission to view tools, antispam or slugs.
 				if( $perm_options )
@@ -1446,27 +1462,6 @@ class _core_Module extends Module
 								'text' => T_('IP Ranges'),
 								'href' => '?ctrl=antispam&amp;tab3=ipranges' ) ) );
 					}
-				}
-
-				if( $perm_emails )
-				{	// Permission to view email management:
-					$AdminUI->add_menu_entries( 'options', array('email' => array(
-									'text' => T_('Email'),
-									'href' => '?ctrl=email',
-									'entries' => array(
-										'sent' => array(
-											'text' => T_('Sent'),
-											'href' => '?ctrl=email' ),
-										'blocked' => array(
-											'text' => T_('Addresses'),
-											'href' => '?ctrl=email&amp;tab=blocked' ),
-										'return' => array(
-											'text' => T_('Return Path'),
-											'href' => '?ctrl=email&amp;tab=return' ),
-										'settings' => array(
-											'text' => T_('Settings'),
-											'href' => '?ctrl=email&amp;tab=settings' ),
-										) ) ) );
 				}
 
 				if( $perm_slugs )
@@ -1538,8 +1533,8 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
- * Revision 1.96  2013/11/06 08:03:47  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.97  2013/11/06 09:08:46  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

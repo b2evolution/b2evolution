@@ -1402,7 +1402,7 @@ function create_demo_contents()
 	$cat_manual_ann = cat_create( T_('Welcome'), 'NULL', $blog_manual_ID, 'Welcome description', false, 15 );
 	$cat_manual_news = cat_create( T_('News'), 'NULL', $blog_manual_ID, 'News description', false, 5 );
 	$cat_manual_bg = cat_create( T_('Background'), 'NULL', $blog_manual_ID, 'Background description', false, 35 );
-	$cat_manual_fun = cat_create( T_('Fun'), 'NULL', $blog_manual_ID, 'Fun description', false, 25 );
+	$cat_manual_fun = cat_create( T_('Cat with intro post'), 'NULL', $blog_manual_ID, 'Description of cat with intro post', false, 25 );
 	$cat_manual_life = cat_create( T_('In real life'), $cat_manual_fun, $blog_manual_ID, NULL, false, 10 );
 	$cat_manual_web = cat_create( T_('On the web'), $cat_manual_fun, $blog_manual_ID, NULL, false, 5 );
 	$cat_manual_sports = cat_create( T_('Sports'), $cat_manual_life, $blog_manual_ID, NULL, false, 35 );
@@ -1560,7 +1560,7 @@ function create_demo_contents()
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
-	$edited_Item->insert( 1, 'Manual', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-US', '', 'http://manual.b2evolution.net/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Manual', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-US', '', 'http://b2evolution.net/man/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -1653,8 +1653,8 @@ function create_demo_contents()
 	$edited_Item->insert( 1, T_("Apache optimization..."), sprintf( T_("<p>b2evolution comes with an <code>.htaccess</code> file destined to optimize the way b2evolution is handled by your webseerver (if you are using Apache). In some circumstances, that file may not be automatically activated at setup. Please se the man page about <a %s>Tricky Stuff</a> for more information.</p>
 
 <p>For further optimization, please review the manual page about <a %s>Performance optimization</a>. Depending on your current configuration and on what your <a %s>web hosting</a> company allows you to do, you may increase the speed of b2evolution by up to a factor of 10!</p>"),
-'href="http://manual.b2evolution.net/Tricky_stuff"',
-'href="http://manual.b2evolution.net/Performance_optimization"',
+'href="http://b2evolution.net/man/tricky-stuff"',
+'href="http://b2evolution.net/man/performance-optimization"',
 'href="http://b2evolution.net/web-hosting/"' ),
 												$now, $cat_b2evo, array( $cat_ann_b ) );
 
@@ -1703,7 +1703,7 @@ function create_demo_contents()
 
 <p>To start customizing a skin, open its "<code>index.main.php</code>" file in an editor and read the comments in there. Note: you can also edit skins in the "Files" tab of the admin interface.</p>
 
-<p>And, of course, read the <a href="http://manual.b2evolution.net/Skins_2.0" target="_blank">manual on skins</a>!</p>'), $now, $cat_b2evo );
+<p>And, of course, read the <a href="http://b2evolution.net/man/skin-structure" target="_blank">manual on skins</a>!</p>'), $now, $cat_b2evo );
 	$edited_Item->set_tags_from_string( 'skins' );
 	$edited_Item->set( 'featured', 1 );
 	$edited_Item->dbsave();
@@ -1888,7 +1888,7 @@ function create_demo_contents()
 	// Insert a cat intro:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
-	$edited_Item->insert( 1, T_("Fun intro"), T_('This is an intro-cat post for the Fun category'), $now, $cat_manual_fun,
+	$edited_Item->insert( 1, T_("Cat intro post"), T_('This is an intro-cat post for the category with intro post'), $now, $cat_manual_fun,
 		array(), 'published', '#', '', '', 'open', array('default'), 1520 );
 
 	// Insert a PAGE:
@@ -1902,7 +1902,7 @@ function create_demo_contents()
 	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('First Topic'), T_('<p>This is the first topic.</p>
 
-<p>It appears in a single category.</p>'), $now, $cat_manual_ann, array( $cat_manual_news, $cat_manual_movies ), 
+<p>It appears in a single category.</p>'), $now, $cat_manual_ann, array( $cat_manual_news, $cat_manual_movies ),
 		'published', '#', '', '', 'open', array('default'), 1, NULL, 10 );
 
 	// Insert a post:
@@ -2229,8 +2229,8 @@ function create_default_posts_location()
 
 /*
  * $Log$
- * Revision 1.336  2013/11/06 08:05:19  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.337  2013/11/06 09:09:09  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

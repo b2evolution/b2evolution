@@ -43,28 +43,28 @@ echo '<?xml version="1.0" encoding="UTF-8"?'.'>';
 	    	if( !empty($blog) ) { echo ' blogID="'.$blog.'"'; }
 	    	?>>
 				<settings>
-					<docs>http://manual.b2evolution.net/MetaWeblog_API</docs>
+					<docs>http://b2evolution.net/man/metaweblog-api</docs>
 				</settings>
 			</api>
 	    <api name="MovableType" preferred="false" apiLink="<?php echo $xmlsrv_url; ?>xmlrpc.php"<?php
 	    	if( !empty($blog) ) { echo ' blogID="'.$blog.'"'; }
 	    	?>>
 				<settings>
-					<docs>http://manual.b2evolution.net/MovableType_API</docs>
+					<docs>http://b2evolution.net/man/movabletype-api</docs>
 				</settings>
 			</api>
 	    <api name="Blogger" preferred="false" apiLink="<?php echo $xmlsrv_url; ?>xmlrpc.php"<?php
 	    	if( !empty($blog) ) { echo ' blogID="'.$blog.'"'; }
 	    	?>>
 				<settings>
-					<docs>http://manual.b2evolution.net/Blogger_API</docs>
+					<docs>http://b2evolution.net/man/blogger-api</docs>
 				</settings>
 			</api>
 	    <api name="b2" preferred="false" apiLink="<?php echo $xmlsrv_url; ?>xmlrpc.php"<?php
 	    	if( !empty($blog) ) { echo ' blogID="'.$blog.'"'; }
 	    	?>>
 				<settings>
-					<docs>http://manual.b2evolution.net/B2_API</docs>
+					<docs>http://b2evolution.net/man/b2-api</docs>
 				</settings>
 			</api>
 	  </apis>
@@ -74,8 +74,8 @@ echo '<?xml version="1.0" encoding="UTF-8"?'.'>';
 
 /*
  * $Log$
- * Revision 1.8  2013/11/06 08:05:53  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.9  2013/11/06 09:09:31  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

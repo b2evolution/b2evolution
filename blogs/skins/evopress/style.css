@@ -4,11 +4,6 @@
 * Distributed with b2evolution with written permission from Michael Heilemann (2007-01-25).
 */
 
-/* The following are now requested in _skin.class.php::display_init() -- please see note there */
-/* @import url("../../rsc/css/basic.css");	/* Import basic styles */
-/* @import url("../../rsc/css/blog_base.css");	/* Import default blog navigation styles */
-/* @import url("item.css");	/* Import blog content styles */
-
 
 /* Begin Typography & Colors */
 body {
@@ -17,6 +12,9 @@ font-family: 'Lucida Grande', Verdana, Arial, Sans-Serif;
 background: #d5d6d7 url('img/kubrickbgcolor.jpg');
 color: #333;
 text-align: center;
+}
+textarea, input, select, option, optgroup, ul.ui-autocomplete, li.token-input-token-facebook, div.token-input-dropdown-facebook {
+font: 12px 'Lucida Grande', Verdana, Arial, Sans-Serif;
 }
 
 #page {
@@ -498,8 +496,10 @@ width: 100%;
 /* Styles for comments */
 div.bComment, /* Entire comment block */
 form.bComment { /* New comment form */
-margin: 1ex 0;
-border: 1px dotted #999;
+	margin: 1ex 0;
+}
+form.bComment {
+	margin-top: 0;
 }
 
 div.moderation_msg {
@@ -561,6 +561,8 @@ width: 490px;
 div.top_menu li {
 display: inline;
 padding: 0 1em 0 0;
+white-space: nowrap;
+float: left;
 }
 div.top_menu a {
 font-weight: bold;
@@ -579,4 +581,23 @@ div.top_menu_left {
 
 div.top_menu_right {
 	margin-left: 0px;
+}
+
+/* jQuery Tokeninput plugin */
+div.input ul.token-input-list-facebook {
+	width: 309px;
+}
+
+/* Not published comments display */
+#styled_content_block .bComment .status_draft,
+#styled_content_block .bComment .status_review,
+#styled_content_block .bComment .status_community,
+#styled_content_block .bComment .status_protected,
+#styled_content_block .bComment .status_private {
+	top: 0px;
+	left: 12px;
+}
+
+div.tabs {
+	padding-left: 10px;
 }

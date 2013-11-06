@@ -80,7 +80,7 @@ switch( $type )
 			}
 			elseif( $demo_mode )
 			{ // Debug mode restriction: sending email is disabled
-				$Messages->add( T_('Sorry, could not send email. Sending email in debug mode is disabled.' ), 'error' );
+				$Messages->add( 'Sorry, could not send email. Sending email in demo mode is disabled.', 'error' );
 			}
 			else
 			{

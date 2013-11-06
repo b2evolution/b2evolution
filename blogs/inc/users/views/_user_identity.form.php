@@ -168,7 +168,7 @@ if( $new_user_creating )
 	$GroupCache = & get_GroupCache();
 	$Form->select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, T_( 'User group' ) );
 
-	$field_note = '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://manual.b2evolution.net/User_levels"' );
+	$field_note = '[0 - 10]';
 	$Form->text_input( 'edited_user_level', $edited_User->get('level'), 2, T_('User level'), $field_note, array( 'required' => true ) );
 
 	$email_fieldnote = '<a href="mailto:'.$edited_User->get('email').'">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
@@ -504,6 +504,16 @@ $Form->end_form();
 
 ?>
 <script type="text/javascript">
+	function replace_form_params( result )
+	{
+		return result.replace( '#fieldstart#', '<?php echo format_to_js( str_ireplace( '$id$', '', $Form->fieldstart ) ); ?>' )
+			.replace( '#fieldend#', '<?php echo format_to_js( $Form->fieldend ); ?>' )
+			.replace( '#labelstart#', '<?php echo format_to_js( $Form->labelstart ); ?>' )
+			.replace( '#labelend#', '<?php echo format_to_js( $Form->labelend ); ?>' )
+			.replace( '#inputstart#', '<?php echo format_to_js( $Form->inputstart ); ?>' )
+			.replace( '#inputend#', '<?php echo format_to_js( $Form->inputend ); ?>' );
+	}
+
 	jQuery( '#button_add_field' ).click( function ()
 	{	// Action for the button when we want to add a new field in the Additional info
 		var field_id = jQuery( this ).parent().prev().find( 'option:selected' ).val();
@@ -533,6 +543,7 @@ $Form->end_form();
 				}
 				else
 				{
+					result = replace_form_params( result );
 					var field_duplicated = parseInt( result.replace( /^\[(\d+)\](.*)/, '$1' ) );
 					if( field_duplicated == 0 )
 					{	// This field is NOT duplicated
@@ -620,6 +631,7 @@ $Form->end_form();
 				}
 				else
 				{
+					result = replace_form_params( result );
 					var field_duplicated = parseInt( result.replace( /^\[(\d+)\](.*)/, '$1' ) );
 					if( field_duplicated == 0 )
 					{	// This field is NOT duplicated
@@ -686,8 +698,8 @@ echo_regional_js( 'edited_user', user_region_visible() );
 
 /*
  * $Log$
- * Revision 1.65  2013/11/06 08:05:04  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.66  2013/11/06 09:09:09  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

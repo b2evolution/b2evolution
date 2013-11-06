@@ -469,6 +469,9 @@ span.label_field_required {
 	font-weight: bold;
 	margin-right: 4px;
 }
+.not_required span.label_field_required {
+	display: none;
+}
 
 span.field_error {
 	display: block;
@@ -554,7 +557,7 @@ label.radiooption {
 
 legend {
 	font-weight: bold;
-	color: #888;
+	font-size: 120%;
 }
 
 
@@ -576,9 +579,27 @@ legend {
 	padding-top: .5ex;
 	/* border: 1px solid #f00; */
 }
+.fform fieldset.field_wide div.label,
+.fform fieldset.field_inline div.label {
+	float: none;
+	text-align: left;
+	width: auto;
+	margin-bottom: 5px;
+}
+.fform fieldset.field_inline div.label {
+	float: left;
+}
 .fform div.input {
 	margin: 0 0 0 25%;
 	/* border: 1px solid #f00; */
+}
+.fform fieldset.field_wide div.input {
+	margin-left: 20px;
+}
+.fform fieldset.field_inline div.input {
+	float: left;
+	margin-left: 5px;
+	line-height: 24px;
 }
 * html .fform div.input {
 	height:1%; /* so IE6 gains layout (hasLayout) and does not cause 3px bug for lines below div.label (if div.input is heigher than div.label) */
@@ -603,14 +624,6 @@ legend {
 /* hide checkbox in order to indent exactly the same size */
 input.invisible{
 	visibility: hidden;
-}
-
-
-/* Browser specific */
-body#body_mac.body_firefox input[type=text],
-body#body_mac.body_firefox select,
-body#body_mac.body_firefox textarea {
-	border: 1px solid #999;
 }
 
 

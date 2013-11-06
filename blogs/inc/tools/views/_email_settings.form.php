@@ -84,7 +84,7 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 	$Form->end_fieldset();
 }
 
-$Form->begin_fieldset( T_('Settings to decode the returned emails').get_manual_link('blog_by_email') );
+$Form->begin_fieldset( T_('Settings to decode the returned emails').get_manual_link('return-path-configuration') );
 
 	if( extension_loaded( 'imap' ) )
 	{
@@ -137,10 +137,13 @@ $Form->begin_fieldset( T_('Settings to decode the returned emails').get_manual_l
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_( 'Email notifications' ).get_manual_link( 'email_notifications' ) );
-	$Form->text_input( 'notification_sender_email', $Settings->get( 'notification_sender_email' ), 50, T_( 'Sender email address' ) );
-	$Form->text_input( 'notification_return_path', $Settings->get( 'notification_return_path' ), 50, T_( 'Return path' ) );
-	$Form->text_input( 'notification_sender_name', $Settings->get( 'notification_sender_name' ), 50, T_( 'Sender name' ) );
+$Form->begin_fieldset( T_( 'Email notifications' ).get_manual_link( 'email-notification-settings' ) );
+	$Form->text_input( 'notification_sender_email', $Settings->get( 'notification_sender_email' ), 50, T_( 'Sender email address' ), '', array( 'maxlength' => 127, 'required' => true ) );
+	$Form->text_input( 'notification_sender_name', $Settings->get( 'notification_sender_name' ), 50, T_( 'Sender name' ), '', array( 'maxlength' => 127, 'required' => true ) );
+	$Form->text_input( 'notification_return_path', $Settings->get( 'notification_return_path' ), 50, T_( 'Return path' ), '', array( 'maxlength' => 127, 'required' => true ) );
+	$Form->text_input( 'notification_short_name', $Settings->get( 'notification_short_name' ), 50, T_( 'Short site name' ), '', array( 'maxlength' => 127, 'required' => true ) );
+	$Form->text_input( 'notification_long_name', $Settings->get( 'notification_long_name' ), 50, T_( 'Long site name' ), '', array( 'maxlength' => 255 ) );
+	$Form->text_input( 'notification_logo', $Settings->get( 'notification_logo' ), 50, T_( 'Site logo (URL)' ), '', array( 'maxlength' => 5000 ) );
 $Form->end_fieldset();
 
 if( $current_User->check_perm( 'emails', 'edit' ) )
@@ -154,8 +157,8 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 
 /*
  * $Log$
- * Revision 1.2  2013/11/06 08:04:55  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.3  2013/11/06 09:08:59  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

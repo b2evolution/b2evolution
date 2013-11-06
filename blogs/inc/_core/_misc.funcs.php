@@ -2537,9 +2537,7 @@ function debug_info( $force = false, $force_clean = false )
 
 		$close_url = url_add_param( $_SERVER['REQUEST_URI'], 'jslog' );
 		echo '<div id="debug_ajax_info" class="debug"'.$jslog_styles.'>';
-		echo '<div class="jslog_titlebar">'.
-				T_('AJAX Debug log').
-				get_manual_link('ajax_debug_log').
+		echo '<div class="jslog_titlebar">AJAX Debug log'.get_manual_link('ajax_debug_log').
 				action_icon( T_('Close'), 'close', $close_url, NULL, NULL, NULL, array( 'class' => 'jslog_switcher' ) ).
 			'</div>';
 		echo '<div id="jslog_container"></div>';
@@ -3208,7 +3206,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
  */
 function send_mail_to_User( $user_ID, $subject, $template_name, $template_params = array(), $force_on_non_activated = false, $headers = array() )
 {
-	global $UserSettings, $current_charset;
+	global $UserSettings, $Settings, $current_charset;
 
 	$UserCache = & get_UserCache();
 	if( $User = $UserCache->get_by_ID( $user_ID ) )
@@ -3228,18 +3226,18 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 		// Check if a new email to User with the corrensponding email type is allowed
 		switch( $template_name )
 		{
-			case 'validate_account_easy':
-				 if( !$template_params['is_reminder'] )
-				 { // this is not a notification email
-				 	break;
-				 }
-			case 'notify_message':
-			case 'unread_message_reminder':
-			case 'notify_post':
-			case 'notify_comment':
-			case 'user_activated':
-			case 'close_account':
-			case 'user_reported':
+			case 'account_activate':
+				if( $Settings->get( 'validation_process' ) == 'easy' && !$template_params['is_reminder'] )
+				{ // this is not a notification email
+					break;
+				}
+			case 'private_message_new':
+			case 'private_messages_unread_reminder':
+			case 'post_new':
+			case 'comment_new':
+			case 'account_activated':
+			case 'account_closed':
+			case 'account_reported':
 				// this is a notificaiton email
 				if( !check_allow_new_email( 'notification_email_limit', 'last_notification_email', $User->ID ) )
 				{ // more notification email is not allowed today
@@ -3328,7 +3326,12 @@ function mail_autoinsert_user_data( $text, $User = NULL )
  */
 function mail_template( $template_name, $format = 'auto', $params = array(), $User = NULL )
 {
-	global $emailskins_path, $current_charset, $is_admin_page;
+	global $current_charset, $is_admin_page;
+
+	if( !empty( $params['locale'] ) )
+	{ // Switch to locale for current email template
+		locale_temp_switch( $params['locale'] );
+	}
 
 	$value_is_admin_page = $is_admin_page;
 	// Set TRUE to use gender settings from back office
@@ -3340,13 +3343,13 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 	{
 		case 'auto':
 			// $template_exts['non-mime'] = '.txt.php'; // The area that is ignored by MIME-compliant clients
-			$template_exts['html'] = '.html.php';
 			$template_exts['text'] = '.txt.php';
+			$template_exts['html'] = '.html.php';
 			$boundary = $params['boundary'];
 			$boundary_alt = 'b2evo-alt-'.md5( rand() );
 			$template_headers = array(
-					'html' => 'Content-Type: text/html; charset='.$current_charset,
 					'text' => 'Content-Type: text/plain; charset='.$current_charset,
+					'html' => 'Content-Type: text/html; charset='.$current_charset,
 				);
 			break;
 
@@ -3362,7 +3365,7 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 	$template_message = '';
 
 	if( isset( $boundary, $boundary_alt ) )
-	{	// Start new boundary content
+	{ // Start new boundary content
 		$template_message .= "\n".'--'.$boundary."\n";
 		$template_message .= 'Content-Type: multipart/alternative; boundary="'.$boundary_alt.'"'."\n\n";
 	}
@@ -3370,40 +3373,30 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 	foreach( $template_exts as $format => $ext )
 	{
 		if( isset( $boundary, $boundary_alt ) && $format != 'non-mime' )
-		{	// Start new boundary alt content
+		{ // Start new boundary alt content
 			$template_message .= "\n".'--'.$boundary_alt."\n";
 		}
 
 		if( isset( $template_headers[ $format ] ) )
-		{	// Header data for each content
+		{ // Header data for each content
 			$template_message .= $template_headers[ $format ]."\n\n";
 		}
 
 		// Get mail template
 		ob_start();
-		$template_header = $emailskins_path.'_header.inc'.$ext;
-		if( @file_exists( $template_header ) )
-		{	// Include message header if it exists
-			require $template_header;
-		}
+		emailskin_include( $template_name.$ext, $params );
+		$template_message .= ob_get_clean();
 
-		$template_body = $emailskins_path.$template_name.$ext;
-		if( @file_exists( $template_body ) )
-		{	// Include message body text if it exists
-			require $template_body;
-		}
-
-		$template_message .= ob_get_contents();
-		ob_end_clean();
-
-		if( $format == 'html' && !empty( $User ) )
-		{	// Replace login with gender colored link + icon
-			$template_message = str_replace( '$login$', $User->get_colored_login( array( 'mask' => '$avatar$ $login$' ) ), $template_message );
+		if( !empty( $User ) )
+		{ // Replace $login$ with gender colored link + icon in HTML format,
+		  //   and with simple login text in PLAIN TEXT format
+			$user_login = $format == 'html' ? $User->get_colored_login( array( 'mask' => '$avatar$ $login$' ) ) : $User->login;
+			$template_message = str_replace( '$login$', $user_login, $template_message );
 		}
 	}
 
 	if( isset( $boundary, $boundary_alt ) )
-	{	// End all boundary contents
+	{ // End all boundary contents
 		$template_message .= "\n".'--'.$boundary_alt.'--'."\n";
 		$template_message .= "\n".'--'.$boundary.'--'."\n";
 	}
@@ -3411,7 +3404,57 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 	// Return back the value
 	$is_admin_page = $value_is_admin_page;
 
+	if( !empty( $params['locale'] ) )
+	{ // Restore previous locale
+		locale_restore_previous();
+	}
+
 	return $template_message;
+}
+
+
+/**
+ * Include email template from folder /skins_email/custom/ or /skins_email/
+ *
+ * @param string Template name
+ * @param array Params
+ */
+function emailskin_include( $template_name, $params = array() )
+{
+	global $emailskins_path, $is_admin_page, $rsc_url;
+
+	/**
+	* @var Log
+	*/
+	global $Debuglog;
+	global $Timer;
+
+	$timer_name = 'emailskin_include('.$template_name.')';
+	$Timer->resume( $timer_name );
+
+	$is_customized = false;
+
+	// Try to include custom template firstly
+	$template_path = $emailskins_path.'custom/'.$template_name;
+	if( file_exists( $template_path ) )
+	{ // Include custom template file if it exists
+		$Debuglog->add( 'emailskin_include: '.rel_path_to_base( $template_path ), 'skins' );
+		require $template_path;
+		// This template is customized, Don't include standard template
+		$is_customized = true;
+	}
+
+	if( !$is_customized )
+	{ // Try to include standard template only if custom template doesn't exist
+		$template_path = $emailskins_path.$template_name;
+		if( file_exists( $template_path ) )
+		{ // Include standard template file if it exists
+			$Debuglog->add( 'emailskin_include: '.rel_path_to_base( $template_path ), 'skins' );
+			require $template_path;
+		}
+	}
+
+	$Timer->pause( $timer_name );
 }
 
 
@@ -5718,8 +5761,8 @@ function is_ajax_content( $template_name = '' )
 
 /*
  * $Log$
- * Revision 1.300  2013/11/06 08:03:47  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.301  2013/11/06 09:08:46  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

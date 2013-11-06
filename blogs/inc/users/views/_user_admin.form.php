@@ -82,10 +82,10 @@ $Form->hidden( 'edited_user_login', $edited_User->login );
 
 /***************  User permissions  **************/
 
-$Form->begin_fieldset( T_('User permissions').get_manual_link('user_permissions'), array( 'class'=>'fieldset clear' ) );
+$Form->begin_fieldset( T_('User permissions').get_manual_link('user-admin-permissions'), array( 'class'=>'fieldset clear' ) );
 
 $edited_User->get_Group();
-$level_fieldnote = '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://manual.b2evolution.net/User_levels"' );
+$level_fieldnote = '[0 - 10]';
 
 if( $edited_User->ID == 1 )
 {	// This is Admin user
@@ -107,7 +107,7 @@ else
 
 $Form->end_fieldset(); // user permissions
 
-$Form->begin_fieldset( T_('Email') );
+$Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
 	$email_fieldnote = '<a href="mailto:'.$edited_User->get( 'email' ).'" class="roundbutton">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
 	$Form->text_input( 'edited_user_email', $edited_User->get( 'email' ), 30, T_('Email'), $email_fieldnote, array( 'maxlength' => 100, 'required' => true ) );
 
@@ -129,34 +129,72 @@ $Form->begin_fieldset( T_('Email') );
 	$Form->text_input( 'notification_sender_email', $UserSettings->get( 'notification_sender_email', $edited_User->ID ), 50, T_( 'Sender email address' ) );
 	$Form->text_input( 'notification_sender_name', $UserSettings->get( 'notification_sender_name', $edited_User->ID ), 50, T_( 'Sender name' ) );
 
-	// Last account activation email date ( reminders and requested activation emails are logged as well )
-	$last_activation_email = $UserSettings->get( 'last_activation_email', $edited_User->ID );
-	if( empty( $last_activation_email ) )
-	{ // latest activation email date is not set, because user is already activated or email was not sent yet ( if email was not sent yet and the user is not activated and not closed probably there is some problem with the user email address )
-		$last_activation_email = $edited_User->check_status( 'is_validated' ) ? T_('Account is already activated') : T_('None yet');
+	// Display user account activation info ( Last/Next activate account email )
+	$account_activation_info = get_account_activation_info( $edited_User );
+	foreach( $account_activation_info as $field_options )
+	{ // Display each info field
+		$field_note = isset( $field_options[2] ) ? $field_options[2] : '';
+		$Form->info_field( $field_options[0], $field_options[1], array( 'note' => $field_note ) );
 	}
-	else
-	{ // format last activation email date
-		$last_activation_email = format_to_output( $last_activation_email );
-	}
-	$Form->info_field( T_('Latest account activation email'), $last_activation_email, array( 'note' => T_('Responsable schedule job for reminders is "Send reminders about not activated accounts".') ) );
+
+	// Display last unread messages reminder info
 	$last_unread_messages_reminder = $UserSettings->get( 'last_unread_messages_reminder', $edited_User->ID );
 	$Form->info_field( T_('Latest unread messages reminder'), empty( $last_unread_messages_reminder ) ? T_('None yet') : format_to_output( $last_unread_messages_reminder ), array( 'note' => T_('Responsable schedule job is "Send reminders about unread messages".') ) );
+	// Display next unread message reminder info
+	$reminder_info = get_next_reminder_info( $edited_User->ID );
+	if( is_array( $reminder_info ) )
+	{ // We have field note to display
+		$Form->info_field( T_('Next unread messages reminder'), $reminder_info[0], array( 'note' => $reminder_info[1] ) );
+	}
+	else
+	{ // Display next reminder info, without note
+		$Form->info_field( T_('Next unread messages reminder'), $reminder_info );
+	}
+
+	// Display information about notification emails
 	$last_notification_email = $UserSettings->get( 'last_notification_email', $edited_User->ID );
-	$last_notificaiton_date = empty( $last_notification_email ) ? T_('None yet') : format_to_output( date2mysql( substr( $last_notification_email, 0, strpos( $last_notification_email, '_' ) ) ) );
-	$Form->info_field( T_('Latest notification email'), $last_notificaiton_date, array( 'note' => T_('The latest between all kind of notification emails.') ) );
+	if( empty( $last_notification_email ) )
+	{ // Notification email to the edited User was not sent yet
+		$Form->info_field( T_('Latest notification email'), T_('None yet'), array( 'note' => T_('The latest between all kind of notification emails.') ) );
+	}
+	else
+	{ // At least one notification email was sent
+		// Separator between the last notification email timestamp and counter
+		$counter_separator = strpos( $last_notification_email, '_' );
+		$last_notificaiton_timestamp = substr( $last_notification_email, 0, $counter_separator );
+		$last_notificaiton_date = format_to_output( date2mysql( $last_notificaiton_timestamp ) );
+		$Form->info_field( T_('Latest notification email'), $last_notificaiton_date, array( 'note' => T_('The latest between all kind of notification emails.') ) );
+		$notification_counter = ( date( 'Ymd', $servertimenow ) == date( 'Ymd', $last_notificaiton_timestamp ) ) ? substr( $last_notification_email, $counter_separator + 1 ) : 0;
+		$notification_limit = $UserSettings->get( 'notification_email_limit',  $edited_User->ID );
+		$Form->info_field( T_('Notifications already sent today'), sprintf( T_('%d out of a maximum allowed of %d'), $notification_counter, $notification_limit ) );
+	}
+
+	// Display information about newsletters
 	$last_newsletter = $UserSettings->get( 'last_newsletter', $edited_User->ID );
-	$last_newsletter_date = empty( $last_newsletter ) ? T_('None yet') : format_to_output( date2mysql( substr( $last_newsletter, 0, strpos( $last_newsletter, '_' ) ) ) );
-	$Form->info_field( T_('Latest newsletter'), $last_newsletter_date );
+	if( empty( $last_newsletter ) )
+	{ // Newsletter to the edited User was not sent yet
+		$Form->info_field( T_('Latest newsletter'), T_('None yet') );
+	}
+	else
+	{ // At least one newsletter was sent
+		// Separator between the last newsletter timestamp and counter
+		$counter_separator = strpos( $last_newsletter, '_' );
+		$last_newsletter_timestamp = substr( $last_newsletter, 0, $counter_separator );
+		$last_newsletter_date = format_to_output( date2mysql( $last_newsletter_timestamp ) );
+		$Form->info_field( T_('Latest newsletter'), $last_newsletter_date );
+		$newsletter_counter = ( date( 'Ymd', $servertimenow ) == date( 'Ymd', $last_newsletter_timestamp ) ) ? substr( $last_newsletter, $counter_separator + 1 ) : 0;
+		$newsletter_limit = $UserSettings->get( 'newsletter_limit',  $edited_User->ID );
+		$Form->info_field( T_('Newsletters already sent today'), sprintf( T_('%d out of a maximum allowed of %d'), $newsletter_counter, $newsletter_limit ) );
+	}
 $Form->end_fieldset(); // Email info
 
-$Form->begin_fieldset( T_('Additional info') );
+$Form->begin_fieldset( T_('Usage info').get_manual_link('user-admin-usage') );
 
 	$activity_tab_url = '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab=activity';
 
 	$Form->info_field( T_('ID'), $edited_User->ID );
 
-	// Other users reports from the edited User 
+	// Other users reports from the edited User
 	$Form->info_field( T_('Reports'), count_reports_from( $edited_User->ID ) );
 
 	// Number of blogs owned by the edited User
@@ -232,7 +270,7 @@ while( $loop_Plugin = & $Plugins->get_next() )
 	$user_from_country_suffix .= $loop_Plugin->GetUserFromCountrySuffix( $tmp_params = array( 'User' => & $edited_User ) );
 }
 
-$Form->begin_fieldset( T_('Registration info') );
+$Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-registration') );
 	$Form->info_field( T_('Account registered on'), $edited_User->dget('datecreated'), array( 'note' => '('.date_ago( strtotime( $edited_User->get( 'datecreated' ) ) ).')') );
 	$Form->info_field( T_('From IP'), format_to_output( int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) ) ) );
 
@@ -269,12 +307,12 @@ $Form->begin_fieldset( T_('Registration info') );
 	{
 		$account_close_ts = $UserSettings->get( 'account_close_ts', $edited_User->ID );
 		$account_close_date =  empty( $account_close_ts ) ? T_( 'Unknown date' ) : format_to_output( date2mysql( $account_close_ts ) );
-		//$days_on_site = empty( $account_close_ts ) ? T_( 'Unknown' ) : ( round( ( $account_close_ts - $registration_ts ) / 86400/* 60*60*24 */) ); 
+		//$days_on_site = empty( $account_close_ts ) ? T_( 'Unknown' ) : ( round( ( $account_close_ts - $registration_ts ) / 86400/* 60*60*24 */) );
 	}
 	else
 	{
 		$account_close_date = 'n/a';
-		//$days_on_site = ( round( ( $servertimenow - $registration_ts ) / 86400/* 60*60*24 */) ); 
+		//$days_on_site = ( round( ( $servertimenow - $registration_ts ) / 86400/* 60*60*24 */) );
 	}
 
 	$Form->info_field( T_('Account closed on'), $account_close_date );
@@ -390,8 +428,8 @@ jQuery( '#edited_iprange_status' ).change( function()
 
 /*
  * $Log$
- * Revision 1.9  2013/11/06 08:05:04  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.10  2013/11/06 09:09:09  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

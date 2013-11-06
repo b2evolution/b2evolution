@@ -422,13 +422,13 @@ switch( $action )
 			SELECT tag_name AS id, tag_name AS title
 			  FROM T_items__tag
 			 WHERE tag_name LIKE '.$DB->quote('%'.$term.'%').'
-			 ORDER BY tag_name' );
+			 ORDER BY tag_name', ARRAY_A );
 
 		// Check if current term is not an existing tag
 		$term_is_new_tag = true;
 		foreach( $tags as $tag )
 		{
-			if( $tag->title == $term )
+			if( $tag['title'] == $term )
 			{ // Current term is an existing tag
 				$term_is_new_tag = false;
 			}
@@ -559,8 +559,8 @@ function get_comments_awaiting_moderation( $blog_ID )
 
 /*
  * $Log$
- * Revision 1.81  2013/11/06 08:03:44  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.82  2013/11/06 09:08:46  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

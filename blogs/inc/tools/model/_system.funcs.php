@@ -127,6 +127,11 @@ function system_check_dir( $directory = 'media', $relative_path = NULL )
 		}
 	}
 
+	if( $directory == 'cache' && $relative_path != NULL )
+	{ // Create .htaccess file with deny rules
+		create_htaccess_deny( $path );
+	}
+
 	return 0;
 }
 
@@ -486,11 +491,4 @@ function system_check_max_execution_time()
 
 	return $max_execution_time;
 }
-
-/*
- * $Log$
- * Revision 1.15  2013/11/06 08:04:54  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

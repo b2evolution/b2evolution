@@ -495,13 +495,13 @@ function locale_dialing_code( $locale = '' )
  * Template function: Display locale flag
  *
  * @param string locale to use, '' for current
- * @param string collection name (subdir of img/flags)   !! OLD PARAM - NOT USED IN THE FUNCTION ANYMORE !!
+ * @param string DEPRECATED PARAM - NOT USED IN THE FUNCTION ANYMORE !!
  * @param string name of class for IMG tag   !! OLD PARAM - NOT USED IN THE FUNCTION ANYMORE !!
  * @param string deprecated HTML align attribute   !! OLD PARAM - NOT USED IN THE FUNCTION ANYMORE !!
  * @param boolean to echo or not
  * @param mixed use absolute url (===true) or path to flags directory (used in installer)   !! OLD PARAM - NOT USED IN THE FUNCTION ANYMORE !!
  */
-function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $align = '', $disp = true, $absoluteurl = true )
+function locale_flag( $locale = '', $collection = 'deprecated_param', $class = 'flag', $align = '', $disp = true, $absoluteurl = true )
 {
 	global $locales, $current_locale, $country_flags_bg;
 
@@ -1269,8 +1269,8 @@ function locale_file_po_percent_done( $po_file_info )
 
 /*
  * $Log$
- * Revision 1.53  2013/11/06 08:04:25  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.54  2013/11/06 09:08:58  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

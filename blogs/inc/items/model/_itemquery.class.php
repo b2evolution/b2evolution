@@ -295,7 +295,7 @@ class ItemQuery extends SQL
 			debug_die( 'Status restriction requires to work with a specific blog first.' );
 		}
 
-		$this->WHERE_and( statuses_where_clause( $show_statuses, $this->dbprefix, $this->blog ) );
+		$this->WHERE_and( statuses_where_clause( $show_statuses, $this->dbprefix, $this->blog, 'blog_post!', true, $this->author ) );
 	}
 
 
@@ -757,8 +757,8 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
- * Revision 1.29  2013/11/06 08:04:15  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.30  2013/11/06 09:08:48  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

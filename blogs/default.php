@@ -208,7 +208,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 
 	<div class="body_fade_out">
 
-	<div class="menu_bottom"><!-- InstanceBeginEditable name="MenuBottom" -->Powered by <a href="http://b2evolution.net/" target="_blank">b2evolution</a> &bull; <a href="http://manual.b2evolution.net/" target="_blank">Manual</a> &bull; <a href="http://forums.b2evolution.net/" target="_blank">Forums</a>
+	<div class="menu_bottom"><!-- InstanceBeginEditable name="MenuBottom" -->Powered by <a href="http://b2evolution.net/" target="_blank">b2evolution</a> &bull; <a href="http://b2evolution.net/man/" target="_blank">Manual</a> &bull; <a href="http://forums.b2evolution.net/" target="_blank">Forums</a>
 		<!-- InstanceEndEditable --></div>
 
 	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->

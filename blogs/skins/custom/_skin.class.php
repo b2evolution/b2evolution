@@ -51,15 +51,13 @@ class custom_Skin extends Skin
 					'label' => T_('Header Background Color'),
 					'note' => T_('E-g: #ff0000 for red'),
 					'defaultvalue' => '#78a',
-					'valid_pattern' => array( 'pattern'=>'~^(#([a-f0-9]{3}){1,2})?$~i',
-																		'error'=>T_('Invalid color code.') ),
+					'type' => 'color',
 				),
 				'menu_bg_color' => array(
 					'label' => T_('Menu Background Color'),
 					'note' => T_('E-g: #ff0000 for red'),
 					'defaultvalue' => '#ddd',
-					'valid_pattern' => array( 'pattern'=>'~^(#([a-f0-9]{3}){1,2})?$~i',
-																		'error'=>T_('Invalid color code.') ),
+					'type' => 'color',
 				),
 				'display_post_time' => array(
 					'label' => T_('Post time'),
@@ -150,8 +148,8 @@ class custom_Skin extends Skin
 
 /*
  * $Log$
- * Revision 1.18  2013/11/06 08:05:43  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.19  2013/11/06 09:09:14  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

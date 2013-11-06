@@ -78,7 +78,10 @@ class CommentQuery extends SQL
 		$r = false;
 
 		$this->c = $c;
-		$this->author = $author;
+		if( empty( $this->author ) )
+		{ // Change $this->author only if it is empty, because possible that it was set previously 
+			$this->author = $author;
+		}
 
 		// if a comment number is specified, load that comment
 		if( !empty($c) )
@@ -364,20 +367,21 @@ class CommentQuery extends SQL
 	 * Restrict to specific statuses
 	 *
 	 * @param string List of statuses to restrict to (must have been previously validated)
+	 * @param boolean Filter by user permission. Set to false to select each comment with the correspondong visibily statuses even if current User has no permission to view them.
 	 */
-	function where_statuses( $show_statuses )
+	function where_statuses( $show_statuses, $filter_by_perm = true )
 	{
-		global $blog;
-
 		if( empty( $show_statuses ) )
 		{ // initialize if emty
 			$show_statuses = get_visibility_statuses( 'keys', array( 'trash', 'redirected' ) );
 		}
 		$this->show_statuses = $show_statuses;
 
-		if( $blog )
+		if( $filter_by_perm )
 		{ // show not published comments corresponding to the given blog perms
-			$this->WHERE_and( statuses_where_clause( $this->show_statuses, $this->dbprefix, $blog, 'blog_comment!' ) );
+			// When Blog is empty we must set blog param to 0, this way we will check all blogs
+			$blog = empty( $this->Blog ) ? 0 : $this->Blog->ID;
+			$this->WHERE_and( statuses_where_clause( $this->show_statuses, $this->dbprefix, $blog, 'blog_comment!', true, $this->author ) );
 		}
 		else
 		{
@@ -534,8 +538,8 @@ class CommentQuery extends SQL
 
 /*
  * $Log$
- * Revision 1.11  2013/11/06 08:03:58  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.12  2013/11/06 09:08:47  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

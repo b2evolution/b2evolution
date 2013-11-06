@@ -629,3 +629,20 @@ div.input ul.token-input-list-facebook {
 #styled_content_block .postinfo {
 	clear:none;
 }
+
+form#user_checkchanges.bComment {
+	border-top: 1px solid #CCC9B8;
+	border-left: none;
+	border-right: none;
+}
+div.tabs {
+	margin-top: 10px;
+}
+div.tabs div a {
+	border-color: #CCC9B8;
+	background-color: #E5E0C3;
+}
+div.tabs div.selected a {
+	background-color: #F2ECCE;
+	border-bottom-color: #F2ECCE;
+}

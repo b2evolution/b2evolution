@@ -1008,7 +1008,7 @@ function blogs_results_block( $params = array() )
 			'edited_User'          => NULL,
 			'results_param_prefix' => 'actv_blog_',
 			'results_title'        => T_('Blogs owned by the user'),
-			'results_no_text'      => T_('User has no own blogs'),
+			'results_no_text'      => T_('User does not own any blogs'),
 		), $params );
 
 	if( !is_logged_in() )

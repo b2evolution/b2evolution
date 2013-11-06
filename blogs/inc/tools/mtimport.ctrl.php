@@ -336,7 +336,7 @@ param( 'import_mode', 'string', 'normal' );
 			form_text( 'default_password2', $default_password, 20, 'Confirm password', 'please confirm the password', 30 , '', 'password' );
 			$GroupCache = & get_GroupCache();
 			form_select_object( 'default_usergroup', $Settings->get('newusers_grp_ID'), $GroupCache, T_('User group') );
-			$field_note = '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://manual.b2evolution.net/User_levels"' );
+			$field_note = '[0 - 10]';
 			form_text( 'default_userlevel', $Settings->get('newusers_level'), 2, T_('Level'), $field_note, 2 );
 			?>
 		</fieldset>
@@ -1682,8 +1682,8 @@ function tidypostdata( $string )
 
 /*
  * $Log$
- * Revision 1.25  2013/11/06 08:04:54  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.26  2013/11/06 09:08:59  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

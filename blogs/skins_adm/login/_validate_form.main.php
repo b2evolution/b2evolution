@@ -51,7 +51,7 @@ if( $current_User->group_ID == 1 )
 	$Form->hidden( 'sessID', $Session->ID );
 
 	$Form->begin_fieldset();
-	echo '<p>'.sprintf( T_('Since you are an admin user, you can validate your email address (%s) by a single click.' ), $current_User->email ).'</p>';
+	echo '<p>'.sprintf( T_('Since you are an admin user, you can activate your account (%s) by a single click.' ), $current_User->email ).'</p>';
 	// TODO: the form submit value is too wide (in Konqueror and most probably in IE!)
 	$Form->end_form( array(array( 'name'=>'form_validatemail_admin_submit', 'value'=>T_('Activate my account!'), 'class'=>'ActionButton' )) ); // display hidden fields etc
 }
@@ -69,8 +69,8 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
- * Revision 1.13  2013/11/06 08:05:53  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.14  2013/11/06 09:09:29  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

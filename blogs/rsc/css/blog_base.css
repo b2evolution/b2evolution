@@ -117,6 +117,10 @@ form.bComment /* New comment form */
 	padding: 0 1em 1em;
 	border: 1px dotted #999;
 }
+form#user_checkchanges.bComment {
+	border-style: solid;
+	margin-top: 0;
+}
 #comment_preview {
 	background-color: #eee;
 }
@@ -203,10 +207,28 @@ form.bComment fieldset div.label
 	font-weight: bold;
 	/* border: 1px solid #f00; */
 }
+form.bComment fieldset.field_wide div.label,
+form.bComment fieldset.field_inline div.label {
+	float: none;
+	text-align: left;
+	width: auto;
+	margin-bottom: 5px;
+}
+form.bComment fieldset.field_inline div.label {
+	float: left;
+}
 form.bComment fieldset div.input
 { /* input zone of form line */
 	margin: 0 0 0 108px;
 	/* border: 1px solid #f00; */
+}
+form.bComment fieldset.field_wide div.input {
+	margin-left: 20px;
+}
+form.bComment fieldset.field_inline div.input {
+	float: left;
+	margin-left: 5px;
+	line-height: 20px;
 }
 form.bComment fieldset.input{
 	margin: 0;
@@ -221,7 +243,7 @@ form.bComment fieldset.info_full div.info {
 	margin-left: 5px;
 }
 form.bComment fieldset div.label select {
-	width: 94%;
+	width: 91%;
 }
 
 /* bComment Avatar */
@@ -329,26 +351,36 @@ ul li.widget_core_coll_item_list.nobullets ul li:before {
 
 /* tabs */
 div.tabs {
-	line-height:normal;
+	line-height: normal;
 	position: relative;
-	top: 2px;
-	margin: 0 14px 36px; /* pjsnet */
+	top: 1px;
+	padding-left: 20px;
 	list-style: none;
 }
-
-div.tabs div.option,
-div.tabs div.selected {
-	padding: 0 0 0 6px;
-	margin: 5px;
+div.tabs div {
 	float: left;
 }
-
-div.tabs div.selected {
-	font-weight:bold;
+div.tabs div a {
+	display: block;
+	padding: 5px;
+	background: #E6E6E6;
+	border: 1px solid #999;
+	border-left-width: 0;
+	border-radius: 6px 6px 0 0;
+	-moz-border-radius-topleft: 4px; -moz-border-radius-topright: 4px;
+	-khtml-border-radius-topleft: 4px; -khtml-border-radius-topright: 4px;
+	-webkit-border-top-left-radius: 4px; -webkit-border-top-right-radius: 4px;
+	text-decoration: none;
 }
-
-div.tabs div.option a:hover {
-	text-decoration: underline;
+div.tabs div:first-child a {
+	border-left-width: 1px;
+}
+div.tabs div.selected a, div.tabs div a:hover {
+	background: #FFF;
+	text-decoration: none;
+}
+div.tabs div.selected a {
+	border-bottom-color: #FFF;
 }
 
 .action_icon {
@@ -722,4 +754,57 @@ div.results .status_trash span {
 		top: -15px;
 		left: -2px;
 	}
+}
+
+/* Messages list & form */
+.messages_list .messages_navigation {
+	padding: 5px;
+}
+.messages_list h2 {
+	border: 1px solid #BBB;
+	border-bottom: none;
+	background-color: #D4D4D4;
+	padding: 0 7px;
+	margin: 0;
+}
+.messages_list form.bComment {
+	border: 1px solid #BBB;
+	background-color: #DDDDDD;
+	margin: 0;
+	padding-top: 5px;
+}
+.messages_list table.bForums {
+	border: none;
+}
+.messages_list table.bForums td {
+	background: none;
+	vertical-align: top;
+}
+.messages_list div.messages_list_actions {
+	text-align: center;
+	border-left: 1px solid #BBB;
+	border-right: 1px solid #BBB;
+	padding: 10px 0;
+}
+.messages_list div.messages_list_actions p {
+	margin: 0;
+	padding: 0;
+	text-align: center;
+}
+.messages_list div.messages_list_actions a {
+	margin-bottom: 1ex;
+	display: inline-block;
+}
+.messages_list div.messages_list_actions a:last-child {
+	margin-bottom: 0;
+}
+.messages_list div.results {
+	margin-top: 0;
+}
+.messages_list span.error {
+	border: 1px solid #BBB;
+	border-bottom: none;
+	padding: 10px;
+	text-align: center;
+	display: block;
 }

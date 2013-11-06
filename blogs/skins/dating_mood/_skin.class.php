@@ -51,14 +51,13 @@ class dating_mood_Skin extends Skin
 					'label' => T_('Background Color'),
 					'note' => T_('E-g: #000000 for black'),
 					'defaultvalue' => '#000',
-					'valid_pattern' => array( 'pattern'=>'~^(#([a-f0-9]{3}){1,2})?$~i',
-																		'error'=>T_('Invalid color code.') ),
+					'type' => 'color',
 				),
 				'colorbox' => array(
 					'label' => T_('Colorbox Image Zoom'),
 					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
 					'defaultvalue' => 1,
-					'type'	=>	'checkbox',
+					'type' => 'checkbox',
 				),
 				'gender_colored' => array(
 					'label' => T_('Display gender'),
@@ -133,8 +132,8 @@ class dating_mood_Skin extends Skin
 
 /*
  * $Log$
- * Revision 1.12  2013/11/06 08:05:43  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.13  2013/11/06 09:09:14  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

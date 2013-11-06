@@ -510,7 +510,11 @@ class Item extends ItemLight
 			$this->set_from_Request( 'locale' );
 		}
 
-		if( param( 'item_typ_ID', 'integer', NULL ) !== NULL )
+		if( param( 'post_type', 'string', NULL ) !== NULL )
+		{ // Set type ID from request type code
+			$this->set( 'ptyp_ID', get_item_type_ID( get_param( 'post_type' ) ) );
+		}
+		elseif( param( 'item_typ_ID', 'integer', NULL ) !== NULL )
 		{
 			$this->set_from_Request( 'ptyp_ID', 'item_typ_ID' );
 
@@ -715,30 +719,42 @@ class Item extends ItemLight
 		// Locations
 		load_funcs( 'regional/model/_regional.funcs.php' );
 		if( $this->Blog->country_visible() )
-		{	// Save country
+		{ // Save country
 			$country_ID = param( 'item_ctry_ID', 'integer', 0 );
-			param_check_number( 'item_ctry_ID', T_('Please select a country'), ( $this->Blog->get_setting( 'location_country' ) == 'required' && countries_exist() ) );
+			$country_is_required = $this->Blog->get_setting( 'location_country' ) == 'required'
+					&& countries_exist()
+					&& ! $this->is_special();
+			param_check_number( 'item_ctry_ID', T_('Please select a country'), $country_is_required );
 			$this->set_from_Request( 'ctry_ID', 'item_ctry_ID', true );
 		}
 
 		if( $this->Blog->region_visible() )
-		{	// Save region
+		{ // Save region
 			$region_ID = param( 'item_rgn_ID', 'integer', 0 );
-			param_check_number( 'item_rgn_ID', T_('Please select a region'), ( $this->Blog->get_setting( 'location_region' ) == 'required' && regions_exist( $country_ID ) ) );
+			$region_is_required = $this->Blog->get_setting( 'location_region' ) == 'required'
+					&& regions_exist( $country_ID )
+					&& ! $this->is_special();
+			param_check_number( 'item_rgn_ID', T_('Please select a region'), $region_is_required );
 			$this->set_from_Request( 'rgn_ID', 'item_rgn_ID', true );
 		}
 
 		if( $this->Blog->subregion_visible() )
-		{	// Save subregion
+		{ // Save subregion
 			$subregion_ID = param( 'item_subrg_ID', 'integer', 0 );
-			param_check_number( 'item_subrg_ID', T_('Please select a sub-region'), ( $this->Blog->get_setting( 'location_subregion' ) == 'required' && subregions_exist( $region_ID ) ) );
+			$subregion_is_required = $this->Blog->get_setting( 'location_subregion' ) == 'required'
+					&& subregions_exist( $region_ID )
+					&& ! $this->is_special();
+			param_check_number( 'item_subrg_ID', T_('Please select a sub-region'), $subregion_is_required );
 			$this->set_from_Request( 'subrg_ID', 'item_subrg_ID', true );
 		}
 
 		if( $this->Blog->city_visible() )
-		{	// Save city
+		{ // Save city
 			param( 'item_city_ID', 'integer', 0 );
-			param_check_number( 'item_city_ID', T_('Please select a city'), ( $this->Blog->get_setting( 'location_city' ) == 'required' && cities_exist( $country_ID, $region_ID, $subregion_ID ) ) );
+			$city_is_required = $this->Blog->get_setting( 'location_city' ) == 'required'
+					&& cities_exist( $country_ID, $region_ID, $subregion_ID )
+					&& ! $this->is_special();
+			param_check_number( 'item_city_ID', T_('Please select a city'), $city_is_required );
 			$this->set_from_Request( 'city_ID', 'item_city_ID', true );
 		}
 
@@ -5252,20 +5268,21 @@ class Item extends ItemLight
 			}
 
 			$email_template_params = array(
-					'locale'      => $notify_locale,
-					'notify_full' => $notify_full,
-					'Item'        => $this,
+					'locale'         => $notify_locale,
+					'notify_full'    => $notify_full,
+					'Item'           => $this,
+					'recipient_User' => $notify_User,
 				);
 
 			if( $display ) echo T_('Notifying:').$notify_email."<br />\n";
 			if( $debug >= 2 )
 			{
-				$message_content = mail_template( 'notify_post', 'txt', $email_template_params );
+				$message_content = mail_template( 'post_new', 'txt', $email_template_params );
 				echo "<p>Sending notification to $notify_email:<pre>$message_content</pre>";
 			}
 
 			$subject_type = $notify_full ? 'full' : 'short';
-			send_mail_to_User( $user_ID, $cache_by_locale[$notify_locale]['subject'][$subject_type], 'notify_post', $email_template_params );
+			send_mail_to_User( $user_ID, $cache_by_locale[$notify_locale]['subject'][$subject_type], 'post_new', $email_template_params );
 
 			blocked_emails_memorize( $notify_User->email );
 		}
@@ -6255,8 +6272,8 @@ class Item extends ItemLight
 
 /*
  * $Log$
- * Revision 1.270  2013/11/06 08:04:15  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.271  2013/11/06 09:08:48  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

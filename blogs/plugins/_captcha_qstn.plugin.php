@@ -39,7 +39,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class captcha_qstn_plugin extends Plugin
 {
-	//var $help_url = 'http://manual.b2evolution.net/Plugins/captcha_qstn';
+	//var $help_url = 'http://b2evolution.net/man/captcha_qstn';
 	var $version = '5.0.0';
 	var $group = 'antispam';
 	var $code = 'captcha_qstn';

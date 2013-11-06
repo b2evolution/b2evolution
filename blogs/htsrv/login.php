@@ -80,7 +80,7 @@ switch( $action )
 					'reason'  => param( 'account_close_reason', 'text', '' ),
 					'user_ID' => $current_User->ID,
 				);
-			send_admin_notification( NT_('User account closed'), 'close_account', $email_template_params );
+			send_admin_notification( NT_('User account closed'), 'account_closed', $email_template_params );
 
 			// log out current User
 			logout();
@@ -94,7 +94,7 @@ switch( $action )
 		/* exited */
 		break;
 
-	case 'retrievepassword': // Send passwort change request by mail
+	case 'retrievepassword': // Send password change request by mail
 		global $servertimenow;
 		$login_required = true; // Do not display "Without login.." link on the form
 
@@ -102,9 +102,9 @@ switch( $action )
 		if( $request_ts_login != NULL )
 		{
 			list( $last_request_ts, $last_request_login ) = preg_split( '~_~', $request_ts_login );
-			if( ( $login == $last_request_login ) && ( ( $servertimenow - 300 ) < $last_request_ts ) )
-			{ // the same request was sent from the same session in the last five minutes
-				$Messages->add( sprintf( T_('We have already sent you a password recovery email at %s. Please allow 5 minutes for delivery before requesting a new one.' ), date( locale_datetimefmt(), $last_request_ts ) ) );
+			if( ( $login == $last_request_login ) && ( ( $servertimenow - $pwdchange_request_delay ) < $last_request_ts ) )
+			{ // the same request was sent from the same session in the last $pwdchange_request_delay seconds ( 5 minutes by default )
+				$Messages->add( sprintf( T_('We have already sent you a password recovery email at %s. Please allow %d minutes for delivery before requesting a new one.' ), date( locale_datetimefmt(), $last_request_ts ), $pwdchange_request_delay / 60 ) );
 				$action = 'req_login';
 				break;
 			}
@@ -194,13 +194,12 @@ switch( $action )
 
 			$subject = sprintf( T_( 'Password change request for %s' ), $login );
 			$email_template_params = array(
-					'UserCache'      => $UserCache,
 					'user_count'     => $user_count,
 					'request_id'     => $request_id,
 					'blog_param'     => $blog_param,
 				);
 
-			if( ! send_mail_to_User( $forgetful_User->ID, $subject, 'password_change_request', $email_template_params, true ) )
+			if( ! send_mail_to_User( $forgetful_User->ID, $subject, 'account_password_reset', $email_template_params, true ) )
 			{
 				$Messages->add( T_('Sorry, the email with the link to reset your password could not be sent.')
 					.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
@@ -473,7 +472,7 @@ switch( $action )
 			}
 			elseif( $demo_mode )
 			{
-				$Messages->add( T_('Sorry, could not send email. Sending email in debug mode is disabled.' ), 'error' );
+				$Messages->add( 'Sorry, could not send email. Sending email in demo mode is disabled.', 'error' );
 			}
 			else
 			{
@@ -581,12 +580,4 @@ switch( $action )
 }
 
 exit(0);
-
-
-/*
- * $Log$
- * Revision 1.124  2013/11/06 08:03:44  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

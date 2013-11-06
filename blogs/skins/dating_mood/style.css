@@ -386,6 +386,11 @@ div.token-input-dropdown-facebook {
 	color: #000 !important;
 }
 
+.messages_list form.bComment {
+	-moz-border-radius: 0;
+	border-radius: 0;
+}
+
 /* Not published comments display */
 #styled_content_block .bComment .status_draft,
 #styled_content_block .bComment .status_review,
@@ -403,4 +408,15 @@ div.token-input-dropdown-facebook {
 #styled_content_block .bSmallHead .status_private {
 	top: -6px;
 	left: 6px;
+}
+
+div.tabs div a {
+	background-color: #FFF;
+}
+div.tabs div a:hover {
+	background-color: #F5EBF3;
+}
+div.tabs div.selected a {
+	background-color: #F5EBF3;
+	border-bottom-color: #F5EBF3;
 }

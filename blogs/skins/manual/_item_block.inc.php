@@ -51,11 +51,24 @@ if( ( $disp == 'single' ) && empty( $cat ) )
 			) );
 		// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
 
-	$item_edit_link = $Item->get_edit_link( array( // Link to backoffice for editing
+	$action_links = $Item->get_edit_link( array( // Link to backoffice for editing
 			'before' => '',
 			'after'  => '',
+			'text'   => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : '#',
 			'class'  => 'roundbutton roundbutton_text',
 		) );
+	if( $Item->is_intro() && $Item->ptyp_ID != 1500 )
+	{ // Link to edit category
+		$ItemChapter = & $Item->get_main_Chapter();
+		if( !empty( $ItemChapter ) )
+		{
+			$action_links .= $ItemChapter->get_edit_link( array(
+					'text'          => get_icon( 'edit' ).' '.T_('Edit Cat'),
+					'class'         => 'roundbutton roundbutton_text',
+					'redirect_page' => 'front',
+				) );
+		}
+	}
 	if( $Item->status != 'published' )
 	{
 		$Item->status( array( 'format' => 'styled' ) );
@@ -63,7 +76,7 @@ if( ( $disp == 'single' ) && empty( $cat ) )
 	$Item->title( array(
 			'link_type'  => $params['item_link_type'],
 			'before'     => '<div class="bTitle linked"><h1>',
-			'after'      => '</h1>'.$item_edit_link.'<div class="clear"></div></div>',
+			'after'      => '</h1><div class="roundbutton_group">'.$action_links.'</div><div class="clear"></div></div>',
 			'nav_target' => false,
 		) );
 

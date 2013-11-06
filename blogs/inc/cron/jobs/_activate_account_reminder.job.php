@@ -10,7 +10,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $DB, $UserSettings, $Settings;
 
-global $servertimenow, $baseurl, $secure_htsrv_url;
+global $servertimenow, $baseurl, $secure_htsrv_url, $activate_account_reminder_config, $activate_account_reminder_threshold;
 
 if( $Settings->get( 'validation_process' ) != 'easy' )
 {
@@ -24,18 +24,25 @@ if( empty( $UserSettings ) )
 	$UserSettings = new UserSettings();
 }
 
-// Load required functions ( we need to load here, because in CLI mode it is not loaded )
-load_funcs( '_core/_url.funcs.php' );
-
-// We want to send an activation reminder after +1, +2.5 and +7 days after the new user was registered,
-// or the user status was changed to new, deactivated or emailchanged status
-$one_day_ago = date2mysql( $servertimenow - 86400/* 60*60*24 = 24 hour*/ );
-$one_and_half_days_ago = date2mysql( $servertimenow - 129600/* 60*60*24*1.5 = 60 hour*/ );
-$four_and_half_days_ago = date2mysql( $servertimenow - 388800/* 60*60*24*4.5 = 4.5 days*/ );
-$seven_days_ago = date2mysql( $servertimenow - 604800/* 60*60*24*7 = 7 days*/ );
 // Only users with "new", "emailchanged" OR "deactivated" statuses may receive activation reminders
 // This will be a precondition to get less users from db, but this will be checked again with check_status() in the send_easy_validate_emails() function
 $status_condition = '( user_status = "new" OR user_status = "emailchanged" OR user_status = "deactivated" )';
+
+// Set configuration details from $activate_account_reminder_config array
+$number_of_max_reminders = ( count( $activate_account_reminder_config ) - 1 );
+if( $number_of_max_reminders < 1 )
+{ // The config array is wrong, it must have at least two elements
+	$result_message = sprintf( T_('The job advanced configuration is wrong, can\'t send reminders!') );
+	return 3; /* error */
+}
+$reminder_date = date2mysql( $servertimenow - $activate_account_reminder_config[0] );
+$reminder_delay_conditions = array( '( ( last_sent.uset_value IS NULL OR last_sent.uset_value < '.$DB->quote( $reminder_date ).' ) AND ( reminder_sent.uset_value IS NULL OR reminder_sent.uset_value = "0" ) )' );
+for( $i = 1; $i < $number_of_max_reminders; $i++ )
+{
+	$reminder_date = date2mysql( $servertimenow - $activate_account_reminder_config[$i] );
+	$reminder_delay_conditions[] = '( last_sent.uset_value < '.$DB->quote( $reminder_date ).' AND reminder_sent.uset_value = '.$DB->quote( $i ).' )';
+}
+$failed_activation_threshold = $activate_account_reminder_config[$number_of_max_reminders];
 
 $SQL = new SQL();
 $SQL->SELECT( 'T_users.*' );
@@ -50,13 +57,11 @@ $SQL->WHERE( $status_condition );
 $SQL->WHERE_and( 'LENGTH(TRIM(user_email)) > 0' );
 // check that user email is not blocked
 $SQL->WHERE_and( 'user_email NOT IN ( SELECT emblk_address FROM T_email__blocked WHERE '.get_mail_blocked_condition().' )' );
-// check that user was created more then a day ago!
-$SQL->WHERE_and( 'user_created_datetime < '.$DB->quote( $one_day_ago ) );
+// check that user was created more than x ( = confugred activate account reminder threshold ) seconds ago!
+$threshold_date = date2mysql( $servertimenow - $activate_account_reminder_threshold );
+$SQL->WHERE_and( 'user_created_datetime < '.$DB->quote( $threshold_date ) );
 // check how many reminders was sent to the user and when => send reminders only if required
-$SQL->WHERE_and( '(
-	( ( last_sent.uset_value IS NULL OR last_sent.uset_value < '.$DB->quote( $one_day_ago ).' ) AND ( reminder_sent.uset_value IS NULL OR reminder_sent.uset_value = "0" ) )
-	OR ( last_sent.uset_value < '.$DB->quote( $one_and_half_days_ago ).' AND reminder_sent.uset_value = "1" )
-	OR ( last_sent.uset_value < '.$DB->quote( $four_and_half_days_ago ).' AND reminder_sent.uset_value = "2" ) )' );
+$SQL->WHERE_and( implode( ' OR ', $reminder_delay_conditions ) );
 // check if user wants to recevice activation reminder or not
 $SQL->WHERE_and( 'notif_setting.uset_value IS NULL OR notif_setting.uset_value <> '.$DB->quote( '0' ) );
 
@@ -70,11 +75,12 @@ $reminder_sent = send_easy_validate_emails( $UserCache->get_ID_array() );
 
 // Set failed activation status for all users who didn't receive activation reminder or account validation email in the last seven days,
 // and user was created more then a week, and have received at least one activation email.
+$failed_activation_date = date2mysql( $servertimenow - $failed_activation_threshold );
 $DB->query( 'UPDATE T_users
 		LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID
 		SET user_status = "failedactivation"
-		WHERE ( uset_name = "last_activation_email" AND uset_value IS NOT NULL AND uset_value < '.$DB->quote( $seven_days_ago ).' )
-			AND ( user_created_datetime < '.$DB->quote( $seven_days_ago ).' ) AND '.$status_condition );
+		WHERE ( uset_name = "last_activation_email" AND uset_value IS NOT NULL AND uset_value < '.$DB->quote( $failed_activation_date ).' )
+			AND ( user_created_datetime < '.$DB->quote( $failed_activation_date ).' ) AND '.$status_condition );
 
 $result_message = sprintf( T_( '%d account activation reminder emails were sent!' ), $reminder_sent );
 return 1; /* ok */

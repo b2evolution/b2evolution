@@ -581,7 +581,7 @@ class collections_Module extends Module
 							);
 		$entries['manual'] = array(
 								'text' => T_('Open Online manual'),
-								'href' => 'http://manual.b2evolution.net/',
+								'href' => 'http://b2evolution.net/man/',
 								'target' => '_blank',
 							);
 		$entries['info_sep'] = array(
@@ -760,7 +760,7 @@ class collections_Module extends Module
 								'entries' => $skin_entries,
 							),
 							'plugin_settings' => array(
-								'text' => T_('Plugin settings'),
+								'text' => T_('Plugins'),
 								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=plugin_settings&amp;blog='.$blog, ),
 							'widgets' => array(
 								'text' => T_('Widgets'),
@@ -989,8 +989,8 @@ $collections_Module = new collections_Module();
 
 /*
  * $Log$
- * Revision 1.33  2013/11/06 08:03:57  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.34  2013/11/06 09:08:47  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

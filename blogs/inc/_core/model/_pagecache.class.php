@@ -196,6 +196,9 @@ class PageCache
 			cleardir_r( $this->ads_collcache_path );
 		}
 
+		// Create htaccess file with deny rules
+		create_htaccess_deny( $this->ads_collcache_path );
+
 		return true;
 	}
 
@@ -704,8 +707,8 @@ class PageCache
 
 /*
  * $Log$
- * Revision 1.40  2013/11/06 08:03:47  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.41  2013/11/06 09:08:46  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

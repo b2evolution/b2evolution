@@ -370,7 +370,7 @@ function get_table_count( $table_name )
 
 /**
  * Dispaly posts awaiting moderation with the given status
- * 
+ *
  * @param string visibility status
  * @param object block_item_Widget
  * @return boolean true if items were displayed, false otherwise
@@ -409,7 +409,7 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 			break;
 
 		case 'protected':
-			$block_title = T_('Recent members posts awaiting moderation');
+			$block_title = T_('Recent member posts awaiting moderation');
 			break;
 
 		case 'community':
@@ -470,8 +470,8 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 
 /*
  * $Log$
- * Revision 1.52  2013/11/06 08:04:08  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.53  2013/11/06 09:08:48  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

@@ -1,0 +1,52 @@
+a.roundbutton, a.roundbutton_text, span.roundbutton {
+	filter: none !important;
+	background: #f4f4f4;
+	box-shadow: inset 0 -10px 10px rgba(0,0,0,0.24);
+}
+a.roundbutton:hover, a.roundbutton_text:hover {
+	background: #a0a0a0;
+	box-shadow: inset 0 -10px 10px rgba(255,255,255,0.515);
+}
+a.roundbutton.roundbutton_selected, a.roundbutton_text.roundbutton_selected, span.roundbutton {
+	background: #6b6b6b;
+	box-shadow: inset 0 -10px 10px rgba(255,255,255,0.3);
+}
+a.roundbutton_green, span.roundbutton_green,
+a.roundbutton_green:hover, span.roundbutton_green:hover {
+	background: #09f197;
+	box-shadow: inset 0 -10px 10px rgba(255,255,255,0.2);
+}
+a.roundbutton_red, span.roundbutton_red,
+a.roundbutton_red:hover, span.roundbutton_red:hover {
+	background: #fa7171;
+	box-shadow: inset 0 -10px 10px rgba(255,255,255,0.2);
+}
+
+div.menu3 a:hover {
+	filter: none !important;
+	background: #919191;
+	box-shadow: inset 0 -4px 5px rgba(255,255,255,0.2);
+}
+div.menu3 .current a, div.menu3 .current a:hover {
+	filter: none;
+	background: #8b8d8d;
+	box-shadow: inset 0 4px 5px rgba(0,0,0,0.3);
+}
+
+#width_switcher a.roundbutton {
+	filter: none !important;
+	background: #f4f4f4;
+	box-shadow: inset 0 -20px 20px rgba(0,0,0,0.24);
+}
+#width_switcher a.roundbutton:hover {
+	background: #a0a0a0;
+	box-shadow: inset 0 -20px 20px rgba(255,255,255,0.515);
+}
+#width_switcher a.roundbutton.roundbutton_selected {
+	background: #6b6b6b;
+	box-shadow: inset 0 -20px 20px rgba(255,255,255,0.3);
+}
+
+#styled_content_block [class*='status_'] span {
+	filter: none !important;
+}

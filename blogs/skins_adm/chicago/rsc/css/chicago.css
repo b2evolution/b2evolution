@@ -1136,7 +1136,8 @@ div#ffield_item_tags ul.token-input-list-facebook {
 }
 #itemform_adv_props ul.token-input-list-facebook {
 	width: 100%;
-	padding-right: 0;
+	padding: 0;
+	margin: 0;
 }
 
 /* Statuses of posts & comments display */

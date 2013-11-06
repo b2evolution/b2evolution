@@ -121,8 +121,8 @@ class UserSettings extends AbstractSettings
 	var $_configurable_defaults = array(
 		'notify_messages' => 1, 	// Notify user when receives a private message
 		'notify_unread_messages' => 1, // Notify user when he has unread messages more then 24 hour, and he was not notified in the last 3 days
-		'notify_published_comments' => 1,
-		'notify_comment_moderation' => 0,
+		'notify_published_comments' => 1, // Notify user when a comment is published in an own post
+		'notify_comment_moderation' => 1, // Notify when a comment is awaiting moderation in a post where the user has moderation rights
 
 		'enable_PM' => 1,
 		'enable_email' => 1,
@@ -302,8 +302,8 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
- * Revision 1.19  2013/11/06 08:05:03  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.20  2013/11/06 09:08:59  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

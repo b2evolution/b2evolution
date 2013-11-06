@@ -63,6 +63,10 @@ dt {
 dd {
   padding-left: 25px; 
 }
+legend {
+	color: #FFF;
+	font-size: 130%;
+}
 
 div.pageHeader {
 	padding: 1ex;
@@ -603,7 +607,6 @@ div#sidebar li.widget_core_coll_title h3 {
 
 div.bComment, form.bComment {
 	border:1px solid #111111;
-	margin:1ex 2ex;
 	padding:0 1ex 7px;
 }
 textarea {
@@ -883,4 +886,19 @@ table.rating_summary th {
 #styled_content_block .bComment .status_protected,
 #styled_content_block .bComment .status_private {
 	left: 6px;
+}
+
+div.tabs {
+	margin-bottom: 25px;
+}
+div.tabs div a {
+	background-color: #0C0C0C;
+	border-color: #111;
+}
+div.tabs div.selected a, div.tabs div a:hover {
+	background-color: transparent;
+}
+div.tabs div.selected a {
+	border-bottom-color: #070707;
+	color: #FFF;
 }

@@ -30,7 +30,7 @@ if( $Settings->get( 'system_lock' ) )
 /**
  * Cron support functions
  */
-load_funcs( '/cron/_cron.funcs.php' );
+load_funcs( 'cron/_cron.funcs.php' );
 
 /**
  * @global integer Quietness.
@@ -41,6 +41,9 @@ load_funcs( '/cron/_cron.funcs.php' );
 $quiet = 0;
 if( $is_cli )
 { // called through Command Line Interface, handle args:
+
+	// Load required functions ( we need to load here, because in CLI mode it is not loaded )
+	load_funcs( '_core/_url.funcs.php' );
 
 	if( isset( $_SERVER['argc'], $_SERVER['argv'] ) )
 	{
@@ -240,8 +243,8 @@ if( ! $is_cli )
 
 /*
  * $Log$
- * Revision 1.25  2013/11/06 08:03:44  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.26  2013/11/06 09:08:46  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

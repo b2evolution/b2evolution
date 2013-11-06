@@ -427,6 +427,10 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			$Form->info( $parmeta['label'], $parmeta['info'] );
 			break;
 
+		case 'color':
+			$Form->color_input( $input_name, $set_value, $set_label, '', $params );
+			break;
+
 		default:
 			debug_die( 'Unsupported type ['.$parmeta['type'].'] from GetDefaultSettings()!' );
 	}
@@ -1116,8 +1120,8 @@ function install_plugin_db_schema_action( & $Plugin, $force_install_db_deltas = 
 
 /*
  * $Log$
- * Revision 1.22  2013/11/06 08:04:35  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.23  2013/11/06 09:08:59  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

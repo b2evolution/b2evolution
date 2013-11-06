@@ -257,7 +257,7 @@ switch( $action )
 				'email'       => $email,
 				'new_user_ID' => $new_User->ID,
 			);
-		send_admin_notification( NT_('New user registration'), 'registration', $email_template_params );
+		send_admin_notification( NT_('New user registration'), 'account_new', $email_template_params );
 
 		$Plugins->trigger_event( 'AfterUserRegistration', array( 'User' => & $new_User ) );
 
@@ -279,7 +279,7 @@ switch( $action )
 			}
 			elseif( $demo_mode )
 			{
-				$Messages->add( T_('Sorry, could not send email. Sending email in debug mode is disabled.' ), 'error' );
+				$Messages->add( 'Sorry, could not send email. Sending email in demo mode is disabled.', 'error' );
 			}
 			else
 			{
@@ -353,8 +353,8 @@ require $adminskins_path.'login/_reg_form.main.php';
 
 /*
  * $Log$
- * Revision 1.118  2013/11/06 08:03:44  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.119  2013/11/06 09:08:46  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

@@ -421,6 +421,10 @@ switch( $action )
 		$edited_Item->set( 'dateset', 0 );	// Date not explicitly set yet
 		$edited_Item->set( 'issue_date', date( 'Y-m-d H:i:s', $localtimenow ) );
 
+		// Set post comment status and extracats
+		$post_comment_status = $edited_Item->get( 'comment_status' );
+		$post_extracats = postcats_get_byID( $p );
+
 		// Check if new category was started to create. If yes then set up parameters for next page
 		check_categories_nosave ( $post_category, $post_extracats );
 
@@ -1579,8 +1583,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.119  2013/11/06 08:04:15  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.120  2013/11/06 09:08:48  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

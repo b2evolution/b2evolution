@@ -1283,8 +1283,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 /*
  * $Log$
- * Revision 1.10  2013/11/06 08:03:48  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.11  2013/11/06 09:08:46  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

@@ -17,11 +17,11 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * them when creating a new post.
  * Do not remove any IDs from this array.
  *
- * @todo fp>get rid of this and just delete 4000 &  500 from the database during upgrade
+ * @todo fp>get rid of this and just delete 5000 from the database during upgrade
  *
  * @global array $posttypes_reserved_IDs
  */
-$posttypes_reserved_IDs = array( 4000, 5000 );
+$posttypes_reserved_IDs = array( 5000 );
 
 /**
  * Post types that can be restricted on a per-blog basis using the blog
@@ -53,8 +53,26 @@ $posttypes_perms = array(
 		2000,
 	),
 	'sidebar' => array(
-		3000,
+		3000,	// Sidebar link
+		4000, // (Sidebar) Advertisement
 	),
 );
+
+
+/**
+ * Post types that should not appear in the normal post stream
+ */
+$posttypes_specialtypes = array_merge( $posttypes_perms['page'], $posttypes_perms['intro'], $posttypes_perms['sidebar'] );
+
+/**
+ * Post types that should not have a permanent URL
+ */
+$posttypes_nopermanentURL = $posttypes_perms['sidebar'];
+
+/**
+ * Post types that should have a permanent URL as url of their main chapter
+ */
+$posttypes_catpermanentURL = $posttypes_perms['intro'];
+
 
 ?>

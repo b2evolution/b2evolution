@@ -43,19 +43,7 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'form' );
 
-if( get_param( 'redirect_page' ) == 'manual' )
-{ // Url to manual pages
-	global $admin_url, $blog;
-	$close_url = $admin_url.'?ctrl=items&blog='.$blog.'&tab=manual';
-	if( !empty( $edited_Chapter->parent_ID ) )
-	{ // Open current category in the list
-		$close_url .= '&cat_ID='.$edited_Chapter->parent_ID;
-	}
-}
-else
-{ // Url to chapters list
-	$close_url = regenerate_url( 'action' );
-}
+$close_url = get_chapter_redirect_url( get_param( 'redirect_page' ), $edited_Chapter->parent_ID, $edited_Chapter->ID );
 $Form->global_icon( T_('Cancel editing!'), 'close', $close_url );
 
 $Form->begin_form( 'fform', $creating ?  T_('New category') : T_('Category') );
@@ -109,8 +97,8 @@ else
 
 /*
  * $Log$
- * Revision 1.16  2013/11/06 08:03:57  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.17  2013/11/06 09:08:47  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

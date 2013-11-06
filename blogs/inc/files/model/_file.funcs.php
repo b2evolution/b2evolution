@@ -1921,52 +1921,110 @@ function copy_file( $file_path, $root_ID, $path, $check_perms = true )
  */
 function create_profile_picture_links()
 {
+	global $DB;
+
 	load_class( 'files/model/_filelist.class.php', 'Filelist' );
 	load_class( 'files/model/_fileroot.class.php', 'FileRoot' );
 	$path = 'profile_pictures';
 
 	$FileRootCache = & get_FileRootCache();
 	$UserCache = & get_UserCache();
-	$UserCache->load_all();
 
-	while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
-	{ // Iterate through UserCache)
-		$user_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $iterator_User->ID );
-		if( !$user_FileRoot )
-		{ // User FileRoot doesn't exist
-			continue;
-		}
+	// SQL query to get all users and limit by page below
+	$users_SQL = new SQL();
+	$users_SQL->SELECT( '*' );
+	$users_SQL->FROM( 'T_users' );
+	$users_SQL->ORDER_BY( 'user_ID' );
 
-		$ads_list_path = get_canonical_path( $user_FileRoot->ads_path.$path );
-		// Previously uploaded avatars
-		if( !is_dir( $ads_list_path ) )
-		{ // profile_picture folder doesn't exists in the user root dir
-			continue;
-		}
+	$page = 0;
+	$page_size = 100;
+	while( count( $UserCache->cache ) > 0 || $page == 0 )
+	{ // Load users by 100 at one time to avoid errors about memory exhausting
+		$users_SQL->LIMIT( ( $page * $page_size ).', '.$page_size );
+		$UserCache->clear();
+		$UserCache->load_by_sql( $users_SQL );
 
-		$user_avatar_Filelist = new Filelist( $user_FileRoot, $ads_list_path );
-		$user_avatar_Filelist->load();
+		while( ( $iterator_User = & $UserCache->get_next(/* $user_ID, false, false */) ) != NULL )
+		{ // Iterate through UserCache)
+			$FileRootCache->clear();
+			$user_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $iterator_User->ID );
+			if( !$user_FileRoot )
+			{ // User FileRoot doesn't exist
+				continue;
+			}
 
-		if( $user_avatar_Filelist->count() > 0 )
-		{	// profile_pictures folder is not empty
-			$info_content = '';
-			$LinkOwner = new LinkUser( $iterator_User );
-			while( $lFile = & $user_avatar_Filelist->get_next() )
-			{ // Loop through all Files:
-				$lFile->load_meta( true );
-				if( $lFile->is_image() )
-				{
-					$lFile->link_to_Object( $LinkOwner );
+			$ads_list_path = get_canonical_path( $user_FileRoot->ads_path.$path );
+			// Previously uploaded avatars
+			if( !is_dir( $ads_list_path ) )
+			{ // profile_picture folder doesn't exists in the user root dir
+				continue;
+			}
+
+			$user_avatar_Filelist = new Filelist( $user_FileRoot, $ads_list_path );
+			$user_avatar_Filelist->load();
+
+			if( $user_avatar_Filelist->count() > 0 )
+			{	// profile_pictures folder is not empty
+				$info_content = '';
+				$LinkOwner = new LinkUser( $iterator_User );
+				while( $lFile = & $user_avatar_Filelist->get_next() )
+				{ // Loop through all Files:
+					$lFile->load_meta( true );
+					if( $lFile->is_image() )
+					{
+						$lFile->link_to_Object( $LinkOwner );
+					}
 				}
 			}
 		}
+
+		// Increase page number to get next portion of users
+		$page++;
 	}
+
+	// Clear cache data
+	$UserCache->clear();
+	$FileRootCache->clear();
 }
 
-/*
- * $Log$
- * Revision 1.63  2013/11/06 08:04:08  efy-asimo
- * Update to version 5.0.1-alpha-5
+
+/**
+ * Create .htaccess and sample.htaccess files with deny rules in the folder
  *
+ * @param string Directory path
  */
+function create_htaccess_deny( $dir )
+{
+	if( ! mkdir_r( $dir, NULL ) )
+	{
+		return;
+	}
+
+	$htaccess_files = array(
+			$dir.'.htaccess',
+			$dir.'sample.htaccess'
+		);
+
+	$htaccess_content = '# We don\'t want web users to access any file in this directory'."\r\n".
+		'Order Deny,Allow'."\r\n".
+		'Deny from All';
+
+	foreach( $htaccess_files as $htaccess_file )
+	{
+		if( file_exists( $htaccess_file ) )
+		{ // File already exists
+			continue;
+		}
+
+		$handle = fopen( $htaccess_file, 'w' );
+
+		if( !$handle )
+		{ // File cannot be created
+			continue;
+		}
+
+		fwrite( $handle, $htaccess_content );
+		fclose( $handle );
+	}
+}
 ?>

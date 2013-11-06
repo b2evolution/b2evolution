@@ -440,6 +440,10 @@ div.input ul.token-input-list-facebook {
 	width: 285px;
 }
 
+div.results table{
+	padding: 0;
+}
+
 /* Not published comments display */
 #styled_content_block .bComment .status_draft,
 #styled_content_block .bComment .status_review,

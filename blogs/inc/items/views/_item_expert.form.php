@@ -487,13 +487,15 @@ echo_onchange_newcat();
 $edited_Item->load_Blog();
 // Location
 echo_regional_js( 'item', $edited_Item->Blog->region_visible() );
+// Item type
+echo_onchange_item_type_js();
 
 // require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
- * Revision 1.86  2013/11/06 08:04:24  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.87  2013/11/06 09:08:58  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

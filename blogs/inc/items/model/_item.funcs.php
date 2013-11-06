@@ -290,6 +290,39 @@ function & get_featured_Item()
 
 
 /**
+ * Get item type ID by type code
+ *
+ * @param string Type code
+ * @return integer Item type ID
+ */
+function get_item_type_ID( $type_code )
+{
+	$item_types = array(
+			1    => 'post',
+			1000 => 'page',
+			1500 => 'intro-main',
+			1520 => 'intro-cat',
+			1530 => 'intro-tag',
+			1570 => 'intro-sub',
+			1600 => 'intro-all',
+			2000 => 'podcast',
+			3000 => 'sidebar-link',
+			4000 => 'advertisement',
+			//5000 => 'reserved',
+		);
+
+	$item_type_ID = array_search( $type_code, $item_types );
+
+	if( $item_type_ID === false )
+	{ // No found type, Use standard type ID = 1
+		$item_type_ID = 1;
+	}
+
+	return $item_type_ID;
+}
+
+
+/**
  * Validate URL title (slug) / Also used for category slugs
  *
  * Using title as a source if url title is empty.
@@ -543,6 +576,94 @@ function bpost_count_words( $str )
 
 
 /**
+ * Get allowed statuses for the current User
+ *
+ * Note: This function must be called only from the statuses_where_clause()!
+ *
+ * @param array statuses to filter
+ * @param string database status field column prefix 
+ * @param integer the blog ID where to check allowed statuses
+ * @param string the status permission prefix
+ * @return string the condition
+ */
+function get_allowed_statuses_condition( $statuses, $dbprefix, $req_blog, $perm_prefix )
+{
+	global $current_User;
+
+	// init where clauses array
+	$where = array();
+	// init allowed statuses array
+	$allowed_statuses = array();
+
+	$is_logged_in = is_logged_in( false );
+	$creator_coll_name = ( $dbprefix == 'post_' ) ? $dbprefix.'creator_user_ID' : $dbprefix.'author_ID';
+	// Iterate through all statuses and set allowed to true only if the corresponding status is allowed in case of any post/comments
+	// If the status is not allowed to show, but exists further conditions which may allow it, then set the condition.
+	foreach( $statuses as $key => $status )
+	{
+		switch( $status )
+		{
+			case 'community': // It is always allowed for logged in users
+				$allowed = $is_logged_in;
+				break;
+
+			case 'protected': // It is always allowed for members
+				$allowed = ( $is_logged_in && ( $current_User->check_perm( 'blog_ismember', 1, false, $req_blog ) ) );
+				break;
+
+			case 'private': // It is allowed for users who has global 'editall' permission but only on back-office
+				$allowed = ( is_admin_page() && $current_User->check_perm( 'blogs', 'editall' ) );
+				if( !$allowed && $is_logged_in && $current_User->check_perm( $perm_prefix.'private', 'create', false, $req_blog ) )
+				{ // Own private posts/comments are allowed if user can create private posts/comments
+					$where[] = ' ( '.$dbprefix."status = 'private' AND ".$creator_coll_name.' = '.$current_User->ID.' ) ';
+				}
+				break;
+
+			case 'review': // It is allowed for users who have permission to create comments with 'review' status and have at least 'lt' posts/comments edit perm
+				$allowed = ( $is_logged_in && $current_User->check_perm( $perm_prefix.'review', 'moderate', false, $req_blog ) );
+				if( !$allowed && $is_logged_in && $current_User->check_perm( $perm_prefix.'review', 'create', false, $req_blog ) )
+				{ // Own posts/comments with 'review' status are allowed if user can create posts/comments with 'review' status
+					$where[] = ' ( '.$dbprefix."status = 'review' AND ".$creator_coll_name.' = '.$current_User->ID.' ) ';
+				}
+				break;
+
+			case 'draft': // In back-office it is always allowed for users who may create posts/commetns with 'draft' status
+				$allowed = ( is_admin_page() && $current_User->check_perm( $perm_prefix.'draft', 'create', false, $req_blog ) );
+				if( !$allowed && $is_logged_in && $current_User->check_perm( $perm_prefix.'draft', 'create', false, $req_blog ) )
+				{ // In front-office only authors may see their own draft posts/comments, but only if the have permission to create draft posts/comments
+					$where[] = ' ( '.$dbprefix."status = 'draft' AND ".$creator_coll_name.' = '.$current_User->ID.' ) ';
+				}
+				break;
+
+			case 'deprecated': // In back-office it is always allowed for users who may create posts/comments with 'deprecated' status
+				$allowed = ( is_admin_page() && $current_User->check_perm( $perm_prefix.'deprecated', 'create', false, $req_blog ) );
+				// In front-office it is never allowed
+				break;
+
+			case 'published': // Published post/comments are always allowed
+			default: // Allow other statuses by default
+				$allowed = true;
+		}
+
+		if( $allowed )
+		{ // All posts/comments with this status can be displayed in the request blog for the current User ( or for anonymous )
+			$allowed_statuses[] = $status;
+		}
+	}
+
+	if( count( $allowed_statuses ) )
+	{ // add allowed statuses condition
+		$where[] = $dbprefix.'status IN ( \''.implode( '\',\'', $allowed_statuses ).'\' )';
+	}
+
+	// Implode conditions collected in the $where array
+	// NOTE: If the array is empty, it means that the user has no permission to the requested statuses, so FALSE must be returned
+	$where_condition = count( $where ) > 0 ? ' ( '.implode( ' OR ', $where ).' ) ' : ' FALSE ';
+	return $where_condition;
+}
+
+
+/**
  * Construct the where clause to limit retrieved posts/comment on their status
  *
  * TODO: asimo> would be good to move this function to an items and comments common file
@@ -554,9 +675,9 @@ function bpost_count_words( $str )
  * @param boolean filter statuses by the current user perm and current page, by default is true. It should be false only e.g. when we have to count comments awaiting moderation. 
  * @return string statuses where condition 
  */
-function statuses_where_clause( $show_statuses = NULL, $dbprefix = 'post_', $req_blog = NULL, $perm_prefix = 'blog_post!', $filter_by_perm = true )
+function statuses_where_clause( $show_statuses = NULL, $dbprefix = 'post_', $req_blog = NULL, $perm_prefix = 'blog_post!', $filter_by_perm = true, $author_filter = NULL )
 {
-	global $current_User, $blog;
+	global $current_User, $blog, $DB;
 
 	if( is_null( $req_blog ) )
 	{ // try to init request blog if it was not set
@@ -572,80 +693,100 @@ function statuses_where_clause( $show_statuses = NULL, $dbprefix = 'post_', $req
 	// init where clauses array
 	$where = array();
 
-	// Set additional "where" clause from modules method
-	$ret = modules_call_method( 'get_item_statuses_where_clause', array( 'blog_ID' => $req_blog, 'statuses' => $show_statuses ) );
-	if( !empty( $ret ) )
-	{
-		$where[] = $ret;
+	if( $req_blog )
+	{ // If requested blog is set, then set additional "where" clause from modules method, before we would manipulate the $show_statuses array
+		$ret = modules_call_method( 'get_item_statuses_where_clause', array( 'blog_ID' => $req_blog, 'statuses' => $show_statuses ) );
+		if( !empty( $ret ) )
+		{
+			$where[] = $ret;
+		}
+	}
+
+	if( is_logged_in( false ) )
+	{ // User is logged in and the account was activated 
+		if( $current_User->check_perm( 'blogs', 'editall', false ) )
+		{ // User has permission to all blogs posts and comments, we don't have to check blog specific permissions.
+			$where[] = get_allowed_statuses_condition( $show_statuses, $dbprefix, NULL, $perm_prefix );
+			$filter_by_perm = false;
+			$show_statuses = NULL;
+		}
+		elseif( !empty( $author_filter ) && ( $author_filter != $current_User->ID ) )
+		{ // Author filter is set, but current_User is not the filtered user, then these statuses are not visible for sure
+			$show_statuses = array_diff( $show_statuses, array( 'private', 'draft' ) );
+		}
+	}
+
+	if( ( $req_blog == 0 ) && $filter_by_perm )
+	{ // This is a very special case when we must check visibility statuses from each blog separately
+		// Note: This case should not be called frequently, it may be really slow!!
+		$where_condition = '';
+		$condition = '';
+		if( in_array( 'published', $show_statuses ) )
+		{ // 'published' status is always allowed in case of all blogs, handle this condition separately
+			$where_condition = '( '.$dbprefix.'status = "published" )';
+			$condition = ' OR ';
+		}
+		if( !is_logged_in( false ) )
+		{ // When user is not logged in only the 'published' status is allowed, don't check more
+			return $where_condition;
+		}
+		if( in_array( 'community', $show_statuses ) )
+		{ // 'community' status is always allowed in case of all blogs when a user is logged in, handle this condition separately
+			$where_condition .= $condition.'( '.$dbprefix.'status = "community" )';
+			$condition = ' OR ';
+		}
+		// Remove 'published' and 'community' statuses because those were already handled
+		$show_statuses = array_diff( $show_statuses, array( 'published', 'community' ) );
+		if( empty( $show_statuses ) )
+		{ // return if there are no other status
+			return $where_condition;
+		}
+		// Select each blog
+		$blog_ids = $DB->get_col( 'SELECT blog_ID FROM T_blogs' );
+		$sub_condition = '';
+		foreach( $blog_ids as $blog_id )
+		{ // create statuses where clause condition for each blog separately
+			$status_perm = statuses_where_clause( $show_statuses, $dbprefix, $blog_id, $perm_prefix, $filter_by_perm, $author_filter );
+			if( $status_perm )
+			{ // User has permission to view some statuses on this blog
+				$sub_condition .= '( ( cat_blog_ID = '.$blog_id.' ) AND'.$status_perm.' ) OR ';
+			}
+		}
+		if( $dbprefix == 'post_' )
+		{ // Item query condition
+			$from_table = 'FROM T_items__item';
+			$reference_column = 'post_ID';
+		}
+		else
+		{ // Comment query condition
+			$from_table = 'FROM T_comments';
+			$reference_column ='comment_post_ID';
+		}
+		// Select each object ID which corresponds to the statuses condition.
+		// Note: This is a very slow query when there is many post/comments. This case should not be used frequently.
+		$sub_query = 'SELECT '.$dbprefix.'ID '.$from_table.'
+						INNER JOIN T_postcats ON '.$reference_column.' = postcat_post_ID
+						INNER JOIN T_categories ON postcat_cat_ID = cat_ID
+						WHERE ('.substr( $sub_condition, 0, ( strlen( $sub_condition ) - 3 ) ).')';
+		$object_ids = implode( ',', $DB->get_col( $sub_query ) );
+		if( $object_ids )
+		{ // If thre is at least one post or comment
+			$where_condition .= $condition.'( '.$dbprefix.'ID IN ('.$object_ids.') )';
+		}
+		return $where_condition;
 	}
 
 	if( $filter_by_perm )
 	{ // filter allowed statuses by the current User perms and by the current page ( front or back office )
-		$allowed_statuses = array();
-		$is_logged_in = is_logged_in( false );
-		$creator_coll_name = ( $dbprefix == 'post_' ) ? $dbprefix.'creator_user_ID' : $dbprefix.'author_ID';
-		// Iterate through all statuses and set allowed to true only if the corresponding status is allowed in case of any post/comments
-		// If the status is not allowed to show, but exists further conditions which may allow it, then set the condition.
-		foreach( $show_statuses as $key => $status )
-		{
-			switch( $status )
-			{
-				case 'community': // It is always allowed for logged in users
-					$allowed = $is_logged_in;
-					break;
-
-				case 'protected': // It is always allowed for members
-					$allowed = ( $is_logged_in && ( $current_User->check_perm( 'blog_ismember', 1, false, $req_blog ) ) );
-					break;
-
-				case 'private': // It is allowed for users who has global 'editall' permission but only on back-office
-					$allowed = ( is_admin_page() && $current_User->check_perm( 'blogs', 'editall' ) );
-					if( !$allowed && $is_logged_in && $current_User->check_perm( $perm_prefix.'private', 'create', false, $req_blog ) )
-					{ // Own private posts/comments are allowed if user can create private posts/comments
-						$where[] = ' ( '.$dbprefix."status = 'private' AND ".$creator_coll_name.' = '.$current_User->ID.' ) ';
-					}
-					break;
-
-				case 'review': // It is allowed for users who have permission to create comments with 'review' status and have at least 'lt' posts/comments edit perm
-					$allowed = ( $is_logged_in && $current_User->check_perm( $perm_prefix.'review', 'moderate', false, $req_blog ) );
-					if( !$allowed && $is_logged_in && $current_User->check_perm( $perm_prefix.'review', 'create', false, $req_blog ) )
-					{ // Own posts/comments with 'review' status are allowed if user can create posts/comments with 'review' status
-						$where[] = ' ( '.$dbprefix."status = 'review' AND ".$creator_coll_name.' = '.$current_User->ID.' ) ';
-					}
-					break;
-
-				case 'draft': // In back-office it is always allowed for users who may create posts/commetns with 'draft' status
-					$allowed = ( is_admin_page() && $current_User->check_perm( $perm_prefix.'draft', 'create', false, $req_blog ) );
-					if( !$allowed && $is_logged_in && $current_User->check_perm( $perm_prefix.'draft', 'create', false, $req_blog ) )
-					{ // In front-office only authors may see their own draft posts/comments, but only if the have permission to create draft posts/comments
-						$where[] = ' ( '.$dbprefix."status = 'draft' AND ".$creator_coll_name.' = '.$current_User->ID.' ) ';
-					}
-					break;
-
-				case 'deprecated': // In back-office it is always allowed for users who may create posts/comments with 'deprecated' status
-					$allowed = ( is_admin_page() && $current_User->check_perm( $perm_prefix.'deprecated', 'create', false, $req_blog ) );
-					// In front-office it is never allowed
-					break;
-
-				case 'published': // Published post/comments are always allowed
-				default: // Allow other statuses by default
-					$allowed = true;
-			}
-
-			if( $allowed )
-			{ // All posts/comments with this status can be displayed in the request blog for the current User ( or for anonymous )
-				$allowed_statuses[] = $status;
-			}
+		$allowd_statuses_cond = get_allowed_statuses_condition( $show_statuses, $dbprefix, $req_blog, $perm_prefix );
+		if( $allowd_statuses_cond )
+		{ // condition is not empty
+			$where[] = $allowd_statuses_cond;
 		}
 	}
-	else
-	{ // we are not filtering so all status are allowed
-		$allowed_statuses = $show_statuses;
-	}
-
-	if( count( $allowed_statuses ) )
-	{ // add allowed statuses condition
-		$where[] = $dbprefix.'status IN ( \''.implode( '\',\'', $allowed_statuses ).'\' )';
+	elseif( count( $show_statuses ) )
+	{ // we are not filtering so all status are allowed, add allowed statuses condition
+		$where[] = $dbprefix.'status IN ( \''.implode( '\',\'', $show_statuses ).'\' )';
 	}
 
 	$where = count( $where ) > 0 ? ' ( '.implode( ' OR ', $where ).' ) ' : '';
@@ -1907,6 +2048,38 @@ function echo_show_comments_changed()
 
 
 /**
+ * Make location fields are not required for special posts
+ */
+function echo_onchange_item_type_js()
+{
+	global $posttypes_perms;
+
+	$special_types = array();
+	foreach( $posttypes_perms as $permname => $posttypes )
+	{
+		$special_types = array_merge( $special_types, $posttypes );
+	}
+?>
+	<script type="text/javascript">
+		var item_special_types = [<?php echo implode( ',', $special_types ) ?>];
+		jQuery( '#item_typ_ID' ).change( function()
+		{
+			for( var i in item_special_types )
+			{
+				if( item_special_types[i] == jQuery( this ).val() )
+				{
+					jQuery( '#item_locations' ).addClass( 'not_required' );
+					return true;
+				}
+			}
+			jQuery( '#item_locations' ).removeClass( 'not_required' );
+		} );
+	</script>
+<?php
+}
+
+
+/**
  * Display CommentList with the given filters
  *
  * @param int blog
@@ -2461,7 +2634,15 @@ function echo_item_location_form( & $Form, & $edited_Item )
 
 	$Form->begin_fieldset( T_('Location') );
 
+	$table_class = '';
+	if( $edited_Item->is_special() )
+	{ // A post with special type should always has the location fields as not required
+		// This css class hides all red stars of required fields
+		$table_class = ' not_required';
+	}
+
 	$Form->switch_layout( 'table' );
+	$Form->formstart = '<table id="item_locations" cellspacing="0" class="fform'.$table_class.'">'."\n";
 	$Form->labelstart = '<td class="right"><strong>';
 	$Form->labelend = '</strong></td>';
 
@@ -2472,21 +2653,25 @@ function echo_item_location_form( & $Form, & $edited_Item )
 
 	// Country
 	$CountryCache = & get_CountryCache();
-	$Form->select_country( 'item_ctry_ID', $edited_Item->ctry_ID, $CountryCache, T_('Country'), array( 'required' => ( $edited_Item->Blog->get_setting( 'location_country' ) == 'required' ), 'allow_none' => true ) );
+	$country_is_required = ( $edited_Item->Blog->get_setting( 'location_country' ) == 'required' );
+	$Form->select_country( 'item_ctry_ID', $edited_Item->ctry_ID, $CountryCache, T_('Country'), array( 'required' => $country_is_required, 'allow_none' => true ) );
 
 	if( $edited_Item->Blog->region_visible() )
-	{	// Region
-		$Form->select_input_options( 'item_rgn_ID', get_regions_option_list( $edited_Item->ctry_ID, $edited_Item->rgn_ID, array( 'none_option_text' => T_( 'Unknown' ) ) ), T_( 'Region' ), sprintf( $button_refresh_regional, 'button_refresh_region' ), array( 'required' => ( $edited_Item->Blog->get_setting( 'location_region' ) == 'required' ) ) );
+	{ // Region
+		$region_is_required = ( $edited_Item->Blog->get_setting( 'location_region' ) == 'required' );
+		$Form->select_input_options( 'item_rgn_ID', get_regions_option_list( $edited_Item->ctry_ID, $edited_Item->rgn_ID, array( 'none_option_text' => T_( 'Unknown' ) ) ), T_( 'Region' ), sprintf( $button_refresh_regional, 'button_refresh_region' ), array( 'required' => $region_is_required ) );
 	}
 
 	if( $edited_Item->Blog->subregion_visible() )
-	{	// Subregion
-		$Form->select_input_options( 'item_subrg_ID', get_subregions_option_list( $edited_Item->rgn_ID, $edited_Item->subrg_ID, array( 'none_option_text' => T_( 'Unknown' ) ) ), T_( 'Sub-region' ), sprintf( $button_refresh_regional, 'button_refresh_subregion' ), array( 'required' => ( $edited_Item->Blog->get_setting( 'location_subregion' ) == 'required' ) ) );
+	{ // Subregion
+		$subregion_is_required = ( $edited_Item->Blog->get_setting( 'location_subregion' ) == 'required' );
+		$Form->select_input_options( 'item_subrg_ID', get_subregions_option_list( $edited_Item->rgn_ID, $edited_Item->subrg_ID, array( 'none_option_text' => T_( 'Unknown' ) ) ), T_( 'Sub-region' ), sprintf( $button_refresh_regional, 'button_refresh_subregion' ), array( 'required' => $subregion_is_required ) );
 	}
 
 	if( $edited_Item->Blog->city_visible() )
-	{	// City
-		$Form->select_input_options( 'item_city_ID', get_cities_option_list( $edited_Item->ctry_ID, $edited_Item->rgn_ID, $edited_Item->subrg_ID, $edited_Item->city_ID, array( 'none_option_text' => T_( 'Unknown' ) ) ), T_( 'City' ), sprintf( $button_refresh_regional, 'button_refresh_city' ), array( 'required' => ( $edited_Item->Blog->get_setting( 'location_city' ) == 'required' ) ) );
+	{ // City
+		$city_is_required = ( $edited_Item->Blog->get_setting( 'location_city' ) == 'required' );
+		$Form->select_input_options( 'item_city_ID', get_cities_option_list( $edited_Item->ctry_ID, $edited_Item->rgn_ID, $edited_Item->subrg_ID, $edited_Item->city_ID, array( 'none_option_text' => T_( 'Unknown' ) ) ), T_( 'City' ), sprintf( $button_refresh_regional, 'button_refresh_city' ), array( 'required' => $city_is_required ) );
 	}
 
 	echo $Form->formend;
@@ -2763,7 +2948,7 @@ function items_created_results_block( $params = array() )
 			'edited_User'          => NULL,
 			'results_param_prefix' => 'actv_postown_',
 			'results_title'        => T_('Posts created by the user'),
-			'results_no_text'      => T_('User has no own created posts'),
+			'results_no_text'      => T_('User has not created any posts'),
 		), $params );
 
 	if( !is_logged_in() )
@@ -2856,7 +3041,7 @@ function items_edited_results_block( $params = array() )
 			'edited_User'          => NULL,
 			'results_param_prefix' => 'actv_postedit_',
 			'results_title'        => T_('Posts edited by the user'),
-			'results_no_text'      => T_('User has no own edited posts'),
+			'results_no_text'      => T_('User has not edited any posts'),
 		), $params );
 
 	if( !is_logged_in() )
@@ -3755,8 +3940,8 @@ function manual_display_post_row( $Item, $level, $params = array() )
 
 /*
  * $Log$
- * Revision 1.155  2013/11/06 08:04:15  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.156  2013/11/06 09:08:48  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

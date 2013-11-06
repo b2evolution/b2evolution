@@ -49,9 +49,6 @@ $ItemCache = & get_ItemCache();
  */
 $edited_Item = & $ItemCache->get_by_ID( $item_ID );
 
-// Load required functions ( we need to load here, because in CLI mode it is not loaded )
-load_funcs( '_core/_url.funcs.php' );
-
 // send outbound pings:
 if( ! $edited_Item->send_outbound_pings() )
 {
@@ -78,8 +75,8 @@ return 1; /* ok */
 
 /*
  * $Log$
- * Revision 1.7  2013/11/06 08:04:07  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.8  2013/11/06 09:08:47  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>

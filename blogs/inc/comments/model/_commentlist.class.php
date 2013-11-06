@@ -60,14 +60,14 @@ class CommentList2 extends DataObjectList2
 	/**
 	 * Constructor
 	 *
-	 * @param Blog
+	 * @param Blog This may be NULL only when must select comments from all Blog. Use NULL carefully, because it may generate very long queries!
 	 * @param integer|NULL Limit
 	 * @param string name of cache to be used
 	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
 	 * @param string Name to be used when saving the filterset (leave empty to use default for collection)
 	 */
 	function CommentList2(
-		$Blog = NULL,
+		$Blog,
 		$limit = 1000,
 		$cache_name = 'CommentCache',	// name of cache to be used
 		$param_prefix = '',
@@ -79,14 +79,17 @@ class CommentList2 extends DataObjectList2
 		// Call parent constructor:
 		parent::DataObjectList2( get_Cache($cache_name), $limit, $param_prefix, NULL );
 
+		// Set Blog. Note: It can be NULL on ?disp=usercomments
+		$this->Blog = $Blog;
+
 		// The SQL Query object:
 		$this->CommentQuery = new CommentQuery(/* $this->Cache->dbtablename, $this->Cache->dbprefix, $this->Cache->dbIDname*/ );
+		$this->CommentQuery->Blog = $this->Blog;
 
-		$this->Blog = & $Blog;
-
-		// The Item SQL Query object:
+		// The Item filter SQL Query object:
 		$this->ItemQuery = new ItemQuery( 'T_items__item', 'post_', 'post_ID' );
-		$this->ItemQuery->blog = $this->Blog->ID;
+		// Blog can be NULL on ?disp=usercomments, in this case ItemQuery blog must be set to 0, which means all blog
+		$this->ItemQuery->blog = empty( $this->Blog ) ? 0 : $this->Blog->ID;
 
 		if( !empty( $filterset_name ) )
 		{	// Set the filterset_name with the filterset_name param
@@ -143,7 +146,9 @@ class CommentList2 extends DataObjectList2
 	{
 		// The SQL Query object:
 		$this->CommentQuery = new CommentQuery( $this->Cache->dbtablename, $this->Cache->dbprefix, $this->Cache->dbIDname );
+		$this->CommentQuery->Blog = $this->Blog;
 		$this->ItemQuery = new ItemQuery( 'T_items__item', 'post_', 'post_ID' );
+		$this->ItemQuery->blog = empty( $this->Blog ) ? 0 : $this->Blog->ID;
 
 		parent::reset();
 	}
@@ -419,6 +424,7 @@ class CommentList2 extends DataObjectList2
 		{ // Allow only inskin statuses for posts
 			$post_show_statuses = get_inskin_statuses();
 		}
+		// Restrict post filters to available statuses. When blog = 0 we will check visibility statuses for each blog separately ( on the same query ).
 		$this->ItemQuery->where_visibility( $post_show_statuses );
 		$sql_item_IDs = 'SELECT DISTINCT post_ID'
 						.$this->ItemQuery->get_from()
@@ -725,8 +731,8 @@ class CommentList2 extends DataObjectList2
 
 /*
  * $Log$
- * Revision 1.39  2013/11/06 08:03:58  efy-asimo
- * Update to version 5.0.1-alpha-5
+ * Revision 1.40  2013/11/06 09:08:47  efy-asimo
+ * Update to version 5.0.2-alpha-5
  *
  */
 ?>
