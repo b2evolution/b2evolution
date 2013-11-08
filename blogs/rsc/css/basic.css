@@ -62,6 +62,10 @@ div.multi_image_zone div.image_block
 div.image_block img {
 	margin: 1ex;
 }
+.replied_comment div.image_block img {
+	max-width: 100%;
+	height: auto;
+}
 
 div.image_legend {
 	font-size: 84%;
@@ -676,6 +680,7 @@ td.warning {
 
 p.error,
 span.error,
+span.warning,
 p.warning {
 	color: #e00;
 	font-weight:bold;

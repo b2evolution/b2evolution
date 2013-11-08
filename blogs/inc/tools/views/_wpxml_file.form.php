@@ -32,7 +32,7 @@ $Form->hidden( 'action', 'import' );
 
 $Form->begin_fieldset( T_('Select XML file') );
 
-	$Form->text_input( 'wp_file', '', 20, T_('WordPress XML File'), '', array( 'type' => 'file', 'required' => true ) );
+	$Form->text_input( 'wp_file', '', 20, T_('WordPress XML File'), '<strong>'.T_('Allowed file extensions').'</strong>: xml, txt, zip.', array( 'type' => 'file', 'required' => true ) );
 
 $Form->end_fieldset();
 
@@ -62,10 +62,4 @@ $Form->buttons( array( array( 'submit', 'submit', T_('Continue !'), 'SaveButton'
 
 $Form->end_form();
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:04:55  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

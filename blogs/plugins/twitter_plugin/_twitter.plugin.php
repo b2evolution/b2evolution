@@ -303,6 +303,10 @@ class twitter_plugin extends Plugin
 		$account = $connection->get('account/verify_credentials');
 		if( empty( $account->errors ) )
 		{
+			if( is_array( $account ) )
+			{ // Get only first account
+				$account = $account[0];
+			}
 			return $account->screen_name;
 		}
 		return '';
@@ -559,9 +563,10 @@ class twitter_plugin extends Plugin
 					'url'		=> ''
 				), $content );
 
+		// Replace the title and exerpt, but before replacing decode the html entities
 		$msg = str_replace(
 				array( '$title$', '$excerpt$' ),
-				array( $content['title'], $content['excerpt'] ),
+				array( html_entity_decode( $content['title'] ), html_entity_decode( $content['excerpt'] ) ),
 				$oauth['msg_format']
 			);
 
@@ -604,7 +609,7 @@ class twitter_plugin extends Plugin
 
 		if( empty($result) )
 		{
-			$xmlrpcresp = 'Unknown error while posting "'.$msg.'" to account @'.$oauth['contact'];
+			$xmlrpcresp = 'Unknown error while posting "'.htmlspecialchars( $msg ).'" to account @'.$oauth['contact'];
 			return false;
 		}
 		elseif( !empty($result->error) )

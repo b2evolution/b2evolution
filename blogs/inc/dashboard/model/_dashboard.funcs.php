@@ -209,6 +209,8 @@ function get_comments_awaiting_moderation_number( $blog_ID )
 
 	$BlogCache = & get_BlogCache();
 	$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+	$moderation_statuses = $Blog->get_setting( 'moderation_statuses' );
+	$moderation_statuses_condition = '\''.str_replace( ',', '\',\'', $moderation_statuses ).'\'';
 
 	$sql = 'SELECT COUNT(DISTINCT(comment_ID))
 				FROM T_comments
@@ -219,7 +221,7 @@ function get_comments_awaiting_moderation_number( $blog_ID )
 
 	$sql .= 'WHERE '.$Blog->get_sql_where_aggregate_coll_IDs('othercats.cat_blog_ID');
 	$sql .= ' AND comment_type IN (\'comment\',\'trackback\',\'pingback\') ';
-	$sql .= ' AND comment_status IN ( \''.implode( '\',\'', get_visibility_statuses( 'dashboard' ) ).'\' )';
+	$sql .= ' AND comment_status IN ( '.$moderation_statuses_condition.' )';
 	$sql .= ' AND '.statuses_where_clause();
 
 	return $DB->get_var( $sql );
@@ -253,11 +255,14 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 			$exlude_ID_list = '-'.implode( ",", $comment_IDs );
 		}
 
+		$moderation_statuses = explode( ',', $Blog->get_setting( 'moderation_statuses' ) );
+
 		// Filter list:
 		$CommentList->set_filters( array(
 				'types' => array( 'comment', 'trackback', 'pingback' ),
-				'statuses' => get_visibility_statuses( 'dashboard' ),
+				'statuses' => $moderation_statuses,
 				'comment_ID_list' => $exlude_ID_list,
+				'post_statuses' => array( 'published', 'community', 'protected' ),
 				'order' => 'DESC',
 				'comments' => $limit,
 			) );
@@ -336,7 +341,12 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		echo '</div>';
 
 		// Display Spam Voting system
-		$Comment->vote_spam( '', '', '&amp;', true, true );
+		$vote_spam_params = array();
+		if( ! $script )
+		{ // This is an async request, so javascript is enabled for sure and we may display voting
+			$vote_spam_params['display'] = true;
+		}
+		$Comment->vote_spam( '', '', '&amp;', true, true, $vote_spam_params );
 
 		echo '<div class="clear"></div>';
 		echo '</div>';
@@ -430,11 +440,16 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 		// Load item's creator user:
 		$Item->get_creator_User();
 
+		$Item->status( array(
+				'before' => '<div class="floatright"><span class="note status_'.$Item->status.'"><span>',
+				'after'  => '</span></span></div>',
+			) );
+
 		echo '<div class="dashboard_float_actions">';
 		$Item->edit_link( array( // Link to backoffice for editing
 				'before'    => ' ',
 				'after'     => ' ',
-				'class'     => 'ActionButton'
+				'class'     => 'ActionButton btn'
 			) );
 		$Item->publish_link( '', '', '#', '#', 'PublishButton' );
 		echo get_icon( 'pixel' );
@@ -452,10 +467,6 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 		}
 		echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$item_title.'</a>';
 		echo ' <span class="dashboard_post_details">';
-		$Item->status( array(
-				'before' => '<div class="floatright"><span class="status_'.$Item->status.'">',
-				'after'  => '</span></div>',
-			) );
 		echo '</span>';
 		echo '</h3>';
 
@@ -467,11 +478,4 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 	return true;
 }
 
-
-/*
- * $Log$
- * Revision 1.53  2013/11/06 09:08:48  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

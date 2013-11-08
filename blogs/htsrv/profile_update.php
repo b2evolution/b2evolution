@@ -42,6 +42,9 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
 
+// Check if the request exceed the post max size. If it does then the function will a call header_redirect.
+check_post_max_size_exceeded();
+
 $action = param_action();
 $disp = param( 'user_tab', 'string', '' );
 $blog = param( 'blog', 'integer', 0 );

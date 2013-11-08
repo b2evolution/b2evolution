@@ -76,8 +76,8 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 				$email_is_detected = true;
 			}
 
-			if( !$Blog->get_setting( 'threaded_comments' ) )
-			{
+			if( empty( $Comment->in_reply_to_cmt_ID ) )
+			{ // Display the comment preview here only if this comment is not a reply, otherwise it was already displayed
 				// ------------------ PREVIEW COMMENT INCLUDED HERE ------------------
 				skin_include( $params['comment_template'], array(
 						'Comment'              => & $Comment,
@@ -123,10 +123,10 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 				$comment_author_url = '';
 			}
 			else
-			{
-				$comment_author = isset($_COOKIE[$cookie_name]) ? trim($_COOKIE[$cookie_name]) : '';
-				$comment_author_email = isset($_COOKIE[$cookie_email]) ? trim($_COOKIE[$cookie_email]) : '';
-				$comment_author_url = isset($_COOKIE[$cookie_url]) ? trim($_COOKIE[$cookie_url]) : '';
+			{ // Try to get params from $_COOKIE through the param() function
+				$comment_author = param_cookie( $cookie_name, 'string', '' );
+				$comment_author_email = evo_strtolower( param_cookie( $cookie_email, 'string', '' ) );
+				$comment_author_url = param_cookie( $cookie_url, 'string', '' );
 			}
 			if( empty($comment_author_url) )
 			{	// Even if we have a blank cookie, let's reset this to remind the bozos what it's for
@@ -232,7 +232,7 @@ function validateCommentForm(form)
 }
 /* ]]> *
 </script>';*/
-	
+
 	$Form = new Form( $samedomain_htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID, 'post', NULL, 'multipart/form-data' );
 
 	$Form->switch_template_parts( $params['form_params'] );
@@ -264,7 +264,7 @@ function validateCommentForm(form)
 
 	if( check_user_status( 'is_validated' ) )
 	{ // User is logged in and activated:
-		$Form->info_field( T_('User'), '<strong>'.$current_User->get_identity_link( array( 'link_text' => 'text' ) ).'</strong>'
+		$Form->info_field( T_('User'), '<strong>'.$current_User->get_identity_link( array( 'link_text' => 'login' ) ).'</strong>'
 			.' '.get_user_profile_link( ' [', ']', T_('Edit profile') ) );
 	}
 	else

@@ -438,7 +438,7 @@ class Item extends ItemLight
 				'after'          => ' ',
 				'format'         => 'htmlbody',
 				'link_to'        => 'userpage',
-				'link_text'      => 'preferredname',
+				'link_text'      => 'preferredname', // avatar | only_avatar | login | nickname | firstname | lastname | fullname | preferredname
 				'link_rel'       => '',
 				'link_class'     => '',
 				'thumb_size'     => 'crop-top-32x32',
@@ -468,7 +468,7 @@ class Item extends ItemLight
 				'after'          => ' ',
 				'format'         => 'htmlbody',
 				'link_to'        => 'userpage',
-				'link_text'      => 'preferredname',
+				'link_text'      => 'preferredname', // avatar | only_avatar | login | nickname | firstname | lastname | fullname | preferredname
 				'link_rel'       => '',
 				'link_class'     => '',
 				'thumb_size'     => 'crop-top-32x32',
@@ -505,36 +505,42 @@ class Item extends ItemLight
 		global $default_locale, $current_User, $localtimenow;
 		global $posttypes_reserved_IDs, $item_typ_ID;
 
+		// LOCALE:
 		if( param( 'post_locale', 'string', NULL ) !== NULL )
 		{
 			$this->set_from_Request( 'locale' );
 		}
 
+		// TYPE:
 		if( param( 'post_type', 'string', NULL ) !== NULL )
-		{ // Set type ID from request type code
+		{ // Set type ID from request type code, happens when e.g. we add an intro from manual skin by url: /blog6.php?disp=edit&cat=25&post_type=intro-cat
 			$this->set( 'ptyp_ID', get_item_type_ID( get_param( 'post_type' ) ) );
 		}
 		elseif( param( 'item_typ_ID', 'integer', NULL ) !== NULL )
-		{
+		{ // fp> when does this happen?
+			// yura>fp: this happens on submit expert form
 			$this->set_from_Request( 'ptyp_ID', 'item_typ_ID' );
 
-			if ( in_array( $item_typ_ID, $posttypes_reserved_IDs ) )
+			if( in_array( $item_typ_ID, $posttypes_reserved_IDs ) )
 			{
 				param_error( 'item_typ_ID', T_( 'This post type is reserved and cannot be used. Please choose another one.' ), '' );
 			}
 		}
 
+		// URL associated with Item:
 		if( param( 'post_url', 'string', NULL ) !== NULL )
 		{
 			param_check_url( 'post_url', 'posting', '' );
 			$this->set_from_Request( 'url' );
 		}
-		// Note: post_url is not part of the simple form, so this message can be a little bit awkward there
+
 		if( $this->status == 'redirected' && empty($this->url) )
 		{
+			// Note: post_url is not part of the simple form, so this message can be a little bit awkward there
 			param_error( 'post_url', T_('If you want to redirect this post, you must specify an URL! (Expert mode)') );
 		}
 
+		// ISSUE DATE / TIMESTAMP:
 		$this->load_Blog();
 		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $this->Blog->ID ) )
 		{
@@ -554,28 +560,38 @@ class Item extends ItemLight
 			}
 		}
 
+		// DEADLINE:
+		if( param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL ) !== NULL ) {
+			$this->set_from_Request( 'datedeadline', 'item_deadline', true );
+		}
+
+		// SLUG:
 		if( param( 'post_urltitle', 'string', NULL ) !== NULL ) {
 			$this->set_from_Request( 'urltitle' );
 		}
 
+		// <title> TAG:
 		if( param( 'titletag', 'string', NULL ) !== NULL ) {
 			$this->set_from_Request( 'titletag', 'titletag' );
 		}
 
+		// <meta> DESC:
 		if( param( 'metadesc', 'string', NULL ) !== NULL ) {
 			$this->set_setting( 'post_metadesc', get_param( 'metadesc' ) );
 		}
 
+		// <meta> KEYWORDS:
 		if( param( 'custom_headers', 'string', NULL ) !== NULL ) {
 			$this->set_setting( 'post_custom_headers', get_param( 'custom_headers' ) );
 		}
 
+		// TAGS:
 		if( param( 'item_tags', 'string', NULL ) !== NULL ) {
 			$this->set_tags_from_string( get_param('item_tags') );
 			// pre_dump( $this->tags );
 		}
 
-		// Workflow stuff:
+		// WORKFLOW stuff:
 		param( 'item_st_ID', 'integer', NULL );
 		$this->set_from_Request( 'pst_ID', 'item_st_ID', true );
 
@@ -585,31 +601,27 @@ class Item extends ItemLight
 		param( 'item_priority', 'integer', NULL );
 		$this->set_from_Request( 'priority', 'item_priority', true );
 
+		// FEATURED checkbox:
 		$this->set( 'featured', param( 'item_featured', 'integer', 0 ), false );
 
+		// HIDE TEASER checkbox:
 		$this->set_setting( 'hide_teaser', param( 'item_hideteaser', 'integer', 0 ) );
 
-		// Expiry delay
-		$expiry_delay = param_duration( 'expiry_delay' );
-		if( empty( $expiry_delay ) )
-		{ // Check if we have 'expiry_delay' param set as string from simple or mass form
-			$expiry_delay = param( 'expiry_delay', 'string', NULL );
-		}
-		$this->set_setting( 'post_expiry_delay', $expiry_delay, true );
-
+		// ORDER:
 		param( 'item_order', 'double', NULL );
 		$this->set_from_Request( 'order', 'item_order', true );
 
+		// OWNER:
 		$this->creator_user_login = param( 'item_owner_login', 'string', NULL );
-
 		if( $current_User->check_perm( 'users', 'edit' ) && param( 'item_owner_login_displayed', 'string', NULL ) !== NULL )
-		{   // only admins can change this..
+		{	// only admins can change the owner..
 			if( param_check_not_empty( 'item_owner_login', T_('Please enter valid owner login.') ) && param_check_login( 'item_owner_login', true ) )
 			{
 				$this->set_creator_by_login( $this->creator_user_login );
 			}
 		}
 
+		// LOCATION COORDINATES:
 		if( $this->Blog->get_setting( 'show_location_coordinates' ) )
 		{ // location coordinates are enabled, save map settings
 			param( 'item_latitude', 'double', NULL ); // get par value
@@ -622,7 +634,7 @@ class Item extends ItemLight
 			$this->set_setting( 'map_type', get_param( 'google_map_type' ), true );
 		}
 
-		// CUSTOM FIELDS
+		// CUSTOM FIELDS:
 		foreach( array( 'double', 'varchar' ) as $type )
 		{
 			$field_count = $this->Blog->get_setting( 'count_custom_'.$type );
@@ -640,13 +652,9 @@ class Item extends ItemLight
 			}
 		}
 
-		if( param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL ) !== NULL ) {
-			$this->set_from_Request( 'datedeadline', 'item_deadline', true );
-		}
-
-		// Save status of "Allow comments for this item" (only if comments are allowed in this blog, and disable_comments_bypost is enabled):
+		// COMMENTS:
 		if( ( $this->Blog->get_setting( 'allow_comments' ) != 'never' ) && ( $this->Blog->get_setting( 'disable_comments_bypost' ) ) )
-		{
+		{	// Save status of "Allow comments for this item" (only if comments are allowed in this blog, and disable_comments_bypost is enabled):
 			$post_comment_status = param( 'post_comment_status', 'string', 'open' );
 			if( !empty( $post_comment_status ) )
 			{ // 'open' or 'closed' or ...
@@ -654,8 +662,18 @@ class Item extends ItemLight
 			}
 		}
 
+		// EXPIRY DELAY:
+		$expiry_delay = param_duration( 'expiry_delay' );
+		if( empty( $expiry_delay ) )
+		{ // Check if we have 'expiry_delay' param set as string from simple or mass form
+			$expiry_delay = param( 'expiry_delay', 'string', NULL );
+		}
+		$this->set_setting( 'post_expiry_delay', $expiry_delay, true );
+
+		// EXTRA PARAMS FROM MODULES:
 		modules_call_method( 'update_item_settings', array( 'edited_Item' => $this ) );
 
+		// RENDERERS:
 		if( param( 'renderers_displayed', 'integer', 0 ) )
 		{ // use "renderers" value only if it has been displayed (may be empty)
 			global $Plugins;
@@ -667,18 +685,25 @@ class Item extends ItemLight
 			$renderers = $this->get_renderers_validated();
 		}
 
+		// CONTENT + TITLE:
 		if( $this->Blog->get_setting( 'allow_html_post' ) )
-		{	// HTML is allowed for this post
+		{	// HTML is allowed for this post, we'll accept HTML tags:
 			$text_format = 'html';
 		}
 		else
-		{	// HTML is disallowed for this post
+		{	// HTML is disallowed for this post, we'll encode all special chars:
 			$text_format = 'htmlspecialchars';
+		}
+
+		$editor_code = param( 'editor_code', 'string', NULL );
+		if( !empty( $editor_code ) )
+		{ // Update item editor code if it was explicitly set
+			$this->set_setting( 'editor_code', $editor_code );
 		}
 
 		if( param( 'content', $text_format, NULL ) !== NULL )
 		{
-			// Never allow html content on post titles
+			// Never allow html content on post titles:  (fp> probably so as to not mess up backoffice and all sorts of tools)
 			param( 'post_title', 'htmlspecialchars', NULL );
 
 			// Do some optional filtering on the content
@@ -689,8 +714,7 @@ class Item extends ItemLight
 			$params = array( 'object_type' => 'Item', 'object_Blog' => & $this->Blog );
 			$Plugins_admin->filter_contents( $GLOBALS['post_title'] /* by ref */, $GLOBALS['content'] /* by ref */, $renderers, $params /* by ref */ );
 
-
-			// Title handling:
+			// Title checking:
 			$require_title = $this->Blog->get_setting('require_title');
 
 			if( ( ! $editing || $creating ) && $require_title == 'required' ) // creating is important, when the action is create_edit
@@ -699,21 +723,20 @@ class Item extends ItemLight
 			}
 
 			// Format raw HTML input to cleaned up and validated HTML:
-			param_check_html( 'post_title', T_('Invalid title.'), '' );
-			$this->set( 'title', get_param( 'post_title' ) );
-
 			param_check_html( 'content', T_('Invalid content.') );
 			$this->set( 'content', get_param( 'content' ) );
+
+			$this->set( 'title', get_param( 'post_title' ) );
 		}
 
-		// Excerpt, must come after content (to handle excerpt_autogenerated)
+		// EXCERPT: (must come after content (to handle excerpt_autogenerated))
 		if( param( 'post_excerpt', 'text', NULL ) !== NULL )
 		{
 			$this->set( 'excerpt_autogenerated', 0 ); // Set this to the '0' for saving a field 'excerpt' from a request
 			$this->set_from_Request( 'excerpt' );
 		}
 
-		// Locations
+		// LOCATION (COUNTRY -> CITY):
 		load_funcs( 'regional/model/_regional.funcs.php' );
 		if( $this->Blog->country_visible() )
 		{ // Save country
@@ -803,7 +826,10 @@ class Item extends ItemLight
 		if( $this->get_assigned_User() )
 		{
 			echo $before;
-			$this->assigned_User->preferred_name( $format );
+			echo $this->assigned_User->get_identity_link( array(
+					'format'    => $format,
+					'link_text' => 'login',
+				) );
 			echo $after;
 		}
 	}
@@ -1414,7 +1440,7 @@ class Item extends ItemLight
 		if( !empty($r) )
 		{
 			echo $params['before'];
-			echo format_to_output( $this->excerpt, $params['format'] );
+			echo format_to_output( $this->excerpt, 'htmlspecialchars' );
 			if( !empty( $params['excerpt_more_text'] ) )
 			{
 				echo $params['excerpt_before_more'];
@@ -1583,7 +1609,8 @@ class Item extends ItemLight
 			$view_type = 'teaser';
 		}
 
-		$output = array_shift( $this->get_content_parts($params) );
+		$content_parts = $this->get_content_parts( $params );
+		$output = array_shift( $content_parts );
 
 		// Render Inline Images  [image:123:caption]  :
 		$params['check_code_block'] = true;
@@ -2353,6 +2380,38 @@ class Item extends ItemLight
 
 
 	/**
+	 * Get an attached image tag with lightbox reference
+	 *
+	 * @private function
+	 *
+	 * @param object the attached image File
+	 * @param array params
+	 * @return string the attached image tag
+	 */
+	function get_attached_image_tag( $File, $params )
+	{
+		// Make sure $link_to is set
+		$link_to = isset( $params['image_link_to'] ) ? $params['image_link_to'] : 'original';
+
+		if( $link_to == 'single' )
+		{ // We're linking to the post (displayed on a single post page):
+			$link_to = $this->get_permanent_url( $link_to );
+			$link_title = $this->title;
+			$link_rel = '';
+		}
+		else
+		{ // We're linking to the original image, let lighbox (or clone) quick in:
+			$link_title = '#title#';	// This title will be used by lightbox (colorbox for instance)
+			$link_rel = 'lightbox[p'.$this->ID.']';	// Make one "gallery" per post.
+		}
+
+		// Generate the IMG tag with all the alt, title and desc if available
+		return $File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'],
+				$params['after_image'], $params['image_size'], $link_to, $link_title, $link_rel, '', '', $this->title );
+	}
+
+
+	/**
 	 * Display the images linked to the current Item
 	 *
 	 * @param array of params
@@ -2443,21 +2502,8 @@ class Item extends ItemLight
 				continue;
 			}
 
-			$link_to = $params['image_link_to']; // Can be 'orginal' (image) or 'single' (this post)
-			if( $link_to == 'single' )
-			{	// We're linking to the post (displayed on a single post page):
-				$link_to = $this->get_permanent_url( $link_to );
-				$link_title = $this->title;
-				$link_rel = '';
-			}
-			else
-			{	// We're linking to the original image, let lighbox (or clone) quick in:
-				$link_title = '#title#';	// This title will be used by lightbox (colorbox for instance)
-				$link_rel = 'lightbox[p'.$this->ID.']';	// Make one "gallery" per post.
-			}
 			// Generate the IMG tag with all the alt, title and desc if available
-			$r .= $File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'],
-					$params['after_image'], $params['image_size'], $link_to, $link_title, $link_rel, '', '', $this->title );
+			$r .= $this->get_attached_image_tag( $File, $params );
 		}
 
 		if( !empty($r) )
@@ -3980,7 +4026,7 @@ class Item extends ItemLight
 
 	/**
 	 * Get raw status
-	 * 
+	 *
 	 * @return string Status
 	 */
 	function get_status_raw()
@@ -4575,7 +4621,7 @@ class Item extends ItemLight
 
 	/**
 	 * Insert new item in test mode, Use this function only in test tool to create very much items at one time
-	 * 
+	 *
 	 * @return boolean true on success
 	 */
 	function dbinsert_test()
@@ -4921,7 +4967,8 @@ class Item extends ItemLight
 	function get_autogenerated_excerpt( $crop_length = 254, $suffix = '&hellip;' )
 	{
 		// autogenerated excerpt should NEVER show anything after <!-- more --> or after <!-- page -->
-		$excerpt_content = array_shift( $this->get_content_parts( array( 'disppage' => 1 ) ) );
+		$content_parts = $this->get_content_parts( array( 'disppage' => 1 ) );
+		$excerpt_content = array_shift( $content_parts );
 		$r = str_replace( '<p>', ' <p>', $excerpt_content );
 		$r = str_replace( '<br', ' <br', $excerpt_content );
 		$r = trim(strip_tags($r));
@@ -5149,7 +5196,7 @@ class Item extends ItemLight
 			$already_notified = $this->send_moderation_emails();
 		}
 		else
-		{ // Moderation notifications were not sent, so there are no already notified users 
+		{ // Moderation notifications were not sent, so there are no already notified users
 			$already_notified = NULL;
 		}
 
@@ -5465,7 +5512,8 @@ class Item extends ItemLight
 		load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
 
 		$this->load_Blog();
-		$ping_plugins = array_unique(explode(',', $this->Blog->get_setting('ping_plugins')));
+		$ping_plugins = trim( $this->Blog->get_setting( 'ping_plugins' ) );
+		$ping_plugins = empty( $ping_plugins ) ? array() :  array_unique( explode( ',', $this->Blog->get_setting( 'ping_plugins' ) ) );
 
 		// init result
 		$r = true;
@@ -6321,18 +6369,24 @@ class Item extends ItemLight
 			return $this->is_locked;
 		}
 
-		// presuppose that all category is locked, we will change this value if only one category is not locked
-		$this->is_locked = true;
-
 		// Get item chapters to check lock status, but use cached chapters array instead of db query
 		$item_chapters = $this->get_Chapters();
-		foreach( $item_chapters as $item_Chapter )
-		{ // check if all item categories is locked
-			if( !$item_Chapter->lock )
-			{ // this category is not locked so the item is not locked either
-				$this->is_locked = false;
-				break;
+
+		if( count( $item_chapters ) )
+		{ // Presuppose that all category is locked, we will change this value if only one category is not locked
+			$this->is_locked = true;
+			foreach( $item_chapters as $item_Chapter )
+			{ // Check if all item categories is locked
+				if( !$item_Chapter->lock )
+				{ // This category is not locked so the item is not locked either
+					$this->is_locked = false;
+					break;
+				}
 			}
+		}
+		else
+		{ // If no category was set yet ( e.g. in case of new item create ), the Item can't be locked
+			$this->is_locked = false;
 		}
 
 		return $this->is_locked;
@@ -6405,27 +6459,15 @@ class Item extends ItemLight
 						break;
 					}
 					elseif( $File->is_image() )
-					{	// Generate the IMG tag with all the alt, title and desc if available
-						$link_to = $params['image_link_to']; // Can be 'orginal' (image) or 'single' (this post)
-						if( $link_to == 'single' )
-						{	// We're linking to the post (displayed on a single post page):
-							$link_to = $this->get_permanent_url( $link_to );
-							$link_rel = '';
-						}
-						else
-						{	// We're linking to the original image, let lighbox (or clone) quick in:
-							$link_rel = 'lightbox[p'.$this->ID.']';	// Make one "gallery" per post.
-						}
-						// Generate the IMG tag with all the alt, title and desc if available
-						$image_tag = $File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'],
-								$params['after_image'], $params['image_size'], $link_to, '', $link_rel, '', '', '', $current_link_caption );
+					{ // Generate the IMG tag with all the alt, title and desc if available
+						$image_tag = $this->get_attached_image_tag( $File, $params );
 
 						// Replace inline image tag with HTML img tag
 						$content = str_replace( $current_link_tag, $image_tag, $content );
 					}
 					else
-					{	// Display error if file is not image
-						$content = str_replace( $current_link_tag, '<div class="error">'.sprintf( T_('This file is not image: %s'), $current_link_tag ).'</div>', $content );
+					{	// Display error if file is not an image
+						$content = str_replace( $current_link_tag, '<div class="error">'.sprintf( T_('This file cannot be included here because it is not an image: %s'), $current_link_tag ).'</div>', $content );
 					}
 				}
 			}

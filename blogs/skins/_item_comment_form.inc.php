@@ -29,6 +29,7 @@ $params = array_merge( array(
 		'form_submit_text'     => T_('Send comment'),
 		'form_params'          => array(), // Use to change a structre of form, i.e. fieldstart, fieldend and etc.
 		'policy_text'          => '',
+		'author_link_text'     => 'login',
 		'textarea_lines'       => 10,
 		'default_text'         => '',
 		'preview_block_start'  => '',
@@ -77,8 +78,8 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 				$email_is_detected = true;
 			}
 
-			if( !$Blog->get_setting( 'threaded_comments' ) )
-			{
+			if( empty( $Comment->in_reply_to_cmt_ID ) )
+			{ // Display the comment preview here only if this comment is not a reply, otherwise it was already displayed
 				// ------------------ PREVIEW COMMENT INCLUDED HERE ------------------
 				skin_include( $params['comment_template'], array(
 						'Comment'              => & $Comment,
@@ -86,6 +87,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 						'comment_start'        => $Comment->email_is_detected ? $params['comment_error_start'] : $params['preview_start'],
 						'comment_end'          => $Comment->email_is_detected ? $params['comment_error_end'] : $params['preview_end'],
 						'comment_block_end'    => $Comment->email_is_detected ? '' : $params['preview_block_end'],
+						'author_link_text'     => $params['author_link_text'],
 					) );
 				// Note: You can customize the default item feedback by copying the generic
 				// /skins/_item_comment.inc.php file into the current skin folder.
@@ -124,10 +126,10 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 				$comment_author_url = '';
 			}
 			else
-			{
-				$comment_author = isset($_COOKIE[$cookie_name]) ? trim($_COOKIE[$cookie_name]) : '';
-				$comment_author_email = isset($_COOKIE[$cookie_email]) ? trim($_COOKIE[$cookie_email]) : '';
-				$comment_author_url = isset($_COOKIE[$cookie_url]) ? trim($_COOKIE[$cookie_url]) : '';
+			{ // Get params from $_COOKIE
+				$comment_author = param_cookie( $cookie_name, 'string', '' );
+				$comment_author_email = evo_strtolower( param_cookie( $cookie_email, 'string', '' ) );
+				$comment_author_url = param_cookie( $cookie_url, 'string', '' );
 			}
 			if( empty($comment_author_url) )
 			{	// Even if we have a blank cookie, let's reset this to remind the bozos what it's for
@@ -214,8 +216,9 @@ function validateCommentForm(form)
 
 	if( check_user_status( 'is_validated' ) )
 	{ // User is logged in and activated:
-		$Form->info_field( T_('User'), '<strong>'.$current_User->get_identity_link( array( 'link_text' => 'text' ) ).'</strong>'
-			.' '.get_user_profile_link( ' [', ']', T_('Edit profile') ) );
+		$Form->info_field( T_('User'), '<strong>'.$current_User->get_identity_link( array(
+				'link_text' => $params['author_link_text'] ) ).'</strong> '
+				.get_user_profile_link( ' [', ']', T_('Edit profile') ) );
 	}
 	else
 	{ // User is not logged in or not activated:
@@ -239,7 +242,7 @@ function validateCommentForm(form)
 	if( $Item->can_rate() )
 	{	// Comment rating:
 		echo $Form->begin_field( NULL, T_('Your vote'), true );
-		$Comment->rating_input();
+		$Comment->rating_input( array( 'item_ID' => $Item->ID ) );
 		echo $Form->end_field();
 	}
 
@@ -357,10 +360,4 @@ function validateCommentForm(form)
 
 	echo_comment_reply_js( $Item );
 }
-/*
- * $Log$
- * Revision 1.38  2013/11/06 08:05:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

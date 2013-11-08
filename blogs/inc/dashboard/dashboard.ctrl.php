@@ -26,7 +26,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $current_User;
 
-global $dispatcher, $allow_evo_stats;
+global $dispatcher, $allow_evo_stats, $blog;
 
 if( $blog )
 {
@@ -44,6 +44,8 @@ $AdminUI->set_path( 'dashboard' );
 require_js( 'communication.js' ); // auto requires jQuery
 // Load the appropriate blog navigation styles (including calendar, comment forms...):
 require_css( $rsc_url.'css/blog_base.css' ); // Default styles for the blog navigation
+// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
+require_js_helper( 'colorbox' );
 
 $AdminUI->breadcrumbpath_init();
 
@@ -75,13 +77,18 @@ if( $blog )
 
 	$nb_blocks_displayed = 0;
 
-	$dashboard_statuses = get_visibility_statuses( 'dashboard' );
+	$blog_moderation_statuses = explode( ',', $Blog->get_setting( 'moderation_statuses' ) );
+	$highest_publish_status = get_highest_publish_status( 'comment', $Blog->ID, false );
+	$user_modeartion_statuses = array();
 
-	$user_perm_moderate_cmt = false;
-	foreach( $dashboard_statuses as $status )
+	foreach( $blog_moderation_statuses as $status )
 	{
-		$user_perm_moderate_cmt = $user_perm_moderate_cmt || $current_User->check_perm( 'blog_comment!'.$status, 'edit', false, $blog );
+		if( ( $status !== $highest_publish_status ) && $current_User->check_perm( 'blog_comment!'.$status, 'edit', false, $blog ) )
+		{
+			$user_modeartion_statuses[] = $status;
+		}
 	}
+	$user_perm_moderate_cmt = count( $user_modeartion_statuses );
 
 	if( $user_perm_moderate_cmt )
 	{
@@ -93,7 +100,9 @@ if( $blog )
 		// Filter list:
 		$CommentList->set_filters( array(
 				'types' => array( 'comment','trackback','pingback' ),
-				'statuses' => $dashboard_statuses,
+				'statuses' => $user_modeartion_statuses,
+				'user_perm' => 'moderate',
+				'post_statuses' => array( 'published', 'community', 'protected' ),
 				'order' => 'DESC',
 				'comments' => 5,
 			) );
@@ -411,10 +420,10 @@ if( $blog )
 		$opentrash_link = get_opentrash_link();
 		$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', 'javascript:startRefreshComments()' ).'</span> ';
 
-		$show_statuses_param = $param_prefix.'show_statuses[]='.implode( '&amp;'.$param_prefix.'show_statuses[]=', $dashboard_statuses );
+		$show_statuses_param = $param_prefix.'show_statuses[]='.implode( '&amp;'.$param_prefix.'show_statuses[]=', $user_modeartion_statuses );
 		$block_item_Widget->title = $refresh_link.$opentrash_link.T_('Comments awaiting moderation').
-			' <a href="'.$admin_url.'?ctrl=comments&amp;'.$show_statuses_param.'" style="text-decoration:none">'.
-			'<span id="badge" class="badge">'.$CommentList->total_rows.'</span></a>';
+			' <a href="'.$admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;'.$show_statuses_param.'" style="text-decoration:none">'.
+			'<span id="badge" class="badge badge-important">'.$CommentList->total_rows.'</span></a>';
 
 		echo '<div id="styled_content_block">';
 		echo '<div id="comments_block">';
@@ -437,13 +446,17 @@ if( $blog )
 	/*
 	 * RECENT POSTS awaiting moderation
 	 */
-	foreach( $dashboard_statuses as $status )
+	// TODO: asimo> Make this configurable per blogs the same way as we have in case of comments
+	echo '<div id="styled_content_block" class="items_container">';
+	$default_moderation_statuses = get_visibility_statuses( 'moderation' );
+	foreach( $default_moderation_statuses as $status )
 	{ // go through all statuses
 		if( display_posts_awaiting_moderation( $status, $block_item_Widget ) )
 		{ // a block was dispalyed for this status
 			$nb_blocks_displayed++;
 		}
 	}
+	echo '</div>';
 
 	/*
 	 * RECENTLY EDITED
@@ -475,6 +488,8 @@ if( $blog )
 		$block_item_Widget->title = T_('Recently edited');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 
+		echo '<div id="styled_content_block" class="items_container">';
+
 		while( $Item = & $ItemList->get_item() )
 		{
 			echo '<div class="dashboard_post dashboard_post_'.($ItemList->current_idx % 2 ? 'even' : 'odd' ).'" lang="'.$Item->get('locale').'">';
@@ -482,11 +497,16 @@ if( $blog )
 			// Load item's creator user:
 			$Item->get_creator_User();
 
+			$Item->status( array(
+					'before' => '<div class="floatright"><span class="note status_'.$Item->status.'"><span>',
+					'after'  => '</span></span></div>',
+				) );
+
 			echo '<div class="dashboard_float_actions">';
 			$Item->edit_link( array( // Link to backoffice for editing
 					'before'    => ' ',
 					'after'     => ' ',
-					'class'     => 'ActionButton'
+					'class'     => 'ActionButton btn'
 				) );
 			echo '</div>';
 
@@ -498,10 +518,6 @@ if( $blog )
 			}
 			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$item_title.'</a>';
 			echo ' <span class="dashboard_post_details">';
-			$Item->status( array(
-					'before' => '<div class="floatright"><span class="status_'.$Item->status.'">',
-					'after'  => '</span></div>',
-				) );
 			$Item->views();
 			echo '</span>';
 			echo '</h3>';
@@ -518,11 +534,13 @@ if( $blog )
 					'restrict_to_image_position' => 'teaser',	// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
 				) );
 
-			echo '<div class="small">'.$Item->get_content_excerpt( 150 ).'</div>';
+			echo '<span class="small">'.htmlspecialchars( $Item->get_content_excerpt( 150 ) ).'</span>';
 
 			echo '<div style="clear:left;">'.get_icon('pixel').'</div>'; // IE crap
 			echo '</div>';
 		}
+
+		echo '</div>';
 
 		$block_item_Widget->disp_template_raw( 'block_end' );
 	}
@@ -746,10 +764,4 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-/*
- * $Log$
- * Revision 1.86  2013/11/06 08:04:07  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

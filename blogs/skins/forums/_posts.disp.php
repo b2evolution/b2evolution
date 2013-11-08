@@ -27,8 +27,8 @@ $Skin->display_post_button( $cat );
 // BREADCRUMBS
 $Skin->display_breadcrumbs( $cat );
 ?>
-<div class="clear"></div>
 </div>
+<div class="clear"></div>
 <?php
 
 // Display message if no post:
@@ -93,10 +93,4 @@ mainlist_page_links( array(
 	) );
 // ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:05:44  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -352,7 +352,7 @@ class File extends DataObject
 		}
 		else
 		{ // Create an empty file:
-			$success = touch( $this->_adfp_full_path );
+			$success = @touch( $this->_adfp_full_path );
 			$this->_is_dir = false; // used by chmod
 		}
 		$this->chmod( $chmod ); // uses $Settings for NULL
@@ -1402,7 +1402,7 @@ class File extends DataObject
 
 			while ( $temp_File = $temp_Filelist->get_next() )
 			{
-				$temp_File->modify_path ( $rel_dir, $full_dir, $paths );
+				$temp_File->modify_path ( $rel_dir, $full_dir );
 			}
 		}
 
@@ -1949,6 +1949,7 @@ class File extends DataObject
 					// Let's point directly into the cache:
 					global $Settings;
 					$url = $this->_FileRoot->ads_url.dirname($this->_rdfp_rel_path).'/'.$Settings->get( 'evocache_foldername' ).'/'.$this->_name.'/'.$size_name.'.'.$this->get_ext().'?mtime='.$this->get_lastmod_ts();
+					$url = str_replace( '\/', '', $url ); // Fix incorrect path
 					return $url;
 				}
 			}
@@ -2281,16 +2282,18 @@ class File extends DataObject
 
 	/**
 	 * @param LinkOwner
+	 * @param integer Order
+	 * @param string Position
 	 */
-	function link_to_Object( & $LinkOwner )
+	function link_to_Object( & $LinkOwner, $set_order = 1, $set_position = NULL )
 	{
 		global $DB;
 
 		// Automatically determine default position.
 		// First image becomes "teaser", otherwise "aftermore".
 
-		$order = 1;
-		$position =  $LinkOwner->get_default_position( $this->is_image() );
+		$order = $set_order;
+		$position = is_null( $set_position ) ? $LinkOwner->get_default_position( $this->is_image() ) : $set_position;
 		$existing_Links = & $LinkOwner->get_Links();
 
 		// Find highest order
@@ -2425,11 +2428,4 @@ class File extends DataObject
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.98  2013/11/06 08:04:08  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

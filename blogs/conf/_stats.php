@@ -113,7 +113,7 @@ $user_agents = array(
 	array('robot', 'Sphere Scout', 'Sphere Scout' ),
 	array('robot', 'Gigabot/', 'Gigablast (Gigabot)' ),
 	array('robot', 'Yandex', 'Yandex' ),
-	array('robot', 'Mail.Ru', 'Mail.Ru' ),
+	array('robot', 'Mail.RU/', 'Mail.Ru' ),
 	array('robot', 'Baiduspider', 'Baidu spider' ),
 	array('robot', 'infometrics-bot', 'Infometrics Bot' ),
 	array('robot', 'DotBot/', 'DotBot' ),
@@ -157,6 +157,9 @@ $user_agents = array(
 	array('robot', 'Nymesis/', 'Nymesis' ),
 	array('robot', 'YodaoBot/', 'YodaoBot' ),
 	array('robot', 'Exabot/', 'Exabot' ),
+	array('robot', 'AhrefsBot/', 'AhrefsBot' ),
+	array('robot', 'SISTRIX Crawler', 'SISTRIX' ),
+	array('robot', 'AcoonBot/', 'AcoonBot' ),
 	// Unknown robots:
 	array('robot', 'psycheclone', 'Psycheclone' ),
 	// Aggregators:
@@ -175,59 +178,149 @@ $user_agents = array(
 	array('aggregator', 'UniversalFeedParser/', 'Universal Feed Parser'),
 );
 
+/* Set user devices */
+// MOBILE
+$mobile_user_devices = array(
+	'iphone'   => '(iphone|ipod)',
+	'android'  => 'android.*mobile',
+	'blkberry' => 'blackberry',
+	'winphone' => 'windows phone os',
+	'wince'    => 'windows ce; (iemobile|ppc|smartphone)',
+	'palm'     => '(avantgo|blazer|elaine|hiptop|palm|plucker|xiino)',
+	'gendvice' => '(kindle|mobile|mmp|midp|pocket|psp|symbian|smartphone|treo|up.browser|up.link|vodafone|wap|opera mini)'
+);
+
+// TABLET
+$tablet_user_devices = array(
+	'ipad'     => '(ipad)',
+	'andrtab'  => 'android(?!.*mobile)',
+	'berrytab' => 'rim tablet os',
+);
+
+// PC
+$pc_user_devices = array(
+	'win311'   => 'win16',
+	'win95'    => '(windows 95)|(win95)|(windows_95)',
+	'win98'    => '(windows 98)|(win98)',
+	'win2000'  => '(windows nt 5.0)|(windows 2000)',
+	'winxp'    => '(windows nt 5.1)|(windows XP)',
+	'win2003'  => '(windows nt 5.2)',
+	'winvista' => '(windows nt 6.0)',
+	'win7'     => '(windows nt 6.1)',
+	'winnt40'  => '(windows nt 4.0)|(winnt4.0)|(winnt)|(windows nt)',
+	'winme'    => '(windows me)|(win 9x 4.90)',
+	'openbsd'  => 'openbsd',
+	'sunos'    => 'sunos',
+	'linux'    => '(linux)|(x11)',
+	'ubuntu'   => 'ubuntu',
+	'macosx'   => 'mac os x',
+	'macos'    => '(mac_powerpc)|(macintosh)',
+	'qnx'      => 'qnx',
+	'beos'     => 'beos',
+	'os2'      => 'os/2'
+);
+
+$user_devices = array_merge(
+	$tablet_user_devices,
+	$mobile_user_devices,
+	$pc_user_devices
+);
+
+$user_devices_color = array(
+	// Mobile
+	'iphone'   => 'd8c1a1',
+	'ipad'     => 'c5aa8c',
+	'andrtab'  => 'cdba9c',
+	'android'  => 'e0caa5',
+	'berrytab' => 'b29575',
+	'blkberry' => 'baa286',
+	'winphone' => 'ceb28b',
+	'wince'    => 'e4d6b9',
+	'palm'     => 'c8ac84',
+	'gendvice' => 'e6d4bf',
+	// PC
+	'win311'   => 'CCCCCC',
+	'win95'    => '676767',
+	'win98'    => 'ABABAB',
+	'win2000'  => '898989',
+	'winxp'    => 'DEDEDE',
+	'win2003'  => 'A3A3A3',
+	'winvista' => 'EEEEEE',
+	'win7'     => '999999',
+	'winnt40'  => 'B9B9B9',
+	'winme'    => '7F7F7F',
+	'openbsd'  => 'AFAFAF',
+	'sunos'    => '808080',
+	'linux'    => 'E0E0E0',
+	'ubuntu'   => 'B4B4B4',
+	'macosx'   => '9F9F9F',
+	'macos'    => 'F0F0F0',
+	'qnx'      => 'D0D0D0',
+	'beos'     => '8F8F8F',
+	'os2'      => 'C0C0C0'
+	);
+
 $referer_type_array = array (
-	'0'			=> 'All',
-	'search'	=> 'Search',
-	'referer'	=> 'Referer',
-	'direct'	=> 'Direct',
-	'self'		=> 'Self',
-	'special'	=> 'Special',
-	'spam'		=> 'Spam',
-	'admin'		=> 'Admin'
-							);
+	'0'       => 'All',
+	'search'  => 'Search',
+	'referer' => 'Referer',
+	'direct'  => 'Direct',
+	'self'    => 'Self',
+	'special' => 'Special',
+	'spam'    => 'Spam',
+	'admin'   => 'Admin'
+	);
 
 $referer_type_color = array(
-	'search'	=> '0099FF',
-	'special'	=> 'ff00ff',
-	'referer'	=> '00CCFF',
-	'direct'	=> '00FFCC',
-	'spam'		=> 'FF0000',
-	'self'		=> '00FF99',
-	'admin'		=> '999999'
+	'search'  => '0099FF',
+	'special' => 'ff00ff',
+	'referer' => '00CCFF',
+	'direct'  => '00FFCC',
+	'spam'    => 'FF0000',
+	'self'    => '00FF99',
+	'admin'   => '999999'
 	);
 
 $agent_type_array = array (
-	'0'			=> 'All',
-	'rss'		=> 'RSS',
-	'robot'		=> 'Robot',
-	'browser'	=> 'Browser',
-	'unknown'	=> 'Unknown',
+	'0'       => 'All',
+	'robot'   => 'Robot',
+	'browser' => 'Browser',
+	'unknown' => 'Unknown',
 	);
 
-
 $agent_type_color = array(
-	'rss'		=> 'FF6600',
-	'robot'		=> 'FF9900',
-	'browser'	=> 'FFCC00',
-	'unknown'	=> 'cccccc'
+	'rss'     => 'FF6600',
+	'robot'   => 'FF9900',
+	'browser' => 'FFCC00',
+	'unknown' => 'cccccc'
 );
 
 $hit_type_array = array (
-	'0'			=> 'All',
-	'standard'	=> 'Standard',
-	'service'	=> 'Service',
-	'rss'		=> 'RSS',
-	'ajax'		=> 'AJAX',
-	'admin'		=> 'Andmin'
+	'0'        => 'All',
+	'rss'      => 'RSS',
+	'standard' => 'Standard',
+	'ajax'     => 'AJAX',
+	'service'  => 'Service',
+	'admin'    => 'Admin'
 	);
 
 $hit_type_color = array(
-	'standard'	=> '0092ef',
-	'service'	=> '0072FF',
-	'rss'		=> 'FF6600',
-	'ajax'		=> '009900',
-	'admin'		=> 'e0e0e0'
+	'standard'         => 'FFBB00',
+	'service'          => '0072FF',
+	'rss'              => 'FF6600',
+	'ajax'             => '009900',
+	'admin'            => 'AAE0E0',
+	'standard_robot'   => 'FF9900',
+	'standard_browser' => 'FFCC00'
 );
 
+$user_gender_color = array(
+	'women_active'       => '990066',
+	'women_notactive'    => 'ff66cc',
+	'men_active'         => '003399',
+	'men_notactive'      => '6699ff',
+	'nogender_active'    => '666666',
+	'nogender_notactive' => 'cccccc'
+);
 
 ?>

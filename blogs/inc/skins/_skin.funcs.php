@@ -119,6 +119,12 @@ function skin_init( $disp )
 		// CONTENT PAGES:
 		case 'single':
 		case 'page':
+			if( ( ! $preview ) && ( empty( $Item ) ) )
+			{ // No Item, Incorrect request, Display 404 page
+				$Messages->add( 'Invalid page URL!' );
+				header_redirect( url_add_param( $Blog->gen_blogurl(), 'disp=404', '&' ), 302 );
+			}
+
 			init_ajax_forms(); // auto requires jQuery
 			init_ratings_js();
 			init_voting_comment_js();
@@ -229,7 +235,7 @@ function skin_init( $disp )
 					}
 
 					global $cat, $catsel;
-					if( empty( $catsel ) && preg_match( '~[0-9]+~', $cat ) )
+					if( empty( $catsel ) && preg_match( '~^[0-9]+$~', $cat ) )
 					{	// We are on a single cat page:
 						// NOTE: we must have selected EXACTLY ONE CATEGORY through the cat parameter
 						// BUT: - this can resolve to including children
@@ -423,16 +429,35 @@ function skin_init( $disp )
 			break;
 
 		case 'login':
+			global $Plugins, $transmit_hashed_password;
+
 			$seo_page_type = 'Login form';
 			$robots_index = false;
+			require_js( 'functions.js', 'blog' );
+
+			$transmit_hashed_password = (bool)$Settings->get('js_passwd_hashing') && !(bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
+			if( $transmit_hashed_password )
+			{ // Include JS for client-side password hashing:
+				require_js( 'sha1_md5.js', 'blog' );
+			}
 			break;
 
 		case 'register':
+			if( is_logged_in() )
+			{ // If user is logged in the register form should not be displayed. In this case redirect to the blog home page.
+				$Messages->add( T_( 'You are already logged in.' ), 'note' );
+				header_redirect( $Blog->gen_blogurl(), false );
+			}
 			$seo_page_type = 'Register form';
 			$robots_index = false;
 			break;
 
 		case 'lostpassword':
+			if( is_logged_in() )
+			{ // If user is logged in the lost password form should not be displayed. In this case redirect to the blog home page.
+				$Messages->add( T_( 'You are already logged in.' ), 'note' );
+				header_redirect( $Blog->gen_blogurl(), false );
+			}
 			$seo_page_type = 'Lost password form';
 			$robots_index = false;
 			break;
@@ -608,7 +633,7 @@ function skin_init( $disp )
 
 	if( !empty( $_SERVER['HTTP_USER_AGENT'] ) )
 	{	// Detect IE browser version
-		preg_match( '/msie (\d)/i', $_SERVER['HTTP_USER_AGENT'], $browser_ie );
+		preg_match( '/msie (\d+)/i', $_SERVER['HTTP_USER_AGENT'], $browser_ie );
 		if( count( $browser_ie ) == 2 && $browser_ie[1] < 7 )
 		{	// IE < 7
 			require_css( 'ie6.css', 'relative' );
@@ -883,14 +908,14 @@ function skin_description_tag()
 
 	if( is_default_page() )
 	{
-		if( !empty($Blog) )
+		if( ! empty( $Blog ) )
 		{	// Description for the blog:
-			$r = $Blog->get('shortdesc');
+			$r = $Blog->get( 'shortdesc' );
 		}
 	}
 	elseif( $disp_detail == 'posts-cat' || $disp_detail == 'posts-subcat' )
 	{
-		if( $Blog->get_setting( 'categories_meta_description') )
+		if( $Blog->get_setting( 'categories_meta_description' ) && ( ! empty( $Chapter ) ) )
 		{
 			$r = $Chapter->get( 'description' );
 		}
@@ -1264,11 +1289,4 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 	$Form->end_fieldset();
 }
 
-
-/*
- * $Log$
- * Revision 1.122  2013/11/06 08:04:45  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -321,12 +321,14 @@ class tinymce_plugin extends Plugin
 					tinyMCE.execCommand('mceAddControl', false, id);
 					jQuery.get('<?php echo $this->get_htsrv_url('save_editor_state', array('on'=>1, 'blog'=>$Blog->ID, 'item'=>$edited_Item->ID), '&'); ?>');
 					jQuery('#tinymce_plugin_toggle_button').attr('value', 'HTML');
+					jQuery('[name="editor_code"]').attr('value', '<?php echo $this->code; ?>');
 				}
 				else
 				{
 					tinyMCE.execCommand('mceRemoveControl', false, id);
 					jQuery.get('<?php echo $this->get_htsrv_url('save_editor_state', array('on'=>0, 'blog'=>$Blog->ID, 'item'=>$edited_Item->ID), '&'); ?>');
 					jQuery('#tinymce_plugin_toggle_button').attr('value', 'WYSIWYG');
+					jQuery('[name="editor_code"]').attr('value', 'html');
 				}
 				jQuery('#tinymce_plugin_toggle_button').removeAttr("disabled");
 			}
@@ -493,10 +495,16 @@ class tinymce_plugin extends Plugin
 			}
 		}
 
+		$editor_code = 'html';
 		if( $use_tinymce )
 		{ // User used MCE last time, load MCE on document.ready:
+			$editor_code = $this->code;
 			echo '<script type="text/javascript">jQuery( tinymce_plugin_toggleEditor("'.$this->tmce_editor_id.'") );</script>';
 		}
+		// By default set the editor code to an empty string
+		echo '<input type="hidden" name="editor_code" value="">';
+		// If the js is enabled set the editor code to the currently used value
+		echo '<script type="text/javascript">jQuery(\'[name="editor_code"]\').attr(\'value\', \''.$editor_code.'\');</script>';
 
 		// We also want to save the 'last used/not-used' state: (if no NULLs, this won't change anything)
 		$this->htsrv_save_editor_state( array('on'=>$use_tinymce, 'blog'=>$Blog->ID, 'item'=>$edited_Item->ID ) );
@@ -873,10 +881,6 @@ class tinymce_plugin extends Plugin
 		$init_options[] = 'theme_advanced_buttons4 : "'.$tmce_theme_advanced_buttons4.'"';
 		// UI options:
 		$init_options[] = 'theme_advanced_blockformats : "p,pre,blockquote,h2,h3,h4,h5,h6,address,dt,dd,div"';
-		$init_options[] = 'style_formats : [
-			{ title : "Wide DIV", block : "div", classes : "wide_scroll" },
-			{ title : ".nowrap", block : "div", classes : "nowrap" }
-		]';
 		// if( $edit_layout == 'expert' )
 		{
 			$init_options[] = 'theme_advanced_path_location : "bottom"';
@@ -1010,16 +1014,7 @@ class tinymce_plugin extends Plugin
 			return;
 		}
 
-		// fp>This is a super dirty hack that we're going to use only until we have a clean API for handling WYSIWYG editors:
-		if( !empty($params['item']) )
-		{	// Save the status last used by this Item:
-			// fp> TODO: also do that on CREATE post because it won't have been done here:
-			$sql = 'REPLACE INTO T_items__item_settings ( iset_item_ID, iset_name, iset_value )
-								VALUES( '.$DB->quote((int)$params['item']).', '.$DB->quote( 'editor_code' ).', '.$DB->quote( (int)$params['on'] ? $this->code : 'html' ).' )';
-			$DB->query( $sql, 'Save editor state for current post' );
-		}
-
-		// Clean:
+		// Save plugin usersettings
 		if( !empty($params['blog']) )
 		{	// This is in order to try & recall a specific state for each blog: (will be used for new posts especially)
 			$this->UserSettings->set( 'use_tinymce_coll'.(int)$params['blog'], (int)$params['on'] );
@@ -1069,6 +1064,30 @@ class tinymce_plugin extends Plugin
 	function GetHtsrvMethods()
 	{
 		return array('save_editor_state', 'get_item_content_css');
+	}
+
+
+	/**
+	 * Event handler: Called as action just before updating the {@link Plugin::$Settings plugin's settings}.
+	 *
+	 * @return false|NULL Return false to prevent the settings from being updated to DB.
+	 */
+	function PluginSettingsUpdateAction()
+	{
+		if( $this->Settings->get( 'use_gzip_compressor' ) == 1 )
+		{ // Check if the cache folder is not writable
+			global $cache_path;
+			$cache_folder = $cache_path.'plugins/tinymce'; // Cache path, this is where the .gz files will be stored
+
+			if( !is_writable( $cache_folder ) )
+			{
+				global $Messages;
+				$Messages->add( sprintf( T_( 'TinyMCE plugin cannot uses the compressor because folder %s is not writable' ), '<b>'.$cache_folder.'</b>' ), 'note' );
+
+				// Disable gzip compressor
+				$this->Settings->set( 'use_gzip_compressor', 0 );
+			}
+		}
 	}
 }
 

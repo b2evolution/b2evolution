@@ -195,6 +195,20 @@ function load_image( $path, $mimetype )
 	if( $function )
 	{	// Call GD built-in function to load image
 		// fp> Note: sometimes this GD call will die and there is no real way to recover :/
+		load_funcs( 'tools/model/_system.funcs.php' );
+		$memory_limit = system_check_memory_limit();
+		$curr_mem_usage = memory_get_usage( true );
+		// Calculate the aproximative memory size which would be required to create the image resource
+		$tweakfactor = 1.8; // Or whatever works for you
+		$memory_needed = round( ( $image_info[0] * $image_info[1]
+				* ( isset( $image_info['bits'] ) ? $image_info['bits'] : 4 )
+				* ( isset( $image_info['channels'] ) ? $image_info['channels'] / 8 : 1 )
+				+ Pow( 2, 16 ) // number of bytes in 64K
+			) * $tweakfactor );
+		if( ( $memory_limit - $curr_mem_usage ) < $memory_needed )// ( 4 * $image_info[0] * $image_info[1] ) )
+		{ // Don't try to load the image into the memory because it would cause 'Allowed memory size exhausted' error
+			return array( "!Cannot resize too large image", false );
+		}
 		$imh = $function( $path );
 	}
 
@@ -572,11 +586,4 @@ if( !function_exists( 'imagerotate' ) )
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.28  2013/11/06 08:04:08  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

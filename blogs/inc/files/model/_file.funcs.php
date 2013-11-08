@@ -468,6 +468,30 @@ function get_canonical_path( $ads_path )
 
 
 /**
+ * Fix the length of a given file name based on the global $filename_max_length setting.
+ *
+ * @param string the file name
+ * @param string the index before we should remove the over characters
+ * @return string the modified filename if the length was above the max length and the $remove_before_index param was correct. The original filename otherwie.
+ */
+function fix_filename_length( $filename, $remove_before_index )
+{
+	global $filename_max_length;
+
+	$filename_length = strlen( $filename );
+	if( $filename_length > $filename_max_length )
+	{
+		$difference = $filename_length - $filename_max_length;
+		if( $remove_before_index > $difference )
+		{ // Fix file name length only if the filename part before the 'remove index' contains more characters then what we have to remove
+			$filename = substr_replace( $filename, '', $remove_before_index - $difference, $difference );
+		}
+	}
+	return $filename;
+}
+
+
+/**
  * Process filename:
  *  - convert to lower case
  *  - replace consecutive dots with one dot
@@ -480,6 +504,8 @@ function get_canonical_path( $ads_path )
  */
 function process_filename( & $filename, $force_validation = false )
 {
+	global $filename_max_length;
+
 	if( empty( $filename ) )
 	{
 		return T_( 'Empty file name is not valid.' );
@@ -488,6 +514,9 @@ function process_filename( & $filename, $force_validation = false )
 	if( $force_validation )
 	{ // replace every not valid characters
 		$filename = preg_replace( '/[^a-z0-9\-_.]+/i', '_', $filename );
+		// Make sure the filename length doesn't exceed the maximum allowed. Remove characters from the end of the filename ( before the extension ) if required.
+		$extension_pos = strrpos( $filename, '.' );
+		$filename = fix_filename_length( $filename, strrpos( $filename, '.', ( $extension_pos ? $extension_pos : strlen( $filename ) ) ) );
 	}
 
 	// check if the file name contains consecutive dots, and replace them with one dot without warning ( keep only one dot '.' instead of '...' )
@@ -514,11 +543,16 @@ function process_filename( & $filename, $force_validation = false )
  */
 function validate_filename( $filename, $allow_locked_filetypes = NULL )
 {
-	global $Settings, $force_regexp_filename;
+	global $Settings, $force_regexp_filename, $filename_max_length;
 
 	if( strpos( $filename, '..' ) !== false )
 	{ // consecutive dots are not allowed in file name
 		return sprintf( T_('&laquo;%s&raquo; is not a valid filename.').' '.T_( 'Consecutive dots are not allowed.' ), $filename );
+	}
+
+	if( strlen( $filename ) > $filename_max_length )
+	{ // filename is longer then the maximum allowed
+		return sprintf( T_('&laquo;%s&raquo; is not a valid filename.').' '.sprintf( T_( 'Max %d characters are allowed on filenames.' ), $filename_max_length ), $filename );
 	}
 
 	// Check filename
@@ -573,10 +607,15 @@ function validate_filename( $filename, $allow_locked_filetypes = NULL )
  */
 function validate_dirname( $dirname )
 {
-	global $Settings, $force_regexp_dirname;
+	global $Settings, $force_regexp_dirname, $filename_max_length;
 
 	if( $dirname != '..' )
 	{
+		if( strlen( $dirname ) > $filename_max_length )
+		{ // Don't allow longer directory names then the max file name length
+			return sprintf( T_('&laquo;%s&raquo; is not a valid directory name.'), $dirname ).' '.sprintf( T_( 'Max %d characters are allowed.' ), $filename_max_length );
+		}
+
 		if( !empty( $force_regexp_dirname ) )
 		{ // Use the regexp from _advanced.php
 			if( preg_match( ':'.str_replace( ':', '\:', $force_regexp_dirname ).':', $dirname ) )
@@ -603,27 +642,35 @@ function validate_dirname( $dirname )
  * used when renaming a file, File settings
  *
  * @param string the new name
- * @param boolean 0 if directory
- * @param boolean 0 if permission denied
- * @return nothing if the rename is acceptable, error message if not
+ * @param boolean true if it is a directory, false if not
+ * @param string the absolute path of the parent directory
+ * @param boolean true if user has permission to all kind of fill types, false otherwise
+ * @return mixed NULL if the rename is acceptable, error message if not
  */
-function check_rename( & $newname, $is_dir, $allow_locked_filetypes )
+function check_rename( & $newname, $is_dir, $dir_path, $allow_locked_filetypes )
 {
+	global $dirpath_max_length;
+
 	// Check if provided name is okay:
 	$newname = trim( strip_tags($newname) );
 
-	if( ! $is_dir )
+	if( $is_dir )
 	{
-		if( $error_filename = validate_filename( $newname, $allow_locked_filetypes ) )
-		{ // Not a file name or not an allowed extension
-			return $error_filename;
+		if( $error_dirname = validate_dirname( $newname ) )
+		{ // invalid directory name
+			return $error_dirname;
+		}
+		if( $dirpath_max_length < ( strlen( $dir_path ) + strlen( $newname ) ) )
+		{ // The new path length would be too long
+			return T_('The new name is too long for this folder.');
 		}
 	}
-	elseif( $error_dirname = validate_dirname( $newname ) )
-	{ // directory name
-		return $error_dirname;
+	elseif( $error_filename = validate_filename( $newname, $allow_locked_filetypes ) )
+	{ // Not a file name or not an allowed extension
+		return $error_filename;
 	}
-	return;
+
+	return NULL;
 }
 
 
@@ -884,18 +931,97 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
  */
 function mkdir_r( $dirName, $chmod = NULL )
 {
-	if( is_dir($dirName) )
+	return evo_mkdir( $dirName, $chmod, true );
+}
+
+
+/**
+ * Create a directory
+ *
+ * @param string Directory path
+ * @param integer Permissions
+ * @param boolean Create a dir recursively
+ * @return boolean TRUE on success
+ */
+function evo_mkdir( $dir_path, $chmod = NULL, $recursive = false )
+{
+	if( is_dir( $dir_path ) )
 	{ // already exists:
 		return true;
 	}
 
-	if( $chmod === NULL )
-	{
-		global $Settings;
-		$chmod = $Settings->get('fm_default_chmod_dir');
+	if( mkdir( $dir_path, 0777, $recursive ) )
+	{ // Directory is created succesfully
+		if( $chmod === NULL )
+		{ // Get default permissions
+			global $Settings;
+			$chmod = $Settings->get( 'fm_default_chmod_dir' );
+		}
+
+		if( ! empty( $chmod ) )
+		{ // Set the dir rights by chmod() function because mkdir() doesn't provide this operation correctly
+			chmod( $dir_path, is_string( $chmod ) ? octdec( $chmod ) : $chmod );
+		}
+
+		return true;
 	}
 
-	return mkdir( $dirName, octdec($chmod), true );
+	return false;
+}
+
+
+/**
+ * Copy directory recusively or one file
+ *
+ * @param mixed Source path
+ * @param mixed Destination path
+ */
+function copy_r( $source, $dest )
+{
+	$result = true;
+
+	if( is_dir( $source ) )
+	{ // Copy directory recusively
+		if( ! ( $dir_handle = @opendir( $source ) ) )
+		{ // Unable to open dir
+			return false;
+		}
+		$source_folder = basename( $source );
+		if( ! mkdir_r( $dest.'/'.$source_folder ) )
+		{ // No rights to create a dir
+			return false;
+		}
+		while( $file = readdir( $dir_handle ) )
+		{
+			if( $file != '.' && $file != '..' )
+			{
+				if( is_dir( $source.'/'.$file ) )
+				{ // Copy the files of subdirectory
+					$result = copy_r( $source.'/'.$file, $dest.'/'.$source_folder ) && $result;
+				}
+				else
+				{ // Copy one file of the directory
+					$result = @copy( $source.'/'.$file, $dest.'/'.$source_folder.'/'.$file ) && $result;
+				}
+			}
+		}
+		closedir( $dir_handle );
+	}
+	else
+	{ // Copy a file and check destination folder for existing
+		$dest_folder = preg_replace( '#(.+)/[^/]+$#', '$1', $dest );
+		if( ! file_exists( $dest_folder ) )
+		{ // Create destination folder recursively if it doesn't exist
+			if( ! mkdir_r( $dest_folder ) )
+			{ // Unable to create a destination folder
+				return false;
+			}
+		}
+		// Copy a file
+		$result = @copy( $source, $dest );
+	}
+
+	return $result;
 }
 
 
@@ -1218,10 +1344,10 @@ function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perm
 	}
 
 	// Get param arrays for all uploaded files:
-	$uploadfile_title = param( 'uploadfile_title', 'array', array() );
-	$uploadfile_alt = param( 'uploadfile_alt', 'array', array() );
-	$uploadfile_desc = param( 'uploadfile_desc', 'array', array() );
-	$uploadfile_name = param( 'uploadfile_name', 'array', array() );
+	$uploadfile_title = param( 'uploadfile_title', 'array/string', array() );
+	$uploadfile_alt = param( 'uploadfile_alt', 'array/string', array() );
+	$uploadfile_desc = param( 'uploadfile_desc', 'array/string', array() );
+	$uploadfile_name = param( 'uploadfile_name', 'array/string', array() );
 
 	// LOOP THROUGH ALL UPLOADED FILES AND PROCCESS EACH ONE:
 	foreach( $_FILES['uploadfile']['name'] as $lKey => $lName )
@@ -1251,8 +1377,8 @@ function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perm
 			continue;
 		}
 
-		if( !empty( $min_size ) )
-		{	// Check pictures for small sizes
+		if( ( !( $_FILES['uploadfile']['error'][$lKey] ) ) && ( !empty( $min_size ) ) )
+		{ // If there is no error and a minimum size is required, check if the uploaded picture satisfies the "minimum size" criteria
 			$image_sizes = imgsize( $_FILES['uploadfile']['tmp_name'][$lKey], 'widthheight' );
 			if( $image_sizes[0] < $min_size || $image_sizes[1] < $min_size )
 			{	// Abort upload for this file:
@@ -1478,10 +1604,11 @@ function prepare_uploaded_files( $uploadedFiles )
  */
 function prepare_uploaded_image( $File, $mimetype )
 {
-	global $Settings;
+	global $Settings, $Messages;
 
 	$thumb_width = $Settings->get( 'fm_resize_width' );
 	$thumb_height = $Settings->get( 'fm_resize_height' );
+	$thumb_quality = $Settings->get( 'fm_resize_quality' );
 
 	$do_resize = false;
 	if( $Settings->get( 'fm_resize_enable' ) &&
@@ -1498,17 +1625,23 @@ function prepare_uploaded_image( $File, $mimetype )
 
 	$resized_imh = null;
 	if( $do_resize )
-	{	// Resize image
+	{ // Resize image
 		list( $err, $src_imh ) = load_image( $File->get_full_path(), $mimetype );
 		if( empty( $err ) )
 		{
 			list( $err, $resized_imh ) = generate_thumb( $src_imh, 'fit', $thumb_width, $thumb_height );
 		}
-	}
 
-	if( !empty( $err ) )
-	{	// Error exists, Exit here
-		return;
+		if( empty( $err ) )
+		{ // Image was rezised successfully
+			$Messages->add( sprintf( T_( '%s was resized to %dx%d pixels.' ), '<b>'.$File->get('name').'</b>', imagesx( $resized_imh ), imagesy( $resized_imh ) ), 'success' );
+		}
+		else
+		{ // Image was not rezised
+			$Messages->add( sprintf( T_( '%s could not be resized to target resolution of %dx%d pixels.' ), '<b>'.$File->get('name').'</b>', $thumb_width, $thumb_height ), 'error' );
+			// Error exists, exit here
+			return;
+		}
 	}
 
 	if( $mimetype == 'image/jpeg' )
@@ -1524,7 +1657,7 @@ function prepare_uploaded_image( $File, $mimetype )
 
 	if( $do_resize && empty( $err ) )
 	{	// Save resized image ( and also rotated image if this operation was done )
-		save_image( $resized_imh, $File->get_full_path(), $mimetype );
+		save_image( $resized_imh, $File->get_full_path(), $mimetype, $thumb_quality );
 	}
 }
 
@@ -1608,6 +1741,8 @@ function exif_orientation( $file_name, & $imh/* = null*/, $save_image = false )
  */
 function check_file_exists( $fm_FileRoot, $path, $newName, $image_info = NULL )
 {
+	global $filename_max_length;
+
 	// Get File object for requested target location:
 	$FileCache = & get_FileCache();
 	$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$newName, true );
@@ -1640,6 +1775,14 @@ function check_file_exists( $fm_FileRoot, $path, $newName, $image_info = NULL )
 		{
 			$replace_length = strlen( '-'.($num_ext-1) );
 			$newName = substr_replace( $newName, '-'.$num_ext, $ext_pos-$replace_length, $replace_length );
+		}
+		if( strlen( $newName ) > $filename_max_length )
+		{
+			$newName = fix_filename_length( $newName, strrpos( $newName, '-' ) );
+			if( $error_filename = process_filename( $newName, true ) )
+			{ // The file name is still not valid
+				debug_die( 'Invalid file name has found during file exists check: '.$error_filename );
+			}
 		}
 		$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$newName, true );
 	}
@@ -1675,6 +1818,7 @@ function remove_orphan_files( $file_ids = NULL, $older_then = NULL )
 
 	$result = $DB->get_col( $sql );
 	$FileCache = & get_FileCache();
+	$FileCache->load_list( $result );
 	$count = 0;
 	foreach( $result as $file_ID )
 	{
@@ -1693,6 +1837,8 @@ function remove_orphan_files( $file_ids = NULL, $older_then = NULL )
 			$count++;
 		}
 	}
+	// Clear FileCache to save memory
+	$FileCache->clear();
 
 	return $count;
 }
@@ -1969,6 +2115,12 @@ function create_profile_picture_links()
 				$LinkOwner = new LinkUser( $iterator_User );
 				while( $lFile = & $user_avatar_Filelist->get_next() )
 				{ // Loop through all Files:
+					$fileName = $lFile->get_name();
+					if( process_filename( $fileName ) )
+					{ // The file has invalid file name, don't create in the database
+						// TODO: asimo> we should collect each invalid file name here, and send an email to the admin
+						continue;
+					}
 					$lFile->load_meta( true );
 					if( $lFile->is_image() )
 					{
@@ -1992,12 +2144,13 @@ function create_profile_picture_links()
  * Create .htaccess and sample.htaccess files with deny rules in the folder
  *
  * @param string Directory path
+ * @return boolean TRUE if files have been created successfully
  */
 function create_htaccess_deny( $dir )
 {
 	if( ! mkdir_r( $dir, NULL ) )
 	{
-		return;
+		return false;
 	}
 
 	$htaccess_files = array(
@@ -2016,15 +2169,17 @@ function create_htaccess_deny( $dir )
 			continue;
 		}
 
-		$handle = fopen( $htaccess_file, 'w' );
+		$handle = @fopen( $htaccess_file, 'w' );
 
 		if( !$handle )
 		{ // File cannot be created
-			continue;
+			return false;
 		}
 
 		fwrite( $handle, $htaccess_content );
 		fclose( $handle );
 	}
+
+	return true;
 }
 ?>

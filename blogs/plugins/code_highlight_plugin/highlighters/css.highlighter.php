@@ -150,24 +150,12 @@ class am_css_highlighter
 	 */
 	function highlight_declarations( $block )
 	{
-		$block[1] = preg_replace( array(
-						'#([^:;]+?):([^;]+?;)#',
-						'#([^:;]+?):([^;]+?)$#',
-					),
-					array(
-						'<span class="amc_attribute">$1</span>:<span class="amc_string">$2</span>',
-					),
-						$block[1] );
+		$block[1] = preg_replace( '#([^:;]+?):([^;]+?(;|$))#',
+					'<span class="amc_attribute">$1</span>:<span class="amc_string">$2</span>',
+					$block[1] );
 		return '<span class="amc_default">'.$block[1].'</span>'.( empty( $block[2] ) ? '' : $block[2] );
 	}
 
 }
 
-
-/*
- * $Log$
- * Revision 1.9  2013/11/06 08:05:22  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

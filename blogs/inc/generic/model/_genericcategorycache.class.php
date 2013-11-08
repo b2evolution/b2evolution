@@ -165,7 +165,7 @@ class GenericCategoryCache extends GenericCache
 					// echo $GenericCategory->name;
 					if( ! is_null( $GenericCategory->parent_ID ) )
 					{	// This category has a parent, so add it to its parent children list:
-						$this->cache[$GenericCategory->parent_ID]->add_children( $this->cache[$cat_ID] );
+						$this->cache[$GenericCategory->parent_ID]->add_child_category( $this->cache[$cat_ID] );
 					}
 					else
 					{	// This category has no parent, so add it to the parent categories list
@@ -228,7 +228,7 @@ class GenericCategoryCache extends GenericCache
 						if( ! is_null( $GenericCategory->parent_ID ) )
 						{	// This category has a parent, so add it to its parent children list:
 							$Debuglog->add( 'adding child with ID='.$cat_ID.' to parent ID='.$GenericCategory->parent_ID, 'CategoryCache' );
-							$this->cache[$GenericCategory->parent_ID]->add_children( $this->cache[$cat_ID] );
+							$this->cache[$GenericCategory->parent_ID]->add_child_category( $this->cache[$cat_ID] );
 						}
 						else
 						{	// This category has no parent, so add it to the parent categories list
@@ -444,10 +444,4 @@ class GenericCategoryCache extends GenericCache
 
 }
 
-/*
- * $Log$
- * Revision 1.14  2013/11/06 08:04:15  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

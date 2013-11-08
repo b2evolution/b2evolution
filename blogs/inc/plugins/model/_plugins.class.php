@@ -2131,7 +2131,7 @@ class Plugins
 	/**
 	 * Validate renderer list.
 	 *
-	 * @deprecated by Plugins_admin::validate_renderer_list()
+	 * @deprecated by Plugins::validate_renderer_list()
 	 * @param array renderer codes ('default' will include all "opt-out"-ones)
 	 * @return array validated array of renderer codes
 	 */
@@ -2140,18 +2140,12 @@ class Plugins
 		global $Debuglog, $Plugins;
 		$Debuglog->add('Call to deprecated method Plugins::validate_list()', 'deprecated');
 
-		return $Plugins->validate_renderer_list($renderers);
+		// Return an empty array, because this method call is not supported anymore
+		return array();
 	}
 
 
 	// }}}
 }
 
-
-/*
- * $Log$
- * Revision 1.25  2013/11/06 08:04:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -49,7 +49,7 @@ require_once dirname(__FILE__).'/conf/_config.php';
  */
 $is_admin_page = true;
 
-// user must be logged in and his/her account must be validated before access to admin 
+// user must be logged in and his/her account must be validated before access to admin
 $login_required = true;
 $validate_required = true;
 require_once $inc_path.'_main.inc.php';
@@ -61,7 +61,7 @@ if( ! $current_User->check_perm( 'admin', 'restricted' ) )
 	// asimo> This should always denied access, but we insert a hack to create a temporary solution
 	// We do allow comments and items actions, if the redirect is set to the front office! This way users without admin access may use the comments, and items controls.
 	$test_ctrl = param( 'ctrl', '/^[a-z0-9_]+$/', '', false );
-	$test_redirect_to = param( 'redirect_to', 'string', '', false );
+	$test_redirect_to = param( 'redirect_to', 'url', '', false );
 	$test_action = param_action();
 	// asimo> If we also would like to allow publish, deprecate and delete item/comment actions for users without admin access, we must uncomment the commented part below.
 	if( ( ( $test_ctrl !== 'comments' ) && ( $test_ctrl !== 'items' ) )
@@ -86,6 +86,9 @@ if( !$current_User->check_status( 'can_access_admin' ) )
 	}
 }
 
+// Check that the request doesn't exceed the post max size
+// This is required because another way not even the $ctrl param can be initialized and the request may freeze
+check_post_max_size_exceeded();
 
 /*
  * Get the blog from param, defaulting to the last selected one for this user:
@@ -245,10 +248,4 @@ if( empty( $dont_request_controller ) || !$dont_request_controller )
 	require $inc_path.$ctrl_mappings[$ctrl];
 }
 
-/*
- * $Log$
- * Revision 1.41  2013/11/06 08:03:44  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

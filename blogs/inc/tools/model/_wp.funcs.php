@@ -41,11 +41,60 @@ function wpxml_import()
 	// The import type ( replace | append )
 	$import_type = param( 'import_type', 'string', 'replace' );
 
-	// Get XML file from request
-	$xml_file = $_FILES['wp_file'];
+	$XML_file_path = $_FILES['wp_file']['tmp_name'];
+
+	if( preg_match( '/\.(xml|txt)$/i', $_FILES['wp_file']['name'] ) )
+	{ // XML format
+		// Check WordPress XML file
+		if( ! wpxml_check_xml_file( $XML_file_path ) )
+		{ // Errors are in XML file
+			return;
+		}
+	}
+	else if( preg_match( '/\.zip$/i', $_FILES['wp_file']['name'] ) )
+	{ // ZIP format
+		// Extract ZIP and check WordPress XML file
+		global $cache_path;
+
+		$ZIP_folder_path = $cache_path.'import-'.md5( rand() );
+
+		if( ! unpack_archive( $XML_file_path, $ZIP_folder_path, true, $_FILES['wp_file']['name'] ) )
+		{ // Errors on unpack ZIP file
+			return;
+		}
+
+		// Find valid XML file in ZIP package
+		$ZIP_files_list = scandir( $ZIP_folder_path );
+		$xml_exists_in_zip = false;
+		foreach( $ZIP_files_list as $ZIP_file )
+		{
+			if( preg_match( '/\.(xml|txt)$/i', $ZIP_file ) )
+			{ // XML file is found in ZIP package
+				if( wpxml_check_xml_file( $ZIP_folder_path.'/'.$ZIP_file ) )
+				{ // XML file is valid
+					$XML_file_path = $ZIP_folder_path.'/'.$ZIP_file;
+					$xml_exists_in_zip = true;
+					break;
+				}
+			}
+		}
+
+		if( ! $xml_exists_in_zip )
+		{ // No XML is detected in ZIP package
+			echo '<p style="color:red">'.T_( 'XML file is not detected in your ZIP package.' ).'</p>';
+			// Delete temporary folder that contains the files from extracted ZIP package
+			rmdir_r( $ZIP_folder_path );
+			return;
+		}
+	}
+	else
+	{ // Unrecognized extension
+		echo '<p style="color:red">'.sprintf( T_( '%s has an unrecognized extension.' ), '<b>'.$xml_file['name'].'</b>' ).'</p>';
+		return;
+	}
 
 	// Parse WordPress XML file into array
-	$xml_data = wpxml_parser( $xml_file['tmp_name'] );
+	$xml_data = wpxml_parser( $XML_file_path );
 
 
 	$DB->begin();
@@ -69,7 +118,7 @@ function wpxml_import()
 		}
 
 		echo T_('Removing the comments... ');
-		flush();
+		evo_flush();
 		if( !empty( $old_posts ) )
 		{
 			$SQL = new SQL();
@@ -86,7 +135,7 @@ function wpxml_import()
 		echo T_('OK').'<br />';
 
 		echo T_('Removing the posts... ');
-		flush();
+		evo_flush();
 		if( !empty( $old_categories ) )
 		{
 			$DB->query( 'DELETE FROM T_items__item WHERE post_main_cat_ID IN ( '.implode( ', ', $old_categories ).' )' );
@@ -103,12 +152,12 @@ function wpxml_import()
 		echo T_('OK').'<br />';
 	
 		echo T_('Removing the categories... ');
-		flush();
+		evo_flush();
 		$DB->query( 'DELETE FROM T_categories WHERE cat_blog_ID = '.$DB->quote( $wp_blog_ID ) );
 		echo T_('OK').'<br />';
 
 		echo T_('Removing the tags that are no longer used... ');
-		flush();
+		evo_flush();
 		if( !empty( $old_posts ) )
 		{	// Remove the tags
 
@@ -150,7 +199,7 @@ function wpxml_import()
 		global $Settings, $UserSettings;
 
 		echo T_('Importing the users... ');
-		flush();
+		evo_flush();
 
 		// Get existing users
 		$SQL = new SQL();
@@ -237,9 +286,9 @@ function wpxml_import()
 					}
 				}
 				$User->set( 'source', $author['author_source'] );
-				$User->set_datecreated( $author['author_created_ts'], true );
-				$User->set( 'lastseen_ts', $author['author_lastseen_ts'] );
-				$User->set( 'profileupdate_date', $author['author_profileupdate_date'] );
+				$User->set_datecreated( empty( $author['author_created_ts'] ) ? mktime() : intval( $author['author_created_ts'] ) );
+				$User->set( 'lastseen_ts', ( empty( $author['author_lastseen_ts'] ) ? NULL : $author['author_lastseen_ts'] ), true );
+				$User->set( 'profileupdate_date', empty( $author['author_profileupdate_date'] ) ? date( 'Y-m-d', mktime() ): $author['author_profileupdate_date'] );
 				$User->dbinsert();
 				$user_ID = $User->ID;
 				if( !empty( $user_ID ) && !empty( $author['author_created_fromIPv4'] ) )
@@ -262,6 +311,83 @@ function wpxml_import()
 		echo sprintf( T_('%d records'), $authors_count ).'<br />';
 	}
 
+	/* Import files, Copy them all to media folder */
+	if( isset( $ZIP_folder_path ) && isset( $xml_data['files'] ) && count( $xml_data['files'] ) > 0 )
+	{
+		echo T_('Importing the files... ');
+		evo_flush();
+
+		$files_count = 0;
+		$files = array();
+
+		foreach( $xml_data['files'] as $file )
+		{
+			switch( $file['file_root_type'] )
+			{
+				case 'shared':
+					// Shared files
+					$file_root_ID = 0;
+					break;
+
+				case 'user':
+					// User's files
+					if( isset( $authors_IDs[ $file['file_root_ID'] ] ) )
+					{ // If owner of this file exists in our DB
+						$file_root_ID = $authors_IDs[ $file['file_root_ID'] ];
+						break;
+					}
+					// Otherwise we should upload this file into blog's folder:
+
+				default: // 'collection', 'absolute', 'skins'
+					// The files from other blogs and from other places must be moved in the folder of the current blog
+					$file['file_root_type'] = 'collection';
+					$file_root_ID = $wp_blog_ID;
+					break;
+			}
+
+			// Get FileRoot by type and ID
+			$FileRoot = new FileRoot( $file['file_root_type'], $file_root_ID );
+			if( is_dir( $ZIP_folder_path.'/'.$file['zip_path'].$file['file_path'] ) )
+			{ // Folder
+				$file_destination_path = $FileRoot->ads_path;
+			}
+			else
+			{ // File
+				$file_destination_path = $FileRoot->ads_path.$file['file_path'];
+			}
+
+			if( ! copy_r( $ZIP_folder_path.'/'.$file['zip_path'].$file['file_path'], $file_destination_path ) )
+			{ // No permission to copy to this folder
+				if( is_dir( $ZIP_folder_path.'/'.$file['zip_path'].$file['file_path'] ) )
+				{ // Folder
+					echo '<p class="orange">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<b>'.$file['file_path'].'</b>', '<b>'.$file_destination_path.'</b>' ).'</p>';
+				}
+				else
+				{ // File
+					echo '<p class="orange">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<b>'.$file['file_path'].'</b>', '<b>'.$file_destination_path.'</b>' ).'</p>';
+				}
+				// Skip it
+				continue;
+			}
+
+			// Create new File object, It will be linked to the items below
+			$File = new File( $file['file_root_type'], $file_root_ID, $file['file_path'] );
+			$File->set( 'title', $file['file_title'] );
+			$File->set( 'alt', $file['file_alt'] );
+			$File->set( 'desc', $file['file_desc'] );
+			$files[ $file['file_ID'] ] = $File;
+
+			$files_count++;
+		}
+
+		echo sprintf( T_('%d records'), $files_count ).'<br />';
+
+		if( file_exists( $ZIP_folder_path ) )
+		{ // This folder was created only to extract files from ZIP package, Remove it now
+			rmdir_r( $ZIP_folder_path );
+		}
+	}
+
 	/* Import categories */
 	$category_default = 0;
 
@@ -275,7 +401,7 @@ function wpxml_import()
 	if( isset( $xml_data['categories'] ) && count( $xml_data['categories'] ) > 0 )
 	{
 		echo T_('Importing the categories... ');
-		flush();
+		evo_flush();
 
 		load_class( 'chapters/model/_chapter.class.php', 'Chapter' );
 		load_funcs( 'locales/_charset.funcs.php' );
@@ -322,7 +448,7 @@ function wpxml_import()
 	if( isset( $xml_data['tags'] ) && count( $xml_data['tags'] ) > 0 )
 	{
 		echo T_('Importing the tags... ');
-		flush();
+		evo_flush();
 
 		// Get existing tags
 		$SQL = new SQL();
@@ -373,7 +499,7 @@ function wpxml_import()
 		$post_types = $DB->get_assoc( $SQL->get() );
 
 		echo T_('Importing the posts... ');
-		flush();
+		evo_flush();
 
 		foreach( $xml_data['posts'] as $post )
 		{
@@ -448,7 +574,7 @@ function wpxml_import()
 			$Item->set( 'locale', $post['post_locale'] );
 			$Item->set( 'excerpt_autogenerated', $post['post_excerpt_autogenerated'] );
 			$Item->set( 'titletag', $post['post_titletag'] );
-			$Item->set( 'notifications_status', $post['post_notifications_status'] );
+			$Item->set( 'notifications_status', empty( $post['post_notifications_status'] ) ? 'noreq' : $post['post_notifications_status'] );
 			$Item->set( 'views', $post['post_views'] );
 			$Item->set( 'renderers', array( $post['post_renderers'] ) );
 			$Item->set( 'priority', $post['post_priority'] );
@@ -479,8 +605,21 @@ function wpxml_import()
 			$Item->dbinsert();
 			$posts[ $post['post_id'] ] = $Item->ID;
 
+			if( ! empty( $files ) && ! empty( $post['links'] ) )
+			{ // Link the files to the Item if it has them
+				foreach( $post['links'] as $link )
+				{
+					if( isset( $files[ $link['link_file_ID'] ] ) )
+					{ // Link a file to Item
+						$File = $files[ $link['link_file_ID'] ];
+						$LinkOwner = new LinkItem( $Item );
+						$File->link_to_Object( $LinkOwner, $link['link_order'], $link['link_position'] );
+					}
+				}
+			}
+
 			if( !empty( $post['comments'] ) )
-			{	// Set comments
+			{ // Set comments
 				$comments[ $Item->ID ] = $post['comments'];
 			}
 		}
@@ -504,7 +643,7 @@ function wpxml_import()
 	if( !empty( $comments ) )
 	{
 		echo T_('Importing the comments... ');
-		flush();
+		evo_flush();
 
 		$comments_count = 0;
 		$comments_IDs = array();
@@ -577,7 +716,7 @@ function wpxml_import()
 				$Comment->set( 'karma', $comment['comment_karma'] );
 				$Comment->set( 'spam_karma', $comment['comment_spam_karma'] );
 				$Comment->set( 'allow_msgform', $comment['comment_allow_msgform'] );
-				$Comment->set( 'notif_status', $comment['comment_notif_status'] );
+				$Comment->set( 'notif_status', empty( $comment['comment_notif_status'] ) ? 'noreq' : $comment['comment_notif_status'] );
 				$Comment->dbinsert();
 
 				$comments_IDs[ $comment['comment_id'] ] = $Comment->ID;
@@ -612,6 +751,7 @@ function wpxml_parser( $file )
 	$categories = array();
 	$tags = array();
 	$terms = array();
+	$files = array();
 
 	$xml = simplexml_load_file( $file );
 
@@ -669,6 +809,24 @@ function wpxml_parser( $file )
 			'author_lastseen_ts'          => (string) $ae->author_lastseen_ts,
 			'author_created_fromIPv4'     => (string) $ae->author_created_fromIPv4,
 			'author_profileupdate_date'   => (string) $ae->author_profileupdate_date,
+		);
+	}
+
+	// Get files
+	foreach( $xml->xpath('/rss/channel/file') as $file_arr )
+	{
+		$t = $file_arr->children( $namespaces['evo'] );
+		$files[] = array(
+			'file_ID'        => (int) $t->file_ID,
+			'file_root_type' => (string) $t->file_root_type,
+			'file_root_ID'   => (int) $t->file_root_ID,
+			'file_path'      => (string) $t->file_path,
+			'file_title'     => (string) $t->file_title,
+			'file_alt'       => (string) $t->file_alt,
+			'file_desc'      => (string) $t->file_desc,
+			'file_hash'      => (string) $t->file_hash,
+			'file_path_hash' => (string) $t->file_path_hash,
+			'zip_path'       => (string) $t->zip_path,
 		);
 	}
 
@@ -835,11 +993,32 @@ function wpxml_parser( $file )
 			);
 		}
 
+		foreach( $evo->link as $link )
+		{ // Get the links
+			$evo_link = $link->children( $namespaces['evo'] );
+
+			$post['links'][] = array(
+				'link_ID'               => (int) $link->link_ID,
+				'link_datecreated'      => (string) $link->link_datecreated,
+				'link_datemodified'     => (string) $link->link_datemodified,
+				'link_creator_user_ID'  => (int) $link->link_creator_user_ID,
+				'link_lastedit_user_ID' => (int) $link->link_lastedit_user_ID,
+				'link_itm_ID'           => (int) $link->link_itm_ID,
+				'link_cmt_ID'           => (int) $link->link_cmt_ID,
+				'link_usr_ID'           => (int) $link->link_usr_ID,
+				'link_file_ID'          => (int) $link->link_file_ID,
+				'link_ltype_ID'         => (int) $link->link_ltype_ID,
+				'link_position'         => (string) $link->link_position,
+				'link_order'            => (int) $link->link_order,
+			);
+		}
+
 		$posts[] = $post;
 	}
 
 	return array(
 		'authors'    => $authors,
+		'files'      => $files,
 		'posts'      => $posts,
 		'categories' => $categories,
 		'tags'       => $tags,
@@ -854,21 +1033,23 @@ function wpxml_parser( $file )
  * Check WordPress XML file for correct format
  *
  * @param string File path
- * @param boolean TRUE - halt on errors
+ * @param boolean TRUE to halt process of error, FALSE to print out error
+ * @return boolean TRUE on success, FALSE or HALT on errors
  */
-function wpxml_check_file( $file, $halt = false )
+function wpxml_check_xml_file( $file, $halt = false )
 {
 	$internal_errors = libxml_use_internal_errors( true );
 	$xml = simplexml_load_file( $file );
 	if( !$xml )
-	{	// halt/display if loading produces an error
+	{ // halt/display if loading produces an error
 		if( $halt )
 		{
-			debug_die( 'There was an error when reading this WXR file' );
+			debug_die( 'There was an error when reading this WXR file.' );
 		}
 		else
 		{
-			param_error( 'wp_file', T_('There was an error when reading this WXR file') );
+			echo '<p style="color:red">'.T_('There was an error when reading this WXR file.').'</p>';
+			return false;
 		}
 	}
 
@@ -877,26 +1058,30 @@ function wpxml_check_file( $file, $halt = false )
 	{
 		if( $halt )
 		{
-			debug_die( 'This does not appear to be a WXR file, missing/invalid WXR version number' );
+			debug_die( 'This does not appear to be a WXR file, missing/invalid WXR version number.' );
 		}
 		else
 		{
-			param_error( 'wp_file', T_('This does not appear to be a WXR file, missing/invalid WXR version number') );
+			echo '<p style="color:red">'.T_('This does not appear to be a WXR file, missing/invalid WXR version number.').'</p>';
+			return false;
 		}
 	}
 
 	$wxr_version = (string) trim( $wxr_version[0] );
 	if( !preg_match( '/^\d+\.\d+$/', $wxr_version ) )
-	{	// confirm that we are dealing with the correct file format
+	{ // confirm that we are dealing with the correct file format
 		if( $halt )
 		{
-			debug_die( 'This does not appear to be a WXR file, missing/invalid WXR version number' );
+			debug_die( 'This does not appear to be a WXR file, missing/invalid WXR version number.' );
 		}
 		else
 		{
-			param_error( 'wp_file', T_('This does not appear to be a WXR file, missing/invalid WXR version number') );
+			echo '<p style="color:red">'.T_('This does not appear to be a WXR file, missing/invalid WXR version number.').'</p>';
+			return false;
 		}
 	}
+
+	return true;
 }
 
 
@@ -1016,10 +1201,4 @@ function wp_get_regional_data( $country_code, $region, $subregion, $city )
 	return $data;
 }
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:04:54  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

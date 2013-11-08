@@ -215,16 +215,13 @@ function comments_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 	if( $one == '#' ) $one = T_('1 comment');
 	if( $more == '#' ) $more = T_('%d comments');
 
-	// original hack by dodo@regretless.com
 	if( empty( $post_ID ) )
 	{
 		global $id;
 		$post_ID = $id;
 	}
-	// fp>attila: I'm not sure about this below. It's only in the backoffice where
-	// we want to display the total. in the front, we still don't want to count in drafts
-	// can you check & confirm?
-	// attila>fp: This function is called only from the backoffice ( _item_list_full.view.php ).
+
+	// attila> This function is called only from the backoffice ( _item_list_full.view.php ).
 	// There we always have to show all comments.
 	$number = generic_ctp_number( $post_ID, 'comments', 'total' );
 	if ($number == 0)
@@ -475,7 +472,7 @@ function get_opentrash_link( $check_perm = true, $force_show = false )
 			$comment_list_param_prefix = $CommentList->param_prefix;
 		}
 		$result .= '<span class="floatright">'.action_icon( T_('Open recycle bin'), 'recycle_full',
-						$admin_url.'?ctrl=comments&amp;'.$comment_list_param_prefix.'show_statuses[]=trash', T_('Open recycle bin'), 5, 3 ).'</span> ';
+						$admin_url.'?ctrl=comments&amp;blog='.$blog.'&amp;'.$comment_list_param_prefix.'show_statuses[]=trash', T_('Open recycle bin'), 5, 3 ).'</span> ';
 	}
 	return $result.'</div>';
 }
@@ -637,31 +634,54 @@ function display_comment_replies( $comment_ID, $params = array(), $level = 1 )
 			'comment_error_start' => '<div class="bComment" id="comment_error">',
 			'comment_error_end'   => '</div>',
 			'link_to'             => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
+			'author_link_text'    => 'login', // avatar | only_avatar | login | nickname | firstname | lastname | fullname | preferredname
 		), $params );
 
 	if( isset( $CommentReplies[ $comment_ID ] ) )
-	{	// This comment has the replies
+	{ // This comment has the replies
 		foreach( $CommentReplies[ $comment_ID ] as $Comment )
-		{	// Loop through the replies:
-			if( !empty( $Comment->ID ) )
-			{	// Comment from DB
+		{ // Loop through the replies:
+			if( empty( $Comment->ID ) )
+			{ // Get html tag of the comment block of preview
+				$comment_start = $Comment->email_is_detected ? $params['comment_error_start'] : $params['preview_start'];
+			}
+			else
+			{ // Get html tag of the comment block of existing comment
+				$comment_start = $params['comment_start'];
+			}
+
+			// Set margin left for each sub level comment
+			$attrs = ' style="margin-left:'.( 20 * $level ).'px"';
+			if( strpos( $comment_start, 'class="' ) === false )
+			{ // Add a class attribute for the replied comment
+				$attrs .= ' class="replied_comment"';
+			}
+			else
+			{ // Add a class name for the replied comment
+				$comment_start = str_replace( 'class="', 'class="replied_comment ', $comment_start );
+			}
+			$comment_start = str_replace( '>', $attrs.'>', $comment_start );
+
+			if( ! empty( $Comment->ID ) )
+			{ // Comment from DB
 				skin_include( $params['comment_template'], array(
-						'Comment'         => & $Comment,
-					  'comment_start'   => str_replace( '>', ' style="margin-left:'.( 20 * $level ).'px">', $params['comment_start'] ),
-					  'comment_end'     => $params['comment_end'],
-						'link_to'         => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
+						'Comment'          => & $Comment,
+						'comment_start'    => $comment_start,
+						'comment_end'      => $params['comment_end'],
+						'link_to'          => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
+						'author_link_text' => $params['author_link_text'],
 					) );
 			}
 			else
-			{	// PREVIEW comment
+			{ // PREVIEW comment
 				skin_include( $params['comment_template'], array(
 						'Comment'              => & $Comment,
 						'comment_block_start'  => $Comment->email_is_detected ? '' : $params['preview_block_start'],
-						'comment_start'        => str_replace( '>', ' style="margin-left:'.( 20 * $level ).'px">', $Comment->email_is_detected ? $params['comment_error_start'] : $params['preview_start'] ),
+						'comment_start'        => $comment_start,
 						'comment_end'          => $Comment->email_is_detected ? $params['comment_error_end'] : $params['preview_end'],
 						'comment_block_end'    => $Comment->email_is_detected ? '' : $params['preview_block_end'],
+						'author_link_text'     => $params['author_link_text'],
 					) );
-
 			}
 
 			// Display the rest replies recursively
@@ -731,9 +751,11 @@ jQuery( document ).on( 'click', 'a.comment_reply_current', function()
 
 
 /**
- * JS Behaviour: Output JavaScript code to vote on the comments
+ * JS Behaviour: Output JavaScript code to moderate the comments
+ * Vote on the comment
+ * Change a status of the comment
  */
-function echo_comment_vote_js()
+function echo_comment_moderate_js()
 {
 	if( !is_logged_in( false ) )
 	{
@@ -749,31 +771,56 @@ function echo_comment_vote_js()
 ?>
 <script type="text/javascript">
 /* <![CDATA[ */
-// Display voting tool when JS is enable
-jQuery( ".vote_spam" ).show();
-
-function fadeIn( id, color )
+function fadeIn( selector, color )
 {
-	var bg_color = jQuery("#" + id).css( "backgroundColor" );
-	jQuery("#" + id).animate({ backgroundColor: color }, 200).animate({ backgroundColor: bg_color }, 200);
+	if( jQuery( selector ).length == 0 )
+	{
+		return;
+	}
+	if( jQuery( selector ).get(0).tagName == 'TR' )
+	{ // Fix selector, <tr> cannot have a css property background-color
+		selector = selector + ' td';
+	}
+	var bg_color = jQuery( selector ).css( 'backgroundColor' );
+	jQuery( selector ).animate( { backgroundColor: color }, 200 );
+	return bg_color;
 }
+
+function fadeInStatus( selector, status )
+{
+	switch( status )
+	{
+		case 'published':
+			return fadeIn( selector, '#99EE44' );
+		case 'community':
+			return fadeIn( selector, '#2E8BB9' );
+		case 'protected':
+			return fadeIn( selector, '#FF9C2A' );
+		case 'review':
+			return fadeIn( selector, '#CC0099' );
+	}
+}
+
+// Display voting tool when JS is enable
+jQuery( '.vote_spam' ).show();
 
 // Set comments vote
 function setCommentVote( id, type, vote )
 {
-	var row_id = "comment_row_" + id + " td";
+	var row_selector = '#comment_row_' + id;
 	var highlight_class = '';
+	var color = '';
 	switch(vote)
 	{
-		case "spam":
-			fadeIn(row_id, "#ffc9c9");
+		case 'spam':
+			color = fadeIn( row_selector, '#ffc9c9' );
 			highlight_class = 'roundbutton_red';
 			break;
-		case "notsure":
-			fadeIn(row_id, "#bbbbbb");
+		case 'notsure':
+			color = fadeIn( row_selector, '#bbbbbb' );
 			break;
-		case "ok":
-			fadeIn(row_id, "#bcffb5");
+		case 'ok':
+			color = fadeIn( row_selector, '#bcffb5' );
 			highlight_class = 'roundbutton_green';
 			break;
 	}
@@ -796,10 +843,71 @@ function setCommentVote( id, type, vote )
 		},
 	success: function(result)
 		{
+			if( color != '' )
+			{ // Revert the color
+				fadeIn( row_selector, color );
+			}
 			jQuery("#vote_"+type+"_"+id).after( ajax_debug_clear( result ) );
 			jQuery("#vote_"+type+"_"+id).remove();
 		}
 	});
+}
+
+// Set comment status
+function setCommentStatus( id, status, redirect_to )
+{
+	var row_selector = '[id=comment_row_' + id + ']';
+	var color = fadeInStatus( row_selector, status );
+
+	jQuery.ajax({
+	type: 'POST',
+	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+	data:
+		{ 'blogid': '<?php echo $Blog->ID; ?>',
+			'commentid': id,
+			'status': status,
+			'action': 'moderate_comment',
+			'redirect_to': redirect_to,
+			'crumb_comment': '<?php echo get_crumb('comment'); ?>',
+		},
+	success: function(result)
+		{
+			if( color != '' )
+			{ // Revert the color
+				fadeIn( row_selector, color );
+			}
+			var statuses = ajax_debug_clear( result ).split( ':' );
+			var new_status = statuses[0];
+			if( new_status == '' )
+			{ // Status was not changed
+				return;
+			}
+			var class_name = jQuery( row_selector ).attr( 'class' );
+			class_name = class_name.replace( /vs_([a-z]+)/g, 'vs_' + new_status );
+			jQuery( row_selector ).attr( 'class', class_name );
+			update_moderation_buttons( row_selector, statuses[1], statuses[2] );
+		}
+	});
+}
+
+// Add classes for first and last roundbuttons, because css pseudo-classes don't support to exclude hidden elements
+function update_moderation_buttons( selector, raise_status, lower_status )
+{
+	var parent_selector = '.roundbutton_group ';
+	if( typeof( selector ) != 'undefined' )
+	{
+		parent_selector = selector + ' ' + parent_selector;
+	}
+	selector = parent_selector + '.roundbutton_text';
+
+	// Clear previous classes of first and last visible buttons
+	jQuery( selector ).removeClass( 'first-child last-child btn_next_status' );
+	// Make the raise and lower button are visible
+	jQuery( selector + '.btn_raise_' + raise_status ).addClass( 'btn_next_status' );
+	jQuery( selector + '.btn_lower_' + lower_status ).addClass( 'btn_next_status' );
+	// Add classes for first and last buttons to fix round corners
+	jQuery( selector + ':visible:first' ).addClass( 'first-child' );
+	jQuery( selector + ':visible:last' ).addClass( 'last-child' );
 }
 /* ]]> */
 </script>
@@ -852,6 +960,84 @@ function display_comment_mass_delete( $CommentList )
 	}
 
 	require dirname(__FILE__).'/../views/_comment_mass.form.php';
+}
+
+
+/**
+ * Delete the comments
+ *
+ * @param string Type of deleting:
+ *               'recycle' - to move into recycle bin
+ *               'delete' - to delete permanently
+ * @param string sql query to get deletable comment ids
+ */
+function comment_mass_delete_process( $mass_type, $deletable_comments_query )
+{
+	if( $mass_type != 'recycle' && $mass_type != 'delete' )
+	{ // Incorrect action
+		return;
+	}
+
+	global $DB, $cache_comments_has_replies, $user_post_read_statuses, $cache_postcats;
+
+	/**
+	 * Disable log queries because it increases the memory and stops the process with error "Allowed memory size of X bytes exhausted..."
+	 */
+	$DB->log_queries = false;
+
+	$Form = new Form();
+
+	$Form->begin_form( 'fform' );
+
+	$Form->begin_fieldset( T_('Mass deleting log') );
+
+	echo T_('The comments are deleting...');
+	evo_flush();
+
+	$CommentCache = & get_CommentCache();
+	$ItemCache = & get_ItemCache();
+	$ChapterCache = & get_ChapterCache();
+
+	// Get the comments by 1000 to avoid an exhausting of memory
+	$deletable_comment_ids = $DB->get_col( $deletable_comments_query.' LIMIT 1000' );
+	while( !empty( $deletable_comment_ids ) )
+	{
+		// Get the first slice of the deletable comment ids list
+		$ids = array_splice( $deletable_comment_ids, 0, 100 );
+		// Make sure the CommentCache is empty
+		$CommentCache->clear();
+		// Load deletable comment ids
+		$CommentCache->load_list( $ids );
+
+		while( ( $iterator_Comment = & $CommentCache->get_next() ) != NULL )
+		{ // Delete all comments from CommentCache
+			$iterator_Comment->dbdelete( $mass_type == 'delete' );
+		}
+
+		// Display progress dot
+		echo ' .';
+		evo_flush();
+
+		if( empty( $deletable_comment_ids ) )
+		{
+			// Clear all caches to save memory
+			$ItemCache->clear();
+			$ChapterCache->clear();
+			$cache_comments_has_replies = array();
+			$user_post_read_statuses = array();
+			$cache_postcats = array();
+
+			// Get new portion of deletable comments
+			$deletable_comment_ids = $DB->get_col( $deletable_comments_query.' LIMIT 1000' );
+		}
+	}
+
+	echo ' OK';
+
+	$Form->end_form();
+
+	// Clear a comment cache
+	$CommentCache->clear();
 }
 
 
@@ -1065,23 +1251,10 @@ function comments_results( & $comments_Results, $params = array() )
 	if( $params['display_additional_columns'] )
 	{	// Display additional columns from the Plugins
 		global $Plugins;
-
-		$plugin_params = array(
-				'table'  => $params['plugin_table_name'],
-				'column' => $params['field_prefix'].'author_IP'
-			);
-		$Plugins->restart();
-		while( $loop_Plugin = & $Plugins->get_next() )
-		{
-			$columns = $loop_Plugin->GetAdditionalColumnsTable( $plugin_params );
-			if( !empty( $columns ) && is_array( $columns ) )
-			{
-				foreach( $columns as $column )
-				{
-					$comments_Results->cols[] = $column;
-				}
-			}
-		}
+		$Plugins->trigger_event( 'GetAdditionalColumnsTable', array(
+			'table'   => $params['plugin_table_name'],
+			'column'  => $params['field_prefix'].'author_IP',
+			'Results' => $comments_Results ) );
 	}
 
 	if( $params['display_spam'] )
@@ -1270,6 +1443,23 @@ function get_colored_status( $Comment )
 
 
 /**
+ * Get template for the styled status of comment or item
+ *
+ * @param string Status value
+ * @param string Status title
+ * @return string Styled template for status
+ */
+function get_styled_status( $status_value, $status_title )
+{
+	return '<div class="floatright">'
+		.'<span class="note status_'.$status_value.'">'
+		.'<span>'.format_to_output( $status_title ).'</span>'
+		.'</span>'
+		.'</div>';
+}
+
+
+/**
  * Get the edit actions for comment
  *
  * @param object Comment
@@ -1332,13 +1522,5 @@ function comment_edit_actions( $Comment )
 /**
  * End of helper functions block to display Comments results.
  * New ( not display helper ) functions must be created above comments_results function
- */
-
-
-/*
- * $Log$
- * Revision 1.40  2013/11/06 09:08:47  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
  */
 ?>

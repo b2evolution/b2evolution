@@ -248,7 +248,7 @@ class forums_Skin extends Skin
 		$write_new_post_url = $Blog->get_write_item_url( $chapter_ID );
 		if( $write_new_post_url != '' )
 		{ // Display button to write a new post
-			$post_button = '<a href="'.$write_new_post_url.'"><img src="img/post.gif" alt="'.T_('Post new topic').'" title="'.T_('Post new topic').'" /></a>';
+			$post_button = '<a href="'.$write_new_post_url.'"><span class="ficon newTopic" title="'.T_('Post new topic').'"></span></a>';
 		}
 		else
 		{ // If a creating of new post is unavailable
@@ -257,7 +257,7 @@ class forums_Skin extends Skin
 
 			if( $current_Chapter && $current_Chapter->lock )
 			{ // Display icon to inform that this forum is locked
-				$post_button = '<img src="img/reply-locked.gif " alt="'.T_('This forum is locked: you cannot post, reply to, or edit topics.').'" title="'.T_('This forum is locked: you cannot post, reply to, or edit topics.').'" />';
+				$post_button = '<span class="ficon locked" title="'.T_('This forum is locked: you cannot post, reply to, or edit topics.').'"></span>';
 				$chapter_is_locked = true;
 			}
 		}
@@ -268,12 +268,12 @@ class forums_Skin extends Skin
 			{ // Display icon to inform that this topic is locked for comments
 				if( !$chapter_is_locked )
 				{ // Display this button only when chapter is not locked, to avoid a duplicate button
-					$post_button .= ' <img src="img/reply-locked.gif" alt="'.T_('This topic is locked: you cannot edit posts or make replies.').'" title="'.T_('This topic is locked: you cannot edit posts or make replies.').'" />';
+					$post_button .= ' <span class="ficon locked" title="'.T_('This topic is locked: you cannot edit posts or make replies.').'"></span>';
 				}
 			}
 			else
 			{ // Display button to post a reply
-				$post_button .= ' <a href="'.$Item->get_feedback_url().'#form_p'.$Item->ID.'"><img src="img/reply.gif" alt="'.T_('Reply to topic').'" title="'.T_('Reply to topic').'" /></a>';
+				$post_button .= ' <a href="'.$Item->get_feedback_url().'#form_p'.$Item->ID.'"><span class="ficon postReply" title="'.T_('Reply to topic').'"></span></a>';
 			}
 		}
 
@@ -328,9 +328,9 @@ class forums_Skin extends Skin
 				// Get children
 				$SQL->WHERE( 'cat_parent_ID = '.$DB->quote( $category->cat_ID ) );
 				$children = $DB->get_results( $SQL->get() );
-				foreach( $children as $child )
+				foreach( $children as $child_Chapter )
 				{
-					$skin_chapters_cache[$c]->children[] = $ChapterCache->get_by_ID( $child->cat_ID );
+					$skin_chapters_cache[$c]->children[$child_Chapter->cat_ID] = $ChapterCache->get_by_ID( $child_Chapter->cat_ID );
 				}
 			}
 		}
@@ -344,18 +344,18 @@ class forums_Skin extends Skin
 				$skin_chapters_cache = $ChapterCache->subset_cache[ $Blog->ID ];
 
 				foreach( $skin_chapters_cache as $c => $Chapter )
-				{	// Init children
-					foreach( $skin_chapters_cache as $child )
-					{	// Again go through all chapters to find a children for current chapter
-						if( $Chapter->ID == $child->get( 'parent_ID' ) )
-						{	// Add to array of children
-							$skin_chapters_cache[$c]->children[] = $child;
+				{ // Init children
+					foreach( $skin_chapters_cache as $child_Chapter )
+					{ // Again go through all chapters to find a children for current chapter
+						if( $Chapter->ID == $child_Chapter->get( 'parent_ID' ) )
+						{ // Add to array of children
+							$skin_chapters_cache[$c]->children[$child_Chapter->ID] = $child_Chapter;
 						}
 					}
 				}
 
 				foreach( $skin_chapters_cache as $c => $Chapter )
-				{	// Unset the child chapters
+				{ // Unset the child chapters
 					if( $Chapter->get( 'parent_ID' ) )
 					{
 						unset( $skin_chapters_cache[$c] );
@@ -393,10 +393,4 @@ class forums_Skin extends Skin
 	}
 }
 
-/*
- * $Log$
- * Revision 1.3  2013/11/06 09:09:14  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

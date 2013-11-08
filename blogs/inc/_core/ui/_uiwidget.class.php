@@ -199,7 +199,12 @@ class Widget
 
 			case 'title':
 				// Results title:
-				return $this->replace_vars( $this->title );
+				// Espace $title$ strings from the title to avoid infinite loop replacing
+				$escaped_title = str_replace( '$title$', '&#36;title&#36;', $this->title );
+				// Replace vars on the title
+				$result = $this->replace_vars( $escaped_title );
+				// Replace back the $title$ strings and return the result
+				return str_replace( '&#36;title&#36;', '$title$', $result );
 
 			case 'no_results':
 				// No Results text:
@@ -797,6 +802,15 @@ class Table extends Widget
 							$output = str_replace( '$class_attrib$', 'class="'.$class.'"', $output );
 						}
 
+						// Replace column header title attribute
+						if( isset( $this->cols[$key]['th_title'] ) )
+						{ // Column header title is set
+							$output = str_replace( '$title_attrib$', ' title="'.$this->cols[$key]['th_title'].'"', $output );
+						}
+						else
+						{ // Column header title is not set, replace with empty string
+							$output = str_replace( '$title_attrib$', '', $output );
+						}
 
 						// Set colspan and rowspan values for the cell:
 						$output = preg_replace( '#(<)([^>]*)>$#', '$1$2 colspan="'.$cell['colspan'].'" rowspan="'.$cell['rowspan'].'">' , $output );
@@ -856,8 +870,10 @@ class Table extends Widget
 								}
 
 								// Toggle Icon + Title
+								// Set link title only if the column header title was not set
+								$link_title = isset( $this->cols[$key]['th_title'] ) ? '' : ' title="'.T_('Change Order').'"';
 								echo '<a href="'.$col_sort_values['order_toggle'].'"'
-											.' title="'.T_('Change Order').'"'
+											.$link_title
 											.' class="basic'.$class_suffix.'"'
 											.'>'.$sort_icon.' '.$th_title.'</a>';
 
@@ -1001,7 +1017,7 @@ class Table extends Widget
 				unset($extra_attr['format_to_output']);
 				$output = substr( $output, 0, -1 ).get_field_attribs_as_string( $extra_attr, $format_to_output ).'>';
 
-				
+
 			}
 
 		}
@@ -1107,10 +1123,4 @@ class Table extends Widget
 
 }
 
-/*
- * $Log$
- * Revision 1.27  2013/11/06 09:08:46  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

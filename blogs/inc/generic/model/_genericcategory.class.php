@@ -125,21 +125,16 @@ class GenericCategory extends GenericElement
 
 	/**
 	 * Add a child
-	 * @todo dh> "children" is plural..!
 	 * @param GenericCategory
 	 */
-	function add_children( & $GenericCategory )
+	function add_child_category( & $GenericCategory )
 	{
-		$this->children[] = & $GenericCategory;
+		if( !isset( $this->children[$GenericCategory->ID] ) )
+		{ // Add only if it was not added yet
+			$this->children[$GenericCategory->ID] = & $GenericCategory;
+		}
 	}
 
 }
 
-
-/*
- * $Log$
- * Revision 1.10  2013/11/06 08:04:15  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

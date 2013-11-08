@@ -53,17 +53,26 @@ class qqUploadedFileXhr {
 	{
         $input = fopen("php://input", "rb");
         $temp = tmpfile();
-		stream_copy_to_stream($input, $temp);
-        fclose($input);
+		stream_copy_to_stream( $input, $temp );
+        fclose( $input );
 
 		fseek($temp, 0, SEEK_SET);
 		$contents = '';
 
-		while (!feof($temp))
+		load_funcs( 'tools/model/_system.funcs.php' );
+		$memory_limit = system_check_memory_limit();
+
+		while( ! feof( $temp ) )
 		{
-			$contents .= fread($temp, 8192);
+			$curr_mem_usage = memory_get_usage( true );
+			if( ( $memory_limit - $curr_mem_usage ) < 8192 )
+			{ // Don't try to load the next portion of image into the memory because it would cause 'Allowed memory size exhausted' error
+				fclose( $temp );
+				return false;
+			}
+			$contents .= fread( $temp, 8192 );
 		}
-		fclose($temp);
+		fclose( $temp );
 		return $contents;
 	}
 
@@ -111,16 +120,26 @@ class qqUploadedFileForm
 
 	function get_content()
 	{
-		$temp = fopen($_FILES['qqfile']['tmp_name'], "rb");
-		fseek($temp, 0, SEEK_SET);
+		$temp = fopen( $_FILES['qqfile']['tmp_name'], "rb" );
+		fseek( $temp, 0, SEEK_SET );
 		$contents = '';
-		while (!feof($temp))
+
+		load_funcs( 'tools/model/_system.funcs.php' );
+		$memory_limit = system_check_memory_limit();
+
+		while( ! feof( $temp ) )
 		{
-			$contents .= fread($temp, 8192);
+			$curr_mem_usage = memory_get_usage( true );
+			if( ( $memory_limit - $curr_mem_usage ) < 8192 )
+			{ // Don't try to load the next portion of image into the memory because it would cause 'Allowed memory size exhausted' error
+				fclose( $temp );
+				return false;
+			}
+			$contents .= fread( $temp, 8192 );
 		}
-		fclose($temp);
+
+		fclose( $temp );
 		return $contents;
-		//return file_get_contents($_FILES['qqfile']['tmp_name']);
 	}
 }
 
@@ -231,7 +250,15 @@ if( $upload )
 	$newName = $newFile->get('name');
 
 	// If everything is ok, save the file somewhere
-	if( save_to_file( $file->get_content(), $newFile->get_full_path(), 'wb' ) )
+	$file_content = $file->get_content();
+	if( $file_content === false )
+	{ // No memory enough to upload file
+		$message['text'] = '<span class="result_error">'.T_( 'Not enough memory to upload this too large file!' ).'</span>';
+		$message['status'] = 'error';
+		out_echo($message, $specialchars);
+		exit();
+	}
+	elseif( save_to_file( $file_content, $newFile->get_full_path(), 'wb' ) )
 	{
 		// Change to default chmod settings
 		$newFile->chmod( NULL );
@@ -241,6 +268,9 @@ if( $upload )
 
 		// save file into the db
 		$newFile->dbsave();
+
+		// Prepare the uploaded file to the final format ( E.g. Resize and Rotate images )
+		prepare_uploaded_files( array( $newFile ) );
 
 		$message = '';
 		if( ! empty($oldFile_thumb) )
@@ -267,11 +297,21 @@ if( $upload )
 			$message .= '</div>';
 		}
 
+		$warning = '';
+		if( $Messages->count > 0 )
+		{ // Some errors/info messages can be created during prepare_uploaded_files()
+			$warning .= $Messages->display( NULL, NULL, false );
+		}
+
 		if( !empty( $message ) )
 		{
 			$message .= '<input type="hidden" name="renamedFiles['.$newFile->ID.'][newName]" value="'.$newName.'" />' .
 			'<input type="hidden" name="renamedFiles['.$newFile->ID.'][oldName]" value="'.$oldName.'" />';
-			$message = array('text' => $message, 'status' => 'rename');
+			$message = array(
+					'text' => $message,
+					'warning' => $warning,
+					'status' => 'rename'
+				);
 			out_echo($message, $specialchars);
 			exit();
 		}
@@ -288,6 +328,7 @@ if( $upload )
 			}
 
 			$message['text'] = "<span class=\"result_success\"> ".T_( 'OK' )." </span> $newFile_thumb ";
+			$message['warning'] = $warning;
 			out_echo($message, $specialchars);
 			exit();
 		}
@@ -304,10 +345,4 @@ $message['text'] =  '<span class="error">Invalid upload param</span>';
 out_echo($message, $specialchars);
 exit();
 
-/*
- * $Log$
- * Revision 1.12  2013/11/06 08:03:44  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

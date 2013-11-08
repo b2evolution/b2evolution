@@ -40,24 +40,20 @@ switch( $action )
 
 		$wp_blog_ID = param( 'wp_blog_ID', 'integer', 0 );
 		param_check_not_empty( 'wp_blog_ID', T_('Please select a blog!') );
-		
+
 		// XML File
 		$xml_file = $_FILES['wp_file'];
 		if( $xml_file['size'] == 0 )
-		{	// File is empty
-			param_error( 'wp_file', T_('Please select XML file to import.') );
+		{ // File is empty
+			param_error( 'wp_file', T_('Please select file to import.') );
 		}
-		else if( !preg_match( '/\.xml$/i', $xml_file['name'] ) )
-		{	// Extension is incorrect
-			param_error( 'wp_file', sprintf( T_('&laquo;%s&raquo; has an unrecognized extension.'), $xml['name'] ) );
-		}
-		else
-		{	// Check WordPress XML file for correct format
-			wpxml_check_file( $xml_file['tmp_name'] );
+		else if( ! preg_match( '/\.(xml|txt|zip)$/i', $xml_file['name'] ) )
+		{ // Extension is incorrect
+			param_error( 'wp_file', sprintf( T_('&laquo;%s&raquo; has an unrecognized extension.'), $xml_file['name'] ) );
 		}
 
 		if( param_errors_detected() )
-		{	// Stop import if errors exist
+		{ // Stop import if errors exist
 			$action = 'file';
 			break;
 		}
@@ -73,7 +69,7 @@ $AdminUI->breadcrumbpath_init( false );
 $AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system' );
 $AdminUI->breadcrumbpath_add( T_('Maintenance'), '?ctrl=tools' );
 $AdminUI->breadcrumbpath_add( T_('Import'), '?ctrl=tools&amp;tab3=import' );
-$AdminUI->breadcrumbpath_add( T_('phpBB Importer'), '?ctrl=phpbbimport' );
+$AdminUI->breadcrumbpath_add( T_('WordPress XML Importer'), '?ctrl=wpimportxml' );
 
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -104,10 +100,4 @@ $AdminUI->disp_payload_end();
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:04:54  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

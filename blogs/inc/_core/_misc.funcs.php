@@ -48,10 +48,16 @@ load_funcs('files/model/_file.funcs.php');
 
 /**
  * Call a method for all modules in a row
+ *
+ * @param string the name of the method which should be called
+ * @param array params
+ * @return array[module_name][return value], or NULL if the method doesn't have any return value
  */
 function modules_call_method( $method_name, $params = NULL )
 {
 	global $modules;
+
+	$result = NULL;
 
 	foreach( $modules as $module )
 	{
@@ -64,9 +70,13 @@ function modules_call_method( $method_name, $params = NULL )
 		{
 			$ret = $Module->{$method_name}( $params );
 		}
+		if( isset( $ret ) )
+		{
+			$result[$module] = $ret;
+		}
 	}
 
-	return $ret;
+	return $result;
 }
 
 
@@ -389,17 +399,23 @@ function zeroise( $number, $threshold )
  * @param int Maximum length
  * @return string
  */
-function excerpt( $str, $crop_at = 200 )
+function excerpt( $str, $maxlen = 200 )
 {
+	// Add spaces
+	$str = str_replace( array( '<p>', '<br' ), array( ' <p>', ' <br' ), $str );
+
+	// Remove <code>
+	$str = preg_replace( '#<code>(.+)</code>#i', '', $str );
+
 	// fp> Note: I'm not sure about using 'text' here, but there should definitely be no rendering here.
-	$output = format_to_output( $str, 'text' );
+	$str = format_to_output( $str, 'text' );
 
-	// Ger rid of all new lines:
-	$output = trim( str_replace( array( "\r", "\n", "\t" ), array( ' ', ' ', ' ' ), $output ) );
+	// Ger rid of all new lines and Display the html tags as source text:
+	$str = trim( str_replace( array( "\r", "\n", "\t" ), ' ', $str ) );
 
-	$output = strmaxlen($output, $crop_at);
+	$str = strmaxlen( $str, $maxlen );
 
-	return $output;
+	return $str;
 }
 
 
@@ -1972,7 +1988,19 @@ function xmlrpc_displayresult( $result, $display = true, $log = '' )
 		$out = '';
 		foreach($value as $l_value)
 		{
-			$out .= ' ['.$l_value.'] ';
+			if( is_array( $l_value ) )
+			{
+				$out .= ' [';
+				foreach( $l_value as $lv_key => $lv_val )
+				{
+					$out .= $lv_key.' => '.( is_array( $lv_val ) ? '{'.implode( '; ', $lv_val ).'}' : $lv_val ).'; ';
+				}
+				$out .= '] ';
+			}
+			else
+			{
+				$out .= ' ['.$l_value.'] ';
+			}
 		}
 	}
 	else
@@ -2364,7 +2392,7 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 function debug_die( $additional_info = '', $params = array() )
 {
 	global $debug, $baseurl;
-	global $log_app_errors, $app_name, $is_cli, $debug;
+	global $log_app_errors, $app_name, $is_cli, $display_errors_on_production;
 
 	$params = array_merge( array(
 		'status' => '500 Internal Server Error',
@@ -2374,8 +2402,8 @@ function debug_die( $additional_info = '', $params = array() )
 	{ // Command line interface, e.g. in cron_exec.php:
 		echo '== '.T_('An unexpected error has occurred!')." ==\n";
 		echo T_('If this error persists, please report it to the administrator.')."\n";
-		if( $debug )
-		{	// Display additional info only in debug mode because it can reveal system info to hackers and greatly facilitate exploits
+		if( $debug || $display_errors_on_production )
+		{ // Display additional info only in debug mode or when it was explicitly set by display_errors_on_production setting because it can reveal system info to hackers and greatly facilitate exploits
 			echo T_('Additional information about this error:')."\n";
 			echo strip_tags( $additional_info )."\n\n";
 		}
@@ -2401,16 +2429,28 @@ function debug_die( $additional_info = '', $params = array() )
 		if( ! empty( $additional_info ) )
 		{
 			echo '<div style="background-color: #ddd; padding: 1ex; margin-bottom: 1ex;">';
-			if( $debug )
-			{	// Display additional info only in debug mode because it can reveal system info to hackers and greatly facilitate exploits
+			if( $debug || $display_errors_on_production )
+			{ // Display additional info only in debug mode or when it was explicitly set by display_errors_on_production setting because it can reveal system info to hackers and greatly facilitate exploits
 				echo '<h3>'.T_('Additional information about this error:').'</h3>';
 				echo $additional_info;
 			}
 			else
 			{
-				echo '<p><i>Enable debugging to get additional information about this error.</i></p>';
+				echo '<p><i>Enable debugging to get additional information about this error.</i></p>' . get_manual_link('debugging','How to enable debug mode?');
 			}
 			echo '</div>';
+
+			// Append the error text to AJAX log if it is AJAX request
+			global $Ajaxlog;
+			if( ! empty( $Ajaxlog ) )
+			{
+				$Ajaxlog->add( $additional_info, 'error' );
+				$Ajaxlog->display( NULL, NULL, true, 'all',
+								array(
+										'error' => array( 'class' => 'jslog_error', 'divClass' => false ),
+										'note'  => array( 'class' => 'jslog_note',  'divClass' => false ),
+									), 'ul', 'jslog' );
+			}
 		}
 	}
 
@@ -2522,9 +2562,21 @@ function bad_request_die( $additional_info = '' )
 		}
 		else
 		{
-			echo '<p><i>Enable debugging to get additional information about this error.</i></p>';
+			echo '<p><i>Enable debugging to get additional information about this error.</i></p>' . get_manual_link('debugging','How to enable debug mode?');
 		}
 		echo '</div>';
+
+		// Append the error text to AJAX log if it is AJAX request
+		global $Ajaxlog;
+		if( ! empty( $Ajaxlog ) )
+		{
+			$Ajaxlog->add( $additional_info, 'error' );
+			$Ajaxlog->display( NULL, NULL, true, 'all',
+							array(
+									'error' => array( 'class' => 'jslog_error', 'divClass' => false ),
+									'note'  => array( 'class' => 'jslog_note',  'divClass' => false ),
+								), 'ul', 'jslog' );
+		}
 	}
 
 	if( $debug )
@@ -3005,6 +3057,38 @@ function debug_info( $force = false, $force_clean = false )
 
 
 /**
+ * Check if the current request exceed the post max size limit.
+ * If too much data was sent add an error message and call header redirect.
+ */
+function check_post_max_size_exceeded()
+{
+	global $Messages;
+
+	if( ( $_SERVER['REQUEST_METHOD'] == 'POST' ) && empty( $_POST ) && empty( $_FILES ) && ( $_SERVER['CONTENT_LENGTH'] > 0 ) )
+	{
+		// Check post max size ini setting
+		$post_max_size = ini_get( 'post_max_size' );
+
+		// Convert post_max_size value to bytes
+		switch ( substr( $post_max_size, -1 ) )
+		{
+			case 'G':
+				$post_max_size = $post_max_size * 1024;
+			case 'M':
+				$post_max_size = $post_max_size * 1024;
+			case 'K':
+				$post_max_size = $post_max_size * 1024;
+		}
+
+		// Add error message and redirect back to the referer url
+		$Messages->add( sprintf( T_('You have sent too much data (too many large files?) for the server to process (%s sent / %s maximum). Please try again by sending less data/files at a time.'), bytesreadable( $_SERVER['CONTENT_LENGTH'] ), bytesreadable( $post_max_size ) ) );
+		header_redirect( $_SERVER['HTTP_REFERER'] );
+		exit(0); // Already exited here
+	}
+}
+
+
+/**
  * Prevent email header injection.
  */
 function mail_sanitize_header_string( $header_str, $close_brace = false )
@@ -3130,7 +3214,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	// Stop a request from the blocked IP addresses
 	antispam_block_ip();
 
-	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $Settings, $demo_mode;
+	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $Settings, $demo_mode, $sendmail_additional_params;
 
 	// Memorize email address
 	$to_email_address = $to;
@@ -3218,9 +3302,12 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	}
 
 	// Set an additional parameter for the return path:
-	if( !empty($return_path) )
+	if( ! empty( $sendmail_additional_params ) )
 	{
-		$additional_parameters = '-r '.$return_path;
+		$additional_parameters = str_replace(
+			array( '$from-address$', '$return-address$' ),
+			array( $from, ( empty( $return_path ) ? $from : $return_path ) ),
+			$sendmail_additional_params );
 	}
 	else
 	{
@@ -3243,7 +3330,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		{
 			mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error' );
 
-			debug_die( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.', 'error' );
+			debug_die( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.' );
 		}
 	}
 	else
@@ -5270,7 +5357,9 @@ function get_secure_htsrv_url()
 
 /**
  * Set max execution time
+ *
  * @param integer seconds
+ * @return string the old value on success, false on failure.
  */
 function set_max_execution_time( $seconds )
 {
@@ -5278,7 +5367,7 @@ function set_max_execution_time( $seconds )
 	{
 		set_time_limit( $seconds );
 	}
-	@ini_set( 'max_execution_time', $seconds );
+	return @ini_set( 'max_execution_time', $seconds );
 }
 
 
@@ -5603,6 +5692,53 @@ function int2ip( $int )
 
 
 /**
+ * Check if the given string is a valid IPv4 or IPv6 address value
+ *
+ * @param string IP
+ * @return boolean true if valid, false otherwise
+ */
+function is_valid_ip_format( $ip )
+{
+	if( function_exists( 'filter_var' ) )
+	{ // filter_var() function exists we have PHP version >= 5.2.0
+		return filter_var( $ip, FILTER_VALIDATE_IP ) !== false;
+	}
+
+	// PHP version is < 5.2.0
+	if( $ip == '::1' )
+	{	// Reserved IP for localhost
+		$ip = '127.0.0.1';
+	}
+
+	if( strpos( $ip, '.' ) !== false )
+	{ // we have IPv4
+		if( strpos( $ip, ':' !== false ) )
+		{ // It is combined with IPv6, remove the IPv6 prefix
+			$ip = substr( $ip, strrpos( $ip, ':' ) );
+		}
+		if( substr_count( $ip, '.' ) != 3 )
+		{ // Don't vaildate formats like 'zz.yyyyy' which would be allowed by ip2long() function
+			return false;
+		}
+		$result = ip2long( $ip );
+		return ( ( $result !== false ) && ( $result !== -1 ) );
+	}
+
+	// Check if it is a valid IPv6 string
+	if( preg_match( "/^[0-9a-f]{1,4}:([0-9a-f]{0,4}:){1,6}[0-9a-f]{1,4}$/", $ip ) )
+	{ // $ip has the correct format
+		if( ( substr_count( $ip, '::' ) > 1 ) || ( strpos( $ip, ':::' ) !== false ) )
+		{ // Not valid IPv6 format because contains a ':::' char sequence or more than one '::'
+			return false;
+		}
+		return true;
+	}
+
+	return false;
+}
+
+
+/**
  * Convert IP address to integer (get only 32bits of IPv6 address)
  *
  * @param string IP address
@@ -5610,8 +5746,8 @@ function int2ip( $int )
  */
 function ip2int( $ip )
 {
-	if( filter_var( $ip, FILTER_VALIDATE_IP ) === false )
-	{	// IP format is incorrect
+	if( ! is_valid_ip_format( $ip ) )
+	{ // IP format is incorrect
 		return 0;
 	}
 
@@ -5621,22 +5757,16 @@ function ip2int( $ip )
 	}
 
 	$parts = unpack( 'N*', inet_pton( $ip ) );
+	// In case of IPv6 return only a parts of it
+	$result = ( strpos( $ip, '.' ) !== false ) ? $parts[1] /* IPv4*/ : $parts[4] /* IPv6*/;
 
-	if( strpos( $ip, '.' ) !== false )
-	{	// fix IPv4
-		$parts = array( 1 => 0, 2 => 0, 3 => 0, 4 => $parts[1] );
-	}
-	foreach( $parts as &$part )
-	{	// convert any unsigned ints to signed from unpack.
+	if( $result < 0 )
+	{ // convert unsigned int to signed from unpack.
 		// this should be OK as it will be a PHP float not an int
-		if( $part < 0 )
-		{
-			$part += 4294967296;
-		}
+		$result += 4294967296;
 	}
 
-	// Return only small range of IPv6
-	return $parts[4];
+	return $result;
 }
 
 
