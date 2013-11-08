@@ -6,6 +6,8 @@
 	<!-- TemplateEndEditable -->
 	<meta name="viewport" content="width = 750" />
 	<meta name="robots" content="noindex, follow" />
+	<link href="../blogs/rsc/css/basic_styles.css" rel="stylesheet" type="text/css" />
+	<link href="../blogs/rsc/css/basic.css" rel="stylesheet" type="text/css" />
 	<link href="../blogs/rsc/css/evo_distrib_2.css" rel="stylesheet" type="text/css" />
 	<!-- TemplateBeginEditable name="head" --><!-- TemplateEndEditable -->
 	<!-- TemplateParam name="lang" type="text" value="en-US" passthrough="true" --> 
@@ -22,8 +24,8 @@
 		
 		<div class="menu_top"><!-- TemplateBeginEditable name="MenuTop" --> 
 			<span class="floatright"> After install: <a href="../blogs/index.php">Blogs</a> &bull; <a href="../blogs/admin.php">Admin</a> </span> 
-			Before install: <a href="../index.html">Hello!</a> &bull; <a href="../doc/changes.html">Changelog</a> &bull; <a href="../blogs/install/index.php">Installer</a> 
-		<!-- TemplateEndEditable --></div>
+			Before install: <a href="../index.html">Hello!</a> &bull; <a href="http://b2evolution.net/man/introduction/what-s-new/">Changelog</a> &bull; <a href="../blogs/install/index.php">Installer</a> 
+    <!-- TemplateEndEditable --></div>
 		
 		<!-- TemplateBeginEditable name="Main" -->
 		<div class="block1">
@@ -42,7 +44,7 @@
 			Online resources: <a href="http://b2evolution.net/" target="_blank">Official website</a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank">Find a host</a> &bull; <a href="http://manual.b2evolution.net/" target="_blank">Manual</a> &bull; <a href="http://forums.b2evolution.net/" target="_blank">Forums</a>
 		<!-- TemplateEndEditable --></div>
 	
-	<div class="copyright"><!-- TemplateBeginEditable name="CopyrightTail" -->Copyright &copy; 2003-2011 by Fran&ccedil;ois Planque &amp; others &middot; <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a><!-- TemplateEndEditable --></div>
+	<div class="copyright"><!-- TemplateBeginEditable name="CopyrightTail" -->Copyright &copy; 2003-2013 by Fran&ccedil;ois Planque &amp; others &middot; <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a><!-- TemplateEndEditable --></div>
 		
 	</div>
 	</div>
