@@ -331,15 +331,23 @@ class User extends DataObject
 			{	// Admin form
 				$notification_sender_email = param( 'notification_sender_email', 'string', true );
 				param_check_email( 'notification_sender_email' );
-				if( !empty( $notification_sender_email ) || $UserSettings->get( 'notification_sender_email' , $this->ID ) != '' )
-				{
+				if( ! empty( $notification_sender_email ) )
+				{ // Change a value of setting
 					$UserSettings->set( 'notification_sender_email', $notification_sender_email, $this->ID );
+				}
+				elseif( $UserSettings->get( 'notification_sender_email' , $this->ID ) != '' )
+				{ // Delete a setting record from DB
+					$UserSettings->delete( 'notification_sender_email', $this->ID );
 				}
 
 				$notification_sender_name = param( 'notification_sender_name', 'string', true );
-				if( !empty( $notification_sender_name ) || $UserSettings->get( 'notification_sender_name' , $this->ID ) != '' )
-				{
+				if( ! empty( $notification_sender_name ) )
+				{ // Change a value of setting
 					$UserSettings->set( 'notification_sender_name', $notification_sender_name, $this->ID );
+				}
+				elseif( $UserSettings->get( 'notification_sender_name' , $this->ID ) != '' )
+				{ // Delete a setting record from DB
+					$UserSettings->delete( 'notification_sender_name', $this->ID );
 				}
 
 				if( !isset( $this->dbchanges['user_email'] ) )
@@ -1109,7 +1117,7 @@ class User extends DataObject
 		$params = array_merge( array(
 				'format'       => 'htmlbody',
 				'link_to'      => 'userpage', // userurl userpage 'userurl>userpage'
-				'link_text'    => 'preferredname',
+				'link_text'    => 'preferredname', // avatar | preferredname
 				'link_rel'     => '',
 				'link_class'   => '',
 				'thumb_size'   => 'crop-top-32x32',
@@ -1181,15 +1189,15 @@ class User extends DataObject
 
 		if( !empty( $this->nickname ) )
 		{	// Nickname
-			return parent::get( 'nickname' );
+			return $this->get( 'nickname' );
 		}
-		elseif( !empty( $this->firstname ) )
+		elseif( !empty( $this->firstname ) || !empty( $this->lastname ) )
 		{	// First name
-			return parent::get( 'firstname' );
+			return $this->get('fullname');
 		}
 		else
 		{	// Login
-			return parent::get( 'login' );
+			return $this->get( 'login' );
 		}
 	}
 
@@ -1242,7 +1250,7 @@ class User extends DataObject
 				'after'          => ' ',
 				'format'         => 'htmlbody',
 				'link_to'        => 'userpage',
-				'link_text'      => 'avatar', // avatar | only_avatar | login | nickname
+				'link_text'      => 'avatar', // avatar | only_avatar | login | nickname | firstname | lastname | fullname | preferredname
 				'link_rel'       => '',
 				'link_class'     => '',
 				'thumb_size'     => 'crop-top-15x15',
@@ -1266,7 +1274,7 @@ class User extends DataObject
 		{
 			$avatar_tag = $this->get_avatar_imgtag( $params['thumb_size'], $params['thumb_class'], '', $params['thumb_zoomable'] );
 			if( $params['thumb_zoomable'] )
-			{	// User avatar is zoomable
+			{ // User avatar is zoomable
 				// Add tag param to init bubbletip
 				$avatar_tag = str_replace( '<img ', '<img rel="bubbletip_user_'.$this->ID.'"', $avatar_tag );
 				return $avatar_tag; // We should exit here, to avoid the double adding of tag <a>
@@ -1275,13 +1283,32 @@ class User extends DataObject
 
 		$link_login = '';
 		if( $params['link_text'] != 'only_avatar' )
-		{ // Display login
-			if( $params['link_text'] == 'nickname' && ! empty( $this->nickname ) )
-			{ // Use nickname if it is defined
-				$link_login = $this->nickname;
+		{ // Display a login, nickname, firstname, lastname, fullname or preferredname
+			switch( $params['link_text'] )
+			{
+				case 'login':
+				case 'avatar':
+					$link_login = $this->login;
+					break;
+				case 'nickname':
+					$link_login = $this->nickname;
+					break;
+				case 'firstname':
+					$link_login = $this->firstname;
+					break;
+				case 'lastname':
+					$link_login = $this->lastname;
+					break;
+				case 'fullname':
+					$link_login = $this->firstname.' '.$this->lastname;
+					break;
+				case 'preferredname':
+					$link_login = $this->get_preferred_name();
+					break;
 			}
-			else
-			{ // Use login
+			$link_login = trim( $link_login );
+			if( empty( $link_login ) )
+			{ // Use a login by default if a selected field is empty
 				$link_login = $this->login;
 			}
 			if( $params['login_mask'] != '' )
@@ -1603,7 +1630,7 @@ class User extends DataObject
 				}
 				return false;
 			}
-			elseif( !@mkdir( $userdir ) )
+			elseif( ! evo_mkdir( $userdir ) )
 			{ // add error
 				if( is_admin_page() )
 				{
@@ -1613,12 +1640,7 @@ class User extends DataObject
 				return false;
 			}
 			else
-			{ // chmod and add note:
-				$chmod = $Settings->get('fm_default_chmod_dir');
-				if( !empty($chmod) )
-				{
-					@chmod( $userdir, octdec($chmod) );
-				}
+			{ // add note:
 				if( is_admin_page() )
 				{
 					$Messages->add( sprintf( T_("The user's directory &laquo;%s&raquo; has been created with permissions %s."), rel_path_to_base($userdir), substr( sprintf('%o', fileperms($userdir)), -3 ) ), 'success' );
@@ -3038,7 +3060,7 @@ class User extends DataObject
 
 		if( empty( $redirect_to_after ) )
 		{ // redirect to was not set
-			$redirect_to_after = param( 'redirect_to', 'string', '' );
+			$redirect_to_after = param( 'redirect_to', 'url', '' );
 			if( empty( $redirect_to_after ) )
 			{
 				if( is_admin_page() )
@@ -4389,10 +4411,15 @@ class User extends DataObject
 	 */
 	function send_welcome_message()
 	{
-		global $Settings;
+		global $Settings, $UserSettings;
 
 		if( !$Settings->get( 'welcomepm_enabled' ) )
-		{	// Sending of welcome PM is disabled
+		{ // Sending of welcome PM is disabled
+			return false;
+		}
+
+		if( $UserSettings->get( 'welcome_message_sent', $this->ID ) )
+		{ // User already received the welcome message
 			return false;
 		}
 
@@ -4405,7 +4432,7 @@ class User extends DataObject
 		$UserCache = & get_UserCache();
 		$User = $UserCache->get_by_login( $Settings->get( 'welcomepm_from' ) );
 		if( !$User )
-		{	// Don't send an welcome email if sender login is incorrect
+		{ // Don't send an welcome email if sender login is incorrect
 			return false;
 		}
 
@@ -4421,7 +4448,12 @@ class User extends DataObject
 		$edited_Message->set( 'author_user_ID', $User->ID );
 		$edited_Message->creator_user_ID = $User->ID;
 		$edited_Message->set( 'text', $Settings->get( 'welcomepm_message' ) );
-		$edited_Message->dbinsert_individual( $User );
+		if( $edited_Message->dbinsert_individual( $User ) )
+		{ // The welcome message was sent/created successfully
+			// Change user setting to TRUE in order to don't send it twice
+			$UserSettings->set( 'welcome_message_sent', 1, $this->ID );
+			$UserSettings->dbupdate();
+		}
 	}
 
 
@@ -4641,8 +4673,11 @@ class User extends DataObject
 		global $DB, $Plugins, $current_User;
 
 		// Check permissions
-		// Note: if users have delete messaging perms then they can delete any user messages ( Of course only if the delete action is available/displayed for them )
-		$current_User->check_perm( 'perm_messaging', 'delete', true );
+		// Note: If current user can edit the users then it is allowed to delete all user data even if it wouldn't be allowed otherwise
+		if( ! $current_User->check_perm( 'users', 'edit' ) )
+		{ // Note: if users have delete messaging perms then they can delete any user messages ( Of course only if the delete action is available/displayed for them )
+			$current_User->check_perm( 'perm_messaging', 'delete', true );
+		}
 
 		$DB->begin();
 

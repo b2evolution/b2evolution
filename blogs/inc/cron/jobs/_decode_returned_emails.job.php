@@ -30,7 +30,6 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-
 global $Settings, $DB, $result_message;
 global $dre_messages, $dre_emails, $email_cntr, $del_cntr, $is_cron_mode;
 
@@ -54,6 +53,11 @@ if( ! extension_loaded('imap') )
 load_funcs( '_core/_param.funcs.php' );
 load_class( '_ext/mime_parser/rfc822_addresses.php', 'rfc822_addresses_class' );
 load_class( '_ext/mime_parser/mime_parser.php', 'mime_parser_class' );
+
+if( isset($GLOBALS['files_Module']) )
+{
+	load_funcs( 'files/model/_file.funcs.php');
+}
 
 if( ! $mbox = dre_connect() )
 {	// We couldn't connect to the mail server
@@ -91,10 +95,4 @@ if( $email_cntr > 0 )
 
 return 1; // success
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:04:07  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

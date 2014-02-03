@@ -125,7 +125,7 @@ class CommentList2 extends DataObjectList2
 				'expiry_statuses' => array( 'active' ), // Show active/expired comments
 				'types' => array( 'comment','trackback','pingback' ),
 				'orderby' => 'date',
-				'order' => !is_null( $this->Blog ) ? $this->Blog->get_setting('orderdir') : 'DESC',
+				'order' => !is_null( $this->Blog ) ? $this->Blog->get_setting('comments_orderdir') : 'DESC',
 				//'order' => 'DESC',
 				'comments' => $this->limit,
 				'page' => 1,
@@ -133,6 +133,7 @@ class CommentList2 extends DataObjectList2
 				'timestamp_min' => NULL, // Do not show comments from posts before this timestamp
 				'timestamp_max' => NULL, // Do not show comments from posts after this timestamp
 				'threaded_comments' => false, // Mode to display the comment replies
+				'user_perm' => NULL,
 		) );
 	}
 
@@ -226,6 +227,11 @@ class CommentList2 extends DataObjectList2
 			memorize_param( $this->param_prefix.'type', 'string', $this->default_filters['types'], $this->filters['types'] );  // List of comment types to restrict to
 
 			/*
+			 * Restrict to current User specific permission:
+			 */
+			memorize_param( $this->param_prefix.'user_perm', 'string', $this->default_filters['user_perm'], $this->filters['user_perm'] );  // Restrict to comments with permitted action for the current User
+
+			/*
 			 * Restrict to the statuses we want to show:
 			 */
 			// Note: oftentimes, $show_statuses will have been preset to a more restrictive set of values
@@ -305,17 +311,22 @@ class CommentList2 extends DataObjectList2
 		/*
 		 * Restrict to selected statuses:
 		 */
-		$this->filters['statuses'] = param( $this->param_prefix.'show_statuses', 'array', $this->default_filters['statuses'], true );      // List of statuses to restrict to
+		$this->filters['statuses'] = param( $this->param_prefix.'show_statuses', 'array/string', $this->default_filters['statuses'], true );      // List of statuses to restrict to
 
 		/*
 		 * Restrict to active/expired comments:
 		 */
-		$this->filters['expiry_statuses'] = param( $this->param_prefix.'expiry_statuses', 'array', $this->default_filters['expiry_statuses'], true );      // List of expiry statuses to restrict to
+		$this->filters['expiry_statuses'] = param( $this->param_prefix.'expiry_statuses', 'array/string', $this->default_filters['expiry_statuses'], true );      // List of expiry statuses to restrict to
 
 		/*
 		 * Restrict to selected types:
 		 */
-		$this->filters['types'] = param( $this->param_prefix.'types', 'array', $this->default_filters['types'], true );      // List of types to restrict to
+		$this->filters['types'] = param( $this->param_prefix.'types', 'array/string', $this->default_filters['types'], true );      // List of types to restrict to
+
+		/*
+		 * Restrict to selected user perm:
+		 */
+		$this->filters['user_perm'] = param( $this->param_prefix.'user_perm', 'string', $this->default_filters['user_perm'], true );      // A specific user perm to restrict to
 
 		/*
 		 * Restrict by keywords
@@ -327,7 +338,7 @@ class CommentList2 extends DataObjectList2
 		/*
 		 * Restrict to selected rating:
 		 */
-		$this->filters['rating_toshow'] = param( $this->param_prefix.'rating_toshow', 'array', $this->default_filters['rating_toshow'], true );      // Rating to restrict to
+		$this->filters['rating_toshow'] = param( $this->param_prefix.'rating_toshow', 'array/string', $this->default_filters['rating_toshow'], true );      // Rating to restrict to
 		$this->filters['rating_turn'] = param( $this->param_prefix.'rating_turn', 'string', $this->default_filters['rating_turn'], true );      // Rating to restrict to
 		$this->filters['rating_limit'] = param( $this->param_prefix.'rating_limit', 'integer', $this->default_filters['rating_limit'], true ); 	// Rating to restrict to
 
@@ -402,6 +413,11 @@ class CommentList2 extends DataObjectList2
 		$this->CommentQuery->where_types( $this->filters['types'] );
 		$this->ItemQuery->where_datestart( '', '', '', '', $this->filters['timestamp_min'], $this->filters['timestamp_max'] );
 
+		if( !is_null( $this->Blog ) && isset( $this->filters['user_perm'] ) )
+		{ // If Blog and required user permission is set, add the corresponding restriction
+			$this->CommentQuery->user_perm_restrict( $this->filters['user_perm'], $this->Blog->ID );
+		}
+
 
 		/*
 		 * ORDER BY stuff:
@@ -416,7 +432,11 @@ class CommentList2 extends DataObjectList2
 		$this->CommentQuery->order_by( $order_by );
 
 		// GET Item IDs, this way we don't have to JOIN two times the items and the categories table into the comment query
-		if( isset( $this->filters['post_ID'] ) && is_admin_page() )
+		if( isset( $this->filters['post_statuses'] ) )
+		{ // Set post statuses by filters
+			$post_show_statuses = $this->filters['post_statuses'];
+		}
+		elseif( isset( $this->filters['post_ID'] ) && is_admin_page() )
 		{ // Allow all kind of post status ( This statuses will be filtered later by user perms )
 			$post_show_statuses = get_visibility_statuses( 'keys' );
 		}
@@ -715,24 +735,23 @@ class CommentList2 extends DataObjectList2
 
 
 	/**
-	 * Checks if currently selected filter contains only comments trash status
+	 * Checks if currently selected filter contains comments with trash status
 	 *
+	 * @param boolean set true to check if the filter contains only recycled comments, set false to check if the filter contains the recycled comments
 	 * @return boolean
 	 */
-	function is_trashfilter()
+	function is_trashfilter( $only_trash = true )
 	{
+		if( ! $only_trash )
+		{ // Check if statuses filter contains the 'trash' value
+			return in_array( 'trash', $this->filters['statuses'] );
+		}
 		if( count( $this->filters['statuses'] ) == 1 )
-		{
+		{ // Check if statuses filter contains only the 'trash' value
 			return $this->filters['statuses'][0] == 'trash';
 		}
 		return false;
 	}
 }
 
-/*
- * $Log$
- * Revision 1.40  2013/11/06 09:08:47  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

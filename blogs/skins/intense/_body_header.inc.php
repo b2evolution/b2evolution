@@ -3,7 +3,7 @@
  * This is the BODY header include template.
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
- * {@link http://manual.b2evolution.net/Skins_2.0}
+ * {@link http://b2evolution.net/man/skin-structure}
  *
  * This is meant to be included in a page template.
  *
@@ -44,7 +44,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				<h1 id="title"><a href="<?php $Blog->disp('url'); ?>" title="<?php $Blog->disp('name'); ?>"><?php $Blog->disp('name'); ?></a></h1>
 			</div>
 
-			<div class="nav bl"><div class="nav2 br">
+			<div class="nav rounded_bottom">
 				<div id="slogan"><?php $Blog->tagline(); ?></div>
 				<div id="navdiv">
 					<ul id="navlist">
@@ -66,4 +66,4 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 					</ul>
 				</div>
 			</div>
-		</div>
+			<!--[if IE]><div class="rounded_ie_corners_bottom"></div><![endif]-->

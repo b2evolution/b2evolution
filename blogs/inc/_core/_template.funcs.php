@@ -127,7 +127,7 @@ function header_redirect( $redirect_to = NULL, $status = false )
 	 *
 	 * @var Hit
 	 */
- 	global $Hit;
+	global $Hit;
 	global $baseurl, $Blog, $htsrv_url_sensitive;
 	global $Session, $Debuglog, $Messages;
 	global $http_response_code;
@@ -135,7 +135,7 @@ function header_redirect( $redirect_to = NULL, $status = false )
 	// TODO: fp> get this out to the caller, make a helper func like get_returnto_url()
 	if( empty($redirect_to) )
 	{ // see if there's a redirect_to request param given:
-		$redirect_to = param( 'redirect_to', 'string', '' );
+		$redirect_to = param( 'redirect_to', 'url', '' );
 
 		if( empty($redirect_to) )
 		{
@@ -384,7 +384,7 @@ function get_request_title( $params = array() )
 			'avatar_text'         => T_('Profile picture'),
 			'pwdchange_text'      => T_('Password change'),
 			'userprefs_text'      => T_('User preferences'),
-			'user_text'           => T_('User'),
+			'user_text'           => T_('User: %s'),
 			'users_text'          => T_('Users'),
 			'closeaccount_text'   => T_('Close account'),
 			'subs_text'           => T_('Notifications'),
@@ -545,7 +545,7 @@ function get_request_title( $params = array() )
 			break;
 
 		case 'lostpassword':
-			// We are requesting the activate info form:
+			// We are requesting the lost password form:
 			$r[] = $params['lostpassword_text'];
 			break;
 
@@ -571,8 +571,12 @@ function get_request_title( $params = array() )
 			break;
 
 		case 'user':
-			// We are requesting the message form:
-			$r[] = $params['user_text'];
+			// We are requesting the user page:
+			$user_ID = param( 'user_ID', 'integer', 0 );
+			$UserCache = & get_UserCache();
+			$User = & $UserCache->get_by_ID( $user_ID, false, false );
+			$user_login = $User ? $User->get( 'login' ) : '';
+			$r[] = sprintf( $params['user_text'], $user_login );
 			break;
 
 		case 'users':
@@ -1097,19 +1101,17 @@ function add_js_for_toolbar( $relative_to = 'rsc_url' )
 	}
 
 	require_js( '#jquery#', $relative_to );
-	require_js( 'functions.js', $relative_to );	// for rollovers AddEvent - TODO: change to jQuery
-	require_js( 'rollovers.js', $relative_to );	// TODO: change to jQuery
 	// Superfish menus:
 	require_js( 'hoverintent.js', $relative_to );
 	require_js( 'superfish.js', $relative_to );
 	add_js_headline( '
-		jQuery( function() {
-			jQuery("ul.sf-menu").superfish({
-	            delay: 500, // mouseout
-	            animation: {opacity:"show",height:"show"},
-	            speed: "fast"
-	        });
-		} )');
+	jQuery( function() {
+	  jQuery("ul.sf-menu").superfish( {
+	    delay: 500, // mouseout
+	    animation: {opacity:"show",height:"show"},
+	    speed: "fast"
+	  } );
+	} );');
 
 	return true;
 }
@@ -1315,6 +1317,37 @@ function init_colorpicker_js( $relative_to = 'rsc_url' )
 			} );
 	} );' );
 }
+
+
+/**
+ * Registers headlines required to autocomplete the user logins
+ *
+ * @param string alias, url or filename (relative to rsc/css, rsc/js) for JS/CSS files
+ */
+function init_autocomplete_login_js( $relative_to = 'rsc_url' )
+{
+	require_js( '#jquery#', $relative_to ); // dependency
+
+	// Use hintbox plugin of jQuery
+
+	// Add jQuery hintbox (autocompletion).
+	// Form 'username' field requires the following JS and CSS.
+	// fp> TODO: think about a way to bundle this with other JS on the page -- maybe always load hintbox in the backoffice
+	//     dh> Handle it via http://www.appelsiini.net/projects/lazyload ?
+	// dh> TODO: should probably also get ported to use jquery.ui.autocomplete (or its successor)
+	require_css( 'jquery/jquery.hintbox.css', $relative_to );
+	require_js( 'jquery/jquery.hintbox.min.js', $relative_to );
+	add_js_headline( 'jQuery( document ).ready( function()
+	{
+		jQuery( "input.autocomplete_login" ).hintbox(
+		{
+			url: "'.get_secure_htsrv_url().'async.php?action=get_login_list",
+			matchHint: true,
+			autoDimentions: true
+		} );
+	} );' );
+}
+
 
 /**
  * Outputs the collected HTML HEAD lines.
@@ -1669,7 +1702,7 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
  * @param array contains object which were already seen
  * @return boolean true if contains recursion false otherwise
  */
-function is_recursive( array & $array, array & $alreadySeen = array() )
+function is_recursive( /*array*/ & $array, /*array*/ & $alreadySeen = array() )
 {
     static $uniqueObject;
     if( !$uniqueObject )
@@ -1702,7 +1735,7 @@ function is_recursive( array & $array, array & $alreadySeen = array() )
         array_pop( $item );
 
         if( $recursionDetected || is_recursive( $item, $alreadySeen ) )
-        { // Check until recursion detected or there are not more arrays 
+        { // Check until recursion detected or there are not more arrays
             return true;
         }
     }
@@ -2037,9 +2070,11 @@ function display_lostpassword_form( $login, $hidden_params )
 	echo '<li>'.T_('Please enter your login (or email address) below.').'</li>';
 	echo '<li>'.T_('An email will be sent to your registered email address immediately.').'</li>';
 	echo '<li>'.T_('As soon as you receive the email, click on the link therein to change your password.').'</li>';
+	echo '<li>'.T_('Your browser will open a page where you can chose a new password.').'</li>';
 	echo '</ol>';
+	echo '<p class="red"><strong>'.T_('Important: for security reasons, you must do steps 1 and 4 on the same computer and same web browser. Do not close your browser in between.').'</strong></p>';
 
-	$Form->text( $dummy_fields[ 'login' ], $login, 16, T_('Login'), '', 255, 'input_text' );
+	$Form->text( $dummy_fields[ 'login' ], $login, 30, T_('Login'), '', 255, 'input_text' );
 
 	$Form->buttons_input( array(array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Send me an email now!'), 'class' => 'ActionButton' )) );
 
@@ -2266,7 +2301,7 @@ function display_password_indicator( $params = array() )
 			pstatus.innerHTML = bar_status;
 		}
 		if( ".$params['disp-time']." ) {
-			document.getElementById('p-time').innerHTML = '".T_('Estimated crack time').": ' + passcheck.crack_time_display;
+			document.getElementById('p-time').innerHTML = '".TS_('Estimated crack time').": ' + passcheck.crack_time_display;
 		}
 	}
 </script>";
@@ -2287,9 +2322,9 @@ function display_login_validator( $params = array() )
 		), $params );
 
 	echo '<script type="text/javascript">
-	var login_icon_load = \'<img src="'.$rsc_url.'img/ajax-loader.gif" alt="'.T_('Loading...').'" title="'.T_('Loading...').'" style="margin:2px 0 0 5px" align="top" />\';
-	var login_icon_available = \''.get_icon( 'allowback' ).'\';
-	var login_icon_exists = \''.get_icon( 'xross' ).'\';
+	var login_icon_load = \'<img src="'.$rsc_url.'img/ajax-loader.gif" alt="'.TS_('Loading...').'" title="'.TS_('Loading...').'" style="margin:2px 0 0 5px" align="top" />\';
+	var login_icon_available = \''.get_icon( 'allowback', 'imgtag', array( 'title' => TS_('This username is available.') ) ).'\';
+	var login_icon_exists = \''.get_icon( 'xross', 'imgtag', array( 'title' => TS_('This username is already in use. Please choose another one.') ) ).'\';
 
 	var login_text_empty = \''.TS_('Choose an username.').'\';
 	var login_text_available = \''.TS_('This username is available.').'\';
@@ -2330,11 +2365,4 @@ function display_login_validator( $params = array() )
 </script>';
 }
 
-
-/*
- * $Log$
- * Revision 1.122  2013/11/06 09:08:46  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

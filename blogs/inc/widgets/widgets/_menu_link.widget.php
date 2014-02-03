@@ -137,6 +137,19 @@ class menu_link_Widget extends ComponentWidget
 					'type' => 'select',
 					'options' => $menu_link_widget_link_types,
 					'defaultvalue' => 'home',
+					'onchange' => '
+						var curr_link_type = this.value;
+						var allow_blockcache = jQuery("[id$=\'_set_allow_blockcache\']");
+						if( curr_link_type == "login" || curr_link_type == "register" )
+						{
+							allow_blockcache.removeAttr(\'checked\');
+							allow_blockcache.attr( \'disabled\', \'disabled\' );
+						}
+						else
+						{
+							allow_blockcache.removeAttr(\'disabled\');
+							allow_blockcache.attr( \'checked\', \'checked\' );
+						};'
 				),
 				'link_text' => array(
 					'label' => T_('Link text'),
@@ -161,6 +174,19 @@ class menu_link_Widget extends ComponentWidget
 					'defaultvalue' => '',
 				),
 			), parent::get_param_definitions( $params )	);
+
+		// Disable allow blockcache if the link type param is set to 'login' or 'register'
+		// Do not modify anything during update because the editing form contains all of the required modifications
+		if( !isset( $params['for_updating'] ) && ( ! empty( $this->params ) ) && ( ! isset( $params['infinite_loop'] ) ) )
+		{ // This is an already existing widget
+			$link_type = $this->get_param( 'link_type', true );
+			if( $link_type == 'login' || $link_type == 'register' )
+			{ // Disable allow blockcache
+				$r['allow_blockcache']['defaultvalue'] = false;
+				$r['allow_blockcache']['disabled'] = 'disabled';
+				$this->set( 'allow_blockcache', false );
+			}
+		}
 
 		return $r;
 	}
@@ -467,11 +493,4 @@ class menu_link_Widget extends ComponentWidget
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.30  2013/11/06 09:09:09  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

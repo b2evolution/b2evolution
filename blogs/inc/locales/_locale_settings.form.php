@@ -51,9 +51,11 @@ if( $action == 'edit' )
 { // Edit a locale:
 	param( 'template', 'string', ($edit_locale == '_new_') ? T_('Create new locale') : T_('Edit locale'), 'createnew' );
 
-	$Form = new Form( $pagenow, 'loc_checkchanges' );
+	$Form = new Form( NULL, 'loc_checkchanges', 'post', 'compact' );
 
-	$Form->begin_form( 'fform' );
+	$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,template' ) );
+
+	$Form->begin_form( 'fform', T_('Locale settings').get_manual_link('locale-form') );
 
 	$Form->add_crumb( 'locales' );
 	$Form->hidden( 'ctrl', 'locales' );
@@ -83,7 +85,6 @@ if( $action == 'edit' )
 	}
 	$Form->hidden( 'newloc_transliteration_map', (isset($ltemplate['transliteration_map']) ? base64_encode(serialize($ltemplate['transliteration_map'])) : '') );
 
-	$Form->begin_fieldset( T_('Locale settings') );
 	$Form->text( 'newloc_locale', $newlocale, 20, T_('Locale'), sprintf(T_('The first two letters should be a <a %s>ISO 639 language code</a>. The last two letters should be a <a %s>ISO 3166 country code</a>.'), 'href="http://www.gnu.org/software/gettext/manual/html_chapter/gettext_15.html#SEC221"', 'href="http://www.gnu.org/software/gettext/manual/html_chapter/gettext_16.html#SEC222"'), 20 );
 	$Form->checkbox( 'newloc_enabled', (isset($ltemplate['enabled']) && $ltemplate['enabled']), T_('Enabled'),	T_('Should this locale be available to users?') );
 	$Form->text( 'newloc_name', (isset($ltemplate['name']) ? $ltemplate['name'] : ''), 40, T_('Name'),
@@ -109,7 +110,6 @@ if( $action == 'edit' )
 	{ // remove the locale we want to edit from the generated array
 		$l_warnfor = str_replace("'$newlocale'", "'thiswillneverevermatch'", $l_warnfor);
 	}
-	$Form->end_fieldset();
 
 	$Form->end_form( array( array( 'submit', 'submit', ($edit_locale == '_new_') ? T_('Create') : T_('Update'), 'SaveButton' ),
 													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
@@ -173,7 +173,7 @@ else
 	$Form->hidden( 'action', 'update' );
 	$Form->hidden( 'loc_transinfo', $loc_transinfo );
 
-	$Form->begin_fieldset( T_('Regional settings').get_manual_link('regional_settings') );
+	$Form->begin_fieldset( T_('Regional settings').get_manual_link('locales-tab') );
 
 	if( ! isset($locales[$Settings->get('default_locale')])
 		|| ! $locales[$Settings->get('default_locale')]['enabled'] )
@@ -187,7 +187,7 @@ else
 	$Form->end_fieldset();
 
 
-	$Form->begin_fieldset( T_('Available locales') );
+	$Form->begin_fieldset( T_('Available locales').get_manual_link('locales-tab') );
 
 	echo '<p class="center">';
 	if( $loc_transinfo )
@@ -334,7 +334,7 @@ else
 
 			echo action_icon( T_('Copy locale'), 'copy', '?ctrl=locales&amp;action=edit&amp;edit_locale=_new_&amp;template='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '' ) );
 
-			echo action_icon( T_('Edit locale'), 'edit', '?ctrl=locales&amp;action=edit&amp;edit_locale=_new_&amp;template='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '' ) );
+			echo action_icon( T_('Edit locale'), 'edit', '?ctrl=locales&amp;action=edit&amp;edit_locale=_edit_&amp;template='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '' ) );
 
 			if( isset($lval[ 'fromdb' ]) )
 			{ // allow to delete locales loaded from db
@@ -401,10 +401,4 @@ else
 	}
 }
 
-/*
- * $Log$
- * Revision 1.16  2013/11/06 08:04:25  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

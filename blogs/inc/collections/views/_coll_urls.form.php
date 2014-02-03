@@ -274,19 +274,36 @@ $Form->end_fieldset();
 // Javascript juice for the tag fields.
 ?>
 <script type="text/javascript">
-jQuery("#tag_links_fieldset input[type=radio]").click( function()
+jQuery( '#tag_links_fieldset input[type=radio]' ).click( function()
 {
-	// Disable tag_prefix, if "param" is used.
-	jQuery('#tag_prefix').attr("disabled", this.value == 'param' ? "disabled" : "");
-	// Disable tag_rel_attrib, if "prefix-only" is not used.
-	jQuery('#tag_rel_attrib').attr("disabled", this.value == 'prefix-only' ? "" : "disabled");
+	if( jQuery( this ).val() == 'param' )
+	{ // Disable tag_prefix, if "param" is used.
+		jQuery( '#tag_prefix' ).attr( 'disabled', 'disabled' );
+	}
+	else
+	{
+		jQuery( '#tag_prefix' ).removeAttr( 'disabled' );
+	}
+
+	if( jQuery( this ).val() == 'prefix-only' )
+	{ // Enable tag_rel_attrib, if "prefix-only" is used.
+		jQuery( '#tag_rel_attrib' ).removeAttr( 'disabled' );
+	}
+	else
+	{
+		jQuery( '#tag_rel_attrib' ).attr( 'disabled', 'disabled' );
+	}
 
 	// NOTE: dh> ".closest('fieldset').andSelf()" is required for the add-field_required-class-to-fieldset-hack. Remove as appropriate.
-	if( this.value == 'prefix-only' )
-		jQuery('#tag_prefix').closest('fieldset').andSelf().addClass('field_required');
+	if( jQuery( this ).val() == 'prefix-only' )
+	{
+		jQuery( '#tag_prefix' ).closest( 'fieldset' ).andSelf().addClass( 'field_required' );
+	}
 	else
-		jQuery('#tag_prefix').closest('fieldset').andSelf().removeClass('field_required');
-} ).filter(":checked").click();
+	{
+		jQuery( '#tag_prefix' ).closest( 'fieldset' ).andSelf().removeClass( 'field_required' );
+	}
+} ).filter( ':checked' ).click();
 
 // Set text of span.tag_links_tag_prefix according to this field, defaulting to "tag" for "prefix-only".
 jQuery("#tag_prefix").keyup( function() {
@@ -331,10 +348,4 @@ $Form->buttons( array( array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
 
 $Form->end_form();
 
-/*
- * $Log$
- * Revision 1.31  2013/11/06 08:03:58  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

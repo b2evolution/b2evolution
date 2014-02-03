@@ -108,6 +108,16 @@ class coll_category_list_Widget extends ComponentWidget
 					'defaultvalue' => 0,
 					'note' => T_('Add checkboxes to allow selection of multiple categories.'),
 				),
+			'default_match' => array(
+					'label' => T_('Default Match'),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array(
+							array( 'or', T_('OR') ),
+							array( 'nor', T_('NOR') ),
+							array( 'and', T_('AND') ) ),
+					'defaultvalue' => 'or',
+				),
 			'disp_names_for_coll_list' => array(
 					'type' => 'checkbox',
 					'label' => T_('Display blog names'),
@@ -179,7 +189,8 @@ class coll_category_list_Widget extends ComponentWidget
 
 			if( $this->disp_params['option_all'] )
 			{	// We want to display a link to all cats:
-				$tmp_disp .= $this->disp_params['item_start'].'<a href="';
+				$tmp_disp .= $this->add_cat_class_attr( $this->disp_params['item_start'], 'all' );
+				$tmp_disp .= '<a href="';
 				if( $this->disp_params['link_type'] == 'context' )
 				{	// We want to preserve current browsing context:
 					$tmp_disp .= regenerate_url( 'cats,catsel' );
@@ -262,23 +273,37 @@ class coll_category_list_Widget extends ComponentWidget
 
 
 		if( $this->disp_params['use_form'] || $this->disp_params['display_checkboxes'] )
-		{	// We want to add form fields:
+		{ // We want to add form fields:
+			if( $cat_modifier == '-' || ( empty( $cat_modifier ) && $this->disp_params['default_match'] == 'nor' ) )
+			{ // Select NOR
+				$cat_modifier_selected = 'nor';
+			}
+			else if( $cat_modifier == '*' || ( empty( $cat_modifier ) && $this->disp_params['default_match'] == 'and' ) )
+			{ // Select AND
+				$cat_modifier_selected = 'and';
+			}
+			else
+			{ // Select OR
+				$cat_modifier_selected = 'or';
+			}
 		?>
+		<div class="multiple_cat_match_options">
+			<p class="multiple_cat_match_title"><?php echo T_('Retain only results that match:'); ?></p>
 			<div class="tile">
-				<input type="radio" name="cat" value="" id="catANY" class="radio" <?php if( $cat_modifier != '-' && $cat_modifier != '*' ) echo 'checked="checked" '?> />
-				<label for="catANY"><?php echo T_('ANY') ?></label>
+				<input type="radio" name="cat" value="|" id="cat_or" class="radio"<?php if( $cat_modifier_selected == 'or' ) echo ' checked="checked"'; ?> />
+				<label for="cat_or"><?php echo T_( 'Any selected category (OR)' ); ?></label>
 			</div>
 			<div class="tile">
-				<input type="radio" name="cat" value="-" id="catANYBUT" class="radio" <?php if( $cat_modifier == '-' ) echo 'checked="checked" '?> />
-				<label for="catANYBUT"><?php echo T_('ANY BUT') ?></label>
+				<input type="radio" name="cat" value="-" id="cat_nor" class="radio"<?php if( $cat_modifier_selected == 'nor' ) echo ' checked="checked"'; ?> />
+				<label for="cat_nor"><?php echo T_( 'None of the selected categories (NOR)' ); ?></label>
 			</div>
 			<div class="tile">
-				<input type="radio" name="cat" value="*" id="catALL" class="radio" <?php if( $cat_modifier == '*' ) echo 'checked="checked" '?> />
-				<label for="catALL"><?php echo T_('ALL') ?></label>
+				<input type="radio" name="cat" value="*" id="cat_and" class="radio"<?php if( $cat_modifier_selected == 'and' ) echo ' checked="checked"'; ?> />
+				<label for="cat_and"><?php echo T_( 'All of the selected categories (AND)' ); ?></label>
 			</div>
-		<?php
+			<?php
 			if( $this->disp_params['use_form'] )
-			{	// We want a complete form:
+			{ // We want a complete form:
 			?>
 				<div class="tile">
 					<input type="submit" value="<?php echo T_( 'Filter categories' ); ?>" />
@@ -286,6 +311,9 @@ class coll_category_list_Widget extends ComponentWidget
 				</form>
 			<?php
 			}
+			?>
+		</div>
+		<?php
 		}
 
 		echo $this->disp_params['block_end'];
@@ -312,29 +340,36 @@ class coll_category_list_Widget extends ComponentWidget
 
 		$exclude_cats = sanitize_id_list($this->disp_params['exclude_cats'], true);
 		if( in_array( $Chapter->ID, $exclude_cats ) )
-		{    // Cat ID is excluded, skip it
+		{ // Cat ID is excluded, skip it
 			return;
 		}
 
 		if( in_array( $Chapter->ID, $cat_array ) )
-		{	// This category is in the current selection
-			$r = $this->disp_params['item_selected_start'];
+		{ // This category is in the current selection
+			$start_tag = $this->disp_params['item_selected_start'];
 		}
 		else if( empty( $Chapter->children ) )
-		{	// This category has no children
-			$r = $this->disp_params['item_last_start'];
+		{ // This category has no children
+			$start_tag = $this->disp_params['item_last_start'];
 		}
 		else
 		{
-			$r = $this->disp_params['item_start'];
+			$start_tag = $this->disp_params['item_start'];
 		}
 
+		if( $Chapter->meta )
+		{ // Add class name "meta" for meta categories
+			$start_tag = $this->add_cat_class_attr( $start_tag, 'meta' );
+		}
+
+		$r = $start_tag;
+
 		if( $this->disp_params['use_form'] || $this->disp_params['display_checkboxes'] )
-		{	// We want to add form fields:
+		{ // We want to add form fields:
 			$cat_checkbox_params = '';
 			if( $Chapter->meta )
-			{	// Hide and disable the checkbox of meta category
-				$cat_checkbox_params = ' style="visibility:hidden" disabled="disabled"';
+			{ // Disable the checkbox of meta category ( and hide it by css )
+				$cat_checkbox_params = ' disabled="disabled"';
 			}
 
 			$r .= '<label><input type="checkbox" name="catsel[]" value="'.$Chapter->ID.'" class="checkbox middle"';
@@ -345,33 +380,26 @@ class coll_category_list_Widget extends ComponentWidget
 			$r .= $cat_checkbox_params.' /> ';
 		}
 
-		$cat_name_params = '';
-		if( $Chapter->meta )
-		{	// Mark the meta category with bold style
-			$cat_name_params = ' style="font-weight:bold"';
+		$cat_name = $Chapter->dget('name');
+		if( $Chapter->lock && isset( $this->disp_params['show_locked'] ) && $this->disp_params['show_locked'] )
+		{
+			$cat_name .= '<span style="padding:0 5px;" >'.get_icon( 'file_not_allowed', 'imgtag', array( 'title' => T_('Locked') ) ).'</span>';
 		}
 
+		// Make a link from category name
 		$r .= '<a href="';
-
 		if( $this->disp_params['link_type'] == 'context' )
-		{	// We want to preserve current browsing context:
+		{ // We want to preserve current browsing context:
 			$r .= regenerate_url( 'cats,catsel', 'cat='.$Chapter->ID );
 		}
 		else
 		{
 			$r .= $Chapter->get_permanent_url();
 		}
-
-		$cat_name = $Chapter->dget('name');
-		if( $Chapter->lock && isset( $this->disp_params['show_locked'] ) && $this->disp_params['show_locked'] )
-		{
-			$cat_name .= '<span style="padding:0 5px;" >'.get_icon( 'file_not_allowed', 'imgtag', array( 'title' => T_('Locked')) ).'</span>';
-		}
-
-		$r .= '"'.$cat_name_params.'>'.$cat_name.'</a>';
+		$r .= '">'.$cat_name.'</a>';
 
 		if( $this->disp_params['use_form'] || $this->disp_params['display_checkboxes'] )
-		{	// We want to add form fields:
+		{ // We want to add form fields:
 			$r .= '</label>';
 		}
 
@@ -430,13 +458,26 @@ class coll_category_list_Widget extends ComponentWidget
 		}
 		return $r;
 	}
+
+
+	/**
+	 * Add new class name for start tag
+	 *
+	 * @param string HTML start tag: e.g. <div class="div_class"> or <div>
+	 * @param string New class name
+	 * @return string HTML start tag with new added class name
+	 */
+	function add_cat_class_attr( $start_tag, $class_name )
+	{
+		if( preg_match( '/ class="[^"]*"/i', $start_tag ) )
+		{ // Append to already existing attribute
+			return preg_replace( '/ class="([^"]*)"/i', ' class="$1 '.$class_name.'"', $start_tag );
+		}
+		else
+		{ // Add new attribute for meta class
+			return preg_replace( '/^<([^\s>]+)/', '<$1 class="'.$class_name.'"', $start_tag );
+		}
+	}
 }
 
-
-/*
- * $Log$
- * Revision 1.30  2013/11/06 08:05:09  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

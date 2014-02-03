@@ -68,7 +68,7 @@ function dbm_delete_pagecache()
 				$Messages->add( sprintf( T_('Could not delete blog %d cache: %s'), $l_blog, $cache_path.'c'.$l_blog ), 'error' );
 			}
 			// Create .htaccess file with deny rules
-			create_htaccess_deny( $cache_path.'c'.$l_blog.'/' );
+			create_htaccess_deny( $cache_path );
 		}
 	}
 
@@ -178,7 +178,7 @@ function dbm_optimize_tables_process( $display_messages = true, $separate_tables
 	if( $display_messages )
 	{ // Display messages
 		echo '<b>'.sprintf( T_('Optimize %s tables...'), $table_type ).'</b><br />';
-		flush();
+		evo_flush();
 	}
 	$timer_name = 'optimize_'.strtolower( $table_type );
 
@@ -198,7 +198,7 @@ function dbm_optimize_tables_process( $display_messages = true, $separate_tables
 					dbm_display_result_messages( $table_results, 'optimize' );
 					echo '<b>'.sprintf( T_('Time: %s seconds'), $Timer->get_duration( $timer_name.'_table' ) ).'</b><br /><br />';
 				}
-				flush();
+				evo_flush();
 				$results = array_merge( $results, $table_results );
 			}
 		}
@@ -217,7 +217,7 @@ function dbm_optimize_tables_process( $display_messages = true, $separate_tables
 			dbm_display_result_messages( $results, 'optimize' );
 		}
 		echo '<b>'.sprintf( T_('Full execution time: %s seconds'), $Timer->get_duration( $timer_name ) ).'</b><br /><br />';
-		flush();
+		evo_flush();
 	}
 
 	return $results;
@@ -349,6 +349,191 @@ function dbm_delete_orphan_comment_uploads()
 
 
 /**
+ * Find and delete orphan File objects with no matching file on disk
+ */
+function dbm_delete_orphan_files()
+{
+	global $DB;
+
+	$FileCache = & get_FileCache();
+
+	echo T_('Deleting of the orphan File objects from the database...');
+	evo_flush();
+
+	$files_SQL = new SQL();
+	$files_SQL->SELECT( 'file_ID' );
+	$files_SQL->FROM( 'T_files' );
+	$files_SQL->ORDER_BY( 'file_ID' );
+
+	$count_files_valid = 0;
+	$count_files_deleted = 0;
+
+	$page_size = 100;
+	$current_page = 0;
+	while( 1 )
+	{ // Search the files by page to save memory
+		$files_SQL->LIMIT( ( $current_page * $page_size ).', '.$page_size );
+		$files = $DB->get_col( $files_SQL->get() );
+
+		if( empty( $files ) )
+		{ // All files were verified, Stop here
+			break;
+		}
+
+		foreach( $files as $file_ID )
+		{
+			$File = & $FileCache->get_by_ID( $file_ID, false, false );
+
+			if( $File !== false )
+			{ // File object is correct
+				if( $File->exists() )
+				{ // File exists on the disk
+					$count_files_valid++;
+				}
+				else
+				{ // File doesn't exist on the disk, Remove it from DB
+					$File->dbdelete();
+					$count_files_deleted++;
+				}
+			}
+		}
+
+		echo ' .';
+		evo_flush();
+
+		// Clear cache after each page to save memory
+		$FileCache->clear();
+
+		$current_page++;
+	}
+
+	echo 'OK<p>';
+	echo sprintf( T_('%d File objects have been deleted.'), $count_files_deleted ).'<br />';
+	echo sprintf( T_('%d File objects are valid entries.'), $count_files_valid ).'</p>';
+
+	// Call a tool to remove all orphan file roots from disk and DB
+	dbm_delete_orphan_file_roots();
+}
+
+
+/**
+ * Remove orphan file roots ( with no matching Blog or User entry in the database ) recursively with all of the content
+ */
+function dbm_delete_orphan_file_roots()
+{
+	global $DB, $media_path;
+
+	echo T_('Removing of the orphan file roots recursively with all of the content... ');
+	evo_flush();
+
+	// Store all directories that must be deleted
+	$delete_dirs = array();
+
+	/* BLOGS */
+
+	// Get the media diretories of all existing blogs
+	$BlogCache = & get_BlogCache();
+	$BlogCache->load_all();
+	$blog_dirs = array();
+	foreach( $BlogCache->cache as $Blog )
+	{
+		$blog_dirs[] = $Blog->get_media_dir();
+	}
+	$BlogCache->clear();
+
+	$media_path_blogs = $media_path.'blogs/';
+
+	if( ( $media_dir_blogs = @opendir( $media_path_blogs ) ) === false )
+	{ // Could not open blogs media dir
+		echo '<p class="red">'.sprintf( T_('Cannot open blogs media directory %s'), '<b>'.$media_path_blogs.'</b>' ).'</p>';
+	}
+	else
+	{
+		// Find the blog dirs that must be deleted
+		while( ( $folder = readdir( $media_dir_blogs ) ) !== false )
+		{
+			if( $folder == '.' || $folder == '..' || ! is_dir( $media_path_blogs.$folder ) )
+			{ // Skip files
+				continue;
+			}
+			if( ! in_array( $media_path_blogs.$folder.'/', $blog_dirs ) )
+			{ // This dir must be deleted because it is not media dir of the existing blogs
+				$delete_dirs[] = $media_path_blogs.$folder.'/';
+			}
+		}
+
+		closedir( $media_dir_blogs );
+	}
+
+	/* USERS */
+	echo '. ';
+	evo_flush();
+
+	// Get logins of all existing users
+	$SQL = new SQL();
+	$SQL->SELECT( 'user_login' );
+	$SQL->FROM( 'T_users' );
+	$user_logins = $DB->get_col( $SQL->get() );
+
+	$media_path_users = $media_path.'users/';
+
+	if( ( $media_dir_users = @opendir( $media_path_users ) ) === false )
+	{ // Could not open users media dir
+		echo '<p class="red">'.sprintf( T_('Cannot open users media directory %s'), '<b>'.$media_path_users.'</b>' ).'</p>';
+	}
+	else
+	{
+		// Find the user dirs that must be deleted
+		while( ( $folder = readdir( $media_dir_users ) ) !== false )
+		{
+			if( $folder == '.' || $folder == '..' || ! is_dir( $media_path_users.$folder ) )
+			{ // Skip files
+				continue;
+			}
+			if( ! in_array( $folder, $user_logins ) )
+			{ // This dir must be deleted because it is not media dir of the existing users
+				$delete_dirs[] = $media_path_users.$folder.'/';
+			}
+		}
+
+		closedir( $media_dir_users );
+	}
+
+	/* DELETE broken  file roots */
+	echo '. ';
+	evo_flush();
+
+	foreach( $delete_dirs as $delete_dir )
+	{
+		if( rmdir_r( $delete_dir ) )
+		{ // Success deleting
+			echo '<p class="green">'.sprintf( T_('Invalid file root %s was found and removed with all of its content.'), '<b>'.$delete_dir.'</b>' ).'</p>';
+		}
+		else
+		{ // Failed deleting
+			echo '<p class="red">'.sprintf( T_('Cannot delete directory %s. Please check the permissions or delete it manually.'), '<b>'.$delete_dir.'</b>' ).'</p>';
+		}
+	}
+
+	/* DELETE orphan DB file records of the blogs and the users */
+	echo '. ';
+	evo_flush();
+
+	$count_files_deleted = $DB->query( 'DELETE f, l, fv FROM T_files AS f
+			 LEFT JOIN T_links AS l ON l.link_file_ID = f.file_ID
+			 LEFT JOIN T_files__vote AS fv ON fv.fvot_file_ID = f.file_ID
+		WHERE ( file_root_type = "collection"
+		        AND file_root_ID NOT IN ( SELECT blog_ID FROM T_blogs ) )
+		   OR ( file_root_type = "user"
+		        AND file_root_ID NOT IN ( SELECT user_ID FROM T_users ) )' );
+
+	echo 'OK.<p>';
+	echo sprintf( T_('%d File roots have been removed from the disk.'), count( $delete_dirs ) ).'<br />';
+	echo sprintf( T_('%d File objects have been deleted from DB.'), intval( $count_files_deleted ) ).'</p>';
+}
+
+
+/**
  * Recreate all item slugs (change title-[0-9] canonical slugs to a slug generated from current title). Old slugs will still work, but redirect to the new one.
  */
 function dbm_recreate_itemslugs()
@@ -386,6 +571,26 @@ function dbm_recreate_itemslugs()
 
 
 /**
+ * Recreate all autogenerated posts excerpts.
+ */
+function dbm_recreate_autogenerated_excerpts()
+{
+	global $DB;
+
+	$continue_url = regenerate_url('action,crumb,remove_all_excerpts', 'action=recreate_autogenerated_excerpts&amp;remove_all_excerpts=0&amp;'.url_crumb('tools') );
+	$remove_all_excerpts = param( 'remove_all_excerpts', 'boolean', 1 );
+
+	// Display process status
+	echo $remove_all_excerpts ? T_('Re-creating of autogenerated excerpts...') : T_('Continue re-creating of autogenerated excerpts...');
+	evo_flush();
+
+	recreate_autogenerated_excerpts( $continue_url, $remove_all_excerpts, true );
+	$custom_excerpts = $DB->get_var( 'SELECT count(*) FROM T_items__item WHERE post_excerpt_autogenerated = 0' );
+	echo '<br />'.sprintf( T_('All autogenerated excerpts were re-created ( %d custom excerpts were left untouched ).'), $custom_excerpts ).'<br />';
+}
+
+
+/**
  * Check DB tables
  *
  * @param boolean Display messages
@@ -411,7 +616,7 @@ function dbm_check_tables( $display_messages = true, $separate_tables = true )
 	if( $display_messages )
 	{ // Display messages
 		echo '<b>'.T_('Check tables...').'</b><br />';
-		flush();
+		evo_flush();
 	}
 
 	$Timer->start( 'check_tables' );
@@ -428,7 +633,7 @@ function dbm_check_tables( $display_messages = true, $separate_tables = true )
 				dbm_display_result_messages( $table_results, 'check' );
 				echo '<b>'.sprintf( T_('Time: %s seconds'), $Timer->get_duration( 'check_one_table' ) ).'</b><br /><br />';
 			}
-			flush();
+			evo_flush();
 			$check_results = array_merge( $check_results, $table_results );
 		}
 	}
@@ -477,7 +682,7 @@ function dbm_analyze_tables( $display_messages = true, $separate_tables = true )
 	if( $display_messages )
 	{ // Display messages
 		echo '<b>'.T_('Analyze tables...').'</b><br />';
-		flush();
+		evo_flush();
 	}
 
 	$Timer->start( 'analyze_tables' );
@@ -494,7 +699,7 @@ function dbm_analyze_tables( $display_messages = true, $separate_tables = true )
 				dbm_display_result_messages( $table_results, 'analyze' );
 				echo '<b>'.sprintf( T_('Time: %s seconds'), $Timer->get_duration( 'analyze_one_table' ) ).'</b><br /><br />';
 			}
-			flush();
+			evo_flush();
 			$analyze_results = array_merge( $analyze_results, $table_results );
 		}
 	}
@@ -514,5 +719,25 @@ function dbm_analyze_tables( $display_messages = true, $separate_tables = true )
 	}
 
 	return $analyze_results;
+}
+
+
+/**
+ * Update a progress information, display how many is done from all
+ *
+ * @param string the id of the html element which content must be replaced with the current values
+ * @param integer done
+ * @param integer all
+ */
+function echo_progress_log_update( $progress_log_id, $done, $all )
+{
+	echo '<span class="function_echo_progress_log_update">';
+	?>
+	<script type="text/javascript">
+		jQuery('.function_echo_progress_log_update').remove();
+		jQuery( '#' + '<?php echo $progress_log_id; ?>' ).html("<?php echo ' '.$done.' / '.$all ?>");
+	</script>
+	<?php
+	echo '</span>';
 }
 ?>

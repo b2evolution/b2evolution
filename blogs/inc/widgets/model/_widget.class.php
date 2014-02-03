@@ -147,7 +147,7 @@ class ComponentWidget extends DataObject
 		load_funcs('plugins/_plugin.funcs.php');
 
 		// Loop through all widget params:
-		foreach( $this->get_param_definitions( array('for_editing'=>true) ) as $parname => $parmeta )
+		foreach( $this->get_param_definitions( array( 'for_editing' => true, 'for_updating' => true  ) ) as $parname => $parmeta )
 		{
 			autoform_set_param_from_request( $parname, $parmeta, $this, 'Widget' );
 		}
@@ -295,9 +295,10 @@ class ComponentWidget extends DataObject
 	/**
  	 * Get param value.
  	 * @param string
+ 	 * @param boolean default false, set to true only if it is called from a widget::get_param_definition() function to avoid infinite loop
  	 * @return mixed
 	 */
-	function get_param( $parname )
+	function get_param( $parname, $check_infinite_loop = false )
 	{
 		$this->load_param_array();
 		if( isset( $this->param_array[$parname] ) )
@@ -306,7 +307,8 @@ class ComponentWidget extends DataObject
 		}
 
 		// Try default values:
-		$params = $this->get_param_definitions( NULL );
+		// Note we set 'infinite_loop' param to avoid calling the get_param() from the get_param_definitions() function recursively
+		$params = $this->get_param_definitions( $check_infinite_loop ? array( 'infinite_loop' => true ) : NULL );
 		if( isset( $params[$parname]['defaultvalue'] ) )
 		{	// We ahve a default value:
 			return $params[$parname]['defaultvalue'] ;
@@ -326,7 +328,7 @@ class ComponentWidget extends DataObject
 	 */
 	function set( $parname, $parvalue, $make_null = false )
 	{
-		$params = $this->get_param_definitions( NULL );
+		$params = $this->get_param_definitions( array( 'infinite_loop' => true ) );
 
 		if( isset( $params[$parname] ) )
 		{	// This is a widget specific param:
@@ -760,11 +762,4 @@ class ComponentWidget extends DataObject
 
 }
 
-
-/*
- * $Log$
- * Revision 1.84  2013/11/06 09:09:09  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

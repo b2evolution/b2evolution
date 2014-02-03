@@ -34,26 +34,33 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 function hits_results( & $Results, $params = array() )
 {
+	$params = array_merge( array(
+			'default_order' => '--D'
+		), $params );
+
 	global $blog, $Session, $sess_ID;
 	global $preset_results_title, $preset_referer_type, $preset_filter_all_url;
-	global $hide_columns;
+	global $hide_columns, $admin_url;
 
 	$hide_columns = explode( ',', $hide_columns );
 
-	$Results->title = isset( $preset_results_title ) ? $preset_results_title : T_('Recent hits');
+	$Results->title = isset( $preset_results_title ) ? $preset_results_title : T_('Recent hits').get_manual_link( 'recent-hits-list' );
+
+	$param_prefix = 'results_'.$Results->param_prefix;
+	$tab = get_param( 'tab' );
 
 	$filter_presets = array();
-	$filter_presets['all'] = array( T_('All'), isset( $preset_filter_all_url ) ? $preset_filter_all_url : '?ctrl=stats&amp;tab=hits&amp;blog='.$blog );
+	$filter_presets['all'] = array( T_('All'), isset( $preset_filter_all_url ) ? $preset_filter_all_url : $admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;blog='.$blog.'&amp;'.$param_prefix.'order='.$params['default_order'] );
 	if( !isset( $preset_referer_type ) )
 	{	// Show these presets only when referer type is not set
-		$filter_presets['all_but_curr'] = array( T_('All but current session'), '?ctrl=stats&amp;tab=hits&amp;blog='.$blog.'&amp;sess_ID='.$Session->ID.'&amp;exclude=1' );
-		$filter_presets['direct_hits'] = array( T_('Direct hits'), '?ctrl=stats&amp;agent_type=browser&amp;tab=hits&amp;blog='.$blog.'&amp;referer_type=direct&amp;exclude=0' );
-		$filter_presets['refered_hits'] = array( T_('Refered hits'), '?ctrl=stats&amp;agent_type=browser&amp;tab=hits&amp;blog='.$blog.'&amp;referer_type=referer&amp;exclude=0' );
+		$filter_presets['all_but_curr'] = array( T_('All but current session'), $admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;blog='.$blog.'&amp;sess_ID='.$Session->ID.'&amp;exclude=1&amp;'.$param_prefix.'order='.$params['default_order'] );
+		$filter_presets['direct_hits'] = array( T_('Direct hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.'&amp;blog='.$blog.'&amp;referer_type=direct&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
+		$filter_presets['refered_hits'] = array( T_('Refered hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.'&amp;blog='.$blog.'&amp;referer_type=referer&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
 	}
 
 	$Results->filter_area = array(
 		'callback' => 'filter_hits',
-		'url_ignore' => 'results_hits_page,results_direct_hits_page,results_referer_hits_page,results_search_hits_page,exclude,sess_ID,remote_IP',
+		'url_ignore' => $param_prefix.'page,exclude,sess_ID,remote_IP',
 		'presets' => $filter_presets
 		);
 
@@ -63,19 +70,19 @@ function hits_results( & $Results, $params = array() )
 	}
 	else
 	{
-		$session_link = '<a href="?ctrl=stats&amp;tab=hits&amp;blog='.$blog.'" title="'.T_( 'Show all sessions' ).'">$sess_ID$</a>';
+		$session_link = '<a href="?ctrl=stats&amp;tab='.$tab.'&amp;blog='.$blog.'" title="'.T_( 'Show all sessions' ).'">$sess_ID$</a>';
 	}
 
 	$Results->cols[] = array(
 			'th' => T_('Session'),
-			'order' => 'hit_sess_ID',
+			'order' => 'hit_sess_ID, hit_ID',
 			'td_class' => 'right compact_data',
 			'td' => $session_link,
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('User'),
-			'order' => 'user_login',
+			'order' => 'user_login, hit_ID',
 			'td_class' => 'shrinkwrap compact_data',
 			'td' => '%stat_session_login( #user_login# )%',
 		);
@@ -90,7 +97,7 @@ function hits_results( & $Results, $params = array() )
 
 	$Results->cols[] = array(
 			'th' => T_('Agent'),
-			'order' => 'hit_agent_type',
+			'order' => 'hit_agent_type, hit_ID',
 			'td_class' => 'shrinkwrap compact_data',
 			'td' => '$hit_agent_type$',
 			'extra' => array ( 'style' => 'background-color: %hit_agent_type_color( "#hit_agent_type#" )%;',
@@ -99,26 +106,28 @@ function hits_results( & $Results, $params = array() )
 
 	$Results->cols[] = array(
 			'th' => T_('Device'),
-			'order' => 'sess_device',
+			'order' => 'sess_device, hit_ID',
 			'td_class' => 'shrinkwrap compact_data',
 			'td' => '$sess_device$',
 			'extra' => array ( 'style' => 'background-color: %hit_device_color( "#sess_device#" )%;', 'format_to_output' => false )
 		);
 
 	if( !in_array( 'referer', $hide_columns ) )
-	{
+	{ // Referer Type & Domain
 		$Results->cols[] = array(
-				'th' => T_('Referer'),
-				'order' => 'hit_referer_type',
+				'th_group' => T_('Referer'),
+				'th' => T_('Type'),
+				'order' => 'hit_referer_type, hit_ID',
 				'td_class' => 'shrinkwrap compact_data',
 				'td' => '$hit_referer_type$',
-				'extra' => array (	'style'				=> 'background-color: %hit_referer_type_color( "#hit_referer_type#" )%;',
-									'format_to_output'	=> false)
+				'extra' => array ( 'style' => 'background-color: %hit_referer_type_color( "#hit_referer_type#" )%;',
+					'format_to_output' => false )
 			);
 
 		$Results->cols[] = array(
-				'th' => T_('Referer'),
-				'order' => 'dom_name',
+				'th_group' => T_('Referer'),
+				'th' => T_('Domain'),
+				'order' => 'dom_name, hit_ID',
 				'td_class' => 'nowrap compact_data',
 				'td' => '<a href="$hit_referer$">$dom_name$</a>',
 			);
@@ -127,7 +136,7 @@ function hits_results( & $Results, $params = array() )
 	// Keywords:
 	$Results->cols[] = array(
 			'th' => T_('Search keywords'),
-			'order' => 'hit_keyphrase',
+			'order' => 'hit_keyphrase, hit_ID',
 			'td' => '%stats_search_keywords( #hit_keyphrase#, 45 )%',
 			'td_class' => 'compact_data'
 		);
@@ -135,14 +144,15 @@ function hits_results( & $Results, $params = array() )
 	// Serp Rank:
 	$Results->cols[] = array(
 			'th' => T_('SR'),
-			'order' => 'hit_serprank',
+			'th_title' => T_('Serp rank'),
+			'order' => 'hit_serprank, hit_ID',
 			'td_class' => 'center compact_data',
 			'td' => '$hit_serprank$',
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('Goal'),
-			'order' => 'goal_name',
+			'order' => 'goal_name, hit_ID',
 			'default_dir' => 'D',
 			'td' => '$goal_name$',
 			'td_class' => 'compact_data'
@@ -150,13 +160,13 @@ function hits_results( & $Results, $params = array() )
 
 	$Results->cols[] = array(
 			'th' => T_('Blog'),
-			'order' => 'hit_blog_ID',
+			'order' => 'hit_blog_ID, hit_ID',
 			'td' => '$blog_shortname$',
 			'td_class' => 'compact_data'
 		);
 	$Results->cols[] = array(
 			'th' => T_('Hit type'),
-			'order' => 'hit_type',
+			'order' => 'hit_type, hit_ID',
 			'td_class' => 'shrinkwrap compact_data',
 			'td' => '$hit_type$',
 			'extra' => array (	'style'				=> 'background-color: %hit_type_color( "#hit_type#" )%',
@@ -165,20 +175,20 @@ function hits_results( & $Results, $params = array() )
 	// Requested URI (linked to blog's baseurlroot+URI):
 	$Results->cols[] = array(
 			'th' => T_('Requested URI'),
-			'order' => 'hit_uri',
+			'order' => 'hit_uri, hit_ID',
 			'td' => '%stats_format_req_URI( #hit_blog_ID#, #hit_uri#, 40, #hit_disp#, #hit_ctrl#, #hit_action# )%',
 			'td_class' => 'compact_data'
 		);
 	$Results->cols[] = array(
 			'th' => T_('Resp Code'),
-			'order' => 'hit_response_code',
+			'order' => 'hit_response_code, hit_ID',
 			'td' => '$hit_response_code$',
 			'td_class' => '%hit_response_code_class( #hit_response_code# )% shrinkwrap compact_data'
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('Remote IP'),
-			'order' => 'hit_remote_addr',
+			'order' => 'hit_remote_addr, hit_ID',
 			'td' => '%disp_clickable_log_IP( #hit_remote_addr# )%',
 			'td_class' => 'compact_data'
 		);
@@ -313,33 +323,9 @@ function stat_session_login( $login )
 function stat_session_hits( $sess_ID,  $link_text )
 {
 	global $blog;
-	return '<strong><a href="?ctrl=stats&tab=hits&colselect_submit=Filter+list&sess_ID='.$sess_ID.'&remote_IP=&blog='.$blog.'">'.$link_text.'</a></strong>';
+	return '<strong><a href="?ctrl=stats&tab='.get_param( 'tab' ).'&colselect_submit=Filter+list&sess_ID='.$sess_ID.'&remote_IP=&blog='.$blog.'">'.$link_text.'</a></strong>';
 }
 
-/**
- * Display clickable sessID
- *
- * @param string session ID
- */
-function disp_clickable_log_sessID( $hit_sess_ID)
-{
-	global $current_User, $blog;
-	static $perm = NULL;
-
-	if(empty($perm))
-	{
-	$perm = $current_User->check_perm( 'stats', 'view' );
-	}
-	if($perm == true)
-	{
-		return '<strong><a href="?ctrl=stats&tab=hits&colselect_submit=Filter+list&sess_ID='.$hit_sess_ID.'&remote_IP=&blog='.$blog.'">'.$hit_sess_ID.'</a></strong>';
-	}
-	else
-	{
-		return "$hit_sess_ID";
-	}
-
-}
 
 /**
  * Display clickable log IP address
@@ -351,13 +337,14 @@ function disp_clickable_log_IP( $hit_remote_addr )
 	global $current_User, $blog;
 	static $perm = NULL;
 
-	if(empty($perm))
+	if( empty( $perm ) )
 	{
-	$perm = $current_User->check_perm( 'stats', 'view' );
+		$perm = $current_User->check_perm( 'stats', 'view' );
 	}
-	if($perm == true)
+
+	if( $perm == true )
 	{
-		return '<a href="?ctrl=stats&tab=hits&colselect_submit=Filter+list&sess_ID=&remote_IP='.$hit_remote_addr.'&blog='.$blog.'">'.$hit_remote_addr.'</a>';
+		return '<a href="?ctrl=stats&tab='.get_param( 'tab' ).'&colselect_submit=Filter+list&sess_ID=&remote_IP='.$hit_remote_addr.'&blog='.$blog.'">'.$hit_remote_addr.'</a>';
 	}
 	else
 	{
@@ -365,7 +352,6 @@ function disp_clickable_log_IP( $hit_remote_addr )
 	}
 
 }
-
 
 
 /**
@@ -514,10 +500,4 @@ function hit_referer_type_color($hit_referer_type)
 
 	return $color;
 }
-/*
- * $Log$
- * Revision 1.24  2013/11/06 09:08:59  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

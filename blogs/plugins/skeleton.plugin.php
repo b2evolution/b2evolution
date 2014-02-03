@@ -4,7 +4,7 @@
  * This file provides a skeleton to create a new {@link http://b2evolution.net/ b2evolution}
  * plugin quickly.
  * See also:
- *  - {@link http://manual.b2evolution.net/CreatingPlugin}
+ *  - {@link http://b2evolution.net/man/creating-plugin}
  *  - {@link http://doc.b2evolution.net/stable/plugins/Plugin.html}
  * (Delete this first paragraph, of course)
  * -----------------------------------------------------------------------------------------
@@ -47,8 +47,6 @@ class pluginname_plugin extends Plugin
 	var $version = '0.1-dev';
 	var $author = 'http://example.com/';
 	var $help_url = '';
-
-	var $apply_rendering = 'opt-in';
 
 	/**
 	 * Group of the plugin, e.g. "widget", "rendering", "antispam"

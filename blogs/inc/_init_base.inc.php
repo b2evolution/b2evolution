@@ -52,15 +52,15 @@ $is_web = ! $is_cli;
 
 
 if( $maintenance_mode )
-{	// Maintenance mode with a conf switch
+{ // Maintenance mode with a conf switch
 	header('HTTP/1.0 503 Service Unavailable');
 	echo '<h1>503 Service Unavailable</h1>';
 	die( 'The site is temporarily down for maintenance.' );
 }
-elseif( file_exists( $conf_path.'imaintenance.html') )
-{	// Maintenance mode with a file - "imaintenance.html" with an "i" prevents access to the site but NOT to install
+elseif( file_exists( $conf_path.'imaintenance.html' ) )
+{ // Maintenance mode with a file - "imaintenance.html" with an "i" prevents access to the site but NOT to install
 	header('HTTP/1.0 503 Service Unavailable');
-	readfile( $conf_path.'imaintenance.html');
+	readfile( $conf_path.'imaintenance.html' );
 	die();
 }
 
@@ -91,6 +91,11 @@ $servertimenow = time();
 		}
 	}
 }
+
+/**
+ * Request/Transaction name, used for performance monitoring.
+ */
+$request_transaction_name = '';
 
 
 if( !$config_is_done )
@@ -153,17 +158,10 @@ $Messages = new Messages();
 /*
  * Start timer:
  */
-if( $debug )
-{
-	load_class( '_core/model/_timer.class.php', 'Timer' );
-	$Timer = new Timer('total');
-	$Timer->resume( '_init_base' );
-}
-else
-{
-	load_class( '_core/model/_timer.class.php', 'Timer_noop' );
-	$Timer = new Timer_noop();
-}
+load_class( '_core/model/_timer.class.php', 'Timer' );
+$Timer = new Timer('total');
+$Timer->resume( '_init_base' );
+$Timer->resume( '_MAIN.inc' );
 
 
 
@@ -273,10 +271,4 @@ foreach( $modules as $module )
 
 $Timer->pause( '_init_base' );
 
-/*
- * $Log$
- * Revision 1.9  2013/11/06 08:03:45  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

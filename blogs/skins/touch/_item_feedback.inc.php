@@ -45,6 +45,7 @@ $params = array_merge( array(
 		'comment_error_start'  => '<div class="bComment" id="comment_error">',
 		'comment_error_end'    => '</div>',
 		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
+		'author_link_text'     => 'login', // avatar | only_avatar | login | nickname | firstname | lastname | fullname | preferredname
 		'link_to'              => 'userurl>userpage',		    // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		'form_title_start'     => '<h3 id="respond">',
 		'form_title_end'       => '</h3>',
@@ -243,9 +244,10 @@ if( $Item->can_see_comments( true ) )
 					'Comment'         => & $Comment,
 					'comment_start'   => $params['comment_start'],
 					'comment_end'     => $params['comment_end'],
+					'author_link_text' => $params['author_link_text'],
 					'link_to'         => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 				) );
-			// Note: You can customize the default item feedback by copying the generic
+			// Note: You can customize the default item comment by copying the generic
 			// /skins/_item_comment.inc.php file into the current skin folder.
 			// ---------------------- END OF COMMENT ---------------------
 
@@ -291,7 +293,7 @@ else
 {
 	skin_include( '_item_comment_form.inc.php', $params );
 }
-// Note: You can customize the default item feedback by copying the generic
+// Note: You can customize the default item comment form by copying the generic
 // /skins/_item_comment_form.inc.php file into the current skin folder.
 // ---------------------- END OF COMMENT FORM ---------------------
 
@@ -341,7 +343,7 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 }
 
 
-if( $Item->can_see_comments( true ) && ( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks'] ) )
+if( $Item->can_see_comments( false ) && ( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks'] ) )
 {	// user is allowed to see comments
 	// Display link for comments feed:
 	$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>' );
@@ -349,10 +351,4 @@ if( $Item->can_see_comments( true ) && ( $params['disp_comments'] || $params['di
 
 echo '</div>';// End of <div id="comment_wrapper">
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:05:48  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

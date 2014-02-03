@@ -3,7 +3,7 @@
  * This is the BODY footer include template.
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
- * {@link http://manual.b2evolution.net/Skins_2.0}
+ * {@link http://b2evolution.net/man/skin-structure}
  *
  * This is meant to be included in a page template.
  *
@@ -44,7 +44,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			) );
 		// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
 	?>
-	<div class="clear"><img src="../../rsc/img/blank.gif" width="0" height="0" alt="" /></div>
+	<div class="clear"><?php echo get_icon( 'pixel' ); ?></div>
 	</div>
   </div><!--/footer -->
 </div><!--/page -->

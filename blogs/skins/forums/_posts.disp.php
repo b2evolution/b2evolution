@@ -20,16 +20,19 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // --------------------------------- START OF POSTS -------------------------------------
 global $cat, $MainList;
 
+if( $cat > 0 )
+{
 ?>
 <div class="post_panel">
 <?php
-$Skin->display_post_button( $cat );
-// BREADCRUMBS
-$Skin->display_breadcrumbs( $cat );
+	$Skin->display_post_button( $cat );
+	// BREADCRUMBS
+	$Skin->display_breadcrumbs( $cat );
 ?>
 </div>
 <div class="clear"></div>
 <?php
+} // End of the selected category specific display
 
 // Display message if no post:
 display_if_empty();

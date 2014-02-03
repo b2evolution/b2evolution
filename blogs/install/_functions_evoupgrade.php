@@ -31,7 +31,7 @@ load_funcs('_core/_param.funcs.php');
  */
 function set_upgrade_checkpoint( $version )
 {
-	global $DB, $script_start_time, $locale;
+	global $DB, $script_start_time, $locale, $action;
 
 	echo "Creating DB schema version checkpoint at $version... ";
 
@@ -51,12 +51,13 @@ function set_upgrade_checkpoint( $version )
 	$elapsed_time = time() - $script_start_time;
 
 	echo "OK. (Elapsed upgrade time: $elapsed_time seconds)<br />\n";
-	flush();
+	evo_flush();
 
 	$max_exe_time = ini_get( 'max_execution_time' );
 	if( $max_exe_time && ( $elapsed_time > ( $max_exe_time - 20 ) ) )
 	{ // Max exe time not disabled and we're recahing the end
-		echo 'We are reaching the time limit for this script. Please click <a href="index.php?locale='.$locale.'&amp;action=evoupgrade">continue</a>...';
+		$upgrade_action = ( ( $action == 'svn_upgrade' ) || ( $action == 'auto_upgrade' ) ) ? $action : 'evoupgrade';
+		echo 'We are reaching the time limit for this script. Please click <a href="index.php?locale='.$locale.'&amp;action='.$upgrade_action.'">continue</a>...';
 		// Dirty temporary solution:
 		exit(0);
 	}
@@ -284,8 +285,10 @@ function convert_lang_to_locale( $table, $columnlang, $columnID )
 
 /**
  * upgrade_b2evo_tables(-)
+ *
+ * @param string the action param value corresponding the current upgrade process ( evoupgrade, svn_upgrade, auto_upgrade )
  */
-function upgrade_b2evo_tables()
+function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 {
 	global $db_config, $tableprefix;
 	global $baseurl, $old_db_version, $new_db_version;
@@ -324,12 +327,6 @@ function upgrade_b2evo_tables()
 	if( $old_db_version < 8000 ) debug_die( T_('This version is too old!') );
 	if( $old_db_version > $new_db_version ) debug_die( T_('This version is too recent! We cannot downgrade to the version you are trying to install...') );
 	echo "OK.<br />\n";
-
-
-	// Try to obtain some serious time to do some serious processing (5 minutes)
-	set_max_execution_time(300);
-
-
 
 	if( $old_db_version < 8010 )
 	{
@@ -487,7 +484,7 @@ function upgrade_b2evo_tables()
 			grp_perm_options enum('none','view','edit') NOT NULL default 'none',
 			grp_perm_users enum('none','view','edit') NOT NULL default 'none',
 			grp_perm_templates TINYINT NOT NULL DEFAULT 0,
-			grp_perm_files enum('none','view','add','edit') NOT NULL default 'none',
+			grp_perm_files enum('none','view','add','edit','all') NOT NULL default 'none',
 			PRIMARY KEY grp_ID (grp_ID)
 		)";
 		$DB->query( $query );
@@ -595,6 +592,11 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		echo 'Upgrading users table... ';
+		$DB->query( 'UPDATE T_users
+									  SET dateYMDhour = \'2000-01-01 00:00:00\'
+									WHERE ( dateYMDhour = \'0000-00-00 00:00:00\' OR dateYMDhour = \'2000-00-00 00:00:01\' )' );
+		$DB->query( 'ALTER TABLE T_users
+							MODIFY COLUMN dateYMDhour DATETIME NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
 		$query = "ALTER TABLE T_users
 							ADD COLUMN user_notify tinyint(1) NOT NULL default 1,
 							ADD COLUMN user_grp_ID int(4) NOT NULL default 1,
@@ -681,7 +683,6 @@ function upgrade_b2evo_tables()
 							CHANGE COLUMN post_lang post_locale varchar(20) NOT NULL default 'en-EU',
 							DROP COLUMN post_url,
 							CHANGE COLUMN post_trackbacks post_url varchar(250) NULL default NULL,
-							MODIFY COLUMN post_flags SET( 'pingsdone', 'imported' ),
 							ADD COLUMN post_renderers VARCHAR(179) NOT NULL default 'default',
 							DROP INDEX post_date,
 							ADD INDEX post_issue_date( post_issue_date ),
@@ -783,6 +784,11 @@ function upgrade_b2evo_tables()
 		}
 
 		echo 'Upgrading Comments table... ';
+		$DB->query( 'UPDATE T_comments
+									  SET comment_date = \'2000-01-01 00:00:00\'
+									WHERE comment_date = \'0000-00-00 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_comments
+							MODIFY COLUMN comment_date DATETIME NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
 		$query = "ALTER TABLE T_comments
 							ADD COLUMN comment_author_ID int unsigned NULL default NULL AFTER comment_status,
 							MODIFY COLUMN comment_author varchar(100) NULL,
@@ -1398,7 +1404,6 @@ function upgrade_b2evo_tables()
 	if( $old_db_version < 9200 )
 	{
 		task_begin( 'Upgrading hitlog table... ' );
- 		flush();
 		$DB->query( 'ALTER TABLE T_hitlog
 										CHANGE COLUMN hit_referer_type hit_referer_type   ENUM(\'search\',\'blacklist\',\'referer\',\'direct\') NOT NULL,
 										ADD COLUMN hit_agnt_ID        INT UNSIGNED NULL AFTER hit_remote_addr' );
@@ -1893,7 +1898,7 @@ function upgrade_b2evo_tables()
           )' );
 		echo "OK.<br />\n";
 
-		install_basic_skins();
+		install_basic_skins( false );
 
 		echo 'Updating blogs table... ';
 		$DB->query( 'ALTER TABLE T_blogs
@@ -1904,7 +1909,7 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 
-		install_basic_widgets();
+		install_basic_widgets( $old_db_version );
 
 		set_upgrade_checkpoint( '9408' );
 	}
@@ -2158,7 +2163,7 @@ function upgrade_b2evo_tables()
 			ADD COLUMN post_varchar3  VARCHAR(255) NULL COMMENT 'Custom varchar value 3' AFTER post_varchar2" );
 		echo "OK.<br />\n";
 
- 		echo 'Creating keyphrase table... ';
+		echo 'Creating keyphrase table... ';
 		$query = "CREATE TABLE T_track__keyphrase (
             keyp_ID      INT UNSIGNED NOT NULL AUTO_INCREMENT,
             keyp_phrase  VARCHAR( 255 ) NOT NULL,
@@ -2168,8 +2173,8 @@ function upgrade_b2evo_tables()
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
- 		echo 'Upgrading hitlog table... ';
- 		flush();
+		echo 'Upgrading hitlog table... ';
+		evo_flush();
 		$query = "ALTER TABLE T_hitlog
 			 CHANGE COLUMN hit_ID hit_ID              INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			 CHANGE COLUMN hit_datetime hit_datetime  DATETIME NOT NULL DEFAULT '2000-01-01 00:00:00',
@@ -2215,8 +2220,10 @@ function upgrade_b2evo_tables()
 	if( $old_db_version < 9900 )
 	{	// 3.0 part 1
 		task_begin( 'Updating keyphrases in hitlog table... ' );
-		flush();
 		load_class( 'sessions/model/_hit.class.php', 'Hit' );
+		// New Hit object creation was added later, to fix upgrades from very old versions.
+		// We create a new temp Hit object to be able to call the Hit::extract_params_from_referer() function which was static when this upgrade block was created.
+		$tempHit = new Hit();
 		$sql = 'SELECT SQL_NO_CACHE hit_ID, hit_referer
   		          FROM T_hitlog
    		         WHERE hit_referer_type = "search"
@@ -2224,7 +2231,7 @@ function upgrade_b2evo_tables()
 		$rows = $DB->get_results( $sql, OBJECT, 'get all search hits' );
 		foreach( $rows as $row )
 		{
-			$params = Hit::extract_params_from_referer( $row->hit_referer );
+			$params = $tempHit->extract_params_from_referer( $row->hit_referer );
 			if( empty( $params['keyphrase'] ) )
 			{
 				continue;
@@ -2331,7 +2338,7 @@ function upgrade_b2evo_tables()
 		task_end();
 
 		task_begin( 'Creating table for User fields...' );
-		$DB->query( "CREATE TABLE T_users__fields (
+		$DB->query( "CREATE TABLE {$tableprefix}users_fields (
 				uf_ID      int(10) unsigned NOT NULL auto_increment,
 			  uf_user_ID int(10) unsigned NOT NULL,
 			  uf_ufdf_ID int(10) unsigned NOT NULL,
@@ -2505,7 +2512,7 @@ function upgrade_b2evo_tables()
 			) ENGINE = innodb' );
 		task_end();
 
-		create_default_countries( $tableprefix.'country' );
+		create_default_countries( $tableprefix.'country', false );
 
 		task_begin( 'Upgrading user permissions table... ' );
 		$DB->query( "ALTER TABLE T_coll_user_perms
@@ -2980,8 +2987,9 @@ function upgrade_b2evo_tables()
 		task_end();
 
 		task_begin( 'Upgrading settings table... ');
-		$DB->query( 'INSERT INTO T_settings (set_name, set_value)
-						VALUES ( "smart_hit_count", 1 )' );
+		// This query was removed later, to avoid performance issue because of the smart view counting
+		/*$DB->query( 'INSERT INTO T_settings (set_name, set_value)
+						VALUES ( "smart_hit_count", 1 )' );*/
 		$DB->query( 'ALTER TABLE T_coll_settings
 									CHANGE COLUMN cset_value cset_value   VARCHAR( 10000 ) NULL COMMENT "The AdSense plugin wants to store very long snippets of HTML"' );
   		task_end();
@@ -3138,7 +3146,6 @@ function upgrade_b2evo_tables()
 		}
 
 		task_begin( 'Upgrading hitlog table...' );
- 		flush();
 		$DB->query( 'ALTER TABLE T_hitlog
 								ADD COLUMN hit_disp        VARCHAR(30) DEFAULT NULL AFTER hit_uri,
 								ADD COLUMN hit_ctrl        VARCHAR(30) DEFAULT NULL AFTER hit_disp,
@@ -3197,7 +3204,6 @@ function upgrade_b2evo_tables()
 	if( $old_db_version < 10500 )
 	{	//  part 3
 		task_begin( 'Upgrading hitlog table...' );
- 		flush();
 		$DB->query( "ALTER TABLE T_hitlog
 								CHANGE COLUMN hit_referer_type  hit_referer_type ENUM(  'search',  'special',  'spam',  'referer',  'direct',  'self',  'admin', 'blacklist' ) NOT NULL,
 								ADD COLUMN hit_type ENUM('standard','rss','admin','ajax', 'service') DEFAULT 'standard' NOT NULL AFTER hit_ctrl,
@@ -3385,7 +3391,6 @@ function upgrade_b2evo_tables()
 		task_end();
 
 		task_begin( 'Upgrading hitlog table...' );
- 		flush();
 		$DB->query( "ALTER TABLE T_hitlog
 						ADD COLUMN hit_keyphrase VARCHAR(255) DEFAULT NULL AFTER hit_keyphrase_keyp_ID" );
 		task_end();
@@ -3411,7 +3416,6 @@ function upgrade_b2evo_tables()
 		task_end();
 
 		task_begin( 'Upgrading hitlog table...' );
- 		flush();
 		$DB->query( 'UPDATE T_hitlog
 						SET hit_type = "rss",
 							hit_agent_type = "unknown"
@@ -3487,7 +3491,7 @@ function upgrade_b2evo_tables()
 
 
 		task_begin( 'Creating table for groups of messaging contacts...' );
-		$DB->query( "CREATE TABLE T_messaging__contact_groups (
+		$DB->query( "CREATE TABLE IF NOT EXISTS T_messaging__contact_groups (
 			cgr_ID      int(10) unsigned NOT NULL auto_increment,
 			cgr_user_ID int(10) unsigned NOT NULL,
 			cgr_name    varchar(50) NOT NULL,
@@ -3673,7 +3677,7 @@ function upgrade_b2evo_tables()
 		// Modify Indexes
 		$DB->query( 'ALTER TABLE T_users__fields
 						DROP INDEX uf_varchar,
-						ADD INDEX uf_varchar ( uf_varchar )' );
+						ADD INDEX uf_varchar ( uf_varchar(255) )' );
 		task_end();
 
 		task_begin( 'Upgrading cron tasks table...' );
@@ -3685,7 +3689,7 @@ function upgrade_b2evo_tables()
 		task_end();
 
 		task_begin( 'Creating table for Blocked Email Addreses...' );
-		$DB->query( "CREATE TABLE T_email__blocked (
+		$DB->query( "CREATE TABLE {$tableprefix}email__blocked (
 			emblk_ID                    INT(10) UNSIGNED NOT NULL auto_increment,
 			emblk_address               VARCHAR(255) DEFAULT NULL,
 			emblk_status                ENUM ( 'unknown', 'warning', 'suspicious1', 'suspicious2', 'suspicious3', 'prmerror', 'spammer' ) NOT NULL DEFAULT 'unknown',
@@ -3729,8 +3733,10 @@ function upgrade_b2evo_tables()
 		set_upgrade_checkpoint( '10900' );
 	}
 
-	if( $old_db_version < 11000 )
-	{	// part 8 trunk aka first part of "i4"
+	if( $old_db_version < 10970 )
+	{	// part 8/a trunk aka first part of "i4"
+
+		global $db_storage_charset;
 
 		task_begin( 'Upgrading Locales table...' );
 		db_add_col( 'T_locales', 'loc_transliteration_map', 'VARCHAR(10000) NOT NULL default \'\' AFTER loc_priority' );
@@ -3738,9 +3744,13 @@ function upgrade_b2evo_tables()
 
 		task_begin( 'Upgrading general settings table...' );
 		$DB->query( 'UPDATE T_settings SET set_name = '.$DB->quote( 'smart_view_count' ).' WHERE set_name = '.$DB->quote( 'smart_hit_count' ) );
+		// This query below was added later to turn OFF smart view counting on upgrade from v4 to v5 for better performance
+		$DB->query( 'DELETE FROM T_settings WHERE set_name = '.$DB->quote( 'smart_view_count' ) );
 		task_end();
 
 		task_begin( 'Upgrading sessions table...' );
+		$DB->query( "UPDATE T_sessions SET sess_lastseen = concat( '2000-01-01 ', time( sess_lastseen ) )
+						WHERE date( sess_lastseen ) = '1970-01-01'" );
 		$DB->query( "ALTER TABLE T_sessions CHANGE COLUMN sess_lastseen sess_lastseen_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00' COMMENT 'User last logged activation time. Value may be off by up to 60 seconds'" );
 		db_add_col( 'T_sessions', 'sess_start_ts', "TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00' AFTER sess_hitcount" );
 		$DB->query( 'UPDATE T_sessions SET sess_start_ts = TIMESTAMPADD( SECOND, -1, sess_lastseen_ts )' );
@@ -3790,6 +3800,12 @@ function upgrade_b2evo_tables()
 		$DB->query( "ALTER TABLE T_antispam__iprange CHANGE COLUMN aipr_user_count aipr_user_count int(10) unsigned DEFAULT 0" );
 		task_end();
 
+		set_upgrade_checkpoint( '10970' );
+	}
+
+	if( $old_db_version < 10975 )
+	{	// part 8/b trunk aka first part of "i4"
+
 		task_begin( 'Creating default antispam IP ranges... ' );
 		$DB->query( '
 			INSERT INTO T_antispam__iprange ( aipr_IPv4start, aipr_IPv4end, aipr_status )
@@ -3800,6 +3816,11 @@ function upgrade_b2evo_tables()
 			' );
 		task_end();
 
+		set_upgrade_checkpoint( '10975' );
+	}
+
+	if( $old_db_version < 11000 )
+	{	// part 8/c trunk aka first part of "i4"
 
 		task_begin( 'Adding new countries...' );
 		// IGNORE is needed for upgrades from DB version 9970 or later
@@ -4008,7 +4029,7 @@ function upgrade_b2evo_tables()
 		db_add_col( 'T_files', 'file_hash', 'char(32) default NULL' );
 		task_end();
 
-		task_begin( 'Create table for files voting... ' );
+		task_begin( 'Create table for files voting...' );
 		$DB->query( 'CREATE TABLE T_files__vote (
 				fvot_file_ID       int(11) UNSIGNED NOT NULL,
 				fvot_user_ID       int(11) UNSIGNED NOT NULL,
@@ -4308,7 +4329,10 @@ function upgrade_b2evo_tables()
 	{	// part 11 trunk aka fourth part of "i4"
 
 		task_begin( 'Upgrading items table...' );
-		flush();
+		$DB->query( "UPDATE T_items__item SET post_datecreated = concat( '2000-01-01 ', time( post_datecreated ) )
+						WHERE date( post_datecreated ) = '1970-01-01'" );
+		$DB->query( "UPDATE T_items__item SET post_datemodified = concat( '2000-01-01 ', time( post_datemodified ) )
+						WHERE date( post_datemodified ) = '1970-01-01'" );
 		$DB->query( "ALTER TABLE T_items__item CHANGE COLUMN post_datecreated post_datecreated TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00'" );
 		$DB->query( "ALTER TABLE T_items__item CHANGE COLUMN post_datemodified post_datemodified TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00'" );
 		db_add_col( 'T_items__item', 'post_last_touched_ts', "TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00' AFTER post_datemodified" );
@@ -4394,98 +4418,156 @@ function upgrade_b2evo_tables()
 		 * This part will be included in trunk and i5 branches
 		 */
 
-		//set_upgrade_checkpoint( '11100' );
+		set_upgrade_checkpoint( '11100' );
 	}
 
-	// Update modules own b2evo tables
-	echo "Calling modules for individual upgrades...<br>\n";
-	flush();
-	modules_call_method( 'upgrade_b2evo_tables' );
+	if( $old_db_version < 11110 )
+	{ // part 13 trunk aka second part of "i5"
 
-	// Just in case, make sure the db schema version is up to date at the end.
-	if( $old_db_version != $new_db_version )
-	{ // Update DB schema version to $new_db_version
-		set_upgrade_checkpoint( $new_db_version );
+		// Add new settings for antispam groups
+		$antispam_group_settings = $DB->get_assoc( 'SELECT set_name, set_value
+			 FROM T_settings
+			WHERE set_name IN ( '.$DB->quote( array( 'antispam_suspicious_group', 'antispam_trust_groups' ) ).')' );
+		if( count( $antispam_group_settings ) < 2 )
+		{ // Insert new settings only if don't exist in DB
+			task_begin( 'Updating general settings...' );
+			// Set antispam suspicious group
+			if( !isset( $antispam_group_settings['antispam_suspicious_group'] ) )
+			{ // Insert new value, Don't rewrite value if it already defined before
+				$suspect_group_SQL = new SQL();
+				$suspect_group_SQL->SELECT( 'grp_ID' );
+				$suspect_group_SQL->FROM( 'T_groups' );
+				$suspect_group_SQL->WHERE( 'grp_name = '.$DB->quote( 'Misbehaving/Suspect Users' ) );
+				$suspect_group_ID = $DB->get_var( $suspect_group_SQL->get() );
+				if( !empty( $suspect_group_ID ) )
+				{ // Save setting value
+					$DB->query( 'INSERT INTO T_settings ( set_name, set_value ) VALUES
+							( '.$DB->quote( 'antispam_suspicious_group' ).', '.$DB->quote( $suspect_group_ID ).' )' );
+				}
+			}
+			// Set antispam trust groups
+			if( !isset( $antispam_group_settings['antispam_trust_groups'] ) )
+			{ // Insert new value, Don't rewrite value if it already defined before
+				$trust_groups = array( 'Administrators', 'Moderators', 'Trusted Users', 'Spammers/Restricted Users' );
+				$trust_groups_SQL = new SQL();
+				$trust_groups_SQL->SELECT( 'grp_ID' );
+				$trust_groups_SQL->FROM( 'T_groups' );
+				$trust_groups_SQL->WHERE( 'grp_name IN ( '.$DB->quote( $trust_groups ).')' );
+				$trust_groups_IDs = $DB->get_col( $trust_groups_SQL->get() );
+				if( !empty( $trust_groups_IDs ) )
+				{ // Save setting value
+					$DB->query( 'INSERT INTO T_settings ( set_name, set_value ) VALUES
+							( '.$DB->quote( 'antispam_trust_groups' ).', '.$DB->quote( implode( ',', $trust_groups_IDs ) ).' )' );
+				}
+			}
+			task_end();
+		}
+
+		/*
+		 * ADD UPGRADES FOR i5 BRANCH __ABOVE__ IN THIS BLOCK.
+		 *
+		 * This part will be included in trunk and i5 branches
+		 */
+
+		//set_upgrade_checkpoint( '11110' );
 	}
 
-	// We're going to need some environment in order to init caches and create profile picture links...
-	if( ! is_object( $Settings ) )
-	{ // create Settings object
-		load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
-		$Settings = new GeneralSettings();
-	}
-	if( ! is_object( $Plugins ) )
-	{ // create Plugins object
-		load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
-		$Plugins = new Plugins();
-	}
+	// Execute general upgrade tasks.
+	// These tasks needs to be called after every upgrade process, except if they were already executed but the upgrade was not finished because of the max execution time check.
+	if( param( 'exec_general_tasks', 'boolean', 1 ) )
+	{	// We haven't executed these general tasks yet:
 
-	// Init Caches: (it should be possible to do this with each upgrade)
-	task_begin( '(Re-)Initializing caches...' );
-	load_funcs('tools/model/_system.funcs.php');
-	if( system_init_caches() )
-	{ // cache was initialized successfully
-		// Check all cache folders if exist and work properly. Try to repair cache folders if they aren't ready for operation.
-		system_check_caches();
-	}
-	else
-	{
-		echo "<strong>".T_('The /cache folder could not be created/written to. b2evolution will still work but without caching, which will make it operate slower than optimal.')."</strong><br />\n";
-	}
-	task_end();
+		// Update modules own b2evo tables
+		echo "Calling modules for individual upgrades...<br>\n";
+		evo_flush();
+		modules_call_method( 'upgrade_b2evo_tables' );
 
-	// Check if profile picture links should be recreated. It won't be executed in each upgrade, but only in those cases when it is required.
-	// This requires an up to date database, and also $Plugins and $GeneralSettings objects must be initialized before this.
-	// Note: Check $create_profile_picture_links intialization and usage above to get more information.
-	if( $create_profile_picture_links )
-	{ // Create links for all files from the users profile_pictures folder
-		task_begin( 'Creating profile picture links...' );
-		create_profile_picture_links();
+		// Just in case, make sure the db schema version is up to date at the end.
+		if( $old_db_version != $new_db_version )
+		{ // Update DB schema version to $new_db_version
+			set_upgrade_checkpoint( $new_db_version );
+		}
+
+		// We're going to need some environment in order to init caches and create profile picture links...
+		if( ! is_object( $Settings ) )
+		{ // create Settings object
+			load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
+			$Settings = new GeneralSettings();
+		}
+		if( ! is_object( $Plugins ) )
+		{ // create Plugins object
+			load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
+			$Plugins = new Plugins();
+		}
+
+		// Init Caches: (it should be possible to do this with each upgrade)
+		task_begin( '(Re-)Initializing caches...' );
+		load_funcs('tools/model/_system.funcs.php');
+		if( system_init_caches() )
+		{ // cache was initialized successfully
+			// Check all cache folders if exist and work properly. Try to repair cache folders if they aren't ready for operation.
+			system_check_caches();
+		}
+		else
+		{
+			echo "<strong>".T_('The /cache folder could not be created/written to. b2evolution will still work but without caching, which will make it operate slower than optimal.')."</strong><br />\n";
+		}
+		task_end();
+
+		// Check if profile picture links should be recreated. It won't be executed in each upgrade, but only in those cases when it is required.
+		// This requires an up to date database, and also $Plugins and $GeneralSettings objects must be initialized before this.
+		// Note: Check $create_profile_picture_links intialization and usage above to get more information.
+		if( $create_profile_picture_links )
+		{ // Create links for all files from the users profile_pictures folder
+			task_begin( 'Creating profile picture links...' );
+			create_profile_picture_links();
+			task_end();
+		}
+
+		// Invalidate all page caches after every upgrade.
+		// A new version of b2evolution may not use the same links to access special pages.
+		// We want to play it safe here so that people don't think that upgrading broke their blog!
+		task_begin( 'Invalidating all page caches to make sure they don\'t contain old action links...' );
+		invalidate_pagecaches();
+		task_end();
+
+
+		// Reload plugins after every upgrade, to detect even those changes on plugins which didn't require db modifications
+		task_begin( 'Reloading installed plugins to make sure their config is up to date...' );
+		$Plugins_admin = & get_Plugins_admin();
+		$Plugins_admin->reload_plugins();
+		task_end();
+
+
+		// This has to be at the end because plugin install may fail if the DB schema is not current (matching Plugins class).
+		// Only new default plugins will be installed, based on $old_db_version.
+		// dh> NOTE: if this fails (e.g. fatal error in one of the plugins), it will not get repeated
+		task_begin( 'Installing new default plugins (if any)...' );
+		install_basic_plugins( $old_db_version );
+		task_end();
+
+
+		// Create default cron jobs (this can be done at each upgrade):
+		echo "Checking if some default cron jobs need to be installed...<br/>\n";
+		evo_flush();
+		require_once dirname(__FILE__).'/_functions_create.php';
+		create_default_jobs( true );
+
+		// "Time running low" test: Check if the upgrade script elapsed time is close to the max execution time.
+		// Note: This should not really happen except the case when many plugins must be installed.
+		task_begin( 'Checking timing of upgrade...' );
+		$elapsed_time = time() - $script_start_time;
+		$max_exe_time = ini_get( 'max_execution_time' );
+		if( $max_exe_time && ( $elapsed_time > ( $max_exe_time - 20 ) ) )
+		{ // Max exe time not disabled and we're recahing the end
+			// URL to continue the upgrade process from install folder
+			$upgrade_continue_url = $baseurl.'install/index.php?locale='.$locale.'&amp;action='.$upgrade_action.'&amp;exec_general_tasks=0';
+			echo 'We are reaching the time limit for this script. Please click <a href="'.$upgrade_continue_url.'">continue</a>...';
+			// Dirty temporary solution:
+			exit(0);
+		}
 		task_end();
 	}
-
-	// Invalidate all page caches after every upgrade.
-	// A new version of b2evolution may not use the same links to access special pages.
-	// We want to play it safe here so that people don't think that upgrading broke their blog!
-	task_begin( 'Invalidating all page caches to make sure they don\'t contain old action links...' );
-	invalidate_pagecaches();
-	task_end();
-
-
-	// Reload plugins after every upgrade, to detect even those changes on plugins which didn't require db modifications
-	task_begin( 'Reloading installed plugins to make sure their config is up to date...' );
-	$Plugins_admin = & get_Plugins_admin();
-	$Plugins_admin->reload_plugins();
-	task_end();
-
-
-	// This has to be at the end because plugin install may fail if the DB schema is not current (matching Plugins class).
-	// Only new default plugins will be installed, based on $old_db_version.
-	// dh> NOTE: if this fails (e.g. fatal error in one of the plugins), it will not get repeated
-	task_begin( 'Installing new default plugins (if any)...' );
-	install_basic_plugins( $old_db_version );
-	task_end();
-
-
-	// Create default cron jobs (this can be done at each upgrade):
-	echo "Checking if some default cron jobs need to be installed...<br/>\n";
-	flush();
-	require_once dirname(__FILE__).'/_functions_create.php';
-	create_default_jobs( true );
-
-
-	// "Time running low" test: Check if the upgrade script elapsed time is close to the max execution time.
-	// Note: This should not really happen except the case when many plugins must be installed.
-	task_begin( 'Checking timing of upgrade...' );
-	$elapsed_time = time() - $script_start_time;
-	$max_exe_time = ini_get( 'max_execution_time' );
-	if( $max_exe_time && ( $elapsed_time > ( $max_exe_time - 20 ) ) )
-	{ // Max exe time not disabled and we're recahing the end
-		echo 'We are reaching the time limit for this script. Please click <a href="index.php?locale='.$locale.'&amp;action=evoupgrade">continue</a>...';
-		// Dirty temporary solution:
-		exit(0);
-	}
-	task_end();
 
 
 	/*
@@ -4494,7 +4576,7 @@ function upgrade_b2evo_tables()
 	 * -----------------------------------------------
 	 */
 	echo "Starting to check DB...<br/>\n";
-	flush();
+	evo_flush();
 
 	$upgrade_db_deltas = array(); // This holds changes to make, if any (just all queries)
 

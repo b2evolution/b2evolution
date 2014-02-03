@@ -48,15 +48,18 @@ else
 	error_reporting( E_ALL );
 }
 
-// To help debugging severe errors, you'll probably want PHP to display the errors on screen.
-// In this case, uncomment the following line:
-// ini_set( 'display_errors', 'on' );
+/**
+ * Do we want to display errors, even when not in debug mode?
+ *
+ * You are welcome to change/override this if you know what you're doing.
+ * This is turned on by default so that newbies can quote meaningful error messages in the forums.
+ */
+$display_errors_on_production = true;
 
 // If you get blank pages or missing thumbnail images, PHP may be crashing because it doesn't have enough memory.
 // The default is 8 MB (in PHP < 5.2) and 128 MB (in PHP > 5.2)
 // Try uncommmenting the following line:
 // ini_set( 'memory_limit', '128M' );
-
 
 /**
  * Log application errors through {@link error_log() PHP's logging facilities}?
@@ -71,6 +74,12 @@ else
  */
 $log_app_errors = 1;
 
+
+/**
+ * Allows to force a timezone if PHP>=5.1
+ * See: http://b2evolution.net/man/date_default_timezone-forcing-a-timezone
+ */
+$date_default_timezone = '';
 
 /**
  * Thumbnail size definitions.
@@ -206,8 +215,6 @@ $basedomain = preg_replace( '/^( .* \. )? (.+? \. .+? )$/xi', '$2', $basehost );
  * readers surely will complain about it!
  *
  * You can change the notification email address alone a few lines below.
- *
- * @todo generate a random instance name at install and have it saved in the global params in the DB
  *
  * @global string Default: 'b2evo'
  */
@@ -366,7 +373,7 @@ $pagecache_max_age = 900;
 
 /**
  * Dummy field names to obfuscate spamboots
- * 
+ *
  * We use funky field names to defeat the most basic spambots in the front office public forms
  */
 $dummy_fields = array(
@@ -636,6 +643,17 @@ $upload_maxmaxkb = 32000;
 $force_regexp_filename = '';
 $force_regexp_dirname = '';
 
+/**
+ * The maximum length of a file name. On new uploads file names with more characters are not allowed.
+ */
+$filename_max_length = 64;
+
+/**
+ * The maximum length of a file absolute path. Creating folders/files with longer path then this value is not allowed.
+ * Note: 247 is the max length what php file operations functions can handle on windows
+ */
+$dirpath_max_length = 247 - $filename_max_length - 35 /* the maximum additional path length because of the _evocache folder */;
+
 
 /**
  * XMLRPC logging. Set this to 1 to log XMLRPC calls received by this server (into /xmlsrv/xmlrpc.log).
@@ -667,7 +685,7 @@ $pwdchange_request_delay = 300; // 5 minutes
  * The first element of the array ( in position 0 ) shows the time in seconds when the firs reminder email must be sent after the new user was registered, or the user status was changed to new, deactivated or emailchanged status
  * Each element between the postion [1 -> (n - 1)) shows the time in seconds when the next reminder email must be sent after the previous one
  * The last element of the array shows when an account status will be set to 'failedactivation' if it was not activated after the last reminder email. This value must be the highest value of the array!
- * 
+ *
  * E.g. $activate_account_reminder_config = array( 86400, 129600, 388800, 604800 ); = array( 1 day, 1.5 days, 4.5 days, 7 days )
  * At most 3 reminder will be sent, the first 1 day after the registration or deactivation, the seond in 1.5 days after the first one, and the third one after 2.5 days after the second one.
  * 7 days after the last reminder email the account status will be set to 'failedactivation' and no more reminder will be sent.
@@ -687,6 +705,13 @@ $activate_account_reminder_threshold = 86400; // 24 hours
  * A moderator user may receive Comment moderation reminder if there are comments awaiting moderation which were created at least x ( = threshold value defined below ) seconds ago.
  */
 $comment_moderation_reminder_threshold = 86400; // 24 hours
+
+
+/**
+ * Post moderation reminder threshold given in seconds.
+ * A moderator user may receive Post moderation reminder if there are posts awaiting moderation which were created at least x ( = threshold value defined below ) seconds ago.
+ */
+$post_moderation_reminder_threshold = 86400; // 24 hours
 
 
 /**
@@ -745,6 +770,16 @@ $tags_dash_fix = 0;
  */
 $use_hacks = false;
 
+
+
+/**
+ * Additional params you may want to pass to sendmail when sending emails
+ * For setting the return-path, some Linux servers will require -r, others will require -f.
+ * Allowed placeholders: $from-address$ , $return-address$
+ *
+ * @global string $sendmail_additional_params
+ */
+$sendmail_additional_params = '-r $return-address$';
 
 
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----

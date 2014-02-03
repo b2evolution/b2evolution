@@ -100,7 +100,7 @@ class FileRootCache
 				$r[ $skins_FileRoot->ID ] = & $skins_FileRoot;
 			}
 		}
-		
+
 		return $r;
 	}
 
@@ -172,11 +172,4 @@ class FileRootCache
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.12  2013/11/06 08:04:08  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

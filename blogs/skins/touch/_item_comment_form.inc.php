@@ -89,7 +89,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 						'comment_block_end'    => $Comment->email_is_detected ? '' : $params['preview_block_end'],
 						'author_link_text'     => $params['author_link_text'],
 					) );
-				// Note: You can customize the default item feedback by copying the generic
+				// Note: You can customize the default item comment by copying the generic
 				// /skins/_item_comment.inc.php file into the current skin folder.
 				// ---------------------- END OF PREVIEW COMMENT ---------------------
 			}

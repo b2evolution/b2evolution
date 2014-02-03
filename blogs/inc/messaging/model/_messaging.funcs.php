@@ -236,7 +236,7 @@ function create_new_message( $thrd_ID )
 
 /**
  * User leave a thread
- * 
+ *
  * @param integer thread ID
  * @param integer user ID
  * @param boolean set true to close the thread, which means no one can reply, leave false if thread must remain open
@@ -256,17 +256,19 @@ function leave_thread( $thread_ID, $user_ID, $close_thread = false )
 
 	// create subquery to select the last message ID in this thread. This will be the last visible message for the user from this thread.
 	$msg_subquery = 'SELECT msg_ID FROM T_messaging__message
-						WHERE msg_thread_ID = '.$thread_ID.'
+						WHERE msg_thread_ID = '.$DB->quote( $thread_ID ).'
 						ORDER BY msg_datetime DESC
 						LIMIT 1';
 	// set last visible thread ID query
 	$query = 'UPDATE T_messaging__threadstatus
-				SET tsta_thread_leave_msg_ID = ( '.$msg_subquery.' )
-				WHERE tsta_thread_ID = '.$thread_ID.' AND tsta_thread_leave_msg_ID IS NULL';
-	if( !$close_thread )
+			SET tsta_thread_leave_msg_ID = ( '.$msg_subquery.' )
+		WHERE tsta_thread_ID = '.$DB->quote( $thread_ID ).'
+			AND tsta_thread_leave_msg_ID IS NULL';
+	if( ! $close_thread )
 	{ // don't close the thread for all user only the given user wants to leave
-		$query .= ' AND tsta_user_ID = '.$user_ID;
+		$query .= ' AND tsta_user_ID = '.$DB->quote( $user_ID );
 	}
+
 	return $DB->query( $query );
 }
 
@@ -435,7 +437,7 @@ function get_threads_recipients_sql( $thread_ID = 0 )
 
 	$recipients_SQL->FROM( 'T_messaging__threadstatus ts
 								LEFT OUTER JOIN T_messaging__threadstatus tsr
-									ON ts.tsta_thread_ID = tsr.tsta_thread_ID AND tsr.tsta_first_unread_msg_ID IS NULL 
+									ON ts.tsta_thread_ID = tsr.tsta_thread_ID AND tsr.tsta_first_unread_msg_ID IS NULL
 										AND tsr.tsta_thread_leave_msg_ID IS NULL
 								LEFT OUTER JOIN T_users ur
 									ON tsr.tsta_user_ID = ur.user_ID'.$read_user_sql_limit.'
@@ -468,12 +470,12 @@ function get_threads_recipients_sql( $thread_ID = 0 )
 /**
  * Get all those user threads and their recipients where the corresponding users have unread messages.
  * This function is used for the different email notifications.
- * 
+ *
  * @param array required user id list
  * @param integer a thread ID that should be skipped from the result list. Leave it to NULL if you don't want to skip any thread.
  * @param string Threads format ( string | array )
  * @param string User logins format ( text | html )
- * @return array ( user_ID -> (string or array) ) pairs, the string contains the users unread threads titles and their recipients list 
+ * @return array ( user_ID -> (string or array) ) pairs, the string contains the users unread threads titles and their recipients list
  */
 function get_users_unread_threads( $userid_list, $skip_thread_ID = NULL, $threads_format = 'string', $login_format = 'text' )
 {
@@ -485,7 +487,7 @@ function get_users_unread_threads( $userid_list, $skip_thread_ID = NULL, $thread
 		return $result;
 	}
 
-	// Get all those user threads where the corresponding user has unread messages, and sort descending by last modifiaction date 
+	// Get all those user threads where the corresponding user has unread messages, and sort descending by last modifiaction date
 	$query = 'SELECT DISTINCT tsta_user_ID, GROUP_CONCAT( CONVERT( thrd_ID, CHAR(10) ) ORDER BY thrd_datemodified DESC SEPARATOR "," ) as threads
 			FROM T_messaging__threadstatus
 			LEFT JOIN T_messaging__thread ON thrd_ID = tsta_thread_ID
@@ -595,7 +597,7 @@ function get_threads_results( $params = array() )
 			'sent_user_ID' => '',              // To limit messages only for sent by given user ID
 			'search_word' => '',               // Filter by this keyword
 			'search_user' => '',               // Filter by this user name
-			'show_closed_threads' => false,    // Show closed conversations
+			'show_closed_threads' => NULL,     // Show closed conversations
 			'only_sql' => false,               // TRUE - to return only SQL object, FALSE - Results object
 		), $params );
 
@@ -656,11 +658,23 @@ function get_threads_results( $params = array() )
 	$select_SQL->FROM( 'T_messaging__threadstatus' );
 	$select_SQL->FROM_add( 'INNER JOIN T_messaging__thread ON tsta_thread_ID = thrd_ID' );
 	$select_SQL->FROM_add( 'LEFT OUTER JOIN T_messaging__message ON tsta_first_unread_msg_ID = msg_ID' );
-	if( !$perm_abuse_management )
-	{	// Limit threads by current user
+	if( ! $perm_abuse_management )
+	{ // Limit threads by current user
 		$select_SQL->WHERE( 'tsta_user_ID = '.$params['user_ID'] );
-		if( !$params['show_closed_threads'] )
-		{ // not show closed conversation
+		if( $params['show_closed_threads'] === NULL )
+		{ // Explicit param value was not set, use the default
+			// Show closed messages by default only if there are unread messages in closed conversations
+			$params['show_closed_threads'] = $DB->get_var(
+				'SELECT COUNT( tsta_thread_ID )
+					FROM T_messaging__threadstatus
+					WHERE tsta_thread_leave_msg_ID IS NOT NULL AND tsta_first_unread_msg_ID IS NOT NULL
+					AND tsta_first_unread_msg_ID <= tsta_thread_leave_msg_ID AND tsta_user_ID = '.$params['user_ID']
+			);
+			// Set 'show_closed' param value, so the checkobx filter can be displayed correctly
+			set_param( 'show_closed', $params['show_closed_threads'] ? true : false );
+		}
+		if( ! $params['show_closed_threads'] )
+		{ // Don't show the closed conversations
 			$select_SQL->WHERE_and( '( tsta_thread_leave_msg_ID IS NULL )' );
 		}
 	}
@@ -678,21 +692,25 @@ function get_threads_results( $params = array() )
 	$count_SQL = new SQL();
 	$count_SQL->SELECT( 'COUNT( DISTINCT tsta_thread_ID )' );
 	$count_SQL->FROM( 'T_messaging__threadstatus' );
-	if( !empty( $filter_sql ) )
-	{	// Filter
+	if( ! empty( $filter_sql ) )
+	{ // Filter
 		$count_SQL->FROM_add( 'INNER JOIN T_messaging__thread ON tsta_thread_ID = thrd_ID' );
 	}
-	if( !$perm_abuse_management )
-	{	// Limit threads by current user
+	if( ! $perm_abuse_management )
+	{ // Limit threads by current user
 		$count_SQL->WHERE( 'tsta_user_ID = '.$params['user_ID'] );
+		if( ! $params['show_closed_threads'] )
+		{ // Don't show the closed conversations
+			$count_SQL->WHERE_and( '( tsta_thread_leave_msg_ID IS NULL )' );
+		}
 	}
 	if( !empty( $filter_sql ) )
-	{	// Filter
+	{ // Filter
 		$count_SQL->WHERE_and( $filter_sql );
 	}
 
 	if( $params['only_sql'] )
-	{	// Return only SQL object
+	{ // Return only SQL object
 		return $select_SQL;
 	}
 
@@ -1244,8 +1262,8 @@ function check_contact( $to_user_ID )
 
 
 /**
- * Update current User last new thread timestamp, and today's new thread count 
- * 
+ * Update current User last new thread timestamp, and today's new thread count
+ *
  * @param integer how many new thread was just created
  */
 function update_todays_thread_settings( $new_threads_count )
@@ -1281,7 +1299,7 @@ function update_todays_thread_settings( $new_threads_count )
 
 /**
  * Get current User max new threads settings for today
- * 
+ *
  * @return array ( max new threads per day, how many threads has already created today )
  */
 function get_todays_thread_settings()
@@ -1318,7 +1336,7 @@ function get_todays_thread_settings()
 /**
  * Check if current User already reached his 'create new thread' limit for today or not.
  * Important: The current User messaging permission is not checked here!
- * 
+ *
  * @param boolean true to add a success/error message to $Messages about the current User thread limit, false otherwise
  * @return boolean true if current user already reached his limit, false otherwise
  */
@@ -1360,7 +1378,7 @@ function check_create_thread_limit( $add_message = false )
 
 /**
  * Get a count of unread messages for the user
- * 
+ *
  * @param integer User ID (0 - current user)
  * @return integer A count of unread messages
  */
@@ -1396,7 +1414,7 @@ function get_unread_messages_count( $user_ID = 0 )
 
 /**
  * Get the first ( oldest ) unread message of the user
- * 
+ *
  * @param integer user ID
  * @return mixed NULL if the user doesn't have unread messages, or the oldest unread message datetime otherwise
  */
@@ -1517,7 +1535,7 @@ function get_next_reminder_info( $user_ID )
 
 /**
  * Mark a thread as read by the given user.
- * 
+ *
  * @param integer thread ID
  * @param integer user ID
  */
@@ -1535,7 +1553,7 @@ function mark_as_read_by_user( $thrd_ID, $user_ID )
 
 /**
  * Delete orphan threads
- * 
+ *
  * @param integer user_ID - to delete those orphan threads where this user was involved, leave it to NULL to delete all orphan threads
  * @return boolean true on success
  */
@@ -2042,11 +2060,4 @@ function col_thread_delete_action( $thread_ID )
  * New ( not display helper ) functions must be created above threads_results function
  */
 
-
-/*
- * $Log$
- * Revision 1.23  2013/11/06 09:08:58  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

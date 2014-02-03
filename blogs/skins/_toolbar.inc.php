@@ -3,7 +3,7 @@
  * This is the Evo Toolbar include template.
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
- * {@link http://manual.b2evolution.net/Skins_2.0}
+ * {@link http://b2evolution.net/man/skin-structure}
  *
  * This is meant to be included in a page template.
  *
@@ -22,18 +22,25 @@ if( ! is_logged_in() )
 	return;
 }
 
+/**
+ * @var User
+ */
+global $current_User;
+
+if( !$current_User->check_perm( 'admin', 'toolbar' ) )
+{ // don't show toolbar for current User
+	return;
+}
+
 global $Blog;
 
 global $Settings;
 
 global $is_admin_page, $localtimenow, $disp_detail;
 
-/**
- * @var User
- */
-global $current_User;
-
 global $home_url, $admin_url, $debug, $seo_page_type, $robots_index;
+
+global $request_transaction_name;
 
 /**
  * @var Hit
@@ -82,14 +89,14 @@ $Plugins->trigger_event( 'AdminAfterEvobarInit' );
 	</div>
 	<div class="actions_left">
 		<?php
-		if( $is_admin_page || $current_User->check_perm( 'admin', 'restricted' ) )
-		{ // We are already in admin or we have permission to view admin options:
+		if( $topleft_Menu->has_entires() )
+		{ // The Menu has entries, it means that current User has permission to at least one action
 			// Display evobar menu:
 			echo $topleft_Menu->get_html_menu( NULL, 'sf-menu-left' );
 
 			if( $debug )
 			{
-				echo '<div style="position:relative;left:5px;top:-7px;color:#999;z-index:-1;">'.$disp_detail.'</div>';
+				echo '<div style="position:relative;left:5px;top:-7px;color:#999;z-index:-1;">'.$request_transaction_name.'</div>';
 			}
 		}
 		?>

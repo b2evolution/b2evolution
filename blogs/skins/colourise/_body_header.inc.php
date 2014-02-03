@@ -1,8 +1,18 @@
-<?php 
+<?php
 /**
  * This is the BODY header include template.
- * 
+ *
+ * For a quick explanation of b2evo 2.0 skins, please start here:
+ * {@link http://b2evolution.net/man/skin-structure}
+ *
+ * The main page template is used to display the blog when no specific page template is available
+ * to handle the request (based on $disp).
+ *
+ * @package colourise
+ * @subpackage colourise
  */
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
 ?>
 <div id="wrap">
 	<div id="header" class="pageHeader">
@@ -21,7 +31,7 @@
 				) );
 		?>
 		</div>
-			
+
 		<?php
 			// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
@@ -34,7 +44,7 @@
 				) );
 			// ----------------------------- END OF "Header" CONTAINER -----------------------------
 		?>
-		
+
 		<div id="nav">
 			<ul>
 			<?php
@@ -54,7 +64,7 @@
 			?>
 			</ul>
 		</div>
-		
+
 		<form action="<?php $Blog->gen_blogurl() ?>" method="get" class="search" id="quick-search">
 			<p>
 			<label for="qsearch">Search:</label>
@@ -62,5 +72,5 @@
 			<input type="submit" value="Submit" class="btn"/>
 			</p>
 		</form>
-		
+
 	</div>

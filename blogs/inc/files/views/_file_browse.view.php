@@ -86,9 +86,22 @@ if( isset( $edited_User ) )
 		$Widget->global_icon( /* TRANS: verb */ T_('Upload...'), '', regenerate_url( 'ctrl', 'ctrl=upload' ), /* TRANS: verb */ T_('Upload ').' &raquo;', 1, 5 );
 	}
 
-	if( !empty($LinkOwner) )
-	{ // Return to post editing:
-		$Widget->global_icon( T_('Close file manager'), 'close', $LinkOwner->get_edit_url() );
+	if( ! empty( $LinkOwner ) )
+	{ // Display a link to close file browser and return to post editing:
+		$close_link_params = array();
+		global $mode;
+		if( $mode == 'upload' )
+		{ // Initialize JavaScript function to close popup window
+			echo '<script type="text/javascript">
+			function close_popup_window()
+			{
+				window.close();
+			}
+			</script>';
+			$close_link_params['onclick'] = 'return close_popup_window()';
+		}
+
+		$Widget->global_icon( T_('Close file manager'), 'close', $LinkOwner->get_edit_url(), '', 3, 2, $close_link_params );
 	}
 
 	$Widget->title = T_('File browser').get_manual_link('file_browser');
@@ -136,8 +149,8 @@ if( isset( $edited_User ) )
 					if( $fm_Filelist->is_filtering() )
 					{ // "reset filter" form
 						?>
-						<input type="image" name="actionArray[filter_unset]" value="<?php echo T_('Unset filter'); ?>"
-							title="<?php echo T_('Unset filter'); ?>" src="<?php echo get_icon( 'delete', 'url' ) ?>" class="ActionButton" />
+						<button type="submit" name="actionArray[filter_unset]" value="<?php echo T_('Unset filter'); ?>"
+							title="<?php echo T_('Unset filter'); ?>" class="ActionButton" style="background:none;border:none;padding:0;cursor:pointer;"><?php echo get_icon( 'delete' ) ?></button>
 						<?php
 					}
 				$Form->end_form();
@@ -377,6 +390,7 @@ if( isset( $edited_User ) )
 						$Form->add_crumb( 'file' );
 						$Form->hidden( 'ctrl', 'upload' );
 						$Form->hidden( 'upload_quickmode', 1 );
+						$Form->hidden( 'tab3_onsubmit', 'standard' );
 						// The following is mainly a hint to the browser.
 						$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 );
 						$Form->hiddens_by_key( get_memorized('ctrl') );
@@ -411,11 +425,4 @@ if( isset( $edited_User ) )
 
 <?php
 	$Widget->disp_template_raw( 'block_end' );
-
-/*
- * $Log$
- * Revision 1.25  2013/11/06 08:04:15  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

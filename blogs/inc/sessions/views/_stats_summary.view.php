@@ -98,19 +98,19 @@ if( count($res_hits) )
 		if ($row_stats['hit_agent_type'] == 'unknown')
 		{	// only those hits are calculated which hit_agent_type = unknown
 			$col = $col_mapping[$row_stats['hit_agent_type']];
-			$chart['chart_data'][$col][0] = $row_stats['hits'];
+			$chart['chart_data'][$col][0] += $row_stats['hits'];
 		}
 		else
 		{
 			if (! empty ( $col_mapping[$row_stats['hit_type'].'_'.$row_stats['hit_agent_type']] ) )
 			{	// those hits are calculated here if hit_type = standard and hit_agent_type = browser, robot
 				$col = $col_mapping[$row_stats['hit_type'].'_'.$row_stats['hit_agent_type']];
-				$chart['chart_data'][$col][0] = $row_stats['hits'];
+				$chart['chart_data'][$col][0] += $row_stats['hits'];
 			}
 			if (! empty ( $col_mapping[$row_stats['hit_type']]) )
 			{	// those hits are calculated here which did not match either of the above rules
 				$col = $col_mapping[$row_stats['hit_type']];
-				$chart['chart_data'][$col][0] = $row_stats['hits'];
+				$chart['chart_data'][$col][0] += $row_stats['hits'];
 			}
 
 		}
@@ -233,18 +233,18 @@ if( count($res_hits) )
 		// Increment hitcounter:
 		if( ! empty( $col_mapping[$row_stats['hit_type'].'_'.$row_stats['hit_agent_type']] ) )
 		{	// We have a column for this narrow type:
-			$hits[$row_stats['hit_type'].'_'.$row_stats['hit_agent_type']] = $row_stats['hits'];
+			$hits[$row_stats['hit_type'].'_'.$row_stats['hit_agent_type']] += $row_stats['hits'];
 			$hits_total[$row_stats['hit_type'].'_'.$row_stats['hit_agent_type']] += $row_stats['hits'];
 		}
 		elseif( !empty( $col_mapping[$row_stats['hit_type']]) )
 		{	// We have a column for this broad type:
-			$hits[$row_stats['hit_type']] = $row_stats['hits'];
+			$hits[$row_stats['hit_type']] += $row_stats['hits'];
 			$hits_total[$row_stats['hit_type']] += $row_stats['hits'];
 		}
 		else
 		{ // We have no column for this hit_type, This will go to the "Other" column.
 			// Note: this will never happen if all hit_types are properly defined in  $col_mapping
-			$hits[$row_stats['hit_agent_type']] = $row_stats['hits'];
+			$hits[$row_stats['hit_agent_type']] += $row_stats['hits'];
 			$hits_total[$row_stats['hit_agent_type']] += $row_stats['hits'];
 		}
 
@@ -298,10 +298,4 @@ if( count($res_hits) )
 	<!--[if IE]><?php echo get_icon( 'pixel' ); ?><![endif]-->
 	<?php
 }
-/*
- * $Log$
- * Revision 1.20  2013/11/06 08:04:45  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

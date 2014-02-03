@@ -44,7 +44,7 @@ global $AdminUI;
 global $current_User;
 
 global $dispatcher;
-		
+
 // Check minimum permission:
 $current_User->check_perm( 'options', 'view', true );
 
@@ -72,7 +72,7 @@ $AdminUI->breadcrumbpath_add( T_('Post statuses'), '?ctrl=itemtypes&amp;blog=$bl
 
 $list_title = T_('Post statuses');
 $default_col_order = 'A';
-$edited_name_maxlen = 40;
+$edited_name_maxlen = 30;
 $perm_name = 'options';
 $perm_level = 'edit';
 $form_below_list = true;
@@ -94,10 +94,4 @@ $GenericElementCache = new GenericCache( 'GenericElement', false, 'T_items__stat
 
 require $inc_path.'generic/inc/_generic_listeditor.php';
 
-/*
- * $Log$
- * Revision 1.12  2013/11/06 08:04:15  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -3,7 +3,7 @@
  * This is the main/default page template.
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
- * {@link http://manual.b2evolution.net/Skins_2.0}
+ * {@link http://b2evolution.net/man/skin-structure}
  *
  * The main page template is used to display the blog when no specific page template is available
  * to handle the request (based on $disp).
@@ -35,7 +35,7 @@ skin_include( '_html_header.inc.php' );
 // ------------------------- BODY HEADER INCLUDED HERE --------------------------
 skin_include( '_body_header.inc.php' );
 // Note: You can customize the default BODY header by copying the generic
-// /skins/_body_footer.inc.php file into the current skin folder.
+// /skins/_body_header.inc.php file into the current skin folder.
 // ------------------------------- END OF HEADER --------------------------------
 ?>
 
@@ -74,7 +74,7 @@ while( $Item = & mainlist_get_item() )
 					'link_class' => 'sh2'
 				) );
 		?>
-		
+
 		<div class="single-post-meta-top">
 			<?php
 				// We want to display the post date:
@@ -86,7 +86,8 @@ while( $Item = & mainlist_get_item() )
 						'before'      => /* TRANS: time */ T_('at '),
 					) );
 				$Item->author( array(
-						'before'      => ' > ',
+						'before'    => ' > ',
+						'link_text' => 'preferredname',
 					) );
 			?>
 		<br>
@@ -116,10 +117,10 @@ while( $Item = & mainlist_get_item() )
 			}
 			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 			skin_include( '_item_content.inc.php', array(
-					'image_size'	=>	'fit-400x320',
+					'image_size' => 'fit-400x320',
 				) );
-			// Note: You can customize the default item feedback by copying the generic
-			// /skins/_item_feedback.inc.php file into the current skin folder.
+			// Note: You can customize the default item content by copying the generic
+			// /skins/_item_content.inc.php file into the current skin folder.
 			// -------------------------- END OF POST CONTENT -------------------------
 		?>
 
@@ -127,7 +128,7 @@ while( $Item = & mainlist_get_item() )
 			// ------------------------- "Item - Single" CONTAINER EMBEDDED HERE --------------------------
 			// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 			// Display container contents:
-			skin_container( NT_('Item Single'), array(
+			skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 					// The following (optional) params will be used as defaults for widgets included in this container:
 					// This will enclose each widget in a block:
 					'block_start' => '<div class="$wi_class$">',
@@ -179,14 +180,7 @@ while( $Item = & mainlist_get_item() )
 						) );
 				?>
 		</div>
-		
-		<? /*<ul id="post-options">
-			<li><a id="oprev" href="http://wordpress.re/?p=50"></a></li>
-			<li><a id="omail" onclick="return confirm('Mail a link to this post?');" href="mailto:?subject=Wordpress for b2evolution- Another Post with Everything In It&amp;body=Check out this post:%20http://wordpress.re/?p=57"></a></li>
-			<li><a id="otweet" href="javascript:(function(){var%20f=false,t=true,a=f,b=f,u='',w=window,d=document,g=w.open(),p,linkArr=d.getElementsByTagName('link');for(var%20i=0;i%3ClinkArr.length&amp;&amp;!a;i++){var%20l=linkArr[i];for(var%20x=0;x%3Cl.attributes.length;x++){if(l.attributes[x].nodeName.toLowerCase()=='rel'){p=l.attributes[x].nodeValue.split('%20');for(y=0;y%3Cp.length;y++){if(p[y]=='short_url'||p[y]=='shorturl'||p[y]=='shortlink'){a=t;}}}if(l.attributes[x].nodeName.toLowerCase()=='rev'&amp;&amp;l.attributes[x].nodeValue=='canonical'){a=t;}if(a){u=l.href;}}}if(a){go(u);}else{var%20h=d.getElementsByTagName('head')[0]||d.documentElement,s=d.createElement('script');s.src='http://api.bit.ly/shorten?callback=bxtShCb&amp;longUrl='+encodeURIComponent(window.location.href)+'&amp;version=2.0.1&amp;login=amoebe&amp;apiKey=R_60a24cf53d0d1913c5708ea73fa69684';s.charSet='utf-8';h.appendChild(s);}bxtShCb=function(data){var%20rs,r;for(r%20in%20data.results){rs=data.results[r];break;}go(rs['shortUrl']);};function%20go(u){return%20g.document.location.href=('http://mobile.twitter.com/home/?status='+encodeURIComponent(document.title+'%20'+u));}})();"></a></li>		<li><a id="facebook" href="javascript:var%20d=document,f='http://www.facebook.com/share',l=d.location,e=encodeURIComponent,p='.php?src=bm&amp;v=4&amp;i=1297484757&amp;u='+e(l.href)+'&amp;t='+e(d.title);1;try{if%20(!/^(.*\.)?facebook\.[^.]*$/.test(l.host))throw(0);share_internal_bookmarklet(p)}catch(z)%20{a=function()%20{if%20(!window.open(f+'r'+p,'sharer','toolbar=0,status=0,resizable=1,width=626,height=436'))l.href=f+p};if%20(/Firefox/.test(navigator.userAgent))setTimeout(a,0);else{a()}}void(0)"></a></li>		<li><a id="obook" href="javascript:return false;"></a></li>
-			<li><a id="onext" href="http://wordpress.re/?p=1"></a></li>
-		</ul>*/ ?>
-		
+
 		<?php
 			// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
 			item_prevnext_links( array(
@@ -209,7 +203,9 @@ while( $Item = & mainlist_get_item() )
 
 	<?php
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
-		skin_include( '_item_feedback.inc.php' );
+		skin_include( '_item_feedback.inc.php', array(
+				'author_link_text' => 'preferredname',
+			) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.
 		// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------

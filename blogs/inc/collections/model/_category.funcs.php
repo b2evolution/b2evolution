@@ -232,68 +232,6 @@ function cat_load_cache()
 
 
 /**
- * Load cache for category associations with current posts
- *
- * @todo put this into main post query when MySQL 4.0 commonly available
- * @todo dh> why is this limited to the _global_ $postIDlist?!
- *           Really ridiculous, trying to get a list of category names for an Item (which is not in $postIDlist for example.. :/)
- * fp> This is legacy from a quick b2/cafelog hack. This will de deprecated.
- * dh> Only used in ItemLight::get_Chapters now - move it there for now? fp> no it should stay close to $cache_postcats handling until teh whole thing dies.
- */
-function cat_load_postcats_cache()
-{
-	global $DB, $cache_postcats, $postIDlist, $preview, $blog;
-
-	if( isset($cache_postcats) )
-	{ // already done!
-		return;
-	}
-
-	if( $preview )
-	{ // Preview mode
-		global $extracats, $post_category;
-		param( 'extracats', 'array', array() );
-		if( !in_array( $post_category, $extracats ) )
-			$extracats[] = $post_category;
-		$cache_postcats[0] = $extracats;
-		return;
-	}
-
-	$sql = NULL;
-	if( !empty($postIDlist) )
-	{
-		$sql = "SELECT postcat_post_ID, postcat_cat_ID
-						FROM T_postcats
-						WHERE postcat_post_ID IN ($postIDlist)
-						ORDER BY postcat_post_ID, postcat_cat_ID";
-	}
-	elseif( !empty( $blog ) )
-	{ // This is a hack to load all postcats from this blog.
-		// This was required because in some cases the $postIDlist is not set but we would like to use the itemlight class get_Cahpters() function
-		// TODO: This part should be fixed when this function will be deleted.
-		$sql = "SELECT postcat_post_ID, postcat_cat_ID
-						FROM T_postcats INNER JOIN T_categories ON cat_ID = postcat_cat_ID
-						WHERE cat_blog_ID = ".$DB->quote( $blog )."
-						ORDER BY postcat_post_ID, postcat_cat_ID";
-	}
-
-	if( !empty( $sql ) )
-	{
-		foreach( $DB->get_results( $sql, ARRAY_A ) as $myrow )
-		{
-			$postcat_post_ID = $myrow["postcat_post_ID"];
-			if( ! isset( $cache_postcats[$postcat_post_ID] ) )
-			{
-				 $cache_postcats[$postcat_post_ID] = array();
-			}
-			$cache_postcats[$postcat_post_ID][] = $myrow["postcat_cat_ID"];
-			// echo "just cached: post=$postcat_post_ID  cat=".$myrow["postcat_cat_ID"]."<br />";
-		}
-	}
-}
-
-
-/**
  * Get # of posts for each category in a blog
  *
  * @param integer Category ID
@@ -366,19 +304,25 @@ function get_commentcount_in_category( $cat_ID, $blog_ID = NULL )
 
 
 /**
- * Get category associations with given post
+ * Get category associations with given item
+ *
+ * sam2kb> TODO: Cache item cat IDs into Item::categories property instead of global $cache_postcats
  */
 function postcats_get_byID( $post_ID )
 {
-	global $DB;
+	global $DB, $cache_postcats;
 
-	//echo "looking up cats for post $post_ID ";
+	if( ! isset($cache_postcats[$post_ID]) )
+	{
+		$sql = 'SELECT postcat_cat_ID
+				FROM T_postcats
+				WHERE postcat_post_ID = '.$DB->quote($post_ID).'
+				ORDER BY postcat_cat_ID';
 
-	$sql = "SELECT postcat_cat_ID
-					FROM T_postcats
-					WHERE postcat_post_ID = $post_ID
-					ORDER BY postcat_cat_ID";
-	return $DB->get_col( $sql );
+		$cache_postcats[$post_ID] = $DB->get_col( $sql, 0, 'Get category associations with given item' );
+	}
+
+	return $cache_postcats[$post_ID];
 }
 
 
@@ -524,8 +468,9 @@ function compile_cat_array( $cat, $catsel, & $cat_array, & $cat_modifier, $restr
 	{ // specified a category string:
 		$cat_modifier = substr($cat, 0, 1 );
 		// echo 'cats['.$first_char.']';
-		if( ($cat_modifier == '*')
-			|| ($cat_modifier == '-') )
+		if( ( $cat_modifier == '*' ) ||
+		    ( $cat_modifier == '-' ) ||
+		    ( $cat_modifier == '|' ) )
 		{
 			$cat = substr( $cat, 1 );
 		}
@@ -590,7 +535,7 @@ function cat_req( $parent_cat_ID, $level )
 
 /**
  * Get global cross posting settings -- (cross posting = 1 post in multiple blogs)
- * 
+ *
  * @return int
  * 		0 - cross posting disabled
  * 		1 - cross posting enabled for extra categories
@@ -611,10 +556,4 @@ function cat_req_dummy()
 {
 }
 
-/*
- * $Log$
- * Revision 1.18  2013/11/06 08:03:57  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

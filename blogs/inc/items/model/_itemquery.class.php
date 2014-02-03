@@ -45,7 +45,9 @@ class ItemQuery extends SQL
 	var $show_statuses;
 	var $tags;
 	var $author;
+	var $author_login;
 	var $assignees;
+	var $assignees_login;
 	var $statuses;
 	var $types;
 	var $dstart;
@@ -195,6 +197,8 @@ class ItemQuery extends SQL
 
 		if( ! empty($cat_array) )
 		{	// We want to restict to some cats:
+			global $DB;
+
 			if( $cat_modifier == '-' )
 			{
 				$eq = 'NOT IN';
@@ -203,7 +207,7 @@ class ItemQuery extends SQL
 			{
 				$eq = 'IN';
 			}
-			$whichcat = 'postcat_cat_ID '. $eq.' ('.implode(',', $cat_array). ') ';
+			$whichcat = 'postcat_cat_ID '. $eq.' ('.$DB->quote( $cat_array ). ') ';
 
 			// echo $whichcat;
 			$this->WHERE_and( $whichcat );
@@ -260,6 +264,8 @@ class ItemQuery extends SQL
 
 		if( ! empty($cat_array) )
 		{	// We want to restict to some cats:
+			global $DB;
+
 			if( $cat_modifier == '-' )
 			{
 				$eq = 'NOT IN';
@@ -268,7 +274,7 @@ class ItemQuery extends SQL
 			{
 				$eq = 'IN';
 			}
-			$whichcat = $cat_ID_field.' '.$eq.' ('.implode(',', $cat_array). ') ';
+			$whichcat = $cat_ID_field.' '.$eq.' ('.$DB->quote( $cat_array ). ') ';
 
 			// echo $whichcat;
 			$this->WHERE_and( $whichcat );
@@ -347,60 +353,123 @@ class ItemQuery extends SQL
 
 
 	/**
-	 * Restrict to specific authors
+	 * Restrict to specific authors by users IDs
 	 *
-	 * @param string List of authors to restrict to (must have been previously validated)
+	 * @param string List of authors IDs to restrict to (must have been previously validated)
 	 */
-	function where_author( $author )
+	function where_author( $author_IDs )
 	{
-		$this->author = $author;
+		$this->author = $author_IDs;
 
-		if( empty( $author ) )
+		if( empty( $this->author ) )
 		{
 			return;
 		}
 
-		if( substr( $author, 0, 1 ) == '-' )
-		{	// List starts with MINUS sign:
+		if( substr( $this->author, 0, 1 ) == '-' )
+		{ // Exclude the users IF a list starts with MINUS sign:
 			$eq = 'NOT IN';
-			$author_list = substr( $author, 1 );
+			$users_IDs = substr( $this->author, 1 );
 		}
 		else
-		{
+		{ // Include the users:
 			$eq = 'IN';
-			$author_list = $author;
+			$users_IDs = $this->author;
 		}
 
-		$this->WHERE_and( $this->dbprefix.'creator_user_ID '.$eq.' ('.$author_list.')' );
+		$this->WHERE_and( $this->dbprefix.'creator_user_ID '.$eq.' ( '.$users_IDs.' )' );
 	}
 
 
 	/**
-	 * Restrict to specific assignees
+	 * Restrict to specific authors by users logins
 	 *
-	 * @param string List of assignees to restrict to (must have been previously validated)
+	 * @param string List of authors logins to restrict to (must have been previously validated)
 	 */
-	function where_assignees( $assignees )
+	function where_author_logins( $author_logins )
 	{
-		$this->assignees = $assignees;
+		$this->author_login = $author_logins;
 
-		if( empty( $assignees ) )
+		if( empty( $this->author_login ) )
 		{
 			return;
 		}
 
-		if( $assignees == '-' )
+		if( substr( $this->author_login, 0, 1 ) == '-' )
+		{ // Exclude the users IF a list starts with MINUS sign:
+			$eq = 'NOT IN';
+			$users_IDs = get_users_IDs_by_logins( substr( $this->author_login, 1 ) );
+		}
+		else
+		{ // Include the users:
+			$eq = 'IN';
+			$users_IDs = get_users_IDs_by_logins( $this->author_login );
+		}
+
+		if( ! empty( $users_IDs ) )
+		{
+			$this->WHERE_and( $this->dbprefix.'creator_user_ID '.$eq.' ( '.$users_IDs.' )' );
+		}
+	}
+
+
+	/**
+	 * Restrict to specific assignees by users IDs
+	 *
+	 * @param string List of assignees IDs to restrict to (must have been previously validated)
+	 * @param string List of assignees logins to restrict to (must have been previously validated)
+	 */
+	function where_assignees( $assignees, $assignees_logins = '' )
+	{
+		$this->assignees = $assignees;
+
+		if( empty( $this->assignees ) )
+		{
+			return;
+		}
+
+		if( $this->assignees == '-' )
 		{	// List is ONLY a MINUS sign (we want only those not assigned)
 			$this->WHERE_and( $this->dbprefix.'assigned_user_ID IS NULL' );
 		}
-		elseif( substr( $assignees, 0, 1 ) == '-' )
+		elseif( substr( $this->assignees, 0, 1 ) == '-' )
 		{	// List starts with MINUS sign:
 			$this->WHERE_and( '( '.$this->dbprefix.'assigned_user_ID IS NULL
-			                  OR '.$this->dbprefix.'assigned_user_ID NOT IN ('.substr( $assignees, 1 ).') )' );
+			                  OR '.$this->dbprefix.'assigned_user_ID NOT IN ('.substr( $this->assignees, 1 ).') )' );
 		}
 		else
 		{
-			$this->WHERE_and( $this->dbprefix.'assigned_user_ID IN ('.$assignees.')' );
+			$this->WHERE_and( $this->dbprefix.'assigned_user_ID IN ('.$this->assignees.')' );
+		}
+	}
+
+
+	/**
+	 * Restrict to specific assignees by users logins
+	 *
+	 * @param string List of assignees logins to restrict to (must have been previously validated)
+	 */
+	function where_assignees_logins( $assignees_logins )
+	{
+		$this->assignees_logins = $assignees_logins;
+
+		if( empty( $this->assignees_logins ) )
+		{
+			return;
+		}
+
+		if( $this->assignees_logins == '-' )
+		{	// List is ONLY a MINUS sign (we want only those not assigned)
+			$this->WHERE_and( $this->dbprefix.'assigned_user_ID IS NULL' );
+		}
+		elseif( substr( $this->assignees_logins, 0, 1 ) == '-' )
+		{	// List starts with MINUS sign:
+			$this->WHERE_and( '( '.$this->dbprefix.'assigned_user_ID IS NULL
+			                  OR '.$this->dbprefix.'assigned_user_ID NOT IN ('.get_users_IDs_by_logins( substr( $this->assignees_logins, 1 ) ).') )' );
+		}
+		else
+		{
+			$this->WHERE_and( $this->dbprefix.'assigned_user_ID IN ('.get_users_IDs_by_logins( $this->assignees_logins ).')' );
 		}
 	}
 
@@ -524,7 +593,7 @@ class ItemQuery extends SQL
 	 */
 	function where_datestart( $m = '', $w = '', $dstart = '', $dstop = '', $timestamp_min = '', $timestamp_max = 'now' )
 	{
-		global $time_difference;
+		global $time_difference, $DB;
 
 		$this->m = $m;
 		$this->w = $w;
@@ -548,8 +617,8 @@ class ItemQuery extends SQL
 			$dstart_mysql = substr($dstart0,0,4).'-'.substr($dstart0,4,2).'-'.substr($dstart0,6,2).' '
 											.substr($dstart0,8,2).':'.substr($dstart0,10,2);
 
-			$this->WHERE_and( $this->dbprefix.'datestart >= \''.$dstart_mysql.'\'
-													OR ( '.$this->dbprefix.'datedeadline IS NULL AND '.$this->dbprefix.'datestart >= \''.$dstart_mysql.'\' )' );
+			$this->WHERE_and( $this->dbprefix.'datestart >= '.$DB->quote( $dstart_mysql ).'
+													OR ( '.$this->dbprefix.'datedeadline IS NULL AND '.$this->dbprefix.'datestart >= '.$DB->quote( $dstart_mysql ).' )' );
 
 			$start_is_set = true;
 		}
@@ -592,7 +661,7 @@ class ItemQuery extends SQL
 											.substr($dstop,8,2).':'.substr($dstop,10,2);
 			}
 
-			$this->WHERE_and( $this->dbprefix.'datestart < \''.$dstop_mysql.'\'' ); // NOT <= comparator because we compare to the superior stop date
+			$this->WHERE_and( $this->dbprefix.'datestart < '.$DB->quote( $dstop_mysql ) ); // NOT <= comparator because we compare to the superior stop date
 
 			$stop_is_set = true;
 		}
@@ -652,7 +721,7 @@ class ItemQuery extends SQL
 		{ // Hide posts before
 			// echo 'hide before '.$timestamp_min;
 			$date_min = remove_seconds( $timestamp_min + $time_difference );
-			$this->WHERE_and( $this->dbprefix.'datestart >= \''. $date_min.'\'' );
+			$this->WHERE_and( $this->dbprefix.'datestart >= '.$DB->quote( $date_min ) );
 		}
 
 		if( $timestamp_max == 'now' )
@@ -664,7 +733,7 @@ class ItemQuery extends SQL
 		{ // Hide posts after
 			// echo 'after';
 			$date_max = remove_seconds( $timestamp_max + $time_difference );
-			$this->WHERE_and( $this->dbprefix.'datestart <= \''. $date_max.'\'' );
+			$this->WHERE_and( $this->dbprefix.'datestart <= '.$DB->quote( $date_max ) );
 		}
 
 	}
@@ -677,13 +746,13 @@ class ItemQuery extends SQL
 	 */
 	function where_datecreated( $timestamp_created_max = 'now' )
 	{
-		global $time_difference;
+		global $time_difference, $DB;
 
 		if( !empty($timestamp_created_max) )
 		{ // Hide posts after
 			// echo 'after';
 			$date_max = date('Y-m-d H:i:s', $timestamp_created_max + $time_difference );
-			$this->WHERE_and( $this->dbprefix.'datecreated <= \''. $date_max.'\'' );
+			$this->WHERE_and( $this->dbprefix.'datecreated <= '.$DB->quote( $date_max ) );
 		}
 
 	}
@@ -733,7 +802,7 @@ class ItemQuery extends SQL
 				$swords = 'AND';
 
 			// puts spaces instead of commas
-			$keywords = preg_replace('/, +/', '', $keywords);
+			$keywords = preg_replace('/, +/', ',', $keywords);
 			$keywords = str_replace(',', ' ', $keywords);
 			$keywords = str_replace('"', ' ', $keywords);
 			$keywords = trim($keywords);
@@ -754,11 +823,4 @@ class ItemQuery extends SQL
 
 }
 
-
-/*
- * $Log$
- * Revision 1.30  2013/11/06 09:08:48  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

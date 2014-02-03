@@ -257,7 +257,7 @@ class File extends DataObject
 		// If there's a valid file root, handle extra stuff. This should not get done when the FileRoot is invalid.
 		if( $this->_FileRoot )
 		{
-			$this->_rdfp_rel_path = no_trailing_slash(str_replace( '\\', '/', $rdfp_rel_path ));
+			$this->_rdfp_rel_path = trim( str_replace( '\\', '/', $rdfp_rel_path ), '/' );
 			$this->_adfp_full_path = $this->_FileRoot->ads_path.$this->_rdfp_rel_path;
 			$this->_name = basename( $this->_adfp_full_path );
 			$this->_dir = dirname( $this->_adfp_full_path ).'/';
@@ -1791,37 +1791,50 @@ class File extends DataObject
 
 	/**
 	 * Get Link to view the file (either with viewer of with browser, etc...)
+	 *
+	 * @param string|NULL Text of the link
+	 * @param string|NULL Title of the link
+	 * @param string|NULL Text when user has no access for this file
+	 * @param string Format for text of the link: $text$
+	 * @param string Class name of the link
+	 * @return string Link tag
 	 */
-	function get_view_link( $text = NULL, $title = NULL, $no_access_text = NULL )
+	function get_view_link( $text = NULL, $title = NULL, $no_access_text = NULL, $format = '$text$', $class = '' )
 	{
 		if( is_null( $text ) )
-		{	// Use file root+relpath+name by default
+		{ // Use file root+relpath+name by default
 			$text = $this->get_root_and_rel_path();
 		}
 
 		if( is_null( $title ) )
-		{	// Default link title
+		{ // Default link title
 			$this->load_meta();
 			$title = $this->title;
 		}
 
 		if( is_null( $no_access_text ) )
-		{	// Default text when no access:
+		{ // Default text when no access:
 			$no_access_text = $text;
 		}
 
 		// Get the URL for viewing the file/dir:
 		$url = $this->get_view_url( false );
 
-		if( empty($url) )
-		{
+		if( empty( $url ) )
+		{ // Display this text when current user has no access
 			return $no_access_text;
 		}
+
+		// Replace a mask in the link text
+		$text = str_replace( '$text$', $text, $format );
+
+		// Init an attribute for class
+		$class_attr = empty( $class ) ? '' : ' class="'.$class.'"';
 
 		$Filetype = & $this->get_Filetype();
 		if( $Filetype && in_array( $Filetype->viewtype, array( 'external', 'download' ) ) )
 		{ // Link to open in the curent window
-			return '<a href="'.$url.'" title="'.$title.'">'.$text.'</a>';
+			return '<a href="'.$url.'" title="'.$title.'"'.$class_attr.'>'.$text.'</a>';
 		}
 		else
 		{ // Link to open in a new window
@@ -1832,7 +1845,9 @@ class File extends DataObject
 				title="'.T_('Open in a new window').'" onclick="'
 				."this.target = ''; return pop_up_window( '$url', '$target', "
 				.(( $width = $this->get_image_size( 'width' ) ) ? ( $width + 100 ) : 750 ).', '
-				.(( $height = $this->get_image_size( 'height' ) ) ? ( $height + 150 ) : 550 ).' )">'.$text.'</a>';
+				.(( $height = $this->get_image_size( 'height' ) ) ? ( $height + 150 ) : 550 ).' )"'
+				.$class_attr.'>'
+				.$text.'</a>';
 		}
 	}
 

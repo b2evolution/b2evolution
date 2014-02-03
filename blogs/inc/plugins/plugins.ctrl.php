@@ -204,8 +204,13 @@ switch( $action )
 		}
 
 		load_funcs('plugins/_plugin.funcs.php');
-		if( ! install_plugin_db_schema_action( $edit_Plugin ) )
-		{
+		if( install_plugin_db_schema_action( $edit_Plugin ) )
+		{ // Changes are done, or no changes
+			$action = 'list';
+		}
+		else
+		{ // delta queries have to be confirmed in payload
+			$action = 'install_db_schema';
 			$next_action = 'enable_plugin';
 			break;
 		}
@@ -314,8 +319,12 @@ switch( $action )
 		}
 
 		load_funcs('plugins/_plugin.funcs.php');
-		if( ! install_plugin_db_schema_action( $edit_Plugin ) )
-		{
+		if( install_plugin_db_schema_action( $edit_Plugin ) )
+		{ // Changes are done, or no changes
+			$action = 'list';
+		}
+		else
+		{ // delta queries have to be confirmed in payload
 			$next_action = 'install_db_schema';
 			break;
 		}
@@ -1047,10 +1056,4 @@ $AdminUI->disp_payload_end();
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-/*
- * $Log$
- * Revision 1.27  2013/11/06 08:04:35  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

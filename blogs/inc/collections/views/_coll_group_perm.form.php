@@ -114,7 +114,7 @@ $Results->ID_col = 'grp_ID';
  */
 $Results->grp_cols[] = array(
 						'td_colspan' => 0,  // nb_cols
-						'td' => '~conditional( #bloggroup_ismember#, \''.TS_('Members').'\', \''.TS_('Non members').'\' )~',
+						'td' => '~conditional( #bloggroup_ismember#, \''.format_to_output( TS_('Members'), 'htmlattr' ).'\', \''.format_to_output( TS_('Non members'), 'htmlattr' ).'\' )~',
 					);
 
 /*
@@ -131,37 +131,37 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 						'th' => T_('Group'),
 						'order' => 'grp_name',
-						'td' => '<a href="?ctrl=users&amp;grp_ID=$grp_ID$">$grp_name$</a>',
+						'td' => '<a href="?ctrl=users&amp;filter=new&amp;group=$grp_ID$">$grp_name$</a>',
 					);
 
 $Results->cols[] = array(
 						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Is<br />member'),
 						'th_class' => 'checkright',
-						'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'ismember\', \''.TS_('Permission to read members posts').'\', \'checkallspan_state_$grp_ID$\' )%',
+						'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'ismember\', \''.format_to_output( TS_('Permission to read members posts'), 'htmlattr' ).'\', \'checkallspan_state_$grp_ID$\' )%',
 						'td_class' => 'center',
 					);
 
 $Results->cols[] = array(
 						'th' => T_('Post statuses'),
 						'th_class' => 'checkright',
-						'td' => '%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'published\', \''.TS_('Permission to post into this blog with published status').'\', \'post\' )%'.
-								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'community\', \''.TS_('Permission to post into this blog with community status').'\', \'post\' )%'.
-								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'protected\', \''.TS_('Permission to post into this blog with members status').'\', \'post\' )%'.
-								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'review\', \''.TS_('Permission to post into this blog with review status').'\', \'post\' )%'.
-								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'private\', \''.TS_('Permission to post into this blog with private status').'\', \'post\' )%'.
-								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'draft\', \''.TS_('Permission to post into this blog with draft status').'\', \'post\' )%'.
-								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'deprecated\', \''.TS_('Permission to post into this blog with deprecated status').'\', \'post\' )%'.
-								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'redirected\', \''.TS_('Permission to post into this blog with redirected status').'\', \'post\' )%',
+						'td' => '%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'published\', \''.format_to_output( TS_('Permission to post into this blog with published status'), 'htmlattr' ).'\', \'post\' )%'.
+								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'community\', \''.format_to_output( TS_('Permission to post into this blog with community status'), 'htmlattr' ).'\', \'post\' )%'.
+								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'protected\', \''.format_to_output( TS_('Permission to post into this blog with members status'), 'htmlattr' ).'\', \'post\' )%'.
+								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'private\', \''.format_to_output( TS_('Permission to post into this blog with private status'), 'htmlattr' ).'\', \'post\' )%'.
+								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'review\', \''.format_to_output( TS_('Permission to post into this blog with review status'), 'htmlattr' ).'\', \'post\' )%'.
+								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'draft\', \''.format_to_output( TS_('Permission to post into this blog with draft status'), 'htmlattr' ).'\', \'post\' )%'.
+								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'deprecated\', \''.format_to_output( TS_('Permission to post into this blog with deprecated status'), 'htmlattr' ).'\', \'post\' )%'.
+								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'redirected\', \''.format_to_output( TS_('Permission to post into this blog with redirected status'), 'htmlattr' ).'\', \'post\' )%',
 						'td_class' => 'center',
 					);
 
 $Results->cols[] = array(
 						'th' => T_('Post types'),
 						'th_class' => 'checkright',
-						'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_page\', \''.TS_('Permission to create pages').'\' )%'.
-								'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_intro\', \''.TS_('Permission to create intro posts (Intro-* post types)').'\' )%'.
-								'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_podcast\', \''.TS_('Permission to create podcast episodes').'\' )%'.
-								'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_sidebar\', \''.TS_('Permission to create sidebar links').'\' )%',
+						'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_page\', \''.format_to_output( TS_('Permission to create pages'), 'htmlattr' ).'\' )%'.
+								'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_intro\', \''.format_to_output( TS_('Permission to create intro posts (Intro-* post types)'), 'htmlattr' ).'\' )%'.
+								'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_podcast\', \''.format_to_output( TS_('Permission to create podcast episodes'), 'htmlattr' ).'\' )%'.
+								'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_sidebar\', \''.format_to_output( TS_('Permission to create sidebar links'), 'htmlattr' ).'\' )%',
 						'td_class' => 'center',
 					);
 
@@ -178,7 +178,7 @@ $Results->cols[] = array(
 						'th_class' => 'checkright',
 						'order' => 'bloggroup_perm_delpost',
 						'default_dir' => 'D',
-						'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_delpost\', \''.TS_('Permission to delete posts in this blog').'\' )%',
+						'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_delpost\', \''.format_to_output( TS_('Permission to delete posts in this blog'), 'htmlattr' ).'\' )%',
 						'td_class' => 'center',
 					);
 
@@ -187,20 +187,20 @@ $Results->cols[] = array(
 						'th_class' => 'checkright',
 						'order' => 'bloggroup_perm_edit_ts',
 						'default_dir' => 'D',
-						'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_edit_ts\', \''.TS_('Permission to edit timestamp on posts and comments in this blog').'\' )%',
+						'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_edit_ts\', \''.format_to_output( TS_('Permission to edit timestamp on posts and comments in this blog'), 'htmlattr' ).'\' )%',
 						'td_class' => 'center',
 					);
 
 $Results->cols[] = array(
 						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Comment<br />statuses'),
 						'th_class' => 'checkright',
-						'td' => '%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'published\', \''.TS_('Permission to comment into this blog with published status').'\', \'comment\' )%'.
-								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'community\', \''.TS_('Permission to comment into this blog with community status').'\', \'comment\' )%'.
-								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'protected\', \''.TS_('Permission to comment into this blog with members status').'\', \'comment\' )%'.
-								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'review\', \''.TS_('Permission to comment into this blog with review status').'\', \'comment\' )%'.
-								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'private\', \''.TS_('Permission to comment into this blog with private status').'\', \'comment\' )%'.
-								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'draft\', \''.TS_('Permission to comment into this blog with draft status').'\', \'comment\' )%'.
-								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'deprecated\', \''.TS_('Permission to comment into this blog with deprecated status').'\', \'comment\' )%',
+						'td' => '%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'published\', \''.format_to_output( TS_('Permission to comment into this blog with published status'), 'htmlattr' ).'\', \'comment\' )%'.
+								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'community\', \''.format_to_output( TS_('Permission to comment into this blog with community status'), 'htmlattr' ).'\', \'comment\' )%'.
+								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'protected\', \''.format_to_output( TS_('Permission to comment into this blog with members status'), 'htmlattr' ).'\', \'comment\' )%'.
+								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'private\', \''.format_to_output( TS_('Permission to comment into this blog with private status'), 'htmlattr' ).'\', \'comment\' )%'.
+								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'review\', \''.format_to_output( TS_('Permission to comment into this blog with review status'), 'htmlattr' ).'\', \'comment\' )%'.
+								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'draft\', \''.format_to_output( TS_('Permission to comment into this blog with draft status'), 'htmlattr' ).'\', \'comment\' )%'.
+								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'deprecated\', \''.format_to_output( TS_('Permission to comment into this blog with deprecated status'), 'htmlattr' ).'\', \'comment\' )%',
 						'td_class' => 'center',
 					);
 
@@ -217,39 +217,42 @@ $Results->cols[] = array(
 						'th_class' => 'checkright',
 						'order' => 'bloggroup_perm_delcmts',
 						'default_dir' => 'D',
-						'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_delcmts\', \''.TS_('Permission to delete comments on this blog').'\' )%&nbsp;'.
-								'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_recycle_owncmts\', \''.TS_('Permission to recycle comments on their own posts').'\' )%&nbsp;'.
-								'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_vote_spam_cmts\', \''.TS_('Permission to give a spam vote on any comment').'\' )%&nbsp;',
+						'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_delcmts\', \''.format_to_output( TS_('Permission to delete comments on this blog'), 'htmlattr' ).'\' )%&nbsp;'.
+								'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_recycle_owncmts\', \''.format_to_output( TS_('Permission to recycle comments on their own posts'), 'htmlattr' ).'\' )%&nbsp;'.
+								'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_vote_spam_cmts\', \''.format_to_output( TS_('Permission to give a spam vote on any comment'), 'htmlattr' ).'\' )%&nbsp;',
 						'td_class' => 'center',
 					);
 
 $Results->cols[] = array(
 						'th_group' => T_('Edit blog settings'),
 						'th' => T_('Cats'),
+						'th_title' => T_('Categories'),
 						'th_class' => 'checkright',
 						'order' => 'bloggroup_perm_cats',
 						'default_dir' => 'D',
-						'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_cats\', \''.TS_('Permission to edit categories for this blog').'\' )%',
+						'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_cats\', \''.format_to_output( TS_('Permission to edit categories for this blog'), 'htmlattr' ).'\' )%',
 						'td_class' => 'center',
 					);
 
 $Results->cols[] = array(
 						'th_group' => T_('Edit blog settings'),
 						'th' => /* TRANS: Short for blog features */  T_('Feat.'),
+						'th_title' => T_('Features'),
 						'th_class' => 'checkright',
 						'order' => 'bloggroup_perm_properties',
 						'default_dir' => 'D',
-						'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_properties\', \''.TS_('Permission to edit blog features').'\' )%',
+						'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_properties\', \''.format_to_output( TS_('Permission to edit blog features'), 'htmlattr' ).'\' )%',
 						'td_class' => 'center',
 					);
 
 $Results->cols[] = array(
 						'th_group' => T_('Edit blog settings'),
 						'th' => /* TRANS: Short for advanced */  T_('Adv.'),
+						'th_title' => T_('Advanced/Administrative blog properties'),
 						'th_class' => 'checkright',
 						'order' => 'bloggroup_perm_admin',
 						'default_dir' => 'D',
-						'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_admin\', \''.TS_('Permission to edit advanced/administrative blog properties').'\' )%',
+						'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_admin\', \''.format_to_output( TS_('Permission to edit advanced/administrative blog properties'), 'htmlattr' ).'\' )%',
 						'td_class' => 'center',
 					);
 
@@ -259,9 +262,9 @@ $Results->cols[] = array(
 						'th_class' => 'checkright',
 						'order' => 'bloggroup_perm_media_upload',
 						'default_dir' => 'D',
-						'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_media_upload\', \''.TS_('Permission to upload into blog\'s media folder').'\' )%'.
-								'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_media_browse\', \''.TS_('Permission to browse blog\'s media folder').'\' )%'.
-								'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_media_change\', \''.TS_('Permission to change the blog\'s media folder content').'\' )%',
+						'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_media_upload\', \''.format_to_output( TS_('Permission to upload into blog\'s media folder'), 'htmlattr' ).'\' )%'.
+								'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_media_browse\', \''.format_to_output( TS_('Permission to browse blog\'s media folder'), 'htmlattr' ).'\' )%'.
+								'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_media_change\', \''.format_to_output( TS_('Permission to change the blog\'s media folder content'), 'htmlattr' ).'\' )%',
 						'td_class' => 'center',
 					);
 
@@ -292,10 +295,4 @@ $Form->hidden( 'group_IDs', implode( ',', $grp_IDs) );
 $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'SaveButton' ),
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
-/*
- * $Log$
- * Revision 1.25  2013/11/06 08:03:58  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -89,8 +89,8 @@ class FileRoot
 		 */
 		global $current_User;
 		global $Messages;
- 		global $Settings, $Debuglog;
- 		global $Blog;
+		global $Settings, $Debuglog;
+		global $Blog;
 
 		// Store type:
 		$this->type = $root_type;
@@ -107,7 +107,7 @@ class FileRoot
 				{	// User not found
 					return false;
 				}
-				$this->name = $User->get( 'preferredname' ); //.' ('. /* TRANS: short for "user" */ T_('u').')';
+				$this->name = $User->get( 'login' ); //.' ('. /* TRANS: short for "user" */ T_('u').')';
 				$this->ads_path = $User->get_media_dir( $create );
 				$this->ads_url = $User->get_media_url();
 				return;
@@ -159,14 +159,14 @@ class FileRoot
 				}
 				return;
 
-    	case 'skins':
-    		// fp> some stuff here should go out of here... but I don't know where to put it yet. I'll see after the Skin refactoring.
-     		if( ! $Settings->get( 'fm_enable_roots_skins' ) )
+			case 'skins':
+				// fp> some stuff here should go out of here... but I don't know where to put it yet. I'll see after the Skin refactoring.
+				if( ! $Settings->get( 'fm_enable_roots_skins' ) )
 				{ // Skins root is disabled:
 					$Debuglog->add( 'Attempt to access skins dir, but this feature is globally disabled', 'files' );
 				}
 				elseif( empty( $current_User ) || ( ! $current_User->check_perm( 'templates' ) ) )
-				{	// No perm to access templates:
+				{ // No perm to access templates:
 					$Debuglog->add( 'Attempt to access skins dir, but no permission', 'files' );
 				}
 				else
@@ -175,7 +175,7 @@ class FileRoot
 					$this->name = T_('Skins');
 					$this->ads_path = $skins_path;
 					if( isset($Blog) )
-					{	// (for now) Let's make skin files appear as being part of the currently displayed blog:
+					{ // (for now) Let's make skin files appear as being part of the currently displayed blog:
 						$this->ads_url = $Blog->get_local_skins_url();
 					}
 					else
@@ -229,11 +229,4 @@ class FileRoot
 
 }
 
-
-/*
- * $Log$
- * Revision 1.17  2013/11/06 08:04:08  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

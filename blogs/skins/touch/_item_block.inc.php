@@ -47,7 +47,7 @@ $params = array_merge( array(
 		}
 	?>
 
-	<a class="post-arrow" id="arrow-188" href="javascript:%20return%20false;"></a>
+	<a class="post-arrow" id="arrow-<?php echo $Item->ID; ?>" href="javascript:"></a>
 
 	<div class="calendar">
 		<div class="cal-month month-<?php $Item->issue_time( array( 'time_format' => 'm', 'before' => '', 'after' => '' ) ); ?>"><?php $Item->issue_time( array( 'time_format' => 'M', 'before' => '', 'after' => '' ) ); ?></div>
@@ -75,7 +75,7 @@ $params = array_merge( array(
 	?>
 
 	<div class="post-author">
-		<span class="lead">By</span> <?php $Item->author() ?><br />
+		<span class="lead">By</span> <?php $Item->author( array( 'link_text' => 'preferredname' ) ) ?><br />
 
 	<?php
 		if( ! $Item->is_intro() )
@@ -107,7 +107,7 @@ $params = array_merge( array(
 	<?php
 		// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 		skin_include( '_item_content.inc.php', $params );
-		// Note: You can customize the default item feedback by copying the generic
+		// Note: You can customize the default item content by copying the generic
 		// /skins/_item_content.inc.php file into the current skin folder.
 		// -------------------------- END OF POST CONTENT -------------------------
 	?>

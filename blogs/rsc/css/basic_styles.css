@@ -158,9 +158,29 @@ span.icon {
 	padding: 0 !important;
 	font-size: 9px;
 	display: inline-block !important;
+	overflow: hidden;
+	vertical-align: top;
 }
 span.icon.voted {
 	margin: 0 2px;
+}
+a.rollover_sprite:hover span.icon {
+	visibility: hidden;
+	visibility: visible\0/;/* IE8 */
+}
+@media screen and (min-width:0\0) { /* IE9-10 */
+	a.rollover_sprite:hover span.icon {
+		visibility: visible;
+	}
+}
+a.rollover_sprite:hover span.icon:before {
+	visibility: visible !important;
+	background: inherit;
+	float: left;
+	width: 32px;
+	height: 16px;
+	content: "";
+	margin-left: -16px;
 }
 .vote_spam span.icon.voted {
 	margin: auto;
@@ -309,11 +329,13 @@ a.roundbutton_red:hover, span.roundbutton_red:hover {
 	left: -1px;
 }
 .roundbutton_group .roundbutton:first-child:before,
-.roundbutton_group .roundbutton_text:first-child:before {
+.roundbutton_group .roundbutton_text:first-child:before,
+.roundbutton_group .roundbutton_text.first-child:before {
 	border: none;
 }
 .roundbutton_group .roundbutton:first-child,
-.roundbutton_group .roundbutton_text:first-child {
+.roundbutton_group .roundbutton_text:first-child,
+.roundbutton_group .roundbutton_text.first-child {
 	border-radius: 4px 0 0 4px;
 	-moz-border-radius-topleft: 4px; -moz-border-radius-bottomleft: 4px;
 	-khtml-border-radius-topleft: 4px; -khtml-border-radius-bottomleft: 4px;
@@ -322,7 +344,8 @@ a.roundbutton_red:hover, span.roundbutton_red:hover {
 	border-right: 1px solid #787878;
 }
 .roundbutton_group .roundbutton:last-child,
-.roundbutton_group .roundbutton_text:last-child {
+.roundbutton_group .roundbutton_text:last-child,
+.roundbutton_group .roundbutton_text.last-child {
 	border-left: none;
 	border-right: 1px solid #787878;
 	border-radius: 0 4px 4px 0;
@@ -331,7 +354,8 @@ a.roundbutton_red:hover, span.roundbutton_red:hover {
 	-webkit-border-top-right-radius: 4px; -webkit-border-bottom-right-radius: 4px;
 }
 .roundbutton_group .roundbutton:first-child:last-child,
-.roundbutton_group .roundbutton_text:first-child:last-child {
+.roundbutton_group .roundbutton_text:first-child:last-child,
+.roundbutton_group .roundbutton_text.first-child.last-child {
 	border: 1px solid #787878;
 	border-radius: 4px;
 	-moz-border-radius: 4px;
@@ -388,4 +412,15 @@ div.edit_toolbar input:hover {
 div.comment_toolbars {
 	margin-top: 1em;
 	text-align: center;
+}
+
+/* Meta categories */
+.widget_core_coll_category_list .meta {
+	font-weight: bold;
+}
+.widget_core_coll_category_list .meta ul {
+	font-weight: normal;
+}
+.widget_core_coll_category_list .meta input[disabled="disabled"] {
+	visibility: hidden;
 }

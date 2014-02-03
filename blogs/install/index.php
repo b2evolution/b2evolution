@@ -13,7 +13,6 @@
  * @package install
  */
 
-
 // Turn off the output buffering to do the correct work of the function flush()
 @ini_set( 'output_buffering', 'off' );
 
@@ -29,6 +28,9 @@ define( 'EVO_MAIN_INIT', true );
  * Define that we're in the install process.
  */
 define( 'EVO_IS_INSTALLING', true );
+
+// Force to display errors during install/upgrade, even when not in debug mode
+$display_errors_on_production = true;
 
 $script_start_time = time();
 $localtimenow = $script_start_time; // used e.g. for post_datemodified (sample posts)
@@ -94,6 +96,8 @@ param( 'action', 'string', 'default' );
 switch( $action )
 {
 	case 'evoupgrade':
+	case 'auto_upgrade':
+	case 'svn_upgrade':
 	case 'newdb':
 	case 'cafelogupgrade':
 	case 'deletedb':
@@ -114,6 +118,20 @@ switch( $action )
 }
 
 $timestamp = time() - 120; // We start dates 2 minutes ago because their dates increase 1 second at a time and we want everything to be visible when the user watches the blogs right after install :P
+
+// Load all available locale defintions:
+locales_load_available_defs();
+param( 'locale', 'string' );
+$use_locale_from_request = false;
+if( preg_match( '/[a-z]{2}-[A-Z]{2}(-.{1,14})?/', $locale ) )
+{
+	$default_locale = $locale;
+	$use_locale_from_request = true;
+}
+if( ! empty( $default_locale ) && ! empty( $locales ) && isset( $locales[ $default_locale ] ) )
+{ // Set correct charset, The main using is for DB connection
+	$evo_charset = $locales[ $default_locale ]['charset'];
+}
 
 if( $config_is_done || $try_db_connect )
 { // Connect to DB:
@@ -156,14 +174,7 @@ if( $config_is_done || $try_db_connect )
 	}
 }
 
-// Load all available locale defintions:
-locales_load_available_defs();
-param( 'locale', 'string' );
-if( preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,14})?/', $locale) )
-{
-	$default_locale = $locale;
-}
-else
+if( ! $use_locale_from_request )
 { // detect language
 	// try to check if db already exists and default locale is set on it
 	$default_locale = get_default_locale_from_db();
@@ -185,6 +196,8 @@ init_charsets( $current_charset );
 switch( $action )
 {
 	case 'evoupgrade':
+	case 'auto_upgrade':
+	case 'svn_upgrade':
 		$title = T_('Upgrade from a previous version');
 		break;
 
@@ -257,6 +270,11 @@ header('Cache-Control: no-cache'); // no request to this page should get cached!
 block_open();
 
 // echo $action;
+$date_timezone = ini_get( "date.timezone" );
+if( empty( $date_timezone ) && empty( $date_default_timezone ) )
+{ // The default timezone is not set, display a warning
+	echo '<div class="error"><p class="error">'.sprintf( T_("No default time zone is set. Please open PHP.ini and set the value of 'date.timezone' (Example: date.timezone = Europe/Paris) or open /conf/_advanced.php and set the value of %s (Example: %s)"), '$date_default_timezone', '$date_default_timezone = \'Europe/Paris\';' ).'</p></div>';
+}
 
 if( ( $config_is_done || $try_db_connect ) && ( $DB->error ) )
 { // DB connect was unsuccessful, restart conf
@@ -537,6 +555,26 @@ switch( $action )
 			<p style="margin-left: 2em;">
 				<input type="checkbox" name="create_sample_contents" id="create_sample_contents" value="1" checked="checked" />
 				<label for="create_sample_contents"><?php echo T_('Also install sample blogs &amp; sample contents. The sample posts explain several features of b2evolution. This is highly recommended for new users.')?></label>
+				<br />
+				<?php
+					// Pre-check if current installation is local
+					$is_local = php_sapi_name() != 'cli' && // NOT php CLI mode
+						( $_SERVER['SERVER_ADDR'] == '127.0.0.1' ||
+							$_SERVER['SERVER_ADDR'] == '::1' || // IPv6 address of 127.0.0.1
+							$basehost == 'localhost' ||
+							$_SERVER['REMOTE_ADDR'] == '127.0.0.1' ||
+							$_SERVER['REMOTE_ADDR'] == '::1' );
+				?>
+				<input type="checkbox" name="local_installation" id="local_installation" value="1"<?php echo $is_local ? ' checked="checked"' : ''; ?> />
+				<label for="local_installation"><?php echo T_('This is a local / test / intranet installation.')?></label>
+				<?php
+					if( $test_install_all_features )
+					{	// Checkbox to install all features
+				?>
+				<br />
+				<input type="checkbox" name="install_all_features" id="install_all_features" value="1" />
+				<label for="install_all_features"><?php echo T_('Also install all test features.')?></label>
+				<?php } ?>
 			</p>
 
 			<p><input type="radio" name="action" id="evoupgrade" value="evoupgrade"
@@ -626,6 +664,8 @@ switch( $action )
 		 * Note: auto installers should kick in directly at this step and provide all required params.
 		 */
 
+		$test_install_all_features = param( 'install_all_features', 'boolean', false );
+
 		// fp> TODO: this test should probably be made more generic and applied to upgrade too.
 		$expected_connection_charset = $DB->php_to_mysql_charmap($evo_charset);
 		if( $DB->connection_charset != $expected_connection_charset )
@@ -651,7 +691,7 @@ switch( $action )
 		echo '<h2>'.T_('Installing b2evolution...').'</h2>';
 
 		echo '<h2>'.T_('Checking files...').'</h2>';
-		flush();
+		evo_flush();
 		// Check for .htaccess:
 		if( !install_htaccess( false ) )
 		{	// Exit installation here because the .htaccess file has the some errors
@@ -664,6 +704,8 @@ switch( $action )
 
 
 	case 'evoupgrade':
+	case 'auto_upgrade':
+	case 'svn_upgrade':
 		/*
 		 * -----------------------------------------------------------------------------------
 		 * EVO UPGRADE: Upgrade data from existing b2evolution database
@@ -675,22 +717,49 @@ switch( $action )
 		echo '<h2>'.T_('Upgrading b2evolution...').'</h2>';
 
 		echo '<h2>'.T_('Checking files...').'</h2>';
-		flush();
+		evo_flush();
 		// Check for .htaccess:
 		if( !install_htaccess( true ) )
 		{	// Exit installation here because the .htaccess file has the some errors
 			break;
 		}
 
+		// Try to obtain some serious time to do some serious processing (5 minutes)
+		// NOte: this must NOT be in upgrade_b2evo_tables(), otherwise it will mess with the longer setting used by the auto upgrade feature.
+		if( set_max_execution_time(300) === false )
+		{ // max_execution_time ini setting could not be changed for this script, display a warning
+			$manual_url = '"http://b2evolution.net/man/blank-or-partial-page" target = "_blank"';
+			echo '<div class="orange">'.sprintf( T_('WARNING: the max_execution_time is set to %s seconds in php.ini and cannot be increased automatically. This may lead to a PHP <a href=%s>timeout causing the upgrade to fail</a>. If so please post a screenshot to the <a href=%s>forums</a>.'), ini_get( 'max_execution_time' ), $manual_url, '"http://forums.b2evolution.net/"' ).'</div>';
+		}
+
 		echo '<h2>'.T_('Upgrading data in existing b2evolution database...').'</h2>';
-		flush();
-		if( upgrade_b2evo_tables() )
+		evo_flush();
+
+		$not_evoupgrade = ( $action !== 'evoupgrade' );
+		if( upgrade_b2evo_tables( $action ) )
 		{
+			if( $not_evoupgrade )
+			{ // After successful auto_upgrade or svn_upgrade we must remove files/folder based on the upgrade_policy.conf
+				remove_after_upgrade();
+				// disable maintenance mode at the end of the upgrade script
+				switch_maintenance_mode( false, 'upgrade' );
+			}
 			?>
 			<p><?php echo T_('Upgrade completed successfully!')?></p>
 			<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$admin_url.'"', 'b2evolution')?></p>
 			<?php
 		}
+		else
+		{
+			if( $not_evoupgrade )
+			{ // disable maintenance mode at the end of the upgrade script
+				switch_maintenance_mode( false, 'upgrade' );
+			}
+			?>
+			<p class="red"><?php echo T_('Upgrade failed!')?></p>
+			<?php
+		}
+
 		break;
 
 
@@ -703,7 +772,7 @@ switch( $action )
 		require_once( dirname(__FILE__). '/_functions_delete.php' );
 
 		echo '<h2>'.T_('Deleting b2evolution tables from the datatase...').'</h2>';
-		flush();
+		evo_flush();
 
 		if( $allow_evodb_reset != 1 )
 		{
@@ -814,7 +883,7 @@ block_close();
 			<?php echo T_('Online resources') ?>: <a href="http://b2evolution.net/" target="_blank"><?php echo T_('Official website') ?></a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank"><?php echo T_('Find a host') ?></a> &bull; <a href="http://b2evolution.net/man/" target="_blank"><?php echo T_('Manual') ?></a> &bull; <a href="http://forums.b2evolution.net/" target="_blank"><?php echo T_('Forums') ?></a>
 		<!-- InstanceEndEditable --></div>
 
-	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->Copyright &copy; 2003-2013 by Fran&ccedil;ois Planque &amp; others &middot; <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a>
+	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->Copyright &copy; 2003-2014 by Fran&ccedil;ois Planque &amp; others &middot; <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a>
 		<!-- InstanceEndEditable --></div>
 
 	</div>
@@ -832,13 +901,3 @@ block_close();
 	<!-- InstanceEndEditable -->
 </body>
 <!-- InstanceEnd --></html>
-
-
-<?php
-/*
- * $Log$
- * Revision 1.206  2013/11/06 09:09:09  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
-?>

@@ -344,11 +344,12 @@ if( !empty($p) || !empty($title) )
 	else
 	{	// Get from post title:
 		$orig_title = $title;
+		// Convert all special chars to -
 		$title = preg_replace( '/[^A-Za-z0-9_]/', '-', $title );
 		$Item = & $ItemCache->get_by_urltitle( $title, false, false );
 
 		if( ( !empty( $Item ) ) && ( $Item !== false ) && (! $Item->is_part_of_blog( $blog ) ) )
-		{ // we have found an Item object, but it doesn't belong to the current blog
+		{ // We have found an Item object, but it doesn't belong to the current blog!
 			unset($Item);
 		}
 
@@ -469,6 +470,12 @@ elseif( $disp == 'posts' && !empty($Item) )
 	// That feels more consistent and may also allow some skins to handle redirects differently (framing?)
 	// I hope I didn't screw that up... but it felt like the historical reasons for this to be here no longer applied.
 }
+elseif( ( ( $disp == 'page' ) || ( $disp == 'single' ) ) && empty( $Item ) )
+{ // 'page' and 'single' are not valid display params if $Item is not set
+	// Note: The 'preview' action is the only one exception, but that is handled above in this if statement
+	$disp = '404';
+	$disp_detail = '404-post_not_found';
+}
 
 
 /*
@@ -498,7 +505,8 @@ if( isset( $skin ) )
 	if( $Skin->type == 'feed' )
 	{	// Check if we actually allow the display of the feed; last chance to revert to 404 displayed in default skin.
 		// Note: Skins with the type "feed" can always be accessed, even when they're not installed.
-		if( $Blog->get_setting('feed_content') == 'none' )
+		if( ( $disp == 'posts' && $Blog->get_setting('feed_content') == 'none' ) ||
+		    ( $disp == 'comments' && $Blog->get_setting('comment_feed_content') == 'none' ) )
 		{ // We don't want to provide feeds; revert to 404!
 			unset( $skin );
 			unset( $Skin );
@@ -545,8 +553,31 @@ if( !empty( $skin ) && !skin_exists( $skin ) )
 	debug_die( $err_msg );
 }
 
+/*
+ * _______________ Name request/transaction for performance logging ________________
+ *
+ * A this point, we know what the request/transaction is about and we can give it
+ * a meaning ful name.
+ */
+$request_transaction_name = $Blog->shortname;
+
+if( !empty($disp_detail) )
+{
+	$request_transaction_name .= ':'.$disp_detail;
+}
+elseif( !empty($disp) )
+{
+	$request_transaction_name .= ':'.$disp;
+}
+
+$Debuglog->add( 'Transaction name: '.$request_transaction_name, 'request' );
+// Let's name the transaction for proper APM reporting:
+apm_name_transaction( $request_transaction_name );
+
 
 $Timer->pause( '_BLOG_MAIN.inc');
+// LOG with APM:
+$Timer->log_duration( '_BLOG_MAIN.inc' );
 
 
 /*
@@ -669,6 +700,8 @@ if( !empty( $skin ) )
 	$Timer->pause( 'PageCache' );
 
 	$Timer->pause( 'SKIN DISPLAY' );
+	// LOG with APM:
+	$Timer->log_duration( 'SKIN DISPLAY' );
 
 	// We probably don't want to return to the caller if we have displayed a skin...
 	// That is useful if the caller implements a custom display but we still use skins for RSS/ Atom etc..

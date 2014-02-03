@@ -121,7 +121,7 @@ foreach( $users_to_remind_ids as $user_ID )
 			'threads_link' => $threads_link,
 		);
 	$notify_User = $UserCache->get_by_ID( $user_ID );
-	// Change locale here to localize the email subject and content 
+	// Change locale here to localize the email subject and content
 	locale_temp_switch( $notify_User->get( 'locale' ) );
 	if( send_mail_to_User( $user_ID, T_( 'You have unread messages!' ), 'private_messages_unread_reminder', $email_template_params ) )
 	{ // Update users last unread message reminder timestamp

@@ -212,6 +212,16 @@ class user_tools_Widget extends ComponentWidget
 			),
 		), parent::get_param_definitions( $params )	);
 
+		if( isset( $r['allow_blockcache'] ) )
+		{ // Set default blockcache to false and disable this setting because caching is never allowed for this widget
+			$r['allow_blockcache']['defaultvalue'] = false;
+			$r['allow_blockcache']['disabled'] = 'disabled';
+			if( ! empty( $this->params ) && ( ! isset( $params['infinite_loop'] ) ) )
+			{ // Force allow_blockache to false! It is never allowed to be on, no matter what was set in the database.
+				$this->set( 'allow_blockcache', false );
+			}
+		}
+
 		return $r;
 	}
 
@@ -257,7 +267,7 @@ class user_tools_Widget extends ComponentWidget
 		$this->init_display( $params ); // just in case it hasn't been done before
 
 		$this->disp_params['item_start'] .= '<strong>';
-		$this->disp_params['item_end'] .= '</strong>';
+		$this->disp_params['item_end'] = '</strong>'.$this->disp_params['item_end'];
 
 		$tools_links = '';
 		if( $this->get_param('user_postnew_link_show') )
@@ -357,11 +367,4 @@ class user_tools_Widget extends ComponentWidget
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.19  2013/11/06 08:05:10  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

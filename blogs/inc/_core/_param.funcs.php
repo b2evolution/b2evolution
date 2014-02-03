@@ -73,6 +73,7 @@ $GLOBALS['debug_params'] = false;
  * - '' (does nothing) -- DEPRECATED, use "raw" instead
  * - '/^...$/' check regexp pattern match (string)
  * - boolean (will force type to boolean, but you can't use 'true' as a default since it has special meaning. There is no real reason to pass booleans on a URL though. Passing 0 and 1 as integers seems to be best practice).
+ * - url (like string but dies on illegal urls)
  * Value type will be forced only if resulting value (probably from default then) is !== NULL
  * @param mixed Default value or TRUE if user input required
  * @param boolean Do we need to memorize this to regenerate the URL for this page?
@@ -206,6 +207,27 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 				$GLOBALS[$var] = trim( strip_tags($GLOBALS[$var]) );
 
 				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as string', 'params' );
+				break;
+
+			case 'url':
+				if( ! is_scalar($GLOBALS[$var]) )
+				{ // This happens if someone uses "foo[]=x" where "foo" is expected as string
+					debug_die( 'param(-): <strong>'.$var.'</strong> is not scalar!' );
+				}
+
+				// Make sure the string is a single line
+				$GLOBALS[$var] = preg_replace( '~\r|\n~', '', $GLOBALS[$var] );
+				// strip out any html:
+				$GLOBALS[$var] = trim( strip_tags( $GLOBALS[$var] ) );
+				// Decode url:
+				$GLOBALS[$var] = urldecode( $GLOBALS[$var] );
+
+				if( ( !empty( $GLOBALS[$var] ) ) && ( ( strpos( $GLOBALS[$var], '"' ) !== false ) || ( ! preg_match( '#^(/|\?|https?://)#i', $GLOBALS[$var] ) ) ) )
+				{ // We cannot accept this MISMATCH:
+					bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
+				}
+
+				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as url', 'params' );
 				break;
 
 			case 'array':
@@ -378,6 +400,10 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 								}
 								// Restore current array with prepared data
 								$GLOBALS[$var] = $globals_var;
+							}
+							elseif( ( $type == 'boolean' ) && ( strtolower( $GLOBALS[$var] ) == 'false' ) )
+							{ // 'false' string must be interpreted as boolean false value
+								$GLOBALS[$var] = false;
 							}
 							elseif( !is_scalar( $GLOBALS[$var] ) || !preg_match( $regexp, $GLOBALS[$var] ) )
 							{ // Value of scalar var does not match!
@@ -1204,7 +1230,7 @@ function param_compile_cat_array( $restrict_to_blog = 0, $cat_default = NULL, $c
 	// fp> we want might to use a $set_globals params to compile_cat_array()
 	global $cat_array, $cat_modifier;
 
-	$cat = param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', $cat_default, true ); // List of cats to restrict to
+	$cat = param( 'cat', '/^[*\-\|]?([0-9]+(,[0-9]+)*)?$/', $cat_default, true ); // List of cats to restrict to
 	$catsel = param( 'catsel', 'array/integer', $catsel_default, true );  // Array of cats to restrict to
 
 	$cat_array = array();

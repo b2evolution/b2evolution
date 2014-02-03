@@ -58,9 +58,9 @@ if( !$current_User->check_perm( 'users', 'view' ) )
 
 	// Make sure the user only edits himself:
 	$user_ID = $current_User->ID;
-	if( !in_array( $action, array( 'update', 'edit', 'default_settings' ) ) )
+	if( !in_array( $action, array( 'update', 'edit', 'default_settings', 'change_admin_skin' ) ) )
 	{
-		header_redirect( regenerate_url( 'ctrl,action', 'ctrl=user&amp;action=edit&amp;user_ID='.$user_ID ) );
+		header_redirect( regenerate_url( 'ctrl,action', 'ctrl=user&action=edit&user_ID='.$user_ID, '', '&' ) );
 	}
 }
 
@@ -126,7 +126,7 @@ if( !$Messages->has_errors() )
 		case 'change_admin_skin':
 			// Skin switch from menu
 			param( 'new_admin_skin', 'string', true );
-			param( 'redirect_to', 'string', '' );
+			param( 'redirect_to', 'url', '' );
 
 			$UserSettings->set( 'admin_skin', $new_admin_skin );
 			$UserSettings->dbupdate();
@@ -342,7 +342,7 @@ if( !$Messages->has_errors() )
 			}
 
 			$Messages->add( T_('Customizations have been removed!' ), 'success' );
-			$redirect_to = param( 'redirect_to', 'string', regenerate_url( 'action' ) );
+			$redirect_to = param( 'redirect_to', 'url', regenerate_url( 'action' ) );
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $redirect_to );
 			/* EXITED */

@@ -18,7 +18,9 @@ $AdminUI->set_path( 'users', 'users' );
 param_action();
 
 param( 'user_ID', 'integer', NULL );	// Note: should NOT be memorized (would kill navigation/sorting) use memorize_param() if needed
-param( 'redirect_to', 'string', NULL );
+param( 'redirect_to', 'url', NULL );
+
+param( 'display_mode', 'string', 'normal' );
 
 /**
  * @global boolean true, if user is only allowed to edit his profile
@@ -64,7 +66,7 @@ if( ! is_null($user_ID) )
 		// We have EXITed already at this point!!
 	}
 
-	if( $action != 'view' )
+	if( $action != 'view' && $action != 'report_user' && $action != 'remove_report' )
 	{ // check edit permissions
 		if( ! $current_User->check_perm( 'users', 'edit' )
 		    && $edited_User->ID != $current_User->ID )
@@ -131,7 +133,9 @@ if( !$Messages->has_errors() )
 				break;
 			}
 
-			$action = 'edit';
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=user&user_tab=avatar&user_ID='.$edited_User->ID, 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 			break;
 
 		case 'delete_avatar':
@@ -152,7 +156,9 @@ if( !$Messages->has_errors() )
 				$action = $result;
 				break;
 			}
-			$action = 'edit';
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=user&user_tab=avatar&user_ID='.$edited_User->ID, 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 			break;
 
 		case 'upload_avatar':
@@ -172,7 +178,9 @@ if( !$Messages->has_errors() )
 				$action = $result;
 				break;
 			}
-			$action = 'edit';
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=user&user_tab=avatar&user_ID='.$edited_User->ID, 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 			break;
 
 		case 'update_avatar':
@@ -193,7 +201,9 @@ if( !$Messages->has_errors() )
 				$action = $result;
 				break;
 			}
-			$action = 'edit';
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=user&user_tab=avatar&user_ID='.$edited_User->ID, 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 			break;
 
 		case 'rotate_avatar_90_left':
@@ -241,7 +251,9 @@ if( !$Messages->has_errors() )
 				}
 				break;
 			}
-			$action = 'edit';
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=user&user_tab=avatar&user_ID='.$edited_User->ID, 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 			break;
 
 		case 'update':
@@ -343,7 +355,7 @@ if( !$Messages->has_errors() )
 						header_redirect( $baseurl, 303 );
 						// will have exited
 					}
-					if( isset( $current_User->Group ) && ( $current_User->Group->ID != 1 ) )
+					if( $current_User->grp_ID != 1 )
 					{ // admin user has changed his own group, change user_tab for redirect
 						$user_tab = 'profile';
 					}
@@ -566,7 +578,7 @@ if( !$Messages->has_errors() )
 				if( $edited_User->delete_messages() &&
 				    $edited_User->delete_comments() &&
 				    $edited_User->delete_posts( 'created|edited' ) &&
-				    $edited_User->delete_blogs() && 
+				    $edited_User->delete_blogs() &&
 				    $edited_User->dbdelete( $Messages ) )
 				{	// User and all his contributions were deleted successfully
 					$Messages->add( sprintf( T_('The user &laquo;%s&raquo; and all his contributions were deleted.'), $user_login ), 'success' );
@@ -577,65 +589,135 @@ if( !$Messages->has_errors() )
 				}
 			}
 			break;
+
+		case 'report_user': // Report a user
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+
+			if( !$current_User->check_status( 'can_report_user' ) )
+			{ // current User status doesn't allow user reporting
+				// Redirect to the account activation page
+				$Messages->add( T_( 'You must activate your account before you can report another user. <b>See below:</b>' ), 'error' );
+				header_redirect( get_activate_info_url(), 302 );
+				// will have exited
+			}
+
+			$report_status = param( 'report_user_status', 'string', '' );
+			$report_info = param( 'report_info_content', 'text', '' );
+			$user_ID = param( 'user_ID', 'integer', 0 );
+
+			if( get_report_status_text( $report_status ) == '' )
+			{ // A report status is incorrect
+				$Messages->add( T_('Please select the correct report reason!'), 'error' );
+				$user_tab = 'report';
+			}
+
+			if( ! param_errors_detected() )
+			{
+				// add report and block contact ( it will be blocked if was already on this user contact list )
+				add_report_from( $user_ID, $report_status, $report_info );
+				$blocked_message = '';
+				if( $current_User->check_perm( 'perm_messaging', 'reply' ) )
+				{ // user has messaging permission, set/add this user as blocked contact
+					$contact_status = check_contact( $user_ID );
+					if( $contact_status == NULL )
+					{ // contact doesn't exists yet, create as blocked contact
+						create_contacts_user( $user_ID, true );
+						$blocked_message = ' '.T_('You have also blocked this user from contacting you in the future.');
+					}
+					elseif( $contact_status )
+					{ // contact exists and it's not blocked, set as blocked
+						set_contact_blocked( $user_ID, 1 );
+						$blocked_message = ' '.T_('You have also blocked this user from contacting you in the future.');
+					}
+				}
+				$Messages->add( T_('The user was repoted.').$blocked_message, 'success' );
+			}
+
+			header_redirect( $admin_url.'?ctrl=user&user_tab='.$user_tab.'&user_ID='.$user_ID );
+			break;
+
+	case 'remove_report': // Remove current User report from the given user
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'user' );
+
+		$user_ID = param( 'user_ID', 'integer', 0 );
+
+		remove_report_from( $user_ID );
+		$unblocked_message = '';
+		if( set_contact_blocked( $user_ID, 0 ) )
+		{ // the user was unblocked
+			$unblocked_message = ' '.T_('You have also unblocked this user. He will be able to contact you again in the future.');
+		}
+		$Messages->add( T_('The report was removed.').$unblocked_message, 'success' );
+		header_redirect( $admin_url.'?ctrl=user&user_tab='.$user_tab.'&user_ID='.$user_ID );
+		break;
 	}
 }
 
-// require colorbox js
-require_js_helper( 'colorbox', 'rsc_url' );
-
-$AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
-if( $action == 'new' )
+if( $display_mode != 'js')
 {
-	$AdminUI->breadcrumbpath_add( $edited_User->login, '?ctrl=user&amp;user_ID='.$edited_User->ID );
-}
-else
-{
-	$AdminUI->breadcrumbpath_add( $edited_User->get_colored_login(), '?ctrl=user&amp;user_ID='.$edited_User->ID );
-}
-switch( $user_tab )
-{
-	case 'profile':
-		$AdminUI->breadcrumbpath_add( T_('Profile'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
-		require_css( $rsc_url.'css/jquery/smoothness/jquery-ui.css' );
-		init_userfields_js();
-		break;
-	case 'avatar':
-		if( isset($GLOBALS['files_Module']) )
-		{
-			$AdminUI->breadcrumbpath_add( T_('Profile picture'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
-		}
-		break;
-	case 'pwdchange':
-		$AdminUI->breadcrumbpath_add( T_('Change password'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
-		break;
-	case 'userprefs':
-		$AdminUI->breadcrumbpath_add( T_('Preferences'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
-		break;
-	case 'subs':
-		$AdminUI->breadcrumbpath_add( T_('Notifications'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
-		break;
-	case 'advanced':
-		$AdminUI->breadcrumbpath_add( T_('Advanced'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
-		break;
-	case 'admin':
-		$AdminUI->breadcrumbpath_add( T_('Admin'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
-		load_funcs('tools/model/_email.funcs.php');
-		break;
-	case 'sessions':
-		$AdminUI->breadcrumbpath_add( T_('Sessions'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
-		break;
-	case 'activity':
-		$AdminUI->breadcrumbpath_add( $current_User->ID == $edited_User->ID ? T_('My Activity') : T_('User Activity'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
-		require_css( $rsc_url.'css/blog_base.css' ); // Default styles for the blog navigation
-		break;
-}
+	// Display a form to quick search users
+	$AdminUI->top_block = get_user_quick_search_form();
 
-// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
-$AdminUI->disp_html_head();
+	// require colorbox js
+	require_js_helper( 'colorbox', 'rsc_url' );
 
-// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-$AdminUI->disp_body_top();
+	$AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
+	$AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
+	if( $action == 'new' )
+	{
+		$AdminUI->breadcrumbpath_add( $edited_User->login, '?ctrl=user&amp;user_ID='.$edited_User->ID );
+	}
+	else
+	{
+		$AdminUI->breadcrumbpath_add( $edited_User->get_colored_login(), '?ctrl=user&amp;user_ID='.$edited_User->ID );
+	}
+
+	switch( $user_tab )
+	{
+		case 'profile':
+			$AdminUI->breadcrumbpath_add( T_('Profile'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+			require_css( $rsc_url.'css/jquery/smoothness/jquery-ui.css' );
+			init_userfields_js();
+			break;
+		case 'avatar':
+			if( isset($GLOBALS['files_Module']) )
+			{
+				$AdminUI->breadcrumbpath_add( T_('Profile picture'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+			}
+			break;
+		case 'pwdchange':
+			$AdminUI->breadcrumbpath_add( T_('Change password'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+			break;
+		case 'userprefs':
+			$AdminUI->breadcrumbpath_add( T_('Preferences'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+			break;
+		case 'subs':
+			$AdminUI->breadcrumbpath_add( T_('Notifications'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+			break;
+		case 'advanced':
+			$AdminUI->breadcrumbpath_add( T_('Advanced'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+			break;
+		case 'admin':
+			$AdminUI->breadcrumbpath_add( T_('Admin'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+			load_funcs('tools/model/_email.funcs.php');
+			break;
+		case 'sessions':
+			$AdminUI->breadcrumbpath_add( T_('Sessions'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+			break;
+		case 'activity':
+			$AdminUI->breadcrumbpath_add( $current_User->ID == $edited_User->ID ? T_('My Activity') : T_('User Activity'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+			require_css( $rsc_url.'css/blog_base.css' ); // Default styles for the blog navigation
+			break;
+	}
+
+	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+	$AdminUI->disp_html_head();
+
+	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
+	$AdminUI->disp_body_top();
+}
 
 /*
  * Display appropriate payload:
@@ -770,19 +852,36 @@ switch( $action )
 				$AdminUI->disp_view( 'users/views/_user_activity.view.php' );
 				$AdminUI->disp_payload_end();
 				break;
+
+			case 'report':
+				if( $display_mode == 'js')
+				{ // Do not append Debuglog & Debug JSlog to response!
+					$debug = false;
+					$debug_jslog = false;
+				}
+
+				if( $display_mode != 'js')
+				{
+					$AdminUI->disp_payload_begin();
+				}
+				$user_tab = param( 'user_tab_from', 'string', 'profile' );
+				$AdminUI->disp_view( 'users/views/_user_report.form.php' );
+				if( $display_mode != 'js')
+				{
+					$AdminUI->disp_payload_end();
+				}
+				break;
 		}
 
 		break;
 }
 
+if( $display_mode != 'js')
+{
+	// Init JS for user reporting
+	echo_user_report_js();
 
-// Display body bottom, debug info and close </html>:
-$AdminUI->disp_global_footer();
-
-/*
- * $Log$
- * Revision 1.42  2013/11/06 08:04:55  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
+	// Display body bottom, debug info and close </html>:
+	$AdminUI->disp_global_footer();
+}
 ?>

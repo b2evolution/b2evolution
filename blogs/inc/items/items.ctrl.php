@@ -92,7 +92,7 @@ switch( $action )
 		set_working_blog( $Blog->ID );
 
 		// Where are we going to redirect to?
-		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID, '&' ) );
+		param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID, '&' ) );
 		break;
 
 	case 'mass_edit' :
@@ -118,7 +118,7 @@ switch( $action )
 		set_working_blog( $Blog->ID );
 
 		// Where are we going to redirect to?
-		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID, '&' ) );
+		param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID, '&' ) );
 
 		// What form button has been pressed?
 		param( 'save', 'string', '' );
@@ -126,7 +126,7 @@ switch( $action )
 		break;
 
 	case 'mass_save' :
-		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog=' . $Blog->ID, '&' ) );
+		param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog=' . $Blog->ID, '&' ) );
 		break;
 
 	case 'new' :
@@ -160,7 +160,7 @@ switch( $action )
 			}
 
 			// Where are we going to redirect to?
-			param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID, '&' ) );
+			param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID, '&' ) );
 
 			// What form buttton has been pressed?
 			param( 'save', 'string', '' );
@@ -241,16 +241,17 @@ switch( $action )
 			{
 				// checking if selected "same as above" category option
 				if ( $cat_Array[$fileNum]!='same' )
-				{
+				{ // Use a selected category ID
 					$edited_Item->set( 'main_cat_ID', $cat_Array[$fileNum] );
 				}
 				else
-				{
+				{ // Get a category ID from previous item
+					$cat_Array[$fileNum] = $cat_Array[$fileNum-1];
 					$edited_Item->set( 'main_cat_ID', $cat_Array[$fileNum-1] );
 				}
 			}
 			else
-			{
+			{ // Use default category ID if it was not selected on the form
 				$edited_Item->set( 'main_cat_ID', $Blog->get_default_cat_ID() );
 			}
 
@@ -288,13 +289,16 @@ switch( $action )
 
 				$DB->commit();
 
+				// Invalidate blog's media BlockCache
+				BlockCache::invalidate_key( 'media_coll_ID', $edited_Item->get_blog_ID() );
+
 				$Messages->add( sprintf( T_('&laquo;%s&raquo; has been posted.'), $l_File->dget('name') ), 'success' );
 				$fileNum++;
 			}
 			else
 			{
 				$DB->rollback();
-				$Messages->add( sprintf( T_('&laquo;%s&raquo; couldn\t be posted.'), $l_File->dget('name') ), 'error' );
+				$Messages->add( sprintf( T_('&laquo;%s&raquo; couldn\'t be posted.'), $l_File->dget('name') ), 'error' );
 			}
 		}
 
@@ -336,6 +340,12 @@ switch( $action )
 	case 'new_switchtab': // this gets set as action by JS, when we switch tabs
 		// New post form  (can be a bookmarklet form if mode == bookmarklet )
 
+		// We don't check the following earlier, because we want the blog switching buttons to be available:
+		if( ! blog_has_cats( $blog ) )
+		{
+			break;
+		}
+
 		load_class( 'items/model/_item.class.php', 'Item' );
 		$edited_Item = new Item();
 
@@ -365,7 +375,7 @@ switch( $action )
 		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing:
 			$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
 		}
-		$post_extracats = param( 'post_extracats', 'array', $post_extracats );
+		$post_extracats = param( 'post_extracats', 'array/integer', $post_extracats );
 
 		param( 'item_tags', 'string', '' );
 
@@ -488,7 +498,7 @@ switch( $action )
 		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing:
 			$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
 		}
-		$post_extracats = param( 'post_extracats', 'array', $post_extracats );
+		$post_extracats = param( 'post_extracats', 'array/integer', $post_extracats );
 
 		param( 'item_tags', 'string', '' );
 
@@ -693,7 +703,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( $exit_after_save );
+		$edited_Item->handle_post_processing( true, $exit_after_save );
 
 		$Messages->add( T_('Post has been created.'), 'success' );
 
@@ -754,7 +764,7 @@ switch( $action )
 		}
 
 		// Check if new category was started to create.  If yes check if it is valid.
-		$isset_category = check_categories ( $post_category, $post_extracats );
+		$isset_category = check_categories( $post_category, $post_extracats );
 
 		// Check permission on statuses:
 		$current_User->check_perm( 'cats_post!'.$post_status, 'edit', true, $post_extracats );
@@ -766,12 +776,12 @@ switch( $action )
 
 		// UPDATE POST:
 		// Set the params we already got:
-		$edited_Item->set ( 'status', $post_status );
+		$edited_Item->set( 'status', $post_status );
 
 		if( $isset_category )
 		{ // we change the categories only if the check was succesfull
-			$edited_Item->set ( 'main_cat_ID', $post_category );
-			$edited_Item->set ( 'extra_cat_IDs', $post_extracats );
+			$edited_Item->set( 'main_cat_ID', $post_category );
+			$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 		}
 
 		// Set object params:
@@ -810,7 +820,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( $exit_after_save );
+		$edited_Item->handle_post_processing( false, $exit_after_save );
 
 		$Messages->add( T_('Post has been updated.'), 'success' );
 
@@ -874,7 +884,8 @@ switch( $action )
 		{	// check user permission
 			$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $Item );
 
-			$title = param ( 'mass_title_' . $Item->ID, 'string', NULL );
+			// Not allow html content on post titles
+			$title = param ( 'mass_title_' . $Item->ID, 'htmlspecialchars', NULL );
 			$urltitle = param ( 'mass_urltitle_' . $Item->ID, 'string', NULL );
 			$titletag = param ( 'mass_titletag_' . $Item->ID, 'string', NULL );
 
@@ -901,7 +912,9 @@ switch( $action )
 
 		if( $update_nr > 0 )
 		{
-			$Messages->add( $update_nr.' '.T_('post(s) has been updated!'), 'success' );
+			$Messages->add( $update_nr == 1 ?
+				T_('One post has been updated!') :
+				sprintf( T_('%d posts have been updated!'), $update_nr ), 'success' );
 		}
 		else
 		{
@@ -937,9 +950,28 @@ switch( $action )
 		$edited_Item->dbupdate();
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing();
+		$edited_Item->handle_post_processing( false );
 
-		$Messages->add( T_('Post has been published.'), 'success' );
+		// Set the success message corresponding for the new status
+		switch( $edited_Item->status )
+		{
+			case 'published':
+				$success_message = T_('Post has been published.');
+				break;
+			case 'community':
+				$success_message = T_('The post is now visible by the community.');
+				break;
+			case 'protected':
+				$success_message = T_('The post is now visible by the members.');
+				break;
+			case 'review':
+				$success_message = T_('The post is now visible by moderators.');
+				break;
+			default:
+				$success_message = T_('Post has been updated.');
+				break;
+		}
+		$Messages->add( $success_message, 'success' );
 
 		// fp> I noticed that after publishing a new post, I always want to see how the blog looks like
 		// If anyone doesn't want that, we can make this optional...
@@ -1215,7 +1247,13 @@ switch( $action )
 		// We don't check the following earlier, because we want the blog switching buttons to be available:
 		if( ! blog_has_cats( $blog ) )
 		{
-			$Messages->add( sprintf( T_('Since this blog has no categories, you cannot post into it. You must <a %s>create categories</a> first.'), 'href="'.$dispatcher.'?ctrl=chapters&amp;blog='.$blog.'"') , 'error' );
+			$error_message = T_('Since this blog has no categories, you cannot post into it.');
+			if( $current_User->check_perm( 'blog_cats', 'edit', false, $blog ) )
+			{ // If current user has a permission to create a category
+				global $admin_url;
+				$error_message .= ' '.sprintf( T_('You must <a %s>create categories</a> first.'), 'href="'.$admin_url.'?ctrl=chapters&amp;blog='.$blog.'"');
+			}
+			$Messages->add( $error_message, 'error' );
 			$action = 'nil';
 			break;
 		}
@@ -1273,7 +1311,13 @@ switch( $action )
 		// We don't check the following earlier, because we want the blog switching buttons to be available:
 		if( ! blog_has_cats( $blog ) )
 		{
-			$Messages->add( sprintf( T_('Since this blog has no categories, you cannot post into it. You must <a %s>create categories</a> first.'), 'href="'.$dispatcher.'?ctrl=chapters&amp;blog='.$blog.'"') , 'error' );
+			$error_message = T_('Since this blog has no categories, you cannot post into it.');
+			if( $current_User->check_perm( 'blog_cats', 'edit', false, $blog ) )
+			{ // If current user has a permission to create a category
+				global $admin_url;
+				$error_message .= ' '.sprintf( T_('You must <a %s>create categories</a> first.'), 'href="'.$admin_url.'?ctrl=chapters&amp;blog='.$blog.'"');
+			}
+			$Messages->add( $error_message, 'error' );
 			$action = 'nil';
 			break;
 		}
@@ -1313,6 +1357,11 @@ switch( $action )
 if( !empty($tab) )
 {
 	$AdminUI->append_path_level( $tab );
+
+	if( in_array( $tab, array( 'expert', 'full', 'list', 'pages', 'intros', 'podcasts', 'links', 'ads' ) ) )
+	{ // Init JS to autcomplete the user logins
+		init_autocomplete_login_js( 'rsc_url' );
+	}
 }
 
 // Load the date picker style for _item_simple.form.php and _item_expert.form.php
@@ -1376,8 +1425,17 @@ switch( $action )
 		// Begin payload block:
 		$AdminUI->disp_payload_begin();
 
+		// We never allow HTML in titles, so we always encode and decode special chars.
 		$item_title = htmlspecialchars_decode( $edited_Item->title );
-		$item_content = htmlspecialchars_decode( $edited_Item->content );
+
+		if( $Blog->get_setting( 'allow_html_post' ) )
+		{	// HTML is allowed for this post, we have HTML in the DB and we can edit it:
+			$item_content = $edited_Item->content;
+		}
+		else
+		{	// HTML is disallowed for this post, content is encoded in DB and we need to decode it for editing:
+			$item_content = htmlspecialchars_decode( $edited_Item->content );
+		}
 
 		// Format content for editing, if we were not already in editing...
 		$Plugins_admin = & get_Plugins_admin();
@@ -1407,8 +1465,17 @@ switch( $action )
 		// Begin payload block:
 		$AdminUI->disp_payload_begin();
 
-		$item_title = $edited_Item->title;
-		$item_content = $edited_Item->content;
+		// We never allow HTML in titles, so we always encode and decode special chars.
+		$item_title = htmlspecialchars_decode( $edited_Item->title );
+
+		if( $Blog->get_setting( 'allow_html_post' ) )
+		{ // HTML is allowed for this post, we have HTML in the DB and we can edit it:
+			$item_content = $edited_Item->content;
+		}
+		else
+		{ // HTML is disallowed for this post, content is encoded in DB and we need to decode it for editing:
+			$item_content = htmlspecialchars_decode( $edited_Item->content );
+		}
 
 		// Format content for editing, if we were not already in editing...
 		$Plugins_admin = & get_Plugins_admin();
@@ -1581,10 +1648,4 @@ switch( $action )
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-/*
- * $Log$
- * Revision 1.120  2013/11/06 09:08:48  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

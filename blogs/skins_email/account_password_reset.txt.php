@@ -54,11 +54,13 @@ while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
 
 	$message_content .= T_( 'Link to change your password:' )
 						."\n"
+						.'$secret_content_start$'
 						.$secure_htsrv_url.'login.php?action=changepwd'
 							.'&'.$dummy_fields[ 'login' ].'='.rawurlencode( $iterator_User->login )
 							.'&reqID='.$params['request_id']
 							.'&sessID='.$Session->ID  // used to detect cookie problems
 							.$params['blog_param']
+						.'$secret_content_end$'
 						."\n";
 }
 

@@ -141,7 +141,9 @@ class ItemListLight extends DataObjectList2
 				'cat_focus' => 'wide',					// Search in extra categories, not just main cat
 				'tags' => NULL,
 				'authors' => NULL,
+				'authors_login' => NULL,
 				'assignees' => NULL,
+				'assignees_login' => NULL,
 				'author_assignee' => NULL,
 				'lc' => 'all',									// Filter on requested locale
 				'keywords' => NULL,
@@ -237,12 +239,18 @@ class ItemListLight extends DataObjectList2
 			/*
 			 * Restrict to selected authors:
 			 */
-			memorize_param( $this->param_prefix.'author', 'string', $this->default_filters['authors'], $this->filters['authors'] );  // List of authors to restrict to
+			// List of authors users IDs to restrict to
+			memorize_param( $this->param_prefix.'author', 'string', $this->default_filters['authors'], $this->filters['authors'] );
+			// List of authors users logins to restrict to
+			memorize_param( $this->param_prefix.'author_login', 'string', $this->default_filters['authors_login'], $this->filters['authors_login'] );
 
 			/*
 			 * Restrict to selected assignees:
 			 */
-			memorize_param( $this->param_prefix.'assgn', 'string', $this->default_filters['assignees'], $this->filters['assignees'] );  // List of assignees to restrict to
+			// List of assignees users IDs to restrict to
+			memorize_param( $this->param_prefix.'assgn', 'string', $this->default_filters['assignees'], $this->filters['assignees'] );
+			// List of assignees users logins to restrict to
+			memorize_param( $this->param_prefix.'assgn_login', 'string', $this->default_filters['assignees_login'], $this->filters['assignees_login'] );
 
 			/*
 			 * Restrict to selected author OR assignee:
@@ -385,13 +393,19 @@ class ItemListLight extends DataObjectList2
 		/*
 		 * Restrict to selected authors:
 		 */
-		$this->filters['authors'] = param( $this->param_prefix.'author', '/^-?[0-9]+(,[0-9]+)*$/', $this->default_filters['authors'], true );      // List of authors to restrict to
+		// List of authors users IDs to restrict to
+		$this->filters['authors'] = param( $this->param_prefix.'author', '/^-?[0-9]+(,[0-9]+)*$/', $this->default_filters['authors'], true );
+		// List of authors users logins to restrict to
+		$this->filters['authors_login'] = param( $this->param_prefix.'author_login', '/^-?[A-Za-z0-9_\.]+(,[A-Za-z0-9_\.]+)*$/', $this->default_filters['authors_login'], true );
 
 
 		/*
 		 * Restrict to selected assignees:
 		 */
-		$this->filters['assignees'] = param( $this->param_prefix.'assgn', '/^(-|-[0-9]+|[0-9]+)(,[0-9]+)*$/', $this->default_filters['assignees'], true );      // List of assignees to restrict to
+		// List of assignees users IDs to restrict to
+		$this->filters['assignees'] = param( $this->param_prefix.'assgn', '/^(-|-[0-9]+|[0-9]+)(,[0-9]+)*$/', $this->default_filters['assignees'], true );
+		// List of assignees users logins to restrict to
+		$this->filters['assignees_login'] = param( $this->param_prefix.'assgn_login', '/^(-|-[A-Za-z0-9_\.]+|[A-Za-z0-9_\.]+)(,[A-Za-z0-9_\.]+)*$/', $this->default_filters['assignees_login'], true );
 
 
 		/*
@@ -471,7 +485,7 @@ class ItemListLight extends DataObjectList2
 		 * Restrict to the statuses we want to show:
 		 */
 		// Note: oftentimes, $show_statuses will have been preset to a more restrictive set of values
-		$this->filters['visibility_array'] = param( $this->param_prefix.'show_statuses', 'array', $this->default_filters['visibility_array']
+		$this->filters['visibility_array'] = param( $this->param_prefix.'show_statuses', 'array/string', $this->default_filters['visibility_array']
 						, true, false, true, false );	// Array of sharings to restrict to
 
 		/*
@@ -558,7 +572,9 @@ class ItemListLight extends DataObjectList2
 		}
 		$this->ItemQuery->where_tags( $this->filters['tags'] );
 		$this->ItemQuery->where_author( $this->filters['authors'] );
+		$this->ItemQuery->where_author_logins( $this->filters['authors_login'] );
 		$this->ItemQuery->where_assignees( $this->filters['assignees'] );
+		$this->ItemQuery->where_assignees_logins( $this->filters['assignees_login'] );
 		$this->ItemQuery->where_author_assignee( $this->filters['author_assignee'] );
 		$this->ItemQuery->where_locale( $this->filters['lc'] );
 		$this->ItemQuery->where_statuses( $this->filters['statuses'] );
@@ -607,30 +623,34 @@ class ItemListLight extends DataObjectList2
 		/*
 		elseif( !empty($this->filters['ymdhms']) // no restriction if we request a month... some permalinks may point to the archive!
 		*/
-		elseif( $this->filters['unit'] == 'days'    // We are going to limit to x days: no limit
-			 	 || $this->filters['unit'] == 'all' )	 // We want ALL results!
+		elseif( $this->filters['unit'] == 'days'  // We are going to limit to x days: no limit
+		     || $this->filters['unit'] == 'all' ) // We want ALL results!
 		{
 			$this->total_rows = NULL; // unknown!
 			$this->total_pages = 1;
 			$this->page = 1;
 		}
 		elseif( $this->filters['unit'] == 'posts' )
-		{
-			/*
-			 * TODO: The result is incorrect when using AND on categories
-			 * We would need to use a HAVING close and thyen COUNT, which would be a subquery
-			 * This is nto compatible with mysql 3.23
-			 * We need fallback code.
-			 */
-			$sql_count = '
-				SELECT COUNT( DISTINCT '.$this->Cache->dbIDname.') '
+		{ // Calculate a count of the posts
+			if( $this->ItemQuery->get_group_by() == '' )
+			{ // SQL query without GROUP BY clause
+				$sql_count = 'SELECT COUNT( DISTINCT '.$this->Cache->dbIDname.' )'
 					.$this->ItemQuery->get_from()
-					.$this->ItemQuery->get_where();
-
-			//echo $DB->format_query( $sql_count );
+					.$this->ItemQuery->get_where()
+					.$this->ItemQuery->get_limit();
+			}
+			else
+			{ // SQL query with GROUP BY clause, Summarize a count of each grouped result
+				$sql_count = 'SELECT SUM( cnt_tbl.cnt ) FROM (
+						SELECT COUNT( DISTINCT '.$this->Cache->dbIDname.' ) AS cnt '
+						.$this->ItemQuery->get_from()
+						.$this->ItemQuery->get_where()
+						.$this->ItemQuery->get_group_by()
+						.$this->ItemQuery->get_limit().'
+					) AS cnt_tbl ';
+			}
 
 			parent::count_total_rows( $sql_count );
-			//echo '<br />'.$this->total_rows;
 		}
 		else
 		{
@@ -770,7 +790,9 @@ class ItemListLight extends DataObjectList2
 		$lastpost_ItemQuery->where_chapter2( $this->Blog, $this->filters['cat_array'], $this->filters['cat_modifier'],
 																				 $this->filters['cat_focus']  );
 		$lastpost_ItemQuery->where_author( $this->filters['authors'] );
+		$lastpost_ItemQuery->where_author_logins( $this->filters['authors_login'] );
 		$lastpost_ItemQuery->where_assignees( $this->filters['assignees'] );
+		$lastpost_ItemQuery->where_assignees_logins( $this->filters['assignees_login'] );
 		$lastpost_ItemQuery->where_locale( $this->filters['lc'] );
 		$lastpost_ItemQuery->where_statuses( $this->filters['statuses'] );
 		$lastpost_ItemQuery->where_types( $this->filters['types'] );
@@ -873,11 +895,11 @@ class ItemListLight extends DataObjectList2
 			}
 			if( $this->filters['cat_modifier'] == '*' )
 			{
-				$cat_names_string = implode( ' + ', $cat_names );
+				$cat_names_string = '"'.implode( '" '.T_('and').' "', $cat_names ).'"';
 			}
 			else
 			{
-				$cat_names_string = implode( ', ', $cat_names );
+				$cat_names_string = '"'.implode( '" '.T_('or').' "', $cat_names ).'"';
 			}
 			if( !empty( $cat_names_string ) )
 			{
@@ -932,9 +954,23 @@ class ItemListLight extends DataObjectList2
 
 
 		// KEYWORDS:
-		if( !empty($this->filters['keywords']) )
+		if( ! empty( $this->filters['keywords'] ) )
 		{
-			$title_array['keywords'] = T_('Keyword(s)').': '.$this->filters['keywords'];
+			if( $this->filters['phrase'] == 'OR' || $this->filters['phrase'] == 'AND' )
+			{
+				$keywords = trim( preg_replace( '/("|, *)/', ' ', $this->filters['keywords'] ) );
+				$keywords = explode( ' ', $keywords );
+				$keywords_count = count( $keywords );
+				$keywords = '"'.implode( '" '.( $this->filters['phrase'] == 'OR' ? T_('or') : T_('and') ).' "', $keywords ).'"';
+			}
+			else
+			{
+				$keywords = '"'.$this->filters['keywords'].'"';
+				$keywords_count = 1;
+			}
+			$title_array['keywords'] = ( $keywords_count == 1 ? T_('Keyword') : T_('Keywords') ).': '
+				.( $this->filters['exact'] ? T_('Exact match').' ' : '' )
+				.$keywords;
 		}
 
 
@@ -946,28 +982,45 @@ class ItemListLight extends DataObjectList2
 
 
 		// AUTHORS:
-		if( !empty($this->filters['authors']) )
+		if( ! empty( $this->filters['authors'] ) || ! empty( $this->filters['authors_login'] ) )
 		{
-			$authors = preg_split('~\s*,\s*~', $this->filters['authors'], -1, PREG_SPLIT_NO_EMPTY);
+			$authors = trim( $this->filters['authors'].','.get_users_IDs_by_logins( $this->filters['authors_login'] ), ',' );
+			$exclude_authors = false;
+			if( substr( $authors, 0, 1 ) == '-' )
+			{ // Authors are excluded
+				$authors = substr( $authors, 1 );
+				$exclude_authors = true;
+			}
+			$authors = preg_split( '~\s*,\s*~', $authors, -1, PREG_SPLIT_NO_EMPTY );
+			$author_names = array();
 			if( $authors )
 			{
-				$UserCache = get_UserCache();
-				$author_names = array();
+				$UserCache = & get_UserCache();
 				foreach( $authors as $author_ID )
 				{
-					if( $tmp_Author = $UserCache->get_by_ID($author_ID, false) )
+					if( $tmp_User = $UserCache->get_by_ID( $author_ID, false, false ) )
 					{
-						$author_names[] = htmlspecialchars($tmp_Author->get_preferred_name());
+						$author_names[] = $tmp_User->get_identity_link( array( 'link_text' => 'login' ) );
 					}
 				}
-				$authors = implode(', ', $author_names);
 			}
-			$title_array[] = T_('Author(s)').': '.$authors;
+			if( count( $author_names ) > 0 )
+			{ // Display info of filter by authors
+				if( $exclude_authors )
+				{ // 
+					$title_array[] = sprintf( T_('All authors except: %s'), implode( ' '.T_('and').' ', $author_names ) );
+				}
+				else
+				{ // 
+					$title_array[] = ( count( $author_names ) == 1 ? T_('Author') : T_('Authors') )
+						.': '.implode( ', ', $author_names );
+				}
+			}
 		}
 
 
 		// ASSIGNEES:
-		if( !empty($this->filters['assignees']) )
+		if( ! empty( $this->filters['assignees'] ) || ! empty( $this->filters['assignees_login'] ) )
 		{
 			if( $this->filters['assignees'] == '-' )
 			{
@@ -975,7 +1028,21 @@ class ItemListLight extends DataObjectList2
 			}
 			else
 			{
-				$title_array[] = T_('Assigned to').': '.$this->filters['assignees'];
+				$assignees = trim( $this->filters['assignees'].','.get_users_IDs_by_logins( $this->filters['assignees_login'] ), ',' );
+				$assignees = preg_split( '~\s*,\s*~', $assignees, -1, PREG_SPLIT_NO_EMPTY );
+				$assignees_names = array();
+				if( $assignees )
+				{
+					$UserCache = & get_UserCache();
+					foreach( $assignees as $user_ID )
+					{
+						if( $tmp_User = & $UserCache->get_by_ID( $user_ID, false, false ) )
+						{
+							$assignees_names[] = $tmp_User->get_identity_link( array( 'link_text' => 'login' ) );
+						}
+					}
+				}
+				$title_array[] = T_('Assigned to').': '.implode( ', ', $assignees_names );
 			}
 		}
 
@@ -996,23 +1063,35 @@ class ItemListLight extends DataObjectList2
 			}
 			else
 			{
-				$title_array[] = T_('Status(es)').': '.$this->filters['statuses'];
+				$status_IDs = explode( ',', $this->filters['statuses'] );
+				$ItemStatusCache = & get_ItemStatusCache();
+				$statuses = array();
+				foreach( $status_IDs as $status_ID )
+				{
+					if( $ItemStatus = & $ItemStatusCache->get_by_ID( $status_ID ) )
+					{
+						$statuses[] = $ItemStatus->get_name();
+					}
+				}
+				$title_array[] = ( count( $statuses ) > 1 ? T_('Statuses') : T_('Status') )
+					.': '.implode( ', ', $statuses );
 			}
 		}
 
 
 		// SHOW STATUSES
-		if( count( $this->filters['visibility_array'] ) < 5
-			&& !in_array( 'visibility', $ignore ) )
+		if( !in_array( 'visibility', $ignore ) )
 		{
 			$post_statuses = get_visibility_statuses();
-
-			$status_titles = array();
-			foreach( $this->filters['visibility_array'] as $status )
-			{
-				$status_titles[] = $post_statuses[$status];
+			if( count( $this->filters['visibility_array'] ) != count( $post_statuses ) )
+			{ // Display it only when visibility filter is changed
+				$status_titles = array();
+				foreach( $this->filters['visibility_array'] as $status )
+				{
+					$status_titles[] = $post_statuses[$status];
+				}
+				$title_array[] = T_('Visibility').': '.implode( ', ', $status_titles );
 			}
-			$title_array[] = T_('Visibility').': '.implode( ', ', $status_titles );
 		}
 
 
@@ -1455,10 +1534,4 @@ class ItemListLight extends DataObjectList2
 
 }
 
-/*
- * $Log$
- * Revision 1.48  2013/11/06 08:04:15  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

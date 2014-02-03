@@ -147,7 +147,7 @@ function hits_results_block( $params = array() )
 	$operator = ($exclude ? ' <> ' : ' = ' );
 
 	if( ! empty( $sess_ID ) )
-	{	// We want to filter on the session ID:
+	{ // We want to filter on the session ID:
 		$filter = 'hit_sess_ID' . $operator . $sess_ID;
 		$SQL->WHERE( $filter );
 		$CountSQL->WHERE( $filter );
@@ -176,7 +176,7 @@ function hits_results_block( $params = array() )
 	if( !empty($device) )
 	{
 		if( $device == 'other' )
-		{	// Unknown device
+		{ // Unknown device
 			$device = '';
 		}
 		$filter = 'sess_device = '. $DB->quote($device);
@@ -224,10 +224,12 @@ function hits_results_block( $params = array() )
 		$resuts_param_prefix = substr( $preset_referer_type, 0, 8 ).'_'.$resuts_param_prefix;
 	}
 
-	$Results = new Results( $SQL->get(), $resuts_param_prefix, '--D', $UserSettings->get( 'results_per_page' ), $CountSQL->get() );
+	$default_order = '--D';
+
+	$Results = new Results( $SQL->get(), $resuts_param_prefix, $default_order, $UserSettings->get( 'results_per_page' ), $CountSQL->get() );
 
 	// Initialize Results object
-	hits_results( $Results );
+	hits_results( $Results, array( 'default_order' => $default_order ) );
 
 	if( is_ajax_content() )
 	{ // init results param by template name
@@ -500,20 +502,22 @@ function generate_random_ip()
 	return mt_rand(0, 255).'.'.mt_rand(0, 255).'.'.mt_rand(0, 255).'.'.mt_rand(0, 255);
 }
 
+
 /**
  * Generate fake hit statistics
+ *
  * @param integer the number of days to generate statistics
  * @param integer min interval between hits in seconds
  * @param integer max interval between hits in seconds
+ * @param boolean TRUE to display the process dots during generating of the hits
  * @return integer count of inserted hits
  */
-function generate_hit_stat($days, $min_interval, $max_interval)
+function generate_hit_stat( $days, $min_interval, $max_interval, $display_process = false )
 {
-	global $baseurlroot, $admin_url, $user_agents, $DB;
+	global $baseurlroot, $admin_url, $user_agents, $DB, $htsrv_url;
+
 	load_class('items/model/_itemlistlight.class.php', 'ItemListLight');
 	load_class('sessions/model/_hit.class.php', 'Hit');
-
-
 
 	$links = array();
 
@@ -522,7 +526,7 @@ function generate_hit_stat($days, $min_interval, $max_interval)
 	$blogs_id = $BlogCache->load_public();
 
 	foreach ($blogs_id as $blog_id)
-		{ // handle all public blogs
+	{ // handle all public blogs
 			$listBlog = & $BlogCache->get_by_ID($blog_id);
 		if (empty($listBlog))
 		{
@@ -589,6 +593,11 @@ function generate_hit_stat($days, $min_interval, $max_interval)
 		$links[] = array('link' => url_add_param( '/' . $listBlog->siteurl, 'disp=profile', '&' ),
 			'blog_id' => $blog_id,
 			'disp' => 'profile');
+
+		$links[] = array(
+				'link' => $htsrv_url.'anon_async.php',
+				'blog_id' => $blog_id
+			);
 	}
 
 	$referes = array('http://www.fake-referer1.com',
@@ -642,7 +651,7 @@ function generate_hit_stat($days, $min_interval, $max_interval)
 
 	$links_count = count($links);
 
-	if (empty($links_count))
+	if( empty( $links_count ) )
 	{
 		$Messages->add('Do not have blog links to generate statistics');
 		break;
@@ -660,7 +669,7 @@ function generate_hit_stat($days, $min_interval, $max_interval)
 	$users_count = count( $users_array );
 	$devices_count = count( $devices );
 
-	if (empty($users_count))
+	if( empty( $users_count ) )
 	{
 		$Messages->add('Do not have valid users to generate statistics');
 		break;
@@ -741,7 +750,7 @@ function generate_hit_stat($days, $min_interval, $max_interval)
 		else
 		{
 			if (($time_shift - $cur_seesion['sess_lastseen_ts']) > 3000 || !empty($cur_seesion['robot']))
-				{ // This session last updated more than 3000 sec ago. Instead of this session create a new session.
+			{ // This session last updated more than 3000 sec ago. Instead of this session create a new session.
 				$cur_seesion = array(
 					'sess_ID'          => -1,
 					'sess_key'         => generate_random_key(32),
@@ -878,6 +887,15 @@ function generate_hit_stat($days, $min_interval, $max_interval)
 		}
 
 		$sessions[$rand_i] = $cur_seesion;
+
+		if( $display_process )
+		{
+			if( $insert_data_count % 100 == 0 )
+			{ // Display a process of creating by one dot for 100 hits
+				echo ' .';
+				flush();
+			}
+		}
 	}
 
 	return $insert_data_count;
@@ -908,11 +926,4 @@ function stats_dom_type_title( $dom_type, $escape_quotes = false )
 	return $dom_type;
 }
 
-
-/*
- * $Log$
- * Revision 1.26  2013/11/06 08:04:45  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

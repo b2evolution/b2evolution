@@ -64,6 +64,9 @@ while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
 		.'&sessID='.$Session->ID  // used to detect cookie problems
 		.$params['blog_param'];
 
+	// Restrict the password change url to be saved in the email logs
+	$url_change_password = '$secret_content_start$'.$url_change_password.'$secret_content_end$';
+
 	// Buttons:
 	$message_content .= '<div class="buttons">'."\n";
 	$message_content .= get_link_tag( $url_change_password, T_( 'Change your password NOW' ), 'button_yellow' )."\n";

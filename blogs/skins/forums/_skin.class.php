@@ -196,8 +196,8 @@ class forums_Skin extends Skin
 	 */
 	function display_breadcrumbs( $chapter_ID, $params = array() )
 	{
-		if( $chapter_ID == 0 )
-		{	// No selected chapter
+		if( $chapter_ID <= 0 )
+		{ // No selected chapter, or an exlcude chapter filter is set
 			return;
 		}
 

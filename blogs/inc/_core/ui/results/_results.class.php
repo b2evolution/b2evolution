@@ -395,7 +395,7 @@ class Results extends Table
 	 */
 	function restart()
 	{
-		// Make sure query has exexuted:
+		// Make sure query has executed:
 		$this->query( $this->sql );
 
 		$this->current_idx = 0;
@@ -858,40 +858,52 @@ class Results extends Table
 	 */
 	function display( $display_params = NULL, $fadeout = NULL )
 	{
-		// Initialize displaying:
-		$this->display_init( $display_params, $fadeout );
+		// Lazy fill $this->params:
+		parent::display_init( $display_params, $fadeout );
 
 		// -------------------------
 		// Proceed with display:
 		// -------------------------
 		echo $this->params['before'];
 
+		if( ! is_ajax_content() )
+		{ // Display TITLE/FILTERS only if NO AJAX request
+
+			// DISPLAY TITLE:
+			if( isset( $this->title ) )
+			{ // A title has been defined for this result set:
+				echo $this->replace_vars( $this->params['head_title'] );
+			}
+
+			// DISPLAY FILTERS:
+			$this->display_filters();
+		}
+
+		// Flush in order to show the filters before slow SQL query will be executed below
+		evo_flush();
+
+		// Make sure query has executed and we're at the top of the resultset:
+		$this->restart();
+
+		if( ! is_ajax_content() )
+		{ // Display COL SELECTION only if NO AJAX request
+			$this->display_colselect();
+		}
+
+		// START OF AJAX CONTENT:
+		echo $this->replace_vars( $this->params['content_start'] );
+
 			if( $this->total_pages == 0 )
-			{	// There are no results! Nothing to display!
-
-				// TITLE / FILTERS:
-				$this->display_head();
-
-				// START OF AJAX CONTENT:
-				echo $this->replace_vars( $this->params['content_start'] );
+			{ // There are no results! Nothing to display!
 
 				// START OF LIST/TABLE:
 				$this->display_list_start();
 
 				// END OF LIST/TABLE:
 				$this->display_list_end();
-
-				// END OF AJAX CONTENT:
-				echo $this->params['content_end'];
 			}
 			else
-			{	// We have rows to display:
-
-				// TITLE / FILTERS:
-				$this->display_head();
-
-				// START OF AJAX CONTENT:
-				echo $this->replace_vars( $this->params['content_start'] );
+			{ // We have rows to display:
 
 				// GLOBAL (NAV) HEADER:
 				$this->display_nav( 'header' );
@@ -916,10 +928,10 @@ class Results extends Table
 
 				// GLOBAL (NAV) FOOTER:
 				$this->display_nav( 'footer' );
-
-				// END OF AJAX CONTENT:
-				echo $this->params['content_end'];
 			}
+
+		// END OF AJAX CONTENT:
+		echo $this->params['content_end'];
 
 		echo $this->params['after'];
 
@@ -938,7 +950,7 @@ class Results extends Table
  	 */
 	function display_init( $display_params = NULL, $fadeout = NULL )
 	{
-	 	// Lazy fill $this->params:
+		// Lazy fill $this->params:
 		parent::display_init( $display_params, $fadeout );
 
 		// Make sure query has executed and we're at the top of the resultset:
@@ -1475,11 +1487,11 @@ class Results extends Table
 					switch( substr( $this->order, $i, 1 ) )
 					{
 						case 'A':
-							$orders[] = preg_replace('~(?<!asc|desc)\s*,~i', ' ASC,', $this->cols[$i]['order']).' ASC';
+							$orders[] = preg_replace( '~(?<!asc|desc)\s*,~i', ' ASC,', $this->cols[$i]['order'] ).' ASC';
 							break;
 
 						case 'D':
-							$orders[] = str_replace( '~(?<asc|desc)\s*,~i', ' DESC,', $this->cols[$i]['order']).' DESC';
+							$orders[] = preg_replace( '~(asc|desc)?\s*,~i', ' DESC,', $this->cols[$i]['order'] ).' DESC';
 							break;
 					}
 				}
@@ -2063,13 +2075,4 @@ function conditional( $condition, $on_true, $on_false = '' )
 	}
 }
 
-
-
-
-/*
- * $Log$
- * Revision 1.46  2013/11/06 08:03:48  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

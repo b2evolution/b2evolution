@@ -274,7 +274,7 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result )
 		( '.$DB->quote( $user_ID ).',
 		  '.$DB->quote( $to ).',
 		  '.$DB->quote( $result ).',
-		  '.$DB->quote( $subject ).',
+		  '.$DB->quote( evo_substr( $subject, 0, 255 ) ).',
 		  '.$DB->quote( $message ).',
 		  '.$DB->quote( $headers ).' )' );
 
@@ -461,10 +461,81 @@ function blocked_emails_display()
 	}
 }
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:04:54  efy-asimo
- * Update to version 5.0.1-alpha-5
+
+/**
+ * Parse message of mail if content is in multipart or HTML format
  *
+ * @param string Headers
+ * @param string Message
+ * @return array|boolean Mail data or FALSE when message has only Plain Text content
  */
+function mail_log_parse_message( $headers, $message )
+{
+	preg_match( '/Content-Type: ([^;]+);/i', $headers, $header_matches );
+
+	if( empty( $header_matches[1] ) )
+	{ // Incorrect headers, Exit here
+		return false;
+	}
+
+	// Get only <body> content of html email message
+	$html_search_body = '#.+<body[^>]*>(.+)</body>.+#is';
+	$html_replace_body = '$1';
+
+	$data = array();
+
+	if( $header_matches[1] == 'text/html' )
+	{ // Message has one content in HTML format
+		$data['html'] = array(
+				'type' => $header_matches[0],
+				'content' => preg_replace( $html_search_body, $html_replace_body, $message ),
+			);
+
+		return $data;
+	}
+	elseif( $header_matches[1] != 'multipart/mixed' )
+	{ // Message content is not multipart
+		return false;
+	}
+
+	preg_match( '/Content-Type: multipart\/alternative; boundary="([^;]+)"/i', $message, $boundary_matches );
+
+	if( empty( $boundary_matches ) || empty( $boundary_matches[1] ) )
+	{ // No found boundary delimiter of message contents
+		return false;
+	}
+
+	$boundary_delimiter = '--'.$boundary_matches[1];
+
+	$contents = explode( $boundary_delimiter, $message );
+	unset( $contents[0] );
+	unset( $contents[3] );
+
+	foreach( $contents as $content )
+	{
+		preg_match( '/(Content-Type: ([^;]+);(.+)){1}\n([\s\S\n]+)/i', $content, $type_matches );
+
+		switch( $type_matches[2] )
+		{
+			case 'text/html':
+				// Get data of Plain Text content
+				$data['html'] = array(
+						'type' => $type_matches[1],
+						'content' => preg_replace( $html_search_body, $html_replace_body, $type_matches[4] ),
+					);
+				break;
+
+			case 'text/plain':
+				// Get data of HTML content
+				$data['text'] = array(
+						'type' => $type_matches[1],
+						'content' => $type_matches[4],
+					);
+				break;
+		}
+	}
+
+	return $data;
+}
+
 ?>

@@ -3,7 +3,7 @@
  * This is the BODY header include template.
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
- * {@link http://manual.b2evolution.net/Skins_2.0}
+ * {@link http://b2evolution.net/man/skin-structure}
  *
  * This is meant to be included in a page template.
  *

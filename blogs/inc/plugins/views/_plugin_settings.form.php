@@ -124,7 +124,7 @@ $Form->end_fieldset();
 
 
 // --------------------------- EVENTS ---------------------------
-$Form->begin_fieldset( T_('Plugin events').' ('.T_('Advanced').') '.get_icon('expand', 'imgtag', array( 'id' => 'clickimg_pluginevents' ) ),
+$Form->begin_fieldset( T_('Plugin events').' ('.T_('Advanced').') '.get_icon( 'collapse', 'imgtag', array( 'id' => 'clickimg_pluginevents' ) ),
 											 array('legend_params' => array( 'onclick' => 'toggle_clickopen(\'pluginevents\')') )
 											 );
 	?>
@@ -182,11 +182,4 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 }
 $Form->end_form();
 
-
-/*
- * $Log$
- * Revision 1.16  2013/11/06 08:04:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

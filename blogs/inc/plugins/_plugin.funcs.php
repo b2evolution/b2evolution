@@ -234,6 +234,14 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	{ // a "multiple" select:
 		$input_name .= '[]';
 	}
+
+	// Get a value from _POST request to display it e.g. when some error was created during update
+	$value_from_request = get_param( $input_name );
+	if( $value_from_request !== NULL )
+	{
+		$set_value = $value_from_request;
+	}
+
 	switch( $parmeta['type'] )
 	{
 		case 'checkbox':
@@ -1062,9 +1070,8 @@ function handle_array_keys_in_plugin_settings( & $a )
  */
 function install_plugin_db_schema_action( & $Plugin, $force_install_db_deltas = false )
 {
-	global $action, $inc_path, $install_db_deltas, $DB, $Messages;
+	global $inc_path, $install_db_deltas, $DB, $Messages;
 
-	$action = 'list';
 	// Prepare vars for DB layout changes
 	$install_db_deltas_confirm_md5 = param( 'install_db_deltas_confirm_md5' );
 
@@ -1092,7 +1099,6 @@ function install_plugin_db_schema_action( & $Plugin, $force_install_db_deltas = 
 		{ // delta queries to make
 			if( empty($install_db_deltas_confirm_md5) && !$force_install_db_deltas )
 			{ // delta queries have to be confirmed in payload
-				$action = 'install_db_schema';
 				return false;
 			}
 			elseif( $install_db_deltas_confirm_md5 == md5( implode('', $install_db_deltas) ) || $force_install_db_deltas )
@@ -1109,19 +1115,12 @@ function install_plugin_db_schema_action( & $Plugin, $force_install_db_deltas = 
 				$Messages->add( T_('The DB schema has been changed since confirmation.'), 'error' );
 
 				// delta queries have to be confirmed (again) in payload
-				$action = 'install_db_schema';
 				return false;
 			}
 		}
 	}
+
 	return true;
 }
 
-
-/*
- * $Log$
- * Revision 1.23  2013/11/06 09:08:59  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

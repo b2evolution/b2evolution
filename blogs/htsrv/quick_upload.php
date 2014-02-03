@@ -253,7 +253,7 @@ if( $upload )
 	$file_content = $file->get_content();
 	if( $file_content === false )
 	{ // No memory enough to upload file
-		$message['text'] = '<span class="result_error">'.T_( 'Not enough memory to upload this too large file!' ).'</span>';
+		$message['text'] = '<span class="result_error">'.T_( 'The server (PHP script) has not enough available memory to receive this large file!' ).'</span>';
 		$message['status'] = 'error';
 		out_echo($message, $specialchars);
 		exit();

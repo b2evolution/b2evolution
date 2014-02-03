@@ -61,11 +61,4 @@ $schema_queries['T_files__vote'] = array(
 			primary key (fvot_file_ID, fvot_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" );
 
-
-/*
- * $Log$
- * Revision 1.9  2013/11/06 08:04:08  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

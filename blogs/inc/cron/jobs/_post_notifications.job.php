@@ -13,7 +13,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $Settings, $Messages;
 
-
 if( $Settings->get( 'outbound_notifications_mode' ) != 'cron' )
 { // Autopruning is NOT requested
 	$result_message = T_('Post notifications are not set to run as a scheduled task.');
@@ -72,11 +71,4 @@ if( empty( $result_message ) )
 }
 
 return 1; /* ok */
-
-/*
- * $Log$
- * Revision 1.8  2013/11/06 09:08:47  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

@@ -20,7 +20,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher;
+global $admin_url, $media_path;
 
 $Form = new Form( NULL, '', 'post', NULL, 'multipart/form-data' );
 
@@ -30,20 +30,94 @@ $Form->add_crumb( 'wpxml' );
 $Form->hidden_ctrl();
 $Form->hidden( 'action', 'import' );
 
-$Form->begin_fieldset( T_('Select XML file') );
+// Get available files to import from the folder /media/import/
+$import_files = wpxml_get_import_files();
 
-	$Form->text_input( 'wp_file', '', 20, T_('WordPress XML File'), '<strong>'.T_('Allowed file extensions').'</strong>: xml, txt, zip.', array( 'type' => 'file', 'required' => true ) );
+$Table = new Table( NULL, 'import' );
 
-$Form->end_fieldset();
+$Table->cols = array(
+	array( 'th' => T_('Import'), 'td_class' => 'shrinkwrap' ),
+	array( 'th' => T_('File') ),
+	array( 'th' => T_('Type') ),
+	array( 'th' => T_('Uploaded'), 'td_class' => 'shrinkwrap' ),
+);
 
-$Form->begin_fieldset( T_('Select a blog for import') );
+$Table->title = T_('Potential files to be imported').get_manual_link('file-importer');
+$Table->title .= ' - '.action_icon( T_('Refresh'), 'refresh', $admin_url.'?ctrl=wpimportxml', T_('Refresh'), 3, 4 );
+$Table->display_init();
+// TABLE START:
+$Table->display_list_start();
+// TITLE:
+$Table->display_head();
+
+if( empty( $import_files ) )
+{ // No files to import
+
+	// BODY START:
+	$Table->display_body_start();
+
+	$Table->display_line_start();
+	$Table->display_col_start();
+	echo '<p class="center">'.T_('We have not found any suitable file to perform the blog import. Please read the details at the manual page.').get_manual_link('file-importer').'</p>';
+	$Table->display_col_end();
+	$Table->display_line_end();
+}
+else
+{ // Display the files to import in table
+
+	// COLUMN HEADERS:
+	$Table->display_col_headers();
+	// BODY START:
+	$Table->display_body_start();
+
+	foreach( $import_files as $import_file )
+	{
+		$Table->display_line_start();
+
+		// Checkbox to import
+		$Table->display_col_start();
+		echo '<input type="radio" name="wp_file" value="'.$import_file['path'].'"'.( get_param( 'wp_file' ) == $import_file['path'] ? ' checked="checked"' : '' ).' />';
+		$Table->display_col_end();
+
+		// File
+		$Table->display_col_start();
+		echo basename( $import_file['path'] );
+		$Table->display_col_end();
+
+		// Type
+		$Table->display_col_start();
+		echo $import_file['type'];
+		$Table->display_col_end();
+
+		// File date
+		$Table->display_col_start();
+		echo date( locale_datefmt().' '.locale_timefmt(), filemtime( $import_file['path'] ) );
+		$Table->display_col_end();
+
+		$Table->display_line_end();
+
+		evo_flush();
+	}
+}
+
+// BODY END / TABLE END:
+$Table->display_body_end();
+$Table->display_list_end();
+
+
+if( ! empty( $import_files ) )
+{
+	$Form->begin_fieldset( T_('Select a blog for import') );
 
 	$BlogCache = & get_BlogCache();
+	$BlogCache->load_all( 'shortname,name', 'ASC' );
 	$BlogCache->none_option_text = '&nbsp;';
 
 	$Form->select_input_object( 'wp_blog_ID', param( 'wp_blog_ID', 'integer', 0 ), $BlogCache, T_('Blog for import'), array(
-			'note' => T_('This blog will be used for import.').' <a href="'.$dispatcher.'?ctrl=collections&action=new">'.T_('Create new blog').' &raquo;</a>',
-			'allow_none' => true, 'required' => true ) );
+			'note' => T_('This blog will be used for import.').' <a href="'.$admin_url.'?ctrl=collections&action=new">'.T_('Create new blog').' &raquo;</a>',
+			'allow_none' => true,
+			'required' => true,
+			'loop_object_method' => 'get_extended_name' ) );
 
 	$Form->radio_input( 'import_type', param( 'import_type', 'string', 'replace' ), array(
 				array(
@@ -55,11 +129,18 @@ $Form->begin_fieldset( T_('Select a blog for import') );
 					'label' => T_('Append to existing contents') ),
 			), '', array( 'lines' => true ) );
 
-$Form->end_fieldset();
+	$Form->end_fieldset();
 
-$Form->buttons( array( array( 'submit', 'submit', T_('Continue !'), 'SaveButton' ),
+	$Form->buttons( array( array( 'submit', 'submit', T_('Continue !'), 'SaveButton' ),
 											 array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+}
 
 $Form->end_form();
 
 ?>
+<script type="text/javascript">
+jQuery( '.table_scroll td' ).click( function()
+{
+	jQuery( this ).parent().find( 'input[type=radio]' ).attr( 'checked', 'checked' );
+} );
+</script>

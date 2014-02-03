@@ -110,4 +110,14 @@ $skinfaktory_links = array( '' => array( array( 73, 'http://evofactory.com/', ar
 														             array( 100, 'http://skinfaktory.com/', array( array( 92, 'Skin Faktory'), array( 97, 'SkinFaktory'), array( 99, 'Skin Factory'), array( 100, 'SkinFactory') ) ),
 																				)
 												);
+
+
+// Move user to suspect group by IP address
+antispam_suspect_user();
+
+
+$Timer->pause( '_MAIN.inc' );
+// LOG with APM:
+$Timer->log_duration( '_MAIN.inc' );
+
 ?>

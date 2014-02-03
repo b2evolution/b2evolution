@@ -1435,12 +1435,12 @@ class Item extends ItemLight
 				'update_db'           => true,
 			), $params );
 
-		$r = $this->get_excerpt2($params);
+		$r = $this->get_excerpt2( $params );
 
-		if( !empty($r) )
+		if( ! empty( $r ) )
 		{
 			echo $params['before'];
-			echo format_to_output( $this->excerpt, 'htmlspecialchars' );
+			echo format_to_output( $this->excerpt, $params['format'] );
 			if( !empty( $params['excerpt_more_text'] ) )
 			{
 				echo $params['excerpt_before_more'];
@@ -1964,6 +1964,8 @@ class Item extends ItemLight
 				'link_to'     => 'single#anchor',	// target URL for more link, 'single' or 'single#anchor'
 				'disppage'    => '#',		// page number to display specific page, # for url parameter
 				'format'      => 'htmlbody',
+				'link_class'  => '', // class name of the link
+				'force_hide_teaser' => false, // Force an item setting 'hide_teaser'
 			), $params );
 
 		global $more;
@@ -1983,6 +1985,9 @@ class Item extends ItemLight
 		}
 
 		$content_parts = $this->get_content_parts($params);
+
+		// Init an attribute for class
+		$class_attr = empty( $params['link_class'] ) ? '' : ' class="'.$params['link_class'].'"';
 
 		if( ! $more && ! $params['force_more'] )
 		{	// We're NOT in "more" mode:
@@ -2005,11 +2010,11 @@ class Item extends ItemLight
 			}
 
 			return format_to_output( $params['before']
-						.'<a href="'.$params['link_to'].'">'
+						.'<a href="'.$params['link_to'].'"'.$class_attr.'>'
 						.$params['link_text'].'</a>'
 						.$params['after'], $params['format'] );
 		}
-		elseif( ! $this->get_setting( 'hide_teaser' ) )
+		elseif( ! $params['force_hide_teaser'] && ! $this->get_setting( 'hide_teaser' ) )
 		{	// We are in more mode and we're not hiding the teaser:
 			// (if we're hiding the teaser we display this as a normal page ie: no anchor)
 			if( $params['anchor_text'] == '#' )
@@ -2017,7 +2022,7 @@ class Item extends ItemLight
 				$params['anchor_text'] = '<p class="bMore">'.T_('Follow up:').'</p>';
 			}
 
-			return format_to_output( '<a id="more'.$this->ID.'" name="more'.$this->ID.'"></a>'
+			return format_to_output( '<a id="more'.$this->ID.'" name="more'.$this->ID.'"'.$class_attr.'></a>'
 							.$params['anchor_text'], $params['format'] );
 		}
 	}
@@ -2560,8 +2565,8 @@ class Item extends ItemLight
 		$params = array_merge( array(
 				'before' =>              '<div class="item_attachments"><h3>'.T_('Attachments').':</h3><ul class="bFiles">',
 				'before_attach' =>         '<li>',
-				'before_attach_size' =>    ' <span class="file_size">',
-				'after_attach_size' =>     '</span>',
+				'before_attach_size' =>    '<span class="file_size">(',
+				'after_attach_size' =>     ')</span>',
 				'after_attach' =>          '</li>',
 				'after' =>               '</ul></div>',
 			// fp> TODO: we should only have one limit param. Or is there a good reason for having two?
@@ -2569,7 +2574,14 @@ class Item extends ItemLight
 				'limit_attach' =>        1000, // Max # of files displayed
 				'limit' =>               1000,
 				'restrict_to_image_position' => '',	// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
-				'data'  =>  '',
+				'data'                       =>  '',
+				'attach_format'              => '$icon_link$ $file_link$ $file_size$', // $icon_link$ $icon$ $file_link$ $file_size$
+				'file_link_format'           => '$file_name$', // $icon$ $file_name$ $file_size$
+				'file_link_class'            => '',
+				'download_link_icon'         => 'download',
+				'download_link_title'        => T_('Download file'),
+				'file_size_abbr'             => true, // Use HTML <abbr> tag for type of the file size
+				'file_size_info'             => true, // Display full text of size type when $params['file_size_abbr'] == false
 			), $params );
 
 		// Get list of attached files
@@ -2608,17 +2620,37 @@ class Item extends ItemLight
 			}
 
 			if( $File->is_audio() )
-			{
+			{ // Player for audio file
 				$r_file[$i]  = '<div class="podplayer">';
 				$r_file[$i] .= $this->get_player( $File->get_url() );
 				$r_file[$i] .= '</div>';
 			}
 			else
-			{
+			{ // A link to download a file
+
+				// Just icon with download icon
+				$icon = ( strpos( $params['attach_format'].$params['file_link_format'], '$icon$' ) !== false ) ?
+						get_icon( $params['download_link_icon'], 'imgtag', array( 'title' => $params['download_link_title'] ) ) : '';
+
+				// A link with icon to download
+				$icon_link = ( strpos( $params['attach_format'], '$icon_link$' ) !== false ) ?
+						action_icon( $params['download_link_title'], $params['download_link_icon'], $File->get_url(), '', 5 ) : '';
+
+				// File size info
+				$file_size = ( strpos( $params['attach_format'].$params['file_link_format'], '$file_size$' ) !== false ) ?
+						$params['before_attach_size'].bytesreadable( $File->get_size(), $params['file_size_abbr'], $params['file_size_info'] ).$params['after_attach_size'] : '';
+
+				// A link with file name to download
+				$file_link_format = str_replace( array( '$icon$', '$file_name$', '$file_size$' ),
+					array( $icon, '$text$', $file_size ),
+					$params['file_link_format'] );
+				$file_link = ( strpos( $params['attach_format'], '$file_link$' ) !== false ) ?
+						$File->get_view_link( $File->get_name(), NULL, NULL, $file_link_format, $params['file_link_class'] ) : '';
+
 				$r_file[$i] = $params['before_attach'];
-				$r_file[$i] .= action_icon( T_('Download file'), 'download', $File->get_url(), '', 5 ).' ';
-				$r_file[$i] .= $File->get_view_link( $File->get_name() );
-				$r_file[$i] .= $params['before_attach_size'].'('.bytesreadable( $File->get_size() ).')'.$params['after_attach_size'];
+				$r_file[$i] .= str_replace( array( '$icon$', '$icon_link$', '$file_link$', '$file_size$' ),
+					array( $icon, $icon_link, $file_link, $file_size ),
+					$params['attach_format'] );
 				$r_file[$i] .= $params['after_attach'];
 			}
 
@@ -2726,6 +2758,17 @@ class Item extends ItemLight
 	 * @param array
 	 */
 	function feedback_link( $params )
+	{
+		echo $this->get_feedback_link( $params );
+	}
+
+
+	/**
+	 * Get a link to feedback page (under some conditions)
+	 *
+	 * @param array
+	 */
+	function get_feedback_link( $params )
 	{
 		global $ReqURL;
 
@@ -2839,27 +2882,29 @@ class Item extends ItemLight
 			$anchor = '#'.$params['type'];
 		}
 
-		echo $params['link_before'];
+		$r = $params['link_before'];
 
 		if( !empty( $params['url'] ) )
 		{
-			echo '<a href="'.$params['url'].$anchor.'" ';	// Position on feedback
-			echo 'title="'.$params['link_title'].'"';
+			$r .= '<a href="'.$params['url'].$anchor.'" ';	// Position on feedback
+			$r .= 'title="'.$params['link_title'].'"';
 			if( $params['use_popup'] )
-			{	// Special URL if we can open a popup (i-e if JS is enabled):
+			{ // Special URL if we can open a popup (i-e if JS is enabled):
 				$popup_url = url_add_param( $params['url'], 'disp=feedback-popup' );
-				echo ' onclick="return pop_up_window( \''.$popup_url.'\', \'evo_comments\' )"';
+				$r .= ' onclick="return pop_up_window( \''.$popup_url.'\', \'evo_comments\' )"';
 			}
-			echo '>';
-			echo $link_text;
-			echo '</a>';
+			$r .= '>';
+			$r .= $link_text;
+			$r .= '</a>';
 		}
 		else
 		{
-			echo $link_text;
+			$r .= $link_text;
 		}
 
-		echo $params['link_after'];
+		$r .= $params['link_after'];
+
+		return $r;
 	}
 
 
@@ -4898,6 +4943,8 @@ class Item extends ItemLight
 		// remember ID, because parent method resets it to 0
 		$old_ID = $this->ID;
 
+		$blog_ID = $this->get_blog_ID();
+
 		$DB->begin();
 
 		if( $r = parent::dbdelete() )
@@ -4916,6 +4963,9 @@ class Item extends ItemLight
 			$DB->commit();
 
 			$Plugins->trigger_event( 'AfterItemDelete', $params = array( 'Item' => & $this ) );
+
+			// BLOCK CACHE INVALIDATION:
+			BlockCache::invalidate_key( 'cont_coll_ID', $blog_ID ); // Content has changed
 
 			$this->ID = 0;
 		}
@@ -4974,7 +5024,7 @@ class Item extends ItemLight
 		$r = trim(strip_tags($r));
 		// fp> this is borked: $r = preg_replace('~(\r?\n)+~', '\n', $r);
 		$r = trim($r);
-		$r = strmaxlen( $r, $crop_length, $suffix );
+		$r = strmaxlen( $r, $crop_length, $suffix, 'raw', true );
 		return $r;
 	}
 

@@ -266,6 +266,11 @@ function get_icon_info($name)
 			'size' => array( 16, 16 ),
 			'xy' => array( 128, 0 )
 		);
+		case 'arrow-down-green': return array(
+			'alt'  => T_('Download'),
+			'size' => array( 24, 24 ),
+			'xy' => array( 96, 272 )
+		);
 
 
 		case 'warning': return array( // TODO: not really transparent at its borders
@@ -395,6 +400,11 @@ function get_icon_info($name)
 			'alt'  => '&bull;',
 			'size' => array( 9, 9 ),
 			'xy' => array( 0, 192 )
+		);
+		case 'bullet_magenta': return array(
+			'alt'  => '&bull;',
+			'size' => array( 9, 9 ),
+			'xy' => array( 16, 192 )
 		);
 
 		case 'activate': return array(
@@ -569,6 +579,26 @@ function get_icon_info($name)
 			'size' => array( 12, 13 ),
 			'xy' => array( 144, 240 )
 		);
+		case 'arrow_left_white': return array(
+			'alt'  => T_('Previous'),
+			'size' => array( 10, 14 ),
+			'xy' => array( 128, 256 )
+		);
+		case 'arrow_right_white': return array(
+			'alt'  => T_('Next'),
+			'size' => array( 10, 14 ),
+			'xy' => array( 144, 256 )
+		);
+		case 'arrow_left_grey': return array(
+			'alt'  => T_('Previous'),
+			'size' => array( 10, 14 ),
+			'xy' => array( 128, 224 )
+		);
+		case 'arrow_right_grey': return array(
+			'alt'  => T_('Next'),
+			'size' => array( 10, 14 ),
+			'xy' => array( 144, 224 )
+		);
 
 		case 'check_all': return array(
 			'alt'  => T_('Check all'),
@@ -680,12 +710,12 @@ function get_icon_info($name)
 		case 'login': return array(
 			'alt'  => T_('Login'),
 			'size' => array( 24, 24 ),
-			'xy' => array( 128, 160 )
+			'xy' => array( 0, 272 )
 		);
 		case 'register': return array(
 			'alt'  => T_('Register'),
 			'size' => array( 24, 24 ),
-			'xy' => array( 128, 184 )
+			'xy' => array( 0, 296 )
 		);
 
 		case 'magnifier': return array(
@@ -730,7 +760,7 @@ function get_icon_info($name)
 		case 'notification': return array(
 			'alt'  => T_('Email notification'),
 			'size' => array( 15, 12 ),
-			'xy' => array( 144, 224 )
+			'xy' => array( 16, 0 )
 		);
 
 		case 'width_increase': return array(
@@ -755,13 +785,13 @@ function get_icon_info($name)
 			'size' => array( 16, 16 ),
 			'xy' => array( 64, 128 )
 		);
+
+		case 'arrow-btn': return array(
+			'alt'  => T_('More info'),
+			'size' => array( 8, 12 ),
+			'xy' => array( 128, 160 ),
+			'rollover' => true,
+		);
 	}
 }
-
-/*
- * $Log$
- * Revision 1.93  2013/11/06 08:03:44  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

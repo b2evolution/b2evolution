@@ -54,7 +54,7 @@ $Results->cols[] = array(
 	'td_class' => 'small center',
 );
 $Results->cols[] = array(
-	'th' => T_('Canoncical Slug ID'),
+	'th' => T_('Canonical Slug ID'),
 	'th_class' => 'shrinkwrap',
 	'order' => 'post_canonical_slug_ID',
 	'td' => '$post_canonical_slug_ID$',
@@ -71,10 +71,4 @@ if( ( $current_User->check_perm('options', 'edit', true) ) && ( $Results->get_nu
 	echo '<p>[<a href="'.$redirect_to.'">'.T_( 'Delete these posts' ).'</a>]</p>';
 }
 
-/*
- * $Log$
- * Revision 1.5  2013/11/06 08:04:54  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

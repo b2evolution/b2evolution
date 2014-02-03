@@ -42,14 +42,14 @@ switch( $action )
 		param_check_not_empty( 'wp_blog_ID', T_('Please select a blog!') );
 
 		// XML File
-		$xml_file = $_FILES['wp_file'];
-		if( $xml_file['size'] == 0 )
-		{ // File is empty
+		$xml_file = param( 'wp_file', 'string', '' );
+		if( empty( $xml_file ) )
+		{ // File is not selected
 			param_error( 'wp_file', T_('Please select file to import.') );
 		}
-		else if( ! preg_match( '/\.(xml|txt|zip)$/i', $xml_file['name'] ) )
+		else if( ! preg_match( '/\.(xml|txt|zip)$/i', $xml_file ) )
 		{ // Extension is incorrect
-			param_error( 'wp_file', sprintf( T_('&laquo;%s&raquo; has an unrecognized extension.'), $xml_file['name'] ) );
+			param_error( 'wp_file', sprintf( T_('&laquo;%s&raquo; has an unrecognized extension.'), $xml_file ) );
 		}
 
 		if( param_errors_detected() )

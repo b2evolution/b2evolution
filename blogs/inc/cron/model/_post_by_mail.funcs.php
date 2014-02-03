@@ -22,7 +22,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Print out a debugging message with optional HTML color added
  *
  * @param string Message
- * @param string 
+ * @param string
  */
 function pbm_msg( $message, $cron = false )
 {
@@ -36,7 +36,7 @@ function pbm_msg( $message, $cron = false )
 	{	// We are in cron mode, log the message
 		if( $is_web )
 			$message .= '<br />';
-		
+
 		$result_message .= $message."\n";
 	}
 }
@@ -135,7 +135,7 @@ function pbm_process_messages( & $mbox, $limit )
 	// No execution time limit
 	set_max_execution_time(0);
 
-	// Are we in test mode? 
+	// Are we in test mode?
 	$test_mode_on = $Settings->get('eblog_test_mode');
 
 	$post_cntr = 0;
@@ -277,7 +277,7 @@ function pbm_process_messages( & $mbox, $limit )
 			if( ($auth = pbm_get_auth_tag($content)) === false )
 			{	// No <auth> tag, let's detect legacy "username:password" on the first line
 				$a_body = explode( "\n", $content, 2 );
-				
+
 				// tblue> splitting only into 2 parts allows colons in the user PW
 				// Note: login and password cannot include '<' !
 				$auth = explode( ':', strip_tags($a_body[0]), 2 );
@@ -445,7 +445,7 @@ function pbm_process_messages( & $mbox, $limit )
 		$Plugins_admin->filter_contents( $post_title /* by ref */, $content /* by ref */, $renderers, $params );
 
 		pbm_msg('Filtered post content: <pre style="font-size:10px">'.htmlspecialchars($content).'</pre>');
-		
+
 		$context = $Settings->get('eblog_html_tag_limit') ? 'commenting' : 'posting';
 		$post_title = check_html_sanity( $post_title, $context, $pbmUser );
 		$content = check_html_sanity( $content, $context, $pbmUser );
@@ -471,7 +471,7 @@ function pbm_process_messages( & $mbox, $limit )
 			load_class( 'items/model/_item.class.php', 'Item' );
 
 			global $pbm_items, $DB, $localtimenow;
-			
+
 			$post_status = 'published';
 
 			pbm_msg( sprintf('<h4>Saving item "%s" in the database</h4>', $post_title ) );
@@ -499,7 +499,7 @@ function pbm_process_messages( & $mbox, $limit )
 			pbm_msg( sprintf('Item created?: '.(isset($edited_Item->ID) ? 'yes' : 'no') ) );
 
 			// Execute or schedule notifications & pings:
-			$edited_Item->handle_post_processing();
+			$edited_Item->handle_post_processing( true );
 
 			if( !empty($pbm_item_files) )
 			{	// Attach files
@@ -524,6 +524,9 @@ function pbm_process_messages( & $mbox, $limit )
 					$pbmLink->dbinsert();
 					pbm_msg( sprintf('File attached?: '.(isset($pbmLink->ID) ? 'yes' : 'no') ) );
 				}
+
+				// Invalidate blog's media BlockCache
+				BlockCache::invalidate_key( 'media_coll_ID', $edited_Item->get_blog_ID() );
 			}
 
 			// Save posted items sorted by author user for reports
@@ -587,7 +590,7 @@ function pbm_process_header( $header, & $subject, & $post_date )
 			return false;
 		}
 	}
-	
+
 	if( empty($ddate_U) )
 	{
 		$dmonths = array(
@@ -620,7 +623,7 @@ function pbm_process_header( $header, & $subject, & $post_date )
 
 		$ddate_U = mktime( $ddate_H, $ddate_i, $ddate_s, $ddate_m, $ddate_d, $ddate_Y );
 	}
-	
+
 	$post_date = date( 'Y-m-d H:i:s', $ddate_U );
 
 	return true;
@@ -639,7 +642,7 @@ function pbm_process_header( $header, & $subject, & $post_date )
  */
 function pbm_process_attachments( & $content, $mailAttachments, $mediadir, $media_url, $add_img_tags = true, $type = 'attach' )
 {
-	global $Settings, $pbm_item_files;
+	global $Settings, $pbm_item_files, $filename_max_length;
 
 	pbm_msg('<h4>Processing attachments</h4>');
 
@@ -671,11 +674,26 @@ function pbm_process_attachments( & $content, $mailAttachments, $mediadir, $medi
 		$cnt = 0;
 		$prename = substr( $filename, 0, strrpos( $filename, '.' ) ).'-';
 		$sufname = strrchr( $filename, '.' );
+		$error_in_filename = false;
 
 		while( file_exists( $mediadir.$filename ) )
 		{
 			$filename = $prename.$cnt.$sufname;
+			if( strlen( $filename ) > $filename_max_length )
+			{ // This is a special case, when the filename is longer then the maximum allowed
+				// Cut as many characters as required before the counter on the file name
+				$filename = fix_filename_length( $filename, strlen( $prename ) - 1 );
+				if( $error_in_filename = process_filename( $filename, true ) )
+				{ // The file name is not valid, this is an unexpected situation, because the file name was already validated before
+					pbm_msg('Invalid filename: '.$error_filename);
+					break;
+				}
+			}
 			++$cnt;
+		}
+		if( $error_in_filename )
+		{ // Don't create file with invalid file name
+			continue;
 		}
 		pbm_msg( sprintf('New file name is <b>%s</b>', $filename) );
 
@@ -778,7 +796,7 @@ function pbm_get_auth_tag( & $content )
 function pbm_prepare_html_message( $message )
 {
 	pbm_msg('Message body (original): <pre style="font-size:10px">'.htmlspecialchars($message).'</pre>');
-		
+
 	$marker = 0;
 	if( preg_match( '~<body[^>]*>(.*?)</body>~is', $message, $result ) )
 	{	// First see if we can get contents of <body> tag
@@ -817,11 +835,11 @@ function pbm_prepare_html_message( $message )
 		'~ moz-do-not-send="true"~',			// Thunderbird inline image with absolute "src"
 		'~ class="moz-signature" cols="\d+"~',	// Thunderbird signature in HTML message
 		'~ goomoji="[^"]+"~',					// Gmail smilies
-	);		
+	);
 	$content = preg_replace( $patterns, '', $content );
 
 	pbm_msg('Message body (processed): <pre style="font-size:10px">'.htmlspecialchars($content).'</pre>');
-	
+
 	return array( $auth, $content );
 }
 
@@ -866,16 +884,9 @@ function pbm_tempdir( $dir, $prefix = 'tmp', $mode = 0700 )
 	// Add trailing slash
 	$dir = trailing_slash($dir);
 
-	do { $path = $dir.$prefix.mt_rand(); } while( !mkdir( $path, $mode ) );
+	do { $path = $dir.$prefix.mt_rand(); } while( ! evo_mkdir( $path, $mode ) );
 
 	return $path;
 }
 
-
-/*
- * $Log$
- * Revision 1.4  2013/11/06 08:04:07  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

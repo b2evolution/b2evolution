@@ -157,9 +157,11 @@ class Blog extends DataObject
 
 		$this->delete_restrictions = array(
 				array( 'table'=>'T_categories', 'fk'=>'cat_blog_ID', 'msg'=>T_('%d related categories') ),
+				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition' => 'file_root_type = "collection"', 'msg'=>T_('%d files in this blog file root') ),
 			);
 
 		$this->delete_cascades = array(
+				array( 'table'=>'T_coll_settings', 'fk'=>'cset_coll_ID', 'msg'=>T_('%d blog settings') ),
 				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_blog_ID', 'msg'=>T_('%d user permission definitions') ),
 				array( 'table'=>'T_coll_group_perms', 'fk'=>'bloggroup_blog_ID', 'msg'=>T_('%d group permission definitions') ),
 				array( 'table'=>'T_subscriptions', 'fk'=>'sub_coll_ID', 'msg'=>T_('%d subscriptions') ),
@@ -562,6 +564,15 @@ class Blog extends DataObject
 			// Set to show Latitude & Longitude params for this blog items
 			$this->set_setting( 'show_location_coordinates', param( 'show_location_coordinates', 'integer', 0 ) );
 
+			// Load custom double & varchar fields
+			$custom_field_names = array();
+			$this->load_custom_fields( 'double', $update_cascade_query, $custom_field_names );
+			$this->load_custom_fields( 'varchar', $update_cascade_query, $custom_field_names );
+			if( !empty( $update_cascade_query ) )
+			{ // Some custom fields were deleted and these fields must be deleted from the item settings table also. Add required query.
+				$this->CollectionSettings->add_update_cascade( $update_cascade_query );
+			}
+
 			// call modules update_collection_features on this blog
 			modules_call_method( 'update_collection_features', array( 'edited_Blog' => & $this ) );
 		}
@@ -673,15 +684,6 @@ class Blog extends DataObject
 			$this->set_setting( 'tags_meta_keywords', param( 'tags_meta_keywords', 'integer', 0 ) );
 		}
 
-		// Load custom double & varchar fields
-		$custom_field_names = array();
-		$this->load_custom_fields( 'double', $update_cascade_query, $custom_field_names );
-		$this->load_custom_fields( 'varchar', $update_cascade_query, $custom_field_names );
-		if( !empty( $update_cascade_query ) )
-		{ // Some custom fields were deleted and these fields must be deleted from the item settings table also. Add required query.
-			$this->CollectionSettings->add_update_cascade( $update_cascade_query );
-		}
-
 
 		/*
 		 * ADVANCED ADMIN SETTINGS
@@ -771,12 +773,15 @@ class Blog extends DataObject
 				if( $access_type == 'absolute' )
 				{
 					$blog_siteurl = param( 'blog_siteurl_absolute', 'string', true );
-					if( !preg_match( '#^https?://.+#', $blog_siteurl ) )
-					{
-						$Messages->add( T_('Blog Folder URL').': '
-														.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!'), 'error' );
+					if( preg_match( '#^https?://[^/]+/.*#', $blog_siteurl, $matches ) )
+					{ // It looks like valid absolute URL, so we may update the blog siteurl
+						$this->set( 'siteurl', $blog_siteurl );
 					}
-					$this->set( 'siteurl', $blog_siteurl );
+					else
+					{ // It is not valid absolute URL, don't update the blog 'siteurl' to avoid errors
+						$Messages->add( T_('Blog Folder URL').': '.sprintf( T_('%s is an invalid absolute URL'), '&laquo;'.htmlspecialchars( $blog_siteurl ).'&raquo;' )
+							.' '.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>) and it must contain at least one \'/\' sign after the domain name!'), 'error' );
+					}
 				}
 				elseif( $access_type == 'relative' )
 				{ // relative siteurl
@@ -816,6 +821,7 @@ class Blog extends DataObject
 
 			if( param( 'blog_media_location',  'string', NULL ) !== NULL )
 			{	// Media files location:
+				$old_media_dir = $this->get_media_dir();
 				$this->set_from_Request( 'media_location' );
 				$this->set_media_subdir( param( 'blog_media_subdir', 'string', '' ) );
 				$this->set_media_fullpath( param( 'blog_media_fullpath', 'string', '' ) );
@@ -870,6 +876,23 @@ class Blog extends DataObject
 						}
 						break;
 				}
+
+				if( ! param_errors_detected() )
+				{ // If no error were created before we can try to move old files to new file root
+					$FileRootCache = & get_FileRootCache();
+					if( ( $blog_FileRoot = & $FileRootCache->get_by_type_and_ID( 'collection', $this->ID ) ) !== false )
+					{
+						$new_media_dir = $blog_FileRoot->ads_path;
+						if( ! empty( $old_media_dir ) && ! empty( $new_media_dir ) &&
+						    $old_media_dir != $new_media_dir )
+						{ // Blog's media dir was changed, We should move the files from old to new dir
+							if( ! @rename( $old_media_dir, $new_media_dir ) )
+							{ // Some error on renaming
+								$Messages->add( sprintf( T_('You cannot choose new media dir "%s" (cannot rename blog fileroot)'), $new_media_dir ), 'error' );
+							}
+						}
+					}
+				}
 			}
 		}
 
@@ -891,7 +914,12 @@ class Blog extends DataObject
 		$empty_title_error = false; // use this to display empty title fields error message only ones
 		$real_custom_field_count = 0; // custom fields count after update
 		$custom_field_count = param( 'count_custom_'.$type, 'integer', 0 ); // all custom fields count ( contains even deleted fields )
-		$deleted_custom_fields = explode( ',', param( 'deleted_custom_'.$type, 'string', '' ) );
+		$delted_field_guids = param( 'deleted_custom_'.$type, 'string', '' );
+		if( ( $custom_field_count == 0 ) && empty( $delted_field_guids ) )
+		{ // There were no custom field add, update or delete request so no need for further checks
+			return;
+		}
+		$deleted_custom_fields = explode( ',', $delted_field_guids );
 
 		// Update custom fields
 		for( $i = 1 ; $i <= $custom_field_count; $i++ )
@@ -1097,8 +1125,8 @@ class Blog extends DataObject
 		}
 
 		if( substr( $url, -1 ) != '/' )
-		{	// Crop at the last "/"
-			$url = substr( $url, 0, strrpos($url,'/')+1 );
+		{ // Crop an url part after the last "/"
+			$url = substr( $url, 0, strrpos( $url, '/' ) + 1 );
 		}
 
 		// For case relative and absolute:
@@ -1549,7 +1577,7 @@ class Blog extends DataObject
 		if( $create && ! is_dir( $mediadir ) )
 		{
 			// Display absolute path to blog admin and relative path to everyone else
-			$msg_mediadir_path = $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ? $mediadir : rel_path_to_base($mediadir);
+			$msg_mediadir_path = ( is_logged_in() && $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ) ? $mediadir : rel_path_to_base( $mediadir );
 
 			// TODO: Link to some help page(s) with errors!
 			if( ! is_writable( dirname($mediadir) ) )
@@ -1561,7 +1589,7 @@ class Blog extends DataObject
 				}
 				return false;
 			}
-			elseif( !@mkdir( $mediadir ) )
+			elseif( ! evo_mkdir( $mediadir ) )
 			{ // add error
 				if( is_admin_page() )
 				{
@@ -1571,12 +1599,7 @@ class Blog extends DataObject
 				return false;
 			}
 			else
-			{ // chmod and add note:
-				$chmod = $Settings->get('fm_default_chmod_dir');
-				if( !empty($chmod) )
-				{
-					@chmod( $mediadir, octdec($chmod) );
-				}
+			{ // add note:
 				if( is_admin_page() )
 				{
 					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; has been created with permissions %s."), $msg_mediadir_path, substr( sprintf('%o', fileperms($mediadir)), -3 ) ), 'success' );
@@ -2327,13 +2350,32 @@ class Blog extends DataObject
 		$PageCache = new PageCache( $this );
 		$PageCache->cache_delete();
 
+		// Delete the blog files/links from DB
+		$DB->query( 'DELETE f, l, fv FROM T_files AS f
+			LEFT JOIN T_links l ON l.link_file_ID = f.file_ID
+			LEFT JOIN T_files__vote AS fv ON fv.fvot_file_ID = f.file_ID
+			    WHERE f.file_root_type = "collection"
+			      AND f.file_root_ID = '.$this->ID );
+
 		// remember ID, because parent method resets it to 0
 		$old_ID = $this->ID;
 
 		// Delete main (blog) object:
-		parent::dbdelete();
+		if( ! parent::dbdelete() )
+		{
+			$DB->rollback();
+
+			$Messages->add( 'Blog has not been deleted.', 'error' );
+			return false;
+		}
 
 		$DB->commit();
+
+		// Delete blog's media folder recursively
+		$FileRootCache = & get_FileRootCache();
+		$root_directory = $FileRootCache->get_root_dir( 'collection', $old_ID );
+		rmdir_r( $root_directory );
+		$Messages->add( T_('Deleted blog\'s files'), 'success' );
 
 		// re-set the ID for the Plugin event
 		$this->ID = $old_ID;
@@ -2423,10 +2465,38 @@ class Blog extends DataObject
 		return $this->name;
 	}
 
-
+	/**
+	 * Get the name of the blog limited by length
+	 *
+	 * @param integer Max length
+	 * @return string Limited name
+	 */
 	function get_maxlen_name( $maxlen = 50 )
 	{
 		return strmaxlen( $this->get_name(), $maxlen, NULL, 'raw' );
+	}
+
+
+	/**
+	 * Get short and long name of the blog
+	 *
+	 * @return string
+	 */
+	function get_extended_name()
+	{
+		$names = array();
+
+		if( ! empty( $this->shortname ) )
+		{ // Short name
+			$names[] = $this->shortname;
+		}
+
+		if( ! empty( $this->name ) )
+		{ // Title
+			$names[] = $this->name;
+		}
+
+		return implode( ' - ', $names );
 	}
 
 

@@ -55,23 +55,29 @@ function cron_log( $message, $level = 0 )
 	}
 }
 
+/**
+ * Extract keyphrases from the hitlog
+ *
+ * fp>yura fp>attila : this is not the right place to put this function. Who put it here?
+ */
 function keyphrase_job()
 {
 	global $DB;
 
+	// Look for unextracted keyphrases:
 	$sql = 'SELECT MIN(h.hit_ID) as min, MAX(h.hit_ID) as max
 				FROM T_hitlog as h
 				WHERE h.hit_keyphrase IS NOT NULL
 					AND h.hit_keyphrase_keyp_ID IS NULL';
-	$ids = $DB->get_row( $sql, "ARRAY_A", NULL, ' Get max/min hits ids of unprocessed keyphrases' );
+	$ids = $DB->get_row( $sql, "ARRAY_A", NULL, ' Get max/min hits ids of unextracted keyphrases' );
 
 	if ( ! empty ( $ids['min'] ) && ! empty ( $ids['max'] ) )
-	{
+	{ // Extract keyphrases if needed:
 
 		$sql = 'INSERT INTO T_track__keyphrase(keyp_phrase, keyp_count_refered_searches)
 					SELECT h.hit_keyphrase, 1
 					FROM T_hitlog as h
-					WHERE 
+					WHERE
 						(h.hit_ID >= '.$ids['min'].' AND h.hit_ID <= '.$ids['max'].')
 						AND h.hit_keyphrase IS NOT NULL
 						AND h.hit_keyphrase_keyp_ID IS NULL
@@ -101,14 +107,11 @@ function keyphrase_job()
 
 		$sql = 'UPDATE T_hitlog as h, T_track__keyphrase as k
 				SET h.hit_keyphrase_keyp_ID = k.keyp_ID
-				WHERE 
+				WHERE
 					h.hit_keyphrase = k.keyp_phrase
 					AND (h.hit_ID >= '.$ids['min'].' AND h.hit_ID <= '.$ids['max'].')';
 		$DB->query( $sql, 'Update hitlogs keyphrase id' );
-
-
 	}
-
 }
 
 
@@ -130,6 +133,8 @@ function call_job( $job_name, $job_params = array() )
 	$error_message = '';
 	$result_message = NULL;
 	$result_status = 'error';
+
+	apm_name_transaction( 'CRON/'.$job_name );
 
 	if( preg_match( '~^plugin_(\d+)_(.*)$~', $job_name, $match ) )
 	{ // Cron job provided by a plugin:
@@ -221,8 +226,46 @@ function cron_status_color( $status )
 			'error'    => 'FF0000',
 			'timeout'  => 'FFA500',
 		);
-	
+
 	return isset( $colors[ $status ] ) ? '#'.$colors[ $status ] : 'none';
+}
+
+
+/**
+ * Get the manual page link for the requested cron job, given by the controller path
+ *
+ * @param string job ctrl path
+ * @return string NULL when the corresponding manual topic was not defined, the manual link otherwise
+ */
+function cron_job_manual_link( $job_ctrl )
+{
+	$manual_topics = array(
+		'cron/jobs/_activate_account_reminder.job.php' => 'task-send-non-activated-account-reminders',
+		'cron/jobs/_antispam_poll.job.php' => 'task-poll-antispam-blacklist',
+		'cron/jobs/_cleanup_jobs.job.php' => 'task-cleanup-scheduled-jobs',
+		'cron/jobs/_comment_moderation_reminder.job.php' => 'task-send-unmoderated-comments-reminders',
+		'cron/jobs/_comment_notifications.job.php' => 'task-send-comment-notifications',
+		'cron/jobs/_decode_returned_emails.job.php' => 'task-process-return-path-inbox',
+		'cron/jobs/_error_test.job.php' => 'task-error-test',
+		'cron/jobs/_heavy_db_maintenance.job.php' => 'task-heavy-db-maintenance',
+		'cron/jobs/_light_db_maintenance.job.php' => 'task-light-db-maintenance',
+		'cron/jobs/_post_by_email.job.php' => 'task-create-post-by-email',
+		'cron/jobs/_post_notifications.job.php' => 'task-send-post-notifications',
+		'cron/jobs/_process_hitlog.job.php' => 'task-process-hit-log',
+		'cron/jobs/_prune_hits_sessions.job.php' => 'task-prune-old-hits-and-sessions',
+		'cron/jobs/_prune_page_cache.job.php' => 'task-prune-old-files-from-page-cache',
+		'cron/jobs/_prune_recycled_comments.job.php' => 'task-prune-recycled-comments',
+		'cron/jobs/_test.job.php' => 'task-test',
+		'cron/jobs/_unread_message_reminder.job.php' => 'task-send-unread-messages-reminders',
+	);
+
+	if( isset( $manual_topics[$job_ctrl] ) )
+	{ // return the corresponding manual page topic
+		return get_manual_link( $manual_topics[$job_ctrl] );
+	}
+
+	// The topic was not defined
+	return NULL;
 }
 
 
@@ -278,10 +321,4 @@ function detect_timeout_cron_jobs( $error_task = NULL )
 	}
 }
 
-/*
- * $Log$
- * Revision 1.15  2013/11/06 09:08:47  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

@@ -8,7 +8,6 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-
 global $dbm_tables_count;
 
 load_funcs('tools/model/_dbmaintenance.funcs.php');
@@ -39,11 +38,4 @@ $result_message = array(
 );
 
 return 1; /* ok */
-
-/*
- * $Log$
- * Revision 1.1  2013/11/06 08:04:07  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

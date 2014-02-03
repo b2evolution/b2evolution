@@ -85,8 +85,10 @@ class UserSettings extends AbstractSettings
 		'last_activation_reminder_key' => NULL, // It will be set at the first time when activation reminder email will be sent
 		'activation_reminder_count' => 0, // How many activation reminder was sent since the user is not activated
 		'send_activation_reminder' => 1, // Send reminder to activate my account if it is not activated
+		'welcome_message_sent' => 0, // Used to know if user already received a welcome message after email activation
 
 		// admin user notifications
+		'send_cmt_moderation_reminder' => 1, // Send reminders about comments awaiting moderation
 		'notify_new_user_registration' => 1, // Notify admin user when a new user has registered
 		'notify_activated_account' => 1, // Notify admin user when an account has been activated by email
 		'notify_closed_account' => 1, // Notify admin user when an account has been closed by the account owner
@@ -122,7 +124,8 @@ class UserSettings extends AbstractSettings
 		'notify_messages' => 1, 	// Notify user when receives a private message
 		'notify_unread_messages' => 1, // Notify user when he has unread messages more then 24 hour, and he was not notified in the last 3 days
 		'notify_published_comments' => 1, // Notify user when a comment is published in an own post
-		'notify_comment_moderation' => 1, // Notify when a comment is awaiting moderation in a post where the user has moderation rights
+		'notify_comment_moderation' => 1, // Notify when a comment is awaiting moderation and the user has right to moderate that comment
+		'notify_post_moderation' => 1, // Notify when a post is awaiting moderation and the user has right to moderate that post
 
 		'enable_PM' => 1,
 		'enable_email' => 1,
@@ -299,11 +302,4 @@ class UserSettings extends AbstractSettings
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.20  2013/11/06 09:08:59  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

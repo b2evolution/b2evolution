@@ -835,3 +835,7 @@ div.results .status_trash span {
 	padding-left: 31px;
 	display: inline-block;
 }
+
+form#comment_edit {
+	clear: both;
+}

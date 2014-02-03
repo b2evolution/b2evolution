@@ -68,7 +68,7 @@ $SpecialList = array(
 	// webmails
 	'.mail.yahoo.com/',
 	'//mail.google.com/',
-	'//webmail.aol.com/',
+	'webmail.aol.com/',
 	// stat services
 	'sitemeter.com/',
 	// aggregators

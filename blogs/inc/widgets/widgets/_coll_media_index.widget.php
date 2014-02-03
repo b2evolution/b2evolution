@@ -177,11 +177,6 @@ class coll_media_index_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		if( $this->disp_params[ 'order_by' ] == 'RAND' && isset($this->BlockCache) )
-		{	// Do NOT cache if display order is random
-			$this->BlockCache->abort_collect();
-		}
-
 		global $Blog;
 		$list_blogs = ( $this->disp_params[ 'blog_ID' ] ? $this->disp_params[ 'blog_ID' ] : $Blog->ID );
 		//pre_dump( $list_blogs );
@@ -210,7 +205,7 @@ class coll_media_index_Widget extends ComponentWidget
 		$SQL->WHERE_and( 'post_datestart <= \''.remove_seconds( $localtimenow ).'\'' );
 		if( !empty( $this->disp_params[ 'item_type' ] ) )
 		{ // Get items only with specified type
-			$SQL->WHERE_and( 'post_ptyp_ID = \''.(int)$this->disp_params[ 'item_type' ].'\'' );
+			$SQL->WHERE_and( 'post_ptyp_ID = '.intval( $this->disp_params[ 'item_type' ] ) );
 		}
 		$SQL->GROUP_BY( 'link_ID' );
 		$SQL->LIMIT( $this->disp_params[ 'limit' ]*4 ); // fp> TODO: because we have no way of getting images only, we get 4 times more data than requested and hope that 25% at least will be images :/
@@ -327,13 +322,24 @@ class coll_media_index_Widget extends ComponentWidget
 
 		return true;
 	}
+
+
+	/**
+	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 *
+	 * @return array of keys this widget depends on
+	 */
+	function get_cache_keys()
+	{
+		global $Blog;
+
+		return array(
+				'wi_ID'         => $this->ID,  // Have the widget settings changed?
+				'set_coll_ID'   => $Blog->ID,  // Have the settings of the blog changed? (ex: new skin)
+				'cont_coll_ID'  => empty($this->disp_params['blog_ID']) ? $Blog->ID : $this->disp_params['blog_ID'],  // Has the content of the displayed blog changed?
+				'media_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], 	// Have some media files attached to one of the blogs item?
+			);
+	}
 }
 
-
-/*
- * $Log$
- * Revision 1.27  2013/11/06 08:05:09  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

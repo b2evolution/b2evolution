@@ -125,7 +125,7 @@ function stats_active_percent( $percent )
 	return floor( $percent * 100 ).' %';
 }
 $Results->cols[] = array(
-		'th' => T_('% of active users'),
+		'th' => /* xgettext:no-php-format */ T_('% of active users'),
 		'td' => '%stats_active_percent( #percent# )%',
 		'order' => 'percent',
 		'default_dir' => 'D',
@@ -350,10 +350,4 @@ ONE COLOR for user_gender = NULL AND status NOT IN ( activated, autoactivated )
 	echo '</div>';
 }
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:05:04  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -79,6 +79,7 @@ if( $num_file_results > 0 )
 
 $Results = new Results( $num_file_results ? $SQL->get() : NULL, 'fdupl_', $default_order, $UserSettings->get( 'results_per_page' ), $num_file_results );
 $Results->Cache = & get_FileCache();
+$Results->Cache->clear();
 $Results->title = T_('Duplicate files');
 
 /*
@@ -121,16 +122,43 @@ $Results->filter_area = array(
 	'presets' => $filter_presets,
 	);
 
+function td_file_duplicates_icon( $File )
+{
+	if( is_object( $File ) )
+	{ // Check if File object is correct
+		return $File->get_preview_thumb( 'fulltype', true );
+	}
+	// Broken File object
+	return T_('Not Found');
+}
 $Results->cols[] = array(
 		'th' => T_('Icon/Type'),
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap',
-		'td' => '% {Obj}->get_preview_thumb( "fulltype", true ) %',
+		'td' => '%td_file_duplicates_icon( {Obj} )%',
 	);
 
+function td_file_duplicates_path( $File, $file_root_type, $file_root_ID, $file_path )
+{
+	if( is_object( $File ) )
+	{ // Check if File object is correct
+		return $File->get_view_link().' '.$File->get_target_icon();
+	}
+	else
+	{ // Broken File object
+		if( empty( $file_path ) )
+		{ // No file data exist in DB
+			return T_('File no longer exists on disk.');
+		}
+		else
+		{ // Display file info from DB
+			return $file_root_type.'_'.$file_root_ID.':'.$file_path;
+		}
+	}
+}
 $Results->cols[] = array(
 		'th' => T_('Path'),
-		'td' => '% {Obj}->get_view_link() % % {Obj}->get_target_icon() %',
+		'td' => '%td_file_duplicates_path( {Obj}, #file_root_type#, #file_root_ID#, #file_path# )%',
 		'order' => 'file_path'
 	);
 
@@ -140,7 +168,7 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => T_('Like'),
+		'th' => /* TRANS: Header for # of times photo has been liked */ T_('Likes'),
 		'td' => '$total_like$',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'center',
@@ -149,7 +177,7 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => T_('Inappropriate'),
+		'th' => /* TRANS: Header for # of times photo has been votes inappropriate */ T_('Inappropriate'),
 		'td' => '$total_inappropriate$',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'center',
@@ -168,11 +196,4 @@ $Results->cols[] = array(
 
 $Results->display();
 
-
-/*
- * $Log$
- * Revision 1.3  2013/11/06 09:08:48  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

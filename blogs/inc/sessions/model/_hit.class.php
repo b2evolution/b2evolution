@@ -1515,7 +1515,7 @@ class Hit
 			$query = str_replace( '&', '&amp;', strstr($query, '?') );
 		}
 		elseif( $search_engine_name == 'Google' && (strpos($query, '&as_') !== false || strpos($query, 'as_') === 0) )
-		{
+		{ // Google with "as_" param
 			$keys = array();
 
 			if( $key = $this->get_param_from_string($query, 'as_q') )
@@ -1538,7 +1538,7 @@ class Hit
 		}
 
 		if( empty($key) )
-		{
+		{	// we haven't extracted a search key with the special cases above...
 			foreach( $keyword_param as $param )
 			{
 				if( $param[0] == '/' )
@@ -1560,13 +1560,25 @@ class Hit
 			}
 		}
 
-		if( empty($key) )
-		{	// Not a search referer
+		$key_param_in_query = false;
+		if( empty( $key ) && ! empty( $keyword_param ) )
+		{ // Check if empty key param exists in query, e.g. "/search?q=&other_param=text"
+			foreach( $keyword_param as $k_param )
+			{
+				if( strpos( $query, '&'.$k_param.'=' ) !== false || strpos( $query, $k_param.'=' ) === 0 )
+				{ // Key param with empty value exists in query, We can decide this referer url as from search engine
+					$key_param_in_query = true;
+				}
+			}
+		}
+
+		if( empty( $key ) && ! $key_param_in_query )
+		{ // Not a search referer
 			if( $this->referer_type == 'search' )
-			{	// If the referer was detected as 'search' we need to change it back to 'referer'
+			{ // If the referer was detected as 'search' we need to change it to 'special'
 				// to keep search stats clean.
-				$this->referer_type = 'referer';
-				$Debuglog->add( 'Hit: extract_params_from_referer() overrides referer type set by detect_referer(): "search" -> "referer"', 'request' );
+				$this->referer_type = 'special';
+				$Debuglog->add( 'Hit: extract_params_from_referer() overrides referer type set by detect_referer(): "search" -> "special"', 'request' );
 			}
 
 			return false;
@@ -1797,11 +1809,4 @@ class Hit
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.85  2013/11/06 08:04:45  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

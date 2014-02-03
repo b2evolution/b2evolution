@@ -251,11 +251,6 @@ class coll_item_list_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		if( $this->disp_params[ 'order_by' ] == 'RAND' && isset($this->BlockCache) )
-		{	// Do NOT cache if display order is random
-			$this->BlockCache->abort_collect();
-		}
-
 		$listBlog = ( $this->disp_params[ 'blog_ID' ] ? $BlogCache->get_by_ID( $this->disp_params[ 'blog_ID' ], false ) : $Blog );
 
 		if( empty($listBlog) )
@@ -579,10 +574,4 @@ class coll_item_list_Widget extends ComponentWidget
 	}
 }
 
-/*
- * $Log$
- * Revision 1.37  2013/11/06 09:09:09  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

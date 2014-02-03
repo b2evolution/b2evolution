@@ -1,48 +1,53 @@
-# Apache configuration for the blog folder
-# Lines starting with # are considered as comments.
+# Apache configuration for b2evolution's base folder
+# Lines starting with # are comments.
+# Updated 2013-07-16
 
-# PHP SECURITY:
-# this will make register globals off in the evo directory
-<IfModule mod_php4.c>
-	php_flag register_globals off
-</IfModule>
+# PHP / SECURITY:
 <IfModule mod_php5.c>
-	php_flag register_globals off
+	# On some overly "secured" systems, the following may need to be added in each folder:
+	# AddHandler application/x-httpd-php5 .php
+	
+	# The following will try to configure PHP in the way b2evolution would like it to be:
+	php_flag register_globals Off
+	php_flag display_errors On
+	php_value error_reporting E_ALL
+	
+	# You may also need some of the following:
+	# Increase memory limit
+	# php_value memory_limit 256M
 </IfModule>
 
-# PHP5
-# This may need to be in each folder:
-# AddHandler application/x-httpd-php5 .php
-
-# CLEAN URLS:
-# If you're using Apache 2, you may wish to try this if clean URLs don't work:
-# AcceptPathInfo	On
-
+# DISABLE LISTING FILES ON SERVER:
+# Don't show directory contents (not desirable, especially for media folders)
+Options -Indexes
+# Note: if you have access to the command line of your server, it would probably
+# be even better to type this:  a2dismod autoindex
+# (This disables the directory listing module completely)
 
 # DEFAULT DOCUMENT TO DISPLAY:
-# this will select the default blog template to be displayed
-# if the URL is just .../blogs/
+# In case no specific file is requested, we want to fall back to index.php
+# In case some subdirectories are accessed, we want to display index.html
 <IfModule mod_dir.c>
 	DirectoryIndex index.php index.html
 </IfModule>
 
+# CLEAN URLS:
+# The following will ensure you can pass extra params after the filename on the URL
+AcceptPathInfo	On
 
-# CATCH EVERYTHING INTO B2EVO:
+# CATCH EVERYTHING INTO B2EVO: (even if no php file appears in the URL)
 # The following will allow you to have a blog running right off the site root,
 # using index.php as a stub but not showing it in the URLs.
 # This will add support for URLs like:  http://example.com/2006/08/29/post-title
 <IfModule mod_rewrite.c>
 	RewriteEngine On
-	php_value display_errors On
-	php_value error_reporting E_ALL
 
 	# This line may be needed or not.
-	# enabling this would prevent running ina subdir like /blog/index.php
-	# This has been disabled in v 4.0.0-alpha. Please let us know if you find it needs to be enabled.
+	# enabling this would prevent running in a subdir like /blog/index.php
 	# RewriteBase /
 
-	# Redirect anything that's not an existing directory or file to index.php:
+	# Redirect any .htm .html or no-extension-file that's not an existing file or directory to index.php:
 	RewriteCond %{REQUEST_FILENAME} !-d
 	RewriteCond %{REQUEST_FILENAME} !-f
-	RewriteRule ^  index.php
+	RewriteRule ^[^.]+(\.(html|htm))?$ index.php [L]
 </IfModule>

@@ -120,15 +120,14 @@ function skin_init( $disp )
 		case 'single':
 		case 'page':
 			if( ( ! $preview ) && ( empty( $Item ) ) )
-			{ // No Item, Incorrect request, Display 404 page
-				$Messages->add( 'Invalid page URL!' );
-				header_redirect( url_add_param( $Blog->gen_blogurl(), 'disp=404', '&' ), 302 );
+			{ // No Item, incorrect request and incorrect state of the application, a 404 redirect should have already happened
+				debug_die( 'Invalid page URL!' );
 			}
 
-			init_ajax_forms(); // auto requires jQuery
-			init_ratings_js();
-			init_voting_comment_js();
-			init_scrollwide_js(); // Add jQuery Wide Scroll plugin
+			init_ajax_forms( 'blog' ); // auto requires jQuery
+			init_ratings_js( 'blog' );
+			init_voting_comment_js( 'blog' );
+			init_scrollwide_js( 'blog' ); // Add jQuery Wide Scroll plugin
 
 			if( $disp == 'single' )
 			{

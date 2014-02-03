@@ -165,7 +165,7 @@ class manual_Skin extends Skin
 		}
 
 		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
-		if($this->get_setting("colorbox")) 
+		if($this->get_setting("colorbox"))
 		{
 			require_js_helper( 'colorbox', 'blog' );
 		}
@@ -185,8 +185,8 @@ class manual_Skin extends Skin
 	 */
 	function display_breadcrumbs( $chapter_ID, $params = array() )
 	{
-		if( $chapter_ID == 0 )
-		{	// No selected chapter
+		if( $chapter_ID <= 0 )
+		{ // No selected chapter, or an exlcude chapter filter is set
 			return '';
 		}
 
@@ -439,8 +439,8 @@ class manual_Skin extends Skin
 
 
 	/**
-	 * 
-	 * 
+	 *
+	 *
 	 * @param array Params
 	 */
 	function display_chapter_item( $params = array() )

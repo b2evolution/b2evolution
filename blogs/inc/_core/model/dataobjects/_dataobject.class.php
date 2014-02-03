@@ -297,7 +297,10 @@ class DataObject
 		// Reset changes in object:
 		$this->dbchanges = array();
 
-		$Plugins->trigger_event( 'AfterObjectInsert', $params = array( 'Object' => & $this, 'type' => get_class($this) ) );
+		if( !empty( $Plugins ) )
+		{
+			$Plugins->trigger_event( 'AfterObjectInsert', $params = array( 'Object' => & $this, 'type' => get_class($this) ) );
+		}
 
 		return true;
 	}
@@ -330,7 +333,7 @@ class DataObject
 	 *
 	 * @return boolean true on success
 	 */
-	function dbdelete()
+	function dbdelete( $ignore_restrictions = array() )
 	{
 		global $DB, $Messages, $Plugins, $db_config;
 
@@ -341,6 +344,14 @@ class DataObject
 
 			// Start transaction:
 			$DB->begin();
+
+			if( ! $this->check_delete( T_('Delete restriction error:'), $ignore_restrictions ) )
+			{ // Some restrictions still prevent deletion
+				// Note: This restrictions must be handled previously before dbdelete is called.
+				// If this code is executed it means there is an impelmentation issue and restricitons must be check there.
+				$DB->rollback();
+				return false;
+			}
 
 			foreach( $this->delete_cascades as $restriction )
 			{
@@ -532,7 +543,7 @@ class DataObject
 		echo '<p class="warning">'.$confirm_title.'</p>';
 		echo '<p class="warning">'.T_('THIS CANNOT BE UNDONE!').'</p>';
 
-		$redirect_to = param( 'redirect_to', 'string', '' );
+		$redirect_to = param( 'redirect_to', 'url', '' );
 
 		$Form = new Form( '', 'form_confirm', 'get', '' );
 
@@ -881,12 +892,4 @@ class DataObject
 	}
 }
 
-
-
-/*
- * $Log$
- * Revision 1.40  2013/11/06 08:03:47  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

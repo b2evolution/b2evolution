@@ -82,7 +82,7 @@ switch( $action )
 		$Plugins_admin->unfilter_contents( $comment_title /* by ref */, $comment_content /* by ref */, $edited_Comment_Item->get_renderers_validated(), $params );
 
 		// Where are we going to redirect to?
-		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$edited_Comment_Item->ID, '&' ) );
+		param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$edited_Comment_Item->ID, '&' ) );
 		break;
 
 	case 'elevate':
@@ -158,7 +158,7 @@ switch( $action )
 		}
 
 		// Where are we going to redirect to?
-		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=comments&blog='.$blog.'&filter=restore', '&' ) );
+		param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=comments&blog='.$blog.'&filter=restore', '&' ) );
 
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( $redirect_to, 303 ); // Will EXIT
@@ -233,7 +233,7 @@ switch( $action )
 			param( 'newcomment_author_url', 'string' );
 			param( 'comment_allow_msgform', 'integer', 0 /* checkbox */ );
 
-			param_check_not_empty( 'newcomment_author', T_('Please enter and author name.'), '' );
+			param_check_not_empty( 'newcomment_author', T_('Please enter an author name.'), '' );
 			$edited_Comment->set( 'author', $newcomment_author );
 			param_check_email( 'newcomment_author_email', false );
 			$edited_Comment->set( 'author_email', $newcomment_author_email );
@@ -292,12 +292,14 @@ switch( $action )
 
 		// Content:
 		param( 'content', $text_format );
+		// Don't allow the hidden text in comment content
+		$content = str_replace( '<!', '&lt;!', $content );
 
 		// Renderers:
 		if( param( 'renderers_displayed', 'integer', 0 ) )
 		{ // use "renderers" value only if it has been displayed (may be empty)
 			global $Plugins;
-			$renderers = $Plugins->validate_renderer_list( param( 'renderers', 'array', array() ), array( 'Comment' => & $edited_Comment ) );
+			$renderers = $Plugins->validate_renderer_list( param( 'renderers', 'array/string', array() ), array( 'Comment' => & $edited_Comment ) );
 			$edited_Comment->set_renderers( $renderers );
 		}
 
@@ -311,6 +313,7 @@ switch( $action )
 			) );
 
 		param_check_html( 'content', T_('Invalid comment text.') );	// Check this is backoffice content (NOT with comment rules)
+		param_check_not_empty( 'content', T_('Empty comment content is not allowed.') );
 		$edited_Comment->set( 'content', get_param( 'content' ) );
 
 		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
@@ -354,10 +357,10 @@ switch( $action )
 
 			if( $edited_Comment->status == 'published' )
 			{ // comment status was set to published or it was already published, needs to handle notifications
-				$edited_Comment->handle_notifications();
+				$edited_Comment->handle_notifications( false, $current_User->ID );
 			}
-	
-			$Messages->add( T_('Comment has been updated.'), 'success' );	
+
+			$Messages->add( T_('Comment has been updated.'), 'success' );
 
 			header_redirect( $redirect_to );
 			/* exited */
@@ -377,7 +380,7 @@ switch( $action )
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
 		// comment status was set to published, needs to handle notifications
-		$edited_Comment->handle_notifications();
+		$edited_Comment->handle_notifications( false, $current_User->ID );
 
 		// Set the success message corresponding for the new status
 		switch( $edited_Comment->status )
@@ -414,9 +417,6 @@ switch( $action )
 		$edited_Comment->handle_qm_secret();
 
 		$edited_Comment->dbupdate();	// Commit update to the DB
-
-		// comment status was set to published, needs to handle notifications
-		$edited_Comment->handle_notifications();
 
 		$Messages->add( T_('Comment has been restricted.'), 'success' );
 
@@ -611,36 +611,20 @@ switch( $action )
 			// Check that this action request is not a CSRF hacked request:
 			$Session->assert_received_crumb( 'comment' );
 
-			$CommentList->limit = 0; // Remove a limit to get comments from all pages
-			$CommentList->query();
+			// Init the comment list query, but don't execute it
+			$CommentList->query_init();
+			// Set sql query to get deletable comment ids
+			$deletable_comments_query = 'SELECT DISTINCT '.$CommentList->Cache->dbIDname.' '
+					.$CommentList->CommentQuery->get_from()
+					.$CommentList->CommentQuery->get_where();
 
-			switch( $mass_type )
-			{
-				case 'recycle':
-					// Move the comments to recycle bin:
-					foreach( $CommentList->rows as $Comment )
-					{
-						$deleted_Comment = & Comment_get_by_ID( $Comment->comment_ID );
-						$deleted_Comment->dbdelete();
-					}
+			// Set an action param to display a correct template
+			$process_action = $action;
+			unset( $_POST['actionArray'] );
+			set_param( 'action', 'list' );
 
-					$Messages->add( sprintf( T_( '%s comments were moved to recycle bin.' ), $CommentList->total_rows ), 'success' );
-					break;
-
-				case 'delete': // Delete the comments permanently:
-					foreach( $CommentList->rows as $Comment )
-					{
-						$deleted_Comment = & Comment_get_by_ID( $Comment->comment_ID );
-						$deleted_Comment->set( 'status', 'trash' );
-						$deleted_Comment->dbdelete();
-					}
-
-					$Messages->add( sprintf( T_( '%s comments were deleted permanently.' ), $CommentList->total_rows ), 'success' );
-					break;
-			}
-
-			// Redirect to refresh comments list
-			header_redirect( regenerate_url( 'action', '', '', '&' ) );
+			// Try to obtain some serious time to do some serious processing (15 minutes)
+			set_max_execution_time( 10000 );
 		}
 
 		break;
@@ -663,6 +647,8 @@ if( ( $action == 'edit' ) || ( $action == 'update_publish' ) || ( $action == 'up
 
 require_css( 'rsc/css/blog_base.css', true ); // Default styles for the blog navigation
 require_js( 'communication.js' ); // auto requires jQuery
+// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
+require_js_helper( 'colorbox' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -714,6 +700,13 @@ switch( $action )
 
 		echo '<table class="browse" cellspacing="0" cellpadding="0" border="0"><tr>';
 		echo '<td class="browse_left_col">';
+
+		if( ! empty( $process_action ) && $process_action == 'mass_delete' && !empty( $mass_type ) )
+		{ // Mass deleting of the comments
+			comment_mass_delete_process( $mass_type, $deletable_comments_query );
+			$CommentList->reset();
+		}
+
 		// Display VIEW:
 		if( $tab3 == 'fullview' )
 		{
@@ -740,11 +733,4 @@ switch( $action )
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-
-/*
- * $Log$
- * Revision 1.51  2013/11/06 08:03:58  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

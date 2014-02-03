@@ -84,6 +84,8 @@ else
 
 // Note: we use funky field names to defeat the most basic guestbook spam bots and/or their most basic authors
 $comment = param( $dummy_fields[ 'content' ], $text_format );
+// Don't allow the hidden text in comment content
+$comment = str_replace( '<!', '&lt;!', $comment );
 
 if( is_logged_in( false ) )
 {

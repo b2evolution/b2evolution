@@ -172,9 +172,16 @@ switch( $action )
 
 			$action = 'list';
 			// Redirect so that a reload doesn't write to the DB twice:
-			$redirect_to = param( 'redirect_to', 'string', '?ctrl=collections' );
+			$redirect_to = param( 'redirect_to', 'url', '?ctrl=collections' );
 			header_redirect( $redirect_to, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
+		}
+		else
+		{ // Check if blog has delete restrictions
+			if( ! $edited_Blog->check_delete( sprintf( T_('Cannot delete Blog &laquo;%s&raquo;'), $edited_Blog->get_name() ), array( 'file_root_ID', 'cat_blog_ID' ) ) )
+			{ // There are restrictions:
+				$action = 'view';
+			}
 		}
 		break;
 
@@ -338,18 +345,21 @@ switch($action)
 	case 'delete':
 		// ----------  Delete a blog from DB ----------
 		// Not confirmed
+		$FileRootCache = & get_FileRootCache();
+		$root_directory = $FileRootCache->get_root_dir( 'collection', $edited_Blog->ID );
 		?>
 		<div class="panelinfo">
 			<h3><?php printf( T_('Delete blog [%s]?'), $edited_Blog->dget( 'name' ) )?></h3>
 
-			<p><?php echo T_('Deleting this blog will also delete all its categories, posts and comments!') ?></p>
+			<p><?php echo sprintf( T_('Deleting this blog will also delete ALL its categories, posts, comments and ALL its attached files in the blog\'s fileroot (%s) !'),
+				$root_directory ) ?></p>
 
 			<p><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
 
 			<p>
 
 			<?php
-				$redirect_to = param( 'redirect_to', 'string', '' );
+				$redirect_to = param( 'redirect_to', 'url', '' );
 
 				$Form = new Form( NULL, '', 'get', 'none' );
 
@@ -405,11 +415,4 @@ switch($action)
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-
-/*
- * $Log$
- * Revision 1.33  2013/11/06 08:03:57  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

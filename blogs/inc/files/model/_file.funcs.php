@@ -53,9 +53,10 @@ if( ! function_exists('fnmatch') )
  *
  * @param integer bytes
  * @param boolean use HTML <abbr> tags
+ * @param boolean Display full text of size type when $htmlabbr == false
  * @return string bytes made readable
  */
-function bytesreadable( $bytes, $htmlabbr = true )
+function bytesreadable( $bytes, $htmlabbr = true, $display_size_type = true )
 {
 	static $types = NULL;
 
@@ -86,7 +87,7 @@ function bytesreadable( $bytes, $htmlabbr = true )
 
 	$r .= $htmlabbr ? ( '&nbsp;<abbr title="'.$types[$i]['text'].'">' ) : ' ';
 	$r .= $types[$i]['abbr'];
-	$r .= $htmlabbr ? '</abbr>' : ( ' ('.$types[$i]['text'].')' );
+	$r .= $htmlabbr ? '</abbr>' : ( $display_size_type ? ' ('.$types[$i]['text'].')' : '' );
 
 	// $r .= ' '.$precision;
 
@@ -971,7 +972,7 @@ function evo_mkdir( $dir_path, $chmod = NULL, $recursive = false )
 
 
 /**
- * Copy directory recusively or one file
+ * Copy directory recursively or one file
  *
  * @param mixed Source path
  * @param mixed Destination path
@@ -1674,34 +1675,45 @@ function exif_orientation( $file_name, & $imh/* = null*/, $save_image = false )
 	global $Settings;
 
 	if( !$Settings->get( 'exif_orientation' ) )
-	{	// Autorotate is disabled
+	{ // Autorotate is disabled
 		return;
 	}
 
 	if( ! function_exists('exif_read_data') )
-	{	// EXIF extension is not loaded
+	{ // Exif extension is not loaded
 		return;
 	}
 
-	$EXIF = exif_read_data( $file_name );
-	if( !( isset( $EXIF['Orientation'] ) && in_array( $EXIF['Orientation'], array( 3, 6, 8 ) ) ) )
-	{	// EXIF Orientation tag is not defined OR we don't interested in current value
+	$image_info = array();
+	getimagesize( $file_name, $image_info );
+	if( ! isset( $image_info['APP1'] ) || ( strpos( $image_info['APP1'], 'Exif' ) !== 0 ) )
+	{ // This file format is not an 'Exchangeable image file format' so there are no Exif data to read
+		return;
+	}
+
+	if( ( $exif_data = exif_read_data( $file_name ) ) === false )
+	{ // Could not read Exif data
+		return;
+	}
+
+	if( !( isset( $exif_data['Orientation'] ) && in_array( $exif_data['Orientation'], array( 3, 6, 8 ) ) ) )
+	{ // Exif Orientation tag is not defined OR we don't interested in current value
 		return;
 	}
 
 	load_funcs( 'files/model/_image.funcs.php' );
 
 	if( is_null( $imh ) )
-	{	// Create image resource from file name
+	{ // Create image resource from file name
 		$imh = imagecreatefromjpeg( $file_name );
 	}
 
 	if( !$imh )
-	{	// Image resource is incorrect
+	{ // Image resource is incorrect
 		return;
 	}
 
-	switch( $EXIF['Orientation'] )
+	switch( $exif_data['Orientation'] )
 	{
 		case 3:	// Rotate for 180 degrees
 			$imh = @imagerotate( $imh, 180, 0 );

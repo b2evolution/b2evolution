@@ -413,7 +413,7 @@ function excerpt( $str, $maxlen = 200 )
 	// Ger rid of all new lines and Display the html tags as source text:
 	$str = trim( str_replace( array( "\r", "\n", "\t" ), ' ', $str ) );
 
-	$str = strmaxlen( $str, $maxlen );
+	$str = strmaxlen( $str, $maxlen, NULL, 'raw', true );
 
 	return $str;
 }
@@ -438,6 +438,8 @@ function excerpt( $str, $maxlen = 200 )
  */
 function strmaxlen( $str, $maxlen = 50, $tail = NULL, $format = 'raw', $cut_at_whitespace = false  )
 {
+	global $current_charset;
+
 	if( is_null($tail) )
 	{
 		$tail = '&hellip;';
@@ -461,7 +463,7 @@ function strmaxlen( $str, $maxlen = 50, $tail = NULL, $format = 'raw', $cut_at_w
 		{ // if the format isn't raw we make sure that we do not cut in the middle of an HTML entity
 			$maxlen_entity = 7; # "&amp;" is 5, min 3!
 			$str_inspect = evo_substr($str_cropped, 1-$maxlen_entity);
-			$pos_amp = strpos($str_inspect, '&');
+			$pos_amp = evo_strpos($str_inspect, '&');
 			if( $pos_amp !== false )
 			{ // there's an ampersand at the end of the cropped string
 				$look_until = $pos_amp;
@@ -479,26 +481,30 @@ function strmaxlen( $str, $maxlen = 50, $tail = NULL, $format = 'raw', $cut_at_w
 
 		if( $cut_at_whitespace )
 		{
-			if( ! ctype_space($str[strlen($str_cropped)]) )
+			// Get the first character being cut off. Note: we can't use $str[index] in case of utf8 strings!
+			$first_cut_off_char = evo_substr( $str, evo_strlen( $str_cropped ), 1 );
+			if( ! ctype_space( $first_cut_off_char ) )
 			{ // first character being cut off is not whitespace
-				$i = evo_strlen($str_cropped);
-				while( $i && ! ctype_space($str_cropped[--$i]) )
+				// Get the chars as an array in case of utf8 charset from the cropped string to be able to get chars by position ( in case of 'iso-8859-1' charset one char is one byte )
+				$str_cropped_chars = ( $current_charset == 'iso-8859-1' ) ? $str_cropped : preg_split( '//u', $str_cropped, -1, PREG_SPLIT_NO_EMPTY );
+				$i = evo_strlen( $str_cropped );
+				while( $i && ! ctype_space( $str_cropped_chars[--$i] ) )
 				{}
 				if( $i )
 				{
-					$str_cropped = substr($str_cropped, 0, $i);
+					$str_cropped = evo_substr( $str_cropped, 0, $i );
 				}
 			}
 		}
 
-		$str = format_to_output(rtrim($str_cropped), $format);
+		$str = format_to_output( rtrim( $str_cropped ), $format );
 		$str .= $tail;
 
 		return $str;
 	}
 	else
 	{
-		return format_to_output($str, $format);
+		return format_to_output( $str, $format );
 	}
 }
 
@@ -3216,10 +3222,16 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $Settings, $demo_mode, $sendmail_additional_params;
 
+	$NL = "\r\n";
+	$message = str_replace( array( "\r\n", "\r" ), $NL, $message );
+
+	// Replace secret content in the mail logs message body
+	$message_log = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $message );
+	// Remove secret content marks from the message
+	$message = str_replace( array( '$secret_content_start$', '$secret_content_end$' ), '', $message );
+
 	// Memorize email address
 	$to_email_address = $to;
-
-	$NL = "\r\n";
 
 	if( $demo_mode )
 	{ // Debug mode restriction: Sending email in debug mode is not allowed
@@ -3269,8 +3281,6 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	$clear_subject = $subject;
 	$subject = mail_encode_header_string($subject);
 
-	$message = str_replace( array( "\r\n", "\r" ), $NL, $message );
-
 	// Convert encoding of message (from internal encoding to the one of the message):
 	// fp> why do we actually convert to $current_charset?
 	// dh> I do not remember. Appears to make sense sending it unconverted in $evo_charset.
@@ -3318,7 +3328,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	{ // Check if the email address is blocked
 		$Debuglog->add( 'Sending mail to &laquo;'.htmlspecialchars( $to_email_address ).'&raquo; FAILED, because this email marked with spam or permanent errors.', 'error' );
 
-		mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'blocked' );
+		mail_log( $user_ID, $to_email_address, $clear_subject, $message_log, $headerstring, 'blocked' );
 
 		return false;
 	}
@@ -3328,7 +3338,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	{	// We agree to die for debugging...
 		if( ! mail( $to, $subject, $message, $headerstring, $additional_parameters ) )
 		{
-			mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error' );
+			mail_log( $user_ID, $to_email_address, $clear_subject, $message_log, $headerstring, 'error' );
 
 			debug_die( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.' );
 		}
@@ -3339,7 +3349,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		{
 			$Debuglog->add( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.', 'error' );
 
-			mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error' );
+			mail_log( $user_ID, $to_email_address, $clear_subject, $message_log, $headerstring, 'error' );
 
 			return false;
 		}
@@ -3347,7 +3357,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	$Debuglog->add( 'Sent mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo;.' );
 
-	mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'ok' );
+	mail_log( $user_ID, $to_email_address, $clear_subject, $message_log, $headerstring, 'ok' );
 
 	return true;
 }
@@ -3470,7 +3480,7 @@ function mail_autoinsert_user_data( $text, $User = NULL )
 	}
 
 	$rpls_from = array( '$login$' , '$email$', '$user_ID$', '$unsubscribe_key$' );
-	$rpls_to = array( $User->login, $User->email, $User->ID, md5( $User->ID.$User->unsubscribe_key ) );
+	$rpls_to = array( $User->login, $User->email, $User->ID, '$secret_content_start$'.md5( $User->ID.$User->unsubscribe_key ).'$secret_content_end$' );
 
 	return str_replace( $rpls_from, $rpls_to, $text );
 }
@@ -5980,5 +5990,35 @@ function evo_flush()
 {
 	@ob_end_flush(); // This function helps to turn off output buffering on PHP 5.4.x
 	flush();
+}
+
+// ---------- APM : Application Performance Monitoring -----------
+
+/**
+ * Name the transaction for the APM.
+ * This avoids that every request be called 'index.php' or 'admin.php' or 'cron_exec.php'
+ *
+ * @param mixed $request_transaction_name
+ */
+function apm_name_transaction( $request_transaction_name )
+{
+	if(extension_loaded('newrelic'))
+	{	// New Relic is installed on the server for monitoring.
+		newrelic_name_transaction( $request_transaction_name );
+	}
+}
+
+/**
+ * Log a custom metric
+ *
+ * @param mixed $name name of the custom metric
+ * @param mixed $value assumed to be in milliseconds (ms)
+ */
+function apm_log_custom_metric( $name, $value )
+{
+	if(extension_loaded('newrelic'))
+	{	// New Relic is installed on the server for monitoring.
+		newrelic_custom_metric( 'Custom/'.$name, $value );
+	}
 }
 ?>

@@ -6,7 +6,6 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-	keyphrase_job();
-	return 1; /* ok */
-
+keyphrase_job();
+return 1; /* ok */
 ?>

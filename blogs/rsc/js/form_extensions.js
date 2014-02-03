@@ -69,7 +69,7 @@ function check( object, action )
  */
 function check_all( e )
 {	// Get the event target element
-	target =  findTarget(e);
+	target = findTarget(e);
 	// Call check funtion to check all check boxes
 	// Cancel the event click (href..)
 	check( target, true );
@@ -85,7 +85,7 @@ function check_all( e )
  */
 function uncheck_all( e )
 {	// Get the event target element
-	target =  findTarget(e);
+	target = findTarget(e);
 	// Call check funtion to uncheck all check boxes
 	check( target, false );
 	// Cancel the event click (href..)
@@ -322,4 +322,28 @@ function input_decorated_help( id, hvalue )
 
 	// init:
 	onblur();
+}
+
+
+/**
+ * caters for the differences between Internet Explorer and fully DOM-supporting browsers
+ */
+function findTarget( e )
+{
+	var target;
+
+	if( window.event && window.event.srcElement )
+		target = window.event.srcElement;
+	else if( e && e.target )
+		target = e.target;
+	if( ! target )
+		return null;
+
+	while( target != document.body && target.nodeName.toLowerCase() != 'a' )
+		target = target.parentNode;
+
+	if( target.nodeName.toLowerCase() != 'a' )
+		return null;
+
+	return target;
 }

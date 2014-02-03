@@ -41,24 +41,28 @@ function wpxml_import()
 	// The import type ( replace | append )
 	$import_type = param( 'import_type', 'string', 'replace' );
 
-	$XML_file_path = $_FILES['wp_file']['tmp_name'];
+	$XML_file_path = get_param( 'wp_file' );
+	$XML_file_name = basename( $XML_file_path );
 
-	if( preg_match( '/\.(xml|txt)$/i', $_FILES['wp_file']['name'] ) )
+	if( preg_match( '/\.(xml|txt)$/i', $XML_file_name ) )
 	{ // XML format
 		// Check WordPress XML file
 		if( ! wpxml_check_xml_file( $XML_file_path ) )
 		{ // Errors are in XML file
 			return;
 		}
+
+		// Use this folder to upload files if they exist in subfolder "/b2evolution_export_files"
+		$attached_files_path = dirname( $XML_file_path );
 	}
-	else if( preg_match( '/\.zip$/i', $_FILES['wp_file']['name'] ) )
+	else if( preg_match( '/\.zip$/i', $XML_file_name ) )
 	{ // ZIP format
 		// Extract ZIP and check WordPress XML file
-		global $cache_path;
+		global $media_path;
 
-		$ZIP_folder_path = $cache_path.'import-'.md5( rand() );
+		$ZIP_folder_path = $media_path.'import/temp-'.md5( rand() );
 
-		if( ! unpack_archive( $XML_file_path, $ZIP_folder_path, true, $_FILES['wp_file']['name'] ) )
+		if( ! unpack_archive( $XML_file_path, $ZIP_folder_path, true, $XML_file_name ) )
 		{ // Errors on unpack ZIP file
 			return;
 		}
@@ -86,6 +90,9 @@ function wpxml_import()
 			rmdir_r( $ZIP_folder_path );
 			return;
 		}
+
+		// Use this folder to upload files, $ZIP_folder_path must be deleted after import
+		$attached_files_path = $ZIP_folder_path;
 	}
 	else
 	{ // Unrecognized extension
@@ -130,6 +137,7 @@ function wpxml_import()
 			if( !empty( $old_comments ) )
 			{
 				$DB->query( 'DELETE FROM T_comments__votes WHERE cmvt_cmt_ID IN ( '.implode( ', ', $old_comments ).' )' );
+				$DB->query( 'DELETE FROM T_links WHERE link_cmt_ID IN ( '.implode( ', ', $old_comments ).' )' );
 			}
 		}
 		echo T_('OK').'<br />';
@@ -147,6 +155,7 @@ function wpxml_import()
 				$DB->query( 'DELETE FROM T_items__version WHERE iver_itm_ID IN ( '.implode( ', ', $old_posts ).' )' );
 				$DB->query( 'DELETE FROM T_postcats WHERE postcat_post_ID IN ( '.implode( ', ', $old_posts ).' )' );
 				$DB->query( 'DELETE FROM T_slug WHERE slug_itm_ID IN ( '.implode( ', ', $old_posts ).' )' );
+				$DB->query( 'DELETE FROM T_links WHERE link_itm_ID IN ( '.implode( ', ', $old_posts ).' )' );
 			}
 		}
 		echo T_('OK').'<br />';
@@ -312,79 +321,94 @@ function wpxml_import()
 	}
 
 	/* Import files, Copy them all to media folder */
-	if( isset( $ZIP_folder_path ) && isset( $xml_data['files'] ) && count( $xml_data['files'] ) > 0 )
+	if( isset( $xml_data['files'] ) && count( $xml_data['files'] ) > 0 )
 	{
 		echo T_('Importing the files... ');
 		evo_flush();
 
-		$files_count = 0;
-		$files = array();
+		if( ! file_exists( $attached_files_path.'/b2evolution_export_files' ) )
+		{ // Display an error if files are attached but folder doesn't exist
+			echo '<p class="red">'.sprintf( T_('No folder %s found. It must exists to import the attached files properly.'), '<b>'.$attached_files_path.'/b2evolution_export_files'.'</b>' ).'</p>';
+		}
+		else
+		{ // The attached files are located in this subfolder
+			$subfolder_path = '/b2evolution_export_files';
 
-		foreach( $xml_data['files'] as $file )
-		{
-			switch( $file['file_root_type'] )
+			$files_count = 0;
+			$files = array();
+
+			foreach( $xml_data['files'] as $file )
 			{
-				case 'shared':
-					// Shared files
-					$file_root_ID = 0;
-					break;
-
-				case 'user':
-					// User's files
-					if( isset( $authors_IDs[ $file['file_root_ID'] ] ) )
-					{ // If owner of this file exists in our DB
-						$file_root_ID = $authors_IDs[ $file['file_root_ID'] ];
+				switch( $file['file_root_type'] )
+				{
+					case 'shared':
+						// Shared files
+						$file_root_ID = 0;
 						break;
-					}
-					// Otherwise we should upload this file into blog's folder:
 
-				default: // 'collection', 'absolute', 'skins'
-					// The files from other blogs and from other places must be moved in the folder of the current blog
-					$file['file_root_type'] = 'collection';
-					$file_root_ID = $wp_blog_ID;
-					break;
-			}
+					case 'user':
+						// User's files
+						if( isset( $authors_IDs[ $file['file_root_ID'] ] ) )
+						{ // If owner of this file exists in our DB
+							$file_root_ID = $authors_IDs[ $file['file_root_ID'] ];
+							break;
+						}
+						// Otherwise we should upload this file into blog's folder:
 
-			// Get FileRoot by type and ID
-			$FileRoot = new FileRoot( $file['file_root_type'], $file_root_ID );
-			if( is_dir( $ZIP_folder_path.'/'.$file['zip_path'].$file['file_path'] ) )
-			{ // Folder
-				$file_destination_path = $FileRoot->ads_path;
-			}
-			else
-			{ // File
-				$file_destination_path = $FileRoot->ads_path.$file['file_path'];
-			}
+					default: // 'collection', 'absolute', 'skins'
+						// The files from other blogs and from other places must be moved in the folder of the current blog
+						$file['file_root_type'] = 'collection';
+						$file_root_ID = $wp_blog_ID;
+						break;
+				}
 
-			if( ! copy_r( $ZIP_folder_path.'/'.$file['zip_path'].$file['file_path'], $file_destination_path ) )
-			{ // No permission to copy to this folder
-				if( is_dir( $ZIP_folder_path.'/'.$file['zip_path'].$file['file_path'] ) )
+				// Get FileRoot by type and ID
+				$FileRoot = new FileRoot( $file['file_root_type'], $file_root_ID );
+				if( is_dir( $attached_files_path.$subfolder_path.'/'.$file['zip_path'].$file['file_path'] ) )
 				{ // Folder
-					echo '<p class="orange">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<b>'.$file['file_path'].'</b>', '<b>'.$file_destination_path.'</b>' ).'</p>';
+					$file_destination_path = $FileRoot->ads_path;
 				}
 				else
 				{ // File
-					echo '<p class="orange">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<b>'.$file['file_path'].'</b>', '<b>'.$file_destination_path.'</b>' ).'</p>';
+					$file_destination_path = $FileRoot->ads_path.$file['file_path'];
 				}
-				// Skip it
-				continue;
+
+				if( ! file_exists( $attached_files_path.$subfolder_path.'/'.$file['zip_path'].$file['file_path'] ) )
+				{ // File doesn't exist
+					echo '<p class="orange">'.sprintf( T_('Unable to copy file %s, because it does not exist.'), '<b>'.$file['zip_path'].$file['file_path'].'</b>' ).'</p>';
+					// Skip it
+					continue;
+				}
+				else if( ! copy_r( $attached_files_path.$subfolder_path.'/'.$file['zip_path'].$file['file_path'], $file_destination_path ) )
+				{ // No permission to copy to this folder
+					if( is_dir( $attached_files_path.$subfolder_path.'/'.$file['zip_path'].$file['file_path'] ) )
+					{ // Folder
+						echo '<p class="orange">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<b>'.$file['zip_path'].$file['file_path'].'</b>', '<b>'.$file_destination_path.'</b>' ).'</p>';
+					}
+					else
+					{ // File
+						echo '<p class="orange">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<b>'.$file['zip_path'].$file['file_path'].'</b>', '<b>'.$file_destination_path.'</b>' ).'</p>';
+					}
+					// Skip it
+					continue;
+				}
+
+				// Create new File object, It will be linked to the items below
+				$File = new File( $file['file_root_type'], $file_root_ID, $file['file_path'] );
+				$File->set( 'title', $file['file_title'] );
+				$File->set( 'alt', $file['file_alt'] );
+				$File->set( 'desc', $file['file_desc'] );
+				$files[ $file['file_ID'] ] = $File;
+
+				$files_count++;
 			}
 
-			// Create new File object, It will be linked to the items below
-			$File = new File( $file['file_root_type'], $file_root_ID, $file['file_path'] );
-			$File->set( 'title', $file['file_title'] );
-			$File->set( 'alt', $file['file_alt'] );
-			$File->set( 'desc', $file['file_desc'] );
-			$files[ $file['file_ID'] ] = $File;
+			echo sprintf( T_('%d records'), $files_count ).'<br />';
 
-			$files_count++;
-		}
-
-		echo sprintf( T_('%d records'), $files_count ).'<br />';
-
-		if( file_exists( $ZIP_folder_path ) )
-		{ // This folder was created only to extract files from ZIP package, Remove it now
-			rmdir_r( $ZIP_folder_path );
+			if( isset( $ZIP_folder_path ) && file_exists( $ZIP_folder_path ) )
+			{ // This folder was created only to extract files from ZIP package, Remove it now
+				rmdir_r( $ZIP_folder_path );
+			}
 		}
 	}
 
@@ -557,7 +581,8 @@ function wpxml_import()
 			$Item->set( 'datemodified', !empty( $post['post_datemodified'] ) ? $post['post_datemodified'] : $post['post_date'] );
 			$Item->set( 'urltitle', !empty( $post['post_urltitle'] ) ? $post['post_urltitle'] : $post['post_title'] );
 			$Item->set( 'status', isset( $post_statuses[ (string) $post['status'] ] ) ? $post_statuses[ (string) $post['status'] ] : 'draft' );
-			$Item->set( 'comment_status', $post['comment_status'] == 'open' ? 'open' : 'closed' );
+			// If 'comment_status' has the unappropriate value set it to 'open'
+			$Item->set( 'comment_status', ( in_array( $post['comment_status'], array( 'open', 'closed', 'disabled' ) ) ? $post['comment_status'] : 'open' ) );
 			$Item->set( 'ptyp_ID', $post_type_ID );
 			if( empty( $post['post_excerpt'] ) && !empty( $post['post_content'] ) )
 			{	// Generate excerpt
@@ -1199,6 +1224,64 @@ function wp_get_regional_data( $country_code, $region, $subregion, $city )
 	}
 
 	return $data;
+}
+
+
+/**
+ * Get available files to import from the folder /media/import/
+ * 
+ * @return array Files
+ */
+function wpxml_get_import_files()
+{
+	global $media_path;
+
+	// Get all files from the import folder
+	$files = get_filenames( $media_path.'import/', array(
+			'flat' => false
+		) );
+
+	$import_files = array();
+	foreach( $files as $file )
+	{
+		$file_paths = array();
+		$file_type = '';
+		if( is_array( $file ) )
+		{ // It is a folder, Find xml file inside
+			foreach( $file as $key => $sub_file )
+			{
+				if( $key == 'b2evolution_export_files' && is_array( $sub_file ) )
+				{ // Probably it is folder with the attached files
+					$file_type = T_('attached files');
+				}
+				elseif( is_string( $sub_file ) && preg_match( '/\.(xml|txt)$/i', $sub_file ) )
+				{ // Probably it is a file with import data
+					$file_paths[] = $sub_file;
+				}
+			}
+		}
+		elseif( is_string( $file ) )
+		{ // File in the root, Single XML file
+			$file_paths[] = $file;
+		}
+
+		foreach( $file_paths as $file_path )
+		{
+			if( ! empty( $file_path ) && preg_match( '/\.(xml|txt|zip)$/i', $file_path, $file_matches ) )
+			{ // This file can be a file with import data
+				if( empty( $file_type ) )
+				{ // Set type from file extension
+					$file_type = $file_matches[1] == 'zip' ? T_('archive') : T_('single');
+				}
+				$import_files[] = array(
+						'path' => $file_path,
+						'type' => $file_type,
+					);
+			}
+		}
+	}
+
+	return $import_files;
 }
 
 ?>

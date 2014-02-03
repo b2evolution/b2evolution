@@ -30,7 +30,6 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-
 global $Settings, $DB, $result_message;
 global $pbm_item_files, $pbm_messages, $pbm_items, $post_cntr, $del_cntr, $is_cron_mode;
 
@@ -127,11 +126,4 @@ if( $post_cntr > 0 )
 }
 
 return 1; // success
-
-/*
- * $Log$
- * Revision 1.5  2013/11/06 09:08:47  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

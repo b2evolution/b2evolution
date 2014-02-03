@@ -136,7 +136,7 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	$Form->radio( 'blog_media_location', $edited_Blog->get( 'media_location' ),
 			array(
 				array( 'none', T_('None') ),
-				array( 'default', T_('Default'), $media_path.$edited_Blog->urlname.'/' ),
+				array( 'default', T_('Default'), $media_path.'blogs/'.$edited_Blog->urlname.'/' ),
 				array( 'subdir', T_('Subdirectory of media folder').':',
 					'',
 					' <span class="nobr"><code>'.$media_path.'</code><input
@@ -230,12 +230,3 @@ $Form->end_form( array(
 		}
 	} );
 </script>
-<?php
-
-/*
- * $Log$
- * Revision 1.41  2013/11/06 08:03:57  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
-?>

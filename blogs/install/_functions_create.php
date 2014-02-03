@@ -207,8 +207,6 @@ function create_default_data()
 			 WHERE ctry_code = '.$DB->quote( strtolower( $country_code[1] ) ) );
 	}
 
-	$User_Admin = new User();
-	$User_Admin->set( 'login', 'admin' );
 	if( !isset( $install_password ) )
 	{
 		$random_password = generate_random_passwd(); // no ambiguous chars
@@ -217,23 +215,13 @@ function create_default_data()
 	{
 		$random_password = $install_password;
 	}
-	$User_Admin->set( 'pass', md5($random_password) );	// random
-	$User_Admin->set_email( $admin_email );
-	$User_Admin->set( 'status', 'autoactivated' ); // assume it's activated
-	$User_Admin->set( 'level', 10 );
-	$User_Admin->set( 'locale', $default_locale );
-	if( !empty( $default_country ) )
-	{	// Set default country
-		$User_Admin->set( 'ctry_ID', $default_country );
-	}
-	if( $test_install_all_features )
-	{
-		$User_Admin->set( 'gender', 'F' );
-	}
-	$User_Admin->set_datecreated( $timestamp++ );
-	// Note: NEVER use database time (may be out of sync + no TZ control)
-	$User_Admin->set_Group( $Group_Admins );
-	$User_Admin->dbinsert();
+
+	create_user( array(
+			'login'  => 'admin',
+			'level'  => 10,
+			'gender' => 'M',
+			'Group'  => $Group_Admins,
+		) );
 	task_end();
 
 	// Activating multiple sessions and email message form for administrator, and set other user settings
@@ -304,34 +292,10 @@ function create_default_data()
 		" );
 	task_end();
 
-	if( ! empty( $current_locale ) )
-	{	// Make sure the user sees his new system localized.
-		task_begin( 'Activating selected default locale... ' );
+	// Insert default locales into T_locales.
+	create_default_locales();
 
-		// Make sure default transliteration_map is set
-		$transliteration_map = '';
-		if( isset($locales[$current_locale]['transliteration_map']) && is_array($locales[$current_locale]['transliteration_map']) )
-		{
-			$transliteration_map = base64_encode( serialize($locales[$current_locale]['transliteration_map']) );
-		}
-
-		$DB->query( 'INSERT INTO T_locales '
-				   .'( loc_locale, loc_charset, loc_datefmt, loc_timefmt, '
-				   .'loc_startofweek, loc_name, loc_messages, loc_priority, '
-				   .'loc_transliteration_map, loc_enabled ) '
-				   .'VALUES ( '.$DB->quote( $current_locale ).', '
-				   .$DB->quote( $locales[$current_locale]['charset'] ).', '
-				   .$DB->quote( $locales[$current_locale]['datefmt'] ).', '
-				   .$DB->quote( $locales[$current_locale]['timefmt'] ).', '
-				   .$DB->quote( $locales[$current_locale]['startofweek'] ).', '
-				   .$DB->quote( $locales[$current_locale]['name'] ).', '
-				   .$DB->quote( $locales[$current_locale]['messages'] ).', '
-				   .$DB->quote( $locales[$current_locale]['priority'] ).', '
-				   .$DB->quote( $transliteration_map ).', '
-				   .' 1)' );
-		task_end();
-	}
-
+	// Insert default settings into T_settings.
 	create_default_settings();
 
 	// create default scheduled jobs
@@ -533,7 +497,7 @@ function create_default_currencies( $table_name = 'T_regional__currency' )
  * Create default countries with relations to currencies
  *
  */
-function create_default_countries( $table_name = 'T_regional__country' )
+function create_default_countries( $table_name = 'T_regional__country', $set_preferred_country = true )
 {
 	global $DB, $current_locale;
 
@@ -789,12 +753,12 @@ function create_default_countries( $table_name = 'T_regional__country' )
 			(247, 'zw', 'Zimbabwe', 146),
 			(248, 'ct', 'Catalonia', 2)" );
 
-	if (!empty($current_locale))
+	if( $set_preferred_country && !empty( $current_locale ) )
 	{	// Set default preferred country from current locale
 		$result = array();
 		preg_match('#.*?-(.*)#', strtolower($current_locale),$result);
 
-		$DB->query( "UPDATE T_regional__country
+		$DB->query( "UPDATE $table_name
 										SET ctry_preferred = 1
 									WHERE ctry_code = '".$DB->escape($result[1])."'");
 	}
@@ -1116,9 +1080,10 @@ function create_blog(
 	$allow_rating_items = '',
 	$use_inskin_login = 0,
 	$blog_access_type = 'relative',
-	$allow_html = true )
+	$allow_html = true,
+	$owner_user_ID = 1 )
 {
-	global $default_locale, $test_install_all_features;
+	global $default_locale, $test_install_all_features, $local_installation;
 
 	$Blog = new Blog( NULL );
 
@@ -1127,7 +1092,12 @@ function create_blog(
 	$Blog->set( 'tagline', $blog_tagline );
 	$Blog->set( 'longdesc', $blog_longdesc );
 	$Blog->set( 'locale', $default_locale );
+	$Blog->set( 'owner_user_ID', $owner_user_ID );
 	$Blog->set_setting( 'normal_skin_ID', $blog_skin_ID );
+	if( $local_installation )
+	{ // Turn off all ping plugins if the installation is local/test/intranet
+		$Blog->set_setting( 'ping_plugins', '' );
+	}
 
 	$Blog->dbinsert();
 
@@ -1173,6 +1143,49 @@ function create_blog(
 	return $Blog->ID;
 }
 
+/**
+ * Create a new User
+ *
+ * @param array Params
+ * @return integer User ID
+ */
+function create_user( $params = array() )
+{
+	global $timestamp;
+	global $random_password, $admin_email;
+	global $default_locale, $default_country;
+
+	$params = array_merge( array(
+			'login'   => '',
+			'pass'    => $random_password, // random
+			'email'   => $admin_email,
+			'status'  => 'autoactivated', // assume it's active
+			'level'   => 0,
+			'locale'  => $default_locale,
+			'ctry_ID' => $default_country,
+			'gender'  => 'M',
+			'Group'   => NULL,
+		), $params );
+
+	$User = new User();
+	$User->set( 'login', $params['login'] );
+	$User->set( 'pass', md5( $params['pass'] ) );
+	$User->set_email( $params['email'] );
+	$User->set( 'status', $params['status'] );
+	$User->set( 'level', $params['level'] );
+	$User->set( 'locale', $params['locale'] );
+	if( !empty( $params['ctry_ID'] ) )
+	{ // Set country
+		$User->set( 'ctry_ID', $params['ctry_ID'] );
+	}
+	$User->set( 'gender', $params['gender'] );
+	$User->set_datecreated( $timestamp++ );
+	$User->set_Group( $params['Group'] );
+	$User->dbinsert( false );
+
+	return $User->ID;
+}
+
 
 /**
  * This is called only for fresh installs and fills the tables with
@@ -1201,58 +1214,74 @@ function create_demo_contents()
 	load_class( 'links/model/_link.class.php', 'Link' );
 
 	task_begin('Assigning avatar to Admin... ');
-	if( $test_install_all_features )
-	{ // Set girl avatar in the test mode
+	$UserCache = & get_UserCache();
+	$User_Admin = & $UserCache->get_by_ID( 1 );
+	if( $User_Admin->get( 'gender' ) == 'F' )
+	{ // Set girl avatar if user has female gender
 		$edit_File = new File( 'user', 1, 'faceyourmanga_admin_girl.png' );
 	}
 	else
-	{
+	{ // Set boy avatar if user has male gender
 		$edit_File = new File( 'user', 1, 'faceyourmanga_admin_boy.png' );
 	}
 	// Load meta data AND MAKE SURE IT IS CREATED IN DB:
 	$edit_File->load_meta( true );
-	$UserCache = & get_UserCache();
-	$User_Admin = & $UserCache->get_by_ID( 1 );
 	$User_Admin->set( 'avatar_file_ID', $edit_File->ID );
 	$User_Admin->dbupdate();
 	task_end();
 
-	task_begin('Creating demo blogger user... ');
-	$User_Blogger = new User();
-	$User_Blogger->set( 'login', 'ablogger' );
-	$User_Blogger->set( 'pass', md5($random_password) ); // random
-	$User_Blogger->set_email( $admin_email );
-	$User_Blogger->set( 'status', 'autoactivated' ); // assume it's active
-	$User_Blogger->set( 'level', 1 );
-	$User_Blogger->set( 'locale', $default_locale );
-	if( !empty( $default_country ) )
-	{	// Set default country
-		$User_Blogger->set( 'ctry_ID', $default_country );
-	}
-	if( $test_install_all_features )
-	{
-		$User_Blogger->set( 'gender', 'M' );
-	}
-	$User_Blogger->set_datecreated( $timestamp++ );
-	$User_Blogger->set_Group( $Group_Bloggers );
-	$User_Blogger->dbinsert();
+	task_begin('Creating demo amoderator user... ');
+	$amoderator_ID = create_user( array(
+			'login'  => 'amoderator',
+			'level'  => 2,
+			'gender' => 'M',
+			'Group'  => $Group_Privileged,
+		) );
 	task_end();
 
-	task_begin('Creating demo user... ');
-	$User_Demo = new User();
-	$User_Demo->set( 'login', 'demouser' );
-	$User_Demo->set( 'pass', md5($random_password) ); // random
-	$User_Demo->set_email( $admin_email );
-	$User_Demo->set( 'status', 'autoactivated' ); // assume it's active
-	$User_Demo->set( 'level', 0 );
-	$User_Demo->set( 'locale', $default_locale );
-	if( !empty( $default_country ) )
-	{	// Set default country
-		$User_Demo->set( 'ctry_ID', $default_country );
-	}
-	$User_Demo->set_datecreated( $timestamp++ );
-	$User_Demo->set_Group( $Group_Users );
-	$User_Demo->dbinsert();
+	task_begin('Creating demo bmoderator user... ');
+	$bmoderator_ID = create_user( array(
+			'login'  => 'bmoderator',
+			'level'  => 2,
+			'gender' => 'F',
+			'Group'  => $Group_Privileged,
+		) );
+	task_end();
+
+	task_begin('Creating demo ablogger user... ');
+	$ablogger_ID = create_user( array(
+			'login'  => 'ablogger',
+			'level'  => 1,
+			'gender' => 'M',
+			'Group'  => $Group_Bloggers,
+		) );
+	task_end();
+
+	task_begin('Creating demo bblogger user... ');
+	$bblogger_ID = create_user( array(
+			'login'  => 'bblogger',
+			'level'  => 1,
+			'gender' => 'F',
+			'Group'  => $Group_Bloggers,
+		) );
+	task_end();
+
+	task_begin('Creating demo auser user... ');
+	$auser_ID = create_user( array(
+			'login'  => 'auser',
+			'level'  => 0,
+			'gender' => 'M',
+			'Group'  => $Group_Users,
+		) );
+	task_end();
+
+	task_begin('Creating demo buser user... ');
+	$buser_ID = create_user( array(
+			'login'  => 'buser',
+			'level'  => 0,
+			'gender' => 'F',
+			'Group'  => $Group_Users,
+		) );
 	task_end();
 
 	task_begin( 'Set settings for demo users... ' );
@@ -1261,7 +1290,15 @@ function create_demo_contents()
 		VALUES ( 2, 'created_fromIPv4', '".ip2int( '127.0.0.1' )."' ),
 				( 2, 'user_domain', 'localhost' ),
 				( 3, 'created_fromIPv4', '".ip2int( '127.0.0.1' )."' ),
-				( 3, 'user_domain', 'localhost' )" );
+				( 3, 'user_domain', 'localhost' ),
+				( 4, 'created_fromIPv4', '".ip2int( '127.0.0.1' )."' ),
+				( 4, 'user_domain', 'localhost' ),
+				( 5, 'created_fromIPv4', '".ip2int( '127.0.0.1' )."' ),
+				( 5, 'user_domain', 'localhost' ),
+				( 6, 'created_fromIPv4', '".ip2int( '127.0.0.1' )."' ),
+				( 6, 'user_domain', 'localhost' ),
+				( 7, 'created_fromIPv4', '".ip2int( '127.0.0.1' )."' ),
+				( 7, 'user_domain', 'localhost' )" );
 	task_end();
 
 	global $default_locale, $query, $timestamp;
@@ -1286,7 +1323,9 @@ function create_demo_contents()
 		'std',
 		'any',
 		1,
-		$blog_a_access_type );
+		$blog_a_access_type,
+		true,
+		$ablogger_ID );
 
 	$blog_shortname = 'Blog B';
 	$blog_b_access_type = ( $test_install_all_features ) ? 'index.php' : $default_blog_access_type;
@@ -1297,11 +1336,13 @@ function create_demo_contents()
 		$blog_stub,
 		sprintf( T_('Tagline for %s'), $blog_shortname ),
 		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-		2,
+		2, // Skin ID
 		'std',
 		'',
 		0,
-		$blog_b_access_type ); // Skin ID
+		$blog_b_access_type,
+		true,
+		$bblogger_ID );
 
 	$blog_shortname = 'Linkblog';
 	$blog_linkblog_access_type = ( $test_install_all_features ) ? 'extrapath' : $default_blog_access_type;
@@ -1319,7 +1360,9 @@ function create_demo_contents()
 		'std',
 		'any',
 		0,
-		$blog_linkblog_access_type );
+		$blog_linkblog_access_type,
+		true,
+		$ablogger_ID );
 
 	$blog_shortname = 'Photoblog';
 	$blog_stub = 'photos';
@@ -1332,7 +1375,9 @@ function create_demo_contents()
 		$blog_stub,
 		T_('This blog shows photos...'),
 		sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
-		4, 'photo' ); // SKin ID
+		4, // SKin ID
+		'photo', '', 0, 'relative', true,
+		$ablogger_ID );
 
 	$blog_shortname = 'Forums';
 	$blog_forums_long = sprintf( T_('%s Title'), $blog_shortname );
@@ -1344,7 +1389,8 @@ function create_demo_contents()
 		sprintf( T_('Tagline for %s'), $blog_shortname ),
 		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 		5, // Skin ID
-		'forum', 'any', 1, 'relative', false );
+		'forum', 'any', 1, 'relative', false,
+		$ablogger_ID );
 
 	$blog_shortname = 'Manual';
 	$blog_manual_long = sprintf( T_('%s Title'), $blog_shortname );
@@ -1356,7 +1402,8 @@ function create_demo_contents()
 		sprintf( T_('Tagline for %s'), $blog_shortname ),
 		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 		6, // Skin ID
-		'manual', 'any', 1, $default_blog_access_type );
+		'manual', 'any', 1, $default_blog_access_type, true,
+		$ablogger_ID );
 
 	task_end();
 
@@ -1427,7 +1474,7 @@ function create_demo_contents()
 	{	// Insert three ADVERTISEMENTS for each blog:
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
-		$edited_Item->insert( 1, T_('b2evo : The software for blog pros!'), T_('The software for blog pros!'), $now, $adv_cat_ID,
+		$edited_Item->insert( 1, /* TRANS: sample ad content */ T_('b2evo : The software for blog pros!'), /* TRANS: sample ad content */ T_('The software for blog pros!'), $now, $adv_cat_ID,
 			array(), 'published', '#', '', 'http://b2evolution.net', 'open', array('default'), 4000 );
 		$edit_File = new File( 'shared', 0, 'banners/b2evo-125-pros.png' );
 		$LinkOwner = new LinkItem( $edited_Item );
@@ -1435,7 +1482,7 @@ function create_demo_contents()
 
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
-		$edited_Item->insert( 1, T_('b2evo : Better Blog Software!'), T_('Better Blog Software!'), $now, $adv_cat_ID,
+		$edited_Item->insert( 1, /* TRANS: sample ad content */ T_('b2evo : Better Blog Software!'), /* TRANS: sample ad content */ T_('Better Blog Software!'), $now, $adv_cat_ID,
 			array(), 'published', '#', '', 'http://b2evolution.net', 'open', array('default'), 4000 );
 		$edit_File = new File( 'shared', 0, 'banners/b2evo-125-better.png' );
 		$LinkOwner = new LinkItem( $edited_Item );
@@ -1443,7 +1490,7 @@ function create_demo_contents()
 
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
-		$edited_Item->insert( 1, T_('b2evo : The other blog tool!'), T_('The other blog tool!'), $now, $adv_cat_ID,
+		$edited_Item->insert( 1, /* TRANS: sample ad content */ T_('b2evo : The other blog tool!'), /* TRANS: sample ad content */ T_('The other blog tool!'), $now, $adv_cat_ID,
 			array(), 'published', '#', '', 'http://b2evolution.net', 'open', array('default'), 4000 );
 		$edit_File = new File( 'shared', 0, 'banners/b2evo-125-other.png' );
 		$LinkOwner = new LinkItem( $edited_Item );
@@ -2024,27 +2071,16 @@ function create_demo_contents()
 	$DB->query( $query );
 
 	if( $test_install_all_features )
-	{
-		$now = date('Y-m-d H:i:s');
-		$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author_ID, comment_author_IP,
-																			comment_date, comment_content, comment_renderers, comment_karma, comment_notif_status)
-							VALUES( '".$Item_BlogA_welcome_ID."', 'comment', '1', '127.0.0.1', '$now', '".
-										 $DB->escape( sprintf( T_('Hi, this is a comment.<br />From %s.'), 'admin' ) ). "', 'default', 0, 'finished')";
-		$DB->query( $query );
-
-		$now = date('Y-m-d H:i:s');
-		$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author_ID, comment_author_IP,
-																			comment_date, comment_content, comment_renderers, comment_karma, comment_notif_status)
-							VALUES( '".$Item_BlogA_welcome_ID."', 'comment', '2', '127.0.0.1', '$now', '".
-										 $DB->escape( sprintf( T_('Hi, this is a comment.<br />From %s.'), 'ablogger' ) ). "', 'default', 0, 'finished')";
-		$DB->query( $query );
-
-		$now = date('Y-m-d H:i:s');
-		$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author_ID, comment_author_IP,
-																			comment_date, comment_content, comment_renderers, comment_karma, comment_notif_status)
-							VALUES( '".$Item_BlogA_welcome_ID."', 'comment', '3', '127.0.0.1', '$now', '".
-										 $DB->escape( sprintf( T_('Hi, this is a comment.<br />From %s.'), 'demouser' ) ). "', 'default', 0, 'finished')";
-		$DB->query( $query );
+	{ // Insert the comments from each user
+		for( $i_user_ID = 1; $i_user_ID <= 7; $i_user_ID++ )
+		{
+			$now = date('Y-m-d H:i:s');
+			$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author_ID, comment_author_IP,
+																				comment_date, comment_content, comment_renderers, comment_karma, comment_notif_status)
+								VALUES( '".$Item_BlogA_welcome_ID."', 'comment', '$i_user_ID', '127.0.0.1', '$now', '".
+											 $DB->escape( T_('Hi, this is my comment.') ). "', 'default', 0, 'finished')";
+			$DB->query( $query );
+		}
 	}
 
 	// Comments for Forums:
@@ -2058,27 +2094,16 @@ function create_demo_contents()
 	$DB->query( $query );
 
 	if( $test_install_all_features )
-	{
-		$now = date('Y-m-d H:i:s');
-		$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author_ID, comment_author_IP,
-																			comment_date, comment_content, comment_renderers, comment_karma, comment_notif_status)
-							VALUES( '".$Item_Forum_welcome_ID."', 'comment', '1', '127.0.0.1', '$now', '".
-										 $DB->escape( sprintf( T_('Hi, this is a comment.<br />From %s.'), 'admin' ) ). "', 'default', 0, 'finished')";
-		$DB->query( $query );
-
-		$now = date('Y-m-d H:i:s');
-		$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author_ID, comment_author_IP,
-																			comment_date, comment_content, comment_renderers, comment_karma, comment_notif_status)
-							VALUES( '".$Item_Forum_welcome_ID."', 'comment', '2', '127.0.0.1', '$now', '".
-										 $DB->escape( sprintf( T_('Hi, this is a comment.<br />From %s.'), 'ablogger' ) ). "', 'default', 0, 'finished')";
-		$DB->query( $query );
-
-		$now = date('Y-m-d H:i:s');
-		$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author_ID, comment_author_IP,
-																			comment_date, comment_content, comment_renderers, comment_karma, comment_notif_status)
-							VALUES( '".$Item_Forum_welcome_ID."', 'comment', '3', '127.0.0.1', '$now', '".
-										 $DB->escape( sprintf( T_('Hi, this is a comment.<br />From %s.'), 'demouser' ) ). "', 'default', 0, 'finished')";
-		$DB->query( $query );
+	{ // Insert the comments from each user
+		for( $i_user_ID = 1; $i_user_ID <= 7; $i_user_ID++ )
+		{
+			$now = date('Y-m-d H:i:s');
+			$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author_ID, comment_author_IP,
+																				comment_date, comment_content, comment_renderers, comment_karma, comment_notif_status)
+								VALUES( '".$Item_Forum_welcome_ID."', 'comment', '$i_user_ID', '127.0.0.1', '$now', '".
+											 $DB->escape( T_('Hi, this is my comment.') ). "', 'default', 0, 'finished')";
+			$DB->query( $query );
+		}
 	}
 
 	// Comments for Manual:
@@ -2092,27 +2117,16 @@ function create_demo_contents()
 	$DB->query( $query );
 
 	if( $test_install_all_features )
-	{
-		$now = date('Y-m-d H:i:s');
-		$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author_ID, comment_author_IP,
-																			comment_date, comment_content, comment_renderers, comment_karma, comment_notif_status)
-							VALUES( '".$Item_Manual_welcome_ID."', 'comment', '1', '127.0.0.1', '$now', '".
-										 $DB->escape( sprintf( T_('Hi, this is a comment.<br />From %s.'), 'admin' ) ). "', 'default', 0, 'finished')";
-		$DB->query( $query );
-
-		$now = date('Y-m-d H:i:s');
-		$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author_ID, comment_author_IP,
-																			comment_date, comment_content, comment_renderers, comment_karma, comment_notif_status)
-							VALUES( '".$Item_Manual_welcome_ID."', 'comment', '2', '127.0.0.1', '$now', '".
-										 $DB->escape( sprintf( T_('Hi, this is a comment.<br />From %s.'), 'ablogger' ) ). "', 'default', 0, 'finished')";
-		$DB->query( $query );
-
-		$now = date('Y-m-d H:i:s');
-		$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author_ID, comment_author_IP,
-																			comment_date, comment_content, comment_renderers, comment_karma, comment_notif_status)
-							VALUES( '".$Item_Manual_welcome_ID."', 'comment', '3', '127.0.0.1', '$now', '".
-										 $DB->escape( sprintf( T_('Hi, this is a comment.<br />From %s.'), 'demouser' ) ). "', 'default', 0, 'finished')";
-		$DB->query( $query );
+	{ // Insert the comments from each user
+		for( $i_user_ID = 1; $i_user_ID <= 7; $i_user_ID++ )
+		{
+			$now = date('Y-m-d H:i:s');
+			$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author_ID, comment_author_IP,
+																				comment_date, comment_content, comment_renderers, comment_karma, comment_notif_status)
+								VALUES( '".$Item_Manual_welcome_ID."', 'comment', '$i_user_ID', '127.0.0.1', '$now', '".
+											 $DB->escape( T_('Hi, this is my comment.') ). "', 'default', 0, 'finished')";
+			$DB->query( $query );
+		}
 	}
 
 	task_end();
@@ -2198,7 +2212,7 @@ function create_demo_contents()
 	// Set default locations for each post in test mode installation
 	create_default_posts_location();
 
-	install_basic_widgets();
+	install_basic_widgets( $new_db_version );
 
 	load_funcs( 'tools/model/_system.funcs.php' );
 	if( !system_init_caches() )
@@ -2226,11 +2240,4 @@ function create_default_posts_location()
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.337  2013/11/06 09:09:09  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

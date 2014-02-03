@@ -45,6 +45,7 @@ function resetstatus()
 	window.status = 'Done';
 }
 
+
 /**
  * Opens a window, centers it and makes sure it gets focus.
  */
@@ -192,16 +193,24 @@ function textarea_wrap_selection( myField, before, after, replace, target_docume
 	{
 		return;
 	}
-	if( window.opener
-		&& ( typeof window.opener != "undefined" )
-		&& window.opener.b2evo_Callbacks
-		&& ( typeof window.opener.b2evo_Callbacks != "undefined" ) )
-	{ // callback in opener document (e.g. "Files" popup)
-		if( window.opener.b2evo_Callbacks.trigger_callback( "wrap_selection_for_"+myField.id, hook_params ) )
-		{
-			return;
+
+	if( window.opener && ( typeof window.opener != "undefined" ) )
+	{
+		try
+		{ // Try find object 'b2evo_Callbacks' on window.opener to avoid halt error when page was opened from other domain
+			if( window.opener.b2evo_Callbacks &&
+		   ( typeof window.opener.b2evo_Callbacks != "undefined" ) &&
+		   window.opener.b2evo_Callbacks.trigger_callback( "wrap_selection_for_"+myField.id, hook_params ) )
+			{ // callback in opener document (e.g. "Files" popup)
+				return;
+			}
+		}
+		catch( e )
+		{ // Catch an error of the cross-domain restriction
+			// Ignore this error because it dies when browser has no permission to access to other domain windows
 		}
 	}
+
 	if( window.parent
 		&& ( typeof window.parent != "undefined" )
 		&& window.parent.b2evo_Callbacks

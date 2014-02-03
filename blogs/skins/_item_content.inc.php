@@ -75,8 +75,8 @@ $params = array_merge( array(
 		'attach_list_end'          => '</ul></div>',
 		'attach_start'             => '<li>',
 		'attach_end'               => '</li>',
-		'before_attach_size'       => ' <span class="file_size">',
-		'after_attach_size'        => '</span>',
+		'before_attach_size'       => ' <span class="file_size">(',
+		'after_attach_size'        => ')</span>',
 
 		'page_links_start'         => '<p class="right">'.T_('Pages:').' ',
 		'page_links_end'           => '</p>',

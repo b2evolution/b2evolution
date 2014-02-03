@@ -43,7 +43,7 @@ $Results = get_threads_results( array(
 		'results_param_prefix' => $perm_abuse_management ? 'abuse_' : 'thrd_',
 		'search_word' => param( 's', 'string', '', true ),
 		'search_user' => param( 'u', 'string', '', true ),
-		'show_closed_threads' => param( 'show_closed', 'boolean', false, true ),
+		'show_closed_threads' => param( 'show_closed', 'boolean', NULL, true ),
 	) );
 
 $Results->Cache = & get_ThreadCache();
@@ -75,11 +75,21 @@ function filter_recipients( & $Form )
 	}
 }
 
+if( $perm_abuse_management )
+{ // In case of abuse management
+	$preset_filters = array( 'all' => array( T_('All'), get_dispctrl_url( 'abuse' ) ) );
+}
+else
+{ // In case of simple thread list view
+	$preset_filters = array(
+		'avtive' => array( T_('Active conversations'), get_dispctrl_url( 'threads', 'show_closed=0' ) ),
+		'all' => array( T_('All conversations'), get_dispctrl_url( 'threads', 'show_closed=1' ) )
+	);
+}
+
 $Results->filter_area = array(
 	'callback' => 'filter_recipients',
-	'presets' => array(
-		'all' => array( T_('All'), get_dispctrl_url( $perm_abuse_management ? 'abuse' : 'threads' ) ),
-		)
+	'presets' => $preset_filters,
 	);
 
 // Initialize Results object
@@ -103,10 +113,4 @@ if( ! $perm_abuse_management )
 
 $Results->display( $display_params );
 
-/*
- * $Log$
- * Revision 1.45  2013/11/06 08:04:35  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

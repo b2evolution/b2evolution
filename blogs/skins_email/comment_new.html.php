@@ -20,14 +20,13 @@ global $htsrv_url, $admin_url;
 
 // Default params:
 $params = array_merge( array(
-		'notify_full'    => false,
-		'Comment'        => NULL,
-		'Blog'           => NULL,
-		'Item'           => NULL,
-		'author_name'    => '',
-		'notify_type'    => '',
-		'notify_user_ID' => 0,
-		'notify_key'     => '',
+		'notify_full' => false,
+		'Comment'     => NULL,
+		'Blog'        => NULL,
+		'Item'        => NULL,
+		'author_ID'   => NULL,
+		'author_name' => '',
+		'notify_type' => '',
 	), $params );
 
 
@@ -35,7 +34,8 @@ $Comment = $params['Comment'];
 $Blog = $params['Blog'];
 $Item = $params['Item'];
 
-$notify_message = '<p>'.sprintf( T_( '%s posted a new comment on %s in %s.' ), get_user_colored_login( $params['author_name'] ), '<b>'.get_link_tag( $Item->get_permanent_url(), $Item->get('title') ).'</b>', '<b>'.$Blog->get('shortname').'</b>' ).'</p>';
+$author_name = empty( $params['author_ID'] ) ? $params['author_name'] : get_user_colored_login( $params['author_name'] );
+$notify_message = '<p>'.sprintf( T_( '%s posted a new comment on %s in %s.' ), '<b>'.$author_name.'</b>', '<b>'.get_link_tag( $Item->get_permanent_url(), $Item->get('title') ).'</b>', '<b>'.$Blog->get('shortname').'</b>' ).'</p>';
 
 if( $params['notify_full'] )
 {	// Long format notification:
@@ -91,13 +91,13 @@ echo $notify_message;
 
 echo '<div class="buttons">'."\n";
 
-echo get_link_tag( str_replace( '&amp;', '&', $Comment->get_permanent_url() ), T_( 'Read full comment' ), 'button_green' )."\n";
+echo get_link_tag( $Comment->get_permanent_url(), T_( 'Read full comment' ), 'button_green' )."\n";
 
 if( $params['notify_type'] == 'moderator' )
 { // moderation email
 	if( ( $Blog->get_setting( 'comment_quick_moderation' ) != 'never' ) && ( !empty( $Comment->secret ) ) )
 	{ // quick moderation is permitted, and comment secret was set
-		echo get_link_tag( $htsrv_url.'comment_review.php?cmt_ID='.$Comment->ID.'&secret='.$Comment->secret, T_('Quick moderation'), 'button_yellow' )."\n";
+		echo get_link_tag( '$secret_content_start$'.$htsrv_url.'comment_review.php?cmt_ID='.$Comment->ID.'&secret='.$Comment->secret.'$secret_content_end$', T_('Quick moderation'), 'button_yellow' )."\n";
 	}
 	echo get_link_tag( $admin_url.'?ctrl=comments&action=edit&comment_ID='.$Comment->ID, T_('Edit comment'), 'button_gray' )."\n";
 }
@@ -111,14 +111,14 @@ if( $params['notify_type'] == 'moderator' )
 { // moderation email
 	$params['unsubscribe_text'] = T_( 'You are a moderator in this blog, and you are receiving notifications when a comments may need moderation.' ).'<br />';
 	$params['unsubscribe_text'] .= T_( 'If you don\'t want to receive any more notifications about comment moderation, click here:' )
-			.' <a href="'.$htsrv_url.'quick_unsubscribe.php?type=moderator&user_ID='.$params['notify_user_ID'].'&key='.md5( $params['notify_user_ID'].$params['notify_key'] ).'">'
+			.' <a href="'.$htsrv_url.'quick_unsubscribe.php?type=comment_moderator&user_ID=$user_ID$&key=$unsubscribe_key$">'
 			.T_('instant unsubscribe').'</a>.';
 }
 else if( $params['notify_type'] == 'blog_subscription' )
 { // blog subscription
 	$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on any post.' ).'<br />';
 	$params['unsubscribe_text'] .= T_( 'If you don\'t want to receive any more notifications on this blog, click here:' )
-			.' <a href="'.$htsrv_url.'quick_unsubscribe.php?type=coll_comment&user_ID='.$params['notify_user_ID'].'&coll_ID='.$Blog->ID.'&key='.md5( $params['notify_user_ID'].$params['notify_key'] ).'">'
+			.' <a href="'.$htsrv_url.'quick_unsubscribe.php?type=coll_comment&coll_ID='.$Blog->ID.'&user_ID=$user_ID$&key=$unsubscribe_key$">'
 			.T_('instant unsubscribe').'</a>.';
 	// subscribers are not allowed to see comment author email
 }
@@ -126,7 +126,7 @@ else if( $params['notify_type'] == 'item_subscription' )
 { // item subscription
 	$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on this post.' ).'<br />';
 	$params['unsubscribe_text'] .= T_( 'If you don\'t want to receive any more notifications on this post, click here:' )
-			.' <a href="'.$htsrv_url.'quick_unsubscribe.php?type=post&user_ID='.$params['notify_user_ID'].'&post_ID='.$Item->ID.'&key='.md5( $params['notify_user_ID'].$params['notify_key'] ).'">'
+			.' <a href="'.$htsrv_url.'quick_unsubscribe.php?type=post&post_ID='.$Item->ID.'&user_ID=$user_ID$&key=$unsubscribe_key$">'
 			.T_('instant unsubscribe').'</a>.';
 	// subscribers are not allowed to see comment author email
 }
@@ -134,7 +134,7 @@ else if( $params['notify_type'] == 'creator' )
 { // user is the creator of the post
 	$params['unsubscribe_text'] = T_( 'This is your post. You are receiving notifications when anyone comments on your posts.' ).'<br />';
 	$params['unsubscribe_text'] .= T_( 'If you don\'t want to receive any more notifications on your posts, click here:' )
-			.' <a href="'.$htsrv_url.'quick_unsubscribe.php?type=creator&user_ID='.$params['notify_user_ID'].'&key='.md5( $params['notify_user_ID'].$params['notify_key'] ).'">'
+			.' <a href="'.$htsrv_url.'quick_unsubscribe.php?type=creator&user_ID=$user_ID$&key=$unsubscribe_key$">'
 			.T_('instant unsubscribe').'</a>.';
 }
 

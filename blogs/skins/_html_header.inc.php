@@ -12,10 +12,11 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $xmlsrv_url;
+global $xmlsrv_url, $app_version;
 
 $params = array_merge( array(
-	'auto_pilot' => 'seo_title',
+	'auto_pilot'    => 'seo_title',
+	'generator_tag' => '<meta name="generator" content="b2evolution '.$app_version.'" /> <!-- Please leave this for stats -->'."\n"
 ), $params );
 
 require_css( 'style.css', 'relative' );
@@ -53,9 +54,10 @@ add_headline( '<![endif]-->' );
 	add_js_headline( "// Paths used by JS functions:
 		var htsrv_url = '".get_samedomain_htsrv_url()."';"
 		.$js_blog_id );
-	?>
-	<meta name="generator" content="b2evolution <?php app_version(); ?>" /> <!-- Please leave this for stats -->
-	<?php
+
+	// Meta tag with generator info (Please leave this for stats)
+	echo $params['generator_tag'];
+
 	if( $Blog->get_setting( 'feed_content' ) != 'none' )
 	{ // auto-discovery urls
 		?>
