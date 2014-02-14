@@ -119,7 +119,7 @@ $Results->filter_area = array(
 	);
 
 
-$Results->title = T_('Referring domains');
+$Results->title = T_('Referring domains').get_manual_link('referring-domains-tab');
 
 $Results->cols[] = array(
 						'th' => T_('Domain name'),
@@ -210,10 +210,4 @@ if( $current_User->check_perm( 'stats', 'edit' ) )
 <?php
 }
 
-/*
- * $Log$
- * Revision 1.11  2013/11/06 08:04:45  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

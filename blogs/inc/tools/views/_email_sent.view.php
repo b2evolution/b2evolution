@@ -165,10 +165,4 @@ $Results->cols[] = array(
 // Display results:
 $Results->display();
 
-/*
- * $Log$
- * Revision 1.3  2013/11/06 09:08:59  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

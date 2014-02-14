@@ -74,8 +74,7 @@ if( param_errors_detected() )
 }
 else
 {
-// fp> WTF? Are you kidding me? This MUST be factorized with the cron task!
-
+	// Extract keyphrases from the hitlog:
 	keyphrase_job();
 
 	$SQL = new SQL();
@@ -171,7 +170,7 @@ else
 // Create result set:
 $Results = new Results( $sql, 'keywords_', $split_engines ? '--D' : '-D' , NULL, $sql_count );
 
-$Results->title = T_('Keyphrases');
+$Results->title = T_('Keyphrases').get_manual_link( 'search-keywords-list' );
 
 /**
  * Callback to add filters on top of the result set
@@ -195,7 +194,7 @@ function filter_keyphrases( & $Form )
 
 	$Form->text_input( 'goal_name', get_param('goal_name'), 20, T_('Goal names starting with'), '', array( 'maxlength'=>50 ) );
 
- 	$Form->checkbox_basic_input( 'split_engines', get_param('split_engines'), T_('Split engines') );
+ 	$Form->checkbox_basic_input( 'split_engines', get_param('split_engines'), /* TRANS: split search engines in results table */ T_('Split search engines') );
 }
 $today = date( 'Y-m-d', $localtimenow );
 $Results->filter_area = array(
@@ -288,10 +287,4 @@ $Results->global_icon( T_('Reset counters'), 'file_delete', regenerate_url( 'act
 // Display results:
 $Results->display();
 
-/*
- * $Log$
- * Revision 1.14  2013/11/06 08:04:45  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

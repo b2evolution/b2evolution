@@ -19,18 +19,50 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $admin_url;
+global $admin_url, $UserSettings, $Plugins;
+
+$ip_address = param( 'ip_address', 'string', '', true );
 
 $SQL = new SQL();
-
 $SQL->SELECT( '*' );
 $SQL->FROM( 'T_antispam__iprange' );
 
-// Create result set:
-$Results = new Results( $SQL->get(), 'aipr_', 'A' );
+$CountSQL = new SQL();
+$CountSQL->SELECT( 'SQL_NO_CACHE COUNT( aipr_ID )' );
+$CountSQL->FROM( 'T_antispam__iprange' );
 
-$Results->title = T_('IP Ranges').' ('.$Results->total_rows.')';
+if( !empty( $ip_address ) )
+{ // Filter by IP address
+	$ip_address = ip2int( $ip_address );
+
+	$SQL->WHERE( 'aipr_IPv4start <= '.$DB->quote( $ip_address ) );
+	$SQL->WHERE_and( 'aipr_IPv4end >= '.$DB->quote( $ip_address ) );
+
+	$CountSQL->WHERE( 'aipr_IPv4start <= '.$DB->quote( $ip_address ) );
+	$CountSQL->WHERE_and( 'aipr_IPv4end >= '.$DB->quote( $ip_address ) );
+}
+
+// Create result set:
+$Results = new Results( $SQL->get(), 'aipr_', 'A', $UserSettings->get( 'results_per_page' ), $CountSQL->get() );
+
+$Results->title = T_('IP Ranges').' ('.$Results->total_rows.')'.get_manual_link('ip-ranges-tab');
 $Results->Cache = get_IPRangeCache();
+
+/**
+ * Callback to add filters on top of the result set
+ *
+ * @param Form
+ */
+function filter_email_blocked( & $Form )
+{
+	$Form->text_input( 'ip_address', get_param( 'ip_address' ), 40, T_('IP address') );
+}
+$Results->filter_area = array(
+	'callback' => 'filter_email_blocked',
+	'presets' => array(
+		'all' => array( T_('All'), $admin_url.'?ctrl=antispam&amp;tab3=ipranges' ),
+		)
+	);
 
 $Results->cols[] = array(
 		'th' => T_('ID'),
@@ -77,6 +109,12 @@ $Results->cols[] = array(
 		'td' => '$aipr_block_count$',
 		'order' => 'aipr_block_count',
 	);
+
+// Get additional columns from the Plugins
+$Plugins->trigger_event( 'GetAdditionalColumnsTable', array(
+	'table'   => 'ipranges',
+	'column'  => 'aipr_IPv4start',
+	'Results' => $Results ) );
 
 if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 {	// Check permission to edit IP ranges:
@@ -143,10 +181,4 @@ jQuery( document ).ready( function()
 <?php
 }
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:03:48  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

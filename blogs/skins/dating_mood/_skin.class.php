@@ -130,10 +130,4 @@ class dating_mood_Skin extends Skin
 	}
 }
 
-/*
- * $Log$
- * Revision 1.13  2013/11/06 09:09:14  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

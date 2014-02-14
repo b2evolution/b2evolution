@@ -70,7 +70,7 @@ global $Blog;
  */
 global $DB;
 
-global $unread_messsage_reminder_threshold, $unread_message_reminder_delay, $activate_account_reminder_threshold;
+global $unread_messsage_reminder_threshold, $unread_message_reminder_delay, $activate_account_reminder_threshold, $comment_moderation_reminder_threshold;
 
 // Default params:
 $default_params = array(
@@ -210,9 +210,18 @@ $Form->begin_fieldset( T_('Notifications') );
 	{ // user has at least one post or user has right to create new post
 		$notify_options[] = array( 'edited_user_notify_publ_comments', 1, T_('a comment is published on one of <strong>my</strong> posts.'), $UserSettings->get( 'notify_published_comments', $edited_User->ID ), $disabled );
 	}
-	if( $edited_User->check_role( 'moderator' ) )
-	{ // edited user is moderator at least in one blog
-		$notify_options[] = array( 'edited_user_notify_moderation', 1, T_('a comment is posted in a blog where I am a moderator.'), $UserSettings->get( 'notify_comment_moderation', $edited_User->ID ), $disabled );
+	$is_comment_moderator = $edited_User->check_role( 'comment_moderator' );
+	if( $is_comment_moderator || $edited_User->check_role( 'comment_editor' ) )
+	{ // edited user has permission to edit other than his own comments at least in one status in one blog
+		$notify_options[] = array( 'edited_user_notify_cmt_moderation', 1, T_('a comment is posted and I have permissions to moderate it.'), $UserSettings->get( 'notify_comment_moderation', $edited_User->ID ), $disabled );
+	}
+	if( $is_comment_moderator )
+	{ // edited user is comment moderator at least in one blog
+		$notify_options[] = array( 'edited_user_send_cmt_moderation_reminder', 1, sprintf( T_('comments are awaiting moderation for more than %s.'), seconds_to_period( $comment_moderation_reminder_threshold ) ), $UserSettings->get( 'send_cmt_moderation_reminder', $edited_User->ID ), $disabled );
+	}
+	if( $edited_User->check_role( 'post_moderator' ) )
+	{ // edited user is post moderator at least in one blog
+		$notify_options[] = array( 'edited_user_notify_post_moderation', 1, T_('a post is created and I have permissions to moderate it.'), $UserSettings->get( 'notify_post_moderation', $edited_User->ID ), $disabled );
 	}
 	if( $current_User->check_perm( 'users', 'edit' ) )
 	{ // current User is an administrator
@@ -372,7 +381,7 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Individual post subscriptions') );
 
-	$sql = 'SELECT DISTINCT post_ID, post_title, blog_ID, blog_shortname
+	$sql = 'SELECT DISTINCT post_ID, blog_ID, blog_shortname
 				FROM T_items__subscriptions
 					INNER JOIN T_items__item ON isub_item_ID = post_ID
 					INNER JOIN T_categories ON post_main_cat_ID = cat_ID
@@ -387,10 +396,17 @@ $Form->begin_fieldset( T_('Individual post subscriptions') );
 	}
 	else
 	{
+		global $admin_url;
+		$ItemCache = & get_ItemCache();
+
 		$Form->info_field( '', T_( 'You are subscribed to be notified on all updates on the following posts' ).':', array( 'class' => 'info_full' ) );
 		$blog_name = NULL;
 		foreach( $individual_posts_subs as $row )
 		{
+			if( ! ( $Item = $ItemCache->get_by_ID( $row->post_ID, false, false ) ) )
+			{ // Item doesn't exist anymore
+				continue;
+			}
 			$subs_item_IDs[] = $row->post_ID;
 			if( $blog_name != $row->blog_shortname )
 			{
@@ -401,7 +417,15 @@ $Form->begin_fieldset( T_('Individual post subscriptions') );
 				$blog_name = $row->blog_shortname;
 				$post_subs = array();
 			}
-			$post_subs[] = array( 'item_sub_'.$row->post_ID, 1, $row->post_title, 1 );
+			if( is_admin_page() && $current_User->check_perm( 'item_post!CURSTATUS', 'view', false, $Item ) )
+			{ // Link title to back-office if user has a permission
+				$item_title = '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$row->blog_ID.'&amp;p='.$Item->ID.'">'.format_to_output( $Item->title ).'</a>';
+			}
+			else
+			{ // Link title to front-office
+				$item_title = $Item->get_permanent_link( '#title#' );
+			}
+			$post_subs[] = array( 'item_sub_'.$row->post_ID, 1, $item_title, 1 );
 		}
 		// display individual post subscriptions from the last Blog
 		$Form->checklist( $post_subs, 'item_subscriptions', $blog_name );
@@ -422,11 +446,4 @@ if( $action != 'view' )
 
 $Form->end_form();
 
-
-/*
- * $Log$
- * Revision 1.3  2013/11/06 09:09:09  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

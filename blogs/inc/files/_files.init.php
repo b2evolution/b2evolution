@@ -18,7 +18,7 @@ $required_php_version[ 'files' ] = '5.0';
 /**
  * Minimum MYSQL version required for files module to function properly
  */
-$required_mysql_version[ 'files' ] = '4.1';
+$required_mysql_version[ 'files' ] = '5.0.3';
 
 /**
  * Aliases for table names:

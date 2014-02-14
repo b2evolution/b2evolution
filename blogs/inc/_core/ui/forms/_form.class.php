@@ -2244,7 +2244,7 @@ class Form extends Widget
 			 .$field_options
 			 ."</select>\n";
 
-		if( $field_options == $option_new  || $input_class == 'field_error' || $field_value != '' )
+		if( $field_options == $option_new  || strpos( $input_class, 'field_error' ) !== false || $field_value != '' )
 		{	// The list is empty or there is an error on the combo or no field value, so we have to display the input text:
 			$visible = 'inline';
 		}
@@ -3171,6 +3171,11 @@ class Form extends Widget
 			$format_to_output = true;
 		}
 
+		if( isset( $field_params['inline'] ) )
+		{ // Delete 'inline' param from attributes list
+			unset( $field_params['inline'] );
+		}
+
 		$r = $input_prefix
 			.'<input'.get_field_attribs_as_string( $field_params, $format_to_output ).' />'
 			.$input_suffix;
@@ -3449,10 +3454,4 @@ class Form extends Widget
 
 }
 
-/*
- * $Log$
- * Revision 1.100  2013/11/06 09:08:46  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

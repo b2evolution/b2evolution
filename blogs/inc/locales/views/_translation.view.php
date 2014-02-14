@@ -102,10 +102,4 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	$Form->end_form( $buttons ) ;
 }
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:04:25  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

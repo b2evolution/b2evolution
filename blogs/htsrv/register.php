@@ -74,7 +74,7 @@ param( 'firstname', 'string', '' );
 param( 'gender', 'string', NULL );
 param( 'locale', 'string', '' );
 param( 'source', 'string', '' );
-param( 'redirect_to', 'string', '' ); // do not default to $admin_url; "empty" gets handled better in the end (uses $blogurl, if no admin perms).
+param( 'redirect_to', 'url', '' ); // do not default to $admin_url; "empty" gets handled better in the end (uses $blogurl, if no admin perms).
 param( 'inskin', 'boolean', false, true );
 
 global $Blog;
@@ -196,12 +196,6 @@ switch( $action )
 		{ // set locale if it was prompted, otherwise let default
 			$new_User->set( 'locale', $locale );
 		}
-		$newusers_grp_ID = $Settings->get('newusers_grp_ID');
-		// echo $newusers_grp_ID;
-		$GroupCache = & get_GroupCache();
-		$new_user_Group = & $GroupCache->get_by_ID( $newusers_grp_ID );
-		// echo $new_user_Group->disp('name');
-		$new_User->set_Group( $new_user_Group );
 
 		$new_User->dbinsert();
 
@@ -350,11 +344,4 @@ require_js( 'ajax.js' );
 // Display reg form:
 require $adminskins_path.'login/_reg_form.main.php';
 
-
-/*
- * $Log$
- * Revision 1.119  2013/11/06 09:08:46  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

@@ -112,10 +112,4 @@ require_once $inc_path.'_filters.inc.php';
 
 require $ads_current_skin_path.'index.main.php';
 
-/*
- * $Log$
- * Revision 1.9  2013/11/06 08:05:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -102,10 +102,7 @@ class IPRange extends DataObject
 		global $Messages;
 
 		$aipr_status = param( 'aipr_status', 'string', true );
-		if( !empty( $aipr_status ) )
-		{
-			$this->set( 'status', $aipr_status );
-		}
+		$this->set( 'status', $aipr_status, true );
 
 		$aipr_IPv4start = param( 'aipr_IPv4start', 'string', true );
 		param_check_regexp( 'aipr_IPv4start', '#^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$#i', T_('Please enter a correct IP range start') );
@@ -145,11 +142,4 @@ class IPRange extends DataObject
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:03:48  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

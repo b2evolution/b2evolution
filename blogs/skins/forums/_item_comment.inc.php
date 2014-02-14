@@ -36,7 +36,6 @@ $params = array_merge( array(
 		'comment_end'          => '</div>',
 		'comment_block_end'    => '',
 		'link_to'              => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
-		'author_link_text'     => 'avatar',
 		'before_image'         => '<div class="image_block">',
 		'before_image_legend'  => '<div class="image_legend">',
 		'after_image_legend'   => '</div>',
@@ -51,7 +50,13 @@ $params = array_merge( array(
  */
 $Comment = & $params['Comment'];
 
-$comment_class = ( $comment_template_counter % 2 == 0 ) ? ' class="odd"' : '';
+$comment_class = 'vs_'.$Comment->status;
+if( $comment_template_counter % 2 == 0 )
+{ // Mark odd rows
+	$comment_class .= ' odd';
+}
+$comment_class = ' class="'.$comment_class.'"';
+
 ?>
 <!-- ========== START of a COMMENT/TB/PB ========== -->
 <?php echo $params['comment_block_start'];
@@ -79,7 +84,7 @@ $comment_class = ( $comment_template_counter % 2 == 0 ) ? ' class="odd"' : '';
 				'after_user'   => '',
 				'format'       => 'htmlbody',
 				'link_to'      => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
-				'link_text'    => $params['author_link_text'],
+				'link_text'    => 'avatar',
 				'thumb_size'   => 'crop-top-80x80',
 				'thumb_class'  => 'avatar_above_login',
 				'nowrap'       => false,
@@ -91,13 +96,13 @@ $comment_class = ( $comment_template_counter % 2 == 0 ) ? ' class="odd"' : '';
 		$post_header_class = 'bPostDate';
 		if( $Skin->enabled_status_banner( $Comment->status ) && $Comment->ID > 0 )
 		{ // Don't display status for previewed comments
-			$Comment->status( 'styled' );
+			$Comment->statuses();
 			$post_header_class .= ' '.$Comment->status;
 			$legend_statuses[] = $Comment->status;
 		}
 		?>
 		<div class="<?php echo $post_header_class; ?>">
-			<a href="<?php echo $Comment->get_permanent_url() ?>"><img src="img/icon_minipost.gif" width="12" height="9" alt="Post" title="Post" /></a>
+			<a href="<?php echo $Comment->get_permanent_url() ?>"><span class="ficon minipost" title="<?php echo T_('Post'); ?>"></span></a>
 			<?php
 				if( $Skin->get_setting( 'display_post_date') )
 				{	// We want to display the post date:
@@ -117,7 +122,7 @@ $comment_class = ( $comment_template_counter % 2 == 0 ) ? ' class="odd"' : '';
 		<?php echo $params['comment_end']; ?>
 	</td>
 </tr>
-<tr<?php echo $comment_class; ?>>
+<tr<?php echo $comment_class; ?> id="comment_row_<?php echo $Comment->ID; ?>">
 	<td class="left col1"><a href="<?php
 		if( $disp == 'comments' )
 		{	// We are displaying a comment in the Latest comments page:
@@ -137,7 +142,7 @@ $comment_class = ( $comment_template_counter % 2 == 0 ) ? ' class="odd"' : '';
 			echo '<div class="floatleft">';
 			if( $commented_Item && $commented_Item->can_comment( NULL ) )
 			{	// Display button to quote this comment
-				echo '<a href="'.$commented_Item->get_permanent_url().'?mode=quote&amp;qc='.$Comment->ID.'#form_p'.$commented_Item->ID.'" title="'.T_('Reply with quote').'" class="roundbutton_text floatleft">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).T_('Quote').'</a>';
+				echo '<a href="'.$commented_Item->get_permanent_url().'?mode=quote&amp;qc='.$Comment->ID.'#form_p'.$commented_Item->ID.'" title="'.T_('Reply with quote').'" class="roundbutton_text floatleft quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).T_('Quote').'</a>';
 			}
 
 			if( $params['display_vote_helpful'] )
@@ -165,10 +170,15 @@ $comment_class = ( $comment_template_counter % 2 == 0 ) ? ' class="odd"' : '';
 
 			echo '<div class="floatright">';
 			$comment_redirect_url = rawurlencode( $Comment->get_permanent_url() );
-			$Comment->edit_link( ' ', '', '#', T_('Edit this post'), 'roundbutton_text', '&amp;', true, $comment_redirect_url ); /* Link for editing */
+			$Comment->edit_link( ' ', '', '#', T_('Edit this reply'), 'roundbutton_text', '&amp;', true, $comment_redirect_url ); /* Link for editing */
 			echo ' <span class="roundbutton_group">';
-			$Comment->raise_link( array( 'class' => 'roundbutton_text', 'redirect_to' => $comment_redirect_url ) );
-			$Comment->lower_link( array( 'class' => 'roundbutton_text', 'redirect_to' => $comment_redirect_url ) );
+			$delete_button_is_displayed = is_logged_in() && $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $Comment );
+			$Comment->moderation_links( array(
+					'ajax_button' => true,
+					'class'       => 'roundbutton_text',
+					'redirect_to' => $comment_redirect_url,
+					'detect_last' => !$delete_button_is_displayed,
+				) );
 			$Comment->delete_link( '', '', '#', T_('Delete this reply'), 'roundbutton_text', false, '&amp;', true, false, '#', rawurlencode( $commented_Item->get_permanent_url() ) ); /* Link to backoffice for deleting */
 			echo '</span>';
 			echo '</div>';

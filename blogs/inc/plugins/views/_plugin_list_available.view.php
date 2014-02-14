@@ -183,7 +183,7 @@ while( $loop_Plugin = & $AvailablePlugins->get_next() )
 
 	$Table->display_line_end();
 
-	flush();
+	evo_flush();
 	// free memory:
 	$AvailablePlugins->unregister($loop_Plugin);
 }
@@ -207,11 +207,4 @@ printf( T_('To make a plugin available for installation, extract it into the "%s
 	rel_path_to_base($plugins_path) );
 echo '</p>';
 
-
-/*
- * $Log$
- * Revision 1.16  2013/11/06 08:04:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -90,11 +90,4 @@ if( $plugin_ID )
 	$Plugins->call_method( $Plugin->ID, 'htsrv_'.$method, $params );
 }
 
-
-/* {{{ Revision log:
- * $Log$
- * Revision 1.17  2013/11/06 08:03:44  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

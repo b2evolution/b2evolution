@@ -5024,7 +5024,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
     }
 
     // ----- Create the directory
-    if (!@mkdir($p_dir, 0777))
+    if( ! evo_mkdir( $p_dir ) )
     {
       // ----- Error log
       PclZip::privErrorLog(PCLZIP_ERR_DIR_CREATE_FAIL, "Unable to create directory '$p_dir'");

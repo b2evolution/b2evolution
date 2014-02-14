@@ -272,6 +272,12 @@ switch( $action )
 			$Plugins->load_plugins_table();
 		}
 
+		// Suspicious users
+		$Settings->set( 'antispam_suspicious_group', param( 'antispam_suspicious_group', 'integer', 0 ) );
+
+		// Trust groups
+		$trust_groups = param( 'antispam_trust_groups', 'array/integer', array() );
+		$Settings->set( 'antispam_trust_groups', implode( ',', $trust_groups ) );
 
 		if( ! $Messages->has_errors() )
 		{
@@ -432,7 +438,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		$bankruptcy_blogs_IDs = param( 'bankruptcy_blogs', 'array', array() );
+		$bankruptcy_blogs_IDs = param( 'bankruptcy_blogs', 'array/integer', array() );
 
 		if( empty( $bankruptcy_blogs ) )
 		{
@@ -566,11 +572,4 @@ if( $display_mode != 'js')
 	$AdminUI->disp_global_footer();
 }
 
-
-/*
- * $Log$
- * Revision 1.4  2013/11/06 08:03:48  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

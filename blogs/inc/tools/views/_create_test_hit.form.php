@@ -28,15 +28,9 @@ $Form->begin_form( 'fform',  T_('Create sample data for hits testing') );
 	$Form->text_input( 'max_interval', 5000, 5, T_( 'Maximal interval between 2 consecutive hits (sec)' ), '', array('required' => true ) );
 
 	$Form->hidden( 'ctrl', 'tools' );
-	$Form->hidden( 'action',  'create_test_hit' );
+	$Form->hidden( 'action',  'create_sample_hits' );
 	$Form->hidden( 'tab3', get_param( 'tab3' ) );
 
 $Form->end_form( array( array( 'submit', 'submit', T_('Generate'), 'SaveButton' ) ) );
 
-/*
- * $Log$
- * Revision 1.5  2013/11/06 08:04:54  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

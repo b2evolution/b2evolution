@@ -200,10 +200,4 @@ class AdminUI extends AdminUI_general
 
 }
 
-/*
- * $Log$
- * Revision 1.44  2013/11/06 09:09:29  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

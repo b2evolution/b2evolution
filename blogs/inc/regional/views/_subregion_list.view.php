@@ -121,6 +121,7 @@ function subrg_td_preferred( $subrg_preferred, $subrg_ID )
 
 $Results->cols[] = array(
 		'th' => /* TRANS: shortcut for enabled */ T_('En'),
+		'th_title' => T_('Enabled'),
 		'order' => 'subrg_enabled',
 		'td' => '%subrg_td_enabled( #subrg_enabled#, #subrg_ID# )%',
 		'th_class' => 'shrinkwrap',
@@ -129,6 +130,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 		'th' => /* TRANS: shortcut for preferred */ T_('Pref'),
+		'th_title' => T_('Preferred'),
 		'order' => 'subrg_preferred',
 		'default_dir' => 'D',
 		'td' => '%subrg_td_preferred( #subrg_preferred# , #subrg_ID# )%',
@@ -274,11 +276,3 @@ jQuery( '#c' ).change( function ()
 	} );
 } );
 </script>
-<?php
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:04:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
-?>

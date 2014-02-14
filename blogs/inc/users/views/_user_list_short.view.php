@@ -145,10 +145,4 @@ $UserList->display( $display_params );
 
 load_funcs( 'users/model/_user_js.funcs.php' );
 
-/*
- * $Log$
- * Revision 1.9  2013/11/06 08:05:04  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

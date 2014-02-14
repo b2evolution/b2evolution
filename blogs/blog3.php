@@ -3,7 +3,7 @@
  * This is a stub file for displaying a b2evolution blog.
  *
  * A stub file is used to anchor a particular blog in a particular location of your website.
- * More info: {@link http://manual.b2evolution.net/Stub_file}
+ * More info: {@link http://b2evolution.net/man/stub-file}
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

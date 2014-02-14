@@ -43,7 +43,7 @@ switch( $action )
 		if( empty( $updates ) )
 		{
 			?><div class="action_messages">
-				<div class="log_error" style="text-align:center;font-weight:bold"><?php echo T_( 'There are no any new updates.' ); ?></div>
+				<div class="log_error" style="text-align:center;font-weight:bold"><?php echo T_( 'There are no new updates.' ); ?></div>
 			</div><?php
 
 			$Form->end_form();
@@ -67,6 +67,10 @@ switch( $action )
 
 				case 'unzip':
 					$button = T_( 'Unzip & install now!' );
+					break;
+
+				case 'backup_and_overwrite':
+					$button = T_('Backup & Overwrite source files!');
 					break;
 
 				case 'install':
@@ -99,11 +103,4 @@ switch( $action )
 		break;
 }
 
-
-/*
- * $Log$
- * Revision 1.8  2013/11/06 08:04:25  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

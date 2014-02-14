@@ -33,7 +33,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $edited_File;
 
-global $blog;
+global $blog, $filename_max_length;
 
 $Form = new Form( NULL, 'fm_properties_checkchanges' );
 
@@ -49,7 +49,7 @@ $Form->begin_form( 'fform', T_('File properties') );
 	$Form->begin_fieldset( T_('Properties') );
 		if( $current_User->check_perm( 'files', 'edit', false, $blog ? $blog : NULL ) )
 		{ // User can edit: 
-			$Form->text( 'name', $edited_File->dget('name'), 32, T_('Filename'), T_('This is the name of the file on the server hard drive.'), 128 );
+			$Form->text( 'name', $edited_File->dget('name'), 32, T_('Filename'), T_('This is the name of the file on the server hard drive.'), $filename_max_length );
 		}
 		else
 		{ // User can view only:
@@ -83,10 +83,4 @@ else
 	$Form->end_form();
 }
 
-/*
- * $Log$
- * Revision 1.12  2013/11/06 08:04:15  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -6,7 +6,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
- * @see http://manual.b2evolution.net/B2_API
+ * @see http://b2evolution.net/man/b2-api
  *
  * @package xmlsrv
  *
@@ -150,10 +150,4 @@ $xmlrpc_procs['b2.getPostURL'] = array(
 				'signature' => $b2_getPostURL_sig,
 				'docstring' => $b2_getPostURL_doc );
 
-/*
- * $Log$
- * Revision 1.16  2013/11/06 08:05:10  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

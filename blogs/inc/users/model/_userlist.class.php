@@ -727,7 +727,13 @@ class UserList extends DataObjectList2
 			}
 		}
 
+		// Get the filters from Session
 		$this->filters = $Session->get( $this->filterset_name );
+		if( ! is_array( $this->filters ) )
+		{
+			$this->filters = array();
+		}
+		$this->filters = array_merge( $this->default_filters, $this->filters );
 
 		// Rewrite a previous order to new value
 		$this->filters['order'] = str_repeat( '-', $col_num ).$direction;

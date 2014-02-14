@@ -177,17 +177,25 @@ class geoip_plugin extends Plugin
 	 */
 	function get_country_by_IP( $IP )
 	{
-		// Include GeoIP API
-		require_once( dirname( __FILE__ ).'/geoip.inc' );
+		if( function_exists('geoip_country_code_by_name') )
+		{	// GeoIP extension
 
-		// Open GeoIP database
-		$GeoIP = geoip_open( $this->geoip_file_path, GEOIP_STANDARD );
+			// Get country code by user IP address
+			$country_code = @geoip_country_code_by_name($IP);
+		}
+		else
+		{	// Include GeoIP API
+			require_once( dirname( __FILE__ ).'/geoip.inc' );
 
-		// Get country code by user IP address
-		$country_code = geoip_country_code_by_addr( $GeoIP, $IP );
+			// Open GeoIP database
+			$GeoIP = geoip_open( $this->geoip_file_path, GEOIP_STANDARD );
 
-		// Close GeoIP DB
-		geoip_close( $GeoIP );
+			// Get country code by user IP address
+			$country_code = geoip_country_code_by_addr( $GeoIP, $IP );
+
+			// Close GeoIP DB
+			geoip_close( $GeoIP );
+		}
 
 		if( ! $country_code )
 		{	// No found country with current IP address
@@ -237,7 +245,7 @@ class geoip_plugin extends Plugin
 <script type="text/javascript">
 jQuery( document ).ready( function()
 {
-	jQuery( '#geoip_load_country' ).click( function () 
+	jQuery( '#geoip_load_country' ).click( function ()
 	{
 		var obj_this = jQuery( this );
 		jQuery.post( '<?php echo $this->get_htsrv_url( 'load_country', array( 'user_ID' => $User->ID ), '&' ); ?>',
@@ -396,7 +404,7 @@ jQuery( document ).ready( function()
 				if( ! isset( $params['Form'] ) )
 				{	// there's no Form where we add to, but we create our own form:
 					$Form = new Form( regenerate_url() );
-					
+
 				}
 				else
 				{
@@ -414,31 +422,35 @@ jQuery( document ).ready( function()
 
 
 	/**
-	 * This method should return an array that used as additional columns
+	 * This method initializes an array that used as additional columns
 	 *   for the results table in the BackOffice
 	 *
 	 * @param array Associative array of parameters
-	 * @return array Columns
+	 *   'table'   - Special name that used to know what plugin must use current table
+	 *   'column'  - DB field which contains IP address
+	 *   'Results' - Object
 	 */
 	function GetAdditionalColumnsTable( & $params )
 	{
 		$params = array_merge( array(
-				'table'  => '', // sessions, activity
-				'column' => ''  // sess_ipaddress, comment_author_IP
+				'table'   => '', // sessions, activity, ipranges
+				'column'  => '', // sess_ipaddress, comment_author_IP, aipr_IPv4start
+				'Results' => NULL
 			), $params );
 
-		$columns = array();
+		if( is_null( $params['Results'] ) || !is_object( $params['Results'] ) )
+		{ // Results must be object
+			return;
+		}
 
-		if( in_array( $params['table'], array( 'sessions', 'activity' ) ) )
-		{	// Display column only for required tables by GeoIP plugin
-			$columns[] = array(
+		if( in_array( $params['table'], array( 'sessions', 'activity', 'ipranges' ) ) )
+		{ // Display column only for required tables by GeoIP plugin
+			$params['Results']->cols[] = array(
 				'th' => T_('Country'),
 				'order' => $params['column'],
 				'td' => '%geoip_get_country_by_IP( #'.$params['column'].'# )%',
 			);
 		}
-
-		return $columns;
 	}
 
 
@@ -557,7 +569,7 @@ jQuery( document ).ready( function()
 /**
  * Get country by IP address (Used in the method GetAdditionalColumnsTable() in the table column)
  *
- * @param string IP address
+ * @param string|integer IP address
  * @return string Country with flag
  */
 function geoip_get_country_by_IP( $IP )
@@ -570,8 +582,13 @@ function geoip_get_country_by_IP( $IP )
 
 	if( $Plugins && $geoip_Plugin = & $Plugins->get_by_code( 'evo_GeoIP' ) )
 	{
+		if( strlen( intval( $IP ) ) == strlen( $IP ) )
+		{ // IP is in integer format, We should convert it to normal IP
+			$IP = int2ip( $IP );
+		}
+
 		if( $Country = & $geoip_Plugin->get_country_by_IP( $IP ) )
-		{	// Get country flag + name
+		{ // Get country flag + name
 			load_funcs( 'regional/model/_regional.funcs.php' );
 			$country = country_flag( $Country->get( 'code' ), $Country->get_name(), 'w16px', 'flag', '', false ).
 				' '.$Country->get_name();
@@ -583,10 +600,4 @@ function geoip_get_country_by_IP( $IP )
 	return $country;
 }
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:05:22  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -131,7 +131,7 @@ switch( $action )
 			forget_param( 'slug_ID' );
 			$Messages->add( $msg, 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=slugs', 303 ); // Will EXIT
+			header_redirect( regenerate_url( 'action', '', '', '&' ), 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		else
@@ -189,11 +189,4 @@ $AdminUI->disp_payload_end();
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-
-/*
- * $Log$
- * Revision 1.9  2013/11/06 08:04:53  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

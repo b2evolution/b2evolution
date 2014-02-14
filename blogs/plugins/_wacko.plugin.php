@@ -212,11 +212,4 @@ class wacko_plugin extends Plugin
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.22  2013/11/06 08:05:22  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -298,6 +298,7 @@ if( in_array( 'login', $show_columns ) )
 
 $Results->cols[] = array(
 					'th' => T_('S'),
+					'th_title' => T_('Status'),
 					'order' => 'mct_blocked',
 					'th_class' => 'shrinkwrap',
 					'td_class' => 'shrinkwrap',
@@ -439,10 +440,10 @@ if( count( $Results->rows ) > 0 )
 
 	$Form->switch_layout( 'none' );
 	$Form->switch_template_parts( array(
-			'formstart' => '<span class="nowrap">',
-			'formend' => '</span>',
-			'labelstart' => '<strong>',
-			'labelend' => '</strong>',
+			'formstart'  => '<div class="form_add_contacts">',
+			'labelstart' => '<span class="label">',
+			'labelend'   => '</span> <span class="controls">',
+			'formend'    => '</span></div>',
 	) );
 
 	$Form->begin_form();
@@ -534,10 +535,4 @@ function get_selected_users()
 <?php
 }
 
-/*
- * $Log$
- * Revision 1.23  2013/11/06 08:04:35  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

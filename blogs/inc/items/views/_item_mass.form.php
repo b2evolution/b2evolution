@@ -176,7 +176,7 @@ $Form->begin_form( '', '', $params );
 	$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'itemform_renderers' ) );
 
 	// fp> TODO: there should be no param call here (shld be in controller)
-	$edited_Item->renderer_checkboxes( param('renderers', 'array', NULL) );
+	$edited_Item->renderer_checkboxes( param('renderers', 'array/string', NULL) );
 
 	$Form->end_fieldset();
 
@@ -217,10 +217,4 @@ $Form->end_form();
 // New category input box:
 echo_onchange_newcat();
 
-/*
- * $Log$
- * Revision 1.16  2013/11/06 08:04:24  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -23,7 +23,7 @@ global $Blog, $Session;
  * Initialize everything
  */
 $action = param_action( 'list' );
-$redirect_to = param( 'redirect_to', 'string', /*regenerate_url( '', '', '', '&' )*/NULL );
+$redirect_to = param( 'redirect_to', 'url', /*regenerate_url( '', '', '', '&' )*/NULL );
 //$mode = 'iframe';
 
 switch( $action )
@@ -68,8 +68,8 @@ switch( $action )
 
 if( $action == 'edit_links' )
 { // set LinkOwner from params
-	$link_type = param( 'link_type', 'string', 'item' );
-	$object_ID = param( 'link_object_ID', 'integer', 0 );
+	$link_type = param( 'link_type', 'string', 'item', true );
+	$object_ID = param( 'link_object_ID', 'integer', 0, true );
 	$LinkOwner = get_link_owner( $link_type, $object_ID );
 	if( empty( $Blog ) )
 	{ // Load the blog we're in:
@@ -112,7 +112,7 @@ switch( $action )
 		// Update last touched date of Item
 		$LinkOwner->item_update_last_touched_date();
 
-		$Messages->add( $LinkOwner->T_( 'Link has been deleted from $ownerTitle$' ), 'success' );
+		$Messages->add( $LinkOwner->translate( 'Link has been deleted from $ownerTitle$' ), 'success' );
 
 		header_redirect( $redirect_to );
 		break;

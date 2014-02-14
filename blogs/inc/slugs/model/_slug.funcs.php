@@ -59,8 +59,6 @@ function generate_tinyurl( $last_url = NULL )
 	if( ! $last_url )
 	{ // no tinyurl is set, used the default value for the first one
 		$last_url = 'aA0';
-		/*$Settings->set( 'tinyurl', $last_url );
-		$Settings->dbupdate();*/
 		return $last_url;
 	}
 
@@ -219,11 +217,4 @@ function getnext_tinyurl()
 	return $url;
 }
 
-
-/*
- * $Log$
- * Revision 1.4  2013/11/06 08:04:53  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

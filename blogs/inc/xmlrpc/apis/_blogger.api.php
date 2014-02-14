@@ -6,7 +6,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
- * @see http://manual.b2evolution.net/Blogger_API
+ * @see http://b2evolution.net/man/blogger-api
  * @see http://www.blogger.com/developers/api/1_docs/
  * @see http://www.sixapart.com/developers/xmlrpc/blogger_api/
  *
@@ -505,10 +505,4 @@ $xmlrpc_procs['blogger.getRecentPosts'] = array(
 				'signature' => $bloggergetrecentposts_sig,
 				'docstring' => $bloggergetrecentposts_doc );
 
-/*
- * $Log$
- * Revision 1.19  2013/11/06 08:05:10  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

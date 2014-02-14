@@ -63,7 +63,7 @@ if( $current_User->check_perm( 'blogs', 'editall' ) )
 {
 	if( $CommentList->is_trashfilter() )
 	{
-		$emptytrash_link = '<span class="floatright">'.action_icon( T_('Empty recycle bin'), 'recycle_empty', $admin_url.'?ctrl=comments&amp;action=emptytrash', T_('Empty recycle bin...'), 5, 3 ).'</span> ';
+		$emptytrash_link = '<span class="floatright">'.action_icon( T_('Empty recycle bin'), 'recycle_empty', $admin_url.'?ctrl=comments&amp;blog='.$CommentList->Blog->ID.'&amp;action=emptytrash', T_('Empty recycle bin...'), 5, 3 ).'</span> ';
 	}
 	else
 	{
@@ -113,11 +113,4 @@ $CommentList->display_nav( 'footer' );
 
 $block_item_Widget->disp_template_replaced( 'block_end' );
 
-
-/*
- * $Log$
- * Revision 1.16  2013/11/06 08:04:07  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

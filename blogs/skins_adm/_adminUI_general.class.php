@@ -962,9 +962,9 @@ class AdminUI_general extends Menu
 							'filters_start' => '<tr class="filters"><td colspan="$nb_cols$">',
 							'filters_end' => '</td></tr>',
 							'line_start_head' => '<tr>',  // TODO: fusionner avec colhead_start_first; mettre a jour admin_UI_general; utiliser colspan="$headspan$"
-							'colhead_start' => '<th $class_attrib$>',
-							'colhead_start_first' => '<th class="firstcol $class$">',
-							'colhead_start_last' => '<th class="lastcol $class$">',
+							'colhead_start' => '<th $class_attrib$ $title_attrib$>',
+							'colhead_start_first' => '<th class="firstcol $class$" $title_attrib$>',
+							'colhead_start_last' => '<th class="lastcol $class$" $title_attrib$>',
 							'colhead_end' => "</th>\n",
 							'sort_asc_off' => get_icon( 'sort_asc_off' ),
 							'sort_asc_on' => get_icon( 'sort_asc_on' ),
@@ -1442,11 +1442,4 @@ class AdminUI_general extends Menu
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.121  2013/11/06 09:09:29  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

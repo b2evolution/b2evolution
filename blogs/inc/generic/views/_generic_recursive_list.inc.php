@@ -170,11 +170,4 @@ echo $GenericCategoryCache->recurse( $callbacks, $subset_ID );
 
 echo '</table>';
 
-
-/*
- * $Log$
- * Revision 1.8  2013/11/06 08:04:15  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

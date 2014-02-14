@@ -52,11 +52,4 @@ $params = array_merge( array(
 
 require $inc_path.'users/views/_user_list_short.view.php';
 
-
-/**
- * $Log$
- * Revision 1.6  2013/11/06 08:05:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

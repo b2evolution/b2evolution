@@ -489,10 +489,4 @@ class DataObjectList2 extends FilteredResults
 	}
 }
 
-/*
- * $Log$
- * Revision 1.17  2013/11/06 08:03:47  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

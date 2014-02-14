@@ -98,10 +98,4 @@ class miami_blue_Skin extends Skin
 	
 }
 
-/*
- * $Log$
- * Revision 1.9  2013/11/06 08:05:48  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

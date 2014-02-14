@@ -152,7 +152,7 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Custom fields').get_manual_link('item-custom-fields') );
 	$custom_field_types = array(
 			'double' => array( 'label' => T_('Numeric'), 'title' => T_('Add new numeric custom field'), 'note' => T_('Ex: Price, Weight, Length... &ndash; will be stored as a double floating point number.'), 'size' => 20, 'maxlength' => 40 ),
-			'varchar' => array( 'label' => T_('String'), 'title' => T_('Add new text custom field'), 'note' => T_('Ex: Color, Fabric... &ndash; will be stored as a varchar() field.'), 'size' => 30, 'maxlength' => 60 )
+			'varchar' => array( 'label' => T_('String'), 'title' => T_('Add new text custom field'), 'note' => T_('Ex: Color, Fabric... &ndash; will be stored as a varchar(2000) field.'), 'size' => 30, 'maxlength' => 60 )
 	);
 
 	foreach( $custom_field_types as $type => $data )
@@ -284,12 +284,3 @@ echo_regional_required_js( 'location_' );
 		return field_name.substr( 0, 36 ).replace( /[^a-z0-9\-_]/ig, '_' ).toLowerCase();
 	}
 </script>
-<?php
-
-/*
- * $Log$
- * Revision 1.57  2013/11/06 08:03:58  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
-?>

@@ -264,8 +264,4 @@ $AdminUI->disp_payload_end();
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-/*
- * $ Log: userfieldsgroups.ctrl.php,v $
- *
- */
 ?>

@@ -23,12 +23,5 @@ header('Content-Type: text/html; charset=iso-8859-1'); // no translation
 	</body>
 </html>
 <?php
- 	exit(0);		// Note: this is NOT a crash. There should be no dying here!
-
-/*
- * $Log$
- * Revision 1.5  2013/11/06 08:05:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
+	exit(0);		// Note: this is NOT a crash. There should be no dying here!
 ?>

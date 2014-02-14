@@ -164,7 +164,7 @@ if( $new_user_creating )
 
 	$Form->begin_fieldset( T_( 'New user' ), array( 'class' => 'fieldset clear' ) );
 
-	$chosengroup = ( $edited_User->Group === NULL ) ? $Settings->get( 'newusers_grp_ID' ) : $edited_User->Group->ID;
+	$chosengroup = ( $edited_User->Group === NULL ) ? $Settings->get( 'newusers_grp_ID' ) : $edited_User->grp_ID;
 	$GroupCache = & get_GroupCache();
 	$Form->select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, T_( 'User group' ) );
 
@@ -238,13 +238,10 @@ if( $action != 'view' )
 		$Form->text_input( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), '', array( 'maxlength' => 50, 'required' => ( $nickname_editing == 'edited-user-required' ) ) );
 	}
 
-	if( $Settings->get( 'registration_require_gender' ) != 'hidden' )
-	{
-		$Form->radio( 'edited_user_gender', $edited_User->get('gender'), array(
-					array( 'M', T_('A man') ),
-					array( 'F', T_('A woman') ),
-				), T_('I am'), false, '', $Settings->get( 'registration_require_gender' ) == 'required' );
-	}
+	$Form->radio( 'edited_user_gender', $edited_User->get('gender'), array(
+			array( 'M', T_('A man') ),
+			array( 'F', T_('A woman') ),
+		), T_('I am'), false, '', $Settings->get( 'registration_require_gender' ) == 'required' );
 
 	$button_refresh_regional = '<button id="%s" type="submit" name="actionArray[refresh_regional]" class="action_icon refresh_button">'.get_icon( 'refresh' ).'</button>';
 	$button_refresh_regional .= '<img src="'.$rsc_url.'img/ajax-loader.gif" alt="'.T_('Loading...').'" title="'.T_('Loading...').'" style="display:none;margin:2px 0 0 5px" align="top" />';
@@ -331,13 +328,10 @@ else
 	$Form->info( T_('Nickname'), $edited_User->get('nickname') );
 	$Form->info( T_('Identity shown'), $edited_User->get('preferredname') );
 
-	if( $Settings->get( 'registration_require_gender' ) != 'hidden' )
+	$user_gender = $edited_User->get( 'gender' );
+	if( ! empty( $user_gender ) )
 	{
-		$user_gender = $edited_User->get( 'gender' );
-		if( ! empty( $user_gender ) )
-		{
-			$Form->info( T_('Gender'), $edited_User->get_gender() );
-		}
+		$Form->info( T_('Gender'), $edited_User->get_gender() );
 	}
 
 	if( ! empty( $edited_User->ctry_ID ) )
@@ -406,13 +400,13 @@ if( empty( $edited_User->ID ) && $action != 'view' )
 global $DB;
 
 // Get original user id for duplicate
-if ($edited_User->ID == 0)
+if( $edited_User->ID == 0 )
 {
-	$user_id = param( 'user_ID', 'string', "" );
-	if ($user_id == "" || $user_id == 0 )
-		$user_id = param( 'orig_user_ID', 'string', "" );
-	if ($user_id == "" || $user_id == 0 )
-		$user_id = $edited_User->ID;
+	$user_id = param( 'user_ID', 'integer', 0 );
+	if( $user_id == 0 )
+	{
+		$user_id = param( 'orig_user_ID', 'integer', 0 );
+	}
 }
 else
 {
@@ -460,7 +454,7 @@ $Form->begin_fieldset( T_('Add new fields') );
 				SELECT ufdf_ID, "0" AS uf_ID, ufdf_type, ufdf_name, "" AS uf_varchar, ufdf_required, ufdf_options, ufdf_suggest, ufdf_duplicated, ufgp_ID, ufgp_name
 					FROM T_users__fielddefs
 						LEFT JOIN T_users__fieldgroups ON ufdf_ufgp_ID = ufgp_ID
-				WHERE ufdf_ID = "'.$add_field_type.'"' );
+				WHERE ufdf_ID = '.intval( $add_field_type ) );
 
 				userfields_display( $userfields, $Form, 'add', false );
 			}
@@ -696,10 +690,4 @@ bind_autocomplete( jQuery( 'input[id^=uf_][autocomplete=on]' ) );
 // Location
 echo_regional_js( 'edited_user', user_region_visible() );
 
-/*
- * $Log$
- * Revision 1.66  2013/11/06 09:09:09  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

@@ -292,10 +292,6 @@ if( version_compare( $system_stats['db_version'], $required_mysql_version['appli
 {
 	disp_system_check( 'error', sprintf( T_('This version is too old. The minimum recommended MySQL version is %s.'), $required_mysql_version['application'] ) );
 }
-elseif( version_compare( $system_stats['db_version'], '4.3' ) < 0 )
-{
-	disp_system_check( 'warning', T_('This version is old. b2evolution may run but some features may fail. You should ask your host to upgrade MySQL before running b2evolution.') );
-}
 else
 {
 	disp_system_check( 'ok' );
@@ -452,11 +448,11 @@ if( empty($memory_limit) )
 else
 {
 	init_system_check( 'PHP memory_limit', ini_get('memory_limit') );
-	if( $memory_limit < 8096 )
+	if( $memory_limit < get_php_bytes_size( '8M' ) )
 	{
 		disp_system_check( 'error', T_('The memory_limit is very low. Some features of b2evolution will fail to work;') );
 	}
-	elseif( $memory_limit < 12288 )
+	elseif( $memory_limit < get_php_bytes_size( '12M' ) )
 	{
 		disp_system_check( 'warning', T_('The memory_limit is low. Some features of b2evolution may fail to work;') );
 	}
@@ -665,10 +661,4 @@ $AdminUI->disp_payload_end();
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-/*
- * $Log$
- * Revision 1.42  2013/11/06 08:04:54  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

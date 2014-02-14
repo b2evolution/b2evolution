@@ -52,6 +52,9 @@ $current_User->check_perm( 'files', 'add', true, $blog ? $blog : NULL );
 
 $AdminUI->set_path( 'files' );
 
+// Save the number of already existing error messages
+$initial_error_count = $Messages->count( 'error' );
+
 // Params that may need to be passed through:
 param( 'fm_mode', 'string', NULL, true );
 param( 'link_type', 'string', NULL, true );
@@ -176,7 +179,8 @@ file_controller_build_tabs();
 // If there were errors, display them and exit (especially in case there's no valid FileRoot ($fm_FileRoot)):
 // TODO: dh> this prevents users from uploading if _any_ blog media directory is not writable.
 //           See http://forums.b2evolution.net/viewtopic.php?p=49001#49001
-if( $Messages->has_errors() )
+// Exit only if new error messages were added in this file
+if( $Messages->count( 'error' ) > $initial_error_count )
 {
 	$AdminUI->set_path( 'files', 'upload', $tab3 );
 
@@ -214,7 +218,8 @@ if( ! $Settings->get('upload_enabled') )
 
 
 // If there were errors, display them and exit (especially in case there's no valid FileRoot ($fm_FileRoot)):
-if( $Messages->has_errors() )
+// Exit only if new error messages were added in this file
+if( $Messages->count( 'error' ) > $initial_error_count )
 {
 	$AdminUI->set_path( 'files', 'upload', $tab3 );
 
@@ -403,13 +408,13 @@ if(  ( $action != 'switchtab' ) && isset($_FILES) && count( $_FILES ) )
 				$img_tag = format_to_output( $uploadedFile->get_tag(), 'formvalue' );
 				if( $uploadedFile->is_image() )
 				{
-					$link_msg = $LinkOwner->T_( 'Link this image to your owner' );
+					$link_msg = $LinkOwner->translate( 'Link this image to your owner' );
 					$link_note = T_('recommended - allows automatic resizing');
 				}
 				else
 				{
-					$link_msg = $LinkOwner->T_( 'Link this file to your owner' );
-					$link_note = $LinkOwner->T_( 'The file will be appended for download at the end of the owner' );
+					$link_msg = $LinkOwner->translate( 'Link this file to your owner' );
+					$link_note = $LinkOwner->translate( 'The file will be linked for download at the end of the owner' );
 				}
 				$success_msg .= '<ul>'
 						.'<li>'.action_icon( T_('Link this file!'), 'link',
@@ -420,7 +425,7 @@ if(  ( $action != 'switchtab' ) && isset($_FILES) && count( $_FILES ) )
 						.'<li>'.T_('or').' <a href="#" onclick="if( window.focus && window.opener ){'
 						.'window.opener.focus(); textarea_wrap_selection( window.opener.document.getElementById(\''.$LinkOwner->type.'form_post_content\'), \''
 						.format_to_output( $uploadedFile->get_tag(), 'formvalue' ).'\', \'\', 1, window.opener.document ); } return false;">'
-						.$LinkOwner->T_( 'Insert the following code snippet into your owner' ).'</a> : <input type="text" value="'.$img_tag.'" size="60" /></li>'
+						.$LinkOwner->translate( 'Insert the following code snippet into your owner' ).'</a> : <input type="text" value="'.$img_tag.'" size="60" /></li>'
 						// fp> TODO: it would be supacool to have an ajaxy "tumbnail size selector" here that generates a thumnail of requested size on server and then changes the code in the input above
 					.'</ul>';
 			}
@@ -495,11 +500,4 @@ else
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-
-/*
- * $Log$
- * Revision 1.53  2013/11/06 08:04:08  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

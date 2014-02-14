@@ -48,7 +48,7 @@ if( $inskin )
 }
 
 // gets used by header_redirect();
-param( 'redirect_to', 'string', $ReqURI );
+param( 'redirect_to', 'url', $ReqURI );
 
 switch( $action )
 {
@@ -530,7 +530,7 @@ if( $inskin && use_in_skin_login() )
 	{
 		if( !empty( $login_error ) )
 		{
-			$Messages->add( T_( $login_error ) );
+			$Messages->add( $login_error );
 		}
 		if( empty( $redirect_to ) )
 		{

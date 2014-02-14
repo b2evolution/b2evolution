@@ -131,7 +131,7 @@ function trackback(
 			$http_request .= "User-Agent: $app_name/$app_version\r\n";
 			$http_request .= "\r\n";
 			$http_request .= $query_string;
-			flush();
+			evo_flush();
 			if( $fs = @fsockopen($trackback_url['host'], $port, $errno, $errst, 20) ) // this timeout is just for setting up the socket
 			{
 				// Set timeout for data:
@@ -221,11 +221,4 @@ function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 	echo $blah;
 }
 
-
-/*
- * $Log$
- * Revision 1.16  2013/11/06 08:03:58  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

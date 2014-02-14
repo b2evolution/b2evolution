@@ -64,7 +64,7 @@ function cat_line( $Chapter, $level )
 	global $line_class, $permission_to_edit, $current_User, $Settings;
 	global $GenericCategoryCache, $current_default_cat_ID;
 	global $number_of_posts_in_cat;
-	
+
 	global $Session;
 	$result_fadeout = $Session->get( 'fadeout_array' );
 
@@ -82,7 +82,7 @@ function cat_line( $Chapter, $level )
 	// Default
 	if( $current_default_cat_ID == $Chapter->ID )
 	{
-		$makedef_icon = get_icon( 'enabled', 'imgtag', array( 'title' => format_to_output( T_( 'This is default category' ), 'htmlattr' ) ) );
+		$makedef_icon = get_icon( 'enabled', 'imgtag', array( 'title' => format_to_output( T_( 'This is the default category' ), 'htmlattr' ) ) );
 	}
 	else
 	{
@@ -326,10 +326,5 @@ if( ! $Settings->get('allow_moving_chapters') )
 
 //Flush fadeout
 $Session->delete( 'fadeout_array');
-/*
- * $Log$
- * Revision 1.33  2013/11/06 08:03:57  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
+
 ?>

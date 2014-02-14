@@ -75,11 +75,3 @@ include_footerlines(); // enables translation strings for js
 
 </body>
 </html>
-<?php
-/*
- * $Log$
- * Revision 1.16  2013/11/06 08:05:49  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
-?>

@@ -199,11 +199,4 @@ $postIDarray = $ItemList->get_page_ID_array();
 // DISPLAY table now:
 $ItemList->display( NULL, $result_fadeout );
 
-
-/*
- * $Log$
- * Revision 1.16  2013/11/06 08:04:24  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

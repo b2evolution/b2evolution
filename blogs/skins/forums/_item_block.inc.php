@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item, $preview;
+global $Item, $preview, $dummy_fields;
 
 /**
  * @var array Save all statuses that used on this page in order to show them in the footer legend
@@ -104,7 +104,7 @@ $Skin->display_breadcrumbs( $current_cat );
 			}
 			?>
 			<div class="<?php echo $post_header_class; ?>">
-				<a href="<?php echo $Item->get_permanent_url(); ?>"><img src="img/icon_minipost.gif" width="12" height="9" alt="Post" title="Post" /></a>
+				<a href="<?php echo $Item->get_permanent_url(); ?>"><span class="ficon minipost" title="<?php echo T_('Topic'); ?>"></span></a>
 				<?php
 					if( $Skin->get_setting( 'display_post_date') )
 					{	// We want to display the post date:
@@ -135,7 +135,7 @@ $Skin->display_breadcrumbs( $current_cat );
 			echo '<div class="floatleft">';
 			if( $Item->can_comment( NULL ) )
 			{	// Display button to quote this post
-				echo '<a href="'.$Item->get_permanent_url().'?mode=quote&amp;qp='.$Item->ID.'#form_p'.$Item->ID.'" title="'.T_('Reply with quote').'" class="roundbutton_text floatleft">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).T_('Quote').'</a>';
+				echo '<a href="'.$Item->get_permanent_url().'?mode=quote&amp;qp='.$Item->ID.'#form_p'.$Item->ID.'" title="'.T_('Reply with quote').'" class="roundbutton_text floatleft quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).T_('Quote').'</a>';
 			}
 			echo '</div>';
 
@@ -150,7 +150,7 @@ $Skin->display_breadcrumbs( $current_cat );
 			$Item->edit_link( array(
 					'before' => ' ',
 					'after'  => '',
-					'title'  => T_('Edit this post'),
+					'title'  => T_('Edit this topic'),
 					'text'   => '#',
 					'class'  => 'roundbutton_text',
 				) );
@@ -159,7 +159,7 @@ $Skin->display_breadcrumbs( $current_cat );
 			$redirect_after_publish = $Item->add_navigation_param( $Item->get_permanent_url(), 'same_category', $current_cat );
 			$Item->next_status_link( array( 'before' => ' ', 'class' => 'roundbutton_text', 'post_navigation' => 'same_category', 'nav_target' => $current_cat ), true );
 			$Item->next_status_link( array( 'class' => 'roundbutton_text', 'before_text' => '', 'post_navigation' => 'same_category', 'nav_target' => $current_cat ), false );
-			$Item->delete_link( '', '', '#', '#', 'roundbutton_text', false, '#', TS_('You are about to delete this post!\\nThis cannot be undone!'), get_caturl( $current_cat ) );
+			$Item->delete_link( '', '', '#', T_('Delete this topic'), 'roundbutton_text', false, '#', TS_('You are about to delete this post!\\nThis cannot be undone!'), get_caturl( $current_cat ) );
 			echo '</span>';
 			echo '</div>';
 		?>
@@ -231,6 +231,7 @@ if( !$Item->can_see_comments( true ) || $preview )
 				'comment_mode'         => param( 'mode', 'string', '' ),
 				'comment_qc'           => param( 'qc', 'integer', 0 ),
 				'comment_qp'           => param( 'qp', 'integer', 0 ),
+				$dummy_fields[ 'content' ] => param( $dummy_fields[ 'content' ], 'html' )
 			) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.
@@ -240,13 +241,21 @@ if( !$Item->can_see_comments( true ) || $preview )
 	<?php
 		locale_restore_previous();	// Restore previous locale (Blog locale)
 	?>
-
-<?php
-
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:05:44  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
-?>
+<script type="text/javascript">
+jQuery( document ).ready( function()
+{
+	jQuery( '.quote_button' ).click( function()
+	{ // Submit a form to save the already entered content
+		console.log( jQuery( this ).attr( 'href' ) );
+		var form = jQuery( 'form[id^=bComment_form_id_]' );
+		if( form.length == 0 )
+		{ // No form found, Use an url of this link
+			return true;
+		}
+		// Set an action as url of this link and submit a form
+		form.attr( 'action', jQuery( this ).attr( 'href' ) );
+		form.submit();
+		return false;
+	} );
+} );
+</script>

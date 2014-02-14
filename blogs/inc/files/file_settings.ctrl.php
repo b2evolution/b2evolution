@@ -79,7 +79,8 @@ switch( $action )
 					'exif_orientation',
 					'fm_resize_enable',
 					'fm_resize_width',
-					'fm_resize_height' ) );
+					'fm_resize_height',
+					'fm_resize_quality' ) );
 			if( $Settings->dbupdate() )
 			{
 				$Messages->add( T_('Restored default values.'), 'success' );
@@ -174,6 +175,8 @@ switch( $action )
 			$Settings->set( 'fm_resize_width', $fm_resize_width );
 			param( 'fm_resize_height', 'integer', 0 );
 			$Settings->set( 'fm_resize_height', $fm_resize_height );
+			param_integer_range( 'fm_resize_quality', 0, 100, T_('The compression value must be between %d and %d.') );
+			$Settings->set( 'fm_resize_quality', $fm_resize_quality );
 
 			if( ! $Messages->has_errors() )
 			{
@@ -228,10 +231,4 @@ $AdminUI->disp_payload_end();
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-/*
- * $Log$
- * Revision 1.17  2013/11/06 08:04:08  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

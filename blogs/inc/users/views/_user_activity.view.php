@@ -70,37 +70,37 @@ echo '<div style="margin-top:25px;font-weight:bold;"><span>'.T_( 'User created f
 user_reports_results_block( array(
 		'edited_User'       => $edited_User,
 	) );
-flush();
+evo_flush();
 
 /**** Blogs owned by the user ****/
 blogs_results_block( array(
 		'edited_User'       => $edited_User,
 	) );
-flush();
+evo_flush();
 
 /**** Posts created by the user  ****/
 items_created_results_block( array(
 		'edited_User'       => $edited_User,
 	) );
-flush();
+evo_flush();
 
 /**** Posts edited by the user ****/
 items_edited_results_block( array(
 		'edited_User'       => $edited_User,
 	) );
-flush();
+evo_flush();
 
 /**** Comments posted by the user ****/
 comments_results_block( array(
 		'edited_User'       => $edited_User,
 	) );
-flush();
+evo_flush();
 
 /**** Private messages sent by the user ****/
 threads_results_block( array(
 		'edited_User'       => $edited_User,
 	) );
-flush();
+evo_flush();
 
 
 if( $current_User->ID != $edited_User->ID && $edited_User->ID != 1 )
@@ -108,10 +108,4 @@ if( $current_User->ID != $edited_User->ID && $edited_User->ID != 1 )
 	echo '<div style="margin-top:25px;">'.action_icon( T_('Delete User and All his contributions'), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_userdata&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete User and All his contributions'), 3, 4 ).'</div>';
 }
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:05:04  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

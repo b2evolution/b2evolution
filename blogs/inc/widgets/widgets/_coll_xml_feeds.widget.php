@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the xyz Widget class.
+ * This file implements the coll_xml_feeds Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -192,11 +192,4 @@ class coll_xml_feeds_Widget extends ComponentWidget
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.28  2013/11/06 08:05:09  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

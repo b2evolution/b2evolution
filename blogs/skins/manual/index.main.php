@@ -6,7 +6,7 @@
  * It will also rely on default includes for specific dispays (like the comment form).
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
- * {@link http://manual.b2evolution.net/Skins_2.0}
+ * {@link http://b2evolution.net/man/skin-structure}
  *
  * The main page template is used to display the blog when no specific page template is available
  * to handle the request (based on $disp).
@@ -30,8 +30,12 @@ if( version_compare( $app_version, '3.0' ) < 0 )
 $cookie_skin_width_name = 'skin_width';
 
 if( isset( $_COOKIE[ $cookie_skin_width_name ] ) )
-{
-	$cookie_skin_width_value = $_COOKIE[ $cookie_skin_width_name ];
+{ // Get skin width from $_COOKIE through param function
+	$cookie_skin_width_value = param_cookie( $cookie_skin_width_name, '/^\d+(px|%)$/i', NULL );
+	if( empty( $cookie_skin_width_value ) )
+	{ // Force illegal value of width to default
+		$cookie_skin_width_value = '960px';
+	}
 }
 
 if( $disp == 'posts' && ! isset( $tag ) && isset( $cat ) )
@@ -40,9 +44,7 @@ if( $disp == 'posts' && ! isset( $tag ) && isset( $cat ) )
 	$disp = 'catdir';
 }
 
-// fp>yura: what is that??
-/* yura>fp:
-It is used for home page and for category page where we have the intro Items.
+/* yura> The following JS is used for home page and for category page where we have the intro Items.
 For normal we need to check if current Item can be rated,
 but in the disp == 'posts' or 'catdir' we don't have the object Item in the begining of this file,
 we will have that only after calling of function get_featured_Item();

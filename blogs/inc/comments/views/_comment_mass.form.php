@@ -33,8 +33,8 @@ $Form->hidden( 'ctrl', 'comments' );
 
 	$mass_type_value = 'delete';
 	$mass_types = array();
-	if( !$CommentList->is_trashfilter() )
-	{	// Don't display this option in the recycle bin
+	if( !$CommentList->is_trashfilter( false ) )
+	{	// Don't display this option if trashed comments are also displayed
 		$mass_types[] = array( 'value' => 'recycle', 'label' => T_('Move to Recycle bin') );
 		$mass_type_value = 'recycle';
 	}
@@ -68,11 +68,3 @@ jQuery( 'input[name=mass_type]' ).click( function()
 	}
 } );
 </script>
-<?php
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:04:07  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
-?>

@@ -70,11 +70,4 @@ $Form->begin_form( 'fform' );
 
 $Form->end_form( array( array( 'submit', 'submit', T_('Save changes'), 'SaveButton' ) ) );
 
-
-/*
- * $Log$
- * Revision 1.19  2013/11/06 08:04:46  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -12,7 +12,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Settings, $Plugins, $current_User;
+global $current_User;
 
 if( is_logged_in() )
 { // User is already logged in
@@ -25,21 +25,13 @@ if( is_logged_in() )
 
 	// User is already logged in, redirect to "redirect_to" page
 	$Messages->add( T_( 'You are already logged in.' ), 'note' );
-	$redirect_to = param( 'redirect_to', 'string', NULL );
+	$redirect_to = param( 'redirect_to', 'url', NULL );
 	if( empty( $redirect_to ) )
 	{
 		$redirect_to = regenerate_url( 'disp', '', '', '&' );
 	}
 	header_redirect( $redirect_to, 302 );
 	// will have exited
-}
-
-require_js( 'functions.js', 'blog' );
-
-$transmit_hashed_password = (bool)$Settings->get('js_passwd_hashing') && !(bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
-if( $transmit_hashed_password )
-{ // Include JS for client-side password hashing:
-	require_js( 'sha1_md5.js', 'blog' );
 }
 
 require $ads_current_skin_path.'index.main.php';

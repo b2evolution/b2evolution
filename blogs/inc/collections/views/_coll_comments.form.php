@@ -198,7 +198,7 @@ $Form->begin_fieldset( T_('Comment moderation') );
 	foreach( $moderation_statuses as $status => $status_text )
 	{ // Add a checklist option for each possible modeartion status
 		$is_checked = ( strpos( $blog_moderation_statuses, $status) !== false );
-		$checklist_options[] = array( 'notif_'.$status, 1, T_( $status_text ), $is_checked );
+		$checklist_options[] = array( 'notif_'.$status, 1, $status_text, $is_checked );
 	}
 	$Form->checklist( $checklist_options, 'moderation_statuses', T_('Comment moderation reminder statuses'), false, false, array( 'note' => 'Comments with the selected statuses will be notified on the "Send reminders about comments awaiting moderation" scheduled job.' ) );
 

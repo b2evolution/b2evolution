@@ -115,11 +115,4 @@ class coll_link_list_Widget extends coll_item_list_Widget
 
 }
 
-
-/*
- * $Log$
- * Revision 1.7  2013/11/06 08:05:09  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

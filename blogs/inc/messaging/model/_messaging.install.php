@@ -96,11 +96,4 @@ $schema_queries['T_messaging__contact_groupusers'] = array(
                       ON DELETE CASCADE
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" );
 
-
-/*
- * $Log$
- * Revision 1.8  2013/11/06 08:04:25  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

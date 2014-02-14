@@ -51,38 +51,38 @@ global $backup_tables;
  * @var array
  */
 $backup_paths = array(
-	'application_files'   => array (
-		'label'    => T_( 'Application files' ), /* It is files root. Please, don't remove it. */
+	'application_files'   => array(
+		'label'    => T_('Application files'), /* It is files root. Please, don't remove it. */
 		'path'     => '*',
 		'included' => true ),
 
-	'configuration_files' => array (
-		'label'    => T_( 'Configuration files' ),
+	'configuration_files' => array(
+		'label'    => T_('Configuration files'),
 		'path'     => $conf_subdir,
 		'included' => true ),
 
-	'skins_files'         => array (
-		'label'    => T_( 'Skins' ),
-		'path'     => array( 	$skins_subdir,
+	'skins_files'         => array(
+		'label'    => T_('Skins'),
+		'path'     => array( $skins_subdir,
 							$adminskins_subdir ),
 		'included' => true ),
 
-	'plugins_files'       => array (
-		'label'    => T_( 'Plugins' ),
+	'plugins_files'       => array(
+		'label'    => T_('Plugins'),
 		'path'     => $plugins_subdir,
 		'included' => true ),
 
-	'media_files'         => array (
-		'label'    => T_( 'Media folder' ),
+	'media_files'         => array(
+		'label'    => T_('Media folder'),
 		'path'     => $media_subdir,
 		'included' => false ),
 
-	'backup_files'        => array (
+	'backup_files'        => array(
 		'label'    => NULL,		// Don't display in form. Just exclude from backup.
 		'path'     => $backup_subdir,
 		'included' => false ),
 
-	'upgrade_files'        => array (
+	'upgrade_files'        => array(
 		'label'    => NULL,		// Don't display in form. Just exclude from backup.
 		'path'     => $upgrade_subdir,
 		'included' => false ) );
@@ -96,13 +96,13 @@ $backup_paths = array(
  * @var array
  */
 $backup_tables = array(
-	'content_tables'      => array (
-		'label'    => T_( 'Content tables' ), /* It means collection of all of the tables. Please, don't remove it. */
+	'content_tables'      => array(
+		'label'    => T_('Content tables'), /* It means collection of all of the tables. Please, don't remove it. */
 		'table'   => '*',
 		'included' => true ),
 
-	'logs_stats_tables'   => array (
-		'label'    => T_( 'Logs & stats tables' ),
+	'logs_stats_tables'   => array(
+		'label'    => T_('Logs & stats tables'),
 		'table'   => array(
 			'T_sessions',
 			'T_hitlog',
@@ -193,7 +193,7 @@ class Backup
 		// Check are there something to backup
 		if( !$this->has_included( $this->backup_paths ) && !$this->has_included( $this->backup_tables ) )
 		{
-			$Messages->add( T_( 'There is nothing to backup. Please select at least one option' ), 'error' );
+			$Messages->add( T_('You have not selected anything to backup.'), 'error' );
 			return false;
 		}
 
@@ -211,13 +211,13 @@ class Backup
 		// Create current backup path
 		$cbackup_path = $backup_path.date( 'Y-m-d-H-i-s', $servertimenow ).'/';
 
- 		echo '<p>'.sprintf( T_('Starting backup to: &laquo;%s&raquo; ...'), $cbackup_path ).'</p>';
- 		flush();
+		echo '<p>'.sprintf( T_('Starting backup to: &laquo;%s&raquo; ...'), $cbackup_path ).'</p>';
+		evo_flush();
 
- 		// Prepare backup directory
- 		$success = prepare_maintenance_dir( $backup_path, true );
+		// Prepare backup directory
+		$success = prepare_maintenance_dir( $backup_path, true );
 
- 		// Backup directories and files
+		// Backup directories and files
 		if( $success && $this->has_included( $this->backup_paths ) )
 		{
 			$backup_files_path = $this->pack_backup_files ? $cbackup_path : $cbackup_path.'files/';
@@ -244,7 +244,7 @@ class Backup
 		if( $success )
 		{
 			echo '<p>'.sprintf( T_('Backup complete. Directory: &laquo;%s&raquo;'), $cbackup_path ).'</p>';
-			flush();
+			evo_flush();
 
 			return true;
 		}
@@ -262,8 +262,8 @@ class Backup
 	{
 		global $basepath, $backup_paths, $inc_path;
 
-		echo '<h4>'.T_( 'Creating folders/files backup...' ).'</h4>';
-		flush();
+		echo '<h4>'.T_('Creating folders/files backup...').'</h4>';
+		evo_flush();
 
 		// Find included and excluded files
 
@@ -312,21 +312,26 @@ class Backup
 
 			$PclZip = new PclZip( $zip_filepath );
 
-			echo sprintf( T_( 'Archiving files to &laquo;<strong>%s</strong>&raquo;...' ), $zip_filepath ).'<br/>';
-			flush();
+			echo sprintf( T_('Archiving files to &laquo;<strong>%s</strong>&raquo;...'), $zip_filepath ).'<br/>';
+			evo_flush();
 
 			foreach( $included_files as $included_file )
 			{
-				echo sprintf( T_( 'Backing up &laquo;<strong>%s</strong>&raquo; ...' ), $basepath.$included_file ).'<br/>';
-				flush();
+				echo sprintf( T_('Backing up &laquo;<strong>%s</strong>&raquo; ...'), $basepath.$included_file );
+				evo_flush();
 
 				$file_list = $PclZip->add( no_trailing_slash( $basepath.$included_file ), PCLZIP_OPT_REMOVE_PATH, no_trailing_slash( $basepath ) );
-				if ($file_list == 0)
+				if( $file_list == 0 )
 				{
-					echo '<p style="color:red">'.sprintf( T_( 'Unable to create &laquo;%s&raquo;' ), $zip_filepath ).'</p>';
-	    			flush();
+					echo '<p style="color:red">'.sprintf( T_('Unable to create &laquo;%s&raquo;'), $zip_filepath ).'</p>';
+					evo_flush();
 
 					return false;
+				}
+				else
+				{
+					echo ' OK.<br />';
+					evo_flush();
 				}
 			}
 		}
@@ -352,8 +357,8 @@ class Backup
 	{
 		global $DB, $db_config, $backup_tables, $inc_path;
 
-		echo '<h4>'.T_( 'Creating database backup...' ).'</h4>';
-		flush();
+		echo '<h4>'.T_('Creating database backup...').'</h4>';
+		evo_flush();
 
 		// Collect all included tables
 		$ready_to_backup = array();
@@ -411,8 +416,8 @@ class Backup
 		// Check if backup file exists
 		if( file_exists( $backup_sql_filepath ) )
 		{	// Stop tables backup, because backup file exists
-			echo '<p style="color:red">'.sprintf( T_( 'Unable to write database dump. Database dump already exists: &laquo;%s&raquo;' ), $backup_sql_filepath ).'</p>';
-			flush();
+			echo '<p style="color:red">'.sprintf( T_('Unable to write database dump. Database dump already exists: &laquo;%s&raquo;'), $backup_sql_filepath ).'</p>';
+			evo_flush();
 
 			return false;
 		}
@@ -420,21 +425,21 @@ class Backup
 		$f = @fopen( $backup_sql_filepath , 'w+' );
 		if( $f == false )
 		{	// Stop backup, because it can't open backup file for writing
-			echo '<p style="color:red">'.sprintf( T_( 'Unable to write database dump. Could not open &laquo;%s&raquo; for writing.' ), $backup_sql_filepath ).'</p>';
-			flush();
+			echo '<p style="color:red">'.sprintf( T_('Unable to write database dump. Could not open &laquo;%s&raquo; for writing.'), $backup_sql_filepath ).'</p>';
+			evo_flush();
 
 			return false;
 		}
 
-		echo sprintf( T_( 'Dumping tables to &laquo;<strong>%s</strong>&raquo;...' ), $backup_sql_filepath ).'<br/>';
-		flush();
+		echo sprintf( T_('Dumping tables to &laquo;<strong>%s</strong>&raquo;...'), $backup_sql_filepath ).'<br/>';
+		evo_flush();
 
 		// Create and save created SQL backup script
 		foreach( $ready_to_backup as $table )
 		{
 			// progressive display of what backup is doing
-			echo sprintf( T_( 'Backing up table &laquo;<strong>%s</strong>&raquo; ...' ), $table ).'<br/>';
-			flush();
+			echo sprintf( T_('Backing up table &laquo;<strong>%s</strong>&raquo; ...'), $table );
+			evo_flush();
 
 			$row_table_data = $DB->get_row( 'SHOW CREATE TABLE '.$table, ARRAY_N );
 			fwrite( $f, $row_table_data[1].";\n\n" );
@@ -446,23 +451,22 @@ class Backup
 				$num_fields = count( $row );
 				for( $index = 0; $index < $num_fields; $index++ )
 				{
-					$row[$index] = str_replace("\n","\\n", addslashes( $row[$index] ) );
-
-	            	if ( isset($row[$index]) )
-	            	{
+					if( isset( $row[$index] ) )
+					{
+						$row[$index] = str_replace("\n","\\n", addslashes( $row[$index] ) );
 						$values .= '\''.$row[$index].'\'' ;
 					}
 					else
-					{
-						$values .= '\'\'';
+					{ // The $row[$index] value is not set or is NULL
+						$values .= 'NULL';
 					}
 
-					if ( $index<( $num_fields-1 ) )
+					if( $index<( $num_fields-1 ) )
 					{
 						$values .= ',';
 					}
-	            }
-	            $values_list[] = $values.')';
+				}
+				$values_list[] = $values.')';
 			}
 
 			if( !empty( $values_list ) )
@@ -473,7 +477,12 @@ class Backup
 			unset( $values_list );
 
 			// Flush the output to a file
-			fflush( $f );
+			if( fflush( $f ) )
+			{
+				echo ' OK.';
+			}
+			echo '<br />';
+			evo_flush();
 		}
 
 		// Close backup file input stream
@@ -491,10 +500,10 @@ class Backup
 			$PclZip = new PclZip( $zip_filepath );
 
 			$file_list = $PclZip->add( $backup_dirpath.$backup_sql_filename, PCLZIP_OPT_REMOVE_PATH, no_trailing_slash( $backup_dirpath ) );
-			if ($file_list == 0)
+			if( $file_list == 0 )
 			{
-				echo '<p style="color:red">'.sprintf( T_( 'Unable to create &laquo;%s&raquo;' ), $zip_filepath ).'</p>';
-	    		flush();
+				echo '<p style="color:red">'.sprintf( T_('Unable to create &laquo;%s&raquo;'), $zip_filepath ).'</p>';
+				evo_flush();
 
 				return false;
 			}
@@ -516,19 +525,25 @@ class Backup
 	{
 		if( is_dir( $src ) )
 		{
-			$dir = opendir( $src );
-			@mkdir( $dest );
+			if( ! ( $dir = opendir( $src ) ) )
+			{
+				return false;
+			}
+			if( ! evo_mkdir( $dest ) )
+			{
+				return false;
+			}
 			while( false !== ( $file = readdir( $dir ) ) )
 			{
-				if ( ( $file != '.' ) && ( $file != '..' ) )
+				if( ( $file != '.' ) && ( $file != '..' ) )
 				{
 					$srcfile = $src.'/'.$file;
-					if ( is_dir( $srcfile ) )
+					if( is_dir( $srcfile ) )
 					{
 						if( $root )
 						{ // progressive display of what backup is doing
-							echo sprintf( T_( 'Backing up &laquo;<strong>%s</strong>&raquo; ...' ), $srcfile ).'<br/>';
-							flush();
+							echo sprintf( T_('Backing up &laquo;<strong>%s</strong>&raquo; ...'), $srcfile ).'<br/>';
+							evo_flush();
 						}
 						$this->recurse_copy( $srcfile, $dest . '/' . $file, false );
 					}
@@ -602,11 +617,4 @@ class Backup
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.11  2013/11/06 08:04:25  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

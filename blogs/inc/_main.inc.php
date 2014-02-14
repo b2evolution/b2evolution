@@ -112,8 +112,10 @@ $skinfaktory_links = array( '' => array( array( 73, 'http://evofactory.com/', ar
 												);
 
 
-// Move user to suspect group by IP address
-antispam_suspect_user();
+if( ! $is_cli )
+{ // Move user to suspect group by IP address
+	antispam_suspect_user();
+}
 
 
 $Timer->pause( '_MAIN.inc' );

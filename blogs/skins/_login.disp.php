@@ -25,7 +25,7 @@ if( is_logged_in() )
 
 $login = param( $dummy_fields[ 'login' ], 'string', '' );
 $action = param( 'action', 'string', '' );
-$redirect_to = param( 'redirect_to', 'string', '' );
+$redirect_to = param( 'redirect_to', 'url', '' );
 $source = param( 'source', 'string', 'inskin login form' );
 $login_required = ( $action == 'req_login' );
 
@@ -47,17 +47,10 @@ $params = array(
 
 display_login_form( $params );
 
-echo '<div class="notes" style="margin: 1em"><a href="'.$secure_htsrv_url.'login.php?source='.rawurlencode($source).'&redirect_to='.$redirect_to.'">'.T_( 'Use standard login form instead').' &raquo;</a></div>';
+echo '<div class="notes" style="margin: 1em"><a href="'.$secure_htsrv_url.'login.php?source='.rawurlencode($source).'&redirect_to='.rawurlencode( $redirect_to ).'">'.T_( 'Use standard login form instead').' &raquo;</a></div>';
 
 echo '<div class="form_footer_notes">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
 
 echo '<div class="clear"></div>';
 
-
-/*
- * $Log$
- * Revision 1.23  2013/11/06 08:05:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

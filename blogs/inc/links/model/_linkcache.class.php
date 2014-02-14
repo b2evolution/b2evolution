@@ -516,12 +516,51 @@ class LinkCache extends DataObjectCache
 			$FileCache->load_where( 'file_ID IN ( '.implode( ',', $link_file_ids ).' )' );
 		}
 	}
+
+
+	/**
+	 * Clear the cache **extensively**
+	 *
+	 * @param boolean Keep copy of cache in case we try to re instantiate previous object
+	 * @param string What to clear: 'all', 'user', 'item', 'comment', 'file'
+	 * @param integer ID of the clearing object
+	 */
+	function clear( $keep_shadow = false, $object = 'all', $object_ID = 0 )
+	{
+		parent::clear( $keep_shadow );
+
+		switch( $object )
+		{
+			case 'all':
+				// Clear all cached objects
+				$this->cache_item = array();
+				$this->loaded_cache_item = array();
+				$this->cache_comment = array();
+				$this->loaded_cache_comment = array();
+				$this->cache_user = array();
+				$this->loaded_cache_user = array();
+				$this->cache_file = array();
+				$this->loaded_cache_file = array();
+				break;
+
+			case 'item':
+			case 'comment':
+			case 'user':
+			case 'file':
+				// Clear only the selected type of objects
+				if( empty( $object_ID ) )
+				{ // Clear all cached objects of this type
+					$this->{'cache_'.$object} = array();
+					$this->{'loaded_cache_'.$object} = array();
+				}
+				else
+				{ // Clear a cache only one object
+					unset( $this->{'cache_'.$object}[ $object_ID ] );
+					unset( $this->{'loaded_cache_'.$object}[ $object_ID ] );
+				}
+				break;
+		}
+	}
 }
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:04:24  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

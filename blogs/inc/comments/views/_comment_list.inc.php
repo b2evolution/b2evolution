@@ -37,7 +37,7 @@ global $current_User;
 global $dispatcher;
 
 // If rediret_to was not set, create new redirect
-$redirect_to = param( 'redirect_to', 'string', regenerate_url( '', 'filter=restore', '', '&' ) );
+$redirect_to = param( 'redirect_to', 'url', regenerate_url( '', 'filter=restore', '', '&' ) );
 $redirect_to = rawurlencode( $redirect_to );
 $save_context = param( 'save_context', 'boolean', 'true' );
 $show_comments = param( 'show_comments', 'string', 'all' );
@@ -66,10 +66,4 @@ if( ( $item_id != 0 ) && ( $comments_number > 0 ) )
 	echo_pages( $item_id, $currentpage, $comments_number );
 }
 
-/*
- * $Log$
- * Revision 1.24  2013/11/06 08:04:07  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

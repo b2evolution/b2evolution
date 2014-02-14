@@ -1,12 +1,12 @@
 <?php
 /**
  * This file implements the LinkComment class, which is a wrapper class for Comment class to handle linked files.
- * 
+ *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
  * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
- * 
+ *
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
@@ -39,8 +39,8 @@ class LinkComment extends LinkOwner
 		$this->_trans = array(
 			'Link this image to your owner' => NT_( 'Link this image to your comment' ),
 			'Link this file to your owner' => NT_( 'Link this file to your comment'),
-			'The file will be appended for download at the end of the owner' => NT_( 'The file will be appended for download at the end of the comment' ),
-			'Insert the following code snippet into your owner' => NT_( 'Insert the following code snippet into your comment' ),
+			'The file will be linked for download at the end of the owner' => NT_( 'The file will be linked for download at the end of the comment.' ),
+			'Insert the following code snippet into your owner' => NT_( 'Insert the following code snippet into your comment.' ),
 			'View this owner...' => NT_( 'View this comment...' ),
 			'Edit this owner...' => NT_( 'Edit this comment...' ),
 			'Click on link %s icons below to link additional files to $ownerTitle$.' => NT_( 'Click on link %s icons below to link additional files to <strong>Comment</strong>.' ),
@@ -52,7 +52,7 @@ class LinkComment extends LinkOwner
 
 	/**
 	 * Check current User Comment permissions
-	 * 
+	 *
 	 * @param string permission level
 	 * @param boolean true to assert if user dosn't have the required permission
 	 */
@@ -66,7 +66,7 @@ class LinkComment extends LinkOwner
 
 	/**
 	 * Get all positions ( key, display name ) pairs where link can be displayed
-	 * 
+	 *
 	 * @return array
 	 */
 	function get_positions()
@@ -92,7 +92,7 @@ class LinkComment extends LinkOwner
 
 	/**
 	 * Add new link to owner Comment
-	 * 
+	 *
 	 * @param integer file ID
 	 * @param integer link position ( 'teaser', 'aftermore' )
 	 * @param int order of the link
@@ -131,7 +131,7 @@ class LinkComment extends LinkOwner
 
 	/**
 	 * Get Comment parameter
-	 * 
+	 *
 	 * @param string parameter name to get
 	 */
 	function get( $parname )
@@ -151,7 +151,8 @@ class LinkComment extends LinkOwner
 	 */
 	function get_edit_url()
 	{
-		return '?ctrl=comments&amp;comment_ID='.$this->Comment->ID;
+		$this->load_Blog();
+		return '?ctrl=comments&amp;blog='.$this->Blog->ID.'&amp;action=edit&amp;comment_ID='.$this->Comment->ID;
 	}
 
 	/**

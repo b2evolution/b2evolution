@@ -77,9 +77,9 @@ while( $Item = & $ItemList->get_item() )
 		$edit_slug_link = '&nbsp;'.action_icon( T_('Edit slugs...'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID );
 	}
 
-	$Form->text( 'mass_title_'.$Item->ID , $Item->get( 'title' ), 70, T_('Title'), '', 255 );
+	$Form->text( 'mass_title_'.$Item->ID , htmlspecialchars_decode( $Item->get( 'title' ) ), 70, T_('Title'), '', 255 );
 	$Form->text( 'mass_urltitle_'.$Item->ID, $Item->get_slugs(), 70, T_('URL slugs').$edit_slug_link, '', 255 );
-	$Form->text( 'mass_titletag_'.$Item->ID, $Item->get( 'titletag' ), 70, T_( htmlspecialchars('<title> tag') ), '', 255 );
+	$Form->text( 'mass_titletag_'.$Item->ID, $Item->get( 'titletag' ), 70, htmlspecialchars( T_('<title> tag') ), '', 255 );
 
 	$Form->end_fieldset();
 }
@@ -90,11 +90,4 @@ $Form->buttons( array(array('submit', 'actionArray[mass_save]', T_('Save changes
 
 $Form->end_form();
 
-
-/*
- * $Log$
- * Revision 1.5  2013/11/06 08:04:24  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

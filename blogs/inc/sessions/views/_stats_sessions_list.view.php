@@ -119,22 +119,10 @@ $Results->cols[] = array(
 					);
 
 // Get additional columns from the Plugins
-$plugin_params = array(
-		'table'  => 'sessions',
-		'column' => 'sess_ipaddress'
-	);
-$Plugins->restart();
-while( $loop_Plugin = & $Plugins->get_next() )
-{
-	$columns = $loop_Plugin->GetAdditionalColumnsTable( $plugin_params );
-	if( !empty( $columns ) && is_array( $columns ) )
-	{
-		foreach( $columns as $column )
-		{
-			$Results->cols[] = $column;
-		}
-	}
-}
+$Plugins->trigger_event( 'GetAdditionalColumnsTable', array(
+	'table'   => 'sessions',
+	'column'  => 'sess_ipaddress',
+	'Results' => $Results ) );
 
 function display_sess_length( $sess_ID, $sess_length )
 {
@@ -181,10 +169,4 @@ $Results->display();
 // End payload block:
 $this->disp_payload_end();
 
-/*
- * $Log$
- * Revision 1.14  2013/11/06 08:04:45  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

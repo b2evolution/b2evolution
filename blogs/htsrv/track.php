@@ -68,7 +68,7 @@ if( !empty($Goal->goal_redir_url) )
 	// TODO: dh> str_repeat won't be enough (when gzipped), see http://core.trac.wordpress.org/ticket/8942
 	//           should be probably a more general function and get used in e.g. bad_request_die(), too (if necessary)
 	echo str_repeat( ' ', 1024 );
-	flush();
+	evo_flush();
 	// At this point Firefox 2 will redirect without waiting for the end of the page, but IE7 will not :/
 }
 else
@@ -80,7 +80,7 @@ else
 	header('Content-Length: '.filesize( $blank_gif ) );
 	header_nocache();
 	readfile( $blank_gif );
-	flush();
+	evo_flush();
 }
 
 // We need to log the HIT now! Because we need the hit ID!
@@ -102,12 +102,4 @@ $sql = 'INSERT INTO T_track__goalhit( ghit_goal_ID, ghit_hit_ID, ghit_params )
 				VALUES( '.$Goal->goal_ID.', '.$Hit->ID.', '.$DB->quote($extra_params).' )';
 $DB->query( $sql );
 
-
-
-/*
- * $Log$
- * Revision 1.13  2013/11/06 08:03:44  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

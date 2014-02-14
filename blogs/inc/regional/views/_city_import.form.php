@@ -58,11 +58,4 @@ $Form->begin_form( 'fform', T_('Import cities') );
 $Form->end_form( array( array( 'submit', 'actionArray[import]', T_('Import'), 'SaveButton' ),
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
-
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:04:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

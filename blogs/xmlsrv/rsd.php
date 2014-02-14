@@ -70,12 +70,3 @@ echo '<?xml version="1.0" encoding="UTF-8"?'.'>';
 	  </apis>
 	</service>
 </rsd>
-<?php
-
-/*
- * $Log$
- * Revision 1.9  2013/11/06 09:09:31  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
-?>

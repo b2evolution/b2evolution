@@ -47,6 +47,18 @@ class evopress_Skin extends Skin
 	function get_param_definitions( $params )
 	{
 		$r = array_merge( array(
+				'head_bg_color_top' => array(
+					'label' => T_('Header gradient top color'),
+					'note' => T_('E-g: #ff0000 for red'),
+					'defaultvalue' => '#6aace6',
+					'type' => 'color',
+				),
+				'head_bg_color_bottom' => array(
+					'label' => T_('Header gradient bottom color'),
+					'note' => T_('E-g: #00ff00 for green'),
+					'defaultvalue' => '#4280b6',
+					'type' => 'color',
+				),
 				'display_post_date' => array(
 					'label' => T_('Post date'),
 					'note' => T_('Display the date of each post'),
@@ -106,6 +118,31 @@ class evopress_Skin extends Skin
 		require_css( 'item.css', 'relative' );
 		require_css( 'style.css', 'relative' );
 
+		// Add custom CSS:
+		$custom_css = '';
+
+		$head_bg_color_top = $this->get_setting( 'head_bg_color_top' );
+		$head_bg_color_bottom = $this->get_setting( 'head_bg_color_bottom' );
+		if( !empty( $head_bg_color_top ) && !empty( $head_bg_color_bottom ) )
+		{ // Custom Header background color:
+			$custom_css .= '#headerimg {'."\n"
+					.'background:-webkit-linear-gradient(top, '.$head_bg_color_top.', '.$head_bg_color_bottom.');'."\n"
+					.'background:-moz-linear-gradient(top, '.$head_bg_color_top.', '.$head_bg_color_bottom.');'."\n"
+					.'background:-o-linear-gradient(top, '.$head_bg_color_top.', '.$head_bg_color_bottom.');'."\n"
+					.'background: -ms-linear-gradient(top, '.$head_bg_color_top.', '.$head_bg_color_bottom.');'."\n"
+					.'filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=\''.$head_bg_color_top.'\', endColorstr=\''.$head_bg_color_bottom.'\');'."\n"
+				.'}'."\n";
+		}
+
+		if( !empty( $custom_css ) )
+		{
+			$custom_css = '<style type="text/css">
+	<!--
+'.$custom_css.'	-->
+	</style>';
+			add_headline( $custom_css );
+		}
+
 		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
 		if( $this->get_setting("colorbox") )
 		{
@@ -115,10 +152,4 @@ class evopress_Skin extends Skin
 
 }
 
-/*
- * $Log$
- * Revision 1.17  2013/11/06 08:05:43  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

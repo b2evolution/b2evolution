@@ -123,7 +123,7 @@ function newsletter_send()
 	$users = $DB->get_col( $SQL->get() );
 
 	echo sprintf( T_('Newsletter is sending for %s users...'), count( $users ) ).'<br /><br />';
-	flush();
+	evo_flush();
 
 	$email_newsletter_params = array(
 			'message' => $Session->get( 'newsletter_message' )
@@ -150,14 +150,8 @@ function newsletter_send()
 			echo '<span class="red">'.T_('Failed').'</span>';
 		}
 		echo '<br />';
-		flush();
+		evo_flush();
 	}
 }
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:04:35  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

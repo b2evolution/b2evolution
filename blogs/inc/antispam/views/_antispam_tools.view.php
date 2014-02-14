@@ -30,11 +30,4 @@ echo '<li><a href="'.regenerate_url('action,tool', 'tool=bankruptcy').'">'.T_('D
 echo '</ul>';
 $block_item_Widget->disp_template_raw( 'block_end' );
 
-
-/*
- * $Log$
- * Revision 1.3  2013/11/06 08:03:48  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

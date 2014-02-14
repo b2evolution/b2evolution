@@ -103,8 +103,10 @@ if( isset($collections_Module) )
 	{ // Try the memorized blog from the previous action:
 		$blog = $user_selected_blog;
 		if( ! ($Blog = & $BlogCache->get_by_ID( $blog, false, false ) ) )
-		{	// That one doesn't exist either...
+		{ // That one doesn't exist either...
 			$blog = 0;
+			// Unset $Blog because otherwise isset( $Blog ) returns true and it may cause issues later
+			unset( $Blog );
 		}
 	}
 	elseif( $blog != $user_selected_blog )

@@ -50,13 +50,13 @@ if( $mode != 'upload' )
 
 	$Results = new Results( $SQL->get(), 'link_' );
 
-	$view_link_title = $LinkOwner->T_( 'View this owner...' );
+	$view_link_title = $LinkOwner->translate( 'View this owner...' );
 	$Results->title = sprintf( T_('Files linked to &laquo;%s&raquo;'),
 					'<a href="'.$LinkOwner->get_view_url().'" title="'.$view_link_title.'">'.$LinkOwner->get( 'title' ).'</a>' );
 
 	if( $LinkOwner->check_perm( 'edit', false ) )
 	{
-		$Results->global_icon( $LinkOwner->T_( 'Edit this owner...' ), 'edit', $LinkOwner->get_edit_url(), T_('Edit') );
+		$Results->global_icon( $LinkOwner->translate( 'Edit this owner...' ), 'edit', $LinkOwner->get_edit_url(), T_('Edit') );
 	}
 
 	// Close link mode and continue in File Manager (remember the Item_ID though):
@@ -139,16 +139,8 @@ if( $mode != 'upload' )
 
 if( $LinkOwner->check_perm( 'edit' ) )
 {	// Check that we have permission to edit item:
-	echo '<div>', $LinkOwner->T_( 'Click on link %s icons below to link additional files to $ownerTitle$.',
+	echo '<div>', $LinkOwner->translate( 'Click on link %s icons below to link additional files to $ownerTitle$.',
 							get_icon( 'link', 'imgtag', array('class'=>'top') ) ), '</div>';
 }
 
-
-
-/*
- * $Log$
- * Revision 1.20  2013/11/06 08:04:15  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

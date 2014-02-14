@@ -29,7 +29,7 @@ global $row_stats;	// for hit functions
 
 $Form = new Form( NULL, 'antispam_ban', 'post', 'compact' );
 
-$redirect_to = param( 'redirect_to', 'string', NULL );
+$redirect_to = param( 'redirect_to', 'url', NULL );
 if( $redirect_to == NULL )
 {
 	$redirect_to = regenerate_url( 'action' );
@@ -265,10 +265,4 @@ $Form->begin_form( 'fform', T_('Add a banned keyword') );
 	 */
 $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveButton' ) ) );
 
-/*
- * $Log$
- * Revision 1.35  2013/11/06 08:03:48  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -138,11 +138,4 @@ if( !isset( $perm_name ) || $current_User->check_perm( $perm_name, $perm_level, 
 // $Results->display();
 $Results->display( NULL, $result_fadeout );
 
-
-/*
- * $Log$
- * Revision 1.10  2013/11/06 08:04:15  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -25,7 +25,7 @@ global $dispatcher, $flush_action;
 $Form = new Form();
 
 $Form->begin_form( 'fform', T_('phpBB Importer').' - '.T_('Step 7: Import messages') );
-flush();
+evo_flush();
 
 $Form->add_crumb( 'phpbb' );
 $Form->hidden_ctrl();
@@ -67,10 +67,4 @@ $Form->buttons( array( array( 'submit', 'submit', T_('Go to Forum'), 'SaveButton
 
 $Form->end_form();
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:04:55  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

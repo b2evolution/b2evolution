@@ -237,6 +237,8 @@ switch( $action )
 			$order_direction = 'ASC';
 		}
 
+		$DB->begin( 'SERIALIZABLE' );
+
 		// Get near field, We should exchange the order with this field
 		$switched_Userfield = $DB->get_row( 'SELECT ufdf_ID, ufdf_order
 			FROM T_users__fielddefs
@@ -247,24 +249,33 @@ switch( $action )
 
 		if( is_null( $switched_Userfield ) )
 		{	// Current field is first or last in group, no change ordering
+			$DB->commit(); // This is required only to not leave open transaction
 			break;
 		}
 
-		$DB->begin();
-
 		// Updare order of editing field
-		$DB->query( 'UPDATE T_users__fielddefs
+		$result = $DB->query( 'UPDATE T_users__fielddefs
 			SET ufdf_order = '.$switched_Userfield->ufdf_order.'
 			WHERE ufdf_ID = '.$edited_Userfield->ID );
 
 		// Update order of near field
-		$DB->query( 'UPDATE T_users__fielddefs
+		$result = ( $result !== false ) && $DB->query( 'UPDATE T_users__fielddefs
 			SET ufdf_order = '.$edited_Userfield->order.'
 			WHERE ufdf_ID = '.$switched_Userfield->ufdf_ID );
 
-		$DB->commit();
+		if( $result !== false )
+		{ // Update was successful
+			$DB->commit();
+			$Messages->add( T_('Order has been changed.'), 'success' );
+		}
+		else
+		{ // Couldn't update successfully, probably because of concurrent modification
+			// Note: In this case we may try again to execute the same queries.
+			$DB->rollback();
+			// The message is not localized because it may appear very rarely
+			$Messages->add( 'Order could not be changed. Please try again.', 'error' );
+		}
 
-		$Messages->add( 'Order is changed.', 'success' );
 		break;
 
 }
@@ -323,19 +334,4 @@ $AdminUI->disp_payload_end();
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-/*
- * $ Log: userfields.ctrl.php,v $
- * Revision 1.5  2009/09/16 18:29:35  fplanque
- * doc
- *
- * Revision 1.4  2009/09/16 18:27:19  fplanque
- * Readded with -kkv option
- *
- * efy-sergey
- *
- * Revision 1.1  2009/09/11 18:34:06  fplanque
- * userfields editing module.
- * needs further cleanup but I think it works.
- *
- */
 ?>

@@ -25,7 +25,7 @@ global $phpbb_db_config, $dispatcher;
 $Form = new Form();
 
 $Form->begin_form( 'fform', T_('phpBB Importer').' - '.T_('Step 2: User group mapping') );
-flush();
+evo_flush();
 
 $Form->add_crumb( 'phpbb' );
 $Form->hidden_ctrl();
@@ -101,10 +101,4 @@ $Form->buttons( array( array( 'submit', 'submit', T_('Continue !'), 'SaveButton'
 
 $Form->end_form();
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:04:55  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

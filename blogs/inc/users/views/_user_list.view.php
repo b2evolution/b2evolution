@@ -310,6 +310,7 @@ function user_reg_country( $user_ID, $country_code, $country_name )
 }
 $UserList->cols[] = array(
 					'th' => T_('RC'),
+					'th_title' => T_('Registration country'),
 					'th_class' => 'shrinkwrap small',
 					'td_class' => 'shrinkwrap small',
 					'order' => 'rc.ctry_name',
@@ -470,10 +471,4 @@ if( $current_User->check_perm( 'users', 'edit' ) && $UserList->result_num_rows >
 
 load_funcs( 'users/model/_user_js.funcs.php' );
 
-/*
- * $Log$
- * Revision 1.47  2013/11/06 09:09:09  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

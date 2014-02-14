@@ -113,7 +113,7 @@ class custom_Skin extends Skin
 		require_css( 'item_base.css', 'blog' ); // Default styles for the post CONTENT
 
 		// Make sure standard CSS is called ahead of custom CSS generated below:
-		require_css( 'style.css', true );
+		require_css( 'style.css', 'relative' );
 
 		// Add custom CSS:
 		$custom_css = '';
@@ -138,7 +138,7 @@ class custom_Skin extends Skin
 		}
 
 		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
-		if($this->get_setting("colorbox")) 
+		if($this->get_setting("colorbox"))
 		{
 			require_js_helper( 'colorbox', 'blog' );
 		}
@@ -146,10 +146,4 @@ class custom_Skin extends Skin
 
 }
 
-/*
- * $Log$
- * Revision 1.19  2013/11/06 09:09:14  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

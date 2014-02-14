@@ -23,11 +23,3 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <h3>Hello world!</h3>
 <p>This is a custom disp mode provided by the test plugin.</p>
 <p>You can customise this file by copying it to your skins folder!</p>
-<?php
-/*
- * $Log$
- * Revision 1.3  2013/11/06 08:05:23  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
-?>

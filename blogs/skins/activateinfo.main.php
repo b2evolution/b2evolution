@@ -30,7 +30,7 @@ if( !$current_User->check_status( 'can_be_validated' ) )
 		$redirect_to = $Session->get( 'core.validatemail.redirect_to' );
 		if( empty( $redirect_to ) )
 		{ // Session param is empty try to get general redirect_to param
-			$redirect_to = param( 'redirect_to', 'string', '' );
+			$redirect_to = param( 'redirect_to', 'url', '' );
 		}
 		else
 		{ // cleanup validateemail.redirect_to param from session

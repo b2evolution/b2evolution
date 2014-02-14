@@ -10,7 +10,7 @@
  * @author tblue246 (Tilman BLUMENBACH)
  * @author waltercruz
  *
- * @see http://manual.b2evolution.net/MovableType_API
+ * @see http://b2evolution.net/man/movabletype-api
  *
  * @package xmlsrv
  *
@@ -243,7 +243,7 @@ function mt_publishPost($m)
 		return xmlrpcs_resperror();
 	}
 	logIO( 'mt_publishPost: Login OK' );
-	
+
 	// GET POST:
 	/**
 	 * @var Item
@@ -272,7 +272,7 @@ function mt_publishPost($m)
 
 	// Execute or schedule notifications & pings:
 	logIO( 'mt_publishPost: Handling notifications...' );
-	$edited_Item->handle_post_processing( false );
+	$edited_Item->handle_post_processing( false, false );
 
 	logIO( 'mt_publishPost: OK.' );
 
@@ -316,11 +316,4 @@ $xmlrpc_procs['mt.publishPost'] = array(
 	http://www.sixapart.com/developers/xmlrpc/movable_type_api/
 */
 
-
-/*
- * $Log$
- * Revision 1.16  2013/11/06 08:05:10  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

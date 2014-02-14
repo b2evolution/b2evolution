@@ -43,7 +43,7 @@ $required_php_version[ '_core' ] = '5.0';
 /**
  * Minimum MYSQL version required for _core module to function properly.
  */
-$required_mysql_version[ '_core' ] = '4.1';
+$required_mysql_version[ '_core' ] = '5.0.3';
 
 /**
  * Aliases for table names:
@@ -231,16 +231,22 @@ function & get_CurrencyCache()
 /**
  * Get the GroupCache
  *
+ * @param boolean TRUE to ignore cached object and create new cache object
+ * @param string The text that gets used for the "None" option in the objects options list (Default: T_('No group')).
  * @return GroupCache
  */
-function & get_GroupCache()
+function & get_GroupCache( $force_cache = false, $allow_none_text = NULL )
 {
 	global $Plugins;
 	global $GroupCache;
 
-	if( ! isset( $GroupCache ) )
-	{	// Cache doesn't exist yet:
-		$Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', 'new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\', \'\', T_(\'No group\') )' );
+	if( $force_cache || ! isset( $GroupCache ) )
+	{ // Cache doesn't exist yet:
+		if( is_null( $allow_none_text ) )
+		{ // Set default value for "None" option
+			$allow_none_text = T_('No group');
+		}
+		$Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', 'new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\', \'\', \''.str_replace( "'", "\'", $allow_none_text ).'\' )' );
 	}
 
 	return $GroupCache;
@@ -509,6 +515,7 @@ class _core_Module extends Module
 			'comment_subscription_notif' => $def_notification,
 			'comment_moderation_notif' => $def_notification,
 			'post_subscription_notif' => $def_notification,
+			'post_moderation_notif' => $def_notification,
 		 );
 	}
 
@@ -643,6 +650,9 @@ class _core_Module extends Module
 				),
 			'post_subscription_notif' => array_merge(
 				array( 'label' => T_( 'New Post subscription notifications' ) ), $notifications_array
+				),
+			'post_moderation_notif' => array_merge(
+				array( 'label' => T_( 'New Post moderation notifications' ) ), $notifications_array
 				),
 			);
 		return $permissions;
@@ -1076,6 +1086,10 @@ class _core_Module extends Module
 
 					if( $perm_options )
 					{	// If we have access to options, then we add a submenu:
+						$entries['tools']['entries']['antispam']['entries']['ipranges'] = array(
+								'text' => T_('IP Ranges').'&hellip;',
+								'href' => $admin_url.'?ctrl=antispam&amp;tab3=ipranges' );
+
 						$entries['tools']['entries']['antispam']['entries']['settings'] = array(
 								'text' => T_('Settings').'&hellip;',
 								'href' => $admin_url.'?ctrl=antispam&amp;tab3=settings' );
@@ -1086,9 +1100,6 @@ class _core_Module extends Module
 									'text' => T_('Tools').'&hellip;',
 									'href' => $admin_url.'?ctrl=antispam&amp;tab3=tools' );
 						}
-						$entries['tools']['entries']['antispam']['entries']['ipranges'] = array(
-								'text' => T_('IP Ranges').'&hellip;',
-								'href' => $admin_url.'?ctrl=antispam&amp;tab3=ipranges' );
 					}
 				}
 
@@ -1446,6 +1457,11 @@ class _core_Module extends Module
 					if( $perm_options )
 					{	// If we have access to options, then we add a submenu:
 						$AdminUI->add_menu_entries( array( 'options', 'antispam' ), array(
+							'ipranges' => array(
+								'text' => T_('IP Ranges'),
+								'href' => '?ctrl=antispam&amp;tab3=ipranges' ) ) );
+
+						$AdminUI->add_menu_entries( array( 'options', 'antispam' ), array(
 							'settings' => array(
 								'text' => T_('Settings'),
 								'href' => '?ctrl=antispam&amp;tab3=settings' ) ) );
@@ -1457,10 +1473,6 @@ class _core_Module extends Module
 									'text' => T_('Tools'),
 									'href' => '?ctrl=antispam&amp;tab3=tools' ) ) );
 						}
-						$AdminUI->add_menu_entries( array( 'options', 'antispam' ), array(
-							'ipranges' => array(
-								'text' => T_('IP Ranges'),
-								'href' => '?ctrl=antispam&amp;tab3=ipranges' ) ) );
 					}
 				}
 
@@ -1530,11 +1542,4 @@ class _core_Module extends Module
 
 $_core_Module = new _core_Module();
 
-
-/*
- * $Log$
- * Revision 1.97  2013/11/06 09:08:46  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

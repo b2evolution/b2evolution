@@ -97,7 +97,7 @@ else
 
 $Results = new Results( $SQL->get(), 'ghits_', '--D', $UserSettings->get( 'results_per_page' ), $SQL_count->get() );
 
-$Results->title = T_('Recent goal hits');
+$Results->title = T_('Recent goal hits').get_manual_link( 'goal-hits' );
 
 /**
  * Callback to add filters on top of the result set
@@ -181,10 +181,4 @@ $Results->cols[] = array(
 // Display results:
 $Results->display();
 
-/*
- * $Log$
- * Revision 1.13  2013/11/06 08:04:45  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

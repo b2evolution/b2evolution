@@ -8,7 +8,7 @@
  *
  * @author tor
  *
- * @see http://manual.b2evolution.net/MetaWeblog_API
+ * @see http://b2evolution.net/man/metaweblog-api
  * @see http://www.xmlrpc.com/metaWeblogApi
  *
  * @package xmlsrv
@@ -595,11 +595,4 @@ $xmlrpc_procs['metaWeblog.getUsersBlogs'] = array(
 				'signature' => $mwgetusersblogs_sig,
 				'docstring' => $mwgetusersblogs_doc );
 
-
-/*
- * $Log$
- * Revision 1.34  2013/11/06 08:05:10  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

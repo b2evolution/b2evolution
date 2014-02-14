@@ -45,7 +45,7 @@ if( ! $current_User->check_perm( 'blogs', 'view' ) )
 		. ' AND bloguser_user_ID = ' . $current_User->ID . ' )'
 		. ' LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0'
 		. ' AND blog_ID = bloggroup_blog_ID'
-		. ' AND bloggroup_group_ID = ' . $current_User->group_ID . ' )' );
+		. ' AND bloggroup_group_ID = ' . $current_User->grp_ID . ' )' );
 	$SQL->WHERE( 'blog_owner_user_ID = ' . $current_User->ID
 		. ' OR bloguser_ismember <> 0'
 		. ' OR bloggroup_ismember <> 0' );
@@ -73,11 +73,4 @@ blogs_results( $Results );
 
 $Results->display( NULL, 'session' );
 
-
-/*
- * $Log$
- * Revision 1.18  2013/11/06 08:03:58  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

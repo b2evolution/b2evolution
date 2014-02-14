@@ -98,7 +98,7 @@ class archives_plugin extends Plugin
 	 */
 	function SkinTag( $params )
 	{
-	 	global $month;
+		global $month;
 
 		/**
 		 * @todo get rid of this global:
@@ -114,6 +114,9 @@ class archives_plugin extends Plugin
 		{
 			return false;
 		}
+
+		// Prefix of the ItemList object
+		$itemlist_prefix = isset( $params['itemlist_prefix'] ) ? $params['itemlist_prefix'] : '';
 
 		/**
 		 * Default params:
@@ -142,7 +145,7 @@ class archives_plugin extends Plugin
 
 		// Link type:
 		if(!isset($params['link_type'])) $params['link_type'] = 'canonic';
-		if(!isset($params['context_isolation'])) $params['context_isolation'] = 'm,w,p,title,unit,dstart';
+		if(!isset($params['context_isolation'])) $params['context_isolation'] = $itemlist_prefix.'m,'.$itemlist_prefix.'w,'.$itemlist_prefix.'p,'.$itemlist_prefix.'title,'.$itemlist_prefix.'unit,'.$itemlist_prefix.'dstart';
 
 		// Add form fields?:
 		if(!isset($params['form']))
@@ -193,7 +196,7 @@ class archives_plugin extends Plugin
 
 					if( $params['form'] )
 					{ // We want a radio button:
-						echo '<input type="radio" name="m" value="'.$arc_m.'" class="checkbox"';
+						echo '<input type="radio" name="'.$itemlist_prefix.'m" value="'.$arc_m.'" class="checkbox"';
 						if( $m == $arc_m ) echo ' checked="checked"' ;
 						echo ' /> ';
 					}
@@ -202,7 +205,7 @@ class archives_plugin extends Plugin
 
 					if( $params['link_type'] == 'context' )
 					{	// We want to preserve current browsing context:
-						echo '<a rel="nofollow" href="'.regenerate_url( $params['context_isolation'], 'm='.$arc_m ).'">'.$text.'</a>';
+						echo '<a rel="nofollow" href="'.regenerate_url( $params['context_isolation'], $itemlist_prefix.'m='.$arc_m ).'">'.$text.'</a>';
 					}
 					else
 					{	// We want to link to the absolute canonical URL for this archive:
@@ -218,7 +221,7 @@ class archives_plugin extends Plugin
 
 					if( $params['form'] )
 					{ // We want a radio button:
-						echo '<input type="radio" name="m" value="'. $arc_m. '" class="checkbox"';
+						echo '<input type="radio" name="'.$itemlist_prefix.'m" value="'. $arc_m. '" class="checkbox"';
 						if( $m == $arc_m ) echo ' checked="checked"' ;
 						echo ' /> ';
 					}
@@ -227,7 +230,7 @@ class archives_plugin extends Plugin
 
 					if( $params['link_type'] == 'context' )
 					{	// We want to preserve current browsing context:
-						echo '<a rel="nofollow" href="'.regenerate_url( $params['context_isolation'], 'm='.$arc_m ).'">'.$text.'</a>';
+						echo '<a rel="nofollow" href="'.regenerate_url( $params['context_isolation'], $itemlist_prefix.'m='.$arc_m ).'">'.$text.'</a>';
 					}
 					else
 					{	// We want to link to the absolute canonical URL for this archive:
@@ -244,7 +247,7 @@ class archives_plugin extends Plugin
 
 					if( $params['link_type'] == 'context' )
 					{	// We want to preserve current browsing context:
-						echo '<a rel="nofollow" href="'.regenerate_url( $params['context_isolation'], 'm='.$arc_year.'&amp;w='.$arc_w ).'">'.$text.'</a>';
+						echo '<a rel="nofollow" href="'.regenerate_url( $params['context_isolation'], $itemlist_prefix.'m='.$arc_year.'&amp;'.$itemlist_prefix.'w='.$arc_w ).'">'.$text.'</a>';
 					}
 					else
 					{	// We want to link to the absolute canonical URL for this archive:
@@ -635,13 +638,4 @@ class ArchiveList extends Results
 	}
 }
 
-
-
-
-/*
- * $Log$
- * Revision 1.68  2013/11/06 08:05:21  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

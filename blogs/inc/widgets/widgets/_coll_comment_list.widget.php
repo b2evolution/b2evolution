@@ -165,7 +165,12 @@ class coll_comment_list_Widget extends ComponentWidget
 
 		echo $this->disp_params[ 'list_start' ];
 
-    /**
+		if( empty( $this->disp_params[ 'author_link_text' ] ) )
+		{
+			$this->disp_params[ 'author_link_text' ] = 'login';
+		}
+
+		/**
 		 * @var Comment
 		 */
 		while( $Comment = & $CommentList->get_next() )
@@ -173,7 +178,7 @@ class coll_comment_list_Widget extends ComponentWidget
 			// Load comment's Item object:
 			$Comment->get_Item();
 			echo $this->disp_params[ 'item_start' ];
-			$Comment->author( '', ' ', '', ' ', 'htmlbody', $this->disp_params[ 'author_links' ] );
+			$Comment->author( '', ' ', '', ' ', 'htmlbody', $this->disp_params[ 'author_links' ], $this->disp_params[ 'author_link_text' ] );
 			echo T_( 'on ' );
 			$Comment->permanent_link( array(
 				'text'        => $Comment->Item->title,
@@ -188,11 +193,4 @@ class coll_comment_list_Widget extends ComponentWidget
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.21  2013/11/06 08:05:09  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

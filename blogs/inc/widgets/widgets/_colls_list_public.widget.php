@@ -150,11 +150,4 @@ class colls_list_public_Widget extends ComponentWidget
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.15  2013/11/06 08:05:09  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

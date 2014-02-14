@@ -133,7 +133,7 @@ $Form->begin_fieldset( T_('Settings to decode the returned emails').get_manual_l
 				T_('Body Terminator'), T_('Starting from any of these strings, everything will be ignored, including these strings.'), 50, 'large' );
 
 	$Form->textarea( 'repath_errtype', $Settings->get( 'repath_errtype' ), 15, T_('Error message decoding configuration'),
-				T_('The first letter means one of the following:<br />Spam suspicion<br />Permament error<br />Temporary error<br />Configuration error<br />Unknown error (default)<br />The next string after space is an error text, it is case-insensitive string.'), 50, 'large' );
+				T_('The first letter means one of the following:<br />S: Spam suspicion<br />P: Permament error<br />T: Temporary error<br />C: Configuration error<br />U: Unknown error (default)<br />The string after the space is a case-insensitive error text.'), 50, 'large' );
 
 $Form->end_fieldset();
 
@@ -153,7 +153,7 @@ $Form->begin_fieldset( T_( 'Email notifications' ).get_manual_link( 'email-notif
 		if( $custom_sender_email_count > 0 )
 		{ // There are users with custom sender email settings
 			$sender_email_remove_customization = sprintf( $remove_customization, url_add_param( $remove_customization_url, 'type=sender_email&redirect_to='.$redirect_to, '&' ) );
-			$notification_sender_email_note = '(!) '.sprintf( T_('<a href="%s">%d users</a> have different custom address'), url_add_param( $users_url, 'custom_sender_email=1', '&' ), $custom_sender_email_count ).$sender_email_remove_customization;
+			$notification_sender_email_note = get_icon( 'warning_yellow' ).' '.sprintf( T_('<a href="%s">%d users</a> have different custom address'), url_add_param( $users_url, 'custom_sender_email=1', '&' ), $custom_sender_email_count ).$sender_email_remove_customization;
 		}
 
 		$notification_sender_name = $Settings->get( 'notification_sender_name' );
@@ -161,7 +161,7 @@ $Form->begin_fieldset( T_( 'Email notifications' ).get_manual_link( 'email-notif
 		if( $custom_sender_name_count > 0 )
 		{ // There are users with custom sender name settings
 			$sender_name_remove_customization = sprintf( $remove_customization, url_add_param( $remove_customization_url, 'type=sender_name&redirect_to='.$redirect_to, '&' ) );
-			$notification_sender_name_note = '(!) '.sprintf( T_('<a href="%s">%d users</a> have different custom name'), url_add_param( $users_url, 'custom_sender_name=1', '&' ), $custom_sender_name_count ).$sender_name_remove_customization;
+			$notification_sender_name_note = get_icon( 'warning_yellow' ).' '.sprintf( T_('<a href="%s">%d users</a> have different custom name'), url_add_param( $users_url, 'custom_sender_name=1', '&' ), $custom_sender_name_count ).$sender_name_remove_customization;
 		}
 	}
 

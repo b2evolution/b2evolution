@@ -125,7 +125,7 @@ class Chapter extends GenericCategory
 		if( $this->has_posts() && $cat_meta )
 		{	// Display error message if we want make the meta category from category with posts
 			global $Messages;
-			$Messages->add( T_('This category cannot be set as meta category. You must remove the posts it contains first.') );
+			$Messages->add( sprintf( T_('The category &laquo;%s&raquo; cannot be set as meta category. You must remove the posts it contains first.'), $this->dget('name') ) );
 		}
 		else
 		{	// Save the category as 'Meta' only if it has no posts
@@ -297,16 +297,21 @@ class Chapter extends GenericCategory
 
 		if( $this->ID != 0 ) die( 'Existing object cannot be inserted!' );
 
-		$DB->begin();
+		// Start transaction because of urltitle validation
+		$DB->begin( 'SERIALIZABLE' );
 
 		// validate url title / slug
 		$this->set( 'urlname', urltitle_validate( $this->urlname, $this->name, $this->ID, false, $this->dbprefix.'urlname', $this->dbIDname, $this->dbtablename) );
 
-		$r = parent::dbinsert();
+		if( parent::dbinsert() )
+		{ // The chapter was inserted successful
+			$DB->commit();
+			return true;
+		}
 
-		$DB->commit();
-
-		return $r;
+		// Could not insert the chapter object
+		$DB->rollback();
+		return false;
 	}
 
 	/**
@@ -318,7 +323,8 @@ class Chapter extends GenericCategory
 	{
 		global $DB;
 
-		$DB->begin();
+		// Start transaction because of urltitle validation
+		$DB->begin( 'SERIALIZABLE' );
 
 		// validate url title / slug
 		if( empty($this->urlname) || isset($this->dbchanges['cat_urlname']) )
@@ -326,11 +332,15 @@ class Chapter extends GenericCategory
 			$this->set( 'urlname', urltitle_validate( $this->urlname, $this->name, $this->ID, false, $this->dbprefix.'urlname', $this->dbIDname, $this->dbtablename) );
 		}
 
-		$r = parent::dbupdate();
+		if( parent::dbupdate() === false )
+		{ // The update was unsuccessful
+			$DB->rollback();
+			return false;
+		}
 
+		// The chapter was updated successful
 		$DB->commit();
-
-		return $r;
+		return true;
 	}
 
 
@@ -456,11 +466,4 @@ class Chapter extends GenericCategory
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.20  2013/11/06 09:08:47  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

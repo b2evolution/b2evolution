@@ -24,11 +24,4 @@ echo '<p>'.sprintf( T_('In case of concerns with the contents of this blog/site,
 
 echo '<p><a href="http://b2evolution.net/man/content-issues">'.T_('What to do if the owner doesn\'t respond').' &raquo;</a></p>';
 
-
-/*
- * $Log$
- * Revision 1.5  2013/11/06 09:09:14  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

@@ -58,12 +58,8 @@ jQuery( document ).ready( function()
 	} );
 
 	jQuery( 'div#debug_ajax_info' ).ajaxSuccess( function( event, request, settings )
-	{	// AJAX request is success, Add debug info into the list
+	{ // AJAX request is success, Add debug info into the list
 		var debug_ajax_date_end = new Date();
-
-		var data = jQuery( document.createElement('div') );
-		data.html( request.responseText );
-		var jslog = data.find( 'div.jslog' );
 
 		var log = '<h4>Request #' + debug_ajax_request_number + ':</h4>';
 		log += '<b>request time</b>: ' + get_formated_date( debug_ajax_date_start ) + '<br />';
@@ -75,29 +71,20 @@ jQuery( document ).ready( function()
 		{
 			log += '<b>response data type</b>: ' + settings.dataType + '<br />';
 		}
-		if( jslog.length > 0 )
-		{	// AJAX Debug exist in the response text
-			log += '<p>Remote debug info:</p>';
-			log += jslog.html();
-
-			if( jslog.find( 'ul.jslog_error' ).length > 0 )
-			{	// AJAX Response has the errors
-				jQuery( this ).show();
-			}
-		}
+		log += ajax_debug_extract_log( request.responseText, this );
 
 		ajax_debug_info_add( log );
 	} );
 
 	jQuery( 'div#debug_ajax_info' ).ajaxError( function( event, request, settings, thrownError )
-	{	// AJAX request is failed, Add debug info into the list
+	{ // AJAX request is failed, Add debug info into the list
 		jQuery( this ).show();
 
 		var log = '<h4 class="error">Request ERROR #' + debug_ajax_request_number + ':</h4>';
 		log += '<b>url</b>: ' + settings.url + '<br />';
 		log += '<b>' + settings.type + ' data</b>: ' + settings.data + '<br />';
 		log += '<b>error</b>: <b class="red">' + thrownError + '</b><br />';
-		
+		log += ajax_debug_extract_log( request.responseText, this );
 
 		ajax_debug_info_add( log );
 	} );
@@ -118,6 +105,35 @@ function ajax_debug_info_add( log )
 	debug_info_div.scrollTop( debug_info_div[0].scrollHeight );
 
 	debug_ajax_request_number++;
+}
+
+
+/**
+ * Extract JS log from response text
+ *
+ * @param string Response text
+ * @param object Object of div with JS log
+ * @return string JS log text
+ */
+function ajax_debug_extract_log( text, div_obj )
+{
+	var log = '';
+	var data = jQuery( '<div/>' );
+	data.html( text.replace( /(<script[^>]+><\/script>|<link[^>]+\/>)/gim, '' ) );
+	var jslog = data.find( 'div.jslog' );
+
+	if( jslog.length > 0 )
+	{ // AJAX Debug exist in the response text
+		log += '<p>Remote debug info:</p>';
+		log += jslog.html();
+
+		if( jslog.find( 'ul.jslog_error' ).length > 0 )
+		{ // AJAX Response has the errors
+			jQuery( div_obj ).show();
+		}
+	}
+
+	return log;
 }
 
 

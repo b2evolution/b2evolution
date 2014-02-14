@@ -434,7 +434,7 @@ switch( $action )
 		}
 		else
 		{
-			$Messages->add( sprintf( T_('The category &laquo;%s&raquo; couldn\t be locked.'), $edited_GenericCategory->dget('name') ), 'error' );
+			$Messages->add( sprintf( T_('The category &laquo;%s&raquo; couldn\'t be locked.'), $edited_GenericCategory->dget('name') ), 'error' );
 		}
 
 		// Redirect so that a reload doesn't write to the DB twice:
@@ -452,7 +452,7 @@ switch( $action )
 		}
 		else
 		{
-			$Messages->add( sprintf( T_('The category &laquo;%s&raquo; couldn\t be unlocked.'), $edited_GenericCategory->dget('name') ), 'error' );
+			$Messages->add( sprintf( T_('The category &laquo;%s&raquo; couldn\'t be unlocked.'), $edited_GenericCategory->dget('name') ), 'error' );
 		}
 
 		// Redirect so that a reload doesn't write to the DB twice:
@@ -583,11 +583,4 @@ switch( $action )
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-
-/*
- * $Log$
- * Revision 1.27  2013/11/06 09:08:47  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

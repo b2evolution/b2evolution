@@ -3,7 +3,7 @@
  * This is the main/default page template.
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
- * {@link http://manual.b2evolution.net/Skins_2.0}
+ * {@link http://b2evolution.net/man/skin-structure}
  *
  * The main page template is used to display the blog when no specific page template is available
  * to handle the request (based on $disp).
@@ -107,26 +107,27 @@ while( $Item = & mainlist_get_item() )
 					'link_type' => 'permalink'
 					) );
 			?></h2>
-		<span class="post-cat"><?php
+		<?php
 				$Item->categories( array(
-					'before'          => '',
-					'after'           => ' ',
+					'before'          => '<span class="post-cat">',
+					'after'           => '</span>',
 					'include_main'    => true,
 					'include_other'   => true,
 					'include_external'=> true,
 					'link_categories' => true,
 				) );
-			?></span> <span class="mini-add-comment"><?php // Link to comments, trackbacks, etc.:
-					$Item->feedback_link( array(
-									'link_before' => '',
-									'link_after' => '',
-									'link_text_zero' => 'Add comments',
-									'link_text_one' => 'Add comments',
-									'link_text_more' => 'Add comments',
-									'link_title' => '#',
-									'use_popup' => false,
-								) ); ?></span>
-	  </div>
+			// Link to comments, trackbacks, etc.:
+				$Item->feedback_link( array(
+					'link_before' => '<span class="mini-add-comment">',
+					'link_after' => '</span>',
+					'link_text_zero' => T_('Add comments'),
+					'link_text_one' => T_('Add comments'),
+					'link_text_more' => T_('Add comments'),
+					'link_title' => '#',
+					'use_popup' => false,
+					'show_in_single_mode' => true
+				) ); ?>
+		</div>
 
 		<?php
 			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
@@ -165,6 +166,7 @@ while( $Item = & mainlist_get_item() )
 		skin_include( '_item_feedback.inc.php', array(
 				'before_section_title' => '<h3>',
 				'after_section_title'  => '</h3>',
+				'author_link_text'     => 'preferredname',
 			) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.

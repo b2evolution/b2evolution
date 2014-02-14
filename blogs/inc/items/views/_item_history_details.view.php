@@ -43,10 +43,4 @@ $Form->info( T_('Content'), $Revision->iver_content );
 
 $Form->end_form();
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:04:24  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

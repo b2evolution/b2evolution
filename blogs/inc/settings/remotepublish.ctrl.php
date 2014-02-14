@@ -97,7 +97,7 @@ switch( $action )
 					$BlogCache = & get_BlogCache();
 					$setting_Blog = & $BlogCache->get_by_ID( $autoselect_blog );
 					$renderer_params = array( 'Blog' => & $setting_Blog, 'setting_name' => 'coll_apply_rendering' );
-					$renderers = $Plugins->validate_renderer_list( param( 'eblog_renderers', 'array', array() ), $renderer_params );
+					$renderers = $Plugins->validate_renderer_list( param( 'eblog_renderers', 'array/string', array() ), $renderer_params );
 					$Settings->set( 'eblog_renderers', $renderers );
 				}
 				break;
@@ -233,11 +233,4 @@ $AdminUI->disp_payload_end();
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-
-/*
- * $Log$
- * Revision 1.4  2013/11/06 08:04:45  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -36,12 +36,14 @@ if( empty( $cjob_row->clog_status ) && $current_User->check_perm( 'options', 'ed
 
 $Form->global_icon( T_('Close sheet'), 'close', regenerate_url( 'action,cjob_ID' ) );
 
+$manual_link = cron_job_manual_link( $cjob_row->ctsk_controller );
+
 $Form->begin_form( 'fform', T_('Scheduled job') );
 
-	$Form->begin_fieldset( T_('Job details').get_manual_link( $cjob_row->ctsk_name ) );
+	$Form->begin_fieldset( T_('Job details').$manual_link );
 
 		$Form->info( T_('Job #'), $cjob_row->ctsk_ID );
-		$Form->info( T_('Job name'), $cjob_row->ctsk_name.get_manual_link( $cjob_row->ctsk_name ) );
+		$Form->info( T_('Job name'), $cjob_row->ctsk_name.$manual_link );
 		$Form->info( T_('Scheduled at'), mysql2localedatetime($cjob_row->ctsk_start_datetime) );
 		$cjob_repeat_after = '';
 		if( $cjob_repeat_after_days = floor( $cjob_row->ctsk_repeat_after / 86400 ) )
@@ -135,11 +137,4 @@ $Form->begin_form( 'fform', T_('Scheduled job') );
 
 $Form->end_form();
 
-
-/*
- * $Log$
- * Revision 1.9  2013/11/06 08:04:07  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

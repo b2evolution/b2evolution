@@ -137,7 +137,7 @@ $Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
 	}
 	elseif( $default_notification_sender_email != $notifcation_sender_email )
 	{
-		$notifcation_sender_email_note = '(!) '.T_('This is different from the new sender address which is currently:').' '.$default_notification_sender_email;
+		$notifcation_sender_email_note = get_icon( 'warning_yellow' ).' '.T_('This is different from the new sender address which is currently:').' '.$default_notification_sender_email;
 	}
 	$Form->text_input( 'notification_sender_email', $notifcation_sender_email, 50, T_( 'Sender email address' ), $notifcation_sender_email_note );
 
@@ -151,7 +151,7 @@ $Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
 	}
 	elseif( $default_notification_sender_name != $notification_sender_name )
 	{
-		$notifcation_sender_name_note = '(!) '.T_('This is different from the new sender name which is currently:').' '.$default_notification_sender_name;
+		$notifcation_sender_name_note = get_icon( 'warning_yellow' ).' '.T_('This is different from the new sender name which is currently:').' '.$default_notification_sender_name;
 	}
 	$Form->text_input( 'notification_sender_name', $notification_sender_name, 50, T_( 'Sender name' ), $notifcation_sender_name_note );
 

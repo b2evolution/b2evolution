@@ -260,7 +260,7 @@ class Comment extends DataObject
 		if( ! isset($this->Item) )
 		{
 			$ItemCache = & get_ItemCache();
-			$this->Item = & $ItemCache->get_by_ID( $this->item_ID );
+			$this->Item = & $ItemCache->get_by_ID( $this->item_ID, false );
 		}
 
 		return $this->Item;
@@ -280,7 +280,7 @@ class Comment extends DataObject
 			case 't_status':
 				// Text status:
 				$visibility_statuses = get_visibility_statuses( '', array( 'redirected' ) );
-				return $visibility_statuses[$this->status];
+				return $visibility_statuses[ $this->status ];
 		}
 
 		return parent::get( $parname );
@@ -300,7 +300,16 @@ class Comment extends DataObject
 		switch( $parname )
 		{
 			case 'rating':
-				return $this->set_param( $parname, 'string', $parvalue, true );
+				// Save star rating with checking correct values
+				if( $parvalue < 1 )
+				{ // cannot be less than 0
+					$parvalue = NULL;
+				}
+				elseif( $parvalue > 5 )
+				{ // cannot be more than 5
+					$parvalue = 5;
+				}
+				return $this->set_param( $parname, 'number', $parvalue, true );
 
 			case 'status':
 				// Save previous status temporarily to make some changes on dbinsert(), dbupdate() & dbdelete()
@@ -768,17 +777,19 @@ class Comment extends DataObject
 	 * @param string String to display after author name if he's a user
 	 * @param string Output format, see {@link format_to_output()}
 	 * @param boolean true for link, false if you want NO html link
+	 * @param string What show as user name: avatar | only_avatar | login | nickname | firstname | lastname | fullname | preferredname
 	 */
 	function author( $before = '', $after = '#', $before_user = '', $after_user = '#',
-										$format = 'htmlbody', $makelink = false )
+										$format = 'htmlbody', $makelink = false, $lint_text = 'login' )
 	{
 		echo $this->get_author( array(
-					'before'       => $before,
-					'after'        => $after,
-					'before_user'  => $before_user,
-					'after_user'   => $after_user,
-					'format'       => $format,
-					'link_to'		   => ( $makelink ? 'userurl>userpage' : '' )
+					'before'      => $before,
+					'after'       => $after,
+					'before_user' => $before_user,
+					'after_user'  => $after_user,
+					'format'      => $format,
+					'link_to'     => ( $makelink ? 'userurl>userpage' : '' ),
+					'link_text'   => $lint_text,
 				)
 			);
 	}
@@ -811,8 +822,8 @@ class Comment extends DataObject
 				'before_user'  => '',
 				'after_user'   => '#',
 				'format'       => 'htmlbody',
-				'link_to'      => 'userurl>userpage',		// 'userpage' or 'userurl' or 'userurl>userpage' 'userpage>userurl'
-				'link_text'    => 'preferredname',
+				'link_to'      => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' 'userpage>userurl'
+				'link_text'    => 'preferredname', // avatar | only_avatar | login | nickname | firstname | lastname | fullname | preferredname
 				'link_rel'     => '',
 				'link_class'   => '',
 				'thumb_size'   => 'crop-top-32x32',
@@ -1061,7 +1072,7 @@ class Comment extends DataObject
 	function author_url_with_actions( $redirect_to = NULL, $ajax_button = false, $check_perms = true, $save_context = true )
 	{
 		global $current_User;
-		if( $this->author_url( '', ' <span &bull; Url: id="commenturl_'.$this->ID.'" <span class="bUrl" >', '</span>' ) )
+		if( $this->author_url( '', ' <span &bull; Url: id="commenturl_'.$this->ID.'" <span class="bUrl" >', '' ) )
 		{
 			if( $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this ) )
 			{ // There is an URL and we have permission to edit this comment...
@@ -1385,15 +1396,30 @@ class Comment extends DataObject
 			return false;
 		}
 
-		if( !$current_User->check_perm( 'comment!deprecated', 'moderate', false, $this ) )
-		{
+		if( ( $this->status == 'deprecated' ) // Already deprecated!
+		    || !$current_User->check_perm( 'comment!deprecated', 'moderate', false, $this ) )
+		{ // User has no right to deprecated this comment:
 			return false;
+		}
+
+		$status = 'deprecated';
+		$status_order = get_visibility_statuses( 'ordered-array' );
+		$status_index = get_visibility_statuses( 'ordered-index', array( 'redirected' ) );
+		if( isset( $status_index[ $status ] ) &&
+		    isset( $status_order[ $status_index[ $status ] ] ) &&
+		    ! empty( $status_order[ $status_index[ $status ] ][3] ) )
+		{ // Get color of button icon
+			$status_icon_color = $status_order[ $status_index[ $status ] ][3];
+		}
+		else
+		{ // Use grey arrow as default
+			$status_icon_color = 'grey';
 		}
 
 		$params = array(
 			'before' => $before,
 			'after'  => $after,
-			'text'   => ( ( $text == '#' ) ?  get_icon( 'deprecate' ).' '.T_('Deprecate!') : $text ),
+			'text'   => ( ( $text == '#' ) ?  get_icon( 'move_down_'.$status_icon_color ).' '.T_('Deprecate!') : $text ),
 			'title'  => $title,
 			'class'  => $class,
 			'glue'   => $glue,
@@ -1701,17 +1727,28 @@ class Comment extends DataObject
 	 * Get next status to publish/restrict to this comment
 	 *
 	 * @param boolean true to get next publish status, and false to get next restrict status
+	 * @param string Status that can be used instead of $this->status
 	 * @return mixed false if user has no permission | array( status, status_text, icon_color ) otherwise
 	 */
-	function get_next_status( $publish )
+	function get_next_status( $publish, $current_status = NULL )
 	{
+		if( !is_logged_in() )
+		{
+			return false;
+		}
+
 		global $current_User;
+
+		if( is_null( $current_status ) )
+		{ // Use status of comment if param is NULL
+			$current_status = $this->status;
+		}
 
 		$status_order = get_visibility_statuses( 'ordered-array' );
 		$status_index = get_visibility_statuses( 'ordered-index', array( 'redirected' ) );
 
-		$curr_index = $status_index[$this->status];
-		if( ( !$publish ) && ( $curr_index == 0 ) && ( $this->status != 'trash' ) && ( $this->status != 'deprecated' ) )
+		$curr_index = $status_index[$current_status];
+		if( ( !$publish ) && ( $curr_index == 0 ) && ( $current_status != 'trash' ) && ( $current_status != 'deprecated' ) )
 		{ // Increase curr_index value to allow deprecated status for the other statuses from the same public level
 			$curr_index = $curr_index + 1;
 		}
@@ -1879,10 +1916,23 @@ class Comment extends DataObject
 			return false;
 		}
 
+		$status_order = get_visibility_statuses( 'ordered-array' );
+		$status_index = get_visibility_statuses( 'ordered-index', array( 'redirected' ) );
+		if( isset( $status_index[ $highest_status ] ) &&
+		    isset( $status_order[ $status_index[ $highest_status ] ] ) &&
+		    ! empty( $status_order[ $status_index[ $highest_status ] ][3] ) )
+		{ // Get color of button icon
+			$status_icon_color = $status_order[ $status_index[ $highest_status ] ][3];
+		}
+		else
+		{ // Use green arrow as default
+			$status_icon_color = 'green';
+		}
+
 		$params = array(
 			'before' => $before,
 			'after'  => $after,
-			'text'   => ( ( $text == '#' ) ? get_icon( 'publish', 'imgtag' ).' '.$publish_text : $text ),
+			'text'   => ( ( $text == '#' ) ? get_icon( 'move_up_'.$status_icon_color, 'imgtag' ).' '.$publish_text : $text ),
 			'title'  => ( ( $title == '#' ) ? $publish_text : $title ),
 			'class'  => $class,
 			'glue'   => $glue,
@@ -1905,19 +1955,23 @@ class Comment extends DataObject
 	 *
 	 * @param array params
 	 * @param boolean set true to get raise link and false to get lower link
+	 * @param string set any status what is required instead of $this->status
 	 * @return boolean true if link is available, false otherwise
 	 */
-	function next_status_link( $params, $raise )
+	function next_status_link( $params, $raise, $current_status = NULL )
 	{
 		global $current_User;
 
 		if( ! is_logged_in( false ) ) return false;
 
-		$next_status_in_row = $this->get_next_status( $raise );
+		$next_status_in_row = $this->get_next_status( $raise, $current_status );
 		if( !$next_status_in_row )
-		{
+		{ // Next status is not allowed for current user
 			return false;
 		}
+
+		$class = empty( $params['class'] ) ? '' : $params['class'].' ';
+		unset( $params['class'] );
 
 		$next_status = $next_status_in_row[0];
 		$status_text = $next_status_in_row[1];
@@ -1925,11 +1979,13 @@ class Comment extends DataObject
 		{
 			$action = 'publish';
 			$action_icon = get_icon( 'move_up_'.$next_status_in_row[2], 'imgtag', array( 'title' => '' ) );
+			$class .= 'btn_raise_'.$next_status;
 		}
 		else
 		{
 			$action = 'restrict';
 			$action_icon = get_icon( 'move_down_'.$next_status_in_row[2], 'imgtag', array( 'title' => '' ) );
+			$class .= 'btn_lower_'.$next_status;
 		}
 
 		$params = array_merge( array(
@@ -1939,7 +1995,7 @@ class Comment extends DataObject
 				'title'        => $status_text,
 				'action'       => $action,
 				'status'       => $next_status,
-				'class'        => '',
+				'class'        => $class,
 				'glue'         => '&amp;',
 				'save_context' => true,
 				'ajax_button'  => false,
@@ -1973,6 +2029,90 @@ class Comment extends DataObject
 	function lower_link( $params )
 	{
 		return $this->next_status_link( $params, false );
+	}
+
+
+	/**
+	 * Display moderation status links if it is available
+	 *
+	 * @param array params
+	 * @return boolean true if link was displayed, false otherwise
+	 */
+	function moderation_links( $params )
+	{
+		$params = array_merge( array(
+				'detect_last' => true, // TRUE if we should find what button is last and visible, FALSE if we have some other buttons after moderation buttons (e.g. button to delete a comment)
+			), $params );
+
+		$statuses = get_visibility_statuses( 'ordered-array' );
+		$statuses = array_reverse( $statuses );
+
+		// Get first and last statuses that will be visible buttons
+		$first_status_in_row = $this->get_next_status( true, $this->status );
+		$last_status_in_row = $this->get_next_status( false, $this->status );
+		$first_status = $first_status_in_row ? $first_status_in_row[0] : '';
+		$last_status = '';
+		if( $params['detect_last'] )
+		{ // We should detect what button is last
+			$last_status = $last_status_in_row ? $last_status_in_row[0] : '';
+		}
+
+		$r = '';
+		$prev_status = '';
+		foreach( $statuses as $status )
+		{ // Print the buttons to increase status
+			$next_status_in_row = $this->get_next_status( true, $status[0] );
+			if( $next_status_in_row && $prev_status != $next_status_in_row[0] )
+			{
+				$tmp_params = $params;
+				if( $first_status == $next_status_in_row[0] )
+				{ // Mark this button as first visible
+					$tmp_params['class'] = ( isset( $tmp_params['class'] ) ? $tmp_params['class'] : '' ).' first-child';
+					if( $params['detect_last'] && empty( $last_status ) )
+					{ // This first button is also last button
+						$tmp_params['class'] .= ' last-child';
+					}
+				}
+				if( $next_status_in_row[0] == $first_status_in_row[0] )
+				{
+					$tmp_params['class'] .= ' btn_next_status';
+				}
+				$r .= $this->next_status_link( $tmp_params, true, $status[0] );
+			}
+			$prev_status = $next_status_in_row[0];
+		}
+
+		$prev_status = '';
+		foreach( $statuses as $status )
+		{ // Print the buttons to decrease status
+			$next_status_in_row = $this->get_next_status( false, $status[0] );
+
+			if( $next_status_in_row && $prev_status != $next_status_in_row[0] )
+			{
+				$tmp_params = $params;
+				$tmp_params['class'] = (isset( $tmp_params['class'] ) ? $tmp_params['class'] : '' );
+				if( $params['detect_last'] && $last_status == $next_status_in_row[0] )
+				{ // Mark this button as last visible
+					$tmp_params['class'] .= ' last-child';
+				}
+				if( empty( $first_status ) )
+				{ // This last button also is first button
+					$tmp_params['class'] .= ' first-child';
+				}
+				if( $next_status_in_row[0] == $last_status_in_row[0] )
+				{
+					$tmp_params['class'] .= ' btn_next_status';
+				}
+				if( $next_status_in_row[0] == 'deprecated' )
+				{ // Don't make ajax button to Deprecate comment
+					$tmp_params = array_merge( $tmp_params, array( 'ajax_button' => false ) );
+				}
+				$r .= $this->next_status_link( $tmp_params, false, $status[0] );
+			}
+			$prev_status = $next_status_in_row[0];
+		}
+
+		return $r;
 	}
 
 
@@ -2460,7 +2600,7 @@ class Comment extends DataObject
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
 				'author_format' => '%s',
-				'link_text'     => 'login', // avatar | only_avatar | login
+				'link_text'     => 'login', // avatar | only_avatar | login | nickname | firstname | lastname | fullname | preferredname
 				'thumb_size'    => 'crop-top-32x32' // author's avatar size
 			), $params );
 
@@ -2589,10 +2729,28 @@ class Comment extends DataObject
 									'label_3'    => T_('Average'),
 									'label_4'    => T_('Good'),
 									'label_high' => T_('Excellent'),
-									'reset' => false,
+									'reset'      => false,
+									'item_ID'    => 0, // Set only for new comments without defined item ID
 								), $params );
 
 		echo $params['before'];
+
+		if( empty( $this->item_ID ) && !empty( $params['item_ID'] ) )
+		{	// Set item ID for form with new comment
+			$this->item_ID = $params['item_ID'];
+		}
+		if( $comment_Item = & $this->get_Item() )
+		{
+			if( $item_Blog = & $comment_Item->get_Blog() )
+			{
+				if( $item_Blog->get_setting( 'rating_question' ) != '' )
+				{	// Display star rating question
+					echo '<div id="comment_rating_question">';
+					echo nl2br( $item_Blog->get_setting( 'rating_question' ) );
+					echo '</div>';
+				}
+			}
+		}
 
 		echo '<div id="comment_rating">';
 
@@ -2685,15 +2843,11 @@ class Comment extends DataObject
 				break;
 
 			case 'styled':
-				$r .= '<div class="floatright">'
-					.'<span class="note status_'.$this->status.'">'
-					.'<span>'.format_to_output( $this->get('t_status') ).'</span>'
-					.'</span>'
-					.'</div>';
+				$r .= get_styled_status( $this->status, $this->get( 't_status' ) );
 				break;
 
 			default:
-				$r .= format_to_output( $this->get('t_status'), $format );
+				$r .= format_to_output( $this->get( 't_status' ), $format );
 				break;
 		}
 
@@ -2720,17 +2874,42 @@ class Comment extends DataObject
 
 
 	/**
+	 * Template function: display all statuses and only one is visible by css class name
+	 *
+	 * Statuses:
+	 * - published
+	 * - community
+	 * - protected
+	 * - review
+	 * - private
+	 * - draft
+	 */
+	function statuses()
+	{
+		$statuses = get_visibility_statuses( '', array( 'deprecated', 'redirected', 'trash' ) );
+
+		foreach( $statuses as $status => $title )
+		{
+			echo get_styled_status( $status, $title );
+		}
+	}
+
+
+	/**
 	 * Handle comment email notifications
 	 *
 	 * Should be called only when a new comment was posted or when a comment status was changed to published
+	 * 
+	 * @param boolean set true if the comment was posted just now, false otherwise
+	 * @param integer the user ID who executed the action which will be notified, or NULL if it was executed by an anonymous user
 	 */
-	function handle_notifications( $just_posted = false )
+	function handle_notifications( $just_posted = false, $executed_by_userid = NULL )
 	{
 		global $Settings;
 
 		if( $just_posted )
 		{ // send email notification to moderators
-			$this->send_email_notifications( true );
+			$this->send_email_notifications( true, false, $executed_by_userid );
 		}
 
 		if( $this->status != 'published' )
@@ -2754,7 +2933,7 @@ class Comment extends DataObject
 
 		if( $notifications_mode == 'immediate' )
 		{ // Send email notifications now!
-			$this->send_email_notifications( false, $just_posted );
+			$this->send_email_notifications( false, $just_posted, $executed_by_userid );
 
 			// Record that processing has been done:
 			$this->set( 'notif_status', 'finished' );
@@ -2775,7 +2954,7 @@ class Comment extends DataObject
 			$edited_Cronjob->set( 'controller', 'cron/jobs/_comment_notifications.job.php' );
 
 			// params: specify which post this job is supposed to send notifications for:
-			$edited_Cronjob->set( 'params', array( 'comment_ID' => $this->ID, 'except_moderators' => $just_posted ) );
+			$edited_Cronjob->set( 'params', array( 'comment_ID' => $this->ID, 'except_moderators' => $just_posted, 'executed_by_userid' => $executed_by_userid ) );
 
 			// Save cronjob to DB:
 			$edited_Cronjob->dbinsert();
@@ -2798,8 +2977,9 @@ class Comment extends DataObject
 	 *
 	 * @param boolean true if send only moderation email, false otherwise
 	 * @param boolean true if send for everyone else but not for moterators, because a moderation email was sent for them
+	 * @param integer the user ID who executed the action which will be notified, or NULL if it was executed by an anonymous user
 	 */
-	function send_email_notifications( $only_moderators = false, $except_moderators = false )
+	function send_email_notifications( $only_moderators = false, $except_moderators = false, $executed_by_userid = NULL )
 	{
 		global $DB, $admin_url, $baseurl, $debug, $Debuglog, $htsrv_url;
 		global $Settings, $UserSettings;
@@ -2813,6 +2993,7 @@ class Comment extends DataObject
 		$edited_Blog = & $edited_Item->get_Blog();
 		$owner_User = $edited_Blog->get_owner_User();
 		$notify_users = array();
+		$moderators = array();
 
 		if( $only_moderators || $except_moderators )
 		{ // we need the list of moderators:
@@ -2822,51 +3003,49 @@ class Comment extends DataObject
 							LEFT JOIN T_coll_group_perms ON bloggroup_group_ID = user_grp_ID
 							LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "notify_comment_moderation"
 							LEFT JOIN T_groups ON grp_ID = user_grp_ID
-						WHERE ( ( bloguser_blog_ID = '.$edited_Blog->ID.' AND bloguser_perm_edit_cmt IN ( "lt", "le", "all" ) )
-								OR ( bloggroup_blog_ID = '.$edited_Blog->ID.' AND bloggroup_perm_edit_cmt IN ( "lt", "le", "all" ) )
+						WHERE ( ( bloguser_blog_ID = '.$edited_Blog->ID.' AND bloguser_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) )
+								OR ( bloggroup_blog_ID = '.$edited_Blog->ID.' AND bloggroup_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) )
 								OR ( grp_perm_blogs = "editall" ) )
 							AND LENGTH(TRIM(user_email)) > 0';
 			$moderators_to_notify = $DB->get_results( $sql );
-		}
 
-		if( $only_moderators )
-		{ // Preprocess moderator list:
 			foreach( $moderators_to_notify as $moderator )
 			{
 				$notify_moderator = ( is_null( $moderator->notify_moderation ) ) ? $Settings->get( 'def_notify_comment_moderation' ) : $moderator->notify_moderation;
 				if( $notify_moderator )
 				{ // add user to notify
-					$notify_users[$moderator->user_ID] = 'moderator';
+					$moderators[] = $moderator->user_ID;
 				}
 			}
 			if( $UserSettings->get( 'notify_comment_moderation', $owner_User->ID ) && is_email( $owner_User->get( 'email' ) ) )
 			{ // add blog owner
-				$notify_users[$owner_User->ID] = 'moderator';
+				$moderators[] = $owner_User->ID;
+			}
+
+			// Load all moderators, and check each edit permission on this comment
+			$UserCache = & get_UserCache();
+			$UserCache->load_list( $moderators );
+			foreach( $moderators as $index => $moderator_ID )
+			{
+				$moderator_User = $UserCache->get_by_ID( $moderator_ID, false );
+				if( ( ! $moderator_User ) || ( ! $moderator_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this ) ) )
+				{ // User doesn't exists any more, or has no permission to edit this comment!
+					unset( $moderators[$index] );
+				}
+				elseif( $only_moderators )
+				{
+					$notify_users[$moderator_ID] = 'moderator';
+				}
 			}
 		}
-		else
-		{ // Not just moderators:
-			$moderators = array();
+
+		if( ! $only_moderators )
+		{ // Not only moderators needs to be notified:
 			$except_condition = '';
 
-			if( $except_moderators )
+			if( $except_moderators && ( ! empty( $moderators ) ) )
 			{ // Set except moderators condition. Exclude moderators who already got a notification email.
-				foreach( $moderators_to_notify as $moderator )
-				{
-					$notify_moderator = ( is_null( $moderator->notify_moderation ) ) ? $Settings->get( 'def_notify_comment_moderation' ) : $moderator->notify_moderation;
-					if( $notify_moderator )
-					{ // select all moderators by ID which notify moderation setting is turned on
-						$moderators[] = $moderator->user_ID;
-					}
-				}
-				if( $UserSettings->get( 'notify_comment_moderation', $owner_User->ID ) && is_email( $owner_User->get( 'email' ) ) )
-				{ // add blog owner
-					$moderators[] = $owner_User->ID;
-				}
-				if( ! empty( $moderators ) )
-				{
-					$except_condition = ' AND user_ID NOT IN ( "'.implode( '", "', $moderators ).'" )';
-				}
+				$except_condition = ' AND user_ID NOT IN ( "'.implode( '", "', $moderators ).'" )';
 			}
 
 			// Check if we need to include the item creator user:
@@ -2912,6 +3091,11 @@ class Comment extends DataObject
 			}
 		}
 
+		if( ( $executed_by_userid != NULL ) && isset( $notify_users[$executed_by_userid] ) )
+		{ // don't notify the user who just created/updated this comment
+			unset( $notify_users[$executed_by_userid] );
+		}
+
 		if( ! count( $notify_users ) )
 		{ // No-one to notify:
 			return false;
@@ -2928,26 +3112,21 @@ class Comment extends DataObject
 		// Get author email address. It will be visible for moderators/blog/post owners only -- NOT for other subscribers
 		if( $this->get_author_User() )
 		{ // Comment from a registered user:
-			if( isset( $notify_users[$this->author_user_ID] ) )
-			{ // don't notify comment's author User
-				unset( $notify_users[$this->author_user_ID] );
-				if( ! count( $notify_users ) )
-				{ // No-one to notify:
-					return false;
-				}
-			}
 			$reply_to = $this->author_User->get('email');
 			$author_name = $this->author_User->get('login');
+			$author_ID = $this->author_User->ID;
 		}
 		elseif( ! empty( $this->author_email ) )
 		{ // non-member, but with email address:
 			$reply_to = $this->author_email;
 			$author_name = $this->dget( 'author' );
+			$author_ID = NULL;
 		}
 		else
 		{ // Fallback (we have no email address):  fp>TODO: or the subscriber is not allowed to view it.
 			$reply_to = NULL;
 			$author_name =  $this->dget( 'author' );
+			$author_ID = NULL;
 		}
 
 		// Load all users who will be notified, becasuse another way the send_mail_to_User funtion would load them one by one
@@ -2963,7 +3142,6 @@ class Comment extends DataObject
 			// get data content
 			$notify_User = $UserCache->get_by_ID( $notify_user_ID );
 			$notify_email = $notify_User->get( 'email' );
-			$notify_key = $notify_User->get( 'unsubscribe_key' );
 
 			// init notification setting
 			locale_temp_switch( $notify_User->get( 'locale' ) );
@@ -3020,14 +3198,13 @@ class Comment extends DataObject
 			$subject = sprintf( $subject, $notify_full ? $edited_Blog->get('shortname') : $author_name, $edited_Item->get('title') );
 
 			$email_template_params = array(
-					'notify_full'    => $notify_full,
-					'Comment'        => $this,
-					'Blog'           => $edited_Blog,
-					'Item'           => $edited_Item,
-					'author_name'    => $author_name,
-					'notify_type'    => $notify_type,
-					'notify_user_ID' => $notify_user_ID,
-					'notify_key'     => $notify_key,
+					'notify_full' => $notify_full,
+					'Comment'     => $this,
+					'Blog'        => $edited_Blog,
+					'Item'        => $edited_Item,
+					'author_name' => $author_name,
+					'author_ID'   => $author_ID,
+					'notify_type' => $notify_type,
 				);
 
 			if( $debug )
@@ -3216,15 +3393,28 @@ class Comment extends DataObject
 	/**
 	 * Trigger event AfterCommentDelete after calling parent method.
 	 *
+	 * @param boolean set true to force permanent delete, leave false otherwise
 	 * @return boolean true on success
 	 */
-	function dbdelete()
+	function dbdelete( $force_permanent_delete = false )
 	{
 		global $Plugins, $DB;
 
 		$DB->begin();
 
-		if( $this->status == 'trash' )
+		$was_published = $this->is_published();
+		if( $this->status != 'trash' )
+		{ // The comment was not recycled yet
+			if( $this->has_replies() )
+			{ // Move the replies to the one level up
+				$new_parent_ID = !empty( $this->in_reply_to_cmt_ID ) ? $DB->quote( $this->in_reply_to_cmt_ID ) : 'NULL';
+				$DB->query( 'UPDATE T_comments
+				    SET comment_in_reply_to_cmt_ID = '.$new_parent_ID.'
+				  WHERE comment_in_reply_to_cmt_ID = '.$this->ID );
+			}
+		}
+
+		if( $force_permanent_delete || ( $this->status == 'trash' ) )
 		{
 			// remember ID, because parent method resets it to 0
 			$old_ID = $this->ID;
@@ -3254,26 +3444,17 @@ class Comment extends DataObject
 		}
 		else
 		{ // don't delete, just move to the trash:
-			$was_published = $this->is_published();
 			$this->set( 'status', 'trash' );
 			$r = $this->dbupdate();
-
-			if( $this->has_replies() )
-			{	// Move the replies to the one level up
-				$new_parent_ID = !empty( $this->in_reply_to_cmt_ID ) ? $DB->quote( $this->in_reply_to_cmt_ID ) : 'NULL';
-				$DB->query( 'UPDATE T_comments
-				    SET comment_in_reply_to_cmt_ID = '.$new_parent_ID.'
-				  WHERE comment_in_reply_to_cmt_ID = '.$this->ID );
-			}
-			if( $r && $was_published )
-			{ // Update last touched date of item if a published comment was deleted
-				$comment_Item = & $this->get_Item();
-				$comment_Item->update_last_touched_date();
-			}
 		}
 
 		if( $r )
 		{
+			if( $was_published )
+			{ // Update last touched date of item if a published comment was deleted
+				$comment_Item = & $this->get_Item();
+				$comment_Item->update_last_touched_date();
+			}
 			$DB->commit();
 		}
 		else
@@ -3358,23 +3539,28 @@ class Comment extends DataObject
 	{
 		global $cache_comments_has_replies;
 
-		if( !isset( $cache_comments_has_replies ) )
-		{	// Get all comments that have the replies from DB (first time)
+		if( ! isset( $cache_comments_has_replies ) )
+		{ // Init an array to cache
+			$cache_comments_has_replies = array();
+		}
+
+		if( ! isset( $cache_comments_has_replies[ $this->item_ID ] ) )
+		{ // Get all comments that have the replies from DB (first time)
 			global $DB;
 
-			$cache_comments_has_replies = array();
-
+			// Cache a result
 			$SQL = new SQL();
 			$SQL->SELECT( 'DISTINCT ( comment_in_reply_to_cmt_ID ), comment_ID' );
 			$SQL->FROM( 'T_comments' );
 			$SQL->WHERE( 'comment_in_reply_to_cmt_ID IS NOT NULL' );
 			$SQL->WHERE_and( 'comment_post_ID = '.$this->item_ID );
 
-			$cache_comments_has_replies = $DB->get_assoc( $SQL->get() );
+			// Init an array to cache a result from current item
+			$cache_comments_has_replies[ $this->item_ID ] = $DB->get_assoc( $SQL->get() );
 		}
 
 		// Get a result from cache
-		return isset( $cache_comments_has_replies[ (int) $this->ID ] );
+		return isset( $cache_comments_has_replies[ $this->item_ID ][ $this->ID ] );
 	}
 
 
@@ -3398,11 +3584,4 @@ class Comment extends DataObject
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.128  2013/11/06 09:08:47  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

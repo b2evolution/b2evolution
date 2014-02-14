@@ -246,6 +246,8 @@ class Plugins_admin extends Plugins
 				// allow plugins to handle $disp modes
 				'GetHandledDispModes' => 'Called when building possible $disp list',
 				'HandleDispMode' => 'Called when displaying $disp',
+
+				'GetAdditionalColumnsTable' => 'Called to add columns for Results object',
 			);
 
 			if( ! defined('EVO_IS_INSTALLING') || ! EVO_IS_INSTALLING )
@@ -384,7 +386,7 @@ class Plugins_admin extends Plugins
 					$Debuglog->add( 'Skipping duplicate plugin (classname '.$classname.')!', array('error', 'plugins') );
 					continue;
 				}
-				$this->register( $classname, 0, -1, NULL, $filename ); // auto-generate negative ID; will return string on error.
+				$this->register( $classname, 0, -1, $filename ); // auto-generate negative ID; will return string on error.
 			}
 		}
 
@@ -411,7 +413,7 @@ class Plugins_admin extends Plugins
 					'always' => 'always',
 					'opt-out' => 'opt-out',
 					'opt-in' => 'opt-in',
-					'lazy' => 'automatic', // The plugin will automatically deside to use rendering or not 
+					'lazy' => 'automatic', // The plugin will automatically deside to use rendering or not
 					'never' => 'never',
 				);
 		}
@@ -519,9 +521,11 @@ class Plugins_admin extends Plugins
 	 * @param string Classname of the plugin to install
 	 * @param string Initial DB Status of the plugin ("enabled", "disabled", "needs_config", "broken")
 	 * @param string Optional classfile path, if not default (used for tests).
+	 * @param boolean Must the plugin exist (classfile_path and classname)?
+	 *                This is used internally to be able to unregister a non-existing plugin.
 	 * @return Plugin The installed Plugin (perhaps with $install_dep_notes set) or a string in case of error.
 	 */
-	function & install( $classname, $plug_status = 'enabled', $classfile_path = NULL )
+	function & install( $classname, $plug_status = 'enabled', $classfile_path = NULL, $must_exists = true )
 	{
 		global $DB, $Debuglog;
 
@@ -529,7 +533,7 @@ class Plugins_admin extends Plugins
 		$this->load_plugins_table();
 
 		// Register the plugin:
-		$Plugin = & $this->register( $classname, 0, -1, NULL, $classfile_path ); // Auto-generates negative ID; New ID will be set a few lines below
+		$Plugin = & $this->register( $classname, 0, -1, $classfile_path, $must_exists ); // Auto-generates negative ID; New ID will be set a few lines below
 
 		if( is_string($Plugin) )
 		{ // return error message from register()
@@ -855,7 +859,7 @@ class Plugins_admin extends Plugins
 	 *  - Register new events
 	 *  - Unregister obsolete events
 	 *  - Detect plugins with no code and try to have at least one plugin with the default code
-	 * 
+	 *
 	 * @return boolean true if plugins have been changed, false otherwise
 	 */
 	function reload_plugins()
@@ -1413,9 +1417,9 @@ class Plugins_admin extends Plugins
 
 	/**
 	 * Handle filter/unfilter_contents
-	 * 
+	 *
 	 * See {@link Plugins_admin::filter_contents()} and {@link Plugins_admin::unfilter_contents()}
-	 * 
+	 *
 	 * @param array renderer codes to use for opt-out, opt-in and lazy
 	 * @param array array params key => value, must contain:
 	 *  - 'event' => 'FilterItemContents' or 'UnfilterItemContents'
@@ -1556,10 +1560,4 @@ class Plugins_admin extends Plugins
 
 }
 
-/*
- * $Log$
- * Revision 1.42  2013/11/06 08:04:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

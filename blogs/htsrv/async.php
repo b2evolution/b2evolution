@@ -218,6 +218,7 @@ switch( $action )
 		$blog = param( 'blogid', 'integer' );
 		$moderation = param( 'moderation', 'string', NULL );
 		$status = param( 'status', 'string' );
+		$expiry_status = param( 'expiry_status', 'string', 'active' );
 		$limit = param( 'limit', 'integer', 0 );
 		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ), false );
 		if( $edited_Comment !== false )
@@ -225,7 +226,7 @@ switch( $action )
 			// Check permission:
 			$current_User->check_perm( 'comment!'.$status, 'moderate', true, $edited_Comment );
 
-			$redirect_to = param( 'redirect_to', 'string', NULL );
+			$redirect_to = param( 'redirect_to', 'url', NULL );
 
 			$edited_Comment->set( 'status', $status );
 			// Comment moderation is done, handle moderation "secret"
@@ -261,7 +262,7 @@ switch( $action )
 				{
 					$limit = $UserSettings->get( 'results_per_page' ); 
 				}
-				echo_item_comments( $blog, $item_ID, $status_list, $currentpage, $limit, array(), $filterset_name );
+				echo_item_comments( $blog, $item_ID, $status_list, $currentpage, $limit, array(), $filterset_name, $expiry_status );
 				break;
 			}
 		}
@@ -307,6 +308,7 @@ switch( $action )
 		$blog = param( 'blogid', 'integer' );
 		$commentIds = param( 'commentIds', 'array' );
 		$statuses = param( 'statuses', 'string', NULL );
+		$expiry_status = param( 'expiry_status', 'string', 'active' );
 		$item_ID = param( 'itemid', 'integer' );
 		$currentpage = param( 'currentpage', 'integer', 1 );
 		$limit = param( 'limit', 'integer', 0 );
@@ -341,7 +343,7 @@ switch( $action )
 		{
 			$limit = $UserSettings->get( 'results_per_page' ); 
 		}
-		echo_item_comments( $blog, $item_ID, $status_list, $currentpage, $limit, array(), $filterset_name );
+		echo_item_comments( $blog, $item_ID, $status_list, $currentpage, $limit, array(), $filterset_name, $expiry_status );
 		break;
 
 	case 'delete_comment_url':
@@ -392,6 +394,7 @@ switch( $action )
 		$blog = param( 'blogid', 'integer' );
 		$item_ID = param( 'itemid', 'integer', NULL );
 		$statuses = param( 'statuses', 'string', NULL );
+		$expiry_status = param( 'expiry_status', 'string', 'active' );
 		$currentpage = param( 'currentpage', 'string', 1 );
 
 		// Check minimum permissions ( The comment specific permissions are checked when displaying the comments )
@@ -407,7 +410,7 @@ switch( $action )
 			$status_list = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
 		}
 
-		echo_item_comments( $blog, $item_ID, $status_list, $currentpage );
+		echo_item_comments( $blog, $item_ID, $status_list, $currentpage, 20, array(), '', $expiry_status );
 		break;
 
 	case 'get_tags':
@@ -557,10 +560,4 @@ function get_comments_awaiting_moderation( $blog_ID )
 	show_comments_awaiting_moderation( $blog_ID, NULL, $limit, array(), false );
 }
 
-/*
- * $Log$
- * Revision 1.82  2013/11/06 09:08:46  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

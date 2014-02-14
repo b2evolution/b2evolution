@@ -47,10 +47,4 @@ function duplicate( $Obj )
 	return $Copy;
 }
 
-/*
- * $Log$
- * Revision 1.24  2013/11/06 08:03:47  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -431,10 +431,4 @@ $schema_queries = array(
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" )
 );
 
-/*
- * $Log$
- * Revision 1.71  2013/11/06 08:03:47  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

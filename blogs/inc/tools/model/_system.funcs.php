@@ -129,7 +129,10 @@ function system_check_dir( $directory = 'media', $relative_path = NULL )
 
 	if( $directory == 'cache' && $relative_path != NULL )
 	{ // Create .htaccess file with deny rules
-		create_htaccess_deny( $path );
+		if( ! create_htaccess_deny( $cache_path ) )
+		{
+			return 6;
+		}
 	}
 
 	return 0;
@@ -152,7 +155,8 @@ function system_get_result( $check_dir_code, $before_msg = '' )
 		2 => T_( 'The directory doesn\'t exist.' ),
 		3 => T_( 'The directory is not readable.' ),
 		4 => T_( 'The directory is not writable.' ),
-		5 => T_( 'No permission to create/delete file in directory!' ) );
+		5 => T_( 'No permission to create/delete file in directory!' ),
+		6 => T_( 'No permission to create .htaccess file in directory!' ) );
 	return array( $status, $before_msg.$system_results[$check_dir_code] );
 }
 
@@ -429,13 +433,7 @@ function system_check_process_group()
  */
 function system_check_upload_max_filesize()
 {
-	$upload_max_filesize = ini_get('upload_max_filesize');
-	if( strpos( $upload_max_filesize, 'M' ) )
-	{
-		$upload_max_filesize = intval($upload_max_filesize) * 1024;
-	}
-
-	return $upload_max_filesize;
+	return get_php_bytes_size( ini_get('upload_max_filesize') );
 }
 
 /**
@@ -443,12 +441,7 @@ function system_check_upload_max_filesize()
  */
 function system_check_post_max_size()
 {
-	$post_max_size = ini_get('post_max_size');
-	if( strpos( $post_max_size, 'M' ) )
-	{
-		$post_max_size = intval($post_max_size) * 1024;
-	}
-	return $post_max_size;
+	return get_php_bytes_size( ini_get('post_max_size') );
 }
 
 /**
@@ -456,13 +449,7 @@ function system_check_post_max_size()
  */
 function system_check_memory_limit()
 {
-	$memory_limit = ini_get('memory_limit');
-
-	if( strpos( $memory_limit, 'M' ) )
-	{
-		$memory_limit = intval($memory_limit) * 1024;
-	}
-	return $memory_limit;
+	return get_php_bytes_size( ini_get('memory_limit') );
 }
 
 
@@ -490,5 +477,40 @@ function system_check_max_execution_time()
 	$max_execution_time = ini_get('max_execution_time');
 
 	return $max_execution_time;
+}
+
+
+/**
+ * Get how much bytes php ini value takes
+ *
+ * @param string PHP ini value,
+ *    Examples:
+ *         912 - 912 bytes
+ *          4K - 4 Kilobytes
+ *         13M - 13 Megabytes
+ *          8G - 8 Gigabytes
+ * @return integer Bytes
+ */
+function get_php_bytes_size( $php_ini_value )
+{
+	if( (string) intval( $php_ini_value ) === (string) $php_ini_value )
+	{ // Bytes
+		return $php_ini_value;
+	}
+	elseif( strpos( $php_ini_value, 'K' ) !== false )
+	{ // Kilobytes
+		return intval( $php_ini_value ) * 1024;
+	}
+	elseif( strpos( $php_ini_value, 'M' ) !== false  )
+	{ // Megabytes
+		return intval( $php_ini_value ) * 1024 * 1024;
+	}
+	elseif( strpos( $php_ini_value, 'G' ) !== false  )
+	{ // Gigabytes
+		return intval( $php_ini_value ) * 1024 * 1024 * 1024;
+	}
+
+	// Unknown format
+	return $php_ini_value;
 }
 ?>

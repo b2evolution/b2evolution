@@ -45,7 +45,7 @@ $Results = new Results( $SQL->get(), 'goals_', '-A' );
 
 $Results->Cache = & get_GoalCache();
 
-$Results->title = T_('Goals');
+$Results->title = T_('Goals').get_manual_link( 'goal-settings' );
 
 /**
  * Callback to add filters on top of the result set
@@ -117,10 +117,4 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 // Display results:
 $Results->display();
 
-/*
- * $Log$
- * Revision 1.14  2013/11/06 08:04:45  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

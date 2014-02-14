@@ -143,9 +143,27 @@ while( $Item = & $ItemList->get_item() )
 		{
 			echo 'fadeout-ffff00" id="fadeout-1';
 		}
-	 	?>">
+		?>">
 			<?php
 				echo '<div class="bSmallHeadRight">';
+				$Item->permanent_link( array(
+						'before' => '',
+						'text'   => '#text#'
+					) );
+				// Item slug control:
+				$Item->tinyurl_link( array(
+						'before' => ' - '.T_('Short').': ',
+						'after'  => ''
+					) );
+				global $admin_url;
+				if( $current_User->check_perm( 'slugs', 'view' ) )
+				{ // user has permission to view slugs:
+					echo '&nbsp;'.action_icon( T_('Edit slugs...'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID,
+						NULL, NULL, NULL, array( 'class' => 'small' ) );
+				}
+				echo '<div class="bViews">';
+				$Item->views();
+				echo '</div>';
 				If( !empty( $Item->order ) )
 				{
 					echo T_('Order').': '.$Item->order;
@@ -167,13 +185,6 @@ while( $Item = & $ItemList->get_item() )
 				// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 				echo ' ', T_('by'), ' ', $Item->creator_User->get_identity_link( array( 'link_text' => 'text' ) );
 
-				echo '<div class="bSmallHeadRight">';
-				$Item->status( array(
-						'before' => T_('Visibility').': <span class="bStatus">',
-						'after'  => '</span>',
-					) );
-				echo '</div>';
-
 				echo '<br />';
 				$Item->type( T_('Type').': <span class="bType">', '</span> &nbsp; ' );
 
@@ -184,26 +195,6 @@ while( $Item = & $ItemList->get_item() )
 					$Item->extra_status( T_('Task Status').': <span class="bExtStatus">', '</span>' );
 				}
 				echo '&nbsp;';
-
-				echo '<div class="bSmallHeadRight"><span class="bViews">';
-				$Item->views();
-				echo '</span>';
-				$Item->permanent_link( array(
-						'before' => '<br />',
-						'text'   => '#text#'
-					) );
-				// Item slug control:
-				$Item->tinyurl_link( array(
-						'before' => ' - '.T_('Short').': ',
-						'after'  => ''
-					) );
-				global $admin_url;
-				if( $current_User->check_perm( 'slugs', 'view' ) )
-				{ // user has permission to view slugs:
-					echo '&nbsp;'.action_icon( T_('Edit slugs...'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID,
-						NULL, NULL, NULL, array( 'class' => 'small' ) );
-				}
-				echo '</div>';
 
 				echo '<br />';
 
@@ -328,11 +319,19 @@ while( $Item = & $ItemList->get_item() )
 			echo '</span>';
 
 			echo '<span class="roundbutton_group">';
-			// Display publish NOW button if current user has the rights:
-			$Item->publish_link( ' ', '', '#', '#', 'roundbutton_text' );
+			// Display the moderate buttons if current user has the rights:
+			$status_link_params = array(
+					'class'       => 'roundbutton_text',
+					'redirect_to' => regenerate_url( '', '&highlight='.$Item->ID.'#item_'.$Item->ID, '', '&' ),
+				);
+			$Item->next_status_link( $status_link_params, true );
+			$Item->next_status_link( $status_link_params, false );
 
-			// Display deprecate button if current user has the rights:
-			$Item->deprecate_link( '', '', '#', '#', 'roundbutton_text' );
+			$next_status_in_row = $Item->get_next_status( false );
+			if( $next_status_in_row && $next_status_in_row[0] != 'deprecated' )
+			{ // Display deprecate button if current user has the rights:
+				$Item->deprecate_link( '', '', get_icon( 'move_down_grey', 'imgtag', array( 'title' => '' ) ), '#', 'roundbutton' );
+			}
 
 			// Display delete button if current user has the rights:
 			$Item->delete_link( '', ' ', '#', '#', 'roundbutton_text', false );
@@ -383,6 +382,13 @@ while( $Item = & $ItemList->get_item() )
 				param( 'comments_number', 'integer', $total_comments_number );
 			}
 
+			$show_comments_expiry = param( 'show_comments_expiry', 'string', 'active', false, true );
+			$expiry_statuses = array( 'active' );
+			if( $show_comments_expiry == 'all' )
+			{ // Display also the expired comments
+				$expiry_statuses[] = 'expired';
+			}
+
 			global $CommentList;
 			$CommentList = new CommentList2( $Blog );
 
@@ -393,12 +399,13 @@ while( $Item = & $ItemList->get_item() )
 				'order' => 'ASC',
 				'post_ID' => $Item->ID,
 				'comments' => 20,
+				'expiry_statuses' => $expiry_statuses,
 			) );
 			$CommentList->query();
 
 			// We do not want to comment actions use new redirect
 			param( 'save_context', 'boolean', false );
-			param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$Item->ID, '&' ), false, true );
+			param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$Item->ID, '&' ), false, true );
 			param( 'item_id', 'integer', $Item->ID );
 			param( 'currentpage', 'integer', 1 );
 			param( 'show_comments', 'string', $show_comments, false, true );
@@ -438,6 +445,21 @@ while( $Item = & $ItemList->get_item() )
 				<label for="show_all"><?php echo T_('All comments') ?></label>
 			</div>
 			<?php
+			$expiry_delay = $Item->get_setting( 'post_expiry_delay' );
+			if( ! empty( $expiry_delay ) )
+			{ // A filter to display even the expired comments
+			?>
+			<div class="tile">
+				&nbsp; | &nbsp;
+				<input type="radio" name="show_comments_expiry" value="expiry" id="show_expiry_delay" class="radio" <?php if( $show_comments_expiry == 'active' ) echo 'checked="checked" '?> />
+				<label for="show_expiry_delay"><?php echo get_duration_title( $expiry_delay ); ?></label>
+			</div>
+			<div class="tile">
+				<input type="radio" name="show_comments_expiry" value="all" id="show_expiry_all" class="radio" <?php if( $show_comments_expiry == 'all' ) echo 'checked="checked" '?> />
+				<label for="show_expiry_all"><?php echo T_('All comments') ?></label>
+			</div>
+			<?php
+			}
 
 			load_funcs( 'comments/model/_comment_js.funcs.php' );
 
@@ -509,10 +531,4 @@ $ItemList->display_nav( 'footer' );
 
 $block_item_Widget->disp_template_replaced( 'block_end' );
 
-/*
- * $Log$
- * Revision 1.57  2013/11/06 08:04:24  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

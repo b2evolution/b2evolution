@@ -107,7 +107,7 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'phpbb' );
 
-		$phpbb_ranks = param( 'phpbb_ranks', 'array', array() );
+		$phpbb_ranks = param( 'phpbb_ranks', 'array/integer', array() );
 		$phpbb_group_default = param( 'phpbb_group_default', 'integer' );
 		$phpbb_group_invalid = param( 'phpbb_group_invalid', 'integer' );
 
@@ -117,8 +117,8 @@ switch( $action )
 		phpbb_set_var( 'group_default', $phpbb_group_default );
 		phpbb_set_var( 'group_invalid', $phpbb_group_invalid );
 
-		$phpbb_categories = param( 'phpbb_categories', 'array', array() );
-		$phpbb_forums = param( 'phpbb_forums', 'array', array() );
+		$phpbb_categories = param( 'phpbb_categories', 'array/integer', array() );
+		$phpbb_forums = param( 'phpbb_forums', 'array/integer', array() );
 		phpbb_set_var( 'import_categories', $phpbb_categories );
 		phpbb_set_var( 'import_forums', $phpbb_forums );
 
@@ -228,10 +228,4 @@ $AdminUI->disp_payload_end();
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:04:54  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

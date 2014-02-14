@@ -128,6 +128,7 @@ function city_td_preferred( $city_preferred, $city_ID )
 
 $Results->cols[] = array(
 		'th' => /* TRANS: shortcut for enabled */ T_('En'),
+		'th_title' => T_('Enabled'),
 		'order' => 'city_enabled',
 		'td' => '%city_td_enabled( #city_enabled#, #city_ID# )%',
 		'th_class' => 'shrinkwrap',
@@ -136,6 +137,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 		'th' => /* TRANS: shortcut for preferred */ T_('Pref'),
+		'th_title' => T_('Preferred'),
 		'order' => 'city_preferred',
 		'default_dir' => 'D',
 		'td' => '%city_td_preferred( #city_preferred# , #city_ID# )%',
@@ -318,11 +320,3 @@ function load_subregions( region_ID )
 	} );
 }
 </script>
-<?php
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:04:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
-?>

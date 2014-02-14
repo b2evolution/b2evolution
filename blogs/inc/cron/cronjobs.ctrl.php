@@ -75,14 +75,15 @@ if( in_array( $action, array( 'new', 'create', 'edit', 'update', 'copy' ) ) )
 			'prune_hits_sessions' => T_('Prune old hits & sessions (includes OPTIMIZE)'),
 			'prune_page_cache' => T_('Prune old files from page cache'),
 			'post_by_email' => T_('Create posts by email'),
-			'process_hitlog' => T_('Process hit log'),
+			'process_hitlog' => T_('Extract info from hit log'),
 			'unread_message_reminder' => T_( 'Send reminders about unread messages' ),
-			'activate_account_reminder' => T_( 'Send reminders about not activated accounts' ),
+			'activate_account_reminder' => T_( 'Send reminders about non-activated accounts' ),
 			'comment_moderation_reminder' => T_( 'Send reminders about comments awaiting moderation' ),
 			'return_path' => T_('Process the return path inbox'),
 			'light_db_maintenance' => T_('Light DB maintenance (ANALYZE)'),
 			'heavy_db_maintenance' => T_('Heavy DB maintenance (CHECK & OPTIMIZE)'),
 			// post notifications, not user schedulable
+			// comment notifications, not user schedulable
 		);
 	$cron_job_params = array(
 			'test' => array(
@@ -376,10 +377,4 @@ $AdminUI->disp_payload_end();
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-/*
- * $Log$
- * Revision 1.18  2013/11/06 09:08:47  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

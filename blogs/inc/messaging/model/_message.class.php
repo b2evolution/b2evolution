@@ -137,9 +137,10 @@ class Message extends DataObject
 	/**
 	 * Insert discussion (one thread for all recipients)
 	 *
+	 * @param User who sent the message, it must be set only if it is not the current User
 	 * @return true if success, false otherwise
 	 */
-	function dbinsert_discussion()
+	function dbinsert_discussion( $from_User = NULL )
 	{
 		global $DB;
 
@@ -163,7 +164,7 @@ class Message extends DataObject
 						{
 							$DB->commit();
 
-							$this->send_email_notifications();
+							$this->send_email_notifications( true, $from_User );
 							return true;
 						}
 					}
@@ -179,9 +180,10 @@ class Message extends DataObject
 	/**
 	 * Insert new thread for each recipient
 	 *
+	 * @param User who sent the message, it must be set only if it is not the current User
 	 * @return true if success, instead false
 	 */
-	function dbinsert_individual()
+	function dbinsert_individual( $from_User = NULL )
 	{
 		foreach( $this->Thread->recipients_list as $recipient_ID )
 		{
@@ -189,7 +191,7 @@ class Message extends DataObject
 
 			$message->Thread->recipients_list = array( $recipient_ID );
 
-			if ( !$message->dbinsert_discussion() )
+			if ( !$message->dbinsert_discussion( $from_User ) )
 			{
 				return false;
 			}
@@ -479,9 +481,10 @@ class Message extends DataObject
 	 * Send email notification to recipients on new thread or new message event.
 	 *
 	 * @param boolean true if new thread, false if new message in the current thread
+	 * @param boolean the User who sent the message, in case of current User it may be NULL ( This is not the current User e.g. in case of welcome messages )
 	 * @return boolean True if all messages could be sent, false otherwise.
 	 */
-	function send_email_notifications( $new_thread = true )
+	function send_email_notifications( $new_thread = true, $from_User = NULL )
 	{
 		global $DB, $current_User, $admin_url, $baseurl, $app_name;
 		global $Settings, $UserSettings, $servertimenow;
@@ -540,11 +543,13 @@ class Message extends DataObject
 					'Message'              => $this,
 					'message_link'         => $message_link,
 					'other_unread_threads' => $other_unread_threads[$recipient_ID],
+					'from_User'            => $from_User,
 				);
 			$notify_User = $UserCache->get_by_ID( $recipient_ID );
 			// Change locale here to localize the email subject and content
 			locale_temp_switch( $notify_User->get( 'locale' ) );
-			$localized_subject = sprintf( T_( $subject ), $current_User->login );
+			$sender_login = ( $from_User === NULL ) ? $current_User->login : $from_User->login;
+			$localized_subject = sprintf( T_( $subject ), $sender_login );
 			// Note: Not activated users won't get notification email
 			if( send_mail_to_User( $recipient_ID, $localized_subject, 'private_message_new', $email_template_params ) )
 			{ // email sent successful, update las_unread_message_reminder timestamp, because the notification contains all unread messages

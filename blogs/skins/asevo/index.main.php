@@ -3,7 +3,7 @@
  * This is the main/default page template.
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
- * {@link http://manual.b2evolution.net/Skins_2.0}
+ * {@link http://b2evolution.net/man/skin-structure}
  *
  * It is used to display the blog when no specific page template is available to handle the request.
  *
@@ -145,7 +145,7 @@ skin_include( '_html_header.inc.php' );
 					'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
 					'intro_mode'   => 'normal',	// Intro posts will be displayed in normal mode
 					'item_class'   => 'featured_post',
-					'image_size'	 =>	'fit-400x320',
+					'image_size'   => 'fit-400x320',
 				) );
 			// ----------------------------END ITEM BLOCK  ----------------------------
 		}
@@ -182,6 +182,7 @@ skin_include( '_html_header.inc.php' );
 				'disp_posts'  => '',		// We already handled this case above
 				'disp_single' => '',		// We already handled this case above
 				'disp_page'   => '',		// We already handled this case above
+				'author_link_text' => 'preferredname',
 			) );
 		// Note: you can customize any of the sub templates included here by
 		// copying the matching php file into your skin directory.

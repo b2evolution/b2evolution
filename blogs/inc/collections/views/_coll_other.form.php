@@ -92,13 +92,3 @@ $Form->end_form( array(
 	array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
 ?>
-<?php
-
-
-/*
- * $Log$
- * Revision 1.3  2013/11/06 08:03:58  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
-?>

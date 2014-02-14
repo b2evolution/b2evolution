@@ -270,10 +270,16 @@ $AdminUI->breadcrumbpath_add( T_('Emails'), '?ctrl=email' );
 switch( $tab )
 {
 	case 'sent':
-		$AdminUI->breadcrumbpath_add( T_('Sent'), '?ctrl=email' );
+		$AdminUI->breadcrumbpath_add( T_('Sent'), '?ctrl=email&amp;tab='.$tab );
+
+		$emlog_ID = param( 'emlog_ID', 'integer', 0 );
 		if( empty( $emlog_ID ) )
-		{	// Init datepicker css on list page
+		{ // Init datepicker css on list page
 			require_css( 'ui.datepicker.css' );
+		}
+		else
+		{ // Require the styles for email content
+			require_css( $emailskins_url.'_email_style.css' );
 		}
 		break;
 
@@ -312,12 +318,11 @@ $AdminUI->disp_body_top();
 // Begin payload block:
 $AdminUI->disp_payload_begin();
 
-flush();
+evo_flush();
 
 switch( $tab )
 {
 	case 'sent':
-		$emlog_ID = param( 'emlog_ID', 'integer', 0 );
 		if( $emlog_ID > 0 )
 		{	// Display a details of selected email log
 			$MailLog = $DB->get_row( '
@@ -375,10 +380,4 @@ $AdminUI->disp_payload_end();
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-/*
- * $Log$
- * Revision 1.3  2013/11/06 09:08:59  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

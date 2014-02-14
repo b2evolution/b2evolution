@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $blog;
 
-$redirect_to = param( 'redirect_to', 'string', '' );
+$redirect_to = param( 'redirect_to', 'url', '' );
 if( empty( $redirect_to ) )
 {
 	$redirect_to = regenerate_url( 'disp' );

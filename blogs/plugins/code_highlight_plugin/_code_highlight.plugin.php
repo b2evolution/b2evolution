@@ -111,6 +111,14 @@ class code_highlight_plugin extends Plugin
 
 
 	/**
+	 * TRUE when HTML tags are allowed for content of current rendered post/comment/message
+	 * In this case we should prepare a content with function htmlspecialchars() to display a code as it is
+	 *
+	 * @var boolean
+	 */
+	var $allow_html = false;
+
+	/**
 	 * Init
 	 */
 	function PluginInit( & $params )
@@ -405,6 +413,26 @@ class code_highlight_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
+		// Get a setting "Allow HTML" for:
+		if( ! empty( $params['Comment'] ) )
+		{ // Comment
+			$Comment = & $params['Comment'];
+			$comment_Item = & $Comment->get_Item();
+			$item_Blog = $comment_Item->get_Blog();
+			$this->allow_html = $item_Blog->get_setting( 'allow_html_comment' );
+		}
+		else if( ! empty( $params['Item'] ) )
+		{ // Item
+			$Item = & $params['Item'];
+			$item_Blog = $Item->get_Blog();
+			$this->allow_html = $item_Blog->get_setting( 'allow_html_post' );
+		}
+		else if( ! empty( $params['Message'] ) )
+		{ // Message
+			global $Settings;
+			$this->allow_html = $Settings->get( 'allow_html_message' );
+		}
+
 		// 2 - attribs : lang &| line
 		// 4 - codeblock
 		$content = preg_replace_callback( '#(\<p>)?\<!--\s*codeblock([^-]*?)\s*-->(\</p>)?\<pre[^>]*><code>([\s\S]+?)</code>\</pre>(\<p>)?\<!--\s*/codeblock\s*-->(\</p>)?#i',
@@ -655,10 +683,14 @@ class code_highlight_plugin extends Plugin
 		$language = strtolower( ( empty( $match[2] ) ? 'code' : $match[2] ) );
 
 		if( $code = trim( $block[4] ) )
-		{	// we have a code block
+		{ // we have a code block
+			if( $this->allow_html )
+			{ // If HTML is allowed in content we should disallow this for <code> content
+				$code = htmlspecialchars( $code );
+			}
 			// is the relevant language highlighter already cached?
 			if( empty( $this->languageCache[ $language ] ) )
-			{	// lets attempt to load the language
+			{ // lets attempt to load the language
 				$language_file = dirname(__FILE__).'/highlighters/'.$language.'.highlighter.php';
 				if( is_file( $language_file ) )
 				{ // language class exists, lets load and cache an instance of it
@@ -667,10 +699,10 @@ class code_highlight_plugin extends Plugin
 					$this->languageCache[ $language ] = new $class( $this );
 				}
 				else
-				{	// language class doesn't exists, fallback to default highlighter
+				{ // language class doesn't exists, fallback to default highlighter
 					$language = 'code';
 					if( empty( $this->languageCache[ $language ] ) )
-					{	// lets attempt to load the default language
+					{ // lets attempt to load the default language
 						$language_file = dirname(__FILE__).'/highlighters/'.$language.'.highlighter.php';
 						if( is_file( $language_file ) )
 						{ // default lanugage exists
@@ -697,11 +729,4 @@ class code_highlight_plugin extends Plugin
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.37  2013/11/06 08:05:22  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

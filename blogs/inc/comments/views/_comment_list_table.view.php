@@ -61,11 +61,4 @@ comments_results( $CommentList );
 
 $CommentList->display();
 
-
-/*
- * $Log$
- * Revision 1.12  2013/11/06 08:04:07  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

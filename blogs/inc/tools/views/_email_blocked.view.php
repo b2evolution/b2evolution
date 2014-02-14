@@ -28,7 +28,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $blog, $admin_url, $UserSettings, $email, $statuses;
 
 param( 'email', 'string', '', true );
-param( 'statuses', 'array', array( 'warning', 'suspicious3' ), true );
+param( 'statuses', 'array/string', array( 'warning', 'suspicious3' ), true );
 
 // Create result set:
 
@@ -142,7 +142,7 @@ $Results->cols[] = array(
 		'th' => T_('Sent count'),
 		'order' => 'emblk_sent_count',
 		'default_dir' => 'D',
-		'td' => '<a href="'.$admin_url.'?ctrl=email&amp;filter=new&amp;email=$emblk_address$">$emblk_sent_count$</a>',
+		'td' => '<a href="'.$admin_url.'?ctrl=email&amp;tab=sent&amp;filter=new&amp;email=$emblk_address$">$emblk_sent_count$</a>',
 		'td_class' => 'right'
 	);
 
@@ -279,10 +279,4 @@ foreach( $status_titles as $status_value => $status_title )
 <?php
 }
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:04:55  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

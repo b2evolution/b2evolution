@@ -55,6 +55,11 @@ class Results extends Table
 	var $sql;
 
 	/**
+	 * SQL query to count total rows
+	 */
+	var $count_sql;
+
+	/**
 	 * Total number of rows (if > {@link $limit}, it will result in multiple pages)
 	 */
 	var $total_rows;
@@ -261,18 +266,14 @@ class Results extends Table
 		parent::Table( NULL, $param_prefix );
 
 		$this->sql = $sql;
+		$this->count_sql = $count_sql;
 
 		$this->init_limit_param( $default_limit );
-
-		// Count total rows:
-		// TODO: check if this can be done later instead
-		$this->count_total_rows( $count_sql );
 
 		if( $init_page )
 		{	// attribution of a page number
 			$this->page_param = 'results_'.$this->param_prefix.'page';
-			$page = param( $this->page_param, 'integer', 1, true );
-			$this->page = min( $page, $this->total_pages );
+			$this->page = param( $this->page_param, 'integer', 1, true );
 		}
 
 		$this->init_order_param( $default_order );
@@ -395,6 +396,11 @@ class Results extends Table
 	 */
 	function restart()
 	{
+		if( !isset( $this->total_rows ) )
+		{ // Count total rows to be able to display pages correctly
+			$this->count_total_rows( $this->count_sql );
+		}
+
 		// Make sure query has executed:
 		$this->query( $this->sql );
 

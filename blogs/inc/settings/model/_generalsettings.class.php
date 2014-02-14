@@ -91,9 +91,10 @@ class GeneralSettings extends AbstractSettings
 
 		// Image options
 		'exif_orientation' => '1',
-		'fm_resize_enable' => '1',
-		'fm_resize_width' => '1980',
-		'fm_resize_height' => '1080',
+		'fm_resize_enable' => '0',
+		'fm_resize_width' => '2880',
+		'fm_resize_height' => '1800',
+		'fm_resize_quality' => '95',
 
 		'newusers_canregister' => '0',
 		'newusers_mustvalidate' => '1',
@@ -104,7 +105,7 @@ class GeneralSettings extends AbstractSettings
 		'after_email_validation' => 'return_to_original', // where to redirect after account activation. Values: return_to_original, or the previously set specific url
 		'after_registration' => 'return_to_original', // where to redirect after new user registration. Values: return_to_original redirect_to url, or return to the previously set specific url
 		'newusers_level' => '1',
-		'registration_require_gender' => 'optional',
+		'registration_require_gender' => 'hidden',
 		'registration_ask_locale' => '0',
 
 		// Default user settings
@@ -114,6 +115,7 @@ class GeneralSettings extends AbstractSettings
 		'def_notify_unread_messages' => '1',
 		'def_notify_published_comments' => '1',
 		'def_notify_comment_moderation' => '1',
+		'def_notify_post_moderation' => '1',
 		'def_newsletter_news' => '1',
 		'def_newsletter_ads' => '0',
 		'def_notification_email_limit' => '3',
@@ -192,11 +194,12 @@ Delivery Status Notification (Failure)
 delayed 24 hours
 delayed 48 hours
 delayed 72 hours
-failure notice',
+failure notice
+Undeliverable:',
 		'repath_body_terminator' => '---------- Forwarded message ----------
 ------ This is a copy of the message, including all the headers. ------
 ----- Transcript of session follows -----
-Reporting-MTA:
+Received: from
 --- Below this line is a copy of the message.',
 		'repath_errtype' => 'C ^101
 C ^111
@@ -393,12 +396,4 @@ C message size exceeds',
 
 }
 
-
-
-/*
- * $Log$
- * Revision 1.49  2013/11/06 09:08:59  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

@@ -360,7 +360,7 @@ class basic_antispam_plugin extends Plugin
 		else
 		{
 			// flush now, so that the meat of the page will get shown before it tries to check back against the refering URL.
-			flush();
+			evo_flush();
 
 			$this->debug_log( 'AppendHitLog: loading referering page..' );
 
@@ -642,11 +642,4 @@ class basic_antispam_plugin extends Plugin
 
 }
 
-
-/*
- * $Log$
- * Revision 1.47  2013/11/06 08:05:22  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

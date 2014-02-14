@@ -59,11 +59,11 @@ $Form->begin_form( 'fform', $creating ?  T_('New file type') : T_('File type') )
 
 	if( ! $creating ) $Form->hidden( 'ftyp_ID', $edited_Filetype->ID );
 
-	$Form->text_input( 'ftyp_extensions', $edited_Filetype->extensions, 40, T_('Extensions'), '', array( 'maxlength'=>80, 'required'=>true, 'note'=>sprintf('E.g. &laquo;%s&raquo;'.', '.T_('separated by whitespace'), 'html') ) );
+	$Form->text_input( 'ftyp_extensions', $edited_Filetype->extensions, 40, T_('Extensions'), '', array( 'maxlength'=>30, 'required'=>true, 'note'=>sprintf('E.g. &laquo;%s&raquo;'.', '.T_('separated by whitespace'), 'html') ) );
 
-	$Form->text_input( 'ftyp_name', $edited_Filetype->name, 40, T_('File type name'), sprintf('E.g. &laquo;%s&raquo;', 'HTML file'), array( 'maxlength'=> 80, 'required'=>true ) );
+	$Form->text_input( 'ftyp_name', $edited_Filetype->name, 40, T_('File type name'), sprintf('E.g. &laquo;%s&raquo;', 'HTML file'), array( 'maxlength'=> 30, 'required'=>true ) );
 
-	$Form->text_input( 'ftyp_mimetype', $edited_Filetype->mimetype, 40, T_('Mime type'), sprintf('E.g. &laquo;%s&raquo;', 'text/html'), array( 'maxlength'=> 80, 'required'=>true ) );
+	$Form->text_input( 'ftyp_mimetype', $edited_Filetype->mimetype, 40, T_('Mime type'), sprintf('E.g. &laquo;%s&raquo;', 'text/html'), array( 'maxlength'=> 50, 'required'=>true ) );
 
 	$Form->select_input_array( 'ftyp_icon', $edited_Filetype->icon, get_available_filetype_icons(), T_('Icon') );
 
@@ -113,11 +113,4 @@ else
 													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 }
 
-
-/*
- * $Log$
- * Revision 1.11  2013/11/06 08:04:15  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

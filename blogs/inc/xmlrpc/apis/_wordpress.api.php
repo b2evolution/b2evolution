@@ -1546,10 +1546,4 @@ $xmlrpc_procs['wp.getMediaLibrary'] = array( // TODO
 				'docstring' => $wordpressgetmedialibrary_doc);
 */
 
-/*
- * $Log$
- * Revision 1.19  2013/11/06 09:09:09  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

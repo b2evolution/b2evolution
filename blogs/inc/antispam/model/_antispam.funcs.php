@@ -480,7 +480,6 @@ function get_ip_range( $ip_start, $ip_end, $aipr_ID = 0 )
  * Block request by IP address
  *
  * @param string IP address
- * @return boolean
  */
 function antispam_block_ip( $IP_address = '' )
 {
@@ -494,19 +493,83 @@ function antispam_block_ip( $IP_address = '' )
 	$IP_address = ip2int( $IP_address );
 
 	$SQL = new SQL();
-	$SQL->SELECT( '*' );
+	$SQL->SELECT( 'aipr_ID' );
 	$SQL->FROM( 'T_antispam__iprange' );
 	$SQL->WHERE( 'aipr_IPv4start <= '.$DB->quote( $IP_address ) );
 	$SQL->WHERE_and( 'aipr_IPv4end >= '.$DB->quote( $IP_address ) );
 	$SQL->WHERE_and( 'aipr_status = \'blocked\'' );
+	$ip_range_ID = $DB->get_var( $SQL->get() );
 
-	if( $ip_range = $DB->get_row( $SQL->get() ) )
-	{	// We should block the request from this IP address
+	if( !is_null( $ip_range_ID ) )
+	{ // We should block the request from this IP address
 		$DB->query( 'UPDATE T_antispam__iprange
 			SET aipr_block_count = aipr_block_count + 1
-			WHERE aipr_ID = '.$DB->quote( $ip_range->aipr_ID ) );
+			WHERE aipr_ID = '.$DB->quote( $ip_range_ID ) );
 
 		debug_die( 'This request has been blocked.' );
+	}
+}
+
+
+/**
+ * Move user to suspect group by IP address
+ *
+ * @param string IP address
+ */
+function antispam_suspect_user( $IP_address = '' )
+{
+	global $DB, $Settings, $current_User;
+
+	$suspicious_group_ID = $Settings->get('antispam_suspicious_group');
+
+	if( empty( $suspicious_group_ID ) )
+	{ // We don't need to move users to suspicious group
+		return;
+	}
+
+	if( !is_logged_in() )
+	{ // User must be logged in for this action
+		return;
+	}
+
+	if( $current_User->grp_ID == $suspicious_group_ID )
+	{ // Current User already is in suspicious group
+		return;
+	}
+
+	$antispam_trust_groups = $Settings->get('antispam_trust_groups');
+	if( !empty( $antispam_trust_groups ) )
+	{
+		$antispam_trust_groups = explode( ',', $antispam_trust_groups );
+		if( in_array( $current_User->grp_ID, $antispam_trust_groups ) )
+		{ // Current User has group which cannot be moved to suspicious users
+			return;
+		}
+	}
+
+	if( empty( $IP_address ) && array_key_exists( 'REMOTE_ADDR', $_SERVER ) )
+	{
+		$IP_address = $_SERVER['REMOTE_ADDR'];
+	}
+
+	$IP_address = ip2int( $IP_address );
+
+	$SQL = new SQL();
+	$SQL->SELECT( 'aipr_ID' );
+	$SQL->FROM( 'T_antispam__iprange' );
+	$SQL->WHERE( 'aipr_IPv4start <= '.$DB->quote( $IP_address ) );
+	$SQL->WHERE_and( 'aipr_IPv4end >= '.$DB->quote( $IP_address ) );
+	$SQL->WHERE_and( 'aipr_status = \'suspect\'' );
+	$ip_range_ID = $DB->get_row( $SQL->get() );
+
+	if( !is_null( $ip_range_ID ) )
+	{ // Move current user to suspicious group because current IP address is suspected
+		$GroupCache = & get_GroupCache();
+		if( $suspicious_Group = & $GroupCache->get_by_ID( $suspicious_group_ID, false, false ) )
+		{ // Group exists in DB and we can change user's group
+			$current_User->set_Group( $suspicious_Group );
+			$current_User->dbupdate();
+		}
 	}
 }
 
@@ -655,7 +718,7 @@ function antispam_bankruptcy_delete( $blog_IDs = array(), $comment_status = NULL
 	}
 
 	echo T_('The comments are deleting...');
-	flush();
+	evo_flush();
 
 	$DB->begin();
 
@@ -703,7 +766,7 @@ function antispam_bankruptcy_delete( $blog_IDs = array(), $comment_status = NULL
 			LIMIT 10000' );
 
 		echo ' .';
-		flush();
+		evo_flush();
 	}
 
 	echo 'OK';
@@ -711,11 +774,4 @@ function antispam_bankruptcy_delete( $blog_IDs = array(), $comment_status = NULL
 	$DB->commit();
 }
 
-
-/*
- * $Log$
- * Revision 1.23  2013/11/06 08:03:48  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

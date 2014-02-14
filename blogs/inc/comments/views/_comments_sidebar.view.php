@@ -95,7 +95,7 @@ $Form->begin_form( '' );
 
 	<?php
 	echo '</fieldset>';
-	
+
 	echo '<fieldset>';
 	echo '<legend>'.T_('Title / Text contains').'</legend>';
 
@@ -132,7 +132,7 @@ $Form->begin_form( '' );
 	<div class="rating">
 		<input type="checkbox" name="<?php echo $pp ?>rating_toshow[]" value="norating" id="rating_ts_norating" class="checkbox" <?php if( isset( $rating_toshow ) && in_array( "norating", $rating_toshow ) ) echo 'checked="checked" '?> />
 		<label for="rating_ts_norating"><?php echo T_('No rating') ?> </label><br />
-		
+
 		<input type="checkbox" name="<?php echo $pp ?>rating_toshow[]" value="haverating" id="rating_ts_haverating" class="checkbox" <?php if( isset( $rating_toshow ) && in_array( "haverating", $rating_toshow ) ) echo 'checked="checked" '?> />
 		<label for="rating_ts_haverating"><?php echo T_('Have rating') ?> </label><br />
 	</div>
@@ -196,7 +196,7 @@ $Form->begin_form( '' );
 	echo $Form->inputstart;
 	?>
 	<div><?php echo T_('IP') ?> <input type="text" name="<?php echo $pp ?>author_IP" size="20" value="<?php echo htmlspecialchars($author_IP) ?>" class="SearchField" style="width:85%" /></div>
-	<div class="note"><?php echo T_('use % for partial matches') ?></div>
+	<div class="note"><?php echo T_('use \'%\' for partial matches') ?></div>
 	<?php
 	echo $Form->inputend;
 
@@ -208,11 +208,4 @@ $Form->end_form();
 
 echo $template['block_end'];
 
-
-/*
- * $Log$
- * Revision 1.13  2013/11/06 08:04:07  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

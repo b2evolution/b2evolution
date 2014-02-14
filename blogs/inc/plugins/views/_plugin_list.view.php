@@ -128,6 +128,7 @@ function plugin_results_td_status( $plug_status, $plug_ID )
 }
 $Results->cols[] = array(
 		'th' => /* TRANS: shortcut for enabled */ T_('En'),
+		'th_title' => T_('Enabled'),
 		'order' => 'plug_status',
 		'td' => '%plugin_results_td_status( \'$plug_status$\', $plug_ID$ )%',
 		'td_class' => 'center',
@@ -260,11 +261,4 @@ unset($Results); // free memory
 //Flush fadeout
 $Session->delete( 'fadeout_id');
 
-
-/*
- * $Log$
- * Revision 1.17  2013/11/06 08:04:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

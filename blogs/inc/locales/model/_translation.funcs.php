@@ -216,11 +216,11 @@ function translation_generate_po_file( $locale )
 	{
 		if( !file_exists( $locales_path.$locales[$locale]['messages'] ) )
 		{
-			@mkdir( $locales_path.$locales[$locale]['messages'] );
+			evo_mkdir( $locales_path.$locales[$locale]['messages'] );
 		}
 		if( !file_exists( $locales_path.$locales[$locale]['messages'].'/LC_MESSAGES' ) )
 		{
-			@mkdir( $locales_path.$locales[$locale]['messages'].'/LC_MESSAGES' );
+			evo_mkdir( $locales_path.$locales[$locale]['messages'].'/LC_MESSAGES' );
 		}
 	}
 
@@ -340,11 +340,4 @@ function translation_find_T_strings( $file, & $translation_strings )
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:04:25  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

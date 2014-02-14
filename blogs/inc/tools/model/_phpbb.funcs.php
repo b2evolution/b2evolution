@@ -115,7 +115,7 @@ function phpbb_log( $message, $type = 'message', $nl = '<br />', $bl = '' )
 			break;
 	}
 
-	flush();
+	evo_flush();
 }
 
 
@@ -2081,10 +2081,4 @@ function phpbb_check_step( $step_name )
 
 }
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:04:54  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

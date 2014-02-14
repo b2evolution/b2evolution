@@ -83,6 +83,19 @@ class LinkUser extends LinkOwner
 	}
 
 	/**
+	 * Clear all links of owner User
+	 */
+	function clear_Links()
+	{
+		if( ! is_null( $this->Links ) )
+		{ // Links have been loaded:
+			$this->Links = NULL;
+			$LinkCache = & get_LinkCache();
+			$LinkCache->clear( false, 'user', $this->User->ID );
+		}
+	}
+
+	/**
 	 * Add new link to owner User
 	 *
 	 * @param integer file ID

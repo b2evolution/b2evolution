@@ -59,67 +59,6 @@ $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'seo' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
-$Form->begin_fieldset( T_('SEO Presets') );
-
-	$available_presets = array( 'awall' => 'Aaron Wall',
-                              'abeal' => 'Andy Beal',
-                              'mgray' => 'Michael Gray',
-                              'rfishkin' => 'Rand Fishkin',
-                              'sspencer' => 'Stephan Spencer' );
-
-  $preset_html = '';
-	foreach( $available_presets as $preset_code => $preset_name )
-	{
-		$preset_html .= '<a href="?ctrl=coll_settings&amp;tab=seo&amp;blog='.$edited_Blog->ID.'&amp;preset='
-												.$preset_code.'" title="'.$preset_name.'"';
-		if( $preset == $preset_code )
-		{
-			$preset_html .= ' class="current"';
-		}
-		$preset_html .= '><img alt="'.$preset_name.'" src="'
-												.$rsc_url.'/img/people/'.$preset_code.'.png" width="124" height="180" /></a>';
-	}
-
-
-	echo '<div class="seo_presets">'.$preset_html.'</div>';
-
-	switch( $preset )
-	{
-		case 'awall':
-			$seo_author = '<a href="http://www.seobook.com/" target="_blank">Aaron Wall</a>';
-			$seo_site = 'For more SEO tips, visit <strong><a href="http://www.seobook.com/" target="_blank">SEO Book</a></strong>.';
-			break;
-
-		case 'abeal':
-			$seo_author = '<a href="http://www.marketingpilgrim.com/" target="_blank">Andy Beal</a>';
-			$seo_site = 'For more advanced optimization, visit <strong><a href="http://www.marketingpilgrim.com/" target="_blank">Marketing Pilgrim</a></strong>.';
-			break;
-
-		case 'mgray':
-			$seo_author = '<a href="http://www.wolf-howl.com/" target="_blank">Michael Gray</a>';
-			$seo_site = 'For more advanced optimization, visit <strong><a href="http://www.wolf-howl.com/" target="_blank">Graywolf\'s SEO blog</a></strong>.';
-			break;
-
-		case 'rfishkin':
-			$seo_author = '<a href="http://www.seomoz.org/team/randfish" target="_blank">Rand Fishkin</a>';
-			$seo_site = 'For more advanced optimization, visit <strong><a href="http://www.seomoz.org/" target="_blank">SEOmoz</a></strong>.';
-			break;
-
-		case 'sspencer':
-			$seo_author = '<a href="http://www.stephanspencer.com/" target="_blank">Stephan Spencer</a>';
-			$seo_site = 'For more advanced optimization, visit <strong><a href="http://www.netconcepts.com/" target="_blank">NetConcepts</a></strong>.';
-			break;
-	}
-
-	if( !empty($seo_author) )
-	{
-	 	echo '<div class="seo_message">';
-		printf( T_('You can review the SEO settings recommended by <strong>%s</strong> below. Click the "Save!" button to apply these settings.'),
-								$seo_author );
-		echo '<br/>'.$seo_site.'</div>';
-	}
-$Form->end_fieldset();
-
 $Form->begin_fieldset( T_('Main page / post list').get_manual_link('main_page_seo') );
 	$Form->checkbox( 'default_noindex', $edited_Blog->get_setting( 'default_noindex' ), T_('Default blog page'), T_('META NOINDEX') );
 	$Form->checklist( array(
@@ -175,16 +114,18 @@ $Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_li
 								.url_add_tail( $blogurl, '<strong>/cat/subcat/post-title</strong>' ) ),
 			), T_('Permalink scheme'), true );
 
+	$Form->text_input( 'slug_limit', $edited_Blog->get_setting('slug_limit'), 3, T_('Limit slug length to'), '', array( 'input_suffix' => ' '.T_('words') ) );
+
 	$Form->checklist( array(
 		array( 'canonical_item_urls', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_item_urls' ) ),
 		array( 'relcanonical_item_urls', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_item_urls' ) ),
 		), 'canonical_item_urls_options', T_('Make canonical') );
 
 	$Form->checkbox( 'excerpts_meta_description', $edited_Blog->get_setting( 'excerpts_meta_description' ),
-			T_('Meta description'), T_('Fallback to excerpt as meta description for posts and pages if meta description for item is empty') );
+			T_('Meta description'), T_('When no meta description is provided for an item, use the excerpt instead.') );
 
 	$Form->checkbox( 'tags_meta_keywords', $edited_Blog->get_setting( 'tags_meta_keywords' ),
-			T_('Meta Keywords'), T_('Fallback to tags as meta keywords for posts and pages if meta keywords for item is empty') );
+			T_('Meta Keywords'), T_('When no meta keywords are provided for an item, use tags instead.') );
 
 $Form->end_fieldset();
 
@@ -394,12 +335,4 @@ $Form->end_form( array(
 	array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
 	array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
-echo '<p class="note right">SEO portraits kindly provided by <a href="http://www.seomoz.org/" target="_blank">SEOmoz</a>.</p>';
-
-/*
- * $Log$
- * Revision 1.34  2013/11/06 08:03:58  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

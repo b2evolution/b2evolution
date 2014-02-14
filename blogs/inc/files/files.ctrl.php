@@ -61,6 +61,8 @@ global $dispatcher;
 
 global $blog;
 
+global $filename_max_length, $dirpath_max_length;
+
 // Check permission:
 $current_User->check_perm( 'files', 'view', true, $blog ? $blog : NULL );
 
@@ -287,6 +289,11 @@ if( $fm_FileRoot )
 		{	// We have reduced the absolute path, we should also reduce the relative $path (used in urls params)
 			$path = get_canonical_path( $path );
 		}
+
+		if( ( $Messages->count() == 0 ) && ( strlen( $ads_list_path ) > $dirpath_max_length ) && $current_User->check_perm( 'options', 'edit' ) )
+		{ // This folder absolute path exceed the max allowed length, a warning message must be displayed, if there were no other message yet. ( If there are other messages then this one should have been already added )
+			$Messages->add( sprintf( T_( 'This folder has an access path that is too long and cannot be properly handled by b2evolution. Please check and increase the &laquo;%s&raquo; variable.'), '$dirpath_max_length' ), 'warning' );
+		}
 	}
 }
 
@@ -325,7 +332,7 @@ $Debuglog->add( 'path: '.var_export( $path, true ), 'files' );
  *
  * @global array
  */
-$fm_selected = param( 'fm_selected', 'array', array(), true );
+$fm_selected = param( 'fm_selected', 'array/string', array(), true );
 $Debuglog->add( count($fm_selected).' selected files/directories', 'files' );
 /**
  * The selected files (must be within current fileroot)
@@ -396,7 +403,7 @@ switch( $action )
 			break;
 		}
 
-		if( !	param( 'create_name', 'string', '' ) )
+		if( ! param( 'create_name', 'string', '' ) )
 		{ // No name was supplied:
 			$Messages->add( T_('Cannot create a directory without name.'), 'error' );
 			break;
@@ -417,6 +424,12 @@ switch( $action )
 		 */
 		$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, $path.$create_name );
 
+		if( strlen( $newFile->get_full_path() ) > $dirpath_max_length )
+		{
+			$Messages->add( T_('The new file access path is too long, shorter folder names would be required.'), 'error' );
+			break;
+		}
+
 		if( $newFile->exists() )
 		{
 			$Messages->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $create_name ), 'error' );
@@ -425,7 +438,9 @@ switch( $action )
 
 		if( ! $newFile->create( $create_type ) )
 		{
-			$Messages->add( sprintf( T_('Could not create directory &laquo;%s&raquo; in &laquo;%s&raquo;.'), $create_name, $fm_Filelist->_rds_list_path ), 'error' );
+			$Messages->add( sprintf( T_('Could not create directory &laquo;%s&raquo; in &laquo;%s&raquo;.'), $create_name, $path )
+				.' '.get_file_permissions_message(), 'error' );
+			break;
 		}
 
 		$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; has been created.'), $create_name ), 'success' );
@@ -472,7 +487,9 @@ switch( $action )
 
 		if( ! $newFile->create( $create_type ) )
 		{
-			$Messages->add( sprintf( T_('Could not create file &laquo;%s&raquo; in &laquo;%s&raquo;.'), $create_name, $fm_Filelist->_rds_list_path ), 'error' );
+			$Messages->add( sprintf( T_('Could not create file &laquo;%s&raquo; in &laquo;%s&raquo;.'), $create_name, $newFile->get_dir() )
+				.' '.get_file_permissions_message(), 'error' );
+			break;
 		}
 
 		$Messages->add( sprintf( T_('The file &laquo;%s&raquo; has been created.'), $create_name ), 'success' );
@@ -644,7 +661,7 @@ switch( $action )
 		// Downloading
 		load_class( '_ext/_zip_archives.php', 'zip_file' );
 
-		$arraylist = $selected_Filelist->get_array( 'get_rdfs_rel_path' );
+		$arraylist = $selected_Filelist->get_array( 'get_name' );
 
 		$options = array (
 			'basedir' => $fm_Filelist->get_ads_list_path(),
@@ -654,7 +671,7 @@ switch( $action )
 
 		$zipfile = new zip_file( $zipname );
 		$zipfile->set_options( $options );
-		$zipfile->add_files( $arraylist );
+		$zipfile->add_files( $arraylist, array( '_evocache' ) );
 		$zipfile->create_archive();
 
 		if( $zipfile->error )
@@ -706,7 +723,7 @@ switch( $action )
 			}
 
 			// Check if provided name is okay:
-			if( $check_error = check_rename( $new_names[$loop_src_File->get_md5_ID()], $loop_src_File->is_dir(), $allow_locked_filetypes ) )
+			if( $check_error = check_rename( $new_names[$loop_src_File->get_md5_ID()], $loop_src_File->is_dir(), $loop_src_File->get_dir(), $allow_locked_filetypes ) )
 			{
 				$confirmed = 0;
 				param_error( 'new_names['.$loop_src_File->get_md5_ID().']', $check_error );
@@ -1030,7 +1047,7 @@ switch( $action )
 		if( $new_name != $old_name)
 		{ // Name has changed...
 			$allow_locked_filetypes = $current_User->check_perm( 'files', 'all' );
-			if( $check_error = check_rename( $new_name, $edited_File->is_dir(), $allow_locked_filetypes ) )
+			if( $check_error = check_rename( $new_name, $edited_File->is_dir(), $edited_File->get_dir(), $allow_locked_filetypes ) )
 			{
 				$error_occured = true;
 				param_error( 'new_name', $check_error );
@@ -1177,7 +1194,7 @@ switch( $action )
 		// Forget selected files
 		if( $files_count > 1 ) $fm_selected = NULL;
 
-		$Messages->add( $LinkOwner->T_( 'Selected files have been linked to owner.' ), 'success' );
+		$Messages->add( $LinkOwner->translate( 'Selected files have been linked to owner.' ), 'success' );
 
 		// In case the mode had been closed, reopen it:
 		$fm_mode = 'link_object';
@@ -1330,7 +1347,7 @@ switch( $fm_mode )
 		}
 
 		// Get the source list
-		if( $fm_sources = param( 'fm_sources', 'array', array(), true ) )
+		if( $fm_sources = param( 'fm_sources', 'array/string', array(), true ) )
 		{
 			$fm_sources_root = param( 'fm_sources_root', 'string', '', true );
 
@@ -1412,10 +1429,18 @@ switch( $fm_mode )
 				continue;
 			}
 
-			// Check if destination file exists:
+			// If the source is a directory, then we must check if the target path length is allowed or not
 			$FileCache = & get_FileCache();
-			if( ($dest_File = & $FileCache->get_by_root_and_path( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID(), $fm_Filelist->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()] ))
-							&& $dest_File->exists() )
+			$dest_File = & $FileCache->get_by_root_and_path( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID(), $fm_Filelist->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()] );
+			if( $loop_src_File->is_dir() && ( strlen( $dest_File->get_full_path() ) > $dirpath_max_length ) )
+			{ // The path would be too long we can not allowe to move this folder
+				param_error( 'new_names['.$loop_src_File->get_md5_ID().']', T_('The target path is too long for this folder.') );
+				$confirm = 0;
+				continue;
+			}
+
+			// Check if destination file exists:
+			if( $dest_File && $dest_File->exists() )
 			{ // Target exists
 				if( $dest_File === $loop_src_File )
 				{
@@ -1708,11 +1733,4 @@ $AdminUI->disp_payload_end();
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-
-/*
- * $Log$
- * Revision 1.84  2013/11/06 08:04:08  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

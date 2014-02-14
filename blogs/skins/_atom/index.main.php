@@ -3,7 +3,7 @@
  * This template generates an Atom feed for the requested blog's latest posts
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
- * {@link http://manual.b2evolution.net/Skins_2.0}
+ * {@link http://b2evolution.net/man/skin-structure}
  *
  * See {@link http://atompub.org/2005/07/11/draft-ietf-atompub-format-10.html}
  *

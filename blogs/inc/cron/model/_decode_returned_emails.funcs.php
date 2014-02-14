@@ -368,7 +368,7 @@ function dre_tempdir( $dir, $prefix = 'tmp', $mode = 0700 )
 	// Add trailing slash
 	$dir = trailing_slash($dir);
 
-	do { $path = $dir.$prefix.mt_rand(); } while( !mkdir( $path, $mode ) );
+	do { $path = $dir.$prefix.mt_rand(); } while( ! evo_mkdir( $path, $mode ) );
 
 	return $path;
 }
@@ -611,9 +611,9 @@ function dre_get_error_message( $message )
 {
 	$error_text = '';
 
-	if( preg_match_all( '# 5[0-9][0-9][\s\d\.-]+([^\n]+)#i', $message, $errors ) )
+	if( preg_match( '#[\s;]{1}(5[0-9][0-9][\s\d\.\-]+([^\n]+))#i', $message, $errors ) )
 	{	// Get first found error
-		$error_text = trim( $errors[0][0] );
+		$error_text = trim( $errors[1] );
 	}
 	else
 	{	// If no errors - use full content(between email and body terminator)
@@ -913,11 +913,4 @@ function dre_save_blocked_email( $email_returned )
 	$EmailBlocked->dbsave();
 }
 
-
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:04:07  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -104,7 +104,7 @@ switch( $action )
 		$subject = param( 'subject', 'string', '' );
 		$email_author = param( 'email_author', 'string', '' );
 		$email_author_address = param( 'email_author_address', 'string', '' );
-		$redirect_to = param( 'redirect_to', 'string', '' );
+		$redirect_to = param( 'redirect_to', 'url', '' );
 		$post_id = NULL;
 		$comment_id = param( 'comment_id', 'integer', 0 );
 		$BlogCache = & get_BlogCache();
@@ -124,7 +124,7 @@ switch( $action )
 		{ // Get identity link for existed users
 			$RecipientCache = & get_UserCache();
 			$Recipient = $RecipientCache->get_by_ID( $recipient_id );
-			$recipient_link = $Recipient->get_identity_link( array( 'link_text' => 'text' ) );
+			$recipient_link = $Recipient->get_identity_link( array( 'link_text' => 'nickname' ) );
 		}
 		else if( $comment_id > 0 )
 		{ // Anonymous Users
@@ -365,7 +365,7 @@ switch( $action )
 		param( 'vote_type', 'string', '' );
 		param( 'vote_ID', 'string', 0 );
 		param( 'checked', 'integer', 0 );
-		param( 'redirect_to', 'string', '' );
+		param( 'redirect_to', 'url', '' );
 
 		$Ajaxlog->add( sprintf( 'vote action: %s', $vote_action ), 'note' );
 		$Ajaxlog->add( sprintf( 'vote type: %s', $vote_type ), 'note' );
@@ -755,8 +755,14 @@ switch( $action )
 		if( param( 'is_backoffice', 'integer', 0 ) )
 		{
 			global $current_User, $UserSettings, $is_admin_page;
-			$params = array( 'skin_type' => 'admin', 'skin_name' => $UserSettings->get( 'admin_skin', $current_User->ID ) );
+			$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+			$params = array( 'skin_type' => 'admin', 'skin_name' => $admin_skin );
 			$is_admin_page = true;
+			/**
+			 * Load the AdminUI class for the skin.
+			 */
+			require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+			$AdminUI = new AdminUI();
 
 			// Get the requested params and memorize it to make correct links for paging, ordering and etc.
 			param( 'ctrl', '/^[a-z0-9_]+$/', $default_ctrl, true );
@@ -839,6 +845,50 @@ switch( $action )
 		echo evo_json_encode( $result_users );
 		exit(0);
 
+	case 'moderate_comment':
+		// Used for quick moderation of comments in front-office
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'comment' );
+
+		if( !is_logged_in() )
+		{ // Only logged in users can moderate comments
+			break;
+		}
+
+		// Check comment moderate permission below after we have the $edited_Comment object
+
+		$blog = param( 'blogid', 'integer' );
+		$status = param( 'status', 'string' );
+		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ), false );
+		if( $edited_Comment !== false )
+		{ // The comment still exists
+			// Check permission:
+			$current_User->check_perm( 'comment!'.$status, 'moderate', true, $edited_Comment );
+
+			$redirect_to = param( 'redirect_to', 'url', NULL );
+
+			$edited_Comment->set( 'status', $status );
+			// Comment moderation is done, handle moderation "secret"
+			$edited_Comment->handle_qm_secret();
+			if( $edited_Comment->dbupdate() !== false )
+			{
+				if( $status == 'published' )
+				{
+					$edited_Comment->handle_notifications( false, $current_User->ID );
+				}
+
+				// Send new current status as ajax response
+				echo $edited_Comment->status;
+				// Also send the statuses which will be after raising/lowering of a status by current user
+				$comment_raise_status = $edited_Comment->get_next_status( true, $edited_Comment->status );
+				$comment_lower_status = $edited_Comment->get_next_status( false, $edited_Comment->status );
+				echo ':'.( $comment_raise_status ? $comment_raise_status[0] : '' );
+				echo ':'.( $comment_lower_status ? $comment_lower_status[0] : '' );
+			}
+		}
+		break;
+
 	default:
 		$Ajaxlog->add( T_('Incorrect action!'), 'error' );
 		break;
@@ -860,10 +910,4 @@ echo '<!-- Ajax response end -->';
 
 exit(0);
 
-/*
- * $Log$
- * Revision 1.32  2013/11/06 09:08:46  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

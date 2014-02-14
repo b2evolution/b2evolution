@@ -185,24 +185,33 @@ switch( $action )
 		$report_info = param( 'report_info_content', 'text', '' );
 		$user_ID = param( 'user_ID', 'integer', 0 );
 
-		// add report and block contact ( it will be blocked if was already on this user contact list )
-		add_report_from( $user_ID, $report_status, $report_info );
-		$blocked_message = '';
-		if( $current_User->check_perm( 'perm_messaging', 'reply' ) )
-		{ // user has messaging permission, set/add this user as blocked contact
-			$contact_status = check_contact( $user_ID );
-			if( $contact_status == NULL )
-			{ // contact doesn't exists yet, create as blocked contact
-				create_contacts_user( $user_ID, true );
-				$blocked_message = ' '.T_('You have also blocked this user from contacting you in the future.');
-			}
-			elseif( $contact_status )
-			{ // contact exists and it's not blocked, set as blocked
-				set_contact_blocked( $user_ID, 1 );
-				$blocked_message = ' '.T_('You have also blocked this user from contacting you in the future.');
-			}
+		if( get_report_status_text( $report_status ) == '' )
+		{ // A report status is incorrect
+			$Messages->add( T_('Please select the correct report reason!'), 'error' );
 		}
-		$Messages->add( T_('The user was repoted.').$blocked_message, 'success' );
+
+		if( ! param_errors_detected() )
+		{
+			// add report and block contact ( it will be blocked if was already on this user contact list )
+			add_report_from( $user_ID, $report_status, $report_info );
+			$blocked_message = '';
+			if( $current_User->check_perm( 'perm_messaging', 'reply' ) )
+			{ // user has messaging permission, set/add this user as blocked contact
+				$contact_status = check_contact( $user_ID );
+				if( $contact_status == NULL )
+				{ // contact doesn't exists yet, create as blocked contact
+					create_contacts_user( $user_ID, true );
+					$blocked_message = ' '.T_('You have also blocked this user from contacting you in the future.');
+				}
+				elseif( $contact_status )
+				{ // contact exists and it's not blocked, set as blocked
+					set_contact_blocked( $user_ID, 1 );
+					$blocked_message = ' '.T_('You have also blocked this user from contacting you in the future.');
+				}
+			}
+			$Messages->add( T_('The user was repoted.').$blocked_message, 'success' );
+		}
+
 		header_redirect( url_add_param( $Blog->gen_blogurl(), 'disp=user&user_ID='.$user_ID ) );
 		break;
 
@@ -244,10 +253,4 @@ require_once $inc_path.'_filters.inc.php';
 
 require $ads_current_skin_path.'index.main.php';
 
-/*
- * $Log$
- * Revision 1.9  2013/11/06 08:05:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

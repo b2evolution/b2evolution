@@ -37,7 +37,7 @@ global $blog, $admin_url, $rsc_url;
 // TOP REFERING SEARCH ENGINES
 ?>
 
-<h3><?php echo T_('Top refering search engines') ?></h3>
+<h3><?php echo T_('Top refering search engines').get_manual_link( 'top-refering-search-engines' ) ?></h3>
 
 <?php
 global $res_stats, $row_stats;
@@ -70,10 +70,4 @@ if( count( $res_stats ) )
 }
 
 
-/*
- * $Log$
- * Revision 1.6  2013/11/06 08:04:45  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

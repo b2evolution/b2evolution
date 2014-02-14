@@ -162,7 +162,16 @@ class CommentQuery extends SQL
 			$post_list = $post;
 		}
 
-		$this->WHERE_and( $this->dbprefix.'post_ID '.$eq.' ('.$post_list.')' );
+		// Validate post ID list
+		$post_ids = array();
+		$post_list = explode( ',', $post_list );
+		foreach( $post_list as $p_id )
+		{
+			$post_ids[] = intval( $p_id );// make sure they're all numbers
+		}
+		$this->post = implode( ',', $post_ids );
+
+		$this->WHERE_and( $this->dbprefix.'post_ID '.$eq.' ('.$this->post.')' );
 	}
 
 
@@ -215,6 +224,11 @@ class CommentQuery extends SQL
 			$author_list = $author;
 		}
 
+		if( preg_match( '/^[0-9]+(,[0-9]+)*$/', $author_list ) === false )
+		{
+			debug_die( 'Invalid comment author filter request' );
+		}
+
 		$this->WHERE_and( $this->dbprefix.'author_ID '.$eq.' ('.$author_list.')' );
 	}
 
@@ -226,6 +240,8 @@ class CommentQuery extends SQL
 	 */
 	function where_author_email( $author_email )
 	{
+		global $DB;
+
 		$this->author_email = $author_email;
 
 		if( empty( $author_email ) )
@@ -236,15 +252,15 @@ class CommentQuery extends SQL
 		if( substr( $author_email, 0, 1 ) == '-' )
 		{	// List starts with MINUS sign:
 			$eq = 'NOT IN';
-			$author_email_list = substr( $author_email, 1 );
+			$author_email_list = explode( ',', substr( $author_email, 1 ) );
 		}
 		else
 		{
 			$eq = 'IN';
-			$author_email_list = $author_email;
+			$author_email_list = explode( ',', $author_email );
 		}
 
-		$this->WHERE_and( $this->dbprefix.'author_email '.$eq.' ('.$author_email_list.')' );
+		$this->WHERE_and( $this->dbprefix.'author_email '.$eq.' ( '.$DB->quote( $author_email_list ).' )' );
 	}
 
 
@@ -371,6 +387,8 @@ class CommentQuery extends SQL
 	 */
 	function where_statuses( $show_statuses, $filter_by_perm = true )
 	{
+		global $DB;
+
 		if( empty( $show_statuses ) )
 		{ // initialize if emty
 			$show_statuses = get_visibility_statuses( 'keys', array( 'trash', 'redirected' ) );
@@ -389,7 +407,7 @@ class CommentQuery extends SQL
 			$sep = '';
 			foreach( $show_statuses as $status )
 			{
-				$list .= $sep.'\''.$status.'\'';
+				$list .= $sep.$DB->quote( $status );
 				$sep = ',';
 			}
 
@@ -405,6 +423,8 @@ class CommentQuery extends SQL
 	 */
 	function where_types( $types )
 	{
+		global $DB;
+
 		$this->types = $types;
 
 		if( empty( $types ) )
@@ -416,7 +436,7 @@ class CommentQuery extends SQL
 		$sep = '';
 		foreach( $types as $type )
 		{
-			$list .= $sep.'\''.$type.'\'';
+			$list .= $sep.$DB->quote( $type );
 			$sep = ',';
 		}
 
@@ -533,13 +553,84 @@ class CommentQuery extends SQL
 		}
 	}
 
+
+	/**
+	 * Restrict to show only those comments where user has some specific permission
+	 * 
+	 * @param string the required permission to check
+	 * @param integer the blog ID
+	 */
+	function user_perm_restrict( $user_perm, $blog_ID )
+	{
+		global $current_User, $DB;
+
+		if( !is_logged_in( false ) )
+		{ // Anonymous users can see only published comments, no need further restriction
+			return;
+		}
+
+		if( ( $user_perm !== 'moderate' ) && ( $user_perm !== 'edit' ) )
+		{ // No need furhter restriciton because the user doesn't want to edit/moderate these comments
+			return;
+		}
+
+		if( $current_User->check_perm( 'blogs', 'editall' ) )
+		{ // User has global permission one ach blog
+			return;
+		}
+
+		$BlogCache = & get_BlogCache();
+		$Blog = $BlogCache->get_by_ID( $blog_ID );
+		if( $current_User->ID == $Blog->get( 'owner_user_ID' ) )
+		{ // User is the blog owner, so has permission on edit/moderate each comment
+			return;
+		}
+
+		if( ! $Blog->get( 'advanced_perms' ) )
+		{ // Blog advanced perm settings is not enabled, user has no permission to edit/moderate comments 
+			$this->WHERE_and( 'FALSE' );
+			return;
+		}
+
+		$SQL = new SQL();
+		$SQL->SELECT( 'IF( bloguser_perm_edit_cmt + 0 > bloggroup_perm_edit_cmt + 0, bloguser_perm_edit_cmt, bloggroup_perm_edit_cmt ) as perm_edit_cmt' );
+		$SQL->FROM( 'T_blogs' );
+		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON bloguser_blog_ID = blog_ID AND bloguser_user_ID = '.$current_User->ID );
+		$SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON bloggroup_blog_ID = blog_ID AND bloggroup_group_ID = '.$current_User->grp_ID );
+		$SQL->WHERE( 'blog_ID = '.$blog_ID );
+
+		$perm_edit_cmt = $DB->get_var( $SQL->get() );
+		$user_level = $current_User->level;
+		$condition = '';
+
+		switch( $perm_edit_cmt )
+		{
+			case 'le':
+			case 'lt':
+				$operator = ( $perm_edit_cmt == 'le' ) ? '<=' : '<';
+				$condition = '( comment_author_ID IN ( SELECT user_ID FROM T_users WHERE user_level '.$operator.' '.$current_User->level.' ) )';
+				$condition .= ' OR ';
+			case 'anon':
+				$condition .= 'comment_author_ID IS NULL';
+				break;
+
+			case 'own':
+				$condition = 'comment_author_ID = '.$current_User->ID;
+				break;
+
+			case 'no':
+				$condtion = 'FALSE';
+				break;
+
+			case 'all': // In this case we don't add any specific permission check because everything is permitted
+				break;
+
+			default:
+				debug_die('This value of edit permission is not implemented!');
+		}
+
+		$this->WHERE_and( $condition );
+	}
 }
 
-
-/*
- * $Log$
- * Revision 1.12  2013/11/06 09:08:47  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

@@ -98,11 +98,4 @@ display_login_form( $params );
 
 require dirname(__FILE__).'/_html_footer.inc.php';
 
-
-/*
- * $Log$
- * Revision 1.36  2013/11/06 08:05:53  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

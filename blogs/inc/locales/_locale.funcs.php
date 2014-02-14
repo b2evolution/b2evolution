@@ -42,7 +42,7 @@ $GLOBALS['debug_locale'] = false;
 
 
 // LOCALIZATION:
-if( $use_l10n )
+if( isset( $use_l10n ) && $use_l10n )
 { // We are going to use localization:
 
 	/**
@@ -1101,6 +1101,7 @@ function locales_load_available_defs()
 	// Go through all locale folders:
 	foreach( $locale_folders as $locale_folder )
 	{
+		//pre_dump( $locale_folder );
 		$ad_locale_folder = $locales_path.'/'.$locale_folder;
 		// Get files in folder:
 		$filename_params = array(
@@ -1112,7 +1113,8 @@ function locales_load_available_defs()
 		// Go through files in locale folder:
 		foreach( $locale_def_files as $locale_def_file )
 		{	// Check if it's a definition file:
-			if( preg_match( '~[a-z0-9\-]\.locale\.php$~i', $locale_def_file ) )
+			// pre_dump( $locale_def_file );
+			if( preg_match( '~[a-z0-9\-.]\.locale\.php$~i', $locale_def_file ) )
 			{	// We found a definition file:
 				// pre_dump( $locale_def_file );
 				include $ad_locale_folder.'/'.$locale_def_file;
@@ -1267,10 +1269,66 @@ function locale_file_po_percent_done( $po_file_info )
 	return $percent_done;
 }
 
-/*
- * $Log$
- * Revision 1.54  2013/11/06 09:08:58  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
+
+/**
+ * Insert default locales into T_locales.
  */
+function locale_insert_default()
+{
+	global $DB, $current_locale, $locales, $test_install_all_features;
+
+	$activate_locales = array();
+
+	if( isset( $test_install_all_features ) && $test_install_all_features )
+	{ // Activate also additional locales on install
+		$activate_locales[] = 'en-US';
+		$activate_locales[] = 'de-DE';
+		$activate_locales[] = 'fr-FR';
+		$activate_locales[] = 'ru-RU';
+	}
+
+	if( ! empty( $current_locale ) )
+	{ // Make sure the user sees his new system localized.
+		$activate_locales[] = $current_locale;
+	}
+
+	$activate_locales = array_unique( $activate_locales );
+
+	if( ! empty( $activate_locales ) )
+	{ // Insert locales into DB
+		$insert_data = array();
+		foreach( $activate_locales as $a_locale )
+		{
+			if( !isset( $locales[ $a_locale ] ) )
+			{ // Skip an incorrect locale
+				continue;
+			}
+
+			// Make sure default transliteration_map is set
+			$transliteration_map = '';
+			if( isset( $locales[ $a_locale ]['transliteration_map'] ) && is_array( $locales[ $a_locale ]['transliteration_map'] ) )
+			{
+				$transliteration_map = base64_encode( serialize( $locales[ $a_locale ]['transliteration_map'] ) );
+			}
+
+			$insert_data[] = '( '.$DB->quote( $a_locale ).', '
+				.$DB->quote( $locales[ $a_locale ]['charset'] ).', '
+				.$DB->quote( $locales[ $a_locale ]['datefmt'] ).', '
+				.$DB->quote( $locales[ $a_locale ]['timefmt'] ).', '
+				.$DB->quote( $locales[ $a_locale ]['startofweek'] ).', '
+				.$DB->quote( $locales[ $a_locale ]['name'] ).', '
+				.$DB->quote( $locales[ $a_locale ]['messages'] ).', '
+				.$DB->quote( $locales[ $a_locale ]['priority'] ).', '
+				.$DB->quote( $transliteration_map ).', '
+				.'1 )';
+		}
+
+		$DB->query( 'INSERT INTO T_locales '
+					 .'( loc_locale, loc_charset, loc_datefmt, loc_timefmt, '
+					 .'loc_startofweek, loc_name, loc_messages, loc_priority, '
+					 .'loc_transliteration_map, loc_enabled ) '
+					 .'VALUES '.implode( ', ', $insert_data ) );
+	}
+}
+
 ?>

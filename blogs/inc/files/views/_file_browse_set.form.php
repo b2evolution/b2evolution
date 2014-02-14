@@ -37,7 +37,7 @@ $Form = new Form( NULL, 'file_displaysettings_checkchanges' );
 
 $Form->global_icon( T_('Close settings!'), 'close', regenerate_url() );
 
-$Form->begin_form( 'fform', T_('Display settings') );
+$Form->begin_form( 'fform', T_('Display settings').get_manual_link('file-manager-display-settings') );
 
 	$Form->add_crumb( 'file' );
 	$Form->hidden_ctrl();
@@ -89,10 +89,4 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 $Form->end_form( array( array( 'submit', 'actionArray[update_settings]', T_('Update !'), 'ActionButton'),
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
-/*
- * $Log$
- * Revision 1.11  2013/11/06 08:04:15  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -479,13 +479,14 @@ function get_user_register_link( $before = '', $after = '', $link_text = '', $li
 
 
 /**
- * put your comment there...
+ * Get a user registration url
  *
- * @param mixed $redirect
- * @param mixed $default_source_string
- * @param mixed $disp_when_logged_in
+ * @param string redirect to url
+ * @param string where this registration url will be displayed
+ * @param boolean force to display even when a user is logged in
+ * @param string delimiter to use for more url params
  */
-function get_user_register_url( $redirect = NULL, $default_source_string = '', $disp_when_logged_in = false )
+function get_user_register_url( $redirect = NULL, $default_source_string = '', $disp_when_logged_in = false, $glue = '&amp;' )
 {
 	global $Settings, $edited_Blog, $secure_htsrv_url;
 
@@ -506,7 +507,7 @@ function get_user_register_url( $redirect = NULL, $default_source_string = '', $
 		$BlogCache = & get_BlogCache();
 		$Blog = $BlogCache->get_by_ID( $blog );
 
-		$register_url = url_add_param( $Blog->get( 'url' ), 'disp=register' );
+		$register_url = url_add_param( $Blog->get( 'url' ), 'disp=register', $glue );
 	}
 	else
 	{
@@ -521,18 +522,18 @@ function get_user_register_url( $redirect = NULL, $default_source_string = '', $
 	}
 	if( ! empty($source) )
 	{
-		$register_url = url_add_param( $register_url, 'source='.rawurlencode($source), '&' );
+		$register_url = url_add_param( $register_url, 'source='.rawurlencode($source), $glue );
 	}
 
 	// Redirect_to=
 	if( ! isset($redirect) )
 	{
-		$redirect = regenerate_url( '', '', '', '&' );
+		$redirect = regenerate_url( '', '', '', $glue );
 	}
 
 	if( ! empty($redirect) )
 	{
-		$register_url = url_add_param( $register_url, 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $secure_htsrv_url ) ), '&' );
+		$register_url = url_add_param( $register_url, 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $secure_htsrv_url ) ), $glue );
 	}
 
 	return $register_url;
@@ -1446,55 +1447,70 @@ function get_user_avatar_styled( $user_ID, $params )
  */
 function get_avatar_imgtag_default( $size = 'crop-top-15x15', $class = '', $align = '', $params = array() )
 {
-	global $Settings;
+	global $Settings, $thumbnail_sizes;
 
-	if( ! $Settings->get('allow_avatars') || ! $Settings->get('use_gravatar') )
-	{ // Avatars & Gravatars are not allowed, Exit here
+	if( ! $Settings->get('allow_avatars') )
+	{ // Avatars are not allowed, Exit here
 		return '';
 	}
 
-	global $thumbnail_sizes;
+	// Default params:
+	$params = array_merge( array(
+			'email'    => '',
+			'username' => '',
+			'default'  => '',
+		), $params );
 
-	$default_gravatar = $Settings->get('default_gravatar');
-	if( $default_gravatar == 'b2evo' )
-	{ // Use gravatar from b2evo default avatar image
+	if( ! $Settings->get('use_gravatar') )
+	{ // Gravatars are not allowed, Use default avatars instead
 		global $default_avatar;
 		$img_url = $default_avatar;
 		$gravatar_width = isset( $thumbnail_sizes[$size] ) ? $thumbnail_sizes[$size][1] : '15';
 		$gravatar_height = isset( $thumbnail_sizes[$size] ) ? $thumbnail_sizes[$size][2] : '15';
 	}
+	else
+	{ // Gravatars are enabled
+		$default_gravatar = $Settings->get('default_gravatar');
 
-	if( empty( $img_url ) )
-	{ // Use gravatar
-		$params = array_merge( array(
-				'email'    => '',
-				'username' => '',
-				'default'  => $default_gravatar,
-			), $params );
-
-		$img_url = 'http://www.gravatar.com/avatar/'.md5( $params['email'] );
-		$gravatar_width = isset( $thumbnail_sizes[$size] ) ? $thumbnail_sizes[$size][1] : '15';
-		$gravatar_height = $gravatar_width;
-
-		$img_url_params = array();
-		if( !empty( $params['rating'] ) )
-		{ // Rating
-			$img_url_params[] = 'rating='.$params['rating'];
+		if( empty( $params['default'] ) )
+		{ // Set default gravatar
+			if( $default_gravatar == 'b2evo' )
+			{ // Use gravatar from b2evo default avatar image
+				global $default_avatar;
+				$params['default'] = $default_avatar;
+			}
+			else
+			{ // Use a selected gravatar type
+				$params['default'] = $default_gravatar;
+			}
 		}
 
-		if( !empty( $gravatar_width ) )
-		{ // Size
-			$img_url_params[] = 'size='.$gravatar_width;
-		}
+		if( empty( $img_url ) )
+		{
+			$img_url = 'http://www.gravatar.com/avatar/'.md5( $params['email'] );
+			$gravatar_width = isset( $thumbnail_sizes[$size] ) ? $thumbnail_sizes[$size][1] : '15';
+			$gravatar_height = $gravatar_width;
 
-		if( !empty( $params['default'] ) )
-		{ // Type
-			$img_url_params[] = 'default='.urlencode( $params['default'] );
-		}
+			$img_url_params = array();
+			if( !empty( $params['rating'] ) )
+			{ // Rating
+				$img_url_params[] = 'rating='.$params['rating'];
+			}
 
-		if( count( $img_url_params ) > 0 )
-		{ // Append url params to request gravatar
-			$img_url .= '?'.implode( '&', $img_url_params );
+			if( !empty( $gravatar_width ) )
+			{ // Size
+				$img_url_params[] = 'size='.$gravatar_width;
+			}
+
+			if( !empty( $params['default'] ) )
+			{ // Type
+				$img_url_params[] = 'default='.urlencode( $params['default'] );
+			}
+
+			if( count( $img_url_params ) > 0 )
+			{ // Append url params to request gravatar
+				$img_url .= '?'.implode( '&', $img_url_params );
+			}
 		}
 	}
 
@@ -2566,16 +2582,13 @@ function callback_filter_userlist( & $Form )
 
 	$Form->text( 'keywords', get_param('keywords'), 20, T_('Name'), '', 50 );
 
-	if( $Settings->get( 'registration_require_gender' ) != 'hidden' )
+	echo '<span class="nowrap">';
+	$Form->checkbox( 'gender_men', get_param('gender_men'), T_('Men') );
+	$Form->checkbox( 'gender_women', get_param('gender_women'), T_('Women') );
+	echo '</span>';
+	if( !is_admin_page() )
 	{
-		echo '<span class="nowrap">';
-		$Form->checkbox( 'gender_men', get_param('gender_men'), T_('Men') );
-		$Form->checkbox( 'gender_women', get_param('gender_women'), T_('Women') );
-		echo '</span>';
-		if( !is_admin_page() )
-		{
-			echo '<br />';
-		}
+		echo '<br />';
 	}
 
 	if( is_admin_page() )
@@ -3465,6 +3478,36 @@ function user_report_form( $params = array() )
 		$report_content = sprintf( $report_content, mysql2localedatetime( $current_report[ 'date' ] ), $report_options[ $current_report[ 'status' ] ], $current_report[ 'info' ], 'href="'.$params['cancel_url'].'"' );
 		$Form->info( T_('Already reported'), $report_content );
 	}
+}
+
+
+/**
+ * Get IDs of users by logins separated by comma
+ * Used to filter the posts by authors and assigned users
+ *
+ * @param string Logins (e.g. 'admin,ablogger,auser')
+ * @return string Users IDs (e.g. '1,3,5')
+ */
+function get_users_IDs_by_logins( $logins )
+{
+	if( empty( $logins ) )
+	{
+		return '';
+	}
+
+	$UserCache = & get_UserCache();
+
+	$logins = explode( ',', $logins );
+	$ids = array();
+	foreach( $logins as $login )
+	{
+		if( $User = $UserCache->get_by_login( $login, true ) )
+		{ // User exists with this login
+			$ids[] = $User->ID;
+		}
+	}
+
+	return implode( ',', $ids );
 }
 
 

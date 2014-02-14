@@ -32,7 +32,7 @@ $Form = new Form( NULL, 'slug_checkchanges', 'post', 'compact' );
 
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
 
-$Form->begin_form( 'fform', $creating ?  T_('New Slug') : T_('Slug') );
+$Form->begin_form( 'fform', $creating ?  T_('New Slug') . get_manual_link('slug-form') : T_('Slug') . get_manual_link('slug-form') );
 
 	$Form->add_crumb( 'slug' );
 	$Form->hidden( 'action',  $creating ? 'create' : 'update' );
@@ -58,11 +58,4 @@ else
 							array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 }
 
-
-/*
- * $Log$
- * Revision 1.5  2013/11/06 08:04:54  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

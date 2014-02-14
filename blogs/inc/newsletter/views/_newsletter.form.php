@@ -61,10 +61,4 @@ $Form->end_fieldset();
 $Form->end_form( array( array( 'submit', 'submit', T_('Preview !'), 'SaveButton' ),
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:04:35  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

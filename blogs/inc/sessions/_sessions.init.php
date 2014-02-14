@@ -37,7 +37,7 @@ $required_php_version[ 'sessions' ] = '5.0';
 /**
  * Minimum MYSQL version required for sessions module to function properly
  */
-$required_mysql_version[ 'sessions' ] = '4.1';
+$required_mysql_version[ 'sessions' ] = '5.0.3';
 
 /**
  * Aliases for table names:
@@ -356,11 +356,4 @@ class sessions_Module extends Module
 
 $sessions_Module = new sessions_Module();
 
-
-/*
- * $Log$
- * Revision 1.39  2013/11/06 08:04:45  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -57,14 +57,24 @@ $Form->info( T_('Subject'), '<pre class="email_log"><span>'.htmlspecialchars($Ma
 
 $Form->info( T_('Headers'), '<pre class="email_log"><span>'.htmlspecialchars($MailLog->emlog_headers).'</span></pre>' );
 
-$Form->info( T_('Message'), '<pre class="email_log_scroll"><span>'.htmlspecialchars($MailLog->emlog_message).'</span></pre>' );
+$mail_contents = mail_log_parse_message( $MailLog->emlog_headers, $MailLog->emlog_message );
+
+if( !empty( $mail_contents ) )
+{
+	if( !empty( $mail_contents['text'] ) )
+	{ // Display Plain Text content
+		$Form->info( T_('Text content'), $mail_contents['text']['type']
+				.'<pre class="email_log_scroll"><span>'.htmlspecialchars( $mail_contents['text']['content'] ).'</span></pre>' );
+	}
+	if( !empty( $mail_contents['html'] ) )
+	{ // Display HTML content
+		$Form->info( T_('HTML content'), $mail_contents['html']['type']
+				.'<div class="email_log_html">'.$mail_contents['html']['content'].'</div>' );
+	}
+}
+
+$Form->info( T_('Raw email source'), '<pre class="email_log_scroll"><span>'.htmlspecialchars($MailLog->emlog_message).'</span></pre>' );
 
 $Form->end_form();
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:04:55  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

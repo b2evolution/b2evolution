@@ -748,11 +748,4 @@ function session_unserialize_load_all_classes()
 	load_class( 'users/model/_user.class.php', 'User' );
 }
 
-
-/*
- * $Log$
- * Revision 1.43  2013/11/06 08:04:45  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

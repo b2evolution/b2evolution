@@ -120,7 +120,7 @@ class ItemList2 extends ItemListLight
 		$post_url = param( 'post_url', 'string', '' );
 		check_categories_nosave( $post_category, $post_extracats );
 		$post_views = param( 'post_views', 'integer', 0 );
-		$renderers = param( 'renderers', 'array', array('default') );
+		$renderers = param( 'renderers', 'array/string', array('default') );
 		if( ! is_array($renderers) )
 		{ // dh> workaround for param() bug. See rev 1.93 of /inc/_misc/_misc.funcs.php
 			$renderers = array('default');
@@ -156,15 +156,10 @@ class ItemList2 extends ItemListLight
 		}
 		locale_restore_previous();
 
-
-		if( !($item_typ_ID = param( 'item_typ_ID', 'integer', NULL )) )
-			$item_typ_ID = NULL;
-		if( !($item_st_ID = param( 'item_st_ID', 'integer', NULL )) )
-			$item_st_ID = NULL;
-		if( !($item_assigned_user_ID = param( 'item_assigned_user_ID', 'integer', NULL )) )
-			$item_assigned_user_ID = NULL;
-		if( !($item_deadline = param( 'item_deadline', 'string', NULL )) )
-			$item_deadline = NULL;
+		$item_typ_ID = param( 'item_typ_ID', 'integer', NULL );
+		$item_st_ID = param( 'item_st_ID', 'integer', NULL );
+		$item_assigned_user_ID = param( 'item_assigned_user_ID', 'integer', NULL );
+		$item_deadline = param( 'item_deadline', 'string', NULL );
 		$item_priority = param( 'item_priority', 'integer', NULL ); // QUESTION: can this be also empty/NULL?
 
 		// Do some optional filtering on the content
@@ -675,7 +670,9 @@ class ItemList2 extends ItemListLight
 		$next_Query->where_chapter2( $this->Blog, $this->filters['cat_array'], $this->filters['cat_modifier'],
 																 $this->filters['cat_focus'] );
 		$next_Query->where_author( $this->filters['authors'] );
+		$next_Query->where_author_logins( $this->filters['authors_login'] );
 		$next_Query->where_assignees( $this->filters['assignees'] );
+		$next_Query->where_assignees_logins( $this->filters['assignees_login'] );
 		$next_Query->where_author_assignee( $this->filters['author_assignee'] );
 		$next_Query->where_locale( $this->filters['lc'] );
 		$next_Query->where_statuses( $this->filters['statuses'] );
@@ -855,10 +852,4 @@ class ItemList2 extends ItemListLight
 	}
 }
 
-/*
- * $Log$
- * Revision 1.46  2013/11/06 08:04:15  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

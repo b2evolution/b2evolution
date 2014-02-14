@@ -3,7 +3,7 @@
  * This is the main/default page template.
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
- * {@link http://manual.b2evolution.net/Skins_2.0}
+ * {@link http://b2evolution.net/man/skin-structure}
  *
  * The main page template is used to display the blog when no specific page template is available
  * to handle the request (based on $disp).
@@ -109,8 +109,9 @@ skin_include( '_body_header.inc.php' );
 				skin_include( '_item_feedback.inc.php', array(
 						'before_section_title' => '<h3 class="feedback_section">',
 						'after_section_title'  => '</h3>',
-						'form_title_start' => '<h3 class="comment_form_title">',
-						'form_title_end'  => '</h3>',
+						'form_title_start'     => '<h3 class="comment_form_title">',
+						'form_title_end'       => '</h3>',
+						'author_link_text'     => 'preferredname',
 					) );
 				// Note: You can customize the default item feedback by copying the generic
 				// /skins/_item_feedback.inc.php file into the current skin folder.

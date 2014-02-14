@@ -597,7 +597,7 @@ function url_crumb( $crumb_name )
 function get_crumb($crumb_name)
 {
 	global $Session;
-	return $Session->create_crumb($crumb_name);
+	return isset( $Session ) ? $Session->create_crumb( $crumb_name ) : '';
 }
 
 
@@ -903,10 +903,4 @@ function get_link_tag( $url, $text = '', $class='', $max_url_length = 50 )
 	return '<a class="'.$class.'" href="'.str_replace('&amp;', '&', $url ).'">'.$text.'</a>';
 }
 
-/* {{{ Revision log:
- * $Log$
- * Revision 1.58  2013/11/06 09:08:46  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

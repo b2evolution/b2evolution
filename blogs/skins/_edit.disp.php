@@ -126,6 +126,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->hidden( 'trackback_url', $trackback_url );
 		$Form->hidden( 'item_featured', $edited_Item->featured );
 		$Form->hidden( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ) );
+		$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'post_expiry_delay' ) );
 		$Form->hidden( 'item_order', $edited_Item->order );
 
 		$creator_User = $edited_Item->get_creator_User();
@@ -168,6 +169,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 	$require_title = $Blog->get_setting('require_title');
 	if( $require_title != 'none' )
 	{
+		$Form->switch_layout( 'none' );
 		echo '<table width="100%"><tr>';
 		$Form->labelstart = '<th width="10%">';
 		$Form->labelend = '</th>';
@@ -175,6 +177,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->inputend = '</td>';
 		$Form->text_input( 'post_title', $item_title, 20, T_('Title'), '', array('maxlength'=>255, 'style'=>'width: 100%;', 'required'=>($require_title=='required')) );
 		echo '</tr></table>';
+		$Form->switch_layout( NULL );
 	}
 
 	// --------------------------- TOOLBARS ------------------------------------
@@ -188,12 +191,11 @@ $Form->begin_form( 'inskin', '', $form_params );
 	echo '</div>';
 
 	// ---------------------------- TEXTAREA -------------------------------------
+	$Form->switch_layout( 'none' );
 	$Form->fieldstart = '<div class="edit_area">';
 	$Form->fieldend = "</div>\n";
-	$Form->labelstart = '';
-	$Form->labelend = '';
-	$Form->labelempty = '';
 	$Form->textarea_input( 'content', $item_content, 16, NULL, array( 'cols' => 50 , 'id' => 'itemform_post_content' ) );
+	$Form->switch_layout( NULL );
 	?>
 	<script type="text/javascript" language="JavaScript">
 		<!--
@@ -215,18 +217,14 @@ $Form->end_fieldset();
 	if( ! $display_item_settings_is_defined )
 	{
 		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
-		{	// ------------------------------------ TIME STAMP -------------------------------------
+		{ // ------------------------------------ TIME STAMP -------------------------------------
 			$Form->begin_fieldset();
 
-			$Form->fieldstart = '';
-			$Form->fieldend = '';
-			$Form->labelstart = '';
-			$Form->labelend = '';
-			$Form->inputstart = '';
-			$Form->inputend = '';
+			$Form->switch_layout( 'none' );
 			echo '<div id="itemform_edit_timestamp" class="edit_fieldgroup">';
 			issue_date_control( $Form, false, '<strong>'.T_('Issue date').'</strong>' );
 			echo '</div>';
+			$Form->switch_layout( NULL );
 
 			$Form->end_fieldset();
 		}
@@ -265,12 +263,14 @@ $Form->end_fieldset();
 		$Form->end_fieldset();
 	}
 
+	$Form->switch_layout( 'none' );
 	echo '<table cellspacing="0" width="100%">';
 	echo '<tr><td class="label shrinkwrap"><label for="item_tags"><strong>'.T_('Tags').':</strong></label></td>';
 	echo '<td class="input">';
 	$Form->text_input( 'item_tags', $item_tags, 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
 	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
 	echo '</table>';
+	$Form->switch_layout( NULL );
 ?>
 
 <div class="clear"></div>

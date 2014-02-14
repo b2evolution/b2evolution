@@ -79,6 +79,7 @@ function curr_td_enabled( $curr_enabled, $curr_ID )
 }
 $Results->cols[] = array(
 		'th' => /* TRANS: shortcut for enabled */ T_('En'),
+		'th_title' => T_('Enabled'),
 		'order' => 'curr_enabled',
 		'td' => '%curr_td_enabled( #curr_enabled#, #curr_ID# )%',
 		'td_class' => 'center'
@@ -178,10 +179,4 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 
 $Results->display();
 
-/*
- * $Log$
- * Revision 1.16  2013/11/06 08:04:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

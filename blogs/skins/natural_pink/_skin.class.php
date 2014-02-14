@@ -96,10 +96,4 @@ class natural_pink_Skin extends Skin
 	}
 }
 
-/*
- * $Log$
- * Revision 1.10  2013/11/06 08:05:48  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

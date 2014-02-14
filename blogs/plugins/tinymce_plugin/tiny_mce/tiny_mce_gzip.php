@@ -52,7 +52,7 @@
 
 	// Setup cache info
 	if ($diskCache) {
-		if (!$cachePath || !is_readable($cachePath))
+		if (!$cachePath || !is_writable($cachePath))
 			die("alert('Compressor Real path failed. (tiny_mce_gzip.php) $cachePath');");
 
 		$cacheKey = getParam("plugins", "") . getParam("languages", "") . getParam("themes", "") . $suffix;

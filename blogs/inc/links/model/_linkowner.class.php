@@ -317,7 +317,7 @@ class LinkOwner
 	 * 
 	 * @param string text key in the translation map
 	 */
-	function T_( $text_key, $text_params = NULL )
+	function translate( $text_key, $text_params = NULL )
 	{
 		if( empty( $this->_trans ) || empty( $text_key ) || ( !array_key_exists( $text_key, $this->_trans ) ) )
 		{ // This text was not listed in translation map

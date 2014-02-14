@@ -1571,14 +1571,13 @@ class DB
 			debug_die( 'Invalid transaction isolation level!' );
 		}
 
-		if( ( $this->transaction_isolation_level != $transaction_isolation_level ) && ( !$this->transaction_nesting_level ) )
-		{ // It is the beggining of a new transaction and the isolation level was changed
+		if( ( $this->transaction_isolation_level != $transaction_isolation_level ) && ( ( !$this->transaction_nesting_level ) || ( $transaction_isolation_level == 'SERIALIZABLE' ) ) )
+		{ // The isolation level was changed and it is the beggining of a new transaction or this is a nested transaction but it needs 'SERIALIZABLE' isolation level
+			// Note: We change the transaction isolation level for nested transactions only if the requested isolation level is 'SERIALIZABLE'
 			// Set session transaction isolation level to the new value
 			$this->transaction_isolation_level = $transaction_isolation_level;
 			$this->query( 'SET SESSION TRANSACTION ISOLATION LEVEL '.$transaction_isolation_level, 'Set transaction isolation level' );
 		}
-		// attila> Transaction isolation level can't be changed inside a transaction!
-		// attila> When transaction handling was refactored we may call debug_die() when an inner transaction isolation level is set to SERIALIZABLE but the outer is not
 
 		if( !$this->transaction_nesting_level )
 		{ // Start a new transaction
@@ -1609,10 +1608,6 @@ class DB
 			{
 				$this->query( 'COMMIT', 'COMMIT transaction' );
 			}
-			if( $this->transaction_isolation_level != 'REPEATABLE READ' )
-			{ // Set transaction isolation level back to default
-				$this->query( 'SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ', 'Set transaction isolation level' );
-			}
 			$this->rollback_nested_transaction = false;
 		}
 
@@ -1636,10 +1631,6 @@ class DB
 		if( $this->transaction_nesting_level == 1 )
 		{ // Only ROLLBACK if there are no remaining nested transactions:
 			$this->query( 'ROLLBACK', 'ROLLBACK transaction' );
-			if( $this->transaction_isolation_level != 'REPEATABLE READ' )
-			{ // Set transaction isolation level back to default
-				$this->query( 'SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ', 'Set transaction isolation level' );
-			}
 			$this->rollback_nested_transaction = false;
 		}
 		else
@@ -1759,11 +1750,4 @@ class DB
 
 }
 
-
-/*
- * $Log$
- * Revision 1.60  2013/11/06 08:03:47  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

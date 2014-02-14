@@ -324,10 +324,4 @@ function form_textarea( $field_name, $field_value, $field_rows, $field_label, $f
 	echo $r;
 }
 
-/*
- * $Log$
- * Revision 1.10  2013/11/06 08:03:48  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

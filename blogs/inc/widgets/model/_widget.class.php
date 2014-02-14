@@ -331,7 +331,9 @@ class ComponentWidget extends DataObject
 		$params = $this->get_param_definitions( array( 'infinite_loop' => true ) );
 
 		if( isset( $params[$parname] ) )
-		{	// This is a widget specific param:
+		{ // This is a widget specific param:
+			// Make sure param_array is loaded before set the param value
+			$this->load_param_array();
 			$this->param_array[$parname] = $parvalue;
 			// This is what'll be saved to the DB:
 			return $this->set_param( 'params', 'string', serialize($this->param_array), $make_null );

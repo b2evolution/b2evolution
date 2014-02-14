@@ -16,8 +16,8 @@
 require_once dirname(__FILE__).'/../conf/_config.php';
 
 /**
- * @todo fp> This MIGHT be overkill. check...
- *       dh> It IS overkill! (e.g. creating $Session, $Hit, etc)
+ * Include main initialization
+ * Note: This will initialize only the required objects ( e.g. $Session or $Hit objects will NOT be initialized in cli mode ).
  */
 require_once $inc_path .'_main.inc.php';
 

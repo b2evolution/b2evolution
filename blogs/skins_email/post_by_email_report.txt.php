@@ -29,7 +29,7 @@ echo T_('You just created the following posts:')."\n\n";
 foreach( $Items as $Item )
 {
 	echo format_to_output( $Item->title )."\n";
-	echo $Item->get_permanent_url()."\n\n";
+	echo $Item->get_permanent_url( '', '', '&' )."\n\n";
 }
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------

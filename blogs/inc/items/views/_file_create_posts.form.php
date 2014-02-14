@@ -75,33 +75,44 @@ $Form->hidden( 'crumb_file', get_param( 'crumb_file' ) );
 $post_extracats = array();
 $post_counter = 0;
 
-function fcpf_categories_select( $default_Value, $parent_Category = -1, $level = 0 )
+
+/**
+ * Get the categories list
+ *
+ * @param integer Parent category ID
+ * @param integer Level
+ * @return array Categories
+ */
+function fcpf_categories_select( $parent_category_ID = -1, $level = 0 )
 {
 	global $blog, $DB;
 	$result_Array = array();
 
-	if( $parent_Category == -1 )
+	$SQL = new SQL();
+	$SQL->SELECT( 'cat_ID, cat_name' );
+	$SQL->FROM( 'T_categories' );
+	$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $blog ) );
+	if( $parent_category_ID == -1 )
 	{
-		$result = $DB->get_results( 'SELECT * from T_categories WHERE cat_parent_ID is NULL and cat_blog_ID = '.$DB->escape( $blog ).' ORDER by cat_name' );
+		$SQL->WHERE_and( 'cat_parent_ID IS NULL' );
 	}
 	else
 	{
-		$result = $DB->get_results( 'SELECT * from T_categories WHERE cat_parent_ID = '.$DB->escape( $parent_Category ).' and cat_blog_ID = '.$DB->escape( $blog ).' ORDER by cat_name' );
+		$SQL->WHERE( 'cat_parent_ID = '.$DB->quote( $parent_category_ID ) );
 	}
+	$SQL->ORDER_BY( 'cat_name' );
+	$categories = $DB->get_results( $SQL->get() );
 
-	if( ! empty( $result ) )
+	if( ! empty( $categories ) )
 	{
-		foreach( $result as $item )
+		foreach( $categories as $category )
 		{
-			$label = "";
-			for( $i = 0; $i < $level; $i++ )
-			{
-				$label .= '&nbsp;&nbsp;&nbsp';
-			}
-			$label .= $item->cat_name;
-			$result_Array[] = array( "value" => $item->cat_ID, "label" => $label );
+			$result_Array[] = array(
+					'value' => $category->cat_ID,
+					'label' => str_repeat( '&nbsp;&nbsp;&nbsp;', $level ).$category->cat_name
+				);
 
-			$child_Categories_opts = fcpf_categories_select( $default_Value, $item->cat_ID, $level + 1 );
+			$child_Categories_opts = fcpf_categories_select( $category->cat_ID, $level + 1 );
 			if( $child_Categories_opts != '' )
 			{
 				foreach( $child_Categories_opts as $cat )
@@ -116,6 +127,9 @@ function fcpf_categories_select( $default_Value, $parent_Category = -1, $level =
 
 $FileCache = & get_FileCache();
 
+// Get the categories
+$categories = fcpf_categories_select();
+
 foreach( $images_list as $item )
 {
 	$File = & $FileCache->get_by_root_and_path( $fm_FileRoot->type,  $fm_FileRoot->in_type_ID, urldecode( $item ), true );
@@ -124,34 +138,38 @@ foreach( $images_list as $item )
 	{
 		$title = basename( urldecode( $File->get( 'name' ) ) );
 	}
-	$Form->begin_fieldset( T_('Post #').( $post_counter + 1 ) );
-	$Form->text_input( "post_title[".$post_counter."]", $title, 40, T_('Post title') );
-	$categories = fcpf_categories_select("");
+	$Form->begin_fieldset( T_('Post #').( $post_counter + 1 ).get_manual_link( 'creating-posts-from-files' ) );
+	$Form->text_input( 'post_title['.$post_counter.']', $title, 40, T_('Post title') );
 
-	if ( $post_counter != 0 )
-	{
-		$categories = array_merge(
-			array(
+	if( $post_counter != 0 )
+	{ // The posts after first
+		if( $post_counter == 1 )
+		{ // Add new option to select a category from previous post
+			$categories = array_merge(
 				array(
-					"value"	=>	'same',
-					"label"	=>	'Same as above<br>',
-				)
-			), $categories );
+					array(
+						'value' => 'same',
+						'label' => T_('Same as above').'<br />',
+					)
+				), $categories );
+		}
+		// Use the same category for all others after first
+		$selected_category_ID = 'same';
+	}
+	else
+	{ // First post, Use a default category as selected on load form
+		global $Blog;
+		$selected_category_ID = isset( $Blog ) ? $Blog->get_default_cat_ID() : 1;
 	}
 
-	$Form->radio_input( "category[".$post_counter."]", 1 , $categories, "Category", array( "suffix" => "<br>" ) );
-	echo '<div class="label"><label>Post content:</label></div>';
-	?>
-
-<img src="<?php echo $fm_FileRoot->ads_url.urldecode($item); ?>"
-	width="200" style="margin-left: 20px" />
-
-<?php
+	$Form->radio_input( 'category['.$post_counter.']', $selected_category_ID, $categories, T_('Category'), array( 'suffix' => '<br />' ) );
+	$Form->info( T_('Post content'), '<img src="'.$fm_FileRoot->ads_url.urldecode( $item ).'" width="200" />' );
 
 	$Form->end_fieldset();
+
 	$post_counter++;
 }
-$edited_Item=NULL;
+$edited_Item = NULL;
 
 $Form->end_form( array( array( 'submit', 'actionArray[make_posts_from_files]', T_('Make posts'), 'ActionButton') ) );
 

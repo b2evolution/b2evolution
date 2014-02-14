@@ -52,10 +52,4 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 printf( '<p>'.T_('You can import contents from your phpBB 2.x database into your b2evolution database by using <a %s>phpBB Importer</a>.').'</p>', ' href="?ctrl=phpbbimport"' );
 $block_item_Widget->disp_template_raw( 'block_end' );
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:04:55  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

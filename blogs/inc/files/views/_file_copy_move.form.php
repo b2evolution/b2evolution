@@ -56,6 +56,8 @@ global $fm_source_Filelist;
  */
 global $new_names;
 
+global $filename_max_length;
+
 
 $Form = new Form( NULL, 'fm_copymove_checkchanges' );
 
@@ -79,7 +81,7 @@ $Form->begin_form( 'fform', $fm_mode == 'file_copy' ? T_('Copy') : T_('Move') );
 		}
 
 		$Form->text( 'new_names['.$loop_src_File->get_md5_ID().']', $new_names[$loop_src_File->get_md5_ID()], 32,
-									T_('New name'), $loop_src_File->dget('title'), 128 );
+									T_('New name'), $loop_src_File->dget('title'), $filename_max_length );
 
 		$Form->end_fieldset();
 	}
@@ -90,10 +92,4 @@ $Form->end_form( array( array( 'submit', 'submit', $fm_mode == 'file_copy' ? T_(
 echo '<p class="notes"><strong>'.T_('You are in copy/move mode.')
 				.'</strong> '.T_('Please navigate to the desired target location.').'</p>';
 
-/*
- * $Log$
- * Revision 1.8  2013/11/06 08:04:15  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

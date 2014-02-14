@@ -3,7 +3,7 @@
  * This is the main/default page template.
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
- * {@link http://manual.b2evolution.net/Skins_2.0}
+ * {@link http://b2evolution.net/man/skin-structure}
  *
  * It is used to display the blog when no specific page template is available to handle the request.
  *
@@ -180,6 +180,7 @@ skin_include( '_html_header.inc.php' );
 				'disp_posts'  => '',		// We already handled this case above
 				'disp_single' => '',		// We already handled this case above
 				'disp_page'   => '',		// We already handled this case above
+				'author_link_text' => 'preferredname',
 			) );
 		// Note: you can customize any of the sub templates included here by
 		// copying the matching php file into your skin directory.
@@ -230,6 +231,7 @@ skin_include( '_html_header.inc.php' );
 			) );
 	?>
 
+	<div class="bSideBarBg"></div>
 </div>
 
 </div>
@@ -244,7 +246,7 @@ skin_include( '_html_header.inc.php' );
 				) );
 		?>
 
-    <?php
+		<?php
 			// Display a link to contact the owner of this blog (if owner accepts messages):
 			$Blog->contact_link( array(
 					'before'      => '',
@@ -264,7 +266,7 @@ skin_include( '_html_header.inc.php' );
 
 		<?php
 			// Display additional credits:
- 			// If you can add your own credits without removing the defaults, you'll be very cool :))
+			// If you can add your own credits without removing the defaults, you'll be very cool :))
 			// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
 			credits( array(
 					'list_start'  => ' &bull; ',
@@ -276,6 +278,7 @@ skin_include( '_html_header.inc.php' );
 		?>
 	</p>
 </div>
+<div id="pageFooterBg"><div></div></div>
 </div>
 </div>
 <?php

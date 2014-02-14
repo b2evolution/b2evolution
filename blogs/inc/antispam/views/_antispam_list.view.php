@@ -178,11 +178,4 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 // Display results:
 $Results->display();
 
-
-/*
- * $Log$
- * Revision 1.13  2013/11/06 08:03:48  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

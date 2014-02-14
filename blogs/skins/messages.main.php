@@ -15,7 +15,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $htsrv_url, $Messages, $current_User;
 
 // fp> The correct place to get thrd_ID is here, because we want it in redirect_to in case we need to ask for login.
-// fp>attila fp>yura : make sure you understand this.
 param( 'thrd_ID', 'integer', '', true );
 
 if( !is_logged_in() )
@@ -50,7 +49,7 @@ if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
 
 if( !empty( $thrd_ID ) )
 { // if this thread exists and current user is part of this thread update status because won't be any unread messages on this conversation
-	// we need to mark this early to make sure the unread message count will be correct in the evobar 
+	// we need to mark this early to make sure the unread message count will be correct in the evobar
 	mark_as_read_by_user( $thrd_ID, $current_User->ID );
 }
 
@@ -68,10 +67,4 @@ require_once $inc_path.'_filters.inc.php';
 
 require $ads_current_skin_path.'index.main.php';
 
-/*
- * $Log$
- * Revision 1.8  2013/11/06 08:05:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

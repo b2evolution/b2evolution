@@ -22,11 +22,4 @@ $Plugins->call_by_code( 'evo_Arch', array( 'title'=>'',
 	                                          'limit'=>'',
 	                                          'more_link'=>'' ) );
 
-
-/*
- * $Log$
- * Revision 1.6  2013/11/06 08:05:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

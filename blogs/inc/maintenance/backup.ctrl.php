@@ -93,12 +93,12 @@ switch( $action )
 		// Interactive / flush() backup should start here
 		$Form->begin_form( 'fform', T_('System backup is in progress...') );
 
-		flush();
+		evo_flush();
 
 		$success = true;
 		if( $maintenance_mode = param( 'bk_maintenance_mode', 'boolean' ) )
 		{	// Enable maintenance mode
-			$success = switch_maintenance_mode( true, T_( 'System backup is in progress. Please reload this page in a few minutes.' ) );
+			$success = switch_maintenance_mode( true, 'all', T_( 'System backup is in progress. Please reload this page in a few minutes.' ) );
 
 			// Make sure we exit the maintenance mode if PHP dies
 			register_shutdown_function( 'switch_maintenance_mode', false, '', true );
@@ -112,7 +112,7 @@ switch( $action )
 
 		if( $maintenance_mode )
 		{	// Disable maintenance mode
-			switch_maintenance_mode( false );
+			switch_maintenance_mode( false, 'all' );
 		}
 
 		$Form->end_form();
@@ -124,11 +124,4 @@ $AdminUI->disp_payload_end();
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-
-/*
- * $Log$
- * Revision 1.11  2013/11/06 08:04:25  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

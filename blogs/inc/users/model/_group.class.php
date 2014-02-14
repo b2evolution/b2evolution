@@ -424,7 +424,7 @@ class Group extends DataObject
 							$blog_perms[$key] = $value;
 						}
 					}
-					else
+					elseif( isset( $blog_perms[$key] ) )
 					{ // Check user and group perm as well
 						$blog_perms[$key] = (int) $value | (int) $blog_perms[$key];
 					}

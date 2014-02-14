@@ -112,12 +112,3 @@ else
 		}
 	} );
 </script>
-<?php
-
-/*
- * $Log$
- * Revision 1.14  2013/11/06 08:05:04  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
-?>

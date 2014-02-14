@@ -59,7 +59,7 @@ if( $recipient_User )
 		$disp = 'login';
 		param( 'action', 'string', 'req_login' );
 		// override redirect to param
-		param( 'redirect_to', 'string', regenerate_url(), true, true );
+		param( 'redirect_to', 'url', regenerate_url(), true, true );
 		$Messages->add( T_( 'You must log in before you can contact this user' ) );
 	}
 	elseif( ( $allow_msgform == 'PM' ) && check_user_status( 'can_be_validated' ) )

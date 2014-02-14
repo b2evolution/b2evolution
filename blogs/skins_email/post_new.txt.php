@@ -20,10 +20,10 @@ global $admin_url, $baseurl, $htsrv_url;
 
 // Default params:
 $params = array_merge( array(
-		'locale'         => '',
-		'notify_full'    => '',
+		'notify_full'    => false,
 		'Item'           => NULL,
 		'recipient_User' => NULL,
+		'notify_type'    => '',
 	), $params );
 
 
@@ -45,10 +45,15 @@ if( $params['notify_full'] )
 	// linked URL or "-" if empty:
 	echo str_pad( T_('Url'), $pad_len ).': '.( empty( $Item->url ) ? '-' : str_replace( '&amp;', '&', $Item->get('url') ) )."\n";
 
+	if( $params['notify_type'] == 'moderator' )
+	{
+		echo T_('Status').': '.$Item->get( 't_status' )."\n";
+	}
+
 	echo str_pad( T_('Content'), $pad_len ).': ';
 	// TODO: We MAY want to force a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 	// TODO: might get moved onto a single line, at the end of the content..
-	echo str_replace( '&amp;', '&', $Item->get_permanent_url() )."\n\n";
+	echo $Item->get_permanent_url( '', '', '&' )."\n\n";
 
 	echo $Item->get('content')."\n";
 
@@ -62,13 +67,30 @@ else
 	echo sprintf( T_( '%s created a new post on %s with title %s.' ), $Item->creator_User->get( 'login' ), '"'.$Blog->get('shortname').'"', '"'.$Item->get('title').'"' );
 	echo "\n\n";
 	echo T_( 'To read the full content of the post click here:' ).' ';
-	echo str_replace( '&amp;', '&', $Item->get_permanent_url() );
+	echo $Item->get_permanent_url( '', '', '&' );
 	echo "\n";
+
+	if( $params['notify_type'] == 'moderator' )
+	{
+		echo "\n"
+			.T_('Status').': '.$Item->get( 't_status' )."\n"
+			.T_( 'This is a short form moderation message. To make these emails more useful for quick moderation, ask the administrator to send you long form moderation messages instead.' )
+			."\n";
+	}
 }
 
 // Footer vars:
-$params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notifications about new posts on this blog, click here:' ).' '.
-		$htsrv_url.'quick_unsubscribe.php?type=coll_post&user_ID=$user_ID$&coll_ID='.$Blog->ID.'&key=$unsubscribe_key$';
+if( $params['notify_type'] == 'moderator' )
+{ // moderation email
+	$params['unsubscribe_text'] = T_( 'You are a moderator in this blog, and you are receiving notifications when a post may need moderation.' )."\n";
+	$params['unsubscribe_text'] .= T_( 'If you don\'t want to receive any more notifications about post moderation, click here' ).': '
+			.$htsrv_url.'quick_unsubscribe.php?type=post_moderator&user_ID=$user_ID$&key=$unsubscribe_key$';
+}
+else
+{ // subscription email
+	$params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notifications about new posts on this blog, click here:' ).' '.
+			$htsrv_url.'quick_unsubscribe.php?type=coll_post&user_ID=$user_ID$&coll_ID='.$Blog->ID.'&key=$unsubscribe_key$';
+}
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.txt.php', $params );

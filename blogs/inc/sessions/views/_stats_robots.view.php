@@ -33,7 +33,7 @@ require_once dirname(__FILE__).'/_stats_view.funcs.php';
 
 global $blog, $admin_url, $rsc_url, $AdminUI, $agent_type_color;
 
-echo '<h2>'.T_('Hits from indexing robots / spiders / crawlers - Summary').'</h2>';
+echo '<h2>'.T_('Hits from indexing robots / spiders / crawlers - Summary').get_manual_link( 'robots-hits-summary' ).'</h2>';
 
 echo '<p class="notes">'.T_('In order to be detected, robots must be listed in /conf/_stats.php.').'</p>';
 
@@ -172,10 +172,4 @@ $Results->cols[] = array(
 $Results->display();
 */
 
-/*
- * $Log$
- * Revision 1.18  2013/11/06 08:04:45  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

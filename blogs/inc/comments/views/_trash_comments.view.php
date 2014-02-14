@@ -74,11 +74,4 @@ echo '<p>[<a href="'.regenerate_url( 'action,blog_ID', 'action=trash_delete' ).'
 
 $Results->display();
 
-
-/*
- * $Log$
- * Revision 1.8  2013/11/06 08:04:07  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

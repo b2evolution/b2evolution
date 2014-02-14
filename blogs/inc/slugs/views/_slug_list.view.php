@@ -52,7 +52,7 @@ if( $filter_item_ID = get_param( 'slug_item_ID' ) )
 // Create result set:
 $Results = new Results( $SQL->get(), 'slug_', 'A' );
 
-$Results->title = T_('Slugs').' ('.$Results->total_rows.')';
+$Results->title = T_('Slugs').' ('.$Results->total_rows.')' . get_manual_link('slugs-list');
 $Results->Cache = get_SlugCache();
 
 /**
@@ -224,11 +224,4 @@ if( $current_User->check_perm( 'slugs', 'edit' ) )
 
 $Results->display();
 
-
-/*
- * $Log$
- * Revision 1.15  2013/11/06 08:04:54  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

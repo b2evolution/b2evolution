@@ -111,10 +111,4 @@ $Results->cols[] = array(
 // Display results:
 $Results->display();
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:05:03  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

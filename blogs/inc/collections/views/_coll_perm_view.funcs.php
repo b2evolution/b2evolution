@@ -87,6 +87,42 @@ function coll_perm_checkbox( $row, $prefix, $perm, $title, $id = NULL )
 
 
 /**
+ * Check if the current comment statuses perm value contains at least as much perms as anonymous users have
+ * If anonymous users have no permission to post comments, then this will automatically return true;
+ *
+ * @param integer statuses perm value for the checked user/group
+ * @return boolean true if the minimum required permission is granted, false otherwise
+ */
+function check_default_create_comment_perm( $perm_statuses )
+{
+	global $edited_Blog;
+
+	if( $edited_Blog->get_setting( 'allow_comments' ) != 'any' )
+	{ // Anonymous users are not allowed to post comments
+		return true;
+	}
+
+	$default_status = $edited_Blog->get_setting( 'new_feedback_status' );
+	$default_status_perm_value = get_status_permvalue( $default_status );
+	if( $perm_statuses & $default_status_perm_value )
+	{ // Posting comments with default status is allowed
+		return true;
+	}
+
+	$published_perm_value = get_status_permvalue( 'published' );
+	// Remove hihger perm vlaues then 'published' status perm value ( 'deprecated' and 'redirected' values are not important in this context )
+	$perm_statuses = $perm_statuses & ( $published_perm_value + $published_perm_value - 1 );
+	$review_perm_value = get_status_permvalue( 'review' );
+	if( ( $perm_statuses > $default_status_perm_value ) || ( ( $default_status == 'draft' ) && (  $perm_statuses & $review_perm_value ) ) )
+	{
+		return true;
+	}
+
+	return false;
+}
+
+
+/**
  * Get perm post/comment statuses for a user or group
  * 
  * @param object db row
@@ -97,9 +133,10 @@ function coll_perm_checkbox( $row, $prefix, $perm, $title, $id = NULL )
  */
 function coll_perm_status_checkbox( $row, $prefix, $perm_status, $title, $type )
 {
-	global $permission_to_change_admin;
+	global $edited_Blog, $permission_to_change_admin;
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
+	$default_status = NULL;
 
 	switch( $type )
 	{
@@ -110,6 +147,10 @@ function coll_perm_status_checkbox( $row, $prefix, $perm_status, $title, $type )
 
 		case 'comment':
 			$perm_statuses = 'perm_cmtstatuses';
+			if( ! check_default_create_comment_perm( $row->{$perm_statuses} ) )
+			{ // Doesn't have at least as high comment create permission as anonymous users have
+				$default_status = $edited_Blog->get_setting( 'new_feedback_status' );
+			}
 			$type_param = 'cmt_';
 			break;
 
@@ -131,7 +172,15 @@ function coll_perm_status_checkbox( $row, $prefix, $perm_status, $title, $type )
 	{
 	 	$r .= ' disabled="disabled"';
 	}
+	if( $perm_status == $default_status )
+	{
+		$title .= "\n".T_('Note: Anonymous users may create comments with this status. You will probably want to give the same permission to this user/group.');
+	}
 	$r .= ' class="checkbox" value="1" title="'.$title.'" />';
+	if( $perm_status == $default_status )
+	{ // This is the default comment status checkbox, and user has no permission to create comment with this status ( like anonymous users ) or a higher status
+		$r = '<span class="red-bordered-checkbox">'.$r.'</span>';
+	}
 	return $r;
 }
 

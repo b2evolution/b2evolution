@@ -40,7 +40,7 @@ if( !$ctst_pending && !$ctst_started && !$ctst_timeout && !$ctst_error && !$ctst
  * Create result set :
  */
 $SQL = new SQL();
-$SQL->SELECT( 'ctsk_ID, ctsk_start_datetime, ctsk_name, ctsk_repeat_after, IFNULL( clog_status, "pending" ) as status' );
+$SQL->SELECT( 'ctsk_ID, ctsk_start_datetime, ctsk_name, ctsk_controller, ctsk_repeat_after, IFNULL( clog_status, "pending" ) as status' );
 $SQL->FROM( 'T_cron__task LEFT JOIN T_cron__log ON ctsk_ID = clog_ctsk_ID' );
 if( $ctst_pending )
 {
@@ -119,7 +119,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 						'th' => T_('Name'),
 						'order' => 'ctsk_name',
-						'td' => '<a href="%regenerate_url(\'action,cjob_ID\',\'action=view&amp;cjob_ID=$ctsk_ID$\')%">$ctsk_name$</a>%get_manual_link( #ctsk_name# )%',
+						'td' => '<a href="%regenerate_url(\'action,cjob_ID\',\'action=view&amp;cjob_ID=$ctsk_ID$\')%">$ctsk_name$</a>%cron_job_manual_link( #ctsk_controller# )%',
 					);
 
 $Results->cols[] = array(
@@ -178,11 +178,4 @@ $Results->display();
 global $cron_url;
 echo '<p>[<a href="'.$cron_url.'cron_exec.php" onclick="return pop_up_window( \''.$cron_url.'cron_exec.php\', \'evo_cron\' )" target="evo_cron">'.T_('Execute pending jobs in a popup window now!').'</a>]</p>';
 
-
-/*
- * $Log$
- * Revision 1.12  2013/11/06 08:04:07  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

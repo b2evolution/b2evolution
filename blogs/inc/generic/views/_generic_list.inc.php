@@ -134,11 +134,4 @@ if( !$form_below_list )
 // $Results->display();
 $Results->display( NULL, $result_fadeout );
 
-
-/*
- * $Log$
- * Revision 1.10  2013/11/06 08:04:15  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

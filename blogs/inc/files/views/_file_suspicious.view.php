@@ -125,7 +125,7 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => T_('Like'),
+		'th' => /* TRANS: Header for # of times photo has been liked */ T_('Likes'),
 		'td' => '$total_like$',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'center',
@@ -134,7 +134,7 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => T_('Inappropriate'),
+		'th' => /* TRANS: Header for # of times photo has been votes inappropriate */ T_('Inappropriate'),
 		'td' => '$total_inappropriate$',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'center',
@@ -153,7 +153,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 		'th' => T_('Duplicates'),
-		'td' => '~conditional( #total_duplicates# >= 1, "<a href=\"?ctrl=filemod&amp;tab=duplicates&amp;file_ID=#file_ID#\">'.T_('this').' + #total_duplicates#</a>", "'.T_('none').'")~',
+		'td' => '~conditional( #total_duplicates# >= 1, "<a href=\"?ctrl=filemod&amp;tab=duplicates&amp;file_ID=#file_ID#\">'./* TRANS: "This file" in suspicious file view */ T_('this one').' + #total_duplicates#</a>", "'.T_('none').'")~',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'center',
 		'order' => 'total_duplicates',
@@ -162,11 +162,4 @@ $Results->cols[] = array(
 
 $Results->display();
 
-
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:04:15  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

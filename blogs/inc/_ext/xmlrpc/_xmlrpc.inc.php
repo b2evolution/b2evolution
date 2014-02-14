@@ -2254,6 +2254,8 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 		*/
 		function &parseResponseHeaders(&$data, $headers_processed=false)
 		{
+			  if( $this->debug ) echo "Parsing headers...<br />\n";
+
 				// Support "web-proxy-tunelling" connections for https through proxies
 				if(preg_match('/^HTTP\/1\.[0-1] 200 Connection established/', $data))
 				{
@@ -2495,7 +2497,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 			if($this->debug)
 			{
 				//by maHo, replaced htmlspecialchars with htmlentities
-				print "<PRE>---GOT---\n" . htmlentities($data) . "\n---END---\n</PRE>";
+				print '<PRE>---GOT---['.strlen($data)." chars]---\n".htmlentities($data)."\n---END---\n</PRE>";
 			}
 
 			if($data == '')

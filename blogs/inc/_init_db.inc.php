@@ -93,10 +93,4 @@ $global_Cache = new AbstractSettings( 'T_global__cache', array( 'cach_name' ), '
 
 $Timer->pause( '_init_db' );
 
-/*
- * $Log$
- * Revision 1.4  2013/11/06 08:03:47  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -55,7 +55,7 @@ $Form->hidden( 'action', 'update_settings' );
 
 if( isset($collections_Module) )
 {
-	$Form->begin_fieldset( T_('Display options').get_manual_link('display_options') );
+	$Form->begin_fieldset( T_('Display options').get_manual_link('collections-display-options') );
 
 	$BlogCache = & get_BlogCache();
 
@@ -66,7 +66,7 @@ if( isset($collections_Module) )
 				'loop_object_method' => 'get_maxlen_name',
 				'onchange' => '' )  );
 
-		$Form->select_input_options( 'blogs_order_by', array_to_option_list( get_coll_sort_options(), $Settings->get('blogs_order_by') ), T_('Order blogs by'), T_('Select default blog list order.') );
+		$Form->select_input_options( 'blogs_order_by', array_to_option_list( get_coll_sort_options(), $Settings->get('blogs_order_by') ), T_('Order blogs by'), T_('Select blog list order.') );
 
 		$Form->select_input_options( 'blogs_order_dir', array_to_option_list(
 				array( 'ASC' => T_('Ascending'), 'DESC' => T_('Descending') ), $Settings->get('blogs_order_dir') ), T_('Order direction'), T_('Select default blog list order direction.') );
@@ -76,7 +76,7 @@ if( isset($collections_Module) )
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Timeouts') );
+$Form->begin_fieldset( T_('Timeouts').get_manual_link('collections-timeouts') );
 
 	$Form->duration_input( 'reloadpage_timeout', (int)$Settings->get('reloadpage_timeout'), T_('Reload-page timeout'), 'minutes', 'seconds', array( 'minutes_step' => 1, 'required' => true ) );
 	// $Form->text_input( 'reloadpage_timeout', (int)$Settings->get('reloadpage_timeout'), 5,
@@ -88,7 +88,7 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Caching') );
+$Form->begin_fieldset( T_('Caching').get_manual_link('collections-caching-settings') );
 
 	$Form->checkbox_input( 'general_cache_enabled', $Settings->get('general_cache_enabled'), T_('Enable general cache'), array( 'note'=>T_('Cache rendered pages that are not controlled by a skin. See Blog Settings for skin output caching.') ) );
 
@@ -125,7 +125,7 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Cross posting') );
+$Form->begin_fieldset( T_('Cross posting').get_manual_link('collections-cross-posting-settings') );
 	$Form->checklist( array(
 		array( 'cross_posting', 1, T_('Allow cross-posting posts to several blogs'), $Settings->get('cross_posting'), false, T_('(Extra cats in different blogs)') ),
 		array( 'cross_posting_blogs', 1, T_('Allow moving posts between different blogs'), $Settings->get('cross_posting_blogs'), false, T_('(Main cat can move to different blog)') ) ),
@@ -134,7 +134,7 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Subscribing to new blogs') );
+$Form->begin_fieldset( T_('Subscribing to new blogs').get_manual_link('collections-subscription-settings') );
 	$Form->radio_input( 'subscribe_new_blogs', $Settings->get('subscribe_new_blogs'),
 		array(
 			array( 'value' => 'page', 'label' => T_('From blog page only') ),
@@ -147,7 +147,7 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Default skins') );
+$Form->begin_fieldset( T_('Default skins').get_manual_link('collections-default-skins') );
 	$normal_skins = array();
 	$mobile_skins = array( 0 => T_('Same as normal skin') );
 	$tablet_skins = array( 0 => T_('Same as normal skin') );
@@ -188,10 +188,4 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 }
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:03:58  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

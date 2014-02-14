@@ -258,11 +258,4 @@ if( ( $current_User->ID == $edited_User->ID ) && isset( $Blog ) )
 
 $Form->end_form();
 
-
-/*
- * $Log$
- * Revision 1.28  2013/11/06 09:09:09  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

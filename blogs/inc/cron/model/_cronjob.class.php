@@ -135,8 +135,8 @@ class Cronjob extends DataObject
 		{	// Create new cron job
 			$cjob_type = param( 'cjob_type', 'string', true );
 			if( !isset( $cron_job_params[$cjob_type] ) )
-			{
-				param_error( 'cjob_type', T_('Invalid job type') );
+			{ // This cron job type doesn't exist, so this is an invalid state
+				debug_die('Invalid job type received');
 				$cjob_name = '';
 			}
 			else
@@ -159,7 +159,10 @@ class Cronjob extends DataObject
 		$this->set( 'repeat_after', $cjob_repeat_after );
 
 		// name:
-		$this->set( 'name', $cjob_name );
+		if( !empty( $cjob_name ) && $cjob_name != $this->get( 'name' ) )
+		{
+			$this->set( 'name', $cjob_name );
+		}
 
 		if( $this->ID == 0 && get_param( 'ctsk_ID' ) == 0 )
 		{	// Set these params only on creating and copying actions
@@ -228,10 +231,4 @@ class Cronjob extends DataObject
 	}
 }
 
-/*
- * $Log$
- * Revision 1.10  2013/11/06 08:04:07  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

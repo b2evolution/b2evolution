@@ -104,35 +104,18 @@ global $fm_FileRoot;
 		var uploadfiles = document.getElementById("uploadfileinputs");
 		var newLI = document.createElement("li");
 		var closeLink = document.createElement("a");
-		var closeImage = document.createElement("img");
+		closeLink.innerHTML = '<?php echo get_icon( 'close' ); ?>';
+		var closeImage = jQuery( closeLink ).children( 'span' );
 
 		uploadfiles.appendChild( newLI );
 		newLI.appendChild( closeLink );
-		closeLink.appendChild( closeImage );
-
-
 		newLI.className = "clear";
 
-		closeImage.src = "<?php echo get_icon( 'close', 'url' ) ?>";
-		closeImage.alt = "<?php echo get_icon( 'close', 'alt' ) ?>";
-
 		<?php
-		$icon_class = get_icon( 'close', 'class' );
-		if( $icon_class )
-		{
-			?>
-			closeImage.className = '<?php echo $icon_class ?>';
-			<?php
-		}
-
 		if( get_icon( 'close', 'rollover' ) )
 		{ // handle rollover images ('close' by default is one).
 			?>
-			closeLink.className = 'rollover'; // dh> use "+=" to append class?
-			if( typeof setupRollovers == 'function' )
-			{
-				setupRollovers();
-			}
+			closeLink.className = 'rollover_sprite'; // dh> use "+=" to append class?
 			<?php
 		}
 		// add handler to image to close the parent LI and add css to float right.
@@ -377,11 +360,4 @@ $Form->end_form();
 // End payload block:
 $this->disp_payload_end();
 
-
-/*
- * $Log$
- * Revision 1.26  2013/11/06 08:04:15  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -32,7 +32,7 @@ $required_php_version[ 'messaging' ] = '5.0';
 /**
  * Minimum MYSQL version required for messaging module to function properly
  */
-$required_mysql_version[ 'messaging' ] = '4.1';
+$required_mysql_version[ 'messaging' ] = '5.0.3';
 
 /**
  * Aliases for table names:
@@ -180,7 +180,7 @@ class messaging_Module extends Module
 		// 'options' is permission options
 		$permissions = array(
 			'perm_messaging' => array(
-				'label' => T_('Messaging'),
+				'label' => T_('Messages'),
 				'user_func'  => 'check_messaging_user_perm',
 				'group_func' => 'check_messaging_group_perm',
 				'perm_block' => 'additional',
@@ -304,13 +304,16 @@ class messaging_Module extends Module
 
 		if( $current_User->check_perm( 'perm_messaging', 'reply' ) )
 		{
-			// TODO: this is hackish and would require a proper function call
-			$topleft_Menu->_menus['entries']['tools']['disabled'] = false;
+			if( ! empty( $topleft_Menu->_menus['entries']['tools']['entries'] ) )
+			{
+				// TODO: this is hackish and would require a proper function call
+				$topleft_Menu->_menus['entries']['tools']['disabled'] = false;
 
-			$left_entries['messaging'] = array(
-					'text' => T_('Messages').'&hellip;',
-					'href' => $admin_url.'?ctrl=threads',
-				);
+				$left_entries['messaging'] = array(
+						'text' => T_('Messages').'&hellip;',
+						'href' => $admin_url.'?ctrl=threads',
+					);
+			}
 
 			$right_entries['messaging'] = array(
 				'text' => T_('Messages'),
@@ -394,7 +397,7 @@ class messaging_Module extends Module
 		$current_User->check_perm( 'perm_messaging', 'reply', true );
 
 		// set where to redirect
-		$redirect_to = param( 'redirect_to', 'string', NULL );
+		$redirect_to = param( 'redirect_to', 'url', NULL );
 		if( empty( $redirect_to ) )
 		{
 			if( isset( $Blog ) )
@@ -576,10 +579,4 @@ class messaging_Module extends Module
 
 $messaging_Module = new messaging_Module();
 
-/*
- * $Log$
- * Revision 1.26  2013/11/06 09:08:58  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

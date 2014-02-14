@@ -280,12 +280,3 @@ jQuery( 'input[name=edited_grp_perm_options]' ).click( function()
 	}
 } );
 </script>
-<?php
-
-/*
- * $Log$
- * Revision 1.34  2013/11/06 08:05:03  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
-?>

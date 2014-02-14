@@ -195,8 +195,10 @@ $Form->begin_form( '', '', $params );
 
 
 	// ####################### ATTACHMENTS/LINKS #########################
-	if( isset($GLOBALS['files_Module']) )
-	{
+	if( isset($GLOBALS['files_Module']) && ( !$creating ||
+		( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item )
+		&& $current_User->check_perm( 'files', 'view', false ) ) ) )
+	{ // Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files
 		load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
 		$LinkOwner = new LinkItem( $edited_Item );
 		attachment_iframe( $Form, $LinkOwner, $iframe_name, $creating );
@@ -223,14 +225,26 @@ $Form->begin_form( '', '', $params );
 	$Form->hidden( 'slug_changed', 0 );
 
 	$edit_slug_link = '';
-	if( $current_User->check_perm( 'slugs', 'view' ) )
+	if( $edited_Item->ID > 0 && $current_User->check_perm( 'slugs', 'view' ) )
 	{	// user has permission to view slugs:
 		$edit_slug_link = '&nbsp;'.action_icon( T_('Edit slugs...'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$edited_Item->ID );
 	}
 
-	echo '<tr><td class="label"><label for="post_urltitle" title="'.T_('&quot;slug&quot; to be used in permalinks').'"><strong>'.T_('URL slugs').$edit_slug_link.':</strong></label></td>';
+	if( empty( $edited_Item->tiny_slug_ID ) )
+	{
+		$tiny_slug_info = T_('No Tiny URL yet.');
+	}
+	else
+	{
+		$tiny_slug_info = $edited_Item->get_tinyurl_link( array(
+				'before' => T_('Tiny URL').': ',
+				'after'  => ''
+			) );
+	}
+
+	echo '<tr><td class="label" valign="top"><label for="post_urltitle" title="'.T_('&quot;slug&quot; to be used in permalinks').'"><strong>'.T_('URL slugs').$edit_slug_link.':</strong></label></td>';
 	echo '<td class="input" width="97%">';
-	$Form->text_input( 'post_urltitle', $edited_Item->get_slugs(), 40, '', '', array('maxlength'=>210, 'style'=>'width: 100%;') );
+	$Form->text_input( 'post_urltitle', $edited_Item->get_slugs(), 40, '', '<br />'.$tiny_slug_info, array('maxlength'=>210, 'style'=>'width: 100%;') );
 	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
 
 	echo '<tr><td class="label"><label for="titletag"><strong>'.T_('&lt;title&gt; tag').':</strong></label></td>';
@@ -429,7 +443,7 @@ $Form->begin_form( '', '', $params );
 	$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'itemform_renderers' ) );
 
 	// fp> TODO: there should be no param call here (shld be in controller)
-	$edited_Item->renderer_checkboxes( param('renderers', 'array', NULL) );
+	$edited_Item->renderer_checkboxes( param('renderers', 'array/string', NULL) );
 
 	$Form->end_fieldset();
 
@@ -492,10 +506,4 @@ echo_onchange_item_type_js();
 
 // require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
-/*
- * $Log$
- * Revision 1.87  2013/11/06 09:08:58  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

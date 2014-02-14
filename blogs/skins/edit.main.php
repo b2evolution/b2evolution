@@ -36,12 +36,24 @@ if( !$current_User->check_status( 'can_edit_post' ) )
 	}
 
 	// Redirect to the blog url for users without messaging permission
-	$Messages->add( 'You are not allowed to create & edit posts!' );
+	$Messages->add( T_('You are not allowed to create & edit posts!') );
 	header_redirect( $Blog->gen_blogurl(), 302 );
 }
 
 // user logged in and the account was activated
 check_item_perm_edit( $post_ID );
+
+if( ! blog_has_cats( $Blog->ID ) )
+{ // No categories are in this blog
+	$error_message = T_('Since this blog has no categories, you cannot post into it.');
+	if( $current_User->check_perm( 'blog_cats', 'edit', false, $Blog->ID ) )
+	{ // If current user has a permission to create a category
+		global $admin_url;
+		$error_message .= ' '.sprintf( T_('You must <a %s>create categories</a> first.'), 'href="'.$admin_url.'?ctrl=chapters&amp;blog='.$Blog->ID.'"');
+	}
+	$Messages->add( $error_message, 'error' );
+	header_redirect( $Blog->gen_blogurl(), 302 );
+}
 
 // Require datapicker.css
 require_css( 'ui.datepicker.css' );
@@ -53,10 +65,4 @@ require_js( 'extracats.js', 'blog' );
 
 require $ads_current_skin_path.'index.main.php';
 
-/*
- * $Log$
- * Revision 1.3  2013/11/06 08:05:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

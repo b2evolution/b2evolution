@@ -27,7 +27,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $blog, $admin_url, $rsc_url, $AdminUI, $agent_type_color;
 
-echo '<h2>'.T_('Hits from RSS/Atom feed readers - Summary').'</h2>';
+echo '<h2>'.T_('Hits from RSS/Atom feed readers - Summary').get_manual_link( 'feed-hits-summary' ).'</h2>';
 
 echo '<p class="notes">'.T_('Any user agent accessing the XML feeds will be flagged as an XML reader.').'</p>';
 
@@ -86,10 +86,4 @@ if( count($res_hits) )
 
 }
 
-/*
- * $Log$
- * Revision 1.15  2013/11/06 08:04:45  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

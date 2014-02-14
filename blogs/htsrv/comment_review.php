@@ -222,11 +222,3 @@ else
 
 </body>
 </html>
-<?php
-/*
- * $Log$
- * Revision 1.20  2013/11/06 08:03:44  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
-?>

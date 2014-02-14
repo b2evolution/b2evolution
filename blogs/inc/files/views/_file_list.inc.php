@@ -71,7 +71,7 @@ global $edited_User;
 
 global $Blog, $blog;
 
-global $fm_mode, $fm_hide_dirtree, $create_name, $ads_list_path;
+global $fm_mode, $fm_hide_dirtree, $create_name, $ads_list_path, $mode;
 
 // Abstract data we want to pass through:
 global $linkctrl, $linkdata;
@@ -197,7 +197,6 @@ $Form->begin_form();
 
 		/***********  Hidden info used by Javascript:  ***********/
 
-		global $mode;
 		if( $mode == 'upload' )
 		{	// This mode allows to insert img tags into the post...
 			// Hidden info used by Javascript:
@@ -507,7 +506,7 @@ $Form->begin_form();
 			 */
 			if( $fm_mode == 'link_object' && $mode != 'upload' )
 			{	// We are linking to an object...
-				$field_options['link'] = $LinkOwner->T_( 'Link files to current owner' );
+				$field_options['link'] = $LinkOwner->translate( 'Link files to current owner' );
 			}
 
 			if( $mode != 'upload' && ($fm_Filelist->get_root_type() == 'collection' || !empty($Blog))
@@ -693,11 +692,3 @@ $Form->begin_form();
 	}}}
 ?>
 <!-- End of detailed file list -->
-<?php
-/*
- * $Log$
- * Revision 1.53  2013/11/06 08:04:15  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
-?>

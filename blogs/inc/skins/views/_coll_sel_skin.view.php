@@ -43,10 +43,4 @@ foreach( $SkinCache->cache as $Skin )
 
 echo '<div class="clear"></div>';
 
-/*
- * $Log$
- * Revision 1.11  2013/11/06 08:04:46  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

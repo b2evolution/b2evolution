@@ -147,10 +147,4 @@ $schema_queries['T_track__goalhit'] = array(
 		  KEY ghit_hit_ID (ghit_hit_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
 
-/*
- * $Log$
- * Revision 1.28  2013/11/06 08:04:45  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -272,55 +272,13 @@ $ProfileForm->begin_fieldset( sprintf( T_('You and %s...'), $User->login ) );
 		}
 	}
 
-	if( $is_logged_in && ( $current_User->ID != $User->ID ) && $current_User->check_status( 'can_report_user' ) )
-	{ // Display Report User part
-		$ProfileForm->add_crumb( 'messaging_contacts' );
-		$ProfileForm->hidden( 'user_ID', $User->ID );
-
-		$report_options = array_merge( array( 'none' => '' ), get_report_statuses() );
-
-		$ProfileForm->custom_content( '<p><strong>'.get_icon('warning_yellow').' '.T_( 'If you have an issue with this user, you can report it here:' ).'</strong></p>' );
-
-		// get current User report from edited User
-		$current_report = get_report_from( $User->ID );
-
-		if( $current_report == NULL )
-		{ // currentUser didn't add any report from this user yet
-			$report_content = '<select id="report_user_status" name="report_user_status">';
-			foreach( $report_options as $option => $option_label )
-			{ // add select option, none must be selected
-				$report_content .= '<option '.( ( $option == 'none' ) ? 'selected="selected" ' : '' ).'value="'.$option.'">'.$option_label.'</option>';
-			}
-			$report_content .= '</select><div id="report_info" style="width:100%;"></div>';
-
-			$info_content = '<div><span>'.T_('You can provide additional information below').':</span></div>';
-			$info_content .= '<table style="width:100%;"><td style="width:99%;background-color:inherit;"><textarea id="report_info_content" name="report_info_content" class="form_textarea_input" style="width:100%;" rows="2" maxlength="240"></textarea></td>';
-			$info_content .= '<td style="vertical-align:top;background-color:inherit;"><input type="submit" class="SaveButton" style="color:red;margin-left:2px;" value="'.T_('Report this user now!').'" name="actionArray[report_user]" /></td></table>';
-			$report_content .= '<script type="text/javascript">
-				var info_content = \''.$info_content.'\';
-				jQuery("#report_user_status").change( function() {
-					var report_info = jQuery("#report_info");
-					var value = jQuery(this).val();
-					if( value == "none" )
-					{
-						report_info.html("");
-					}
-					else if( report_info.is(":empty") )
-					{
-						report_info.html( info_content );
-					}
-				});
-				</script>';
-				$ProfileForm->info( T_('Report NOW'), $report_content );
-		}
-		else
-		{
-			$report_content = T_('You have reported this user on %s as "%s" with the additional info "%s" - <a %s>Cancel report</a>');
-			$cancel_link = 'href="'.url_add_param( $Blog->get('url'), 'disp=contacts&amp;user_ID='.$User->ID.'&amp;action=remove_report&amp;'.url_crumb( 'messaging_contacts' ) ).'"';
-			$report_content = sprintf( $report_content, mysql2localedatetime( $current_report[ 'date' ] ), $report_options[ $current_report[ 'status' ] ], $current_report[ 'info' ], $cancel_link );
-			$ProfileForm->info( T_('Already reported'), $report_content );
-		}
-	}
+	// Display Report User part
+	user_report_form( array(
+			'Form'       => $ProfileForm,
+			'user_ID'    => $User->ID,
+			'crumb_name' => 'messaging_contacts',
+			'cancel_url' => url_add_param( $Blog->get('url'), 'disp=contacts&amp;user_ID='.$User->ID.'&amp;action=remove_report&amp;'.url_crumb( 'messaging_contacts' ) ),
+		) );
 
 $ProfileForm->end_fieldset();
 

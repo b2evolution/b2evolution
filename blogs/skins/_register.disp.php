@@ -45,7 +45,7 @@ $email = param( $dummy_fields[ 'email' ], 'string', '' );
 $firstname = param( 'firstname', 'string', '' );
 $gender = param( 'gender', 'string', false );
 $source = param( 'source', 'string', 'register form' );
-$redirect_to = param( 'redirect_to', 'string', '' );
+$redirect_to = param( 'redirect_to', 'url', '' );
 
 if( $register_user = $Session->get('core.register_user') )
 {	// Get an user data from predefined session (after adding of a comment)
@@ -106,12 +106,12 @@ if( $registration_require_firstname )
 }
 
 $registration_require_gender = $Settings->get( 'registration_require_gender' );
-if( $registration_require_gender == 'required' )
-{ // gender required
+if( $registration_require_gender != 'hidden' )
+{ // Display a gender field if it is not hidden
 	$Form->radio_input( 'gender', $gender, array(
 				array( 'value' => 'M', 'label' => T_('A man') ),
 				array( 'value' => 'F', 'label' => T_('A woman') ),
-			), T_('I am'), array( 'required' => true ) );
+			), T_('I am'), array( 'required' => $registration_require_gender == 'required' ) );
 }
 
 if( $Settings->get( 'registration_ask_locale' ) )
@@ -144,11 +144,4 @@ display_password_indicator();
 // Display javascript login validator
 display_login_validator();
 
-
-/*
- * $Log$
- * Revision 1.22  2013/11/06 08:05:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

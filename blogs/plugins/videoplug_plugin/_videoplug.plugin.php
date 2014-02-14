@@ -194,11 +194,4 @@ class videoplug_plugin extends Plugin
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.27  2013/11/06 08:05:35  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

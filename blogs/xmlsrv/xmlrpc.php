@@ -85,11 +85,4 @@ $s->response_charset_encoding = 'auto';
 // DO THE SERVING:
 $s->service();
 
-
-/*
- * $Log$
- * Revision 1.160  2013/11/06 08:05:53  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -63,6 +63,7 @@ switch ( $action )
 		param( 'notify_unread_messages', 'integer', 0 );
 		param( 'notify_published_comments', 'integer', 0 );
 		param( 'notify_comment_moderation', 'integer', 0 );
+		param( 'notify_post_moderation', 'integer', 0 );
 		param( 'newsletter_news', 'integer', 0 );
 		param( 'newsletter_ads', 'integer', 0 );
 		param_integer_range( 'notification_email_limit', 0, 999, T_('Notificaiton email limit must be between %d and %d.') );
@@ -129,6 +130,7 @@ switch ( $action )
 					 array( 'def_notify_unread_messages', $notify_unread_messages ),
 					 array( 'def_notify_published_comments', $notify_published_comments ),
 					 array( 'def_notify_comment_moderation', $notify_comment_moderation ),
+					 array( 'def_notify_post_moderation', $notify_post_moderation ),
 					 array( 'def_newsletter_news', $newsletter_news ),
 					 array( 'def_newsletter_ads', $newsletter_ads ),
 					 array( 'def_notification_email_limit', $notification_email_limit ),
@@ -193,10 +195,4 @@ $AdminUI->disp_payload_end();
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-/*
- * $Log$
- * Revision 1.20  2013/11/06 08:04:55  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

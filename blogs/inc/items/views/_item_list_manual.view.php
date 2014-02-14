@@ -92,7 +92,12 @@ jQuery( document ).on( 'click', 'td[id^=order-]', function()
 		var td_obj = jQuery( this ).parent();
 		if( td_obj.attr( 'rel' ) != jQuery( this ).val() )
 		{ // Value was changed, ask about saving
-			if( confirm( '<?php echo TS_('Do you want clear your changes for this order field?'); ?>' ) )
+			// fp>yura: please explain where and when this happens:
+			// yura>fp: 1. Go to in backoffice "Manual BLOG > Contents > Manual Pages" like this url: /admin.php?ctrl=items&tab=manual&filter=restore&blog=6
+			// 2. Click on the cell of the column "Order", You will see the input to change an order
+			// 3. Change to other value
+			// 4. Click outside input(to init event "blur") - and this message will be appeared
+			if( confirm( '<?php echo TS_('Do you want discard your changes for this order field?'); ?>' ) )
 			{
 				revert_changes = true;
 			}

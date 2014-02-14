@@ -210,13 +210,15 @@ $Results->cols[] = array(
 
 function format_msg_text( $msg_text, $thread_title )
 {
+	global $evo_charset;
+	
 	if( empty( $msg_text ) )
 	{
 		return format_to_output( $thread_title, 'htmlspecialchars' );
 	}
 
 	// WARNING: the messages may contain MALICIOUS HTML and javascript snippets. They must ALWAYS be ESCAPED prior to display!
-	$msg_text = htmlentities( $msg_text );
+	$msg_text = htmlentities( $msg_text, ENT_COMPAT, $evo_charset );
 
 	$msg_text = make_clickable( $msg_text );
 	$msg_text = preg_replace( '#<a #i', '<a rel="nofollow" target="_blank"', $msg_text );
@@ -441,15 +443,13 @@ if( $is_recipient && empty( $leave_msg_ID ) && ( count( $available_recipients ) 
 	echo '</div>';
 }
 
+// Disable rollover effect on table rows
+$Results->display_init( $display_params );
+$display_params['list_start'] = str_replace( 'class="grouped', 'class="grouped nohover', $Results->params['list_start'] );
+
 // Dispaly message list
 $Results->display( $display_params );
 
 echo $params['messages_list_end'];
 
-/*
- * $Log$
- * Revision 1.52  2013/11/06 09:08:58  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

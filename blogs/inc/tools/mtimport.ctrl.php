@@ -117,7 +117,7 @@ if( ! isset($config_is_done) || ! $config_is_done )
 
 
 // Check if user is logged in and is in group #1 (admins)
-if( !is_logged_in( false ) || $current_User->Group->ID != 1 )
+if( !is_logged_in( false ) || $current_User->grp_ID != 1 )
 {	// login failed
 	debug_die( 'You must login with an administrator (group #1) account.' );
 }
@@ -1145,7 +1145,7 @@ param( 'import_mode', 'string', 'normal' );
 			}
 
 			echo "</li>\n";
-			flush();
+			evo_flush();
 		}
 		?>
 		</ol>
@@ -1680,10 +1680,4 @@ function tidypostdata( $string )
 	return str_replace( array('&quot;', '&#039;', '&lt;', '&gt;'), array('"', "'", '<', '>'), remove_magic_quotes( $string ) );
 }
 
-/*
- * $Log$
- * Revision 1.26  2013/11/06 09:08:59  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

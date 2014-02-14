@@ -353,48 +353,44 @@ function dbm_delete_orphan_comment_uploads()
  */
 function dbm_delete_orphan_files()
 {
-	global $DB;
+	global $DB, $admin_url;
 
 	$FileCache = & get_FileCache();
+	$FileCache->clear();
 
 	echo T_('Deleting of the orphan File objects from the database...');
 	evo_flush();
 
 	$files_SQL = new SQL();
-	$files_SQL->SELECT( 'file_ID' );
+	$files_SQL->SELECT( '*' );
 	$files_SQL->FROM( 'T_files' );
 	$files_SQL->ORDER_BY( 'file_ID' );
 
 	$count_files_valid = 0;
+	$count_files_invalid = 0;
 	$count_files_deleted = 0;
 
 	$page_size = 100;
 	$current_page = 0;
-	while( 1 )
-	{ // Search the files by page to save memory
-		$files_SQL->LIMIT( ( $current_page * $page_size ).', '.$page_size );
-		$files = $DB->get_col( $files_SQL->get() );
-
-		if( empty( $files ) )
-		{ // All files were verified, Stop here
-			break;
-		}
-
-		foreach( $files as $file_ID )
+	// Search the files by page to save memory
+	$files_SQL->LIMIT( '0, '.$page_size );
+	while( $loaded_Files = $FileCache->load_by_sql( $files_SQL ) )
+	{ // Check all loaded files
+		foreach( $loaded_Files as $File )
 		{
-			$File = & $FileCache->get_by_ID( $file_ID, false, false );
-
-			if( $File !== false )
-			{ // File object is correct
-				if( $File->exists() )
-				{ // File exists on the disk
-					$count_files_valid++;
-				}
-				else
-				{ // File doesn't exist on the disk, Remove it from DB
-					$File->dbdelete();
-					$count_files_deleted++;
-				}
+			if( is_null( $File ) )
+			{ // The File object couldn't be created because the db entry is invalid
+				$count_files_invalid++;
+				continue;
+			}
+			if( $File->exists() )
+			{ // File exists on the disk
+				$count_files_valid++;
+			}
+			else
+			{ // File doesn't exist on the disk, Remove it from DB
+				$File->dbdelete();
+				$count_files_deleted++;
 			}
 		}
 
@@ -405,14 +401,22 @@ function dbm_delete_orphan_files()
 		$FileCache->clear();
 
 		$current_page++;
+		$files_SQL->LIMIT( ( $current_page * $page_size ).', '.$page_size );
 	}
 
 	echo 'OK<p>';
-	echo sprintf( T_('%d File objects have been deleted.'), $count_files_deleted ).'<br />';
-	echo sprintf( T_('%d File objects are valid entries.'), $count_files_valid ).'</p>';
+	echo sprintf( T_('The number of deleted orphan File objects: %d.'), $count_files_deleted ).'<br />';
+	echo sprintf( T_('The number of valid File objects in the database: %d.'), $count_files_valid ).'</p>';
 
-	// Call a tool to remove all orphan file roots from disk and DB
-	dbm_delete_orphan_file_roots();
+	if( $count_files_invalid )
+	{ // There are invalid files in the database
+		// Display warning to show that the 'Remove orphan file roots' tool should be also called
+		$remove_orphan_file_roots = 'href="'.$admin_url.'ctrl=tools&amp;action=delete_orphan_file_roots&amp;'.url_crumb('tools').'"';
+		$invalid_files_note = ( $count_files_invalid == 1 ) ? T_('An invalid File object was found in the database.') : sprintf( T_('%d invalid File objects were found in the database.'), $count_files_invalid );
+		echo '<p class="warning">'.$invalid_files_note."<br/>"
+			.sprintf( T_('It is strongly recommended to also execute the &lt;<a %s>Remove orphan file roots</a>&gt; tool to remove invalid files from the database and from the disk as well!'), $remove_orphan_file_roots )
+			.'</p>';
+	}
 }
 
 

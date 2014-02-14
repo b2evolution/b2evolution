@@ -565,11 +565,4 @@ $comments_allowed_attributes = array
 	'small' => $C_A_attrs,
 );
 
-
-/*
- * $Log$
- * Revision 1.13  2013/11/06 08:05:10  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

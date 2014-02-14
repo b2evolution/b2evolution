@@ -94,11 +94,4 @@ else
 													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 }
 
-
-/*
- * $Log$
- * Revision 1.17  2013/11/06 09:08:47  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

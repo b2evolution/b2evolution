@@ -271,10 +271,4 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 }
 
-/*
- * $Log$
- * Revision 1.16  2013/11/06 09:09:09  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

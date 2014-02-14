@@ -251,9 +251,10 @@ class UserCache extends DataObjectCache
 	 * Load members of a given blog
 	 *
 	 * @todo make a UNION query when we upgrade to MySQL 4
-	 * @param integer blog ID to load members for
+	 * @param integer Blog ID to load members for
+	 * @param integer Limit, 0 - for unlimit
 	 */
-	function load_blogmembers( $blog_ID )
+	function load_blogmembers( $blog_ID, $limit = 0 )
 	{
 		global $DB, $Debuglog;
 
@@ -263,33 +264,45 @@ class UserCache extends DataObjectCache
 			return false;
 		}
 
+		// Clear previous users to get only the members of this blog
+		$this->clear();
+
 		// Remember this special load:
 		$this->alreadyCached['blogmembers'][$blog_ID] = true;
 
 		$Debuglog->add( "Loading <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache", 'dataobjects' );
 
-		// User perms:
-		$sql = 'SELECT T_users.*
-					    FROM T_users INNER JOIN T_coll_user_perms ON user_ID = bloguser_user_ID
-				     WHERE bloguser_blog_ID = '.$blog_ID.'
-					     AND bloguser_ismember <> 0';
-		foreach( $DB->get_results( $sql ) as $row )
-		{
-			if( !isset($this->cache[$row->user_ID]) )
-			{	// Save reinstatiating User if it's already been added
-				$this->add( new User( $row ) );
-			}
+		// Get users which are members of the blog:
+		$user_perms_SQL = new SQL();
+		$user_perms_SQL->SELECT( 'T_users.*' );
+		$user_perms_SQL->FROM( 'T_users' );
+		$user_perms_SQL->FROM_add( 'INNER JOIN T_coll_user_perms ON user_ID = bloguser_user_ID' );
+		$user_perms_SQL->WHERE( 'bloguser_blog_ID = '.$DB->quote( $blog_ID ) );
+		$user_perms_SQL->WHERE_and( 'bloguser_ismember <> 0' );
+
+		// Get users which groups are members of the blog:
+		$group_perms_SQL = new SQL();
+		$group_perms_SQL->SELECT( 'T_users.*' );
+		$group_perms_SQL->FROM( 'T_users' );
+		$group_perms_SQL->FROM_add( 'INNER JOIN T_coll_group_perms ON user_grp_ID = bloggroup_group_ID' );
+		$group_perms_SQL->WHERE( 'bloggroup_blog_ID = '.$DB->quote( $blog_ID ) );
+		$group_perms_SQL->WHERE_and( 'bloggroup_ismember <> 0' );
+
+		// Union two sql queries to execute one query and save an order as one list
+		$users_sql = '( '.$user_perms_SQL->get().' )'
+			.' UNION '
+			.'( '.$group_perms_SQL->get().' )'
+			.' ORDER BY user_login';
+		if( $limit > 0 )
+		{ // Limit the users
+			$users_sql .= ' LIMIT '.$limit;
 		}
 
-		// Group perms:
-		$sql = 'SELECT T_users.*
-					    FROM T_users LEFT JOIN T_coll_group_perms ON user_grp_ID = bloggroup_group_ID
-					   WHERE bloggroup_blog_ID = '.$blog_ID.'
-					     AND bloggroup_ismember  <> 0';
-		foreach( $DB->get_results( $sql ) as $row )
+		$users = $DB->get_results( $users_sql );
+		foreach( $users as $row )
 		{
 			if( !isset($this->cache[$row->user_ID]) )
-			{	// Save reinstatiating User if it's already been added
+			{ // Save reinstatiating User if it's already been added
 				$this->add( new User( $row ) );
 			}
 		}
@@ -355,11 +368,4 @@ class UserCache extends DataObjectCache
 	}
 }
 
-
-/*
- * $Log$
- * Revision 1.14  2013/11/06 08:05:03  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

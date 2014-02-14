@@ -112,19 +112,6 @@ if( ( $tab == 'perm' || $tab == 'permgroup' )
  */
 switch( $action )
 {
-	case 'edit':
-	case 'filter1':
-	case 'filter2':
-		// Edit collection form (depending on tab):
-		// Check permissions:
-		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
-
-		param( 'preset', 'string', '' );
-
-		$edited_Blog->load_presets( $preset );
-
-		break;
-
 	case 'update':
 		// Update DB:
 
@@ -484,11 +471,4 @@ $AdminUI->disp_payload_end();
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-
-/*
- * $Log$
- * Revision 1.47  2013/11/06 09:08:47  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

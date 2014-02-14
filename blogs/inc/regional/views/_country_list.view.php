@@ -107,6 +107,7 @@ function ctry_td_preferred( $ctry_preferred, $ctry_ID )
 
 $Results->cols[] = array(
 		'th' => /* TRANS: shortcut for enabled */ T_('En'),
+		'th_title' => T_('Enabled'),
 		'order' => 'ctry_enabled',
 		'td' => '%ctry_td_enabled( #ctry_enabled#, #ctry_ID# )%',
 		'th_class' => 'shrinkwrap',
@@ -115,6 +116,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 		'th' => /* TRANS: shortcut for preferred */ T_('Pref'),
+		'th_title' => T_('Preferred'),
 		'order' => 'ctry_preferred',
 		'default_dir' => 'D',
 		'td' => '%ctry_td_preferred( #ctry_preferred# , #ctry_ID# )%',
@@ -242,10 +244,4 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 
 $Results->display();
 
-/*
- * $Log$
- * Revision 1.28  2013/11/06 08:04:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

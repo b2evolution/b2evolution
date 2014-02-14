@@ -372,14 +372,12 @@ function set_cache_enabled( $cache_key, $new_status, $coll_ID = NULL, $save_sett
 	{ // general cache
 		$Blog = NULL;
 		$old_cache_status = $Settings->get( $cache_key );
-		$cache_name = T_( 'General' );
 	}
 	else
 	{ // blog page cache
 		$BlogCache = & get_BlogCache();
 		$Blog = $BlogCache->get_by_ID( $coll_ID );
 		$old_cache_status = $Blog->get_setting( $cache_key );
-		$cache_name = T_( 'Page' );
 	}
 
 	$PageCache = new PageCache( $Blog );
@@ -387,18 +385,39 @@ function set_cache_enabled( $cache_key, $new_status, $coll_ID = NULL, $save_sett
 	{ // Caching has been turned ON:
 		if( $PageCache->cache_create( false ) )
 		{ // corresponding cache folder was created
-			$result = array( 'success', sprintf( T_( '%s caching has been enabled.' ), $cache_name ) );
+			if( empty( $coll_ID ) )
+			{ // general cache
+				$result = array( 'success', T_( 'General caching has been enabled.' ) );
+			}
+			else
+			{ // blog page cache
+				$result = array( 'success', T_( 'Page caching has been enabled.' ) );
+			}
 		}
 		else
 		{ // error creating cache folder
-			$result = array( 'error', sprintf( T_( '%s caching could not be enabled. Check /cache/ folder file permissions.' ), $cache_name ) );
+			if( empty( $coll_ID ) )
+			{ // general cache
+				$result = array( 'error', T_( 'General caching could not be enabled. Check /cache/ folder file permissions.' ) );
+			}
+			else
+			{ // blog page cache
+				$result = array( 'error', T_( 'Page caching could not be enabled. Check /cache/ folder file permissions.' ) );
+			}
 			$new_status = false;
 		}
 	}
 	elseif( $old_cache_status == true && $new_status == false )
 	{ // Caching has been turned OFF:
 		$PageCache->cache_delete();
-		$result = array( 'note',  sprintf( T_( '%s caching has been disabled. Cache contents have been purged.' ), $cache_name ) );
+		if( empty( $coll_ID ) )
+		{ // general cache
+			$result = array( 'note',  T_( 'General caching has been disabled. Cache contents have been purged.' ) );
+		}
+		else
+		{ // blog page cache
+			$result = array( 'note',  T_( 'Page caching has been disabled. Cache contents have been purged.' ) );
+		}
 	}
 	else
 	{ // nothing was changed
@@ -797,7 +816,7 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 
 /**
  * Get a list of those statuses which can be displayed in the front office
- * 
+ *
  * @return array
  */
 function get_inskin_statuses()

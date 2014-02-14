@@ -48,10 +48,4 @@ switch( $action )
 		break;
 }
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:03:45  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

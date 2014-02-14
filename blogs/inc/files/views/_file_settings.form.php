@@ -227,7 +227,7 @@ $Form->begin_fieldset( T_('Advanced options'), array( 'id' => 'ffset_fileadvance
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Image options') );
+$Form->begin_fieldset( T_('Image options').get_manual_link( 'image-options' ) );
 
 	$Form->checkbox( 'exif_orientation', $Settings->get( 'exif_orientation' ), T_('Use EXIF info in photos'), T_('Use orientation tag to automatically rotate thumbnails to upright position.') );
 
@@ -236,6 +236,8 @@ $Form->begin_fieldset( T_('Image options') );
 	$resize_input_suffix .= ' x ';
 	$resize_input_suffix .= '<input type="text" id="fm_resize_height" name="fm_resize_height" class="form_text_input" size="4" maxlength="4" value="'.$Settings->get( 'fm_resize_height' ).'" />';
 	$resize_input_suffix .= ' '.T_('pixels').' ';
+	$resize_input_suffix .= '<input type="text" id="fm_resize_quality" name="fm_resize_quality" class="form_text_input" size="3" maxlength="3" style="margin-left:10px" value="'.$Settings->get( 'fm_resize_quality' ).'" />';
+	$resize_input_suffix .= ' % '.T_('quality').' ';
 	$Form->checkbox_input( 'fm_resize_enable', $Settings->get( 'fm_resize_enable' ), T_('Resize large images after upload'), array( 'input_suffix' => $resize_input_suffix ) );
 
 $Form->end_fieldset();
@@ -243,7 +245,7 @@ $Form->end_fieldset();
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Form->buttons( array(
-			array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
+			array( 'submit', 'submit[update]', T_('Update'), 'SaveButton' ),
 			array( 'reset', '', T_('Reset'), 'ResetButton' ),
 			array( 'submit', 'submit[restore_defaults]', T_('Restore defaults'), 'ResetButton' ),
 		) );
@@ -257,11 +259,4 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 	echo T_('Blog Settings').' &gt; '.T_('Advanced').' &gt; '.T_('Media directory location');
 }
 
-
-/*
- * $Log$
- * Revision 1.19  2013/11/06 08:04:15  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>
