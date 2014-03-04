@@ -571,7 +571,7 @@ class ItemLight extends DataObject
 		{	// Preview mode
 			global $extracats, $post_category;
 
-			param( 'extracats', 'array', array() );
+			$extracats = param( 'post_extracats', 'array/integer', array() );
 			if( ( ! empty( $post_category ) ) && ( ! in_array( $post_category, $extracats ) ) )
 			{
 				$extracats[] = $post_category;

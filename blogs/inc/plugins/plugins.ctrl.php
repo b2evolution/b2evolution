@@ -480,8 +480,8 @@ switch( $action )
 		param( 'edited_plugin_code' );
 		param( 'edited_plugin_priority' );
 		param( 'edited_plugin_apply_rendering' );
-		param( 'edited_plugin_displayed_events', 'array', array() );
-		param( 'edited_plugin_events', 'array', array() );
+		param( 'edited_plugin_displayed_events', 'array/string', array() );
+		param( 'edited_plugin_events', 'array/integer', array() );
 
 		$default_Plugin = & $admin_Plugins->register($edit_Plugin->classname);
 

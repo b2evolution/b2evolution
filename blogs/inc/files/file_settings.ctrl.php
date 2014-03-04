@@ -61,7 +61,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		param( 'submit', 'array', array() );
+		param( 'submit', 'array/string', array() );
 		if( isset($submit['restore_defaults']) )
 		{
 			$Settings->delete_array( array(

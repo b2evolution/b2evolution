@@ -768,7 +768,8 @@ class Blog extends DataObject
 
 			if( ($access_type = param( 'blog_access_type', 'string', NULL )) !== NULL )
 			{ // Blog URL parameters:
-				$this->set( 'access_type', $access_type );
+				// Note: We must avoid to set an invalid url, because the new blog url will be displayed in the evobar even if it was not saved
+				$allow_new_access_type = true;
 
 				if( $access_type == 'absolute' )
 				{
@@ -779,6 +780,7 @@ class Blog extends DataObject
 					}
 					else
 					{ // It is not valid absolute URL, don't update the blog 'siteurl' to avoid errors
+						$allow_new_access_type = false; // If site url is not updated do not allow access_type update either
 						$Messages->add( T_('Blog Folder URL').': '.sprintf( T_('%s is an invalid absolute URL'), '&laquo;'.htmlspecialchars( $blog_siteurl ).'&raquo;' )
 							.' '.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>) and it must contain at least one \'/\' sign after the domain name!'), 'error' );
 					}
@@ -796,6 +798,11 @@ class Blog extends DataObject
 				else
 				{
 					$this->set( 'siteurl', '' );
+				}
+
+				if( $allow_new_access_type )
+				{ // The received siteurl value was correct, may update the access_type value
+					$this->set( 'access_type', $access_type );
 				}
 			}
 

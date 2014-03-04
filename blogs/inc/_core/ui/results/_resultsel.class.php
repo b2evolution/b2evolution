@@ -397,7 +397,7 @@ function selection_action( $action, $selection_ID, $selection_name, $prefix, $pr
 
 	global $DB, $Messages, $confirm, $item_ID_list, $current_User;
 
-	$items = param( $prefix.'items', 'array', array(), false );	// do NOT memorize // ?????????????
+	$items = param( $prefix.'items', 'array/string', array(), false );	// do NOT memorize // ?????????????
 	param( 'item_ID_list', 'string', '', false );
 
 	$current_User->check_perm( 'selections', 'edit', true );

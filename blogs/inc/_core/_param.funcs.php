@@ -259,9 +259,15 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 						debug_die( 'param(-): <strong>'.$var.'['.$i.']</strong> is not array!' );
 					}
 
+					if( $type == 'array' )
+					{ // This param may contain any kind of elements we need to check and validate it recursively
+						$globals_var[$i] = param_check_general_array( $var_array );
+						break;
+					}
+
 					foreach( $var_array as $j => $var_value )
 					{
-						if( $type != 'array' && ! is_scalar( $var_value ) )
+						if( ! is_scalar( $var_value ) )
 						{ // This happens if someone uses "foo[][]=x" where "foo[]" is expected as string
 							debug_die( 'param(-): element of array <strong>'.$var.'</strong> is not scalar!' );
 						}
@@ -297,7 +303,11 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 			default:
 				if( substr( $type, 0, 1 ) == '/' )
 				{	// We want to match against a REGEXP:
-					if( preg_match( $type, $GLOBALS[$var] ) )
+					if( ! is_scalar( $GLOBALS[$var] ) )
+					{ // This happens if someone uses "foo[]=x" where "foo" is expected as string
+						debug_die( 'param(-): <strong>'.$var.'</strong> is not scalar!' );
+					}
+					elseif( preg_match( $type, $GLOBALS[$var] ) )
 					{	// Okay, match
 						if( isset($Debuglog) ) $Debuglog->add( 'param(-): <strong>'.$var.'</strong> matched against '.$type, 'params' );
 					}
@@ -2057,6 +2067,33 @@ function param_check_gender( $var, $required = false )
 
 
 /**
+ * Check html sanity of the not numeric and not object content in a general 'array' param. Handles the array recursivley.
+ *
+ * @param array the value of an 'array' type param
+ * @return array the validated/modified content
+ */
+function param_check_general_array( $param_value )
+{
+	if( is_array( $param_value ) )
+	{ // This param is an array, validate all of the elements
+		foreach( $param_value as $i => $var_value )
+		{ // Check array content recursively
+			$param_value[$i] = param_check_general_array( $var_value );
+		}
+		return $param_value;
+	}
+
+	if( ! ( is_numeric( $param_value ) || is_object( $param_value ) ) )
+	{ // This value is not numeric and not an object, we consider it as string
+		// Check the content html sanity
+		$param_value = check_html_sanity( $param_value, 'general_array_params' );
+	}
+
+	return $param_value;
+}
+
+
+/**
  * DEPRECATED Stub for plugin compatibility:
  */
 function format_to_post( $content, $is_comment = 0, $encoding = NULL )
@@ -2109,6 +2146,9 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 		$User = $current_User;
 	}
 
+	// Add error messages
+	$verbose = true;
+
 	switch( $context )
 	{
 		case 'posting':
@@ -2140,6 +2180,17 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 			$bypass_antispam  = false;
 			break;
 
+		case 'general_array_params':
+			$xhtmlvalidation  = false;
+			$allow_css_tweaks = true;
+			$allow_javascript = false;
+			$allow_iframes    = false;
+			$allow_objects    = false;
+			$bypass_antispam  = false;
+			// Do not add error messages in this context
+			$verbose = false;
+			break;
+
 		default:
 			debug_die( 'unknown context: '.$context );
 	}
@@ -2150,9 +2201,9 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 	$content = preg_replace( '/&(?!#[0-9]+;|#x[0-9a-fA-F]+;|[a-zA-Z_:][a-zA-Z0-9._:-]*;)/', '&amp;', $content );
 
 	// ANTISPAM check:
-	if( ! $bypass_antispam
-		&& $block = antispam_check($content) )
-	{
+	$error = ( ( ! $bypass_antispam ) && ( $block = antispam_check($content) ) );
+	if( $error && $verbose )
+	{ // Add error message
 		if( $context == 'xmlrpc_posting' )
 		{
 			$errmsg = ($context == 'commenting')
@@ -2167,7 +2218,6 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 		}
 
 		$Messages->add(	$errmsg, 'error' );
-		$error = true;
 	}
 
 	$content = trim( $content );
@@ -2207,47 +2257,46 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 		// i modifier at the end means caseless
 
 		// CHECK Styling restictions:
-		if( ! $allow_css_tweaks
-			&& preg_match( '#\s((style|class|id)\s*=)#i', $check, $matches) )
+		$css_tweaks_error = ( ( ! $allow_css_tweaks ) && preg_match( '#\s((style|class|id)\s*=)#i', $check, $matches ) );
+		if( $css_tweaks_error && $verbose )
 		{
 			$Messages->add( T_('Illegal CSS markup found: ').htmlspecialchars($matches[1]), 'error' );
-			$error = true;
 		}
 
 		// CHECK JAVASCRIPT:
-		if( ! $allow_javascript
+		$javascript_error = ( ( ! $allow_javascript )
 			&& ( preg_match( '~( < \s* //? \s* (script|noscript) )~xi', $check, $matches )
 				|| preg_match( '#\s((on[a-z]+)\s*=)#i', $check, $matches )
 				// action=, background=, cite=, classid=, codebase=, data=, href=, longdesc=, profile=, src=, usemap=
-				|| preg_match( '#=["\'\s]*((javascript|vbscript|about):)#i', $check, $matches ) ) )
+				|| preg_match( '#=["\'\s]*((javascript|vbscript|about):)#i', $check, $matches ) ) );
+		if( $javascript_error && $verbose )
 		{
 			$Messages->add( T_('Illegal javascript markup found: ').htmlspecialchars($matches[1]), 'error' );
-			$error = true;
 		}
 
 		// CHECK IFRAMES:
-		if( ! $allow_iframes
-			&& preg_match( '~( < \s* //? \s* (frame|iframe) )~xi', $check, $matches) )
+		$iframe_error = ( ( ! $allow_iframes ) && preg_match( '~( < \s* //? \s* (frame|iframe) )~xi', $check, $matches ) );
+		if( $iframe_error && $verbose )
 		{
 			$Messages->add( T_('Illegal frame markup found: ').htmlspecialchars($matches[1]), 'error' );
-			$error = true;
 		}
 
 		// CHECK OBJECTS:
-		if( ! $allow_objects
-			&& preg_match( '~( < \s* //? \s* (applet|object|param|embed) )~xi', $check, $matches) )
+		$object_error = ( ( ! $allow_objects ) && preg_match( '~( < \s* //? \s* (applet|object|param|embed) )~xi', $check, $matches ) );
+		if( $object_error && $verbose )
 		{
 			$Messages->add( T_('Illegal object markup found: ').htmlspecialchars($matches[1]), 'error' );
-			$error = true;
 		}
 
+		// Set the final error value based on all of the results
+		$error = $error || $css_tweaks_error || $javascript_error || $iframe_error || $object_error;
 	}
 
 	if( $error )
 	{
-		if( !empty($User)
-				&& !empty($Group)  // This one will basically prevent this case from happening when commenting
-				&& $User->check_perm( 'users', 'edit', false ) )
+		if( $verbose && ( ! empty( $User ) )
+			&& ( ! empty( $Group ) ) // This one will basically prevent this case from happening when commenting
+			&& $User->check_perm( 'users', 'edit', false ) )
 		{
 			$Messages->add( sprintf( T_('(Note: To get rid of the above validation warnings, you can deactivate unwanted validation rules in your <a %s>Group settings</a>.)'),
 										'href="'.$admin_url.'?ctrl=groups&amp;grp_ID='.$Group->ID.'"' ), 'error' );
