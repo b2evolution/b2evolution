@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @version $Id$
  */
@@ -56,6 +56,22 @@ if( $params['notify_full'] )
 	echo $Item->get_permanent_url( '', '', '&' )."\n\n";
 
 	echo $Item->get('content')."\n";
+
+	// Attachments:
+	$LinkCache = & get_LinkCache();
+	$item_links = $LinkCache->get_by_item_ID( $Item->ID );
+	if( !empty( $item_links ) )
+	{
+		echo "\n".T_('Attachments').":\n";
+		foreach( $item_links as $Link )
+		{
+			if( $File = $Link->get_File() )
+			{
+				echo ' - '.$File->get_name().': '.$File->get_url()."\n";
+			}
+		}
+		echo "\n";
+	}
 
 	if( $recipient_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 	{ // User has permission to edit this post

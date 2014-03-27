@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004 by PROGIDISTRI - {@link http://progidistri.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
@@ -205,6 +205,7 @@ class Form extends Widget
 															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
 					'fieldset_end' => '</fieldset>'."\n",
 					'fieldstart' => '<fieldset$ID$>'."\n",
+					'labelclass' => '',
 					'labelstart' => '<div class="label">',
 					'labelend' => "</div>\n",
 					'labelempty' => '<div class="label"></div>', // so that IE6 aligns DIV.input correcctly
@@ -267,6 +268,7 @@ class Form extends Widget
 					$this->fieldset_begin = $template['fieldset_begin'];
 					$this->fieldset_end   = $template['fieldset_end'];
 					$this->fieldstart     = $template['fieldstart'];
+					$this->labelclass     = $template['labelclass'];
 					$this->labelstart     = $template['labelstart'];
 					$this->labelend       = $template['labelend'];
 					$this->labelempty     = $template['labelempty'];
@@ -679,7 +681,7 @@ class Form extends Widget
 				'maxlength' => $field_size,
 				'name'      => $field_name,
 				'label'     => $field_label,
-				'class'     => '', // default class 'form_text_input'
+				'class'     => '', // default class 'form_text_input form-control'
 			), $field_params );
 
 		if( isset( $field_params['force_to'] ) )
@@ -693,7 +695,7 @@ class Form extends Widget
 		}
 
 		// Give it a class, so it can be selected for CSS in IE6
-		$field_params['class'] = empty( $field_params['class'] ) ? 'form_text_input' : $field_params['class'].' form_text_input';
+		$field_params['class'] = ( empty( $field_params['class'] ) ? '' : $field_params['class'].' ' ).'form_text_input form-control';
 
 		return $this->input_field( $field_params );
 	}
@@ -766,7 +768,7 @@ class Form extends Widget
 				'maxlength' => 7,
 				'name'      => $field_name,
 				'label'     => $field_label,
-				'class'     => '', // default class 'form_text_input form_color_input'
+				'class'     => '', // default class 'form_text_input form-control form_color_input'
 			), $field_params );
 
 		if( isset( $field_params['force_to'] ) )
@@ -780,8 +782,7 @@ class Form extends Widget
 		}
 
 		// Give it a class, so it can be selected for CSS in IE6
-		$field_params['class'] = empty( $field_params['class'] ) ? 'form_text_input' : $field_params['class'].' form_text_input';
-		$field_params['class'] .= ' form_color_input';
+		$field_params['class'] = ( empty( $field_params['class'] ) ? '' : $field_params['class'].' ' ).'form_text_input form-control form_color_input';
 
 		return $this->input_field( $field_params );
 	}
@@ -849,9 +850,10 @@ class Form extends Widget
 	 * @param integer size of the input field
 	 * @param string label displayed in front of the field
 	 * @param string note displayed with field
+	 * @param string class of the input field. Class name "only_assignees" provides to load only assignee users of the blog
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function username( $field_name, &$User, $field_label, $field_note = '' )
+	function username( $field_name, &$User, $field_label, $field_note = '', $field_class = '' )
 	{
 		global $htsrv_url;
 
@@ -866,29 +868,9 @@ class Form extends Widget
 
 		$r = $this->begin_field();
 
-		// Add jQuery hintbox (autocompletion).
-		// Form 'username' field requires the following JS and CSS.
-		// fp> TODO: think about a way to bundle this with other JS on the page -- maybe always load hintbox in the backoffice
-		//     dh> Handle it via http://www.appelsiini.net/projects/lazyload ?
-		// dh> TODO: should probably also get ported to use jquery.ui.autocomplete (or its successor)
-		global $rsc_url;
-		$r .= '<script type="text/javascript" src="'.$rsc_url.'js/jquery/jquery.hintbox.min.js"></script>';
-		$r .= '<script type="text/javascript">jQuery("<link>").appendTo("head").attr({
-			rel: "stylesheet",
-			type: "text/css",
-			href: "'.$rsc_url.'css/jquery/jquery.hintbox.css"
-			});</script>';
+		$user_login = empty( $User ) ? '' : $User->login;
 
-		$r .= '<script type="text/javascript">';
-		$r .= 'jQuery(function(){';
-		$r .= 'jQuery(\'#'.$field_name.'\').hintbox({';
-		$r .= ' url: \''.$htsrv_url.'async.php?action=get_login_list\',';
-		$r .= ' matchHint: true,';
-		$r .= ' autoDimentions: true';
-		$r .= '});';
-		$r .= '});';
-		$r .= '</script>';
-		$r .= '<input type="text" class="form_text_input" value="'.$User->login.'" name="'.$field_name.'" id="'.$field_name.'" />';
+		$r .= '<input type="text" class="form_text_input form-control autocomplete_login '.$field_class.'" value="'.$user_login.'" name="'.$field_name.'" id="'.$field_name.'" />';
 
 		$r .= $this->end_field();
 
@@ -1005,8 +987,7 @@ class Form extends Widget
 		 @TODO ^^ fp> It might make sense to have 2 date formats for locales: 1 for display and 1 for inputs. Input formats could be forced to used numeric data only.
 		 */
 		// Give it a class, so it can be selected for CSS in IE6
-		if( empty($field_params['class']) ) $field_params['class'] = 'form_date_input';
-		else $field_params['class'] .= ' form_date_input';
+		$field_params['class'] = ( empty( $field_params['class'] ) ? '' : $field_params['class'].' ' ).'form_date_input form-control';
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
@@ -1530,6 +1511,8 @@ class Form extends Widget
 		{
 			$form_params['class'] = $form_class;
 		}
+		// Append bootstrap class
+		$form_params['class'] = empty( $form_params['class'] ) ? 'form-horizontal' : $form_params['class'].' form-horizontal';
 
 		if( !isset($form_params['method']) )
 		{
@@ -2046,6 +2029,8 @@ class Form extends Widget
 			$r .= get_icon( 'parent_childto_arrow' );
 		}
 
+		$field_params['class'] = ( empty( $field_params['class'] ) ? '' : $field_params['class'].' ' ).'form-control';
+
 		$r .="\n<select".get_field_attribs_as_string($field_params).'>'
 			 .$field_options
 			 ."</select>\n";
@@ -2290,15 +2275,17 @@ class Form extends Widget
 			'cols' => 50,
 			'note_format' => '<br/><span class="notes">%s</span>', // handled as common param
 			'format_value' => 'formvalue',
+			'display_fix_pixel' => true,
 		);
 		$format_value = $field_params['format_value'];
+		$display_fix_pixel = $field_params['display_fix_pixel'];
 		unset($field_params['format_value']); // no HTML attrib
+		unset($field_params['display_fix_pixel']); // no HTML attrib
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
 		// Give it a class, so it can be selected for CSS in IE6
-		if( empty($field_params['class']) ) $field_params['class'] = 'form_textarea_input';
-		else $field_params['class'] .= ' form_textarea_input';
+		$field_params['class'] = ( empty( $field_params['class'] ) ? '' : $field_params['class'].' ' ).'form_textarea_input form-control';
 
 		if( isset($field_params['maxlength']) )
 		{ // attach event to the textarea to accomplish max length:
@@ -2317,18 +2304,22 @@ class Form extends Widget
 			unset($field_params['maxlength']); // not a HTML attribute for textarea
 		}
 
-		$r = $this->begin_field()
-			// NOTE: The following pixel is needed to avoid the dity IE textarea expansion bug
+		$r = $this->begin_field();
+		if( $display_fix_pixel )
+		{ // NOTE: The following pixel is needed to avoid the dity IE textarea expansion bug
 			// see http://fplanque.net/2003/Articles/iecsstextarea/index.html
-			.get_icon( 'pixel' )
-			.'<textarea'
+			$r .= get_icon( 'pixel' );
+		}
+		$r .= '<textarea'
 			.get_field_attribs_as_string( $field_params )
 			.' rows="'.$field_rows.'">'
 			.format_to_output( $field_value, $format_value )
-			.'</textarea>'
-			// NOTE: this one is for compensating the previous pixel in case of center aligns.
-			.get_icon( 'pixel' )
-			.$this->end_field();
+			.'</textarea>';
+		if( $display_fix_pixel )
+		{ // NOTE: this one is for compensating the previous pixel in case of center aligns.
+			$r .= get_icon( 'pixel' );
+		}
+		$r .= $this->end_field();
 
 		return $this->display_or_return( $r );
 	}
@@ -2414,16 +2405,7 @@ class Form extends Widget
 		}
 		$r = str_replace( '$ID$', $ffield_id, $this->fieldstart );
 
-		if( strlen($field_label) )
-		{
-			$r .= $this->labelstart.$field_label;
-			$r .= $this->label_suffix;
-			$r .= $this->labelend;
-		}
-		else
-		{ // Empty label:
-			$r .= $this->labelempty;
-		}
+		$r .= $this->get_label();
 
 		$r .= $this->infostart;
 
@@ -2563,11 +2545,36 @@ class Form extends Widget
 		$field_params = array_merge( array(
 				'type'         => 'submit',
 				'input_prefix' => "\t\t\t",
+				'class'        => '',
 			), $field_params );
 
 		if( empty($field_params['type']) )
 		{ // default type
 			$field_params['type'] = 'submit';
+		}
+
+		// Use bootstrap classes for buttons
+		$field_params['class'] .= ' btn';
+		if( strpos( $field_params['class'], 'SaveButton' ) !== false ||
+		    strpos( $field_params['class'], 'SaveEditButton' ) !== false )
+		{ // Submit button
+			$field_params['class'] .= ' btn-primary';
+		}
+		elseif( strpos( $field_params['class'], 'ResetButton' ) !== false )
+		{ // Reset button
+			$field_params['class'] .= ' btn-danger';
+		}
+		elseif( strpos( $field_params['class'], 'PreviewButton' ) !== false )
+		{ // Preview button
+			$field_params['class'] .= ' btn-info';
+		}
+		elseif( strpos( $field_params['class'], 'SmallButton' ) !== false )
+		{ // Small button
+			$field_params['class'] .= ' btn-xs';
+		}
+		if( ! preg_match( '/btn\-(primary|success|info|warning|danger)/', $field_params['class'] ) )
+		{ // This button is default
+			$field_params['class'] .= ' btn-default';
 		}
 
 		return $this->display_or_return( $this->get_input_element( $field_params ) );
@@ -3176,6 +3183,12 @@ class Form extends Widget
 			unset( $field_params['inline'] );
 		}
 
+		if( isset( $field_params['input_required'] ) )
+		{ // Set html attribute "required" (used to highlight input with red border/shadow by bootstrap)
+			$field_params['required'] = $field_params['input_required'];
+			unset( $field_params['input_required'] );
+		}
+
 		$r = $input_prefix
 			.'<input'.get_field_attribs_as_string( $field_params, $format_to_output ).' />'
 			.$input_suffix;
@@ -3230,6 +3243,9 @@ class Form extends Widget
 			else
 			{
 				$r .= '<label'
+					.( ! empty( $this->labelclass )
+						? ' class="'.format_to_output( $this->labelclass, 'htmlattr' ).'"'
+						: '' )
 					.( ! empty( $this->_common_params['id'] )
 						? ' for="'.format_to_output( $this->_common_params['id'], 'htmlattr' ).'"'
 						: '' )

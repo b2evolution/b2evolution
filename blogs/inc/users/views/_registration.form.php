@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2014 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -61,6 +61,8 @@ $Form->begin_form( 'fform', '',
 $Form->begin_fieldset( T_('Default user permissions').get_manual_link('default-user-permissions') );
 
 	$Form->checkbox( 'newusers_canregister', $Settings->get('newusers_canregister'), T_('New users can register'), T_('Check to allow new users to register themselves.' ) );
+
+	$Form->checkbox( 'registration_is_public', $Settings->get('registration_is_public'), T_('Registration links'), T_('Check to show self-registration links to the public.' ), '', 1, ! $Settings->get('newusers_canregister') );
 
 	$GroupCache = & get_GroupCache();
 	$Form->select_object( 'newusers_grp_ID', $Settings->get('newusers_grp_ID'), $GroupCache, T_('Group for new users'), T_('Groups determine user roles and permissions.') );
@@ -191,8 +193,20 @@ $Form->end_fieldset();
 
 if( $current_User->check_perm( 'users', 'edit' ) )
 {
-	$Form->end_form( array( array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
-													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+	$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 }
 
 ?>
+<script type="text/javascript">
+jQuery( '#newusers_canregister' ).click( function()
+{
+	if( jQuery( this ).is( ':checked' ) )
+	{
+		jQuery( '#registration_is_public' ).removeAttr( 'disabled' );
+	}
+	else
+	{
+		jQuery( '#registration_is_public' ).attr( 'disabled', 'disabled' );
+	}
+} );
+</script>

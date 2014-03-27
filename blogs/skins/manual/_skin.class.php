@@ -569,10 +569,10 @@ class manual_Skin extends Skin
 
 		// Get the posts of current category
 		$ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $Blog->get_setting('posts_per_page') );
-		$ItemList->load_from_Request();
 		$ItemList->set_filters( array(
-				'cat_array' => array( $params['chapter_ID'] ), // Limit only by selected cat (exclude posts from child categories)
-				'unit'      => 'all', // Display all items of this category, Don't limit by page
+				'cat_array'    => array( $params['chapter_ID'] ), // Limit only by selected cat (exclude posts from child categories)
+				'cat_modifier' => NULL,
+				'unit'         => 'all', // Display all items of this category, Don't limit by page
 			) );
 		$ItemList->query();
 

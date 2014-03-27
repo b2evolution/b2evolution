@@ -3,7 +3,7 @@
  * This file is part of b2evolution - {@link http://b2evolution.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2014 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -111,6 +111,9 @@ if( $perm_abuse_management )
 switch( $action )
 {
 	case 'create': // Record new message
+		// Stop a request from the blocked IP addresses or Domains
+		antispam_block_request();
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'messaging_messages' );
 
@@ -182,6 +185,9 @@ else
 	$AdminUI->set_path( 'messaging', 'threads' );
 }
 
+
+// Display messages depending on user email status
+display_user_email_status_message();
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

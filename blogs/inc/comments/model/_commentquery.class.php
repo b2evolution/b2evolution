@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -171,7 +171,7 @@ class CommentQuery extends SQL
 		}
 		$this->post = implode( ',', $post_ids );
 
-		$this->WHERE_and( $this->dbprefix.'post_ID '.$eq.' ('.$this->post.')' );
+		$this->WHERE_and( $this->dbprefix.'item_ID '.$eq.' ('.$this->post.')' );
 	}
 
 
@@ -229,7 +229,7 @@ class CommentQuery extends SQL
 			debug_die( 'Invalid comment author filter request' );
 		}
 
-		$this->WHERE_and( $this->dbprefix.'author_ID '.$eq.' ('.$author_list.')' );
+		$this->WHERE_and( $this->dbprefix.'author_user_ID '.$eq.' ('.$author_list.')' );
 	}
 
 
@@ -521,7 +521,7 @@ class CommentQuery extends SQL
 			return;
 		}
 
-		$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbprefix.'post_ID = postcat_post_ID
+		$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbprefix.'item_ID = postcat_post_ID
 						 INNER JOIN T_categories othercats ON postcat_cat_ID = othercats.cat_ID ' );
 
 		$this->WHERE_and( $Blog->get_sql_where_aggregate_coll_IDs('othercats.cat_blog_ID') );
@@ -543,12 +543,12 @@ class CommentQuery extends SQL
 
 		if( !$show_expired )
 		{
-			$this->FROM_add( 'LEFT JOIN T_items__item_settings as expiry_setting ON iset_item_ID = comment_post_ID AND iset_name = "post_expiry_delay"' );
+			$this->FROM_add( 'LEFT JOIN T_items__item_settings as expiry_setting ON iset_item_ID = comment_item_ID AND iset_name = "post_expiry_delay"' );
 			$this->WHERE_and( 'expiry_setting.iset_value IS NULL OR expiry_setting.iset_value = "" OR TIMESTAMPDIFF(SECOND, comment_date, '.$DB->quote( date2mysql( $localtimenow ) ).') < expiry_setting.iset_value' );
 		}
 		elseif( !$show_active )
 		{
-			$this->FROM_add( 'LEFT JOIN T_items__item_settings as expiry_setting ON iset_item_ID = comment_post_ID AND iset_name = "post_expiry_delay"' );
+			$this->FROM_add( 'LEFT JOIN T_items__item_settings as expiry_setting ON iset_item_ID = comment_item_ID AND iset_name = "post_expiry_delay"' );
 			$this->WHERE_and( 'expiry_setting.iset_value IS NOT NULL AND expiry_setting.iset_value <> "" AND TIMESTAMPDIFF(SECOND, comment_date, '.$DB->quote( date2mysql( $localtimenow ) ).') >= expiry_setting.iset_value' );
 		}
 	}
@@ -608,14 +608,14 @@ class CommentQuery extends SQL
 			case 'le':
 			case 'lt':
 				$operator = ( $perm_edit_cmt == 'le' ) ? '<=' : '<';
-				$condition = '( comment_author_ID IN ( SELECT user_ID FROM T_users WHERE user_level '.$operator.' '.$current_User->level.' ) )';
+				$condition = '( comment_author_user_ID IN ( SELECT user_ID FROM T_users WHERE user_level '.$operator.' '.$current_User->level.' ) )';
 				$condition .= ' OR ';
 			case 'anon':
-				$condition .= 'comment_author_ID IS NULL';
+				$condition .= 'comment_author_user_ID IS NULL';
 				break;
 
 			case 'own':
-				$condition = 'comment_author_ID = '.$current_User->ID;
+				$condition = 'comment_author_user_ID = '.$current_User->ID;
 				break;
 
 			case 'no':

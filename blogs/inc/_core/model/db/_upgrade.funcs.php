@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link https://thequod.de/}.
  *
  * {@link db_delta()} is based on dbDelta() from {@link http://wordpress.com Wordpress}, see
@@ -1655,6 +1655,100 @@ function get_engine_from_query( $query )
 		return $match[1];
 	}
 	return false;
+}
+
+
+/**
+ * Get those colum definitions from a CREATE TABLE command where the 'CHARACTER SET' or the 'COLLATE' is defined
+ *
+ * @param string create table query
+ * @return array column_name => column_definition
+ */
+function get_columns_with_charset_definition( $query )
+{
+	$fields = get_fieldlines_from_query( $query );
+	$fields_with_charset = array();
+	foreach( $fields as $field_name => $field_definition )
+	{
+		if( $field_name == 'PRIMARY' || $field_name == '0' )
+		{
+			continue;
+		}
+		if( strpos( $field_definition, 'CHARACTER SET' ) !== false )
+		{ // Column contains 'CHARACTER SET' definition
+			$fields_with_charset[$field_name] = $field_definition;
+		}
+		elseif( strpos( $field_definition, 'COLLATE' ) !== false )
+		{ // Column contains 'COLLATE' definition
+			$fields_with_charset[$field_name] = $field_definition;
+		}
+	}
+	return $fields_with_charset;
+}
+
+
+/**
+ * Convert table character set to utf8
+ * Those columns where the charset or the collation is explicitly defined will be skipped ( those won't be converted )
+ *
+ * @param sytring table
+ */
+function convert_table_to_utf8( $table )
+{
+	global $DB, $schema_queries;
+
+	// Get the table alias
+	$table_index = array_search( $table, $DB->dbreplaces );
+	if( $table_index === NULL )
+	{ // The table doesn't exists in the configuration
+		return;
+	}
+	$table_alias = $DB->dbaliases[$table_index];
+	$table_alias = substr( $table_alias, 3, strlen( $table_alias ) - 6 );
+
+	// Get those columns which contains charset or collation definition
+	$columns_with_charset = get_columns_with_charset_definition( $schema_queries[$table_alias][1] );
+	if( empty( $columns_with_charset ) )
+	{ // There is no explicit charset or collation definition in this table, we update everything utf8
+		$text_columns = $DB->get_results( 'SHOW FULL COLUMNS FROM `'.$table.'` WHERE type LIKE "%TEXT%"' );
+	}
+	else
+	{ // There are columns with charset or collation definition
+		// Skip columns with explicit definition but update all of the other *text, *char, set and enum columns since they all have charset definition and we will not call convert charset for the whole table
+		$text_columns = $DB->get_results( 'SHOW FULL COLUMNS FROM `'.$table.'` WHERE type LIKE "%TEXT%" OR type LIKE "%CHAR%" OR type LIKE "SET%" OR type LIKE "ENUM%"' );
+		foreach( $text_columns as $column_key => $text_column )
+		{ // Update each columns character set where the charset is not explicitly defined ( but it could be ) to utf8
+			if( isset( $columns_with_charset[$text_column->Field] ) )
+			{ // Do not update those columns where the charset or the collation was explicitly defined
+				unset( $text_columns[$column_key] );
+			}
+		}
+	}
+
+	// Note: Text type columns must be updated before the table update to avoid type changes because of the charset modification
+	// This way we avoid the automatic modification of e.g. mediumtext colums to longtext
+	foreach( $text_columns as $text_column )
+	{ // Update each text column character set explicitly to utf8. Those columns which should not be updated were already removed from this array.
+		$col_definition = $text_column->Field.
+			' '.$text_column->Type.' COLLATE utf8_general_ci'.
+			( ( $text_column->Null == 'NO' ) ? ' NOT' : '' ).' NULL'.
+			( isset( $text_column->Default ) ? ' DEFAULT "'.$text_column->Default.'"' : '' ).
+			( isset( $text_column->Extra ) ? ' '.$text_column->Extra : '' ).
+			( isset( $text_column->Comment ) ? ' COMMENT "'.$text_column->Comment.'"' : '' );
+		$DB->query( 'ALTER TABLE `'.$table.'` MODIFY '.$col_definition );
+	}
+
+	if( empty( $columns_with_charset ) )
+	{ // Update the table default character set and convert fields to utf8
+		$DB->query( 'ALTER TABLE `'.$table.'`
+			DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci,
+			CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci' );
+	}
+	else
+	{ // Update the table default character set, but not convert the fields to utf8, since they were already converted
+		$DB->query( 'ALTER TABLE `'.$table.'`
+			DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci' );
+	}
 }
 
 ?>

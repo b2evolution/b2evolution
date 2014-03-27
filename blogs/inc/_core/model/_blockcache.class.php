@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -59,13 +59,15 @@ class BlockCache
 	 */
 	function BlockCache( $type, $keys )
 	{
+		global $instance_name;
+
 		$this->type = $type;
 
 		// Make sure keys are always in the same order:
 		ksort( $keys );
 		$this->keys = $keys;
 
-		$this->serialized_keys = $type;
+		$this->serialized_keys = $instance_name.'+'.$type;
 		foreach( $keys as $key => $val )
 		{
 			$this->serialized_keys .= '+'.$key.'='.$val;
@@ -81,15 +83,16 @@ class BlockCache
 	 *
 	 * All we do is store the timestamp of teh invalidation
 	 *
+	 * @see http://b2evolution.net/man/widget-caching
 	 */
 	function invalidate_key( $key, $val )
 	{
-		global $Debuglog, $servertimenow;
+		global $Debuglog, $servertimenow, $instance_name;
 
-		$lastchanged_key_name = 'last_changed+'.$key.'='.$val;
+		$lastchanged_key_name = $instance_name.'+last_changed+'.$key.'='.$val;
 
 		// Invalidate using the real time (seconds may have elapsed since $sertimenow)
-		// Add 1 second because of teh granularity that's down to teh second
+		// Add 1 second because of the granularity that's down to the second
 		// Worst case scenario: content will be collected/cahced several times for a whole second (as well as the first request after the end of that second)
 		BlockCache::cacheproviderstore( $lastchanged_key_name, time()+1 );
 
@@ -109,14 +112,14 @@ class BlockCache
 	 */
 	function check()
 	{
-		global $Debuglog, $servertimenow;
+		global $Debuglog, $servertimenow, $instance_name;
 
 		$missing_date = false;
 		$most_recent_invalidation_ts = 0;
 		$most_recent_invaliating_key = '';
 		foreach( $this->keys as $key => $val )
 		{
-			$lastchanged_key_name = 'last_changed+'.$key.'='.$val;
+			$lastchanged_key_name = $instance_name.'+last_changed+'.$key.'='.$val;
 			$last_changed_ts = $this->cacheproviderretrieve( $lastchanged_key_name, $success );
 			if( ! $success )
 			{	// We have lost the key! Recreate and keep going for other keys:

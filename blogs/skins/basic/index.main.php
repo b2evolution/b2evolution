@@ -25,6 +25,9 @@ skin_init( $disp );
 
 require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
 
+// The following is temporary and should be moved to some SiteSkin class
+siteskin_init();
+
 // ----------------------------- HEADER BEGINS HERE ------------------------------
 ?>
 <html>
@@ -45,6 +48,12 @@ require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
 <body>
 <?php
 // -------------------------------- END OF HEADER --------------------------------
+
+
+// ---------------------------- SITE HEADER INCLUDED HERE ----------------------------
+// If site headers are enabled, they will be included here:
+siteskin_include( '_site_body_header.inc.php' );
+// ------------------------------- END OF SITE HEADER --------------------------------
 ?>
 
 	<?php
@@ -295,6 +304,11 @@ require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
 	?>
 
 	<?php
+		// ---------------------------- SITE FOOTER INCLUDED HERE ----------------------------
+		// If site footers are enabled, they will be included here:
+		siteskin_include( '_site_body_footer.inc.php' );
+		// ------------------------------- END OF SITE FOOTER --------------------------------
+
 		$Hit->log();  // log the hit on this page
 		debug_info();	// output debug info if requested
 	?>

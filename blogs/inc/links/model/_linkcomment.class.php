@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  *
@@ -106,8 +106,8 @@ class LinkComment extends LinkOwner
 		$edited_Link->set( 'order', $order );
 		$edited_Link->dbinsert();
 
-		// Update last touched date of the Item
-		$this->item_update_last_touched_date();
+		// Update last touched date of the Comment & Item
+		$this->update_last_touched_date();
 	}
 
 	/**
@@ -165,20 +165,13 @@ class LinkComment extends LinkOwner
 
 
 	/**
-	 * Update field last_touched_ts of Item
+	 * Update field last_touched_ts of Comment & Item
 	 */
-	function item_update_last_touched_date()
+	function update_last_touched_date()
 	{
-		$updated_Item = NULL;
-
 		if( !empty( $this->Comment ) )
-		{
-			$updated_Item = & $this->Comment->get_Item();
-		}
-
-		if( !empty( $updated_Item ) )
-		{	// Update Item if it exists
-			$updated_Item->update_last_touched_date();
+		{ // Update Item & Comment if it exist
+			$this->Comment->update_last_touched_date();
 		}
 	}
 }

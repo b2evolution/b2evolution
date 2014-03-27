@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @version $Id$
  */
@@ -66,8 +66,11 @@ if( !empty( $Blog ) )
 echo '<p>'.sprintf( T_('%s (%s) has sent you this message:'), '<b>'.$params['sender_name'].'</b>', '<a href="mailto:'.$params['sender_address'].'">'.$params['sender_address'].'</a>' ).'</p>';
 
 echo '<div class="email_ugc">'."\n";
-echo '<p>'.nl2br( htmlentities( $params['message'], ENT_COMPAT, $evo_charset ) ).'</p>';
+echo '<p>'.nl2br( evo_htmlentities( $params['message'], ENT_COMPAT, $evo_charset ) ).'</p>';
 echo "</div>\n";
+
+// show sender IP address
+echo '<p>'.sprintf( T_( 'This message was typed by a user connecting from this IP address: %s.' ), implode( ', ', get_ip_list() ) ).'</p>';
 
 // show sender email address
 echo '<p>'.sprintf( T_( 'By replying, your email will go directly to %s.' ), '<a href="mailto:'.$params['sender_address'].'">'.$params['sender_address'].'</a>' ).'</p>';

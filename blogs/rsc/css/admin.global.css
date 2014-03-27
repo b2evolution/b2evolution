@@ -41,7 +41,7 @@ div.dashboard_sidebar li li {
 	color: #999;
 }
 .dashboard_thumbnails {
-	float:left;
+	display: inline;
 	margin-right: 2px;
 	width: 100%;
 }
@@ -86,24 +86,34 @@ div.dashboard_rating {
 	height: 100%;
 	width: 100%;
 	display:none;
-	z-index:998;
+	z-index:9998;
 }
 
 #overlay_page{
 	display:none;
 }
 
-#overlay_page.overlay_page_active{
+#overlay_page.overlay_page_active, #overlay_page.overlay_page_active_transparent{
 	position:fixed;
 	top:40px;
 	bottom:5%;
 	right:5%;
 	left:5%;
 	overflow:auto;
-	z-index:999;
+	z-index:9999;
 	background:#f1f6f8;
 	border:1px solid #ccc;
 	display:block;
+}
+#overlay_page.overlay_page_active_transparent{
+	background: transparent;
+	border: none;
+	margin: 0 auto;
+	top: 40%;
+	bottom: auto;
+}
+#overlay_page.overlay_page_active_transparent .fieldset{
+	margin: 0;
 }
 
 .overlay_page_active form{
@@ -724,7 +734,8 @@ pre.email_log {
 	font-size: 112%;
 	margin: .5ex 0;
 }
-pre.email_log_scroll {
+pre.email_log_scroll,
+div.email_log_html {
 	overflow: scroll;
 	font-size: 112%;
 	margin: .5ex 0;
@@ -736,7 +747,7 @@ pre.email_log_scroll span {
 	background: #eee;
 }
 
-div#user_status_icon, div#email_status_icon, div#iprange_status_icon {
+div.status_icon {
 	float: left;
 	padding: 5px 5px 0 0;
 }
@@ -799,6 +810,43 @@ td.diff-title-deletedline, td.diff-title-addedline {
 	font-weight: bold;
 }
 
+/* phpBB importer */
+.tool_steps {
+	text-align: center;
+	font-size: 14px;
+	font-weight: normal;
+	color: #999;
+	padding-bottom: 5px;
+}
+
+.tool_steps .step {
+	margin-right: 25px;
+	display: inline-block;
+}
+.tool_steps .step div {
+	background-color: #CCC;
+	border: 1px solid #999;
+	color: #999;
+	display: inline-block;
+	font-size: 15px;
+	margin-right: 5px;
+	padding: 5px;
+	text-align: center;
+	width: 20px;
+	-moz-border-radius: 90px 90px 90px 90px;
+	-webkit-border-radius: 90px 90px 90px 90px;
+	-khtml-border-radius: 90px 90px 90px 90px; 
+	border-radius: 90px 90px 90px 90px;
+}
+.tool_steps .step.current {
+	font-weight: bold;
+	color: #666;
+}
+.tool_steps .step.current div {
+	background-color: #666;
+	color: #FFF;
+}
+
 .RedButton {
 	background: #F00;
 	color: #FFF;
@@ -807,4 +855,26 @@ td.diff-title-deletedline, td.diff-title-addedline {
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 	-khtml-border-radius: 4px;
+}
+
+.red-bordered-checkbox {
+	border-left: 1px solid red;
+	border-right: 1px solid red;
+	background-color: red;
+	padding-top: 3px;
+}
+
+.browse_side_item .hintbox_list_container ul {
+	margin: 0;
+	padding: 0;
+}
+
+.task_priority_edit a {
+	color: #000;
+}
+
+div.comment_toolbars div.edit_toolbar, div.message_toolbars div.edit_toolbar {
+	width: 97%;
+	padding-left: 0;
+	padding-right: 0;
 }

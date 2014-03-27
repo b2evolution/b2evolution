@@ -1,5 +1,7 @@
 <?php
-// B2evo mods: added check in setAcceptedCompression() - starting line 1040
+// B2evo mods:
+//  - added check in setAcceptedCompression() - starting line 1040
+//  - changed simple htmlspecialchars to evo_htmlspecialchars, to use the correct charset
 
 // by Edd Dumbill (C) 1999-2002
 // <edd@usefulinc.com>
@@ -1364,7 +1366,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 			if($this->debug > 1)
 			{
-				print "<PRE>\n---SENDING---\n" . htmlentities($op) . "\n---END---\n</PRE>";
+				print "<PRE>\n---SENDING---\n" . evo_htmlentities($op) . "\n---END---\n</PRE>";
 				// let the client see this now in case http times out...
 				evo_flush();
 			}
@@ -1508,7 +1510,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 			if($this->debug > 1)
 			{
-				print "<PRE>\n---SENDING---\n" . htmlentities($payload) . "\n---END---\n</PRE>";
+				print "<PRE>\n---SENDING---\n" . evo_htmlentities($payload) . "\n---END---\n</PRE>";
 				// let the client see this now in case http times out...
 				evo_flush();
 			}
@@ -1674,7 +1676,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			{
 				print "<PRE>\n---CURL INFO---\n";
 				foreach(curl_getinfo($curl) as $name => $val)
-					 print $name . ': ' . htmlentities($val). "\n";
+					 print $name . ': ' . evo_htmlentities($val). "\n";
 				print "---END---\n</PRE>";
 			}
 
@@ -1957,7 +1959,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				// error response
 				$this->errno = $fcode;
 				$this->errstr = $fstr;
-				//$this->errstr = htmlspecialchars($fstr); // XXX: encoding probably shouldn't be done here; fix later.
+				//$this->errstr = evo_htmlspecialchars($fstr); // XXX: encoding probably shouldn't be done here; fix later.
 			}
 			else
 			{
@@ -2415,11 +2417,11 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 					print '<PRE>';
 					foreach($GLOBALS['_xh']['headers'] as $header => $value)
 					{
-						print htmlentities("HEADER: $header: $value\n");
+						print evo_htmlentities("HEADER: $header: $value\n");
 					}
 					foreach($GLOBALS['_xh']['cookies'] as $header => $value)
 					{
-						print htmlentities("COOKIE: $header={$value['value']}\n");
+						print evo_htmlentities("COOKIE: $header={$value['value']}\n");
 					}
 					print "</PRE>\n";
 				}
@@ -2453,13 +2455,13 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 								{
 									$data = $degzdata;
 									if($this->debug)
-									print "<PRE>---INFLATED RESPONSE---[".strlen($data)." chars]---\n" . htmlentities($data) . "\n---END---</PRE>";
+									print "<PRE>---INFLATED RESPONSE---[".strlen($data)." chars]---\n" . evo_htmlentities($data) . "\n---END---</PRE>";
 								}
 								elseif($GLOBALS['_xh']['headers']['content-encoding'] == 'gzip' && $degzdata = @gzinflate(substr($data, 10)))
 								{
 									$data = $degzdata;
 									if($this->debug)
-									print "<PRE>---INFLATED RESPONSE---[".strlen($data)." chars]---\n" . htmlentities($data) . "\n---END---</PRE>";
+									print "<PRE>---INFLATED RESPONSE---[".strlen($data)." chars]---\n" . evo_htmlentities($data) . "\n---END---</PRE>";
 								}
 								else
 								{
@@ -2497,7 +2499,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 			if($this->debug)
 			{
 				//by maHo, replaced htmlspecialchars with htmlentities
-				print '<PRE>---GOT---['.strlen($data)." chars]---\n".htmlentities($data)."\n---END---\n</PRE>";
+				print '<PRE>---GOT---['.strlen($data)." chars]---\n".evo_htmlentities($data)."\n---END---\n</PRE>";
 			}
 
 			if($data == '')
@@ -2536,7 +2538,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 					$start += strlen('<!-- SERVER DEBUG INFO (BASE64 ENCODED):');
 					$end = strpos($data, '-->', $start);
 					$comments = substr($data, $start, $end-$start);
-					print "<PRE>---SERVER DEBUG INFO (DECODED) ---\n\t".htmlentities(str_replace("\n", "\n\t", base64_decode($comments)))."\n---END---\n</PRE>";
+					print "<PRE>---SERVER DEBUG INFO (DECODED) ---\n\t".evo_htmlentities(str_replace("\n", "\n\t", base64_decode($comments)))."\n---END---\n</PRE>";
 				}
 			}
 
@@ -2668,7 +2670,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 					print "<PRE>---PARSED---\n";
 					// somehow htmlentities chokes on var_export, and some full html string...
 					//print htmlentitites(var_export($GLOBALS['_xh']['value'], true));
-					print htmlspecialchars(var_export($GLOBALS['_xh']['value'], true));
+					print evo_htmlspecialchars(var_export($GLOBALS['_xh']['value'], true));
 					print "\n---END---</PRE>";
 				}
 

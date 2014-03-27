@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -134,14 +134,13 @@ class ItemLight extends DataObject
 												$creator_field, $lasteditor_field );
 
 		$this->delete_restrictions = array(
-				array( 'table'=>'T_links', 'fk'=>'link_dest_itm_ID', 'msg'=>T_('%d links to source items') ),
 				array( 'table'=>'T_items__item', 'fk'=>'post_parent_ID', 'msg'=>T_('%d links to child items') ),
 			);
 
 		$this->delete_cascades = array(
 				array( 'table'=>'T_links', 'fk'=>'link_itm_ID', 'msg'=>T_('%d links to destination items') ),
 				array( 'table'=>'T_postcats', 'fk'=>'postcat_post_ID', 'msg'=>T_('%d links to extra categories') ),
-				array( 'table'=>'T_comments', 'fk'=>'comment_post_ID', 'msg'=>T_('%d comments') ),
+				array( 'table'=>'T_comments', 'fk'=>'comment_item_ID', 'msg'=>T_('%d comments') ),
 				array( 'table'=>'T_items__version', 'fk'=>'iver_itm_ID', 'msg'=>T_('%d versions') ),
 				array( 'table'=>'T_slug', 'fk'=>'slug_itm_ID', 'msg'=>T_('%d slugs') ),
 				array( 'table'=>'T_items__itemtag', 'fk'=>'itag_itm_ID', 'msg'=>T_('%d links to tags') ),
@@ -440,7 +439,7 @@ class ItemLight extends DataObject
 			if( $params['link_categories'] )
 			{ // we want to display links
 				$lBlog = & $Chapter->get_Blog();
-				$cat_name = '<a href="'.$Chapter->get_permanent_url().'" title="'.htmlspecialchars($params['link_title']).'">'.$cat_name.'</a>';
+				$cat_name = '<a href="'.$Chapter->get_permanent_url().'" title="'.evo_htmlspecialchars($params['link_title']).'">'.$cat_name.'</a>';
 			}
 
 			if( $Chapter->ID == $this->main_cat_ID )
@@ -1345,6 +1344,51 @@ class ItemLight extends DataObject
 		}
 	}
 
+
+	/**
+	 * Get a link to history of Item
+	 *
+	 * @return string A link to history
+	 */
+	function get_history_link( $params = array() )
+	{
+		$params = array_merge( array(
+				'before'    => '',
+				'after'     => '',
+				'link_text' => '$icon$' // Use a mask $icon$ or some other text
+			), $params );
+
+		if( ( $history_url = $this->get_history_url() ) === false )
+		{ // No url available for current user, Don't display a link
+			return;
+		}
+
+		// Replace all masks with values
+		$link_text = str_replace( '$icon$', $this->history_info_icon(), $params['link_text'] );
+
+		return $params['before']
+			.'<a href="'.$history_url.'">'.$link_text.'</a>'
+			.$params['after'];
+	}
+
+
+	/**
+	 * Get URL to history of Item
+	 *
+	 * @param string Glue between url params
+	 * @return string|boolean URL to history OR False when user cannot see a history
+	 */
+	function get_history_url( $glue = '&amp;' )
+	{
+		global $current_User, $admin_url;
+
+		if( ! is_logged_in() || ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		{ // Current user cannot see a history
+			return false;
+		}
+
+		return $admin_url.'?ctrl=items'.$glue.'action=history'.$glue.'p='.$this->ID;
+	}
 }
 
 ?>

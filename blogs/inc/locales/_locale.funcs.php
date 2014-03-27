@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -218,7 +218,7 @@ if( isset( $use_l10n ) && $use_l10n )
 		}
 		else
 		{
-			$Debuglog->add(sprintf('Warning: evo_charset not set to translate "%s"', htmlspecialchars($string)), 'locale');
+			$Debuglog->add(sprintf('Warning: evo_charset not set to translate "%s"', evo_htmlspecialchars($string)), 'locale');
 		}
 
 		if( $params['for_helper'] )

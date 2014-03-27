@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @author fplanque: Francois PLANQUE.
  * @author gorgeb: Bertrand GORGE / EPISTEMA
@@ -313,8 +313,8 @@ XX(      graydead.gif
 	{
 		$attribs = array(
 			'src' => $smiley['image'],
-			'title' => htmlspecialchars($smiley['code']),
-			'alt' => htmlspecialchars($smiley['code']),
+			'title' => evo_htmlspecialchars($smiley['code']),
+			'alt' => evo_htmlspecialchars($smiley['code']),
 			'class' => 'middle',
 			);
 

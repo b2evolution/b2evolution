@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -114,7 +114,21 @@ switch( $action )
 		break;
 
 	case 'upload_avatar':
+		// Stop a request from the blocked IP addresses or Domains
+		antispam_block_request();
+
 		$current_User->update_avatar_from_upload();
+		break;
+
+	case 'redemption':
+		// Change status of user email to 'redemption'
+		$EmailAddressCache = & get_EmailAddressCache();
+		if( $EmailAddress = & $EmailAddressCache->get_by_name( $current_User->get( 'email' ), false, false ) && 
+		    in_array( $EmailAddress->get( 'status' ), array( 'warning', 'suspicious1', 'suspicious2', 'suspicious3', 'prmerror' ) ) )
+		{ // Change to 'redemption' status only if status is 'warning', 'suspicious1', 'suspicious2', 'suspicious3' or 'prmerror'
+			$EmailAddress->set( 'status', 'redemption' );
+			$EmailAddress->dbupdate();
+		}
 		break;
 }
 

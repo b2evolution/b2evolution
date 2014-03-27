@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  *
@@ -43,6 +43,12 @@ if( is_logged_in() && ( !check_user_status( 'can_view_users' ) ) )
 add_js_headline( "// Paths used by JS functions:
 		var bgxy_expand = '".get_icon( 'expand', 'xy' )."';
 		var bgxy_collapse = '".get_icon( 'collapse', 'xy' )."';" );
+
+if( has_cross_country_restriction( 'users' ) && empty( $current_User->ctry_ID ) )
+{ // User may browse other users only from the same country
+	$Messages->add( T_('Please specify your country before attempting to contact other users.') );
+	header_redirect( get_user_profile_url() );
+}
 
 // Require results.css to display thread query results in a table
 require_css( 'results.css' ); // Results/tables styles

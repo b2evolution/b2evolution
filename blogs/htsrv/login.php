@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -71,19 +71,37 @@ switch( $action )
 		global $Session, $Messages, $UserSettings;
 		$Session->assert_received_crumb( 'closeaccountform' );
 
+		$reasons = trim( $Settings->get( 'user_closing_reasons' ) );
+		param( 'account_close_type', 'string', '' );
+		if( ! empty( $reasons ) && empty( $account_close_type ) )
+		{ // Don't submit a form without a selected reason
+			$Messages->add( T_( 'Please quickly select a reason for closing your account.' ) );
+			// Redirect to show the errors:
+			header_redirect(); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+
+		if( is_logged_in() && $current_User->check_perm( 'users', 'edit', false ) )
+		{ // Admins cannot close own accounts
+			$Messages->add( T_( 'You cannot close your own account!' ) );
+			// Redirect to show the errors:
+			header_redirect(); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+
 		if( is_logged_in() && $current_User->update_status_from_Request( true, 'closed' ) )
 		{ // user account was closed successful
 			// Send notification email about closed account to users with edit users permission
 			$email_template_params = array(
 					'login'   => $current_User->login,
 					'email'   => $current_User->email,
-					'reason'  => param( 'account_close_reason', 'text', '' ),
+					'reason'  => trim( param( 'account_close_type', 'string', '' ).' '.param( 'account_close_reason', 'text', '' ) ),
 					'user_ID' => $current_User->ID,
 				);
 			send_admin_notification( NT_('User account closed'), 'account_closed', $email_template_params );
 
-			// log out current User
-			logout();
+			// Set this session var only to know when display a bye message
+			$Session->set( 'account_closing_success', true );
 		}
 		else
 		{ // db update was unsuccessful
@@ -116,6 +134,7 @@ switch( $action )
 		{ // user gave an email, get users by email
 			$only_activated = false;
 			// load all not closed users with this email address
+			$login = evo_strtolower( $login );
 			$UserCache->load_where( 'user_email = "'.$login.'" && user_status <> "closed"' );
 
 			$not_activated_Ids = array();
@@ -287,8 +306,8 @@ switch( $action )
 
 
 	case 'activateaccount': // Clicked to activate account link from an account activation reminder email
-		// Stop a request from the blocked IP addresses
-		antispam_block_ip();
+		// Stop a request from the blocked IP addresses or Domains
+		antispam_block_request();
 
 		global $UserSettings, $Session, $baseurl;
 
@@ -334,8 +353,8 @@ switch( $action )
 		break;
 
 	case 'validatemail': // Clicked "Validate email" link from a mail
-		// Stop a request from the blocked IP addresses
-		antispam_block_ip();
+		// Stop a request from the blocked IP addresses or Domains
+		antispam_block_request();
 
 		param( 'reqID', 'string', '' );
 		param( 'sessID', 'integer', '' );
@@ -423,7 +442,7 @@ switch( $action )
 		}
 
 		param( 'req_validatemail_submit', 'integer', 0 ); // has the form been submitted
-		$email = param( $dummy_fields['email'], 'string', $current_User->email ); // the email address is editable
+		$email = evo_strtolower( param( $dummy_fields['email'], 'string', $current_User->email ) ); // the email address is editable
 
 		if( $req_validatemail_submit )
 		{ // Form has been submitted
@@ -563,13 +582,22 @@ switch( $action )
 {
 	case 'lostpassword':
 		// Lost password:
-		$page_title = T_('Lost password ?');
+		$page_title = T_('Lost your password?');
 		$page_icon = 'login';
 		$hidden_params = array( 'redirect_to' => url_rel_to_same_host($redirect_to, $secure_htsrv_url) );
+		$wrap_width = '480px';
+		$wrap_height = '430px';
 		// Include page header:
 		require $adminskins_path.'login/_html_header.inc.php';
 		// Display form:
-		display_lostpassword_form( $login, $hidden_params );
+		display_lostpassword_form( $login, $hidden_params, array(
+				'form_before' => str_replace( '$title$', $page_title, $form_before ),
+				'form_after' => $form_after,
+				'form_class'    => 'form-login form-lostpass',
+				'form_template' => $login_form_params,
+				'inskin'        => false,
+				'inskin_urls'   => false,
+			) );
 		require $adminskins_path.'login/_html_footer.inc.php';
 		break;
 

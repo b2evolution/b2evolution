@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -1170,7 +1170,7 @@ class Filelist
 				continue;
 			}
 
-			$to_load[] = $DB->quote( $loop_File->get_rdfp_rel_path() );
+			$to_load[] = $DB->quote( md5( $this->_FileRoot->type.$this->_FileRoot->in_type_ID.$loop_File->get_rdfp_rel_path(), true ) );
 		}
 
 		if( count( $to_load ) )
@@ -1183,9 +1183,7 @@ class Filelist
 			$rows = $DB->get_results( "
 				SELECT *
 				  FROM T_files
-				 WHERE file_root_type = '".$this->_FileRoot->type."'
-				   AND file_root_ID = ".$this->_FileRoot->in_type_ID."
-				   AND file_path IN (".implode( ',', $to_load ).")",
+				 WHERE file_path_hash IN (".implode( ',', $to_load ).")",
 				OBJECT, 'Load FileList meta data' );
 
 			if( count($rows) )

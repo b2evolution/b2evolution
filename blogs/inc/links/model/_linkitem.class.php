@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  *
@@ -66,15 +66,28 @@ class LinkItem extends LinkOwner
 	/**
 	 * Get all positions ( key, display ) pairs where link can be displayed
 	 *
+	 * @param integer File ID
 	 * @return array
 	 */
-	function get_positions()
+	function get_positions( $file_ID = NULL )
 	{
-		return array(
-			'teaser' => T_( 'Teaser' ),
-			'aftermore' => T_( 'After "more"' ),
-			'inline' => T_( 'Inline' ),
-			);
+		$additional_positions = array();
+
+		if( $this->Item && ( $item_Blog = & $this->Item->get_Blog() ) !== NULL && $item_Blog->get( 'type' ) == 'photo' )
+		{ // Only images of the photo blogs can have this position
+
+			$FileCache = & get_FileCache();
+			if( ( $File = $FileCache->get_by_ID( $file_ID, false, false ) ) && $File->is_image() )
+			{ // Must be image
+				$additional_positions['albumart'] = T_('Album Art');
+			}
+		}
+
+		return array_merge( array(
+				'teaser'    => T_( 'Teaser' ),
+				'aftermore' => T_( 'After "more"' ),
+				'inline'    => T_( 'Inline' ),
+			), $additional_positions );
 	}
 
 	/**
@@ -103,13 +116,22 @@ class LinkItem extends LinkOwner
 		$edited_Link->set( 'file_ID', $file_ID );
 		$edited_Link->set( 'position', $position );
 		$edited_Link->set( 'order', $order );
-		$edited_Link->dbinsert();
+		if( $edited_Link->dbinsert() )
+		{
+			// New link was added to the item, invalidate blog's media BlockCache
+			BlockCache::invalidate_key( 'media_coll_ID', $this->Item->get_blog_ID() );
 
-		// New link was added to the item, invalidate blog's media BlockCache
-		BlockCache::invalidate_key( 'media_coll_ID', $this->Item->get_blog_ID() );
+			// Update last touched date of the Item
+			$this->update_last_touched_date();
 
-		// Update last touched date of the Item
-		$this->item_update_last_touched_date();
+			// Reset the Links
+			$this->Links = NULL;
+			$this->load_Links();
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -167,12 +189,39 @@ class LinkItem extends LinkOwner
 	/**
 	 * Update field last_touched_ts of Item
 	 */
-	function item_update_last_touched_date()
+	function update_last_touched_date()
 	{
 		if( !empty( $this->Item ) )
 		{	// Update Item if it exists
 			$this->Item->update_last_touched_date();
 		}
+	}
+
+	/**
+	 * This function is called after when some file was unlinked from item
+	 *
+	 * @param integer Link ID
+	 */
+	function after_unlink_action( $link_ID = 0 )
+	{
+		if( empty( $this->Item ) )
+		{ // No existing Item, Exit here
+			return;
+		}
+
+		if( ! empty( $link_ID ) )
+		{ // Find inline image placeholders if link ID is defined
+			preg_match_all( '/\[image:'.$link_ID.':?[^\]]*\]/i', $this->Item->content, $inline_images );
+			if( ! empty( $inline_images[0] ) )
+			{ // There are inline image placeholders in the post content
+				$this->Item->set( 'content', str_replace( $inline_images[0], '', $this->Item->content ) );
+				$this->Item->dbupdate();
+				return;
+			}
+		}
+
+		// Update last touched date of the Item
+		$this->update_last_touched_date();
 	}
 }
 

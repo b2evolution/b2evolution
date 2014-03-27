@@ -7,7 +7,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -1209,7 +1209,7 @@ class Plugins
 			{
 				$debug_params['pass_md5'] = '-hidden-';
 			}
-			$Debuglog->add( 'Calling '.$Plugin->classname.'(#'.$Plugin->ID.')->'.$method.'( '.htmlspecialchars(var_export( $debug_params, true )).' )', 'plugins' );
+			$Debuglog->add( 'Calling '.$Plugin->classname.'(#'.$Plugin->ID.')->'.$method.'( '.evo_htmlspecialchars(var_export( $debug_params, true )).' )', 'plugins' );
 			*/
 			$Debuglog->add( 'Calling '.$Plugin->classname.'(#'.$Plugin->ID.')->'.$method.'( )', 'plugins' );
 		}
@@ -2050,7 +2050,7 @@ class Plugins
 			}
 			$atLeastOneRenderer = true;
 
-			$r .= '<div>';
+			$r .= '<div id="block_renderer_'.$loop_RendererPlugin->code.'">';
 
 			$r .= '<input type="checkbox" class="checkbox" name="'.$name_prefix.'renderers[]" value="'.$loop_RendererPlugin->code.'" id="renderer_'.$loop_RendererPlugin->code.'"';
 
@@ -2137,8 +2137,22 @@ class Plugins
 	 */
 	function validate_list( $renderers = array('default') )
 	{
-		global $Debuglog, $Plugins;
+		global $Debuglog, $Plugins, $debug;
 		$Debuglog->add('Call to deprecated method Plugins::validate_list()', 'deprecated');
+
+		$error_msg = 'Error because of a deprecated method call Plugins::validate_list().';
+		if( $debug == 0 )
+		{
+			$error_msg = $error_msg."<br />".'Enable debugging to see which incompatible plugin has triggered this error and uninstall the deprecated plugin.';
+			$error_msg = $error_msg."<br />".get_manual_link( 'debugging', 'Check the manual about how to enable debugging.' );
+		}
+		else
+		{
+			$error_msg = $error_msg."<br />".'Check the debug info below which incompatible plugin has triggered this error and uninstall the deprecated plugin.';
+		}
+		$error_msg = $error_msg."<br />".get_manual_link( 'plugins', 'Check the manual about how to uninstall a plugin.' );
+		debug_die( $error_msg );
+		// Already exited here
 
 		// Return an empty array, because this method call is not supported anymore
 		return array();

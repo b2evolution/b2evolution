@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -41,13 +41,13 @@ $SQL->WHERE( 'itst_locale = '.$DB->quote( $edit_locale ) );
 $SQL->ORDER_BY( '*, iost_string' );
 
 // Create a count sql
-$CountSQL = new SQL();
-$CountSQL->SELECT( 'SQL_NO_CACHE COUNT( itst_ID )' );
-$CountSQL->FROM( 'T_i18n_translated_string' );
-$CountSQL->WHERE( 'itst_locale = '.$DB->quote( $edit_locale ) );
+$count_SQL = new SQL();
+$count_SQL->SELECT( 'SQL_NO_CACHE COUNT( itst_ID )' );
+$count_SQL->FROM( 'T_i18n_translated_string' );
+$count_SQL->WHERE( 'itst_locale = '.$DB->quote( $edit_locale ) );
 
 // Create result set:
-$Results = new Results( $SQL->get(), 'itst_', '-A'/*, NULL, $CountSQL->get()*/ );
+$Results = new Results( $SQL->get(), 'itst_', '-A'/*, NULL, $count_SQL->get()*/ );
 
 $Results->title = sprintf( T_('Translation editor for locale "%s"'), $edit_locale );
 
@@ -56,13 +56,13 @@ $Results->global_icon( T_('Add new translated string...'), 'new', regenerate_url
 $Results->cols[] = array(
 		'th' => T_('Original string'),
 		'order' => 'iost_string',
-		'td' => '%htmlspecialchars( #iost_string# )%',
+		'td' => '%evo_htmlspecialchars( #iost_string# )%',
 	);
 
 $Results->cols[] = array(
 		'th' => T_('Translated string'),
 		'order' => 'itst_standard',
-		'td' => '%htmlspecialchars( #itst_standard# )%',
+		'td' => '%evo_htmlspecialchars( #itst_standard# )%',
 	);
 
 function iost_td_actions( $translated_string_ID )

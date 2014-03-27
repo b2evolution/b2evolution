@@ -6,7 +6,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -175,7 +175,6 @@ class Plugins_admin extends Plugins
 				'ItemApplyAsRenderer' => 'Asks the plugin if it wants to apply as a renderer for an item.',
 				'ItemCanComment' => 'Asks the plugin if an item can receive comments/feedback.',
 				'ItemSendPing' => 'Send a ping to a service about new items.',
-				'ItemViewsIncreased' => 'Called when the view counter of an item got increased.',
 
 				'SkinTag' => 'This method gets invoked when a plugin is called by its code. Providing this method causes the plugin to be listed as a widget.',
 
@@ -229,6 +228,8 @@ class Plugins_admin extends Plugins
 
 				'AfterLoginAnonymousUser' => 'Gets called at the end of the login procedure for anonymous visitors.',
 				'AfterLoginRegisteredUser' => 'Gets called at the end of the login procedure for registered users.',
+
+				'BeforeBlockableAction' => 'Gets called at the end of antispam block ip/domain call.',
 
 				'BeforeBlogDisplay' => 'Gets called before a (part of the blog) gets displayed.',
 				'InitMainList' => 'Initializes the MainList object. Use this method to create your own MainList, see init_MainList()',

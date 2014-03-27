@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -25,35 +25,38 @@ if( $cat > 0 )
 	$MainList->load_from_Request();
 	$MainList->set_filters( array(
 			'cat_array' => array( $cat ), // Limit only by selected cat (exclude posts from child categories)
+			'cat_modifier' => NULL,
 			'page' => $page
 		) );
 	$MainList->query();
 	$MainList->nav_target = $cat; // set navigation target, we are always navigating through category in this skin
 
+	// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
+	mainlist_page_links( array(
+			'block_start' => '<div class="navigation_top"><div class="navigation">'.T_('Page').': ',
+			'block_end' => '</div></div>',
+			'prev_text' => T_('Previous'),
+			'next_text' => T_('Next'),
+		) );
+	// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 
+
+	// Breadcrumbs
+	$Skin->display_breadcrumbs( $cat );
+
+?>
+<div class="post_panel">
+<?php
+	$Skin->display_post_button( $cat );
+
+	// Page title
 	$ChapterCache = & get_ChapterCache();
 	if( $category = & $ChapterCache->get_by_ID( $cat ) )
 	{	// Display category title
 		$category_name = $category->get( 'name' ); // $category_name is also used below
 		echo '<h2 class="page_title">'.$category_name.'</h2>';
 	}
-
-// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
-mainlist_page_links( array(
-		'block_start' => '<div class="navigation_top"><div class="navigation">'.T_('Page').': ',
-		'block_end' => '</div></div>',
-		'prev_text' => T_('Previous'),
-		'next_text' => T_('Next'),
-	) );
-// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
-
 ?>
-<div class="post_panel">
-<?php
-	$Skin->display_post_button( $cat );
-	// BREADCRUMBS
-	$Skin->display_breadcrumbs( $cat );
-	?>
 	<div class="clear"></div>
 </div>
 <?php
@@ -92,17 +95,17 @@ if( count( $chapters ) > 0 )
 		{	// Loop through categories:
 			if( $Chapter->lock )
 			{	// Set icon for locked chapter
-				$chapter_icon = 'folder_locked_big.gif';
+				$chapter_icon = 'catBigLocked';
 				$chapter_icon_title = T_('This forum is locked: you cannot post, reply to, or edit topics.');
 			}
 			else
 			{	// Set icon for unlocked chapter
-				$chapter_icon = 'folder_big.gif';
+				$chapter_icon = 'catBig';
 				$chapter_icon_title = T_('No new posts');
 			}
 ?>
 		<tr>
-			<td class="status"><img src="img/<?php echo $chapter_icon; ?>" width="46" height="25" alt="<?php echo $chapter_icon_title; ?>" title="<?php echo $chapter_icon_title; ?>" /></td>
+			<td class="status"><span class="ficon <?php echo $chapter_icon; ?>" title="<?php echo $chapter_icon_title; ?>"></span></td>
 			<td class="left">
 				<a href="<?php echo $Chapter->get_permanent_url(); ?>" class="forumlink"><?php echo $Chapter->dget( 'name' ); ?></a>
 				<?php
@@ -187,10 +190,4 @@ mainlist_page_links( array(
 	) );
 // ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:05:44  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

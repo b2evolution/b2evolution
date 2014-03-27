@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -44,6 +44,7 @@ $menu_link_widget_link_types = array(
 		'users' => T_('User directory'),
 
 		'login' => T_('Log in form'),
+		'logout' => T_('Logout link'),
 		'register' => T_('Registration form'),
 		'myprofile' => T_('My profile'),
 		'profile' => T_('Edit profile'),
@@ -140,15 +141,18 @@ class menu_link_Widget extends ComponentWidget
 					'onchange' => '
 						var curr_link_type = this.value;
 						var allow_blockcache = jQuery("[id$=\'_set_allow_blockcache\']");
+						var allow_blockcache_note = allow_blockcache.find(".notes");
 						if( curr_link_type == "login" || curr_link_type == "register" )
 						{
 							allow_blockcache.removeAttr(\'checked\');
 							allow_blockcache.attr( \'disabled\', \'disabled\' );
+							allow_blockcache_note.html("'.T_('The current configuration prevents caching this widget in the block cache.').'");
 						}
 						else
 						{
 							allow_blockcache.removeAttr(\'disabled\');
 							allow_blockcache.attr( \'checked\', \'checked\' );
+							allow_blockcache_note.html("'.T_('Uncheck to prevent this widget from ever being cached in the block cache. (The whole page may still be cached.) This is only needed when a widget is poorly handling caching and cache keys.').'");
 						};'
 				),
 				'link_text' => array(
@@ -184,7 +188,7 @@ class menu_link_Widget extends ComponentWidget
 			{ // Disable allow blockcache
 				$r['allow_blockcache']['defaultvalue'] = false;
 				$r['allow_blockcache']['disabled'] = 'disabled';
-				$this->set( 'allow_blockcache', false );
+				$r['allow_blockcache']['note'] = T_('The current configuration prevents caching this widget in the block cache.');
 			}
 		}
 
@@ -321,6 +325,15 @@ class menu_link_Widget extends ComponentWidget
 				{	// Let's display the link as selected
 					$link_class = $this->disp_params['link_selected_class'];
 				}
+				break;
+
+			case 'logout':
+				if( ! is_logged_in() )
+				{
+					return false;
+				}
+				$url = get_user_logout_url();
+				$text = T_('Logout');
 				break;
 
 			case 'register':

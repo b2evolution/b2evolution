@@ -58,6 +58,12 @@ switch( $action )
 switch( $action )
 {
 	case 'new':
+		if( has_cross_country_restriction() && empty( $current_User->ctry_ID ) )
+		{ // Cross country contact is restricted but user country is not set
+			$Messages->add( T_('Please specify your country before attempting to contact other users.') );
+			header_redirect( get_user_profile_url() );
+		}
+
 		if( check_create_thread_limit( true ) )
 		{ // user has already reached his limit, don't allow to create new thread
 			$action = '';
@@ -82,6 +88,9 @@ switch( $action )
 		break;
 
 	case 'create': // Record new thread
+		// Stop a request from the blocked IP addresses or Domains
+		antispam_block_request();
+
 		if( check_create_thread_limit() )
 		{ // max new threads limit reached, don't allow to create new thread
 			debug_die( 'Invalid request, new conversation limit already reached!' );
@@ -113,7 +122,7 @@ switch( $action )
 			forget_param( 'msg_ID' );
 			$Messages->add( $msg, 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
-			$redirect_to = param( 'redirect_to', 'string', '?ctrl=threads' );
+			$redirect_to = param( 'redirect_to', 'url', '?ctrl=threads' );
 			header_redirect( $redirect_to, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
@@ -150,8 +159,11 @@ switch( $action )
 }
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('Messaging'), '?ctrl=threads' );
+$AdminUI->breadcrumbpath_add( T_('Messages'), '?ctrl=threads' );
 $AdminUI->breadcrumbpath_add( T_('Conversations'), '?ctrl=threads' );
+
+// Display messages depending on user email status
+display_user_email_status_message();
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -198,10 +210,4 @@ $AdminUI->disp_payload_end();
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-/*
- * $Log$
- * Revision 1.22  2013/11/06 08:04:25  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

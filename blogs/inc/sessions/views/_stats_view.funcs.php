@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -160,7 +160,7 @@ function hits_results( & $Results, $params = array() )
 
 	$Results->cols[] = array(
 			'th' => T_('Blog'),
-			'order' => 'hit_blog_ID, hit_ID',
+			'order' => 'hit_coll_ID, hit_ID',
 			'td' => '$blog_shortname$',
 			'td_class' => 'compact_data'
 		);
@@ -176,11 +176,11 @@ function hits_results( & $Results, $params = array() )
 	$Results->cols[] = array(
 			'th' => T_('Requested URI'),
 			'order' => 'hit_uri, hit_ID',
-			'td' => '%stats_format_req_URI( #hit_blog_ID#, #hit_uri#, 40, #hit_disp#, #hit_ctrl#, #hit_action# )%',
+			'td' => '%stats_format_req_URI( #hit_coll_ID#, #hit_uri#, 40, #hit_disp#, #hit_ctrl#, #hit_action# )%',
 			'td_class' => 'compact_data'
 		);
 	$Results->cols[] = array(
-			'th' => T_('Resp Code'),
+			'th' => T_('HTTP resp'),
 			'order' => 'hit_response_code, hit_ID',
 			'td' => '$hit_response_code$',
 			'td_class' => '%hit_response_code_class( #hit_response_code# )% shrinkwrap compact_data'
@@ -190,6 +190,13 @@ function hits_results( & $Results, $params = array() )
 			'th' => T_('Remote IP'),
 			'order' => 'hit_remote_addr, hit_ID',
 			'td' => '%disp_clickable_log_IP( #hit_remote_addr# )%',
+			'td_class' => 'compact_data'
+		);
+
+	$Results->cols[] = array(
+			'th' => T_('Agent Name'),
+			'order' => 'hit_agent_ID',
+			'td' => '%get_hit_agent_name_by_ID( #hit_agent_ID# )%',
 			'td_class' => 'compact_data'
 		);
 }
@@ -208,39 +215,57 @@ function filter_hits( & $Form )
 	global $hit_type_color, $hit_type_array;
 	global $datestart, $datestop;
 	global $preset_referer_type, $preset_agent_type;
+	global $DB, $blog;
 
-	$Form->checkbox_basic_input( 'exclude', get_param('exclude'), T_('Exclude').' &mdash; ' );
-	$Form->text_input( 'sess_ID', get_param('sess_ID'), 15, T_('Session ID'), '', array( 'maxlength'=>20 ) );
-	$Form->text_input( 'remote_IP', get_param('remote_IP'), 15, T_('Remote IP'), '', array( 'maxlength'=>23 ) );
+	$Form->checkbox_basic_input( 'exclude', get_param( 'exclude' ), T_( 'Exclude' ).' &mdash; ' );
+	$Form->text_input( 'sess_ID', get_param( 'sess_ID' ), 15, T_( 'Session ID' ), '', array( 'maxlength' => 20 ) );
+	$Form->text_input( 'remote_IP', get_param( 'remote_IP' ), 15, T_( 'Remote IP' ), '', array( 'maxlength' => 23 ) );
 
-	$Form->date_input( 'datestartinput', $datestart, T_('From date') );
-	$Form->date_input( 'datestopinput', $datestop, T_('To date') );
+	$Form->date_input( 'datestartinput', $datestart, T_( 'From date' ) );
+	$Form->date_input( 'datestopinput', $datestop, T_( 'To date' ) );
 	
 	if( !isset( $preset_agent_type ) )
 	{
-		$Form->select_input_array( 'agent_type', get_param('agent_type'), $agent_type_array, 'Agent type', '', array('force_keys_as_values' => true, 'background_color' => $agent_type_color) );
+		$Form->select_input_array( 'agent_type', get_param( 'agent_type' ), $agent_type_array, T_( 'Agent type' ), '', array( 'force_keys_as_values' => true, 'background_color' => $agent_type_color ) );
 	}
 
 	$devices_array = array_keys( $user_devices );
 	$devices_array = array_merge(
-			array( '0' => T_('All') ),
+			array( '0' => T_( 'All' ) ),
 			array_combine( $devices_array, $devices_array ),
-			array( 'other' => T_('Other') )
+			array( 'other' => T_( 'Other' ) )
 		);
-	$Form->select_input_array( 'device', get_param('device'), $devices_array , 'Device', '', array('force_keys_as_values' => true, 'background_color' => $user_devices_color) );
+	$Form->select_input_array( 'device', get_param( 'device' ), $devices_array , T_( 'Device' ), '', array( 'force_keys_as_values' => true, 'background_color' => $user_devices_color ) );
 
 	if( !isset( $preset_referer_type ) )
 	{
-		$Form->select_input_array( 'referer_type', get_param('referer_type'), $referer_type_array, 'Referer type', '', array('force_keys_as_values' => true, 'background_color' => $referer_type_color) );
+		$Form->select_input_array( 'referer_type', get_param( 'referer_type' ), $referer_type_array, T_( 'Referer type' ), '', array( 'force_keys_as_values' => true, 'background_color' => $referer_type_color ) );
 	}
-	$Form->select_input_array( 'hit_type', get_param('hit_type'), $hit_type_array, 'Hit type', '', array('force_keys_as_values' => true, 'background_color' => $hit_type_color) );
+	$Form->select_input_array( 'hit_type', get_param( 'hit_type' ), $hit_type_array, T_( 'Hit type' ), '', array( 'force_keys_as_values' => true, 'background_color' => $hit_type_color ) );
 
-	$Form->text_input( 'reqURI', get_param('reqURI'), 15, T_('Requested URI'), '', array( 'maxlength'=>250 ) );
+	$Form->text_input( 'reqURI', get_param( 'reqURI' ), 15, T_( 'Requested URI' ), '', array( 'maxlength' => 250 ) );
+
+	// Get the response codes that are used in b2evolution
+	$resp_codes = array(
+			'0' => T_( 'All' ),
+			'200' => '200',
+			'301' => '301',
+			'302' => '302',
+			'303' => '303',
+			'304' => '304',
+			'400' => '400',
+			'403' => '403',
+			'404' => '404',
+			'410' => '410',
+			'500' => '500'
+		);
+	$Form->select_input_array( 'resp_code', get_param( 'resp_code' ), $resp_codes, T_( 'HTTP resp' ), '', array( 'force_keys_as_values' => true ) );
 }
 
 
 /**
  * Helper function for "Requested URI" column
+ *
  * @param integer Blog ID
  * @param string Requested URI
  * @param integer Output string lenght
@@ -248,12 +273,12 @@ function filter_hits( & $Form )
  * @param string Controller
  * @return string
  */
-function stats_format_req_URI( $hit_blog_ID, $hit_uri, $max_len = 40, $hit_disp = NULL, $hit_ctrl = NULL, $hit_action = NULL)
+function stats_format_req_URI( $hit_coll_ID, $hit_uri, $max_len = 40, $hit_disp = NULL, $hit_ctrl = NULL, $hit_action = NULL)
 {
-	if( !empty( $hit_blog_ID ) )
+	if( ! empty( $hit_coll_ID ) )
 	{
 		$BlogCache = & get_BlogCache();
-		$tmp_Blog = & $BlogCache->get_by_ID( $hit_blog_ID );
+		$tmp_Blog = & $BlogCache->get_by_ID( $hit_coll_ID );
 		$full_url = $tmp_Blog->get_baseurl_root().$hit_uri;
 	}
 	else
@@ -264,9 +289,9 @@ function stats_format_req_URI( $hit_blog_ID, $hit_uri, $max_len = 40, $hit_disp 
 	$int_search_uri = urldecode($hit_uri);
 	if( ( evo_strpos( $int_search_uri , '?s=' ) !== false )
 	 || ( evo_strpos( $int_search_uri , '&s=' ) !== false ) )
-	{	// This is an internal search:
+	{ // This is an internal search:
 		preg_match( '~[?&]s=([^&#]*)~', $int_search_uri, $res );
-		$hit_uri = 'Internal search : '.$res[1];
+		$hit_uri = sprintf( T_( 'Internal search: %s' ), $res[1] );
 	}
 	elseif( evo_strlen($hit_uri) > $max_len )
 	{
@@ -276,20 +301,18 @@ function stats_format_req_URI( $hit_blog_ID, $hit_uri, $max_len = 40, $hit_disp 
 	if( $hit_disp != NULL || $hit_ctrl != NULL || $hit_action != NULL)
 	{
 		$hit_uri = '';
-
-		if($hit_disp != NULL)
+		if( $hit_disp != NULL )
 		{
-			$hit_uri = '[disp=<a href="'.$full_url.'">'.$hit_disp.'</a>]';
+			$hit_uri .= '[disp=<a href="'.$full_url.'">'.$hit_disp.'</a>]';
 		}
-		if($hit_ctrl != NULL)
+		if( $hit_ctrl != NULL )
 		{
-			$hit_uri =$hit_uri.' [ctrl=<a href="'.$full_url.'">'.$hit_ctrl.'</a>]';
+			$hit_uri .= ' [ctrl=<a href="'.$full_url.'">'.$hit_ctrl.'</a>]';
 		}
-		if($hit_action != NULL)
+		if( $hit_action != NULL )
 		{
-			$hit_uri =$hit_uri.' [action=<a href="'.$full_url.'">'.$hit_action.'</a>]';
+			$hit_uri .= ' [action=<a href="'.$full_url.'">'.$hit_action.'</a>]';
 		}
-
 
 		return $hit_uri;
 	}
@@ -348,9 +371,8 @@ function disp_clickable_log_IP( $hit_remote_addr )
 	}
 	else
 	{
-		return "$hit_remote_addr";
+		return $hit_remote_addr;
 	}
-
 }
 
 
@@ -364,13 +386,12 @@ function disp_color_referer( $hit_referer_type )
 	global $referer_type_color;
 	if(!empty ($referer_type_color[$hit_referer_type]))
 	{
-		return '<span style="background-color: #'.$referer_type_color[$hit_referer_type].'" >'.$hit_referer_type.'</span>';
+		return '<span style="background-color: #'.$referer_type_color[$hit_referer_type].'">'.$hit_referer_type.'</span>';
 	}
 	else
 	{
-		return "$hit_referer_type";
+		return $hit_referer_type;
 	}
-
 }
 
 /**
@@ -383,17 +404,17 @@ function disp_color_agent( $hit_agent_type )
 	global $agent_type_color;
 	if(!empty ($agent_type_color[$hit_agent_type]))
 	{
-		return '<span style="background-color: #'.$agent_type_color[$hit_agent_type].'" >'.$hit_agent_type.'</span>';
+		return '<span style="background-color: #'.$agent_type_color[$hit_agent_type].'">'.$hit_agent_type.'</span>';
 	}
 	else
 	{
-		return "$hit_agent_type";
+		return $hit_agent_type;
 	}
-
 }
 
 /**
  * Generate html response code class
+ *
  * @param integer response code
  * @return string class
  */
@@ -427,11 +448,12 @@ function hit_response_code_class($hit_response_code)
 
 
 /**
- * Generate color
+ * Generate color for hit type
+ *
  * @param string hit_type
  * @return string color in hex format #FFFFFF
  */
-function hit_type_color($hit_type)
+function hit_type_color( $hit_type )
 {
 	global $hit_type_color;
 	$color = '#FFFFFF';
@@ -446,11 +468,12 @@ function hit_type_color($hit_type)
 
 
 /**
- * Generate color
+ * Generate color for hit agent type
+ *
  * @param string hit_agent_type
  * @return string color in hex format #FFFFFF
  */
-function hit_agent_type_color($hit_agent_type)
+function hit_agent_type_color( $hit_agent_type )
 {
 	global $agent_type_color;
 	$color = '#FFFFFF';
@@ -465,7 +488,8 @@ function hit_agent_type_color($hit_agent_type)
 
 
 /**
- * Generate color
+ * Generate color for hit device
+ *
  * @param string hit_device
  * @return string color in hex format #FFFFFF
  */
@@ -484,20 +508,110 @@ function hit_device_color( $hit_device )
 
 
 /**
- * Generate color
+ * Generate color for hit referer type
+ *
  * @param string hit_referer_type
  * @return string color in hex format #FFFFFF
  */
-function hit_referer_type_color($hit_referer_type)
+function hit_referer_type_color( $hit_referer_type )
 {
 	global $referer_type_color;
 	$color = '#FFFFFF';
 
-	if( ! empty ( $referer_type_color[$hit_referer_type] ) )
+	if( ! empty ( $referer_type_color[ $hit_referer_type ] ) )
 	{
-		$color ='#'.$referer_type_color[$hit_referer_type];
+		$color ='#'.$referer_type_color[ $hit_referer_type ];
 	}
 
 	return $color;
+}
+
+
+/**
+ * Get status code of IP range by IP address
+ *
+ * @param string IP address in format xxx.xxx.xxx.xxx
+ * @return string Status value as it is stored in DB
+ */
+function hit_iprange_status( $IP_address )
+{
+	global $DB, $hit_iprange_statuses_cache;
+
+	$IP_address = ip2int( $IP_address );
+
+	if( ! is_array( $hit_iprange_statuses_cache ) )
+	{ // Initialize it only first time
+		$SQL = new SQL();
+		$SQL->SELECT( 'aipr_status AS status, aipr_IPv4start AS start, aipr_IPv4end AS end' );
+		$SQL->FROM( 'T_antispam__iprange' );
+		$hit_iprange_statuses_cache = $DB->get_results( $SQL->get() );
+	}
+
+	// Use this empty value for IPs without detected ranges in DB
+	$ip_range_status = '';
+
+	// Find status in the cache
+	foreach( $hit_iprange_statuses_cache as $hit_iprange_status )
+	{
+		if( $IP_address >= $hit_iprange_status->start &&
+		    $IP_address <= $hit_iprange_status->end )
+		{ // IP is detected in this range
+			$ip_range_status = $hit_iprange_status->status;
+			break;
+		}
+	}
+
+	return $ip_range_status;
+}
+
+
+/**
+ * Get status title of IP range by IP address
+ *
+ * @param string IP address in format xxx.xxx.xxx.xxx
+ * @return string Status title
+ */
+function hit_iprange_status_title( $IP_address )
+{
+	global $current_User;
+
+	// Get status code of IP range by IP address
+	$ip_range_status = hit_iprange_status( $IP_address );
+
+	if( $ip_range_status === '' )
+	{ // No IP range for this IP address
+		return '';
+	}
+
+	if( $current_User->check_perm( 'spamblacklist', 'view' ) )
+	{ // Current user has access to view IP ranges
+		global $admin_url, $blog;
+		$blog_param = empty( $blog ) ? '' : '&amp;blog=1';
+		return '<a href="'.$admin_url.'?ctrl=antispam&amp;tab=stats&amp;tab3=ipranges&amp;ip_address='.$IP_address.$blog_param.'">'.aipr_status_title( $ip_range_status ).'</a>';
+	}
+	else
+	{ // No view access, Display only the status
+		return aipr_status_title( $ip_range_status );
+	}
+}
+
+
+/**
+ * Get status color of IP range by IP address
+ *
+ * @param string IP address in format xxx.xxx.xxx.xxx
+ * @return string Status color
+ */
+function hit_iprange_status_color( $IP_address )
+{
+	// Get status code of IP range by IP address
+	$ip_range_status = hit_iprange_status( $IP_address );
+
+	if( $ip_range_status === '' )
+	{ // No IP range for this IP address
+		return '';
+	}
+
+	return aipr_status_color( $ip_range_status );
 }
 ?>

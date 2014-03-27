@@ -33,6 +33,12 @@ skin_include( '_html_header.inc.php' );
 // Note: You can customize the default HTML header by copying the generic
 // /skins/_html_header.inc.php file into the current skin folder.
 // -------------------------------- END OF HEADER --------------------------------
+
+
+// ---------------------------- SITE HEADER INCLUDED HERE ----------------------------
+// If site headers are enabled, they will be included here:
+siteskin_include( '_site_body_header.inc.php' );
+// ------------------------------- END OF SITE HEADER --------------------------------
 ?>
 
 
@@ -296,8 +302,8 @@ skin_include( '_html_header.inc.php' );
 
 		<?php
 			// Display additional credits:
- 			// If you can add your own credits without removing the defaults, you'll be very cool :))
-		 	// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
+			// If you can add your own credits without removing the defaults, you'll be very cool :))
+			// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
 			credits( array(
 					'list_start'  => '&bull;',
 					'list_end'    => ' ',
@@ -312,6 +318,12 @@ skin_include( '_html_header.inc.php' );
 
 
 <?php
+// ---------------------------- SITE FOOTER INCLUDED HERE ----------------------------
+// If site footers are enabled, they will be included here:
+siteskin_include( '_site_body_footer.inc.php' );
+// ------------------------------- END OF SITE FOOTER --------------------------------
+
+
 // ------------------------- HTML FOOTER INCLUDED HERE --------------------------
 skin_include( '_html_footer.inc.php' );
 // Note: You can customize the default HTML footer by copying the

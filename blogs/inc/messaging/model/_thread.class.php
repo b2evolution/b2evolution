@@ -3,7 +3,7 @@
  * This file is part of b2evolution - {@link http://b2evolution.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2014 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -257,9 +257,11 @@ class Thread extends DataObject
 		$closed_recipients_list = array();
 		$status_restricted_recipients = array();
 		$recipients_without_perm = array();
+		$recipients_from_different_country = array();
 		$recipients_restricted_pm = array();
 		// check if recipient user enable private messages only if sender user doesn't have 'delete' messaging permission
 		$check_enable_pm = !$current_User->check_perm( 'perm_messaging', 'delete' );
+		$cross_country_restrict = has_cross_country_restriction( 'contact' );
 		foreach( $recipients_list as $recipient )
 		{
 			$recipient_User = $UserCache->get_by_login( $recipient, false );
@@ -284,6 +286,12 @@ class Thread extends DataObject
 			if( !$recipient_User->check_perm( 'perm_messaging', 'reply' ) )
 			{ // user doesn't have permission to read private messages
 				$recipients_without_perm[] = $recipient;
+				continue;
+			}
+
+			if( $cross_country_restrict && $current_User->ctry_ID != $recipient_User->ctry_ID )
+			{ // user can contact with other users only from the same coutnry, but this recipient country is different
+				$recipients_from_different_country[] = $recipient;
 				continue;
 			}
 
@@ -334,6 +342,15 @@ class Thread extends DataObject
 				$error_msg .= '<br />';
 			}
 			$error_msg .= sprintf( 'The following users have no permission to read private messages: %s', implode( ', ', $recipients_without_perm ) );
+		}
+
+		if( count( $recipients_from_different_country ) > 0 )
+		{
+			if ( ! empty( $error_msg ) )
+			{
+				$error_msg .= '<br />';
+			}
+			$error_msg .= sprintf( 'You are not allowed to contact with the following users: %s', implode( ', ', $recipients_from_different_country ) );
 		}
 
 		$restricted_pm_count = count( $recipients_restricted_pm );

@@ -6,12 +6,15 @@
 <IfModule mod_php5.c>
 	# On some overly "secured" systems, the following may need to be added in each folder:
 	# AddHandler application/x-httpd-php5 .php
-	
+
 	# The following will try to configure PHP in the way b2evolution would like it to be:
 	php_flag register_globals Off
+	# You may want to turn the following to Off on production servers
+	# Please do this only if you know what you're doing and will be able to retrieve potential errors from your error log
 	php_flag display_errors On
-	php_value error_reporting E_ALL
-	
+	# The following is the same as 'E_ALL & ~ E_STRICT' (except those constants may not be available here)
+	php_value error_reporting 30719
+
 	# You may also need some of the following:
 	# Increase memory limit
 	# php_value memory_limit 256M

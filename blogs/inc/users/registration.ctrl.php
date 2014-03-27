@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2014 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -52,6 +52,7 @@ switch ( $action )
 
 		// UPDATE general settings:
 		param( 'newusers_canregister', 'integer', 0 );
+		param( 'registration_is_public', 'integer', 0 );
 		param( 'newusers_grp_ID', 'integer', true );
 
 		param_integer_range( 'newusers_level', 0, 9, T_('User level must be between %d and %d.') );
@@ -122,6 +123,7 @@ switch ( $action )
 
 		$Settings->set_array( array(
 					 array( 'newusers_canregister', $newusers_canregister ),
+					 array( 'registration_is_public', $registration_is_public ),
 					 array( 'newusers_grp_ID', $newusers_grp_ID ),
 					 array( 'newusers_level', $newusers_level ),
 					 array( 'def_enable_PM', $enable_PM ),

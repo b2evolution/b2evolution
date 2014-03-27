@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -462,10 +462,10 @@ $UserList->filter_area = array(
 $UserList->display( $display_params );
 
 
-if( $current_User->check_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
-{	// Newsletter button
+if( $current_User->check_perm( 'emails', 'edit' ) && $UserList->result_num_rows > 0 )
+{ // Newsletter button
 	echo '<p class="center">';
-	echo '<input type="button" value="'.T_('Send newsletter to the current selection').'" onclick="location.href=\''.$admin_url.'?ctrl=newsletter\'" />';
+	echo '<input type="button" value="'.T_('Send newsletter to the current selection').'" onclick="location.href=\''.$admin_url.'?ctrl=campaigns&amp;action=users&amp;'.url_crumb( 'campaign' ).'\'" />';
 	echo '</p>';
 }
 

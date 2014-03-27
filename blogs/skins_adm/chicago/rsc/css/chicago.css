@@ -27,10 +27,6 @@ select, option, optgroup {
 	background: #fff url(../img/foot24.png) repeat-x bottom;
 	padding-top: 10px;
 }
-#upload_wrapper {
-	background: #fff url(../img/foot24.png) repeat-x bottom;
-	padding-top: 1px;
-}
 
 /*
  * General styles
@@ -308,6 +304,7 @@ input.SearchField {
 	-moz-box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
 	-webkit-box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
 	box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
+	max-width: 100%;
 }
 input.field_error,
 select.field_error,
@@ -432,6 +429,12 @@ table.filelist tr.even:hover,
 table.filelist tr.odd:hover {
 	background-color: #DBE5ED;
 }
+table.grouped.nohover tr.even:hover {
+	background-color:#fff;
+}
+table.grouped.nohover tr.odd:hover {
+	background-color:#f1f6f8;
+}
 ul.grouped li,
 table.grouped td,
 table.filelist td {
@@ -542,6 +545,7 @@ div.edit_actions input.SaveButton:hover {
 	margin: 0;
 	padding: 8px 8px 4px 8px;
 	border-bottom: 1px solid #9DB0BC;
+	min-height: 64px;
 }
 .dashboard_post_even {
 	background-color: #f1f6f8;
@@ -737,10 +741,8 @@ div.bCommentdraft span.bStatus,
 	background-color: #ff9;
 }
 
-#comments_block .status_community,
-#comments_block .status_protected,
-#comments_block .status_draft,
-#comments_block .status_review {
+#comments_container span[class*=status_],
+.items_container span[class*=status_] {
 	top: -8px !important;
 	left: 8px !important;
 }
@@ -1029,9 +1031,6 @@ div.edit_actions {
 #fm_files {
 	border-color: #9db0bc;
 	background-color: #E0E9F0;
-}
-.toolbaritem  {
-	padding: 4px 0;
 }
 
 div.upload_title {

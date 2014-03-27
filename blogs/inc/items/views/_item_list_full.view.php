@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -161,14 +161,11 @@ while( $Item = & $ItemList->get_item() )
 					echo '&nbsp;'.action_icon( T_('Edit slugs...'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID,
 						NULL, NULL, NULL, array( 'class' => 'small' ) );
 				}
-				echo '<div class="bViews">';
-				$Item->views();
-				echo '</div>';
 				If( !empty( $Item->order ) )
 				{
 					echo T_('Order').': '.$Item->order;
 				}
-				$Item->locale_flag(array('class'=>'flagtop'));
+				$Item->locale_flag( array(' class' => 'flagtop' ) );
 				echo '</div>';
 
 				$Item->issue_date( array(
@@ -185,6 +182,8 @@ while( $Item = & $ItemList->get_item() )
 				// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 				echo ' ', T_('by'), ' ', $Item->creator_User->get_identity_link( array( 'link_text' => 'text' ) );
 
+				echo $Item->get_history_link( array( 'before' => ' ' ) );
+
 				echo '<br />';
 				$Item->type( T_('Type').': <span class="bType">', '</span> &nbsp; ' );
 
@@ -192,7 +191,13 @@ while( $Item = & $ItemList->get_item() )
 				{ // Only display workflow properties, if activated for this blog.
 					$Item->priority( T_('Priority').': <span class="bPriority">', '</span> &nbsp; ' );
 					$Item->assigned_to( T_('Assigned to').': <span class="bAssignee">', '</span> &nbsp; ' );
-					$Item->extra_status( T_('Task Status').': <span class="bExtStatus">', '</span>' );
+					$Item->extra_status( T_('Task Status').': <span class="bExtStatus">', '</span> &nbsp; ' );
+					if( ! empty( $Item->datedeadline ) )
+					{ // Display deadline date
+						echo T_('Deadline').': <span class="bDate">';
+						$Item->deadline_date();
+						echo '</span>';
+					}
 				}
 				echo '&nbsp;';
 
@@ -231,13 +236,6 @@ while( $Item = & $ItemList->get_item() )
 
 			<div class="bText">
 				<?php
-					// Uncomment this if you want to count views in backoffice:
-					/*
-					$Item->count_view( array(
-							'allow_multiple_counts_per_page' => false,
-						) );
-					*/
-
 					// Display CONTENT:
 					$Item->content_teaser( array(
 							'before'              => '',
@@ -488,7 +486,7 @@ while( $Item = & $ItemList->get_item() )
 			$Form->begin_form( 'bComment' );
 
 			$Form->add_crumb( 'comment' );
-			$Form->hidden( 'comment_post_ID', $Item->ID );
+			$Form->hidden( 'comment_item_ID', $Item->ID );
 			$Form->hidden( 'redirect_to', $ReqURI );
 			?>
 				<fieldset>

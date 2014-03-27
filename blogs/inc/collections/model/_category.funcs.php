@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2004 by The University of North Carolina at Charlotte as
  * contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
@@ -257,7 +257,7 @@ function get_postcount_in_category( $cat_ID, $blog_ID = NULL )
 		$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $blog_ID ) );
 		// fp> TODO: the following probably needs to be ALL except $posttypes_specialtypes
 		$SQL->WHERE_and( 'post_ptyp_ID IN ( '.$DB->quote( array( 1, 2000 ) ).' )' );
-		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses(), 'post_', $blog_ID, 'blog_post!', true ) );
+		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $blog_ID, 'post' ), 'post_', $blog_ID, 'blog_post!', true ) );
 		$SQL->GROUP_BY( 'cat_ID' );
 		$number_of_posts_in_cat[ (string) $blog_ID ] = $DB->get_assoc( $SQL->get() );
 	}
@@ -287,13 +287,13 @@ function get_commentcount_in_category( $cat_ID, $blog_ID = NULL )
 		$SQL = new SQL();
 		$SQL->SELECT( 'cat_ID, COUNT( comment_ID ) c' );
 		$SQL->FROM( 'T_comments' );
-		$SQL->FROM_add( 'LEFT JOIN T_postcats ON comment_post_ID = postcat_post_ID' );
+		$SQL->FROM_add( 'LEFT JOIN T_postcats ON comment_item_ID = postcat_post_ID' );
 		$SQL->FROM_add( 'LEFT JOIN T_categories ON postcat_cat_ID = cat_id' );
-		$SQL->FROM_add( 'LEFT JOIN T_items__item ON comment_post_ID = post_id' );
+		$SQL->FROM_add( 'LEFT JOIN T_items__item ON comment_item_ID = post_id' );
 		$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $blog_ID ) );
-		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses(), 'comment_', $blog_ID, 'blog_comment!', true ) );
+		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $blog_ID, 'comment' ), 'comment_', $blog_ID, 'blog_comment!', true ) );
 		// add where condition to show only those posts commetns which are visible for the current User
-		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses(), 'post_', $blog_ID, 'blog_post!', true ) );
+		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $blog_ID, 'post' ), 'post_', $blog_ID, 'blog_post!', true ) );
 		$SQL->GROUP_BY( 'cat_ID' );
 
 		$number_of_comments_in_cat[(string) $blog_ID] = $DB->get_assoc( $SQL->get() );

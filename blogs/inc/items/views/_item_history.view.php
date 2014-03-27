@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -56,17 +56,17 @@ $SQL->WHERE( 'iver_itm_ID = ' . $edited_Item->ID );
 // UNION
 // SELECT "'.$edited_Item->datecreated.'" AS iver_edit_datetime, "'.$edited_Item->creator_user_ID.'" AS user_login, "First version" AS action';
 
-$CountSQL = new SQL();
-$CountSQL->SELECT( 'COUNT(*)+1' );
-$CountSQL->FROM( 'T_items__version' );
-$CountSQL->WHERE( $SQL->get_where( '' ) );
+$count_SQL = new SQL();
+$count_SQL->SELECT( 'COUNT(*)+1' );
+$count_SQL->FROM( 'T_items__version' );
+$count_SQL->WHERE( $SQL->get_where( '' ) );
 
-$revisions_count = $DB->get_var( $CountSQL->get() );
+$revisions_count = $DB->get_var( $count_SQL->get() );
 
 $default_order = $revisions_count > 1 ? '---D' : '-D';
 
 // Create result set:
-$Results = new Results( $sql_current_version . ' UNION ' . $SQL->get(), 'iver_', $default_order, NULL, $CountSQL->get() );
+$Results = new Results( $sql_current_version . ' UNION ' . $SQL->get(), 'iver_', $default_order, NULL, $count_SQL->get() );
 
 $Results->title = T_('Item history (experimental) for:').' '.$edited_Item->get_title();
 
@@ -213,11 +213,11 @@ $Results->cols[] = array(
 						'td_class' => 'shrinkwrap',
 					);
 
-$Form = new Form();
+$Form = new Form( NULL, '', 'get' );
 
-$Form->add_crumb( 'item' );
 $Form->hidden_ctrl();
 $Form->hidden( 'p', get_param( 'p' ) );
+$Form->hidden( 'action', 'history_compare' );
 
 $Form->begin_form();
 
@@ -229,7 +229,7 @@ $Form->buttonsend = '';
 $buttons = array();
 if( $revisions_count > 1 )
 {	// Button to compare the revisions
-	$buttons = array( array( 'submit', 'actionArray[history_compare]', T_('Compare selected revisions'), 'SaveButton' ) );
+	$buttons = array( array( 'submit', '', T_('Compare selected revisions'), 'SaveButton' ) );
 	echo get_icon( 'multi_action', 'imgtag', array( 'style' => 'margin-left:18px;position:relative;top:-5px;') );
 }
 $Form->end_form( $buttons );

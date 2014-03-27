@@ -7,7 +7,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2012-2013 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2012-2014 by Francois PLANQUE - {@link http://fplanque.net/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -39,7 +39,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class captcha_qstn_plugin extends Plugin
 {
-	//var $help_url = 'http://b2evolution.net/man/captcha_qstn';
 	var $version = '5.0.0';
 	var $group = 'antispam';
 	var $code = 'captcha_qstn';
@@ -149,7 +148,7 @@ class captcha_qstn_plugin extends Plugin
 	 */
 	function PluginSettingsUpdateAction()
 	{
-		global $DB;
+		global $DB, $Messages;
 
 		// Store in this array all questions IDs which are inserted or updated on currect action
 		$questions_IDs = array( -1 );
@@ -157,48 +156,84 @@ class captcha_qstn_plugin extends Plugin
 		$questions_formated = array();
 
 		$questions = $this->Settings->get( 'questions' );
+		if( empty( $questions ) )
+		{ // No questions
+			// Delete all questions from DB:
+			$DB->query( 'DELETE FROM '.$this->get_sql_table( 'questions' ) );
+			return true;
+		}
+
 		$questions = explode( "\n", str_replace( "\r\n", "\n", $questions ) );
 
+		$insert_data = array();
+		$update_data = array();
 		foreach( $questions as $question )
 		{
 			if( preg_match( '/(.+\?)(.+)/i', $question, $match ) )
-			{	// Check a question for correct format
+			{ // Check a question for correct format
 				$question = trim( $match[1] );
 				$answers = trim( $match[2] );
 				if( !empty( $question ) && !empty( $answers ) )
-				{	// Save this question in DB
+				{ // Save this question in DB
 					$SQL = new SQL();
 					$SQL->SELECT( 'cptq_ID' );
 					$SQL->FROM( $this->get_sql_table( 'questions' ) );
 					$SQL->WHERE( 'cptq_question = '.$DB->quote( $question ) );
 
 					if( $question_ID = $DB->get_var( $SQL->get() ) )
-					{	// This question already exists, we should only update the answers
-						$DB->query( 'UPDATE '.$this->get_sql_table( 'questions' ).'
-							  SET cptq_answers = '.$DB->quote( $answers ).'
-							WHERE cptq_ID = '.$question_ID );
-						$questions_IDs[] = $question_ID;
+					{ // This question already exists, we should only update the answers
+						$update_data[ $question_ID ] = $answers;
 					}
 					else
-					{	// Insert new question
-						$DB->query( 'INSERT INTO '.$this->get_sql_table( 'questions' ).'
-							( cptq_question, cptq_answers ) VALUES
-							( '.$DB->quote( $question ).', '.$DB->quote( $answers ).' )' );
-						$questions_IDs[] = $DB->insert_id;
+					{ // New question
+						$insert_data[] = '( '.$DB->quote( $question ).', '.$DB->quote( $answers ).' )';
 					}
 
 					$questions_formated[] = $question.' '.$answers;
 				}
 			}
+			elseif( ! empty( $question ) )
+			{ // Incorrect format of question
+				$Messages->add( sprintf( T_('Invalid question format in the line %s.'), '"<b>'.$question.'</b>"' ), 'error' );
+			}
 		}
 
-		// Delete the old questions from DB
-		$DB->query( 'DELETE FROM '.$this->get_sql_table( 'questions' ).'
-			WHERE cptq_ID NOT IN ( '.implode( ', ', $questions_IDs ).' )' );
+		if( param_errors_detected() )
+		{ // Don't save the changes on errors
+			return false;
+		}
+		else
+		{ // Save the changes on success
+			if( count( $insert_data ) )
+			{ // Insert new questions in DB:
+				foreach( $insert_data as $qstn_data )
+				{
+					$DB->query( 'INSERT INTO '.$this->get_sql_table( 'questions' ).'
+						( cptq_question, cptq_answers ) VALUES '.$qstn_data );
+					$questions_IDs[] = $DB->insert_id;
+				}
+			}
 
-		// Resave the questions in order to delere all whitespaces and questions with incorrect format
-		$this->Settings->set( 'questions', implode( "\r\n", $questions_formated ) );
-		$this->Settings->dbupdate();
+			if( count( $update_data ) )
+			{ // Update the questions in DB:
+				foreach( $update_data as $qstn_ID => $qstn_answers )
+				{
+					$DB->query( 'UPDATE '.$this->get_sql_table( 'questions' ).'
+						  SET cptq_answers = '.$DB->quote( $qstn_answers ).'
+						WHERE cptq_ID = '.$qstn_ID );
+					$questions_IDs[] = $qstn_ID;
+				}
+			}
+
+			// Delete the old questions from DB:
+			$DB->query( 'DELETE FROM '.$this->get_sql_table( 'questions' ).'
+				WHERE cptq_ID NOT IN ( '.implode( ', ', $questions_IDs ).' )' );
+
+			// Resave the questions in order to delere all whitespaces and questions with incorrect format
+			$this->Settings->set( 'questions', implode( "\r\n", $questions_formated ) );
+
+			return true;
+		}
 	}
 
 

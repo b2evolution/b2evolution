@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -93,6 +93,7 @@ class UserSettings extends AbstractSettings
 		'notify_activated_account' => 1, // Notify admin user when an account has been activated by email
 		'notify_closed_account' => 1, // Notify admin user when an account has been closed by the account owner
 		'notify_reported_account' => 1, // Notify admin user when an account has been reported by another user
+		'notify_changed_account' => 1, // Notify admin user when an account has been changed
 		'notify_cronjob_error' => 1, // Notify admin user when a scheduled task ends with an error or timeout
 
 		'account_close_ts' => NULL, // It will be the date when the account was closed. Until the account is not closed this will be NULL.
@@ -274,6 +275,10 @@ class UserSettings extends AbstractSettings
 			if( is_null($value) )
 			{ // it's not saved yet and there's not default defined ($_defaults)
 				$value = $default;
+			}
+			if( $memorize )
+			{ // Memorize param
+				memorize_param( $param_name, $type, $default, $value );
 			}
 		}
 

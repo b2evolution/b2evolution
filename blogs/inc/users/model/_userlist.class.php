@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -148,6 +148,18 @@ class UserList extends DataObjectList2
 
 		// Page
 		$this->page = param( $this->page_param, 'integer', 1 );
+
+		// Country
+		if( has_cross_country_restriction() )
+		{ // In case of cross country restrionction we always have to set the ctry filter
+			// In this case we always have a logged in user
+			global $current_User;
+			if( ( ! empty( $current_User->ctry_ID ) ) && ( $current_User->ctry_ID != $this->filters['country'] ) )
+			{ // current country filter is not the same
+				$this->filters['country'] = $current_User->ctry_ID;
+				$this->refresh_query = true;
+			}
+		}
 
 		// asimo> memorize is always false for now, because is not fully implemented
 		if( $this->memorize )
@@ -392,6 +404,8 @@ class UserList extends DataObjectList2
 	 */
 	function query_init()
 	{
+		global $current_User;
+
 		if( empty( $this->filters ) )
 		{	// Filters have not been set before, we'll use the default filterset:
 			// If there is a preset filter, we need to activate its specific defaults:
@@ -417,6 +431,18 @@ class UserList extends DataObjectList2
 			$this->UserQuery->where_status( 'closed', $this->query_params['where_status_closed'] );
 		}
 
+		// If browse users from different countries is restricted, then always filter to the current User country
+		if( has_cross_country_restriction() )
+		{ // Browse users from different countries is restricted, filter to current user country
+			$ctry_filter = $current_User->ctry_ID;
+			// if country filtering was changed the qurey must be refreshed
+			$this->refresh_query = ( $this->refresh_query || ( $ctry_filter != $this->filters['country'] ) );
+		}
+		else
+		{ // Browse users from different countries is allowed
+			$ctry_filter = $this->filters['country'];
+		}
+
 		/*
 		 * filtering stuff:
 		 */
@@ -427,7 +453,7 @@ class UserList extends DataObjectList2
 		$this->UserQuery->where_reported( $this->filters['reported'] );
 		$this->UserQuery->where_custom_sender( $this->filters['custom_sender_email'], $this->filters['custom_sender_name'] );
 		$this->UserQuery->where_group( $this->filters['group'] );
-		$this->UserQuery->where_location( 'ctry', $this->filters['country'] );
+		$this->UserQuery->where_location( 'ctry', $ctry_filter );
 		$this->UserQuery->where_location( 'rgn', $this->filters['region'] );
 		$this->UserQuery->where_location( 'subrg', $this->filters['subregion'] );
 		$this->UserQuery->where_location( 'city', $this->filters['city'] );
@@ -596,6 +622,15 @@ class UserList extends DataObjectList2
 		 * @var User
 		 */
 		$prev_User = & $this->get_prevnext_User( $direction );
+		if( has_cross_country_restriction() )
+		{ // If current user has cross country restriction, make sure we display only users from the same country
+			// Note: This may happen only if the user list filter was saved and the cross country restriction was changed after that
+			global $current_User;
+			while( !empty( $prev_User ) && ( $current_User->ctry_ID !== $prev_User->ctry_ID ) )
+			{
+				$prev_User = & $this->get_prevnext_User( $direction, $prev_User->ID );
+			}
+		}
 
 		if( !empty( $prev_User ) )
 		{	// User exists in DB
@@ -662,9 +697,10 @@ class UserList extends DataObjectList2
 	/**
 	 * Skip to previous/next User
 	 *
+	 * @param integer the currently selected user ID ( Note: it must be set only if we would like to skip some users from the list )
 	 * @param string prev | next  (relative to the current sort order)
 	 */
-	function & get_prevnext_User( $direction = 'next' )
+	function & get_prevnext_User( $direction = 'next', $selected_user_ID = NULL )
 	{
 		$users_list = $this->filters['users'];
 
@@ -675,9 +711,12 @@ class UserList extends DataObjectList2
 		}
 
 		// ID of selected user
-		$user_ID = get_param( 'user_ID' );
+		if( $selected_user_ID === NULL )
+		{ // get currently selected user ID from param
+			$selected_user_ID = get_param( 'user_ID' );
+		}
 
-		$user_key = array_search( $user_ID, $users_list );
+		$user_key = array_search( $selected_user_ID, $users_list );
 		if( is_int( $user_key ) )
 		{	// Selected user is located in the list
 			$prevnext_key = $direction == 'next' ? $user_key + 1 : $user_key - 1;

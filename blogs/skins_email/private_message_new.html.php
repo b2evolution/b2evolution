@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @version $Id$
  */
@@ -54,7 +54,7 @@ echo "</p>\n";
 if( $recipient_User->check_perm( 'pm_notif', 'full' ) )
 {
 	echo '<div class="email_ugc">'."\n";
-	echo '<p>'.nl2br( htmlentities( $Message->get('text'), ENT_COMPAT, $evo_charset ) ).'</p>';
+	echo '<p>'.nl2br( evo_htmlentities( $Message->get('text'), ENT_COMPAT, $evo_charset ) ).'</p>';
 	echo "</div>\n";
 
 	// Buttons:

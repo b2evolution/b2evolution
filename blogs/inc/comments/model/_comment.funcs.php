@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -51,14 +51,14 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 		return 0;
 	}
 
-	$show_statuses = is_admin_page() ? get_visibility_statuses( 'keys', array( 'trash', 'redirected' ) ) : get_inskin_statuses();
+	$show_statuses = is_admin_page() ? get_visibility_statuses( 'keys', array( 'trash', 'redirected' ) ) : get_inskin_statuses( $blog, 'comment' );
 	$filter_index = $filter_by_perm ? 0 : 1;
 	if( !isset($cache_ctp_number) || !isset($cache_ctp_number[$filter_index][$post_id]) )
 	{ // we need a query to count comments
 		$count_SQL = new SQL();
-		$count_SQL->SELECT( 'comment_post_ID, comment_type, comment_status, COUNT(*) AS type_count' );
+		$count_SQL->SELECT( 'comment_item_ID, comment_type, comment_status, COUNT(*) AS type_count' );
 		$count_SQL->FROM( 'T_comments' );
-		$count_SQL->GROUP_BY( 'comment_post_ID, comment_type, comment_status' );
+		$count_SQL->GROUP_BY( 'comment_item_ID, comment_type, comment_status' );
 		if( !empty( $blog ) )
 		{
 			$count_SQL->WHERE( statuses_where_clause( $show_statuses, 'comment_', $blog, 'blog_comment!', $filter_by_perm ) );
@@ -66,7 +66,7 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 
 		if( !$count_expired )
 		{
-			$count_SQL->FROM_add( 'LEFT JOIN T_items__item_settings as expiry_setting ON comment_post_ID = iset_item_ID AND iset_name = "post_expiry_delay"' );
+			$count_SQL->FROM_add( 'LEFT JOIN T_items__item_settings as expiry_setting ON comment_item_ID = iset_item_ID AND iset_name = "post_expiry_delay"' );
 			$count_SQL->WHERE_and( 'expiry_setting.iset_value IS NULL OR expiry_setting.iset_value = "" OR TIMESTAMPDIFF(SECOND, comment_date, '.$DB->quote( date2mysql( $servertimenow ) ).') < expiry_setting.iset_value' );
 		}
 	}
@@ -96,21 +96,21 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 			}
 
 			$countall_SQL = $count_SQL;
-			$countall_SQL->WHERE_and( 'comment_post_ID IN ('.$postIDlist.')' );
+			$countall_SQL->WHERE_and( 'comment_item_ID IN ('.$postIDlist.')' );
 
 			foreach( $DB->get_results( $countall_SQL->get() ) as $row )
 			{
 				// detail by status, tyep and post:
-				$cache_ctp_number[$filter_index][$row->comment_post_ID][$row->comment_type.'s'][$row->comment_status] = $row->type_count;
+				$cache_ctp_number[$filter_index][$row->comment_item_ID][$row->comment_type.'s'][$row->comment_status] = $row->type_count;
 
 				// Total for type on post:
-				$cache_ctp_number[$filter_index][$row->comment_post_ID][$row->comment_type.'s']['total'] += $row->type_count;
+				$cache_ctp_number[$filter_index][$row->comment_item_ID][$row->comment_type.'s']['total'] += $row->type_count;
 
 				// Total for status on post:
-				$cache_ctp_number[$filter_index][$row->comment_post_ID]['feedbacks'][$row->comment_status] += $row->type_count;
+				$cache_ctp_number[$filter_index][$row->comment_item_ID]['feedbacks'][$row->comment_status] += $row->type_count;
 
 				// Total for post:
-				$cache_ctp_number[$filter_index][$row->comment_post_ID]['feedbacks']['total'] += $row->type_count;
+				$cache_ctp_number[$filter_index][$row->comment_item_ID]['feedbacks']['total'] += $row->type_count;
 			}
 		}
 	}
@@ -132,21 +132,21 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 				'feedbacks' => $statuses_array
 			);
 
-		$count_SQL->WHERE_and( 'comment_post_ID = '.intval($post_id) );
+		$count_SQL->WHERE_and( 'comment_item_ID = '.intval($post_id) );
 
 		foreach( $DB->get_results( $count_SQL->get() ) as $row )
 		{
 			// detail by status, type and post:
-			$cache_ctp_number[$filter_index][$row->comment_post_ID][$row->comment_type.'s'][$row->comment_status] = $row->type_count;
+			$cache_ctp_number[$filter_index][$row->comment_item_ID][$row->comment_type.'s'][$row->comment_status] = $row->type_count;
 
 			// Total for type on post:
-			$cache_ctp_number[$filter_index][$row->comment_post_ID][$row->comment_type.'s']['total'] += $row->type_count;
+			$cache_ctp_number[$filter_index][$row->comment_item_ID][$row->comment_type.'s']['total'] += $row->type_count;
 
 			// Total for status on post:
-			$cache_ctp_number[$filter_index][$row->comment_post_ID]['feedbacks'][$row->comment_status] += $row->type_count;
+			$cache_ctp_number[$filter_index][$row->comment_item_ID]['feedbacks'][$row->comment_status] += $row->type_count;
 
 			// Total for post:
-			$cache_ctp_number[$filter_index][$row->comment_post_ID]['feedbacks']['total'] += $row->type_count;
+			$cache_ctp_number[$filter_index][$row->comment_item_ID]['feedbacks']['total'] += $row->type_count;
 		}
 	}
 
@@ -285,7 +285,7 @@ function echo_comment_buttons( $Form, $edited_Comment )
 	global $Blog, $current_User, $highest_publish_status;
 
 	// ---------- SAVE ------------
-	$Form->submit( array( 'actionArray[update]', T_('Save!'), 'SaveButton' ) );
+	$Form->submit( array( 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) );
 
 	// ---------- PUBLISH ---------
 	list( $highest_publish_status, $publish_text ) = get_highest_publish_status( 'comment', $Blog->ID );
@@ -452,7 +452,7 @@ function get_opentrash_link( $check_perm = true, $force_show = false )
 		$SQL = new SQL( 'Get number of trash comments' );
 		$SQL->SELECT( 'COUNT( comment_ID )' );
 		$SQL->FROM( 'T_comments' );
-		$SQL->FROM_add( 'INNER JOIN T_items__item ON comment_post_ID = post_ID' );
+		$SQL->FROM_add( 'INNER JOIN T_items__item ON comment_item_ID = post_ID' );
 		$SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
 		$SQL->WHERE( 'comment_status = "trash"' );
 		if( isset( $blog ) )
@@ -544,7 +544,7 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	// else -> user is logged in and account was activated
 
 	$register_link = '';
-	if( ( !$is_logged_in ) && ( $Settings->get( 'newusers_canregister' ) ) )
+	if( ( !$is_logged_in ) && ( $Settings->get( 'newusers_canregister' ) ) && ( $Settings->get( 'registration_is_public' ) ) )
 	{
 		$register_link = '<p>'.sprintf( T_( 'If you have no account yet, you can <a href="%s">register now</a>...<br />(It only takes a few seconds!)' ), get_user_register_url( $item_url, 'reg to post comment' ) ).'</p>';
 	}
@@ -570,7 +570,7 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	echo $params['form_params']['fieldstart'];
 	echo $params['form_params']['labelstart'].$params['form_comment_text'].':'.$params['form_params']['labelend'];
 	echo $params['form_params']['inputstart'];
-	echo '<textarea id="p" class="bComment form_text_areainput" rows="5" name="p" cols="40" disabled="disabled">'.$disabled_text.'</textarea>';
+	echo '<textarea id="p" class="bComment form_textarea_input" rows="5" name="p" cols="40" disabled="disabled">'.$disabled_text.'</textarea>';
 	echo $params['form_params']['inputend'];
 	echo $params['form_params']['fieldend'];
 	echo $params['form_params']['fieldset_end'];
@@ -929,7 +929,7 @@ function check_comment_mass_delete( $CommentList )
 		return false;
 	}
 
-	if( $CommentList->total_rows == 0 )
+	if( $CommentList->get_total_rows() == 0 )
 	{	// No comments for current list
 		return false;
 	}
@@ -1042,6 +1042,132 @@ function comment_mass_delete_process( $mass_type, $deletable_comments_query )
 
 
 /**
+ * Delete the comments by keyword
+ *
+ * @param string SQL "where" clause
+ * @param array comment ids to delete - it should be set when the ids are known instead of the "where" clause
+ * @return mixed integer the number of the deleted comments on success, false on failure
+ */
+function comments_delete_where( $sql_where, $comment_ids = NULL )
+{
+	global $DB;
+
+	if( !empty( $sql_where ) )
+	{ // Get all comments that should be deleted
+		$comments_SQL = new SQL();
+		$comments_SQL->SELECT( 'comment_ID' );
+		$comments_SQL->FROM( 'T_comments' );
+		$comments_SQL->WHERE( $sql_where );
+		$delete_comment_ids = $comments_SQL->get();
+	}
+	elseif( !empty( $comment_ids ) )
+	{
+		$delete_comment_ids = implode( ', ', $comment_ids );
+		$sql_where = 'comment_ID IN ( '.$delete_comment_ids.' )';
+	}
+	else
+	{ // Delete condition was not set
+		return 0;
+	}
+
+	$DB->begin();
+
+	// Get the files of these comments
+	$files_SQL = new SQL();
+	$files_SQL->SELECT( 'link_file_ID' );
+	$files_SQL->FROM( 'T_links' );
+	$files_SQL->WHERE( 'link_cmt_ID IN ( '.$delete_comment_ids.' )' );
+	$files_IDs = $DB->get_col( $files_SQL->get() );
+
+	// Delete the comment data from the related tables
+	$temp_Comment = new Comment();
+	if( ! empty( $temp_Comment->delete_cascades ) )
+	{
+		foreach( $temp_Comment->delete_cascades as $cascade )
+		{
+			$DB->query( 'DELETE
+				 FROM '.$cascade['table'].'
+				WHERE '.$cascade['fk'].' IN ( '.$delete_comment_ids.' )',
+				'Delete the related records of the comments' );
+		}
+	}
+
+	if( count( $files_IDs ) )
+	{ // The deleted comments have some files, we can delete the files only if they are not used by other side
+		$used_files_SQL = new SQL();
+		$used_files_SQL->SELECT( 'link_file_ID' );
+		$used_files_SQL->FROM( 'T_links' );
+		$used_files_SQL->WHERE( 'link_file_ID IN ( '.implode( ', ', $files_IDs ).' )' );
+		$used_files_IDs = $DB->get_col( $used_files_SQL->get() );
+
+		$delete_folders = array();
+		$unused_files_IDs = array_diff( $files_IDs, $used_files_IDs );
+		if( count( $unused_files_IDs ) )
+		{
+			$FileCache = & get_FileCache();
+			$index = 0; // use this counter to load only a portion of files into the cache
+			foreach( $unused_files_IDs as $unused_file_ID )
+			{
+				if( ( $index % 100 ) == 0 )
+				{ // Clear the cache to save memory and load the next portion list of files
+					$FileCache->clear();
+					$FileCache->load_list( array_slice( $unused_files_IDs, $index, 100 ) );
+				}
+				$index++;
+				if( $comment_File = & $FileCache->get_by_ID( $unused_file_ID, false ) )
+				{ // Delete a file from disk and from DB
+					$rdfp_rel_path = $comment_File->get_rdfp_rel_path();
+					$folder_path = dirname( $comment_File->get_full_path() );
+					if( $comment_File->unlink( false ) &&
+						( preg_match( '/^(anonymous_)?comments\/p(\d+)\/.*$/', $rdfp_rel_path ) ) &&
+					    ! in_array( $folder_path, $delete_folders ) )
+					{ // Collect comment attachments folders to delete the empty folders later
+						$delete_folders[] = $folder_path;
+					}
+				}
+			}
+		}
+
+		// Delete the empty folders
+		if( count( $delete_folders ) )
+		{
+			foreach( $delete_folders as $delete_folder )
+			{
+				if( file_exists( $delete_folder ) )
+				{ // Delete folder only if it is empty, Hide an error if folder is not empty
+					@rmdir( $delete_folder );
+				}
+			}
+		}
+	}
+
+	// Delete the comment prerendering contents
+	$DB->query( 'DELETE
+		 FROM T_comments__prerendering
+		WHERE cmpr_cmt_ID IN ( '.$delete_comment_ids.' )',
+		'Delete the comment prerendering contents' );
+
+	// Delete all comments
+	// asimo> If a comment with this keyword content was inserted here, the user will not even observe that (This is good)
+	$r = $DB->query( 'DELETE
+		 FROM T_comments
+		WHERE '.$sql_where,
+		'Delete the comments by where clause' );
+
+	if( $r !== false )
+	{ // Success on delete the comments
+		$DB->commit();
+		return $r;
+	}
+	else
+	{ // Failed
+		$DB->rollback();
+		return false;
+	}
+}
+
+
+/**
  * Display comments results table
  *
  * @param array Params
@@ -1091,7 +1217,7 @@ function comments_results_block( $params = array() )
 	$SQL = new SQL();
 	$SQL->SELECT( '*' );
 	$SQL->FROM( 'T_comments' );
-	$SQL->WHERE( 'comment_author_ID = '.$DB->quote( $edited_User->ID ) );
+	$SQL->WHERE( 'comment_author_user_ID = '.$DB->quote( $edited_User->ID ) );
 
 	// Create result set:
 	$comments_Results = new Results( $SQL->get(), $params['results_param_prefix'], 'D' );
@@ -1099,9 +1225,7 @@ function comments_results_block( $params = array() )
 	$comments_Results->title = $params['results_title'];
 	$comments_Results->no_results_text = $params['results_no_text'];
 
-	// Get a count of the comments which current user can delete
-	$deleted_comments_count = count( $edited_User->get_deleted_comments() );
-	if( $comments_Results->total_rows > 0 && $deleted_comments_count )
+	if( $comments_Results->get_total_rows() > 0 && $edited_User->has_comment_to_delete() )
 	{	// Display action icon to delete all records if at least one record exists & current user can delete at least one comment posted by user
 		$comments_Results->global_icon( sprintf( T_('Delete all comments posted by %s'), $edited_User->login ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_comments&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
 	}
@@ -1190,7 +1314,7 @@ function comments_results( & $comments_Results, $params = array() )
 		}
 		$comments_Results->cols[] = array(
 				'th' => $params['col_post'],
-				'order' => $params['field_prefix'].'post_ID',
+				'order' => $params['field_prefix'].'item_ID',
 				'td' => $td,
 			);
 	}

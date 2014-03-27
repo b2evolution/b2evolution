@@ -48,7 +48,7 @@ ul#mainnav li, ul#mainnav a.selected, .leftside h3, .bCommentTitle {color:#c0926
 
 #bannertop ul li a {color:#4b3528;}
 #bannertop a:hover {color:#fff;}
-#bannertop a.selected {#3c2d21}
+#bannertop a.selected {color:#3c2d21;}
 
 /* LINK STYLEE */
 
@@ -57,6 +57,10 @@ a:hover {
 	text-decoration: underline;
 }
 .topicons a img {border:none;}
+
+.action_messages a {
+	color: #00F;
+}
 
 .searchcloud {font-size:0.9em;clear:both;margin:auto 40px 40px;text-align:center;border:1px solid #9e7d55;background-color: #6b4634;padding:10px;}
 .searchcloud h3 {margin-top:0px;color:#b2916f;font-weight:bold;font-size:1.1em;}
@@ -73,12 +77,25 @@ a.search_cloud_9 {color:#ede0cc;}
 a.search_cloud_10 {color:#f7ecda;}
 .searchcloud a:hover {color:#fff;}
 
-#prewrap {width:912px; margin:-10px auto;}
-#prewrap ul {padding-top:20px;}
-#prewrap ul li {margin-left:0px; display:inline;}
-#wrap {width:912px; background:url(img/vast_body.gif) top repeat-y; margin:0 auto 10px auto;}
-#bannertop {width:912px; background:url(img/vast_header.jpg) top no-repeat; height:53px;}
-#bannermid {width:912px; background:url(img/vast_header.jpg) bottom no-repeat; height:104px;}
+#wrap {
+	width:900px;
+	background:#895c46 url(img/vast_foot.gif) bottom repeat-x;
+	margin:0 auto 10px auto;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	-khtml-border-radius: 10px;
+	border-radius: 10px;
+	border: 1px solid #000;
+	box-shadow: 0 0 5px 1px #000000;
+	overflow: hidden;
+}
+#bannertop {
+	width:900px;
+	background:url(img/vast_header.jpg) top no-repeat;
+	height:46px;
+	-webkit-border-radius: 9px 9px 0 0;
+}
+#bannermid {width:900px; background:url(img/vast_header.jpg) bottom no-repeat; height:104px;}
 #quote, .google_banner {font:1.0em "Lucida Sans";font-style:italic;margin-left:40px;margin-bottom:20px;}
 
 .topicons {font-size:0.7em; font-weight:bold; padding:0px 0px 0 0; margin:20px 18px 0 0; float:right;}
@@ -93,31 +110,19 @@ a.search_cloud_10 {color:#f7ecda;}
 
 .subtitle h1 {margin-bottom:10px;margin-left:-40px;}
 
-/*.submenu { ENABLE FOR SINGLE BLOG SYSTEMS
-	font:0.9em "Lucida Sans", Arial, Verdana, Tahoma, Sans-Serif;
-	font-weight:bold;
-	letter-spacing:0.1em;
-	height:20px;
-	padding:6px 0px 2px 35px;
-	margin:0px 6px 30px;
-	background-color:#000;
-	background:url(img/vast_menu.jpg) top repeat-y;
-	border-bottom:1px solid #9e7d55;}*/
-
 .submenu { /* ENABLE FOR MULTIBLOG SYSTEMS */
 	font:0.9em "Lucida Sans", Arial, Verdana, Tahoma, Sans-Serif;
 	font-weight:bold;
 	letter-spacing:0.1em;
 	padding-top:8px;
 	padding-left:10px;
-	margin:0px 6px 30px;
-	background-color:#000;
-	background:url(img/vast_menu.jpg) top repeat-y;
+	margin:0 0 30px;
+	background:#2b1a12;
 	border-bottom:1px solid #9e7d55;}
 
 .submenu h1 {display:inline; padding-right:4px;}
 
-#content {width:912px; background:url(img/vast_body.gif) top repeat-y;}
+#content {width:900px;}
 
 a img {border:0px; vertical-align:middle;}
 
@@ -265,8 +270,7 @@ td.bCalendarLinkPost {background-color:#6b4634; font-weight:bold;}
 
 div.rss {background:url(img/vast_rss.gif) top left no-repeat; padding-top:40px; margin-top:25px;}
 
-.pagefoot {
-	background:url(img/vast_foot.gif) bottom no-repeat; font-size:0.75em; height:90px; clear:both; text-align:center;}
+.pagefoot {font-size: 0.75em; height: 90px; clear: both; text-align: center;}
 .pagefoot a {
 	color:#3C2D21;
 	text-decoration: none;
@@ -348,4 +352,8 @@ div.tabs div.selected a, div.tabs div:hover a {
 }
 div.tabs div.selected a {
 	border-bottom-color: #895c46;
+}
+
+.form_add_contacts {
+	text-align: left;
 }

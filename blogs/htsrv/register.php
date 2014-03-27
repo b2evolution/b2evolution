@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -67,7 +67,7 @@ $registration_require_gender = $Settings->get('registration_require_gender');
 $registration_ask_locale = $Settings->get('registration_ask_locale');
 
 $login = param( $dummy_fields[ 'login' ], 'string', '' );
-$email = param( $dummy_fields[ 'email' ], 'string', '' );
+$email = evo_strtolower( param( $dummy_fields[ 'email' ], 'string', '' ) );
 param( 'action', 'string', '' );
 param( 'country', 'integer', '' );
 param( 'firstname', 'string', '' );
@@ -112,8 +112,8 @@ if( $register_user = $Session->get('core.register_user') )
 switch( $action )
 {
 	case 'register':
-		// Stop a request from the blocked IP addresses
-		antispam_block_ip();
+		// Stop a request from the blocked IP addresses or Domains
+		antispam_block_request();
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'regform' );
@@ -225,7 +225,7 @@ switch( $action )
 		$initial_hit = $new_User->get_first_session_hit_params( $Session->ID );
 		if( ! empty ( $initial_hit ) )
 		{	// Save User Settings
-			$UserSettings->set( 'initial_blog_ID' , $initial_hit->hit_blog_ID, $new_User->ID );
+			$UserSettings->set( 'initial_blog_ID' , $initial_hit->hit_coll_ID, $new_User->ID );
 			$UserSettings->set( 'initial_URI' , $initial_hit->hit_uri, $new_User->ID );
 			$UserSettings->set( 'initial_referer' , $initial_hit->hit_referer , $new_User->ID );
 		}

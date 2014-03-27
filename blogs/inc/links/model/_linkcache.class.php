@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -286,6 +286,27 @@ class LinkCache extends DataObjectCache
 
 
 	/**
+	 * Load a set of Links by the given link type into the cache.
+	 *
+	 * @param SQL SQL object
+	 */
+	function load_type_by_sql( $SQL, $cache_type )
+	{
+		global $DB;
+
+		$links = $DB->get_results( $SQL->get() );
+
+		// Load linked files into the FileCache
+		$this->load_linked_files( $links );
+
+		foreach( $links as $row )
+		{ // Cache each matching object:
+			$this->add( new Link( $row ), $cache_type );
+		}
+	}
+
+
+	/**
 	 * Load links for a given Item
 	 *
 	 * Optimization: If the Item happens to be in the current MainList, Links for the whole MainList will be cached.
@@ -327,14 +348,13 @@ class LinkCache extends DataObjectCache
 
 			$Debuglog->add( "Loading <strong>$this->objtype(Item #$item_ID)</strong> into cache", 'dataobjects' );
 
-			$sql = 'SELECT *
-								FROM T_links
-							 WHERE link_itm_ID = '.$item_ID.'
-							 ORDER BY link_ltype_ID, link_dest_itm_ID, link_file_ID';
-			foreach( $DB->get_results( $sql ) as $row )
-			{	// Cache each matching object:
-				$this->add( new Link( $row ) );
-			}
+			$SQL = new SQL( 'Get the links by item ID' );
+			$SQL->SELECT( '*' );
+			$SQL->FROM( 'T_links' );
+			$SQL->WHERE( 'link_itm_ID  = '.$DB->quote( $item_ID ) );
+			$SQL->ORDER_BY( 'link_ltype_ID, link_file_ID' );
+
+			$this->load_type_by_sql( $SQL, 'item' );
 		}
 
 		return true;
@@ -362,14 +382,13 @@ class LinkCache extends DataObjectCache
 
 		$Debuglog->add( "Loading <strong>$this->objtype(Comment #$comment_ID)</strong> into cache", 'dataobjects' );
 
-		$sql = 'SELECT *
-							FROM T_links
-						 WHERE link_cmt_ID = '.$comment_ID.'
-						 ORDER BY link_file_ID';
-		foreach( $DB->get_results( $sql ) as $row )
-		{	// Cache each matching object:
-			$this->add( new Link( $row ) );
-		}
+		$SQL = new SQL( 'Get the links by comment ID' );
+		$SQL->SELECT( '*' );
+		$SQL->FROM( 'T_links' );
+		$SQL->WHERE( 'link_cmt_ID  = '.$DB->quote( $comment_ID ) );
+		$SQL->ORDER_BY( 'link_file_ID' );
+
+		$this->load_type_by_sql( $SQL, 'comment' );
 
 		return true;
 	}
@@ -401,15 +420,8 @@ class LinkCache extends DataObjectCache
 		$SQL->FROM( 'T_links' );
 		$SQL->WHERE( 'link_usr_ID  = '.$DB->quote( $user_ID ) );
 		$SQL->ORDER_BY( 'link_file_ID' );
-		$links = $DB->get_results( $SQL->get() );
 
-		// Load linked files into the FileCache
-		$this->load_linked_files( $links );
-
-		foreach( $links as $row )
-		{ // Cache each matching object:
-			$this->add( new Link( $row ), 'user' );
-		}
+		$this->load_type_by_sql( $SQL, 'user' );
 
 		return true;
 	}
@@ -442,11 +454,8 @@ class LinkCache extends DataObjectCache
 		$SQL->FROM( 'T_links' );
 		$SQL->WHERE( 'link_itm_ID IN ('.$item_list.')' );
 		$SQL->ORDER_BY( 'link_ID' );
-		$links = $DB->get_results( $SQL->get() );
-		foreach( $links as $row )
-		{ // Cache each matching object:
-			$this->add( new Link( $row ), 'item' );
-		}
+
+		$this->load_type_by_sql( $SQL, 'item' );
 
 		return true;
 	}

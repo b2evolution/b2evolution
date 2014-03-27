@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -245,8 +245,7 @@ $Form->end_fieldset();
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Form->buttons( array(
-			array( 'submit', 'submit[update]', T_('Update'), 'SaveButton' ),
-			array( 'reset', '', T_('Reset'), 'ResetButton' ),
+			array( 'submit', 'submit[update]', T_('Save Changes!'), 'SaveButton' ),
 			array( 'submit', 'submit[restore_defaults]', T_('Restore defaults'), 'ResetButton' ),
 		) );
 }

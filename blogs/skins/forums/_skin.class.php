@@ -202,8 +202,8 @@ class forums_Skin extends Skin
 		}
 
 		$params = array_merge( array(
-				'before'    => '<span class="breadcrumbs">',
-				'after'     => '</span>',
+				'before'    => '<div class="breadcrumbs">',
+				'after'     => '</div>',
 				'separator' => ' -> ',
 			), $params );
 

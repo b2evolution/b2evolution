@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -34,6 +34,7 @@ global $DB;
 // Check permission:
 $current_User->check_perm( 'emails', 'view', true );
 
+load_class( 'tools/model/_emailaddress.class.php', 'EmailAddress' );
 load_funcs('tools/model/_email.funcs.php');
 
 param_action();
@@ -44,15 +45,14 @@ param( 'action', 'string' );
 
 if( $tab == 'blocked' )
 {	// Email addresses
-	load_class( 'tools/model/_emailblocked.class.php', 'EmailBlocked' );
-	if( param( 'emblk_ID', 'integer', '', true) )
-	{	// Load Email Blocked object
-		$EmailBlockedCache = & get_EmailBlockedCache();
-		if( ( $edited_EmailBlocked = & $EmailBlockedCache->get_by_ID( $emblk_ID, false ) ) === false )
+	if( param( 'emadr_ID', 'integer', '', true) )
+	{	// Load Email Address object
+		$EmailAddressCache = & get_EmailAddressCache();
+		if( ( $edited_EmailAddress = & $EmailAddressCache->get_by_ID( $emadr_ID, false ) ) === false )
 		{	// We could not find the goal to edit:
-			unset( $edited_EmailBlocked );
-			forget_param( 'emblk_ID' );
-			$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Email Blocked') ), 'error' );
+			unset( $edited_EmailAddress );
+			forget_param( 'emadr_ID' );
+			$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Email Address') ), 'error' );
 		}
 	}
 }
@@ -214,28 +214,28 @@ switch( $action )
 		break;
 
 	case 'blocked_new':
-		// Init Email Blocked to show on the form
-		$edited_EmailBlocked = new EmailBlocked();
+		// Init Email Address to show on the form
+		$edited_EmailAddress = new EmailAddress();
 		break;
 
 	case 'blocked_save':
-		// Update Email Blocked...
+		// Update Email Address...
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'email_blocked' );
 
 		$action = 'blocked_edit';
-		if( !isset( $edited_EmailBlocked ) )
+		if( !isset( $edited_EmailAddress ) )
 		{	// Create a new address
-			$edited_EmailBlocked = new EmailBlocked();
+			$edited_EmailAddress = new EmailAddress();
 			$action = 'blocked_new';
 		}
 
 		// load data from request
-		if( $edited_EmailBlocked->load_from_Request() )
+		if( $edited_EmailAddress->load_from_Request() )
 		{	// We could load data from form without errors:
-			// Save Email Blocked in DB:
-			$edited_EmailBlocked->dbsave();
+			// Save Email Address in DB:
+			$edited_EmailAddress->dbsave();
 			$Messages->add( T_('The email address was updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
@@ -245,15 +245,15 @@ switch( $action )
 		break;
 
 	case 'blocked_delete':
-		// Delete Email Blocked...
+		// Delete Email Address...
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'email_blocked' );
 
-		// Make sure we got an iprange_ID:
-		param( 'emblk_ID', 'integer', true );
+		// Make sure we got an emadr_ID:
+		param( 'emadr_ID', 'integer', true );
 
-		if( $edited_EmailBlocked->dbdelete() )
+		if( $edited_EmailAddress->dbdelete() )
 		{
 			$Messages->add( T_('The email address was deleted.'), 'success' );
 
@@ -265,7 +265,7 @@ switch( $action )
 }
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('Emails'), '?ctrl=email' );
+$AdminUI->breadcrumbpath_add( T_('Emails'), '?ctrl=campaigns' );
 
 switch( $tab )
 {
@@ -285,7 +285,7 @@ switch( $tab )
 
 	case 'blocked':
 		$AdminUI->breadcrumbpath_add( T_('Addresses'), '?ctrl=email&amp;tab='.$tab );
-		if( !isset( $edited_EmailBlocked ) )
+		if( !isset( $edited_EmailAddress ) )
 		{	// List page
 			// Init datepicker css
 			require_css( 'ui.datepicker.css' );
@@ -340,13 +340,13 @@ switch( $tab )
 		break;
 
 	case 'blocked':
-		if( isset( $edited_EmailBlocked ) )
+		if( isset( $edited_EmailAddress ) )
 		{	// Display form to create/edit an email address
-			$AdminUI->disp_view( 'tools/views/_email_blocked.form.php' );
+			$AdminUI->disp_view( 'tools/views/_email_address.form.php' );
 			break;
 		}
 		// Display a list of email logs:
-		$AdminUI->disp_view( 'tools/views/_email_blocked.view.php' );
+		$AdminUI->disp_view( 'tools/views/_email_address.view.php' );
 		break;
 
 	case 'return':

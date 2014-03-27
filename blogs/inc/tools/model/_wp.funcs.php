@@ -5,7 +5,7 @@
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal Open Source relicensing agreement:
  * }}
@@ -40,6 +40,8 @@ function wpxml_import()
 
 	// The import type ( replace | append )
 	$import_type = param( 'import_type', 'string', 'replace' );
+	// Should we delete files on 'replace' mode?
+	$delete_files = param( 'delete_files', 'integer', 0 );
 
 	$XML_file_path = get_param( 'wp_file' );
 	$XML_file_name = basename( $XML_file_path );
@@ -107,7 +109,7 @@ function wpxml_import()
 	$DB->begin();
 
 	if( $import_type == 'replace' )
-	{	// Remove data from selected blog
+	{ // Remove data from selected blog
 
 		// Get existing categories
 		$SQL = new SQL();
@@ -116,7 +118,7 @@ function wpxml_import()
 		$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $wp_blog_ID ) );
 		$old_categories = $DB->get_col( $SQL->get() );
 		if( !empty( $old_categories ) )
-		{	// Get existing posts
+		{ // Get existing posts
 			$SQL = new SQL();
 			$SQL->SELECT( 'post_ID' );
 			$SQL->FROM( 'T_items__item' );
@@ -131,9 +133,9 @@ function wpxml_import()
 			$SQL = new SQL();
 			$SQL->SELECT( 'comment_ID' );
 			$SQL->FROM( 'T_comments' );
-			$SQL->WHERE( 'comment_post_ID IN ( '.implode( ', ', $old_posts ).' )' );
+			$SQL->WHERE( 'comment_item_ID IN ( '.implode( ', ', $old_posts ).' )' );
 			$old_comments = $DB->get_col( $SQL->get() );
-			$DB->query( 'DELETE FROM T_comments WHERE comment_post_ID IN ( '.implode( ', ', $old_posts ).' )' );
+			$DB->query( 'DELETE FROM T_comments WHERE comment_item_ID IN ( '.implode( ', ', $old_posts ).' )' );
 			if( !empty( $old_comments ) )
 			{
 				$DB->query( 'DELETE FROM T_comments__votes WHERE cmvt_cmt_ID IN ( '.implode( ', ', $old_comments ).' )' );
@@ -148,14 +150,24 @@ function wpxml_import()
 		{
 			$DB->query( 'DELETE FROM T_items__item WHERE post_main_cat_ID IN ( '.implode( ', ', $old_categories ).' )' );
 			if( !empty( $old_posts ) )
-			{	// Remove the post's data from related tables
+			{ // Remove the post's data from related tables
+				if( $delete_files )
+				{ // Get the file IDs that should be deleted from hard drive
+					$SQL = new SQL();
+					$SQL->SELECT( 'DISTINCT link_file_ID' );
+					$SQL->FROM( 'T_links' );
+					$SQL->WHERE( 'link_itm_ID IN ( '.implode( ', ', $old_posts ).' )' );
+					$deleted_file_IDs = $DB->get_col( $SQL->get() );
+				}
 				$DB->query( 'DELETE FROM T_items__item_settings WHERE iset_item_ID IN ( '.implode( ', ', $old_posts ).' )' );
 				$DB->query( 'DELETE FROM T_items__prerendering WHERE itpr_itm_ID IN ( '.implode( ', ', $old_posts ).' )' );
 				$DB->query( 'DELETE FROM T_items__subscriptions WHERE isub_item_ID IN ( '.implode( ', ', $old_posts ).' )' );
 				$DB->query( 'DELETE FROM T_items__version WHERE iver_itm_ID IN ( '.implode( ', ', $old_posts ).' )' );
 				$DB->query( 'DELETE FROM T_postcats WHERE postcat_post_ID IN ( '.implode( ', ', $old_posts ).' )' );
 				$DB->query( 'DELETE FROM T_slug WHERE slug_itm_ID IN ( '.implode( ', ', $old_posts ).' )' );
-				$DB->query( 'DELETE FROM T_links WHERE link_itm_ID IN ( '.implode( ', ', $old_posts ).' )' );
+				$DB->query( 'DELETE l, lv FROM T_links AS l
+											 LEFT JOIN T_links__vote AS lv ON lv.lvot_link_ID = l.link_ID
+											WHERE l.link_itm_ID IN ( '.implode( ', ', $old_posts ).' )' );
 			}
 		}
 		echo T_('OK').'<br />';
@@ -168,7 +180,7 @@ function wpxml_import()
 		echo T_('Removing the tags that are no longer used... ');
 		evo_flush();
 		if( !empty( $old_posts ) )
-		{	// Remove the tags
+		{ // Remove the tags
 
 			// Get tags from selected blog
 			$SQL = new SQL();
@@ -196,7 +208,49 @@ function wpxml_import()
 			// Remove the links of tags with posts
 			$DB->query( 'DELETE FROM T_items__itemtag WHERE itag_itm_ID IN ( '.implode( ', ', $old_posts ).' )' );
 		}
-		echo T_('OK').'<br /><br />';
+		echo T_('OK').'<br />';
+
+		if( $delete_files )
+		{ // Delete the files
+			echo T_('Removing the files... ');
+
+			if( ! empty( $deleted_file_IDs ) )
+			{
+				// Commit the DB changes before files deleting
+				$DB->commit();
+
+				// Get the deleted file IDs that are linked to other objects
+				$SQL = new SQL();
+				$SQL->SELECT( 'DISTINCT link_file_ID' );
+				$SQL->FROM( 'T_links' );
+				$SQL->WHERE( 'link_file_ID IN ( '.implode( ', ', $deleted_file_IDs ).' )' );
+				$linked_file_IDs = $DB->get_col( $SQL->get() );
+				// We can delete only the files that are NOT linked to other objects
+				$deleted_file_IDs = array_diff( $deleted_file_IDs, $linked_file_IDs );
+
+				$FileCache = & get_FileCache();
+				foreach( $deleted_file_IDs as $deleted_file_ID )
+				{
+					if( ! ( $deleted_File = & $FileCache->get_by_ID( $deleted_file_ID, false, false ) ) )
+					{ // Incorrect file ID
+						echo '<p class="red">'.sprintf( T_('No file #%s found in DB. It cannot be deleted.'), $deleted_file_ID ).'</p>';
+					}
+					if( ! $deleted_File->unlink() )
+					{ // No permission to delete file
+						echo '<p class="red">'.sprintf( T_('Could not delete the file &laquo;%s&raquo;.'), $deleted_File->get_full_path() ).'</p>';
+					}
+					// Clear cache to save memory
+					$FileCache->clear();
+				}
+
+				// Start new transaction for the data inserting
+				$DB->begin();
+			}
+
+			echo T_('OK').'<br />';
+		}
+
+		echo '<br />';
 	}
 
 
@@ -600,7 +654,6 @@ function wpxml_import()
 			$Item->set( 'excerpt_autogenerated', $post['post_excerpt_autogenerated'] );
 			$Item->set( 'titletag', $post['post_titletag'] );
 			$Item->set( 'notifications_status', empty( $post['post_notifications_status'] ) ? 'noreq' : $post['post_notifications_status'] );
-			$Item->set( 'views', $post['post_views'] );
 			$Item->set( 'renderers', array( $post['post_renderers'] ) );
 			$Item->set( 'priority', $post['post_priority'] );
 			$Item->set( 'featured', $post['post_featured'] );
@@ -681,10 +734,10 @@ function wpxml_import()
 
 			foreach( $comments as $comment )
 			{
-				$comment_author_ID = 0;
+				$comment_author_user_ID = 0;
 				if( !empty( $comment['comment_user_id'] ) && isset( $authors_IDs[ (string) $comment['comment_user_id'] ] ) )
 				{	// Author ID
-					$comment_author_ID = $authors_IDs[ (string) $comment['comment_user_id'] ];
+					$comment_author_user_ID = $authors_IDs[ (string) $comment['comment_user_id'] ];
 				}
 
 				$comment_parent_ID = 0;
@@ -704,16 +757,15 @@ function wpxml_import()
 				}
 
 				$Comment = new Comment();
-				$Comment->item_ID = $post_ID;
-				$Comment->set( 'post_ID', $post_ID );
+				$Comment->set( 'item_ID', $post_ID );
 				if( !empty( $comment_parent_ID ) )
 				{
 					$Comment->set( 'in_reply_to_cmt_ID', $comment_parent_ID );
 				}
 				$Comment->set( 'date', $comment['comment_date'] );
-				if( !empty( $comment_author_ID ) )
+				if( !empty( $comment_author_user_ID ) )
 				{
-					$Comment->set( 'author_ID', $comment_author_ID );
+					$Comment->set( 'author_user_ID', $comment_author_user_ID );
 				}
 				$Comment->set( 'author', evo_substr( $comment['comment_author'], 0, 100 ) );
 				$Comment->set( 'author_IP', $comment['comment_author_IP'] );
@@ -936,7 +988,6 @@ function wpxml_parser( $file )
 		$post['post_urltitle']      = (string) $evo->post_urltitle;
 		$post['post_titletag']      = (string) $evo->post_titletag;
 		$post['post_notifications_status'] = (string) $evo->post_notifications_status;
-		$post['post_views']         = (int) $evo->post_views;
 		$post['post_renderers']     = (string) $evo->post_renderers;
 		$post['post_priority']      = (int) $evo->post_priority;
 		$post['post_featured']      = (int) $evo->post_featured;
@@ -1242,6 +1293,12 @@ function wpxml_get_import_files()
 		) );
 
 	$import_files = array();
+
+	if( empty( $files ) )
+	{ // No access to the import folder OR it is empty
+		return $import_files;
+	}
+
 	foreach( $files as $file )
 	{
 		$file_paths = array();

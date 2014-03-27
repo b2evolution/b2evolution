@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  * @ignore
@@ -26,7 +26,7 @@ class wacko_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $help_url = 'http://b2evolution.net/man/technical-reference/renderer-plugins/wacko-plugin';
+	var $help_topic = 'wacko-plugin';
 	var $number_of_installs = 1;
 
 	/**
@@ -62,7 +62,7 @@ class wacko_plugin extends Plugin
 			'$1<h2>$2</h2>',
 			'<hr />',
 			'\'<div class="codeblock"><pre><code>\'.
-			htmlspecialchars(stripslashes(\'$2\'),ENT_NOQUOTES).
+			evo_htmlspecialchars(stripslashes(\'$2\'),ENT_NOQUOTES).
 			\'</code></pre></div>\''
 		);
 

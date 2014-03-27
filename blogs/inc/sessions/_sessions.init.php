@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -48,11 +48,11 @@ $required_mysql_version[ 'sessions' ] = '5.0.3';
  */
 $db_config['aliases']['T_basedomains'] = $tableprefix.'basedomains';
 $db_config['aliases']['T_hitlog'] = $tableprefix.'hitlog';
-$db_config['aliases']['T_track__keyphrase'] = $tableprefix.'track__keyphrase';
 $db_config['aliases']['T_sessions'] = $tableprefix.'sessions';
 $db_config['aliases']['T_track__goal'] = $tableprefix.'track__goal';
 $db_config['aliases']['T_track__goalhit'] = $tableprefix.'track__goalhit';
-$db_config['aliases']['T_logs__internal_searches'] = $tableprefix.'logs__internal_searches';
+$db_config['aliases']['T_track__goalcat'] = $tableprefix.'track__goalcat';
+$db_config['aliases']['T_track__keyphrase'] = $tableprefix.'track__keyphrase';
 
 
 /**
@@ -71,7 +71,6 @@ $db_config['aliases']['T_logs__internal_searches'] = $tableprefix.'logs__interna
  */
 $ctrl_mappings['stats'] = 'sessions/stats.ctrl.php';
 $ctrl_mappings['goals'] = 'sessions/goals.ctrl.php';
-$ctrl_mappings['internalsearches'] = 'sessions/internal_searches.ctrl.php';
 
 
 /**
@@ -84,28 +83,35 @@ function & get_GoalCache()
 	global $GoalCache;
 
 	if( ! isset( $GoalCache ) )
-	{	// Cache doesn't exist yet:
-		$GoalCache = new DataObjectCache( 'Goal', false, 'T_track__goal', 'goal_', 'goal_ID', 'goal_name', 'goal_name' ); // COPY (FUNC)
+	{ // Cache doesn't exist yet:
+		load_class( 'sessions/model/_goal.class.php', 'Goal' );
+		$GoalCache = new DataObjectCache( 'Goal', false, 'T_track__goal', 'goal_', 'goal_ID', 'goal_key', 'goal_name' ); // COPY (FUNC)
 	}
 
 	return $GoalCache;
 }
 
 /**
- * Get the Internal Searches Cache
+ * Get the GoalCategoryCache
  *
- * @return InternalSearchesCache
+ * @param string The text that gets used for the "None" option in the objects options list (Default: T_('None')).
+ * @return GoalCategoryCache
  */
-function & get_InternalSearchesCache()
+function & get_GoalCategoryCache( $allow_none_text = NULL )
 {
-	global $InternalSearchesCache;
+	global $GoalCategoryCache;
 
-	if( ! isset( $InternalSearchesCache ) )
-	{	// Cache doesn't exist yet:
-		$InternalSearchesCache = new DataObjectCache( 'InternalSearches', false, 'T_logs__internal_searches', 'isrch_', 'isrch_ID', 'isrch_sessionID', 'isrch_keywords' ); // COPY (FUNC)
+	if( ! isset( $GoalCategoryCache ) )
+	{ // Cache doesn't exist yet:
+		if( ! isset( $allow_none_text ) )
+		{
+			$allow_none_text = T_('None');
+		}
+		load_class( 'sessions/model/_goalcat.class.php', 'GoalCategory' );
+		$GoalCategoryCache = new DataObjectCache( 'GoalCategory', false, 'T_track__goalcat', 'gcat_', 'gcat_ID', 'gcat_name', 'gcat_name', $allow_none_text ); // COPY (FUNC)
 	}
 
-	return $InternalSearchesCache;
+	return $GoalCategoryCache;
 }
 
 
@@ -245,7 +251,7 @@ class sessions_Module extends Module
 	 */
 	function build_menu_1()
 	{
-		global $blog, $dispatcher;
+		global $blog, $admin_url;
 		/**
 		 * @var User
 		 */
@@ -268,24 +274,24 @@ class sessions_Module extends Module
 					array(
 						'stats' => array(
 							'text' => T_('Analytics'),
-							'href' => $dispatcher.'?ctrl=stats&amp;tab=summary&amp;tab3=global',
+							'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global',
 							'entries' => array(
 								'summary' => array(
 									'text' => T_('Hit summary'),
-									'href' => $dispatcher.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$blog,
+									'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$blog,
 									'entries' => array(
 										'global' => array(
 											'text' => T_('Global hits'),
-											'href' => $dispatcher.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$blog ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$blog ),
 										'browser' => array(
 											'text' => T_('Browser hits'),
-											'href' => $dispatcher.'?ctrl=stats&amp;tab=summary&amp;tab3=browser&amp;blog='.$blog ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=browser&amp;blog='.$blog ),
 										'robot' => array(
 											'text' => T_('Robot hits'),
-											'href' => $dispatcher.'?ctrl=stats&amp;tab=summary&amp;tab3=robot&amp;blog='.$blog ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=robot&amp;blog='.$blog ),
 										'feed' => array(
 											'text' => T_('RSS/Atom hits'),
-											'href' => $dispatcher.'?ctrl=stats&amp;tab=summary&amp;tab3=feed&amp;blog='.$blog ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=feed&amp;blog='.$blog ),
 										),
 									),
 								),
@@ -293,61 +299,93 @@ class sessions_Module extends Module
 						)
 					);
 
+			$ips_entries = array( 'top' => array(
+					'text' => T_('Top IPs'),
+					'href' => $admin_url.'?ctrl=stats&amp;tab=ips&amp;blog='.$blog
+				) );
+			if( $current_User->check_perm( 'spamblacklist', 'view' ) )
+			{ // Display IP ranges only if current user has access to view Antispam tools
+				$ips_entries['ranges'] = array(
+					'text' => T_('IP Ranges'),
+					'href' => $admin_url.'?ctrl=antispam&amp;tab=stats&amp;tab3=ipranges&amp;blog='.$blog
+				);
+			}
+
 			$AdminUI->add_menu_entries( 'stats', array(
 								'refsearches' => array(
 									'text' => T_('Search B-hits'),
-									'href' => $dispatcher.'?ctrl=stats&amp;tab=refsearches&amp;tab3=hits&amp;blog='.$blog,
+									'href' => $admin_url.'?ctrl=stats&amp;tab=refsearches&amp;tab3=hits&amp;blog='.$blog,
 									'entries' => array(
 										'hits' => array(
 											'text' => T_('Search hits'),
-											'href' => $dispatcher.'?ctrl=stats&amp;tab=refsearches&amp;tab3=hits&amp;blog='.$blog ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=refsearches&amp;tab3=hits&amp;blog='.$blog ),
 										'keywords' => array(
 											'text' => T_('Keywords'),
-											'href' => $dispatcher.'?ctrl=stats&amp;tab=refsearches&amp;tab3=keywords&amp;blog='.$blog ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=refsearches&amp;tab3=keywords&amp;blog='.$blog ),
 										'topengines' => array(
 											'text' => T_('Top engines'),
-											'href' => $dispatcher.'?ctrl=stats&amp;tab=refsearches&amp;tab3=topengines&amp;blog='.$blog ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=refsearches&amp;tab3=topengines&amp;blog='.$blog ),
 										),
-									 ),
+									),
 								'referers' => array(
 									'text' => T_('Referered B-hits'),
-									'href' => $dispatcher.'?ctrl=stats&amp;tab=referers&amp;blog='.$blog ),
+									'href' => $admin_url.'?ctrl=stats&amp;tab=referers&amp;blog='.$blog ),
 								'other' => array(
 									'text' => T_('Direct B-hits'),
-									'href' => $dispatcher.'?ctrl=stats&amp;tab=other&amp;blog='.$blog ),
+									'href' => $admin_url.'?ctrl=stats&amp;tab=other&amp;blog='.$blog ),
 								'hits' => array(
 									'text' => T_('All Hits'),
-									'href' => $dispatcher.'?ctrl=stats&amp;tab=hits&amp;blog='.$blog ),
+									'href' => $admin_url.'?ctrl=stats&amp;tab=hits&amp;blog='.$blog ),
+								'ips' => array(
+									'text' => T_('IPs'),
+									'href' => $admin_url.'?ctrl=stats&amp;tab=ips&amp;blog='.$blog,
+									'entries' => $ips_entries ),
 								'domains' => array(
 									'text' => T_('Referring domains'),
-									'href' => $dispatcher.'?ctrl=stats&amp;tab=domains&amp;blog='.$blog ),
+									'href' => $admin_url.'?ctrl=stats&amp;tab=domains&amp;blog='.$blog,
+									'entries' => array(
+										'all' => array(
+											'text' => T_('All referrers'),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=domains&amp;blog='.$blog ),
+										'top' => array(
+											'text' => T_('Top referrers'),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=domains&amp;tab3=top&amp;blog='.$blog ),
+										),
+									),
 							)
 						);
 		}
 
-		if( $blog == 0 && $current_User->check_perm( 'stats', 'view' ) )
+		if( $current_User->check_perm( 'stats', 'view' ) )
 		{	// Viewing aggregate + Permission to view stats for ALL blogs:
 			$AdminUI->add_menu_entries(
 					'stats',
 					array(
 						'goals' => array(
 							'text' => T_('Goals'),
-							'href' => $dispatcher.'?ctrl=goals',
+							'href' => $admin_url.'?ctrl=goals',
 							'entries' => array(
 								'goals' => array(
 									'text' => T_('Goals'),
-									'href' => $dispatcher.'?ctrl=goals'
+									'href' => $admin_url.'?ctrl=goals'
+									),
+								'cats' => array(
+									'text' => T_('Categories'),
+									'href' => $admin_url.'?ctrl=goals&amp;tab3=cats'
 									),
 								'hits' => array(
 									'text' => T_('Goal hits'),
-									'href' => $dispatcher.'?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;blog=0'
+									'href' => $admin_url.'?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;blog=0'
 									),
 								'stats' => array(
 									'text' => T_('Stats'),
-									'href' => $dispatcher.'?ctrl=goals&amp;tab3=stats'
+									'href' => $admin_url.'?ctrl=goals&amp;tab3=stats'
 									),
 								),
 							),
+						'settings' => array(
+							'text' => T_('Settings'),
+							'href' => $admin_url.'?ctrl=stats&amp;tab=settings' ),
 						)
 				);
 		}

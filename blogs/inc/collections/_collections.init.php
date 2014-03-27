@@ -2,7 +2,7 @@
 /**
  * This is the init file for the collections module
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -23,7 +23,7 @@ $required_php_version[ 'collections' ] = '5.0';
 /**
  * Minimum MYSQL version required for collections module to function properly
  */
-$required_mysql_version[ 'collections' ] = '4.1';
+$required_mysql_version[ 'collections' ] = '5.0.3';
 
 /**
  * Aliases for table names:
@@ -51,11 +51,12 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_items__subscriptions'   => $tableprefix.'items__subscriptions',
 		'T_items__version'         => $tableprefix.'items__version',
 		'T_links'                  => $tableprefix.'links',
-		'T_postcats'             => $tableprefix.'postcats',
-		'T_skins__container'     => $tableprefix.'skins__container',
-		'T_skins__skin'          => $tableprefix.'skins__skin',
-		'T_subscriptions'        => $tableprefix.'subscriptions',
-		'T_widget'               => $tableprefix.'widget',
+		'T_links__vote'            => $tableprefix.'links__vote',
+		'T_postcats'               => $tableprefix.'postcats',
+		'T_skins__container'       => $tableprefix.'skins__container',
+		'T_skins__skin'            => $tableprefix.'skins__skin',
+		'T_subscriptions'          => $tableprefix.'subscriptions',
+		'T_widget'                 => $tableprefix.'widget',
 	) );
 
 /**
@@ -86,7 +87,6 @@ $ctrl_mappings = array_merge( $ctrl_mappings, array(
 		'skins'        => 'skins/skins.ctrl.php',
 		'tools'        => 'tools/tools.ctrl.php',
 		'widgets'      => 'widgets/widgets.ctrl.php',
-		'wpimport'     => 'tools/wpimport.ctrl.php',
 		'wpimportxml'  => 'tools/wpimportxml.ctrl.php',
 		'phpbbimport'  => 'tools/phpbbimport.ctrl.php',
 	) );
@@ -394,26 +394,27 @@ class collections_Module extends Module
 		switch( $grp_ID )
 		{
 			case 1:		// Administrators (group ID 1) have permission by default:
-				$permname = 'always';
+				$permapi = 'always'; // Can use APIs
+				$permcreateblog = 'allowed'; // Creating new blogs
+				$permgetblog = 'denied'; // Automatically add a new blog to the new users
+				break;
+
+			case 2:		// Moderators (group ID 2) have permission by default:
+				$permapi = 'always';
 				$permcreateblog = 'allowed';
 				$permgetblog = 'denied';
 				break;
 
-			case 2:		// Privileged bloggers (group ID 2) have permission by default:
-				$permname = 'always';
-				$permcreateblog = 'allowed';
-				$permgetblog = 'allowed';
-				break;
-
-			case 3:		// Bloggers (group ID 3) have permission by default:
-				$permname = 'always';
+			case 3:		// Trusted Users (group ID 3) have permission by default:
+			case 4: 	// Normal Users (group ID 4) have permission by default:
+				$permapi = 'always';
 				$permcreateblog = 'denied';
 				$permgetblog = 'denied';
 				break;
 
 			default:
 				// Other groups have no permission by default
-				$permname = 'never';
+				$permapi = 'never';
 				$permcreateblog = 'denied';
 				$permgetblog = 'denied';
 				break;
@@ -421,7 +422,7 @@ class collections_Module extends Module
 
 		// We can return as many default permissions as we want:
 		// e.g. array ( permission_name => permission_value, ... , ... )
-		return $permissions = array( 'perm_api' => $permname, 'perm_createblog' => $permcreateblog, 'perm_getblog' => $permgetblog );
+		return $permissions = array( 'perm_api' => $permapi, 'perm_createblog' => $permcreateblog, 'perm_getblog' => $permgetblog );
 	}
 
 
@@ -539,7 +540,7 @@ class collections_Module extends Module
 		 */
 		global $topleft_Menu, $topright_Menu;
 		global $current_User;
-		global $home_url, $admin_url, $dispatcher, $debug, $seo_page_type, $robots_index;
+		global $home_url, $admin_url, $debug, $seo_page_type, $robots_index;
 		global $Blog, $blog;
 
 		global $Settings;
@@ -550,17 +551,26 @@ class collections_Module extends Module
 		}
 
 		$entries = array();
-		if( $current_User->check_perm( 'blogs', 'create' ) )
-		{
-			$entries['newblog_sep'] = array(
-					'separator' => true,
-				);
 
-			$entries['newblog'] = array(
-					'text' => T_('Create new blog').'&hellip;',
-					'href' => $admin_url.'?ctrl=collections&amp;action=new',
+		// Separator
+		$entries['newblog_sep'] = array(
+				'separator' => true,
+			);
+
+		if( $current_User->check_perm( 'options', 'view' ) )
+		{ // Menu to edit site settings
+			$entries['structure'] = array(
+					'text' => T_('Site structure').'&hellip;',
+					'href' => $admin_url.'?ctrl=collections',
 				);
 		}
+
+		// Menu to view blogs list
+		$entries['blogs'] = array(
+				'text' => T_('Blogs').'&hellip;',
+				'href' => $admin_url.'?ctrl=collections&amp;tab=list',
+			);
+
 		$topleft_Menu->add_menu_entries( 'blog', $entries );
 
 		if( !$current_User->check_perm( 'admin', 'normal' ) )
@@ -581,7 +591,7 @@ class collections_Module extends Module
 							);
 		$entries['manual'] = array(
 								'text' => T_('Open Online manual'),
-								'href' => 'http://b2evolution.net/man/',
+								'href' => get_manual_url( NULL ),
 								'target' => '_blank',
 							);
 		$entries['info_sep'] = array(
@@ -607,7 +617,7 @@ class collections_Module extends Module
 	 */
 	function build_menu_1()
 	{
-		global $blog, $dispatcher;
+		global $blog, $admin_url;
 		/**
 		 * @var User
 		 */
@@ -634,13 +644,13 @@ class collections_Module extends Module
 				array(
 					'dashboard' => array(
 						'text' => T_('Dashboard'),
-						'href' => $dispatcher.'?ctrl=dashboard&amp;blog='.$blog,
+						'href' => $admin_url.'?ctrl=dashboard&amp;blog='.$blog,
 						'style' => 'font-weight: bold;'
 						),
 
 					'items' => array(
 						'text' => T_('Contents'),
-						'href' => $dispatcher.'?ctrl=items&amp;blog='.$blog.'&amp;filter=restore',
+						'href' => $admin_url.'?ctrl=items&amp;blog='.$blog.'&amp;filter=restore',
 						// Controller may add subtabs
 						),
 					) );
@@ -653,7 +663,7 @@ class collections_Module extends Module
 	 */
 	function build_menu_2()
 	{
-		global $blog, $loc_transinfo, $ctrl, $dispatcher;
+		global $blog, $loc_transinfo, $ctrl, $admin_url;
 		/**
 		 * @var User
 		 */
@@ -676,22 +686,31 @@ class collections_Module extends Module
 					NULL, // root
 					array(
 						'blogs' => array(
-							'text' => T_('Blogs'),
-							'href' => $dispatcher.'?ctrl=collections',
-							'entries' => array(
-								'list' => array(
-									'text' => T_('List'),
-									'href' => $dispatcher.'?ctrl=collections',
-								),
-							)
+							'text' => T_('Structure'),
+							'href' => $admin_url.'?ctrl=collections',
 						),
 					), 'dashboard' );
 			if( $current_User->check_perm( 'options', 'view' ) )
 			{
 				$AdminUI->add_menu_entries( 'blogs', array(
-						'settings' => array(
-							'text' => T_('Settings'),
-							'href' => $dispatcher.'?ctrl=collections&amp;tab=settings',
+						'site_settings' => array(
+									'text' => T_('Site Settings'),
+									'href' => $admin_url.'?ctrl=collections&amp;tab=site_settings'
+						),
+					) );
+			}
+			$AdminUI->add_menu_entries( 'blogs', array(
+					'list' => array(
+									'text' => T_('Blogs'),
+									'href' => $admin_url.'?ctrl=collections&amp;tab=list',
+					),
+				) );
+			if( $current_User->check_perm( 'options', 'view' ) )
+			{
+				$AdminUI->add_menu_entries( 'blogs', array(
+						'blog_settings' => array(
+							'text' => T_('Blog Settings'),
+							'href' => $admin_url.'?ctrl=collections&amp;tab=blog_settings',
 						),
 					) );
 			}
@@ -704,20 +723,20 @@ class collections_Module extends Module
 			$coll_settings_perm = $current_User->check_perm( 'blog_properties', 'any', false, $blog );
 
 			// Determine default page based on permissions:
-			if( $coll_settings_perm )
+			if( $coll_settings_perm && ! empty( $blog ) )
 			{	// Default: show General Blog Settings
-				$default_page = $dispatcher.'?ctrl=coll_settings&amp;blog='.$blog;
+				$default_page = $admin_url.'?ctrl=coll_settings&amp;blog='.$blog;
 			}
 			else
-			{	// Default: Show list of blogs
-				$default_page = $dispatcher.'?ctrl=collections';
+			{	// Default: Show site settings
+				$default_page = $admin_url.'?ctrl=collections';
 			}
 
 			$AdminUI->add_menu_entries(
 					NULL, // root
 					array(
 						'blogs' => array(
-							'text' => T_('Blogs'),
+							'text' => T_('Structure'),
 							'href' => $default_page,
 							),
 						), 'dashboard' );
@@ -726,54 +745,54 @@ class collections_Module extends Module
 			{
 				$skin_entries['current_skin'] = array(
 							'text' => T_('Skins for this blog'),
-							'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog );
+							'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog );
 
 				if( $current_User->check_perm( 'options', 'view' ) )
 				{
 					$skin_entries['manage_skins'] = array(
 							'text' => T_('Manage skins'),
-							'href' => $dispatcher.'?ctrl=skins&amp;blog='.$blog );
+							'href' => $admin_url.'?ctrl=skins&amp;blog='.$blog );
 				}
 
 				$AdminUI->add_menu_entries( 'blogs',	array(
 							'general' => array(
 								'text' => T_('General'),
-								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog, ),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog, ),
 							'features' => array(
 								'text' => T_('Features'),
-								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$blog,
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$blog,
 								'entries' => array(
 									'features' => array(
 										'text' => T_('Posts'),
-										'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$blog ),
+										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$blog ),
 									'comments' => array(
 										'text' => T_('Comments'),
-										'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=comments&amp;blog='.$blog ),
+										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=comments&amp;blog='.$blog ),
 									'other' => array(
 										'text' => T_('Other'),
-										'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=other&amp;blog='.$blog ),
+										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=other&amp;blog='.$blog ),
 								),
 							),
 							'skin' => array(
 								'text' => T_('Skin'),
-								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog,
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog,
 								'entries' => $skin_entries,
 							),
 							'plugin_settings' => array(
 								'text' => T_('Plugins'),
-								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=plugin_settings&amp;blog='.$blog, ),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=plugin_settings&amp;blog='.$blog, ),
 							'widgets' => array(
 								'text' => T_('Widgets'),
-								'href' => $dispatcher.'?ctrl=widgets&amp;blog='.$blog, ),
+								'href' => $admin_url.'?ctrl=widgets&amp;blog='.$blog, ),
 							'urls' => array(
 								'text' => T_('URLs'),
-								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=urls&amp;blog='.$blog, ),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=urls&amp;blog='.$blog, ),
 							'seo' => array(
 								'text' => T_('SEO'),
-								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=seo&amp;blog='.$blog, ),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=seo&amp;blog='.$blog, ),
 							'advanced' => array(
 								'text' => T_('Advanced'),
-								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$blog, ),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$blog, ),
 						) );
 
 				if( $Blog && $Blog->advanced_perms )
@@ -781,10 +800,10 @@ class collections_Module extends Module
 					$AdminUI->add_menu_entries( 'blogs', array(
 								'perm' => array(
 									'text' => T_('User perms'), // keep label short
-									'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=perm&amp;blog='.$blog, ),
+									'href' => $admin_url.'?ctrl=coll_settings&amp;tab=perm&amp;blog='.$blog, ),
 								'permgroup' => array(
 									'text' => T_('Group perms'), // keep label short
-									'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$blog, ),
+									'href' => $admin_url.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$blog, ),
 							) );
 				}
 			}
@@ -799,7 +818,7 @@ class collections_Module extends Module
 	 */
 	function build_menu_3()
 	{
-		global $blog, $loc_transinfo, $ctrl, $dispatcher;
+		global $blog, $loc_transinfo, $ctrl, $admin_url;
 		/**
 		 * @var User
 		 */
@@ -820,23 +839,23 @@ class collections_Module extends Module
 			$AdminUI->add_menu_entries( 'options', array(
 					'misc' => array(
 						'text' => T_('Maintenance'),
-						'href' => $dispatcher.'?ctrl=tools',
+						'href' => $admin_url.'?ctrl=tools',
 						'entries' => array(
 							'tools' => array(
 								'text' => T_('Tools'),
-								'href' => $dispatcher.'?ctrl=tools' ),
+								'href' => $admin_url.'?ctrl=tools' ),
 							'import' => array(
 								'text' => T_('Import'),
-								'href' => $dispatcher.'?ctrl=tools&amp;tab3=import' ),
+								'href' => $admin_url.'?ctrl=tools&amp;tab3=import' ),
 							'test' => array(
 								'text' => T_('Testing'),
-								'href' => $dispatcher.'?ctrl=tools&amp;tab3=test' ),
+								'href' => $admin_url.'?ctrl=tools&amp;tab3=test' ),
 							'backup' => array(
 								'text' => T_('Backup'),
-								'href' => $dispatcher.'?ctrl=backup' ),
+								'href' => $admin_url.'?ctrl=backup' ),
 							'upgrade' => array(
 								'text' => T_('Check for updates'),
-								'href' => $dispatcher.'?ctrl=upgrade' ),
+								'href' => $admin_url.'?ctrl=upgrade' ),
 							),
 				) ) );
 
@@ -870,7 +889,7 @@ class collections_Module extends Module
 				// Unlink a file from a LinkOwner ( Item, Comment ) object, and delete that file if it's not linked to any other object
 
 				$link_ID = param( 'link_ID', 'integer', true );
-				$redirect_to = param( 'redirect_to', 'string', '' );
+				$redirect_to = param( 'redirect_to', 'url', '' );
 				$LinkCache = & get_LinkCache();
 				$edited_Link = & $LinkCache->get_by_ID( $link_ID, false );
 
@@ -894,9 +913,14 @@ class collections_Module extends Module
 				$confirmed = param( 'confirmed', 'integer', 0 );
 				if( $confirmed )
 				{ // Unlink File from Item:
+					$deleted_link_ID = $edited_Link->ID;
 					$edited_Link->dbdelete( true );
 					unset($edited_Link);
-					$Messages->add( $LinkOwner->T_( 'Link has been deleted from $ownerTitle$.' ), 'success' );
+
+					$LinkOwner->after_unlink_action( $deleted_link_ID );
+
+					$Messages->add( $LinkOwner->translate( 'Link has been deleted from $ownerTitle$.' ), 'success' );
+
 					if( $current_User->check_perm( 'files', 'edit' ) )
 					{ // current User has permission to edit/delete files
 						$file_name = $linked_File->get_name();
@@ -937,7 +961,7 @@ class collections_Module extends Module
 				// Subscribe/Unsubscribe user on the selected item
 
 				if( $demo_mode && ( $current_User->ID <= 3 ) )
-				{ // don't allow default users profile change on demo mode 
+				{ // don't allow default users profile change on demo mode
 					bad_request_die( 'Demo mode: you can\'t edit the admin and demo users profile!<br />[<a href="javascript:history.go(-1)">'
 								. T_('Back to profile') . '</a>]' );
 				}
@@ -986,11 +1010,4 @@ class collections_Module extends Module
 
 $collections_Module = new collections_Module();
 
-
-/*
- * $Log$
- * Revision 1.34  2013/11/06 09:08:47  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @version $Id$
  */
@@ -69,7 +69,7 @@ if( $params['notify_full'] )
 
 	if( !empty( $Comment->rating ) )
 	{
-		$notify_message .= T_('Rating').": $Comment->rating\n";
+		$notify_message .= T_('Rating').': '.$Comment->rating.'/5'."\n";
 	}
 
 	if( $params['notify_type'] == 'moderator' )
@@ -77,7 +77,24 @@ if( $params['notify_full'] )
 		$notify_message .= T_('Status').': '.$Comment->get( 't_status' )."\n";
 	}
 
+	// Content:
 	$notify_message .= $Comment->get('content')."\n";
+
+	// Attachments:
+	$LinkCache = & get_LinkCache();
+	$comment_links = $LinkCache->get_by_comment_ID( $Comment->ID );
+	if( !empty( $comment_links ) )
+	{
+		$notify_message .= "\n".T_('Attachments').":\n";
+		foreach( $comment_links as $Link )
+		{
+			if( $File = $Link->get_File() )
+			{
+				$notify_message .= ' - '.$File->get_name().': '.$File->get_url()."\n";
+			}
+		}
+		$notify_message .= "\n";
+	}
 }
 else
 {	// Shot format notification:

@@ -77,6 +77,7 @@ function setCommentStatus( id, status, redirect_to )
 	modifieds[divid] = status;
 
 	var statuses = get_show_statuses();
+	var expiry_status = get_expiry_status();
 	var currentpage = get_current_page();
 	var item_id = get_itemid();
 	var limit = get_limit();
@@ -92,6 +93,7 @@ function setCommentStatus( id, status, redirect_to )
 			'action': 'set_comment_status',
 			'moderation': 'commentlist',
 			'statuses': statuses,
+			'expiry_status': expiry_status,
 			'itemid': item_id,
 			'currentpage': currentpage,
 			'redirect_to': redirect_to,
@@ -168,6 +170,7 @@ function deleteComment( commentIds )
 	}
 
 	var statuses = get_show_statuses();
+	var expiry_status = get_expiry_status();
 	var item_id = get_itemid();
 	var currentpage = get_current_page();
 	var limit = get_limit();
@@ -175,7 +178,7 @@ function deleteComment( commentIds )
 	jQuery.ajax({
 	type: 'POST',
 	url: '<?php echo $htsrv_url; ?>async.php',
-	data: 'action=get_opentrash_link&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
+	data: 'action=get_opentrash_link&blog=<?php echo $Blog->ID; ?>&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
 	success: function(result)
 		{
 			jQuery('#recycle_bin').replaceWith( ajax_debug_clear( result ) );
@@ -191,6 +194,7 @@ function deleteComment( commentIds )
 			'action': 'delete_comments',
 			'itemid': item_id,
 			'statuses': statuses,
+			'expiry_status': expiry_status,
 			'currentpage': currentpage,
 			'limit': limit,
 			'crumb_comment': '<?php echo get_crumb('comment'); ?>',
@@ -335,6 +339,17 @@ function get_show_statuses()
 	return '(published,community,protected,private,review,draft,deprecated)';
 }
 
+function get_expiry_status()
+{
+	var expiry_status = 'active';
+	if( jQuery('#show_expiry_all') && jQuery('#show_expiry_all').attr('checked') )
+	{
+		expiry_status = 'all';
+	}
+
+	return expiry_status;
+}
+
 function get_itemid()
 {
 	var item_id = jQuery('#comments_container').attr('value');
@@ -348,6 +363,7 @@ function get_itemid()
 function refresh_item_comments( item_id, currentpage )
 {
 	var statuses = get_show_statuses();
+	var expiry_status = get_expiry_status();
 
 	if( ! isDefined( currentpage ) )
 	{
@@ -360,7 +376,7 @@ function refresh_item_comments( item_id, currentpage )
 	jQuery.ajax({
 		type: 'POST',
 		url: '<?php echo $htsrv_url; ?>async.php',
-		data: 'blogid=' + <?php echo $Blog->ID; ?> + '&action=refresh_item_comments&itemid=' + item_id + '&statuses=' + statuses + '&currentpage=' + currentpage,
+		data: 'blogid=' + <?php echo $Blog->ID; ?> + '&action=refresh_item_comments&itemid=' + item_id + '&statuses=' + statuses + '&currentpage=' + currentpage + '&expiry_status=' + expiry_status,
 		success: function(result)
 		{
 			endRefreshComments( ajax_debug_clear( result ) );

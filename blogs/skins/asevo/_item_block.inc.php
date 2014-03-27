@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -17,10 +17,11 @@ global $Item;
 
 // Default params:
 $params = array_merge( array(
-		'feature_block'     => false,
-		'content_mode'      => 'auto',		// 'auto' will auto select depending on $disp-detail
-		'item_class'        => 'evo_post',
-		'image_size'	      => 'fit-400x320',
+		'feature_block'    => false,
+		'content_mode'     => 'auto',		// 'auto' will auto select depending on $disp-detail
+		'item_class'       => 'evo_post',
+		'image_size'	     => 'fit-400x320',
+		'author_link_text' => 'preferredname',
 	), $params );
 
 echo '<div id="styled_content_block">'; // Beginning of post display
@@ -69,6 +70,7 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 		$Item->author( array(
 				'before'    => ', '.T_('by').' ',
 				'after'     => '',
+				'link_text' => $params['author_link_text'],
 			) );
 
 		$Item->categories( array(
@@ -131,6 +133,7 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 		skin_include( '_item_feedback.inc.php', array(
 				'before_section_title' => '<h4>',
 				'after_section_title'  => '</h4>',
+				'author_link_text' => $params['author_link_text'],
 			) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.
@@ -146,10 +149,4 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 
 echo '</div>'; // End of post display 
 
-/*
- * $Log$
- * Revision 1.5  2013/11/06 08:05:43  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

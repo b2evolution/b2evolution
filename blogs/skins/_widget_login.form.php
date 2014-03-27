@@ -4,7 +4,7 @@
  *
  * This file is not meant to be called directly.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evocore
  *

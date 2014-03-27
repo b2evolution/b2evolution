@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -19,7 +19,9 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $admin_url, $UserSettings, $Plugins;
+global $admin_url, $UserSettings, $Plugins, $tab;
+
+$tab_param = empty( $tab ) ? '' : '&amp;tab='.$tab;
 
 $ip_address = param( 'ip_address', 'string', '', true );
 
@@ -27,9 +29,9 @@ $SQL = new SQL();
 $SQL->SELECT( '*' );
 $SQL->FROM( 'T_antispam__iprange' );
 
-$CountSQL = new SQL();
-$CountSQL->SELECT( 'SQL_NO_CACHE COUNT( aipr_ID )' );
-$CountSQL->FROM( 'T_antispam__iprange' );
+$count_SQL = new SQL();
+$count_SQL->SELECT( 'SQL_NO_CACHE COUNT( aipr_ID )' );
+$count_SQL->FROM( 'T_antispam__iprange' );
 
 if( !empty( $ip_address ) )
 { // Filter by IP address
@@ -38,14 +40,14 @@ if( !empty( $ip_address ) )
 	$SQL->WHERE( 'aipr_IPv4start <= '.$DB->quote( $ip_address ) );
 	$SQL->WHERE_and( 'aipr_IPv4end >= '.$DB->quote( $ip_address ) );
 
-	$CountSQL->WHERE( 'aipr_IPv4start <= '.$DB->quote( $ip_address ) );
-	$CountSQL->WHERE_and( 'aipr_IPv4end >= '.$DB->quote( $ip_address ) );
+	$count_SQL->WHERE( 'aipr_IPv4start <= '.$DB->quote( $ip_address ) );
+	$count_SQL->WHERE_and( 'aipr_IPv4end >= '.$DB->quote( $ip_address ) );
 }
 
 // Create result set:
-$Results = new Results( $SQL->get(), 'aipr_', 'A', $UserSettings->get( 'results_per_page' ), $CountSQL->get() );
+$Results = new Results( $SQL->get(), 'aipr_', 'A', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 
-$Results->title = T_('IP Ranges').' ('.$Results->total_rows.')'.get_manual_link('ip-ranges-tab');
+$Results->title = T_('IP Ranges').' ('.$Results->get_total_rows().')'.get_manual_link('ip-ranges-tab');
 $Results->Cache = get_IPRangeCache();
 
 /**
@@ -60,7 +62,7 @@ function filter_email_blocked( & $Form )
 $Results->filter_area = array(
 	'callback' => 'filter_email_blocked',
 	'presets' => array(
-		'all' => array( T_('All'), $admin_url.'?ctrl=antispam&amp;tab3=ipranges' ),
+		'all' => array( T_('All'), $admin_url.'?ctrl=antispam'.$tab_param.'&amp;tab3=ipranges' ),
 		)
 	);
 
@@ -102,12 +104,14 @@ $Results->cols[] = array(
 		'th' => T_('User count'),
 		'td' => '$aipr_user_count$',
 		'order' => 'aipr_user_count',
+		'default_dir' => 'D',
 	);
 
 $Results->cols[] = array(
 		'th' => T_('Block count'),
 		'td' => '$aipr_block_count$',
 		'order' => 'aipr_block_count',
+		'default_dir' => 'D',
 	);
 
 // Get additional columns from the Plugins
@@ -117,13 +121,13 @@ $Plugins->trigger_event( 'GetAdditionalColumnsTable', array(
 	'Results' => $Results ) );
 
 if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
-{	// Check permission to edit IP ranges:
+{ // Check permission to edit IP ranges:
 	$Results->cols[] = array(
 			'th' => T_('Actions'),
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'shrinkwrap',
 			'td' => action_icon( TS_('Edit this IP range...'), 'properties',
-					$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;iprange_ID=$aipr_ID$&amp;action=iprange_edit' )
+					$admin_url.'?ctrl=antispam'.$tab_param.'&amp;tab3=ipranges&amp;iprange_ID=$aipr_ID$&amp;action=iprange_edit' )
 					.action_icon( T_('Delete this IP range!'), 'delete',
 						regenerate_url( 'iprange_ID,action', 'iprange_ID=$aipr_ID$&amp;action=iprange_delete&amp;'.url_crumb('iprange') ) ),
 		);
@@ -134,51 +138,16 @@ $Results->global_icon( T_('Add a new IP range...'), 'new', regenerate_url( 'acti
 $Results->display();
 
 if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
-{	// Check permission to edit IP ranges:
-?>
-<script type="text/javascript">
-jQuery( document ).ready( function()
-{
-	jQuery( '.iprange_status_edit' ).editable( htsrv_url + 'async.php?action=iprange_status_edit&<?php echo url_crumb( 'iprange' ) ?>',
-	{
-	data : function( value, settings )
-		{
-			value = ajax_debug_clear( value );
-			var re =  /rel="(.*)"/;
-			var result = value.match(re);
-			return {
-				''         : '<?php echo aipr_status_title( '' ) ?>',
-				'trusted'  : '<?php echo aipr_status_title( 'trusted' ) ?>',
-				'suspect'  : '<?php echo aipr_status_title( 'suspect' ) ?>',
-				'blocked'  : '<?php echo aipr_status_title( 'blocked' ) ?>',
-				'selected' : result[1]
-			}
-		},
-	type     : 'select',
-	name     : 'new_status',
-	tooltip  : 'Click to edit',
-	event    : 'click',
-	callback : function( settings, original )
-		{
-			//evoFadeSuccess( this );
-			jQuery( this ).html( ajax_debug_clear( settings ) );
-			var link = jQuery( this ).find( 'a' );
-			jQuery( this ).css( 'background-color', link.attr( 'color' ) );
-			link.removeAttr( 'color' );
-		},
-	onsubmit: function( settings, original ) {
-	},
-	submitdata: function( value, settings ) {
-			var id = jQuery( ':first', jQuery( this ).parent() ).text();
-			return { iprange_ID: id }
-		},
-	onerror : function( settings, original, xhr ) {
-			evoFadeFailure( original );
-		}
-	} );
-} );
-</script>
-<?php
+{ // Check permission to edit IP ranges:
+	// Print JS to edit status of IP range
+	echo_editable_column_js( array(
+		'column_selector' => '.iprange_status_edit',
+		'ajax_url'        => get_secure_htsrv_url().'async.php?action=iprange_status_edit&'.url_crumb( 'iprange' ),
+		'options'         => aipr_status_titles(),
+		'new_field_name'  => 'new_status',
+		'ID_value'        => 'jQuery( ":first", jQuery( this ).parent() ).text()',
+		'ID_name'         => 'iprange_ID',
+		'colored_cells'   => true ) );
 }
 
 ?>

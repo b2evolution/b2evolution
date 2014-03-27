@@ -5,7 +5,7 @@
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -44,17 +44,18 @@ else
 $exclude = param( 'exclude', 'integer', 0, true );
 $sess_ID = param( 'sess_ID', 'integer', NULL, true );
 $goal_name = param( 'goal_name', 'string', NULL, true );
+$goal_cat = param( 'goal_cat', 'integer', 0, true );
 
 if( param_errors_detected() )
 {
 	$sql = 'SELECT 0 AS count';
-	$sql_count = 'SELECT 0';
+	$sql_count = 0;
 }
 else
 {
 	// Create result set:
 	$SQL = new SQL();
-	$SQL->SELECT( 'hit_ID, sess_ID, hit_datetime, hit_referer_type, hit_uri, hit_blog_ID, hit_referer, hit_remote_addr,
+	$SQL->SELECT( 'hit_ID, sess_ID, hit_datetime, hit_referer_type, hit_uri, hit_coll_ID, hit_referer, hit_remote_addr,
 									user_login, hit_agent_type, dom_name, goal_name, keyp_phrase' );
 	$SQL->FROM( 'T_track__goalhit LEFT JOIN T_hitlog ON ghit_hit_ID = hit_ID
 									LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
@@ -86,16 +87,29 @@ else
 		$SQL_count->WHERE_and( 'hit_sess_ID'.$operator.$sess_ID );
 	}
 
-	if( !empty($goal_name) ) // TODO: allow combine
-	{ // We want to filter on the goal name:
-		$operator = ($exclude ? ' NOT LIKE ' : ' LIKE ' );
-		$SQL->WHERE_and( 'goal_name'.$operator.$DB->quote($goal_name.'%') );
+	if( ! empty( $goal_name ) || ! empty( $goal_cat ) )
+	{
 		$SQL_count->FROM_add( 'LEFT JOIN T_track__goal ON ghit_goal_ID = goal_ID' );
-		$SQL_count->WHERE_and( 'goal_name'.$operator.$DB->quote($goal_name.'%') );
+		if( ! empty( $goal_name ) ) // TODO: allow combine
+		{ // We want to filter on the goal name:
+			$operator = ($exclude ? ' NOT LIKE ' : ' LIKE ' );
+			$SQL->WHERE_and( 'goal_name'.$operator.$DB->quote($goal_name.'%') );
+			$SQL_count->WHERE_and( 'goal_name'.$operator.$DB->quote($goal_name.'%') );
+		}
+
+		if( ! empty( $goal_cat ) )
+		{ // We want to filter on the goal category:
+			$operator = ($exclude ? ' != ' : ' = ' );
+			$SQL->WHERE_and( 'goal_gcat_ID'.$operator.$DB->quote( $goal_cat ) );
+			$SQL_count->WHERE_and( 'goal_gcat_ID'.$operator.$DB->quote( $goal_cat ) );
+		}
 	}
+
+	$sql = $SQL->get();
+	$sql_count = $SQL_count->get();
 }
 
-$Results = new Results( $SQL->get(), 'ghits_', '--D', $UserSettings->get( 'results_per_page' ), $SQL_count->get() );
+$Results = new Results( $sql, 'ghits_', '--D', $UserSettings->get( 'results_per_page' ), $sql_count );
 
 $Results->title = T_('Recent goal hits').get_manual_link( 'goal-hits' );
 
@@ -114,6 +128,10 @@ function filter_goal_hits( & $Form )
 	$Form->checkbox_basic_input( 'exclude', get_param('exclude'), T_('Exclude').' &rarr; ' );
 	$Form->text_input( 'sess_ID', get_param('sess_ID'), 15, T_('Session ID'), '', array( 'maxlength'=>20 ) );
 	$Form->text_input( 'goal_name', get_param('goal_name'), 20, T_('Goal names starting with'), '', array( 'maxlength'=>50 ) );
+
+	$GoalCategoryCache = & get_GoalCategoryCache( T_('All') );
+	$GoalCategoryCache->load_all();
+	$Form->select_input_object( 'goal_cat', get_param('goal_cat'), $GoalCategoryCache, T_('Goal category'), array( 'allow_none' => true ) );
 }
 $Results->filter_area = array(
 	'callback' => 'filter_goal_hits',

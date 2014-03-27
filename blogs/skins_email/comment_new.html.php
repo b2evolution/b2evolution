@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @version $Id$
  */
@@ -60,7 +60,7 @@ if( $params['notify_full'] )
 
 	if( !empty( $Comment->rating ) )
 	{
-		$notify_message .= '<p>'.T_('Rating').': '.$Comment->rating."</p>\n";
+		$notify_message .= '<p>'.T_('Rating').': '.$Comment->rating.'/5'."</p>\n";
 	}
 
 	if( $params['notify_type'] == 'moderator' )
@@ -72,6 +72,27 @@ if( $params['notify_full'] )
 	$notify_message .= '<div class="email_ugc">'."\n";
 	$notify_message .= '<p>'.nl2br( $Comment->get('content') ).'</p>';
 	$notify_message .= "</div>\n";
+
+	// Attachments:
+	$LinkCache = & get_LinkCache();
+	$comment_links = $LinkCache->get_by_comment_ID( $Comment->ID );
+	if( !empty( $comment_links ) )
+	{
+		$notify_message .= '<p>'.T_('Attachments').':<ul>'."\n";
+		foreach( $comment_links as $Link )
+		{
+			if( $File = $Link->get_File() )
+			{
+				$notify_message .= '<li><a href="'.$File->get_url().'">';
+				if( $File->is_image() )
+				{ // Display an image
+					$notify_message .= $File->get_thumb_imgtag( 'fit-80x80', '', 'middle' ).' ';
+				}
+				$notify_message .= $File->get_name().'</a></li>'."\n";
+			}
+		}
+		$notify_message .= "</ul></p>\n";
+	}
 }
 else
 {	// Short format notification:

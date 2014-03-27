@@ -22,6 +22,20 @@ if( file_exists(dirname(__FILE__).'/maintenance.html') )
 	readfile(dirname(__FILE__).'/maintenance.html');
 	die();
 }
+elseif( file_exists(dirname(__FILE__).'/umaintenance.html') )
+{ // Maintenance mode with a file - "umaintenance.html" with an "u" prevents access to the site but NOT to upgrade
+	$get_ctrl = isset( $_GET['ctrl'] ) ? $_GET['ctrl'] : ( isset( $_POST['ctrl'] ) ? $_POST['ctrl'] : '' );
+	// Check if the request is to the upgrade controller or it is an upgrade action request from the upgrade ctrl
+	$is_upgrade = ( ( $get_ctrl == 'upgrade' ) || ( ( substr( $_SERVER['PHP_SELF'], -17 ) == 'install/index.php' )
+				&& isset( $_GET['action'] ) && ( $_GET['action'] == 'svn_upgrade' || $_GET['action'] == 'auto_upgrade' ) ) ); // The request action is 'svn_upgrade' or 'auto_upgrade'
+	if( ! $is_upgrade )
+	{ // NOT an upgrade
+		header('HTTP/1.0 503 Service Unavailable');
+		readfile(dirname(__FILE__).'/umaintenance.html');
+		die();
+	}
+}
+
 
 /**
  * This makes sure the config does not get loaded twice in Windows
@@ -70,11 +84,25 @@ if( $debug == 'pwd' )
 			if( $_GET['debug'] == $debug_pwd )
 			{	// Password matches
 				$debug = 1;
-				setcookie( 'debug', $debug_pwd, 0, $cookie_path, $cookie_domain );
+				if( version_compare( phpversion(), '5.2', '>=' ) )
+				{ // Use HTTP-only setting since PHP 5.2.0
+					setcookie( 'debug', $debug_pwd, 0, $cookie_path, $cookie_domain, false, true );
+				}
+				else
+				{ // PHP < 5.2 doesn't support HTTP-only
+					setcookie( 'debug', $debug_pwd, 0, $cookie_path, $cookie_domain );
+				}
 			}
 			else
 			{	// Password doesn't match: turn off debug mode:
-				setcookie( 'debug', '', $cookie_expired, $cookie_path, $cookie_domain );
+				if( version_compare( phpversion(), '5.2', '>=' ) )
+				{ // Use HTTP-only setting since PHP 5.2.0
+					setcookie( 'debug', '', $cookie_expired, $cookie_path, $cookie_domain, false, true );
+				}
+				else
+				{ // PHP < 5.2 doesn't support HTTP-only
+					setcookie( 'debug', '', $cookie_expired, $cookie_path, $cookie_domain );
+				}
 			}
 		}
 		elseif( !empty( $_COOKIE['debug'] ) && $_COOKIE['debug'] == $debug_pwd )
@@ -122,6 +150,17 @@ if( $debug_jslog == 'pwd' )
 	}
 }
 
+
+// To help debugging severe errors, you'll probably want PHP to display the errors on screen.
+if( $debug > 0 || $display_errors_on_production )
+{ // We are debugging or w want to display errors on screen production anyways:
+	ini_set( 'display_errors', 'On' );
+}
+else
+{ // Do not display errors on screen:
+	ini_set( 'display_errors', 'Off' );
+}
+
 // Check compatibility. Server PHP version can't be lower then the application required PHP version.
 $php_version = phpversion();
 if( version_compare( $php_version, $required_php_version[ 'application' ], '<' ) )
@@ -132,14 +171,15 @@ if( version_compare( $php_version, $required_php_version[ 'application' ], '<' )
 	die('<h1>Insufficient Requirements</h1><p>'.$compat.'</p>');
 }
 
+// Check timezone setting:
+$date_timezone = ini_get( "date.timezone" );
+if( version_compare( $php_version, '5.1', '>=' ) && ( !empty( $date_default_timezone ) || empty( $date_timezone ) ) )
+{ // Set default timezone in php versions >= 5.1 but only if $date_default_timezone is set or php.ini 'date.timezone' setting was not set
+	date_default_timezone_set( empty( $date_default_timezone ) ? 'Europe/Paris' : $date_default_timezone );
+}
+
 // STUFF THAT SHOULD BE INITIALIZED (to avoid param injection on badly configured PHP)
 $use_db = true;
 $use_session = true;
 
-/*
- * $Log$
- * Revision 1.66  2013/11/06 08:03:44  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

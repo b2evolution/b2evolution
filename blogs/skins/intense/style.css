@@ -8,6 +8,11 @@ body{
 	background:#333 url(rsc/img/bodybg.png) repeat-x fixed top center;
 	font:11px Verdana,Arial,Helvetica,sans-serif;
 }
+
+div#skin_wrapper div.sitewide_header {
+	margin-bottom: 0;
+}
+
 #rap{
 	width:700px;
 	margin:auto;
@@ -66,7 +71,7 @@ hr{
 }
 fieldset
 {
-    border:none;
+	border:none;
 }
 pre
 {
@@ -319,18 +324,6 @@ form p{
 	margin:0;
 	padding:0;
 	color:#999;
-}
-#content .post-info
-{
-	color:#777;
-	text-align:right;
-	background:url(rsc/img/dottedborder.gif) repeat-x top;
-}
-#content .post-info em
-{
-	font-style:normal;
-	float:left;
-	margin:0 5px 0 0;
 }
 
 /* sidebar */

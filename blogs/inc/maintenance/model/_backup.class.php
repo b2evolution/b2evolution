@@ -3,7 +3,7 @@
  * This file is part of b2evolution - {@link http://b2evolution.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2014 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -307,6 +307,10 @@ class Backup
 
 			// Pack using 'zlib' extension and PclZip wrapper
 
+			if( ! defined( 'PCLZIP_TEMPORARY_DIR' ) )
+			{ // Set path for temp files of PclZip
+				define( 'PCLZIP_TEMPORARY_DIR', $backup_dirpath );
+			}
 			// Load PclZip class (PHP4):
 			load_class( '_ext/pclzip/pclzip.lib.php', 'PclZip' );
 
@@ -444,37 +448,61 @@ class Backup
 			$row_table_data = $DB->get_row( 'SHOW CREATE TABLE '.$table, ARRAY_N );
 			fwrite( $f, $row_table_data[1].";\n\n" );
 
-			$values_list = array();
-			foreach( $DB->get_results( 'SELECT * FROM '.$table, ARRAY_N ) as $row )
-			{
-				$values = '(';
-				$num_fields = count( $row );
-				for( $index = 0; $index < $num_fields; $index++ )
+			$page = 0;
+			$page_size = 500;
+			$is_insert_sql_started = false;
+			$is_first_insert_sql_value = true;
+			while( ! empty( $rows ) || $page == 0 )
+			{ // Get the records by page(500) in order to save memory and avoid fatal error
+				$rows = $DB->get_results( 'SELECT * FROM '.$table.' LIMIT '.( $page * $page_size ).', '.$page_size, ARRAY_N );
+
+				if( $page == 0 && ! $is_insert_sql_started && ! empty( $rows ) )
+				{ // Start SQL INSERT clause
+					fwrite( $f, 'INSERT INTO '.$table.' VALUES ' );
+					$is_insert_sql_started = true;
+				}
+
+				foreach( $rows as $row )
 				{
-					if( isset( $row[$index] ) )
+					$values = '(';
+					$num_fields = count( $row );
+					for( $index = 0; $index < $num_fields; $index++ )
 					{
-						$row[$index] = str_replace("\n","\\n", addslashes( $row[$index] ) );
-						$values .= '\''.$row[$index].'\'' ;
+						if( isset( $row[$index] ) )
+						{
+							$row[$index] = str_replace("\n","\\n", addslashes( $row[$index] ) );
+							$values .= '\''.$row[$index].'\'' ;
+						}
+						else
+						{ // The $row[$index] value is not set or is NULL
+							$values .= 'NULL';
+						}
+
+						if( $index<( $num_fields-1 ) )
+						{
+							$values .= ',';
+						}
+					}
+					$values .= ')';
+					if( $is_first_insert_sql_value )
+					{ // Don't write a comma before first row values
+						$is_first_insert_sql_value = false;
 					}
 					else
-					{ // The $row[$index] value is not set or is NULL
-						$values .= 'NULL';
+					{ // Write a comma between row values
+						$values = ','.$values;
 					}
 
-					if( $index<( $num_fields-1 ) )
-					{
-						$values .= ',';
-					}
+					fwrite( $f, $values );
 				}
-				$values_list[] = $values.')';
+				unset( $rows );
+				$page++;
 			}
 
-			if( !empty( $values_list ) )
-			{
-				fwrite( $f, 'INSERT INTO '.$table.' VALUES '.implode( ',', $values_list ).";\n\n" );
+			if( $is_insert_sql_started )
+			{ // End SQL INSERT clause
+				fwrite( $f, ";\n\n" );
 			}
-
-			unset( $values_list );
 
 			// Flush the output to a file
 			if( fflush( $f ) )
@@ -486,13 +514,17 @@ class Backup
 		}
 
 		// Close backup file input stream
-		fclose($f);
+		fclose( $f );
 
 		if( $this->pack_backup_files )
-		{	// Pack created backup SQL script
+		{ // Pack created backup SQL script
 
 			// Pack using 'zlib' extension and PclZip wrapper
 
+			if( ! defined( 'PCLZIP_TEMPORARY_DIR' ) )
+			{ // Set path for temp files of PclZip
+				define( 'PCLZIP_TEMPORARY_DIR', $backup_dirpath );
+			}
 			// Load PclZip class (PHP4):
 			load_class( '_ext/pclzip/pclzip.lib.php', 'PclZip' );
 

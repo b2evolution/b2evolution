@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  *
@@ -34,6 +34,12 @@ if( !$current_User->check_status( 'can_view_contacts' ) )
 	// Redirect to the blog url for users without messaging permission
 	$Messages->add( 'You are not allowed to view Contacts!' );
 	header_redirect( $Blog->gen_blogurl(), 302 );
+}
+
+if( has_cross_country_restriction( 'any' ) && empty( $current_User->ctry_ID ) )
+{ // User may browse/contact other users only from the same country
+	$Messages->add( T_('Please specify your country before attempting to contact other users.') );
+	header_redirect( get_user_profile_url() );
 }
 
 // Get action parameter from request:

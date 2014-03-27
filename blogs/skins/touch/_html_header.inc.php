@@ -22,7 +22,7 @@ require_css( 'style.css', 'relative' );
 
 add_js_for_toolbar( 'blog' );		// Registers all the javascripts needed by the toolbar menu
 init_bubbletip_js( 'blog' ); // Add jQuery bubbletip plugin
-init_scrollwide_js( 'blog' ); // Add jQuery Wide Scroll plugin
+init_scrollwide_js( 'blog' ); // Add jQuery Wide Scroll JS plugin to horizontal scroll "div.wide_scroll" by yellow right/left panel arrows
 init_results_js( 'blog' ); // Add functions to work with Results tables
 require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
 ?>

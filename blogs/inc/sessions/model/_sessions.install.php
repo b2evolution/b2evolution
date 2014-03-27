@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -44,13 +44,13 @@ $schema_queries['T_sessions'] = array(
 		'Creating table for active sessions',
 		"CREATE TABLE T_sessions (
 			sess_ID          INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-			sess_key         CHAR(32) NULL,
+			sess_key         CHAR(32) COLLATE ascii_bin NULL,
 			sess_start_ts    TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			sess_lastseen_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00' COMMENT 'User last logged activation time. Value may be off by up to 60 seconds',
-			sess_ipaddress   VARCHAR(39) NOT NULL DEFAULT '',
+			sess_ipaddress   VARCHAR(39) COLLATE ascii_bin NOT NULL DEFAULT '',
 			sess_user_ID     INT(10) DEFAULT NULL,
 			sess_data        MEDIUMBLOB DEFAULT NULL,
-			sess_device      VARCHAR(8) NOT NULL DEFAULT '',
+			sess_device      VARCHAR(8) COLLATE ascii_bin NOT NULL DEFAULT '',
 			PRIMARY KEY      ( sess_ID ),
 		  KEY sess_user_ID (sess_user_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
@@ -62,8 +62,8 @@ $schema_queries['T_basedomains'] = array(
 		"CREATE TABLE T_basedomains (
 			dom_ID     INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			dom_name   VARCHAR(250) NOT NULL DEFAULT '',
-			dom_status ENUM('unknown','whitelist','blacklist') NOT NULL DEFAULT 'unknown',
-			dom_type   ENUM('unknown','normal','searcheng','aggregator','email') NOT NULL DEFAULT 'unknown',
+			dom_status ENUM('unknown','trusted','suspect','blocked') COLLATE ascii_bin NOT NULL DEFAULT 'unknown',
+			dom_type   ENUM('unknown','normal','searcheng','aggregator','email') COLLATE ascii_bin NOT NULL DEFAULT 'unknown',
 			PRIMARY KEY     (dom_ID),
 			UNIQUE dom_type_name (dom_type, dom_name)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
@@ -83,26 +83,27 @@ $schema_queries['T_track__keyphrase'] = array(
 $schema_queries['T_hitlog'] = array(
 		'Creating table for Hit-Logs',
 		"CREATE TABLE T_hitlog (
-			hit_ID                INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			hit_ID                INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			hit_sess_ID           INT UNSIGNED,
-			hit_datetime          DATETIME NOT NULL DEFAULT '2000-01-01 00:00:00',
+			hit_datetime          TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			hit_uri               VARCHAR(250) DEFAULT NULL,
 			hit_disp              VARCHAR(30) DEFAULT NULL,
-			hit_ctrl              VARCHAR(30) DEFAULT NULL,
+			hit_ctrl              VARCHAR(30) COLLATE ascii_bin DEFAULT NULL,
 			hit_action            VARCHAR(30) DEFAULT NULL,
-			hit_type              ENUM('standard','rss','admin','ajax', 'service') DEFAULT 'standard' NOT NULL,
-			hit_referer_type      ENUM('search','special','spam','referer','direct','self') NOT NULL,
+			hit_type              ENUM('standard','rss','admin','ajax', 'service') COLLATE ascii_bin DEFAULT 'standard' NOT NULL,
+			hit_referer_type      ENUM('search','special','spam','referer','direct','self') COLLATE ascii_bin NOT NULL,
 			hit_referer           VARCHAR(250) DEFAULT NULL,
 			hit_referer_dom_ID    INT UNSIGNED DEFAULT NULL,
 			hit_keyphrase_keyp_ID INT UNSIGNED DEFAULT NULL,
 			hit_keyphrase         VARCHAR(255) DEFAULT NULL,
-			hit_serprank          INT UNSIGNED DEFAULT NULL,
-			hit_blog_ID           int(11) UNSIGNED NULL DEFAULT NULL,
-			hit_remote_addr       VARCHAR(40) DEFAULT NULL,
-			hit_agent_type        ENUM('robot','browser','unknown') DEFAULT 'unknown' NOT NULL,
-			hit_response_code     INT DEFAULT NULL,
-			PRIMARY KEY              (hit_ID),
-			INDEX hit_blog_ID        ( hit_blog_ID ),
+			hit_serprank          SMALLINT UNSIGNED DEFAULT NULL,
+			hit_coll_ID           INT(10) UNSIGNED NULL DEFAULT NULL,
+			hit_remote_addr       VARCHAR(40) COLLATE ascii_bin DEFAULT NULL,
+			hit_agent_type        ENUM('robot','browser','unknown') COLLATE ascii_bin DEFAULT 'unknown' NOT NULL,
+			hit_agent_ID          SMALLINT UNSIGNED NULL DEFAULT NULL,
+			hit_response_code     SMALLINT DEFAULT NULL,
+			PRIMARY KEY              ( hit_ID ),
+			INDEX hit_coll_ID        ( hit_coll_ID ),
 			INDEX hit_uri            ( hit_uri ),
 			INDEX hit_referer_dom_ID ( hit_referer_dom_ID ),
 			INDEX hit_remote_addr    ( hit_remote_addr ),
@@ -126,11 +127,16 @@ $schema_queries['T_hitlog'] = array(
 $schema_queries['T_track__goal'] = array(
 		'Creating goals table',
 		"CREATE TABLE T_track__goal(
-		  goal_ID int(10) unsigned NOT NULL auto_increment,
-		  goal_name varchar(50) default NULL,
-		  goal_key varchar(32) default NULL,
-		  goal_redir_url varchar(255) default NULL,
-		  goal_default_value double default NULL,
+		  goal_ID             int(10) unsigned NOT NULL auto_increment,
+		  goal_gcat_ID        int(10) unsigned NOT NULL,
+		  goal_name           varchar(50) default NULL,
+		  goal_key            varchar(32) default NULL,
+		  goal_redir_url      varchar(255) default NULL,
+		  goal_temp_redir_url varchar(255) default NULL,
+		  goal_temp_start_ts  TIMESTAMP NULL,
+		  goal_temp_end_ts    TIMESTAMP NULL,
+		  goal_default_value  double default NULL,
+		  goal_notes          TEXT DEFAULT NULL,
 		  PRIMARY KEY (goal_ID),
 		  UNIQUE KEY goal_key (goal_key)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
@@ -138,13 +144,22 @@ $schema_queries['T_track__goal'] = array(
 $schema_queries['T_track__goalhit'] = array(
 		'Creating goal hits table',
 		"CREATE TABLE T_track__goalhit (
-		  ghit_ID int(10) unsigned NOT NULL auto_increment,
+		  ghit_ID         int(10) unsigned NOT NULL auto_increment,
 		  ghit_goal_ID    int(10) unsigned NOT NULL,
 		  ghit_hit_ID     int(10) unsigned NOT NULL,
 		  ghit_params     TEXT default NULL,
 		  PRIMARY KEY  (ghit_ID),
 		  KEY ghit_goal_ID (ghit_goal_ID),
 		  KEY ghit_hit_ID (ghit_hit_ID)
+		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
+
+$schema_queries['T_track__goalcat'] = array(
+	'Creating goal categories table',
+	"CREATE TABLE T_track__goalcat (
+		  gcat_ID     int(10) unsigned NOT NULL auto_increment,
+		  gcat_name   varchar(50) default NULL,
+		  gcat_color  char(7) COLLATE ascii_bin default NULL,
+		  PRIMARY KEY (gcat_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
 
 ?>

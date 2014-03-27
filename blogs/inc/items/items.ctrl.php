@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal Open Source relicensing agreement:
  * }}
@@ -108,6 +108,11 @@ switch( $action )
 	case 'delete' :
 	// Note: we need to *not* use $p in the cases above or it will conflict with the list display
 	case 'edit_switchtab' : // this gets set as action by JS, when we switch tabs
+		if( $action != 'edit_switchtab' )
+		{ // Stop a request from the blocked IP addresses or Domains
+			antispam_block_request();
+		}
+
 		// Load post to edit:
 		param ( 'post_ID', 'integer', true, true );
 		$ItemCache = & get_ItemCache ();
@@ -137,6 +142,11 @@ switch( $action )
 	case 'create' :
 	case 'create_publish' :
 	case 'list' :
+		if( in_array( $action, array( 'create_edit', 'create', 'create_publish' ) ) )
+		{ // Stop a request from the blocked IP addresses or Domains
+			antispam_block_request();
+		}
+
 		if( $action == 'list' )
 		{	// We only need view permission
 			$selected = autoselect_blog( 'blog_ismember', 'view' );
@@ -170,54 +180,57 @@ switch( $action )
 
 	case 'make_posts_pre':
 		// form for edit several posts
-		break;
-
-	case 'make_posts_from_files':
-		// Make posts with selected images:
-
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'file' );
-
-		$FileRootCache = & get_FileRootCache();
-		// getting root
-		$root = param("root");
-
-		$fm_FileRoot = & $FileRootCache->get_by_ID($root, true);
-
-		// fp> TODO: this block should move to a general level
-		// Try to go to the right blog:
-		if( $fm_FileRoot->type == 'collection' )
-		{
-			set_working_blog( $fm_FileRoot->in_type_ID );
-      // Load the blog we're in:
-			$Blog = & $BlogCache->get_by_ID( $blog );
-		}
-		// ---
-
 
 		if( empty( $Blog ) )
 		{
 			$Messages->add( T_('No destination blog is selected.'), 'error' );
 			break;
 		}
-		//$Blog->disp('name');
 
-		// Get default status (includes PERM CHECK):
-		$item_status = $Blog->get_allowed_item_status();
-		if( empty($item_status) )
+		// Check perms:
+		$current_User->check_perm( 'blog_post_statuses', 'edit', true, $Blog->ID );
+		break;
+
+	case 'make_posts_from_files':
+		// Make posts with selected images:
+
+		// Stop a request from the blocked IP addresses or Domains
+		antispam_block_request();
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'file' );
+
+		$FileRootCache = & get_FileRootCache();
+		// getting root
+		$root = param( 'root' );
+
+		$fm_FileRoot = & $FileRootCache->get_by_ID( $root, true );
+
+		// fp> TODO: this block should move to a general level
+		// Try to go to the right blog:
+		if( $fm_FileRoot->type == 'collection' )
 		{
-			$Messages->add( T_('Sorry, you have no permission to post into this blog.'), 'error' );
+			set_working_blog( $fm_FileRoot->in_type_ID );
+			// Load the blog we're in:
+			$Blog = & $BlogCache->get_by_ID( $blog );
+		}
+		// ---
+
+		if( empty( $Blog ) )
+		{
+			$Messages->add( T_('No destination blog is selected.'), 'error' );
 			break;
 		}
 
-		//print_r($_POST);die();
+		// Get status (includes PERM CHECK):
+		$item_status = param( 'post_status', 'string', $Blog->get_allowed_item_status() );
+		$current_User->check_perm( 'blog_post!'.$item_status, 'create', true, $Blog->ID );
+
 		load_class( 'files/model/_filelist.class.php', 'FileList' );
 		$selected_Filelist = new Filelist( $fm_FileRoot, false );
 		$fm_selected = param( "fm_selected" , "array" );
-//		print_r($fm_selected);
 		foreach( $fm_selected as $l_source_path )
 		{
-			// echo '<br>'.$l_source_path;
 			$selected_Filelist->add_by_subpath( urldecode($l_source_path), true );
 		}
 		// make sure we have loaded metas for all files in selection!
@@ -226,29 +239,50 @@ switch( $action )
 		// Ready to create post(s):
 		load_class( 'items/model/_item.class.php', 'Item' );
 
-		$fileNum =0;
-		$cat_Array=param("category","array");
-		$title_Array=param("post_title","array");
+		$fileNum = 0;
+		$cat_Array = param( 'category', 'array/string' );
+		$title_Array = param( 'post_title', 'array/string' );
+		$new_categories = param( 'new_categories', 'array/string', array() );
 		while( $l_File = & $selected_Filelist->get_next() )
 		{
 			// Create a post:
 			$edited_Item = new Item();
 			$edited_Item->set( 'status', $item_status );
 
-
 			// replacing category if selected at preview screen
-			if ( isset($cat_Array[$fileNum]) )
+			if( isset( $cat_Array[ $fileNum ] ) )
 			{
 				// checking if selected "same as above" category option
-				if ( $cat_Array[$fileNum]!='same' )
-				{ // Use a selected category ID
-					$edited_Item->set( 'main_cat_ID', $cat_Array[$fileNum] );
+				switch( $cat_Array[ $fileNum ] )
+				{
+					case 'same':
+						// Get a category ID from previous item
+						$cat_Array[ $fileNum ] = $cat_Array[ $fileNum - 1 ];
+						break;
+
+					case 'new':
+						// Create a new category from an entered name
+
+						// Check permissions:
+						$current_User->check_perm( 'blog_cats', '', true, $blog );
+
+						$GenericCategoryCache = & get_ChapterCache();
+						$new_GenericCategory = & $GenericCategoryCache->new_obj( NULL, $blog );	// create new category object
+						$new_GenericCategory->set( 'name', $new_categories[ $fileNum ] );
+						if( $new_GenericCategory->dbinsert() !== false )
+						{ // Category is created successfully
+							$Messages->add( sprintf( T_('New category %s created.'), '<b>'.$new_categories[ $fileNum ].'</b>' ), 'success' );
+							$GenericCategoryCache->clear();
+						}
+						else
+						{ // Error on creating new category
+							$Messages->add( sprintf( T_('New category %s creation failed.'), '<b>'.$new_categories[ $fileNum ].'</b>' ), 'error' );
+							continue; // Skip this post
+						}
+						$cat_Array[ $fileNum ] = $new_GenericCategory->ID;
+						break;
 				}
-				else
-				{ // Get a category ID from previous item
-					$cat_Array[$fileNum] = $cat_Array[$fileNum-1];
-					$edited_Item->set( 'main_cat_ID', $cat_Array[$fileNum-1] );
-				}
+				$edited_Item->set( 'main_cat_ID', intval( $cat_Array[ $fileNum ] ) );
 			}
 			else
 			{ // Use default category ID if it was not selected on the form
@@ -256,7 +290,7 @@ switch( $action )
 			}
 
 			$title = $l_File->get('title');
-			if( empty($title) )
+			if( empty( $title ) )
 			{
 				$title = $l_File->get('name');
 			}
@@ -264,18 +298,17 @@ switch( $action )
 			$edited_Item->set( 'title', $title );
 
 			// replacing category if selected at preview screen
-			if (isset($title_Array[$fileNum])) {
-				$edited_Item->set( 'title', $title_Array[$fileNum] );
+			if( isset( $title_Array[ $fileNum ] ) ) {
+				$edited_Item->set( 'title', $title_Array[ $fileNum ] );
 			}
 
 			$DB->begin( 'SERIALIZABLE' );
-
 			// INSERT NEW POST INTO DB:
 			if( $edited_Item->dbinsert() )
 			{
 				// echo '<br>file meta: '.$l_File->meta;
-				if(	$l_File->meta == 'notfound' )
-				{	// That file has no meta data yet, create it now!
+				if( $l_File->meta == 'notfound' )
+				{ // That file has no meta data yet, create it now!
 					$l_File->dbsave();
 				}
 
@@ -316,11 +349,10 @@ switch( $action )
 
 
 	default:
-		debug_die( 'unhandled action 1:'.htmlspecialchars($action) );
+		debug_die( 'unhandled action 1:'.evo_htmlspecialchars($action) );
 }
 
-$AdminUI->breadcrumbpath_init();
-$AdminUI->breadcrumbpath_add( T_('Contents'), '?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' );
+$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Contents'), 'url' => '?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' ) );
 
 /**
  * Perform action:
@@ -531,11 +563,12 @@ switch( $action )
 		break;
 
 	case 'history_compare':
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'item' );
-
 		// Check permission:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+		{
+			$Messages->add( T_('You have no permission to view history for this item.'), 'error' );
+			header_redirect( $admin_url );
+		}
 
 		param( 'r1', 'integer', 0 );
 		$r2 = (int)param( 'r2', 'string', 0 );
@@ -638,6 +671,9 @@ switch( $action )
 		// Set object params:
 		$edited_Item->load_from_Request( /* editing? */ ($action == 'create_edit'), /* creating? */ true );
 
+		// Check and clear inline images, to avoid to have placeholders without corresponding attachment
+		$edited_Item->check_and_clear_inline_images();
+
 		$Plugins->trigger_event ( 'AdminBeforeItemEditCreate', array ('Item' => & $edited_Item ) );
 
 		if( !empty( $mass_create ) )
@@ -717,10 +753,13 @@ switch( $action )
 		// We want to highlight the edited object on next list display:
 		$Session->set( 'fadeout_array', array( 'item-'.$edited_Item->ID ) );
 
-		if( $edited_Item->status == 'published' )
+		if( $edited_Item->status == 'published' &&
+		    ! strpos( $redirect_to, 'tab=tracker' ) &&
+		    ! strpos( $redirect_to, 'tab=manual' ) )
 		{	// fp> I noticed that after publishing a new post, I always want to see how the blog looks like
 			// If anyone doesn't want that, we can make this optional...
 			// sam2kb> Please make this optional, this is really annoying when you create more than one post or when you publish draft images created from FM.
+			// yura> When a post is created from "workflow" or "manual" we should display a post list
 
 			// Where do we want to go after publishing?
 			if( $edited_Item->Blog->get_setting( 'enable_goto_blog' ) == 'blog' )
@@ -739,7 +778,7 @@ switch( $action )
 		}
 
 		// REDIRECT / EXIT
-		header_redirect( $redirect_to );
+		header_redirect( url_add_param( $redirect_to, 'highlight='.$edited_Item->ID, '&' ) );
 		// Switch to list mode:
 		// $action = 'list';
 		//init_list_mode();
@@ -787,6 +826,9 @@ switch( $action )
 		// Set object params:
 		$edited_Item->load_from_Request( false );
 
+		// Check and clear inline images, to avoid to have placeholders without corresponding attachment
+		$edited_Item->check_and_clear_inline_images();
+
 		$Plugins->trigger_event( 'AdminBeforeItemEditUpdate', array( 'Item' => & $edited_Item ) );
 
 		// Params we need for tab switching (in case of error or if we save&edit)
@@ -833,13 +875,17 @@ switch( $action )
 		 *     to see how the blog looks like. If anyone doesn't want that,
 		 *     we can make this optional...
 		 */
-		$edited_Item->load_Blog();
-		if( $edited_Item->status == 'redirected' )
-		{ // If a post is in "Redirected" status we should show the posts list
+		if( $edited_Item->status == 'redirected' ||
+		    strpos( $redirect_to, 'tab=tracker' ) ||
+		    strpos( $redirect_to, 'tab=manual' ) )
+		{ // We should show the posts list if:
+			//    a post is in "Redirected" status
+			//    a post is updated from "workflow" or "manual" view tab
 			$blog_redirect_setting = 'no';
 		}
 		elseif( ! $was_published && $edited_Item->status == 'published' )
 		{ // The post's last status wasn't "published", but we're going to publish it now.
+			$edited_Item->load_Blog();
 			$blog_redirect_setting = $edited_Item->Blog->get_setting( 'enable_goto_blog' );
 		}
 		else
@@ -1092,7 +1138,7 @@ switch( $action )
 		break;
 
 	default:
-		debug_die( 'unhandled action 2: '.htmlspecialchars($action) );
+		debug_die( 'unhandled action 2: '.evo_htmlspecialchars($action) );
 }
 
 
@@ -1117,6 +1163,13 @@ function init_list_mode()
 	else
 	{	// Store/retrieve preferred tab from UserSettings:
 		$UserSettings->param_Request( 'tab', 'pref_browse_tab', 'string', NULL, true /* memorize */, true /* force */ );
+	}
+
+	if( $tab == 'tracker' && ! $Blog->get_setting( 'use_workflow' ) )
+	{ // Display workflow view only if it is enabled
+		global $Messages;
+		$Messages->add( T_('Workflow feature has not been enabled for this collection.'), 'note' );
+		$tab = 'full';
 	}
 
 	/*
@@ -1161,7 +1214,13 @@ function init_list_mode()
 				header_redirect( $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=list&filter=restore' );
 			}
 
-			$AdminUI->breadcrumbpath_add( T_('Manual Pages'), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;filter=restore' );
+			global $ReqURI, $blog;
+
+			init_field_editor_js( array(
+					'action_url' => $ReqURI.'&blog='.$blog.'&order_action=update&order_data=',
+				) );
+
+			$AdminUI->breadcrumbpath_add( T_('Manual view'), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;filter=restore' );
 			break;
 
 		case 'list':
@@ -1209,6 +1268,9 @@ function init_list_mode()
 			$ItemList->set_default_filters( array(
 					'orderby' => 'priority',
 					'order' => 'ASC' ) );
+			$AdminUI->breadcrumbpath_add( T_( 'Workflow view' ), '?ctrl=items&amp;blog=$blog$&amp;tab=tracker&amp;filter=restore' );
+			// JS to edit priority of items from list view
+			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 			break;
 
 		default:
@@ -1293,6 +1355,14 @@ switch( $action )
 						' '.T_('Permalink'), 4, 3, array(
 						 		'style' => 'margin-right: 3ex',
 						 ) );
+
+				if( $edited_Item->ID > 0 )
+				{ // Display a link to history if Item exists in DB
+					$AdminUI->global_icon( T_('History'), '', $edited_Item->get_history_url(),
+						$edited_Item->history_info_icon().' '.T_('History'), 4, 3, array(
+								'style' => 'margin-right: 3ex'
+						) );
+				}
 				break;
 		}
 
@@ -1358,7 +1428,7 @@ if( !empty($tab) )
 {
 	$AdminUI->append_path_level( $tab );
 
-	if( in_array( $tab, array( 'expert', 'full', 'list', 'pages', 'intros', 'podcasts', 'links', 'ads' ) ) )
+	if( in_array( $tab, array( 'expert', 'full', 'list', 'pages', 'intros', 'podcasts', 'links', 'ads', 'tracker' ) ) )
 	{ // Init JS to autcomplete the user logins
 		init_autocomplete_login_js( 'rsc_url' );
 	}

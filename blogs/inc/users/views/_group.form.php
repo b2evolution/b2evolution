@@ -7,7 +7,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -253,9 +253,7 @@ $Form->end_fieldset();
 
 if( $action != 'view' )
 {
-	$Form->buttons( array(
-		array( '', '', T_('Save !'), 'SaveButton' ),
-		array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+	$Form->buttons( array( array( '', '', T_('Save Changes!'), 'SaveButton' ) ) );
 }
 
 $Form->end_form();

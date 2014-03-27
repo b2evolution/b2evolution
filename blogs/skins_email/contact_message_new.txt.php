@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @version $Id$
  */
@@ -39,6 +39,9 @@ echo sprintf( T_('%s has sent you this message:'), $params['sender_name'] )."\n\
 
 echo $params['message'];
 echo "\n\n-- \n";
+
+// show sender IP address
+echo sprintf( T_( 'This message was typed by a user connecting from this IP address: %s.' ), implode( ', ', get_ip_list() ) )."\n\n";
 
 // show sender email address
 echo sprintf( T_( 'By replying, your email will go directly to %s.' ), $params['sender_address'] );

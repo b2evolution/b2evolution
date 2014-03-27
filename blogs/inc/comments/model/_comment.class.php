@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -97,6 +97,11 @@ class Comment extends DataObject
 	 */
 	var $author_IP;
 	/**
+	 * ID of Country that is detected by IP address
+	 * @var integer
+	 */
+	var $IP_ctry_ID;
+	/**
 	 * Date of the comment (MySQL DATETIME - use e.g. {@link mysql2timestamp()}); local time ({@link $localtimenow})
 	 * @var string
 	 */
@@ -109,6 +114,20 @@ class Comment extends DataObject
 	 * @var string
 	 */
 	var $renderers;
+	/**
+	 * Star rating from 0 to 5
+	 * @var integer
+	 */
+	var $rating;
+	/**
+	 * @var integer
+	 */
+	var $featured;
+	/**
+	 * Karma
+	 * @var integer
+	 */
+	var $karma;
 	/**
 	 * Spam karma of the comment (0-100), 0 being "probably no spam at all"
 	 * @var integer
@@ -150,25 +169,31 @@ class Comment extends DataObject
 	 *
 	 * @var integer
 	 */
-	var $comment_helpful_addvotes;
+	var $helpful_addvotes;
 	/**
 	 * A count of all votes in system helpfulness
 	 *
 	 * @var integer
 	 */
-	var $comment_helpful_countvotes;
+	var $helpful_countvotes;
 	/**
 	 * Voting result of all votes in system spam detecting
 	 *
 	 * @var integer
 	 */
-	var $comment_spam_addvotes;
+	var $spam_addvotes;
 	/**
 	 * A count of all votes in system spam detecting
 	 *
 	 * @var integer
 	 */
-	var $comment_spam_countvotes;
+	var $spam_countvotes;
+
+	/**
+	 * Date when comment was edited last time (timestamp)
+	 * @var integer
+	 */
+	var $last_touched_ts;
 
 	/**
 	 * Constructor
@@ -196,10 +221,10 @@ class Comment extends DataObject
 		else
 		{
 			$this->ID = $db_row->comment_ID;
-			$this->item_ID = $db_row->comment_post_ID;
-			if( ! empty($db_row->comment_author_ID) )
+			$this->item_ID = $db_row->comment_item_ID;
+			if( ! empty( $db_row->comment_author_user_ID ) )
 			{
-				$this->author_user_ID = $db_row->comment_author_ID;
+				$this->author_user_ID = $db_row->comment_author_user_ID;
 			}
 			$this->type = $db_row->comment_type;
 			$this->status = $db_row->comment_status;
@@ -225,10 +250,10 @@ class Comment extends DataObject
 			$this->notif_status = $db_row->comment_notif_status;
 			$this->notif_ctsk_ID = $db_row->comment_notif_ctsk_ID;
 			$this->in_reply_to_cmt_ID = $db_row->comment_in_reply_to_cmt_ID;
-			$this->comment_helpful_addvotes = $db_row->comment_helpful_addvotes;
-			$this->comment_helpful_countvotes = $db_row->comment_helpful_countvotes;
-			$this->comment_spam_addvotes = $db_row->comment_spam_addvotes;
-			$this->comment_spam_countvotes = $db_row->comment_spam_countvotes;
+			$this->helpful_addvotes = $db_row->comment_helpful_addvotes;
+			$this->helpful_countvotes = $db_row->comment_helpful_countvotes;
+			$this->spam_addvotes = $db_row->comment_spam_addvotes;
+			$this->spam_countvotes = $db_row->comment_spam_countvotes;
 		}
 	}
 
@@ -311,6 +336,9 @@ class Comment extends DataObject
 				}
 				return $this->set_param( $parname, 'number', $parvalue, true );
 
+			case 'author_email':
+				return $this->set_param( $parname, 'string', evo_strtolower( $parvalue ), $make_null );
+
 			case 'status':
 				// Save previous status temporarily to make some changes on dbinsert(), dbupdate() & dbdelete()
 				$this->previous_status = $this->get( 'status' );
@@ -328,8 +356,7 @@ class Comment extends DataObject
 	function set_Item( & $Item )
 	{
 		$this->Item = & $Item;
-		$this->item_ID = $Item->ID;
-		parent::set_param( 'post_ID', 'number', $Item->ID );
+		parent::set_param( 'item_ID', 'number', $Item->ID );
 	}
 
 
@@ -339,8 +366,7 @@ class Comment extends DataObject
 	function set_author_User( & $author_User )
 	{
 		$this->author_User = & $author_User;
-		$this->author_user_ID = $author_User->ID;
-		parent::set_param( 'author_ID', 'number', $author_User->ID );
+		parent::set_param( 'author_user_ID', 'number', $author_User->ID );
 	}
 
 
@@ -427,8 +453,8 @@ class Comment extends DataObject
 		                SET comment_'.$vote_type.'_addvotes = '.$DB->quote( $vote->s ).',
 		                    comment_'.$vote_type.'_countvotes = '.$DB->quote( $vote->c ).'
 		              WHERE comment_ID = '.$DB->quote( $this->ID ) );
-		$this->{'comment_'.$vote_type.'_addvotes'} = $vote->s;
-		$this->{'comment_'.$vote_type.'_countvotes'} = $vote->c;
+		$this->{$vote_type.'_addvotes'} = $vote->s;
+		$this->{$vote_type.'_countvotes'} = $vote->c;
 
 		$DB->commit();
 
@@ -557,13 +583,13 @@ class Comment extends DataObject
 			return '';
 		}
 
-		if( $this->{'comment_'.$type.'_countvotes'} == 0 )
+		if( $this->{$type.'_countvotes'} == 0 )
 		{	// No votes for current comment
 			return '';
 		}
 
 		// Calculate a vote summary
-		$summary = ceil( $this->{'comment_'.$type.'_addvotes'} / $this->{'comment_'.$type.'_countvotes'} * 100 );
+		$summary = ceil( $this->{$type.'_addvotes'} / $this->{$type.'_countvotes'} * 100 );
 
 		if( $summary < -20 )
 		{	// Comment is OK
@@ -625,6 +651,24 @@ class Comment extends DataObject
 		else
 		{
 			return $this->author;
+		}
+	}
+
+
+	/**
+	 * Get the comment author's gender.
+	 *
+	 * @return string
+	 */
+	function get_author_gender()
+	{
+		if( $this->get_author_User() )
+		{
+			return $this->author_User->get( 'gender' );
+		}
+		else
+		{
+			return '';
 		}
 	}
 
@@ -763,6 +807,7 @@ class Comment extends DataObject
 		return get_avatar_imgtag_default( $size, $class, '', array(
 				'email'    => $this->get_author_email(),
 				'username' => $this->get_author_name(),
+				'gender'   => $this->get_author_gender(),
 			) );
 	}
 
@@ -1073,9 +1118,9 @@ class Comment extends DataObject
 	{
 		global $current_User;
 		if( $this->author_url( '', ' <span &bull; Url: id="commenturl_'.$this->ID.'" <span class="bUrl" >', '' ) )
-		{
-			if( $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this ) )
-			{ // There is an URL and we have permission to edit this comment...
+		{ // There is an URL
+			if( ! $this->get_author_User() && $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this ) )
+			{ // Author is anonymous user and we have permission to edit this comment...
 				if( $redirect_to == NULL )
 				{
 					$redirect_to = rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
@@ -2040,12 +2085,16 @@ class Comment extends DataObject
 	 */
 	function moderation_links( $params )
 	{
+		global $blog;
+
 		$params = array_merge( array(
 				'detect_last' => true, // TRUE if we should find what button is last and visible, FALSE if we have some other buttons after moderation buttons (e.g. button to delete a comment)
 			), $params );
 
 		$statuses = get_visibility_statuses( 'ordered-array' );
 		$statuses = array_reverse( $statuses );
+
+		$inskin_statuses = get_inskin_statuses( $blog, 'comment' );
 
 		// Get first and last statuses that will be visible buttons
 		$first_status_in_row = $this->get_next_status( true, $this->status );
@@ -2077,6 +2126,10 @@ class Comment extends DataObject
 				{
 					$tmp_params['class'] .= ' btn_next_status';
 				}
+				if( ! in_array( $next_status_in_row[0], $inskin_statuses ) )
+				{ // Don't make ajax button for those statuses which are not allowed in the front office
+					$tmp_params = array_merge( $tmp_params, array( 'ajax_button' => false ) );
+				}
 				$r .= $this->next_status_link( $tmp_params, true, $status[0] );
 			}
 			$prev_status = $next_status_in_row[0];
@@ -2103,8 +2156,8 @@ class Comment extends DataObject
 				{
 					$tmp_params['class'] .= ' btn_next_status';
 				}
-				if( $next_status_in_row[0] == 'deprecated' )
-				{ // Don't make ajax button to Deprecate comment
+				if( ! in_array( $next_status_in_row[0], $inskin_statuses ) )
+				{ // Don't make ajax button for those statuses which are not allowed in the front office
 					$tmp_params = array_merge( $tmp_params, array( 'ajax_button' => false ) );
 				}
 				$r .= $this->next_status_link( $tmp_params, false, $status[0] );
@@ -2223,12 +2276,11 @@ class Comment extends DataObject
 	 */
 	function get_permanent_link( $text = '#', $title = '#', $class = '', $nofollow = false, $restrict_status = true )
 	{
-		if( $restrict_status && ! in_array( $this->status, get_inskin_statuses() ) )
+		$comment_Item = & $this->get_Item();
+		if( $restrict_status && ! in_array( $this->status, get_inskin_statuses( $comment_Item->get_blog_ID(), 'comment' ) ) )
 		{
 			return '';
 		}
-
-		global $current_User, $baseurl;
 
 		switch( $text )
 		{
@@ -2245,7 +2297,6 @@ class Comment extends DataObject
 				break;
 
 			case '#item#':
-				$comment_Item = & $this->get_Item();
 				$text = $comment_Item->get_title( array( 'link_type' => 'none' ) );
 				break;
 		}
@@ -2331,7 +2382,7 @@ class Comment extends DataObject
 					if( empty( $CommentList ) )
 					{  // load prerendered cache for each comment which belongs to this comments Item
 						$SQL->FROM_add( 'INNER JOIN T_comments ON cmpr_cmt_ID = comment_ID' );
-						$SQL->WHERE( 'comment_post_ID = '.$this->Item->ID );
+						$SQL->WHERE( 'comment_item_ID = '.$this->Item->ID );
 					}
 					else
 					{ // load prerendered cache for each comment from the CommentList
@@ -2377,6 +2428,49 @@ class Comment extends DataObject
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Delete the attached files if they are not connected to other objects.
+	 * If the folders containing the deleted files are empty the folder will be also deleted.
+	 *
+	 * @param array the ids of the attached files
+	 */
+	function delete_orphan_attachments( $file_ids )
+	{
+		if( empty( $file_ids ) )
+		{ // This comment has no attachments
+			return;
+		}
+
+		// Remove deleted comment not linked attachments
+		remove_orphan_files( $file_ids );
+
+		// Delete empty folder of the comment attachments
+		$FileRootCache = & get_FileRootCache();
+		if( $this->author_user_ID > 0 )
+		{ // registered user
+			$root_ID = FileRoot::gen_ID( 'user', $this->author_user_ID );
+			$path = 'comments/p'.$this->item_ID;
+		}
+		else
+		{ // anonymous user
+			$commented_Item = & $this->get_Item();
+			if( empty( $commented_Item ) )
+			{ // Don't execute the following code because this comment is broken
+				return;
+			}
+			$commented_Item->load_Blog();
+			$root_ID = FileRoot::gen_ID( 'collection', $commented_Item->Blog->ID );
+			$path = 'anonymous_comments/p'.$commented_Item->ID;
+		}
+
+		if( $comment_FileRoot = & $FileRootCache->get_by_ID( $root_ID ) &&
+		    file_exists( $comment_FileRoot->ads_path.$path ) )
+		{ // Delete folder only if it is empty, Hide an error if folder is not empty
+			@rmdir( $comment_FileRoot->ads_path.$path );
+		}
 	}
 
 
@@ -2458,53 +2552,89 @@ class Comment extends DataObject
 				}
 			}
 			else
-			{ // Get links
-				$LinkCache = & get_LinkCache();
-				$commentLinks = $LinkCache->get_by_comment_ID( $this->ID );
-				if( !empty( $commentLinks ) )
-				{
-					foreach( $commentLinks as $Link )
-					{
-						$File = $Link->get_File();
-						$attachments[] = $File;
-					}
-				}
+			{ // Get all Links
+				$LinkOwner = new LinkComment( $this );
+				$attachments = & $LinkOwner->get_Links();
 			}
 		}
 
 		$images_is_attached = false;
-		foreach ($attachments as $index => $attachment)
+		foreach( $attachments as $index => $attachment )
 		{
-			$r = '';
-			$params['File'] = $attachment;
-			$params['data'] = & $r;
+			if( !empty( $this->ID ) )
+			{ // Normal mode when comment exists in DB (NOT PREVIEW mode)
+				$Link = $attachment;
+				$params['Link'] = $Link;
+				$attachment = $attachment->get_File();
+			}
 
-			if( count($Plugins->trigger_event_first_true('RenderCommentAttachment', $params)) != 0 )
-			{
-				echo $r;
-				unset($attachments[$index]);
+			$File = $attachment;
+
+			if( empty( $File ) )
+			{ // File doesn't exist in DB
+				unset( $attachments[ $index ] );
 				continue;
 			}
-			if( $attachment->is_image() )
-			{
+
+			if( ! $File->exists() )
+			{ // File doesn't exist
+				global $Debuglog;
+				$Debuglog->add( sprintf( 'File linked to comment #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+				unset( $attachments[ $index ] );
+				continue;
+			}
+
+			$r = '';
+			$params['File'] = $File;
+			$params['Comment'] = $this;
+			$params['data'] = & $r;
+
+			$temp_params = $params;
+			foreach( $params as $param_key => $param_value )
+			{ // Pass all params by reference, in order to give possibility to modify them by plugin
+				// So plugins can add some data before/after image tag (E.g. used by infodots plugin)
+				$params[ $param_key ] = & $params[ $param_key ];
+			}
+
+			if( count( $Plugins->trigger_event_first_true( 'RenderCommentAttachment', $params ) ) != 0 )
+			{ // File was processed by plugin
+				echo $r;
+				unset( $attachments[ $index ] );
+				continue;
+			}
+			if( $File->is_image() )
+			{ // File is image
 				if( $params['attachments_mode'] == 'view' )
-				{	// Only preview attachments
+				{ // Only preview attachments
 					$image_link_rel = '';
 					$image_link_to = '';
 				}
 				else// if( $params['attachments_mode'] == 'read' )
-				{	// Read attachments
+				{ // Read attachments
 					$image_link_rel = 'lightbox[c'.$this->ID.']';
 					$image_link_to = 'original';
 				}
-				echo $attachment->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'], $image_link_to, T_('Posted by ').$this->get_author_name(), $image_link_rel );
-				unset($attachments[$index]);
+
+				if( empty( $this->ID ) )
+				{ // PREVIEW mode
+					echo $File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'], $image_link_to, T_('Posted by ').$this->get_author_name(), $image_link_rel, '', '', '', '#' );
+				}
+				else
+				{
+					echo $Link->get_tag( array_merge( array(
+						'image_link_to'    => $image_link_to,
+						'image_link_title' => T_('Posted by ').$this->get_author_name(),
+						'image_link_rel'   => $image_link_rel,
+					), $params ) );
+				}
+				unset( $attachments[ $index ] );
 				$images_is_attached = true;
 			}
+			$params = $temp_params;
 		}
 
 		if( $images_is_attached && $params['image_text'] != '' )
-		{	// Display info text below pictures
+		{ // Display info text below pictures
 			echo $params['image_text'];
 		}
 
@@ -2531,8 +2661,10 @@ class Comment extends DataObject
 				echo '<ul class="bFiles">';
 				$after_docs = '</ul>';
 			}
-			foreach( $attachments as $doc_File )
+			foreach( $attachments as $attachment )
 			{
+				// $attachment is a File in preview mode, but it is a Link in normal mode
+				$doc_File = empty( $this->ID ) ? $attachment : $attachment->get_File();
 				if( $params['attachments_mode'] == 'view' )
 				{	// Only preview attachments
 					$attachment_download_link = '';
@@ -2899,7 +3031,7 @@ class Comment extends DataObject
 	 * Handle comment email notifications
 	 *
 	 * Should be called only when a new comment was posted or when a comment status was changed to published
-	 * 
+	 *
 	 * @param boolean set true if the comment was posted just now, false otherwise
 	 * @param integer the user ID who executed the action which will be notified, or NULL if it was executed by an anonymous user
 	 */
@@ -3114,19 +3246,19 @@ class Comment extends DataObject
 		{ // Comment from a registered user:
 			$reply_to = $this->author_User->get('email');
 			$author_name = $this->author_User->get('login');
-			$author_ID = $this->author_User->ID;
+			$author_user_ID = $this->author_User->ID;
 		}
 		elseif( ! empty( $this->author_email ) )
 		{ // non-member, but with email address:
 			$reply_to = $this->author_email;
 			$author_name = $this->dget( 'author' );
-			$author_ID = NULL;
+			$author_user_ID = NULL;
 		}
 		else
 		{ // Fallback (we have no email address):  fp>TODO: or the subscriber is not allowed to view it.
 			$reply_to = NULL;
 			$author_name =  $this->dget( 'author' );
-			$author_ID = NULL;
+			$author_user_ID = NULL;
 		}
 
 		// Load all users who will be notified, becasuse another way the send_mail_to_User funtion would load them one by one
@@ -3203,7 +3335,7 @@ class Comment extends DataObject
 					'Blog'        => $edited_Blog,
 					'Item'        => $edited_Item,
 					'author_name' => $author_name,
-					'author_ID'   => $author_ID,
+					'author_ID'   => $author_user_ID,
 					'notify_type' => $notify_type,
 				);
 
@@ -3305,6 +3437,8 @@ class Comment extends DataObject
 	{
 		global $Plugins, $DB;
 
+		$this->set_last_touched_date();
+
 		$dbchanges = $this->dbchanges;
 
 		$DB->begin();
@@ -3375,6 +3509,8 @@ class Comment extends DataObject
 			$this->set( 'secret', generate_random_key() );
 		}
 
+		$this->set_last_touched_date();
+
 		$dbchanges = $this->dbchanges;
 
 		if( $r = parent::dbinsert() )
@@ -3427,10 +3563,8 @@ class Comment extends DataObject
 
 			if( $r = parent::dbdelete() )
 			{
-				if( !empty( $result ) )
-				{ // remove deleted comment not linked attachments
-					remove_orphan_files( $result );
-				}
+				// Delete comment attachments if they are not attached to anything else
+				$this->delete_orphan_attachments( $result );
 
 				// re-set the ID for the Plugin event
 				$this->ID = $old_ID;
@@ -3452,8 +3586,7 @@ class Comment extends DataObject
 		{
 			if( $was_published )
 			{ // Update last touched date of item if a published comment was deleted
-				$comment_Item = & $this->get_Item();
-				$comment_Item->update_last_touched_date();
+				$this->update_last_touched_date();
 			}
 			$DB->commit();
 		}
@@ -3553,7 +3686,7 @@ class Comment extends DataObject
 			$SQL->SELECT( 'DISTINCT ( comment_in_reply_to_cmt_ID ), comment_ID' );
 			$SQL->FROM( 'T_comments' );
 			$SQL->WHERE( 'comment_in_reply_to_cmt_ID IS NOT NULL' );
-			$SQL->WHERE_and( 'comment_post_ID = '.$this->item_ID );
+			$SQL->WHERE_and( 'comment_item_ID = '.$this->item_ID );
 
 			// Init an array to cache a result from current item
 			$cache_comments_has_replies[ $this->item_ID ] = $DB->get_assoc( $SQL->get() );
@@ -3581,6 +3714,34 @@ class Comment extends DataObject
 			), $params );
 
 		return $this->get_permanent_link( $params['text'], $params['title'], $params['class'], $params['nofollow'], $params['restrict_status'] );
+	}
+
+
+	/**
+	 * Set field last_touched_ts
+	 */
+	function set_last_touched_date()
+	{
+		global $localtimenow;
+		$this->set_param( 'last_touched_ts', 'date', date( 'Y-m-d H:i:s', $localtimenow ) );
+	}
+
+
+	/**
+	 * Update field last_touched_ts
+	 */
+	function update_last_touched_date()
+	{
+		if( $comment_Item = & $this->get_Item() )
+		{ // Update last touched data of the Item
+			$comment_Item->update_last_touched_date();
+		}
+
+		if( $this->ID > 0 )
+		{ // If the comment was not deleted then update last touched date
+			$this->set_last_touched_date();
+			$this->dbupdate();
+		}
 	}
 }
 

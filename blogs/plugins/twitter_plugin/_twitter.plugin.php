@@ -7,7 +7,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2014 by Francois PLANQUE - {@link http://fplanque.net/}
  * @copyright (c)2007 by Lee Turner - {@link http://leeturner.org/}.
  *
  * @license GNU General Public License 2 (GPL) - http://www.opensource.org/licenses/gpl-license.php
@@ -566,7 +566,7 @@ class twitter_plugin extends Plugin
 		// Replace the title and exerpt, but before replacing decode the html entities
 		$msg = str_replace(
 				array( '$title$', '$excerpt$' ),
-				array( html_entity_decode( $content['title'] ), html_entity_decode( $content['excerpt'] ) ),
+				array( evo_html_entity_decode( $content['title'] ), evo_html_entity_decode( $content['excerpt'] ) ),
 				$oauth['msg_format']
 			);
 
@@ -609,7 +609,7 @@ class twitter_plugin extends Plugin
 
 		if( empty($result) )
 		{
-			$xmlrpcresp = 'Unknown error while posting "'.htmlspecialchars( $msg ).'" to account @'.$oauth['contact'];
+			$xmlrpcresp = 'Unknown error while posting "'.evo_htmlspecialchars( $msg ).'" to account @'.$oauth['contact'];
 			return false;
 		}
 		elseif( !empty($result->error) )

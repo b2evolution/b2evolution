@@ -8,7 +8,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -109,8 +109,8 @@ $UserCache = & get_UserCache();
 if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 { // User is trying to login right now
 
-	// Stop a request from the blocked IP addresses
-	antispam_block_ip();
+	// Stop a request from the blocked IP addresses or Domains
+	antispam_block_request();
 
 	global $action;
 	// Set $action so it can be recorded in the hitlog:
@@ -318,8 +318,6 @@ else
 		 */
 		// echo ' NOT logged in...';
 		$Debuglog->add( 'Login: NOT logged in... (did not try)', '_init_login' );
-
-		$login_error = T_('You must log in!');
 	}
 }
 unset($pass);
@@ -376,8 +374,8 @@ if( !empty($login_action) && empty( $login_error ) && ( $action != 'logout' ) )
 	}
 }
 
-if( ! empty( $login_error ) )
-{	// ----- LOGIN FAILED -----
+if( ! empty( $login_error ) || ( $login_required && ! is_logged_in() ) )
+{ // ----- LOGIN FAILED ----- OR Login is required and user is not logged in yet
 	$Debuglog->add( 'Login error: '.$login_error, '_init_login' );
 	// inskin param is set when the login request come from the front office
 	// we need this to decide if we should use display in-skin login from or not

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @todo fp> do we want to restrict API definitions to a specific blog with blogID="" ?
  *
@@ -43,28 +43,28 @@ echo '<?xml version="1.0" encoding="UTF-8"?'.'>';
 	    	if( !empty($blog) ) { echo ' blogID="'.$blog.'"'; }
 	    	?>>
 				<settings>
-					<docs>http://b2evolution.net/man/metaweblog-api</docs>
+					<docs><?php echo get_manual_url( 'metaweblog-api' ); ?></docs>
 				</settings>
 			</api>
 	    <api name="MovableType" preferred="false" apiLink="<?php echo $xmlsrv_url; ?>xmlrpc.php"<?php
 	    	if( !empty($blog) ) { echo ' blogID="'.$blog.'"'; }
 	    	?>>
 				<settings>
-					<docs>http://b2evolution.net/man/movabletype-api</docs>
+					<docs><?php echo get_manual_url( 'movabletype-api' ); ?></docs>
 				</settings>
 			</api>
 	    <api name="Blogger" preferred="false" apiLink="<?php echo $xmlsrv_url; ?>xmlrpc.php"<?php
 	    	if( !empty($blog) ) { echo ' blogID="'.$blog.'"'; }
 	    	?>>
 				<settings>
-					<docs>http://b2evolution.net/man/blogger-api</docs>
+					<docs><?php echo get_manual_url( 'blogger-api' ); ?></docs>
 				</settings>
 			</api>
 	    <api name="b2" preferred="false" apiLink="<?php echo $xmlsrv_url; ?>xmlrpc.php"<?php
 	    	if( !empty($blog) ) { echo ' blogID="'.$blog.'"'; }
 	    	?>>
 				<settings>
-					<docs>http://b2evolution.net/man/b2-api</docs>
+					<docs><?php echo get_manual_url( 'b2-api' ); ?></docs>
 				</settings>
 			</api>
 	  </apis>

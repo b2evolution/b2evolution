@@ -21,7 +21,7 @@ $Form->begin_form( 'fform', '' );
 	$Form->hidden( 'ctrl', 'usersettings' );
 	$Form->hidden( 'action', 'update' );
 
-$Form->begin_fieldset( T_('Session Timeout').get_manual_link('timeouts') );
+$Form->begin_fieldset( T_('Session Timeouts').get_manual_link('session-timeouts') );
 
 	// fp>TODO: enhance UI with a general Form method for Days:Hours:Minutes:Seconds
 
@@ -36,7 +36,7 @@ $Form->begin_fieldset( T_('Session Timeout').get_manual_link('timeouts') );
 						array( 'minutes_step' => 1, 'required' => true, 'note' => T_( 'If the user stays inactive for this long, we will no longer display him as "online" and we will start sending him email notifications when things happen while he is away.' ) ) );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('User latitude') );
+$Form->begin_fieldset( T_('User latitude').get_manual_link('user-profile-latitude-settings') );
 
 	$Form->checkbox_input( 'allow_avatars', $Settings->get( 'allow_avatars', true ), T_('Allow profile pictures'), array( 'note'=>T_('Allow users to upload profile pictures.') ) );
 
@@ -90,8 +90,7 @@ $Form->end_fieldset();
 
 if( $current_User->check_perm( 'users', 'edit' ) )
 {
-	$Form->buttons( array( array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
-													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+	$Form->buttons( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 }
 
 $Form->end_form();
@@ -100,10 +99,4 @@ $Form->end_form();
 load_funcs( 'regional/model/_regional.funcs.php' );
 echo_regional_required_js( 'uset_location_' );
 
-/*
- * $Log$
- * Revision 1.13  2013/11/06 08:05:04  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

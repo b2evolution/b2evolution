@@ -7,7 +7,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -143,6 +143,12 @@ class AdminUI_general extends Menu
 	var $breadcrumb_titles = array();
 
 	/**
+	 * Manual link for entire pages, used to get a big scope describing functionalities.
+	 *
+	 */
+	var $page_manual_link = '';
+
+	/**
 	 * Constructor.
 	 */
 	function AdminUI_general()
@@ -168,24 +174,51 @@ class AdminUI_general extends Menu
 	/**
 	* Note: These are not real breadcrumbs. It's just "so to speak" for a hierarchical path.
 	*
+	* @param boolean Add blog path
+	* @param array Additional path: @see breadcrumbpath_add()
+	* 		'text'
+	* 		'url'
+	* 		'help'  = NULL
+	* 		'attrs' = ''
 	*/
-	function breadcrumbpath_init( $add_blog = true )
+	function breadcrumbpath_init( $add_blog = true, $additional_path = array() )
 	{
-		global $Blog;
-		$this->breadcrumbpath_add( T_('Dashboard'), '?ctrl=dashboard&amp;blog=0' );
-		if( $add_blog && isset($Blog) )
-		{
-			$this->breadcrumbpath_add( $Blog->dget('shortname'), '?ctrl=dashboard&amp;blog=$blog$' );
+		global $Blog, $Settings;
+
+		// Path to site root
+		$site_style = $Settings->get( 'site_color' ) != '' ? 'style="color:'.$Settings->get( 'site_color' ).'"' : '';
+		$this->breadcrumbpath_add( $Settings->get( 'site_code' ), '?ctrl=dashboard&amp;blog=0', NULL, $site_style );
+
+		if( !empty( $additional_path ) )
+		{ // Additional path
+			$path = array_merge( array(
+					'text'  => '',
+					'url'   => '',
+					'help'  => NULL,
+					'attrs' => '',
+				), $additional_path );
+			$this->breadcrumbpath_add( $path['text'], $path['url'], $path['help'], $path['attrs'] );
+			$blog_url = $path['url'];
 		}
+
+		if( $add_blog && isset( $Blog ) )
+		{ // Add path to Blog
+			$this->breadcrumbpath_add( $Blog->dget('shortname'), !empty( $blog_url ) ? $blog_url : '?ctrl=dashboard&amp;blog=$blog$' );
+		}
+
+		// Initialize the default manual link, this is always visible when explicit manual link is not set for a page
+		$this->page_manual_link = get_manual_link( '', NULL, T_('View manual'), 5 );
 	}
 
 	/**
 	* Note: These are not real breadcrumbs. It's just "so to speak" for a hierarchical path.
 	*
-	* @param mixed $text
-	* @param mixed $url
+	* @param string Text
+	* @param string Url
+	* @param string Title for help
+	* @param string Additional attributes for link tag
 	*/
-	function breadcrumbpath_add( $text, $url, $help = NULL )
+	function breadcrumbpath_add( $text, $url, $help = NULL, $attrs = '' )
 	{
 		global $Blog, $current_User;
 
@@ -195,7 +228,7 @@ class AdminUI_general extends Menu
 		$html = $text;
 		if( $current_User->check_perm( 'admin', 'normal' ) )
 		{
-			$html = '<a href="'.$url.'">'.$text.'</a>';
+			$html = '<a href="'.$url.'"'.( !empty( $attrs ) ? ' '.$attrs : '' ).'>'.$text.'</a>';
 		}
 
 		if( !empty($help) )
@@ -207,23 +240,52 @@ class AdminUI_general extends Menu
 		$this->breadcrumb_titles[] = strip_tags( $text );
 	}
 
-
-	function breadcrumbpath_get_html()
+	/**
+	 * Adds a manual link to the entire page right after the breadcrumb
+	 *
+	 * @param string Topic to the manual page
+	 */
+	function set_page_manual_link( $topic )
 	{
+		$this->page_manual_link = get_manual_link( $topic, NULL, T_('Manual page'), 5 );
+	}
+
+	/**
+	 * Get breadcrumb path in html format
+	 *
+	 * @param array Params
+	 * @return string Breadcrumb path links
+	 */
+	function breadcrumbpath_get_html( $params = array() )
+	{
+		$params = array_merge( array(
+				'before'     => '<div class="breadcrumbpath floatleft">',
+				'after'      => '</div><div class="breadcrumbpath floatright">'.$this->page_manual_link.'</div><div class="clear"></div>'."\n",
+				'beforeText' => '&bull; <strong>'.T_('You are here').':</strong> ',
+				'beforeEach' => '',
+				'afterEach'  => '',
+				'beforeSel'  => '<strong>',
+				'afterSel'   => '</strong>',
+				'separator'  => ' &gt; ',
+			), $params );
+
 		$r = '';
 
-		if( $count = count($this->breadcrumbpath) )
+		if( $count = count( $this->breadcrumbpath ) )
 		{
-			$r = '<div class="breadcrumbpath">&bull; <strong>'.T_('You are here').':</strong> ';
+			$r = $params['before'].$params['beforeText'];
 
 			for( $i=0; $i<$count-1; $i++ )
 			{
-				$r .= $this->breadcrumbpath[$i].' &gt; ';
+				$r .= $params['beforeEach']
+						.$this->breadcrumbpath[$i]
+						.$params['separator']
+					.$params['afterEach'];
 			}
 
-			$r .= '<strong>'.$this->breadcrumbpath[$i].'</strong>';
+			$r .= $params['beforeSel'].$this->breadcrumbpath[$i].$params['afterSel'];
 
-			$r .= "</div>\n";
+			$r .= $params['after'];
 		}
 
 		return $r;
@@ -682,20 +744,15 @@ class AdminUI_general extends Menu
 
 		$buttons = '';
 		$select_options = '';
-		$count = 0;
-		$current_is_displayed = false;
+		$not_favorite_blogs = false;
 
 		foreach( $blog_array as $l_blog_ID )
-		{	// Loop through all blogs that match the requested permission:
+		{ // Loop through all blogs that match the requested permission:
 
 			$l_Blog = & $BlogCache->get_by_ID( $l_blog_ID );
 
-			$count++;
-
-			if( $count < $max_buttons
-					|| ($current_is_displayed && $count == $max_buttons )
-					|| $l_blog_ID == $blog )
-			{	// Not too many yet OR current blog, add blog as a button:
+			if( $l_Blog->get( 'favorite' ) || $l_blog_ID == $blog )
+			{ // If blog is favorute OR current blog, Add blog as a button:
 				$buttons .= $template[ $l_blog_ID == $blog ? 'beforeEachSel' : 'beforeEach' ];
 
 				$buttons .= '<a href="'.$url_params.'blog='.$l_blog_ID
@@ -710,7 +767,6 @@ class AdminUI_general extends Menu
 
 				if( $l_blog_ID == $blog )
 				{
-					$current_is_displayed = true;
 					$buttons .= $template['afterEachSel'];
 				}
 				else
@@ -719,21 +775,24 @@ class AdminUI_general extends Menu
 				}
 			}
 
-			// Add item select list:
-			$select_options .= '<option value="'.$l_blog_ID.'"';
-			if( $l_blog_ID == $blog )
-			{
-				$select_options .= ' selected="selected"';
+			if( !$l_Blog->get( 'favorite' ) )
+			{ // If blog is not favorute, Add it into the select list:
+				$not_favorite_blogs = true;
+				$select_options .= '<option value="'.$l_blog_ID.'"';
+				if( $l_blog_ID == $blog )
+				{
+					$select_options .= ' selected="selected"';
+				}
+				$select_options .= '>'.$l_Blog->dget( 'shortname', 'formvalue' ).'</option>';
 			}
-			$select_options .= '>'.$l_Blog->dget( 'shortname', 'formvalue' ).'</option>';
 		}
 
 		$r = $template['before'];
 
 		$r .= $title;
 
-		if( !empty($this->coll_list_all_title) )
-		{	// We want to add an "all" button
+		if( !empty( $this->coll_list_all_title ) )
+		{ // We want to add an "all" button
 			$r .= $template[ $blog == 0 ? 'beforeEachSel' : 'beforeEach' ];
 			$r .= '<a href="'.$this->coll_list_all_url
 						.'" class="'.( $blog == 0 ? 'CurrentBlog' : 'OtherBlog' ).'">'
@@ -747,20 +806,22 @@ class AdminUI_general extends Menu
 
 
 		$r .= $template['select_start'];
-		if( $count > $max_buttons )
-		{	// We could not display all blogs as buttons
+		if( $not_favorite_blogs )
+		{ // Display select list with not favorite blogs
 			$r .= '<form action="'.$pagenow.'" method="get">';
 			$r .= $form_params;
 			$r .= '<select name="blog" onchange="';
 			if( empty( $this->coll_list_onclick ) )
-			{	// Just submit...
-				$r .= 'this.form.submit();';
+			{ // Just submit...
+				$r .= 'if(this.value>0) this.form.submit();';
 			}
 			else
 			{
 				$r .= sprintf( $this->coll_list_onclick, 'this.value' );
 			}
-			$r .= '">'.$select_options.'</select>';
+			$r .= '">'
+				.'<option value="0">'.T_('Select blog').'</option>'
+				.$select_options.'</select>';
 			$r .= '<noscript><input type="submit" value="Go" /></noscript></form>';
 		}
 		$r .= $template['select_end'];
@@ -1038,6 +1099,7 @@ class AdminUI_general extends Menu
 															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
 					'fieldset_end' => '</fieldset>'."\n",
 					'fieldstart' => '<span class="block" $ID$>',
+					'labelclass' => '',
 					'labelstart' => '',
 					'labelend' => "\n",
 					'labelempty' => '',
@@ -1064,6 +1126,7 @@ class AdminUI_general extends Menu
 															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
 					'fieldset_end' => '</fieldset></div>'."\n",
 					'fieldstart' => '<fieldset $ID$>'."\n",
+					'labelclass' => '',
 					'labelstart' => '<div class="label">',
 					'labelend' => "</div>\n",
 					'labelempty' => '<div class="label"></div>', // so that IE6 aligns DIV.input correcctly

@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -21,7 +21,7 @@ $params = array_merge( array(
 		'item_class'             => 'bPost',
 		'item_status_class'      => 'bPost',
 		'content_mode'           => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
-		'image_size'	           =>	'', // Do not display images in content block - Image is handled separately
+		'image_size'             => '', // Do not display images in content block - Image is handled separately
 		'url_link_text_template' => '', // link will be displayed (except player if podcast)
 	), $params );
 
@@ -75,7 +75,7 @@ $params = array_merge( array(
 								'link_text_one' => get_icon( 'comments' ),
 								'link_text_more' => get_icon( 'comments' ),
 								'link_title' => '#',
-								'use_popup' => true,
+								'use_popup' => ( $Skin->get_setting( 'comments_display' ) == 'popup' ),
 							) );
 
 				$Item->permanent_link( array(
@@ -139,12 +139,13 @@ $params = array_merge( array(
 			$Item->author( array(
 					'before'    => T_('By').' ',
 					'after'     => ' &bull; ',
+					'link_text' => 'preferredname',
 				) );
 		?>
 
 		<?php
 			$Item->categories( array(
-				'before'          => T_('Albums').': ',
+				'before'          => T_('Galleries').': ',
 				'after'           => ' ',
 				'include_main'    => true,
 				'include_other'   => true,
@@ -182,6 +183,7 @@ $params = array_merge( array(
 		skin_include( '_item_feedback.inc.php', array(
 				'before_section_title' => '<h4>',
 				'after_section_title'  => '</h4>',
+				'author_link_text' => 'preferredname',
 			) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.
@@ -193,11 +195,3 @@ $params = array_merge( array(
 	?>
 
 </div>
-<?php
-/*
- * $Log$
- * Revision 1.8  2013/11/06 08:05:48  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
-?>

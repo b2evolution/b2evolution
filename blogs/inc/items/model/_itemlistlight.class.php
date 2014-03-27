@@ -8,7 +8,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -114,8 +114,9 @@ class ItemListLight extends DataObjectList2
 		// Call parent constructor:
 		parent::DataObjectList2( get_Cache($cache_name), $limit, $param_prefix, NULL );
 
+		// asimo> The ItemQuery init was moved into the query_init() method
 		// The SQL Query object:
-		$this->ItemQuery = new ItemQuery( $this->Cache->dbtablename, $this->Cache->dbprefix, $this->Cache->dbIDname );
+		// $this->ItemQuery = new ItemQuery( $this->Cache->dbtablename, $this->Cache->dbprefix, $this->Cache->dbIDname );
 
 		$this->Blog = & $Blog;
 
@@ -158,7 +159,7 @@ class ItemListLight extends DataObjectList2
 				'ymdhms_max' => NULL,
 				'statuses' => NULL,
 				'types' => '-'.implode(',',$posttypes_specialtypes),	// Keep content post types, Exclide pages, intros, sidebar links and ads
-				'visibility_array' => get_inskin_statuses(),
+				'visibility_array' => get_inskin_statuses( is_null( $this->Blog ) ? NULL : $this->Blog->ID, 'post' ),
 				'orderby' => !is_null( $this->Blog ) ? $this->Blog->get_setting('orderby') : 'datestart',
 				'order' => !is_null( $this->Blog ) ? $this->Blog->get_setting('orderdir') : 'DESC',
 				'unit' => !is_null( $this->Blog ) ? $this->Blog->get_setting('what_to_show'): 'posts',
@@ -195,7 +196,8 @@ class ItemListLight extends DataObjectList2
 	{
 		if( !empty( $filters ) )
 		{ // Activate the filterset (fallback to default filter when a value is not set):
-			$this->filters = array_merge( $this->default_filters, $filters );
+			// If $this->filters were activated before(e.g. on load from request) it should be saved here
+			$this->filters = array_merge( $this->default_filters, $this->filters, $filters );
 		}
 
 		// Activate preset filters if necessary:
@@ -219,7 +221,10 @@ class ItemListLight extends DataObjectList2
 			 * Blog & Chapters/categories restrictions:
 			 */
 			// Get chapters/categories (and compile those values right away)
-			memorize_param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', $this->default_filters['cat_modifier'], $this->filters['cat_modifier'] );  // List of authors to restrict to
+			if( isset( $this->filters['cat_modifier'] ) )
+			{ // Update cat param with the cat modifier only if it was set explicitly, otherwise it may overwrite the global $cat variable
+				memorize_param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', $this->default_filters['cat_modifier'], $this->filters['cat_modifier'] );  // Category modifier
+			}
 			memorize_param( 'catsel', 'array', $this->default_filters['cat_array'], $this->filters['cat_array'] );
 			memorize_param( $this->param_prefix.'cat_focus', 'string', $this->default_filters['cat_focus'], $this->filters['cat_focus'] );  // Categories to search on
 			// TEMP until we get this straight:
@@ -540,6 +545,10 @@ class ItemListLight extends DataObjectList2
 	{
 		global $current_User;
 
+		// Call reset to init the ItemQuery
+		// This way avoid adding the same conditions twice if the ItemQuery was already initialized
+		$this->reset();
+
 		if( empty( $this->filters ) )
 		{	// Filters have not been set before, we'll use the default filterset:
 			// If there is a preset filter, we need to activate its specific defaults:
@@ -604,7 +613,12 @@ class ItemListLight extends DataObjectList2
 
 		if( empty($order_by) )
 		{
-			$order_by = gen_order_clause( $this->filters['orderby'], $this->filters['order'], $this->Cache->dbprefix, $this->Cache->dbIDname );
+			$available_fields = array_keys( get_available_sort_options() );
+			$available_fields[] = 'creator_user_ID';
+			$available_fields[] = 'assigned_user_ID';
+			$available_fields[] = 'pst_ID';
+			$available_fields[] = 'datedeadline';
+			$order_by = gen_order_clause( $this->filters['orderby'], $this->filters['order'], $this->Cache->dbprefix, $this->Cache->dbIDname, $available_fields );
 		}
 
 		$this->ItemQuery->order_by( $order_by );
@@ -744,6 +758,12 @@ class ItemListLight extends DataObjectList2
 
 		// INNIT THE QUERY:
 		$this->query_init();
+
+		// Check the number of totla rows after it was initialized in the query_init() function
+		if( isset( $this->total_rows ) && ( intval( $this->total_rows ) === 0 ) )
+		{ // Count query was already executed and returned 0
+			return;
+		}
 
 		// QUERY:
 		$this->sql = 'SELECT DISTINCT '.$this->Cache->dbIDname.', post_datestart, post_datemodified, post_title, post_url,
@@ -1007,11 +1027,11 @@ class ItemListLight extends DataObjectList2
 			if( count( $author_names ) > 0 )
 			{ // Display info of filter by authors
 				if( $exclude_authors )
-				{ // 
+				{ //
 					$title_array[] = sprintf( T_('All authors except: %s'), implode( ' '.T_('and').' ', $author_names ) );
 				}
 				else
-				{ // 
+				{ //
 					$title_array[] = ( count( $author_names ) == 1 ? T_('Author') : T_('Authors') )
 						.': '.implode( ', ', $author_names );
 				}

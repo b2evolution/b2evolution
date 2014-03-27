@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -411,7 +411,7 @@ class quicktags_plugin extends Plugin
 		//]]>
 		</script>
 
-		<div class="edit_toolbar"><script type="text/javascript">b2evoToolbar();</script></div>
+		<div class="edit_toolbar quicktags_toolbar"><script type="text/javascript">b2evoToolbar();</script></div>
 
 		<?php
 		return true;

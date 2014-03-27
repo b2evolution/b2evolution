@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -51,11 +51,11 @@ if( $MailLog->emlog_user_ID > 0 )
 	}
 }
 
-$Form->info( T_('To'), '<pre class="email_log"><span>'.htmlspecialchars($MailLog->emlog_to).$deleted_user_note.'</span></pre>' );
+$Form->info( T_('To'), '<pre class="email_log"><span>'.evo_htmlspecialchars($MailLog->emlog_to).$deleted_user_note.'</span></pre>' );
 
-$Form->info( T_('Subject'), '<pre class="email_log"><span>'.htmlspecialchars($MailLog->emlog_subject).'</span></pre>' );
+$Form->info( T_('Subject'), '<pre class="email_log"><span>'.evo_htmlspecialchars($MailLog->emlog_subject).'</span></pre>' );
 
-$Form->info( T_('Headers'), '<pre class="email_log"><span>'.htmlspecialchars($MailLog->emlog_headers).'</span></pre>' );
+$Form->info( T_('Headers'), '<pre class="email_log"><span>'.evo_htmlspecialchars($MailLog->emlog_headers).'</span></pre>' );
 
 $mail_contents = mail_log_parse_message( $MailLog->emlog_headers, $MailLog->emlog_message );
 
@@ -64,7 +64,7 @@ if( !empty( $mail_contents ) )
 	if( !empty( $mail_contents['text'] ) )
 	{ // Display Plain Text content
 		$Form->info( T_('Text content'), $mail_contents['text']['type']
-				.'<pre class="email_log_scroll"><span>'.htmlspecialchars( $mail_contents['text']['content'] ).'</span></pre>' );
+				.'<pre class="email_log_scroll"><span>'.evo_htmlspecialchars( $mail_contents['text']['content'] ).'</span></pre>' );
 	}
 	if( !empty( $mail_contents['html'] ) )
 	{ // Display HTML content
@@ -73,7 +73,7 @@ if( !empty( $mail_contents ) )
 	}
 }
 
-$Form->info( T_('Raw email source'), '<pre class="email_log_scroll"><span>'.htmlspecialchars($MailLog->emlog_message).'</span></pre>' );
+$Form->info( T_('Raw email source'), '<pre class="email_log_scroll"><span>'.evo_htmlspecialchars($MailLog->emlog_message).'</span></pre>' );
 
 $Form->end_form();
 

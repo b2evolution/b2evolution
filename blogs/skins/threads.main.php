@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  *
@@ -43,9 +43,17 @@ if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
 }
 
 $action = param( 'action', 'string', 'view' );
-if( ( $action == 'new' ) && ( check_create_thread_limit( true ) ) )
-{ // don't allow to create new thread, because the new thread limit was already reached
-	set_param( 'action', 'view' );
+if( $action == 'new' )
+{ // Before new message form is displayed ...
+	if( has_cross_country_restriction( 'contact' ) && empty( $current_User->ctry_ID ) )
+	{ // Cross country contact restriction is enabled, but user country is not set yet
+		$Messages->add( T_('Please specify your country before attempting to contact other users.') );
+		header_redirect( get_user_profile_url() );
+	}
+	elseif( check_create_thread_limit( true ) )
+	{ // don't allow to create new thread, because the new thread limit was already reached
+		set_param( 'action', 'view' );
+	}
 }
 
 // var bgxy_expand is used by toggle_filter_area() and toggle_clickopen()

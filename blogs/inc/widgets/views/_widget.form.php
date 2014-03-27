@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -39,7 +39,7 @@ $Form->begin_form( 'fform', sprintf( $creating ?  T_('New widget %s in %s') : T_
 // Display properties:
 $Form->begin_fieldset( T_('Properties') );
 	$Form->info( T_('Widget type'), $edited_ComponentWidget->get_name() );
- 	$Form->info( T_('Description'), $edited_ComponentWidget->get_desc() );
+	$Form->info( T_('Description'), $edited_ComponentWidget->get_desc() );
 $Form->end_fieldset();
 
 
@@ -65,16 +65,7 @@ $Form->end_fieldset();
 //       catch any params/settings maybe? Although this could be done in the
 //       same hook in most cases probably. (dh)
 
+$Form->end_form( array( array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ) ) );
 
-if( $creating )
-{
-	$Form->end_form( array( array( 'submit', 'submit', T_('Record'), 'SaveButton' ),
-													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
-}
-else
-{
-	$Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
-													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
-}
 
 ?>

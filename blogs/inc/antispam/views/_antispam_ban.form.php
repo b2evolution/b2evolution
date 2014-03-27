@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -48,16 +48,16 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 
 	// Check for potentially affected logged hits:
 	$sql = 'SELECT SQL_NO_CACHE hit_ID, UNIX_TIMESTAMP(hit_datetime) as hit_datetime, hit_uri, hit_referer, dom_name,
-									hit_blog_ID, hit_remote_addr, blog_shortname
+									hit_coll_ID, hit_remote_addr, blog_shortname
 					 FROM T_hitlog INNER JOIN T_basedomains ON hit_referer_dom_ID = dom_ID
-						 		LEFT JOIN T_blogs ON hit_blog_ID = blog_ID
+					 LEFT JOIN T_blogs ON hit_coll_ID = blog_ID
 					WHERE hit_referer LIKE '.$DB->quote('%'.$keyword.'%').'
 					ORDER BY dom_name ASC
 					LIMIT 500';
 	$res_affected_hits = $DB->get_results( $sql, ARRAY_A );
 	if( $DB->num_rows == 0 )
 	{ // No matching hits.
-		printf( '<p>'.T_('No <strong>log-hits</strong> match the keyword [%s].').'</p>', htmlspecialchars($keyword) );
+		printf( '<p>'.T_('No <strong>log-hits</strong> match the keyword [%s].').'</p>', evo_htmlspecialchars($keyword) );
 	}
 	else
 	{
@@ -102,17 +102,17 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 
 	// Check for potentially affected comments:
 	$sql = 'SELECT *
-				FROM T_comments
+			  FROM T_comments
 			 WHERE comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
-				 OR comment_author_email LIKE '.$DB->quote('%'.$keyword.'%').'
-			 	 OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
-    		   	 OR comment_content LIKE '.$DB->quote('%'.$keyword.'%').'
+			    OR comment_author_email LIKE '.$DB->quote('%'.evo_strtolower( $keyword ).'%').'
+			    OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
+			    OR comment_content LIKE '.$DB->quote('%'.$keyword.'%').'
 			 ORDER BY comment_date ASC
 			 LIMIT 500';
 	$res_affected_comments = $DB->get_results( $sql, OBJECT, 'Find matching comments' );
 	if( $DB->num_rows == 0 )
 	{ // No matching hits.
-		printf( '<p>'.T_('No <strong>comments</strong> match the keyword [%s].').'</p>', htmlspecialchars($keyword) );
+		printf( '<p>'.T_('No <strong>comments</strong> match the keyword [%s].').'</p>', evo_htmlspecialchars($keyword) );
 	}
 	else
 	{ // create comment arrays
@@ -219,7 +219,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 	// Check if the string is already in the blacklist:
 	if( antispam_check($keyword) )
 	{ // Already there:
-		printf( '<p>'.T_('The keyword [%s] is <strong>already handled</strong> by the blacklist.').'</p>', htmlspecialchars($keyword) );
+		printf( '<p>'.T_('The keyword [%s] is <strong>already handled</strong> by the blacklist.').'</p>', evo_htmlspecialchars($keyword) );
 	}
 	else
 	{ // Not in blacklist
@@ -227,7 +227,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 		<p>
 		<input type="checkbox" name="blacklist_locally" id="blacklist_locally_cb" value="1" checked="checked" />
 		<label for="blacklist_locally_cb">
-			<?php printf ( T_('<strong>Blacklist</strong> the keyword [%s] locally.'), htmlspecialchars($keyword) ) ?>
+			<?php printf ( T_('<strong>Blacklist</strong> the keyword [%s] locally.'), evo_htmlspecialchars($keyword) ) ?>
 		</label>
 		</p>
 
@@ -238,7 +238,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 			<p>
 			<input type="checkbox" name="report" id="report_cb" value="1" checked="checked" />
 			<label for="report_cb">
-				<?php printf ( T_('<strong>Report</strong> the keyword [%s] as abuse to b2evolution.net.'), htmlspecialchars($keyword) ) ?>
+				<?php printf ( T_('<strong>Report</strong> the keyword [%s] as abuse to b2evolution.net.'), evo_htmlspecialchars($keyword) ) ?>
 			</label>
 			[<a href="http://b2evolution.net/about/terms.html"><?php echo T_('Terms of service') ?></a>]
 			</p>

@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage glossyblue
@@ -50,7 +50,7 @@ $Comment = & $params['Comment'];
 					'text' => '&#167; ',
 					'nofollow' => true,
 				) );
-				$Comment->author('','','','&#174;','htmlbody',true);
+				$Comment->author( '', '', '', '&#174;', 'htmlbody', true, 'preferredname' );
 				$Comment->msgform_link( $Blog->get('msgformurl') );
 
 				$commented_Item = & $Comment->get_Item();
@@ -64,13 +64,13 @@ $Comment = & $params['Comment'];
 			case 'trackback': // Display a trackback:
 				$Comment->permanent_link( T_('Trackback') );
 				echo ' '.T_('from:').' ';
-				$Comment->author( '', '#', '', '#', 'htmlbody', true );
+				$Comment->author( '', '#', '', '#', 'htmlbody', true, 'preferredname' );
 				break;
 
 			case 'pingback': // Display a pingback:
 				$Comment->permanent_link( T_('Pingback') );
 				echo ' '.T_('from:').' ';
-				$Comment->author( '', '#', '', '#', 'htmlbody', true );
+				$Comment->author( '', '#', '', '#', 'htmlbody', true, 'preferredname' );
 				break;
 		}
 	?>
@@ -92,12 +92,3 @@ $Comment = & $params['Comment'];
 	$glossyblue_oddcomment = 'alt' == $glossyblue_oddcomment ? '' : 'alt';
 ?>
 <!-- ========== END of a COMMENT/TB/PB ========== -->
-<?php
-
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:05:44  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
-?>

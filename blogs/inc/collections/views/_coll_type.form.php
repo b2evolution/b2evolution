@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal Open Source relicensing agreement:
@@ -58,7 +58,7 @@ $Form->begin_fieldset( T_('Collection type').get_manual_link('collection-type') 
 $Form->end_fieldset();
 
 
-$Form->buttons( array( array( 'submit', 'submit', T_('Save changes!'), 'SaveButton' ) ) );
+$Form->buttons( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 
 $Form->end_form();
 

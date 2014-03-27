@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -158,7 +158,7 @@ $Form->begin_form();
 	?>
 	</thead>
 
-	<tbody>
+	<tbody id="filelist_tbody">
 	<?php
 	$checkall = param( 'checkall', 'integer', 0 );  // Non-Javascript-CheckAll
 	$fm_highlight = param( 'fm_highlight', 'string', NULL );
@@ -218,12 +218,12 @@ $Form->begin_form();
 			}
 			else
 			{
-				echo $lFile->get_preview_thumb( 'fulltype', true );
+				echo $lFile->get_preview_thumb( 'fulltype', array( 'init' => true ) );
 			}
 		}
 		else
 		{	// No image preview, small type:
- 			if( $lFile->is_dir() )
+			if( $lFile->is_dir() )
 			{ // Navigate into Directory
 				echo '<a href="'.$lFile->get_view_url().'" title="'.T_('Change into this directory').'">'.$lFile->get_icon().'</a>';
 			}
@@ -244,7 +244,7 @@ $Form->begin_form();
 		}
 
 
-		echo '<td class="fm_filename">';
+		echo '<td class="fm_filename" rel="'.$lFile->get_name().'">';
 
 			/*************  Invalid filename warning:  *************/
 
@@ -325,7 +325,7 @@ $Form->begin_form();
 			}
 			else
 			{ // File
-				if( $view_link = $lFile->get_view_link( $lFile->get_name(), NULL, NULL ) )
+				if( $view_link = $lFile->get_view_link( '<span class="fname">'.$lFile->get_name().'</span>', NULL, NULL ) )
 				{
 					echo $view_link;
 				}
@@ -427,7 +427,7 @@ $Form->begin_form();
 		{ // User can edit:
 			if( $lFile->is_editable( $all_perm ) )
 			{
-				echo action_icon( T_('Edit file...'), 'edit', regenerate_url( 'fm_selected', 'action=edit_file&amp;crumb_file='.url_crumb('file').'&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ) );
+				echo action_icon( T_('Edit file...'), 'edit', regenerate_url( 'fm_selected', 'action=edit_file&amp;'.url_crumb('file').'&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ) );
 			}
 			else
 			{
@@ -485,7 +485,93 @@ $Form->begin_form();
 
 		<?php
 	}
-	else
+
+	echo '</tbody>';
+
+	echo '<tfoot>';
+
+	// -------------
+	// Quick upload with drag&drop button:
+	// --------------
+	if( $Settings->get( 'upload_enabled' ) && $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
+	{ // Upload is enabled and we have permission to use it...
+	?>
+		<tr id="fileuploader_form" class="listfooter firstcol lastcol">
+			<td colspan="<?php echo $filetable_cols ?>">
+			<?php
+			if( isset( $LinkOwner ) && $LinkOwner->check_perm( 'edit' ) )
+			{ // Offer option to link the file to an Item (or anything else):
+				$link_attribs = array();
+				$link_action = 'link';
+				if( $mode == 'upload' )
+				{ // We want the action to happen in the post attachments iframe:
+					$link_attribs['target'] = $iframe_name;
+					$link_action = 'link_inpost';
+				}
+				$icon_to_link_files = action_icon( T_('Link this file!'), 'link',
+							regenerate_url( 'fm_selected', 'action='.$link_action.'&amp;fm_selected[]=$file_path$&amp;'.url_crumb('file') ),
+							NULL, NULL, NULL, $link_attribs ).' ';
+			}
+			else
+			{ // No icon to link files
+				$icon_to_link_files = '';
+			}
+
+			$template_filerow = '<table><tr>'
+				.'<td class="checkbox firstcol">&nbsp;</td>'
+				.'<td class="icon_type qq-upload-image"><span class="qq-upload-spinner">&nbsp;</span></td>';
+			if( $fm_flatmode )
+			{
+				$template_filerow .= '<td class="filepath">'.( empty( $path ) ? './' : $path ).'</td>';
+			}
+			$template_filerow .= '<td class="fm_filename qq-upload-file">&nbsp;</td>';
+			if( $UserSettings->get('fm_showtypes') )
+			{
+				$template_filerow .= '<td class="type">&nbsp;</td>';
+			}
+			$template_filerow .= '<td class="size"><span class="qq-upload-size">&nbsp;</span><span class="qq-upload-spinner">&nbsp;</span></td>';
+			if( $UserSettings->get('fm_showdate') != 'no' )
+			{
+				$template_filerow .= '<td class="qq-upload-status timestamp">'.TS_('Uploading...').'</td>';
+			}
+			if( $UserSettings->get('fm_showfsperms') )
+			{
+				$template_filerow .= '<td class="perms">&nbsp;</td>';
+			}
+			if( $UserSettings->get('fm_showfsowner') )
+			{
+				$template_filerow .= '<td class="fsowner">&nbsp;</td>';
+			}
+			if( $UserSettings->get('fm_showfsgroup') )
+			{
+				$template_filerow .= '<td class="fsgroup">&nbsp;</td>';
+			}
+			$template_filerow .= '<td class="actions lastcol">';
+			if( $UserSettings->get('fm_showdate') == 'no' )
+			{ // Display status in the last column if column with datetime is hidden
+				$template_filerow .= '<span class="qq-upload-status">'.TS_('Uploading...').'</span> ';
+			}
+			$template_filerow .= '<a class="qq-upload-cancel" href="#">'.TS_('Cancel').'</a>'
+				.'</td>'
+			.'</tr></table>';
+			// Display a button to quick upload the files by drag&drop method
+			display_dragdrop_upload_button( array(
+					'fileroot_ID'         => $fm_FileRoot->ID,
+					'path'                => $path,
+					'list_style'          => 'table',
+					'template_filerow'    => $template_filerow,
+					'display_support_msg' => false,
+					'additional_dropzone' => '#filelist_tbody',
+					'filename_before'     => $icon_to_link_files,
+				) );
+			?>
+			</td>
+		</tr>
+	<?php
+	}
+
+
+	if( $countFiles > 0 )
 	{
 		// -------------
 		// Footer with "check all", "with selected: ..":
@@ -509,9 +595,11 @@ $Form->begin_form();
 				$field_options['link'] = $LinkOwner->translate( 'Link files to current owner' );
 			}
 
-			if( $mode != 'upload' && ($fm_Filelist->get_root_type() == 'collection' || !empty($Blog))
+			if( ( $fm_Filelist->get_root_type() == 'collection' || ( ! empty( $Blog )
+						&& $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) ) )
+				&& $mode != 'upload'
 				&& $current_User->check_perm( 'admin', 'normal' ) )
-			{	// We are browsing files for a collection:
+			{ // We are browsing files for a collection:
 				// User must have access to admin permission
 				// fp> TODO: use current as default but let user choose into which blog he wants to post
 				$field_options['make_post'] = T_('Make one post (including all images)');
@@ -570,7 +658,7 @@ $Form->begin_form();
 		<?php
 	}
 	?>
-	</tbody>
+	</tfoot>
 </table>
 <?php
 	$Form->end_form();

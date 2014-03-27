@@ -7,7 +7,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -127,106 +127,114 @@ function hits_results_block( $params = array() )
 	$device = param( 'device', 'string', NULL, true );
 	$hit_type = param( 'hit_type', 'string', NULL, true );
 	$reqURI = param( 'reqURI', 'string', NULL, true );
+	$resp_code = param( 'resp_code', 'integer', NULL, true );
 
 	// Create result set:
 
 	$SQL = new SQL();
-	$SQL->SELECT( 'SQL_NO_CACHE hit_ID, sess_ID, sess_device, hit_datetime, hit_type, hit_referer_type, hit_uri, hit_disp, hit_ctrl, hit_action, hit_blog_ID, hit_referer, hit_remote_addr,'
-		. 'user_login, hit_agent_type, blog_shortname, dom_name, goal_name, hit_keyphrase, hit_serprank, hit_response_code' );
+	$SQL->SELECT( 'SQL_NO_CACHE hit_ID, sess_ID, sess_device, hit_datetime, hit_type, hit_referer_type, hit_uri, hit_disp, hit_ctrl, hit_action, hit_coll_ID, hit_referer, hit_remote_addr,'
+		.'user_login, hit_agent_type, blog_shortname, dom_name, goal_name, hit_keyphrase, hit_serprank, hit_response_code, hit_agent_ID' );
 	$SQL->FROM( 'T_hitlog LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID'
-		. ' LEFT JOIN T_sessions ON hit_sess_ID = sess_ID'
-		. ' LEFT JOIN T_blogs ON hit_blog_ID = blog_ID'
-		. ' LEFT JOIN T_users ON sess_user_ID = user_ID'
-		. ' LEFT JOIN T_track__goalhit ON hit_ID = ghit_hit_ID'
-		. ' LEFT JOIN T_track__goal ON ghit_goal_ID = goal_ID' );
+		.' LEFT JOIN T_sessions ON hit_sess_ID = sess_ID'
+		.' LEFT JOIN T_blogs ON hit_coll_ID = blog_ID'
+		.' LEFT JOIN T_users ON sess_user_ID = user_ID'
+		.' LEFT JOIN T_track__goalhit ON hit_ID = ghit_hit_ID'
+		.' LEFT JOIN T_track__goal ON ghit_goal_ID = goal_ID' );
 
-	$CountSQL = new SQL();
-	$CountSQL->SELECT( 'SQL_NO_CACHE COUNT(hit_ID)' );
-	$CountSQL->FROM( 'T_hitlog' );
+	$count_SQL = new SQL();
+	$count_SQL->SELECT( 'SQL_NO_CACHE COUNT(hit_ID)' );
+	$count_SQL->FROM( 'T_hitlog' );
 
-	$operator = ($exclude ? ' <> ' : ' = ' );
+	$operator = ( $exclude ? ' <> ' : ' = ' );
 
 	if( ! empty( $sess_ID ) )
 	{ // We want to filter on the session ID:
-		$filter = 'hit_sess_ID' . $operator . $sess_ID;
+		$filter = 'hit_sess_ID'.$operator.$sess_ID;
 		$SQL->WHERE( $filter );
-		$CountSQL->WHERE( $filter );
+		$count_SQL->WHERE( $filter );
 	}
-	elseif( !empty($remote_IP) ) // TODO: allow combine
+	elseif( ! empty( $remote_IP ) ) // TODO: allow combine
 	{ // We want to filter on the goal name:
-		$filter = 'hit_remote_addr' . $operator . $DB->quote( $remote_IP );
+		$filter = 'hit_remote_addr'.$operator.$DB->quote( $remote_IP );
 		$SQL->WHERE( $filter );
-		$CountSQL->WHERE( $filter );
+		$count_SQL->WHERE( $filter );
 	}
 
-	if( !empty($referer_type) )
+	if( ! empty( $referer_type ) )
 	{
-		$filter = 'hit_referer_type = ' .$DB->quote($referer_type);
+		$filter = 'hit_referer_type = '.$DB->quote( $referer_type );
 		$SQL->WHERE_and( $filter );
-		$CountSQL->WHERE_and( $filter );
+		$count_SQL->WHERE_and( $filter );
 	}
 
-	if( !empty($agent_type) )
+	if( ! empty( $agent_type ) )
 	{
-		$filter = 'hit_agent_type = '. $DB->quote($agent_type);
+		$filter = 'hit_agent_type = '.$DB->quote( $agent_type );
 		$SQL->WHERE_and( $filter );
-		$CountSQL->WHERE_and( $filter );
+		$count_SQL->WHERE_and( $filter );
 	}
 
-	if( !empty($device) )
+	if( ! empty( $device ) )
 	{
 		if( $device == 'other' )
 		{ // Unknown device
 			$device = '';
 		}
-		$filter = 'sess_device = '. $DB->quote($device);
+		$filter = 'sess_device = '.$DB->quote( $device );
 		$SQL->WHERE_and( $filter );
-		$CountSQL->WHERE_and( $filter );
-		$CountSQL->FROM_add( 'LEFT JOIN T_sessions ON hit_sess_ID = sess_ID' );
+		$count_SQL->WHERE_and( $filter );
+		$count_SQL->FROM_add( 'LEFT JOIN T_sessions ON hit_sess_ID = sess_ID' );
 	}
 
-	if( !empty($hit_type) )
+	if( ! empty( $hit_type ) )
 	{
-		$filter = 'hit_type = '. $DB->quote($hit_type);
+		$filter = 'hit_type = '.$DB->quote( $hit_type );
 		$SQL->WHERE_and( $filter );
-		$CountSQL->WHERE_and( $filter );
+		$count_SQL->WHERE_and( $filter );
 	}
 
-	if( !empty($reqURI) )
+	if( ! empty( $reqURI ) )
 	{
-		$filter = 'hit_uri LIKE ' .$DB->quote( $reqURI );
+		$filter = 'hit_uri LIKE '.$DB->quote( $reqURI );
 		$SQL->WHERE_and( $filter );
-		$CountSQL->WHERE_and( $filter );
+		$count_SQL->WHERE_and( $filter );
 	}
 
-	if( !empty($datestart) )
+	if( ! empty( $resp_code ) )
 	{
-		$SQL->WHERE_and( 'hit_datetime >= '.$DB->quote($datestart.' 00:00:00') );
-		$CountSQL->WHERE_and( 'hit_datetime >= '.$DB->quote($datestart.' 00:00:00') );
-	}
-	if( !empty($datestop) )
-	{
-		$SQL->WHERE_and( 'hit_datetime <= '.$DB->quote($datestop.' 23:59:59') );
-		$CountSQL->WHERE_and( 'hit_datetime <= '.$DB->quote($datestop.' 23:59:59') );
-	}
-
-
-	if( !empty( $blog ) )
-	{
-		$filter = 'hit_blog_ID = ' .$DB->escape($blog);
+		$filter = 'hit_response_code = ' .$DB->quote( $resp_code );
 		$SQL->WHERE_and( $filter );
-		$CountSQL->WHERE_and( $filter );
+		$count_SQL->WHERE_and( $filter );
+	}
+
+	if( ! empty( $datestart ) )
+	{
+		$SQL->WHERE_and( 'hit_datetime >= '.$DB->quote( $datestart.' 00:00:00' ) );
+		$count_SQL->WHERE_and( 'hit_datetime >= '.$DB->quote( $datestart.' 00:00:00' ) );
+	}
+	if( ! empty( $datestop ) )
+	{
+		$SQL->WHERE_and( 'hit_datetime <= '.$DB->quote( $datestop.' 23:59:59' ) );
+		$count_SQL->WHERE_and( 'hit_datetime <= '.$DB->quote( $datestop.' 23:59:59' ) );
+	}
+
+
+	if( ! empty( $blog ) )
+	{
+		$filter = 'hit_coll_ID = '.$DB->escape( $blog );
+		$SQL->WHERE_and( $filter );
+		$count_SQL->WHERE_and( $filter );
 	}
 
 	$resuts_param_prefix = 'hits_';
-	if( !empty( $preset_referer_type ) )
+	if( ! empty( $preset_referer_type ) )
 	{
 		$resuts_param_prefix = substr( $preset_referer_type, 0, 8 ).'_'.$resuts_param_prefix;
 	}
 
 	$default_order = '--D';
 
-	$Results = new Results( $SQL->get(), $resuts_param_prefix, $default_order, $UserSettings->get( 'results_per_page' ), $CountSQL->get() );
+	$Results = new Results( $SQL->get(), $resuts_param_prefix, $default_order, $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 
 	// Initialize Results object
 	hits_results( $Results, array( 'default_order' => $default_order ) );
@@ -296,7 +304,7 @@ function refererList(
 	}
 	if( $disp_blog )
 	{
-		$sql .= ', hit_blog_ID';
+		$sql .= ', hit_coll_ID';
 	}
 	if( $disp_uri )
 	{
@@ -313,7 +321,7 @@ function refererList(
 			   AND hit_agent_type = 'browser'";
 	if( !empty($blog_ID) )
 	{
-		$sql_from_where .= " AND hit_blog_ID = '".$blog_ID."'";
+		$sql_from_where .= " AND hit_coll_ID = '".$blog_ID."'";
 	}
 	if ( $visitURL != 'global' )
 	{
@@ -419,7 +427,7 @@ function stats_hit_percent(
 function stats_blog_ID()
 {
 	global $row_stats;
-	echo $row_stats['hit_blog_ID'];
+	echo $row_stats['hit_coll_ID'];
 }
 
 
@@ -431,7 +439,7 @@ function stats_blog_name()
 	global $row_stats;
 
 	$BlogCache = & get_BlogCache();
-	$Blog = & $BlogCache->get_by_ID($row_stats['hit_blog_ID']);
+	$Blog = & $BlogCache->get_by_ID($row_stats['hit_coll_ID']);
 
 	$Blog->disp('name');
 }
@@ -447,7 +455,7 @@ function stats_referer( $before='', $after='', $disp_ref = true )
 	if( strlen($ref) > 0 )
 	{
 		echo $before;
-		if( $disp_ref ) echo htmlentities( $ref );
+		if( $disp_ref ) echo evo_htmlentities( $ref );
 		echo $after;
 	}
 }
@@ -460,7 +468,7 @@ function stats_basedomain( $disp = true )
 {
 	global $row_stats;
 	if( $disp )
-		echo htmlentities( $row_stats['dom_name'] );
+		echo evo_htmlentities( $row_stats['dom_name'] );
 	else
 		return $row_stats['dom_name'];
 }
@@ -486,7 +494,7 @@ function stats_search_keywords( $keyphrase, $length = 45 )
 	// Convert keyword encoding, some charsets are supported only in PHP 4.3.2 and later.
 	// This fixes encoding problem for Cyrillic keywords
 	// See http://forums.b2evolution.net/viewtopic.php?t=17431
-	$keyphrase = htmlentities( $keyphrase, ENT_COMPAT, $evo_charset );
+	$keyphrase = evo_htmlentities( $keyphrase, ENT_COMPAT, $evo_charset );
 
 	return '<span title="'.format_to_output( $keyphrase_orig, 'htmlattr' ).'">'.$keyphrase.'</span>';
 }
@@ -903,27 +911,246 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 
 
 /**
- * Get domain type title by value
+ * Get domain type titles
  *
- * @param string Domain type value
- * @return string Domain title
+ * @param boolean TRUE to escape quotes in titles
+ * @return array Domain titles
  */
-function stats_dom_type_title( $dom_type, $escape_quotes = false )
+function stats_dom_type_titles( $escape_quotes = false )
 {
-	$dom_type_titles = array(
+	return array(
 			'unknown'    => $escape_quotes ? TS_('Unknown') : T_('Unknown'),
 			'normal'     => $escape_quotes ? TS_('Referer') : T_('Referer'),
 			'searcheng'  => $escape_quotes ? TS_('Search referer') : T_('Search referer'),
 			'aggregator' => $escape_quotes ? TS_('Aggregator referer') : T_('Aggregator referer'),
 			'email'      => $escape_quotes ? TS_('Email provider') : T_('Email provider'),
 		);
-
-	if( isset( $dom_type_titles[ $dom_type ] ) )
-	{
-		return $dom_type_titles[ $dom_type ];
-	}
-
-	return $dom_type;
 }
 
+
+/**
+ * Get domain status titles
+ *
+ * @param boolean TRUE to escape quotes in titles
+ * @return array Domain titles
+ */
+function stats_dom_status_titles( $escape_quotes = false )
+{
+	return array(
+			'trusted' => $escape_quotes ? TS_('Trusted') : T_('Trusted'),
+			'unknown' => $escape_quotes ? TS_('Unknown') : T_('Unknown'),
+			'suspect' => $escape_quotes ? TS_('Suspect') : T_('Suspect'),
+			'blocked' => $escape_quotes ? TS_('Blocked') : T_('Blocked'),
+		);
+}
+
+
+/**
+ * Get status colors of domain
+ *
+ * @return array Color values
+ */
+function stats_dom_status_colors()
+{
+	return array(
+			'trusted' => '00CC00',
+			'unknown' => '999999',
+			'suspect' => 'FFAA00',
+			'blocked' => 'FF0000',
+		);
+}
+
+
+/**
+ * Get array of status icons for domains
+ *
+ * @return array Status icons
+ */
+function stats_dom_status_icons()
+{
+	return array(
+			'trusted' => get_icon( 'bullet_green', 'imgtag', array( 'title' => aipr_status_title( 'trusted' ) ) ),
+			'unknown' => get_icon( 'bullet_white', 'imgtag', array( 'title' => aipr_status_title( 'unknown' ) ) ),
+			'suspect' => get_icon( 'bullet_orange', 'imgtag', array( 'title' => aipr_status_title( 'suspect' ) ) ),
+			'blocked' => get_icon( 'bullet_red', 'imgtag', array( 'title' => aipr_status_title( 'blocked' ) ) )
+		);
+}
+
+
+/**
+ * Get domain type title by value
+ *
+ * @param string Domain type value
+ * @param boolean TRUE to escape quotes in titles
+ * @return string Domain type title
+ */
+function stats_dom_type_title( $dom_type, $escape_quotes = false )
+{
+	$dom_type_titles = stats_dom_type_titles( $escape_quotes );
+	return isset( $dom_type_titles[ $dom_type ] ) ? $dom_type_titles[ $dom_type ] : $dom_type;
+}
+
+
+/**
+ * Get domain status title by value
+ *
+ * @param string Domain status value
+ * @param boolean TRUE to escape quotes in titles
+ * @return string Domain status title
+ */
+function stats_dom_status_title( $dom_status, $escape_quotes = false )
+{
+	$dom_status_titles = stats_dom_status_titles( $escape_quotes );
+	return isset( $dom_status_titles[ $dom_status ] ) ? $dom_status_titles[ $dom_status ] : $dom_status;
+}
+
+
+/**
+ * Get domain status color by value
+ *
+ * @param string Domain status value
+ * @return string Domain status color
+ */
+function stats_dom_status_color( $dom_status )
+{
+	$dom_status_colors = stats_dom_status_colors();
+	return isset( $dom_status_colors[ $dom_status ] ) ? '#'.$dom_status_colors[ $dom_status ] : 'none';
+}
+
+
+/**
+ * Get domain status icon by value
+ *
+ * @param string Domain status value
+ * @return string Domain status icon
+ */
+function stats_dom_status_icon( $dom_status )
+{
+	$dom_status_icons = stats_dom_status_icons();
+	return isset( $dom_status_icons[ $dom_status ] ) ? $dom_status_icons[ $dom_status ] : '';
+}
+
+
+/**
+ * Get Domain object by url
+ *
+ * @param string URL
+ * @return onject Domain object
+ */
+function & get_Domain_by_url( $url )
+{
+	// Exctract domain name from url
+	$domain_name = url_part( $url, 'host' );
+
+	$DomainCache = & get_DomainCache();
+	while( empty( $Domain ) )
+	{
+		if( $Domain = & $DomainCache->get_by_name( $domain_name, false, false ) )
+		{ // Domain exists with name, Get it
+			return $Domain;
+		}
+		if( ! preg_match( '/[^\.]+\.(.+\..+)$/i', $domain_name, $matches ) )
+		{ // Find if DB contains the parent domain of current subdomain
+			break;
+		}
+		$domain_name = $matches[1];
+	}
+
+	$Domain = NULL;
+	return $Domain;
+}
+
+
+/**
+ * Get user agent name by ID
+ *
+ * @param integer Agent ID
+ * @param string Agent name or Agent ID if agent is not found
+ */
+function get_hit_agent_name_by_ID( $agent_ID )
+{
+	global $user_agents;
+
+	if( isset( $user_agents[ $agent_ID ] ) && ! empty( $user_agents[ $agent_ID ][2] ) )
+	{ // Agent is found with given ID
+		return $user_agents[ $agent_ID ][2];
+	}
+	else
+	{ // No agent, Return ID
+		return $agent_ID;
+	}
+}
+
+
+/**
+ * Extract keyphrases from the hitlog
+ *
+ * @return mixed boolean true on success, string message if the process is already running and not allowed to run
+ */
+function extract_keyphrase_from_hitlogs()
+{
+	global $DB, $Messages;
+
+	// Set lock name based on the database name, table name and process name
+	$lock_name = $DB->dbname.'.T_track__keyphrase.extract_keyphrase';
+
+	if( $DB->get_var( 'SELECT IS_FREE_LOCK( '.$DB->quote( $lock_name ).' )' ) === '0' )
+	{ // The "exctract_keyphrase" process is already running on a different request, do not start it again
+		return T_( 'A process to extract keyphrases from hits is already running in a different request. It was not executed now.');
+	}
+
+	// Important: If a two or more different simultanious process will arrive to this point at the same time, only one of them will acquire the lock!
+	// The other processes have to wait until the one who acquired the lock will release it. After that the other process will get it one by one.
+
+	// Get lock with a 20 seconds timeout
+	$DB->get_var( 'SELECT GET_LOCK( '.$DB->quote( $lock_name ).', 20 )' );
+
+	// Look for unextracted keyphrases:
+	$sql = 'SELECT MIN(h.hit_ID) as min, MAX(h.hit_ID) as max
+				FROM T_hitlog as h
+				WHERE h.hit_keyphrase IS NOT NULL
+					AND h.hit_keyphrase_keyp_ID IS NULL';
+	$ids = $DB->get_row( $sql, "ARRAY_A", NULL, ' Get max/min hits ids of unextracted keyphrases' );
+
+	if ( ! empty ( $ids['min'] ) && ! empty ( $ids['max'] ) )
+	{ // Extract keyphrases if needed:
+
+		$sql = 'INSERT INTO T_track__keyphrase(keyp_phrase, keyp_count_refered_searches)
+					SELECT h.hit_keyphrase, 1
+					FROM T_hitlog as h
+					WHERE
+						(h.hit_ID >= '.$ids['min'].' AND h.hit_ID <= '.$ids['max'].')
+						AND h.hit_keyphrase IS NOT NULL
+						AND h.hit_keyphrase_keyp_ID IS NULL
+						AND h.hit_referer_type = "search"
+				ON DUPLICATE KEY UPDATE
+				T_track__keyphrase.keyp_count_refered_searches = T_track__keyphrase.keyp_count_refered_searches + 1';
+		$DB->query( $sql, ' Insert/Update external keyphrase' );
+
+		$sql = 'INSERT INTO T_track__keyphrase(keyp_phrase, keyp_count_internal_searches)
+					SELECT h.hit_keyphrase, 1
+					FROM T_hitlog as h
+					WHERE
+						(h.hit_ID >= '.$ids['min'].' AND h.hit_ID <= '.$ids['max'].')
+						AND h.hit_keyphrase IS NOT NULL
+						AND h.hit_keyphrase_keyp_ID IS NULL
+						AND h.hit_referer_type != "search"
+				ON DUPLICATE KEY UPDATE
+				T_track__keyphrase.keyp_count_internal_searches = T_track__keyphrase.keyp_count_internal_searches + 1';
+		$DB->query( $sql, 'Insert/Update  internal keyphrase' );
+
+		$sql = 'UPDATE T_hitlog as h, T_track__keyphrase as k
+				SET h.hit_keyphrase_keyp_ID = k.keyp_ID
+				WHERE
+					h.hit_keyphrase = k.keyp_phrase
+					AND ( h.hit_ID >= '.$ids['min'].' )
+					AND ( h.hit_ID <= '.$ids['max'].' )
+					AND ( h.hit_keyphrase_keyp_ID IS NULL )';
+		$DB->query( $sql, 'Update hitlogs keyphrase id' );
+	}
+
+	$DB->get_var( 'SELECT RELEASE_LOCK( '.$DB->quote( $lock_name ).' )' );
+
+	return true;
+}
 ?>

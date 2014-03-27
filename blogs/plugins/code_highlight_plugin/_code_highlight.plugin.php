@@ -4,7 +4,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2007 by Yabba/Scott - {@link http://astonishme.co.uk/contact/}.
  *
  * {@internal License choice
@@ -84,7 +84,7 @@ class code_highlight_plugin extends Plugin
 	var $version = '5.0.0';
 	var $author = 'Astonish Me';
 	var $group = 'rendering';
-	var $help_url = 'http://b2evolution.net/man/technical-reference/renderer-plugins/code-highlight-plugin';
+	var $help_topic = 'code-highlight-plugin';
 	var $number_of_installs = 1;
 
 	/**
@@ -112,7 +112,7 @@ class code_highlight_plugin extends Plugin
 
 	/**
 	 * TRUE when HTML tags are allowed for content of current rendered post/comment/message
-	 * In this case we should prepare a content with function htmlspecialchars() to display a code as it is
+	 * In this case we should prepare a content with function evo_htmlspecialchars() to display a code as it is
 	 *
 	 * @var boolean
 	 */
@@ -372,7 +372,7 @@ class code_highlight_plugin extends Plugin
 	function CommentFormSent( & $params )
 	{
 		$ItemCache = & get_ItemCache();
-		$comment_Item = & $ItemCache->get_by_ID( $params['comment_post_ID'], false );
+		$comment_Item = & $ItemCache->get_by_ID( $params['comment_item_ID'], false );
 		if( !$comment_Item )
 		{	// Incorrect item
 			return false;
@@ -518,7 +518,7 @@ class code_highlight_plugin extends Plugin
 	 */
 	function filter_codeblock_callback( $block )
 	{ // if code block exists then tidy everything up for the database, otherwise just remove the pointless tag
-		$attributes = str_replace( array( '"', '\'' ), '', html_entity_decode( $block[2] ) );
+		$attributes = str_replace( array( '"', '\'' ), '', evo_html_entity_decode( $block[2] ) );
 		return ( empty( $block[3] ) ||  !trim( $block[3] ) ? '' : '<!-- codeblock'.$attributes.' --><pre class="codeblock"><code>'
 						.$block[3]
 						.'</code></pre><!-- /codeblock -->' );
@@ -533,7 +533,7 @@ class code_highlight_plugin extends Plugin
 	 */
 	function format_to_edit( $block )
 	{
-		return '[codeblock'.$block[1].']'.html_entity_decode( $block[2] ).'[/codeblock]';
+		return '[codeblock'.$block[1].']'.evo_html_entity_decode( $block[2] ).'[/codeblock]';
 	}
 
 
@@ -545,7 +545,7 @@ class code_highlight_plugin extends Plugin
 	 */
 	function format_span_to_edit( $span )
 	{
-		return '[codespan]'.html_entity_decode( $span[1] ).'[/codespan]';
+		return '[codespan]'.evo_html_entity_decode( $span[1] ).'[/codespan]';
 	}
 
 
@@ -686,7 +686,7 @@ class code_highlight_plugin extends Plugin
 		{ // we have a code block
 			if( $this->allow_html )
 			{ // If HTML is allowed in content we should disallow this for <code> content
-				$code = htmlspecialchars( $code );
+				$code = evo_htmlspecialchars( $code );
 			}
 			// is the relevant language highlighter already cached?
 			if( empty( $this->languageCache[ $language ] ) )

@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -52,65 +52,6 @@ function cron_log( $message, $level = 0 )
 	else
 	{
 		echo "\n".$message."\n";
-	}
-}
-
-/**
- * Extract keyphrases from the hitlog
- *
- * fp>yura fp>attila : this is not the right place to put this function. Who put it here?
- */
-function keyphrase_job()
-{
-	global $DB;
-
-	// Look for unextracted keyphrases:
-	$sql = 'SELECT MIN(h.hit_ID) as min, MAX(h.hit_ID) as max
-				FROM T_hitlog as h
-				WHERE h.hit_keyphrase IS NOT NULL
-					AND h.hit_keyphrase_keyp_ID IS NULL';
-	$ids = $DB->get_row( $sql, "ARRAY_A", NULL, ' Get max/min hits ids of unextracted keyphrases' );
-
-	if ( ! empty ( $ids['min'] ) && ! empty ( $ids['max'] ) )
-	{ // Extract keyphrases if needed:
-
-		$sql = 'INSERT INTO T_track__keyphrase(keyp_phrase, keyp_count_refered_searches)
-					SELECT h.hit_keyphrase, 1
-					FROM T_hitlog as h
-					WHERE
-						(h.hit_ID >= '.$ids['min'].' AND h.hit_ID <= '.$ids['max'].')
-						AND h.hit_keyphrase IS NOT NULL
-						AND h.hit_keyphrase_keyp_ID IS NULL
-						AND h.hit_referer_type = "search"
-				ON DUPLICATE KEY UPDATE
-				T_track__keyphrase.keyp_count_refered_searches = T_track__keyphrase.keyp_count_refered_searches + 1';
-		$DB->query( $sql, ' Insert/Update external keyphrase' );
-
-		$sql = 'INSERT INTO T_track__keyphrase(keyp_phrase, keyp_count_internal_searches)
-					SELECT h.hit_keyphrase, 1
-					FROM T_hitlog as h
-					WHERE
-						(h.hit_ID >= '.$ids['min'].' AND h.hit_ID <= '.$ids['max'].')
-						AND h.hit_keyphrase IS NOT NULL
-						AND h.hit_keyphrase_keyp_ID IS NULL
-						AND h.hit_referer_type != "search"
-				ON DUPLICATE KEY UPDATE
-				T_track__keyphrase.keyp_count_internal_searches = T_track__keyphrase.keyp_count_internal_searches + 1';
-		$DB->query( $sql, 'Insert/Update  internal keyphrase' );
-
-	// fp> This is dirty! No transaction -> no consistency! :(
-	// fp> Not possible to do transactions on myisam
-	// fp> workaround: in the queries above: set hit_keyphrase_keyp_ID = 0 on a TEMPORARY BASIS
-
-	// fp> double dirty: this also updates rows that are already up to date.
-	// fp> Add an additional WHERE condition: hit_keyphrase_keyp_ID = 0
-
-		$sql = 'UPDATE T_hitlog as h, T_track__keyphrase as k
-				SET h.hit_keyphrase_keyp_ID = k.keyp_ID
-				WHERE
-					h.hit_keyphrase = k.keyp_phrase
-					AND (h.hit_ID >= '.$ids['min'].' AND h.hit_ID <= '.$ids['max'].')';
-		$DB->query( $sql, 'Update hitlogs keyphrase id' );
 	}
 }
 

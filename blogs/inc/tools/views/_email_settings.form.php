@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -68,9 +68,8 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 					'<a href="'.$url.'test_3">['.T_('Copy/Paste an error message').']</a>' );
 
 		if( $action == 'test_3' )
-		{	// Display a textarea to fill a sample error message
-			$Form->textarea( 'test_error_message', param( 'test_error_message', 'raw', '' ), 15, T_('Test error message'),
-				'', 50, 'large' );
+		{ // Display a textarea to fill a sample error message
+			$Form->textarea( 'test_error_message', param( 'test_error_message', 'raw', '' ), 15, T_('Test error message'), '', 50 );
 			$Form->buttons( array( array( 'submit', 'actionArray[test_3]', T_('Test'), 'SaveButton' ) ) );
 		}
 
@@ -127,13 +126,13 @@ $Form->begin_fieldset( T_('Settings to decode the returned emails').get_manual_l
 				T_('Check this if you want processed messages to be deleted from server after successful processing.') );
 
 	$Form->textarea( 'repath_subject', $Settings->get( 'repath_subject' ), 5, T_('Strings to match in titles to identify return path emails'),
-				T_('Any email that has any of these strings in the title will be detected by b2evolution as the returned emails'), 50, 'large' );
+				T_('Any email that has any of these strings in the title will be detected by b2evolution as the returned emails'), 50 );
 
 	$Form->textarea( 'repath_body_terminator', $Settings->get('repath_body_terminator'), 5,
-				T_('Body Terminator'), T_('Starting from any of these strings, everything will be ignored, including these strings.'), 50, 'large' );
+				T_('Body Terminator'), T_('Starting from any of these strings, everything will be ignored, including these strings.'), 50 );
 
 	$Form->textarea( 'repath_errtype', $Settings->get( 'repath_errtype' ), 15, T_('Error message decoding configuration'),
-				T_('The first letter means one of the following:<br />S: Spam suspicion<br />P: Permament error<br />T: Temporary error<br />C: Configuration error<br />U: Unknown error (default)<br />The string after the space is a case-insensitive error text.'), 50, 'large' );
+				T_('The first letter means one of the following:<br />S: Spam suspicion<br />P: Permament error<br />T: Temporary error<br />C: Configuration error<br />U: Unknown error (default)<br />The string after the space is a case-insensitive error text.'), 50 );
 
 $Form->end_fieldset();
 
@@ -169,17 +168,14 @@ $Form->begin_fieldset( T_( 'Email notifications' ).get_manual_link( 'email-notif
 	$Form->text_input( 'notification_sender_email', $Settings->get( 'notification_sender_email' ), 50, T_( 'Sender email address' ), $notification_sender_email_note, array( 'maxlength' => 127, 'required' => true ) );
 	$Form->text_input( 'notification_sender_name', $Settings->get( 'notification_sender_name' ), 50, T_( 'Sender name' ), $notification_sender_name_note, array( 'maxlength' => 127, 'required' => true ) );
 	$Form->text_input( 'notification_return_path', $Settings->get( 'notification_return_path' ), 50, T_( 'Return path' ), '', array( 'maxlength' => 127, 'required' => true ) );
-	$Form->text_input( 'notification_short_name', $Settings->get( 'notification_short_name' ), 50, T_( 'Short site name' ), '', array( 'maxlength' => 127, 'required' => true ) );
-	$Form->text_input( 'notification_long_name', $Settings->get( 'notification_long_name' ), 50, T_( 'Long site name' ), '', array( 'maxlength' => 255 ) );
-	$Form->text_input( 'notification_logo', $Settings->get( 'notification_logo' ), 50, T_( 'Site logo (URL)' ), '', array( 'maxlength' => 5000 ) );
+	$Form->text_input( 'notification_short_name', $Settings->get( 'notification_short_name' ), 50, T_( 'Short site name' ), T_('Shared with site settings'), array( 'maxlength' => 127, 'required' => true ) );
+	$Form->text_input( 'notification_long_name', $Settings->get( 'notification_long_name' ), 50, T_( 'Long site name' ), T_('Shared with site settings'), array( 'maxlength' => 255 ) );
+	$Form->text_input( 'notification_logo', $Settings->get( 'notification_logo' ), 50, T_( 'Site logo (URL)' ), T_('Shared with site settings'), array( 'maxlength' => 5000 ) );
 $Form->end_fieldset();
 
 if( $current_User->check_perm( 'emails', 'edit' ) )
 {
-	$Form->end_form( array(
-		array( 'submit', '', T_('Update'), 'SaveButton' ),
-		array( 'reset', '', T_('Reset'), 'ResetButton' ),
-		) );
+	$Form->end_form( array( array( 'submit', '', T_('Save Changes!'), 'SaveButton' ) ) );
 }
 
 ?>

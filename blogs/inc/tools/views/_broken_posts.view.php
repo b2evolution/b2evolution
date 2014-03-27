@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -67,8 +67,11 @@ $Results->display( array(
 
 if( ( $current_User->check_perm('options', 'edit', true) ) && ( $Results->get_num_rows() ) )
 { // display Delete link
-	$redirect_to = regenerate_url( 'action', 'action=del_broken_posts&'.url_crumb( 'tools' ) );
-	echo '<p>[<a href="'.$redirect_to.'">'.T_( 'Delete these posts' ).'</a>]</p>';
+	global $DB;
+	$post_IDs = $DB->get_col( $SQL->get() );
+
+	echo '<p>[<a href="'.regenerate_url( 'action', 'action=del_broken_posts&amp;posts='.implode( ',', $post_IDs ).'&amp;'.url_crumb( 'tools' ) ).'">'
+		.T_( 'Delete these posts' ).'</a>]</p>';
 }
 
 ?>

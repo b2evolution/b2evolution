@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2014 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -40,10 +40,15 @@ load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
  */
 class Userfield extends DataObject
 {
-	var $group_ID = '';
+	/**
+	 * Userfield Group ID
+	 * @var integer
+	 */
+	var $ufgp_ID = 0;
+
 	var $type = '';
 	var $name = '';
-	var $options = '';
+	var $options = NULL;
 	var $required = 'optional';
 	var $duplicated = 'allowed';
 	var $order = '';
@@ -70,7 +75,7 @@ class Userfield extends DataObject
 		if( $db_row != NULL )
 		{
 			$this->ID         = $db_row->ufdf_ID;
-			$this->group_ID   = $db_row->ufdf_ufgp_ID;
+			$this->ufgp_ID    = $db_row->ufdf_ufgp_ID;
 			$this->type       = $db_row->ufdf_type;
 			$this->name       = $db_row->ufdf_name;
 			$this->options    = $db_row->ufdf_options;
@@ -179,6 +184,7 @@ class Userfield extends DataObject
 	function load_from_Request()
 	{
 		// Group
+		$old_group_ID = $this->ufgp_ID; // Save old group ID to know if it was changed
 		param_string_not_empty( 'ufdf_ufgp_ID', T_('Please select a group.') );
 		$this->set_from_Request( 'ufgp_ID' );
 
@@ -200,6 +206,10 @@ class Userfield extends DataObject
 			}
 			$this->set_from_Request( 'options' );
 		}
+		else
+		{ // The 'options' field must be set because it doesn't have a default value
+			$this->set( 'options', '' );
+		}
 
 		// Required
 		param_string_not_empty( 'ufdf_required', 'Please select Hidden, Optional, Recommended or Required.' );
@@ -210,8 +220,8 @@ class Userfield extends DataObject
 		$this->set_from_Request( 'duplicated' );
 
 		// Order
-		if( $this->group_ID != $this->ufgp_ID )
-		{	// Group is changing, set order as last
+		if( $old_group_ID != $this->ufgp_ID )
+		{ // Group is changing, set order as last
 			$this->set( 'order', $this->get_last_order( $this->ufgp_ID ) );
 		}
 

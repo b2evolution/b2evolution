@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -38,7 +38,7 @@ global $Settings;
 
 global $pagenow;
 
-global $Session;
+global $Session, $evo_charset;
 
 global $mode, $admin_url, $rsc_url;
 global $post_comment_status, $trackback_url, $item_tags;
@@ -100,6 +100,51 @@ $Form->begin_form( '', '', $params );
 <div class="left_col">
 
 	<?php
+	// ############################ WORKFLOW #############################
+
+	if( $Blog->get_setting( 'use_workflow' ) )
+	{	// We want to use workflow properties for this blog:
+		$Form->begin_fieldset( T_('Workflow properties'), array( 'id' => 'itemform_workflow_props' ) );
+
+			echo '<div id="itemform_edit_workflow" class="edit_fieldgroup">';
+			$Form->switch_layout( 'linespan' );
+
+			$Form->select_input_array( 'item_priority', $edited_Item->priority, item_priority_titles(), T_('Priority'), '', array( 'force_keys_as_values' => true ) );
+
+			echo ' '; // allow wrapping!
+
+			// Load current blog members into cache:
+			$UserCache = & get_UserCache();
+			// Load only first 21 users to know when we should display an input box instead of full users list
+			$UserCache->load_blogmembers( $Blog->ID, 21, false );
+
+			if( count( $UserCache->cache ) > 20 )
+			{
+				$assigned_User = & $UserCache->get_by_ID( $edited_Item->get( 'assigned_user_ID' ), false, false );
+				$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees' );
+			}
+			else
+			{
+				$Form->select_object( 'item_assigned_user_ID', NULL, $edited_Item, T_('Assigned to'),
+														'', true, '', 'get_assigned_user_options' );
+			}
+
+			echo ' '; // allow wrapping!
+
+			$ItemStatusCache = & get_ItemStatusCache();
+			$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->pst_ID, true ), T_('Task status') );
+
+			echo ' '; // allow wrapping!
+
+			$Form->date( 'item_deadline', $edited_Item->get('datedeadline'), T_('Deadline') );
+
+			$Form->switch_layout( NULL );
+			echo '</div>';
+
+		$Form->end_fieldset();
+	}
+
+
 	// ############################ POST CONTENTS #############################
 
 	$Form->begin_fieldset( T_('Post contents').get_manual_link('post_contents_fieldset') );
@@ -281,7 +326,7 @@ $Form->begin_form( '', '', $params );
 	<div id="itemform_post_excerpt" class="edit_fieldgroup">
 		<label for="post_excerpt"><strong><?php echo T_('Excerpt') ?>:</strong>
 		<span class="notes"><?php echo T_('(for XML feeds)') ?></span></label><br />
-		<textarea name="post_excerpt" rows="2" cols="25" class="large" id="post_excerpt"><?php echo htmlspecialchars($edited_Item_excerpt) ?></textarea>
+		<textarea name="post_excerpt" rows="2" cols="25" class="form_textarea_input" id="post_excerpt"><?php echo evo_htmlspecialchars( $edited_Item_excerpt, NULL, $evo_charset ) ?></textarea>
 	</div>
 
 	<?php
@@ -292,37 +337,6 @@ $Form->begin_form( '', '', $params );
 	}
 	$Form->end_fieldset();
 
-
-	// ############################ WORKFLOW #############################
-
-	if( $Blog->get_setting( 'use_workflow' ) )
-	{	// We want to use workflow properties for this blog:
-		$Form->begin_fieldset( T_('Workflow properties'), array( 'id' => 'itemform_workflow_props' ) );
-
-			echo '<div id="itemform_edit_timestamp" class="edit_fieldgroup">';
-			$Form->switch_layout( 'linespan' );
-
-			$Form->select_object( 'item_priority', NULL, $edited_Item, T_('Priority'), '', true, '', 'priority_options' );
-
-			echo ' '; // allow wrapping!
-
-			$Form->select_object( 'item_assigned_user_ID', NULL, $edited_Item, T_('Assigned to'),
-														'', true, '', 'get_assigned_user_options' );
-
-			echo ' '; // allow wrapping!
-
-			$ItemStatusCache = & get_ItemStatusCache();
-			$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->pst_ID, true ), T_('Task status') );
-
-			echo ' '; // allow wrapping!
-
-			$Form->date( 'item_deadline', $edited_Item->get('datedeadline'), T_('Deadline') );
-
-			$Form->switch_layout( NULL );
-			echo '</div>';
-
-		$Form->end_fieldset();
-	}
 
 	// ####################### ADDITIONAL ACTIONS #########################
 

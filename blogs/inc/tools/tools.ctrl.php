@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  * @author blueyed: Daniel HAHLER
@@ -106,14 +106,19 @@ if( empty($tab) )
 			$template_action = $action;
 			break;
 
-		case 'find_broken_posts':
-			// Find all broken posts that have no matching category
-			dbm_find_broken_posts();
+		case 'del_broken_posts':
+			// Delete all broken posts that have no matching category
+			$template_action = $action;
 			break;
 
-		case 'find_broken_slugs':
+		case 'del_broken_slugs':
 			// Find all broken slugs that have no matching target post
-			dbm_find_broken_slugs();
+			dbm_delete_broken_slugs();
+			break;
+
+		case 'delete_orphan_comments':
+			// delete orphan orphan comments with no matching Item
+			dbm_delete_orphan_comments();
 			break;
 
 		case 'delete_orphan_comment_uploads':

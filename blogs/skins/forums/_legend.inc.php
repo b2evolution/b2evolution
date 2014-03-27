@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -20,11 +20,11 @@ if( $disp == 'catdir' )
 {	// If forums list is displayed
 	$legends[] = array(
 			array(
-				'icon'  => 'folder_big.gif',
+				'icon'  => 'catBig',
 				'title' => T_('No new posts'),
 			),
 			array(
-				'icon'  => 'folder_locked_big.gif',
+				'icon'  => 'catBigLocked',
 				'title' => T_('Forum is locked'),
 			),
 		);
@@ -34,7 +34,7 @@ if( $disp != 'single' && isset( $MainList ) && $MainList->result_num_rows > 0 )
 {	// If some topics are displayed on the current page
 	$legends[] = array(
 			array(
-				'icon'  => 'folder.gif',
+				'icon'  => 'topic',
 				'title' => T_('No new posts'),
 			),
 			array(
@@ -42,11 +42,11 @@ if( $disp != 'single' && isset( $MainList ) && $MainList->result_num_rows > 0 )
 				'title' => T_('No new posts').' [ '.T_('Popular').' ]',
 			),
 			array(
-				'icon'  => 'folder_lock.gif',
+				'icon'  => 'topicLocked',
 				'title' => T_('No new posts').' [ '.T_('Locked').' ]',
 			),
 			array(
-				'icon'  => 'folder_sticky.gif',
+				'icon'  => 'topicSticky',
 				'title' => T_('Sticky'),
 			),
 		);
@@ -63,7 +63,20 @@ foreach( $legends as $l => $legend )
 	foreach( $legend as $s => $status )
 	{	// Display legend icon with description
 	?>
-		<th><img src="img/<?php echo $status['icon']; ?>" alt="<?php echo $status['title']; ?>" title="<?php echo $status['title']; ?>" /></th>
+		<th>
+		<?php
+			if( strpos( $status['icon'], '.gif' ) !== false )
+			{ // The animated icon
+		?>
+			<img src="img/<?php echo $status['icon']; ?>" width="19" height="18" alt="<?php echo $status['title']; ?>" title="<?php echo $status['title']; ?>" />
+		<?php
+			}
+			else
+			{ // Static icon
+		?>
+			<span class="ficon <?php echo $status['icon']; ?>" title="<?php echo $status['title']; ?>"></span>
+		<?php } ?>
+		</th>
 		<td><?php echo $status['title']; ?></td>
 	<?php } ?>
 	</tr>
@@ -85,7 +98,7 @@ if( !empty( $legend_statuses ) && is_logged_in() )
 		{	// Only statuses that exist on the page
 		?>
 			<li>
-				<a href="http://b2evolution.net/man/visibility-statuses"><span class="note status_<?php echo $status; ?>"><span><?php echo $statuses[ $status ]; ?></span></span></a>
+				<a href="<?php echo get_manual_url( 'visibility-statuses' ); ?>" target="_blank"><span class="note status_<?php echo $status; ?>"><span><?php echo $statuses[ $status ]; ?></span></span></a>
 				<span><?php echo $title; ?></span>
 			</li>
 		<?php
@@ -96,10 +109,4 @@ if( !empty( $legend_statuses ) && is_logged_in() )
 <?php
 }
 
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:05:44  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

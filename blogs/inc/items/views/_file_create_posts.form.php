@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -31,15 +31,12 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-/**
- * @var Settings
- */
-
 load_class( 'items/model/_item.class.php', 'Item' );
 load_class( 'files/model/_filelist.class.php', 'FileList' );
 
-global $post_extracats , $fm_FileRoot , $edited_Item;
-$edited_Item= new Item();
+global $post_extracats, $fm_FileRoot, $edited_Item, $blog;
+
+$edited_Item = new Item();
 
 $Form = new Form( NULL, 'pre_post_publish' );
 
@@ -127,6 +124,9 @@ function fcpf_categories_select( $parent_category_ID = -1, $level = 0 )
 
 $FileCache = & get_FileCache();
 
+// Check if current user can add new categories
+$user_has_cat_perms = $current_User->check_perm( 'blog_cats', '', false, $blog );
+
 // Get the categories
 $categories = fcpf_categories_select();
 
@@ -162,7 +162,19 @@ foreach( $images_list as $item )
 		$selected_category_ID = isset( $Blog ) ? $Blog->get_default_cat_ID() : 1;
 	}
 
+	if( $user_has_cat_perms )
+	{ // Field to create a new category if current user has the rights
+		$categories[] = array(
+				'value'  => 'new',
+				'label'  => T_('New').':',
+				'suffix' => '<input type="text" id="new_categories['.$post_counter.']" name="new_categories['.$post_counter.']" class="form_text_input" maxlength="255" size="25" />'
+			);
+	}
+
 	$Form->radio_input( 'category['.$post_counter.']', $selected_category_ID, $categories, T_('Category'), array( 'suffix' => '<br />' ) );
+	// Clear last option to create a new for next item with other $post_counter
+	array_pop( $categories );
+
 	$Form->info( T_('Post content'), '<img src="'.$fm_FileRoot->ads_url.urldecode( $item ).'" width="200" />' );
 
 	$Form->end_fieldset();
@@ -171,6 +183,27 @@ foreach( $images_list as $item )
 }
 $edited_Item = NULL;
 
+$visibility_statuses = get_visibility_statuses( 'notes-string', array(), true, $blog );
+if( empty( $visibility_statuses ) )
+{
+	$visibility_statuses = get_visibility_statuses( 'notes-string' );
+	if( isset( $visibility_statuses[ $Blog->get_setting( 'default_post_status' ) ] ) )
+	{ // Current user can create a post only with default status
+		$Form->info( T_('Status of new posts'), $visibility_statuses[ $Blog->get_setting( 'default_post_status' ) ] );
+	}
+}
+else
+{ // Display a list with the post statuses
+	$Form->select_input_array( 'post_status', $Blog->get_setting( 'default_post_status' ), $visibility_statuses, T_('Status of new posts') );
+}
+
 $Form->end_form( array( array( 'submit', 'actionArray[make_posts_from_files]', T_('Make posts'), 'ActionButton') ) );
 
 ?>
+<script type="text/javascript">
+jQuery( 'input[id^=new_categories]' ).focus( function()
+{
+	var num = jQuery( this ).attr( 'id' ).replace( /new_categories\[(\d+)\]/gi, '$1' );
+	jQuery( 'input[name=category\\[' + num + '\\]]' ).attr( 'checked', 'checked' );
+} );
+</script>

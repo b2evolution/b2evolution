@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage basic
@@ -36,18 +36,18 @@ $Comment = & $params['Comment'];
 	{
 		case 'comment': // Display a comment:
 			echo T_('Comment from:') ?>
-			<?php $Comment->author() ?>
+			<?php $Comment->author( '', '#', '', '#', 'htmlbody', false, 'preferredname' ) ?>
 			<?php $Comment->author_url( '', ' &middot; ', '' ) ?>
 			<?php break;
 
 		case 'trackback': // Display a trackback:
 			echo T_('Trackback from:') ?>
-			<?php $Comment->author( '', '#', '', '#', 'htmlbody', true ) ?>
+			<?php $Comment->author( '', '#', '', '#', 'htmlbody', true, 'preferredname' ) ?>
 			<?php break;
 
 		case 'pingback': // Display a pingback:
 			echo T_('Pingback from:') ?>
-			<?php $Comment->author( '', '#', '', '#', 'htmlbody', true ) ?>
+			<?php $Comment->author( '', '#', '', '#', 'htmlbody', true, 'preferredname' ) ?>
 			<?php break;
 	}
 
@@ -66,12 +66,3 @@ $Comment = & $params['Comment'];
 </blockquote>
 <?php echo $params['comment_end']; ?>
 <!-- ========== END of a COMMENT/TB/PB ========== -->
-<?php
-
-/*
- * $Log$
- * Revision 1.2  2013/11/06 08:05:43  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
-?>

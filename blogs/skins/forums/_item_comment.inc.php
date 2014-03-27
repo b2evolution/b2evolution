@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -140,8 +140,20 @@ $comment_class = ' class="'.$comment_class.'"';
 			$commented_Item = & $Comment->get_Item();
 
 			echo '<div class="floatleft">';
-			if( $commented_Item && $commented_Item->can_comment( NULL ) )
-			{	// Display button to quote this comment
+
+			// Check if BBcode plugin is enabled for current blog
+			$bbcode_plugin_is_enabled = false;
+			if( class_exists( 'bbcode_plugin' ) )
+			{ // Plugin exists
+				global $Plugins;
+				$bbcode_Plugin = & $Plugins->get_by_classname( 'bbcode_plugin' );
+				if( $bbcode_Plugin->status == 'enabled' && $bbcode_Plugin->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) != 'never' )
+				{ // Plugin is enabled and activated for comments
+					$bbcode_plugin_is_enabled = true;
+				}
+			}
+			if( $bbcode_plugin_is_enabled && $commented_Item && $commented_Item->can_comment( NULL ) )
+			{ // Display button to quote this comment
 				echo '<a href="'.$commented_Item->get_permanent_url().'?mode=quote&amp;qc='.$Comment->ID.'#form_p'.$commented_Item->ID.'" title="'.T_('Reply with quote').'" class="roundbutton_text floatleft quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).T_('Quote').'</a>';
 			}
 

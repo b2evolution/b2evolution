@@ -3,7 +3,7 @@
  * This file is part of b2evolution - {@link http://b2evolution.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2014 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -97,7 +97,11 @@ else
 
 $Form->text_input( 'thrd_title', $edited_Thread->title, $params['cols'], T_('Subject'), '', array( 'maxlength'=> 255, 'required'=>true, 'class'=>'wide_input' ) );
 
-$Form->textarea_input( 'msg_text', isset( $edited_Thread->text ) ? $edited_Thread->text : $edited_Message->text, 10, T_('Message'), array( 'cols'=>$params['cols'], 'class'=>'wide_textarea', 'required'=>true ) );
+$Form->textarea_input( 'msg_text', isset( $edited_Thread->text ) ? $edited_Thread->text : $edited_Message->text, 10, T_('Message'), array(
+		'cols' => $params['cols'],
+		'required' => true,
+		'display_fix_pixel' => false
+	) );
 
 global $thrd_recipients_array, $recipients_selected;
 if( !empty( $thrd_recipients_array ) )

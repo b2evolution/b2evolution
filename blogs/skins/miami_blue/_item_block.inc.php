@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -49,9 +49,10 @@ $params = array_merge( array(
 				'date_format' => '#',
 			) );
 
-    $Item->author( array(
-				'before'       => ' | '.T_('by').' <strong>',
-				'after'        => '</strong>',
+		$Item->author( array(
+				'before'    => ' | '.T_('by').' <strong>',
+				'after'     => '</strong>',
+				'link_text' => 'preferredname',
 			) );
 		$Item->msgform_link( array(
 				'text'    => '<span class="mb_icon envelope"></span>',
@@ -118,6 +119,7 @@ $params = array_merge( array(
 		skin_include( '_item_feedback.inc.php', array(
 				'before_section_title' => '<h4>',
 				'after_section_title'  => '</h4>',
+				'author_link_text'     => 'preferredname',
 			) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.
@@ -128,13 +130,3 @@ $params = array_merge( array(
 		locale_restore_previous();	// Restore previous locale (Blog locale)
 	?>
 </div>
-
-<?php
-
-/*
- * $Log$
- * Revision 1.5  2013/11/06 08:05:48  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
-?>

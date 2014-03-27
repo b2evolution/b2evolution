@@ -2,12 +2,12 @@
 /**
  * This file implements the abstract Link Owner class, which is a wrapper class for objects which can have linked files.
  * Important: This class is abstract must never be instantiated.
- * 
+ *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
- * 
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
+ *
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
@@ -26,14 +26,14 @@ class LinkOwner
 {
 	/**
 	 * Type of the Link Owner object
-	 * 
+	 *
 	 * @var string
 	 */
 	var $type;
 
 	/**
 	 * The link owner object
-	 * 
+	 *
 	 * @var DataObject
 	 */
 	var $link_Object;
@@ -50,21 +50,21 @@ class LinkOwner
 
 	/**
 	 * The link owner Blog
-	 * 
+	 *
 	 * @var Blog
 	 */
 	var $Blog = NULL;
 
 	/**
 	 * The translation map, and it must be initialized in every subclass constructor
-	 * 
+	 *
 	 * @var array
 	 */
 	var $_trans = NULL;
 
 	/**
 	 * Abstract methods that needs to be overriden in every subclass
-	 * 
+	 *
 	 * function check_perm( $perm_name, $assert = false ); // check link owner object ( item, comment, ... ) edit/view permission
 	 * function get_where_condition(); // get where condition for select query to get link owner links
 	 * function get_positions(); // get all positions where link can be displayed ( 'teaser', 'aftermore' )
@@ -77,9 +77,9 @@ class LinkOwner
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @protected It is allowed to be called only from subclasses
-	 *  
+	 *
 	 * @param object the link owner object
 	 * @param string the link type ( item, comment, ... )
 	 */
@@ -140,8 +140,26 @@ class LinkOwner
 	}
 
 	/**
+	 * Get Link by link ID
+	 *
+	 * @param integer link ID
+	 * @return object The Link with the requested ID if it exisits between this owners links, NULL otherwise
+	 */
+	function get_link_by_link_ID( $link_ID )
+	{
+		$this->load_Links();
+
+		if( isset( $this->Links[ $link_ID ] ) )
+		{
+			return $this->Links[ $link_ID ];
+		}
+
+		return NULL;
+	}
+
+	/**
 	 * Count how many files are attached to this link owner owner object
-	 * 
+	 *
 	 * @return int the number of attachments
 	 */
 	function count_links()
@@ -163,7 +181,7 @@ class LinkOwner
 
 	/**
 	 * Get SQL query to select all links attached to this owner
-	 * 
+	 *
 	 * @param string links order by
 	 * @return object SQL
 	 */
@@ -183,8 +201,9 @@ class LinkOwner
 			$order_by = 'link_order, link_ID';
 		}
 
-		$SQL->SELECT( 'link_ID, link_ltype_ID, link_position, link_cmt_ID, link_itm_ID, file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
-		$SQL->FROM( 'T_links LEFT JOIN T_files ON link_file_ID = file_ID' );
+		// Set links query. Note: Use inner join to make sure that result contains only existing files!
+		$SQL->SELECT( 'link_ID, link_ltype_ID, link_position, link_cmt_ID, link_itm_ID, file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash' );
+		$SQL->FROM( 'T_links INNER JOIN T_files ON link_file_ID = file_ID' );
 		$SQL->WHERE( $this->get_where_condition() );
 		$SQL->ORDER_BY( $order_by );
 
@@ -201,7 +220,7 @@ class LinkOwner
 
 	/**
 	 * Get link owner object parameter
-	 * 
+	 *
 	 * @param string parameter name to get
 	 */
 	function get( $parname )
@@ -211,7 +230,7 @@ class LinkOwner
 
 	/**
 	 * Get a ready-to-display position name by key value
-	 * 
+	 *
 	 * @param string link position
 	 */
 	function dget_position( $position )
@@ -226,7 +245,7 @@ class LinkOwner
 
 	/**
 	 * Get default position for a new link
-	 * 
+	 *
 	 * @param boolean new link file is image or not
 	 */
 	function get_default_position( $is_image = false )
@@ -262,9 +281,9 @@ class LinkOwner
 
 	/**
 	 * Get list of attached files
-	 * 
+	 *
 	 * INNER JOIN on files ensures we only get back file links
-	 * 
+	 *
 	 * @param integer Limit max result
 	 * @param string Restrict to files/images linked to a specific position.
 	 *               Position can be 'teaser'|'aftermore'|'inline'
@@ -286,7 +305,7 @@ class LinkOwner
 		$FileList = new DataObjectList2( $FileCache ); // IN FUNC
 
 		$SQL = new SQL();
-		$SQL->SELECT( 'file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, link_ID' );
+		$SQL->SELECT( 'file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash, link_ID' );
 		$SQL->FROM( 'T_links INNER JOIN T_files ON link_file_ID = file_ID' );
 		$SQL->WHERE( $this->get_where_condition() );
 		if( !empty($position) )
@@ -313,8 +332,71 @@ class LinkOwner
 
 
 	/**
+	 * Get list of attached Links
+	 *
+	 * @param integer Limit max result
+	 * @param string Restrict to files/images linked to a specific position.
+	 *               Position can be 'teaser'|'aftermore'|'inline'
+	 *               Use comma as separator
+	 * @param string File type: 'image', 'audio', 'other'; NULL - to select all
+	 * @param array Params
+	 * @return DataObjectList2 on success or NULL if no linked files found
+	 */
+	function get_attachment_LinkList( $limit = 1000, $position = NULL, $file_type = NULL, $params = array() )
+	{
+		if( ! isset($GLOBALS['files_Module']) )
+		{
+			return NULL;
+		}
+
+		$params = array_merge( array(
+				'sql_select_add' => '', // Additional fields for SELECT clause
+				'sql_order_by'   => 'link_order', // ORDER BY clause
+			), $params );
+
+		global $DB;
+
+		load_class( '_core/model/dataobjects/_dataobjectlist2.class.php', 'DataObjectList2' );
+
+		$LinkCache = & get_LinkCache();
+
+		$LinkList = new DataObjectList2( $LinkCache ); // IN FUNC
+
+		$SQL = new SQL();
+		$SQL->SELECT( 'l.*' );
+		$SQL->SELECT_add( $params['sql_select_add'] );
+		$SQL->FROM( 'T_links AS l' );
+		$SQL->WHERE( $this->get_where_condition() );
+		if( !empty($position) )
+		{
+			$position = explode( ',', $position );
+			$SQL->WHERE_and( 'link_position IN ( '.$DB->quote( $position ).' )' );
+		}
+		$SQL->ORDER_BY( $params['sql_order_by'] );
+		$SQL->LIMIT( $limit );
+
+		if( ! is_null( $file_type ) )
+		{ // Restrict the Links by File type
+			$SQL->FROM_add( 'INNER JOIN T_files ON link_file_ID = file_ID' );
+			$SQL->WHERE_and( 'file_type = '.$DB->quote( $file_type ).' OR file_type IS NULL' );
+		}
+
+		$LinkList->sql = $SQL->get();
+
+		$LinkList->query( false, false, false, 'get_attachment_LinkList' );
+
+		if( $LinkList->result_num_rows == 0 )
+		{ // Nothing found
+			$LinkList = NULL;
+		}
+
+		return $LinkList;
+	}
+
+
+	/**
 	 * Get translated text for the specific link owner class
-	 * 
+	 *
 	 * @param string text key in the translation map
 	 */
 	function translate( $text_key, $text_params = NULL )
@@ -329,12 +411,24 @@ class LinkOwner
 
 
 	/**
-	 * Update owner last_touched_ts if exists 
+	 * Update owner last_touched_ts if exists
 	 * This must be override in the subclasses if the owner object has last_touched_ts field
 	 */
-	function item_update_last_touched_date()
+	function update_last_touched_date()
 	{
 		return;
+	}
+
+
+	/**
+	 * This function is called after when some file was unlinked from owner
+	 *
+	 * @param integer Link ID
+	 */
+	function after_unlink_action( $link_ID = 0 )
+	{
+		// Update last touched date of the Owner
+		$this->update_last_touched_date();
 	}
 }
 

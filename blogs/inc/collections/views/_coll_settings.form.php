@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -55,7 +55,7 @@ $Form->hidden( 'action', 'update_settings' );
 
 if( isset($collections_Module) )
 {
-	$Form->begin_fieldset( T_('Display options').get_manual_link('collections-display-options') );
+	$Form->begin_fieldset( T_('Display options').get_manual_link('display_options') );
 
 	$BlogCache = & get_BlogCache();
 
@@ -76,7 +76,7 @@ if( isset($collections_Module) )
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Timeouts').get_manual_link('collections-timeouts') );
+$Form->begin_fieldset( T_('Timeouts') );
 
 	$Form->duration_input( 'reloadpage_timeout', (int)$Settings->get('reloadpage_timeout'), T_('Reload-page timeout'), 'minutes', 'seconds', array( 'minutes_step' => 1, 'required' => true ) );
 	// $Form->text_input( 'reloadpage_timeout', (int)$Settings->get('reloadpage_timeout'), 5,
@@ -88,7 +88,7 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Caching').get_manual_link('collections-caching-settings') );
+$Form->begin_fieldset( T_('Caching') );
 
 	$Form->checkbox_input( 'general_cache_enabled', $Settings->get('general_cache_enabled'), T_('Enable general cache'), array( 'note'=>T_('Cache rendered pages that are not controlled by a skin. See Blog Settings for skin output caching.') ) );
 
@@ -125,7 +125,7 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Cross posting').get_manual_link('collections-cross-posting-settings') );
+$Form->begin_fieldset( T_('Cross posting') );
 	$Form->checklist( array(
 		array( 'cross_posting', 1, T_('Allow cross-posting posts to several blogs'), $Settings->get('cross_posting'), false, T_('(Extra cats in different blogs)') ),
 		array( 'cross_posting_blogs', 1, T_('Allow moving posts between different blogs'), $Settings->get('cross_posting_blogs'), false, T_('(Main cat can move to different blog)') ) ),
@@ -134,7 +134,7 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Subscribing to new blogs').get_manual_link('collections-subscription-settings') );
+$Form->begin_fieldset( T_('Subscribing to new blogs') );
 	$Form->radio_input( 'subscribe_new_blogs', $Settings->get('subscribe_new_blogs'),
 		array(
 			array( 'value' => 'page', 'label' => T_('From blog page only') ),
@@ -147,7 +147,7 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Default skins').get_manual_link('collections-default-skins') );
+$Form->begin_fieldset( T_('Default skins') );
 	$normal_skins = array();
 	$mobile_skins = array( 0 => T_('Same as normal skin') );
 	$tablet_skins = array( 0 => T_('Same as normal skin') );
@@ -184,8 +184,7 @@ $Form->end_fieldset();
 
 if( $current_User->check_perm( 'options', 'edit' ) )
 {
-	$Form->end_form( array( array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
-													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+	$Form->end_form( array( array( 'submit', 'submit', T_('Save changes!'), 'SaveButton' ) ) );
 }
 
 ?>

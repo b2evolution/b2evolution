@@ -37,7 +37,7 @@ if( $user_profile_only )
 
 	// Make sure the user only edits himself:
 	$user_ID = $current_User->ID;
-	if( ! in_array( $action, array( 'update', 'update_avatar', 'upload_avatar', 'edit', 'default_settings' ) ) )
+	if( ! in_array( $action, array( 'update', 'update_avatar', 'upload_avatar', 'edit', 'default_settings', 'redemption' ) ) )
 	{
 		$action = 'edit';
 	}
@@ -162,6 +162,9 @@ if( !$Messages->has_errors() )
 			break;
 
 		case 'upload_avatar':
+			// Stop a request from the blocked IP addresses or Domains
+			antispam_block_request();
+
 			// Check that this action request is not a CSRF hacked request:
 			$Session->assert_received_crumb( 'user' );
 
@@ -590,7 +593,9 @@ if( !$Messages->has_errors() )
 			}
 			break;
 
-		case 'report_user': // Report a user
+		case 'report_user':
+			// Report a user
+
 			// Check that this action request is not a CSRF hacked request:
 			$Session->assert_received_crumb( 'user' );
 
@@ -634,24 +639,95 @@ if( !$Messages->has_errors() )
 				$Messages->add( T_('The user was repoted.').$blocked_message, 'success' );
 			}
 
-			header_redirect( $admin_url.'?ctrl=user&user_tab='.$user_tab.'&user_ID='.$user_ID );
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $admin_url.'?ctrl=user&user_tab='.$user_tab.'&user_ID='.$user_ID, 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 			break;
 
-	case 'remove_report': // Remove current User report from the given user
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'user' );
+		case 'remove_report':
+			// Remove current User report from the given user
 
-		$user_ID = param( 'user_ID', 'integer', 0 );
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
 
-		remove_report_from( $user_ID );
-		$unblocked_message = '';
-		if( set_contact_blocked( $user_ID, 0 ) )
-		{ // the user was unblocked
-			$unblocked_message = ' '.T_('You have also unblocked this user. He will be able to contact you again in the future.');
-		}
-		$Messages->add( T_('The report was removed.').$unblocked_message, 'success' );
-		header_redirect( $admin_url.'?ctrl=user&user_tab='.$user_tab.'&user_ID='.$user_ID );
-		break;
+			$user_ID = param( 'user_ID', 'integer', 0 );
+
+			remove_report_from( $user_ID );
+			$unblocked_message = '';
+			if( set_contact_blocked( $user_ID, 0 ) )
+			{ // the user was unblocked
+				$unblocked_message = ' '.T_('You have also unblocked this user. He will be able to contact you again in the future.');
+			}
+			$Messages->add( T_('The report was removed.').$unblocked_message, 'success' );
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $admin_url.'?ctrl=user&user_tab='.$user_tab.'&user_ID='.$user_ID ); // Will EXIT
+			// We have EXITed already at this point!!
+			break;
+
+		case 'delete_data':
+			// Delete all posts, comments or private messages of the user
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+
+			// Check edit permissions:
+			$current_User->check_perm( 'users', 'edit', true );
+
+			if( param( 'delete_comments', 'integer', 0 ) )
+			{ // Delete the comments
+				// Count even recycled comments only if current User has global editall blogs permission, because only those users can delete trashed comments
+				$comments_created = $edited_User->get_num_comments( '', $current_User->check_perm( 'blogs', 'eidtall', false ) );
+				if( $comments_created > 0 && $edited_User->delete_comments() )
+				{ // The comments were deleted successfully
+					$result_message = ( $comments_created == 1 ) ? T_('1 comment was deleted.') : sprintf( T_('%s comments were deleted.'), $comments_created );
+					$Messages->add( $result_message, 'success' );
+				}
+			}
+
+			if( param( 'delete_posts', 'integer', 0 ) )
+			{ // Delete the posts
+				$posts_created = $edited_User->get_num_posts();
+				if( $posts_created > 0 && $edited_User->delete_posts( 'created' ) )
+				{ // The posts were deleted successfully
+					$result_message = ( $posts_created == 1 ) ? T_('1 post was deleted.') : sprintf( T_('%s posts were deleted.'), $posts_created );
+					$Messages->add( $result_message, 'success' );
+				}
+			}
+
+			if( param( 'delete_messages', 'integer', 0 ) )
+			{ // Delete the messages
+				$messages_sent = $edited_User->get_num_messages( 'sent' );
+				if( $messages_sent > 0 && $edited_User->delete_messages() )
+				{ // The messages were deleted successfully
+					$result_message = ( $messages_sent == 1 ) ? T_('1 private message was deleted.') : sprintf( T_('%s private messages were deleted.'), $messages_sent );
+					$Messages->add( $result_message, 'success' );
+				}
+			}
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $admin_url.'?ctrl=user&user_tab='.$user_tab.'&user_ID='.$user_ID ); // Will EXIT
+			// We have EXITed already at this point!!
+			break;
+
+		case 'redemption':
+			// Change status of user email to 'redemption'
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+
+			$EmailAddressCache = & get_EmailAddressCache();
+			if( $EmailAddress = & $EmailAddressCache->get_by_name( $edited_User->get( 'email' ), false, false ) &&
+			    in_array( $EmailAddress->get( 'status' ), array( 'warning', 'suspicious1', 'suspicious2', 'suspicious3', 'prmerror' ) ) )
+			{ // Change to 'redemption' status only if status is 'warning', 'suspicious1', 'suspicious2', 'suspicious3' or 'prmerror'
+				$EmailAddress->set( 'status', 'redemption' );
+				$EmailAddress->dbupdate();
+			}
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $admin_url.'?ctrl=user&user_tab='.$user_tab.'&user_ID='.$user_ID ); // Will EXIT
+			// We have EXITed already at this point!!
+			break;
 	}
 }
 
@@ -702,6 +778,7 @@ if( $display_mode != 'js')
 		case 'admin':
 			$AdminUI->breadcrumbpath_add( T_('Admin'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 			load_funcs('tools/model/_email.funcs.php');
+			load_funcs('sessions/model/_hitlog.funcs.php');
 			break;
 		case 'sessions':
 			$AdminUI->breadcrumbpath_add( T_('Sessions'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
@@ -711,6 +788,9 @@ if( $display_mode != 'js')
 			require_css( $rsc_url.'css/blog_base.css' ); // Default styles for the blog navigation
 			break;
 	}
+
+	// Display messages depending on user email status
+	display_user_email_status_message( $edited_User->ID );
 
 	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 	$AdminUI->disp_html_head();
@@ -780,6 +860,10 @@ switch( $action )
 			case 'admin':
 				// Display user admin form:
 				$AdminUI->disp_view( 'users/views/_user_admin.form.php' );
+				if( $display_mode != 'js' )
+				{ // Init JS for form to delete the posts, the comments and the messages of user
+					echo_user_deldata_js();
+				}
 				break;
 			case 'sessions':
 				// Display user admin form:
@@ -821,10 +905,9 @@ switch( $action )
 							break;
 
 						case 'delete_all_comments':
-							$deleted_comments_count = count( $edited_User->get_deleted_comments() );
-							if( $deleted_comments_count > 0 )
-							{	// Display a confirm message if curent user can delete at least one comment posted by the edited user
-								$confirm_message = sprintf( T_('Delete %d comments posted by the user?'), $deleted_comments_count );
+							if( $edited_User->has_comment_to_delete() )
+							{ // Display a confirm message if curent user can delete at least one comment posted by the edited user
+								$confirm_message = sprintf( T_('Delete %s comments posted by the user?'), $edited_User->get_num_comments( '', true ) );
 							}
 							break;
 
@@ -866,6 +949,25 @@ switch( $action )
 				}
 				$user_tab = param( 'user_tab_from', 'string', 'profile' );
 				$AdminUI->disp_view( 'users/views/_user_report.form.php' );
+				if( $display_mode != 'js')
+				{
+					$AdminUI->disp_payload_end();
+				}
+				break;
+
+			case 'deldata':
+				if( $display_mode == 'js')
+				{ // Do not append Debuglog & Debug JSlog to response!
+					$debug = false;
+					$debug_jslog = false;
+				}
+
+				if( $display_mode != 'js')
+				{
+					$AdminUI->disp_payload_begin();
+				}
+				$user_tab = param( 'user_tab_from', 'string', 'profile' );
+				$AdminUI->disp_view( 'users/views/_user_deldata.form.php' );
 				if( $display_mode != 'js')
 				{
 					$AdminUI->disp_payload_end();

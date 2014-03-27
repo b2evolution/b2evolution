@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * (dh please re-add)
  *
  * {@internal License choice
@@ -52,6 +52,9 @@ $current_User->check_perm( 'files', 'add', true, $blog ? $blog : NULL );
 
 $AdminUI->set_path( 'files' );
 
+// 1 when AJAX request, E.g. when popup is used to link a file to item/comment
+param( 'ajax_request', 'integer', 0, true );
+
 // Save the number of already existing error messages
 $initial_error_count = $Messages->count( 'error' );
 
@@ -61,22 +64,8 @@ param( 'link_type', 'string', NULL, true );
 param( 'link_object_ID', 'integer', NULL, true );
 param( 'user_ID', 'integer', NULL, true );
 param( 'iframe_name', 'string', '', true );
-param( 'tab3', 'string' );
-if( empty( $tab3 ) )
-{
-	$tab3 = param( 'tab3_onsubmit', 'string', 'quick' );
-}
 
 $action = param_action();
-
-if( $tab3 == 'quick' )
-{
-	require_css( 'quick_upload.css' );
-	//require_js( 'multiupload/sendfile.js' );
-	//require_js( 'multiupload/quick_upload.js' );
-	require_js( 'multiupload/fileuploader.js' );
-	require_css( 'fileuploader.css' );
-}
 
 // INIT params:
 if( param( 'root_and_path', 'string', '', false ) /* not memorized (default) */ && strpos( $root_and_path, '::' ) )
@@ -182,7 +171,7 @@ file_controller_build_tabs();
 // Exit only if new error messages were added in this file
 if( $Messages->count( 'error' ) > $initial_error_count )
 {
-	$AdminUI->set_path( 'files', 'upload', $tab3 );
+	$AdminUI->set_path( 'files', 'upload' );
 
 	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 	$AdminUI->disp_html_head();
@@ -221,7 +210,7 @@ if( ! $Settings->get('upload_enabled') )
 // Exit only if new error messages were added in this file
 if( $Messages->count( 'error' ) > $initial_error_count )
 {
-	$AdminUI->set_path( 'files', 'upload', $tab3 );
+	$AdminUI->set_path( 'files', 'upload' );
 
 	$AdminUI->disp_html_head();
 	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
@@ -328,49 +317,7 @@ if( ! empty($renamedFiles) )
 		$replace_old = param( 'Renamed_'.$rKey, 'string', null );
 		if( $replace_old == "Yes" )
 		{ // replace the old file with the new one
-			$FileCache = & get_FileCache();
-			$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$renamedFiles[$rKey]['newName'], true );
-			$oldFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$renamedFiles[$rKey]['oldName'], true );
-			$new_filename = $newFile->get_name();
-			$old_filename = $oldFile->get_name();
-			$dir = $newFile->get_dir();
-			$oldFile->rm_cache();
-			$newFile->rm_cache();
-			$error_message = '';
-
-			// rename new uploaded file to temp file name
-			$index = 0;
-			$temp_filename = 'temp'.$index.'-'.$new_filename;
-			while( file_exists( $dir.$temp_filename ) )
-			{ // find an unused filename
-				$index++;
-				$temp_filename = 'temp'.$index.'-'.$new_filename;
-			}
-
-			// @rename will overwrite a file with the same name if exists. In this case it shouldn't be a problem.
-			if( ! @rename( $newFile->get_full_path(), $dir.$temp_filename ) )
-			{ // rename new file to temp file name failed
-				$error_message = $Messages->add( sprintf( T_('The new file could not be renamed to %s'), $temp_filename ), 'error' );
-			}
-
-			if( empty( $error_message ) && ( ! @rename( $oldFile->get_full_path(), $dir.$new_filename ) ) )
-			{ // rename original file to the new file name failed
-				$error_message = sprintf( T_( "The original file could not be renamed to %s. The new file is now named %s." ), $new_filename, $temp_filename );
-			}
-
-			if( empty( $error_message ) && ( ! @rename( $dir.$temp_filename, $dir.$old_filename ) ) )
-			{ // rename new file to the original file name failed
-				$error_message = sprintf( T_( "The new file could not be renamed to %s. It is now named %s." ), $old_filename, $temp_filename );
-			}
-
-			if( empty( $error_message ) )
-			{
-				$Messages->add( sprintf( T_('%s has been replaced with the new version!'), $old_filename ), 'success' );
-			}
-			else
-			{
-				$Messages->add( $error_message, 'error' );
-			}
+			replace_old_file_with_new( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, $path, $renamedFiles[$rKey]['newName'], $renamedFiles[$rKey]['oldName'] );
 		}
 	}
 	forget_param( 'renamedFiles' );
@@ -383,8 +330,11 @@ if( ! empty($renamedFiles) )
 }
 
 // Process uploaded files:
-if(  ( $action != 'switchtab' ) && isset($_FILES) && count( $_FILES ) )
+if( ( $action != 'switchtab' ) && isset($_FILES) && count( $_FILES ) )
 {
+	// Stop a request from the blocked IP addresses or Domains
+	antispam_block_request();
+
 	// Check that this action request is not a CSRF hacked request:
 	$Session->assert_received_crumb( 'file' );
 
@@ -450,7 +400,7 @@ if(  ( $action != 'switchtab' ) && isset($_FILES) && count( $_FILES ) )
 
 file_controller_build_tabs();
 
-$AdminUI->set_path( 'files', 'upload', $tab3 );
+$AdminUI->set_path( 'files', 'upload' );
 
 // fp> TODO: this here is a bit sketchy since we have Blog & fileroot not necessarilly in sync. Needs investigation / propositions.
 // Note: having both allows to post from any media dir into any blog.
@@ -462,21 +412,7 @@ if( !isset($Blog) || $fm_FileRoot->type != 'collection' || $fm_FileRoot->in_type
 			(isset($Blog) && $fm_FileRoot->type == 'collection') ? sprintf( T_('You are ready to post files from %s into %s...'),
 			$fm_FileRoot->name, $Blog->get('shortname') ) : '' );
 }
-$AdminUI->breadcrumbpath_add( /* TRANS: noun */ T_('Upload'), '?ctrl=upload&amp;blog=$blog$&amp;root='.$fm_FileRoot->ID );
-switch( $tab3 )
-{
-	case 'quick':
-		$AdminUI->breadcrumbpath_add( T_('Quick'), '?ctrl=upload&amp;tab3='.$tab3 );
-		break;
-
-	case 'standard':
-		$AdminUI->breadcrumbpath_add( T_('Standard'), '?ctrl=upload&amp;tab3='.$tab3 );
-		break;
-
-	case 'advanced':
-		$AdminUI->breadcrumbpath_add( T_('Advanced'), '?ctrl=upload&amp;tab3='.$tab3 );
-		break;
-}
+$AdminUI->breadcrumbpath_add( /* TRANS: noun */ T_('Advanced Upload'), '?ctrl=upload&amp;blog=$blog$&amp;root='.$fm_FileRoot->ID );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -488,14 +424,7 @@ $AdminUI->disp_body_top();
 /*
  * Display payload:
  */
-if( $tab3 == 'quick' )
-{
-	$AdminUI->disp_view( 'files/views/_file_quick_upload.view.php' );
-}
-else
-{
-	$AdminUI->disp_view( 'files/views/_file_upload.view.php' );
-}
+$AdminUI->disp_view( 'files/views/_file_upload.view.php' );
 
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();

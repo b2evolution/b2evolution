@@ -159,27 +159,35 @@ if( ( $current_User->ID == $edited_User->ID ) || ( $current_User->check_perm( 'u
 	global $Settings;
 	if( $Settings->get('upload_enabled') && ( $Settings->get( 'fm_enable_roots_user' ) ) )
 	{	// Upload is enabled and we have permission to use it...
-		$user_avatars = $edited_User->get_avatar_Files();
+		$user_avatars = $edited_User->get_avatar_Links();
 		if( count( $user_avatars ) > 0 )
 		{
 			$info_content = '';
-			foreach( $user_avatars as $uFile )
+			foreach( $user_avatars as $user_Link )
 			{
 				if( is_admin_page() )
 				{
-					$url_update = regenerate_url( '', 'user_tab=avatar&user_ID='.$edited_User->ID.'&action=update_avatar&file_ID='.$uFile->ID.'&'.url_crumb('user'), '', '&');
-					$url_delete = regenerate_url( '', 'user_tab=avatar&user_ID='.$edited_User->ID.'&action=delete_avatar&file_ID='.$uFile->ID.'&'.url_crumb('user'), '', '&');
+					$url_update = regenerate_url( '', 'user_tab=avatar&user_ID='.$edited_User->ID.'&action=update_avatar&file_ID='.$user_Link->File->ID.'&'.url_crumb('user'), '', '&');
+					$url_delete = regenerate_url( '', 'user_tab=avatar&user_ID='.$edited_User->ID.'&action=delete_avatar&file_ID='.$user_Link->File->ID.'&'.url_crumb('user'), '', '&');
 				}
 				else
 				{
-					$url_update = get_secure_htsrv_url().'profile_update.php?user_tab=avatar&blog='.$Blog->ID.'&user_ID='.$edited_User->ID.'&action=update_avatar&file_ID='.$uFile->ID.'&'.url_crumb('user');
-					$url_delete = get_secure_htsrv_url().'profile_update.php?user_tab=avatar&blog='.$Blog->ID.'&user_ID='.$edited_User->ID.'&action=delete_avatar&file_ID='.$uFile->ID.'&'.url_crumb('user');
+					$url_update = get_secure_htsrv_url().'profile_update.php?user_tab=avatar&blog='.$Blog->ID.'&user_ID='.$edited_User->ID.'&action=update_avatar&file_ID='.$user_Link->File->ID.'&'.url_crumb('user');
+					$url_delete = get_secure_htsrv_url().'profile_update.php?user_tab=avatar&blog='.$Blog->ID.'&user_ID='.$edited_User->ID.'&action=delete_avatar&file_ID='.$user_Link->File->ID.'&'.url_crumb('user');
 				}
 				$info_content .= '<div class="avatartag avatar_rounded">';
-				$info_content .= $uFile->get_tag( '', '', '', '', 'crop-top-80x80', 'original', $edited_User->login, 'lightbox[user_pictures]' );
+				$info_content .= $user_Link->get_tag( array(
+						'before_image'        => '',
+						'before_image_legend' => '',
+						'after_image_legend'  => '',
+						'after_image'         => '',
+						'image_size'          => 'crop-top-80x80',
+						'image_link_title'    => $edited_User->login,
+						'image_link_rel'      => 'lightbox[user_pictures]',
+					) );
 				$info_content .= '<br />'.action_icon( T_('Use as main picture'), 'move_up', $url_update, T_('Main'), 3, 4, array(), array( 'style' => 'margin-right:4px' ) );
 				$info_content .= '<br />'.action_icon( T_('Delete this picture'), 'xross', $url_delete, T_('Delete'), 3, 4, array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to delete this picture?').'\');' ), array( 'style' => 'margin-right:4px' ) );
-				$info_content .= $edited_User->get_rotate_avatar_icons( $uFile->ID );
+				$info_content .= $edited_User->get_rotate_avatar_icons( $user_Link->File->ID );
 				$info_content .= '</div>';
 			}
 			$Form->info( T_('Other pictures'), $info_content );

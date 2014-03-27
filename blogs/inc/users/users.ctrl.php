@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -193,7 +193,7 @@ if( !$Messages->has_errors() )
 			if( param( 'deltype', 'string', '', true ) == 'spammer' )
 			{ // If we delete user as spammer we also should remove the comments and the messages
 				$edited_User->delete_cascades = array_merge( $edited_User->delete_cascades, array(
-						array( 'table'=>'T_comments', 'fk'=>'comment_author_ID', 'msg'=>T_('%d comments by this user') ),
+						array( 'table'=>'T_comments', 'fk'=>'comment_author_user_ID', 'msg'=>T_('%d comments by this user') ),
 						array( 'table'=>'T_messaging__message', 'fk'=>'msg_author_user_ID', 'msg'=>T_('%d private messages sent by this user') ),
 					) );
 			}
@@ -302,7 +302,7 @@ if( !$Messages->has_errors() )
 			// Make query to get a count of users
 			$UserList->query();
 
-			if( $UserList->total_rows == 1 )
+			if( $UserList->get_total_rows() == 1 )
 			{	// If we find only one user by quick search we do a redirect to user's edit page
 				$User = $UserList->rows[0];
 				if( !empty( $User ) )

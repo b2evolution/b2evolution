@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -82,7 +82,9 @@ $db_config['aliases'] = array(
 		'T_slug'                   => $tableprefix.'slug',
 		'T_email__log'             => $tableprefix.'email__log',
 		'T_email__returns'         => $tableprefix.'email__returns',
-		'T_email__blocked'         => $tableprefix.'email__blocked',
+		'T_email__address'         => $tableprefix.'email__address',
+		'T_email__campaign'        => $tableprefix.'email__campaign',
+		'T_email__campaign_send'   => $tableprefix.'email__campaign_send',
 	);
 
 
@@ -126,10 +128,11 @@ $ctrl_mappings = array(
 		'registration'     => 'users/registration.ctrl.php',
 		'display'          => 'users/display.ctrl.php',
 		'groups'           => 'users/groups.ctrl.php',
+		'userclosing'      => 'users/closing.ctrl.php',
 		'upload'           => 'files/upload.ctrl.php',
 		'slugs'            => 'slugs/slugs.ctrl.php',
 		'email'            => 'tools/email.ctrl.php',
-		'newsletter'       => 'newsletter/newsletter.ctrl.php',
+		'campaigns'        => 'email_campaigns/campaigns.ctrl.php',
 	);
 
 
@@ -145,6 +148,7 @@ function & get_CountryCache( $allow_none_text = NULL )
 
 	if( ! isset( $CountryCache ) )
 	{	// Cache doesn't exist yet:
+		load_class( 'regional/model/_country.class.php', 'Country' );
 		if( ! isset( $allow_none_text ) )
 		{
 			$allow_none_text = T_('Unknown');
@@ -167,6 +171,7 @@ function & get_RegionCache()
 
 	if( ! isset( $RegionCache ) )
 	{	// Cache doesn't exist yet:
+		load_class( 'regional/model/_region.class.php', 'Region' );
 		$RegionCache = new DataObjectCache( 'Region', false, 'T_regional__region', 'rgn_', 'rgn_ID', 'rgn_name', 'rgn_name', T_('Unknown') );
 	}
 
@@ -185,6 +190,7 @@ function & get_SubregionCache()
 
 	if( ! isset( $SubregionCache ) )
 	{	// Cache doesn't exist yet:
+		load_class( 'regional/model/_subregion.class.php', 'Subregion' );
 		$SubregionCache = new DataObjectCache( 'Subregion', false, 'T_regional__subregion', 'subrg_', 'subrg_ID', 'subrg_name', 'subrg_name', T_('Unknown') );
 	}
 
@@ -203,6 +209,7 @@ function & get_CityCache()
 
 	if( ! isset( $CityCache ) )
 	{	// Cache doesn't exist yet:
+		load_class( 'regional/model/_city.class.php', 'City' );
 		$CityCache = new DataObjectCache( 'City', false, 'T_regional__city', 'city_', 'city_ID', 'city_name', 'city_name', T_('Unknown') );
 	}
 
@@ -365,20 +372,59 @@ function & get_IPRangeCache()
 
 
 /**
- * Get the EmailBlockedCache
+ * Get the DomainCache
  *
- * @return EmailBlockedCache
+ * @return DomainCache
  */
-function & get_EmailBlockedCache()
+function & get_DomainCache()
 {
-	global $EmailBlockedCache;
+	global $DomainCache;
 
-	if( ! isset( $EmailBlockedCache ) )
-	{	// Cache doesn't exist yet:
-		$EmailBlockedCache = new DataObjectCache( 'EmailBlocked', false, 'T_email__blocked', 'emblk_', 'emblk_ID', 'emblk_address' );
+	if( ! isset( $DomainCache ) )
+	{ // Cache doesn't exist yet:
+		load_class( 'sessions/model/_domain.class.php', 'Domain' );
+		$DomainCache = new DataObjectCache( 'Domain', false, 'T_basedomains', 'dom_', 'dom_ID', 'dom_name' );
 	}
 
-	return $EmailBlockedCache;
+	return $DomainCache;
+}
+
+
+/**
+ * Get the EmailAddressCache
+ *
+ * @return EmailAddressCache
+ */
+function & get_EmailAddressCache()
+{
+	global $EmailAddressCache;
+
+	if( ! isset( $EmailAddressCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'tools/model/_emailaddress.class.php', 'EmailAddress' );
+		$EmailAddressCache = new DataObjectCache( 'EmailAddress', false, 'T_email__address', 'emadr_', 'emadr_ID', 'emadr_address' );
+	}
+
+	return $EmailAddressCache;
+}
+
+
+/**
+ * Get the EmailCampaignCache
+ *
+ * @return EmailCampaignCache
+ */
+function & get_EmailCampaignCache()
+{
+	global $EmailCampaignCache;
+
+	if( ! isset( $EmailCampaignCache ) )
+	{ // Cache doesn't exist yet:
+		load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
+		$EmailCampaignCache = new DataObjectCache( 'EmailCampaign', false, 'T_email__campaign', 'ecmp_', 'ecmp_ID' );
+	}
+
+	return $EmailCampaignCache;
 }
 
 
@@ -442,20 +488,22 @@ class _core_Module extends Module
 	 */
 	function get_default_group_permissions( $grp_ID )
 	{
+		// Deny browse/contact users from other countries in case of suspect and spammer users.
+		$cross_country_settings_default = ( $grp_ID == 5 || $grp_ID == 6 ) ? 'denied' : 'allowed';
 		switch( $grp_ID )
 		{
 			case 1:		// Administrators (group ID 1) have permission by default:
-				$permadmin = 'normal';
-				$permusers = 'edit';
-				$permoptions = 'edit';
-				$permspam = 'edit';
-				$permslugs = 'edit';
-				$permtemplates = 'allowed';
-				$permemails = 'edit';
-				$def_notification = 'full';
+				$permadmin = 'normal'; // Access to Admin area
+				$permusers = 'edit'; // Users & Groups
+				$permoptions = 'edit'; // Global settings
+				$permspam = 'edit'; // Antispam settings
+				$permslugs = 'edit'; // Slug manager
+				$permtemplates = 'allowed'; // Skin settings
+				$permemails = 'edit'; // Email management
+				$def_notification = 'full'; // Default notification type: short/full
 				break;
 
-			case 2:		// Privileged bloggers (group ID 2) have permission by default:
+			case 2:		// Moderators (group ID 2) have permission by default:
 				$permadmin = 'normal';
 				$permusers = 'view';
 				$permoptions = 'view';
@@ -466,7 +514,8 @@ class _core_Module extends Module
 				$def_notification = 'short';
 				break;
 
-			case 3:		// Bloggers (group ID 3) have permission by default:
+			case 3:		// Trusted Users (group ID 3) have permission by default:
+			case 4: 	// Normal Users (group ID 4) have permission by default:
 				$permadmin = 'normal';
 				$permusers = 'none';
 				$permoptions = 'none';
@@ -477,17 +526,8 @@ class _core_Module extends Module
 				$def_notification = 'short';
 				break;
 
-			case 5:		// Spam/Suspect  (group ID 5) have permission by default:
-				$permadmin = 'no_toolbar';
-				$permusers = 'none';
-				$permoptions = 'none';
-				$permspam = 'none';
-				$permslugs = 'none';
-				$permtemplates = 'denied';
-				$permemails = 'none';
-				$def_notification = 'short';
-				break;
-
+			// case 5:		// Misbehaving/Suspect users (group ID 5) have permission by default:
+			// case 6:  // Spammers/restricted Users
 			default:
 				// Other groups have no permission by default
 				$permadmin = 'none';
@@ -516,6 +556,8 @@ class _core_Module extends Module
 			'comment_moderation_notif' => $def_notification,
 			'post_subscription_notif' => $def_notification,
 			'post_moderation_notif' => $def_notification,
+			'cross_country_allow_profiles' => $cross_country_settings_default,
+			'cross_country_allow_contact' => $cross_country_settings_default
 		 );
 	}
 
@@ -527,6 +569,8 @@ class _core_Module extends Module
 	 */
 	function get_available_group_permissions( $grp_ID = NULL )
 	{
+		global $Settings;
+
 		$none_option = array( 'none', T_( 'No Access' ), '' );
 		$view_option = array( 'view', T_( 'View only' ), '' );
 		$full_option = array( 'edit', T_( 'Full Access' ), '' );
@@ -592,6 +636,13 @@ class _core_Module extends Module
 				'field_lines' => false,
 		);
 
+		// Set additional note for cross country users restriction, if anonymous users can see the users list or users profiles
+		$cross_country_note = '';
+		if( $Settings->get('allow_anonymous_user_list') || $Settings->get('allow_anonymous_user_profiles') )
+		{
+			$cross_country_note = ' <span class="warning">'.T_('Browsing / Viewing users is currently allowed for anonymous users').'</span>';
+		}
+
 		$permissions = array(
 			'perm_admin' => $perm_admin_values,
 			'perm_users' => $perm_users_values,
@@ -653,6 +704,22 @@ class _core_Module extends Module
 				),
 			'post_moderation_notif' => array_merge(
 				array( 'label' => T_( 'New Post moderation notifications' ) ), $notifications_array
+				),
+			'cross_country_allow_profiles' => array(
+				'label' => T_('Cross country'),
+				'user_func'  => 'check_cross_country_user_perm',
+				'group_func' => 'check_cross_country_group_perm',
+				'perm_block' => 'additional',
+				'perm_type' => 'checkbox',
+				'note' => T_('Allow to browse users from other countries').$cross_country_note,
+				),
+			'cross_country_allow_contact' => array(
+				'label' => '',
+				'user_func'  => 'check_cross_country_user_perm',
+				'group_func' => 'check_cross_country_group_perm',
+				'perm_block' => 'additional',
+				'perm_type' => 'checkbox',
+				'note' => T_('Allow to contact users from other countries'),
 				),
 			);
 		return $permissions;
@@ -761,6 +828,15 @@ class _core_Module extends Module
 	}
 
 	/**
+	 * Check permission for the group
+	 */
+	function check_cross_country_group_perm( $permlevel, $permvalue, $permtarget )
+	{
+		// Check if browse/contact users from other countries is allowed
+		return $permvalue == 'allowed';
+	}
+
+	/**
 	 * Build teh evobar menu
 	 */
 	function build_evobar_menu()
@@ -816,7 +892,7 @@ class _core_Module extends Module
 		{	// restricted Access to Admin:
 			$entries = array(
 				'see' => array(
-						'text' => T_('Site'),
+						'text' => T_('Structure'),
 						'href' => $home_url,
 						'title' => T_('See the home page'),
 					),
@@ -879,10 +955,18 @@ class _core_Module extends Module
 				$entries['blog']['disabled'] = false;
 				$entries['blog']['title'] = T_('Manage this blog');
 
+				if( $Blog->get_setting( 'use_workflow' ) )
+				{ // Workflow view
+					$entries['blog']['entries']['workflow'] = array(
+									'text' => T_('Workflow view').'&hellip;',
+									'href' => $items_url.'&amp;tab=tracker',
+								);
+				}
+
 				if( $Blog->get( 'type' ) == 'manual' )
-				{ // Manual Pages
+				{ // Manual view
 					$entries['blog']['entries']['manual'] = array(
-									'text' => T_('Manual Pages').'&hellip;',
+									'text' => T_('Manual view').'&hellip;',
 									'href' => $items_url.'&amp;tab=manual',
 								);
 				}
@@ -976,6 +1060,26 @@ class _core_Module extends Module
 						}
 				}
 			}
+
+			if( ! is_admin_page() )
+			{ // Display a menu to turn on/off the debug containers
+				global $ReqURI, $Session;
+
+				if( $Session->get( 'debug_containers_'.$Blog->ID ) == 1 )
+				{ // To hide the debug containers
+					$entries['blog']['entries']['containers'] = array(
+						'text' => T_('Hide containers'),
+						'href' => url_add_param( $ReqURI, 'debug_containers=hide' ),
+					);
+				}
+				else
+				{ // To show the debug containers
+					$entries['blog']['entries']['containers'] = array(
+						'text' => T_('Show containers'),
+						'href' => url_add_param( $ReqURI, 'debug_containers=show' ),
+					);
+				}
+			}
 		}
 
 		// SYSTEM MENU:
@@ -1033,8 +1137,11 @@ class _core_Module extends Module
 				{
 					$entries['tools']['entries']['email'] = array(
 							'text' => T_('Emails'),
-							'href' => $admin_url.'?ctrl=email',
+							'href' => $admin_url.'?ctrl=campaigns',
 							'entries' => array(
+								'campaigns' => array(
+									'text' => T_('Campaigns').'&hellip;',
+									'href' => $admin_url.'?ctrl=campaigns' ),
 								'blocked' => array(
 									'text' => T_('Addresses').'&hellip;',
 									'href' => $admin_url.'?ctrl=email' ),
@@ -1089,6 +1196,16 @@ class _core_Module extends Module
 						$entries['tools']['entries']['antispam']['entries']['ipranges'] = array(
 								'text' => T_('IP Ranges').'&hellip;',
 								'href' => $admin_url.'?ctrl=antispam&amp;tab3=ipranges' );
+						$entries['tools']['entries']['antispam']['entries']['countries'] = array(
+								'text' => T_('Countries').'&hellip;',
+								'href' => $admin_url.'?ctrl=antispam&amp;tab3=countries' );
+
+						if( $current_User->check_perm( 'stats', 'list' ) )
+						{
+							$entries['tools']['entries']['antispam']['entries']['domains'] = array(
+									'text' => T_('Referring domains').'&hellip;',
+									'href' => $admin_url.'?ctrl=antispam&amp;tab3=domains' );
+						}
 
 						$entries['tools']['entries']['antispam']['entries']['settings'] = array(
 								'text' => T_('Settings').'&hellip;',
@@ -1384,6 +1501,9 @@ class _core_Module extends Module
 							'userfields' => array(
 								'text' => T_('User fields'),
 								'href' => '?ctrl=userfields' ),
+							'userclosing' => array(
+								'text' => T_('Account closing'),
+								'href' => '?ctrl=userclosing' ),
 							),
 						),
 				);
@@ -1397,8 +1517,11 @@ class _core_Module extends Module
 		{ // Permission to view email management:
 			$AdminUI->add_menu_entries( NULL, array( 'email' => array(
 					'text' => T_('Emails'),
-					'href' => '?ctrl=email',
+					'href' => '?ctrl=campaigns',
 					'entries' => array(
+						'campaigns' => array(
+							'text' => T_('Campaigns'),
+							'href' => '?ctrl=campaigns' ),
 						'blocked' => array(
 							'text' => T_('Addresses'),
 							'href' => '?ctrl=email' ),
@@ -1441,10 +1564,6 @@ class _core_Module extends Module
 				}
 				if( $perm_spam )
 				{	// Permission to view antispam:
-					/*if( !$perm_options )
-					{
-						$tools_entries['tools']['href'] = '?ctrl=antispam';
-					}*/
 					$AdminUI->add_menu_entries( 'options', array(
 						'antispam' => array(
 							'text' => T_('Antispam'),
@@ -1460,6 +1579,18 @@ class _core_Module extends Module
 							'ipranges' => array(
 								'text' => T_('IP Ranges'),
 								'href' => '?ctrl=antispam&amp;tab3=ipranges' ) ) );
+						$AdminUI->add_menu_entries( array( 'options', 'antispam' ), array(
+							'countries' => array(
+								'text' => T_('Countries'),
+								'href' => '?ctrl=antispam&amp;tab3=countries' ) ) );
+
+						if( $current_User->check_perm( 'stats', 'list' ) )
+						{
+							$AdminUI->add_menu_entries( array( 'options', 'antispam' ), array(
+								'domains' => array(
+									'text' => T_('Referring domains'),
+									'href' => '?ctrl=antispam&amp;tab3=domains' ) ) );
+						}
 
 						$AdminUI->add_menu_entries( array( 'options', 'antispam' ), array(
 							'settings' => array(
@@ -1493,7 +1624,7 @@ class _core_Module extends Module
 			$AdminUI->add_menu_entries( 'options', array(
 				'general' => array(
 					'text' => T_('General'),
-					'href' => '?ctrl=gensettings' ),
+					'href' => '?ctrl=gensettings', ),
 				'regional' => array(
 					'text' => T_('Regional'),
 					'href' => '?ctrl=regional',

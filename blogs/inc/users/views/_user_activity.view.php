@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -73,7 +73,7 @@ user_reports_results_block( array(
 evo_flush();
 
 /**** Blogs owned by the user ****/
-blogs_results_block( array(
+blogs_user_results_block( array(
 		'edited_User'       => $edited_User,
 	) );
 evo_flush();

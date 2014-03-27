@@ -7,13 +7,13 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Blog, $last_part;
+global $Blog, $requested_404_title;
 
 echo '<div class="error_404">';
 
@@ -22,11 +22,11 @@ echo '<h1>404 Not Found</h1>';
 echo '<p>'.T_('The manual page you are requesting doesn\'t seem to exist (yet).').'</p>';
 
 $post_title = '';
-	$post_urltitle = '';
-if( !empty( $last_part ) )
+$post_urltitle = '';
+if( !empty( $requested_404_title ) )
 {	// Set title & urltitle for new post
-	$post_title = str_replace( ' ', '%20', ucwords( str_replace( '-', ' ', $last_part ) ) );
-	$post_urltitle = $last_part;
+	$post_title = str_replace( ' ', '%20', ucwords( str_replace( '-', ' ', $requested_404_title ) ) );
+	$post_urltitle = $requested_404_title;
 }
 
 // Button to create a new page
@@ -40,9 +40,9 @@ echo '<p>'.T_('You can search the manual below.').'</p>';
 
 echo '</div>';
 
-if( !empty( $last_part ) )
+if( !empty( $requested_404_title ) )
 {	// Initialize a prefilled search form
-	set_param( 's', str_replace( '-', ' ', $last_part ) );
+	set_param( 's', str_replace( '-', ' ', $requested_404_title ) );
 	set_param( 'sentence', 'OR' );
 	set_param( 'title', '' ); // Empty this param to exclude a filter by post_urltitle
 

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal Open Source relicensing agreement:
@@ -32,7 +32,17 @@ global $action, $next_action, $blogtemplate, $blog, $tab, $admin_url;
 
 $Form = new Form();
 
-$Form->begin_form( 'fform' );
+$form_title = '';
+if( $edited_Blog->ID == 0 )
+{ // "New blog" form: Display a form title and icon to close form
+	global $kind;
+	$kind_title = get_collection_kinds( $kind );
+	$form_title = sprintf( T_('New %s'), $kind_title ).':';
+
+	$Form->global_icon( sprintf( T_('Abort New %s'), $kind_title ), 'close', $admin_url.'?ctrl=collections&amp;tab=list', ' '.sprintf( T_('Abort New %s'), $kind_title ), 3, 3 );
+}
+
+$Form->begin_form( 'fform', $form_title );
 
 $Form->add_crumb( 'collection' );
 $Form->hidden_ctrl();
@@ -56,10 +66,13 @@ $Form->begin_fieldset( T_('Collection type').get_manual_link('collection-type') 
 		echo '<p>'
 			.sprintf( T_('This is %s &ndash; '), $collection_kinds[ $edited_Blog->get( 'type' ) ]['name'] )
 			.$collection_kinds[ $edited_Blog->get( 'type' ) ]['desc']
-		.'</p>'
-		.'<p><a href="'.$admin_url.'?ctrl=coll_settings&tab=general&action=type&blog='.$edited_Blog->ID.'">'
-				.T_('Change collection type / Reset &raquo;')
-		.'</a></p>';
+		.'</p>';
+		if( $edited_Blog->ID > 0 )
+		{
+			echo '<p><a href="'.$admin_url.'?ctrl=coll_settings&tab=general&action=type&blog='.$edited_Blog->ID.'">'
+					.T_('Change collection type / Reset &raquo;')
+			.'</a></p>';
+		}
 	}
 $Form->end_fieldset();
 
@@ -69,10 +82,6 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link('blogs_general_p
 	$Form->text( 'blog_name', $edited_Blog->get( 'name' ), 50, T_('Title'), T_('Will be displayed on top of the blog.'), 255 );
 
 	$Form->text( 'blog_shortname', $edited_Blog->get( 'shortname', 'formvalue' ), 15, T_('Short name'), T_('Will be used in selection menus and throughout the admin interface.'), 255 );
-
-	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
-	{	// Permission to edit advanced admin settings
-	}
 
 	$owner_User = & $edited_Blog->get_owner_User();
 	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
@@ -96,17 +105,21 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link('blogs_general_p
 
 	$Form->select( 'blog_locale', $edited_Blog->get( 'locale' ), 'locale_options_return', T_('Main Locale'), T_('Determines the language of the navigation links on the blog.') );
 
+	$Form->checkbox( 'favorite', $edited_Blog->get( 'favorite' ),
+						T_( 'Favorite' ), T_( 'Include in the quick blog selector at the top of the back office pages.' ) );
+
+	$Form->text( 'blog_order', $edited_Blog->get( 'order' ), 10, T_('Order') );
+
 $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Description').get_manual_link('collection-description') );
 	$Form->text( 'blog_tagline', $edited_Blog->get( 'tagline' ), 50, T_('Tagline'), T_('This is displayed under the blog name on the blog template.'), 250 );
-	$Form->textarea( 'blog_longdesc', $edited_Blog->get( 'longdesc' ), 5, T_('Long Description'), T_('This is displayed on the blog template.'), 50, 'large' );
+	$Form->textarea( 'blog_longdesc', $edited_Blog->get( 'longdesc' ), 5, T_('Long Description'), T_('This is displayed on the blog template.'), 50 );
 $Form->end_fieldset();
 
 
-$Form->buttons( array( array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
-													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+$Form->buttons( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 
 $Form->end_form();
 

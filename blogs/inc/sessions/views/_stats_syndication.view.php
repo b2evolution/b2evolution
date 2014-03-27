@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -38,7 +38,7 @@ $sql = "
 	 WHERE hit_type = 'rss'";
 if( $blog > 0 )
 {
-	$sql .= ' AND hit_blog_ID = '.$blog;
+	$sql .= ' AND hit_coll_ID = '.$blog;
 }
 $sql .= ' GROUP BY year, month, day
 					ORDER BY year DESC, month DESC, day DESC';

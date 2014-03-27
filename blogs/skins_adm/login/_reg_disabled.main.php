@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -31,16 +31,22 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Include page header:
  */
 $page_title = T_('Registration Currently Disabled');
+$wrap_height = '170px';
+
 require dirname(__FILE__).'/_html_header.inc.php';
 
-echo '<p class="error">'.T_('User registration is currently not allowed.').'</p>';
+echo str_replace( '$title$', $page_title, $form_before );
 
 ?>
-<p class="center">
-	<a href="<?php echo $baseurl ?>" ><?php echo T_('Home') ?></a>
-</p>
-
+<div class="form-login">
+	<p class="error"><?php echo T_('User registration is currently not allowed.'); ?></p>
+	<p class="center">
+		<a href="<?php echo $baseurl ?>" class="btn btn-default"><?php echo T_('Home') ?></a>
+	</p>
+</div>
 <?php
-require dirname(__FILE__).'/_html_footer.inc.php';
 
+echo $form_after;
+
+require dirname(__FILE__).'/_html_footer.inc.php';
 ?>

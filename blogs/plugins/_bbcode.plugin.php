@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -25,7 +25,7 @@ class bbcode_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $help_url = 'http://b2evolution.net/man/technical-reference/renderer-plugins/bb-code-plugin';
+	var $help_topic = 'bb-code-plugin';
 	var $number_of_installs = 1;
 
 	/*
@@ -44,7 +44,7 @@ class bbcode_plugin extends Plugin
 	{
 		$this->short_desc = T_('BB formatting e-g [b]bold[/b]');
 		$this->long_desc = T_('Supported tags and the BB code toolbar are configurable.
-		Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [quote] [list=1] [list=a] [list] [*] [bg=]');
+		Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [quote] [list=1] [list=a] [list] [*] [bg=] [clear]');
 	}
 
 
@@ -75,11 +75,13 @@ class bbcode_plugin extends Plugin
  #\[quote(=?)](.+?)\[/quote]#is
  #\[quote=([^\]\#]*?)\#([cp][0-9]+)](.+?)\[/quote]#is
 [quote] #\[quote=([^\]]*?)](.+?)\[/quote]#is
+[indent] #\[indent](.+?)\[/indent]#is
 [list=1] #\[list=1](.+?)\[/list]#is
 [list=a] #\[list=a](.+?)\[/list]#is
 [list] #\[list](.+?)\[/list]#is
 [*] #\[\*](.+?)(\n|\[/list\])#is
-[bg] !\[bg=(#?[A-Za-z0-9]+?)](.+?)\[/bg]!is',
+[bg] !\[bg=(#?[A-Za-z0-9]+?)](.+?)\[/bg]!is
+[clear] #\[clear]#is',
 				),
 				'coll_post_replace_list' => array(
 					'label' => $this->T_( 'Replace list for posts'),
@@ -96,11 +98,13 @@ class bbcode_plugin extends Plugin
 <blockquote>$2</blockquote>
 <strong class="quote_author">$1 wrote <a href="#$2">earlier</a>:</strong><blockquote>$3</blockquote>
 <strong class="quote_author">$1 wrote:</strong><blockquote>$2</blockquote>
+<div class="indented">$1</div>
 <ol type="1">$1</ol>
 <ol type="a">$1</ol>
 <ul>$1</ul>
 <li>$1</li>
-<span style="background-color:$1">$2</span>',
+<span style="background-color:$1">$2</span>
+<div class="clear"></div>',
 				),
 				'coll_comment_search_list' => array(
 					'label' => $this->T_( 'Search list for comments'),
@@ -117,11 +121,13 @@ class bbcode_plugin extends Plugin
  #\[quote(=?)](.+?)\[/quote]#is
  #\[quote=([^\]\#]*?)\#([cp][0-9]+)](.+?)\[/quote]#is
 [quote] #\[quote=([^\]]*?)](.+?)\[/quote]#is
+[indent] #\[indent](.+?)\[/indent]#is
 [list=1] #\[list=1](.+?)\[/list]#is
 [list=a] #\[list=a](.+?)\[/list]#is
 [list] #\[list](.+?)\[/list]#is
 [*] #\[\*](.+?)(\n|\[/list\])#is
-[bg] !\[bg=(#?[A-Za-z0-9]+?)](.+?)\[/bg]!is',
+[bg] !\[bg=(#?[A-Za-z0-9]+?)](.+?)\[/bg]!is
+[clear] #\[clear]#is',
 				),
 				'coll_comment_replace_list' => array(
 					'label' => $this->T_( 'Replace list for comments'),
@@ -138,11 +144,13 @@ class bbcode_plugin extends Plugin
 <blockquote>$2</blockquote>
 <strong class="quote_author">$1 wrote <a href="#$2">earlier</a>:</strong><blockquote>$3</blockquote>
 <strong class="quote_author">$1 wrote:</strong><blockquote>$2</blockquote>
+<div class="indented">$1</div>
 <ol type="1">$1</ol>
 <ol type="a">$1</ol>
 <ul>$1</ul>
 <li>$1</li>
-<span style="background-color:$1">$2</span>',
+<span style="background-color:$1">$2</span>
+<div class="clear"></div>',
 				),
 			)
 		);

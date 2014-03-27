@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -121,8 +121,9 @@ function headers_content_mightcache( $type = 'text/html', $max_age = '#', $chars
  *
  * @param string Destination URL to redirect to
  * @param boolean|integer is this a permanent redirect? if true, send a 301; otherwise a 303 OR response code 301,302,303
+ * @param boolean is this a redirected post display? This param may be true only if we should redirect to a post url where the post status is 'redirected'!
  */
-function header_redirect( $redirect_to = NULL, $status = false )
+function header_redirect( $redirect_to = NULL, $status = false, $redirected_post = false )
 {
 	/**
 	 * put your comment there...
@@ -132,7 +133,7 @@ function header_redirect( $redirect_to = NULL, $status = false )
 	global $Hit;
 	global $baseurl, $Blog, $htsrv_url_sensitive;
 	global $Session, $Debuglog, $Messages;
-	global $http_response_code;
+	global $http_response_code, $allow_redirects_to_different_domain;
 
 	// TODO: fp> get this out to the caller, make a helper func like get_returnto_url()
 	if( empty($redirect_to) )
@@ -181,6 +182,20 @@ function header_redirect( $redirect_to = NULL, $status = false )
 		// TODO: fp> action should actually not be used to trigger views. This should be changed at some point.
 		// TODO: fp> confirm should be normalized to confirmed
 		$redirect_to = preg_replace( '~(?<=\?|&) (login|pwd|confirm(ed)?) = [^&]+ ~x', '', $redirect_to );
+	}
+
+	if( ( $allow_redirects_to_different_domain != 'always' ) // Always allow redirects to different domains is not set
+	 && ( ! ( ( $allow_redirects_to_different_domain == 'only_redirected_posts' ) && $redirected_post ) ) ) // This is not a 'redirected' post display request
+	{ // Force header redirects into the same domain. Do not allow external URLs.
+		$redirect_url_parts = parse_url( $redirect_to );
+		$host = empty( $redirect_url_parts['host'] ) ? null : $redirect_url_parts['host'];
+		$baseurl_parts = parse_url( $baseurl );
+		$base_host = empty( $baseurl_parts['host'] ) ? null : $baseurl_parts['host'];
+		if( ( $host != null ) && ( $host !== $base_host ) && ( substr( $host, - ( strlen( $base_host ) + 1 ) ) != '.'.$base_host ) )
+		{ // The main domain of the redirect_to url and the base url doesn't match
+			$Messages->add( 'Tried to redirect to an external url!', 'error' );
+			$redirect_to = $baseurl;
+		}
 	}
 
 	if( is_integer($status) )
@@ -244,7 +259,7 @@ function header_redirect( $redirect_to = NULL, $status = false )
 	if( headers_sent($filename, $line) )
 	{
 		debug_die( sprintf('Headers have already been sent in %s on line %d.', basename($filename), $line)
-						.'<br />Cannot <a href="'.htmlspecialchars($redirect_to).'">redirect</a>.' );
+						.'<br />Cannot <a href="'.evo_htmlspecialchars($redirect_to).'">redirect</a>.' );
 	}
 	header( 'Location: '.$redirect_to, true, $http_response_code ); // explictly setting the status is required for (fast)cgi
 	exit(0);
@@ -381,7 +396,7 @@ function get_request_title( $params = array() )
 			'register_text'       => T_('Register'),
 			'req_validatemail'    => T_('Account activation'),
 			'account_activation'  => T_('Account activation'),
-			'lostpassword_text'   => T_('Lost password?'),
+			'lostpassword_text'   => T_('Lost your password?'),
 			'profile_text'        => T_('User Profile'),
 			'avatar_text'         => T_('Profile picture'),
 			'pwdchange_text'      => T_('Password change'),
@@ -663,6 +678,15 @@ function get_request_title( $params = array() )
 			$r[] = $params['usercomments_text'];
 			break;
 
+		case 'posts':
+			// We are requesting a posts page:
+			if( $params['posts_text'] != '#' )
+			{
+				$r[] = $params['posts_text'];
+				break;
+			}
+			// No break if empty, Use title from default case
+
 		default:
 			if( isset( $MainList ) )
 			{
@@ -799,7 +823,7 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
  */
 function require_js( $js_file, $relative_to = 'rsc_url' )
 {
-	global $rsc_url, $debug, $app_version;
+	global $rsc_url, $debug, $app_version_long;
 	static $required_js;
 
 	$js_aliases = array(
@@ -864,7 +888,7 @@ function require_js( $js_file, $relative_to = 'rsc_url' )
 
 
 	// Be sure to get a fresh copy of this JS file after application upgrades:
-	$js_url = url_add_param( $js_url, 'v='.$app_version );
+	$js_url = url_add_param( $js_url, 'v='.$app_version_long );
 
 	// Add to headlines, if not done already:
 	if( empty( $required_js ) || ! in_array( strtolower($js_url), $required_js ) )
@@ -891,7 +915,7 @@ function require_js( $js_file, $relative_to = 'rsc_url' )
  */
 function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media = NULL, $version = '#' )
 {
-	global $rsc_url, $debug, $app_version;
+	global $rsc_url, $debug, $app_version_long;
 	static $required_css;
 
 	if( $relative_to === 'relative' || $relative_to === true )
@@ -920,7 +944,7 @@ function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media
 	{	// Be sure to get a fresh copy of this CSS file after application upgrades:
 		if( $version == '#' )
 		{
-			$version = $app_version;
+			$version = $app_version_long;
 		}
 		$css_url = url_add_param( $css_url, 'v='.$version );
 	}
@@ -997,13 +1021,14 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				// Added by fplanque - (MIT License) - http://colorpowered.com/colorbox/
 				require_js( '#jqueryUI#', $relative_to );
 				require_js( 'voting.js', $relative_to );
+				require_js( 'jquery/jquery.touchswipe.min.js', $relative_to );
 				require_js( 'colorbox/jquery.colorbox-min.js', $relative_to );
 				require_css( 'colorbox/colorbox.css', $relative_to );
 				if( is_logged_in() )
 				{	// If user is logged in - display a voting panel
 					$colorbox_params = ',
 								displayVoting: true,
-								votingUrl: "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=file&'.url_crumb( 'voting' ).'",
+								votingUrl: "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=link&'.url_crumb( 'voting' ).'",
 								minWidth: 345';
 				}
 				else
@@ -1011,15 +1036,27 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 					$colorbox_params = ',
 								minWidth: 255';
 				}
-				add_js_headline('jQuery(document).ready(function()
+				add_js_headline('jQuery( document ).ready( function()
 						{
-							jQuery("a[rel^=\'lightbox\']").colorbox(
+							jQuery( "a[rel^=\'lightbox\']" ).colorbox(
 							{
 								maxWidth: "95%",
 								maxHeight: "90%",
 								slideshow: true,
 								slideshowAuto: false'.
 								$colorbox_params.'
+							} );
+
+							jQuery( "#colorbox" ).swipe(
+							{
+								swipeLeft: function( event, direction, distance, duration, fingerCount )
+								{
+									jQuery.colorbox.next();
+								},
+								swipeRight: function( event, direction, distance, duration, fingerCount )
+								{
+									jQuery.colorbox.prev();
+								},
 							} );
 						} );' );
 				// TODO: translation strings
@@ -1104,7 +1141,6 @@ function add_js_for_toolbar( $relative_to = 'rsc_url' )
 
 	require_js( '#jquery#', $relative_to );
 	// Superfish menus:
-	require_js( 'hoverintent.js', $relative_to );
 	require_js( 'superfish.js', $relative_to );
 	add_js_headline( '
 	jQuery( function() {
@@ -1162,10 +1198,7 @@ function init_bubbletip_js( $relative_to = 'rsc_url' )
 	require_js( '#jquery#', $relative_to ); // dependency
 	require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
 	require_js( 'bubbletip.js', $relative_to );
-	require_css( 'jquery/bubbletip/bubbletip.css', $relative_to );
-	add_headline('<!--[if IE]>');
-	require_css( 'jquery/bubbletip/bubbletip-IE.css', $relative_to );
-	add_headline('<![endif]-->');
+	require_css( 'jquery/jquery.bubbletip.css', $relative_to );
 }
 
 
@@ -1177,10 +1210,7 @@ function init_userfields_js( $relative_to = 'rsc_url' )
 	require_js( '#jquery#', $relative_to ); // dependency
 	require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
 	require_js( 'userfields.js', $relative_to );
-	require_css( 'jquery/bubbletip/bubbletip.css', $relative_to );
-	add_headline('<!--[if IE]>');
-	require_css( 'jquery/bubbletip/bubbletip-IE.css', $relative_to );
-	add_headline('<![endif]-->');
+	require_css( 'jquery/jquery.bubbletip.css', $relative_to );
 }
 
 
@@ -1192,10 +1222,7 @@ function init_plugins_js( $relative_to = 'rsc_url' )
 	require_js( '#jquery#', $relative_to ); // dependency
 	require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
 	require_js( 'plugins.js', $relative_to );
-	require_css( 'jquery/bubbletip/bubbletip.css', $relative_to );
-	add_headline('<!--[if IE]>');
-	require_css( 'jquery/bubbletip/bubbletip-IE.css', $relative_to );
-	add_headline('<![endif]-->');
+	require_css( 'jquery/jquery.bubbletip.css', $relative_to );
 }
 
 
@@ -1235,16 +1262,13 @@ function init_datepicker_js( $relative_to = 'rsc_url' )
 
 /**
  * Registers headlines for initialization of scroll wide
+ * JS plugin to horizontal scroll "div.wide_scroll" by yellow right/left panel arrows
+ * You can create such div elements by TinyMCE toolbar by selecting "wide_scroll" style
  */
 function init_scrollwide_js( $relative_to = 'rsc_url' )
 {
 	require_js( '#jquery#', $relative_to ); // dependency
 	require_js( 'jquery/jquery.scrollwide.min.js', $relative_to );
-	add_js_headline( 'jQuery( document ).ready( function()
-		{
-			jQuery( "div.wide_scroll" ).scrollWide( { scroll_time: 100 } );
-		} )' );
-	// require_css( 'jquery/scrollwide/jquery.scrollwide.css', $relative_to );
 }
 
 
@@ -1328,6 +1352,8 @@ function init_colorpicker_js( $relative_to = 'rsc_url' )
  */
 function init_autocomplete_login_js( $relative_to = 'rsc_url' )
 {
+	global $blog;
+
 	require_js( '#jquery#', $relative_to ); // dependency
 
 	// Use hintbox plugin of jQuery
@@ -1339,14 +1365,22 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url' )
 	// dh> TODO: should probably also get ported to use jquery.ui.autocomplete (or its successor)
 	require_css( 'jquery/jquery.hintbox.css', $relative_to );
 	require_js( 'jquery/jquery.hintbox.min.js', $relative_to );
-	add_js_headline( 'jQuery( document ).ready( function()
+	add_js_headline( 'jQuery( document ).on( "focus", "input.autocomplete_login", function()
 	{
-		jQuery( "input.autocomplete_login" ).hintbox(
+		var ajax_params = "";
+		if( jQuery( this ).hasClass( "only_assignees" ) )
 		{
-			url: "'.get_secure_htsrv_url().'async.php?action=get_login_list",
+			ajax_params = "&user_type=assignees&blog='.$blog.'";
+		}
+		jQuery( this ).hintbox(
+		{
+			url: "'.get_secure_htsrv_url().'async.php?action=get_login_list" + ajax_params,
 			matchHint: true,
 			autoDimentions: true
 		} );
+		'
+		// Don't submit a form by Enter when user is editing the owner fields
+		.get_prevent_key_enter_js( 'input.autocomplete_login' ).'
 	} );' );
 }
 
@@ -1841,8 +1875,11 @@ function display_login_form( $params )
 	global $secure_htsrv_url, $admin_url, $baseurl, $ReqHost;
 
 	$params = array_merge( array(
+			'form_before' => '',
+			'form_after' => '',
 			'form_action' => '',
-			'form_name' => 'login_form' ,
+			'form_name' => 'login_form',
+			'form_title' => '',
 			'form_layout' => '',
 			'form_class' => 'bComment',
 			'source' => 'inskin login form',
@@ -1890,7 +1927,7 @@ function display_login_form( $params )
 		{ // logged in user isn't required for redirect_to url, set abort url to redirect_to
 			$abort_url = $redirect_to;
 		}
-		$links[] = '<a href="'.htmlspecialchars( url_rel_to_same_host( $abort_url, $ReqHost ) ).'">'
+		$links[] = '<a href="'.evo_htmlspecialchars( url_rel_to_same_host( $abort_url, $ReqHost ) ).'">'
 		./* Gets displayed as link to the location on the login form if no login is required */ T_('Abort login!').'</a>';
 	}
 
@@ -1901,9 +1938,13 @@ function display_login_form( $params )
 
 	if( count($links) )
 	{
-		echo '<div style="float:right; margin: 0 1em">'.implode( $links, ' &middot; ' ).'</div>
-		<div class="clear"></div>';
+		echo '<div class="form-login-links">'
+				.'<div class="floatright">'.implode( $links, ' &middot; ' ).'</div>'
+				.'<div class="clear"></div>'
+			.'</div>';
 	}
+
+	echo $params['form_before'];
 
 	$Form = new Form( $params[ 'form_action' ] , $params[ 'form_name' ], 'post', $params[ 'form_layout' ] );
 
@@ -1913,13 +1954,19 @@ function display_login_form( $params )
 	$source = param( 'source', 'string', $params[ 'source' ].' login form' );
 	$Form->hidden( 'source', $source );
 	$Form->hidden( 'redirect_to', $redirect_to );
-	if( $inskin )
+	if( $inskin || $params['inskin_urls'] )
 	{ // inskin login form
 		$Form->hidden( 'inskin', true );
 		$separator = '<br />';
 	}
 	else
 	{ // standard login form
+
+		if( ! empty( $params['form_title'] ) )
+		{
+			echo '<h4>'.$params['form_title'].'</h4>';
+		}
+
 		$Form->hidden( 'validate_required', $params[ 'validate_required' ] );
 		if( isset( $params[ 'action' ],  $params[ 'reqID' ], $params[ 'sessID' ] ) &&  $params[ 'action' ] == 'validatemail' )
 		{ // the user clicked the link from the "validate your account" email, but has not been logged in; pass on the relevant data:
@@ -1947,10 +1994,18 @@ function display_login_form( $params )
 		$Form->hidden( 'pwd_hashed', '' ); // gets filled by JS
 	}
 
-	$Form->begin_field();
-	$Form->text_input( $dummy_fields[ 'login' ], $params[ 'login' ], 18, T_('Login'), $separator.T_('Enter your username (or email address).'),
-					array( 'maxlength' => 255, 'class' => 'input_text', 'required'=>true ) );
-	$Form->end_field();
+	if( $inskin )
+	{
+		$Form->begin_field();
+		$Form->text_input( $dummy_fields[ 'login' ], $params[ 'login' ], 18, T_('Login'), $separator.T_('Enter your username (or email address).'),
+					array( 'maxlength' => 255, 'class' => 'input_text', 'required' => true ) );
+		$Form->end_field();
+	}
+	else
+	{
+		$Form->text_input( $dummy_fields[ 'login' ], $params[ 'login' ], 18, '', '',
+					array( 'maxlength' => 255, 'class' => 'input_text', 'input_required' => 'required', 'placeholder' => T_('Username (or email address)') ) );
+	}
 
 	if( $inskin )
 	{
@@ -1960,21 +2015,28 @@ function display_login_form( $params )
 	{
 		$lost_password_url = $secure_htsrv_url.'login.php?action=lostpassword&amp;redirect_to='.rawurlencode( url_rel_to_same_host( $redirect_to, $secure_htsrv_url) );
 	}
-	if( !empty($login) )
+	if( ! empty( $login ) )
 	{
 		$lost_password_url .= '&amp;'.$dummy_fields[ 'login' ].'='.rawurlencode($login);
 	}
-	$pwd_note = $pwd_note = '<a href="'.$lost_password_url.'">'.T_('Lost password ?').'</a>';
+	$pwd_note = '<a href="'.$lost_password_url.'">'.T_('Lost your password?').'</a>';
 
-	$Form->begin_field();
-	$Form->password_input( $dummy_fields[ 'pwd' ], '', 18, T_('Password'), array( 'note'=>$pwd_note, 'maxlength' => 70, 'class' => 'input_text', 'required'=>true ) );
-	$Form->end_field();
+	if( $inskin )
+	{
+		$Form->begin_field();
+		$Form->password_input( $dummy_fields[ 'pwd' ], '', 18, T_('Password'), array( 'note' => $pwd_note, 'maxlength' => 70, 'class' => 'input_text', 'required' => true ) );
+		$Form->end_field();
+	}
+	else
+	{
+		$Form->password_input( $dummy_fields[ 'pwd' ], '', 18, '', array( 'placeholder' => T_('Password'), 'maxlength' => 70, 'class' => 'input_text', 'input_required' => 'required' ) );
+	}
 
 	// Allow a plugin to add fields/payload
 	$Plugins->trigger_event( 'DisplayLoginFormFieldset', array( 'Form' => & $Form ) );
 
 	// Submit button(s):
-	$submit_buttons = array( array( 'name'=>'login_action[login]', 'value'=>T_('Log in!'), 'class'=>'search', 'style'=>'font-size: 120%' ) );
+	$submit_buttons = array( array( 'name'=>'login_action[login]', 'value'=>T_('Log in!'), 'class'=>'search btn-primary', 'style'=>'font-size: 120%' ) );
 	if( ( !$inskin ) && ( strpos( $redirect_to, $admin_url ) !== 0 )
 		&& ( strpos( $ReqHost.$redirect_to, $admin_url ) !== 0 )// if $redirect_to is relative
 		&& ( ! is_admin_page() ) )
@@ -1986,29 +2048,30 @@ function display_login_form( $params )
 
 	if( $inskin )
 	{
-		$before_register_link = '<strong>';
-		$after_register_link = '</strong>';
-		$register_link_style = 'text-align:right; margin: 1em 0 1ex';
+		$before_register_link = '<div class="login_actions" style="text-align:right; margin: 1em 0 1ex"><strong>';
+		$after_register_link = '</strong></div>';
+		user_register_link( $before_register_link, $after_register_link, T_('No account yet? Register here').' &raquo;', '#', true /*disp_when_logged_in*/, $redirect_to, $source );
 	}
 	else
 	{
-		echo '<div class="center notes" style="margin: 1em 0">'.T_('You will have to accept cookies in order to log in.').'</div>';
-
 		// Passthrough REQUEST data (when login is required after having POSTed something)
 		// (Exclusion of 'login_action', 'login', and 'action' has been removed. This should get handled via detection in Form (included_input_field_names),
 		//  and "action" is protected via crumbs)
 		$Form->hiddens_by_key( remove_magic_quotes($_REQUEST) );
-
-		$before_register_link = '';
-		$after_register_link = '';
-		$register_link_style = 'text-align:right';
 	}
 
-	echo '<div class="login_actions" style="'.$register_link_style.'">';
-	echo get_user_register_link( $before_register_link, $after_register_link, T_('No account yet? Register here').' &raquo;', '#', true /*disp_when_logged_in*/, $redirect_to, $source );
-	echo '</div>';
-
 	$Form->end_form();
+
+	echo $params['form_after'];
+
+	if( ! $inskin )
+	{
+		echo '<div class="form-login-links">';
+		echo '<a href="'.$lost_password_url.'" class="floatleft">'.T_('Forgot your password?').'</a>';
+		user_register_link( '<div class="floatright">', '</div>', T_('Create an account').' &raquo;', '#', true /*disp_when_logged_in*/, $redirect_to, $source );
+		echo '<div class="clear"></div>';
+		echo '</div>';
+	}
 
 	echo '<script type="text/javascript">';
 	// Autoselect login text input or pwd input, if there\'s a login already:
@@ -2049,14 +2112,35 @@ function display_login_form( $params )
 /**
  * Display lost password form
  *
+ * @param string Login value
  * @param array login form hidden params
+ * @param array Params
  */
-function display_lostpassword_form( $login, $hidden_params )
+function display_lostpassword_form( $login, $hidden_params, $params = array() )
 {
 	global $secure_htsrv_url, $dummy_fields;
-	$Form = new Form( $secure_htsrv_url.'login.php', '', 'post', 'fieldset' );
 
-	$Form->begin_form( 'fform' );
+	$params = array_merge( array(
+			'form_before'   => '',
+			'form_after'    => '',
+			'form_action'   => $secure_htsrv_url.'login.php',
+			'form_name'     => 'lostpass_form',
+			'form_class'    => 'fform',
+			'form_template' => NULL,
+			'inskin'        => true,
+			'inskin_urls'   => true,
+		), $params );
+
+	echo $params['form_before'];
+
+	$Form = new Form( $params['form_action'], $params['form_name'], 'post', 'fieldset' );
+
+	if( ! empty( $params['form_template'] ) )
+	{ // Switch layout to template from array
+		$Form->switch_template_parts( $params['form_template'] );
+	}
+
+	$Form->begin_form( $params['form_class'] );
 
 	// Display hidden fields
 	$Form->add_crumb( 'lostpassform' );
@@ -2076,13 +2160,47 @@ function display_lostpassword_form( $login, $hidden_params )
 	echo '</ol>';
 	echo '<p class="red"><strong>'.T_('Important: for security reasons, you must do steps 1 and 4 on the same computer and same web browser. Do not close your browser in between.').'</strong></p>';
 
-	$Form->text( $dummy_fields[ 'login' ], $login, 30, T_('Login'), '', 255, 'input_text' );
+	if( $params['inskin'] )
+	{
+		$Form->text( $dummy_fields[ 'login' ], $login, 30, T_('Login'), '', 255, 'input_text' );
+	}
+	else
+	{
+		$Form->text_input( $dummy_fields[ 'login' ], $login, 30, '', '', array( 'maxlength' => 255, 'placeholder' => T_('Username (or email address)'), 'input_required' => 'required' ) );
+	}
 
-	$Form->buttons_input( array(array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Send me an email now!'), 'class' => 'ActionButton' )) );
+	$Form->buttons_input( array(array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Send me an email now!'), 'class' => 'ActionButton btn-primary' )) );
 
-	$Form->end_fieldset();;
+	if( $params['inskin'] || $params['inskin_urls'] )
+	{
+		$login_url = regenerate_url( 'disp', 'disp=login' );
+	}
+	else
+	{
+		$login_url = $secure_htsrv_url.'login.php';
+	}
+	$login_link = '<a href="'.$login_url.'" class="floatleft">'.'&laquo; '.T_('Back to login form').'</a>';
+
+	if( $params['inskin'] )
+	{
+		echo '<div class="login_actions" style="text-align:right; margin: 1em 0 1ex"><strong>';
+		echo $login_link;
+		echo '</strong></div>';
+	}
+
+	$Form->end_fieldset();
 
 	$Form->end_form();
+
+	echo $params['form_after'];
+
+	if( ! $params['inskin'] )
+	{
+		echo '<div class="form-login-links">';
+		echo $login_link;
+		echo '<div class="clear"></div>';
+		echo '</div>';
+	}
 }
 
 
@@ -2101,6 +2219,18 @@ function display_activateinfo( $params )
 		debug_die( "You must log in to see this page." );
 	}
 
+	$params = array_merge( array(
+			'form_before' => '',
+			'form_after' => '',
+			'form_action' => $secure_htsrv_url.'login.php',
+			'form_name' => 'form_validatemail',
+			'form_class' => 'fform',
+			'form_layout' => 'fieldset',
+			'form_template' => NULL,
+			'form_title' => '',
+			'inskin' => false,
+		), $params );
+
 	// init force request new email address param
 	$force_request = param( 'force_request', 'boolean', false );
 
@@ -2109,14 +2239,14 @@ function display_activateinfo( $params )
 
 	if( $force_request || empty( $last_activation_email_date ) )
 	{ // notification email was not sent yet, or user needs another one ( forced request )
-		$params = array_merge( array(
-				'form_action' => $secure_htsrv_url.'login.php',
-				'form_name' => 'form_validatemail',
-				'form_class' => 'fform',
-				'form_layout' => 'fieldset',
-				'inskin' => false,
-			), $params );
+		echo $params['form_before'];
+
 		$Form = new Form( $params[ 'form_action' ], $params[ 'form_name' ], 'post', $params[ 'form_layout' ] );
+
+		if( ! empty( $params['form_template'] ) )
+		{ // Switch layout to template from array
+			$Form->switch_template_parts( $params['form_template'] );
+		}
 
 		$Form->begin_form( $params[ 'form_class' ] );
 
@@ -2127,6 +2257,10 @@ function display_activateinfo( $params )
 		{
 			$Form->hidden( 'inskin', $params[ 'inskin' ] );
 			$Form->hidden( 'blog', $params[ 'blog' ] );
+		}
+		else
+		{ // Form title in standard form
+			echo '<h4>'.$params['form_title'].'</h4>';
 		}
 		$Form->hidden( 'req_validatemail_submit', 1 ); // to know if the form has been submitted
 
@@ -2139,11 +2273,11 @@ function display_activateinfo( $params )
 		// set email text input content only if this is not a forced request. This way the user may have bigger chance to write a correct email address.
 		$user_email = ( $force_request ? '' : $current_User->email );
 		// fp> note: 45 is the max length for evopress skin.
-		$Form->text_input( $dummy_fields[ 'email' ], $user_email, 45, T_('Your email'), '', array( 'maxlength'=>255, 'class'=>'input_text', 'required'=>true ) );
+		$Form->text_input( $dummy_fields[ 'email' ], $user_email, 42, T_('Your email'), '', array( 'maxlength' => 255, 'class' => 'input_text', 'required' => true, 'input_required' => 'required' ) );
 		$Form->end_fieldset();
 
 		// Submit button:
-		$submit_button = array( array( 'name'=>'submit', 'value'=>T_('Send me a new activation email now!'), 'class'=>'submit' ) );
+		$submit_button = array( array( 'name'=>'submit', 'value'=>T_('Send me a new activation email now!'), 'class'=>'submit btn-primary' ) );
 
 		$Form->buttons_input($submit_button);
 
@@ -2153,6 +2287,8 @@ function display_activateinfo( $params )
 		}
 
 		$Form->end_form();
+
+		echo $params['form_after'];
 
 		return;
 	}
@@ -2167,6 +2303,13 @@ function display_activateinfo( $params )
 	$last_email_date = date( locale_datefmt(), $last_activation_email_ts + $time_difference );
 	$last_email_time = date( locale_shorttimefmt(), $last_activation_email_ts + $time_difference );
 	$user_email = $current_User->email;
+
+	echo $params['form_before'];
+
+	if( ! $params['inskin'] )
+	{
+		echo '<div class="'.$params['form_class'].'">';
+	}
 
 	echo '<ol start="1" class="expanded">';
 	$instruction =  sprintf( T_('Open your email account for %s and find a message we sent you on %s at %s with the following title:'), $user_email, $last_email_date, $last_email_time );
@@ -2184,6 +2327,13 @@ function display_activateinfo( $params )
 	{	// The user is on hotmail and we have a help screen to show him: (needs to be localized and include correct site name)
 		echo '<div class="center" style="margin: 2em auto"><img src="'.$rsc_url.'img/login_help/hotmail-validation.png" /></div>';
 	}
+
+	if( ! $params['inskin'] )
+	{
+		echo '</div>';
+	}
+
+	echo $params['form_after'];
 }
 
 
@@ -2365,6 +2515,109 @@ function display_login_validator( $params = array() )
 		}
 	} );
 </script>';
+}
+
+
+/*
+ * Display javascript to quick edit field by AJAX
+ * Used to edit fields such as 'order' by one click on value in table list
+ *
+ * @param array Params
+ */
+function init_field_editor_js( $params = array() )
+{
+	// Make sure we are not missing any param:
+	$params = array_merge( array(
+			'field_prefix' => 'order-',
+			'action_url'   => '',
+			'question'     => TS_("Do you want discard your changes for this order field?"),
+			'relative_to'  => 'rsc_url',
+		), $params );
+
+	require_js( '#jquery#', $params['relative_to'] ); // dependency
+
+	add_js_headline( 'jQuery( document ).on( "click", "[id^='.$params['field_prefix'].']", function()
+{
+	if( jQuery( this ).find( "input" ).length > 0 )
+	{ // This order field is already editing now
+		return false;
+	}
+
+	// Create <input> to edit order field
+	var input = document.createElement( "input" )
+	var $input = jQuery( input );
+	$input.val( jQuery( this ).html() );
+	$input.css( {
+		width: jQuery( this ).width() - 2,
+		height: jQuery( this ).height() - 2,
+		padding: "0",
+		"text-align": "center"
+	} );
+
+	// Save current value
+	jQuery( this ).attr( "rel", jQuery( this ).html() );
+
+	// Replace statis value with <input>
+	jQuery( this ).html( "" ).append( $input );
+	$input.focus();
+
+	// Bind events for <input>
+	$input.bind( "keydown", function( e )
+	{
+		var key = e.keyCode;
+		var parent_obj = jQuery( this ).parent();
+		if( key == 27 )
+		{ // "Esc" key
+			parent_obj.html( parent_obj.attr( "rel" ) );
+		}
+		else if( key == 13 )
+		{ // "Enter" key
+			results_ajax_load( jQuery( this ), "'.$params['action_url'].'" + parent_obj.attr( "id" ) + "&new_value=" + jQuery( this ).val() );
+		}
+	} );
+
+	$input.bind( "blur", function()
+	{
+		var revert_changes = false;
+
+		var parent_obj = jQuery( this ).parent();
+		if( parent_obj.attr( "rel" ) != jQuery( this ).val() )
+		{ // Value was changed, ask about saving
+			if( confirm( "'.$params['question'].'" ) )
+			{
+				revert_changes = true;
+			}
+		}
+		else
+		{
+			revert_changes = true;
+		}
+
+		if( revert_changes )
+		{ // Revert the changed value
+			parent_obj.html( parent_obj.attr( "rel" ) );
+		}
+	} );
+
+	return false;
+} );' );
+}
+
+
+/**
+ * Get JS code to prevent event of the key "Enter" for selected elements,
+ * Used to stop form submitting by enter on some input fields
+ *
+ * @param string Selection for jQuery selector
+ */
+function get_prevent_key_enter_js( $jquery_selection )
+{
+	if( empty( $jquery_selection ) )
+	{ // jQuery selection must be filled
+		return '';
+	}
+
+	return 'jQuery( "'.$jquery_selection.'" ).keypress( function( e ) { if( e.keyCode == 13 ) return false; } );';
 }
 
 ?>

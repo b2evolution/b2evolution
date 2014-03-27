@@ -296,7 +296,7 @@ class tinymce_plugin extends Plugin
 			type="button"
 			value="WYSIWYG"
 			style="display:none"
-			title="<?php echo htmlspecialchars($this->T_('Toggle between WYSIWYG and plain HTML editor')); ?>" />
+			title="<?php echo evo_htmlspecialchars($this->T_('Toggle between WYSIWYG and plain HTML editor')); ?>" />
 
 		<script type="text/javascript">
 			jQuery("#tinymce_plugin_toggle_button").click( function() {
@@ -316,21 +316,34 @@ class tinymce_plugin extends Plugin
 					return;
 				}
 
-				if( ! tinyMCE.getInstanceById(id))
-				{
-					tinyMCE.execCommand('mceAddControl', false, id);
-					jQuery.get('<?php echo $this->get_htsrv_url('save_editor_state', array('on'=>1, 'blog'=>$Blog->ID, 'item'=>$edited_Item->ID), '&'); ?>');
-					jQuery('#tinymce_plugin_toggle_button').attr('value', 'HTML');
-					jQuery('[name="editor_code"]').attr('value', '<?php echo $this->code; ?>');
+				if( ! tinyMCE.getInstanceById( id ) )
+				{ // Turn on WYSIWYG editor
+					tinyMCE.execCommand( 'mceAddControl', false, id );
+					jQuery.get( '<?php echo $this->get_htsrv_url( 'save_editor_state', array( 'on' => 1, 'blog' => $Blog->ID, 'item' => $edited_Item->ID ), '&' ); ?>' );
+					jQuery( '#tinymce_plugin_toggle_button' ).attr( 'value', 'HTML' );
+					jQuery( '[name="editor_code"]').attr('value', '<?php echo $this->code; ?>' );
+					// Hide the plugin toolbars that allow to insert html tags
+					jQuery( '.quicktags_toolbar, .code_toolbar, #block_renderer_evo_code' ).hide();
+					renderer_evo_code_checked = jQuery( 'input#renderer_evo_code' ).is( ':checked' );
+					if( renderer_evo_code_checked )
+					{
+						jQuery( 'input#renderer_evo_code' ).removeAttr( 'checked' );
+					}
 				}
 				else
-				{
-					tinyMCE.execCommand('mceRemoveControl', false, id);
-					jQuery.get('<?php echo $this->get_htsrv_url('save_editor_state', array('on'=>0, 'blog'=>$Blog->ID, 'item'=>$edited_Item->ID), '&'); ?>');
-					jQuery('#tinymce_plugin_toggle_button').attr('value', 'WYSIWYG');
-					jQuery('[name="editor_code"]').attr('value', 'html');
+				{ // Hide the editor, Display only source HTML
+					tinyMCE.execCommand( 'mceRemoveControl', false, id );
+					jQuery.get( '<?php echo $this->get_htsrv_url( 'save_editor_state', array( 'on' => 0, 'blog' => $Blog->ID, 'item' => $edited_Item->ID ), '&' ); ?>' );
+					jQuery( '#tinymce_plugin_toggle_button' ).attr( 'value', 'WYSIWYG' );
+					jQuery( '[name="editor_code"]' ).attr( 'value', 'html' );
+					// Show the plugin toolbars that allow to insert html tags
+					jQuery( '.quicktags_toolbar, .code_toolbar, #block_renderer_evo_code' ).show();
+					if( renderer_evo_code_checked )
+					{
+						jQuery( 'input#renderer_evo_code' ).attr( 'checked', 'checked' );
+					}
 				}
-				jQuery('#tinymce_plugin_toggle_button').removeAttr("disabled");
+				jQuery( '#tinymce_plugin_toggle_button' ).removeAttr( 'disabled' );
 			}
 
 			// Make the "toggle" button visible using JS:
@@ -346,7 +359,7 @@ class tinymce_plugin extends Plugin
 			// Load TinyMCE Javascript source file:
 			// This cannot be done through AJAX, since there appear to be scope problems on init then (TinyMCE problem?! - "u not defined").
 			// Anyway, not using AJAX to fetch the file makes it more cachable anyway.
-			echo '<script type="text/javascript" src="'.htmlspecialchars($this->get_tinymce_src_url()).'"></script>';
+			echo '<script type="text/javascript" src="'.evo_htmlspecialchars($this->get_tinymce_src_url()).'"></script>';
 			?>
 
 			<script type="text/javascript">

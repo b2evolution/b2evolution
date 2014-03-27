@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -206,6 +206,12 @@ switch( $action )
 			echo get_avatar_imgtag( $User->login, true, true, $avatar_size, 'avatar_above_login', '', $avatar_overlay_text, $link_overlay_class );
 			echo '</div>';
 
+			if( ! ( $Settings->get( 'allow_anonymous_user_profiles' ) || ( is_logged_in() && $current_User->check_perm( 'user', 'view', false, $User ) ) ) )
+			{ // User is not logged in and anonymous users may NOT view user profiles, or if current User has no permission to view additional information about the User
+				echo '</div>'; /* end of: <div class="bubbletip_user"> */
+				break;
+			}
+
 			// Additional user info
 			$user_info = array();
 
@@ -377,34 +383,40 @@ switch( $action )
 
 		switch( $vote_type )
 		{
-			case 'file':
+			case 'link':
 				// Vote on pictures
 
-				$file_ID = preg_replace( '/f(\d+)/i', '$1', $vote_ID );
-				if( empty( $file_ID ) )
-				{ // No file ID
+				$link_ID = preg_replace( '/link_(\d+)/i', '$1', $vote_ID );
+				if( empty( $link_ID )  || ( ! is_decimal( $link_ID ) ) )
+				{ // There is no correct link ID
 					break 2;
 				}
 
-				$FileCache = & get_FileCache();
-				$File = $FileCache->get_by_ID( $file_ID, false );
+				$LinkCache = & get_LinkCache();
+				$Link = & $LinkCache->get_by_ID( $link_ID, false );
+				if( !$Link )
+				{ // Incorrect link ID
+					break 2;
+				}
+
+				$File = & $Link->get_File();
 				if( !$File )
-				{ // Incorrect file ID
+				{ // The Link File is not available
 					break 2;
 				}
 
 				if( empty( $File->hash ) )
 				{ // File hash still is not defined, we should create and save it
-					$File->set_param( 'hash', 'string', md5_file( $File->get_full_path() ) );
+					$File->set_param( 'hash', 'string', md5_file( $File->get_full_path(), true ) );
 					$File->dbsave();
 				}
 
 				if( !empty( $vote_action ) )
-				{ // Vote for this file
-					file_vote( $file_ID, $current_User->ID, $vote_action, $checked );
+				{ // Vote for this file link
+					link_vote( $link_ID, $current_User->ID, $vote_action, $checked );
 				}
 
-				$voting_form_params['vote_ID'] = $file_ID;
+				$voting_form_params['vote_ID'] = $link_ID;
 
 				if( empty( $vote_action ) || in_array( $vote_action, array( 'like', 'noopinion', 'dontlike' ) ) )
 				{ // Display a voting form if no action
@@ -791,7 +803,8 @@ switch( $action )
 			case 'comments_results_block':
 			case 'threads_results_block':
 			case 'user_reports_results_block':
-			case 'blogs_results_block':
+			case 'blogs_user_results_block':
+			case 'blogs_all_results_block':
 			case 'items_list_block_by_page':
 			case 'items_manual_results_block':
 				break;

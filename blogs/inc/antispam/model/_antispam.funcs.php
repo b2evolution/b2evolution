@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}.
  * Parts of this file are copyright (c)2005 by The University of North Carolina at Charlotte as
@@ -341,7 +341,7 @@ function get_ban_domain( $url )
  * Creates an sql command part, which is a condition, that restrict to show comments from those blogs,
  * where current user has no edit permission for comments.
  * It is used by the antispam.ctrl, when current_User wants to delete the affected comments.
- * 
+ *
  * asimo> It was changed so it doesn't restrict to blogs now, but it restricts to comment statuses.
  * When we will have per blog permanently delete comments permission then this function must be changed.
  *
@@ -394,7 +394,7 @@ function echo_affected_comments( $affected_comments, $status, $keyword, $noperms
 	{
 		if( $noperms_count == 0 )
 		{ // There isn't any affected comment witch corresponding status
-			printf( '<p>'.T_('No %s comments match the keyword [%s].').'</p>', '<strong>'.$status.'</strong>', htmlspecialchars($keyword) );
+			printf( '<p>'.T_('No %s comments match the keyword [%s].').'</p>', '<strong>'.$status.'</strong>', evo_htmlspecialchars($keyword) );
 		}
 		else
 		{ // There are affected comment witch corresponding status, but current user has no permission
@@ -477,37 +477,179 @@ function get_ip_range( $ip_start, $ip_end, $aipr_ID = 0 )
 
 
 /**
- * Block request by IP address
- *
- * @param string IP address
+ * Block request by IP address, Domain of current user or block because of a Plugin
+ * Bock by Plugin: e.g. GeoIP plugin can block the request if it comes from a blocked country
  */
-function antispam_block_ip( $IP_address = '' )
+function antispam_block_request()
+{
+	global $DB, $Plugins;
+
+	// Check block by IP
+	antispam_block_by_ip();
+
+	// Check block by domain
+	if( is_logged_in() )
+	{ // Current user is logged in, We also can check the domains with blocked status
+		global $current_User, $UserSettings;
+
+		if( empty( $UserSettings ) )
+		{ // Initialize UserSettings
+			load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
+			$UserSettings = new UserSettings();
+		}
+
+		$DomainCache = & get_DomainCache();
+
+		$user_domain = $UserSettings->get( 'user_domain', $current_User->ID );
+		if( ! empty( $user_domain ) &&
+		    $Domain = & $DomainCache->get_by_name( $user_domain, false, false ) &&
+		    $Domain->get( 'status' ) == 'blocked' )
+		{ // The request from this domain must be blocked
+			debug_die( 'This request has been blocked.', array(
+				'debug_info' => sprintf( 'A request from \'%s\' domain was blocked because of this domain is blocked.', $user_domain ) ) );
+		}
+
+		load_funcs('sessions/model/_hitlog.funcs.php');
+		$initial_referer = $UserSettings->get( 'initial_referer', $current_User->ID );
+		if( ! empty( $initial_referer ) &&
+		    $Domain = & get_Domain_by_url( $initial_referer ) &&
+		    $Domain->get( 'status' ) == 'blocked' )
+		{ // The request from this domain must be blocked
+			debug_die( 'This request has been blocked.', array(
+				'debug_info' => sprintf( 'A request from \'%s\' initial referer was blocked because of a blocked domain.', $initial_referer ) ) );
+		}
+	}
+
+	// Check if plugins may block the request
+	$Plugins->trigger_event( 'BeforeBlockableAction' );
+}
+
+
+/**
+ * Block request by IP address
+ */
+function antispam_block_by_ip()
 {
 	global $DB;
 
-	if( empty( $IP_address ) && array_key_exists( 'REMOTE_ADDR', $_SERVER ) )
-	{
-		$IP_address = $_SERVER['REMOTE_ADDR'];
+	// Detect request IP adresses
+	$request_ip_list = get_ip_list();
+
+	if( empty( $request_ip_list ) )
+	{ // Could not get any IP address, so can't check anything
+		return;
 	}
 
-	$IP_address = ip2int( $IP_address );
+	$condition = '';
+	foreach( $request_ip_list as $ip_address )
+	{ // create condition for each detected IP address
+		$numeric_ip_address = ip2int( $ip_address );
+		$condition .= ' OR ( aipr_IPv4start <= '.$DB->quote( $numeric_ip_address ).' AND aipr_IPv4end >= '.$DB->quote( $numeric_ip_address ).' )';
+	}
+	$condition = '( '.substr( $condition, 4 ).' )';
 
 	$SQL = new SQL();
 	$SQL->SELECT( 'aipr_ID' );
 	$SQL->FROM( 'T_antispam__iprange' );
-	$SQL->WHERE( 'aipr_IPv4start <= '.$DB->quote( $IP_address ) );
-	$SQL->WHERE_and( 'aipr_IPv4end >= '.$DB->quote( $IP_address ) );
+	$SQL->WHERE( $condition );
 	$SQL->WHERE_and( 'aipr_status = \'blocked\'' );
+	$SQL->LIMIT( 1 );
 	$ip_range_ID = $DB->get_var( $SQL->get() );
 
 	if( !is_null( $ip_range_ID ) )
-	{ // We should block the request from this IP address
+	{ // The request from this IP address must be blocked
 		$DB->query( 'UPDATE T_antispam__iprange
 			SET aipr_block_count = aipr_block_count + 1
 			WHERE aipr_ID = '.$DB->quote( $ip_range_ID ) );
 
-		debug_die( 'This request has been blocked.' );
+		debug_die( 'This request has been blocked.', array(
+			'debug_info' => sprintf( 'A request with ( %s ) ip addresses was blocked because of a blocked IP range ID#%s.', implode( ', ', $request_ip_list ), $ip_range_ID ) ) );
 	}
+}
+
+
+/**
+ * Block request by country
+ *
+ * @param integer country ID
+ * @param boolean set true to block the requet here, or false to handle outside the function
+ * @return boolean true if blocked, false otherwise
+ */
+function antispam_block_by_country( $country_ID, $assert = true )
+{
+	global $DB;
+
+	$CountryCache = & get_CountryCache();
+	$Country = $CountryCache->get_by_ID( $country_ID, false );
+
+	if( $Country && $Country->get( 'status' ) == 'blocked' )
+	{ // The country exists in the database and has blocked status
+		if( $assert )
+		{ // block the request
+			debug_die( 'This request has been blocked.', array(
+				'debug_info' => sprintf( 'A request from \'%s\' was blocked because of this country is blocked.', $Country->get_name() ) ) );
+		}
+		// Update the number of requests from blocked countries
+		$DB->query( 'UPDATE T_regional__country
+			SET ctry_block_count = ctry_block_count + 1
+			WHERE ctry_ID = '.$Country->ID );
+		return true;
+	}
+
+	return false;
+}
+
+
+/**
+ * Check if we can move current user to suspect group
+ *
+ * @param integer|NULL User ID, NULL = $current_User
+ * @return boolean TRUE if current user can be moved
+ */
+function antispam_suspect_check( $user_ID = NULL )
+{
+	global $Settings;
+
+	$suspicious_group_ID = $Settings->get('antispam_suspicious_group');
+
+	if( empty( $suspicious_group_ID ) )
+	{ // We don't need to move users to suspicious group
+		return false;
+	}
+
+	if( is_null( $user_ID ) )
+	{ // current User
+		global $current_User;
+		$User = $current_User;
+	}
+	else
+	{ // Get User by ID
+		$UserCache = & get_UserCache();
+		$User = $UserCache->get_by_ID( $user_ID, false, false );
+	}
+
+	if( empty( $User ) )
+	{ // User must be logged in for this action
+		return false;
+	}
+
+	if( $User->grp_ID == $suspicious_group_ID )
+	{ // Current User already is in suspicious group
+		return false;
+	}
+
+	$antispam_trust_groups = $Settings->get('antispam_trust_groups');
+	if( !empty( $antispam_trust_groups ) )
+	{
+		$antispam_trust_groups = explode( ',', $antispam_trust_groups );
+		if( in_array( $User->grp_ID, $antispam_trust_groups ) )
+		{ // Current User has group which cannot be moved to suspicious users
+			return false;
+		}
+	}
+
+	// We can move current user to suspect group
+	return true;
 }
 
 
@@ -516,35 +658,13 @@ function antispam_block_ip( $IP_address = '' )
  *
  * @param string IP address
  */
-function antispam_suspect_user( $IP_address = '' )
+function antispam_suspect_user_by_IP( $IP_address = '' )
 {
 	global $DB, $Settings, $current_User;
 
-	$suspicious_group_ID = $Settings->get('antispam_suspicious_group');
-
-	if( empty( $suspicious_group_ID ) )
-	{ // We don't need to move users to suspicious group
+	if( !antispam_suspect_check() )
+	{ // Current user cannot be moved to suspect group
 		return;
-	}
-
-	if( !is_logged_in() )
-	{ // User must be logged in for this action
-		return;
-	}
-
-	if( $current_User->grp_ID == $suspicious_group_ID )
-	{ // Current User already is in suspicious group
-		return;
-	}
-
-	$antispam_trust_groups = $Settings->get('antispam_trust_groups');
-	if( !empty( $antispam_trust_groups ) )
-	{
-		$antispam_trust_groups = explode( ',', $antispam_trust_groups );
-		if( in_array( $current_User->grp_ID, $antispam_trust_groups ) )
-		{ // Current User has group which cannot be moved to suspicious users
-			return;
-		}
 	}
 
 	if( empty( $IP_address ) && array_key_exists( 'REMOTE_ADDR', $_SERVER ) )
@@ -565,10 +685,55 @@ function antispam_suspect_user( $IP_address = '' )
 	if( !is_null( $ip_range_ID ) )
 	{ // Move current user to suspicious group because current IP address is suspected
 		$GroupCache = & get_GroupCache();
-		if( $suspicious_Group = & $GroupCache->get_by_ID( $suspicious_group_ID, false, false ) )
+		if( $suspicious_Group = & $GroupCache->get_by_ID( (int)$Settings->get('antispam_suspicious_group'), false, false ) )
 		{ // Group exists in DB and we can change user's group
 			$current_User->set_Group( $suspicious_Group );
 			$current_User->dbupdate();
+		}
+	}
+}
+
+
+/**
+ * Move user to suspect group by Country ID
+ *
+ * @param integer Country ID
+ * @param integer|NULL User ID, NULL = $current_User
+ */
+function antispam_suspect_user_by_country( $country_ID, $user_ID = NULL )
+{
+	global $DB, $Settings, $current_User;
+
+	if( !antispam_suspect_check( $user_ID ) )
+	{ // Current user cannot be moved to suspect group
+		return;
+	}
+
+	if( is_null( $user_ID ) )
+	{ // current User
+		global $current_User;
+		$User = $current_User;
+	}
+	else
+	{ // Get User by ID
+		$UserCache = & get_UserCache();
+		$User = $UserCache->get_by_ID( $user_ID, false, false );
+	}
+
+	$SQL = new SQL();
+	$SQL->SELECT( 'ctry_ID' );
+	$SQL->FROM( 'T_regional__country' );
+	$SQL->WHERE( 'ctry_ID = '.$DB->quote( $country_ID ) );
+	$SQL->WHERE_and( 'ctry_status = \'suspect\'' );
+	$country_ID = $DB->get_var( $SQL->get() );
+
+	if( !is_null( $country_ID ) )
+	{ // Move current user to suspicious group because country is suspected
+		$GroupCache = & get_GroupCache();
+		if( $suspicious_Group = & $GroupCache->get_by_ID( (int)$Settings->get('antispam_suspicious_group'), false, false ) )
+		{ // Group exists in DB and we can change user's group
+			$User->set_Group( $suspicious_Group );
+			$User->dbupdate();
 		}
 	}
 }
@@ -583,11 +748,11 @@ function antispam_suspect_user( $IP_address = '' )
 function aipr_status_titles( $include_false_statuses = true )
 {
 	$status_titles = array();
-	if( $include_false_statuses )
-	{	// Include Unknown status
-		$status_titles[''] = T_('Unknown ');
-	}
 	$status_titles['trusted'] = T_('Trusted');
+	if( $include_false_statuses )
+	{ // Include Unknown status
+		$status_titles[''] = T_('Unknown');
+	}
 	$status_titles['suspect'] = T_('Suspect');
 	$status_titles['blocked'] = T_('Blocked');
 
@@ -687,7 +852,7 @@ function antispam_bankruptcy_blogs( $comment_status = NULL )
 	$SQL = new SQL( 'Get blogs list with number of comments' );
 	$SQL->SELECT( 'blog_ID, blog_name, COUNT( comment_ID ) AS comments_count' );
 	$SQL->FROM( 'T_comments' );
-	$SQL->FROM_add( 'INNER JOIN T_items__item ON comment_post_ID = post_ID' );
+	$SQL->FROM_add( 'INNER JOIN T_items__item ON comment_item_ID = post_ID' );
 	$SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
 	$SQL->FROM_add( 'INNER JOIN T_blogs ON cat_blog_ID = blog_ID' );
 	if( !empty( $comment_status ) )
@@ -732,7 +897,7 @@ function antispam_bankruptcy_delete( $blog_IDs = array(), $comment_status = NULL
 	$comments_IDs_SQL = new SQL( 'Get all comments IDs of selected blogs' );
 	$comments_IDs_SQL->SELECT( 'comment_ID' );
 	$comments_IDs_SQL->FROM( 'T_comments' );
-	$comments_IDs_SQL->WHERE( 'comment_post_ID IN ( '.$DB->quote( $items_IDs ).' )' );
+	$comments_IDs_SQL->WHERE( 'comment_item_ID IN ( '.$DB->quote( $items_IDs ).' )' );
 	if( !empty( $comment_status ) )
 	{ // Limit by comment status
 		$comments_IDs_SQL->WHERE_and( 'comment_status = '.$DB->quote( $comment_status ) );
@@ -760,8 +925,8 @@ function antispam_bankruptcy_delete( $blog_IDs = array(), $comment_status = NULL
 		{ // Limit by comment status
 			$sql_comments_where = ' AND comment_status = '.$DB->quote( $comment_status );
 		}
-		$affected_rows += $DB->query( 'DELETE FROM T_comments 
-			WHERE comment_post_ID IN ( '.$DB->quote( $items_IDs ).' )'.
+		$affected_rows += $DB->query( 'DELETE FROM T_comments
+			WHERE comment_item_ID IN ( '.$DB->quote( $items_IDs ).' )'.
 			$sql_comments_where.'
 			LIMIT 10000' );
 
@@ -773,5 +938,4 @@ function antispam_bankruptcy_delete( $blog_IDs = array(), $comment_status = NULL
 
 	$DB->commit();
 }
-
 ?>

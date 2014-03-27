@@ -34,7 +34,6 @@
 	$.fn.raty = function(settings) {
 
 		if (this.length == 0) {
-			debug('Selector invalid or missing!');
 			return;
 		} else if (this.length > 1) {
 			return this.each(function() {

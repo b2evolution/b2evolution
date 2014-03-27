@@ -115,7 +115,7 @@ function b2edit_reload( form, newaction, blog, params )
 	}
 
 	// Set the blog we are switching to:
-	if( typeof blog != 'undefined' )
+	if( typeof blog != 'undefined' && blog != 'undefined' )
 	{
 		if( blog == null )
 		{ // Set to an empty string, otherwise POST param value will be 'null' in IE and it cause issues

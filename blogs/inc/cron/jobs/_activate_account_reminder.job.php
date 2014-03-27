@@ -56,7 +56,7 @@ $SQL->WHERE( $status_condition );
 // check if user has an email address
 $SQL->WHERE_and( 'LENGTH(TRIM(user_email)) > 0' );
 // check that user email is not blocked
-$SQL->WHERE_and( 'user_email NOT IN ( SELECT emblk_address FROM T_email__blocked WHERE '.get_mail_blocked_condition().' )' );
+$SQL->WHERE_and( 'user_email NOT IN ( SELECT emadr_address FROM T_email__address WHERE '.get_mail_blocked_condition().' )' );
 // check that user was created more than x ( = confugred activate account reminder threshold ) seconds ago!
 $threshold_date = date2mysql( $servertimenow - $activate_account_reminder_threshold );
 $SQL->WHERE_and( 'user_created_datetime < '.$DB->quote( $threshold_date ) );

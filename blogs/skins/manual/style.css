@@ -1,4 +1,4 @@
-/* Designed by François PLANQUE - http://fplanque.net/ */
+/* Designed by Franï¿½ois PLANQUE - http://fplanque.net/ */
 
 body {
 	padding: 0px;
@@ -6,6 +6,19 @@ body {
 	color: #000;
 	font: 84% Arial, Helvetica, sans-serif;
 }
+
+div#skin_wrapper div.sitewide_header {
+	margin-bottom: 0;
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 10000;
+	-webkit-font-smoothing: subpixel-antialiased;
+}
+div#skin_wrapper.skin_wrapper_loggedin div.sitewide_header {
+	top: 23px;
+}
+
 textarea, input, select, option, optgroup, ul.ui-autocomplete, li.token-input-token-facebook, div.token-input-dropdown-facebook {
 	font: 13.43px Arial, Helvetica, sans-serif;
 }
@@ -22,6 +35,14 @@ div.pageHeader {
 	border: 1px solid #000;
 	border-top: none;
 	text-align: center;
+}
+div.pageHeader.site_skins {
+	margin-top: 43px;
+}
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+	div.pageHeader.site_skins {
+		margin-top: 0;
+	}
 }
 
 div.pageHeader h1 {
@@ -267,7 +288,6 @@ textarea.bComment
 {
 	background-color: #eee;
 	border: 1px solid #ccc;
-	width: 97%;
 	padding: 2px;
 	margin: 0ex;
 }
@@ -399,16 +419,30 @@ div.input ul.token-input-list-facebook {
 }
 
 
+#width_switcher_layout {
+	position: absolute;
+	top: 115px;
+	right: 3px;
+	z-index: 10001;
+}
 #width_switcher {
 	display: none;
-	position: fixed;
-	top: 10px;
-	right: 10px;
 }
 #width_switcher a {
 	width: 26px;
 	height: 36px;
 	text-decoration: none;
+}
+#width_switcher.fixed {
+	position: fixed;
+	top: 3px;
+	right: 3px;
+}
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+	#width_switcher.fixed {
+		position: absolute;
+		width: 75px;
+	}
 }
 
 div.breadcrumbs {
@@ -518,4 +552,8 @@ div.error_404 {
 #styled_content_block .bComment .status_private {
 	top: 0px;
 	left: 14px;
+}
+
+.form_add_contacts .controls {
+	padding-left: 0;
 }

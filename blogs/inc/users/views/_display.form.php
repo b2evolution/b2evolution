@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2014 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -63,9 +63,12 @@ $Form->begin_fieldset( T_('Profile pictures').get_manual_link('profile-picture-s
 
 	$Form->checkbox_input( 'use_gravatar', $Settings->get('use_gravatar'), T_('Use gravatar'), array( 'note' => T_('Fall back to Gravatar if a user has not uploaded a profile picture.') ) );
 
-	global $default_avatar;
+	global $default_avatar_unknown, $default_avatar_men, $default_avatar_women;
+	$default_images_info = '<br />'.T_('For unknow gender').': <a href="'.$default_avatar_unknown.'" target="_blank">'.$default_avatar_unknown.'</a>';
+	$default_images_info .= '<br />'.T_('For men').': <a href="'.$default_avatar_men.'" target="_blank">'.$default_avatar_men.'</a>';
+	$default_images_info .= '<br />'.T_('For women').': <a href="'.$default_avatar_women.'" target="_blank">'.$default_avatar_women.'</a>';
 	$Form->radio( 'default_gravatar', $Settings->get('default_gravatar'),
-		array( array( 'b2evo', T_('Default image'), $default_avatar ),
+		array( array( 'b2evo', T_('Default image'), $default_images_info ),
 					array( '', 'Gravatar' ),
 					array( 'identicon', 'Identicon' ),
 					array( 'monsterid', 'Monsterid' ),
@@ -141,8 +144,7 @@ $Form->end_fieldset();
 
 if( $current_User->check_perm( 'users', 'edit' ) )
 {
-	$Form->end_form( array( array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
-													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+	$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 }
 
 ?>

@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -275,7 +275,9 @@ function rmdir_r( $path )
 
 
 /**
- * Clear contents of dorectory, but do not delete directory itself
+ * Clear contents of a directory, but do not delete the directory itself
+ *
+ * @param string the directory path
  * @return boolean False on failure (may be only partial), true on success.
  */
 function cleardir_r( $path )
@@ -584,7 +586,7 @@ function validate_filename( $filename, $allow_locked_filetypes = NULL )
 			}
 			else
 			{	// Filename hasn't an allowed extension
-				return sprintf( T_('&laquo;%s&raquo; is a locked extension.'), htmlentities($match[1]) );
+				return sprintf( T_('&laquo;%s&raquo; is a locked extension.'), evo_htmlentities($match[1]) );
 			}
 		}
 		else
@@ -1095,27 +1097,9 @@ function file_controller_build_tabs()
 				'files',
 				array(
 						'upload' => array(
-							'text' => /* TRANS: verb */ T_('Upload '),
+							'text' => /* TRANS: verb */ T_('Advanced Upload'),
 							'href' => regenerate_url( 'ctrl', 'ctrl=upload' ) ),
 					)
-			);
-
-		$AdminUI->add_menu_entries(
-			array('files', 'upload'),
-			array(
-					'quick' => array(
-						'text' => /* TRANS: Quick upload method */ T_('Quick '),
-						'href' => '?ctrl=upload&amp;tab3=quick',
-						'onclick' => 'return b2edit_reload( document.getElementById( \'fm_upload_checkchanges\' ), \'?ctrl=upload&amp;tab3=quick\' );' ),
-					'standard' => array(
-						'text' => /* TRANS: Standard upload method */ T_('Standard '),
-						'href' => '?ctrl=upload&amp;tab3=standard',
-						'onclick' => 'return b2edit_reload( document.getElementById( \'fm_upload_checkchanges\' ), \'?ctrl=upload&amp;tab3=standard\' );' ),
-					'advanced' => array(
-						'text' => /* TRANS: Advanced upload method */ T_('Advanced '),
-						'href' => '?ctrl=upload&amp;tab3=advanced',
-						'onclick' => 'return b2edit_reload( document.getElementById( \'fm_upload_checkchanges\' ), \'?ctrl=upload&amp;tab3=advanced\' );' ),
-				)
 			);
 	}
 
@@ -1810,22 +1794,26 @@ function check_file_exists( $fm_FileRoot, $path, $newName, $image_info = NULL )
  * @param integer remove files older than the given hour, default NULL will remove all
  * @return integer the number of removed files
  */
-function remove_orphan_files( $file_ids = NULL, $older_then = NULL )
+function remove_orphan_files( $file_ids = NULL, $older_than = NULL )
 {
 	global $DB, $localtimenow;
 	// asimo> This SQL query should use file class delete_restrictions array (currently T_links and T_users is explicitly used)
 	// select orphan comment attachment file ids
 	$sql = 'SELECT file_ID FROM T_files
-				WHERE ( file_path LIKE "comments/p%" OR file_path LIKE "anonymous_comments/p%" ) AND file_ID NOT IN (
+				WHERE file_ID NOT IN (
 					SELECT * FROM (
 						( SELECT DISTINCT link_file_ID FROM T_links
 							WHERE link_file_ID IS NOT NULL ) UNION
 						( SELECT DISTINCT user_avatar_file_ID FROM T_users
 							WHERE user_avatar_file_ID IS NOT NULL ) ) AS linked_files )';
 
-	if( $file_ids != NULL )
-	{ // remove only from the given files
+	if( $file_ids !== NULL )
+	{ // Remove only from the given files
 		$sql .= ' AND file_ID IN ( '.implode( ',', $file_ids ).' )';
+	}
+	else
+	{ // Remove only the files in the comment folders
+		$sql .= ' AND ( file_path LIKE "comments/p%" OR file_path LIKE "anonymous_comments/p%" )';
 	}
 
 	$result = $DB->get_col( $sql );
@@ -1835,10 +1823,10 @@ function remove_orphan_files( $file_ids = NULL, $older_then = NULL )
 	foreach( $result as $file_ID )
 	{
 		$File = $FileCache->get_by_ID( $file_ID, false, false );
-		if( $older_then != NULL )
-		{ // we have to check if the File is older then the given value
+		if( $older_than != NULL && $File->exists() )
+		{ // we have to check if the File is older than the given value
 			$datediff = $localtimenow - filemtime( $File->_adfp_full_path );
-			if( $datediff > $older_then * 3600 ) // convert hours to seconds
+			if( $datediff > $older_than * 3600 ) // convert hours to seconds
 			{ // not older
 				continue;
 			}
@@ -1887,85 +1875,6 @@ function get_available_filetype_icons()
 	);
 
 	return $icons;
-}
-
-
-/**
- * Save a vote for the file by user
- *
- * @param string File ID
- * @param integer User ID
- * @param string Action of the voting ( 'like', 'noopinion', 'dontlike', 'inappropriate', 'spam' )
- * @param integer 1 = checked, 0 = unchecked (for checkboxes: 'Inappropriate' & 'Spam' )
- */
-function file_vote( $file_ID, $user_ID, $vote_action, $checked = 1 )
-{
-	global $DB;
-
-	// Set modified field name and value
-	switch( $vote_action )
-	{
-		case 'like':
-			$field_name = 'fvot_like';
-			$field_value = '1';
-			break;
-
-		case 'noopinion':
-			$field_name = 'fvot_like';
-			$field_value = '0';
-			break;
-
-		case 'dontlike':
-			$field_name = 'fvot_like';
-			$field_value = '-1';
-			break;
-
-		case 'inappropriate':
-			$field_name = 'fvot_inappropriate';
-			$field_value = $checked;
-			break;
-
-		case 'spam':
-			$field_name = 'fvot_spam';
-			$field_value = $checked;
-			break;
-
-		default:
-			// invalid vote action
-			return;
-	}
-
-	$DB->begin();
-
-	$SQL = new SQL();
-	$SQL->SELECT( 'fvot_file_ID' );
-	$SQL->FROM( 'T_files__vote' );
-	$SQL->WHERE( 'fvot_file_ID = '.$DB->quote( $file_ID ) );
-	$SQL->WHERE_and( 'fvot_user_ID = '.$DB->quote( $user_ID ) );
-	$vote = $DB->get_row( $SQL->get() );
-
-	// Save a voting results in DB
-	if( empty( $vote ) )
-	{	// User replace into to avoid duplicate key conflict in case when user clicks two times fast one after the other
-		$result = $DB->query( 'REPLACE INTO T_files__vote ( fvot_file_ID, fvot_user_ID, '.$field_name.' )
-						VALUES ( '.$DB->quote( $file_ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $field_value ).' )' );
-	}
-	else
-	{	// Update existing record, because user already has a vote for this file
-		$result = $DB->query( 'UPDATE T_files__vote
-					SET '.$field_name.' = '.$DB->quote( $field_value ).'
-					WHERE fvot_file_ID = '.$DB->quote( $file_ID ).'
-						AND fvot_user_ID = '.$DB->quote( $user_ID ) );
-	}
-
-	if( $result )
-	{
-		$DB->commit();
-	}
-	else
-	{
-		$DB->rollback();
-	}
 }
 
 
@@ -2193,5 +2102,403 @@ function create_htaccess_deny( $dir )
 	}
 
 	return true;
+}
+
+
+/**
+ * Display a button to quick upload the files by drag&drop method
+ *
+ * @param integer ID of FileRoot object
+ */
+function display_dragdrop_upload_button( $params = array() )
+{
+	global $htsrv_url;
+
+	$params = array_merge( array(
+			'fileroot_ID' => 0, // Root type and ID, e.g. collection_1
+			'path'        => '', // Subpath for the file/folder
+			'list_style'  => 'list',  // 'list' or 'table'
+			'template_button' => '<div class="qq-uploader">'
+					.'<div class="qq-upload-drop-area"><span>'.TS_('Drop files here to upload').'</span></div>'
+					.'<div class="qq-upload-button">#button_text#</div>'
+					.'<ul class="qq-upload-list"></ul>'
+				.'</div>',
+			'template_filerow' => '<li>'
+					.'<span class="qq-upload-file"></span>'
+					.'<span class="qq-upload-spinner"></span>'
+					.'<span class="qq-upload-size"></span>'
+					.'<a class="qq-upload-cancel" href="#">'.TS_('Cancel').'</a>'
+					.'<span class="qq-upload-failed-text">'.TS_('Failed').'</span>'
+				.'</li>',
+			'display_support_msg' => true, // Display info under button about that current supports drag&drop
+			'additional_dropzone' => '', // jQuery selector of additional drop zone
+			'filename_before'     => '', // Append this text before file name on success uploading of new file,
+			                             // Used a mask $file_path$ to replace it with File->get_rdfp_rel_path()
+		), $params );
+
+	$root_and_path = $params['fileroot_ID'].'::'.$params['path'];
+	$quick_upload_url = $htsrv_url.'quick_upload.php?upload=true';
+
+	?>
+	<div id="file-uploader" style="width:100%">
+		<noscript>
+			<p><?php echo T_('Please enable JavaScript to use file uploader.'); ?></p>
+		</noscript>
+	</div>
+	<input id="saveBtn" type="submit" style="display:none" name="saveBtn" value="<?php echo T_('Save modified files'); ?>" class="ActionButton" />
+	<script type="text/javascript">
+		if( 'draggable' in document.createElement('span') )
+		{
+			var button_text = '<?php echo TS_('Drag & Drop files to upload here <br /><span>or click to manually select files...</span>') ?>';
+			var file_uploader_note_text = '<?php echo TS_('Your browser supports full upload functionality.') ?>';
+		}
+		else
+		{
+			var button_text = '<?php echo TS_('Click to manually select files...') ?>';
+			var file_uploader_note_text = '<?php echo TS_('Your browser does not support full upload functionality: You can only upload files one by one and you cannot use Drag & Drop.') ?>';
+		}
+
+		var url = <?php echo '"'.$quick_upload_url.'&'.url_crumb( 'file' ).'"'; ?>;
+		var root_and_path = '<?php echo $root_and_path ?>';
+
+		jQuery( '#fm_dirtree input[type=radio]' ).click( function()
+		{
+			url = "<?php echo $quick_upload_url; ?>"+"&root_and_path="+this.value+"&"+"<?php echo url_crumb( 'file' ); ?>";
+			root_and_path = this.value;
+			uploader.setParams({root_and_path: root_and_path});
+		} );
+
+		jQuery( document ).ready( function()
+		{
+			uploader = new qq.FileUploader(
+			{
+				element: document.getElementById( 'file-uploader' ),
+				list_style: '<?php echo $params['list_style']; ?>',
+				additional_dropzone: '<?php echo $params['additional_dropzone']; ?>',
+				action: url,
+				debug: true,
+				onComplete: function( id, fileName, responseJSON )
+				{
+					if( responseJSON.success != undefined )
+					{
+						if( responseJSON.success.status == 'fatal' )
+						{
+							var text = responseJSON.success.text;
+						}
+						else
+						{
+							var text = base64_decode( responseJSON.success.text );
+							if( responseJSON.success.specialchars == 1 )
+							{
+								text = htmlspecialchars_decode( text );
+							}
+						}
+
+						<?php
+						if( $params['list_style'] == 'list' )
+						{ // List view
+						?>
+						if( responseJSON.success.status != undefined && responseJSON.success.status == 'rename' )
+						{
+							jQuery('#saveBtn').show();
+						}
+						<?php } ?>
+					}
+
+					<?php
+					if( $params['list_style'] == 'table' )
+					{ // Table view
+					?>
+					var this_row = jQuery( 'tr[rel=file_upload_' + id + ']' );
+					if( responseJSON.success == undefined || responseJSON.success.status == 'error' || responseJSON.success.status == 'fatal' )
+					{ // Failed
+						this_row.find( '.qq-upload-status' ).html( '<span class="red"><?php echo TS_('Upload ERROR'); ?></span>' )
+						this_row.find( '.qq-upload-file' ).append( text );
+						this_row.find( '.qq-upload-image, td.size' ).prepend( '<?php echo get_icon( 'warning_yellow' ); ?>' );
+						if( responseJSON != '' )
+						{ // Disppay the fatal errors
+							this_row.find( '.qq-upload-file' ).append( responseJSON );
+						}
+					}
+					else
+					{ // Success
+						var filename_before = '<?php echo str_replace( "'", "\'", $params['filename_before'] ); ?>';
+						if( filename_before != '' )
+						{
+							filename_before = filename_before.replace( '$file_path$', responseJSON.success.path );
+						}
+
+						var warning = '';
+						if( responseJSON.success.warning != '' )
+						{
+							warning = '<div class="orange">' + responseJSON.success.warning + '</div>';
+						}
+
+						if( responseJSON.success.status == 'success' )
+						{
+							this_row.find( '.qq-upload-status' ).html( '<span class="green"><?php echo TS_('Upload OK'); ?></span>' );
+							this_row.find( '.qq-upload-image' ).html( text );
+							this_row.find( '.qq-upload-file' ).html( filename_before + '<span class="fname">' + responseJSON.success.newname + '</span>' + warning );
+						}
+						else if( responseJSON.success.status == 'rename' )
+						{
+							this_row.find( '.qq-upload-status' ).html( '<span class="orange"><?php echo TS_('Upload Conflict'); ?></span>' )
+							this_row.find( '.qq-upload-image' ).append( htmlspecialchars_decode( responseJSON.success.file ) );
+							this_row.find( '.qq-upload-file' ).html( filename_before + '<span class="fname">' + responseJSON.success.newname + '</span> - '
+								+ '<a href="#" '
+								+ 'class="roundbutton_text roundbutton_text_noicon qq-conflict-replace" '
+								+ 'old="' + responseJSON.success.oldname + '" '
+								+ 'new="' + responseJSON.success.newname + '">'
+								+ '<div><?php echo TS_('Use this new file to replace the old file'); ?></div>'
+								+ '<div style="display:none"><?php echo TS_('Revert'); ?></div>'
+								+ '</a>'
+								+ warning );
+							this_row.find( '.qq-upload-file' ).removeAttr( 'rel' );
+							var old_file_obj = jQuery( 'td.fm_filename[rel="' + responseJSON.success.oldname + '"]' );
+							if( old_file_obj.length > 0 )
+							{
+								old_file_obj.append( ' <span class="orange"><?php echo TS_('(Old File)'); ?></span>' );
+							}
+						}
+					}
+					<?php
+					}
+					else
+					{ // Simple list
+					?>
+						jQuery( uploader._getItemByFileId( id ) ).append( text );
+						if( responseJSON.success == undefined && responseJSON != '' )
+						{ // Disppay the fatal errors
+							jQuery( uploader._getItemByFileId( id ) ).append( responseJSON );
+						}
+					<?php
+					}
+					?>
+				},
+				template: '<?php echo str_replace( '#button_text#', "' + button_text + '", $params['template_button'] ); ?>',
+				fileTemplate: '<?php echo $params['template_filerow']; ?>',
+				params: { root_and_path: root_and_path }
+			} );
+		} );
+
+		<?php
+		if( $params['list_style'] == 'table' )
+		{
+		// A click event for button to replace old file with name
+		?>
+		jQuery( document ).on( 'click', '.qq-conflict-replace', function()
+		{
+			var this_obj = jQuery( this );
+
+			var is_replace = this_obj.children( 'div:first' ).is( ':visible' );
+
+			var old_file_name = this_obj.attr( 'old' );
+			var old_file_obj = jQuery( 'td.fm_filename[rel="' + old_file_name + '"]' );
+			if( old_file_obj.length == 0 )
+			{ // No element found with old file name
+				alert( '<?php echo TS_('The old file is not found on the page!') ?>' );
+				return false;
+			}
+			this_obj.hide();
+
+			// Highlight the rows with new and old files
+			var tr_rows = old_file_obj.parent().children( 'td' );
+			tr_rows = tr_rows.add( this_obj.parent().parent().children( 'td' ) );
+			tr_rows.css( 'background', '#FFFF00' );
+			// Remove previous errors
+			tr_rows.find( 'span.error' ).remove();
+
+			jQuery.ajax(
+			{ // Replace old file name with new
+				type: 'POST',
+				url: '<?php echo get_secure_htsrv_url(); ?>async.php',
+				data:
+				{
+					action: 'conflict_files',
+					fileroot_ID: '<?php echo $params['fileroot_ID']; ?>',
+					path: '<?php echo $params['path']; ?>',
+					oldfile: old_file_name,
+					newfile: this_obj.attr( 'new' ),
+					crumb_conflictfiles: '<?php echo get_crumb( 'conflictfiles' ); ?>'
+				},
+				success: function( result )
+				{
+					var data = jQuery.parseJSON( result );
+					if( typeof data.error == 'undefined' )
+					{ // Success
+						this_obj.show();
+						var old_filename_obj = old_file_obj.find( 'span.fname' );
+						var new_filename_obj = this_obj.parent().find( 'span.fname' );
+						if( is_replace )
+						{ // The replacing was executed, Change data of html elements
+							this_obj.children( 'div:first' ).hide();
+							this_obj.children( 'div:last' ).show();
+							old_filename_obj.html( data.new );
+							new_filename_obj.html( data.old );
+						}
+						else
+						{ // The replacing was reverting, Put back the data of html elements
+							this_obj.children( 'div:first' ).show();
+							this_obj.children( 'div:last' ).hide();
+							old_filename_obj.html( data.old );
+							new_filename_obj.html( data.new );
+						}
+						var old_icon_link = old_filename_obj.prev();
+						if( old_icon_link.length == 0 || old_icon_link.get(0).tagName != 'A' )
+						{
+							old_icon_link = old_filename_obj.parent().prev();
+						}
+						if( old_icon_link.length > 0 && old_icon_link.get(0).tagName == 'A' )
+						{ // The icons exist to link files, We should swap them
+							var old_href = old_icon_link.attr( 'href' );
+							old_icon_link.attr( 'href', new_filename_obj.prev().attr( 'href' ) );
+							new_filename_obj.prev().attr( 'href', old_href );
+						}
+					}
+					else
+					{ // Failed
+						this_obj.show();
+						this_obj.parent().append( '<span class="error"> - ' + data.error + '</span>' );
+					}
+					tr_rows.css( 'background', '' );
+				}
+			} );
+
+			return false;
+		} );
+		<?php } ?>
+
+		<?php
+		if( $params['display_support_msg'] )
+		{ // Display a message about the dragdrop supproting by current browser
+		?>
+		document.write( '<p class="note">' + file_uploader_note_text + '</p>' );
+		<?php } ?>
+	</script>
+	<?php
+}
+
+
+/**
+ * Replace the old file with the new one
+ *
+ * @param string Root type: 'user', 'group' or 'collection'
+ * @param integer ID of the user, the group or the collection the file belongs to...
+ * @param string Subpath for this file/folder, relative the associated root, including trailing slash (if directory)
+ * @param string Name of NEW file
+ * @param string Name of OLD file
+ * @param boolean TRUE to display message
+ * @return boolean|string TRUE on success, otherwise an error message
+ */
+function replace_old_file_with_new( $root_type, $root_in_type_ID, $path, $new_name, $old_name, $display_message = true )
+{
+	$error_message = '';
+
+	if( empty( $new_name ) )
+	{
+		$error_message = T_( 'The new file name is empty!' );
+	}
+	elseif( empty( $new_name ) )
+	{
+		$error_message = T_( 'The old file name is empty!' );
+	}
+
+	if( empty( $error_message ) )
+	{
+		$FileCache = & get_FileCache();
+		$newFile = & $FileCache->get_by_root_and_path( $root_type, $root_in_type_ID, trailing_slash( $path ).$new_name, true );
+		$oldFile = & $FileCache->get_by_root_and_path( $root_type, $root_in_type_ID, trailing_slash( $path ).$old_name, true );
+		$new_filename = $newFile->get_name();
+		$old_filename = $oldFile->get_name();
+		$dir = $newFile->get_dir();
+		$oldFile->rm_cache();
+		$newFile->rm_cache();
+
+		// rename new uploaded file to temp file name
+		$index = 0;
+		$temp_filename = 'temp'.$index.'-'.$new_filename;
+		while( file_exists( $dir.$temp_filename ) )
+		{ // find an unused filename
+			$index++;
+			$temp_filename = 'temp'.$index.'-'.$new_filename;
+		}
+	}
+
+	// @rename will overwrite a file with the same name if exists. In this case it shouldn't be a problem.
+	if( empty( $error_message ) && ( ! @rename( $newFile->get_full_path(), $dir.$temp_filename ) ) )
+	{ // rename new file to temp file name failed
+		$error_message = sprintf( T_( 'The new file could not be renamed to %s' ), $temp_filename );
+	}
+
+	if( empty( $error_message ) && ( ! @rename( $oldFile->get_full_path(), $dir.$new_filename ) ) )
+	{ // rename original file to the new file name failed
+		$error_message = sprintf( T_( 'The original file could not be renamed to %s. The new file is now named %s.' ), $new_filename, $temp_filename );
+	}
+
+	if( empty( $error_message ) && ( ! @rename( $dir.$temp_filename, $dir.$old_filename ) ) )
+	{ // rename new file to the original file name failed
+		$error_message = sprintf( T_( 'The new file could not be renamed to %s. It is now named %s.' ), $old_filename, $temp_filename );
+	}
+
+	if( $display_message )
+	{
+		global $Messages;
+		if( empty( $error_message ) )
+		{
+			$Messages->add( sprintf( T_( '%s has been replaced with the new version!' ), $old_filename ), 'success' );
+		}
+		else
+		{
+			$Messages->add( $error_message, 'error' );
+		}
+	}
+
+	return empty( $error_message ) ? true : $error_message;
+}
+
+
+/**
+ * Check if directory is empty
+ * 
+ * @param string Directory path
+ * @param boolean TRUE - to decide when dir is not empty if at least one file exists in subdirectories,
+ *                FALSE - to decide - if dir contains even only empty subdirectories
+ * @return boolean TRUE if directory is empty
+ */
+function is_empty_directory( $dir, $recursive = true )
+{
+	$result = true;
+
+	if( empty( $dir ) || ! file_exists( $dir ) || ! is_readable( $dir ) )
+	{ // Return TRUE if dir doesn't exist or it is not readbale
+		return $result;
+	}
+
+	// Fix dir path if slash is missed at the end
+	$dir = rtrim( $dir, '/' ).'/';
+
+	$handle = opendir( $dir );
+	while( ( $file = readdir( $handle ) ) !== false )
+	{
+		if( $file != '.' && $file != '..' )
+		{ // Check what is it, dir or file?
+			if( $recursive && is_dir( $dir.$file ) )
+			{ // It is a directory - try to find the files inside
+				$result = is_empty_directory( $dir.$file, $recursive );
+				if( $result === false )
+				{ // A file was found inside the directory
+					break;
+				}
+			}
+			else
+			{ // It is a file then directory is not empty
+				$result = false;
+				break; // Stop here
+			}
+		}
+	}
+	closedir( $handle );
+
+	return $result;
 }
 ?>

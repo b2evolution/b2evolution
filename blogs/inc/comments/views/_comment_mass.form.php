@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -42,7 +42,7 @@ $Form->hidden( 'ctrl', 'comments' );
 
 	$Form->labelstart = '<b>';
 	$Form->labelend = '</b>';
-	$Form->radio_input( 'mass_type', $mass_type_value, $mass_types, sprintf( T_('Are you sure you want to mass delete %s comments?'), $CommentList->total_rows ), array( 'lines' => true ) );
+	$Form->radio_input( 'mass_type', $mass_type_value, $mass_types, sprintf( T_('Are you sure you want to mass delete %s comments?'), $CommentList->get_total_rows() ), array( 'lines' => true ) );
 
 	$Form->submit_input( array(
 			'id' => 'mass_submit',

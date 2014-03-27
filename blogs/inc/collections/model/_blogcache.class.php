@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -59,7 +59,7 @@ class BlogCache extends DataObjectCache
 	 */
 	function BlogCache()
 	{
-		parent::DataObjectCache( 'Blog', false, 'T_blogs', 'blog_', 'blog_ID', NULL, '',
+		parent::DataObjectCache( 'Blog', false, 'T_blogs', 'blog_', 'blog_ID', NULL, 'blog_order',
 			/* TRANS: "None" select option */ T_('No blog'), 0 );
 	}
 
@@ -432,6 +432,8 @@ class BlogCache extends DataObjectCache
 	 */
 	function get_option_list_forums( $default = 0, $allow_none = false, $method = 'get_name' )
 	{
+		// Clear previous cache list
+		$this->clear();
 		// Load only blogs with type 'forum'
 		$this->load_where( 'blog_type = "forum"' );
 

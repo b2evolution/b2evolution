@@ -3,7 +3,7 @@
  * This is the BODY header include template.
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
- * {@link http://manual.b2evolution.net/Skins_2.0}
+ * {@link http://b2evolution.net/man/skin-structure}
  *
  * This is meant to be included in a page template.
  *
@@ -12,6 +12,11 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+// ---------------------------- SITE HEADER INCLUDED HERE ----------------------------
+// If site headers are enabled, they will be included here:
+siteskin_include( '_site_body_header.inc.php' );
+// ------------------------------- END OF SITE HEADER --------------------------------
 ?>
 
 <div id="outer_wrap">
@@ -45,24 +50,25 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			) );
 		// ----------------------------- END OF "Header" CONTAINER -----------------------------
 	?>
-</div>
 
-<div id="nav">
-	<ul class="nav">
-	<?php
-		// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
-		// Display container and contents:
-		skin_container( NT_('Menu'), array(
-				// The following params will be used as defaults for widgets included in this container:
-				'block_start' => '',
-				'block_end' => '',
-				'block_display_title' => false,
-				'list_start' => '',
-				'list_end' => '',
-				'item_start' => '<li>',
-				'item_end' => '</li>',
-			) );
-		// ----------------------------- END OF "Menu" CONTAINER -----------------------------
-	?>
-	</ul>
+	<div id="nav">
+		<ul class="nav">
+		<?php
+			// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
+			// Display container and contents:
+			skin_container( NT_('Menu'), array(
+					// The following params will be used as defaults for widgets included in this container:
+					'block_start' => '',
+					'block_end' => '',
+					'block_display_title' => false,
+					'list_start' => '',
+					'list_end' => '',
+					'item_start' => '<li>',
+					'item_end' => '</li>',
+				) );
+			// ----------------------------- END OF "Menu" CONTAINER -----------------------------
+		?>
+		</ul>
+	</div>
+
 </div>

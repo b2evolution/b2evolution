@@ -2,7 +2,7 @@
 /**
  * This is the init file for the files module
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -30,7 +30,6 @@ $required_mysql_version[ 'files' ] = '5.0.3';
 $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_files'               => $tableprefix.'files',
 		'T_filetypes'           => $tableprefix.'filetypes',
-		'T_files__vote'         => $tableprefix.'files__vote',
 	) );
 
 /**
@@ -145,26 +144,34 @@ class files_Module extends Module
 		switch( $grp_ID )
 		{
 			case 1: // Administrators group ID equals 1
-				$permfiles = 'all';
-				$permshared = 'edit';
+				$permfiles = 'all'; // Files permissions
+				$permshared = 'edit'; // Access to shared root
+				$permimport = 'edit'; // Access to import root
 				break;
-			case 2: // Privileged Bloggers group equals 2
+			case 2: // Moderators group equals 2
 				$permfiles = 'add';
 				$permshared = 'add';
+				$permimport = 'none';
 				break;
-			case 3: // Bloggers group ID equals 3
+			case 3: // Trusted Users (group ID 3) have permission by default:
 				$permfiles = 'view';
 				$permshared = 'view';
+				$permimport = 'none';
 				break;
 			default: // Other groups
 				$permfiles = 'none';
 				$permshared = 'none';
+				$permimport = 'none';
 				break;
 		}
 
 		// We can return as many default permissions as we want:
 		// e.g. array ( permission_name => permission_value, ... , ... )
-		return $permissions = array( 'perm_files' => $permfiles, 'perm_shared_root' => $permshared );
+		return $permissions = array(
+				'perm_files' => $permfiles,
+				'perm_shared_root' => $permshared,
+				'perm_import_root' => $permimport,
+			);
 	}
 
 	/**
@@ -211,6 +218,21 @@ class files_Module extends Module
 				'label' => T_('Access to shared root'),
 				'user_func'  => 'check_sharedroot_user_perm',
 				'group_func' => 'check_sharedroot_group_perm',
+				'perm_block' => 'additional',
+				'options'  => array(
+						// format: array( radio_button_value, radio_button_label, radio_button_note )
+						array( 'none', T_('No Access') ),
+						array( 'view', T_('Read only') ),
+						array( 'add', T_('Add/Upload') ),
+						array( 'edit', T_('Edit') ),
+					),
+				'perm_type' => 'radiobox',
+				'field_lines' => false,
+				),
+			'perm_import_root' => array(
+				'label' => T_('Access to import root'),
+				'user_func'  => 'check_importroot_user_perm',
+				'group_func' => 'check_importroot_group_perm',
 				'perm_block' => 'additional',
 				'options'  => array(
 						// format: array( radio_button_value, radio_button_label, radio_button_note )
@@ -294,6 +316,8 @@ class files_Module extends Module
 			{
 				case 'shared':
 					return $current_User->check_perm( 'shared_root', $permlevel );
+				case 'import':
+					return $current_User->check_perm( 'import_root', $permlevel );
 				case 'user':
 					return $permtarget->in_type_ID == $current_User->ID;
 			}
@@ -302,7 +326,54 @@ class files_Module extends Module
 		return $perm;
 	}
 
+	/**
+	 * Callback function to check a group permission for shared root. ( see 'group_func' in get_available_group_permissions() function )
+	 *
+	 * @param string Permission level: 'edit', 'add', 'view'
+	 * @param string Permission value: 'edit', 'add', 'view'
+	 * @param mixed Permission target (blog ID, array of cat IDs...)
+	 * @return boolean True on success (permission is granted), false if permission is not granted
+	 */
 	function check_sharedroot_group_perm( $permlevel, $permvalue, $permtarget )
+	{
+		$perm = false;
+		switch ( $permvalue )
+		{
+			case 'edit':
+				if( $permlevel == 'edit' )
+				{ // User can ask for normal edit perm...
+					$perm = true;
+					break;
+				}
+
+			case 'add':
+				// User can ask for normal add perm...
+				if( $permlevel == 'add' )
+				{
+					$perm = true;
+					break;
+				}
+
+			case 'view':
+				// User can ask for normal view perm...
+				if( $permlevel == 'view' )
+				{
+					$perm = true;
+					break;
+				}
+		}
+		return $perm;
+	}
+
+	/**
+	 * Callback function to check a group permission for import root. ( see 'group_func' in get_available_group_permissions() function )
+	 *
+	 * @param string Permission level: 'edit', 'add', 'view'
+	 * @param string Permission value: 'edit', 'add', 'view'
+	 * @param mixed Permission target (blog ID, array of cat IDs...)
+	 * @return boolean True on success (permission is granted), false if permission is not granted
+	 */
+	function check_importroot_group_perm( $permlevel, $permvalue, $permtarget )
 	{
 		$perm = false;
 		switch ( $permvalue )
@@ -417,50 +488,9 @@ class files_Module extends Module
 						),
 					) );
 		}
-
-	}
-
-	/**
-	 * Builds the 3rd half of the menu. This is the one with the configuration features
-	 *
-	 * At some point this might be displayed differently than the 1st half.
-	 */
-	function build_menu_3()
-	{
 	}
 }
 
 $files_Module = new files_Module();
 
-
-/*
- * _files.init.php,v
- * Revision 1.16  2011/09/13 15:31:35  fplanque
- * Enhanced back-office navigation.
- *
- * Revision 1.15  2011/09/04 22:13:15  fplanque
- * copyright 2011
- *
- * Revision 1.14  2011/04/05 12:41:39  efy-asimo
- * file perms check and file delete - fix
- *
- * Revision 1.13  2011/02/15 15:37:00  efy-asimo
- * Change access to admin permission
- *
- * Revision 1.12  2011/01/18 16:23:02  efy-asimo
- * add shared_root perm and refactor file perms - part1
- *
- * Revision 1.11  2010/10/19 02:00:54  fplanque
- * MFB
- *
- * Revision 1.9.2.3  2010/10/19 01:04:48  fplanque
- * doc
- *
- * Revision 1.3  2009/08/30 12:31:44  tblue246
- * Fixed CVS keywords
- *
- * Revision 1.1  2009/08/30 00:30:52  fplanque
- * increased modularity
- *
- */
 ?>

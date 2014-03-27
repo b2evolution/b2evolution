@@ -6,7 +6,7 @@
  * TODO:
  *  - Wrap this by an abstract import class!
  *  - list of all posts, editable (overkill?)
- *  - assign comment_author_ID to comments if user exist?! }}
+ *  - assign comment_author_user_ID to comments if user exist?! }}
  *
  *
  * This script was developed and tested with b2evolution 0.9.0.4 (on Sourceforge CVS)
@@ -16,7 +16,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Credits go to the WordPress team (@link http://wordpress.org), where I got the basic
  * import-mt.php script with most of the core functions. Thank you!
@@ -70,7 +70,14 @@ $output_debug_dump = 0;
 load_funcs('files/model/_file.funcs.php');
 load_class( 'items/model/_item.class.php', 'Item' );
 
-set_magic_quotes_runtime( 0 );  // be clear on this
+if( function_exists( 'set_magic_quotes_runtime' ) )
+{
+	@set_magic_quotes_runtime( 0 );  // be clear on this
+}
+else
+{
+	ini_set( 'magic_quotes_runtime', 0 );
+}
 
 // TODO: $io_charset !!
 $head = <<<EOB
@@ -447,7 +454,7 @@ param( 'import_mode', 'string', 'normal' );
 		<p>Please note:</p>
 		<ul>
 			<li>b2evolution does not support excerpts yet.
-			So, we will import them in front of the body with "<?php echo htmlspecialchars('<!--more-->< !--noteaser-->') ?>" tags,
+			So, we will import them in front of the body with "<?php echo evo_htmlspecialchars('<!--more-->< !--noteaser-->') ?>" tags,
 			but only if there is no extended body for the post. In that case we'll use the extended body appended with the &lt;!--more--&gt; tag to the body - excerpts are lost then (but you'll get a note about it).
 			</li>
 		</ul>
@@ -456,7 +463,6 @@ param( 'import_mode', 'string', 'normal' );
 			<div class="input">
 				<input type="hidden" name="import_mode" value="<?php echo $import_mode ?>" />
 				<input class="search" type="submit" value=" Import! " />
-				<input class="search" type="reset" value="Reset form" />
 			</div>
 		</fieldset>
 
@@ -735,7 +741,7 @@ param( 'import_mode', 'string', 'normal' );
 				if( !empty($excerpt) )
 				{
 					$message .=	'<li><span style="color:red">Excerpt discarded because of existing extended body:</span>
-					<blockquote>'.htmlspecialchars($excerpt).'</blockquote></li>';
+					<blockquote>'.evo_htmlspecialchars($excerpt).'</blockquote></li>';
 				}
 				$post_content = $body."\n<!--more-->\n".$extended;
 			}
@@ -1006,8 +1012,8 @@ param( 'import_mode', 'string', 'normal' );
 
 					if( $post_content != $old_content )
 					{
-						$message .= '<li><p style="color:darkblue;border:1px dashed orange;">'.htmlspecialchars($old_content).'</p>
-						html-converted to: <p style="color:darkblue;border:1px dashed orange;">'.htmlspecialchars($post_content).'</p></li>';
+						$message .= '<li><p style="color:darkblue;border:1px dashed orange;">'.evo_htmlspecialchars($old_content).'</p>
+						html-converted to: <p style="color:darkblue;border:1px dashed orange;">'.evo_htmlspecialchars($post_content).'</p></li>';
 					}
 				}
 
@@ -1020,8 +1026,8 @@ param( 'import_mode', 'string', 'normal' );
 					}
 					if( $post_content != $old_content )
 					{
-						echo '<p style="color:darkblue;border:1px dashed orange;">'.htmlspecialchars($old_content).'</p>
-						converted img-links to: <p style="color:darkblue;border:1px dashed orange;">'.htmlspecialchars($post_content).'</p>';
+						echo '<p style="color:darkblue;border:1px dashed orange;">'.evo_htmlspecialchars($old_content).'</p>
+						converted img-links to: <p style="color:darkblue;border:1px dashed orange;">'.evo_htmlspecialchars($post_content).'</p>';
 					}
 				}*/
 
@@ -1083,7 +1089,7 @@ param( 'import_mode', 'string', 'normal' );
 					{
 						if( !$simulate )
 						{
-							$DB->query( "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author_ID, comment_author,
+							$DB->query( "INSERT INTO T_comments( comment_item_ID, comment_type, comment_author_user_ID, comment_author,
 																										comment_author_email, comment_author_url, comment_author_IP,
 																										comment_date, comment_content, comment_renderers )
 												VALUES( $post_ID, 'comment', NULL, ".$DB->quote($comment_author).",
@@ -1131,7 +1137,7 @@ param( 'import_mode', 'string', 'normal' );
 						if( !$simulate )
 						{
 							$DB->query( "INSERT INTO T_comments
-								(comment_post_ID, comment_type, comment_author, comment_author_email, comment_author_url,
+								(comment_item_ID, comment_type, comment_author, comment_author_email, comment_author_url,
 								comment_author_IP, comment_date, comment_content, comment_renderers )
 								VALUES
 								($post_ID, 'trackback', ".$DB->quote($comment_author).", ".$DB->quote($comment_email).", ".$DB->quote($comment_url).",
@@ -1310,7 +1316,7 @@ function fieldset_cats()
 					echo ' checked="checked"';
 				echo ' />';
 			}
-			echo ' '.htmlspecialchars(get_catname($cat_ID));
+			echo ' '.evo_htmlspecialchars(get_catname($cat_ID));
 		}
 
 		function import_cat_select_after_each( $cat_ID, $level )

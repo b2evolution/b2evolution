@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -67,6 +67,7 @@ class GeneralSettings extends AbstractSettings
 		'log_spam_hits' => '0',
 		'auto_prune_stats_mode' => 'page',  // 'page' is the safest mode for average installs (may be "off", "page" or "cron")
 		'auto_prune_stats' => '15',         // days (T_hitlog and T_sessions)
+		'auto_empty_trash' => '15',         // days (How many days to keep recycled comments)
 
 		'outbound_notifications_mode' => 'immediate', // 'immediate' is the safest mode for average installs (may be "off", "immediate" or "cron")
 		'notification_sender_email' => '', // notification emails will be sent from this email. The real default value is set in the constructor.
@@ -97,6 +98,7 @@ class GeneralSettings extends AbstractSettings
 		'fm_resize_quality' => '95',
 
 		'newusers_canregister' => '0',
+		'registration_is_public' => '1',
 		'newusers_mustvalidate' => '1',
 		'newusers_revalidate_emailchg' => '1',
 		'validation_process' => 'easy',
@@ -134,14 +136,13 @@ class GeneralSettings extends AbstractSettings
 		'regexp_filename' => '^[a-zA-Z0-9\-_. ]+$', // TODO: accept (spaces and) special chars / do full testing on this
 		'regexp_dirname' => '^[a-zA-Z0-9\-_]+$', // TODO: accept spaces and special chars / do full testing on this
 		'reloadpage_timeout' => '300',
-		'smart_view_count' => '0',
 		'time_difference' => '0',
 		'timeout_sessions' => '604800',             // seconds (604800 == 7 days)
 		'timeout_online' => '1200',                 // seconds (1200 == 20 minutes)
 		'upload_enabled' => '1',
 		'upload_maxkb' => '10000',					// 10 MB
 		'evocache_foldername' => '.evocache',
-		'blogs_order_by' => 'ID',					// blogs order in backoffice menu and other places
+		'blogs_order_by' => 'order',				// blogs order in backoffice menu and other places
 		'blogs_order_dir' => 'ASC',					// blogs order direction in backoffice menu and other places
 
 		'user_minpwdlen' => '5',
@@ -156,11 +157,19 @@ class GeneralSettings extends AbstractSettings
 
 		'cross_posting' => 0,						// Allow additional categories from other blogs
 		'cross_posting_blog' => 0,					// Allow to choose main category from another blog
+		'redirect_moved_posts' => 0,                // Allow to redirect moved posts link to the correct blog
 
 		'subscribe_new_blogs' => 'public', // Subscribing to new blogs: 'page', 'public', 'all'
 
+		// Site settings
 		'system_lock' => 0,
+		'site_code' => 'b2evo',
+		'site_color' => '',
+		'site_footer_text' => 'Cookies are required to enable core site functionality. &copy;$year$ by $short_site_name$.',
+		'site_skins_enabled' => 1, // Enables a sitewide header and footer
+		'info_blog_ID' => 0, // Blog for info pages
 		'general_cache_enabled' => 0,
+
 		'newblog_cache_enabled' => 0,
 		'newblog_cache_enabled_widget' => 0,
 
@@ -286,6 +295,12 @@ C message size exceeds',
 		'bubbletip_overlay' => "Log in to\r\nsee this\r\nimage",// Overlay text on the profile image for anonymous users
 		'allow_anonymous_user_list' => 1, // Allow anonymous users to see user list (disp=users)
 		'allow_anonymous_user_profiles' => 0, // Allow anonymous users to see the user display ( disp=user )
+
+		// Account closing options:
+		'user_closing_allow'   => 1, // Allow users to close their account themselves
+		'user_closing_intro'   => "We are sorry to see you leave.\n\nWe value your feedback. Please be so kind and tell us in a few words why you are leaving us. This will help us to improve the site for the future.",
+		'user_closing_reasons' => "I don't need this account any more.\nI do not like this site.", // Reasons to close an account, separated by new line
+		'user_closing_byemsg'  => 'Your account has now been closed. If you ever want to log in again, you will need to create a new account.',
 
 	// Back-end settings, these can't be modified by the users:
 		'last_invalidation_timestamp' => 0,

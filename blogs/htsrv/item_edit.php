@@ -8,6 +8,9 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
 
+// Stop a request from the blocked IP addresses or Domains
+antispam_block_request();
+
 if( empty( $Blog ) )
 {
 	param( 'blog', 'integer', 0 );
@@ -72,7 +75,7 @@ switch( $action )
 		set_working_blog( $Blog->ID );
 
 		// Where are we going to redirect to?
-		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID, '&' ) );
+		param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID, '&' ) );
 
 		// What form button has been pressed?
 		param( 'save', 'string', '' );
@@ -118,7 +121,7 @@ switch( $action )
 		$tab_switch_params = 'blog='.$blog;
 
 		// Where are we going to redirect to?
-		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID, '&' ) );
+		param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID, '&' ) );
 		break;
 
 	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
@@ -309,7 +312,7 @@ switch( $action )
 
 		$Messages->add( T_('Post has been updated.'), 'success' );
 
-		$inskin_statuses = get_inskin_statuses();
+		$inskin_statuses = get_inskin_statuses( $edited_Item->get_blog_ID(), 'post' );
 		if( ! in_array( $post_status, $inskin_statuses ) )
 		{ // If post is not published we show it in the Back-office
 			$edited_Item->load_Blog();

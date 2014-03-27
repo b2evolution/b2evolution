@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -120,9 +120,6 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	}
 	else
 	{ // New code used in all situations:
-		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-							VALUES( '.$blog_id.', "Page Top", 1, "core", "colls_list_public" )' );
-
 		/* Header */
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code ) VALUES
 			( '.$blog_id.', "Header", 1, "core", "coll_title" ),
@@ -161,6 +158,10 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		if( $test_install_all_features && $kind != 'forum' )
 		{ // Add menu with User Directory
 			$widgets_insert_sql_rows[] = '( '.$blog_id.', "Menu", 70, "core", "menu_link", "'.$DB->escape( serialize( array( 'link_type' => 'users' ) ) ).'" )';
+		}
+		if( $kind == 'photo' )
+		{ // Add menu with Photo index
+			$widgets_insert_sql_rows[] = '( '.$blog_id.', "Menu", 75, "core", "menu_link", "'.$DB->escape( serialize( array( 'link_type' => 'mediaidx', 'link_text' => T_('Index') ) ) ).'" )';
 		}
 		$DB->query( $widgets_insert_sql.implode( ', ', $widgets_insert_sql_rows ) );
 
@@ -246,6 +247,8 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		}
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 							VALUES( '.$blog_id.', "Sidebar", 130, "core", "coll_xml_feeds" )' );
+		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+			VALUES ( '.$blog_id.', "Sidebar", 140, "core", "mobile_skin_switcher" )' );
 
 		/* Sidebar 2 */
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )

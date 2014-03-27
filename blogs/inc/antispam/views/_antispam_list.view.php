@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -113,7 +113,7 @@ $Results->filter_area = array(
 $Results->cols[] = array(
 						'th' => T_('Keyword'),
 						'order' => 'aspm_string',
-						'td' => '%htmlspecialchars(#aspm_string#)%',
+						'td' => '%evo_htmlspecialchars(#aspm_string#)%',
 					);
 
 // Set columns:

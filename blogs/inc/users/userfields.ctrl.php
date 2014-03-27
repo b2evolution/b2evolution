@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2014 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -242,7 +242,7 @@ switch( $action )
 		// Get near field, We should exchange the order with this field
 		$switched_Userfield = $DB->get_row( 'SELECT ufdf_ID, ufdf_order
 			FROM T_users__fielddefs
-			WHERE ufdf_ufgp_ID = '.$edited_Userfield->group_ID.'
+			WHERE ufdf_ufgp_ID = '.$edited_Userfield->ufgp_ID.'
 				AND ufdf_order '.$order_condition.' '.$edited_Userfield->order.'
 			ORDER BY ufdf_order '.$order_direction.'
 			LIMIT 1' );

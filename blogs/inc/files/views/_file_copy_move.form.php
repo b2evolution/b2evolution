@@ -13,7 +13,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -86,8 +86,7 @@ $Form->begin_form( 'fform', $fm_mode == 'file_copy' ? T_('Copy') : T_('Move') );
 		$Form->end_fieldset();
 	}
 
-$Form->end_form( array( array( 'submit', 'submit', $fm_mode == 'file_copy' ? T_('Copy') : T_('Move'), 'SaveButton' ),
-												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+$Form->end_form( array( array( 'submit', 'submit', $fm_mode == 'file_copy' ? T_('Copy') : T_('Move'), 'SaveButton' ) ) );
 
 echo '<p class="notes"><strong>'.T_('You are in copy/move mode.')
 				.'</strong> '.T_('Please navigate to the desired target location.').'</p>';

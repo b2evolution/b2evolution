@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -20,7 +20,7 @@ $CommentList = new CommentList2( $Blog );
 // Filter list:
 $CommentList->set_filters( array(
 		'types' => array( 'comment', 'trackback', 'pingback' ),
-		'statuses' => get_inskin_statuses(),
+		'statuses' => get_inskin_statuses( $Blog->ID, 'comment' ),
 		'order' => 'DESC',
 		'comments' => 50,
 		// fp> I don't think it's necessary to add a restriction here. (use case?)
@@ -66,5 +66,5 @@ while( $Comment = & $CommentList->get_next() )
 <?php
 }
 
-echo_comment_vote_js();
+echo_comment_moderate_js();
 ?>

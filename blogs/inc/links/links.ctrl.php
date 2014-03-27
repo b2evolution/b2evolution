@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * 
  * @package admin
  * 
@@ -106,11 +106,11 @@ switch( $action )
 		$LinkOwner->check_perm( 'edit', true );
 
 		// Unlink File from Item:
+		$deleted_link_ID = $edited_Link->ID;
 		$edited_Link->dbdelete( true );
-		unset($edited_Link);
+		unset( $edited_Link );
 
-		// Update last touched date of Item
-		$LinkOwner->item_update_last_touched_date();
+		$LinkOwner->after_unlink_action( $deleted_link_ID );
 
 		$Messages->add( $LinkOwner->translate( 'Link has been deleted from $ownerTitle$' ), 'success' );
 
@@ -174,8 +174,8 @@ switch( $action )
 
 			$Messages->add( $msg, 'success' );
 
-			// Update last touched date of Item
-			$LinkOwner->item_update_last_touched_date();
+			// Update last touched date of Owners
+			$LinkOwner->update_last_touched_date();
 		}
 		else
 		{
@@ -197,8 +197,8 @@ switch( $action )
 		{
 			$Messages->add( T_('Link position has been changed.'), 'success' );
 
-			// Update last touched date of Item
-			$LinkOwner->item_update_last_touched_date();
+			// Update last touched date of Owners
+			$LinkOwner->update_last_touched_date();
 		}
 		else
 		{

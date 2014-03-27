@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -107,6 +107,8 @@ class Filetype extends DataObject
 		$this->set_from_Request( 'name' );
 
 		// Mime type
+		// asimo> TODO: Consider to add some further validation for the ftyp_mimetype param value
+		// If it will be correctly validated, the corresponding db field collation may be changed to 'ascii_bin'
 		param_string_not_empty( 'ftyp_mimetype', T_('Please enter a mime type.') );
 		$this->set_from_Request( 'mimetype' );
 
@@ -200,7 +202,7 @@ class Filetype extends DataObject
 
 	/**
 	 * Get if filetype is allowed for the currentUser
-	 * 
+	 *
 	 * @param boolean locked files are allowed for the current user.
 	 * @return boolean true if currentUser is allowed to upload/rename files with this filetype, false otherwise
 	 */

@@ -30,7 +30,7 @@ $SQL = new SQL();
 $SQL->SELECT( 'DISTINCT cat_blog_ID' );
 $SQL->FROM( 'T_categories' );
 $SQL->FROM_add( 'INNER JOIN T_items__item ON post_main_cat_ID = cat_ID AND post_status IN ('.$DB->quote( array( 'published', 'community', 'protected' ) ).')' );
-$SQL->FROM_add( 'INNER JOIN T_comments ON comment_post_ID = post_ID AND comment_status IN ('.$DB->quote( $notify_statuses ).') AND comment_date < '.$DB->quote( $threshold_date ) );
+$SQL->FROM_add( 'INNER JOIN T_comments ON comment_item_ID = post_ID AND comment_status IN ('.$DB->quote( $notify_statuses ).') AND comment_date < '.$DB->quote( $threshold_date ) );
 
 $moderation_blogs = $DB->get_col( $SQL->get() );
 
@@ -139,7 +139,7 @@ else
 }
 
 // Select blocked and spam email addresses to prevent sending emails to them
-$blocked_emails = $DB->get_col( 'SELECT emblk_address FROM T_email__blocked WHERE '.get_mail_blocked_condition() );
+$blocked_emails = $DB->get_col( 'SELECT emadr_address FROM T_email__address WHERE '.get_mail_blocked_condition() );
 $blocked_emails_condition = ( count( $blocked_emails ) ) ? 'user_email NOT IN ( "'.implode( '","', $blocked_emails ).'" )' : NULL;
 
 // load all required Users ( global moderators, blog owners and users with advanced blog perms )
@@ -171,10 +171,10 @@ $BlogCache->load_list( $moderation_blogs );
 
 // count all comments awaiting for moderation in the required blogs, group by blog/comment_status/author_level
 $SQL = new SQL();
-$SQL->SELECT( 'cat_blog_ID as blog_ID, comment_status, IF( comment_author_ID IS NULL, 0, user_level ) as author_level, count( comment_ID ) as cmt_count' );
+$SQL->SELECT( 'cat_blog_ID as blog_ID, comment_status, IF( comment_author_user_ID IS NULL, 0, user_level ) as author_level, count( comment_ID ) as cmt_count' );
 $SQL->FROM( 'T_comments' );
-$SQL->FROM_add( 'LEFT JOIN T_users ON user_ID = comment_author_ID' );
-$SQL->FROM_add( 'LEFT JOIN T_items__item ON post_ID = comment_post_ID' );
+$SQL->FROM_add( 'LEFT JOIN T_users ON user_ID = comment_author_user_ID' );
+$SQL->FROM_add( 'LEFT JOIN T_items__item ON post_ID = comment_item_ID' );
 $SQL->FROM_add( 'LEFT JOIN T_categories ON cat_ID = post_main_cat_ID' );
 $SQL->WHERE( 'comment_status IN ( '.$DB->quote( $notify_statuses ).' )' );
 $SQL->WHERE_and( 'post_status IN ( '.$DB->quote( array( 'published', 'community', 'protected' ) ).' )' );

@@ -109,6 +109,7 @@ class touch_Skin extends Skin
 		require_css( 'basic.css', 'blog' ); // Basic styles
 		require_css( 'style.css', 'relative' );
 
+		add_js_headline( 'var touch_skin_switch_confirm_text = "'.TS_( 'Switch to regular view? \n \n You can switch back again in the footer.' ).'";' );
 		require_js( 'js/core.js', 'relative' );
 		require_js( 'navigation.js', 'blog' );
 	}

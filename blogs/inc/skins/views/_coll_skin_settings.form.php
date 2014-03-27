@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -68,6 +68,6 @@ $Form->begin_form( 'fform' );
 		display_skin_fieldset( $Form, $params[ 'skin_ID' ], array( 'fieldset_title' => $params[ 'fieldset_title' ], 'fieldset_links' => $fieldset_title_links ) );
 	}
 
-$Form->end_form( array( array( 'submit', 'submit', T_('Save changes'), 'SaveButton' ) ) );
+$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 
 ?>

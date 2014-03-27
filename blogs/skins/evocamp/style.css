@@ -7,6 +7,10 @@
 
 /* -------------------[ Main Page Elements ]------------------- */
 
+div#skin_wrapper div.sitewide_header {
+	margin-bottom: 0;
+}
+
 textarea, input, select, option, optgroup, ul.ui-autocomplete, li.token-input-token-facebook, div.token-input-dropdown-facebook {
 	font: 10.66px georgia,times,'times new roman', serif;
 }
@@ -23,30 +27,35 @@ line-height: 140%;
 }
 
 #wrap {
-padding: 0 5px;
+padding: 0;
 width: 960px;
 margin: 0 auto;
 background: #FFFDF2 url(img/zekebg.gif) top left repeat-y;
+box-shadow: 0 0 5px 3px rgba(0,0,0,0.5);
 }
 
 #header {
 color: #FAF7E8;
 width:960px;
 clear: both;
-padding: 0;
+padding: 0 0 40px 0;
 margin: 0 auto;
 height:160px;
 background: #330000 url(img/zekehead.jpg) top center no-repeat;
+position: relative;
 }
 
 #nav {
+background: rgba(0,0,0,0.45);
 width:960px;
-background: #660000 url(img/zekenav.gif) center center no-repeat;
 height:40px;
 line-height:40px;
 margin: 0 auto;
-padding:1px 0 0;
+padding:0;
+border-top:1px solid rgba(255,255,255,0.15);
 border-bottom:1px solid #fff;
+position: absolute;
+bottom: 0;
 }
 
 #page {
@@ -467,7 +476,8 @@ font-size:8pt;
 
 /* -------------------[ Navigation ]------------------- */
 
-ul.nav {
+#nav ul.nav {
+float: none;
 font-size: 8pt;
 font-weight:bold;
 letter-spacing: 0px;
@@ -479,14 +489,15 @@ padding: 0;
 margin: 0;
 }
 
-ul.nav li {
+#nav ul.nav li {
 float: left !important;
 margin: 0;
 padding: 0;
 list-style-type: none;
 }
 
-ul.nav li a, ul.nav li a:link, ul.nav li a:visited {
+#nav ul.nav li a, #nav ul.nav li a:link, #nav ul.nav li a:visited {
+font-style: normal;
 color: #FAF7E8;
 float: left;
 display: block;

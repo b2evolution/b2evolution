@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -39,6 +39,8 @@ class Link extends DataObject
 {
 	var $ltype_ID = 0;
 	var $file_ID = 0;
+	var $position;
+	var $order;
 	/**
 	 * @var Link owner object
 	 */
@@ -59,6 +61,10 @@ class Link extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_links', 'link_', 'link_ID',
 													'datecreated', 'datemodified', 'creator_user_ID', 'lastedit_user_ID' );
+
+		$this->delete_cascades = array(
+				array( 'table'=>'T_links__vote', 'fk'=>'lvot_link_ID', 'msg'=>T_('%d votes') ),
+			);
 
 		if( $db_row != NULL )
 		{
@@ -142,10 +148,76 @@ class Link extends DataObject
 			return 'file';
 		}
 
-
 		return 'unkown';
 	}
 
+
+	/**
+	 * Get a complete tag (IMG or A HREF) pointing to the file of this link.
+	 *
+	 * @param array Params
+	 * @return string the file tag if the file exists, empty string otherwise
+	 */
+	function get_tag( $params = array() )
+	{
+		$File = & $this->get_File();
+		if( !$File )
+		{ // No file
+			return '';
+		}
+
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before_image'        => '<div class="image_block">',
+				'before_image_legend' => '<div class="image_legend">', // can be NULL
+				'after_image_legend'  => '</div>',
+				'after_image'         => '</div>',
+				'image_size'          => 'original',
+				'image_link_to'       => 'original',
+				'image_link_title'    => '',	// can be text or #title# or #desc#
+				'image_link_rel'      => '',
+				'image_class'         => '',
+				'image_align'         => '',
+				'image_alt'           => '',
+				'image_desc'          => '#',
+			), $params );
+
+		return $File->get_tag( $params['before_image'],
+				$params['before_image_legend'],
+				$params['after_image_legend'],
+				$params['after_image'],
+				$params['image_size'],
+				$params['image_link_to'],
+				$params['image_link_title'],
+				$params['image_link_rel'],
+				$params['image_class'],
+				$params['image_align'],
+				$params['image_alt'],
+				$params['image_desc'],
+				'link_'.$this->ID );
+	}
+
+
+	/**
+	 * Get the link file preview thumbnail.
+	 *
+	 * @return string HTML to display
+	 */
+	function get_preview_thumb()
+	{
+		$File = & $this->get_File();
+		if( !$File )
+		{ // No file
+			return '';
+		}
+
+		return $File->get_preview_thumb( 'fulltype', array(
+				'init' => true,
+				'lightbox_rel' => 'lightbox[o'.$this->LinkOwner->get_ID().']',  // Mark images from the same onwer
+				'link_id' => 'link_'.$this->ID  // Use 'link_' prefix to enable voting ( Note: Voting is enable only for links )
+			)
+		);
+	}
 }
 
 ?>

@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -59,7 +59,7 @@ $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'comments' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
-$Form->begin_fieldset( T_('Comment viewing options') );
+$Form->begin_fieldset( T_('Comment viewing options') . get_manual_link('comment-viewing-options') );
 
 	$Form->radio( 'allow_view_comments', $edited_Blog->get_setting( 'allow_view_comments' ),
 						array(  array( 'any', T_('Any user'), T_('Including anonymous users') ),
@@ -87,11 +87,13 @@ $Form->begin_fieldset( T_('Comment viewing options') );
 
 	$Form->checkbox( 'comments_latest', $edited_Blog->get_setting( 'comments_latest' ), T_('Latest comments'), T_('Check to enable viewing of the latest comments') );
 
+	$Form->checklist( get_inskin_statuses_options( $edited_Blog, 'comment' ), 'comment_inskin_statuses', T_('Front office statuses'), false, false, array( 'note' => 'Uncheck the statuses that should never appear in the front office.' ) );
+
 	echo '</div>';
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Feedback options') );
+$Form->begin_fieldset( T_('Feedback options') . get_manual_link('comment-feedback-options') );
 
 	$advanced_perms_warning = $edited_Blog->get_advanced_perms_warning();
 	$Form->radio( 'allow_comments', $edited_Blog->get_setting( 'allow_comments' ),
@@ -151,13 +153,13 @@ $Form->begin_fieldset( T_('Feedback options') );
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Voting options'), array( 'class' => 'feedback_details_container' ) );
+$Form->begin_fieldset( T_('Voting options') . get_manual_link('comment-voting-options'), array( 'class' => 'feedback_details_container' ) );
 
 	$Form->radio( 'allow_rating_items', $edited_Blog->get_setting( 'allow_rating_items' ),
 						array( $any_option, $registered_option, $member_option, $never_option,
 						), T_('Allow star ratings from'), true );
 
-	$Form->textarea_input( 'rating_question', $edited_Blog->get_setting( 'rating_question' ), 3, T_('Star rating question'), array( 'class' => 'large' ) );
+	$Form->textarea_input( 'rating_question', $edited_Blog->get_setting( 'rating_question' ), 3, T_('Star rating question') );
 
 	$Form->checkbox( 'allow_rating_comment_helpfulness', $edited_Blog->get_setting( 'allow_rating_comment_helpfulness' ), T_('Allow helpful/not helpful'), T_("Allow users to say if a comment was helpful or not.") );
 
@@ -168,7 +170,7 @@ $Form->end_fieldset();
 // echo 'modules';
 modules_call_method( 'display_collection_comments', array( 'Form' => & $Form, 'edited_Blog' => & $edited_Blog ) );
 
-$Form->begin_fieldset( T_('Comment moderation') );
+$Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moderation') );
 	$newstatus_warning_attrs = ' id="newstatus_warning" style="display:'.( $edited_Blog->get_setting('new_feedback_status') == 'published' ? 'inline' : 'none' ).'"';
 	$newstatus_warning = str_replace( '$attrs$', $newstatus_warning_attrs, $spammers_warning );
 	$status_options = get_visibility_statuses( '', array( 'redirected', 'trash' ) );
@@ -209,7 +211,7 @@ $Form->begin_fieldset( T_('Comment moderation') );
 						), T_('Comment quick moderation'), true );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('RSS/Atom feeds') );
+$Form->begin_fieldset( T_('RSS/Atom feeds') . get_manual_link('comment-rss-atom-feeds') );
 	$Form->radio( 'comment_feed_content', $edited_Blog->get_setting('comment_feed_content'),
 								array(  array( 'none', T_('No feeds') ),
 										array( 'excerpt', T_('Comment excerpts') ),
@@ -220,21 +222,19 @@ $Form->begin_fieldset( T_('RSS/Atom feeds') );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Subscriptions') );
+$Form->begin_fieldset( T_('Subscriptions') . get_manual_link('comment-subscriptions') );
 	$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), T_('Email subscriptions'), T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Registration of commenters') );
+$Form->begin_fieldset( T_('Registration of commenters') . get_manual_link('comment-registration-of-commenters') );
 	$Form->checkbox( 'comments_detect_email', $edited_Blog->get_setting( 'comments_detect_email' ), T_('Email addresses'), T_( 'Detect email addresses in comments.' ) );
 
 	$Form->checkbox( 'comments_register', $edited_Blog->get_setting( 'comments_register' ), T_('Register after comment'), T_( 'Display the registration form right after submitting a comment.' ) );
 $Form->end_fieldset();
 
 
-$Form->end_form( array(
-	array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
-	array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 
 ?>
 <script type="text/javascript">

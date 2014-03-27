@@ -127,7 +127,7 @@ $CommentList = new CommentList2( $Blog, $comments_per_page );
 // Filter list:
 $CommentList->set_filters( array(
 		'types' => $type_list,
-		'statuses' => get_inskin_statuses(),
+		'statuses' => get_inskin_statuses( $Blog->ID, 'comment' ),
 		'post_ID' => $Item->ID,
 		'order' => $Blog->get_setting( 'comments_orderdir' ),
 		'threaded_comments' => $Blog->get_setting( 'threaded_comments' ),
@@ -182,7 +182,7 @@ if( $disp_comment_form )
 	{ // User can leave a comment
 		if( $Blog->get_ajax_form_enabled() )
 		{
-			$json_params = array( 
+			$json_params = array(
 				'action' => 'get_comment_form',
 				'p' => $Item->ID,
 				'blog' => $Blog->ID,

@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -111,8 +111,7 @@ if( $action == 'edit' )
 		$l_warnfor = str_replace("'$newlocale'", "'thiswillneverevermatch'", $l_warnfor);
 	}
 
-	$Form->end_form( array( array( 'submit', 'submit', ($edit_locale == '_new_') ? T_('Create') : T_('Update'), 'SaveButton' ),
-													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+	$Form->end_form( array( array( 'submit', 'submit', ($edit_locale == '_new_') ? T_('Create') : T_('Save Changes!'), 'SaveButton' ) ) );
 
 	?>
 	<div class="panelinfo">
@@ -396,8 +395,7 @@ else
 
 	if( $current_User->check_perm( 'options', 'edit' ) )
 	{
-		$Form->end_form( array( array( 'submit', '', T_('Save !'), 'SaveButton' ),
-														array( 'reset', '', T_('Reset'), 'ResetButton' ) ) ) ;
+		$Form->end_form( array( array( 'submit', '', T_('Save Changes!'), 'SaveButton' ) ) ) ;
 	}
 }
 

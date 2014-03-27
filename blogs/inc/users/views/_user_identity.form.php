@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -201,10 +201,18 @@ if( $action != 'view' )
 		$user_pictures = '<div class="avatartag">'.$edited_User->get_avatar_imgtag( 'crop-top-80x80', 'avatar', 'top', true, '', 'user' ).'</div>';
 
 		// Get other pictures:
-		$user_avatars = $edited_User->get_avatar_Files();
-		foreach( $user_avatars as $uFile )
+		$user_avatars = $edited_User->get_avatar_Links();
+		foreach( $user_avatars as $user_Link )
 		{
-			$user_pictures .= $uFile->get_tag( '<div class="avatartag">', '', '', '</div>', 'crop-top-80x80', 'original', $edited_User->login, 'lightbox[user]' );
+			$user_pictures .= $user_Link->get_tag( array(
+					'before_image'        => '<div class="avatartag">',
+					'before_image_legend' => '',
+					'after_image_legend'  => '',
+					'after_image'         => '</div>',
+					'image_size'          => 'crop-top-80x80',
+					'image_link_title'    => $edited_User->login,
+					'image_link_rel'      => 'lightbox[user]',
+				) );
 		}
 
 		if( $edited_User->has_avatar() )
@@ -481,11 +489,9 @@ $Plugins->trigger_event( 'DisplayProfileFormFieldset', array(
 
 if( $action != 'view' )
 { // Edit buttons
-	$action_buttons = array(
-		array( '', 'actionArray[update]', T_( $is_admin ? 'Save !' : 'Save changes' ), 'SaveButton' ) );
+	$action_buttons = array( array( '', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) );
 	if( $is_admin )
 	{
-		$action_buttons[] = array( 'reset', '', T_('Reset'), 'ResetButton' );
 		// dh> TODO: Non-Javascript-confirm before trashing all settings with a misplaced click.
 		$action_buttons[] = array( 'type' => 'submit', 'name' => 'actionArray[default_settings]', 'value' => T_('Restore defaults'), 'class' => 'ResetButton',
 			'onclick' => "return confirm('".TS_('This will reset all your user settings.').'\n'.TS_('This cannot be undone.').'\n'.TS_('Are you sure?')."');" );

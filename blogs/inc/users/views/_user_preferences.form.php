@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -239,9 +239,7 @@ $Form->end_fieldset();
 
 if( $action != 'view' )
 { // Edit buttons
-	$action_buttons = array(
-		array( '', 'actionArray[update]', T_('Save !'), 'SaveButton' ),
-		array( 'reset', '', T_('Reset'), 'ResetButton' ) );
+	$action_buttons = array( array( '', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) );
 	if( $is_admin )
 	{
 		// dh> TODO: Non-Javascript-confirm before trashing all settings with a misplaced click.
@@ -251,8 +249,10 @@ if( $action != 'view' )
 	$Form->buttons( $action_buttons );
 }
 
-if( ( $current_User->ID == $edited_User->ID ) && isset( $Blog ) )
-{
+if( $Settings->get( 'user_closing_allow' ) && isset( $Blog ) &&
+    ( $current_User->ID == $edited_User->ID ) && ! $current_User->check_perm( 'users', 'edit', false ) )
+{ // Display a linkt to close account
+  // Admins cannot close own accounts from front office
 	$Form->info( '', '<a href="'.url_add_param( $Blog->gen_blogurl(), 'disp=closeaccount' ).'">'.T_( 'I want to close my account...' ).'</a>' );
 }
 

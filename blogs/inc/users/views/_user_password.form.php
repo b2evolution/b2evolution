@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -147,11 +147,17 @@ if( $action != 'view' )
 	$Form->begin_fieldset( $is_admin ? T_('Password') : '', array( 'class'=>'fieldset clear' ) );
 
 		// current password is not required:
-		//   - current user has full access and not editing his own pasword
 		//   - password change requested by email
-		if( !( ( $has_full_access && $edited_User->ID != $current_User->ID ) || ( !empty( $reqID ) && $reqID == $Session->get( 'core.changepwd.request_id' ) ) ) )
+		if( empty( $reqID ) || $reqID != $Session->get( 'core.changepwd.request_id' ) )
 		{
-			$Form->password_input( 'current_user_pass', '', 20, T_('Current password'), array( 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off' ) );
+			if( ! $has_full_access || $edited_User->ID == $current_User->ID )
+			{ // Current user has no full access or editing his own pasword
+				$Form->password_input( 'current_user_pass', '', 20, T_('Current password'), array( 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off', 'style' => 'width:163px' ) );
+			}
+			else
+			{ // Ask password of current admin
+				$Form->password_input( 'current_user_pass', '', 20, T_('Enter your current password'), array( 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off', 'style' => 'width:163px', 'note' => T_('We ask for <b>your</b> <i>current</i> password as an additional security measure.') ) );
+			}
 		}
 		$Form->password_input( 'edited_user_pass1', '', 20, T_('New password'), array( 'note' => sprintf( T_('Minimum length: %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off' ) );
 		$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off' ) );

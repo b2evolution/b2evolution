@@ -5,7 +5,7 @@
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
@@ -249,7 +249,7 @@ function dre_process_messages( & $mbox, $limit )
 		if( empty($html_body) )
 		{	// Plain text message
 			dre_msg('Message type: TEXT');
-			dre_msg('Message body: <pre style="font-size:10px">'.htmlspecialchars($strbody).'</pre>');
+			dre_msg('Message body: <pre style="font-size:10px">'.evo_htmlspecialchars($strbody).'</pre>');
 
 			// Process body. First fix different line-endings (dos, mac, unix), remove double newlines
 			$content = str_replace( array("\r", "\n\n"), "\n", trim($strbody) );
@@ -331,7 +331,7 @@ function dre_simulate_message( $message_text )
 
 	dre_msg('<hr /><h3>Processing message:</h3>');
 
-	dre_msg('Message body: <pre style="font-size:10px">'.htmlspecialchars( $content ).'</pre>');
+	dre_msg('Message body: <pre style="font-size:10px">'.evo_htmlspecialchars( $content ).'</pre>');
 
 	dre_msg('<b class="green">Success</b>');
 
@@ -499,7 +499,7 @@ function dre_get_emails( $content, $max_count = 1, $delimeter = ', ' )
  */
 function dre_prepare_html_message( $message )
 {
-	dre_msg('Message body (original): <pre style="font-size:10px">'.htmlspecialchars($message).'</pre>');
+	dre_msg('Message body (original): <pre style="font-size:10px">'.evo_htmlspecialchars($message).'</pre>');
 
 	$marker = 0;
 	if( preg_match( '~<body[^>]*>(.*?)</body>~is', $message, $result ) )
@@ -535,7 +535,7 @@ function dre_prepare_html_message( $message )
 	);
 	$content = preg_replace( $patterns, '', $content );
 
-	pbm_msg('Message body (processed): <pre style="font-size:10px">'.htmlspecialchars($content).'</pre>');
+	dre_msg('Message body (processed): <pre style="font-size:10px">'.evo_htmlspecialchars($content).'</pre>');
 
 	return $content;
 }
@@ -584,8 +584,8 @@ function dre_get_processing_content( $content, $emails )
 			$error_text = trim( evo_substr( $content, evo_strpos( $content, $email ) + evo_strlen( $email ) ) );
 		}
 		if( empty( $error_text ) )
-		{	// If error text is empty we should get all content before email
-			$error_text = trim( evo_substr( $content, 0, evo_strpos( $content, $email ) ) );
+		{	// If error text is empty we should get all content before email OR full content if no email address in content
+			$error_text = empty( $email ) ? $content : trim( evo_substr( $content, 0, evo_strpos( $content, $email ) ) );
 		}
 	}
 	else
@@ -800,7 +800,7 @@ function dre_insert_returned_email( $content, $message_text, $headers )
 	global $DB, $dre_emails;
 
 	// Extract emails from content
-	$emails = dre_get_emails( $content );
+	$emails = evo_strtolower( dre_get_emails( $content ) );
 
 	// Get content between email and body terminator
 	$content = dre_get_processing_content( $content, $emails );
@@ -855,62 +855,64 @@ function dre_save_blocked_email( $email_returned )
 		return;
 	}
 
-	load_class( 'tools/model/_emailblocked.class.php', 'EmailBlocked' );
-
-	$EmailBlockedCache = & get_EmailBlockedCache();
+	$EmailAddressCache = & get_EmailAddressCache();
 	// Get an existing email address to update if it exist
-	$EmailBlocked = & $EmailBlockedCache->get_by_name( $email_returned['address'], false );
-	if( !$EmailBlocked )
+	$EmailAddress = & $EmailAddressCache->get_by_name( $email_returned['address'], false );
+	if( !$EmailAddress )
 	{	// Insert new email address
-		$EmailBlocked = new EmailBlocked();
-		$EmailBlocked->set( 'address', $email_returned['address'] );
+		$EmailAddress = new EmailAddress();
+		$EmailAddress->set( 'address', $email_returned['address'] );
 	}
 
 	switch( $email_returned['errtype'] )
 	{	// Error type of the returned email:
 		case 'P':	// Permanent error
-			$EmailBlocked->increase_counter( 'prmerror' );
+			$EmailAddress->increase_counter( 'prmerror' );
 			// Update only the adresses with NOT spammer statuses
-			$EmailBlocked->set_status( 'prmerror' );
+			$EmailAddress->set_status( 'prmerror' );
 			break;
 
 		case 'T':	// Temporary error
-			if( in_array( $EmailBlocked->get( 'status' ), array( 'suspicious1', 'suspicious2', 'suspicious3' ) ) )
-			{	// If current status alredy is defined as 'suspicious1', 'suspicious2' or 'suspicious3'
-				if( $EmailBlocked->get( 'sent_last_returnerror' ) <= 1 )
+			if( in_array( $EmailAddress->get( 'status' ), array( 'suspicious1', 'suspicious2', 'suspicious3' ) ) )
+			{ // If current status already is defined as 'suspicious1', 'suspicious2' or 'suspicious3'
+				if( $EmailAddress->get( 'sent_last_returnerror' ) <= 1 )
 				{
-					if( $EmailBlocked->get( 'status' ) == 'suspicious1' )
+					if( $EmailAddress->get( 'status' ) == 'suspicious1' )
 					{	// Increase status from suspicious1 to suspicious2
-						$EmailBlocked->set( 'status', 'suspicious2' );
+						$EmailAddress->set( 'status', 'suspicious2' );
 					}
-					elseif( $EmailBlocked->get( 'status' ) == 'suspicious2' )
+					elseif( $EmailAddress->get( 'status' ) == 'suspicious2' )
 					{	// Increase status from suspicious2 to suspicious3
-						$EmailBlocked->set( 'status', 'suspicious3' );
+						$EmailAddress->set( 'status', 'suspicious3' );
 					}
 				}
 			}
-			else
-			{	// Update only the email addresses with level status less then Suspicious 1
-				$EmailBlocked->set_status( 'suspicious1' );
+			elseif( $EmailAddress->get( 'status' ) == 'redemption' )
+			{ // IF current status is 'redemption' we should set it as 'suspicious3'
+				$EmailAddress->set_status( 'suspicious3' );
 			}
-			$EmailBlocked->increase_counter( 'tmperror' );
+			else
+			{ // Update only the email addresses with level status less then Suspicious 1
+				$EmailAddress->set_status( 'suspicious1' );
+			}
+			$EmailAddress->increase_counter( 'tmperror' );
 			break;
 
 		case 'S':	// Spam suspicion
-			$EmailBlocked->increase_counter( 'spamerror' );
+			$EmailAddress->increase_counter( 'spamerror' );
 			// Update only the email addresses with 'unknown' status
-			$EmailBlocked->set_status( 'warning' );
+			$EmailAddress->set_status( 'warning' );
 			break;
 
 		default:	// Other errors
-			$EmailBlocked->increase_counter( 'othererror' );
+			$EmailAddress->increase_counter( 'othererror' );
 			// Update only the email addresses with 'unknown' status
-			$EmailBlocked->set_status( 'warning' );
+			$EmailAddress->set_status( 'warning' );
 			break;
 	}
 
 	// Insert/Update an email address
-	$EmailBlocked->dbsave();
+	$EmailAddress->dbsave();
 }
 
 ?>

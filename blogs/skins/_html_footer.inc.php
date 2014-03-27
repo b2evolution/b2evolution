@@ -21,7 +21,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	// SkinEndHtmlBody hook -- could be used e.g. by a google_analytics plugin to add the javascript snippet here:
 	$Plugins->trigger_event('SkinEndHtmlBody');
 
-	$Blog->disp_setting( 'footer_includes', 'raw');
+	$Blog->disp_setting( 'footer_includes', 'raw' );
 ?>
 </body>
 </html>

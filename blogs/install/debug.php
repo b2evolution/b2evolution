@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the bedug tool
+ * This is the debug tool
  *
  * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT PHP IS NOT PROPERLY INSTALLED
  * ON YOUR WEB SERVER. IF YOU DON'T KNOW WHAT THIS MEANS, CONTACT YOUR SERVER ADMINISTRATOR
@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package install
  */
@@ -20,6 +20,11 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 
 // Make the includes believe they are being called in the right place...
 define( 'EVO_MAIN_INIT', true );
+
+if( ! $config_is_done )
+{ // Base config is not done yet, try to guess some values needed for correct display:
+	$rsc_url = '../rsc/';
+}
 
 require_once $inc_path.'_core/_class'.floor(PHP_VERSION).'.funcs.php';
 require_once $inc_path.'_core/_misc.funcs.php';
@@ -341,11 +346,12 @@ $debug_jslog = 1;<br />
 $allow_po_extraction = 1;<br />
 $test_install_all_features = true;<br />
 $db_config[\'debug_dump_rows\'] = 20;<br />
-$db_config[\'debug_explain_joins\'] = false;'
+$db_config[\'debug_explain_joins\'] = false;<br />
+$display_errors_on_production = false;'
 						) );
 				?>
 					<div class="input">
-						<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search" />
+						<input type="submit" name="submit" value="<?php echo T_('Save Changes!') ?>" class="search" />
 					</div>
 			</fieldset>
 
@@ -379,7 +385,7 @@ block_close();
 	<div class="body_fade_out">
 
 	<div class="menu_bottom"><!-- InstanceBeginEditable name="MenuBottom" -->
-			<?php echo T_('Online resources') ?>: <a href="http://b2evolution.net/" target="_blank"><?php echo T_('Official website') ?></a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank"><?php echo T_('Find a host') ?></a> &bull; <a href="http://b2evolution.net/man/" target="_blank"><?php echo T_('Manual') ?></a> &bull; <a href="http://forums.b2evolution.net/" target="_blank"><?php echo T_('Forums') ?></a>
+			<?php echo T_('Online resources') ?>: <a href="http://b2evolution.net/" target="_blank"><?php echo T_('Official website') ?></a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank"><?php echo T_('Find a host') ?></a> &bull; <a href="<?php echo get_manual_url( NULL ); ?>" target="_blank"><?php echo T_('Manual') ?></a> &bull; <a href="http://forums.b2evolution.net/" target="_blank"><?php echo T_('Forums') ?></a>
 		<!-- InstanceEndEditable --></div>
 
 	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->Copyright &copy; 2003-2014 by Fran&ccedil;ois Planque &amp; others &middot; <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a>

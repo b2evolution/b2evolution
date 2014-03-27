@@ -4,7 +4,7 @@
  *
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -32,27 +32,24 @@ require_once $inc_path.'_main.inc.php';
 
 param( 'key', 'string', '' );
 
-$sql = 'SELECT *
-					FROM T_track__goal
-				 WHERE goal_key = '.$DB->quote($key);
+$GoalCache = & get_GoalCache();
+$Goal = & $GoalCache->get_by_name( $key, false, false );
 
-$Goal = $DB->get_row( $sql );
-
-if( empty($Goal) )
-{
-	require $skins_path.'_404_not_found.main.php'; // error & exit
+if( empty( $Goal ) )
+{ // Goal key doesn't exist in DB
+	load_funcs( 'skins/_skin.funcs.php' );
+	require $siteskins_path.'_404_not_found.main.php'; // error & exit
 	exit(0);
 }
 
-if( !empty($Goal->goal_redir_url) )
-{	// TODO adapt and use header_redirect()
+if( ! empty( $Goal->redir_url ) || ! empty( $Goal->temp_redir_url ) )
+{ // TODO adapt and use header_redirect()
 
-	$redir_url = $Goal->goal_redir_url;
+	$redir_url = $Goal->get_active_url();
 
 	if( preg_match( '/\$([a-z_]+)\$/i', $redir_url, $matches ) )
-	{	// We want to replace a special code like $hit_ID$ in the redir URL:
+	{ // We want to replace a special code like $hit_ID$ in the redir URL:
 		// Tblue> What about using preg_replace_callback() to do this?
-		// echo $matches[1];
 		switch( $matches[1] )
 		{
 			case 'hit_ID':
@@ -76,8 +73,8 @@ else
 	load_funcs( '_core/_template.funcs.php' );
 	$blank_gif = $rsc_path.'img/blank.gif';
 
- 	header('Content-type: image/gif' );
-	header('Content-Length: '.filesize( $blank_gif ) );
+	header( 'Content-type: image/gif' );
+	header( 'Content-Length: '.filesize( $blank_gif ) );
 	header_nocache();
 	readfile( $blank_gif );
 	evo_flush();
@@ -85,8 +82,6 @@ else
 
 // We need to log the HIT now! Because we need the hit ID!
 $Hit->log();
-
-// pre_dump($Hit);
 
 $extra_params = '';
 if( isset( $_SERVER['QUERY_STRING'] ) )
@@ -96,10 +91,8 @@ if( isset( $_SERVER['QUERY_STRING'] ) )
 	$extra_params = trim( $extra_params, '&' );
 }
 
-
 // Record a goal hit:
-$sql = 'INSERT INTO T_track__goalhit( ghit_goal_ID, ghit_hit_ID, ghit_params )
-				VALUES( '.$Goal->goal_ID.', '.$Hit->ID.', '.$DB->quote($extra_params).' )';
-$DB->query( $sql );
+$DB->query( 'INSERT INTO T_track__goalhit( ghit_goal_ID, ghit_hit_ID, ghit_params )
+	VALUES( '.$Goal->ID.', '.$Hit->ID.', '.$DB->quote( $extra_params ).' )' );
 
 ?>

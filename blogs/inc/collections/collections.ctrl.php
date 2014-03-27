@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -37,16 +37,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 $AdminUI->set_path( 'blogs' );
 
-param( 'tab', 'string', 'list' );
+$default_tab = $current_User->check_perm( 'options', 'view' ) ? 'site_settings' : 'list';
+param( 'tab', 'string', $default_tab, true );
 
 param_action( 'list' );
 
-if( $action != 'new'
-	&& $action != 'new-selskin'
-	&& $action != 'new-name'
-	&& $action != 'list'
-	&& $action != 'create'
-	&& $action != 'update_settings' )
+if( !in_array( $action, array( 'new', 'new-selskin', 'new-name', 'list', 'create', 'update_settings_blog', 'update_settings_site' ) ) )
 {
 	if( valid_blog_requested() )
 	{
@@ -187,7 +183,7 @@ switch( $action )
 		break;
 
 
-	case 'update_settings':
+	case 'update_settings_blog':
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'collectionsettings' );
 
@@ -201,18 +197,6 @@ switch( $action )
 
 		$Settings->set( 'blogs_order_by', param( 'blogs_order_by', 'string', true ) );
 		$Settings->set( 'blogs_order_dir', param( 'blogs_order_dir', 'string', true ) );
-
-		// Reload page timeout
-		$reloadpage_timeout = param_duration( 'reloadpage_timeout' );
-
-		if( $reloadpage_timeout > 99999 )
-		{
-			param_error( 'reloadpage_timeout', sprintf( T_( 'Reload-page timeout must be between %d and %d seconds.' ), 0, 99999 ) );
-		}
-		$Settings->set( 'reloadpage_timeout', $reloadpage_timeout );
-
-		// Smart hit count
-		$Settings->set( 'smart_view_count', param( 'smart_view_count', 'integer', 0 ) );
 
 		$new_cache_status = param( 'general_cache_enabled', 'integer', 0 );
 		if( ! $Messages->has_errors() )
@@ -241,6 +225,9 @@ switch( $action )
 		$Settings->set( 'cross_posting', param( 'cross_posting', 'integer', 0 ) );
 		$Settings->set( 'cross_posting_blogs', param( 'cross_posting_blogs', 'integer', 0 ) );
 
+		// Redirect moved posts:
+		$Settings->set( 'redirect_moved_posts', param( 'redirect_moved_posts', 'integer', 0 ) );
+
 		// Subscribing to new blogs:
 		$Settings->set( 'subscribe_new_blogs', param( 'subscribe_new_blogs', 'string', 'public' ) );
 
@@ -252,21 +239,111 @@ switch( $action )
 		$Settings->set( 'def_mobile_skin_ID', param( 'def_mobile_skin_ID', 'integer', 0 ) );
 		$Settings->set( 'def_tablet_skin_ID', param( 'def_tablet_skin_ID', 'integer', 0 ) );
 
+		// Comment recycle bin
+		param( 'auto_empty_trash', 'integer', $Settings->get_default('auto_empty_trash'), false, false, true, false );
+		$Settings->set( 'auto_empty_trash', get_param('auto_empty_trash') );
+
 		if( ! $Messages->has_errors() )
 		{
 			$Settings->dbupdate();
-			$Messages->add( T_('Settings updated.'), 'success' );
+			$Messages->add( T_('Blog settings updated.'), 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=collections&tab=settings', 303 ); // Will EXIT
+			header_redirect( '?ctrl=collections&tab=blog_settings', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
+		break;
+
+	case 'update_settings_site':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'collectionsettings' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		// Lock system
+		if( $current_User->check_perm( 'users', 'edit' ) )
+		{
+			$system_lock = param( 'system_lock', 'integer', 0 );
+			if( $Settings->get( 'system_lock' ) && ( ! $system_lock ) && ( ! $Messages->has_errors() ) && ( 1 == $Messages->count() ) )
+			{ // System lock was turned off and there was no error, remove the warning about the system lock
+				$Messages->clear();
+			}
+			$Settings->set( 'system_lock', $system_lock );
+		}
+
+		// Site code
+		$Settings->set( 'site_code',  param( 'site_code', 'string', '' ) );
+
+		// Site color
+		$site_color = param( 'site_color', 'string', '' );
+		param_check_regexp( 'site_color', '~^(#([a-f0-9]{3}){1,2})?$~i', T_('Invalid color code.'), NULL, false );
+		$Settings->set( 'site_color', $site_color );
+
+		// Site short name
+		$short_name = param( 'notification_short_name', 'string', '' );
+		param_check_not_empty( 'notification_short_name' );
+		$Settings->set( 'notification_short_name', $short_name );
+
+		// Site long name
+		$Settings->set( 'notification_long_name', param( 'notification_long_name', 'string', '' ) );
+
+		// Small site logo url
+		$Settings->set( 'notification_logo', param( 'notification_logo', 'string', '' ) );
+
+		// Large site logo url
+		$Settings->set( 'notification_logo_large', param( 'notification_logo_large', 'string', '' ) );
+
+		// Site footer text
+		$Settings->set( 'site_footer_text', param( 'site_footer_text', 'string', '' ) );
+
+		// Enable site skins
+		$Settings->set( 'site_skins_enabled', param( 'site_skins_enabled', 'integer', 0 ) );
+
+		// Blog for info pages
+		$Settings->set( 'info_blog_ID', param( 'info_blog_ID', 'integer', 0 ) );
+
+		if( param( 'default_blog_ID', 'integer', NULL ) !== NULL )
+		{
+			$Settings->set( 'default_blog_ID', $default_blog_ID );
+		}
+
+		// Reload page timeout
+		$reloadpage_timeout = param_duration( 'reloadpage_timeout' );
+		if( $reloadpage_timeout > 99999 )
+		{
+			param_error( 'reloadpage_timeout', sprintf( T_( 'Reload-page timeout must be between %d and %d seconds.' ), 0, 99999 ) );
+		}
+		$Settings->set( 'reloadpage_timeout', $reloadpage_timeout );
+
+		// General cache
+		$new_cache_status = param( 'general_cache_enabled', 'integer', 0 );
+		if( ! $Messages->has_errors() )
+		{
+			load_funcs( 'collections/model/_blog.funcs.php' );
+			$result = set_cache_enabled( 'general_cache_enabled', $new_cache_status, NULL, false );
+			if( $result != NULL )
+			{ // general cache setting was changed
+				list( $status, $message ) = $result;
+				$Messages->add( $message, $status );
+			}
+		}
+
+		if( ! $Messages->has_errors() )
+		{
+			$Settings->dbupdate();
+			$Messages->add( T_('Site settings updated.'), 'success' );
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=collections&tab=site_settings', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+
 		break;
 }
 
 $AdminUI->set_path( 'blogs', $tab );
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('Blogs'), '?ctrl=collections' );
+$AdminUI->breadcrumbpath_add( T_('Structure'), '?ctrl=collections' );
 
 /**
  * Display page header, menus & messages:
@@ -276,20 +353,35 @@ if( strpos( $action, 'new' ) === false )
 	// fp> TODO: fall back to ctrl=chapters when no perm for blog_properties
 	$AdminUI->set_coll_list_params( 'blog_properties', 'edit',
 												array( 'ctrl' => 'coll_settings', 'tab' => 'general' ),
-												T_('All'), '?ctrl=collections&amp;blog=0' );
+												T_('Site'), '?ctrl=collections&amp;blog=0' );
+
+	$AdminUI->breadcrumbpath_add( T_('Site'), '?ctrl=collections' );
 
 	switch( $tab )
 	{
-		case 'settings':
+		case 'site_settings':
 			// Check minimum permission:
 			$current_User->check_perm( 'options', 'view', true );
 
-			$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=collections&amp;tab=settings' );
+			$AdminUI->breadcrumbpath_add( T_('Site Settings'), '?ctrl=collections&amp;tab=site_settings' );
+			init_colorpicker_js();
+			break;
+
+		case 'blog_settings':
+			// Check minimum permission:
+			$current_User->check_perm( 'options', 'view', true );
+
+			$AdminUI->breadcrumbpath_add( T_('Blog Settings'), '?ctrl=collections&amp;tab=blog_settings' );
 			break;
 
 		case 'list':
 		default:
-			$AdminUI->breadcrumbpath_add( T_('List'), '?ctrl=collections' );
+			init_field_editor_js( array(
+					'field_prefix' => 'order-blog-',
+					'action_url' => $ReqURI.'&order_action=update&order_data=',
+				) );
+
+			$AdminUI->breadcrumbpath_add( T_('Blogs'), '?ctrl=collections&amp;tab=list' );
 			break;
 	}
 }
@@ -332,9 +424,6 @@ switch($action)
 		$AdminUI->displayed_sub_begin = 1;	// DIRTY HACK :/ replacing an even worse hack...
 		$AdminUI->disp_payload_begin();
 
-		// ---------- "New blog" form ----------
-		echo '<h2>'.sprintf( T_('New %s'), get_collection_kinds($kind) ).':</h2>';
-
 		$next_action = 'create';
 
 		$AdminUI->disp_view( 'collections/views/_coll_general.form.php' );
@@ -375,6 +464,7 @@ switch($action)
 				$Form->begin_form( 'inline' );
 					$Form->add_crumb( 'collection' );
 					$Form->hidden_ctrl();
+					$Form->hidden( 'tab', $tab );
 					$Form->hidden( 'action', 'delete' );
 					$Form->hidden( 'blog', $edited_Blog->ID );
 					$Form->hidden( 'confirm', 1 );
@@ -388,6 +478,7 @@ switch($action)
 					if( empty( $redirect_to ) )
 					{ // If redirect url is not defined we should go to blogs list after cancel action
 						$Form->hidden_ctrl();
+						$Form->hidden( 'tab', $tab );
 						$Form->hidden( 'blog', 0 );
 					}
 					$Form->submit( array( '', T_('CANCEL'), 'CancelButton' ) );
@@ -407,8 +498,12 @@ switch($action)
 		// Display VIEW:
 		switch( $tab )
 		{
-			case 'settings':
-				$AdminUI->disp_view( 'collections/views/_coll_settings.form.php' );
+			case 'site_settings':
+				$AdminUI->disp_view( 'collections/views/_coll_settings_site.form.php' );
+				break;
+
+			case 'blog_settings':
+				$AdminUI->disp_view( 'collections/views/_coll_settings_blog.form.php' );
 				break;
 
 			case 'list':

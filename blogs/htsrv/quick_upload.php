@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -26,35 +26,37 @@
 /**
  * Handle file uploads via XMLHttpRequest
  */
-class qqUploadedFileXhr {
-    /**
-     * Save the file to the specified path
-     * @return boolean TRUE on success
-     */
-    function save($path) {
-        $input = fopen("php://input", "r");
-        $temp = tmpfile();
-        $realSize = stream_copy_to_stream($input, $temp);
-        fclose($input);
+class qqUploadedFileXhr
+{
+	/**
+	 * Save the file to the specified path
+	 * @return boolean TRUE on success
+	 */
+	function save( $path )
+	{
+		$input = fopen("php://input", "r");
+		$temp = tmpfile();
+		$realSize = stream_copy_to_stream($input, $temp);
+		fclose($input);
 
-        if ($realSize != $this->getSize()){
-            return false;
-        }
+		if ($realSize != $this->getSize()){
+			return false;
+		}
 
-        $target = fopen($path, "w");
-        fseek($temp, 0, SEEK_SET);
-        stream_copy_to_stream($temp, $target);
-        fclose($target);
+		$target = fopen($path, "w");
+		fseek($temp, 0, SEEK_SET);
+		stream_copy_to_stream($temp, $target);
+		fclose($target);
 
-        return true;
-    }
+		return true;
+	}
 
 	function get_content()
 	{
-        $input = fopen("php://input", "rb");
-        $temp = tmpfile();
+		$input = fopen("php://input", "rb");
+		$temp = tmpfile();
 		stream_copy_to_stream( $input, $temp );
-        fclose( $input );
+		fclose( $input );
 
 		fseek($temp, 0, SEEK_SET);
 		$contents = '';
@@ -78,16 +80,18 @@ class qqUploadedFileXhr {
 
 
 
-    function getName() {
-        return $_GET['qqfile'];
-    }
-    function getSize() {
-        if (isset($_SERVER["CONTENT_LENGTH"])){
-            return (int)$_SERVER["CONTENT_LENGTH"];
-        } else {
-            throw new Exception('Getting content length is not supported.');
-        }
-    }
+	function getName()
+	{
+		return $_GET['qqfile'];
+	}
+	function getSize()
+	{
+		if (isset($_SERVER["CONTENT_LENGTH"])){
+			return (int)$_SERVER["CONTENT_LENGTH"];
+		} else {
+			throw new Exception('Getting content length is not supported.');
+		}
+	}
 }
 
 /**
@@ -95,28 +99,28 @@ class qqUploadedFileXhr {
  */
 class qqUploadedFileForm
 {
-    /**
-     * Save the file to the specified path
-     * @return boolean TRUE on success
-     */
-    function save($path)
-    {
+	/**
+	 * Save the file to the specified path
+	 * @return boolean TRUE on success
+	 */
+	function save($path)
+	{
 		if( !move_uploaded_file($_FILES['qqfile']['tmp_name'], $path) )
 		{
-            return false;
-        }
-        return true;
-    }
+			return false;
+		}
+		return true;
+	}
 
-    function getName()
-    {
-        return $_FILES['qqfile']['name'];
-    }
+	function getName()
+	{
+		return $_FILES['qqfile']['name'];
+	}
 
-    function getSize()
-    {
-        return $_FILES['qqfile']['size'];
-    }
+	function getSize()
+	{
+		return $_FILES['qqfile']['size'];
+	}
 
 	function get_content()
 	{
@@ -150,7 +154,7 @@ function out_echo( $message ,$specialchars )
 	if( $specialchars == 1 )
 	{
 		$message['specialchars'] = 1;
-		echo htmlspecialchars(evo_json_encode(array('success'=>$message)));
+		echo evo_htmlspecialchars(evo_json_encode(array('success'=>$message)));
 	}
 	else
 	{
@@ -170,6 +174,9 @@ $message = array();
 
 require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'_main.inc.php';
+
+// Stop a request from the blocked IP addresses or Domains
+antispam_block_request();
 
 // Do not append Debuglog to response!
 $debug = false;
@@ -197,7 +204,8 @@ if( strpos( $root_and_path, '::' ) )
 
 if( $upload_path === false )
 {
-	$message['text'] = '<span class="result_error">Bad request. Unknown upload location!</span>'; // NO TRANS!!
+	$message['text'] = '#'.$root_and_path.'#<span class="result_error">Bad request. Unknown upload location!</span>'; // NO TRANS!!
+	$message['status'] = 'error';
 	out_echo($message, $specialchars);
 	exit();
 }
@@ -205,6 +213,7 @@ if( $upload_path === false )
 if( $upload && ( !$current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) ) )
 {
 	$message['text'] = '<span class="result_error">'.T_( 'You don\'t have permission to upload on this file root.' ).'</span>';
+	$message['status'] = 'error';
 	out_echo($message, $specialchars);
 	exit();
 }
@@ -232,6 +241,7 @@ if( $upload )
 		// fp>vitaliy : call function to make human readable sized in kB MB etc.
 		sprintf( T_('The file is too large: %s but the maximum allowed is %s.'), bytesreadable($file->getSize()), bytesreadable($Settings->get( 'upload_maxkb' )*1024) )
 		. '</span>';
+		$message['status'] = 'error';
 		out_echo($message, $specialchars);
 		exit();
 	}
@@ -240,11 +250,14 @@ if( $upload )
 	$oldName = $newName;
 	// validate file name
 	if( $error_filename = process_filename( $newName ) )
-	{	// Not a file name or not an allowed extension
-		$message['text'] =  '<span class="result_error"> '.$error_filename.'</span>';
+	{ // Not a file name or not an allowed extension
+		$message['text'] = '<span class="result_error"> '.$error_filename.'</span>';
+		$message['status'] = 'error';
 		out_echo($message, $specialchars);
 		exit();
 	}
+	// Process a name of old name
+	process_filename( $oldName );
 
 	list( $newFile, $oldFile_thumb ) = check_file_exists( $fm_FileRoot, $path, $newName );
 	$newName = $newFile->get('name');
@@ -308,27 +321,24 @@ if( $upload )
 			$message .= '<input type="hidden" name="renamedFiles['.$newFile->ID.'][newName]" value="'.$newName.'" />' .
 			'<input type="hidden" name="renamedFiles['.$newFile->ID.'][oldName]" value="'.$oldName.'" />';
 			$message = array(
-					'text' => $message,
+					'text'    => $message,
 					'warning' => $warning,
-					'status' => 'rename'
+					'status'  => 'rename',
+					'file'    => $newFile->get_preview_thumb( 'fulltype' ),
+					'oldname' => $oldName,
+					'newname' => $newName,
+					'path'    => rawurlencode( $newFile->get_rdfp_rel_path() ),
 				);
 			out_echo($message, $specialchars);
 			exit();
 		}
 		else
 		{
-			$image_info = getimagesize( $newFile->get_full_path() );
-			if( $image_info )
-			{
-				$newFile_thumb = $newFile->get_preview_thumb( 'fulltype' );
-			}
-			else
-			{
-				$newFile_thumb = $newFile->get_size_formatted();
-			}
-
-			$message['text'] = "<span class=\"result_success\"> ".T_( 'OK' )." </span> $newFile_thumb ";
+			$message['text'] = $newFile->get_preview_thumb( 'fulltype' );
 			$message['warning'] = $warning;
+			$message['status'] = 'success';
+			$message['newname'] = $newName;
+			$message['path'] = rawurlencode( $newFile->get_rdfp_rel_path() );
 			out_echo($message, $specialchars);
 			exit();
 		}
@@ -336,12 +346,14 @@ if( $upload )
 	}
 
 	$message['text'] = '<span class="result_error">'.T_( 'The file could not be saved!' ).'</span>';
+	$message['status'] = 'error';
 	out_echo($message, $specialchars);
 	exit();
 
 }
 
 $message['text'] =  '<span class="error">Invalid upload param</span>';
+$message['status'] = 'error';
 out_echo($message, $specialchars);
 exit();
 

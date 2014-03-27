@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -131,7 +131,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 
 		echo $Form->inputstart;
 		?>
-		<div><input type="text" name="<?php echo $pp ?>s" size="20" value="<?php echo htmlspecialchars($s) ?>" class="SearchField" /></div>
+		<div><input type="text" name="<?php echo $pp ?>s" size="20" value="<?php echo evo_htmlspecialchars($s) ?>" class="SearchField" /></div>
 		<?php
 		echo $Form->inputend;
 		// echo T_('Words').' : ';
@@ -160,7 +160,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 		// Load current blog members into cache:
 		$UserCache = & get_UserCache();
 		// Load only first 21 users to know when we should display an input box instead of full users list
-		$UserCache->load_blogmembers( $Blog->ID, 21 );
+		$UserCache->load_blogmembers( $Blog->ID, 21, false );
 		$user_count = count( $UserCache->cache );
 
 		if( $Blog->get_setting( 'use_workflow' ) )
@@ -218,6 +218,9 @@ echo $Widget->replace_vars( $template['block_start'] );
 			<?php
 		}
 
+		// Load only first 21 users to know when we should display an input box instead of full users list
+		$UserCache->load_blogmembers( $Blog->ID, 21 );
+		$user_count = count( $UserCache->cache );
 
 		/*
 		 * Authors:

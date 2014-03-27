@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -32,7 +32,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Get available thumbnail sizes
  *
- * @param string The text that used for the "None" option 
+ * @param string The text that used for the "None" option
  * @return array 'key'=>'name'
  */
 function get_available_thumb_sizes( $allow_none_text = NULL )
@@ -244,6 +244,10 @@ function save_image( $imh, $path, $mimetype, $quality = 90, $chmod = NULL )
 	switch( $mimetype )
 	{
 		case 'image/jpeg':
+			if( imagesx( $imh ) > 32 || imagesy( $imh ) > 32 )
+			{ // Enable interlacing
+				imageinterlace( $imh, 1 );
+			}
 			$r = @imagejpeg( $imh, $path, $quality );
 			break;
 
@@ -255,7 +259,7 @@ function save_image( $imh, $path, $mimetype, $quality = 90, $chmod = NULL )
 			$r = @imagepng( $imh, $path );
 			break;
 
- 		default:
+		default:
 			// Unrecognized mime type
 			$err = '!Unsupported format '.$mimetype.' (save_image)';
 			break;
@@ -307,6 +311,10 @@ function output_image( $imh, $mimetype )
 	{
 		case 'image/jpeg':
 			header('Content-type: '.$mimetype );
+			if( imagesx( $imh ) > 32 || imagesy( $imh ) > 32 )
+			{ // Enable interlacing
+				imageinterlace( $imh, 1 );
+			}
 			imagejpeg( $imh );
 			break;
 
@@ -315,7 +323,7 @@ function output_image( $imh, $mimetype )
 			imagegif( $imh );
 			break;
 
- 		default:
+		default:
 			// Unrecognized mime type
 			$err = 'Emime';	// Sort error code
 			break;

@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -30,19 +30,51 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+// init force request new email address param
+$force_request = param( 'force_request', 'boolean', false );
+
+// get last activation email timestamp from User Settings
+$last_activation_email_date = $UserSettings->get( 'last_activation_email', $current_User->ID );
+
 /**
  * Include page header:
  */
 $page_title = T_( 'Account activation' );
-$page_icon = 'register';
+$wrap_width = '500px';
+if( $force_request || empty( $last_activation_email_date ) )
+{
+	$wrap_height = 235;
+}
+else
+{
+	$wrap_height = 410;
+}
+if( $current_User->grp_ID == 1 )
+{
+	$wrap_height += 100;
+}
+$wrap_height .= 'px';
+
 require dirname(__FILE__).'/_html_header.inc.php';
 
-display_activateinfo( array( 'redirect_to' => url_rel_to_same_host($redirect_to, $secure_htsrv_url) ) );
+display_activateinfo( array(
+		'form_before' => str_replace( '$title$', $page_title, $form_before ),
+		'form_after' => $form_after,
+		'form_class'    => 'form-login',
+		'form_template' => $login_form_params,
+		'redirect_to'   => url_rel_to_same_host( $redirect_to, $secure_htsrv_url )
+	) );
 
-if( $current_User->group_ID == 1 )
+if( $current_User->grp_ID == 1 )
 { // allow admin users to validate themselves by a single click:
+
+	echo str_replace( '$title$', $page_title, $form_before );
+
 	$Form = new Form( $secure_htsrv_url.'login.php', 'form_validatemail', 'post', 'fieldset' );
-	$Form->begin_form( 'fform' );
+
+	$Form->switch_template_parts( $login_form_params );
+
+	$Form->begin_form( 'form-login' );
 
 	$Form->add_crumb( 'validateform' );
 	$Form->hidden( 'action', 'validatemail');
@@ -50,14 +82,15 @@ if( $current_User->group_ID == 1 )
 	$Form->hidden( 'reqID', 1 );
 	$Form->hidden( 'sessID', $Session->ID );
 
-	$Form->begin_fieldset();
 	echo '<p>'.sprintf( T_('Since you are an admin user, you can activate your account (%s) by a single click.' ), $current_User->email ).'</p>';
 	// TODO: the form submit value is too wide (in Konqueror and most probably in IE!)
 	$Form->end_form( array(array( 'name'=>'form_validatemail_admin_submit', 'value'=>T_('Activate my account!'), 'class'=>'ActionButton' )) ); // display hidden fields etc
+
+	echo $form_after;
 }
 ?>
 
-<div style="text-align:right">
+<div class="form-login-links floatright">
 	<?php
 	user_logout_link();
 	?>
@@ -66,11 +99,4 @@ if( $current_User->group_ID == 1 )
 <?php
 require dirname(__FILE__).'/_html_footer.inc.php';
 
-
-/*
- * $Log$
- * Revision 1.14  2013/11/06 09:09:29  efy-asimo
- * Update to version 5.0.2-alpha-5
- *
- */
 ?>

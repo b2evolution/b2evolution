@@ -47,7 +47,7 @@ require_css( $rsc_url.'css/blog_base.css' ); // Default styles for the blog navi
 // Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
 require_js_helper( 'colorbox' );
 
-$AdminUI->breadcrumbpath_init();
+$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Dashboard'), 'url' => '?ctrl=dashboard' ) );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -423,7 +423,7 @@ if( $blog )
 		$show_statuses_param = $param_prefix.'show_statuses[]='.implode( '&amp;'.$param_prefix.'show_statuses[]=', $user_modeartion_statuses );
 		$block_item_Widget->title = $refresh_link.$opentrash_link.T_('Comments awaiting moderation').
 			' <a href="'.$admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;'.$show_statuses_param.'" style="text-decoration:none">'.
-			'<span id="badge" class="badge badge-important">'.$CommentList->total_rows.'</span></a>';
+			'<span id="badge" class="badge badge-important">'.$CommentList->get_total_rows().'</span></a>';
 
 		echo '<div id="styled_content_block">';
 		echo '<div id="comments_block">';
@@ -517,9 +517,6 @@ if( $blog )
 				$item_title = '['.format_to_output(T_('No title')).']';
 			}
 			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$item_title.'</a>';
-			echo ' <span class="dashboard_post_details">';
-			$Item->views();
-			echo '</span>';
 			echo '</h3>';
 
 			// Display images that are linked to this post:
@@ -534,7 +531,7 @@ if( $blog )
 					'restrict_to_image_position' => 'teaser',	// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
 				) );
 
-			echo '<span class="small">'.htmlspecialchars( $Item->get_content_excerpt( 150 ) ).'</span>';
+			echo '<span class="small">'.evo_htmlspecialchars( $Item->get_content_excerpt( 150 ), NULL, $evo_charset ).'</span>';
 
 			echo '<div style="clear:left;">'.get_icon('pixel').'</div>'; // IE crap
 			echo '</div>';
@@ -683,7 +680,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	$block_item_Widget->disp_template_replaced( 'block_start' );
 
 
-	// Note: hopefully, the update swill have been downloaded in the shutdown function of a previous page (including the login screen)
+	// Note: hopefully, the updates will have been downloaded in the shutdown function of a previous page (including the login screen)
 	// However if we have outdated info, we will load updates here.
 	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
 	// Let's clear any remaining messages that should already have been displayed before...
@@ -706,13 +703,11 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 			}
 		}
 
-
 		$block_item_Widget->disp_template_replaced( 'block_end' );
 
 		/*
 		 * DashboardAdminMain to be added here (anyone?)
 		 */
-
 	}
 	else
 	{
@@ -721,6 +716,17 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	}
 
 	echo '</td><td>';
+
+	// Track just the first login into b2evolution to determine how many people installed manually vs automatic installs:
+	if( $current_User->ID == 1 && $UserSettings->get('first_login') == NULL )
+	{
+		echo 'This is the Admin\'s first ever login.';
+		echo '<img src="http://b2evolution.net/htsrv/track.php?key=first-ever-login" alt="" />';
+		// OK, done. Never do this again from now on:
+		$UserSettings->set('first_login', $localtimenow ); // We might actually display how long the system has been running somewhere
+		$UserSettings->dbupdate();
+	}
+
 
 	/*
 	 * RIGHT COL

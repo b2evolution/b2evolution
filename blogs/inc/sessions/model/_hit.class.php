@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -123,6 +123,14 @@ class Hit
 	 * @var string
 	 */
 	var $user_agent;
+
+	/**
+	 * The user agent ID, eg 1000
+	 * @see Hit::get_agent_ID()
+	 * @access protected
+	 * @var integer
+	 */
+	var $agent_ID;
 
 	/**
 	 * The user agent name, eg "safari"
@@ -363,7 +371,7 @@ class Hit
 	{
 		global $Debuglog, $debug;
 		global $self_referer_list, $SpecialList;  // used to detect $referer_type
-		global $skins_path;
+		global $skins_path, $siteskins_path;
 		global $Settings;
 
 		if( isset($referer) )
@@ -459,7 +467,7 @@ class Hit
 
 			if( $Settings->get('antispam_block_spam_referers') )
 			{ // In order to preserve server resources, we're going to stop processing immediatly (no logging)!!
-				require $skins_path.'_403_referer_spam.main.php';	// error & exit
+				require $siteskins_path.'_403_referer_spam.main.php';	// error & exit
 				exit(0); // just in case.
 				// THIS IS THE END!!
 			}
@@ -552,7 +560,7 @@ class Hit
 	 */
 	function detect_useragent()
 	{
-		if( isset($this->agent_type) )
+		if( isset( $this->agent_type ) )
 		{ // already detected.
 			return;
 		}
@@ -574,29 +582,30 @@ class Hit
 		$this->is_opera = false;
 		$this->is_NS4 = false;
 
+		$this->agent_ID = NULL;
 		$this->agent_type = 'unknown';
 		$this->agent_name = '';
 		$this->agent_platform = '';
 
 		$user_agent = $this->get_user_agent();
 
-		if( ! empty($user_agent) )
+		if( ! empty( $user_agent ) )
 		{ // detect browser
-			if( strpos($user_agent, 'Win') !== false)
+			if( strpos( $user_agent, 'Win' ) !== false )
 			{
 				$this->agent_platform = 'win';
 			}
-			elseif( strpos($user_agent, 'Mac') !== false)
+			elseif( strpos( $user_agent, 'Mac' ) !== false )
 			{
 				$this->agent_platform = 'mac';
 			}
-			elseif( strpos($user_agent, 'Linux') !== false)
+			elseif( strpos( $user_agent, 'Linux' ) !== false )
 			{
 				$this->agent_platform = 'linux';
 			}
 			elseif( $browscap = $this->get_browser_caps() )
 			{
-				$platform = isset($browscap->platform) ? $browscap->platform : '';
+				$platform = isset( $browscap->platform) ? $browscap->platform : '';
 
 				$Debuglog->add( 'Hit:detect_useragent(): Trying to detect platform using browscap', 'request' );
 				$Debuglog->add( 'Hit:detect_useragent(): Raw platform string: "'.$platform.'"', 'request' );
@@ -608,20 +617,20 @@ class Hit
 				}
 			}
 
-			if(strpos($user_agent, 'Lynx') !== false)
+			if( strpos( $user_agent, 'Lynx' ) !== false )
 			{
 				$this->is_lynx = 1;
 				$this->agent_name = 'lynx';
 				$this->agent_type = 'browser';
 			}
-			elseif(strpos($user_agent, 'Firefox/') !== false)
+			elseif( strpos( $user_agent, 'Firefox/' ) !== false )
 			{
 				$this->is_firefox = 1;
 				$this->agent_name = 'firefox';
 				$this->agent_type = 'browser';
 			}
-			elseif(strpos($user_agent, 'Gecko/') !== false)	// We don't want to see Safari as Gecko
-			{	// Tblue> Note: Gecko is only a rendering engine, not a real browser!
+			elseif( strpos( $user_agent, 'Gecko/' ) !== false )	// We don't want to see Safari as Gecko
+			{ // Tblue> Note: Gecko is only a rendering engine, not a real browser!
 				$this->is_gecko = 1;
 				$this->agent_name = 'gecko';
 				$this->agent_type = 'browser';
@@ -646,19 +655,19 @@ class Hit
 				$this->agent_name = 'chrome';
 				$this->agent_type = 'browser';
 			}
-			elseif(strpos($user_agent, 'Safari/') !== false)
+			elseif( strpos( $user_agent, 'Safari/' ) !== false )
 			{
 				$this->is_safari = true;
 				$this->agent_name = 'safari';
 				$this->agent_type = 'browser';
 			}
-			elseif(strpos($user_agent, 'Opera') !== false)
+			elseif( strpos( $user_agent, 'Opera' ) !== false )
 			{
 				$this->is_opera = 1;
 				$this->agent_name = 'opera';
 				$this->agent_type = 'browser';
 			}
-			elseif(strpos($user_agent, 'Nav') !== false || preg_match('/Mozilla\/4\./', $user_agent))
+			elseif( strpos( $user_agent, 'Nav' ) !== false || preg_match( '/Mozilla\/4\./', $user_agent ) )
 			{
 				$this->is_NS4 = 1;
 				$this->agent_name = 'nav4';
@@ -670,27 +679,29 @@ class Hit
 		$Debuglog->add( 'Hit:detect_useragent(): Agent platform: '.$this->agent_platform, 'request' );
 
 
-		 // Lookup robots
-			$match = false;
-			foreach( $user_agents as $lUserAgent )
+		// Lookup robots
+		$match = false;
+		foreach( $user_agents as $agent_ID => $lUserAgent )
+		{
+			if( $lUserAgent[0] == 'robot' && strpos( $this->user_agent, $lUserAgent[1] ) !== false )
 			{
-				if( $lUserAgent[0] == 'robot' && strpos( $this->user_agent, $lUserAgent[1] ) !== false )
-				{
-					$Debuglog->add( 'Hit:detect_useragent(): robot', 'request' );
-					$this->agent_type = 'robot';
-					$match = true;
-					break;
-				}
-			}
-
-			if( ! $match && ($browscap = $this->get_browser_caps()) &&
-				isset($browscap->crawler) && $browscap->crawler )
-			{
-				$Debuglog->add( 'Hit:detect_useragent(): robot (through browscap)', 'request' );
+				$Debuglog->add( 'Hit:detect_useragent(): robot', 'request' );
+				$Debuglog->add( 'Hit:detect_useragent(): Agent ID: '.$agent_ID, 'request' );
 				$this->agent_type = 'robot';
+				$this->agent_ID = $agent_ID;
+				$match = true;
+				break;
 			}
-
 		}
+
+		if( ! $match && ( $browscap = $this->get_browser_caps() ) &&
+		    isset( $browscap->crawler ) && $browscap->crawler )
+		{
+			$Debuglog->add( 'Hit:detect_useragent(): robot (through browscap)', 'request' );
+			$this->agent_type = 'robot';
+		}
+
+	}
 
 
 	/**
@@ -807,15 +818,15 @@ class Hit
 
 		$this->action = $this->get_action();
 
-		if(empty($this->test_uri))
+		if( empty( $this->test_uri ) )
 		{
-			if( !empty($Blog) )
+			if( ! empty( $Blog ) )
 			{
 				$blog_ID = $Blog->ID;
 			}
-			elseif( !empty( $blog ) )
+			elseif( ! empty( $blog ) )
 			{
-				if( ! is_numeric($blog) )
+				if( ! is_numeric( $blog ) )
 				{ // this can be anything given by URL param "blog"! (because it's called on shutdown)
 				  // see todo in param().
 					$blog = NULL;
@@ -833,75 +844,49 @@ class Hit
 			$ReqURI = $this->test_uri['link'];
 		}
 
-		$hit_uri = substr($ReqURI, 0, 250); // VARCHAR(250) and likely to be longer
-		$hit_referer = substr($this->referer, 0, 250); // VARCHAR(250) and likely to be longer
+		$hit_uri = substr( $ReqURI, 0, 250 ); // VARCHAR(250) and likely to be longer
+		$hit_referer = substr( $this->referer, 0, 250 ); // VARCHAR(250) and likely to be longer
 
 		// Extract the keyphrase from search referers:
 		$keyphrase = $this->get_keyphrase();
 
 		$keyp_ID = NULL;
 
-		if ( empty ($keyphrase) )
+		if ( empty( $keyphrase ) )
 		{	// No search hit
-			if ( ! empty($this->test_mode) && !empty($this->test_uri['s']))
+			if ( ! empty( $this->test_mode ) && ! empty( $this->test_uri['s'] ) )
 			{
 				$s = $this->test_uri['s'];
 			}
 			else
 			{
-				$s = get_param("s");
+				$s = get_param( 's' );
 			}
-			if( !empty($s) && !empty($blog_ID) )
-			{	// Record Internal Search:
+			if( ! empty( $s ) && ! empty( $blog_ID ) )
+			{ // Record Internal Search:
 				$keyphrase  = $s;
-/*						load_class('sessions/model/_internal_searches.class.php', 'Internalsearches' );
-						$internal_searches = new InternalSearches();
-						$internal_searches->set("coll_ID" , $blog_ID);
-						$internal_searches->set("hit_ID" , $hit_ID);
-						$internal_searches->set("keywords" , get_param("s") );
-						$internal_searches->dbinsert();
-*/			}
-		}
-
-
-
-/*		if( !empty( $keyphrase ) )
-		{
-			$DB->begin();
-
-			$sql = 'SELECT keyp_ID
-			          FROM T_track__keyphrase
-			         WHERE keyp_phrase = '.$DB->quote($keyphrase);
-			$keyp_ID = $DB->get_var( $sql, 0, 0, 'Get keyphrase ID' );
-
-			if( empty( $keyp_ID ) )
-			{
-				$sql = 'INSERT INTO T_track__keyphrase( keyp_phrase )
-					VALUES ('.$DB->quote($keyphrase).')';
-				$DB->query( $sql, 'Add new keyphrase' );
-				$keyp_ID = $DB->insert_id;
 			}
 		}
-*/
+
 		// Extract the serprank from search referers:
 		$serprank = $this->get_serprank();
 
-		if (!empty($http_response_code))
-		{	//  in some cases $http_response_code not set and we can use value by default
+		if( ! empty( $http_response_code ) )
+		{ //  in some cases $http_response_code not set and we can use value by default
 			$this->hit_response_code = $http_response_code;
 		}
 
-		if (empty($this->hit_type))
+		if( empty( $this->hit_type ) )
 		{
 			global $Skin;
 
-			if( (isset( $Skin ) && $Skin->type == 'feed') || !empty($this->test_rss) )
+			if( ( isset( $Skin ) && $Skin->type == 'feed' ) || ! empty( $this->test_rss ) )
 			{
 				$this->hit_type = 'rss';
 			}
 			else
 			{
-				if ( isset($_SERVER['HTTP_X_REQUESTED_WITH']) && (strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') )
+				if( isset( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && ( strtolower( $_SERVER['HTTP_X_REQUESTED_WITH'] ) == 'xmlhttprequest' ) )
 				{
 					$this->hit_type = 'ajax';
 				}
@@ -912,40 +897,47 @@ class Hit
 			}
 		}
 
+		// Insert a hit into DB table:
+		$sql_insert_fields = array(
+				'hit_datetime'          => 'FROM_UNIXTIME( '.$localtimenow.' )',
+				'hit_uri'               => $DB->quote( $hit_uri ),
+				'hit_disp'              => $DB->quote( $disp ),
+				'hit_ctrl'              => $DB->quote( $ctrl ),
+				'hit_action'            => $DB->quote( $this->action ),
+				'hit_type'              => $DB->quote( $this->hit_type ),
+				'hit_referer_type'      => $DB->quote( $this->referer_type ),
+				'hit_referer'           => $DB->quote( $hit_referer ),
+				'hit_referer_dom_ID'    => $DB->quote( $this->get_referer_domain_ID() ),
+				'hit_keyphrase_keyp_ID' => $DB->quote( $keyp_ID ),
+				'hit_keyphrase'         => $DB->quote( $keyphrase ),
+				'hit_serprank'          => $DB->quote( $serprank ),
+				'hit_coll_ID'           => $DB->quote( $blog_ID ),
+				'hit_remote_addr'       => $DB->quote( $this->IP ),
+				'hit_agent_type'        => $DB->quote( $this->get_agent_type() ),
+				'hit_agent_ID'          => $DB->quote( $this->get_agent_ID() ),
+				'hit_response_code'     => $DB->quote( $this->hit_response_code )
+			);
 
-		// insert hit into DB table:
-		if (empty($this->test_mode))
-		{
-			$sql = "
-				INSERT INTO T_hitlog(
-					hit_sess_ID, hit_datetime, hit_uri, hit_disp, hit_ctrl, hit_action, hit_type ,hit_referer_type,
-					hit_referer, hit_referer_dom_ID, hit_keyphrase_keyp_ID, hit_keyphrase, hit_serprank, hit_blog_ID, hit_remote_addr, hit_agent_type, hit_response_code )
-				VALUES( '".$Session->ID."', FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($hit_uri)."', ".$DB->quote($disp).", ".$DB->quote($ctrl).", ".$DB->quote($this->action).", '".$this->hit_type."', '".$this->referer_type
-					."', '".$DB->escape($hit_referer)."', ".$DB->null($this->get_referer_domain_ID()).', '.$DB->null($keyp_ID).', '.$DB->quote($keyphrase)
-					.', '.$DB->null($serprank).', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', '".$this->get_agent_type()."', ".$DB->null($this->hit_response_code).")";
+		if( empty( $this->test_mode ) )
+		{ // Normal mode
+			$sql_insert_fields['hit_sess_ID']  = $DB->quote( $Session->ID );
 		}
 		else
-		{
-			// Test mode
-			isset($this->test_uri['disp']) ? $test_disp = $this->test_uri['disp'] : $test_disp = NULL;
-			isset($this->test_uri['ctrl']) ? $test_ctrl = $this->test_uri['ctrl'] : $test_ctrl = NULL;
-			$this->action = NULL;
-
-			$sql = "
-				INSERT INTO T_hitlog(
-					hit_sess_ID, hit_datetime, hit_uri, hit_disp, hit_ctrl, hit_action, hit_type, hit_referer_type,
-					hit_referer, hit_referer_dom_ID, hit_keyphrase_keyp_ID, hit_keyphrase ,hit_serprank, hit_blog_ID, hit_remote_addr, hit_agent_type, hit_response_code )
-				VALUES( '".$this->session_id."', FROM_UNIXTIME(".$this->hit_time."), '".$DB->escape($hit_uri)."', ".$DB->quote($test_disp).", ".$DB->quote($test_ctrl).", ".$DB->quote($this->action).", '".$this->hit_type."', '".$this->referer_type
-					."', '".$DB->escape($hit_referer)."', ".$DB->null($this->get_referer_domain_ID()).', '.$DB->null($keyp_ID).', '.$DB->quote($keyphrase)
-					.', '.$DB->null($serprank).', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', '".$this->get_agent_type()."', ".$DB->null($this->hit_response_code).")";
-
+		{ // Test mode
+			$sql_insert_fields['hit_sess_ID']  = $DB->quote( $this->session_id );
+			$sql_insert_fields['hit_datetime'] = 'FROM_UNIXTIME( '.$this->hit_time.' )';
+			$sql_insert_fields['hit_disp']     = $DB->quote( isset( $this->test_uri['disp'] ) ? $this->test_uri['disp'] : NULL );
+			$sql_insert_fields['hit_ctrl']     = $DB->quote( isset( $this->test_uri['ctrl'] ) ? $this->test_uri['ctrl'] : NULL );
+			$sql_insert_fields['hit_action']   = 'NULL';
 		}
 
+		$sql = 'INSERT INTO T_hitlog ( '.implode( ', ', array_keys( $sql_insert_fields ) ).' )'.
+		                    ' VALUES ( '.implode( ', ', $sql_insert_fields ).' )';
 
 		$DB->query( $sql, 'Record the hit' );
 		$hit_ID = $DB->insert_id;
 
-		if( !empty( $keyphrase ) )
+		if( ! empty( $keyphrase ) )
 		{
 			$DB->commit();
 		}
@@ -1111,13 +1103,28 @@ class Hit
 
 
 	/**
+	 * Get the User agent's ID.
+	 *
+	 * @return integer
+	 */
+	function get_agent_ID()
+	{
+		if( ! isset( $this->agent_ID ) )
+		{
+			$this->detect_useragent();
+		}
+		return $this->agent_ID;
+	}
+
+
+	/**
 	 * Get the User agent's name.
 	 *
 	 * @return string
 	 */
 	function get_agent_name()
 	{
-		if( ! isset($this->agent_name) )
+		if( ! isset( $this->agent_name ) )
 		{
 			$this->detect_useragent();
 		}
@@ -1132,7 +1139,7 @@ class Hit
 	 */
 	function get_agent_platform()
 	{
-		if( ! isset($this->agent_platform) )
+		if( ! isset( $this->agent_platform ) )
 		{
 			$this->detect_useragent();
 		}
@@ -1147,7 +1154,7 @@ class Hit
 	 */
 	function get_agent_type()
 	{
-		if( ! isset($this->agent_type) )
+		if( ! isset( $this->agent_type ) )
 		{
 			$this->detect_useragent();
 		}

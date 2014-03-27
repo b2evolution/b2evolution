@@ -26,12 +26,21 @@
 function evo_display_position_onchange( selectInput, url, crumb )
 {
 	var oThis = selectInput;
-	jQuery.get( url + 'async.php?action=set_object_link_position&link_ID=' + selectInput.id.substr(17) + '&link_position=' + selectInput.value + '&crumb_link=' + crumb, {
+	var new_position = selectInput.value;
+	jQuery.get( url + 'async.php?action=set_object_link_position&link_ID=' + selectInput.id.substr(17) + '&link_position=' + new_position + '&crumb_link=' + crumb, {
 	}, function(r, status) {
 		r = ajax_debug_clear( r );
 		if( r == "OK" ) {
 			evoFadeSuccess( jQuery(oThis.form).closest('tr') );
 			jQuery(oThis.form).closest('td').removeClass('error');
+			if( new_position == 'albumart')
+			{ // Position "Album Art" can be used only by one link
+				jQuery( 'select[name=link_position][id!=' + selectInput.id + '] option[value=albumart]:selected' ).each( function()
+				{ // Replace previous position with "Inline"
+					jQuery( this ).parent().val( 'aftermore' );
+					evoFadeSuccess( jQuery( this ).closest('tr') );
+				} );
+			}
 		} else {
 			jQuery(oThis).val(r);
 			evoFadeFailure( jQuery(oThis.form).closest('tr') );
@@ -65,5 +74,27 @@ function insert_image_link( link_ID, caption )
 				$position_selector.val( 'inline' ).change();
 			}
 		}
+	}
+}
+
+
+/**
+ * Replace the inline image placeholders when file is unlinked from item
+ *
+ * @param integer Link ID
+ */
+function item_unlink( link_ID )
+{
+	var b2evoCanvas = window.parent.document.getElementById( 'itemform_post_content' );
+	if( b2evoCanvas != null )
+	{ // Canvas exists
+		var textarea_obj = jQuery( '#itemform_post_content', window.parent.document );
+		if( textarea_obj.length == 0 )
+		{ // No found textarea
+			return;
+		}
+		var content = textarea_obj.val();
+		var regexp = new RegExp( '\\\[image:' + link_ID + ':?[^\\\]]*\\\]', 'ig' );
+		textarea_obj.val( content.replace( regexp, '' ) );
 	}
 }

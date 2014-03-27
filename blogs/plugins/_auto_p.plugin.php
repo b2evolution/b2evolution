@@ -21,12 +21,12 @@ class auto_p_plugin extends Plugin
 {
 	var $code = 'b2WPAutP';
 	var $name = 'Auto P';
-	var $priority = 70;
+	var $priority = 80;
 	var $version = '5.0.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $help_url = 'http://b2evolution.net/man/technical-reference/renderer-plugins/auto-p-plugin';
+	var $help_topic = 'auto-p-plugin';
 	var $number_of_installs = 1;
 
 	/**

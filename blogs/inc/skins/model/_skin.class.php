@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -192,13 +192,15 @@ class Skin extends DataObject
 		 */
 		global $Blog;
 		global $admin_url, $rsc_url;
-		global $Timer;
+		global $Timer, $Session;
 
 		$timer_name = 'skin_container('.$sco_name.')';
 		$Timer->start($timer_name);
 
-		if( false )
-		{	// DEBUG:
+		$show_debug_containers = $Session->get( 'debug_containers_'.$Blog->ID ) == 1;
+
+		if( $show_debug_containers )
+		{ // DEBUG:
 			echo '<div class="debug_container">';
 			echo '<div class="debug_container_name"><span class="debug_container_action"><a href="'
 						.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'">Edit</a></span>'.$sco_name.'</div>';
@@ -223,8 +225,8 @@ class Skin extends DataObject
 			}
 		}
 
-		if( false )
-		{	// DEBUG:
+		if( $show_debug_containers )
+		{ // DEBUG:
 			echo get_icon( 'pixel', 'imgtag', array( 'class' => 'clear' ) );
 			echo '</div>';
 		}
@@ -811,6 +813,7 @@ class Skin extends DataObject
 															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
 					'fieldset_end' => '</fieldset>'."\n",
 					'fieldstart' => '<span class="block" $ID$>',
+					'labelclass' => '',
 					'labelstart' => '',
 					'labelend' => "\n",
 					'labelempty' => '',

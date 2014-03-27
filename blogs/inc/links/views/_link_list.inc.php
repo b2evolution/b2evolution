@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -63,73 +63,68 @@ $Results->cols[] = array(
 /*
  * Sub Type column
  */
-function display_subtype( & $row )
+function display_subtype( $link_ID )
 {
-	if( empty($row->file_ID) )
-	{
-		return '';
-	}
+	global $LinkOwner, $current_File;
 
-	global $current_File;
-	// Instantiate a File object for this line:
-	$current_File = new File( $row->file_root_type, $row->file_root_ID, $row->file_path ); // COPY!
-	// Flow meta data into File object:
-	$current_File->load_meta( false, $row );
+	$Link = & $LinkOwner->get_link_by_link_ID( $link_ID );
+	// Instantiate a File object for this line
+	$current_File = $Link->get_File();
 
-	return $current_File->get_preview_thumb( 'fulltype' );
+	return $Link->get_preview_thumb();
 }
 $Results->cols[] = array(
 						'th' => T_('Icon/Type'),
 						'td_class' => 'shrinkwrap',
-						'td' => '%display_subtype( {row} )%',
+						'td' => '%display_subtype( #link_ID# )%',
 					);
 
 
 /*
  * LINK column
  */
-function display_link( & $row )
+function display_link()
 {
-	if( !empty($row->file_ID) )
+	/**
+	 * @var File
+	 */
+	global $current_File;
+
+	if( empty( $current_File ) )
 	{
-		/**
-		 * @var File
-		 */
-		global $current_File;
-
-		$r = '';
-
-		// File relative path & name:
-		if( $current_File->is_dir() )
-		{ // Directory
-			$r .= $current_File->dget( '_name' );
-		}
-		else
-		{ // File
-			if( $view_link = $current_File->get_view_link() )
-			{
-				$r .= $view_link;
-			}
-			else
-			{ // File extension unrecognized
-				$r .= $current_File->dget( '_name' );
-			}
-		}
-
-		$title = $current_File->dget('title');
-		if( $title !== '' )
-		{
-			$r .= '<span class="filemeta"> - '.$title.'</span>';
-		}
-
-		return $r;
+		return '?';
 	}
 
-	return '?';
+	$r = '';
+
+	// File relative path & name:
+	if( $current_File->is_dir() )
+	{ // Directory
+		$r .= $current_File->dget( '_name' );
+	}
+	else
+	{ // File
+		if( $view_link = $current_File->get_view_link() )
+		{
+			$r .= $view_link;
+		}
+		else
+		{ // File extension unrecognized
+			$r .= $current_File->dget( '_name' );
+		}
+	}
+
+	$title = $current_File->dget('title');
+	if( $title !== '' )
+	{
+		$r .= '<span class="filemeta"> - '.$title.'</span>';
+	}
+
+	return $r;
 }
 $Results->cols[] = array(
 						'th' => T_('Destination'),
-						'td' => '%display_link( {row} )%',
+						'td' => '%display_link()%',
 					);
 
 

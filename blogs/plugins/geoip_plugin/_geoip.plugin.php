@@ -8,7 +8,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -145,7 +145,7 @@ class geoip_plugin extends Plugin
 	 */
 	function AfterUserInsert( & $params )
 	{
-		$Country = $this->get_country_by_IP( $_SERVER['REMOTE_ADDR'] );
+		$Country = $this->get_country_by_IP( get_ip_list( true ) );
 
 		if( !$Country )
 		{	// No found country
@@ -166,6 +166,9 @@ class geoip_plugin extends Plugin
 				  SET user_reg_ctry_ID = '.$DB->quote( $Country->ID ).
 				  $user_update_sql.'
 				WHERE user_ID = '.$DB->quote( $User->ID ) );
+
+		// Move user to suspect group by Country ID
+		antispam_suspect_user_by_country( $Country->ID, $User->ID );
 	}
 
 
@@ -322,6 +325,9 @@ jQuery( document ).ready( function()
 			$DB->query( 'UPDATE T_users
 					  SET user_reg_ctry_ID = '.$DB->quote( $Country->ID ).'
 					WHERE user_ID = '.$DB->quote( $User->ID ) );
+
+			// Move user to suspect group by Country ID
+			antispam_suspect_user_by_country( $Country->ID, $User->ID );
 		}
 	}
 
@@ -337,7 +343,7 @@ jQuery( document ).ready( function()
 	 */
 	function AfterCommentInsert( & $params )
 	{
-		$Country = $this->get_country_by_IP( $_SERVER['REMOTE_ADDR'] );
+		$Country = $this->get_country_by_IP( get_ip_list( true ) );
 
 		if( !$Country )
 		{	// No found country
@@ -381,7 +387,7 @@ jQuery( document ).ready( function()
 			return;
 		}
 
-		$Country = $this->get_country_by_IP( $_SERVER['REMOTE_ADDR'] );
+		$Country = $this->get_country_by_IP( get_ip_list( true ) );
 
 		if( !$Country )
 		{	// No found country by IP address
@@ -434,8 +440,9 @@ jQuery( document ).ready( function()
 	{
 		$params = array_merge( array(
 				'table'   => '', // sessions, activity, ipranges
-				'column'  => '', // sess_ipaddress, comment_author_IP, aipr_IPv4start
-				'Results' => NULL
+				'column'  => '', // sess_ipaddress, comment_author_IP, aipr_IPv4start, hit_remote_addr
+				'Results' => NULL, // object Results
+				'order'   => true, // TRUE - to make a column sortable
 			), $params );
 
 		if( is_null( $params['Results'] ) || !is_object( $params['Results'] ) )
@@ -443,13 +450,17 @@ jQuery( document ).ready( function()
 			return;
 		}
 
-		if( in_array( $params['table'], array( 'sessions', 'activity', 'ipranges' ) ) )
+		if( in_array( $params['table'], array( 'sessions', 'activity', 'ipranges', 'top_ips' ) ) )
 		{ // Display column only for required tables by GeoIP plugin
-			$params['Results']->cols[] = array(
+			$column = array(
 				'th' => T_('Country'),
-				'order' => $params['column'],
 				'td' => '%geoip_get_country_by_IP( #'.$params['column'].'# )%',
 			);
+			if( $params['order'] )
+			{
+				$column['order'] = $params['column'];
+			}
+			$params['Results']->cols[] = $column;
 		}
 	}
 
@@ -549,6 +560,9 @@ jQuery( document ).ready( function()
 								  SET user_reg_ctry_ID = '.$DB->quote( $Country->ID ).'
 								WHERE user_ID = '.$DB->quote( $user_ID ) );
 
+						// Move user to suspect group by Country ID
+						antispam_suspect_user_by_country( $Country->ID, $user_ID );
+
 						$users_report .= ' - '.sprintf( T_('Country: <b>%s</b>'), $Country->get( 'name' ) ).'<br />';
 					}
 
@@ -562,6 +576,51 @@ jQuery( document ).ready( function()
 					break;
 			}
 		}
+	}
+
+
+	/**
+	 * Event handler: Gets invoked when an action request was called which should be blocked in specific cases
+	 *
+	 * Blocakble actions: comment post, user login/registration, email send/validation, account activation 
+	 */
+	function BeforeBlockableAction()
+	{
+		// Get request Ip addresses
+		$request_ip_list = get_ip_list();
+		foreach( $request_ip_list as $IP_address )
+		{
+			$Country = $this->get_country_by_IP( $IP_address );
+
+			if( ! $Country )
+			{ // Country not found
+				continue;
+			}
+
+			if( antispam_block_by_country( $Country->ID, false ) )
+			{ // Block the action if the country is blocked
+				debug_die( 'This request has been blocked.', array(
+					'debug_info' => sprintf( 'A request with [ %s ] ip addresses was blocked because of \'%s\' is blocked.', implode( ', ', $request_ip_list ), $Country->get_name() ) ) );
+			}
+		}
+	}
+
+
+	/**
+	 * Event handler: Called at the end of the login procedure, if the
+	 * {@link $current_User current User} is set and the user is therefor registered.
+	 */
+	function AfterLoginRegisteredUser( & $params )
+	{
+		$Country = $this->get_country_by_IP( get_ip_list( true ) );
+
+		if( ! $Country )
+		{	// Country not found
+			return false;
+		}
+
+		// Check if the currently logged in user should be moved into the suspect group based on the Country ID
+		antispam_suspect_user_by_country( $Country->ID );
 	}
 }
 

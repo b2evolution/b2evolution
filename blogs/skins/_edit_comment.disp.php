@@ -7,7 +7,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -122,7 +122,7 @@ $Form->begin_form( 'bComment' );
 	}
 
 	echo '<div class="center margin2ex">';
-	$Form->submit( array( 'actionArray[update]', T_('Save changes'), 'SaveButton', '' ) );
+	$Form->submit( array( 'actionArray[update]', T_('Save Changes!'), 'SaveButton', '' ) );
 	echo '</div>';
 $Form->end_form();
 

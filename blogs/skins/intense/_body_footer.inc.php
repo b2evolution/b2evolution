@@ -3,7 +3,7 @@
  * This is the BODY footer include template.
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
- * {@link http://manual.b2evolution.net/Skins_2.0}
+ * {@link http://b2evolution.net/man/skin-structure}
  *
  * This is meant to be included in a page template.
  *
@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 ?>
 
 		<div class="footer">
-			<div class="nav tl"><div class="tr"><div class="br"><div class="bl">
+			<div class="nav rounded">
 				<div id="copyright">
 					<?php
 					// Display a link to contact the owner of this blog (if owner accepts messages):
@@ -57,10 +57,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 							'item_end'   => ' ',
 						) );
 					?>
-     		</div>
-     		</div></div></div></div>
+					</div>
+				</div>
 			</div>
 		</div>
-		<div id="bottom">
-		</div>
 	</div>
+<?php
+// ---------------------------- SITE FOOTER INCLUDED HERE ----------------------------
+// If site footers are enabled, they will be included here:
+siteskin_include( '_site_body_footer.inc.php' );
+// ------------------------------- END OF SITE FOOTER --------------------------------
+?>

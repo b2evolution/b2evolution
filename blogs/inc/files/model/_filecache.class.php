@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -64,9 +64,9 @@ class FileCache extends DataObjectCache
 		// Get ID of the object we'ere preparing to instantiate...
 		$obj_ID = $db_row->{$this->dbIDname};
 
- 		if( !empty($obj_ID) )
+		if( !empty($obj_ID) )
 		{	// If the object ID is valid:
-	 		if( !isset($this->cache[$obj_ID]) )
+			if( !isset($this->cache[$obj_ID]) )
 			{	// If not already cached:
 				// Instantiate a File object for this line:
 				$current_File = new File( $db_row->file_root_type, $db_row->file_root_ID, $db_row->file_path ); // COPY!

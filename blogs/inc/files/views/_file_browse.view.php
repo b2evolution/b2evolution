@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -58,7 +58,7 @@ global $UserSettings;
 
 global $fm_hide_dirtree, $create_name, $ads_list_path, $rsc_url;
 
-global $fm_FileRoot, $path;
+global $fm_FileRoot, $path, $ajax_request;
 
 /**
  * @var Link Owner
@@ -81,16 +81,15 @@ if( isset( $edited_User ) )
 <?php
 	$Widget = new Widget( 'file_browser' );
 
-	if( $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
+	if( ! $ajax_request && $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
 	{
-		$Widget->global_icon( /* TRANS: verb */ T_('Upload...'), '', regenerate_url( 'ctrl', 'ctrl=upload' ), /* TRANS: verb */ T_('Upload ').' &raquo;', 1, 5 );
+		$Widget->global_icon( /* TRANS: verb */ T_('Advanced Upload...'), '', regenerate_url( 'ctrl', 'ctrl=upload' ), /* TRANS: verb */ T_('Advanced Upload').' &raquo;', 1, 5 );
 	}
 
 	if( ! empty( $LinkOwner ) )
 	{ // Display a link to close file browser and return to post editing:
 		$close_link_params = array();
-		global $mode;
-		if( $mode == 'upload' )
+		if( $ajax_request )
 		{ // Initialize JavaScript function to close popup window
 			echo '<script type="text/javascript">
 			function close_popup_window()
@@ -315,10 +314,12 @@ if( isset( $edited_User ) )
 
 				echo '<td id="fm_files">';
 
-				// ______________________________ Toolbar ______________________________
-				// Start capturing toolbar panel
-				@ob_start();
 
+				// ______________________________ Files ______________________________
+				require dirname(__FILE__).'/_file_list.inc.php';
+
+
+				// ______________________________ Toolbar ______________________________
 				echo '<div class="fileman_toolbars_bottom">';
 
 				/*
@@ -390,7 +391,6 @@ if( isset( $edited_User ) )
 						$Form->add_crumb( 'file' );
 						$Form->hidden( 'ctrl', 'upload' );
 						$Form->hidden( 'upload_quickmode', 1 );
-						$Form->hidden( 'tab3_onsubmit', 'standard' );
 						// The following is mainly a hint to the browser.
 						$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 );
 						$Form->hiddens_by_key( get_memorized('ctrl') );
@@ -402,27 +402,20 @@ if( isset( $edited_User ) )
 					echo '</div>';
 				}
 
-				echo '</div>';
 				echo '<div class="clear"></div>';
-
-				// Get captured toolbar panel
-				$toobar_panel = @ob_get_clean();
-
-				// Display the toolbar
-				echo $toobar_panel;
-
-				// ______________________________ Files ______________________________
-				require dirname(__FILE__).'/_file_list.inc.php';
-
-				// Display the toolbar
-				echo $toobar_panel;
+				echo '</div>';
 
 				echo '</td>'
 			?>
 		</tr>
 	</tbody>
 </table>
-
+<script type="text/javascript">
+if( typeof file_uploader_note_text != 'undefined' )
+{
+	document.write( '<p class="note center">' + file_uploader_note_text + '</p>' );
+}
+</script>
 <?php
 	$Widget->disp_template_raw( 'block_end' );
 ?>

@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -24,6 +24,7 @@ $params = array_merge( array(
 		'Message'              => NULL,
 		'message_link'         => '',
 		'other_unread_threads' => '',
+		'from_User'            => NULL,
 	), $params );
 
 
@@ -31,18 +32,19 @@ $Message = $params['Message'];
 $UserCache = & get_UserCache();
 
 $recipient_User = $UserCache->get_by_ID( $params['recipient_ID'] );
+$from_User = ( $params['from_User'] == NULL ) ? $current_User : $params['from_User'];
 
 if( $params['new_thread'] )
 {
-	echo sprintf( T_( '%s just sent you a message with the title %s.' ), $current_User->login, '"'.$Message->Thread->title.'"' );
+	echo sprintf( T_( '%s just sent you a message with the title %s.' ), $from_User->login, '"'.$Message->Thread->title.'"' );
 }
 elseif( count( $params['thrd_recipients'] ) == 1 )
 {
-	echo sprintf( T_( '%s just replied to your message in the %s conversation. ' ), $current_User->login, '"'.$Message->Thread->title.'"' );
+	echo sprintf( T_( '%s just replied to your message in the %s conversation. ' ), $from_User->login, '"'.$Message->Thread->title.'"' );
 }
 else
 {
-	echo sprintf( T_( '%s just replied to the %s conversation.' ), $current_User->login, '"'.$Message->Thread->title.'"' );
+	echo sprintf( T_( '%s just replied to the %s conversation.' ), $from_User->login, '"'.$Message->Thread->title.'"' );
 }
 
 echo "\n\n";
@@ -50,7 +52,7 @@ echo "\n\n";
 if( $recipient_User->check_perm( 'pm_notif', 'full' ) )
 {
 	echo T_( 'To read the full conversation, click here:' )."\n".$params['message_link']."\n";
-	echo T_( 'Message content:' ).' '.htmlentities( $Message->get('text'), ENT_COMPAT, $evo_charset );
+	echo T_( 'Message content:' ).' '.evo_htmlentities( $Message->get('text'), ENT_COMPAT, $evo_charset );
 }
 else
 {

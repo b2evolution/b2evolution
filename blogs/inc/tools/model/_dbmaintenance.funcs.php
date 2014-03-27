@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -290,48 +290,113 @@ function dbm_display_result_messages( $results, $command_type )
 
 
 /**
- * Find all broken posts that have no matching category
+ * Delete all broken posts that have no matching category
  */
-function dbm_find_broken_posts()
+function dbm_delete_broken_posts()
 {
-	global $DB, $Messages;
-
-	// select broken items
-	$sql = 'SELECT * FROM T_items__item
-				WHERE post_canonical_slug_ID NOT IN (
-					SELECT slug_ID FROM T_slug )';
-	$broken_items = $DB->get_results( $sql, OBJECT, 'Find broken posts' );
+	global $DB, $Messages, $current_User;
 
 	$num_deleted = 0;
-	foreach( $broken_items as $row )
-	{ // delete broken items
-		$broken_Item = new Item( $row );
-		if( $broken_Item->dbdelete() )
-		{
-			$num_deleted++;
+
+	echo T_('Removing of the broken posts that have no matching category... ');
+	evo_flush();
+
+	// Delete the posts only by these IDs
+	$post_IDs = trim( param( 'posts', '/^[\d,]+$/', true ), ',' );
+	$post_IDs = preg_replace( '/(,){2,}/', ',', $post_IDs );
+
+	if( ! empty( $post_IDs ) )
+	{
+		// select broken items
+		$SQL = new SQL();
+		$SQL->SELECT( '*' );
+		$SQL->FROM( 'T_items__item' );
+		$SQL->WHERE( 'post_main_cat_ID NOT IN ( SELECT cat_ID FROM T_categories )' );
+		$SQL->WHERE_and( 'post_ID IN ( '.$post_IDs.' )' );
+		$broken_items = $DB->get_results( $SQL->get(), OBJECT, 'Find broken posts' );
+
+		foreach( $broken_items as $r => $row )
+		{ // delete broken items
+			$broken_Item = new Item( $row );
+			if( $broken_Item->dbdelete() )
+			{ // Post was deleted successfully
+				$num_deleted++;
+			}
+			else
+			{ // Post was NOT deleted
+				echo '<p class="red">'.sprintf( T_('Cannot delete a post ID=%s'), $broken_Item->ID ).'</p>';
+			}
+			if( $r % 100 == 0 )
+			{ // Display a log dot after each 100 processed posts
+				echo '. ';
+				evo_flush();
+			}
 		}
 	}
 
-	$Messages->add( sprintf( T_('Deleted %d posts.'), $num_deleted ), 'success' );
+	echo '<p>'.sprintf( T_('Deleted %d posts.'), $num_deleted ).'</p>';
 }
 
 
 /**
- * Find all broken slugs that have no matching target post
+ * Delete all broken slugs that have no matching target post
  */
-function dbm_find_broken_slugs()
+function dbm_delete_broken_slugs()
 {
 	global $DB, $Messages;
 
-	// delete broken slugs
-	$r = $DB->query( 'DELETE FROM T_slug
-						WHERE slug_type = "item" and slug_itm_ID NOT IN (
-							SELECT post_ID FROM T_items__item )' );
+	// Delete the s;ugs only by these IDs
+	$slug_IDs = trim( param( 'slugs', '/^[\d,]+$/', true ), ',' );
+	$slug_IDs = preg_replace( '/(,){2,}/', ',', $slug_IDs );
 
-	if( $r !== false )
+	if( ! empty( $slug_IDs ) )
 	{
-		$Messages->add( sprintf( T_('Deleted %d slugs.'), $r ), 'success' );
+		// delete broken slugs
+		$num_deleted = $DB->query( 'DELETE FROM T_slug
+			WHERE slug_type = "item"
+			  AND slug_itm_ID NOT IN ( SELECT post_ID FROM T_items__item )
+			  AND slug_ID IN ( '.$slug_IDs.' )' );
 	}
+	else
+	{
+		$num_deleted = 0;
+	}
+
+	$Messages->add( sprintf( T_('Deleted %d slugs.'), intval( $num_deleted ) ), 'success' );
+}
+
+
+/**
+ * Find and delete orphan comments with no matching Item
+ */
+function dbm_delete_orphan_comments()
+{
+	global $Messages, $DB;
+
+	// Get all comment with no matching Item
+	$comments_SQL = new SQL();
+	$comments_SQL->SELECT( 'comment_ID' );
+	$comments_SQL->FROM( 'T_comments' );
+	$comments_SQL->FROM_add( 'LEFT JOIN T_items__item ON comment_item_ID = post_ID' );
+	$comments_SQL->WHERE( 'post_ID IS NULL' );
+	$comments = $DB->get_col( $comments_SQL->get() );
+
+	$num_deleted = 0;
+	$CommentCache = & get_CommentCache();
+	foreach( $comments as $comment_ID )
+	{
+		if( ( $broken_Comment = & $CommentCache->get_by_ID( $comment_ID, false, false ) ) !== false )
+		{ // Comment object is created
+			if( $broken_Comment->dbdelete( true ) )
+			{ // Comment is deleted successfully
+				$num_deleted++;
+			}
+		}
+		// Clear cache to save memory
+		$CommentCache->clear();
+	}
+
+	$Messages->add( sprintf( T_('%d comments have been deleted'), $num_deleted ), 'success' );
 }
 
 
@@ -523,9 +588,9 @@ function dbm_delete_orphan_file_roots()
 	echo '. ';
 	evo_flush();
 
-	$count_files_deleted = $DB->query( 'DELETE f, l, fv FROM T_files AS f
+	$count_files_deleted = $DB->query( 'DELETE f, l, lv FROM T_files AS f
 			 LEFT JOIN T_links AS l ON l.link_file_ID = f.file_ID
-			 LEFT JOIN T_files__vote AS fv ON fv.fvot_file_ID = f.file_ID
+			 LEFT JOIN T_links__vote AS lv ON l.link_ID = lv.lvot_link_ID
 		WHERE ( file_root_type = "collection"
 		        AND file_root_ID NOT IN ( SELECT blog_ID FROM T_blogs ) )
 		   OR ( file_root_type = "user"

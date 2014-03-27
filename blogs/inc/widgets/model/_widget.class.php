@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -328,7 +328,7 @@ class ComponentWidget extends DataObject
 	 */
 	function set( $parname, $parvalue, $make_null = false )
 	{
-		$params = $this->get_param_definitions( array( 'infinite_loop' => true ) );
+		$params = $this->get_param_definitions( NULL );
 
 		if( isset( $params[$parname] ) )
 		{ // This is a widget specific param:
@@ -491,15 +491,18 @@ class ComponentWidget extends DataObject
 	 */
 	function display_with_cache( $params, $keys = array() )
 	{
-		global $Blog, $Timer, $debug, $admin_url;
+		global $Blog, $Timer, $debug, $admin_url, $Session;
 
 		$this->init_display( $params );
+
+		// Display the debug conatainers when $debug = 2 OR when it is turned on from evo menu under "Blog" -> "Show/Hide containers"
+		$show_debug_containers = $Session->get( 'debug_containers_'.$Blog->ID ) == 1 || $debug == 2;
 
 		if( ! $Blog->get_setting('cache_enabled_widgets')
 			|| ! $this->disp_params['allow_blockcache'] )
 		{	// NO CACHING - We do NOT want caching for this collection or for this specific widget:
 
-			if( $debug == 2 )
+			if( $show_debug_containers )
 			{	// DEBUG:
 				echo '<div class="debug_widget"><div class="debug_widget_name" title="'.
 							( $Blog->get_setting('cache_enabled_widgets') ? 'Widget params have BlockCache turned off' : 'Collection params have BlockCache turned off' ).'"><span class="debug_container_action"><a href="'
@@ -508,7 +511,7 @@ class ComponentWidget extends DataObject
 
 			$this->display( $params );
 
-			if( $debug == 2 )
+			if( $show_debug_containers )
 			{	// DEBUG:
 				echo "</div></div>\n";
 			}
@@ -528,7 +531,7 @@ class ComponentWidget extends DataObject
 			if( $content !== false )
 			{ // cache hit, let's display:
 
-				if( $debug == 2 )
+				if( $show_debug_containers )
 				{	// DEBUG:
 					echo '<div class="debug_widget widget_in_cache"><div class="debug_widget_name" title="'.$this->BlockCache->serialized_keys.'"><span class="debug_container_action"><a href="'
 								.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>FROM CACHE: '.$this->get_name().'</div><div class="$wi_class$">'."\n";
@@ -536,7 +539,7 @@ class ComponentWidget extends DataObject
 
 				echo $content;
 
-				if( $debug == 2 )
+				if( $show_debug_containers )
 				{	// DEBUG:
 					echo "</div></div>\n";
 				}
@@ -545,7 +548,7 @@ class ComponentWidget extends DataObject
 			else
 			{	// Cache miss, we have to generate:
 
-				if( $debug == 2 )
+				if( $show_debug_containers )
 				{	// DEBUG:
 					echo '<div class="debug_widget widget_not_in_cache"><div class="debug_widget_name" title="'.$this->BlockCache->serialized_keys.'"><span class="debug_container_action"><a href="'
 								.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>NOT IN CACHE: '.$this->get_name().'</div><div class="$wi_class$">'."\n";
@@ -558,7 +561,7 @@ class ComponentWidget extends DataObject
 				// Save collected cached data if needed:
 				$this->BlockCache->end_collect();
 
-				if( $debug == 2 )
+				if( $show_debug_containers )
 				{	// DEBUG:
 					echo "</div></div>\n";
 				}
@@ -758,10 +761,10 @@ class ComponentWidget extends DataObject
 
 		parent::dbupdate();
 
+		// BLOCK CACHE INVALIDATION:
 		// This widget has been modified, cached content depending on it should be invalidated:
 		BlockCache::invalidate_key( 'wi_ID', $this->ID );
 	}
 
 }
-
 ?>

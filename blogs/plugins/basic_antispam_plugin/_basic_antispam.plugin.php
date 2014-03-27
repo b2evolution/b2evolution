@@ -4,7 +4,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -595,11 +595,11 @@ class basic_antispam_plugin extends Plugin
 		$sql = '
 				SELECT comment_ID
 				  FROM T_comments
-				 WHERE comment_post_ID = '.$Comment->item_ID;
+				 WHERE comment_item_ID = '.$Comment->item_ID;
 
 		if( isset($Comment->author_user_ID) )
 		{ // registered user:
-			$sql .= ' AND comment_author_ID = '.$Comment->author_user_ID;
+			$sql .= ' AND comment_author_user_ID = '.$Comment->author_user_ID;
 		}
 		else
 		{ // visitor (also trackback):
@@ -610,7 +610,7 @@ class basic_antispam_plugin extends Plugin
 			}
 			if( ! empty($Comment->author_email) )
 			{
-				$sql_ors[] = 'comment_author_email = '.$DB->quote($Comment->author_email);
+				$sql_ors[] = 'comment_author_email = '.$DB->quote( $Comment->author_email );
 			}
 			if( ! empty($Comment->author_url) )
 			{

@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -44,7 +44,7 @@ function blog_update_perms( $blog, $context = 'user' )
 {
 	global $DB;
 
- 	/**
+	/**
 	 * @var User
 	 */
 	global $current_User;
@@ -65,14 +65,12 @@ function blog_update_perms( $blog, $context = 'user' )
 	// Get affected user/group IDs:
 	$IDs = param( $context.'_IDs', '/^[0-9]+(,[0-9]+)*$/', '' );
 	$ID_array = explode( ',', $IDs );
-	// pre_dump( $ID_array );
 
 	// Can the current user touch advanced admin permissions?
 	if( ! $current_User->check_perm( 'blog_admin', 'edit', false, $blog ) )
-	{	// We have no permission to touch advanced admins!
-		// echo 'restrict';
+	{ // We have no permission to touch advanced admins!
 
-		// Get the users/groups which are adavnced admins
+		// Get the users/groups which are advanced admins
 		$admins_ID_array = $DB->get_col( "SELECT {$ID_field}
 																				FROM $table
 																			 WHERE {$ID_field} IN (".implode(',',$ID_array).")
@@ -81,9 +79,7 @@ function blog_update_perms( $blog, $context = 'user' )
 
 		// Take the admins out of the list:
 		$ID_array = array_diff( $ID_array, $admins_ID_array );
-		// pre_dump( $ID_array );
 	}
-	// else echo 'adv admin';
 
 	if( empty( $ID_array ) )
 	{
@@ -98,12 +94,12 @@ function blog_update_perms( $blog, $context = 'user' )
 	$inserted_values = array();
 	foreach( $ID_array as $loop_ID )
 	{ // Check new permissions for each user:
-		// echo "<br/>getting perms for $ID_field : $loop_ID <br />";
 
 		// Use checkboxes
 		$perm_post = array();
 
 		$ismember = param( 'blog_ismember_'.$loop_ID, 'integer', 0 );
+		$can_be_assignee = param( 'blog_can_be_assignee_'.$loop_ID, 'integer', 0 );
 
 		$perm_published = param( 'blog_perm_published_'.$loop_ID, 'string', '' );
 		if( !empty($perm_published) ) $perm_post[] = 'published';
@@ -156,7 +152,7 @@ function blog_update_perms( $blog, $context = 'user' )
 		$perm_properties = param( 'blog_perm_properties_'.$loop_ID, 'integer', 0 );
 
 		if( $current_User->check_perm( 'blog_admin', 'edit', false, $blog ) )
-		{	// We have permission to give advanced admins perm!
+		{ // We have permission to give advanced admins perm!
 			$perm_admin = param( 'blog_perm_admin_'.$loop_ID, 'integer', 0 );
 		}
 		else
@@ -170,13 +166,13 @@ function blog_update_perms( $blog, $context = 'user' )
 
 		// Update those permissions in DB:
 
-		if( $ismember || count($perm_post) || $perm_delpost || $perm_edit_ts || $perm_delcmts || $perm_recycle_owncmts || $perm_vote_spam_comments || $perm_cmtstatuses ||
+		if( $ismember || $can_be_assignee || count($perm_post) || $perm_delpost || $perm_edit_ts || $perm_delcmts || $perm_recycle_owncmts || $perm_vote_spam_comments || $perm_cmtstatuses ||
 			$perm_cats || $perm_properties || $perm_admin || $perm_media_upload || $perm_media_browse || $perm_media_change )
 		{ // There are some permissions for this user:
 			$ismember = 1;	// Must have this permission
 
 			// insert new perms:
-			$inserted_values[] = " ( $blog, $loop_ID, $ismember, ".$DB->quote(implode(',',$perm_post)).",
+			$inserted_values[] = " ( $blog, $loop_ID, $ismember, $can_be_assignee, ".$DB->quote(implode(',',$perm_post)).",
 																".$DB->quote($perm_edit).",
 																$perm_delpost, $perm_edit_ts, $perm_delcmts, $perm_recycle_owncmts, $perm_vote_spam_comments, $perm_cmtstatuses,
 																".$DB->quote( $perm_edit_cmt ).",
@@ -189,7 +185,7 @@ function blog_update_perms( $blog, $context = 'user' )
 	// Proceed with insertions:
 	if( count( $inserted_values ) )
 	{
-		$DB->query( "INSERT INTO $table( {$prefix}blog_ID, {$ID_field}, {$prefix}ismember,
+		$DB->query( "INSERT INTO $table( {$prefix}blog_ID, {$ID_field}, {$prefix}ismember, {$prefix}can_be_assignee,
 											{$prefix}perm_poststatuses, {$prefix}perm_edit, {$prefix}perm_delpost, {$prefix}perm_edit_ts,
 											{$prefix}perm_delcmts, {$prefix}perm_recycle_owncmts, {$prefix}perm_vote_spam_cmts, {$prefix}perm_cmtstatuses, {$prefix}perm_edit_cmt,
 											{$prefix}perm_cats, {$prefix}perm_properties, {$prefix}perm_admin,
@@ -197,6 +193,42 @@ function blog_update_perms( $blog, $context = 'user' )
 											{$prefix}perm_page, {$prefix}perm_intro, {$prefix}perm_podcast, {$prefix}perm_sidebar )
 									VALUES ".implode( ',', $inserted_values ) );
 	}
+
+	// Unassign users from the items of the blog
+	$DB->query( 'UPDATE T_items__item
+			SET post_assigned_user_ID = NULL
+		WHERE post_main_cat_ID IN
+		  (
+		    SELECT cat_ID
+		      FROM T_categories
+		     WHERE cat_blog_ID = '.$DB->quote( $blog ).'
+		  )
+		  AND post_assigned_user_ID NOT IN
+		  (
+		    SELECT bloguser_user_ID
+		      FROM T_coll_user_perms
+		     WHERE bloguser_can_be_assignee = 1
+		       AND bloguser_blog_ID = '.$DB->quote( $blog ).'
+		  )
+		  AND post_assigned_user_ID NOT IN
+		  (
+		    SELECT user_ID
+		      FROM T_users INNER JOIN T_coll_group_perms ON user_grp_ID = bloggroup_group_ID
+		     WHERE bloggroup_can_be_assignee = 1
+		       AND bloggroup_blog_ID = '.$DB->quote( $blog ).'
+		  )' );
+
+	if( $DB->rows_affected > 0 )
+	{
+		global $Messages;
+		$Messages->add( sprintf( '%d tasks have lost their assignee due to new permissions', $DB->rows_affected ), 'warning' );
+	}
+
+	// BLOCK CACHE INVALIDATION:
+	BlockCache::invalidate_key( 'set_coll_ID', $blog ); // Settings have changed
+	BlockCache::invalidate_key( 'set_coll_ID', 'any' ); // Settings of a have changed (for widgets tracking a change on ANY blog)
+
+	// cont_coll_ID  // Content has not changed
 }
 
 
@@ -817,11 +849,48 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 /**
  * Get a list of those statuses which can be displayed in the front office
  *
- * @return array
+ * @param integer blog ID
+ * @param string get setting for 'post' or 'comment'
+ * @return array front office statuses in the given blog
  */
-function get_inskin_statuses()
+function get_inskin_statuses( $blog_ID, $type )
 {
-	return array( 'published', 'community', 'protected', 'private', 'review', 'draft' );
+	if( empty( $blog_ID ) )
+	{ // When blog is not set return the default value
+		return array( 'published', 'community', 'protected', 'private', 'review' );
+	}
+
+	$BlogCache = & get_BlogCache();
+	$Blog = $BlogCache->get_by_ID( $blog_ID );
+	$inskin_statuses = $Blog->get_setting( ( $type == 'comment' ) ? 'comment_inskin_statuses' : 'post_inskin_statuses' );
+	return explode( ',', $inskin_statuses );
+}
+
+
+/**
+ * Get post/comment inskin statuses option list
+ *
+ * @param string type = 'post' or 'comment'
+ * @return array checklist options
+ */
+function get_inskin_statuses_options( & $edited_Blog, $type )
+{
+	$checklist_options = array();
+	if( $type != 'post' && $type != 'comment' )
+	{
+		return $checklist_options;
+	}
+
+	// Get all available statuses except 'deprecated', 'trash' and 'redirected'
+	$statuses = get_visibility_statuses( '', array( 'deprecated', 'trash', 'redirected' ) );
+	$inskin_statuses = $edited_Blog->get_setting( $type.'_inskin_statuses' );
+	foreach( $statuses as $status => $status_text )
+	{ // Add a checklist option for each possible front office post/comment status
+		$is_checked = ( strpos( $inskin_statuses, $status ) !== false );
+		$checklist_options[] = array( $type.'_inskin_'.$status, 1, $status_text, $is_checked );
+	}
+
+	return $checklist_options;
 }
 
 
@@ -830,9 +899,11 @@ function get_inskin_statuses()
  *
  * @param string Statuses format, defaults to translated statuses
  * @param array Statuses to exclude. Unused 'trash' status excluded by default
+ * @param array Check if current user has a permission for each status
+ * @param integer Blog ID
  * @return array of statuses
  */
-function get_visibility_statuses( $format = '', $exclude = array('trash') )
+function get_visibility_statuses( $format = '', $exclude = array('trash'), $check_perms = false, $blog_ID = NULL )
 {
 	switch( $format )
 	{
@@ -945,6 +1016,18 @@ function get_visibility_statuses( $format = '', $exclude = array('trash') )
 		}
 	}
 
+	if( $check_perms && ! is_null( $blog_ID ) )
+	{ // Check what status is available for current user
+		global $current_User;
+		foreach( $r as $status_key => $status_title )
+		{
+			if( ! $current_User->check_perm( 'blog_post!'.$status_key, 'create', false, $blog_ID ) )
+			{ // Unset this status from list because current user has no perms to use this status
+				unset( $r[ $status_key ] );
+			}
+		}
+	}
+
 	if( $format == 'keys' )
 	{ // Return status keys for 'visibility_array'
 		$r = array_keys( $r );
@@ -1051,7 +1134,7 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view' )
  *
  * @param array Params
  */
-function blogs_results_block( $params = array() )
+function blogs_user_results_block( $params = array() )
 {
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
@@ -1105,7 +1188,7 @@ function blogs_results_block( $params = array() )
 
 	// Get a count of the blogs which current user can delete
 	$deleted_blogs_count = count( $edited_User->get_deleted_blogs() );
-	if( $blogs_Results->total_rows > 0 && $deleted_blogs_count > 0 )
+	if( $blogs_Results->get_total_rows() > 0 && $deleted_blogs_count > 0 )
 	{	// Display action icon to delete all records if at least one record exists & user can delete at least one blog
 		$blogs_Results->global_icon( sprintf( T_('Delete all blogs owned by %s'), $edited_User->login ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_blogs&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
 	}
@@ -1113,6 +1196,9 @@ function blogs_results_block( $params = array() )
 	// Initialize Results object
 	blogs_results( $blogs_Results, array(
 			'display_owner' => false,
+			'display_plist' => false,
+			'display_order' => false,
+			'display_fav'   => false,
 		) );
 
 	if( is_ajax_content() )
@@ -1137,6 +1223,110 @@ function blogs_results_block( $params = array() )
 
 
 /**
+ * Display all blogs results table
+ *
+ * @param array Params
+ */
+function blogs_all_results_block( $params = array() )
+{
+	// Make sure we are not missing any param:
+	$params = array_merge( array(
+			'results_param_prefix' => 'blog_',
+			'results_title'        => T_('Blog list'),
+			'results_no_text'      => T_('No blog has been created yet!'),
+			'results_no_perm_text' => T_('Sorry, you have no permission to edit/view any blog\'s properties.'),
+		), $params );
+
+	if( !is_logged_in() )
+	{ // Only logged in users can access to this function
+		return;
+	}
+
+	global $current_User;
+
+	if( is_ajax_content() )
+	{
+		$order_action = param( 'order_action', 'string' );
+
+		if( $order_action == 'update' )
+		{ // Update an order to new value
+			$new_value = (int)param( 'new_value', 'string', 0 );
+			$order_data = param( 'order_data', 'string' );
+			$order_obj_ID = (int)str_replace( 'order-blog-', '', $order_data );
+			if( $order_obj_ID > 0 )
+			{ // Update blog order
+				$BlogCache = & get_BlogCache();
+				if( $updated_Blog = & $BlogCache->get_by_ID( $order_obj_ID, false ) )
+				{
+					if( $current_User->check_perm( 'blog_properties', 'edit', false, $updated_Blog->ID ) )
+					{ // Check permission to edit this Blog
+						$updated_Blog->set( 'order', $new_value );
+						$updated_Blog->dbupdate();
+						$BlogCache->clear();
+					}
+				}
+			}
+		}
+	}
+
+	$SQL = new SQL();
+	$SQL->SELECT( 'T_blogs.*, user_login' );
+	$SQL->FROM( 'T_blogs INNER JOIN T_users ON blog_owner_user_ID = user_ID' );
+
+	if( ! $current_User->check_perm( 'blogs', 'view' ) )
+	{ // We do not have perm to view all blogs... we need to restrict to those we're a member of:
+
+		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0'
+			. ' AND blog_ID = bloguser_blog_ID'
+			. ' AND bloguser_user_ID = ' . $current_User->ID . ' )'
+			. ' LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0'
+			. ' AND blog_ID = bloggroup_blog_ID'
+			. ' AND bloggroup_group_ID = ' . $current_User->grp_ID . ' )' );
+		$SQL->WHERE( 'blog_owner_user_ID = ' . $current_User->ID
+			. ' OR bloguser_ismember <> 0'
+			. ' OR bloggroup_ismember <> 0' );
+
+		$no_results = $params['results_no_perm_text'];
+	}
+	else
+	{
+		$no_results = $params['results_no_text'];
+	}
+
+	// Create result set:
+	$blogs_Results = new Results( $SQL->get(), $params['results_param_prefix'], '--------A' );
+	$blogs_Results->Cache = & get_BlogCache();
+	$blogs_Results->title = $params['results_title'];
+	$blogs_Results->no_results_text = $no_results;
+
+	if( $current_User->check_perm( 'blogs', 'create' ) )
+	{
+		global $dispatcher;
+		$blogs_Results->global_icon( T_('New blog...'), 'new', url_add_param( $dispatcher, 'ctrl=collections&amp;action=new' ), T_('New blog...'), 3, 4 );
+	}
+
+	// Initialize Results object
+	blogs_results( $blogs_Results );
+
+	if( is_ajax_content() )
+	{ // init results param by template name
+		if( !isset( $params[ 'skin_type' ] ) || ! isset( $params[ 'skin_name' ] ) )
+		{
+			debug_die( 'Invalid ajax results request!' );
+		}
+		$blogs_Results->init_params_by_skin( $params[ 'skin_type' ], $params[ 'skin_name' ] );
+	}
+
+	$blogs_Results->display( NULL, 'session' );
+
+	if( !is_ajax_content() )
+	{ // Create this hidden div to get a function name for AJAX request
+		echo '<div id="'.$params['results_param_prefix'].'ajax_callback" style="display:none">'.__FUNCTION__.'</div>';
+	}
+}
+
+
+/**
  * Initialize Results object for blogs list
  *
  * @param object Results
@@ -1146,13 +1336,16 @@ function blogs_results( & $blogs_Results, $params = array() )
 {
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
-			'display_id' => true,
-			'display_name' => true,
+			'display_id'       => true,
+			'display_name'     => true,
 			'display_fullname' => true,
-			'display_owner' => true,
-			'display_url' => true,
-			'display_locale' => true,
-			'display_actions' => true,
+			'display_owner'    => true,
+			'display_url'      => true,
+			'display_locale'   => true,
+			'display_plist'    => true,
+			'display_fav'      => true,
+			'display_order'    => true,
+			'display_actions'  => true,
 		), $params );
 
 	if( $params['display_id'] )
@@ -1171,7 +1364,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 		$blogs_Results->cols[] = array(
 				'th' => T_('Name'),
 				'order' => 'blog_shortname',
-				'td' => '<strong>%disp_coll_name( #blog_shortname#, #blog_ID# )%</strong>',
+				'td' => '<strong>%blog_row_name( #blog_shortname#, #blog_ID# )%</strong>',
 			);
 	}
 
@@ -1212,13 +1405,46 @@ function blogs_results( & $blogs_Results, $params = array() )
 			);
 	}
 
+	if( $params['display_plist'] )
+	{ // Display P.List column
+		$blogs_Results->cols[] = array(
+				'th' => T_('P.List'),
+				'order' => 'blog_in_bloglist',
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap',
+				'td' => '%blog_row_setting( #blog_ID#, "plist", #blog_in_bloglist# )%',
+			);
+	}
+
+	if( $params['display_fav'] )
+	{ // Display Favorite column
+		$blogs_Results->cols[] = array(
+				'th' => T_('Fav'),
+				'order' => 'blog_favorite',
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap',
+				'td' => '%blog_row_setting( #blog_ID#, "fav", #blog_favorite# )%',
+			);
+	}
+
+	if( $params['display_order'] )
+	{	// Display Order column
+		$blogs_Results->cols[] = array(
+				'th' => T_('Order'),
+				'order' => 'blog_order',
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap',
+				'td' => '%blog_row_order( #blog_ID#, #blog_order# )%',
+			);
+	}
+
 	if( $params['display_actions'] )
 	{	// Display Actions column
 		$blogs_Results->cols[] = array(
 				'th' => T_('Actions'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
-				'td' => '%disp_actions( #blog_ID# )%',
+				'td' => '%blog_row_actions( #blog_ID# )%',
 			);
 	}
 }
@@ -1230,25 +1456,25 @@ function blogs_results( & $blogs_Results, $params = array() )
  */
 
 /**
- * Get a blogs name with link to edit
+ * Get a blog name with link to edit
  *
  * @param string Blog name
  * @param integer Blog ID
  * @return string Link
  */
-function disp_coll_name( $coll_name, $coll_ID )
+function blog_row_name( $coll_name, $coll_ID )
 {
-	global $current_User, $ctrl;
+	global $current_User, $ctrl, $admin_url;
 	if( $ctrl == 'dashboard' )
-	{	// Dashboard
-		$edit_url = regenerate_url( 'ctrl', 'ctrl=dashboard&amp;blog='.$coll_ID );
+	{ // Dashboard
+		$edit_url = $admin_url.'?ctrl=dashboard&amp;blog='.$coll_ID;
 		$r = '<a href="'.$edit_url.'">';
 		$r .= $coll_name;
 		$r .= '</a>';
 	}
 	elseif( $current_User->check_perm( 'blog_properties', 'edit', false, $coll_ID ) )
-	{	// Blog setting & can edit
-		$edit_url = regenerate_url( 'ctrl', 'ctrl=coll_settings&amp;blog='.$coll_ID );
+	{ // Blog setting & can edit
+		$edit_url = $admin_url.'?ctrl=coll_settings&amp;blog='.$coll_ID;
 		$r = '<a href="'.$edit_url.'" title="'.T_('Edit properties...').'">';
 		$r .= $coll_name;
 		$r .= '</a>';
@@ -1260,6 +1486,93 @@ function disp_coll_name( $coll_name, $coll_ID )
 	return $r;
 }
 
+/**
+ * Get a blog order with link to edit
+ *
+ * @param integer Blog ID
+ * @param integer Blog order
+ * @return string Link or Text
+ */
+function blog_row_order( $blog_ID, $blog_order )
+{
+	global $current_User, $admin_url;
+
+	if( $current_User->check_perm( 'blog_properties', 'edit', false, $blog_ID ) )
+	{	// Blog setting & can edit
+		$edit_url = $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog_ID.'#blog_order';
+		$r = '<a href="'.$edit_url.'" id="order-blog-'.$blog_ID.'" style="display:block;">';
+		$r .= $blog_order;
+		$r .= '</a>';
+	}
+	else
+	{
+		$r = $blog_order;
+	}
+	return $r;
+}
+
+
+/**
+ * Get an icon to show that blog setting is enabled or disabled
+ * Make a link to switch setting value if user has permissions to edit blog settings
+ *
+ * @param integer Blog ID
+ * @param boolean Blog setting name: 'plist', 'favorite'
+ * @param boolean Blog setting value: 0, 1
+ * @return string Icon or Link to change setting
+ */
+function blog_row_setting( $blog_ID, $setting_name, $setting_value )
+{
+	global $current_User, $admin_url;
+
+	switch( $setting_name )
+	{
+		case'plist':
+			// Blog in public list
+			$title = $setting_value ?
+					T_('The blog is in public blog list.') :
+					T_('The blog is not in public blog list.');
+			break;
+
+		case'fav':
+			// Favorite Blog
+			$title = $setting_value ?
+					T_('The blog is favorite.') :
+					T_('The blog is not favorite.');
+			break;
+
+		default:
+			// Incorrect setting name
+			return;
+	}
+
+	if( $setting_value )
+	{ // Setting is enabled
+		$action = 'disable_setting';
+		$icon = 'enabled';
+	}
+	else
+	{ // Setting is disabled
+		$action = 'enable_setting';
+		$icon = 'disabled';
+	}
+
+	if( $current_User->check_perm( 'blog_properties', 'false', false, $blog_ID ) )
+	{ // Link to update blog setting
+		return '<a href="'.$admin_url.'?ctrl=coll_settings'
+			.'&amp;action='.$action
+			.'&amp;setting='.$setting_name
+			.'&amp;blog='.$blog_ID
+			.'&amp;'.url_crumb('collection').'">'
+				.get_icon( $icon, 'imgtag', array( 'title' => $title ) )
+			.'</a>';
+	}
+	else
+	{ // Simple icon to display current value of blog setting
+		return get_icon( $icon, 'imgtag', array( 'title' => $title ) );
+	}
+}
+
 
 /**
  * Get available actions for current blog
@@ -1267,7 +1580,7 @@ function disp_coll_name( $coll_name, $coll_ID )
  * @param integer Blog ID
  * @return string Action links
  */
-function disp_actions( $curr_blog_ID )
+function blog_row_actions( $curr_blog_ID )
 {
 	global $current_User, $admin_url;
 	$r = '';
@@ -1284,7 +1597,7 @@ function disp_actions( $curr_blog_ID )
 
 	if( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
 	{
-		$r .= action_icon( T_('Delete this blog...'), 'delete', $admin_url.'?ctrl=collections&amp;action=delete&amp;blog='.$curr_blog_ID.'&amp;'.url_crumb('collection').'&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) ) );
+		$r .= action_icon( T_('Delete this blog...'), 'delete', $admin_url.'?ctrl=collections&amp;tab=list&amp;action=delete&amp;blog='.$curr_blog_ID.'&amp;'.url_crumb('collection').'&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) ) );
 	}
 
 	if( empty($r) )

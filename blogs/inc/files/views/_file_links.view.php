@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -66,14 +66,13 @@ if( $mode != 'upload' )
 	// TYPE COLUMN:
 	function file_type( & $row )
 	{
-		global $current_File;
+		global $LinkOwner, $current_File;
 
-		// Instantiate a File object for this line:
-		$current_File = new File( $row->file_root_type, $row->file_root_ID, $row->file_path ); // COPY (FUNC) needed for following columns
-		// Flow meta data into File object:
-		$current_File->load_meta( false, $row );
-
-		return $current_File->get_preview_thumb( 'fulltype' );
+		$Link = $LinkOwner->get_link_by_link_ID( $row->link_ID );
+		// Instantiate a File object for this line
+		$current_File = $Link->get_File();
+		// Return Link tag
+		return $Link->get_preview_thumb();
 	}
 	$Results->cols[] = array(
 							'th' => T_('File'),
@@ -139,7 +138,7 @@ if( $mode != 'upload' )
 
 if( $LinkOwner->check_perm( 'edit' ) )
 {	// Check that we have permission to edit item:
-	echo '<div>', $LinkOwner->translate( 'Click on link %s icons below to link additional files to $ownerTitle$.',
+	echo '<div class="center">', $LinkOwner->translate( 'Click on link %s icons below to link additional files to $ownerTitle$.',
 							get_icon( 'link', 'imgtag', array('class'=>'top') ) ), '</div>';
 }
 

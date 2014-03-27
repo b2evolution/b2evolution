@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  *
@@ -117,7 +117,10 @@ class LinkUser extends LinkOwner
 			$edited_Link->set( 'creator_user_ID', $this->User->ID );
 			$edited_Link->set( 'lastedit_user_ID', $this->User->ID );
 		}
-		$edited_Link->dbinsert();
+		if( $edited_Link->dbinsert() && ( ! is_null( $this->Links ) ) )
+		{ // If user Links were already loaded update its content 
+			$this->Links[$edited_Link->ID] = & $edited_Link;
+		}
 	}
 
 	/**

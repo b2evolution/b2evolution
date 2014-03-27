@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -195,7 +195,7 @@ function validateCommentForm(form)
 	//           before display!
 
 	$Form->add_crumb( 'comment' );
-	$Form->hidden( 'comment_post_ID', $Item->ID );
+	$Form->hidden( 'comment_item_ID', $Item->ID );
 	if( !empty( $comment_reply_ID ) )
 	{
 		$Form->hidden( 'reply_ID', $comment_reply_ID );
@@ -257,7 +257,7 @@ function validateCommentForm(form)
 
 	// Message field:
 	$note = '';
-	// $note = T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags));
+	// $note = T_('Allowed XHTML tags').': '.evo_htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags));
 	$Form->textarea( $dummy_fields[ 'content' ], $comment_content, $params['textarea_lines'], $params['form_comment_text'], $note, 38, 'bComment' );
 
 	// set b2evoCanvas for plugins

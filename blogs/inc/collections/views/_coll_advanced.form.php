@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -163,17 +163,17 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 
 $Form->begin_fieldset( T_('Meta data').get_manual_link('blog_meta_data') );
 	// TODO: move stuff to coll_settings
-	$Form->text( 'blog_description', $edited_Blog->get( 'description' ), 60, T_('Short Description'), T_('This is is used in meta tag description and RSS feeds. NO HTML!'), 250, 'large' );
+	$Form->text( 'blog_shortdesc', $edited_Blog->get( 'shortdesc' ), 60, T_('Short Description'), T_('This is is used in meta tag description and RSS feeds. NO HTML!'), 250, 'large' );
 	$Form->text( 'blog_keywords', $edited_Blog->get( 'keywords' ), 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );
 	$Form->text( 'blog_footer_text', $edited_Blog->get_setting( 'blog_footer_text' ), 60, T_('Blog footer'), sprintf(
 		T_('Use &lt;br /&gt; to insert a line break. You might want to put your copyright or <a href="%s" target="_blank">creative commons</a> notice here.'),
 		'http://creativecommons.org/license/' ), 1000, 'large' );
 	$Form->textarea( 'single_item_footer_text', $edited_Blog->get_setting( 'single_item_footer_text' ), 2, T_('Single post footer'),
-		T_('This will be displayed after each post in single post view.').' '.sprintf( T_('Available variables: %s.'), '<b>$perm_url$</b>, <b>$title$</b>, <b>$excerpt$</b>, <b>$views$</b>, <b>$author$</b>, <b>$author_login$</b>' ), 50, 'large' );
+		T_('This will be displayed after each post in single post view.').' '.sprintf( T_('Available variables: %s.'), '<b>$perm_url$</b>, <b>$title$</b>, <b>$excerpt$</b>, <b>$author$</b>, <b>$author_login$</b>' ), 50 );
 	$Form->textarea( 'xml_item_footer_text', $edited_Blog->get_setting( 'xml_item_footer_text' ), 2, T_('Post footer in RSS/Atom'),
-		T_('This will be appended to each post in your RSS/Atom feeds.').' '.sprintf( T_('Available variables: %s.'), T_('same as above') ), 50, 'large' );
+		T_('This will be appended to each post in your RSS/Atom feeds.').' '.sprintf( T_('Available variables: %s.'), T_('same as above') ), 50 );
 	$Form->textarea( 'blog_notes', $edited_Blog->get( 'notes' ), 5, T_('Notes'),
-		T_('Additional info. Appears in the backoffice.'), 50, 'large' );
+		T_('Additional info. Appears in the backoffice.'), 50 );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Software credits').get_manual_link('software_credits') );
@@ -194,17 +194,15 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 		$Form->checkbox( 'blog_allowblogcss', $edited_Blog->get( 'allowblogcss' ), T_('Allow customized blog CSS file'), T_('You will be able to customize the blog\'s skin stylesheet with a file named style.css in the blog\'s media file folder.') );
 		$Form->checkbox( 'blog_allowusercss', $edited_Blog->get( 'allowusercss' ), T_('Allow user customized CSS file for this blog'), T_('Users will be able to customize the blog and skin stylesheets with a file named style.css in their personal file folder.') );
 		$Form->textarea( 'blog_head_includes', $edited_Blog->get_setting( 'head_includes' ), 5, T_('Custom meta tag/css section (before &lt;/head&gt;)'),
-			T_('Add custom meta tags and/or css styles to the &lt;head&gt; section. Example use: website verification, Google+, favicon image...'), 50, 'large' );
+			T_('Add custom meta tags and/or css styles to the &lt;head&gt; section. Example use: website verification, Google+, favicon image...'), 50 );
 		$Form->textarea( 'blog_footer_includes', $edited_Blog->get_setting( 'footer_includes' ), 5, T_('Custom javascript section (before &lt;/body&gt;)'),
-			T_('Add custom javascript before the closing &lt;/body&gt; tag in order to avoid any issues with page loading delays for visitors with slow connection speeds.<br />Example use: tracking scripts, javascript libraries...'), 50, 'large' );
+			T_('Add custom javascript before the closing &lt;/body&gt; tag in order to avoid any issues with page loading delays for visitors with slow connection speeds.<br />Example use: tracking scripts, javascript libraries...'), 50 );
 	$Form->end_fieldset();
 
 }
 
 
-$Form->end_form( array(
-	array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
-	array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 
 ?>
 
@@ -227,6 +225,23 @@ $Form->end_form( array(
 		{
 			jQuery( '#ajax_form_enabled' ).attr( "checked", true );
 			jQuery( '#ajax_form_loggedin_enabled' ).attr( "disabled", false );
+		}
+	} );
+
+	var blog_media_location_current = '<?php echo empty( $edited_Blog->temp_old_media_location ) ? $edited_Blog->get( 'media_location' ) : $edited_Blog->temp_old_media_location; ?>';
+	jQuery( '#blogadvanced_checkchanges' ).submit( function()
+	{
+		var blog_media_location_updated = jQuery( 'input[name=blog_media_location]:checked' ).val();
+		if( blog_media_location_current != 'none' &&
+		    blog_media_location_updated != 'none' &&
+		    blog_media_location_current != blog_media_location_updated )
+		{
+			var msg = '<?php echo TS_('All files will be moved from old blog media directory to new. Are you sure?'); ?>';
+			if( <?php echo is_empty_directory( empty( $edited_Blog->temp_old_media_dir ) ? $edited_Blog->get_media_dir( false ) : $edited_Blog->temp_old_media_dir ) ? 'false' : 'true' ?> && blog_media_location_updated == 'custom' )
+			{
+				msg += "\n\n" + '<?php echo TS_('The blog\'s current media directory is not empty. It is your responsibility to move the files to the new media directory, otherwise the files will not be available in the file browser. Are you sure you want to proceed with the new setting?'); ?>';
+			}
+			return confirm( msg );
 		}
 	} );
 </script>

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -63,7 +63,7 @@ else
 }
 
 $SQL = new SQL();
-$SQL->SELECT( 'user_ID, user_login, user_level, bloguser_perm_poststatuses + 0 as perm_poststatuses, bloguser_perm_edit, bloguser_ismember,'
+$SQL->SELECT( 'user_ID, user_login, user_level, bloguser_perm_poststatuses + 0 as perm_poststatuses, bloguser_perm_edit, bloguser_ismember, bloguser_can_be_assignee,'
 	. 'bloguser_perm_delcmts, bloguser_perm_recycle_owncmts, bloguser_perm_vote_spam_cmts, bloguser_perm_cmtstatuses + 0 as perm_cmtstatuses, bloguser_perm_edit_cmt,'
 	. 'bloguser_perm_delpost, bloguser_perm_edit_ts, bloguser_perm_cats,'
 	. 'bloguser_perm_properties, bloguser_perm_admin, bloguser_perm_media_upload,'
@@ -140,7 +140,8 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Is<br />member'),
 						'th_class' => 'checkright',
-						'td' => '%coll_perm_checkbox( {row}, \'bloguser_\', \'ismember\', \''.format_to_output( TS_('Permission to read members posts'), 'htmlattr' ).'\', \'checkallspan_state_$user_ID$\' )%',
+						'td' => '%coll_perm_checkbox( {row}, \'bloguser_\', \'ismember\', \''.format_to_output( TS_('Permission to read members posts'), 'htmlattr' ).'\', \'checkallspan_state_$user_ID$\' )%'.
+						( $edited_Blog->get_setting( 'use_workflow' ) ? '%coll_perm_checkbox( {row}, \'bloguser_\', \'can_be_assignee\', \''.format_to_output( TS_('Items can be assigned to this user'), 'htmlattr' ).'\', \'checkallspan_state_$user_ID$\' )%' : '' ),
 						'td_class' => 'center',
 					);
 
@@ -295,7 +296,6 @@ foreach( $Results->rows as $row )
 }
 $Form->hidden( 'user_IDs', implode( ',', $user_IDs) );
 
-$Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'SaveButton' ),
-												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+$Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) ) );
 
 ?>

@@ -9,7 +9,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -80,6 +80,31 @@ class Messages
 	 * @var boolean
 	 */
 	var $has_errors = false;
+
+	/**
+	 * Params
+	 * 
+	 * @var array
+	 */
+	var $params = array();
+
+
+	/**
+	 * Constructor.
+	 *
+	 * @param array Params
+	 */
+	function Messages( $params = array() )
+	{
+		// Default params of messages
+		$this->params = array_merge( array(
+				'class_success'  => 'log_success',
+				'class_warning'  => 'log_warning',
+				'class_error'    => 'log_error',
+				'class_note'     => 'log_note',
+				'before_message' => '',
+			), $params );
+	}
 
 	/**
 	 * Clears messages content
@@ -201,7 +226,11 @@ class Messages
 		$disp .= '<ul>';
 		for( $i = 0; $i < $this->count; $i++ )
 		{
-			$disp .= "<li>\t<div class=\"log_{$this->messages_type[$i]}\"".'>'
+			$class = isset( $this->params['class_'.$this->messages_type[$i]] ) ?
+					$this->params['class_'.$this->messages_type[$i]] :
+					$this->params['class_note'];
+			$disp .= "<li>\t<div class=\"{$class}\"".'>'
+					.$this->params['before_message']
 					.$this->messages_text[$i]."</div></li>\n";
 		}
 		$disp .= '</ul>';
@@ -289,6 +318,20 @@ class Messages
 	function has_errors()
 	{
 		return $this->has_errors;
+	}
+
+
+	/**
+	 * Set params for messages
+	 *
+	 * @param array Params
+	 */
+	function set_params( $params = array() )
+	{
+		if( ! empty( $params ) )
+		{ // Change default params
+			$this->params = array_merge( $this->params, $params );
+		}
 	}
 }
 

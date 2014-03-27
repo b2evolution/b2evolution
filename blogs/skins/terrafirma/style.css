@@ -95,36 +95,32 @@ h1,h2,h3,h4,h5,h6
 {
 	font-family:Georgia, "Lucida Sans Unicode", Tahoma, Arial, Serif;
 }
-#upbg
-{
-	position: absolute;
-	top: 0;
-	left: 0;
-	background: #fff url('img/upbg.gif') no-repeat;
-	width: 747px;
-	height: 264px;
-	z-index: 1;
-}
 
 #wrapper
 {
 	position: relative;
-	width: 747px;
+	width: 717px;
 	margin: 0 auto;
-	background: #fff url('img/abg.gif') repeat-y;
+	background: #FFF;
+	border: 1px solid #dcdcd0;
 }
 
 #inner
 {
 	position: relative;
-	padding: 13px 30px 13px 30px;
+	padding: 13px 15px;
 	z-index: 2;
+	box-shadow: 0 15px 8px 5px rgba(0, 0, 0, 0.05);
 }
 
 .pageHeader
 {
 	position: absolute;
-	background: #FF7800 url('img/a8.gif') repeat-x;
+	background:-webkit-linear-gradient(top, #fb5100, #ff7800);
+	background:-moz-linear-gradient(top, #fb5100, #ff7800);
+	background:-o-linear-gradient(top, #fb5100, #ff7800);
+	background: -ms-linear-gradient(top, #fb5100, #ff7800);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fb5100', endColorstr='#ff7800');
 	width: 202px;
 	height: 92px;
 	color: #fff;
@@ -162,7 +158,7 @@ h1,h2,h3,h4,h5,h6
 #splash
 {
 	position: absolute;
-	right: 30px;
+	right: 15px;
 	background: #EAEAE2 url('img/a10.jpg') no-repeat;
 	width: 458px;
 	height: 92px;

@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -79,6 +79,8 @@ function skin_init( $disp )
 
 	global $Messages, $PageCache;
 
+	global $Session;
+
 	$Timer->resume( 'skin_init' );
 
 	if( empty($disp_detail) )
@@ -127,7 +129,7 @@ function skin_init( $disp )
 			init_ajax_forms( 'blog' ); // auto requires jQuery
 			init_ratings_js( 'blog' );
 			init_voting_comment_js( 'blog' );
-			init_scrollwide_js( 'blog' ); // Add jQuery Wide Scroll plugin
+			init_scrollwide_js( 'blog' ); // Add jQuery Wide Scroll JS plugin to horizontal scroll "div.wide_scroll" by yellow right/left panel arrows
 
 			if( $disp == 'single' )
 			{
@@ -143,7 +145,7 @@ function skin_init( $disp )
 			{	// $redir=no here allows to force a 'single post' URL for commenting
 				// Redirect to the URL specified in the post:
 				$Debuglog->add( 'Redirecting to post URL ['.$Item->url.'].' );
-				header_redirect( $Item->url, true );
+				header_redirect( $Item->url, true, true );
 			}
 
 			// Check if we want to redirect to a canonical URL for the post
@@ -205,7 +207,7 @@ function skin_init( $disp )
 
 		case 'posts':
 			init_ajax_forms( 'blog' ); // auto requires jQuery
-			init_scrollwide_js( 'blog' ); // Add jQuery Wide Scroll plugin
+			init_scrollwide_js( 'blog' ); // Add jQuery Wide Scroll JS plugin to horizontal scroll "div.wide_scroll" by yellow right/left panel arrows
 			// fp> if we add this here, we have to exetnd the inner if()
 			// init_ratings_js( 'blog' );
 
@@ -425,6 +427,9 @@ function skin_init( $disp )
 			// just in case some robot would be logged in:
 			$seo_page_type = 'Messaging module';
 			$robots_index = false;
+
+			// Display messages depending on user email status
+			display_user_email_status_message();
 			break;
 
 		case 'login':
@@ -474,6 +479,9 @@ function skin_init( $disp )
 			{	// We prefer robots not to index these pages:
 				$robots_index = false;
 			}
+
+			// Display messages depending on user email status
+			display_user_email_status_message();
 			break;
 
 		case 'users':
@@ -572,18 +580,11 @@ function skin_init( $disp )
 			{ // Init items list
 				global $user_ItemList;
 
-				$param_prefix = 'useritems_';
-				$page = param( $param_prefix.'paged', 'integer', 1 );
-				$orderby = param( $param_prefix.'orderby', 'string', $Blog->get_setting('orderby') );
-				$order = param( $param_prefix.'order', 'string', $Blog->get_setting('orderdir') );
 				$useritems_Blog = NULL;
-				$user_ItemList = new ItemList2( $useritems_Blog, NULL, NULL, NULL, 'ItemCache', $param_prefix );
+				$user_ItemList = new ItemList2( $useritems_Blog, NULL, NULL, NULL, 'ItemCache', 'useritems_' );
 				$user_ItemList->load_from_Request();
 				$user_ItemList->set_filters( array(
-						'page'          => $page,
-						'authors'       => $user_ID,
-						'orderby'       => str_replace( $param_prefix, '', $orderby ),
-						'order'         => str_replace( $param_prefix, '', $order ),
+						'authors' => $user_ID,
 					) );
 				$user_ItemList->query();
 			}
@@ -591,18 +592,10 @@ function skin_init( $disp )
 			{ // Init comments list
 				global $user_CommentList;
 
-				$param_prefix = 'usercmts_';
-				$page = param( $param_prefix.'paged', 'integer', 1 );
-				$orderby = param( $param_prefix.'orderby', 'string', 'date' );
-				$order = param( $param_prefix.'order', 'string', $Blog->get_setting('orderdir') );
-
-				$user_CommentList = new CommentList2( NULL, NULL, 'CommentCache', $param_prefix );
+				$user_CommentList = new CommentList2( NULL, NULL, 'CommentCache', 'usercmts_' );
 				$user_CommentList->load_from_Request();
 				$user_CommentList->set_filters( array(
-						'page'          => $page,
-						'author_IDs'    => $user_ID,
-						'orderby'       => str_replace( $param_prefix, '', $orderby ),
-						'order'         => str_replace( $param_prefix, '', $order ),
+						'author_IDs' => $user_ID,
 					) );
 				$user_CommentList->query();
 			}
@@ -615,11 +608,38 @@ function skin_init( $disp )
 				global $disp;
 				$disp = '404';
 			}
-			else
-			{
-				break;
-			}
+			break;
 
+		case 'closeaccount':
+			global $current_User;
+			if( ! $Settings->get( 'user_closing_allow' ) ||
+			    ( is_logged_in() && $current_User->check_perm( 'users', 'edit', false ) ) ||
+			    ( ! is_logged_in() && ! $Session->get( 'account_closing_success' ) ) )
+			{ // If an account closing page is disabled - Display 404 page with error message
+			  // Don't allow admins close own accounts from front office
+			  // Don't display this message for not logged in users, except of one case to display a bye message after account closing
+				global $disp;
+				$disp = '404';
+			}
+			elseif( $Session->get( 'account_closing_success' ) )
+			{ // User has closed the account
+				global $account_closing_success;
+				$account_closing_success = $Session->get( 'account_closing_success' );
+				// Unset this temp session var to don't display the message twice
+				$Session->delete( 'account_closing_success' );
+				if( is_logged_in() )
+				{ // log out current User
+					logout();
+				}
+			}
+			break;
+	}
+
+	$Debuglog->add('skin_init: $disp='.$disp. ' / $disp_detail='.$disp_detail.' / $seo_page_type='.$seo_page_type, 'skins' );
+
+	// Make this switch block special only for 404 page
+	switch( $disp )
+	{
 		case '404':
 			// We have a 404 unresolved content error
 			// How do we want do deal with it?
@@ -667,6 +687,18 @@ function skin_init( $disp )
 	}
 }
 
+function siteskin_init()
+{
+	// The following is temporary and should be moved to some SiteSkin class
+	global $Settings;
+
+	if( $Settings->get( 'site_skins_enabled' ) )
+	{ // Site skins are enabled
+		// Include the additional required files
+		siteskin_include( '_skin_init.inc.php' );
+	}
+}
+
 
 /**
  * Initialize skin for AJAX request
@@ -694,6 +726,35 @@ function skin_init_ajax( $skin_name, $disp )
 	}
 
 	return true;
+}
+
+
+/**
+ * Init some global variables used by skins
+ * Note: This initializations were removed from the _main.inc.php, because it should not be part of the main init.
+ */
+function skin_init_global_vars()
+{
+	global $credit_links, $francois_links, $fplanque_links, $skin_links, $skinfaktory_links;
+
+	$credit_links = array();
+	$francois_links = array(
+		'fr' => array( 'http://fplanque.net/', array( array( 78, 'Fran&ccedil;ois'),  array( 100, 'Francois') ) ),
+		'' => array( 'http://fplanque.com/', array( array( 78, 'Fran&ccedil;ois'),  array( 100, 'Francois') ) )
+	);
+	$fplanque_links = array(
+		'fr' => array( 'http://fplanque.net/', array( array( 78, 'Fran&ccedil;ois Planque'),  array( 100, 'Francois Planque') ) ),
+		'' => array( 'http://fplanque.com/', array( array( 78, 'Fran&ccedil;ois Planque'),  array( 100, 'Francois Planque') ) )
+	);
+	$skin_links = array(
+		'' => array( 'http://skinfaktory.com/', array( array( 15, 'b2evo skin'), array( 20, 'b2evo skins'), array( 35, 'b2evolution skin'), array( 40, 'b2evolution skins'), array( 55, 'Blog skin'), array( 60, 'Blog skins'), array( 75, 'Blog theme'),array( 80, 'Blog themes'), array( 95, 'Blog template'), array( 100, 'Blog templates') ) ),
+	);
+	$skinfaktory_links = array(
+		'' => array(
+			array( 73, 'http://evofactory.com/', array( array( 61, 'Evo Factory'), array( 68, 'EvoFactory'), array( 73, 'Evofactory') ) ),
+			array( 100, 'http://skinfaktory.com/', array( array( 92, 'Skin Faktory'), array( 97, 'SkinFaktory'), array( 99, 'Skin Factory'), array( 100, 'SkinFactory') ) ),
+		)
+	);
 }
 
 
@@ -801,7 +862,7 @@ function skin_include( $template_name, $params = array() )
 		if( !isset( $disp_handlers['disp_'.$disp] ) )
 		{
 			global $Messages;
-			$Messages->add( sprintf( 'Unhandled disp type [%s]', htmlspecialchars( $disp ) ) );
+			$Messages->add( sprintf( 'Unhandled disp type [%s]', evo_htmlspecialchars( $disp ) ) );
 			$Messages->display();
 			$Timer->pause( $timer_name );
 			$disp = '404';
@@ -851,6 +912,79 @@ function skin_include( $template_name, $params = array() )
 		if( !empty($current_User) && $current_User->level == 10 )
 		{
 			printf( '<div class="skin_error">User level 10 help info: [%s]</div>', $ads_current_skin_path.$template_name );
+		}
+	}
+
+	$Timer->pause( $timer_name );
+}
+
+
+/**
+ * Template tag.
+ *
+ * @param 
+ * @param 
+ * @param boolean force include even if sitewide header/footer not enabled 
+ */
+function siteskin_include( $template_name, $params = array(), $force = false )
+{
+	global $Settings, $siteskins_path;
+
+	if( !$Settings->get( 'site_skins_enabled' ) && !$force )
+	{ // Site skins are not enabled and we don't want to force either
+		return;
+	}
+
+	if( is_ajax_content( $template_name ) )
+	{ // When we request ajax content for results table we need to hide wrapper data (header, footer & etc)
+		return;
+	}
+
+	// Globals that may be needed by the template:
+	global $current_User, $Hit, $Session, $Settings;
+	global $skin_url, $htsrv_url, $htsrv_url_sensitive;
+	global $samedomain_htsrv_url, $secure_htsrv_url;
+	global $credit_links, $skin_links, $francois_links, $fplanque_links, $skinfaktory_links;
+	/**
+	* @var Log
+	*/
+	global $Debuglog;
+	global $Timer;
+
+	$timer_name = 'siteskin_include('.$template_name.')';
+	$Timer->resume( $timer_name );
+
+	$is_customized = false;
+
+	if( file_exists( $siteskins_path.'custom/'.$template_name ) )
+	{ // Use the default template:
+		global $Debuglog;
+		$file = $siteskins_path.'custom/'.$template_name;
+		$Debuglog->add('siteskin_include: '.rel_path_to_base($file), 'skins');
+		require $file;
+		$disp_handled = true;
+		// This template is customized, Don't include standard template
+		$is_customized = true;
+	}
+
+	if( !$is_customized )
+	{ // Try to include standard template only if custom template doesn't exist
+		if( file_exists( $siteskins_path.$template_name ) )
+		{ // Use the default template:
+			global $Debuglog;
+			$file = $siteskins_path.$template_name;
+			$Debuglog->add('siteskin_include: '.rel_path_to_base($file), 'skins');
+			require $file;
+			$disp_handled = true;
+		}
+	}
+
+	if( ! $disp_handled )
+	{ // nothing handled the display
+		printf( '<div class="skin_error">Site template [%s] not found.</div>', $template_name );
+		if( !empty($current_User) && $current_User->level == 10 )
+		{
+			printf( '<div class="skin_error">User level 10 help info: [%s]</div>', $siteskins_path.$template_name );
 		}
 	}
 

@@ -1,12 +1,17 @@
 /* Designed by François PLANQUE - http://fplanque.net/ */
 
 body {
-	background: #fff url(img/bg.png) repeat-y 50% 0;
+	background: #fff;
 	padding: 0px;
 	margin: 0px;
 	color: #000;
 	font: 84% Arial, Helvetica, sans-serif;
 }
+
+div#skin_wrapper div.sitewide_header {
+	margin-bottom: 0;
+}
+
 textarea, input, select, option, optgroup, ul.ui-autocomplete, li.token-input-token-facebook, div.token-input-dropdown-facebook {
 	font: 13.43px Arial, Helvetica, sans-serif;
 }
@@ -30,6 +35,9 @@ div.pageHeader h1 a:visited {  /* IE6 */
 }
 div.pageHeader h1 a:hover {
 	text-decoration: underline;
+}
+.top_menu{
+	height: 22px;
 }
 
 h2 {
@@ -88,23 +96,23 @@ hr {
 	border-top: 1px solid #78a;
 }
 
-div.wrapper_left {
-	background: #fff url(img/bg_content_left.gif) repeat-y 0 0;
-}
-
-div.wrapper_right {
-	background: #fff url(img/bg_content_right.gif) repeat-y 0 0;
-}
-
 div#wrapper {
 	width: 740px;
 	margin: 0 auto;
 	padding: 0;
+	box-shadow: 0 0 20px 0 rgba(0,0,0,0.4);
+	border-left: 1px solid #000;
+	border-right: 1px solid #000;
+}
+div#wrapper.wrapper_right .bPosts {
+	border-right: 1px solid #DDD;
+}
+div#wrapper.wrapper_left .bPosts {
+	border-left: 1px solid #DDD;
 }
 
 div.pageHeader {
 	padding: 1ex;
-	margin: 0 1px 0 1px;
 	border-bottom: 1px solid #000;
 	text-align: center;
 	background: #78a;
@@ -133,7 +141,7 @@ div.PageTop ul li {
 
 div.top_menu ul {
 	background-color: #ddd;
-	margin: 0 1px;
+	margin: 0;
 	padding: 0;
 	list-style-type:none;
 	padding: .5ex 0;
@@ -196,7 +204,6 @@ h2 {
 	float: left;
 	width: 480px;
 	overflow: hidden;
-	/* background: #090;*/
 }
 
 .bPosts_left {
@@ -212,7 +219,6 @@ div.action_messages {
 	margin: 0 2.5ex;
 	padding: 0;
 	border-bottom: 1px solid #ddd;
-	/* border: 1px solid #78a; */
 }
 .bSmallHead {
 	font-size: 80%;
@@ -270,15 +276,20 @@ input.preview:hover {
 
 /* Styles for sidebar (right) */
 .bSideBar {
-	width: 259px;
+	width: 258px;
 	float: right;
 	overflow: hidden;
-	/* background: #900; */
+	border-left: 1px solid #DDD;
+	position: relative;
+	left: -1px;
 }
 
 /* Styles for sidebar (left) */
 .bSideBar_left {
 	float: left;
+	border-left: none;
+	border-right: 1px solid #DDD;
+	left: 1px;
 }
 
 .bSideItem {

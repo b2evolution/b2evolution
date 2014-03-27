@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}
  * Parts of this file are copyright (c)2005 by Jason EDGECOMBE
  *
@@ -298,13 +298,20 @@ function create_default_data()
 	// Insert default settings into T_settings.
 	create_default_settings();
 
-	// create default scheduled jobs
+	// Create default scheduled jobs
 	create_default_jobs();
 
 	task_begin( 'Creating default "help" slug... ' );
 	$DB->query( '
 		INSERT INTO T_slug( slug_title, slug_type )
 		VALUES( "help", "help" )', 'Add "help" slug' );
+	task_end();
+
+	// Create the 'Default' goal category which must always exists and which is not deletable
+	// The 'Default' category ID will be always 1 because it will be always the first entry in the T_track__goalcat table
+	task_begin( 'Creating default goal category... ' );
+	$DB->query( 'INSERT INTO T_track__goalcat ( gcat_name, gcat_color )
+		VALUES ( '.$DB->quote( 'Default' ).', '.$DB->quote( '#999999' ).' )' );
 	task_end();
 
 	install_basic_skins();
@@ -759,8 +766,8 @@ function create_default_countries( $table_name = 'T_regional__country', $set_pre
 		preg_match('#.*?-(.*)#', strtolower($current_locale),$result);
 
 		$DB->query( "UPDATE $table_name
-										SET ctry_preferred = 1
-									WHERE ctry_code = '".$DB->escape($result[1])."'");
+			SET ctry_preferred = 1, ctry_status = 'trusted'
+			WHERE ctry_code = '".$DB->escape($result[1])."'" );
 	}
 	task_end();
 }
@@ -1010,6 +1017,7 @@ function create_default_jobs( $is_upgrade = false )
 	$moderation_reminder_ctrl = 'cron/jobs/_comment_moderation_reminder.job.php';
 	$light_db_maintenance_ctrl = 'cron/jobs/_light_db_maintenance.job.php';
 	$heavy_db_maintenance_ctrl = 'cron/jobs/_heavy_db_maintenance.job.php';
+	$prune_comments_ctrl = 'cron/jobs/_prune_recycled_comments.job.php';
 
 	// init insert values
 	// run unread messages reminder in every 29 minutes
@@ -1024,6 +1032,7 @@ function create_default_jobs( $is_upgrade = false )
 	$light_db_maintenance = "( ".$DB->quote( form_date( $date, '06:00:00' ) ).", 86400, ".$DB->quote( T_('Light DB maintenance (ANALYZE)') ).", ".$DB->quote( $light_db_maintenance_ctrl ).", ".$ctsk_params." )";
 	$next_sunday = date2mysql( strtotime( 'next Sunday',  $localtimenow + 86400 ) );
 	$heavy_db_maintenance = "( ".$DB->quote( form_date( $next_sunday, '06:30:00' ) ).", 604800, ".$DB->quote( T_('Heavy DB maintenance (CHECK & OPTIMIZE)') ).", ".$DB->quote( $heavy_db_maintenance_ctrl ).", ".$ctsk_params." )";
+	$prune_comments = "( ".$DB->quote( form_date( $date, '06:30:00' ) ).", 86400, ".$DB->quote( T_( 'Prune recycled comments' ) ).", ".$DB->quote( $prune_comments_ctrl ).", ".$ctsk_params." )";
 	$insert_values = array(
 		$messages_reminder_ctrl => $messages_reminder,
 		$activate_reminder_ctrl => $activate_reminder,
@@ -1033,7 +1042,8 @@ function create_default_jobs( $is_upgrade = false )
 		$poll_antispam_ctrl => $poll_antispam,
 		$moderation_reminder_ctrl => $moderation_reminder,
 		$light_db_maintenance_ctrl => $light_db_maintenance,
-		$heavy_db_maintenance_ctrl => $heavy_db_maintenance );
+		$heavy_db_maintenance_ctrl => $heavy_db_maintenance,
+		$prune_comments_ctrl => $prune_comments );
 	if( $is_upgrade )
 	{ // Check if these jobs already exist, and don't create another
 		$SQL = new SQL();
@@ -1081,6 +1091,7 @@ function create_blog(
 	$use_inskin_login = 0,
 	$blog_access_type = 'relative',
 	$allow_html = true,
+	$in_bloglist = 1,
 	$owner_user_ID = 1 )
 {
 	global $default_locale, $test_install_all_features, $local_installation;
@@ -1092,6 +1103,7 @@ function create_blog(
 	$Blog->set( 'tagline', $blog_tagline );
 	$Blog->set( 'longdesc', $blog_longdesc );
 	$Blog->set( 'locale', $default_locale );
+	$Blog->set( 'in_bloglist', (int)$in_bloglist );
 	$Blog->set( 'owner_user_ID', $owner_user_ID );
 	$Blog->set_setting( 'normal_skin_ID', $blog_skin_ID );
 	if( $local_installation )
@@ -1137,6 +1149,8 @@ function create_blog(
 		$Blog->set_setting( 'allow_html_post', 0 );
 		$Blog->set_setting( 'allow_html_comment', 0 );
 	}
+
+	$Blog->set( 'order', $Blog->ID );
 
 	$Blog->dbupdate();
 
@@ -1208,6 +1222,11 @@ function create_demo_contents()
 	 */
 	global $FileRootCache;
 
+	$lorem_1paragraph = "\n\n<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>";
+	
+	$lorem_2more = "\n\n<p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?</p>\n\n"
+		."<p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.</p>";
+
 	load_class( 'collections/model/_blog.class.php', 'Blog' );
 	load_class( 'files/model/_file.class.php', 'File' );
 	load_class( 'files/model/_filetype.class.php', 'FileType' );
@@ -1228,6 +1247,9 @@ function create_demo_contents()
 	$edit_File->load_meta( true );
 	$User_Admin->set( 'avatar_file_ID', $edit_File->ID );
 	$User_Admin->dbupdate();
+	// Set link between user and avatar file
+	$LinkOwner = new LinkUser( $User_Admin );
+	$edit_File->link_to_Object( $LinkOwner );
 	task_end();
 
 	task_begin('Creating demo amoderator user... ');
@@ -1310,14 +1332,13 @@ function create_demo_contents()
 	task_begin( 'Creating default blogs... ' );
 
 	$blog_shortname = 'Blog A';
-	$blog_a_long = sprintf( T_('%s Title'), $blog_shortname );
 	$blog_a_access_type = ( $test_install_all_features ) ? 'default' : $default_blog_access_type;
 	$blog_stub = 'a';
 	$blog_a_ID = create_blog(
-		$blog_a_long,
+		T_('Blog A Title'),
 		$blog_shortname,
 		$blog_stub,
-		sprintf( T_('Tagline for %s'), $blog_shortname ),
+		T_('Tagline for Blog A'),
 		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 		1, // Skin ID
 		'std',
@@ -1331,10 +1352,10 @@ function create_demo_contents()
 	$blog_b_access_type = ( $test_install_all_features ) ? 'index.php' : $default_blog_access_type;
 	$blog_stub = 'b';
 	$blog_b_ID = create_blog(
-		sprintf( T_('%s Title'), $blog_shortname ),
+		T_('Blog B Title'),
 		$blog_shortname,
 		$blog_stub,
-		sprintf( T_('Tagline for %s'), $blog_shortname ),
+		T_('Tagline for Blog B'),
 		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 		2, // Skin ID
 		'std',
@@ -1344,62 +1365,61 @@ function create_demo_contents()
 		true,
 		$bblogger_ID );
 
-	$blog_shortname = 'Linkblog';
+	$blog_shortname = 'Info';
 	$blog_linkblog_access_type = ( $test_install_all_features ) ? 'extrapath' : $default_blog_access_type;
-	$blog_stub = 'links';
+	$blog_stub = 'info';
 	$blog_more_longdesc = '<br />
 <br />
 <strong>'.T_("The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.").'</strong>';
 	$blog_linkblog_ID = create_blog(
-		'Linkblog',
+		'Info',
 		$blog_shortname,
 		$blog_stub,
-		T_('Some interesting links...'),
+		T_('Information about this site'),
 		sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
-		3, // SKin ID
+		3, // Skin ID
 		'std',
 		'any',
 		0,
 		$blog_linkblog_access_type,
 		true,
+		0,
 		$ablogger_ID );
 
-	$blog_shortname = 'Photoblog';
+	$blog_shortname = 'Photos';
 	$blog_stub = 'photos';
 	$blog_more_longdesc = '<br />
 <br />
 <strong>'.T_("This is a photoblog, optimized for displaying photos.").'</strong>';
 	$blog_photoblog_ID = create_blog(
-		'Photoblog',
+		'Photos',
 		$blog_shortname,
 		$blog_stub,
 		T_('This blog shows photos...'),
 		sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
-		4, // SKin ID
+		4, // Skin ID
 		'photo', '', 0, 'relative', true,
 		$ablogger_ID );
 
 	$blog_shortname = 'Forums';
-	$blog_forums_long = sprintf( T_('%s Title'), $blog_shortname );
 	$blog_stub = 'forums';
 	$blog_forums_ID = create_blog(
-		$blog_forums_long,
+		T_('Forums Title'),
 		$blog_shortname,
 		$blog_stub,
-		sprintf( T_('Tagline for %s'), $blog_shortname ),
+		T_('Tagline for Forums'),
 		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 		5, // Skin ID
 		'forum', 'any', 1, 'relative', false,
 		$ablogger_ID );
 
 	$blog_shortname = 'Manual';
-	$blog_manual_long = sprintf( T_('%s Title'), $blog_shortname );
 	$blog_stub = 'manual';
 	$blog_manual_ID = create_blog(
-		$blog_manual_long,
+		T_('Manual Title'),
 		$blog_shortname,
 		$blog_stub,
-		sprintf( T_('Tagline for %s'), $blog_shortname ),
+		T_('Tagline for Manual'),
 		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 		6, // Skin ID
 		'manual', 'any', 1, $default_blog_access_type, true,
@@ -1520,6 +1540,46 @@ function create_demo_contents()
 	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('b2evo skins repository'), '', $now, $cat_additional_skins, array(), 'published', 'en-US', '', 'http://skins.b2evolution.net/', 'open', array('default'), 3000 );
 
+	// Insert a post with markdown examples:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = new Item();
+	$edited_Item->insert( 1, T_('Markdown examples'), T_('Heading
+=======
+
+Sub-heading
+-----------
+
+###H3 header
+
+#### H4 header ####
+
+> Email-style angle brackets
+> are used for blockquotes.
+
+> > And, they can be nested.
+
+> ##### Headers in blockquotes
+>
+> * You can quote a list.
+> * Etc.
+
+[This is a link](http://b2evolution.net/) if Links are turned on in the markdown plugin settings
+
+Paragraphs are separated by a blank line.
+
+    This is a preformatted
+    code block.
+
+Text attributes *Italic*, **bold**, `monospace`.
+
+Shopping list:
+
+* apples
+* oranges
+* pears
+
+The rain---not the reign---in Spain.'), $now, $cat_news );
+
 	// PHOTOBLOG:
 	/**
 	 * @var FileRootCache
@@ -1530,47 +1590,32 @@ function create_demo_contents()
 	// Insert a post into photoblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
-	$edited_Item->insert( 1, T_('Bus Stop Ahead'), 'In the middle of nowhere: a school bus stop where you wouldn\'t really expect it!',
+	$edited_Item->insert( 1, T_('Bus Stop Ahead'), 'In the middle of nowhere: a school bus stop where you wouldn\'t really expect it!'.
+( $test_install_all_features ? '
+[infodot:20:191:36:100px]School bus [b]here[/b]
+
+####In the middle of nowhere:
+a school bus stop where you wouldn\'t really expect it!
+
+1. Item 1
+2. Item 2
+3. Item 3
+
+[enddot]
+[infodot:21:104:99]cowboy and horse[enddot]
+[infodot:23:207:28:15em]Red planet[enddot]' : '' ),
 					 $now, $cat_photo_album, array(), 'published','en-US', '', 'http://fplanque.com/photo/monument-valley' );
+	$LinkOwner = new LinkItem( $edited_Item );
 	$edit_File = new File( 'shared', 0, 'monument-valley/bus-stop-ahead.jpg' );
-	$LinkOwner = new LinkItem( $edited_Item );
-	$edit_File->link_to_Object( $LinkOwner );
-
-	// Insert a post into photoblog:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = new Item();
-	$edited_Item->insert( 1, T_('John Ford Point'), 'Does this scene look familiar? You\'ve probably seen it in a couple of John Ford westerns!',
-					 $now, $cat_photo_album, array(), 'published','en-US', '', 'http://fplanque.com/photo/monument-valley' );
+	$edit_File->link_to_Object( $LinkOwner, 1 );
 	$edit_File = new File( 'shared', 0, 'monument-valley/john-ford-point.jpg' );
-	$LinkOwner = new LinkItem( $edited_Item );
-	$edit_File->link_to_Object( $LinkOwner );
-
-	// Insert a post into photoblog:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = new Item();
-	$edited_Item->insert( 1, T_('Monuments'), 'This is one of the most famous views in Monument Valley. I like to frame it with the dirt road in order to give a better idea of the size of those things!',
-					 $now, $cat_photo_album, array(), 'published','en-US', '', 'http://fplanque.com/photo/monument-valley' );
+	$edit_File->link_to_Object( $LinkOwner, 2 );
 	$edit_File = new File( 'shared', 0, 'monument-valley/monuments.jpg' );
-	$LinkOwner = new LinkItem( $edited_Item );
-	$edit_File->link_to_Object( $LinkOwner );
-
-	// Insert a post into photoblog:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = new Item();
-	$edited_Item->insert( 1, T_('Road to Monument Valley'), 'This gives a pretty good idea of the Monuments you\'re about to drive into...',
-					 $now, $cat_photo_album, array(), 'published','en-US', '', 'http://fplanque.com/photo/monument-valley' );
+	$edit_File->link_to_Object( $LinkOwner, 3 );
 	$edit_File = new File( 'shared', 0, 'monument-valley/monument-valley-road.jpg' );
-	$LinkOwner = new LinkItem( $edited_Item );
-	$edit_File->link_to_Object( $LinkOwner );
-
-	// Insert a post into photoblog:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = new Item();
-	$edited_Item->insert( 1, T_('Monument Valley'), T_('This is a short photo album demo. Use the arrows to navigate between photos. Click on "Index" to see a thumbnail index.'),
-					 $now, $cat_photo_album, array(), 'published','en-US', '', 'http://fplanque.com/photo/monument-valley' );
+	$edit_File->link_to_Object( $LinkOwner, 4 );
 	$edit_File = new File( 'shared', 0, 'monument-valley/monument-valley.jpg' );
-	$LinkOwner = new LinkItem( $edited_Item );
-	$edit_File->link_to_Object( $LinkOwner );
+	$edit_File->link_to_Object( $LinkOwner, 5 );
 
 
 	// POPULATE THE LINKBLOG:
@@ -1607,7 +1652,7 @@ function create_demo_contents()
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
-	$edited_Item->insert( 1, 'Manual', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-US', '', 'http://b2evolution.net/man/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Manual', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-US', '', get_manual_url( NULL ), 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -1639,14 +1684,14 @@ function create_demo_contents()
 	// Insert a PAGE:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
-	$edited_Item->insert( 1, T_("About this system"), T_("<p>This blog platform is powered by b2evolution.</p>
+	$edited_Item->insert( 1, T_("About this site"), T_("<p>This blog platform is powered by b2evolution.</p>
 
-<p>You are currently looking at an info page about this system. It is cross-posted among the demo blogs. Thus, this page will be linked on each of these blogs.</p>
+<p>You are currently looking at an info page about this site.</p>
 
 <p>Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the sidebar instead.</p>
 
-<p>If needed, an evoskin can format info pages differently from regular posts.</p>"), $now, $cat_ann_a,
-		array( $cat_ann_a, $cat_ann_b, $cat_linkblog_b2evo, $cat_forums_ann ), 'published', '#', '', '', 'open', array('default'), 1000 );
+<p>If needed, an evoskin can format info pages differently from regular posts.</p>"), $now, $cat_linkblog_b2evo,
+		array( $cat_linkblog_b2evo ), 'published', '#', '', '', 'open', array('default'), 1000 );
 	$edit_File = new File( 'shared', 0, 'logos/b2evolution8.png' );
 	$LinkOwner = new LinkItem( $edited_Item );
 	$edit_File->link_to_Object( $LinkOwner );
@@ -1689,7 +1734,7 @@ function create_demo_contents()
 
 <p>It will be featured whenever we have no specific \"Intro\" post to display for the current request. To see it in action, try displaying the \"Announcements\" category.</p>
 
-<p>Also note that when the post is featured, it does not appear in the regular post flow.</p>"),
+<p>Also note that when the post is featured, it does not appear in the regular post flow.</p>").$lorem_1paragraph,
 	$now, $cat_b2evo, array( $cat_ann_b ) );
 	$edited_Item->set( 'featured', 1 );
 	$edited_Item->dbsave();
@@ -1700,8 +1745,8 @@ function create_demo_contents()
 	$edited_Item->insert( 1, T_("Apache optimization..."), sprintf( T_("<p>b2evolution comes with an <code>.htaccess</code> file destined to optimize the way b2evolution is handled by your webseerver (if you are using Apache). In some circumstances, that file may not be automatically activated at setup. Please se the man page about <a %s>Tricky Stuff</a> for more information.</p>
 
 <p>For further optimization, please review the manual page about <a %s>Performance optimization</a>. Depending on your current configuration and on what your <a %s>web hosting</a> company allows you to do, you may increase the speed of b2evolution by up to a factor of 10!</p>"),
-'href="http://b2evolution.net/man/tricky-stuff"',
-'href="http://b2evolution.net/man/performance-optimization"',
+'href="'.get_manual_url( 'tricky-stuff' ).'"',
+'href="'.get_manual_url( 'performance-optimization' ).'"',
 'href="http://b2evolution.net/web-hosting/"' ),
 												$now, $cat_b2evo, array( $cat_ann_b ) );
 
@@ -1740,7 +1785,7 @@ function create_demo_contents()
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
-	$edited_Item->insert( 1, T_("About skins..."), T_('<p>By default, b2evolution blogs are displayed using an evoskin.</p>
+	$edited_Item->insert( 1, T_("About skins..."), sprintf( T_('<p>By default, b2evolution blogs are displayed using an evoskin.</p>
 
 <p>You can change the skin used by any blog by editing the blog settings in the admin interface.</p>
 
@@ -1750,7 +1795,7 @@ function create_demo_contents()
 
 <p>To start customizing a skin, open its "<code>index.main.php</code>" file in an editor and read the comments in there. Note: you can also edit skins in the "Files" tab of the admin interface.</p>
 
-<p>And, of course, read the <a href="http://b2evolution.net/man/skin-structure" target="_blank">manual on skins</a>!</p>'), $now, $cat_b2evo );
+<p>And, of course, read the <a href="%s" target="_blank">manual on skins</a>!</p>'), get_manual_url( 'skin-structure' ) ), $now, $cat_b2evo );
 	$edited_Item->set_tags_from_string( 'skins' );
 	$edited_Item->set( 'featured', 1 );
 	$edited_Item->dbsave();
@@ -1773,31 +1818,30 @@ function create_demo_contents()
 	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('This is a multipage post'), T_('<p>This is page 1 of a multipage post.</p>
 
-<p>You can see the other pages by clicking on the links below the text.</p>
+<p>You can see the other pages by clicking on the links below the text.</p>').'
 
 <!--nextpage-->
 
-<p>This is page 2.</p>
+'.sprintf( T_("<p>This is page %d.</p>"), 2 ).$lorem_2more.'
 
 <!--nextpage-->
 
-<p>This is page 3.</p>
+'.sprintf( T_("<p>This is page %d.</p>"), 3 ).$lorem_1paragraph.'
 
 <!--nextpage-->
 
-<p>This is page 4.</p>
+'.sprintf( T_("<p>This is page %d.</p>"), 4 ).'
 
-<p>It is the last page.</p>'), $now, $cat_bg );
+'.T_('<p>It is the last page.</p>'), $now, $cat_bg );
 
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
-	$edited_Item->insert( 1, T_('Extended post with no teaser'), T_('<p>This is an extended post with no teaser. This means that you won\'t see this teaser any more when you click the "more" link.</p>
+	$edited_Item->insert( 1, T_('Extended post with no teaser'), T_('<p>This is an extended post with no teaser. This means that you won\'t see this teaser any more when you click the "more" link.</p>').$lorem_1paragraph
+	.'<!--more-->
 
-<!--more-->
-
-<p>This is the extended text. You only see it when you have clicked the "more" link.</p>'), $now, $cat_bg );
+'.T_('<p>This is the extended text. You only see it when you have clicked the "more" link.</p>').$lorem_2more, $now, $cat_bg );
 	$edited_Item->set_setting( 'hide_teaser', '1' );
 	$edited_Item->dbsave();
 
@@ -1805,26 +1849,28 @@ function create_demo_contents()
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
-	$edited_Item->insert( 1, T_('Extended post'), T_('<p>This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.</p>
+	$edited_Item->insert( 1, T_('Extended post'), T_('<p>This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.</p>').$lorem_1paragraph
+	.'<!--more-->
 
-<!--more-->
-
-<p>This is the extended text. You only see it when you have clicked the "more" link.</p>'), $now, $cat_bg );
+'.T_('<p>This is the extended text. You only see it when you have clicked the "more" link.</p>').$lorem_2more, $now, $cat_bg );
 
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
-	$Item_BlogA_welcome_ID = $edited_Item->insert( 1, T_("Welcome to b2evolution!"), T_("<p>Four blogs have been created with sample contents:</p>
+	$Item_BlogA_welcome_ID = $edited_Item->insert( 1, T_("Welcome to your b2evolution-powered website!"), 
+		T_("<p>To get you started, the installer has automatically created several sample collections and populated them with some sample contents. Of course, this starter structure is all yours to edit. Until you do that, though, here's what you will find on this site:</p>
 
 <ul>
-	<li><strong>Blog A</strong>: You are currently looking at it. It contains a few sample posts, using simple features of b2evolution.</li>
-	<li><strong>Blog B</strong>: You can access it from a link at the top of the page. It contains information about more advanced features.</li>
-	<li><strong>Linkblog</strong>: By default, the linkblog is included as a \"Blogroll\" in the sidebar of both Blog A &amp; Blog B.</li>
-	<li><strong>Photoblog</strong>: This blog is an example of how you can use b2evolution to showcase photos, with one photo per page as well as a thumbnail index.</li>
+<li><strong>Blog A</strong>: You are currently looking at it. It contains a few sample posts, using simple features of b2evolution.</li>
+<li><strong>Blog B</strong>: You can access it from the link at the top of the page. It contains information about more advanced features. Note that it is deliberately using a different skin from Blog A to give you an idea of what's possible.</li>
+<li><strong>Photos</strong>: This collection is an example of how you can use b2evolution to showcase photos, with photos grouped into photo albums.</li>
+<li><strong>Forums</strong>: This collection is a discussion forum (a.k.a. bulletin board) allowing your users to discuss among themselves.</li>
+<li><strong>Manual</strong>: This showcases how b2evolution can be used to publish structured content such as an online manual or book.</li>
+
 </ul>
 
-<p>You can add new blogs, delete unwanted blogs and customize existing blogs (title, sidebar, blog skin, widgets, etc.) from the Blog Settings tab in the admin interface.</p>"), $now, $cat_ann_a );
+<p>You can add new collections of any type (blog, photos, forums, etc.), delete unwanted one and customize existing collections (title, sidebar, blog skin, widgets, etc.) from the admin interface.</p>"), $now, $cat_ann_a );
 	$edit_File = new File( 'shared', 0, 'logos/b2evolution8.png' );
 	$LinkOwner = new LinkItem( $edited_Item );
 	$edit_File->link_to_Object( $LinkOwner );
@@ -1842,14 +1888,14 @@ function create_demo_contents()
 	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('First Topic'), T_('<p>This is the first topic.</p>
 
-<p>It appears in a single category.</p>'), $now, $cat_forums_ann );
+<p>It appears in a single category.</p>').$lorem_2more, $now, $cat_forums_ann );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('Second topic'), T_('<p>This is the second topic.</p>
 
-<p>It appears in multiple categories.</p>'), $now, $cat_forums_news, array( $cat_forums_ann ) );
+<p>It appears in multiple categories.</p>').$lorem_2more, $now, $cat_forums_news, array( $cat_forums_ann ) );
 
 
 	// Insert a post:
@@ -1868,21 +1914,21 @@ function create_demo_contents()
 	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('This is a multipage topic'), T_('<p>This is page 1 of a multipage topic.</p>
 
-<p>You can see the other pages by clicking on the links below the text.</p>
+<p>You can see the other pages by clicking on the links below the text.</p>').'
 
 <!--nextpage-->
 
-<p>This is page 2.</p>
+'.sprintf( T_("<p>This is page %d.</p>"), 2 ).$lorem_2more.'
 
 <!--nextpage-->
 
-<p>This is page 3.</p>
+'.sprintf( T_("<p>This is page %d.</p>"), 3 ).$lorem_1paragraph.'
 
 <!--nextpage-->
 
-<p>This is page 4.</p>
+'.sprintf( T_("<p>This is page %d.</p>"), 4 ).'
 
-<p>It is the last page.</p>'), $now, $cat_forums_bg );
+'.T_('<p>It is the last page.</p>'), $now, $cat_forums_bg );
 
 
 	// Insert a post:
@@ -1913,10 +1959,10 @@ function create_demo_contents()
 	$Item_Forum_welcome_ID = $edited_Item->insert( 1, T_("Welcome to b2evolution!"), T_("<p>Four blogs have been created with sample contents:</p>
 
 <ul>
-	<li><strong>Blog A</strong>: You are currently looking at it. It contains a few sample posts, using simple features of b2evolution.</li>
-	<li><strong>Blog B</strong>: You can access it from a link at the top of the page. It contains information about more advanced features.</li>
-	<li><strong>Linkblog</strong>: By default, the linkblog is included as a \"Blogroll\" in the sidebar of both Blog A &amp; Blog B.</li>
-	<li><strong>Photoblog</strong>: This blog is an example of how you can use b2evolution to showcase photos, with one photo per page as well as a thumbnail index.</li>
+<li><strong>Blog A</strong>: You are currently looking at it. It contains a few sample posts, using simple features of b2evolution.</li>
+<li><strong>Blog B</strong>: You can access it from a link at the top of the page. It contains information about more advanced features.</li>
+<li><strong>Linkblog</strong>: By default, the linkblog is included as a \"Blogroll\" in the sidebar of both Blog A &amp; Blog B.</li>
+<li><strong>Photos</strong>: This blog is an example of how you can use b2evolution to showcase photos, with one photo per page as well as a thumbnail index.</li>
 </ul>
 
 <p>You can add new blogs, delete unwanted blogs and customize existing blogs (title, sidebar, blog skin, widgets, etc.) from the Blog Settings tab in the admin interface.</p>"), $now, $cat_forums_ann );
@@ -1978,21 +2024,21 @@ function create_demo_contents()
 	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('This is a multipage topic'), T_('<p>This is page 1 of a multipage topic.</p>
 
-<p>You can see the other pages by clicking on the links below the text.</p>
+<p>You can see the other pages by clicking on the links below the text.</p>').'
 
 <!--nextpage-->
 
-<p>This is page 2.</p>
+'.sprintf( T_("<p>This is page %d.</p>"), 2 ).$lorem_2more.'
 
 <!--nextpage-->
 
-<p>This is page 3.</p>
+'.sprintf( T_("<p>This is page %d.</p>"), 3 ).$lorem_1paragraph.'
 
 <!--nextpage-->
 
-<p>This is page 4.</p>
+'.sprintf( T_("<p>This is page %d.</p>"), 4 ).'
 
-<p>It is the last page.</p>'), $now, $cat_manual_fun, array(),
+'.T_('<p>It is the last page.</p>'), $now, $cat_manual_fun, array(),
 		'published', '#', '', '', 'open', array('default'), 1, NULL, 8 );
 
 
@@ -2026,10 +2072,10 @@ function create_demo_contents()
 	$Item_Manual_welcome_ID = $edited_Item->insert( 1, T_("Welcome to b2evolution!"), T_("<p>Four blogs have been created with sample contents:</p>
 
 <ul>
-	<li><strong>Blog A</strong>: You are currently looking at it. It contains a few sample posts, using simple features of b2evolution.</li>
-	<li><strong>Blog B</strong>: You can access it from a link at the top of the page. It contains information about more advanced features.</li>
-	<li><strong>Linkblog</strong>: By default, the linkblog is included as a \"Blogroll\" in the sidebar of both Blog A &amp; Blog B.</li>
-	<li><strong>Photoblog</strong>: This blog is an example of how you can use b2evolution to showcase photos, with one photo per page as well as a thumbnail index.</li>
+<li><strong>Blog A</strong>: You are currently looking at it. It contains a few sample posts, using simple features of b2evolution.</li>
+<li><strong>Blog B</strong>: You can access it from a link at the top of the page. It contains information about more advanced features.</li>
+<li><strong>Linkblog</strong>: By default, the linkblog is included as a \"Blogroll\" in the sidebar of both Blog A &amp; Blog B.</li>
+<li><strong>Photos</strong>: This blog is an example of how you can use b2evolution to showcase photos, with one photo per page as well as a thumbnail index.</li>
 </ul>
 
 <p>You can add new blogs, delete unwanted blogs and customize existing blogs (title, sidebar, blog skin, widgets, etc.) from the Blog Settings tab in the admin interface.</p>"), $now, $cat_manual_ann, array( $cat_manual_life ),
@@ -2062,11 +2108,11 @@ function create_demo_contents()
 
 	// Comments for Blog A:
 	$now = date('Y-m-d H:i:s');
-	$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author,
+	$query = "INSERT INTO T_comments( comment_item_ID, comment_type, comment_author,
 																				comment_author_email, comment_author_url, comment_author_IP,
-																				comment_date, comment_content, comment_renderers, comment_karma)
+																				comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_karma)
 						VALUES( '".$Item_BlogA_welcome_ID."', 'comment', 'miss b2', 'missb2@example.com', 'http://example.com', '127.0.0.1',
-									 '$now', '".
+									 '$now', '$now', '".
 									 $DB->escape(T_('Hi, this is a comment.<br />To delete a comment, just log in, and view the posts\' comments, there you will have the option to edit or delete them.'))."', 'default', 0)";
 	$DB->query( $query );
 
@@ -2075,21 +2121,21 @@ function create_demo_contents()
 		for( $i_user_ID = 1; $i_user_ID <= 7; $i_user_ID++ )
 		{
 			$now = date('Y-m-d H:i:s');
-			$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author_ID, comment_author_IP,
-																				comment_date, comment_content, comment_renderers, comment_karma, comment_notif_status)
-								VALUES( '".$Item_BlogA_welcome_ID."', 'comment', '$i_user_ID', '127.0.0.1', '$now', '".
-											 $DB->escape( T_('Hi, this is my comment.') ). "', 'default', 0, 'finished')";
+			$query = "INSERT INTO T_comments( comment_item_ID, comment_type, comment_author_user_ID, comment_author_IP,
+																				comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_karma, comment_notif_status)
+								VALUES( '".$Item_BlogA_welcome_ID."', 'comment', '$i_user_ID', '127.0.0.1', '$now', '$now', '".
+											 $DB->escape( T_('Hi, this is my comment.') ). "', 'default', 0, 'finished' )";
 			$DB->query( $query );
 		}
 	}
 
 	// Comments for Forums:
 	$now = date('Y-m-d H:i:s');
-	$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author,
+	$query = "INSERT INTO T_comments( comment_item_ID, comment_type, comment_author,
 																				comment_author_email, comment_author_url, comment_author_IP,
-																				comment_date, comment_content, comment_renderers, comment_karma)
+																				comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_karma)
 						VALUES( '".$Item_Forum_welcome_ID."', 'comment', 'miss b2', 'missb2@example.com', 'http://example.com', '127.0.0.1',
-									 '$now', '".
+									 '$now', '$now', '".
 									 $DB->escape(T_('Hi, this is a comment.<br />To delete a comment, just log in, and view the posts\' comments, there you will have the option to edit or delete them.')). "', 'default', 0)";
 	$DB->query( $query );
 
@@ -2098,9 +2144,9 @@ function create_demo_contents()
 		for( $i_user_ID = 1; $i_user_ID <= 7; $i_user_ID++ )
 		{
 			$now = date('Y-m-d H:i:s');
-			$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author_ID, comment_author_IP,
-																				comment_date, comment_content, comment_renderers, comment_karma, comment_notif_status)
-								VALUES( '".$Item_Forum_welcome_ID."', 'comment', '$i_user_ID', '127.0.0.1', '$now', '".
+			$query = "INSERT INTO T_comments( comment_item_ID, comment_type, comment_author_user_ID, comment_author_IP,
+																				comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_karma, comment_notif_status)
+								VALUES( '".$Item_Forum_welcome_ID."', 'comment', '$i_user_ID', '127.0.0.1', '$now', '$now', '".
 											 $DB->escape( T_('Hi, this is my comment.') ). "', 'default', 0, 'finished')";
 			$DB->query( $query );
 		}
@@ -2108,11 +2154,11 @@ function create_demo_contents()
 
 	// Comments for Manual:
 	$now = date('Y-m-d H:i:s');
-	$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author,
+	$query = "INSERT INTO T_comments( comment_item_ID, comment_type, comment_author,
 																				comment_author_email, comment_author_url, comment_author_IP,
-																				comment_date, comment_content, comment_renderers, comment_karma)
+																				comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_karma)
 						VALUES( '".$Item_Manual_welcome_ID."', 'comment', 'miss b2', 'missb2@example.com', 'http://example.com', '127.0.0.1',
-									 '$now', '".
+									 '$now', '$now', '".
 									 $DB->escape(T_('Hi, this is a comment.<br />To delete a comment, just log in, and view the posts\' comments, there you will have the option to edit or delete them.')). "', 'default', 0)";
 	$DB->query( $query );
 
@@ -2121,9 +2167,9 @@ function create_demo_contents()
 		for( $i_user_ID = 1; $i_user_ID <= 7; $i_user_ID++ )
 		{
 			$now = date('Y-m-d H:i:s');
-			$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author_ID, comment_author_IP,
-																				comment_date, comment_content, comment_renderers, comment_karma, comment_notif_status)
-								VALUES( '".$Item_Manual_welcome_ID."', 'comment', '$i_user_ID', '127.0.0.1', '$now', '".
+			$query = "INSERT INTO T_comments( comment_item_ID, comment_type, comment_author_user_ID, comment_author_IP,
+																				comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_karma, comment_notif_status)
+								VALUES( '".$Item_Manual_welcome_ID."', 'comment', '$i_user_ID', '127.0.0.1', '$now', '$now', '".
 											 $DB->escape( T_('Hi, this is my comment.') ). "', 'default', 0, 'finished')";
 			$DB->query( $query );
 		}
@@ -2144,7 +2190,7 @@ function create_demo_contents()
 
 	task_begin( 'Creating default group/blog permissions... ' );
 	$query = "
-		INSERT INTO T_coll_group_perms( bloggroup_blog_ID, bloggroup_group_ID, bloggroup_ismember,
+		INSERT INTO T_coll_group_perms( bloggroup_blog_ID, bloggroup_group_ID, bloggroup_ismember, bloggroup_can_be_assignee,
 			bloggroup_perm_poststatuses, bloggroup_perm_edit, bloggroup_perm_delpost, bloggroup_perm_edit_ts,
 			bloggroup_perm_delcmts, bloggroup_perm_recycle_owncmts, bloggroup_perm_vote_spam_cmts, bloggroup_perm_cmtstatuses, bloggroup_perm_edit_cmt,
 			bloggroup_perm_cats, bloggroup_perm_properties,
@@ -2156,16 +2202,16 @@ function create_demo_contents()
 	// Init the permissions for all blogs
 	$all_statuses = "'published,community,deprecated,protected,private,review,draft'";
 	$gp_user_groups = array(
-			'admins'     => $Group_Admins->ID.",     1, $all_statuses, 'all', 1, 1, 1, 1, 1, $all_statuses, 'all', 1, 1, 1, 1, 1",
-			'privileged' => $Group_Privileged->ID.", 1, $all_statuses, 'le', 1, 0, 1, 1, 1, $all_statuses, 'le', 0, 0, 1, 1, 1",
-			'bloggers'   => $Group_Bloggers->ID.",   1, '', 'no', 0, 0, 0, 0, 1, '', 'no', 0, 0, 1, 1, 0",
+			'admins'     => $Group_Admins->ID.",     1, 1, $all_statuses, 'all', 1, 1, 1, 1, 1, $all_statuses, 'all', 1, 1, 1, 1, 1",
+			'privileged' => $Group_Privileged->ID.", 1, 1, $all_statuses, 'le', 1, 0, 1, 1, 1, $all_statuses, 'le', 0, 0, 1, 1, 1",
+			'bloggers'   => $Group_Bloggers->ID.",   1, 0, '', 'no', 0, 0, 0, 0, 1, '', 'no', 0, 0, 1, 1, 0",
 		);
 
 	// Init the special permissions for Forums
 	$gp_user_groups_forums = array(
-			'bloggers'   => $Group_Bloggers->ID.",   1, 'community,draft', 'no', 0, 0, 0, 0, 1, 'community,draft', 'no', 0, 0, 1, 1, 0",
-			'users'      => $Group_Users->ID.",      1, 'community,draft', 'no', 0, 0, 0, 0, 0, 'community,draft', 'no', 0, 0, 0, 0, 0",
-			'suspect'    => $Group_Suspect->ID.",    1, 'review,draft', 'no', 0, 0, 0, 0, 0, 'review,draft', 'no', 0, 0, 0, 0, 0"
+			'bloggers'   => $Group_Bloggers->ID.",   1, 0, 'community,draft', 'no', 0, 0, 0, 0, 1, 'community,draft', 'no', 0, 0, 1, 1, 0",
+			'users'      => $Group_Users->ID.",      1, 0, 'community,draft', 'no', 0, 0, 0, 0, 0, 'community,draft', 'no', 0, 0, 0, 0, 0",
+			'suspect'    => $Group_Suspect->ID.",    1, 0, 'review,draft', 'no', 0, 0, 0, 0, 0, 'review,draft', 'no', 0, 0, 0, 0, 0"
 		);
 	$gp_user_groups_forums = array_merge( $gp_user_groups, $gp_user_groups_forums );
 

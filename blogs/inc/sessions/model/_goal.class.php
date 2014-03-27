@@ -23,14 +23,19 @@ load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
  */
 class Goal extends DataObject
 {
+	var $gcat_ID = 0;
 	var $name = '';
 	var $key = '';
 	var $redir_url = '';
+	var $temp_redir_url = '';
+	var $temp_start_ts = NULL;
+	var $temp_end_ts = NULL;
+	var $notes = '';
 
 	/**
 	 * @var double
 	 */
- 	var $default_value = '';
+	var $default_value = '';
 
 
 	/**
@@ -51,14 +56,16 @@ class Goal extends DataObject
 
  		if( $db_row )
 		{
-			$this->ID            = $db_row->goal_ID;
-			$this->name          = $db_row->goal_name;
-			$this->key           = $db_row->goal_key;
-			$this->redir_url     = $db_row->goal_redir_url;
-			$this->default_value = $db_row->goal_default_value;
-		}
-		else
-		{	// Create a new goal:
+			$this->ID             = $db_row->goal_ID;
+			$this->gcat_ID        = $db_row->goal_gcat_ID;
+			$this->name           = $db_row->goal_name;
+			$this->key            = $db_row->goal_key;
+			$this->redir_url      = $db_row->goal_redir_url;
+			$this->temp_redir_url = $db_row->goal_temp_redir_url;
+			$this->temp_start_ts  = strtotime( $db_row->goal_temp_start_ts );
+			$this->temp_end_ts    = strtotime( $db_row->goal_temp_end_ts );
+			$this->default_value  = $db_row->goal_default_value;
+			$this->notes          = $db_row->goal_notes;
 		}
 	}
 
@@ -107,19 +114,62 @@ class Goal extends DataObject
 	 */
 	function load_from_Request()
 	{
+		// Category
+		param( 'goal_gcat_ID', 'integer', true );
+		param_check_not_empty( 'goal_gcat_ID', T_('Please select a category.') );
+		$this->set_from_Request( 'gcat_ID' );
+
 		// Name
 		$this->set_string_from_param( 'name', true );
 
 		// Key
 		$this->set_string_from_param( 'key', true );
 
-		// Redir URL:
-		$this->set_string_from_param( 'redir_url' );
+		// Temporary Redirection URL:
+		$this->set_string_from_param( 'temp_redir_url' );
+
+		// Normal Redirection URL:
+		param( 'goal_redir_url', 'string' );
+		if( $this->get( 'temp_redir_url' ) != '' )
+		{ // Normal Redirection URL is required when Temporary Redirection URL is not empty
+			param_check_not_empty( 'goal_redir_url', T_('Please enter Normal Redirection URL.') );
+		}
+		$this->set_from_Request( 'redir_url' );
+
+		// Temporary Start
+		$temp_start_date = param_date( 'goal_temp_start_date', T_('Please enter a valid date.'), false );
+		if( ! empty( $temp_start_date ) )
+		{
+			$temp_start_time = param( 'goal_temp_start_time', 'string' );
+			$temp_start_time = empty( $temp_start_time ) ? '' : param_time( 'goal_temp_start_time' );
+			$this->set( 'temp_start_ts', form_date( get_param( 'goal_temp_start_date' ), get_param( 'goal_temp_start_time' ) ) );
+		}
+		else
+		{
+			$this->set( 'temp_start_ts', NULL );
+		}
+
+		// Temporary End
+		$temp_end_date = param_date( 'goal_temp_end_date', T_('Please enter a valid date.'), false );
+		if( ! empty( $temp_end_date ) )
+		{
+			$temp_end_time = param( 'goal_temp_end_time', 'string' );
+			$temp_end_time = empty( $temp_end_time ) ? '' : param_time( 'goal_temp_end_time' );
+			$this->set( 'temp_end_ts', form_date( get_param( 'goal_temp_end_date' ), $temp_end_time ) );
+		}
+		else
+		{
+			$this->set( 'temp_end_ts', NULL );
+		}
 
 		// Default value:
 		param( 'goal_default_value', 'string' );
 		param_check_decimal( 'goal_default_value', T_('Default value must be a number.') );
 		$this->set_from_Request( 'default_value', 'goal_default_value', true  );
+
+		// Notes
+		param( 'goal_notes', 'text' );
+		$this->set_from_Request( 'notes', 'goal_notes' );
 
 		return ! param_errors_detected();
 	}
@@ -149,6 +199,7 @@ class Goal extends DataObject
 				return $this->set_param( $parname, 'number', $parvalue, true );
 
 			case 'redir_url':
+			case 'temp_redir_url':
 				return $this->set_param( $parname, 'string', $parvalue, true );
 
 			case 'name':
@@ -167,6 +218,34 @@ class Goal extends DataObject
 	function dbexists()
 	{
 		return parent::dbexists('goal_key', $this->key);
+	}
+
+
+	/**
+	 * Get redirection URL that is active now
+	 *
+	 * @param string $this->redir_url or $this->temp_redir_url
+	 */
+	function get_active_url()
+	{
+		if( empty( $this->temp_redir_url ) )
+		{ // Use normal redirection URL when temporary redirection URL is empty
+			return $this->redir_url;
+		}
+		else
+		{ // Check if we can use temporary redirection URL
+			global $localtimenow;
+
+			if( ( empty( $this->temp_start_ts ) || $this->temp_start_ts <= $localtimenow ) &&
+			    ( empty( $this->temp_end_ts ) || $this->temp_end_ts >= $localtimenow ) )
+			{ // Use temporary redirection URL now
+				return $this->temp_redir_url;
+			}
+			else
+			{ // Temporary redirection URL is out date, Use normal URL now
+				return $this->redir_url;
+			}
+		}
 	}
 }
 

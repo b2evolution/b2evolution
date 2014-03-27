@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -109,10 +109,12 @@ class msg_menu_link_Widget extends ComponentWidget
 						var curr_link_type = this.value;
 						var allow_blockcache = jQuery("[id$=\'_set_allow_blockcache\']");
 						var show_badge = jQuery("[id$=\'_set_show_badge\']");
+						var allow_blockcache_note = allow_blockcache.find(".notes");
 						if( curr_link_type == "messages" )
 						{
 							allow_blockcache.removeAttr(\'checked\');
 							allow_blockcache.attr( \'disabled\', \'disabled\' );
+							allow_blockcache_note.html("'.T_('The current configuration prevents caching this widget in the block cache.').'");
 							show_badge.removeAttr(\'disabled\');
 							show_badge.attr( \'checked\', \'checked\' );
 						}
@@ -121,6 +123,7 @@ class msg_menu_link_Widget extends ComponentWidget
 							allow_blockcache.removeAttr(\'disabled\');
 							show_badge.attr( \'disabled\', \'disabled\' );
 							allow_blockcache.attr( \'checked\', \'checked\' );
+							allow_blockcache_note.html("'.T_('Uncheck to prevent this widget from ever being cached in the block cache. (The whole page may still be cached.) This is only needed when a widget is poorly handling caching and cache keys.').'");
 							show_badge.removeAttr(\'checked\');
 						};'
 				),
@@ -158,19 +161,12 @@ class msg_menu_link_Widget extends ComponentWidget
 			{
 				$r['show_badge']['defaultvalue'] = false;
 				$r['show_badge']['disabled'] = 'disabled';
-				if( ! empty( $this->params ) && ! isset( $params['infinite_loop'] ) )
-				{ // Force show_badge to false! It is never allowed to be on, no matter what was set in the database.
-					$this->set( 'show_badge', false );
-				}
 			}
 			else
 			{
 				$r['allow_blockcache']['defaultvalue'] = false;
 				$r['allow_blockcache']['disabled'] = 'disabled';
-				if( ! empty( $this->params ) && ! isset( $params['infinite_loop'] ) )
-				{ // Force allow_blockache to false! It is never allowed to be on, no matter what was set in the database.
-					$this->set( 'allow_blockcache', false );
-				}
+				$r['allow_blockcache']['note'] = T_('The current configuration prevents caching this widget in the block cache.');
 			}
 		}
 

@@ -7,7 +7,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -119,7 +119,6 @@ class ItemList2 extends ItemListLight
 		$post_excerpt = param( 'post_excerpt', 'string', true );
 		$post_url = param( 'post_url', 'string', '' );
 		check_categories_nosave( $post_category, $post_extracats );
-		$post_views = param( 'post_views', 'integer', 0 );
 		$renderers = param( 'renderers', 'array/string', array('default') );
 		if( ! is_array($renderers) )
 		{ // dh> workaround for param() bug. See rev 1.93 of /inc/_misc/_misc.funcs.php
@@ -196,7 +195,6 @@ class ItemList2 extends ItemListLight
 			NULL AS post_tiny_slug_ID,
 			'".$DB->escape($post_url)."' AS post_url,
 			$post_category AS post_main_cat_ID,
-			$post_views AS post_views,
 			'' AS post_flags,
 			'noreq' AS post_notifications_status,
 			NULL AS post_notifications_ctsk_ID,
@@ -269,6 +267,12 @@ class ItemList2 extends ItemListLight
 
 		// INIT THE QUERY:
 		$this->query_init();
+
+		// Check the number of totla rows after it was initialized in the query_init() function
+		if( isset( $this->total_rows ) && ( intval( $this->total_rows ) === 0 ) )
+		{ // Count query was already executed and returned 0
+			return;
+		}
 
 		$select_temp_order = '';
 		if( !empty( $this->ItemQuery->order_by ) && strpos( $this->ItemQuery->order_by, 'post_order' ) !== false )
@@ -484,7 +488,7 @@ class ItemList2 extends ItemListLight
 						$this->nav_target = $current_Item->main_cat_ID;
 					}
 					$this->filters['cat_array'][] = $this->nav_target;
-					// Note: If there will be other navigation type ( like tag ) with params, those filters must be removed. 
+					// Note: If there will be other navigation type ( like tag ) with params, those filters must be removed.
 					break;
 
 				case 'same_author': // This doesn't require extra param because a post always has only one author
@@ -818,7 +822,7 @@ class ItemList2 extends ItemListLight
 				break;
 
 			default:
-				echo 'WARNING: unhandled sorting: '.htmlspecialchars( $orderby_array[0] );
+				echo 'WARNING: unhandled sorting: '.evo_htmlspecialchars( $orderby_array[0] );
 		}
 
 		// GET DATA ROWS:

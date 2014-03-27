@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -396,13 +396,6 @@ class PageCache
 			// unset the empty line
 			unset($lines[$i]);
 
-			// count item views happening on this page:
-			if( isset( $optional_headers[ 'item_IDs_on_this_page' ] ) )
-			{
-				global $shutdown_count_item_views;
-				$shutdown_count_item_views = explode( ',', $optional_headers[ 'item_IDs_on_this_page' ] );
-			}
-
 			// Check if the request has an If-Modified-Since date
 			if( array_key_exists( 'HTTP_IF_MODIFIED_SINCE', $_SERVER) )
 			{
@@ -426,9 +419,6 @@ class PageCache
 					}
 				}
 			}
-
-			// Page was modified, revert $shutdown_count_item_views set
-			$shutdown_count_item_views = array();
 
 			// ============== Ready to send cached version of the page =================
 
@@ -557,12 +547,6 @@ class PageCache
 			global $servertimenow;
 			$file_head .= $servertimenow."\n";
 
-			// set optional header line for item view count
-			global $shutdown_count_item_views;
-			if( !empty( $shutdown_count_item_views ) )
-			{
-				$file_head .= 'item_IDs_on_this_page:'.implode( ',', $shutdown_count_item_views )."\n";
-			}
 			global $skin;
 			if( !empty( $skin ) )
 			{ // add current skin folder into the cache file header

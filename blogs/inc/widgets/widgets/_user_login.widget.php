@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -170,10 +170,7 @@ class user_login_Widget extends ComponentWidget
 		{ // Set default blockcache to false and disable this setting because caching is never allowed for this widget
 			$r['allow_blockcache']['defaultvalue'] = false;
 			$r['allow_blockcache']['disabled'] = 'disabled';
-			if( ! empty( $this->params ) && ( ! isset( $params['infinite_loop'] ) ) )
-			{ // Force allow_blockache to false! It is never allowed to be on, no matter what was set in the database.
-				$this->set( 'allow_blockcache', false );
-			}
+			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
 		}
 
 		return $r;

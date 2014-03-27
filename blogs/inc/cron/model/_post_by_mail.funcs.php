@@ -5,7 +5,7 @@
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author Stephan Knauss
@@ -268,7 +268,7 @@ function pbm_process_messages( & $mbox, $limit )
 		if( empty($html_body) )
 		{	// Plain text message
 			pbm_msg('Message type: TEXT');
-			pbm_msg('Message body: <pre style="font-size:10px">'.htmlspecialchars($strbody).'</pre>');
+			pbm_msg('Message body: <pre style="font-size:10px">'.evo_htmlspecialchars($strbody).'</pre>');
 
 			// Process body. First fix different line-endings (dos, mac, unix), remove double newlines
 			$content = str_replace( array("\r", "\n\n"), "\n", trim($strbody) );
@@ -316,7 +316,7 @@ function pbm_process_messages( & $mbox, $limit )
 		$pbmUser = & pbm_validate_user_password( $user_login, $user_pass );
 		if( ! $pbmUser )
 		{
-			pbm_msg( sprintf( T_( 'Authentication failed for user &laquo;%s&raquo;' ), htmlspecialchars($user_login) ), true );
+			pbm_msg( sprintf( T_( 'Authentication failed for user &laquo;%s&raquo;' ), evo_htmlspecialchars($user_login) ), true );
 			rmdir_r( $tmpDirMIME );
 			continue;
 		}
@@ -444,7 +444,7 @@ function pbm_process_messages( & $mbox, $limit )
 		$params = array( 'object_type' => 'Item', 'object_Blog' => & $pbmBlog );
 		$Plugins_admin->filter_contents( $post_title /* by ref */, $content /* by ref */, $renderers, $params );
 
-		pbm_msg('Filtered post content: <pre style="font-size:10px">'.htmlspecialchars($content).'</pre>');
+		pbm_msg('Filtered post content: <pre style="font-size:10px">'.evo_htmlspecialchars($content).'</pre>');
 
 		$context = $Settings->get('eblog_html_tag_limit') ? 'commenting' : 'posting';
 		$post_title = check_html_sanity( $post_title, $context, $pbmUser );
@@ -660,7 +660,7 @@ function pbm_process_attachments( & $content, $mailAttachments, $mediadir, $medi
 		if( $filename == '' )
 		{
 			$filename = 'upload_'.uniqid().'.'.$attachment['SubType'];
-			pbm_msg( sprintf('Attachment without name. Using "%s".', htmlspecialchars($filename)) );
+			pbm_msg( sprintf('Attachment without name. Using "%s".', evo_htmlspecialchars($filename)) );
 		}
 
 		// Check valid filename/extension: (includes check for locked filenames)
@@ -700,10 +700,10 @@ function pbm_process_attachments( & $content, $mailAttachments, $mediadir, $medi
 		$imginfo = NULL;
 		if( ! $Settings->get('eblog_test_mode') )
 		{
-			pbm_msg( 'Saving file to: '.htmlspecialchars($mediadir.$filename) );
+			pbm_msg( 'Saving file to: '.evo_htmlspecialchars($mediadir.$filename) );
 			if( !copy( $attachment['DataFile'], $mediadir.$filename ) )
 			{
-				pbm_msg( 'Unable to copy uploaded file to '.htmlspecialchars($mediadir.$filename) );
+				pbm_msg( 'Unable to copy uploaded file to '.evo_htmlspecialchars($mediadir.$filename) );
 				continue;
 			}
 
@@ -795,7 +795,7 @@ function pbm_get_auth_tag( & $content )
 
 function pbm_prepare_html_message( $message )
 {
-	pbm_msg('Message body (original): <pre style="font-size:10px">'.htmlspecialchars($message).'</pre>');
+	pbm_msg('Message body (original): <pre style="font-size:10px">'.evo_htmlspecialchars($message).'</pre>');
 
 	$marker = 0;
 	if( preg_match( '~<body[^>]*>(.*?)</body>~is', $message, $result ) )
@@ -838,7 +838,7 @@ function pbm_prepare_html_message( $message )
 	);
 	$content = preg_replace( $patterns, '', $content );
 
-	pbm_msg('Message body (processed): <pre style="font-size:10px">'.htmlspecialchars($content).'</pre>');
+	pbm_msg('Message body (processed): <pre style="font-size:10px">'.evo_htmlspecialchars($content).'</pre>');
 
 	return array( $auth, $content );
 }

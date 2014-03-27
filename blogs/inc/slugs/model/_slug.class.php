@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -250,7 +250,7 @@ class Slug extends DataObject
 
 			default:
 				// not defined restriction
-				debug_die('Slug::get_object: Unhandled object type: '.htmlspecialchars($this->type));
+				debug_die('Slug::get_object: Unhandled object type: '.evo_htmlspecialchars($this->type));
 		}
 	}
 

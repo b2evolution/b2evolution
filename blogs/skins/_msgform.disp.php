@@ -10,7 +10,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  *
@@ -30,7 +30,7 @@ global $DB;
  *       login/logout link from the msgform page.
  *       BUT, for the logout link remembering it here is too late normally.. :/
  */
-$redirect_to = param( 'redirect_to', 'string', '' ); // pass-through (hidden field)
+$redirect_to = param( 'redirect_to', 'url', '' ); // pass-through (hidden field)
 $recipient_id = param( 'recipient_id', 'integer', 0 );
 $post_id = param( 'post_id', 'integer', 0 );
 $comment_id = param( 'comment_id', 'integer', 0 );
@@ -46,10 +46,10 @@ if( is_logged_in() )
 	$email_author = $current_User->get_preferred_name();
 	$email_author_address = $current_User->email;
 }
-if( ! strlen($email_author) && isset($_COOKIE[$cookie_name]) )
-{
-	$email_author = trim($_COOKIE[$cookie_name]);
-	$email_author_address = trim($_COOKIE[$cookie_email]);
+if( ! strlen( $email_author ) )
+{ // Try to get params from $_COOKIE through the param() function
+	$email_author = param_cookie( $cookie_name, 'string', '' );
+	$email_author_address = param_cookie( $cookie_email, 'string', '' );
 }
 
 $recipient_User = NULL;
@@ -86,7 +86,7 @@ if( !empty( $Blog ) && ( $Blog->get_ajax_form_enabled() ) )
 		$subject = '';
 	}
 	// init params
-	$json_params = array( 
+	$json_params = array(
 		'action' => 'get_msg_form',
 		'subject' => $subject,
 		'recipient_id' => $recipient_id,
@@ -105,7 +105,7 @@ else
 {
 	if( ! empty( $recipient_User ) )
 	{ // Get identity link for existed users
-		$recipient_link = $recipient_User->get_identity_link( array( 'link_text' => 'text' ) );
+		$recipient_link = $recipient_User->get_identity_link( array( 'link_text' => 'nickname' ) );
 	}
 	else
 	{ // Get login name for anonymous user
@@ -119,10 +119,4 @@ else
 	require '_contact_msg.form.php';
 }
 
-/*
- * $Log$
- * Revision 1.30  2013/11/06 08:05:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -32,21 +32,6 @@ function addEvent( elm, evType, fn, useCapture )
 
 
 /**
- * Browser status changed.
- * Warning: This is disabled in modern browsers.
- */
-function setstatus( message )
-{
-	window.status = message;
-	return true;
-}
-function resetstatus()
-{
-	window.status = 'Done';
-}
-
-
-/**
  * Opens a window, centers it and makes sure it gets focus.
  */
 function pop_up_window( href, target, width, height, params )
@@ -87,30 +72,6 @@ function pop_up_window( href, target, width, height, params )
 	}
 
 	// Tell the caller there is no need to process href="" :
-	return false;
-}
-
-
-/**
- * Shows/Hides target_id, and updates text_id object with either
- * text_when_displayed or text_when_hidden.
- *
- * It simply uses the value of the elements display attribute and toggles it.
- *
- * @return false
- */
-function toggle_display_by_id( text_id, target_id, text_when_displayed, text_when_hidden )
-{
-	if( document.getElementById(target_id).style.display=="" )
-	{
-		document.getElementById( text_id ).innerHTML = text_when_hidden;
-		document.getElementById( target_id ).style.display="none";
-	}
-	else
-	{
-		document.getElementById( text_id ).innerHTML = text_when_displayed;
-		document.getElementById( target_id ).style.display="";
-	}
 	return false;
 }
 

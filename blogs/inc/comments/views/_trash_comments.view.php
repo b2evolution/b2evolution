@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -29,14 +29,19 @@ $SQL = new SQL();
 $SQL->SELECT( 'DISTINCT(blog_ID), blog_name, count(comment_ID) as comments_number' ); // select target_title for sorting
 $SQL->FROM( 'T_blogs LEFT OUTER JOIN T_categories ON blog_ID = cat_blog_ID' );
 $SQL->FROM_add( 'LEFT OUTER JOIN T_items__item ON cat_ID = post_main_cat_ID' );
-$SQL->FROM_add( 'LEFT OUTER JOIN T_comments ON post_ID = comment_post_ID' );
+$SQL->FROM_add( 'LEFT OUTER JOIN T_comments ON post_ID = comment_item_ID' );
 $SQL->WHERE( 'comment_status = "trash"');
 $SQL->GROUP_BY( 'blog_ID' );
 
-// Create result set:
-$Results = new Results( $SQL->get(), 'emptytrash_' );
+$count_SQL = new SQL();
+$count_SQL->SELECT( 'COUNT( comment_ID )' );
+$count_SQL->FROM( 'T_comments' );
+$count_SQL->WHERE( 'comment_status = "trash"');
 
-$Results->title = T_('Comment recycle bins').' ('.$Results->total_rows.')';
+// Create result set:
+$Results = new Results( $SQL->get(), 'emptytrash_', '', NULL, $count_SQL->get() );
+
+$Results->title = T_('Comment recycle bins').' ('.$Results->get_total_rows().')';
 
 $Results->cols[] = array(
 			'th' => T_('Blog ID'),

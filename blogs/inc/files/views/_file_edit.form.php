@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -46,10 +46,9 @@ $Form->begin_form( 'fform', T_('Editing:').' '.$edited_File->get_rdfs_rel_path()
  	$Form->switch_layout( 'none' );
 	echo '<div class="center">';
 
-	$Form->textarea_input( 'file_content', $edited_File->content, 25, '', array( 'class'=>'large', 'cols' => '80' ) );
+	$Form->textarea_input( 'file_content', $edited_File->content, 25, '', array( 'cols' => '80' ) );
 
-	$Form->buttons( array( array( 'submit', '', T_('Save!'), 'SaveButton' ),
-												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+	$Form->buttons( array( array( 'submit', '', T_('Save Changes!'), 'SaveButton' ) ) );
 
 	echo '</div>';
  	$Form->switch_layout( NULL );

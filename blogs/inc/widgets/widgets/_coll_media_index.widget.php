@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -173,46 +173,46 @@ class coll_media_index_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $localtimenow;
+		global $localtimenow, $DB;
 
 		$this->init_display( $params );
 
 		global $Blog;
-		$list_blogs = ( $this->disp_params[ 'blog_ID' ] ? $this->disp_params[ 'blog_ID' ] : $Blog->ID );
-		//pre_dump( $list_blogs );
+		$blog_ID = ( $this->disp_params[ 'blog_ID' ] ? $this->disp_params[ 'blog_ID' ] : $Blog->ID );
+		//pre_dump( $blog_ID );
 
 		// Display photos:
 		// TODO: permissions, complete statuses...
 		// TODO: A FileList object based on ItemListLight but adding File data into the query?
 		//          overriding ItemListLigth::query() for starters ;)
 
-
+		// Init caches
+		$ItemCache = & get_ItemCache();
 		$FileCache = & get_FileCache();
 
-		$FileList = new DataObjectList2( $FileCache );
-
 		// Query list of files:
-		$SQL = new SQL();
-		$SQL->SELECT( 'post_ID, post_datestart, post_datemodified, post_main_cat_ID, post_urltitle, post_canonical_slug_ID,
+		// Note: We use ItemQuery to get attachments from all posts which should be visible ( even in case of aggregate blogs )
+		$ItemQuery = new ItemQuery( $ItemCache->dbtablename, $ItemCache->dbprefix, $ItemCache->dbIDname );
+		$ItemQuery->SELECT( 'post_ID, post_datestart, post_datemodified, post_main_cat_ID, post_urltitle, post_canonical_slug_ID,
 									post_tiny_slug_ID, post_ptyp_ID, post_title, post_excerpt, post_url, file_ID,
-									file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
-		$SQL->FROM( 'T_categories INNER JOIN T_postcats ON cat_ID = postcat_cat_ID
-									INNER JOIN T_items__item ON postcat_post_ID = post_ID
-									INNER JOIN T_links ON post_ID = link_itm_ID
-									INNER JOIN T_files ON link_file_ID = file_ID' );
-		$SQL->WHERE( 'cat_blog_ID IN ('.$list_blogs.')' ); // fp> TODO: want to restrict on images :]
-		$SQL->WHERE_and( 'post_status = "published"' );	// TODO: this is a dirty hack. More should be shown.
-		$SQL->WHERE_and( 'post_datestart <= \''.remove_seconds( $localtimenow ).'\'' );
+									file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash' );
+		$ItemQuery->FROM_add( 'INNER JOIN T_links ON post_ID = link_itm_ID' );
+		$ItemQuery->FROM_add( 'INNER JOIN T_files ON link_file_ID = file_ID' );
+		$ItemQuery->where_chapter( $blog_ID );
+		$ItemQuery->where_visibility( NULL );
+		$ItemQuery->WHERE_and( 'post_datestart <= \''.remove_seconds( $localtimenow ).'\'' );
 		if( !empty( $this->disp_params[ 'item_type' ] ) )
 		{ // Get items only with specified type
-			$SQL->WHERE_and( 'post_ptyp_ID = '.intval( $this->disp_params[ 'item_type' ] ) );
+			$ItemQuery->WHERE_and( 'post_ptyp_ID = '.intval( $this->disp_params[ 'item_type' ] ) );
 		}
-		$SQL->GROUP_BY( 'link_ID' );
-		$SQL->LIMIT( $this->disp_params[ 'limit' ]*4 ); // fp> TODO: because we have no way of getting images only, we get 4 times more data than requested and hope that 25% at least will be images :/
-		$SQL->ORDER_BY(	gen_order_clause( $this->disp_params['order_by'], $this->disp_params['order_dir'],
+		$ItemQuery->GROUP_BY( 'link_ID' );
+		$ItemQuery->LIMIT( intval( $this->disp_params[ 'limit' ] ) * 4 ); // fp> TODO: because no way of getting images only, we get 4 times more data than requested and hope that 25% at least will be images :/
+		$ItemQuery->ORDER_BY(	gen_order_clause( $this->disp_params['order_by'], $this->disp_params['order_dir'],
 											'post_', 'post_ID '.$this->disp_params['order_dir'].', link_ID' ) );
 
-		$FileList->sql = $SQL->get();
+		// Init FileList with the above defined query
+		$FileList = new DataObjectList2( $FileCache );
+		$FileList->sql = $ItemQuery->get();
 
 		$FileList->query( false, false, false, 'Media index widget' );
 
@@ -232,8 +232,9 @@ class coll_media_index_Widget extends ComponentWidget
 			}
 
 			if( ! $File->is_image() )
-			{	// Skip anything that is not an image
-				// fp> TODO: maybe this property should be stored in link_ltype_ID or in the files table
+			{ // Skip anything that is not an image
+				// Only images are selected or those files where we don't know the file type yet.
+				// This check is only for those files where we don't know the filte type. The file type will be set during the check.
 				continue;
 			}
 

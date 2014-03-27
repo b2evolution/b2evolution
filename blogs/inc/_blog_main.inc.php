@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -64,8 +64,20 @@ $BlogCache = & get_BlogCache();
 $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 if( empty( $Blog ) )
 {
-	require $skins_path.'_404_blog_not_found.main.php'; // error & exit
+	require $siteskins_path.'_404_blog_not_found.main.php'; // error & exit
 	// EXIT.
+}
+
+
+// Show/Hide the debug containers:
+$debug_containers = param( 'debug_containers', 'string' );
+if( $debug_containers == 'show' )
+{
+	$Session->set( 'debug_containers_'.$blog, 1 );
+}
+elseif( $debug_containers == 'hide' )
+{
+	$Session->delete( 'debug_containers_'.$blog );
 }
 
 
@@ -344,18 +356,30 @@ if( !empty($p) || !empty($title) )
 	else
 	{	// Get from post title:
 		$orig_title = $title;
+
+		// Remove .html or .htm extension:
+		$title = preg_replace( '/\.(html|htm)$/', '', $title );
+
 		// Convert all special chars to -
 		$title = preg_replace( '/[^A-Za-z0-9_]/', '-', $title );
+
+		// Search item by title:
 		$Item = & $ItemCache->get_by_urltitle( $title, false, false );
 
 		if( ( !empty( $Item ) ) && ( $Item !== false ) && (! $Item->is_part_of_blog( $blog ) ) )
 		{ // We have found an Item object, but it doesn't belong to the current blog!
+			// Check if we want to redirect moved posts:
+			if( $Settings->get( 'redirect_moved_posts' ) )
+			{ // Redirect to the item current permanent url
+				header_redirect( $Item->get_permanent_url(), 301 );
+				// already exited
+			}
 			unset($Item);
 		}
 
 		if( empty($Item) && substr($title, -1) == '-' )
-		{ // Try lookup by removing last invalid char, which might have been e.g. ">"
-			$Item = $ItemCache->get_by_urltitle(substr($title, 0, -1), false, false);
+		{ // Try lookup by removing last invalid chars, which might have been e.g. > | "> | , | ,. | ">?!
+			$Item = $ItemCache->get_by_urltitle( preg_replace( '/\-+$/', '', $title ), false, false );
 		}
 	}
 	if( empty( $Item ) )
@@ -429,6 +453,7 @@ if( !empty($p) || !empty($title) )
 		{	// We were not able to fallback to anything meaningful:
 			$disp = '404';
 			$disp_detail = '404-post_not_found';
+			$requested_404_title = $title;
 		}
 	}
 }
@@ -445,7 +470,7 @@ if( !empty($p) || !empty($title) )
  */
 if( $stats || $disp == 'stats' )
 {	// This used to be a spamfest...
-	require $skins_path.'_410_stats_gone.main.php'; // error & exit
+	require $siteskins_path.'_410_stats_gone.main.php'; // error & exit
 	// EXIT.
 }
 elseif( !empty($preview) )
@@ -481,6 +506,28 @@ elseif( ( ( $disp == 'page' ) || ( $disp == 'single' ) ) && empty( $Item ) )
 /*
  * ______________________ DETERMINE WHICH SKIN TO USE FOR DISPLAY _______________________
  */
+
+// Check if a forced skin has been requested (used by mobile skin switcher widget):
+param( 'force_skin', 'string', '' );
+if( ! empty( $force_skin ) )
+{ // Set the forced skin from request
+	if( $force_skin == 'auto' )
+	{ // Delete the forced skin from Session to use default skin
+		$Session->delete( 'force_skin' );
+	}
+	else
+	{ // Save the forced skin in Session
+		$Session->set( 'force_skin', $force_skin );
+	}
+}
+else
+{ // Try to get a skin from session
+	$force_skin = $Session->get( 'force_skin' );
+}
+if( ! empty( $force_skin ) )
+{ // The forced skin is defined in request or in Session
+	$skin = $Blog->get_skin_folder( $force_skin );
+}
 
 // Check if a temporary skin has been requested (used for RSS syndication for example):
 param( 'tempskin', 'string', '', true );
@@ -527,7 +574,7 @@ if( isset( $skin ) )
 	}
 	elseif( skin_exists( $skin ) && ! skin_installed( $skin ) )
 	{	// The requested skin is not a feed skin and exists in the file system, but isn't installed:
-		debug_die( sprintf( T_( 'The skin [%s] is not installed on this system.' ), htmlspecialchars( $skin ) ) );
+		debug_die( sprintf( T_( 'The skin [%s] is not installed on this system.' ), evo_htmlspecialchars( $skin ) ) );
 	}
 	elseif( ! empty( $tempskin ) )
 	{ // By definition, we want to see the temporary skin (if we don't use feedburner... )
@@ -547,7 +594,7 @@ if( !isset( $skin ) && !empty( $blog_skin_ID ) )	// Note: if $skin is set to '',
 if( !empty( $skin ) && !skin_exists( $skin ) )
 { // We want to use a skin, but it doesn't exist!
 	$err_msg = sprintf( T_('The skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file.'),
-		htmlspecialchars($skin),
+		evo_htmlspecialchars($skin),
 		$Blog->dget('shortname'),
 		'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$Blog->ID.'"' );
 	debug_die( $err_msg );
@@ -608,6 +655,9 @@ if( !empty( $skin ) )
 	if( ! $PageCache->check() )
 	{	// Cache miss, we have to generate:
 		$Timer->pause( 'PageCache' );
+
+		// Init global vars which may be required for any skin
+		skin_init_global_vars();
 
 		if( $skin_provided_by_plugin = skin_provided_by_plugin($skin) )
 		{

@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2014 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -55,6 +55,7 @@ param( 'domain', 'string' );
 param( 'filteron', 'string', '', true );
 param( 'filter', 'array/string', array() );
 
+$tab = param( 'tab', 'string', '', true );
 $tab3 = param( 'tab3', 'string', '', true );
 $tool = param( 'tool', 'string', '', true );
 
@@ -108,7 +109,7 @@ switch( $action )
 		// it has to be a minimum of 5 characters to avoid being too generic
 		if( evo_strlen($keyword) < 5 )
 		{
-			$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; is too short, it has to be a minimum of 5 characters!'), htmlspecialchars($keyword) ), 'error' );
+			$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; is too short, it has to be a minimum of 5 characters!'), evo_htmlspecialchars($keyword) ), 'error' );
 			break;
 		}
 
@@ -118,14 +119,14 @@ switch( $action )
 												WHERE hit_referer LIKE '.$DB->quote('%'.$keyword.'%'),
 												'Delete all banned hit-log entries' );
 
-			$Messages->add( sprintf( T_('Deleted %d logged hits matching &laquo;%s&raquo;.'), $r, htmlspecialchars($keyword) ), 'success' );
+			$Messages->add( sprintf( T_('Deleted %d logged hits matching &laquo;%s&raquo;.'), $r, evo_htmlspecialchars($keyword) ), 'success' );
 		}
 
 		if( $delcomments )
 		{ // select banned comments
 			$del_condition = blog_restrict( $delstatuses );
 			$keyword_cond = '(comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
-							OR comment_author_email LIKE '.$DB->quote('%'.$keyword.'%').'
+							OR comment_author_email LIKE '.$DB->quote('%'.evo_strtolower( $keyword ).'%').'
 							OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
 							OR comment_content LIKE '.$DB->quote('%'.$keyword.'%').')';
 			// asimo> we don't need transaction here 
@@ -134,18 +135,19 @@ switch( $action )
 				$query = 'SELECT comment_ID FROM T_comments
 							  WHERE '.$keyword_cond.$del_condition;
 				$deleted_ids = implode( ',', $DB->get_col($query, 0, 'Get comment ids awaiting for delete') );
-			};
-			// asimo> If a comment whith this keyword content was inserted here, the user will not even observe that (This is good)
-			$r = $DB->query('DELETE FROM T_comments
-			                  WHERE '.$keyword_cond.$del_condition );
-			$Messages->add( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars($keyword) ), 'success' );
+			}
+
+			// Delete all comments data from DB
+			$r = comments_delete_where( $keyword_cond.$del_condition );
+
+			$Messages->add( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, evo_htmlspecialchars($keyword) ), 'success' );
 		}
 
 		if( $blacklist_locally )
 		{ // Local blacklist:
 			if( antispam_create( $keyword ) )
 			{
-				$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; has been blacklisted locally.'), htmlspecialchars($keyword) ), 'success' );
+				$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; has been blacklisted locally.'), evo_htmlspecialchars($keyword) ), 'success' );
 				// Redirect so that a reload doesn't write to the DB twice:
 				if( $display_mode != 'js' )
 				{
@@ -375,7 +377,7 @@ switch( $action )
 			$Messages->add( T_('New IP Range created.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=antispam&tab3=ipranges', 303 ); // Will EXIT
+			header_redirect( '?ctrl=antispam&tab='.$tab.'&tab3=ipranges', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		$action = 'iprange_new';
@@ -401,7 +403,7 @@ switch( $action )
 			$Messages->add( T_('IP Range updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=antispam&tab3=ipranges', 303 ); // Will EXIT
+			header_redirect( '?ctrl=antispam&tab='.$tab.'&tab3=ipranges', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		$action = 'iprange_edit';
@@ -424,7 +426,7 @@ switch( $action )
 			$Messages->add( T_('IP Range deleted.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=antispam&tab3=ipranges', 303 ); // Will EXIT
+			header_redirect( '?ctrl=antispam&tab='.$tab.'&tab3=ipranges', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		break;
@@ -456,13 +458,23 @@ switch( $action )
 		break;
 }
 
-if( $display_mode != 'js')
+if( $display_mode != 'js' )
 {
-	$AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-	$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system' );
-	$AdminUI->breadcrumbpath_add( T_('Antispam'), '?ctrl=antispam' );
+	if( $tab == 'stats' )
+	{
+		$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Analytics'), 'url' => '?ctrl=stats&amp;blog=$blog$' ) );
+		$AdminUI->breadcrumbpath_add( T_('IPs'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( T_('IP Ranges'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+		$AdminUI->set_path( 'stats', 'ips', 'ranges' );
+	}
+	else
+	{
+		$AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
+		$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system' );
+		$AdminUI->breadcrumbpath_add( T_('Antispam'), '?ctrl=antispam' );
+	}
 
-	if( empty($tab3) )
+	if( empty( $tab3 ) )
 	{
 		$tab3 = 'blacklist';
 	}
@@ -492,9 +504,27 @@ if( $display_mode != 'js')
 			}
 			$AdminUI->breadcrumbpath_add( T_('IP Ranges'), '?ctrl=antispam&amp;tab3='.$tab3 );
 			break;
+
+		case 'countries':
+			if( $current_User->check_perm( 'options', 'edit' ) )
+			{
+				require_js( 'jquery/jquery.jeditable.js' );
+			}
+			break;
+
+		case 'domains':
+			load_funcs('sessions/model/_hitlog.funcs.php');
+			$AdminUI->breadcrumbpath_add( T_('Referring domains'), '?ctrl=antispam&amp;tab3='.$tab3 );
+			if( $current_User->check_perm( 'stats', 'edit' ) )
+			{
+				require_js( 'jquery/jquery.jeditable.js' );
+			}
+			// Used for edit form
+			$tab_from = 'antispam';
+			break;
 	}
 
-	if( !empty($tab3) )
+	if( !empty( $tab3 ) )
 	{
 		$AdminUI->append_path_level( $tab3 );
 	}
@@ -548,6 +578,14 @@ switch( $tab3 )
 				$AdminUI->disp_view( 'antispam/views/_antispam_ipranges.view.php' );
 				break;
 		}
+		break;
+
+	case 'countries':
+		$AdminUI->disp_view( 'regional/views/_country_list.view.php' );
+		break;
+
+	case 'domains':
+		$AdminUI->disp_view( 'sessions/views/_stats_refdomains.view.php' );
 		break;
 
 	case 'blacklist':

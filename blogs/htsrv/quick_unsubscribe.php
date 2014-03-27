@@ -64,9 +64,22 @@ switch( $type )
 		$UserSettings->dbupdate();
 		break;
 
-	case 'moderator':
-		// unsubscribe from moderation notifications
+	case 'cmt_moderation_reminder':
+		// unsubscribe from comment moderation reminder notifications
+		$UserSettings->set( 'send_cmt_moderation_reminder', '0', $edited_User->ID );
+		$UserSettings->dbupdate();
+		break;
+
+	case 'comment_moderator':
+	case 'moderator': // Note: This was not chaned to 'comment_moderator' to make sure old emails unsubscribe link are also work
+		// unsubscribe from new comment may need moderation notifications
 		$UserSettings->set( 'notify_comment_moderation', '0', $edited_User->ID );
+		$UserSettings->dbupdate();
+		break;
+
+	case 'post_moderator':
+		// unsubscribe from post moderation notifications
+		$UserSettings->set( 'notify_post_moderation', '0', $edited_User->ID );
 		$UserSettings->dbupdate();
 		break;
 
@@ -118,6 +131,12 @@ switch( $type )
 		$UserSettings->dbupdate();
 		break;
 
+	case 'account_changed':
+		// unsubscribe from account changed notifications
+		$UserSettings->set( 'notify_changed_account', '0', $edited_User->ID );
+		$UserSettings->dbupdate();
+		break;
+
 	case 'msgform':
 		// turn off allow emails through b2evo message forms
 		$UserSettings->set( 'enable_email', '0', $edited_User->ID );
@@ -133,11 +152,4 @@ switch( $type )
 
 echo( T_( 'You have successfully unsubscribed.' ) );
 exit;
-
-/*
- * $Log$
- * Revision 1.6  2013/11/06 08:03:44  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

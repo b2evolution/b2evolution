@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -149,7 +149,7 @@ class coll_search_form_Widget extends ComponentWidget
 		}
 
 		$s = get_param( 's' );
-		echo '<input type="text" name="s" size="25" value="'.htmlspecialchars($s).'" class="search_field SearchField" title="'.format_to_output( T_('Enter text to search for'), 'htmlattr' ).'" />';
+		echo '<input type="text" name="s" size="25" value="'.evo_htmlspecialchars($s).'" class="search_field SearchField" title="'.format_to_output( T_('Enter text to search for'), 'htmlattr' ).'" />';
 
 		if( $this->disp_params[ 'use_search_disp' ] )
 		{

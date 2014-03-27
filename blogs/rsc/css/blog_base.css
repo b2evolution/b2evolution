@@ -257,8 +257,7 @@ form.bComment fieldset div.avatartag a {
 }
 
 /* bComment TextArea */
-.bComment.form_textarea_input,
-#content.bComment.form_textarea_input {
+textarea.form_textarea_input {
 	width: 100%;
 }
 
@@ -828,6 +827,32 @@ div.results .status_trash span {
 }
 [class*='vs_'] .btn_next_status {
 	display: inline-block;
+}
+
+/* Photo Index */
+.image_index {
+	margin: 1ex auto;
+	text-align: center;
+}
+.image_index div {
+	display: inline-block;
+	background: #DDD;
+	text-align: center;
+	vertical-align: middle;
+	border: 1px solid #999;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-khtml-border-radius: 2px;
+	border-radius: 2px;
+	padding: 2px;
+	margin: 2px 2px 1px 1px;
+}
+.image_index div:hover {
+	background: #EEE;
+}
+.image_index div span {
+	display: table-cell;
+	vertical-align: middle;
 }
 
 .form_add_contacts .controls {

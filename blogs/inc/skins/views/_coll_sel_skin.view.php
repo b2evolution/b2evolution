@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -15,9 +15,13 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $kind;
+global $kind, $admin_url;
 
-echo '<h2>'.sprintf( T_('New %s'), get_collection_kinds($kind) ).':</h2>';
+$kind_title = get_collection_kinds( $kind );
+
+echo action_icon( sprintf( T_('Abort New %s'), $kind_title ), 'close', $admin_url.'?ctrl=collections&amp;tab=list', ' '.sprintf( T_('Abort New %s'), $kind_title ), 3, 3, array( 'class' => 'action_icon floatright' ) );
+
+echo '<h2>'.sprintf( T_('New %s'), $kind_title ).':</h2>';
 
 echo '<h3>'.T_('Pick a skin:').'</h3>';
 

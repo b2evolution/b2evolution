@@ -8,6 +8,10 @@ body {
 	background-color: #666;
 }
 
+div#skin_wrapper div.sitewide_header {
+	margin-bottom: 0;
+}
+
 textarea, input, select, option, optgroup, ul.ui-autocomplete, li.token-input-token-facebook, div.token-input-dropdown-facebook {
 	font: 13.43px Arial,Helvetica,sans-serif;
 }
@@ -24,6 +28,9 @@ a:hover {
 	text-decoration: underline;
 }
 
+.action_messages a {
+	color: #00F;
+}
 
 div#pageFooter {
 	padding: 0 0 1ex 0;
@@ -81,6 +88,9 @@ div.PageTop a:hover {
 	color: #fff;
 }
 
+div.top_menu > span.menu_link:not(:first-child):before {
+	content: " | ";
+}
 
 /* Styles for main area (left) */
 h2 {
@@ -187,19 +197,11 @@ select.bComment  /* Used by the profile form */
 	margin: 1em;
 }
 
-table.image_index {
-	margin: 1ex auto;
-}
-table.image_index td {
-	width: 88px;
-	height: 88px;
+.image_index div {
 	background: #555;
-	text-align: center;
-	vertical-align: middle;
 	border: 1px solid #333;
-	padding: 0;
 }
-table.image_index td:hover {
+.image_index div:hover {
 	background: #777;
 }
 
@@ -286,4 +288,12 @@ div.tabs div.selected a, div.tabs div a:hover {
 }
 div.tabs div.selected a {
 	border-bottom-color: #666;
+}
+
+.form_add_contacts .controls {
+	padding-left: 0;
+}
+
+.bImages .flowplayer_block, .bImages .videojs_block, .bImages .mediajs_block {
+	padding: 0 12px;
 }

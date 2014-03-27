@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -76,10 +76,16 @@ class File extends DataObject
 	var $desc;
 
 	/**
-	 * Meta data: Hash value of file path
+	 * Meta data: Hash value of file content
 	 * @var string
 	 */
 	var $hash;
+
+	/**
+	 * Meta data: Hash value of file path variables: $root_type, $root_ID, $rdfp_rel_path
+	 * @var string
+	 */
+	var $path_hash;
 
 	/**
 	 * FileRoot of this file
@@ -246,9 +252,7 @@ class File extends DataObject
 				array( 'table'=>'T_users', 'fk'=>'user_avatar_file_ID', 'msg'=>T_('%d linked users (profile pictures)') ),
 			);
 
-		$this->delete_cascades = array(
-				array( 'table'=>'T_files__vote', 'fk'=>'fvot_file_ID', 'msg'=>T_('%d votes') ),
-			);
+		$this->delete_cascades = array();
 
 		// Memorize filepath:
 		$FileRootCache = & get_FileRootCache();
@@ -293,9 +297,7 @@ class File extends DataObject
 			{	// No DB data has been provided:
 				$row = $DB->get_row( "
 					SELECT * FROM T_files
-					 WHERE file_root_type = '".$this->_FileRoot->type."'
-					   AND file_root_ID = ".$this->_FileRoot->in_type_ID."
-					   AND file_path = ".$DB->quote($this->_rdfp_rel_path),
+					 WHERE file_path_hash = ".$DB->quote( md5( $this->_FileRoot->type.$this->_FileRoot->in_type_ID.$this->_rdfp_rel_path, true ) ),
 					OBJECT, 0, 'Load file meta data' );
 			}
 
@@ -312,6 +314,7 @@ class File extends DataObject
 				{
 					$this->hash  = $row->file_hash;
 				}
+				$this->path_hash = $row->file_path_hash;
 
 				// Store this in the FileCache:
 				$FileCache = & get_FileCache();
@@ -1041,10 +1044,11 @@ class File extends DataObject
 	                  $image_class = '',
 	                  $image_align = '',
 	                  $image_alt = '',
-	                  $image_desc = '#' )
+	                  $image_desc = '#',
+	                  $image_link_id = '' )
 	{
 		if( $this->is_dir() )
-		{	// We can't reference a directory
+		{ // We can't reference a directory
 			return '';
 		}
 
@@ -1074,7 +1078,7 @@ class File extends DataObject
 			$img = '<img'.get_field_attribs_as_string($img_attribs).$image_class.$image_align.' />';
 
 			if( $image_link_to == 'original' )
-			{	// special case
+			{ // special case
 				$image_link_to = $this->get_url();
 			}
 			if( !empty( $image_link_to ) )
@@ -1088,13 +1092,16 @@ class File extends DataObject
 
 				if( !empty($image_link_title) )
 				{
-					$a .= ' title="'.htmlspecialchars($image_link_title).'"';
+					$a .= ' title="'.evo_htmlspecialchars($image_link_title).'"';
 				}
 				if( !empty($image_link_rel) )
 				{
-					$a .= ' rel="'.htmlspecialchars($image_link_rel).'"';
+					$a .= ' rel="'.evo_htmlspecialchars($image_link_rel).'"';
 				}
-				$a .= ' id="f'.$this->ID.'"';
+				if( !empty( $image_link_id ) )
+				{ // Set attribute "id" for link
+					$a .= ' id="'.$image_link_id.'"';
+				}
 				$img = $a.'>'.$img.'</a>';
 			}
 			$r .= $img;
@@ -1112,7 +1119,7 @@ class File extends DataObject
 			$r .= $after_image;
 		}
 		else
-		{	// Make an A HREF link:
+		{ // Make an A HREF link:
 			$r = '<a href="'.$this->get_url().'"'
 						// title
 						.( $this->get('desc') ? ' title="'.$this->dget('desc', 'htmlattr').'"' : '' ).'>'
@@ -1584,11 +1591,14 @@ class File extends DataObject
 	 * @access public
 	 * @return boolean true on success, false on failure
 	 */
-	function unlink()
+	function unlink( $use_transactions = true )
 	{
 		global $DB;
 
-		$DB->begin();
+		if( $use_transactions )
+		{
+			$DB->begin();
+		}
 
 		// Check if there is meta data to be removed:
 		if( $this->load_meta() )
@@ -1609,16 +1619,22 @@ class File extends DataObject
 			$unlinked =	@unlink( $this->_adfp_full_path );
 		}
 
-		if( !$unlinked )
+		if( ! $unlinked )
 		{
-			$DB->rollback();
+			if( $use_transactions )
+			{
+				$DB->rollback();
+			}
 
 			return false;
 		}
 
 		$this->_exists = false;
 
-		$DB->commit();
+		if( $use_transactions )
+		{
+			$DB->commit();
+		}
 
 		return true;
 	}
@@ -1683,9 +1699,10 @@ class File extends DataObject
 		$this->set_param( 'root_type', 'string', $this->_FileRoot->type );
 		$this->set_param( 'root_ID', 'number', $this->_FileRoot->in_type_ID );
 		$this->set_param( 'path', 'string', $this->_rdfp_rel_path );
+		$this->set_param( 'path_hash', 'string', md5( $this->_FileRoot->type.$this->_FileRoot->in_type_ID.$this->_rdfp_rel_path, true ) );
 		if( ! $this->is_dir() )
 		{ // create hash value only for files but not for folders
-			$this->set_param( 'hash', 'string', md5_file( $this->get_full_path() ) );
+			$this->set_param( 'hash', 'string', md5_file( $this->get_full_path(), true ) );
 		}
 
 		// Let parent do the insert:
@@ -1714,6 +1731,11 @@ class File extends DataObject
 
 		$DB->begin();
 
+		$file_path_hash = md5( $this->_FileRoot->type.$this->_FileRoot->in_type_ID.$this->_rdfp_rel_path, true );
+		if( $file_path_hash != $this->path_hash )
+		{ // The file path was changed
+			$this->set_param( 'path_hash', 'string', $file_path_hash );
+		}
 		// Let parent do the update:
 		if( ( $r = parent::dbupdate() ) !== false )
 		{
@@ -1725,7 +1747,7 @@ class File extends DataObject
 				$LinkOwner = & $Link->get_LinkOwner();
 				if( $LinkOwner != NULL )
 				{
-					$LinkOwner->item_update_last_touched_date();
+					$LinkOwner->update_last_touched_date();
 				}
 			}
 
@@ -2079,10 +2101,13 @@ class File extends DataObject
 	 * Displays a preview thumbnail which is clickable and opens a view popup
 	 *
 	 * @param string what do do with files that are not images? 'fulltype'
-	 * @param boolean TRUE - to init colorbox plugin for images
+	 * @param array colorbox plugin params:
+	 *   - 'init': set true to init colorbox plugin for images and show preview thumb in colorbox
+	 *   - 'lightbox_rel': set a specific group id string if the displayed image belongs to a group of images
+	 *   - 'link_id': this must be set only if the displayed file belongs to a Link object
 	 * @return string HTML to display
 	 */
-	function get_preview_thumb( $format_for_non_images = '', $preview_image = false )
+	function get_preview_thumb( $format_for_non_images = '', $cbox_params = array() )
 	{
 		if( $this->is_image() )
 		{	// Ok, it's an image:
@@ -2090,17 +2115,22 @@ class File extends DataObject
 			$img_attribs = $this->get_img_attribs( 'fit-80x80', $type, $type );
 			$img = '<img'.get_field_attribs_as_string( $img_attribs ).' />';
 
-			if( $preview_image )
-			{	// Create link to preview image by colorbox plugin
-				$link = '<a href="'.$this->get_url().'" rel="lightbox" id="f'.$this->ID.'">'.$img.'</a>';
+			$cbox_params = array_merge( array(
+					'init' => false,
+					'lightbox_rel' => 'lightbox',
+					'link_id' => 'f'.$this->ID
+				), $cbox_params );
+			if( $cbox_params['init'] )
+			{ // Create link to preview image by colorbox plugin
+				$link = '<a href="'.$this->get_url().'" rel="'.$cbox_params['lightbox_rel'].'" id="'.$cbox_params['link_id'].'">'.$img.'</a>';
 			}
 			else
-			{	// Get link to view the file (fallback to no view link - just the img):
+			{ // Get link to view the file (fallback to no view link - just the img):
 				$link = $this->get_view_link( $img );
 			}
 
 			if( ! $link )
-			{	// no view link available:
+			{ // no view link available:
 				$link = $img;
 			}
 
@@ -2296,7 +2326,9 @@ class File extends DataObject
 
 
 	/**
-	 * @param LinkOwner
+	 * Link file to object
+	 *
+	 * @param object LinkOwner
 	 * @param integer Order
 	 * @param string Position
 	 */
@@ -2319,8 +2351,10 @@ class File extends DataObject
 				return;
 			}
 			$existing_order = $loop_Link->get('order');
-			if( $existing_order >= $order )
-				$order = $existing_order+1;
+			if( $set_order == 1 && $existing_order >= $order )
+			{ // Set order if $set_order is default
+				$order = $existing_order + 1;
+			}
 		}
 
 		$DB->begin();

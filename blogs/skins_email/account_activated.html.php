@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @version $Id$
  */
@@ -87,6 +87,22 @@ if( !empty( $initial_blog_ID ) )
 }
 
 echo '</table>'."\n";
+
+// User's pictures:
+echo '<p>'.T_('The current profile pictures for this account are:').'</p>'."\n";
+$user_pictures = '';
+$user_avatars = $activated_User->get_avatar_Links( false );
+foreach( $user_avatars as $user_Link )
+{
+	$user_pictures .= $user_Link->get_tag( array(
+			'before_image'        => '',
+			'before_image_legend' => '',
+			'after_image_legend'  => '',
+			'after_image'         => ' ',
+			'image_size'          => 'crop-top-80x80',
+		) );
+}
+echo empty( $user_pictures ) ? '<p><b>'.T_('No pictures.').'</b></p>' : $user_pictures;
 
 // Buttons:
 echo '<div class="buttons">'."\n";

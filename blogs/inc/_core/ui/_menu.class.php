@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -441,6 +441,20 @@ class Menu extends Widget
 	function has_entires()
 	{
 		return !empty( $this->_menus );
+	}
+
+
+	/**
+	 * Clear menu entries of the given path.
+	 *
+	 * @param NULL|string The path to clear the entries from. See {@link get_node_by_path()}.
+	 */
+	function clear_menu_entries( $path )
+	{
+		// Get a reference to the node in the menu list.
+		$node = & $this->get_node_by_path( $path, true );
+
+		$node['entries'] = array();
 	}
 }
 

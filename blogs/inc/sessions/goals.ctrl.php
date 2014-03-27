@@ -5,7 +5,7 @@
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -17,6 +17,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 load_class( 'sessions/model/_goal.class.php', 'Goal' );
+load_class( 'sessions/model/_goalcat.class.php', 'GoalCategory' );
 load_funcs('sessions/model/_hitlog.funcs.php');
 
 /**
@@ -34,16 +35,34 @@ $current_User->check_perm( 'stats', 'view', true );
 $tab3 = param( 'tab3', 'string', 'goals', true );
 $AdminUI->set_path( 'stats', 'goals', $tab3 );
 
+if( isset( $collections_Module ) )
+{ // Display list of blogs:
+	$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => 'summary', 'tab3' => 'global' ), T_('All'),
+					$admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog=0' );
+}
+
 param_action();
 
 if( param( 'goal_ID', 'integer', '', true) )
-{// Load file type:
+{ // Load goal:
 	$GoalCache = & get_GoalCache();
 	if( ($edited_Goal = & $GoalCache->get_by_ID( $goal_ID, false )) === false )
-	{	// We could not find the goal to edit:
+	{ // We could not find the goal to edit:
 		unset( $edited_Goal );
 		forget_param( 'goal_ID' );
 		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Goal') ), 'error' );
+		$action = 'nil';
+	}
+}
+
+if( param( 'gcat_ID', 'integer', '', true) )
+{ // Load goal category:
+	$GoalCategoryCache = & get_GoalCategoryCache();
+	if( ($edited_GoalCategory = & $GoalCategoryCache->get_by_ID( $gcat_ID, false )) === false )
+	{ // We could not find the goal category to edit:
+		unset( $edited_GoalCategory );
+		forget_param( 'gcat_ID' );
+		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Goal Category') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -68,19 +87,19 @@ switch( $action )
 		break;
 
 	case 'edit':
-		// Edit file type form...:
+		// Edit goal form...:
 
 		// Check permission:
 		$current_User->check_perm( 'stats', 'edit', true );
 
 		// Make sure we got an ftyp_ID:
 		param( 'goal_ID', 'integer', true );
- 		break;
+		break;
 
 	case 'create': // Record new goal
 	case 'create_new': // Record goal and create new
 	case 'create_copy': // Record goal and create similar
-		// Insert new file type...:
+		// Insert new goal...:
 		$edited_Goal = new Goal();
 
 		// Check that this action request is not a CSRF hacked request:
@@ -135,7 +154,7 @@ switch( $action )
 		break;
 
 	case 'update':
-		// Edit file type form...:
+		// Edit goal form...:
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'goal' );
@@ -180,7 +199,7 @@ switch( $action )
 		break;
 
 	case 'delete':
-		// Delete file type:
+		// Delete goal:
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'goal' );
@@ -211,6 +230,148 @@ switch( $action )
 		}
 		break;
 
+	// **** Categories **** //
+	case 'cat_new':
+	case 'cat_copy':
+		// New goal category form...:
+
+		// Check permission:
+		$current_User->check_perm( 'stats', 'edit', true );
+
+		if( ! isset( $edited_GoalCategory ) )
+		{ // We don't have a model to use, start with blank object:
+			$edited_GoalCategory = new GoalCategory();
+		}
+		else
+		{ // Duplicate object in order no to mess with the cache:
+			$edited_GoalCategory = duplicate( $edited_GoalCategory ); // PHP4/5 abstraction
+			$edited_GoalCategory->ID = 0;
+		}
+		break;
+
+	case 'cat_edit':
+		// Edit goal category form...:
+
+		// Check permission:
+		$current_User->check_perm( 'stats', 'edit', true );
+
+		// Make sure we got an ftyp_ID:
+		param( 'gcat_ID', 'integer', true );
+		break;
+
+	case 'cat_create': // Record new goal category
+	case 'cat_create_new': // Record goal category and create new
+	case 'cat_create_copy': // Record goal category and create similar
+		// Insert new goal category...:
+		$edited_GoalCategory = new GoalCategory();
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'goalcat' );
+
+		// Check permission:
+		$current_User->check_perm( 'stats', 'edit', true );
+
+		// load data from request
+		if( $edited_GoalCategory->load_from_Request() )
+		{ // We could load data from form without errors:
+
+			// Insert in DB:
+			$DB->begin();
+			$edited_GoalCategory->dbinsert();
+			$Messages->add( T_('New goal category created.'), 'success' );
+			$DB->commit();
+
+			// What next?
+			switch( $action )
+			{
+				case 'cat_create_copy':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=goals&tab3=cats&action=cat_new&gcat_ID='.$edited_GoalCategory->ID, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'cat_create_new':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=goals&tab3=cats&action=cat_new', 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'cat_create':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=goals&tab3=cats', 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+			}
+		}
+		break;
+
+	case 'cat_update':
+		// Edit goal category form...:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'goalcat' );
+
+		// Check permission:
+		$current_User->check_perm( 'stats', 'edit', true );
+
+		// Make sure we got an ftyp_ID:
+		param( 'gcat_ID', 'integer', true );
+
+		// load data from request
+		if( $edited_GoalCategory->load_from_Request() )
+		{	// We could load data from form without errors:
+
+			// Update in DB:
+			$DB->begin();
+			$edited_GoalCategory->dbupdate();
+			$Messages->add( T_('Goal category updated.'), 'success' );
+			$DB->commit();
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=goals&tab3=cats', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+
+
+		break;
+
+	case 'cat_delete':
+		// Delete goal category:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'goalcat' );
+
+		// Check permission:
+		$current_User->check_perm( 'stats', 'edit', true );
+
+		// Make sure we got an ftyp_ID:
+		param( 'gcat_ID', 'integer', true );
+
+		if( $gcat_ID == 1 )
+		{ // Deny to delete "Default" category
+			$Messages->add( sprintf( T_('Cannot delete goal category &laquo;%s&raquo;'), $edited_GoalCategory->dget('name') ), 'error' );
+			$action = 'view';
+			break;
+		}
+
+		if( param( 'confirm', 'integer', 0 ) )
+		{ // confirmed, Delete from DB:
+			$msg = sprintf( T_('Goal category &laquo;%s&raquo; deleted.'), $edited_GoalCategory->dget('name') );
+			$edited_GoalCategory->dbdelete( true );
+			unset( $edited_GoalCategory );
+			forget_param( 'gcat_ID' );
+			$Messages->add( $msg, 'success' );
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=goals&tab3=cats', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+		else
+		{ // not confirmed, Check for restrictions:
+			if( ! $edited_GoalCategory->check_delete( sprintf( T_('Cannot delete goal category &laquo;%s&raquo;'), $edited_GoalCategory->dget('name') ) ) )
+			{ // There are restrictions:
+				$action = 'view';
+			}
+		}
+		break;
+
 }
 
 $AdminUI->breadcrumbpath_init();
@@ -224,7 +385,14 @@ switch( $tab3 )
 	case 'stats':
 		$AdminUI->breadcrumbpath_add( T_('Goal hit stats'), '?ctrl=goals&amp;tab3=stats' );
 		break;
+	case 'cats':
+		$AdminUI->breadcrumbpath_add( T_('Goal categories'), '?ctrl=goals&amp;tab3=cats' );
+		init_colorpicker_js();
+		break;
 }
+
+// Load the date picker style for invitation form
+require_css( 'ui.datepicker.css' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -260,6 +428,21 @@ switch( $action )
 		$AdminUI->disp_view( 'sessions/views/_goal.form.php' );
 		break;
 
+	case 'cat_delete':
+		// We need to ask for confirmation:
+		$edited_GoalCategory->confirm_delete(
+				sprintf( T_('Delete goal category &laquo;%s&raquo;?'), $edited_GoalCategory->dget('name') ),
+				'goalcat', $action, get_memorized( 'action' ) );
+		/* no break */
+	case 'cat_new':
+	case 'cat_copy':
+	case 'cat_create':	// we return in this state after a validation error
+	case 'cat_create_new':	// we return in this state after a validation error
+	case 'cat_create_copy':	// we return in this state after a validation error
+	case 'cat_edit':
+	case 'cat_update':	// we return in this state after a validation error
+		$AdminUI->disp_view( 'sessions/views/_stats_goalcats.form.php' );
+		break;
 
 	default:
 		// No specific request, list all file types:
@@ -270,6 +453,10 @@ switch( $action )
 				forget_param( 'goal_ID' );
 				// Display goals list:
 				$AdminUI->disp_view( 'sessions/views/_stats_goals.view.php' );
+				break;
+
+			case 'cats':
+				$AdminUI->disp_view( 'sessions/views/_stats_goalcats.view.php' );
 				break;
 
 			case 'stats':

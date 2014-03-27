@@ -4,7 +4,7 @@
  *
  * This file is not meant to be called directly.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evocore
  *
@@ -41,7 +41,7 @@ if( empty( $session_registration_trigger_url/*$Session->get( 'registration_trigg
 }
 
 $login = param( $dummy_fields[ 'login' ], 'string', '' );
-$email = param( $dummy_fields[ 'email' ], 'string', '' );
+$email = evo_strtolower( param( $dummy_fields[ 'email' ], 'string', '' ) );
 $firstname = param( 'firstname', 'string', '' );
 $gender = param( 'gender', 'string', false );
 $source = param( 'source', 'string', 'register form' );

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -207,7 +207,7 @@ $AdminUI->set_path( 'blogs', 'skin', 'manage_skins' );
  */
 $AdminUI->set_coll_list_params( 'blog_properties', 'edit',
 											array( 'ctrl' => 'skins' ),
-											T_('All'), '?ctrl=collections&amp;blog=0' );
+											T_('Site'), '?ctrl=collections&amp;blog=0' );
 
 
 $AdminUI->breadcrumbpath_init();

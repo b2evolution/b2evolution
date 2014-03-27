@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @version $Id$
  */
@@ -20,10 +20,10 @@ global $htsrv_url;
 
 // Default params:
 $params = array_merge( array(
-		'message' => '',
+		'message_html' => '',
 	), $params );
 
-echo nl2br( $params['message'] );
+echo $params['message_html'];
 
 // Footer vars:
 $params['unsubscribe_text'] = T_( 'If you don\'t want to receive this newsletter anymore, click here:' )

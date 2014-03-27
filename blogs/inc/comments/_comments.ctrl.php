@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal Open Source relicensing agreement:
  * }}
@@ -44,6 +44,11 @@ switch( $action )
 	case 'delete_url':
 	case 'update_publish':
 	case 'delete':
+		if( $action != 'edit' && $action != 'switch_view' )
+		{ // Stop a request from the blocked IP addresses or Domains
+			antispam_block_request();
+		}
+
 		param( 'comment_ID', 'integer', true );
 		$edited_Comment = & Comment_get_by_ID( $comment_ID );
 
@@ -86,6 +91,9 @@ switch( $action )
 		break;
 
 	case 'elevate':
+		// Stop a request from the blocked IP addresses or Domains
+		antispam_block_request();
+
 		global $blog;
 		load_class( 'items/model/_item.class.php', 'Item' );
 
@@ -172,8 +180,7 @@ switch( $action )
 // Set the third level tab
 param( 'tab3', 'string', '', true );
 
-$AdminUI->breadcrumbpath_init();
-$AdminUI->breadcrumbpath_add( T_('Contents'), '?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' );
+$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Contents'), 'url' => '?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' ) );
 $AdminUI->breadcrumbpath_add( T_('Comments'), '?ctrl=comments&amp;blog=$blog$&amp;filter=restore' );
 switch( $tab3 )
 {
@@ -308,7 +315,7 @@ switch( $action )
 		// The OpenID plugin will validate a given OpenID here (via redirect and coming back here).
 		$Plugins->trigger_event( 'CommentFormSent', array(
 				'dont_remove_pre' => true,
-				'comment_post_ID' => $edited_Comment_Item->ID,
+				'comment_item_ID' => $edited_Comment_Item->ID,
 				'comment' => & $content,
 			) );
 
@@ -473,40 +480,27 @@ switch( $action )
 		break;
 
 
-
 	case 'trash_delete':
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
 
-		$query = 'SELECT T_comments.*
+		if( isset( $blog_ID ) && ( $blog_ID != 0 ) )
+		{ // delete by comment ids
+			$query = 'SELECT comment_ID
 					FROM T_blogs LEFT OUTER JOIN T_categories ON blog_ID = cat_blog_ID
 						LEFT OUTER JOIN T_items__item ON cat_ID = post_main_cat_ID
-						LEFT OUTER JOIN T_comments ON post_ID = comment_post_ID
-					WHERE comment_status = "trash"';
-
-		if( isset($blog_ID) && ( $blog_ID != 0 ) )
-		{
-			$query .=  'AND blog_ID='.$blog_ID;
+						LEFT OUTER JOIN T_comments ON post_ID = comment_item_ID
+					WHERE comment_status = "trash" AND blog_ID = '.$blog_ID;
+			$comment_ids = $DB->query->get_col( $query, 'get trash comment ids' );
+			$result = comments_delete_where( NULL, $comment_ids );
+		}
+		else
+		{ // delete by where clause
+			$result = comments_delete_where( 'comment_status = "trash"' );
 		}
 
-		$DB->begin();
-		$trash_comments = $DB->get_results( $query, OBJECT, 'get_trash_comments' );
-
-		$result = true;
-		foreach( $trash_comments as $row_stats )
+		if( $result !== false )
 		{
-			$Comment = new Comment( $row_stats );
-			$result = $result && $Comment->dbdelete();
-			if( !$result )
-			{
-				$DB->rollback();
-				break;
-			}
-		}
-
-		if( $result )
-		{
-			$DB->commit();
 			$Messages->add( T_('Recycle bin contents were successfully deleted.'), 'success' );
 		}
 		else

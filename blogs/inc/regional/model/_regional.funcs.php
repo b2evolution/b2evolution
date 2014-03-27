@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -731,6 +731,76 @@ function country_flag( $country_code, $country_name, $collection = 'w16px', $cla
 	else
 		return $r; // return it
 
+}
+
+
+/**
+ * Get status titles of country
+ *
+ * @param boolean TRUE - to include false statuses, which don't exist in DB
+ * @return array Status titles
+ */
+function ctry_status_titles( $include_false_statuses = true )
+{
+	$status_titles = array();
+	if( $include_false_statuses )
+	{ // Include Unknown status
+		$status_titles[''] = T_('Unknown ');
+	}
+	$status_titles['trusted'] = T_('Trusted');
+	$status_titles['suspect'] = T_('Suspect');
+	$status_titles['blocked'] = T_('Blocked');
+
+	return $status_titles;
+}
+
+
+/**
+ * Get status colors of country
+ *
+ * @return array Color values
+ */
+function ctry_status_colors()
+{
+	return array(
+			''        => '999999',
+			'trusted' => '00CC00',
+			'suspect' => 'FFAA00',
+			'blocked' => 'FF0000',
+		);
+}
+
+
+/**
+ * Get status title of country by status value
+ *
+ * @param string Status value
+ * @return string Status title
+ */
+function ctry_status_title( $status )
+{
+	$statuses = ctry_status_titles();
+
+	return isset( $statuses[ $status ] ) ? $statuses[ $status ] : $status;
+}
+
+
+/**
+ * Get status color of ip range by status value
+ *
+ * @param string Status value
+ * @return string Color value
+ */
+function ctry_status_color( $status )
+{
+	if( $status == 'NULL' )
+	{
+		$status = '';
+	}
+
+	$status_colors = ctry_status_colors();
+
+	return isset( $status_colors[ $status ] ) ? '#'.$status_colors[ $status ] : 'none';
 }
 
 ?>

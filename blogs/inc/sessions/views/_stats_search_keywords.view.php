@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -71,11 +71,16 @@ if( param_errors_detected() )
 {
 	$sql = 'SELECT 0 AS count';
 	$sql_count = 0;
+	$total = 0;
 }
 else
 {
 	// Extract keyphrases from the hitlog:
-	keyphrase_job();
+	$extract_keyphrase_result = extract_keyphrase_from_hitlogs();
+	if( $extract_keyphrase_result !== true )
+	{ // Could not execute the extract_keyphrase process, display a warning
+		echo '<div class="action_messages"><div class="warning">'.$extract_keyphrase_result.'</div></div>';
+	}
 
 	$SQL = new SQL();
 	if( empty( $goal_ID ) && empty($goal_name)  )
@@ -132,7 +137,7 @@ else
 
 	if( ! empty($blog) )
 	{
-		$SQL->WHERE_and( 'T_hitlog.hit_blog_ID = '.$blog );
+		$SQL->WHERE_and( 'T_hitlog.hit_coll_ID = '.$blog );
 	}
 
 	// COUNT:

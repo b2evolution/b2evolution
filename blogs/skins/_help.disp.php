@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -22,6 +22,6 @@ echo '<h2>'.T_('Content issues').'</h2>';
 
 echo '<p>'.sprintf( T_('In case of concerns with the contents of this blog/site, please <a %s>contact the owner of this blog</a>.'), 'href="'.$Blog->get_contact_url( true ).'"' ).'</p>';
 
-echo '<p><a href="http://b2evolution.net/man/content-issues">'.T_('What to do if the owner doesn\'t respond').' &raquo;</a></p>';
+echo '<p><a href="'.get_manual_url( 'content-issues' ).'">'.T_('What to do if the owner doesn\'t respond').' &raquo;</a></p>';
 
 ?>

@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -54,28 +54,29 @@ $SQL = new SQL();
 $SQL->SELECT( 'SQL_NO_CACHE emlog_ID, emlog_timestamp, emlog_user_ID, emlog_to, emlog_result, emlog_subject' );
 $SQL->FROM( 'T_email__log' );
 
-$CountSQL = new SQL();
-$CountSQL->SELECT( 'SQL_NO_CACHE COUNT(emlog_ID)' );
-$CountSQL->FROM( 'T_email__log' );
+$count_SQL = new SQL();
+$count_SQL->SELECT( 'SQL_NO_CACHE COUNT(emlog_ID)' );
+$count_SQL->FROM( 'T_email__log' );
 
 if( !empty( $datestart ) )
 {	// Filter by start date
 	$SQL->WHERE_and( 'emlog_timestamp >= '.$DB->quote( $datestart.' 00:00:00' ) );
-	$CountSQL->WHERE_and( 'emlog_timestamp >= '.$DB->quote($datestart.' 00:00:00' ) );
+	$count_SQL->WHERE_and( 'emlog_timestamp >= '.$DB->quote($datestart.' 00:00:00' ) );
 }
 if( !empty( $datestop ) )
 {	// Filter by end date
 	$SQL->WHERE_and( 'emlog_timestamp <= '.$DB->quote( $datestop.' 23:59:59' ) );
-	$CountSQL->WHERE_and( 'emlog_timestamp <= '.$DB->quote( $datestop.' 23:59:59' ) );
+	$count_SQL->WHERE_and( 'emlog_timestamp <= '.$DB->quote( $datestop.' 23:59:59' ) );
 }
 if( !empty( $email ) )
 {	// Filter by email
+	$email = evo_strtolower( $email );
 	$SQL->WHERE_and( 'emlog_to LIKE '.$DB->quote( $email ) );
-	$CountSQL->WHERE_and( 'emlog_to LIKE '.$DB->quote( $email ) );
+	$count_SQL->WHERE_and( 'emlog_to LIKE '.$DB->quote( $email ) );
 }
 
 
-$Results = new Results( $SQL->get(), 'emlog_', 'D', $UserSettings->get( 'results_per_page' ), $CountSQL->get() );
+$Results = new Results( $SQL->get(), 'emlog_', 'D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 
 $Results->title = T_('Sent emails');
 
@@ -143,7 +144,7 @@ function emlog_to( $emlog_ID, $emlog_to, $emlog_user_ID )
 	if( empty( $to ) )
 	{	// User is not defined
 		global $admin_url;
-		$to = '<a href="'.$admin_url.'?ctrl=email&amp;tab=sent&amp;emlog_ID='.$emlog_ID.'">'.htmlspecialchars( $emlog_to ).$deleted_user_note.'</a>';
+		$to = '<a href="'.$admin_url.'?ctrl=email&amp;tab=sent&amp;emlog_ID='.$emlog_ID.'">'.evo_htmlspecialchars( $emlog_to ).$deleted_user_note.'</a>';
 	}
 
 	return $to;
@@ -157,7 +158,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Subject'),
 		'order' => 'emlog_subject',
-		'td' => '<a href="'.$admin_url.'?ctrl=email&amp;tab=sent&amp;emlog_ID=$emlog_ID$">%htmlspecialchars(#emlog_subject#)%</a>',
+		'td' => '<a href="'.$admin_url.'?ctrl=email&amp;tab=sent&amp;emlog_ID=$emlog_ID$">%evo_htmlspecialchars(#emlog_subject#)%</a>',
 	);
 
 

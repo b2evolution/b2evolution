@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @version $Id$
  */
@@ -79,7 +79,7 @@ if( !empty( $params['trigger_url'] ) )
 
 if( !empty ( $params['initial_hit'] ) )
 { // Hit info
-	echo '<tr><th>'.T_('Initial page').':</th><td>'.T_('Blog')." ".$params['initial_hit']->hit_blog_ID." - ".$params['initial_hit']->hit_uri.'</td></tr>'."\n";
+	echo '<tr><th>'.T_('Initial page').':</th><td>'.T_('Blog')." ".$params['initial_hit']->hit_coll_ID." - ".$params['initial_hit']->hit_uri.'</td></tr>'."\n";
 	echo '<tr><th>'.T_('Initial referer').':</th><td>'.get_link_tag( $params['initial_hit']->hit_referer ).'</td></tr>'."\n";
 }
 

@@ -63,7 +63,6 @@ input,
 select {
 	border: 1px solid #aaa;
 	background-color: #f6f6f6;
-	padding: 1px;
 	margin: 1px;
 	vertical-align: middle;
 }
@@ -789,4 +788,8 @@ ul.widget_container {
 span.note.status_draft span {
 	color: #fff;
 	background-color: #FF9966;
+}
+
+.dashboard_post {
+	min-height: 70px;
 }

@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -184,6 +184,26 @@ class FileRoot
 					}
 				}
 				return;
+
+			case 'import':
+				// Import dir
+				global $media_path, $media_url;
+				$rds_import_subdir = 'import/';
+				$ads_import_dir = $media_path.$rds_import_subdir;
+				if( ! mkdir_r( $ads_import_dir ) )
+				{
+					if( is_admin_page() )
+					{ // Only display error on an admin page:
+						$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; could not be created.'), $rds_import_subdir ).get_manual_link('directory_creation_error'), 'error' );
+					}
+				}
+				else
+				{
+					$this->name = T_('Import');
+					$this->ads_path = $media_path.$rds_import_subdir;
+					$this->ads_url = $media_url.$rds_import_subdir;
+				}
+				return;
 		}
 
 		debug_die( "Invalid root type" );
@@ -221,6 +241,7 @@ class FileRoot
 			case 'shared':
 			case 'collection':
 			case 'skins':
+			case 'import':
 				return $root_type.'_'.$root_in_type_ID;
 		}
 

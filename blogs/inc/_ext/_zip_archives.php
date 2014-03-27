@@ -12,7 +12,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @author Devin Doucette - darksnoopy@shaw.ca
  *
@@ -173,9 +173,9 @@ class archive
 		unset ($this->exclude, $this->storeonly);
 	}
 
-	function add_files($list)
+	function add_files( $list, $exclude = array() )
 	{
-		$temp = $this->list_files($list);
+		$temp = $this->list_files( $list, $exclude );
 		foreach ($temp as $current)
 			$this->files[] = $current;
 	}
@@ -194,7 +194,7 @@ class archive
 			$this->storeonly[] = $current;
 	}
 
-	function list_files($list)
+	function list_files( $list, $exclude = array() )
 	{
 		if (!is_array ($list))
 		{
@@ -218,7 +218,7 @@ class archive
 				$regex = preg_replace("/([\\\^\$\.\[\]\|\(\)\?\+\{\}\/])/", "\\\\\\1", $current);
 				$regex = str_replace("*", ".*", $regex);
 				$dir = strstr($current, "/") ? substr($current, 0, strrpos($current, "/")) : ".";
-				$temp = $this->parse_dir($dir);
+				$temp = $this->parse_dir( $dir, $exclude );
 				foreach ($temp as $current2)
 					if (preg_match("/^{$regex}$/i", $current2['name']))
 						$files[] = $current2;
@@ -226,7 +226,7 @@ class archive
 			}
 			else if (@is_dir($current))
 			{
-				$temp = $this->parse_dir($current);
+				$temp = $this->parse_dir( $current, $exclude );
 				foreach ($temp as $file)
 					$files[] = $file;
 				unset ($temp, $file);
@@ -248,7 +248,7 @@ class archive
 		return $files;
 	}
 
-	function parse_dir($dirname)
+	function parse_dir( $dirname, $exclude = array() )
 	{
 		if ($this->options['storepaths'] == 1 && !preg_match("/^(\.+\/*)+$/", $dirname))
 			$files = array (array ('name' => $dirname, 'name2' => $this->options['prepend'] .
@@ -260,6 +260,10 @@ class archive
 
 		while ($file = @readdir($dir))
 		{
+			if( in_array( $file, $exclude ) )
+			{ // Skip this file/folder
+				continue;
+			}
 			$fullname = $dirname . "/" . $file;
 			if ($file == "." || $file == "..")
 				continue;
@@ -267,7 +271,7 @@ class archive
 			{
 				if (empty ($this->options['recurse']))
 					continue;
-				$temp = $this->parse_dir($fullname);
+				$temp = $this->parse_dir( $fullname, $exclude );
 				foreach ($temp as $file2)
 					$files[] = $file2;
 			}
@@ -456,8 +460,7 @@ class tar_file extends archive
 				}
 				else if ($file['type'] == 5)
 				{
-					if (!is_dir($file['name']))
-						mkdir($file['name'], $file['stat'][2]);
+					evo_mkdir($file['name'], $file['stat'][2]);
 				}
 				else if ($this->options['overwrite'] == 0 && file_exists($file['name']))
 				{
@@ -639,7 +642,7 @@ class zip_file extends archive
 
 			$block = pack("VvvvV", 0x04034b50, 0x000A, 0x0000, (isset($current['method']) || $this->options['method'] == 0) ? 0x0000 : 0x0008, $timedate);
 
-			if ($current['stat'][7] == 0 && $current['type'] == 5)
+			if ( ( $current['stat'][7] == 0 || @is_dir( $current['name'] ) )&& $current['type'] == 5 )
 			{
 				$block .= pack("VVVvv", 0x00000000, 0x00000000, 0x00000000, strlen($current['name2']) + 1, 0x0000);
 				$block .= $current['name2'] . "/";
@@ -706,10 +709,4 @@ class zip_file extends archive
 	}
 }
 
-/*
- * $Log$
- * Revision 1.9  2013/11/06 08:03:48  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

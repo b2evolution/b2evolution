@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @author fplanque: Francois PLANQUE.
  * @author gorgeb: Bertrand GORGE / EPISTEMA
@@ -44,6 +44,18 @@ class flowplayer_plugin extends Plugin
 		require_js( $this->get_plugin_url( true ).'flowplayer.min.js', 'relative' );
 		require_js( $this->get_plugin_url( true ).'flowplayer_init.js', 'relative' );
 		add_js_headline( 'flowplayer_url = "'.$this->get_plugin_url( true ).'";' );
+		add_css_headline( '.flowplayer_block {
+	margin: 0 auto 1em;
+}
+.flowplayer_block .flowplayer {
+	display: block;
+	margin: auto;
+}
+.flowplayer_block .flowplayer_text {
+	font-size: 84%;
+	text-align: center;
+	margin: 4px 0;
+}' );
 	}
 
 
@@ -57,36 +69,39 @@ class flowplayer_plugin extends Plugin
 
 
 	/**
-	 * Get the settings that the plugin can use.
+	 * Define here default collection/blog settings that are to be made available in the backoffice.
 	 *
-	 * Those settings are transfered into a Settings member object of the plugin
-	 * and can be edited in the backoffice (Settings / Plugins).
-	 *
-	 * @see Plugin::GetDefaultSettings()
-	 * @see PluginSettings
-	 * @see Plugin::PluginSettingsValidateSet()
-	 * @return array
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::get_coll_setting_definitions()}.
 	 */
-	function GetDefaultSettings( & $params )
+	function get_coll_setting_definitions( & $params )
 	{
-		return array(
-			'width' => array(
-				'label' => T_('Video width (px)'),
-				'note' => T_('100% width if left empty or 0'),
-				),
-			'height' => array(
-				'label' => T_('Video height (px)'),
-				'type' => 'integer',
-				'defaultvalue' => 300,
-				'note' => '',
-				'valid_range' => array( 'min' => 1 ),
-				),
-			'allow_download' => array(
-				'label' => T_('Allow downloading of the video file'),
-				'type' => 'checkbox',
-				'defaultvalue' => 0,
-				),
-			);
+		return array_merge( parent::get_coll_setting_definitions( $params ),
+			array(
+				'width' => array(
+					'label' => T_('Video width (px)'),
+					'note' => T_('100% width if left empty or 0'),
+					),
+				'height' => array(
+					'label' => T_('Video height (px)'),
+					'type' => 'integer',
+					'defaultvalue' => 300,
+					'note' => '',
+					'valid_range' => array( 'min' => 1 ),
+					),
+				'allow_download' => array(
+					'label' => T_('Allow downloading of the video file'),
+					'type' => 'checkbox',
+					'defaultvalue' => 0,
+					),
+				'disp_caption' => array(
+					'label' => T_('Display caption'),
+					'note' => T_('Check to display the video file caption under the video player.'),
+					'type' => 'checkbox',
+					'defaultvalue' => 0,
+					),
+			)
+		);
 	}
 
 
@@ -118,18 +133,22 @@ class flowplayer_plugin extends Plugin
 			return false;
 		}
 
-		$width = (int) $this->Settings->get( 'width' );
+		$Item = & $params['Item'];
+		$item_Blog = $Item->get_Blog();
+
+		$width = intval( $this->get_coll_setting( 'width', $item_Blog ) );
 		if( empty( $width ) )
-		{	// Set default width
-			$width = 'width:100%';
+		{ // Set default width
+			$width = 'width:100%;';
 		}
 		else
-		{
-			$width = 'width:'.$width.'px';
+		{ // Set width from blog plugin setting
+			$width = 'width:'.$width.'px;';
 		}
 
-		$height = (int) $this->Settings->get( 'height' );
-		$height = 'height:'.$height.'px';
+		// Set height from blog plugin setting
+		$height = intval( $this->get_coll_setting( 'height', $item_Blog ) );
+		$height = 'height:'.$height.'px;';
 
 		if( $File->exists() )
 		{
@@ -137,15 +156,25 @@ class flowplayer_plugin extends Plugin
 			{
 				$params['data'] .= '<div style="clear: both; height: 0px; font-size: 0px"></div>';
 			}
-			$params['data'] .= '<br /><a class="flowplayer" style="display: block; '.$width.';'.$height.';" href="'.$File->get_url().'"></a>';
+			$params['data'] .= '<div class="flowplayer_block">';
 
-			if( $this->Settings->get( 'allow_download' ) )
-			{	// Allow to download the video files
-				$params['data'] .= '<div class="small center"><a href="'.$File->get_url().'">'.T_('Download this video').'</a></div>';
+			$params['data'] .= '<a class="flowplayer" style="'.$width.$height.'" href="'.$File->get_url().'"></a>';
+
+			if( $File->get( 'desc' ) != '' && $this->get_coll_setting( 'disp_caption', $item_Blog ) )
+			{ // Display caption
+				$params['data'] .= '<div class="flowplayer_text">'.$File->get( 'desc' ).'</div>';
 			}
+
+			if( $this->get_coll_setting( 'allow_download', $item_Blog ) )
+			{ // Allow to download the video files
+				$params['data'] .= '<div class="flowplayer_text"><a href="'.$File->get_url().'">'.T_('Download this video').'</a></div>';
+			}
+
+			$params['data'] .= '</div>';
 
 			return true;
 		}
+
 		return false;
 	}
 
@@ -158,6 +187,9 @@ class flowplayer_plugin extends Plugin
 	 */
 	function RenderCommentAttachment( & $params )
 	{
+		$Comment = & $params['Comment'];
+		$params['Item'] = & $Comment->get_Item();
+
 		return $this->RenderItemAttachment( $params, true );
 	}
 

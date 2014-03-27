@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -38,7 +38,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $Settings;
 
-global $upload_quickmode, $failedFiles, $ads_list_path, $tab3, $renamedMessages, $renamedFiles;
+global $upload_quickmode, $failedFiles, $ads_list_path, $renamedMessages, $renamedFiles;
 
 global $fm_FileRoot;
 
@@ -141,17 +141,10 @@ global $fm_FileRoot;
 		appendLabelAndInputElements( newLI, '<?php echo TS_('Choose a file'); ?>:', false, 'input', 'uploadfile['+evo_upload_fields_count+']', '70', '0', 'file', 'upload_file' );
 		newLI.appendChild( radioURL );
 		appendLabelAndInputElements( newLI, '<?php echo TS_('Upload by URL'); ?>:', false, 'input', 'uploadfile_url['+evo_upload_fields_count+']', '70', '0', 'text', 'upload_file' );
-		<?php
-		if( $tab3 == 'advanced' )
-		{	// We want file properties on the upload form:
-			?>
 		appendLabelAndInputElements( newLI, '<?php echo TS_('Filename on server (optional)'); ?>:', false, 'input', 'uploadfile_name[]', '50', '80', 'text', '' );
 		appendLabelAndInputElements( newLI, '<?php echo TS_('Long title'); ?>:', true, 'input', 'uploadfile_title[]', '50', '255', 'text', 'large' );
 		appendLabelAndInputElements( newLI, '<?php echo TS_('Alternative text (useful for images)'); ?>:', true, 'input', 'uploadfile_alt[]', '50', '255', 'text', 'large' );
 		appendLabelAndInputElements( newLI, '<?php echo TS_('Caption/Description of the file'); ?>:', true, 'textarea', 'uploadfile_desc[]', '38', '3', '', 'large' );
-			<?php
-		}
-		?>
 	}
 	// -->
 </script>
@@ -167,7 +160,6 @@ global $fm_FileRoot;
 	$Form->hidden_ctrl();
 	$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 ); // Just a hint for the browser.
 	$Form->hidden( 'upload_quickmode', $upload_quickmode );
-	$Form->hidden( 'tab3_onsubmit', $tab3 );
 	$Form->hiddens_by_key( get_memorized() );
 
 	$Widget = new Widget( 'file_browser' );
@@ -288,30 +280,27 @@ global $fm_FileRoot;
 							<label for="<?php echo 'Yes_'.$lKey ?>"><?php echo sprintf( T_("Don't touch the old version and keep the new version as %s."), $renamedFiles[$lKey]['newName'] ) ?> </label><br />
 							<?php
 						}
-						if( $tab3 == 'advanced' )
-						{	// We want file properties on the upload form:
-							?>
-							<label><?php echo T_('Filename on server (optional)'); ?>:</label>
-							<input name="uploadfile_name[]" type="text" size="50" maxlength="80"
-								value="<?php echo ( isset( $uploadfile_name[$lKey] ) ? format_to_output( $uploadfile_name[$lKey], 'formvalue' ) : '' ) ?>" /><br />
+						// We want file properties on the upload form:
+						?>
+						<label><?php echo T_('Filename on server (optional)'); ?>:</label>
+						<input name="uploadfile_name[]" type="text" size="50" maxlength="80"
+							value="<?php echo ( isset( $uploadfile_name[$lKey] ) ? format_to_output( $uploadfile_name[$lKey], 'formvalue' ) : '' ) ?>" /><br />
 
-							<label><?php echo T_('Long title'); ?>:</label><br />
-							<input name="uploadfile_title[]" type="text" size="50" maxlength="255" class="large"
-								value="<?php echo ( isset( $uploadfile_title[$lKey] ) ? format_to_output( $uploadfile_title[$lKey], 'formvalue' ) : '' );
-								?>" /><br />
+						<label><?php echo T_('Long title'); ?>:</label><br />
+						<input name="uploadfile_title[]" type="text" size="50" maxlength="255" class="large"
+							value="<?php echo ( isset( $uploadfile_title[$lKey] ) ? format_to_output( $uploadfile_title[$lKey], 'formvalue' ) : '' );
+							?>" /><br />
 
-							<label><?php echo T_('Alternative text (useful for images)'); ?>:</label><br />
-							<input name="uploadfile_alt[]" type="text" size="50" maxlength="255" class="large"
-								value="<?php echo ( isset( $uploadfile_alt[$lKey] ) ? format_to_output( $uploadfile_alt[$lKey], 'formvalue' ) : '' );
-								?>" /><br />
+						<label><?php echo T_('Alternative text (useful for images)'); ?>:</label><br />
+						<input name="uploadfile_alt[]" type="text" size="50" maxlength="255" class="large"
+							value="<?php echo ( isset( $uploadfile_alt[$lKey] ) ? format_to_output( $uploadfile_alt[$lKey], 'formvalue' ) : '' );
+							?>" /><br />
 
-							<label><?php echo T_('Caption/Description of the file'); /* TODO: maxlength (DB) */ ?>:</label><br />
-							<textarea name="uploadfile_desc[]" rows="3" cols="38" class="large"><?php
-								echo ( isset( $uploadfile_desc[$lKey] ) ? $uploadfile_desc[$lKey] : '' )
-							?></textarea><br />
-							<?php
-						}
-
+						<label><?php echo T_('Caption/Description of the file'); /* TODO: maxlength (DB) */ ?>:</label><br />
+						<textarea name="uploadfile_desc[]" rows="3" cols="38" class="form_textarea_input"><?php
+							echo ( isset( $uploadfile_desc[$lKey] ) ? $uploadfile_desc[$lKey] : '' )
+						?></textarea><br />
+						<?php
 						echo '</li>';
 						// no text after </li> or JS will bite you! (This is where additional blocks get inserted)
 					}
@@ -337,7 +326,6 @@ global $fm_FileRoot;
 
 			<div class="upload_foot">
 				<input type="submit" value="<?php echo format_to_output( T_('Upload to server now'), 'formvalue' ); ?>" class="ActionButton" >
-				<input type="reset" value="<?php echo format_to_output( T_('Reset'), 'formvalue' ); ?>" class="ResetButton">
 
 				<p class="note">
 					<?php

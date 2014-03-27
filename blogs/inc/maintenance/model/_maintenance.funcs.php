@@ -52,7 +52,7 @@ function check_version( $new_version_dir )
 
 	if( ! file_exists( $new_version_file ) )
 	{ // Invalid structure of the downloaded upgrade package
-		debug_die( 'No config file found with b2evolution version! Probably you have downloaded the invalid package.' );
+		debug_die( '/conf/_application.php not found in /b2evolution/blogs/ nor /b2evolution/site/ nor /b2evolution/! You may have downloaded an invalid ZIP package.' );
 	}
 
 	require( $new_version_file );
@@ -61,21 +61,34 @@ function check_version( $new_version_dir )
 
 	if( $vc < 0 )
 	{
-		return T_( 'This is an old version!' );
+		$result = 'old';
 	}
 	elseif( $vc == 0 )
 	{
 		if( $app_date == $GLOBALS['app_date'] )
 		{
-			return T_( 'This package is already installed!' );
+			$result = 'same';
 		}
 		elseif( $app_date < $GLOBALS['app_date'] )
 		{
-			return T_( 'This is an old version!' );
+			$result = 'old';
 		}
 	}
 
-	return NULL;
+	if( empty( $result ) )
+	{
+		return NULL;
+	}
+	elseif( $result == 'old' )
+	{
+		return T_( 'This is an old version!' )
+			.'<p>'.T_('You should NOT install this older version.').'</p>';
+	}
+	elseif( $result == 'same' )
+	{
+		return T_( 'This package is already installed!' )
+			.'<p style="color:#000">'.T_( 'No upgrade is needed at this time. You might force a re-install if you want to force a cleanup.' ).'</p>';
+	}
 }
 
 
@@ -301,7 +314,7 @@ function verify_overwrite( $src, $dest, $action = '', $overwrite = true, & $read
 
 	if( $dir === false )
 	{ // $dir is not a valid directory or it can not be opened due to permission restrictions
-		echo '<div class="red">The &laquo;'.htmlspecialchars( $src ).'&raquo; is not a valid direcotry or the directory can not be opened due to permission restrictions or filesystem errors.</div>';
+		echo '<div class="red">The &laquo;'.evo_htmlspecialchars( $src ).'&raquo; is not a valid direcotry or the directory can not be opened due to permission restrictions or filesystem errors.</div>';
 		return false;
 	}
 
@@ -336,9 +349,11 @@ function verify_overwrite( $src, $dest, $action = '', $overwrite = true, & $read
 
 	if( ! empty( $action ) && $action == 'Copying' )
 	{ // Display errors about config file or the unknown and incorrect commands from config file
+		$config_has_errors = false;
 		if( is_string( $config_ignore_files ) )
 		{ // Config file has some errors, but the upgrade should not fail because of that
 			echo '<div class="red">'.$config_ignore_files.'</div>';
+			$config_has_errors = true;
 		}
 		else
 		{
@@ -351,6 +366,7 @@ function verify_overwrite( $src, $dest, $action = '', $overwrite = true, & $read
 				{
 					echo '<div class="red">'.sprintf( T_('Unknown policy command: %s'), $config_unknown_command ).'</div>';
 				}
+				$config_has_errors = true;
 			}
 
 			if( ! empty( $config_incorrect_commands ) && is_array( $config_incorrect_commands ) )
@@ -359,7 +375,14 @@ function verify_overwrite( $src, $dest, $action = '', $overwrite = true, & $read
 				{
 					echo '<div class="red">'.sprintf( T_('Incorrect policy command: %s'), $config_incorrect_command ).'</div>';
 				}
+				$config_has_errors = true;
 			}
+		}
+
+		if( $config_has_errors )
+		{ // The upgrade config file contains the errors, Stop the upgrading process
+			echo '<div class="red">'.sprintf( T_('To continue the upgrade process please fix the issues of the file %s or delete it.'), '&laquo;<b>upgrade_policy.conf</b>&raquo;' ).'</div>';
+			return false;
 		}
 	}
 
@@ -481,86 +504,6 @@ function verify_overwrite( $src, $dest, $action = '', $overwrite = true, & $read
 
 
 /**
- * Get upgrade action
- * @param string download url
- * @return upgrade action
- */
-function get_upgrade_action( $download_url )
-{
-	global $upgrade_path, $backup_path, $servertimenow, $debug;
-
-	// Construct version name from download URL
-	$slash_pos = strrpos( $download_url, '/' );
-	$point_pos = strrpos( $download_url, '.' );
-
-	if( $slash_pos < $point_pos )
-	{
-		$version_name = substr( $download_url, $slash_pos + 1, $point_pos - $slash_pos - 1 );
-	}
-
-	if( empty( $version_name ) )
-	{
-		return false;
-	}
-
-	if( file_exists( $upgrade_path ) )
-	{
-		$filename_params = array(
-				'inc_files'	=> false,
-				'recurse'	=> false,
-				'basename'	=> true,
-			);
-		// Search if there is unpacked version in '_upgrade' directory
-		foreach( get_filenames( $upgrade_path, $filename_params ) as $dir_name )
-		{
-			if( strpos( $dir_name, $version_name ) === 0 )
-			{
-				$action_props = array();
-				$new_version_status = check_version( $dir_name );
-				if( !empty( $new_version_status ) )
-				{
-					$action_props['action'] = 'none';
-					$action_props['status'] = $new_version_status;
-				}
-
-				if( $debug > 0 || empty( $new_version_status ) )
-				{
-					if( file_exists( $backup_path ) )
-					{ // The backup was already created. In this case the upgrade should have run successfully maybe the backup folder was not deleted.
-						$action_props['action'] = 'none';
-					}
-					else
-					{ // The backup was not created yet
-						$action_props['action'] = 'backup_and_overwrite';
-					}
-					$action_props['name'] = $dir_name;
-				}
-
-				return $action_props;
-			}
-		}
-
-		$filename_params = array(
-				'inc_dirs'	=> false,
-				'recurse'	=> false,
-				'basename'	=> true,
-			);
-		// Search if there is packed version in '_upgrade' directory
-		foreach( get_filenames( $upgrade_path, $filename_params ) as $file_name )
-		{
-			if( strpos( $file_name, $version_name ) === 0 )
-			{
-				return array( 'action' => 'unzip', 'name' => substr( $file_name, 0, strrpos( $file_name, '.' ) ) );
-			}
-		}
-	}
-
-	// There is no any version in '_upgrade' directory. So, we need download package before.
-	return array( 'action' => 'download', 'name' => $version_name.'-'.date( 'Y-m-d', $servertimenow ) );
-}
-
-
-/**
  * Convert aliases to real table names as table backup works with real table names
  * @param mixed aliases
  * @return mixed
@@ -624,7 +567,7 @@ function get_upgrade_config( $action )
 {
 	global $conf_path, $upgrade_policy_config;
 
-	if( !isset( $upgrade_policy_config ) )
+	if( ! isset( $upgrade_policy_config ) )
 	{ // Init global array first time
 		$upgrade_policy_config = array();
 	}
@@ -638,9 +581,10 @@ function get_upgrade_config( $action )
 		return $upgrade_policy_config[ $action ];
 	}
 
-	if( !check_upgrade_config() )
-	{ // No config file
-		$upgrade_policy_config = sprintf( T_('%s was not found.'), '&laquo;<b>upgrade_policy.conf</b>&raquo;' );
+	if( ! check_upgrade_config() )
+	{ // The upgrade config file is NOT mandatory
+		// Return just an empty array without error text
+		// Error message is displayed on top page by $Messages object
 		return $upgrade_policy_config;
 	}
 
@@ -800,4 +744,137 @@ function remove_after_upgrade()
 	}
 }
 
+
+/**
+ * Get affected paths
+ *
+ * @param string Path
+ * @return string
+ */
+function get_affected_paths( $path )
+{
+	global $basepath;
+
+	$affected_paths = T_( 'Affected paths:' ).' ';
+	if( is_array( $path ) )
+	{
+		$paths = array();
+		foreach( $path as $p )
+			$paths[] = no_trailing_slash( $p );
+
+		$affected_paths .= implode( ', ', $paths );
+	}
+	elseif( $path == '*' )
+	{
+		$filename_params = array(
+				'inc_files'	=> false,
+				'recurse'	=> false,
+				'basename'	=> true,
+			);
+		$affected_paths .= implode( ', ', get_filenames( $basepath, $filename_params ) );
+	}
+	else
+	{
+		$affected_paths .= no_trailing_slash( $path );
+	}
+	return $affected_paths;
+}
+
+
+/**
+ * Get affected tables
+ *
+ * @param string Table
+ * @return string
+ */
+function get_affected_tables( $table )
+{
+	global $DB;
+
+	$affected_tables = T_( 'Affected tables:' ).' ';
+	if( is_array( $table ) )
+	{
+		$affected_tables .= implode( ', ', aliases_to_tables( $table ) );
+	}
+	elseif( $table == '*' )
+	{
+		$tables = array();
+		foreach( $DB->get_results( 'SHOW TABLES', ARRAY_N ) as $row )
+				$tables[] = $row[0];
+
+		$affected_tables .= implode( ', ', $tables );
+	}
+	else
+	{
+		$affected_tables .= aliases_to_tables( $table );
+	}
+	return $affected_tables;
+}
+
+/**
+ * Get html template of steps panel
+ *
+ * @param array Steps
+ * @param integer Current step
+ * @return string
+ */
+function get_tool_steps( $steps, $current_step )
+{
+	if( empty( $steps ) || empty( $current_step ) )
+	{ // Bad input data
+		return '';
+	}
+
+	$r = '<div class="tool_steps">';
+	foreach( $steps as $step_num => $step_title )
+	{
+		$r .= '<div class="step'.( $step_num == $current_step ? ' current' : '' ).'">'
+					.'<div>'.$step_num
+						.( $step_num < $current_step ? '<span>&#10003;</span>' : '' )
+					.'</div>'
+					.$step_title
+				.'</div>';
+	}
+	$r .= '</div>';
+
+	return $r;
+}
+
+/**
+ * Display steps panel
+ *
+ * @param integer Current step
+ */
+function autoupgrade_display_steps( $current_step )
+{
+	$steps = array(
+			1 => T_('Check for updates'),
+			2 => T_('Download'),
+			3 => T_('Unzip'),
+			4 => T_('Ready to upgrade'),
+			5 => T_('Backup &amp; Upgrade'),
+			6 => T_('Installer script'),
+		);
+
+	echo get_tool_steps( $steps, $current_step );
+}
+
+
+/**
+ * Display steps panel
+ *
+ * @param integer Current step
+ */
+function svnupgrade_display_steps( $current_step )
+{
+	$steps = array(
+			1 => T_('Connect to SVN'),
+			2 => T_('Export'),
+			3 => T_('Ready to upgrade'),
+			4 => T_('Backup &amp; Upgrade'),
+			5 => T_('Installer script'),
+		);
+
+	echo get_tool_steps( $steps, $current_step );
+}
 ?>

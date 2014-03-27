@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  * @ignore
@@ -26,7 +26,7 @@ class wikilinks_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $help_url = 'http://b2evolution.net/man/technical-reference/renderer-plugins/wiki-links-plugin';
+	var $help_topic = 'wiki-links-plugin';
 	var $number_of_installs = 1;
 
 	/**
@@ -72,8 +72,6 @@ class wikilinks_plugin extends Plugin
 	/**
 	 * Perform rendering
 	 *
-	 * @todo get rid of global $blog
-	 *
 	 * @param array Associative array of parameters
 	 *   'data': the data (by reference). You probably want to modify this.
 	 *   'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
@@ -83,10 +81,38 @@ class wikilinks_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		global $ItemCache, $admin_url, $blog, $evo_charset;
-
-		$Item = $params['Item'];
+		if( !empty( $params['Item'] ) )
+		{ // Get Item from params
+			$Item = & $params['Item'];
+		}
+		elseif( !empty( $params['Comment'] ) )
+		{ // Get Item from Comment
+			$Comment = & $params['Comment'];
+			$Item = & $Comment->get_Item();
+		}
+		else
+		{ // Item and Comment are not defined, Exit here
+			return;
+		}
 		$item_Blog = & $Item->get_Blog();
+
+		return $this->render_content( $content, $item_Blog );
+	}
+
+
+	/**
+	 * Render content of Item, Comment, Message
+	 *
+	 * @todo get rid of global $blog
+	 *
+	 * @param string Content
+	 * @param object Blog
+	 * @param boolean Allow empty Blog
+	 * return boolean
+	 */
+	function render_content( & $content, $item_Blog = NULL, $allow_null_blog = false )
+	{
+		global $ItemCache, $admin_url, $blog, $evo_charset;
 
 		$regexp_modifier = '';
 		if( $evo_charset == 'utf-8' )
@@ -131,7 +157,7 @@ class wikilinks_plugin extends Plugin
 		$search_wikiwords = array();
 		$replace_links = array();
 
-		if( $this->get_coll_setting( 'link_without_brackets', $item_Blog ) )
+		if( $this->get_coll_setting( 'link_without_brackets', $item_Blog, $allow_null_blog ) )
 		{	// Create the links from standalone WikiWords
 
 			// STANDALONE WIKIWORDS:
@@ -321,11 +347,4 @@ class wikilinks_plugin extends Plugin
 		return true;
 	}
 }
-
-/*
- * $Log$
- * Revision 1.33  2013/11/06 08:05:22  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

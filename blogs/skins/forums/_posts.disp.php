@@ -9,25 +9,32 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-//global $Item;
-
 // --------------------------------- START OF POSTS -------------------------------------
 global $cat, $MainList;
 
 if( $cat > 0 )
-{
+{ // One single category is set
+	// Breadcrumbs
+	$Skin->display_breadcrumbs( $cat );
+
 ?>
 <div class="post_panel">
 <?php
 	$Skin->display_post_button( $cat );
-	// BREADCRUMBS
-	$Skin->display_breadcrumbs( $cat );
+
+	// Display page title
+	$ChapterCache = & get_ChapterCache();
+	if( $category = & $ChapterCache->get_by_ID( $cat ) )
+	{	// Display category title
+		$category_name = $category->get( 'name' ); // $category_name is also used below
+		echo '<h2 class="page_title">'.$category_name.'</h2>';
+	}
 ?>
 </div>
 <div class="clear"></div>

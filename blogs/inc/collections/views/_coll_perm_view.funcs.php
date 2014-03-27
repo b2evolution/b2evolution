@@ -4,7 +4,7 @@
  * 
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * 
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * 
  * @package evocore
  * 

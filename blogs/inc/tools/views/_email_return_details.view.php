@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -37,13 +37,13 @@ $Form->info( T_('Date'), mysql2localedatetime_spans( $MailReturn->emret_timestam
 
 $Form->info( T_('Error Type'), dre_decode_error_type( $MailReturn->emret_errtype ) );
 
-$Form->info( T_('Address'), '<pre class="email_log"><span>'.htmlspecialchars($MailReturn->emret_address).'</span></pre>' );
+$Form->info( T_('Address'), '<pre class="email_log"><span>'.evo_htmlspecialchars($MailReturn->emret_address).'</span></pre>' );
 
-$Form->info( T_('Error'), '<pre class="email_log"><span>'.htmlspecialchars($MailReturn->emret_errormsg).'</span></pre>' );
+$Form->info( T_('Error'), '<pre class="email_log"><span>'.evo_htmlspecialchars($MailReturn->emret_errormsg).'</span></pre>' );
 
-$Form->info( T_('Headers'), '<pre class="email_log_scroll"><span>'.htmlspecialchars($MailReturn->emret_headers).'</span></pre>' );
+$Form->info( T_('Headers'), '<pre class="email_log_scroll"><span>'.evo_htmlspecialchars($MailReturn->emret_headers).'</span></pre>' );
 
-$Form->info( T_('Message'), '<pre class="email_log_scroll"><span>'.htmlspecialchars($MailReturn->emret_message).'</span></pre>' );
+$Form->info( T_('Message'), '<pre class="email_log_scroll"><span>'.evo_htmlspecialchars($MailReturn->emret_message).'</span></pre>' );
 
 $Form->end_form();
 

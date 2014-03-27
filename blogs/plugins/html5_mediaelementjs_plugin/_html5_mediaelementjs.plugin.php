@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @author fplanque: Francois PLANQUE.
  *
@@ -40,15 +40,26 @@ class html5_mediaelementjs_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
+		global $Blog;
+
 		require_css( $this->get_plugin_url().'rsc/mediaelementplayer.min.css', 'relative' );
 		require_js( '#jquery#', 'blog' );
 		require_js( $this->get_plugin_url().'rsc/mediaelement-and-player.min.js', 'relative' );
 		$this->require_skin();
 
 		// Set a video size in css style, because option setting cannot sets correct size
-		$width = (int) $this->Settings->get( 'width' );
-		$height = (int) $this->Settings->get( 'height' );
-		add_css_headline( 'video.html5_mediaelementjs_video{ width: '.$width.'px !important; height: '.$height.'px !important; }' );
+		$width = intval( $this->get_coll_setting( 'width', $Blog ) );
+		$width = empty( $width ) ? '100%' : $width.'px';
+		$height = intval( $this->get_coll_setting( 'height', $Blog ) );
+		add_css_headline( 'video.html5_mediaelementjs_video{ width: '.$width.' !important; height: '.$height.'px !important; display: block; margin: auto; }
+.mediajs_block {
+	margin: 0 auto 1em;
+}
+.mediajs_block .mediajs_text {
+	font-size: 84%;
+	text-align: center;
+	margin: 4px 0;
+}' );
 
 		// Initialize a player
 		add_js_headline( 'jQuery( document ).ready( function() {
@@ -117,45 +128,46 @@ class html5_mediaelementjs_plugin extends Plugin
 
 
 	/**
-	 * Get the settings that the plugin can use.
+	 * Define here default collection/blog settings that are to be made available in the backoffice.
 	 *
-	 * Those settings are transfered into a Settings member object of the plugin
-	 * and can be edited in the backoffice (Settings / Plugins).
-	 *
-	 * @see Plugin::GetDefaultSettings()
-	 * @see PluginSettings
-	 * @see Plugin::PluginSettingsValidateSet()
-	 * @return array
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::get_coll_setting_definitions()}.
 	 */
-	function GetDefaultSettings( & $params )
+	function get_coll_setting_definitions( & $params )
 	{
-		return array(
-			'skin' => array(
-				'label' => T_('Skin'),
-				'type' => 'select',
-				'options' => $this->get_skins_list(),
-				'defaultvalue' => 'default',
-				),
-			'width' => array(
-				'label' => T_('Video width (px)'),
-				'type' => 'integer',
-				'defaultvalue' => 425,
-				'note' => '',
-				'valid_range' => array( 'min' => 1 ),
-				),
-			'height' => array(
-				'label' => T_('Video height (px)'),
-				'type' => 'integer',
-				'defaultvalue' => 300,
-				'note' => '',
-				'valid_range' => array( 'min' => 1 ),
-				),
-			'allow_download' => array(
-				'label' => T_('Allow downloading of the video file'),
-				'type' => 'checkbox',
-				'defaultvalue' => 0,
-				),
-			);
+		return array_merge( parent::get_coll_setting_definitions( $params ),
+			array(
+				'skin' => array(
+					'label' => T_('Skin'),
+					'type' => 'select',
+					'options' => $this->get_skins_list(),
+					'defaultvalue' => 'default',
+					),
+				'width' => array(
+					'label' => T_('Video width (px)'),
+					'defaultvalue' => 425,
+					'note' => T_('100% width if left empty or 0'),
+					),
+				'height' => array(
+					'label' => T_('Video height (px)'),
+					'type' => 'integer',
+					'defaultvalue' => 300,
+					'note' => '',
+					'valid_range' => array( 'min' => 1 ),
+					),
+				'allow_download' => array(
+					'label' => T_('Allow downloading of the video file'),
+					'type' => 'checkbox',
+					'defaultvalue' => 0,
+					),
+				'disp_caption' => array(
+					'label' => T_('Display caption'),
+					'note' => T_('Check to display the video file caption under the video player.'),
+					'type' => 'checkbox',
+					'defaultvalue' => 0,
+					),
+			)
+		);
 	}
 
 
@@ -187,6 +199,9 @@ class html5_mediaelementjs_plugin extends Plugin
 			return false;
 		}
 
+		$Item = & $params['Item'];
+		$item_Blog = $Item->get_Blog();
+
 		if( $File->exists() )
 		{
 			/**
@@ -200,14 +215,23 @@ class html5_mediaelementjs_plugin extends Plugin
 				$params['data'] .= '<div style="clear: both; height: 0px; font-size: 0px"></div>';
 			}
 
+			$params['data'] .= '<div class="mediajs_block">';
+
 			$params['data'] .= '<video class="html5_mediaelementjs_video '.$this->get_skin_class().'" id="html5_mediaelementjs_'.$html5_mediaelementjs_number.'">'.
-				'<source src="'.$File->get_url().'" type="'.$this->get_video_mimetype( $File ).'" />'.
+				'<source src="'.$File->get_url().'" type="'.$this->get_video_mimetype( $File ).'" align="center" />'.
 			'</video>';
 
-			if( $this->Settings->get( 'allow_download' ) )
-			{	// Allow to download the video files
-				$params['data'] .= '<div class="small center"><a href="'.$File->get_url().'">'.T_('Download this video').'</a></div>';
+			if( $File->get( 'desc' ) != '' && $this->get_coll_setting( 'disp_caption', $item_Blog ) )
+			{ // Display caption
+				$params['data'] .= '<div class="mediajs_text">'.$File->get( 'desc' ).'</div>';
 			}
+
+			if( $this->get_coll_setting( 'allow_download', $item_Blog ) )
+			{ // Allow to download the video files
+				$params['data'] .= '<div class="mediajs_text"><a href="'.$File->get_url().'">'.T_('Download this video').'</a></div>';
+			}
+
+			$params['data'] .= '</div>';
 
 			return true;
 		}
@@ -224,6 +248,9 @@ class html5_mediaelementjs_plugin extends Plugin
 	 */
 	function RenderCommentAttachment( & $params )
 	{
+		$Comment = & $params['Comment'];
+		$params['Item'] = & $Comment->get_Item();
+
 		return $this->RenderItemAttachment( $params, true );
 	}
 
@@ -259,11 +286,13 @@ class html5_mediaelementjs_plugin extends Plugin
 	 */
 	function get_skin_class()
 	{
-		$skin = $this->Settings->get( 'skin' );
+		global $Blog;
 
-		if( !empty( $skin ) && $skin != 'default')
+		$skin = $this->get_coll_setting( 'skin', $Blog );
+
+		if( ! empty( $skin ) && $skin != 'default')
 		{
-			return 'mejs-'.$this->Settings->get( 'skin' );
+			return 'mejs-'.$skin;
 		}
 
 		return ''; // Default skin
@@ -274,7 +303,9 @@ class html5_mediaelementjs_plugin extends Plugin
 	 */
 	function require_skin()
 	{
-		$skin = $this->Settings->get( 'skin' );
+		global $Blog;
+
+		$skin = $this->get_coll_setting( 'skin', $Blog );
 		if( !empty( $skin ) && $skin != 'default')
 		{
 			$skins_path = dirname( $this->classfile_path ).'/skins';

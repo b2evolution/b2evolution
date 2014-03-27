@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -39,7 +39,7 @@ if( $Session->has_User() )
 			$redirect_to = $baseurl;
 		}
 		$Messages->add( sprintf( T_('Note: You are already logged in as %s!'), $tmp_User->get('login') )
-			.' <a href="'.htmlspecialchars($redirect_to).'">'.T_('Continue').' &raquo;</a>', 'note' );
+			.' <a href="'.evo_htmlspecialchars($redirect_to).'">'.T_('Continue').' &raquo;</a>', 'note' );
 	}
 	unset($tmp_User);
 }
@@ -49,7 +49,7 @@ if( $Session->has_User() )
  * Include page header (also displays Messages):
  */
 $page_title = T_('Log in to your account');
-$page_icon = 'login';
+$wrap_height = '300px';
 
 /*
   fp> The login page is small. Let's use it as a preloader for the backoffice (which is awfully slow to initialize)
@@ -79,13 +79,16 @@ if( $transmit_hashed_password )
 require dirname(__FILE__).'/_html_header.inc.php';
 
 $params = array(
+	'form_before' => str_replace( '$title$', $page_title, $form_before ),
+	'form_after' => $form_after,
 	'form_action' => $secure_htsrv_url.'login.php',
 	'form_layout' => 'fieldset',
-	'form_class' => 'fform',
+	'form_class' => 'form-login',
 	'source' => param( 'source', 'string', 'std login form' ),
 	'inskin' => false,
+	'inskin_urls' => false,
 	'redirect_to' => $redirect_to,
-	'login' => $login,
+	'login' => evo_strtolower( $login ),
 	'login_required' => $login_required,
 	'validate_required' => $validate_required,
 	'action' => $action,

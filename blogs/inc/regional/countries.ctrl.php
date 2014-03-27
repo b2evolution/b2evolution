@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2014 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -53,6 +53,23 @@ $AdminUI->set_path( 'options', 'regional', 'countries' );
 // Get action parameter from request:
 param_action();
 
+// Set redirect_to value when it is required
+if( in_array( $action, array( 'enable_country', 'disable_country', 'enable_country_pref', 'disable_country_pref' ) ) )
+{
+	// Get page and order params before creating redirect url
+	param( 'results_ctry_page', 'integer', '', true );
+	param( 'results_ctry_order', 'string', '', true );
+	// Get redirect ctrl param, and set redirect_to
+	if( param( 'redirect_ctrl', 'string', 'countries' ) == 'countries' )
+	{
+		$redirect_to = regenerate_url( '', '', '', '&' );
+	}
+	else
+	{
+		$redirect_to = regenerate_url( 'ctrl', 'ctrl=antispam&tab3=countries', '', '&' );
+	}
+}
+
 if( param( 'ctry_ID', 'integer', '', true) )
 {// Load country from cache:
 	$CountryCache = & get_CountryCache();
@@ -95,11 +112,8 @@ switch( $action )
 		// Update db with new flag value.
 		$edited_Country->dbupdate();
 
-		param( 'results_ctry_page', 'integer', '', true );
-		param( 'results_ctry_order', 'string', '', true );
-
 		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( regenerate_url( '', '', '', '&' ), 303 ); // Will EXIT
+		header_redirect( $redirect_to, 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 
@@ -128,16 +142,18 @@ switch( $action )
 		{	// Enable country by setting flag to true.
 			$edited_Country->set( 'preferred', 1 );
 			$Messages->add( sprintf( T_('Added to preferred countries (%s, #%d).'), $edited_Country->name, $edited_Country->ID ), 'success' );
+
+			if( $edited_Country->get( 'status' ) == '' )
+			{ // If status was 'unknown' and country is became pref now, We should change country to trusted status
+				$edited_Country->set( 'status', 'trusted' );
+			}
 		}
 
 		// Update db with new flag value.
 		$edited_Country->dbupdate();
 
-		param( 'results_ctry_page', 'integer', '', true );
-		param( 'results_ctry_order', 'string', '', true );
-
 		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( regenerate_url( '', '', '', '&' ), 303 ); // Will EXIT
+		header_redirect( $redirect_to, 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 
@@ -296,6 +312,10 @@ switch( $action )
 
 }
 
+if( empty( $action ) )
+{ // JS to edit status of countries from list view
+	require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+}
 
 $AdminUI->breadcrumbpath_init( false );
 $AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system',

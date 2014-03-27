@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -110,12 +110,20 @@ class Plugin
 	var $author = 'Unknown author';
 
 	/**
+	 * The topic of the plugin manual page in the b2evolution manual.
+	 *
+	 * If empty, it defaults to [plugin_classname], which is the plugin's PHP class name.
+	 *
+	 * @var string
+	 */
+	var $help_topic = '';
+
+	/**
 	 * URL for more info about the plugin, author and new versions.
 	 *
 	 * This is for user info only.
 	 *
-	 * If empty, it defaults to 'http://b2evolution.net/man/[plugin_classname]',
-	 * where '[plugin_classname]' is the plugin's PHP class name (with first char uppercased).
+	 * If empty, it defaults to {@link get_manual_url( Plugin->help_topic )}.
 	 *
 	 * @var string
 	 */
@@ -850,6 +858,16 @@ class Plugin
 
 
 	/**
+	 * Event handler: Gets invoked when an action request was called which should be blocked in specific cases
+	 *
+	 * Blocakble actions: comment post, user login/registration, email send/validation, account activation 
+	 */
+	function BeforeBlockableAction()
+	{
+	}
+
+
+	/**
 	 * Event handler: Called when a MainList object gets created.
 	 *
 	 * Note: you must create your own MainList object here, set filters and query the database, see init_MainList() for detailes.
@@ -1339,17 +1357,6 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called when the view counter of an item got increased.
-	 *
-	 * @param array Associative array of parameters
-	 *   - 'Item': the Item object (by reference)
-	 */
-	function ItemViewsIncreased( & $params )
-	{
-	}
-
-
-	/**
 	 * Event handler: Called at the end of the "Edit item" form.
 	 *
 	 * @param array Associative array of parameters
@@ -1554,14 +1561,14 @@ class Plugin
 	 *
 	 * If you need to delegate to another service (what OpenID does), you need to remember all
 	 * these params (use array_keys($params)) and restore them when coming back.
-	 * Only comment_post_ID is required at the beginning of comment_post.php (where this hook)
+	 * Only comment_item_ID is required at the beginning of comment_post.php (where this hook)
 	 * is located (and has to be passed via GET/POST) - all other params can get stored in a
 	 * local session and restored when coming back (this is recommended.)
 	 *
 	 * @since 1.10.0
 	 * @see Plugin::DisplayCommentFormFieldset()
 	 * @param array Associative array of parameters
-	 *   - 'comment_post_ID': ID of the item the comment is for
+	 *   - 'comment_item_ID': ID of the item the comment is for
 	 *   - 'comment': the comment text (by reference)
 	 *   - 'original_comment': the original, unfiltered comment text - you should not modify it here,
 	 *      this is meant e.g. for the OpenID plugin to re-inject it after redirection (by reference)
@@ -3052,7 +3059,7 @@ class Plugin
 	{
 		if( empty( $this->help_url ) )
 		{
-			return 'http://b2evolution.net/man/'.strtolower( str_replace( '_', '-', $this->classname ) );
+			return get_manual_url( empty( $this->help_topic ) ? $this->classname : $this->help_topic );
 		}
 		else
 		{

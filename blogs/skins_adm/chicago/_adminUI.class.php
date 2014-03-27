@@ -6,7 +6,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -314,6 +314,7 @@ class AdminUI extends AdminUI_general
 					'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="$id$"><h2 $title_attribs$>$fieldset_title$</h2>',
 					'fieldset_end' => '</div>',
 					'fieldstart' => '<fieldset $ID$>'."\n",
+					'labelclass' => '',
 					'labelstart' => '<div class="label">',
 					'labelend' => "</div>\n",
 					'labelempty' => '<div class="label"></div>', // so that IE6 aligns DIV.input correcctly
@@ -341,6 +342,7 @@ class AdminUI extends AdminUI_general
 						<fieldset $fieldset_attribs$>'."\n", // $fieldset_attribs will contain ID
 					'fieldset_end' => '</fieldset></div>'."\n",
 					'fieldstart' => '<fieldset $ID$>'."\n",
+					'labelclass' => '',
 					'labelstart' => '<div class="label">',
 					'labelend' => "</div>\n",
 					'labelempty' => '<div class="label"></div>', // so that IE6 aligns DIV.input correcctly

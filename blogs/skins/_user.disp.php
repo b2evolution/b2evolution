@@ -8,7 +8,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -195,13 +195,21 @@ $ProfileForm->begin_fieldset( T_('Identity') );
 
 	if( $is_logged_in && $current_User->check_status( 'can_view_user', $user_ID ) )
 	{ // Display other pictures, but only for logged in and activated users:
-		$user_avatars = $User->get_avatar_Files();
+		$user_avatars = $User->get_avatar_Links();
 		if( count( $user_avatars ) > 0 )
 		{
 			$info_content = '';
-			foreach( $user_avatars as $uFile )
+			foreach( $user_avatars as $uLink )
 			{
-				$info_content .= $uFile->get_tag( '<div class="avatartag">', '', '', '</div>', 'crop-top-80x80', 'original', $User->login, 'lightbox[user]' );
+				$info_content .= $uLink->get_tag( array(
+					'before_image' => '<div class="avatartag">',
+					'before_image_legend' => NULL,
+					'after_image_legend'  => NULL,
+					'image_size'          => 'crop-top-80x80',
+					'image_link_to'       => 'original',
+					'image_link_title'    => $User->login,
+					'image_link_rel'      => 'lightbox[user]'
+				) );
 			}
 			$info_content .= '<div class="clear"></div>';
 			$ProfileForm->info( T_('Other pictures'), $info_content );

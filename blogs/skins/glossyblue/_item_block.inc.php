@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -112,13 +112,3 @@ $params = array_merge( array(
 		locale_restore_previous();	// Restore previous locale (Blog locale)
 	?>
 </div>
-
-<?php
-
-/*
- * $Log$
- * Revision 1.4  2013/11/06 08:05:44  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
-?>

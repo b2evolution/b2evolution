@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -29,13 +29,14 @@ $default_order = ( $min_inappropriate_votes >= $min_spam_votes ) ? '----D' : '--
 // Create result set:
 $SQL = new SQL();
 $SQL->SELECT( 'f1.*,
-	SUM( IFNULL( fvot_like, 0 ) ) as total_like,
-	SUM( IFNULL( fvot_inappropriate, 0 ) ) as total_inappropriate,
-	SUM( IFNULL( fvot_spam, 0 ) ) as total_spam,
+	SUM( IFNULL( lvot_like, 0 ) ) as total_like,
+	SUM( IFNULL( lvot_inappropriate, 0 ) ) as total_inappropriate,
+	SUM( IFNULL( lvot_spam, 0 ) ) as total_spam,
 	( SELECT COUNT( file_ID ) FROM T_files AS f2 WHERE f1.file_hash = f2.file_hash ) - 1 AS total_duplicates' );
-$SQL->FROM( 'T_files__vote' );
-$SQL->FROM_add( 'INNER JOIN T_files AS f1 ON fvot_file_ID = file_ID' );
-$SQL->GROUP_BY( 'fvot_file_ID' );
+$SQL->FROM( 'T_links__vote' );
+$SQL->FROM_add( 'INNER JOIN T_links ON link_ID = lvot_link_ID' );
+$SQL->FROM_add( 'INNER JOIN T_files AS f1 ON link_file_ID = file_ID' );
+$SQL->GROUP_BY( 'link_file_ID' );
 $SQL->ORDER_BY( '*, total_spam DESC, total_inappropriate DESC' );
 
 // Set filters condition to SQL queries
@@ -43,22 +44,23 @@ if( $min_inappropriate_votes <= 1 && $min_spam_votes <= 1 && ( !( $min_inappropr
 { // We must show all votes or where is at least one spam vote or where is at least one inappropriate ( one filter must be 0 and none of them > 1 )
 	if( $min_inappropriate_votes )
 	{ // Min inappropriate filter is set to 1 but min spam is 0
-		$sql_where = 'fvot_inappropriate = 1';
+		$sql_where = 'lvot_inappropriate = 1';
 	}
 	elseif( $min_spam_votes )
 	{ // Min spam filter is set to 1 but min inappropriate is 0
-		$sql_where = 'fvot_spam = 1';
+		$sql_where = 'lvot_spam = 1';
 	}
 	else
 	{ // We have to show all files which has any kind of spam vote
-		$sql_where = '( fvot_inappropriate = 1 OR fvot_spam = 1 )';
+		$sql_where = '( lvot_inappropriate = 1 OR lvot_spam = 1 )';
 	}
 	// Set the main query where condition
 	$SQL->WHERE_and( $sql_where );
 	// Create count result query
 	$count_SQL = new SQL();
-	$count_SQL->SELECT( 'COUNT( DISTINCT( fvot_file_ID ) )' );
-	$count_SQL->FROM( 'T_files__vote' );
+	$count_SQL->SELECT( 'COUNT( DISTINCT( link_file_ID ) )' );
+	$count_SQL->FROM( 'T_links__vote' );
+	$count_SQL->FROM_add( 'INNER JOIN T_links ON link_ID = lvot_link_ID' );
 	$count_SQL->WHERE_and( $sql_where );
 	// count the number of filtered result
 	$filtered_num_results = $DB->get_var( $count_SQL->get() );
@@ -69,10 +71,11 @@ else
 	$SQL->HAVING( '( total_inappropriate >= '.$DB->quote( $min_inappropriate_votes ).' ) AND ( total_spam >= '.$DB->quote( $min_spam_votes ).' )' );
 	// Create count result query
 	$count_SQL = new SQL();
-	$count_SQL->SELECT( 'fvot_file_ID' );
-	$count_SQL->FROM( 'T_files__vote' );
-	$count_SQL->GROUP_BY( 'fvot_file_ID' );
-	$count_SQL->HAVING( '( SUM( fvot_inappropriate ) >= '.$DB->quote( $min_inappropriate_votes ).' ) AND ( SUM( fvot_spam ) >= '.$DB->quote( $min_spam_votes ).' )' );
+	$count_SQL->SELECT( 'link_file_ID' );
+	$count_SQL->FROM( 'T_links__vote' );
+	$count_SQL->FROM_add( 'INNER JOIN T_links ON link_ID = lvot_link_ID' );
+	$count_SQL->GROUP_BY( 'link_file_ID' );
+	$count_SQL->HAVING( '( SUM( lvot_inappropriate ) >= '.$DB->quote( $min_inappropriate_votes ).' ) AND ( SUM( lvot_spam ) >= '.$DB->quote( $min_spam_votes ).' )' );
 	// count the number of filtered result ( we need subquery because we can't count all when we have group by )
 	$filtered_num_results = $DB->get_var( "SELECT COUNT(*) FROM (". $count_SQL->get() ." )  AS TotalSelected " );
 }
@@ -110,7 +113,7 @@ $Results->cols[] = array(
 		'th' => T_('Icon/Type'),
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap',
-		'td' => '% {Obj}->get_preview_thumb( "fulltype", true ) %',
+		'td' => '% {Obj}->get_preview_thumb( "fulltype", array( "init" => true ) ) %',
 	);
 
 $Results->cols[] = array(

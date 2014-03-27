@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -60,6 +60,8 @@ $Form->begin_fieldset( T_('Post list').get_manual_link('item-list-features') );
                         array( 'duration', T_('only the next') ),
                       ), T_('Show future posts'), true );
   $Form->duration_input( 'timestamp_max_duration', $edited_Blog->get_setting('timestamp_max_duration'), '' );
+
+  $Form->checklist( get_inskin_statuses_options( $edited_Blog, 'post' ), 'post_inskin_statuses', T_('Front office statuses'), false, false, array( 'note' => 'Uncheck the statuses that should never appear in the front office.' ) );
 
 $Form->end_fieldset();
 
@@ -201,9 +203,7 @@ $Form->begin_fieldset( T_('Custom fields').get_manual_link('item-custom-fields')
 $Form->end_fieldset();
 
 
-$Form->end_form( array(
-	array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
-	array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 
 
 load_funcs( 'regional/model/_regional.funcs.php' );

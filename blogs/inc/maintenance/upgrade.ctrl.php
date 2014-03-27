@@ -5,7 +5,7 @@
  * This file is part of b2evolution - {@link http://b2evolution.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2014 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -89,6 +89,8 @@ switch( $action )
 		// STEP 1: Check for updates.
 		if( $tab == '' )
 		{
+			autoupgrade_display_steps( 1 );
+
 			$block_item_Widget = new Widget( 'block_item' );
 			$block_item_Widget->title = T_('Updates from b2evolution.net').get_manual_link( 'auto-upgrade' );
 			$block_item_Widget->disp_template_replaced( 'block_start' );
@@ -102,7 +104,6 @@ switch( $action )
 
 			// Display info & error messages
 			echo $Messages->display( NULL, NULL, false, 'action_messages' );
-
 
 			/**
 			 * @var AbstractSettings
@@ -124,6 +125,10 @@ switch( $action )
 			// Extract available updates:
 			$updates = $global_Cache->get( 'updates' );
 		}
+		elseif( $tab == 'svn' )
+		{
+			svnupgrade_display_steps( 1 );
+		}
 
 		// DEBUG:
 		// $updates[0]['url'] = 'http://xxx/b2evolution-1.0.0.zip'; // TODO: temporary URL
@@ -133,6 +138,7 @@ switch( $action )
 		break;
 
 	case 'download':
+	case 'force_download':
 		// STEP 2: DOWNLOAD.
 
 		if( $demo_mode )
@@ -141,16 +147,41 @@ switch( $action )
 			break;
 		}
 
+		$action_success = true;
+		$download_success = true;
+
+		autoupgrade_display_steps( 2 );
+
 		$block_item_Widget = new Widget( 'block_item' );
-		$block_item_Widget->title = T_('Downloading, unzipping & installing package...');
+		$block_item_Widget->title = T_('Downloading package...');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 
-		$download_url = param( 'upd_url', 'string' );
+		$download_url = param( 'upd_url', 'string', '', true );
 
-		$upgrade_name = param( 'upd_name', 'string', '', true );
+		$upgrade_name = pathinfo( $download_url );
+		$upgrade_name = $upgrade_name['filename'];
 		$upgrade_file = $upgrade_path.$upgrade_name.'.zip';
 
-		if( $success = prepare_maintenance_dir( $upgrade_path, true ) )
+		if( file_exists( $upgrade_file ) )
+		{ // The downloading file already exists
+			if( $action == 'force_download' )
+			{ // Try to delete previous package if the downloading is forced
+				if( ! @unlink( $upgrade_file ) )
+				{
+					echo '<p class="red">'.sprintf( T_('Unable to delete previous downloaded package %s before forcing the download.'), '<b>'.$upgrade_file.'</b>' ).'</p>';
+					$action_success = false;
+				}
+			}
+			else
+			{
+				echo '<div class="action_messages"><div class="log_error" style="text-align:center;font-weight:bold">'
+					.sprintf( T_( 'The package %s is already downloaded.' ), $upgrade_name.'.zip' ).'</div></div>';
+				$action_success = false;
+			}
+			evo_flush();
+		}
+
+		if( $action_success && ( $download_success = prepare_maintenance_dir( $upgrade_path, true ) ) )
 		{
 			// Set maximum execution time
 			set_max_execution_time( 1800 ); // 30 minutes
@@ -161,14 +192,14 @@ switch( $action )
 			// Downloading
 			$file_contents = fetch_remote_page( $download_url, $info, 1800 );
 
-			if( empty($file_contents) )
-			{
-				$success = false;
+			if( $info['status'] != 200 || empty( $file_contents ) )
+			{ // Impossible to download
+				$download_success = false;
 				echo '</p><p style="color:red">'.sprintf( T_( 'Unable to download package from &laquo;%s&raquo;' ), $download_url ).'</p>';
 			}
 			elseif( ! save_to_file( $file_contents, $upgrade_file, 'w' ) )
-			{	// Impossible to save file...
-				$success = false;
+			{ // Impossible to save file...
+				$download_success = false;
 				echo '</p><p style="color:red">'.sprintf( T_( 'Unable to create file: &laquo;%s&raquo;' ), $upgrade_file ).'</p>';
 
 				if( file_exists( $upgrade_file ) )
@@ -181,12 +212,34 @@ switch( $action )
 			}
 			else
 			{ // The package is downloaded successfully
-				echo ' OK.</p>';
+				echo ' OK '.bytesreadable( filesize( $upgrade_file ), false, false ).'.</p>';
 			}
 			evo_flush();
 		}
 
+		if( $action_success && $download_success )
+		{ // Init a button to unzip
+			$upgrade_buttons = array( 'unzip' => T_( 'Unzip package' ) );
+		}
+		elseif( $download_success )
+		{ // Init the buttons to select next action
+			$upgrade_buttons = array(
+					'unzip'          => T_( 'Skip Download' ),
+					'force_download' => T_( 'Force New Download' ),
+				);
+		}
+		else
+		{ // Init a button to back step
+			$upgrade_buttons = array( 'start' => T_( 'Back to select package' ) );
+		}
+
+		// Pause a process before next step
+		$AdminUI->disp_view( 'maintenance/views/_upgrade_continue.form.php' );
+		unset( $block_item_Widget );
+		break;
+
 	case 'unzip':
+	case 'force_unzip':
 		// STEP 3: UNZIP.
 
 		if( $demo_mode )
@@ -195,60 +248,144 @@ switch( $action )
 			break;
 		}
 
-		if( !isset( $block_item_Widget ) )
-		{
-			$block_item_Widget = new Widget( 'block_item' );
-			$block_item_Widget->title = T_('Unzipping & installing package...');
-			$block_item_Widget->disp_template_replaced( 'block_start' );
+		$action_success = true;
+		$unzip_success = true;
 
-			$upgrade_name = param( 'upd_name', 'string', '', true );
-			$upgrade_file = $upgrade_path.$upgrade_name.'.zip';
+		autoupgrade_display_steps( 3 );
 
-			$success = true;
+		$block_item_Widget = new Widget( 'block_item' );
+		$block_item_Widget->title = T_('Unzipping package...');
+		$block_item_Widget->disp_template_replaced( 'block_start' );
+		evo_flush();
+
+		$download_url = param( 'upd_url', 'string', '', true );
+
+		$upgrade_name = pathinfo( $download_url );
+		$upgrade_name = $upgrade_name['filename'];
+		$upgrade_dir = $upgrade_path.$upgrade_name;
+		$upgrade_file = $upgrade_dir.'.zip';
+
+		if( file_exists( $upgrade_dir ) )
+		{ // The downloading file already exists
+			if( $action == 'force_unzip' )
+			{ // Try to delete previous package if the downloading is forced
+				if( ! rmdir_r( $upgrade_dir ) )
+				{
+					echo '<p class="red">'.sprintf( T_('Unable to delete previous unzipped package %s before forcing the unzip.'), '<b>'.$upgrade_dir.'</b>' ).'</p>';
+					$action_success = false;
+				}
+			}
+			else
+			{
+				echo '<div class="action_messages"><div class="log_error" style="text-align:center;font-weight:bold">'
+					.sprintf( T_( 'The package %s is already unzipped.' ), $upgrade_name.'.zip' ).'</div></div>';
+				$action_success = false;
+			}
+			evo_flush();
 		}
 
-		if( $success )
+		if( $action_success )
 		{
 			// Set maximum execution time
 			set_max_execution_time( 1800 ); // 30 minutes
 
-			echo '<p>'.sprintf( T_( 'Unpacking package to &laquo;<strong>%s</strong>&raquo;...' ), $upgrade_path.$upgrade_name );
+			echo '<p>'.sprintf( T_( 'Unpacking package to &laquo;<strong>%s</strong>&raquo;...' ), $upgrade_dir );
 			evo_flush();
 
 			// Unpack package
-			if( $success = unpack_archive( $upgrade_file, $upgrade_path.$upgrade_name, true ) )
+			if( $unzip_success = unpack_archive( $upgrade_file, $upgrade_dir, true ) )
 			{
-				global $debug;
-
 				echo ' OK.</p>';
 				evo_flush();
-
-				$new_version_status = check_version( $upgrade_name );
-				if( $debug == 0 && !empty( $new_version_status ) )
-				{
-					echo '<h4 style="color:red">'.$new_version_status.'</h4>';
-					evo_flush();
-					break;
-				}
 			}
 			else
 			{
 				echo '</p>';
 				// Additional check
-				@rmdir_r( $upgrade_path.$upgrade_name );
+				@rmdir_r( $upgrade_dir );
 			}
 		}
 
-		if( $success )
-		{ // Pause a process before upgrading
-			$action = 'backup_and_overwrite';
-			$AdminUI->disp_view( 'maintenance/views/_upgrade_continue.form.php' );
-			unset( $block_item_Widget );
+		if( $action_success && $unzip_success )
+		{ // Init a button to next step
+			$upgrade_buttons = array( 'ready' => T_( 'Continue' ) );
 		}
+		elseif( $unzip_success )
+		{ // Init the buttons to select next action
+			$upgrade_buttons = array( 'ready' => T_( 'Skip Unzip' ) );
+			if( file_exists( $upgrade_file ) )
+			{
+				$upgrade_buttons['force_unzip'] = T_( 'Force New Unzip' );
+			}
+		}
+		else
+		{ // Init a button to back step
+			$upgrade_buttons = array( 'download' => T_( 'Back to download package' ) );
+		}
+
+		// Pause a process before next step
+		$AdminUI->disp_view( 'maintenance/views/_upgrade_continue.form.php' );
+		unset( $block_item_Widget );
+		break;
+
+	case 'ready':
+		// STEP 4: READY TO UPGRADE.
+	case 'ready_svn':
+		// SVN STEP 3: READY TO UPGRADE.
+
+		if( $action == 'ready_svn' )
+		{ // SVN upgrade
+			svnupgrade_display_steps( 3 );
+
+			$upgrade_name = param( 'upd_name', 'string', NULL, true );
+		}
+		else
+		{ // Auto upgrade
+			autoupgrade_display_steps( 4 );
+
+			$download_url = param( 'upd_url', 'string', '', true );
+
+			$upgrade_name = pathinfo( $download_url );
+			$upgrade_name = $upgrade_name['filename'];
+			$upgrade_dir = $upgrade_path.$upgrade_name;
+			$upgrade_file = $upgrade_dir.'.zip';
+		}
+
+		$block_item_Widget = new Widget( 'block_item' );
+		$block_item_Widget->title = T_('Ready to upgrade...');
+		$block_item_Widget->disp_template_replaced( 'block_start' );
+		evo_flush();
+
+		$new_version_status = check_version( $upgrade_name );
+		$action_backup_value = ( $action == 'ready_svn' ) ? 'backup_and_overwrite_svn' : 'backup_and_overwrite';
+		if( empty( $new_version_status ) )
+		{ // New version
+			echo '<p><b>'.T_( 'The new files are ready to be installed.' ).'</b></p>';
+			$upgrade_buttons = array( $action_backup_value => T_( 'Backup & Upgrade' ) );
+		}
+		else
+		{ // Old/Same version
+			echo '<div class="action_messages"><div class="log_error" style="text-align:center;font-weight:bold">'.$new_version_status.'</div></div>';
+			$upgrade_buttons = array( $action_backup_value => T_( 'Force Backup & Upgrade' ) );
+		}
+
+		echo '<p>'
+			.T_( 'If you continue, the following sequence will be carried out automatically (trying to minimize "maintenance time" for the site):' )
+			.'<ul><li>'.T_( 'The site will switch to maintenance mode' ).'</li>'
+				.'<li>'.T_( 'A backup will be performed' ).'</li>'
+				.'<li>'.T_( 'The upgrade will be applied' ).'</li>'
+				.'<li>'.T_( 'The install script of the new version will be called' ).'</li>'
+				.'<li>'.sprintf( T_( 'The cleanup rules from %s will be applied' ), '<b>upgrade_policy.conf</b>' ).'</li>'
+				.'<li>'.T_( 'The site will switch to normal mode again at the end of the install script.' ).'</li>'
+			.'</ul></p>';
+
+		// Pause a process before next step
+		$AdminUI->disp_view( 'maintenance/views/_upgrade_continue.form.php' );
+		unset( $block_item_Widget );
 		break;
 
 	case 'backup_and_overwrite':
-		// STEP 4: BACKUP AND OVERWRITE.
+		// STEP 5: BACKUP & UPGRADE.
 	case 'backup_and_overwrite_svn':
 		// SVN STEP 2: BACKUP AND OVERWRITE.
 
@@ -260,13 +397,28 @@ switch( $action )
 
 		if( !isset( $block_item_Widget ) )
 		{
+			if( $action == 'backup_and_overwrite_svn' )
+			{ // SVN upgrade
+				svnupgrade_display_steps( 4 );
+			}
+			else
+			{ // Auto upgrade
+				autoupgrade_display_steps( 5 );
+			}
+
 			$block_item_Widget = new Widget( 'block_item' );
 			$block_item_Widget->title = $action == 'backup_and_overwrite_svn'
 				? T_('Installing package from SVN...')
 				: T_('Installing package...');
 			$block_item_Widget->disp_template_replaced( 'block_start' );
 
-			$upgrade_name = param( 'upd_name', 'string', '', true );
+			$upgrade_name = param( 'upd_name', 'string', NULL, true );
+			if( $upgrade_name === NULL )
+			{ // Get an upgrade name from url (Used for auto-upgrade, not svn)
+				$download_url = param( 'upd_url', 'string', '', true );
+				$upgrade_name = pathinfo( $download_url );
+				$upgrade_name = $upgrade_name['filename'];
+			}
 
 			$success = true;
 		}
@@ -296,16 +448,16 @@ switch( $action )
 				// Load Backup class (PHP4) and backup all of the folders and files
 				load_class( 'maintenance/model/_backup.class.php', 'Backup' );
 				$Backup = new Backup();
-				$Backup->include_all();
+				$Backup->load_from_Request();
 
-				if( !function_exists('gzopen') )
+				if( ! function_exists( 'gzopen' ) )
 				{
 					$Backup->pack_backup_files = false;
 				}
 
 				// Start backup
 				if( $success = $Backup->start_backup() )
-				{	// We can upgrade files and database
+				{ // We can upgrade files and database
 
 					// Copying new folders and files
 					echo '<h4>'.T_( 'Copying new folders and files...' ).'</h4>';
@@ -346,9 +498,13 @@ switch( $action )
 
 		if( $success )
 		{ // Pause a process before upgrading, and display a link to the normal upgrade action
-			$upgrade_url = 'href="'.$baseurl.'install/index.php?action='.(( $action == 'backup_and_overwrite_svn' ) ? 'svn_upgrade' : 'auto_upgrade' ).'&locale='.$current_locale.'"';
+			$block_item_Widget->disp_template_replaced( 'block_end' );
+			$Form = new Form();
+			$Form->begin_form( 'fform' );
+			$Form->begin_fieldset( T_( 'Actions' ) );
 			echo '<p><b>'.T_('All new b2evolution files are in place. You will now be redirected to the installer to perform a DB upgrade.').'</b> '.T_('Note: the User Interface will look different.').'</p>';
-			echo '<p><b><span style="font-size:110%">'.sprintf( T_('<a %s>Click here to continue &raquo;</a>'), $upgrade_url ).'</span></b></p>';
+			$continue_onclick = 'location.href="'.$baseurl.'install/index.php?action='.( ( $action == 'backup_and_overwrite_svn' ) ? 'svn_upgrade' : 'auto_upgrade' ).'&locale='.$current_locale.'"';
+			$Form->end_form( array( array( 'button', 'continue', T_('Continue to installer'), '', $continue_onclick ) ) );
 			unset( $block_item_Widget );
 		}
 		else
@@ -359,8 +515,9 @@ switch( $action )
 		break;
 
 	/****** UPGRADE FROM SVN *****/
-	case 'upgrade_svn':
-		// SVN STEP 1: EXPORT.
+	case 'export_svn':
+	case 'force_export_svn':
+		// SVN STEP 2: EXPORT.
 
 		if( $demo_mode )
 		{
@@ -368,15 +525,17 @@ switch( $action )
 			break;
 		}
 
+		svnupgrade_display_steps( 2 );
+
 		$block_item_Widget = new Widget( 'block_item' );
 		$block_item_Widget->title = T_('Exporting package from SVN...');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 
-		$svn_url = param( 'svn_url', 'string', '' );
-		$svn_folder = param( 'svn_folder', 'string', '/' );
-		$svn_user = param( 'svn_user', 'string', false );
-		$svn_password = param( 'svn_password', 'string', false );
-		$svn_revision = param( 'svn_revision', 'integer' );
+		$svn_url = param( 'svn_url', 'string', '', true );
+		$svn_folder = param( 'svn_folder', 'string', '/', true );
+		$svn_user = param( 'svn_user', 'string', false, true );
+		$svn_password = param( 'svn_password', 'string', false, true );
+		$svn_revision = param( 'svn_revision', 'integer', 0, true );
 
 		$UserSettings->set( 'svn_upgrade_url', $svn_url );
 		$UserSettings->set( 'svn_upgrade_folder', $svn_folder );
@@ -385,7 +544,7 @@ switch( $action )
 		$UserSettings->dbupdate();
 
 		$success = param_check_not_empty( 'svn_url', T_('Please enter the URL of repository') );
-		$success = $success && param_check_regexp( 'svn_folder', '#/blogs/$#', T_('A correct SVN folder path must ends with "/blogs/"') );
+		//$success = $success && param_check_regexp( 'svn_folder', '#/blogs/$#', T_('A correct SVN folder path must ends with "/blogs/"') );
 
 		if( ! $success )
 		{
@@ -436,9 +595,20 @@ switch( $action )
 			memorize_param( 'upd_name', 'string', '', $upgrade_name );
 			$upgrade_folder = $upgrade_path.$upgrade_name;
 
-			if( file_exists( $upgrade_path.$upgrade_name ) )
+			if( $action == 'force_export_svn' && file_exists( $upgrade_folder ) )
+			{ // The exported folder already exists
+				// Try to delete previous package
+				if( ! rmdir_r( $upgrade_folder ) )
+				{
+					echo '<p class="red">'.sprintf( T_('Unable to delete previous exported package %s before forcing the export.'), '<b>'.$upgrade_folder.'</b>' ).'</p>';
+				}
+				evo_flush();
+			}
+
+			if( file_exists( $upgrade_folder ) )
 			{ // Current version already is downloaded
-				echo '<p class="green">'.sprintf( T_('Revision %s has already been downloaded. Using: %s'), $repository_version, $upgrade_path.$upgrade_name );
+				echo '<p class="green">'.sprintf( T_('Revision %s has already been downloaded. Using: %s'), $repository_version, $upgrade_folder );
+				$revision_is_exported = true;
 			}
 			else
 			{ // Download files
@@ -462,7 +632,17 @@ switch( $action )
 
 		if( $success )
 		{ // Pause a process before upgrading
-			$action = 'backup_and_overwrite_svn';
+			if( empty( $revision_is_exported ) )
+			{ // Init the buttons to continue
+				$upgrade_buttons = array( 'ready_svn' => T_( 'Continue' ) );
+			}
+			else
+			{ // Init the buttons to select next action
+				$upgrade_buttons = array(
+						'ready_svn'        => T_( 'Skip Export' ),
+						'force_export_svn' => T_( 'Force New Export' ),
+					);
+			}
 			$AdminUI->disp_view( 'maintenance/views/_upgrade_continue.form.php' );
 			unset( $block_item_Widget );
 		}

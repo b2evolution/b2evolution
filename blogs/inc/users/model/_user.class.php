@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -70,6 +70,8 @@ class User extends DataObject
 	var $source;
 	var $unsubscribe_key;
 	var $gender;
+	var $email_dom_ID;
+	var $profileupdate_date;
 
 	/**
 	 * User account status
@@ -145,6 +147,11 @@ class User extends DataObject
 	var $userfield_defs;
 
 	/**
+	 * The previous values of significant fields which were changed and these changes should be notified.
+	 */
+	var $significant_changed_values = array();
+
+	/**
 	 * Constructor
 	 *
 	 * @param object DB row
@@ -185,6 +192,7 @@ class User extends DataObject
 				array( 'table'=>'T_links', 'fk'=>'link_usr_ID', 'msg'=>T_('%d links to this user') ),
 				array( 'table'=>'T_links', 'fk'=>'link_creator_user_ID', 'msg'=>T_('%d links created by this user') ),
 				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition' => 'file_root_type = "user"', 'msg'=>T_('%d files from this user file root') ),
+				array( 'table'=>'T_email__campaign_send', 'fk'=>'csnd_user_ID', 'msg'=>T_('%d newsletter emails for this user') ),
 			);
 
 		if( $db_row == NULL )
@@ -322,14 +330,14 @@ class User extends DataObject
 			$this->set_from_Request('source', 'edited_user_source', true);
 
 			// set email, without changing the user status
-			$edited_user_email = param( 'edited_user_email', 'string', true );
+			$edited_user_email = evo_strtolower( param( 'edited_user_email', 'string', true ) );
 			param_check_not_empty( 'edited_user_email', T_('Please enter your e-mail address.') );
 			param_check_email( 'edited_user_email', true );
 			$this->set_email( $edited_user_email, false );
 
 			if( $is_admin_form )
 			{	// Admin form
-				$notification_sender_email = param( 'notification_sender_email', 'string', true );
+				$notification_sender_email = evo_strtolower( param( 'notification_sender_email', 'string', true ) );
 				param_check_email( 'notification_sender_email' );
 				if( ! empty( $notification_sender_email ) )
 				{ // Change a value of setting
@@ -352,48 +360,87 @@ class User extends DataObject
 
 				if( !isset( $this->dbchanges['user_email'] ) )
 				{	// If email address is not changed
-					// Update status of email address in the T_email_blocked table
+					// Update status of email address in the T_email_address table
 					$edited_email_status = param( 'edited_email_status', 'string' );
-					load_class( 'tools/model/_emailblocked.class.php', 'EmailBlocked' );
-					$EmailBlockedCache = & get_EmailBlockedCache();
-					$EmailBlocked = & $EmailBlockedCache->get_by_name( $this->get( 'email' ), false, false );
-					if( !$EmailBlocked && $edited_email_status != 'unknown' )
-					{	// Create new record in the T_email_blocked table
-						$EmailBlocked = new EmailBlocked();
-						$EmailBlocked->set( 'address', $this->get( 'email' ) );
+					$EmailAddressCache = & get_EmailAddressCache();
+					$EmailAddress = & $EmailAddressCache->get_by_name( $this->get( 'email' ), false, false );
+					if( !$EmailAddress && $edited_email_status != 'unknown' )
+					{	// Create new record in the T_email_address table
+						$EmailAddress = new EmailAddress();
+						$EmailAddress->set( 'address', $this->get( 'email' ) );
 					}
-					if( !empty( $EmailBlocked ) )
+					if( !empty( $EmailAddress ) )
 					{	// Save status of an email address
-						$EmailBlocked->set( 'status', $edited_email_status );
-						$EmailBlocked->dbsave();
+						$EmailAddress->set( 'status', $edited_email_status );
+						$EmailAddress->dbsave();
 					}
 				}
 
-				// Update status of IP range in DB
-				$edited_iprange_status = param( 'edited_iprange_status', 'string' );
-				$IPRangeCache = & get_IPRangeCache();
-				$IPRange = & $IPRangeCache->get_by_ip( int2ip( $UserSettings->get( 'created_fromIPv4', $this->ID ) ) );
-				if( !$IPRange && !empty( $edited_iprange_status ) )
-				{	// IP range doesn't exist in DB, Create new record
-					$ip_24bit_start = ip2int( preg_replace( '#\.\d{1,3}$#i', '.0', int2ip( $UserSettings->get( 'created_fromIPv4', $this->ID ) ) ) );
-					$ip_24bit_end = ip2int( preg_replace( '#\.\d{1,3}$#i', '.255', int2ip( $UserSettings->get( 'created_fromIPv4', $this->ID ) ) ) );
-					$IPRange = new IPRange();
-					$IPRange->set( 'IPv4start', $ip_24bit_start );
-					$IPRange->set( 'IPv4end', $ip_24bit_end );
-					$IPRange->set( 'user_count', 1 );
+				if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+				{ // User can edit IP ranges
+					// Update status of IP range in DB
+					$edited_iprange_status = param( 'edited_iprange_status', 'string' );
+					$IPRangeCache = & get_IPRangeCache();
+					$IPRange = & $IPRangeCache->get_by_ip( int2ip( $UserSettings->get( 'created_fromIPv4', $this->ID ) ) );
+					if( !$IPRange && !empty( $edited_iprange_status ) )
+					{ // IP range doesn't exist in DB, Create new record
+						$ip_24bit_start = ip2int( preg_replace( '#\.\d{1,3}$#i', '.0', int2ip( $UserSettings->get( 'created_fromIPv4', $this->ID ) ) ) );
+						$ip_24bit_end = ip2int( preg_replace( '#\.\d{1,3}$#i', '.255', int2ip( $UserSettings->get( 'created_fromIPv4', $this->ID ) ) ) );
+						$IPRange = new IPRange();
+						$IPRange->set( 'IPv4start', $ip_24bit_start );
+						$IPRange->set( 'IPv4end', $ip_24bit_end );
+						$IPRange->set( 'user_count', 1 );
+					}
+					if( $IPRange )
+					{ // Save status of IP range
+						if( $IPRange->get( 'status' ) != 'blocked' && $edited_iprange_status == 'blocked' )
+						{	// Status was changed to blocked, we should increase counter
+							$IPRange->set( 'block_count', $IPRange->block_count + 1 );
+						}
+						else if( $IPRange->get( 'status' ) == 'blocked' && $edited_iprange_status != 'blocked' )
+						{ // Status was changed from blocked to another, we should decrease counter
+							$IPRange->set( 'block_count', $IPRange->block_count - 1 );
+						}
+						$IPRange->set( 'status', $edited_iprange_status, true );
+						$IPRange->dbsave();
+					}
 				}
-				if( $IPRange )
-				{	// Save status of IP range
-					if( $IPRange->get( 'status' ) != 'blocked' && $edited_iprange_status == 'blocked' )
-					{	// Status was changed to blocked, we should increase counter
-						$IPRange->set( 'block_count', $IPRange->block_count + 1 );
+
+				if( $current_User->check_perm( 'stats', 'edit' ) )
+				{ // User can edit Domains
+					$DomainCache = & get_DomainCache();
+
+					// Update status of Domain in DB
+					$edited_domain_status = param( 'edited_domain_status', 'string' );
+					$user_domain = $UserSettings->get( 'user_domain', $this->ID );
+					$Domain = & $DomainCache->get_by_name( $user_domain, false, false );
+					if( ! $Domain && $edited_domain_status != 'unknown' && ! empty( $user_domain ) )
+					{ // Domain doesn't exist in DB, Create new record
+						$Domain = new Domain();
+						$Domain->set( 'name', $user_domain );
 					}
-					else if( $IPRange->get( 'status' ) == 'blocked' && $edited_iprange_status != 'blocked' )
-					{	// Status was changed from blocked to another, we should decrease counter
-						$IPRange->set( 'block_count', $IPRange->block_count - 1 );
+					if( $Domain )
+					{ // Save status of Domain
+						$Domain->set( 'status', $edited_domain_status, true );
+						$Domain->dbsave();
 					}
-					$IPRange->set( 'status', $edited_iprange_status, true );
-					$IPRange->dbsave();
+
+					// Update status of Initial referer in DB
+					load_funcs('sessions/model/_hitlog.funcs.php');
+					$edited_initial_referer_status = param( 'edited_initial_referer_status', 'string' );
+					$initial_referer = $UserSettings->get( 'initial_referer', $this->ID );
+					$initial_referer_domain = url_part( $initial_referer, 'host' );
+					$Domain = & get_Domain_by_url( $initial_referer );
+					if( ! $Domain && $edited_initial_referer_status != 'unknown' && ! empty( $initial_referer_domain ) )
+					{ // Domain doesn't exist in DB, Create new record
+						$Domain = new Domain();
+						$Domain->set( 'name', $initial_referer_domain );
+					}
+					if( $Domain )
+					{ // Save status of Domain
+						$Domain->set( 'status', $edited_initial_referer_status, true );
+						$Domain->dbsave();
+					}
 				}
 			}
 		}
@@ -770,16 +817,15 @@ class User extends DataObject
 		{
 			$reqID = param( 'reqID', 'string', '' );
 
-			if( $is_new_user || ( $has_full_access && $this->ID != $current_User->ID ) || ( !empty( $reqID ) && $reqID == $Session->get( 'core.changepwd.request_id' ) ) )
-			{	// current password is not required:
+			if( $is_new_user || ( !empty( $reqID ) && $reqID == $Session->get( 'core.changepwd.request_id' ) ) )
+			{ // current password is not required:
 				//   - new user creating process
-				//   - current user has full access and not editing his own pasword
 				//   - password change requested by email
 				param( 'edited_user_pass1', 'string', true );
 				$edited_user_pass2 = param( 'edited_user_pass2', 'string', true );
 
 				if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') ) )
-				{ 	// We can set password
+				{ // We can set password
 					$this->set( 'pass', md5( $edited_user_pass2 ) );
 				}
 			}
@@ -791,17 +837,36 @@ class User extends DataObject
 
 				$current_user_pass = param( 'current_user_pass', 'string', true );
 
+				if( $this->ID != $current_User->ID )
+				{ // Set the messages when admin changes a password of other user
+					$checkpwd_params = array(
+							'msg_pass_new'   => T_('Please enter new password.'),
+							'msg_pass_twice' => T_('Please enter new password twice.'),
+						);
+				}
+				else
+				{ // Use default messages
+					$checkpwd_params = array();
+				}
+
 				if( ! strlen($current_user_pass) )
 				{
 					param_error('current_user_pass' , T_('Please enter your current password.') );
-					param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') );
+					param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen'), $checkpwd_params );
 				}
 				else
 				{
-
-					if( $this->pass == md5($current_user_pass) )
+					if( $has_full_access && $this->ID != $current_User->ID )
+					{ // Admin is changing a password of other user, Check a password of current admin
+						$pass_to_check = $current_User->pass;
+					}
+					else
+					{ // User is changing own pasword
+						$pass_to_check = $this->pass;
+					}
+					if( $pass_to_check == md5($current_user_pass) )
 					{
-						if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') ) )
+						if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen'), $checkpwd_params ) )
 						{ // We can set password
 							$this->set( 'pass', md5( $edited_user_pass2 ) );
 						}
@@ -809,7 +874,7 @@ class User extends DataObject
 					else
 					{
 						param_error('current_user_pass' , T_('Your current password is incorrect.') );
-						param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') );
+						param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen'), $checkpwd_params );
 					}
 				}
 
@@ -879,7 +944,7 @@ class User extends DataObject
 			{ // Update user's settings
 
 				// Email communication
-				$edited_user_email = param( 'edited_user_email', 'string', true );
+				$edited_user_email = evo_strtolower( param( 'edited_user_email', 'string', true ) );
 				param_check_not_empty( 'edited_user_email', T_('Please enter your e-mail address.') );
 				param_check_email( 'edited_user_email', true );
 				$this->set_email( $edited_user_email );
@@ -932,6 +997,7 @@ class User extends DataObject
 					$UserSettings->set( 'notify_activated_account', param( 'edited_user_notify_activated_account', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'notify_closed_account', param( 'edited_user_notify_closed_account', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'notify_reported_account', param( 'edited_user_notify_reported_account', 'integer', 0 ), $this->ID );
+					$UserSettings->set( 'notify_changed_account', param( 'edited_user_notify_changed_account', 'integer', 0 ), $this->ID );
 				}
 
 				if( $this->check_perm( 'options', 'edit' ) )
@@ -1246,13 +1312,7 @@ class User extends DataObject
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'before'         => ' ',
-				'after'          => ' ',
-				'format'         => 'htmlbody',
-				'link_to'        => 'userpage',
 				'link_text'      => 'avatar', // avatar | only_avatar | login | nickname | firstname | lastname | fullname | preferredname
-				'link_rel'       => '',
-				'link_class'     => '',
 				'thumb_size'     => 'crop-top-15x15',
 				'thumb_class'    => 'avatar_before_login',
 				'thumb_zoomable' => false,
@@ -1323,8 +1383,8 @@ class User extends DataObject
 		}
 
 		$link_title = T_( 'Show the user profile' );
-		$link_text = '<span'.( $params['nowrap'] ? ' class="nowrap"' : '' ).'>'.$avatar_tag.$link_login.'</span>';
-		return '<a href="'.$identity_url.'" title="'.$link_title.'" class="'.$this->get_gender_class().'"'.$attr_bubbletip.'>'.$link_text.'</a>';
+		$link_class = $this->get_gender_class().( $params['nowrap'] ? ' nowrap' : '' );
+		return '<a href="'.$identity_url.'" title="'.$link_title.'" class="'.$link_class.'"'.$attr_bubbletip.'>'.$avatar_tag.$link_login.'</a>';
 	}
 
 
@@ -1496,9 +1556,10 @@ class User extends DataObject
 	 * Get the number of comments for the user.
 	 *
 	 * @param string Comments status
+	 * @param boolean Count already recycled comments
 	 * @return integer
 	 */
-	function get_num_comments( $status = '' )
+	function get_num_comments( $status = '', $count_recycled = false )
 	{
 		global $DB;
 		global $collections_Module;
@@ -1508,15 +1569,18 @@ class User extends DataObject
 			$SQL = new SQL( 'Get the number of comments for the user' );
 			$SQL->SELECT( 'comment_status, COUNT(*)' );
 			$SQL->FROM( 'T_comments' );
-			$SQL->WHERE( 'comment_author_ID = '.$this->ID );
+			$SQL->WHERE( 'comment_author_user_ID = '.$this->ID );
 			$SQL->GROUP_BY( 'comment_status' );
 			$this->_num_comments = $DB->get_assoc( $SQL->get() );
 
 			// Calc number of comments with all statuses
 			$total_num_comments = 0;
-			foreach( $this->_num_comments as $status_num_comments )
+			foreach( $this->_num_comments as $curr_status => $status_num_comments )
 			{
-				$total_num_comments += $status_num_comments;
+				if( $count_recycled || ( $curr_status != 'trash' ) )
+				{
+					$total_num_comments += $status_num_comments;
+				}
 			}
 			$this->_num_comments[''] = $total_num_comments;
 		}
@@ -1802,6 +1866,12 @@ class User extends DataObject
 	 */
 	function set( $parname, $parvalue, $make_null = false )
 	{
+		if( isset( $this->$parname ) && ( ! isset( $this->significant_changed_values[ $parname ] ) ) && ( ( $old_value = $this->get( $parname ) ) != $parvalue )
+			&& in_array( $parname, array( 'login', 'group_ID', 'nickname', 'firstname', 'lastname', 'gender', 'ctry_ID', 'rgn_ID', 'subrg_ID', 'city_ID' ) ) )
+		{ // Save previous value of significant changes for later use in send_account_changed_notifications()
+			$this->significant_changed_values[ $parname ] = $old_value;
+		}
+
 		switch( $parname )
 		{
 			case 'level':
@@ -1846,7 +1916,7 @@ class User extends DataObject
 	{
 		global $Settings;
 
-		$r = parent::set_param( 'email', 'string', $email );
+		$r = parent::set_param( 'email', 'string', evo_strtolower( $email ) );
 
 		if( $change_status )
 		{ // Change user status to 'emailchanged' (if email has changed and Settings are available, which they are not during install):
@@ -1962,7 +2032,7 @@ class User extends DataObject
 	 */
 	function check_perm( $permname, $permlevel = 'any', $assert = false, $perm_target = NULL )
 	{
-		global $Debuglog;
+		global $Debuglog, $Settings;
 
 		if( is_object($perm_target) && isset($perm_target->ID) )
 		{
@@ -2063,6 +2133,7 @@ class User extends DataObject
 				break;
 
 			case 'blog_ismember':
+			case 'blog_can_be_assignee':
 			case 'blog_post_statuses':
 			case 'blog_post!published':
 			case 'blog_post!community':
@@ -2265,6 +2336,46 @@ class User extends DataObject
 				}
 				break;
 
+			case 'user':
+				// Check if user can 'view'/'moderate'/'edit'/'delete' another user
+				$User = & $perm_target;
+				if( !$this->check_status( 'can_view_user', $User->ID ) )
+				{ // User can't even view the edited User
+					break;
+				}
+
+				// If user has global permission on all users then everything is allowed
+				if( $this->check_perm( 'users', 'edit' ) )
+				{ // Check if user can edit/delete other users
+					$perm = true;
+					break;
+				}
+
+				if( $permlevel == 'delete' || $permlevel == 'edit' )
+				{ // These permission levels are not allowed for this user
+					break;
+				}
+
+				if( ( ! $Settings->get('allow_anonymous_user_profiles') ) && ( ! $this->check_perm( 'cross_country_allow_profiles' ) ) && ( empty( $this->ctry_ID ) || ( $this->ctry_ID !== $User->ctry_ID ) ) )
+				{ // Users can view/browse other users only from the same country, but this user country is empty or not the same as the target user country
+					// this User has no permission to even view the target user
+					break;
+				}
+
+				// Note: With this implementation only admin users are allowed to view users from different countries when cross country browsing is restricted
+				// check if user has permission to moderate another user
+				if( ( $permlevel == 'moderate' ) && $this->check_perm( 'users', 'moderate' ) )
+				{ // this user has moderator permission, check if the group level is higher then the target user group level
+					$this->get_Group();
+					$User->get_Group;
+					$perm = ( $this->Group->level > $User->Group->level );
+					break;
+				}
+
+				// Only 'view' permlevel remained, and this user is allowed to view the target user
+				$perm = true;
+				break;
+
 			// asimo> edit_timestamp permission was converted to blog_edit_ts permission
 
 
@@ -2453,6 +2564,7 @@ class User extends DataObject
 	 * @see User::check_perm()
 	 * @param string Permission name, can be one of the following:
 	 *                  - blog_ismember
+	 *                  - blog_can_be_assignee
 	 *                  - blog_post_statuses
 	 *                  - blog_del_post
 	 *                  - blog_edit_ts
@@ -2687,6 +2799,10 @@ class User extends DataObject
 			{
 				global $current_User;
 			}
+			if( has_cross_country_restriction( 'contact' ) && ( empty( $current_User->ctry_ID ) || ( $current_User->ctry_ID !== $this->ctry_ID ) ) )
+			{ // Contat to this user is not enabled
+				return NULL;
+			}
 			if( $this->accepts_pm() && $current_User->accepts_pm() && ( $this->ID != $current_User->ID ) )
 			{ // both user has permission to send or receive private message and not the same user
 				// check if current_User is allowed to create a new conversation with this user.
@@ -2730,6 +2846,10 @@ class User extends DataObject
 
 		if( ( is_logged_in() ) && $this->accepts_pm() )
 		{
+			if( has_cross_country_restriction( 'contact' ) && ( empty( $current_User->ctry_ID ) || ( $current_User->ctry_ID !== $this->ctry_ID ) ) )
+			{ // Contat to this user is not enabled
+				return T_( 'You are not allowed to contact with this user.' );
+			}
 			if( $current_User->accepts_pm() )
 			{ // current User accepts private messages
 				if( $current_User->ID == $this->ID )
@@ -2838,7 +2958,7 @@ class User extends DataObject
 
 		$DB->begin();
 
-		parent::dbupdate();
+		$result = parent::dbupdate();
 
 		// Update existing fields:
 		if( !empty($this->updated_fields) )
@@ -2878,6 +2998,12 @@ class User extends DataObject
 
 		$DB->commit();
 
+		if( $result === true && count( $this->significant_changed_values ) > 0 )
+		{ // Send notification email about the changes of user account
+			$this->send_account_changed_notification();
+		}
+
+		// BLOCK CACHE INVALIDATION:
 		// This User has been modified, cached content depending on it should be invalidated:
 		BlockCache::invalidate_key( 'user_ID', $this->ID );
 
@@ -2910,11 +3036,11 @@ class User extends DataObject
 		{ // If we delete user as not spammer we keep his comments as from anonymous user
 			// Transform registered user comments to unregistered:
 			$ret = $DB->query( 'UPDATE T_comments
-													SET comment_author_ID = NULL,
+													SET comment_author_user_ID = NULL,
 															comment_author = '.$DB->quote( $this->get('preferredname') ).',
 															comment_author_email = '.$DB->quote( $this->get('email') ).',
 															comment_author_url = '.$DB->quote( $this->get('url') ).'
-													WHERE comment_author_ID = '.$this->ID );
+													WHERE comment_author_user_ID = '.$this->ID );
 			if( is_a( $Log, 'log' ) )
 			{
 				$Log->add( 'Transforming user\'s comments to unregistered comments... '.sprintf( '(%d rows)', $ret ), 'note' );
@@ -2931,7 +3057,7 @@ class User extends DataObject
 		{
 			// Delete comments
 			$ret = $DB->query( "DELETE FROM T_comments
-													WHERE comment_post_ID IN ($post_list)" );
+													WHERE comment_item_ID IN ($post_list)" );
 			if( is_a( $Log, 'log' ) )
 			{
 				$Log->add( sprintf( 'Deleted %d comments on user\'s posts.', $ret ), 'note' );
@@ -3004,18 +3130,17 @@ class User extends DataObject
 
 		if( $deltype == 'spammer' )
 		{ // User was deleted as spammer, we should mark email of this user as 'Spammer'
-			load_class( 'tools/model/_emailblocked.class.php', 'EmailBlocked' );
-			$EmailBlockedCache = & get_EmailBlockedCache();
-			$EmailBlocked = & $EmailBlockedCache->get_by_name( $old_email, false, false );
-			if( !$EmailBlocked )
-			{	// Create new record in the T_email_blocked table
-				$EmailBlocked = new EmailBlocked();
-				$EmailBlocked->set( 'address', $old_email );
+			$EmailAddressCache = & get_EmailAddressCache();
+			$EmailAddress = & $EmailAddressCache->get_by_name( $old_email, false, false );
+			if( !$EmailAddress )
+			{	// Create new record in the T_email_address table
+				$EmailAddress = new EmailAddress();
+				$EmailAddress->set( 'address', $old_email );
 			}
-			if( !empty( $EmailBlocked ) )
+			if( !empty( $EmailAddress ) )
 			{ // Save status of an email address
-				$EmailBlocked->set( 'status', 'spammer' );
-				$EmailBlocked->dbsave();
+				$EmailAddress->set( 'status', 'spammer' );
+				$EmailAddress->dbsave();
 			}
 		}
 
@@ -3030,6 +3155,10 @@ class User extends DataObject
 		$this->ID = $old_ID;
 		$Plugins->trigger_event( 'AfterUserDelete', $params = array( 'User' => & $this ) );
 		$this->ID = 0;
+
+		// BLOCK CACHE INVALIDATION:
+		// This User has been modified, cached content depending on it should be invalidated:
+		BlockCache::invalidate_key( 'user_ID', $old_ID );
 
 		return true;
 	}
@@ -3047,6 +3176,9 @@ class User extends DataObject
 	{
 		global $app_name, $Session, $secure_htsrv_url, $baseurl, $servertimenow;
 		global $Settings, $UserSettings;
+
+		// Display messages depending on user email status
+		display_user_email_status_message( $this->ID );
 
 		if( $Settings->get( 'validation_process' ) == 'easy' )
 		{ // validation process is set to easy, send and easy activation email
@@ -3132,9 +3264,9 @@ class User extends DataObject
 		{	// We have to assign the all old comments from current user by email
 			$DB->query( '
 				UPDATE T_comments
-				   SET comment_author_ID = "'.$this->ID.'"
-				 WHERE comment_author_email = "'.$this->email.'"
-				   AND comment_author_ID IS NULL' );
+				   SET comment_author_user_ID = "'.$this->ID.'"
+				 WHERE comment_author_email = '.$DB->quote( $this->email ).'
+				   AND comment_author_user_ID IS NULL' );
 		}
 
 		// Create a welcome private message when user's status was changed to Active
@@ -3443,22 +3575,42 @@ class User extends DataObject
 		return $File;
 	}
 
+
 	/**
-	 * Get array of {@link File} objects of the previously uploaded avatars.
+	 * Get {@link Link} object of the user's avatar.
+	 *
+	 * @return Link This may be NULL.
+	 */
+	function & get_avatar_Link()
+	{
+		$Link = NULL;
+
+		if( $this->has_avatar() )
+		{
+			$LinkOwner = new LinkUser( $this );
+			$Link = $LinkOwner->get_link_by_file_ID( $this->avatar_file_ID );
+		}
+
+		return $Link;
+	}
+
+
+	/**
+	 * Get array of {@link Link} objects of the previously uploaded avatars.
 	 *
 	 * @param boolean TRUE - to exclude main picture from list
 	 * @param boolean TRUE - to ignore the settings and get the avatars anyway
-	 * @return array of Files.
+	 * @return array of Links
 	 */
-	function get_avatar_Files( $exclude_main_picture = true, $ignore_settings = false )
+	function get_avatar_Links( $exclude_main_picture = true, $ignore_settings = false )
 	{
 		global $Settings;
 
-		$avatar_Files = array();
+		$avatar_Links = array();
 
 		if( !$ignore_settings && !( $Settings->get('upload_enabled') && $Settings->get( 'fm_enable_roots_user' ) ) )
 		{ // Upload is not enabled and we have no permission to use it...
-			return $avatar_Files;
+			return $avatar_Links;
 		}
 
 		$LinkOwner = new LinkUser( $this );
@@ -3471,11 +3623,11 @@ class User extends DataObject
 				{ // Exclude the main picture from list of other pictures
 					continue;
 				}
-				$avatar_Files[] = $l_File;
+				$avatar_Links[] = $user_Link;
 			}
 		}
 
-		return $avatar_Files;
+		return $avatar_Links;
 	}
 
 
@@ -3495,16 +3647,27 @@ class User extends DataObject
 		global $current_User;
 
 		/**
+		 * @var Link
+		 */
+		$Link = & $this->get_avatar_Link();
+
+		/**
 		 * @var File
 		 */
-		if( ! $File = & $this->get_avatar_File() )
-		{	// User doesn't have an avatar
-			return get_avatar_imgtag_default( $size, $class, $align, array( 'email' => $this->get( 'email' ) ) );
+		if( ! $Link || ! $File = & $Link->get_File() )
+		{ // User doesn't have an avatar
+			return get_avatar_imgtag_default( $size, $class, $align, array(
+					'email'  => $this->get( 'email' ),
+					'gender' => $this->get( 'gender' ),
+				) );
 		}
 
 		if( ( !$this->check_status( 'can_display_avatar' ) ) && !( is_admin_page() && is_logged_in( false ) && ( $current_User->check_perm( 'users', 'edit' ) ) ) )
 		{ // if the user status doesn't allow to display avatar and current User is not an admin in admin interface, then show default avatar
-			return get_avatar_imgtag_default( $size, $class, $align, array( 'email' => $this->get( 'email' ) ) );
+			return get_avatar_imgtag_default( $size, $class, $align, array(
+					'email' => $this->get( 'email' ),
+					'gender' => $this->get( 'gender' ),
+				) );
 		}
 
 		if( $zoomable )
@@ -3515,13 +3678,23 @@ class User extends DataObject
 				// this is usefull because the same avatar picture may appear more times in the same page
 				if( empty( $lightbox_group ) )
 				{
-					$link_rel = 'lightbox[f'.$File->ID.rand(0, 100000).']';
+					$link_rel = 'lightbox[l'.$Link->ID.rand(0, 100000).']';
 				}
 				else
 				{
 					$link_rel = 'lightbox['.$lightbox_group.']';
 				}
-				$r = $File->get_tag( '', '', '', '', $size, 'original', $this->login, $link_rel, $class, $align );
+				$r = $Link->get_tag( array(
+						'before_image'        => '',
+						'before_image_legend' => '',
+						'after_image_legend'  => '',
+						'after_image'         => '',
+						'image_size'          => $size,
+						'image_link_title'    => $this->login,
+						'image_link_rel'      => $link_rel,
+						'image_class'         => $class,
+						'image_align'         => $align,
+					) );
 			}
 			else
 			{	// Anonymous user get an avatar picture with link to login page
@@ -3980,17 +4153,19 @@ class User extends DataObject
 			$new_status = param( 'edited_user_status', 'string', true );
 		}
 
-		// get close reason text - max 255 characters
+		// a close reason type thst is selected from list
+		$account_close_type = param( 'account_close_type', 'string', '' );
+		// a close reason text - max 255 characters
 		$account_close_reason = substr( param( 'account_close_reason', 'text', '' ), 0, 255 );
 		if( ( !$this->check_status( 'is_closed' ) ) && ( $new_status == 'closed' ) )
 		{ // account was not closed yet
-			if( empty( $account_close_reason ) )
-			{
-				$account_close_reason = sprintf( T_( 'Account closed by %s' ), $current_User->get( 'login' ) );
+			if( empty( $account_close_reason ) && empty( $account_close_type ) )
+			{ // Default value of reason
+				$account_close_reason = T_( 'Other' );
 			}
 			$this->set( 'status', 'closed' );
 			$UserSettings->set( 'account_close_ts', $servertimenow, $this->ID );
-			$UserSettings->set( 'account_close_reason', $account_close_reason, $this->ID );
+			$UserSettings->set( 'account_close_reason', trim( $account_close_type.' '.$account_close_reason ), $this->ID );
 			// delete last activation email data, this user must not be allowed to reactivate the account ( only admin users may change the status again )
 			$UserSettings->delete( 'last_activation_reminder_key', $this->ID );
 			$UserSettings->delete( 'last_activation_email', $this->ID );
@@ -4116,6 +4291,10 @@ class User extends DataObject
 		$this->dbupdate();
 
 		$Messages->add( T_('Your profile picture has been changed.'), 'success' );
+
+		// Send notification email about the changes of user account
+		$this->send_account_changed_notification( true );
+
 		return true;
 	}
 
@@ -4323,12 +4502,14 @@ class User extends DataObject
 			{	// uploaded file is an image
 				$LinkOwner = new LinkUser( $this );
 				$File->link_to_Object( $LinkOwner );
+				$avatar_changed = false;
 				if( empty( $this->avatar_file_ID ) )
 				{	// set uploaded image as avatar
 					$this->set( 'avatar_file_ID', $File->ID, true );
 					// update profileupdate_date, because a publicly visible user property was changed
 					$this->set_profileupdate_date();
 					$this->dbupdate();
+					$avatar_changed = true;
 					$Messages->add( T_('Your profile picture has been changed.'), 'success' );
 				}
 				else
@@ -4337,6 +4518,8 @@ class User extends DataObject
 				}
 				// Clear previous Links to load new uploaded file
 				$LinkOwner->clear_Links();
+				// Send notification email about the changes of user account
+				$this->send_account_changed_notification( $avatar_changed, $File->ID );
 				return true;
 			}
 			else
@@ -4545,7 +4728,7 @@ class User extends DataObject
 	 *               'created|edited' - the posts created OR edited by this user
 	 * @return array Items
 	 */
-	function get_deleted_posts( $type )
+	function get_deleted_posts( $type, $check_perm = true )
 	{
 		global $DB, $current_User;
 
@@ -4569,7 +4752,7 @@ class User extends DataObject
 		$deleted_Items = array();
 		foreach( $user_Items as $user_Item )
 		{
-			if( $current_User->check_perm( 'item_post!CURSTATUS', 'delete', false, $user_Item ) )
+			if( ( ! $check_perm ) || $current_User->check_perm( 'item_post!CURSTATUS', 'delete', false, $user_Item ) )
 			{	// Current user has a permission to delete this item
 				$deleted_Items[] = $user_Item;
 			}
@@ -4590,12 +4773,14 @@ class User extends DataObject
 	 */
 	function delete_posts( $type )
 	{
-		global $DB, $Plugins;
+		global $DB, $Plugins, $current_User;
 
 		$DB->begin();
 
-		// Get the posts of this user which current user can delete
-		$deleted_Items = $this->get_deleted_posts( $type );
+		// Get the posts of this user which current user can delete.
+		// Note: If current user can moderate this user then it is allowed to delete all user data even if it wouldn't be allowed otherwise.
+		$check_perm = ( ( $type != 'created' ) || ( ! $current_User->check_perm( 'users', 'edit' ) ) );
+		$deleted_Items = $this->get_deleted_posts( $type, $check_perm );
 
 		foreach( $deleted_Items as $deleted_Item )
 		{
@@ -4612,29 +4797,59 @@ class User extends DataObject
 
 
 	/**
-	 * Get the comments of this user which current user can delete
+	 * Get the comments IDs that were created by this user
 	 *
-	 * @return array Comments
+	 * @return array IDs of the own comments
 	 */
-	function get_deleted_comments()
+	function get_own_comments_IDs()
 	{
-		global $DB, $current_User;
+		global $DB;
 
 		// Get the comments of the user
-		$CommentCache = & get_CommentCache();
-		$CommentCache->ID_array = array();
-		$user_Comments = $CommentCache->load_where( 'comment_author_ID = '.$DB->quote( $this->ID ) );
+		$SQL = new SQL();
+		$SQL->SELECT( 'comment_ID' );
+		$SQL->FROM( 'T_comments' );
+		$SQL->WHERE( 'comment_author_user_ID = '.$DB->quote( $this->ID ) );
 
-		$deleted_Comments = array();
-		foreach( $user_Comments as $user_Comment )
-		{
-			if( $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $user_Comment ) )
-			{	// Current user has a permission to delete this comment
-				$deleted_Comments[] = $user_Comment;
-			}
+		return $DB->get_col( $SQL->get() );
+	}
+
+
+	/**
+	 * Check if current has at least one own comment to delete
+	 *
+	 * @return array Comments IDs
+	 */
+	function has_comment_to_delete()
+	{
+		global $current_User;
+
+		$comments_IDs = $this->get_own_comments_IDs();
+
+		if( ! count( $comments_IDs ) )
+		{ // User has no comments
+			return false;
 		}
 
-		return $deleted_Comments;
+		if( $current_User->check_perm( 'users', 'edit' ) )
+		{ // If current user can moderate this user then it is allowed to delete all user data even if it wouldn't be allowed otherwise.
+			return true;
+		}
+
+		$CommentCache = & get_CommentCache();
+
+		foreach( $comments_IDs as $comment_ID )
+		{
+			if( ( $user_Comment = & $CommentCache->get_by_ID( $comment_ID, false, false ) ) &&
+				  $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $user_Comment ) )
+			{ // Current user has a permission to delete this comment
+				return true;
+			}
+			// Clear a cache to avoid a memory allocation error
+			$CommentCache->clear();
+		}
+
+		return false;
 	}
 
 
@@ -4645,16 +4860,40 @@ class User extends DataObject
 	 */
 	function delete_comments()
 	{
-		global $DB, $Plugins;
+		global $DB, $current_User;
+
+		// If user has a huge amount of the comments it will takes many time to delete all comments
+		set_max_execution_time( 900 );
 
 		$DB->begin();
 
 		// Get the comments of this user which current user can delete
-		$deleted_Comments = $this->get_deleted_comments();
+		$comments_IDs = $this->get_own_comments_IDs();
 
-		foreach( $deleted_Comments as $deleted_Comment )
-		{ // Delete from DB
-			$deleted_Comment->dbdelete( true );
+		if( ! count( $comments_IDs ) )
+		{ // User has no comments
+			return false;
+		}
+
+		$CommentCache = & get_CommentCache();
+		$ItemCache = & get_ItemCache();
+
+		// If current user can moderate this user then it is allowed to delete all user data even if it wouldn't be allowed otherwise.
+		$current_user_can_moderate = $current_User->check_perm( 'users', 'edit' );
+
+		foreach( $comments_IDs as $comment_ID )
+		{
+			$deleted_Comment = & $CommentCache->get_by_ID( $comment_ID, false, false );
+			if( $deleted_Comment &&
+			    ( $current_user_can_moderate ||
+			      $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $deleted_Comment ) ) )
+			{ // Current user has a permission to delete this comment
+				// Delete from DB
+				$deleted_Comment->dbdelete( true );
+			}
+			// Clear a cache to avoid a memory allocation error
+			$CommentCache->clear();
+			$ItemCache->clear();
 		}
 
 		$DB->commit();
@@ -4673,7 +4912,7 @@ class User extends DataObject
 		global $DB, $Plugins, $current_User;
 
 		// Check permissions
-		// Note: If current user can edit the users then it is allowed to delete all user data even if it wouldn't be allowed otherwise
+		// Note: If current user can moderate this user then it is allowed to delete all user data even if it wouldn't be allowed otherwise
 		if( ! $current_User->check_perm( 'users', 'edit' ) )
 		{ // Note: if users have delete messaging perms then they can delete any user messages ( Of course only if the delete action is available/displayed for them )
 			$current_User->check_perm( 'perm_messaging', 'delete', true );
@@ -4799,17 +5038,17 @@ class User extends DataObject
 		$comments_SQL->SELECT( 'cmvt_user_ID AS user_ID, COUNT(*) AS cnt' );
 		$comments_SQL->FROM( 'T_comments' );
 		$comments_SQL->FROM_add( 'INNER JOIN T_comments__votes ON comment_ID = cmvt_cmt_ID' );
-		$comments_SQL->WHERE( 'comment_author_ID = '.$this->ID );
+		$comments_SQL->WHERE( 'comment_author_user_ID = '.$this->ID );
 		$comments_SQL->WHERE_and( 'comment_status IN ( "published", "community", "protected", "review" )' );
 		$comments_SQL->WHERE_and( 'cmvt_helpful = 1' );
 		$comments_SQL->GROUP_BY( 'user_ID' );
 
 		$links_SQL = new SQL( 'Get number of helpful votes on links for this user' );
-		$links_SQL->SELECT( 'fvot_user_ID AS user_ID, COUNT(*) AS cnt' );
+		$links_SQL->SELECT( 'lvot_user_ID AS user_ID, COUNT(*) AS cnt' );
 		$links_SQL->FROM( 'T_links' );
-		$links_SQL->FROM_add( 'INNER JOIN T_files__vote ON link_file_ID = fvot_file_ID' );
+		$links_SQL->FROM_add( 'INNER JOIN T_links__vote ON link_ID = lvot_link_ID' );
 		$links_SQL->WHERE( 'link_creator_user_ID = '.$this->ID );
-		$links_SQL->WHERE_and( 'fvot_like = 1' );
+		$links_SQL->WHERE_and( 'lvot_like = 1' );
 		$links_SQL->GROUP_BY( 'user_ID' );
 
 		$votes = $DB->get_assoc( 'SELECT user_ID, SUM( cnt )
@@ -4851,14 +5090,112 @@ class User extends DataObject
 
 		$links_SQL = new SQL( 'Get number of spam votes on links by this user' );
 		$links_SQL->SELECT( 'COUNT(*) AS cnt' );
-		$links_SQL->FROM( 'T_files__vote' );
-		$links_SQL->WHERE( 'fvot_user_ID = '.$this->ID );
-		$links_SQL->WHERE_and( 'fvot_spam = 1' );
+		$links_SQL->FROM( 'T_links__vote' );
+		$links_SQL->WHERE( 'lvot_user_ID = '.$this->ID );
+		$links_SQL->WHERE_and( 'lvot_spam = 1' );
 
 		$votes = $DB->get_var( 'SELECT SUM( cnt )
 			FROM ('.$comments_SQL->get().' UNION ALL '.$links_SQL->get().') AS tbl' );
 
 		return sprintf( $params['text'], $this->login, '<b>'.$votes.'</b>' );
+	}
+
+
+	/**
+	 * Get status of user email
+	 *
+	 * @return string Status: 'unknown', 'warning', 'suspicious1', 'suspicious2', 'suspicious3', 'prmerror', 'spammer', 'redemption'
+	 */
+	function get_email_status()
+	{
+		$user_email = $this->get( 'email' );
+
+		$EmailAddressCache = & get_EmailAddressCache();
+		if( !empty( $user_email ) && $EmailAddress = & $EmailAddressCache->get_by_name( $user_email, false, false ) )
+		{ // The email of this user is located in the DB table
+			return $EmailAddress->get( 'status' );
+		}
+		else
+		{ // There is no email address in the DB table
+			return 'unknown';
+		}
+	}
+
+
+	/**
+	 * Send an email notification when user account has been changed
+	 *
+	 * @param boolean true if the main profile picture was changed, false otherwise
+	 * @param mixed false if there was no new profile picture upload, the newly uploaded file ID otherwise
+	 */
+	function send_account_changed_notification( $avatar_changed = false, $new_avatar_upload = false )
+	{
+		if( empty( $this->significant_changed_values ) && ( ! $avatar_changed ) && ( ! $new_avatar_upload ) )
+		{ // Nothing important was changed, so no need to send changed notification
+			return;
+		}
+
+		$email_template_params = array(
+				'user_ID' => $this->ID,
+				'login'   => $this->login,
+				'fields'  => array(
+					'login'     => array( 'title' => NT_('Login') ),
+					'group_ID'  => array( 'title' => NT_('Group'), 'className' => 'Group' ),
+					'nickname'  => array( 'title' => NT_('Nickname') ),
+					'firstname' => array( 'title' => NT_('First name') ),
+					'lastname'  => array( 'title' => NT_('Last name') ),
+					'gender'    => array( 'title' => NT_('Gender') ),
+					'ctry_ID'   => array( 'title' => NT_('Country'), 'className' => 'Country' ),
+					'rgn_ID'    => array( 'title' => NT_('Region'), 'className' => 'Region' ),
+					'subrg_ID'  => array( 'title' => NT_('Sub-region'), 'className' => 'Subregion' ),
+					'city_ID'   => array( 'title' => NT_('City'), 'className' => 'City' ),
+				),
+				'avatar_changed'    => $avatar_changed,
+				'new_avatar_upload' => $new_avatar_upload,
+			);
+
+		foreach( $email_template_params['fields'] as $user_field_name => $user_field_data )
+		{ // Set new and previous values for email template
+			$field_was_changed = ( isset( $this->significant_changed_values[ $user_field_name ] ) && ( ! empty( $this->significant_changed_values[ $user_field_name ] ) ) );
+			if( isset( $user_field_data['className'] ) )
+			{ // The field value is an object ID, get the object name
+				$Cache = & call_user_func( 'get_'.$user_field_data['className'].'Cache' );
+				$Object = & $Cache->get_by_ID( $this->get( $user_field_name ), false, false );
+				$user_field_data['new'] = empty( $Object ) ? NULL : $Object->get_name();
+				if( $field_was_changed )
+				{ // Get the old display value of the field
+					$Object = & $Cache->get_by_ID( $this->significant_changed_values[ $user_field_name ] );
+					$user_field_data['old'] = $Object->get_name();
+				}
+			}
+			elseif( $user_field_name == 'gender' )
+			{ // This is the gender field, get the display name of the gender
+				$user_field_data['new'] = $this->get_gender();
+				if( $field_was_changed )
+				{
+					$user_field_data['old'] = ( $this->significant_changed_values[ $user_field_name ] == 'M' ) ? T_('A man') : T_('A woman');
+				}
+			}
+			else
+			{ // Get the field value
+				$user_field_data['new'] = $this->get( $user_field_name );
+				if( $field_was_changed )
+				{ // The field was changed
+					$user_field_data['old'] = $this->significant_changed_values[ $user_field_name ];
+				}
+			}
+
+			if( !isset( $user_field_data['old'] ) )
+			{ // The field was not changed or the old value was empty
+				$user_field_data['old'] = array_key_exists( $user_field_name, $this->significant_changed_values ) ? NULL : $user_field_data['new'];
+			}
+
+			$email_template_params['fields'][ $user_field_name ] = $user_field_data;
+		}
+
+		send_admin_notification( NT_('User profile changed'), 'account_changed', $email_template_params );
+		// Clear changed values
+		$this->significant_changed_values = array();
 	}
 }
 

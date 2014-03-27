@@ -169,20 +169,22 @@ div#evo_toolbar {
 	font-family: "Microsoft sans serif", sans-serif, Arial, Helvetica;
 
 	position: fixed;
-	z-index: 10000;
+	z-index: 11000;
 	left: 0px;
 	top: 0px;
 	height: 21px;
-	width:100%;		/* Safari Windows */
+	width:100%; /* Safari Windows */
 	-webkit-text-size-adjust: none; /* iPhone */
 }
-
-
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+	div#evo_toolbar {
+		position: absolute;
+	}
+}
 div.skin_wrapper_loggedin {
 	margin-top: 22px;
 	padding-top: 1px;
 }
-
 div#evo_toolbar .actions_left {
 	padding: 1px 4px;
 }
@@ -190,8 +192,6 @@ div#evo_toolbar .actions_right {
 	padding: 1px 4px;
 	float: right;
 }
-
-
 div#evo_toolbar img {
 	position: relative;
 	top: -2px;
@@ -509,10 +509,10 @@ span.checkbox_surround_init {
 
 
 input.large,
-textarea.large {
+textarea.form_textarea_input {
 	width: 97%;
-	margin-left: 0;
-	margin-right: 0;
+	margin: 0;
+	display: block;
 }
 
 label.radiooption {
@@ -648,10 +648,13 @@ div.action_messages ol {
 }
 div.log_container div,
 div.action_messages div {
-	border:1px solid #6287c2;
-	background:#ddd;
 	margin:1ex auto;
 	padding:1ex;
+}
+div.log_container div.log_note,
+div.action_messages div.log_note {
+	border:1px solid #6287c2;
+	background:#ddd;
 }
 div.log_container div.log_success,
 div.action_messages div.log_success,
@@ -924,6 +927,16 @@ div.debug td.odd {
 	background-color: #eee;
 }
 
+div.debug_error {
+	padding: 10px;
+	background: #FDD;
+	border: 2px solid #F00;
+	border-radius: 6px;
+}
+div.debug_error h2 {
+	margin: 12px 0;
+	color: #F00;
+}
 /*
  * AJAX Debug output formatting:
  */
@@ -1021,4 +1034,8 @@ ul.jslog_error {
 }
 .item_custom_fields th {
 	text-align: left;
+}
+
+.form-login-links {
+	padding: 0 1em;
 }

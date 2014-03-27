@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -101,7 +101,7 @@ $Form->begin_form( '' );
 
 	echo $Form->inputstart;
 	?>
-	<div><input type="text" name="<?php echo $pp ?>s" size="20" value="<?php echo htmlspecialchars($s) ?>" class="SearchField" /></div>
+	<div><input type="text" name="<?php echo $pp ?>s" size="20" value="<?php echo evo_htmlspecialchars($s) ?>" class="SearchField" /></div>
 	<?php
 	echo $Form->inputend;
 	?>
@@ -172,7 +172,7 @@ $Form->begin_form( '' );
 
 	echo $Form->inputstart;
 	?>
-	<div><input type="text" name="<?php echo $pp ?>author_url" size="20" value="<?php echo htmlspecialchars($author_url) ?>" class="SearchField" /></div>
+	<div><input type="text" name="<?php echo $pp ?>author_url" size="20" value="<?php echo evo_htmlspecialchars($author_url) ?>" class="SearchField" /></div>
 	<?php
 	echo $Form->inputend;
 	?>
@@ -195,7 +195,7 @@ $Form->begin_form( '' );
 	echo '<legend>'.T_('IP').'</legend>';
 	echo $Form->inputstart;
 	?>
-	<div><?php echo T_('IP') ?> <input type="text" name="<?php echo $pp ?>author_IP" size="20" value="<?php echo htmlspecialchars($author_IP) ?>" class="SearchField" style="width:85%" /></div>
+	<div><?php echo T_('IP') ?> <input type="text" name="<?php echo $pp ?>author_IP" size="20" value="<?php echo evo_htmlspecialchars($author_IP) ?>" class="SearchField" style="width:85%" /></div>
 	<div class="note"><?php echo T_('use \'%\' for partial matches') ?></div>
 	<?php
 	echo $Form->inputend;

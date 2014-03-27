@@ -24,7 +24,7 @@ $required_php_version[ 'maintenance' ] = '5.0';
 /**
  * Minimum MYSQL version required for maintenance module to function properly
  */
-$required_mysql_version[ 'maintenance' ] = '4.1';
+$required_mysql_version[ 'maintenance' ] = '5.0.3';
 
 $ctrl_mappings['backup'] = 'maintenance/backup.ctrl.php';
 $ctrl_mappings['upgrade'] = 'maintenance/upgrade.ctrl.php';
@@ -63,22 +63,16 @@ class maintenance_Module extends Module
 		switch( $grp_ID )
 		{
 			case 1: // Administrators group ID equals 1
-				$permname = 'upgrade';
-				break;
-			case 2: // Privileged Bloggers group equals 2
-				$permname = 'none';
-				break;
-			case 3: // Bloggers group ID equals 3
-				$permname = 'none';
+				$perm_maintenance = 'upgrade'; // Maintenance permissions like backup or upgrade
 				break;
 			default: // Other groups
-				$permname = 'none';
+				$perm_maintenance = 'none';
 				break;
 		}
 
 		// We can return as many default permissions as we want:
 		// e.g. array ( permission_name => permission_value, ... , ... )
-		return $permissions = array( 'perm_maintenance' => $permname );
+		return $permissions = array( 'perm_maintenance' => $perm_maintenance );
 	}
 
 
@@ -189,8 +183,13 @@ class maintenance_Module extends Module
 			// Display Updates tab in System -> Maintenance menu
 			$AdminUI->add_menu_entries( array( 'options', 'misc' ), array(
 									'upgrade' => array(
-									'text' => T_('Check for updates'),
-									'href' => '?ctrl=upgrade'	),
+									'text' => T_('Auto Upgrade'),
+									'href' => '?ctrl=upgrade' ),
+							) );
+			$AdminUI->add_menu_entries( array( 'options', 'misc' ), array(
+									'upgradesvn' => array(
+									'text' => T_('Upgrade from SVN'),
+									'href' => '?ctrl=upgrade&amp;tab=svn' ),
 							) );
 		}
 	}
@@ -198,11 +197,4 @@ class maintenance_Module extends Module
 
 $maintenance_Module = new maintenance_Module();
 
-
-/*
- * $Log$
- * Revision 1.8  2013/11/06 08:04:25  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

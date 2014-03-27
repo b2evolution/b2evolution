@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -54,28 +54,29 @@ $SQL = new SQL();
 $SQL->SELECT( 'SQL_NO_CACHE emret_ID, emret_timestamp, emret_address, emret_errormsg, emret_errtype' );
 $SQL->FROM( 'T_email__returns' );
 
-$CountSQL = new SQL();
-$CountSQL->SELECT( 'SQL_NO_CACHE COUNT(emret_ID)' );
-$CountSQL->FROM( 'T_email__returns' );
+$count_SQL = new SQL();
+$count_SQL->SELECT( 'SQL_NO_CACHE COUNT(emret_ID)' );
+$count_SQL->FROM( 'T_email__returns' );
 
 if( !empty( $datestart ) )
 {	// Filter by start date
 	$SQL->WHERE_and( 'emret_timestamp >= '.$DB->quote( $datestart.' 00:00:00' ) );
-	$CountSQL->WHERE_and( 'emret_timestamp >= '.$DB->quote( $datestart.' 00:00:00' ) );
+	$count_SQL->WHERE_and( 'emret_timestamp >= '.$DB->quote( $datestart.' 00:00:00' ) );
 }
 if( !empty( $datestop ) )
 {	// Filter by end date
 	$SQL->WHERE_and( 'emret_timestamp <= '.$DB->quote( $datestop.' 23:59:59' ) );
-	$CountSQL->WHERE_and( 'emret_timestamp <= '.$DB->quote( $datestop.' 23:59:59' ) );
+	$count_SQL->WHERE_and( 'emret_timestamp <= '.$DB->quote( $datestop.' 23:59:59' ) );
 }
 if( !empty( $email ) )
 {	// Filter by email
+	$email = evo_strtolower( $email );
 	$SQL->WHERE_and( 'emret_address LIKE '.$DB->quote( $email ) );
-	$CountSQL->WHERE_and( 'emret_address LIKE '.$DB->quote( $email ) );
+	$count_SQL->WHERE_and( 'emret_address LIKE '.$DB->quote( $email ) );
 }
 
 
-$Results = new Results( $SQL->get(), 'emret_', 'D', $UserSettings->get( 'results_per_page' ), $CountSQL->get() );
+$Results = new Results( $SQL->get(), 'emret_', 'D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 
 $Results->title = T_('Returned emails');
 
@@ -134,7 +135,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Error'),
 		'order' => 'emret_errormsg',
-		'td' => '<a href="'.$admin_url.'?ctrl=email&amp;tab=return&amp;emret_ID=$emret_ID$">%htmlspecialchars( #emret_errormsg# )%</a>',
+		'td' => '<a href="'.$admin_url.'?ctrl=email&amp;tab=return&amp;emret_ID=$emret_ID$">%evo_htmlspecialchars( #emret_errormsg# )%</a>',
 	);
 
 $Results->cols[] = array(

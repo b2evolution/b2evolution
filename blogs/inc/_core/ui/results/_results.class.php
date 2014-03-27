@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -61,6 +61,8 @@ class Results extends Table
 
 	/**
 	 * Total number of rows (if > {@link $limit}, it will result in multiple pages)
+	 *
+	 * Note: Do not use directly outside of the results class, use get_total_rows() function instead!
 	 */
 	var $total_rows;
 
@@ -388,6 +390,7 @@ class Results extends Table
 	function reset()
 	{
 		$this->rows = NULL;
+		$this->total_rows = NULL;
 	}
 
 
@@ -449,6 +452,11 @@ class Results extends Table
 
 		if( empty( $this->sql ) )
 		{ // the sql query is empty so we can't process it
+			return;
+		}
+
+		if( isset( $this->total_rows ) && intval( $this->total_rows ) === 0 )
+		{ // The number of total rows was counted and the sql query has no results
 			return;
 		}
 
@@ -830,6 +838,22 @@ class Results extends Table
 
 
 	/**
+	 * Get the number of total rows in the result
+	 *
+	 * @return integer
+	 */
+	function get_total_rows()
+	{
+		if( !isset( $this->total_rows ) )
+		{ // Count total rows to be able to display pages correctly
+			$this->count_total_rows( $this->count_sql );
+		}
+
+		return $this->total_rows;
+	}
+
+
+	/**
 	 * Note: this function might actually not be very useful.
 	 * If you define ->Cache before display, all rows will be instantiated on the fly.
 	 * No need to restart et go through the rows a second time here.
@@ -950,7 +974,7 @@ class Results extends Table
 	 * Initialize things in order to be ready for displaying.
 	 *
 	 * This is useful when manually displaying, i-e: not by using Results::display()
- 	*
+ 	 *
 	 * @param array ***please document***
 	 * @param array Fadeout settings array( 'key column' => array of values ) or 'session'
  	 */
@@ -960,7 +984,10 @@ class Results extends Table
 		parent::display_init( $display_params, $fadeout );
 
 		// Make sure query has executed and we're at the top of the resultset:
-		$this->restart();
+		if( ( ! isset( $this->total_rows ) ) || ( ( intval( $this->total_rows ) > 0 ) && ( ! isset( $this->rows ) ) ) )
+		{ // The result is not empty but the rows are not set yet, the query needs to be executed
+			$this->restart();
+		}
 	}
 
 
@@ -1556,20 +1583,22 @@ class Results extends Table
 	 *
 	 * This is one of the key functions to look at when you want to use the Results class.
 	 * - $var$
-	 * - £var£
+	 * - Â£varÂ£ - replaced by its utf-8 hex character (c2 a3)
+	 * - Â²varÂ² - replaced by its utf-8 hex character (c2 b2)
 	 * - #var#
 	 * - {row}
 	 * - %func()%
 	 * - ~func()~
+	 * - Â¤func()Â¤ - @deprecated by ~func()~ - replaced by its utf-8 hex character (c2 a4)
 	 */
 	function parse_col_content( $content )
 	{
 		// Make variable substitution for STRINGS:
 		$content = preg_replace( '#\$ (\w+) \$#ix', "'.format_to_output(\$row->$1).'", $content );
 		// Make variable substitution for URL STRINGS:
-		$content = preg_replace( '#\£ (\w+) \£#ix', "'.format_to_output(\$row->$1, 'urlencoded').'", $content );
+		$content = preg_replace( '#\x{c2}\x{a3} (\w+) \x{c2}\x{a3}#ix', "'.format_to_output(\$row->$1, 'urlencoded').'", $content );
 		// Make variable substitution for escaped strings:
-		$content = preg_replace( '#² (\w+) ²#ix', "'.htmlentities(\$row->$1).'", $content );
+		$content = preg_replace( '#\x{c2}\x{b2} (\w+) \x{c2}\x{b2}#ix', "'.evo_htmlentities(\$row->$1).'", $content );
 		// Make variable substitution for RAWS:
 		$content = preg_replace( '!\# (\w+) \#!ix', "\$row->$1", $content );
 		// Make variable substitution for full ROW:
@@ -1584,7 +1613,7 @@ class Results extends Table
 		$content = preg_replace( '#~ (.+?) ~#ix', "'.$1.'", $content );
 
 		// @deprecated by ~func()~. Left here for backward compatibility only, to be removed in future versions.
-		$content = preg_replace( '#¤ (.+?) ¤#ix', "'.$1.'", $content );
+		$content = preg_replace( '#\x{c2}\x{a4} (.+?) \x{c2}\x{a4}#ix', "'.$1.'", $content );
 
 		// Make callback function move_icons for orderable lists // dh> what does it do?
 		$content = str_replace( '{move}', "'.\$this->move_icons().'", $content );
@@ -1722,9 +1751,16 @@ class Results extends Table
 				}
 				$r = '<a href="'
 						.regenerate_url( $this->page_param, (($this->page > 2) ? $this->page_param.'='.($this->page-1) : ''), $this->params['page_url'] ).'"';
+				$attr_rel = array();
 				if( $this->nofollow_pagenav )
-				{	// We want to NOFOLLOW page navigation
-					$r .= ' rel="nofollow"';
+				{ // We want to NOFOLLOW page navigation
+					$attr_rel[] = 'nofollow';
+				}
+				// Add attribute rel="prev" for previous page
+				$attr_rel[] = 'prev';
+				if( ! empty( $attr_rel ) )
+				{
+					$r .= ' rel="'.implode( ' ', $attr_rel ).'"';
 				}
 				$r .= '>'.$this->params['prev_text'].'</a>';
 				return $r;
@@ -1737,9 +1773,16 @@ class Results extends Table
 				}
 				$r = '<a href="'
 						.regenerate_url( $this->page_param, $this->page_param.'='.($this->page+1), $this->params['page_url'] ).'"';
+				$attr_rel = array();
 				if( $this->nofollow_pagenav )
-				{	// We want to NOFOLLOW page navigation
-					$r .= ' rel="nofollow"';
+				{ // We want to NOFOLLOW page navigation
+					$attr_rel[] = 'nofollow';
+				}
+				// Add attribute rel="next" for next page
+				$attr_rel[] = 'next';
+				if( ! empty( $attr_rel ) )
+				{
+					$r .= ' rel="'.implode( ' ', $attr_rel ).'"';
 				}
 				$r .= '>'.$this->params['next_text'].'</a>';
 				return $r;
@@ -1941,6 +1984,8 @@ class Results extends Table
 		$i = 0;
 		$list = '';
 
+		$page_prev_i = $this->page - 1;
+		$page_next_i = $this->page + 1;
 		for( $i=$min; $i<=$max; $i++)
 		{
 			if( $i == $this->page )
@@ -1951,9 +1996,22 @@ class Results extends Table
 			{ //a link for non-current pages
 				$list .= '<a href="'
 					.regenerate_url( $this->page_param, ( $i>1 ? $this->page_param.'='.$i : '' ), $page_url ).'"';
+				$attr_rel = array();
 				if( $this->nofollow_pagenav )
-				{	// We want to NOFOLLOW page navigation
-					$list .=  ' rel="nofollow"';
+				{ // We want to NOFOLLOW page navigation
+					$attr_rel[] = 'nofollow';
+				}
+				if( $page_prev_i == $i )
+				{ // Add attribute rel="prev" for previous page
+					$attr_rel[] = 'prev';
+				}
+				elseif( $page_next_i == $i )
+				{ // Add attribute rel="next" for next page
+					$attr_rel[] = 'next';
+				}
+				if( ! empty( $attr_rel ) )
+				{
+					$list .= ' rel="'.implode( ' ', $attr_rel ).'"';
 				}
 				$list .= '>'.$i.'</a> ';
 			}

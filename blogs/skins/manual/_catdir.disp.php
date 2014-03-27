@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage manual
@@ -41,10 +41,11 @@ if( !empty( $cat ) )
 	$MainList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $Blog->get_setting('posts_per_page') );
 	$MainList->load_from_Request();
 	$MainList->set_filters( array(
-			'cat_array' => array( $cat ), // Limit only by selected cat (exclude posts from child categories)
-			'cat_focus' => 'main',
-			'page'      => param( 'paged', 'integer', 1, true, true ),
-			'unit'      => $main_items_unit,
+			'cat_array'    => array( $cat ), // Limit only by selected cat (exclude posts from child categories)
+			'cat_modifier' => NULL,
+			'cat_focus'    => 'main',
+			'page'         => param( 'paged', 'integer', 1, true, true ),
+			'unit'         => $main_items_unit,
 		) );
 	$MainList->query();
 	$MainList->nav_target = $cat; // set navigation target, we are always navigating through category in this skin
@@ -213,9 +214,10 @@ if( !empty( $cat ) )
 	$MainList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $Blog->get_setting('posts_per_page'), 'ItemCache', 'extra_' );
 	$MainList->load_from_Request();
 	$MainList->set_filters( array(
-			'cat_array' => array( $cat ), // Limit only by selected cat (exclude posts from child categories)
-			'cat_focus' => 'extra',
-			'page'      => param( 'extra_paged', 'integer', 1, true, true ),
+			'cat_array'    => array( $cat ), // Limit only by selected cat (exclude posts from child categories)
+			'cat_modifier' => NULL,
+			'cat_focus'    => 'extra',
+			'page'         => param( 'extra_paged', 'integer', 1, true, true ),
 		) );
 	$MainList->query();
 	$MainList->nav_target = $cat; // set navigation target, we are always navigating through category in this skin

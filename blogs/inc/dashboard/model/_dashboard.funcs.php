@@ -5,7 +5,7 @@
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal Open Source relicensing agreement:
  * }}
@@ -214,7 +214,7 @@ function get_comments_awaiting_moderation_number( $blog_ID )
 
 	$sql = 'SELECT COUNT(DISTINCT(comment_ID))
 				FROM T_comments
-					INNER JOIN T_items__item ON comment_post_ID = post_ID ';
+					INNER JOIN T_items__item ON comment_item_ID = post_ID ';
 
 	$sql .= 'INNER JOIN T_postcats ON post_ID = postcat_post_ID
 				INNER JOIN T_categories othercats ON postcat_cat_ID = othercats.cat_ID ';
@@ -355,7 +355,7 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 
 	if( !$script )
 	{
-		echo '<input type="hidden" id="new_badge" value="'.$CommentList->total_rows.'"/>';
+		echo '<input type="hidden" id="new_badge" value="'.$CommentList->get_total_rows().'"/>';
 	}
 }
 

@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -44,7 +44,7 @@ $SQL->FROM( 'T_hitlog' );
 $SQL->WHERE( 'hit_agent_type = "robot"' );
 if( $blog > 0 )
 {
-	$SQL->WHERE_and( 'hit_blog_ID = ' . $blog );
+	$SQL->WHERE_and( 'hit_coll_ID = ' . $blog );
 }
 $SQL->GROUP_BY( 'year, month, day' );
 $SQL->ORDER_BY( 'year DESC, month DESC, day DESC' );
@@ -103,18 +103,18 @@ $SQL->SELECT( 'SQL_NO_CACHE COUNT(*) AS hit_count, agnt_signature' );
 $SQL->FROM( 'T_hitlog' );
 $SQL->WHERE( 'hit_agent_type = "robot"' );
 if( ! empty( $blog ) )
-	$SQL->WHERE_and( 'hit_blog_ID = ' . $blog );
+	$SQL->WHERE_and( 'hit_coll_ID = ' . $blog );
 $SQL->GROUP_BY( 'agnt_signature' );
 
-$CountSQL = new SQL();
-$CountSQL->SELECT( 'SQL_NO_CACHE COUNT( DISTINCT agnt_signature )' );
-$CountSQL->FROM( $SQL->get_from( '' ) );
-$CountSQL->WHERE( $SQL->get_where( '' ) );
+$count_SQL = new SQL();
+$count_SQL->SELECT( 'SQL_NO_CACHE COUNT( DISTINCT agnt_signature )' );
+$count_SQL->FROM( $SQL->get_from( '' ) );
+$count_SQL->WHERE( $SQL->get_where( '' ) );
 
-$Results = new Results( $SQL->get(), 'topidx', '-D', 20, $CountSQL->get() );
+$Results = new Results( $SQL->get(), 'topidx', '-D', 20, $count_SQL->get() );
 
-$CountSQL->SELECT( 'SQL_NO_CACHE COUNT(*)' );
-$total_hit_count = $DB->get_var( $CountSQL->get() );
+$count_SQL->SELECT( 'SQL_NO_CACHE COUNT(*)' );
+$total_hit_count = $DB->get_var( $count_SQL->get() );
 
 $Results->title = T_('Top Indexing Robots');
 
@@ -126,20 +126,20 @@ function translate_user_agent( $agnt_signature )
 {
 	global $user_agents;
 
-	$html_signature = htmlspecialchars( $agnt_signature );
+	$html_signature = evo_htmlspecialchars( $agnt_signature );
 	$format = '<span title="'.$html_signature.'">%s</span>';
 
 	foreach ($user_agents as $curr_user_agent)
 	{
 		if( strpos($agnt_signature, $curr_user_agent[1]) !== false )
 		{
-			return sprintf( $format, htmlspecialchars($curr_user_agent[2]) );
+			return sprintf( $format, evo_htmlspecialchars($curr_user_agent[2]) );
 		}
 	}
 
 	if( ( $browscap = @get_browser( $agnt_signature ) ) && $browscap->browser != 'Default Browser' )
 	{
-		return sprintf( $format, htmlspecialchars( $browscap->browser ) );
+		return sprintf( $format, evo_htmlspecialchars( $browscap->browser ) );
 	}
 
 	return $html_signature;

@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -166,7 +166,7 @@ class UserCache extends DataObjectCache
 
 		// Get all users with matching email address
 		$result = $DB->get_results('SELECT * FROM T_users
-					WHERE LOWER(user_email) = '.$DB->quote( evo_strtolower($email) ).'
+					WHERE user_email = '.$DB->quote( evo_strtolower( $email ) ).'
 					ORDER BY user_lastseen_ts DESC, user_status ASC');
 
 		if( empty( $result ) )
@@ -253,22 +253,45 @@ class UserCache extends DataObjectCache
 	 * @todo make a UNION query when we upgrade to MySQL 4
 	 * @param integer Blog ID to load members for
 	 * @param integer Limit, 0 - for unlimit
+	 * @param boolean TRUE - to load only members, FALSE - to load the users which can be assigned to items if it is allowed by blog's settings
 	 */
-	function load_blogmembers( $blog_ID, $limit = 0 )
+	function load_blogmembers( $blog_ID, $limit = 0, $load_members = true )
 	{
 		global $DB, $Debuglog;
 
-		if( isset( $this->alreadyCached['blogmembers'] ) && isset( $this->alreadyCached['blogmembers'][$blog_ID] ) )
+		$load_assignees = false;
+		if( ! $load_members && ! empty( $blog_ID ) )
+		{
+			$BlogCache = & get_BlogCache();
+			if( $Blog = $BlogCache->get_by_ID( $blog_ID, false, false ) )
+			{ // Load assignees only when advanced perms are available and workflow is used
+				$load_assignees = $Blog->get( 'advanced_perms' ) && $Blog->get_setting( 'use_workflow' );
+			}
+		}
+		if( $load_assignees )
+		{ // Load users which can be assigneed to items of the blog
+			$cache_name = 'blogassignees';
+			$db_field = 'can_be_assignee';
+		}
+		else
+		{ // Load members of the blog
+			$cache_name = 'blogmembers';
+			$db_field = 'ismember';
+		}
+
+		if( isset( $this->alreadyCached[ $cache_name ] ) && isset( $this->alreadyCached[ $cache_name ][ $blog_ID ] ) )
 		{
 			$Debuglog->add( "Already loaded <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache", 'dataobjects' );
 			return false;
 		}
 
+		$this->none_option_text = T_('No user');
+
 		// Clear previous users to get only the members of this blog
 		$this->clear();
 
 		// Remember this special load:
-		$this->alreadyCached['blogmembers'][$blog_ID] = true;
+		$this->alreadyCached[ $cache_name ][ $blog_ID ] = true;
 
 		$Debuglog->add( "Loading <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache", 'dataobjects' );
 
@@ -278,7 +301,7 @@ class UserCache extends DataObjectCache
 		$user_perms_SQL->FROM( 'T_users' );
 		$user_perms_SQL->FROM_add( 'INNER JOIN T_coll_user_perms ON user_ID = bloguser_user_ID' );
 		$user_perms_SQL->WHERE( 'bloguser_blog_ID = '.$DB->quote( $blog_ID ) );
-		$user_perms_SQL->WHERE_and( 'bloguser_ismember <> 0' );
+		$user_perms_SQL->WHERE_and( 'bloguser_'.$db_field.' <> 0' );
 
 		// Get users which groups are members of the blog:
 		$group_perms_SQL = new SQL();
@@ -286,7 +309,7 @@ class UserCache extends DataObjectCache
 		$group_perms_SQL->FROM( 'T_users' );
 		$group_perms_SQL->FROM_add( 'INNER JOIN T_coll_group_perms ON user_grp_ID = bloggroup_group_ID' );
 		$group_perms_SQL->WHERE( 'bloggroup_blog_ID = '.$DB->quote( $blog_ID ) );
-		$group_perms_SQL->WHERE_and( 'bloggroup_ismember <> 0' );
+		$group_perms_SQL->WHERE_and( 'bloggroup_'.$db_field.' <> 0' );
 
 		// Union two sql queries to execute one query and save an order as one list
 		$users_sql = '( '.$user_perms_SQL->get().' )'
@@ -325,12 +348,11 @@ class UserCache extends DataObjectCache
 	{
 		if( $blog_ID )
 		{ // Load requested blog members:
-			$this->load_blogmembers( $blog_ID );
+			$this->load_blogmembers( $blog_ID, 0, false );
 
 			// Make sure current user is in list:
 			if( $default && $always_load_default )
 			{
-				// echo '<option>getting default';
 				$this->get_by_ID( $default );
 			}
 		}

@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -116,10 +116,17 @@ $Form->begin_fieldset( T_('Hit & session logging').get_manual_link('hit_logging'
 
 $Form->end_fieldset();
 
+// --------------------------------------------
+
+$Form->begin_fieldset( T_('Comment recycle bin').get_manual_link('recycle-bin-settings') );
+
+	$Form->text_input( 'auto_empty_trash', $Settings->get('auto_empty_trash'), 5, T_('Prune recycled comments after'), T_('days.') );
+
+$Form->end_fieldset();
+
 if( $current_User->check_perm( 'options', 'edit' ) )
 {
-	$Form->end_form( array( array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
-													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+	$Form->end_form( array( array( 'submit', 'submit', T_('Save changes!'), 'SaveButton' ) ) );
 }
 
 ?>

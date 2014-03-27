@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -35,82 +35,11 @@ echo '<p class="note">'.T_('<strong>Note:</strong> Deleting a category does not 
 global $Settings, $dispatcher, $ReqURI, $blog;
 
 echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categories is currently set to %s in the %sblogs settings%s.'),
-	$Settings->get('chapter_ordering') == 'manual' ? /* TRANS: Manual here = "by hand" */ T_('Manual ') : T_('Alphabetical'), '<a href="'.$dispatcher.'?ctrl=collections&tab=settings#categories">', '</a>' ).'</p> ';
+	$Settings->get('chapter_ordering') == 'manual' ? /* TRANS: Manual here = "by hand" */ T_('Manual ') : T_('Alphabetical'), '<a href="'.$dispatcher.'?ctrl=collections&tab=blog_settings#categories">', '</a>' ).'</p> ';
 
 if( ! $Settings->get('allow_moving_chapters') )
 { // TODO: check perm
-	echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Moving categories across blogs is currently disabled in the %sblogs settings%s.'), '<a href="'.$dispatcher.'?ctrl=collections&tab=settings#categories">', '</a>' ).'</p> ';
+	echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Moving categories across blogs is currently disabled in the %sblogs settings%s.'), '<a href="'.$dispatcher.'?ctrl=collections&tab=blog_settings#categories">', '</a>' ).'</p> ';
 }
 
 ?>
-<script type="text/javascript">
-jQuery( document ).on( 'click', 'td[id^=order-]', function()
-{
-	if( jQuery( this ).find( 'input' ).length > 0 )
-	{ // This order field is already editing now
-		return;
-	}
-
-	// Create <input> to edit order field
-	var input = document.createElement( 'input' )
-	var $input = jQuery( input );
-	$input.val( jQuery( this ).html() );
-	$input.css( {
-		width: jQuery( this ).width() - 2,
-		height: jQuery( this ).height() - 2,
-		padding: '0',
-		'text-align': 'center'
-	} );
-
-	// Save current value
-	jQuery( this ).attr( 'rel', jQuery( this ).html() );
-
-	// Replace statis value with <input>
-	jQuery( this ).html( '' ).append( $input );
-	$input.focus();
-
-	// Bind events for <input>
-	$input.bind( 'keydown', function( e )
-	{
-		var key = e.keyCode;
-		//console.log(key);
-		var td_obj = jQuery( this ).parent();
-		if( key == 27 )
-		{ // "Esc" key
-			td_obj.html( td_obj.attr( 'rel' ) );
-		}
-		else if( key == 13 )
-		{ // "Enter" key
-			results_ajax_load( jQuery( this ), '<?php echo $ReqURI; ?>&blog=<?php echo $blog; ?>&order_action=update&order_data=' + td_obj.attr( 'id' ) + '&order_value=' + jQuery( this ).val() );
-		}
-	} );
-
-	$input.bind( 'blur', function()
-	{
-		var revert_changes = false;
-
-		var td_obj = jQuery( this ).parent();
-		if( td_obj.attr( 'rel' ) != jQuery( this ).val() )
-		{ // Value was changed, ask about saving
-			// fp>yura: please explain where and when this happens:
-			// yura>fp: 1. Go to in backoffice "Manual BLOG > Contents > Manual Pages" like this url: /admin.php?ctrl=items&tab=manual&filter=restore&blog=6
-			// 2. Click on the cell of the column "Order", You will see the input to change an order
-			// 3. Change to other value
-			// 4. Click outside input(to init event "blur") - and this message will be appeared
-			if( confirm( '<?php echo TS_('Do you want discard your changes for this order field?'); ?>' ) )
-			{
-				revert_changes = true;
-			}
-		}
-		else
-		{
-			revert_changes = true;
-		}
-
-		if( revert_changes )
-		{ // Revert the changed value
-			td_obj.html( td_obj.attr( 'rel' ) );
-		}
-	} );
-} );
-</script>

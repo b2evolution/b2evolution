@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * {@internal License choice
@@ -115,7 +115,7 @@ function replace_special_chars( $str, $post_locale = NULL )
 
 	// Decode entities to be able to transliterate the associated chars:
 	// Tblue> TODO: Check if this could have side effects.
-	$str = html_entity_decode( $str, ENT_NOQUOTES, $evo_charset );
+	$str = evo_html_entity_decode( $str, ENT_NOQUOTES, $evo_charset );
 
 	$our_locale = $post_locale;
 	if( $our_locale === NULL )
@@ -142,7 +142,7 @@ function replace_special_chars( $str, $post_locale = NULL )
 
 	if( ( $newstr = evo_iconv_transliterate( $str, $post_locale ) ) !== false )
 	{	// iconv allows us to get nice URL titles by transliterating non-ASCII chars.
-		// Tblue> htmlentities() does not know anything about ASCII?! ISO-8859-1 will work too, though.
+		// Tblue> evo_htmlentities() does not know anything about ASCII?! ISO-8859-1 will work too, though.
 		$newstr_charset = 'ISO-8859-1';
 	}
 	// TODO: sam2kb> convert this to 'transliteration_map'
@@ -169,7 +169,7 @@ function replace_special_chars( $str, $post_locale = NULL )
 	}
 
 	// Replace HTML entities
-	$newstr = htmlentities( $newstr, ENT_NOQUOTES, $newstr_charset );
+	$newstr = evo_htmlentities( $newstr, ENT_NOQUOTES, $newstr_charset );
 
 	// Handle special entities (e.g., use "-" instead of "a" for "&"):
 	$newstr = str_replace(

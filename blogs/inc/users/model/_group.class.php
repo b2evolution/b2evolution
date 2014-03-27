@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -178,8 +178,9 @@ class Group extends DataObject
 		foreach( $GroupSettings->permission_values as $name => $value )
 		{
 			// We need to handle checkboxes and radioboxes separately , because when a checkbox isn't checked the checkbox variable is not sent
-			if( $name == 'perm_createblog' || $name == 'perm_getblog' || $name == 'perm_templates' )
-			{ // These two permissions are represented by checkboxes, all other pluggable group permissions are represented by radiobox.
+			if( $name == 'perm_createblog' || $name == 'perm_getblog' || $name == 'perm_templates'
+				|| $name == 'cross_country_allow_profiles' || $name == 'cross_country_allow_contact' )
+			{ // These permissions are represented by checkboxes, all other pluggable group permissions are represented by radiobox.
 				$value = param( 'edited_grp_'.$name, 'string', 'denied' );
 			}
 			elseif( ( $name == 'perm_admin' || $name == 'perm_users' ) && ( $this->ID == 1 ) )
@@ -271,7 +272,7 @@ class Group extends DataObject
 			$permvalue = false; // This will result in $perm == false always. We go on for the $Debuglog..
 		}
 
-		$pluggable_perms = array( 'admin', 'shared_root', 'spamblacklist', 'slugs', 'templates', 'options', 'emails', 'files', 'users' );
+		$pluggable_perms = array( 'admin', 'shared_root', 'import_root', 'spamblacklist', 'slugs', 'templates', 'options', 'emails', 'files', 'users' );
 		if( in_array( $permname, $pluggable_perms ) )
 		{
 			$permname = 'perm_'.$permname;
@@ -379,6 +380,7 @@ class Group extends DataObject
 	 * @see User::check_perm()
 	 * @param string Permission name can be any from the blog advanced perm names. A few possible permname:
 	 *                  - blog_ismember
+	 *                  - blog_can_be_assignee
 	 *                  - blog_del_post
 	 *                  - blog_edit_ts
 	 *                  - blog_post_statuses

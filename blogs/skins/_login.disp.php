@@ -4,7 +4,7 @@
  *
  * This file is not meant to be called directly.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evocore
  *
@@ -23,7 +23,7 @@ if( is_logged_in() )
 	return;
 }
 
-$login = param( $dummy_fields[ 'login' ], 'string', '' );
+$login = evo_strtolower( param( $dummy_fields[ 'login' ], 'string', '' ) );
 $action = param( 'action', 'string', '' );
 $redirect_to = param( 'redirect_to', 'url', '' );
 $source = param( 'source', 'string', 'inskin login form' );

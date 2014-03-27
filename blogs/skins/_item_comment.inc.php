@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -18,7 +18,7 @@ $params = array_merge( array(
 		'comment_start'        => '<div class="bComment">',
 		'comment_end'          => '</div>',
 		'link_to'              => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
-		'author_link_text'     => 'preferredname',
+		'author_link_text'     => 'login', // avatar | only_avatar | login | nickname | firstname | lastname | fullname | preferredname
 		'before_image'         => '<div class="image_block">',
 		'before_image_legend'  => '<div class="image_legend">',
 		'after_image_legend'   => '</div>',
@@ -56,8 +56,8 @@ $Comment = & $params['Comment'];
 					$Comment->permanent_link( array(
 							'before'    => '',
 							'after'     => ' '.T_('from:').' ',
-							'text' 			=> T_('Comment'),
-							'nofollow'	=> true,
+							'text'      => T_('Comment'),
+							'nofollow'  => true,
 						) );
 				}
 				$Comment->author2( array(
@@ -66,7 +66,7 @@ $Comment = & $params['Comment'];
 						'before_user'  => '',
 						'after_user'   => '#',
 						'format'       => 'htmlbody',
-						'link_to'		   => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
+						'link_to'      => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 						'link_text'    => $params['author_link_text'],
 					) );
 
@@ -120,12 +120,3 @@ $Comment = & $params['Comment'];
 	echo $params['comment_end'];
 ?>
 <!-- ========== END of a COMMENT/TB/PB ========== -->
-<?php
-
-/*
- * $Log$
- * Revision 1.16  2013/11/06 08:05:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
-?>

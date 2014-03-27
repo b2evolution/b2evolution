@@ -13,7 +13,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -175,7 +175,7 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 				}
 
 				// convert all html to special characters:
-				$GLOBALS[$var] = trim( htmlspecialchars( $GLOBALS[$var] ) );
+				$GLOBALS[$var] = trim( evo_htmlspecialchars( $GLOBALS[$var] ) );
 				// cross-platform newlines:
 				$GLOBALS[$var] = preg_replace( "~(\r\n|\r)~", "\n", $GLOBALS[$var] );
 				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as text with html special chars', 'params' );
@@ -954,7 +954,7 @@ function param_date( $var, $err_msg, $required, $default = '', $date_format = NU
 		set_param( $var, $iso_date );
 	}
 
-	return $GLOBALS[$var];
+	return $iso_date;
 }
 
 
@@ -1075,6 +1075,34 @@ function param_check_date( $var, $err_msg, $required = false, $date_format = NUL
 	param_error( $var, $err_msg );
 
 	return false;
+}
+
+
+/**
+ * Checks if the param is a color
+ *
+ * @param string param name
+ * @param string error message
+ * @return boolean true if OK
+ */
+function param_check_color( $var, $err_msg, $required = false )
+{
+	return param_validate( $var, 'check_is_color', $required, $err_msg );
+}
+
+
+/**
+ * Checks if the param is a decimal number
+ *
+ * @param string decimal to check
+ * @return string error message if decimal is not valid
+ */
+function check_is_color( $color )
+{
+	if( ! is_color( $color ) )
+	{
+		return T_('The color value is invalid.');
+	}
 }
 
 
@@ -1380,10 +1408,18 @@ function check_is_phone( $phone )
  * @param string param name
  * @param boolean Is a password required? (non-empty)
  * @param integer Minimum password length
+ * @param array Params
  * @return boolean true if OK
  */
-function param_check_passwords( $var1, $var2, $required = false, $min_length = 6 )
+function param_check_passwords( $var1, $var2, $required = false, $min_length = 6, $params = array() )
 {
+	$params = array_merge( array(
+			'msg_pass_new'   => T_('Please enter your new password.'),
+			'msg_pass_twice' => T_('Please enter your new password twice.'),
+			'msg_pass_diff'  => T_('You typed two different passwords.'),
+			'msg_pass_min'   => T_('The minimum password length is %d characters.'),
+		), $params );
+
 	$pass1 = get_param($var1);
 	$pass2 = get_param($var2);
 
@@ -1394,26 +1430,26 @@ function param_check_passwords( $var1, $var2, $required = false, $min_length = 6
 
 	if( ! strlen($pass1) )
 	{
-		param_error( $var1, T_('Please enter your new password.') );
-		param_error( $var2, T_('Please enter your new password twice.') );
+		param_error( $var1, $params['msg_pass_new'] );
+		param_error( $var2, $params['msg_pass_twice'] );
 		return false;
 	}
 	if( ! strlen($pass2) )
 	{
-		param_error( $var2, T_('Please enter your new password twice.') );
+		param_error( $var2, $params['msg_pass_twice'] );
 		return false;
 	}
 
 	// checking the password has been typed twice the same:
 	if( $pass1 != $pass2 )
 	{
-		param_error_multiple( array( $var1, $var2), T_('You typed two different passwords.') );
+		param_error_multiple( array( $var1, $var2 ), $params['msg_pass_diff'] );
 		return false;
 	}
 
 	if( evo_strlen($pass1) < $min_length )
 	{
-		param_error_multiple( array( $var1, $var2), sprintf( T_('The minimum password length is %d characters.'), $min_length ) );
+		param_error_multiple( array( $var1, $var2 ), sprintf( $params['msg_pass_min'], $min_length ) );
 		return false;
 	}
 
@@ -1998,14 +2034,16 @@ function param_html( $var, $default = '', $memorize = false, $err_msg )
  *
  * @param string param name
  * @param string error message
+ * @param string field error message
+ * @param string the context of this function call
  * @return boolean|string
  */
-function param_check_html( $var, $err_msg = '#', $field_err_msg = '#' )
+function param_check_html( $var, $err_msg = '#', $field_err_msg = '#', $context = 'posting' )
 {
 	global $Messages, $evo_charset;
 
 	// The param was already converted to the $evo_charset in the param() function, we need to use that charset!
-	$altered_html = check_html_sanity( $GLOBALS[$var], 'posting', NULL, $evo_charset );
+	$altered_html = check_html_sanity( $GLOBALS[$var], $context, NULL, $evo_charset );
 
  	if( $altered_html === false )
 	{	// We have errors, do not keep sanitization attemps:
@@ -2191,6 +2229,18 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 			$verbose = false;
 			break;
 
+		case 'head_extension':
+			$xhtmlvalidation  = true;
+			// We disable everything else, because the XMHTML validator will set explicit rules for the 'head_extension' context
+			$allow_css_tweaks = false;
+			$allow_javascript = false;
+			$allow_iframes    = false;
+			$allow_objects    = false;
+			$bypass_antispam  = false;
+			// Do not add error messages in this context
+			$verbose = false;
+			break;
+
 		default:
 			debug_die( 'unknown context: '.$context );
 	}
@@ -2214,7 +2264,7 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 		{
 			$errmsg = ($context == 'commenting')
 				? T_('Illegal content found (spam?).')
-				: sprintf( T_('Illegal content found: blacklisted word &laquo;%s&raquo;.'), htmlspecialchars($block) );
+				: sprintf( T_('Illegal content found: blacklisted word &laquo;%s&raquo;.'), evo_htmlspecialchars($block) );
 		}
 
 		$Messages->add(	$errmsg, 'error' );
@@ -2245,7 +2295,7 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 
 		if( $context == 'commenting' )
 		{	// DEPRECATED but still...
-			// echo 'allowed tags:',htmlspecialchars($comment_allowed_tags);
+			// echo 'allowed tags:',evo_htmlspecialchars($comment_allowed_tags);
 			$content = strip_tags( $content, $comment_allowed_tags );
 		}
 
@@ -2260,7 +2310,7 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 		$css_tweaks_error = ( ( ! $allow_css_tweaks ) && preg_match( '#\s((style|class|id)\s*=)#i', $check, $matches ) );
 		if( $css_tweaks_error && $verbose )
 		{
-			$Messages->add( T_('Illegal CSS markup found: ').htmlspecialchars($matches[1]), 'error' );
+			$Messages->add( T_('Illegal CSS markup found: ').evo_htmlspecialchars($matches[1]), 'error' );
 		}
 
 		// CHECK JAVASCRIPT:
@@ -2271,21 +2321,21 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 				|| preg_match( '#=["\'\s]*((javascript|vbscript|about):)#i', $check, $matches ) ) );
 		if( $javascript_error && $verbose )
 		{
-			$Messages->add( T_('Illegal javascript markup found: ').htmlspecialchars($matches[1]), 'error' );
+			$Messages->add( T_('Illegal javascript markup found: ').evo_htmlspecialchars($matches[1]), 'error' );
 		}
 
 		// CHECK IFRAMES:
 		$iframe_error = ( ( ! $allow_iframes ) && preg_match( '~( < \s* //? \s* (frame|iframe) )~xi', $check, $matches ) );
 		if( $iframe_error && $verbose )
 		{
-			$Messages->add( T_('Illegal frame markup found: ').htmlspecialchars($matches[1]), 'error' );
+			$Messages->add( T_('Illegal frame markup found: ').evo_htmlspecialchars($matches[1]), 'error' );
 		}
 
 		// CHECK OBJECTS:
 		$object_error = ( ( ! $allow_objects ) && preg_match( '~( < \s* //? \s* (applet|object|param|embed) )~xi', $check, $matches ) );
 		if( $object_error && $verbose )
 		{
-			$Messages->add( T_('Illegal object markup found: ').htmlspecialchars($matches[1]), 'error' );
+			$Messages->add( T_('Illegal object markup found: ').evo_htmlspecialchars($matches[1]), 'error' );
 		}
 
 		// Set the final error value based on all of the results

@@ -18,14 +18,15 @@
 	margin:1ex 0;
 }
 
-div#fileman_toolbars_bottom {
-	padding: 0 .5ex;
+div.fileman_toolbars_bottom {
+	padding: 3px;
 }
 .toolbaritem {
-	margin: 0 6px 0 1em;
+	margin: 0 0 0 1em;
 	float:right;
 	white-space:nowrap;
 	text-align: right;
+	padding: 2px 10px;
 }
 .toolbaritem form {
 	width: 20%; /* For IE7 */
@@ -66,6 +67,7 @@ div#fileman_toolbars_bottom {
 	width: 15%;
 	padding: .5ex;
 	border: 1px solid #bbb;
+	border-right: none;
 }
 #fm_files {
 	vertical-align: top;
@@ -163,6 +165,35 @@ table.filelist td.fm_filename div.path {
 	clear:right;
 	float:right;
 }
+table.filelist td.fm_filename .result_error {
+	border: none;
+}
+table.filelist tr#fileuploader_form td {
+	padding: 3px;
+	background: #b5cee0;
+}
+table.filelist .qq-upload-button,
+table.filelist .qq-upload-drop-area,
+table.filelist .qq-upload-drop-area-active,
+div.fileman_toolbars_bottom .toolbaritem {
+	border: 2px dashed #fff;
+	border-radius: 9px;
+	-moz-border-radius: 9px;
+	-webkit-border-radius: 9px;
+	-khtml-border-radius: 9px;
+	background: #b5cee0;
+}
+table.filelist .qq-upload-button-hover,
+table.filelist .qq-upload-drop-area,
+table.filelist .qq-upload-drop-area-active {
+	background: #f6ada8;
+}
+div.fileman_toolbars_bottom .toolbaritem {
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-khtml-border-radius: 3px;
+}
 .filemeta /* meta data after filename */
 {
 	color: #999;
@@ -174,6 +205,10 @@ table.filelist td.actions {
 }
 table.filelist td.size {
 	text-align: right;
+}
+table.filelist td.size span.qq-upload-size {
+	font: inherit;
+	margin: 0;
 }
 table.filelist td.perms {
 	text-align: center;
@@ -294,4 +329,8 @@ div#FM_anchor {
 
 #fm_highlighted {
 	background-color:#ffe79f;
+}
+
+#fileuploader_form ul.qq-upload-list {
+	display: none;
 }

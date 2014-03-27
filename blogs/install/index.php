@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package install
  */
@@ -103,6 +103,7 @@ switch( $action )
 	case 'deletedb':
 	case 'menu':
 	case 'localeinfo':
+	case 'utf8upgrade':
 		$try_db_connect = true;
 		break;
 	case 'start':
@@ -213,6 +214,10 @@ switch( $action )
 		$title = T_('Delete b2evolution tables');
 		break;
 
+	case 'utf8upgrade':
+		$title = T_('Upgrade your DB to UTF-8');
+		break;
+
 	case 'start':
 		$title = T_('Base configuration');
 		break;
@@ -266,7 +271,9 @@ header('Cache-Control: no-cache'); // no request to this page should get cached!
 		<!-- InstanceEndEditable --></div>
 
 		<!-- InstanceBeginEditable name="Main" -->
+		
 <?php
+
 block_open();
 
 // echo $action;
@@ -394,7 +401,7 @@ switch( $action )
 					<li><strong><?php echo T_('You can allow the installer to create the config file by changing permissions for the /conf directory:') ?></strong>
 						<ol>
 							<li><?php printf( T_('Make sure there is no existing and potentially locked configuration file named <code>%s</code>. If so, please delete it.'), $conf_filepath ); ?></li>
-							<li><?php printf( T_('<code>chmod 777 %s</code>. If needed, see the <a %s>online manual about permissions</a>.'), $conf_path, 'href="http://manual.b2evolution.net/Directory_and_file_permissions" target="_blank"' ); ?></li>
+							<li><?php printf( T_('<code>chmod 777 %s</code>. If needed, see the <a %s>online manual about permissions</a>.'), $conf_path, 'href="'.get_manual_url( 'directory-and-file-permissions' ).'" target="_blank"' ); ?></li>
 							<li><?php echo T_('Come back to this page and refresh/reload.') ?></li>
 						</ol>
 						<br />
@@ -413,7 +420,7 @@ switch( $action )
 				<p><?php echo T_('This is how your _basic_config.php should look like:') ?></p>
 				<blockquote>
 				<pre><?php
-					echo htmlspecialchars( $conf );
+					echo evo_htmlspecialchars( $conf );
 				?></pre>
 				</blockquote>
 				<?php
@@ -431,6 +438,8 @@ switch( $action )
 		 */
 		if( $action == 'start' || !$config_is_done )
 		{
+			track_step( 'installer-startdb' );
+
 			display_locale_selector();
 
 			block_open();
@@ -524,6 +533,7 @@ switch( $action )
 		 * Menu
 		 * -----------------------------------------------------------------------------------
 		 */
+		track_step( 'installer-menu' );
 
 		display_locale_selector();
 
@@ -598,6 +608,10 @@ switch( $action )
 					<label for="start"><?php echo T_('<strong>Change your base configuration</strong> (see recap below): You only want to do this in rare occasions where you may have moved your b2evolution files or database to a different location...')?></label></p>
 					<?php
 				}
+			?>
+					<p><input type="radio" name="action" id="utf8upgrade" value="utf8upgrade" />
+					<label for="utf8upgrade"><?php echo T_('<strong>Upgrade your DB to UTF-8</strong>: all the b2evolution tables in your b2evolution MySQL database will be converted to UTF-8 instead of their current charset.')?></label></p>
+			<?php
 
 
 			if( $allow_evodb_reset != 1 )
@@ -641,7 +655,7 @@ switch( $action )
 		<h3>What if there is no language pack to download?</h3>
 		<p>Nobody has contributed a language pack in your language yet. You could help by providing a translation for your language.</p>
 		<p>For now, you will have to install b2evolution with a supported language.</p>
-		<p>Once you get familiar with b2evolution you will be able to <a href="http://b2evolution.net/man/localization" target="_blank">create your own language pack</a> fairly easily.</p>
+		<p>Once you get familiar with b2evolution you will be able to <a href="<?php echo get_manual_url( 'localization' ); ?>" target="_blank">create your own language pack</a> fairly easily.</p>
 		<p><a href="index.php?locale=<?php echo $default_locale ?>">&laquo; <?php echo T_('Back to install menu') ?></a></p>
 		<?php
 		break;
@@ -663,6 +677,7 @@ switch( $action )
 		 * -----------------------------------------------------------------------------------
 		 * Note: auto installers should kick in directly at this step and provide all required params.
 		 */
+		track_step( 'install-start' );
 
 		$test_install_all_features = param( 'install_all_features', 'boolean', false );
 
@@ -711,8 +726,9 @@ switch( $action )
 		 * EVO UPGRADE: Upgrade data from existing b2evolution database
 		 * -----------------------------------------------------------------------------------
 		 */
-		require_once( dirname(__FILE__). '/_functions_evoupgrade.php' );
+		track_step( 'upgrade-start' );
 
+		require_once( dirname(__FILE__). '/_functions_evoupgrade.php' );
 
 		echo '<h2>'.T_('Upgrading b2evolution...').'</h2>';
 
@@ -728,8 +744,8 @@ switch( $action )
 		// NOte: this must NOT be in upgrade_b2evo_tables(), otherwise it will mess with the longer setting used by the auto upgrade feature.
 		if( set_max_execution_time(300) === false )
 		{ // max_execution_time ini setting could not be changed for this script, display a warning
-			$manual_url = '"http://b2evolution.net/man/blank-or-partial-page" target = "_blank"';
-			echo '<div class="orange">'.sprintf( T_('WARNING: the max_execution_time is set to %s seconds in php.ini and cannot be increased automatically. This may lead to a PHP <a href=%s>timeout causing the upgrade to fail</a>. If so please post a screenshot to the <a href=%s>forums</a>.'), ini_get( 'max_execution_time' ), $manual_url, '"http://forums.b2evolution.net/"' ).'</div>';
+			$manual_url = 'href="'.get_manual_url( 'blank-or-partial-page' ).'" target = "_blank"';
+			echo '<div class="orange">'.sprintf( T_('WARNING: the max_execution_time is set to %s seconds in php.ini and cannot be increased automatically. This may lead to a PHP <a %s>timeout causing the upgrade to fail</a>. If so please post a screenshot to the <a %s>forums</a>.'), ini_get( 'max_execution_time' ), $manual_url, 'href="http://forums.b2evolution.net/"' ).'</div>';
 		}
 
 		echo '<h2>'.T_('Upgrading data in existing b2evolution database...').'</h2>';
@@ -789,7 +805,7 @@ switch( $action )
 			?>
 			<p>
 			<?php
-			echo nl2br( htmlspecialchars( sprintf( /* TRANS: %s gets replaced by app name, usually "b2evolution" */ T_( "Are you sure you want to delete your existing %s tables?\nDo you have a backup?" ), $app_name ) ) );
+			echo nl2br( evo_htmlspecialchars( sprintf( /* TRANS: %s gets replaced by app name, usually "b2evolution" */ T_( "Are you sure you want to delete your existing %s tables?\nDo you have a backup?" ), $app_name ) ) );
 			?>
 			</p>
 			<p>
@@ -869,6 +885,41 @@ switch( $action )
 		<p><a href="index.php?locale=<?php echo $default_locale ?>">&laquo; <?php echo T_('Back to install menu') ?></a></p>
 		<?php
 		break;
+
+
+	case 'utf8upgrade':
+		/*
+		 * -----------------------------------------------------------------------------------
+		 * UPGRADE DB to UTF-8: all DB tables will be converted to UTF-8
+		 * -----------------------------------------------------------------------------------
+		 */
+
+		load_funcs('_core/model/db/_upgrade.funcs.php');
+
+		echo '<h2>'.T_('Upgrading all tables in b2evolution MySQL database to UTF-8...').'</h2>';
+		evo_flush();
+
+		// Load db schema to be able to check the original charset definition
+		load_db_schema();
+
+		$db_tables = $DB->get_col( 'SHOW TABLES FROM `'.$db_config['name'].'` LIKE "'.$tableprefix.'%"' );
+		foreach( $db_tables as $table )
+		{ // Convert all tables charset to utf8
+			echo "Converting $table...";
+			evo_flush();
+			convert_table_to_utf8( $table );
+			echo " OK<br />\n";
+		}
+
+		echo "Changing default charset of DB...<br />\n";
+		evo_flush();
+		$DB->query( 'ALTER DATABASE `'.$db_config['name'].'` CHARACTER SET utf8 COLLATE utf8_general_ci' );
+
+		?>
+		<p><?php echo T_('Upgrading done!')?></p>
+		<p><a href="index.php?locale=<?php echo $default_locale ?>">&laquo; <?php echo T_('Back to install menu') ?></a></p>
+		<?php
+		break;
 }
 
 block_close();
@@ -880,7 +931,7 @@ block_close();
 	<div class="body_fade_out">
 
 	<div class="menu_bottom"><!-- InstanceBeginEditable name="MenuBottom" -->
-			<?php echo T_('Online resources') ?>: <a href="http://b2evolution.net/" target="_blank"><?php echo T_('Official website') ?></a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank"><?php echo T_('Find a host') ?></a> &bull; <a href="http://b2evolution.net/man/" target="_blank"><?php echo T_('Manual') ?></a> &bull; <a href="http://forums.b2evolution.net/" target="_blank"><?php echo T_('Forums') ?></a>
+			<?php echo T_('Online resources') ?>: <a href="http://b2evolution.net/" target="_blank"><?php echo T_('Official website') ?></a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank"><?php echo T_('Find a host') ?></a> &bull; <a href="<?php echo get_manual_url( NULL ); ?>" target="_blank"><?php echo T_('Manual') ?></a> &bull; <a href="http://forums.b2evolution.net/" target="_blank"><?php echo T_('Forums') ?></a>
 		<!-- InstanceEndEditable --></div>
 
 	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->Copyright &copy; 2003-2014 by Fran&ccedil;ois Planque &amp; others &middot; <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a>

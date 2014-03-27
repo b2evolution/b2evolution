@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -72,7 +72,7 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 				$scheme = 'mailto:';
 				$Debuglog->add( 'URI scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
 				return $verbose
-					? sprintf( T_('URI scheme "%s" not allowed.'), htmlspecialchars($scheme) )
+					? sprintf( T_('URI scheme "%s" not allowed.'), evo_htmlspecialchars($scheme) )
 					: T_('URI scheme not allowed.');
 			}
 
@@ -80,13 +80,13 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 			if( ! $match )
 			{
 				return $verbose
-					? sprintf( T_('Invalid email link: %s.'), htmlspecialchars($url) )
+					? sprintf( T_('Invalid email link: %s.'), evo_htmlspecialchars($url) )
 					: T_('Invalid email link.');
 			}
       elseif( ! is_email($match[2]) )
 			{
 				return $verbose
-					? sprintf( T_('Supplied email address (%s) is invalid.'), htmlspecialchars($match[2]) )
+					? sprintf( T_('Supplied email address (%s) is invalid.'), evo_htmlspecialchars($match[2]) )
 					: T_('Invalid email address.');
 			}
 		}
@@ -97,7 +97,7 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 				$scheme = 'clsid:';
 				$Debuglog->add( 'URI scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
 				return $verbose
-					? sprintf( T_('URI scheme "%s" not allowed.'), htmlspecialchars($scheme) )
+					? sprintf( T_('URI scheme "%s" not allowed.'), evo_htmlspecialchars($scheme) )
 					: T_('URI scheme not allowed.');
 			}
 
@@ -114,7 +114,7 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 				$scheme = 'javascript:';
 				$Debuglog->add( 'URI scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
 				return $verbose
-					? sprintf( T_('URI scheme "%s" not allowed.'), htmlspecialchars($scheme) )
+					? sprintf( T_('URI scheme "%s" not allowed.'), evo_htmlspecialchars($scheme) )
 					: T_('URI scheme not allowed.');
 			}
 
@@ -140,7 +140,7 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 			{ // Cannot validate URL structure
 				$Debuglog->add( 'URL &laquo;'.$url.'&raquo; does not match url pattern!', 'error' );
 				return $verbose
-					? sprintf( T_('Invalid URL format (%s).'), htmlspecialchars($url) )
+					? sprintf( T_('Invalid URL format (%s).'), evo_htmlspecialchars($url) )
 					: T_('Invalid URL format.');
 			}
 
@@ -149,7 +149,7 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 			{ // Scheme not allowed
 				$Debuglog->add( 'URI scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
 				return $verbose
-					? sprintf( T_('URI scheme "%s" not allowed.'), htmlspecialchars($scheme) )
+					? sprintf( T_('URI scheme "%s" not allowed.'), evo_htmlspecialchars($scheme) )
 					: T_('URI scheme not allowed.');
 			}
 		}
@@ -158,14 +158,14 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 	{ // URL is relative..
 		if( $context == 'commenting' )
 		{	// We do not allow relative URLs in comments
-			return $verbose ? sprintf( T_('URL "%s" must be absolute.'), htmlspecialchars($url) ) : T_('URL must be absolute.');
+			return $verbose ? sprintf( T_('URL "%s" must be absolute.'), evo_htmlspecialchars($url) ) : T_('URL must be absolute.');
 		}
 
 		$char = substr($url, 0, 1);
 		if( $char != '/' && $char != '#' )
 		{ // must start with a slash or hash (for HTML anchors to the same page)
 			return $verbose
-				? sprintf( T_('URL "%s" must be a full path starting with "/" or an anchor starting with "#".'), htmlspecialchars($url) )
+				? sprintf( T_('URL "%s" must be a full path starting with "/" or an anchor starting with "#".'), evo_htmlspecialchars($url) )
 				: T_('URL must be a full path starting with "/" or an anchor starting with "#".');
 		}
 	}
@@ -176,7 +176,7 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 		if( $block = antispam_check($url) )
 		{
 			return $verbose
-				? sprintf( T_('URL "%s" not allowed: blacklisted word "%s".'), htmlspecialchars($url), $block )
+				? sprintf( T_('URL "%s" not allowed: blacklisted word "%s".'), evo_htmlspecialchars($url), $block )
 				: T_('URL not allowed');
 		}
 	}
@@ -752,11 +752,11 @@ function disp_url( $url, $max_length = NULL )
 {
 	if( !empty($max_length) && evo_strlen($url) > $max_length )
 	{
-		$disp_url = htmlspecialchars(substr( $url, 0, $max_length-1 )).'&hellip;';
+		$disp_url = evo_htmlspecialchars(substr( $url, 0, $max_length-1 )).'&hellip;';
 	}
 	else
 	{
-		$disp_url = htmlspecialchars($url);
+		$disp_url = evo_htmlspecialchars($url);
 	}
 	echo '<a href="'.$url.'">'.$disp_url.'</a>';
 }
@@ -903,4 +903,30 @@ function get_link_tag( $url, $text = '', $class='', $max_url_length = 50 )
 	return '<a class="'.$class.'" href="'.str_replace('&amp;', '&', $url ).'">'.$text.'</a>';
 }
 
+
+/**
+ * Get part of url, Based on function parse_url()
+ *
+ * @param string URL
+ * @param string Part name:
+ *    scheme - e.g. http
+ *    host
+ *    port
+ *    user
+ *    pass
+ *    path
+ *    query - after the question mark ?
+ *    fragment - after the hashmark #
+ * @return string Part of url
+ */
+function url_part( $url, $part )
+{
+	$url_data = @parse_url( $url );
+	if( $url_data && ! empty( $url_data[ $part ] ) )
+	{
+		return $url_data[ $part ];
+	}
+
+	return '';
+}
 ?>

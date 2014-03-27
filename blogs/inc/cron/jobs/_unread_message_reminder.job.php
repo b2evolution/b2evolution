@@ -50,7 +50,7 @@ $query = 'SELECT DISTINCT user_ID, last_sent.uset_value
 			AND ( last_sent.uset_value IS NULL OR last_sent.uset_value < '.$DB->quote( $reminder_threshold ).' )
 			AND ( '.$notify_condition.' )
 			AND ( LENGTH(TRIM(user_email)) > 0 )
-			AND ( user_email NOT IN ( SELECT emblk_address FROM T_email__blocked WHERE '.get_mail_blocked_condition().' ) )';
+			AND ( user_email NOT IN ( SELECT emadr_address FROM T_email__address WHERE '.get_mail_blocked_condition().' ) )';
 $users_to_remind = $DB->get_assoc( $query, 0, 'Find users who need to be reminded' );
 
 if( empty( $users_to_remind ) )

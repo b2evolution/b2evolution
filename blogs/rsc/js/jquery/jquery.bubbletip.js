@@ -19,7 +19,7 @@
 			// check to see if the tip is a descendant of 
 			// a table.bubbletip element and therefore
 			// has already been instantiated as a bubbletip
-			if ($('table.bubbletip #' + $(tip).get(0).id).length > 0) {
+			if ($('div.bubbletip #' + $(tip).get(0).id).length > 0) {
 				return this;
 			}
 
@@ -31,6 +31,7 @@
 			_tip = $(tip);
 			_bindIndex = bindIndex++;  // for window.resize namespace binding
 			_options = {
+				wrapperContainer: 'body', // element selector
 				positionAt: 'element', // element | body | mouse
 				positionAtElement: _this,
 				offsetTop: 0,
@@ -42,6 +43,7 @@
 				animationEasing: 'swing', // linear | swing
 				bindShow: 'mouseover', // mouseover | focus | click | etc.
 				bindHide: 'mouseout', // mouseout | blur | etc.
+				bindClose: 'click', // click | etc.
 				delayShow: 0,
 				delayHide: 500,
 				calculateOnShow: false,
@@ -57,9 +59,9 @@
 				delta: 0,
 				mouseTop: 0,
 				mouseLeft: 0,
-				tipHeight: 0,
 				bindShow: (_options.bindShow + ' ').replace(/ +/g, '.bubbletip' + _bindIndex),
-				bindHide: (_options.bindHide + ' ').replace(/ +/g, '.bubbletip' + _bindIndex)
+				bindHide: (_options.bindHide + ' ').replace(/ +/g, '.bubbletip' + _bindIndex),
+				bindClose: (_options.bindClose + ' ').replace(/ +/g, '.bubbletip' + _bindIndex)
 			};
 			_timeoutAnimate = null;
 			_timeoutRefresh = null;
@@ -84,17 +86,17 @@
 
 			// create the wrapper table element
 			if (_options.deltaDirection.match(/^up$/i)) {
-				_wrapper = $('<table class="bubbletip" cellspacing="0" cellpadding="0"><tbody><tr><td class="bt-topleft"></td><td class="bt-top"></td><td class="bt-topright"></td></tr><tr><td class="bt-left"></td><td class="bt-content"></td><td class="bt-right"></td></tr><tr><td class="bt-bottomleft"></td><td><table class="bt-bottom" cellspacing="0" cellpadding="0"><tr><th></th><td><div></div></td><th></th></tr></table></td><td class="bt-bottomright"></td></tr></tbody></table>');
+				_wrapper = $('<div class="bubbletip bt-up"><div class="bt-content"></div></div>');
 			} else if (_options.deltaDirection.match(/^down$/i)) {
-				_wrapper = $('<table class="bubbletip" cellspacing="0" cellpadding="0"><tbody><tr><td class="bt-topleft"></td><td><table class="bt-top" cellspacing="0" cellpadding="0"><tr><th></th><td><div></div></td><th></th></tr></table></td><td class="bt-topright"></td></tr><tr><td class="bt-left"></td><td class="bt-content"></td><td class="bt-right"></td></tr><tr><td class="bt-bottomleft"></td><td class="bt-bottom"></td><td class="bt-bottomright"></td></tr></tbody></table>');
+				_wrapper = $('<div class="bubbletip bt-down"><div class="bt-content"></div></div>');
 			} else if (_options.deltaDirection.match(/^left$/i)) {
-				_wrapper = $('<table class="bubbletip" cellspacing="0" cellpadding="0"><tbody><tr><td class="bt-topleft"></td><td class="bt-top"></td><td class="bt-topright"></td></tr><tr><td class="bt-left"></td><td class="bt-content"></td><td class="bt-right-tail"><div class="bt-right"></div><div class="bt-right-tail"></div><div class="bt-right"></div></td></tr><tr><td class="bt-bottomleft"></td><td class="bt-bottom"></td><td class="bt-bottomright"></td></tr></tbody></table>');
+				_wrapper = $('<div class="bubbletip bt-left"><div class="bt-content"></div></div>');
 			} else if (_options.deltaDirection.match(/^right$/i)) {
-				_wrapper = $('<table class="bubbletip" cellspacing="0" cellpadding="0"><tbody><tr><td class="bt-topleft"></td><td class="bt-top"></td><td class="bt-topright"></td></tr><tr><td class="bt-left-tail"><div class="bt-left"></div><div class="bt-left-tail"></div><div class="bt-left"></div></td><td class="bt-content"></td><td class="bt-right"></td></tr><tr><td class="bt-bottomleft"></td><td class="bt-bottom"></td><td class="bt-bottomright"></td></tr></tbody></table>');
+				_wrapper = $('<div class="bubbletip bt-right"><div class="bt-content"></div></div>');
 			}
 
 			// append the wrapper to the document body
-			_wrapper.appendTo('body');
+			_wrapper.appendTo( _options.wrapperContainer );
 
 			// apply IE filters to _wrapper elements
 			if ((/msie/.test(navigator.userAgent.toLowerCase())) && (!/opera/.test(navigator.userAgent.toLowerCase()))) {
@@ -118,25 +120,10 @@
 			$('.bt-content', _wrapper).append(_tip);
 			// show the tip (in case it is hidden) so that we can calculate its dimensions
 			_tip.show();
-			// handle left|right delta
-			if (_options.deltaDirection.match(/^left|right$/i)) {
-				// tail is 40px, so divide height by two and subtract 20px;
-				_calc.tipHeight = parseInt(_tip.height() / 2);
-				// handle odd integer height
-				if ((_tip.height() % 2) == 1) {
-					_calc.tipHeight++;
-				}
-				_calc.tipHeight = (_calc.tipHeight < 20) ? 1 : _calc.tipHeight - 20;
-				if (_options.deltaDirection.match(/^left$/i)) {
-					$('div.bt-right', _wrapper).css('height', _calc.tipHeight + 'px');
-				} else {
-					$('div.bt-left', _wrapper).css('height', _calc.tipHeight + 'px');
-				}
-			}
 			// set the opacity of the wrapper to 0
 			_wrapper.css('opacity', 0);
 			// hack for FF 3.6
-			_wrapper.css({ 'width': _wrapper.width(), 'height': _wrapper.height() });
+			_wrapper.css({ 'width': _wrapper.width() + 2, 'height': _wrapper.height() });
 			// execute initial calculations
 			_Calculate();
 			_wrapper.hide();
@@ -187,6 +174,16 @@
 				return false;
 			});
 
+			// handle click event (only for wrapper)
+			$(_wrapper.get(0)).bind(_calc.bindClose, function() {
+				_isHiding = true;
+				_wrapper.animate({ 'opacity': 0 }, _options.animationDuration, _options.animationEasing, function() {
+					_wrapper.hide();
+					_isHiding = false;
+					_isActive = false;
+				});
+			});
+
 			function _Show() {
 				var animation;
 
@@ -229,6 +226,8 @@
 					}
 				}
 				_isHiding = false;
+				_this.css('z-index', bubbletipZIndex+1);
+				_this.css('position', 'relative');
 				_wrapper.css('z-index', bubbletipZIndex);
 				bubbletipZIndex++;
 				_wrapper.show();
@@ -360,7 +359,7 @@
 						elem = elem.parentNode;
 					}
 					// attach the tip element to body and hide
-					$('#' + tipsActive[i][0]).appendTo('body').hide();
+					$('#' + tipsActive[i][0]).appendTo( _options.wrapperContainer ).hide();
 					// remove the surrounding table.bubbletip
 					$(elem).remove();
 

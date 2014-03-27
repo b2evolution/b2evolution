@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -23,16 +23,18 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 ?>
-
+	</div>
 </div>
 
-
 <?php
-  echo '<div class="form_footer_notes">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
+	echo '<div class="form_footer_notes">'
+			.sprintf( T_('Your IP address: %s'), $Hit->IP ).'<br />'
+			.T_('You will have to accept cookies in order to log in.')
+		.'</div>';
 
 	// Please help us promote b2evolution and leave this logo on your blog:
 	powered_by( array(
-			'block_start' => '<div class="center" style="margin:1em">',
+			'block_start' => '<div class="center" style="margin:1em 1em .5ex">',
 			'block_end'   => '</div>',
 			// Check /rsc/img/ for other possible images -- Don't forget to change or remove width & height too
 			'img_url'     => '$rsc$img/powered-by-b2evolution-120t.gif',
@@ -43,28 +45,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 <p class="footer"><?php echo $app_footer_text; ?></p>
 <p class="footer"><?php echo $copyright_text; ?></p>
-<p class="footer">
-	<?php
-		// Display additional credits:
- 		// If you can add your own credits without removing the defaults, you'll be very cool :))
-		// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
-		credits( array(
-				'list_start'  => T_('Credits').': ',
-				'list_end'    => ' ',
-				'separator'   => '|',
-				'item_start'  => ' ',
-				'item_end'    => ' ',
-			) );
-	?>
-</p>
 
 </body>
 </html>
-<?php
-/*
- * $Log$
- * Revision 1.10  2013/11/06 08:05:53  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
-?>

@@ -46,7 +46,7 @@ switch( $action )
 		$Form->password_input( 'svn_password', get_param( 'svn_password' ), 32, T_('Password'), '', array( 'maxlength' => 300 ) );
 		$Form->text_input( 'svn_revision', $UserSettings->get( 'svn_upgrade_revision' ), 7, T_('Revision'), T_('Leave blank to get the latest revision') );
 
-		$Form->end_form( array( array( 'submit', 'actionArray[upgrade_svn]', T_( 'Export revision from SVN...' ), 'SaveButton' ) ) );
+		$Form->end_form( array( array( 'submit', 'actionArray[export_svn]', T_( 'Export revision from SVN...' ), 'SaveButton' ) ) );
 
 		break;
 }

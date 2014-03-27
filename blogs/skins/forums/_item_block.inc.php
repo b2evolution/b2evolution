@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -32,15 +32,7 @@ $params = array_merge( array(
 		'item_class'      => 'bPost',
 		'image_size'	    => 'fit-400x320',
 	), $params );
-?>
 
-<h2><?php
-	$Item->title( array(
-			'link_type' => 'permalink'
-		) );
-?></h2>
-<div class="post_panel">
-<?php
 // In this skin, it makes no sense to navigate in any different mode than "same category"
 // Use the category from param
 $current_cat = param( 'cat', 'integer', 0 );
@@ -48,10 +40,20 @@ if( $current_cat == 0 )
 { // Use main category by default because the category wasn't set
 	$current_cat = $Item->main_cat_ID;
 }
-
-$Skin->display_post_button( $current_cat, $Item );
-// BREADCRUMBS
+// Breadcrumbs
 $Skin->display_breadcrumbs( $current_cat );
+?>
+<div class="post_panel">
+<?php
+// Buttons to post/reply
+$Skin->display_post_button( $current_cat, $Item );
+
+// Page title
+$Item->title( array(
+		'before'    => '<h2 class="page_title">',
+		'after'     => '</h2>',
+		'link_type' => 'permalink'
+	) );
 ?>
 	<div class="clear"></div>
 </div>
@@ -133,7 +135,19 @@ $Skin->display_breadcrumbs( $current_cat );
 		<td class="left">
 		<?php
 			echo '<div class="floatleft">';
-			if( $Item->can_comment( NULL ) )
+
+			// Check if BBcode plugin is enabled for current blog
+			$bbcode_plugin_is_enabled = false;
+			if( class_exists( 'bbcode_plugin' ) )
+			{ // Plugin exists
+				global $Plugins;
+				$bbcode_Plugin = & $Plugins->get_by_classname( 'bbcode_plugin' );
+				if( $bbcode_Plugin->status == 'enabled' && $bbcode_Plugin->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) != 'never' )
+				{ // Plugin is enabled and activated for comments
+					$bbcode_plugin_is_enabled = true;
+				}
+			}
+			if( $bbcode_plugin_is_enabled && $Item->can_comment( NULL ) )
 			{	// Display button to quote this post
 				echo '<a href="'.$Item->get_permanent_url().'?mode=quote&amp;qp='.$Item->ID.'#form_p'.$Item->ID.'" title="'.T_('Reply with quote').'" class="roundbutton_text floatleft quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).T_('Quote').'</a>';
 			}

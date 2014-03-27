@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package install
  */
@@ -156,12 +156,20 @@ function install_newdb()
 		$create_sample_contents = 1;
 	}
 
+	/**
+	 * 1 - If current installation is local, test or intranet
+	 *     Used to turn off gravatar and all ping plugins
+	 *
+	 * @var integer
+	 */
+	$local_installation = param( 'local_installation', 'integer', 0 );
+
 	echo '<h2>'.T_('Creating b2evolution tables...').'</h2>';
-	flush();
+	evo_flush();
 	create_tables();
 
 	echo '<h2>'.T_('Creating minimum default data...').'</h2>';
-	flush();
+	evo_flush();
 	create_default_data();
 
 	if( $create_sample_contents )
@@ -169,7 +177,7 @@ function install_newdb()
 		global $Settings, $test_install_all_features;
 
 		echo '<h2>'.T_('Installing sample contents...').'</h2>';
-		flush();
+		evo_flush();
 
 		// We're gonna need some environment in order to create the demo contents...
 		load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
@@ -178,6 +186,11 @@ function install_newdb()
 		 * @var GeneralSettings
 		 */
 		$Settings = new GeneralSettings();
+
+		// Translate the messages for account closing
+		$Settings->set( 'user_closing_intro', T_("We are sorry to see you leave.\n\nWe value your feedback. Please be so kind and tell us in a few words why you are leaving us. This will help us to improve the site for the future.") );
+		$Settings->set( 'user_closing_reasons', T_("I don't need this account any more.\nI do not like this site.") );
+		$Settings->set( 'user_closing_byemsg', T_('Your account has now been closed. If you ever want to log in again, you will need to create a new account.') );
 
 		if( $test_install_all_features )
 		{	// Set manual ordering of categories
@@ -196,6 +209,7 @@ function install_newdb()
 		create_demo_contents();
 	}
 
+	track_step( 'install-success' );
 	echo '<h2>'.T_('Installation successful!').'</h2>';
 
 	echo '<p><strong>';
@@ -218,7 +232,7 @@ function install_newdb()
 function task_begin( $title )
 {
 	echo $title."\n";
-	flush();
+	evo_flush();
 }
 
 
@@ -360,6 +374,17 @@ function install_validate_requirements()
 
 
 /**
+ * Insert default locales into T_locales.
+ */
+function create_default_locales()
+{
+	task_begin( 'Activating default locales... ' );
+	locale_insert_default();
+	task_end();
+}
+
+
+/**
  * Insert default settings into T_settings.
  *
  * It only writes those to DB, that get overridden (passed as array), or have
@@ -370,8 +395,9 @@ function install_validate_requirements()
  */
 function create_default_settings( $override = array() )
 {
-	global $DB, $new_db_version, $default_locale, $Group_Users;
-	global $test_install_all_features;
+	global $DB, $new_db_version, $default_locale;
+	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users, $Group_Suspect, $Group_Spam;
+	global $test_install_all_features, $create_sample_contents, $local_installation;
 
 	$defaults = array(
 		'db_version' => $new_db_version,
@@ -390,6 +416,41 @@ function create_default_settings( $override = array() )
 		$defaults['location_region'] = 'required';
 		$defaults['location_subregion'] = 'required';
 		$defaults['location_city'] = 'required';
+	}
+	if( $create_sample_contents )
+	{
+		$defaults['info_blog_ID'] = '3';
+	}
+	if( !empty( $Group_Suspect ) )
+	{ // Set default antispam suspicious group
+		$defaults['antispam_suspicious_group'] = $Group_Suspect->ID;
+	}
+	$antispam_trust_groups = array();
+	if( !empty( $Group_Admins ) )
+	{
+		$antispam_trust_groups[] = $Group_Admins->ID;
+	}
+	if( !empty( $Group_Privileged ) )
+	{
+		$antispam_trust_groups[] = $Group_Privileged->ID;
+	}
+	if( !empty( $Group_Bloggers ) )
+	{
+		$antispam_trust_groups[] = $Group_Bloggers->ID;
+	}
+	if( !empty( $Group_Spam ) )
+	{
+		$antispam_trust_groups[] = $Group_Spam->ID;
+	}
+	if( count( $antispam_trust_groups ) > 0 )
+	{ // Set default antispam trust group
+		$defaults['antispam_trust_groups'] = implode( ',', $antispam_trust_groups );
+	}
+	if( $local_installation )
+	{ // Current installation is local
+		// Turn off gravatar and use 'Default gravatars' = 'Gravatar'
+		$defaults['use_gravatar'] = 0;
+		$defaults['default_gravatar'] = '';
 	}
 
 	$settings = array_merge( array_keys($defaults), array_keys($override) );
@@ -418,7 +479,7 @@ function create_default_settings( $override = array() )
 /**
  * Install basic skins.
  */
-function install_basic_skins()
+function install_basic_skins( $install_mobile_skins = true )
 {
 	load_funcs( 'skins/_skin.funcs.php' );
 
@@ -433,8 +494,8 @@ function install_basic_skins()
 	// Note: Skin #3 will we used by Linkblog
 	skin_install( 'miami_blue' );
 
-	// Note: Skin #4 will we used by Photoblog
-	skin_install( 'photoblog' );
+	// Note: Skin #4 will we used by Photos
+	skin_install( 'photoalbums' );
 
 	// Note: Skin #5 will we used by Forums
 	skin_install( 'forums' );
@@ -449,10 +510,14 @@ function install_basic_skins()
 	skin_install( 'intense' );
 	skin_install( 'natural_pink' );
 	skin_install( 'nifty_corners' );
+	skin_install( 'photoblog' );
 	skin_install( 'pixelgreen' );
 	skin_install( 'pluralism' );
 	skin_install( 'terrafirma' );
-	skin_install( 'touch' );
+	if( $install_mobile_skins )
+	{
+		skin_install( 'touch' );
+	}
 	skin_install( 'vastitude' );
 	skin_install( '_atom' );
 	skin_install( '_rss2' );
@@ -542,19 +607,23 @@ function install_basic_plugins( $old_db_version = 0 )
 
 	if( $old_db_version < 11100 )
 	{ // Upgrade to 5.0.1-alpha-5
-		if( $test_install_all_features )
-		{
-			install_plugin( 'bbcode_plugin' );
-			install_plugin( 'code_highlight_plugin' );
-		}
+		install_plugin( 'bbcode_plugin', $test_install_all_features );
+		install_plugin( 'star_plugin', $test_install_all_features );
+		install_plugin( 'code_highlight_plugin', $test_install_all_features );
+		install_plugin( 'markdown_plugin' );
+		install_plugin( 'infodots_plugin', $test_install_all_features );
 	}
 }
 
 
 /**
+ * Install plugin
+ *
+ * @param string Plugin name
+ * @param boolean TRUE - to activate plugin
  * @return true on success
  */
-function install_plugin( $plugin )
+function install_plugin( $plugin, $activate = true )
 {
 	/**
 	 * @var Plugins_admin
@@ -572,16 +641,22 @@ function install_plugin( $plugin )
 	load_funcs('plugins/_plugin.funcs.php');
 	install_plugin_db_schema_action( $edit_Plugin, true );
 
-	// Try to enable plugin:
-	$enable_return = $edit_Plugin->BeforeEnable();
-	if( $enable_return !== true )
-	{
-		$Plugins_admin->set_Plugin_status( $edit_Plugin, 'disabled' ); // does not unregister it
-		echo $enable_return."<br />\n";
-		return false;
-	}
+	if( $activate )
+	{	// Try to enable plugin:
+		$enable_return = $edit_Plugin->BeforeEnable();
+		if( $enable_return !== true )
+		{
+			$Plugins_admin->set_Plugin_status( $edit_Plugin, 'disabled' ); // does not unregister it
+			echo $enable_return."<br />\n";
+			return false;
+		}
 
-	$Plugins_admin->set_Plugin_status( $edit_Plugin, 'enabled' );
+		$Plugins_admin->set_Plugin_status( $edit_Plugin, 'enabled' );
+	}
+	else
+	{	// Set plugin status as disable
+		$Plugins_admin->set_Plugin_status( $edit_Plugin, 'disabled' );
+	}
 
 	task_end();
 	return true;
@@ -591,7 +666,7 @@ function install_plugin( $plugin )
 /**
  * Install basic widgets.
  */
-function install_basic_widgets()
+function install_basic_widgets( $old_db_version = 0 )
 {
 	/**
 	* @var DB
@@ -600,7 +675,15 @@ function install_basic_widgets()
 
 	load_funcs( 'widgets/_widgets.funcs.php' );
 
-	$blog_ids = $DB->get_assoc( 'SELECT blog_ID, blog_type FROM T_blogs' );
+	if( $old_db_version < 11010 )
+	{
+		$blog_ids = $DB->get_assoc( 'SELECT blog_ID, "std" FROM T_blogs' );
+	}
+	else
+	{
+		$blog_ids = $DB->get_assoc( 'SELECT blog_ID, blog_type FROM T_blogs' );
+	}
+
 	foreach( $blog_ids as $blog_id => $blog_type )
 	{
 		task_begin( 'Installing default widgets for blog #'.$blog_id.'... ' );
@@ -662,8 +745,8 @@ function create_relations()
 											on update restrict' );
 
 	$DB->query( 'alter table T_comments
-								add constraint FK_comment_post_ID
-											foreign key (comment_post_ID)
+								add constraint FK_comment_item_ID
+											foreign key (comment_item_ID)
 											references T_items__item (post_ID)
 											on delete restrict
 											on update restrict' );
@@ -727,12 +810,6 @@ function create_relations()
 								add constraint FK_link_lastedit_user_ID
 											foreign key (link_lastedit_user_ID)
 											references T_users (user_ID)
-											on delete restrict
-											on update restrict' );
-	$DB->query( 'alter table T_links
-								add constraint FK_link_dest_itm_ID
-											foreign key (link_dest_itm_ID)
-											references T_items__item (post_ID)
 											on delete restrict
 											on update restrict' );
 	$DB->query( 'alter table T_links
@@ -906,8 +983,8 @@ function do_install_htaccess( $upgrade = false )
 			{	// The .htaccess file has content that different from a sample file
 				$error_message = '<p class="red">'.T_('There is already a file called .htaccess at the blog root. If you don\'t specifically need this file, it is recommended that you delete it or rename it to old.htaccess before you continue. This will allow b2evolution to create a new .htaccess file that is optimized for best results.').'</p>';
 				$error_message .= T_('Here are the contents of the current .htaccess file:');
-				$error_message .= '<div style="overflow:auto"><pre>'.htmlspecialchars( $content_htaccess ).'</pre></div><br />';
-				$error_message .= sprintf( T_('Again, we recommend you remove this file before continuing. If you chose to keep it, b2evolution will probably still work, but for optimization you should follow <a %s>these instructions</a>.'), 'href="http://b2evolution.net/man/htaccess-file" target="_blank"');
+				$error_message .= '<div style="overflow:auto"><pre>'.evo_htmlspecialchars( $content_htaccess ).'</pre></div><br />';
+				$error_message .= sprintf( T_('Again, we recommend you remove this file before continuing. If you chose to keep it, b2evolution will probably still work, but for optimization you should follow <a %s>these instructions</a>.'), 'href="'.get_manual_url( 'htaccess-file' ).'" target="_blank"' );
 				return $error_message;
 			}
 			else
@@ -963,9 +1040,20 @@ function do_install_htaccess( $upgrade = false )
 function get_antispam_query()
 {
 	//used base64_encode() for getting this code
-	$r = base64_decode('SU5TRVJUIElOVE8gVF9hbnRpc3BhbShhc3BtX3N0cmluZykgVkFMVUVTICgnb25saW5lLWNhc2lubycpLCAoJ3BlbmlzLWVubGFyZ2VtZW50JyksICgnb3JkZXItdmlhZ3JhJyksICgnb3JkZXItcGhlbnRlcm1pbmUnKSwgKCdvcmRlci14ZW5pY2FsJyksICgnb3JkZXItcHJvcGhlY2lhJyksICgnc2V4eS1saW5nZXJpZScpLCAoJy1wb3JuLScpLCAoJy1hZHVsdC0nKSwgKCctdGl0cy0nKSwgKCdidXktcGhlbnRlcm1pbmUnKSwgKCdvcmRlci1jaGVhcC1waWxscycpLCAoJ2J1eS14ZW5hZHJpbmUnKSwJKCd4eHgnKSwgKCdwYXJpcy1oaWx0b24nKSwgKCdwYXJpc2hpbHRvbicpLCAoJ2NhbWdpcmxzJyksICgnYWR1bHQtbW9kZWxzJyk=');
+	$r = base64_decode('SU5TRVJUIElOVE8gVF9hbnRpc3BhbShhc3BtX3N0cmluZykgVkFMVUVTICgnb25saW5lLWNhc2lubycpLCAoJ3BlbmlzLWVubGFyZ2VtZW50JyksICgnb3JkZXItdmlhZ3JhJyksICgnb3JkZXItcGhlbnRlcm1pbmUnKSwgKCdvcmRlci14ZW5pY2FsJyksICgnb3JkZXItcHJvcGhlY2lhJyksICgnc2V4eS1saW5nZXJpZScpLCAoJy1wb3JuLScpLCAoJy1hZHVsdC0nKSwgKCctdGl0cy0nKSwgKCdidXktcGhlbnRlcm1pbmUnKSwgKCdvcmRlci1jaGVhcC1waWxscycpLCAoJ2J1eS14ZW5hZHJpbmUnKSwgKCdwYXJpcy1oaWx0b24nKSwgKCdwYXJpc2hpbHRvbicpLCAoJ2NhbWdpcmxzJyksICgnYWR1bHQtbW9kZWxzJyk=');
 	// pre_dump($r);
 	return $r;
 }
+
+/**
+ * We use the following tracking to determine the installer reliability (% of failed vs successful installs).
+ */
+function track_step( $current_step )
+{
+	// echo 'Tracking '.$current_step;
+	echo '<img src="http://b2evolution.net/htsrv/track.php?key='.$current_step.'" alt="" />';
+}
+
+
 
 ?>

@@ -1051,7 +1051,7 @@ function xmlrpcs_new_comment( $params = array(), & $commented_Item )
 		$User = NULL;
 
 		$author = trim($params['author']);
-		$email = trim($params['author_email']);
+		$email = evo_strtolower( trim($params['author_email']) );
 
 		if( $commented_Item->Blog->get_setting('allow_anon_url') )
 		{
@@ -1140,8 +1140,8 @@ function xmlrpcs_new_comment( $params = array(), & $commented_Item )
 	 */
 	$query = 'SELECT MAX(comment_date)
 				FROM T_comments
-				WHERE comment_author_IP = '.$DB->quote($Hit->IP).'
-				OR comment_author_email = '.$DB->quote($email);
+				WHERE comment_author_IP = '.$DB->quote( $Hit->IP ).'
+				OR comment_author_email = '.$DB->quote( $email );
 	$ok = 1;
 	if( $then = $DB->get_var( $query ) )
 	{
@@ -1221,7 +1221,8 @@ function xmlrpcs_new_comment( $params = array(), & $commented_Item )
 		// asimo> this handle moderators and general users as well and use "outbound_notifications_mode" in case of general users
 		// Moderators will get emails about every new comment
 		// Subscribed user will only get emails about new published comments
-		$Comment->handle_notifications( true );
+		$executed_by_userid = empty( $User ) ? NULL : $User->ID;
+		$Comment->handle_notifications( true, $executed_by_userid );
 	}
 	else
 	{
@@ -1298,7 +1299,7 @@ function xmlrpcs_edit_comment( $params = array(), & $edited_Comment )
 
 	// Execute or schedule notifications & pings:
 	logIO( 'Handling notifications...' );
-	$edited_Comment->handle_notifications( true );
+	$edited_Comment->handle_notifications( false, $current_User->ID );
 
 	logIO( 'OK.' );
 	return new xmlrpcresp( new xmlrpcval( true, 'boolean' ) );
@@ -1480,7 +1481,7 @@ function xmlrpcs_new_item( $params, & $Blog = NULL )
 
 	// Execute or schedule notifications & pings:
 	logIO( 'Handling notifications...' );
-	$edited_Item->handle_post_processing();
+	$edited_Item->handle_post_processing( true );
 
  	logIO( 'OK.' );
 	return new xmlrpcresp(new xmlrpcval($edited_Item->ID));
@@ -1684,7 +1685,7 @@ function xmlrpcs_edit_item( & $edited_Item, $params )
 
 	// Execute or schedule notifications & pings:
 	logIO( 'Handling notifications...' );
-	$edited_Item->handle_post_processing();
+	$edited_Item->handle_post_processing( false );
 
 	logIO( 'OK.' );
 	return new xmlrpcresp( new xmlrpcval( 1, 'boolean' ) );
@@ -2138,11 +2139,4 @@ function wp_or_b2evo_item_status( $raw_status, $convert_to = 'b2evo' )
 	return $status;
 }
 
-
-/*
- * $Log$
- * Revision 1.33  2013/11/06 08:05:10  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -24,10 +24,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * @return array Status titles
  */
-function emblk_get_status_titles()
+function emadr_get_status_titles()
 {
 	return array(
 			'unknown'     => TS_('Unknown'),
+			'redemption'  => TS_('Redemption'),
 			'warning'     => TS_('Warning'),
 			'suspicious1' => TS_('Suspicious 1'),
 			'suspicious2' => TS_('Suspicious 2'),
@@ -43,11 +44,12 @@ function emblk_get_status_titles()
  *
  * @return array Status colors
  */
-function emblk_get_status_colors()
+function emadr_get_status_colors()
 {
 	return array(
 			''            => '808080',
 			'unknown'     => '808080',
+			'redemption'  => 'FF00FF',
 			'warning'     => 'FFFF00',
 			'suspicious1' => 'FFC800',
 			'suspicious2' => 'FFA500',
@@ -63,16 +65,17 @@ function emblk_get_status_colors()
  *
  * @return array Status icons
  */
-function emblk_get_status_icons()
+function emadr_get_status_icons()
 {
 	return array(
-			'unknown'     => get_icon( 'bullet_white', 'imgtag', array( 'title' => emblk_get_status_title( 'unknown' ) ) ),
-			'warning'     => get_icon( 'bullet_yellow', 'imgtag', array( 'title' => emblk_get_status_title( 'warning' ) ) ),
-			'suspicious1' => get_icon( 'bullet_orange', 'imgtag', array( 'title' => emblk_get_status_title( 'suspicious1' ) ) ),
-			'suspicious2' => get_icon( 'bullet_orange', 'imgtag', array( 'title' => emblk_get_status_title( 'suspicious2' ) ) ),
-			'suspicious3' => get_icon( 'bullet_orange', 'imgtag', array( 'title' => emblk_get_status_title( 'suspicious3' ) ) ),
-			'prmerror'    => get_icon( 'bullet_red', 'imgtag', array( 'title' => emblk_get_status_title( 'prmerror' ) ) ),
-			'spammer'     => get_icon( 'bullet_brown', 'imgtag', array( 'title' => emblk_get_status_title( 'spammer' ) ) ),
+			'unknown'     => get_icon( 'bullet_white', 'imgtag', array( 'title' => emadr_get_status_title( 'unknown' ) ) ),
+			'redemption'  => get_icon( 'bullet_magenta', 'imgtag', array( 'title' => emadr_get_status_title( 'redemption' ) ) ),
+			'warning'     => get_icon( 'bullet_yellow', 'imgtag', array( 'title' => emadr_get_status_title( 'warning' ) ) ),
+			'suspicious1' => get_icon( 'bullet_orange', 'imgtag', array( 'title' => emadr_get_status_title( 'suspicious1' ) ) ),
+			'suspicious2' => get_icon( 'bullet_orange', 'imgtag', array( 'title' => emadr_get_status_title( 'suspicious2' ) ) ),
+			'suspicious3' => get_icon( 'bullet_orange', 'imgtag', array( 'title' => emadr_get_status_title( 'suspicious3' ) ) ),
+			'prmerror'    => get_icon( 'bullet_red', 'imgtag', array( 'title' => emadr_get_status_title( 'prmerror' ) ) ),
+			'spammer'     => get_icon( 'bullet_brown', 'imgtag', array( 'title' => emadr_get_status_title( 'spammer' ) ) ),
 		);
 }
 
@@ -82,16 +85,17 @@ function emblk_get_status_icons()
  *
  * @return array Status levels
  */
-function emblk_get_status_levels()
+function emadr_get_status_levels()
 {
 	$levels = array(
 			'unknown'     => 1,
-			'warning'     => 2,
-			'suspicious1' => 3,
-			'suspicious2' => 4,
-			'suspicious3' => 5,
-			'prmerror'    => 6,
-			'spammer'     => 7,
+			'redemption'  => 2,
+			'warning'     => 3,
+			'suspicious1' => 4,
+			'suspicious2' => 5,
+			'suspicious3' => 6,
+			'prmerror'    => 7,
+			'spammer'     => 8,
 		);
 
 	return $levels;
@@ -104,9 +108,9 @@ function emblk_get_status_levels()
  * @param string Status value
  * @return integer Status level
  */
-function emblk_get_status_level( $status )
+function emadr_get_status_level( $status )
 {
-	$levels = emblk_get_status_levels();
+	$levels = emadr_get_status_levels();
 
 	return isset( $levels[ $status ] ) ? $levels[ $status ] : 0;
 }
@@ -118,10 +122,10 @@ function emblk_get_status_level( $status )
  * @param string Status value
  * @return array Statuses
  */
-function emblk_get_statuses_less_level( $status )
+function emadr_get_statuses_less_level( $status )
 {
-	$levels = emblk_get_status_levels();
-	$current_level = emblk_get_status_level( $status );
+	$levels = emadr_get_status_levels();
+	$current_level = emadr_get_status_level( $status );
 
 	$statuses = array();
 	foreach( $levels as $status => $level )
@@ -142,11 +146,11 @@ function emblk_get_statuses_less_level( $status )
  * @param string Status value
  * @return string Status title
  */
-function emblk_get_status_title( $status )
+function emadr_get_status_title( $status )
 {
-	$emblk_statuses = emblk_get_status_titles();
+	$statuses = emadr_get_status_titles();
 
-	return isset( $emblk_statuses[ $status ] ) ? $emblk_statuses[ $status ] : $status;
+	return isset( $statuses[ $status ] ) ? $statuses[ $status ] : $status;
 }
 
 
@@ -156,16 +160,16 @@ function emblk_get_status_title( $status )
  * @param string Status value
  * @return string Color value
  */
-function emblk_get_status_color( $status )
+function emadr_get_status_color( $status )
 {
 	if( $status == 'NULL' )
 	{
 		$status = '';
 	}
 
-	$emblk_statuses = emblk_get_status_colors();
+	$colors = emadr_get_status_colors();
 
-	return isset( $emblk_statuses[ $status ] ) ? '#'.$emblk_statuses[ $status ] : 'none';
+	return isset( $colors[ $status ] ) ? '#'.$colors[ $status ] : 'none';
 }
 
 
@@ -175,11 +179,11 @@ function emblk_get_status_color( $status )
  * @param string Status value
  * @return string Icon
  */
-function emblk_get_status_icon( $status )
+function emadr_get_status_icon( $status )
 {
-	$emblk_statuses = emblk_get_status_icons();
+	$icons = emadr_get_status_icons();
 
-	return isset( $emblk_statuses[ $status ] ) ? $emblk_statuses[ $status ] : '';
+	return isset( $icons[ $status ] ) ? $icons[ $status ] : '';
 }
 
 
@@ -263,12 +267,21 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result )
 {
 	global $DB, $servertimenow;
 
+	/**
+	 * @var integer|NULL This global var stores ID of the last inserted mail log
+	 */
+	global $mail_log_insert_ID;
+	$mail_log_insert_ID = NULL;
+
 	if( empty( $user_ID ) )
 	{
 		$user_ID = NULL;
 	}
 
-	$DB->query( 'INSERT DELAYED INTO T_email__log
+	$to = evo_strtolower( $to );
+
+	// Insert mail log
+	$DB->query( 'INSERT INTO T_email__log
 		( emlog_user_ID, emlog_to, emlog_result, emlog_subject, emlog_message, emlog_headers )
 		VALUES
 		( '.$DB->quote( $user_ID ).',
@@ -278,15 +291,18 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result )
 		  '.$DB->quote( $message ).',
 		  '.$DB->quote( $headers ).' )' );
 
+	// Store ID of new inserted mail log
+	$mail_log_insert_ID = $DB->insert_id;
+
 	if( $result == 'ok' )
-	{	// Save a report about sending of this message in the table T_email__blocked
+	{ // Save a report about sending of this message in the table T_email__address
 		// The mail sending is susccess. Update last sent date and increase a counter
-		$DB->query( 'INSERT INTO T_email__blocked ( emblk_address, emblk_sent_count, emblk_sent_last_returnerror, emblk_last_sent_ts )
+		$DB->query( 'INSERT INTO T_email__address ( emadr_address, emadr_sent_count, emadr_sent_last_returnerror, emadr_last_sent_ts )
 			VALUES( '.$DB->quote( $to ).', 1, 1, '.$DB->quote( date( 'Y-m-d H:i:s', $servertimenow ) ).' )
 			ON DUPLICATE KEY UPDATE
-			    emblk_sent_count = emblk_sent_count + 1,
-			    emblk_sent_last_returnerror = emblk_sent_last_returnerror + 1,
-			    emblk_last_sent_ts = '.$DB->quote( date( 'Y-m-d H:i:s', $servertimenow ) ) );
+			    emadr_sent_count = emadr_sent_count + 1,
+			    emadr_sent_last_returnerror = emadr_sent_last_returnerror + 1,
+			    emadr_last_sent_ts = '.$DB->quote( date( 'Y-m-d H:i:s', $servertimenow ) ) );
 	}
 }
 
@@ -325,10 +341,10 @@ function load_blocked_emails( $user_IDs, $blocked_statuses = array() )
 	}
 
 	$SQL = new SQL();
-	$SQL->SELECT( 'user_email, emblk_ID' );
+	$SQL->SELECT( 'user_email, emadr_ID' );
 	$SQL->FROM( 'T_users' );
-	$SQL->FROM_add( 'LEFT JOIN T_email__blocked
-		 ON user_email = emblk_address
+	$SQL->FROM_add( 'LEFT JOIN T_email__address
+		 ON user_email = emadr_address
 		AND '.get_mail_blocked_condition( true, $blocked_statuses ) );
 	$SQL->WHERE( 'user_ID IN ( '.$DB->quote( $user_IDs ).' )' );
 	$blocked_emails = $DB->get_assoc( $SQL->get() );
@@ -373,9 +389,9 @@ function mail_is_blocked( $email, $blocked_statuses = array() )
 	{ // If we check status of this email first time - get it from DB and store in cache
 		global $DB;
 		$SQL = new SQL();
-		$SQL->SELECT( 'emblk_ID' );
-		$SQL->FROM( 'T_email__blocked' );
-		$SQL->WHERE( 'emblk_address = '.$DB->quote( $email ) );
+		$SQL->SELECT( 'emadr_ID' );
+		$SQL->FROM( 'T_email__address' );
+		$SQL->WHERE( 'emadr_address = '.$DB->quote( evo_strtolower( $email ) ) );
 		$SQL->WHERE_and( get_mail_blocked_condition( true, $blocked_statuses ) );
 		$cache_mail_is_blocked_status[ $status_filter_name ][ $email ] = (boolean) $DB->get_var( $SQL->get() );
 	}
@@ -409,7 +425,7 @@ function get_mail_blocked_condition( $is_blocked = true, $blocked_statuses = arr
 	}
 
 	$operator = $is_blocked ? 'IN' : 'NOT IN';
-	return 'emblk_status '.$operator.' ( '.$DB->quote( $blocked_statuses ).' )';
+	return 'emadr_status '.$operator.' ( '.$DB->quote( $blocked_statuses ).' )';
 }
 
 

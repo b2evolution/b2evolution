@@ -12,7 +12,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $xmlsrv_url, $app_version;
+global $xmlsrv_url, $Session, $app_version;
 
 $params = array_merge( array(
 	'auto_pilot'    => 'seo_title',
@@ -20,6 +20,9 @@ $params = array_merge( array(
 ), $params );
 
 require_css( 'style.css', 'relative' );
+
+// The following is temporary and should be moved to some SiteSkin class
+siteskin_init();
 
 add_js_for_toolbar( 'blog' );		// Registers all the javascripts needed by the toolbar menu
 init_bubbletip_js( 'blog' ); // Add jQuery bubbletip plugin

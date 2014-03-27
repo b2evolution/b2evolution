@@ -8,81 +8,103 @@
  * @package admin
  */
 
-@import url("basic.css");            /* Import basic styles */
+html, body {
+	height: 100%;
+}
 
 body {
 	margin: 0;
-	background-color: #fff;
+	background-color: #F5F5F5;
 	color: #000;
 	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
-	font-size: 84%;
 }
-
-/* Titles */
-h1.logintitle {
-	padding:0;
-	margin:0;
-}
-h2.logintitle {
-	color: #000;
-	font-size: 120%;
-	padding: 0;
-	margin: .5ex;
-}
-
 
 div.log_container {
-	margin-left: 0;
-	margin-right: 0;
-}
-
-/* Form elements: */
-input.input_text {
-	border: 1px solid #ccc;
-	background-color: #eee;
-	padding: 1px;
-	vertical-align: middle;
-	margin: 1px;
-	margin-left: 0;
-	margin-right: 0;
-}
-input.field_error {
-	background:#fbf2ee;
-	border: 1px solid #d99;
-}
-
-/* Links and buttons: */
-a {
-	background-color: transparent;
-	color: #008;
-	text-decoration: none;
-}
-a:hover {
-	color: #00b;
-	text-decoration: underline;
-}
-
-div.loginblock {
-	border: 1px solid #CCCCCC;
-	padding: 2ex;
-	margin: 5em auto;
-	width: 40em;
-	clear: both;
-}
-div.loginblock fieldset {
 	margin: 0;
-	padding: 1ex 0;
-	border: none;
 }
-div.loginblock legend {
-	margin: 0 1ex;
-	font-weight: bold;
+
+.container {
+	width: auto;
+	height: 100%;
+	min-height: 100%;
+	padding: 0 40px;
+	position: relative;
+}
+.wrap {
+	width: 400px;
+	margin: 0 auto;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	margin: auto;
+}
+
+.panel {
+	margin: 5px 0;
+}
+.panel-body {
+	padding: 20px 30px 0;
+}
+.form-login-links {
+	padding: 0 5px;
+	font-size: 92%;
+}
+
+.form-login fieldset {
+	margin-bottom: 20px;
+}
+.form-login input[type=text], .form-login input[type=password] {
+	width: 100%;
+}
+.form-login .btn {
+	margin-top: 5px;
+}
+
+.form-horizontal .controls,
+.form-horizontal .controls-info {
+	padding-right: 14px;
+}
+div#ffield_m {
+	margin-bottom: 4px;
+}
+div#p-status {
+	margin-left: 5px;
+}
+
+.form-horizontal .form-actions {
+	background: none;
+	border: none;
+	text-align: center;
+	padding: 0;
+	margin-bottom: 0;
+}
+
+.form-lostpass .controls {
+	margin-left: 0;
+	padding: 0;
+	width: 100%;
+}
+.form-lostpass .controls input.form-control {
+	width: 100%;
+}
+.form-lostpass .control-label {
+	display: none;
+}
+.form-lostpass .control-buttons {
+	margin: 0;
+	padding: 0;
+	text-align: center;
+	width: 100%;
 }
 
 .form_footer_notes {
-  text-align: center;
-  color: #999;
-  font-size: 78%;
+	text-align: center;
+	color: #999;
+	font-size: 78%;
+	line-height: 2.5ex;
+	margin-top: 1em;
 }
 
 .footer {
@@ -92,4 +114,12 @@ div.loginblock legend {
 	margin-bottom: 0ex;
 	padding-bottom: 1ex;
 	clear: both;
+	line-height: 12px;
+	color: #999;
+}
+.footer a {
+	color: #999;
+}
+.footer a:hover {
+	color: #005580;
 }

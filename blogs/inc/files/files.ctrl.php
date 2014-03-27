@@ -12,7 +12,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -67,6 +67,9 @@ global $filename_max_length, $dirpath_max_length;
 $current_User->check_perm( 'files', 'view', true, $blog ? $blog : NULL );
 
 $AdminUI->set_path( 'files', 'browse' );
+
+// 1 when AJAX request, E.g. when popup is used to link a file to item/comment
+param( 'ajax_request', 'integer', 0, true );
 
 
 // INIT params:
@@ -297,8 +300,10 @@ if( $fm_FileRoot )
 	}
 }
 
-
-file_controller_build_tabs();
+if( ! $ajax_request )
+{ // Don't display tabs on AJAX request
+	file_controller_build_tabs();
+}
 
 
 if( empty($ads_list_path) )
@@ -816,7 +821,7 @@ switch( $action )
 			}
 			$action = 'list';
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=files&blog='.$blog.'&root='.$root.'&path='.$path, 303 ); // Will EXIT
+			header_redirect( regenerate_url( '', '', '', '&' ), 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		else
@@ -847,7 +852,7 @@ switch( $action )
 			{ // no files left in list, cancel action
 				$action = 'list';
 				// Redirect so that a reload doesn't write to the DB twice:
-				header_redirect( '?ctrl=files&blog='.$blog.'&root='.$root.'&path='.$path, 303 ); // Will EXIT
+				header_redirect( regenerate_url( '', '', '', '&' ), 303 ); // Will EXIT
 				// We have EXITed already at this point!!
 			}
 		}
@@ -904,6 +909,10 @@ switch( $action )
 		{
 			case 'make_post':
 				// SINGLE POST:
+
+				// Stop a request from the blocked IP addresses or Domains
+				antispam_block_request();
+
 				// Create a post:
 				$edited_Item = new Item();
 				$edited_Item->set( 'status', $item_status );
@@ -1005,7 +1014,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'file' );
 
 		// Check permission!
- 		$current_User->check_perm( 'files', 'edit', true, $blog ? $blog : NULL );
+		$current_User->check_perm( 'files', 'edit', true, $blog ? $blog : NULL );
 
 		$edited_File = & $selected_Filelist->get_by_idx(0);
 		$edited_File->load_meta();
@@ -1077,7 +1086,7 @@ switch( $action )
 			header_redirect( regenerate_url( 'fm_selected', 'action=edit_properties&amp;fm_selected[]='.rawurlencode($edited_File->get_rdfp_rel_path() ).'&amp;'.url_crumb('file'), '', '&' ), 303 );
 			// We have EXITed already, no need else.
 		}
-		header_redirect( '?ctrl=files&blog='.$blog.'&root='.$root.'&path='.$path, 303 ); // Will EXIT
+		header_redirect( regenerate_url( '', '', '', '&' ), 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 
@@ -1125,7 +1134,7 @@ switch( $action )
 		// update profileupdate_date, because a publicly visible user property was changed
 		$edited_User->set_profileupdate_date();
 		// Save to DB:
- 		$edited_User->dbupdate();
+		$edited_User->dbupdate();
 
 		$Messages->add( T_('Your profile picture has been changed.'), 'success' );
 
@@ -1512,7 +1521,7 @@ switch( $fm_mode )
 																		$loop_src_File->get_rdfp_rel_path(), $dest_File->get_rdfp_rel_path() ) );
 					}
 					// Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( '?ctrl=files&blog='.$blog.'&root='.$root.'&path='.$path, 303 ); // Will EXIT
+					header_redirect( regenerate_url( 'fm_mode', '', '', '&' ), 303 ); // Will EXIT
 					// We have EXITed already at this point!!
 				}
 				elseif( $fm_mode == 'file_move' )
@@ -1561,7 +1570,7 @@ switch( $fm_mode )
 
 					$DB->commit();
 					// Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( '?ctrl=files&blog='.$blog.'&root='.$root.'&path='.$path, 303 ); // Will EXIT
+					header_redirect( regenerate_url( 'fm_mode', '', '', '&' ), 303 ); // Will EXIT
 					// We have EXITed already at this point!!
 				}
 				else debug_die( 'Unhandled file copy/move mode' );
@@ -1605,6 +1614,15 @@ if( !isset($Blog) || $fm_FileRoot->type != 'collection' || $fm_FileRoot->in_type
 
 // require colorbox js
 require_js_helper( 'colorbox' );
+// require File Uploader js and css
+require_js( 'multiupload/fileuploader.js' );
+require_css( 'fileuploader.css' );
+
+$mode = param( 'mode', 'string', '' );
+if( $mode == 'upload' || $mode == 'import' )
+{ // Add css to remove spaces around window
+	require_css( 'fileadd.css', 'rsc_url' );
+}
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @version $Id$
  */
@@ -83,7 +83,11 @@ if( !empty( $initial_blog_ID ) )
 	echo T_('Initial referer').": ".$UserSettings->get( 'initial_referer', $activated_User->ID )."\n";
 }
 
-echo "\n";
+// A count of user's pictures:
+$user_pictures_count = count( $activated_User->get_avatar_Links( false ) );
+echo sprintf( T_('The user has %s profile pictures.'), $user_pictures_count )."\n\n";
+
+
 echo T_('Edit user').': '.$admin_url.'?ctrl=user&user_tab=profile&user_ID='.$activated_User->ID."\n";
 echo T_('Recent registrations').': '.$admin_url.'?ctrl=users&action=show_recent'."\n";
 

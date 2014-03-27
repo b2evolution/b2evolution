@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -167,7 +167,8 @@ class CommentList2 extends DataObjectList2
 	{
 		if( !empty( $filters ) )
 		{ // Activate the filterset (fallback to default filter when a value is not set):
-			$this->filters = array_merge( $this->default_filters, $filters );
+			// If $this->filters were activated before(e.g. on load from request) it should be saved here
+			$this->filters = array_merge( $this->default_filters, $this->filters, $filters );
 		}
 
 		// Activate preset filters if necessary:
@@ -351,9 +352,9 @@ class CommentList2 extends DataObjectList2
 		$this->filters['page'] = param( $this->page_param, 'integer', 1, true );      // List page number in paged display
 		$this->page = $this->filters['page'];
 
-		$this->filters['order'] = param( $this->param_prefix.'order', 'string', $this->default_filters['order'], true );   		// ASC or DESC
+		$this->filters['order'] = param( $this->param_prefix.'order', '/^(ASC|asc|DESC|desc)$/', $this->default_filters['order'], true );   		// ASC or DESC
 		// This order style is OK, because sometimes the commentList is not displayed on a table so we cannot say we want to order by a specific column. It's not a crap.
-		$this->filters['orderby'] = param( $this->param_prefix.'orderby', 'string', $this->default_filters['orderby'], true );  // list of fields to order by (TODO: change that crap)
+		$this->filters['orderby'] = param( $this->param_prefix.'orderby', '/^([A-Za-z0-9_]+([ ,][A-Za-z0-9_]+)*)?$/', $this->default_filters['orderby'], true );  // list of fields to order by (TODO: change that crap)
 
 		if( $use_filters && $filter_action == 'save' )
 		{
@@ -422,7 +423,8 @@ class CommentList2 extends DataObjectList2
 		/*
 		 * ORDER BY stuff:
 		 */
-		$order_by = gen_order_clause( $this->filters['orderby'], $this->filters['order'], $this->Cache->dbprefix, $this->Cache->dbIDname );
+		$available_sort_options = array( 'date', 'type', 'author', 'author_url', 'author_email', 'author_IP', 'spam_karma', 'status', 'item_ID' );
+		$order_by = gen_order_clause( $this->filters['orderby'], $this->filters['order'], $this->Cache->dbprefix, $this->Cache->dbIDname, $available_sort_options );
 
 		if( $this->filters['threaded_comments'] )
 		{	// In mode "Threaded comments" we should get all replies in the begining of the list
@@ -436,13 +438,13 @@ class CommentList2 extends DataObjectList2
 		{ // Set post statuses by filters
 			$post_show_statuses = $this->filters['post_statuses'];
 		}
-		elseif( isset( $this->filters['post_ID'] ) && is_admin_page() )
+		elseif( is_admin_page() )
 		{ // Allow all kind of post status ( This statuses will be filtered later by user perms )
 			$post_show_statuses = get_visibility_statuses( 'keys' );
 		}
 		else
 		{ // Allow only inskin statuses for posts
-			$post_show_statuses = get_inskin_statuses();
+			$post_show_statuses = get_inskin_statuses( isset( $this->Blog ) ? $this->Blog->ID : NULL, 'post');
 		}
 		// Restrict post filters to available statuses. When blog = 0 we will check visibility statuses for each blog separately ( on the same query ).
 		$this->ItemQuery->where_visibility( $post_show_statuses );
@@ -751,6 +753,48 @@ class CommentList2 extends DataObjectList2
 			return $this->filters['statuses'][0] == 'trash';
 		}
 		return false;
+	}
+
+
+	/**
+	 * Auto pruning of recycled comments.
+	 *
+	 * It uses a general setting to store the day of the last prune, avoiding multiple prunes per day.
+	 * fplanque>> Check: How much faster is this than DELETING right away with an INDEX on the date field?
+	 *
+	 * NOTE: do not call this directly, but only in conjuction with auto_prune_stats_mode.
+	 *
+	 * @static
+	 * @return string Empty, if ok.
+	 */
+	function dbprune()
+	{
+		/**
+		 * @var DB
+		 */
+		global $DB;
+		global $Debuglog, $Settings, $localtimenow;
+
+		// Prune when $localtime is a NEW day (which will be the 1st request after midnight):
+		$last_prune = $Settings->get( 'auto_empty_trash_done' );
+		if( $last_prune >= date('Y-m-d', $localtimenow) && $last_prune <= date('Y-m-d', $localtimenow+86400) )
+		{ // Already pruned today (and not more than one day in the future -- which typically never happens)
+			return T_('Pruning of recycled comments has already been done today');
+		}
+
+		$time_prune_before = $localtimenow - ( $Settings->get('auto_empty_trash') * 86400 ); // 1 day = 86400 seconds
+
+		$rows_affected = comments_delete_where( 'comment_status = "trash"
+			AND comment_last_touched_ts < '.$DB->quote( date2mysql( $time_prune_before ) ) );
+		$Debuglog->add( 'CommentList2::dbprune(): autopruned '.$rows_affected.' rows from T_comments.', 'request' );
+
+		// Optimizing tables
+		$DB->query('OPTIMIZE TABLE T_comments');
+
+		$Settings->set( 'auto_empty_trash_done', date('Y-m-d H:i:s', $localtimenow) ); // save exact datetime
+		$Settings->dbupdate();
+
+		return ''; /* ok */
 	}
 }
 

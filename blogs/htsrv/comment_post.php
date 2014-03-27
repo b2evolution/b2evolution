@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -30,21 +30,21 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
 
-// Stop a request from the blocked IP addresses
-antispam_block_ip();
+// Stop a request from the blocked IP addresses or Domains
+antispam_block_request();
 
 // Check if the request exceed the post max size. If it does then the function will a call header_redirect.
 check_post_max_size_exceeded();
 
 // Getting GET or POST parameters:
-param( 'comment_post_ID', 'integer', true ); // required
+param( 'comment_item_ID', 'integer', true ); // required
 param( 'redirect_to', 'url', '' );
 param( 'reply_ID', 'integer', 0 );
 
-$action = param_arrayindex( 'submit_comment_post_'.$comment_post_ID, 'save' );
+$action = param_arrayindex( 'submit_comment_post_'.$comment_item_ID, 'save' );
 
 $ItemCache = & get_ItemCache();
-$commented_Item = & $ItemCache->get_by_ID( $comment_post_ID );
+$commented_Item = & $ItemCache->get_by_ID( $comment_item_ID );
 // Make sure Blog is loaded
 $commented_Item->load_Blog();
 $blog = $commented_Item->Blog->ID;
@@ -104,7 +104,7 @@ else
 	$User = NULL;
 	// Note: we use funky field names to defeat the most basic guestbook spam bots and/or their most basic authors
 	$author = param( $dummy_fields[ 'name' ], 'string' );
-	$email = param( $dummy_fields[ 'email' ], 'string' );
+	$email = evo_strtolower( param( $dummy_fields[ 'email' ], 'string' ) );
 	$url = param( $dummy_fields[ 'url' ], 'string' );
 
 	if( $url != '' && ! $commented_Item->Blog->get_setting( 'allow_anon_url' ) )
@@ -132,7 +132,7 @@ $original_comment = $comment;
 // This must get triggered before any internal validation and must pass all relevant params.
 // The OpenID plugin will validate a given OpenID here (via redirect and coming back here).
 $Plugins->trigger_event( 'CommentFormSent', array(
-		'comment_post_ID' => $comment_post_ID,
+		'comment_item_ID' => $comment_item_ID,
 		'comment' => & $comment,
 		'original_comment' => & $original_comment,
 		'action' => & $action,
@@ -282,7 +282,7 @@ if( $action != 'preview' )
 	$query = 'SELECT MAX(comment_date)
 							FROM T_comments
 						 WHERE comment_author_IP = '.$DB->quote($Hit->IP).'
-								OR comment_author_email = '.$DB->quote($Comment->get_author_email());
+								OR comment_author_email = '.$DB->quote( $Comment->get_author_email() );
 	$ok = 1;
 	if( $then = $DB->get_var( $query ) )
 	{
@@ -431,7 +431,7 @@ if( $Messages->has_errors() && $action != 'preview' )
 
 if( $action == 'preview' )
 { // set the Comment into user's session and redirect.
-	$Comment->set( 'original_content', html_entity_decode( $original_comment ) ); // used in the textarea input field again
+	$Comment->set( 'original_content', evo_html_entity_decode( $original_comment ) ); // used in the textarea input field again
 	$Comment->set( 'preview_attachments', $preview_attachments ); // memorize attachments
 	$Comment->set( 'checked_attachments', $checked_attachments ); // memorize checked attachments
 	$Comment->set( 'email_is_detected', $comments_email_is_detected ); // used to change a style of the comment
@@ -447,11 +447,11 @@ if( $action == 'preview' )
 
 	if( $comments_email_is_detected )
 	{ // Comment contains an email address, We should show an error about this
-		if( $Settings->get( 'newusers_canregister' ) )
+		if( $Settings->get( 'newusers_canregister' ) && $Settings->get( 'registration_is_public' ) )
 		{ // Users can register and we give them a links to log in and registration
 			if( is_null( $commented_Item ) )
 			{ // Initialize the commented Item object
-				$commented_Item = & $ItemCache->get_by_ID( $comment_post_ID );
+				$commented_Item = & $ItemCache->get_by_ID( $comment_item_ID );
 			}
 			$link_log_in = 'href="'.get_login_url( 'blocked comment email', $commented_Item->get_url( 'public_view' ) ).'"';
 			$link_register = 'href="'.get_user_register_url( $commented_Item->get_url( 'public_view' ), 'blocked comment email' ).'"';
@@ -492,28 +492,27 @@ else
 
 
 // RECORD comment:
-
-$Comment->dbinsert();
+$result = $Comment->dbinsert();
 
 // Create links
-if( !empty( $preview_attachments ) )
+if( $result && ( !empty( $preview_attachments ) ) )
 {
 	global $DB;
+	load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
+
 	$order = 1;
 	$FileCache = & get_FileCache();
 	$attachments = explode( ',', $preview_attachments );
 	$final_attachments = explode( ',', $checked_attachments );
-	$DB->begin();
+	$LinkOnwer = new LinkComment( $Comment );
+	$attachment_dir = NULL;
+
+	// No need transaction here, because if one file can't be attached, the rest should be still attached
 	foreach( $attachments as $file_ID )
 	{ // create links between comment and attached files
 		if( in_array( $file_ID, $final_attachments ) )
 		{ // attachment checkbox was checked, create the link
-			$edited_Link = new Link();
-			$edited_Link->set( 'cmt_ID', $Comment->ID );
-			$edited_Link->set( 'file_ID', $file_ID );
-			$edited_Link->set( 'position', 'aftermore' );
-			$edited_Link->set( 'order', $order );
-			$edited_Link->dbinsert();
+			$LinkOnwer->add_link( $file_ID, 'aftermore', $order );
 			$order++;
 		}
 		else
@@ -521,11 +520,23 @@ if( !empty( $preview_attachments ) )
 			$unused_File = $FileCache->get_by_ID( $file_ID, false );
 			if( $unused_File )
 			{
+				if( empty( $checked_attachments ) && empty( $attachment_dir ) )
+				{ // None of the previously attached file was checked to be attached
+					$attachment_dir = dirname( $unused_File->get_full_path() ).'/';
+				}
 				$unused_File->unlink();
 			}
 		}
 	}
-	$DB->commit();
+
+	if( empty( $checked_attachments ) && ( ! empty( $attachment_dir ) ) )
+	{ // None of the previously attached files were finally attached
+		$dir_content = get_filenames( $attachment_dir, array( 'recurse' => false, 'inc_hidden' => false ) );
+		if( empty( $dir_content ) )
+		{ // The attachment dir is empty, delete the directory
+			rmdir_r( $attachment_dir );
+		}
+	}
 }
 
 
@@ -544,23 +555,23 @@ if( !is_logged_in() )
 			$url = ' '; // this to make sure a cookie is set for 'no url'
 
 		// fplanque: made cookies available for whole site
-		setcookie( $cookie_name, $author, $cookie_expires, $cookie_path, $cookie_domain);
-		setcookie( $cookie_email, $email, $cookie_expires, $cookie_path, $cookie_domain);
-		setcookie( $cookie_url, $url, $cookie_expires, $cookie_path, $cookie_domain);
+		evo_setcookie( $cookie_name, $author, $cookie_expires, $cookie_path, $cookie_domain, false, true );
+		evo_setcookie( $cookie_email, $email, $cookie_expires, $cookie_path, $cookie_domain, false, true );
+		evo_setcookie( $cookie_url, $url, $cookie_expires, $cookie_path, $cookie_domain, false, true );
 	}
 	else
 	{	// Erase cookies:
 		if( !empty($_COOKIE[$cookie_name]) )
 		{
-			setcookie( $cookie_name, '', $cookie_expired, $cookie_path, $cookie_domain);
+			evo_setcookie( $cookie_name, '', $cookie_expired, $cookie_path, $cookie_domain, false, true );
 		}
 		if( !empty($_COOKIE[$cookie_email]) )
 		{
-			setcookie( $cookie_email, '', $cookie_expired, $cookie_path, $cookie_domain);
+			evo_setcookie( $cookie_email, '', $cookie_expired, $cookie_path, $cookie_domain, false, true );
 		}
 		if( !empty($_COOKIE[$cookie_url]) )
 		{
-			setcookie( $cookie_url, '', $cookie_expired, $cookie_path, $cookie_domain);
+			evo_setcookie( $cookie_url, '', $cookie_expired, $cookie_path, $cookie_domain, false, true );
 		}
 	}
 }
@@ -614,7 +625,7 @@ if( $Comment->ID )
 
 	if( !is_logged_in() )
 	{
-		if( $Settings->get( 'newusers_canregister' ) && $Comment->Item->Blog->get_setting( 'comments_register' ) )
+		if( $Settings->get( 'newusers_canregister' ) && $Settings->get( 'registration_is_public' ) && $Comment->Item->Blog->get_setting( 'comments_register' ) )
 		{ // Redirect to the registration form
 			$Messages->add( T_('ATTENTION: Create a user account now so that other users can contact you after reading your comment.'), 'error' );
 

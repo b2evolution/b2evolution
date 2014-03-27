@@ -3,7 +3,7 @@
  * This file is part of b2evolution - {@link http://b2evolution.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2014 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -52,40 +52,6 @@ $Form->hiddens_by_key( get_memorized( 'action' ) );
 // Backup settings for folders and files
 $Form->begin_fieldset( T_( 'Folders & files' ), array( 'class'=>'fieldset clear' ) );
 
-/**
- * Get affected paths
- * @param mixed path
- * @return string
- */
-function get_affected_paths( $path )
-{
-	global $basepath;
-
-	$affected_paths = T_( 'Affected paths:' ).' ';
-	if( is_array( $path ) )
-	{
-		$paths = array();
-		foreach( $path as $p )
-			$paths[] = no_trailing_slash( $p );
-
-		$affected_paths .= implode( ', ', $paths );
-	}
-	elseif( $path == '*' )
-	{
-		$filename_params = array(
-				'inc_files'	=> false,
-				'recurse'	=> false,
-				'basename'	=> true,
-			);
-		$affected_paths .= implode( ', ', get_filenames( $basepath, $filename_params ) );
-	}
-	else
-	{
-		$affected_paths .= no_trailing_slash( $path );
-	}
-	return $affected_paths;
-}
-
 // Display checkboxes
 foreach( $backup_paths as $name => $settings )
 {
@@ -110,35 +76,6 @@ $Form->end_fieldset();
 // Backup settings for database tables
 $Form->begin_fieldset( T_( 'Database tables' ), array( 'class'=>'fieldset clear' ) );
 
-/**
- * Get affected tables
- * @param mixed table
- * @return string
- */
-function get_affected_tables( $table )
-{
-	global $DB;
-
-	$affected_tables = T_( 'Affected tables:' ).' ';
-	if( is_array( $table ) )
-	{
-		$affected_tables .= implode( ', ', aliases_to_tables( $table ) );
-	}
-	elseif( $table == '*' )
-	{
-		$tables = array();
-		foreach( $DB->get_results( 'SHOW TABLES', ARRAY_N ) as $row )
-				$tables[] = $row[0];
-
-		$affected_tables .= implode( ', ', $tables );
-	}
-	else
-	{
-		$affected_tables .= aliases_to_tables( $table );
-	}
-	return $affected_tables;
-}
-
 // Display checkboxes
 foreach( $backup_tables as $name => $settings )
 {
@@ -158,7 +95,7 @@ foreach( $backup_tables as $name => $settings )
 $Form->end_fieldset();
 
 // Enable/Disable maintenance mode
-$Form->begin_fieldset( T_( 'Maintenance' ), array( 'class'=>'fieldset clear' ) );
+$Form->begin_fieldset( T_( 'General Options' ), array( 'class'=>'fieldset clear' ) );
 
 $Form->checkbox( 'bk_maintenance_mode', true, T_( 'Maintenance mode' ), T_( 'Put b2evolution into Maintenance Mode while backing up - Recommended' ) );
 
@@ -169,7 +106,6 @@ if( function_exists('gzopen') )
 $Form->add_crumb( 'backup' );
 $Form->end_fieldset();
 
-$Form->end_form( array( array( 'submit', 'actionArray[backup]', T_('Backup'), 'SaveButton' ),
-												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+$Form->end_form( array( array( 'submit', 'actionArray[backup]', T_('Backup'), 'SaveButton' ) ) );
 
 ?>

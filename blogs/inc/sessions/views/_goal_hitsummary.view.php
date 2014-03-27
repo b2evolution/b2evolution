@@ -5,7 +5,7 @@
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -16,6 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 $final = param( 'final', 'integer', 0, true );
 $goal_name = param( 'goal_name', 'string', NULL, true );
+$goal_cat = param( 'goal_cat', 'integer', 0, true );
 
 // Get all goal hits:
 $sql = 'SELECT DATE_FORMAT( hit_datetime, "%Y-%m-%d" ) as day, ghit_goal_ID, COUNT(ghit_ID) as count
@@ -41,6 +42,10 @@ if( !empty($final) )
 if( !empty($goal_name) ) // TODO: allow combine
 { // We want to filter on the goal name:
 	$SQL->WHERE_and( 'goal_name LIKE '.$DB->quote($goal_name.'%') );
+}
+if( ! empty( $goal_cat ) )
+{ // We want to filter on the goal category:
+	$SQL->WHERE_and( 'goal_gcat_ID = '.$DB->quote( $goal_cat ) );
 }
 $SQL->ORDER_BY( 'goal_name' );
 $goal_rows = $DB->get_results( $SQL->get(), OBJECT, 'Get list of all goals' );
@@ -77,6 +82,10 @@ function filter_goal_hitsummary( & $Form )
 {
 	$Form->checkbox_basic_input( 'final', get_param('final'), T_('Final') );
 	$Form->text_input( 'goal_name', get_param('goal_name'), 20, T_('Goal names starting with'), '', array( 'maxlength'=>50 ) );
+
+	$GoalCategoryCache = & get_GoalCategoryCache( T_('All') );
+	$GoalCategoryCache->load_all();
+	$Form->select_input_object( 'goal_cat', get_param('goal_cat'), $GoalCategoryCache, T_('Goal category'), array( 'allow_none' => true ) );
 }
 $Table->filter_area = array(
 	'callback' => 'filter_goal_hitsummary',

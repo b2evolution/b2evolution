@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -98,7 +98,7 @@ switch( $type )
 			$DB->query( '
 				UPDATE T_comments
 				   SET comment_allow_msgform = 0
-				 WHERE comment_author_email = '.$DB->quote( $anon_email ) );
+				 WHERE comment_author_email = '.$DB->quote( evo_strtolower( $anon_email ) ) );
 
 			$Messages->add( T_('All your comments have been marked not to allow emailing you through a message form.'), 'success' );
 

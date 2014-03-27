@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -41,14 +41,15 @@ $hash_SQL->GROUP_BY( 'f.file_hash' );
 
 if( ( $min_inappropriate_votes > 0 ) || ( $min_spam_votes > 0 ) )
 { // we need to join files vote table to be able to filter by votes
-	$hash_SQL->FROM_add( 'LEFT JOIN T_files__vote AS fv ON fv.fvot_file_ID = f.file_ID' );
+	$hash_SQL->FROM_add( 'LEFT JOIN T_links AS l ON l.link_file_ID = f.file_ID' );
+	$hash_SQL->FROM_add( 'LEFT JOIN T_links__vote AS lv ON lv.lvot_link_ID = l.link_ID' );
 	if( $min_inappropriate_votes > 0 )
 	{	// Filter by minimum count of inappropriate votes
-		$hash_SQL->HAVING_and( 'SUM( fvot_inappropriate ) >= '.$DB->quote( $min_inappropriate_votes ) );
+		$hash_SQL->HAVING_and( 'SUM( lvot_inappropriate ) >= '.$DB->quote( $min_inappropriate_votes ) );
 	}
 	if( $min_spam_votes > 0 )
 	{	// Filter by minimum count of spam votes
-		$hash_SQL->HAVING_and( 'SUM( fvot_spam ) >= '.$DB->quote( $min_spam_votes ) );
+		$hash_SQL->HAVING_and( 'SUM( lvot_spam ) >= '.$DB->quote( $min_spam_votes ) );
 	}
 }
 if( $file_ID > 0 )
@@ -66,13 +67,14 @@ if( $num_file_results > 0 )
 { // Create SQL query to build a results table
 	$SQL = new SQL();
 	$SQL->SELECT( 'f.*,
-		SUM( IFNULL( fvot_like, 0 ) ) as total_like,
-		SUM( IFNULL( fvot_inappropriate, 0 ) ) as total_inappropriate,
-		SUM( IFNULL( fvot_spam, 0 ) ) as total_spam,
+		SUM( IFNULL( lvot_like, 0 ) ) as total_like,
+		SUM( IFNULL( lvot_inappropriate, 0 ) ) as total_inappropriate,
+		SUM( IFNULL( lvot_spam, 0 ) ) as total_spam,
 		( SELECT COUNT( file_ID ) FROM T_files AS f2 WHERE f.file_hash = f2.file_hash ) AS total_duplicates' );
 	$SQL->FROM( 'T_files AS f' );
-	$SQL->FROM_add( 'LEFT JOIN T_files__vote AS fv ON fv.fvot_file_ID = f.file_ID' );
-	$SQL->WHERE( 'f.file_hash IN ( "'.implode( '","', $file_hash_values ).'" )' );
+	$SQL->FROM_add( 'LEFT JOIN T_links AS l ON l.link_file_ID = f.file_ID' );
+	$SQL->FROM_add( 'LEFT JOIN T_links__vote AS lv ON lv.lvot_link_ID = l.link_ID' );
+	$SQL->WHERE( 'f.file_hash IN ( '.$DB->quote( $file_hash_values ).' )' );
 	$SQL->GROUP_BY( 'f.file_ID, f.file_hash' );
 	$SQL->ORDER_BY( 'f.file_hash, *, total_spam DESC, total_inappropriate DESC' );
 }
@@ -126,7 +128,7 @@ function td_file_duplicates_icon( $File )
 {
 	if( is_object( $File ) )
 	{ // Check if File object is correct
-		return $File->get_preview_thumb( 'fulltype', true );
+		return $File->get_preview_thumb( 'fulltype', array( 'init' => true ) );
 	}
 	// Broken File object
 	return T_('Not Found');

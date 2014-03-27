@@ -13,10 +13,8 @@ textarea, input, select, option, optgroup, ul.ui-autocomplete, li.token-input-to
 	font: 13.43px Georgia, "Times New Roman", Times, serif;
 }
 
-div.wrapper
-{
-	margin: 0 1em;
-	padding: 1em 0;
+div.wrapper {
+	margin: 1em;
 }
 div.wrapper2 /* Main white content zone */
 {

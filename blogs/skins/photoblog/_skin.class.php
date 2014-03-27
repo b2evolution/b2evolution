@@ -47,7 +47,46 @@ class photoblog_Skin extends Skin
 	 */
 	function get_param_definitions( $params )
 	{
+		// Load to use function get_available_thumb_sizes()
+		load_funcs( 'files/model/_image.funcs.php' );
+
 		$r = array_merge( array(
+				'menu_bg_color' => array(
+					'label' => T_('Menu background color'),
+					'note' => T_('E-g: #0000ff for blue'),
+					'defaultvalue' => '#333333',
+					'type' => 'color',
+				),
+				'menu_text_color' => array(
+					'label' => T_('Menu text color'),
+					'note' => T_('E-g: #ff6600 for orange'),
+					'defaultvalue' => '#AAAAAA',
+					'type' => 'color',
+				),
+				'page_bg_color' => array(
+					'label' => T_('Page background color'),
+					'note' => T_('E-g: #ff0000 for red'),
+					'defaultvalue' => '#666666',
+					'type' => 'color',
+				),
+				'page_text_color' => array(
+					'label' => T_('Page text color'),
+					'note' => T_('E-g: #00ff00 for green'),
+					'defaultvalue' => '#AAAAAA',
+					'type' => 'color',
+				),
+				'post_bg_color' => array(
+					'label' => T_('Post info background color'),
+					'note' => T_('E-g: #0000ff for blue'),
+					'defaultvalue' => '#555555',
+					'type' => 'color',
+				),
+				'post_text_color' => array(
+					'label' => T_('Post info text color'),
+					'note' => T_('E-g: #ff6600 for orange'),
+					'defaultvalue' => '#AAAAAA',
+					'type' => 'color',
+				),
 				'colorbox' => array(
 					'label' => T_('Colorbox Image Zoom'),
 					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
@@ -65,6 +104,23 @@ class photoblog_Skin extends Skin
 					'note' => T_('Check to enable bubble tips on usernames'),
 					'defaultvalue' => 0,
 					'type' => 'checkbox',
+				),
+				'comments_display' => array(
+					'label' => T_('Comments display'),
+					'note' => '',
+					'defaultvalue' => 'popup',
+					'type' => 'radio',
+					'options' => array(
+						array( 'popup', T_('In a popup window') ),
+						array( 'under_post', T_('Under each post') ) ),
+					'field_lines' => true,
+				),
+				'mediaidx_thumb_size' => array(
+					'label' => T_('Thumbnail size for media index'),
+					'note' => '',
+					'defaultvalue' => 'fit-80x80',
+					'options' => get_available_thumb_sizes(),
+					'type' => 'select',
 				),
 			), parent::get_param_definitions( $params )	);
 
@@ -92,6 +148,66 @@ class photoblog_Skin extends Skin
 		if ($this->get_setting("colorbox")) 
 		{
 			require_js_helper( 'colorbox', 'blog' );
+		}
+
+		// Make sure standard CSS is called ahead of custom CSS generated below:
+		require_css( 'style.css', 'relative' );
+
+		// Add custom CSS:
+		$custom_css = '';
+
+		// Custom menu styles:
+		$custom_styles = array();
+		if( $bg_color = $this->get_setting( 'menu_bg_color' ) )
+		{ // Background color:
+			$custom_styles[] = 'background-color: '.$bg_color;
+		}
+		if( $text_color = $this->get_setting( 'menu_text_color' ) )
+		{ // Text color:
+			$custom_styles[] = 'color: '.$text_color;
+		}
+		if( ! empty( $custom_styles ) )
+		{
+			$custom_css .= '	div.pageHeader { '.implode( ';', $custom_styles )." }\n";
+		}
+
+		// Custom page styles:
+		$custom_styles = array();
+		if( $bg_color = $this->get_setting( 'page_bg_color' ) )
+		{ // Background color:
+			$custom_styles[] = 'background-color: '.$bg_color;
+		}
+		if( $text_color = $this->get_setting( 'page_text_color' ) )
+		{ // Text color:
+			$custom_styles[] = 'color: '.$text_color;
+		}
+		if( ! empty( $custom_styles ) )
+		{
+			$custom_css .= '	body { '.implode( ';', $custom_styles )." }\n";
+		}
+
+		// Custom post area styles:
+		$custom_styles = array();
+		if( $bg_color = $this->get_setting( 'post_bg_color' ) )
+		{ // Background color:
+			$custom_styles[] = 'background-color: '.$bg_color;
+		}
+		if( $text_color = $this->get_setting( 'post_text_color' ) )
+		{ // Text color:
+			$custom_styles[] = 'color: '.$text_color;
+		}
+		if( ! empty( $custom_styles ) )
+		{
+			$custom_css .= '	div.bDetails { '.implode( ';', $custom_styles )." }\n";
+		}
+
+		if( !empty( $custom_css ) )
+		{
+			$custom_css = '<style type="text/css">
+	<!--
+'.$custom_css.'	-->
+	</style>';
+			add_headline( $custom_css );
 		}
 	}
 

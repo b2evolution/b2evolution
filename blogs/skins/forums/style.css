@@ -1,4 +1,4 @@
-/* Designed by François PLANQUE - http://fplanque.net/ */
+/* Designed by Franï¿½ois PLANQUE - http://fplanque.net/ */
 
 body {
 	background: #fff;
@@ -6,6 +6,19 @@ body {
 	margin: 0px;
 	color: #000;
 }
+
+div#skin_wrapper div.sitewide_header {
+	margin-bottom: 0;
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 10000;
+	-webkit-font-smoothing: subpixel-antialiased;
+}
+div#skin_wrapper.skin_wrapper_loggedin div.sitewide_header {
+	top: 23px;
+}
+
 textarea, input, select, option, optgroup, ul.ui-autocomplete, li.token-input-token-facebook, div.token-input-dropdown-facebook {
 	font: 11px Verdana, Arial, Helvetica, sans-serif;
 }
@@ -55,6 +68,11 @@ h2 {
 }
 h2.page_title {
 	padding: 0 2px;
+	font-weight: normal;
+}
+.post_panel h2.page_title {
+	float: left;
+	padding: 0;
 }
 h2 a:link{
 	font-weight: normal;
@@ -131,6 +149,14 @@ div.pageHeader {
 	margin: 0;
 	border-bottom: 1px solid #000;
 	text-align: center;
+}
+div.pageHeader.site_skins {
+	margin-top: 43px;
+}
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+	div.pageHeader.site_skins {
+		margin-top: 0;
+	}
 }
 
 div.pageHeader h1 {
@@ -627,8 +653,7 @@ table.bForums div.avatartag {
 }
 .breadcrumbs {
 	font-weight: bold;
-	float: left;
-	padding-top: 5px;
+	padding: 10px 0 2px;
 }
 .breadcrumbs a {
 	text-decoration: none;
@@ -644,6 +669,7 @@ table.bForums div.avatartag {
 .user_contacts_groups th, .user_contacts_groups td {
 	background: none;
 	color: #000;
+	border: none;
 }
 
 .navigation {
@@ -692,6 +718,7 @@ table.catselect th {
 	background: #D1D7DC;
 	color: #000;
 	height: auto;
+	border: none;
 }
 table.catselect a {
 	text-decoration: none;
@@ -758,6 +785,7 @@ table.legend td {
 	background: #D1D7DC;
 	color: #000;
 	height: auto;
+	border: none;
 }
 
 .bForums .bComment.form_textarea_input {
@@ -777,16 +805,35 @@ td.message_text {
 	width: 90%;
 }
 
+div.comment_toolbars div.edit_toolbar,
+div.message_toolbars div.edit_toolbar {
+	width: 99%;
+}
+
+#width_switcher_layout {
+	position: absolute;
+	top: 115px;
+	right: 3px;
+	z-index: 10001;
+}
 #width_switcher {
 	display: none;
-	position: fixed;
-	top: 10px;
-	right: 10px;
 }
 #width_switcher a {
 	width: 26px;
 	height: 36px;
 	text-decoration: none;
+}
+#width_switcher.fixed {
+	position: fixed;
+	top: 3px;
+	right: 3px;
+}
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+	#width_switcher.fixed {
+		position: absolute;
+		width: 75px;
+	}
 }
 div.edit_toolbars, div.comment_toolbars {
 	margin: 0;
@@ -977,4 +1024,8 @@ td.custom_content p {
 	width: 7px;
 	height: 9px;
 	margin: 0 3px 0 2px;
+}
+
+.form_add_contacts .controls {
+	padding-left: 0;
 }

@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -23,7 +23,7 @@ load_class( 'links/model/_linkuser.class.php', 'LinkUser' );
 
 /**
  * Get a link owner object from link_type and object ID
- * 
+ *
  * @param string link type ( item, comment, ... )
  * @param integer the corresponding object ID
  */
@@ -61,7 +61,7 @@ function get_link_owner( $link_type, $object_ID )
 
 /**
  * Compose screen: display link files iframe
- * 
+ *
  * @param object Form
  * @param object LinkOwner object
  * @param string iframe name
@@ -108,7 +108,7 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 		&& $LinkOwner->check_perm( 'edit', false ) )
 	{	// Check that we have permission to edit owner:
 		$fieldset_title .= ' - <a href="'.$dispatcher.'?ctrl=links&amp;link_type='.$LinkOwner->type.'&amp;fm_mode=link_object&amp;link_object_ID='.$LinkOwner->get_ID()
-					.'" onclick="return pop_up_window( \''.$dispatcher.'?ctrl=files&amp;mode=upload&amp;iframe_name='
+					.'" onclick="return pop_up_window( \''.$dispatcher.'?ctrl=files&amp;mode=upload&amp;ajax_request=1&amp;iframe_name='
 					.$iframe_name.'&amp;fm_mode=link_object&amp;link_type='.$LinkOwner->type.'&amp;link_object_ID='.$LinkOwner->get_ID().'\', \'fileman_upload\', 1000 )">'
 					.get_icon( 'folder', 'imgtag' ).' '.T_('Add/Link files').'</a> <span class="note">(popup)</span>';
 	}
@@ -124,7 +124,7 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 
 /**
  * Display a table with the attached files
- * 
+ *
  * @param object LinkOwner
  * @param array display params
  */
@@ -154,9 +154,14 @@ function display_attachments( & $LinkOwner, $params = array() )
 	$row_style = '';
 	foreach( $links as $Link )
 	{ // display each link attachment in a row
+		if( ! ( $link_File = & $Link->get_File() ) )
+		{ // No File object
+			global $Debuglog;
+			$Debuglog->add( sprintf( 'Link ID#%d does not have a file object!', $Link->ID ), array( 'error', 'files' ) );
+			continue;
+		}
 		$row_style = ( $row_style == 'even' ) ? 'odd' : 'even';
 		echo '<tr class="'.$row_style.'"><td class="firstcol">';
-		$link_File = & $Link->get_File();
 		echo $link_File->get_preview_thumb( 'fulltype' );
 		echo '</td><td class="nowrap left">';
 		echo $link_File->get_view_link();
@@ -176,7 +181,7 @@ function display_attachments( & $LinkOwner, $params = array() )
 
 /**
  * Display link actions
- * 
+ *
  * @param $link_ID
  * @param $cur_idx
  * @param $total_rows
@@ -216,7 +221,7 @@ function link_actions( $link_ID, $cur_idx = 0, $total_rows = 2 )
 		}
 	}
 
-	if( isset($current_File) && $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
+	if( $current_File && $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
 	{
 		if( $current_File->is_dir() )
 			$title = T_('Locate this directory!');
@@ -232,10 +237,11 @@ function link_actions( $link_ID, $cur_idx = 0, $total_rows = 2 )
 	if( $LinkOwner->check_perm( 'edit' ) )
 	{ // Check that we have permission to edit LinkOwner object:
 		$r .= action_icon( T_('Delete this link!'), 'unlink',
-		                  regenerate_url( 'ctrl,p,itm_ID,action', 'ctrl=links&amp;link_ID='.$link_ID.'&amp;action=unlink&amp;'.url_crumb('link') ) );
+		                  regenerate_url( 'ctrl,p,itm_ID,action', 'ctrl=links&amp;link_ID='.$link_ID.'&amp;action=unlink&amp;'.url_crumb('link') ), NULL, NULL, NULL,
+		                  array( 'onclick' => 'item_unlink('.$link_ID.')' ) );
 	}
 
-	if( isset( $current_File ) && $current_File->is_image() )
+	if( $current_File && $current_File->is_image() )
 	{	// Display icon to insert image into post inline
 		$r .= ' '.get_icon( 'add', 'imgtag', array(
 				'title'   => T_('Insert image into the post'),
@@ -250,7 +256,7 @@ function link_actions( $link_ID, $cur_idx = 0, $total_rows = 2 )
 
 /**
  * Display link position edit action
- * 
+ *
  * @param $row
  */
 function display_link_position( & $row )
@@ -264,7 +270,7 @@ function display_link_position( & $row )
 	// NOTE: dh> using method=get so that we can use regenerate_url (for non-JS).
 	$r = '<form action="" method="post">
 		<select id="'.$id.'" name="link_position">'
-		.Form::get_select_options_string( $LinkOwner->get_positions(), $row->link_position, true).'</select>'
+		.Form::get_select_options_string( $LinkOwner->get_positions( $row->file_ID ), $row->link_position, true).'</select>'
 		.'<script type="text/javascript">jQuery("#'.$id.'").change( { url: "'.$htsrv_url.'", crumb: "'.get_crumb( 'link' ).'" }, function( event ) {
 			evo_display_position_onchange( this, event.data.url, event.data.crumb ) } );</script>';
 
@@ -276,7 +282,7 @@ function display_link_position( & $row )
 	foreach($params as $param)
 	{
 		list($k, $v) = explode('=', $param);
-		$r .= '<input type="hidden" name="'.htmlspecialchars($k).'" value="'.htmlspecialchars($v).'" />';
+		$r .= '<input type="hidden" name="'.evo_htmlspecialchars($k).'" value="'.evo_htmlspecialchars($v).'" />';
 	}
 	$r .= '<input class="SaveButton" type="submit" value="&raquo;" />';
 	$r .= '</noscript>';
@@ -297,11 +303,14 @@ function get_file_links( $file_ID, $params = array() )
 {
 	global $DB, $current_User, $baseurl, $admin_url;
 
-	$params = array_merge( array( 
-			'separator' => '<br />',
-			'post_prefix' => T_('Post').' - ',
-			'comment_prefix' => T_('Comment on').' - ',
-			'user_prefix' => T_('Profile picture').' - ',
+	$params = array_merge( array(
+			'separator'       => '<br />',
+			'post_prefix'     => T_('Post').' - ',
+			'comment_prefix'  => T_('Comment on').' - ',
+			'user_prefix'     => T_('Profile picture').' - ',
+			'current_link_ID' => 0,
+			'current_before'  => '<b>',
+			'current_after'   => '</b>',
 		), $params );
 
 	// Create result array
@@ -309,71 +318,157 @@ function get_file_links( $file_ID, $params = array() )
 
 	// Get all links with posts and comments
 	$links_SQL = new SQL();
-	$links_SQL->SELECT( 'link_itm_ID, link_cmt_ID' );
+	$links_SQL->SELECT( 'link_ID, link_itm_ID, link_cmt_ID, link_usr_ID' );
 	$links_SQL->FROM( 'T_links' );
 	$links_SQL->WHERE( 'link_file_ID = '.$DB->quote( $file_ID ) );
 	$links = $DB->get_results( $links_SQL->get() );
 
 	if( !empty( $links ) )
-	{	// File is linked with some posts or comments
+	{ // File is linked with some posts or comments
 		$ItemCache = & get_ItemCache();
 		$CommentCache = & get_CommentCache();
+		$UserCache = & get_UserCache();
 		foreach( $links as $link )
 		{
+			$r = '';
+			if( $params['current_link_ID'] == $link->link_ID )
+			{
+				$r .= $params['current_before'];
+			}
 			if( !empty( $link->link_itm_ID ) )
-			{	// File is linked to a post
+			{ // File is linked to a post
 				if( $Item = & $ItemCache->get_by_ID( $link->link_itm_ID, false ) )
 				{
 					$Blog = $Item->get_Blog();
 					if( $current_User->check_perm( 'item_post!CURSTATUS', 'view', false, $Item ) )
-					{	// Current user can edit the linked post
-						$attached_to[] = $params['post_prefix'].'<a href="'.url_add_param( $admin_url, 'ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$link->link_itm_ID ).'">'.$Item->get( 'title' ).'</a>';
+					{ // Current user can edit the linked post
+						$r .= $params['post_prefix'].'<a href="'.url_add_param( $admin_url, 'ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$link->link_itm_ID ).'">'.$Item->get( 'title' ).'</a>';
 					}
 					else
-					{	// No access to edit the linked post
-						$attached_to[] = $params['post_prefix'].$Item->get( 'title' );
+					{ // No access to edit the linked post
+						$r .= $params['post_prefix'].$Item->get( 'title' );
 					}
 				}
 			}
 			if( !empty( $link->link_cmt_ID ) )
-			{	// File is linked to a comment
+			{ // File is linked to a comment
 				if( $Comment = & $CommentCache->get_by_ID( $link->link_cmt_ID, false ) )
 				{
 					$Item = $Comment->get_Item();
 					if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
-					{	// Current user can edit the linked Comment
-						$attached_to[] = $params['comment_prefix'].'<a href="'.url_add_param( $admin_url, 'ctrl=comments&amp;action=edit&amp;comment_ID='.$link->link_cmt_ID ).'">'.$Item->get( 'title' ).'</a>';
+					{ // Current user can edit the linked Comment
+						$r .= $params['comment_prefix'].'<a href="'.url_add_param( $admin_url, 'ctrl=comments&amp;action=edit&amp;comment_ID='.$link->link_cmt_ID ).'">'.$Item->get( 'title' ).'</a>';
 					}
 					else
-					{	// No access to edit the linked Comment
-						$attached_to[] = $params['comment_prefix'].$Item->get( 'title' );
+					{ // No access to edit the linked Comment
+						$r .= $params['comment_prefix'].$Item->get( 'title' );
 					}
 				}
 			}
-		}
-	}
-
-	// Get all links with profile pictures
-	$profile_links_SQL = new SQL();
-	$profile_links_SQL->SELECT( 'user_ID, user_login' );
-	$profile_links_SQL->FROM( 'T_users' );
-	$profile_links_SQL->WHERE( 'user_avatar_file_ID = '.$DB->quote( $file_ID ) );
-	$profile_links = $DB->get_results( $profile_links_SQL->get() );
-	if( !empty( $profile_links ) )
-	{
-		foreach( $profile_links as $link )
-		{
-			if( $current_User->ID != $link->user_ID && !$current_User->check_perm( 'users', 'view' ) )
-			{ // No permission to view other users in admin form
-				$attached_to[] = $params['user_prefix'].'<a href="'.url_add_param( $baseurl, 'disp=user&amp;user_ID='.$link->user_ID ).'">'.$link->user_login.'</a>';
+			if( !empty( $link->link_usr_ID ) )
+			{ // File is linked to user
+				if( $User = & $UserCache->get_by_ID( $link->link_usr_ID, false ) )
+				{
+					if( $current_User->ID != $User->ID && !$current_User->check_perm( 'users', 'view' ) )
+					{ // No permission to view other users in admin form
+						$r .= $params['user_prefix'].'<a href="'.url_add_param( $baseurl, 'disp=user&amp;user_ID='.$User->ID ).'">'.$User->login.'</a>';
+					}
+					else
+					{ // Build a link to display a user in admin form
+						$r .= $params['user_prefix'].'<a href="?ctrl=user&amp;user_tab=profile&amp;user_ID='.$User->ID.'">'.$User->login.'</a>';
+					}
+				}
 			}
-			else
-			{ // Build a link to display a user in admin form
-				$attached_to[] = $params['user_prefix'].'<a href="?ctrl=user&amp;user_tab=profile&amp;user_ID='.$link->user_ID.'">'.$link->user_login.'</a>';
+			if( $params['current_link_ID'] == $link->link_ID )
+			{
+				$r .= $params['current_after'];
+			}
+			if( !empty( $r ) )
+			{
+				$attached_to[] = $r;
 			}
 		}
 	}
 
 	return implode( $params['separator'], $attached_to );
+}
+
+
+/**
+ * Save a vote for the link of file by user
+ *
+ * @param string Link ID
+ * @param integer User ID
+ * @param string Action of the voting ( 'like', 'noopinion', 'dontlike', 'inappropriate', 'spam' )
+ * @param integer 1 = checked, 0 = unchecked (for checkboxes: 'Inappropriate' & 'Spam' )
+ */
+function link_vote( $link_ID, $user_ID, $vote_action, $checked = 1 )
+{
+	global $DB;
+
+	// Set modified field name and value
+	switch( $vote_action )
+	{
+		case 'like':
+			$field_name = 'lvot_like';
+			$field_value = '1';
+			break;
+
+		case 'noopinion':
+			$field_name = 'lvot_like';
+			$field_value = '0';
+			break;
+
+		case 'dontlike':
+			$field_name = 'lvot_like';
+			$field_value = '-1';
+			break;
+
+		case 'inappropriate':
+			$field_name = 'lvot_inappropriate';
+			$field_value = $checked;
+			break;
+
+		case 'spam':
+			$field_name = 'lvot_spam';
+			$field_value = $checked;
+			break;
+
+		default:
+			// invalid vote action
+			return;
+	}
+
+	$DB->begin();
+
+	$SQL = new SQL();
+	$SQL->SELECT( 'lvot_link_ID' );
+	$SQL->FROM( 'T_links__vote' );
+	$SQL->WHERE( 'lvot_link_ID = '.$DB->quote( $link_ID ) );
+	$SQL->WHERE_and( 'lvot_user_ID = '.$DB->quote( $user_ID ) );
+	$vote = $DB->get_row( $SQL->get() );
+
+	// Save a voting results in DB
+	if( empty( $vote ) )
+	{ // User replace into to avoid duplicate key conflict in case when user clicks two times fast one after the other
+		$result = $DB->query( 'REPLACE INTO T_links__vote ( lvot_link_ID, lvot_user_ID, '.$field_name.' )
+						VALUES ( '.$DB->quote( $link_ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $field_value ).' )' );
+	}
+	else
+	{ // Update existing record, because user already has a vote for this file
+		$result = $DB->query( 'UPDATE T_links__vote
+					SET '.$field_name.' = '.$DB->quote( $field_value ).'
+					WHERE lvot_link_ID = '.$DB->quote( $link_ID ).'
+						AND lvot_user_ID = '.$DB->quote( $user_ID ) );
+	}
+
+	if( $result )
+	{
+		$DB->commit();
+	}
+	else
+	{
+		$DB->rollback();
+	}
 }
 ?>

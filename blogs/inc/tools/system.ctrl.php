@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * {@internal License choice
@@ -341,7 +341,9 @@ if( version_compare( $system_stats['php_version'], $required_php_version['applic
 }
 elseif( version_compare( $system_stats['php_version'], '5.2', '<' ) )
 {
-	disp_system_check( 'warning', T_('This version is old. b2evolution may run but some features may fail. You should ask your host to upgrade PHP before running b2evolution.') );
+	disp_system_check( 'warning', T_('This version is old. b2evolution may run but some features may fail. You should ask your host to upgrade PHP before running b2evolution.')
+		// Display a message about httpOnly for PHP < 5.2
+		.'<br />'.T_( 'PHP 5.2 or greater is recommended for maximum security, especially for "httpOnly" cookies support.' ) );
 }
 else
 {

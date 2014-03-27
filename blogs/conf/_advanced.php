@@ -36,9 +36,8 @@ $debug_jslog = 'pwd';
  */
 $debug_pwd = '';
 
-
 // Most of the time you'll want to see all errors, including notices:
-// b2evo should run notice free! (plugins too!)
+// b2evo should run without any notices! (plugins too!)
 if( version_compare( phpversion(), '5.3', '>=' ) )
 {	// sam2kb> Disable E_STRICT messages on PHP > 5.3, there are numerous E_STRICT warnings displayed throughout the app
 	error_reporting( E_ALL & ~E_STRICT );
@@ -47,7 +46,6 @@ else
 {
 	error_reporting( E_ALL );
 }
-
 /**
  * Do we want to display errors, even when not in debug mode?
  *
@@ -94,11 +92,18 @@ $thumbnail_sizes = array(
 			'fit-520x390' => array( 'fit', 520, 390, 90 ),
 			'fit-400x320' => array( 'fit', 400, 320, 85 ),
 			'fit-320x320' => array( 'fit', 320, 320, 85 ),
+			'fit-256x256' => array( 'fit', 256, 256, 85 ),
+			'fit-192x192' => array( 'fit', 192, 192, 85 ),
 			'fit-160x160' => array( 'fit', 160, 160, 80 ),
 			'fit-160x160-blur-13' => array( 'fit', 160, 160, 80, 13 ),
 			'fit-160x160-blur-18' => array( 'fit', 160, 160, 80, 18 ),
 			'fit-160x120' => array( 'fit', 160, 120, 80 ),
+			'fit-128x128' => array( 'fit', 128, 128, 80 ),
 			'fit-80x80' => array( 'fit', 80, 80, 80 ),
+			'crop-480x320' => array( 'crop', 480, 320, 90 ),
+			'crop-256x256' => array( 'crop', 256, 256, 85 ),
+			'crop-192x192' => array( 'crop', 192, 192, 85 ),
+			'crop-128x128' => array( 'crop', 128, 128, 85 ),
 			'crop-80x80' => array( 'crop', 80, 80, 85 ),
 			'crop-64x64' => array( 'crop', 64, 64, 85 ),
 			'crop-48x48' => array( 'crop', 48, 48, 85 ),
@@ -481,20 +486,26 @@ $skins_path = $basepath.$skins_subdir;   // You should not need to change this
 $skins_url = $baseurl.$skins_subdir;     // You should not need to change this
 
 /**
+ * Location of the site skins folder.
+ * @global string $siteskins_subdir
+ */
+$siteskins_subdir = 'skins_site/';       		    // Subdirectory relative to base
+$siteskins_path = $basepath.$siteskins_subdir;  // You should not need to change this
+$siteskins_url = $baseurl.$siteskins_subdir;    // You should not need to change this
+
+/**
  * Location of the email skins folder.
  * @global string $emailskins_subdir
  */
-$emailskins_subdir = 'skins_email/';                // Subdirectory relative to base
+$emailskins_subdir = 'skins_email/';               // Subdirectory relative to base
 $emailskins_path = $basepath.$emailskins_subdir;   // You should not need to change this
 $emailskins_url = $baseurl.$emailskins_subdir;     // You should not need to change this
-
 
 /**
  * Location of the admin interface dispatcher
  */
 $dispatcher = 'admin.php'; // DEPRECATED
 $admin_url = $baseurl.$dispatcher;
-
 
 /**
  * Location of the admin skins folder.
@@ -600,7 +611,9 @@ $upgrade_path = $basepath.$upgrade_subdir;  // You should not need to change thi
 // fp> TODO: do not use a setting for this.
 // fp> put the file into the shared files directory with the other sample "admin" avatars. That way it is very easy to replace with another default.
 // fp> PS: I like the ? image ;)
-$default_avatar = $rsc_url.'img/default_avatar.jpg';
+$default_avatar_unknown = $media_url.'shared/global/avatars/default_avatar_unknown.jpg';
+$default_avatar_men = $media_url.'shared/global/avatars/default_avatar_men.jpg';
+$default_avatar_women = $media_url.'shared/global/avatars/default_avatar_women.jpg';
 
 
 /**
@@ -650,9 +663,11 @@ $filename_max_length = 64;
 
 /**
  * The maximum length of a file absolute path. Creating folders/files with longer path then this value is not allowed.
- * Note: 247 is the max length what php file operations functions can handle on windows
+ * Note: 247 is the max length of an absolute path what the php file operation functions can handle on windows.
+ * On unix systems the file path length is not an issue, so there we can allow a higher value.
+ * The OS independent max length is 767, because that is what b2evolution can handle correctly.
  */
-$dirpath_max_length = 247 - $filename_max_length - 35 /* the maximum additional path length because of the _evocache folder */;
+$dirpath_max_length = ( ( ( strtoupper( substr( PHP_OS, 0, 3 ) ) ) === 'WIN' ) ? ( 247 - 35 /* the maximum additional path length because of the _evocache folder */ ) : 767 ) - $filename_max_length;
 
 
 /**
@@ -770,6 +785,16 @@ $tags_dash_fix = 0;
  */
 $use_hacks = false;
 
+
+
+/**
+ * Allow redirects to different domain. Usually it should not be allowed to redirect to an external URL.
+ * Possible values:
+ *  - 'always' : Always allow redirect to a different domain
+ *  - 'only_redirected_posts' ( Default ): Allow redirects to a different domain only in case of posts with redirected status
+ *  - 'never' : Force redirects to the same domain in all of the cases, and never allow redirect to a different domain
+ */
+$allow_redirects_to_different_domain = 'only_redirected_posts';
 
 
 /**

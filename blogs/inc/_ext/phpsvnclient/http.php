@@ -146,7 +146,7 @@ class http_class {
     Function OutputDebug($message) {
 	$message.="\n";
 	if ($this->html_debug)
-	    $message = str_replace("\n", "<br />\n", HtmlEntities($message));
+	    $message = str_replace("\n", "<br />\n", evo_htmlentites($message));
 	echo $message;
 	evo_flush();
     }

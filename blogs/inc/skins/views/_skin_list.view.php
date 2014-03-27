@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -22,11 +22,11 @@ $SQL->FROM( 'T_skins__skin LEFT JOIN T_coll_settings ON skin_ID = cset_value AND
 			( cset_name = "normal_skin_ID" OR cset_name = "mobile_skin_ID" OR cset_name = "tablet_skin_ID" )' );
 $SQL->GROUP_BY( 'skin_ID' );
 
-$CountSQL = new SQL();
-$CountSQL->SELECT( 'COUNT( * )' );
-$CountSQL->FROM( 'T_skins__skin' );
+$count_SQL = new SQL();
+$count_SQL->SELECT( 'COUNT( * )' );
+$count_SQL->FROM( 'T_skins__skin' );
 
-$Results = new Results( $SQL->get(), 'skin_', '', NULL, $CountSQL->get() );
+$Results = new Results( $SQL->get(), 'skin_', '', NULL, $count_SQL->get() );
 
 $Results->Cache = & get_SkinCache();
 

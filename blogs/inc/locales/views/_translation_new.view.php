@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -39,7 +39,7 @@ $Results->title = sprintf( T_('Translation editor for locale "%s"'), $edit_local
 $Results->cols[] = array(
 		'th' => T_('Original string'),
 		'order' => 'iost_string',
-		'td' => '%htmlspecialchars( #iost_string# )%',
+		'td' => '%evo_htmlspecialchars( #iost_string# )%',
 	);
 
 function iost_td_actions( $translated_string_ID )

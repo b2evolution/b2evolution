@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal Open Source relicensing agreement:
  * }}
@@ -477,7 +477,7 @@ if( $display_mode == 'normal' )
 	 * Display page header, menus & messages:
 	 */
 	$AdminUI->set_coll_list_params( 'blog_properties', 'edit', array( 'ctrl' => 'widgets' ),
-				T_('All'), '?ctrl=collections&amp;blog=0' );
+				T_('Site'), '?ctrl=collections&amp;blog=0' );
 
 	$AdminUI->set_path( 'blogs', 'widgets' );
 
@@ -510,7 +510,7 @@ if( $display_mode == 'normal' )
 	require_css( 'blog_widgets.css' );
 
 
-	$AdminUI->breadcrumbpath_init( true );
+	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Structure'), 'url' => '?ctrl=coll_settings' ) );
 	$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=coll_settings&amp;blog=$blog$' );
 	$AdminUI->breadcrumbpath_add( T_('Widgets'), '?ctrl=widgets&amp;blog=$blog$' );
 

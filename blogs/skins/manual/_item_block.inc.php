@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage manual
@@ -97,20 +97,20 @@ if( ( $disp == 'single' ) && empty( $cat ) )
 
 		echo '<p class="notes">';
 		$Item->author( array(
-				'before' => T_('Created by '),
-				'after'  => ' &bull; ',
+				'before'    => T_('Created by '),
+				'after'     => ' &bull; ',
+				'link_text' => 'login',
 			) );
 		$Item->lastedit_user( array(
-				'before' => T_('Last edit by '),
-				'after'  => T_(' on ').$Item->get_mod_date( 'F jS, Y' ),
+				'before'    => T_('Last edit by '),
+				'after'     => T_(' on ').$Item->get_mod_date( 'F jS, Y' ),
+				'link_text' => 'login',
 			) );
 		'</p>';
-		if( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
-		{	// Check permission to view histories of this item
-			global $admin_url;
-			echo '  &bull; ';
-			echo '<a href="'.$admin_url.'?ctrl=items&amp;action=history&amp;p='.$Item->ID.'">'.T_('View history').'</a>';
-		}
+		echo $Item->get_history_link( array(
+				'before'    => ' &bull; ',
+				'link_text' => T_('View history')
+			) );
 
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array_merge( $params, array(

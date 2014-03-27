@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  *
@@ -74,6 +74,13 @@ class watermark_plugin extends Plugin
 					'defaultvalue' => 12,
 					'note' => '',
 				),
+			'min_dimension' => array(
+					'label' => 'Min dimension',
+					'type' => 'integer',
+					'size' => 4,
+					'defaultvalue' => 400,
+					'note' => T_('Enter the minimum pixel dimension an image must have to get a watermark.')
+				),
 			);
 	}
 
@@ -107,6 +114,13 @@ class watermark_plugin extends Plugin
 							48=>48,50=>50,52=>52,54=>54,56=>56,58=>58,60=>60,62=>62,64=>64,66=>66,68=>68),
 					'defaultvalue' => $this->Settings->get('font_size'),
 					'note' => '',
+				),
+			'coll_min_dimension' => array(
+					'label' => 'Min dimension',
+					'type' => 'integer',
+					'size' => 4,
+					'defaultvalue' => 400,
+					'note' => T_('Enter the minimum pixel dimension an image must have to get a watermark.')
 				),
 			);
 
@@ -199,21 +213,23 @@ class watermark_plugin extends Plugin
 			$Blog = & $BlogCache->get_by_ID( $params['root_type_ID'], false, false );
 		}
 
-		if( !empty($Blog) )
-		{	// Use blog settings when possible
-			$font = $this->get_coll_setting('coll_font', $Blog);
-			$text = $this->get_coll_setting('coll_text', $Blog);
-			$font_size = $this->get_coll_setting('coll_font_size', $Blog);
+		if( ! empty( $Blog ) )
+		{ // Use blog settings when possible
+			$font = $this->get_coll_setting( 'coll_font', $Blog );
+			$text = $this->get_coll_setting( 'coll_text', $Blog );
+			$font_size = $this->get_coll_setting( 'coll_font_size', $Blog );
+			$min_dimension = $this->get_coll_setting( 'coll_min_dimension', $Blog );
 		}
 		else
-		{	// Use global settings
-			$font = $this->Settings->get('font');
-			$text = $this->Settings->get('text');
-			$font_size = $this->Settings->get('font_size');
+		{ // Use global settings
+			$font = $this->Settings->get( 'font' );
+			$text = $this->Settings->get( 'text' );
+			$font_size = $this->Settings->get( 'font_size' );
+			$min_dimension = $this->Settings->get( 'min_dimension' );
 		}
-		
-		if( !function_exists('imagettftext') )
-		{	// The function imagettftext() is not available.
+
+		if( ! function_exists( 'imagettftext' ) )
+		{ // The function imagettftext() is not available.
 			return;
 		}
 
@@ -221,8 +237,8 @@ class watermark_plugin extends Plugin
 		$width = imagesx( $params['imh'] ) ;
 		$height = imagesy( $params['imh'] );
 
-		if( $width < 161 || $height < 161 )
-		{	// Skip small thumbnails
+		if( $width < $min_dimension || $height < $min_dimension )
+		{ // Skip small thumbnails
 			return;
 		}
 
@@ -241,7 +257,7 @@ class watermark_plugin extends Plugin
 			return;
 		}
 
-		$text = html_entity_decode( $text );
+		$text = evo_html_entity_decode( $text );
 
 		// Text margins
 		$margin_left = 10;

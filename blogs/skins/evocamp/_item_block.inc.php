@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage evocamp
@@ -50,10 +50,11 @@ $params = array_merge( array(
 	<p class="postinfo">
 	<?php
 		if( ! $Item->is_intro() )
-		{	// Display only if we're not displaying an intro post:
-      $Item->author( array(
-				'before'       => T_('By').' ',
-				'after'        => ' ',
+		{ // Display only if we're not displaying an intro post:
+			$Item->author( array(
+				'before'    => T_('By').' ',
+				'after'     => ' ',
+				'link_text' => 'preferredname',
 			) );
 			$Item->issue_time( array(
 					'before'      => /* TRANS: date */ T_('on '),
@@ -110,10 +111,4 @@ $params = array_merge( array(
 <?php
 locale_restore_previous();	// Restore previous locale (Blog locale)
 
-/*
- * $Log$
- * Revision 1.7  2013/11/06 08:05:43  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>

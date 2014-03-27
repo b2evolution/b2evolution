@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009-2013 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2014 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
@@ -44,6 +44,8 @@ class Country extends DataObject
 	var $curr_ID = '';
 	var $enabled = 1;
 	var $preferred = 0;
+	var $status = '';
+	var $block_count = 0;
 
 	/**
 	 * Constructor
@@ -65,12 +67,14 @@ class Country extends DataObject
 
 		if( $db_row )
 		{
-			$this->ID            = $db_row->ctry_ID;
-			$this->code          = $db_row->ctry_code;
-			$this->name          = $db_row->ctry_name;
-			$this->curr_ID       = $db_row->ctry_curr_ID;
-			$this->enabled       = $db_row->ctry_enabled;
-			$this->preferred     = $db_row->ctry_preferred;
+			$this->ID          = $db_row->ctry_ID;
+			$this->code        = $db_row->ctry_code;
+			$this->name        = $db_row->ctry_name;
+			$this->curr_ID     = $db_row->ctry_curr_ID;
+			$this->enabled     = $db_row->ctry_enabled;
+			$this->preferred   = $db_row->ctry_preferred;
+			$this->status      = $db_row->ctry_status;
+			$this->block_count = $db_row->ctry_block_count;
 		}
 	}
 

@@ -9,11 +9,18 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+
+// Default params:
+$params = array_merge( array(
+		'author_link_text' => 'login', // avatar | only_avatar | login | nickname | firstname | lastname | fullname | preferredname
+		'display_comment_avatar' => true,
+	), $params );
 
 
 $CommentList = new CommentList2( $Blog );
@@ -21,7 +28,7 @@ $CommentList = new CommentList2( $Blog );
 // Filter list:
 $CommentList->set_filters( array(
 		'types' => array( 'comment', 'trackback', 'pingback' ),
-		'statuses' => get_inskin_statuses(),
+		'statuses' => get_inskin_statuses( $Blog->ID, 'comment' ),
 		'order' => 'DESC',
 		'comments' => 50,
 		// fp> I don't think it's necessary to add a restriction here. (use case?)
@@ -48,7 +55,10 @@ while( $Comment = & $CommentList->get_next() )
 		{
 			$Comment->status( 'styled' );
 		}
-		$Comment->avatar();
+		if( $params['display_comment_avatar'] )
+		{
+			$Comment->avatar();
+		}
 		?>
 		<h3 class="bTitle">
 			<?php echo T_('In response to:') ?>
@@ -59,11 +69,12 @@ while( $Comment = & $CommentList->get_next() )
 		<div class="bCommentTitle">
 			<?php $Comment->author(
 				/* before: */ '',
-				/* after:  */ '#',
+				/* after: */ '#',
 				/* before_user: */ '',
-				/* after_user:  */ '#',
+				/* after_user: */ '#',
 				/* format: */ 'htmlbody',
-				/* makelink: */ true ) ?>
+				/* makelink: */ true,
+				/* linkt_text*/ $params['author_link_text'] ) ?>
 			<?php /* $Comment->author_url( '', ' &middot; ', '' ) */ ?>
 		</div>
 		<div class="bCommentText">
@@ -88,11 +99,4 @@ while( $Comment = & $CommentList->get_next() )
 }	// End of comment loop.
 echo '</div>';
 
-
-/*
- * $Log$
- * Revision 1.19  2013/11/06 08:05:36  efy-asimo
- * Update to version 5.0.1-alpha-5
- *
- */
 ?>
