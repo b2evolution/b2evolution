@@ -1,0 +1,34 @@
+/**
+ * CSS for overlay windows with file browser
+ * Used to add new file to the posts/comments to import manager
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2014 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package admin
+ */
+
+html, body {
+	height: 100%;
+}
+#upload_wrapper, #import_wrapper {
+	min-height: 100%;
+	background: #F1F6F8;
+	border: 1px solid #CCC;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+}
+div.pblock, div.pan_left, div.pan_right, div.pan_top, div.pan_tl, div.pan {
+	margin: 0;
+	padding: 0;
+	background: none;
+}
+div.pan_bot {
+	display: none;
+}
+div.panelblock {
+	border: none;
+	background: none;
+}

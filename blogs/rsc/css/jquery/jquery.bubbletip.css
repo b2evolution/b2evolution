@@ -1,0 +1,64 @@
+/* jQuery bubbletip */
+.bubbletip {
+	position: absolute;
+	z-index: 50;
+	border-collapse: collapse;
+	font-size: 9pt;
+	color: #000;
+}
+.bubbletip .bt-content, .bubbletip .bt-content:after {
+	background-color: #fff;
+	border: 1px solid #84b3ec;
+}
+.bubbletip .bt-content {
+	position: relative;
+	padding: 12px;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-khtml-border-radius: 5px;
+	box-shadow: 0 0 8px rgba(0,0,0,0.5);
+	-webkit-box-shadow: 0 0 8px rgba(0,0,0,0.5);
+}
+.bubbletip .bt-content:after {
+	content: "";
+	position: absolute;
+	margin: auto;
+	width: 10px;
+	height: 10px;
+	transform: rotate(45deg);
+	-ms-transform: rotate(45deg);
+	-webkit-transform: rotate(45deg);
+}
+.bubbletip.bt-up { padding-bottom: 12px; }
+.bubbletip.bt-up .bt-content:after {
+	left: 0;
+	right: 0;
+	bottom: -6px;
+	border-left: none;
+	border-top: none;
+}
+.bubbletip.bt-down { padding-top: 12px; }
+.bubbletip.bt-down .bt-content:after {
+	left: 0;
+	right: 0;
+	top: -6px;
+	border-right: none;
+	border-bottom: none;
+}
+.bubbletip.bt-left { padding-right: 12px; }
+.bubbletip.bt-left .bt-content:after {
+	top: 0;
+	bottom: 0;
+	right: -6px;
+	border-left: none;
+	border-bottom: none;
+}
+.bubbletip.bt-right { padding-left: 12px; }
+.bubbletip.bt-right .bt-content:after {
+	top: 0;
+	bottom: 0;
+	left: -6px;
+	border-right: none;
+	border-top: none;
+}
