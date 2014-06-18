@@ -3,9 +3,20 @@
 ## Complex websites made easy.
 
 One blog. Multiple blogs. Photo albums. User community. Discussion forums. Online manuals.
+
 b2evolution can run them all on a single installation. Right out of the box — plugins fully optional.
 
 More info: http://b2evolution.net
+
+## Status of this Repository on GitHub
+
+The master branch is the current state of the (previously called) “i6” branch from which the 5.1 releases have been drawn. 
+
+This branch currently contains updates ahead of the 5.1.1-beta release and we plan to maintain this GitHub repo ahead of public releases.
+
+We are planing to transition the development branches to GitHub also but haven't decided on a branching model and workflow yet.
+
+## Usage info
 
 ### Requirements
 
