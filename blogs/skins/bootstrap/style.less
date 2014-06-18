@@ -1,0 +1,235 @@
+/* Designed by François PLANQUE - http://fplanque.net/ */
+
+// Login Form
+.widget_core_user_login #login_form {
+	.form-group {
+		margin: 0;
+	}
+	label {
+		text-align: left;
+		width: 160px;
+		padding-left: 0;
+	}
+	.controls {
+		padding: 0;
+		width: 100%;
+	}
+	.form_text_input.form-control {
+		width: 100%;
+	}
+}
+
+// Profile tabs on ?disp=profile
+ul.profile_tabs {
+	margin: 0 2ex 2ex;
+	position: relative;
+	top: 1px;
+}
+
+.profile_avatar {
+	float: right;
+	padding: 10px;
+	margin-left: 10px;
+}
+
+// Set border color of form the same as profile tabs
+div.bComment, form.bComment {
+	border-color: #DDD;
+	padding: 1em;
+	.controls textarea.form-control {
+		width: 100%;
+	}
+}
+
+// A search button
+input.search_field {
+	margin-bottom: 0;
+	display: inline-block;
+}
+div.compact_search_form input.search_field {
+	width: 183px;
+}
+div.extended_search_form {
+	text-align: center;
+	input.search_field {
+		margin-right: 3px;
+		width: 500px;
+	}
+}
+
+// A login button
+.widget_core_user_login .submit {
+	font-size: 12px;
+}
+
+// Table for select categories of item
+table.catselect {
+	input#new_category_name {
+		width: 98% !important;
+	}
+}
+
+// Form elements on item edit page
+label.control-label[for=post_title] {
+	width: auto;
+}
+.item_tags {
+	td.label {
+		background: none;
+		color: #000;
+		text-shadow: none;
+		padding: 0;
+		font-size: 100%;
+	}
+	td.input {
+		width: 90%;
+		label {
+			display: none;
+		}
+	}
+	.controls {
+		margin-left: 0;
+	}
+}
+
+// A form to create a new message/thread
+.messages_list form.bComment {
+	background: none;
+}
+textarea.message_text {
+	width: 95%;
+}
+
+// Fix the form elements
+form.bComment {
+	border: none;
+	padding: 0;
+	overflow: hidden;
+	.form-actions {
+		margin-bottom: 0;
+	}
+	legend {
+		padding: 0 10px;
+	}
+	div.form-group, div.custom_content {
+		padding: 0 20px;
+	}
+	fieldset {
+		margin-top: 0;
+	}
+}
+#comment_rating {
+	margin-top: 7px;
+}
+#comment_date_field {
+	input {
+		width: 80px;
+	}
+	label {
+		font-weight: normal;
+	}
+}
+
+.bPost, .featurepost {
+	margin-bottom: 2em;
+	.bTitle {
+		margin: 0;
+	}
+	.bSmallHead {
+		margin-bottom: 10px;
+	}
+}
+
+div.bSideItem {
+	background: #F7F5FA;
+	border-radius: 5px;
+	padding: 10px;
+	margin-bottom: 10px;
+	text-shadow: 0 1px 0 #FFFFFF;
+	h4 {
+		margin-top: 0;
+	}
+}
+
+// Login form:
+.wrap-form-login, .wrap-form-lostpass {
+	width: 400px;
+	margin: 1.5em auto auto;
+	.panel {
+		margin: 5px 0;
+	}
+	.panel-body {
+		padding: 20px 30px 0;
+	}
+}
+.wrap-form-lostpass {
+	width: 480px;
+	.panel-body {
+		.panel {
+			border: none;
+			box-shadow: none;
+		}
+		.panel-body {
+			padding: 0;
+		}
+	}
+	.fieldset {
+		margin: 0;
+	}
+	.control-buttons{
+		padding: 0;
+		width: 100%;
+		text-align: center;
+	}
+}
+.form-login-links {
+	padding: 0 5px;
+	font-size: 92%;
+}
+.form-login {
+	fieldset {
+		margin-bottom: 20px;
+	}
+	.controls {
+		padding: 0;
+		margin: 0;
+		width: 100%;
+	}
+	.control-buttons {
+		margin-left: 0;
+	}
+	input.form-control[type=text], input.form-control[type=password] {
+		width: 100%;
+	}
+	.btn {
+		margin-top: 5px;
+	}
+	.form-actions {
+		padding: 0;
+		margin: 0 0 20px;
+		background: none;
+		border: none;
+	}
+	.form-group {
+		margin-left: 0;
+		margin-right: 0;
+	}
+}
+.standard_login_link {
+	text-align: center;
+	margin: 3em 0 1ex 0;
+}
+.form_footer_notes {
+	margin-top: 0;
+}
+
+// Status banners
+#styled_content_block span.note[class*="status_"] {
+	top: -14px;
+	left: 14px
+}
+
+// Pagination
+.pagination {
+	margin: 0;
+}

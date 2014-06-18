@@ -1,0 +1,12 @@
+{
+  "name": "b2evolution",
+  "version": "6.0.0",
+  "description": "NodeJS Package for b2evolution",
+  "license": "GPL v2",
+  "devDependencies": {
+    "grunt": "^0.4.4",
+    "grunt-contrib-uglify": "^0.4.0",
+    "grunt-contrib-less": "^0.10.0",
+    "grunt-contrib-watch": "^0.6.0"
+  }
+}
