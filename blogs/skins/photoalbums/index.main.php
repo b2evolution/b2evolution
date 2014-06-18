@@ -182,7 +182,7 @@ if( $disp == 'single' )
 	?>
 
 	<?php
-	if( $disp != 'front' && $disp != 'posts' )
+	if( $disp != 'front' && $disp != 'download' && $disp != 'posts' )
 	{
 		// ------------------------------------ START OF POSTS ----------------------------------------
 		// Display message if no post:

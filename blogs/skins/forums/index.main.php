@@ -38,29 +38,27 @@ if( isset( $_COOKIE[ $cookie_skin_width_name ] ) )
 	}
 }
 
-if( $disp == 'posts' && ! isset( $tag ) )
-{
-	// Compile cat array to set the correct category params, and change to category display only if required
-	param_compile_cat_array();
-
-	// Display a list of forums instead of posts
-	if( ! isset( $cat ) )
-	{ // First page, Category is not selected, We should use special disp for forums
-		$disp = 'catdir';
-	}
-	elseif( $cat > 0 )
-	{ // A specific category was requested
-		$chapters = $Skin->get_chapters( $cat );
-		if( count( $chapters ) > 0 )
-		{ // Current chapter has children
-			$disp = 'catdir';
-		}
-	}
-}
-
 // This is the main template; it may be used to display very different things.
 // Do inits depending on current $disp:
 skin_init( $disp );
+
+global $cat;
+$posts_text = T_('Forum');
+if( $disp == 'posts' )
+{
+	if( !empty( $cat ) && ( $cat > 0 ) )
+	{ // Set category name when some forum is opened
+		$ChapterCache = & get_ChapterCache();
+		if( $Chapter = $ChapterCache->get_by_ID( $cat ) )
+		{
+			$posts_text .= ': '.$Chapter->get( 'name' );
+		}
+	}
+	else
+	{ // Set title for ?disp=posts
+		$posts_text = T_('Latest topics');
+	}
+}
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php', array(
@@ -69,6 +67,8 @@ skin_include( '_html_header.inc.php', array(
 	'catdir_text'       => T_('Forum'),
 	'category_text'     => T_('Forum').': ',
 	'comments_text'     => T_('Latest Replies'),
+	'front_text'        => T_('Forum'),
+	'posts_text'        => $posts_text,
 	'useritems_text'    => T_('User\'s topics'),
 	'usercomments_text' => T_('User\'s replies'),
 ) );
@@ -146,7 +146,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 
 <?php
-if( $disp == 'catdir' )
+if( $disp == 'front' || $disp == 'posts' )
 {
 	// ------------------------- "Menu Top" CONTAINER EMBEDDED HERE --------------------------
 	// Display container and contents:
@@ -178,7 +178,7 @@ if( $disp == 'catdir' )
 
 	<?php
 		if( $disp == 'edit' )
-		{ // Add or Edit a post
+		{	// Add or Edit a post
 			$p = param( 'p', 'integer', 0 ); // Edit post from Front-office
 		}
 		// ------------------------ TITLE FOR THE CURRENT REQUEST ------------------------
@@ -194,6 +194,7 @@ if( $disp == 'catdir' )
 				'categories_text'   => '',
 				'catdir_text'       => '',
 				'comments_text'     => T_('Latest Replies'),
+				'front_text'        => '',
 				'posts_text'        => '',
 				'useritems_text'    => T_('User\'s topics'),
 				'usercomments_text' => T_('User\'s replies'),
@@ -211,8 +212,8 @@ if( $disp == 'catdir' )
 			'skin_form_params'      => array(
 					'formstart'      => '<table class="bForums" width="100%" cellspacing="1" cellpadding="2" border="0">',
 					'formend'        => '</table>',
-					'fieldset_begin' => '<tr><th colspan="3" $fieldset_attribs$>$fieldset_title$',
-					'fieldset_end'   => '</th></tr>',
+					'fieldset_begin' => '<tr><th colspan="3" $fieldset_attribs$>$fieldset_title$</th></tr>',
+					'fieldset_end'   => '',
 					'fieldstart'     => '<tr $ID$>',
 					'fieldend'       => '</tr>',
 					'labelstart'     => '<td class="row1 left">',

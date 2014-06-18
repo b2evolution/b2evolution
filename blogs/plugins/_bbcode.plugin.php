@@ -44,7 +44,7 @@ class bbcode_plugin extends Plugin
 	{
 		$this->short_desc = T_('BB formatting e-g [b]bold[/b]');
 		$this->long_desc = T_('Supported tags and the BB code toolbar are configurable.
-		Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [quote] [list=1] [list=a] [list] [*] [bg=] [clear]');
+Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [quote] [list=1] [list=a] [list] [*] [bg=] [clear]');
 	}
 
 

@@ -90,9 +90,11 @@ class coll_tagline_Widget extends ComponentWidget
 
 		// Collection tagline:
 		echo $this->disp_params['block_start'];
+		echo $this->disp_params['block_body_start'];
 		// TODO: there appears to be no possibility to wrap the tagline in e.g. "<h2>%s</h2>"
 		//       Should there be a widget param for this?  fp> probably yes
 		$Blog->disp( 'tagline', 'htmlbody' );
+		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
 
 		return true;

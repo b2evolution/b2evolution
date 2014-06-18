@@ -244,7 +244,9 @@ class user_avatars_Widget extends ComponentWidget
 
 		// Display title if requested
 		$this->disp_title();
-		
+
+		echo $this->disp_params['block_body_start'];
+
 		if( $layout == 'grid' )
 		{
 			echo $this->disp_params[ 'grid_start' ];
@@ -269,6 +271,8 @@ class user_avatars_Widget extends ComponentWidget
 		{
 			echo $this->disp_params[ 'list_end' ];
 		}
+
+		echo $this->disp_params['block_body_end'];
 
 		echo $this->disp_params[ 'block_end' ];
 

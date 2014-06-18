@@ -35,6 +35,7 @@ $core_componentwidget_defs = array(
 			'linkblog',	        	// Simple List
 			'coll_media_index',
 			'coll_comment_list',
+			'coll_featured_intro',
 		'*'.T_('Blog navigation'),
 			'coll_tag_cloud',
 			'coll_category_list',

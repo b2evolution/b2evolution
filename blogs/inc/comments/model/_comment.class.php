@@ -914,11 +914,14 @@ class Comment extends DataObject
 			}
 
 			$author_name_params = array();
-			if( $params['link_text'] == 'avatar' )
+			if( strpos( $params['link_text'], 'avatar' ) !== false )
 			{ // Get avatar for anonymous user
 				$author_name_params['before'] = $this->get_avatar( $params['thumb_size'], $params['thumb_class'] );
 			}
-			$author_name = $this->get_author_name_anonymous( $params['format'], $author_name_params );
+			// Don't display avatar login name on mode 'only_avatar'
+			$author_name = $params['link_text'] == 'only_avatar' ?
+				$author_name_params['before'] :
+				$this->get_author_name_anonymous( $params['format'], $author_name_params );
 
 			switch( $params['link_to'] )
 			{
@@ -926,7 +929,7 @@ class Comment extends DataObject
 				case 'userurl>userpage':
 				case 'userpage>userurl':
 					// Make a link:
-					$r = $this->get_author_url_link( $author_name, $params['before'], $params['after'], true );
+					$r = $this->get_author_url_link( $author_name, $params['before'], $params['after'], true, $params['link_class'] );
 					break;
 
 				default:
@@ -953,17 +956,24 @@ class Comment extends DataObject
 	 *
 	 * @param string String to display before IP, if IP exists
 	 * @param string String to display after IP, if IP exists
-	 * @param boolean TRUE - create an url to filter by IP
+	 * @param boolean|string Type of url
+	 *                TRUE|'filter' - create an url to filter by IP
+	 *                'antispam' - to antispam page with filtered by the IP
+	 *                FALSE - display IP as plain text without link
 	 */
-	function author_ip( $before='', $after='', $filter_by_IP = false )
+	function author_ip( $before = '', $after = '', $IP_link_to = false )
 	{
 		if( !empty( $this->author_IP ) )
 		{
 			global $Plugins, $CommentList;
 
 			$author_IP = $this->author_IP;
-			if( $filter_by_IP )
-			{	// Add link to filter by IP
+			if( $IP_link_to === 'antispam' )
+			{ // Add link to antispam page
+				$author_IP = implode( ', ', get_linked_ip_list( array( $author_IP ) ) );
+			}
+			elseif( $IP_link_to === 'filter' || $IP_link_to )
+			{ // Add link to filter by IP
 				$filter_IP_url = regenerate_url( 'filter,ctrl,comments,cmnt_fullview_comments', 'cmnt_fullview_author_IP='.$author_IP.'&amp;ctrl=comments' );
 				$author_IP = '<a href="'.$filter_IP_url.'">'.$author_IP.'</a>';
 			}
@@ -1053,9 +1063,10 @@ class Comment extends DataObject
 	 * @param string String to display before link, if link exists
 	 * @param string String to display after link, if link exists
 	 * @param boolean false if you want NO html link
+	 * @param string Link class
 	 * @return boolean true if URL has been displayed
 	 */
-	function get_author_url_link( $linktext='', $before='', $after='', $makelink = true )
+	function get_author_url_link( $linktext = '', $before = '', $after = '', $makelink = true, $link_class = '' )
 	{
 		global $Plugins;
 
@@ -1074,6 +1085,10 @@ class Comment extends DataObject
 			if( $this->nofollow )
 			{
 				$r .= 'rel="nofollow" ';
+			}
+			if( ! empty( $link_class ) )
+			{
+				$r .= 'class="'.$link_class.'" ';
 			}
 			$r .= 'href="'.$url.'">';
 		}
@@ -1524,19 +1539,19 @@ class Comment extends DataObject
 				$title = $is_voted ? $params['title_spam_voted'] : $params['title_spam'];
 				$icon_params['title'] = $title;
 				$text = get_icon( 'vote_spam'.( $class != '' ? '_'.$class : '' ), 'imgtag', $icon_params );
-				$class .= ' roundbutton';
+				$class .= ' '.button_class();
 			break;
 			case "notsure":
 				$title = $is_voted ? $params['title_notsure_voted'] : $params['title_notsure'];
 				$icon_params['title'] = $title;
 				$text = get_icon( 'vote_notsure'.( $class != '' ? '_'.$class : '' ), 'imgtag', $icon_params );
-				$class .= ' roundbutton';
+				$class .= ' '.button_class();
 			break;
 			case "ok":
 				$title = $is_voted ? $params['title_ok_voted'] : $params['title_ok'];
 				$icon_params['title'] = $title;
 				$text = get_icon( 'vote_ok'.( $class != '' ? '_'.$class : '' ), 'imgtag', $icon_params );
-				$class .= ' roundbutton';
+				$class .= ' '.button_class();
 			break;
 			case "yes":
 				$title = $is_voted ? $params['title_yes_voted'] : $params['title_yes'];
@@ -1554,6 +1569,12 @@ class Comment extends DataObject
 			 $class .= ' rollover_sprite';
 		}
 		$class .= ' action_icon';
+		// change classes for bootstrap styles
+		if( $is_voted )
+		{
+			$class .= ' active';
+		}
+		$class = str_replace( 'disabled', '', $class );
 
 		$r = '';
 		if( !$is_voted )
@@ -1664,7 +1685,7 @@ class Comment extends DataObject
 		{ // Display form to vote
 			echo T_('Spam Vote:').' ';
 
-			echo '<span class="roundbutton_group">';
+			echo '<span class="'.button_class( 'group' ).'">';
 			foreach( $vote_result['icons_statuses'] as $vote_type => $vote_class )
 			{ // Print out 3 buttons for spam voting
 				echo $this->get_vote_link( 'spam', $vote_type, $vote_class, $glue, $save_context, $ajax_button, $params );
@@ -2571,16 +2592,16 @@ class Comment extends DataObject
 			$File = $attachment;
 
 			if( empty( $File ) )
-			{ // File doesn't exist in DB
-				unset( $attachments[ $index ] );
+			{ // File object doesn't exist in DB
+				global $Debuglog;
+				$Debuglog->add( sprintf( 'File object linked to comment #%d does not exist in DB!', $this->ID ), array( 'error', 'files' ) );
 				continue;
 			}
 
 			if( ! $File->exists() )
-			{ // File doesn't exist
+			{ // File doesn't exist on the disk
 				global $Debuglog;
 				$Debuglog->add( sprintf( 'File linked to comment #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
-				unset( $attachments[ $index ] );
 				continue;
 			}
 
@@ -2665,20 +2686,37 @@ class Comment extends DataObject
 			{
 				// $attachment is a File in preview mode, but it is a Link in normal mode
 				$doc_File = empty( $this->ID ) ? $attachment : $attachment->get_File();
-				if( $params['attachments_mode'] == 'view' )
-				{	// Only preview attachments
+				echo '<li>';
+				if( empty( $doc_File ) ) 
+				{ // Broken File object
+					$attachment_download_link = '';
+					$attachment_name = empty( $attachment ) ? '' : T_( 'Link ID' ).'#'.$attachment->ID;
+				}
+				elseif( ! $doc_File->exists() )
+				{
+					$attachment_download_link = '';
+					$attachment_name = $doc_File->get_name();
+				}
+				elseif( $params['attachments_mode'] == 'view' )
+				{ // Only preview attachments
 					$attachment_download_link = '';
 					$attachment_name = $doc_File->get_type();
 				}
 				else// if( $params['attachments_mode'] == 'read' )
-				{	// Read attachments
+				{ // Read attachments
 					$attachment_download_link = action_icon( T_('Download file'), 'download', $doc_File->get_url(), '', 5 ).' ';
 					$attachment_name = $doc_File->get_view_link( $doc_File->get_name() );
 				}
-				echo '<li>';
 				echo $attachment_download_link;
 				echo $attachment_name;
-				echo ' ('.bytesreadable( $doc_File->get_size() ).')';
+				if( ! empty( $doc_File ) && $doc_File->exists() )
+				{ // Display file size if it exists
+					echo ' ('.bytesreadable( $doc_File->get_size() ).')';
+				}
+				else
+				{ // Display warning if File is broken
+					echo ' - <span class="red nowrap">'.get_icon( 'warning_yellow' ).' '.T_('Missing attachment!').'</span>';
+				}
 				if( !empty( $params['attachments_view_text'] ) )
 				{
 					echo $params['attachments_view_text'];
@@ -3330,13 +3368,14 @@ class Comment extends DataObject
 			$subject = sprintf( $subject, $notify_full ? $edited_Blog->get('shortname') : $author_name, $edited_Item->get('title') );
 
 			$email_template_params = array(
-					'notify_full' => $notify_full,
-					'Comment'     => $this,
-					'Blog'        => $edited_Blog,
-					'Item'        => $edited_Item,
-					'author_name' => $author_name,
-					'author_ID'   => $author_user_ID,
-					'notify_type' => $notify_type,
+					'notify_full'    => $notify_full,
+					'Comment'        => $this,
+					'Blog'           => $edited_Blog,
+					'Item'           => $edited_Item,
+					'author_name'    => $author_name,
+					'author_ID'      => $author_user_ID,
+					'notify_type'    => $notify_type,
+					'recipient_User' => $notify_User,
 				);
 
 			if( $debug )

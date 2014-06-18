@@ -160,15 +160,22 @@ class CommentList2 extends DataObjectList2
 	 *
 	 * This will also set back the GLOBALS !!! needed for regenerate_url().
 	 *
-	 * @param array
-	 * @param boolean
+	 * @param array Filters
+	 * @param boolean TRUE to memorize the filter params
+	 * @param boolean TRUE to use filters from previous request (from array $this->filters if it was defined before)
 	 */
-	function set_filters( $filters, $memorize = true )
+	function set_filters( $filters, $memorize = true, $use_previous_filters = false )
 	{
 		if( !empty( $filters ) )
 		{ // Activate the filterset (fallback to default filter when a value is not set):
-			// If $this->filters were activated before(e.g. on load from request) it should be saved here
-			$this->filters = array_merge( $this->default_filters, $this->filters, $filters );
+			if( $use_previous_filters )
+			{ // If $this->filters were activated before(e.g. on load from request), they can be saved here
+				$this->filters = array_merge( $this->default_filters, $this->filters, $filters );
+			}
+			else
+			{ // Don't use the filters from previous request
+				$this->filters = array_merge( $this->default_filters, $filters );
+			}
 		}
 
 		// Activate preset filters if necessary:
@@ -366,13 +373,23 @@ class CommentList2 extends DataObjectList2
 
 
 	/**
-	 *
+	 * Initialize sql query
 	 *
 	 * @todo count?
+	 *
+	 * @param boolean
 	 */
-	function query_init()
+	function query_init( $force_init = false )
 	{
 		global $DB;
+
+		if( ! $force_init && ! empty( $this->query_is_initialized ) )
+		{ // Don't initialize query because it was already done
+			return;
+		}
+
+		// Save to know the query init was done
+		$this->query_is_initialized = true;
 
 		if( empty( $this->filters ) )
 		{	// Filters have not been set before, we'll use the default filterset:

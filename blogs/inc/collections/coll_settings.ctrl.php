@@ -135,6 +135,7 @@ switch( $action )
 				}
 				break;
 
+			case 'home':
 			case 'features':
 			case 'comments':
 			case 'other':
@@ -367,6 +368,14 @@ switch( $AdminUI->get_path(1) )
 		{
 			$AdminUI->breadcrumbpath_add( T_('Collection type'), '?ctrl=coll_settings&amp;blog=$blog$&amp;action=type&amp;tab='.$tab );
 		}
+		// Init JS to autcomplete the user logins
+		init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+		break;
+
+	case 'home':
+		$AdminUI->set_path( 'blogs', 'features', $tab );
+		$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( T_('Front page'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 		break;
 
 	case 'features':
@@ -459,6 +468,9 @@ switch( $AdminUI->get_path(1) )
 	case 'features':
 		switch( $AdminUI->get_path(2) )
 		{
+			case 'features';
+				$AdminUI->disp_view( 'collections/views/_coll_features.form.php' );
+				break;
 			case 'comments';
 				$AdminUI->disp_view( 'collections/views/_coll_comments.form.php' );
 				break;
@@ -466,7 +478,7 @@ switch( $AdminUI->get_path(1) )
 				$AdminUI->disp_view( 'collections/views/_coll_other.form.php' );
 				break;
 			default:
-				$AdminUI->disp_view( 'collections/views/_coll_features.form.php' );
+				$AdminUI->disp_view( 'collections/views/_coll_home.form.php' );
 				break;
 		}
 		break;

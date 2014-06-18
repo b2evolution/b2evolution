@@ -126,7 +126,6 @@ class AdminUI_general extends Menu
 	 */
 	var $coll_list_onclick = NULL;
 
-
 	/**
 	 * Bread crumb path
 	 *
@@ -496,12 +495,20 @@ class AdminUI_general extends Menu
 	function disp_html_head()
 	{
 		if( is_ajax_content() )
-		{	// Don't display this content on AJAX request
+		{ // Don't display this content on AJAX request
 			return;
 		}
 
 		global $adminskins_path;
-		require $adminskins_path.'_html_header.inc.php';
+
+		if( isset( $this->skin_name ) && file_exists( $adminskins_path.$this->skin_name.'/_html_header.inc.php' ) )
+		{ // Get header of the skin
+			require $adminskins_path.$this->skin_name.'/_html_header.inc.php';
+		}
+		else
+		{ // Get general header
+			require $adminskins_path.'_html_header.inc.php';
+		}
 	}
 
 
@@ -579,7 +586,14 @@ class AdminUI_general extends Menu
 
 		global $adminskins_path, $mode;
 
-		require $adminskins_path.'_html_footer.inc.php';
+		if( isset( $this->skin_name ) && file_exists( $adminskins_path.$this->skin_name.'/_html_footer.inc.php' ) )
+		{ // Get footer of the skin
+			require $adminskins_path.$this->skin_name.'/_html_footer.inc.php';
+		}
+		else
+		{ // Get general footer
+			require $adminskins_path.'_html_footer.inc.php';
+		}
 	}
 
 
@@ -591,12 +605,17 @@ class AdminUI_general extends Menu
 	 *
 	 * @see disp_payload_end()
 	 */
-	function disp_payload_begin()
+	function disp_payload_begin( $params = array() )
 	{
 		if( is_ajax_content() )
 		{	// Don't display this content on AJAX request
 			return;
 		}
+
+		$params = array_merge( array(
+				'display_menu2' => true,
+				'display_menu3' => true,
+			), $params );
 
 		global $Plugins;
 
@@ -608,14 +627,14 @@ class AdminUI_general extends Menu
 
 			//echo ' disp_submenu-BEGIN ';
 			$path0 = $this->get_path(0);
-			$r = $this->get_html_menu( $path0, 'sub' );
+			$r = $this->get_html_menu( $path0, 'sub', 0, ! $params['display_menu2'] );
 
 			echo $this->replace_vars( $r );
 			//echo ' disp_submenu-END ';
 
 			// Show 3rd level menu for settings tab
 			$path1 = $this->get_path(1);
-			echo $this->get_html_menu( array($path0, $path1), 'menu3' );
+			echo $this->get_html_menu( array($path0, $path1), 'menu3', 0, ! $params['display_menu3'] );
 
 
 			$this->displayed_sub_begin = 1;
@@ -858,6 +877,8 @@ class AdminUI_general extends Menu
 					'afterEachSelWithSub' => '</li>',
 					'_props' => array(
 						/**
+						 * 'recurse'       => 'yes', // To display the submenus recursively
+						 * 'recurse_level' => 2,     // Limit recursion
 						 * @todo Move to new skin (recurse for subentries if an entry is selected)
 						'recurseSelected' => true,
 						*/
@@ -1111,6 +1132,7 @@ class AdminUI_general extends Menu
 					'buttonsend' => "\n",
 					'customstart' => '',
 					'customend' => "\n",
+					'note_format' => ' <span class="notes">%s</span>',
 					'formend' => '',
 				);
 
@@ -1138,6 +1160,7 @@ class AdminUI_general extends Menu
 					'buttonsend' => "</div></fieldset>\n\n",
 					'customstart' => '<div class="custom_content">',
 					'customend' => "</div>\n",
+					'note_format' => ' <span class="notes">%s</span>',
 					'formend' => '',
 				);
 
@@ -1159,6 +1182,41 @@ class AdminUI_general extends Menu
 					'block_start' => '<div class="browse_side_item"><h3><span style="float:right">$global_icons$</span>$title$</h3>',
 					'block_end' => '</div>',
 				);
+
+			case 'user_navigation':
+				// The Prev/Next links of users, @see user_prevnext_links()
+				return array();
+
+			case 'button_classes':
+				// Button classes, @see button_class()
+				return array();
+
+			case 'table_browse':
+				// A browse table for items and comments
+				return array(
+					'table_start'     => '<table class="browse" cellspacing="0" cellpadding="0" border="0"><tr>',
+					'full_col_start'  => '<td class="browse_left_col">',
+					'left_col_start'  => '<td class="browse_left_col">',
+					'left_col_end'    => '</td>',
+					'right_col_start' => '<td class="browse_right_col">',
+					'right_col_end'   => '</td>',
+					'table_end'       => '</tr></table>',
+				);
+
+			case 'tooltip_plugin':
+				// Plugin name for tooltips: 'bubbletip' or 'popover'
+				return 'bubbletip';
+				break;
+
+			case 'autocomplete_plugin':
+				// Plugin name to autocomplete the fields: 'hintbox', 'typeahead'
+				return 'hintbox';
+				break;
+
+			case 'modal_window_js':
+				// JavaScript to init Modals, @see echo_user_ajaxwindow_js()
+				return false;
+				break;
 
 			default:
 				debug_die( 'Unknown $name for AdminUI::get_template(): '.var_export($name, true) );
@@ -1446,12 +1504,11 @@ class AdminUI_general extends Menu
 
 		$r = '';
 
-		if( $Hit->is_winIE() )
-		{
-		 $r .= '<!--[if lt IE 7]>
-<div style="text-align:center; color:#f00; font-weight:bold; margin:1ex;">'.
-			T_('WARNING: Internet Explorer 6 may not able to display this admin skin properly. We strongly recommend you upgrade to IE 7 or Firefox.').'</div>
-<![endif]-->';
+		if( $Hit->is_winIE() && $Hit->is_IE( 9, '<=' ) )  // We can do this test because BackOffice is never page-cached
+		{ // Warning for IE 9 and less
+			$r .= '<div style="text-align:center; color:#f00; font-weight:bold;">'
+				.T_('WARNING: Old versions of Internet Explorer may not able to display this admin skin properly. We strongly recommend you upgrade to IE 11, Firefox or Chrome.')
+				.'</div>';
 		}
 
 		$r .= '<div class="footer">'.$app_footer_text.' &ndash; '.$copyright_text."</div>\n\n";
@@ -1497,7 +1554,7 @@ class AdminUI_general extends Menu
 
 	/**
 	 * Get show evobar setting. Default true for every admin skin.
-	 * @return boolean 
+	 * @return boolean
 	 */
 	function get_show_evobar()
 	{

@@ -64,10 +64,10 @@ $Form->begin_fieldset();
 
 	$Form->text_input( $dummy_fields[ 'login' ], $login, 22, T_('Login'), '', array( 'placeholder' => T_('Choose an username'), 'maxlength' => 20, 'class' => 'input_text', 'required' => true, 'input_required' => 'required', 'input_suffix' => ' <span id="login_status"></span>', 'style' => 'width:250px' ) );
 
-	$Form->password_input( $dummy_fields[ 'pass1' ], '', 18, T_('Password'), array( 'placeholder' => T_('Choose a password'), 'maxlength' => 70, 'class' => 'input_text', 'required' => true, 'input_required' => 'required', 'style' => 'width:250px' ) );
-	$Form->password_input( $dummy_fields[ 'pass2' ], '', 18, '', array( 'placeholder' => T_('Retype your password'), 'note' => '<span id="pass2_status" class="red"></span>', 'maxlength' => 70, 'class' => 'input_text', 'required' => true, 'input_required' => 'required', 'style' => 'width:250px' ) );
+	$Form->password_input( $dummy_fields[ 'pass1' ], '', 18, T_('Password'), array( 'placeholder' => T_('Choose a password'), 'maxlength' => 70, 'class' => 'input_text', 'required' => true, 'input_required' => 'required', 'style' => 'width:250px', 'autocomplete' => 'off' ) );
+	$Form->password_input( $dummy_fields[ 'pass2' ], '', 18, '', array( 'placeholder' => T_('Retype your password'), 'note' => '<div id="pass2_status" class="red"></div>', 'maxlength' => 70, 'class' => 'input_text', 'required' => true, 'input_required' => 'required', 'style' => 'width:250px', 'autocomplete' => 'off' ) );
 
-	$Form->text_input( $dummy_fields[ 'email' ], $email, 50, T_('Email'), '<br />'.T_('We respect your privacy. Your email will remain strictly confidential.'), array( 'placeholder' => T_('Email address'), 'maxlength' => 255, 'class' => 'input_text', 'required' => true, 'input_required' => 'required', 'style' => 'width:250px' ) );
+	$Form->text_input( $dummy_fields[ 'email' ], $email, 50, T_('Email'), '<br />'.T_('We respect your privacy. Your email will remain strictly confidential.'), array( 'placeholder' => T_('Email address'), 'maxlength' => 255, 'class' => 'input_text', 'required' => true, 'input_required' => 'required', 'style' => 'width:390px' ) );
 
 	$registration_require_country = (bool)$Settings->get('registration_require_country');
 
@@ -100,7 +100,7 @@ $Form->begin_fieldset();
 
 	$Plugins->trigger_event( 'DisplayRegisterFormFieldset', array( 'Form' => & $Form, 'inskin' => false ) );
 
-	$Form->buttons_input( array( array( 'name' => 'submit', 'value' => T_('Register my account now!'), 'class' => 'btn-primary', 'style' => 'font-size: 120%' ) ) );
+	$Form->buttons_input( array( array( 'name' => 'submit', 'value' => T_('Register my account now!'), 'class' => 'btn-primary btn-lg' ) ) );
 
 $Form->end_fieldset();
 $Form->end_form(); // display hidden fields etc

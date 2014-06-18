@@ -2,7 +2,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Blog, $htsrv_url, $current_User, $Session, $admin_url, $status_list;
+global $Blog, $current_User, $Session, $admin_url, $status_list;
 
 ?>
 <script type="text/javascript">
@@ -15,47 +15,54 @@ function isDefined( variable )
 }
 
 //Fade in background color
-function fadeIn( id, color )
+function fadeIn( selector, color )
 {
-	var bg_color = jQuery('#' + id).css( 'backgroundColor' );
-	jQuery('#' + id).animate({ backgroundColor: color }, 200);
+	if( jQuery( selector ).length == 0 )
+	{
+		return;
+	}
+	if( jQuery( selector ).get(0).tagName == 'TR' )
+	{ // Fix selector, <tr> cannot have a css property background-color
+		selector = selector + ' td';
+	}
+	var bg_color = jQuery( selector ).css( 'backgroundColor' );
+	jQuery( selector ).animate( { backgroundColor: color }, 200 );
 	return bg_color;
 }
 
-function fadeInStatus( id, status )
+function fadeInStatus( selector, status )
 {
-	switch(status)
+	switch( status )
 	{
-		
 		case 'published':
-			return fadeIn( id, '#99EE44' );
+			return fadeIn( selector, '#99EE44' );
 		case 'community':
-			return fadeIn( id, '#2E8BB9' );
+			return fadeIn( selector, '#2E8BB9' );
 		case 'protected':
-			return fadeIn( id, '#FF9C2A' );
+			return fadeIn( selector, '#FF9C2A' );
 		case 'review':
-			return fadeIn( id, '#CC0099' );
+			return fadeIn( selector, '#CC0099' );
 		case 'deprecated':
-			return fadeIn( id, '#656565' );
+			return fadeIn( selector, '#656565' );
 		case 'deleted':
-			return fadeIn( id, '#fcc' );
+			return fadeIn( selector, '#fcc' );
 		case 'spam':
-			return fadeIn( id, '#ffc9c9' );
+			return fadeIn( selector, '#ffc9c9' );
 		case 'notsure':
-			return fadeIn( id, '#bbbbbb' );
+			return fadeIn( selector, '#bbbbbb' );
 		case 'ok':
-			return fadeIn( id, '#bcffb5' );
+			return fadeIn( selector, '#bcffb5' );
 	}
 }
 
 function delete_comment_url( comment_id )
 {
-	var divid = 'commenturl_' + comment_id;
-	fadeIn(divid, '#fcc');
+	var selector = '#commenturl_' + comment_id;
+	fadeIn( selector, '#fcc' );
 
 	jQuery.ajax({
 		type: 'POST',
-		url: '<?php echo $htsrv_url; ?>async.php',
+		url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
 		data: 'blogid=' + <?php echo $Blog->ID ?> + '&commentid=' + comment_id + '&action=delete_comment_url' + '&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
 		success: function(result) { jQuery('#' + divid).remove(); }
 	});
@@ -65,17 +72,23 @@ function show_modifieds()
 {
 	for(var id in modifieds)
 	{
-		fadeInStatus( id, modifieds[id] );
+		fadeInStatus( '#' + id, modifieds[id] );
 	}
 }
 
 // Set comments status
 function setCommentStatus( id, status, redirect_to )
 {
-	var divid = 'c' + id;
-	fadeInStatus( divid, status );
+	var divid = 'comment_' + id;
+	var selector = '[id=' + divid + ']';
+
+	if( typeof( modifieds[divid] ) != 'undefined' )
+	{ // This comment is in process now, Wait the ending of previous action
+		return;
+	}
 	modifieds[divid] = status;
 
+	var color = fadeInStatus( selector, status );
 	var statuses = get_show_statuses();
 	var expiry_status = get_expiry_status();
 	var currentpage = get_current_page();
@@ -84,13 +97,14 @@ function setCommentStatus( id, status, redirect_to )
 
 	jQuery.ajax({
 	type: 'POST',
-	url: '<?php echo $htsrv_url; ?>async.php',
+	url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
 	data:
 		{ 'blogid': <?php echo '\''.$Blog->ID.'\''; ?>,
 			'commentid': id,
 			'status': status,
 			'limit': limit,
 			'action': 'set_comment_status',
+			<?php echo is_admin_page() ? "'is_backoffice': 1,\n" : ''; ?>
 			'moderation': 'commentlist',
 			'statuses': statuses,
 			'expiry_status': expiry_status,
@@ -102,6 +116,7 @@ function setCommentStatus( id, status, redirect_to )
 	success: function(result)
 		{
 			delete modifieds[divid];
+			fadeIn( selector, color );
 			jQuery( '#comments_container' ).html( ajax_debug_clear( result ) );
 			jQuery( '.vote_spam' ).show();
 			show_modifieds();
@@ -114,38 +129,40 @@ jQuery( 'document' ).ready( function() { jQuery( '.vote_spam' ).show(); } );
 // Set comments vote
 function setCommentVote( id, type, vote )
 {
-	var color = fadeInStatus( 'c' + id, vote );
+	var selector = '#comment_' + id;
+	var color = fadeInStatus( selector, vote );
 
 	var highlight_class = '';
 	switch(vote)
 	{
 		case 'spam':
-			highlight_class = 'roundbutton_red';
+			highlight_class = '<?php echo button_class( 'button_red' ); ?>';
 			break;
 		case 'ok':
-			highlight_class = 'roundbutton_green';
+			highlight_class = '<?php echo button_class( 'button_green' ); ?>';
 			break;
 	}
 
 	if( highlight_class != '' )
 	{
-		jQuery( '#vote_'+type+'_'+id ).find( 'a.roundbutton, span.roundbutton' ).addClass( highlight_class );
+		jQuery( '#vote_'+type+'_'+id ).find( '<?php echo button_class( 'button', true ); ?>' ).addClass( highlight_class );
 	}
 
 	jQuery.ajax({
 	type: 'POST',
-	url: '<?php echo $htsrv_url; ?>anon_async.php',
+	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
 	data:
 		{ 'blogid': <?php echo '\''.$Blog->ID.'\''; ?>,
 			'commentid': id,
 			'type': type,
 			'vote': vote,
 			'action': 'set_comment_vote',
-			'crumb_comment': <?php echo '\''.get_crumb('comment').'\''; ?>,
+			<?php echo is_admin_page() ? "'is_backoffice': 1,\n" : ''; ?>
+			'crumb_comment': '<?php echo get_crumb('comment'); ?>',
 		},
 	success: function(result)
 		{
-			fadeIn( 'c' + id, color );
+			fadeIn( selector, color );
 			jQuery('#vote_'+type+'_'+id).after( ajax_debug_clear( result ) );
 			jQuery('#vote_'+type+'_'+id).remove();
 		}
@@ -161,7 +178,7 @@ function deleteComment( commentIds )
 	}
 	for(var id in commentIds)
 	{
-		var divid = 'c' + commentIds[id];
+		var divid = 'comment_' + commentIds[id];
 		if( jQuery('#'+divid) != null )
 		{
 			fadeIn(divid, '#fcc');
@@ -177,7 +194,7 @@ function deleteComment( commentIds )
 
 	jQuery.ajax({
 	type: 'POST',
-	url: '<?php echo $htsrv_url; ?>async.php',
+	url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
 	data: 'action=get_opentrash_link&blog=<?php echo $Blog->ID; ?>&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
 	success: function(result)
 		{
@@ -187,11 +204,12 @@ function deleteComment( commentIds )
 
 	jQuery.ajax({
 	type: 'POST',
-	url: '<?php echo $htsrv_url; ?>async.php',
-	data: 
+	url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+	data:
 		{ 'blogid': '<?php echo $Blog->ID; ?>',
 			'commentIds': commentIds,
 			'action': 'delete_comments',
+			<?php echo is_admin_page() ? "'is_backoffice': 1,\n" : ''; ?>
 			'itemid': item_id,
 			'statuses': statuses,
 			'expiry_status': expiry_status,
@@ -211,46 +229,16 @@ function deleteComment( commentIds )
 	});
 }
 
-//This is called when we get the response from the server:
-function antispamSettings( the_html )
-{
-	// add placeholder for antispam settings form:
-	jQuery( 'body' ).append( '<div id="screen_mask" onclick="closeAntispamSettings()"></div><div id="overlay_page"></div>' );
-	var evobar_height = jQuery( '#evo_toolbar' ).height();
-	jQuery( '#screen_mask' ).css({ top: evobar_height });
-	jQuery( '#screen_mask' ).fadeTo(1,0.5).fadeIn(200);
-	jQuery( '#overlay_page' ).html( the_html ).addClass( 'overlay_page_active' );
-	AttachServerRequest( 'antispam_ban' ); // send form via hidden iframe
-	jQuery( '#close_button' ).bind( 'click', closeAntispamSettings );
-	jQuery( '.SaveButton' ).bind( 'click', refresh_overlay );
-
-	// Close antispam popup if Escape key is pressed:
-	var keycode_esc = 27;
-	jQuery(document).keyup(function(e)
-	{
-		if( e.keyCode == keycode_esc )
-		{
-			closeAntispamSettings();
-		}
-	});
-}
-
-// This is called to close the antispam ban overlay page
-function closeAntispamSettings()
-{
-	jQuery( '#overlay_page' ).hide();
-	jQuery( '.action_messages').remove();
-	jQuery( '#server_messages' ).insertBefore( '.first_payload_block' );
-	jQuery( '#overlay_page' ).remove();
-	jQuery( '#screen_mask' ).remove();
-	return false;
-}
+<?php
+// Initialize JavaScript to build and open window
+echo_modalwindow_js();
+?>
 
 // Ban comment url
 function ban_url( authorurl )
 {
 	<?php global $rsc_url; ?>
-	antispamSettings( '<img src="<?php echo $rsc_url; ?>img/ajax-loader2.gif" alt="<?php echo T_('Loading...'); ?>" title="<?php echo T_('Loading...'); ?>" style="display:block;margin:auto;position:absolute;top:0;bottom:0;left:0;right:0;" />' );
+	openModalWindow( '<img src="<?php echo $rsc_url; ?>img/ajax-loader2.gif" alt="<?php echo T_('Loading...'); ?>" title="<?php echo T_('Loading...'); ?>" style="display:block;margin:auto;position:absolute;top:0;bottom:0;left:0;right:0;" />', '90%', false, '', false );
 	jQuery.ajax({
 		type: 'POST',
 		url: '<?php echo $admin_url; ?>',
@@ -258,26 +246,9 @@ function ban_url( authorurl )
 			  '&' + <?php echo '\''.url_crumb('antispam').'\''; ?>,
 		success: function(result)
 		{
-			antispamSettings( result );
+			openModalWindow( result, '90%', false, '', false );
 		}
 	});
-}
-
-// Refresh overlay page after Check&ban button click
-function refresh_overlay()
-{
-	var parameters = jQuery( '#antispam_add' ).serialize();
-
-	jQuery.ajax({
-		type: 'POST',
-		url: '<?php echo $admin_url; ?>',
-		data: 'action=ban&display_mode=js&mode=iframe&request=checkban&' + parameters,
-		success: function(result)
-		{
-			antispamSettings( result );
-		}
-	});
-	return false;
 }
 
 // Refresh comments on dashboard after ban url -> delete comment
@@ -286,8 +257,7 @@ function refreshAfterBan( deleted_ids )
 	var comment_ids = String(deleted_ids).split(',');
 	for( var i=0;i<comment_ids.length; ++i )
 	{
-		var divid = 'c' + comment_ids[i];
-		fadeIn(divid, '#fcc');
+		fadeIn( '#comment_' + comment_ids[i], '#fcc' );
 	}
 	var item_id = get_itemid();
 	refresh_item_comments( item_id );
@@ -375,7 +345,7 @@ function refresh_item_comments( item_id, currentpage )
 	}
 	jQuery.ajax({
 		type: 'POST',
-		url: '<?php echo $htsrv_url; ?>async.php',
+		url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
 		data: 'blogid=' + <?php echo $Blog->ID; ?> + '&action=refresh_item_comments&itemid=' + item_id + '&statuses=' + statuses + '&currentpage=' + currentpage + '&expiry_status=' + expiry_status,
 		success: function(result)
 		{

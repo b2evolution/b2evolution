@@ -173,7 +173,7 @@ if( count($res_hits) )
 
 	?>
 
-	<table class="grouped" cellspacing="0">
+	<table class="grouped table table-striped table-bordered table-hover table-condensed" cellspacing="0">
 		<tr>
 			<th class="firstcol"><?php echo T_('Date') ?></th>
 			<th style="background-color: #<?php echo $referer_type_color['search'] ?>"><?php echo T_('Refering searches') ?></th>
@@ -302,7 +302,6 @@ if( count($res_hits) )
 
 	</table>
 
-	<!--[if IE]><?php echo get_icon( 'pixel' ); ?><![endif]-->
 	<?php
 }
 

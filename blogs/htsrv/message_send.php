@@ -223,8 +223,15 @@ if( $success_message )
 	// restore the locale to the blog visitor language, before we would display an error message
 	locale_restore_previous();
 
-	if( !$success_message )
-	{ // could not send email
+	if( $success_message )
+	{ // Email has been sent successfully
+		if( ! is_logged_in() )
+		{ // We should save a counter (only for anonymous users)
+			antispam_increase_counter( 'contact_email' );
+		}
+	}
+	else
+	{ // Could not send email
 		if( $demo_mode )
 		{
 			$Messages->add( 'Sorry, could not send email. Sending email in demo mode is disabled.', 'error' );

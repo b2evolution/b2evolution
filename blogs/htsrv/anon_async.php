@@ -331,6 +331,15 @@ switch( $action )
 			break;
 		}
 
+		if( param( 'is_backoffice', 'integer', 0 ) )
+		{ // Set admin skin, used for buttons, @see button_class()
+			global $current_User, $UserSettings, $is_admin_page, $adminskins_path;
+			$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+			$is_admin_page = true;
+			require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+			$AdminUI = new AdminUI();
+		}
+
 		// Check permission for spam voting
 		$current_User->check_perm( 'blog_vote_spam_comments', 'edit', true, param( 'blogid', 'integer' ) );
 
@@ -519,9 +528,13 @@ switch( $action )
 			echo '[1]';
 		}
 
+		// Use the glyph icons if it is defined by skin
+		param( 'use_glyphicons', 'integer', 0 );
+
 		$Form = new Form();
 		$Form->fieldstart = '#fieldstart#';
 		$Form->fieldend = '#fieldend#';
+		$Form->labelclass = '#labelclass#';
 		$Form->labelstart = '#labelstart#';
 		$Form->labelend = '#labelend#';
 		$Form->inputstart = '#inputstart#';
@@ -594,6 +607,10 @@ switch( $action )
 
 	case 'get_userfields_criteria':
 		// Get fieldset for users filter by Specific criteria
+
+		// Use the glyph icons if it is defined by skin
+		param( 'use_glyphicons', 'integer', 0 );
+
 		$Form = new Form();
 		$Form->switch_layout( 'blockspan' );
 
@@ -705,7 +722,11 @@ switch( $action )
 		}
 
 		if( !empty( $field_info ) )
-		{	// Replace mask text (+) with img tag
+		{ // Replace mask text (+) with img tag
+
+			// Use the glyph icons if it is defined by skin
+			param( 'use_glyphicons', 'integer', 0 );
+
 			echo str_replace( '(+)', get_icon( 'add' ), $field_info );
 		}
 

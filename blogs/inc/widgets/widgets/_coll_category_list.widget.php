@@ -177,6 +177,8 @@ class coll_category_list_Widget extends ComponentWidget
 		// Display title if requested
 		$this->disp_title();
 
+		echo $this->disp_params['block_body_start'];
+
 		if ( $this->disp_params['use_form'] )
 		{	// We want a complete form:
 			echo '<form method="get" action="'.$Blog->gen_blogurl().'">';
@@ -315,6 +317,8 @@ class coll_category_list_Widget extends ComponentWidget
 		</div>
 		<?php
 		}
+
+		echo $this->disp_params['block_body_end'];
 
 		echo $this->disp_params['block_end'];
 

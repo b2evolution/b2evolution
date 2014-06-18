@@ -95,16 +95,17 @@ $ctrl_mappings = array_merge( $ctrl_mappings, array(
 /**
  * Get the BlogCache
  *
+ * @param string Name of the order field or NULL to use name field
  * @return BlogCache
  */
-function & get_BlogCache()
+function & get_BlogCache( $order_by = 'blog_order' )
 {
 	global $BlogCache;
 
 	if( ! isset( $BlogCache ) )
 	{	// Cache doesn't exist yet:
 		load_class( 'collections/model/_blogcache.class.php', 'BlogCache' );
-		$BlogCache = new BlogCache(); // COPY (FUNC)
+		$BlogCache = new BlogCache( $order_by ); // COPY (FUNC)
 	}
 
 	return $BlogCache;
@@ -762,6 +763,9 @@ class collections_Module extends Module
 								'text' => T_('Features'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$blog,
 								'entries' => array(
+									'home' => array(
+										'text' => T_('Front page'),
+										'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=home&amp;blog='.$blog ),
 									'features' => array(
 										'text' => T_('Posts'),
 										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$blog ),

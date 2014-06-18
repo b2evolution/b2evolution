@@ -23,6 +23,14 @@ if( is_logged_in() )
 	return;
 }
 
+// Default params:
+$params = array_merge( array(
+		'login_form_inskin' => true,
+		'login_form_before' => '',
+		'login_form_after'  => '',
+		'login_form_class'  => 'bComment',
+	), $params );
+
 $login = evo_strtolower( param( $dummy_fields[ 'login' ], 'string', '' ) );
 $action = param( 'action', 'string', '' );
 $redirect_to = param( 'redirect_to', 'url', '' );
@@ -36,18 +44,24 @@ if( !isset( $redirect_to ) )
 	$redirect_to = regenerate_url( 'disp' );
 }
 
-$params = array(
+$login_form_params = array(
 	'source' => $source,
 	'login_required' => $login_required,
 	'redirect_to' => $redirect_to,
 	'login' => $login,
 	'action' => $action,
 	'transmit_hashed_password' => $transmit_hashed_password,
+	'inskin' => $params['login_form_inskin'],
+	'form_class' => $params['login_form_class'],
 );
 
-display_login_form( $params );
+echo $params['login_form_before'];
 
-echo '<div class="notes" style="margin: 1em"><a href="'.$secure_htsrv_url.'login.php?source='.rawurlencode($source).'&redirect_to='.rawurlencode( $redirect_to ).'">'.T_( 'Use standard login form instead').' &raquo;</a></div>';
+display_login_form( $login_form_params );
+
+echo $params['login_form_after'];
+
+echo '<div class="notes standard_login_link"><a href="'.$secure_htsrv_url.'login.php?source='.rawurlencode($source).'&redirect_to='.rawurlencode( $redirect_to ).'">'.T_( 'Use standard login form instead').' &raquo;</a></div>';
 
 echo '<div class="form_footer_notes">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
 

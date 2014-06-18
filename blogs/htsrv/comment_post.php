@@ -128,6 +128,8 @@ $now = date( 'Y-m-d H:i:s', $localtimenow );
 
 $original_comment = $comment;
 
+$comment_renderers = param( 'renderers', 'array/string', array() );
+
 // Trigger event: a Plugin could add a $category="error" message here..
 // This must get triggered before any internal validation and must pass all relevant params.
 // The OpenID plugin will validate a given OpenID here (via redirect and coming back here).
@@ -145,6 +147,7 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 		'User' => & $User,
 		'redirect_to' => & $redirect_to,
 		'crumb_comment' => & $crumb_comment,
+		'renderers' => $comment_renderers,
 	) );
 
 // Check that this action request is not a CSRF hacked request:
@@ -259,7 +262,6 @@ $Comment->set( 'content', $comment );
 if( param( 'renderers_displayed', 'integer', 0 ) )
 { // use "renderers" value only if it has been displayed (may be empty)
 	global $Plugins;
-	$comment_renderers = param( 'renderers', 'array/string', array() );
 	$renderers = $Plugins->validate_renderer_list( $comment_renderers, array( 'Comment' => & $Comment ) );
 	$Comment->set_renderers( $renderers );
 }

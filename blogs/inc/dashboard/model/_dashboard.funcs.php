@@ -306,6 +306,11 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		$Comment->author_url_with_actions( '', true );
 		$Comment->author_email( '', ' &bull; Email: <span class="bEmail">', '</span> &bull; ' );
 		$Comment->author_ip( 'IP: <span class="bIP">', '</span> ', true );
+		if( ! empty( $Comment->author_IP ) )
+		{ // Display icon of yellow lightning with link to antispam page
+			$antispam_icon = get_icon( 'lightning', 'imgtag', array( 'title' => T_( 'Go to edit this IP address in antispam control panel' ) ) );
+			echo implode( ', ', get_linked_ip_list( array( $Comment->author_IP ), NULL, $antispam_icon ) );
+		}
 		$Comment->ip_country();
 		$Comment->spam_karma( ' &bull; '.T_('Spam Karma').': %s%', ' &bull; '.T_('No Spam Karma') );
 		echo '</div>';
@@ -325,17 +330,17 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 
 		echo '<div class="floatleft">';
 
-		$Comment->edit_link( ' ', ' ', get_icon( 'edit' ), '#', 'roundbutton', '&amp;', true, $redirect_to );
+		$Comment->edit_link( ' ', ' ', get_icon( 'edit' ), '#', button_class(), '&amp;', true, $redirect_to );
 
-		echo '<span class="roundbutton_group">';
+		echo '<span class="'.button_class( 'group' ).'">';
 		// Display publish NOW button if current user has the rights:
-		$Comment->publish_link( '', '', '#', '#', 'roundbutton_text', '&amp;', true, true );
+		$Comment->publish_link( '', '', '#', '#', button_class( 'text' ), '&amp;', true, true );
 
 		// Display deprecate button if current user has the rights:
-		$Comment->deprecate_link( '', '', '#', '#', 'roundbutton_text', '&amp;', true, true );
+		$Comment->deprecate_link( '', '', '#', '#', button_class( 'text' ), '&amp;', true, true );
 
 		// Display delete button if current user has the rights:
-		$Comment->delete_link( '', '', '#', '#', 'roundbutton_text', false, '&amp;', true, true );
+		$Comment->delete_link( '', '', '#', '#', button_class( 'text' ), false, '&amp;', true, true );
 		echo '</span>';
 
 		echo '</div>';
@@ -449,7 +454,7 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 		$Item->edit_link( array( // Link to backoffice for editing
 				'before'    => ' ',
 				'after'     => ' ',
-				'class'     => 'ActionButton btn'
+				'class'     => 'ActionButton btn btn-default'
 			) );
 		$Item->publish_link( '', '', '#', '#', 'PublishButton' );
 		echo get_icon( 'pixel' );

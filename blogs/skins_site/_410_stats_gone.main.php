@@ -10,7 +10,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // return;
 
 header_http_response('410 Gone');
-header('Content-Type: text/html; charset=iso-8859-1'); // no translation
 
 $page_title = '410 Gone';
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------

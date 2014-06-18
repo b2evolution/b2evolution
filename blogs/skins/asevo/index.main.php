@@ -135,6 +135,8 @@ siteskin_include( '_site_body_header.inc.php' );
 			// ----------------------------END ITEM BLOCK  ----------------------------
 		}
 
+	if( $disp != 'front' && $disp != 'download' )
+	{
 		// Display message if no post:
 		display_if_empty();
 
@@ -155,10 +157,11 @@ siteskin_include( '_site_body_header.inc.php' );
 				'block_start' => '<p class="center"><strong>',
 				'block_end' => '</strong></p>',
 				'links_format' => '$prev$ :: $next$',
-   			'prev_text' => '&lt;&lt; '.T_('Previous'),
-   			'next_text' => T_('Next').' &gt;&gt;',
+				'prev_text' => '&lt;&lt; '.T_('Previous'),
+				'next_text' => T_('Next').' &gt;&gt;',
 			) );
 		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
+	}
 	?>
 
 	<?php

@@ -3,7 +3,7 @@
  * These are included in basic.css but also in item_base.css so they are available in WYSIWYG editors
  */
 
-code {
+code, samp {
 	font-family: Menlo, Monaco, "Courier New", Courier, monospace;
 	/* font-size: 107%; */
 }

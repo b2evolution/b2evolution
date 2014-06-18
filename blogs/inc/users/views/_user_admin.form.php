@@ -48,17 +48,7 @@ $this->disp_payload_begin();
 
 // ------------------- PREV/NEXT USER LINKS -------------------
 user_prevnext_links( array(
-		'block_start'  => '<table class="prevnext_user"><tr>',
-		'prev_start'   => '<td width="33%">',
-		'prev_end'     => '</td>',
-		'prev_no_user' => '<td width="33%">&nbsp;</td>',
-		'back_start'   => '<td width="33%" class="back_users_list">',
-		'back_end'     => '</td>',
-		'next_start'   => '<td width="33%" class="right">',
-		'next_end'     => '</td>',
-		'next_no_user' => '<td width="33%">&nbsp;</td>',
-		'block_end'    => '</tr></table>',
-		'user_tab'     => 'admin'
+		'user_tab' => 'admin'
 	) );
 // ------------- END OF PREV/NEXT USER LINKS -------------------
 
@@ -108,7 +98,7 @@ else
 $Form->end_fieldset(); // user permissions
 
 $Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
-	$email_fieldnote = '<a href="mailto:'.$edited_User->get( 'email' ).'" class="roundbutton">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
+	$email_fieldnote = '<a href="mailto:'.$edited_User->get( 'email' ).'" class="'.button_class().'">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
 	$Form->text_input( 'edited_user_email', $edited_User->get( 'email' ), 30, T_('Email'), $email_fieldnote, array( 'maxlength' => 100, 'required' => true ) );
 
 	$email_status = $edited_User->get_email_status();
@@ -217,7 +207,7 @@ $Form->begin_fieldset( T_('Usage info').get_manual_link('user-admin-usage') );
 	$blogs_owned = $edited_User->get_num_blogs();
 	if( $blogs_owned > 0 )
 	{
-		$blogs_owned .= ' - <a href="'.$activity_tab_url.'#owned_blogs_result" class="roundbutton middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
+		$blogs_owned .= ' - <a href="'.$activity_tab_url.'#owned_blogs_result" class="'.button_class().' middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
 	}
 	$Form->info_field( T_('Blogs owned'), $blogs_owned );
 
@@ -225,7 +215,7 @@ $Form->begin_fieldset( T_('Usage info').get_manual_link('user-admin-usage') );
 	$posts_created = $edited_User->get_num_posts();
 	if( $posts_created > 0 )
 	{
-		$posts_created .= ' - <a href="'.$activity_tab_url.'#created_posts_result" class="roundbutton middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
+		$posts_created .= ' - <a href="'.$activity_tab_url.'#created_posts_result" class="'.button_class().' middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
 		$posts_created .= ' - '.action_icon( T_('Delete All').'...', 'delete', $admin_url.'?ctrl=user&amp;user_tab=deldata&amp;user_ID='.$edited_User->ID, ' '.T_('Delete All').'...', 3, 4, array( 'onclick' => 'return user_deldata( '.$edited_User->ID.', \''.get_param( 'user_tab' ).'\')' ) );
 		$posts_created .= get_manual_link( 'delete-user-data' );
 	}
@@ -235,7 +225,7 @@ $Form->begin_fieldset( T_('Usage info').get_manual_link('user-admin-usage') );
 	$posts_edited = $edited_User->get_num_edited_posts();
 	if( $posts_edited > 0 )
 	{
-		$posts_edited .= ' - <a href="'.$activity_tab_url.'#edited_posts_result" class="roundbutton middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
+		$posts_edited .= ' - <a href="'.$activity_tab_url.'#edited_posts_result" class="'.button_class().' middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
 	}
 	$Form->info_field( T_('Posts edited'), $posts_edited );
 
@@ -245,7 +235,7 @@ $Form->begin_fieldset( T_('Usage info').get_manual_link('user-admin-usage') );
 	$comments_created = $edited_User->get_num_comments( '', $current_User->check_perm( 'blogs', 'editall', false ) );
 	if( $comments_created > 0 )
 	{
-		$comments_created .= ' - <a href="'.$activity_tab_url.'#comments_result" class="roundbutton middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
+		$comments_created .= ' - <a href="'.$activity_tab_url.'#comments_result" class="'.button_class().' middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
 		$comments_created .= ' - '.action_icon( T_('Delete All').'...', 'delete', $admin_url.'?ctrl=user&amp;user_tab=deldata&amp;user_ID='.$edited_User->ID, ' '.T_('Delete All').'...', 3, 4, array( 'onclick' => 'return user_deldata( '.$edited_User->ID.', \''.get_param( 'user_tab' ).'\')' ) );
 		$comments_created .= get_manual_link( 'delete-user-data' );
 	}
@@ -258,7 +248,7 @@ $Form->begin_fieldset( T_('Usage info').get_manual_link('user-admin-usage') );
 	$messages_sent = $edited_User->get_num_messages( 'sent' );
 	if( $messages_sent > 0 )
 	{
-		$messages_sent .= ' - <a href="'.$activity_tab_url.'#threads_result" class="roundbutton middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
+		$messages_sent .= ' - <a href="'.$activity_tab_url.'#threads_result" class="'.button_class().' middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
 		if( $current_User->check_perm( 'perm_messaging', 'abuse' ) )
 		{
 			$messages_sent .= ' - <a href="'.$admin_url.'?ctrl=abuse&amp;colselect_submit=Filter+list&amp;u='.$edited_User->login.'">'.T_('Go to abuse management').' &raquo;</a>';
@@ -270,7 +260,7 @@ $Form->begin_fieldset( T_('Usage info').get_manual_link('user-admin-usage') );
 	$messages_received = $edited_User->get_num_messages( 'received' );
 	if( $messages_received > 0 && $current_User->check_perm( 'perm_messaging', 'abuse' ) )
 	{
-		$messages_received .= ' - <a href="'.$admin_url.'?ctrl=abuse&amp;colselect_submit=Filter+list&amp;u='.$edited_User->login.'" class="roundbutton middle" title="'.format_to_output( T_('Go to abuse management'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to abuse management') ) ).'</a>';
+		$messages_received .= ' - <a href="'.$admin_url.'?ctrl=abuse&amp;colselect_submit=Filter+list&amp;u='.$edited_User->login.'" class="'.button_class().' middle" title="'.format_to_output( T_('Go to abuse management'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to abuse management') ) ).'</a>';
 	}
 	$Form->info_field( T_('# of private messages received'), $messages_received );
 

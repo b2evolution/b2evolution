@@ -71,4 +71,3 @@ siteskin_include( '_site_body_header.inc.php' );
 					</ul>
 				</div>
 			</div>
-			<!--[if IE]><div class="rounded_ie_corners_bottom"></div><![endif]-->

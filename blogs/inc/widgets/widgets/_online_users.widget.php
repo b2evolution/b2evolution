@@ -120,6 +120,8 @@ class online_users_Widget extends ComponentWidget
 		// Display title if requested
 		$this->disp_title();
 
+		echo $this->disp_params['block_body_start'];
+
 		$r = '';
 
 		while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
@@ -145,6 +147,8 @@ class online_users_Widget extends ComponentWidget
 			$r .= $params['list_end'];
 			echo $r;
 		}
+
+		echo $this->disp_params['block_body_end'];
 
 		echo $this->disp_params['block_end'];
 

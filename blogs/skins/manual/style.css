@@ -1,5 +1,4 @@
-/* Designed by Fran�ois PLANQUE - http://fplanque.net/ */
-
+/* Designed by Francois PLANQUE - http://fplanque.net/ */
 body {
 	padding: 0px;
 	margin: 0px;
@@ -39,7 +38,9 @@ div.pageHeader {
 div.pageHeader.site_skins {
 	margin-top: 43px;
 }
-@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+/* Devices with max width <= 1024px (iPhone,iPad):
+   Remove margin-top from page header because .sitewide_header is not fixed */
+@media only screen and (max-device-width: 1024px) {
 	div.pageHeader.site_skins {
 		margin-top: 0;
 	}
@@ -305,6 +306,20 @@ select.bComment  /* Used by the profile form */
 	float: left;
 	width: 235px;
 	padding-right: 10px;
+	background: #FFF;
+}
+.bSideBar.fixed {
+	position: fixed;
+}
+/* Windows with max height <= 800px:
+   Don't fix a position of the left side bar */
+@media (max-height:800px) {
+	.bSideBar.fixed {
+		position: static;
+	}
+	.fixed_spacer {
+		display: none;
+	}
 }
 
 .bSideItem {
@@ -438,7 +453,9 @@ div.input ul.token-input-list-facebook {
 	top: 3px;
 	right: 3px;
 }
-@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+/* Devices with max width <= 1024px (iPhone,iPad):
+   Don't fix a position of the width switcher */
+@media only screen and (max-device-width: 1024px) {
 	#width_switcher.fixed {
 		position: absolute;
 		width: 75px;
@@ -552,6 +569,10 @@ div.error_404 {
 #styled_content_block .bComment .status_private {
 	top: 0px;
 	left: 14px;
+}
+
+.search_title {
+	color: #00E;
 }
 
 .form_add_contacts .controls {

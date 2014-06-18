@@ -15,6 +15,10 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+$params = array_merge( array(
+		'pagination' => array(),
+	), $params );
+
 // --------------------------------- START OF COMMON LINKS --------------------------------
 skin_widget( array(
 		// CODE for the widget:
@@ -41,8 +45,9 @@ while( mainlist_get_item() )
 
 	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 	skin_include( '_item_block.inc.php', array(
-			'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
-			'image_size'	 =>	'fit-400x320',
+			'content_mode'   => 'auto', // 'auto' will auto select depending on $disp-detail
+			'image_size'     => 'fit-400x320',
+			'item_link_type' => 'permalink', // Use 'permalink' to display title of all posts as links (used especially for intro-cat posts)
 		) );
 	// ----------------------------END ITEM BLOCK  ----------------------------
 

@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/conf/_config.php';
  */
 require_once $inc_path.'_main.inc.php';
 
+load_funcs('skins/_skin.funcs.php');
 
 
 // --------------------- PAGE LEVEL CACHING SUPPORT ---------------------
@@ -60,7 +61,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 	<!-- InstanceParam name="lang" type="text" value="&lt;?php locale_lang() ?&gt;" -->
 </head>
 
-<body>
+<body<?php skin_body_attrs(); ?>>
 	<!-- InstanceBeginEditable name="BodyHead" -->
 	<?php
 	// ---------------------------- TOOLBAR INCLUDED HERE ----------------------------

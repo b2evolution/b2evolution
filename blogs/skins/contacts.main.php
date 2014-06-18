@@ -33,7 +33,10 @@ if( !$current_User->check_status( 'can_view_contacts' ) )
 
 	// Redirect to the blog url for users without messaging permission
 	$Messages->add( 'You are not allowed to view Contacts!' );
-	header_redirect( $Blog->gen_blogurl(), 302 );
+	$blogurl = $Blog->gen_blogurl();
+	// If it was a front page request or the front page is set to display 'contacts' then we must not redirect to the front page because it is forbidden for the current User
+	$redirect_to = ( is_front_page() || ( $Blog->get_setting( 'front_disp' ) == 'contacts' ) ) ? url_add_param( $blogurl, 'disp=403', '&' ) : $blogurl;
+	header_redirect( $redirect_to, 302 );
 }
 
 if( has_cross_country_restriction( 'any' ) && empty( $current_User->ctry_ID ) )
@@ -48,7 +51,10 @@ param_action();
 if( ( $action != 'report_user' && $action != 'remove_report' ) && ( !$current_User->check_perm( 'perm_messaging', 'reply' ) ) )
 { // Redirect to the blog url for users without messaging permission
 	$Messages->add( 'You are not allowed to view Contacts!' );
-	header_redirect( $Blog->gen_blogurl(), 302 );
+	$blogurl = $Blog->gen_blogurl();
+	// If it was a front page request or the front page is set to display 'contacts' then we must not redirect to the front page because it is forbidden for the current User
+	$redirect_to = ( is_front_page() || ( $Blog->get_setting( 'front_disp' ) == 'contacts' ) ) ? url_add_param( $blogurl, 'disp=403', '&' ) : $blogurl;
+	header_redirect( $redirect_to, 302 );
 	// will have exited
 }
 

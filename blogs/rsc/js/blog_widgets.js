@@ -514,7 +514,7 @@ function addNewWidget( widget_list_item, admin_call )
 	var destination = jQuery( '.available_widgets' ).attr( 'id' );
 	destination = destination.substr( 18, destination.length ).replace( '_', ' ' );
 
-	SendAdminRequest( 'widgets', 'create', admin_call+"&container="+destination, true );
+	SendAdminRequest( 'widgets', 'create', admin_call+"&blog="+blog+"&container="+destination, true );
 }
 
 

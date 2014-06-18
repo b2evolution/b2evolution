@@ -92,7 +92,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 		$Form->hidden( 'tab', $tab );
 		$Form->hidden( 'blog', $Blog->ID );
 
-		echo '<fieldset>';
+		echo '<fieldset class="clear">';
 		echo '<legend>'.T_('Posts to show').'</legend>';
 		?>
 		<div>
@@ -129,11 +129,9 @@ echo $Widget->replace_vars( $template['block_start'] );
 		echo '<fieldset>';
 		echo '<legend>'.T_('Title / Text contains').'</legend>';
 
-		echo $Form->inputstart;
 		?>
 		<div><input type="text" name="<?php echo $pp ?>s" size="20" value="<?php echo evo_htmlspecialchars($s) ?>" class="SearchField" /></div>
 		<?php
-		echo $Form->inputend;
 		// echo T_('Words').' : ';
 		?>
 		<div class="tile">

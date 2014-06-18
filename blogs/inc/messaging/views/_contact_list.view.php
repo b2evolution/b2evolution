@@ -428,6 +428,8 @@ if( count( $Results->rows ) > 0 )
 
 	$Form = new Form( get_dispctrl_url( 'contacts' ), 'add_group_contacts' );
 
+	echo '<div class="form_send_contacts">';
+
 	$multi_action_icon = get_icon( 'multi_action', 'imgtag', array( 'style' => 'margin:0 2px 0 14px;position:relative;top:-5px;') );
 
 	$Form->button_input( array(
@@ -438,12 +440,14 @@ if( count( $Results->rows ) > 0 )
 			'input_prefix' => $multi_action_icon
 		) );
 
+	echo '</div>';
+
 	$Form->switch_layout( 'none' );
 	$Form->switch_template_parts( array(
 			'formstart'  => '<div class="form_add_contacts">',
 			'labelstart' => '<span class="label">',
 			'labelend'   => '</span> <span class="controls">',
-			'formend'    => '</span></div>',
+			'formend'    => '</div>',
 	) );
 
 	$Form->begin_form();
@@ -461,6 +465,8 @@ if( count( $Results->rows ) > 0 )
 	$Form->combo_box( 'group', param( 'group_combo', 'string', '' ), get_contacts_groups_options( param( 'group', 'string', '-1' ), false ), $multi_action_icon.T_('Add all selected contacts to this group'), array( 'new_field_size' => '8' ) );
 
 	$Form->buttons( array( array( 'submit', 'actionArray[add_group]', T_('Add'), 'SaveButton' ) ) );
+
+	echo '</span>';
 
 	if( isset( $group_filtered ) )
 	{	// Contacts list is filtered by group

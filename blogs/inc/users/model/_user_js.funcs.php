@@ -49,12 +49,17 @@ for(var c = 0; c < jQuery( 'select[id^=criteria_type]' ).length; c++ )
 }
 
 jQuery( document ).on( 'click', 'span[rel=add_criteria]', function()
-{	// Add new criteria to search
+{ // Add new criteria to search
+	var params = '<?php
+			global $use_glyphicons;
+			echo empty( $use_glyphicons ) ? '' : '&use_glyphicons=1';
+		?>';
+
 	obj_this = jQuery( this ).parent().parent();
 	jQuery.ajax({
 	type: 'POST',
 	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
-	data: 'action=get_userfields_criteria',
+	data: 'action=get_userfields_criteria' + params,
 	success: function( result )
 		{	// Display fieldset of new Specific criteria
 			obj_this.after( ajax_debug_clear( result ) );

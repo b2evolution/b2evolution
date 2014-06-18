@@ -436,7 +436,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( $old_db_version < 8040 )
 	{ // upgrade to 0.8.7
 		echo 'Creating table for Antispam Blackist... ';
-		$query = "CREATE TABLE T_antispam (
+		$query = "CREATE TABLE {$tableprefix}antispam (
 			aspm_ID bigint(11) NOT NULL auto_increment,
 			aspm_string varchar(80) NOT NULL,
 			aspm_source enum( 'local','reported','central' ) NOT NULL default 'reported',
@@ -5017,6 +5017,72 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_begin( 'Updating goal categories table...' );
 		$DB->query( 'ALTER TABLE T_track__goalcat MODIFY gcat_color CHAR(7) COLLATE ascii_bin default NULL' );
 		task_end();
+		set_upgrade_checkpoint( '11235' );
+	}
+
+	if( $old_db_version < 11240 )
+	{ // part 16.d trunk aka seventh part of "i6"
+
+		task_begin( 'Updating general settings...' );
+		$DB->query( 'UPDATE T_settings SET
+			set_name = CASE
+				WHEN set_name = "user_closing_allow" THEN "account_close_enabled"
+				WHEN set_name = "user_closing_intro" THEN "account_close_intro"
+				WHEN set_name = "user_closing_reasons" THEN "account_close_reasons"
+				WHEN set_name = "user_closing_byemsg" THEN "account_close_byemsg"
+				ELSE set_name
+			END' );
+		task_end();
+
+		set_upgrade_checkpoint( '11240' );
+	}
+
+	if( $old_db_version < 11245 )
+	{ // part 16.e trunk aka eighth part of "i6"
+
+		task_begin( 'Updating Antispam IP Ranges table...' );
+		db_add_col( 'T_antispam__iprange', 'aipr_contact_email_count', 'int(10) unsigned DEFAULT 0 AFTER aipr_user_count' );
+		task_end();
+
+		task_begin( 'Updating invalid locale settings...' );
+		$current_default_locale = $DB->get_var( 'SELECT set_value FROM T_settings WHERE set_name = "default_locale"' );
+		if( empty( $current_default_locale ) )
+		{ // The default locale is not set in the database, use the one from the config file
+			global $default_locale;
+			$current_default_locale = $default_locale;
+		}
+		if( $DB->get_var( 'SELECT loc_enabled FROM T_locales WHERE loc_locale = '.$DB->quote( $current_default_locale ) ) )
+		{ // Update invalid user and collection locales to the default, but only if the default exists and it is enabled
+			$DB->query( 'UPDATE T_users
+				SET user_locale = '.$DB->quote( $current_default_locale ).'
+				WHERE  user_locale NOT IN ( SELECT loc_locale FROM T_locales WHERE loc_enabled = 1 )'
+			);
+			$DB->query( 'UPDATE T_blogs
+				SET blog_locale = '.$DB->quote( $current_default_locale ).'
+				WHERE  blog_locale NOT IN ( SELECT loc_locale FROM T_locales WHERE loc_enabled = 1 )'
+			);
+		}
+		task_end();
+
+		set_upgrade_checkpoint( '11245' );
+	}
+
+	if( $old_db_version < 11250 )
+	{ // part 16.f trunk aka ninth part of "i6"
+
+		// Convert item content separators to new format
+		load_funcs('tools/model/_dbmaintenance.funcs.php');
+		dbm_convert_item_content_separators();
+		set_upgrade_checkpoint( '11250' );
+	}
+
+	if( $old_db_version < 11255 )
+	{ // part 16.g trunk aka tenth part of "i6"
+
+		task_begin( 'Updating post types...' );
+		$DB->query( "INSERT INTO T_items__type ( ptyp_ID, ptyp_name )
+			VALUES ( 1400, 'Intro-Front' )" );
+		task_end();
 
 		/*
 		 * ADD UPGRADES FOR i6 BRANCH __ABOVE__ IN THIS BLOCK.
@@ -5024,7 +5090,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		 * This part will be included in trunk and i6 branches
 		 */
 
-		// set_upgrade_checkpoint( '11235' );
+		// set_upgrade_checkpoint( '11255' );
 	}
 
 	// Execute general upgrade tasks.

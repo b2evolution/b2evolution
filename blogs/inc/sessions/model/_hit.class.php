@@ -195,48 +195,52 @@ class Hit
 	/**
 	 * Session ID
 	 */
-	 var $session_id;
+	var $session_id;
 
-	 /**
+	/**
 	 * Hit time
 	 */
-	 var $hit_time;
+	var $hit_time;
 
 	/**
 	 * Hit_response_code
 	 */
-	 var $hit_response_code = 200;
+	var $hit_response_code = 200;
 
 	/**
 	 * Hit action
 	 */
-	 var $action;
+	var $action;
 
+	/**
+	 * Test mode
+	 * The mode used by geneartion of a fake statisctics. In this case test_mode = 1
+	 * fp>vitaliy what is this for?
+	 * Test what & when?
+	 *
+	 */
+	var $test_mode;
 
+	/**
+	 * Test rss mode
+	 * fp>vitaliy what is this for?
+	 * Test_rss is used for geneartion of fake statistics. In the normal mode
+	 * Hit class determines rss hit using $Skin->type == 'feed'. In the test mode
+	 * skin type doesn't change and that is why the new variable was needed to emulate
+	 * skin type.
+	 */
+	var $test_rss;
 
-	 /**
-	  * Test mode
-	  * The mode used by geneartion of a fake statisctics. In this case test_mode = 1
-	  * fp>vitaliy what is this for?
-	  * Test what & when?
-	  *
-	  */
-	 var $test_mode;
+	/**
+	 * Test URI
+	 */
+	var $test_uri;
 
-	 /**
-	  * Test rss mode
-	  * fp>vitaliy what is this for?
-	  * Test_rss is used for geneartion of fake statistics. In the normal mode
-	  * Hit class determines rss hit using $Skin->type == 'feed'. In the test mode
-	  * skin type doesn't change and that is why the new variable was needed to emulate
-	  * skin type.
-	  */
-	 var $test_rss;
-
-	 /**
-	  * Test URI
-	  */
-	 var $test_uri;
+	/**
+	 * Browser version
+	 * @var integer
+	 */
+	var $browser_version;
 
 	/**
 	 * Constructor
@@ -587,6 +591,8 @@ class Hit
 		$this->agent_name = '';
 		$this->agent_platform = '';
 
+		$this->browser_version = 0;
+
 		$user_agent = $this->get_user_agent();
 
 		if( ! empty( $user_agent ) )
@@ -635,21 +641,25 @@ class Hit
 				$this->agent_name = 'gecko';
 				$this->agent_type = 'browser';
 			}
-			elseif(strpos($user_agent, 'MSIE') !== false && $this->agent_platform == 'win' )
+			elseif( strpos( $user_agent, 'MSIE' ) !== false )
 			{
+				if( preg_match( '/MSIE (\d+)\./', $user_agent, $browser_version ) )
+				{ // Detect version of IE browser
+					$this->browser_version = (int)$browser_version[1];
+				}
 				$this->is_IE = true;
-				$this->is_winIE = 1;
+				if( $this->agent_platform == 'win' )
+				{ // Win IE
+					$this->is_winIE = 1;
+				}
+				if( $this->agent_platform == 'mac' )
+				{ // Mac IE
+					$this->is_macIE = 1;
+				}
 				$this->agent_name = 'msie';
 				$this->agent_type = 'browser';
 			}
-			elseif(strpos($user_agent, 'MSIE') !== false && $this->agent_platform == 'mac' )
-			{
-				$this->is_IE = true;
-				$this->is_macIE = 1;
-				$this->agent_name = 'msie';
-				$this->agent_type = 'browser';
-			}
-			elseif(strpos($user_agent, 'Chrome/') !== false)
+			elseif( strpos( $user_agent, 'Chrome/' ) !== false )
 			{
 				$this->is_chrome = true;
 				$this->agent_name = 'chrome';
@@ -1738,13 +1748,48 @@ class Hit
 
 	/**
 	 * Is this Internet Explorer?
+	 *
+	 * @param integer Version of IE, NULL to don't check a version
+	 * @param string Operator to compare a version: '=', '<', '>', '<=', '>=', '!='
 	 * @return boolean
 	 */
-	function is_IE()
+	function is_IE( $version = NULL, $operator = '=' )
 	{
-		if( ! isset($this->is_IE) )
+		if( ! isset( $this->is_IE ) )
+		{
 			$this->detect_useragent();
-		return $this->is_IE;
+		}
+
+		$result = $this->is_IE;
+
+		if( ! $result )
+		{ // No IE
+			return false;
+		}
+
+		if( ! is_null( $version ) )
+		{ // Check version of IE
+			switch( $operator )
+			{
+				case '=':
+					return $this->get_browser_version() == $version;
+				case '>':
+					return $this->get_browser_version() > $version;
+				case '<':
+					return $this->get_browser_version() < $version;
+				case '>=':
+					return $this->get_browser_version() >= $version;
+				case '<=':
+					return $this->get_browser_version() <= $version;
+				case '!=':
+					return $this->get_browser_version() != $version;
+				default:
+					// Incorrect operator
+					return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -1813,6 +1858,17 @@ class Hit
 		if( ! isset($this->is_robot) )
 			$this->is_robot = ($this->get_agent_type() == 'robot');
 		return $this->is_robot;
+	}
+
+
+	/**
+	 * Get a version of browser
+	 *
+	 * @return integer Browser version
+	 */
+	function get_browser_version()
+	{
+		return intval( $this->browser_version );
 	}
 }
 

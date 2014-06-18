@@ -1,4 +1,4 @@
-/* Designed by Fran�ois PLANQUE - http://fplanque.net/ */
+/* Designed by Francois PLANQUE - http://fplanque.net/ */
 
 body {
 	background: #fff;
@@ -90,6 +90,10 @@ h4 {
 	font-size: 110%;
 }
 
+.bText h1, .bText h2, .bText h3, .bText h4, .bText h5, .bText h6 {
+	color: #000;
+}
+
 table.invisible
 {
 	margin: 1ex;
@@ -153,7 +157,9 @@ div.pageHeader {
 div.pageHeader.site_skins {
 	margin-top: 43px;
 }
-@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+/* Devices with max width <= 1024px (iPhone,iPad):
+   Remove margin-top from page header because .sitewide_header has no fixed position */
+@media only screen and (max-device-width: 1024px) {
 	div.pageHeader.site_skins {
 		margin-top: 0;
 	}
@@ -788,7 +794,7 @@ table.legend td {
 	border: none;
 }
 
-.bForums .bComment.form_textarea_input {
+.bForums .form_textarea_input {
 	width: 99%;
 }
 
@@ -829,7 +835,9 @@ div.message_toolbars div.edit_toolbar {
 	top: 3px;
 	right: 3px;
 }
-@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+/* Devices with max width <= 1024px (iPhone,iPad):
+   Don't fix a width switcher */
+@media only screen and (max-device-width: 1024px) {
 	#width_switcher.fixed {
 		position: absolute;
 		width: 75px;
@@ -841,6 +849,10 @@ div.edit_toolbars, div.comment_toolbars {
 div.edit_toolbars div.edit_toolbar, div.comment_toolbars div.edit_toolbar {
 	width: 99%;
 	text-align: center;
+	margin-left: 1px;
+}
+td.comment_content textarea {
+	margin: 0 0 0 1px;
 }
 
 /* Code highlight plugin */
@@ -916,7 +928,7 @@ div.edit_toolbars div.edit_toolbar, div.comment_toolbars div.edit_toolbar {
 	padding-right: 5px;
 }
 
-/* Add this padding temporarily because moderator links are higher then img */
+/* Add this padding temporarily because moderator links are higher then img */ 
 .bForums td.left a img {
 	padding-top: 1px;
 }

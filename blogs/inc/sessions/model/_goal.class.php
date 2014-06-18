@@ -136,13 +136,19 @@ class Goal extends DataObject
 		}
 		$this->set_from_Request( 'redir_url' );
 
+		if( $this->get( 'temp_redir_url' ) != '' && $this->get( 'temp_redir_url' ) == $this->get( 'redir_url' ) )
+		{ // Compare normal and temp urls
+			param_error( 'goal_temp_redir_url', T_( 'Temporary Redirection URL should not be equal to Normal Redirection URL' ) );
+			param_error( 'goal_redir_url', NULL, '' );
+		}
+
 		// Temporary Start
 		$temp_start_date = param_date( 'goal_temp_start_date', T_('Please enter a valid date.'), false );
 		if( ! empty( $temp_start_date ) )
 		{
 			$temp_start_time = param( 'goal_temp_start_time', 'string' );
-			$temp_start_time = empty( $temp_start_time ) ? '' : param_time( 'goal_temp_start_time' );
-			$this->set( 'temp_start_ts', form_date( get_param( 'goal_temp_start_date' ), get_param( 'goal_temp_start_time' ) ) );
+			$temp_start_time = empty( $temp_start_time ) ? '00:00:00' : param_time( 'goal_temp_start_time' );
+			$this->set( 'temp_start_ts', form_date( $temp_start_date, $temp_start_time ) );
 		}
 		else
 		{
@@ -154,12 +160,21 @@ class Goal extends DataObject
 		if( ! empty( $temp_end_date ) )
 		{
 			$temp_end_time = param( 'goal_temp_end_time', 'string' );
-			$temp_end_time = empty( $temp_end_time ) ? '' : param_time( 'goal_temp_end_time' );
-			$this->set( 'temp_end_ts', form_date( get_param( 'goal_temp_end_date' ), $temp_end_time ) );
+			$temp_end_time = empty( $temp_end_time ) ? '00:00:00' : param_time( 'goal_temp_end_time' );
+			$this->set( 'temp_end_ts', form_date( $temp_end_date, $temp_end_time ) );
 		}
 		else
 		{
 			$this->set( 'temp_end_ts', NULL );
+		}
+
+		if( $this->get( 'temp_start_ts' ) !== NULL && $this->get( 'temp_end_ts' ) !== NULL &&
+		    strtotime( $this->get( 'temp_start_ts' ) ) >= strtotime( $this->get( 'temp_end_ts' ) ) )
+		{ // Compare Start and End dates
+			param_error( 'goal_temp_start_date', NULL, '' );
+			param_error( 'goal_temp_start_time', NULL, '' );
+			param_error( 'goal_temp_end_date', NULL, '' );
+			param_error( 'goal_temp_end_time', T_( 'Temporary Start Date/Time should not be greater than Temporary End Date/Time' ) );
 		}
 
 		// Default value:
@@ -224,10 +239,16 @@ class Goal extends DataObject
 	/**
 	 * Get redirection URL that is active now
 	 *
-	 * @param string $this->redir_url or $this->temp_redir_url
+	 * @param array Params
+	 * @return string $this->redir_url or $this->temp_redir_url
 	 */
-	function get_active_url()
+	function get_active_url( $params = array() )
 	{
+		$params = array_merge( array(
+			'before_temp' => '',
+			'after_temp'  => '',
+			), $params );
+
 		if( empty( $this->temp_redir_url ) )
 		{ // Use normal redirection URL when temporary redirection URL is empty
 			return $this->redir_url;
@@ -239,13 +260,46 @@ class Goal extends DataObject
 			if( ( empty( $this->temp_start_ts ) || $this->temp_start_ts <= $localtimenow ) &&
 			    ( empty( $this->temp_end_ts ) || $this->temp_end_ts >= $localtimenow ) )
 			{ // Use temporary redirection URL now
-				return $this->temp_redir_url;
+				return $params['before_temp'].$this->temp_redir_url.$params['after_temp'];
 			}
 			else
 			{ // Temporary redirection URL is out date, Use normal URL now
 				return $this->redir_url;
 			}
 		}
+	}
+
+
+	/**
+	 * Record goal hit
+	 *
+	 * @param string Extra params, Use '#' to get params from the $_SERVER['QUERY_STRING']
+	 */
+	function record_hit( $extra_params = '#' )
+	{
+		global $DB, $Hit;
+
+		if( $extra_params == '#' )
+		{ // Use standard extra params from query string
+			if( isset( $_SERVER['QUERY_STRING'] ) )
+			{ // Set additional params in goal hit
+				$extra_params = '&'.$_SERVER['QUERY_STRING'].'&';
+				$extra_params = preg_replace( '/&key=[^&]+(&)?/i', '$1', $extra_params );
+				$extra_params = trim( $extra_params, '&' );
+			}
+			if( empty( $extra_params ) )
+			{ // No extra params
+				$extra_params = NULL;
+			}
+		}
+
+		// We need to log the HIT now! Because we need the hit ID!
+		$Hit->log();
+
+		// Insert a goal hit:
+		$DB->query( 'INSERT INTO T_track__goalhit( ghit_goal_ID, ghit_hit_ID, ghit_params )
+			VALUES( '.$this->ID.', '.$Hit->ID.', '.$DB->quote( $extra_params ).' )',
+			'Record goal hit' );
 	}
 }
 

@@ -140,7 +140,7 @@ class DataObjectCache
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
 	 * @param string Name of the name field (including prefix)
-	 * @param string field names or NULL to use name field
+	 * @param string Name of the order field or NULL to use name field
 	 * @param string The text that gets used for the "None" option in the objects options list (Default: T_('None')).
 	 * @param mixed  The value that gets used for the "None" option in the objects options list.
 	 * @param string Additional part for SELECT clause of sql query

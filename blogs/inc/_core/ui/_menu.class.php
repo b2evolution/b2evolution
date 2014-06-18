@@ -240,9 +240,11 @@ class Menu extends Widget
 	 *
 	 * @param NULL|string|array The path. See {@link get_node_by_path()}.
 	 * @param string Template name, see {@link get_template()}.
+	 * @param integer Level
+	 * @param boolean TRUE - to get template for empty menu, used to hide menus
 	 * @return string The HTML for the menu.
 	 */
-	function get_html_menu( $path = NULL, $template = 'main', $level = 0 )
+	function get_html_menu( $path = NULL, $template = 'main', $level = 0, $force_empty = false )
 	{
 		global $current_User;
 
@@ -259,7 +261,7 @@ class Menu extends Widget
 
 		$templateForLevel = $this->get_template( $template, $level );
 
-		if( !( $menuEntries = $this->get_menu_entries($path) ) )
+		if( $force_empty || !( $menuEntries = $this->get_menu_entries($path) ) )
 		{	// No menu entries at this level
 			if( isset($templateForLevel['empty']) )
 			{
@@ -355,9 +357,14 @@ class Menu extends Widget
 						$r .= isset($templateForLevel['beforeEachSelWithSub']) ? $templateForLevel['beforeEachSelWithSub'] : $templateForLevel['beforeEachSel'];
 						$r .= $anchor;
 
-						if( $recurse != 'no' )
+						if( $templateForLevel['_props']['recurse'] != 'no' )
 						{ // Recurse:
-							$r .= $this->get_html_menu( $recursePath, $template, $level+1 );
+							if( ! isset( $templateForLevel['_props']['recurse_level'] ) ||
+							    ( isset( $templateForLevel['_props']['recurse_level'] ) &&
+							      $templateForLevel['_props']['recurse_level'] > $level + 1 ) )
+							{ // Display submenus if this level is not limited by param 'recurse_level'
+								$r .= $this->get_html_menu( $recursePath, $template, $level+1 );
+							}
 						}
 
 						$r .= isset($templateForLevel['afterEachSelWithSub']) ? $templateForLevel['afterEachSelWithSub'] : $templateForLevel['afterEachSel'];

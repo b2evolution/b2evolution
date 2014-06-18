@@ -65,7 +65,6 @@ class ItemType extends DataObject
 		$this->allow_ID_insert = true;
 
 		$this->delete_restrictions = array(
-				array( 'table'=>'T_ityp_col', 'fk'=>'itco_ityp_ID', 'msg'=>T_('%d related collections') ), // "Lignes de missions"
 				array( 'table'=>'T_items__item', 'fk'=>'post_ptyp_ID', 'msg'=>T_('%d related items') ), // "Lignes de visit reports"
 			);
 

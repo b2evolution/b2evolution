@@ -194,6 +194,7 @@ switch( $tab )
 {
 	case 'eblog':
 		$AdminUI->breadcrumbpath_add( T_('Post by Email'), '?ctrl=remotepublish&amp;tab='.$tab );
+		$AdminUI->set_page_manual_link( 'post-by-email' );
 		break;
 
 	case 'xmlrpc':

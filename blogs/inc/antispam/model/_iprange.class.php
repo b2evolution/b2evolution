@@ -123,7 +123,10 @@ class IPRange extends DataObject
 		{	// Check IPs for inside in other ranges
 			if( $ip_range = get_ip_range( $aipr_IPv4start, $aipr_IPv4end, $this->ID ) )
 			{
-				$Messages->add( sprintf( T_('IP range already exists with params: %s'), int2ip( $ip_range->aipr_IPv4start ).' - '.int2ip( $ip_range->aipr_IPv4end ) ), 'error' );
+				$admin_url;
+				$Messages->add( sprintf( T_('IP range already exists with params: %s - <a %s>Edit this range</a>'),
+					int2ip( $ip_range->aipr_IPv4start ).' - '.int2ip( $ip_range->aipr_IPv4end ),
+					'href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;action=iprange_edit&amp;iprange_ID='.$ip_range->aipr_ID.'"' ), 'error' );
 			}
 		}
 

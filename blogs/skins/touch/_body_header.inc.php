@@ -31,21 +31,17 @@ global $dummy_fields;
 	<div id="wptouch-menu-inner">
 		<div id="menu-head">
 			<div id="tabnav">
-				<a class="selected" href="#head-pages"><?php echo T_('Pages'); ?></a>
-				<a href="#head-blogs"><?php echo T_('Blogs'); ?></a>
-				<?php if( is_logged_in() ) { ?>
-				<a href="#head-account"><?php echo T_('My Profile'); ?></a>
-				<?php } else { ?>
-				<a href="#head-account" id="loginopen"><?php echo T_('Login'); ?></a>
-				<?php } ?>
+				<a class="selected" href="#head-nav"><?php echo T_('Navigation'); ?></a>
+				<a class="selected" href="#head-tools"><?php echo T_('Tools'); ?></a>
+				<a href="#head-blogs"><?php echo T_('Other Blogs'); ?></a>
 			</div>
 
 			<?php
-				// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
+				// ------------------------- "Navigation Menu" CONTAINER EMBEDDED HERE --------------------------
 				// Display container and contents:
-				skin_container( NT_('Menu'), array(
+				skin_container( NT_('Mobile: Navigation Menu'), array(
 						// The following params will be used as defaults for widgets included in this container:
-						'block_start' => '<ul id="head-pages">',
+						'block_start' => '<ul id="head-nav">',
 						'block_end' => '</ul>',
 						'block_display_title' => false,
 						'list_start' => '',
@@ -53,13 +49,32 @@ global $dummy_fields;
 						'item_start' => '<li>',
 						'item_end' => '</li>',
 					) );
-				// ----------------------------- END OF "Menu" CONTAINER -----------------------------
+				// ----------------------------- END OF "Navigation Menu" CONTAINER -----------------------------
+			?>
+
+			<?php
+				// ------------------------- "Tools Menu" CONTAINER EMBEDDED HERE --------------------------
+				// Display container and contents:
+				skin_container( NT_('Mobile: Tools Menu'), array(
+						// The following params will be used as defaults for widgets included in this container:
+						'block_start' => '<ul id="head-tools">',
+						'block_end' => '</ul>',
+						'block_display_title' => false,
+						'list_start' => '',
+						'list_end' => '',
+						'item_start' => '<li>',
+						'item_end' => '</li>',
+					) );
+				// ----------------------------- END OF "Tools Menu" CONTAINER -----------------------------
 			?>
 	
-			<?php 
-				// Display container and contents:
-				skin_container( NT_('Page Top'), array(
-						// The following params will be used as defaults for widgets included in this container:
+			<?php
+				// --------------------------------- START OF BLOG LIST --------------------------------
+				// Call widget directly (without container):
+				skin_widget( array(
+							// CODE for the widget:
+							'widget' => 'colls_list_public',
+							// Optional display params
 						'block_start' => '<ul id="head-blogs">',
 						'block_end' => '</ul>',
 						'block_display_title' => false,
@@ -68,40 +83,8 @@ global $dummy_fields;
 						'item_start' => '<li>',
 						'item_end' => '</li>',
 					) );
+				// ---------------------------------- END OF BLOG LIST ---------------------------------
 			?>
-
-			<ul id="head-account">
-			<?php
-				if( is_logged_in() )
-				{	// Build menu for logged in user
-					if( $current_User->check_perm( 'admin', 'normal' ) )
-					{	// User has a permission to access admin
-						global $admin_url;
-				?>
-					<li><a href="<?php echo $admin_url; ?>"><?php echo T_('Admin'); ?></a></li>
-				<?php } ?>
-				<li><a href="<?php echo url_add_param( $Blog->get('url'), 'disp=user' ); ?>"><?php echo T_('My Profile'); ?></a></li>
-				<?php
-					if( $current_User->check_perm( 'perm_messaging', 'reply' ) )
-					{	// User has access for messages module
-				?>
-				<li><a href="<?php echo url_add_param( $Blog->get('url'), 'disp=threads' ); ?>"><?php echo T_('My messages'); ?></a></li>
-				<?php } ?>
-				<li><a href="<?php echo get_user_logout_url(); ?>"><?php echo T_('Logout'); ?></a></li>
-			<?php
-				}
-				else
-				{	// Display info to login user
-			?>
-				<li class="text">
-					<?php echo T_('Enter your username and password<br>in the boxes above.'); ?><br><br>
-					<?php
-						$source = param( 'source', 'string', 'inskin login form' );
-						echo get_user_register_link( '<strong>', '</strong>', T_('No account yet? Register here').' &raquo;', '#', true /*disp_when_logged_in*/, '', $source );
-					?>
-				</li>
-			<?php } ?>
-			</ul>
 		</div>
 	</div>
 </div>
@@ -113,22 +96,6 @@ global $dummy_fields;
 	</div>
 	<div id="headerbar-menu">
 		<a href="javascript:return false;"><?php echo T_( 'Menu' ); ?></a>
-	</div>
-</div>
-
-<!--#start The Login Overlay -->
-<div id="wptouch-login">
-	<div id="wptouch-login-inner">
-		<form name="loginform" id="loginform" action="<?php echo get_samedomain_htsrv_url() ?>login.php" method="post">
-			<label><input type="text" name="<?php echo $dummy_fields['login'] ?>" id="log" placeholder="<?php echo T_( 'Login' ); ?>" value="" /></label>
-			<label><input type="password" name="<?php echo $dummy_fields['pwd'] ?>" placeholder="<?php echo T_( 'Password' ); ?>" id="pwd" value="" /></label>
-			<input type="submit" id="logsub" name="submit" value="<?php echo T_( 'Login' ); ?>" />
-			<input type="hidden" name="redirect_to" value="<?php echo $_SERVER['REQUEST_URI']; ?>"/>
-			<input type="hidden" value="<?php echo get_crumb( 'loginform' ); ?>" name="crumb_loginform" />
-			<input type="hidden" value="login" name="login_action[login]" />
-			<input type="hidden" value="<?php echo (int)use_in_skin_login(); ?>" name="inskin" />
-			<a href="javascript:return false;"><img class="head-close" src="<?php echo $Skin->get_url(); ?>img/head-close.png" alt="close" /></a>
-		</form>
 	</div>
 </div>
 

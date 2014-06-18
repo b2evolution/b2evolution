@@ -92,7 +92,6 @@ class intense_Skin extends Skin
 		require_css( 'item_base.css', 'blog' ); // Default styles for the post CONTENT
 		require_css( 'forms.css', 'blog' ); // Default form styles
 		require_css( 'comments.css', 'blog' ); // Default comment styles
-		add_headline( '<!--[if IE]><link rel="stylesheet" type="text/css" href="ie.css" /><![endif]-->' );
 
 		if($this->get_setting("colorbox")) 
 		{

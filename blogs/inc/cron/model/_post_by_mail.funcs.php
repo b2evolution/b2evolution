@@ -144,6 +144,7 @@ function pbm_process_messages( & $mbox, $limit )
 	{
 		pbm_msg('<hr /><h3>Processing message #'.$index.':</h3>');
 
+		$html_body = '';
 		$strbody = '';
 		$hasAttachment = false;
 		$hasRelated = false;

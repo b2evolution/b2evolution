@@ -30,6 +30,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
 global $menu_link_widget_link_types;
 $menu_link_widget_link_types = array(
 		'home' => T_('Blog home'),
+		'recentposts' => T_('Recent posts'),
 		'search' => T_('Search page'),
 		'arcdir' => T_('Archive directory'),
 		'catdir' => T_('Category directory'),
@@ -162,6 +163,13 @@ class menu_link_Widget extends ComponentWidget
 					'size' => 20,
 					'defaultvalue' => '',
 				),
+				'blog_ID' => array(
+					'label' => T_('Blog ID'),
+					'note' => T_( 'Leave empty for current blog.' ),
+					'type' => 'text',
+					'size' => 5,
+					'defaultvalue' => '',
+				),
 				// fp> TODO: ideally we would have a link icon to go click on the destination...
 				'item_ID' => array(
 					'label' => T_('Item ID'),
@@ -214,10 +222,49 @@ class menu_link_Widget extends ComponentWidget
 		// Default link class
 		$link_class = $this->disp_params['link_default_class'];
 
-		switch(	$this->disp_params['link_type'] )
+		$blog_ID = intval( $this->disp_params['blog_ID'] );
+		if( $blog_ID > 0 )
+		{ // Try to use blog from widget setting
+			$BlogCache = & get_BlogCache();
+			$current_Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+		}
+
+		if( empty( $current_Blog ) )
+		{ // Blog is not defined in setting or it doesn't exist in DB
+			// Use current blog
+			$current_Blog = & $Blog;
+		}
+
+		switch( $this->disp_params['link_type'] )
 		{
+			case 'recentposts':
+				$url = $current_Blog->get( 'recentpostsurl' );
+				if( is_same_url( $url, $Blog->get( 'url' ) ) )
+				{ // This menu item has the same url as front page of blog
+					$EnabledWidgetCache = & get_EnabledWidgetCache();
+					$Widget_array = & $EnabledWidgetCache->get_by_coll_container( $current_Blog->ID, NT_('Menu') );
+					if( !empty( $Widget_array ) )
+					{
+						foreach( $Widget_array as $Widget )
+						{
+							$Widget->init_display( $params );
+							if( !empty( $Widget->param_array ) && $Widget->param_array['link_type'] == 'home' )
+							{ // Don't display this menu if 'Blog home' menu item exists with the same url
+								return false;
+							}
+						}
+					}
+				}
+
+				$text = T_('Recently');
+				if( $disp == 'posts' )
+				{	// Let's display the link as selected
+					$link_class = $this->disp_params['link_selected_class'];
+				}
+				break;
+
 			case 'search':
-				$url = $Blog->get('searchurl');
+				$url = $current_Blog->get( 'searchurl' );
 				$text = T_('Search');
 				// Is this the current display?
 				if( $disp == 'search' )
@@ -227,7 +274,7 @@ class menu_link_Widget extends ComponentWidget
 				break;
 
 			case 'arcdir':
-				$url = $Blog->get('arcdirurl');
+				$url = $current_Blog->get( 'arcdirurl' );
 				$text = T_('Archives');
 				if( $disp == 'arcdir' )
 				{	// Let's display the link as selected
@@ -236,7 +283,7 @@ class menu_link_Widget extends ComponentWidget
 				break;
 
 			case 'catdir':
-				$url = $Blog->get('catdirurl');
+				$url = $current_Blog->get( 'catdirurl' );
 				$text = T_('Categories');
 				if( $disp == 'catdir' )
 				{	// Let's display the link as selected
@@ -245,7 +292,7 @@ class menu_link_Widget extends ComponentWidget
 				break;
 
 			case 'postidx':
-				$url = $Blog->get('postidxurl');
+				$url = $current_Blog->get( 'postidxurl' );
 				$text = T_('Post index');
 				if( $disp == 'postidx' )
 				{	// Let's display the link as selected
@@ -254,7 +301,7 @@ class menu_link_Widget extends ComponentWidget
 				break;
 
 			case 'mediaidx':
-				$url = $Blog->get('mediaidxurl');
+				$url = $current_Blog->get( 'mediaidxurl' );
 				$text = T_('Photo index');
 				if( $disp == 'mediaidx' )
 				{	// Let's display the link as selected
@@ -263,7 +310,7 @@ class menu_link_Widget extends ComponentWidget
 				break;
 
 			case 'sitemap':
-				$url = $Blog->get('sitemapurl');
+				$url = $current_Blog->get( 'sitemapurl' );
 				$text = T_('Site map');
 				if( $disp == 'sitemap' )
 				{	// Let's display the link as selected
@@ -272,11 +319,11 @@ class menu_link_Widget extends ComponentWidget
 				break;
 
 			case 'latestcomments':
-				if( !$Blog->get_setting( 'comments_latest' ) )
+				if( !$current_Blog->get_setting( 'comments_latest' ) )
 				{ // This page is disabled
 					return false;
 				}
-				$url = $Blog->get('lastcommentsurl');
+				$url = $current_Blog->get( 'lastcommentsurl' );
 				$text = T_('Latest comments');
 				if( $disp == 'comments' )
 				{	// Let's display the link as selected
@@ -285,25 +332,25 @@ class menu_link_Widget extends ComponentWidget
 				break;
 
 			case 'owneruserinfo':
-				$url = url_add_param( $Blog->get('userurl'), 'user_ID='.$Blog->owner_user_ID );
+				$url = url_add_param( $current_Blog->get( 'userurl' ), 'user_ID='.$current_Blog->owner_user_ID );
 				$text = T_('Owner details');
 				// Is this the current display?
 				global $User;
-				if( $disp == 'user' && !empty($User) && $User->ID == $Blog->owner_user_ID )
+				if( $disp == 'user' && ! empty( $User ) && $User->ID == $current_Blog->owner_user_ID )
 				{	// Let's display the link as selected
 					$link_class = $this->disp_params['link_selected_class'];
 				}
 				break;
 
 			case 'ownercontact':
-				if( ! $url = $Blog->get_contact_url( true ) )
+				if( ! $url = $current_Blog->get_contact_url( true ) )
 				{ // user does not allow contact form:
 					return;
 				}
 				$text = T_('Contact');
 				// Is this the current display?
 				if( $disp == 'msgform' )
-				{	// Let's display the link as selected
+				{ // Let's display the link as selected
 					// fp> I think it's interesting to select this link , even if the recipient ID is different from the owner
 					// odds are there is no other link to highlight in this case
 					$link_class = $this->disp_params['link_selected_class'];
@@ -312,9 +359,9 @@ class menu_link_Widget extends ComponentWidget
 
 			case 'login':
 				if( is_logged_in() ) return false;
-				$url = get_login_url( 'menu link' );
-				if( isset($this->BlockCache) )
-				{	// Do NOT cache because some of these links are using a redirect_to param, which makes it page dependent.
+				$url = get_login_url( 'menu link', NULL, false, $current_Blog->ID );
+				if( isset( $this->BlockCache ) )
+				{ // Do NOT cache because some of these links are using a redirect_to param, which makes it page dependent.
 					// so this will be cached by the PageCache; there is no added benefit to cache it in the BlockCache
 					// (which could have been shared between several pages):
 					$this->BlockCache->abort_collect();
@@ -322,7 +369,7 @@ class menu_link_Widget extends ComponentWidget
 				$text = T_('Log in');
 				// Is this the current display?
 				if( $disp == 'login' )
-				{	// Let's display the link as selected
+				{ // Let's display the link as selected
 					$link_class = $this->disp_params['link_selected_class'];
 				}
 				break;
@@ -332,17 +379,17 @@ class menu_link_Widget extends ComponentWidget
 				{
 					return false;
 				}
-				$url = get_user_logout_url();
+				$url = get_user_logout_url( $current_Blog->ID );
 				$text = T_('Logout');
 				break;
 
 			case 'register':
-				if( ! $url = get_user_register_url( NULL, 'menu link' ) )
+				if( ! $url = get_user_register_url( NULL, 'menu link', false, '&amp;', $current_Blog->ID ) )
 				{
 					return false;
 				}
-				if( isset($this->BlockCache) )
-				{	// Do NOT cache because some of these links are using a redirect_to param, which makes it page dependent.
+				if( isset( $this->BlockCache ) )
+				{ // Do NOT cache because some of these links are using a redirect_to param, which makes it page dependent.
 					// Note: also beware of the source param.
 					// so this will be cached by the PageCache; there is no added benefit to cache it in the BlockCache
 					// (which could have been shared between several pages):
@@ -358,7 +405,7 @@ class menu_link_Widget extends ComponentWidget
 
 			case 'profile':
 				if( ! is_logged_in() ) return false;
-				$url = get_user_profile_url();
+				$url = get_user_profile_url( $current_Blog->ID );
 				$text = T_('Edit profile');
 				// Is this the current display?  (Edit my Profile)
 				if( in_array( $disp, array( 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs' ) ) )
@@ -369,7 +416,7 @@ class menu_link_Widget extends ComponentWidget
 
 			case 'avatar':
 				if( ! is_logged_in() ) return false;
-				$url = get_user_avatar_url();
+				$url = get_user_avatar_url( $current_Blog->ID );
 				$text = T_('Profile picture');
 				// Note: we never highlight this, it will always highlight 'profile' instead
 				break;
@@ -380,7 +427,7 @@ class menu_link_Widget extends ComponentWidget
 				{	// Don't allow anonymous users to see users list
 					return false;
 				}
-				$url = $Blog->get( 'usersurl' );
+				$url = $current_Blog->get( 'usersurl' );
 				$text = T_('User directory');
 				// Is this the current display?
 				// Note: If $user_ID is not set, it means we are viewing "My Profile" instead
@@ -397,18 +444,18 @@ class menu_link_Widget extends ComponentWidget
 				/**
 				* @var Item
 				*/
-				$item_ID = (integer)($this->disp_params['item_ID']);
+				$item_ID = intval( $this->disp_params['item_ID'] );
 				$disp_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
-				if( empty($disp_Item) )
-				{	// Item not found
+				if( empty( $disp_Item ) )
+				{ // Item not found
 					return false;
 				}
 				$url = $disp_Item->get_permanent_url();
 				$text = $disp_Item->title;
 				// Is this the current item?
 				global $Item;
-				if( !empty($Item) && $disp_Item->ID == $Item->ID )
-				{	// The current page is currently displaying the Item this link is pointing to
+				if( ! empty( $Item ) && $disp_Item->ID == $Item->ID )
+				{ // The current page is currently displaying the Item this link is pointing to
 					// Let's display it as selected
 					$link_class = $this->disp_params['link_selected_class'];
 				}
@@ -425,7 +472,7 @@ class menu_link_Widget extends ComponentWidget
 				{	// Don't allow users to create a new post
 					return false;
 				}
-				$url = url_add_param( $Blog->get( 'url' ), 'disp=edit' );
+				$url = url_add_param( $current_Blog->get( 'url' ), 'disp=edit' );
 				$text = T_('Write a new post');
 				// Is this the current display?
 				if( $disp == 'edit' )
@@ -439,13 +486,13 @@ class menu_link_Widget extends ComponentWidget
 				{	// Don't show this link for not logged in users
 					return false;
 				}
-				$url = url_add_param( $Blog->get( 'url' ), 'disp=user' );
+				$url = url_add_param( $current_Blog->get( 'url' ), 'disp=user' );
 				$text = T_('My profile');
 				// Is this the current display?  (Edit my Profile)
 				global $user_ID, $current_User;
 				// If $user_ID is not set, it means we will fall back to the current user, so it's ok
 				// If $user_ID is set, it means we are browsing the directory instead
-				if( $disp == 'user' && empty($user_ID) )
+				if( $disp == 'user' && empty( $user_ID ) )
 				{	// Let's display the link as selected
 					$link_class = $this->disp_params['link_selected_class'];
 				}
@@ -453,24 +500,40 @@ class menu_link_Widget extends ComponentWidget
 
 			case 'home':
 			default:
-				$url = $Blog->get('url');
+				$url = $current_Blog->get( 'url' );
 				$text = T_('Home');
 		}
 
 		// Override default link text?
-		if( !empty($this->param_array['link_text']) )
-		{	// We have a custom link text:
+		if( ! empty( $this->param_array['link_text'] ) )
+		{ // We have a custom link text:
 			$text = $this->param_array['link_text'];
 		}
 
 		echo $this->disp_params['block_start'];
+		echo $this->disp_params['block_body_start'];
 		echo $this->disp_params['list_start'];
 
-		echo $this->disp_params['item_start'];
+		if( $link_class == $this->disp_params['link_selected_class'] )
+		{
+			echo $this->disp_params['item_selected_start'];
+		}
+		else
+		{
+			echo $this->disp_params['item_start'];
+		}
 		echo '<a href="'.$url.'" class="'.$link_class.'">'.$text.'</a>';
-		echo $this->disp_params['item_end'];
+		if( $link_class == $this->disp_params['link_selected_class'] )
+		{
+			echo $this->disp_params['item_selected_end'];
+		}
+		else
+		{
+			echo $this->disp_params['item_end'];
+		}
 
 		echo $this->disp_params['list_end'];
+		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
 
 		return true;

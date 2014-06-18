@@ -3312,6 +3312,39 @@ class Plugin
 
 
 	/**
+	 * Check if this plugin is enabled to render
+	 *
+	 * @param string Setting "apply_rendering" of current Blog or global for Messages
+	 * @param array What renderers are selected for current Item, Comment or Message
+	 * @return boolean TRUE if this plugin is enabled to render, otherwise FALSE
+	 */
+	function is_renderer_enabled( $rendering_setting_value, $renderers )
+	{
+		switch( $rendering_setting_value )
+		{
+			case 'stealth':
+			case 'always':
+				// Always enabled
+				return true;
+
+			case 'opt-out':
+			case 'opt-in':
+			case 'lazy':
+				if( is_array( $renderers ) && in_array( $this->code, $renderers ) )
+				{ // Option is enabled
+					return true;
+				}
+				// Option is disabled
+				return false;
+
+			case 'never':
+				// Never enabled
+				return false;
+		}
+	}
+
+
+	/**
 	 * This method should return a string that used as suffix
 	 *   for the field 'From Country' on the user profile page in the BackOffice
 	 *

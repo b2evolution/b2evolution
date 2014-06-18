@@ -57,7 +57,7 @@ $Form->begin_fieldset( T_('Test saved settings') );
 	
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('General settings').get_manual_link('blog_by_email') );
+$Form->begin_fieldset( T_('General settings').get_manual_link('post-by-email-general-settings') );
 
 	if( extension_loaded( 'imap' ) )
 	{
@@ -103,10 +103,10 @@ $Form->begin_fieldset( T_('General settings').get_manual_link('blog_by_email') )
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Posting settings') );
+$Form->begin_fieldset( T_('Posting settings').get_manual_link('post-by-email-posting-settings') );
 
 	// TODO: provide a list of categories to choose from
-	$Form->text_input( 'eblog_default_category', $Settings->get('eblog_default_category'), 5,
+	$Form->text_input( 'eblog__default_category', $Settings->get('eblog_default_category'), 5,
 				T_('Default Category ID'), sprintf( T_('This is a default category for your posts.').'<br />'.
 				T_('You can use the following code in message body to define categories: %s. In this example 2 will be main category and 5, 47 extra categories.'), '<b>&lt;category&gt;2, 5, 47&lt;/category&gt;</b>' ), array( 'maxlength' => 6 ) );
 
@@ -132,7 +132,7 @@ $Form->begin_fieldset( T_('Posting settings') );
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('HTML messages') );
+$Form->begin_fieldset( T_('HTML messages').get_manual_link('post-by-email-html-messages') );
 
 // sam2kb> TODO: display some warning message about potential risk with HTML emails
 $Form->checkbox( 'eblog_html_enabled', $Settings->get('eblog_html_enabled'), T_('Enable HTML messages'),

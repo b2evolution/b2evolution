@@ -155,6 +155,8 @@ siteskin_include( '_site_body_header.inc.php' );
 	?>
 
 	<?php
+	if( $disp != 'front' && $disp != 'download' )
+	{
 		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 		mainlist_page_links( array(
 				'block_start' => '<p class="center">'.T_('Pages:').' <strong>',
@@ -194,10 +196,11 @@ siteskin_include( '_site_body_header.inc.php' );
 		mainlist_page_links( array(
 				'block_start' => '<p class="center"><strong>',
 				'block_end' => '</strong></p>',
-   			'prev_text' => '&lt;&lt;',
-   			'next_text' => '&gt;&gt;',
+				'prev_text' => '&lt;&lt;',
+				'next_text' => '&gt;&gt;',
 			) );
 		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
+	}
 	?>
 
 

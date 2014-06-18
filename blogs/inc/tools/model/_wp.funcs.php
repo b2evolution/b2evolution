@@ -417,7 +417,8 @@ function wpxml_import()
 				}
 
 				// Get FileRoot by type and ID
-				$FileRoot = new FileRoot( $file['file_root_type'], $file_root_ID );
+				$FileRootCache = & get_FileRootCache();
+				$FileRoot = & $FileRootCache->get_by_type_and_ID( $file['file_root_type'], $file_root_ID );
 				if( is_dir( $attached_files_path.$subfolder_path.'/'.$file['zip_path'].$file['file_path'] ) )
 				{ // Folder
 					$file_destination_path = $FileRoot->ads_path;
@@ -468,6 +469,7 @@ function wpxml_import()
 
 	/* Import categories */
 	$category_default = 0;
+	load_class( 'chapters/model/_chapter.class.php', 'Chapter' );
 
 	// Get existing categories
 	$SQL = new SQL();
@@ -481,7 +483,6 @@ function wpxml_import()
 		echo T_('Importing the categories... ');
 		evo_flush();
 
-		load_class( 'chapters/model/_chapter.class.php', 'Chapter' );
 		load_funcs( 'locales/_charset.funcs.php' );
 
 		$categories_count = 0;
@@ -509,16 +510,25 @@ function wpxml_import()
 			}
 		}
 
-		if( empty( $category_default ) )
-		{	// Set first category as default
-			foreach( $categories as $category_name => $category_ID )
-			{
-				$category_default = $category_ID;
-				break;
-			}
-		}
-
 		echo sprintf( T_('%d records'), $categories_count ).'<br />';
+	}
+
+	if( empty( $category_default ) )
+	{ // No categories in XML file, Try to use first category(from DB) as default
+		foreach( $categories as $category_name => $category_ID )
+		{
+			$category_default = $category_ID;
+			break;
+		}
+	}
+
+	if( empty( $category_default ) )
+	{ // If category is still not defined then we should create default, because blog must has at least one category
+		$new_Chapter = new Chapter( NULL, $wp_blog_ID );
+		$new_Chapter->set( 'name', T_('Uncategorized') );
+		$new_Chapter->set( 'urlname', $wp_Blog->get( 'urlname' ).'-main' );
+		$new_Chapter->dbinsert();
+		$category_default = $new_Chapter->ID;
 	}
 
 	/* Import tags */
@@ -634,6 +644,7 @@ function wpxml_import()
 			$Item->set( 'datecreated', !empty( $post['post_datecreated'] ) ? $post['post_datecreated'] : $post['post_date'] );
 			$Item->set( 'datemodified', !empty( $post['post_datemodified'] ) ? $post['post_datemodified'] : $post['post_date'] );
 			$Item->set( 'urltitle', !empty( $post['post_urltitle'] ) ? $post['post_urltitle'] : $post['post_title'] );
+			$Item->set( 'url', $post['post_url'] );
 			$Item->set( 'status', isset( $post_statuses[ (string) $post['status'] ] ) ? $post_statuses[ (string) $post['status'] ] : 'draft' );
 			// If 'comment_status' has the unappropriate value set it to 'open'
 			$Item->set( 'comment_status', ( in_array( $post['comment_status'], array( 'open', 'closed', 'disabled' ) ) ? $post['comment_status'] : 'open' ) );
@@ -804,6 +815,8 @@ function wpxml_import()
 		echo sprintf( T_('%d records'), $comments_count ).'<br />';
 	}
 
+	echo '<p>'.T_('Import complete.').'</p>';
+
 	$DB->commit();
 }
 
@@ -839,6 +852,19 @@ function wpxml_parser( $file )
 	$base_url = $xml->xpath( '/rss/channel/wp:base_site_url' );
 	$base_url = (string) trim( $base_url[0] );
 
+	// Check language
+	global $evo_charset, $xml_import_convert_to_latin;
+	$language = $xml->xpath( '/rss/channel/language' );
+	$language = (string) trim( $language[0] );
+	if( $evo_charset != 'utf-8' && ( strpos( $language, 'utf8' ) !== false ) )
+	{ // We should convert the text values from utf8 to latin1
+		$xml_import_convert_to_latin = true;
+	}
+	else
+	{ // Don't convert, it is correct encoding
+		$xml_import_convert_to_latin = false;
+	}
+
 	$namespaces = $xml->getDocNamespaces();
 	if( !isset( $namespaces['wp'] ) )
 	{
@@ -863,13 +889,13 @@ function wpxml_parser( $file )
 			'author_id'                   => (int) $a->author_id,
 			'author_login'                => $login,
 			'author_email'                => (string) $a->author_email,
-			'author_display_name'         => (string) $a->author_display_name,
-			'author_first_name'           => (string) $a->author_first_name,
-			'author_last_name'            => (string) $a->author_last_name,
+			'author_display_name'         => wpxml_convert_value( $a->author_display_name ),
+			'author_first_name'           => wpxml_convert_value( $a->author_first_name ),
+			'author_last_name'            => wpxml_convert_value( $a->author_last_name ),
 			'author_pass'                 => (string) $ae->author_pass,
 			'author_group'                => (string) $ae->author_group,
 			'author_status'               => (string) $ae->author_status,
-			'author_nickname'             => (string) $ae->author_nickname,
+			'author_nickname'             => wpxml_convert_value( $ae->author_nickname ),
 			'author_url'                  => (string) $ae->author_url,
 			'author_level'                => (int) $ae->author_level,
 			'author_locale'               => (string) $ae->author_locale,
@@ -898,11 +924,9 @@ function wpxml_parser( $file )
 			'file_root_type' => (string) $t->file_root_type,
 			'file_root_ID'   => (int) $t->file_root_ID,
 			'file_path'      => (string) $t->file_path,
-			'file_title'     => (string) $t->file_title,
-			'file_alt'       => (string) $t->file_alt,
-			'file_desc'      => (string) $t->file_desc,
-			'file_hash'      => (string) $t->file_hash,
-			'file_path_hash' => (string) $t->file_path_hash,
+			'file_title'     => wpxml_convert_value( $t->file_title ),
+			'file_alt'       => wpxml_convert_value( $t->file_alt ),
+			'file_desc'      => wpxml_convert_value( $t->file_desc ),
 			'zip_path'       => (string) $t->zip_path,
 		);
 	}
@@ -913,10 +937,10 @@ function wpxml_parser( $file )
 		$t = $term_arr->children( $namespaces['wp'] );
 		$categories[] = array(
 			'term_id'              => (int) $t->term_id,
-			'category_nicename'    => (string) $t->category_nicename,
+			'category_nicename'    => wpxml_convert_value( $t->category_nicename ),
 			'category_parent'      => (string) $t->category_parent,
-			'cat_name'             => (string) $t->cat_name,
-			'category_description' => (string) $t->category_description
+			'cat_name'             => wpxml_convert_value( $t->cat_name ),
+			'category_description' => wpxml_convert_value( $t->category_description )
 		);
 	}
 
@@ -927,8 +951,8 @@ function wpxml_parser( $file )
 		$tags[] = array(
 			'term_id'         => (int) $t->term_id,
 			'tag_slug'        => (string) $t->tag_slug,
-			'tag_name'        => (string) $t->tag_name,
-			'tag_description' => (string) $t->tag_description
+			'tag_name'        => wpxml_convert_value( $t->tag_name ),
+			'tag_description' => wpxml_convert_value( $t->tag_description )
 		);
 	}
 
@@ -941,8 +965,8 @@ function wpxml_parser( $file )
 			'term_taxonomy'    => (string) $t->term_taxonomy,
 			'slug'             => (string) $t->term_slug,
 			'term_parent'      => (string) $t->term_parent,
-			'term_name'        => (string) $t->term_name,
-			'term_description' => (string) $t->term_description
+			'term_name'        => wpxml_convert_value( $t->term_name ),
+			'term_description' => wpxml_convert_value( $t->term_description )
 		);
 	}
 
@@ -950,7 +974,7 @@ function wpxml_parser( $file )
 	foreach( $xml->channel->item as $item )
 	{
 		$post = array(
-			'post_title' => (string) $item->title,
+			'post_title' => wpxml_convert_value( $item->title ),
 			'guid'       => (string) $item->guid,
 		);
 
@@ -959,8 +983,8 @@ function wpxml_parser( $file )
 
 		$content = $item->children( 'http://purl.org/rss/1.0/modules/content/' );
 		$excerpt = $item->children( $namespaces['excerpt'] );
-		$post['post_content'] = (string) $content->encoded;
-		$post['post_excerpt'] = (string) $excerpt->encoded;
+		$post['post_content'] = wpxml_convert_value( $content->encoded );
+		$post['post_excerpt'] = wpxml_convert_value( $excerpt->encoded );
 
 		$wp = $item->children( $namespaces['wp'] );
 		$evo = $item->children( $namespaces['evo'] );
@@ -987,6 +1011,7 @@ function wpxml_parser( $file )
 		$post['post_excerpt_autogenerated'] = (int) $evo->post_excerpt_autogenerated;
 		$post['post_urltitle']      = (string) $evo->post_urltitle;
 		$post['post_titletag']      = (string) $evo->post_titletag;
+		$post['post_url']           = (string) $evo->post_url;
 		$post['post_notifications_status'] = (string) $evo->post_notifications_status;
 		$post['post_renderers']     = (string) $evo->post_renderers;
 		$post['post_priority']      = (int) $evo->post_priority;
@@ -1009,7 +1034,7 @@ function wpxml_parser( $file )
 			{
 				$post['terms'][] = array(
 					'name'   => (string) $c,
-					'slug'   => (string) $att['nicename'],
+					'slug'   => wpxml_convert_value( $att['nicename'] ),
 					'domain' => (string) $att['domain']
 				);
 			}
@@ -1019,7 +1044,7 @@ function wpxml_parser( $file )
 		{
 			$post['postmeta'][] = array(
 				'key'   => (string) $meta->meta_key,
-				'value' => (string) $meta->meta_value
+				'value' => wpxml_convert_value( $meta->meta_value )
 			);
 		}
 
@@ -1034,20 +1059,20 @@ function wpxml_parser( $file )
 				{
 					$meta[] = array(
 						'key'   => (string) $m->meta_key,
-						'value' => (string) $m->meta_value
+						'value' => wpxml_convert_value( $m->meta_value )
 					);
 				}
 			}
 
 			$post['comments'][] = array(
 				'comment_id'           => (int) $comment->comment_id,
-				'comment_author'       => (string) $comment->comment_author,
+				'comment_author'       => wpxml_convert_value( $comment->comment_author ),
 				'comment_author_email' => (string) $comment->comment_author_email,
 				'comment_author_IP'    => (string) $comment->comment_author_IP,
 				'comment_author_url'   => (string) $comment->comment_author_url,
 				'comment_date'         => (string) $comment->comment_date,
 				'comment_date_gmt'     => (string) $comment->comment_date_gmt,
-				'comment_content'      => (string) $comment->comment_content,
+				'comment_content'      => wpxml_convert_value( $comment->comment_content ),
 				'comment_approved'     => (string) $comment->comment_approved,
 				'comment_type'         => (string) $comment->comment_type,
 				'comment_parent'       => (string) $comment->comment_parent,
@@ -1309,7 +1334,7 @@ function wpxml_get_import_files()
 			{
 				if( $key == 'b2evolution_export_files' && is_array( $sub_file ) )
 				{ // Probably it is folder with the attached files
-					$file_type = T_('attached files');
+					$file_type = T_('Complete export (text+attachments)');
 				}
 				elseif( is_string( $sub_file ) && preg_match( '/\.(xml|txt)$/i', $sub_file ) )
 				{ // Probably it is a file with import data
@@ -1328,7 +1353,7 @@ function wpxml_get_import_files()
 			{ // This file can be a file with import data
 				if( empty( $file_type ) )
 				{ // Set type from file extension
-					$file_type = $file_matches[1] == 'zip' ? T_('archive') : T_('single');
+					$file_type = $file_matches[1] == 'zip' ? T_('Compressed Archive') : T_('Basic export (text only)');
 				}
 				$import_files[] = array(
 						'path' => $file_path,
@@ -1339,6 +1364,34 @@ function wpxml_get_import_files()
 	}
 
 	return $import_files;
+}
+
+
+/**
+ * Convert string value to normal encoding
+ *
+ * @param string Value
+ * @return string A converted value
+ */
+function wpxml_convert_value( $value )
+{
+	global $xml_import_convert_to_latin;
+
+	$value = (string) $value;
+
+	if( $xml_import_convert_to_latin )
+	{ // We should convert a value from utf8 to latin1
+		if( function_exists( 'iconv' ) )
+		{ // Convert by iconv extenssion
+			$value = iconv( 'utf-8', 'iso-8859-1', $value );
+		}
+		elseif( function_exists( 'mb_convert_encoding' ) )
+		{ // Convert by mb extenssion
+			$value = mb_convert_encoding( $value, 'iso-8859-1', 'utf-8' );
+		}
+	}
+
+	return $value;
 }
 
 ?>

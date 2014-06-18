@@ -170,11 +170,11 @@ switch( $action )
 		{
 			if( $delcomments && $r ) // $r not null => means the commentlist was deleted successfully
 			{
-				send_javascript_message( array( 'refreshAfterBan' => array( $deleted_ids ), 'closeAntispamSettings' => array() ), true );
+				send_javascript_message( array( 'refreshAfterBan' => array( $deleted_ids ), 'closeModalWindow' => array() ), true );
 			}
 			else
 			{
-				send_javascript_message( array( 'closeAntispamSettings' => array() ), true );
+				send_javascript_message( array( 'closeModalWindow' => array() ), true );
 			}
 		}
 
@@ -503,6 +503,7 @@ if( $display_mode != 'js' )
 				$action = '';
 			}
 			$AdminUI->breadcrumbpath_add( T_('IP Ranges'), '?ctrl=antispam&amp;tab3='.$tab3 );
+			$AdminUI->set_page_manual_link( 'ip-ranges' );
 			break;
 
 		case 'countries':
@@ -566,7 +567,18 @@ switch( $tab3 )
 		switch( $action )
 		{
 			case 'iprange_new':
-				$edited_IPRange = new IPRange();
+				if( ! isset( $edited_IPRange ) )
+				{ // Define new IPRange object only when it was not defined before, e.g. in action 'iprange_create'
+					$edited_IPRange = new IPRange();
+				}
+				// Set IP Start and End from _GET request
+				$ip = param( 'ip', 'string', '' );
+				if( ! empty( $ip ) && is_valid_ip_format( $ip ) &&
+				    ( $ip = explode( '.', $ip ) ) && count( $ip ) == 4 )
+				{
+					$edited_IPRange->set( 'IPv4start', ip2int( implode( '.', array( $ip[0], $ip[1], $ip[2], 0 ) ) ) );
+					$edited_IPRange->set( 'IPv4end', ip2int( implode( '.', array( $ip[0], $ip[1], $ip[2], 255 ) ) ) );
+				}
 				$AdminUI->disp_view( 'antispam/views/_antispam_ipranges.form.php' );
 				break;
 

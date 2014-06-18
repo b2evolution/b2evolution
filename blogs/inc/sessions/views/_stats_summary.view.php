@@ -173,7 +173,7 @@ if( count($res_hits) )
 	$last_date = 0;
 
 
-	echo '<table class="grouped" cellspacing="0">';
+	echo '<table class="grouped table table-striped table-bordered table-hover table-condensed" cellspacing="0">';
 	echo '<tr>';
 	echo '<th class="firstcol">'.T_('Date').'</th>';
 	echo '<th style="background-color: #'.$hit_type_color['rss'].'"><a href="?ctrl=stats&amp;tab=hits&amp;hit_type=rss&amp;blog='.$blog.'">'.T_('RSS/Atom').'</a></th>';
@@ -295,7 +295,6 @@ if( count($res_hits) )
 
 	</table>
 
-	<!--[if IE]><?php echo get_icon( 'pixel' ); ?><![endif]-->
 	<?php
 }
 ?>

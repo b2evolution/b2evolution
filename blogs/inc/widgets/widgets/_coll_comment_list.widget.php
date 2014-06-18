@@ -60,7 +60,7 @@ class coll_comment_list_Widget extends ComponentWidget
 				'label' => T_('Block title'),
 				'note' => T_( 'Title to display in your skin.' ),
 				'size' => 40,
-				'defaultvalue' => T_('Recent comments'),
+				'defaultvalue' => T_('Recent Comments'),
 			),
 			'disp_order' => array(
 				'label' => T_('Order'),
@@ -145,15 +145,22 @@ class coll_comment_list_Widget extends ComponentWidget
 		$limit = $this->disp_params[ 'limit' ];
 		$order = $this->disp_params[ 'disp_order' ];
 
-		$CommentList = new CommentList2( $listBlog );
+		$CommentList = new CommentList2( $listBlog, $limit, 'CommentCache', $this->code.'_');
 
-		// Filter list:
-		$CommentList->set_filters( array(
+		$filters = array(
 				'types' => array( 'comment','trackback','pingback' ),
 				'statuses' => array( 'published' ),
 				'order' => $order,
 				'comments' => $limit,
-			) );
+			);
+
+		if( isset( $this->disp_params['page'] ) )
+		{
+			$filters['page'] = $this->disp_params['page'];
+		}
+
+		// Filter list:
+		$CommentList->set_filters( $filters );
 
 		// Get ready for display (runs the query):
 		$CommentList->display_init();
@@ -162,6 +169,8 @@ class coll_comment_list_Widget extends ComponentWidget
 
 		// Display title if requested
 		$this->disp_title();
+
+		echo $this->disp_params['block_body_start'];
 
 		echo $this->disp_params[ 'list_start' ];
 
@@ -186,7 +195,20 @@ class coll_comment_list_Widget extends ComponentWidget
 				) );
 			echo $this->disp_params[ 'item_end' ];
 		}	// End of comment loop.}
+
+		if( isset( $this->disp_params['page'] ) )
+		{
+			if( empty( $this->disp_params['pagination'] ) )
+			{
+				$this->disp_params['pagination'] = array();
+			}
+			$CommentList->page_links( $this->disp_params['pagination'] );
+		}
+
 		echo $this->disp_params[ 'list_end' ];
+
+		echo $this->disp_params['block_body_end'];
+
 		echo $this->disp_params[ 'block_end' ];
 
 		return true;

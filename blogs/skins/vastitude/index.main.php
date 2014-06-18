@@ -101,6 +101,8 @@ siteskin_include( '_site_body_header.inc.php' );
 	?>
 <div class="text">
 	<?php
+	if( $disp != 'single' )
+	{
 		// ------------------------ TITLE FOR THE CURRENT REQUEST ------------------------
 		request_title( array(
 				'title_before'=> '<h2>',
@@ -111,6 +113,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				'format'      => 'htmlbody',
 			) );
 		// ----------------------------- END OF REQUEST TITLE ----------------------------
+	}
 	?>
 
 	<?php
@@ -130,6 +133,8 @@ siteskin_include( '_site_body_header.inc.php' );
 	?>
 
 	<?php
+	if( $disp != 'front' && $disp != 'download' )
+	{
 		// --------------------------------- START OF POSTS -------------------------------------
 		// Display message if no post:
 		display_if_empty();
@@ -150,12 +155,13 @@ siteskin_include( '_site_body_header.inc.php' );
 	<?php
 		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 		mainlist_page_links( array(
-		'block_start'		=>	'<p class="center">',
-		'block_end'		=>	'</p>',
-   		'prev_text'		=>	'&lt;&lt;',
-   		'next_text'		=>	'&gt;&gt;',
-		) );
+				'block_start'		=>	'<p class="center">',
+				'block_end'		=>	'</p>',
+				'prev_text'		=>	'&lt;&lt;',
+				'next_text'		=>	'&gt;&gt;',
+			) );
 		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
+	}
 	?>
 
 

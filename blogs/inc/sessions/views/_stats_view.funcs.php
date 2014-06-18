@@ -580,7 +580,14 @@ function hit_iprange_status_title( $IP_address )
 
 	if( $ip_range_status === '' )
 	{ // No IP range for this IP address
-		return '';
+		if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+		{ // Display a link to create new one if user has an access
+			return '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;action=iprange_new&amp;ip='.$IP_address.'">'.T_('Create').'</a>';
+		}
+		else
+		{ // No access to create new IP range
+			return '';
+		}
 	}
 
 	if( $current_User->check_perm( 'spamblacklist', 'view' ) )

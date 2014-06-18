@@ -485,10 +485,10 @@ if( $blog )
 			$block_item_Widget->global_icon( T_('Write a new post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID, T_('New post').' &raquo;', 3, 4 );
 		}
 
+		echo '<div id="styled_content_block" class="items_container">';
+
 		$block_item_Widget->title = T_('Recently edited');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
-
-		echo '<div id="styled_content_block" class="items_container">';
 
 		while( $Item = & $ItemList->get_item() )
 		{
@@ -506,7 +506,7 @@ if( $blog )
 			$Item->edit_link( array( // Link to backoffice for editing
 					'before'    => ' ',
 					'after'     => ' ',
-					'class'     => 'ActionButton btn'
+					'class'     => 'ActionButton btn btn-default'
 				) );
 			echo '</div>';
 

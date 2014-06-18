@@ -552,6 +552,10 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	// disabled comment form
 	echo '<form class="bComment" action="">';
 
+	echo $params['form_params']['formstart'];
+
+	echo $params['form_params']['fieldset_begin'];
+
 	echo '<div class="comment_posting_disabled_msg">';
 	if( $is_logged_in )
 	{
@@ -564,7 +568,7 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	}
 	echo '</div>';
 
-	echo $params['form_params']['formstart'];
+	echo $params['form_params']['fieldset_end'];
 
 	echo $params['form_params']['fieldset_begin'];
 	echo $params['form_params']['fieldstart'];
@@ -807,7 +811,7 @@ jQuery( '.vote_spam' ).show();
 // Set comments vote
 function setCommentVote( id, type, vote )
 {
-	var row_selector = '#comment_row_' + id;
+	var row_selector = '#comment_' + id;
 	var highlight_class = '';
 	var color = '';
 	switch(vote)
@@ -856,7 +860,7 @@ function setCommentVote( id, type, vote )
 // Set comment status
 function setCommentStatus( id, status, redirect_to )
 {
-	var row_selector = '[id=comment_row_' + id + ']';
+	var row_selector = '[id=comment_' + id + ']';
 	var color = fadeInStatus( row_selector, status );
 
 	jQuery.ajax({
@@ -1208,7 +1212,7 @@ function comments_results_block( $params = array() )
 		}
 	}
 
-	global $DB;
+	global $DB, $AdminUI;
 
 	param( 'user_tab', 'string', '', true );
 	param( 'user_ID', 'integer', 0, true );
@@ -1248,8 +1252,9 @@ function comments_results_block( $params = array() )
 		$comments_Results->init_params_by_skin( $params[ 'skin_type' ], $params[ 'skin_name' ] );
 	}
 
+	$results_params = $AdminUI->get_template( 'Results' );
 	$display_params = array(
-		'before' => '<div class="results" style="margin-top:25px" id="comments_result">'
+		'before' => str_replace( '>', ' style="margin-top:25px" id="comments_result">', $results_params['before'] ),
 	);
 	$comments_Results->display( $display_params );
 
@@ -1647,4 +1652,5 @@ function comment_edit_actions( $Comment )
  * End of helper functions block to display Comments results.
  * New ( not display helper ) functions must be created above comments_results function
  */
+
 ?>

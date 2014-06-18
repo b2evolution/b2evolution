@@ -415,6 +415,8 @@ function get_request_title( $params = array() )
 			'posts_text'          => '#',
 			'useritems_text'      => T_('User posts'),
 			'usercomments_text'   => T_('User comments'),
+			'download_head_text'  => T_('Download').' - $file_title$ - $post_title$',
+			'download_body_text'  => '',
 		), $params );
 
 	if( $params['auto_pilot'] == 'seo_title' )
@@ -432,6 +434,14 @@ function get_request_title( $params = array() )
 
 	switch( $disp )
 	{
+		case 'front':
+			// We are requesting a front page:
+			if( !empty( $params['front_text'] ) )
+			{
+				$r[] = $params['front_text'];
+			}
+			break;
+
 		case 'arcdir':
 			// We are requesting the archive directory:
 			$r[] = $params['arcdir_text'];
@@ -585,6 +595,23 @@ function get_request_title( $params = array() )
 			{
 				$after = $params['title_'.$disp.'_after'];
 			}
+			break;
+	
+		case 'download':
+			// We are displaying a download page:
+			global $download_Link;
+
+			$download_text = ( $params['format'] == 'htmlhead' ) ? $params['download_head_text'] : $params['download_body_text'];
+			if( strpos( $download_text, '$file_title$' ) !== false )
+			{ // Replace a mask $file_title$ with real file name
+				$download_File = & $download_Link->get_File();
+				$download_text = str_replace( '$file_title$', $download_File->get_name(), $download_text );
+			}
+			if( strpos( $download_text, '$post_title$' ) !== false )
+			{ // Replace a mask $file_title$ with real file name
+				$download_text = str_replace( '$post_title$', implode( $params['glue'], $MainList->get_filter_titles( array( 'visibility', 'hide_future' ) ) ), $download_text );
+			}
+			$r[] = $download_text;
 			break;
 
 		case 'user':
@@ -810,6 +837,72 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
 
 
 /**
+ * Get library url of JS or CSS file by file name or alias
+ *
+ * @param string File or Alias name
+ * @param boolean|string Is the file's path relative to the base path/url?
+ * @param string File type: 'js' or 'css'
+ * @return string URL
+ */
+function get_require_url( $lib_file, $relative_to = 'rsc_url', $type = 'js' )
+{
+	global $library_local_urls, $library_cdn_urls, $debug, $rsc_url;
+
+	if( ! empty( $library_cdn_urls[ $lib_file ] ) )
+	{ // Rewrite local urls with CDN urls if they are defined in _advanced.php
+		$library_local_urls[ $lib_file ] = $library_cdn_urls[ $lib_file ];
+	}
+
+	if( ! empty( $library_local_urls[ $lib_file ] ) )
+	{ // We are requesting an alias
+		if( $debug && ! empty( $library_local_urls[ $lib_file ][1] ) )
+		{ // Load JS file for debug mode (optional)
+			$lib_file = $library_local_urls[ $lib_file ][1];
+		}
+		else
+		{ // Load JS file for production mode
+			$lib_file = $library_local_urls[ $lib_file ][0];
+		}
+
+		if( $relative_to === 'relative' || $relative_to === true )
+		{ // Aliases cannot be relative, make it relative to $rsc_url
+			$relative_to = 'rsc_url';
+		}
+	}
+
+	if( $relative_to === 'relative' || $relative_to === true )
+	{ // Make the file relative to current page <base>:
+		$lib_url = $lib_file;
+	}
+	elseif( preg_match('~^(https?:)?//~', $lib_file ) )
+	{ // It's an absolute url, keep it as is:
+		$lib_url = $lib_file;
+	}
+	elseif( $relative_to === 'rsc_url' || $relative_to === false )
+	{ // Get the file from $rsc_url:
+		$lib_url = $rsc_url.$type.'/'.$lib_file;
+	}
+	elseif( $relative_to === 'blog' )
+	{ // Get the file from $rsc_url:
+		global $Blog;
+		if( !empty( $Blog ) )
+		{
+			$lib_url = $Blog->get_local_rsc_url().$type.'/'.$lib_file;
+		}
+		else
+		{
+			$lib_url = $rsc_url.$type.'/'.$lib_file;
+		}
+	}
+	else
+	{
+		debug_die( 'Unknown $relative to argument in get_require_url()' );
+	}
+
+	return $lib_url;
+}
+
+/**
  * Memorize that a specific javascript file will be required by the current page.
  * All requested files will be included in the page head only once (when headlines is called)
  *
@@ -823,77 +916,29 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
  */
 function require_js( $js_file, $relative_to = 'rsc_url' )
 {
-	global $rsc_url, $debug, $app_version_long;
+	global $app_version_long;
 	static $required_js;
 
-	$js_aliases = array(
-		'#jquery#' => 'jquery.min.js',
-		'#jquery_debug#' => 'jquery.js',
-		'#jqueryUI#' => 'jquery/jquery.ui.all.min.js',
-		'#jqueryUI_debug#' => 'jquery/jquery.ui.all.js',
-	);
-
-	if( in_array( $js_file, array( '#jqueryUI#', '#jqueryUI_debug#' ) ) )
-	{	// Dependency : ensure jQuery is loaded
-		require_js( '#jquery#', $relative_to );
+	if( is_admin_page() && ( $relative_to == 'blog' ) )
+	{ // Make sure we never use resource url relative to any blog url in case of an admin page ( important in case of multi-domain installations )
+		$relative_to = 'rsc_url';
 	}
-	elseif( $js_file == 'communication.js' )
-	{ // jQuery dependency
+
+	if( in_array( $js_file, array( '#jqueryUI#', 'communication.js' ) ) )
+	{ // Dependency : ensure jQuery is loaded
 		require_js( '#jquery#', $relative_to );
 	}
 
-	if( !empty( $js_aliases[$js_file]) )
-	{ // We are requsting an alias
-		if ( $js_file == '#jquery#' && $debug )
-		{
-			$js_file = '#jquery_debug#';
-		}
-		$js_file = $js_aliases[$js_file];
-
-		if( $relative_to === 'relative' || $relative_to === true )
-		{	// Aliases cannot be relative, make it relative to $rsc_url
-			$relative_to = 'rsc_url';
-		}
-	}
-
-
-	if( $relative_to === 'relative' || $relative_to === true )
-	{	// Make the file relative to current page <base>:
-		$js_url = $js_file;
-	}
-	elseif( preg_match('~^https?://~', $js_file ) )
-	{ // It's an absolute url, keep it as is:
-		$js_url = $js_file;
-	}
-	elseif( $relative_to === 'rsc_url' || $relative_to === false )
-	{	// Get the file from $rsc_url:
-		$js_url = $rsc_url.'js/'.$js_file;
-	}
-	elseif( $relative_to === 'blog' )
-	{	// Get the file from $rsc_url:
-		global $Blog;
-		if( !empty( $Blog ) )
-		{
-			$js_url = $Blog->get_local_rsc_url().'js/'.$js_file;
-		}
-		else
-		{
-			$js_url = $rsc_url.'js/'.$js_file;
-		}
-	}
-	else
-	{
-		debug_die('Unknown $relative to argument in require_js()');
-	}
-
+	// Get library url of JS file by alias name
+	$js_url = get_require_url( $js_file, $relative_to, 'js' );
 
 	// Be sure to get a fresh copy of this JS file after application upgrades:
 	$js_url = url_add_param( $js_url, 'v='.$app_version_long );
 
 	// Add to headlines, if not done already:
-	if( empty( $required_js ) || ! in_array( strtolower($js_url), $required_js ) )
+	if( empty( $required_js ) || ! in_array( strtolower( $js_url ), $required_js ) )
 	{
-		$required_js[] = strtolower($js_url);
+		$required_js[] = strtolower( $js_url );
 		add_headline( '<script type="text/javascript" src="'.$js_url.'"></script>' );
 	}
 }
@@ -915,33 +960,14 @@ function require_js( $js_file, $relative_to = 'rsc_url' )
  */
 function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media = NULL, $version = '#' )
 {
-	global $rsc_url, $debug, $app_version_long;
+	global $app_version_long;
 	static $required_css;
 
-	if( $relative_to === 'relative' || $relative_to === true )
-	{	// Make the file relative to current page <base>:
-		$css_url = $css_file;
-	}
-	elseif( preg_match('~^https?://~', $css_file ) )
-	{ // It's an absolute url, keep it as is:
-		$css_url = $css_file;
-	}
-	elseif( $relative_to === 'rsc_url' || $relative_to === false )
-	{	// Get the file from $rsc_url:
-		$css_url = $rsc_url.'css/'.$css_file;
-	}
-	elseif( $relative_to === 'blog' )
-	{	// Get the file from $rsc_url:
-		global $Blog;
-		$css_url = $Blog->get_local_rsc_url().'css/'.$css_file;
-	}
-	else
-	{
-		debug_die('Unknown $relative to argument in require_css()');
-	}
+	// Get library url of CSS file by alias name
+	$css_url = get_require_url( $css_file, $relative_to, 'css' );
 
-	if( !empty($version) )
-	{	// Be sure to get a fresh copy of this CSS file after application upgrades:
+	if( ! empty( $version ) )
+	{ // Be sure to get a fresh copy of this CSS file after application upgrades:
 		if( $version == '#' )
 		{
 			$version = $app_version_long;
@@ -951,18 +977,17 @@ function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media
 
 	// Add to headlines, if not done already:
 	// fp> TODO: check for url without version to avoid duplicate load due to lack of verison in @import statements
-	if( empty( $required_css ) || ! in_array( strtolower($css_url), $required_css ) )
+	if( empty( $required_css ) || ! in_array( strtolower( $css_url ), $required_css ) )
 	{
-		$required_css[] = strtolower($css_url);
+		$required_css[] = strtolower( $css_url );
 
 		$start_link_tag = '<link rel="stylesheet"';
-		if ( !empty( $title ) ) $start_link_tag .= ' title="' . $title . '"';
-		if ( !empty( $media ) ) $start_link_tag .= ' media="' . $media . '"';
+		$start_link_tag .= empty( $title ) ? '' : ' title="'.$title.'"';
+		$start_link_tag .= empty( $media ) ? '' : ' media="'.$media.'"';
 		$start_link_tag .= ' type="text/css" href="';
 		$end_link_tag = '" />';
-		add_headline( $start_link_tag . $css_url . $end_link_tag );
+		add_headline( $start_link_tag.$css_url.$end_link_tag );
 	}
-
 }
 
 
@@ -1021,7 +1046,7 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				// Added by fplanque - (MIT License) - http://colorpowered.com/colorbox/
 				require_js( '#jqueryUI#', $relative_to );
 				require_js( 'voting.js', $relative_to );
-				require_js( 'jquery/jquery.touchswipe.min.js', $relative_to );
+				require_js( '#touchswipe#', $relative_to );
 				require_js( 'colorbox/jquery.colorbox-min.js', $relative_to );
 				require_css( 'colorbox/colorbox.css', $relative_to );
 				if( is_logged_in() )
@@ -1187,42 +1212,90 @@ function init_ratings_js( $relative_to = 'blog', $force_init = false )
 
 /**
  * Registers headlines required to a bubbletip above user login.
+ *
+ * @param string alias, url or filename (relative to rsc/css, rsc/js) for JS/CSS files
+ * @param string Library: 'bubbletip', 'popover'
  */
-function init_bubbletip_js( $relative_to = 'rsc_url' )
+function init_bubbletip_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 {
 	if( ! check_setting( 'bubbletip' ) )
 	{ // If setting "bubbletip" is OFF for current case
 		return;
 	}
 
-	require_js( '#jquery#', $relative_to ); // dependency
-	require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
-	require_js( 'bubbletip.js', $relative_to );
-	require_css( 'jquery/jquery.bubbletip.css', $relative_to );
+	switch( $library )
+	{
+		case 'popover':
+			// Use popover library of bootstrap
+			require_js( '#jquery#', $relative_to );
+			require_js( 'bootstrap/usernames.min.js', $relative_to );
+			break;
+
+		case 'bubbletip':
+		default:
+			// Use bubbletip plugin of jQuery
+			require_js( '#jquery#', $relative_to ); // dependency
+			require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
+			require_js( 'bubbletip.js', $relative_to );
+			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
+			break;
+	}
 }
 
 
 /**
  * Registers headlines required to display a bubbletip to the right of user multi-field.
+ *
+ * @param string alias, url or filename (relative to rsc/css, rsc/js) for JS/CSS files
+ * @param string Library: 'bubbletip', 'popover'
  */
-function init_userfields_js( $relative_to = 'rsc_url' )
+function init_userfields_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 {
-	require_js( '#jquery#', $relative_to ); // dependency
-	require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
-	require_js( 'userfields.js', $relative_to );
-	require_css( 'jquery/jquery.bubbletip.css', $relative_to );
+	switch( $library )
+	{
+		case 'popover':
+			// Use popover library of bootstrap
+			require_js( '#jquery#', $relative_to );
+			require_js( 'bootstrap/userfields.min.js', $relative_to );
+			break;
+
+		case 'bubbletip':
+		default:
+			// Use bubbletip plugin of jQuery
+			require_js( '#jquery#', $relative_to ); // dependency
+			require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
+			require_js( 'userfields.js', $relative_to );
+			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
+			break;
+	}
 }
 
 
 /**
  * Registers headlines required to display a bubbletip to the right of plugin help icon.
+ *
+ * @param string alias, url or filename (relative to rsc/css, rsc/js) for JS/CSS files
+ * @param string Library: 'bubbletip', 'popover'
  */
-function init_plugins_js( $relative_to = 'rsc_url' )
+function init_plugins_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 {
-	require_js( '#jquery#', $relative_to ); // dependency
-	require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
-	require_js( 'plugins.js', $relative_to );
-	require_css( 'jquery/jquery.bubbletip.css', $relative_to );
+	switch( $library )
+	{
+		case 'popover':
+			// Use popover library of bootstrap
+			require_js( '#jquery#', $relative_to );
+			require_js( 'bootstrap/plugins.min.js', $relative_to );
+			break;
+
+		case 'bubbletip':
+		default:
+			// Use bubbletip plugin of jQuery
+			require_js( '#jquery#', $relative_to ); // dependency
+			require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
+			require_js( 'plugins.js', $relative_to );
+			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
+			break;
+	}
 }
 
 
@@ -1325,22 +1398,88 @@ function init_voting_comment_js( $relative_to = 'rsc_url' )
  */
 function init_colorpicker_js( $relative_to = 'rsc_url' )
 {
+	// Inititialize bubbletip plugin
+	global $Skin, $AdminUI;
+	if( ! empty( $AdminUI ) )
+	{ // Get library of tooltip for current back-office skin
+		$tooltip_plugin = $AdminUI->get_template( 'tooltip_plugin' );
+	}
+	elseif( ! empty( $Skin ) )
+	{ // Get library of tooltip for current front-office skin
+		$tooltip_plugin = $Skin->get_template( 'tooltip_plugin' );
+	}
+	else
+	{ // Use bubbletip library by default for unknown skins
+		$tooltip_plugin = 'bubbletip';
+	}
+	init_bubbletip_js( $relative_to, $tooltip_plugin );
+
+	switch( $tooltip_plugin )
+	{
+		case 'popover':
+			// Use popover library of bootstrap
+			$init_tooltip_js = '
+			jQuery( this ).popover( {
+					trigger: "manual",
+					placement: "right",
+					html: true,
+					content: jQuery( "#" + colorpicker_ID ),
+				} );
+			jQuery( this ).focus( function()
+			{
+				var popover_obj = jQuery( this ).parent().find( ".popover" );
+				if( popover_obj.length == 0 )
+				{ // Initialize popover only first time
+					jQuery( "#" + colorpicker_ID ).show();
+					jQuery( this ).popover( "show" );
+				}
+				else
+				{ // Show popover
+					popover_obj.show();
+				}
+			} ).blur( function()
+			{
+				var popover_obj = jQuery( this ).parent().find( ".popover" );
+				if( popover_obj.length > 0 )
+				{ // Hide popover
+					popover_obj.hide();
+				}
+			} );';
+			// Hide each colopicker on load
+			$init_colorpicker_css = ' style=\"display:none\"';
+			break;
+
+		case 'bubbletip':
+		default:
+			// Use bubbletip plugin of jQuery
+			$init_tooltip_js = '
+			jQuery( this ).bubbletip( jQuery( "#" + colorpicker_ID ), {
+					bindShow: "focus",
+					bindHide: "blur",
+					calculateOnShow: true,
+					deltaDirection: "right",
+					deltaShift: 0,
+				} );';
+			$init_colorpicker_css = '';
+			break;
+	}
+
+	// Initialize farbastic colorpicker
 	require_js( '#jquery#', $relative_to );
 	require_js( 'jquery/jquery.farbtastic.min.js', $relative_to );
-	require_css( 'jquery/farbtastic/farbtastic.css' );
-	add_js_headline( 'jQuery(document).ready( function() {
-		jQuery( "body" ).append( "<div id=\"colorpicker\"></div>" );
-		var farbtastic_colorpicker = jQuery.farbtastic( "#colorpicker" );
-		jQuery( ".form_color_input" )
-			.each( function () { farbtastic_colorpicker.linkTo( this ); } )
-			.blur( function () { jQuery( "#colorpicker" ).hide(); } )
-			.focus( function () {
-				farbtastic_colorpicker.linkTo( this );
-				jQuery( "#colorpicker" ).css( {
-					top: jQuery( this ).offset().top - 90,
-					left: jQuery( this ).offset().left + jQuery( this ).width() + 15,
-				} ).show();
-			} );
+	require_css( 'jquery/farbtastic/farbtastic.css', $relative_to );
+	add_js_headline( 'jQuery(document).ready( function()
+	{
+		var colorpicker_num = 1;
+		jQuery( ".form_color_input" ).each( function ()
+		{
+			var colorpicker_ID = "farbtastic_colorpicker_" + colorpicker_num;
+			jQuery( "body" ).append( "<div id=\"" + colorpicker_ID + "\"'.$init_colorpicker_css.'></div>" );
+			var farbtastic_colorpicker = jQuery.farbtastic( "#" + colorpicker_ID );
+			farbtastic_colorpicker.linkTo( this );
+			'.$init_tooltip_js.'
+			colorpicker_num++;
+		} );
 	} );' );
 }
 
@@ -1349,39 +1488,79 @@ function init_colorpicker_js( $relative_to = 'rsc_url' )
  * Registers headlines required to autocomplete the user logins
  *
  * @param string alias, url or filename (relative to rsc/css, rsc/js) for JS/CSS files
+ * @param string Library: 'hintbox', 'typeahead'
  */
-function init_autocomplete_login_js( $relative_to = 'rsc_url' )
+function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintbox' )
 {
 	global $blog;
 
 	require_js( '#jquery#', $relative_to ); // dependency
 
-	// Use hintbox plugin of jQuery
-
-	// Add jQuery hintbox (autocompletion).
-	// Form 'username' field requires the following JS and CSS.
-	// fp> TODO: think about a way to bundle this with other JS on the page -- maybe always load hintbox in the backoffice
-	//     dh> Handle it via http://www.appelsiini.net/projects/lazyload ?
-	// dh> TODO: should probably also get ported to use jquery.ui.autocomplete (or its successor)
-	require_css( 'jquery/jquery.hintbox.css', $relative_to );
-	require_js( 'jquery/jquery.hintbox.min.js', $relative_to );
-	add_js_headline( 'jQuery( document ).on( "focus", "input.autocomplete_login", function()
+	switch( $library )
 	{
-		var ajax_params = "";
-		if( jQuery( this ).hasClass( "only_assignees" ) )
-		{
-			ajax_params = "&user_type=assignees&blog='.$blog.'";
-		}
-		jQuery( this ).hintbox(
-		{
-			url: "'.get_secure_htsrv_url().'async.php?action=get_login_list" + ajax_params,
-			matchHint: true,
-			autoDimentions: true
-		} );
-		'
-		// Don't submit a form by Enter when user is editing the owner fields
-		.get_prevent_key_enter_js( 'input.autocomplete_login' ).'
-	} );' );
+		case 'typeahead':
+			// Use typeahead library of bootstrap
+			add_js_headline( 'jQuery( document ).ready( function()
+			{
+				jQuery( "input.autocomplete_login" ).typeahead( null,
+				{
+					displayKey: "login",
+					source: function ( query, cb )
+					{
+						jQuery.ajax(
+						{
+							url: "'.get_secure_htsrv_url().'async.php?action=get_login_list",
+							type: "post",
+							data: { q: query, data_type: "json" },
+							dataType: "JSON",
+							success: function( logins )
+							{
+								var json = new Array();
+								for( var l in logins )
+								{
+									json.push( { login: logins[ l ] } );
+								}
+								cb( json );
+							}
+						} );
+					}
+				} );
+				'
+				// Don't submit a form by Enter when user is editing the owner fields
+				.get_prevent_key_enter_js( 'input.autocomplete_login' ).'
+			} );' );
+			break;
+
+		case 'hintbox':
+		default:
+			// Use hintbox plugin of jQuery
+
+			// Add jQuery hintbox (autocompletion).
+			// Form 'username' field requires the following JS and CSS.
+			// fp> TODO: think about a way to bundle this with other JS on the page -- maybe always load hintbox in the backoffice
+			//     dh> Handle it via http://www.appelsiini.net/projects/lazyload ?
+			// dh> TODO: should probably also get ported to use jquery.ui.autocomplete (or its successor)
+			require_css( 'jquery/jquery.hintbox.css', $relative_to );
+			require_js( 'jquery/jquery.hintbox.min.js', $relative_to );
+			add_js_headline( 'jQuery( document ).on( "focus", "input.autocomplete_login", function()
+			{
+				var ajax_params = "";
+				if( jQuery( this ).hasClass( "only_assignees" ) )
+				{
+					ajax_params = "&user_type=assignees&blog='.$blog.'";
+				}
+				jQuery( this ).hintbox(
+				{
+					url: "'.get_secure_htsrv_url().'async.php?action=get_login_list" + ajax_params,
+					matchHint: true,
+					autoDimentions: true
+				} );
+				'
+				// Don't submit a form by Enter when user is editing the owner fields
+				.get_prevent_key_enter_js( 'input.autocomplete_login' ).'
+			} );' );
+			break;
+	}
 }
 
 
@@ -1465,11 +1644,18 @@ function bullet( $bool )
  */
 function item_prevnext_links( $params = array() )
 {
+	global $disp;
+
+	if( $disp == 'download' )
+	{ // Don't display the links on download page
+		return;
+	}
+
 	global $MainList;
 
 	$params = array_merge( array( 'target_blog' => 'auto' ), $params );
 
-	if( isset($MainList) )
+	if( isset( $MainList ) )
 	{
 		$MainList->prevnext_item_links( $params );
 	}
@@ -1480,7 +1666,35 @@ function item_prevnext_links( $params = array() )
  */
 function user_prevnext_links( $params = array() )
 {
-	global $UserList;
+	global $UserList, $AdminUI, $Skin;
+
+	$params = array_merge( array(
+			'template'     => '$prev$$back$$next$',
+			'block_start'  => '<table class="prevnext_user"><tr>',
+			'prev_start'   => '<td width="33%">',
+			'prev_end'     => '</td>',
+			'prev_no_user' => '<td width="33%">&nbsp;</td>',
+			'back_start'   => '<td width="33%" class="back_users_list">',
+			'back_end'     => '</td>',
+			'next_start'   => '<td width="33%" class="right">',
+			'next_end'     => '</td>',
+			'next_no_user' => '<td width="33%">&nbsp;</td>',
+			'block_end'    => '</tr></table>',
+			'user_tab'     => 'profile',
+		), $params );
+
+	if( !empty( $AdminUI ) )
+	{ // Set template from AdminUI
+		$user_navigation = $AdminUI->get_template( 'user_navigation' );
+	}
+	elseif( !empty( $Skin ) )
+	{ // Set template from Skin
+		$user_navigation = $Skin->get_template( 'user_navigation' );
+	}
+	if( !empty( $user_navigation ) && is_array( $user_navigation ) )
+	{
+		$params = array_merge( $params, $user_navigation );
+	}
 
 	if( isset($UserList) )
 	{
@@ -1506,14 +1720,21 @@ function messages( $params = array() )
 
 /**
  * Stub: Links to list pages:
+ *
+ * @param array Params
+ * @param object ItemList2, NULL to use global $MainList
  */
-function mainlist_page_links( $params = array() )
+function mainlist_page_links( $params = array(), $ItemList2 = NULL )
 {
-	global $MainList;
-
-	if( isset($MainList) )
+	if( is_null( $ItemList2 ) )
 	{
-		$MainList->page_links( $params );
+		global $MainList;
+		$ItemList2 = $MainList;
+	}
+
+	if( ! empty( $ItemList2 ) )
+	{
+		$ItemList2->page_links( $params );
 	}
 }
 
@@ -1529,13 +1750,13 @@ function & mainlist_get_item()
 {
 	global $MainList, $featured_displayed_item_IDs;
 
-	if( isset($MainList) )
+	if( isset( $MainList ) )
 	{
 		$Item = & $MainList->get_item();
 
 		if( $Item && in_array( $Item->ID, $featured_displayed_item_IDs ) )
-		{	// This post was already displayed as a Featured post, let's skip it and get the next one:
-			$Item = & $MainList->get_item();
+		{ // This post was already displayed as a Featured post, let's skip it and get the next one:
+			$Item = & mainlist_get_item();
 		}
 	}
 	else
@@ -1884,6 +2105,7 @@ function display_login_form( $params )
 			'form_class' => 'bComment',
 			'source' => 'inskin login form',
 			'inskin' => true,
+			'inskin_urls' => true, // Use urls of front-end
 			'login_required' => true,
 			'validate_required' => NULL,
 			'redirect_to' => '',
@@ -2007,7 +2229,7 @@ function display_login_form( $params )
 					array( 'maxlength' => 255, 'class' => 'input_text', 'input_required' => 'required', 'placeholder' => T_('Username (or email address)') ) );
 	}
 
-	if( $inskin )
+	if( $inskin || $params[ 'inskin_urls' ] )
 	{
 		$lost_password_url = regenerate_url( 'disp', 'disp=lostpassword' );
 	}
@@ -2036,12 +2258,12 @@ function display_login_form( $params )
 	$Plugins->trigger_event( 'DisplayLoginFormFieldset', array( 'Form' => & $Form ) );
 
 	// Submit button(s):
-	$submit_buttons = array( array( 'name'=>'login_action[login]', 'value'=>T_('Log in!'), 'class'=>'search btn-primary', 'style'=>'font-size: 120%' ) );
-	if( ( !$inskin ) && ( strpos( $redirect_to, $admin_url ) !== 0 )
+	$submit_buttons = array( array( 'name'=>'login_action[login]', 'value'=>T_('Log in!'), 'class'=>'btn-primary btn-lg' ) );
+	if( ( !$inskin && !$params['inskin_urls'] ) && ( strpos( $redirect_to, $admin_url ) !== 0 )
 		&& ( strpos( $ReqHost.$redirect_to, $admin_url ) !== 0 )// if $redirect_to is relative
 		&& ( ! is_admin_page() ) )
 	{ // provide button to log straight into backoffice, if we would not go there anyway
-		$submit_buttons[] = array( 'name'=>'login_action[redirect_to_backoffice]', 'value'=>T_('Log into backoffice!'), 'class'=>'search' );
+		$submit_buttons[] = array( 'name'=>'login_action[redirect_to_backoffice]', 'value'=>T_('Log into backoffice!'), 'class'=>'btn-lg' );
 	}
 
 	$Form->buttons_input( $submit_buttons );
@@ -2169,7 +2391,7 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 		$Form->text_input( $dummy_fields[ 'login' ], $login, 30, '', '', array( 'maxlength' => 255, 'placeholder' => T_('Username (or email address)'), 'input_required' => 'required' ) );
 	}
 
-	$Form->buttons_input( array(array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Send me an email now!'), 'class' => 'ActionButton btn-primary' )) );
+	$Form->buttons_input( array(array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Send me an email now!'), 'class' => 'btn-primary btn-lg' )) );
 
 	if( $params['inskin'] || $params['inskin_urls'] )
 	{
@@ -2277,7 +2499,7 @@ function display_activateinfo( $params )
 		$Form->end_fieldset();
 
 		// Submit button:
-		$submit_button = array( array( 'name'=>'submit', 'value'=>T_('Send me a new activation email now!'), 'class'=>'submit btn-primary' ) );
+		$submit_button = array( array( 'name'=>'submit', 'value'=>T_('Send me a new activation email now!'), 'class'=>'btn-primary btn-lg' ) );
 
 		$Form->buttons_input($submit_button);
 
@@ -2430,19 +2652,19 @@ function display_password_indicator( $params = array() )
 		switch(passcheck.score) {
 			case 1:
 				bar_color = '#F88158';
-				bar_status = '".format_to_output( T_('Weak'), 'htmlattr' )."';
+				bar_status = '".format_to_output( TS_('Weak'), 'htmlattr' )."';
 				break;
 			case 2:
 				bar_color = '#FBB917';
-				bar_status = '".format_to_output( T_('So-so'), 'htmlattr' )."';
+				bar_status = '".format_to_output( TS_('So-so'), 'htmlattr' )."';
 				break;
 			case 3:
 				bar_color = '#8BB381';
-				bar_status = '".format_to_output( T_('Good'), 'htmlattr' )."';
+				bar_status = '".format_to_output( TS_('Good'), 'htmlattr' )."';
 				break;
 			case 4:
 				bar_color = '#59E817';
-				bar_status = '".format_to_output( T_('Great!'), 'htmlattr' )."';
+				bar_status = '".format_to_output( TS_('Great!'), 'htmlattr' )."';
 				break;
 		}
 
@@ -2456,6 +2678,18 @@ function display_password_indicator( $params = array() )
 			document.getElementById('p-time').innerHTML = '".TS_('Estimated crack time').": ' + passcheck.crack_time_display;
 		}
 	}
+
+	jQuery( 'input#".$params[ 'pass1-id' ].", input#".$params[ 'pass2-id' ]."' ).keyup( function()
+	{	// Validate passwords
+		if( jQuery( 'input#".$params[ 'pass2-id' ]."' ).val() != jQuery( 'input#".$params[ 'pass1-id' ]."' ).val() )
+		{	// Passwords are different
+			jQuery( '#pass2_status' ).html( '".get_icon( 'xross' )." ".TS_('The second password is different from the first.')."' );
+		}
+		else
+		{
+			jQuery( '#pass2_status' ).html( '' );
+		}
+	} );
 </script>";
 }
 
@@ -2470,7 +2704,7 @@ function display_login_validator( $params = array() )
 	global $rsc_url, $dummy_fields;
 
 	$params = array_merge( array(
-			'login-id'    => $dummy_fields[ 'login' ],
+			'login-id' => $dummy_fields[ 'login' ],
 		), $params );
 
 	echo '<script type="text/javascript">

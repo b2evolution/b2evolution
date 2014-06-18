@@ -220,7 +220,7 @@ class user_login_Widget extends ComponentWidget
 		echo $this->disp_params['block_start'];
 
 		if( ! is_logged_in() )
-		{	// Login form:
+		{ // Login form:
 			$source = 'user_login_widget';
 			if( empty( $redirect_to ) )
 			{
@@ -228,12 +228,19 @@ class user_login_Widget extends ComponentWidget
 			}
 
 			$this->disp_title();
+
+			echo $this->disp_params['block_body_start'];
+
 			// display widget login form
 			require $skins_path.'_widget_login.form.php';
+
+			echo $this->disp_params['block_body_end'];
 		}
 		else
-		{	// Display a greeting text
+		{ // Display a greeting text
 			global $current_User;
+
+			echo $this->disp_params['block_body_start'];
 
 			if( $this->get_param('profile_picture_size') != '' )
 			{	// Display profile picture
@@ -260,6 +267,8 @@ class user_login_Widget extends ComponentWidget
 					.str_replace( '$level$', $current_User->get( 'level' ), $this->get_param('level_text') )
 					.'</p>';
 			}
+
+			echo $this->disp_params['block_body_end'];
 		}
 
 		echo $this->disp_params['block_end'];

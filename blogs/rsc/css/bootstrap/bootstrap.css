@@ -700,11 +700,12 @@ address {
 }
 
 code,
+samp,
 pre {
   font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
 }
 
-code {
+code, samp {
   padding: 2px 4px;
   font-size: 90%;
   color: #c7254e;

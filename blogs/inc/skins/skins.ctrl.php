@@ -74,7 +74,10 @@ switch( $action )
 		$Messages->add( T_('Skin has been installed.'), 'success' );
 
 		// We want to highlight the edited object on next list display:
-		$Session->set( 'fadeout_array', array( 'skin_ID' => array($edited_Skin->ID) ) );
+		$Session->set( 'fadeout_array', array( 'skin_ID' => array( $edited_Skin->ID ) ) );
+
+		// Replace a mask by value. Used for install skin on creating of new blog
+		$redirect_to = str_replace( '$skin_ID$', $edited_Skin->ID, $redirect_to );
 
 		// PREVENT RELOAD & Switch to list mode:
 		header_redirect( $redirect_to );

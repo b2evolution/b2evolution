@@ -204,6 +204,7 @@
 			sf.IE7fix.call($ul);
 			o.onBeforeShow.call($ul);
 			$ul.animate(o.animation,o.speed,function(){ sf.IE7fix.call($ul); o.onShow.call($ul); });
+			$ul.css( 'overflow', 'visible' );
 			return this;
 		}
 	});

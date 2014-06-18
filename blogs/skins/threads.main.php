@@ -12,7 +12,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $htsrv_url, $Messages, $current_User;
+global $htsrv_url, $Messages, $current_User, $Skin;
 
 if( !is_logged_in() )
 { // Redirect to the login page for anonymous users
@@ -31,14 +31,21 @@ if( !$current_User->check_status( 'can_view_threads' ) )
 	}
 
 	$Messages->add( 'You are not allowed to view Messages!' );
-	header_redirect( $Blog->gen_blogurl(), 302 );
+
+	$blogurl = $Blog->gen_blogurl();
+	// If it was a front page request or the front page is set to display 'threads' then we must not redirect to the front page because it is forbidden for the current User
+	$redirect_to = ( is_front_page() || ( $Blog->get_setting( 'front_disp' ) == 'threads' ) ) ? url_add_param( $blogurl, 'disp=404', '&' ) : $blogurl;
+	header_redirect( $redirect_to, 302 );
 	// will have exited
 }
 
 if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
 { // Redirect to the blog url for users without messaging permission
 	$Messages->add( 'You are not allowed to view Messages!' );
-	header_redirect( $Blog->gen_blogurl(), 302 );
+	$blogurl = $Blog->gen_blogurl();
+	// If it was a front page request or the front page is set to display 'threads' then we must not redirect to the front page because it is forbidden for the current User
+	$redirect_to = ( is_front_page() || ( $Blog->get_setting( 'front_disp' ) == 'threads' ) ) ? url_add_param( $blogurl, 'disp=403', '&' ) : $blogurl;
+	header_redirect( $redirect_to, 302 );
 	// will have exited
 }
 
@@ -112,6 +119,8 @@ switch( $action )
 		$current_User->check_perm( 'perm_messaging', 'reply', true );
 		break;
 }
+
+init_plugins_js( 'blog', $Skin->get_template( 'tooltip_plugin' ) );
 
 // Require functions.js to show/hide a panel with filters
 require_js( 'functions.js', 'blog' );

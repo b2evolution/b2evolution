@@ -807,9 +807,12 @@ function locale_overwritefromDB()
  */
 function locale_updateDB()
 {
-	global $locales, $DB;
+	global $locales, $DB, $Settings, $Messages, $action;
+	global $saved_params;
 
 	$templocales = $locales;
+	$disabled_locales = array();
+	$saved_params = array();
 
 	$lnr = 0;
 	// Loop through list of all HTTP POSTed params:
@@ -822,6 +825,7 @@ function locale_updateDB()
 
 		// This is a locale related parameter, get it now:
 		$pval = param( $pkey, 'string', '' );
+		$saved_params[$pkey] = $pval;
 
 		$lfield = $matches[2];
 
@@ -830,6 +834,10 @@ function locale_updateDB()
 			$lnr = $matches[1];
 			$plocale = $pval;
 
+			if( $templocales[ $plocale ]['enabled'] )
+			{ // Collect previously enabled locales
+				$disabled_locales[$plocale] = $plocale;
+			}
 			// checkboxes default to 0
 			$templocales[ $plocale ]['enabled'] = 0;
 		}
@@ -839,11 +847,71 @@ function locale_updateDB()
 			{ // startofweek must be between 0 and 6
 				continue;
 			}
-			$templocales[ $plocale ][$lfield] = $pval;
+			if( $lfield == 'enabled' )
+			{ // This locale is enabled, remove from the list of the disabled locales
+				unset( $disabled_locales[$plocale] );
+			}
+			$templocales[$plocale][$lfield] = $pval;
 		}
 	}
 
 	$locales = $templocales;
+
+	// Make sure the default locale is enabled
+	$current_default_locale = $Settings->get('default_locale');
+	if( isset( $current_default_locale ) && ( ! $locales[$current_default_locale]['enabled'] ) )
+	{ // The default locale is not enabled, we do not allow to update locales in this case
+		$Messages->add( T_('Updating locales are not enabled until default locale is not valid!'), 'error' );
+		return false;
+	}
+
+	// Check the usage of the disabled locales
+	$disabled_locales = ( count( $disabled_locales ) > 0 ) ? $DB->quote( $disabled_locales ) : false;
+	if( $disabled_locales && ( $action != 'confirm_update' ) )
+	{ // Some locales were disabled, create warning message if required
+		$user_disabled_locales = $DB->get_assoc( '
+			SELECT user_locale, count( user_ID ) as number_of_users
+			FROM T_users
+			WHERE user_locale IN ( '.$disabled_locales.' )
+			GROUP BY user_locale
+			HAVING number_of_users > 0
+			ORDER BY user_locale'
+		);
+		$coll_disabled_locales = $DB->get_assoc( '
+			SELECT blog_locale, count( blog_ID ) as number_of_blogs
+			FROM T_blogs
+			WHERE blog_locale IN ( '.$disabled_locales.' )
+			GROUP BY blog_locale
+			HAVING number_of_blogs > 0
+			ORDER BY blog_locale'
+		);
+
+		global $warning_message;
+		$warning_message = array();
+		$users_message = T_('%d users with invalid locale %s');
+		$colls_message = T_('%d collections with invalid locale %s');
+		foreach( $user_disabled_locales as $disabled_locale => $numbe_of_users )
+		{ // Disabled locale is used by users, add warning
+			$warning_message[] = sprintf( $users_message, $numbe_of_users, $disabled_locale );
+			if( isset( $coll_disabled_locales[$disabled_locale] ) )
+			{ // Disabled locale is used by blogs, add warning
+				$warning_message[] = sprintf( $colls_message, $coll_disabled_locales[$disabled_locale], $disabled_locale );
+				unset( $coll_disabled_locales[$disabled_locale] );
+			}
+		}
+		foreach( $coll_disabled_locales as $disabled_locale => $numbe_of_colls )
+		{ // Disabled locale is used by blogs, add warning
+			$warning_message[] = sprintf( $colls_message, $numbe_of_colls, $disabled_locale );
+		}
+
+		if( !empty( $warning_message ) )
+		{ // There are disabled locales which are used, create the final warning message
+			$warning_message = T_('You have disabled some locales. This results in:')."\n"
+				.'<ul><li>'.implode( '</li><li>', $warning_message ).'</li></ul>'
+				.sprintf( T_('These will be assigned the default locale %s'), $current_default_locale );
+			return false;
+		}
+	}
 
 	$query = "REPLACE INTO T_locales ( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_startofweek, loc_name, loc_messages, loc_priority, loc_transliteration_map, loc_enabled ) VALUES ";
 	foreach( $locales as $localekey => $lval )
@@ -880,9 +948,33 @@ function locale_updateDB()
 		), ';
 	}
 	$query = substr($query, 0, -2);
-	$q = $DB->query($query);
 
-	return (bool)$q;
+	$DB->begin();
+
+	$result = true;
+	if( $action == 'confirm_update' )
+	{ // Update users and blogs locale to the default if the prevously used locale was disabled
+		$users_update = $DB->query( 'UPDATE T_users
+			SET user_locale = '.$DB->quote( $current_default_locale ).'
+			WHERE  user_locale IN ( '.$disabled_locales.' )'
+		);
+		$blogs_update = $DB->query( 'UPDATE T_blogs
+			SET blog_locale = '.$DB->quote( $current_default_locale ).'
+			WHERE  blog_locale IN ( '.$disabled_locales.' )'
+		);
+		$result = ( $users_update !== false ) && ( $blogs_update !== false );
+	}
+
+	if( $result && ( $DB->query($query) !== false ) )
+	{ // Commit after successful update
+		$DB->commit();
+		return true;
+	}
+
+	// Some error occured, rollback the transaction and add error message
+	$DB->rollback();
+	$Messages->add( T_('Unexpected error occured, regional settings could not be updated.') );
+	return false;
 }
 
 

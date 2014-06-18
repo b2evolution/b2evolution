@@ -93,14 +93,6 @@ class Form extends Widget
 	var $_common_params = array();
 
 	/**
-	 * This is the default note format, where {@link handle_common_params()} falls
-	 * back to, when not given with $field_params.
-	 * @todo This might be used in switch_layout().
-	 * @var string
-	 */
-	var $note_format = ' <span class="notes">%s</span>';
-
-	/**
 	 * This is a buffer for hidden fields. We'll display all of them just before the end of form </form>. This avoids having them caught in between table rows.
 	 *
 	 * @var string
@@ -184,9 +176,16 @@ class Form extends Widget
 		else
 		{	// This happens for comment forms & login screen for example...
 			$template_is_empty = true;
-			if( ( is_object( $Skin ) ) && ( !empty( $layout ) ) )
+			if( is_object( $Skin ) )
 			{ // Get skin setting:
-				$template = $Skin->get_template( $layout.'_form' );
+				if( empty( $layout ) || $layout == 'split' || $layout == 'none' || $layout == 'fieldset' )
+				{ // Get default skin setting:
+					$template = $Skin->get_template( 'Form' );
+				}
+				else
+				{
+					$template = $Skin->get_template( $layout.'_form' );
+				}
 				$template_is_empty = empty( $template );
 				if( !$template_is_empty )
 				{
@@ -217,6 +216,7 @@ class Form extends Widget
 					'buttonsend' => "</div></fieldset>\n\n",
 					'customstart' => '<div class="custom_content">',
 					'customend' => "</div>\n",
+					'note_format' => ' <span class="notes">%s</span>',
 					'formend' => '</div>',
 				);
 				$layout = 'fieldset';
@@ -280,6 +280,7 @@ class Form extends Widget
 					$this->buttonsend     = $template['buttonsend'];
 					$this->customstart    = $template['customstart'];
 					$this->customend      = $template['customend'];
+					$this->note_format    = $template['note_format'];
 					$this->formend        = $template['formend'];
 				}
 			}
@@ -313,6 +314,7 @@ class Form extends Widget
 					$this->buttonsend = "</td></tr>\n";
 					$this->customstart = '<tr><td colspan="2" class="custom_content">';
 					$this->customend = "</td></tr>\n";
+					$this->note_format = ' <span class="notes">%s</span>';
 					$this->formend = "</table>\n";
 					break;
 
@@ -335,6 +337,7 @@ class Form extends Widget
 					$this->buttonsend = "</div></fieldset>\n\n";
 					$this->customstart = '<div class="custom_content">';
 					$this->customend = "</div>\n";
+					$this->note_format = ' <span class="notes">%s</span>';
 					$this->formend = '</div>';
 					break;
 
@@ -357,6 +360,7 @@ class Form extends Widget
 					$this->buttonsend = "</div></fieldset>\n\n";
 					$this->customstart = '<div class="custom_content">';
 					$this->customend = "</div>\n";
+					$this->note_format = ' <span class="notes">%s</span>';
 					$this->formend = '</div>';
 					break;
 
@@ -379,6 +383,7 @@ class Form extends Widget
 					$this->buttonsend = "\n";
 					$this->customstart = '';
 					$this->customend = "\n";
+					$this->note_format = ' <span class="notes">%s</span>';
 					$this->formend = '';
 					break;
 
@@ -401,6 +406,7 @@ class Form extends Widget
 					$this->buttonsend = "\n";
 					$this->customstart = '';
 					$this->customend = '';
+					$this->note_format = ' <span class="notes">%s</span>';
 					$this->formend = '';
 					break;
 
@@ -424,6 +430,7 @@ class Form extends Widget
 					$this->buttonsend = "\n";
 					$this->customstart = '';
 					$this->customend = "\n";
+					$this->note_format = ' <span class="notes">%s</span>';
 					$this->formend = '';
 			}
 
@@ -450,6 +457,7 @@ class Form extends Widget
 	 *    fieldend
 	 *    buttonsstart
 	 *    buttonsend
+	 *    note_format
 	 *    formend
 	 */
 	function switch_template_parts( $parts )
@@ -518,12 +526,21 @@ class Form extends Widget
 			$field_classes[] = 'field_required';
 		}
 
+		$r = $this->fieldstart;
+
 		if( count( $field_classes ) > 0 )
-		{ // Add class attribute
-			$ffield_id .= ' class="'.implode( ' ', $field_classes ).'"';
+		{
+			if( strpos( $r, 'class="' ) === false )
+			{ // Add class attribute
+				$ffield_id .= ' class="'.implode( ' ', $field_classes ).'"';
+			}
+			else
+			{ // Append classes to attribute
+				$r = str_replace( ' class="', ' class="'.implode( ' ', $field_classes ).' ', $r );
+			}
 		}
 
-		$r = str_replace( '$ID$', $ffield_id, $this->fieldstart );
+		$r = str_replace( '$ID$', $ffield_id, $r );
 
 		if( isset($this->_common_params['field_prefix']) )
 		{
@@ -855,8 +872,6 @@ class Form extends Widget
 	 */
 	function username( $field_name, &$User, $field_label, $field_note = '', $field_class = '' )
 	{
-		global $htsrv_url;
-
 		$field_params = array();
 
 		if( !empty($field_note) )
@@ -928,6 +943,7 @@ class Form extends Widget
 					return $m[0];
 			}' ), $date_format );
 
+		$field_params['type'] = 'text';
 
 		if( param_has_error( $field_name )
 			&&  ! preg_match('~^\d\d\d\d-\d\d-\d\d(?: \d\d:\d\d:\d\d)?$~', $field_value) )
@@ -2183,22 +2199,16 @@ class Form extends Widget
 	 */
 	function combo_box( $field_name, $field_value, $field_options, $field_label, $field_params = array() )
 	{
+		$input_class = 'form-control input-sm';
 		if( param_has_error( $field_name) )
-		{	// There is an error on the combo, so we need to set the combo input text class to 'field_error'
-			$input_class = 'field_error';
+		{ // There is an error on the combo, so we need to set the combo input text class to 'field_error'
+			$input_class .= ' field_error';
 		}
-		else
-		{
-			if( isset( $field_params['required'] ) && $field_params['required'] )
-			{	// The field is required, so update its class:
-				$input_class = ' field_required';
-			}
-			else
-			{
-				$input_class = '';
-			}
+		elseif( isset( $field_params['required'] ) && $field_params['required'] )
+		{ // The field is required, so update its class:
+			$input_class .= ' field_required';
 		}
-		unset($field_params['required']); // already handled above, do not pass to handle_common_params()
+		unset( $field_params['required'] ); // already handled above, do not pass to handle_common_params()
 
 		// Set size param for input with new value
 		if( isset( $field_params['new_field_size'] ) )
@@ -2223,6 +2233,8 @@ class Form extends Widget
 
 		// Add the new option to the select list:
 		$field_options = $option_new . $field_options;
+
+		$field_params['class'] = ( empty( $field_params['class'] ) ? '' : $field_params['class'].' ' ).'form-control input-sm';
 
 		// Select list
 		$r .="\n<select".get_field_attribs_as_string($field_params).'>'
@@ -2273,14 +2285,11 @@ class Form extends Widget
 		// Default params
 		$field_params += array(
 			'cols' => 50,
-			'note_format' => '<br/><span class="notes">%s</span>', // handled as common param
-			'format_value' => 'formvalue',
-			'display_fix_pixel' => true,
+			'note_format' => $this->note_format, // handled as common param
+			'format_value' => 'formvalue'
 		);
 		$format_value = $field_params['format_value'];
-		$display_fix_pixel = $field_params['display_fix_pixel'];
 		unset($field_params['format_value']); // no HTML attrib
-		unset($field_params['display_fix_pixel']); // no HTML attrib
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
@@ -2305,20 +2314,11 @@ class Form extends Widget
 		}
 
 		$r = $this->begin_field();
-		if( $display_fix_pixel )
-		{ // NOTE: The following pixel is needed to avoid the dity IE textarea expansion bug
-			// see http://fplanque.net/2003/Articles/iecsstextarea/index.html
-			$r .= get_icon( 'pixel' );
-		}
 		$r .= '<textarea'
 			.get_field_attribs_as_string( $field_params )
 			.' rows="'.$field_rows.'">'
 			.format_to_output( $field_value, $format_value )
 			.'</textarea>';
-		if( $display_fix_pixel )
-		{ // NOTE: this one is for compensating the previous pixel in case of center aligns.
-			$r .= get_icon( 'pixel' );
-		}
 		$r .= $this->end_field();
 
 		return $this->display_or_return( $r );
@@ -2396,14 +2396,22 @@ class Form extends Widget
 			$ffield_id = ' id="ffield_'.$this->_common_params['id'].'" ';
 		}
 		else
-		{	// No ID in case there's no id/name given for a field.
+		{ // No ID in case there's no id/name given for a field.
 			$ffield_id = '';
 		}
+		$r = $this->fieldstart;
 		if( !empty( $field_params['class'] ) )
-		{	// Add class attribute
-			$ffield_id .= ' class="'.$field_params['class'].'"';
+		{
+			if( strpos( $r, 'class="' ) === false )
+			{ // Add class attribute
+				$ffield_id .= ' class="'.$field_params['class'].'"';
+			}
+			else
+			{ // Append classes to attribute
+				$r = str_replace( ' class="', ' class="'.$field_params['class'].' ', $r );
+			}
 		}
-		$r = str_replace( '$ID$', $ffield_id, $this->fieldstart );
+		$r = str_replace( '$ID$', $ffield_id, $r );
 
 		$r .= $this->get_label();
 
@@ -2870,7 +2878,7 @@ class Form extends Widget
 	function radio_input( $field_name, $field_value, $field_options, $field_label, $field_params = array() )
 	{
 		$field_params = array_merge( array(
-				'note_format' => '<span class="notes">%s</span>',
+				'note_format' => $this->note_format,
 			), $field_params );
 
 		if( isset($field_params['lines']) )

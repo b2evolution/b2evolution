@@ -31,8 +31,8 @@ $params = array_merge( array(
 		'Comment'          => NULL,
 	), $params );
 
-
-$Blog = $params['Blog'];
+$Blog = & $params['Blog'];
+$recipient_User = & $params['recipient_User'];
 
 // show sender name
 echo sprintf( T_('%s has sent you this message:'), $params['sender_name'] )."\n\n";
@@ -41,7 +41,7 @@ echo $params['message'];
 echo "\n\n-- \n";
 
 // show sender IP address
-echo sprintf( T_( 'This message was typed by a user connecting from this IP address: %s.' ), implode( ', ', get_ip_list() ) )."\n\n";
+echo sprintf( T_( 'This message was typed by a user connecting from this IP address: %s.' ), implode( ', ', get_ip_list( false, true ) ) )."\n\n";
 
 // show sender email address
 echo sprintf( T_( 'By replying, your email will go directly to %s.' ), $params['sender_address'] );
@@ -66,7 +66,7 @@ if( !empty( $Blog ) )
 	}
 }
 
-if( !empty( $params['recipient_User'] ) )
+if( ! empty( $recipient_User ) )
 { // Member:
 	global $Settings;
 	if( $Settings->get( 'emails_msgform' ) == 'userset' )
@@ -76,9 +76,9 @@ if( !empty( $params['recipient_User'] ) )
 		{ // go to blog
 			$edit_preferences_url = url_add_param( str_replace( '&amp;', '&', $Blog->gen_blogurl() ), 'disp=userprefs', '&' );
 		}
-		elseif( $params['recipient_User']->check_perm( 'admin', 'restricted' ) )
+		elseif( $recipient_User->check_perm( 'admin', 'restricted' ) )
 		{ // go to admin
-			$edit_preferences_url = $admin_url.'?ctrl=user&user_tab=userprefs&user_ID='.$params['recipient_User']->ID;
+			$edit_preferences_url = $admin_url.'?ctrl=user&user_tab=userprefs&user_ID='.$recipient_User->ID;
 		}
 		if( !empty( $edit_preferences_url ) )
 		{ // add edit preferences link

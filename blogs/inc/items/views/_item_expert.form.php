@@ -97,7 +97,9 @@ $Form->begin_form( '', '', $params );
 	$Form->hidden( 'preview_userid', $current_User->ID );
 
 ?>
-<div class="left_col">
+<div class="row">
+
+<div class="left_col col-md-9">
 
 	<?php
 	// ############################ WORKFLOW #############################
@@ -263,7 +265,7 @@ $Form->begin_form( '', '', $params );
 		echo '<tr><td class="label"><label for="item_varchar_'.$field_guid.'"><strong>'.$field_name.':</strong></label></td>';
 		echo '<td class="input" width="97%">';
 		$Form->text_input( 'item_varchar_'.$field_guid, $edited_Item->get_setting( 'custom_varchar_'.$field_guid ), 20, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
-		echo '</td><td width="1"><!-- for IE7 --></td></tr>';
+		echo '</td></tr>';
 	}
 
 	//add slug_changed field - needed for slug trim, if this field = 0 slug will trimmed
@@ -290,27 +292,27 @@ $Form->begin_form( '', '', $params );
 	echo '<tr><td class="label" valign="top"><label for="post_urltitle" title="'.T_('&quot;slug&quot; to be used in permalinks').'"><strong>'.T_('URL slugs').$edit_slug_link.':</strong></label></td>';
 	echo '<td class="input" width="97%">';
 	$Form->text_input( 'post_urltitle', $edited_Item->get_slugs(), 40, '', '<br />'.$tiny_slug_info, array('maxlength'=>210, 'style'=>'width: 100%;') );
-	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
+	echo '</td></tr>';
 
 	echo '<tr><td class="label"><label for="titletag"><strong>'.T_('&lt;title&gt; tag').':</strong></label></td>';
 	echo '<td class="input" width="97%">';
 	$Form->text_input( 'titletag', $edited_Item->get('titletag'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
-	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
+	echo '</td></tr>';
 
 	echo '<tr><td class="label"><label for="metadesc" title="&lt;meta name=&quot;description&quot;&gt;"><strong>'.T_('&lt;meta&gt; desc').':</strong></label></td>';
 	echo '<td class="input" width="97%">';
 	$Form->text_input( 'metadesc', $edited_Item->get_setting('post_metadesc'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
-	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
+	echo '</td></tr>';
 
 	echo '<tr><td class="label"><label for="custom_headers" title="&lt;meta name=&quot;keywords&quot;&gt;"><strong>'.T_('&lt;meta&gt; keywds').':</strong></label></td>';
 	echo '<td class="input" width="97%">';
 	$Form->text_input( 'custom_headers', $edited_Item->get_setting('post_custom_headers'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
-	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
+	echo '</td></tr>';
 
 	echo '<tr><td class="label"><label for="item_tags"><strong>'.T_('Tags').':</strong></label></td>';
 	echo '<td class="input" width="97%">';
 	$Form->text_input( 'item_tags', $item_tags, 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
-	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
+	echo '</td></tr>';
 
 	echo '</table>';
 
@@ -326,7 +328,7 @@ $Form->begin_form( '', '', $params );
 	<div id="itemform_post_excerpt" class="edit_fieldgroup">
 		<label for="post_excerpt"><strong><?php echo T_('Excerpt') ?>:</strong>
 		<span class="notes"><?php echo T_('(for XML feeds)') ?></span></label><br />
-		<textarea name="post_excerpt" rows="2" cols="25" class="form_textarea_input" id="post_excerpt"><?php echo evo_htmlspecialchars( $edited_Item_excerpt, NULL, $evo_charset ) ?></textarea>
+		<textarea name="post_excerpt" rows="2" cols="25" class="form-control form_textarea_input" id="post_excerpt"><?php echo evo_htmlspecialchars( $edited_Item_excerpt, NULL, $evo_charset ) ?></textarea>
 	</div>
 
 	<?php
@@ -365,7 +367,7 @@ $Form->begin_form( '', '', $params );
 
 </div>
 
-<div class="right_col">
+<div class="right_col col-md-3 form-inline">
 
 	<?php
 	// ################### MODULES SPECIFIC ITEM SETTINGS ###################
@@ -492,6 +494,8 @@ $Form->begin_form( '', '', $params );
 </div>
 
 <div class="clear"></div>
+
+</div>
 
 <?php
 // ================================== END OF EDIT FORM ==================================

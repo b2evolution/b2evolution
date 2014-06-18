@@ -49,6 +49,15 @@ elseif( !empty( $comment_id ) )
 		}
 	}
 }
+else
+{ // Recipient was not defined, try set the blog owner as recipient
+	global $Blog;
+	if( empty( $Blog ) )
+	{ // Blog is not set, this is an invalid request
+		debug_die( 'Invalid send message request!');
+	}
+	$recipient_User = $Blog->get_owner_User();
+}
 
 if( $recipient_User )
 { // recipient User is set

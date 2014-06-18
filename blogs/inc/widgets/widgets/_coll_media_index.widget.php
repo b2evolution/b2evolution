@@ -265,9 +265,12 @@ class coll_media_index_Widget extends ComponentWidget
 			$r .= $File->get_thumb_imgtag( $this->disp_params['thumb_size'], '', '', $ItemLight->title );
 			$r .= '</a>';
 			if( $this->disp_params[ 'disp_image_title' ] )
-			{
-				$title = ($File->get('title')) ? $this->get('title') : $ItemLight->title;
-				$r .= '<span class="note">'.$title.'</span>';
+			{ // Dislay title of image or item
+				$title = ( $File->get( 'title' ) ) ? $File->get( 'title' ) : $ItemLight->title;
+				if( ! empty( $title ) )
+				{
+					$r .= '<span class="note">'.$title.'</span>';
+				}
 			}
 
 			++$count;
@@ -294,6 +297,8 @@ class coll_media_index_Widget extends ComponentWidget
 		// Display title if requested
 		$this->disp_title();
 
+		echo $this->disp_params['block_body_start'];
+
 		if( $layout == 'grid' )
 		{
 			echo $this->disp_params[ 'grid_start' ];
@@ -318,6 +323,8 @@ class coll_media_index_Widget extends ComponentWidget
 		{
 			echo $this->disp_params[ 'list_end' ];
 		}
+
+		echo $this->disp_params['block_body_end'];
 
 		echo $this->disp_params[ 'block_end' ];
 

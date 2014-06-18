@@ -194,7 +194,7 @@ class ItemLight extends DataObject
 	 */
 	function is_intro()
 	{
-		return ($this->ptyp_ID >= 1500 && $this->ptyp_ID <= 1600);
+		return ($this->ptyp_ID >= 1400 && $this->ptyp_ID <= 1600);
 	}
 
 
@@ -348,13 +348,19 @@ class ItemLight extends DataObject
 	{
 		global $DB, $cacheweekly, $Settings, $posttypes_specialtypes, $posttypes_nopermanentURL, $posttypes_catpermanentURL;
 
-		if( in_array( $this->ptyp_ID, $posttypes_specialtypes ) ) // page, intros, sidebar
+		$this->get_Blog();
+		if( $this->Blog->get_setting( 'front_disp' ) == 'page' &&
+		    $this->Blog->get_setting( 'front_post_ID' ) == $this->ID )
+		{ // This item is used as front specific page on the blog's home
+			$permalink_type = 'none';
+		}
+		elseif( in_array( $this->ptyp_ID, $posttypes_specialtypes ) ) // page, intros, sidebar
 		{	// This is not an "in stream" post:
 			if( in_array( $this->ptyp_ID, $posttypes_nopermanentURL ) )
 			{	// This type of post is not allowed to have a permalink:
 				$permalink_type = 'none';
 			}
-			if( in_array( $this->ptyp_ID, $posttypes_catpermanentURL ) )
+			elseif( in_array( $this->ptyp_ID, $posttypes_catpermanentURL ) )
 			{	// This post has a permanent URL as url to main chapter:
 				$permalink_type = 'cat';
 			}
@@ -367,7 +373,6 @@ class ItemLight extends DataObject
 		elseif( empty( $permalink_type ) )
 		{	// Normal "in stream" post:
 			// Use default from collection settings (may be an "in stream" URL):
-			$this->get_Blog();
 			$permalink_type = $this->Blog->get_setting( 'permalinks' );
 		}
 
@@ -382,7 +387,6 @@ class ItemLight extends DataObject
 			case 'none':
 				// This is a silent fallback when we try to permalink to an Item that cannot be addressed directly:
 				// Link to blog home:
-				$this->get_Blog();
 				return $this->Blog->gen_blogurl();
 
 			case 'cat':
@@ -1003,11 +1007,11 @@ class ItemLight extends DataObject
 		switch( $text )
 		{
 			case '#':
-				$text = get_icon( 'permalink', 'imgtag', array('class'=>'icon') ).T_('Permalink');
+				$text = get_icon( 'permalink' ).T_('Permalink');
 				break;
 
 			case '#icon#':
-				$text = get_icon( 'permalink', 'imgtag', array('class'=>'icon') );
+				$text = get_icon( 'permalink' );
 				break;
 
 			case '#text#':

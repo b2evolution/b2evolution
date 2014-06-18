@@ -180,6 +180,7 @@ class Link extends DataObject
 				'image_align'         => '',
 				'image_alt'           => '',
 				'image_desc'          => '#',
+				'image_size_x'        => 1, // Use '2' to build 2x sized thumbnail that can be used for Retina display
 			), $params );
 
 		return $File->get_tag( $params['before_image'],
@@ -194,7 +195,8 @@ class Link extends DataObject
 				$params['image_align'],
 				$params['image_alt'],
 				$params['image_desc'],
-				'link_'.$this->ID );
+				'link_'.$this->ID,
+				$params['image_size_x'] );
 	}
 
 
@@ -217,6 +219,53 @@ class Link extends DataObject
 				'link_id' => 'link_'.$this->ID  // Use 'link_' prefix to enable voting ( Note: Voting is enable only for links )
 			)
 		);
+	}
+
+
+	/**
+	 * Get an url to download file
+	 *
+	 * @param array Params
+	 * @return string|boolean URL or FALSE when Link object is broken
+	 */
+	function get_download_url( $params = array() )
+	{
+		$params = array_merge( array(
+				'glue' => '&amp;', // Glue between url params
+				'type' => 'page', // 'page' - url of the download page, 'action' - url to force download
+			), $params );
+
+		if( ! ( $File = & $this->get_File() ) ||
+		    ! ( $LinkOwner = & $this->get_LinkOwner() ) )
+		{ // Broken Link
+			return false;
+		}
+
+		if( $LinkOwner->type == 'item' && $LinkOwner->Item )
+		{ // Use specific url for Item to download
+			switch( $params['type'] )
+			{
+				case 'action':
+					// Get URL to froce download a file
+					if( $File->get_ext() == 'zip' )
+					{ // Provide direct url to ZIP files
+						return $File->get_url();
+					}
+					else
+					{ // For other files use url through special file that forces a download action
+						return get_samedomain_htsrv_url().'download.php?link_ID='.$this->ID;
+					}
+
+				case 'page':
+				default:
+					// Get URL to display a page with info about file and item
+					return url_add_param( $LinkOwner->Item->get_permanent_url( '', '', $params['glue'] ), 'download='.$this->ID, $params['glue'] );
+			}
+		}
+		else
+		{ // Use standard url for all other types
+			return $File->get_view_url( false );
+		}
 	}
 }
 

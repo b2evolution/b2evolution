@@ -418,7 +418,7 @@ function echo_affected_comments( $affected_comments, $status, $keyword, $noperms
 	echo '</label>';
 	echo '</p>';
 
-	echo '<table class="grouped" cellspacing="0">';
+	echo '<table class="grouped table-striped table-bordered table-hover table-condensed" cellspacing="0">';
 	echo '<thead><tr>';
 	echo '<th class="firstcol">'.T_('Date').'</th>';
 	echo '<th class="center">'.T_('Auth. IP').'</th>';
@@ -937,5 +937,56 @@ function antispam_bankruptcy_delete( $blog_IDs = array(), $comment_status = NULL
 	echo 'OK';
 
 	$DB->commit();
+}
+
+
+/**
+ * Increase a counter in DB antispam ip range table
+ *
+ * @param string Counter name: 'user', 'contact_email'
+ */
+function antispam_increase_counter( $counter_name )
+{
+	switch( $counter_name )
+	{
+		case 'user':
+			$field_name = 'aipr_user_count';
+			break;
+
+		case 'contact_email':
+			$field_name = 'aipr_contact_email_count';
+			break;
+
+		default:
+			debug_die( 'Wrong antispam counter name' );
+	}
+
+	foreach( get_ip_list() as $ip )
+	{
+		if( $ip === '' )
+		{ // Skip an empty
+			continue;
+		}
+
+		$ip = int2ip( ip2int( $ip ) ); // Convert IPv6 to IPv4
+		if( preg_match( '#^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$#i', $ip ) )
+		{ // Check IP for correct format
+			$ip_24bit_start = ip2int( preg_replace( '#\.\d{1,3}$#i', '.0', $ip ) );
+			$ip_24bit_end = ip2int( preg_replace( '#\.\d{1,3}$#i', '.255', $ip ) );
+
+			global $DB;
+			if( $iprange = get_ip_range( $ip_24bit_start, $ip_24bit_end ) )
+			{ // Update ip range
+				$DB->query( 'UPDATE T_antispam__iprange
+								SET '.$field_name.' = '.$field_name.' + 1
+								WHERE aipr_ID = '.$DB->quote( $iprange->aipr_ID ) );
+			}
+			else
+			{ // Insert new ip range
+				$DB->query( 'INSERT INTO T_antispam__iprange ( aipr_IPv4start, aipr_IPv4end, '.$field_name.' )
+								VALUES ( '.$DB->quote( $ip_24bit_start ).', '.$DB->quote( $ip_24bit_end ).', 1 ) ' );
+			}
+		}
+	}
 }
 ?>

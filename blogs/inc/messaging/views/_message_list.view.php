@@ -398,8 +398,7 @@ if( $is_recipient )
 
 			$Form->textarea_input( 'msg_text', !empty( $edited_Message ) ? $edited_Message->original_text : '', 10, T_('Message'), array(
 					'cols' => $params['cols'],
-					'required' => true,
-					'display_fix_pixel' => false
+					'required' => true
 				) );
 
 		$Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' ) ) );

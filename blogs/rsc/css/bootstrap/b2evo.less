@@ -27,14 +27,12 @@ div#evo_toolbar {
 		margin: 0 5px;
 	}
 	input[type="radio"], input[type="checkbox"] {
-		margin-top: 5px;
-		vertical-align: middle;
+		margin-top: 0;
 	}
 	.controls {
 		padding-left: 0;
 		label {
-			display: inline;
-			vertical-align: middle;
+			display: inline-block;
 			padding-top: 5px;
 			// Fix vertical alignment of checkboxes with text
 			input {
@@ -49,7 +47,6 @@ div#evo_toolbar {
 			width: auto;
 		}
 		span.help-inline {
-			display: inline;
 			padding-top: 5px;
 			a.btn {
 				margin-top: -5px;
@@ -82,6 +79,7 @@ div#evo_toolbar {
 	}
 	.radio, .checkbox {
 		display: inline-block;
+		margin-bottom: 5px;
 	}
 	.control-label {
 		padding-top: 5px;
@@ -107,18 +105,6 @@ a.action_icon {
 	font-size: 12px;
 }
 
-// Header of results table
-.label.label-header {
-	display: block;
-	font-size: 16px;
-	padding: 5px;
-	text-align: left;
-	.pull-right a.action_icon {
-		color: #FFF;
-		padding-left: 10px;
-	}
-}
-
 // Field to enter multi usernames
 ul.token-input-list-facebook {
 	width: auto;
@@ -142,8 +128,21 @@ div.results {
 		overflow: auto;
 		width: 100%;
 	}
+	.table-bordered {
+		border-left: none;
+		border-right: none;
+		td.firstcol, th.firstcol {
+			border-left: none;
+		}
+		td.lastcol, th.lastcol {
+			border-right: none;
+		}
+		th {
+			border-bottom: none;
+		}
+	}
 }
-.filters.well, .table_scroll .table {
+.filters, .table_scroll .table {
 	margin-bottom: 0;
 }
 input.filter {
@@ -171,15 +170,6 @@ a:hover .glyphicon {
 	right: 0;
 	bottom: 0;
 	text-align: center;
-}
-// Icon inside blue header
-.label-header {
-	.glyphicon {
-		color: #FFF;
-	}
-	a:hover .glyphicon {
-		color: #EEE;
-	}
 }
 
 // Table for select categories of item
@@ -223,13 +213,13 @@ table.catselect {
 
 // Navigation menu
 .nav {
-	margin-bottom: 20px;
-	margin-left: 0;
+	margin: 20px 0;
 }
 .well {
 	background: #F5F5F5;
 	.nav {
 		padding: 0 15px;
+		margin: 0;
 		li > a {
 			padding: 3px 15px;
 			margin: 0 -15px;
@@ -261,13 +251,118 @@ select:focus:invalid:focus {
 	-moz-box-shadow: 0 0 6px #f8b9b7;
 	box-shadow: 0 0 6px #f8b9b7;
 }
+#login_form {
+	input:focus:invalid:focus,
+	textarea:focus:invalid:focus,
+	select:focus:invalid:focus {
+		border-color: #66afe9;
+		-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+		-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+		box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+	}
+}
 
-.form-horizontal .controls .form-control.form_textarea_input {
-	width: 97%;
+// Panels
+.panel-heading h4 {
+	margin: 0;
+}
+legend.panel-heading {
+	font-size: 16px;
+	font-weight: normal;
+	margin-bottom: 0;
+}
+.panel-title .icon {
+	vertical-align: middle;
+	position: relative;
+	top: -1px;
+}
+
+// Form to add contacts
+.form_add_contacts {
+	display: block;
+	padding-top: 5px;
+	.label {
+		color: #333;
+		font-size: 100%;
+		padding-left: 0;
+	}
+	.controls {
+		padding-left: 0;
+	}
+	.control-label {
+		width: auto;
+		padding-left: 0;
+		line-height: 24px;
+	}
+}
+
+.form-horizontal .controls {
+	input.large,
+	.form-control.form_textarea_input {
+		width: 97%;
+		display: block;
+	}
 }
 div.comment_toolbars div.edit_toolbar,
 div.message_toolbars div.edit_toolbar {
 	width: 97%;
 	padding-left: 0;
 	padding-right: 0;
+}
+
+
+// Remove borders from badge
+.badge {
+	border: none;
+	background-color: #F00;
+}
+a.evo_messages_link .badge {
+	font-size: 10px;
+	margin: -2px 2px;
+	padding: 2px 7px 3px;
+}
+
+// Fix colorbox sizes
+#colorbox,
+#colorbox *,
+#colorbox *:before,
+#colorbox *:after {
+	-webkit-box-sizing: content-box;
+	-moz-box-sizing: content-box;
+	box-sizing: content-box;
+}
+
+.modal-dialog {
+	width: 100%;
+	height: 100%;
+	.modal-content {
+		height: 100%;
+		.modal-body {
+			height: 90%;
+		}
+	}
+}
+.modal_fixed_height .modal-dialog {
+	height: auto;
+}
+
+// Typeahead plugin
+.tt-dropdown-menu {
+	background-color: #FFFFFF;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	border-radius: 8px;
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	padding: 8px 0;
+	.tt-suggestion {
+		font-size: 18px;
+		line-height: 24px;
+		padding: 3px 20px;
+		&.tt-cursor {
+			background-color: #0097CF;
+			color: #FFFFFF;
+		}
+		p {
+			margin: 0;
+		}
+	}
 }

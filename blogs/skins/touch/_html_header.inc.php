@@ -39,6 +39,7 @@ require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
 	?></title>
 	<?php skin_description_tag(); ?>
 	<?php skin_keywords_tag(); ?>
+	<?php skin_opengraph_tags(); ?>
 	<?php robots_tag(); ?>
 	<?php
 	global $htsrv_url;
@@ -72,7 +73,7 @@ require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
 	?>
 </head>
 
-<body class="low-contrast-linen-wptouch-bg">
+<body<?php skin_body_attrs( array( 'class' => 'low-contrast-linen-wptouch-bg' ) ); ?>>
 
 <?php
 // ---------------------------- TOOLBAR INCLUDED HERE ----------------------------

@@ -327,6 +327,8 @@ class user_tools_Widget extends ComponentWidget
 			echo $this->disp_params['block_title_end'];
 		}
 
+		echo $this->disp_params['block_body_start'];
+
 		echo $this->disp_params['list_start'];
 
 		echo $tools_links;
@@ -340,6 +342,8 @@ class user_tools_Widget extends ComponentWidget
 		}
 
 		echo $this->disp_params['list_end'];
+
+		echo $this->disp_params['block_body_end'];
 
 		echo $this->disp_params['block_end'];
 	}
@@ -357,7 +361,7 @@ class user_tools_Widget extends ComponentWidget
 		return array(
 				'wi_ID'   => $this->ID,					// Have the widget settings changed ?
 				'set_coll_ID' => $Blog->ID,			// Have the settings of the blog changed ? (ex: new owner, new skin)
-				'loggedin' => (is_logged_in() ? 1 : 0),
+				'loggedin' => (is_logged_in() ? 1 : 0),  // Is a user logged in at the time this widget is cached/displayed
 				// fp> note: if things get tough in the future, use a per User caching scheme:
 				// 'user_ID' => (is_logged_in() ? $current_User->ID : 0), // Has the current User changed?
 			);

@@ -136,8 +136,8 @@ $Form->begin_fieldset( T_('RSS/Atom feeds').get_manual_link('item-feeds-features
 								array(  array( 'none', T_('No feeds') ),
 												array( 'title', T_('Titles only') ),
 												array( 'excerpt', T_('Post excerpts') ),
-												array( 'normal', T_('Standard post contents (stopping at "&lt;!-- more -->")') ),
-												array( 'full', T_('Full post contents (including after "&lt;!-- more -->")') ),
+												array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")') ),
+												array( 'full', T_('Full post contents (including after "[teaserbreak]")') ),
 											), T_('Post feed contents'), true, T_('How much content do you want to make available in post feeds?') );
 
 	$Form->text( 'posts_per_feed', $edited_Blog->get_setting('posts_per_feed'), 4, T_('Posts in feeds'),  T_('How many of the latest posts do you want to include in RSS & Atom feeds?'), 4 );
@@ -195,10 +195,7 @@ $Form->begin_fieldset( T_('Custom fields').get_manual_link('item-custom-fields')
 		}
 		echo '</div>';
 		// display link to create new custom field
-		echo '<div class="input">';
-		echo '<a onclick="return false;" href="#" id="add_new_'.$type.'_custom_field">'.$data[ 'title' ].'</a>';
-		echo '<span class="notes"> ( '.$data[ 'note' ].' )</span>';
-		echo '</div>';
+		$Form->info( '', '<a onclick="return false;" href="#" id="add_new_'.$type.'_custom_field">'.$data[ 'title' ].'</a>', '( '.$data[ 'note' ].' )' );
 	}
 $Form->end_fieldset();
 
@@ -226,11 +223,11 @@ echo_regional_required_js( 'location_' );
 		var custom_guid = guidGenerator();
 		jQuery( '#custom_double_field_list' ).append( '<fieldset id="ffield_custom_double_' + count_custom_double + '">' +
 				'<input type="hidden" name="custom_double_guid' + count_custom_double + '" value="' + custom_guid + '" />' +
-				'<div class="label"><label for="custom_double_' + count_custom_double + '"><?php echo TS_('Numeric'); ?>:</label></div>' +
-				'<div class="input">' +
+				'<?php echo $Form->labelstart; ?><label for="custom_double_' + count_custom_double + '"<?php echo empty( $Form->labelclass ) ? '' : ' class="'.$Form->labelclass.'"'; ?>><?php echo TS_('Numeric'); ?>:</label><?php echo str_replace( "\n", '', $Form->labelend ); ?>' +
+				'<?php echo $Form->inputstart; ?>' +
 					'Title <input type="text" id="custom_double_' + count_custom_double + '" name="custom_double_' + count_custom_double + '" class="form_text_input new_custom_field_title" size="20" maxlength="60" />' +
 					' Name <input type="text" name="custom_double_fname' + count_custom_double + '" value="" class="form_text_input custom_field_name" maxlength="36" />' +
-				'</div></fieldset>' );
+				'<?php echo str_replace( "\n", '', $Form->inputend ); ?></fieldset>' );
 		jQuery( 'input[name=count_custom_double]' ).attr( 'value', count_custom_double );
 	} );
 
@@ -241,11 +238,11 @@ echo_regional_required_js( 'location_' );
 		var custom_guid = guidGenerator();
 		jQuery( '#custom_varchar_field_list' ).append( '<fieldset id="ffield_custom_string' + count_custom_varchar + '">' +
 				'<input type="hidden" name="custom_varchar_guid' + count_custom_varchar + '" value="' + custom_guid + '" />' +
-				'<div class="label"><label for="custom_varchar_' + count_custom_varchar + '"><?php echo TS_('String'); ?>:</label></div>' +
-				'<div class="input">' +
+				'<?php echo $Form->labelstart; ?><label for="custom_varchar_' + count_custom_varchar + '"<?php echo empty( $Form->labelclass ) ? '' : ' class="'.$Form->labelclass.'"'; ?>><?php echo TS_('String'); ?>:</label><?php echo str_replace( "\n", '', $Form->labelend ); ?>' +
+				'<?php echo $Form->inputstart; ?>' +
 					'Title <input type="text" id="custom_varchar_' + count_custom_varchar + '" name="custom_varchar_' + count_custom_varchar + '" class="form_text_input new_custom_field_title" size="30" maxlength="40" />' +
 					' Name <input type="text" name="custom_varchar_fname' + count_custom_varchar + '" value="" class="form_text_input custom_field_name" maxlength="36" />' +
-				'</div></fieldset>' );
+				'<?php echo str_replace( "\n", '', $Form->inputend ); ?></fieldset>' );
 		jQuery( 'input[name=count_custom_varchar]' ).attr( 'value', count_custom_varchar );
 	} );
 

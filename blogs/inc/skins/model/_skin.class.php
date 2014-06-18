@@ -447,8 +447,9 @@ class Skin extends DataObject
 		global $skins_path, $skins_url;
 
 		$disp_params = array_merge( array(
-				'selected'       => false,
-				'skinshot_class' => 'skinshot',
+				'selected'        => false,
+				'skinshot_class'  => 'skinshot',
+				'skin_compatible' => true,
 			), $disp_params );
 
 		if( isset( $disp_params[ 'select_url' ] ) )
@@ -505,11 +506,22 @@ class Skin extends DataObject
 			switch( $disp_params[ 'function' ] )
 			{
 				case 'install':
-					echo '<a href="'.$disp_params[ 'function_url' ].'" title="'.T_('Install NOW!').'">';
-					echo T_('Install NOW!').'</a>';
+					// Display a link to install the skin
+					if( $disp_params[ 'skin_compatible' ] )
+					{ // If skin is compatible for current selected type
+						echo '<a href="'.$disp_params[ 'function_url' ].'" title="'.T_('Install NOW!').'">';
+						echo T_('Install NOW!').'</a>';
+					}
+					else
+					{ // Inform about skin type is wrong for current case
+						echo '<a href="'.$disp_params[ 'function_url' ].'" title="'.T_('Install NOW!').'" class="red">';
+						echo T_('Wrong Type!').'</a> ';
+						echo get_icon( 'help', 'imgtag', array( 'title' => T_('This skin does not fit the blog type you are trying to create.') ) );
+					}
 					break;
 
 				case 'select':
+					// Display a link to preview the skin
 					echo '<a href="'.$disp_params[ 'function_url' ].'" target="_blank" title="'.T_('Preview blog with this skin in a new window').'">';
 					echo T_('Preview').'</a>';
 					break;
@@ -825,6 +837,7 @@ class Skin extends DataObject
 					'buttonsend' => "\n",
 					'customstart' => '',
 					'customend' => "\n",
+					'note_format' => ' <span class="notes">%s</span>',
 					'formend' => '',
 				);
 		}

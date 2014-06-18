@@ -134,6 +134,13 @@ class msg_menu_link_Widget extends ComponentWidget
 					'size' => 20,
 					'defaultvalue' => '',
 				),
+				'blog_ID' => array(
+					'label' => T_('Blog ID'),
+					'note' => T_('Leave empty for current blog.'),
+					'type' => 'text',
+					'size' => 5,
+					'defaultvalue' => '',
+				),
 				'show_to' => array(
 					'label' => T_( 'Show to' ),
 					'note' => '',
@@ -180,15 +187,24 @@ class msg_menu_link_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		/**
-		* @var Blog
-		*/
-		global $Blog;
-
 		global $current_User, $unread_messages_count;
 		global $disp;
 
 		$this->init_display( $params );
+
+		$blog_ID = intval( $this->disp_params['blog_ID'] );
+		if( $blog_ID > 0 )
+		{ // Try to use blog from widget setting
+			$BlogCache = & get_BlogCache();
+			$current_Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+		}
+
+		if( empty( $current_Blog ) )
+		{ // Blog is not defined in setting or it doesn't exist in DB
+			global $Blog;
+			// Use current blog
+			$current_Blog = & $Blog;
+		}
 
 		switch( $this->disp_params['show_to'] )
 		{
@@ -213,29 +229,29 @@ class msg_menu_link_Widget extends ComponentWidget
 		// Default link class
 		$link_class = $this->disp_params['link_default_class'];
 
-		switch(	$this->disp_params[ 'link_type' ] )
+		switch( $this->disp_params[ 'link_type' ] )
 		{
 			case 'messages':
-				$url = get_dispctrl_url( 'threads' );
+				$url = $current_Blog->get( 'threadsurl' );
 				$text = T_( 'Messages' );
 				// set allow blockcache to 0, this way make sure block cache is never allowed for messages
 				$this->disp_params[ 'allow_blockcache' ] = 0;
 				// Is this the current display?
 				if( $disp == 'threads' )
-				{	// The current page is currently displaying the messages:
+				{ // The current page is currently displaying the messages:
 					// Let's display it as selected
 					$link_class = $this->disp_params['link_selected_class'];
 				}
 				break;
 
 			case 'contacts':
-				$url = get_dispctrl_url( 'contacts' );
+				$url = $current_Blog->get( 'contactsurl' );
 				$text = T_( 'Contacts' );
 				// set show badge to 0, this way make sure badge won't be displayed
 				$this->disp_params[ 'show_badge' ] = 0;
 				// Is this the current display?
 				if( $disp == 'contacts' )
-				{	// The current page is currently displaying the contacts:
+				{ // The current page is currently displaying the contacts:
 					// Let's display it as selected
 					$link_class = $this->disp_params['link_selected_class'];
 				}
@@ -261,13 +277,29 @@ class msg_menu_link_Widget extends ComponentWidget
 		}
 
 		echo $this->disp_params['block_start'];
+		echo $this->disp_params['block_body_start'];
 		echo $this->disp_params['list_start'];
 
-		echo $this->disp_params['item_start'];
+		if( $link_class == $this->disp_params['link_selected_class'] )
+		{
+			echo $this->disp_params['item_selected_start'];
+		}
+		else
+		{
+			echo $this->disp_params['item_start'];
+		}
 		echo '<a href="'.$url.'" class="'.$link_class.'">'.$text.$badge.'</a>';
-		echo $this->disp_params['item_end'];
+		if( $link_class == $this->disp_params['link_selected_class'] )
+		{
+			echo $this->disp_params['item_selected_end'];
+		}
+		else
+		{
+			echo $this->disp_params['item_end'];
+		}
 
 		echo $this->disp_params['list_end'];
+		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
 
 		return true;

@@ -398,6 +398,8 @@ class ComponentWidget extends DataObject
 					'block_display_title' => true,
 					'block_title_start' => '<h3>',
 					'block_title_end' => '</h3>',
+					'block_body_start' => '',
+					'block_body_end' => '',
 					'collist_start' => '',
 					'collist_end' => '',
 					'coll_start' => '<h4>',

@@ -101,15 +101,15 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 		$iframe_name = 'attach_'.generate_random_key( 16 );
 	}
 
-	$fieldset_title .= ' - <a href="'.$admin_url.'?ctrl=links&amp;action=edit_links&amp;link_type='.$LinkOwner->type.'&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;link_object_ID='.$LinkOwner->get_ID()
-				.'" target="'.$iframe_name.'">'.get_icon( 'refresh', 'imgtag' ).' '.T_('Refresh').'</a>';
+	$fieldset_title .= ' - '.action_icon( T_('Refresh'), 'refresh', $admin_url.'?ctrl=links&amp;action=edit_links&amp;link_type='.$LinkOwner->type.'&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;link_object_ID='.$LinkOwner->get_ID(), T_('Refresh'), 3, 4, array( 'target' => $iframe_name ) );
 
 	if( $current_User->check_perm( 'files', 'view', false, $Blog->ID )
 		&& $LinkOwner->check_perm( 'edit', false ) )
 	{	// Check that we have permission to edit owner:
 		$fieldset_title .= ' - <a href="'.$dispatcher.'?ctrl=links&amp;link_type='.$LinkOwner->type.'&amp;fm_mode=link_object&amp;link_object_ID='.$LinkOwner->get_ID()
 					.'" onclick="return pop_up_window( \''.$dispatcher.'?ctrl=files&amp;mode=upload&amp;ajax_request=1&amp;iframe_name='
-					.$iframe_name.'&amp;fm_mode=link_object&amp;link_type='.$LinkOwner->type.'&amp;link_object_ID='.$LinkOwner->get_ID().'\', \'fileman_upload\', 1000 )">'
+					.$iframe_name.'&amp;fm_mode=link_object&amp;link_type='.$LinkOwner->type.'&amp;link_object_ID='.$LinkOwner->get_ID().'\', \'fileman_upload\', 1000 )"'
+					.' class="action_icon">'
 					.get_icon( 'folder', 'imgtag' ).' '.T_('Add/Link files').'</a> <span class="note">(popup)</span>';
 	}
 
@@ -145,7 +145,7 @@ function display_attachments( & $LinkOwner, $params = array() )
 	}
 
 	echo $params[ 'block_start' ];
-	echo '<table class="grouped" cellspacing="0" cellpadding="0">';
+	echo '<table class="grouped table-striped table-bordered table-hover table-condensed" cellspacing="0" cellpadding="0">';
 	echo '<thead>';
 	echo '<th class="firstcol shrinkwrap"><span>'.T_('Icon/Type').'</span></th>';
 	echo '<th class="nowrap"><span>'.T_('Path').'</span></th>';

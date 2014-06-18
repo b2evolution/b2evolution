@@ -465,7 +465,7 @@ $UserList->display( $display_params );
 if( $current_User->check_perm( 'emails', 'edit' ) && $UserList->result_num_rows > 0 )
 { // Newsletter button
 	echo '<p class="center">';
-	echo '<input type="button" value="'.T_('Send newsletter to the current selection').'" onclick="location.href=\''.$admin_url.'?ctrl=campaigns&amp;action=users&amp;'.url_crumb( 'campaign' ).'\'" />';
+	echo '<input type="button" value="'.T_('Send newsletter to the current selection').'" onclick="location.href=\''.$admin_url.'?ctrl=campaigns&amp;action=users&amp;'.url_crumb( 'campaign' ).'\'" class="btn btn-default" />';
 	echo '</p>';
 }
 

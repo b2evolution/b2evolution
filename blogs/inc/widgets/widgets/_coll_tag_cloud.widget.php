@@ -206,6 +206,8 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 		$this->disp_title();
 
+		echo $this->disp_params['block_body_start'];
+
 		echo $this->disp_params['tag_cloud_start'];
 		$count = 0;
 		foreach( $results as $row )
@@ -227,6 +229,8 @@ class coll_tag_cloud_Widget extends ComponentWidget
 			$count++;
 		}
 		echo $this->disp_params['tag_cloud_end'];
+
+		echo $this->disp_params['block_body_end'];
 
 		echo $this->disp_params['block_end'];
 

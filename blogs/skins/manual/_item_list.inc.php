@@ -21,6 +21,7 @@ $params = array_merge( array(
 		'after_title'     => '</h3>',
 		'before_content'  => '<div class="excerpt">',
 		'after_content'   => '</div>',
+		'item_link_type'  => '#',
 	), $params );
 
 global $Item;
@@ -36,6 +37,7 @@ global $Item;
 				//'after'      => ' <span class="red">'.( $Item->get('order') > 0 ? $Item->get('order') : 'NULL').'</span>'.$params['after_title'].$item_edit_link.'<div class="clear"></div>',
 				'post_navigation' => $params['post_navigation'],
 				'link_class'      => 'link',
+				'link_type'       => $params['item_link_type'],
 			) );
 		$Item->excerpt( array(
 				'before' => $params['before_content'],

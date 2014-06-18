@@ -168,7 +168,7 @@ global $fm_FileRoot;
 	$Widget->disp_template_replaced( 'block_start' );
 ?>
 
-<table id="fm_browser" cellspacing="0" cellpadding="0">
+<table id="fm_browser" cellspacing="0" cellpadding="0" class="table table-striped table-bordered table-hover table-condensed">
 	<tbody>
 		<tr>
 			<?php
@@ -325,7 +325,7 @@ global $fm_FileRoot;
 			<p class="uploadfileinputs"><a href="#" onclick="addAnotherFileInput(); return false;" class="small"><?php echo T_('Add another file'); ?></a></p>
 
 			<div class="upload_foot">
-				<input type="submit" value="<?php echo format_to_output( T_('Upload to server now'), 'formvalue' ); ?>" class="ActionButton" >
+				<input type="submit" value="<?php echo format_to_output( T_('Upload to server now'), 'formvalue' ); ?>" class="ActionButton btn btn-default" >
 
 				<p class="note">
 					<?php

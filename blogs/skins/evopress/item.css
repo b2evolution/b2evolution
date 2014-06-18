@@ -44,7 +44,7 @@ line-height: 1.5em;
 }
 
 
-code {
+code, samp {
 font: 1.1em 'Courier New', Courier, Fixed;
 }
 

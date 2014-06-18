@@ -56,7 +56,7 @@ while( $Comment = & $CommentList->get_next() )
 			'comment_end'          => '</div>',
 			'display_vote_helpful' => false,
 		) );
-	// Note: You can customize the default item feedback by copying the generic
+	// Note: You can customize the default item comment by copying the generic
 	// /skins/_item_comment.inc.php file into the current skin folder.
 	// ---------------------- END OF COMMENT ---------------------
 

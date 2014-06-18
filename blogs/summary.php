@@ -56,7 +56,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 <?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 <!-- InstanceEndEditable -->
 </head>
-<body>
+<body<?php skin_body_attrs(); ?>>
 <!-- InstanceBeginEditable name="ToolBar" -->
 <?php
 	// ---------------------------- TOOLBAR INCLUDED HERE ----------------------------

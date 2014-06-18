@@ -150,6 +150,8 @@ siteskin_include( '_site_body_header.inc.php' );
 				?>
 
 				<?php
+				if( $disp != 'front' && $disp != 'download' )
+				{
 					// --------------------------------- START OF POSTS -------------------------------------
 					// Display message if no post:
 					display_if_empty();
@@ -176,6 +178,7 @@ siteskin_include( '_site_body_header.inc.php' );
 						'next_text' => '&gt;&gt;',
 						) );
 					// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
+				}
 				?>
 
 

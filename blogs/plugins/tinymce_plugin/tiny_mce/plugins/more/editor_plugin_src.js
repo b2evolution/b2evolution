@@ -22,7 +22,7 @@
 		{
 			var pb = '<img src="' + url + '/img/trans.gif" class="mceMore mceItemNoResize" />',
 			cls = 'mceMore',
-			sep = ed.getParam('More_separator', '<!--more-->'),
+			sep = ed.getParam('more_separator', '<!--more-->'),
 			pbRE;
 
 			pbRE = new RegExp(sep.replace(/[\?\.\*\[\]\(\)\{\}\+\^\$\:]/g, function(a) {return '\\' + a;}), 'g');

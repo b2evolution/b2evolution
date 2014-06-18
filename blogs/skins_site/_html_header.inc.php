@@ -27,7 +27,7 @@ siteskin_init();
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 </head>
 
-<body>
+<body<?php skin_body_attrs(); ?>>
 
 <?php
 /* In the future we probably want to include the toolbar here...

@@ -35,11 +35,11 @@ class wacko_plugin extends Plugin
 	 * @access private
 	 */
 	var $search = array(
-			'#( ^ | \s ) ====== (.+?) ====== #x',
-			'#( ^ | \s ) ===== (.+?) ===== #x',
-			'#( ^ | \s ) ==== (.+?) ==== #x',
-			'#( ^ | \s ) === (.+?) === #x',
-			'#( ^ | \s ) == (.+?) == #x',
+			'#( ^ | [\s\S] ) ====== (.+?) ====== #x',
+			'#( ^ | [\s\S] ) ===== (.+?) ===== #x',
+			'#( ^ | [\s\S] ) ==== (.+?) ==== #x',
+			'#( ^ | [\s\S] ) === (.+?) === #x',
+			'#( ^ | [\s\S] ) == (.+?) == #x',
 			'#^ \s* --- \s* $#xm',	// multiline start/stop checking
 			'/ %%%
 				( \s*? \n )? 				# Eat optional blank line after %%%
@@ -73,13 +73,13 @@ class wacko_plugin extends Plugin
 	{
 		$this->short_desc = T_('Wacko style formatting');
 		$this->long_desc = T_('Accepted formats:<br />
-			== h2 ==<br />
-			=== h3 ===<br />
-			==== h4 ====<br />
-			===== h5 =====<br />
-			====== h6 ======<br />
-			--- (horinzontal rule)<br />
-			%%%codeblock%%%<br />');
+== h2 ==<br />
+=== h3 ===<br />
+==== h4 ====<br />
+===== h5 =====<br />
+====== h6 ======<br />
+--- (horinzontal rule)<br />
+%%%codeblock%%%<br />');
 	}
 
 

@@ -41,17 +41,7 @@ else
 
 // ------------------- PREV/NEXT USER LINKS -------------------
 user_prevnext_links( array(
-		'block_start'  => '<table class="prevnext_user"><tr>',
-		'prev_start'   => '<td width="33%">',
-		'prev_end'     => '</td>',
-		'prev_no_user' => '<td width="33%">&nbsp;</td>',
-		'back_start'   => '<td width="33%" class="back_users_list">',
-		'back_end'     => '</td>',
-		'next_start'   => '<td width="33%" class="right">',
-		'next_end'     => '</td>',
-		'next_no_user' => '<td width="33%">&nbsp;</td>',
-		'block_end'    => '</tr></table>',
-		'user_tab'     => 'avatar'
+		'user_tab' => 'avatar'
 	) );
 // ------------- END OF PREV/NEXT USER LINKS -------------------
 
@@ -199,7 +189,7 @@ if( ( $current_User->ID == $edited_User->ID ) || ( $current_User->check_perm( 'u
 
 		// Upload
 		$info_content = '<input name="uploadfile[]" type="file" size="10" />';
-		$info_content .= '<input class="ActionButton" type="submit" value="&gt; './* TRANS: action */ T_('Upload!').'" />';
+		$info_content .= '<input class="btn btn-primary ActionButton" type="submit" value="&gt; './* TRANS: action */ T_('Upload!').'" />';
 		$Form->info( T_('Upload a new picture'), $info_content );
 	}
 

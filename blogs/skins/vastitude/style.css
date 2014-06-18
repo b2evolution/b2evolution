@@ -44,7 +44,7 @@ ul#mainnav a {color:#997340; text-decoration: none;}
 ul#mainnav li, ul#mainnav a.selected, .leftside h3, .bCommentTitle {color:#c09261;}
 .text h2 a, .leftside h2 {color:#402416;}
 .footer a, .footer a:hover {color:#908070;}
-.notes, .subtext, .dimmed, code, div.amazon {color:#572d12;}
+.notes, .subtext, .dimmed, code, samp, div.amazon {color:#572d12;}
 
 #bannertop ul li a {color:#4b3528;}
 #bannertop a:hover {color:#fff;}

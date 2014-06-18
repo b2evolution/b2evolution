@@ -354,9 +354,9 @@ function _wp_mw_get_item_struct( & $Item )
 		}
 	}
 
-	// Split item content on before and after <!--more-->
+	// Split item content on before and after [teaserbreak]
 	// No tag balancing, no pages, no rendering, just raw text
-	$content_parts = explode( '<!--more-->', $Item->content, 2 );
+	$content_parts = explode( '[teaserbreak]', $Item->content, 2 );
 	if( !isset($content_parts[1]) ) $content_parts[1] = '';
 
 	$parent_title = '';

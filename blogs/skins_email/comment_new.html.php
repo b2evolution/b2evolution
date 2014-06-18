@@ -20,39 +20,44 @@ global $htsrv_url, $admin_url;
 
 // Default params:
 $params = array_merge( array(
-		'notify_full' => false,
-		'Comment'     => NULL,
-		'Blog'        => NULL,
-		'Item'        => NULL,
-		'author_ID'   => NULL,
-		'author_name' => '',
-		'notify_type' => '',
+		'notify_full'    => false,
+		'Comment'        => NULL,
+		'Blog'           => NULL,
+		'Item'           => NULL,
+		'author_ID'      => NULL,
+		'author_name'    => '',
+		'notify_type'    => '',
+		'recipient_User' => NULL,
 	), $params );
 
 
 $Comment = $params['Comment'];
 $Blog = $params['Blog'];
 $Item = $params['Item'];
+$recipient_User = & $params['recipient_User'];
 
 $author_name = empty( $params['author_ID'] ) ? $params['author_name'] : get_user_colored_login( $params['author_name'] );
 $notify_message = '<p>'.sprintf( T_( '%s posted a new comment on %s in %s.' ), '<b>'.$author_name.'</b>', '<b>'.get_link_tag( $Item->get_permanent_url(), $Item->get('title') ).'</b>', '<b>'.$Blog->get('shortname').'</b>' ).'</p>';
 
 if( $params['notify_full'] )
-{	// Long format notification:
-
+{ // Long format notification:
+	$ip_list = implode( ', ', get_linked_ip_list( array( $Comment->author_IP ), $recipient_User ) );
+	$user_domain = gethostbyaddr( $Comment->author_IP );
+	if( $user_domain != $Comment->author_IP )
+	{ // Add host name after author IP address
+		$ip_list .= ', '.$user_domain;
+	}
 	switch( $Comment->type )
 	{
 		case 'trackback':
-			$user_domain = gethostbyaddr($Comment->author_IP);
-			$notify_message .= '<p>'.T_('Trackback IP').': '.$Comment->author_IP.', '.$user_domain."</p>\n";
+			$notify_message .= '<p>'.T_('Trackback IP').': '.$ip_list."</p>\n";
 			$notify_message .= '<p>'.T_('Url').': '.get_link_tag( $Comment->author_url )."</p>\n";
 			break;
 
 		default:
 			if( ! $Comment->get_author_User() )
 			{ // Comment from visitor:
-				$user_domain = gethostbyaddr($Comment->author_IP);
-				$notify_message .= '<p>'.T_('Commenter IP').': '.$Comment->author_IP.', '.$user_domain."</p>\n";
+				$notify_message .= '<p>'.T_('Commenter IP').': '.$ip_list."</p>\n";
 				$notify_message .= '<p>'.T_('Email').': '.$Comment->author_email."</p>\n";
 				$notify_message .= '<p>'.T_('Url').': '.get_link_tag( $Comment->author_url )."</p>\n";
 			}

@@ -57,7 +57,7 @@ if( ( $disp == 'single' ) && empty( $cat ) )
 			'text'   => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : '#',
 			'class'  => 'roundbutton roundbutton_text',
 		) );
-	if( $Item->is_intro() && $Item->ptyp_ID != 1500 )
+	if( $Item->is_intro() && $Item->ptyp_ID > 1500 )
 	{ // Link to edit category
 		$ItemChapter = & $Item->get_main_Chapter();
 		if( !empty( $ItemChapter ) )

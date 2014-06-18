@@ -744,8 +744,9 @@ class UserList extends DataObjectList2
 	 *
 	 * @param string Field name
 	 * @param string Order direction (A|D)
+	 * @param boolean Save the filters from Session
 	 */
-	function set_order( $order_field, $direction = 'D' )
+	function set_order( $order_field, $direction = 'D', $save_filters = false )
 	{
 		global $Session;
 
@@ -766,13 +767,19 @@ class UserList extends DataObjectList2
 			}
 		}
 
-		// Get the filters from Session
-		$this->filters = $Session->get( $this->filterset_name );
-		if( ! is_array( $this->filters ) )
-		{
+		if( $save_filters )
+		{ // Get the filters from Session
+			$this->filters = $Session->get( $this->filterset_name );
+			if( ! is_array( $this->filters ) )
+			{
+				$this->filters = array();
+			}
+			$this->filters = array_merge( $this->default_filters, $this->filters );
+		}
+		else
+		{ // Reset the filters
 			$this->filters = array();
 		}
-		$this->filters = array_merge( $this->default_filters, $this->filters );
 
 		// Rewrite a previous order to new value
 		$this->filters['order'] = str_repeat( '-', $col_num ).$direction;

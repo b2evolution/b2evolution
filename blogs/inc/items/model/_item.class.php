@@ -755,7 +755,7 @@ class Item extends ItemLight
 
 			// Format raw HTML input to cleaned up and validated HTML:
 			param_check_html( 'content', T_('Invalid content.') );
-			$content = get_param( 'content' );
+			$content = prepare_item_content( get_param( 'content' ) );
 
 			$this->set( 'content', $content );
 
@@ -1571,16 +1571,15 @@ class Item extends ItemLight
 	 */
 	function split_pages( $format = 'htmlbody' )
 	{
-		if( ! isset( $this->content_pages[$format] ) )
+		if( ! isset( $this->content_pages[ $format ] ) )
 		{
 			// SPLIT PAGES:
-			$this->content_pages[$format] = explode( '<!--nextpage-->', $this->get_prerendered_content($format) );
+			$this->content_pages[ $format ] = split_outcode( '[pagebreak]', $this->get_prerendered_content( $format ) );
 
 			// Balance HTML tags
-			$this->content_pages[$format] = array_map( 'balance_tags', $this->content_pages[$format] );
+			$this->content_pages[ $format ] = array_map( 'balance_tags', $this->content_pages[ $format ] );
 
-			$this->pages = count( $this->content_pages[$format] );
-			// echo ' Pages:'.$this->pages;
+			$this->pages = count( $this->content_pages[ $format ] );
 		}
 	}
 
@@ -1634,7 +1633,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Display content teaser of item (will stop at "<!-- more -->"
+	 * Display content teaser of item (will stop at "[teaserbreak]"
 	 */
 	function content_teaser( $params )
 	{
@@ -1649,7 +1648,7 @@ class Item extends ItemLight
 
 		$r = $this->get_content_teaser( $params['disppage'], $params['stripteaser'], $params['format'], $params );
 
-		if( !empty($r) )
+		if( ! empty( $r ) )
 		{
 			echo $params['before'];
 			echo $r;
@@ -1658,7 +1657,7 @@ class Item extends ItemLight
 	}
 
 	/**
-	 * Template function: get content teaser of item (will stop at "<!-- more -->")
+	 * Template function: get content teaser of item (will stop at "[teaserbreak]")
 	 *
 	 * @param mixed page number to display specific page, # for url parameter
 	 * @param boolean # if you don't want to repeat teaser after more link was pressed and <-- noteaser --> has been found
@@ -1715,23 +1714,22 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get content parts (split by "<!--more-->").
+	 * Get content parts (split by "[teaserbreak]").
+	 *
 	 * @param array 'disppage', 'format'
 	 * @return array Array of content parts
 	 */
-	function get_content_parts($params)
+	function get_content_parts( $params )
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'disppage'    => '#',
-				'format'      => 'htmlbody',
+				'disppage' => '#',
+				'format'   => 'htmlbody',
 			), $params );
 
-		$content_page = $this->get_content_page( $params['disppage'], $params['format'] ); // cannot include format_to_output() because of the magic below.. eg '<!--more-->' will get stripped in "xml"
-		// pre_dump($content_page);
+		$content_page = $this->get_content_page( $params['disppage'], $params['format'] ); // cannot include format_to_output() because of the magic below.. eg '[teaserbreak]' will get stripped in "xml"
 
-		$content_parts = explode( '<!--more-->', $content_page );
-		// echo ' Parts:'.count($content_parts);
+		$content_parts = split_outcode( '[teaserbreak]', $content_page );
 
 		// Balance HTML tags
 		$content_parts = array_map( 'balance_tags', $content_parts );
@@ -1747,7 +1745,7 @@ class Item extends ItemLight
 	{
 		// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 		skin_include( '_item_content.inc.php', array(
-				'image_size'	=>	'fit-400x320',
+				'image_size' => 'fit-400x320',
 			) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.
@@ -1756,7 +1754,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Display content extension of item (part after "<!-- more -->")
+	 * Display content extension of item (part after "[teaserbreak]")
 	 */
 	function content_extension( $params )
 	{
@@ -1771,7 +1769,7 @@ class Item extends ItemLight
 
 		$r = $this->get_content_extension( $params['disppage'], $params['force_more'], $params['format'] );
 
-		if( !empty($r) )
+		if( ! empty( $r ) )
 		{
 			echo $params['before'];
 			echo $r;
@@ -1781,7 +1779,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Template function: get content extension of item (part after "<!-- more -->")
+	 * Template function: get content extension of item (part after "[teaserbreak]")
 	 *
 	 * @param mixed page number to display specific page, # for url parameter
 	 * @param boolean
@@ -1798,14 +1796,14 @@ class Item extends ItemLight
 		}
 
 		$params = array('disppage' => $disppage, 'format' => $format);
-		if( ! $this->has_content_parts($params) )
+		if( ! $this->has_content_parts( $params ) )
 		{ // This is NOT an extended post
 			return NULL;
 		}
 
-		$content_parts = $this->get_content_parts($params);
+		$content_parts = $this->get_content_parts( $params );
 
-		// Output everything after <!-- more -->
+		// Output everything after [teaserbreak]
 		array_shift($content_parts);
 		$output = implode('', $content_parts);
 
@@ -2075,24 +2073,27 @@ class Item extends ItemLight
 
 
 	/**
-	 * Does the post have different content parts (teaser/extension, divided by "<!--more-->")?
+	 * Does the post have different content parts (teaser/extension, divided by "[teaserbreak]")?
 	 * This is also true for posts that have images with "aftermore" position.
 	 *
 	 * @access public
 	 * @return boolean
 	 */
-	function has_content_parts($params)
+	function has_content_parts( $params )
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'disppage'    => '#',
-				'format'      => 'htmlbody',
+				'disppage' => '#',
+				'format'   => 'htmlbody',
 			), $params );
 
-		$content_page = $this->get_content_page($params['disppage'], $params['format']);
+		$content_page = $this->get_content_page( $params['disppage'], $params['format'] );
 
-		return strpos($content_page, '<!--more-->') !== false
-			|| $this->get_images( array('restrict_to_image_position'=>'aftermore') );
+		// Remove <code> and <pre> blocks from content to don't check [teaserbreak] there
+		$content_page = preg_replace( '~<(code|pre)[^>]*>.*?</\1>~is', '', $content_page );
+
+		return strpos( $content_page, '[teaserbreak]' ) !== false
+			|| $this->get_images( array( 'restrict_to_image_position' => 'aftermore' ) );
 	}
 
 
@@ -2452,7 +2453,7 @@ class Item extends ItemLight
 	 *
 	 * @private function
 	 *
-	 * @param objec the attached image Link
+	 * @param object the attached image Link
 	 * @param array params
 	 * @return string the attached image tag
 	 */
@@ -2515,6 +2516,7 @@ class Item extends ItemLight
 				'after_image'                => '</div>',
 				'after'                      => '</div>',
 				'image_size'                 => 'fit-720x500',
+				'image_size_x'               => 1, // Use '2' to build 2x sized thumbnail that can be used for Retina display
 				'image_link_to'              => 'original', // Can be 'original' (image) or 'single' (this post)
 				'limit'                      => 1000, // Max # of images displayed
 				'before_gallery'             => '<div class="bGallery">',
@@ -2655,8 +2657,8 @@ class Item extends ItemLight
 	function get_number_of_images( $image_position = NULL )
 	{
 		// Get list of attached files
-		$LinkOnwer = new LinkItem( $this );
-		if( ! $LinkList = $LinkOnwer->get_attachment_LinkList( 1000, $image_position ) )
+		$LinkOwner = new LinkItem( $this );
+		if( ! $LinkList = $LinkOwner->get_attachment_LinkList( 1000, $image_position ) )
 		{
 			return 0;
 		}
@@ -2705,13 +2707,11 @@ class Item extends ItemLight
 				'file_link_class'            => '',
 				'download_link_icon'         => 'download',
 				'download_link_title'        => T_('Download file'),
-				'file_size_abbr'             => true, // Use HTML <abbr> tag for type of the file size
-				'file_size_info'             => true, // Display full text of size type when $params['file_size_abbr'] == false
 			), $params );
 
 		// Get list of attached files
-		$LinkOnwer = new LinkItem( $this );
-		if( ! $FileList = $LinkOnwer->get_attachment_FileList( $params['limit'], $params['restrict_to_image_position'] ) )
+		$LinkOwner = new LinkItem( $this );
+		if( ! $LinkList = $LinkOwner->get_attachment_LinkList( $params['limit'], $params['restrict_to_image_position'] ) )
 		{
 			return '';
 		}
@@ -2725,10 +2725,14 @@ class Item extends ItemLight
 		 * @var File
 		 */
 		$File = NULL;
-		while( ( $File = & $FileList->get_next() ) && $params['limit_attach'] > $i )
+		while( ( $Link = & $LinkList->get_next() ) && $params['limit_attach'] > $i )
 		{
-			$params['File'] = $File;
-			$params['Item'] = $this;
+			if( ! ( $File = & $Link->get_File() ) )
+			{ // No File object
+				global $Debuglog;
+				$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
+				continue;
+			}
 
 			if( ! $File->exists() )
 			{ // File doesn't exist
@@ -2736,6 +2740,9 @@ class Item extends ItemLight
 				$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
 				continue;
 			}
+
+			$params['File'] = $File;
+			$params['Item'] = $this;
 
 			$temp_params = $params;
 			foreach( $params as $param_key => $param_value )
@@ -2760,39 +2767,49 @@ class Item extends ItemLight
 			}
 
 			if( $File->is_audio() )
-			{ // Player for audio file
+			{ // Player for audio file:
 				$r_file[$i]  = '<div class="podplayer">';
 				$r_file[$i] .= $this->get_player( $File->get_url() );
 				$r_file[$i] .= '</div>';
+				$i++;
+				$params = $temp_params;
+				continue;
+			}
+
+			// A link to download a file:
+
+			// Just icon with download icon
+			$icon = ( $File->exists() && strpos( $params['attach_format'].$params['file_link_format'], '$icon$' ) !== false ) ?
+					get_icon( $params['download_link_icon'], 'imgtag', array( 'title' => $params['download_link_title'] ) ) : '';
+
+			// A link with icon to download
+			$icon_link = ( $File->exists() && strpos( $params['attach_format'], '$icon_link$' ) !== false ) ?
+					action_icon( $params['download_link_title'], $params['download_link_icon'], $File->get_url(), '', 5 ) : '';
+
+			// File size info
+			$file_size = ( $File->exists() && strpos( $params['attach_format'].$params['file_link_format'], '$file_size$' ) !== false ) ?
+					$params['before_attach_size'].bytesreadable( $File->get_size(), false, false ).$params['after_attach_size'] : '';
+
+			// A link with file name to download
+			$file_link_format = str_replace( array( '$icon$', '$file_name$', '$file_size$' ),
+				array( $icon, '$text$', $file_size ),
+				$params['file_link_format'] );
+			if( $File->exists() )
+			{ // Get file link to download if file exists
+				$file_link = ( strpos( $params['attach_format'], '$file_link$' ) !== false ) ?
+						$File->get_view_link( $File->get_name(), NULL, NULL, $file_link_format, $params['file_link_class'], $Link->get_download_url() ) : '';
 			}
 			else
-			{ // A link to download a file
-
-				// Just icon with download icon
-				$icon = ( strpos( $params['attach_format'].$params['file_link_format'], '$icon$' ) !== false ) ?
-						get_icon( $params['download_link_icon'], 'imgtag', array( 'title' => $params['download_link_title'] ) ) : '';
-
-				// A link with icon to download
-				$icon_link = ( strpos( $params['attach_format'], '$icon_link$' ) !== false ) ?
-						action_icon( $params['download_link_title'], $params['download_link_icon'], $File->get_url(), '', 5 ) : '';
-
-				// File size info
-				$file_size = ( strpos( $params['attach_format'].$params['file_link_format'], '$file_size$' ) !== false ) ?
-						$params['before_attach_size'].bytesreadable( $File->get_size(), $params['file_size_abbr'], $params['file_size_info'] ).$params['after_attach_size'] : '';
-
-				// A link with file name to download
-				$file_link_format = str_replace( array( '$icon$', '$file_name$', '$file_size$' ),
-					array( $icon, '$text$', $file_size ),
-					$params['file_link_format'] );
+			{ // File doesn't exist, We cannot display a link, Display only file name and warning
 				$file_link = ( strpos( $params['attach_format'], '$file_link$' ) !== false ) ?
-						$File->get_view_link( $File->get_name(), NULL, NULL, $file_link_format, $params['file_link_class'] ) : '';
-
-				$r_file[$i] = $params['before_attach'];
-				$r_file[$i] .= str_replace( array( '$icon$', '$icon_link$', '$file_link$', '$file_size$' ),
-					array( $icon, $icon_link, $file_link, $file_size ),
-					$params['attach_format'] );
-				$r_file[$i] .= $params['after_attach'];
+						$File->get_name().' - <span class="red nowrap">'.get_icon( 'warning_yellow' ).' '.T_('Missing attachment!').'</span>' : '';
 			}
+
+			$r_file[$i] = $params['before_attach'];
+			$r_file[$i] .= str_replace( array( '$icon$', '$icon_link$', '$file_link$', '$file_size$' ),
+				array( $icon, $icon_link, $file_link, $file_size ),
+				$params['attach_format'] );
+			$r_file[$i] .= $params['after_attach'];
 
 			$i++;
 			$params = $temp_params;
@@ -5131,7 +5148,7 @@ class Item extends ItemLight
 	 */
 	function get_autogenerated_excerpt( $crop_length = 254, $suffix = '&hellip;' )
 	{
-		// autogenerated excerpt should NEVER show anything after <!-- more --> or after <!-- page -->
+		// autogenerated excerpt should NEVER show anything after [teaserbreak] or after [pagebreak]
 		$content_parts = $this->get_content_parts( array( 'disppage' => 1 ) );
 		$excerpt_content = array_shift( $content_parts );
 		$r = str_replace( '<p>', ' <p>', $excerpt_content );
@@ -5449,7 +5466,7 @@ class Item extends ItemLight
 
 		// Select user_ids with the corresponding item edit permission on this item's blog
 		$SQL = new SQL();
-		$SQL->SELECT( 'user_ID, IF( grp_perm_blogs = "editall" OR user_ID = blog_owner_user_ID, "all", IF( bloguser_perm_edit > bloggroup_perm_edit, bloguser_perm_edit, bloggroup_perm_edit ) ) as perm' );
+		$SQL->SELECT( 'user_ID, IF( grp_perm_blogs = "editall" OR user_ID = blog_owner_user_ID, "all", IF( IFNULL( bloguser_perm_edit + 0, 0 ) > IFNULL( bloggroup_perm_edit + 0, 0 ), bloguser_perm_edit, bloggroup_perm_edit ) ) as perm' );
 		$SQL->FROM( 'T_users' );
 		$SQL->FROM_add( 'LEFT JOIN T_blogs ON ( blog_ID = '.$this->blog_ID.' )' );
 		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0 AND user_ID = bloguser_user_ID AND bloguser_blog_ID = '.$this->blog_ID.' )' );

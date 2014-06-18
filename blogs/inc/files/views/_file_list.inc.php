@@ -88,7 +88,7 @@ $Form->begin_form();
 	$Form->hidden( 'md5_cwd', md5($fm_Filelist->get_ads_list_path()) );
 	$Form->hiddens_by_key( get_memorized('fm_selected') ); // 'fm_selected' gets provided by the form itself
 ?>
-<table class="filelist">
+<table class="filelist table table-striped table-bordered table-hover table-condensed">
 	<thead>
 	<?php
 		/*****************  Col headers  ****************/
@@ -239,12 +239,23 @@ $Form->begin_form();
 		if( $fm_flatmode )
 		{
 			echo '<td class="filepath">';
-			echo dirname($lFile->get_rdfs_rel_path()).'/';
+			echo dirname( $lFile->get_rdfs_rel_path() ).'/';
 			echo '</td>';
 		}
 
-
-		echo '<td class="fm_filename" rel="'.$lFile->get_name().'">';
+		/*******************  File name: ******************/
+		if( ! $fm_flatmode ||
+		    ( $selected_Filelist->get_rds_list_path() === false && dirname( $lFile->get_rdfs_rel_path() ) == '.' ) ||
+		    ( $selected_Filelist->get_rds_list_path() == dirname( $lFile->get_rdfs_rel_path() ).'/' ) )
+		{ // Use attribute "rel" only for current folder and not for subfolders
+		  // It is used to detect a duplicate file on quick upload
+			$td_filename_rel_attr = ' rel="'.$lFile->get_name().'"';
+		}
+		else
+		{ // Don't set attribute "rel" for this file because it is from another folder
+			$td_filename_rel_attr = '';
+		}
+		echo '<td class="fm_filename"'.$td_filename_rel_attr.'>';
 
 			/*************  Invalid filename warning:  *************/
 
@@ -577,7 +588,7 @@ $Form->begin_form();
 		// Footer with "check all", "with selected: ..":
 		// --------------
 		?>
-		<tr class="listfooter firstcol lastcol">
+		<tr class="listfooter firstcol lastcol file_selector">
 			<td colspan="<?php echo $filetable_cols ?>">
 
 			<?php
@@ -762,7 +773,7 @@ $Form->begin_form();
 			jQuery( function() {
 				var fm_hl = jQuery("#fm_highlighted");
 				if( fm_hl.length ) {
-					jQuery.getScript('<?php echo $rsc_url ?>js/jquery/jquery.scrollto.js', function () {
+					jQuery.getScript('<?php echo get_require_url( '#scrollto#' ); ?>', function () {
 						jQuery.scrollTo( fm_hl,
 						{ onAfter: function()
 							{

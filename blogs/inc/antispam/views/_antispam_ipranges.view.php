@@ -47,7 +47,7 @@ if( !empty( $ip_address ) )
 // Create result set:
 $Results = new Results( $SQL->get(), 'aipr_', 'A', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 
-$Results->title = T_('IP Ranges').' ('.$Results->get_total_rows().')'.get_manual_link('ip-ranges-tab');
+$Results->title = T_('IP Ranges').' ('.$Results->get_total_rows().')'.get_manual_link( 'ip-ranges' );
 $Results->Cache = get_IPRangeCache();
 
 /**
@@ -108,6 +108,13 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
+		'th' => T_('Anon. contact form submits'),
+		'td' => '$aipr_contact_email_count$',
+		'order' => 'aipr_contact_email_count',
+		'default_dir' => 'D',
+	);
+
+$Results->cols[] = array(
 		'th' => T_('Block count'),
 		'td' => '$aipr_block_count$',
 		'order' => 'aipr_block_count',
@@ -122,14 +129,32 @@ $Plugins->trigger_event( 'GetAdditionalColumnsTable', array(
 
 if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 { // Check permission to edit IP ranges:
+
+	/**
+	 * Get actions links for IP range
+	 *
+	 * @param integer IP range ID
+	 * @param string Current tab value
+	 * @return string HTML links to edit and delete IP range
+	 */
+	function antispam_ipranges_actions( $aipr_ID, $tab_param )
+	{
+		// A link to edit IP range
+		$r = action_icon( T_('Edit this IP range...'), 'properties',
+						$admin_url.'?ctrl=antispam'.$tab_param.'&amp;tab3=ipranges&amp;iprange_ID='.$aipr_ID.'&amp;action=iprange_edit' );
+
+		// A link to delete IP range
+		$r .= action_icon( T_('Delete this IP range!'), 'delete',
+						regenerate_url( 'iprange_ID,action', 'iprange_ID='.$aipr_ID.'&amp;action=iprange_delete&amp;'.url_crumb( 'iprange' ) ) );
+
+		return $r;
+	}
+
 	$Results->cols[] = array(
 			'th' => T_('Actions'),
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'shrinkwrap',
-			'td' => action_icon( TS_('Edit this IP range...'), 'properties',
-					$admin_url.'?ctrl=antispam'.$tab_param.'&amp;tab3=ipranges&amp;iprange_ID=$aipr_ID$&amp;action=iprange_edit' )
-					.action_icon( T_('Delete this IP range!'), 'delete',
-						regenerate_url( 'iprange_ID,action', 'iprange_ID=$aipr_ID$&amp;action=iprange_delete&amp;'.url_crumb('iprange') ) ),
+			'td' => '%antispam_ipranges_actions( #aipr_ID#, "'.$tab_param.'" )%',
 		);
 }
 

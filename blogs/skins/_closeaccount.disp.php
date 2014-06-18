@@ -20,7 +20,7 @@ global $secure_htsrv_url, $Blog, $account_closing_success;
 
 if( ! empty( $account_closing_success ) )
 { // Display a bye message after user closed an account
-	echo '<p>'.nl2br( $Settings->get( 'user_closing_byemsg' ) ).'</p>';
+	echo '<p>'.nl2br( $Settings->get( 'account_close_byemsg' ) ).'</p>';
 }
 else
 { // Display a form to close an account
@@ -34,10 +34,10 @@ else
 	$Form->hidden( 'action', 'closeaccount' );
 
 	// Display intro message
-	echo '<p>'.nl2br( $Settings->get( 'user_closing_intro' ) ).'</p>'."\n";
+	echo '<p>'.nl2br( $Settings->get( 'account_close_intro' ) ).'</p>'."\n";
 
 	// Display the reasons
-	$reasons = trim( $Settings->get( 'user_closing_reasons' ) );
+	$reasons = trim( $Settings->get( 'account_close_reasons' ) );
 	if( ! empty( $reasons ) )
 	{
 		$reasons = explode( "\n", str_replace( array( "\r\n", "\n\n" ), "\n", $reasons ) );

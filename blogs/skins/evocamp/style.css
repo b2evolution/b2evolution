@@ -443,7 +443,7 @@ background:#F2ECCE;
 border-bottom:1px solid #CCC9B8;
 }
 
-code {
+code, samp {
 font: 1.1em 'Courier New', Courier, Fixed;
 }
 

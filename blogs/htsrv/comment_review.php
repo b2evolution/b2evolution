@@ -94,11 +94,20 @@ switch( $action )
 
 	case 'delete':
 		// Delete from DB:
-		$posted_Comment->dbdelete();
+		$posted_Comment->dbdelete( true );
 
 		$Messages->add( T_('Comment has been deleted.'), 'success' );
 
 		header_redirect( $to_dashboard );
+		break;
+
+	case 'recycle':
+		// Recycle comment:
+		$posted_Comment->dbdelete();
+
+		$Messages->add( T_('Comment has been recycled.'), 'success' );
+
+		header_redirect( regenerate_url('action', 'action=exit', '', '&') );
 		break;
 
 	case 'deleteurl':
@@ -143,6 +152,11 @@ if ($secret == $posted_Comment->get('secret') && ($secret != NULL) )
 	// delete button
 	echo '<input type="submit" name="actionArray[delete]"';
 	echo ' value="'.T_('Delete').'" title="'.T_('Delete this comment').'"/>';
+	echo "\n";
+
+	// recycle button
+	echo '<input type="submit" name="actionArray[recycle]"';
+	echo ' value="'.T_('Recycle').'" title="'.T_('Recycle this comment').'"/>';
 	echo "\n";
 
 	// deprecate button
@@ -200,7 +214,7 @@ else
 					echo ' '.action_icon( T_('Antispam tool'), 'ban', $antispam_url );
 				}
 				$posted_Comment->author_email( '', ' &middot; Email: <span class="bEmail">', '</span>' );
-				$posted_Comment->author_ip( ' &middot; IP: <span class="bIP">', '</span>' );
+				$posted_Comment->author_ip( ' &middot; IP: <span class="bIP">', '</span>', 'antispam' );
 				echo ' &middot; <span class="bKarma">';
 				$posted_Comment->spam_karma( T_('Spam Karma').': %s%', T_('No Spam Karma') );
 				echo '</span>';

@@ -809,4 +809,49 @@ function echo_progress_log_update( $progress_log_id, $done, $all )
 	<?php
 	echo '</span>';
 }
+
+
+/**
+ * Convert item content separators to new format
+ */
+function dbm_convert_item_content_separators()
+{
+	global $DB;
+
+	// Display process status
+	echo T_( 'Convert item content separators from &lt;!--more--&gt; to [teaserbreak] and &lt;!--nextpage--&gt; to [pagebreak]...' );
+	evo_flush();
+
+	$DB->query( 'UPDATE T_items__item
+		SET post_content = REPLACE( REPLACE( REPLACE( REPLACE( post_content,
+			"&lt;!--more--&gt;",     "[teaserbreak]" ),
+			"<!--more-->",           "[teaserbreak]" ),
+			"&lt;!--nextpage--&gt;", "[pagebreak]" ),
+			"<!--nextpage-->",       "[pagebreak]" )' );
+
+	/* test code to return to old separators to see how it works with old separators
+	$DB->query( 'UPDATE T_items__item
+		SET post_content = REPLACE( REPLACE( post_content,
+			"[teaserbreak]", "<!--more-->" ),
+			"[pagebreak]",   "<!--nextpage-->" )' );
+	*/
+
+	$item_updated_count = intval( $DB->rows_affected );
+
+	if( $item_updated_count > 0 )
+	{ // Some separators were updated
+		echo ' '.sprintf( T_('%d items have been updated.'), $item_updated_count );
+
+		// To see the changes we should update the pre-renderered item contents
+		echo '<br />'.T_( 'Clear pre-renderered item cache (DB)' ).'...';
+		dbm_delete_itemprecache();
+		echo ' OK.';
+	}
+	else
+	{ // No old separators in DB
+		echo ' '.T_('No old separators were found.');
+	}
+
+	echo "<br />\n";
+}
 ?>

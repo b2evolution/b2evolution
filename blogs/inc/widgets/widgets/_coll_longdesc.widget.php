@@ -114,7 +114,11 @@ class coll_longdesc_Widget extends ComponentWidget
 		// Display title if requested
 		$this->disp_title();
 
+		echo $this->disp_params['block_body_start'];
+
 		$Blog->disp( 'longdesc', 'htmlbody' );
+
+		echo $this->disp_params['block_body_end'];
 
 		echo $this->disp_params['block_end'];
 

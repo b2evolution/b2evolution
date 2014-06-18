@@ -68,11 +68,13 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 <div class="clear"></div>
 
-<div class="left_col">
+<div class="row">
+
+<div class="left_col col-md-9">
 
 
 	<?php
-	$Form->begin_fieldset( T_('Comment contents') );
+	$Form->begin_fieldset( T_('Comment contents').get_manual_link( 'comment-content-fieldset' ) );
 
 	echo '<table cellspacing="0" class="compose_layout">';
 
@@ -100,6 +102,20 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	}
 
 	echo '</tr></table>';
+
+	if( $Blog->get_setting( 'threaded_comments' ) )
+	{ // Display a reply comment ID only when this feature is enabled in blog settings
+		echo '<table cellspacing="0" class="compose_layout">';
+		echo '<tr><td width="1%"><strong>'.T_('In reply to comment ID').':</strong></td>';
+		echo '<td class="input">';
+		$Form->switch_layout( 'none' );
+		$Form->text_input( 'in_reply_to_cmt_ID', $edited_Comment->in_reply_to_cmt_ID, 10, '' );
+		$Form->switch_layout( NULL );
+		echo '&nbsp;<span class="note">'.T_('(leave blank for normal comments)').'</span>';
+		echo '</td>';
+		echo '</tr></table>';
+	}
+
 	echo '<table cellspacing="0" class="compose_layout">';
 
 	if( ! $edited_Comment->get_author_User() )
@@ -231,7 +247,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 </div>
 
-<div class="right_col">
+<div class="right_col col-md-3 form-inline">
 
 <?php
 	if( $comment_Item->can_rate()
@@ -302,6 +318,8 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 </div>
 
 <div class="clear"></div>
+
+</div>
 
 <?php
 $Form->end_form();

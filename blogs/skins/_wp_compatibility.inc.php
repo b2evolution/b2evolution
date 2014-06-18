@@ -124,7 +124,8 @@ function the_content()
  */
 function is_home()
 {
-	return is_default_page();
+	global $is_front;
+	return $is_front;
 }
 
 

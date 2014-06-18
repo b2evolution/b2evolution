@@ -60,7 +60,7 @@ headers_content_mightcache( 'text/html', 0 );		// Never even think about caching
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
  <!-- InstanceEndEditable -->
 </head>
-<body>
+<body<?php skin_body_attrs(); ?>>
 <!-- InstanceBeginEditable name="ToolBar" -->
 <?php
 	// ---------------------------- TOOLBAR INCLUDED HERE ----------------------------

@@ -208,8 +208,6 @@ $Form->begin_form( 'inskin', '', $form_params );
 	// CALL PLUGINS NOW:
 	$Plugins->trigger_event( 'DisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'inskin' ) );
 
-$Form->end_fieldset();
-
 	global $display_item_settings_is_defined;
 	$display_item_settings_is_defined = false;
 	modules_call_method( 'display_item_settings', array( 'Form' => & $Form, 'Blog' => & $Blog, 'edited_Item' => & $edited_Item ) );
@@ -264,11 +262,11 @@ $Form->end_fieldset();
 	}
 
 	$Form->switch_layout( 'none' );
-	echo '<table cellspacing="0" width="100%">';
+	echo '<table cellspacing="0" width="100%" class="item_tags">';
 	echo '<tr><td class="label shrinkwrap"><label for="item_tags"><strong>'.T_('Tags').':</strong></label></td>';
 	echo '<td class="input">';
 	$Form->text_input( 'item_tags', $item_tags, 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
-	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
+	echo '</td></tr>';
 	echo '</table>';
 	$Form->switch_layout( NULL );
 ?>

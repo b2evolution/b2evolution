@@ -177,12 +177,14 @@ function get_user_colored_login( $login, $params = array() )
  * Get url to login
  *
  * @param string describe the source ina word or two, used for stats (search current calls to this function for examples)
- * @param string
- * @return string
+ * @param string URL to redirect
+ * @param boolean TRUE to use normal login form(ignore in-skin login form)
+ * @param integer blog ID for the requested blog. NULL for current $Blog
+ * @return string URL
  */
-function get_login_url( $source, $redirect_to = NULL )
+function get_login_url( $source, $redirect_to = NULL, $force_normal_login = false, $blog_ID = NULL )
 {
-	global $edited_Blog, $secure_htsrv_url;
+	global $secure_htsrv_url;
 
 	if( !empty( $redirect_to ) )
 	{
@@ -195,10 +197,14 @@ function get_login_url( $source, $redirect_to = NULL )
 
 	if( use_in_skin_login() )
 	{ // use in-skin login
-		global $blog;
+		if( empty( $blog_ID ) )
+		{ // Use current blog if it is not defined
+			global $blog;
+			$blog_ID = $blog;
+		}
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog );
-		if( ! empty($redirect) )
+		$Blog = $BlogCache->get_by_ID( $blog_ID );
+		if( ! empty( $redirect ) )
 		{
 			$redirect = 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $Blog->get( 'loginurl' ) ) );
 		}
@@ -206,7 +212,7 @@ function get_login_url( $source, $redirect_to = NULL )
 	}
 	else
 	{ // Normal login
-		if( ! empty($redirect) )
+		if( ! empty( $redirect ) )
 		{
 			$redirect = '?redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $secure_htsrv_url ) );
 		}
@@ -489,8 +495,10 @@ function get_user_register_link( $before = '', $after = '', $link_text = '', $li
  * @param string where this registration url will be displayed
  * @param boolean force to display even when a user is logged in
  * @param string delimiter to use for more url params
+ * @param integer blog ID for the requested blog. NULL for current $Blog
+ * @return string URL
  */
-function get_user_register_url( $redirect_to = NULL, $default_source_string = '', $disp_when_logged_in = false, $glue = '&amp;' )
+function get_user_register_url( $redirect_to = NULL, $default_source_string = '', $disp_when_logged_in = false, $glue = '&amp;', $blog_ID = NULL )
 {
 	global $Settings, $edited_Blog, $secure_htsrv_url;
 
@@ -511,10 +519,14 @@ function get_user_register_url( $redirect_to = NULL, $default_source_string = ''
 
 	if( use_in_skin_login() )
 	{
-		global $blog;
+		if( empty( $blog_ID ) )
+		{ // Use current blog if it is not defined
+			global $blog;
+			$blog_ID = $blog;
+		}
 
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog );
+		$Blog = $BlogCache->get_by_ID( $blog_ID );
 
 		$register_url = url_add_param( $Blog->get( 'url' ), 'disp=register', $glue );
 	}
@@ -591,11 +603,12 @@ function get_user_logout_link( $before = '', $after = '', $link_text = '', $link
 /**
  * Get the URL for the logout button
  *
+ * @param integer blog ID for the requested blog. NULL for current $Blog
  * @return string
  */
-function get_user_logout_url()
+function get_user_logout_url( $blog_ID = NULL )
 {
-	global $admin_url, $baseurl, $is_admin_page, $Blog, $secure_htsrv_url;
+	global $admin_url, $baseurl, $is_admin_page, $secure_htsrv_url;
 
 	if( ! is_logged_in() )
 	{
@@ -605,10 +618,21 @@ function get_user_logout_url()
 	$redirect_to = url_rel_to_same_host( regenerate_url( 'disp,action','','','&' ), $secure_htsrv_url );
 	if( require_login( $redirect_to, true ) )
 	{ // if redirect_to page is a login page, or also require login ( e.g. admin.php )
-		if( !empty( $Blog ) )
+		if( ! empty( $blog_ID ) )
+		{ // Try to use blog by defined ID
+			$BlogCache = & get_BlogCache();
+			$current_Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+		}
+		if( empty( $current_Blog ) )
+		{ // Use current blog
+			global $Blog;
+			$current_Blog = & $Blog;
+		}
+
+		if( ! empty( $current_Blog ) )
 		{ // Blog is set
 			// set redirect_to to Blog url
-			$redirect_to = $Blog->gen_blogurl();
+			$redirect_to = $current_Blog->gen_blogurl();
 		}
 		else
 		{ // Blog is empty, set abort url to baseurl
@@ -773,19 +797,25 @@ function get_user_tab_link( $user_tab = 'user', $before = '', $after = '', $link
 
 /**
  * Get URL to edit user profile
+ *
+ * @param integer blog ID for the requested blog. NULL for current $Blog
+ * @return string URL
  */
-function get_user_profile_url()
+function get_user_profile_url( $blog_ID = NULL )
 {
-	return get_user_settings_url( 'profile' );
+	return get_user_settings_url( 'profile', NULL, $blog_ID );
 }
 
 
 /**
  * Get URL to edit user avatar
+ *
+ * @param integer blog ID for the requested blog. NULL for current $Blog
+ * @return string URL
  */
-function get_user_avatar_url()
+function get_user_avatar_url( $blog_ID = NULL )
 {
-	return get_user_settings_url( 'avatar' );
+	return get_user_settings_url( 'avatar', NULL, $blog_ID );
 }
 
 
@@ -949,10 +979,12 @@ function get_user_identity_url( $user_ID, $user_tab = 'profile' )
  *
  * @param string user tab
  * @param integer user ID for the requested user. If isn't set then return $current_User settings url.
+ * @param integer blog ID for the requested blog. NULL for current $Blog
+ * @return string URL
  */
-function get_user_settings_url( $user_tab, $user_ID = NULL )
+function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 {
-	global $current_User, $Blog, $is_admin_page, $admin_url, $ReqURI;
+	global $current_User, $is_admin_page, $admin_url, $ReqURI;
 
 	if( !is_logged_in() )
 	{
@@ -978,7 +1010,18 @@ function get_user_settings_url( $user_tab, $user_ID = NULL )
 		$user_ID = $current_User->ID;
 	}
 
-	if( $is_admin_page || $is_admin_tab || empty( $Blog ) || $current_User->ID != $user_ID )
+	if( ! empty( $blog_ID ) )
+	{ // Try to use blog by defined ID
+		$BlogCache = & get_BlogCache();
+		$current_Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+	}
+	if( empty( $current_Blog ) )
+	{ // Use current blog
+		global $Blog;
+		$current_Blog = & $Blog;
+	}
+
+	if( $is_admin_page || $is_admin_tab || empty( $current_Blog ) || $current_User->ID != $user_ID )
 	{
 		if( ( $current_User->ID != $user_ID ) && ( ! $current_User->check_perm( 'users', 'view' ) ) )
 		{
@@ -991,7 +1034,7 @@ function get_user_settings_url( $user_tab, $user_ID = NULL )
 		return $admin_url.'?ctrl=user&amp;user_tab='.$user_tab.'&amp;user_ID='.$user_ID;
 	}
 
-	return url_add_param( $Blog->gen_blogurl(), 'disp='.$user_tab );
+	return url_add_param( $current_Blog->gen_blogurl(), 'disp='.$user_tab );
 }
 
 
@@ -1484,7 +1527,7 @@ function get_avatar_imgtag_default( $size = 'crop-top-15x15', $class = '', $alig
 		{ // Set default gravatar
 			if( $default_gravatar == 'b2evo' )
 			{ // Use gravatar from b2evo default avatar image
-				$params['default'] = get_default_avatar_url( $params['gender'], $size, false );
+				$params['default'] = get_default_avatar_url( $params['gender'] );
 			}
 			else
 			{ // Use a selected gravatar type
@@ -1549,46 +1592,40 @@ function get_avatar_imgtag_default( $size = 'crop-top-15x15', $class = '', $alig
  * Get a default avatar url depending on user gender
  *
  * @param string User gender: M - Men; F - Female/Women; Empty string - Unknown gender
- * @param string Avatar size
- * @param boolean TRUE to get a thumbnail url
+ * @param string|NULL Avatar thumbnail size or NULL to get real image
  * @return string URL of avatar
  */
-function get_default_avatar_url( $gender = '', $size = 'crop-top-15x15', $thumb = true )
+function get_default_avatar_url( $gender = '', $size = NULL )
 {
 	switch( $gender )
 	{
 		case 'M':
 			// Default avatar for men
-			global $default_avatar_men;
-			$avatar_url = $default_avatar_men;
+			$avatar_url = '/avatars/default_avatar_men.jpg';
 			break;
 
 		case 'F':
 			// Default avatar for women
-			global $default_avatar_women;
-			$avatar_url = $default_avatar_women;
+			$avatar_url = '/avatars/default_avatar_women.jpg';
 			break;
 
 		default:
 			// Default avatar for users without defined gender
-			global $default_avatar_unknown;
-			$avatar_url = $default_avatar_unknown;
+			$avatar_url = '/avatars/default_avatar_unknown.jpg';
 			break;
 	}
 
-	if( $thumb )
+	if( $size !== NULL )
 	{ // Get a thumbnail url
-		$avatar_url_data = explode( '/shared/global/', $avatar_url );
-		if( is_array( $avatar_url_data ) && count( $avatar_url_data ) == 2 && $avatar_url_data[1] != '' )
-		{ // This url is from shared folder, We can get a thumb image
-			$FileCache = & get_FileCache();
-			$File = & $FileCache->get_by_root_and_path( 'shared', 0, '/'.$avatar_url_data[1] );
+		$FileCache = & get_FileCache();
+		if( $File = & $FileCache->get_by_root_and_path( 'shared', 0, $avatar_url ) ) {
 			return $File->get_thumb_url( $size, '&' );
 		}
 	}
 
 	// Don't get a thumbnail url OR Unknown folder, Return full sized image url
-	return $avatar_url;
+	global $media_url;
+	return $media_url.'shared/global'.$avatar_url;
 }
 
 
@@ -3613,10 +3650,13 @@ jQuery(document).keyup(function(e)
 function echo_user_report_js()
 {
 	global $rsc_url, $admin_url;
-
-	echo_user_ajaxwindow_js();
 ?>
 <script type="text/javascript">
+<?php
+// Initialize JavaScript to build and open window
+echo_modalwindow_js();
+?>
+
 function user_report( user_ID, user_tab_from )
 {
 	userAjaxWindow( '<img src="<?php echo $rsc_url; ?>img/ajax-loader2.gif" alt="<?php echo T_('Loading...'); ?>" title="<?php echo T_('Loading...'); ?>" style="display:block;margin:auto;position:absolute;top:0;bottom:0;left:0;right:0;" />', '680px' );
@@ -3651,10 +3691,13 @@ function user_report( user_ID, user_tab_from )
 function echo_user_deldata_js()
 {
 	global $rsc_url, $admin_url;
-
-	echo_user_ajaxwindow_js();
 ?>
 <script type="text/javascript">
+<?php
+// Initialize JavaScript to build and open window
+echo_modalwindow_js();
+?>
+
 function user_deldata( user_ID, user_tab_from )
 {
 	userAjaxWindow( '<img src="<?php echo $rsc_url; ?>img/ajax-loader2.gif" alt="<?php echo T_('Loading...'); ?>" title="<?php echo T_('Loading...'); ?>" style="display:block;margin:auto;position:absolute;top:0;bottom:0;left:0;right:0;" />', '680px' );
@@ -3718,7 +3761,7 @@ function user_report_form( $params = array() )
 
 	if( $current_report == NULL )
 	{ // currentUser didn't add any report from this user yet
-		$report_content = '<select id="report_user_status" name="report_user_status">';
+		$report_content = '<select id="report_user_status" name="report_user_status" class="form-control" style="width:auto">';
 		foreach( $report_options as $option => $option_label )
 		{ // add select option, none must be selected
 			$report_content .= '<option '.( ( $option == 'none' ) ? 'selected="selected" ' : '' ).'value="'.$option.'">'.$option_label.'</option>';
@@ -3726,7 +3769,7 @@ function user_report_form( $params = array() )
 		$report_content .= '</select><div id="report_info" style="width:100%;"></div>';
 
 		$info_content = '<div><span>'.T_('You can provide additional information below').':</span></div>';
-		$info_content .= '<table style="width:100%;"><td style="width:99%;background-color:inherit;"><textarea id="report_info_content" name="report_info_content" class="form_textarea_input" style="width:100%;" rows="2" maxlength="240"></textarea></td>';
+		$info_content .= '<table style="width:100%;"><td style="width:99%;background-color:inherit;"><textarea id="report_info_content" name="report_info_content" class="form_textarea_input form-control" style="width:100%;" rows="2" maxlength="240"></textarea></td>';
 		$info_content .= '<td style="vertical-align:top;background-color:inherit;"><input type="submit" class="SaveButton" style="color:red;margin-left:2px;" value="'.T_('Report this user now!').'" name="actionArray[report_user]" /></td></table>';
 		$report_content .= '<script type="text/javascript">
 			var info_content = \''.$info_content.'\';
@@ -3826,7 +3869,7 @@ function user_reports_results_block( $params = array() )
 		}
 	}
 
-	global $DB;
+	global $DB, $AdminUI;
 
 	param( 'user_tab', 'string', '', true );
 	param( 'user_ID', 'integer', 0, true );
@@ -3855,8 +3898,9 @@ function user_reports_results_block( $params = array() )
 		$reports_Results->init_params_by_skin( $params[ 'skin_type' ], $params[ 'skin_name' ] );
 	}
 
+	$results_params = $AdminUI->get_template( 'Results' );
 	$display_params = array(
-		'before' => '<div class="results" style="margin-top:25px" id="reports_result">'
+		'before' => str_replace( '>', ' style="margin-top:25px" id="reports_result">', $results_params['before'] ),
 	);
 	$reports_Results->display( $display_params );
 

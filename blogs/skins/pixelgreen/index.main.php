@@ -125,8 +125,8 @@ siteskin_include( '_site_body_header.inc.php' );
 		<?php
 		// ------------------------- SIDEBAR INCLUDED HERE --------------------------
 		skin_include( '_sidebar.inc.php' );
-		// Note: You can customize the default BODY footer by copying the
-		// _body_footer.inc.php file into the current skin folder.
+		// Note: You can customize the sidebar by copying the
+		// _sidebar.inc.php file into the current skin folder.
 		// ----------------------------- END OF SIDEBAR -----------------------------
 		?>
 
@@ -148,6 +148,8 @@ siteskin_include( '_site_body_header.inc.php' );
 			?>
 
 			<?php
+			if( $disp != 'front' && $disp != 'download' )
+			{
 				// --------------------------------- START OF POSTS -------------------------------------
 				// Display message if no post:
 				display_if_empty();
@@ -170,10 +172,11 @@ siteskin_include( '_site_body_header.inc.php' );
 				mainlist_page_links( array(
 						'block_start' => '<p class="center"><strong>',
 						'block_end' => '</strong></p>',
-		   			'prev_text' => '&lt;&lt;',
-		   			'next_text' => '&gt;&gt;',
+						'prev_text' => '&lt;&lt;',
+						'next_text' => '&gt;&gt;',
 					) );
 				// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
+			}
 			?>
 
 			<?php

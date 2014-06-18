@@ -149,7 +149,9 @@ $Form->begin_form( '', '', $params );
 
 ?>
 
-<div class="left_col">
+<div class="row">
+
+<div class="left_col col-md-9">
 
 	<?php
 	// ############################ POST CONTENTS #############################
@@ -166,7 +168,7 @@ $Form->begin_form( '', '', $params );
 		echo '<td class"label"><strong>'.T_('Title').':</strong></td>';
 		echo '<td class="input">';
 		$Form->text_input( 'post_title', $item_title, 20, '', '', array('maxlength'=>255, 'style'=>'width: 100%;', 'required'=>($require_title=='required')) );
-		echo '</td><td width="1"><!-- for IE7 --></td></tr></table>';
+		echo '</td></tr></table>';
 
 		$Form->switch_layout( NULL );
 	}
@@ -234,7 +236,7 @@ $Form->begin_form( '', '', $params );
 	echo '<tr><td class="label"><label for="item_tags">'.T_('Tags').':</strong></label></td>';
 	echo '<td class="input">';
 	$Form->text_input( 'item_tags', $item_tags, 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
-	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
+	echo '</td></tr>';
 	echo '</table>';
 
 	$Form->switch_layout( NULL );
@@ -249,7 +251,7 @@ $Form->begin_form( '', '', $params );
 
 </div>
 
-<div class="right_col">
+<div class="right_col col-md-3 form-inline">
 
 	<?php
 	// ################### MODULES SPECIFIC ITEM SETTINGS ###################
@@ -297,6 +299,8 @@ $Form->begin_form( '', '', $params );
 </div>
 
 <div class="clear"></div>
+
+</div>
 
 <?php
 // ================================== END OF EDIT FORM ==================================

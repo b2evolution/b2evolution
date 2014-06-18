@@ -220,12 +220,13 @@ $schema_queries = array(
 	'T_antispam__iprange' => array(
 		'Creating table for Antispam IP Ranges',
 		"CREATE TABLE T_antispam__iprange (
-			aipr_ID          int(10) unsigned NOT NULL auto_increment,
-			aipr_IPv4start   int(10) unsigned NOT NULL,
-			aipr_IPv4end     int(10) unsigned NOT NULL,
-			aipr_user_count  int(10) unsigned DEFAULT 0,
-			aipr_status      enum( 'trusted', 'suspect', 'blocked' ) COLLATE ascii_bin NULL DEFAULT NULL,
-			aipr_block_count int(10) unsigned DEFAULT 0,
+			aipr_ID                  int(10) unsigned NOT NULL auto_increment,
+			aipr_IPv4start           int(10) unsigned NOT NULL,
+			aipr_IPv4end             int(10) unsigned NOT NULL,
+			aipr_user_count          int(10) unsigned DEFAULT 0,
+			aipr_contact_email_count int(10) unsigned DEFAULT 0,
+			aipr_status              enum( 'trusted', 'suspect', 'blocked' ) COLLATE ascii_bin NULL DEFAULT NULL,
+			aipr_block_count         int(10) unsigned DEFAULT 0,
 			PRIMARY KEY aipr_ID (aipr_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 

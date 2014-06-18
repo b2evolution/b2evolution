@@ -102,23 +102,14 @@ else
 	// Display title depending on selection params:
 	echo $ItemList->get_filter_title( '<h3>', '</h3>', '<br />', NULL, 'htmlbody' );
 
+	global $AdminUI;
+	$admin_template = $AdminUI->get_template( 'Results' );
+
 	// Initialize things in order to be ready for displaying.
 	$display_params = array(
-					'header_start' => '<div class="NavBar center">',
-						'header_text' => '<strong>'.T_('Pages').'</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$',
-						'header_text_single' => T_('1 page'),
-					'header_end' => '</div>',
-					'footer_start' => '',
-						'footer_text' => '<div class="NavBar center"><strong>'.T_('Pages').'</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$<br />$page_size$</div>',
-						'footer_text_single' => '<div class="NavBar center">$page_size$</div>',
-							'prev_text' => T_('Previous'),
-							'next_text' => T_('Next'),
-							'list_prev_text' => T_('...'),
-							'list_next_text' => T_('...'),
-							'list_span' => 11,
-							'scroll_list_range' => 5,
-					'footer_end' => ''
-				);
+			'header_start' => str_replace( 'class="', 'class="NavBar center ', $admin_template['header_start'] ),
+			'footer_start' => str_replace( 'class="', 'class="NavBar center ', $admin_template['footer_start'] ),
+		);
 }
 
 $ItemList->display_init( $display_params );
@@ -274,21 +265,21 @@ while( $Item = & $ItemList->get_item() )
 		<div class="PostActionsArea">
 			<?php
 
-			echo '<span class="roundbutton_group">';
+			echo '<span class="'.button_class( 'group' ).'">';
 			if( $action != 'view' )
 			{
-				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="roundbutton_text">'.get_icon( 'magnifier' ).T_('View').'</a>';
+				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="'.button_class( 'text' ).'">'.get_icon( 'magnifier' ).T_('View').'</a>';
 			}
 
 			if( isset($GLOBALS['files_Module']) && $current_User->check_perm( 'files', 'view' ) )
 			{
 				echo '<a href="'.url_add_param( $Blog->get_filemanager_link(), 'fm_mode=link_object&amp;link_type=item&amp;link_object_ID='.$Item->ID )
-							.'" class="roundbutton_text">'.get_icon( 'folder' ).T_('Files').'</a>';
+							.'" class="'.button_class( 'text' ).'">'.get_icon( 'folder' ).T_('Files').'</a>';
 			}
 
 			if( $Blog->get_setting( 'allow_comments' ) != 'never' )
 			{
-				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'#comments" class="roundbutton_text">';
+				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'#comments" class="'.button_class( 'text' ).'">';
 				// TRANS: Link to comments for current post
 				$comments_number = generic_ctp_number( $Item->ID, 'comments', 'total' );
 				echo get_icon( $comments_number > 0 ? 'comments' : 'nocomment' );
@@ -299,27 +290,27 @@ while( $Item = & $ItemList->get_item() )
 			}
 			echo '</span>';
 
-			echo '<span class="roundbutton_group">';
+			echo '<span class="'.button_class( 'group' ).'"> ';
 			// Display edit button if current user has the rights:
 			$Item->edit_link( array( // Link to backoffice for editing
-					'before' => ' ',
+					'before' => '',
 					'after'  => '',
-					'class'  => 'roundbutton_text'
+					'class'  => button_class( 'text' )
 				) );
 
 			// Display copy button if current user has the rights:
 			$Item->copy_link( array( // Link to backoffice for coping
 					'before' => '',
-					'after'  => ' ',
+					'after'  => '',
 					'text'   => '#icon#',
-					'class'  => 'roundbutton'
+					'class'  => button_class()
 				) );
 			echo '</span>';
 
-			echo '<span class="roundbutton_group">';
+			echo '<span class="'.button_class( 'group' ).'"> ';
 			// Display the moderate buttons if current user has the rights:
 			$status_link_params = array(
-					'class'       => 'roundbutton_text',
+					'class'       => button_class( 'text' ),
 					'redirect_to' => regenerate_url( '', '&highlight='.$Item->ID.'#item_'.$Item->ID, '', '&' ),
 				);
 			$Item->next_status_link( $status_link_params, true );
@@ -328,11 +319,11 @@ while( $Item = & $ItemList->get_item() )
 			$next_status_in_row = $Item->get_next_status( false );
 			if( $next_status_in_row && $next_status_in_row[0] != 'deprecated' )
 			{ // Display deprecate button if current user has the rights:
-				$Item->deprecate_link( '', '', get_icon( 'move_down_grey', 'imgtag', array( 'title' => '' ) ), '#', 'roundbutton' );
+				$Item->deprecate_link( '', '', get_icon( 'move_down_grey', 'imgtag', array( 'title' => '' ) ), '#', button_class() );
 			}
 
 			// Display delete button if current user has the rights:
-			$Item->delete_link( '', ' ', '#', '#', 'roundbutton_text', false );
+			$Item->delete_link( '', ' ', '#', '#', button_class( 'text' ), false );
 			echo '</span>';
 
 			?>
@@ -488,15 +479,8 @@ while( $Item = & $ItemList->get_item() )
 			$Form->add_crumb( 'comment' );
 			$Form->hidden( 'comment_item_ID', $Item->ID );
 			$Form->hidden( 'redirect_to', $ReqURI );
-			?>
-				<fieldset>
-					<div class="label"><?php echo T_('User') ?>:</div>
-					<div class="info">
-						<strong><?php echo $current_User->get_identity_link( array( 'link_text' => 'text' ) )?></strong>
-						<?php user_profile_link( ' [', ']', T_('Edit profile') ) ?>
-						</div>
-				</fieldset>
-			<?php
+			
+			$Form->info( T_('User'), $current_User->get_identity_link( array( 'link_text' => 'text' ) ).' '.get_user_profile_link( ' [', ']', T_('Edit profile') )  );
 			$Form->textarea( $dummy_fields[ 'content' ], '', 12, T_('Comment text'), '', 40, 'bComment' );
 
 			global $Plugins;

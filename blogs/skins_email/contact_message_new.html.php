@@ -31,9 +31,8 @@ $params = array_merge( array(
 		'Comment'          => NULL,
 	), $params );
 
-
-$Blog = $params['Blog'];
-
+$Blog = & $params['Blog'];
+$recipient_User = & $params['recipient_User'];
 
 // show additional message info
 if( !empty( $Blog ) )
@@ -70,13 +69,14 @@ echo '<p>'.nl2br( evo_htmlentities( $params['message'], ENT_COMPAT, $evo_charset
 echo "</div>\n";
 
 // show sender IP address
-echo '<p>'.sprintf( T_( 'This message was typed by a user connecting from this IP address: %s.' ), implode( ', ', get_ip_list() ) ).'</p>';
+$ip_list = implode( ', ', get_linked_ip_list( NULL, $recipient_User ) );
+echo '<p>'.sprintf( T_( 'This message was typed by a user connecting from this IP address: %s.' ), $ip_list ).'</p>';
 
 // show sender email address
 echo '<p>'.sprintf( T_( 'By replying, your email will go directly to %s.' ), '<a href="mailto:'.$params['sender_address'].'">'.$params['sender_address'].'</a>' ).'</p>';
 
 
-if( !empty( $params['recipient_User'] ) )
+if( ! empty( $recipient_User ) )
 { // Member:
 	global $Settings;
 	if( $Settings->get( 'emails_msgform' ) == 'userset' )
@@ -86,9 +86,9 @@ if( !empty( $params['recipient_User'] ) )
 		{ // go to blog
 			$edit_preferences_url = url_add_param( str_replace( '&amp;', '&', $Blog->gen_blogurl() ), 'disp=userprefs', '&' );
 		}
-		elseif( $params['recipient_User']->check_perm( 'admin', 'restricted' ) )
+		elseif( $recipient_User->check_perm( 'admin', 'restricted' ) )
 		{ // go to admin
-			$edit_preferences_url = $admin_url.'?ctrl=user&user_tab=userprefs&user_ID='.$params['recipient_User']->ID;
+			$edit_preferences_url = $admin_url.'?ctrl=user&user_tab=userprefs&user_ID='.$recipient_User->ID;
 		}
 		if( !empty( $edit_preferences_url ) )
 		{ // add edit preferences link

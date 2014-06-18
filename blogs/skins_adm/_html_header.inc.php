@@ -219,18 +219,6 @@ JS;
 		add_headline( $initcheckall_script );
 	}}}
 
-	if( $Hit->is_winIE() )
-	{
-		add_headline( '<!--[if lt IE 7]>
-<style type="text/css">
-/* IE: fix extra space */
-div.skin_wrapper_loggedin {
-	margin-top: 0;
-	padding-top: 0;
-}
-</style>
-<![endif]-->' );
-	}
 
 	// fp> TODO: ideally all this should only be included when the datepicker will be needed
 	// dh> The Datepicker could dynamically load this CSS in document.ready?!

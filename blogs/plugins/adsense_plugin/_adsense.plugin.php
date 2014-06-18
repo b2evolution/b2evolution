@@ -232,13 +232,21 @@ class adsense_plugin extends Plugin
 			return false;
 		}
 
-		echo '<div class="edit_toolbar">';
+		echo '<div class="edit_toolbar">AdSense: ';
 		echo '<input type="button" id="adsense_default" title="'.T_('Insert AdSense block').'" class="quicktags" onclick="textarea_wrap_selection( b2evoCanvas, \'[adsense:]\', \'\', 1 );" value="'.T_('AdSense').'" />';
 		echo '</div>';
 
 		return true;
 	}
 
+
+	/**
+	 * @see Plugin::SkinBeginHtmlHead()
+	 */
+	function SkinBeginHtmlHead()
+	{
+		require_js( 'functions.js', 'blog' );
+	}
 }
 
 ?>

@@ -295,6 +295,7 @@ class tinymce_plugin extends Plugin
 		<input id="tinymce_plugin_toggle_button"
 			type="button"
 			value="WYSIWYG"
+			class="btn btn-default"
 			style="display:none"
 			title="<?php echo evo_htmlspecialchars($this->T_('Toggle between WYSIWYG and plain HTML editor')); ?>" />
 
@@ -323,11 +324,14 @@ class tinymce_plugin extends Plugin
 					jQuery( '#tinymce_plugin_toggle_button' ).attr( 'value', 'HTML' );
 					jQuery( '[name="editor_code"]').attr('value', '<?php echo $this->code; ?>' );
 					// Hide the plugin toolbars that allow to insert html tags
-					jQuery( '.quicktags_toolbar, .code_toolbar, #block_renderer_evo_code' ).hide();
-					renderer_evo_code_checked = jQuery( 'input#renderer_evo_code' ).is( ':checked' );
-					if( renderer_evo_code_checked )
+					jQuery( '.quicktags_toolbar, .code_toolbar, #block_renderer_evo_code, .prism_toolbar, #block_renderer_evo_prism' ).hide();
+					if( jQuery( 'input#renderer_evo_code' ).is( ':checked' ) )
 					{
 						jQuery( 'input#renderer_evo_code' ).removeAttr( 'checked' );
+					}
+					if( jQuery( 'input#renderer_evo_prism' ).is( ':checked' ) )
+					{
+						jQuery( 'input#renderer_evo_prism' ).removeAttr( 'checked' );
 					}
 				}
 				else
@@ -337,10 +341,14 @@ class tinymce_plugin extends Plugin
 					jQuery( '#tinymce_plugin_toggle_button' ).attr( 'value', 'WYSIWYG' );
 					jQuery( '[name="editor_code"]' ).attr( 'value', 'html' );
 					// Show the plugin toolbars that allow to insert html tags
-					jQuery( '.quicktags_toolbar, .code_toolbar, #block_renderer_evo_code' ).show();
-					if( renderer_evo_code_checked )
+					jQuery( '.quicktags_toolbar, .code_toolbar, #block_renderer_evo_code, .prism_toolbar, #block_renderer_evo_prism' ).show();
+					if( jQuery( 'input#renderer_evo_code' ).is( ':checked' ) )
 					{
 						jQuery( 'input#renderer_evo_code' ).attr( 'checked', 'checked' );
+					}
+					if( jQuery( 'input#renderer_evo_prism' ).is( ':checked' ) )
+					{
+						jQuery( 'input#renderer_evo_prism' ).attr( 'checked', 'checked' );
 					}
 				}
 				jQuery( '#tinymce_plugin_toggle_button' ).removeAttr( 'disabled' );
@@ -883,8 +891,8 @@ class tinymce_plugin extends Plugin
 		$init_options[] = 'skin_variant : "silver"';
 		// comma separated list of plugins: -- http://wiki.moxiecode.com/index.php/TinyMCE:Plugins
 		$init_options[] = 'plugins : "'.$tmce_plugins.'"';
-		$init_options[] = 'more_separator : "<!--more-->"';
-		$init_options[] = 'pagebreak_separator : "<!--nextpage-->"';
+		$init_options[] = 'more_separator : "[teaserbreak]"';
+		$init_options[] = 'pagebreak_separator : "[pagebreak]"';
 		// Toolbars:
 		$init_options[] = 'theme_advanced_toolbar_location : "top"';
 		$init_options[] = 'theme_advanced_toolbar_align : "center"'; // just to be consistent with current toolbars for now

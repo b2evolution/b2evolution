@@ -185,13 +185,17 @@ class Blog extends DataObject
 		}
 		else
 		{
+			/**
+			 * NOTE: Check each new added or renamed field by function isset() below,
+			 *       Otherwise it will can create issue on upgrade process from old to new DB:
+			 */
 			$this->ID = $db_row->blog_ID;
 			$this->shortname = $db_row->blog_shortname;
 			$this->name = $db_row->blog_name;
 			$this->owner_user_ID = $db_row->blog_owner_user_ID;
 			$this->advanced_perms = $db_row->blog_advanced_perms;
 			$this->tagline = $db_row->blog_tagline;
-			$this->shortdesc = $db_row->blog_shortdesc;	// description
+			$this->shortdesc = isset( $db_row->blog_shortdesc ) ? $db_row->blog_shortdesc : '';	// description
 			$this->longdesc = $db_row->blog_longdesc;
 			$this->locale = $db_row->blog_locale;
 			$this->access_type = $db_row->blog_access_type;
@@ -209,9 +213,9 @@ class Blog extends DataObject
 			$this->media_fullpath = $db_row->blog_media_fullpath;
 			$this->media_url = $db_row->blog_media_url;
 			$this->UID = $db_row->blog_UID;
-			$this->type = $db_row->blog_type;
-			$this->order = $db_row->blog_order;
-			$this->favorite = $db_row->blog_favorite;
+			$this->type = isset( $db_row->blog_type ) ? $db_row->blog_type : 'std';
+			$this->order = isset( $db_row->blog_order ) ? $db_row->blog_order : 0;
+			$this->favorite = isset( $db_row->blog_favorite ) ? $db_row->blog_favorite : 0;
 		}
 
 		$Timer->pause( 'Blog constructor' );
@@ -257,6 +261,7 @@ class Blog extends DataObject
 				$this->set_setting( 'orderby', 'last_touched_ts' );
 				$this->set_setting( 'orderdir', 'DESC' );
 				$this->set_setting( 'enable_goto_blog', 'post' );
+				$this->set_setting( 'front_disp', 'front' );
 				break;
 
 			case 'manual':
@@ -267,6 +272,7 @@ class Blog extends DataObject
 				$this->set_setting( 'post_navigation', 'same_category' );
 				$this->set_setting( 'single_links', 'chapters' );
 				$this->set_setting( 'enable_goto_blog', 'post' );
+				$this->set_setting( 'front_disp', 'front' );
 				break;
 
 			case 'std':
@@ -448,8 +454,14 @@ class Blog extends DataObject
 		}
 
 		if( param( 'archives_sort_order', 'string', NULL ) !== NULL )
-		{
+		{ // Archive sorting
 			$this->set_setting( 'archives_sort_order', param( 'archives_sort_order', 'string', false ) );
+		}
+
+		if( param( 'download_delay', 'integer', NULL ) !== NULL )
+		{ // Download delay
+			param_check_range( 'download_delay', 0, 10, T_('Download delay must be numeric (0-10).') );
+			$this->set_setting( 'download_delay', get_param( 'download_delay' ) );
 		}
 
 		if( param( 'feed_content', 'string', NULL ) !== NULL )
@@ -530,6 +542,19 @@ class Blog extends DataObject
 		{ // we want to load the multiple authors params
 			$this->set( 'advanced_perms',  param( 'advanced_perms', 'integer', 0 ) );
 			$this->set_setting( 'use_workflow',  param( 'blog_use_workflow', 'integer', 0 ) );
+		}
+
+		if( in_array( 'home', $groups ) )
+		{ // we want to load the front page params:
+			$front_disp = param( 'front_disp', 'string', '' );
+			$this->set_setting( 'front_disp', $front_disp );
+
+			$front_post_ID = param( 'front_post_ID', 'integer', 0 );
+			if( $front_disp == 'page' )
+			{ // Post ID must be required
+				param_check_not_empty( 'front_post_ID', T_('Please enter a specific post ID') );
+			}
+			$this->set_setting( 'front_post_ID', $front_post_ID );
 		}
 
 		if( in_array( 'features', $groups ) )
@@ -712,6 +737,9 @@ class Blog extends DataObject
 			$this->set_setting( 'excerpts_meta_description', param( 'excerpts_meta_description', 'integer', 0 ) );
 			$this->set_setting( 'categories_meta_description', param( 'categories_meta_description', 'integer', 0 ) );
 			$this->set_setting( 'tags_meta_keywords', param( 'tags_meta_keywords', 'integer', 0 ) );
+			$this->set_setting( 'tags_open_graph', param( 'tags_open_graph', 'integer', 0 ) );
+			$this->set_setting( 'download_noindex', param( 'download_noindex', 'integer', 0 ) );
+			$this->set_setting( 'download_nofollowto', param( 'download_nofollowto', 'integer', 0 ) );
 		}
 
 
@@ -862,10 +890,6 @@ class Blog extends DataObject
 			{ // Media files location:
 				$old_media_dir = $this->get_media_dir( false );
 				$old_media_location = $this->get( 'media_location' );
-				if( $media_location == 'none' && ! is_empty_directory( $old_media_dir ) )
-				{ // Old blog folder must be empty if user wants to change media folder to "None"
-					param_error( 'blog_media_location', T_('Blog media folder is not empty, you cannot change it to "None".') );
-				}
 				$this->set_from_Request( 'media_location' );
 				$this->set_media_subdir( param( 'blog_media_subdir', 'string', '' ) );
 				$this->set_media_fullpath( param( 'blog_media_fullpath', 'string', '' ) );
@@ -923,40 +947,10 @@ class Blog extends DataObject
 			}
 
 			if( ! param_errors_detected() && ! empty( $old_media_dir ) )
-			{ // If no error were created before
-				if( $media_location == 'none' && is_empty_directory( $old_media_dir ) )
-				{ // Delete old media dir if it is empty
-					rmdir_r( $old_media_dir );
-				}
-				else
-				{ // Try to move old files to new file root
-					$FileRootCache = & get_FileRootCache();
-					if( ( $blog_FileRoot = & $FileRootCache->get_by_type_and_ID( 'collection', $this->ID ) ) !== false )
-					{
-						$new_media_dir = $blog_FileRoot->ads_path;
-						if( ! empty( $new_media_dir ) && $old_media_dir != $new_media_dir )
-						{ // Blog's media dir was changed, We should move the files from old to new dir
-							if( ! file_exists( $old_media_dir ) )
-							{ // Dir does not exist yet, create new
-								if( ! mkdir_r( $new_media_dir ) )
-								{ // Error on creating
-									$Messages->add( sprintf( T_('You cannot choose new media dir "%s" (cannot create blog fileroot)'), $new_media_dir ), 'error' );
-								}
-							}
-							elseif( ! @rename( $old_media_dir, $new_media_dir ) )
-							{ // Some error on renaming
-								$Messages->add( sprintf( T_('You cannot choose new media dir "%s" (cannot rename blog fileroot)'), $new_media_dir ), 'error' );
-							}
-						}
-					}
-				}
+			{ // No error were detected before and possibly the media directory path was updated, check if it can be managed
+				$this->check_media_dir_change( $old_media_dir, isset( $old_media_location ) ? $old_media_location : NULL );
 			}
 
-			if( param_errors_detected() && ! empty( $old_media_dir ) && ! empty( $old_media_location ) )
-			{ // If error exists then save several current settings in the temp vars for using on the edit form
-				$this->temp_old_media_location = $old_media_location;
-				$this->temp_old_media_dir = $old_media_dir;
-			}
 		}
 
 		return ! param_errors_detected();
@@ -1848,41 +1842,62 @@ class Blog extends DataObject
 			case 'baseurlroot':
 				return $this->get_baseurl_root();
 
+			case 'recentpostsurl':
+				$disp_param = 'posts';
+				break;
+
 			case 'lastcommentsurl':
-				return url_add_param( $this->gen_blogurl(), 'disp=comments' );
+				$disp_param = 'comments';
+				break;
 
 			case 'searchurl':
-				return url_add_param( $this->gen_blogurl(), 'disp=search' );
+				$disp_param = 'search';
+				break;
 
 			case 'arcdirurl':
-				return url_add_param( $this->gen_blogurl(), 'disp=arcdir' );
+				$disp_param = 'arcdir';
+				break;
 
 			case 'catdirurl':
-				return url_add_param( $this->gen_blogurl(), 'disp=catdir' );
+				$disp_param = 'catdir';
+				break;
 
 			case 'postidxurl':
-				return url_add_param( $this->gen_blogurl(), 'disp=postidx' );
+				$disp_param = 'postidx';
+				break;
 
 			case 'mediaidxurl':
-				return url_add_param( $this->gen_blogurl(), 'disp=mediaidx' );
+				$disp_param = 'mediaidx';
+				break;
 
 			case 'sitemapurl':
-				return url_add_param( $this->gen_blogurl(), 'disp=sitemap' );
+				$disp_param = 'sitemap';
+				break;
 
 			case 'msgformurl':
-				return url_add_param( $this->gen_blogurl(), 'disp=msgform' );
+				$disp_param = 'msgform';
+				break;
 
 			case 'userurl':
 				return url_add_param( $this->gen_blogurl(), 'disp=user' );
 
 			case 'usersurl':
-				return url_add_param( $this->gen_blogurl(), 'disp=users' );
+				$disp_param = 'users';
+				break;
 
 			case 'loginurl':
 				return url_add_param( $this->gen_blogurl(), 'disp=login' );
 
 			case 'subsurl':
 				return url_add_param( $this->gen_blogurl(), 'disp=subs#subs' );
+
+			case 'threadsurl':
+				$disp_param = 'threads';
+				break;
+
+			case 'contactsurl':
+				$disp_param = 'contacts';
+				break;
 
 			case 'helpurl':
 				if( $this->get_setting( 'help_link' ) == 'slug' )
@@ -1891,7 +1906,8 @@ class Blog extends DataObject
 				}
 				else
 				{
-					return url_add_param( $this->gen_blogurl(), 'disp=help' );
+					$disp_param = 'help';
+					break;
 				}
 
 			case 'skin_ID':
@@ -1966,6 +1982,18 @@ class Blog extends DataObject
 			default:
 				// All other params:
 				return parent::get( $parname );
+		}
+
+		if( !empty( $disp_param ) )
+		{ // Get url depending on value of param 'disp'
+			if( $this->get_setting( 'front_disp' ) == $disp_param )
+			{ // Get home page of this blog because front page displays current disp
+				return $this->gen_blogurl( 'default' );
+			}
+			else
+			{ // Add disp param to blog's url when current disp is not a front page
+				return url_add_param( $this->gen_blogurl(), 'disp='.$disp_param );
+			}
 		}
 	}
 
@@ -3050,6 +3078,97 @@ class Blog extends DataObject
 	function city_visible()
 	{
 		return $this->get_setting( 'location_city' ) != 'hidden';
+	}
+
+
+	/**
+	 * Check if the media directory or it's location was changed and perform the required data migration
+	 *
+	 * @param string the media directory path before update
+	 * @param string the media directory location before update
+	 * @return boolean true if the media directory was not changed or the change was successful, false otherwise
+	 */
+	function check_media_dir_change( $old_media_dir, $old_media_location = NULL )
+	{
+		global $Messages;
+
+		$new_media_dir = $this->get_media_dir( false );
+		if( $new_media_dir == $old_media_dir )
+		{ // The media dir was not changed, no need fo further updates
+			return true;
+		}
+
+		$new_media_location = $this->get( 'media_location' );
+		if( $old_media_location == NULL )
+		{ // Media location was not changed
+			$old_media_location = $new_media_location;
+		}
+
+		switch( $new_media_location )
+		{
+			case 'none':
+				if( is_empty_directory( $old_media_dir ) )
+				{ // Delete old media dir if it is empty
+					if( file_exists( $old_media_dir ) && ( ! rmdir_r( $old_media_dir ) ) )
+					{
+						$Messages->add( T_('The old media dir could not be removed, please remove it manually!'), 'warning' );
+					}
+				}
+				else
+				{ // The old media dir is not empty, but it must be cleared before it can be changed to none
+					$Messages->add( T_('Blog media folder is not empty, you cannot change it to "None".'), 'error' );
+					return false;
+				}
+				break;
+
+			case 'default':
+			case 'subdir':
+			case 'custom':
+				global $media_path;
+				if( file_exists( $new_media_dir ) )
+				{ // Don't use the existing folder twice
+					$Messages->add( sprintf( T_('Folder %s already exists, it cannot be used for several media locations.'), '<b>'.$new_media_dir.'</b>' ), 'error' );
+					return false;
+				}
+				if( in_array( trim( $new_media_dir, '/\\' ), array( $media_path.'blogs', $media_path.'import', $media_path.'shared', $media_path.'users' ) ) )
+				{ // Don't use the reserved paths
+					$Messages->add( sprintf( T_('Please use another folder name, because %s is reserved.'), '<b>'.$new_media_dir.'</b>' ), 'error' );
+					return false;
+				}
+				if( $new_media_location == 'custom' )
+				{ // Check for folder is not used by other blog, and it is not a sub-folder of other blog folder
+					$BlogCache = & get_BlogCache();
+					$BlogCache->clear( true );
+					$BlogCache->load_where( 'blog_ID != '.$this->ID );
+					$other_blog_IDs = $BlogCache->get_ID_array();
+					foreach( $other_blog_IDs as $other_blog_ID )
+					{
+						$other_Blog = & $BlogCache->get_by_ID( $other_blog_ID, false, false );
+						$other_media_dir = $other_Blog->get_media_dir( false );
+						if( ! empty( $other_media_dir ) && strpos( $new_media_dir, $other_media_dir ) === 0 )
+						{
+							$Messages->add( sprintf( T_('Please use another folder name, because %s cannot be folder or subfolder of other blog media location.'), '<b>'.$new_media_dir.'</b>' ), 'error' );
+							return false;
+						}
+					}
+				}
+				if( ( $old_media_location == 'none' ) || ( ! file_exists( $old_media_dir ) ) )
+				{ // The media folder was not used before, create the new media folder
+					return $this->get_media_dir( true );
+				}
+				if( ! @rename( $old_media_dir, $new_media_dir ) )
+				{ // Some error on renaming
+					$Messages->add( sprintf( T_('Could not move the media folder content from "%s" to the new "%s" location.'), '<b>'.$old_media_dir.'</b>', '<b>'.$new_media_dir.'</b>' ), 'error' );
+					return false;
+				}
+				break;
+
+			default:
+				debug_die('Invalid media location setting received!');
+		}
+
+		$Messages->add( T_('The media directory was successfully moved to the new path, with all of its content.'), 'note' );
+		return true;
 	}
 }
 

@@ -256,7 +256,9 @@ class coll_item_list_Widget extends ComponentWidget
 		if( empty($listBlog) )
 		{
 			echo $this->disp_params['block_start'];
+			echo $this->disp_params['block_body_start'];
 			echo T_('The requested Blog doesn\'t exist any more!');
+			echo $this->disp_params['block_end_start'];
 			echo $this->disp_params['block_end'];
 			return;
 		}
@@ -375,6 +377,8 @@ class coll_item_list_Widget extends ComponentWidget
 		$title = sprintf( ( $this->disp_params[ 'title_link' ] ? '<a href="'.$listBlog->gen_blogurl().'" rel="nofollow">%s</a>' : '%s' ), $this->disp_params[ 'title' ] );
 		$this->disp_title( $title );
 
+		echo $this->disp_params['block_body_start'];
+
 		echo $this->disp_params['list_start'];
 
 		if( $chapter_mode )
@@ -414,10 +418,16 @@ class coll_item_list_Widget extends ComponentWidget
 
 		if( isset( $this->disp_params['page'] ) )
 		{
-			$ItemList->page_links();
+			if( empty( $this->disp_params['pagination'] ) )
+			{
+				$this->disp_params['pagination'] = array();
+			}
+			$ItemList->page_links( $this->disp_params['pagination'] );
 		}
 
 		echo $this->disp_params['list_end'];
+
+		echo $this->disp_params['block_body_end'];
 
 		echo $this->disp_params['block_end'];
 
@@ -446,8 +456,6 @@ class coll_item_list_Widget extends ComponentWidget
 		// Set this var to TRUE when some content(title, excerpt or picture) is displayed
 		$content_is_displayed = false;
 
-		echo $this->disp_params['item_start'];
-
 		// Is this the current item?
 		global $disp, $Item;
 		if( !empty($Item) && $disp_Item->ID == $Item->ID )
@@ -458,6 +466,15 @@ class coll_item_list_Widget extends ComponentWidget
 		else
 		{	// Default link class
 			$link_class = $this->disp_params['link_default_class'];
+		}
+
+		if( $link_class == $this->disp_params['link_selected_class'] )
+		{
+			echo $this->disp_params['item_selected_start'];
+		}
+		else
+		{
+			echo $this->disp_params['item_start'];
 		}
 
 		if( $this->disp_params[ 'disp_title' ] )
@@ -551,7 +568,14 @@ class coll_item_list_Widget extends ComponentWidget
 			}
 		}
 
-		echo $this->disp_params['item_end'];
+		if( $link_class == $this->disp_params['link_selected_class'] )
+		{
+			echo $this->disp_params['item_selected_end'];
+		}
+		else
+		{
+			echo $this->disp_params['item_end'];
+		}
 
 		return $content_is_displayed;
 	}
@@ -573,5 +597,4 @@ class coll_item_list_Widget extends ComponentWidget
 			);
 	}
 }
-
 ?>

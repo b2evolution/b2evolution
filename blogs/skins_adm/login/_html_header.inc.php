@@ -33,9 +33,9 @@ require_css( 'basic.css', 'rsc_url' ); // Basic styles
 require_js( '#jquery#', 'rsc_url' );
 
 // Bootstrap
-require_js( 'bootstrap/bootstrap.min.js', 'rsc_url' );
-require_css( 'bootstrap/bootstrap.min.css', 'rsc_url' );
-require_css( 'bootstrap/bootstrap-theme.min.css', 'rsc_url' );
+require_js( '#bootstrap#', 'rsc_url' );
+require_css( '#bootstrap_css#', 'rsc_url' );
+require_css( '#bootstrap_theme_css#', 'rsc_url' );
 require_css( 'bootstrap/b2evo.css', 'rsc_url' );
 
 require_css( 'login.css', 'rsc_url' );
@@ -67,7 +67,7 @@ $login_form_params = array(
 	'infostart' => '<div class="controls-info col-xs-9">',
 	'inputend' => "</div>\n",
 	'fieldend' => "</div>\n\n",
-	'buttonsstart' => '<div class="form-group"><div class="control-buttons col-sm-offset-2 col-xs-10">',
+	'buttonsstart' => '<div class="form-group"><div class="control-buttons col-sm-offset-3 col-xs-10">',
 	'buttonsend' => "</div></div>\n\n",
 	'customstart' => '<div class="custom_content">',
 	'customend' => "</div>\n",

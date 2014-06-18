@@ -15,7 +15,9 @@ div.sitewide_footer {
 	clear: both;
 	/* border: 1px solid red; */
 }
-@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+/* Devices with max width <= 1024px (iPhone,iPad):
+   Don't fix a position of the sitewide header */
+@media only screen and (max-device-width: 1024px) {
 	div#skin_wrapper div.sitewide_header {
 		position: inherit;
 		width: 100%;

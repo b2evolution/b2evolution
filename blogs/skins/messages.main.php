@@ -12,7 +12,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $htsrv_url, $Messages, $current_User;
+global $htsrv_url, $Messages, $current_User, $Skin;
 
 // fp> The correct place to get thrd_ID is here, because we want it in redirect_to in case we need to ask for login.
 param( 'thrd_ID', 'integer', '', true );
@@ -56,6 +56,8 @@ if( !empty( $thrd_ID ) )
 add_js_headline( "// Paths used by JS functions:
 		var bgxy_expand = '".get_icon( 'expand', 'xy' )."';
 		var bgxy_collapse = '".get_icon( 'collapse', 'xy' )."';" );
+
+init_plugins_js( 'blog', $Skin->get_template( 'tooltip_plugin' ) );
 
 // Require results.css to display message query results in a table
 require_css( 'results.css' ); // Results/tables styles

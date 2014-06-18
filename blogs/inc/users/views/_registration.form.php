@@ -132,7 +132,7 @@ $Form->begin_fieldset( T_('Account activation').get_manual_link('account-activat
 	$Form->radio( 'after_email_validation', $after_email_validation, array(
 					array( 'return_to_original', T_( 'Return to original page' ) ),
 					array( 'specific_url', T_( 'Go to specific URL' ).':', '',
-						'<input type="text" id="specific_after_validation_url" class="form_text_input" name="specific_after_validation_url" size="50" maxlength="120" value="'
+						'<input type="text" id="specific_after_validation_url" class="form_text_input form-control" name="specific_after_validation_url" size="50" maxlength="120" value="'
 						.format_to_output( $after_validation_url, 'formvalue' ).'"
 						onfocus="document.getElementsByName(\'after_email_validation\')[1].checked=true;" />' )
 				), T_( 'After email activation' ), true );
@@ -183,7 +183,7 @@ $Form->begin_fieldset( T_('Other options').get_manual_link('other-registration-s
 	$Form->radio( 'after_registration', $after_registration, array(
 					array( 'return_to_original', T_( 'Return to original page' ) ),
 					array( 'specific_url', T_( 'Go to specific URL' ).':', '',
-						'<input type="text" id="specific_after_registration_url" class="form_text_input" name="specific_after_registration_url" size="50" maxlength="120" value="'
+						'<input type="text" id="specific_after_registration_url" class="form_text_input form-control" name="specific_after_registration_url" size="50" maxlength="120" value="'
 						.format_to_output( $after_registration_url, 'formvalue' ).'"
 						onfocus="document.getElementsByName(\'after_registration\')[1].checked=true;" />' )
 				), T_( 'After registration' ), true );

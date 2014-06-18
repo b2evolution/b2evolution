@@ -57,6 +57,16 @@ $params = array_merge( array(
 		'notification_text3'   => T_( 'Notify me by email when someone comments here.' ),
 		'notification_after'   => '</div>',
 		'feed_title'           => '#',
+		'disp_nav_top'         => true,
+		'disp_nav_bottom'      => true,
+		'nav_top_inside'       => false, // TRUE to display it after start of comments list (inside), FALSE to display a page navigation before comments list
+		'nav_bottom_inside'    => false, // TRUE to display it before end of comments list (inside), FALSE to display a page navigation after comments list
+		'nav_block_start'      => '<p class="center">',
+		'nav_block_end'        => '</p>',
+		'nav_prev_text'        => '&lt;&lt;',
+		'nav_next_text'        => '&gt;&gt;',
+		'nav_prev_class'       => '',
+		'nav_next_class'       => '',
 	), $params );
 
 
@@ -210,10 +220,21 @@ if( $Item->can_see_comments( true ) )
 		// Set redir=no in order to open comment pages
 		memorize_param( 'redir', 'string', '', 'no' );
 
-		if( $Blog->get_setting( 'paged_comments' ) )
+		if( $params['nav_top_inside'] )
+		{ // To use comments page navigation inside list (Useful for table markup)
+			echo $params['comment_list_start'];
+		}
+
+		if( $params['disp_nav_top'] && $Blog->get_setting( 'paged_comments' ) )
 		{ // Prev/Next page navigation
 			$CommentList->page_links( array(
 					'page_url' => url_add_tail( $Item->get_permanent_url(), '#comments' ),
+					'block_start' => $params['nav_block_start'],
+					'block_end'   => $params['nav_block_end'],
+					'prev_text'   => $params['nav_prev_text'],
+					'next_text'   => $params['nav_next_text'],
+					'prev_class'  => $params['nav_prev_class'],
+					'next_class'  => $params['nav_next_class'],
 				) );
 		}
 
@@ -232,7 +253,14 @@ if( $Item->can_see_comments( true ) )
 			}
 		}
 
-		echo $params['comment_list_start'];
+		if( ! $params['nav_top_inside'] )
+		{ // To use comments page navigation before list
+			echo $params['comment_list_start'];
+		}
+
+		// Set number of comment depending on current page
+		$comment_number = ( ( $CommentList->page - 1 ) * $CommentList->limit ) + 1;
+
 		/**
 		 * @var Comment
 		 */
@@ -257,6 +285,7 @@ if( $Item->can_see_comments( true ) )
 					'author_link_text' => $params['author_link_text'],
 					'link_to'          => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 					'author_link_text' => $params['author_link_text'],
+					'comment_number'   => $comment_number,
 				) );
 			// Note: You can customize the default item feedback by copying the generic
 			// /skins/_item_comment.inc.php file into the current skin folder.
@@ -266,15 +295,31 @@ if( $Item->can_see_comments( true ) )
 			{	// Display the comment replies
 				display_comment_replies( $Comment->ID, $params );
 			}
+
+			$comment_number++;
 		}	// End of comment list loop.
-		echo $params['comment_list_end'];
 
+		if( ! $params['nav_bottom_inside'] )
+		{ // To use comments page navigation after list
+			echo $params['comment_list_end'];
+		}
 
-		if( $Blog->get_setting( 'paged_comments' ) )
+		if( $params['disp_nav_bottom'] && $Blog->get_setting( 'paged_comments' ) )
 		{ // Prev/Next page navigation
 			$CommentList->page_links( array(
-					'page_url' => url_add_tail( $Item->get_permanent_url(), '#comments' ),
+					'page_url'    => url_add_tail( $Item->get_permanent_url(), '#comments' ),
+					'block_start' => $params['nav_block_start'],
+					'block_end'   => $params['nav_block_end'],
+					'prev_text'   => $params['nav_prev_text'],
+					'next_text'   => $params['nav_next_text'],
+					'prev_class'  => $params['nav_prev_class'],
+					'next_class'  => $params['nav_next_class'],
 				) );
+		}
+
+		if( $params['nav_bottom_inside'] )
+		{ // To use comments page navigation inside list (Useful for table markup)
+			echo $params['comment_list_end'];
 		}
 
 		// Restore "redir" param

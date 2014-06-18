@@ -38,7 +38,7 @@ $Goal = & $GoalCache->get_by_name( $key, false, false );
 if( empty( $Goal ) )
 { // Goal key doesn't exist in DB
 	load_funcs( 'skins/_skin.funcs.php' );
-	require $siteskins_path.'_404_not_found.main.php'; // error & exit
+	require $siteskins_path.'_404_basic_not_found.main.php'; // error & exit
 	exit(0);
 }
 
@@ -80,19 +80,6 @@ else
 	evo_flush();
 }
 
-// We need to log the HIT now! Because we need the hit ID!
-$Hit->log();
-
-$extra_params = '';
-if( isset( $_SERVER['QUERY_STRING'] ) )
-{
-	$extra_params = '&'.$_SERVER['QUERY_STRING'].'&';
-	$extra_params = str_replace( '&key='.$key.'&', '&', $extra_params );
-	$extra_params = trim( $extra_params, '&' );
-}
-
 // Record a goal hit:
-$DB->query( 'INSERT INTO T_track__goalhit( ghit_goal_ID, ghit_hit_ID, ghit_params )
-	VALUES( '.$Goal->ID.', '.$Hit->ID.', '.$DB->quote( $extra_params ).' )' );
-
+$Goal->record_hit();
 ?>

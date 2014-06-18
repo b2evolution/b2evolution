@@ -28,7 +28,7 @@ class smilies_plugin extends Plugin
 	 *           match "generated" simlies later?
 	 * fp> There is... I can't remember the exact problem thouh. Probably some interaction with the code highlight or the video plugins.
 	 */
-	var $priority = 15;
+	var $priority = 25;
 	var $version = '5.0.0';
 	var $group = 'rendering';
 	var $number_of_installs = 3; // QUESTION: dh> why 3?
@@ -61,7 +61,7 @@ class smilies_plugin extends Plugin
 	{
 		$this->short_desc = T_('Graphical smileys');
 		$this->long_desc = T_('This renderer will convert text smilies like :) to graphical icons.<br />
-			Optionally, it will also display a toolbar for quick insertion of smilies into a post.');
+Optionally, it will also display a toolbar for quick insertion of smilies into a post.');
 	}
 
 
@@ -273,14 +273,25 @@ XX(      graydead.gif
 
 			foreach( $tmpsmilies as $smiley )
 			{
+				// Detect html entities if smile code, to find encoded code version when HTML is disabled in content
+				$html_entities_exist = ( strpos( $smiley['code'], '>' ) !== false || strpos( $smiley['code'], '>' ) !== false );
+
 				$this->search[] = $smiley['code'];
 				$smiley_masked = '';
-				for( $i = 0; $i < strlen($smiley['code'] ); $i++ )
+				for( $i = 0; $i < strlen( $smiley['code'] ); $i++ )
 				{
-					$smiley_masked .= '&#'.ord(substr($smiley['code'], $i, 1)).';';
+					$smiley_masked .= '&#'.ord( substr( $smiley['code'], $i, 1 ) ).';';
+				}
+				if( $html_entities_exist )
+				{ // Add code version with encoded html entities
+					$this->search[] = str_replace( array( '<', '>' ), array( '&lt;', '&gt;' ), $smiley['code'] );
 				}
 				$smiley['code'] = $smiley_masked;
-				$this->replace[] = $this->get_smiley_img_tag($smiley);
+				$this->replace[] = $this->get_smiley_img_tag( $smiley );
+				if( $html_entities_exist )
+				{ // Add a duplicate of replacement when smile code has html entities
+					$this->replace[] = $this->get_smiley_img_tag( $smiley );
+				}
 			}
 		}
 
@@ -313,8 +324,8 @@ XX(      graydead.gif
 	{
 		$attribs = array(
 			'src' => $smiley['image'],
-			'title' => evo_htmlspecialchars($smiley['code']),
-			'alt' => evo_htmlspecialchars($smiley['code']),
+			'title' => format_to_output( $smiley['code'], 'htmlattr' ),
+			'alt' => format_to_output( $smiley['code'], 'htmlattr' ),
 			'class' => 'middle',
 			);
 
@@ -429,7 +440,15 @@ XX(      graydead.gif
 	{
 		return ( ( isset( $smiley_parts[1] ) && isset( $smiley_parts[2] ) ) ? $smiley_parts[1].'<->'.$smiley_parts[2] : '' );
 	}
-}
 
+
+	/**
+	 * @see Plugin::SkinBeginHtmlHead()
+	 */
+	function SkinBeginHtmlHead()
+	{
+		require_js( 'functions.js', 'blog' );
+	}
+}
 
 ?>

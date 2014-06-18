@@ -503,7 +503,7 @@ switch( $action )
 			$Form->begin_form( 'fform' );
 			$Form->begin_fieldset( T_( 'Actions' ) );
 			echo '<p><b>'.T_('All new b2evolution files are in place. You will now be redirected to the installer to perform a DB upgrade.').'</b> '.T_('Note: the User Interface will look different.').'</p>';
-			$continue_onclick = 'location.href="'.$baseurl.'install/index.php?action='.( ( $action == 'backup_and_overwrite_svn' ) ? 'svn_upgrade' : 'auto_upgrade' ).'&locale='.$current_locale.'"';
+			$continue_onclick = 'location.href=\''.$baseurl.'install/index.php?action='.( ( $action == 'backup_and_overwrite_svn' ) ? 'svn_upgrade' : 'auto_upgrade' ).'&locale='.$current_locale.'\'';
 			$Form->end_form( array( array( 'button', 'continue', T_('Continue to installer'), '', $continue_onclick ) ) );
 			unset( $block_item_Widget );
 		}

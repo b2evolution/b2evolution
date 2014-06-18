@@ -128,7 +128,7 @@ $ctrl_mappings = array(
 		'registration'     => 'users/registration.ctrl.php',
 		'display'          => 'users/display.ctrl.php',
 		'groups'           => 'users/groups.ctrl.php',
-		'userclosing'      => 'users/closing.ctrl.php',
+		'accountclose'     => 'users/account_close.ctrl.php',
 		'upload'           => 'files/upload.ctrl.php',
 		'slugs'            => 'slugs/slugs.ctrl.php',
 		'email'            => 'tools/email.ctrl.php',
@@ -1018,7 +1018,7 @@ class _core_Module extends Module
 									),
 									'features' => array(
 										'text' => T_('Features').'&hellip;',
-										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=features'.$blog_param,
+										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=home'.$blog_param,
 									),
 									'skin' => array(
 										'text' => T_('Skin').'&hellip;',
@@ -1422,7 +1422,7 @@ class _core_Module extends Module
 		$topright_Menu->add_menu_entries( NULL, array(
 			'logout' => array(
 				'text' => T_('Logout').' '.get_icon('close'),
-				'class' => 'rollover_sprite',
+				'class' => get_icon( 'close', 'rollover' ) ? 'rollover_sprite' : '',
 				'href' => get_user_logout_url(),
 				)
 		 ) );
@@ -1501,9 +1501,9 @@ class _core_Module extends Module
 							'userfields' => array(
 								'text' => T_('User fields'),
 								'href' => '?ctrl=userfields' ),
-							'userclosing' => array(
+							'accountclose' => array(
 								'text' => T_('Account closing'),
-								'href' => '?ctrl=userclosing' ),
+								'href' => '?ctrl=accountclose' ),
 							),
 						),
 				);

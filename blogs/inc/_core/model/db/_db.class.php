@@ -170,7 +170,7 @@ class DB
 
 	/**
 	 * Which transaction isolation level should be used?
-	 * 
+	 *
 	 * Possible values in case of MySQL: REPEATABLE READ | READ COMMITTED | READ UNCOMMITTED | SERIALIZABLE
 	 * Defailt value is REPEATABLE READ
 	 */
@@ -1650,9 +1650,9 @@ class DB
 	 * @param string PHP charset
 	 * @return string MYSQL charset or unchanged
 	 */
-	function php_to_mysql_charmap( $php_charset )
+	static function php_to_mysql_charmap( $php_charset )
 	{
-		$php_charset = strtolower($php_charset);
+		$php_charset = strtolower( $php_charset );
 
 		/**
 		 * This is taken from phpMyAdmin (libraries/select_lang.lib.php).
@@ -1683,9 +1683,9 @@ class DB
 				'windows-1257' => 'cp1257',
 			);
 
-		if( isset($mysql_charset_map[$php_charset]) )
+		if( isset( $mysql_charset_map[ $php_charset ] ) )
 		{
-			return $mysql_charset_map[$php_charset];
+			return $mysql_charset_map[ $php_charset ];
 		}
 
 		// for lack of a better answer:
@@ -1712,7 +1712,7 @@ class DB
 
 		if( $use_map )
 		{	// We want to use the map
-			$charset = $this->php_to_mysql_charmap( $charset );
+			$charset = self::php_to_mysql_charmap( $charset );
 		}
 
 		$r = true;

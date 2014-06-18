@@ -454,8 +454,8 @@ param( 'import_mode', 'string', 'normal' );
 		<p>Please note:</p>
 		<ul>
 			<li>b2evolution does not support excerpts yet.
-			So, we will import them in front of the body with "<?php echo evo_htmlspecialchars('<!--more-->< !--noteaser-->') ?>" tags,
-			but only if there is no extended body for the post. In that case we'll use the extended body appended with the &lt;!--more--&gt; tag to the body - excerpts are lost then (but you'll get a note about it).
+			So, we will import them in front of the body with "[teaserbreak]" tags,
+			but only if there is no extended body for the post. In that case we'll use the extended body appended with the [teaserbreak] tag to the body - excerpts are lost then (but you'll get a note about it).
 			</li>
 		</ul>
 
@@ -734,7 +734,7 @@ param( 'import_mode', 'string', 'normal' );
 			{ // no extended body, so we can use the excerpt
 				if( empty($excerpt) )
 					$post_content = $body;
-				else $post_content = $excerpt."\n<!--more--><!--noteaser-->\n".$body;
+				else $post_content = $excerpt."\n[teaserbreak]\n".$body;
 			}
 			else
 			{ // we'll use body and extended body
@@ -743,7 +743,7 @@ param( 'import_mode', 'string', 'normal' );
 					$message .=	'<li><span style="color:red">Excerpt discarded because of existing extended body:</span>
 					<blockquote>'.evo_htmlspecialchars($excerpt).'</blockquote></li>';
 				}
-				$post_content = $body."\n<!--more-->\n".$extended;
+				$post_content = $body."\n[teaserbreak]\n".$extended;
 			}
 
 			$post = preg_replace("|(-----\nBODY:.*)|s", '', $post);
@@ -1206,12 +1206,6 @@ param( 'import_mode', 'string', 'normal' );
 	}
 
 ?>
-<div class="panelinfo">
-	<p>
-		Feel free to <a href="http://thequod.de/contact">contact me</a> in case of suggestions, bugs and lack of clarity.
-		Of course, you're also welcome to <a href="https://sourceforge.net/donate/index.php?user_id=663176">donate to me</a> or <a href="http://b2evolution.net/dev/donations.php">the b2evolution project</a>.. :)
-	</p>
-</div>
 <div class="clear">
 <?php if( $output_debug_dump ) $DB->dump_queries() ?>
 </div>

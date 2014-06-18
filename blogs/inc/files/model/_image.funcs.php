@@ -333,8 +333,6 @@ function output_image( $imh, $mimetype )
 }
 
 
-
-
 /**
  * Generate a thumbnail
  *
@@ -343,15 +341,23 @@ function output_image( $imh, $mimetype )
  * @param int Thumbnail width
  * @param int Thumbnail height
  * @param int Thumbnail percent of blur effect (0 - No blur, 1% - Max blur effect, 99% - Min blur effect)
+ * @param integer Ratio size, can be 1, 2 and etc.
  * @return array short error code + dest image handler
  */
-function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height, $thumb_percent_blur = 0 )
+function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height, $thumb_percent_blur = 0, $size_x = 1 )
 {
-	$src_width = imagesx( $src_imh ) ;
+	$src_width = imagesx( $src_imh );
 	$src_height = imagesy( $src_imh );
 
+	$size_x = intval( $size_x );
+	if( $size_x > 1 )
+	{ // Use the expanded size
+		$thumb_width = $thumb_width * $size_x;
+		$thumb_height = $thumb_height * $size_x;
+	}
+
 	if( $src_width <= $thumb_width && $src_height <= $thumb_height )
-	{	// There is no need to resample, use original!
+	{ // There is no need to resample, use original!
 		return array( NULL, $src_imh );
 	}
 

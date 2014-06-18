@@ -45,7 +45,7 @@ refererList(20,'global',0,0,"'search'",'dom_name',$blog,true);
 if( count( $res_stats ) )
 {
 	?>
-	<table class="grouped" cellspacing="0">
+	<table class="grouped table table-striped table-bordered table-hover table-condensed" cellspacing="0">
 		<tr>
 			<th class="firstcol"><?php echo T_('Search engine') ?></th>
 			<th><?php echo T_('Hits') ?></th>

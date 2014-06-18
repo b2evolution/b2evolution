@@ -131,3 +131,16 @@ a.button_gray {
 	background: -webkit-linear-gradient(#f9f9f9, #ebebeb);
 	background: -moz-linear-gradient(#f9f9f9, #ebebeb);
 }
+
+@media only screen
+and ( min-device-width: 320px ) 
+and ( max-device-width: 568px ) {
+	div.email_header, div.email_payload {
+		margin-left: 4px;
+		margin-right: 4px;
+	}
+	div.email_ugc, div.email_footer {
+		margin-left: 0;
+		margin-right: 0;
+	}
+}

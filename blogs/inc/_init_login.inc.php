@@ -257,6 +257,18 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 		{ // save the user for later hits
 			$Session->set_User( $current_User );
 
+			$current_user_locale = $current_User->get( 'locale' );
+			if( ( ! isset( $locales[$current_user_locale] ) ) || ( ! $locales[$current_user_locale]['enabled'] ) )
+			{ // Current user locale doesn't exists or it is not enabled, update to the default locale if it is valid
+				$def_locale = $Settings->get( 'default_locale' );
+				if( isset( $locales[$def_locale] ) && $locales[$def_locale]['enabled'] )
+				{ // Update user locale to the default, and add warning message about the update
+					$current_User->set( 'locale', $def_locale );
+					$current_User->dbupdate();
+					$Messages->add( T_('Your locale was invalid, now it was automitcally updated to the default locale.'), 'warning' );
+				}
+			}
+
 			if( $Settings->get('system_lock') && $current_User->check_perm( 'users', 'edit' ) )
 			{ // System is locked for maintenance but current user has permission to log in, Display a message about this mode
 				$system_lock_url = ' href="'.$admin_url.'?ctrl=gensettings"';

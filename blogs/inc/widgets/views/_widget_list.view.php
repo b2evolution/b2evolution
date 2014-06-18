@@ -45,7 +45,7 @@ function display_container( $container, $legend_suffix = '' )
 	$Table->title = '<span class="container_name">'.T_($container).'</span>'.$legend_suffix;
 
 	// Table ID - fp> needs to be handled cleanly by Table object
-	$table_id = str_replace( ' ', '_', $container ); // fp> Using the container name which has special chars is a bad idea. Counter would be better
+	$table_id = str_replace( array( ' ', ':' ), '_', $container ); // fp> Using the container name which has special chars is a bad idea. Counter would be better
 
 	$Table->global_icon( T_('Add a widget...'), 'new',
 			regenerate_url( '', 'action=new&amp;container='.rawurlencode($container) ), /* TRANS: ling used to add a new widget */ T_('Add widget').' &raquo;', 3, 4, array( 'id' => 'add_new_'.$table_id ) );
@@ -78,6 +78,9 @@ function display_container( $container, $legend_suffix = '' )
 		$Table->params['head_title'] = str_replace( 'class="grouped"', 'class="grouped no-drop"', $Table->params['head_title'] );
 	}
 	*/
+
+	// Dirty hack for bootstrap skin
+	$Table->params['list_start'] = str_replace( '<div class="', '<div class="panel panel-default ', $Table->params['list_start'] );
 
 	$Table->display_list_start();
 
@@ -212,10 +215,7 @@ foreach( $container_Widget_array as $container=>$dummy )
 
 global $rsc_url;
 
-echo '<!--[if IE]>'.get_icon( 'pixel' ).'<![endif]-->';
-
 echo '</fieldset>'."\n";
-
 
 echo get_icon( 'pixel', 'imgtag', array( 'class' => 'clear' ) );
 

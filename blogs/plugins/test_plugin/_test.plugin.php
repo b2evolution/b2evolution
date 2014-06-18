@@ -71,8 +71,8 @@ class test_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->short_desc = 'Test plugin';
-		$this->long_desc = 'This plugin responds to virtually all possible plugin events :P';
+		$this->short_desc = T_('Test plugin');
+		$this->long_desc = T_('This plugin responds to virtually all possible plugin events :P');
 
 		// Trigger plugin settings instantiation (for testing).
 		if( $params['is_installed'] )

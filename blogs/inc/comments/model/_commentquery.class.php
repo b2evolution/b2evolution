@@ -593,7 +593,7 @@ class CommentQuery extends SQL
 		}
 
 		$SQL = new SQL();
-		$SQL->SELECT( 'IF( bloguser_perm_edit_cmt + 0 > bloggroup_perm_edit_cmt + 0, bloguser_perm_edit_cmt, bloggroup_perm_edit_cmt ) as perm_edit_cmt' );
+		$SQL->SELECT( 'IF( IFNULL( bloguser_perm_edit_cmt + 0, 0 ) > IFNULL( bloggroup_perm_edit_cmt + 0, 0 ), bloguser_perm_edit_cmt, bloggroup_perm_edit_cmt ) as perm_edit_cmt' );
 		$SQL->FROM( 'T_blogs' );
 		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON bloguser_blog_ID = blog_ID AND bloguser_user_ID = '.$current_User->ID );
 		$SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON bloggroup_blog_ID = blog_ID AND bloggroup_group_ID = '.$current_User->grp_ID );

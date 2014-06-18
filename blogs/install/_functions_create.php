@@ -250,6 +250,7 @@ function create_default_data()
 		INSERT INTO T_items__type ( ptyp_ID, ptyp_name )
 		VALUES ( 1, 'Post' ),
 					 ( 1000, 'Page' ),
+					 ( 1400, 'Intro-Front' ),
 					 ( 1500, 'Intro-Main' ),
 					 ( 1520, 'Intro-Cat' ),
 					 ( 1530, 'Intro-Tag' ),
@@ -1094,11 +1095,19 @@ function create_blog(
 	$in_bloglist = 1,
 	$owner_user_ID = 1 )
 {
-	global $default_locale, $test_install_all_features, $local_installation;
+	global $default_locale, $test_install_all_features, $local_installation, $Plugins;
 
 	$Blog = new Blog( NULL );
 
 	$Blog->init_by_kind( $kind, $blog_name, $blog_shortname, $blog_urlname );
+
+	if( ( $kind == 'forum' || $kind == 'manual' ) && ( $Plugin = & $Plugins->get_by_code( 'b2evMark' ) ) !== false )
+	{ // Initialize special Markdown plugin settings for Forums and Manual blogs
+		$Blog->set_setting( 'plugin'.$Plugin->ID.'_coll_apply_rendering', 'opt-out' );
+		$Blog->set_setting( 'plugin'.$Plugin->ID.'_links', '1' );
+		$Blog->set_setting( 'plugin'.$Plugin->ID.'_images', '1' );
+		$Blog->set_setting( 'plugin'.$Plugin->ID.'_text_styles', '1' );
+	}
 
 	$Blog->set( 'tagline', $blog_tagline );
 	$Blog->set( 'longdesc', $blog_longdesc );
@@ -1207,7 +1216,7 @@ function create_user( $params = array() )
  */
 function create_demo_contents()
 {
-	global $baseurl, $new_db_version;
+	global $baseurl, $admin_url, $new_db_version;
 	global $random_password, $query;
 	global $timestamp, $admin_email;
 	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users, $Group_Suspect;
@@ -1347,6 +1356,12 @@ function create_demo_contents()
 		$blog_a_access_type,
 		true,
 		$ablogger_ID );
+	$BlogCache = & get_BlogCache();
+	if( $Blog_a = $BlogCache->get_by_ID( $blog_a_ID, false, false ) )
+	{
+		$Blog_a->set_setting( 'front_disp', 'front' );
+		$Blog_a->dbupdate();
+	}
 
 	$blog_shortname = 'Blog B';
 	$blog_b_access_type = ( $test_install_all_features ) ? 'index.php' : $default_blog_access_type;
@@ -1422,7 +1437,7 @@ function create_demo_contents()
 		T_('Tagline for Manual'),
 		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 		6, // Skin ID
-		'manual', 'any', 1, $default_blog_access_type, true,
+		'manual', 'any', 1, $default_blog_access_type, false,
 		$ablogger_ID );
 
 	task_end();
@@ -1483,12 +1498,7 @@ function create_demo_contents()
 
 	// Define here all categories which should have the advertisement banners
 	$adv_cats = array(
-			'blogA'     => $cat_bg, // Background
-			'blogB'     => $cat_ann_b, // Announcements
-			'linkblog'  => $cat_linkblog_b2evo, // b2evolution
-			'photoblog' => $cat_photo_album, // Monument Valley
-			'forums'    => $cat_forums_bg, // Background
-			'manual'    => $cat_manual_bg, // Background
+			'linkblog' => $cat_linkblog_b2evo, // b2evolution
 		);
 	foreach( $adv_cats as $adv_cat_ID )
 	{	// Insert three ADVERTISEMENTS for each blog:
@@ -1518,6 +1528,19 @@ function create_demo_contents()
 	}
 
 	// Insert a post:
+	$now = date('Y-m-d H:i:s', ($timestamp++ - 31536000) ); // A year ago
+	$edited_Item = new Item();
+	$edited_Item->insert( 1, T_('Welcome to Blog A'), sprintf( T_('<p>This is the intro post for the front page of Blog A.</p>
+
+<p>Blog A is currently configured to show a front page like this one instead of directly showing the blog\'s posts.</p>
+
+<ul>
+	<li>To view the blog\'s posts, click on "News" in the menu above.</li>
+	<li>If you don\'t want to have such a front page, you can disable it in the Blog\'s settings > Features > <a %s>Front Page</a>. You can also see an example of a blog without a Front Page in Blog B</li>
+</ul>'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=home&amp;blog='.$blog_a_ID.'"' ),
+				$now, $cat_ann_a, array(), 'published', '#', '', '', 'open', array('default'), 1400 );
+
+	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('First Post'), T_('<p>This is the first post.</p>
@@ -1540,46 +1563,6 @@ function create_demo_contents()
 	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('b2evo skins repository'), '', $now, $cat_additional_skins, array(), 'published', 'en-US', '', 'http://skins.b2evolution.net/', 'open', array('default'), 3000 );
 
-	// Insert a post with markdown examples:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = new Item();
-	$edited_Item->insert( 1, T_('Markdown examples'), T_('Heading
-=======
-
-Sub-heading
------------
-
-###H3 header
-
-#### H4 header ####
-
-> Email-style angle brackets
-> are used for blockquotes.
-
-> > And, they can be nested.
-
-> ##### Headers in blockquotes
->
-> * You can quote a list.
-> * Etc.
-
-[This is a link](http://b2evolution.net/) if Links are turned on in the markdown plugin settings
-
-Paragraphs are separated by a blank line.
-
-    This is a preformatted
-    code block.
-
-Text attributes *Italic*, **bold**, `monospace`.
-
-Shopping list:
-
-* apples
-* oranges
-* pears
-
-The rain---not the reign---in Spain.'), $now, $cat_news );
-
 	// PHOTOBLOG:
 	/**
 	 * @var FileRootCache
@@ -1592,9 +1575,9 @@ The rain---not the reign---in Spain.'), $now, $cat_news );
 	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('Bus Stop Ahead'), 'In the middle of nowhere: a school bus stop where you wouldn\'t really expect it!'.
 ( $test_install_all_features ? '
-[infodot:20:191:36:100px]School bus [b]here[/b]
+[infodot:5:191:36:100px]School bus [b]here[/b]
 
-####In the middle of nowhere:
+#### In the middle of nowhere:
 a school bus stop where you wouldn\'t really expect it!
 
 1. Item 1
@@ -1602,8 +1585,8 @@ a school bus stop where you wouldn\'t really expect it!
 3. Item 3
 
 [enddot]
-[infodot:21:104:99]cowboy and horse[enddot]
-[infodot:23:207:28:15em]Red planet[enddot]' : '' ),
+[infodot:6:104:99]cowboy and horse[enddot]
+[infodot:8:207:28:15em]Red planet[enddot]' : '' ),
 					 $now, $cat_photo_album, array(), 'published','en-US', '', 'http://fplanque.com/photo/monument-valley' );
 	$LinkOwner = new LinkItem( $edited_Item );
 	$edit_File = new File( 'shared', 0, 'monument-valley/bus-stop-ahead.jpg' );
@@ -1820,15 +1803,15 @@ a school bus stop where you wouldn\'t really expect it!
 
 <p>You can see the other pages by clicking on the links below the text.</p>').'
 
-<!--nextpage-->
+[pagebreak]
 
 '.sprintf( T_("<p>This is page %d.</p>"), 2 ).$lorem_2more.'
 
-<!--nextpage-->
+[pagebreak]
 
 '.sprintf( T_("<p>This is page %d.</p>"), 3 ).$lorem_1paragraph.'
 
-<!--nextpage-->
+[pagebreak]
 
 '.sprintf( T_("<p>This is page %d.</p>"), 4 ).'
 
@@ -1839,7 +1822,7 @@ a school bus stop where you wouldn\'t really expect it!
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('Extended post with no teaser'), T_('<p>This is an extended post with no teaser. This means that you won\'t see this teaser any more when you click the "more" link.</p>').$lorem_1paragraph
-	.'<!--more-->
+	.'[teaserbreak]
 
 '.T_('<p>This is the extended text. You only see it when you have clicked the "more" link.</p>').$lorem_2more, $now, $cat_bg );
 	$edited_Item->set_setting( 'hide_teaser', '1' );
@@ -1850,7 +1833,7 @@ a school bus stop where you wouldn\'t really expect it!
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('Extended post'), T_('<p>This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.</p>').$lorem_1paragraph
-	.'<!--more-->
+	.'[teaserbreak]
 
 '.T_('<p>This is the extended text. You only see it when you have clicked the "more" link.</p>').$lorem_2more, $now, $cat_bg );
 
@@ -1916,15 +1899,15 @@ a school bus stop where you wouldn\'t really expect it!
 
 <p>You can see the other pages by clicking on the links below the text.</p>').'
 
-<!--nextpage-->
+[pagebreak]
 
 '.sprintf( T_("<p>This is page %d.</p>"), 2 ).$lorem_2more.'
 
-<!--nextpage-->
+[pagebreak]
 
 '.sprintf( T_("<p>This is page %d.</p>"), 3 ).$lorem_1paragraph.'
 
-<!--nextpage-->
+[pagebreak]
 
 '.sprintf( T_("<p>This is page %d.</p>"), 4 ).'
 
@@ -1936,7 +1919,7 @@ a school bus stop where you wouldn\'t really expect it!
 	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('Extended topic with no teaser'), T_('<p>This is an extended topic with no teaser. This means that you won\'t see this teaser any more when you click the "more" link.</p>
 
-<!--more-->
+[teaserbreak]
 
 <p>This is the extended text. You only see it when you have clicked the "more" link.</p>'), $now, $cat_forums_bg );
 	$edited_Item->set_setting( 'hide_teaser', '1' );
@@ -1948,7 +1931,7 @@ a school bus stop where you wouldn\'t really expect it!
 	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('Extended topic'), T_('<p>This is an extended topic. This means you only see this small teaser by default and you must click on the link below to see more.</p>
 
-<!--more-->
+[teaserbreak]
 
 <p>This is the extended text. You only see it when you have clicked the "more" link.</p>'), $now, $cat_forums_bg );
 
@@ -1976,7 +1959,7 @@ a school bus stop where you wouldn\'t really expect it!
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_("Manual main intro"), T_('This is the main introduction for the manual'), $now, $cat_manual_ann,
-		array(), 'published', '#', '', '', 'open', array('default'), 1500 );
+		array(), 'published', '#', '', '', 'open', array('default'), 1400 );
 
 	// Insert a cat intro:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -2026,15 +2009,15 @@ a school bus stop where you wouldn\'t really expect it!
 
 <p>You can see the other pages by clicking on the links below the text.</p>').'
 
-<!--nextpage-->
+[pagebreak]
 
 '.sprintf( T_("<p>This is page %d.</p>"), 2 ).$lorem_2more.'
 
-<!--nextpage-->
+[pagebreak]
 
 '.sprintf( T_("<p>This is page %d.</p>"), 3 ).$lorem_1paragraph.'
 
-<!--nextpage-->
+[pagebreak]
 
 '.sprintf( T_("<p>This is page %d.</p>"), 4 ).'
 
@@ -2047,7 +2030,7 @@ a school bus stop where you wouldn\'t really expect it!
 	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('Extended topic with no teaser'), T_('<p>This is an extended topic with no teaser. This means that you won\'t see this teaser any more when you click the "more" link.</p>
 
-<!--more-->
+[teaserbreak]
 
 <p>This is the extended text. You only see it when you have clicked the "more" link.</p>'), $now, $cat_manual_bg, array(),
 		'published', '#', '', '', 'open', array('default'), 1, NULL, 5 );
@@ -2060,7 +2043,7 @@ a school bus stop where you wouldn\'t really expect it!
 	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('Extended topic'), T_('<p>This is an extended topic. This means you only see this small teaser by default and you must click on the link below to see more.</p>
 
-<!--more-->
+[teaserbreak]
 
 <p>This is the extended text. You only see it when you have clicked the "more" link.</p>'), $now, $cat_manual_life, array(),
 		'published', '#', '', '', 'open', array('default'), 1, NULL, 10 );
@@ -2099,6 +2082,52 @@ a school bus stop where you wouldn\'t really expect it!
 
 <p>It appears in sports category.</p>'), $now, $cat_manual_sports, array(),
 		'published', '#', '', '', 'open', array('default'), 1, NULL, 5 );
+
+	// Insert a post with markdown examples
+	$markdown_examples_content = T_('Heading
+=======
+
+Sub-heading
+-----------
+
+### H3 header
+
+#### H4 header ####
+
+> Email-style angle brackets
+> are used for blockquotes.
+
+> > And, they can be nested.
+
+> ##### Headers in blockquotes
+>
+> * You can quote a list.
+> * Etc.
+
+[This is a link](http://b2evolution.net/) if Links are turned on in the markdown plugin settings
+
+Paragraphs are separated by a blank line.
+
+    This is a preformatted
+    code block.
+
+Text attributes *Italic*, **bold**, `monospace`.
+
+Shopping list:
+
+* apples
+* oranges
+* pears
+
+The rain---not the reign---in Spain.');
+	// For Forums blog:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = new Item();
+	$edited_Item->insert( 1, T_('Markdown examples'), $markdown_examples_content, $now, $cat_forums_news );
+	// For Manual blog:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = new Item();
+	$edited_Item->insert( 1, T_('Markdown examples'), $markdown_examples_content, $now, $cat_manual_news );
 
 	task_end();
 
@@ -2281,7 +2310,7 @@ function create_default_posts_location()
 
 		$DB->query( 'UPDATE T_items__item SET
 			post_ctry_ID = '.$DB->quote( '74'/* France */ ).',
-			post_rgn_ID = '.$DB->quote( '60'/* Île-de-France */ ).',
+			post_rgn_ID = '.$DB->quote( '60'/* ï¿½le-de-France */ ).',
 			post_subrg_ID = '.$DB->quote( '76'/* Paris */ ) );
 	}
 }

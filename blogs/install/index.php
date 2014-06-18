@@ -184,6 +184,11 @@ if( ! $use_locale_from_request )
 		$default_locale = locale_from_httpaccept();
 	}
 	// echo 'detected locale: ' . $default_locale. '<br />';
+	if( isset( $locales[ $default_locale ] ) && $evo_charset != $locales[ $default_locale ]['charset'] )
+	{ // Redirect to install page with correct defined locale in order to avoid broken chars, e.g. when db locale has utf8 encoding and default locale - latin1
+		header_redirect( 'index.php?locale='.$default_locale );
+		// Exit here.
+	}
 }
 // Activate default locale:
 if( ! locale_activate( $default_locale ) )
@@ -223,6 +228,7 @@ switch( $action )
 		break;
 
 	case 'conf':
+		$config_is_done = 0;
 	case 'menu':
 	case 'localeinfo':
 	case 'default':
@@ -271,7 +277,7 @@ header('Cache-Control: no-cache'); // no request to this page should get cached!
 		<!-- InstanceEndEditable --></div>
 
 		<!-- InstanceBeginEditable name="Main" -->
-		
+
 <?php
 
 block_open();
@@ -331,7 +337,7 @@ switch( $action )
 			'aliases' => $db_config['aliases'],
 			'use_transactions' => $db_config['use_transactions'],
 			'table_options' => $db_config['table_options'],
-			'connection_charset' => $db_config['connection_charset'],
+			'connection_charset' => empty( $db_config['connection_charset'] ) ? DB::php_to_mysql_charmap( $evo_charset ) : $db_config['connection_charset'],
 			'halt_on_error' => false ) );
 		if( $DB->error )
 		{ // restart conf
@@ -682,7 +688,7 @@ switch( $action )
 		$test_install_all_features = param( 'install_all_features', 'boolean', false );
 
 		// fp> TODO: this test should probably be made more generic and applied to upgrade too.
-		$expected_connection_charset = $DB->php_to_mysql_charmap($evo_charset);
+		$expected_connection_charset = DB::php_to_mysql_charmap($evo_charset);
 		if( $DB->connection_charset != $expected_connection_charset )
 		{
 			echo '<div class="error"><p class="error">'.sprintf( T_('In order to install b2evolution with the %s locale, your MySQL needs to support the %s connection charset.').' (SET NAMES %s)',
@@ -860,16 +866,16 @@ switch( $action )
 		$PageCache->cache_delete();
 
 		// Skip if T_blogs table is already deleted. Note that db_delete() will not throw any errors on missing tables.
-		if( $DB->query('SHOW TABLES LIKE "T_blogs"') )
-		{	// Get all blogs
+		if( $DB->query( 'SHOW TABLES LIKE "T_blogs"' ) )
+		{ // Get all blogs
 			$blogs_SQL = new SQL();
 			$blogs_SQL->SELECT( 'blog_ID' );
 			$blogs_SQL->FROM( 'T_blogs' );
 			$blogs = $DB->get_col( $blogs_SQL->get() );
 
+			$BlogCache = & get_BlogCache( 'blog_ID' );
 			foreach( $blogs as $blog_ID )
 			{
-				$BlogCache = & get_BlogCache();
 				$Blog = $BlogCache->get_by_ID( $blog_ID );
 
 				// Remove page cache of current blog

@@ -130,7 +130,7 @@ function mw_newpost($m, $item_type = 'post' )
 
 	if( !empty($content_struct['mt_text_more']) )
 	{	// Add content extension
-		$content .= '<!--more-->'.$content_struct['mt_text_more'];
+		$content .= '[teaserbreak]'.$content_struct['mt_text_more'];
 	}
 	//logIO( "Item content:\n".$content );
 
@@ -259,7 +259,7 @@ function mw_editpost( $m, $item_type = 'post' )
 
 	if( isset($content_struct['mt_text_more']) )
 	{	// Add content extension
-		$content .= '<!--more-->'.$content_struct['mt_text_more'];
+		$content .= '[teaserbreak]'.$content_struct['mt_text_more'];
 	}
 	//logIO( "Item content:\n".$content );
 

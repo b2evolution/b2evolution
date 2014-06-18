@@ -1170,7 +1170,7 @@ function blogs_user_results_block( $params = array() )
 		}
 	}
 
-	global $DB;
+	global $DB, $AdminUI;
 
 	param( 'user_tab', 'string', '', true );
 	param( 'user_ID', 'integer', 0, true );
@@ -1210,8 +1210,9 @@ function blogs_user_results_block( $params = array() )
 		$blogs_Results->init_params_by_skin( $params[ 'skin_type' ], $params[ 'skin_name' ] );
 	}
 
+	$results_params = $AdminUI->get_template( 'Results' );
 	$display_params = array(
-		'before' => '<div class="results" style="margin-top:25px" id="owned_blogs_result">'
+		'before' => str_replace( '>', ' style="margin-top:25px" id="owned_blogs_result">', $results_params['before'] ),
 	);
 	$blogs_Results->display( $display_params );
 

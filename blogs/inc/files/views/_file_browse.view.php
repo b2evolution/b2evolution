@@ -107,7 +107,7 @@ if( isset( $edited_User ) )
 	$Widget->disp_template_replaced( 'block_start' );
 ?>
 
-<table id="fm_browser" cellspacing="0" cellpadding="0">
+<table id="fm_browser" cellspacing="0" cellpadding="0" class="table table-striped table-bordered table-hover table-condensed">
 	<thead>
 		<tr>
 			<td colspan="2" id="fm_bar">
@@ -128,7 +128,7 @@ if( isset( $edited_User ) )
 					<label for="fm_filter" class="tooltitle"><?php echo T_('Filter') ?>:</label>
 					<input type="text" name="fm_filter" id="fm_filter"
 						value="<?php echo format_to_output( $fm_Filelist->get_filter( false ), 'formvalue' ) ?>"
-						size="7" accesskey="f" />
+						size="7" accesskey="f" class="form-control input-sm" />
 
 					<?php
 						if( $UserSettings->get( 'fm_allowfiltering' ) == 'regexp' )
@@ -141,7 +141,7 @@ if( isset( $edited_User ) )
 						}
 					?>
 
-					<input type="submit" name="actionArray[filter]" class="SmallButton"
+					<input type="submit" name="actionArray[filter]" class="SmallButton btn btn-default btn-sm"
 						value="<?php echo format_to_output( T_('Apply'), 'formvalue' ) ?>" />
 
 					<?php
@@ -350,7 +350,7 @@ if( isset( $edited_User ) )
 						else
 						{	// We can create both files and directories:
 							echo T_('New').': ';
-							echo '<select name="create_type">';
+							echo '<select name="create_type" class="form-control input-sm">';
 							echo '<option value="dir"';
 							if( isset($create_type) &&  $create_type == 'dir' )
 							{
@@ -371,8 +371,8 @@ if( isset( $edited_User ) )
 						if( isset( $create_name ) )
 						{
 							echo $create_name;
-						} ?>" size="15" />
-					<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Create!'), 'formvalue' ) ?>" />
+						} ?>" size="15" class="form-control input-sm" />
+					<input class="ActionButton btn btn-default" type="submit" value="<?php echo format_to_output( T_('Create!'), 'formvalue' ) ?>" />
 					<?php
 					$Form->end_form();
 					echo '</div>';
@@ -396,7 +396,7 @@ if( isset( $edited_User ) )
 						$Form->hiddens_by_key( get_memorized('ctrl') );
 						echo '<div>';
 						echo '<input name="uploadfile[]" type="file" size="10" />';
-						echo '<input class="ActionButton" type="submit" value="&gt; '.T_('Quick upload!').'" />';
+						echo '<input class="ActionButton btn btn-primary" type="submit" value="&gt; '.T_('Quick upload!').'" />';
 						echo '</div>';
 					$Form->end_form();
 					echo '</div>';

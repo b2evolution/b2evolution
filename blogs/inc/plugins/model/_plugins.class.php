@@ -1301,7 +1301,7 @@ class Plugins
 		{
 			$event = $event_prefix.'ItemAsText'; // 'RenderItemAsText'/'DisplayItemAsText'
 		}
-		else debug_die( 'Unexpected format in Plugins::render(): '.var_export($format, true) );
+		else debug_die( 'Unexpected $format passed to Plugins::render(): '.var_export($format, true) );
 
 		$renderer_Plugins = $this->get_list_by_event( $event );
 		// Set blog from where the "apply_rendering" collection setting should be get
@@ -1345,28 +1345,9 @@ class Plugins
 			// echo ' ',$loop_RendererPlugin->code, ':';
 
 			$apply_rendering_value = $loop_RendererPlugin->get_coll_setting( 'coll_apply_rendering', $setting_Blog );
-			switch( $apply_rendering_value )
-			{
-				case 'stealth':
-				case 'always':
-					// echo 'FORCED ';
-					$this->call_method( $loop_RendererPlugin->ID, $event, $params );
-					break;
-
-				case 'opt-out':
-				case 'opt-in':
-				case 'lazy':
-					if( in_array( $loop_RendererPlugin->code, $renderers ) )
-					{ // Option is activated
-						// echo 'OPT ';
-						$this->call_method( $loop_RendererPlugin->ID, $event, $params );
-					}
-					// else echo 'NOOPT ';
-					break;
-
-				case 'never':
-					// echo 'NEVER ';
-					break;	// STOP, don't render, go to next renderer
+			if( $loop_RendererPlugin->is_renderer_enabled( $apply_rendering_value, $renderers ) )
+			{ // Plugin is enabled to call method
+				$this->call_method( $loop_RendererPlugin->ID, $event, $params );
 			}
 		}
 

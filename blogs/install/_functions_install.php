@@ -187,11 +187,6 @@ function install_newdb()
 		 */
 		$Settings = new GeneralSettings();
 
-		// Translate the messages for account closing
-		$Settings->set( 'user_closing_intro', T_("We are sorry to see you leave.\n\nWe value your feedback. Please be so kind and tell us in a few words why you are leaving us. This will help us to improve the site for the future.") );
-		$Settings->set( 'user_closing_reasons', T_("I don't need this account any more.\nI do not like this site.") );
-		$Settings->set( 'user_closing_byemsg', T_('Your account has now been closed. If you ever want to log in again, you will need to create a new account.') );
-
 		if( $test_install_all_features )
 		{	// Set manual ordering of categories
 			$Settings->set( 'chapter_ordering', 'manual' );
@@ -498,14 +493,16 @@ function install_basic_skins( $install_mobile_skins = true )
 	skin_install( 'photoalbums' );
 
 	// Note: Skin #5 will we used by Forums
-	skin_install( 'forums' );
+	skin_install( 'pureforums' );
 
 	// Note: Skin #6 will we used by Manual
 	skin_install( 'manual' );
 
 	skin_install( 'asevo' );
+	skin_install( 'bootstrap' );
 	skin_install( 'custom' );
 	skin_install( 'dating_mood' );
+	skin_install( 'forums' );
 	skin_install( 'glossyblue' );
 	skin_install( 'intense' );
 	skin_install( 'natural_pink' );
@@ -558,6 +555,7 @@ function install_basic_plugins( $old_db_version = 0 )
 	{
 		// Toolbars:
 		install_plugin( 'quicktags_plugin' );
+		install_plugin( 'shortcodes_plugin' );
 		// Renderers:
 		install_plugin( 'auto_p_plugin' );
 		install_plugin( 'autolinks_plugin' );
@@ -609,6 +607,7 @@ function install_basic_plugins( $old_db_version = 0 )
 	{ // Upgrade to 5.0.1-alpha-5
 		install_plugin( 'bbcode_plugin', $test_install_all_features );
 		install_plugin( 'star_plugin', $test_install_all_features );
+		install_plugin( 'prism_plugin', $test_install_all_features );
 		install_plugin( 'code_highlight_plugin', $test_install_all_features );
 		install_plugin( 'markdown_plugin' );
 		install_plugin( 'infodots_plugin', $test_install_all_features );

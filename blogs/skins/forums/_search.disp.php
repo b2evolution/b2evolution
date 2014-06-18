@@ -70,6 +70,7 @@ while( mainlist_get_item() )
 			'content_mode'         => 'auto', // 'auto' will auto select depending on $disp-detail
 			'image_size'           => 'fit-400x320',
 			'display_column_forum' => true,
+			'item_link_type'       => 'permalink', // Use 'permalink' to display title of all posts as links (used especially for intro-cat posts)
 		) );
 	// ----------------------------END ITEM BLOCK  ----------------------------
 

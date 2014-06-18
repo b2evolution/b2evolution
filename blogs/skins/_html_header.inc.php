@@ -12,11 +12,14 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $xmlsrv_url, $Session, $app_version;
+global $xmlsrv_url, $Session, $Hit, $Skin, $app_version;
 
 $params = array_merge( array(
 	'auto_pilot'    => 'seo_title',
-	'generator_tag' => '<meta name="generator" content="b2evolution '.$app_version.'" /> <!-- Please leave this for stats -->'."\n"
+	'html_tag'      => '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'."\n"
+	                  .'<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="'.locale_lang( false ).'" lang="'.locale_lang( false ).'">'."\n",
+	'generator_tag' => '<meta name="generator" content="b2evolution '.$app_version.'" /> <!-- Please leave this for stats -->'."\n",
+	'body_class'    => NULL,
 ), $params );
 
 require_css( 'style.css', 'relative' );
@@ -25,15 +28,15 @@ require_css( 'style.css', 'relative' );
 siteskin_init();
 
 add_js_for_toolbar( 'blog' );		// Registers all the javascripts needed by the toolbar menu
-init_bubbletip_js( 'blog' ); // Add jQuery bubbletip plugin
+init_bubbletip_js( 'blog', $Skin->get_template( 'tooltip_plugin' ) ); // Add jQuery bubbletip plugin
 require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
-// CSS for IE9
+// CSS for IE9. NOTE: Don't use php checking here because of page caching!
 add_headline( '<!--[if IE 9 ]>' );
-require_css( 'ie9.css', 'rsc_url' );
+require_css( 'ie9.css', 'blog' );
 add_headline( '<![endif]-->' );
+
+echo $params['html_tag'];
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<?php skin_content_meta(); /* Charset for static pages */ ?>
 	<?php skin_base_tag(); /* Base URL for this skin. You need this to fix relative links! */ ?>
@@ -45,6 +48,7 @@ add_headline( '<![endif]-->' );
 	?></title>
 	<?php skin_description_tag(); ?>
 	<?php skin_keywords_tag(); ?>
+	<?php skin_opengraph_tags(); ?>
 	<?php robots_tag(); ?>
 	<?php
 	global $htsrv_url;
@@ -70,7 +74,6 @@ add_headline( '<![endif]-->' );
 	}
 	?>
 	<link rel="EditURI" type="application/rsd+xml" title="RSD" href="<?php echo $Blog->disp( 'rsd_url', 'raw' ) ?>" />
-	<?php /*<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />*/ ?>
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 	<?php
 		$Blog->disp( 'blog_css', 'raw');
@@ -79,7 +82,7 @@ add_headline( '<![endif]-->' );
 	?>
 </head>
 
-<body>
+<body<?php skin_body_attrs( array( 'class' => $params['body_class'] ) ); ?>>
 
 <?php
 // ---------------------------- TOOLBAR INCLUDED HERE ----------------------------

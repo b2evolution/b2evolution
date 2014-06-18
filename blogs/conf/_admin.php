@@ -43,6 +43,7 @@ $posttypes_perms = array(
 		1000,
 	),
 	'intro' => array(
+		1400,
 		1500,
 		1520,
 		1530,
@@ -67,12 +68,11 @@ $posttypes_specialtypes = array_merge( $posttypes_perms['page'], $posttypes_perm
 /**
  * Post types that should not have a permanent URL
  */
-$posttypes_nopermanentURL = $posttypes_perms['sidebar'];
+$posttypes_nopermanentURL = array_merge( $posttypes_perms['sidebar'], array( 1400, 1500 ) );
 
 /**
  * Post types that should have a permanent URL as url of their main chapter
  */
-$posttypes_catpermanentURL = $posttypes_perms['intro'];
-
+$posttypes_catpermanentURL = array_diff( $posttypes_perms['intro'], array( 1400, 1500 ) );
 
 ?>

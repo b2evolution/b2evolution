@@ -42,7 +42,7 @@ param( 'tab', 'string', $default_tab, true );
 
 param_action( 'list' );
 
-if( !in_array( $action, array( 'new', 'new-selskin', 'new-name', 'list', 'create', 'update_settings_blog', 'update_settings_site' ) ) )
+if( !in_array( $action, array( 'new', 'new-selskin', 'new-installskin', 'new-name', 'list', 'create', 'update_settings_blog', 'update_settings_site' ) ) )
 {
 	if( valid_blog_requested() )
 	{
@@ -67,7 +67,7 @@ else
 switch( $action )
 {
 	case 'new':
-		// New collection:
+		// New collection: Select blog type
 		// Check permissions:
 		$current_User->check_perm( 'blogs', 'create', true );
 
@@ -75,7 +75,8 @@ switch( $action )
 		break;
 
 	case 'new-selskin':
-		// New collection:
+	case 'new-installskin':
+		// New collection: Select or Install skin
 		// Check permissions:
 		$current_User->check_perm( 'blogs', 'create', true );
 
@@ -87,7 +88,7 @@ switch( $action )
 		break;
 
 	case 'new-name':
-		// New collection:
+		// New collection: Set general parameters
 		// Check permissions:
 		$current_User->check_perm( 'blogs', 'create', true );
 
@@ -348,7 +349,7 @@ $AdminUI->breadcrumbpath_add( T_('Structure'), '?ctrl=collections' );
 /**
  * Display page header, menus & messages:
  */
-if( strpos( $action, 'new' ) === false )
+if( strpos( $action, 'new' ) === false && $action != 'create' )
 { // Not creating a new blog:
 	// fp> TODO: fall back to ctrl=chapters when no perm for blog_properties
 	$AdminUI->set_coll_list_params( 'blog_properties', 'edit',
@@ -388,6 +389,8 @@ if( strpos( $action, 'new' ) === false )
 else
 {	// Creating a new blog
 	$AdminUI->breadcrumbpath_add( T_('New blog'), '?ctrl=collections&amp;action=new' );
+	// Init JS to autcomplete the user logins
+	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 }
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -397,7 +400,7 @@ $AdminUI->disp_html_head();
 $AdminUI->disp_body_top();
 
 
-switch($action)
+switch( $action )
 {
 	case 'new':
 		$AdminUI->displayed_sub_begin = 1;	// DIRTY HACK :/ replacing an even worse hack...
@@ -410,6 +413,7 @@ switch($action)
 
 
 	case 'new-selskin':
+	case 'new-installskin':
 		$AdminUI->displayed_sub_begin = 1;	// DIRTY HACK :/ replacing an even worse hack...
 		$AdminUI->disp_payload_begin();
 

@@ -31,12 +31,12 @@ class texturize_plugin extends Plugin
 	{
 		$this->short_desc = T_('Smart quotes + additional typographic replacements.');
 		$this->long_desc = T_('This renderer will replace standard and double quotes with typographic quotes were appropriate.<br />
-		 It will also perform the following replacements:
-		 <ul>
-		 	<li>--- to &#8212;</li>
-			<li>-- to &#8211;</li>
-			<li>... to &#8230;</li>
-		</ul>' );
+It will also perform the following replacements:
+<ul>
+	<li>--- to &#8212;</li>
+	<li>-- to &#8211;</li>
+	<li>... to &#8230;</li>
+</ul>' );
 	}
 
 

@@ -43,13 +43,6 @@ function wptouch_switch_confirmation( e )
 	return true;
 }
 
-if ( $wpt( '#prowl-success' ).length ) {
-	setTimeout( function() { $wpt( '#prowl-success' ).fadeOut( 350 ); }, 5250 );
-}
-if ( $wpt( '#prowl-fail' ).length ) {
-	setTimeout( function() { $wpt( '#prowl-fail' ).fadeOut( 350 ); }, 5250 );
-}
-
 $wpt(function() {
 		var tabContainers = $wpt( '#menu-head > ul' );
 		$wpt( '#tabnav a' ).bind(touchStartOrClick, function () {
@@ -77,37 +70,7 @@ function doWPtouchReady() {
 		$wpt( '#wptouch-search' ).wptouchFadeToggle( 350 );
 		$wpt( '#s' ).focus();		
 	});
-	
-	$wpt( 'a#prowlopen' ).bind( touchStartOrClick, function( e ){	
-		$wpt( '#prowl-message' ).wptouchFadeToggle( 350 );
-	});
-	
-	$wpt( 'a#wordtwitopen' ).bind( touchStartOrClick, function( e ){	
-		$wpt( '#wptouch-wordtwit' ).wptouchFadeToggle( 350 );
-	});
 
-	$wpt( 'a#gigpressopen' ).bind( touchStartOrClick, function( e ){	
-		$wpt( '#wptouch-gigpress' ).wptouchFadeToggle( 350 );
-	});
-
-	$wpt( 'a#loginopen, #wptouch-login-inner a' ).bind( touchStartOrClick, function( e ){	
-		$wpt( '#wptouch-login' ).wptouchFadeToggle(350);
-	});
-	
-	$wpt( 'a#obook' ).bind( touchStartOrClick, function() {
-		$wpt( '#bookmark-box' ).wptouchFadeToggle(350);
-	});
-	
-	$wpt( '.singlentry img, .singlentry .wp-caption' ).each( function() {
-		if ( $wpt( this ).width() <= 250 ) {
-			$wpt( this ).addClass( 'aligncenter' );
-		}
-	});
-	
-	if ( $wpt( '#FollowMeTabLeftSm' ).length ) {
-		$wpt( '#FollowMeTabLeftSm' ).remove();
-	}
-	
 	/* add dynamic automatic video resizing via fitVids */
 
 	var videoSelectors = [

@@ -19,10 +19,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 skin_init( $disp );
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
-// Initializations:
-add_headline( '<!--[if IE]><link rel="stylesheet" type="text/css" href="ie.css" /><![endif]-->' );
-
-// Include the HTML HEAD:
 skin_include( '_html_header.inc.php' );
 // Note: You can customize the default HTML header by copying the
 // _html_header.inc.php file into the current skin folder.
@@ -145,12 +141,14 @@ siteskin_include( '_site_body_header.inc.php' );
 ?>
 
 <?php
-    // -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
-    mainlist_page_links( array(
-            'block_start' => '<p class="center">'.T_('Pages:').' <strong>',
-            'block_end' => '</strong></p>',
-        ) );
-    // ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
+if( $disp != 'front' && $disp != 'download' )
+{
+	// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
+	mainlist_page_links( array(
+			'block_start' => '<p class="center">'.T_('Pages:').' <strong>',
+			'block_end' => '</strong></p>',
+		) );
+	// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 ?>
 
 <?php
@@ -198,7 +196,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			$Item->issue_time( array(
 					'before'    => ', ',
 					'after'     => '',
-					'date_format' => 'l j F Y à H:i',
+					'date_format' => 'l j F Y ï¿½ H:i',
 				) );
 			$Item->categories( array(
 					'before'          => ', '.T_('Categories').': ',
@@ -296,6 +294,7 @@ siteskin_include( '_site_body_header.inc.php' );
             'block_end' => '</strong></p>',
         ) );
     // ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
+}
 	?>
 
 

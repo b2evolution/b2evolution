@@ -75,7 +75,7 @@ $comment_class = ' class="'.$comment_class.'"';
 	<?php
 	}
 	?>
-	<tr valign="top"<?php echo $comment_class; ?> id="comment_row_<?php echo $Comment->ID; ?>">
+	<tr valign="top"<?php echo $comment_class; ?> id="comment_<?php echo $Comment->ID; ?>">
 	<td class="col1"><?php
 		$Comment->author2( array(
 				'before'       => ' ',
@@ -122,7 +122,7 @@ $comment_class = ' class="'.$comment_class.'"';
 		<?php echo $params['comment_end']; ?>
 	</td>
 </tr>
-<tr<?php echo $comment_class; ?> id="comment_row_<?php echo $Comment->ID; ?>">
+<tr<?php echo $comment_class; ?> id="comment_<?php echo $Comment->ID; ?>">
 	<td class="left col1"><a href="<?php
 		if( $disp == 'comments' )
 		{	// We are displaying a comment in the Latest comments page:

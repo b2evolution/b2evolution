@@ -1747,7 +1747,7 @@ function threads_results_block( $params = array() )
 		}
 	}
 
-	global $DB, $current_User;
+	global $DB, $current_User, $AdminUI;
 
 	param( 'user_tab', 'string', '', true );
 	param( 'user_ID', 'integer', 0, true );
@@ -1789,8 +1789,9 @@ function threads_results_block( $params = array() )
 			$threads_Results->init_params_by_skin( $params[ 'skin_type' ], $params[ 'skin_name' ] );
 		}
 
+		$results_params = $AdminUI->get_template( 'Results' );
 		$display_params = array(
-			'before' => '<div class="results" style="margin-top:25px" id="threads_result">'
+			'before' => str_replace( '>', ' style="margin-top:25px" id="threads_result">', $results_params['before'] ),
 		);
 		$threads_Results->display( $display_params );
 

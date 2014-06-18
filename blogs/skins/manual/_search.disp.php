@@ -56,7 +56,9 @@ if( isset( $MainList ) && $MainList->result_num_rows > 0 )
 	{	// For each blog post, do everything below up to the closing curly brace "}"
 
 		// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
-		skin_include( '_item_list.inc.php', array() );
+		skin_include( '_item_list.inc.php', array(
+				'item_link_type' => 'permalink', // Use 'permalink' to display title of all posts as links (used especially for intro-cat posts)
+			) );
 		// ----------------------------END ITEM BLOCK  ----------------------------
 	}
 	echo '</ul>';

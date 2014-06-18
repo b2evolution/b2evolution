@@ -85,21 +85,15 @@ class AutoPPluginTestCase extends EvoPluginUnitTestCase
 
 
 	/**
-	 * Test special tags ("<!--more-->", "<!--nextpage-->" and "<!--noteaser-->")
+	 * Test special tags ("[teaserbreak]" and "[pagebreak]")
 	 */
 	function test_special_tags()
 	{
-		$this->assertEqual( "<p>foo</p><!--more--><p>bar</p>",
-			$this->render( 'foo<!--more-->bar' ) );
+		$this->assertEqual( "<p>foo</p>[teaserbreak]<p>bar</p>",
+			$this->render( 'foo[teaserbreak]bar' ) );
 
-		$this->assertEqual( "<p>foo</p><!--more--><!--noteaser--><p>bar</p>",
-			$this->render( 'foo<!--more--><!--noteaser-->bar' ) );
-
-		$this->assertEqual( "<p>foo</p><!--nextpage--><p>bar</p>",
-			$this->render( 'foo<!--nextpage-->bar' ) );
-
-		$this->assertEqual( "<p>foo</p><!--noteaser--><p>bar</p>",
-			$this->render( 'foo<!--noteaser-->bar' ) );
+		$this->assertEqual( "<p>foo</p>[pagebreak]<p>bar</p>",
+			$this->render( 'foo[pagebreak]bar' ) );
 	}
 
 

@@ -240,10 +240,11 @@ function validateCommentForm(form)
 	}
 
 	if( $Item->can_rate() )
-	{	// Comment rating:
-		echo $Form->begin_field( NULL, T_('Your vote'), true );
+	{ // Comment rating:
+		ob_start();
 		$Comment->rating_input( array( 'item_ID' => $Item->ID ) );
-		echo $Form->end_field();
+		$comment_rating = ob_get_clean();
+		$Form->info_field( T_('Your vote'), $comment_rating );
 	}
 
 	if( !empty($params['policy_text']) )
@@ -339,15 +340,15 @@ function validateCommentForm(form)
 	$Plugins->trigger_event( 'DisplayCommentFormFieldset', array( 'Form' => & $Form, 'Item' => & $Item ) );
 
 	$Form->begin_fieldset();
-		echo '<div class="input">';
+		echo $Form->buttonsstart;
 
 		$preview_text = ( $Item->can_attach() ) ? T_('Preview/Add file') : T_('Preview');
-		$Form->button_input( array( 'name' => 'submit_comment_post_'.$Item->ID.'[save]', 'class' => 'submit', 'value' => $params['form_submit_text'], 'tabindex' => 10 ) );
+		$Form->button_input( array( 'name' => 'submit_comment_post_'.$Item->ID.'[save]', 'class' => 'submit SaveButton', 'value' => $params['form_submit_text'], 'tabindex' => 10 ) );
 		$Form->button_input( array( 'name' => 'submit_comment_post_'.$Item->ID.'[preview]', 'class' => 'preview', 'value' => $preview_text, 'tabindex' => 9 ) );
 
 		$Plugins->trigger_event( 'DisplayCommentFormButton', array( 'Form' => & $Form, 'Item' => & $Item ) );
 
-		echo '</div>';
+		echo $Form->buttonsend;
 	$Form->end_fieldset();
 	?>
 

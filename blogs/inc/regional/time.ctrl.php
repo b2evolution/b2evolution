@@ -93,7 +93,6 @@ switch( $action )
 
 		if( ! $Messages->has_errors() )
 		{
-			locale_updateDB();
 			$Settings->dbupdate();
 			$Messages->add( T_('Time settings updated.'), 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:

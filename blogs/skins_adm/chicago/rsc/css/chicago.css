@@ -333,6 +333,13 @@ textarea.field_error {
 .fieldset_title .action_icon {
 	font-size: 84%;
 }
+#fieldset_wrapper_itemform_links .fieldset_title a.action_icon {
+	line-height: 15px;
+}
+#fieldset_wrapper_itemform_links .fieldset_title a.action_icon span.icon {
+	vertical-align: bottom;
+	margin-right: 2px;
+}
 
 .fform fieldset,
 .left_col fieldset,

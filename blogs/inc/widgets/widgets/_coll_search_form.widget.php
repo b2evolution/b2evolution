@@ -128,6 +128,8 @@ class coll_search_form_Widget extends ComponentWidget
 
 		$this->disp_title();
 
+		echo $this->disp_params['block_body_start'];
+
 		form_formstart( $Blog->gen_blogurl(), 'search', 'SearchForm' );
 		if( $this->disp_params[ 'disp_search_options' ] )
 		{
@@ -149,15 +151,17 @@ class coll_search_form_Widget extends ComponentWidget
 		}
 
 		$s = get_param( 's' );
-		echo '<input type="text" name="s" size="25" value="'.evo_htmlspecialchars($s).'" class="search_field SearchField" title="'.format_to_output( T_('Enter text to search for'), 'htmlattr' ).'" />';
+		echo '<input type="text" name="s" size="25" value="'.evo_htmlspecialchars($s).'" class="search_field SearchField form-control" title="'.format_to_output( T_('Enter text to search for'), 'htmlattr' ).'" />';
 
 		if( $this->disp_params[ 'use_search_disp' ] )
 		{
 			echo '<input type="hidden" name="disp" value="search" />';
 		}
-		echo '<input type="submit" name="submit" class="search_submit submit" value="'.format_to_output( $this->disp_params['button'], 'htmlattr' ).'" />';
+		echo '<input type="submit" name="submit" class="search_submit submit btn btn-primary" value="'.format_to_output( $this->disp_params['button'], 'htmlattr' ).'" />';
 		echo '</div>';
 		echo '</form>';
+
+		echo $this->disp_params['block_body_end'];
 
 		echo $this->disp_params['block_end'];
 

@@ -80,8 +80,8 @@ $Form->begin_fieldset( T_('Main page / post list').get_manual_link('main_page_se
 	$Form->radio( 'main_content', $edited_Blog->get_setting('main_content'),
 		array(
 				array( 'excerpt', T_('Post excerpts') ),
-				array( 'normal', T_('Standard post contents (stopping at "&lt;!-- more -->")') ),
-				array( 'full', T_('Full post contents (including after "&lt;!-- more -->")') ),
+				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")') ),
+				array( 'full', T_('Full post contents (including after "[teaserbreak]")') ),
 			), T_('Post contents'), true );
 
  	$Form->radio( 'permalinks', $edited_Blog->get_setting('permalinks'), array(
@@ -127,6 +127,9 @@ $Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_li
 	$Form->checkbox( 'tags_meta_keywords', $edited_Blog->get_setting( 'tags_meta_keywords' ),
 			T_('Meta Keywords'), T_('When no meta keywords are provided for an item, use tags instead.') );
 
+	$Form->checkbox( 'tags_open_graph', $edited_Blog->get_setting( 'tags_open_graph' ),
+			T_('Open Graph'), T_('Include open graph tags like og:image and og:type.') );
+
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('"By date" archives').get_manual_link('archive_pages_seo') );
@@ -150,8 +153,8 @@ $Form->begin_fieldset( T_('"By date" archives').get_manual_link('archive_pages_s
 	$Form->radio( 'archive_content', $edited_Blog->get_setting('archive_content'),
 		array(
 				array( 'excerpt', T_('Post excerpts') ),
-				array( 'normal', T_('Standard post contents (stopping at "&lt;!-- more -->")') ),
-				array( 'full', T_('Full post contents (including after "&lt;!-- more -->")') ),
+				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")') ),
+				array( 'full', T_('Full post contents (including after "[teaserbreak]")') ),
 			), T_('Post contents'), true );
 
 	$Form->text( 'archive_posts_per_page', $edited_Blog->get_setting('archive_posts_per_page'), 4, T_('Posts per page'),
@@ -199,8 +202,8 @@ $Form->begin_fieldset( T_('Category pages').get_manual_link('category_pages_seo'
 	$Form->radio( 'chapter_content', $edited_Blog->get_setting('chapter_content'),
 		array(
 				array( 'excerpt', T_('Post excerpts') ),
-				array( 'normal', T_('Standard post contents (stopping at "&lt;!-- more -->")') ),
-				array( 'full', T_('Full post contents (including after "&lt;!-- more -->")') ),
+				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")') ),
+				array( 'full', T_('Full post contents (including after "[teaserbreak]")') ),
 			), T_('Post contents'), true );
 
 	$Form->text( 'chapter_posts_per_page', $edited_Blog->get_setting('chapter_posts_per_page'), 4, T_('Posts per page'),
@@ -247,8 +250,8 @@ $Form->begin_fieldset( T_('Tag pages').get_manual_link('tag_pages_seo'), array('
 	$Form->radio( 'tag_content', $edited_Blog->get_setting('tag_content'),
 		array(
 				array( 'excerpt', T_('Post excerpts') ),
-				array( 'normal', T_('Standard post contents (stopping at "&lt;!-- more -->")') ),
-				array( 'full', T_('Full post contents (including after "&lt;!-- more -->")') ),
+				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")') ),
+				array( 'full', T_('Full post contents (including after "[teaserbreak]")') ),
 			), T_('Post contents'), true );
 
 	$Form->text( 'tag_posts_per_page', $edited_Blog->get_setting('tag_posts_per_page'), 4, T_('Posts per page'),
@@ -299,8 +302,8 @@ $Form->begin_fieldset( T_('Other filtered pages').get_manual_link('other_filtere
 	$Form->radio( 'filtered_content', $edited_Blog->get_setting('filtered_content'),
 		array(
 				array( 'excerpt', T_('Post excerpts') ),
-				array( 'normal', T_('Standard post contents (stopping at "&lt;!-- more -->")') ),
-				array( 'full', T_('Full post contents (including after "&lt;!-- more -->")') ),
+				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")') ),
+				array( 'full', T_('Full post contents (including after "[teaserbreak]")') ),
 			), T_('Post contents'), true );
 $Form->end_fieldset();
 
@@ -328,6 +331,11 @@ $Form->begin_fieldset( T_('Other pages').get_manual_link('other_pages_seo') );
 			array( 'slug', T_('Use extra-path').': '.'/help', T_('E-g: ')
 				.url_add_tail( $blogurl, '<strong>/help</strong>' ) ),
 			), T_('Help page'), true );
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Download display').get_manual_link( 'download-display-seo' ) );
+	$Form->checkbox( 'download_noindex', $edited_Blog->get_setting( 'download_noindex' ), T_('Indexing'), T_('META NOINDEX') );
+	$Form->checkbox( 'download_nofollowto', $edited_Blog->get_setting( 'download_nofollowto' ), T_('No Follow TO'), T_('NOFOLLOW on links leading to download pages') );
 $Form->end_fieldset();
 
 

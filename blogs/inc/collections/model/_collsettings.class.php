@@ -46,6 +46,7 @@ class CollectionSettings extends AbstractSettings
 	 */
 	var $_defaults = array(
 		// Home page settings:
+			'front_disp'             => 'posts',
 			'what_to_show'           => 'posts',        // posts, days
 			'main_content'           => 'normal',
 			'posts_per_page'         => '5',
@@ -72,6 +73,7 @@ class CollectionSettings extends AbstractSettings
 			'show_location_coordinates' => 0,
 			'tags_meta_keywords' => 1,
 			'slug_limit' => 5,
+			'tags_open_graph' => 1,
 
 		// Comment settings:
 			// 'new_feedback_status' => 'review',		// Default status for new anonymous comments: 'published', 'community', 'protected', 'private', 'review', 'draft' or 'deprecated'. We don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
@@ -197,6 +199,11 @@ class CollectionSettings extends AbstractSettings
 			'location_region'    => 'hidden', // Editing mode of region for item:    "optional" | "required" | "hidden"
 			'location_subregion' => 'hidden', // Editing mode of subregion for item: "optional" | "required" | "hidden"
 			'location_city'      => 'hidden', // Editing mode of city for item:      "optional" | "required" | "hidden"
+		
+		// Download settings:
+			'download_delay' => 5,
+			'download_noindex' => 1,
+			'download_nofollowto' => 1,
 		);
 
 	/**

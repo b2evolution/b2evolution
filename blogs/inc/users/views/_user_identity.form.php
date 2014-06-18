@@ -91,17 +91,7 @@ else
 
 // ------------------- PREV/NEXT USER LINKS -------------------
 user_prevnext_links( array(
-		'block_start'  => '<table class="prevnext_user"><tr>',
-		'prev_start'   => '<td width="33%">',
-		'prev_end'     => '</td>',
-		'prev_no_user' => '<td width="33%">&nbsp;</td>',
-		'back_start'   => '<td width="33%" class="back_users_list">',
-		'back_end'     => '</td>',
-		'next_start'   => '<td width="33%" class="right">',
-		'next_end'     => '</td>',
-		'next_no_user' => '<td width="33%">&nbsp;</td>',
-		'block_end'    => '</tr></table>',
-		'user_tab'     => 'profile'
+		'user_tab' => 'profile'
 	) );
 // ------------- END OF PREV/NEXT USER LINKS -------------------
 
@@ -508,6 +498,7 @@ $Form->end_form();
 	{
 		return result.replace( '#fieldstart#', '<?php echo format_to_js( str_ireplace( '$id$', '', $Form->fieldstart ) ); ?>' )
 			.replace( '#fieldend#', '<?php echo format_to_js( $Form->fieldend ); ?>' )
+			.replace( '#labelclass#', '<?php echo format_to_js( $Form->labelclass ); ?>' )
 			.replace( '#labelstart#', '<?php echo format_to_js( $Form->labelstart ); ?>' )
 			.replace( '#labelend#', '<?php echo format_to_js( $Form->labelend ); ?>' )
 			.replace( '#inputstart#', '<?php echo format_to_js( $Form->inputstart ); ?>' )
@@ -530,10 +521,15 @@ $Form->end_form();
 		}
 
 		var this_obj = jQuery( this );
+		var params = '<?php
+			global $use_glyphicons;
+			echo empty( $use_glyphicons ) ? '' : '&use_glyphicons=1';
+		?>';
+
 		jQuery.ajax({
 		type: 'POST',
 		url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
-		data: 'action=get_user_new_field&user_id=<?php echo $edited_User->ID; ?>&field_id=' + field_id,
+		data: 'action=get_user_new_field&user_id=<?php echo $edited_User->ID; ?>&field_id=' + field_id + params,
 		success: function(result)
 			{
 				result = ajax_debug_clear( result );
@@ -617,11 +613,15 @@ $Form->end_form();
 	{	// Click event for button 'Add(+)'
 		var this_obj = jQuery( this );
 		var field_id = this_obj.attr( 'rel' ).replace( /^add_ufdf_(\d+)$/, '$1' );
+		var params = '<?php
+			global $use_glyphicons;
+			echo empty( $use_glyphicons ) ? '' : '&use_glyphicons=1';
+		?>';
 
 		jQuery.ajax({
 		type: 'POST',
 		url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
-		data: 'action=get_user_new_field&user_id=<?php echo $edited_User->ID; ?>&field_id=' + field_id,
+		data: 'action=get_user_new_field&user_id=<?php echo $edited_User->ID; ?>&field_id=' + field_id + params,
 		success: function( result )
 			{
 				result = ajax_debug_clear( result );
@@ -644,7 +644,7 @@ $Form->end_form();
 					// Print out new field on the form
 					cur_fieldset_obj.after( result.replace( /^\[\d+\](.*)/, '$1' ) )
 					// Show a button 'Add(+)' with new field
-													.next().find( 'span.icon' ).show();
+													.next().find( 'span[class*=icon]' ).show();
 
 					var new_field = cur_fieldset_obj.next().find( 'input[id^=uf_add_]' );
 					if( new_field.attr( 'autocomplete' ) == 'on' )
@@ -695,5 +695,4 @@ bind_autocomplete( jQuery( 'input[id^=uf_][autocomplete=on]' ) );
 <?php
 // Location
 echo_regional_js( 'edited_user', user_region_visible() );
-
 ?>

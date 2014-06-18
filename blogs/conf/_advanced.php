@@ -607,15 +607,6 @@ $upgrade_subdir = '_upgrade/';              // Subdirectory relative to base
 $upgrade_path = $basepath.$upgrade_subdir;  // You should not need to change this
 
 
-// Define default avatar image URL
-// fp> TODO: do not use a setting for this.
-// fp> put the file into the shared files directory with the other sample "admin" avatars. That way it is very easy to replace with another default.
-// fp> PS: I like the ? image ;)
-$default_avatar_unknown = $media_url.'shared/global/avatars/default_avatar_unknown.jpg';
-$default_avatar_men = $media_url.'shared/global/avatars/default_avatar_men.jpg';
-$default_avatar_women = $media_url.'shared/global/avatars/default_avatar_women.jpg';
-
-
 /**
  * Do you want to allow public access to the media dir?
  *
@@ -806,6 +797,41 @@ $allow_redirects_to_different_domain = 'only_redirected_posts';
  */
 $sendmail_additional_params = '-r $return-address$';
 
+
+/**
+ * Which CDN do you want to use for loading common libraries?
+ *
+ * If you don't want to use a CDN and want to use the local version, comment out the line.
+ * Each line starts with the js or css alias.
+ * The first string is the production (minified URL), the second is the development URL (optional).
+ */
+$library_cdn_urls = array(
+		'#jquery#' => array( '//code.jquery.com/jquery-1.7.1.min.js', '//code.jquery.com/jquery-1.7.1.js' ),
+		'#jqueryUI#' => array( '//code.jquery.com/ui/1.8.18/jquery-ui.min.js', '//code.jquery.com/ui/1.8.18/jquery-ui.js' ),
+		'#bootstrap#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js', '//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.js' ),
+		'#bootstrap_css#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css', '//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.css' ),
+		'#bootstrap_theme_css#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css', '//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.css' ),
+		//'#bootstrap_typeahead#' => array( '//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.10.1/typeahead.bundle.min.js', '//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.10.1/typeahead.bundle.js' ),
+		//'#scrollto#' => array( '//cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/1.4.2/jquery.scrollTo.min.js' ),
+		//'#touchswipe#' => array( '//cdn.jsdelivr.net/jquery.touchswipe/1.6.5/jquery.touchSwipe.min.js', '//cdn.jsdelivr.net/jquery.touchswipe/1.6.5/jquery.touchSwipe.js' ),
+	);
+
+/**
+ * The aliases for all local JS and CSS files that are used when CDN url is not defined in $library_cdn_urls
+ *
+ * Each line starts with the js or css alias.
+ * The first string is the production (minified URL), the second is the development URL (optional).
+ */
+$library_local_urls = array(
+		'#jquery#' => array( 'jquery.min.js', 'jquery.js' ),
+		'#jqueryUI#' => array( 'jquery/jquery.ui.all.min.js', 'jquery/jquery.ui.all.js' ),
+		'#bootstrap#' => array( 'bootstrap/bootstrap.min.js', 'bootstrap/bootstrap.js' ),
+		'#bootstrap_css#' => array( 'bootstrap/bootstrap.min.css', 'bootstrap/bootstrap.css' ),
+		'#bootstrap_theme_css#' => array( 'bootstrap/bootstrap-theme.min.css', 'bootstrap/bootstrap-theme.css' ),
+		'#bootstrap_typeahead#' => array( 'bootstrap/typeahead.bundle.min.js', 'bootstrap/typeahead.bundle.js' ),
+		'#scrollto#' => array( 'jquery/jquery.scrollto.js' ),
+		'#touchswipe#' => array( 'jquery/jquery.touchswipe.min.js', 'jquery/jquery.touchswipe.js' ),
+	);
 
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
 $evonetsrv_host = 'rpc.b2evo.net';

@@ -295,6 +295,15 @@ switch( $action )
 
 			if( $moderation != NULL )
 			{
+				if( param( 'is_backoffice', 'integer', 0 ) )
+				{ // Set admin skin, used for buttons, @see button_class()
+					global $current_User, $UserSettings, $is_admin_page, $adminskins_path;
+					$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+					$is_admin_page = true;
+					require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+					$AdminUI = new AdminUI();
+				}
+
 				$statuses = param( 'statuses', 'string', NULL );
 				$item_ID = param( 'itemid', 'integer' );
 				$currentpage = param( 'currentpage', 'integer', 1 );
@@ -367,6 +376,15 @@ switch( $action )
 		$item_ID = param( 'itemid', 'integer' );
 		$currentpage = param( 'currentpage', 'integer', 1 );
 		$limit = param( 'limit', 'integer', 0 );
+
+		if( param( 'is_backoffice', 'integer', 0 ) )
+		{ // Set admin skin, used for buttons, @see button_class()
+			global $current_User, $UserSettings, $is_admin_page, $adminskins_path;
+			$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+			$is_admin_page = true;
+			require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+			$AdminUI = new AdminUI();
+		}
 
 		foreach( $commentIds as $commentID )
 		{

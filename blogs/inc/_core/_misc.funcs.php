@@ -765,7 +765,7 @@ function evo_substr( $string, $start = 0, $length = '#' )
  * @param boolean turn on/off double encode
  * @return string the converted string
  */
-function evo_htmlspecialchars( $string, $quote_style = NULL, $charset = NULL, $double_encode = NULL )
+function evo_htmlspecialchars( $string, $quote_style = ENT_COMPAT, $charset = NULL, $double_encode = true )
 {
 	global $evo_charset;
 
@@ -787,7 +787,7 @@ function evo_htmlspecialchars( $string, $quote_style = NULL, $charset = NULL, $d
  * @param boolean turn on/off double encode
  * @return string the converted string
  */
-function evo_htmlentities( $string, $quote_style = NULL, $charset = NULL, $double_encode = NULL )
+function evo_htmlentities( $string, $quote_style = ENT_COMPAT, $charset = NULL, $double_encode = true )
 {
 	global $evo_charset;
 
@@ -808,7 +808,7 @@ function evo_htmlentities( $string, $quote_style = NULL, $charset = NULL, $doubl
  * @param string defines character set used in conversion.
  * @return string the converted string
  */
-function evo_html_entity_decode( $string, $quote_style = NULL, $charset = NULL )
+function evo_html_entity_decode( $string, $quote_style = ENT_COMPAT, $charset = NULL )
 {
 	global $evo_charset;
 
@@ -913,11 +913,19 @@ function replace_content_outcode( $search, $replace, $content, $replace_function
  * @param string Source content
  * @param array|string Search list
  * @param array|string Replace list
+ * @param string Type of function: 'preg' -> preg_replace(), 'str' -> str_replace()
  * @return string Replaced content
  */
-function replace_content( $content, $search, $replace )
+function replace_content( $content, $search, $replace, $type = 'preg' )
 {
-	return preg_replace( $search, $replace, $content );
+	if( $type == 'str' )
+	{
+		return str_replace( $search, $replace, $content );
+	}
+	else
+	{
+		return preg_replace( $search, $replace, $content );
+	}
 }
 
 
@@ -932,6 +940,87 @@ function replace_content( $content, $search, $replace )
 function replace_content_callback( $content, $search, $replace_callback )
 {
 	return preg_replace_callback( $search, $replace_callback, $content );
+}
+
+
+/**
+ * Split a content by separators outside <code> and <pre> blocks
+ *
+ * @param string|array Separators
+ * @param string Content
+ * @param boolean TRUE - parenthesized expression of separator will be captured and returned as well
+ * @return array The result of explode() function
+ */
+function split_outcode( $separators, $content, $capture_separator = false )
+{
+	// Check if the separators exists in content
+	if( ! is_array( $separators ) )
+	{ // Convert string to array with one element
+		$separators = array( $separators );
+	}
+	$separators_exists = false;
+	if( is_array( $separators ) )
+	{ // Find in array
+		foreach( $separators as $separator )
+		{
+			if( strpos( $content, $separator ) !== false )
+			{ // Separator is found
+				$separators_exists = true;
+				break;
+			}
+		}
+	}
+
+	if( $separators_exists )
+	{ // There are separators in content, Split the content:
+
+		// Initialize temp values for replace the separators
+		if( $capture_separator )
+		{
+			$rplc_separators = array();
+			foreach( $separators as $s => $separator )
+			{
+				$rplc_separators[] = '#separator'.$s.'='.md5( rand() ).'#';
+			}
+		}
+		else
+		{
+			$rplc_separators = '#separator='.md5( rand() ).'#';
+		}
+		// Replace the content separators with temp value
+		if( strpos( $content, '<code' ) !== false || strpos( $content, '<pre' ) !== false )
+		{ // Call replace_separators_callback() on everything outside code/pre:
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				'replace_content', array( $separators, $rplc_separators, 'str' ) );
+		}
+		else
+		{ // No code/pre blocks, replace on the whole thing
+			$content = str_replace( $separators, $rplc_separators, $content );
+		}
+
+		if( $capture_separator )
+		{ // Save the separators
+			$split_regexp = '~('.implode( '|', $rplc_separators ).')~s';
+			$content_parts = preg_split( $split_regexp, $content, -1, PREG_SPLIT_DELIM_CAPTURE );
+			foreach( $content_parts as $c => $content_part )
+			{
+				if( ( $s = array_search( $content_part, $rplc_separators ) ) !== false )
+				{ // Replace original separator back
+					$content_parts[ $c ] = $separators[ $s ];
+				}
+			}
+			return $content_parts;
+		}
+		else
+		{ // Return only splitted content(without separators)
+			return explode( $rplc_separators, $content );
+		}
+	}
+	else
+	{ // No separators in content, Return whole content as one element of array
+		return array( $content );
+	}
 }
 
 
@@ -2775,10 +2864,10 @@ function debug_info( $force = false, $force_clean = false )
 				}
 				else
 				{ // View from browser
-					echo '<div class="debug_error">'
-							.'<h2>'.$debug_off_title.'</h2>'
+					echo '<div style="margin:1em auto;padding:10px;background:#FEFFFF;border:2px solid #F00;border-radius:6px;text-align:center;">'
+							.'<h2 style="margin:0;color:#F00;">'.$debug_off_title.'</h2>'
 							.'<p>'.$debug_off_msg1.'</p>'
-							.'<p>'.$debug_off_msg2.'</p>'
+							.'<p style="margin-bottom:0">'.$debug_off_msg2.'</p>'
 						.'</div>';
 				}
 			}
@@ -3939,7 +4028,13 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 	{
 		case 'rollover':
 			if( isset( $icon['rollover'] ) )
-			{	// Image has rollover available
+			{ // Image has rollover available
+				global $use_glyphicons;
+
+				if( ! empty( $use_glyphicons ) && ! empty( $icon['glyph'] ) )
+				{ // Glyph icons don't have rollover effect
+					return false;
+				}
 				return $icon['rollover'];
 			}
 			return false;
@@ -4044,7 +4139,43 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 
 
 		case 'imgtag':
-			if( ! isset( $icon['file'] ) )
+			global $use_glyphicons;
+
+			if( ! empty( $use_glyphicons ) && ! empty( $icon['glyph'] ) )
+			{ // Use glyph icon if it is defined in icons config
+				if( isset( $params['class'] ) )
+				{ // Get class from params
+					$params['class'] = 'glyphicon glyphicon-'.$icon['glyph'].' '.$params['class'];
+				}
+				else
+				{ // Set default class
+					$params['class'] = 'glyphicon glyphicon-'.$icon['glyph'];
+				}
+
+				if( isset( $icon['color'] ) )
+				{ // Set a color for icon
+					$params['style'] = 'color:'.$icon['color'];
+				}
+
+				if( ! isset( $params['title'] ) )
+				{ // Use 'alt' for 'title'
+					if( isset( $params['alt'] ) )
+					{
+						$params['title'] = $params['alt'];
+						unset( $params['alt'] );
+					}
+					else if( ! isset( $params['alt'] ) && isset( $icon['alt'] ) )
+					{
+						$params['title'] = $icon['alt'];
+					}
+				}
+
+				// Add all the attributes:
+				$params = get_field_attribs_as_string( $params, false );
+
+				$r = '<span'.$params.'>&nbsp;</span>';
+			}
+			elseif( ! isset( $icon['file'] ) )
 			{ // Use span tag with sprite instead of img
 				$styles = array();
 
@@ -4238,42 +4369,94 @@ function form_date( $date, $time = '' )
  * in this order. '' is used when no IP could be found.
  *
  * @param boolean True, to get only the first IP (probably REMOTE_ADDR)
+ * @param boolean True, to convert IPv6 to IPv4 format
  * @return array|string Depends on first param.
  */
-function get_ip_list( $firstOnly = false )
+function get_ip_list( $firstOnly = false, $convert_to_ipv4 = false )
 {
 	$r = array();
 
-	if( !empty( $_SERVER['REMOTE_ADDR'] ) )
+	if( ! empty( $_SERVER['REMOTE_ADDR'] ) )
 	{
 		foreach( explode( ',', $_SERVER['REMOTE_ADDR'] ) as $l_ip )
 		{
-			$l_ip = trim($l_ip);
-			if( !empty($l_ip) )
+			$l_ip = trim( $l_ip );
+			if( ! empty( $l_ip ) )
 			{
+				if( $convert_to_ipv4 )
+				{ // Convert IP address to IPv4 format(if it is in IPv6 format)
+					$l_ip = int2ip( ip2int( $l_ip ) );
+				}
 				$r[] = $l_ip;
 			}
 		}
 	}
 
-	if( !empty($_SERVER['HTTP_X_FORWARDED_FOR']) )
+	if( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) )
 	{ // IP(s) behind Proxy - this can be easily forged!
 		foreach( explode( ',', $_SERVER['HTTP_X_FORWARDED_FOR'] ) as $l_ip )
 		{
-			$l_ip = trim($l_ip);
-			if( !empty($l_ip) && $l_ip != 'unknown' )
+			$l_ip = trim( $l_ip );
+			if( ! empty( $l_ip ) && $l_ip != 'unknown' )
 			{
+				if( $convert_to_ipv4 )
+				{ // Convert IP address to IPv4 format(if it is in IPv6 format)
+					$l_ip = int2ip( ip2int( $l_ip ) );
+				}
 				$r[] = $l_ip;
 			}
 		}
 	}
 
-	if( !isset( $r[0] ) )
+	if( ! isset( $r[0] ) )
 	{ // No IP found.
 		$r[] = '';
 	}
 
+	// Remove the duplicates
+	$r = array_unique( $r );
+
 	return $firstOnly ? $r[0] : $r;
+}
+
+
+/**
+ * Get list of IP addresses with link to back-office page if User has an access
+ *
+ * @param object|NULL User
+ * @param array|NULL List of IP addresses
+ * @param string Text of link, Use '#' to display IP address
+ * @return array List of IP addresses
+ */
+function get_linked_ip_list( $ip_list = NULL, $User = NULL, $link_text = '#' )
+{
+	if( $User === NULL )
+	{ // Get current User by default
+		global $current_User;
+		$User = & $current_User;
+	}
+
+	if( $ip_list === NULL )
+	{ // Get IP addresses by function get_ip_list()
+		$ip_list = get_ip_list( false, true );
+	}
+
+	if( ! empty( $User ) &&
+	    $User->check_perm( 'admin', 'restricted' ) &&
+	    $User->check_perm( 'spamblacklist', 'view' ) )
+	{ // User has an access to backoffice, Display a link for each IP address
+		global $admin_url;
+		foreach( $ip_list as $i => $ip_address )
+		{
+			if( $link_text == '#' )
+			{ // Use IP address aslink text
+				$link_text = $ip_address;
+			}
+			$ip_list[ $i ] = '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;ip_address='.$ip_address.'">'.$link_text.'</a>';
+		}
+	}
+
+	return $ip_list;
 }
 
 
@@ -4588,6 +4771,19 @@ function is_admin_page()
 	global $is_admin_page;
 
 	return isset($is_admin_page) && $is_admin_page === true; // check for type also, because of register_globals!
+}
+
+
+/**
+ * Is the current page a default 'Front' page of a blog?
+ *
+ * @return boolean
+ */
+function is_front_page()
+{
+	global $is_front;
+
+	return isset($is_front) && $is_front === true;
 }
 
 
@@ -5434,10 +5630,16 @@ function get_samedomain_htsrv_url( $secure = false )
 	$htsrv_domain = $hsrv_url_parts['host'];
 	$samedomain_htsrv_url = substr_replace( $req_htsrv_url, $req_domain, strpos( $req_htsrv_url, $htsrv_domain ), strlen( $htsrv_domain ) );
 
+	// fp> The following check would apply well if we always had 301 redirects.
+	// But it's possible to turn them off in SEO settings for some page and not others (we don't know which here)
+  // And some kinds of pages do not have 301 redirections implemented yet, e-g: disp=users
+  /*
 	if( ( !is_admin_page() ) && ( !empty( $Blog ) ) && ( $samedomain_htsrv_url != $Blog->get_local_htsrv_url() ) )
 	{
 		debug_die( 'Inconsistent state!' );
 	}
+	*/
+
 	return $samedomain_htsrv_url;
 }
 
@@ -6139,6 +6341,154 @@ function evo_setcookie( $name, $value = '', $expire = 0, $path = '', $domain = '
 	{ // PHP < 5.2 doesn't support HTTP-only
 		return setcookie( $name, $value, $expire, $path, $domain, $secure );
 	}
+}
+
+
+/**
+ * Get a button class name depending on template
+ *
+ * @param string Type: 'button', 'button_text', 'button_group'
+ * @param string TRUE - to get class value for jQuery selector
+ * @return string Class name
+ */
+function button_class( $type = 'button', $jQuery_selector = false )
+{
+	// Default class names
+	$classes = array(
+			'button'       => 'roundbutton', // Simple button with icon
+			'button_red'   => 'roundbutton_red', // Button with red background
+			'button_green' => 'roundbutton_green', // Button with green background
+			'text'         => 'roundbutton_text', // Button with text
+			'group'        => 'roundbutton_group', // Group of the buttons
+		);
+
+	if( is_admin_page() )
+	{ // Some admin skins may have special class names
+		global $AdminUI;
+		if( ! empty( $AdminUI ) )
+		{
+			$template_classes = $AdminUI->get_template( 'button_classes' );
+		}
+	}
+	else
+	{ // Some front end skins may have special class names
+		global $Skin;
+		if( ! empty( $Skin ) )
+		{
+			$template_classes = $Skin->get_template( 'button_classes' );
+		}
+	}
+	if( !empty( $template_classes ) )
+	{ // Get class names from admin template
+		$classes = array_merge( $classes, $template_classes );
+	}
+
+	$class_name = isset( $classes[ $type ] ) ? $classes[ $type ] : '';
+
+	if( $jQuery_selector && ! empty( $class_name ) )
+	{ // Convert class name to jQuery selector
+		$class_name = '.'.str_replace( ' ', '.', $class_name );
+	}
+
+	return $class_name;
+}
+
+
+/**
+ * Initialize JavaScript to build and open window
+ */
+function echo_modalwindow_js()
+{
+	global $modalwindow_js_initialized;
+
+	if( $modalwindow_js_initialized )
+	{ // Don't initialize these js-functions twice
+		return;
+	}
+
+	global $AdminUI;
+
+	if( isset( $AdminUI ) && $AdminUI->get_template( 'modal_window_js' ) !== false )
+	{ // Use the functions from admin skin
+		echo $AdminUI->get_template( 'modal_window_js' );
+		$modalwindow_js_initialized = true;
+		return;
+	}
+
+	echo <<< JS_CODE
+/*
+ * Build and open modal window
+ *
+ * @param string HTML content
+ * @param string Width value in css format
+ * @param boolean TRUE - to use transparent template
+ * @param string Title of modal window (Used in bootstrap)
+ * @param string|boolean Button to submit a form (Used in bootstrap), FALSE - to hide bottom panel with buttons
+ */
+function openModalWindow( body_html, width, height, transparent, title, button )
+{
+	var overlay_class = 'overlay_page_active';
+	if( typeof transparent != 'undefined' && transparent == true )
+	{
+		overlay_class = 'overlay_page_active_transparent';
+	}
+
+	if( typeof width == 'undefined' )
+	{
+		width = '560px';
+	}
+	var style_height = '';
+	if( typeof height != 'undefined' && ( height > 0 || height != '' ) )
+	{
+		style_height = ';height:' + height;
+	}
+	if( jQuery( '#overlay_page' ).length > 0 )
+	{ // placeholder already exist
+		jQuery( '#overlay_page' ).html( body_html );
+		return;
+	}
+	// add placeholder for form:
+	jQuery( 'body' ).append( '<div id="screen_mask" onclick="closeModalWindow()"></div><div id="overlay_page" style="width:' + width + style_height + '"></div>' );
+	var evobar_height = jQuery( '#evo_toolbar' ).height();
+	jQuery( '#screen_mask' ).css({ top: evobar_height });
+	jQuery( '#screen_mask' ).fadeTo(1,0.5).fadeIn(200);
+	jQuery( '#overlay_page' ).html( body_html ).addClass( overlay_class );
+	jQuery( document ).on( 'click', '#close_button', function()
+		{
+			closeModalWindow();
+			return false;
+		} );
+}
+
+/**
+ * Close modal window
+ */
+function closeModalWindow( document_obj )
+{
+	if( typeof( document_obj ) == 'undefined' )
+	{
+		document_obj = window.document;
+	}
+
+	jQuery( '#overlay_page', document_obj ).hide();
+	jQuery( '.action_messages', document_obj).remove();
+	jQuery( '#server_messages', document_obj ).insertBefore( '.first_payload_block' );
+	jQuery( '#overlay_page', document_obj ).remove();
+	jQuery( '#screen_mask', document_obj ).remove();
+	return false;
+}
+
+// Close ajax popup if Escape key is pressed:
+jQuery(document).keyup(function(e)
+{
+	if( e.keyCode == 27 )
+	{
+		closeModalWindow();
+	}
+} );
+JS_CODE;
+
+	$modalwindow_js_initialized = true;
 }
 
 

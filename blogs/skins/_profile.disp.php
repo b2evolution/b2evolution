@@ -41,13 +41,31 @@ load_class( 'regional/model/_country.class.php', 'Country' );
 global $Blog, $Session, $Messages, $inc_path;
 global $action, $user_profile_only, $edited_User, $form_action;
 
-$form_action = get_secure_htsrv_url().'profile_update.php';
-
 if( ! is_logged_in() )
 { // must be logged in!
 	echo '<p class="error">'.T_( 'You are not logged in.' ).'</p>';
 	return;
 }
+
+$form_action = get_secure_htsrv_url().'profile_update.php';
+
+// set params
+if( !isset( $params ) )
+{
+	$params = array();
+}
+
+$params = array_merge( array(
+	'profile_tabs' => array(
+			'block_start'         => '<div class="tabs">',
+			'item_start'          => '<div class="option">',
+			'item_end'            => '</div>',
+			'item_selected_start' => '<div class="selected">',
+			'item_selected_end'   => '</div>',
+			'block_end'           => '</div><div class="clear"></div>',
+		),
+	), $params );
+
 
 $user_profile_only = true;
 // check if there is unsaved User object stored in Session
@@ -66,23 +84,29 @@ else
 }
 
 // Display tabs
-echo '<div class="tabs">';
+echo $params['profile_tabs']['block_start'];
 $entries = get_user_sub_entries( false, NULL );
 foreach( $entries as $entry => $entry_data )
 {
 	if( $entry == $disp )
 	{
-		echo '<div class="selected">';
+		echo $params['profile_tabs']['item_selected_start'];
 	}
 	else
 	{
-		echo '<div class="option">';
+		echo $params['profile_tabs']['item_start'];
 	}
 	echo '<a href='.$entry_data['href'].'>'.$entry_data['text'].'</a>';
-	echo '</div>';
+	if( $entry == $disp )
+	{
+		echo $params['profile_tabs']['item_selected_end'];
+	}
+	else
+	{
+		echo $params['profile_tabs']['item_end'];
+	}
 }
-echo '</div>';
-echo '<div class="clear"></div>';
+echo $params['profile_tabs']['block_end'];
 
 // Display form
 switch( $disp )

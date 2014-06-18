@@ -134,6 +134,8 @@ class coll_xml_feeds_Widget extends ComponentWidget
 
 		$this->disp_title( $this->get_title() );
 
+		echo $this->disp_params['block_body_start'];
+
 		echo $this->disp_params['list_start'];
 
 		$SkinCache = & get_SkinCache();
@@ -185,6 +187,8 @@ class coll_xml_feeds_Widget extends ComponentWidget
 			}
 			display_list( $feedhlp, $this->disp_params['notes_start'], $this->disp_params['notes_end'], ' ', '', '', NULL, 1, $link_params );
 		}
+
+		echo $this->disp_params['block_body_end'];
 
 		echo $this->disp_params['block_end'];
 

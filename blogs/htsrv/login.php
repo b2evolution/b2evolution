@@ -71,7 +71,7 @@ switch( $action )
 		global $Session, $Messages, $UserSettings;
 		$Session->assert_received_crumb( 'closeaccountform' );
 
-		$reasons = trim( $Settings->get( 'user_closing_reasons' ) );
+		$reasons = trim( $Settings->get( 'account_close_reasons' ) );
 		param( 'account_close_type', 'string', '' );
 		if( ! empty( $reasons ) && empty( $account_close_type ) )
 		{ // Don't submit a form without a selected reason

@@ -56,7 +56,7 @@ if( is_admin_page() )
 
 if( $unread_messages_count > 0 && !$perm_abuse_management )
 {
-	$Results->title = $Results->title.' <span class="badge">'.$unread_messages_count.'</span></b>';
+	$Results->title = $Results->title.' <span class="badge badge-important">'.$unread_messages_count.'</span></b>';
 }
 
 /**

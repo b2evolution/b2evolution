@@ -57,14 +57,14 @@ class AdminUI extends AdminUI_general
 		require_css( 'admin.global.css', 'rsc_url' ); // Basic admin styles
 		require_css( 'skins_adm/chicago/rsc/css/chicago.css', true );
 
-		if ( $Hit->is_IE() )
-		{
+		if( $Hit->is_IE() ) // We can do this test because BackOffice is never page-cached
+		{ // CSS for IE
 			require_css( 'admin_global_ie.css', 'rsc_url' );
 		}
-		// CSS for IE9
-		add_headline( '<!--[if IE 9 ]>' );
-		require_css( 'ie9.css', 'rsc_url' );
-		add_headline( '<![endif]-->' );
+		if( $Hit->is_IE( 9 ) ) // We can do this test because BackOffice is never page-cached
+		{ // CSS for IE9
+			require_css( 'ie9.css', 'rsc_url' );
+		}
 
 		require_js( '#jquery#', 'rsc_url' );
 		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
@@ -147,12 +147,11 @@ class AdminUI extends AdminUI_general
 
 		$r = '<div class="footer">';
 
-		if( $Hit->is_winIE() )
-		{
-		 $r .= '<!--[if lt IE 7]>
-<div style="text-align:center; color:#f00; font-weight:bold;">'.
-			T_('WARNING: Internet Explorer 6 may not able to display this admin skin properly. We strongly recommend you upgrade to IE 7 or Firefox.').'</div>
-<![endif]-->';
+		if( $Hit->is_winIE() && $Hit->is_IE( 9, '<=' ) )  // We can do this test because BackOffice is never page-cached
+		{ // Warning for IE 9 and less
+			$r .= '<div style="text-align:center; color:#f00; font-weight:bold;">'
+				.T_('WARNING: Old versions of Internet Explorer may not able to display this admin skin properly. We strongly recommend you upgrade to IE 11, Firefox or Chrome.')
+				.'</div>';
 		}
 
 		$r .= '<a href="http://b2evolution.net/" class="footer_logo"><img src="'.$adminskins_url.'chicago/rsc/img/b2evolution-footer-logo-blue-bg.gif" alt="Powered by b2evolution" width="142" height="43" longdesc="http://b2evolution.net/" /></a>';
@@ -326,6 +325,7 @@ class AdminUI extends AdminUI_general
 					'buttonsend' => "</div></fieldset>\n\n",
 					'customstart' => '<div class="custom_content">',
 					'customend' => "</div>\n",
+					'note_format' => ' <span class="notes">%s</span>',
 					'formend' => '</fieldset>'."\n",
 				);
 
@@ -354,6 +354,7 @@ class AdminUI extends AdminUI_general
 					'buttonsend' => "</div></fieldset>\n\n",
 					'customstart' => '<div class="custom_content">',
 					'customend' => "</div>\n",
+					'note_format' => ' <span class="notes">%s</span>',
 					'formend' => '',
 				);
 

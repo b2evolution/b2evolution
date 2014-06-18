@@ -61,6 +61,10 @@ if( ! $PageCache->check() )
 {	// Cache miss, we have to generate:
 	// --------------------- PAGE LEVEL CACHING SUPPORT ---------------------
 
+if( $disp == 'front' )
+{ // Force $disp to 'posts' for all blogs on this template
+	$disp = 'posts';
+}
 
 // This is the main template; it may be used to display very different things.
 // Do inits depending on current $disp:
@@ -104,7 +108,7 @@ require_js( 'ajax.js', 'rsc_url' );
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 	<!-- InstanceEndEditable -->
 </head>
-<body>
+<body<?php skin_body_attrs(); ?>>
 <!-- InstanceBeginEditable name="ToolBar" -->
 <?php
 	// ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
@@ -168,6 +172,8 @@ require_js( 'ajax.js', 'rsc_url' );
 	?>
 
 	<?php
+	if( $disp != 'front' )
+	{
 		// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
 		item_prevnext_links( array(
 				'block_start' => '<table class="prevnext_post"><tr>',
@@ -312,10 +318,11 @@ require_js( 'ajax.js', 'rsc_url' );
 		mainlist_page_links( array(
 				'block_start' => '<p class="center"><strong>',
 				'block_end' => '</strong></p>',
-   			'prev_text' => '&lt;&lt;',
-   			'next_text' => '&gt;&gt;',
+				'prev_text' => '&lt;&lt;',
+				'next_text' => '&gt;&gt;',
 			) );
 		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
+	}
 	?>
 
 

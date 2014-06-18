@@ -111,11 +111,15 @@ class coll_avatar_Widget extends ComponentWidget
 		// Display title if requested
 		$this->disp_title();
 
+		echo $this->disp_params['block_body_start'];
+
 		echo $owner_User->get_link( array(
 				'link_to'		   => 'userpage',  // TODO: make configurable $this->disp_params['link_to']
 				'link_text'    => 'avatar',
 				'thumb_size'	 => $this->disp_params['thumb_size'],
 			) );
+
+		echo $this->disp_params['block_body_end'];
 
 		echo $this->disp_params['block_end'];
 

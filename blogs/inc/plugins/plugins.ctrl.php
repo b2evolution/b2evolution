@@ -841,7 +841,7 @@ $AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system',
 		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
 $AdminUI->breadcrumbpath_add( T_('Plugin configuration'), '?ctrl=plugins' );
 
-init_plugins_js();
+init_plugins_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

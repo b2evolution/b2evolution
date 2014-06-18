@@ -17,9 +17,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $params = array_merge( array(
 		'display_column_forum' => false,
 		'post_navigation' => 'same_category', // In this skin, it makes no sense to navigate in any different mode than "same category"
+		'item_link_type'  => '#',
 	), $params );
 
-global $Item;
+global $Item, $cat;
 
 /**
  * @var array Save all statuses that used on this page in order to show them in the footer legend
@@ -74,14 +75,23 @@ elseif( $comments_number > 25 )
 			<?php } ?>
 			<td class="left"><?php
 				echo $status_title;
+				// Title:
 				$Item->title( array(
 						'link_class'      => 'topictitle',
 						'post_navigation' => $params['post_navigation'],
+						'link_type'       => $params['item_link_type'],
 					) );
 				if( $Skin->enabled_status_banner( $Item->status ) )
-				{
+				{ // Status:
 					$Item->status( array( 'format' => 'styled' ) );
 					$legend_statuses[] = $Item->status;
+				}
+				if( empty( $cat ) )
+				{ // Excerpt:
+					$Item->excerpt( array(
+						'before' => '<div class="small">',
+						'after'  => '</div>',
+						) );
 				}
 			?></td>
 			<td class="row2 font10"><?php

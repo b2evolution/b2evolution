@@ -71,6 +71,12 @@ $Form->begin_form( 'inskin', '', $display_params );
 	$Form->hidden( 'redirect_to', url_add_tail( $comment_Item->get_permanent_url(), '#c'.$edited_Comment->ID ) );
 
 	$Form->info( T_('In response to'), $comment_Item->get_title() );
+
+	if( $Blog->get_setting( 'threaded_comments' ) )
+	{ // Display a reply comment ID only when this feature is enabled in blog settings
+		$Form->text_input( 'in_reply_to_cmt_ID', $edited_Comment->in_reply_to_cmt_ID, 10, T_('In reply to comment ID'), T_('(leave blank for normal comments)') );
+	}
+
 	if( $edited_Comment->get_author_User() )
 	{
 		$Form->info( T_('Author'), $edited_Comment->get_author() );

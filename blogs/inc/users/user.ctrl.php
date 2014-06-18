@@ -755,7 +755,7 @@ if( $display_mode != 'js')
 		case 'profile':
 			$AdminUI->breadcrumbpath_add( T_('Profile'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 			require_css( $rsc_url.'css/jquery/smoothness/jquery-ui.css' );
-			init_userfields_js();
+			init_userfields_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
 			break;
 		case 'avatar':
 			if( isset($GLOBALS['files_Module']) )

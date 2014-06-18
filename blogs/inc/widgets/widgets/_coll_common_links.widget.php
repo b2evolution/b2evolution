@@ -92,10 +92,16 @@ class coll_common_links_Widget extends ComponentWidget
 					'size' => 40,
 					'defaultvalue' => '',
 				),
+				'show_home' => array(
+					'type' => 'checkbox',
+					'label' => T_('Show "Home"'),
+					'note' => T_('Go to the blog\'s home.'),
+					'defaultvalue' => 1,
+				),
 				'show_recently' => array(
 					'type' => 'checkbox',
 					'label' => T_('Show "Recently"'),
-					'note' => T_('Go to the most recent posts / the blog\'s home.'),
+					'note' => T_('Go to the most recent posts (depends on default sort order).'),
 					'defaultvalue' => 1,
 				),
 				'show_search' => array(
@@ -179,12 +185,21 @@ class coll_common_links_Widget extends ComponentWidget
 		// Display title if requested
 		$this->disp_title();
 
+		echo $this->disp_params['block_body_start'];
+
 		echo $this->disp_params['list_start'];
+
+		if( $this->disp_params['show_home'] )
+		{
+			echo $this->disp_params['item_start'];
+			echo '<strong><a href="'.$Blog->get('url').'">'.T_('Home').'</a></strong>';
+			echo $this->disp_params['item_end'];
+		}
 
 		if( $this->disp_params['show_recently'] )
 		{
 			echo $this->disp_params['item_start'];
-			echo '<strong><a href="'.$Blog->get('url').'">'.T_('Recently').'</a></strong>';
+			echo '<strong><a href="'.$Blog->get('recentpostsurl').'">'.T_('Recently').'</a></strong>';
 			echo $this->disp_params['item_end'];
 		}
 
@@ -253,6 +268,9 @@ class coll_common_links_Widget extends ComponentWidget
 		}
 
 		echo $this->disp_params['list_end'];
+
+		echo $this->disp_params['block_body_end'];
+
 		echo $this->disp_params['block_end'];
 
 		return true;

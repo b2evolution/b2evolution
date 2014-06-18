@@ -44,13 +44,10 @@ global $current_User;
 global $Settings;
 
 global $rsc_subdir, $conf_subdir, $pagenow, $locales_path, $locales, $action, $edit_locale, $loc_transinfo, $template, $allow_po_extraction;
-global $localtimenow;
-
+global $localtimenow, $warning_message, $saved_params;
 
 if( $action == 'edit' )
 { // Edit a locale:
-	param( 'template', 'string', ($edit_locale == '_new_') ? T_('Create new locale') : T_('Edit locale'), 'createnew' );
-
 	$Form = new Form( NULL, 'loc_checkchanges', 'post', 'compact' );
 
 	$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,template' ) );
@@ -60,48 +57,79 @@ if( $action == 'edit' )
 	$Form->add_crumb( 'locales' );
 	$Form->hidden( 'ctrl', 'locales' );
 	$Form->hidden( 'loc_transinfo', $loc_transinfo );
-	$Form->hidden( 'action', ($edit_locale == '_new_') ? 'createlocale' : 'updatelocale' );
+	$Form->hidden( 'action', ( $edit_locale == '_new_' ) ? 'createlocale' : 'updatelocale' );
+	$Form->hidden( 'template', param( 'template', 'string', '' ) );
+	$Form->hidden( 'edit_locale', $edit_locale );
 
 	// read template
-
-	if( isset($locales[$template]) )
-	{
+	if( isset( $locales[ $template ] ) )
+	{ // An editing of existing locale
 		$ltemplate = $locales[ $template ];
 		$newlocale = $template;
 	}
-	elseif( $edit_locale != '_new_' && isset($locales[ $edit_locale ]) )
-	{
+	elseif( $edit_locale != '_new_' && isset( $locales[ $edit_locale ] ) )
+	{ // A creating of new locale that exists in $locales array
 		$ltemplate = $locales[ $edit_locale ];
 		$newlocale = $edit_locale;
 	}
 	else
-	{
-		$newlocale = '';
+	{ // New unknown locale
+		$newlocale = get_param( 'newloc_locale' );
+	}
+
+	if( isset( $ltemplate ) )
+	{ // Set properly values when errors exist after form was submitted
+		$newlocale = get_param( 'newloc_locale' ) != '' ? get_param( 'newloc_locale' ) : $newlocale;
+		foreach( $ltemplate as $lt_key => $lt_value )
+		{
+			if( get_param( 'newloc_'.$lt_key ) != '' )
+			{ // Display what user has entered on previous form instead of what saved in DB
+				$ltemplate[ $lt_key ] = get_param( 'newloc_'.$lt_key );
+			}
+		}
 	}
 
 	if( $edit_locale != '_new_' )
 	{ // we need to remember this for updating locale
 		$Form->hidden( 'oldloc_locale', $newlocale );
 	}
-	$Form->hidden( 'newloc_transliteration_map', (isset($ltemplate['transliteration_map']) ? base64_encode(serialize($ltemplate['transliteration_map'])) : '') );
+	$Form->hidden( 'newloc_transliteration_map', ( isset( $ltemplate['transliteration_map'] ) ? base64_encode( serialize( $ltemplate['transliteration_map'] ) ) : '' ) );
 
-	$Form->text( 'newloc_locale', $newlocale, 20, T_('Locale'), sprintf(T_('The first two letters should be a <a %s>ISO 639 language code</a>. The last two letters should be a <a %s>ISO 3166 country code</a>.'), 'href="http://www.gnu.org/software/gettext/manual/html_chapter/gettext_15.html#SEC221"', 'href="http://www.gnu.org/software/gettext/manual/html_chapter/gettext_16.html#SEC222"'), 20 );
-	$Form->checkbox( 'newloc_enabled', (isset($ltemplate['enabled']) && $ltemplate['enabled']), T_('Enabled'),	T_('Should this locale be available to users?') );
-	$Form->text( 'newloc_name', (isset($ltemplate['name']) ? $ltemplate['name'] : ''), 40, T_('Name'),
-		T_('name of the locale'), 40 );
-	$Form->text( 'newloc_charset', (isset($ltemplate['charset']) ? $ltemplate['charset'] : ''), 20, T_('Charset'), T_('Must match the lang file charset.'), 15 );
-	$Form->text( 'newloc_datefmt', (isset($ltemplate['datefmt']) ? $ltemplate['datefmt'] : ''), 20, T_('Date format'), T_('See below.'), 20 );
-	$Form->text( 'newloc_timefmt', (isset($ltemplate['timefmt']) ? $ltemplate['timefmt'] : ''), 20, T_('Time format'), T_('See below.'), 20 );
-	$Form->dayOfWeek( 'newloc_startofweek', (isset($ltemplate['startofweek']) ? $ltemplate['startofweek'] : 0), T_('Start of week'), T_('Day at the start of the week.') );
-	$Form->text( 'newloc_messages', (isset($ltemplate['messages']) ? $ltemplate['messages'] : ''), 20, T_('Lang file'),
-		T_('the lang file to use, from the <code>locales</code> subdirectory'), 20 );
-	$Form->text( 'newloc_priority', (isset($ltemplate['priority']) ? $ltemplate['priority'] : ''), 3, T_('Priority'),
-		T_('1 is highest. Priority is important when selecting a locale from a language code and several locales match the same language; this can happen when detecting browser language. Priority also affects the order in which locales are displayed in dropdown boxes, etc.'), 5 );
+	// Locale
+	$Form->text_input( 'newloc_locale', $newlocale, 20, T_('Locale'), sprintf( T_('The first two letters should be a <a %s>ISO 639 language code</a>. The last two letters should be a <a %s>ISO 3166 country code</a>.'),
+		'href="http://www.gnu.org/software/gettext/manual/html_chapter/gettext_15.html#Language-Codes"',
+		'href="http://www.gnu.org/software/gettext/manual/html_chapter/gettext_15.html#Country-Codes"' ),
+		array( 'required' => true ) );
+	// Enabled
+	$Form->checkbox( 'newloc_enabled', ( isset( $ltemplate['enabled'] ) && $ltemplate['enabled'] ? 1 : get_param( 'newloc_enabled' ) ),
+		T_('Enabled'), T_('Should this locale be available to users?') );
+	// Name
+	$Form->text_input( 'newloc_name', ( isset( $ltemplate['name'] ) ? $ltemplate['name'] : get_param( 'newloc_name' ) ), 40,
+		T_('Name'), T_('name of the locale') );
+	// Charset
+	$Form->text_input( 'newloc_charset', ( isset( $ltemplate['charset'] ) ? $ltemplate['charset'] : get_param( 'newloc_charset' ) ), 20,
+		T_('Charset'), T_('Must match the lang file charset.'), array( 'required' => true, 'maxlength' => 15 ) );
+	// Date format
+	$Form->text_input( 'newloc_datefmt', ( isset( $ltemplate['datefmt'] ) ? $ltemplate['datefmt'] : get_param( 'newloc_datefmt' ) ), 20,
+		T_('Date format'), T_('See below.'), array( 'required' => true ) );
+	// Time format
+	$Form->text_input( 'newloc_timefmt', ( isset( $ltemplate['timefmt'] ) ? $ltemplate['timefmt'] : get_param( 'newloc_timefmt' ) ), 20,
+		T_('Time format'), T_('See below.'), array( 'required' => true ) );
+	// Start of week
+	$Form->dayOfWeek( 'newloc_startofweek', ( isset( $ltemplate['startofweek'] ) ? $ltemplate['startofweek'] : get_param( 'newloc_startofweek' ) ),
+		T_('Start of week'), T_('Day at the start of the week.') );
+	// Lang file
+	$Form->text( 'newloc_messages', ( isset( $ltemplate['messages'] ) ? $ltemplate['messages'] : get_param( 'newloc_messages' ) ), 20,
+		T_('Lang file'), T_('the lang file to use, from the <code>locales</code> subdirectory') );
+	// Priority
+	$Form->text_input( 'newloc_priority', ( isset( $ltemplate['priority'] ) ? $ltemplate['priority'] : get_param( 'newloc_priority' ) ), 3,
+		T_('Priority'), T_('1 is highest. Priority is important when selecting a locale from a language code and several locales match the same language; this can happen when detecting browser language. Priority also affects the order in which locales are displayed in dropdown boxes, etc.'),
+		array( 'required' => true ) );
 
 	// TODO: Update this field onchange of datefmt/timefmt through AJAX:
 	// fp> It would actually make more sense to have the preview at the exact place that says "see below"
-	locale_temp_switch($newlocale);
-	$Form->info_field( T_('Date preview:'), date_i18n( locale_datefmt().' '.locale_timefmt(), $localtimenow ) );
+	locale_temp_switch( $newlocale );
+	$Form->info_field( T_('Date preview'), date_i18n( locale_datefmt().' '.locale_timefmt(), $localtimenow ) );
 	locale_restore_previous();
 
 	// generate Javascript array of locales to warn in case of overwriting
@@ -160,6 +188,29 @@ if( $action == 'edit' )
 	</div>
 <?php
 }
+elseif( $action == 'update' && ( ! empty( $warning_message ) ) )
+{
+	$Form = new Form( NULL, 'loc_confirm' );
+
+	$Form->begin_form( 'fform' );
+
+	$Form->add_crumb( 'locales' );
+	$Form->hidden( 'ctrl', 'locales' );
+	$Form->hidden( 'newdefault_locale', $Settings->get('default_locale') );
+	foreach( $saved_params as $key => $value )
+	{
+		$Form->hidden( $key, $value );
+	}
+
+	$Form->begin_fieldset( T_('Confirm update') );
+	$Form->custom_content( $warning_message );
+	$Form->end_fieldset();
+
+	$Form->end_form( array(
+		array( '', 'actionArray[confirm_update]', T_('Confirm') ),
+		array( '', 'actionArray[abort_update]', T_('Abort') )
+	) );
+}
 else
 { // show main form
 
@@ -209,7 +260,7 @@ else
 	}
 	echo '</p>';
 
-	echo '<table class="grouped" cellspacing="0">';
+	echo '<table class="grouped table table-striped table-bordered table-hover table-condensed" cellspacing="0">';
 
 	?>
 	<tr>
@@ -284,17 +335,17 @@ else
 					<input type="checkbox" name="loc_'.$i.'_enabled" value="1"'. ( $locales[$lkey]['enabled'] ? 'checked="checked"' : '' ).' />
 				</td>
 				<td>
-					<input type="text" name="loc_'.$i.'_name" value="'.format_to_output( $locales[$lkey]['name'], 'formvalue' ).'" maxlength="40" size="17" />
+					<input type="text" name="loc_'.$i.'_name" value="'.format_to_output( $locales[$lkey]['name'], 'formvalue' ).'" maxlength="40" size="17" class="form-control input-sm" />
 				</td>
 				<td>
-					<input type="text" name="loc_'.$i.'_datefmt" value="'.format_to_output( $locales[$lkey]['datefmt'], 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $datefmt_preview ), 'formvalue' ).'" />
+					<input type="text" name="loc_'.$i.'_datefmt" value="'.format_to_output( $locales[$lkey]['datefmt'], 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $datefmt_preview ), 'formvalue' ).'" class="form-control input-sm" />
 				</td>
 				<td>
-					<input type="text" name="loc_'.$i.'_timefmt" value="'.format_to_output( $locales[$lkey]['timefmt'], 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $timefmt_preview ), 'formvalue' ).'" />
+					<input type="text" name="loc_'.$i.'_timefmt" value="'.format_to_output( $locales[$lkey]['timefmt'], 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $timefmt_preview ), 'formvalue' ).'" class="form-control input-sm" />
 				</td>
 				<td>';
 			$Form->switch_layout( 'none' );
-			$Form->dayOfWeek( 'loc_'.$i.'_startofweek', $locales[$lkey]['startofweek'], '', '' );
+			$Form->dayOfWeek( 'loc_'.$i.'_startofweek', $locales[$lkey]['startofweek'], '', '', 'input-sm' );
 			$Form->switch_layout( NULL ); // Restore layout
 			echo '</td>';
 
@@ -395,7 +446,7 @@ else
 
 	if( $current_User->check_perm( 'options', 'edit' ) )
 	{
-		$Form->end_form( array( array( 'submit', '', T_('Save Changes!'), 'SaveButton' ) ) ) ;
+		$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) ) ;
 	}
 }
 

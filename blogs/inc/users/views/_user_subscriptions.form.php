@@ -88,17 +88,7 @@ else
 
 // ------------------- PREV/NEXT USER LINKS -------------------
 user_prevnext_links( array(
-		'block_start'  => '<table class="prevnext_user"><tr>',
-		'prev_start'   => '<td width="33%">',
-		'prev_end'     => '</td>',
-		'prev_no_user' => '<td width="33%">&nbsp;</td>',
-		'back_start'   => '<td width="33%" class="back_users_list">',
-		'back_end'     => '</td>',
-		'next_start'   => '<td width="33%" class="right">',
-		'next_end'     => '</td>',
-		'next_no_user' => '<td width="33%">&nbsp;</td>',
-		'block_end'    => '</tr></table>',
-		'user_tab'     => 'subs'
+		'user_tab' => 'subs'
 	) );
 // ------------- END OF PREV/NEXT USER LINKS -------------------
 
@@ -153,7 +143,7 @@ $has_messaging_perm = $edited_User->check_perm( 'perm_messaging', 'reply', false
 
 $Form->begin_fieldset( T_('Email') );
 
-	$email_fieldnote = '<a href="mailto:'.$edited_User->get('email').'" class="roundbutton">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
+	$email_fieldnote = '<a href="mailto:'.$edited_User->get('email').'" class="'.button_class().'">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
 
 	if( $action != 'view' )
 	{ // We can edit the values:

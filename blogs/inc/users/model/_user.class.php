@@ -1342,6 +1342,7 @@ class User extends DataObject
 		}
 
 		$link_login = '';
+		$class = empty( $params['link_class'] ) ? '' : $params['link_class'];
 		if( $params['link_text'] != 'only_avatar' )
 		{ // Display a login, nickname, firstname, lastname, fullname or preferredname
 			switch( $params['link_text'] )
@@ -1377,14 +1378,15 @@ class User extends DataObject
 			}
 		}
 
+		$class .= ' '.$this->get_gender_class().( $params['nowrap'] ? ' nowrap' : '' );
+
 		if( empty( $identity_url ) )
 		{
-			return '<span class="'.$this->get_gender_class().'"'.$attr_bubbletip.'>'.$avatar_tag.$link_login.'</span>';
+			return '<span class="'.trim( $class ).'"'.$attr_bubbletip.'>'.$avatar_tag.$link_login.'</span>';
 		}
 
 		$link_title = T_( 'Show the user profile' );
-		$link_class = $this->get_gender_class().( $params['nowrap'] ? ' nowrap' : '' );
-		return '<a href="'.$identity_url.'" title="'.$link_title.'" class="'.$link_class.'"'.$attr_bubbletip.'>'.$avatar_tag.$link_login.'</a>';
+		return '<a href="'.$identity_url.'" title="'.$link_title.'" class="'.trim( $class ).'"'.$attr_bubbletip.'>'.$avatar_tag.$link_login.'</a>';
 	}
 
 
@@ -1605,7 +1607,7 @@ class User extends DataObject
 
 		if( $link_sessions && ( $num_sessions > 0 ) )
 		{
-			return $num_sessions.' - <a href="?ctrl=user&amp;user_ID='.$this->ID.'&amp;user_tab=sessions" class="roundbutton middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
+			return $num_sessions.' - <a href="?ctrl=user&amp;user_ID='.$this->ID.'&amp;user_tab=sessions" class="'.button_class().' middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
 		}
 
 		return $num_sessions;
@@ -2919,26 +2921,8 @@ class User extends DataObject
 				$new_Blog->create();
 			}
 
-			/* Save IP Range -- start */
-			$ip = int2ip( ip2int( $_SERVER['REMOTE_ADDR'] ) ); // Convert IPv6 to IPv4
-			if( preg_match( '#^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$#i', $ip ) )
-			{	// Check IP for correct format
-				$ip_24bit_start = ip2int( preg_replace( '#\.\d{1,3}$#i', '.0', $ip ) );
-				$ip_24bit_end = ip2int( preg_replace( '#\.\d{1,3}$#i', '.255', $ip ) );
-
-				if( $iprange = get_ip_range( $ip_24bit_start, $ip_24bit_end ) )
-				{	// Update ip range
-					$DB->query( 'UPDATE T_antispam__iprange
-									SET aipr_user_count = '.$DB->quote( $iprange->aipr_user_count + 1 ).'
-									WHERE aipr_ID = '.$DB->quote( $iprange->aipr_ID ) );
-				}
-				else
-				{	// Insert new ip range
-					$DB->query( 'INSERT INTO T_antispam__iprange ( aipr_IPv4start, aipr_IPv4end, aipr_user_count )
-									VALUES ( '.$DB->quote( $ip_24bit_start ).', '.$DB->quote( $ip_24bit_end ).', '.$DB->quote( '1' ).' ) ' );
-				}
-			}
-			/* Save IP Range -- end */
+			// Save IP Range and user counter
+			antispam_increase_counter( 'user' );
 		}
 
 		$DB->commit();

@@ -20,7 +20,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $wp_blog_ID, $dispatcher;
+global $wp_blog_ID;
 
 $Form = new Form( NULL, '', 'post', NULL, 'multipart/form-data' );
 
@@ -38,8 +38,7 @@ $Form->begin_fieldset( T_('Report of the import') );
 $Form->end_fieldset();
 
 $Form->buttons( array(
-		array( 'button', 'button', T_('Go to Blog'), 'SaveButton', 'onclick' => 'location.href="'.$Blog->get( 'url' ).'"' ),
-		array( 'button', 'button', T_('Back'), 'SaveButton', 'onclick' => 'location.href="'.$dispatcher.'?ctrl=wpimportxml"' )
+		array( 'button', 'button', T_('Go to Blog'), 'SaveButton', 'onclick' => 'location.href=\''.$Blog->get( 'url' ).'\'' ),
 	) );
 
 $Form->end_form();

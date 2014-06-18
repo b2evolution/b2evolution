@@ -16,7 +16,7 @@ global $disp, $MainList, $legend_statuses;
 
 $legends = array();
 
-if( $disp == 'catdir' )
+if( $disp == 'front' || $disp == 'posts' )
 {	// If forums list is displayed
 	$legends[] = array(
 			array(
@@ -30,7 +30,7 @@ if( $disp == 'catdir' )
 		);
 }
 
-if( $disp != 'single' && isset( $MainList ) && $MainList->result_num_rows > 0 )
+if( $disp != 'front' && $disp != 'single' && isset( $MainList ) && $MainList->result_num_rows > 0 )
 {	// If some topics are displayed on the current page
 	$legends[] = array(
 			array(
@@ -106,7 +106,4 @@ if( !empty( $legend_statuses ) && is_logged_in() )
 	}
 	?>
 </ul>
-<?php
-}
-
-?>
+<?php } ?>

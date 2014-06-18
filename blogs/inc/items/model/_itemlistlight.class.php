@@ -189,15 +189,22 @@ class ItemListLight extends DataObjectList2
 	 *
 	 * This will also set back the GLOBALS !!! needed for regenerate_url().
 	 *
-	 * @param array
-	 * @param boolean
+	 * @param array Filters
+	 * @param boolean TRUE to memorize the filter params
+	 * @param boolean TRUE to use filters from previous request (from array $this->filters if it was defined before)
 	 */
-	function set_filters( $filters, $memorize = true )
+	function set_filters( $filters, $memorize = true, $use_previous_filters = false )
 	{
 		if( !empty( $filters ) )
 		{ // Activate the filterset (fallback to default filter when a value is not set):
-			// If $this->filters were activated before(e.g. on load from request) it should be saved here
-			$this->filters = array_merge( $this->default_filters, $this->filters, $filters );
+			if( $use_previous_filters )
+			{ // If $this->filters were activated before(e.g. on load from request), they can be saved here
+				$this->filters = array_merge( $this->default_filters, $this->filters, $filters );
+			}
+			else
+			{ // Don't use the filters from previous request
+				$this->filters = array_merge( $this->default_filters, $filters );
+			}
 		}
 
 		// Activate preset filters if necessary:
@@ -1541,9 +1548,9 @@ class ItemListLight extends DataObjectList2
 			$params['links_format'] = '$prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$';
 		}
 
- 		if( $this->Blog->get_setting( 'paged_nofollowto' ) )
+		if( $this->Blog->get_setting( 'paged_nofollowto' ) )
 		{	// We prefer robots not to follow to pages:
-			$this-> nofollow_pagenav = true;
+			$this->nofollow_pagenav = true;
 		}
 
 		echo $params['block_start'];

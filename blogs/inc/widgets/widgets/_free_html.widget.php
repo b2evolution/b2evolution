@@ -124,7 +124,11 @@ class free_html_Widget extends ComponentWidget
 
 		$this->disp_title( $this->disp_params['title'] );
 
+		echo $this->disp_params['block_body_start'];
+
 		echo format_to_output( $this->disp_params['content'] );
+
+		echo $this->disp_params['block_body_end'];
 
 		echo $this->disp_params['block_end'];
 

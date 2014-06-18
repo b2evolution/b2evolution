@@ -56,9 +56,7 @@ while( $Comment = & $CommentList->get_next() )
 	{ // if show only draft comments, and current comment status isn't draft, then continue with the next comment
 		continue;
 	}
-	echo '<div id="comment_'.$Comment->ID.'">';
 	echo_comment( $Comment->ID, $redirect_to, $save_context );
-	echo '</div>';
 } //end of the loop, don't delete
 
 if( ( $item_id != 0 ) && ( $comments_number > 0 ) )

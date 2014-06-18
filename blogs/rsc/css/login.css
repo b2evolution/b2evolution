@@ -52,25 +52,32 @@ div.log_container {
 	font-size: 92%;
 }
 
+.form-login {
+	padding: 10px 0;
+}
 .form-login fieldset {
 	margin-bottom: 20px;
 }
 .form-login input[type=text], .form-login input[type=password] {
 	width: 100%;
 }
-.form-login .btn {
-	margin-top: 5px;
-}
 
 .form-horizontal .controls,
 .form-horizontal .controls-info {
 	padding-right: 14px;
+}
+span.help-inline {
+	color: #999;
+	font-size: 84%;
 }
 div#ffield_m {
 	margin-bottom: 4px;
 }
 div#p-status {
 	margin-left: 5px;
+}
+#pass2_status .icon {
+	margin-top: -2px;
 }
 
 .form-horizontal .form-actions {
@@ -79,6 +86,9 @@ div#p-status {
 	text-align: center;
 	padding: 0;
 	margin-bottom: 0;
+}
+.control-label .label_field_required {
+	display: none;
 }
 
 .form-lostpass .controls {

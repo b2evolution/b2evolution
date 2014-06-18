@@ -323,7 +323,7 @@ class messaging_Module extends Module
 			$right_entries['messaging'] = array(
 				'text' => T_('Messages'),
 				'href' => get_dispctrl_url( 'threads' ),
-				'style' => 'padding: 3px 1ex;',
+				'class' => 'evo_messages_link',
 			);
 
 			// Count unread messages for current user

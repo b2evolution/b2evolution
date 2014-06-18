@@ -93,12 +93,12 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('External Feeds').get_manual_link('external_feeds') );
 
 	$Form->text_input( 'atom_redirect', $edited_Blog->get_setting( 'atom_redirect' ), 50, T_('Atom Feed URL'),
-	'<br />'.T_('Example: Your Feedburner Atom URL which should replace the original feed URL.').'<br />'
+	T_('Example: Your Feedburner Atom URL which should replace the original feed URL.').'<br />'
 			.sprintf( T_( 'Note: the original URL was: %s' ), url_add_param( $edited_Blog->get_item_feed_url( '_atom' ), 'redir=no' ) ),
 	array('maxlength'=>255, 'class'=>'large') );
 
 	$Form->text_input( 'rss2_redirect', $edited_Blog->get_setting( 'rss2_redirect' ), 50, T_('RSS2 Feed URL'),
-	'<br />'.T_('Example: Your Feedburner RSS2 URL which should replace the original feed URL.').'<br />'
+	T_('Example: Your Feedburner RSS2 URL which should replace the original feed URL.').'<br />'
 			.sprintf( T_( 'Note: the original URL was: %s' ), url_add_param( $edited_Blog->get_item_feed_url( '_rss2' ), 'redir=no' ) ),
 	array('maxlength'=>255, 'class'=>'large') );
 
@@ -140,19 +140,19 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 				array( 'subdir', T_('Subdirectory of media folder').':',
 					'',
 					' <span class="nobr"><code>'.$media_path.'</code><input
-						type="text" name="blog_media_subdir" class="form_text_input" size="20" maxlength="255"
+						type="text" name="blog_media_subdir" class="form_text_input form-control" size="20" maxlength="255"
 						class="'.( param_has_error('blog_media_subdir') ? 'field_error' : '' ).'"
 						value="'.$edited_Blog->dget( 'media_subdir', 'formvalue' ).'" /></span>', '' ),
 				array( 'custom',
 					T_('Custom location').':',
 					'',
-					'<fieldset>'
-					.'<div class="label">'.T_('directory').':</div><div class="input"><input
-						type="text" class="form_text_input" name="blog_media_fullpath" size="50" maxlength="255"
+					'<fieldset class="form-group">'
+					.'<div class="label control-label col-lg-2">'.T_('directory').':</div><div class="input controls col-xs-8"><input
+						type="text" class="form_text_input form-control" name="blog_media_fullpath" size="50" maxlength="255"
 						class="'.( param_has_error('blog_media_fullpath') ? 'field_error' : '' ).'"
 						value="'.$edited_Blog->dget( 'media_fullpath', 'formvalue' ).'" /></div>'
-					.'<div class="label">'.T_('URL').':</div><div class="input"><input
-						type="text" class="form_text_input" name="blog_media_url" size="50" maxlength="255"
+					.'<div class="label control-label col-lg-2">'.T_('URL').':</div><div class="input controls col-xs-8"><input
+						type="text" class="form_text_input form-control" name="blog_media_url" size="50" maxlength="255"
 						class="'.( param_has_error('blog_media_url') ? 'field_error' : '' ).'"
 						value="'.$edited_Blog->dget( 'media_url', 'formvalue' ).'" /></div></fieldset>' )
 			), T_('Media directory'), true
@@ -225,23 +225,6 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveBut
 		{
 			jQuery( '#ajax_form_enabled' ).attr( "checked", true );
 			jQuery( '#ajax_form_loggedin_enabled' ).attr( "disabled", false );
-		}
-	} );
-
-	var blog_media_location_current = '<?php echo empty( $edited_Blog->temp_old_media_location ) ? $edited_Blog->get( 'media_location' ) : $edited_Blog->temp_old_media_location; ?>';
-	jQuery( '#blogadvanced_checkchanges' ).submit( function()
-	{
-		var blog_media_location_updated = jQuery( 'input[name=blog_media_location]:checked' ).val();
-		if( blog_media_location_current != 'none' &&
-		    blog_media_location_updated != 'none' &&
-		    blog_media_location_current != blog_media_location_updated )
-		{
-			var msg = '<?php echo TS_('All files will be moved from old blog media directory to new. Are you sure?'); ?>';
-			if( <?php echo is_empty_directory( empty( $edited_Blog->temp_old_media_dir ) ? $edited_Blog->get_media_dir( false ) : $edited_Blog->temp_old_media_dir ) ? 'false' : 'true' ?> && blog_media_location_updated == 'custom' )
-			{
-				msg += "\n\n" + '<?php echo TS_('The blog\'s current media directory is not empty. It is your responsibility to move the files to the new media directory, otherwise the files will not be available in the file browser. Are you sure you want to proceed with the new setting?'); ?>';
-			}
-			return confirm( msg );
 		}
 	} );
 </script>

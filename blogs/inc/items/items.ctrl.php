@@ -1441,7 +1441,7 @@ require_css( $rsc_url.'css/blog_base.css' ); // Default styles for the blog navi
 // Load jquery ui css for tag autocomplete
 require_css( $rsc_url.'css/jquery/smoothness/jquery-ui.css' );
 require_js( 'communication.js' ); // auto requires jQuery
-init_plugins_js();
+init_plugins_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
 
 // Load the appropriate ITEM/POST styles depending on the blog's skin:
 // It's possible that we have no Blog on the restricted admin interface, when current User doesn't have permission to any blog
@@ -1498,13 +1498,11 @@ switch( $action )
 		// We never allow HTML in titles, so we always encode and decode special chars.
 		$item_title = htmlspecialchars_decode( $edited_Item->title );
 
-		if( $Blog->get_setting( 'allow_html_post' ) )
-		{	// HTML is allowed for this post, we have HTML in the DB and we can edit it:
-			$item_content = $edited_Item->content;
-		}
-		else
-		{	// HTML is disallowed for this post, content is encoded in DB and we need to decode it for editing:
-			$item_content = htmlspecialchars_decode( $edited_Item->content );
+		$item_content = prepare_item_content( $edited_Item->content );
+
+		if( ! $Blog->get_setting( 'allow_html_post' ) )
+		{ // HTML is disallowed for this post, content is encoded in DB and we need to decode it for editing:
+			$item_content = htmlspecialchars_decode( $item_content );
 		}
 
 		// Format content for editing, if we were not already in editing...
@@ -1538,13 +1536,11 @@ switch( $action )
 		// We never allow HTML in titles, so we always encode and decode special chars.
 		$item_title = htmlspecialchars_decode( $edited_Item->title );
 
-		if( $Blog->get_setting( 'allow_html_post' ) )
-		{ // HTML is allowed for this post, we have HTML in the DB and we can edit it:
-			$item_content = $edited_Item->content;
-		}
-		else
+		$item_content = prepare_item_content( $edited_Item->content );
+
+		if( ! $Blog->get_setting( 'allow_html_post' ) )
 		{ // HTML is disallowed for this post, content is encoded in DB and we need to decode it for editing:
-			$item_content = htmlspecialchars_decode( $edited_Item->content );
+			$item_content = htmlspecialchars_decode( $item_content );
 		}
 
 		// Format content for editing, if we were not already in editing...
@@ -1651,9 +1647,16 @@ switch( $action )
 
 		// fplanque> Note: this is depressing, but I have to put a table back here
 		// just because IE supports standards really badly! :'(
-		echo '<table class="browse" cellspacing="0" cellpadding="0" border="0"><tr>';
+		$table_browse_template = $AdminUI->get_template( 'table_browse' );
+		echo $table_browse_template['table_start'];
 
-		echo '<td class="browse_left_col">';
+		if( $tab == 'manual' )
+		{
+			echo $table_browse_template['full_col_start'];
+		}
+		else{
+			echo $table_browse_template['left_col_start'];
+		}
 
 			switch( $tab )
 			{
@@ -1698,17 +1701,17 @@ switch( $action )
 				$block_item_Widget->disp_template_replaced( 'block_end' );
 			}
 
-		echo '</td>';
+		echo $table_browse_template['left_col_end'];
 
 		if( $tab != 'manual' )
 		{
-			echo '<td class="browse_right_col">';
+			echo $table_browse_template['right_col_start'];
 				// Display VIEW:
 				$AdminUI->disp_view( 'items/views/_item_list_sidebar.view.php' );
-			echo '</td>';
+			echo $table_browse_template['right_col_end'];
 		}
 
-		echo '</tr></table>';
+		echo $table_browse_template['table_end'];
 
 		// End payload block:
 		$AdminUI->disp_payload_end();

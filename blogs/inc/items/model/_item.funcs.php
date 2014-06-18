@@ -59,9 +59,18 @@ function init_MainList( $items_nb_limit )
 		if( ! $preview )
 		{
 			if( $disp == 'page' )
-			{	// Get pages:
+			{ // Get pages:
 				$MainList->set_default_filters( array(
 						'types' => '1000',		// pages
+					) );
+			}
+			elseif( $disp == 'search' )
+			{ // Exclude search from 'sidebar' type posts and from reserved type with ID 5000
+				global $posttypes_perms;
+				$filter_post_types = isset( $posttypes_perms['sidebar'] ) ? $posttypes_perms['sidebar'] : array();
+				$filter_post_types = array_merge( $filter_post_types, array( 5000 ) );
+				$MainList->set_default_filters( array(
+						'types' => '-'.implode( ',', $filter_post_types ),
 					) );
 			}
 
@@ -183,13 +192,11 @@ function init_inskin_editing()
 	// We never allow HTML in titles, so we always encode and decode special chars.
 	$item_title = htmlspecialchars_decode( $edited_Item->title );
 
-	if( $Blog->get_setting( 'allow_html_post' ) )
-	{	// HTML is allowed for this post, we have HTML in the DB and we can edit it:
-		$item_content = $edited_Item->content;
-	}
-	else
-	{	// HTML is disallowed for this post, content is encoded in DB and we need to decode it for editing:
-		$item_content = htmlspecialchars_decode( $edited_Item->content );
+	$item_content = prepare_item_content( $edited_Item->content );
+
+	if( ! $Blog->get_setting( 'allow_html_post' ) )
+	{ // HTML is disallowed for this post, content is encoded in DB and we need to decode it for editing:
+		$item_content = htmlspecialchars_decode( $item_content );
 	}
 
 	// Format content for editing, if we were not already in editing...
@@ -213,13 +220,13 @@ function init_inskin_editing()
  *
  * @return Item
  */
-function & get_featured_Item()
+function & get_featured_Item( $restrict_disp = 'posts' )
 {
 	global $Blog;
 	global $disp, $disp_detail, $MainList, $FeaturedList;
 	global $featured_displayed_item_IDs;
 
-	if( $disp != 'posts' || !isset($MainList) )
+	if( $disp != $restrict_disp || !isset($MainList) )
 	{	// If we're not currently displaying posts, no need to try & display a featured/intro post on top!
 		$Item = NULL;
 		return $Item;
@@ -236,9 +243,17 @@ function & get_featured_Item()
 
 		if( ! $MainList->is_filtered() )
 		{	// This is not a filtered page, so we are on the home page.
-			// The competing intro-* types are: 'main' and 'all':
-			// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
-			$restrict_to_types = '1500,1600';
+			if( $restrict_disp == 'front' )
+			{ // Special Front page:
+				// Use Intro-Front posts
+				$restrict_to_types = '1400';
+			}
+			else
+			{ // Default front page displaying posts:
+				// The competing intro-* types are: 'main' and 'all':
+				// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
+				$restrict_to_types = '1500,1600';
+			}
 		}
 		else
 		{	// We are on a filtered... it means a category page or sth like this...
@@ -272,7 +287,7 @@ function & get_featured_Item()
 		// Run the query:
 		$FeaturedList->query();
 
-		if( $FeaturedList->result_num_rows == 0 )
+		if( $FeaturedList->result_num_rows == 0 && $restrict_disp != 'front' )
 		{ // No Intro page was found, try to find a featured post instead:
 
 			$FeaturedList->reset();
@@ -310,6 +325,7 @@ function get_item_type_ID( $type_code )
 	$item_types = array(
 			1    => 'post',
 			1000 => 'page',
+			1400 => 'intro-front',
 			1500 => 'intro-main',
 			1520 => 'intro-cat',
 			1530 => 'intro-tag',
@@ -1067,7 +1083,7 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 
 	cat_load_cache(); // make sure the caches are loaded
 
-	$r .= '<table cellspacing="0" class="catselect">';
+	$r .= '<table cellspacing="0" class="catselect table table-striped table-bordered table-hover table-condensed">';
 	if( get_post_cat_setting($blog) == 3 )
 	{ // Main + Extra cats option is set, display header
 		$r .= cat_select_header( $params );
@@ -1118,8 +1134,8 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 
 	if( isset($blog) && get_allow_cross_posting() )
 	{
-		echo '<script type="text/javascript">jQuery.getScript("'.$rsc_url.'js/jquery/jquery.scrollto.js", function () {
-			jQuery("#itemform_categories").scrollTo( "#catselect_blog'.$blog.'" );
+		echo '<script type="text/javascript">jQuery.getScript("'.get_require_url( '#scrollto#' ).'", function () {
+			jQuery("[id$=itemform_categories]").scrollTo( "#catselect_blog'.$blog.'" );
 		});</script>';
 	}
 	$Form->end_fieldset();
@@ -1145,7 +1161,8 @@ function cat_select_header( $params = array() )
 	$r .= '<th class="selector catsel_extra" title="'.$params['category_extra_title'].'">'.T_('Extra').'</th>';
 
 	// category header
-	$r .= '<th class="catsel_name">'.$params['category_name'].'</th><!--[if IE 7]><th width="1"><!-- for IE7 --></th><![endif]--></tr></thead>';
+	$r .= '<th class="catsel_name">'.$params['category_name'].'</th>'
+		.'</tr></thead>';
 
 	return $r;
 }
@@ -1261,8 +1278,7 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 				.' <a href="'.evo_htmlspecialchars($thisChapter->get_permanent_url()).'" title="'.evo_htmlspecialchars(T_('View category in blog.')).'">'
 				.'&nbsp;&raquo;&nbsp;' // TODO: dh> provide an icon instead? // fp> maybe the A(dmin)/B(log) icon from the toolbar? And also use it for permalinks to posts?
 				.'</a></td>'
-				.'<!--[if IE 7]><td width="1"><!-- for IE7 --></td><![endif]--></tr>'
-				."\n";
+			.'</tr>'."\n";
 
 	return $r;
 }
@@ -1340,9 +1356,9 @@ function cat_select_new()
 	// INPUT TEXT for new category name
 	$r .= '<td class="catsel_name">'
 				.'<input maxlength="255" style="width: 100%;" value="'.$category_name.'" size="20" type="text" name="category_name" id="new_category_name" />'
-				."</td>";
-	$r .= '<!--[if IE 7]><td width="1">&nbsp</td><![endif]-->';
-	$r .= "</tr>";
+				.'</td>'
+			.'</tr>';
+
 	return $r;
 }
 
@@ -2372,7 +2388,8 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 	$expiry_delay = $Item->get_setting( 'post_expiry_delay' );
 	$is_expired = ( !empty( $expiry_delay ) && ( ( $localtimenow - mysql2timestamp( $Comment->get( 'date' ) ) ) > $expiry_delay ) );
 
-	echo '<div id="c'.$comment_ID.'" class="bComment bComment';
+	echo '<a name="c'.$comment_ID.'"></a>';
+	echo '<div id="comment_'.$comment_ID.'" class="bComment bComment';
 	// check if comment is expired
 	if( $is_expired )
 	{ // comment is expired
@@ -2442,12 +2459,12 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 		echo '<div class="floatleft">';
 
 		// Display edit button if current user has the rights:
-		$Comment->edit_link( ' ', ' ', get_icon( 'edit' ), '#', 'roundbutton', '&amp;', $save_context, $redirect_to );
+		$Comment->edit_link( ' ', ' ', get_icon( 'edit' ), '#', button_class(), '&amp;', $save_context, $redirect_to );
 
-		echo '<span class="roundbutton_group">';
+		echo '<span class="'.button_class( 'group' ).'">';
 		// Display publish NOW button if current user has the rights:
 		$link_params = array(
-			'class'        => 'roundbutton_text',
+			'class'        => button_class( 'text' ),
 			'save_context' => $save_context,
 			'ajax_button'  => true,
 			'redirect_to'  => $redirect_to,
@@ -2460,11 +2477,11 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 		$next_status_in_row = $Comment->get_next_status( false );
 		if( $next_status_in_row && $next_status_in_row[0] != 'deprecated' )
 		{ // Display deprecate button if current user has the rights:
-			$Comment->deprecate_link( '', '', get_icon( 'move_down_grey', 'imgtag', array( 'title' => '' ) ), '#', 'roundbutton', '&amp;', true, true );
+			$Comment->deprecate_link( '', '', get_icon( 'move_down_grey', 'imgtag', array( 'title' => '' ) ), '#', button_class(), '&amp;', true, true );
 		}
 
 		// Display delete button if current user has the rights:
-		$Comment->delete_link( '', '', '#', '#', 'roundbutton_text', false, '&amp;', $save_context, true, '#', $redirect_to );
+		$Comment->delete_link( '', '', '#', '#', button_class( 'text' ), false, '&amp;', $save_context, true, '#', $redirect_to );
 		echo '</span>';
 
 		echo '</div>';
@@ -2968,6 +2985,38 @@ function log_new_item_create( $created_through )
 
 
 /**
+ * Prepare item content
+ *
+ * @param string Content
+ * @return string Content
+ */
+function prepare_item_content( $content )
+{
+	// Convert the content separators to new format:
+	$old_separators = array(
+			'&lt;!--more--&gt;', '<!--more-->', '<p>[teaserbreak]</p>',
+			'&lt;!--nextpage--&gt;', '<!--nextpage-->', '<p>[pagebreak]</p>'
+		);
+	$new_separators = array(
+			'[teaserbreak]', '[teaserbreak]', '[teaserbreak]',
+			'[pagebreak]', '[pagebreak]', '[pagebreak]'
+		);
+	if( strpos( $content, '<code' ) !== false || strpos( $content, '<pre' ) !== false )
+	{ // Call prepare_item_content_callback() on everything outside code/pre:
+		$content = callback_on_non_matching_blocks( $content,
+			'~<(code|pre)[^>]*>.*?</\1>~is',
+			'replace_content', array( $old_separators, $new_separators, 'str' ) );
+	}
+	else
+	{ // No code/pre blocks, replace on the whole thing
+		$content = str_replace( $old_separators, $new_separators, $content );
+	}
+
+	return $content;
+}
+
+
+/**
  * Get priority titles of an item
  *
  * @param boolean TRUE - to include null value
@@ -3235,7 +3284,7 @@ function items_created_results_block( $params = array() )
 		}
 	}
 
-	global $DB;
+	global $DB, $AdminUI;
 
 	param( 'user_tab', 'string', '', true );
 	param( 'user_ID', 'integer', 0, true );
@@ -3265,8 +3314,9 @@ function items_created_results_block( $params = array() )
 			'display_history' => false,
 		) );
 
+	$results_params = $AdminUI->get_template( 'Results' );
 	$display_params = array(
-		'before' => '<div class="results" style="margin-top:25px" id="created_posts_result">'
+		'before' => str_replace( '>', ' style="margin-top:25px" id="created_posts_result">', $results_params['before'] ),
 	);
 
 	if( is_ajax_content() )
@@ -3328,7 +3378,7 @@ function items_edited_results_block( $params = array() )
 		}
 	}
 
-	global $DB;
+	global $DB, $AdminUI;
 
 	param( 'user_tab', 'string', '', true );
 	param( 'user_ID', 'integer', 0, true );
@@ -3373,8 +3423,9 @@ function items_edited_results_block( $params = array() )
 		$edited_items_Results->init_params_by_skin( $params[ 'skin_type' ], $params[ 'skin_name' ] );
 	}
 
+	$results_params = $AdminUI->get_template( 'Results' );
 	$display_params = array(
-		'before' => '<div class="results" style="margin-top:25px" id="edited_posts_result">'
+		'before' => str_replace( '>', ' style="margin-top:25px" id="edited_posts_result">', $results_params['before'] ),
 	);
 	$edited_items_Results->display( $display_params );
 

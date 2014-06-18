@@ -192,6 +192,15 @@ class videoplug_plugin extends Plugin
 
 		return true;
 	}
+
+
+	/**
+	 * @see Plugin::SkinBeginHtmlHead()
+	 */
+	function SkinBeginHtmlHead()
+	{
+		require_js( 'functions.js', 'blog' );
+	}
 }
 
 ?>

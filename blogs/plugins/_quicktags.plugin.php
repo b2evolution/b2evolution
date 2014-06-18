@@ -91,7 +91,7 @@ class quicktags_plugin extends Plugin
 				,'bold', 'font-weight:bold;'
 				,'<b>','</b>'
 				,'b'
-				,'<?php echo T_('Bold [Alt-B]') ?>'
+				,'<?php echo TS_('Bold [Alt-B]') ?>'
 			);
 
 		b2evoButtons[b2evoButtons.length] = new b2evoButton(
@@ -99,7 +99,7 @@ class quicktags_plugin extends Plugin
 				,'italic', 'font-style:italic;'
 				,'<i>','</i>'
 				,'i'
-				,'<?php echo T_('Italic [Alt-I]') ?>'
+				,'<?php echo TS_('Italic [Alt-I]') ?>'
 			);
 		<?php
 	}
@@ -111,7 +111,7 @@ class quicktags_plugin extends Plugin
 				,'ins', ''
 				,'<ins>','</ins>'
 				,'b'
-				,'<?php echo T_('INSerted') ?>'
+				,'<?php echo TS_('INSerted') ?>'
 			);
 
 		b2evoButtons[b2evoButtons.length] = new b2evoButton(
@@ -119,7 +119,7 @@ class quicktags_plugin extends Plugin
 				,'del', 'text-decoration:line-through;'
 				,'<del>','</del>'
 				,'i'
-				,'<?php echo T_('DELeted') ?>'
+				,'<?php echo TS_('DELeted') ?>'
 			);
 
 		b2evoButtons[b2evoButtons.length] = new b2evoButton(
@@ -127,7 +127,7 @@ class quicktags_plugin extends Plugin
 				,'str', 'font-weight:bold;'
 				,'<strong>','</strong>'
 				,'s'
-				,'<?php echo T_('STRong [Alt-S]') ?>'
+				,'<?php echo TS_('STRong [Alt-S]') ?>'
 			);
 
 		b2evoButtons[b2evoButtons.length] = new b2evoButton(
@@ -135,7 +135,7 @@ class quicktags_plugin extends Plugin
 				,'em', 'font-style:italic;'
 				,'<em>','</em>'
 				,'e'
-				,'<?php echo T_('EMphasis [Alt-E]') ?>'
+				,'<?php echo TS_('EMphasis [Alt-E]') ?>'
 			);
 
 		b2evoButtons[b2evoButtons.length] = new b2evoButton(
@@ -143,7 +143,7 @@ class quicktags_plugin extends Plugin
 				,'code', ''
 				,'<code>','</code>'
 				,'c'
-				,'<?php echo T_('CODE [Alt-C]') ?>'
+				,'<?php echo TS_('CODE [Alt-C]') ?>'
 			);
 
 		b2evoButtons[b2evoButtons.length] = new b2evoButton(
@@ -151,7 +151,7 @@ class quicktags_plugin extends Plugin
 				,'p', 'margin-left:8px;'
 				,'<p>','</p>'
 				,'p'
-				,'<?php echo T_('Paragraph [Alt-P]') ?>'
+				,'<?php echo TS_('Paragraph [Alt-P]') ?>'
 			);
 
 		b2evoButtons[b2evoButtons.length] = new b2evoButton(
@@ -159,7 +159,7 @@ class quicktags_plugin extends Plugin
 				,'block', ''
 				,'<blockquote>','</blockquote>'
 				,'b'
-				,'<?php echo T_('BLOCKQUOTE [Alt-B]') ?>'
+				,'<?php echo TS_('BLOCKQUOTE [Alt-B]') ?>'
 			);
 
 		b2evoButtons[b2evoButtons.length] = new b2evoButton(
@@ -167,7 +167,7 @@ class quicktags_plugin extends Plugin
 				,'pre', ''
 				,'<pre>','</pre>'
 				,'r'
-				,'<?php echo T_('PREformatted text [Alt-R]') ?>'
+				,'<?php echo TS_('PREformatted text [Alt-R]') ?>'
 			);
 
 		b2evoButtons[b2evoButtons.length] = new b2evoButton(
@@ -175,7 +175,7 @@ class quicktags_plugin extends Plugin
 				,'ul', ''
 				,'<ul>\n','</ul>\n\n'
 				,'u'
-				,'<?php echo T_('Unordered List [Alt-U]') ?>'
+				,'<?php echo TS_('Unordered List [Alt-U]') ?>'
 			);
 
 		b2evoButtons[b2evoButtons.length] = new b2evoButton(
@@ -183,7 +183,7 @@ class quicktags_plugin extends Plugin
 				,'ol', ''
 				,'<ol>\n','</ol>\n\n'
 				,'o'
-				,'<?php echo T_('Ordered List [Alt-O]') ?>'
+				,'<?php echo TS_('Ordered List [Alt-O]') ?>'
 			);
 
 		b2evoButtons[b2evoButtons.length] = new b2evoButton(
@@ -191,7 +191,7 @@ class quicktags_plugin extends Plugin
 				,'li', ''
 				,'  <li>','</li>\n'
 				,'l'
-				,'<?php echo T_('List Item [Alt-L]') ?>'
+				,'<?php echo TS_('List Item [Alt-L]') ?>'
 			);
 
 		<?php
@@ -203,7 +203,7 @@ class quicktags_plugin extends Plugin
 				,'<?php echo ($simple ? 'image' : 'img') ?>', 'margin-left:8px;'
 				,'',''
 				,'g'
-				,'<?php echo T_('IMaGe [Alt-G]') ?>'
+				,'<?php echo TS_('IMaGe [Alt-G]') ?>'
 				,-1
 			); // special case
 
@@ -212,32 +212,8 @@ class quicktags_plugin extends Plugin
 				,'link', 'text-decoration:underline;'
 				,'','</a>'
 				,'a'
-				,'<?php echo T_('A href [Alt-A]') ?>'
+				,'<?php echo TS_('A href [Alt-A]') ?>'
 			); // special case
-
-		b2evoButtons[b2evoButtons.length] = new b2evoButton(
-				'b2evo_more'
-				,'<?php echo ($simple ? 'more separator' : '!M') ?>', 'margin-left:8px;'
-				,'<!-'+'-more-'+'->',''
-				,'m'
-				,'<?php echo T_('More [Alt-M]') ?>'
-				,-1
-			);
-
-	<?php
-		if( !$simple )
-		{ ?>
-		b2evoButtons[b2evoButtons.length] = new b2evoButton(
-				'b2evo_next'
-				,'!NP', ''
-				,'<!-'+'-nextpage-'+'->',''
-				,'q'
-				,'<?php echo T_('next page [Alt-Q]') ?>'
-				,-1
-			);
-			<?php
-		}
-	?>
 
 		function b2evoShowButton(button, i)
 		{
@@ -311,14 +287,14 @@ class quicktags_plugin extends Plugin
 			}
 		}
 
-		function b2evoToolbar()
+		function b2evoToolbar( title )
 		{
-			document.write('<div>');
+			document.write('<div>' + title);
 			for (var i = 0; i < b2evoButtons.length; i++)
 			{
 				b2evoShowButton(b2evoButtons[i], i);
 			}
-			document.write('<input type="button" id="b2evo_close" class="quicktags" onclick="b2evoCloseAllTags();" title="<?php echo T_('Close all tags') ?>" value="<?php echo ($simple ? 'close all tags' : 'X') ?>" style="margin-left:8px;" />');
+			document.write('<input type="button" id="b2evo_close" class="quicktags" onclick="b2evoCloseAllTags();" title="<?php echo format_to_output( T_('Close all tags'), 'htmlattr' ); ?>" value="<?php echo ($simple ? 'close all tags' : 'X') ?>" style="margin-left:8px;" />');
 			document.write('</div>');
 		}
 
@@ -383,7 +359,7 @@ class quicktags_plugin extends Plugin
 			}
 
 			if (!b2evoCheckOpenTags(i)) {
-				var URL = prompt( '<?php echo T_('URL') ?>:', defaultValue);
+				var URL = prompt( '<?php echo TS_('URL') ?>:', defaultValue);
 				if (URL)
 				{
 					b2evoButtons[i].tagStart = '<a href="' + URL + '">';
@@ -398,12 +374,12 @@ class quicktags_plugin extends Plugin
 
 		function b2evoInsertImage(myField)
 		{
-			var myValue = prompt( '<?php echo T_('URL') ?>:', 'http://' );
+			var myValue = prompt( '<?php echo TS_('URL') ?>:', 'http://' );
 			if (myValue) {
 				myValue = '<img src="'
 						+ myValue
-						+ '" alt="' + prompt('<?php echo T_('ALTernate text') ?>:', '')
-						+ '" title="' + prompt('<?php echo T_('Title') ?>:', '')
+						+ '" alt="' + prompt('<?php echo TS_('ALTernate text') ?>:', '')
+						+ '" title="' + prompt('<?php echo TS_('Title') ?>:', '')
 						+ '" />';
 				textarea_wrap_selection( myField, myValue, '', 1 );
 			}
@@ -411,10 +387,19 @@ class quicktags_plugin extends Plugin
 		//]]>
 		</script>
 
-		<div class="edit_toolbar quicktags_toolbar"><script type="text/javascript">b2evoToolbar();</script></div>
+		<div class="edit_toolbar quicktags_toolbar"><script type="text/javascript">b2evoToolbar( '<?php echo 'HTML: '; ?>' );</script></div>
 
 		<?php
 		return true;
+	}
+
+
+	/**
+	 * @see Plugin::SkinBeginHtmlHead()
+	 */
+	function SkinBeginHtmlHead()
+	{
+		require_js( 'functions.js', 'blog' );
 	}
 }
 

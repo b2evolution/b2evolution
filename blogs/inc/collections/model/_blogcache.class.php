@@ -56,10 +56,12 @@ class BlogCache extends DataObjectCache
 
 	/**
 	 * Constructor
+	 *
+	 * @param string Name of the order field or NULL to use name field
 	 */
-	function BlogCache()
+	function BlogCache( $order_by = 'blog_order' )
 	{
-		parent::DataObjectCache( 'Blog', false, 'T_blogs', 'blog_', 'blog_ID', NULL, 'blog_order',
+		parent::DataObjectCache( 'Blog', false, 'T_blogs', 'blog_', 'blog_ID', NULL, $order_by,
 			/* TRANS: "None" select option */ T_('No blog'), 0 );
 	}
 

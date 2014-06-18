@@ -63,7 +63,9 @@ $Form->begin_fieldset( T_('Profile pictures').get_manual_link('profile-picture-s
 
 	$Form->checkbox_input( 'use_gravatar', $Settings->get('use_gravatar'), T_('Use gravatar'), array( 'note' => T_('Fall back to Gravatar if a user has not uploaded a profile picture.') ) );
 
-	global $default_avatar_unknown, $default_avatar_men, $default_avatar_women;
+	$default_avatar_unknown = get_default_avatar_url();
+	$default_avatar_men = get_default_avatar_url( 'M' );
+	$default_avatar_women = get_default_avatar_url( 'F' );
 	$default_images_info = '<br />'.T_('For unknow gender').': <a href="'.$default_avatar_unknown.'" target="_blank">'.$default_avatar_unknown.'</a>';
 	$default_images_info .= '<br />'.T_('For men').': <a href="'.$default_avatar_men.'" target="_blank">'.$default_avatar_men.'</a>';
 	$default_images_info .= '<br />'.T_('For women').': <a href="'.$default_avatar_women.'" target="_blank">'.$default_avatar_women.'</a>';

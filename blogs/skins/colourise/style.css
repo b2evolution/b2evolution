@@ -97,30 +97,30 @@ img {
 	padding: 5px;
 }
 img.float-right {
-  	margin: 5px 0px 10px 10px;  
+	margin: 5px 0px 10px 10px;  
 }
 img.float-left {
-  	margin: 5px 10px 10px 0px;
+	margin: 5px 10px 10px 0px;
 }
 
-code {
-  	margin: 5px 0;
-  	padding: 15px;
-  	text-align: left;
-  	display: block;
-  	overflow: auto;  
-  	font: 500 1em/1.5em 'Lucida Console', 'Courier New', Monospace ;
-  	/* white-space: pre; */
-  	background: #111;  
+code, samp {
+	margin: 5px 0;
+	padding: 15px;
+	text-align: left;
+	display: block;
+	overflow: auto;  
+	font: 500 1em/1.5em 'Lucida Console', 'Courier New', Monospace ;
+	/* white-space: pre; */
+	background: #111;  
 }
 acronym {
-  	cursor: help;
-  	border-bottom: 1px dotted #5B5B5B;
+	cursor: help;
+	border-bottom: 1px dotted #5B5B5B;
 }
 blockquote {
 	margin: 15px 10px;
- 	padding: 10px 10px 10px 35px;  
-   background: #111 url(img/quote.jpg) no-repeat 10px 10px;
+	padding: 10px 10px 10px 35px;  
+	background: #111 url(img/quote.jpg) no-repeat 10px 10px;
 	font-weight: normal;
 	font-size: 18px;
 	line-height: 1.6em;

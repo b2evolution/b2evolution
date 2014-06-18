@@ -7,7 +7,6 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 header_http_response('403 Forbidden');
-header('Content-Type: text/html; charset=iso-8859-1'); // no translation
 
 $page_title = '403 Forbidden - Please stop referer spam.';
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------

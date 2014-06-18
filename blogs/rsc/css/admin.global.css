@@ -869,6 +869,11 @@ td.diff-title-deletedline, td.diff-title-addedline {
 	padding: 0;
 }
 
+.skin_settings {
+	float: left;
+	width: 30%;
+}
+
 .task_priority_edit a {
 	color: #000;
 }

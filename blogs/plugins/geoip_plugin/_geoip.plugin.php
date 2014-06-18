@@ -68,16 +68,23 @@ class geoip_plugin extends Plugin
 	var $geoip_file_name = 'GeoIP.dat';
 
 	/**
+	 * URL to the GeoIP's legacy database download page
+	 * @var string
+	 */
+	var $geoip_manual_download_url = '';
+
+	/**
 	 * Init
 	 *
 	 * This gets called after a plugin has been registered/instantiated.
 	 */
 	function PluginInit( & $params )
 	{
-		$this->short_desc = 'GeoIP plugin to detect user\'s country by IP address';
-		$this->long_desc = 'This plugin detects user\'s country at the moment the account is created';
+		$this->short_desc = T_('GeoIP plugin to detect user\'s country by IP address');
+		$this->long_desc = T_('This plugin detects user\'s country at the moment the account is created');
 
 		$this->geoip_file_path = dirname( __FILE__ ).'/'.$this->geoip_file_name;
+		$this->geoip_manual_download_url = 'http://dev.maxmind.com/geoip/legacy/geolite/';
 	}
 
 
@@ -118,15 +125,15 @@ class geoip_plugin extends Plugin
 
 
 	/**
-	 * Check for existing of the file "GeoIP.dat" (GeoIP Country database)
+	 * Check the existence of the file "GeoIP.dat" (GeoIP Country database)
 	 */
 	function BeforeEnable()
 	{
 		if( !file_exists( $this->geoip_file_path ) )
-		{	// GeoIP DB doesn't exist in the right folder
-			return sprintf( T_('GeoIP Country database not found. Download the <b>GeoLite Country DB in binary format</b> from here: <a %s>%s</a> and then upload the %s file to the folder: %s'),
-					'href="http://www.maxmind.com/app/geolite" target="_blank"',
-					'http://www.maxmind.com/app/geolite',
+		{ // GeoIP DB doesn't exist in the right folder
+			return sprintf( T_('GeoIP Country database not found. Download the <b>GeoLite Country DB in binary format</b> from here: <a %s>%s</a> and then upload the %s file to the folder: %s.'),
+					'href="'.$this->geoip_manual_download_url.'" target="_blank"',
+					$this->geoip_manual_download_url,
 					$this->geoip_file_name,
 					dirname( __FILE__ ) );
 		}
@@ -211,11 +218,11 @@ class geoip_plugin extends Plugin
 		$SQL = new SQL();
 		$SQL->SELECT( 'ctry_ID' );
 		$SQL->FROM( 'T_regional__country' );
-		$SQL->WHERE( 'ctry_code = '.$DB->quote( $country_code ) );
+		$SQL->WHERE( 'ctry_code = '.$DB->quote( strtolower( $country_code ) ) );
 		$country_ID = $DB->get_var( $SQL->get() );
 
 		if( !$country_ID )
-		{	// No found country in the b2evo DB
+		{ // No found country in the b2evo DB
 			return false;
 		}
 

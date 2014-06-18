@@ -45,11 +45,16 @@ if( $params['notify_full'] )
 		// Mail bloat: .' ( '.str_replace('&amp;', '&', $Item->get_permanent_url())." )\n";
 		// TODO: fp> We MAY want to force short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 
+	$ip_list = $Comment->author_IP;
+	$user_domain = gethostbyaddr( $Comment->author_IP );
+	if( $user_domain != $Comment->author_IP )
+	{ // Add host name after author IP address
+		$ip_list .= ', '.$user_domain;
+	}
 	switch( $Comment->type )
 	{
 		case 'trackback':
-			$user_domain = gethostbyaddr($Comment->author_IP);
-			$notify_message .= T_('Website').": $Comment->author (IP: $Comment->author_IP, $user_domain)\n";
+			$notify_message .= T_('Website').": $Comment->author (IP: $ip_list)\n";
 			$notify_message .= T_('Url').": $Comment->author_url\n";
 			break;
 
@@ -60,8 +65,7 @@ if( $params['notify_full'] )
 			}
 			else
 			{ // Comment from visitor:
-				$user_domain = gethostbyaddr($Comment->author_IP);
-				$notify_message .= T_('Author').": $Comment->author (IP: $Comment->author_IP, $user_domain)\n";
+				$notify_message .= T_('Author').": $Comment->author (IP: $ip_list)\n";
 				$notify_message .= T_('Email').": $Comment->author_email\n";
 				$notify_message .= T_('Url').": $Comment->author_url\n";
 			}

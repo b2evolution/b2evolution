@@ -82,8 +82,10 @@ elseif( $debug_containers == 'hide' )
 
 
 // Init $disp
-param( 'disp', '/^[a-z0-9\-_]+$/', 'posts', true );
+$default_disp = '-'; // '-' means we have no explicit disp request yet... this may change with extraptah info or by detecting front page later
+param( 'disp', '/^[a-z0-9\-_]+$/', $default_disp, true );
 $disp_detail = '';
+$is_front = false;	// So far we have not detected that we are displaying the front page
 
 
 /*
@@ -103,16 +105,16 @@ locale_activate( $Blog->get('locale') );
 // Re-Init charset handling, in case current_charset has changed:
 if( init_charsets( $current_charset ) )
 {
-  // Reload Blog(s) (for encoding of name, tagline etc):
-  $BlogCache->clear();
+	// Reload Blog(s) (for encoding of name, tagline etc):
+	$BlogCache->clear();
 
-  $Blog = & $BlogCache->get_by_ID( $blog );
-  if( is_logged_in() )
-  { // We also need to reload the current User with the new final charset
-  	$UserCache = & get_UserCache();
-	$UserCache->clear();
-	$current_User = & $UserCache->get_by_ID( $current_User->ID );
-  }
+	$Blog = & $BlogCache->get_by_ID( $blog );
+	if( is_logged_in() )
+	{ // We also need to reload the current User with the new final charset
+		$UserCache = & get_UserCache();
+		$UserCache->clear();
+		$current_User = & $UserCache->get_by_ID( $current_User->ID );
+	}
 }
 
 
@@ -197,6 +199,7 @@ if( $resolve_extra_path )
 				{ // use blog default
 					$posts = $Blog->get_setting( 'posts_per_page' );
 				}
+				$disp = 'posts';
 			}
 			else
 			{
@@ -216,6 +219,7 @@ if( $resolve_extra_path )
 					{ // use blog default
 						$posts = $Blog->get_setting( 'posts_per_page' );
 					}
+					$disp = 'posts';
 				}
 				elseif( ( $tags_dash_fix && $last_char == '-' && $last_len == 40 ) || $last_char != '/' )
 				{	// NO ENDING SLASH or ends with a dash, is 40 chars long and $tags_dash_fix is true
@@ -277,6 +281,7 @@ if( $resolve_extra_path )
 								{ // We consider this a week number
 									$w = substr( $path_elements[$i], 1, 2 );
 								}
+								$disp = 'posts';
 							}
 							else
 							{	// We did not get a number/year...
@@ -334,11 +339,6 @@ param( 'title', 'string', '', true );						// urtitle of post to display
 param( 'redir', 'string', 'yes', false );				// Do we allow redirection to canonical URL? (allows to force a 'single post' URL for commenting)
 param( 'preview', 'integer', 0, true );         // Is this preview ?
 param( 'stats', 'integer', 0 );									// Deprecated but might still be used by spambots
-
-
-
-// Front page detection & selection should probably occur here.
-
 
 
 /*
@@ -436,19 +436,6 @@ if( !empty($p) || !empty($title) )
 			}
 		}
 
-/*	fp> The following is alternative code for filtering out index.php or blog1.php but this should not be needed
-				since I have re-enabled (a new version of) $pagenow removal earlier in this file.
-		if( ! $title_fallback && $orig_title == $pagenow )
-		{	// We are actually searching for something named after the PHP filename!
-			// Example: blog1.php
-			// Consider this as a request for the homepage:
-			// pre_dump( '', $title, $orig_title, $pagenow, $disp );
-			// Already set: $disp = 'posts';
-			$title_fallback = true;
-			$title = NULL;
-		}
-*/
-
 		if( ! $title_fallback )
 		{	// We were not able to fallback to anything meaningful:
 			$disp = '404';
@@ -458,54 +445,6 @@ if( !empty($p) || !empty($title) )
 	}
 }
 
-
-/*
- * ____________________________ "Clean up" the request ____________________________
- *
- * Make sure that:
- * 1) disp is set to "single" if single post requested
- * 2) URL is canonical if:
- *    - some content was requested in a weird/deprecated way
- *    - or if content identifiers have changed
- */
-if( $stats || $disp == 'stats' )
-{	// This used to be a spamfest...
-	require $siteskins_path.'_410_stats_gone.main.php'; // error & exit
-	// EXIT.
-}
-elseif( !empty($preview) )
-{	// Preview
-	$disp = 'single';
-	// Consider this as an admin hit!
-	$Hit->hit_type = 'admin';
-}
-elseif( $disp == 'posts' && !empty($Item) )
-{ // We are going to display a single post
-	// if( in_array( $Item->ptyp_ID, $posttypes_specialtypes ) )
-	if( $Item->ptyp_ID == 1000 )
-	{
-		$disp = 'page';
-	}
-	else
-	{
-		$disp = 'single';
-	}
-
-	// fp> note: the redirecting code that was here moved to skin_init() with the other redirecting code.
-	// That feels more consistent and may also allow some skins to handle redirects differently (framing?)
-	// I hope I didn't screw that up... but it felt like the historical reasons for this to be here no longer applied.
-}
-elseif( ( ( $disp == 'page' ) || ( $disp == 'single' ) ) && empty( $Item ) )
-{ // 'page' and 'single' are not valid display params if $Item is not set
-	// Note: The 'preview' action is the only one exception, but that is handled above in this if statement
-	$disp = '404';
-	$disp_detail = '404-post_not_found';
-}
-
-
-/*
- * ______________________ DETERMINE WHICH SKIN TO USE FOR DISPLAY _______________________
- */
 
 // Check if a forced skin has been requested (used by mobile skin switcher widget):
 param( 'force_skin', 'string', '' );
@@ -529,13 +468,120 @@ if( ! empty( $force_skin ) )
 	$skin = $Blog->get_skin_folder( $force_skin );
 }
 
+
 // Check if a temporary skin has been requested (used for RSS syndication for example):
 param( 'tempskin', 'string', '', true );
 if( !empty( $tempskin ) )
 { // This will be handled like any other skin:
 	// TODO: maybe restrict that to authorized users
 	$skin = $tempskin;
+	if( empty( $disp ) || $disp == '-' )
+	{ // Set default disp for RSS skins
+		$disp = 'posts';
+	}
 }
+
+
+// Set $disp to 'posts' when filter by categories or tags
+param( 'catsel', 'array/integer', NULL );
+param( 'cat', 'string', NULL );
+param( 'tag', 'string', NULL );
+if( empty( $Item ) && ( ! is_null( $catsel ) || ( $disp != 'edit' && ! is_null( $cat ) ) || ! is_null( $tag ) ) )
+{
+	$disp = 'posts';
+}
+unset( $catsel );
+
+/*
+ * ____________________________ "Clean up" the request ____________________________
+ *
+ * Make sure that:
+ * 1) disp is set to "single" if single post requested
+ * 2) URL is canonical if:
+ *    - some content was requested in a weird/deprecated way
+ *    - or if content identifiers have changed
+ * This will also detect that we are on the front page (if nothing has triggered a specific $disp)
+ */
+if( $stats || $disp == 'stats' )
+{	// This used to be a spamfest...
+	require $siteskins_path.'_410_stats_gone.main.php'; // error & exit
+	// EXIT.
+}
+elseif( !empty($preview) )
+{	// Preview
+	$disp = 'single';
+	// Consider this as an admin hit!
+	$Hit->hit_type = 'admin';
+}
+elseif( $disp == '-' && !empty($Item) )
+{ // We have not requested a specific disp but we have identified a specific post to be displayed
+	// We are going to display a single post
+	// if( in_array( $Item->ptyp_ID, $posttypes_specialtypes ) )
+	if( preg_match( '|[&?](download=\d+)|', $ReqURI ) )
+	{
+		$disp = 'download';
+	}
+	elseif( $Item->ptyp_ID == 1000 )
+	{
+		$disp = 'page';
+	}
+	else
+	{
+		$disp = 'single';
+	}
+}
+elseif( $disp == '-' )
+{ // No specific request of any kind...
+	// We consider this to be the home page:
+	$disp = $Blog->get_setting('front_disp');
+
+	$is_front = true; // we have detected that we are displaying the front page
+
+	// Do we need to handle the canoncial url?
+	if( ( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
+			|| $Blog->get_setting( 'relcanonical_homepage' ) )
+	{ // Check if the URL was canonical:
+		$canonical_url = $Blog->gen_blogurl();
+		if( ! is_same_url($ReqURL, $canonical_url) )
+		{	// We are not on the canocial blog url:
+			if( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
+			{	// REDIRECT TO THE CANONICAL URL:
+				header_redirect( $canonical_url, true );
+			}
+			else
+			{	// Use link rel="canoncial":
+				add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
+			}
+		}
+	}
+
+	if( $disp == 'page' )
+	{ // Specific page is displayed on front page
+		set_param( 'p', $Blog->get_setting('front_post_ID') );
+		$c = 1; // Display comments
+
+		$ItemCache = & get_ItemCache();
+		$Item = & $ItemCache->get_by_ID( $p, false );
+
+		if( empty($Item) )
+		{
+			$Messages->add( sprintf( T_('Front page is set to display page ID=%d but it does not exist.'), $p ), 'error' );
+			$disp = '404';
+		}
+	}
+
+}
+elseif( ( ( $disp == 'page' ) || ( $disp == 'single' ) ) && empty( $Item ) )
+{ // 'page' and 'single' are not valid display params if $Item is not set
+	// Note: The 'preview' action is the only one exception, but that is handled above in this if statement
+	$disp = '404';
+	$disp_detail = '404-post_not_found';
+}
+
+
+/*
+ * ______________________ DETERMINE WHICH SKIN TO USE FOR DISPLAY _______________________
+ */
 
 if( isset( $skin ) )
 {	// A skin has been requested by folder_name (url or stub):
@@ -693,8 +739,10 @@ if( !empty( $skin ) )
 					'users'          => 'users.main.php',
 					'edit'           => 'edit.main.php',
 					'edit_comment'   => 'edit_comment.main.php',
+					'front'          => 'front.main.php',
 					'useritems'      => 'useritems.main.php',
 					'usercomments'   => 'usercomments.main.php',
+					'download'       => 'download.main.php',
 					// All others will default to index.main.php
 				);
 

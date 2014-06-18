@@ -27,8 +27,8 @@ if( is_logged_in() )
 	$Messages->add( T_( 'You are already logged in.' ), 'note' );
 	$redirect_to = param( 'redirect_to', 'url', NULL );
 	if( empty( $redirect_to ) )
-	{
-		$redirect_to = regenerate_url( 'disp', '', '', '&' );
+	{ // If empty redirect to referer page
+		$redirect_to = '';
 	}
 	header_redirect( $redirect_to, 302 );
 	// will have exited

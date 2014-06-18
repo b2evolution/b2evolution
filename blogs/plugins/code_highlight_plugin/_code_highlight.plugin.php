@@ -80,7 +80,7 @@ class code_highlight_plugin extends Plugin
 {
 	var $name = 'Code highlight';
 	var $code = 'evo_code';
-	var $priority = 10;
+	var $priority = 27;
 	var $version = '5.0.0';
 	var $author = 'Astonish Me';
 	var $group = 'rendering';
@@ -271,7 +271,13 @@ class code_highlight_plugin extends Plugin
 		echo '<div class="edit_toolbar code_toolbar">';
 		// TODO: dh> make this optional.. just like with line numbers, this "Code" line is not feasible with oneliners.
 		echo T_('Code').': ';
-		echo '<input type="button" id="codespan" title="'.T_('Insert codespan').'" class="quicktags" onclick="codespan_tag(\'\');" value="'.T_('codespan').'" />';
+		echo '<input type="button" id="code_samp" title="'.T_('Insert &lt;samp&gt; tag').'" class="quicktags" onclick="code_tag(\'samp\');" value="'.T_('samp').'" />';
+		echo '<input type="button" id="code_kbd" title="'.T_('Insert &lt;kbd&gt; tag').'" class="quicktags" onclick="code_tag(\'kbd\');" value="'.T_('kbd').'" />';
+		echo '<input type="button" id="code_var" title="'.T_('Insert &lt;var&gt; tag').'" class="quicktags" onclick="code_tag(\'var\');" value="'.T_('var').'" />';
+		echo '<input type="button" id="code_code" title="'.T_('Insert &lt;code&gt; tag').'" class="quicktags" onclick="code_tag(\'code\');" value="'.T_('code').'" />';
+		/* space */
+		echo '<input type="button" id="codespan" title="'.T_('Insert codespan').'" style="margin-left:8px;" class="quicktags" onclick="codespan_tag(\'\');" value="'.T_('codespan').'" />';
+		/* space */
 		echo '<input type="button" id="codeblock" title="'.T_('Insert codeblock').'" style="margin-left:8px;" class="quicktags" onclick="codeblock_tag(\'\');" value="'.T_('codeblock').'" />';
 		echo '<input type="button" id="codeblock_xml" title="'.T_('Insert XML codeblock').'" class="quicktags" onclick="codeblock_tag(\'xml\');" value="'.T_('XML').'" />';
 		echo '<input type="button" id="codeblock_html" title="'.T_('Insert HTML codeblock').'" class="quicktags" onclick="codeblock_tag(\'html\');" value="'.T_('HTML').'" />';
@@ -283,6 +289,12 @@ class code_highlight_plugin extends Plugin
 		?>
 		<script type="text/javascript">
 			//<![CDATA[
+			function code_tag( tag_name )
+			{
+				tag = '<' + tag_name + '>';
+
+				textarea_wrap_selection( b2evoCanvas, tag, '</' + tag_name + '>', 0 );
+			}
 			function codespan_tag( lang )
 			{
 				tag = '[codespan]';
@@ -374,17 +386,18 @@ class code_highlight_plugin extends Plugin
 		$ItemCache = & get_ItemCache();
 		$comment_Item = & $ItemCache->get_by_ID( $params['comment_item_ID'], false );
 		if( !$comment_Item )
-		{	// Incorrect item
+		{ // Incorrect item
 			return false;
 		}
 
 		$item_Blog = & $comment_Item->get_Blog();
-		if( $this->get_coll_setting( 'coll_apply_comment_rendering', $item_Blog ) )
-		{	// render code blocks in comment
+		$apply_rendering = $this->get_coll_setting( 'coll_apply_comment_rendering', $item_Blog );
+		if( $this->is_renderer_enabled( $apply_rendering, $params['renderers'] ) )
+		{ // render code blocks in comment
 			$params['content' ] = & $params['comment'];
 			$this->FilterItemContents( $params );
 			if( empty( $params['dont_remove_pre'] ) || !$params['dont_remove_pre'] )
-			{	// remove <pre>
+			{ // remove <pre>
 				$params['comment'] = preg_replace( '#(<\!--\s*codeblock[^-]*?\s*-->)<pre[^>]*><code>(.+?)</code></pre>(<\!--\s+/codeblock\s*-->)#is', '$1<code>$2</code>$3', $params['comment'] );
 			}
 		}
@@ -437,6 +450,11 @@ class code_highlight_plugin extends Plugin
 		// 4 - codeblock
 		$content = preg_replace_callback( '#(\<p>)?\<!--\s*codeblock([^-]*?)\s*-->(\</p>)?\<pre[^>]*><code>([\s\S]+?)</code>\</pre>(\<p>)?\<!--\s*/codeblock\s*-->(\</p>)?#i',
 								array( $this, 'render_codeblock_callback' ), $content );
+
+		if( strpos( $content, '\\/codespan' ) !== false || strpos( $content, '\\/codeblock' ) !== false )
+		{ // Replace [\/codeblock] or [\/codespan] to normal view
+			$content = preg_replace( '#([<\[])\\\/code(span|block)([>\]])#i', '$1/code$2$3', $content );
+		}
 
 		return true;
 	}
@@ -558,22 +576,11 @@ class code_highlight_plugin extends Plugin
 	{
 		require_js( 'functions.js', 'blog' );
 
-		add_css_headline('/* AstonishMe code plugin styles */'
+		add_css_headline( '/* AstonishMe code plugin styles */'
 			.'.amc0,.amc1,.amc2,.amc3,.amc4,.amc5,.amc6,.amc7,.amc8,.amc9 {'
-			.'background:url('.$this->get_plugin_url().'img/numbers.gif) no-repeat; }');
+			.'background:url('.$this->get_plugin_url().'img/numbers.gif) no-repeat; }' );
 
-		require_css($this->get_plugin_url().'amcode.css',true);
-
-		// TODO: dh> move this to a IE-specific file, e.g. add_css_headline, but which is specific for IE
-		//           Or easier: fix it with a hack in amcode.css itself?!
-		add_headline('<!--[if IE]>'
-			.'<style type="text/css">'
-			.'/* IE: make sure the last line is not hidden by a scrollbar */'
-			.'div.codeblock.amc_short table {'
-			.'	margin-bottom: 2ex;'
-			.'}'
-			.'</style>'
-			.'<![endif]-->');
+		require_css( $this->get_plugin_url().'amcode.css', true );
 	}
 
 

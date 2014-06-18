@@ -79,8 +79,14 @@ if( ! $public_access_to_media )
 
 // Load the other params:
 param( 'path', 'string', true );
-param( 'size', 'string', NULL );	// Can be used for images.
-param( 'mtime', 'integer', 0 );     // used for unique URLs (that never expire).
+param( 'size', 'string', NULL ); // Can be used for images.
+param( 'size_x', 'integer', 1 ); // Ratio size, can be 1, 2 and etc.
+param( 'mtime', 'integer', 0 );  // used for unique URLs (that never expire).
+
+if( $size_x != 1 && $size_x != 2 )
+{ // Allow only 1x and 2x sizes, in order to avoid hack that creates many x versions
+	$size_x = 1;
+}
 
 // TODO: dh> this failed with filenames containing multiple dots!
 if ( false !== strpos( urldecode( $path ), '..' ) )
@@ -99,7 +105,7 @@ $FileRoot = & $FileRootCache->get_by_ID( $root );
 $File = new File( $FileRoot->type, $FileRoot->in_type_ID, $path );
 
 // Check if the request has an If-Modified-Since date
-if( array_key_exists( 'HTTP_IF_MODIFIED_SINCE', $_SERVER) )
+if( array_key_exists( 'HTTP_IF_MODIFIED_SINCE', $_SERVER ) )
 {
 	$if_modified_since = strtotime( preg_replace('/;.*$/','',$_SERVER['HTTP_IF_MODIFIED_SINCE']) );
 	$file_lastmode_ts = $File->get_lastmod_ts();
@@ -110,7 +116,7 @@ if( array_key_exists( 'HTTP_IF_MODIFIED_SINCE', $_SERVER) )
 	}
 }
 
-if( !empty($size) && $File->is_image() )
+if( ! empty( $size ) && $File->is_image() )
 {	// We want a thumbnail:
 	// fp> TODO: for more efficient caching, this should probably redirect to the static file right after creating it (when $public_access_to_media=true OF COURSE)
 
@@ -119,7 +125,7 @@ if( !empty($size) && $File->is_image() )
 	load_funcs( '/files/model/_image.funcs.php' );
 
 	$size_name = $size;
-	if( ! isset($thumbnail_sizes[$size] ) )
+	if( ! isset( $thumbnail_sizes[$size] ) )
 	{ // this file size alias is not defined, use default:
 		// TODO: dh> this causes links for e.g. "fit-50x50" to work also, but with the drawback of images not getting served from the
 		//           .evocache directory directly. I think invalid $size params should bark out here.
@@ -141,7 +147,7 @@ if( !empty($size) && $File->is_image() )
 	// pre_dump( $mimetype );
 
 	// Try to output the cached thumbnail:
-	$err = $File->output_cached_thumb( $size_name, $mimetype, $mtime );
+	$err = $File->output_cached_thumb( $size_name, $mimetype, $mtime, $size_x );
 	//pre_dump( $err );
 
 	if( $err == '!Thumbnail not found in'.$Settings->get( 'evocache_foldername' ) )
@@ -152,12 +158,12 @@ if( !empty($size) && $File->is_image() )
 
 		if( ! $resample_all_images && $src_width <= $thumb_width && $src_height <= $thumb_height )
 		{	// There is no need to resample, use original!
-			$err = $File->get_af_thumb_path( $size_name, $mimetype, true );
+			$err = $File->get_af_thumb_path( $size_name, $mimetype, true, $size_x );
 
 			if( $err[0] != '!' && @copy( $File->get_full_path(), $err ) )
 			{	// File was saved. Ouput that same file immediately:
 				// note: @copy returns FALSE on failure, if not muted it'll print the error on screen
-				$err = $File->output_cached_thumb( $size_name, $mimetype, $mtime );
+				$err = $File->output_cached_thumb( $size_name, $mimetype, $mtime, $size_x );
 			}
 		}
 		else
@@ -166,14 +172,14 @@ if( !empty($size) && $File->is_image() )
 
 			if( empty( $err ) )
 			{
-				list( $err, $dest_imh ) = generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height, $thumb_percent_blur );
+				list( $err, $dest_imh ) = generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height, $thumb_percent_blur, $size_x );
 				if( empty( $err ) )
 				{
-					$err = $File->save_thumb_to_cache( $dest_imh, $size_name, $mimetype, $thumb_quality );
+					$err = $File->save_thumb_to_cache( $dest_imh, $size_name, $mimetype, $thumb_quality, $size_x );
 					if( empty( $err ) )
 					{	// File was saved. Ouput that same file immediately:
 						// This is probably better than recompressing the memory image..
-						$err = $File->output_cached_thumb( $size_name, $mimetype, $mtime );
+						$err = $File->output_cached_thumb( $size_name, $mimetype, $mtime, $size_x );
 					}
 					else
 					{	// File could not be saved.

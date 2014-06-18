@@ -324,7 +324,7 @@ function load_blocked_emails( $user_IDs, $blocked_statuses = array() )
 {
 	global $DB, $cache_mail_is_blocked_status;
 
-	if( $user_IDs )
+	if( empty( $user_IDs ) )
 	{ // No users, Exit here
 		return;
 	}

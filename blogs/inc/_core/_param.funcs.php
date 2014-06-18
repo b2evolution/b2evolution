@@ -2274,7 +2274,16 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 
 	if( $use_balanceTags )
 	{ // Auto close open tags:
-		$content = balance_tags( $content );
+		if( strpos( $content, '<code' ) !== false || strpos( $content, '<pre' ) !== false || strpos( $content, '```' ) !== false )
+		{ // Call balance_tags() on everything outside code/pre:
+			$content = callback_on_non_matching_blocks( $content,
+					'~(<(code|pre)[^>]*>.*?</\2>|```.*?```)~is',
+					'balance_tags' );
+		}
+		else
+		{ // No code/pre blocks, call balance_tags() on the whole content
+			$content = balance_tags( $content );
+		}
 	}
 
 	if( $xhtmlvalidation )

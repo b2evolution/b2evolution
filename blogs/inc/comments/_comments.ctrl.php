@@ -84,7 +84,7 @@ switch( $action )
 		// Format content for editing, if we were not already in editing...
 		$Plugins_admin = & get_Plugins_admin();
 		$params = array( 'object_type' => 'Comment', 'object_Blog' => & $Blog );
-		$Plugins_admin->unfilter_contents( $comment_title /* by ref */, $comment_content /* by ref */, $edited_Comment_Item->get_renderers_validated(), $params );
+		$Plugins_admin->unfilter_contents( $comment_title /* by ref */, $comment_content /* by ref */, $edited_Comment->get_renderers_validated(), $params );
 
 		// Where are we going to redirect to?
 		param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$edited_Comment_Item->ID, '&' ) );
@@ -194,6 +194,12 @@ switch( $tab3 )
 }
 
 $AdminUI->set_path( 'items' );	// Sublevel may be attached below
+
+if( $action == 'edit' )
+{ // Page with comment edit form
+	// Set an url for manual page
+	$AdminUI->set_page_manual_link( 'editing-comments' );
+}
 
 /**
  * Perform action:
@@ -310,6 +316,33 @@ switch( $action )
 			$edited_Comment->set_renderers( $renderers );
 		}
 
+		if( $edited_Comment_Item->Blog->get_setting( 'threaded_comments' ) &&
+		    ( param( 'in_reply_to_cmt_ID', 'integer', NULL, false, false, false ) !== false ) )
+		{ // Change a field "In reply to comment ID" if threaded comments are enabled for the blog
+			$in_reply_to_cmt_ID = get_param( 'in_reply_to_cmt_ID' );
+			$CommentCache = & get_CommentCache();
+			if( $in_reply_to_cmt_ID > 0 )
+			{ // Check new entered comment ID
+				if( ! empty( $edited_Comment->ID ) && $in_reply_to_cmt_ID == $edited_Comment->ID )
+				{ // Restrict such brake case
+					$Messages->add( T_('You cannot use current comment ID for the field "In reply to comment ID".'), 'error' );
+				}
+				elseif( ! ( $Comment = & $CommentCache->get_by_ID( $in_reply_to_cmt_ID, false, false ) ) )
+				{ // No comment exists
+					$Messages->add( T_('Field "In reply to comment ID" has an unexisting comment ID.'), 'error' );
+				}
+				elseif( $Comment->item_ID != $edited_Comment_Item->ID )
+				{ // Item of new reply comment is not same
+					$Messages->add( T_('Use a comment for field "In reply to comment ID" only from the same post.'), 'error' );
+				}
+			}
+			else
+			{ // Deny wrong comment ID
+				$in_reply_to_cmt_ID = NULL;
+			}
+			$edited_Comment->set( 'in_reply_to_cmt_ID', $in_reply_to_cmt_ID, true );
+		}
+
 		// Trigger event: a Plugin could add a $category="error" message here..
 		// This must get triggered before any internal validation and must pass all relevant params.
 		// The OpenID plugin will validate a given OpenID here (via redirect and coming back here).
@@ -317,6 +350,7 @@ switch( $action )
 				'dont_remove_pre' => true,
 				'comment_item_ID' => $edited_Comment_Item->ID,
 				'comment' => & $content,
+				'renderers' => $edited_Comment->get_renderers(),
 			) );
 
 		param_check_html( 'content', T_('Invalid comment text.') );	// Check this is backoffice content (NOT with comment rules)
@@ -692,8 +726,10 @@ switch( $action )
 		// Begin payload block:
 		$AdminUI->disp_payload_begin();
 
-		echo '<table class="browse" cellspacing="0" cellpadding="0" border="0"><tr>';
-		echo '<td class="browse_left_col">';
+		$table_browse_template = $AdminUI->get_template( 'table_browse' );
+		echo $table_browse_template['table_start'];
+
+		echo $table_browse_template['left_col_start'];
 
 		if( ! empty( $process_action ) && $process_action == 'mass_delete' && !empty( $mass_type ) )
 		{ // Mass deleting of the comments
@@ -710,14 +746,14 @@ switch( $action )
 		{
 			$AdminUI->disp_view( 'comments/views/_comment_list_table.view.php' );
 		}
-		echo '</td>';
+		echo $table_browse_template['left_col_end'];
 
-		echo '<td class="browse_right_col">';
+		echo $table_browse_template['right_col_start'];
 			// Display VIEW:
 			$AdminUI->disp_view( 'comments/views/_comments_sidebar.view.php' );
-		echo '</td>';
+		echo $table_browse_template['right_col_end'];
 
-		echo '</tr></table>';
+		echo $table_browse_template['table_end'];
 
 		// End payload block:
 		$AdminUI->disp_payload_end();

@@ -37,20 +37,20 @@ $Form->hidden( 'tab', 'other' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
 
-$Form->begin_fieldset( T_('Sitemaps') );
+$Form->begin_fieldset( T_('Sitemaps').get_manual_link( 'sitemaps-other' ) );
 	$Form->checkbox( 'enable_sitemaps', $edited_Blog->get_setting( 'enable_sitemaps' ),
 						T_( 'Enable sitemaps' ), T_( 'Check to allow usage of skins with the "sitemap" type.' ) );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Subscriptions') );
+$Form->begin_fieldset( T_('Subscriptions').get_manual_link( 'subscriptions-other' ) );
 	$Form->checkbox( 'allow_subscriptions', $edited_Blog->get_setting( 'allow_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new post and/or comment.') );
 	$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), '', T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
 	// TODO: checkbox 'Enable RSS/Atom feeds'
 	// TODO2: which feeds (skins)?
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('List of public blogs') );
+$Form->begin_fieldset( T_('List of public blogs').get_manual_link( 'public-blogs-other' ) );
 	$Form->checkbox( 'blog_in_bloglist', $edited_Blog->get( 'in_bloglist' ), T_('Include in public blog list'), T_('Check this if you want this blog to be advertised in the list of all public blogs on this system.') );
 $Form->end_fieldset();
 
@@ -59,19 +59,19 @@ if( isset($GLOBALS['files_Module']) )
 	load_funcs( 'files/model/_image.funcs.php' );
 	$params['force_keys_as_values'] = true;
 	
-	$Form->begin_fieldset( T_('User directory') );
+	$Form->begin_fieldset( T_('User directory').get_manual_link( 'user-directory-other' ) );
 			$Form->select_input_array( 'image_size_user_list', $edited_Blog->get_setting( 'image_size_user_list' ), get_available_thumb_sizes(), T_('Profile picture size'), '', $params );
 	$Form->end_fieldset();
 		
-	$Form->begin_fieldset( T_('Messaging') );
+	$Form->begin_fieldset( T_('Messaging').get_manual_link( 'messaging-other' ) );
 			$Form->select_input_array( 'image_size_messaging', $edited_Blog->get_setting( 'image_size_messaging' ), get_available_thumb_sizes(), T_('Profile picture size'), '', $params );
 	$Form->end_fieldset();
 
 }
 
 
-$Form->begin_fieldset( T_('Archives') );
-	$Form->radio( 'archive_mode',  $edited_Blog->get_setting('archive_mode'),
+$Form->begin_fieldset( T_('Archives').get_manual_link( 'archives-other' ) );
+	$Form->radio( 'archive_mode', $edited_Blog->get_setting( 'archive_mode' ),
 							array(  array( 'monthly', T_('monthly') ),
 											array( 'weekly', T_('weekly') ),
 											array( 'daily', T_('daily') ),
@@ -81,10 +81,15 @@ $Form->begin_fieldset( T_('Archives') );
 	// TODO: Hide if archive_mode != 'postbypost' (JS)
 	// fp> there should probably be no post by post mode since we do have other ways to list posts now
 	// fp> TODO: this is display param and should go to plugin/widget
-	$Form->radio( 'archives_sort_order',  $edited_Blog->get_setting('archives_sort_order'),
+	$Form->radio( 'archives_sort_order', $edited_Blog->get_setting( 'archives_sort_order' ),
 							array(  array( 'date', T_('date') ),
 											array( 'title', T_('title') ),
 										), T_('Archive sorting'), false,  T_('How to sort your archives? (only in post by post mode)') );
+$Form->end_fieldset();
+
+
+$Form->begin_fieldset( T_('Download display').get_manual_link( 'download-display-other' ) );
+	$Form->text_input( 'download_delay', $edited_Blog->get_setting( 'download_delay' ), 2, T_('Download delay') );
 $Form->end_fieldset();
 
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );

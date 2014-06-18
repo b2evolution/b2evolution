@@ -43,7 +43,8 @@ if( !$current_User->check_status( 'can_be_validated' ) )
 	}
 	if( empty( $redirect_to ) || preg_match( '#disp=activateinfo#', $redirect_to ) )
 	{ // redirect_to is pointing to the activate info display or is empty
-		$redirect_to = regenerate_url( 'disp' );
+	  // redirect to referer page
+		$redirect_to = '';
 	}
 
 	if( $current_User->check_status( 'is_validated' ) )

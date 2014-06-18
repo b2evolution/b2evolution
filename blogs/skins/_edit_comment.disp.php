@@ -44,6 +44,12 @@ $Form->begin_form( 'bComment' );
 	$Form->hidden( 'redirect_to', url_add_tail( $comment_Item->get_permanent_url(), '#c'.$edited_Comment->ID ) );
 
 	$Form->info( T_('In response to'), $comment_Item->get_title() );
+
+	if( $Blog->get_setting( 'threaded_comments' ) )
+	{ // Display a reply comment ID only when this feature is enabled in blog settings
+		$Form->text_input( 'in_reply_to_cmt_ID', $edited_Comment->in_reply_to_cmt_ID, 10, T_('In reply to comment ID'), T_('(leave blank for normal comments)') );
+	}
+
 	if( $edited_Comment->get_author_User() )
 	{
 		$Form->info( T_('Author'), $edited_Comment->get_author() );
@@ -71,8 +77,8 @@ $Form->begin_form( 'bComment' );
 
 	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{ // ------------------------------------ TIME STAMP -------------------------------------
-		$Form->begin_fieldset();
-		echo '<div class="label">'.T_('Comment date').':</div>';
+		$Form->begin_fieldset( '', array( 'id' => 'comment_date_field' ) );
+		echo $Form->begin_field( NULL, T_('Comment date') );
 		$Form->switch_layout( 'blockspan' );
 		$Form->date_input( 'comment_issue_date', $edited_Comment->date, '', array( 'size' => "10" ) );
 		$Form->time_input( 'comment_issue_time', $edited_Comment->date, '', array( 'size' => "10" ) );
@@ -82,7 +88,10 @@ $Form->begin_form( 'bComment' );
 
 	if( $comment_Item->can_rate() || !empty( $edited_Comment->rating ) )
 	{ // Rating is editable
-		$edited_Comment->rating_input( array( 'before' => '<fieldset><div class="label">'.T_('Rating').':</div><div class="input">', 'after' => '</div></fieldset>' ) );
+		$edited_Comment->rating_input( array(
+				'before' => $Form->begin_field( 'comment_rating_field', T_('Rating') ),
+				'after' => $Form->inputend.$Form->fieldend
+			) );
 	}
 
 	// Get those statuses which are not allowed for the current User to create comments in this blog

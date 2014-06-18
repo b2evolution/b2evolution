@@ -135,7 +135,7 @@ $Results->cols[] = array(
 		'th' => T_('Redirect to'),
 		'order' => 'goal_redir_url',
 		'td_class' => 'small',
-		'td' => '<a href="%{Obj}->get_active_url()%">%{Obj}->get_active_url()%</a>',
+		'td' => '<a href="%{Obj}->get_active_url()%">%{Obj}->get_active_url( array( "before_temp" => "<b>", "after_temp" => "</b>" ) )%</a>',
  	);
 
 $Results->cols[] = array(

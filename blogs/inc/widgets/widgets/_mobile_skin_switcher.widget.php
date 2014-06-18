@@ -172,10 +172,14 @@ class mobile_skin_switcher_Widget extends ComponentWidget
 			}
 		}
 
+		echo $this->disp_params['block_body_start'];
+
 		// Print out the template with the replaced vars
 		echo str_replace( array( '$widget_title$', '$switch_url$' ),
 			array( $this->disp_params['title'], $switch_url ),
 			$params[ $template_name ] );
+
+		echo $this->disp_params['block_body_end'];
 
 		echo $this->disp_params['block_end'];
 

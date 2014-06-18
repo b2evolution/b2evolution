@@ -99,8 +99,7 @@ $Form->text_input( 'thrd_title', $edited_Thread->title, $params['cols'], T_('Sub
 
 $Form->textarea_input( 'msg_text', isset( $edited_Thread->text ) ? $edited_Thread->text : $edited_Message->text, 10, T_('Message'), array(
 		'cols' => $params['cols'],
-		'required' => true,
-		'display_fix_pixel' => false
+		'required' => true
 	) );
 
 global $thrd_recipients_array, $recipients_selected;

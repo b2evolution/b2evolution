@@ -1467,28 +1467,11 @@ class Plugins_admin extends Plugins
 
 		foreach( $filter_Plugins as $loop_filter_Plugin )
 		{ // Go through whole list of renders
-			switch( $loop_filter_Plugin->get_coll_setting( $rendering_setting_name, $params['object_Blog'] ) )
-			{
-				case 'stealth':
-				case 'always':
-					// echo 'FORCED ';
-					$this->call_method( $loop_filter_Plugin->ID, $event, $params );
-					break;
+			$rendering_setting_value = $loop_filter_Plugin->get_coll_setting( $rendering_setting_name, $params['object_Blog'] );
 
-				case 'opt-out':
-				case 'opt-in':
-				case 'lazy':
-					if( in_array( $loop_filter_Plugin->code, $renderers ) )
-					{ // Option is activated
-						// echo 'OPT ';
-						$this->call_method( $loop_filter_Plugin->ID, $event, $params );
-					}
-					// else echo 'NOOPT ';
-					break;
-
-				case 'never':
-					// echo 'NEVER ';
-					break;	// STOP, don't render, go to next renderer
+			if( $loop_filter_Plugin->is_renderer_enabled( $rendering_setting_value, $renderers ) )
+			{ // Plugin is enabled to call method
+				$this->call_method( $loop_filter_Plugin->ID, $event, $params );
 			}
 		}
 

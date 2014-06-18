@@ -56,13 +56,14 @@ else
 	// Create result set:
 	$SQL = new SQL();
 	$SQL->SELECT( 'hit_ID, sess_ID, hit_datetime, hit_referer_type, hit_uri, hit_coll_ID, hit_referer, hit_remote_addr,
-									user_login, hit_agent_type, dom_name, goal_name, keyp_phrase' );
+									user_login, hit_agent_type, dom_name, goal_name, keyp_phrase, gcat_color' );
 	$SQL->FROM( 'T_track__goalhit LEFT JOIN T_hitlog ON ghit_hit_ID = hit_ID
 									LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
-								  LEFT JOIN T_track__keyphrase ON hit_keyphrase_keyp_ID = keyp_ID
+									LEFT JOIN T_track__keyphrase ON hit_keyphrase_keyp_ID = keyp_ID
 									LEFT JOIN T_sessions ON hit_sess_ID = sess_ID
 									LEFT JOIN T_users ON sess_user_ID = user_ID
-									LEFT JOIN T_track__goal ON ghit_goal_ID = goal_ID' );
+									LEFT JOIN T_track__goal ON ghit_goal_ID = goal_ID
+									LEFT JOIN T_track__goalcat ON gcat_ID = goal_gcat_ID' );
 
 	$SQL_count = new SQL();
 	$SQL_count->SELECT( 'COUNT(ghit_ID)' );
@@ -194,6 +195,7 @@ $Results->cols[] = array(
 		'order' => 'goal_name',
 		'default_dir' => 'D',
 		'td' => '$goal_name$',
+		'extra' => array( 'style' => 'color:#gcat_color#' )
 	);
 
 // Display results:
