@@ -1,0 +1,56 @@
+# Apache configuration for b2evolution's base folder
+# Lines starting with # are comments.
+# Updated 2013-07-16
+
+# PHP / SECURITY:
+<IfModule mod_php5.c>
+	# On some overly "secured" systems, the following may need to be added in each folder:
+	# AddHandler application/x-httpd-php5 .php
+
+	# The following will try to configure PHP in the way b2evolution would like it to be:
+	php_flag register_globals Off
+	# You may want to turn the following to Off on production servers
+	# Please do this only if you know what you're doing and will be able to retrieve potential errors from your error log
+	php_flag display_errors On
+	# The following is the same as 'E_ALL & ~ E_STRICT' (except those constants may not be available here)
+	php_value error_reporting 30719
+
+	# You may also need some of the following:
+	# Increase memory limit
+	# php_value memory_limit 256M
+</IfModule>
+
+# DISABLE LISTING FILES ON SERVER:
+# Don't show directory contents (not desirable, especially for media folders)
+Options -Indexes
+# Note: if you have access to the command line of your server, it would probably
+# be even better to type this:  a2dismod autoindex
+# (This disables the directory listing module completely)
+
+# DEFAULT DOCUMENT TO DISPLAY:
+# In case no specific file is requested, we want to fall back to index.php
+# In case some subdirectories are accessed, we want to display index.html
+<IfModule mod_dir.c>
+	DirectoryIndex index.php index.html
+</IfModule>
+
+# CLEAN URLS:
+# The following will ensure you can pass extra params after the filename on the URL
+AcceptPathInfo	On
+
+# CATCH EVERYTHING INTO B2EVO: (even if no php file appears in the URL)
+# The following will allow you to have a blog running right off the site root,
+# using index.php as a stub but not showing it in the URLs.
+# This will add support for URLs like:  http://example.com/2006/08/29/post-title
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+
+	# This line may be needed or not.
+	# enabling this would prevent running in a subdir like /blog/index.php
+	# RewriteBase /
+
+	# Redirect any .htm .html or no-extension-file that's not an existing file or directory to index.php:
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteRule ^[^.]+(\.(html|htm))?$ index.php [L]
+</IfModule>

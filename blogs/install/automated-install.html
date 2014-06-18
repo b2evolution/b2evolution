@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<title>b2evolution Automated Install</title>
+</head>
+<body>
+	<h1>b2evolution Automated Install/Upgrade</h1>
+	<h2>Purpose</h2>
+	<p>This document describes how you can most easily automate the installation of the <a href="http://b2evolution.net/">b2evolution</a> blog software of a hosting account.</p>
+	<p>This document also addresses automated upgrade of b2evolution.</p>
+	<h2>Intended audience</h2>
+	<ul>
+		<li>Web hosting providers</li>
+		<li>Web hosting tool providers</li>
+	</ul>
+	<h2>Operating environment</h2>
+	<p>b2evolution is a PHP + MySQL web application. At this point we strongly recommend the use of PHP 5 as well as MySQL 5 although b2evolution can work perfectly fine on PHP 4.3 and MySQL 4.0.</p>
+	<p>Please see our <a href="http://manual.b2evolution.net/System_requirements">System Requirements page</a> for details.</p>
+	<h2>Basics</h2>
+	<p>Automated installation of web applications such as b2evolution typically involves these steps:</p>
+	<ol>
+		<li>Place the application files in the destination directory.</li>
+		<li>Create a MySQL User, Database and privileges of the user on the database.</li>
+		<li>Write/update a configuration file with the database login information.</li>
+		<li>Run the install/setup script of the application.</li>
+		<li>Delete the installer.</li>
+	</ol>
+	<h1>Recommended Auto Install procedure</h1>
+	<h2>1. Place the application files in the destination directory</h2>
+	<p>We recommend you prompt the user for a directory to install b2evolution into. If he provides an empty directory, b2evolution would be installed in his web root. Let's pretend the user chose to install into www/myblog/ .</p>
+	<p>Once the destination directory selected/created, you need to copy all the contents of the /blogs/ directory as provided in the b2evolution package into the destination directory www/myblog/ . <strong>You should not copy the package info files such as the /doc/ directory.</strong></p>
+	<h3>File permissions</h3>
+	<p>You should make sure that the contents of the www/myblog/media/ directory are writable by PHP. This is the place where the user can upload pictures to insert in his blog posts, etc.</p>
+	<h2>2. Create a MySQL database</h2>
+	<p>You will need to provide b2evolution with a database where it will create its own tables.</p>
+	<h2>3. Write the configuration file</h2>
+	<p>At this point, you need to write/update the basic configuration file you previously copied to www/myblog/conf/_basic_conf.php .</p>
+	<p>You need to update the following lines with the database login info:</p>
+	<pre>$db_config = array(
+ 'user'          =&gt; 'demouser',     // your MySQL username
+ 'password'      =&gt; 'demopass',     // ...and password
+ 'name'          =&gt; 'b2evolution',  // the name of the database
+ 'host'          =&gt; 'localhost',    // MySQL Server (typically 'localhost')
+ );
+</pre>
+	<p>Then, you should update the user's e-mail address on this line:<br>
+	</p>
+	<pre>$admin_email = 'postmaster@localhost';</pre>
+	<p>and you need to tell b2evolution that the configuration has been done by replacing</p>
+	<pre>$config_is_done = 0;</pre>
+	<p>with</p>
+	<pre>$config_is_done = 1;</pre>
+	<h2>4. Run the install script</h2>
+	<p>At this point you can call b2evolution's install script through an HTTP GET request (wget, cURL, etc..) of this form:</p>
+	<pre>http://example.com/myblogs/install/index.php?locale=en-US&amp;action=newdb&amp;create_sample_contents=1</pre>
+	<h3>New in b2evo 2.0.2:</h3>
+	<p>You can detect that installation has been successful by parsing the output and locating the string &lt;evo:password&gt; .</p>
+	<p>Furthermore, you can parse out the password that has been created for the user by parsing it out between &lt;evo:password&gt; and &lt;/evo:password&gt;. Example:</p>
+	<pre>&lt;evo:password&gt;testpwd&lt;/evo:password&gt;</pre>
+	<h2>5. Delete the install folder</h2>
+	<p>At this point, the www/myblog/install/ folder is no longer needed. We recommend you delete it, both to save space and improve security.</p>
+	<p>Note: when upgrading, you will need a <strong>new</strong> install folder. So there is really no point in keeping it.</p>
+	<h1>Recommended Auto Upgrade procedure</h1>
+	<p>Any newer version of b2evolution can upgrade its database from any older version. It will also refuse to update if for some reason you try to &quot;downgrade&quot; it.</p>
+	<h2>0. Detecting which version of b2evolution is installed</h2>
+	<p>Open the file www/myblog/conf/_application.php and parse out the line that says:</p>
+	<pre>$app_version = '2.0.2-alpha';</pre>
+	<p>You can safely ignore the part after the hyphen (-). The version <strong>number</strong> will always change when a new version is released.</p>
+	<p>You can compare this version number with the new one you have available.</p>
+	<p>Note: if using PHP, you can use version_compare() which does all the work for you.</p>
+	<h2>1. Getting confirmation that the user wants to upgrade</h2>
+	<p>You should warn the user that any customizations he may have added to his existing b2evolution may not work properly with the new version. This especially applies to custom skins, custom plugins and custom locales (translations).</p>
+	<p>Optionally, you may want to provide checkboxes for the following:</p>
+	<ul>
+		<li>Reset skins</li>
+		<li>Reset plugins</li>
+		<li>Reset locales (translations)</li>
+	</ul>
+	<h2>2. Replacing the files</h2>
+	<p>Delete all files &amp; folders from the <strong>www/myblog/</strong> except:</p>
+	<ul>
+		<li> <strong>www/myblog/media/</strong> (where the user has uploaded his content files).</li>
+		<li>If the user hasn't requested a reset of these, also keep:
+			<ul>
+				<li><strong>www/myblog/skins</strong>/</li>
+				<li><strong>www/myblog/plugins/</strong></li>
+				<li><strong>www/myblog/locales/</strong></li>
+			</ul>
+		</li>
+		<li><strong>www/conf/_basic_config.php</strong> (no need to rewrite that one)</li>
+	</ul>
+	<p><strong>Warning: if the user has installed into the root folder, you may not want to delete &quot;all files &amp; folders&quot;!</strong> In this case, the folders you should delete are:</p>
+	<ul>
+		<li>www/cron/</li>
+		<li>www/htsrv/</li>
+		<li>www/inc/</li>
+		<li>www/install/ (if it's still there)</li>
+		<li>www/locales/ (if requested)</li>
+		<li>www/plugins/ (if requested)</li>
+		<li>www/rsc/</li>
+		<li>www/skins/ (if requested)</li>
+		<li>www/skins_adm/</li>
+		<li>www/xmlsrv/</li>
+	</ul>
+	<p>After than copy all files from the new b2evolution's /blogs/ folder, <strong>except /blogs/media/ and /blogs/conf/_basic_config.php </strong>.</p>
+	<h2>3. Upgrading the database</h2>
+	<p>At this point you can call b2evolution's install script through an HTTP GET request (wget, cURL, etc..) of this form:</p>
+	<pre>http://example.com/myblogs/install/index.php?locale=en-US&amp;action=evoupgrade
+</pre>
+	<h2>4. Delete the install folder</h2>
+	<p>At this point, the www/myblog/install/ folder is no longer needed. We recommend you delete it, both to save space and improve security.</p>
+	<p>Note: when upgrading again, you will need a <strong>new</strong> install folder. So there is really no point in keeping it.</p>
+	<h1></h1>
+</body>
+</html>

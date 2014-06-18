@@ -1,0 +1,336 @@
+/**
+ * Filemanager Cascading Style Sheets definitions.
+ *
+ * Only alignments, overrides various classes for the filemanmain div
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package admin
+ */
+
+#filemanmain {
+	margin-bottom:1em;
+}
+
+#FilesForm div.panelinfo {
+	margin:1ex 0;
+}
+
+div.fileman_toolbars_bottom {
+	padding: 3px;
+}
+.toolbaritem {
+	margin: 0 0 0 1em;
+	float:right;
+	white-space:nowrap;
+	text-align: right;
+	padding: 2px 10px;
+}
+.toolbaritem form {
+	width: 20%; /* For IE7 */
+}
+
+#fm_browser {
+	clear: both;
+	width: 100%;
+	margin: 1ex auto;
+}
+
+#fm_bar {
+	padding: .5ex;
+	border-top: 1px solid #bbb;
+	border-left: 1px solid #bbb;
+	border-right: 1px solid #bbb;
+	background-color: #ddd; /* Temp color, needs overriding */
+}
+
+#fmbar_cwd {
+	display: inline;
+}
+
+#fmbar_filter,
+#fm_reloadhint {
+	display: inline;
+	white-space: nowrap;
+}
+#fmbar_filecounts {
+	display: inline;
+	white-space: nowrap;
+	margin-left:1ex;
+	font-size: 84%;
+}
+
+#fm_dirtree {
+	vertical-align: top;
+	width: 15%;
+	padding: .5ex;
+	border: 1px solid #bbb;
+	border-right: none;
+}
+#fm_files {
+	vertical-align: top;
+	padding: 0;
+	border: 1px solid #bbb;
+	background-color: #ddd;
+}
+
+
+/* Directory tree: */
+.folder_in_tree {
+	white-space:nowrap;
+}
+
+/**
+ * Files table {{{
+ */
+table.filelist {
+	border-collapse: collapse;
+	width: 100%;
+	border-bottom: 1px solid #bbb;
+}
+table.filelist tr {
+	background-color: #eee;
+}
+table.filelist tr.odd {
+	background-color: #ddd;
+}
+table.filelist tr:hover,
+table.filelist tr.odd:hover {
+	background-color:#ccc;
+}
+table.filelist td {
+	border-left: 1px solid #bbb;
+	padding: 2px 4px;
+}
+table.filelist .firstcol {
+	border-left: none;
+}
+
+
+/* Table headers/footers: */
+table.filelist th {
+	padding: 2px 4px;
+	border-bottom: 1px solid #bbb;
+	border-left: 1px solid #bbb;
+	background-color: #ddd;
+}
+table.filelist th img {
+	vertical-align: bottom;
+}
+
+/* Table BASIC sort buttons/headers: */
+table.filelist th a.basic_current,
+table.filelist th a.basic_sort_link {
+	padding: 0 4px;
+	display: block;
+	height: 100%;
+}
+table.filelist th a.basic_current {
+	background-color:#ccc;
+}
+table.filelist th a.basic_sort_link:hover {
+	background-color:#ccc;
+}
+
+table.filelist td.error {
+	padding:2ex;
+	color:red;
+}
+table.filelist td.checkbox {
+	text-align: center;
+}
+table.filelist input.checkbox {
+	border:none;
+	background-color: #eee;
+}
+table.filelist tr.odd input.checkbox {
+	border:none;
+	background-color: #ddd;
+}
+table.filelist td.icon_type {
+	text-align: center;
+	white-space: nowrap;
+	width: 1%;
+	max-width:500px; /* safetynet for backtraces in here */
+	overflow:auto; /* safetynet for backtraces in here */
+}
+table.filelist td#fileman_error, /* used when an error (e.g. "no files") gets displayed */
+table.filelist td.fm_filename {
+	text-align: left;
+	width:100%; /* the glory hack: makes the table as wide as it can be */
+}
+table.filelist td.fm_filename div.path {
+	clear:right;
+	float:right;
+}
+table.filelist td.fm_filename .result_error {
+	border: none;
+}
+table.filelist tr#fileuploader_form td {
+	padding: 3px;
+	background: #b5cee0;
+}
+table.filelist .qq-upload-button,
+table.filelist .qq-upload-drop-area,
+table.filelist .qq-upload-drop-area-active,
+div.fileman_toolbars_bottom .toolbaritem {
+	border: 2px dashed #fff;
+	border-radius: 9px;
+	-moz-border-radius: 9px;
+	-webkit-border-radius: 9px;
+	-khtml-border-radius: 9px;
+	background: #b5cee0;
+}
+table.filelist .qq-upload-button-hover,
+table.filelist .qq-upload-drop-area,
+table.filelist .qq-upload-drop-area-active {
+	background: #f6ada8;
+}
+div.fileman_toolbars_bottom .toolbaritem {
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-khtml-border-radius: 3px;
+}
+.filemeta /* meta data after filename */
+{
+	color: #999;
+	font-size: 84%;
+}
+table.filelist td.size,
+table.filelist td.actions {
+	white-space: nowrap;
+}
+table.filelist td.size {
+	text-align: right;
+}
+table.filelist td.size span.qq-upload-size {
+	font: inherit;
+	margin: 0;
+}
+table.filelist td.perms {
+	text-align: center;
+}
+table.filelist tr.listfooter td {
+	/* Temporary colors, needs overriding */
+	border-top: 1px solid #bbb;
+	border-left: none;
+	background-color: #ddd;
+}
+
+/* }}} / Files table */
+
+
+
+div.fm_query {
+	padding-top: 2ex;
+	border:1px solid;
+}
+
+div.img_frame {
+	text-align:center;
+	border:1px solid red;
+}
+div.subline {
+	color:#777;
+	font-size:75%;
+}
+img.framed {
+	border:1px dashed #d91;
+	padding:10px;
+	margin:10px;
+}
+.linenr {
+	background-color:#ff0;
+	font-weight:bold;
+}
+div.fileheader,
+div.eof
+{	/* Use in RAW file preview */
+	background:#ccc;
+	padding:1ex;
+	margin: 0;
+}
+pre.rawcontent {
+	margin:0;
+	padding:0 1ex;
+	font-family: Courier New, sans-serif;
+}
+
+.filenameIcon {
+	float:right;
+	border:none;
+	padding:0;
+	margin:0;
+	background:transparent;
+}
+
+em.filter {
+	color:#f00;
+}
+
+.tooltitle {
+	font-weight:bold;
+	padding-left:1ex;
+}
+ul.iconlegend {
+	list-style:none;
+	margin:1ex;
+	padding:0;
+	display: inline;
+}
+ul.iconlegend li {
+	display:inline;
+	margin: 1ex;
+	white-space:nowrap;
+	/* margin-bottom:.5ex; */
+}
+
+div.upload_title {
+	font-weight: bold;
+	padding: 3px 1ex;
+	background-color: #ccc;
+	border-bottom: 1px solid #bbb;
+}
+input.upload_file {
+	width: 70%;
+}
+
+ul#uploadfileinputs {
+	list-style:none;
+	margin:0;
+	padding:0;
+}
+ul#uploadfileinputs li, /* Info block about a file to upload */
+p.uploadfileinputs {    /* Link to add a new info block */
+	background-color:#ddd; /* Temp color, needs overriding */
+	margin: 0;
+	padding:1ex;
+	border-bottom: 1px solid #bbb;
+}
+ul#uploadfileinputs li.invalid
+{	/* Upload block displayed when upload has failed: */
+	border:1px solid #f00;
+}
+ul#uploadfileinputs label {
+	font-weight:bold;
+}
+
+div.upload_foot {
+	margin: 1ex;
+}
+
+div#FM_anchor {
+	padding:2ex 0;
+	text-align:center;
+}
+
+#fm_highlighted {
+	background-color:#ffe79f;
+}
+
+#fileuploader_form ul.qq-upload-list {
+	display: none;
+}

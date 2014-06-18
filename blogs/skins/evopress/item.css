@@ -1,0 +1,95 @@
+/**
+ * These are the styles that are used INSIDE of a blog item/post.
+ * The skin should include this into its design,
+ * but this should ALSO be included in the backoffice when viewing/editing posts.
+ */
+
+
+small, blockquote, strike {
+color: #777;
+}
+
+acronym, abbr, span.caps {
+cursor: help;
+}
+
+acronym, abbr {
+border-bottom: 1px dashed #999;
+}
+
+blockquote {
+margin: 15px 30px 0 10px;
+padding-left: 20px;
+border-left: 5px solid #ddd;
+}
+
+blockquote cite {
+margin: 5px 0 0;
+display: block;
+}
+
+.center
+{
+	text-align: center;
+}
+
+a img {
+border: none;
+}
+
+small {
+font-family: Arial, Helvetica, Sans-Serif;
+font-size: 0.9em;
+line-height: 1.5em;
+}
+
+
+code, samp {
+font: 1.1em 'Courier New', Courier, Fixed;
+}
+
+acronym, abbr, span.caps
+{
+font-size: 0.9em;
+letter-spacing: .07em;
+}
+
+
+/* Begin Lists
+
+Special stylized non-IE bullets
+Do not work in Internet Explorer, which merely default to normal bullets. */
+
+html>body .bText ul {
+margin-left: 0px;
+padding: 0 0 0 30px;
+list-style: none;
+padding-left: 10px;
+text-indent: -10px;
+}
+
+html>body .bText li {
+margin: 7px 0 8px 10px;
+}
+
+.bText ul li:before, #sidebar ul ul li:before {
+content: "\00BB \0020";
+}
+#sidebar ul li.widget_core_coll_item_list.nobullets ul li:before {
+	content: none;
+}
+
+.bText ol {
+padding: 0 0 0 35px;
+margin: 0;
+}
+
+.bText ol li {
+margin: 0;
+padding: 0;
+}
+
+ol li, #sidebar ul ol li {
+list-style: decimal outside;
+}
+/* End bText Lists */

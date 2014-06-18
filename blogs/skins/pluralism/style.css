@@ -1,0 +1,433 @@
+/*
+Theme Name: Pluralism
+Theme URI: http://www.freewpthemes.net/preview/pluralism
+Description: Tested on WP 2.3.1
+Version: 2.0
+Author: Free WordPress Themes
+Author URI: http://www.freewpthemes.net
+*/
+
+/* Default styles overriden for this skin: */
+div#skin_wrapper div.sitewide_header {
+	margin-bottom: 0;
+}
+
+table.prevnext_post {
+	margin-top: 30px;
+	width: 810px;
+}
+
+body {
+	background: #F6F6F6;
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #6B6B6B;
+}
+
+input, textarea {
+	padding: 2px 5px;
+	border: 1px solid #EBEBEB;
+	font: bold 12px "Trebuchet MS", Arial, Helvetica, sans-serif;
+	color: #6B6B6B;
+}
+
+h1, h2, h3, h4 {
+	margin: 0;
+}
+
+h2, h3, h4 {
+	margin-bottom: 20px;
+	padding-bottom: 9px;
+	border-bottom: 1px solid #F2F2F2;
+	letter-spacing: -0.035em;
+	font-weight: normal;
+	color: #37404C;
+}
+
+h2 {
+	font-size: 28px;
+}
+
+h3 {
+	font-size: 16px;
+	font-weight: bold;
+}
+
+h4 {
+	font-size: 14px;
+	font-weight: bold;
+}
+
+p, ul, ol {
+	margin-bottom: 1.5em;
+	line-height: 170%;
+	text-align: justify;
+}
+
+dl.list1 {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+dl.list1 dt {
+	float: left;
+	width: 70px;
+}
+
+dl.list1 dd {
+	margin-bottom: 10px;
+}
+
+dl.list1 a {
+	color: #666666;
+}
+
+ul.list2 {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	line-height: normal;
+}
+
+ul.list2 li {
+	float: left;
+	margin: 0 18px 18px 0;
+}
+
+ul.list2 li.nopad {
+	margin-right: 0;
+}
+
+blockquote {
+	margin-left: 3em;
+	margin-right: 3em;
+}
+
+a {
+	color: #FF5A00;
+}
+
+a:hover {
+	text-decoration: none;
+}
+
+a img {
+	border: none;
+}
+
+img.left {
+	float: left;
+	margin: 5px 20px 0 0;
+}
+
+img.right {
+	float: right;
+	margin: 5px 0 0 20px;
+}
+
+hr {
+	display: none;
+}
+
+.action_messages {
+	padding-top: 30px;
+}
+
+#spectitle {
+	padding-top: 50px;
+}
+
+/* Wrapper */
+
+#wrapper0 {
+	overflow: hidden;
+	width: 100%;
+	box-shadow: 0 20px 20px -20px rgba(0, 0, 0, 0.25) inset;
+}
+
+#wrapper {
+	width: 876px;
+	margin: 0 auto;
+}
+
+/* Header */
+
+#header_wrap {
+	background:-webkit-linear-gradient(top, #0964aa, #04347e);
+	background:-moz-linear-gradient(top, #0964aa, #04347e);
+	background:-o-linear-gradient(top, #0964aa, #04347e);
+	background: -ms-linear-gradient(top, #0964aa, #04347e);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#0964aa', endColorstr='#04347e');
+	border-bottom: 8px solid #FFF;
+}
+#header {
+	height: 140px;
+	background: #087FE7 url(rsc/img/header.jpg) no-repeat;
+	margin: 0 auto;
+	width: 876px;
+}
+
+/* Logo */
+
+#logo {
+	float: left;
+	margin: 0;
+	padding: 57px 0 0 65px;
+	text-transform: lowercase;
+	font-size: 15px;
+	color: #FFFFFF;
+}
+
+#logo h1 {
+	margin: 0;
+	text-transform: lowercase;
+	letter-spacing: -3px;
+	font-size: 40px;
+	color: #FFFFFF;
+}
+
+#logo h1 a {
+	text-decoration: none;
+	color: #FFFFFF;
+}
+
+/* Blogs list */
+
+#blogs {
+	float: right;
+}
+
+#blogs ul {
+	margin: 0;
+	padding: 10px 65px 0 0;
+	list-style: none;
+	line-height: normal;
+}
+
+#blogs li {
+	display: inline;
+}
+
+#blogs a {
+	padding-left: 20px;
+	text-decoration: none;
+	font-size: 13px;
+	font-weight: bold;
+	color: #FFFFFF;
+}
+
+#blogs a.selected {
+	text-decoration: underline;
+}
+
+#blogs a:hover {
+	text-decoration: underline;
+}
+
+/* Menu */
+
+div.featured_post {
+	margin-top:67px;
+	padding-bottom: 20px;
+}
+div.featured_post .title {
+	padding-top: 0;
+}
+
+#menu {
+	float: right;
+	max-width: 630px;
+}
+
+#menu ul {
+	margin: 0;
+	padding: 68px 65px 0 0;
+	list-style: none;
+	line-height: normal;
+}
+
+#menu li {
+	display: inline;
+	float: left;
+}
+
+#menu a {
+	padding-left: 30px;
+	text-decoration: none;
+	font-size: 15px;
+	font-weight: bold;
+	color: #FFFFFF;
+}
+
+#menu a:hover {
+	text-decoration: underline;
+}
+
+/* Page */
+
+#page {
+	background: #FFF url(rsc/img/pagebg.png) no-repeat center top;
+	width: 876px;
+	margin: 0 auto;
+	box-shadow: 0 0 23px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Content */
+
+#content {
+	float: left;
+	width: 555px;
+	padding: 0 0 0 36px;
+}
+
+.title {
+	padding-top: 50px;
+}
+
+.title a {
+	text-decoration: none;
+	color: #37404C;
+}
+
+.title a:hover {
+	text-decoration: underline;
+}
+
+.edit_intro_link{
+	float: right;
+	margin-top: 60px;
+}
+
+/* Navigation */
+
+.navigation {
+	clear: both;
+	padding: 20px 0;
+	font-weight: bold;
+	font-size: larger;
+}
+
+/* Sidebar */
+
+#sidebar {
+	float: right;
+	width: 186px;
+	padding: 67px 76px 0 0;
+}
+
+#sidebar h2 {
+	font-size: 16px;
+	font-weight: bold;
+}
+
+#sidebar ul, #sidebar ul ol {
+margin: 0;
+padding: 0;
+}
+
+#sidebar ul li {
+list-style-type: none;
+list-style-image: none;
+margin-bottom: 15px;
+}
+
+#sidebar ul p, #sidebar ul select {
+margin: 5px 0 8px;
+}
+
+#sidebar ul ul, #sidebar ul ol {
+margin: 5px 0 0 10px;
+}
+
+#sidebar ul ul ul, #sidebar ul ol {
+margin: 0 0 0 10px;
+}
+
+#sidebar ul ul li, #sidebar ul ol li {
+margin: 1px 0 0;
+padding: 0;
+}
+
+#sidebar ul ul li:before {
+content: "\00BB \0020";
+}
+
+.submit, .preview, .SaveButton, .ResetButton {
+	padding: 1px;
+	border-top: 1px solid #BAD300;
+	border-left: 1px solid #A9C817;
+	border-right: 1px solid #7DAB00;
+	border-bottom: 1px solid #578900;
+	background:-webkit-linear-gradient(top, #8db600, #6e9d00);
+	background:-moz-linear-gradient(top, #8db600, #6e9d00);
+	background:-o-linear-gradient(top, #8db600, #6e9d00);
+	background: -ms-linear-gradient(top, #8db600, #6e9d00);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#8db600', endColorstr='#6e9d00');
+	font-size: 11px;
+	font-weight: bold;
+	color: #FFFFFF;
+}
+
+/* Footer */
+
+#footer {
+	height: 70px;
+	font-size: 92%;
+}
+
+#footer p {
+	margin: 0;
+	padding-top: 30px;
+	text-align: center;
+	color: #8E8E8E;
+}
+
+#footer a {
+	color: #666666;
+	text-decoration: none;
+}
+#footer a.contact_link,
+#footer a:hover {
+	text-decoration: underline;
+}
+
+div.input input, ul.ui-autocomplete {
+	font: bold 12px "Trebuchet MS",Arial,Helvetica,sans-serif;
+}
+
+div.compact_search_form input.SearchField {
+	width: 145px;
+}
+
+/* jQuery Tokeninput plugin */
+div.input ul.token-input-list-facebook {
+	width: 400px;
+	border-color: #EBEBEB;
+}
+
+
+div.comment_notification p, div.feedback_feed_msg p {
+	text-align: center;
+	padding: 0 10px;
+}
+div.messages_list {
+	margin-top: 50px;
+}
+
+/* Not published comments display */
+#styled_content_block .bComment .status_draft,
+#styled_content_block .bComment .status_review,
+#styled_content_block .bComment .status_community,
+#styled_content_block .bComment .status_protected,
+#styled_content_block .bComment .status_private {
+	left: 12px;
+}
+/* Not published posts display */
+#styled_content_block .post .status_draft,
+#styled_content_block .post .status_review,
+#styled_content_block .post .status_community,
+#styled_content_block .post .status_protected,
+#styled_content_block .post .status_private {
+	top: -20px;
+}

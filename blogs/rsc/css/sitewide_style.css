@@ -1,0 +1,103 @@
+/*
+ * Site wide styles used when site wide body & footer are enabled
+ */
+/* Override BODY from skin to make sure we touch the edges of the page: */
+body {
+	margin: 0;
+	padding: 0;
+} 
+ 
+div.sitewide_header,
+div.sitewide_footer {
+	font-family:"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial;
+	color: #ccc;
+	margin: 0;
+	clear: both;
+	/* border: 1px solid red; */
+}
+/* Devices with max width <= 1024px (iPhone,iPad):
+   Don't fix a position of the sitewide header */
+@media only screen and (max-device-width: 1024px) {
+	div#skin_wrapper div.sitewide_header {
+		position: inherit;
+		width: 100%;
+	}
+}
+div.sitewide_header p,
+div.sitewide_footer p {
+	margin: 0;
+	padding: 0;
+}
+div.sitewide_header a,
+div.sitewide_footer a {
+	color: #ccc;
+	border: none;
+}
+
+div.sitewide_header{
+	font-size: 16px;
+	font-weight: 300;
+	text-align: left;	
+	box-shadow: 0px -1px 8px 4px rgba(0,0,0,0.5);
+	/* position: fixed;
+	width: 100%; */
+	padding: 0;
+	margin-bottom: 15px;
+	background:-webkit-linear-gradient(top, #595C64, #1B1B1C);
+	background:-moz-linear-gradient(top, #595C64, #1B1B1C);
+	background:-o-linear-gradient(top, #595C64, #1B1B1C);
+	background: -ms-linear-gradient(top, #595C64, #1B1B1C);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#595C64', endColorstr='#1B1B1C');
+	border-bottom:1px solid #666;
+}
+
+a.swhead_item,
+a.swhead_sitename {
+	display: inline-block;
+	padding: 12px;
+	text-decoration: none;
+}
+a.swhead_sitename.swhead_logo {
+	padding: 0;
+	float: left;
+}
+a.swhead_sitename.swhead_logo img {
+	max-height: 43px;
+}
+div.sitewide_header a.swhead_sitename {
+	color: #FFF;
+	font-weight: 400;
+}
+div.sitewide_header a.swhead_item_selected,
+div.sitewide_header a.swhead_item:hover {	
+	text-decoration: none;
+	text-shadow: 0px 0 3px #FFF;
+	color: #FFF;
+	background:-webkit-linear-gradient(top, #696c72, #333334);
+	background:-moz-linear-gradient(top, #696c72, #333334);
+	background:-o-linear-gradient(top, #696c72, #333334);
+	background: -ms-linear-gradient(top, #696c72, #333334);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#696c72', endColorstr='#333334');
+}
+
+div.sitewide_header a.swhead_sitename:hover {	
+	text-decoration: none;
+	text-shadow: 0px 0 3px #FFF;
+	color: #FFF;
+}
+
+
+div.sitewide_footer{
+	font-size: 11px;
+	text-align: center;	
+	border-top: 1px solid #444;
+	box-shadow: inset 0px 1px 2px rgba(0,0,0,0.3);
+	padding: 4px;
+	background-color: #888;
+}
+div.sitewide_footer p{
+	text-align: center;
+}
+div.sitewide_footer a {
+	text-decoration: underline;
+}

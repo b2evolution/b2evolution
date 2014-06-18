@@ -1,0 +1,485 @@
+/* Designed by François PLANQUE http://fplanque.net/ */
+
+div.main {
+	clear: both;
+	margin-right: 0px;
+	margin-left: 0px;
+}
+
+/* Styles for main area (left) */
+h2 {
+	margin-left: 8px;
+}
+
+/* Styles for posts */
+.bPosts {
+	vertical-align: top;
+	float: left;
+	width: 66%;
+	overflow: hidden;
+}
+.bPost, .bPostpublished
+{
+	clear: both;
+	margin-right: 10px;
+	margin-left: 20px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	border: 1px dashed #000000;
+	padding-right: 8px;
+	padding-left: 8px;
+}
+.bPostSide
+{
+	margin-bottom: 8px;
+}
+.bSmallHead {
+	font-size: 80%;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	color: #339999;
+}
+.bTitle {
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+.bText {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+.bSmallPrint
+{
+	clear: both;
+	font-size: 80%;
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+/* Styles for comments */
+div.bComment {
+	border-color: #33CCCC; /* override */
+}
+
+/* Styles for comment form */
+input.bComment,
+textarea.bComment
+{
+	background-color: #f0f0f0;
+	border-width: 1px;
+	border-color: #cccccc;
+	border-style: solid;
+	padding: .5ex;
+	width: 98%;
+	margin: 0ex;
+}
+select.bComment
+{
+	background-color: #f0f0f0;
+	border-width: 1px;
+	border-color: #cccccc;
+	border-style: solid;
+	padding: .5ex;
+	width: 100%;
+	margin: 0ex;
+}
+
+
+/* Styles for stats */
+div.statbloc
+{
+	float: left;
+	width: 44%;
+	margin-left: 2%;
+	margin-right: 0%;
+	margin-bottom: 2ex;
+	border: 1px solid #33BBBB;
+}
+div.statbloc h3
+{
+	margin-top: 0px;
+	margin-left: 0px;
+	margin-right: 0px;
+	color: #FFFFFF;
+	text-align: center;
+	background: #33BBBB;
+	padding: 1ex;
+}
+
+
+/* Styles for sidebar (right) */
+.bSideBar {
+	width: 33%;
+	vertical-align: top;
+	float: right;
+	overflow: hidden;
+}
+.bSideItem {
+	margin-right: 20px;
+	margin-left: 10px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	border: 1px dashed #CCCCCC;
+	padding: 8px;
+}
+.bSideItem h3 {
+	margin-top: 0px;
+	margin-bottom: 8px;
+}
+.bSideItem ul {
+	margin-left: 8px;
+	padding-left: 8px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+.bSideItem ul ul{
+	margin-left: 8px;
+	padding-left: 8px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.bSideItem form {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.dimmed
+{
+	color: #aaa;
+	font-size: 84%;
+}
+input.SearchField
+{
+	background-color: #f0f0f0;
+	border-width: 1px;
+	border-color: #cccccc;
+	border-style: solid;
+	padding: .5ex;
+	width: 96%;
+	margin: 0ex;
+}
+
+/* Styles for Calendar: */
+table.bCalendarTable caption
+{
+	border-left: solid 1px #ccc;
+	border-right: solid 1px #ccc;
+	border-top: solid 1px #ccc;
+	margin: auto;
+	white-space: nowrap;
+}
+table.bCalendarTable
+{
+	margin: auto;
+	font-size: 84%;
+	border: solid 1px #ccc;
+}
+tr.bCalendarRow
+{
+	text-align: center;
+}
+th.bCalendarHeaderCell
+{
+	font-size: 84%;
+}
+td.bCalendarCell
+{
+}
+td.bCalendarEmptyCell
+{
+}
+.bCalendarLinkPost
+{
+	font-weight: bold;
+}
+#bCalendarToday
+{
+	background-color: #DEF;
+}
+
+
+
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	background-color: #fff;
+	margin: 8px;
+	color: #000;
+/*	font-size: 84%; 	poussé vers l'extérieur pour éviter des combinaisons en trop grand nombre */
+}
+div.main {
+	margin: 8px;
+	font-size: 84%;
+}
+caption {
+	font-weight: bold;
+}
+
+a {
+	color: #0066CC;
+}
+a:visited	{
+	color: #009999;
+}
+a:active	{
+	color: #003399;
+}
+a:hover		{
+	color: #003399;
+}
+h1 {
+	color: #009999;
+	font-size: 225%;
+}
+h2 {
+	color: #009999;
+	font-size: 180%;
+}
+h3 {
+	font-size: 120%;
+}
+h4 {
+	font-size: 110%;
+	margin-bottom: 0ex;
+}
+table.wide {
+	width: 100%;
+	clear: both;
+}
+table.thin
+{
+	border: 1px solid #33CCCC;
+	margin: auto;
+	border-collapse: collapse
+}
+table.thin td
+{
+	border-bottom: 1px solid #33CCCC;
+	padding: .3ex 1ex;
+}
+table.thin th
+{
+	color: #FFFFFF;
+	background-color: #33CCCC;
+	border-left: 1px solid #FFFFFF;
+	border-right: 1px solid #FFFFFF;
+	padding: .3ex 1ex;
+}
+
+table.invisible
+{
+	margin: 1ex;
+	border-collapse: collapse
+}
+table.invisible td
+{
+	padding: 0ex 1ex;
+}
+td.right
+{
+	text-align: right;
+}
+p.baseline {
+	font-size: 65%;
+	color: #009999;
+	text-align: center;
+	margin-top: 8px;
+}
+hr {
+	height: 0px;
+	width: 50%;
+	border-top: 1px solid #33CCCC;
+	border-right: 1px none #33CCCC;
+	border-bottom: 1px none #33CCCC;
+	border-left: 1px none #33CCCC;
+
+}
+dt {
+	font-weight: bold;
+	color: #009999;
+}
+blockquote {
+	border: 2px dotted #33CCCC;
+	background-color: #DDEEEE;
+}
+
+del {
+	color: #999999;
+}
+ins {
+	color: #009999;
+	text-decoration: none;
+}
+
+
+
+body {
+	padding: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-left: 0px;
+}
+div.pageHeader {
+	background-color: #33CCCC;
+	padding: 3px 1ex 6px;
+}
+div.pageTitle {
+	white-space: nowrap;
+	padding-left: 2.5ex;
+	padding-top: 8px;
+	padding-right: 0px;
+	padding-bottom: 8px;
+	background-color: #33CCCC;
+	border: 1px solid #FFFFFF;
+	margin-top: 3px;
+}
+h1#pageTitle {
+	color: #FFFFFF;
+	font-size: 270%;
+	font-weight: bold;
+	padding: 0px;
+	margin: 0px;
+}
+
+div.NavBar {
+	clear: both;
+	height: 2em;
+}
+
+a.NavButton {
+	text-decoration: none;
+	background-color: #33AAAA;
+	border: 1px solid #FFFFFF;
+	padding-top: 2px;
+	padding-right: 4px;
+	padding-bottom: 2px;
+	padding-left: 4px;
+	white-space: nowrap;
+	margin-right: 3px;
+	display: block;
+	width: 14ex;
+	float: left;
+}
+a.NavButtonCurr {
+	text-decoration: none;
+	background-color: #33CCCC;
+	border: 1px solid #FFFFFF;
+	text-align: left;
+	vertical-align: top;
+	padding-top: 2px;
+	padding-right: 4px;
+	padding-bottom: 2px;
+	padding-left: 4px;
+	white-space: nowrap;
+	margin-right: 3px;
+	display: block;
+	width: 14ex;
+	float: left;
+}
+a.NavButton2 {
+	text-decoration: none;
+	background-color: #33BBBB;
+	border: 1px solid #FFFFFF;
+	vertical-align: middle;
+	padding-top: 2px;
+	padding-right: 4px;
+	padding-bottom: 2px;
+	padding-left: 4px;
+	white-space: nowrap;
+	margin-top: 3px;
+	margin-right: 3px;
+	display: block;
+	width: 14ex;
+	float: left;
+}
+a.NavButton2Curr {
+	text-decoration: none;
+	background-color: #33CCCC;
+	border: 1px solid #FFFFFF;
+	vertical-align: middle;
+	padding-top: 2px;
+	padding-right: 4px;
+	padding-bottom: 2px;
+	padding-left: 4px;
+	white-space: nowrap;
+	margin-top: 3px;
+	margin-right: 3px;
+	display: block;
+	width: 14ex;
+	float: left;
+}
+
+a.NavButton:link		{
+	color: #FFFFFF;
+}
+a.NavButton:visited	{
+	color: #FFFFFF;
+}
+a.NavButton:active	{
+	color: #FFFFFF;
+}
+a.NavButton:hover		{
+	color: #FFFFFF;
+	background-color: #33CCCC;
+	/* text-decoration: underline; */
+}
+a.NavButtonCurr:link		{
+	color: #FFFFFF;
+}
+a.NavButtonCurr:visited	{
+	color: #FFFFFF;
+}
+a.NavButtonCurr:active	{
+	color: #FFFFFF;
+}
+a.NavButtonCurr:hover		{
+	color: #338888;
+	/* text-decoration: underline; */
+}
+a.NavButton2:link		{
+	color: #FFFFFF;
+}
+a.NavButton2:visited	{
+	color: #FFFFFF;
+}
+a.NavButton2:active	{
+	color: #FFFFFF;
+}
+a.NavButton2:hover		{
+	color: #FFFFFF;
+	background-color: #33CCCC;
+	/* text-decoration: underline; */
+}
+a.NavButton2Curr:link		{
+	color: #FFFFFF;
+}
+a.NavButton2Curr:visited	{
+	color: #FFFFFF;
+}
+a.NavButton2Curr:active	{
+	color: #FFFFFF;
+}
+a.NavButton2Curr:hover		{
+	color: #33AAAA;
+	/* text-decoration: underline; */
+}
+.pageSubTitle {
+	font-size: 109%;
+	color: #009999;
+	letter-spacing: 4px;
+	text-align: center;
+	vertical-align: middle;
+	border: 0px;
+	padding-right: 6px;
+	padding-top: 6px;
+	padding-bottom: 4px;
+	padding-left: 6px;
+}
+
+div.footer {
+	background-color:#33CCCC;
+	padding: 3px 1ex;
+	color: #fff;
+	clear: both;
+}
+div.footer a {
+	color: #fff;
+}

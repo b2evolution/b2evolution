@@ -1,0 +1,885 @@
+/**
+ * Global / basic CSS styles for the admin.
+ *
+ * This should be included with every skin and overridden when needed.
+ */
+
+table.browse {
+	width: 100%;
+}
+table.browse td {
+	vertical-align:top;
+}
+
+div.dashboard_sidebar {
+	margin: 0 1em;
+}
+
+div.dashboard_sidebar ul {
+	margin: 0;
+	padding: 0 0 0 16px;
+}
+
+div.dashboard_sidebar li {
+	list-style: square;
+	margin: 1ex 0;
+	padding: 0;
+	white-space: nowrap;
+}
+div.dashboard_sidebar li li {
+	margin: 0;
+}
+
+.dashboard_post {
+	clear:left;
+	/* border: 1px solid red; */
+	margin: 1ex 0;
+}
+.dashboard_post_details {
+	font-size: 74%;
+	font-weight: normal;
+	color: #999;
+}
+.dashboard_thumbnails {
+	display: inline;
+	margin-right: 2px;
+	width: 100%;
+}
+.dashboard_thumbnails img {
+	border: 1px solid #000;
+	margin-right: 2px;
+}
+h3.dashboard_post_title {
+	font-size: 108%;
+	margin: 0 0 4px 0;
+}
+
+.dashboard_action_area {
+	padding: 1ex 0;
+	font-size: 84%;
+}
+.dashboard_float_actions {
+	font-size: 84%;
+	padding-right: 2px;
+	float: left;
+}
+
+div.dashboard_rating {
+	float: left;
+	margin-right: 5px;
+}
+
+
+.avatar {
+	vertical-align: top;
+}
+
+
+/*
+ * Overlay screen (used for antispam on dashboard):
+ */
+#screen_mask{
+	position:fixed;
+	top: 0;
+	left: 0;
+	background: #000;
+	height: 100%;
+	width: 100%;
+	display:none;
+	z-index:9998;
+}
+
+#overlay_page{
+	display:none;
+}
+
+#overlay_page.overlay_page_active, #overlay_page.overlay_page_active_transparent{
+	position:fixed;
+	top:40px;
+	bottom:5%;
+	right:5%;
+	left:5%;
+	overflow:auto;
+	z-index:9999;
+	background:#f1f6f8;
+	border:1px solid #ccc;
+	display:block;
+}
+#overlay_page.overlay_page_active_transparent{
+	background: transparent;
+	border: none;
+	margin: 0 auto;
+	top: 40%;
+	bottom: auto;
+}
+#overlay_page.overlay_page_active_transparent .fieldset{
+	margin: 0;
+}
+
+.overlay_page_active form{
+	padding:1em;
+}
+
+#overlay_postback{
+	position:absolute;
+	top:-1000em;
+	left:-1000em;
+}
+
+
+/*
+ * Compose screen:
+ */
+table.compose_layout {
+	width: 100%;
+}
+table.compose_layout td {
+	white-space: nowrap;
+	padding: 1px;
+}
+table.compose_layout td.label {
+	white-space: nowrap;
+	width: 1%;
+}
+table.compose_layout td.input {
+	padding: 1px 5px;
+	width: 97%;
+}
+table.compose_layout td.select {
+	padding: 1px 0 1px 5px;
+	width: 97%;
+}
+
+
+/*
+ * Attachments / links
+ */
+fieldset#itemform_createlinks {
+	height: 80px;
+	background-color: #F1F6F8;
+	padding: 0;
+}
+fieldset#itemform_createlinks table {
+	width: 100%;
+	height: 100%;
+}
+fieldset#itemform_createlinks td {
+	text-align: center;
+	vertical-align: middle;
+}
+fieldset#itemform_links {
+	padding: 0;
+}
+div#iframe_wrapper {
+	background-color: #F1F6F8;
+	height: 160px;
+}
+
+
+/*
+ * Categories selection table:
+ */
+table.catselect {
+	border-spacing:0;
+	width:90%;
+	border: 1px solid #bbb;
+}
+table.catselect th {
+	padding: .3ex 1ex;
+	background-color: #ddd;
+	border-bottom: 1px solid #bbb;
+}
+table.catselect td {
+	padding: .2ex 1ex;
+}
+table.catselect tr.group td {
+	border-top: 1px solid #bbb;
+	border-bottom: 1px solid #bbb;
+	background-color: #ccc;
+	font-weight: bold;
+}
+table.catselect tr.odd,
+table.catselect tr.odd input {
+	background-color: #eee;
+}
+table.catselect tr.even,
+table.catselect tr.even input {
+	background-color:#ddd;
+}
+table.catselect tr:hover,
+table.catselect tr:hover input {
+	background-color:#ccc;
+}
+table.catselect th.selector,
+table.catselect td.selector {
+	width: 1%;
+	text-align:center;
+	border-right: 1px solid #bbb;
+}
+table.catselect #new_category_name {
+	background-color:white;
+}
+/* Limit height of .catselect container in item admin view */
+#fieldset_wrapper_itemform_categories {
+	overflow:auto;
+	max-height:500px;
+}
+
+
+/*
+ * Special list formattings
+ */
+ul.clicktree {
+	margin:0;
+	padding:0;
+	list-style:none;
+}
+ul.clicktree ul.clicktree {
+	margin-left:2ex;
+}
+
+ul.plain {
+	list-style:none;
+	margin:0;
+	padding:0;
+}
+
+
+.action_icon,
+.widget_actions a,
+.no_icon {
+	margin: 0 2px;
+	font-weight: bold;
+}
+
+th .action_icon {
+	font-size: 84%;
+}
+
+/*
+ * Icon legend
+ */
+#icon_legend {
+	border: 1px solid #666;
+	background-color: #ddd;
+	margin : 1em;
+	padding: 5px;
+}
+span.legend_element {
+	white-space: nowrap;
+}
+
+
+/*
+ * Cron statuses
+ */
+.cron_started {
+	font-weight: bold;
+}
+.cron_finished {
+	color: #009900;
+}
+.cron_error,
+.cron_timeout {
+	font-weight: bold;
+	color: #FF0000;
+}
+
+
+/*
+ * Grouping of plugins:
+ */
+table.grouped tr.PluginsSubGroup {
+	text-align:left;
+}
+
+table.grouped tr.PluginsSubGroup th {
+	border-left:none;
+	border-bottom: 1px solid #9e9286;
+	border-top: 1px solid #9e9286;
+	background-color: #efede0;
+	color:#666666;
+}
+
+table.grouped tr.PluginsSubGroup th,
+table.grouped tr.PluginsSubGroup td.firstcol {
+	padding-left:15px;
+}
+
+/* / Grouping of plugins */
+
+
+/*
+ * Skin selection:
+ */
+div.skinshot {
+	float: left;
+	background-color: #ccc;
+	margin: 1ex;
+	padding: 0;
+}
+
+div.coll_settings_skinshot {
+	width: 256px;
+	height: 212px;
+	background-color: #ccc;
+	margin: 1ex;
+	padding-top: 1px;
+}
+
+div.skinshot_placeholder {
+	width: 240px;
+	height: 180px;
+	border: 1px solid #000;
+	margin: 1ex 1ex .5ex 1ex;
+	background: #ddd;
+	text-align: center;
+}
+div.skinshot div.current {
+	border: 1px solid #f00;
+}
+
+div.skinshot_noshot {
+	margin: 36px 0 0 0;
+	color: #999;
+}
+div.skinshot_name {
+	margin: 24px 0 0 0;
+	font-size: 170%;
+}
+
+div.skinshot div.legend,
+div.coll_settings_skinshot div.legend {
+	width: 240px;
+	margin: .5ex 1ex 1ex 1ex;
+	padding: 0;
+}
+
+div.skinshot div.actions,
+div.coll_settings_skinshot div.actions {
+	float: right;
+	margin: 0;
+	padding: 0;
+}
+
+
+.timestamp {
+	white-space: nowrap;
+	text-align: center;
+}
+.timestamp .time {
+	font-size:84%;
+}
+
+div.tile {
+	display: inline;
+	white-space: nowrap;
+}
+
+
+/*
+ * System checks
+ */
+div.system_check {
+	margin: 1ex 0;
+	border-top: 1px solid #ddd;
+	padding-top: 1ex;
+}
+
+div.system_check_name {
+	font-weight: bold;
+	float:left;
+}
+
+div.system_check_value_note,
+div.system_check_value_ok,
+div.system_check_value_warning,
+div.system_check_value_error {
+	font-weight: bold;
+	margin-left: 50ex;
+}
+
+div.system_check_value_ok {
+	color: #093;
+}
+div.system_check_value_warning {
+	color: #e60;
+}
+div.system_check_value_error {
+	color: #c00;
+}
+
+div.system_check_message_ok,
+div.system_check_message_warning,
+div.system_check_message_error {
+	margin: 1ex;
+}
+div.system_check_message_warning {
+	padding: 3px;
+	background: #feb;
+}
+div.system_check_message_error {
+	padding: 3px;
+	background: #fbb;
+}
+
+table.coll_kind {
+	margin: 0 3ex;
+}
+table.coll_kind td {
+	padding: 2ex;
+	vertical-align: top;
+}
+table.coll_kind td.coll_kind {
+	white-space: nowrap;
+	padding-right: 3ex;
+}
+td.coll_kind h3 {
+	margin: 0;
+}
+
+div.seo_presets {
+	text-align: center;
+	margin: 1ex;
+}
+div.seo_presets a {
+	margin: 1ex;
+}
+div.seo_presets img {
+	border: 1px solid #000;
+}
+div.seo_presets a:hover img,
+div.seo_presets a.current img {
+	border: 1px solid #f00;
+}
+div.seo_message {
+	text-align: center;
+	font-size: 84%;
+	margin: 2ex 1ex;
+	line-height: 150%;
+}
+
+li.collection_select {
+	padding: 0 1ex;
+}
+
+div.menu3 {
+	margin-bottom: 1em;
+}
+div.menu3 .option3,
+div.menu3 .current {
+	font-weight: bold;
+	margin-right: 2px;
+}
+div.menu3 a {
+	color: #000;
+	font-size: 11px;
+	display: inline-block;
+	line-height: 15px;
+	padding: 0 10px 1px;
+}
+div.menu3 a:hover {
+	text-decoration: none;
+	color: #FFF;
+	border-radius: 8px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	-khtml-border-radius: 8px;
+	/* Safari 4-5, Chrome 1-9 */
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#b1b1b1), to(#9e9e9e));
+	/* Safari 5.1, Chrome 10+ */
+	background: -webkit-linear-gradient(top, #9e9e9e, #b1b1b1);
+	/* Firefox 3.6+ */
+	background: -moz-linear-gradient(top, #9e9e9e, #b1b1b1);
+	/* IE 10 */
+	background: -ms-linear-gradient(top, #9e9e9e, #b1b1b1);
+	/* Opera 11.10+ */
+	background: -o-linear-gradient(top, #9e9e9e, #b1b1b1);
+	/* IE */
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#9e9e9e', endColorstr='#b1b1b1');
+}
+div.menu3 .current a, div.menu3 .current a:hover {
+	border-radius: 8px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	-khtml-border-radius: 8px;
+
+	-moz-box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
+	-webkit-box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
+	box-shadow: 0 1px 2px 1px rgba(0, 0, 0, 0.3) inset;
+
+	/* Safari 4-5, Chrome 1-9 */
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#8b8d8d), to(#757777));
+	/* Safari 5.1, Chrome 10+ */
+	background: -webkit-linear-gradient(top, #757777, #8b8d8d);
+	/* Firefox 3.6+ */
+	background: -moz-linear-gradient(top, #757777, #8b8d8d);
+	/* IE 10 */
+	background: -ms-linear-gradient(top, #757777, #8b8d8d);
+	/* Opera 11.10+ */
+	background: -o-linear-gradient(top, #757777, #8b8d8d);
+	/* IE */
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#757777', endColorstr='#8b8d8d');
+}
+div.menu3 .current a {
+	color: #fff;
+}
+
+
+ul.widget_list {
+	list-style: none;
+	padding-left: 1em;
+	margin-left: 0;
+}
+ul.widget_list li {
+	margin-bottom: 3px;
+}
+
+
+/*
+ * Messaging
+ */
+
+.thread_subject {
+	width: 60%;
+}
+
+#iframe_wrapper .action_messages {
+	margin:0;
+	padding:0.2ex 1ex;
+}
+
+
+/*
+ * Comments
+ */
+
+.tdCommentpublished {
+	color: #0b0;
+}
+
+.tdCommentdraft {
+	color: #f96;
+}
+
+.tdCommentdeprecated {
+	color: #888;
+}
+
+.tdCommenttrash {
+	color: #f66;
+}
+
+
+/* Comment recycling */
+#recycle_bin {
+    float: right;
+}
+.ui-effects-transfer {
+    border: 2px solid red;
+}
+
+
+/*
+ * Avatar selection:
+ */
+div.avatartag {
+	float: left;
+	margin: 0 0.5em 0.5em 0;
+}
+div.avatartag a {
+	outline: none;
+}
+
+table.prevnext_user {
+	width: 100%;
+	margin: -5px 0 5px 0;
+}
+table.prevnext_user .back_users_list {
+	text-align: center;
+	font-size: 84%;
+}
+
+/*  Menu3 with title, used for User editing */
+.user_header {
+	height: 48px;
+}
+.user_header .menu3 {
+	margin: 12px 0 0;
+}
+.user_header .cboxElement {
+	float: left;
+}
+.user_header_content {
+	float: left;
+	margin-left: 6px;
+}
+.user_header_content h2.user_title {
+	line-height: 14px;
+	margin-top: 2px;
+}
+
+.vote_spam {
+	float: left;
+	padding: 1px 10px 0;
+}
+.vote_spam a, .vote_spam span {
+	vertical-align: middle;
+	top: -1px;
+	display: inline-block;
+}
+
+/* User fields */
+.userfield, .userfield.optional{
+	color: #000;
+}
+.userfield.recommended{
+	color: #fa0;
+}
+.userfield.hidden{
+	color: #999;
+}
+.userfield.require{
+	color: #f00;
+}
+
+
+/* Stats & logs screens */
+.reftype_search{
+	background-color: #0099FF;
+}
+.reftype_special{
+	background-color: #ff00ff;
+}
+.reftype_referer{
+	background-color: #00CCFF;
+}
+.reftype_direct{
+	background-color: #00FFCC;
+}
+.reftype_spam{
+	background-color: #FF0000;
+}
+.reftype_self{
+	background-color: #00FF99;
+}
+.reftype_admin{
+	background-color: #999999;
+}
+
+.agent_robot{
+	background-color: #FF9900;
+}
+.agent_browser{
+	background-color: #FFCC00;
+}
+
+.agent_rss{
+	background-color: #FF6600;
+}
+
+
+.code_2xx{
+	color: #0f0;
+	font-weight: bold;
+}
+.code_3xx{
+	color: #f80;
+	font-weight: bold;
+}
+.code_304{
+	color: #0a0;
+	font-weight: bold;
+}
+.code_4xx{
+	color: #f00;
+	font-weight: bold;
+}
+
+.hit_type_standard{
+	background-color:  #0092ef;
+}
+.hit_type_rss{
+	background-color: #FF6600;
+}
+.hit_type_ajax{
+	background-color: #009900;
+}
+.hit_type_service{
+	background-color: #0072FF;
+}
+.hit_type_admin{
+	background-color: #e0e0e0;
+}
+
+.dom_type_edit {
+	width: 200px;
+	height: 30px;
+}
+.dom_type_edit span {
+	color: #0092ef;
+}
+
+.dom_type_edit_error {
+	background: #fbb;
+}
+
+.compact_data {
+	white-space: nowrap;
+	font-size: 84%;
+}
+
+pre.email_log {
+	overflow: auto;
+	font-size: 112%;
+	margin: .5ex 0;
+}
+pre.email_log_scroll,
+div.email_log_html {
+	overflow: scroll;
+	font-size: 112%;
+	margin: .5ex 0;
+	border: 1px solid #ccc;
+	max-width: 900px;
+}
+pre.email_log span,
+pre.email_log_scroll span {
+	background: #eee;
+}
+
+div.status_icon {
+	float: left;
+	padding: 5px 5px 0 0;
+}
+
+/* Diff */
+table.diff, td.diff-otitle, td.diff-ntitle {
+	background-color: white;
+}
+td.diff-otitle, td.diff-ntitle {
+	text-align: center;
+	width: 50%;
+}
+td.diff-marker {
+	text-align: right;
+}
+td.diff-lineno {
+	font-weight: bold;
+}
+td.diff-addedline {
+	background: none repeat scroll 0 0 #CCFFCC;
+	font-size: smaller;
+}
+td.diff-deletedline {
+	background: none repeat scroll 0 0 #FFFFAA;
+	font-size: smaller;
+}
+td.diff-context {
+	background: none repeat scroll 0 0 #EEEEEE;
+	font-size: smaller;
+}
+.diffchange {
+	color: red;
+	font-weight: bold;
+	text-decoration: none;
+	white-space: pre-wrap;
+}
+table.diff {
+	border: medium none;
+	border-spacing: 4px;
+	table-layout: fixed;
+	width: 100%;
+}
+table.diff td {
+	padding: 0;
+}
+table.diff col.diff-marker {
+	width: 2%;
+}
+table.diff col.diff-content {
+	width: 48%;
+}
+table.diff td div {
+	overflow: auto;
+	word-wrap: break-word;
+}
+
+td.diff-title-deletedline, td.diff-title-addedline {
+	text-align: center;
+	font-size: 120%;
+	font-weight: bold;
+}
+
+/* phpBB importer */
+.tool_steps {
+	text-align: center;
+	font-size: 14px;
+	font-weight: normal;
+	color: #999;
+	padding-bottom: 5px;
+}
+
+.tool_steps .step {
+	margin-right: 25px;
+	display: inline-block;
+}
+.tool_steps .step div {
+	background-color: #CCC;
+	border: 1px solid #999;
+	color: #999;
+	display: inline-block;
+	font-size: 15px;
+	margin-right: 5px;
+	padding: 5px;
+	text-align: center;
+	width: 20px;
+	-moz-border-radius: 90px 90px 90px 90px;
+	-webkit-border-radius: 90px 90px 90px 90px;
+	-khtml-border-radius: 90px 90px 90px 90px; 
+	border-radius: 90px 90px 90px 90px;
+}
+.tool_steps .step.current {
+	font-weight: bold;
+	color: #666;
+}
+.tool_steps .step.current div {
+	background-color: #666;
+	color: #FFF;
+}
+
+.RedButton {
+	background: #F00;
+	color: #FFF;
+	border: 1px solid #000;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-khtml-border-radius: 4px;
+}
+
+.red-bordered-checkbox {
+	border-left: 1px solid red;
+	border-right: 1px solid red;
+	background-color: red;
+	padding-top: 3px;
+}
+
+.browse_side_item .hintbox_list_container ul {
+	margin: 0;
+	padding: 0;
+}
+
+.skin_settings {
+	float: left;
+	width: 30%;
+}
+
+.task_priority_edit a {
+	color: #000;
+}
+
+div.comment_toolbars div.edit_toolbar, div.message_toolbars div.edit_toolbar {
+	width: 97%;
+	padding-left: 0;
+	padding-right: 0;
+}

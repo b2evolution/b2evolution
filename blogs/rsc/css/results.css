@@ -1,0 +1,258 @@
+/**
+ * Results/tables styles for the admin.
+ *
+ * This should be included with every skin and overridden when needed.
+ */
+
+
+/*
+ * Results tables:
+ */
+div.results div.table_scroll {
+	overflow: auto;
+	width: 100%;
+}
+table.grouped {
+	border: 1px solid #bbb;
+	margin: 0 auto;
+	width: 100%;
+	/* clear:both; */
+}
+div.compact_results table.grouped {
+	margin: 0 auto;
+}
+div.fieldset_wrapper {
+	margin: 1ex auto;
+}
+
+/* Table Filters: */
+table.grouped tr.filters td, div.filters {
+	border: 1px solid #bbb;
+	border-bottom: none;
+	background-color: #ddd;
+	font-size: 84%;
+}
+div.filters {
+	padding: 3px;
+}
+div.filters form {
+	min-height: 22px;
+}
+a.filters_title {
+	text-decoration:none;
+}
+a.filters_title:hover {
+	text-decoration:underline;
+}
+tr.filters div, div.filters div {
+	margin-left: 15px;
+}
+input.filter {
+	padding: 0;
+	margin: 0 0 1px .5ex;
+	float:right;
+}
+
+/* Table rows: */
+table.grouped tr {
+	background-color: #eee;
+}
+table.grouped tr.odd {
+	background-color: #ddd;
+}
+table.grouped td {
+	border-left: 1px solid #bbb;
+	padding: .3ex 1ex;
+}
+table.grouped th.title{
+	border-left: none;
+	text-align: left;
+}
+div.results div.title, div.table_title {
+	border: 1px solid #BBB;
+	border-bottom: none;
+	background-color: #D4D4D4;
+	padding: 0.3ex 1ex;
+	font-weight: bold;
+	min-height: 16px;
+}
+div.table_title {
+	margin-top: 1ex;
+}
+table.grouped th.firstcol,
+table.grouped td.firstcol {
+	border-left: none;
+}
+table.grouped tr.group td {
+	font-weight: bold;
+	color: #8e8276;
+	background-color: #ccc;
+	border-top: 1px solid #bbb;
+	border-bottom: 1px solid #bbb;
+	border-left: 0;
+}
+table.grouped .notes {
+	color: #666;
+}
+table.grouped td.shrinkwrap
+{
+	width: 1%;
+	white-space:nowrap;
+	text-align:center;
+}
+/* For prices */
+table.grouped td.monetary
+{
+	text-align:right;
+	white-space:nowrap;
+}
+
+table.grouped input.checkbox {
+	border:none;
+	background-color: #eee;
+}
+table.grouped tr.odd input.checkbox {
+	border:none;
+	background-color: #ddd;
+}
+table.grouped tr.even:hover,
+table.grouped tr.odd:hover {
+	background-color:#ccc;
+}
+table.grouped.nohover tr.even:hover {
+	background-color:#eee;
+}
+table.grouped.nohover tr.odd:hover {
+	background-color:#ddd;
+}
+
+/* Table headers/footers: */
+table.grouped th,
+table.grouped thead td,
+table.grouped tfoot td {
+	padding: .5ex;
+	border-bottom: 1px solid #bbb;
+	border-left: 1px solid #bbb;
+	background-color: #d4d4d4;
+}
+table.grouped tfoot td {
+	border-bottom: none;
+}
+table.grouped th {
+	padding: .3ex 1ex;
+}
+table.grouped th img {
+	vertical-align: bottom;
+}
+table.grouped tr.total td {
+	border-top: 1px solid #bbb;
+	font-weight: bold;
+	background-color: #d4d4d4;
+}
+
+/* Table BASIC sort buttons/headers: */
+table.grouped th a.basic_current,
+table.grouped th a.basic_sort_link {
+	padding: 0 1ex;
+	display: block;
+	height: 100%;
+}
+table.grouped th a.basic_current {
+	background-color:#ccc;
+}
+table.grouped th a.basic_sort_link:hover {
+	background-color:#ccc;
+}
+
+
+/* Table SINGLE sort buttons/headers: */
+table.grouped th a.single_current {
+	font-weight : bold;
+}
+table.grouped th a.single_current:hover,
+table.grouped th a.single_sort_link:hover {
+	text-decoration: underline;
+}
+/* / Results tables */
+
+
+/*
+ * Results navigation:
+ */
+.results {
+	margin: 1ex auto;
+	width: 100%;
+	/* border: 1px solid black; */
+}
+.results_nav {
+	text-align: center;
+	padding: 3px;
+	background-color: #D4D4D4;
+	border: 1px solid #BBB;
+	border-bottom: none;
+}
+.results_nav.nav_footer {
+	border-bottom: 1px solid #BBB;
+	border-top: none;
+}
+.results_nav small {
+	margin-top: 4px;
+	display: block;
+}
+
+/* / Results navigation */
+
+/* 
+ * Results drag n drop 
+ */
+ul.grouped li .draggable_object{
+cursor:move;
+}
+
+li.ui-draggable-dragging{
+width: 80%;	/* fp> TODO: JS copy actual pixel width of actual page objetcs */
+}
+
+ul.grouped .actions{
+display:block;
+float:right;
+margin-left:2ex;
+}
+
+.unsaved_change,
+.unsaved_change li,
+.widget_changed{
+background-color:#faa;
+}
+
+.saving_change{
+background-color:#ddd;
+}
+
+.results_ajax_loading {
+	position: absolute;
+	background: #000;
+	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+	-moz-opacity: 0.5;
+	-khtml-opacity: 0.5;
+	opacity: 0.5;
+}
+.results_ajax_loading div {
+	text-align: center;
+	vertical-align: middle;
+	background: url(../img/ajax-loader-white.gif) no-repeat center center;
+	height: 20px;
+	margin: auto;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+.results_unavailable {
+	background: #FFF;
+	border: 1px solid #BBB;
+	color: #F00;
+	text-align: center;
+	padding: 2px;
+}

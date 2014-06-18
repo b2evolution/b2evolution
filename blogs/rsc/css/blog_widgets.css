@@ -1,0 +1,225 @@
+/**
+ * @todo yabs > : this needs sorting out once everything works
+ */
+#save_layout{
+float:left;
+margin:0 2em 0 0;
+}
+
+.widget_container{
+	margin:0;
+	padding:0;
+	list-style:none;
+	border: 1px solid #9DB0BC;
+}
+
+.widget_container li{
+	margin:0;
+	padding: 3px 10px;
+	/* border-top:1px solid #ccc; */
+}
+
+.widget_state
+{
+	border-right: 1px solid #9DB0BC;
+	margin-right: 10px;
+	padding-right: 10px;
+	float: left;
+
+	/* Tblue> Can this be done better? */
+	padding-top: 4px;
+	height: 13px;
+}
+
+.widget_actions{
+	border-left:1px solid #9DB0BC;
+	margin-left:10px;
+	padding-left:10px;
+	cursor:pointer;
+	float:right;
+}
+
+.widget_actions img{
+margin:0 2px;
+}
+
+.odd{
+background-color:#F1F6F8;
+color:#444;
+}
+
+.even{
+background-color:#fff;
+color:#444;
+}
+
+.odd:hover{
+background-color:#eef;
+color:#444;
+}
+
+.even:hover{
+background-color:#dde;
+color:#444;
+}
+
+/*
+#current_widgets .droppable-hover,
+#current_widgets .droppable-hover .fieldset_title_right,
+#current_widgets .droppable-hover .fieldset_title_bg
+{
+color:#444;
+background:#ee8;
+}
+*/
+.widget_container li.droppable-hover {
+	border-top: 2px solid #f00;
+	padding-top: 1px;
+}
+
+.add_widget{
+	background:#ddd;
+}
+
+.add_new_widget{
+cursor:pointer;
+margin:0 0 0 1em;
+}
+
+.draggable_widget{
+cursor:move;
+}
+
+#current_widgets{
+padding:0;
+border:0;
+clear:both;
+}
+
+.available_widgets{
+	top: 40px;
+	left: 5%;
+	right: 5%;
+	bottom: 5%;
+	position: fixed;
+	background:#f1f6ff;
+	display:none;
+	border: 1px solid #9DB0BC;
+	margin:0;
+	padding:0;
+	z-index: 999;
+}
+
+.available_widgets_active{
+display:block;
+}
+
+.available_widgets_toolbar{
+	background:#B7CBDA;
+	font-weight: bold;
+	padding: 2px 1ex;
+	border-bottom: 1px solid #9DB0BC;
+}
+
+#available_widgets_inner{
+	padding: 1em;
+	overflow: auto;
+	position: fixed;
+	top: 62px;
+	left: 5%;
+	right: 5%;
+	bottom: 5%;
+}
+
+.available_widgets h2 {
+	display:none;
+}
+
+.available_widgets h3 {
+	margin-top: 0;
+}
+
+.available_widgets ul {
+	padding-bottom: 1em;
+}
+
+/**
+ * Widget settings page
+ */
+#screen_mask{
+position:fixed;
+top: 0;
+left: 0;
+background: #000;
+height: 100%;
+width: 100%;
+display:none;
+z-index:998;
+}
+
+#widget_settings{
+display:none;
+}
+
+#widget_settings.widget_settings_active{
+position:fixed;
+top:40px;
+bottom:5%;
+right:5%;
+left:5%;
+overflow:auto;
+z-index:999;
+background:#f1f6f8;
+border:1px solid #ccc;
+display:block;
+}
+
+.widget_settings_active form{
+padding:1em;
+}
+
+#widget_postback{
+position:absolute;
+top:-1000em;
+left:-1000em;
+}
+
+/**
+ * widget help
+ */
+#widget_help{
+float:right;
+position:relative;
+}
+
+#widget_help dl{
+position:absolute;
+width:40em;
+padding:1em;
+display:none;
+border:1px solid #ccc;
+background:#f1f6ff;
+right:0;
+top:-1em;
+}
+
+#widget_help:hover dl{
+display:block;
+}
+
+#widget_help dt{
+font-weight:bold;
+}
+
+#widget_help dd{
+margin:0;
+padding:0 0 10px 10px;
+}
+
+.pending_update{
+background-color:#fdd;
+}
+
+.server_updating{
+background-color:#dfd;
+}

@@ -1,0 +1,359 @@
+/*
+Original b2evolution template: Vastitude
+design by Andrew Hreschak
+blog.thedarksighed.com
+*/
+
+body {
+	font:86% Tahoma, "Lucida Sans", Arial, Verdana, Sans-Serif;
+	background:#4c4c4e;
+}
+
+textarea, input, select, option, optgroup, ul.ui-autocomplete, li.token-input-token-facebook, div.token-input-dropdown-facebook {
+	font: 12.38px Tahoma, "Lucida Sans", Arial, Verdana, Sans-Serif;
+}
+
+li.widget_core_coll_title, li.widget_core_coll_longdesc, li.widget_plugin_evo_Calr, li.widget_core_coll_search_form, li.widget_core_linkblog, li.widget_core_coll_category_list, li.widget_core_coll_common_links, li.widget_core_coll_xml_feeds, li.widget_core_user_tools, li.widget_core_coll_xml_feeds ul li, li.prevnext {list-style:none;}
+table.prevnext_post {margin: 20px 0;}
+div#sidebar {margin-left:-10px;}
+div#sidebar h2 {font: 1.4em Tahoma, "Lucida Sans", Arial, Verdana, Sans-Serif;color:#4b3528;}
+li.widget_core_coll_title h2 a {font-size: 1.1em; text-decoration:none;}
+li.widget_core_coll_search_form h2 {}
+
+li.widget_core_coll_xml_feeds h2 img {display:none;}
+li.widget_core_coll_xml_feeds {background:url(img/vast_rss.gif) top left no-repeat; margin-top:28px;padding-top:50px;}
+
+li.widget_core_coll_longdesc, li.widget_core_coll_search_form, li.widget_core_coll_category_list, li.widget_core_coll_common_links, li.widget_core_coll_xml_feeds {margin-bottom:20px;}
+
+/* COLOR MANAGEMENT */
+
+body, .subtitle {color:#3c2d21;}
+.topicons {color:#999; visibility:hidden;}
+.topicons a {color:#444;}
+.topicons a:hover {color:#000;}
+h1, .subtitle h1, .subtitle h1 a, .submenu, .leftside h1, div.bSmallHead, #quote, .rightside h3, .rightside h4, .rightside h4 a, .footer, .pagefoot, .post_date {color:#4b3528;}
+blockquote {color:#523a2c;}
+.rightside h2 {color:#964122;}
+.subtext {color:#BBB;}
+a, ul#mainnav li a:hover, div.rightside, .rightside a, .audio, .righttext form.search input.SearchField, .bCommentText, .leftside .bComment, .leftside .bComment2, .leftside h4, .bCommentform, input#d, input#f, input#g, input#i, input#o, input#u, td#bCalendarToday {
+	color:#d8c19a;
+	text-decoration: none;
+}
+a:hover, .text p a:hover, .rightside a:hover, .music_outer, table.bCalendarCaption, .highlight {color:#fff;}
+ul#mainnav a {color:#997340; text-decoration: none;}
+ul#mainnav li, ul#mainnav a.selected, .leftside h3, .bCommentTitle {color:#c09261;}
+.text h2 a, .leftside h2 {color:#402416;}
+.footer a, .footer a:hover {color:#908070;}
+.notes, .subtext, .dimmed, code, samp, div.amazon {color:#572d12;}
+
+#bannertop ul li a {color:#4b3528;}
+#bannertop a:hover {color:#fff;}
+#bannertop a.selected {color:#3c2d21;}
+
+/* LINK STYLEE */
+
+.topicons a, .subtitle h1 a, .submenu h1 a, .text h2 a, div.bSmallPrint a, div.bSmallHead a, div.moderation_msg a, div.bCommentSmallPrint a, div.bCommentTitle a, ul#mainnav a:hover {text-decoration:none;}
+a:hover {
+	text-decoration: underline;
+}
+.topicons a img {border:none;}
+
+.action_messages a {
+	color: #00F;
+}
+
+.searchcloud {font-size:0.9em;clear:both;margin:auto 40px 40px;text-align:center;border:1px solid #9e7d55;background-color: #6b4634;padding:10px;}
+.searchcloud h3 {margin-top:0px;color:#b2916f;font-weight:bold;font-size:1.1em;}
+a.search_cloud_0 {color:#b2916f;}
+a.search_cloud_1 {color:#bd9f80;}
+a.search_cloud_2 {color:#c9ae92;}
+a.search_cloud_3 {color:#cfb79c;}
+a.search_cloud_4 {color:#d4bea5;}
+a.search_cloud_5 {color:#dac6ad;}
+a.search_cloud_6 {color:#dfcdb6;}
+a.search_cloud_7 {color:#e5d4be;}
+a.search_cloud_8 {color:#e9dac5;}
+a.search_cloud_9 {color:#ede0cc;}
+a.search_cloud_10 {color:#f7ecda;}
+.searchcloud a:hover {color:#fff;}
+
+#wrap {
+	width:900px;
+	background:#895c46 url(img/vast_foot.gif) bottom repeat-x;
+	margin:0 auto 10px auto;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	-khtml-border-radius: 10px;
+	border-radius: 10px;
+	border: 1px solid #000;
+	box-shadow: 0 0 5px 1px #000000;
+	overflow: hidden;
+}
+#bannertop {
+	width:900px;
+	background:url(img/vast_header.jpg) top no-repeat;
+	height:46px;
+	-webkit-border-radius: 9px 9px 0 0;
+}
+#bannermid {width:900px; background:url(img/vast_header.jpg) bottom no-repeat; height:104px;}
+#quote, .google_banner {font:1.0em "Lucida Sans";font-style:italic;margin-left:40px;margin-bottom:20px;}
+
+.topicons {font-size:0.7em; font-weight:bold; padding:0px 0px 0 0; margin:20px 18px 0 0; float:right;}
+
+.subtitle {
+	font:0.7em Verdana, Arial, "Lucida Sans", Tahoma, Sans-Serif;
+	font-weight:normal;
+	padding:0 25px 0 0;
+	margin-left:570px;
+	text-align:right;
+	line-height:1.0em;letter-spacing:3px;}
+
+.subtitle h1 {margin-bottom:10px;margin-left:-40px;}
+
+.submenu { /* ENABLE FOR MULTIBLOG SYSTEMS */
+	font:0.9em "Lucida Sans", Arial, Verdana, Tahoma, Sans-Serif;
+	font-weight:bold;
+	letter-spacing:0.1em;
+	padding-top:8px;
+	padding-left:10px;
+	margin:0 0 30px;
+	background:#2b1a12;
+	border-bottom:1px solid #9e7d55;}
+
+.submenu h1 {display:inline; padding-right:4px;}
+
+#content {width:900px;}
+
+a img {border:0px; vertical-align:middle;}
+
+.text {margin:0px 10px 30px 40px;clear:both;width:576px;clear:both;}
+.text h1 {margin-bottom:0px;}
+
+div.head {padding-bottom:5px;}
+div.bSmallHead {font-size:0.9em; margin:-5px 0 15px 0;}
+div.bSmallHead img {padding-bottom:2px;}
+div.bSmallPrint {font-size:0.8em;margin-bottom:20px;padding:20px 0 5px; border-bottom:1px solid #9e7d55;}
+html>body div.bSmallPrint {margin-bottom:30px;padding-bottom:5px;}
+div.bSmallPrint a img {margin-bottom:0px;margin-right:4px;}
+a.permalink_right {float:right;}
+
+.leftmargin {float:left;}
+.leftmargin img {margin:10px 10px 10px 0;}
+img.leftmargin {float:left; margin-right:2ex; margin-top:.7ex; margin-bottom:.2ex;}
+img.rightmargin {float:right; margin-left:2ex; margin-top:.7ex; margin-bottom:.2ex;}
+.sep {clear:both;height:0px;margin-bottom:-5px;}
+.sep2 {clear:both;margin-bottom:20px;}
+.notes {font-size:0.9em;}
+.strikeout {text-decoration:line-through;}
+.subtext {font-style:italic;}
+.videoblock{margin-bottom:20px;}
+.log_success {margin:0px 0px 20px 40px; padding:10px 0px; text-align:center; background-color:#6b4634; border:1px solid #937d55;}
+blockquote {margin:30px 60px 30px 30px; background:url(img/vast_blockquote.gif) top left no-repeat;font-size:1.05em;}
+blockquote p {margin-left:38px;}
+
+table.invisible {width:462px;}
+table.invisible td.left {vertical-align:top; width:10px;}
+table.invisible td.right {vertical-align:top; text-align: right; width:50px; padding-left:25px;}
+
+p {line-height:1.6em; margin-bottom:1.0em;}
+p.center {text-align:center;}
+html>body p.center {padding-bottom:20px;}
+p.bMore {clear:both;margin-top:20px;}
+.righttext p.center {text-align:center;}
+
+.bText a {
+	color:#c3aa85;
+}
+.bText a:visited {
+	color:#a85;
+}
+
+ul#mainnav {font-size:0.9em; font-weight:bold; margin:0px 0 20px 25px; padding-left:0px;}
+ul#mainnav li {margin-right:12px; display:inline; float:left;}
+ul#mainnav a {text-decoration:none;}
+ul#mainnav a:hover, ul#mainnav a.selected {border-bottom:1px dotted #b98b07;text-decoration:none;}
+ul.clean li {font-size:0.9em;}
+ul li {list-style: circle;}
+ol li {line-height:1.4em;margin-bottom:0.75em;}
+
+div.leftside {
+	font-size:0.9em;
+	width:610px;
+	float:left;
+	text-align:justify;}
+
+div.leftside p {padding:0;}
+
+h1 {font-size:1.1em; margin:0;}
+h2, h3, h4 {font-family:"Lucida Sans Unicode", "Lucida Sans", Arial, Verdana, sans-serif;}
+h3.blogname {padding-bottom:5px;}
+
+.leftside h1 {font-size:0.9em;}
+.leftside h2 {font-size:1.2em; font-weight:bold; margin-top:5px; letter-spacing:1px;text-align:left;}
+.leftside h2 a {}
+.leftside h3 {font-size:1.2em; font-weight:normal;}
+.leftside h4 {font-size:1.2em;}
+.leftside h4.CommentAreaTitle {font:1.1em "Lucida Sans", Arial, Verdana, Tahoma, Sans-Serif; margin-bottom:10px;}
+.leftside h4.bCommentLeaveHead {font:1.1em "Lucida Sans", Arial, Verdana, Tahoma, Sans-Serif; padding-left:3px;}
+
+.rightside ul li h2 {font-size:1.0em;}
+
+/* ----------------------------- FORMS AND COMMENTS ----------------------------- */
+
+.leftside form {padding:0; margin-left:0;}
+.leftside form.bComment, fieldset {border:none;}
+.leftside .messages_list form.bComment, fieldset {border: 1px solid #BBB;}
+
+div.bCommentTitle {background-color:#4b3528; margin:0px -10px; padding-left:10px; padding-bottom:5px; border-bottom:1px solid #9e7d55;}
+div.bCommentTitle img {vertical-align:middle;margin-left:5px;padding-bottom:2px;}
+div.bCommentTitle a {text-decoration: underline;}
+div.bComment {background-color:#6b4634; padding:0 10px; margin-bottom:15px; border:1px solid #9e7d55; line-height:1.5em;}
+div.bComment p {padding-top:10px; margin-top:0px;}
+.bComment .input {text-align:left;}
+div.bCommentSmallPrint {font-size:0.8em; padding:2px 0px 5px 0px;}
+div.bCommentSmallPrint a {padding-left:20px;}
+div.bCommentSmallPrint a img {padding-right:4px;}
+
+.bCommentTitle {line-height:1.3em; font-size:0.9em; font-weight:bold; padding:4px 0px 2px 0px;}
+.bCommentText {margin:0; padding:8px 0; text-align:justify;}
+.bCommentform, input#d, input#f, input#g, input#i, input#o, input#u, textarea#h, .righttext form.search input.SearchField, input#newuser_email, textarea#p {background-color:#6b4634; border:1px solid #9e7d55;}
+
+.righttext form.search input.SearchField {
+	padding:3px 4px;
+	font-weight:bold;
+	font-size:1.0em;}
+
+fieldset {padding-left:0;}
+
+/* --------------------------------- RIGHT SIDE --------------------------------- */
+
+div.rightside {
+	font-size:0.8em;
+	width:230px;
+	float:right;
+	padding:0 30px 25px 0;
+	text-align:left;}
+
+.rightside h2 {font-size:1.3em; letter-spacing:3px; font-variant:small-caps;}
+.rightside h3 {font-size:1.1em; margin-bottom:0; margin-top:22px; font-family:Arial;}
+.rightside h3.blogname {font-size:1.3em; letter-spacing:2px;}
+.rightside h4 {font-size:1.0em; font-family:Arial;}
+.rightside p {margin:5px 0;padding-right:0;}
+.rightside p.stats {text-align:justify;}
+.rightside div.righttext .google {margin-top:25px;}
+.rightside div.righttext {padding-right:0;}
+.rightside div.righttext a {line-height:1.2em;}
+.rightside ol.starrating li {text-indent:-5px; margin-left:-20px;}
+.rightside ul {text-indent:0px;}
+.rightside ul.ministats {margin-top:-5px;}
+.rightside ul.ministats li.stats_last {margin-top:10px;}
+.rightside ul.recentpost li, .rightside ul#lastcomment li {margin-bottom:4px;}
+.rightside ul li {margin-left:-24px;}
+.rightside ul li.nobullet {list-style-type:none;}
+.rightside ul.skinlist {margin-left:0px;list-style-type: none;}
+html>body .rightside ul.skinlist {margin-left:-24px;list-style-type: none;}
+.rightside ul.skinlist li {margin:0px 5px 0px 0px;display:inline;}
+.rightside ul.skinlist li img {margin:5px 0px;}
+
+.bCalendarCaption {margin-top:20px;}
+table.bCalendarTable {margin:10px 0 0 15px; width:215px;}
+table.bCalendarTable td {width:30px; text-align:center; padding:4px;}
+table.bCalendarTable td#prev {text-align:right; padding-left:15px;}
+table.bCalendarTable td#next {text-align:left; padding-left:15px;}
+table.bCalendarTable tr.bCalendarRow {text-align:center;}
+td#bCalendarToday {background-color:#4b3528;}
+td.bCalendarLinkPost {background-color:#6b4634; font-weight:bold;}
+
+.validation {text-align:center; margin-top:50px;}
+.validation img {border:none;}
+.validation .left {margin-right:10px;}
+
+div.rss {background:url(img/vast_rss.gif) top left no-repeat; padding-top:40px; margin-top:25px;}
+
+.pagefoot {font-size: 0.75em; height: 90px; clear: both; text-align: center;}
+.pagefoot a {
+	color:#3C2D21;
+	text-decoration: none;
+}
+.pagefoot a.contact_link {
+	color:#3C2D21;
+	text-decoration: underline;
+}
+
+.pagefoot a.contact_link:hover {
+	color:#D8C19A;
+}
+.pagefoot a:hover {
+	text-decoration: underline;
+}
+
+.footer {clear:both; text-align:center; background:none; font-size:0.7em;}
+.footer ul {border-left:none; margin:0 auto; line-height: 10px; background:none;}
+html>body .footer ul{padding:0;}
+.footer ul li {margin:0; padding:0; display:inline; font-family:Verdana, Arial, Helvetica, sans-serif; border-left:1px solid #FFF;}
+.footer ul li.first {border-left:none;}
+.footer p {margin-top:5px;}
+.footer a {padding:0 6px 0 10px; margin:0;}
+.footer a:hover {}
+
+div.powered_by {
+	text-align: center;
+	margin-top: 30px;
+}
+
+.post_date {
+	font-size: 0.9em;
+	font-weight: bold;
+}
+
+.ui-autocomplete li{
+	list-style: none;
+}
+
+.item_custom_fields {
+	margin-top: 10px;
+}
+
+/* jQuery Tokeninput plugin */
+div.input ul.token-input-list-facebook {
+	width: 100%;
+	background: #FFF;
+}
+
+/* Not published comments display */
+#styled_content_block .bComment .status_draft,
+#styled_content_block .bComment .status_review,
+#styled_content_block .bComment .status_community,
+#styled_content_block .bComment .status_protected,
+#styled_content_block .bComment .status_private {
+	left: 10px;
+	top: 24px;
+}
+/* Not published posts display */
+#styled_content_block .bSmallHead .status_draft,
+#styled_content_block .bSmallHead .status_review,
+#styled_content_block .bSmallHead .status_community,
+#styled_content_block .bSmallHead .status_protected,
+#styled_content_block .bSmallHead .status_private {
+	top: -40px;
+}
+
+form#user_checkchanges.bComment {
+	border-width: 1px;
+}
+div.tabs div a {
+	border-color: #D8C19A;
+	background-color: #2f2118;
+	color: #997340;
+}
+div.tabs div.selected a, div.tabs div:hover a {
+	background-color: transparent;
+	color: #D8C19A;
+}
+div.tabs div.selected a {
+	border-bottom-color: #895c46;
+}
+
+.form_add_contacts {
+	text-align: left;
+}

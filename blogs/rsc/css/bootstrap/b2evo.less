@@ -1,0 +1,368 @@
+/* Designed by François PLANQUE - http://fplanque.net/ */
+
+ul, ol {
+	margin: 0 0 10px 25px;
+	padding: 0;
+}
+
+// Fix line-height of evo toolbar to normal size
+div#evo_toolbar {
+	height: 23px;
+}
+#evo_toolbar li {
+	line-height: 12px;
+}
+
+// Style of bootstrap form
+.form-horizontal {
+	// Additional class for info fields
+	.controls-info {
+		padding-top: 5px;
+		padding-left: 0;
+		label {
+			display: inline;
+		}
+	}
+	.info_full .controls-info {
+		margin: 0 5px;
+	}
+	input[type="radio"], input[type="checkbox"] {
+		margin-top: 0;
+	}
+	.controls {
+		padding-left: 0;
+		label {
+			display: inline-block;
+			padding-top: 5px;
+			// Fix vertical alignment of checkboxes with text
+			input {
+				margin-top: 0;
+			}
+			input[type="radio"], input[type="checkbox"] {
+				margin-top: 0;
+			}
+		}
+		.form-control {
+			display: inline-block;
+			width: auto;
+		}
+		span.help-inline {
+			padding-top: 5px;
+			a.btn {
+				margin-top: -5px;
+			}
+		}
+	}
+	.field_inline label {
+		width: auto;
+		input {
+			width: auto;
+			display: inline-block;
+		}
+	}
+	.field_wide {
+		label {
+			width: 100%;
+			text-align: left;
+		}
+		.controls {
+			margin-left: 40px;
+		}
+	}
+	// Labels of radiobuttons
+	div.tile, div.tile label {
+		display: inline;
+		white-space: nowrap;
+	}
+	.control-buttons {
+		padding-left: 0;
+	}
+	.radio, .checkbox {
+		display: inline-block;
+		margin-bottom: 5px;
+	}
+	.control-label {
+		padding-top: 5px;
+	}
+	.control-label.label {
+		color: #000;
+		padding: 10px;
+		margin-top: 2px;
+	}
+	.controls.input {
+		margin: 2px 0 0 0;
+	}
+}
+.form-inline {
+	.form-control {
+		display: inline-block;
+		width: auto;
+	}
+}
+
+// Used to set a font size of action icons to normal view
+a.action_icon {
+	font-size: 12px;
+}
+
+// Field to enter multi usernames
+ul.token-input-list-facebook {
+	width: auto;
+	background-color: #FFFFFF;
+	border: 1px solid #CCCCCC;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+	transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
+	border-radius: 4px;
+	input, input:focus {
+		box-shadow: none;
+	}
+	li {
+		margin-left: 1px;
+	}
+}
+
+// Results table
+div.results {
+	margin-top: 20px;
+	div.table_scroll {
+		overflow: auto;
+		width: 100%;
+	}
+	.table-bordered {
+		border-left: none;
+		border-right: none;
+		td.firstcol, th.firstcol {
+			border-left: none;
+		}
+		td.lastcol, th.lastcol {
+			border-right: none;
+		}
+		th {
+			border-bottom: none;
+		}
+	}
+}
+.filters, .table_scroll .table {
+	margin-bottom: 0;
+}
+input.filter {
+	padding: 4px 12px;
+}
+
+// Shift a popover window to the right on 35px to don't hide a plus icon
+.popover.right.popover-userfield {
+	margin-left: 35px !important;
+	cursor: pointer;
+}
+
+// Glyphicons
+.glyphicon {
+	font-size: 12px;
+	color: #428BCA;
+}
+a:hover .glyphicon {
+	color: #2A6496;
+}
+.glyphicon:before {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	text-align: center;
+}
+
+// Table for select categories of item
+table.catselect {
+	tr.even, tr.even input{
+		background: none !important;
+	}
+	th, td {
+		border-left: none;
+		border-bottom: none;
+		background: none !important;
+	}
+	input#new_category_name {
+		width: 92% !important;
+	}
+}
+
+// The voting panel of pictures
+#colorbox #cboxVoting {
+	label {
+		display: inline;
+		font-size: 10px !important;
+		line-height: 0;
+		margin: 0;
+		input {
+			margin-top: 0;
+		}
+	}
+}
+
+// Make a label inline
+#itemform_renderers, #itemform_edit_timestamp, table.catselect {
+	label {
+		display: inline-block;
+		margin-right: 5px;
+		input {
+			margin: 0 2px 4px 0;
+		}
+	}
+}
+
+// Navigation menu
+.nav {
+	margin: 20px 0;
+}
+.well {
+	background: #F5F5F5;
+	.nav {
+		padding: 0 15px;
+		margin: 0;
+		li > a {
+			padding: 3px 15px;
+			margin: 0 -15px;
+		}
+		.active > a, .active > a:hover {
+			background-color: #0088CC;
+			color: #FFFFFF;
+			text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+		}
+	}
+}
+
+.avatar_main_frame div {
+	padding-left: 20px;
+}
+
+// Highlight the required fields
+input:focus:invalid,
+textarea:focus:invalid,
+select:focus:invalid {
+	color: #b94a48;
+	border-color: #ee5f5b;
+}
+input:focus:invalid:focus,
+textarea:focus:invalid:focus,
+select:focus:invalid:focus {
+	border-color: #e9322d;
+	-webkit-box-shadow: 0 0 6px #f8b9b7;
+	-moz-box-shadow: 0 0 6px #f8b9b7;
+	box-shadow: 0 0 6px #f8b9b7;
+}
+#login_form {
+	input:focus:invalid:focus,
+	textarea:focus:invalid:focus,
+	select:focus:invalid:focus {
+		border-color: #66afe9;
+		-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+		-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+		box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+	}
+}
+
+// Panels
+.panel-heading h4 {
+	margin: 0;
+}
+legend.panel-heading {
+	font-size: 16px;
+	font-weight: normal;
+	margin-bottom: 0;
+}
+.panel-title .icon {
+	vertical-align: middle;
+	position: relative;
+	top: -1px;
+}
+
+// Form to add contacts
+.form_add_contacts {
+	display: block;
+	padding-top: 5px;
+	.label {
+		color: #333;
+		font-size: 100%;
+		padding-left: 0;
+	}
+	.controls {
+		padding-left: 0;
+	}
+	.control-label {
+		width: auto;
+		padding-left: 0;
+		line-height: 24px;
+	}
+}
+
+.form-horizontal .controls {
+	input.large,
+	.form-control.form_textarea_input {
+		width: 97%;
+		display: block;
+	}
+}
+div.comment_toolbars div.edit_toolbar,
+div.message_toolbars div.edit_toolbar {
+	width: 97%;
+	padding-left: 0;
+	padding-right: 0;
+}
+
+
+// Remove borders from badge
+.badge {
+	border: none;
+	background-color: #F00;
+}
+a.evo_messages_link .badge {
+	font-size: 10px;
+	margin: -2px 2px;
+	padding: 2px 7px 3px;
+}
+
+// Fix colorbox sizes
+#colorbox,
+#colorbox *,
+#colorbox *:before,
+#colorbox *:after {
+	-webkit-box-sizing: content-box;
+	-moz-box-sizing: content-box;
+	box-sizing: content-box;
+}
+
+.modal-dialog {
+	width: 100%;
+	height: 100%;
+	.modal-content {
+		height: 100%;
+		.modal-body {
+			height: 90%;
+		}
+	}
+}
+.modal_fixed_height .modal-dialog {
+	height: auto;
+}
+
+// Typeahead plugin
+.tt-dropdown-menu {
+	background-color: #FFFFFF;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	border-radius: 8px;
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	padding: 8px 0;
+	.tt-suggestion {
+		font-size: 18px;
+		line-height: 24px;
+		padding: 3px 20px;
+		&.tt-cursor {
+			background-color: #0097CF;
+			color: #FFFFFF;
+		}
+		p {
+			margin: 0;
+		}
+	}
+}

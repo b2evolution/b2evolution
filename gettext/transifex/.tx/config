@@ -1,0 +1,9 @@
+[main]
+host = https://www.transifex.com
+type = PO
+
+[b2evolution.b2evomessages]
+file_filter = translations/b2evolution.b2evomessages/<lang>.po
+source_file = messages.pot
+source_lang = en
+

@@ -1,0 +1,299 @@
+/* Designed by François PLANQUE - http://fplanque.net/ */
+
+body {
+	padding: 0px;
+	margin: 0px;
+	color: #aaa;
+	font: 84% Arial, Helvetica, sans-serif;
+	background-color: #666;
+}
+
+div#skin_wrapper div.sitewide_header {
+	margin-bottom: 0;
+}
+
+textarea, input, select, option, optgroup, ul.ui-autocomplete, li.token-input-token-facebook, div.token-input-dropdown-facebook {
+	font: 13.43px Arial,Helvetica,sans-serif;
+}
+
+a {
+	color: #eee;
+	text-decoration: none;
+}
+a:visited {
+	color: #eee;
+}
+a:hover {
+	color: #fff;
+	text-decoration: underline;
+}
+
+.action_messages a {
+	color: #00F;
+}
+
+div#pageFooter {
+	padding: 0 0 1ex 0;
+}
+p.baseline {
+	text-align: center;
+	font-size: 84%;
+	padding: 6ex 0 4ex 0;
+	margin: 0;
+}
+
+
+div.pageHeader {
+	padding: 5px;
+	border-bottom: 1px solid #aaa;
+	background: #333;
+	color: #aaa;
+}
+
+h1#pageTitle {
+	font-size: 100%;
+	font-weight: bold;
+	letter-spacing: 2px;
+	margin: 0;
+	padding: 0;
+}
+
+div.PageTop ul {
+	background: #333;
+	border-bottom: 1px solid #aaa;
+	margin: 0 1px;
+	padding: 0;
+	list-style-type:none;
+	padding: 5px 0;
+}
+div.PageTop li {
+	border-right: 1px solid #aaa;
+	display: inline;
+	padding: 5px 1em;
+}
+
+div.PageTop a {
+	font-weight: bold;
+	text-decoration: none;
+}
+div.PageTop a.default {
+	color: #aaa;
+}
+div.PageTop a.selected,
+div.PageTop a.selected:visited {
+	color: #eee;
+}
+div.PageTop a:hover {
+	text-decoration: underline;
+	color: #fff;
+}
+
+div.top_menu > span.menu_link:not(:first-child):before {
+	content: " | ";
+}
+
+/* Styles for main area (left) */
+h2 {
+	margin: 0;
+	padding: 1ex 0 0 0;
+}
+
+/* Styles for posts */
+.bPosts {
+	width: 820px;
+	margin: 0 auto;
+}
+div.action_messages {
+	margin: 0 2ex;
+}
+
+.nav_right img
+{
+	vertical-align: top;
+}
+.nav_right a
+{
+	display: block;
+	margin: 1ex 0;
+	float: right;
+	border: 1px solid #666;
+}
+.nav_right a:hover
+{
+	border: 1px solid #fff;
+}
+img.no_nav, span.no_nav
+{
+	margin: 1ex 0;
+	float: right;
+	border: 1px solid #666;
+}
+
+.bPost
+{
+	clear: both;
+}
+div.image_block img {
+	background: #fff;
+	padding: 5px;
+	border: 1px solid #555;
+}
+.bDetails {
+	width: 80%;
+	margin: 2em auto;
+	background: #555;
+	border: 1px solid #aaa;
+}
+h3.bTitle, h3.bTitle.linked a {
+	color: #AAAAAA;
+	font-size: 100%;
+	display:inline;
+	letter-spacing: 2px;
+}
+.bText {
+	margin: 0;
+	padding: 0 12px;
+}
+.bSmallHead
+{
+	margin: 0;
+	padding: 12px 12px 6px 12px;
+}
+.bSmallPrint
+{
+	margin: 0;
+	font-size: 84%;
+	padding: 6px 12px 12px 12px;
+}
+.action_right
+{
+	font-size: 84%;
+	float: right;
+	margin: 0 0 0 1em;
+}
+.timestamp {
+	margin: 0 0 0 1em;
+	font-size: 84%;
+}
+
+input.bComment,
+textarea.bComment
+{
+	background-color: #eee;
+	border: 1px solid #ccc;
+	width: 97%;
+	padding: 2px;
+	margin: 0ex;
+}
+select.bComment  /* Used by the profile form */
+{
+	background-color: #eee;
+	border: 1px solid #ccc;
+	padding: 1px;
+	margin: 0ex;
+}
+
+.comments_popup {
+	margin: 1em;
+}
+
+.image_index div {
+	background: #555;
+	border: 1px solid #333;
+}
+.image_index div:hover {
+	background: #777;
+}
+
+#pageFooter a
+{
+	color: #aaa;
+}
+
+table.grouped, #edit_group_contacts {
+	color: #000;
+}
+table.grouped th a, table.grouped a {
+	color: #666;
+}
+
+.user.nogender, user.anonymous.nogender {
+	color: #000;
+}
+
+.user_contacts_groups .col1 {
+	border-color: #999;
+}
+
+.avatar_rounded a {
+	color: #666;
+}
+.avatar_main_frame a {
+	color: #666;
+}
+
+/* Icons */
+.pb_icon {
+	background: url(img/icons.gif) no-repeat;
+	width: 29px;
+	height: 29px;
+	display: inline-block;
+}
+.pb_icon.prev {
+	background-position: 0 0;
+}
+.pb_icon.next {
+	background-position: -29px 0;
+}
+
+div.item_location {
+	padding: 0 12px;
+}
+.item_custom_fields {
+	margin-left: 12px;
+}
+
+/* jQuery Tokeninput plugin */
+div.input ul.token-input-list-facebook {
+	width: 655px;
+	background: #FFF;
+}
+
+/* Not published comments display */
+#styled_content_block .bComment .status_draft,
+#styled_content_block .bComment .status_review,
+#styled_content_block .bComment .status_community,
+#styled_content_block .bComment .status_protected,
+#styled_content_block .bComment .status_private {
+	top: 0px;
+	left: 13px;
+}
+/* Not published posts display */
+#styled_content_block .bSmallHead .status_draft,
+#styled_content_block .bSmallHead .status_review,
+#styled_content_block .bSmallHead .status_community,
+#styled_content_block .bSmallHead .status_protected,
+#styled_content_block .bSmallHead .status_private {
+	top: -12px;
+	left: 12px;
+}
+
+div.tabs div a {
+	background-color: #333;
+	border-color: #999;
+	color: #AAA;
+}
+div.tabs div.selected a, div.tabs div a:hover {
+	background-color: #666;
+}
+div.tabs div.selected a {
+	border-bottom-color: #666;
+}
+
+.form_add_contacts .controls {
+	padding-left: 0;
+}
+
+.bImages .flowplayer_block, .bImages .videojs_block, .bImages .mediajs_block {
+	padding: 0 12px;
+}

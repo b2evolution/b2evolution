@@ -1,0 +1,370 @@
+/* Designed by Francois PLANQUE - http://fplanque.net/ */
+
+/*
+ * Main page construct:
+ */
+body {
+	background: #82cdac url(rsc/img/bg.jpg) repeat-x fixed left top;
+	color: #000;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 84%;
+}
+
+textarea, input, select, option, optgroup, ul.ui-autocomplete, li.token-input-token-facebook, div.token-input-dropdown-facebook {
+	font: 13.43px Arial,Helvetica,sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: "Trebuchet MS", "Lucida Grande", Arial, Helvetica, sans-serif;
+}
+
+div.wrapper
+{
+	margin: 1ex 1em;
+	padding: 1ex 0;
+}
+div.wrapper2 /* Main centered zone */
+{
+	width: 105ex;
+	margin: 0 auto;
+}
+div.outerwrap /* Main rounded content zone */
+{
+	margin: 1ex 0;
+	/* border: 1px solid #000;  */
+}
+div.innerwrap /* Main white content zone */
+{
+	padding: 5px 0;
+	border: 1px solid #fff; /* needed to force inner paddings */
+	background-color:#fff;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	-khtml-border-radius: 8px;
+	border-radius: 8px;
+}
+div.pageHeader /* Title zone */
+{
+	margin: 0 1ex;
+	padding: 0;
+	background-image: url(rsc/img/squares.gif);
+	background-repeat: no-repeat;
+	background-position: right center;
+	/* border: 1px solid #f00; */
+}
+
+table.prevnext_post {
+	width: 98%;
+}
+
+.posts /* Left column */
+{
+	width: 75ex;
+	float: left;
+	overflow: hidden;
+}
+
+.bSideBar /* Right column */
+{
+	width: 29ex;
+	float: right;
+	overflow: hidden;
+}
+div.clear {
+	clear: both;
+}
+div#pageFooter {
+	margin: 1ex;
+	padding:0;
+	border-top: 1px dotted #000;
+}
+p.baseline {
+	font-size: 72%;
+	text-align: center;
+	margin:1ex;
+	color: #444;
+}
+p.baseline a {
+	color: #444;
+}
+
+/*
+ * General styles:
+ */
+a,
+a:visited {
+	color: #666;
+	text-decoration:none;
+}
+a:hover,
+div.top_menu a:hover {
+	color: #26AAE8;
+	text-decoration:underline;
+}
+
+h2 {
+	color: #06a3c4;
+	font-size: 160%;
+	margin: 1ex;
+}
+h3 {
+	color: #06a3c4;
+	font-size: 110%;
+}
+h4 {
+	color: #06a3c4;
+	font-size: 105%;
+}
+
+/*
+ * Blog list on top:
+ */
+div.PageTop ul {
+	border-bottom: 2px solid #06a3c4;
+	margin: 0 1ex 2px 1ex;
+	padding: 0 0 2px 0;
+	list-style-type:none;
+}
+div.PageTop li {
+	display: inline;
+	padding-right: 3ex;
+}
+a.selected {
+	color: #06a3c4;
+	font-weight:bold;
+}
+
+/*
+ * Menu on top:
+ */
+div.top_menu ul {
+	margin: 4px 1ex 2px 1ex;
+	padding: 0 0 2px 0;
+	list-style-type:none;
+}
+div.top_menu li {
+	display: inline;
+	padding-right: 2ex;
+	white-space: nowrap;
+	float: left;
+}
+div.top_menu a {
+	color: #999;
+	font-weight:bold;
+}
+
+
+/*
+ * Header styles:
+ */
+div.pageHeader h1 {
+	font-size: 250%;
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+	color:#06a3c4;
+}
+div.pageHeader h1 a {
+	color:#06a3c4;
+}
+div.pageHeader h1 a:hover {
+	color: #c0c;
+}
+div.pageHeader div.widget_core_coll_tagline {
+	letter-spacing: 4px;
+	padding: 0 0 3px 0;
+	font-size: 109%;
+}
+
+
+/*
+ * Styles for posts
+ */
+.bPost, .bPostpublished
+{
+	clear: both;
+	margin: 0 1ex 3ex 1ex;
+	padding: 0;
+	/* border: 1px solid #e2f1f4; */
+}
+.bSmallHead {
+	font-size: 78%;
+	margin: 1ex;
+}
+div.bTitle {
+	clear: both;
+	margin: 10px 1ex 10px 1ex;
+	padding: 5px 0 4px 0;
+	background-color:#06a3c4;
+	-moz-border-radius-topleft: 6px; -moz-border-radius-topright: 6px;
+	-webkit-border-radius: 6px 6px 0 0;
+	-khtml-border-radius-topleft: 6px; -khtml-border-radius-topright: 6px;
+	border-radius: 6px 6px 0 0;
+}
+h3.bTitle {
+	margin: 0 1ex;
+	color: #fff;
+}
+h3.bTitle a {
+	color: #fff;
+}
+.bText,
+.excerpt {
+	margin: 0 1ex 0;
+}
+.bSmallPrint
+{
+	clear: both;
+	font-size: 78%;
+	margin: 1ex;
+}
+
+input.bComment,
+textarea.bComment
+{
+	background-color: #eee;
+	border: 1px solid #ccc;
+	width: 97%;
+	padding: 2px;
+	margin: 0ex;
+}
+select.bComment		/* Used by the profile form */
+{
+	background-color: #eee;
+	border: 1px solid #ccc;
+	padding: 1px;
+	margin: 0ex;
+}
+
+
+/*
+ * Styles for sidebar (right)
+ */
+.bSideItem {
+	margin: 2ex;
+	padding: 0 0 2ex 0;
+}
+.bSideItem ul {
+	margin-left: 8px;
+	padding-left: 8px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	list-style-type:square;
+}
+.bSideItem ul ul{
+	margin-left: 8px;
+	padding-left: 8px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.bSideItem form {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.dimmed
+{
+	color: #aaa;
+	font-size: 84%;
+}
+div.compact_search_form input.SearchField
+{
+	background-color: #E2F1F4;
+	border: 1px solid #ccc;
+	padding: .5ex;
+	width: 120px;
+}
+
+/* Special SideItems: */
+.widget_plugin_evo_Calr,
+.widget_core_coll_title,
+.widget_core_coll_longdesc {
+	padding: 0;
+}
+.widget_core_coll_title a {
+	color: #06a3c4;
+}
+
+/* Calendar: */
+table.bCalendarTable caption {
+	border: 1px solid #ccc;
+	background-color: #eee;
+	border-bottom: 0;
+}
+table.bCalendarTable {
+	border: solid 1px #ccc;
+	border-collapse: separate;
+}
+table.bCalendarTable a {
+	color: #06a3c4;
+}
+table.bCalendarTable tfoot td {
+	background-color: #eee;
+	border-top: 1px solid #ccc;
+}
+table.bCalendarTable tfoot a {
+	text-decoration: none;
+}
+table.bCalendarTable tfoot a:hover {
+	background-color: #fac;
+}
+th.bCalendarHeaderCell {
+	color: #ccc;
+	font-weight:normal;
+}
+#bCalendarToday {
+	background-color: #E2F1F4;
+}
+
+/*
+ * Styles for comment screen:
+ */
+form.bComment fieldset div.label,
+form.bComment fieldset div.input,
+form.bComment fieldset div.info
+{
+	padding-top: 0;
+	/* font-size: 84%; */
+}
+textarea.bComment,
+input.bComment {
+	background-color: #E2F1F4;
+}
+
+
+
+div.featured_post {
+	margin: 0 1ex ;
+	border-color: #06A3C4;
+	border-top: none;
+	padding: 1px 0 0 0;
+}
+
+div.item_location {
+	margin: 1ex;
+}
+.item_custom_fields {
+	margin-left: 1ex;
+}
+
+/* jQuery Tokeninput plugin */
+div.input ul.token-input-list-facebook {
+	width: 345px;
+}
+
+/* Not published comments display */
+#styled_content_block .bComment .status_draft,
+#styled_content_block .bComment .status_review,
+#styled_content_block .bComment .status_community,
+#styled_content_block .bComment .status_protected,
+#styled_content_block .bComment .status_private {
+	left: 13px;
+}
+/* Not published posts display */
+#styled_content_block .bSmallHead .status_draft,
+#styled_content_block .bSmallHead .status_review,
+#styled_content_block .bSmallHead .status_community,
+#styled_content_block .bSmallHead .status_protected,
+#styled_content_block .bSmallHead .status_private {
+	top: -10px;
+	left: 5px;
+}

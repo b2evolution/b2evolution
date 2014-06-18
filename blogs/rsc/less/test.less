@@ -1,0 +1,23 @@
+// This is an example only (not used in B2evolution at this time)
+// See http://lesscss.org to learn the basics of the LESS language
+
+// define color vars:
+@base: #f938ab;
+@nice-blue: #5B83AD;
+@light-blue: @nice-blue + #111;
+
+// define a function:
+.box-shadow(@style, @c) when (iscolor(@c)) {
+  -webkit-box-shadow: @style @c;
+  box-shadow:         @style @c;
+}
+.box-shadow(@style, @alpha: 50%) when (isnumber(@alpha)) {
+  .box-shadow(@style, rgba(0, 0, 0, @alpha));
+}
+
+.box {
+  color: saturate(@base, 5%);
+  border-color: @light-blue;
+
+  div { .box-shadow(0 0 5px, 30%) }
+}

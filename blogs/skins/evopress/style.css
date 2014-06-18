@@ -1,0 +1,612 @@
+/*
+* Original Design: WordPress Kubrick  1.6 by Michael Heilemann - http://binarybonsai.com/
+* Ported to b2evolution 2.0 by The Skin Faktory - http://skinfaktory.com/
+* Distributed with b2evolution with written permission from Michael Heilemann (2007-01-25).
+*/
+
+
+/* Begin Typography & Colors */
+body {
+font-size: 62.5%; /* Resets 1em to 10px */
+font-family: 'Lucida Grande', Verdana, Arial, Sans-Serif;
+background: #e7e7e7;
+color: #333;
+text-align: center;
+}
+textarea, input, select, option, optgroup, ul.ui-autocomplete, li.token-input-token-facebook, div.token-input-dropdown-facebook {
+font: 12px 'Lucida Grande', Verdana, Arial, Sans-Serif;
+}
+
+#page {
+background-color: white;
+text-align: left;
+}
+
+#header {
+margin: 10px auto 0;
+padding: 0;
+width: 720px;
+overflow: hidden;
+-moz-border-radius: 6px;
+-webkit-border-radius: 6px;
+-khtml-border-radius: 6px;
+border-radius: 6px;
+}
+
+#headerimg {
+font-size: 1.2em;
+text-align: center;
+color: white;
+height: 182px;
+background:-webkit-linear-gradient(top, #6aace6, #4280b6);
+background:-moz-linear-gradient(top, #6aace6, #4280b6);
+background:-o-linear-gradient(top, #6aace6, #4280b6);
+background: -ms-linear-gradient(top, #6aace6, #4280b6);
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#6aace6', endColorstr='#4280b6');
+}
+
+#content {
+clear: both;
+font-size: 1.2em
+}
+
+.widecolumn .bText p {
+font-size: 1.05em;
+}
+
+.narrowcolumn .bText,
+.widecolumn .bText {
+line-height: 1.4em;
+}
+
+.widecolumn {
+line-height: 1.6em;
+}
+
+.narrowcolumn .postmetadata {
+text-align: center;
+}
+
+.alt {
+background-color: #f8f8f8;
+border-top: 1px solid #ddd;
+border-bottom: 1px solid #ddd;
+}
+
+h1, h2, h3 {
+font-family: 'Trebuchet MS', 'Lucida Grande', Verdana, Arial, Sans-Serif;
+font-weight: bold;
+}
+
+#header h1 {
+font-size: 340%;
+text-align: center;
+margin: 0;
+}
+
+h2 {
+font-size: 1.6em;
+}
+
+h2.pagetitle {
+font-size: 1.6em;
+}
+
+#sidebar h2 {
+font-family: 'Lucida Grande', Verdana, Sans-Serif;
+font-size: 1.2em;
+}
+
+h3 {
+font-size: 1.3em;
+}
+
+#header h1, #header h1 a, #header h1 a:hover, #header h1 a:visited {
+text-decoration: none;
+color: white;
+}
+
+h2, h2 a, h2 a:visited, h3, h3 a, h3 a:visited {
+color: #333;
+}
+
+h2, h2 a, h2 a:hover, h2 a:visited, h3, h3 a, h3 a:hover, h3 a:visited, #sidebar h2, #wp-calendar caption, cite {
+text-decoration: none;
+}
+
+.bText a {
+color: #003399;
+}
+
+.commentlist li, #commentform input, #commentform textarea {
+font: 0.9em 'Lucida Grande', Verdana, Arial, Sans-Serif;
+}
+
+.commentlist li {
+font-weight: bold;
+}
+
+.commentlist cite, .commentlist cite a {
+font-weight: bold;
+font-style: normal;
+font-size: 1.1em;
+}
+
+.commentlist p {
+font-weight: normal;
+line-height: 1.5em;
+text-transform: none;
+}
+
+#commentform p {
+font-family: 'Lucida Grande', Verdana, Arial, Sans-Serif;
+}
+
+.commentmetadata {
+font-weight: normal;
+}
+
+#sidebar {
+font: 1em 'Lucida Grande', Verdana, Arial, Sans-Serif;
+}
+
+#sidebar ul ul li, #sidebar ul ol li, .nocomments, .postmetadata {
+color: #777;
+}
+
+a, h2 a:hover, h3 a:hover {
+color: #06c;
+text-decoration: none;
+}
+
+a:hover {
+color: #147;
+text-decoration: underline;
+}
+
+#wp-calendar #prev a, #wp-calendar #next a {
+font-size: 9pt;
+}
+
+#wp-calendar a {
+text-decoration: none;
+}
+
+#wp-calendar caption {
+font: bold 1.3em 'Lucida Grande', Verdana, Arial, Sans-Serif;
+text-align: center;
+}
+
+#wp-calendar th {
+font-style: normal;
+text-transform: capitalize;
+}
+/* End Typography & Colors */
+
+
+
+/* Begin Structure */
+body {
+margin: 0 0 20px 0;
+padding: 0;
+}
+
+#page {
+background: #FFF left 0 repeat-y;
+margin: 20px auto;
+padding: 0;
+width: 740px;
+border: 1px solid #a2a2a2;
+-moz-border-radius: 8px;
+-webkit-border-radius: 8px;
+-khtml-border-radius: 8px;
+border-radius: 8px;
+box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.3);
+overflow: hidden;
+}
+#page.page-left, #page.page-right {
+background-image: url('img/kubrickbg-ltr.gif');
+}
+#page.page-right {
+background-position : right 0;
+}
+
+div.page-right .narrowcolumn {
+float: left;
+padding: 0 0 20px 35px;
+margin: 0px 0 0;
+width: 450px;
+}
+
+div.page-left .narrowcolumn {
+float:right;
+margin:0 0 0;
+padding:0 40px 10px;
+width:460px;
+}
+
+.narrowcolumn {
+margin: 0px 0 0;
+}
+
+.widecolumn {
+padding: 10px 0 20px 0;
+margin: 5px 0 0 150px;
+width: 450px;
+}
+
+.post {
+margin: 0 0 40px;
+text-align: justify;
+}
+
+.post hr {
+display: block;
+}
+
+.widecolumn .post {
+margin: 0;
+}
+
+.widecolumn .postmetadata {
+margin: 30px 0;
+}
+
+.widecolumn .smallattachment {
+text-align: center;
+float: left;
+width: 128px;
+margin: 5px 5px 5px 0px;
+}
+
+.widecolumn .attachment {
+text-align: center;
+margin: 5px 0px;
+}
+
+.postmetadata {
+clear: left;
+}
+
+.posttags {
+	clear: both;
+	text-align: center;
+	color: #777;
+	margin: 1ex 0;
+}
+
+#footer {
+border: none;
+padding: 0;
+margin: 0 auto;
+width: 740px;
+clear: both;
+color: #999;
+-webkit-text-size-adjust: none; /* iPhone */
+background:-webkit-linear-gradient(top, #FFF, #e3e3e3);
+background:-moz-linear-gradient(top, #FFF, #e3e3e3);
+background:-o-linear-gradient(top, #FFF, #e3e3e3);
+background: -ms-linear-gradient(top, #FFF, #e3e3e3);
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFFFFF', endColorstr='#e3e3e3');
+border-radius: 8px;
+-moz-border-radius: 8px;
+-webkit-border-radius: 8px;
+-khtml-border-radius: 8px;
+}
+
+#footer a {
+	color: #999;
+}
+
+#footer p {
+margin: 0;
+padding: 25px 0 15px;
+text-align: center;
+}
+/* End Structure */
+
+
+
+/*	Begin Headers */
+h2 {
+margin: 30px 0 0;
+}
+
+h2.pagetitle {
+margin-top: 30px;
+text-align: center;
+}
+
+#sidebar h2 {
+margin: 5px 0 0;
+padding: 0;
+}
+
+h3 {
+padding: 0;
+margin: 30px 0 0;
+}
+
+h3.comments {
+padding: 0;
+margin: 40px auto 20px ;
+}
+/* End Headers */
+
+
+
+/* Begin Images */
+p img {
+padding: 0;
+max-width: 100%;
+}
+
+/*	Using 'class="alignright"' on an image will (who would've
+thought?!) align the image to the right. And using 'class="centered',
+will of course center the image. This is much better than using
+align="center", being much more futureproof (and valid) */
+
+img.centered {
+display: block;
+margin-left: auto;
+margin-right: auto;
+}
+
+img.alignright {
+padding: 4px;
+margin: 0 0 2px 7px;
+display: inline;
+}
+
+img.alignleft {
+padding: 4px;
+margin: 0 7px 2px 0;
+display: inline;
+}
+
+.alignright {
+float: right;
+}
+
+.alignleft {
+float: left
+}
+/* End Images */
+
+
+.postmetadata ul, .postmetadata li {
+display: inline;
+list-style-type: none;
+list-style-image: none;
+}
+
+#sidebar ul, #sidebar ul ol {
+margin: 0;
+padding: 0;
+}
+
+#sidebar ul li {
+list-style-type: none;
+list-style-image: none;
+margin-bottom: 15px;
+}
+
+#sidebar ul p, #sidebar ul select {
+margin: 5px 0 8px;
+}
+
+#sidebar ul ul, #sidebar ul ol {
+margin: 5px 0 0 10px;
+}
+
+#sidebar ul ul ul, #sidebar ul ol {
+margin: 0 0 0 10px;
+}
+
+#sidebar ul ul li, #sidebar ul ol li {
+margin: 3px 0 0;
+padding: 0;
+}
+
+
+
+/* Begin Sidebar */
+.sidebar-left {
+	margin-left:15px;
+	width:190px;
+}
+
+.sidebar-right {
+	margin-left: 534px;
+	width: 190px;
+}
+
+#sidebar {
+	padding: 20px 0 10px 0;
+}
+
+#sidebar form {
+margin: 0;
+}
+
+
+#sidebar .note,
+#sidebar .notes {
+margin-top: 1ex;
+font-size: 100%;
+}
+
+table.bCalendarTable {
+font-size: 100%;
+width: 155px;
+}
+table.bCalendarTable caption {
+font-size: 130%;
+}
+table.bCalendarTable th {
+font-size: 100%;
+}
+
+.widget_core_coll_search_form div.compact_search_form input.SearchField {
+	width: 106px;
+	background:url(img/search_sprite.png) no-repeat left top;
+	border:0px;
+	height:23px;
+	padding:0px 10px 0px 25px;
+	float:left;
+	margin:0px 4px 15px 0px;
+	font:bold 12px Arial, Helvetica, sans-serif;
+	color:#535353;
+}
+.widget_core_coll_search_form div.compact_search_form input:hover.SearchField {
+	background:url(img/search_sprite.png) no-repeat 0px -24px;
+}
+
+.compact_search_form{padding:10px 0px 0px 0px;}
+
+.widget_core_coll_search_form div.compact_search_form input.search_submit{
+	width:42px;
+	height:24px;
+	background:url(img/search_sprite.png) no-repeat -142px 0px;
+	border:0px;
+	font-size:0px;
+	padding:0px;
+	float:left;
+	cursor:pointer;
+}
+.widget_core_coll_search_form div.compact_search_form input:hover.search_submit{
+	background:url(img/search_sprite.png) no-repeat -142px -24px;
+}
+
+/* End Sidebar */
+
+
+
+/* Begin Various Tags & Classes */
+
+hr {
+height:0;
+border:none;
+}
+
+
+.navigation {
+display: block;
+text-align: center;
+margin-top: 10px;
+margin-bottom: 60px;
+}
+/* End Various Tags & Classes*/
+
+
+/* Default styles overriden for this skin: */
+table.prevnext_post {
+width: 100%;
+}
+
+/* Styles for comments */
+div.bComment, /* Entire comment block */
+form.bComment { /* New comment form */
+	margin: 1ex 0;
+}
+form.bComment {
+	margin-top: 0;
+}
+
+div.moderation_msg {
+margin: 1ex 0;
+}
+
+input.wide_input {
+	width: 305px;
+}
+
+
+
+/*
+ * Header / bloglist on top:
+ */
+div#header ul {
+float:right;
+list-style-type:none;
+margin: 0;
+padding: 10px 10px 27px;
+}
+div#header li {
+margin: 0;
+display: inline;
+padding: 0 1ex 0 0;
+}
+div#header li a {
+font-weight: bold;
+font-style:italic;
+color: #fff;
+}
+div#header li a:hover {
+color: #666;
+text-decoration: underline;
+}
+div#header li a.selected {
+text-decoration: underline;
+}
+
+
+div.widget_core_coll_title {
+	padding-top: 55px;
+}
+
+
+/* Top menu */
+div.top_menu ul {
+float:left;
+margin: 8px 0 0 14px;
+padding: 0;
+list-style-type:none;
+font-size: 108%;
+}
+div.top_menu_narrow ul {
+width: 490px;
+}
+div.top_menu li {
+display: inline;
+padding: 0 1em 0 0;
+white-space: nowrap;
+float: left;
+}
+div.top_menu a {
+font-weight: bold;
+}
+div.top_menu a:hover {
+color: #666;
+text-decoration: underline;
+}
+div.top_menu a.selected {
+text-decoration: underline;
+}
+
+div.top_menu_left {
+	margin-left: 220px;
+}
+
+div.top_menu_right {
+	margin-left: 0px;
+}
+
+/* jQuery Tokeninput plugin */
+div.input ul.token-input-list-facebook {
+	width: 309px;
+}
+
+/* Not published comments display */
+#styled_content_block .bComment .status_draft,
+#styled_content_block .bComment .status_review,
+#styled_content_block .bComment .status_community,
+#styled_content_block .bComment .status_protected,
+#styled_content_block .bComment .status_private {
+	top: 0px;
+	left: 12px;
+}
+
+div.tabs {
+	padding-left: 10px;
+}

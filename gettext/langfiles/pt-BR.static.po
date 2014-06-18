@@ -1,0 +1,422 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Francois PLANQUE
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: pt-BR.static\n"
+"Report-Msgid-Bugs-To: http://fplanque.net/\n"
+"POT-Creation-Date: 2004-04-26 03:00+0200\n"
+"PO-Revision-Date: 2009-03-24 11:57-0300\n"
+"Last-Translator: Walter Cruz <walter.php@gmail.com>\n"
+"Language-Team: Walter Cruz e Sérgio Lima <http://artigos.waltercruz.com/b2evolution/tradutores>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Portuguese\n"
+"X-Poedit-Country: BRAZIL\n"
+"X-Poedit-SourceCharset: iso-8859-1\n"
+
+#: ../../index.src.html:6
+#: ../../doc/upgradefrom_wp.src.html:6
+#: ../../doc/upgradefrom_b2evo.src.html:6
+#: ../../doc/install_new.src.html:6
+#: ../../doc/upgradefrom_b2.src.html:6
+#: ../../doc/upgradefrom_mt.src.html:6
+msgid "b2evo package"
+msgstr "pacote do b2evo"
+
+#: ../../index.src.html:6
+msgid "Start page"
+msgstr "Página inicial"
+
+#: ../../index.src.html:19
+#: ../../doc/upgradefrom_wp.src.html:19
+#: ../../doc/upgradefrom_b2evo.src.html:19
+#: ../../doc/install_new.src.html:19
+#: ../../doc/upgradefrom_b2.src.html:19
+#: ../../doc/upgradefrom_mt.src.html:19
+msgid "Version"
+msgstr "Versão"
+
+#: ../../index.src.html:24
+#: ../../doc/upgradefrom_wp.src.html:24
+#: ../../doc/upgradefrom_b2evo.src.html:24
+#: ../../doc/install_new.src.html:24
+#: ../../doc/upgradefrom_b2.src.html:24
+#: ../../doc/upgradefrom_mt.src.html:24
+msgid "After install"
+msgstr "Depois da instalação"
+
+#: ../../index.src.html:24
+#: ../../doc/upgradefrom_wp.src.html:24
+#: ../../doc/upgradefrom_b2evo.src.html:24
+#: ../../doc/install_new.src.html:24
+#: ../../doc/upgradefrom_b2.src.html:24
+#: ../../doc/upgradefrom_mt.src.html:24
+msgid "Blogs"
+msgstr "Blogs"
+
+#: ../../index.src.html:24
+#: ../../doc/upgradefrom_wp.src.html:24
+#: ../../doc/upgradefrom_b2evo.src.html:24
+#: ../../doc/install_new.src.html:24
+#: ../../doc/upgradefrom_b2.src.html:24
+#: ../../doc/upgradefrom_mt.src.html:24
+msgid "Admin"
+msgstr "Administração"
+
+#: ../../index.src.html:25
+#: ../../doc/upgradefrom_wp.src.html:25
+#: ../../doc/upgradefrom_b2evo.src.html:25
+#: ../../doc/install_new.src.html:25
+#: ../../doc/upgradefrom_b2.src.html:25
+#: ../../doc/upgradefrom_mt.src.html:25
+msgid "Before install"
+msgstr "Antes da instalação"
+
+#: ../../index.src.html:25
+#: ../../index.src.html:31
+#: ../../doc/upgradefrom_wp.src.html:25
+#: ../../doc/upgradefrom_b2evo.src.html:25
+#: ../../doc/install_new.src.html:25
+#: ../../doc/upgradefrom_b2.src.html:25
+#: ../../doc/upgradefrom_mt.src.html:25
+msgid "Hello!"
+msgstr "Olá!"
+
+#: ../../index.src.html:25
+#: ../../doc/upgradefrom_wp.src.html:25
+#: ../../doc/upgradefrom_b2evo.src.html:25
+#: ../../doc/install_new.src.html:25
+#: ../../doc/upgradefrom_b2.src.html:25
+#: ../../doc/upgradefrom_mt.src.html:25
+msgid "Changelog"
+msgstr "Mudanças"
+
+#: ../../index.src.html:25
+#: ../../doc/upgradefrom_wp.src.html:25
+#: ../../doc/upgradefrom_b2evo.src.html:25
+#: ../../doc/install_new.src.html:25
+#: ../../doc/upgradefrom_b2.src.html:25
+#: ../../doc/upgradefrom_mt.src.html:25
+msgid "Installer"
+msgstr "Instalador"
+
+#: ../../index.src.html:32
+msgid "You are about to install the b2evolution  multilingual multiuser multiblog engine. You can learn more about b2evolution by visiting <a %s>b2evolution.net</a> ."
+msgstr "Você está prestes a instalar o b2evolution, motor de blogs multilingüe, multiusuário e multiblog  Você pode aprender mais sobre o b2evolution visitando <a %s>b2evolution.net</a> ."
+
+#: ../../index.src.html:33
+msgid "Below are some quick instructions designed to help you. Please pick your prefered language and read on..."
+msgstr "Abaixo estão algumas instruções rápidas para te auxiliar. Por favor, escolha a sua linguagem favorita e leia..."
+
+#: ../../index.src.html:34
+msgid "trans_current"
+msgstr "trans_current"
+
+#: ../../index.src.html:42
+msgid "Quickstart instructions"
+msgstr "Instruções rápidas"
+
+#: ../../index.src.html:43
+msgid "If you don't have a webserver yet, check out our selection of <a %s>recommended web hosting companies</a> which offer easy, automated install of b2evolution."
+msgstr "Se você não tem um servidor web ainda, verifique nossa seleção de <a %s>empresas de hospedagem recomendadas</a> que oferecem a instalação automatizada e facilitada do b2evolution."
+
+#: ../../index.src.html:44
+msgid "If you already have a PHP/MySQL webserver, you can set up this copy of b2evolution in just a few minutes. Just follow the instructions matching your situation:"
+msgstr "Se você já tem um servidor PHP/MySQL, você pode configurar essa cópia do b2evolution em apenas alguns minutos. Apenas siga as instruções que mais se adequem à sua situação:"
+
+#: ../../index.src.html:47
+#: ../../doc/install_new.src.html:6
+#: ../../doc/install_new.src.html:32
+msgid "Installing b2evolution from scratch"
+msgstr "Instalando o b2evolution do princípio"
+
+#: ../../index.src.html:49
+#: ../../doc/upgradefrom_b2evo.src.html:6
+#: ../../doc/upgradefrom_b2evo.src.html:32
+msgid "Upgrading from a previous version of b2evolution"
+msgstr "Atualizando a partir de uma versão anterior do b2evolution"
+
+#: ../../index.src.html:51
+msgid "Upgrading from other blog software:"
+msgstr "Atualizando de outro programa de blog:"
+
+#: ../../index.src.html:53
+msgid "WordPress"
+msgstr "WordPress"
+
+#: ../../index.src.html:54
+msgid "Movable Type"
+msgstr "Movable Type"
+
+#: ../../index.src.html:55
+msgid "Cafelog/b2"
+msgstr "Cafelog/b2"
+
+#: ../../index.src.html:66
+msgid "Beta software"
+msgstr "Software beta"
+
+#: ../../index.src.html:67
+msgid "This is a BETA release!"
+msgstr "Esta é uma versão BETA!"
+
+#: ../../index.src.html:68
+msgid "There are still bugs we know of, but we consider the software to be globally operational!"
+msgstr "Ainda exitem bugs conhecidos, mas consideramos esse software globalmente operacional!"
+
+#: ../../index.src.html:69
+msgid "NOTE: This version is and will continue to be fully supported in the upgrading scheme and procedures."
+msgstr "NOTA: Essa versão é e continuará a ser completamente suportada nos procedimentos de atualização."
+
+#: ../../index.src.html:80
+#: ../../doc/upgradefrom_wp.src.html:49
+#: ../../doc/upgradefrom_b2evo.src.html:63
+#: ../../doc/install_new.src.html:64
+#: ../../doc/upgradefrom_b2.src.html:52
+#: ../../doc/upgradefrom_mt.src.html:51
+msgid "Online resources"
+msgstr "Recursos online"
+
+#: ../../index.src.html:80
+#: ../../doc/upgradefrom_wp.src.html:49
+#: ../../doc/upgradefrom_b2evo.src.html:63
+#: ../../doc/install_new.src.html:64
+#: ../../doc/upgradefrom_b2.src.html:52
+#: ../../doc/upgradefrom_mt.src.html:51
+msgid "Official website"
+msgstr "sítio oficial"
+
+#: ../../index.src.html:80
+#: ../../doc/upgradefrom_wp.src.html:49
+#: ../../doc/upgradefrom_b2evo.src.html:63
+#: ../../doc/install_new.src.html:64
+#: ../../doc/upgradefrom_b2.src.html:52
+#: ../../doc/upgradefrom_mt.src.html:51
+msgid "Find a host"
+msgstr "Encontre um host"
+
+#: ../../index.src.html:80
+#: ../../doc/upgradefrom_wp.src.html:49
+#: ../../doc/upgradefrom_b2evo.src.html:63
+#: ../../doc/install_new.src.html:64
+#: ../../doc/upgradefrom_b2.src.html:52
+#: ../../doc/upgradefrom_mt.src.html:51
+msgid "Manual"
+msgstr "Manual"
+
+#: ../../index.src.html:80
+#: ../../doc/upgradefrom_wp.src.html:49
+#: ../../doc/upgradefrom_b2evo.src.html:63
+#: ../../doc/install_new.src.html:64
+#: ../../doc/upgradefrom_b2.src.html:52
+#: ../../doc/upgradefrom_mt.src.html:51
+msgid "Forums"
+msgstr "Fóruns"
+
+#: ../../index.src.html:83
+#: ../../doc/upgradefrom_wp.src.html:52
+#: ../../doc/upgradefrom_b2evo.src.html:66
+#: ../../doc/install_new.src.html:67
+#: ../../doc/upgradefrom_b2.src.html:55
+#: ../../doc/upgradefrom_mt.src.html:54
+msgid "GNU GPL license"
+msgstr "Licença GNU GPL"
+
+#: ../../index.src.html:83
+#: ../../doc/upgradefrom_wp.src.html:52
+#: ../../doc/upgradefrom_b2evo.src.html:66
+#: ../../doc/install_new.src.html:67
+#: ../../doc/upgradefrom_b2.src.html:55
+#: ../../doc/upgradefrom_mt.src.html:54
+msgid "Contact"
+msgstr "Contato"
+
+#: ../../doc/upgradefrom_wp.src.html:6
+#: ../../doc/upgradefrom_wp.src.html:31
+msgid "Upgrading from WordPress"
+msgstr "Atualizando a partir do WordPress"
+
+#: ../../doc/upgradefrom_wp.src.html:32
+#: ../../doc/upgradefrom_b2evo.src.html:33
+#: ../../doc/install_new.src.html:35
+#: ../../doc/upgradefrom_mt.src.html:32
+msgid "Before you begin, please note that some network features of b2evolution require you to agree our simple <a %s>Terms of service</a>."
+msgstr "Antes de iniciar, note que algumas características de rede do b2evolution requerem que você concorde com os nossos simples <a %s>Termos de serviço</a>."
+
+#: ../../doc/upgradefrom_wp.src.html:33
+msgid "This procedure has been tested with WordPress version 2.3. It will not work with prior versions. It may work with superior versions. You can't break your WordPress by trying anyway..."
+msgstr "Esse procedimento foi testado com o WordPress versão 2.3. Ele não funcionará com versões anteriores. Ele pode funcionar com versões superiores. De qualquer forma, isso não vai quebrar nada no seu Wordpress tentando migrar..."
+
+#: ../../doc/upgradefrom_wp.src.html:35
+#: ../../doc/upgradefrom_mt.src.html:36
+msgid "<a %s>Install b2evolution in the regular way.</a>"
+msgstr "<a %s>Instalar o b2evolution da forma comum.</a>"
+
+#: ../../doc/upgradefrom_wp.src.html:36
+msgid "Once b2evo is up and running, in the admin, go to the Tools tab and launch the WordPress import utility."
+msgstr "Uma vez que o b2evo esteja configurado e rodando, na administração, vá para a aba Ferramentas e execute o utilitário de importação do WordPress."
+
+#: ../../doc/upgradefrom_wp.src.html:37
+msgid "Follow the instructions on screen and provide connection information to your WordPress database (Read Only)"
+msgstr "Siga as instruções na tela e forneça a informação de conexão para o seu banco de dados do WordPress (Somente Leitura)"
+
+#: ../../doc/upgradefrom_wp.src.html:38
+#: ../../doc/upgradefrom_mt.src.html:40
+msgid "Import will only take a few seconds/minutes depending on how many posts you import."
+msgstr "A importação irá levar somente alguns segundos/minutos dependendo de quantos posts você importar."
+
+#: ../../doc/upgradefrom_b2evo.src.html:35
+msgid "Backup all your b2evolution files. Take special care of the files you may have modified, including <strong>/conf</strong>, <strong>/skins</strong>, <strong>/plugins</strong>, your <strong>/media</strong> directory and possibly stubfiles, hacks or custom templates..."
+msgstr "Faça o backup de todos o seus arquivos do b2evolution. Tome um cuidado especial com arquivos que você possa ter modificado, incluindo <strong>/conf</strong>, <strong>skins</strong>, <strong>plugins</strong>, seus diretório de <strong>mídia</strong> e possíveis arquivos de stub, hacks ou templates personalizados..."
+
+#: ../../doc/upgradefrom_b2evo.src.html:36
+msgid "You should also backup your database if you can. This functionality should be provided by your host."
+msgstr "Você deve também fazer uma cópia de segurança do seu banco de dados se você puder. Essa funcionalidade deve ser fornecida a você pelo seu servidor de hospedagem."
+
+#: ../../doc/upgradefrom_b2evo.src.html:37
+msgid "If you are upgrading from a version prior to 2.0, we highly recommend you clean up outdated files. To achieve this, delete your b2evolution folders <strong>except /media</strong>. Folders to delete include /admin, /conf, /cron, /htsrv, /inc, /install, /plugins, /skins, /skins_adm, /xmlsrv. Depending on your version, you may not have all of these folders on your server. Also, again, make sure you have a backup before deleting."
+msgstr "Se você está atualizando a partir de uma versão anterior ao  2.0, nós recomendados que você limpe seus arquivos desatualizados. Para atingir isso, remova seus diretórios do b2evolution, <strong>exceto o /media</strong>. Diretórios a serem removidos incluem /admin, /conf, /cron, /htsrv, /inc, /install, /plugins, /skins, /skins_adm, /xmlsrv. Dependendo da sua versão, você pode não ter todos esses diretórios no seu servidor. Novamente, verifique que o seu backup esteja ok antes de remover esses arquivos."
+
+#: ../../doc/upgradefrom_b2evo.src.html:38
+msgid "Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you cannot reuse your  /conf files, default skin templates or default plugins as they are.<br /> <br /> Since your custom skins and custom plugins should be using different names, they will not be overwritten. Same for your media files.<br /> <br /> The one file you must absolutely restore from your backup (see step 1) though is <code>/blogs/conf/_basic_config.php</code>. You will need to either restore or recreate that file in order to proceed with upgrade."
+msgstr "Envie <strong>todos os arquivos novos do b2evolution da pasta /blogs </strong> para o seu site. Repetimos: <strong>TODOS OS ARQUIVOS</strong>! E isso significa que você não pode reutilizar seus arquivos no  /conf, skins padrão ou plugins padrão que você tenha.<br /> <br /> Como seus skins personalizados e plugins personalizados devel usar nomes diferentess, eles não serão sobrescritos. O mesmo vale para os seus arquivos de mídia. <br /> <br /> O único arquivo que você deve absolutamente restaurar do seu backup (veja o passo 1) é o <code>/blogs/_basic_config.php</code>. Você irá precisar restaurar ou recriar esse arquivo para proceder com a atualização."
+
+#: ../../doc/upgradefrom_b2evo.src.html:43
+msgid "Run the installation/upgrade script on your server. It is located in <code>http://yoursite.com/yourblogsfolder/install</code>/ . Then, simply follow the on screen instructions.<br /> <br /> The installer/upgrader will  allow you to run a database upgrade from <strong>any</strong> b2evolution version to the new one."
+msgstr "Execute o script de instalação no seu servidor. Ele está localizado em  <code>http://seusite.com/seudiretoriodosblogs/install</code> . Então, simplesmente siga as instruções na tela.<br /> <br /> O instalador permitirá que você execute uma atualização do banco de dados de <strong>qualquer</strong> versão anterior do b2evolution para a nova."
+
+#: ../../doc/upgradefrom_b2evo.src.html:46
+#: ../../doc/install_new.src.html:50
+msgid "Check to make sure the new installation works."
+msgstr "Verifique para garantir que a nova instalação funcione."
+
+#: ../../doc/upgradefrom_b2evo.src.html:47
+msgid "Check the online manual for <a %s>specific upgrade instructions</a> to your new version of b2evolution."
+msgstr "Verifique o manual online para <a %s> instruções específicas de atualização</a> para a sua nova versão do b2evolution."
+
+#: ../../doc/upgradefrom_b2evo.src.html:48
+#: ../../doc/install_new.src.html:51
+msgid "On production servers, it is recommended that you delete the <code>/install</code> subfolder."
+msgstr "Em servidores de produção, é recomendado que você remova o subdiretório <code>/install</code>."
+
+#: ../../doc/upgradefrom_b2evo.src.html:49
+msgid "If you had hacks or other customizations to the core files, your can bring those back now. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly."
+msgstr "Se você tinha hacks ou outras personalizações no core do b2evolution, você pode trazê-los de volta. Recomendamos que você use uma ferramente de diff/merge como <a %s>WinMerge</a>. Isso irá permitir que você facilmente compare os seus arquivos antigos (que você fez backup) com os novos (até mesmo diretórios completos por vez) e mostrar as mudanças necessárias."
+
+#: ../../doc/install_new.src.html:34
+msgid "To install b2evolution you need a PHP/MySQL web server (see <a %s>requirements</a>). Renting a fast server from a reputable hosting company is getting cheaper every day. Check out our  <a %s>recommended hosting offers</a>."
+msgstr "Para instalar o b2evolution você precisará de um servidor web com suporte a PHP/MySQL  (veja os <a %s>requerimentos</a>). Alugar um servidor rápido de uma empresa de hospedagem respeitável está ficando mais barato a cada dia. Verifique nossas  <a %s>hospedagens recomendadas</a>."
+
+#: ../../doc/install_new.src.html:36
+msgid "Once you have unzipped the b2evolution distribution on your local computer:"
+msgstr "Agora que você descompactou a distribuição do b2evolution:"
+
+#: ../../doc/install_new.src.html:38
+msgid "On your server, try to create a new (empty) MySQL database for b2evolution (For example, you can call it \"b2evolution\". The exact procedure to create a new database depends on your host/server setup. Alternatively, you can also use an existing database which b2evolution will share with existing applications.)"
+msgstr "No seu servidor, tente criar um novo banco de dados do MySQL (vazio) para o b2evolution (Você pode chamá-lo de\"b2evolution\", por exemplo. O procedimento exato para criar um novo banco de dados depende da configuração do seu servidor. Como uma alternativa, você pode também usar um banco de dados existente que o b2evolution deverá compartilhar com outras aplicações.)"
+
+#: ../../doc/install_new.src.html:40
+#: ../../doc/install_new.src.html:43
+msgid "Note:"
+msgstr "Nota:"
+
+#: ../../doc/install_new.src.html:40
+msgid "b2evolution will create about 25 tables in the database you select. Unless you changed the config, all these tables' names will be prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. Your existing tables will not be affected in any way."
+msgstr "O b2evolution irá criar cerca de 25 tabelas no banco de dados que você selecionar. Se você não mudar a configuração, os nome de todas essas tabelas serão prefixados com evo_ . A menos que você já tenha uma aplicação usando o mesmo prefixo, isso torna seguro instalar o b2evolution em um banco de dados compartilhado com outras aplicações. Suas tabelas existentes não serão afetadas de forma nenhuma."
+
+#: ../../doc/install_new.src.html:41
+msgid "Upload the b2evolution files to your website."
+msgstr "Envie os arquivos do b2evolution para o seu website."
+
+#: ../../doc/install_new.src.html:43
+msgid "Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. Otherwise, it's best to upload the files to a subdirectory of your webserver. You can keep the <code>/blogs</code> subdirectory name, but you can also choose another."
+msgstr "Somente o conteúdo do diretório <code>/blogs</code> precisa ser enviado para o seu site. Se você quer que o b2evolution sirva a página inicial do seu site, envie o conteúdo do diretório<code>/blogs</code> para a raiz do seu website. Se não, é melhor enviar os arquivos para um  subdiretório no seu servidor.  Você pode mandar o nome do subdiretório como <code>/blogs</code>,mas pode também escolher outro nome."
+
+#: ../../doc/install_new.src.html:46
+msgid "Let's assume you install the contents of the blogs folder to <code>http://yoursite.com/yourfolder</code> ..."
+msgstr "Vamos assumir que você instalou o conteúdo da pasta blogs em <code>http://seusite.com/suapasta</code> ..."
+
+#: ../../doc/install_new.src.html:47
+msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourfolder/install</code> . Then, simply follow the on screen instructions.<br /> <br /> The installer will ask you a few questions, create required database tables and configure b2evolution for you."
+msgstr "Execute o script de instalação no seu servidor. Ele está localizado em  <code>http://seusite.com/suapasta/install</code> . Então, simplesmente siga as instruções na tela.<br /> <br /> O instalador irá perguntar algumas coisas, criar as tabelas necessárias e configurar o b2evollution para você."
+
+#: ../../doc/install_new.src.html:52
+msgid "After basic install is done, there are a few <a %s>tricky things you may need to take care of</a> (online manual)."
+msgstr "Depois que a instação básica estiver concluída, existem alguns <a %s>truques com os quais você deve tomar cuidado</a> (manual online)."
+
+#: ../../doc/upgradefrom_b2.src.html:6
+msgid "Upgrading from Cafelog/b2"
+msgstr "Atualizando a partir do Cafelog/b2"
+
+#: ../../doc/upgradefrom_b2.src.html:32
+msgid "Upgrading from b2/Cafelog"
+msgstr "Atualizando a partir do b2/Cafelog"
+
+#: ../../doc/upgradefrom_b2.src.html:34
+msgid "If you would like to upgrade from the original b2/Cafelog (versions 0.5.x up to 0.6.2), please follow these steps:"
+msgstr "Se você gostaria de atualizar a partir do b2/Cafelog original (versões 0.5.x até a  0.6.2), por favor siga esses passos:"
+
+#: ../../doc/upgradefrom_b2.src.html:37
+msgid "Do <strong>not</strong> install the current version of b2evolution right now. Instead, download b2evolution version 1.x. You can download  <a %s>almost any version of b2evolution here</a>."
+msgstr "<strong>Não</strong> instale a versão atual do b2evolution agora. Ao invés disso, faça o download da versão 1.x. Você pode fazer o download de  <a %s> quase todas as versões do b2evolution aqui</a>."
+
+#: ../../doc/upgradefrom_b2.src.html:39
+msgid "Follow the instructions incuded in b2evolution 1.x to upgrade from b2/Cafelog."
+msgstr "Siga as instruções incluídas no b2evolution 1.x para atualizar a partir do b2/Cafelog."
+
+#: ../../doc/upgradefrom_b2.src.html:41
+msgid "Come back to the current version of b2evolution and <a %s>upgrade from b2evolution 1.x to the current version</a>."
+msgstr "Voltar para a versão atual do b2evolution e <a %s>atualizar da versão 1.x do b2evolution para a versão atual</a>."
+
+#: ../../doc/upgradefrom_mt.src.html:6
+#: ../../doc/upgradefrom_mt.src.html:31
+msgid "Upgrading from Movable Type"
+msgstr "Atualizando a partir do Movable Type"
+
+#: ../../doc/upgradefrom_mt.src.html:33
+msgid "This procedure has been tested with Movable Type version 2.661 but should also work with other versions. You can't break anything by trying anyway..."
+msgstr "Esse procedimento foi testado com o Movable Type versãp 2.661 mas deve funcionar com outras versões. De qualquer forma, isso não vai quebrar nada..."
+
+#: ../../doc/upgradefrom_mt.src.html:35
+msgid "Use MT's export functionnality to create a .TXT file containing your posts."
+msgstr "Use a funcionalidade de exportação do MT para criar um arquivo .TXT  contendo seus posts."
+
+#: ../../doc/upgradefrom_mt.src.html:37
+msgid "Once b2evo is up and running, copy your .TXT export file into the /blogs/admin folder on your server."
+msgstr "Uma vez que o b2evo esteja instalado e rodando, copie seu arquivo .TXT de exportação do diretório /blogs/admin no seu servidor."
+
+#: ../../doc/upgradefrom_mt.src.html:38
+msgid "In the admin, go to the Tools tab and launch the MT migration utility."
+msgstr "Na administração, vá para a aba Ferramentas e execute o utilitário de migração do MT."
+
+#: ../../doc/upgradefrom_mt.src.html:39
+msgid "Follow the instructions on screen."
+msgstr "Siga as instruções na tela."
+
+#~ msgid ""
+#~ "There are still bugs we know of, but we consider the software is globally "
+#~ "operational! The most important thing you need to know about ALPHA / BETA "
+#~ "releases is that nothing is to be considered final, including skintags "
+#~ "and the plugin API."
+#~ msgstr ""
+#~ "Ainda existem bugs conhecidos por nós, mas consideremos esse software "
+#~ "globalmente operacional! O mais importante que você precisa saber sobre "
+#~ "versões ALPHA / BETA é que nada é considerado final, incluindo as "
+#~ "skintags e a API de plugins."
+#~ msgid ""
+#~ "Delete <strong>all your existing b2evolution files from your site</"
+#~ "strong> before uploading the new ones! Some of the old files may not be "
+#~ "compatible with this new version and will cause it to fail! This will "
+#~ "also ensure you don't keep unnecessary files on your server after "
+#~ "upgrading. Plus, it's better for security."
+#~ msgstr ""
+#~ "Remova <strong>todos os seus arquivos existentes do b2evolution do seu "
+#~ "site</strong> antes de enviar os novos! Alguns dos arquivos antigos podem "
+#~ "não ser compatíveis com esse nova versão e irão fazê-la falhar! Isso irá "
+#~ "também garantir que você não mantenha arquivos desnecessários no seu "
+#~ "servidor após a atualização. Além disso, é melhor para a segurança."
+

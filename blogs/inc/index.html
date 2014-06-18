@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<title>/inc Folder</title>
+</head>
+<body>
+	<h2><a href="http://evocore.net/">evoCore</a> FrameWork</h2>
+	<h1><code>/inc</code> folder</h1>
+	<p>This folder holds the <strong>inc</strong>ludes needed by the main PHP entry points.</p>
+	<p>This folder also holds the <code>_main.inc.php</code> file which handle the main initializations for the application.</p>
+	<p>The includes are grouped into &quot;module&quot; folders that group files pertaining to a specific functionality set (e-g: file management).</p>
+	<h2>Controllers</h2>
+	<p>Each module may contain one or more controllers identified by their suffix of <code>.ctrl.php</code></p>
+	<p>Each controller is a PHP include file which implements the logic for manipulating a particular &quot;set&quot; of data. For example there could be a controller to handle general settings and another controller to handle local settings. Those two controllers may be found within the &quot;settings&quot; module.</p>
+	<p>Each HTTP request will typically get routed to precisely <strong>one</strong> controller (except for stub controllers) which means there will be <strong>one</strong> PHP include for that controller. Therefore it seems reasonable to make each controller as small as possible in order to minimize parsing/compiling/memory usage overhead. However, different actions on the same &quot;set&quot; of data -- like creating, editing and deleting the same data -- are closely related and, though they are not invoked at the same time, separating these actions into different controllers makes it harder to maintain the application over time when new fields or constraints are added to that set of data.</p>
+	<p>Thus, it is recommended to try and find the right tradeoff between the size of the controller and the logical grouping of actions into the same controller. </p>
+	<h2>Model</h2>
+	<p>Each module has a <code>/model</code> folder holding the Data <strong>Model</strong> for the module.</p>
+	<p>The Data Model is the translation of the &quot;real world&quot; data into how this data is processed in the computer memory. In other words, it is also a PHP representation of the SQL DBMS data.</p>
+	<p>There will typically be one PHP Class for each DB table. Each object (instance of that class) roughly maps to a row in the table. Of course the Class may/should implement more integrity rules than the DB table alone.</p>
+	<p>There may also typically be one PHP Cacheing Object/Class (a Class with a single instance actually) for many tables in the DB. The Cache object will optimize accesses the DB by avoiding repeated queries on the same data.</p>
+	<p>It is important to note that the Data Model may also include data manipulation functions that do not take the form of a class.</p>
+	<h2>Views</h2>
+	<p>Each module has a <code>/views</code> folder holding  the <strong>View</strong>s for the module.</p>
+	<p>This folder holds PHP include files which output visible data (HTML) to the user. In other words, these views are PHP templates.</p>
+	<p>It is very important to understand that these views are very rough templates. For example a view may decide to output a 
+		list of users with 3 columns (Name, Login and Group). In another scenario it may output a list of Firstnames and Lastnames 
+		and group these by user Group. <strong>BUT</strong> either way, there are still additional layers of presentation which 
+		determine the exact rendering of the View (see the Admin skins <code>/skins_adm</code> folder).</p>
+	<p>It is also important to understand that a specific View can be called by different controllers. A contextual help block would be an example of that (provided the content is dynamic).</p>
+	<p>A single controller can also be calling several views in a row. (The controller can assemble multiple views).</p>
+</body>
+</html>

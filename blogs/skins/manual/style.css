@@ -1,0 +1,580 @@
+/* Designed by Francois PLANQUE - http://fplanque.net/ */
+body {
+	padding: 0px;
+	margin: 0px;
+	color: #000;
+	font: 84% Arial, Helvetica, sans-serif;
+}
+
+div#skin_wrapper div.sitewide_header {
+	margin-bottom: 0;
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 10000;
+	-webkit-font-smoothing: subpixel-antialiased;
+}
+div#skin_wrapper.skin_wrapper_loggedin div.sitewide_header {
+	top: 23px;
+}
+
+textarea, input, select, option, optgroup, ul.ui-autocomplete, li.token-input-token-facebook, div.token-input-dropdown-facebook {
+	font: 13.43px Arial, Helvetica, sans-serif;
+}
+
+a {
+	text-decoration: underline;
+}
+a:hover {
+	text-decoration: none;
+}
+
+div.pageHeader {
+	padding: 1ex;
+	border: 1px solid #000;
+	border-top: none;
+	text-align: center;
+}
+div.pageHeader.site_skins {
+	margin-top: 43px;
+}
+/* Devices with max width <= 1024px (iPhone,iPad):
+   Remove margin-top from page header because .sitewide_header is not fixed */
+@media only screen and (max-device-width: 1024px) {
+	div.pageHeader.site_skins {
+		margin-top: 0;
+	}
+}
+
+div.pageHeader h1 {
+	font-size: 270%;
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+}
+div.pageHeader h1 a {
+	text-decoration: none;
+}
+div.pageHeader h1 a:hover {
+	text-decoration: underline;
+}
+
+h1 {
+	font-size: 25px;
+	margin: 0 0 20px 0;
+}
+h2 {
+	font-size: 20px;
+	margin: 0 0 10px 0;
+}
+h3 {
+	font-size: 16px;
+	margin: 0 0 10px 0;
+}
+h2.table_contents,
+h2.comments_list_title,
+h3.comments_form_title {
+	padding-top: 1ex;
+}
+
+table.invisible
+{
+	margin: 1ex;
+	border-collapse: collapse
+}
+table.invisible td
+{
+	padding: 0ex 1ex;
+}
+td.right
+{
+	text-align: right;
+}
+div#pageFooter {
+	clear: both;
+	margin: 10px 0 0;
+	padding: .5ex 0;
+	border-top: 1px solid #000;
+}
+p.baseline {
+	text-align: center;
+	font-size: 11px;
+	padding: 1ex;
+	margin: 0;
+}
+p.baseline a {
+	color: #777;
+	text-decoration: none;
+}
+p.baseline a:hover {
+	text-decoration: underline;
+}
+hr {
+	height: 0;
+	border: 0;
+	border-top: 1px solid #78a;
+}
+
+div#layout {
+	padding: 0 5px;
+}
+div#wrapper {
+	width: 960px;
+	margin: 0 auto;
+	padding: 0 0 10px 0;
+	transition: width 1s;
+	-moz-transition: width 1s; /* Firefox 4 */
+	-webkit-transition: width 1s; /* Safari and Chrome */
+	-o-transition: width 1s; /* Opera */
+	-ms-transition: width 1s; /* IE */
+}
+
+div.PageTop ul {
+	background-color: #fff;
+	border-bottom: 1px solid #000;
+	margin: 0 1px;
+	padding: 0;
+	list-style-type:none;
+	padding: .5ex 0;
+}
+div.PageTop ul li {
+	border-right: 1px solid #000;
+	display: inline;
+	padding: .5ex 1em;
+}
+
+div.top_menu_bg {
+	width: 100%;
+	height: 23px;
+}
+div.top_menu {
+	height: 23px;
+	position: relative;
+	top: -23px;
+	font: 11px Verdana,Arial,Helvetica,sans-serif;
+}
+div.top_menu ul {
+	margin: 0 5px;
+	padding: 0;
+	list-style-type:none;
+	padding: 4px 0 6px;
+}
+div.top_menu li {
+	display: inline;
+	padding: .5ex 1em .5ex 0;
+}
+div.top_menu a {
+	text-decoration: none;
+	color: #000;
+	font-weight: bold;
+}
+div.top_menu a:hover {
+	text-decoration: underline;
+}
+
+div.PageTop ul {
+	background-color: #fff;
+	border-bottom: 1px solid #000;
+	margin: 0;
+	padding: 0;
+	list-style-type:none;
+	padding: .5ex 0;
+}
+div.PageTop ul li {
+	border-right: 1px solid #000;
+	display: inline;
+	padding: .5ex 1em;
+}
+div.PageTop a {
+	font-weight: bold;
+	text-decoration: none;
+}
+div.PageTop a.default {
+	color: #000;
+}
+div.PageTop a.default:hover {
+	text-decoration: underline;
+	color: #069;
+}
+div.PageTop a.selected,
+div.PageTop a.selected:visited {
+	color: #069;
+}
+div.PageTop a.selected:hover {
+	text-decoration: underline;
+	color: #069;
+}
+
+.widget_core_coll_tagline {
+	letter-spacing: 4px;
+	text-align: center;
+	vertical-align: middle;
+	border: 0px;
+	padding-right: 6px;
+	padding-top: 6px;
+	padding-bottom: 4px;
+	padding-left: 6px;
+	font: 109% Arial, Helvetica, sans-serif;
+}
+
+/* Styles for posts */
+.bPosts {
+	border-left: 1px solid #DDDDDD;
+	overflow: hidden;
+	margin-left: 245px;
+	padding: 0 5px 0 25px;
+	-webkit-margin-start: 0px !important;
+	text-align: justify;
+}
+.bPosts.full_width {
+	margin: 0;
+	border: none;
+	padding: 0 5px;
+}
+.bPosts h1, .bPosts h2, .bPosts h3, .bPosts h4 {
+	text-align: left;
+}
+.bText p {
+	margin-top: 0;
+}
+
+div.action_messages {
+	margin: 0 2ex;
+}
+.bPost, .bPostpublished {
+	clear: both;
+	margin: 0;
+	padding: 0;
+}
+.bSmallHead {
+	font-size: 80%;
+	color: #999;
+	margin: 2ex 0 1ex 0;
+}
+.bTitle h1 {
+	float: left;
+}
+.bTitle h1 {
+	padding-top: 2px;
+}
+.bTitle a.roundbutton {
+	margin: 5px 0 0 30px;
+	float: left;
+}
+.bTitle .roundbutton_group {
+	float: left;
+	margin-left: 30px;
+}
+.bTitle .roundbutton_group a.roundbutton {
+	margin-left: 0;
+}
+.bTitle {
+	color: #000;
+	text-decoration: none;
+}
+.bText {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.bSmallPrint
+{
+	clear: both;
+	color: #999;
+	font-size: 80%;
+	margin: 1ex 0 2ex 0;
+}
+
+input.bComment,
+textarea.bComment
+{
+	background-color: #eee;
+	border: 1px solid #ccc;
+	padding: 2px;
+	margin: 0ex;
+}
+select.bComment  /* Used by the profile form */
+{
+	background-color: #eee;
+	border: 1px solid #ccc;
+	padding: 1px;
+	margin: 0ex;
+}
+
+/* Styles for sidebar (right) */
+.bSideBar {
+	overflow: hidden;
+	float: left;
+	width: 235px;
+	padding-right: 10px;
+	background: #FFF;
+}
+.bSideBar.fixed {
+	position: fixed;
+}
+/* Windows with max height <= 800px:
+   Don't fix a position of the left side bar */
+@media (max-height:800px) {
+	.bSideBar.fixed {
+		position: static;
+	}
+	.fixed_spacer {
+		display: none;
+	}
+}
+
+.bSideItem {
+	margin: 2ex;
+	padding: 0 0 2ex 0;
+	border-bottom: 1px solid #ddd;
+}
+
+.bSideItem ul {
+	margin-left: 8px;
+	padding-left: 8px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	list-style-type:square;
+}
+.bSideItem ul ul{
+	margin-left: 8px;
+	padding-left: 8px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.bSideItem form {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.dimmed {
+	color: #aaa;
+	font-size: 84%;
+}
+/* Search form */
+
+
+.widget_core_coll_search_form {
+	font-weight: bold;
+	margin-bottom: 15px;
+}
+.widget_core_coll_search_form .compact_search_form {
+	display: inline;
+}
+div.extended_search_form {
+	margin-bottom: 10px;
+}
+div.compact_search_form input.search_field,
+div.extended_search_form input.search_field {
+	padding: 2px;
+	width: 185px;
+}
+div.extended_search_form input.search_field {
+	margin: 5px 10px 0 0;
+	width: 80%;
+}
+div.extended_search_form .search_option {
+	float: left;
+	margin-right: 20px;
+}
+div.extended_search_form .search_option input, div.extended_search_form .search_option label {
+	vertical-align: middle;
+}
+div.extended_search_form .search_option input {
+	margin: 0 4px 0 0;
+}
+
+/* Special SideItems: */
+.widget_plugin_evo_Calr,
+.widget_core_coll_title,
+.widget_core_coll_longdesc {
+	/* background-color: #fee; */
+	padding: 0;
+	border-bottom: 0;
+}
+.widget_core_coll_title a {
+	text-decoration: none;
+	color: #78a;
+}
+
+/* Calendar: */
+table.bCalendarTable caption {
+	border: 1px solid #ccc;
+	background-color: #eee;
+	border-bottom: 0;
+}
+table.bCalendarTable {
+	border: solid 1px #ccc;
+	border-collapse: separate;
+}
+table.bCalendarTable tfoot td {
+	background-color: #eee;
+	border-top: 1px solid #ccc;
+}
+th.bCalendarHeaderCell {
+	color: #abc;
+}
+#bCalendarToday {
+	background-color: #bce;
+}
+
+div.featured_post {
+	border: none;
+}
+
+textarea#msg_text {
+	width: 100%;
+}
+
+/* jQuery Tokeninput plugin */
+div.input ul.token-input-list-facebook {
+	width: 319px;
+}
+
+#register_form input#u {
+	max-width: 305px;
+}
+
+
+#width_switcher_layout {
+	position: absolute;
+	top: 115px;
+	right: 3px;
+	z-index: 10001;
+}
+#width_switcher {
+	display: none;
+}
+#width_switcher a {
+	width: 26px;
+	height: 36px;
+	text-decoration: none;
+}
+#width_switcher.fixed {
+	position: fixed;
+	top: 3px;
+	right: 3px;
+}
+/* Devices with max width <= 1024px (iPhone,iPad):
+   Don't fix a position of the width switcher */
+@media only screen and (max-device-width: 1024px) {
+	#width_switcher.fixed {
+		position: absolute;
+		width: 75px;
+	}
+}
+
+div.breadcrumbs {
+	margin-bottom: 30px;
+	font-size: 18px;
+	font-weight: bold;
+}
+
+ul.chapters_list,
+ul.posts_list {
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+ul.chapters_list ul {
+	padding: 0;
+}
+ul.chapters_list li,
+ul.posts_list li {
+	padding: 5px 0;
+}
+ul.chapters_list ul li,
+ul.posts_list ul li {
+	padding-left: 20px;
+	list-style: none;
+}
+ul.chapters_list li a.link,
+ul.posts_list li a.link {
+	display: inline-block;
+	background: url(img/icons.png) no-repeat 6px -35px;
+	padding-left: 20px;
+}
+ul.chapters_list li.opened {
+	padding-bottom: 0;
+}
+ul.chapters_list li.opened>a.link {
+	background-position: -20px -18px;
+	padding-bottom: 5px;
+}
+ul.chapters_list li.post a.link,
+ul.posts_list li a.link {
+	background-position: -36px 1px;
+}
+ul.posts_list li.chapter a.link {
+	background-position: 6px -32px;
+}
+ul.chapters_list li.selected>a.link, ul.chapters_list li.selected>i>a.link {
+	color: #000;
+	font-weight: bold;
+}
+ul.chapters_list li.title a.link {
+	background: none;
+	padding-left: 5px;
+	font-weight: bold;
+}
+ul.chapters_list li div,
+ul.posts_list li div {
+	padding-left: 20px;
+}
+ul.chapters_list h3 a.link {
+	background-position: 6px -33px;
+}
+ul.posts_list h3 a.link {
+	background-position: -36px 3px;
+}
+ul.posts_list h3 {
+	float: left;
+	padding-top: 2px;
+}
+a.roundbutton {
+	text-decoration: none;
+}
+ul.posts_list li a.roundbutton {
+	float: left;
+	margin-left: 30px;
+}
+
+div.bComment, form.bComment {
+	margin: 1ex 0;
+}
+div.navigation {
+	text-align: center;
+	margin: 1ex 0;
+}
+div.featured_post {
+	padding: 0;
+}
+
+div.edit_toolbar {
+	width: 99%;
+}
+div.posts_navigation {
+	text-align: right;
+	margin-bottom: 1ex;
+}
+
+div.error_404 {
+	margin-left: 0;
+	margin-right: 0;
+}
+
+/* Not published comments display */
+#styled_content_block .bComment .status_draft,
+#styled_content_block .bComment .status_review,
+#styled_content_block .bComment .status_community,
+#styled_content_block .bComment .status_protected,
+#styled_content_block .bComment .status_private {
+	top: 0px;
+	left: 14px;
+}
+
+.search_title {
+	color: #00E;
+}
+
+.form_add_contacts .controls {
+	padding-left: 0;
+}

@@ -1,0 +1,1015 @@
+/*
+ * Obviously, this file no longer contains only basic styles.
+ * It now also contains all sorts of base styles like the toolbar and debug for backward comaptibility with older skins... :/
+ */
+
+body {
+	padding: 0;
+	margin: 0;
+}
+
+a[rel~=nofollow]:hover {
+	background: #f8e0e0;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-khtml-border-radius: 2px;
+	border-radius: 2px;
+}
+
+/**
+ * Image styles
+ */
+
+img {
+	border:none;
+}
+img.icon {
+	vertical-align:bottom;
+}
+
+img.flag {
+	vertical-align:middle;
+	border:1px solid #000;
+}
+img.flagtop {
+	vertical-align:top;
+	border:1px solid #000;
+}
+
+div.single_image_zone {
+	overflow: hidden;
+}
+
+div.multi_image_zone {
+	overflow: hidden;
+	background-color: #eee;
+	border: 1px solid #ccc;
+}
+
+div.image_block {
+	/* WARNING: this will screw out backoffice layout (fulltext edit screen) in firefox!
+		overflow: hidden; */
+	text-align: center;
+}
+
+/* We only float image_blocks when in multiple image zone */
+div.multi_image_zone div.image_block
+{
+	margin: 1ex;
+	float: left;
+}
+
+div.image_block img {
+	margin: 1ex;
+}
+.replied_comment div.image_block img {
+	max-width: 100%;
+	height: auto;
+}
+
+div.image_legend {
+	font-size: 84%;
+	color: #aaa;
+	margin: 1ex;
+}
+.shrinkwrap {
+	width: 1%;
+	white-space:nowrap;
+	text-align:center;
+}
+
+.filename {
+	font-family:monospace;
+	font-size:larger;
+}
+
+.block {
+	margin: 1ex;
+	white-space: nowrap;
+}
+
+a.selected {
+	font-weight: bold;
+}
+
+img.avatar_before_login {
+	margin-right: 2px;
+	vertical-align: top;
+}
+img.avatar_before_login_middle {
+	margin-right: 2px;
+	vertical-align: middle;
+}
+img.avatar_above_login {
+	display: block;
+	margin: 0 auto;
+}
+
+.avatar_rounded {
+	background: #FFF;
+	border: 1px solid #CCC;
+	padding: 2px;
+	display: inline-block;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-khtml-border-radius: 4px;
+	border-radius: 4px;
+	text-align: center;
+}
+.avatar_rounded:hover {
+	text-decoration: none;
+}
+.avatar_rounded img {
+	-moz-border-radius-topleft: 2px; -moz-border-radius-topright: 2px;
+	-webkit-border-radius: 2px 2px 0 0;
+	-khtml-border-radius-topleft: 2px; -khtml-border-radius-topright: 2px;
+	border-radius: 2px 2px 0 0;
+}
+
+.avatar_main_frame {
+	background: #FFF;
+	border: 1px solid #CCC;
+	padding: 2px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-khtml-border-radius: 4px;
+	border-radius: 4px;
+	display: table;
+	vertical-align: middle;
+}
+.avatar_main_frame img {
+	-moz-border-radius-topleft: 2px; -moz-border-radius-bottomleft: 2px;
+	-webkit-border-radius: 2px 0 0 2px;
+	-khtml-border-radius-topleft: 2px; -khtml-border-radius-bottomleft: 2px;
+	border-radius: 2px 0 0 2px;
+}
+.avatar_main_frame a.cboxElement {
+	display: table-cell;
+}
+.avatar_main_frame div {
+	display: table-cell;
+	vertical-align: middle;
+	padding-left: 5px;
+}
+
+/*
+ * Evo Toolbar
+ * Note: there may be some properties that seem overkill but the fact is we need to override
+ * any too general styles a skin may want to bring in for its own body/general display.
+ */
+div#evo_toolbar {
+	background-color: ThreeDFace;
+	color: ButtonText;
+	border-top: 1px solid ThreeDHighlight;
+	border-bottom: 1px solid ThreeDShadow;
+	text-align: left;
+	margin: 0;
+	/* font: menu; /* -- poorly supported */
+	font-size: 11px;
+	font-family: "Microsoft sans serif", sans-serif, Arial, Helvetica;
+
+	position: fixed;
+	z-index: 11000;
+	left: 0px;
+	top: 0px;
+	height: 21px;
+	width:100%; /* Safari Windows */
+	-webkit-text-size-adjust: none; /* iPhone */
+}
+/* Devices with max width <= 1024px (iPhone,iPad):
+   Don't fix a position of the evo toolbar */
+@media only screen and (max-device-width: 1024px) {
+	div#evo_toolbar {
+		position: absolute;
+	}
+}
+div.skin_wrapper_loggedin {
+	margin-top: 22px;
+	padding-top: 1px;
+}
+div#evo_toolbar .actions_left {
+	padding: 1px 4px;
+}
+div#evo_toolbar .actions_right {
+	padding: 1px 4px;
+	float: right;
+}
+div#evo_toolbar img {
+	position: relative;
+	top: -2px;
+	vertical-align: top; /* required in strict mode (where no 'align="top"' gets added to IMGs, FF3). Otherwise text next to the img wraps out of the evobar */
+}
+
+/* *** SuperFish *** */
+
+/*** ESSENTIAL STYLES ***/
+.sf-menu, .sf-menu * {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.sf-menu {
+	line-height: 1.0;
+}
+.sf-menu ul {
+	position: absolute;
+	top: -999em;
+	width: 25ex; /* left offset of submenus need to match (see below) */
+}
+.sf-menu ul li {
+	width: 100%;
+}
+.sf-menu li {
+	float: left;
+	position: relative;
+}
+.sf-menu a {
+	display: block;
+	position: relative;
+}
+.sf-menu li:hover ul,
+.sf-menu li.sfHover ul {
+	left: 0;
+	top: 19px; /* 2em / match top ul list item height including padding below */
+	z-index: 99;
+}
+ul.sf-menu li:hover li ul,
+ul.sf-menu li.sfHover li ul {
+	top: -999em;
+}
+ul.sf-menu li li:hover ul,
+ul.sf-menu li li.sfHover ul {
+	left: 25ex; /* match ul width */
+	top: 0;
+}
+ul.sf-menu li li:hover li ul,
+ul.sf-menu li li.sfHover li ul {
+	top: -999em;
+}
+ul.sf-menu li li li:hover ul,
+ul.sf-menu li li li.sfHover ul {
+	left: 25ex; /* match ul width */
+	top: 0;
+}
+
+/*** DEMO SKIN ***/
+.sf-menu {
+	margin-bottom:	1em;
+}
+.sf-menu a {
+	border: 1px solid ThreeDFace;
+	background-color: ThreeDFace;
+	padding: 3px 1ex;  /* .5em need to macth global height above */
+	text-decoration:none;
+	color: ButtonText;
+}
+.sf-menu-right a {
+	padding: 3px 1ex 0px;  /* .5em need to macth global height above */
+}
+.sf-menu a, .sf-menu a:link, .sf-menu a:visited  { /* visited pseudo selector so IE6 applies text colour*/
+	color: ButtonText;
+}
+.sf-menu li li {
+	background: ThreeDFace;
+}
+.sf-menu li li a, .sf-menu li li.separator div {
+	border: none;
+	border-left: 1px solid ThreeDHighlight;
+	border-right: 1px solid ThreeDShadow;
+}
+.sf-menu li li a {
+	padding: 6px 2ex;
+}
+.sf-menu li li:first-child > a {
+	border-top: 1px solid ThreeDHighlight;
+}
+.sf-menu li li:last-child > a {
+	border-bottom: 1px solid ThreeDShadow;
+}
+
+.sf-menu li.separator {
+	padding: 0;
+	margin: 0;
+	height: 10px;
+	overflow: hidden;
+}
+.sf-menu li.separator div {
+	padding: 4px 2px;
+	margin: 0;
+}
+.sf-menu li.separator div:hover {
+	background-color: ThreeDFace;
+}
+.sf-menu hr {
+	height: 0px;
+	display: block;
+	padding: 0;
+	margin: 0;
+	border: none;
+	border-top: 1px solid ThreeDShadow;
+	border-bottom: 1px solid ThreeDHighlight;
+	width: 100%;
+}
+.evo_toolbar_msie hr {
+	position: relative;
+	top: -6px;
+	margin: 6px 0 0;
+	height: 2px;
+}
+
+.sf-menu a.disabled,
+.sf-menu a.disabled:hover {
+	color: GrayText;
+}
+
+.sf-menu a.noborder {
+	border: none;
+}
+
+.sf-menu li:hover, .sf-menu li.sfHover,
+.sf-menu a:focus, .sf-menu a:hover, .sf-menu a:active {
+	text-decoration: none;
+	outline: 0;
+	border-top-color: ThreeDHighlight;
+	border-left-color: ThreeDHighlight;
+	border-bottom-color: ThreeDShadow;
+	border-right-color: ThreeDShadow;
+	color: ButtonText;
+}
+
+.sf-menu li li:hover, .sf-menu li li.sfHover,
+.sf-menu li li a:focus, .sf-menu li li a:hover, .sf-menu li li a:active {
+	border: none;
+	background-color: Highlight;
+	color: HighlightText;
+}
+.sf-menu li li a:focus, .sf-menu li li a:hover, .sf-menu li li a:active {
+	border-left: 1px solid ThreeDHighlight;
+	border-right: 1px solid ThreeDShadow;
+}
+.sf-menu li li:first-child > a:focus, .sf-menu li li:first-child > a:hover, .sf-menu li li:first-child > a:active {
+	border-top: 1px solid ThreeDHighlight;
+}
+.sf-menu li li:last-child > a:focus, .sf-menu li li:last-child > a:hover, .sf-menu li li:last-child > a:active {
+	border-bottom: 1px solid ThreeDShadow;
+}
+
+/*** arrows **/
+.sf-menu a.sf-with-ul {
+	padding-right: 	2.25em;
+	min-width:		1px; /* trigger IE7 hasLayout so spans position accurately */
+}
+.sf-sub-indicator {
+	position:		absolute;
+	display:		block;
+	right:			.75em;
+	top:			6px; /* IE6 only */
+	width:			10px;
+	height:			10px;
+	text-indent: 	-999em;
+	overflow:		hidden;
+	background:		url('../img/superfish-arrows.png') no-repeat -10px -100px; /* 8-bit indexed alpha png. IE6 gets solid image only */
+}
+a > .sf-sub-indicator {  /* give all except IE6 the correct values */
+	top:			4px;
+	background-position: 0 -100px; /* use translucent arrow for modern browsers*/
+}
+li li a > .sf-sub-indicator {  /* give all except IE6 the correct values */
+	top:			6px;
+}
+/* apply hovers to modern browsers */
+a:focus > .sf-sub-indicator,
+a:hover > .sf-sub-indicator,
+a:active > .sf-sub-indicator,
+li:hover > a > .sf-sub-indicator,
+li.sfHover > a > .sf-sub-indicator {
+	background-position: -10px -100px; /* arrow hovers for modern browsers*/
+}
+
+/* point right for anchors in subs */
+.sf-menu ul .sf-sub-indicator { background-position:  -10px 0; }
+.sf-menu ul a > .sf-sub-indicator { background-position:  0 0; }
+/* apply hovers to modern browsers */
+.sf-menu ul a:focus > .sf-sub-indicator,
+.sf-menu ul a:hover > .sf-sub-indicator,
+.sf-menu ul a:active > .sf-sub-indicator,
+.sf-menu ul li:hover > a > .sf-sub-indicator,
+.sf-menu ul li.sfHover > a > .sf-sub-indicator {
+	background-position: -10px 0; /* arrow hovers for modern browsers*/
+}
+
+/*** shadows for all but IE6 ***/
+.sf-shadow ul {
+	background:	url('../img/superfish-shadow.png') no-repeat bottom right;
+	padding: 0;
+	-moz-border-radius-bottomleft: 17px;
+	-moz-border-radius-topright: 17px;
+	-webkit-border-top-right-radius: 17px;
+	-webkit-border-bottom-left-radius: 17px;
+	border-radius: 0 17px 0 17px;
+}
+.sf-shadow ul.sf-shadow-off {
+	background: transparent;
+}
+
+
+/**
+ * Default Form styles
+ */
+
+form {
+	margin: 0;
+	padding: 0;
+} /* thanks #mozilla */
+
+fieldset.input {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+input[type=checkbox]
+{
+	margin:1px;
+}
+
+fieldset div.notes {
+	margin: 0 0 1ex 3ex;
+}
+
+
+/* Used for action icons */
+div.right_icons,
+div.fieldset_icons {
+	text-align: right;
+}
+span.right_icons,
+span.fieldset_icons {
+	float:right;
+}
+
+span.label_field_required {
+	color: #f00;
+	font-weight: bold;
+	margin-right: 4px;
+}
+.not_required span.label_field_required {
+	display: none;
+}
+
+span.field_error {
+	display: block;
+	color: #f00;
+}
+
+input.field_error,
+select.field_error,
+textarea.field_error {
+	background:#fbf2ee;
+	border: 1px solid #d99;
+}
+span.checkbox_error {
+	background: #fbf2ee;
+	border: 1px solid #d99;
+}
+span.checkbox_error input.checkbox {
+	background:#fbf2ee;
+}
+
+span.checkbox_surround {
+	background: #fbf2ee;
+	border: 1px solid #F825F1;
+}
+span.checkbox_surround input.checkbox {
+	background: #fbf2ee;
+}
+span.checkbox_surround_init {
+	padding : 1px;
+}
+
+
+input.large,
+textarea.form_textarea_input {
+	width: 97%;
+	margin: 0;
+	display: block;
+}
+
+label.radiooption {
+	margin-right: 1em;
+}
+
+.linkbutton {
+	border: 1px solid #bbb;
+	margin-right: 5px;
+	padding: 2px 3px;
+	font: normal 12px Arial, Sans-serif;
+	height:30px;
+	background-color: #EEEEEE;
+	cursor:pointer;
+	-moz-border-radius: 3px;
+	-khtml-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+}
+.linkbutton:hover {
+	background-color: #DEF2FC;
+}
+.linkbutton a {
+	background-color: transparent;
+	text-decoration: none;
+	color: #000;
+}
+.linkbutton a:hover {
+	text-decoration: none;
+	color: #000;
+}
+
+/* Enhanced form */
+.eform label {
+	font-weight:bold;
+}
+
+
+/* 24/75% forms - Fast Forms */
+.fform fieldset {
+	border: 1px solid #ddd;
+	margin: 0 0 1ex 0;
+	background-color: #fff; /* dh> change to "transparent"? */
+	padding: .5ex 1ex;
+}
+
+legend {
+	font-weight: bold;
+	font-size: 120%;
+}
+
+
+.fform fieldset fieldset {
+	border: none;
+	margin: 1ex;
+	padding: 0;
+	/* border: 1px solid #00f; */
+}
+.fform fieldset.bordered {
+	border: 1px solid #ddd;
+}
+.fform div.label {
+	float: left;
+	width: 24%;
+	text-align: right;
+	font-weight:bold;
+	margin: 0;
+	padding-top: .5ex;
+	/* border: 1px solid #f00; */
+}
+.fform fieldset.field_wide div.label,
+.fform fieldset.field_inline div.label {
+	float: none;
+	text-align: left;
+	width: auto;
+	margin-bottom: 5px;
+}
+.fform fieldset.field_inline div.label {
+	float: left;
+}
+.fform div.input {
+	margin: 0 0 0 25%;
+	/* border: 1px solid #f00; */
+}
+.fform fieldset.field_wide div.input {
+	margin-left: 20px;
+}
+.fform fieldset.field_inline div.input {
+	float: left;
+	margin-left: 5px;
+	line-height: 24px;
+}
+* html .fform div.input {
+	height:1%; /* so IE6 gains layout (hasLayout) and does not cause 3px bug for lines below div.label (if div.input is heigher than div.label) */
+	margin:0; /* fix the margin after the above fix */
+}
+
+.fform fieldset.input{
+	margin: 0;
+	/* border: 1px solid #0f0; */
+}
+
+.fform div.info {
+	margin: 0 0 0 25%;
+	padding-top: .5ex;
+	/* border: 1px solid #f00; */
+}
+.fform fieldset.info_full div.info {
+	margin-left: 5px;
+}
+
+
+/* hide checkbox in order to indent exactly the same size */
+input.invisible{
+	visibility: hidden;
+}
+
+
+/*
+{{{ Messages
+*/
+div.log_container,
+div.action_messages {
+	margin:1ex;
+}
+div.log_container ul,
+div.action_messages ul,
+div.log_container ol,
+div.action_messages ol {
+	list-style: none;
+	margin: 1ex 0;
+	padding-left: 0;
+}
+div.log_container div,
+div.action_messages div {
+	margin:1ex auto;
+	padding:1ex;
+}
+div.log_container div.log_note,
+div.action_messages div.log_note {
+	border:1px solid #6287c2;
+	background:#ddd;
+}
+div.log_container div.log_success,
+div.action_messages div.log_success,
+div.success {
+	border:1px solid #9d9;
+	background:#f2fbee;
+	color:#0c0;
+}
+div.log_container div.log_error,
+div.action_messages div.log_error,
+div.error,
+td.error {
+	border:1px solid #d99;
+	background:#fbf2ee;
+	color:#e00;
+}
+
+div.log_container div.log_warning,
+div.action_messages div.log_warning,
+div.warning,
+td.warning {
+	border:1px solid #f60;
+	background:#fff0dd;
+	color:#f60;
+}
+
+p.error,
+span.error,
+span.warning,
+p.warning {
+	color: #e00;
+	font-weight:bold;
+}
+p.error {
+	margin: 1ex;
+}
+
+div.bText div.log_container ul {
+	padding: 0;
+	text-indent: 0;
+}
+div.bText div.log_container li {
+	margin: 0;
+	padding: 0;
+	background: none;
+}
+div.bText div.log_container ul li:before {
+	content: none;
+}
+/* }}} */
+
+/* include errors, wrong params, deleted blog, etc... */
+div.skin_error {
+	border: 2px dotted #d99;
+	background:#fbf2ee;
+	color:#e00;
+	padding: 1em;
+	margin: 1em;
+}
+
+table.widget_grid {
+	margin: 8px auto 1px;
+	border-collapse: separate;
+	border-spacing: 3px;
+}
+table.widget_grid td {
+	padding: 0;
+	background-color: #fff;
+	border: 1px solid #ddd;
+	vertical-align: top;
+}
+table.widget_grid img {
+	padding: 1px;
+}
+table.widget_grid .note {
+	text-align: center;
+	padding: 2px;
+	border-top: 1px solid #ddd;
+	line-height: normal;
+	display:block;
+}
+#sidebar table.widget_grid .note {
+	margin: 0;
+}
+
+div.debug_container {
+	border: 1px solid #f00;
+	margin: 0;
+	padding: 0;
+}
+div.debug_container_name {
+	margin: 0;
+	padding: 0;
+	background-color: #fdd;
+	color: #f00;
+	font-size: 7pt;
+	text-align: left;
+	font-weight: normal;
+}
+span.debug_container_action {
+	float: right;
+}
+
+div.debug_widget {
+	border: 1px solid #0000f8;
+	margin: 0;
+	padding: 0;
+}
+div.widget_in_cache {
+	border: 1px solid #00f800;
+}
+div.widget_not_in_cache {
+	border: 1px solid #f80000;
+}
+div.debug_widget_name {
+	margin: 0;
+	padding: 0;
+	background-color: #eef;
+	color: #0000f8;
+	font-size: 7pt;
+	text-align: left;
+	font-weight: normal;
+}
+div.widget_in_cache div.debug_widget_name {
+	background-color: #efe;
+	color: #00f800;
+}
+div.widget_not_in_cache div.debug_widget_name {
+	background-color: #fee;
+	color: #f80000;
+}
+
+
+a.evo_messages_link {
+	padding: 3px 1ex;
+}
+.badge {
+	position: relative;
+	top: -1px;
+	border-radius:12px;
+	-moz-border-radius:12px;
+	-webkit-border-radius:12px;
+	background-color:red;
+	border:2px solid #fff;
+	color:#fff;
+	font-size:10px;
+	padding:0 6px
+}
+
+
+
+/* User Genders */
+.user, user.anonymous{
+	font-weight: bold;
+	word-wrap: break-word;
+}
+
+.user.closed,
+.user.deleted {
+	color: #666;
+}
+
+.user.man{
+	color: #00F;
+}
+.user.woman{
+	color: #e100af;
+}
+.user.nogender, user.anonymous.nogender{
+	color: #000;
+}
+
+.bubbletip_user ul{
+	padding: 0;
+	margin: 0;
+}
+.bubbletip_user ul li{
+	margin: 0.5ex 0;
+	padding: 0;
+	list-style: none;
+	text-align: center;
+}
+.bubbletip_anon{
+	text-align: center;
+}
+.bubbletip_anon div{
+	margin-top: 5px;
+}
+
+/* Overlay text on the bubble tips */
+.bubletip_overlay_text{
+	position: relative;
+}
+.bubletip_overlay_text div{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	text-align: center;
+	/* text-shadow: -1px -1px #000, -1px 0 #000, -1px 1px #000, 0 1px #000, 1px 1px #000, 1px 0 #000, 1px -1px #000, 0 -1px #000; */
+	text-shadow: -1px -1px #000, -2px 0 #000, -1px 1px #000, 0 2px #000, 1px 1px #000, 2px 0 #000, 1px -1px #000, 0 -2px #000;
+	color: #FFF;
+	font-weight: bold;
+}
+a.overlay_link:hover{
+	text-decoration: none;
+}
+a.overlay_link:hover b{
+	text-decoration: underline;
+}
+
+
+
+/*
+ * Bottom of page Debug output formatting:
+ */
+div.debug {
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:10pt;
+	border: 2px solid #000;
+	padding: 1ex;
+	background-color: #ccc;
+	text-align: left;
+	color: #000;
+}
+
+div.debug h2,
+div.debug h3,
+div.debug h4 {
+	color:#0033FF;
+}
+
+div.debug code {
+	font-family: Monaco,"Courier New", Courier, monospace;
+	font-size: 9pt;
+	margin:1ex 1ex 0;
+	display:block;
+}
+
+div.debug div.query_info {
+	background-color: #fff;
+	font-size: 12px;
+	margin:1ex;
+}
+
+div.debug table {
+	border: 1px solid #000;
+	border-collapse:collapse;
+	font-family: Monaco, "Courier New", Courier, monospace;
+	margin: 1ex;
+}
+div.debug table,
+div.debug th,
+div.debug td {
+	font-size:8pt;
+}
+div.debug th {
+	background-color: #fff;
+	border: 1px solid #000;
+	padding: 2px;
+	white-space:nowrap;
+}
+div.debug th span.type {
+	font-weight: normal;
+	color: #999;
+}
+div.debug td {
+	background-color: #ddd;
+	border: 1px solid #000;
+	padding: 2px;
+	vertical-align:top;
+	white-space:nowrap;
+}
+div.debug td.odd {
+	background-color: #eee;
+}
+/*
+ * AJAX Debug output formatting:
+ */
+a.jslog_switcher {
+	cursor: pointer;
+	float: right;
+}
+div#debug_ajax_info {
+	display: none;
+	position: fixed;
+	top: 23px;
+	left: 0;
+	z-index: 100000;
+	min-width: 190px;
+	min-height : 83px;
+	opacity: 0.85;
+	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=85);
+}
+div#debug_ajax_info.debug {
+	padding: 0;
+}
+div#debug_ajax_info h2 {
+	margin-top: 0;
+}
+div#debug_ajax_info h4 {
+	margin-bottom: 5px;
+}
+div#debug_ajax_info h4.error {
+	color: #F00;
+}
+div#debug_ajax_info p {
+	margin: 5px 0 2px 0;
+	font-weight: bold;
+}
+div#debug_ajax_info #jslog_container {
+	max-height: 500px;
+	overflow-y: auto;
+	padding: 0 10px;
+	min-height : 43px;
+}
+
+div#debug_ajax_info .jslog_titlebar, div#debug_ajax_info .jslog_statusbar {
+	padding: 1px 3px;
+}
+div#debug_ajax_info .jslog_titlebar {
+	border-bottom: 1px solid #AAA;
+	cursor: move;
+	background: #006;
+	opacity: 0.85;
+	color: #FFF;
+	font-weight: bold;
+}
+div#debug_ajax_info .jslog_statusbar {
+	border-top: 1px solid #AAA;
+	padding-right: 10px;
+}
+
+div#debug_ajax_info .ui-resizable-e {
+	right: 0;
+	z-index: 999;
+}
+div#debug_ajax_info .ui-resizable-s {
+	bottom: 0;
+	z-index: 999;
+}
+div#debug_ajax_info .ui-resizable-se {
+	z-index: 1000;
+}
+
+div.jslog {
+	display: none;
+}
+
+ul.jslog_note, ul.jslog_error {
+	padding: 0;
+	background: #DDDDDD;
+	border: 1px solid #6287C2;
+	margin: 0 auto 1ex auto;
+	padding: 1ex 1ex 1ex 3ex;
+}
+ul.jslog_error {
+	border: 1px solid #d99;
+	background: #fbf2ee;
+	color: #e00;
+}
+
+/* Item Custom Fields */
+.item_custom_fields {
+	border: none;
+	margin-bottom: 10px;
+	border-collapse: collapse;
+}
+.item_custom_fields th, .item_custom_fields td {
+	padding: 0 10px 0 0;
+}
+.item_custom_fields th {
+	text-align: left;
+}
+
+.form-login-links {
+	padding: 0 1em;
+}

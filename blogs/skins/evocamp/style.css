@@ -1,0 +1,659 @@
+/*
+* Original Design: Zeke 1.0 by Michael D. Pollock - http://www.solostream.com/
+* Ported to b2evolution 2.0 by The Skin Faktory - http://skinfaktory.com/
+* Distributed under GPL license with b2evolution with written permission from Michael D. Pollock (2007-06-22).
+*/
+
+
+/* -------------------[ Main Page Elements ]------------------- */
+
+div#skin_wrapper div.sitewide_header {
+	margin-bottom: 0;
+}
+
+textarea, input, select, option, optgroup, ul.ui-autocomplete, li.token-input-token-facebook, div.token-input-dropdown-facebook {
+	font: 10.66px georgia,times,'times new roman', serif;
+}
+
+#outer_wrap {
+font-size: 10pt;
+font-family: georgia,times,'times new roman', serif;
+background: #713600 url(img/planks.gif);
+color: #303324;
+text-align: left;
+margin: 0;
+padding: 0;
+line-height: 140%;
+}
+
+#wrap {
+padding: 0;
+width: 960px;
+margin: 0 auto;
+background: #FFFDF2 url(img/zekebg.gif) top left repeat-y;
+box-shadow: 0 0 5px 3px rgba(0,0,0,0.5);
+}
+
+#header {
+color: #FAF7E8;
+width:960px;
+clear: both;
+padding: 0 0 40px 0;
+margin: 0 auto;
+height:160px;
+background: #330000 url(img/zekehead.jpg) top center no-repeat;
+position: relative;
+}
+
+#nav {
+background: rgba(0,0,0,0.45);
+width:960px;
+height:40px;
+line-height:40px;
+margin: 0 auto;
+padding:0;
+border-top:1px solid rgba(255,255,255,0.15);
+border-bottom:1px solid #fff;
+position: absolute;
+bottom: 0;
+}
+
+#page {
+clear: both;
+margin: 0 auto;
+padding: 0;
+}
+
+#contentleft {
+width: 680px;
+float:left;
+padding: 0;
+margin: 0;
+}
+
+#content {
+width: 499px;
+float: left;
+margin: 0 1px 0 0;
+padding: 0;
+}
+
+#midcontent {
+font-family:tahoma,geneva,verdana,sans-serif;
+font-size: 8pt;
+width: 160px;
+float: right;
+margin: 0 0 15px 0;
+padding: 15px 10px 15px 0;
+}
+
+#contentright {
+font-family:tahoma,geneva,verdana,sans-serif;
+font-size: 8pt;
+width: 250px;
+float:left;
+padding: 15px 0 15px 15px;
+margin: 0 0 15px;
+}
+
+#sidebar {
+width: 250px;
+font-size: 8pt;
+float: left;
+margin: 0;
+padding: 0;
+}
+
+#footer {
+border-top:1px solid #fff;
+font-family:tahoma,geneva,verdana,sans-serif;
+font-size: 8pt;
+color:#996600;
+width:960px;
+background:#220000;
+font-size: 8pt;
+line-height: 160%;
+clear: both;
+margin: 0px auto;
+padding: 20px 0 ;
+text-align: center;
+}
+
+#footer p {
+margin: 0;
+}
+
+/* -------------------[ Headings ]------------------- */
+
+h1, h2, h3, h4, h5, h6, h7 {
+color:#330000;
+font-family: georgia,times,'times new roman', serif;
+letter-spacing:-1px;
+line-height: 130%;
+margin: 0;
+padding: 0;
+text-align: left;
+font-weight:normal;
+}
+
+h1 {
+text-align:center;
+font-size:30px;
+line-height:100%;
+padding: 5px;
+margin: 0;
+}
+h1 a,
+h1 a:visited {
+color: #FAF7E8;
+}
+
+h2 {
+font-size: 14pt;
+}
+
+h3 {
+font-size: 12pt;
+}
+
+h4,h5,h6,h7 {
+font-size: 10pt;
+}
+
+
+#sidebar h2, #midcontent h2  {
+font-weight: bold;
+font-size:9pt;
+letter-spacing:0px;
+margin: 0;
+padding:0;
+}
+
+
+h1.sectionhead, h2.sectionhead, h2#trackbacks, h3.feedback_section, h3.comment_form_title  {
+line-height:100%;
+font-weight: bold;
+font-size:10pt;
+letter-spacing:0px;
+margin: 0;
+padding: 10px 15px;
+border-bottom:1px solid #CCC9B8;
+background:#E5E0C3;
+}
+
+.entry h1,.entry h2,.entry h3, .entry h4, .entry h5, .entry h6, .entry h7 {
+margin-bottom: 10px;
+}
+
+
+/* -------------------[ Links ]------------------- */
+
+a {
+color: #996600;
+text-decoration: none;
+}
+
+a:hover {
+text-decoration:underline;
+color:#000;
+}
+
+.entry a, .entry a:link, .entry a:visited, .postinfo a, .postinfo a:link, .postinfo a:visited, .postinfo2 a, .postinfo2 a:link, .postinfo2 a:visited {
+text-decoration: underline;
+}
+
+.post h1 a, .post h2 a, .featurepost h2 a, .featurepost h1 a {
+color:#330000;
+}
+
+#footer a:hover {
+text-decoration:underline;
+color:#996600;
+}
+
+#footer a.contact_link:hover {
+color:#fff;
+}
+
+/* -------------------[ Images ]------------------- */
+
+img.alignright {
+float: right;
+clear: right;
+margin: 0 0 5px 10px;
+background: #fff;
+padding: 2px;
+border: 1px solid #ccc;
+}
+
+img.alignleft {
+float: left;
+clear: left;
+margin: 0 10px 5px 0px;
+background: #fff;
+padding: 2px;
+border: 1px solid #ccc;
+}
+
+img.centered {
+display: block;
+padding: 2px;
+margin: 0 auto 20px auto;
+border: 1px solid #ccc;
+float: none;
+clear: both;
+}
+
+
+
+/* -------------------[ Sidebar ]------------------- */
+
+
+#sidebar ul {
+list-style-type: none;
+margin: 0 ;
+padding: 0;
+}
+
+#sidebar ul li {
+list-style-type: none;
+margin: 0 0 10px;
+padding: 0;
+}
+
+#sidebar ul li ul {
+list-style-type: square;
+margin: 0;
+padding: 0;
+}
+
+#sidebar ul li ul li {
+list-style-type:none;
+padding-left:15px;
+margin:0;
+background:url(img/icons.gif) 0 -24px no-repeat;
+}
+
+/* -------------------[ Middle Content ]------------------- */
+
+#midcontent ul {
+list-style-type: none;
+margin: 0 ;
+padding: 0;
+}
+
+#midcontent ul li {
+list-style-type: none;
+margin: 0 0 10px;
+padding: 0;
+}
+
+#midcontent ul li ul {
+list-style-type: square;
+margin: 0;
+padding: 0;
+}
+
+#midcontent ul li ul li {
+list-style-type:none;
+padding-left:15px;
+margin:0;
+background:url(img/icons.gif) 0 -24px no-repeat;
+}
+
+#midcontent li.widget_core_coll_item_list.nobullets ul li {
+background: none;
+margin-left: 0;
+padding-left: 0;
+}
+
+/* -------------------[ Form Elements ]------------------- */
+
+form.bComment {
+font-size:8pt;
+background: #F2ECCE;
+padding: 15px 15px 15px;
+margin: 0;
+border: none;
+border-bottom:1px solid #CCC9B8;
+}
+
+#commentform label {
+display:block;
+margin: 0;
+}
+
+#commentform input {
+width: 170px;
+padding: 1px;
+margin: 0px 5px 10px 0;
+}
+
+#commentform textarea {
+width: 400px;
+padding: 0;
+margin: 0px 0px 10px 0;
+}
+
+#commentform #submit {
+margin: 0 0 20px 0;
+}
+
+#commentform p {
+margin: 5px 0;
+}
+
+
+/* -------------------[ Comments ]------------------- */
+
+div.bComment,
+div.moderation_msg,
+div.feedback_feed_msg {
+font-size:8pt;
+display: block;
+list-style: none;
+padding: 15px 15px 0;
+margin: 0;
+border: none;
+border-bottom:1px solid #CCC9B8;
+}
+
+div.bCommentSmallPrint {
+font-size: 100%;
+margin-bottom: 15px;
+}
+
+#comment_preview {
+background-color: #f2ecce;
+}
+.comment_notification {
+	border-bottom:1px solid #CCC9B8;
+	padding: 15px 15px 0;
+}
+
+/* -------------------[ Misc Tags and Classes ]------------------- */
+
+#header .widget_core_coll_tagline {
+color:#FAF7E8;
+font-size: 12pt;
+padding: 0 100px;
+margin: 0;
+text-align:center;
+}
+
+.post ul, .singlepost ul {
+list-style-type: none;
+}
+
+.post ul li, .singlepost ul li {
+list-style-type:none;
+background: url(img/icons.gif) 0 -25px no-repeat;
+padding: 0 0 2px 14px;
+}
+
+.bText a {
+color:#630;
+}
+.bText a:visited {
+color:#410;
+}
+
+table.prevnext_post {
+margin: 10px auto;
+}
+
+.navigation {
+text-align: left;
+margin:0;
+padding: 10px 15px;
+}
+
+.alignleft {
+float:left;
+}
+
+.alignright {
+float:right;
+}
+
+.entry {
+padding: 0;
+margin: 0;
+}
+
+.postinfo {
+font-family:tahoma,geneva,verdana,sans-serif;
+font-size: 8pt;
+background: url(img/icons.gif) -12px 4px no-repeat;
+clear: both;
+margin: 0 0 10px;
+padding-left: 14px;
+}
+
+.post {
+margin: 0 ;
+padding: 15px 15px 5px;
+border-bottom:1px solid #CCC9B8;
+}
+
+.featurepost {
+margin: 0;
+padding: 15px 15px 5px;
+background:#F2ECCE;
+border-bottom:1px solid #CCC9B8;
+}
+
+code, samp {
+font: 1.1em 'Courier New', Courier, Fixed;
+}
+
+hr {
+display: block;
+clear:both;
+}
+
+p.bMore a {
+background: url(img/icons.gif) right -12px no-repeat;
+padding-right:16px;
+}
+
+/* -------------------[ Search ]------------------- */
+
+div.compact_search_form input.SearchField {
+font-size:8pt;
+width: 110px;
+margin-right: 2px;
+}
+.search p {
+margin-bottom: 0;
+}
+.search {
+margin-bottom: 15px;
+}
+input.submit {
+font-size:8pt;
+}
+
+/* -------------------[ Navigation ]------------------- */
+
+#nav ul.nav {
+float: none;
+font-size: 8pt;
+font-weight:bold;
+letter-spacing: 0px;
+height:40px;
+line-height:40px;
+float:left;
+list-style: none;
+padding: 0;
+margin: 0;
+}
+
+#nav ul.nav li {
+float: left !important;
+margin: 0;
+padding: 0;
+list-style-type: none;
+}
+
+#nav ul.nav li a, #nav ul.nav li a:link, #nav ul.nav li a:visited {
+font-style: normal;
+color: #FAF7E8;
+float: left;
+display: block;
+padding: 0 10px;
+}
+
+ul.nav li a:hover, ul.nav li a:active {
+background: #660000;
+text-decoration: underline;
+}
+
+ul.nav li.current_page_item a {
+text-decoration:underline;
+background: #660000;
+text-decoration: underline;
+}
+
+ul.nav li ul {
+float:left;
+margin:0;
+padding:0;
+}
+
+/* ---------------[ Tables ]--------------- */
+
+.entry table {
+margin-bottom:15px;
+}
+
+.entry tr, .entry td, .entry th {
+margin:auto;
+}
+
+.entry td, .entry th {
+padding:8px;
+vertical-align:top;
+}
+
+.entry th {
+font-weight:bold;
+background:#E5E0C3;
+}
+
+.entry td {
+border:1px solid #E5E0C3;
+}
+
+/* ---------------[ Related Entries ]--------------- */
+
+.related {
+margin: 0 0 1px;
+background:#eee;
+padding:10px 10px 8px;
+}
+
+.related ul {
+line-height:130%;
+margin: 0;
+padding-left:0;
+list-style-type: none;
+}
+
+.related ul li {
+list-style-type:none;
+padding: 0 0 0 14px;
+margin: 0 0 2px;
+background: url(img/icons.gif) 0 -26px no-repeat;
+}
+
+ul#archives {
+margin: 0 0 15px 5px;
+padding: 0;
+}
+
+ul#archives ul {
+padding:0;
+}
+
+ul#archives ul li {
+background:transparent;
+padding-left:0;
+margin:0;
+}
+
+ul#archives ul ul {
+margin:0;
+margin-left: 10px;
+padding:0;
+}
+
+
+
+/*
+* Header / bloglist on top:
+*/
+div#header ul {
+float:right;
+list-style-type:none;
+margin: 0;
+padding: 6px 4px;
+}
+div#header li {
+margin: 0;
+display: inline;
+padding: 0 1ex 0 0;
+}
+div#header li a {
+font-weight: bold;
+font-style:italic;
+color: #fff;
+}
+div#header li a:hover {
+color: #666;
+text-decoration: underline;
+}
+div#header li a.selected {
+text-decoration: underline;
+}
+
+div.widget_core_coll_title {
+	padding-top: 45px;
+}
+
+/* jQuery Tokeninput plugin */
+div.input ul.token-input-list-facebook {
+	width: 345px;
+	background: #FFF;
+}
+
+/* Not published comments display */
+#styled_content_block .status_draft,
+#styled_content_block .status_review,
+#styled_content_block .status_community,
+#styled_content_block .status_protected,
+#styled_content_block .status_private {
+	top: -15px;
+	left: 15px;
+}
+
+#styled_content_block .postinfo {
+	clear:none;
+}
+
+form#user_checkchanges.bComment {
+	border-top: 1px solid #CCC9B8;
+	border-left: none;
+	border-right: none;
+}
+div.tabs {
+	margin-top: 10px;
+}
+div.tabs div a {
+	border-color: #CCC9B8;
+	background-color: #E5E0C3;
+}
+div.tabs div.selected a {
+	background-color: #F2ECCE;
+	border-bottom-color: #F2ECCE;
+}

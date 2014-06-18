@@ -1,0 +1,795 @@
+/**
+ * Backoffice main Cascading Style Sheets definitions for Desert style.
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package admin
+ */
+
+body {
+	margin: 0;
+	background-color: #fff;
+	color: #000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 84%;
+	background-image: url(../img/leftfade.png);
+	background-repeat: repeat-y;
+}
+textarea, input, select, option, optgroup, ul.ui-autocomplete, div.input li.token-input-token-facebook, body div.token-input-dropdown-facebook {
+	font: 13.43px Verdana, Geneva, Arial, Helvetica, sans-serif;
+}
+
+/* Titles */
+#TitleArea h1 {
+	clear: both;
+	margin: 1ex 0;
+	padding: 1ex;
+	font-family: Arial, Helvetica, sans-serif;
+	color: #929292;
+	font-size: 112%;
+	font-weight:normal;
+	background-color: #efede0;
+	border: 1px solid #ddd;
+}
+h2 {
+	margin-top: 0ex;
+	margin-bottom: 1ex;
+	font-size: 130%;
+	padding: 1px;
+}
+h3 {
+	font-size: 120%;
+}
+div.bSideItem h3,
+div.browse_side_item h3 {
+	color: #929292;
+	margin: .5ex 0;
+}
+div.panelinfo h3 {
+	margin: 1ex 0;
+	padding: 0;
+}
+h4 {
+	font-size: 110%;
+	margin-bottom: 1ex;
+	color: #929292;
+}
+
+/* Form elements: */
+textarea,
+input,
+select {
+	border: 1px solid #aaa;
+	background-color: #f6f6f6;
+	margin: 1px;
+	vertical-align: middle;
+}
+input.checkbox,
+input.radio {
+	background-color: #fff;
+	border: 0;
+	padding: 0;
+	margin: 0;
+}
+form.fform fieldset {
+	border-color: #ddd;
+}
+form.fform fieldset.fieldset fieldset {
+	border:transparent;
+}
+
+div.collection_select,
+div.collection_select form {
+	display: inline;
+}
+
+/* Links and buttons: */
+a {
+	background-color: transparent;
+	color: #008;
+	text-decoration: none;
+}
+a:hover {
+	color: #00b;
+	text-decoration: underline;
+}
+a.CurrentBlog,
+a.OtherBlog,
+a.ActionButton,
+a.DeleteButton {
+	color:#333;
+	text-decoration: none;
+	padding: 2px 1ex;
+	border: 1px solid #aaa;
+	white-space:nowrap;
+}
+a.CurrentBlog {
+	font-weight: bold;
+	background-image: url(../../../evo/rsc/img/desert-button-2.gif);
+	background-color: #fff;
+	border: 1px solid #888;
+}
+a.CurrentBlog:hover {
+	color: #000;
+	text-decoration: underline;
+	border: 1px solid #000;
+}
+a.OtherBlog,
+a.ActionButton,
+a.DeleteButton {
+	background-color: #ddd;
+}
+a.OtherBlog {
+	line-height: 3.5ex;
+}
+a.OtherBlog:hover,
+a.ActionButton:hover {
+	color: #00b;
+	text-decoration: underline;
+	background-color: #fff;
+	background-image: url(../../../evo/rsc/img/desert-button-2.gif);
+	border: 1px solid #00b;
+}
+a.DeleteButton:hover {
+	color: #c00;
+	text-decoration: underline;
+	background-color: #fff;
+	background-image: url(../../../evo/rsc/img/desert-button-2.gif);
+	border: 1px solid #c00;
+}
+a.PublishButton {
+	color:#333;
+	background-color: transparent;
+	text-decoration: none;
+	font-weight: bold;
+	padding: 2px 1ex;
+	background-image: url(../../../evo/rsc/img/desert-button.gif);
+	background-color: #ddd;
+	border: 1px solid #ccc5aa;
+	white-space:nowrap;
+}
+a.PublishButton:hover {
+	color: #c00;
+	text-decoration: underline;
+	background-color: #fff;
+	background-image: url(../../../evo/rsc/img/desert-button-2.gif);
+	border: 1px solid #c00;
+}
+
+input.search,
+input.ActionButton,
+input.SaveButton,
+input.DeleteButton,
+input.CancelButton,
+input.ResetButton,
+div.edit_actions input,
+div.PostActionsArea input {
+	padding: 2px;
+	margin: .5ex 1px;
+	color:#333;
+	background-color: #ddd;
+	border: 1px solid #aaa;
+}
+div.edit_actions input,
+div.PostActionsArea input {
+	margin: 1px 1px;
+}
+input.search:hover,
+input.ActionButton:hover,
+input.DeleteButton:hover,
+input.CancelButton:hover,
+div.edit_actions input:hover,
+div.PostActionsArea input:hover {
+	color: #00b;
+	text-decoration: underline;
+	background-color: #fff;
+	background-image: url(../../../evo/rsc/img/desert-button-2.gif);
+	border: 1px solid #00b;
+}
+
+input.SaveButton,
+input.DeleteButton,
+input.CancelButton,
+div.edit_actions input.SaveButton {
+	font-weight: bold;
+}
+input.SaveButton:hover,
+input.DeleteButton:hover,
+input.ResetButton:hover,
+div.edit_actions input.SaveButton:hover,
+div.edit_actions input.SaveEditButton:hover,
+div.edit_actions input.DeleteButton:hover {
+	color: #c00;
+	border: 1px solid #c00;
+}
+
+
+/*
+ * Page layout:
+ */
+#header {
+	font-size:85%;
+	background: #fff url(../../../evo/rsc/img/bg_grey.gif) repeat-x bottom;
+	margin: 0;
+}
+
+#TitleArea {
+	/* clear: both; */
+	margin: 1ex 1em 1ex 1em;
+	padding: .5ex;
+	background-color: #eee;
+	border: 1px solid #ddd; /* force moz to display float before */
+}
+
+#header h1 {
+	margin: 0;
+	padding: .5ex;
+	font-size: 150%;
+}
+div#mainmenu {
+	clear:left;
+	float:left;
+	width:12em;
+	/* border:	1px solid #f0f; */
+}
+.panelbody {
+	margin: 0 0 0 12em;
+	padding: 0;
+	/* border:	1px solid #f00; */
+}
+#payload {
+	float:left;
+	width: 100%;
+	/* border:	1px solid #f00; */
+}
+div.action_messages /* Page top messages */
+{
+	margin:1ex 1em;
+}
+.left_col {
+	clear: both;
+	vertical-align: top;
+	float: left;
+	width: 65%;
+	/* border:	1px solid #f00; */
+	margin: 1ex 0 0 0;
+	padding: 0;
+	overflow: hidden;
+}
+.right_col {
+	/* border:	1px solid #f00; */
+	width: 33%;
+	vertical-align: top;
+	float: right;
+	margin: 1ex 0 0 0;
+	padding: 0;
+	overflow: hidden;
+}
+div.panelinfo {
+	/* clear: both; */
+	background-color: #efede0;
+	border: 1px solid #ddd;
+	padding: 0 1ex;
+	margin: 1ex 1em;
+}
+div.tabbedpanelblock div.panelinfo {
+	/* when embeded, no margin: */
+	margin: 1ex 0;
+}
+div.panelinfo p {
+	margin: 1ex 0;
+	padding: 0;
+}
+div.panelblock {
+	border: 1px solid #ddd;
+	padding: 1ex;
+	margin: 1ex 1em;
+}
+.footer {
+	text-align: center;
+	font-size: 74%;
+	margin-top: 0ex;
+	margin-bottom: 0ex;
+	padding-bottom: 1ex;
+	clear: both;
+}
+
+/* Main tabs: */
+#mainmenu ul{
+	list-style: none;
+	margin: .5ex;
+	padding:0;
+}
+#mainmenu li{
+	border: 1px solid #ddd;
+	background: #fff;
+	margin: .5ex;
+	padding: 0;
+}
+#mainmenu li.current {
+	border: 1px solid #008;
+	background: #ddd;
+	font-weight: bold;
+}
+#mainmenu li:hover,
+#mainmenu li.parent{
+	border: 1px solid #00b;
+	background: #f0f0f0;
+	font-weight: bold;
+}
+#mainmenu li.parent ul.submenu li {
+	font-weight:normal;
+}
+#mainmenu li a{ /* made mainmenu links clickable in whole li (at least with Mozilla) */
+	display:block;
+	padding:.5ex;
+}
+ul.tabs {
+	margin:0;
+	/* clear: both; */
+	padding: 0 1em 0;
+	list-style: none;
+}
+ul.tabs li {
+	float:left;
+	background:url(../../../evo/rsc/img/tabs_left_grey.gif) no-repeat left top;
+	margin:0;
+	padding:0 0 0 9px;
+	border-bottom:1px solid #929292;
+}
+ul.tabs li a {
+	float:left;
+	display:block;
+	white-space:nowrap;
+	background: url(../../../evo/rsc/img/tabs_right_grey.gif) no-repeat right top;
+	padding:4px 11px 3px 2px;
+	text-decoration:none;
+	color:#765;
+}
+/* Commented Backslash Hack: hides rule from IE5-Mac \*/
+ul.tabs li a {float:none;}
+/* End IE5-Mac hack */
+ul.tabs li a:hover {
+	color:#33c;
+	text-decoration: underline;		/* for IE */
+}
+ul.tabs li:hover {			/* Won't work in IE */
+	background-position:0% -150px;
+	color:#333;
+}
+ul.tabs li:hover a {			/* Won't work in IE */
+	background-position:100% -150px;
+	color:#33c;
+	/* text-decoration: none; */
+}
+ul.tabs li.current {
+	background-position:0% -150px;
+	border-width:0;
+}
+ul.tabs li.current a {
+	background-position:100% -150px;
+	color:#333;
+	padding-bottom:4px;
+}
+ul.tabs li.current a:hover {
+	text-decoration: underline;
+	color:#333;
+}
+
+/* Sub-tabs */
+ul.hack { /* fplanque: note: I'm not sure the hack is still needed now we have removed decimal ex paddings */
+	margin:0;
+	/* clear: both; */
+	padding: 2px 1em 0;
+	list-style: none;
+}
+ul.hack li {
+	display: none;
+}
+div.pt
+{
+	margin: 0 1em;
+}
+div.panelblocktabs
+{
+	/* clear: both; */
+	margin-top: 1ex;
+	float:left;
+	width:100%;
+	background: url(../../../evo/rsc/img/tabs_bg.gif) repeat-x bottom;
+	font-size:85%;
+	line-height:normal;
+}
+div.tabbedpanelblock {
+	clear: both;
+	border: 1px solid #929292;
+	border-top: none;
+	background-color: #fbfbfb;
+	padding: 4px 1em 1ex 1em;
+	margin: 0 1em 2ex 1em;
+}
+div.tabbedpanelblock fieldset {
+	border: 1px solid #ddd;
+	margin: 0 0 1ex 0;
+	background-color: #fff;
+	padding: .5ex 1ex;
+}
+div.tabbedpanelblock fieldset fieldset {
+	border: none;
+}
+
+/* browse/ Edit Screen: */
+table.browse {
+	width: 100%;
+}
+td.browse_left_col {
+	vertical-align:top;
+	padding: 1ex 0 0 0;
+}
+td.browse_right_col {
+	width: 19em;
+	vertical-align:top;
+	padding: 1ex 0 0 0;
+}
+.block_item {
+	border: 1px solid #ddd;
+	background-color: #fff;
+	padding: 1ex;
+	margin: 0 0 1em 0;
+}
+.browse_side_item {
+	border: 1px solid #ddd;
+	background-color: #fff;
+	padding: 1ex;
+	margin: 0 0 1em 1em;
+}
+
+div.NavBar {
+	background-color: #eee;
+	border: 1px solid #ddd;
+	padding: 1ex;
+	margin: 0 0 1ex 0;
+}
+div.NavBar table {
+	width: 100%;
+}
+div.PostActionsArea,
+div.CommentActionsArea {
+	clear: both;
+	background-color: #eee;
+	border-top: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+	padding: 1ex;
+	margin: 0;
+}
+
+div.bSideItem {
+	border: 1px solid #ddd;
+	padding: 1ex;
+	margin: 0 1em 1ex 0;
+}
+
+.bSmallHead {
+	font-size: 85%;
+	padding: 1ex;
+	margin: 0;
+	color: #929292;
+	border-bottom: 1px solid #ddd;
+}
+.bSmallHeadRight {
+	float: right;
+	text-align: right;
+	padding-left: 1em; /* do not pad on text in .bSmallHead */
+}
+
+/* Post colors on browse page */
+div.bPost {
+	clear: both;
+	padding: 0;
+	margin: 0 0 1ex 0;
+}
+div.bPostpublished {
+	border: 1px solid #ddd;
+	background-color: #fff;
+}
+.bPostpublished span.Status {
+	color: #0b0;
+}
+
+div.bPostcommunity {
+	border: 1px solid #2E8BB9;
+	background-color: #fff;
+}
+.bPostcommunity > div.bSmallHead /* Direct child only */
+{
+	border-bottom: 1px solid #2E8BB9;
+}
+.bPostcommunity span.bStatus,
+.status_community {
+	color: #2E8BB9;
+}
+
+div.bPostreview {
+	border: 1px solid #CC0099;
+	background-color: #fff;
+}
+.bPostreview > div.bSmallHead /* Direct child only */
+{
+	border-bottom: 1px solid #CC0099;
+}
+.bPostreview span.bStatus,
+.status_review {
+	color: #CC0099;
+}
+
+.bPostprotected {
+	border: 1px solid #fc9;
+	background-color: #fff;
+	/* background-color: #fff7e7; */
+}
+.bPostprotected span.Status {
+	color: #ea0;
+}
+.bPostprotected > div.bSmallHead /* Direct child only */
+{
+	border-bottom: 1px solid #fc9;
+}
+.bPostprivate {
+	border: 1px solid #f99;
+	background-color: #fff;
+	/* background-color: #fee; */
+}
+.bPostprivate span.Status {
+	color: #e00;
+}
+.bPostprivate > div.bSmallHead /* Direct child only */
+{
+	border-bottom: 1px solid #f99;
+}
+.bPostdraft {
+	border: 1px dashed #ccc;
+	background-color: #f4f4f4;
+}
+.bPostdraft span.Status {
+	color: #666;
+}
+.bPostdraft > div.bSmallHead /* Direct child only */
+{
+	border-bottom: 1px dashed #ccc;
+}
+.bPostdeprecated {
+	border: 1px dashed #000;
+	background-color: #d8d8d8;
+	color: #888;
+}
+.bPostdeprecated span.Status {
+	color: #000;
+}
+.bPostdeprecated > div.bSmallHead /* Direct child only */
+{
+	border-bottom: 1px dashed #000;
+}
+
+.bPostredirected {
+	border: 1px solid #639;
+	background-color: #dcf;
+}
+.bPostredirected span.bStatus,
+.status_redirected {
+	color: #639;
+	background-color: #c0b0e0;
+}
+.bPostredirected > div.bSmallHead /* Direct child only */
+{
+	background-color: #c0b0e0;
+	border-bottom: 1px solid #639;
+}
+.bPostredirected div.bSmallPrint {
+	border-top: 1px solid #639;
+}
+.bPostredirected div.PostActionsArea {
+	border: 1px solid #639;
+	border-left: none;
+	border-right: none;
+	background-color: #c0b0e0;
+}
+
+.bContent,
+.bCommentContent,
+.bFeedback {
+	margin: 1ex;
+}
+.bTitle {
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+}
+.bText {
+	margin: 0;
+	padding: 0;
+}
+a.permalink_right {
+	margin: .3ex .3ex 0 0;
+}
+
+div.bComment, /* Entire comment block */
+form.bComment /* New comment form */
+{
+	border: 1px solid #ddd;
+	padding: 0;
+	margin: 1ex;
+}
+div.bComment > p { /* padding for e.g. "No feedback for this post yet..." */
+    padding: 1ex;
+}
+
+.bSideItem ul,
+.browse_side_item ul,
+.right_col ul {
+	margin-left: 0ex;
+	padding-left: 0ex;
+	margin-top: .5ex;
+	margin-bottom: .5ex;
+	list-style-type:none;
+}
+.bSideItem ul ul,
+.browse_side_item ul ul,
+.right_col ul ul {
+	margin-left: 1ex;
+	padding-left: 1ex;
+}
+
+input.SearchField {
+	width: 96%;
+	margin: .5ex auto 0 auto;
+	padding: 2px;
+}
+
+
+/* Write/compose Screen */
+.left_col fieldset {
+	border: 1px solid #ddd;
+	margin: 0 0 1ex 1em;
+	padding: 0 1ex 1ex 1ex;
+}
+
+.bSideItem fieldset div,
+.browse_side_item fieldset div {
+	margin: 1ex 0ex;
+}
+
+.right_col fieldset {
+	border: 1px solid #ddd;
+	margin: 0 1em 1ex 0;
+	padding: 0 1ex 1ex 1ex;
+}
+.bSideItem fieldset,
+.browse_side_item fieldset
+{
+	margin: 1ex 0;
+	clear: both;
+}
+
+fieldset.extracats {
+	border: 1px solid #ddd;
+	padding: 0 0 0 1ex;
+	margin: 1ex 1em 1ex 0;
+	overflow: visible;
+}
+fieldset.extracats div.extracats {
+	/* border: 1px solid #f00; */
+	height: 44ex;
+	overflow: auto;
+	padding: 0 1ex 0 0;
+	margin: 0 0 0 0;
+}
+.extracatnote {
+	/* display: block; */
+	font-size: 80%;
+	margin: 1ex 0;
+	padding: 0;
+	color: #999;
+	/* border: 1px solid #f00; */
+}
+
+div.edit_toolbars {
+	margin-top: 1ex;
+	width: 100%;
+	text-align: center;
+}
+div.edit_toolbar {
+	background-color: #eee;
+	border: 1px solid #ddd;
+	padding: 1px;
+	margin: 1px auto;
+	width: 98%;
+}
+div.edit_toolbar input {
+	color:#333;
+	background-color: #fff;
+	background-image: url(../../../evo/rsc/img/desert-button-2.gif);
+	border: 1px solid #bbb;
+	margin: 0 1px;
+}
+div.edit_toolbar input:hover {
+	color: #000;
+	text-decoration: underline;
+	border: 1px solid #000;
+}
+div.edit_area {
+	width: 100%;
+	text-align: center;
+}
+div.edit_area textarea,
+textarea.bComment {
+	width: 98%;
+	margin: 0 auto;
+}
+div.edit_actions {
+	background-color: #eee;
+	border: 1px solid #ddd;
+	padding: 1px;
+	margin: 1ex auto;
+	width: 98%;
+	text-align: center;
+}
+
+/* User rights: */
+span.checkall,
+th.checkright {
+	font-size: 84%;
+}
+
+/* jQuery Tokeninput plugin */
+div.input ul.token-input-list-facebook {
+	width: 98%;
+	background: #F6F6F6;
+	border: 1px solid #AAAAAA;
+	padding: 1px 4px;
+}
+div#ffield_item_tags ul.token-input-list-facebook {
+	width: 100%;
+}
+#itemform_adv_props ul.token-input-list-facebook {
+	width: 100%;
+	padding: 0 1px;
+	margin: 1px;
+}
+
+ul.widget_container {
+	border-color: #BBB;
+}
+.widget_container li.ui-droppable.even {
+	background: #EEE;
+}
+.widget_container li.ui-droppable.odd {
+	background: #DDD;
+}
+
+.quick_search_form {
+	float: right;
+	margin: -6px -1px 0 0;
+}
+
+/* Statuses of posts & comments display */
+#styled_content_block .status_draft,
+#styled_content_block .status_review,
+#styled_content_block .status_community,
+#styled_content_block .status_protected,
+#styled_content_block .status_private,
+#styled_content_block .status_published,
+#styled_content_block .status_deprecated,
+#styled_content_block .status_redirected {
+	top: -7px;
+	left: 7px;
+}
+span.note.status_draft span {
+	color: #fff;
+	background-color: #FF9966;
+}
+
+.dashboard_post {
+	min-height: 70px;
+}

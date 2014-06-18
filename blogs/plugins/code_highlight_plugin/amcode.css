@@ -1,0 +1,80 @@
+/* AstonishMe code plugin styles */
+
+.codeblock.amc_long {
+	height:24em;
+	overflow:auto;
+}
+
+.codeblock table {
+	border-collapse:collapse;
+}
+.codeblock td {
+	width:100%;
+	padding: 0px 5px 0px 33px;
+	text-indent:-28px;
+}
+
+.amc_code_odd { background:#FBFAF9; color:#666; }
+.amc_code_even{ background:#F2F1F0; color:#666; }
+
+/* code plugin line numbers */
+
+td.amc_line { padding:0 5px; font-size:0; width:auto; }
+td.amc_line div { padding-right:9px; height:10px; }
+.codeblock .amc0 { background-position:90% -90px; }
+.codeblock .amc1 { background-position:90% 0; }
+.codeblock .amc2 { background-position:90% -10px; }
+.codeblock .amc3 { background-position:90% -20px; }
+.codeblock .amc4 { background-position:90% -30px; }
+.codeblock .amc5 { background-position:90% -40px; }
+.codeblock .amc6 { background-position:90% -50px; }
+.codeblock .amc7 { background-position:90% -60px; }
+.codeblock .amc8 { background-position:90% -70px; }
+.codeblock .amc9 { background-position:90% -80px; }
+
+/* XML/HTML syntax highlighting colours */
+
+.codeblock .code_tag {
+	font-weight: bold;
+	color: #c00;
+}
+
+
+/* syntax highlighting colours */
+
+.codeblock .amc_html { color:#000; }
+.codeblock .amc_default { color:#000; }
+.codeblock .amc_keyword { color:#c0c; }
+.codeblock .amc_string { color:#c00; }
+.codeblock .amc_comment { color:#f70; }
+.codeblock .amc_attribute { color:#880; }
+.codeblock .amc_class { color:#080; }
+.codeblock .amc_id { color:#0c0; }
+.codeblock .amc_tags { color:#008; }
+
+.codeblock a:link,
+.codeblock a:visited { color:#00f; }
+.codeblock a:hover{ color:#88f; }
+
+kbd {
+	display: inline-block;
+	padding: .1em .6em;
+	margin: 0 .1em;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	background: #f7f7f7;
+	color: #333;
+	font: 11px 'Helvetica Neue',Helvetica,Arial,sans-serif;
+	-moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+	-webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+	box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+	text-shadow: 0 1px 0 #fff;
+	line-height: 1.4;
+	white-space: nowrap;
+}
+
+var {
+	font: 12px monospace,Helvetica,Arial,sans-serif;
+	font-weight: bold;
+	font-style: normal;
+}

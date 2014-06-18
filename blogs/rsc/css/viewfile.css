@@ -1,0 +1,48 @@
+/* This file has been lost. Quick regen... OMG! */
+
+body {
+	margin: 0;
+	padding: 0;
+}
+
+.content-type-text .filebody {
+	margin:1em;
+}
+
+.fileheader, .eof {
+	background: #ccc;
+	padding:1ex;
+}
+
+div.subline p {
+	margin: 0;
+}
+
+pre.rawcontent {
+	margin: 0;
+	padding: 0;
+}
+
+div.img_preview {
+	background: #ccc;
+	text-align: center;
+}
+div.img_preview img {
+	margin: 1ex;
+	border: 1px solid #000;
+}
+div.subline {
+	font-family:Verdana, Arial, Helvetica, sans-serif;
+	font-size: 84%;
+	margin: 1ex auto;
+	width: 80%;
+	padding: 1ex;
+	background: #aaa;
+	border: 1px solid #000;
+}
+
+div.filecode {
+	font-family:monospace;
+	color:black;
+	font-weight:normal;font-style:normal; /* to be sure */
+}

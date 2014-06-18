@@ -1,0 +1,465 @@
+/********************************************
+   AUTHOR:  			Erwin Aligam
+   WEBSITE:   			http://www.styleshout.com/
+	TEMPLATE NAME: 	PixelGreen
+   TEMPLATE CODE: 	S-0010
+   VERSION:          1.2
+	LAST MODIFIED:    June-05-2007
+ *******************************************/
+
+/********************************************
+   HTML ELEMENTS
+********************************************/
+
+/* top elements */
+* { padding: 0; margin: 0; }
+
+div#skin_wrapper div.sitewide_header {
+	margin-bottom: 0;
+}
+
+#wrap {
+	margin: 0;
+	padding: 0 5px 5px;
+	font: normal 73%/1.5em 'Trebuchet MS', Tahoma, sans-serif;
+	color: #555;
+	background: #FFF url('img/bg.gif') repeat-x;
+	text-align: center;
+}
+
+/* links */
+a { color: #72A545; text-decoration: none; }
+a:hover { color: #006699; text-decoration: underline; }
+
+/* headers */
+h1, h2, h3 { font: bold 1em 'Trebuchet MS', Tahoma, Sans-serif; }
+h1 { font-size: 1.4em; color: #65944A; }
+h2 { font-size: 1.2em; text-transform: uppercase; }
+h3 { font-size: 1.2em; }
+
+p, h1, h2, h3 {
+	margin: 5px 15px;
+}
+ul, ol {
+	margin: 1px 10px;
+	padding: 0 15px;
+}
+
+/* images */
+.bText img {
+	border: 1px solid #DADADA;
+	padding: 5px;
+	background: #FAFAFA;
+}
+img.float-right {
+  margin: 5px 0px 5px 15px;
+}
+img.float-left {
+  margin: 5px 15px 5px 0px;
+}
+
+div.codeblock {
+  margin: 1ex 2ex 1ex 3ex;
+  text-align: left;
+  overflow: auto;
+  font: 500 1em/1.5em 'Lucida Console', 'courier new', monospace;
+  /* white-space: pre; */
+  background: #FAFAFA;
+  border-left: 3px solid #72A545;
+}
+acronym {
+  cursor: help;
+  border-bottom: 1px solid #777;
+}
+blockquote {
+	margin: 15px; 	padding: 0 0 0 20px;
+  	background-color: #FAFAFA;
+	background-position: 8px 10px;
+	border: 1px solid #f2f2f2;
+	border-left: 3px solid #72A545;
+	font: bold 1.2em/1.5em "Trebuchet MS", Tahoma, sans-serif;
+	color: #666666;
+}
+
+
+/* form elements */
+form {
+	margin:10px 15px; padding: 0;
+	border: 1px solid #f2f2f2;
+	background-color: #FAFAFA;
+}
+input {
+	padding: 2px;
+	border:1px solid #eee;
+	font: normal 1em "Trebuchet MS", Tahoma, sans-serif;
+	color:#777;
+}
+textarea {
+	width:360px;
+	padding:2px;
+	font: normal 1em "Trebuchet MS", Tahoma, sans-serif;
+	border:1px solid #eee;
+	display:block;
+	color:#777;
+}
+input.button {
+	margin: 0;
+	font: bold 1em Arial, Sans-serif;
+	background: #FFF url(gradientbg.jpg) repeat-x;
+	padding: 2px 3px;
+	color: #333;
+	border: 1px solid #DADADA;
+}
+/* search form */
+form.search {
+	background-color: transparent;
+	border: none;
+	padding: 0;
+}
+form.search p { margin:0; padding: 0; }
+form.search input.SearchField {
+	width: 160px;
+	color: #333;
+	height: 20px;
+	padding: 2px;
+	margin-bottom: 5px;
+	vertical-align: top;
+}
+form.search input.SearchButton {
+	font: bold 12px Arial, Sans-serif;
+	color: #333;
+	width: 60px;
+	height: 26px;
+	border: 1px solid #DADADA;
+	padding: 3px 5px;
+	vertical-align: top;
+}
+
+/***********************
+	  LAYOUT
+************************/
+
+#header-content, #content, #footer-content {
+	width: 760px;
+}
+
+/* header */
+#header {
+	text-align: left;
+	height: 93px;
+	border-top: 1px solid #272727;
+	border-bottom: 5px solid #6a9c43;
+	font: normal 73%/1.5em 'Trebuchet MS', Tahoma, sans-serif;
+	color: #555;
+	background: #272727;
+}
+#header-content {
+	margin: 0 auto; padding: 0;
+	position: relative;
+}
+#header-content .widget_core_coll_title h1 a {
+	font: bold 40px 'Trebuchet MS', Sans-serif;
+	letter-spacing: -2px;
+	color: #FFF;
+	margin: 0; padding: 0;
+	text-decoration: none;
+
+}
+
+#header-content .widget_core_coll_tagline {
+	font: bold 12px 'Trebuchet Ms', Sans-serif;
+	text-transform: none;
+	color: #FFF;
+	margin: -10px 0 0 18px;
+	margin-top: -10px;
+	padding: 0;
+	color: #ddd;
+}
+
+/* header menu */
+div.PageTop {
+	float: right;
+}
+
+div.top_menu ul {
+	position: absolute;
+	right: 0px;
+	bottom: 6px;
+}
+
+#header-content ul {
+	font: bolder 1.3em 'Trebuchet MS', sans-serif;
+	color: #FFF;
+	list-style: none;
+	margin: 0; padding: 0;
+}
+#header-content li {
+	display: inline;
+}
+#header-content li a {
+	float: left;
+	display: block;
+	padding: 3px 12px;
+	color: #FFF;
+	background-color: #333;
+	text-decoration: none;
+	border-right: 1px solid #272727;
+}
+#header-content li a:hover {
+	background: #65944A;
+	color: #FFF;
+}
+#header-content li a.selected  {
+	background: #65944A;
+	color: #FFF;
+}
+
+/* header photo */
+.headerphoto {
+	margin: 0 auto;
+	width: 770px;
+	height: 200px;
+	padding: 15px 10px 10px 10px;
+	background: #FFF url('img/headerphoto.jpg') no-repeat center;
+}
+
+/* content */
+#content-wrap {
+	clear: both;
+	float: left;
+	width: 100%;
+}
+#content {
+	text-align: left;
+	padding: 0;
+	margin: 0 auto;
+}
+
+/* sidebar */
+#sidebar {
+	float: right;
+	width: 30%;
+	margin: 0 0 10px 0; padding: 0;
+}
+#sidebar h1 {
+	padding: 10px 0px 5px 10px;
+	margin: 0;
+	font: bold 1.3em 'Trebuchet MS', Tahoma, Sans-serif;
+}
+.sidebox {
+	background: #F5F5F5;
+	border: 1px solid #EFEDED;
+	margin-bottom: 10px;
+}
+
+#sidebar img {
+  border: none;
+}
+
+/* sidebar menu */
+#sidebar ul.sidemenu {
+	list-style:none;
+	margin: 10px 0 15px 0;
+	padding: 0;
+	background: #F2F2F2;
+}
+#sidebar ul.sidemenu li {
+	padding: 0px 10px;
+}
+#sidebar ul.sidemenu a {
+	display:block;
+	font-weight:normal;
+	color: #333;
+	padding:.3em 0 .3em 15px;
+	line-height: 1.5em;
+	border-bottom: 1px dashed #D4D4D4;
+	text-decoration:none;
+}
+#sidebar ul.sidemenu a.top{
+	border-top: 1px dashed #D4D4D4;
+}
+#sidebar ul.sidemenu a:hover {
+	padding: .3em 0 .3em 10px;
+	border-left: 5px solid  #65944A;
+	color: #65944A;
+}
+#sidebar ul.sidemenu ul {
+  margin: 0;
+  padding: 0;
+  list-style:none;
+}
+
+/* main */
+#main {
+	float: left;
+	width: 68%;
+	margin: 0 0 10px 0; padding: 0;
+}
+#main h3.bTitle {
+	padding: 10px 0px 0px 5px;
+	margin: 0 0 0 10px;
+	border-bottom: 1px solid #f2f2f2;
+	font: normal 1.5em 'Trebuchet MS', Tahoma, Sans-serif;
+}
+#main h3.bTitle.linked a {
+	color: #555555;
+}
+#main ul {
+	padding-left: 4px;
+	margin-left: 4px;
+}
+#main ul li {
+	list-style: none;
+	background: url(img/icons.gif) no-repeat 0 -33px;
+	padding-left: 17px;
+}
+
+.post {
+	margin: 0px 0px 20px 0px;
+	padding: 0px;
+	background: #FFF url('img/gradientbg.jpg') repeat-x;
+	border: 1px solid #EFEDED;
+}
+.post .post-footer {
+	background-color: #FAFAFA;
+	border: 1px solid #f2f2f2;
+	padding: 5px;
+	margin: 20px 10px 10px 10px;
+	font-size: 95%;
+}
+.post .post-footer img {
+  margin: 3px;
+}
+.post .post-footer .date {
+	background: url('img/icons.gif') no-repeat 3px 1px;
+	padding-left: 22px;
+}
+.post .post-footer .comments {
+	background: url('img/icons.gif') no-repeat 0 -15px;
+	padding-left: 19px; margin: 0 2px 0 2px;
+}
+.post .post-footer .comments a {
+	background: none;
+}
+
+/* footer */
+#footer {
+	clear: both;
+	margin: 0; padding: 0;
+	font: normal .95em/1.6em 'Trebuchet MS', Tahoma, Arial, sans-serif;
+	text-align: left;
+}
+
+#footer h1, #footer p {	margin-left: 0; }
+
+#footer-content {
+	border-top: 1px solid #EAEAEA;
+	margin: 0 auto;
+	padding-left: 15px;
+	color: #777;
+}
+#footer-content a {
+	text-decoration: none;
+	color: #777;
+}
+#footer-content a.contact_link {
+	text-decoration: underline;
+}
+#footer-content a.contact_link:hover {
+	color: #444;
+}
+#footer-content a:hover {
+	text-decoration: underline;
+}
+#footer-content ul {
+	list-style: none;
+	margin: 0; padding: 0;
+}
+#footer-content .col {
+	width: 32%;
+	padding: 0 5px 30px 0;
+}
+#footer-content .col2 {
+	width: 30%;
+	padding: 0 0 30px 0;
+}
+
+/* alignment classes */
+.float-left  { float: left; }
+.float-right { float: right; }
+.align-left  { text-align: left; }
+.align-right {	text-align: right; }
+
+/* additional classes */
+.clear { clear: both; }
+.gray  { color: #BFBFBF; }
+
+#sidebar .widget_core_coll_xml_feeds ul.sidemenu li a {
+  display: inline;
+}
+
+table.bCalendarTable {
+  font-size: 85%;
+}
+td.bCalendarCell, td.bCalendarLinkPost, td.bCalendarEmptyCell {
+  width: 5.5ex;
+}
+
+div.input input, ul.ui-autocomplete {
+	font: 12px "Trebuchet MS",Tahoma,sans-serif;
+}
+
+div.item_location {
+	margin: 1ex 15px;
+}
+.item_custom_fields {
+	margin-left: 15px;
+}
+
+form#login_form {
+	background: none;
+	border: none;
+}
+
+/* jQuery Tokeninput plugin */
+#main div.input ul.token-input-list-facebook {
+	width: 360px;
+	margin: 0;
+	border-color: #EEEEEE;
+	background-color: #FFF;
+}
+#main div.input ul.token-input-list-facebook li {
+	background: none;
+	padding-left: 3px;
+}
+#main div.input ul.token-input-list-facebook li.token-input-token-facebook {
+	background-color: #EFF2F7;
+}
+
+/* Not published comments display */
+#styled_content_block .bComment .status_draft,
+#styled_content_block .bComment .status_review,
+#styled_content_block .bComment .status_community,
+#styled_content_block .bComment .status_protected,
+#styled_content_block .bComment .status_private {
+	top: 0px;
+	left: 11px;
+}
+/* Not published posts display */
+#styled_content_block .bTitle .status_draft,
+#styled_content_block .bTitle .status_review,
+#styled_content_block .bTitle .status_community,
+#styled_content_block .bTitle .status_protected,
+#styled_content_block .bTitle .status_private {
+	top: 24px;
+}
+
+#add_group_contacts {
+	border: none;
+	background: none;
+	margin: 0;
+}
+
+.bImages .flowplayer_block, .bImages .videojs_block, .bImages .mediajs_block {
+	padding: 0 10px;
+}

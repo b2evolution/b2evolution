@@ -1,0 +1,50 @@
+; This is the definitions file for the autolinks plugin.
+;
+; Do NOT MODIFY this file. You may lose your edits when upgrading.
+;
+; To create your own definitions, duplicate this file by SAVING it AS defintions.local.txt .
+;
+; Values are separated by ;
+; Field 1 = word to autolink
+; Field 2 = optional previous required word (allows to create groups of 2 words)
+; Field 3 = reserved
+; Field 4 = url
+
+; Team members and their b2evo blogs
+sam2kb;;;b2evo.sonorth.com/
+fplanque;;;fplanque.com/
+
+; A couple of English definitions
+cro;;;www.tellmewhatis.com/cro-conversion-rate-optimization
+csv;;;www.tellmewhatis.com/csv-comma-separated-values
+cta;;;www.tellmewhatis.com/cta-call-to-action
+dns;;;www.tellmewhatis.com/dns-domain-name-system
+ethernet;;;www.tellmewhatis.com/ethernet
+ftp;;;www.tellmewhatis.com/ftp-file-transfer-protocol
+isp;;;www.tellmewhatis.com/isp-internet-service-provider
+rss;;;webreference.fr/defintions/rss-atom-xml
+xml;;;www.tellmewhatis.com/xml
+
+; b2evo stuff
+b2;;;b2evolution.net/
+b2evo;;;b2evolution.net/
+b2evolution;;;b2evolution.net/
+ccms;;;b2evolution.net/
+engine;multiblog;;b2evolution.net/
+evoskin;;;skins.b2evolution.net/
+evoskins;;;skins.b2evolution.net/
+platform;multiblog;;b2evolution.net/
+skin;evo;;skins.b2evolution.net/
+skins;evo;;skins.b2evolution.net/
+
+; A couple of French definitions (TODO: different files by language/locale)
+hypertexte;;;webreference.fr/defintions/www/hypertexte
+
+; Twitter handles:
+@b2evolution;;;twitter.com/b2evolution
+@francoisplanque;;;twitter.com/francoisplanque
+@sam2kb;;;twitter.com/sam2kb
+@evofactory;;;twitter.com/evofactory
+; Aliases
+@b2evo;;;twitter.com/b2evolution
+@fplanque;;;twitter.com/francoisplanque

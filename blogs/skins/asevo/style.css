@@ -1,0 +1,367 @@
+/* Designed by Asevo - http://asevo.com */
+
+/*
+ * Main page construct:
+ */
+body {
+	background-color: #fff;
+	color: #000;
+}
+textarea, input, select, option, optgroup, ul.ui-autocomplete, li.token-input-token-facebook, div.token-input-dropdown-facebook {
+	font: 13.43px Verdana, Arial, Helvetica, sans-serif;
+}
+
+div.nav_zone {
+	background-color: #ccc;
+	padding: 0 1em;
+}
+div.main_zone
+{
+	padding: 0 1em;
+}
+div.foot_zone
+{
+	background-color: #e0e0e0;
+	padding: 0 1em;
+}
+
+div.inner_wrapper
+{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 84%;
+	width: 88ex;
+	margin: 0 auto;
+	padding: 1px;
+}
+
+.evo_main_area /* Left column */
+{
+	width: 62ex;
+	float: left;
+	overflow: hidden;
+}
+
+.evo_sidebar /* Right column */
+{
+	width: 23ex;
+	float: right;
+	overflow: hidden;
+}
+
+p.baseline,
+p.baseline2 {
+	font-size: 76%;
+	margin: 3px;
+}
+p.baseline2,
+p.baseline2 a {
+	color: #666;
+}
+
+/*
+ * General styles:
+ */
+div.clear {
+	clear: both;
+}
+
+a {
+	color: #666;
+	text-decoration:none;
+}
+a:hover {
+	color: #aaa;
+	text-decoration:underline;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	margin: 2ex 0 1ex 0;
+	color: #e00000;
+	font-size: 100%;
+}
+
+h1 a,
+h2 a,
+h3 a,
+h4 a,
+h5 a,
+h6 a {
+	color: #e00000;
+}
+h1 a:hover,
+h2 a:hover,
+h3 a:hover,
+h4 a:hover,
+h6 a:hover,
+h6 a:hover {
+	color: #aaa;
+	text-decoration:none;
+}
+
+
+/*
+ * Header / bloglist on top:
+ */
+div.PageTop,
+div.top_menu {
+	margin: 3px 0;
+}
+div.PageTop ul,
+div.top_menu ul {
+	margin: 0;
+	list-style-type:none;
+	padding: 0;
+	float: left;
+}
+div.PageTop li,
+div.top_menu li {
+	display: inline;
+	padding-right: 1em;
+}
+div.PageTop a {
+	color: #aaa;
+}
+div.PageTop a.selected {
+	color: #fff;
+	font-weight:bold;
+}
+div.top_menu a {
+	color: #333;
+}
+div.top_menu a.selected {
+	font-weight:bold;
+}
+
+
+/*
+ * Title area styles:
+ */
+div.evo_title_area {
+	margin: 1em 0;
+	padding: 0;
+}
+div.evo_title_area h2 {
+	font-size: 180%;
+	margin: 2em 0 0 0;
+	padding: 0;
+}
+div.evo_title_area div.widget_core_coll_tagline {
+	letter-spacing: 4px;
+	margin: 1ex 0;
+}
+
+
+/*
+ * Styles for content
+ */
+table.prevnext_post {
+	width: 100%;
+}
+table.prevnext_post td {
+	font-size: 84%;
+	padding: 0;
+}
+table.prevnext_post td a {
+	color: #aaa;
+}
+table.prevnext_post td a:hover {
+	color: #000;
+	text-decoration:underline;
+}
+
+.evo_req_title {
+	margin: 0 0 2ex 0;
+	padding: 1px 0;
+	border-bottom: 2px solid #aaa;
+}
+.evo_post
+{
+	clear: both;
+	margin: 0 0 5ex 0;
+	padding: 0;
+}
+.evo_post_title {
+	font-size: 100%;
+	color: #e00000;
+	margin: 1ex 0 .5ex 0;
+	border-bottom: 1px solid #aaa;
+}
+.evo_post_head {
+	font-size: 76%;
+	color: #999;
+}
+.evo_post_text {
+	font-size: 84%;
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.evo_post_text p {
+	margin: 1em 0;
+}
+.evo_post_foot
+{
+	color: #999;
+	font-size: 76%;
+	clear: both;
+	margin: 1ex 0 2ex 0;
+}
+
+.evo_post_text a {
+	text-decoration: underline;
+}
+
+
+.evo_post_head a,
+.evo_post_foot a {
+	color: #999;
+}
+
+
+
+input.bComment,
+textarea.bComment
+{
+	background-color: #eee;
+	border: 1px solid #ccc;
+	width: 97%;
+	padding: 2px;
+	margin: 0ex;
+}
+select.bComment		/* Used by the profile form */
+{
+	background-color: #eee;
+	border: 1px solid #ccc;
+	padding: 1px;
+	margin: 0ex;
+}
+
+
+/*
+ * Styles for sidebar (right)
+ */
+.evo_side_item {
+	font-size: 84%;
+	margin: 2ex;
+	padding: 0 0 2ex 0;
+	border-bottom: 2px solid #e0e0e0;
+}
+
+.evo_side_item ul {
+	margin-left: 8px;
+	padding-left: 8px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	list-style-type:square;
+}
+.evo_side_item ul ul{
+	margin-left: 8px;
+	padding-left: 8px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+.evo_side_item form {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+div.compact_search_form input.SearchField
+{
+	background-color: #eee;
+	border: 1px solid #ccc;
+	padding: .5ex;
+	width: 84px;
+	margin: 0 3px 0 0;
+}
+
+/*
+ * Special SideItems:
+ */
+.widget_plugin_evo_Calr,
+.widget_core_coll_title,
+.widget_core_coll_longdesc {
+	padding: 0;
+}
+.widget_core_coll_title,
+.widget_core_coll_longdesc {
+	border-bottom: none;
+}
+.widget_core_user_login .field_login_btn {
+	width: 150px;
+}
+
+/* Calendar: */
+table.bCalendarTable caption {
+	border: 1px solid #ccc;
+	background-color: #eee;
+	border-bottom: 0;
+}
+table.bCalendarTable {
+	width: 100%;
+	border: solid 1px #ccc;
+}
+table.bCalendarTable td {
+	color: #ccc;
+}
+table.bCalendarTable td.bCalendarLinkPost {
+	color: #000;
+}
+table.bCalendarTable tfoot td {
+	background-color: #eee;
+	border-top: 1px solid #ccc;
+}
+table.bCalendarTable tfoot a {
+	text-decoration: none;
+}
+table.bCalendarTable tfoot a:hover {
+	background-color: #aaa;
+	color: #000;
+}
+th.bCalendarHeaderCell {
+	color: #ccc;
+	font-weight:normal;
+}
+#bCalendarToday {
+	background-color: #aaa;
+}
+
+textarea#msg_text {
+	width: 100%;
+}
+
+/* jQuery Tokeninput plugin */
+div.input ul.token-input-list-facebook {
+	width: 275px;
+}
+
+#user_checkchanges input, #user_checkchanges textarea {
+	max-width: 225px;
+}
+input#thrd_title {
+	max-width: 270px;
+}
+
+/* Not published comments display */
+#styled_content_block .bComment .status_draft,
+#styled_content_block .bComment .status_review,
+#styled_content_block .bComment .status_community,
+#styled_content_block .bComment .status_protected,
+#styled_content_block .bComment .status_private {
+	top: 0px;
+	left: 14px;
+}
+/* Not published posts display */
+#styled_content_block .evo_post_head .status_draft,
+#styled_content_block .evo_post_head .status_review,
+#styled_content_block .evo_post_head .status_community,
+#styled_content_block .evo_post_head .status_protected,
+#styled_content_block .evo_post_head .status_private {
+	top: -4px;
+}
+
+div.tabs {
+	padding-left: 17px;
+}
+div.tabs div a {
+	padding: 5px 4px;
+}

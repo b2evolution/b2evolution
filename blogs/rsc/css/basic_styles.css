@@ -1,0 +1,468 @@
+/*
+ * These are now the real basic styles that once used to be in basic.css
+ * These are included in basic.css but also in item_base.css so they are available in WYSIWYG editors
+ */
+
+code, samp {
+	font-family: Menlo, Monaco, "Courier New", Courier, monospace;
+	/* font-size: 107%; */
+}
+.nobr,
+.nowrap,
+.line {
+	white-space: nowrap;
+}
+.left {
+	text-align: left;
+}
+.center {
+	text-align: center;
+}
+.right {
+	text-align: right;
+}
+.top {
+	vertical-align: top;
+}
+.middle {
+	vertical-align: middle;
+}
+.bottom {
+	vertical-align: bottom;
+}
+.floatleft {
+	float: left;
+}
+.floatright {
+	float: right;
+}
+.clear{
+	clear: both;
+}
+.inline {
+	display: inline;
+}
+.hidden {
+	display: none;
+}
+.indented {
+	margin-left: 3em;
+}
+
+.border {
+	border: 1px solid #000;
+}
+.margin1ex {
+	margin: 1ex;
+}
+.margin2ex {
+	margin: 2ex;
+}
+
+.small {
+	font-size: 84%;
+}
+.small_details {
+	font-size: 84%;
+	color: #555;
+}
+.note,
+.notes,
+.dimmed {
+	font-size: 84%;
+	color: #999;
+	font-weight:normal;
+}
+.red {
+	color: #f00;
+}
+.orange {
+	color: #f60;
+}
+.green {
+	color: #0c0
+}
+.black {
+	color: #000;
+}
+acronym,
+abbr {
+	border-bottom: 1px dotted #000;
+	cursor: help;
+}
+
+del {
+	color: #999999;
+}
+ins {
+	color: #009999;
+	text-decoration: none;
+}
+
+.expanded li {
+	margin-top: 1ex;
+	margin-bottom: 1ex;
+}
+
+a.discreet {
+	text-decoration: none;
+}
+
+img.leftmargin {
+	float:left;
+	margin-right:1ex;
+	margin-top:.2ex;
+	margin-bottom:.2ex;
+}
+img.rightmargin, div.rightmargin {
+	float:right;
+	margin-left:1ex;
+	margin-top:.2ex;
+	margin-bottom:.2ex;
+}
+
+/* Sprite style for the all flags */
+
+/* The sprite image file is located: "/rsc/icons/flags_sprite.png"
+ * **** To change this file use the original file from: "/rsc/icons/src/flags.PSD"
+ * **** You should save the changed file as PNG-8 with 256 colors to the "flags_sprite.png"
+ * **** Also don't forget to save the "flags.PSD"
+ *
+ * NEW ADDED FLAGS:
+ *   aq - Antarctica
+ *   ax - Aland Islands
+ *   bl - Saint Barthelemy
+ *   cc - Cocos Islands
+ *   cx - Christmas Island
+ *   sj - Svalbard And Jan Mayen
+ *
+ * CHANGED FLAGS TO 16px WIDTH:
+ *   np - Nepal
+ *   ch - Switzerland
+ */
+span.flag {
+	border: 1px solid #000000;
+	background: url(../icons/flags_sprite.png) no-repeat;
+	width: 16px;
+	height: 11px;
+	line-height: 11px;
+	padding: 0 !important;
+	font-size: 6px;
+	display: inline-block !important;
+	margin-bottom: -2px;
+}
+
+/* Sprite style for the all icons*/
+span.icon {
+	background: url(../icons/icons_sprite.png) no-repeat -112px -48px;
+	width: 16px;
+	height: 16px;
+	line-height: 16px;
+	padding: 0 !important;
+	font-size: 9px;
+	display: inline-block !important;
+	overflow: hidden;
+	vertical-align: middle;
+}
+span.icon.voted {
+	margin: 0 2px;
+}
+a.rollover_sprite:hover span.icon {
+	visibility: hidden;
+	visibility: visible\0/;/* IE8 */
+}
+@media screen and (min-width:0\0) { /* IE9-10 */
+	a.rollover_sprite:hover span.icon {
+		visibility: visible;
+	}
+}
+a.rollover_sprite:hover span.icon:before {
+	visibility: visible !important;
+	background: inherit;
+	float: left;
+	width: 32px;
+	height: 16px;
+	content: "";
+	margin-left: -16px;
+}
+.vote_spam span.icon.voted {
+	margin: auto;
+}
+
+.action_icon:hover {
+	text-decoration: none;
+}
+.action_icon.hoverlink:hover {
+	text-decoration: underline;
+}
+button.action_icon {
+	background: none;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+}
+
+a.roundbutton, a.roundbutton_text, span.roundbutton {
+	font: 11.28px Verdana, Geneva, Arial, Helvetica, sans-serif;
+	display: inline-block;
+	position: relative;
+	min-width: 16px;
+	height: 20px;
+	line-height: 20px;
+	padding: 0 5px;
+	margin: 0;
+	vertical-align: bottom;
+	text-align: center;
+	font-size: 11.28px;
+	cursor: default;
+	color: #000;
+	text-decoration: none;
+	border: 1px solid #787878;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-khtml-border-radius: 4px;
+
+	background: #bababa;
+	/* Safari 4-5, Chrome 1-9 */
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#bababa), to(#f5f5f5));
+	/* Safari 5.1, Chrome 10+ */
+	background: -webkit-linear-gradient(top, #f5f5f5, #bababa);
+	/* Firefox 3.6+ */
+	background: -moz-linear-gradient(center 1%, #f5f5f5, #bababa);
+	/* IE 10 */
+	background: -ms-linear-gradient(top, #f5f5f5, #bababa);
+	/* Opera 11.10+ */
+	background: -o-linear-gradient(top, #f5f5f5, #bababa);
+	/* IE 8 */
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f5f5f5', endColorstr='#bababa');
+}
+a.roundbutton.middle {
+	vertical-align: middle;
+}
+
+a.roundbutton:hover, a.roundbutton_text:hover {
+	cursor: default;
+	text-decoration: none;
+	background: #d2d2d2;
+	/* Safari 4-5, Chrome 1-9 */
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#d2d2d2), to(#a0a0a0));
+	/* Safari 5.1, Chrome 10+ */
+	background: -webkit-linear-gradient(top, #a0a0a0, #d2d2d2);
+	/* Firefox 3.6+ */
+	background: -moz-linear-gradient(center 1%, #a0a0a0, #d2d2d2);
+	/* IE 10 */
+	background: -ms-linear-gradient(top, #a0a0a0, #d2d2d2);
+	/* Opera 11.10+ */
+	background: -o-linear-gradient(top, #a0a0a0, #d2d2d2);
+	/* IE 8 */
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#a0a0a0', endColorstr='#d2d2d2');
+}
+a.roundbutton.roundbutton_selected, a.roundbutton_text.roundbutton_selected, span.roundbutton {
+	cursor: default;
+	background: #989898;
+	/* Safari 4-5, Chrome 1-9 */
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#989898), to(#6b6b6b));
+	/* Safari 5.1, Chrome 10+ */
+	background: -webkit-linear-gradient(top, #6b6b6b, #989898);
+	/* Firefox 3.6+ */
+	background: -moz-linear-gradient(center 1%, #6b6b6b, #989898);
+	/* IE 10 */
+	background: -ms-linear-gradient(top, #6b6b6b, #989898);
+	/* Opera 11.10+ */
+	background: -o-linear-gradient(top, #6b6b6b, #989898);
+	/* IE 8 */
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#6b6b6b', endColorstr='#989898');
+}
+a.roundbutton_green, span.roundbutton_green,
+a.roundbutton_green:hover, span.roundbutton_green:hover {
+	cursor: default;
+	background: #09f197;
+	/* Safari 4-5, Chrome 1-9 */
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#09f197), to(#00b46e));
+	/* Safari 5.1, Chrome 10+ */
+	background: -webkit-linear-gradient(top, #00b46e, #09f197);
+	/* Firefox 3.6+ */
+	background: -moz-linear-gradient(center 1%, #00b46e, #09f197);
+	/* IE 10 */
+	background: -ms-linear-gradient(top, #00b46e, #09f197);
+	/* Opera 11.10+ */
+	background: -o-linear-gradient(top, #00b46e, #09f197);
+	/* IE 8 */
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00b46e', endColorstr='#09f197');
+}
+a.roundbutton_red, span.roundbutton_red,
+a.roundbutton_red:hover, span.roundbutton_red:hover {
+	cursor: default;
+	background: #fa7171;
+	/* Safari 4-5, Chrome 1-9 */
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fa7171), to(#e62020));
+	/* Safari 5.1, Chrome 10+ */
+	background: -webkit-linear-gradient(top, #e62020, #fa7171);
+	/* Firefox 3.6+ */
+	background: -moz-linear-gradient(center 1%, #e62020, #fa7171);
+	/* IE 10 */
+	background: -ms-linear-gradient(top, #e62020, #fa7171);
+	/* Opera 11.10+ */
+	background: -o-linear-gradient(top, #e62020, #fa7171);
+	/* IE 8 */
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#e62020', endColorstr='#fa7171');
+}
+.roundbutton span, .roundbutton_text span {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	margin: auto;
+}
+.roundbutton_group .roundbutton,
+.roundbutton_group .roundbutton_text {
+	border-radius: 0;
+	border-left: none;
+	border-right: 1px solid #787878;
+}
+.roundbutton_group .roundbutton:before,
+.roundbutton_group .roundbutton_text:before {
+	border-left: 1px solid #b1b1b1;
+	content: "";
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: -1px;
+}
+.roundbutton_group .roundbutton:first-child:before,
+.roundbutton_group .roundbutton_text:first-child:before,
+.roundbutton_group .roundbutton_text.first-child:before {
+	border: none;
+}
+.roundbutton_group .roundbutton:first-child,
+.roundbutton_group .roundbutton_text:first-child,
+.roundbutton_group .roundbutton_text.first-child {
+	border-radius: 4px 0 0 4px;
+	-moz-border-radius-topleft: 4px; -moz-border-radius-bottomleft: 4px;
+	-khtml-border-radius-topleft: 4px; -khtml-border-radius-bottomleft: 4px;
+	-webkit-border-top-left-radius: 4px; -webkit-border-bottom-left-radius: 4px;
+	border-left: 1px solid #787878;
+	border-right: 1px solid #787878;
+}
+.roundbutton_group .roundbutton:last-child,
+.roundbutton_group .roundbutton_text:last-child,
+.roundbutton_group .roundbutton_text.last-child {
+	border-left: none;
+	border-right: 1px solid #787878;
+	border-radius: 0 4px 4px 0;
+	-moz-border-radius-topright: 4px; -moz-border-radius-bottomright: 4px;
+	-khtml-border-radius-topright: 4px; -khtml-border-radius-bottomright: 4px;
+	-webkit-border-top-right-radius: 4px; -webkit-border-bottom-right-radius: 4px;
+}
+.roundbutton_group .roundbutton:first-child:last-child,
+.roundbutton_group .roundbutton_text:first-child:last-child,
+.roundbutton_group .roundbutton_text.first-child.last-child {
+	border: 1px solid #787878;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-khtml-border-radius: 4px;
+}
+
+a.roundbutton_text, a.roundbutton_text_noicon {
+	padding: 0 5px 0 23px;
+	height: 20px;
+	line-height: 20px;
+}
+a.roundbutton_text_noicon {
+	padding-left: 5px;
+}
+a.roundbutton_text span, a.roundbutton_text_noicon span {
+	left: 5px;
+	right: auto;
+}
+
+.roundbutton.rbtn_black, .roundbutton_group .roundbutton.rbtn_black {
+	border-color: #1a1a1a;
+	background-color: #3a3a3a;
+	background-size : 30px 30px;
+	background-repeat:repeat-x;
+	background-position :0;
+	background-image : -moz-linear-gradient(
+		90deg,
+		rgba(0,0,0,0) 0%,
+		rgba(0,0,0,0) 50%,
+		rgba(255,255,255,0.1) 50%,
+		rgba(255,255,255,0.3) 100%
+		);
+	background-image : -o-linear-gradient(
+		90deg,
+		rgba(0,0,0,0) 0%,
+		rgba(0,0,0,0) 50%,
+		rgba(255,255,255,0.1) 50%,
+		rgba(255,255,255,0.3) 100%
+		);
+	background-image : -webkit-linear-gradient(
+		90deg,
+		rgba(0,0,0,0) 0%,
+		rgba(0,0,0,0) 50%,
+		rgba(255,255,255,0.1) 50%,
+		rgba(255,255,255,0.3) 100%
+		);
+}
+.roundbutton.rbtn_black:before, .roundbutton_group .roundbutton.rbtn_black:before {
+	border-color: #1a1a1a;
+}
+.roundbutton.rbtn_black:hover, .roundbutton_group .roundbutton.rbtn_black:hover {
+	background-color: #252525;
+}
+span.roundbutton.rbtn_black, .roundbutton_group span.roundbutton.rbtn_black,
+span.roundbutton.rbtn_black:hover, .roundbutton_group span.roundbutton.rbtn_black:hover {
+	background-color: #666;
+}
+
+.notes a.roundbutton {
+	top: -2px;
+}
+@-moz-document url-prefix() {
+	.notes a.roundbutton { top: 0; }
+}
+
+.mb1{
+	margin-bottom: 1px;
+}
+
+
+div.edit_toolbars {
+	margin-top: 1ex;
+	width: 100%;
+	text-align: center;
+}
+div.edit_toolbar {
+	background-color: #f1f6f8;
+	border: 1px solid #becdd6;
+	padding: 1px 2px;
+	margin: 1px auto;
+	width: 98%;
+}
+div.edit_toolbar input {
+	background: #fefefe url(../img/whitebar24.png) repeat-x center;
+	border: 1px solid #becdd6;
+	margin: 0 1px;
+	padding: 0 1px;
+}
+div.edit_toolbar input:hover {
+	border-color: #00f;
+}
+div.comment_toolbars {
+	margin-top: 1em;
+	text-align: center;
+}
+
+/* Meta categories */
+.widget_core_coll_category_list .meta {
+	font-weight: bold;
+}
+.widget_core_coll_category_list .meta ul {
+	font-weight: normal;
+}
+.widget_core_coll_category_list .meta input[disabled="disabled"] {
+	visibility: hidden;
+}

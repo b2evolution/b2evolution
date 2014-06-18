@@ -1,0 +1,135 @@
+/**
+ * Backoffice main Cascading Style Sheets definitions for Desert style.
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package admin
+ */
+
+html, body {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	background-color: #F5F5F5;
+	color: #000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+}
+
+div.log_container {
+	margin: 0;
+}
+
+.container {
+	width: auto;
+	height: 100%;
+	min-height: 100%;
+	padding: 0 40px;
+	position: relative;
+}
+.wrap {
+	width: 400px;
+	margin: 0 auto;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	margin: auto;
+}
+
+.panel {
+	margin: 5px 0;
+}
+.panel-body {
+	padding: 20px 30px 0;
+}
+.form-login-links {
+	padding: 0 5px;
+	font-size: 92%;
+}
+
+.form-login {
+	padding: 10px 0;
+}
+.form-login fieldset {
+	margin-bottom: 20px;
+}
+.form-login input[type=text], .form-login input[type=password] {
+	width: 100%;
+}
+
+.form-horizontal .controls,
+.form-horizontal .controls-info {
+	padding-right: 14px;
+}
+span.help-inline {
+	color: #999;
+	font-size: 84%;
+}
+div#ffield_m {
+	margin-bottom: 4px;
+}
+div#p-status {
+	margin-left: 5px;
+}
+#pass2_status .icon {
+	margin-top: -2px;
+}
+
+.form-horizontal .form-actions {
+	background: none;
+	border: none;
+	text-align: center;
+	padding: 0;
+	margin-bottom: 0;
+}
+.control-label .label_field_required {
+	display: none;
+}
+
+.form-lostpass .controls {
+	margin-left: 0;
+	padding: 0;
+	width: 100%;
+}
+.form-lostpass .controls input.form-control {
+	width: 100%;
+}
+.form-lostpass .control-label {
+	display: none;
+}
+.form-lostpass .control-buttons {
+	margin: 0;
+	padding: 0;
+	text-align: center;
+	width: 100%;
+}
+
+.form_footer_notes {
+	text-align: center;
+	color: #999;
+	font-size: 78%;
+	line-height: 2.5ex;
+	margin-top: 1em;
+}
+
+.footer {
+	text-align: center;
+	font-size: 74%;
+	margin-top: 0ex;
+	margin-bottom: 0ex;
+	padding-bottom: 1ex;
+	clear: both;
+	line-height: 12px;
+	color: #999;
+}
+.footer a {
+	color: #999;
+}
+.footer a:hover {
+	color: #005580;
+}

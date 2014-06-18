@@ -1,0 +1,422 @@
+/* Designed by Francois PLANQUE - http://fplanque.net/ */
+
+/*
+ * Main page construct:
+ */
+body {
+	background: #000;
+	padding: 0;
+	margin: 0;
+	color: #fff;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 84%;
+}
+textarea, input, select, option, optgroup, ul.ui-autocomplete, li.token-input-token-facebook, div.token-input-dropdown-facebook {
+	font: 13.43px Arial, Helvetica, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: "Trebuchet MS", "Lucida Grande", Arial, Helvetica, sans-serif;
+}
+
+div.wrapper /* Main centered zone */
+{
+	width: 728px;
+	margin: 0 auto;
+	color: #000;
+}
+div.outerwrap /* Main rounded content zone */
+{
+	margin: 2ex 0 1ex 0;
+}
+div.innerwrap /* Main white content zone */
+{
+	padding: 5px 0;
+	border: 1px solid #fff; /* needed to force inner paddings */
+	background-color:#fff;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	-khtml-border-radius: 8px;
+	border-radius: 8px;
+}
+div.pageHeader /* Title zone */
+{
+	margin: 0 1ex;
+	padding: 0;
+}
+
+.posts /* Left column */
+{
+	width: 521px;
+	float: left;
+	overflow: hidden;
+}
+
+.bSideBar /* Right column */
+{
+	width: 200px;
+	float: right;
+	overflow: hidden;
+}
+div.clear {
+	clear: both;
+}
+div#pageFooter {
+	margin: 1ex 1ex 2ex 1ex;
+	padding:0;
+	border-top: 1px dotted #fff;
+	color: #fff;
+}
+p.baseline {
+	font-size: 70%;
+	text-align: center;
+	margin:1ex;
+}
+
+
+/*
+ * General styles:
+ */
+a,
+a:visited {
+	color: #E600B1;
+	text-decoration:none;
+}
+a:hover {
+	text-decoration:underline;
+}
+
+h2 {
+	color: #995AE3;
+	font-size: 160%;
+	margin: 1ex;
+}
+h3 {
+	color: #995AE3;
+	font-size: 110%;
+}
+h4 {
+	color: #995AE3;
+	font-size: 105%;
+}
+
+legend {
+	color: #995AE3;
+}
+
+blockquote {
+	border-color: #AE8ED3;
+	background-color: #E4D9F0;
+}
+
+.note, .notes, .dimmed
+{
+	color: #AE8ED3;
+	font-size: 84%;
+}
+
+/*
+ * Blog list on top:
+ */
+div.PageTop ul {
+	border-bottom: 2px solid #D699DD;
+	margin: 0 1ex 2px 1ex;
+	padding: 0 0 2px 0;
+	list-style-type:none;
+}
+div.PageTop li {
+	display: inline;
+	padding-right: 3ex;
+}
+a.selected {
+	color: #995AE3;
+	font-weight:bold;
+}
+
+/*
+ * Menu on top:
+ */
+div.top_menu ul {
+	margin: 4px 1ex 10px 1ex;
+	padding: 0 0 2px 0;
+	list-style-type:none;
+}
+div.top_menu li {
+	display: inline;
+	padding-right: 2ex;
+	white-space: nowrap;
+	float: left;
+}
+div.top_menu a {
+	color: #E600B1;
+	font-weight:bold;
+}
+
+/*
+ * Header styles:
+ */
+div.pageHeader h1 {
+	font-size: 250%;
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+	color:#995AE3;
+}
+.widget_core_coll_tagline {
+	letter-spacing: 4px;
+	padding: 0 0 3px 0;
+	font-size: 109%;
+}
+
+
+/*
+ * Styles for forms
+ */
+.bPost, .bPostpublished
+{
+	clear: both;
+	margin: 0 1ex 3ex 1ex;
+	padding: 0 0 2px;
+	background-color:#F5EBF3;
+	border: 1px solid #D79ADC;
+}
+.bSmallHead {
+	font-size: 84%;
+	margin: 1ex;
+	color: #AE8ED3;
+}
+.bSmallHead a {
+	color: #D699DD;
+}
+div.bTitle {
+	clear: both;
+	margin: 1ex 1ex 0 1ex;
+	padding: 5px 0 3px 0;
+	background-color:#D699DD;
+	-moz-border-radius-topleft: 6px; -moz-border-radius-topright: 6px;
+	-webkit-border-radius: 6px 6px 0 0;
+	-khtml-border-radius-topleft: 6px; -khtml-border-radius-topright: 6px;
+	border-radius: 6px 6px 0 0;
+}
+h3.bTitle {
+	margin: 0 1ex;
+	color: #fff;
+}
+h3.bTitle a {
+	color: #fff;
+}
+.bText {
+	margin: 0 1ex 0;
+}
+.bSmallPrint
+{
+	font-size: 84%;
+	clear: both;
+	margin: 1ex;
+}
+
+div.bComment, form.bComment {
+	background-color: #F5EBF3;
+	border: 1px solid #D79ADC;
+	-moz-border-radius: 7px;
+	border-radius: 7px;
+	margin-bottom: 12px;
+}
+.bCommentLink a,
+.bCommentLink a:visited {
+	background-color: #E600B1;
+	color: #fff;
+	padding: 2px 1ex;
+	font-weight:bold;
+}
+.bCommentLink a:hover {
+	background-color: #ddd;
+	color: #E600B1;
+}
+
+/* Feedback titles */
+.bPost h4,
+.bPost h3 {
+	margin-left: 1ex;
+}
+.bComment h3 {
+	margin-top: 1ex;
+	color: #995AE3;
+}
+.bComment h3 a {
+	color: #EB34C0;
+}
+
+input.bComment,
+textarea.bComment
+{
+	border: 1px solid #ccc;
+	width: 97%;
+	padding: 2px;
+	margin: 0ex;
+}
+select.bComment		/* Used by the profile form */
+{
+	background-color: #eee;
+	border: 1px solid #ccc;
+	padding: 1px;
+	margin: 0ex;
+}
+
+div.bCommentSmallPrint {
+	font-size: 84%;
+	color:#AE8ED3;
+}
+
+/*
+ * Styles for sidebar (right)
+ */
+.bSideItem {
+	margin: 2ex;
+	padding: 0 0 2ex 0;
+}
+.bSideItem ul {
+	margin-left: 8px;
+	padding-left: 8px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	list-style-type:square;
+}
+.bSideItem ul ul{
+	margin-left: 8px;
+	padding-left: 8px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.bSideItem form {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+div.compact_search_form input.SearchField
+{
+	border: 1px solid #EB34C0;
+	background-color: #F5EBF3;
+	padding: 2px;
+	margin: 0 3px 0 0;
+	width: 123px;
+}
+div.compact_search_form input.search_submit {
+	color: #EB34C0;
+	margin: 5px auto;
+}
+
+/* Special SideItems: */
+.widget_plugin_evo_Calr,
+.widget_core_coll_title,
+.widget_core_coll_longdesc {
+	/* background-color: #fee; */
+	padding: 0;
+	border-bottom: 0;
+}
+
+/*
+ * Calendar:
+ */
+table.bCalendarTable caption {
+	border: 1px solid #AE8ED3;
+	background-color: #AE8ED3;
+	border-bottom: 0;
+	color:#FFFFFF;
+}
+table.bCalendarTable caption a {
+	font-size: 105%;
+	color:#FFFFFF;
+}
+table.bCalendarTable {
+	border: 1px solid #AE8ED3;
+	background-color: #F5EBF3;
+}
+table.bCalendarTable tfoot td {
+	border-top: 1px solid #AE8ED3;
+	background-color: #E4D9F0;
+}
+table.bCalendarTable td a {
+	padding:2px;
+}
+table.bCalendarTable td a:hover {
+	background-color: #E600B1;
+	color: #fff;
+}
+table.bCalendarTable tfoot td a:hover {
+	padding: 2px 1ex;
+}
+th.bCalendarHeaderCell {
+	color: #AE8ED3;
+	font-weight:normal;
+}
+td.bCalendarCell:hover,
+td.bCalendarLinkPost:hover {
+	background-color: #E4D9F0;
+	padding: 0;
+}
+#bCalendarToday {
+	background-color: #E4D9F0;
+	border-color: #AE8ED3;
+}
+
+/*
+ * Styles for comment screen:
+ */
+form.bComment fieldset div.label,
+form.bComment fieldset div.input,
+form.bComment fieldset div.info
+{
+	padding-top: 0;
+	/* font-size: 84%; */
+}
+
+div.item_location {
+	margin: 1ex;
+}
+.item_custom_fields {
+	margin-left: 1ex;
+}
+
+/* jQuery Tokeninput plugin */
+div.input ul.token-input-list-facebook {
+	width: 345px;
+	background: #FFF;
+}
+div.token-input-dropdown-facebook {
+	color: #000 !important;
+}
+
+.messages_list form.bComment {
+	-moz-border-radius: 0;
+	border-radius: 0;
+}
+
+/* Not published comments display */
+#styled_content_block .bComment .status_draft,
+#styled_content_block .bComment .status_review,
+#styled_content_block .bComment .status_community,
+#styled_content_block .bComment .status_protected,
+#styled_content_block .bComment .status_private {
+	top: 0px;
+	left: 14px;
+}
+/* Not published posts display */
+#styled_content_block .bSmallHead .status_draft,
+#styled_content_block .bSmallHead .status_review,
+#styled_content_block .bSmallHead .status_community,
+#styled_content_block .bSmallHead .status_protected,
+#styled_content_block .bSmallHead .status_private {
+	top: -6px;
+	left: 6px;
+}
+
+div.tabs div a {
+	background-color: #FFF;
+}
+div.tabs div a:hover {
+	background-color: #F5EBF3;
+}
+div.tabs div.selected a {
+	background-color: #F5EBF3;
+	border-bottom-color: #F5EBF3;
+}

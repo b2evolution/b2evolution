@@ -1,0 +1,408 @@
+/* Designed by François PLANQUE - http://fplanque.net/ */
+
+body {
+	background: #fff;
+	padding: 0px;
+	margin: 0px;
+	color: #000;
+	font: 84% Arial, Helvetica, sans-serif;
+}
+
+div#skin_wrapper div.sitewide_header {
+	margin-bottom: 0;
+}
+
+textarea, input, select, option, optgroup, ul.ui-autocomplete, li.token-input-token-facebook, div.token-input-dropdown-facebook {
+	font: 13.43px Arial, Helvetica, sans-serif;
+}
+
+a {
+	color: #569;
+	text-decoration: none;
+}
+.bText a:visited {
+	color: #236;
+}
+a:hover {
+	color: #9ae;
+	text-decoration: underline;
+}
+
+div.pageHeader h1 a,
+div.pageHeader h1 a:visited {  /* IE6 */
+	color: #fff;
+	text-decoration: none;
+}
+div.pageHeader h1 a:hover {
+	text-decoration: underline;
+}
+.top_menu{
+	height: 22px;
+}
+
+h2 {
+	color: #78a;
+	font-size: 180%;
+	margin: 0;
+}
+h3 {
+	color: #78a;
+	font-size: 120%;
+}
+h4 {
+	color: #78a;
+	font-size: 110%;
+}
+
+table.invisible
+{
+	margin: 1ex;
+	border-collapse: collapse
+}
+table.invisible td
+{
+	padding: 0ex 1ex;
+}
+td.right
+{
+	text-align: right;
+}
+div#pageFooter {
+	clear: both;
+	background-color: #fff;
+	width: 738px;
+	margin: 0 auto;
+	padding: 0 0 1ex 0;
+}
+p.baseline {
+	border-top: 1px solid #ddd;
+	text-align: center;
+	font-size: 74%;
+	color: #888;
+	padding: 1ex;
+	margin: 0;
+}
+p.baseline a,
+p.baseline a {
+	color: #888;
+	text-decoration: none;
+}
+p.baseline a:hover {
+	text-decoration: underline;
+}
+hr {
+	height: 0;
+	border: 0;
+	border-top: 1px solid #78a;
+}
+
+div#wrapper {
+	width: 740px;
+	margin: 0 auto;
+	padding: 0;
+	box-shadow: 0 0 20px 0 rgba(0,0,0,0.4);
+	border-left: 1px solid #000;
+	border-right: 1px solid #000;
+}
+div#wrapper.wrapper_right .bPosts {
+	border-right: 1px solid #DDD;
+}
+div#wrapper.wrapper_left .bPosts {
+	border-left: 1px solid #DDD;
+}
+
+div.pageHeader {
+	padding: 1ex;
+	border-bottom: 1px solid #000;
+	text-align: center;
+	background: #78a;
+}
+
+div.pageHeader h1 {
+	font-size: 270%;
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+}
+
+div.PageTop ul {
+	background-color: #fff;
+	border-bottom: 1px solid #000;
+	margin: 0 1px;
+	padding: 0;
+	list-style-type:none;
+	padding: .5ex 0;
+}
+div.PageTop ul li {
+	border-right: 1px solid #000;
+	display: inline;
+	padding: .5ex 1em;
+}
+
+div.top_menu ul {
+	background-color: #ddd;
+	margin: 0;
+	padding: 0;
+	list-style-type:none;
+	padding: .5ex 0;
+}
+div.top_menu li {
+	display: inline;
+	padding: .5ex 0 .5ex 1em;
+}
+div.top_menu a {
+	text-decoration: none;
+	color: #000;
+}
+div.top_menu a:hover {
+	text-decoration: underline;
+}
+
+div.PageTop a {
+	font-weight: bold;
+	text-decoration: none;
+}
+div.PageTop a.default {
+	color: #000;
+}
+div.PageTop a.default:hover {
+	text-decoration: underline;
+	color: #9ae;
+}
+div.PageTop a.selected,
+div.PageTop a.selected:visited {
+	color: #78a;
+}
+div.PageTop a.selected:hover {
+	text-decoration: underline;
+	color: #9ae;
+}
+
+.widget_core_coll_tagline {
+	color: #fff;
+	letter-spacing: 4px;
+	text-align: center;
+	vertical-align: middle;
+	border: 0px;
+	padding-right: 6px;
+	padding-top: 6px;
+	padding-bottom: 4px;
+	padding-left: 6px;
+	font: 109% Arial, Helvetica, sans-serif;
+
+}
+
+/* Styles for main area (left) */
+h2 {
+	margin: 1ex;
+	border-bottom: 1px solid #78a;
+}
+
+
+/* Styles for posts */
+.bPosts {
+	float: left;
+	width: 480px;
+	overflow: hidden;
+}
+
+.bPosts_left {
+	float: right;
+}
+
+div.action_messages {
+	margin: 0 2ex;
+}
+.bPost, .bPostpublished
+{
+	clear: both;
+	margin: 0 2.5ex;
+	padding: 0;
+	border-bottom: 1px solid #ddd;
+}
+.bSmallHead {
+	font-size: 80%;
+	color: #999;
+	margin: 2ex 0 1ex 0;
+}
+.bTitle, .bTitle.linked a {
+	color: #78a;
+	margin: 1ex 0;
+}
+.bText {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.bSmallPrint
+{
+	clear: both;
+	color: #999;
+	font-size: 80%;
+	margin: 1ex 0 2ex 0;
+}
+
+input.bComment,
+textarea.bComment
+{
+	background-color: #eee;
+	border: 1px solid #ccc;
+	width: 97%;
+	padding: 2px;
+	margin: 0ex;
+}
+select.bComment  /* Used by the profile form */
+{
+	background-color: #eee;
+	border: 1px solid #ccc;
+	padding: 1px;
+	margin: 0ex;
+}
+
+
+input.submit,
+input.preview,
+input.reset {
+	background-color: #ddd;
+	color: #78a;
+	border: 1px solid #000;
+	font-weight: bold;
+	padding: 1px;
+}
+
+input.submit:hover,
+input.preview:hover {
+	color: #000;
+}
+
+/* Styles for sidebar (right) */
+.bSideBar {
+	width: 258px;
+	float: right;
+	overflow: hidden;
+	border-left: 1px solid #DDD;
+	position: relative;
+	left: -1px;
+}
+
+/* Styles for sidebar (left) */
+.bSideBar_left {
+	float: left;
+	border-left: none;
+	border-right: 1px solid #DDD;
+	left: 1px;
+}
+
+.bSideItem {
+	margin: 2ex;
+	padding: 0 0 2ex 0;
+	border-bottom: 1px solid #ddd;
+}
+
+.bSideItem ul {
+	margin-left: 8px;
+	padding-left: 8px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	list-style-type:square;
+}
+.bSideItem ul ul{
+	margin-left: 8px;
+	padding-left: 8px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.bSideItem form {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.dimmed
+{
+	color: #aaa;
+	font-size: 84%;
+}
+div.compact_search_form input.SearchField
+{
+	background-color: #eee;
+	border: 1px solid #ccc;
+	padding: .5ex;
+	width: 189px;
+	margin: 0 3px 0 0;
+}
+
+/* Special SideItems: */
+.widget_plugin_evo_Calr,
+.widget_core_coll_title,
+.widget_core_coll_longdesc {
+	/* background-color: #fee; */
+	padding: 0;
+	border-bottom: 0;
+}
+.widget_core_coll_title a {
+	text-decoration: none;
+	color: #78a;
+}
+
+/* Calendar: */
+table.bCalendarTable caption {
+	border: 1px solid #ccc;
+	background-color: #eee;
+	border-bottom: 0;
+}
+table.bCalendarTable {
+	border: solid 1px #ccc;
+	border-collapse: separate;
+}
+table.bCalendarTable tfoot td {
+	background-color: #eee;
+	border-top: 1px solid #ccc;
+}
+table.bCalendarTable tfoot a {
+	text-decoration: none;
+}
+table.bCalendarTable tfoot a:hover {
+	background-color: #78a;
+	color: #fff;
+}
+th.bCalendarHeaderCell {
+	color: #abc;
+}
+#bCalendarToday {
+	background-color: #bce;
+}
+
+div.featured_post {
+	margin: 0 2ex;
+	padding: 0 1ex;
+}
+
+textarea#msg_text {
+	width: 100%;
+}
+
+/* jQuery Tokeninput plugin */
+div.input ul.token-input-list-facebook {
+	width: 319px;
+}
+
+/* Not published comments display */
+#styled_content_block .bComment .status_draft,
+#styled_content_block .bComment .status_review,
+#styled_content_block .bComment .status_community,
+#styled_content_block .bComment .status_protected,
+#styled_content_block .bComment .status_private {
+	top: 0px;
+	left: 13px;
+}
+/* Not published posts display */
+#styled_content_block .bSmallHead .status_draft,
+#styled_content_block .bSmallHead .status_review,
+#styled_content_block .bSmallHead .status_community,
+#styled_content_block .bSmallHead .status_protected,
+#styled_content_block .bSmallHead .status_private {
+	top: -13px;
+	left: 5px;
+}
+
+div.tabs div a {
+	border-color: #999;
+}
