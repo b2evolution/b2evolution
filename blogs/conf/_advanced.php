@@ -7,7 +7,7 @@
  *
  * @package conf
  *
- * @version $Id: _advanced.php 6911 2014-06-17 15:35:37Z yura $
+ * @version $Id: _advanced.php 6933 2014-06-19 12:14:51Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -806,8 +806,8 @@ $sendmail_additional_params = '-r $return-address$';
  * The first string is the production (minified URL), the second is the development URL (optional).
  */
 $library_cdn_urls = array(
-		'#jquery#' => array( '//code.jquery.com/jquery-1.11.1.min.js', '//code.jquery.com/jquery-1.11.1.js' ),
-		'#jquery_migrate#' => array( '//code.jquery.com/jquery-migrate-1.2.1.min.js', '//code.jquery.com/jquery-migrate-1.2.1.js' ),
+		//'#jquery#' => array( '//code.jquery.com/jquery-1.11.1.min.js', '//code.jquery.com/jquery-1.11.1.js' ),
+		//'#jquery_migrate#' => array( '//code.jquery.com/jquery-migrate-1.2.1.min.js', '//code.jquery.com/jquery-migrate-1.2.1.js' ),
 		//'#jqueryUI#' => array( '//code.jquery.com/ui/1.10.4/jquery-ui.min.js', '//code.jquery.com/ui/1.10.4/jquery-ui.js' ),
 		//'#jqueryUI_css#' => array( '//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.min.css', '//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css' ),
 		'#bootstrap#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js', '//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.js' ),
@@ -825,11 +825,12 @@ $library_cdn_urls = array(
  * The first string is the production (minified URL), the second is the development URL (optional).
  */
 $library_local_urls = array(
-		'#jquery#' => array( 'jquery.min.js', 'jquery.js' ),
-		'#jquery_migrate#' => array( 'jquery/jquery-migrate.min.js', 'jquery/jquery-migrate.js' ),
+		'#jquery#' => array( 'build/jquery.b2evo.min.js', 'build/jquery.b2evo.js' ),
+# Uncomment the following line if you use official jquery.js and your js code requires the deprecated jquery code that was removed in v1.9.x
+#		'#jquery_migrate#' => array( 'jquery/jquery-migrate.min.js', 'jquery/jquery-migrate.js' ),
 		'#jqueryUI#' => array( 'jquery/jquery.ui.b2evo.min.js', 'jquery/jquery.ui.b2evo.js' ),
 		'#jqueryUI_css#' => array( 'jquery/smoothness/jquery-ui.b2evo.min.css', 'jquery/smoothness/jquery-ui.b2evo.css' ),
-# Uncomment the following line if your plugins need more jQueryUI features than the ones loaded by b2evo:
+# Uncomment the following lines if your plugins need more jQueryUI features than the ones loaded by b2evo:
 #		'#jqueryUI#' => array( 'jquery/jquery.ui.all.min.js', 'jquery/jquery.ui.all.js' ),
 #		'#jqueryUI_css#' => array( 'jquery/smoothness/jquery-ui.css' ),
 		'#bootstrap#' => array( 'bootstrap/bootstrap.min.js', 'bootstrap/bootstrap.js' ),

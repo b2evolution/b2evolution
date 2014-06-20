@@ -52,12 +52,12 @@ jQuery( document ).ready( function()
 	} );
 
 	var debug_ajax_date_start = new Date();
-	jQuery( 'div#debug_ajax_info' ).ajaxStart( function()
-	{	// Save a start time of execution
+	jQuery( document ).ajaxStart( function()
+	{ // Save a start time of execution
 		debug_ajax_date_start = new Date();
 	} );
 
-	jQuery( 'div#debug_ajax_info' ).ajaxSuccess( function( event, request, settings )
+	jQuery( document ).ajaxSuccess( function( event, request, settings )
 	{ // AJAX request is success, Add debug info into the list
 		var debug_ajax_date_end = new Date();
 
@@ -71,20 +71,20 @@ jQuery( document ).ready( function()
 		{
 			log += '<b>response data type</b>: ' + settings.dataType + '<br />';
 		}
-		log += ajax_debug_extract_log( request.responseText, this );
+		log += ajax_debug_extract_log( request.responseText, 'div#debug_ajax_info' );
 
 		ajax_debug_info_add( log );
 	} );
 
-	jQuery( 'div#debug_ajax_info' ).ajaxError( function( event, request, settings, thrownError )
+	jQuery( document ).ajaxError( function( event, request, settings, thrownError )
 	{ // AJAX request is failed, Add debug info into the list
-		jQuery( this ).show();
+		jQuery( 'div#debug_ajax_info' ).show();
 
 		var log = '<h4 class="error">Request ERROR #' + debug_ajax_request_number + ':</h4>';
 		log += '<b>url</b>: ' + settings.url + '<br />';
 		log += '<b>' + settings.type + ' data</b>: ' + settings.data + '<br />';
 		log += '<b>error</b>: <b class="red">' + thrownError + '</b><br />';
-		log += ajax_debug_extract_log( request.responseText, this );
+		log += ajax_debug_extract_log( request.responseText, 'div#debug_ajax_info' );
 
 		ajax_debug_info_add( log );
 	} );

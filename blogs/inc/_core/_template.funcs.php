@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _template.funcs.php 6911 2014-06-17 15:35:37Z yura $
+ * @version $Id: _template.funcs.php 6936 2014-06-19 16:27:57Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -960,10 +960,13 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
 		}
 	}
 
+	/* Yura: Don't require this plugin when it is already concatenated in jquery.b2evo.js
+	 * But we should don't forget it for CDN jQuery file and when js code uses deprecated things of jQuery
 	if( $js_file == '#jquery#' )
 	{ // Dependency : The plugin restores deprecated features and behaviors so that older code will still run properly on jQuery 1.9 and later
 		require_js( '#jquery_migrate#', $relative_to, $async, $output );
 	}
+	 */
 }
 
 
@@ -1065,12 +1068,10 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				// Colorbox: a lightweight Lightbox alternative -- allows zooming on images and slideshows in groups of images
 				// Added by fplanque - (MIT License) - http://colorpowered.com/colorbox/
 				require_js( '#jquery#', $relative_to );
-				require_js( '#touchswipe#', $relative_to );
-				require_js( 'colorbox/jquery.colorbox-min.js', $relative_to );
+				require_js( 'build/jquery.colorbox.b2evo.min.js', $relative_to );
 				require_css( 'colorbox/colorbox.css', $relative_to );
 				if( is_logged_in() )
 				{ // If user is logged in - display a voting panel
-					require_js( 'voting.js', $relative_to );
 					$colorbox_params = ',
 								displayVoting: true,
 								votingUrl: "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=link&'.url_crumb( 'voting' ).'",
@@ -1243,20 +1244,20 @@ function init_bubbletip_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 		return;
 	}
 
+	require_js( '#jquery#', $relative_to );
+
 	switch( $library )
 	{
 		case 'popover':
 			// Use popover library of bootstrap
-			require_js( '#jquery#', $relative_to );
-			require_js( 'bootstrap/usernames.min.js', $relative_to );
+			require_js( 'build/popover_bundle.min.js', $relative_to, true );
 			break;
 
 		case 'bubbletip':
 		default:
 			// Use bubbletip plugin of jQuery
-			require_js( '#jquery#', $relative_to ); // dependency
 			require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
-			require_js( 'bubbletip.js', $relative_to );
+			require_js( 'build/bubbletip_bundle.min.js', $relative_to, true );
 			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
 			break;
 	}
@@ -1279,14 +1280,14 @@ function init_userfields_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 	{
 		case 'popover':
 			// Use popover library of bootstrap
-			require_js( 'bootstrap/userfields.min.js', $relative_to );
+			require_js( 'build/popover_bundle.min.js', $relative_to, true );
 			break;
 
 		case 'bubbletip':
 		default:
 			// Use bubbletip plugin of jQuery
 			require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
-			require_js( 'userfields.js', $relative_to );
+			require_js( 'build/bubbletip_bundle.min.js', $relative_to, true );
 			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
 			break;
 	}
@@ -1301,20 +1302,20 @@ function init_userfields_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
  */
 function init_plugins_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 {
+	require_js( '#jquery#', $relative_to );
+
 	switch( $library )
 	{
 		case 'popover':
 			// Use popover library of bootstrap
-			require_js( '#jquery#', $relative_to );
-			require_js( 'bootstrap/plugins.min.js', $relative_to );
+			require_js( 'build/popover_bundle.min.js', $relative_to, true );
 			break;
 
 		case 'bubbletip':
 		default:
 			// Use bubbletip plugin of jQuery
-			require_js( '#jquery#', $relative_to ); // dependency
 			require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
-			require_js( 'plugins.js', $relative_to );
+			require_js( 'build/bubbletip_bundle.min.js', $relative_to, true );
 			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
 			break;
 	}

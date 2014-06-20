@@ -6,7 +6,7 @@
  *
  * @package evocore
  *
- * @version $Id: _collections.install.php 6907 2014-06-17 11:43:07Z yura $
+ * @version $Id: _collections.install.php 6919 2014-06-18 06:53:52Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -69,7 +69,6 @@ $schema_queries = array_merge( $schema_queries, array(
 			blog_media_subdir    VARCHAR( 255 ) NULL,
 			blog_media_fullpath  VARCHAR( 255 ) NULL,
 			blog_media_url       VARCHAR( 255 ) NULL,
-			blog_UID             VARCHAR(20),
 			blog_type            ENUM( 'std', 'photo', 'group', 'forum', 'manual' ) COLLATE ascii_general_ci DEFAULT 'std' NOT NULL,
 			blog_order           int(11) NULL DEFAULT NULL,
 			blog_favorite        TINYINT(1) NOT NULL DEFAULT 1,
@@ -194,7 +193,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			comment_author             varchar(100) NULL,
 			comment_author_email       varchar(255) COLLATE ascii_general_ci NULL,
 			comment_author_url         varchar(255) NULL,
-			comment_author_IP          varchar(23) COLLATE ascii_general_ci NOT NULL default '',
+			comment_author_IP          varchar(45) COLLATE ascii_general_ci NOT NULL default '',"/* IPv4 mapped IPv6 addresses maximum length is 45 chars: ex. ABCD:ABCD:ABCD:ABCD:ABCD:ABCD:192.168.158.190 */."
 			comment_IP_ctry_ID         int(10) unsigned NULL,
 			comment_date               datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
 			comment_last_touched_ts    TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',

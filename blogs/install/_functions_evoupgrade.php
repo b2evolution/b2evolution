@@ -14,7 +14,7 @@
  *
  * @package install
  *
- * @version $Id: _functions_evoupgrade.php 6907 2014-06-17 11:43:07Z yura $
+ * @version $Id: _functions_evoupgrade.php 6919 2014-06-18 06:53:52Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -4969,6 +4969,36 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_end();
 
 		/*
+		 * ADD UPGRADES FOR i6 BRANCH __ABOVE__ IN THIS BLOCK.
+		 *
+		 * This part will be included in trunk and i6 branches
+		 */
+
+		set_upgrade_checkpoint( '11260' );
+	}
+
+	if( $old_db_version < 11265 )
+	{ // part 16.i trunk aka 12th part of "i6"
+
+		// IPv4 mapped IPv6 addresses maximum length is 45 chars: ex. ABCD:ABCD:ABCD:ABCD:ABCD:ABCD:192.168.158.190
+		task_begin( 'Upgrading comments table...' );
+		$DB->query( "ALTER TABLE T_comments
+			MODIFY comment_author_IP varchar(45) COLLATE ascii_general_ci NOT NULL default ''" );
+		task_end();
+		task_begin( 'Upgrading sessions table...' );
+		$DB->query( "ALTER TABLE T_sessions
+			MODIFY sess_ipaddress VARCHAR(45) COLLATE ascii_general_ci NOT NULL DEFAULT ''" );
+		task_end();
+		task_begin( 'Upgrading hit logs table...' );
+		$DB->query( "ALTER TABLE T_hitlog
+			MODIFY hit_remote_addr VARCHAR(45) COLLATE ascii_general_ci DEFAULT NULL" );
+		task_end();
+
+		task_begin( 'Upgrading blogs table...' );
+		db_drop_col( 'T_blogs', 'blog_UID' );
+		task_end();
+
+		/*
 		 * ADD UPGRADES __ABOVE__ IN THIS BLOCK.
 		 *
 		 * YOU MUST USE:
@@ -4981,7 +5011,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		 * NOTE: every change that gets done here, should bump {@link $new_db_version} (by 100).
 		 */
 
-		// set_upgrade_checkpoint( '11260' );
+		// set_upgrade_checkpoint( '11265' );
 	}
 
 	// Execute general upgrade tasks.

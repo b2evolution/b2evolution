@@ -30,7 +30,7 @@
  *
  * @package evocore
  *
- * @version $Id: _blog.class.php 6832 2014-06-03 05:34:50Z yura $
+ * @version $Id: _blog.class.php 6919 2014-06-18 06:53:52Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -99,7 +99,6 @@ class Blog extends DataObject
 	var $allowblogcss = 0;
 	var $allowusercss = 0;
 	var $in_bloglist = 1;
-	var $UID;
 	var $media_location = 'default';
 	var $media_subdir = '';
 	var $media_fullpath = '';
@@ -212,7 +211,6 @@ class Blog extends DataObject
 			$this->media_subdir = $db_row->blog_media_subdir;
 			$this->media_fullpath = $db_row->blog_media_fullpath;
 			$this->media_url = $db_row->blog_media_url;
-			$this->UID = $db_row->blog_UID;
 			$this->type = isset( $db_row->blog_type ) ? $db_row->blog_type : 'std';
 			$this->order = isset( $db_row->blog_order ) ? $db_row->blog_order : 0;
 			$this->favorite = isset( $db_row->blog_favorite ) ? $db_row->blog_favorite : 0;
