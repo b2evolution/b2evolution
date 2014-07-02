@@ -22,7 +22,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _skin.class.php 7046 2014-07-02 11:41:10Z yura $
+ * @version $Id: _skin.class.php 6956 2014-06-24 06:13:28Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -663,7 +663,7 @@ class Skin extends DataObject
 	function display_init()
 	{
 		// Make sure standard CSS is called ahead of custom CSS generated below:
-		//require_css( 'style.css', true );
+		require_css( 'style.css', true );
 
 		// override this in specific skins...
 	}

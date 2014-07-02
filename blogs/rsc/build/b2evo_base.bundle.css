@@ -246,7 +246,6 @@ a.roundbutton.middle {
 a.roundbutton:hover, a.roundbutton_text:hover {
 	cursor: default;
 	text-decoration: none;
-	color: inherit;
 	background: #d2d2d2;
 	/* Safari 4-5, Chrome 1-9 */
 	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#d2d2d2), to(#a0a0a0));

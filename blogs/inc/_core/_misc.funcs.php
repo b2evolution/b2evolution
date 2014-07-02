@@ -30,7 +30,7 @@
  *
  * @package evocore
  *
- * @version $Id: _misc.funcs.php 7046 2014-07-02 11:41:10Z yura $
+ * @version $Id: _misc.funcs.php 7027 2014-07-01 06:23:23Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -4148,14 +4148,12 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 						// Use glyph icons of bootstrap
 						$icon_class_prefix = 'glyphicon glyphicon-';
 						$icon_param_name = 'glyph';
-						$icon_content = '&nbsp;';
 						break;
 
 					case 'fontawesome':
 						// Use the icons from http://fortawesome.github.io/Font-Awesome/icons/
 						$icon_class_prefix = 'fa fa-';
 						$icon_param_name = 'fa';
-						$icon_content = '';
 						break;
 				}
 			}
@@ -4192,7 +4190,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 				// Add all the attributes:
 				$params = get_field_attribs_as_string( $params, false );
 
-				$r = '<span'.$params.'>'.$icon_content.'</span>';
+				$r = '<span'.$params.'>&nbsp;</span>';
 			}
 			elseif( ! isset( $icon['file'] ) )
 			{ // Use span tag with sprite instead of img
