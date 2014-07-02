@@ -61,7 +61,6 @@ require_js( 'ajax.js' );	// Functions to work with AJAX response data
 
 	add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
 	init_bubbletip_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) ); // Init popover windows for usernames
-	init_scrollwide_js(); // Add jQuery Wide Scroll JS plugin to horizontal scroll "div.wide_scroll" by yellow right/left panel arrows
 	init_results_js(); // Add functions to work with Results tables
 
 	require_js( 'form_extensions.js'); // script allowing to check and uncheck all boxes in forms -- TODO: jQueryfy
@@ -69,6 +68,7 @@ require_js( 'ajax.js' );	// Functions to work with AJAX response data
 	require_js( 'extracats.js' );
 	require_js( 'dynamic_select.js' );
 	require_js( 'admin.js' );
+	require_js( 'backoffice.js' );
 
 
 	global $UserSettings;

@@ -42,9 +42,11 @@ class html5_mediaelementjs_plugin extends Plugin
 	{
 		global $Blog;
 
-		require_css( $this->get_plugin_url().'rsc/mediaelementplayer.min.css', 'relative' );
+		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
+
+		require_css( '#mediaelement_css#', $relative_to );
 		require_js( '#jquery#', 'blog' );
-		require_js( $this->get_plugin_url().'rsc/mediaelement-and-player.min.js', 'relative' );
+		require_js( '#mediaelement#', $relative_to );
 		$this->require_skin();
 
 		// Set a video size in css style, because option setting cannot sets correct size

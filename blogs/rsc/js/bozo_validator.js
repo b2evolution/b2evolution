@@ -3,7 +3,7 @@
  * on a link which will result in potential data input loss
  * Tested on Firefox (XP & Mac OSX) , IE6 (XP), Safari (Mac OSX)
  * b2evolution - http://b2evolution.net/
- * @version $Id: bozo_validator.js 9 2011-10-24 22:32:00Z fplanque $
+ * @version $Id: bozo_validator.js 6972 2014-06-24 19:12:29Z yura $
  */
 var bozo_confirm_mess;
 
@@ -140,6 +140,6 @@ var bozo = {
 }
 
 // Init Bozo validator when the window is loaded:
-addEvent( window, 'load', bozo.init, false );
+jQuery( document ).bind( "ready", bozo.init );
 // Note: beforeunload is a "very special" event and cannot be added with addEvent:
 window.onbeforeunload = bozo.validate_close;

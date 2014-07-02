@@ -188,7 +188,7 @@ class user_login_Widget extends ComponentWidget
 		$transmit_hashed_password = (bool)$Settings->get('js_passwd_hashing') && !(bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
 		if( $transmit_hashed_password )
 		{ // Include JS for client-side password hashing:
-			require_js( 'sha1_md5.js', 'blog' );
+			require_js( 'build/sha1_md5.bmin.js', 'blog' );
 		}
 	}
 

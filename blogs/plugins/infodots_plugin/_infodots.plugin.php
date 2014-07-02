@@ -10,7 +10,7 @@
  *
  * @package plugins
  *
- * @version $Id: _infodots.plugin.php 6342 2014-03-26 11:24:45Z yura $
+ * @version $Id: _infodots.plugin.php 6963 2014-06-24 11:53:01Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -88,6 +88,15 @@ class infodots_plugin extends Plugin
 	 */
 	function init_html_head( $relative_to )
 	{
+		global $Blog;
+
+		if( ! isset( $Blog ) || (
+		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' && 
+		    $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) == 'never' ) )
+		{ // Don't load css/js files when plugin is not enabled
+			return;
+		}
+
 		require_css( $this->get_plugin_url( true ).'infodots.css', $relative_to );
 
 		// Bubbletip
@@ -141,7 +150,7 @@ class infodots_plugin extends Plugin
 	/**
 	 * @see Plugin::SkinBeginHtmlHead()
 	 */
-	function SkinBeginHtmlHead(  )
+	function SkinBeginHtmlHead()
 	{
 		$this->init_html_head( 'blog' );
 	}

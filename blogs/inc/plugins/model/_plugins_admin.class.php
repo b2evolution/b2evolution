@@ -21,7 +21,7 @@
  *
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _plugins_admin.class.php 6796 2014-05-28 16:03:16Z yura $
+ * @version $Id: _plugins_admin.class.php 6983 2014-06-25 12:10:42Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -939,8 +939,8 @@ class Plugins_admin extends Plugins
 			{ // Already set to same value
 				return true;
 			}
-			else
-			{
+			else if( $this->index_code_ID[$code] > 0 )
+			{ // If code exists in DB for another plugin
 				return T_( 'The plugin code is already in use by another plugin.' );
 			}
 		}
@@ -961,15 +961,33 @@ class Plugins_admin extends Plugins
 			$this->index_code_Plugins[$code] = & $Plugin;
 		}
 
+		if( $Plugin->code == $code )
+		{ // Don't update if code has not been changed
+			return false;
+		}
+
+		$old_code = $Plugin->code;
+
+		$DB->begin();
+
 		// Update references to code:
+		// Widgets
+		$DB->query( 'UPDATE T_widget
+			  SET wi_code = '.$DB->quote( $code ).'
+			WHERE wi_code = '.$DB->quote( $old_code ) );
+
 		// TODO: dh> we might want to update item renderer codes and blog ping plugin codes here! (old code=>new code)
 
 		$Plugin->code = $code;
 
-		return $DB->query( '
-			UPDATE T_plugins
-			  SET plug_code = '.$DB->quote($code).'
+		// Update the plugin code
+		$result = $DB->query( 'UPDATE T_plugins
+			  SET plug_code = '.$DB->quote( $code ).'
 			WHERE plug_ID = '.$plugin_ID );
+
+		$DB->commit();
+
+		return $result;
 	}
 
 

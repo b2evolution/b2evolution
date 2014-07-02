@@ -1,38 +1,23 @@
 /**
+ * This file is DEPRECATED. It is left here only so that old plugins can load the functions they need for their toolbars
+ *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
- * @version $Id: functions.js 6888 2014-06-12 12:20:37Z yura $
+ * @version $Id: functions.js 6976 2014-06-25 07:08:15Z yura $
  */
-
-
-/**
- * Cross browser event handling for IE5+, NS6+ an Mozilla/Gecko
- * @obsolete Use jQuery instead
- * @author Scott Andrew
- */
-function addEvent( elm, evType, fn, useCapture )
-{
-	if( elm.addEventListener )
-	{ // Standard & Mozilla way:
-		elm.addEventListener( evType, fn, useCapture );
-		return true;
-	}
-	else if( elm.attachEvent )
-	{ // IE way:
-		var r = elm.attachEvent( 'on'+evType, fn );
-		return r;
-	}
-	else
-	{ // "dirty" way (IE Mac for example):
-		// Will overwrite any previous handler! :((
-		elm['on'+evType] = fn;
-		return false;
-	}
-}
 
 
 /**
  * Opens a window, centers it and makes sure it gets focus.
+ *
+ * Used to open popup window in BACK-office and FRONT-office:
+ *  - _cronjob_list.view.php: ctrl=crontab, to execute cronjob in new window
+ *  - _file.class.php: for url of file view
+ *  - _file_list.inc.php: to open directory
+ *  - _item.class.php: to open feedbacks ( FRONT-office only in skin "Photoblog" 
+ *                                         when skin setting "Comments display" == "In a popup window"(by default)
+ *                                         or it may be used by 3rd party skin)
+ *  - system.ctrl.php: to view phpinfo
  */
 function pop_up_window( href, target, width, height, params )
 {
@@ -76,50 +61,6 @@ function pop_up_window( href, target, width, height, params )
 }
 
 
-/**
- * Open or close a clickopen area (by use of CSS style).
- *
- * You have to define a div with id clickdiv_<ID> and a img with clickimg_<ID>,
- * where <ID> is the first param to the function.
- *
- * @param string html id of the element to toggle
- * @param string CSS display property to use when visible ('inline', 'block')
- * @return false
- */
-function toggle_clickopen( id, hide, displayVisible )
-{
-	if( !( clickdiv = document.getElementById( 'clickdiv_'+id ) )
-			|| !( clickimg = document.getElementById( 'clickimg_'+id ) ) )
-	{
-		alert( 'ID '+id+' not found!' );
-		return false;
-	}
-
-	if( typeof(hide) == 'undefined' )
-	{
-		hide = document.getElementById( 'clickdiv_'+id ).style.display != 'none';
-	}
-
-	if( typeof(displayVisible) == 'undefined' )
-	{
-		displayVisible = ''; // setting it to "empty" is the default for an element's display CSS attribute
-	}
-
-	if( hide )
-	{
-		clickdiv.style.display = 'none';
-		clickimg.style.backgroundPosition = bgxy_expand;
-	}
-	else
-	{
-		clickdiv.style.display = displayVisible;
-		clickimg.style.backgroundPosition = bgxy_collapse;
-	}
-
-	return false;
-}
-
-
 // deprecated but left for old plugins:
 function textarea_replace_selection( myField, snippet, target_document )
 {
@@ -128,6 +69,12 @@ function textarea_replace_selection( myField, snippet, target_document )
 
 /**
  * Textarea insertion code.
+ *
+ * Used on FRONT-office (EDITING) and BACK-office in the following files:
+ *  - By each plugin that works with textarea content of post or comment, to insert a code inside content by click event of toolbar button
+ *  - upload.ctrl.php: ???
+ *  - _file_list.inc.php: ???
+ *  - links.js: to insert inline tag like this [image:123:caption text]
  *
  * @var element
  * @var text
@@ -252,6 +199,9 @@ function textarea_wrap_selection( myField, before, after, replace, target_docume
  * You have to define a div with id clickdiv_<ID> and a img with clickimg_<ID>,
  * where <ID> is the first param to the function.
  *
+ * Used to expand/collapse a filter area of Results table on FRONT-office and BACK-office in the following files:
+ *  - _uiwidget.class.php
+ *
  * @param string html id of the element to toggle
  * @return false
  */
@@ -368,61 +318,10 @@ var b2evo_Callbacks = new b2evo_Callbacks();
 
 
 /**
- * Fades the relevant object to provide feedback, in case of success.
- * @param jQuery selector
- */
-function evoFadeSuccess( selector )
-{
-	evoFadeBg(selector, new Array("#ddff00", "#bbff00"));
-}
-
-
-/**
- * Fades the relevant object to provide feedback, in case of failure.
- * @param jQuery selector
- */
-function evoFadeFailure( selector )
-{
-	evoFadeBg(selector, new Array("#9300ff", "#ff000a", "#ff0000"));
-}
-
-
-/**
- * Fades the relevant object to provide feedback, in case of highlighting
- * e.g. for items the file manager get called for ("#fm_highlighted").
- * @param jQuery selector
- */
-function evoFadeHighlight( selector )
-{
-	evoFadeBg(selector, new Array("#ffbf00", "#ffe79f"));
-}
-
-
-/**
- * Fade jQuery selector via backgrounds colors (bgs), back to original background
- * color and then remove any styles (from animations and others)
+ * Initialize onclick event for each button with attribute "data-func"
  *
- * @param string|jQuery
- * @param Array
- * @param object Options ("speed")
+ * Used only by plugins for toolbar buttons. FRONT-office and BACK-office.
  */
-function evoFadeBg( selector, bgs, options )
-{
-	var origBg = jQuery(selector).css("backgroundColor");
-	var speed = options && options.speed || "slow";
-
-	var toEval = 'jQuery(selector).animate({ backgroundColor: ';
-	for( e in bgs )
-	{
-		toEval += '"'+bgs[e]+'"'+'}, "'+speed+'" ).animate({ backgroundColor: ';
-	}
-	toEval += 'origBg },"'+speed+'", "", function(){jQuery( this ).removeAttr( "style" );});';
-
-	eval(toEval);
-}
-
-
-// Initialize onclick event for each button with attribute "data-func"
 jQuery( document ).ready( function()
 {
 	jQuery( '[data-func]' ).each( function()

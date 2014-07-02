@@ -57,6 +57,15 @@ class star_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead()
 	{
+		global $Blog;
+
+		if( ! isset( $Blog ) || (
+		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' && 
+		    $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) == 'never' ) )
+		{ // Don't load css/js files when plugin is not enabled
+			return;
+		}
+
 		require_css( $this->get_plugin_url( true ).'star.css', 'blog' );
 	}
 

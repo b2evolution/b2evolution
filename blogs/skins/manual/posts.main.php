@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage manual
  *
- * @version $Id: posts.main.php 6719 2014-05-19 13:52:07Z yura $
+ * @version $Id: posts.main.php 7000 2014-06-27 09:20:40Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -223,7 +223,7 @@ skin_include( '_left_navigation_bar.inc.php' );
 			// ----------------------------END ITEM BLOCK  ----------------------------
 		}
 
-		$sub_chapters = $Skin->get_chapters( $Blog->ID, $cat );
+		$sub_chapters = $Skin->get_chapters( $cat );
 
 		if( $chapters_items_mode != 'order' && count( $sub_chapters ) > 0 )
 		{	// Display subchapters

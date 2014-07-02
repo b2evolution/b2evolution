@@ -15,7 +15,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _item_list_full.view.php 6894 2014-06-13 09:56:09Z yura $
+ * @version $Id: _item_list_full.view.php 7036 2014-07-01 18:05:24Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -37,12 +37,7 @@ global $action, $dispatcher, $blog, $posts, $poststart, $postend, $ReqURI;
 global $edit_item_url, $delete_item_url, $htsrv_url, $p, $dummy_fields;
 global $comment_allowed_tags;
 
-if( $highlight = param( 'highlight', 'integer', NULL ) )
-{ // There are lines we want to highlight:
-	require_js( 'fadeout.js', 'rsc_url', false, true );
-	echo '<script type="text/javascript">addEvent( window, "load", Fat.fade_all, false);</script>';
-}
-
+$highlight = param( 'highlight', 'integer', NULL );
 
 // Run the query:
 $ItemList->query();
@@ -294,7 +289,8 @@ while( $Item = & $ItemList->get_item() )
 			$Item->edit_link( array( // Link to backoffice for editing
 					'before' => '',
 					'after'  => '',
-					'class'  => button_class( 'text' )
+					'class'  => button_class( 'text' ),
+					'text'   => get_icon( 'edit_button' ).' '.T_('Edit...')
 				) );
 
 			// Display copy button if current user has the rights:

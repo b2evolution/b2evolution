@@ -7,7 +7,7 @@
  *
  * @package conf
  *
- * @version $Id: _advanced.php 6933 2014-06-19 12:14:51Z yura $
+ * @version $Id: _advanced.php 6956 2014-06-24 06:13:28Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -813,9 +813,15 @@ $library_cdn_urls = array(
 		'#bootstrap#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js', '//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.js' ),
 		'#bootstrap_css#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css', '//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.css' ),
 		'#bootstrap_theme_css#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css', '//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.css' ),
+		// The following are other possible public shared CDNs we are aware of
+		// but it is not clear whether or not they are:
+		// - Future proof (will they continue to serve old versions of the library in the future?)
+		// - Secure (who guarantees the code is genuine?)
 		//'#bootstrap_typeahead#' => array( '//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.10.1/typeahead.bundle.min.js', '//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.10.1/typeahead.bundle.js' ),
 		//'#scrollto#' => array( '//cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/1.4.2/jquery.scrollTo.min.js' ),
 		//'#touchswipe#' => array( '//cdn.jsdelivr.net/jquery.touchswipe/1.6.5/jquery.touchSwipe.min.js', '//cdn.jsdelivr.net/jquery.touchswipe/1.6.5/jquery.touchSwipe.js' ),
+		//'#mediaelement#' => array( '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/js/mediaelement-and-player.min.js', '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/js/mediaelement-and-player.js' ),
+		//'#mediaelement_css#' => array( '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.min.css', '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.css' ),
 	);
 
 /**
@@ -825,7 +831,7 @@ $library_cdn_urls = array(
  * The first string is the production (minified URL), the second is the development URL (optional).
  */
 $library_local_urls = array(
-		'#jquery#' => array( 'build/jquery.b2evo.min.js', 'build/jquery.b2evo.js' ),
+		'#jquery#' => array( 'build/jquery.bmin.js', 'build/jquery.bundle.js' ),
 # Uncomment the following line if you use official jquery.js and your js code requires the deprecated jquery code that was removed in v1.9.x
 #		'#jquery_migrate#' => array( 'jquery/jquery-migrate.min.js', 'jquery/jquery-migrate.js' ),
 		'#jqueryUI#' => array( 'jquery/jquery.ui.b2evo.min.js', 'jquery/jquery.ui.b2evo.js' ),
@@ -839,6 +845,8 @@ $library_local_urls = array(
 		'#bootstrap_typeahead#' => array( 'bootstrap/typeahead.bundle.min.js', 'bootstrap/typeahead.bundle.js' ),
 		'#scrollto#' => array( 'jquery/jquery.scrollto.js' ),
 		'#touchswipe#' => array( 'jquery/jquery.touchswipe.min.js', 'jquery/jquery.touchswipe.js' ),
+		'#mediaelement#' => array( 'mediaelement/mediaelement-and-player.min.js', 'mediaelement/mediaelement-and-player.js' ),
+		'#mediaelement_css#' => array( 'mediaelement/mediaelementplayer.min.css', 'mediaelement/mediaelementplayer.css' ),
 	);
 
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----

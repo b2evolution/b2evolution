@@ -1,7 +1,7 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
- * @version $Id: bubbletip.js 2587 2012-12-03 06:17:26Z yura $
+ * @version $Id: bubbletip.js 6989 2014-06-26 05:10:11Z yura $
  */
 
 jQuery( document ).ready(function()
@@ -35,7 +35,7 @@ jQuery( document ).ready(function()
 
 			jQuery( 'body' ).append( '<div id="' + div_bubbletip_ID + '" style="display:none;"></div>' );
 
-			var bubbletip_params = { showOnInit: true, deltaShift: 2, delayHide: 1 };
+			var bubbletip_params = { showOnInit: true, deltaShift: 0, delayHide: 1 };
 			if( jQuery( '#' + div_cache_ID ).length == 0 )
 			{	// Create a div for cache user data
 				jQuery( 'body' ).append( '<div id="' + div_cache_ID + '" style="display:none;"></div>' );
