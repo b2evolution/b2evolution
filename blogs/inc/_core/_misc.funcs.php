@@ -30,7 +30,7 @@
  *
  * @package evocore
  *
- * @version $Id: _misc.funcs.php 6894 2014-06-13 09:56:09Z yura $
+ * @version $Id: _misc.funcs.php 7046 2014-07-02 11:41:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -4028,10 +4028,10 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 		case 'rollover':
 			if( isset( $icon['rollover'] ) )
 			{ // Image has rollover available
-				global $use_glyphicons;
+				global $b2evo_icons_type;
 
-				if( ! empty( $use_glyphicons ) && ! empty( $icon['glyph'] ) )
-				{ // Glyph icons don't have rollover effect
+				if( isset( $b2evo_icons_type ) && ( ! empty( $icon['glyph'] ) || ! empty( $icon['fa'] ) ) )
+				{ // Glyph and font-awesome icons don't have rollover effect
 					return false;
 				}
 				return $icon['rollover'];
@@ -4138,17 +4138,37 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 
 
 		case 'imgtag':
-			global $use_glyphicons;
+			global $b2evo_icons_type;
 
-			if( ! empty( $use_glyphicons ) && ! empty( $icon['glyph'] ) )
+			if( isset( $b2evo_icons_type ) )
+			{ // Specific icons type is defined
+				switch( $b2evo_icons_type )
+				{
+					case 'glyphicons':
+						// Use glyph icons of bootstrap
+						$icon_class_prefix = 'glyphicon glyphicon-';
+						$icon_param_name = 'glyph';
+						$icon_content = '&nbsp;';
+						break;
+
+					case 'fontawesome':
+						// Use the icons from http://fortawesome.github.io/Font-Awesome/icons/
+						$icon_class_prefix = 'fa fa-';
+						$icon_param_name = 'fa';
+						$icon_content = '';
+						break;
+				}
+			}
+
+			if( isset( $icon_class_prefix ) && ! empty( $icon[ $icon_param_name ] ) )
 			{ // Use glyph icon if it is defined in icons config
 				if( isset( $params['class'] ) )
 				{ // Get class from params
-					$params['class'] = 'glyphicon glyphicon-'.$icon['glyph'].' '.$params['class'];
+					$params['class'] = $icon_class_prefix.$icon[ $icon_param_name ].' '.$params['class'];
 				}
 				else
 				{ // Set default class
-					$params['class'] = 'glyphicon glyphicon-'.$icon['glyph'];
+					$params['class'] = $icon_class_prefix.$icon[ $icon_param_name ];
 				}
 
 				if( isset( $icon['color'] ) )
@@ -4172,7 +4192,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 				// Add all the attributes:
 				$params = get_field_attribs_as_string( $params, false );
 
-				$r = '<span'.$params.'>&nbsp;</span>';
+				$r = '<span'.$params.'>'.$icon_content.'</span>';
 			}
 			elseif( ! isset( $icon['file'] ) )
 			{ // Use span tag with sprite instead of img

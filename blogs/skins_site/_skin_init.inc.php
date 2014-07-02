@@ -5,7 +5,7 @@
  *
  * @package site_skins
  *
- * @version $Id: _skin_init.inc.php 6245 2014-03-18 08:00:23Z yura $
+ * @version $Id: _skin_init.inc.php 7043 2014-07-02 08:35:45Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

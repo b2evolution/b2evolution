@@ -4,7 +4,7 @@
  *
  * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
  *
- * @version $Id: _process_hitlog.job.php 6175 2014-03-13 09:06:01Z attila $
+ * @version $Id: _process_hitlog.job.php 7043 2014-07-02 08:35:45Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

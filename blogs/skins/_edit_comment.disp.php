@@ -13,7 +13,7 @@
  *
  * @package evoskins
  *
- * @version $Id: _edit_comment.disp.php 6508 2014-04-18 04:47:50Z yura $
+ * @version $Id: _edit_comment.disp.php 7043 2014-07-02 08:35:45Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

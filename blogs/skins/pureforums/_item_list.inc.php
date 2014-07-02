@@ -12,7 +12,7 @@
  * @package evoskins
  * @subpackage pureforums
  *
- * @version $Id: _item_list.inc.php 6803 2014-05-29 07:52:32Z yura $
+ * @version $Id: _item_list.inc.php 7043 2014-07-02 08:35:45Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

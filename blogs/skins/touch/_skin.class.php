@@ -88,26 +88,16 @@ class touch_Skin extends Skin
 		parent::display_init();
 
 		// Add CSS:
-		// fp> Note: having those here should allow
-		// 1) Requesting them earlier as if they are @import'ed
-		// 2) Allow bundling
-		// fp> I am not 100% sure though. Comments welcome :)
-		/*require_css( 'basic_styles.css', 'blog' ); // the REAL basic styles
+		require_css( 'basic_styles.css', 'blog' ); // the REAL basic styles
 		require_css( 'basic.css', 'blog' ); // Basic styles
-		require_css( 'blog_base.css', 'blog' ); // Default styles for the blog navigation
-		require_css( 'item_base.css', 'blog' ); // Default styles for the post CONTENT
-		require_css( 'item.css', 'relative' );
-		require_css( 'style.css', 'relative' );*/
+
+		require_css( 'style.css', 'relative' );
 
 		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
 		if( $this->get_setting( 'colorbox' ) )
 		{
 			require_js_helper( 'colorbox', 'blog' );
 		}
-
-		require_css( 'basic_styles.css', 'blog' ); // the REAL basic styles
-		require_css( 'basic.css', 'blog' ); // Basic styles
-		require_css( 'style.css', 'relative' );
 
 		add_js_headline( 'var touch_skin_switch_confirm_text = "'.TS_( 'Switch to regular view? \n \n You can switch back again in the footer.' ).'";' );
 		require_js( 'js/core.js', 'relative' );
