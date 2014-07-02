@@ -13,6 +13,7 @@
 */
 ; (function($) {
 	var bindIndex = 0;
+	var bubbletipZIndex = 1000;
 	$.fn.extend({
 		bubbletip: function(tip, options) {
 			// check to see if the tip is a descendant of 
@@ -225,7 +226,10 @@
 					}
 				}
 				_isHiding = false;
+				_this.css('z-index', bubbletipZIndex+1);
 				_this.css('position', 'relative');
+				_wrapper.css('z-index', bubbletipZIndex);
+				bubbletipZIndex++;
 				_wrapper.show();
 				animation = $.extend(animation, { 'opacity': 1 });
 				_wrapper.animate(animation, _options.animationDuration, _options.animationEasing, function() {

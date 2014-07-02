@@ -32,7 +32,7 @@
  * @author tswicegood: Travis SWICEGOOD.
  * @author vegarg: Vegar BERG GULDAL.
  *
- * @version $Id: _item.funcs.php 6956 2014-06-24 06:13:28Z yura $
+ * @version $Id: _item.funcs.php 6813 2014-05-30 03:35:02Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -65,7 +65,7 @@ function init_MainList( $items_nb_limit )
 					) );
 			}
 			elseif( $disp == 'search' )
-			{ // Exclude 'sidebar' and reserved post types from search
+			{ // Exclude search from 'sidebar' type posts and from reserved type with ID 5000
 				global $posttypes_perms;
 				$filter_post_types = isset( $posttypes_perms['sidebar'] ) ? $posttypes_perms['sidebar'] : array();
 				$filter_post_types = array_merge( $filter_post_types, array( 5000 ) );

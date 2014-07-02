@@ -22,8 +22,7 @@ $params = array_merge( array(
 	'body_class'    => NULL,
 ), $params );
 
-// fp> I am removing this because it forces all skins to include a style.css file which we don't necessarily want.
-// require_css( 'style.css', 'relative' );
+require_css( 'style.css', 'relative' );
 
 // The following is temporary and should be moved to some SiteSkin class
 siteskin_init();

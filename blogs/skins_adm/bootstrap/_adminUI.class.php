@@ -78,9 +78,9 @@ class AdminUI extends AdminUI_general
 				'before_message' => '<button class="close" data-dismiss="alert">&times;</button>',
 			) );
 
-		// Use glyph icons, @see get_icon()
-		global $b2evo_icons_type;
-		$b2evo_icons_type = 'glyphicons';
+		// Set this var to TRUE in order to use glyph icons, @see get_icon()
+		global $use_glyphicons;
+		$use_glyphicons = true;
 	}
 
 

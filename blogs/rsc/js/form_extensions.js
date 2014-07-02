@@ -1,7 +1,7 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
- * @version $Id: form_extensions.js 6972 2014-06-24 19:12:29Z yura $
+ * @version $Id: form_extensions.js 5810 2014-01-27 12:50:22Z yura $
  */
 
 
@@ -177,22 +177,18 @@ function init_check_all()
 	for( var i=0; i < check_links.length ; i++ )
 	{
 		var link = check_links[i];
-		jQuery( link ).bind( {
-			click: check_all,
-			mouseover: surround_unchecked,
-			mouseout: unsurround_all
-		} );
+		addEvent( link, 'click', check_all, false );
+		addEvent( link, 'mouseover', surround_unchecked, false );
+		addEvent( link, 'mouseout', unsurround_all, false );
 	}
 	// Add click event on all un_check_all links
 	var uncheck_links = document.getElementsByName('uncheck_all_nocheckchanges')
 	for( var i=0; i < uncheck_links.length ; i++ )
 	{
 		var link = uncheck_links[i];
-		jQuery( link ).bind( {
-			click: uncheck_all,
-			mouseover: surround_checked,
-			mouseout: unsurround_all
-		} );
+		addEvent( link, 'click', uncheck_all, false );
+		addEvent( link, 'mouseover', surround_checked, false );
+		addEvent( link, 'mouseout', unsurround_all, false );
 	}
 }
 
@@ -307,22 +303,22 @@ function input_decorated_help( id, hvalue )
 			}
 		}
 
-	jQuery( elm ).bind( 'blur', onblur );
+	addEvent( elm, 'blur', onblur, false );
 
-	jQuery( elm ).bind( 'focus', function() {
+	addEvent( elm, 'focus', function() {
 			elm.style.color = '';
 
 			if( elm.value == hvalue )
 				elm.value = '';
-		} );
+		}, false );
 
 	/* on form's submit: set to empty, if help value */
-	jQuery( elm.form ).bind( 'submit', function() {
+	addEvent( elm.form, 'submit', function() {
 			if( elm.value == hvalue )
 			{
 				elm.value = '';
 			}
-		} );
+		}, false );
 
 	// init:
 	onblur();

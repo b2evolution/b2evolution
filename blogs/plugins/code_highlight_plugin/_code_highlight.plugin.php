@@ -27,7 +27,7 @@
  * @author Yabba: Paul Jones - {@link http://astonishme.co.uk/}
  * @author Stk: Scott Kimler - {@link http://astonishme.co.uk/}
  *
- * @version $Id: _code_highlight.plugin.php 6963 2014-06-24 11:53:01Z yura $
+ * @version $Id: _code_highlight.plugin.php 6888 2014-06-12 12:20:37Z yura $
  */
 
 /**
@@ -577,14 +577,9 @@ class code_highlight_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead()
 	{
-		global $Blog;
-
-		if( ! isset( $Blog ) || (
-		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' && 
-		    $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) == 'never' ) )
-		{ // Don't load css/js files when plugin is not enabled
-			return;
-		}
+		add_css_headline( '/* AstonishMe code plugin styles */'
+			.'.amc0,.amc1,.amc2,.amc3,.amc4,.amc5,.amc6,.amc7,.amc8,.amc9 {'
+			.'background:url('.$this->get_plugin_url().'img/numbers.gif) no-repeat; }' );
 
 		require_css( $this->get_plugin_url().'amcode.css', true );
 	}

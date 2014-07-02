@@ -1,5 +1,4 @@
 /*
- * password strength estimation library
  * Copyright (c) 2012 Dropbox, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining

@@ -793,8 +793,3 @@ span.note.status_draft span {
 .dashboard_post {
 	min-height: 70px;
 }
-
-/* Dashboard */
-@media (max-width: 800px) {
-	div.browse_side_item { margin-left: 0; }
-}

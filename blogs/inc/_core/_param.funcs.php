@@ -38,7 +38,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _param.funcs.php 6956 2014-06-24 06:13:28Z yura $
+ * @version $Id: _param.funcs.php 6836 2014-06-03 12:09:52Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -2275,8 +2275,7 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 	if( $use_balanceTags )
 	{ // Auto close open tags:
 		if( strpos( $content, '<code' ) !== false || strpos( $content, '<pre' ) !== false || strpos( $content, '```' ) !== false )
-		{ // Call balance_tags() on everything outside code/pre in order to don't close the opened tags inside code blocks
-		  // For example, to don't add '</b>' in the content '<code><b> - bold text example</code>'
+		{ // Call balance_tags() on everything outside code/pre:
 			$content = callback_on_non_matching_blocks( $content,
 					'~(<(code|pre)[^>]*>.*?</\2>|```.*?```)~is',
 					'balance_tags' );

@@ -32,7 +32,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
- * @version $Id: _generic_recursive_listeditor.php 6972 2014-06-24 19:12:29Z yura $
+ * @version $Id: _generic_recursive_listeditor.php 6135 2014-03-08 07:54:05Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -293,6 +293,11 @@ switch( $action )
 		$AdminUI->disp_payload_end();
 		break;
 }
+
+
+// Fadeout javascript
+echo '<script type="text/javascript" src="'.$rsc_url.'js/fadeout.js"></script>';
+echo '<script type="text/javascript">addEvent( window, "load", Fat.fade_all, false);</script>';
 
 
 // End payload block:

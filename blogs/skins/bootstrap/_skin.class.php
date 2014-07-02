@@ -85,17 +85,15 @@ class bootstrap_Skin extends Skin
 
 		require_js( '#jquery#', 'blog' );
 
-		// Use glyph icons, @see get_icon()
-		global $b2evo_icons_type;
-		$b2evo_icons_type = 'glyphicons';
+		// Set this var to TRUE in order to use glyph icons, @see get_icon()
+		global $use_glyphicons;
+		$use_glyphicons = true;
 
 		// Add CSS:
-		// require_css( 'basic_styles.css', 'blog' ); // the REAL basic styles
-		// require_css( 'basic.css', 'blog' ); // Basic styles
-		// require_css( 'blog_base.css', 'blog' ); // Default styles for the blog navigation
-		// require_css( 'item_base.css', 'blog' ); // Default styles for the post CONTENT
-		// require_css( 'b2evo_base.bundle.css', 'blog' ); // Concatenation of the above
-		require_css( 'b2evo_base.bmin.css', 'blog' ); // Concatenation + Minifaction of the above
+		require_css( 'basic_styles.css', 'blog' ); // the REAL basic styles
+		require_css( 'basic.css', 'blog' ); // Basic styles
+		require_css( 'blog_base.css', 'blog' ); // Default styles for the blog navigation
+		require_css( 'item_base.css', 'blog' ); // Default styles for the post CONTENT
 
 		require_js( '#bootstrap#', 'blog' );
 		require_css( '#bootstrap_css#', 'blog' );

@@ -7,7 +7,6 @@
 jQuery( document ).ready(function()
 {
 	/** Init bubbletip for help icon of plugins **/
-	// fp>yura: is this backoffice only?
 
 	var plugin_number = 1;
 	jQuery( 'a.help_plugin_icon' ).mouseover( function()
@@ -38,7 +37,7 @@ jQuery( document ).ready(function()
 		jQuery( this ).bubbletip( tip, {
 				showOnInit: true,
 				deltaDirection: direction,
-				deltaShift: 0,
+				deltaShift: 3,
 			} );
 
 		// Add this class to avoid of the repeating of init bubbletip

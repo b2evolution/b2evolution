@@ -22,7 +22,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _skin.funcs.php 7021 2014-06-30 12:48:39Z yura $
+ * @version $Id: _skin.funcs.php 6911 2014-06-17 15:35:37Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -131,6 +131,7 @@ function skin_init( $disp )
 			init_ajax_forms( 'blog' ); // auto requires jQuery
 			init_ratings_js( 'blog' );
 			init_voting_comment_js( 'blog' );
+			init_scrollwide_js( 'blog' ); // Add jQuery Wide Scroll JS plugin to horizontal scroll "div.wide_scroll" by yellow right/left panel arrows
 			if( $Blog->get_setting( 'allow_rating_comment_helpfulness' ) )
 			{ // Load jquery UI to animate background color on change comment status or on vote
 				require_js( '#jqueryUI#', 'blog' );
@@ -240,6 +241,7 @@ function skin_init( $disp )
 			$GLOBALS['download_Item'] = & $Item;
 
 			init_ajax_forms( 'blog' ); // auto requires jQuery
+			init_scrollwide_js( 'blog' ); // Add jQuery Wide Scroll JS plugin to horizontal scroll "div.wide_scroll" by yellow right/left panel arrows
 
 			// Initialize JavaScript to download file after X seconds
 			add_js_headline( '
@@ -274,6 +276,7 @@ var downloadInterval = setInterval( function()
 
 		case 'posts':
 			init_ajax_forms( 'blog' ); // auto requires jQuery
+			init_scrollwide_js( 'blog' ); // Add jQuery Wide Scroll JS plugin to horizontal scroll "div.wide_scroll" by yellow right/left panel arrows
 			// fp> if we add this here, we have to exetnd the inner if()
 			// init_ratings_js( 'blog' );
 
@@ -497,7 +500,7 @@ var downloadInterval = setInterval( function()
 			$transmit_hashed_password = (bool)$Settings->get('js_passwd_hashing') && !(bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
 			if( $transmit_hashed_password )
 			{ // Include JS for client-side password hashing:
-				require_js( 'build/sha1_md5.bmin.js', 'blog' );
+				require_js( 'sha1_md5.js', 'blog' );
 			}
 			break;
 

@@ -29,7 +29,7 @@
  *
  * @package admin
  *
- * @version $Id: _user_identity.form.php 7036 2014-07-01 18:05:24Z yura $
+ * @version $Id: _user_identity.form.php 6411 2014-04-07 15:17:33Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -522,8 +522,8 @@ $Form->end_form();
 
 		var this_obj = jQuery( this );
 		var params = '<?php
-			global $b2evo_icons_type;
-			echo empty( $b2evo_icons_type ) ? '' : '&b2evo_icons_type='.$b2evo_icons_type;
+			global $use_glyphicons;
+			echo empty( $use_glyphicons ) ? '' : '&use_glyphicons=1';
 		?>';
 
 		jQuery.ajax({
@@ -614,8 +614,8 @@ $Form->end_form();
 		var this_obj = jQuery( this );
 		var field_id = this_obj.attr( 'rel' ).replace( /^add_ufdf_(\d+)$/, '$1' );
 		var params = '<?php
-			global $b2evo_icons_type;
-			echo empty( $b2evo_icons_type ) ? '' : '&b2evo_icons_type='.$b2evo_icons_type;
+			global $use_glyphicons;
+			echo empty( $use_glyphicons ) ? '' : '&use_glyphicons=1';
 		?>';
 
 		jQuery.ajax({
@@ -644,7 +644,7 @@ $Form->end_form();
 					// Print out new field on the form
 					cur_fieldset_obj.after( result.replace( /^\[\d+\](.*)/, '$1' ) )
 					// Show a button 'Add(+)' with new field
-													.next().find( 'span[rel^=add_ufdf_]' ).show();
+													.next().find( 'span[class*=icon]' ).show();
 
 					var new_field = cur_fieldset_obj.next().find( 'input[id^=uf_add_]' );
 					if( new_field.attr( 'autocomplete' ) == 'on' )

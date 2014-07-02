@@ -1,7 +1,9 @@
 /**
- * item_base.css 
  * These are the default styles that are used INSIDE of a blog post.
  * Override this with an item.css file in your skin folder.
+ *
+ * The skin should @import this into its style.css,
+ * but this is ALSO included in the backoffice when viewing/editing posts.
  */
 
 blockquote {

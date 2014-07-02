@@ -95,8 +95,8 @@ div.image_block img {
 	}
 }' );
 
-// Use glyph icons, @see get_icon()
-$b2evo_icons_type = 'glyphicons';
+// Set this var to TRUE in order to use glyph icons, @see get_icon()
+$use_glyphicons = true;
 
 add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
 
