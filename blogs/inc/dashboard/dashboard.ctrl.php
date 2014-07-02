@@ -17,7 +17,7 @@
  *
  * @todo add 5 plugin hooks. Will be widgetized later (same as SkinTag became Widgets)
  *
- * @version $Id: dashboard.ctrl.php 6911 2014-06-17 15:35:37Z yura $
+ * @version $Id: dashboard.ctrl.php 7046 2014-07-02 11:41:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -72,7 +72,7 @@ if( $blog )
 
 	echo '<h2>'.$Blog->dget( 'name' ).'</h2>';
 
-	echo '<table class="browse" cellspacing="0" cellpadding="0" border="0"><tr><td>';
+	echo '<div class="row browse"><div class="col-lg-9 col-xs-12 floatleft">';
 
 	load_class( 'items/model/_itemlist.class.php', 'ItemList' );
 
@@ -450,8 +450,8 @@ if( $blog )
 	 * RECENT POSTS awaiting moderation
 	 */
 	// TODO: asimo> Make this configurable per blogs the same way as we have in case of comments
-	echo '<div id="styled_content_block" class="items_container">';
 	$default_moderation_statuses = get_visibility_statuses( 'moderation' );
+	ob_start();
 	foreach( $default_moderation_statuses as $status )
 	{ // go through all statuses
 		if( display_posts_awaiting_moderation( $status, $block_item_Widget ) )
@@ -459,7 +459,14 @@ if( $blog )
 			$nb_blocks_displayed++;
 		}
 	}
-	echo '</div>';
+	$posts_awaiting_moderation_content = ob_get_contents();
+	ob_clean();
+	if( ! empty( $posts_awaiting_moderation_content ) )
+	{
+		echo '<div id="styled_content_block" class="items_container">';
+		echo $posts_awaiting_moderation_content;
+		echo '</div>';
+	}
 
 	/*
 	 * RECENTLY EDITED
@@ -509,7 +516,8 @@ if( $blog )
 			$Item->edit_link( array( // Link to backoffice for editing
 					'before'    => ' ',
 					'after'     => ' ',
-					'class'     => 'ActionButton btn btn-default'
+					'class'     => 'ActionButton btn btn-default',
+					'text'      => get_icon( 'edit_button' ).' '.T_('Edit')
 				) );
 			echo '</div>';
 
@@ -572,13 +580,15 @@ if( $blog )
 	 */
 
 
-	echo '</td><td>';
+	echo '</div><div class="col-lg-3 col-xs-12 floatright">';
 
 	/*
 	 * RIGHT COL
 	 */
 
 	$side_item_Widget = new Widget( 'side_item' );
+
+	echo '<div class="row dashboard_sidebar_panels"><div class="col-lg-12 col-sm-6 col-xs-12">';
 
 	$side_item_Widget->title = T_('Manage your blog');
 	$side_item_Widget->disp_template_replaced( 'block_start' );
@@ -604,11 +614,13 @@ if( $blog )
 			echo '<li><a href="'.$dispatcher.'?ctrl=chapters&blog='.$Blog->ID.'">'.T_('Edit categories').' &raquo;</a></li>';
 		}
 
- 		echo '<li><a href="'.$Blog->get('url').'">'.T_('View this blog').'</a></li>';
+		echo '<li><a href="'.$Blog->get('url').'">'.T_('View this blog').'</a></li>';
 	echo '</ul>';
 	echo '</div>';
 
 	$side_item_Widget->disp_template_raw( 'block_end' );
+
+	echo '</div><div class="col-lg-12 col-sm-6 col-xs-12">';
 
 	if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 	{
@@ -630,13 +642,14 @@ if( $blog )
 		$side_item_Widget->disp_template_raw( 'block_end' );
 	}
 
+	echo '</div></div>';
 
 	/*
 	 * DashboardBlogSide to be added here (anyone?)
 	 */
 
 
- 	echo '</td></tr></table>';
+	echo '</div><div class="clear"></div></div>';
 
 
 	// End payload block:
@@ -675,7 +688,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	// Begin payload block:
 	$AdminUI->disp_payload_begin();
 
-	echo '<table class="browse" cellspacing="0" cellpadding="0" border="0"><tr><td>';
+	echo '<div class="row browse"><div class="col-lg-9 col-xs-12 floatleft">';
 
 	$block_item_Widget = new Widget( 'block_item' );
 
@@ -718,8 +731,6 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 		echo '<p>You will <b>NOT</b> be alerted if you are running an insecure configuration.</p>';
 	}
 
-	echo '</td><td>';
-
 	// Track just the first login into b2evolution to determine how many people installed manually vs automatic installs:
 	if( $current_User->ID == 1 && $UserSettings->get('first_login') == NULL )
 	{
@@ -730,6 +741,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 		$UserSettings->dbupdate();
 	}
 
+	echo '</div><div class="col-lg-3 col-xs-12 floatright">';
 
 	/*
 	 * RIGHT COL
@@ -764,7 +776,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	 * DashboardAdminSide to be added here (anyone?)
 	 */
 
-	echo '</td></tr></table>';
+	echo '</div><div class="clear"></div></div>';
 
 	// End payload block:
 	$AdminUI->disp_payload_end();

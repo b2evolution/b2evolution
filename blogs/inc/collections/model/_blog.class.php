@@ -30,7 +30,7 @@
  *
  * @package evocore
  *
- * @version $Id: _blog.class.php 6919 2014-06-18 06:53:52Z yura $
+ * @version $Id: _blog.class.php 6956 2014-06-24 06:13:28Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -186,7 +186,7 @@ class Blog extends DataObject
 		{
 			/**
 			 * NOTE: Check each new added or renamed field by function isset() below,
-			 *       Otherwise it will can create issue on upgrade process from old to new DB:
+			 *       Otherwise it may create issues during upgrade process from old to new DB:
 			 */
 			$this->ID = $db_row->blog_ID;
 			$this->shortname = $db_row->blog_shortname;

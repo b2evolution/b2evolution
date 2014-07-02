@@ -10,6 +10,32 @@ table.browse {
 table.browse td {
 	vertical-align:top;
 }
+div.browse > div.floatleft {
+	width: 80%;
+}
+div.browse > div.floatright {
+	width: 20%;
+}
+@media (max-width: 1170px) {
+	div.browse > div.floatleft { width: 100%; }
+	div.browse > div.floatright { width: 100%; }
+	div.browse_side_item_wrap { margin-left: 0; }
+	div.dashboard_sidebar_panels .col-sm-6 {
+		width: 50%;
+		float: left;
+		padding-right: 14px;
+		box-sizing: border-box;
+	}
+	div.dashboard_sidebar_panels .col-sm-6:last-child {
+		padding-right: 0;
+	}
+}
+@media (max-width: 500px) {
+	div.dashboard_sidebar_panels .col-sm-6 {
+		width: 100%;
+		padding-right: 0;
+	}
+}
 
 div.dashboard_sidebar {
 	margin: 0 1em;

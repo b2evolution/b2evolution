@@ -8,7 +8,7 @@
  * @package skins
  * @subpackage evopress
  *
- * @version $Id: _skin.class.php 3629 2013-05-01 08:05:20Z yura $
+ * @version $Id: _skin.class.php 6956 2014-06-24 06:13:28Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -103,37 +103,29 @@ class evopress_Skin extends Skin
 	 */
 	function display_init()
 	{
-		// call parent:
-		parent::display_init();
-
 		// Add CSS:
-		// fp> Note: having those here should allow
-		// 1) Requesting them earlier as if they are @import'ed
-		// 2) Allow bundling
-		// fp> I am not 100% sure though. Comments welcome :)
-		require_css( 'basic_styles.css', 'blog' ); // the REAL basic styles
-		require_css( 'basic.css', 'blog' ); // Basic styles
-		require_css( 'blog_base.css', 'blog' ); // Default styles for the blog navigation
-		require_css( 'item_base.css', 'blog' ); // Default styles for the post CONTENT
-		require_css( 'item.css', 'relative' );
-		require_css( 'style.css', 'relative' );
+		// require_css( 'basic_styles.css', 'blog' ); // the REAL basic styles
+		// require_css( 'basic.css', 'blog' ); // Basic styles
+		// require_css( 'blog_base.css', 'blog' ); // Default styles for the blog navigation
+		// require_css( 'item_base.css', 'blog' ); // Default styles for the post CONTENT
+		// require_css( 'b2evo_base.bundle.css', 'blog' ); // Concatenation of the above
+		require_css( 'b2evo_base.bmin.css', 'blog' ); // Concatenation + Minifaction of the above
+
+		// require_css( 'style.css', 'relative' );
+		// require_css( 'item.css', 'relative' );
+		// require_css( 'evopress.bundle.css', 'relative' ); // Concatenation of the above
+		require_css( 'evopress.bmin.css', 'relative' ); // Concatenation + Minifaction of the above
 
 		// Add custom CSS:
 		$custom_css = '';
-
 		$head_bg_color_top = $this->get_setting( 'head_bg_color_top' );
 		$head_bg_color_bottom = $this->get_setting( 'head_bg_color_bottom' );
-		if( !empty( $head_bg_color_top ) && !empty( $head_bg_color_bottom ) )
+		if(!empty( $head_bg_color_top ) && !empty( $head_bg_color_bottom ) )
 		{ // Custom Header background color:
 			$custom_css .= '#headerimg {'."\n"
-					.'background:-webkit-linear-gradient(top, '.$head_bg_color_top.', '.$head_bg_color_bottom.');'."\n"
-					.'background:-moz-linear-gradient(top, '.$head_bg_color_top.', '.$head_bg_color_bottom.');'."\n"
-					.'background:-o-linear-gradient(top, '.$head_bg_color_top.', '.$head_bg_color_bottom.');'."\n"
-					.'background: -ms-linear-gradient(top, '.$head_bg_color_top.', '.$head_bg_color_bottom.');'."\n"
-					.'filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=\''.$head_bg_color_top.'\', endColorstr=\''.$head_bg_color_bottom.'\');'."\n"
+					.'background: linear-gradient( to bottom, '.$head_bg_color_top.', '.$head_bg_color_bottom.');'."\n"
 				.'}'."\n";
 		}
-
 		if( !empty( $custom_css ) )
 		{
 			$custom_css = '<style type="text/css">

@@ -611,6 +611,7 @@ function install_basic_plugins( $old_db_version = 0 )
 		install_plugin( 'code_highlight_plugin', $test_install_all_features );
 		install_plugin( 'markdown_plugin' );
 		install_plugin( 'infodots_plugin', $test_install_all_features );
+		install_plugin( 'widescroll_plugin' );
 	}
 }
 

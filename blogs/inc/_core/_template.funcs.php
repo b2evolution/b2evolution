@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _template.funcs.php 6936 2014-06-19 16:27:57Z yura $
+ * @version $Id: _template.funcs.php 7036 2014-07-01 18:05:24Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -960,7 +960,7 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
 		}
 	}
 
-	/* Yura: Don't require this plugin when it is already concatenated in jquery.b2evo.js
+	/* Yura: Don't require this plugin when it is already concatenated in jquery.bundle.js
 	 * But we should don't forget it for CDN jQuery file and when js code uses deprecated things of jQuery
 	if( $js_file == '#jquery#' )
 	{ // Dependency : The plugin restores deprecated features and behaviors so that older code will still run properly on jQuery 1.9 and later
@@ -988,11 +988,20 @@ function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media
 {
 	static $required_css;
 
+	// WHich subfolder do we want to use?
+	if( preg_match( '/\.(bundle|bmin)\.css$/', $css_file ) )
+	{
+		$subfolder = 'build';
+	}
+	else
+	{
+		$subfolder = 'css';
+	}
+
 	// Get library url of CSS file by alias name
-	$css_url = get_require_url( $css_file, $relative_to, 'css', $version );
+	$css_url = get_require_url( $css_file, $relative_to, $subfolder, $version );
 
 	// Add to headlines, if not done already:
-	// fp> TODO: check for url without version to avoid duplicate load due to lack of verison in @import statements
 	if( empty( $required_css ) || ! in_array( strtolower( $css_url ), $required_css ) )
 	{
 		$required_css[] = strtolower( $css_url );
@@ -1067,45 +1076,33 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 			case 'colorbox':
 				// Colorbox: a lightweight Lightbox alternative -- allows zooming on images and slideshows in groups of images
 				// Added by fplanque - (MIT License) - http://colorpowered.com/colorbox/
-				require_js( '#jquery#', $relative_to );
-				require_js( 'build/jquery.colorbox.b2evo.min.js', $relative_to );
-				require_css( 'colorbox/colorbox.css', $relative_to );
+
+				// Initialize js variable b2evo_colorbox_params that is used in async loaded colorbox file
 				if( is_logged_in() )
 				{ // If user is logged in - display a voting panel
+					global $b2evo_icons_type;
 					$colorbox_params = ',
-								displayVoting: true,
-								votingUrl: "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=link&'.url_crumb( 'voting' ).'",
-								minWidth: 345';
+						displayVoting: true,
+						votingUrl: "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=link&b2evo_icons_type='.$b2evo_icons_type.'&'.url_crumb( 'voting' ).'",
+						minWidth: 345';
 				}
 				else
 				{ // Set minimum width
 					$colorbox_params = ',
-								minWidth: 255';
+						minWidth: 255';
 				}
-				add_js_headline('jQuery( document ).ready( function()
-						{
-							jQuery( "a[rel^=\'lightbox\']" ).colorbox(
-							{
-								maxWidth: "95%",
-								maxHeight: "90%",
-								slideshow: true,
-								slideshowAuto: false'.
-								$colorbox_params.'
-							} );
+				add_js_headline( 'var b2evo_colorbox_params = {
+						maxWidth: "95%",
+						maxHeight: "90%",
+						slideshow: true,
+						slideshowAuto: false'.
+						$colorbox_params.'
+					}' );
+				// TODO: translation strings for colorbox buttons
 
-							jQuery( "#colorbox" ).swipe(
-							{
-								swipeLeft: function( event, direction, distance, duration, fingerCount )
-								{
-									jQuery.colorbox.next();
-								},
-								swipeRight: function( event, direction, distance, duration, fingerCount )
-								{
-									jQuery.colorbox.prev();
-								},
-							} );
-						} );' );
-				// TODO: translation strings
+				require_js( '#jquery#', $relative_to );
+				require_js( 'build/colorbox.bmin.js', $relative_to, true );
+				require_css( 'colorbox/colorbox.css', $relative_to );
 				break;
 		}
 		// add to list of loaded helpers
@@ -1250,14 +1247,14 @@ function init_bubbletip_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 	{
 		case 'popover':
 			// Use popover library of bootstrap
-			require_js( 'build/popover_bundle.min.js', $relative_to, true );
+			require_js( 'build/popover.bmin.js', $relative_to, true );
 			break;
 
 		case 'bubbletip':
 		default:
 			// Use bubbletip plugin of jQuery
 			require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
-			require_js( 'build/bubbletip_bundle.min.js', $relative_to, true );
+			require_js( 'build/bubbletip.bmin.js', $relative_to, true );
 			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
 			break;
 	}
@@ -1280,14 +1277,14 @@ function init_userfields_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 	{
 		case 'popover':
 			// Use popover library of bootstrap
-			require_js( 'build/popover_bundle.min.js', $relative_to, true );
+			require_js( 'build/popover.bmin.js', $relative_to, true );
 			break;
 
 		case 'bubbletip':
 		default:
 			// Use bubbletip plugin of jQuery
 			require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
-			require_js( 'build/bubbletip_bundle.min.js', $relative_to, true );
+			require_js( 'build/bubbletip.bmin.js', $relative_to, true );
 			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
 			break;
 	}
@@ -1308,14 +1305,14 @@ function init_plugins_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 	{
 		case 'popover':
 			// Use popover library of bootstrap
-			require_js( 'build/popover_bundle.min.js', $relative_to, true );
+			require_js( 'build/popover.bmin.js', $relative_to, true );
 			break;
 
 		case 'bubbletip':
 		default:
 			// Use bubbletip plugin of jQuery
 			require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
-			require_js( 'build/bubbletip_bundle.min.js', $relative_to, true );
+			require_js( 'build/bubbletip.bmin.js', $relative_to, true );
 			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
 			break;
 	}
@@ -1356,18 +1353,6 @@ function init_datepicker_js( $relative_to = 'rsc_url' )
 
 
 /**
- * Registers headlines for initialization of scroll wide
- * JS plugin to horizontal scroll "div.wide_scroll" by yellow right/left panel arrows
- * You can create such div elements by TinyMCE toolbar by selecting "wide_scroll" style
- */
-function init_scrollwide_js( $relative_to = 'rsc_url' )
-{
-	require_js( '#jquery#', $relative_to ); // dependency
-	require_js( 'jquery/jquery.scrollwide.min.js', $relative_to );
-}
-
-
-/**
  * Registers headlines for initialization of jQuery Tokeninput plugin
  */
 function init_tokeninput_js( $relative_to = 'rsc_url' )
@@ -1393,7 +1378,7 @@ function init_results_js( $relative_to = 'rsc_url' )
  */
 function init_voting_comment_js( $relative_to = 'rsc_url' )
 {
-	global $Blog;
+	global $Blog, $b2evo_icons_type;
 
 	if( empty( $Blog ) || ! is_logged_in( false ) || ! $Blog->get_setting('allow_rating_comment_helpfulness') )
 	{	// If User is not logged OR Users cannot vote
@@ -1405,7 +1390,7 @@ function init_voting_comment_js( $relative_to = 'rsc_url' )
 	add_js_headline( '
 	jQuery( document ).ready( function()
 	{
-		var comment_voting_url = "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=comment&'.url_crumb( 'voting' ).'";
+		var comment_voting_url = "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=comment&b2evo_icons_type='.$b2evo_icons_type.'&'.url_crumb( 'voting' ).'";
 		jQuery( "span[id^=vote_helpful_]" ).each( function()
 		{
 			init_voting_bar( jQuery( this ), comment_voting_url, jQuery( this ).find( "#votingID" ).val(), false );
@@ -1436,73 +1421,10 @@ function init_colorpicker_js( $relative_to = 'rsc_url' )
 	}
 	init_bubbletip_js( $relative_to, $tooltip_plugin );
 
-	switch( $tooltip_plugin )
-	{
-		case 'popover':
-			// Use popover library of bootstrap
-			$init_tooltip_js = '
-			jQuery( this ).popover( {
-					trigger: "manual",
-					placement: "right",
-					html: true,
-					content: jQuery( "#" + colorpicker_ID ),
-				} );
-			jQuery( this ).focus( function()
-			{
-				var popover_obj = jQuery( this ).parent().find( ".popover" );
-				if( popover_obj.length == 0 )
-				{ // Initialize popover only first time
-					jQuery( "#" + colorpicker_ID ).show();
-					jQuery( this ).popover( "show" );
-				}
-				else
-				{ // Show popover
-					popover_obj.show();
-				}
-			} ).blur( function()
-			{
-				var popover_obj = jQuery( this ).parent().find( ".popover" );
-				if( popover_obj.length > 0 )
-				{ // Hide popover
-					popover_obj.hide();
-				}
-			} );';
-			// Hide each colopicker on load
-			$init_colorpicker_css = ' style=\"display:none\"';
-			break;
-
-		case 'bubbletip':
-		default:
-			// Use bubbletip plugin of jQuery
-			$init_tooltip_js = '
-			jQuery( this ).bubbletip( jQuery( "#" + colorpicker_ID ), {
-					bindShow: "focus",
-					bindHide: "blur",
-					calculateOnShow: true,
-					deltaDirection: "right",
-					deltaShift: 0,
-				} );';
-			$init_colorpicker_css = '';
-			break;
-	}
-
 	// Initialize farbastic colorpicker
 	require_js( '#jquery#', $relative_to );
 	require_js( 'jquery/jquery.farbtastic.min.js', $relative_to );
 	require_css( 'jquery/farbtastic/farbtastic.css', $relative_to );
-	add_js_headline( 'jQuery(document).ready( function()
-	{
-		var colorpicker_num = 1;
-		jQuery( ".form_color_input" ).each( function ()
-		{
-			var colorpicker_ID = "farbtastic_colorpicker_" + colorpicker_num;
-			jQuery( "body" ).append( "<div id=\"" + colorpicker_ID + "\"'.$init_colorpicker_css.'></div>" );
-			var farbtastic_colorpicker = jQuery.farbtastic( "#" + colorpicker_ID );
-			farbtastic_colorpicker.linkTo( this );
-			'.$init_tooltip_js.'
-			colorpicker_num++;
-		} );
-	} );' );
 }
 
 
