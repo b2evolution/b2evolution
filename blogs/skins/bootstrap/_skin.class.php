@@ -89,27 +89,10 @@ class bootstrap_Skin extends Skin
 		global $b2evo_icons_type;
 		$b2evo_icons_type = 'glyphicons';
 
-		// Add CSS:
-		// require_css( 'basic_styles.css', 'blog' ); // the REAL basic styles
-		// require_css( 'basic.css', 'blog' ); // Basic styles
-		// require_css( 'blog_base.css', 'blog' ); // Default styles for the blog navigation
-		// require_css( 'item_base.css', 'blog' ); // Default styles for the post CONTENT
-		// require_css( 'b2evo_base.bundle.css', 'blog' ); // Concatenation of the above
-		require_css( 'b2evo_base.bmin.css', 'blog' ); // Concatenation + Minifaction of the above
-
 		require_js( '#bootstrap#', 'blog' );
 		require_css( '#bootstrap_css#', 'blog' );
 		require_css( '#bootstrap_theme_css#', 'blog' );
 		require_css( 'bootstrap/b2evo.css', 'blog' );
-
-		// Make sure standard CSS is called ahead of custom CSS generated below:
-		require_css( 'style.css', 'relative' );
-
-		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
-		if( $this->get_setting( 'colorbox' ) )
-		{
-			require_js_helper( 'colorbox', 'blog' );
-		}
 
 		// Set bootstrap classes for messages
 		$Messages->set_params( array(

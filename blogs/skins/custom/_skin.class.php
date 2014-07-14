@@ -8,7 +8,7 @@
  * @package skins
  * @subpackage custom
  *
- * @version $Id: _skin.class.php 6956 2014-06-24 06:13:28Z yura $
+ * @version $Id: _skin.class.php 7069 2014-07-04 08:32:23Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -106,27 +106,16 @@ class custom_Skin extends Skin
 		// call parent:
 		parent::display_init();
 
-		// Add CSS:
-		// require_css( 'basic_styles.css', 'blog' ); // the REAL basic styles
-		// require_css( 'basic.css', 'blog' ); // Basic styles
-		// require_css( 'blog_base.css', 'blog' ); // Default styles for the blog navigation
-		// require_css( 'item_base.css', 'blog' ); // Default styles for the post CONTENT
-		// require_css( 'b2evo_base.bundle.css', 'blog' ); // Concatenation of the above
-		require_css( 'b2evo_base.bmin.css', 'blog' ); // Concatenation + Minifaction of the above
-
-		// Make sure standard CSS is called ahead of custom CSS generated below:
-		require_css( 'style.css', 'relative' );
-
 		// Add custom CSS:
 		$custom_css = '';
 
-		if( $bg_color = $this->get_setting( 'head_bg_color') )
-		{	// Custom Header background color:
+		if( $bg_color = $this->get_setting( 'head_bg_color' ) )
+		{ // Custom Header background color:
 			$custom_css .= '	div.pageHeader { background-color: '.$bg_color." }\n";
 		}
 
-		if( $bg_color = $this->get_setting( 'menu_bg_color') )
-		{	// Custom Meu background color:
+		if( $bg_color = $this->get_setting( 'menu_bg_color' ) )
+		{ // Custom Meu background color:
 			$custom_css .= '	div.top_menu ul { background-color: '.$bg_color." }\n";
 		}
 
@@ -137,12 +126,6 @@ class custom_Skin extends Skin
 '.$custom_css.'	-->
 	</style>';
 			add_headline( $custom_css );
-		}
-
-		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
-		if($this->get_setting("colorbox"))
-		{
-			require_js_helper( 'colorbox', 'blog' );
 		}
 	}
 

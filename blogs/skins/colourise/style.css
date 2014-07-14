@@ -83,8 +83,7 @@ div.pageHeader h1 {
 	padding: 0;
 }
 
-div.pageHeader h1 a,
-div.pageHeader h1 a:visited {  /* IE6 */
+div.pageHeader h1 a {
 	color: #fff;
 	text-decoration: none;
 }
@@ -168,6 +167,9 @@ label {
 	font-weight: bold;
 	/*margin: 8px 0;*/
 	color: #fff;
+}
+#colorbox label {
+	display: inline;
 }
 input, select, textarea {
 	padding: 5px 4px;

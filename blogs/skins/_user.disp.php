@@ -17,7 +17,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _user.disp.php 6411 2014-04-07 15:17:33Z yura $
+ * @version $Id: _user.disp.php 7060 2014-07-03 12:39:43Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -232,7 +232,7 @@ $ProfileForm->begin_fieldset( sprintf( T_('You and %s...'), $User->login ) );
 	if( !empty($msgform_url) )
 	{
 		$msgform_url = url_add_param( $msgform_url, 'msg_type=PM' );
-		$contacts[] = action_icon( T_('Send a message'), 'email', $msgform_url, T_('Send a message'), 3, 4, array(), array( 'style' => 'margin: 2px' ) );
+		$contacts[] = action_icon( T_('Send a message'), 'email', $msgform_url, T_('Send a message'), 3, 4, array(), array( 'style' => 'margin-right:2px' ) );
 	}
 	else
 	{ // No message form possibility to contact with User, get the reason why

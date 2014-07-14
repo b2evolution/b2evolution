@@ -20,7 +20,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id: _thread_list.view.php 6411 2014-04-07 15:17:33Z yura $
+ * @version $Id: _thread_list.view.php 7057 2014-07-03 11:07:40Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -108,7 +108,7 @@ if( ! $perm_abuse_management )
 		$newmsg_url = regenerate_url( 'disp', 'disp=threads&action=new' );
 	}
 
-	$Results->global_icon( T_('Create a new conversation...'), 'new', $newmsg_url, T_('Compose new').' &raquo;', 3, 4  );
+	$Results->global_icon( T_('Create a new conversation...'), 'compose_new', $newmsg_url, T_('Compose new').' &raquo;', 3, 4  );
 }
 
 $Results->display( $display_params );

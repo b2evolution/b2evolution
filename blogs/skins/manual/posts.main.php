@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage manual
  *
- * @version $Id: posts.main.php 7000 2014-06-27 09:20:40Z yura $
+ * @version $Id: posts.main.php 7091 2014-07-09 05:47:57Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -242,13 +242,6 @@ skin_include( '_left_navigation_bar.inc.php' );
 	<?php
 		}
 
-		// Button to create a new sub-chapter
-		$create_new_chapter_url = $Blog->get_create_chapter_url( $cat );
-		if( !empty( $create_new_chapter_url ) )
-		{	// Display button to write a new post
-			echo '<a href="'.$create_new_chapter_url.'" class="roundbutton roundbutton_text_noicon" style="margin-bottom:15px">'.T_('Add a sub-chapter here').'</a><br />';
-		}
-
 		// ---------------------------------- START OF POSTS ------------------------------------
 
 		// Display the posts ONLY from MAIN category
@@ -321,11 +314,22 @@ skin_include( '_left_navigation_bar.inc.php' );
 		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 
 
+		// Button to create a new sub-chapter
+		$create_new_chapter_url = $Blog->get_create_chapter_url( $cat );
 		// Button to create a new page
 		$write_new_post_url = $Blog->get_write_item_url( $cat );
-		if( !empty( $write_new_post_url ) )
-		{	// Display button to write a new post
-			echo '<a href="'.$write_new_post_url.'" class="roundbutton roundbutton_text_noicon" style="margin-top:15px">'.T_('Add a page here').'</a>';
+		if( ! empty( $create_new_chapter_url ) || ! empty( $write_new_post_url ) )
+		{
+			echo '<div class="roundbutton_group" style="margin:15px 0">';
+			if( ! empty( $create_new_chapter_url ) )
+			{ // Display button to write a new post
+				echo '<a href="'.$create_new_chapter_url.'" class="roundbutton roundbutton_text">'.get_icon( 'add' ).' '.T_('Add a sub-chapter here').'</a>';
+			}
+			if( ! empty( $write_new_post_url ) )
+			{ // Display button to write a new post
+				echo '<a href="'.$write_new_post_url.'" class="roundbutton roundbutton_text">'.get_icon( 'add' ).' '.T_('Add a page here').'</a>';
+			}
+			echo '</div>';
 		}
 
 

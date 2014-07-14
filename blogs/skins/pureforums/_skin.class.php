@@ -8,7 +8,7 @@
  * @package skins
  * @subpackage pureforums
  *
- * @version $Id: _skin.class.php 6956 2014-06-24 06:13:28Z yura $
+ * @version $Id: _skin.class.php 7106 2014-07-11 11:58:53Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -93,6 +93,12 @@ class pureforums_Skin extends Skin
 					'defaultvalue' => 1,
 					'type' => 'checkbox',
 				),
+				'width_switcher' => array(
+					'label' => T_('Width switcher'),
+					'note' => T_('Check to enable the width switcher between fixed value and 100%.'),
+					'defaultvalue' => 1,
+					'type' => 'checkbox',
+				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
@@ -117,9 +123,6 @@ class pureforums_Skin extends Skin
 	{
 		global $disp;
 
-		// call parent:
-		parent::display_init();
-
 		// Add CSS:
 		// require_css( 'basic_styles.css', 'blog' ); // the REAL basic styles
 		// require_css( 'basic.css', 'blog' ); // Basic styles
@@ -128,9 +131,11 @@ class pureforums_Skin extends Skin
 		// require_css( 'b2evo_base.bundle.css', 'blog' ); // Concatenation of the above
 		require_css( 'b2evo_base.bmin.css', 'blog' ); // Concatenation + Minifaction of the above
 
-		// Make sure standard CSS is called ahead of custom CSS generated below:
-		//require_css( 'style-old.css', true );
-		require_css( 'style.css', true );
+		// require_css( 'pureforums_header.css', 'relative' );
+		// require_css( 'pureforums_main.css', 'relative' );
+		// require_css( 'pureforums_footer.css', 'relative' );
+		// require_css( 'pureforums.bundle.css', 'relative' ); // Concatenation of the above
+		require_css( 'pureforums.bmin.css', 'relative' ); // Concatenation + Minifaction of the above
 
 		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
 		if( $this->get_setting( 'colorbox' ) )
@@ -138,9 +143,11 @@ class pureforums_Skin extends Skin
 			require_js_helper( 'colorbox', 'blog' );
 		}
 
-		// Functions to switch between the width sizes
-		require_js( '#jquery#', 'blog' );
-		require_js( 'widthswitcher.js', 'blog' );
+		if( $this->get_setting( 'width_switcher' ) )
+		{ // Functions to switch between the width sizes
+			require_js( '#jquery#', 'blog' );
+			require_js( 'widthswitcher.js', 'blog' );
+		}
 
 		if( in_array( $disp, array( 'single', 'page', 'comments' ) ) )
 		{ // Load jquery UI to animate background color on change comment status or on vote

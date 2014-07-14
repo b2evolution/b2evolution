@@ -40,7 +40,7 @@
  *
  * @todo implement CategoryCache based on LinkCache
  *
- * @version $Id: _category.funcs.php 6135 2014-03-08 07:54:05Z manuel $
+ * @version $Id: _category.funcs.php 7106 2014-07-11 11:58:53Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -55,9 +55,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param integer|NULL Blog ID (will be taken from parent cat, if empty)
  * @param string Category description
  * @param boolean Set to true if the new object needs to be added into the ChapterCache after it was created
+ * @param boolean Is meta category?
  * @param integer Category order
  */
-function cat_create( $cat_name, $cat_parent_ID, $cat_blog_ID = NULL, $cat_description = NULL, $add_to_cache = false, $cat_order = NULL )
+function cat_create( $cat_name, $cat_parent_ID, $cat_blog_ID = NULL, $cat_description = NULL, $add_to_cache = false, $cat_order = NULL, $meta = false )
 {
 	global $DB;
 
@@ -65,7 +66,10 @@ function cat_create( $cat_name, $cat_parent_ID, $cat_blog_ID = NULL, $cat_descri
 
 	if( ! $cat_blog_ID )
 	{
-		if( empty($cat_parent_ID) ) debug_die ( 'cat_create(-) missing parameters (cat_parent_ID)!' );
+		if( empty( $cat_parent_ID ) )
+		{
+			debug_die ( 'cat_create(-) missing parameters (cat_parent_ID)!' );
+		}
 
 		$ChapterCache = & get_ChapterCache();
 		$Chapter = $ChapterCache->get_by_ID($cat_parent_ID);
@@ -73,21 +77,28 @@ function cat_create( $cat_name, $cat_parent_ID, $cat_blog_ID = NULL, $cat_descri
 	}
 
 	if( $cat_parent_ID === 'NULL' )
-		// fix old use case
+	{ // fix old use case
 		$cat_parent_ID = NULL;
-
-	$new_Chapter = new Chapter(NULL, $cat_blog_ID);
-	$new_Chapter->set('name', $cat_name);
-	$new_Chapter->set('parent_ID', $cat_parent_ID);
-	if( !empty( $cat_description ) )
-	{	// Set decription
-		$new_Chapter->set('description', $cat_description);
 	}
-	$new_Chapter->set('order', $cat_order);
+
+	$new_Chapter = new Chapter( NULL, $cat_blog_ID );
+	$new_Chapter->set( 'name', $cat_name );
+	$new_Chapter->set( 'parent_ID', $cat_parent_ID );
+	if( !empty( $cat_description ) )
+	{ // Set decription
+		$new_Chapter->set( 'description', $cat_description );
+	}
+	$new_Chapter->set( 'order', $cat_order );
+	if( $meta )
+	{ // Set this category as meta
+		$new_Chapter->set( 'meta', 1 );
+	}
 
 
 	if( ! $new_Chapter->dbinsert() )
+	{
 		return 0;
+	}
 
 	if( $add_to_cache )
 	{ // add new Category into the Cache
@@ -249,14 +260,24 @@ function get_postcount_in_category( $cat_ID, $blog_ID = NULL )
 
 	if( !isset( $number_of_posts_in_cat[ (string) $blog_ID ] ) )
 	{
+		// fp> TODO: the following probably needs to be ALL except $posttypes_specialtypes
+		$post_types = array( 1, 2000 );
+
+		$BlogCache = & get_BlogCache();
+		$Blog = & $BlogCache->get_by_ID( $blog_ID );
+		$default_post_type = $Blog->get_setting( 'default_post_type' );
+		if( ! in_array( $default_post_type, $post_types ) )
+		{ // Include also default post type of the current blog
+			$post_types[] = $default_post_type;
+		}
+
 		$SQL = new SQL( 'Get # of posts for each category in a blog' );
 		$SQL->SELECT( 'cat_ID, count( postcat_post_ID ) c' );
 		$SQL->FROM( 'T_categories' );
 		$SQL->FROM_add( 'INNER JOIN T_postcats ON postcat_cat_ID = cat_id' );
 		$SQL->FROM_add( 'INNER JOIN T_items__item ON postcat_post_ID = post_id' );
 		$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $blog_ID ) );
-		// fp> TODO: the following probably needs to be ALL except $posttypes_specialtypes
-		$SQL->WHERE_and( 'post_ptyp_ID IN ( '.$DB->quote( array( 1, 2000 ) ).' )' );
+		$SQL->WHERE_and( 'post_ptyp_ID IN ( '.$DB->quote( $post_types ).' )' );
 		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $blog_ID, 'post' ), 'post_', $blog_ID, 'blog_post!', true ) );
 		$SQL->GROUP_BY( 'cat_ID' );
 		$number_of_posts_in_cat[ (string) $blog_ID ] = $DB->get_assoc( $SQL->get() );

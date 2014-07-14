@@ -17,7 +17,7 @@
  *
  * @todo add 5 plugin hooks. Will be widgetized later (same as SkinTag became Widgets)
  *
- * @version $Id: dashboard.ctrl.php 7036 2014-07-01 18:05:24Z yura $
+ * @version $Id: dashboard.ctrl.php 7046 2014-07-02 11:41:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -517,7 +517,7 @@ if( $blog )
 					'before'    => ' ',
 					'after'     => ' ',
 					'class'     => 'ActionButton btn btn-default',
-					'text'      => get_icon( 'edit_button' ).' '.T_('Edit...')
+					'text'      => get_icon( 'edit_button' ).' '.T_('Edit')
 				) );
 			echo '</div>';
 

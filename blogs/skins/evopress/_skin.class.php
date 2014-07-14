@@ -8,7 +8,7 @@
  * @package skins
  * @subpackage evopress
  *
- * @version $Id: _skin.class.php 6956 2014-06-24 06:13:28Z yura $
+ * @version $Id: _skin.class.php 7051 2014-07-03 05:20:49Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -136,7 +136,7 @@ class evopress_Skin extends Skin
 		}
 
 		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
-		if( $this->get_setting("colorbox") )
+		if( $this->get_setting( 'colorbox' ) )
 		{
 			require_js_helper( 'colorbox', 'blog' );
 		}

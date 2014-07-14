@@ -15,7 +15,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _item_list_full.view.php 7036 2014-07-01 18:05:24Z yura $
+ * @version $Id: _item_list_full.view.php 7046 2014-07-02 11:41:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -290,7 +290,7 @@ while( $Item = & $ItemList->get_item() )
 					'before' => '',
 					'after'  => '',
 					'class'  => button_class( 'text' ),
-					'text'   => get_icon( 'edit_button' ).' '.T_('Edit...')
+					'text'   => get_icon( 'edit_button' ).' '.T_('Edit')
 				) );
 
 			// Display copy button if current user has the rights:

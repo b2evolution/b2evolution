@@ -21,7 +21,7 @@
 	ordered & tabbed in a way that represents the nesting of the generated HTML.
 */
 #cboxOverlay{background: rgba( 25, 25, 25, 0.85);}
-#colorbox{font: 11px Verdana,Arial,Sans-Serif;}
+#colorbox, #colorbox *{font: 11px Verdana,Arial,Sans-Serif;font-weight: normal;color: #000;}
 	#cboxContent{
 		border: 7px solid #fff;
 		background:#fff;

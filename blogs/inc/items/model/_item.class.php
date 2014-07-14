@@ -31,7 +31,7 @@
  * @author gorgeb: Bertrand GORGE / EPISTEMA
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
- * @version $Id: _item.class.php 6716 2014-05-19 12:57:02Z yura $
+ * @version $Id: _item.class.php 7079 2014-07-07 11:48:07Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -411,7 +411,7 @@ class Item extends ItemLight
 		if( ! empty( $assigned_User ) )
 		{ // Check if the selected user can be assigned to this item
 			$this->load_Blog();
-			if( $assigned_User->check_perm( 'blog_can_be_assignee', 'view', false, $this->Blog->ID ) )
+			if( $assigned_User->check_perm( 'blog_can_be_assignee', 'edit', false, $this->Blog->ID ) )
 			{ // User exists and has permission to be assigned user to items of the blog
 				$user_ID = $assigned_User->ID;
 			}

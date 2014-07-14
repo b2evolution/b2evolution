@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _menu_link.widget.php 6782 2014-05-27 16:52:04Z yura $
+ * @version $Id: _menu_link.widget.php 7086 2014-07-08 04:47:41Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -462,6 +462,10 @@ class menu_link_Widget extends ComponentWidget
 				break;
 
 			case 'url':
+				if( empty( $this->disp_params['link_href'] ) )
+				{ // Don't display a link if url is empty
+					return false;
+				}
 				$url = $this->disp_params['link_href'];
 				$text = '[URL]';	// should normally be overriden below...
 				// Note: we never highlight this link

@@ -22,7 +22,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _skin.funcs.php 7021 2014-06-30 12:48:39Z yura $
+ * @version $Id: _skin.funcs.php 7083 2014-07-07 16:40:23Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -817,8 +817,8 @@ var downloadInterval = setInterval( function()
 	}
 
 	global $Hit;
-	if( $Hit->is_IE( 7, '<' ) )
-	{ // IE < 7
+	if( $Hit->is_IE( 9, '<' ) )
+	{ // IE < 9
 		$Messages->add( T_('Your web browser is too old. For this site to work correctly, we recommend you use a more recent browser.'), 'note' );
 	}
 

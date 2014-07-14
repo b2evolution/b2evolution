@@ -244,6 +244,7 @@ a.roundbutton.middle {
 a.roundbutton:hover, a.roundbutton_text:hover {
 	cursor: default;
 	text-decoration: none;
+	color: inherit;
 	background: #d2d2d2;
 	/* Safari 4-5, Chrome 1-9 */
 	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#d2d2d2), to(#a0a0a0));
@@ -387,22 +388,22 @@ a.roundbutton_text span, a.roundbutton_text_noicon span {
 	background-position :0;
 	background-image : -moz-linear-gradient(
 		90deg,
-		rgba(0,0,0,0) 0%,
-		rgba(0,0,0,0) 50%,
+		rgba(0,0,0,0.01) 0%,
+		rgba(0,0,0,0.01) 50%,
 		rgba(255,255,255,0.1) 50%,
 		rgba(255,255,255,0.3) 100%
 		);
 	background-image : -o-linear-gradient(
 		90deg,
-		rgba(0,0,0,0) 0%,
-		rgba(0,0,0,0) 50%,
+		rgba(0,0,0,0.01) 0%,
+		rgba(0,0,0,0.01) 50%,
 		rgba(255,255,255,0.1) 50%,
 		rgba(255,255,255,0.3) 100%
 		);
 	background-image : -webkit-linear-gradient(
 		90deg,
-		rgba(0,0,0,0) 0%,
-		rgba(0,0,0,0) 50%,
+		rgba(0,0,0,0.01) 0%,
+		rgba(0,0,0,0.01) 50%,
 		rgba(255,255,255,0.1) 50%,
 		rgba(255,255,255,0.3) 100%
 		);

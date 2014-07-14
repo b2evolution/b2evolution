@@ -87,18 +87,6 @@ class touch_Skin extends Skin
 		// call parent:
 		parent::display_init();
 
-		// Add CSS:
-		require_css( 'basic_styles.css', 'blog' ); // the REAL basic styles
-		require_css( 'basic.css', 'blog' ); // Basic styles
-
-		require_css( 'style.css', 'relative' );
-
-		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
-		if( $this->get_setting( 'colorbox' ) )
-		{
-			require_js_helper( 'colorbox', 'blog' );
-		}
-
 		add_js_headline( 'var touch_skin_switch_confirm_text = "'.TS_( 'Switch to regular view? \n \n You can switch back again in the footer.' ).'";' );
 		require_js( 'js/core.js', 'relative' );
 		require_js( 'navigation.js', 'blog' );

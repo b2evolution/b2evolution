@@ -16,7 +16,7 @@
  * @author fplanque: Francois Planque
  * @author PhiBo: Philipp Seidel (since version 0.6)
  *
- * @version $Id: _tinymce.plugin.php 6836 2014-06-03 12:09:52Z yura $
+ * @version $Id: _tinymce.plugin.php 7063 2014-07-03 13:41:44Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -919,20 +919,27 @@ class tinymce_plugin extends Plugin
 		// fp> we are not aiming for perfect wysiwyg (too heavy), just for a relevant look & feel.
 		// dh>We can/should use class_filter to only keep useful classes.
 		// fp> how???
-			$content_css = '';
-			$blog_skin_ID = $Blog->get_skin_ID();
-			if( ! empty( $blog_skin_ID ) )
-			{
-				$SkinCache = & get_SkinCache();
-				/**
-				 * @var Skin
-				 */
-				$Skin = $SkinCache->get_by_ID( $blog_skin_ID );
-				$item_css_url = $skins_url.$Skin->folder.'/item.css';
-				// else: $item_css_url = $rsc_url.'css/item_base.css';
-				$content_css .= ','.$item_css_url;		// fp> TODO: this needs to be a param... "of course" -- if none: else item_default.css ?
-			}
-			// else item_default.css -- is it still possible to have no skin ?
+		$content_css = '';
+		$blog_skin_ID = $Blog->get_skin_ID();
+		if( ! empty( $blog_skin_ID ) )
+		{
+			$SkinCache = & get_SkinCache();
+			/**
+			 * @var Skin
+			 */
+			$Skin = $SkinCache->get_by_ID( $blog_skin_ID );
+			$item_css_url = $skins_url.$Skin->folder.'/item.css';
+			// else: $item_css_url = $rsc_url.'css/item_base.css';
+			$content_css .= ','.$item_css_url;		// fp> TODO: this needs to be a param... "of course" -- if none: else item_default.css ?
+		}
+		// else item_default.css -- is it still possible to have no skin ?
+
+		// Load the content css files from 3rd party code, e.g. other plugins:
+		global $tinymce_content_css;
+		if( is_array( $tinymce_content_css ) && count( $tinymce_content_css ) )
+		{
+			$content_css .= ','.implode( ',', $tinymce_content_css );
+		}
 
 		$init_options[] = 'content_css : "'.$this->get_plugin_url().'editor.css?v='.( $debug ? $localtimenow : $this->version )
 									.$content_css.'"';

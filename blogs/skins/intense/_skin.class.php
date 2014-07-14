@@ -8,7 +8,7 @@
  * @package skins
  * @subpackage intense
  *
- * @version $Id: _skin.class.php 6956 2014-06-24 06:13:28Z yura $
+ * @version $Id: _skin.class.php 7069 2014-07-04 08:32:23Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -75,28 +75,6 @@ class intense_Skin extends Skin
 		return $r;
 	}
 
-	/**
-	 * Get ready for displaying the skin.
-	 *
-	 * This may register some CSS or JS...
-	 */
-	function display_init()
-	{
-		// call parent:
-		parent::display_init();
-
-		// require_css( 'basic_styles.css', 'blog' ); // the REAL basic styles
-		// require_css( 'basic.css', 'blog' ); // Basic styles
-		// require_css( 'blog_base.css', 'blog' ); // Default styles for the blog navigation
-		// require_css( 'item_base.css', 'blog' ); // Default styles for the post CONTENT
-		// require_css( 'b2evo_base.bundle.css', 'blog' ); // Concatenation of the above
-		require_css( 'b2evo_base.bmin.css', 'blog' ); // Concatenation + Minifaction of the above
-
-		if($this->get_setting("colorbox")) 
-		{
-			require_js_helper( 'colorbox', 'blog' );
-		}
-	}
 }
 
 ?>

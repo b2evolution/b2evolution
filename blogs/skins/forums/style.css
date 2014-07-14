@@ -53,8 +53,7 @@ a.forumlink:hover, a.postlink:hover {
 	font-size: 11px !important;
 }
 
-div.pageHeader h1 a,
-div.pageHeader h1 a:visited {  /* IE6 */
+div.pageHeader h1 a {
 	text-decoration: none;
 }
 div.pageHeader h1 a:hover {
@@ -139,11 +138,11 @@ div#wrapper {
 	font: 11px Verdana, Arial, Helvetica, sans-serif;
 	width: 960px;
 	margin: 0 auto;
-	transition: width 1s;
-	-moz-transition: width 1s; /* Firefox 4 */
-	-webkit-transition: width 1s; /* Safari and Chrome */
-	-o-transition: width 1s; /* Opera */
-	-ms-transition: width 1s; /* IE */
+	transition: all 1s;
+	-moz-transition: all 1s; /* Firefox 4 */
+	-webkit-transition: all 1s; /* Safari and Chrome */
+	-o-transition: all 1s; /* Opera */
+	-ms-transition: all 1s; /* IE */
 }
 div.pageTop, div.pageHeader, div#pageFooter {
 	font: 84% Arial, Helvetica, sans-serif;

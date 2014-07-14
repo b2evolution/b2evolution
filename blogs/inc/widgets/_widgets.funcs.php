@@ -126,14 +126,12 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 			( '.$blog_id.', "Header", 2, "core", "coll_tagline" )' );
 
 		/* Menu */
-		$wi_params_link_home = array( 'link_type' => 'home' );
-		if( $kind == 'forum' )
-		{
-			$wi_params_link_home['link_text'] = T_('Forums Home');
-		}
 		$widgets_insert_sql = 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params ) VALUES';
 		$widgets_insert_sql_rows = array();
-		$widgets_insert_sql_rows[] = '( '.$blog_id.', "Menu", 5, "core", "menu_link", "'.$DB->escape( serialize( $wi_params_link_home ) ).'" )';
+		if( $kind != 'forum' )
+		{ // Home page
+			$widgets_insert_sql_rows[] = '( '.$blog_id.', "Menu", 5, "core", "menu_link", "'.$DB->escape( serialize( array( 'link_type' => 'home' ) ) ).'" )';
+		}
 		if( $blog_id == 1 )
 		{ // Recent Posts
 			$widgets_insert_sql_rows[] = '( '.$blog_id.', "Menu", 10, "core", "menu_link", "'.$DB->escape( serialize( array( 'link_type' => 'recentposts', 'link_text' => T_('News') ) ) ).'" )';
@@ -143,7 +141,10 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 			$widgets_insert_sql_rows[] = '( '.$blog_id.', "Menu", 13, "core", "menu_link", "'.$DB->escape( serialize( array( 'link_type' => 'recentposts', 'link_text' => T_('Latest topics') ) ) ).'" )';
 			$widgets_insert_sql_rows[] = '( '.$blog_id.', "Menu", 15, "core", "menu_link", "'.$DB->escape( serialize( array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest replies') ) ) ).'" )';
 		}
-		$widgets_insert_sql_rows[] = '( '.$blog_id.', "Menu", 20, "core", "coll_page_list", NULL )';
+		if( $kind != 'forum' )
+		{ // Page about blog
+			$widgets_insert_sql_rows[] = '( '.$blog_id.', "Menu", 20, "core", "coll_page_list", NULL )';
+		}
 		if( $kind == 'forum' )
 		{ // My Profile
 			$widgets_insert_sql_rows[] = '( '.$blog_id.', "Menu", 35, "core", "menu_link", "'.$DB->escape( serialize( array( 'link_type' => 'myprofile' ) ) ).'" )';

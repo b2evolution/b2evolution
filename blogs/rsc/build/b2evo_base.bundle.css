@@ -246,6 +246,7 @@ a.roundbutton.middle {
 a.roundbutton:hover, a.roundbutton_text:hover {
 	cursor: default;
 	text-decoration: none;
+	color: inherit;
 	background: #d2d2d2;
 	/* Safari 4-5, Chrome 1-9 */
 	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#d2d2d2), to(#a0a0a0));
@@ -389,22 +390,22 @@ a.roundbutton_text span, a.roundbutton_text_noicon span {
 	background-position :0;
 	background-image : -moz-linear-gradient(
 		90deg,
-		rgba(0,0,0,0) 0%,
-		rgba(0,0,0,0) 50%,
+		rgba(0,0,0,0.01) 0%,
+		rgba(0,0,0,0.01) 50%,
 		rgba(255,255,255,0.1) 50%,
 		rgba(255,255,255,0.3) 100%
 		);
 	background-image : -o-linear-gradient(
 		90deg,
-		rgba(0,0,0,0) 0%,
-		rgba(0,0,0,0) 50%,
+		rgba(0,0,0,0.01) 0%,
+		rgba(0,0,0,0.01) 50%,
 		rgba(255,255,255,0.1) 50%,
 		rgba(255,255,255,0.3) 100%
 		);
 	background-image : -webkit-linear-gradient(
 		90deg,
-		rgba(0,0,0,0) 0%,
-		rgba(0,0,0,0) 50%,
+		rgba(0,0,0,0.01) 0%,
+		rgba(0,0,0,0.01) 50%,
 		rgba(255,255,255,0.1) 50%,
 		rgba(255,255,255,0.3) 100%
 		);
@@ -736,7 +737,8 @@ ul.sf-menu li li li.sfHover ul {
 .sf-menu-right a {
 	padding: 3px 1ex 0px;  /* .5em need to macth global height above */
 }
-.sf-menu a, .sf-menu a:link, .sf-menu a:visited  { /* visited pseudo selector so IE6 applies text colour*/
+/* Set one color for each link status to don't rewrite from skins */
+.sf-menu a, .sf-menu a:link, .sf-menu a:visited {
 	color: ButtonText;
 }
 .sf-menu li li {
@@ -833,16 +835,12 @@ ul.sf-menu li li li.sfHover ul {
 	position:		absolute;
 	display:		block;
 	right:			.75em;
-	top:			6px; /* IE6 only */
+	top:			4px;
 	width:			10px;
 	height:			10px;
 	text-indent: 	-999em;
 	overflow:		hidden;
-	background:		url('../img/superfish-arrows.png') no-repeat -10px -100px; /* 8-bit indexed alpha png. IE6 gets solid image only */
-}
-a > .sf-sub-indicator {  /* give all except IE6 the correct values */
-	top:			4px;
-	background-position: 0 -100px; /* use translucent arrow for modern browsers*/
+	background:		url('../img/superfish-arrows.png') no-repeat 0 -100px; /* 8-bit indexed alpha png. IE6 gets solid image only */
 }
 li li a > .sf-sub-indicator {  /* give all except IE6 the correct values */
 	top:			6px;
@@ -1054,10 +1052,6 @@ legend {
 	float: left;
 	margin-left: 5px;
 	line-height: 24px;
-}
-* html .fform div.input {
-	height:1%; /* so IE6 gains layout (hasLayout) and does not cause 3px bug for lines below div.label (if div.input is heigher than div.label) */
-	margin:0; /* fix the margin after the above fix */
 }
 
 .fform fieldset.input{
@@ -2187,7 +2181,6 @@ div.item_location {
 	-moz-transform: rotate(45deg);
 	-o-transform: rotate(45deg);
 	-ms-transform: rotate(45deg);
-	filter: progid:DXImageTransform.Microsoft.Matrix(sizingMethod='auto expand', M11=0.7071067811865476, M12=-0.7071067811865475, M21=0.7071067811865475, M22=0.7071067811865476); /* IE6,IE7 */
 	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(SizingMethod='auto expand', M11=0.7071067811865476, M12=-0.7071067811865475, M21=0.7071067811865475, M22=0.7071067811865476)"; /* IE8 */
 }
 

@@ -122,11 +122,11 @@ div#wrapper {
 	width: 960px;
 	margin: 0 auto;
 	padding: 0 0 10px 0;
-	transition: width 1s;
-	-moz-transition: width 1s; /* Firefox 4 */
-	-webkit-transition: width 1s; /* Safari and Chrome */
-	-o-transition: width 1s; /* Opera */
-	-ms-transition: width 1s; /* IE */
+	transition: all 1s;
+	-moz-transition: all 1s; /* Firefox 4 */
+	-webkit-transition: all 1s; /* Safari and Chrome */
+	-o-transition: all 1s; /* Opera */
+	-ms-transition: all 1s; /* IE */
 }
 
 div.PageTop ul {
@@ -577,4 +577,12 @@ div.error_404 {
 
 .form_add_contacts .controls {
 	padding-left: 0;
+}
+
+/* disp=user */
+body.disp_user form.bComment fieldset.fieldset {
+	margin: 2em 0;
+}
+body.disp_user legend {
+	margin-bottom: 1em;
 }

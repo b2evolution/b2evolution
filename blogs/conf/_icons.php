@@ -334,6 +334,14 @@ function get_icon_info($name)
 			'glyph' => 'plus',
 			'fa' => 'plus-square'
 		);
+		case 'compose_new': return array( // for composing a new message or text
+			'rollover' => true,
+			'alt'  => T_('New'),
+			'size' => array( 16, 15 ),
+			'xy' => array( 0, 64 ),
+			'glyph' => 'pencil',			// May need something else
+			'fa' => 'pencil'
+		);
 		case 'copy': return array(
 			'alt'  => T_('Copy'),
 			'size' => array( 14, 15 ),
@@ -400,7 +408,9 @@ function get_icon_info($name)
 			'alt'  => T_('Del'),
 			'size' => array( 13, 13 ),
 			'xy' => array( 144, 64 ),
-			'glyph' => 'remove'
+			'glyph' => 'remove',
+			'fa' => 'times',
+			'color' => '#F00',
 		);
 
 		case 'bullet_black':
@@ -883,23 +893,27 @@ function get_icon_info($name)
 		case 'multi_action': return array(
 			'alt'  => T_('Action for selected elements'),
 			'size' => array( 16, 16 ),
-			'xy' => array( 112, 224 )
+			'xy' => array( 112, 224 ),
+			'fa' => 'level-up fa-rotate-90'
 		);
 
 		case 'rotate_right': return array(
 			'alt'  => T_('Rotate this picture 90&deg; to the right'),
 			'size' => array( 15, 16 ),
-			'xy' => array( 64, 224 )
+			'xy' => array( 64, 224 ),
+			'fa' => 'share'
 		);
 		case 'rotate_left': return array(
 			'alt'  => T_('Rotate this picture 90&deg; to the left'),
 			'size' => array( 15, 16 ),
-			'xy' => array( 80, 224 )
+			'xy' => array( 80, 224 ),
+			'fa' => 'reply'
 		);
 		case 'rotate_180': return array(
 			'alt'  => T_('Rotate this picture 180&deg;'),
 			'size' => array( 14, 16 ),
-			'xy' => array( 96, 224 )
+			'xy' => array( 96, 224 ),
+			'fa' => 'rotate-right'
 		);
 
 		case 'notification': return array(

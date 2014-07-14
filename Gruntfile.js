@@ -38,6 +38,7 @@ module.exports = function(grunt) {
 					'blogs/rsc/build/testless.css': 'blogs/rsc/less/test.less',
 					// Custom CSS for bootstrap back-office
 					'blogs/skins_adm/bootstrap/rsc/css/style.css': 'blogs/skins_adm/bootstrap/rsc/css/style.less',
+					'blogs/rsc/css/bootstrap/b2evo.css': 'blogs/rsc/css/bootstrap/b2evo.less',
 				}
 			}
 		},
@@ -50,7 +51,10 @@ module.exports = function(grunt) {
 				},
 				files: {
 					// target.css file: source.scss file
-					'blogs/rsc/build/testscss.css': 'blogs/rsc/scss/test.scss',
+					//'blogs/rsc/build/testscss.css': 'blogs/rsc/scss/test.scss',
+					'blogs/skins/pureforums/pureforums_header.css': 'blogs/skins/pureforums/pureforums_header.scss',
+					'blogs/skins/pureforums/pureforums_main.css': 'blogs/skins/pureforums/pureforums_main.scss',
+					'blogs/skins/pureforums/pureforums_footer.css': 'blogs/skins/pureforums/pureforums_footer.scss',
 				}
 			}
 		},
@@ -76,6 +80,11 @@ module.exports = function(grunt) {
 				nonull: true, // Display missing files
 				src: ['blogs/skins/evopress/style.css', 'blogs/skins/evopress/item.css'],
 				dest: 'blogs/skins/evopress/evopress.bundle.css',
+			},
+			skin_pureforums: {
+				nonull: true, // Display missing files
+				src: ['blogs/skins/pureforums/pureforums_header.css', 'blogs/skins/pureforums/pureforums_main.css', 'blogs/skins/pureforums/pureforums_footer.css'],
+				dest: 'blogs/skins/pureforums/pureforums.bundle.css',
 			},
 			/*
 			 * JS:
@@ -111,6 +120,10 @@ module.exports = function(grunt) {
 			skin_evopress: {
 				src: 'blogs/skins/evopress/evopress.bundle.css',
 				dest: 'blogs/skins/evopress/evopress.bmin.css',
+			},
+			skin_pureforums: {
+				src: 'blogs/skins/pureforums/pureforums.bundle.css',
+				dest: 'blogs/skins/pureforums/pureforums.bmin.css',
 			},
 		},
 
@@ -183,7 +196,7 @@ module.exports = function(grunt) {
 			},
 			*/
 			less: {
-				// Which files to watch (all .less files recursively in the less directory)
+				// Which files to watch (all .less files recursively in the whole blogs directory)
 				files: ['blogs/**/*.less'],
 				tasks: ['less'],
 				options: {
@@ -192,8 +205,16 @@ module.exports = function(grunt) {
 			},
 			sass: {
 				// Which files to watch (all .scss files recursively in the scss directory)
-				files: ['blogs/rsc/scss/**/*.scss'],
+				files: ['blogs/**/*.scss'],
 				tasks: ['sass'],
+				options: {
+					nospawn: true,
+				}
+			},
+			concat_cssmin: {
+				// Which files to watch (all .css files recursively in the whole blogs directory)
+				files: ['blogs/**/*.css'],
+				tasks: ['concat','cssmin'],
 				options: {
 					nospawn: true,
 				}

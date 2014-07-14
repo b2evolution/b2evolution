@@ -82,7 +82,6 @@ a:hover {
 
 #mainmenu li a,
 #coll_list li a {
-	float: left; /* This line needed by IE6, not necessary for IE7 */
 	display: block;
 	height: 15px;
 	padding: 4px 9px;

@@ -15,7 +15,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _dashboard.funcs.php 7036 2014-07-01 18:05:24Z yura $
+ * @version $Id: _dashboard.funcs.php 7046 2014-07-02 11:41:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -455,7 +455,7 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 				'before'    => ' ',
 				'after'     => ' ',
 				'class'     => 'ActionButton btn btn-default',
-				'text'      => get_icon( 'edit_button' ).' '.T_('Edit...')
+				'text'      => get_icon( 'edit_button' ).' '.T_('Edit')
 			) );
 		$Item->publish_link( '', '', '#', '#', 'PublishButton' );
 		echo get_icon( 'pixel' );
