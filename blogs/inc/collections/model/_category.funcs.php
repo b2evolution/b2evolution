@@ -40,7 +40,7 @@
  *
  * @todo implement CategoryCache based on LinkCache
  *
- * @version $Id: _category.funcs.php 7106 2014-07-11 11:58:53Z yura $
+ * @version $Id: _category.funcs.php 7118 2014-07-15 05:32:58Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -55,8 +55,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param integer|NULL Blog ID (will be taken from parent cat, if empty)
  * @param string Category description
  * @param boolean Set to true if the new object needs to be added into the ChapterCache after it was created
- * @param boolean Is meta category?
  * @param integer Category order
+ * @param boolean Is meta category?
  */
 function cat_create( $cat_name, $cat_parent_ID, $cat_blog_ID = NULL, $cat_description = NULL, $add_to_cache = false, $cat_order = NULL, $meta = false )
 {
@@ -260,16 +260,7 @@ function get_postcount_in_category( $cat_ID, $blog_ID = NULL )
 
 	if( !isset( $number_of_posts_in_cat[ (string) $blog_ID ] ) )
 	{
-		// fp> TODO: the following probably needs to be ALL except $posttypes_specialtypes
-		$post_types = array( 1, 2000 );
-
-		$BlogCache = & get_BlogCache();
-		$Blog = & $BlogCache->get_by_ID( $blog_ID );
-		$default_post_type = $Blog->get_setting( 'default_post_type' );
-		if( ! in_array( $default_post_type, $post_types ) )
-		{ // Include also default post type of the current blog
-			$post_types[] = $default_post_type;
-		}
+		global $posttypes_specialtypes;
 
 		$SQL = new SQL( 'Get # of posts for each category in a blog' );
 		$SQL->SELECT( 'cat_ID, count( postcat_post_ID ) c' );
@@ -277,7 +268,7 @@ function get_postcount_in_category( $cat_ID, $blog_ID = NULL )
 		$SQL->FROM_add( 'INNER JOIN T_postcats ON postcat_cat_ID = cat_id' );
 		$SQL->FROM_add( 'INNER JOIN T_items__item ON postcat_post_ID = post_id' );
 		$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $blog_ID ) );
-		$SQL->WHERE_and( 'post_ptyp_ID IN ( '.$DB->quote( $post_types ).' )' );
+		$SQL->WHERE_and( 'post_ptyp_ID NOT IN ( '.$DB->quote( $posttypes_specialtypes ).' )' );
 		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $blog_ID, 'post' ), 'post_', $blog_ID, 'blog_post!', true ) );
 		$SQL->GROUP_BY( 'cat_ID' );
 		$number_of_posts_in_cat[ (string) $blog_ID ] = $DB->get_assoc( $SQL->get() );

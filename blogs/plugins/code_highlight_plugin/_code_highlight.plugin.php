@@ -27,7 +27,7 @@
  * @author Yabba: Paul Jones - {@link http://astonishme.co.uk/}
  * @author Stk: Scott Kimler - {@link http://astonishme.co.uk/}
  *
- * @version $Id: _code_highlight.plugin.php 6963 2014-06-24 11:53:01Z yura $
+ * @version $Id: _code_highlight.plugin.php 7124 2014-07-15 13:05:53Z yura $
  */
 
 /**
@@ -123,8 +123,8 @@ class code_highlight_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->short_desc = T_( 'Display computer code in a post.' );
-		$this->long_desc = T_( 'Display computer code easily with syntax coloring and allowing for easy copy/paste.' );
+		$this->short_desc = T_( 'Display computer code in a post.' ).' '.T_( '(Plugin not available in WYSIWYG mode)' );
+		$this->long_desc = T_( 'Display computer code easily with syntax coloring and allowing for easy copy/paste.' ).' '.T_( '(Plugin not available in WYSIWYG mode)' );
 	}
 
 
@@ -429,26 +429,6 @@ class code_highlight_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		// Get a setting "Allow HTML" for:
-		if( ! empty( $params['Comment'] ) )
-		{ // Comment
-			$Comment = & $params['Comment'];
-			$comment_Item = & $Comment->get_Item();
-			$item_Blog = $comment_Item->get_Blog();
-			$this->allow_html = $item_Blog->get_setting( 'allow_html_comment' );
-		}
-		else if( ! empty( $params['Item'] ) )
-		{ // Item
-			$Item = & $params['Item'];
-			$item_Blog = $Item->get_Blog();
-			$this->allow_html = $item_Blog->get_setting( 'allow_html_post' );
-		}
-		else if( ! empty( $params['Message'] ) )
-		{ // Message
-			global $Settings;
-			$this->allow_html = $Settings->get( 'allow_html_message' );
-		}
-
 		// 2 - attribs : lang &| line
 		// 4 - codeblock
 		$content = preg_replace_callback( '#(\<p>)?\<!--\s*codeblock([^-]*?)\s*-->(\</p>)?\<pre[^>]*><code>([\s\S]+?)</code>\</pre>(\<p>)?\<!--\s*/codeblock\s*-->(\</p>)?#i',
@@ -697,10 +677,6 @@ class code_highlight_plugin extends Plugin
 
 		if( $code = trim( $block[4] ) )
 		{ // we have a code block
-			if( $this->allow_html )
-			{ // If HTML is allowed in content we should disallow this for <code> content
-				$code = evo_htmlspecialchars( $code );
-			}
 			// is the relevant language highlighter already cached?
 			if( empty( $this->languageCache[ $language ] ) )
 			{ // lets attempt to load the language

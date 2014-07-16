@@ -22,7 +22,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _skin.class.php 7069 2014-07-04 08:32:23Z yura $
+ * @version $Id: _skin.class.php 7111 2014-07-14 05:23:46Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -675,7 +675,7 @@ class Skin extends DataObject
 
 		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
 		if( $this->get_setting( 'colorbox' ) )
-		{
+		{	// This can be enabled by a setting in skins where it may be relevant
 			require_js_helper( 'colorbox', 'blog' );
 		}
 

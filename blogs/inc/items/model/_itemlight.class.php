@@ -28,7 +28,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _itemlight.class.php 7000 2014-06-27 09:20:40Z yura $
+ * @version $Id: _itemlight.class.php 7111 2014-07-14 05:23:46Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -700,22 +700,22 @@ class ItemLight extends DataObject
 					}
 				}
 
-				$message = sprintf( T_( 'Item with ID <a %s>%s</a> has an invalid main category ID %s.' ),
+				$message = sprintf( 'Item with ID <a %s>%s</a> has an invalid main category ID %s.', /* Do NOT translate debug messages! */
 						'href="'.$url_to_edit_post.'"',
 						$this->ID,
 						$this->main_cat_ID
 					);
 				if( empty( $Blog ) )
-				{ // No blog defined
-					$message .= ' '.T_( 'In addition we cannot fallback to the default category because no valid blog ID has been specified.' );
+				{	// No blog defined
+					$message .= ' In addition we cannot fallback to the default category because no valid blog ID has been specified.';
 				}
 
 				if( empty( $this->main_Chapter ) )
-				{ // Main chapter is not defined, because blog doesn't have the default cat ID and even blog doesn't have any categories
+				{	// Main chapter is not defined, because blog doesn't have the default cat ID and even blog doesn't have any categories
 					debug_die( $message );
 				}
 				else
-				{ // Main chapter is defined, we can show the page
+				{	// Main chapter is defined, we can show the page
 					global $Messages, $current_User;
 					if( is_logged_in() && $current_User->check_perm( 'blogs', 'editall' ) )
 					{ // User has permission to all blogs posts and comments, display a message as note in order to allow update it

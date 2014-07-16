@@ -21,7 +21,7 @@
  *
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _plugins_admin.class.php 6983 2014-06-25 12:10:42Z yura $
+ * @version $Id: _plugins_admin.class.php 7111 2014-07-14 05:23:46Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -939,7 +939,7 @@ class Plugins_admin extends Plugins
 			{ // Already set to same value
 				return true;
 			}
-			else if( $this->index_code_ID[$code] > 0 )
+			elseif( $this->index_code_ID[$code] > 0 )
 			{ // If code exists in DB for another plugin
 				return T_( 'The plugin code is already in use by another plugin.' );
 			}

@@ -4,7 +4,7 @@
  *
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _prune_recycled_comments.job.php 3413 2013-04-05 05:41:53Z yura $
+ * @version $Id: _prune_recycled_comments.job.php 7043 2014-07-02 08:35:45Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

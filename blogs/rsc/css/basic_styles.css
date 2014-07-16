@@ -85,6 +85,9 @@ code, samp {
 .black {
 	color: #000;
 }
+.disabled {
+	color: #999;
+}
 acronym,
 abbr {
 	border-bottom: 1px dotted #000;

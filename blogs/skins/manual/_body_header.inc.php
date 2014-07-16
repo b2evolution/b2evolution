@@ -10,7 +10,7 @@
  * @package evoskins
  * @subpackage manual
  *
- * @version $Id: _body_header.inc.php 6426 2014-04-08 16:26:27Z yura $
+ * @version $Id: _body_header.inc.php 7043 2014-07-02 08:35:45Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

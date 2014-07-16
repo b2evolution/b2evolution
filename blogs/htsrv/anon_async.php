@@ -21,7 +21,7 @@
  *
  * @package evocore
  *
- * @version $Id: anon_async.php 7036 2014-07-01 18:05:24Z yura $
+ * @version $Id: anon_async.php 7111 2014-07-14 05:23:46Z yura $
  */
 
 
@@ -381,7 +381,7 @@ switch( $action )
 		param( 'vote_ID', 'string', 0 );
 		param( 'checked', 'integer', 0 );
 		param( 'redirect_to', 'url', '' );
-		// Use the glyph or font-awesome icons if it is defined by skin
+		// Use the glyph or font-awesome icons if requested by skin
 		param( 'b2evo_icons_type', 'string', '' );
 
 		$Ajaxlog->add( sprintf( 'vote action: %s', $vote_action ), 'note' );
@@ -530,7 +530,7 @@ switch( $action )
 			echo '[1]';
 		}
 
-		// Use the glyph or font-awesome icons if it is defined by skin
+		// Use the glyph or font-awesome icons if requested by skin
 		param( 'b2evo_icons_type', 'string', '' );
 
 		$Form = new Form();
@@ -610,7 +610,7 @@ switch( $action )
 	case 'get_userfields_criteria':
 		// Get fieldset for users filter by Specific criteria
 
-		// Use the glyph or font-awesome icons if it is defined by skin
+		// Use the glyph or font-awesome icons if requested by skin
 		param( 'b2evo_icons_type', 'string', '' );
 
 		$Form = new Form();
@@ -726,7 +726,7 @@ switch( $action )
 		if( !empty( $field_info ) )
 		{ // Replace mask text (+) with img tag
 
-			// Use the glyph or font-awesome icons if it is defined by skin
+		// Use the glyph or font-awesome icons if requested by skin
 		param( 'b2evo_icons_type', 'string', '' );
 
 			echo str_replace( '(+)', get_icon( 'add' ), $field_info );

@@ -10,7 +10,7 @@
  * @package evoskins
  * @subpackage photoalbum
  *
- * @version $Id: index.main.php 6462 2014-04-14 13:28:56Z yura $
+ * @version $Id: index.main.php 7043 2014-07-02 08:35:45Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

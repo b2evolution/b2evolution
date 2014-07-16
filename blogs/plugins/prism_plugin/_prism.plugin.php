@@ -30,8 +30,8 @@ class prism_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->short_desc = T_('Display computer code.');
-		$this->long_desc = T_('Display computer code rendered by JavaScript plugin Prism.');
+		$this->short_desc = T_( 'Display computer code.' ).' '.T_( '(Plugin not available in WYSIWYG mode)' );
+		$this->long_desc = T_( 'Display computer code rendered by JavaScript plugin Prism.' ).' '.T_( '(Plugin not available in WYSIWYG mode)' );
 	}
 
 

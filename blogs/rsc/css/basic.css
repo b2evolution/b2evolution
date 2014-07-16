@@ -369,7 +369,7 @@ ul.sf-menu li li li.sfHover ul {
 	height:			10px;
 	text-indent: 	-999em;
 	overflow:		hidden;
-	background:		url('../img/superfish-arrows.png') no-repeat 0 -100px; /* 8-bit indexed alpha png. IE6 gets solid image only */
+	background:		url('../img/superfish-arrows.png') no-repeat 0 -100px;
 }
 li li a > .sf-sub-indicator {  /* give all except IE6 the correct values */
 	top:			6px;

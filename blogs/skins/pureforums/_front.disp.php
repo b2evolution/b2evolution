@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage pureforums
  *
- * @version $Id: _front.disp.php 6626 2014-05-07 10:05:49Z yura $
+ * @version $Id: _front.disp.php 7043 2014-07-02 08:35:45Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

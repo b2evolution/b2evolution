@@ -25,7 +25,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author blueyed: Daniel HAHLER.
  *
- * @version $Id: _stats_settings.form.php 6135 2014-03-08 07:54:05Z manuel $
+ * @version $Id: _stats_settings.form.php 7043 2014-07-02 08:35:45Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

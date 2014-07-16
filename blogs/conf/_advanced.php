@@ -7,7 +7,7 @@
  *
  * @package conf
  *
- * @version $Id: _advanced.php 6956 2014-06-24 06:13:28Z yura $
+ * @version $Id: _advanced.php 7111 2014-07-14 05:23:46Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -857,4 +857,7 @@ $evonetsrv_uri = '/evonetsrv/xmlrpc.php';
 $antispamsrv_host = 'antispam.b2evo.net';
 $antispamsrv_port = 80;
 $antispamsrv_uri = '/evonetsrv/xmlrpc.php';
+
+// This is for plugins to add CS files to the TinyMCE editor window:
+$tinymce_content_css = array();
 ?>

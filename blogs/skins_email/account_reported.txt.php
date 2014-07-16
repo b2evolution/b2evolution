@@ -8,7 +8,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
- * @version $Id: account_reported.txt.php 6135 2014-03-08 07:54:05Z manuel $
+ * @version $Id: account_reported.txt.php 7043 2014-07-02 08:35:45Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

@@ -22,7 +22,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _skin.funcs.php 7083 2014-07-07 16:40:23Z yura $
+ * @version $Id: _skin.funcs.php 7127 2014-07-15 13:43:26Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -603,7 +603,7 @@ var downloadInterval = setInterval( function()
 			init_tokeninput_js( 'blog' );
 			init_datepicker_js( 'blog' );
 			init_plugins_js( 'blog', $Skin->get_template( 'tooltip_plugin' ) );
-			require_js( 'admin.js', 'blog' );
+			require_js( 'backoffice.js', 'blog' );
 			require_js( 'extracats.js', 'blog' );
 
 			init_inskin_editing();

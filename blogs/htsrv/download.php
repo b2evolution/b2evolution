@@ -10,7 +10,7 @@
  *
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: download.php 6459 2014-04-14 09:57:00Z yura $
+ * @version $Id: download.php 7043 2014-07-02 08:35:45Z yura $
  */
 
 /**

@@ -24,7 +24,7 @@
  * @package evocore
 
  *
- * @version $Id: _account_close_setting.form.php 6487 2014-04-16 11:11:57Z yura $
+ * @version $Id: _account_close_setting.form.php 7043 2014-07-02 08:35:45Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
