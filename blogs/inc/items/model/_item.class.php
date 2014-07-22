@@ -31,7 +31,7 @@
  * @author gorgeb: Bertrand GORGE / EPISTEMA
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
- * @version $Id: _item.class.php 7079 2014-07-07 11:48:07Z yura $
+ * @version $Id: _item.class.php 7166 2014-07-22 04:22:37Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1186,7 +1186,7 @@ class Item extends ItemLight
 
 		// There are inline image placeholders
 		if( $this->ID > 0 )
-		{ // The post is not saved yet, so it can not contains attachments
+		{ // The post is saved, so it can actually have attachments:
 			global $DB;
 			$links_SQL = new SQL();
 			$links_SQL->SELECT( 'link_ID' );
@@ -1765,9 +1765,10 @@ class Item extends ItemLight
 				'disppage'    => '#',
 				'format'      => 'htmlbody',
 				'force_more'  => false,
+				'image_size'  => 'fit-400x320',
 			), $params );
 
-		$r = $this->get_content_extension( $params['disppage'], $params['force_more'], $params['format'] );
+		$r = $this->get_content_extension( $params['disppage'], $params['force_more'], $params['format'], $params );
 
 		if( ! empty( $r ) )
 		{
@@ -1784,9 +1785,10 @@ class Item extends ItemLight
 	 * @param mixed page number to display specific page, # for url parameter
 	 * @param boolean
 	 * @param string filename to use to display more
+	 * @param array additional params passthrough
 	 * @return string
 	 */
-	function get_content_extension( $disppage = '#', $force_more = false, $format = 'htmlbody' )
+	function get_content_extension( $disppage = '#', $force_more = false, $format = 'htmlbody', $params = array() )
 	{
 		global $Plugins, $more, $preview;
 
@@ -1795,7 +1797,17 @@ class Item extends ItemLight
 			return NULL;
 		}
 
-		$params = array('disppage' => $disppage, 'format' => $format);
+		// Set default params
+		$params = array_merge( array(
+				'image_size' => 'fit-400x320',
+			), $params );
+
+		// Don't rewrite these params from array $params, Use them from separate params of this function
+		$params = array_merge( $params, array(
+				'disppage' => $disppage, 
+				'format'   => $format
+			) );
+
 		if( ! $this->has_content_parts( $params ) )
 		{ // This is NOT an extended post
 			return NULL;
@@ -4992,6 +5004,11 @@ class Item extends ItemLight
 		// BLOCK CACHE INVALIDATION:
 		BlockCache::invalidate_key( 'cont_coll_ID', $Blog->ID ); // Content has changed
 
+		if( $this->is_intro() || $this->is_featured() )
+		{ // Content of intro or featured post has changed
+			BlockCache::invalidate_key( 'intro_feat_coll_ID', $Blog->ID );
+		}
+
 		// set_coll_ID // Settings have not changed
 
 		return $result;
@@ -5098,6 +5115,11 @@ class Item extends ItemLight
 
 			// BLOCK CACHE INVALIDATION:
 			BlockCache::invalidate_key( 'cont_coll_ID', $Blog->ID ); // Content has changed
+
+			if( $this->is_intro() || $this->is_featured() )
+			{ // Content of intro or featured post has changed
+				BlockCache::invalidate_key( 'intro_feat_coll_ID', $Blog->ID );
+			}
 
 			// set_coll_ID // Settings have not changed
 		}

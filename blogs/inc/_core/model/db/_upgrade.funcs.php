@@ -26,7 +26,7 @@
  * @author blueyed: Daniel HAHLER
  * @author Wordpress team
  *
- * @version $Id: _upgrade.funcs.php 6312 2014-03-24 11:45:38Z attila $
+ * @version $Id: _upgrade.funcs.php 7150 2014-07-18 11:57:35Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1727,6 +1727,7 @@ function convert_table_to_utf8( $table )
 
 	// Note: Text type columns must be updated before the table update to avoid type changes because of the charset modification
 	// This way we avoid the automatic modification of e.g. mediumtext colums to longtext
+	$col_definitions = array();
 	foreach( $text_columns as $text_column )
 	{ // Update each text column character set explicitly to utf8. Those columns which should not be updated were already removed from this array.
 		$col_definition = $text_column->Field.
@@ -1735,7 +1736,11 @@ function convert_table_to_utf8( $table )
 			( isset( $text_column->Default ) ? ' DEFAULT "'.$text_column->Default.'"' : '' ).
 			( isset( $text_column->Extra ) ? ' '.$text_column->Extra : '' ).
 			( isset( $text_column->Comment ) ? ' COMMENT "'.$text_column->Comment.'"' : '' );
-		$DB->query( 'ALTER TABLE `'.$table.'` MODIFY '.$col_definition );
+		$col_definitions[] = 'MODIFY '.$col_definition;
+	}
+	if( count( $col_definitions ) )
+	{
+		$DB->query( 'ALTER TABLE `'.$table.'` '.implode( ', ', $col_definitions ) );
 	}
 
 	if( empty( $columns_with_charset ) )

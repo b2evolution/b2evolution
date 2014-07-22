@@ -14,7 +14,7 @@
  *
  * @package install
  *
- * @version $Id: _functions_evoupgrade.php 6919 2014-06-18 06:53:52Z yura $
+ * @version $Id: _functions_evoupgrade.php 7154 2014-07-21 05:02:46Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -4827,8 +4827,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 		// This upgrade block updates all field collations from 'ascii_bin' to 'ascii_general_ci' except of slugs table.
 
+		task_begin( 'Clean up comment emails...' );
+		$DB->query( "UPDATE T_comments
+						SET comment_author_email = CONVERT(comment_author_email USING ascii)" );
+		$DB->commit();
+		task_end();
+
+
 		task_begin( 'Convert the field collations from ascii_bin to ascii_general_ci... ' );
-		$DB->begin();
+		// fp> why would we need a transaction here?	$DB->begin();
 		$DB->query( "ALTER TABLE T_skins__skin
 			MODIFY skin_type enum('normal','feed','sitemap','mobile','tablet') COLLATE ascii_general_ci NOT NULL default 'normal'" );
 		$DB->query( "ALTER TABLE T_blogs
@@ -4965,19 +4972,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$DB->query( "ALTER TABLE T_email__address
 			MODIFY emadr_address VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
 			MODIFY emadr_status  ENUM( 'unknown', 'redemption', 'warning', 'suspicious1', 'suspicious2', 'suspicious3', 'prmerror', 'spammer' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown'" );
-		$DB->commit();
+		//	$DB->commit();
 		task_end();
-
-		/*
-		 * ADD UPGRADES FOR i6 BRANCH __ABOVE__ IN THIS BLOCK.
-		 *
-		 * This part will be included in trunk and i6 branches
-		 */
 
 		set_upgrade_checkpoint( '11260' );
 	}
 
-	if( $old_db_version < 11265 )
+	if( $old_db_version < 11270 )
 	{ // part 16.i trunk aka 12th part of "i6"
 
 		// IPv4 mapped IPv6 addresses maximum length is 45 chars: ex. ABCD:ABCD:ABCD:ABCD:ABCD:ABCD:192.168.158.190
@@ -4989,6 +4990,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$DB->query( "ALTER TABLE T_sessions
 			MODIFY sess_ipaddress VARCHAR(45) COLLATE ascii_general_ci NOT NULL DEFAULT ''" );
 		task_end();
+
+		set_upgrade_checkpoint( '11270' );
+	}
+
+	if( $old_db_version < 11280 )
+	{ // part 16.i trunk aka 12th part of "i6"
+
 		task_begin( 'Upgrading hit logs table...' );
 		$DB->query( "ALTER TABLE T_hitlog
 			MODIFY hit_remote_addr VARCHAR(45) COLLATE ascii_general_ci DEFAULT NULL" );
@@ -4998,21 +5006,22 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		db_drop_col( 'T_blogs', 'blog_UID' );
 		task_end();
 
-		/*
-		 * ADD UPGRADES __ABOVE__ IN THIS BLOCK.
-		 *
-		 * YOU MUST USE:
-		 * task_begin( 'Descriptive text about action...' );
-		 * task_end();
-		 *
-		 * ALL DB CHANGES MUST BE EXPLICITLY CARRIED OUT. DO NOT RELY ON SCHEMA UPDATES!
-		 * Schema updates do not survive after several incremental changes.
-		 *
-		 * NOTE: every change that gets done here, should bump {@link $new_db_version} (by 100).
-		 */
 
-		// set_upgrade_checkpoint( '11265' );
+		// set_upgrade_checkpoint( '11280' );
 	}
+
+	/*
+	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
+	 *
+	 * YOU MUST USE:
+	 * task_begin( 'Descriptive text about action...' );
+	 * task_end();
+	 *
+	 * ALL DB CHANGES MUST BE EXPLICITLY CARRIED OUT. DO NOT RELY ON SCHEMA UPDATES!
+	 * Schema updates do not survive after several incremental changes.
+	 *
+	 * NOTE: every change that gets done here, should bump {@link $new_db_version} (by 100).
+	 */
 
 	// Execute general upgrade tasks.
 	// These tasks needs to be called after every upgrade process, except if they were already executed but the upgrade was not finished because of the max execution time check.

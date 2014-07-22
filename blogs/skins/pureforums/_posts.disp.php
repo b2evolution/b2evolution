@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage pureforums
  *
- * @version $Id: _posts.disp.php 7043 2014-07-02 08:35:45Z yura $
+ * @version $Id: _posts.disp.php 7130 2014-07-16 07:49:53Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -199,4 +199,24 @@ while( mainlist_get_item() )
 </table>
 <?php
 } // ---------------------------------- END OF POSTS ------------------------------------
+elseif( $cat > 0 )
+{ // Display a message about no posts in this category
+	$ChapterCache = & get_ChapterCache();
+	$Chapter = & $ChapterCache->get_by_ID( $cat, false, false );
+	if( $Chapter && ! $Chapter->meta )
+	{ // Note: the meta categories cannot contain the posts
+		echo !empty( $chapters ) ? '<br />' : '';
+?>
+	<table class="forums_table">
+		<tr class="noposts">
+			<td><?php
+				echo T_('There is no topic in this forum yet.').' ';
+				// Buttons to post new topic
+				$Skin->display_post_button( $cat );
+			?></td>
+		</tr>
+	</table>
+<?php
+	}
+}
 ?>

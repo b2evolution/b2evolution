@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _user.class.php 6565 2014-04-29 08:04:03Z yura $
+ * @version $Id: _user.class.php 7172 2014-07-22 08:07:56Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1783,22 +1783,43 @@ class User extends DataObject
 
 	/**
 	 * Get user page url
+	 *
+	 * @return string
 	 */
 	function get_userpage_url()
 	{
-		/**
-		 * @var Blog
-		 */
-		global $Blog;
+		global $Blog, $Settings;
 
-		if( empty($Blog) )
-		{
+		if( empty( $Blog ) || empty( $Settings ) )
+		{ // Wrong request
 			return NULL;
 		}
 
-		$blogurl = $Blog->gen_blogurl();
+		if( is_logged_in() )
+		{ // If current User is logged in
+			if( $Settings->get( 'user_url_loggedin' ) == 'url' && $this->get_field_url( true ) != '' )
+			{ // Use website url if it is defined and setting enables this
+				return $this->get_field_url( true );
+			}
+			else
+			{ // Use an user page if url is not defined
+				return url_add_param( $Blog->get( 'userurl' ), 'user_ID='.$this->ID );
+			}
+		}
+		else
+		{ // For anonymous users
+			if( $Settings->get( 'user_url_anonymous' ) == 'url' && $this->get_field_url( true ) != '' )
+			{ // Use website url if it is defined and setting enables this
+				return $this->get_field_url( true );
+			}
+			elseif( $Settings->get( 'allow_anonymous_user_profiles' ) )
+			{ // Use an user page if url is not defined and this is enabled by setting for anonymous users
+				return url_add_param( $Blog->get( 'userurl' ), 'user_ID='.$this->ID );
+			}
+		}
 
-		return url_add_param( $Blog->get('userurl'), 'user_ID='.$this->ID );
+		// return NULL if user page url is not allowed
+		return NULL;
 	}
 
 

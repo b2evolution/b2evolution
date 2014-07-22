@@ -605,7 +605,7 @@ function install_basic_plugins( $old_db_version = 0 )
 
 	if( $old_db_version < 11100 )
 	{ // Upgrade to 5.0.1-alpha-5
-		install_plugin( 'escapecode_plugin', $test_install_all_features );
+		install_plugin( 'escapecode_plugin' );
 		install_plugin( 'bbcode_plugin', $test_install_all_features );
 		install_plugin( 'star_plugin', $test_install_all_features );
 		install_plugin( 'prism_plugin', $test_install_all_features );

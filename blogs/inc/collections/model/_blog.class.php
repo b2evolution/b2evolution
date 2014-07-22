@@ -30,7 +30,7 @@
  *
  * @package evocore
  *
- * @version $Id: _blog.class.php 6956 2014-06-24 06:13:28Z yura $
+ * @version $Id: _blog.class.php 7163 2014-07-21 13:13:37Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -2175,12 +2175,14 @@ class Blog extends DataObject
 
 		$DB->begin();
 
-		// Set an order as max value of previous order + 1
-		$SQL = new SQL();
-		$SQL->SELECT( 'MAX( blog_order )' );
-		$SQL->FROM( 'T_blogs' );
-		$max_order = intval( $DB->get_var( $SQL->get() ) );
-		$this->set( 'order', $max_order + 1 );
+		if( $this->get( 'order' ) == 0 )
+		{ // Set an order as max value of previous order + 1 if it is not defined yet
+			$SQL = new SQL();
+			$SQL->SELECT( 'MAX( blog_order )' );
+			$SQL->FROM( 'T_blogs' );
+			$max_order = intval( $DB->get_var( $SQL->get() ) );
+			$this->set( 'order', $max_order + 1 );
+		}
 
 		if( parent::dbinsert() )
 		{

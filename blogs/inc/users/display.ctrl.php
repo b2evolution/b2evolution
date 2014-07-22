@@ -23,7 +23,7 @@
  *
  * @package evocore
  *
- * @version $Id: display.ctrl.php 6135 2014-03-08 07:54:05Z manuel $
+ * @version $Id: display.ctrl.php 7172 2014-07-22 08:07:56Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -55,19 +55,23 @@ switch ( $action )
 		param( 'bubbletip_overlay' );
 		param( 'allow_anonymous_user_list', 'integer', 0 );
 		param( 'allow_anonymous_user_profiles', 'integer', 0 );
+		param( 'user_url_loggedin', 'string', '' );
+		param( 'user_url_anonymous', 'string', '' );
 
 		$Settings->set_array( array(
-									 array( 'use_gravatar', $use_gravatar ),
-									 array( 'default_gravatar', $default_gravatar ),
-									 array( 'gender_colored', $gender_colored ),
-									 array( 'bubbletip', $bubbletip ),
-									 array( 'bubbletip_size_admin', $bubbletip_size_admin ),
-									 array( 'bubbletip_size_front', $bubbletip_size_front ),
-									 array( 'bubbletip_anonymous', $bubbletip_anonymous ),
-									 array( 'bubbletip_size_anonymous', $bubbletip_size_anonymous ),
-									 array( 'bubbletip_overlay', $bubbletip_overlay ),
-									 array( 'allow_anonymous_user_list', $allow_anonymous_user_list ),
-									 array( 'allow_anonymous_user_profiles', $allow_anonymous_user_profiles ) ) );
+			array( 'use_gravatar', $use_gravatar ),
+			array( 'default_gravatar', $default_gravatar ),
+			array( 'gender_colored', $gender_colored ),
+			array( 'bubbletip', $bubbletip ),
+			array( 'bubbletip_size_admin', $bubbletip_size_admin ),
+			array( 'bubbletip_size_front', $bubbletip_size_front ),
+			array( 'bubbletip_anonymous', $bubbletip_anonymous ),
+			array( 'bubbletip_size_anonymous', $bubbletip_size_anonymous ),
+			array( 'bubbletip_overlay', $bubbletip_overlay ),
+			array( 'allow_anonymous_user_list', $allow_anonymous_user_list ),
+			array( 'allow_anonymous_user_profiles', $allow_anonymous_user_profiles ),
+			array( 'user_url_loggedin', $user_url_loggedin ),
+			array( 'user_url_anonymous', $user_url_anonymous ) ) );
 
 		if( ! $Messages->has_errors() )
 		{

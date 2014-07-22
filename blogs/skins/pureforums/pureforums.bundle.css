@@ -543,6 +543,16 @@ body.round_avatars .forums_table .ft_author_avatar img {
   float: left;
 }
 
+.forums_table .noposts .post_button {
+  display: inline-block;
+  vertical-align: middle;
+  margin-top: -3px;
+}
+
+.forums_table .noposts td {
+  line-height: 25px;
+}
+
 .topics_table .panel .posts_navigation {
   float: right;
   margin: 6px 0;

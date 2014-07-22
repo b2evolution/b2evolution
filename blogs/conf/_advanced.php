@@ -7,7 +7,7 @@
  *
  * @package conf
  *
- * @version $Id: _advanced.php 7111 2014-07-14 05:23:46Z yura $
+ * @version $Id: _advanced.php 7141 2014-07-17 08:15:03Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -806,8 +806,7 @@ $sendmail_additional_params = '-r $return-address$';
  * The first string is the production (minified URL), the second is the development URL (optional).
  */
 $library_cdn_urls = array(
-		//'#jquery#' => array( '//code.jquery.com/jquery-1.11.1.min.js', '//code.jquery.com/jquery-1.11.1.js' ),
-		//'#jquery_migrate#' => array( '//code.jquery.com/jquery-migrate-1.2.1.min.js', '//code.jquery.com/jquery-migrate-1.2.1.js' ),
+		'#jquery#' => array( '//code.jquery.com/jquery-1.11.1.min.js', '//code.jquery.com/jquery-1.11.1.js' ),
 		//'#jqueryUI#' => array( '//code.jquery.com/ui/1.10.4/jquery-ui.min.js', '//code.jquery.com/ui/1.10.4/jquery-ui.js' ),
 		//'#jqueryUI_css#' => array( '//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.min.css', '//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css' ),
 		'#bootstrap#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js', '//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.js' ),
@@ -831,9 +830,7 @@ $library_cdn_urls = array(
  * The first string is the production (minified URL), the second is the development URL (optional).
  */
 $library_local_urls = array(
-		'#jquery#' => array( 'build/jquery.bmin.js', 'build/jquery.bundle.js' ),
-# Uncomment the following line if you use official jquery.js and your js code requires the deprecated jquery code that was removed in v1.9.x
-#		'#jquery_migrate#' => array( 'jquery/jquery-migrate.min.js', 'jquery/jquery-migrate.js' ),
+		'#jquery#' => array( 'jquery.min.js', 'jquery.js' ),
 		'#jqueryUI#' => array( 'jquery/jquery.ui.b2evo.min.js', 'jquery/jquery.ui.b2evo.js' ),
 		'#jqueryUI_css#' => array( 'jquery/smoothness/jquery-ui.b2evo.min.css', 'jquery/smoothness/jquery-ui.b2evo.css' ),
 # Uncomment the following lines if your plugins need more jQueryUI features than the ones loaded by b2evo:
@@ -843,7 +840,7 @@ $library_local_urls = array(
 		'#bootstrap_css#' => array( 'bootstrap/bootstrap.min.css', 'bootstrap/bootstrap.css' ),
 		'#bootstrap_theme_css#' => array( 'bootstrap/bootstrap-theme.min.css', 'bootstrap/bootstrap-theme.css' ),
 		'#bootstrap_typeahead#' => array( 'bootstrap/typeahead.bundle.min.js', 'bootstrap/typeahead.bundle.js' ),
-		'#scrollto#' => array( 'jquery/jquery.scrollto.js' ),
+		'#scrollto#' => array( 'jquery/jquery.scrollto.min.js', 'jquery/jquery.scrollto.js' ),
 		'#touchswipe#' => array( 'jquery/jquery.touchswipe.min.js', 'jquery/jquery.touchswipe.js' ),
 		'#mediaelement#' => array( 'mediaelement/mediaelement-and-player.min.js', 'mediaelement/mediaelement-and-player.js' ),
 		'#mediaelement_css#' => array( 'mediaelement/mediaelementplayer.min.css', 'mediaelement/mediaelementplayer.css' ),

@@ -27,7 +27,7 @@
  * @author Yabba: Paul Jones - {@link http://astonishme.co.uk/}
  * @author Stk: Scott Kimler - {@link http://astonishme.co.uk/}
  *
- * @version $Id: _code_highlight.plugin.php 7124 2014-07-15 13:05:53Z yura $
+ * @version $Id: _code_highlight.plugin.php 7134 2014-07-16 12:01:07Z yura $
  */
 
 /**
@@ -534,7 +534,7 @@ class code_highlight_plugin extends Plugin
 	 */
 	function format_to_edit( $block )
 	{
-		return '[codeblock'.$block[1].']'.evo_html_entity_decode( $block[2] ).'[/codeblock]';
+		return '[codeblock'.$block[1].']'.$block[2].'[/codeblock]';
 	}
 
 
@@ -546,7 +546,7 @@ class code_highlight_plugin extends Plugin
 	 */
 	function format_span_to_edit( $span )
 	{
-		return '[codespan]'.evo_html_entity_decode( $span[1] ).'[/codespan]';
+		return '[codespan]'.$span[1].'[/codespan]';
 	}
 
 

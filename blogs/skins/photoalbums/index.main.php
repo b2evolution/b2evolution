@@ -10,7 +10,7 @@
  * @package evoskins
  * @subpackage photoalbum
  *
- * @version $Id: index.main.php 7043 2014-07-02 08:35:45Z yura $
+ * @version $Id: index.main.php 7160 2014-07-21 12:13:35Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -90,6 +90,8 @@ siteskin_include( '_site_body_header.inc.php' );
 <?php
 if( $disp == 'single' )
 { // ------------------- NAVIGATION BAR FOR ALBUM(POST) -------------------
+	if( $single_Item = & mainlist_get_item() )
+	{ // Get Item here, because it can be not defined yet, e.g. in Preview mode
 ?>
 <div class="nav_album">
 
@@ -97,10 +99,10 @@ if( $disp == 'single' )
 
 	<span class="nav_album_title">
 	<?php
-		$Item->title( array(
+		$single_Item->title( array(
 				'link_type' => 'permalink'
 			) );
-		$Item->edit_link( array( // Link to backoffice for editing
+		$single_Item->edit_link( array( // Link to backoffice for editing
 				'before'    => ' ',
 				'after'     => '',
 				'text'      => get_icon( 'edit' ),
@@ -130,11 +132,13 @@ if( $disp == 'single' )
 ?>
 
 <div class="nav_album_number">
-<?php printf( T_('%s photos'), $Item->get_number_of_images() ); ?>
+<?php printf( T_('%s photos'), $single_Item->get_number_of_images() ); ?>
 </div>
 
 <div class="clear"></div></div>
-<?php } // ------------------- END OF NAVIGATION BAR FOR ALBUM(POST) ------------------- ?>
+<?php
+	}
+} // ------------------- END OF NAVIGATION BAR FOR ALBUM(POST) ------------------- ?>
 
 <div class="bPosts">
 
@@ -182,23 +186,32 @@ if( $disp == 'single' )
 	?>
 
 	<?php
-	if( $disp != 'front' && $disp != 'download' && $disp != 'posts' )
-	{
-		// ------------------------------------ START OF POSTS ----------------------------------------
+	if( $disp == 'single' || $disp == 'page' )
+	{ // ------------------------------------ START OF A POST ----------------------------------------
+
 		// Display message if no post:
 		display_if_empty();
 
-		echo '<div id="styled_content_block">'; // Beginning of posts display
-		while( $Item = & mainlist_get_item() )
-		{	// For each blog post:
+		if( isset( $single_Item ) )
+		{ // Use Item that already is defined above
+			$Item = & $single_Item;
+		}
+		else
+		{ // Get next Item object
+			$Item = & mainlist_get_item();
+		}
+
+		if( $Item )
+		{
+			echo '<div id="styled_content_block">';
 			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 			skin_include( '_item_block.inc.php', array(
 					'content_mode'  => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
 				) );
 			// ----------------------------END ITEM BLOCK  ----------------------------
-		} // ---------------------------------- END OF POSTS ------------------------------------
-		echo '</div>'; // End of posts display
-	}
+			echo '</div>';
+		}
+	} // ---------------------------------- END OF A POST ------------------------------------
 	?>
 
 

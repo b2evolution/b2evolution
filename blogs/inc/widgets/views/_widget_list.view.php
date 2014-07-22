@@ -11,7 +11,7 @@
  *
  * @package admin
  *
- * @version $Id: _widget_list.view.php 6808 2014-05-29 13:50:09Z yura $
+ * @version $Id: _widget_list.view.php 7157 2014-07-21 10:01:15Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -45,7 +45,7 @@ function display_container( $container, $legend_suffix = '' )
 	$Table->title = '<span class="container_name">'.T_($container).'</span>'.$legend_suffix;
 
 	// Table ID - fp> needs to be handled cleanly by Table object
-	$table_id = str_replace( array( ' ', ':' ), '_', $container ); // fp> Using the container name which has special chars is a bad idea. Counter would be better
+	$table_id = str_replace( array( ' ', ':' ), array( '_', '-' ), $container ); // fp> Using the container name which has special chars is a bad idea. Counter would be better
 
 	$Table->global_icon( T_('Add a widget...'), 'new',
 			regenerate_url( '', 'action=new&amp;container='.rawurlencode($container) ), /* TRANS: ling used to add a new widget */ T_('Add widget').' &raquo;', 3, 4, array( 'id' => 'add_new_'.$table_id ) );

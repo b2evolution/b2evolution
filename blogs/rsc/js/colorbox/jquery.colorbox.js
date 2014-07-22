@@ -73,11 +73,9 @@
 	event_cleanup = prefix + '_cleanup',
 	event_closed = prefix + '_closed',
 	event_purge = prefix + '_purge',
-	
+
 	// Special Handling for IE
-	isIE = $.browser.msie && !$.support.opacity, // Detects IE6,7,8.  IE9 supports opacity.  Feature detection alone gave a false positive on at least one phone browser and on some development versions of Chrome, hence the user-agent test.
-	isIE6 = isIE && $.browser.version < 7,
-	event_ie6 = prefix + '_IE6',
+	isIE = !$.support.opacity, // Detects IE6,7,8.  IE9 supports opacity.  Feature detection alone gave a false positive on at least one phone browser and on some development versions of Chrome, hence the user-agent test.
 
 	// Cached jQuery Object Variables
 	$overlay,
@@ -262,12 +260,6 @@
 				settings.w = setSize(settings.initialWidth, 'x');
 				settings.h = setSize(settings.initialHeight, 'y');
 				publicMethod.position();
-				
-				if (isIE6) {
-					$window.bind('resize.' + event_ie6 + ' scroll.' + event_ie6, function () {
-						$overlay.css({width: $window.width(), height: $window.height(), top: $window.scrollTop(), left: $window.scrollLeft()});
-					}).trigger('resize.' + event_ie6);
-				}
 
 				trigger(event_open, settings.onOpen);
 
@@ -322,8 +314,8 @@
 	publicMethod.init = function () {
 		// Create & Append jQuery Objects
 		$window = $(window);
-		$box = $div().attr({id: colorbox, 'class': isIE ? prefix + (isIE6 ? 'IE6' : 'IE') : ''});
-		$overlay = $div("Overlay", isIE6 ? 'position:absolute' : '').hide();
+		$box = $div().attr({id: colorbox, 'class': isIE ? prefix + 'IE' : ''});
+		$overlay = $div("Overlay").hide();
 		
 		$wrap = $div("Wrapper");
 		$content = $div("Content").append(
@@ -422,7 +414,7 @@
 		// remove the modal so that it doesn't influence the document width/height		
 		$box.hide();
 		
-		if (settings.fixed && !isIE6) {
+		if (settings.fixed) {
 			$box.css({position: 'fixed'});
 		} else {
 			top = $window.scrollTop();
@@ -557,18 +549,9 @@
 		
 		// floating the IMG removes the bottom line-height and fixed a problem where IE miscalculates the width of the parent element as 100% of the document width.
 		//$(photo).css({'float': 'none', marginLeft: 'auto', marginRight: 'auto'});
-		
+
 		$(photo).css({'float': 'none'});
-		
-		// Hides SELECT elements in IE6 because they would otherwise sit on top of the overlay.
-		if (isIE6) {
-			$('select').not($box.find('select')).filter(function () {
-				return this.style.visibility !== 'hidden';
-			}).css({'visibility': 'hidden'}).one(event_cleanup, function () {
-				this.style.visibility = 'inherit';
-			});
-		}
-		
+
 		callback = function () {
 			var prev, prevSrc, next, nextSrc, total = $related.length, iframe, complete;
 			
@@ -894,7 +877,7 @@
 			
 			trigger(event_cleanup, settings.onCleanup);
 			
-			$window.unbind('.' + prefix + ' .' + event_ie6);
+			$window.unbind('.' + prefix);
 			
 			$overlay.fadeTo(200, 0);
 			

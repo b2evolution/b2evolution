@@ -32,7 +32,7 @@
  * @author jeffbearer: Jeff BEARER - {@link http://www.jeffbearer.com/}.
  * @author jupiterx: Jordan RUNNING.
  *
- * @version $Id: _user.funcs.php 6782 2014-05-27 16:52:04Z yura $
+ * @version $Id: _user.funcs.php 7172 2014-07-22 08:07:56Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -946,12 +946,7 @@ function get_user_identity_url( $user_ID, $user_tab = 'profile' )
 
 	if( !is_logged_in() )
 	{ // user is not logged in
-		if( $Settings->get( 'allow_anonymous_user_profiles' ) && ( isset( $Blog ) ) )
-		{
-			return url_add_param( $Blog->gen_blogurl(), 'disp=user&amp;user_ID='.$user_ID );
-		}
-		// return NULL if user is not logged in and display is not allowed or Blog is not set
-		return NULL;
+		return $User->get_userpage_url();
 	}
 
 	if( !$current_User->check_perm( 'user', 'view', false, $User ) )
@@ -959,9 +954,9 @@ function get_user_identity_url( $user_ID, $user_tab = 'profile' )
 		return NULL;
 	}
 
-	if( isset($Blog) && !is_admin_page() )
-	{	// can't display the profile form, display the front office User form
-		return url_add_param( $Blog->gen_blogurl(), 'disp=user&amp;user_ID='.$user_ID );
+	if( !is_admin_page() )
+	{ // can't display the profile form, display the front office User form
+		return $User->get_userpage_url();
 	}
 
 	if( $current_User->check_status( 'can_access_admin' ) && ( ($current_User->ID == $user_ID ) || $current_User->check_perm( 'users', 'view' ) ) )

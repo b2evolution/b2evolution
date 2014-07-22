@@ -24,7 +24,7 @@
  * @package evocore
 
  *
- * @version $Id: _display.form.php 6505 2014-04-17 15:11:37Z yura $
+ * @version $Id: _display.form.php 7172 2014-07-22 08:07:56Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -90,7 +90,7 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Bubble tips in back-office').get_manual_link('user-bubble-tips-settings')  );
+$Form->begin_fieldset( T_('Username display in back-office').get_manual_link('user-bubble-tips-settings')  );
 
 	$Form->checkbox_input( 'bubbletip', $Settings->get('bubbletip'), T_('Username bubble tips'), array( 'note'=>T_('Check to enable bubble tips on usernames') ) );
 
@@ -103,7 +103,12 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Bubble tips in front-office for logged in users').get_manual_link('user-bubble-tips-settings') );
+$Form->begin_fieldset( T_('Username display for logged-in users (front-office)').get_manual_link('user-bubble-tips-settings') );
+
+	$Form->radio( 'user_url_loggedin', $Settings->get( 'user_url_loggedin' ),
+		array( array( 'page', T_('Always user page'), '' ),
+					array( 'url', T_('User website if available (fallback to user page)'), '' ),
+		), T_('Link to'), true );
 
 	$Form->info( T_('Note'), T_('Enable bubble tips in each skin\'s settings.') );
 
@@ -116,7 +121,15 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Bubble tips for anonymous users').get_manual_link('user-bubble-tips-settings') );
+$Form->begin_fieldset( T_('Username display for anonymous user (front-office)').get_manual_link('user-bubble-tips-settings') );
+
+	$Form->radio( 'user_url_anonymous', $Settings->get( 'user_url_anonymous' ),
+		array( array( 'page', T_('Always user page (if allowed)'), '' ),
+					array( 'url', T_('User website if available (fallback to user page)'), '' ),
+		), T_('Link to'), true );
+
+	// Allow anonymous users to see the user display ( disp=user )
+	$Form->checkbox_input( 'allow_anonymous_user_profiles', $Settings->get('allow_anonymous_user_profiles'), T_('Allow to see user profiles') );
 
 	$Form->info( T_('Note'), T_('Enable bubble tips in each skin\'s settings.') );
 
@@ -137,8 +150,6 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Other permissions for anonymous users').get_manual_link('anonymous-users-permissions') );
 
 	$Form->checkbox_input( 'allow_anonymous_user_list', $Settings->get('allow_anonymous_user_list'), T_('Allow to see user list') );
-	// Allow anonymous users to see the user display ( disp=user )
-	$Form->checkbox_input( 'allow_anonymous_user_profiles', $Settings->get('allow_anonymous_user_profiles'), T_('Allow to see user profiles') );
 
 $Form->end_fieldset();
 

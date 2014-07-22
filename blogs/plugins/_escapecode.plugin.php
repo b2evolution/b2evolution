@@ -30,8 +30,8 @@ class escapecode_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->short_desc = T_('Escapes html entities in code tags');
-		$this->long_desc = T_('Escapes tags and entities in &lt;code&gt; tags');
+		$this->short_desc = T_('Escapes html tags in code blocks');
+		$this->long_desc = T_('Escapes tags in blocks marked with &lt;code&gt; [codeblock] [codespan] or ``` (Markdown)');
 	}
 
 
@@ -103,28 +103,29 @@ class escapecode_plugin extends Plugin
 	 * Escape html entities inside <code> tag
 	 *
 	 * @param string Content
+	 * @param string Function name for callback
 	 * @return string Escaped content
 	 */
-	function escape_code( $content )
+	function escape_code( $content, $callback_function = 'escape_code_callback' )
 	{
 		if( strpos( $content, '[codeblock' ) !== false || strpos( $content, '<codeblock' ) !== false )
 		{ // Do escape the html entities in code blocks:
-			$content = preg_replace_callback( '#([<\[]codeblock[^>\]]*[>\]])([\s\S]+?)([<\[]/codeblock[>\]])#is', array( $this, 'escape_code_callback' ), $content );
+			$content = preg_replace_callback( '#([<\[]codeblock[^>\]]*[>\]])([\s\S]+?)([<\[]/codeblock[>\]])#is', array( $this, $callback_function ), $content );
 		}
 
 		if( strpos( $content, '[codespan' ) !== false || strpos( $content, '<codespan' ) !== false )
 		{ // Do escape the html entities in code spans:
-			$content = preg_replace_callback( '#([<\[]codespan[>\]])([\s\S]+?)([<\[]/codespan[>\]])#is', array( $this, 'escape_code_callback' ), $content );
+			$content = preg_replace_callback( '#([<\[]codespan[>\]])([\s\S]+?)([<\[]/codespan[>\]])#is', array( $this, $callback_function ), $content );
 		}
 
 		if( strpos( $content, '<code' ) !== false )
 		{ // At least one tag <code> exists in the content, Do escape the html entities:
-			$content = preg_replace_callback( '#(<code[^>]*>)([\s\S]+?)(</code>)#is', array( $this, 'escape_code_callback' ), $content );
+			$content = preg_replace_callback( '#(<code[^>]*>)([\s\S]+?)(</code>)#is', array( $this, $callback_function ), $content );
 		}
 
 		if( strpos( $content, '```' ) !== false )
 		{ // String of codeblock from markdown, Do escape the html entities:
-			$content = preg_replace_callback( '#(```)([\s\S]+?)(```)#is', array( $this, 'escape_code_callback' ), $content );
+			$content = preg_replace_callback( '#(```)([\s\S]+?)(```)#is', array( $this, $callback_function ), $content );
 		}
 
 		return $content;
@@ -149,6 +150,41 @@ class escapecode_plugin extends Plugin
 		$escaped_content .= $code_content[3];
 
 		return $escaped_content;
+	}
+
+
+	/**
+	 * Unescape html entities inside <code> tag
+	 *
+	 * @param string Code content
+	 * @return string Unescaped code content
+	 */
+	function unescape_code_callback( $code_content )
+	{
+		// Start tag
+		$escaped_content = $code_content[1];
+
+		// Escape two chars to escape html tags inside <code>
+		$escaped_content .= str_replace( array( '&lt;', '&gt;' ), array( '<', '>' ), $code_content[2] );
+
+		// End tag
+		$escaped_content .= $code_content[3];
+
+		return $escaped_content;
+	}
+
+
+	/**
+	 * Formats post contents ready for editing
+	 *
+	 * @param mixed $params
+	 */
+	function UnfilterItemContents( & $params )
+	{
+		$content = & $params['content'];
+		$content = $this->escape_code( $content, 'unescape_code_callback' );
+
+		return true;
 	}
 }
 

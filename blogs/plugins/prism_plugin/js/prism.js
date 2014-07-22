@@ -612,7 +612,12 @@ Prism.hooks.add('after-highlight', function (env) {
 		return;
 	}
 
-	var linesNum = (1 + env.code.split('\n').length);
+	var lines = env.code.split('\n');
+	var linesNum = ( 1 + lines.length );
+	if( lines.length > 1 && lines[ lines.length - 1 ] == '' )
+	{ // Don't calculate last empty line
+		linesNum = linesNum - 1;
+	}
 	var lineNumbersWrapper;
 
 	lines = new Array(linesNum);

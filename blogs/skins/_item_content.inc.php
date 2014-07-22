@@ -271,6 +271,7 @@ switch( $content_mode )
 					'before'      => $params['before_content_extension'],
 					'after'       => $params['after_content_extension'],
 					'force_more'  => $params['force_more'],
+					'image_size'          => $params['image_size'],
 				) );
 
 			// Links to post pages (for multipage posts):

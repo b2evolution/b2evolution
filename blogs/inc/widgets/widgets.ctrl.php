@@ -14,7 +14,7 @@
  *
  * @package admin
  *
- * @version $Id: widgets.ctrl.php 6135 2014-03-08 07:54:05Z manuel $
+ * @version $Id: widgets.ctrl.php 7157 2014-07-21 10:01:15Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -91,6 +91,8 @@ switch( $action )
 		param( 'code', 'string', true );
 	case 'new':
 		param( 'container', 'string', true, true );	// memorize
+		// Change the symbols back to normal view as they are stored in DB
+		$container = str_replace( array( '_', '-' ), array( ' ', ':' ), $container );
 		break;
 
 	case 're-order' : // js request
@@ -99,7 +101,7 @@ switch( $action )
 		$containers = array();
 		foreach( $containers_list as $a_container )
 		{	// add each container and grab its widgets:
-			if( $container_name = trim( str_replace( array( 'container_', '_' ), array( '', ' ' ), $a_container ), ',' ) )
+			if( $container_name = trim( str_replace( array( 'container_', '_', '-' ), array( '', ' ', ':' ), $a_container ), ',' ) )
 			{
 				$containers[ $container_name ] = explode( ',', param( trim( $a_container, ',' ), 'string', true ) );
 			}

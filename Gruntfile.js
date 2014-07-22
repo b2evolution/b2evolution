@@ -94,16 +94,6 @@ module.exports = function(grunt) {
 				src: ['blogs/rsc/js/src/sha1.js', 'blogs/rsc/js/src/md5.js'],
 				dest: 'blogs/rsc/js/build/sha1_md5.bundle.js',
 			},
-			// jQuery:
-			jquery_b2evo: {
-				src: ['blogs/rsc/js/jquery.js', 'blogs/rsc/js/jquery/jquery-migrate.js'],
-				dest: 'blogs/rsc/js/build/jquery.bundle.js',
-			},
-			// jQuery min: (Use jquery-migrate.min.js to construct jquery.bmin.js because jquery-migrate.js writes logs to the console.)
-			jquery_b2evo_min: {
-				src: ['blogs/rsc/js/jquery.min.js', 'blogs/rsc/js/jquery/jquery-migrate.min.js'],
-				dest: 'blogs/rsc/js/build/jquery.bmin.js',
-			},
 		},
 
 		// CSS minification:

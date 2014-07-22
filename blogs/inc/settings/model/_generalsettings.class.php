@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _generalsettings.class.php 6487 2014-04-16 11:11:57Z yura $
+ * @version $Id: _generalsettings.class.php 7172 2014-07-22 08:07:56Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -295,6 +295,8 @@ C message size exceeds',
 		'bubbletip_overlay' => "Log in to\r\nsee this\r\nimage",// Overlay text on the profile image for anonymous users
 		'allow_anonymous_user_list' => 1, // Allow anonymous users to see user list (disp=users)
 		'allow_anonymous_user_profiles' => 0, // Allow anonymous users to see the user display ( disp=user )
+		'user_url_loggedin' => 'page', // Link an user url to 'page' or 'url' for logged-in users
+		'user_url_anonymous' => 'page', // Link an user url to 'page' or 'url' for anonymous users
 
 		// Account closing options:
 		'account_close_enabled' => 1, // Allow users to close their account themselves

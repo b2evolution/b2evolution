@@ -30,7 +30,7 @@
  *
  * @package evocore
  *
- * @version $Id: _misc.funcs.php 7046 2014-07-02 11:41:10Z yura $
+ * @version $Id: _misc.funcs.php 7148 2014-07-18 06:31:29Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -3025,7 +3025,7 @@ function debug_info( $force = false, $force_clean = false )
 			echo "\n</tbody></table>";
 
 			// add jquery.tablesorter to the "Debug info" table.
-			require_js( 'jquery/jquery.tablesorter.min.js', 'rsc_url', false, true );
+			require_js( 'jquery/jquery.tablesorter.min.js', 'rsc_url', true, true );
 			echo '
 			<script type="text/javascript">
 			(function($){

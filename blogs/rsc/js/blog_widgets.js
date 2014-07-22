@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  * @author yabs - http://innervisions.org.uk/
- * @version $Id: blog_widgets.js 6557 2014-04-28 07:30:28Z attila $
+ * @version $Id: blog_widgets.js 7157 2014-07-21 10:01:15Z yura $
  */
 
 
@@ -512,7 +512,7 @@ function addNewWidget( widget_list_item, admin_call )
 
 	var widget_name = jQuery( widget_list_item ).html();
 	var destination = jQuery( '.available_widgets' ).attr( 'id' );
-	destination = destination.substr( 18, destination.length ).replace( '_', ' ' );
+	destination = destination.substr( 18, destination.length ).replace( /_/g, ' ' ).replace( /-/g, ':' );
 
 	SendAdminRequest( 'widgets', 'create', admin_call+"&blog="+blog+"&container="+destination, true );
 }
@@ -529,7 +529,7 @@ function addNewWidget( widget_list_item, admin_call )
 function addNewWidgetCallback( wi_ID, container, wi_order, wi_name )
 {
 	jQuery( '.fade_me' ).removeClass( 'fade_me' ); // kill any active fades
-	createWidget( 'wi_ID_'+wi_ID, container.replace( ' ', '_' ),wi_order, '<strong>'+wi_name+'</strong>', '', 1 );
+	createWidget( 'wi_ID_'+wi_ID, container.replace( / /g, '_' ).replace( /:/g, '-' ), wi_order, '<strong>'+wi_name+'</strong>', '', 1 );
 	doFade( '#wi_ID_'+wi_ID );
 	if( reorder_delay_remaining > 0 )
 	{	// send outstanding updates
