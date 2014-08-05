@@ -33,7 +33,7 @@
  *
  * @package evocore
  *
- * @version $Id: _init_login.inc.php 6581 2014-04-30 10:20:18Z attila $
+ * @version $Id: _init_login.inc.php 7206 2014-08-04 07:57:37Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -367,7 +367,8 @@ if( !empty($login_action) && empty( $login_error ) && ( $action != 'logout' ) )
 			else
 			{
 				$redirect_to = param( 'redirect_to', 'url', $baseurl );
-				if( preg_match( '#/login.php([&?].*)?$#', $redirect_to ) ||
+				if( empty( $redirect_to ) ||
+					preg_match( '#/login.php([&?].*)?$#', $redirect_to ) ||
 					preg_match( '#/register.php([&?].*)?$#', $redirect_to ) ||
 					preg_match( '#disp=(login|register|lostpassword)#', $redirect_to ) )
 				{ // avoid redirect back to login/register screen. This shouldn't occur.

@@ -22,6 +22,7 @@
 */
 #cboxOverlay{background: rgba( 25, 25, 25, 0.85);}
 #colorbox, #colorbox *{font: 11px Verdana,Arial,Sans-Serif;font-weight: normal;color: #000;}
+#colorbox .fa {font-family: FontAwesome;}
 	#cboxContent{
 		border: 7px solid #fff;
 		background:#fff;

@@ -32,7 +32,7 @@
  * @author jeffbearer: Jeff BEARER - {@link http://www.jeffbearer.com/}.
  * @author jupiterx: Jordan RUNNING.
  *
- * @version $Id: _user.funcs.php 7172 2014-07-22 08:07:56Z yura $
+ * @version $Id: _user.funcs.php 7189 2014-07-31 06:58:37Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1613,12 +1613,16 @@ function get_default_avatar_url( $gender = '', $size = NULL )
 	if( $size !== NULL )
 	{ // Get a thumbnail url
 		$FileCache = & get_FileCache();
-		if( $File = & $FileCache->get_by_root_and_path( 'shared', 0, $avatar_url ) ) {
-			return $File->get_thumb_url( $size, '&' );
+		if( $File = & $FileCache->get_by_root_and_path( 'shared', 0, $avatar_url ) )
+		{
+			if( $File->is_image() )
+			{ // Check if the default avatar files are real images and not broken by some reason
+				return $File->get_thumb_url( $size, '&' );
+			}
 		}
 	}
 
-	// Don't get a thumbnail url OR Unknown folder, Return full sized image url
+	// We couldn't get a thumbnail url OR access the folder, Return the full size image URL without further ado:
 	global $media_url;
 	return $media_url.'shared/global'.$avatar_url;
 }

@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _filecache.class.php 6135 2014-03-08 07:54:05Z manuel $
+ * @version $Id: _filecache.class.php 7189 2014-07-31 06:58:37Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -64,21 +64,30 @@ class FileCache extends DataObjectCache
 		// Get ID of the object we'ere preparing to instantiate...
 		$obj_ID = $db_row->{$this->dbIDname};
 
-		if( !empty($obj_ID) )
-		{	// If the object ID is valid:
-			if( !isset($this->cache[$obj_ID]) )
-			{	// If not already cached:
+		if( ! empty( $obj_ID ) )
+		{ // If the object ID is valid:
+			if( ! isset( $this->cache[$obj_ID] ) )
+			{ // If not already cached:
 				// Instantiate a File object for this line:
 				$current_File = new File( $db_row->file_root_type, $db_row->file_root_ID, $db_row->file_path ); // COPY!
-				// Flow meta data into File object:
-				$current_File->load_meta( false, $db_row );
+				if( ! $current_File->_FileRoot )
+				{ // File root is not initialized for this file, probably it is disabled by settings.
+					// We cannot work with such file object. Use NULL instead.
+					$current_File = NULL;
+				}
+				else
+				{ // Flow meta data into File object:
+					$current_File->load_meta( false, $db_row );
+				}
 				$this->add( $current_File );
 			}
 			else
-			{	// Already cached:
+			{ // Already cached:
 				$current_File = & $this->cache[$obj_ID];
-				// Flow meta data into File object:
-				$current_File->load_meta( false, $db_row );
+				if( $current_File )
+				{ // Flow meta data into File object:
+					$current_File->load_meta( false, $db_row );
+				}
 			}
 		}
 
@@ -102,27 +111,33 @@ class FileCache extends DataObjectCache
 
 		if( is_windows() )
 		{
-			$rel_path = strtolower(str_replace( '\\', '/', $rel_path ));
+			$rel_path = strtolower( str_replace( '\\', '/', $rel_path ) );
 		}
 
 		// Generate cache key for this file:
 		$cacheindex = $root_type.':'.$root_in_type_ID.':'.$rel_path;
 
 		if( isset( $this->cache_root_and_path[$cacheindex] ) )
-		{	// Already in cache
+		{ // Already in cache
 			$Debuglog->add( 'File retrieved from cache: '.$cacheindex, 'files' );
 			$File = & $this->cache_root_and_path[$cacheindex];
-			if( $load_meta )
-			{	// Make sure meta is loaded:
+			if( $File && $load_meta )
+			{ // Make sure meta is loaded:
 				$File->load_meta();
 			}
 		}
 		else
-		{	// Not in cache
+		{ // Not in cache
 			$Debuglog->add( 'File not in cache: '.$cacheindex, 'files' );
 			$File = new File( $root_type, $root_in_type_ID, $rel_path, $load_meta ); // COPY !!
+			if( ! $File->_FileRoot )
+			{ // File root is not initialized for this file, probably it is disabled by settings.
+				// We cannot work with such file object. Use NULL instead.
+				$File = NULL;
+			}
 			$this->cache_root_and_path[$cacheindex] = & $File;
 		}
+
 		return $File;
 	}
 

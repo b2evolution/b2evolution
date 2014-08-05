@@ -571,13 +571,19 @@ function wpxml_import()
 
 		// Set status's links between WP and b2evo names
 		$post_statuses = array(
+			// WP statuses => Their analogs in b2evolution
 			'publish'    => 'published',
-			'pending'    => 'deprecated',
+			'pending'    => 'review',
+			'draft'      => 'draft',
+			'trash'      => 'deprecated',
+			// These statuses don't exist in WP, but we handle them if they will appear once
+			'community'  => 'community',
 			'deprecated' => 'deprecated',
 			'protected'  => 'protected',
 			'private'    => 'private',
-			'redirected' => 'redirected',
-			'draft'      => 'draft',
+			'review'     => 'review',
+			'redirected' => 'redirected'
+			// All other unknown statuses will be converted to 'review'
 		);
 
 		// Get post types
@@ -595,10 +601,10 @@ function wpxml_import()
 			$last_edit_user_ID = isset( $authors[ (string) $post['post_lastedit_user'] ] ) ? $authors[ (string) $post['post_lastedit_user'] ] : $author_ID;
 
 			$post_main_cat_ID = $category_default;
-			$post_extra_cat_IDs = array( $post_main_cat_ID );
+			$post_extra_cat_IDs = array();
 			$post_tags = array();
 			if( !empty( $post['terms'] ) )
-			{	// Set categories and tags
+			{ // Set categories and tags
 				foreach( $post['terms'] as $term )
 				{
 					switch( $term['domain'] )
@@ -607,19 +613,17 @@ function wpxml_import()
 							if( isset( $categories[ (string) $term['slug'] ] ) )
 							{
 								if( $post_main_cat_ID == $category_default )
-								{	// Set main category
+								{ // Set main category
 									$post_main_cat_ID = $categories[ (string) $term['slug'] ];
 								}
-								else
-								{	// Set extra categories
-									$post_extra_cat_IDs[] = $categories[ (string) $term['slug'] ];
-								}
+								// Set extra categories
+								$post_extra_cat_IDs[] = $categories[ (string) $term['slug'] ];
 							}
 							break;
 
 						case 'post_tag':
 							if( isset( $tags[ (string) $term['slug'] ] ) )
-							{	// Set tag
+							{ // Set tag
 								$post_tags[] = $term['slug'];
 							}
 							break;
@@ -645,7 +649,7 @@ function wpxml_import()
 			$Item->set( 'datemodified', !empty( $post['post_datemodified'] ) ? $post['post_datemodified'] : $post['post_date'] );
 			$Item->set( 'urltitle', !empty( $post['post_urltitle'] ) ? $post['post_urltitle'] : $post['post_title'] );
 			$Item->set( 'url', $post['post_url'] );
-			$Item->set( 'status', isset( $post_statuses[ (string) $post['status'] ] ) ? $post_statuses[ (string) $post['status'] ] : 'draft' );
+			$Item->set( 'status', isset( $post_statuses[ (string) $post['status'] ] ) ? $post_statuses[ (string) $post['status'] ] : 'review' );
 			// If 'comment_status' has the unappropriate value set it to 'open'
 			$Item->set( 'comment_status', ( in_array( $post['comment_status'], array( 'open', 'closed', 'disabled' ) ) ? $post['comment_status'] : 'open' ) );
 			$Item->set( 'ptyp_ID', $post_type_ID );

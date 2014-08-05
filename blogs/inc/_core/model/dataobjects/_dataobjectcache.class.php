@@ -34,7 +34,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _dataobjectcache.class.php 6799 2014-05-29 05:08:41Z yura $
+ * @version $Id: _dataobjectcache.class.php 7189 2014-07-31 06:58:37Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -345,7 +345,10 @@ class DataObjectCache
 			$this->ID_array = array();
 			foreach( $this->cache as $obj )
 			{
-				$this->ID_array[] = $obj->ID;
+				if( $obj !== NULL )
+				{ // A cached object can be NULL, e.g. File object when the directory is disabled by settings
+					$this->ID_array[] = $obj->ID;
+				}
 			}
 		}
 

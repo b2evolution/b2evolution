@@ -14,7 +14,7 @@
  *
  * @package admin
  *
- * @version $Id: widgets.ctrl.php 7157 2014-07-21 10:01:15Z yura $
+ * @version $Id: widgets.ctrl.php 7178 2014-07-23 08:11:33Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -458,9 +458,6 @@ switch( $action )
 		 * @var Skin
 		 */
 		$edited_Skin = & $SkinCache->get_by_ID( $blog_normal_skin_ID );
-
-		// Look for containers in skin file:
-		$edited_Skin->discover_containers();
 
 		// Save to DB:
 		$edited_Skin->db_save_containers();

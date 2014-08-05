@@ -22,7 +22,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _skin.class.php 7111 2014-07-14 05:23:46Z yura $
+ * @version $Id: _skin.class.php 7178 2014-07-23 08:11:33Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -97,9 +97,6 @@ class Skin extends DataObject
 	 */
 	function install()
 	{
-		// Look for containers in skin file:
-		$this->discover_containers();
-
 		// INSERT NEW SKIN INTO DB:
 		$this->dbinsert();
 	}
@@ -236,24 +233,34 @@ class Skin extends DataObject
 
 
 	/**
-	 * Discover containers included in skin files
+	 * Discover containers included in skin files only in the given folder
+	 *
+	 * @param string Folder name
+	 * @param array Exclude the files
+	 * @return array Files that were prepared
 	 */
-	function discover_containers()
+	function discover_containers_by_folder( $folder, $exclude_files = array() )
 	{
 		global $skins_path, $Messages;
 
-		$this->container_list = array();
-
-		if( ! $dir = @opendir($skins_path.$this->folder) )
-		{	// Skin directory not found!
-			$Messages->add( 'Cannot open skin directory.', 'error' ); // No trans
+		if( ! $dir = @opendir( $skins_path.$folder ) )
+		{ // Skin directory not found!
+			$Messages->add( T_('Cannot open skin directory.'), 'error' ); // No trans
 			return false;
 		}
 
+		// Store the file names to return
+		$files = array();
+
 		// Go through all files in the skin directory:
-		while( ( $file = readdir($dir) ) !== false )
+		while( ( $file = readdir( $dir ) ) !== false )
 		{
-			$rf_main_subpath = $this->folder.'/'.$file;
+			if( in_array( $file, $exclude_files ) )
+			{ // Skip this file
+				continue;
+			}
+
+			$rf_main_subpath = trim( $folder.'/'.$file, '/' );
 			$af_main_path = $skins_path.$rf_main_subpath;
 
 			if( !is_file( $af_main_path ) || ! preg_match( '~\.php$~', $file ) )
@@ -261,23 +268,25 @@ class Skin extends DataObject
 				continue;
 			}
 
-			if( ! is_readable($af_main_path) )
-			{	// Cannot open PHP file:
+			if( ! is_readable( $af_main_path ) )
+			{ // Cannot open PHP file:
 				$Messages->add( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error' );
 				continue;
 			}
 
 			$file_contents = @file_get_contents( $af_main_path );
-			if( ! is_string($file_contents) )
-			{	// Cannot get contents:
+			if( ! is_string( $file_contents ) )
+			{ // Cannot get contents:
 				$Messages->add( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error' );
 				continue;
 			}
 
+			$files[] = $files;
+
 			// DETECT if the file contains containers:
 			// if( ! preg_match_all( '~ \$Skin->container\( .*? (\' (.+?) \' )|(" (.+?) ") ~xmi', $file_contents, $matches ) )
 			if( ! preg_match_all( '~ (\$Skin->|skin_)container\( .*? ((\' (.+?) \')|(" (.+?) ")) ~xmi', $file_contents, $matches ) )
-			{	// No containers in this file, go to next:
+			{ // No containers in this file, go to next:
 				continue;
 			}
 
@@ -287,8 +296,8 @@ class Skin extends DataObject
 			$c = 0;
 			foreach( $container_list as $container )
 			{
-				if( empty($container) )
-				{	// regexp empty match -- NOT a container:
+				if( empty( $container ) )
+				{ // regexp empty match -- NOT a container:
 					continue;
 				}
 
@@ -296,7 +305,7 @@ class Skin extends DataObject
 				$c++;
 
 				if( in_array( $container, $this->container_list ) )
-				{	// we already have that one
+				{ // we already have that one
 					continue;
 				}
 
@@ -309,9 +318,26 @@ class Skin extends DataObject
 			}
 		}
 
-		// pre_dump( $this->container_list );
+		return $files;
+	}
 
-		if( empty($this->container_list) )
+
+	/**
+	 * Discover containers included in skin files
+	 */
+	function discover_containers()
+	{
+		global $Messages;
+
+		$this->container_list = array();
+
+		// Find the containers in the current skin folder
+		$skin_files = $this->discover_containers_by_folder( $this->folder );
+
+		// Find the containers in the root skins folder with excluding the files that are contained in the skin folder
+		$this->discover_containers_by_folder( '', $skin_files );
+
+		if( empty( $this->container_list ) )
 		{
 			$Messages->add( T_('No containers found in this skin!'), 'error' );
 			return false;

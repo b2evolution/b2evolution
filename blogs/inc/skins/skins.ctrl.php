@@ -17,7 +17,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: skins.ctrl.php 6493 2014-04-17 05:45:28Z yura $
+ * @version $Id: skins.ctrl.php 7178 2014-07-23 08:11:33Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -119,14 +119,11 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'skin' );
 
- 		// Check permission:
+		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
 		// Make sure we got an skin_ID:
 		param( 'skin_ID', 'integer', true );
-
-		// Look for containers in skin file:
-		$edited_Skin->discover_containers();
 
 		// Save to DB:
 		$edited_Skin->db_save_containers();
