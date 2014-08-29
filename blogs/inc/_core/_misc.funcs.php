@@ -30,7 +30,7 @@
  *
  * @package evocore
  *
- * @version $Id: _misc.funcs.php 7148 2014-07-18 06:31:29Z yura $
+ * @version $Id: _misc.funcs.php 7258 2014-08-27 03:52:32Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -6337,6 +6337,19 @@ function apm_log_custom_metric( $name, $value )
 	}
 }
 
+/**
+ * Log a custom param
+ *
+ * @param mixed $name name of the custom param
+ * @param mixed $value of the custom param
+ */
+function apm_log_custom_param( $name, $value )
+{
+	if(extension_loaded('newrelic'))
+	{	// New Relic is installed on the server for monitoring.
+		newrelic_add_custom_parameter( $name, $value );
+	}
+}
 
 /**
  * Send a cookie (@see setcookie() for more details)

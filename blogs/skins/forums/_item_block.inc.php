@@ -197,7 +197,7 @@ if( !$Item->can_see_comments( true ) || $preview )
 	<?php
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array(
-				'preview_block_start'  => '<table id="comment_preview" class="bForums" width="100%" cellspacing="1" cellpadding="2" border="0">
+				'preview_block_start'  => '<table id="comment_preview" class="bForums fixed_layout" width="100%" cellspacing="1" cellpadding="2" border="0">
 	<tr>
 		<th width="100">'.T_('Author').'</th>
 		<th>'.T_('PREVIEW Message').'</th>

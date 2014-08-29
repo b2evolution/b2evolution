@@ -31,7 +31,7 @@
  * @author gorgeb: Bertrand GORGE / EPISTEMA
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
- * @version $Id: _item.class.php 7166 2014-07-22 04:22:37Z yura $
+ * @version $Id: _item.class.php 7218 2014-08-06 06:01:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -3660,6 +3660,7 @@ class Item extends ItemLight
 
 
 		if( $params['text'] == '#' ) $params['text'] = get_icon( 'edit' ).' '.T_('Edit...');
+		if( $params['text'] == '#icon#' ) $params['text'] = get_icon( 'edit' );
 		if( $params['title'] == '#' ) $params['title'] = T_('Edit this post...');
 
 		$r = $params['before'];

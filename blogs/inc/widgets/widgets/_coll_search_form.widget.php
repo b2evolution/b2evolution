@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _coll_search_form.widget.php 6411 2014-04-07 15:17:33Z yura $
+ * @version $Id: _coll_search_form.widget.php 7224 2014-08-06 10:02:17Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -106,6 +106,13 @@ class coll_search_form_Widget extends ComponentWidget
 					'type' => 'checkbox',
 					'defaultvalue' => true,
 				),
+				'blog_ID' => array(
+					'label' => T_('Collection ID'),
+					'note' => T_('Leave empty for current collection.'),
+					'type' => 'text',
+					'size' => 5,
+					'defaultvalue' => '',
+				),
 			), parent::get_param_definitions( $params )	);
 
 		return $r;
@@ -119,9 +126,19 @@ class coll_search_form_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog;
-
 		$this->init_display( $params );
+
+		$blog_ID = intval( $this->disp_params['blog_ID'] );
+		if( $blog_ID > 0 )
+		{ // Get Blog for widget setting
+			$BlogCache = & get_BlogCache();
+			$widget_Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+		}
+		if( empty( $widget_Blog ) )
+		{ // Use current blog
+			global $Blog;
+			$widget_Blog = & $Blog;
+		}
 
 		// Collection search form:
 		echo $this->disp_params['block_start'];
@@ -130,7 +147,7 @@ class coll_search_form_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_start'];
 
-		form_formstart( $Blog->gen_blogurl(), 'search', 'SearchForm' );
+		form_formstart( $widget_Blog->gen_blogurl(), 'search', 'SearchForm' );
 		if( $this->disp_params[ 'disp_search_options' ] )
 		{
 			echo '<div class="extended_search_form">';

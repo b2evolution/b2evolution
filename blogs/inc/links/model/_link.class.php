@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _link.class.php 6816 2014-05-30 04:22:57Z yura $
+ * @version $Id: _link.class.php 7261 2014-08-27 05:55:04Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -249,6 +249,7 @@ class Link extends DataObject
 					// Get URL to froce download a file
 					if( $File->get_ext() == 'zip' )
 					{ // Provide direct url to ZIP files
+					  // NOTE: The same hardcoded place is in the file "htsrv/download.php", lines 56-60
 						return $File->get_url();
 					}
 					else

@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE
  * @author fsaya: Fabrice SAYA-GASNIER / PROGIDISTRI
  *
- * @version $Id: _results.class.php 6532 2014-04-22 13:38:39Z yura $
+ * @version $Id: _results.class.php 7221 2014-08-06 09:05:46Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -2077,7 +2077,7 @@ class Results extends Table
 			{ //no link for the current page
 				if( ! isset( $this->params['page_current_template'] ) )
 				{
-					$this->params['page_current_template'] = '<strong class="current_page">$page_num$</strong> ';
+					$this->params['page_current_template'] = '<strong class="current_page">$page_num$</strong>';
 				}
 				$list .= str_replace( '$page_num$', $i, $this->params['page_current_template'] );
 			}
@@ -2102,12 +2102,24 @@ class Results extends Table
 				{
 					$list .= ' rel="'.implode( ' ', $attr_rel ).'"';
 				}
-				$list .= '>'.$i.'</a> ';
+				$list .= '>'.$i.'</a>';
 			}
 
 			if( isset( $this->params['page_item_after'] ) )
 			{
 				$list .= $this->params['page_item_after'];
+			}
+
+			if( $i != $max )
+			{ // Separator between page numbers
+				if( isset( $this->params['page_list_separator'] ) )
+				{ // Use the customized separator from skin
+					$list .= $this->params['page_list_separator'];
+				}
+				else
+				{ // Use a space as default separator
+					$list .= ' ';
+				}
 			}
 		}
 		return $list;

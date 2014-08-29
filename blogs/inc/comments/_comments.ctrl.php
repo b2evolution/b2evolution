@@ -14,7 +14,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _comments.ctrl.php 6911 2014-06-17 15:35:37Z yura $
+ * @version $Id: _comments.ctrl.php 7246 2014-08-20 12:35:51Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -574,14 +574,18 @@ switch( $action )
 		$new_Item->set( 'title', T_( 'Elevated from comment' ) );
 		$new_Item->set( 'content', $item_content );
 
-		if( !$new_Item->dbinsert() )
+		if( ! $new_Item->dbinsert() )
 		{
 			$Messages->add( T_( 'Unable to create the new post!' ), 'error' );
 			break;
 		}
 
+		// Deprecate the comment after elevating
 		$edited_Comment->set( 'status', 'deprecated' );
 		$edited_Comment->dbupdate();
+
+		// Move all child comments to new created post
+		move_child_comments_to_item( $edited_Comment->ID, $new_Item->ID );
 
 		header_redirect( url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&action=edit&p='.$new_Item->ID, '&' ) );
 		break;

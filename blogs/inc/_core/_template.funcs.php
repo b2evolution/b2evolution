@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _template.funcs.php 7036 2014-07-01 18:05:24Z yura $
+ * @version $Id: _template.funcs.php 7233 2014-08-08 10:25:22Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -2254,7 +2254,7 @@ function display_login_form( $params )
 	if( $params[ 'transmit_hashed_password' ] )
 	{ // Hash the password onsubmit and clear the original pwd field
 		// TODO: dh> it would be nice to disable the clicked/used submit button. That's how it has been when the submit was attached to the submit button(s)
-		echo 'addEvent( document.getElementById("login_form"), "submit", function(){'.
+		echo 'jQuery( "#login_form" ).bind( "submit", function(){'.
 				/* this.value = '.TS_('Please wait...').' */
 				'var form = document.getElementById("login_form");'.
 
@@ -2269,7 +2269,7 @@ function display_login_form( $params )
 					// (paddings to make it look like encryption on screen. When the string changes to just one more or one less *, it looks like the browser is changing the password on the fly)
 				'}
 				return true;
-			}, false );';
+			} );';
 	}
 	echo '</script>';
 }

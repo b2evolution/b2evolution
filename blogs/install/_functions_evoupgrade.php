@@ -14,7 +14,7 @@
  *
  * @package install
  *
- * @version $Id: _functions_evoupgrade.php 7154 2014-07-21 05:02:46Z yura $
+ * @version $Id: _functions_evoupgrade.php 7249 2014-08-26 04:33:20Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -3680,11 +3680,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_end();
 
 		task_begin( 'Upgrading users fields table...' );
+		// Drop index before increasing a size to avoid an error about "max key length is 767 bytes"
+		$DB->query( 'ALTER TABLE T_users__fields DROP INDEX uf_varchar' );
+		// Modify field size
 		$DB->query( 'ALTER TABLE T_users__fields CHANGE uf_varchar uf_varchar VARCHAR( 10000 ) NOT NULL' );
-		// Modify Indexes
-		$DB->query( 'ALTER TABLE T_users__fields
-						DROP INDEX uf_varchar,
-						ADD INDEX uf_varchar ( uf_varchar(255) )' );
+		// Add index again with limited size in 255 because of utf8 == 765
+		$DB->query( 'ALTER TABLE T_users__fields ADD INDEX uf_varchar ( uf_varchar(255) )' );
 		task_end();
 
 		task_begin( 'Upgrading cron tasks table...' );

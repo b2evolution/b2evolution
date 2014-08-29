@@ -11,7 +11,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author asimo: Evo Factory / Attila Simo
  *
- * @version $Id: _login.disp.php 6411 2014-04-07 15:17:33Z yura $
+ * @version $Id: _login.disp.php 7237 2014-08-15 15:30:04Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -25,7 +25,11 @@ if( is_logged_in() )
 
 // Default params:
 $params = array_merge( array(
+		'form_title_login'  => '',
+		'form_class_login'  => '',
 		'login_form_inskin' => true,
+		'login_page_before' => '',
+		'login_page_after'  => '',
 		'login_form_before' => '',
 		'login_form_after'  => '',
 		'login_form_class'  => 'bComment',
@@ -45,6 +49,8 @@ if( !isset( $redirect_to ) )
 }
 
 $login_form_params = array(
+	'form_before' => str_replace( '$form_title$', $params['form_title_login'], $params['login_form_before'] ),
+	'form_after' => $params['login_form_after'],
 	'source' => $source,
 	'login_required' => $login_required,
 	'redirect_to' => $redirect_to,
@@ -55,11 +61,11 @@ $login_form_params = array(
 	'form_class' => $params['login_form_class'],
 );
 
-echo $params['login_form_before'];
+echo str_replace( '$form_class$', $params['form_class_login'], $params['login_page_before'] );
 
 display_login_form( $login_form_params );
 
-echo $params['login_form_after'];
+echo $params['login_page_after'];
 
 echo '<div class="notes standard_login_link"><a href="'.$secure_htsrv_url.'login.php?source='.rawurlencode($source).'&redirect_to='.rawurlencode( $redirect_to ).'">'.T_( 'Use standard login form instead').' &raquo;</a></div>';
 

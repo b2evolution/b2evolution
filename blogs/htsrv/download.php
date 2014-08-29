@@ -10,7 +10,7 @@
  *
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: download.php 7043 2014-07-02 08:35:45Z yura $
+ * @version $Id: download.php 7261 2014-08-27 05:55:04Z yura $
  */
 
 /**
@@ -37,6 +37,8 @@ if( ! empty( $key ) )
 /* ------------ Download file ------------ */
 $link_ID = param( 'link_ID', 'integer', 0, true );
 
+apm_log_custom_param( 'LinkID', $link_ID );
+
 $LinkCache = & get_LinkCache();
 if( ! (
 		( $download_Link = & $LinkCache->get_by_ID( $link_ID, false, false ) ) && // Link exists in DB
@@ -49,14 +51,24 @@ if( ! (
 	exit(0);
 }
 
-// Set the headers to force download any file
-header( 'Content-Description: File Transfer' );
-header( 'Content-Type: application/octet-stream' );
-header( 'Content-Disposition: attachment; filename='.$download_File->get_name() );
-header( 'Expires: 0' );
-header( 'Cache-Control: must-revalidate' );
-header( 'Pragma: public' );
-header( 'Content-Length: '.$download_File->get_size() );
-// Print out file content
-readfile( $download_File->get_full_path() );
+apm_log_custom_param( 'FilePath', $download_File->get_full_path() );
+
+if( $download_File->get_ext() == 'zip' )
+{ // Redirect to direct url for ZIP files case
+	// NOTE: The same hardcoded place is in the file "_link.class.php", function Link->get_download_url(), case 'action'
+	header_redirect( $download_File->get_url(), 302 );
+}
+else
+{ // For other files force the downloading
+	// Set the headers to force download any file
+	header( 'Content-Description: File Transfer' );
+	header( 'Content-Type: application/octet-stream' );
+	header( 'Content-Disposition: attachment; filename='.$download_File->get_name() );
+	header( 'Expires: 0' );
+	header( 'Cache-Control: must-revalidate' );
+	header( 'Pragma: public' );
+	header( 'Content-Length: '.$download_File->get_size() );
+	// Print out file content
+	readfile( $download_File->get_full_path() );
+}
 ?>
