@@ -32,7 +32,7 @@
  * @todo Make it a class / global object!
  *        - Provide (static) functions to extract .po files / generate _global.php files (single quoted strings!)
  *
- * @version $Id: _locale.funcs.php 7202 2014-08-04 06:27:13Z yura $
+ * @version $Id: _locale.funcs.php 7289 2014-09-08 10:34:16Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -782,8 +782,9 @@ function locale_overwritefromDB()
 	// sort by priority
 	uasort( $locales, 'locale_priosort' );
 
-	// Overwrite default_locale from DB settings - if enabled.
-	$locale_fromdb = $DB->get_var( 'SELECT set_value FROM T_settings WHERE set_name = "default_locale"' );
+	// overwrite default_locale from DB settings - if enabled.
+	// Checks also if previous $default_locale is enabled. Defaults to en-EU, even if not enabled.
+	$locale_fromdb = $Settings->get('default_locale');
 
 	if( $locale_fromdb )
 	{

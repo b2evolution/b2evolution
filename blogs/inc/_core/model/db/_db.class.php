@@ -57,7 +57,7 @@
  * @author fplanque: Francois PLANQUE
  * @author Justin VINCENT
  *
- * @version $Id: _db.class.php 6894 2014-06-13 09:56:09Z yura $
+ * @version $Id: _db.class.php 7292 2014-09-08 10:57:23Z yura $
  * @todo transaction support
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -328,7 +328,7 @@ class DB
 	 */
 	function DB( $params )
 	{
-		global $debug;
+		global $debug, $evo_charset;
 
 		// Mandatory parameters:
 		if( isset( $params['handle'] ) )
@@ -420,9 +420,13 @@ class DB
 			$this->select($this->dbname);
 		}
 
-		if( !empty($params['connection_charset']) )
-		{	// Specify which charset we are using on the client:
+		if( ! empty( $params['connection_charset'] ) )
+		{ // Specify which charset we are using on the client:
 			$this->set_connection_charset( $params['connection_charset'] );
+		}
+		elseif( ! empty( $evo_charset ) )
+		{ // Use the internal charset if it is defined
+			$this->set_connection_charset( DB::php_to_mysql_charmap( $evo_charset ) );
 		}
 
 		/*

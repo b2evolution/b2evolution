@@ -785,7 +785,11 @@
 					photo.style.marginTop = Math.max(settings.h - photo.height, 0) / 2 + 'px';
 				}
 				
-				if ($related[1] && (index < $related.length - 1 || settings.loop)) {
+				if ($related[1] && (index < $related.length - 1 || settings.loop))
+				{
+					// Clear classes from previous image
+					jQuery( photo ).removeClass( 'zoomin zoomout' );
+
 					var photo_is_zoomed = false;
 					var photo_width = 0;
 					var photo_height = 0;
@@ -800,8 +804,11 @@
 						{ // Photo is small - Use a click event to display next photo
 							publicMethod.next();
 						}
-						else
-						{ // Photo is big - Use a click event to zoom a photo
+					};
+					if( photo_is_big )
+					{ // Photo is big - Use a click event to zoom a photo
+						jQuery( photo ).bind( 'click dblclick', function( e )
+						{
 							if( photo_is_zoomed )
 							{ // Zoom out a photo to window size
 								photo.className = photo.className.replace( /zoomout/, '' );
@@ -827,8 +834,8 @@
 									.scrollTop( pecentY * ( this_parent.scrollHeight - this_parent.clientHeight ) );
 							}
 							photo_is_zoomed = photo_is_zoomed ? false : true;
-						}
-					};
+						} );
+					}
 				}
 				
 				if (isIE) {
@@ -924,3 +931,38 @@
 	$(publicMethod.init);
 
 }(jQuery, document, this));
+
+// Rewrite double click event for double tap event on touch devices (in order to zoom big images)
+jQuery.event.special.dblclick = {
+	setup: function( data, namespaces )
+	{
+		var elem = this,
+			$elem = jQuery( elem );
+		$elem.bind( 'touchend.dblclick', jQuery.event.special.dblclick.handler );
+	},
+
+	teardown: function( namespaces )
+	{
+		var elem = this,
+			$elem = jQuery( elem );
+		$elem.unbind( 'touchend.dblclick' );
+	},
+
+	handler: function( event )
+	{
+		var elem = event.target,
+			$elem = jQuery( elem ),
+			lastTouch = $elem.data( 'lastTouch' ) || 0,
+			now = new Date().getTime();
+
+		var delta = now - lastTouch;
+		if( delta > 20 && delta < 500 )
+		{
+			$elem.data( 'lastTouch', 0 );
+			$elem.trigger( 'dblclick' );
+		} else
+		{
+			$elem.data( 'lastTouch', now );
+		}
+	}
+};

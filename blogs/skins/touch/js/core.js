@@ -61,9 +61,21 @@ function bnc_showhide_coms_toggle() {
 	
 function doWPtouchReady() {
 
-	$wpt( '#headerbar-menu a' ).bind( touchStartOrClick, function( e ){
-		$wpt( '#wptouch-menu' ).wptouchFadeToggle( 350 );
-		$wpt( '#headerbar-menu a' ).toggleClass( 'open' );
+	$wpt( '#headerbar-menu div' ).bind( touchStartOrClick, function( e ){
+		var type = $wpt( this ).attr( 'rel' );
+		var active_type = $wpt( '#wptouch-menu .wptouch-menu-inner:visible' ).length > 0 ? $wpt( '#wptouch-menu .wptouch-menu-inner:visible' ).attr( 'rel' ) : '';
+		console.log( type, active_type );
+		$wpt( '#wptouch-menu .wptouch-menu-inner' ).hide();
+		$wpt( '#wptouch-menu .wptouch-menu-inner[rel=' + type +']' ).show();
+		if( active_type == type || active_type == '' )
+		{
+			$wpt( '#wptouch-menu' ).wptouchFadeToggle( 350 );
+		}
+		$wpt( '#headerbar-menu div' ).removeClass( 'open' );
+		if( active_type != type )
+		{
+			$wpt( this ).addClass( 'open' );
+		}
 	});
 
 	$wpt( 'a#searchopen, #wptouch-search-inner a' ).click( function(){

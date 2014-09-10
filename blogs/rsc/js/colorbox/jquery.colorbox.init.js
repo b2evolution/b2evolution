@@ -5,7 +5,7 @@
  * Used only to initialize colorbox for the links with attribute "rel" ^= "lightbox"
  * Don't load this file directly, It is appended to "/build/jquery.colorbox.b2evo.min.js" by Grunt, because we load colorbox plugin asynchronously.
  *
- * @version $Id: jquery.colorbox.init.js 7043 2014-07-02 08:35:45Z yura $
+ * @version $Id: jquery.colorbox.init.js 7304 2014-09-09 12:04:56Z yura $
  */
 jQuery( document ).ready( function()
 {
@@ -21,5 +21,16 @@ jQuery( document ).ready( function()
 		{
 			jQuery.colorbox.prev();
 		},
+	} );
+	jQuery( document ).on( 'click', '#colorbox img.cboxPhoto', function()
+	{
+		if( jQuery( this ).hasClass( 'zoomout' ) )
+		{ // Disable swipe plugin when picture is zoomed
+			jQuery( '#colorbox' ).swipe( 'disable' );
+		}
+		else
+		{ // Re-enable swipe plugin
+			jQuery( '#colorbox' ).swipe( 'enable' );
+		}
 	} );
 } );

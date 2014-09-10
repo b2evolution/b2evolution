@@ -294,7 +294,8 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		$widgets_insert_sql = 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params ) VALUES
 			( '.$blog_id.', "Mobile: Tools Menu", 10, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'login'))).'" ),
 			( '.$blog_id.', "Mobile: Tools Menu", 20, "core", "msg_menu_link", "'.$DB->escape(serialize(array('link_type'=>'messages'))).'" ),
-			( '.$blog_id.', "Mobile: Tools Menu", 30, "core", "msg_menu_link", "'.$DB->escape(serialize(array('link_type'=>'contacts', 'show_badge'=>0))).'" )';
+			( '.$blog_id.', "Mobile: Tools Menu", 30, "core", "msg_menu_link", "'.$DB->escape(serialize(array('link_type'=>'contacts', 'show_badge'=>0))).'" ),
+			( '.$blog_id.', "Mobile: Tools Menu", 50, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'logout'))).'" )';
 		if( $test_install_all_features )
 		{	// Add menu with User Directory
 			$widgets_insert_sql .= ',

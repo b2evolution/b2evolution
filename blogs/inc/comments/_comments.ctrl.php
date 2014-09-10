@@ -14,7 +14,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _comments.ctrl.php 7246 2014-08-20 12:35:51Z yura $
+ * @version $Id: _comments.ctrl.php 7281 2014-09-05 12:22:20Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -195,7 +195,7 @@ switch( $tab3 )
 
 $AdminUI->set_path( 'items' );	// Sublevel may be attached below
 
-if( $action == 'edit' )
+if( in_array( $action, array( 'edit', 'elevate', 'update_publish', 'update', 'switch_view' ) ) )
 { // Page with comment edit form
 	// Set an url for manual page
 	$AdminUI->set_page_manual_link( 'editing-comments' );

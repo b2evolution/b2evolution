@@ -21,7 +21,7 @@
  *
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _plugins_admin.class.php 7111 2014-07-14 05:23:46Z yura $
+ * @version $Id: _plugins_admin.class.php 7298 2014-09-09 07:16:07Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -922,6 +922,11 @@ class Plugins_admin extends Plugins
 	{
 		global $DB;
 
+		if( strlen( $code ) < 8 )
+		{
+			return T_( 'The minimum length of a plugin code is 8 characters.' );
+		}
+
 		if( strlen( $code ) > 32 )
 		{
 			return T_( 'The maximum length of a plugin code is 32 characters.' );
@@ -970,20 +975,35 @@ class Plugins_admin extends Plugins
 
 		$DB->begin();
 
-		// Update references to code:
-		// Widgets
-		$DB->query( 'UPDATE T_widget
-			  SET wi_code = '.$DB->quote( $code ).'
-			WHERE wi_code = '.$DB->quote( $old_code ) );
-
-		// TODO: dh> we might want to update item renderer codes and blog ping plugin codes here! (old code=>new code)
-
 		$Plugin->code = $code;
 
 		// Update the plugin code
 		$result = $DB->query( 'UPDATE T_plugins
 			  SET plug_code = '.$DB->quote( $code ).'
 			WHERE plug_ID = '.$plugin_ID );
+
+		if( $result )
+		{ // Update references to code:
+			// Widgets
+			$DB->query( 'UPDATE T_widget
+				  SET wi_code = '.$DB->quote( $code ).'
+				WHERE wi_code = '.$DB->quote( $old_code ) );
+			// Update the renderer fields in the tables of Items, Comments:
+			$renderer_fields = array(
+					// Items
+					'T_items__item'             => 'post_renderers',
+					'T_items__prerendering'     => 'itpr_renderers',
+					// Comments
+					'T_comments'                => 'comment_renderers',
+					'T_comments__prerendering'  => 'cmpr_renderers',
+				);
+			foreach( $renderer_fields as $renderer_table => $renderer_field )
+			{
+				$DB->query( 'UPDATE '.$renderer_table.'
+					  SET '.$renderer_field.' = TRIM( BOTH "." FROM REPLACE( CONCAT( ".", '.$renderer_field.', "." ), ".'.$old_code.'.", ".'.$code.'." ) )
+					WHERE '.$renderer_field.' LIKE "%'.addcslashes( $old_code, '%_' ).'%"' );
+			}
+		}
 
 		$DB->commit();
 

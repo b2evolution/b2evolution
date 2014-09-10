@@ -14,7 +14,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _comment.form.php 6608 2014-05-05 10:39:52Z yura $
+ * @version $Id: _comment.form.php 7281 2014-09-05 12:22:20Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -74,7 +74,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 
 	<?php
-	$Form->begin_fieldset( T_('Comment contents').get_manual_link( 'comment-content-fieldset' ) );
+	$Form->begin_fieldset( T_('Comment contents') );
 
 	echo '<table cellspacing="0" class="compose_layout">';
 

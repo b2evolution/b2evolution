@@ -573,13 +573,26 @@ switch( $action )
 				<label for="create_sample_contents"><?php echo T_('Also install sample blogs &amp; sample contents. The sample posts explain several features of b2evolution. This is highly recommended for new users.')?></label>
 				<br />
 				<?php
-					// Pre-check if current installation is local
-					$is_local = php_sapi_name() != 'cli' && // NOT php CLI mode
-						( $_SERVER['SERVER_ADDR'] == '127.0.0.1' ||
-							$_SERVER['SERVER_ADDR'] == '::1' || // IPv6 address of 127.0.0.1
-							$basehost == 'localhost' ||
-							$_SERVER['REMOTE_ADDR'] == '127.0.0.1' ||
-							$_SERVER['REMOTE_ADDR'] == '::1' );
+						// Pre-check if current installation is local
+						$is_local = php_sapi_name() != 'cli' && // NOT php CLI mode
+							( $basehost == 'localhost' ||
+								( isset( $_SERVER['SERVER_ADDR'] ) && (
+									$_SERVER['SERVER_ADDR'] == '127.0.0.1' ||
+									$_SERVER['SERVER_ADDR'] == '::1' ) // IPv6 address of 127.0.0.1
+								) ||
+								( isset( $_SERVER['REMOTE_ADDR'] ) && (
+									$_SERVER['REMOTE_ADDR'] == '127.0.0.1' ||
+									$_SERVER['REMOTE_ADDR'] == '::1' )
+								) ||
+								( isset( $_SERVER['HTTP_HOST'] ) && (
+									$_SERVER['HTTP_HOST'] == '127.0.0.1' ||
+									$_SERVER['HTTP_HOST'] == '::1' )
+								) ||
+								( isset( $_SERVER['SERVER_NAME'] ) && (
+									$_SERVER['SERVER_NAME'] == '127.0.0.1' ||
+									$_SERVER['SERVER_NAME'] == '::1' )
+								)
+							);
 				?>
 				<input type="checkbox" name="local_installation" id="local_installation" value="1"<?php echo $is_local ? ' checked="checked"' : ''; ?> />
 				<label for="local_installation"><?php echo T_('This is a local / test / intranet installation.')?></label>

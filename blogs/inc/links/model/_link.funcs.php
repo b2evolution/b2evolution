@@ -75,7 +75,7 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 	if( ! isset( $GLOBALS[ 'files_Module' ] ) )
 		return;
 
-	$fieldset_title = T_( 'Images &amp; Attachments' ).get_manual_link( $LinkOwner->type.'_attachments_fieldset' );
+	$fieldset_title = T_( 'Images &amp; Attachments' );
 
 	if( $creating )
 	{	// Creating new Item

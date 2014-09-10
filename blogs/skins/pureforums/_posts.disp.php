@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage pureforums
  *
- * @version $Id: _posts.disp.php 7130 2014-07-16 07:49:53Z yura $
+ * @version $Id: _posts.disp.php 7275 2014-09-05 07:42:30Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -22,6 +22,9 @@ global $number_of_posts_in_cat, $cat;
 
 if( $cat > 0 )
 {
+	$ChapterCache = & get_ChapterCache();
+	$current_Chapter = & $ChapterCache->get_by_ID( $cat, false, false );
+
 	// Init MainList
 	$page = param( 'paged', 'integer', 1 );
 	$MainList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $Blog->get_setting('posts_per_page') );
@@ -115,7 +118,8 @@ if( count( $chapters ) > 0 )
 }
 
 // ---------------------------------- START OF POSTS ------------------------------------
-if( isset( $MainList ) && $MainList->result_num_rows > 0 )
+if( isset( $MainList ) && ( empty( $cat ) ||
+   ( isset( $current_Chapter ) && ! $current_Chapter->meta ) /* Note: the meta categories cannot contain the posts */ ) )
 {
 	echo !empty( $chapters ) ? '<br />' : '';
 ?>
@@ -168,15 +172,26 @@ if( ! empty( $cat ) )
 	}
 }
 
-while( mainlist_get_item() )
-{ // For each blog post, do everything below up to the closing curly brace "}"
+if( $MainList->result_num_rows > 0 )
+{
+	while( mainlist_get_item() )
+	{ // For each blog post, do everything below up to the closing curly brace "}"
 
-	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
-	skin_include( '_item_list.inc.php', array(
-			'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
-			'image_size'   => 'fit-400x320',
-		) );
-	// ----------------------------END ITEM BLOCK  ----------------------------
+		// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
+		skin_include( '_item_list.inc.php', array(
+				'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
+				'image_size'   => 'fit-400x320',
+			) );
+		// ----------------------------END ITEM BLOCK  ----------------------------
+	}
+}
+elseif( isset( $current_Chapter ) )
+{ // Display a message about no posts in this category
+?>
+<tr>
+	<td colspan="5"><?php echo T_('There is no topic in this forum yet.'); ?></td>
+</tr>
+<?php
 }
 ?>
 	<tr class="panel bottom">
@@ -199,24 +214,4 @@ while( mainlist_get_item() )
 </table>
 <?php
 } // ---------------------------------- END OF POSTS ------------------------------------
-elseif( $cat > 0 )
-{ // Display a message about no posts in this category
-	$ChapterCache = & get_ChapterCache();
-	$Chapter = & $ChapterCache->get_by_ID( $cat, false, false );
-	if( $Chapter && ! $Chapter->meta )
-	{ // Note: the meta categories cannot contain the posts
-		echo !empty( $chapters ) ? '<br />' : '';
-?>
-	<table class="forums_table">
-		<tr class="noposts">
-			<td><?php
-				echo T_('There is no topic in this forum yet.').' ';
-				// Buttons to post new topic
-				$Skin->display_post_button( $cat );
-			?></td>
-		</tr>
-	</table>
-<?php
-	}
-}
 ?>

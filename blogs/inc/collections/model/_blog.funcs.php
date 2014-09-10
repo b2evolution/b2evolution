@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _blog.funcs.php 6411 2014-04-07 15:17:33Z yura $
+ * @version $Id: _blog.funcs.php 7301 2014-09-09 09:36:51Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -221,7 +221,7 @@ function blog_update_perms( $blog, $context = 'user' )
 	if( $DB->rows_affected > 0 )
 	{
 		global $Messages;
-		$Messages->add( sprintf( '%d tasks have lost their assignee due to new permissions', $DB->rows_affected ), 'warning' );
+		$Messages->add( sprintf( '%d tasks have lost their assignee due to new permissions (this may include fixes to older inconsistencies in the DB).', $DB->rows_affected ), 'warning' );
 	}
 
 	// BLOCK CACHE INVALIDATION:

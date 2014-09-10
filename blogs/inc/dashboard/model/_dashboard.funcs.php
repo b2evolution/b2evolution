@@ -15,7 +15,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _dashboard.funcs.php 7046 2014-07-02 11:41:10Z yura $
+ * @version $Id: _dashboard.funcs.php 7283 2014-09-05 12:58:59Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -484,4 +484,34 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 	return true;
 }
 
+
+/**
+ * Limit number by min and max values
+ *
+ * @param integer Number
+ * @param integer|NULL Minimum value or NULL to don't limit
+ * @param integer|NULL Maximum value or NULL to don't limit
+ */
+function limit_number_by_interval( $number, $min = NULL, $max = NULL )
+{
+	$number = intval( $number );
+
+	if( is_null( $min ) && is_null( $max ) )
+	{ // Nothing to limit
+		return $number;
+	}
+
+	if( ! is_null( $min ) && $number < $min )
+	{ // Limit by min
+		return $min;
+	}
+
+	if( ! is_null( $max ) && $number > $max )
+	{ // Limit by max
+		return $max;
+	}
+
+	// Original value
+	return $number;
+}
 ?>

@@ -17,7 +17,7 @@
  *
  * @todo add 5 plugin hooks. Will be widgetized later (same as SkinTag became Widgets)
  *
- * @version $Id: dashboard.ctrl.php 7046 2014-07-02 11:41:10Z yura $
+ * @version $Id: dashboard.ctrl.php 7283 2014-09-05 12:58:59Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -751,16 +751,22 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	$side_item_Widget->title = T_('System stats');
 	$side_item_Widget->disp_template_replaced( 'block_start' );
 
+	$post_all_counter = intval( get_table_count( 'T_items__item' ) );
+	$post_through_admin = limit_number_by_interval( $global_Cache->get( 'post_through_admin' ), 0, $post_all_counter );
+	$post_through_xmlrpc = limit_number_by_interval( $global_Cache->get( 'post_through_xmlrpc' ), 0, $post_all_counter );
+	$post_through_email = limit_number_by_interval( $global_Cache->get( 'post_through_email' ), 0, $post_all_counter );
+	$post_through_unknown = limit_number_by_interval( ( $post_all_counter - $post_through_admin - $post_through_xmlrpc - $post_through_email ), 0, $post_all_counter );
+
 	echo '<div class="dashboard_sidebar">';
 	echo '<ul>';
 		echo '<li>'.sprintf( T_('%s Users'), get_table_count( 'T_users' ) ).'</li>';
 		echo '<li>'.sprintf( T_('%s Blogs'), get_table_count( 'T_blogs' ) ).'</li>';
-		echo '<li>'.sprintf( T_('%s Posts'), $post_all_counter = (int)get_table_count( 'T_items__item' ) ).'</li>';
+		echo '<li>'.sprintf( T_('%s Posts'), $post_all_counter ).'</li>';
 		echo '<ul>';
-			echo '<li>'.sprintf( T_('%s on web'), $post_through_admin = (int)$global_Cache->get( 'post_through_admin' ) ).'</li>';
-			echo '<li>'.sprintf( T_('%s by XMLRPC'), $post_through_xmlrpc = (int)$global_Cache->get( 'post_through_xmlrpc' ) ).'</li>';
-			echo '<li>'.sprintf( T_('%s by email'), $post_through_email = (int)$global_Cache->get( 'post_through_email' ) ).'</li>';
-			echo '<li>'.sprintf( T_('%s unknown'), $post_all_counter - $post_through_admin - $post_through_xmlrpc - $post_through_email ).'</li>';
+			echo '<li>'.sprintf( T_('%s on web'), $post_through_admin ).'</li>';
+			echo '<li>'.sprintf( T_('%s by XMLRPC'), $post_through_xmlrpc ).'</li>';
+			echo '<li>'.sprintf( T_('%s by email'), $post_through_email ).'</li>';
+			echo '<li>'.sprintf( T_('%s unknown'), $post_through_unknown ).'</li>';
 		echo '</ul>';
 		echo '<li>'.sprintf( T_('%s Slugs'), get_table_count( 'T_slug' ) ).'</li>';
 		echo '<li>'.sprintf( T_('%s Comments'), get_table_count( 'T_comments' ) ).'</li>';
