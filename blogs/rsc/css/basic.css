@@ -72,6 +72,9 @@ div.image_legend {
 	color: #aaa;
 	margin: 1ex;
 }
+div.image_block.noinlinecaption div.image_legend {
+	display: none;
+}
 .shrinkwrap {
 	width: 1%;
 	white-space:nowrap;

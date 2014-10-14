@@ -31,7 +31,7 @@
  * @todo (sessions) When creating a blog, provide "edit options" (3 tabs) instead of a single long "New" form (storing the new Blog object with the session data).
  * @todo Currently if you change the name of a blog it gets not reflected in the blog list buttons!
  *
- * @version $Id: collections.ctrl.php 6493 2014-04-17 05:45:28Z yura $
+ * @version $Id: collections.ctrl.php 7396 2014-10-09 05:13:50Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -289,10 +289,14 @@ switch( $action )
 		$Settings->set( 'notification_long_name', param( 'notification_long_name', 'string', '' ) );
 
 		// Small site logo url
-		$Settings->set( 'notification_logo', param( 'notification_logo', 'string', '' ) );
+		param( 'notification_logo', 'string', '' );
+		param_check_url( 'notification_logo', 'http-https' );
+		$Settings->set( 'notification_logo', get_param( 'notification_logo' ) );
 
 		// Large site logo url
-		$Settings->set( 'notification_logo_large', param( 'notification_logo_large', 'string', '' ) );
+		param( 'notification_logo_large', 'string', '' );
+		param_check_url( 'notification_logo_large', 'http-https' );
+		$Settings->set( 'notification_logo_large', get_param( 'notification_logo_large' ) );
 
 		// Site footer text
 		$Settings->set( 'site_footer_text', param( 'site_footer_text', 'string', '' ) );

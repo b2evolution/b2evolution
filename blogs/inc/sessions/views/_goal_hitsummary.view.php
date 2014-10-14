@@ -9,7 +9,7 @@
  *
  * @package admin
  *
- * @version $Id: _goal_hitsummary.view.php 6395 2014-04-03 14:51:28Z yura $
+ * @version $Id: _goal_hitsummary.view.php 7368 2014-10-06 11:16:43Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -57,7 +57,7 @@ $goal_rows = $DB->get_results( $SQL->get(), OBJECT, 'Get list of all goals' );
 /*
  * Chart
  */
-if( count( $goal_rows ) )
+if( count( $goal_rows ) && count( $hitgroup_array ) )
 {
 	$chart = array();
 

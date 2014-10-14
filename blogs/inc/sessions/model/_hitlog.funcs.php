@@ -39,7 +39,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author vegarg: Vegar BERG GULDAL.
  *
- * @version $Id: _hitlog.funcs.php 7032 2014-07-01 11:20:28Z yura $
+ * @version $Id: _hitlog.funcs.php 7414 2014-10-13 08:10:51Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -49,15 +49,26 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 function hits_results_block( $params = array() )
 {
-	if( !is_logged_in() )
-	{	// Only logged in users can access to this function
+	if( ! is_logged_in() )
+	{ // Only logged in users can access to this function
 		return;
 	}
 
-	global $current_User;
-	if( !$current_User->check_perm( 'stats', 'view' ) )
-	{	// Current user has no permission to view all stats (aggregated stats)
-		return;
+	global $blog, $current_User;
+
+	if( $blog == 0 )
+	{
+		if( ! $current_User->check_perm( 'stats', 'view' ) )
+		{ // Current user has no permission to view all stats (aggregated stats)
+			return;
+		}
+	}
+	else
+	{
+		if( ! $current_User->check_perm( 'stats', 'list', false, $blog ) )
+		{ // Current user has no permission to view the stats of the selected blog
+			return;
+		}
 	}
 
 	/**

@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: cronjobs.ctrl.php 6894 2014-06-13 09:56:09Z yura $
+ * @version $Id: cronjobs.ctrl.php 7347 2014-10-01 11:52:15Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -79,6 +79,7 @@ if( in_array( $action, array( 'new', 'create', 'edit', 'update', 'copy' ) ) )
 			'unread_message_reminder' => T_( 'Send reminders about unread messages' ),
 			'activate_account_reminder' => T_( 'Send reminders about non-activated accounts' ),
 			'comment_moderation_reminder' => T_( 'Send reminders about comments awaiting moderation' ),
+			'post_moderation_reminder' => T_( 'Send reminders about posts awaiting moderation' ),
 			'return_path' => T_('Process the return path inbox'),
 			'light_db_maintenance' => T_('Light DB maintenance (ANALYZE)'),
 			'heavy_db_maintenance' => T_('Heavy DB maintenance (CHECK & OPTIMIZE)'),
@@ -116,6 +117,9 @@ if( in_array( $action, array( 'new', 'create', 'edit', 'update', 'copy' ) ) )
 				'params' => NULL ),
 			'comment_moderation_reminder' => array(
 				'ctrl' => 'cron/jobs/_comment_moderation_reminder.job.php',
+				'params' => NULL ),
+			'post_moderation_reminder' => array(
+				'ctrl' => 'cron/jobs/_post_moderation_reminder.job.php',
 				'params' => NULL ),
 			'return_path' => array(
 				'ctrl' => 'cron/jobs/_decode_returned_emails.job.php',

@@ -9,7 +9,7 @@
  *
  * @package admin
  *
- * @version $Id: _stats_goalhits.view.php 7032 2014-07-01 11:20:28Z yura $
+ * @version $Id: _stats_goalhits.view.php 7368 2014-10-06 11:16:43Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -139,8 +139,8 @@ $Results->filter_area = array(
 	'callback' => 'filter_goal_hits',
 	'url_ignore' => 'results_hits_page,exclude,sess_ID,goal_name,datestartinput,datestart,datestopinput,datestop',
 	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;blog=0' ),
-		'all_but_curr' => array( T_('All but current session'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;blog=0&amp;sess_ID='.$Session->ID.'&amp;exclude=1' ),
+		'all' => array( T_('All'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits' ),
+		'all_but_curr' => array( T_('All but current session'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;sess_ID='.$Session->ID.'&amp;exclude=1' ),
 		)
 	);
 

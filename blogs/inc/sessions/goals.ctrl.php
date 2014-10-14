@@ -12,7 +12,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: goals.ctrl.php 6894 2014-06-13 09:56:09Z yura $
+ * @version $Id: goals.ctrl.php 7414 2014-10-13 08:10:51Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -25,23 +25,48 @@ load_funcs('sessions/model/_hitlog.funcs.php');
  */
 global $current_User;
 
-global $dispatcher;
-
-$blog = 0;
+global $collections_Module;
 
 // Do we have permission to view all stats (aggregated stats) ?
-$current_User->check_perm( 'stats', 'view', true );
+$perm_view_all = $current_User->check_perm( 'stats', 'view' );
 
 $tab3 = param( 'tab3', 'string', 'goals', true );
 $AdminUI->set_path( 'stats', 'goals', $tab3 );
 
 if( isset( $collections_Module ) )
 { // Display list of blogs:
-	$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => 'summary', 'tab3' => 'global' ), T_('All'),
-					$admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog=0' );
+	if( $perm_view_all )
+	{
+		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => 'summary', 'tab3' => 'global' ), T_('All'),
+						$admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog=0' );
+	}
+	else
+	{ // No permission to view aggregated stats:
+		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => 'summary', 'tab3' => $tab3 ) );
+	}
 }
 
 param_action();
+
+if( $blog == 0 )
+{
+	if( ! $perm_view_all && isset( $collections_Module ) )
+	{ // Find a blog we can view stats for:
+		if( ! $selected = autoselect_blog( 'stats', 'view' ) )
+		{ // No blog could be selected
+			$Messages->add( T_('Sorry, there is no blog you have permission to view stats for.'), 'error' );
+			$action = 'nil';
+		}
+		elseif( set_working_blog( $selected ) ) // set $blog & memorize in user prefs
+		{ // Selected a new blog:
+			$BlogCache = & get_BlogCache();
+			$Blog = & $BlogCache->get_by_ID( $blog );
+		}
+	}
+}
+
+// Check permission to view current blog
+$current_User->check_perm( 'stats', 'list', true, $blog );
 
 if( param( 'goal_ID', 'integer', '', true) )
 { // Load goal:
@@ -381,12 +406,15 @@ switch( $tab3 )
 {
 	case 'goals':
 		$AdminUI->breadcrumbpath_add( T_('Goal definitions'), '?ctrl=goals' );
+		$AdminUI->set_page_manual_link( 'goal-settings' );
 		break;
 	case 'stats':
 		$AdminUI->breadcrumbpath_add( T_('Goal hit stats'), '?ctrl=goals&amp;tab3=stats' );
+		$AdminUI->set_page_manual_link( 'goal-stats' );
 		break;
 	case 'cats':
 		$AdminUI->breadcrumbpath_add( T_('Goal categories'), '?ctrl=goals&amp;tab3=cats' );
+		$AdminUI->set_page_manual_link( 'goal-category-settings' );
 		init_colorpicker_js();
 		break;
 }

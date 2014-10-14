@@ -22,7 +22,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _blog_main.inc.php 6653 2014-05-12 05:51:57Z yura $
+ * @version $Id: _blog_main.inc.php 7417 2014-10-13 11:58:41Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -482,11 +482,18 @@ if( !empty( $tempskin ) )
 }
 
 
-// Set $disp to 'posts' when filter by categories or tags
+// Set $disp to 'posts' when filter by categories or tags or date
 param( 'catsel', 'array/integer', NULL );
 param( 'cat', 'string', NULL );
 param( 'tag', 'string', NULL );
-if( empty( $Item ) && ( ! is_null( $catsel ) || ( $disp != 'edit' && ! is_null( $cat ) ) || ! is_null( $tag ) ) )
+param( 'm', 'string', NULL );
+if( empty( $Item ) &&
+		(
+			! is_null( $catsel ) || // Filter by many categories
+			( $disp != 'edit' && ! is_null( $cat ) ) || // Filter by one category
+			! is_null( $tag ) || // Filter by tag
+			! is_null( $m ) // Filter by date like '201410' (urls from ?disp=arcdir)
+	) )
 {
 	$disp = 'posts';
 }

@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class html5_mediaelementjs_plugin extends Plugin
 {
-	var $code = 'b2evH5M';
+	var $code = 'b2evH5MP';
 	var $name = 'HTML 5 MediaElement.js Video Player';
 	var $priority = 80;
 	var $version = '5.0.0';

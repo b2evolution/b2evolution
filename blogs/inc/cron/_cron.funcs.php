@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _cron.funcs.php 6175 2014-03-13 09:06:01Z attila $
+ * @version $Id: _cron.funcs.php 7347 2014-10-01 11:52:15Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -185,6 +185,7 @@ function cron_job_manual_link( $job_ctrl )
 		'cron/jobs/_antispam_poll.job.php' => 'task-poll-antispam-blacklist',
 		'cron/jobs/_cleanup_jobs.job.php' => 'task-cleanup-scheduled-jobs',
 		'cron/jobs/_comment_moderation_reminder.job.php' => 'task-send-unmoderated-comments-reminders',
+		'cron/jobs/_post_moderation_reminder.job.php' => 'task-send-unmoderated-posts-reminders',
 		'cron/jobs/_comment_notifications.job.php' => 'task-send-comment-notifications',
 		'cron/jobs/_decode_returned_emails.job.php' => 'task-process-return-path-inbox',
 		'cron/jobs/_error_test.job.php' => 'task-error-test',

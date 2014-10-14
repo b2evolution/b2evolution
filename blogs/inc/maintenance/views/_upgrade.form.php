@@ -20,7 +20,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id: _upgrade.form.php 6181 2014-03-13 10:56:31Z yura $
+ * @version $Id: _upgrade.form.php 7341 2014-09-30 09:47:23Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -29,36 +29,35 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $action;
 
-if( $action == 'start' )
-{
-	global $updates;
+global $updates;
 
-	$Form = new Form( NULL, 'upgrade_form', 'post', 'compact' );
+$Form = new Form( NULL, 'upgrade_form', 'post', 'compact' );
 
-	$Form->begin_form( 'fform', T_( 'Check for updates' ) );
+$Form->begin_form( 'fform', T_( 'Check for updates' ) );
 
-	if( empty( $updates ) )
-	{ // No new updates
-		?><div class="action_messages">
-			<div class="log_error" style="text-align:center;font-weight:bold"><?php echo T_( 'There are no new updates.' ); ?></div>
-		</div><?php
+if( empty( $updates ) )
+{ // No new updates
+	?><div class="action_messages">
+		<div class="log_error" style="text-align:center;font-weight:bold"><?php echo T_( 'There are no new updates.' ); ?></div>
+	</div><?php
 
-		$Form->end_form();
-	}
-	else
-	{ // Display a form to download new update
-		$update = $updates[0];
+	$Form->end_form();
+}
+else
+{ // Display a form to download new update
+	$update = $updates[0];
 
-		$Form->info( T_( 'Update' ), $update['name'] );
-		$Form->info( T_( 'Description' ), $update['description'] );
-		$Form->info( T_( 'Version' ), $update['version'] );
+	$Form->info( T_( 'Update' ), $update['name'] );
+	$Form->info( T_( 'Description' ), $update['description'] );
+	$Form->info( T_( 'Version' ), $update['version'] );
 
-		$Form->text_input( 'upd_url', $update['url'], 80, T_('URL'), '<br/><span class="red">'.T_( 'This is a test implementation. Please enter the URL of the ZIP file to download and install !' ).'</span>', array( 'maxlength' => 300, 'required' => true ) );
+	$Form->text_input( 'upd_url', ( get_param( 'upd_url' ) != '' ? get_param( 'upd_url' ) : $update['url'] ), 80,
+		T_('URL'), '<br/><span class="red">'.T_( 'This is a test implementation. Please enter the URL of the ZIP file to download and install !' ).'</span>', array( 'maxlength' => 300, 'required' => true ) );
 
-		$Form->hiddens_by_key( get_memorized( 'action' ) );
+	$Form->add_crumb( 'upgrade_started' );
+	$Form->hiddens_by_key( get_memorized( 'action' ) );
 
-		$Form->end_form( array( array( 'submit', 'actionArray[download]', T_( 'Continue' ), 'SaveButton' ) ) );
-	}
+	$Form->end_form( array( array( 'submit', 'actionArray[download]', T_( 'Continue' ), 'SaveButton' ) ) );
 }
 
 ?>

@@ -70,7 +70,8 @@ global $Blog;
  */
 global $DB;
 
-global $unread_messsage_reminder_threshold, $unread_message_reminder_delay, $activate_account_reminder_threshold, $comment_moderation_reminder_threshold;
+global $unread_messsage_reminder_threshold, $unread_message_reminder_delay;
+global $activate_account_reminder_threshold, $comment_moderation_reminder_threshold, $post_moderation_reminder_threshold;
 
 // Default params:
 $default_params = array(
@@ -212,6 +213,7 @@ $Form->begin_fieldset( T_('Notifications') );
 	if( $edited_User->check_role( 'post_moderator' ) )
 	{ // edited user is post moderator at least in one blog
 		$notify_options[] = array( 'edited_user_notify_post_moderation', 1, T_('a post is created and I have permissions to moderate it.'), $UserSettings->get( 'notify_post_moderation', $edited_User->ID ), $disabled );
+		$notify_options[] = array( 'edited_user_send_pst_moderation_reminder', 1, sprintf( T_('posts are awaiting moderation for more than %s.'), seconds_to_period( $post_moderation_reminder_threshold ) ), $UserSettings->get( 'send_pst_moderation_reminder', $edited_User->ID ), $disabled );
 	}
 	if( $current_User->check_perm( 'users', 'edit' ) )
 	{ // current User is an administrator

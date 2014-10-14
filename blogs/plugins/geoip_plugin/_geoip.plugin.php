@@ -488,7 +488,8 @@ jQuery( document ).ready( function()
 		$Form->hiddens_by_key( get_memorized() ); // needed to pass all other memorized params, especially "tab"
 		$Form->hidden( 'action', 'geoip_find_country' );
 
-		echo '<p>'.T_('This tool finds all users that do not have a registration country yet and then assigns them a registration country based on their registration IP.').'</p>';
+		echo '<p>'.T_('This tool finds all users that do not have a registration country yet and then assigns them a registration country based on their registration IP.').
+				   get_manual_link('geoip-plugin').'</p>';
 
 		$Form->button( array(
 				'value' => T_('Find Registration Country for all Users NOW!')

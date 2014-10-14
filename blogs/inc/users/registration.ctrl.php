@@ -27,7 +27,7 @@
  * @author efy-bogdan: Evo Factory / Bogdan.
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: registration.ctrl.php 6135 2014-03-08 07:54:05Z manuel $
+ * @version $Id: registration.ctrl.php 7408 2014-10-10 05:32:26Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -81,14 +81,14 @@ switch ( $action )
 		if( $after_email_validation != 'return_to_original' )
 		{
 			$after_email_validation = param( 'specific_after_validation_url', 'string', NULL );
-			param_check_url( 'specific_after_validation_url', 'email_validation' );
+			param_check_url( 'specific_after_validation_url', 'http-https' );
 		}
 
 		$after_registration = param( 'after_registration', 'string', 'return_to_original' );
 		if( $after_registration != 'return_to_original' )
 		{
 			$after_registration = param( 'specific_after_registration_url', 'string', NULL );
-			param_check_url( 'specific_after_registration_url', 'after_registration' );
+			param_check_url( 'specific_after_registration_url', 'http-https' );
 		}
 
 		param_integer_range( 'user_minpwdlen', 1, 32, T_('Minimum password length must be between %d and %d.') );

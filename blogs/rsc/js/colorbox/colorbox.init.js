@@ -5,7 +5,7 @@
  * Used only to initialize colorbox for the links with attribute "rel" ^= "lightbox"
  * Don't load this file directly, It is appended to "/build/jquery.colorbox.b2evo.min.js" by Grunt, because we load colorbox plugin asynchronously.
  *
- * @version $Id: jquery.colorbox.init.js 7304 2014-09-09 12:04:56Z yura $
+ * @version $Id: colorbox.init.js 7363 2014-10-06 05:05:13Z yura $
  */
 jQuery( document ).ready( function()
 {

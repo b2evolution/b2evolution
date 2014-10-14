@@ -8,7 +8,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
- * @version $Id: posts_unmoderated_reminder.txt.php 7043 2014-07-02 08:35:45Z yura $
+ * @version $Id: posts_unmoderated_reminder.txt.php 7347 2014-10-01 11:52:15Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -38,7 +38,7 @@ foreach( $params['blogs'] as $blog_ID )
 // Footer vars:
 $params['unsubscribe_text'] = T_( 'You are a moderator in this blog, and you are receiving notifications when the posts may need moderation.' )."\n".
 		T_( 'If you don\'t want to receive any more notifications about post moderation, click here' ).': '.
-		$htsrv_url.'quick_unsubscribe.php?type=post_moderator&user_ID=$user_ID$&key=$unsubscribe_key$';
+		$htsrv_url.'quick_unsubscribe.php?type=pst_moderation_reminder&user_ID=$user_ID$&key=$unsubscribe_key$';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.txt.php', $params );

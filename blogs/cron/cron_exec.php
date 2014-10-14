@@ -6,7 +6,7 @@
  * >c:\php4\php cron_exec.php
  * >c:\php4\php-cli cron_exec.php
  *
- * @version $Id: cron_exec.php 5875 2014-02-03 13:38:59Z attila $
+ * @version $Id: cron_exec.php 7380 2014-10-07 11:19:23Z yura $
  */
 
 
@@ -161,7 +161,7 @@ else
 		if( !empty( $task->ctsk_repeat_after ) )
 		{	// This task wants to be repeated:
 			// Note: we use the current time for 2 reasons: 1) prevent scheduling something in the past AND 2) introduce variety so that everyone doesn't run his repeated tasks at the same exact time, especially pings, pollings...
-			if( $task->ctsk_controller == 'cron/_antispam_poll.job.php' )
+			if( $task->ctsk_controller == 'cron/jobs/_antispam_poll.job.php' )
 			{	// THIS IS A HACK. Guess why we need that!? :P  Please do not override or you'll kill our server :(
 				$new_start_datetime = $localtimenow + rand( 43200, 86400 ); // 12 to 24 hours
 			}

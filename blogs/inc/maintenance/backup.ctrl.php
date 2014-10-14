@@ -22,7 +22,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id: backup.ctrl.php 6135 2014-03-08 07:54:05Z manuel $
+ * @version $Id: backup.ctrl.php 7341 2014-09-30 09:47:23Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -81,7 +81,9 @@ switch( $action )
 	case 'backup':
 		if( $demo_mode )
 		{
-			echo('This feature is disabled on the demo server.');
+			$Messages->clear();
+			$Messages->add( T_( 'This feature is disabled on the demo server.' ), 'error' );
+			$Messages->display();
 			break;
 		}
 

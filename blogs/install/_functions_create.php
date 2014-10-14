@@ -37,7 +37,7 @@
  * @author edgester: Jason EDGECOMBE.
  * @author mfollett: Matt Follett.
  *
- * @version $Id: _functions_create.php 7106 2014-07-11 11:58:53Z yura $
+ * @version $Id: _functions_create.php 7347 2014-10-01 11:52:15Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1015,10 +1015,11 @@ function create_default_jobs( $is_upgrade = false )
 	$process_hitlog_ctrl = 'cron/jobs/_process_hitlog.job.php';
 	$messages_reminder_ctrl = 'cron/jobs/_unread_message_reminder.job.php';
 	$activate_reminder_ctrl = 'cron/jobs/_activate_account_reminder.job.php';
-	$moderation_reminder_ctrl = 'cron/jobs/_comment_moderation_reminder.job.php';
+	$comment_reminder_ctrl = 'cron/jobs/_comment_moderation_reminder.job.php';
 	$light_db_maintenance_ctrl = 'cron/jobs/_light_db_maintenance.job.php';
 	$heavy_db_maintenance_ctrl = 'cron/jobs/_heavy_db_maintenance.job.php';
 	$prune_comments_ctrl = 'cron/jobs/_prune_recycled_comments.job.php';
+	$post_reminder_ctrl = 'cron/jobs/_post_moderation_reminder.job.php';
 
 	// init insert values
 	// run unread messages reminder in every 29 minutes
@@ -1029,11 +1030,12 @@ function create_default_jobs( $is_upgrade = false )
 	$process_hitlog = "( ".$DB->quote( form_date( $date, '02:30:00' ) ).", 86400, ".$DB->quote( T_( 'Process hit log' ) ).", ".$DB->quote( $process_hitlog_ctrl ).", ".$ctsk_params." )";
 	$prune_sessions = "( ".$DB->quote( form_date( $date, '03:00:00' ) ).", 86400, ".$DB->quote( T_( 'Prune old hits & sessions (includes OPTIMIZE)' ) ).", ".$DB->quote( $prune_sessions_ctrl ).", ".$ctsk_params." )";
 	$poll_antispam = "( ".$DB->quote( form_date( $date, '04:00:00' ) ).", 86400, ".$DB->quote( T_( 'Poll the antispam blacklist' ) ).", ".$DB->quote( $poll_antispam_ctrl ).", ".$ctsk_params." )";
-	$moderation_reminder = "( ".$DB->quote( form_date( $date, '04:30:00' ) ).", 86400, ".$DB->quote( T_( 'Send reminders about comments awaiting moderation' ) ).", ".$DB->quote( $moderation_reminder_ctrl ).", ".$ctsk_params." )";
+	$comment_reminder = "( ".$DB->quote( form_date( $date, '04:30:00' ) ).", 86400, ".$DB->quote( T_( 'Send reminders about comments awaiting moderation' ) ).", ".$DB->quote( $comment_reminder_ctrl ).", ".$ctsk_params." )";
 	$light_db_maintenance = "( ".$DB->quote( form_date( $date, '06:00:00' ) ).", 86400, ".$DB->quote( T_('Light DB maintenance (ANALYZE)') ).", ".$DB->quote( $light_db_maintenance_ctrl ).", ".$ctsk_params." )";
 	$next_sunday = date2mysql( strtotime( 'next Sunday',  $localtimenow + 86400 ) );
 	$heavy_db_maintenance = "( ".$DB->quote( form_date( $next_sunday, '06:30:00' ) ).", 604800, ".$DB->quote( T_('Heavy DB maintenance (CHECK & OPTIMIZE)') ).", ".$DB->quote( $heavy_db_maintenance_ctrl ).", ".$ctsk_params." )";
 	$prune_comments = "( ".$DB->quote( form_date( $date, '06:30:00' ) ).", 86400, ".$DB->quote( T_( 'Prune recycled comments' ) ).", ".$DB->quote( $prune_comments_ctrl ).", ".$ctsk_params." )";
+	$post_reminder = "( ".$DB->quote( form_date( $date, '07:00:00' ) ).", 86400, ".$DB->quote( T_( 'Send reminders about posts awaiting moderation' ) ).", ".$DB->quote( $post_reminder_ctrl ).", ".$ctsk_params." )";
 	$insert_values = array(
 		$messages_reminder_ctrl => $messages_reminder,
 		$activate_reminder_ctrl => $activate_reminder,
@@ -1041,10 +1043,11 @@ function create_default_jobs( $is_upgrade = false )
 		$process_hitlog_ctrl => $process_hitlog,
 		$prune_sessions_ctrl => $prune_sessions,
 		$poll_antispam_ctrl => $poll_antispam,
-		$moderation_reminder_ctrl => $moderation_reminder,
+		$comment_reminder_ctrl => $comment_reminder,
 		$light_db_maintenance_ctrl => $light_db_maintenance,
 		$heavy_db_maintenance_ctrl => $heavy_db_maintenance,
-		$prune_comments_ctrl => $prune_comments );
+		$prune_comments_ctrl => $prune_comments,
+		$post_reminder_ctrl => $post_reminder );
 	if( $is_upgrade )
 	{ // Check if these jobs already exist, and don't create another
 		$SQL = new SQL();

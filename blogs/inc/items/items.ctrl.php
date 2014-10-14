@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: items.ctrl.php 6894 2014-06-13 09:56:09Z yura $
+ * @version $Id: items.ctrl.php 7338 2014-09-29 15:20:01Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -671,9 +671,6 @@ switch( $action )
 		// Set object params:
 		$edited_Item->load_from_Request( /* editing? */ ($action == 'create_edit'), /* creating? */ true );
 
-		// Check and clear inline images, to avoid to have placeholders without corresponding attachment
-		$edited_Item->check_and_clear_inline_images();
-
 		$Plugins->trigger_event ( 'AdminBeforeItemEditCreate', array ('Item' => & $edited_Item ) );
 
 		if( !empty( $mass_create ) )
@@ -825,9 +822,6 @@ switch( $action )
 
 		// Set object params:
 		$edited_Item->load_from_Request( false );
-
-		// Check and clear inline images, to avoid to have placeholders without corresponding attachment
-		$edited_Item->check_and_clear_inline_images();
 
 		$Plugins->trigger_event( 'AdminBeforeItemEditUpdate', array( 'Item' => & $edited_Item ) );
 

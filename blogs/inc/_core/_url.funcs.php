@@ -21,7 +21,7 @@
  * @author blueyed: Daniel HAHLER
  * @author Danny Ferguson
  *
- * @version $Id: _url.funcs.php 6225 2014-03-16 10:01:05Z attila $
+ * @version $Id: _url.funcs.php 7396 2014-10-09 05:13:50Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -38,7 +38,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * {@internal This function gets tested in misc.funcs.simpletest.php.}}
  *
  * @param string Url to validate
- * @param string Context ("posting", "commenting")
+ * @param string Context ("posting", "commenting", "download_src", "http-https")
  * @param boolean also do an antispam check on the url
  * @return mixed false (which means OK) or error message
  */
@@ -51,14 +51,15 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 		return false;
 	}
 
+	// Do not give verbose info for comments, unless debug is enabled.
 	$verbose = $debug || $context != 'commenting';
 
 	$allowed_uri_schemes = get_allowed_uri_schemes( $context );
 
 	// Validate URL structure
 	if( $url[0] == '$' )
-	{	// This is a 'special replace code' URL (used in footers)
- 		if( ! preg_match( '~\$([a-z_]+)\$~', $url ) )
+	{ // This is a 'special replace code' URL (used in footers)
+		if( ! preg_match( '~\$([a-z_]+)\$~', $url ) )
 		{
 			return T_('Invalid URL $code$ format');
 		}
@@ -83,7 +84,7 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 					? sprintf( T_('Invalid email link: %s.'), evo_htmlspecialchars($url) )
 					: T_('Invalid email link.');
 			}
-      elseif( ! is_email($match[2]) )
+			elseif( ! is_email($match[2]) )
 			{
 				return $verbose
 					? sprintf( T_('Supplied email address (%s) is invalid.'), evo_htmlspecialchars($match[2]) )
@@ -156,12 +157,12 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 	}
 	else
 	{ // URL is relative..
-		if( $context == 'commenting' )
-		{	// We do not allow relative URLs in comments
+		if( $context == 'commenting' || $context == 'download_src' || $context == 'http-https' )
+		{ // We do not allow relative URLs in comments and download urls
 			return $verbose ? sprintf( T_('URL "%s" must be absolute.'), evo_htmlspecialchars($url) ) : T_('URL must be absolute.');
 		}
 
-		$char = substr($url, 0, 1);
+		$char = substr( $url, 0, 1 );
 		if( $char != '/' && $char != '#' )
 		{ // must start with a slash or hash (for HTML anchors to the same page)
 			return $verbose
@@ -170,9 +171,8 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 		}
 	}
 
-
 	if( $antispam_check )
-	{	// Search for blocked keywords:
+	{ // Search for blocked keywords:
 		if( $block = antispam_check($url) )
 		{
 			return $verbose
@@ -187,20 +187,34 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 
 /**
  * Get allowed URI schemes for a given context.
- * @param string Context ("posting", "commenting")
+ * @param string Context ("posting", "commenting", "download_src", "http-https")
  * @return array
  */
 function get_allowed_uri_schemes( $context = 'posting' )
 {
-  /**
+	/**
 	 * @var User
 	 */
 	global $current_User;
 
 	$schemes = array(
 			'http',
-			'https',
-			'ftp',
+			'https'
+		);
+
+	if( $context == 'http-https' )
+	{ // for context == 'http-https' we accepts only http, https.
+		return $schemes;
+	}
+
+	$schemes[] = 'ftp';
+
+	if( $context == 'download_src' )
+	{ // for context == 'download_src' we also accepts ftp.
+		return $schemes;
+	}
+
+	$schemes = array_merge( $schemes, array(
 			'gopher',
 			'nntp',
 			'news',
@@ -208,15 +222,16 @@ function get_allowed_uri_schemes( $context = 'posting' )
 			'irc',
 			'aim',
 			'icq'
-		);
+		) );
 
 	if( $context == 'commenting' )
 	{
 		return $schemes;
 	}
 
+	// for context == 'posting' we MAY allow additional "DANGEROUS" schemes:
 	if( !empty( $current_User ) )
-	{	// Add additional permissions the current User may have:
+	{ // Add additional permissions the current User may have:
 
 		$Group = & $current_User->get_Group();
 

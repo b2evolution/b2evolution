@@ -14,7 +14,7 @@
  *
  * @package install
  *
- * @version $Id: _functions_evoupgrade.php 7249 2014-08-26 04:33:20Z yura $
+ * @version $Id: _functions_evoupgrade.php 7332 2014-09-29 11:31:08Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -4996,7 +4996,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( $old_db_version < 11280 )
-	{ // part 16.i trunk aka 12th part of "i6"
+	{ // part 16.j trunk aka 12th part of "i6"
 
 		task_begin( 'Upgrading hit logs table...' );
 		$DB->query( "ALTER TABLE T_hitlog
@@ -5007,8 +5007,25 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		db_drop_col( 'T_blogs', 'blog_UID' );
 		task_end();
 
+		set_upgrade_checkpoint( '11280' );
+	}
 
-		// set_upgrade_checkpoint( '11280' );
+	if( $old_db_version < 11285 )
+	{ // part 16.k trunk aka 13th part of "i6"
+
+		task_begin( 'Updating plugins table...' );
+		$DB->query( 'UPDATE T_plugins SET
+			plug_code = CASE
+				WHEN plug_classname = "generic_ping_plugin"         THEN "b2evGPing"
+				WHEN plug_classname = "basic_antispam_plugin"       THEN "b2evBAspm"
+				WHEN plug_classname = "flowplayer_plugin"           THEN "b2evFlwP"
+				WHEN plug_classname = "html5_mediaelementjs_plugin" THEN "b2evH5MP"
+				WHEN plug_classname = "html5_videojs_plugin"        THEN "b2evH5VJSP"
+				ELSE plug_code
+			END' );
+		task_end();
+
+		// set_upgrade_checkpoint( '11285' );
 	}
 
 	/*

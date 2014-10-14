@@ -22,7 +22,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id: upgrade.ctrl.php 6776 2014-05-27 06:22:16Z yura $
+ * @version $Id: upgrade.ctrl.php 7357 2014-10-02 16:34:27Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -80,7 +80,7 @@ echo '<h3>Use for testing only at this point!</h3>';
 evo_flush();
 
 /**
- * Display payload:
+ * Do Action Display Payload:
  */
 switch( $action )
 {
@@ -122,28 +122,33 @@ switch( $action )
 				}
 			}
 
-			// Extract available updates:
+			// Extract array of info about available update:
 			$updates = $global_Cache->get( 'updates' );
+
+			$action = 'start';
+			$AdminUI->disp_view( 'maintenance/views/_upgrade.form.php' );
 		}
 		elseif( $tab == 'svn' )
 		{
 			svnupgrade_display_steps( 1 );
+
+			$action = 'start';
+			$AdminUI->disp_view( 'maintenance/views/_upgrade_svn.form.php' );
 		}
-
-		// DEBUG:
-		// $updates[0]['url'] = 'http://xxx/b2evolution-1.0.0.zip'; // TODO: temporary URL
-
-		$action = 'start';
-
 		break;
 
 	case 'download':
 	case 'force_download':
 		// STEP 2: DOWNLOAD.
 
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'upgrade_started' );
+
 		if( $demo_mode )
 		{
-			echo('This feature is disabled on the demo server.');
+			$Messages->clear();
+			$Messages->add( T_( 'This feature is disabled on the demo server.' ), 'error' );
+			$Messages->display();
 			break;
 		}
 
@@ -157,6 +162,26 @@ switch( $action )
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 
 		$download_url = param( 'upd_url', 'string', '', true );
+		$Messages->clear(); // Clear the messages to avoid a double displaying here
+		param_check_not_empty( 'upd_url', T_('Please enter the URL to download ZIP archive') );
+		// Check the download url for correct http, https, ftp URI
+		$success = param_check_url( 'upd_url', 'download_src', NULL );
+		if( $success && ! preg_match( '#\.zip$#i', $download_url ) )
+		{ // Check the download url is a .zip or .ZIP
+			param_error( 'upd_url', sprintf( T_( 'The URL "%s" must be an URL to ZIP archive.' ), $download_url ) );
+		}
+
+		if( $Messages->count() )
+		{ // Display the errors and the download form again to fix url
+			$Messages->display();
+
+			// Extract array of info about available update:
+			$updates = $global_Cache->get( 'updates' );
+
+			$action = 'start';
+			$AdminUI->disp_view( 'maintenance/views/_upgrade.form.php' );
+			break;
+		}
 
 		$upgrade_name = pathinfo( $download_url );
 		$upgrade_name = $upgrade_name['filename'];
@@ -217,24 +242,8 @@ switch( $action )
 			evo_flush();
 		}
 
-		if( $action_success && $download_success )
-		{ // Init a button to unzip
-			$upgrade_buttons = array( 'unzip' => T_( 'Unzip package' ) );
-		}
-		elseif( $download_success )
-		{ // Init the buttons to select next action
-			$upgrade_buttons = array(
-					'unzip'          => T_( 'Skip Download' ),
-					'force_download' => T_( 'Force New Download' ),
-				);
-		}
-		else
-		{ // Init a button to back step
-			$upgrade_buttons = array( 'start' => T_( 'Back to select package' ) );
-		}
-
-		// Pause a process before next step
-		$AdminUI->disp_view( 'maintenance/views/_upgrade_continue.form.php' );
+		// Pause the process before next step
+		$AdminUI->disp_view( 'maintenance/views/_upgrade_downloaded.form.php' );
 		unset( $block_item_Widget );
 		break;
 
@@ -242,9 +251,14 @@ switch( $action )
 	case 'force_unzip':
 		// STEP 3: UNZIP.
 
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'upgrade_downloaded' );
+
 		if( $demo_mode )
 		{
-			echo('This feature is disabled on the demo server.');
+			$Messages->clear();
+			$Messages->add( T_( 'This feature is disabled on the demo server.' ), 'error' );
+			$Messages->display();
 			break;
 		}
 
@@ -306,25 +320,8 @@ switch( $action )
 			}
 		}
 
-		if( $action_success && $unzip_success )
-		{ // Init a button to next step
-			$upgrade_buttons = array( 'ready' => T_( 'Continue' ) );
-		}
-		elseif( $unzip_success )
-		{ // Init the buttons to select next action
-			$upgrade_buttons = array( 'ready' => T_( 'Skip Unzip' ) );
-			if( file_exists( $upgrade_file ) )
-			{
-				$upgrade_buttons['force_unzip'] = T_( 'Force New Unzip' );
-			}
-		}
-		else
-		{ // Init a button to back step
-			$upgrade_buttons = array( 'download' => T_( 'Back to download package' ) );
-		}
-
-		// Pause a process before next step
-		$AdminUI->disp_view( 'maintenance/views/_upgrade_continue.form.php' );
+		// Pause the process before next step
+		$AdminUI->disp_view( 'maintenance/views/_upgrade_unzip.form.php' );
 		unset( $block_item_Widget );
 		break;
 
@@ -332,6 +329,9 @@ switch( $action )
 		// STEP 4: READY TO UPGRADE.
 	case 'ready_svn':
 		// SVN STEP 3: READY TO UPGRADE.
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'upgrade_is_ready' );
 
 		if( $action == 'ready_svn' )
 		{ // SVN upgrade
@@ -361,12 +361,10 @@ switch( $action )
 		if( empty( $new_version_status ) )
 		{ // New version
 			echo '<p><b>'.T_( 'The new files are ready to be installed.' ).'</b></p>';
-			$upgrade_buttons = array( $action_backup_value => T_( 'Backup & Upgrade' ) );
 		}
 		else
 		{ // Old/Same version
 			echo '<div class="action_messages"><div class="log_error" style="text-align:center;font-weight:bold">'.$new_version_status.'</div></div>';
-			$upgrade_buttons = array( $action_backup_value => T_( 'Force Backup & Upgrade' ) );
 		}
 
 		echo '<p>'
@@ -379,8 +377,8 @@ switch( $action )
 				.'<li>'.T_( 'The site will switch to normal mode again at the end of the install script.' ).'</li>'
 			.'</ul></p>';
 
-		// Pause a process before next step
-		$AdminUI->disp_view( 'maintenance/views/_upgrade_continue.form.php' );
+		// Pause the process before next step
+		$AdminUI->disp_view( 'maintenance/views/_upgrade_ready.form.php' );
 		unset( $block_item_Widget );
 		break;
 
@@ -389,9 +387,14 @@ switch( $action )
 	case 'backup_and_overwrite_svn':
 		// SVN STEP 2: BACKUP AND OVERWRITE.
 
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'upgrade_is_launched' );
+
 		if( $demo_mode )
 		{
-			echo('This feature is disabled on the demo server.');
+			$Messages->clear();
+			$Messages->add( T_( 'This feature is disabled on the demo server.' ), 'error' );
+			$Messages->display();
 			break;
 		}
 
@@ -519,9 +522,13 @@ switch( $action )
 	case 'force_export_svn':
 		// SVN STEP 2: EXPORT.
 
+		$Session->assert_received_crumb( 'upgrade_export' );
+
 		if( $demo_mode )
 		{
-			echo('This feature is disabled on the demo server.');
+			$Messages->clear();
+			$Messages->add( T_( 'This feature is disabled on the demo server.' ), 'error' );
+			$Messages->display();
 			break;
 		}
 
@@ -543,12 +550,19 @@ switch( $action )
 		$UserSettings->set( 'svn_upgrade_revision', $svn_revision );
 		$UserSettings->dbupdate();
 
+		$Messages->clear(); // Clear the messages to avoid a double displaying here
+
 		$success = param_check_not_empty( 'svn_url', T_('Please enter the URL of repository') );
-		//$success = $success && param_check_regexp( 'svn_folder', '#/blogs/$#', T_('A correct SVN folder path must ends with "/blogs/"') );
+		$success = $success && param_check_url( 'svn_url', 'download_src' );
+		$success = $success && param_check_regexp( 'svn_folder', '#/blogs/$#', T_('A correct SVN folder path must ends with "/blogs/"') );
+
+		// Display the errors and the download form again to fix data
+		$Messages->display();
 
 		if( ! $success )
 		{
 			$action = 'start';
+			$AdminUI->disp_view( 'maintenance/views/_upgrade_svn.form.php' );
 			break;
 		}
 
@@ -632,18 +646,7 @@ switch( $action )
 
 		if( $success )
 		{ // Pause a process before upgrading
-			if( empty( $revision_is_exported ) )
-			{ // Init the buttons to continue
-				$upgrade_buttons = array( 'ready_svn' => T_( 'Continue' ) );
-			}
-			else
-			{ // Init the buttons to select next action
-				$upgrade_buttons = array(
-						'ready_svn'        => T_( 'Skip Export' ),
-						'force_export_svn' => T_( 'Force New Export' ),
-					);
-			}
-			$AdminUI->disp_view( 'maintenance/views/_upgrade_continue.form.php' );
+			$AdminUI->disp_view( 'maintenance/views/_upgrade_export.form.php' );
 			unset( $block_item_Widget );
 		}
 		break;
@@ -652,17 +655,6 @@ switch( $action )
 if( isset( $block_item_Widget ) )
 {
 	$block_item_Widget->disp_template_replaced( 'block_end' );
-}
-
-switch( $tab )
-{
-	case 'svn':
-		$AdminUI->disp_view( 'maintenance/views/_upgrade_svn.form.php' );
-		break;
-
-	default:
-		$AdminUI->disp_view( 'maintenance/views/_upgrade.form.php' );
-		break;
 }
 
 $AdminUI->disp_payload_end();

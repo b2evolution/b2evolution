@@ -38,7 +38,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _param.funcs.php 7121 2014-07-15 11:05:25Z yura $
+ * @version $Id: _param.funcs.php 7396 2014-10-09 05:13:50Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -813,13 +813,16 @@ function check_is_login( $login )
 
 
 /**
- * @param string param name
- * @param string
+ * Check that a given param is a valid URL
+ *
+ * @param string name of the param that contains the URL to check
+ * @param string Context ("posting", "commenting", "download_src", "http-https")
+ * @param string Error message under field OR NULL to use default mesage
  * @return boolean true if OK
  */
 function param_check_url( $var, $context, $field_err_msg = NULL )
 {
-  /**
+	/**
 	 * @var User
 	 */
 	global $current_User;

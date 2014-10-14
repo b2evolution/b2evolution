@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE - {@link http://fplanque.net/}
  * @author jeffbearer: Jeff BEARER - {@link http://www.jeffbearer.com/}.
  *
- * @version $Id: _whosonline.plugin.php 6135 2014-03-08 07:54:05Z manuel $
+ * @version $Id: _whosonline.plugin.php 7314 2014-09-11 07:07:22Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -201,10 +201,9 @@ class OnlineSessions
 		// NOTE: we do not use DISTINCT here, because guest users are all "NULL".
 		$online_user_ids = $DB->get_col( "
 			SELECT SQL_NO_CACHE sess_user_ID
-			  FROM T_sessions INNER JOIN T_hitlog ON sess_ID = hit_sess_ID
+			  FROM T_sessions
 			 WHERE sess_lastseen_ts > '".$timeout_YMD."'
 			   AND sess_key IS NOT NULL
-			   AND hit_agent_type = 'browser'
 			 GROUP BY sess_ID", 0, 'Sessions: get list of relevant users.' );
 		$registered_online_user_ids = array_diff( $online_user_ids, array( NULL ) );
 		// load all online users into the cache because we need information ( login, avatar ) about them

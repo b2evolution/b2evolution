@@ -37,6 +37,7 @@ div.email_payload {
 	margin: 8px 2em;
 	padding: 1px 1em;
 	border-radius: 5px;
+	overflow: auto;
 }
 div.email_ugc {
 	margin: 1em 1em;

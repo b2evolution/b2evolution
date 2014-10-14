@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _usersettings.class.php 6135 2014-03-08 07:54:05Z manuel $
+ * @version $Id: _usersettings.class.php 7347 2014-10-01 11:52:15Z yura $
  *
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -89,6 +89,7 @@ class UserSettings extends AbstractSettings
 
 		// admin user notifications
 		'send_cmt_moderation_reminder' => 1, // Send reminders about comments awaiting moderation
+		'send_pst_moderation_reminder' => 1, // Send reminders about posts awaiting moderation
 		'notify_new_user_registration' => 1, // Notify admin user when a new user has registered
 		'notify_activated_account' => 1, // Notify admin user when an account has been activated by email
 		'notify_closed_account' => 1, // Notify admin user when an account has been closed by the account owner

@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _sessions.init.php 6211 2014-03-14 15:02:12Z yura $
+ * @version $Id: _sessions.init.php 7414 2014-10-13 08:10:51Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -354,11 +354,11 @@ class sessions_Module extends Module
 									),
 							)
 						);
-		}
 
-		if( $current_User->check_perm( 'stats', 'view' ) )
-		{	// Viewing aggregate + Permission to view stats for ALL blogs:
-			$AdminUI->add_menu_entries(
+			if( $current_User->check_perm( 'stats', 'view' ) ||
+			    autoselect_blog( 'stats', 'view' ) )
+			{ // Viewing aggregate + Permission to view stats for ALL blogs:
+				$AdminUI->add_menu_entries(
 					'stats',
 					array(
 						'goals' => array(
@@ -375,7 +375,7 @@ class sessions_Module extends Module
 									),
 								'hits' => array(
 									'text' => T_('Goal hits'),
-									'href' => $admin_url.'?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;blog=0'
+									'href' => $admin_url.'?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;blog='.$blog
 									),
 								'stats' => array(
 									'text' => T_('Stats'),
@@ -388,6 +388,7 @@ class sessions_Module extends Module
 							'href' => $admin_url.'?ctrl=stats&amp;tab=settings' ),
 						)
 				);
+			}
 		}
 	}
 }

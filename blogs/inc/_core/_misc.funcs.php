@@ -30,7 +30,7 @@
  *
  * @package evocore
  *
- * @version $Id: _misc.funcs.php 7258 2014-08-27 03:52:32Z yura $
+ * @version $Id: _misc.funcs.php 7344 2014-09-30 11:45:19Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -395,7 +395,7 @@ function excerpt( $str, $maxlen = 200 )
 	$str = format_to_output( $str, 'text' );
 
 	// Ger rid of all new lines and Display the html tags as source text:
-	$str = trim( str_replace( array( "\r", "\n", "\t" ), ' ', $str ) );
+	$str = trim( preg_replace( '#[\r\n\t\s]+#', ' ', $str ) );
 
 	$str = strmaxlen( $str, $maxlen, NULL, 'raw', true );
 
@@ -885,21 +885,22 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
  * @param array|string Search list
  * @param array|string Replace list
  * @param string Source content
+ * @param string Type of callback function: 'preg' -> preg_replace(), 'str' -> str_replace() (@see replace_content())
  * @return string Replaced content
  */
-function replace_content_outcode( $search, $replace, $content, $replace_function_callback = 'replace_content' )
+function replace_content_outcode( $search, $replace, $content, $replace_function_callback = 'replace_content', $replace_function_type = 'preg' )
 {
-	if( !empty( $search ) && !empty( $replace ) )
+	if( !empty( $search ) )
 	{
 		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false )
-		{	// Call replace_content() on everything outside code/pre:
+		{ // Call replace_content() on everything outside code/pre:
 			$content = callback_on_non_matching_blocks( $content,
 				'~<(code|pre)[^>]*>.*?</\1>~is',
-				$replace_function_callback, array( $search, $replace ) );
+				$replace_function_callback, array( $search, $replace, $replace_function_type ) );
 		}
 		else
-		{	// No code/pre blocks, replace on the whole thing
-			$content = call_user_func( $replace_function_callback, $content, $search, $replace );
+		{ // No code/pre blocks, replace on the whole thing
+			$content = call_user_func( $replace_function_callback, $content, $search, $replace, $replace_function_type );
 		}
 	}
 

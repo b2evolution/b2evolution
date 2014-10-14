@@ -27,7 +27,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER - {@link http://daniel.hahler.de/}
  *
- * @version $Id: _basic_antispam.plugin.php 6135 2014-03-08 07:54:05Z manuel $
+ * @version $Id: _basic_antispam.plugin.php 7332 2014-09-29 11:31:08Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -48,7 +48,7 @@ class basic_antispam_plugin extends Plugin
 	 * either in the subclass declaration or in the subclass constructor.
 	 */
 	var $name = 'Basic Antispam';
-	var $code = '';
+	var $code = 'b2evBAspm';
 	var $priority = 60;
 	var $version = '5.0.0';
 	var $author = 'The b2evo Group';

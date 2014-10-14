@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: plugins.ctrl.php 6411 2014-04-07 15:17:33Z yura $
+ * @version $Id: plugins.ctrl.php 7332 2014-09-29 11:31:08Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -990,7 +990,7 @@ switch( $action )
 		$Form->info_field( T_('Name'), $edit_Plugin->name );
 		$Form->info_field( T_('Code'),
 				( empty($edit_Plugin->code) ? ' - ' : $edit_Plugin->code ),
-				array( 'note' => T_('This 32 character code uniquely identifies the functionality of this plugin. It is only necessary to call the plugin by code (SkinTag) or when using it as a Renderer.') ) );
+				array( 'note' => T_('This 8-32 character code identifies the plugin when it needs to be called directly and specifically. This is especially useful for renderer plugins and widgets (SkinTags).') ) );
 		$Form->info_field( T_('Short desc'), $edit_Plugin->short_desc );
 		$Form->info_field( T_('Long desc'), $edit_Plugin->long_desc );
 		if( $edit_Plugin->ID > 0 )
