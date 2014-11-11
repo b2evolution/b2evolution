@@ -9,7 +9,7 @@
  * @package admin
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: tools.ctrl.php 6650 2014-05-09 09:22:38Z yura $
+ * @version $Id: tools.ctrl.php 7516 2014-10-27 05:56:16Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -281,6 +281,12 @@ if( empty($tab) )
 			// Execute a testing of flush inside template in order to see a process
 			$template_action = 'test_flush';
 			$template_title = T_('Log of test flush').get_manual_link( 'test-flush-tool' );
+			break;
+
+		case 'utf8upgrade':
+			// Upgrade DB to UTF-8
+			load_funcs('_core/model/db/_upgrade.funcs.php');
+			$template_action = $action;
 			break;
 	}
 }

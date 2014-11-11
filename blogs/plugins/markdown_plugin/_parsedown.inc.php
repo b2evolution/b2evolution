@@ -20,6 +20,7 @@ Modifications by yura:
 	    ```php
 	    $x = $obj->method();
 	    ```
+	7. Split a list in two lists by paragraph after list element
 */
 
 class Parsedown
@@ -125,7 +126,7 @@ class Parsedown
 	# Private Methods 
 	# 
 	
-	private function parse_block_elements(array $lines, $context = '')
+	private function parse_block_elements( array $lines, $context = '', & $return_data = NULL )
 	{
 		$elements = array();
 		
@@ -407,24 +408,28 @@ class Parsedown
 			{
 				case 'li':
 					
-					if (isset($element['ordered'])) # first
-					{
+					if( isset( $element['ordered'] ) || isset( $return_data['last'] ) ) # first
+					{ // Start new list if it is new list or if previous was interrupted with paragraph
 						$list_type = $element['ordered'] ? 'ol' : 'ul';
-						
+
 						$markup .= '<'.$list_type.'>'."\n";
 					}
-					
-					if (isset($element['interrupted']) and ! isset($element['last']))
+
+					if( isset( $element['interrupted'] ) && ! isset( $element['last'] ) )
 					{
 						$element['lines'] []= '';
 					}
-					
-					$text = $this->parse_block_elements($element['lines'], 'li');
-					
+
+					$return_data = array();
+					$text = $this->parse_block_elements( $element['lines'], 'li', $return_data );
+
 					$markup .= '<li>'.$text.'</li>'."\n";
-					
-					isset($element['last']) and $markup .= '</'.$list_type.'>'."\n";
-					
+
+					if( isset( $element['last'] ) || isset( $return_data['last'] ) )
+					{ // End list tag if it is last item or it is interrupted list with paragraph
+						$markup .= '</'.$list_type.'>'."\n";
+					}
+
 					break;
 				
 				case 'p':
@@ -439,13 +444,10 @@ class Parsedown
 					}
 					elseif( $context === 'li' && $index === 0 )
 					{
-						if (isset($element['interrupted']))
-						{
-							$markup .= "\n".'<p>'.$text.'</p>'."\n";
-						}
-						else 
-						{
-							$markup .= $text;
+						$markup .= $text;
+						if( isset( $element['interrupted'] ) )
+						{ // End current list instead of <p> inside <li>
+							$return_data = array( 'last' => true );
 						}
 					}
 					else 

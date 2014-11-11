@@ -32,7 +32,7 @@
  * @todo Make it a class / global object!
  *        - Provide (static) functions to extract .po files / generate _global.php files (single quoted strings!)
  *
- * @version $Id: _locale.funcs.php 7289 2014-09-08 10:34:16Z yura $
+ * @version $Id: _locale.funcs.php 7437 2014-10-15 11:18:00Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -1388,11 +1388,16 @@ function locale_insert_default()
 
 	if( ! empty( $activate_locales ) )
 	{ // Insert locales into DB
+		$SQL = new SQL();
+		$SQL->SELECT( 'loc_locale' );
+		$SQL->FROM( 'T_locales' );
+		$existing_locales = $DB->get_col( $SQL->get() );
+
 		$insert_data = array();
 		foreach( $activate_locales as $a_locale )
 		{
-			if( !isset( $locales[ $a_locale ] ) )
-			{ // Skip an incorrect locale
+			if( !isset( $locales[ $a_locale ] ) || in_array( $a_locale, $existing_locales ) )
+			{ // Skip an incorrect locale or it already exists in DB
 				continue;
 			}
 
@@ -1415,11 +1420,14 @@ function locale_insert_default()
 				.'1 )';
 		}
 
-		$DB->query( 'INSERT INTO T_locales '
+		if( count( $insert_data ) )
+		{ // Do insert only if at least one locale requires this
+			$DB->query( 'INSERT INTO T_locales '
 					 .'( loc_locale, loc_charset, loc_datefmt, loc_timefmt, '
 					 .'loc_startofweek, loc_name, loc_messages, loc_priority, '
 					 .'loc_transliteration_map, loc_enabled ) '
 					 .'VALUES '.implode( ', ', $insert_data ) );
+		}
 	}
 }
 

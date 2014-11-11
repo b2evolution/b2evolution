@@ -36,7 +36,6 @@ a.forumlink, a.postlink, a.topictitle {
 	text-decoration: none;
 }
 a.topictitle {
-	font-size: 11px;
 	line-height: 21px;
 }
 a.forumlink:hover, a.postlink:hover {
@@ -279,9 +278,11 @@ div.pageTop a.selected:hover {
 }
 .bForums td.row2{
 	background-color: #DEE3E7;
+	font-size: 12px;
 }
 .bForums td.row3{
 	background-color: #D1D7DC;
+	font-size: 12px;
 }
 .bForums td.row2 a, .bForums td.row3 a{
 	font-weight: normal;
@@ -678,7 +679,7 @@ table.bForums div.avatartag {
 }
 
 .navigation {
-	font-size: 10px;
+	font-size: 11px;
 	font-weight: bold;
 	text-align: right;
 	padding: 5px 2px;

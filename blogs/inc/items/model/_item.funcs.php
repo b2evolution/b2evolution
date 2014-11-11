@@ -32,7 +32,7 @@
  * @author tswicegood: Travis SWICEGOOD.
  * @author vegarg: Vegar BERG GULDAL.
  *
- * @version $Id: _item.funcs.php 6956 2014-06-24 06:13:28Z yura $
+ * @version $Id: _item.funcs.php 7582 2014-11-06 11:52:51Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1839,7 +1839,7 @@ function echo_autocomplete_tags( $tags = array() )
 	(function($){
 		jQuery(function() {
 			jQuery( '#item_tags' ).tokenInput(
-				'<?php echo $htsrv_url.'async.php?action=get_tags' ?>',
+				'<?php echo $htsrv_url.'anon_async.php?action=get_tags' ?>',
 				{
 					theme: 'facebook',
 					queryParam: 'term',

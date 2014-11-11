@@ -39,7 +39,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author vegarg: Vegar BERG GULDAL.
  *
- * @version $Id: _hitlog.funcs.php 7414 2014-10-13 08:10:51Z yura $
+ * @version $Id: _hitlog.funcs.php 7495 2014-10-22 10:30:38Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -246,6 +246,8 @@ function hits_results_block( $params = array() )
 	}
 
 	$default_order = '--D';
+
+	$SQL->ORDER_BY( '*, hit_ID' );
 
 	$Results = new Results( $SQL->get(), $resuts_param_prefix, $default_order, $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 

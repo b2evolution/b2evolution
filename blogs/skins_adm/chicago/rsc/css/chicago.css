@@ -346,6 +346,8 @@ textarea.field_error {
 	border: 1px solid #9db0bc;
 	margin: 0 0 10px 0;
 	background-color: #fff;
+	width: 100%;
+	box-sizing: border-box;
 }
 
 

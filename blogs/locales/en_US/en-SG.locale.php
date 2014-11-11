@@ -15,6 +15,6 @@ $locale_defs['en-SG'] = array(
 		'datefmt' => 'd/m/y',
 		'timefmt' => 'H:i:s a',
 		'startofweek' => 0,
-		'messages' => 'en_SG',
+		'messages' => 'en_US',
 	);
 ?>

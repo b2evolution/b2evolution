@@ -67,6 +67,7 @@ require_js( 'ajax.js' );	// Functions to work with AJAX response data
 
 	require_js( 'extracats.js' );
 	require_js( 'dynamic_select.js' );
+	require_js( '#jqueryUI#' ); // Need to animate background, e.g. in function evoFadeBg()
 	require_js( 'backoffice.js' );
 
 

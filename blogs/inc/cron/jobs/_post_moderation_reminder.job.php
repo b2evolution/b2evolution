@@ -4,7 +4,7 @@
  *
  * @author yura: Yura Bakhtin
  *
- * @version $Id: _post_moderation_reminder.job.php 7347 2014-10-01 11:52:15Z yura $
+ * @version $Id: _post_moderation_reminder.job.php 7434 2014-10-15 07:18:30Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -189,7 +189,7 @@ foreach( $blog_posts as $row )
 	if( $last_blog_ID != $row->blog_ID )
 	{
 		$Blog = & $BlogCache->get_by_ID( $row->blog_ID );
-		$blog_moderation_statuses = $Blog->get_setting( 'moderation_statuses' );
+		$blog_moderation_statuses = $Blog->get_setting( 'post_moderation_statuses' );
 		$last_blog_ID = $row->blog_ID;
 	}
 	if( strpos( $blog_moderation_statuses, $row->post_status ) === false )
@@ -334,6 +334,6 @@ foreach( $loaded_ids as $moderator_ID )
 	locale_restore_previous();
 }
 
-$result_message = sprintf( T_( '%d moderator have been notified!' ), $mail_sent );
+$result_message = sprintf( T_( '%d moderators have been notified!' ), $mail_sent );
 return 1; /*OK*/
 ?>

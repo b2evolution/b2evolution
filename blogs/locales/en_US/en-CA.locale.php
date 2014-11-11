@@ -15,6 +15,6 @@ $locale_defs['en-CA'] = array(
 		'datefmt' => 'm/d/y',
 		'timefmt' => 'h:i:s a',
 		'startofweek' => 0,
-		'messages' => 'en_CA',
+		'messages' => 'en_US',
 	);
 ?>

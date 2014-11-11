@@ -31,7 +31,7 @@
  * @author gorgeb: Bertrand GORGE / EPISTEMA
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
- * @version $Id: _item.class.php 7338 2014-09-29 15:20:01Z yura $
+ * @version $Id: _item.class.php 7506 2014-10-24 05:23:37Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -812,9 +812,6 @@ class Item extends ItemLight
 			$this->set_from_Request( 'city_ID', 'item_city_ID', true );
 		}
 
-		// Check and clear inline files, to avoid to have placeholders without corresponding attachment
-		$this->check_and_clear_inline_files();
-
 		return ! param_errors_detected();
 	}
 
@@ -1175,17 +1172,17 @@ class Item extends ItemLight
 	/**
 	 * Check if the post contains inline image placeholders without corresponding attachemnt file.
 	 * Removes the invalid inline image placeholders from the item content.
+	 *
+	 * @param string Content
+	 * @return string Prepared content
 	 */
-	function check_and_clear_inline_files()
+	function check_and_clear_inline_files( $content )
 	{
-		global $Messages;
-
-		$original_content = $this->content;
-		preg_match_all( '/\[image:(\d+):?[^\]]*\]/i', $this->content, $inline_images );
+		preg_match_all( '/\[image:(\d+):?[^\]]*\]/i', $content, $inline_images );
 
 		if( empty( $inline_images[1] ) )
 		{ // There are no inline image placeholders in the post content
-			return;
+			return $content;
 		}
 
 		// There are inline image placeholders
@@ -1216,10 +1213,13 @@ class Item extends ItemLight
 		// Clear the unused inline images from content
 		if( count( $unused_inline_images ) )
 		{ // Remove all unused inline images from the content
+			global $Messages;
 			$unused_inline_images = array_unique( $unused_inline_images );
-			$this->content = replace_content_outcode( $unused_inline_images, '', $this->content, 'replace_content', 'str' );
-			$Messages->add( T_('Invalid inline image placeholders were removed.'), 'note' );
+			$content = replace_content_outcode( $unused_inline_images, '', $content, 'replace_content', 'str' );
+			$Messages->add( T_('Invalid inline image placeholders won\'t be displayed.'), 'note' );
 		}
+
+		return $content;
 	}
 
 
@@ -1319,6 +1319,9 @@ class Item extends ItemLight
 			$r = $this->content;
 			$Plugins->render( $r /* by ref */, $post_renderers, $format, array( 'Item' => $this ), 'Render' );
 
+			// Check and clear inline files, to avoid to have placeholders without corresponding attachment
+			$r = $this->check_and_clear_inline_files( $r );
+
 			return $r;
 		}
 
@@ -1403,7 +1406,7 @@ class Item extends ItemLight
 		}
 
 		if( ! isset( $r ) )
-		{	// Not cached yet:
+		{ // Not cached yet:
 			global $Debuglog;
 
 			if( $this->update_renderers_from_Plugins() )
@@ -1416,10 +1419,11 @@ class Item extends ItemLight
 			}
 
 			// Call RENDERER plugins:
-			// pre_dump( $this->content );
 			$r = $this->content;
 			$Plugins->render( $r /* by ref */, $post_renderers, $format, array( 'Item' => $this ), 'Render' );
-			// pre_dump( $r );
+
+			// Check and clear inline files, to avoid to have placeholders without corresponding attachment
+			$r = $this->check_and_clear_inline_files( $r );
 
 			$Debuglog->add( 'Generated pre-rendered content ['.$cache_key.'] for item #'.$this->ID, 'items' );
 

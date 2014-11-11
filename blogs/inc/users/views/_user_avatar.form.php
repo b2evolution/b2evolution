@@ -96,7 +96,7 @@ $Form->begin_form( $form_class, $form_title );
 $Form->begin_fieldset( $is_admin ? T_('Profile picture') : '', array( 'class'=>'fieldset clear' ) );
 
 global $admin_url;
-$avatar_tag = $edited_User->get_avatar_imgtag( 'fit-160x160', 'avatar', '', true, '', 'user_pictures' );
+$avatar_tag = $edited_User->get_avatar_imgtag( ( is_admin_page() ? 'fit-320x320' : 'fit-160x160' ), 'avatar', '', true, '', 'user_pictures' );
 if( empty( $avatar_tag ) )
 {
 	if( ( $current_User->ID == $edited_User->ID ) )
@@ -171,7 +171,7 @@ if( ( $current_User->ID == $edited_User->ID ) || ( $current_User->check_perm( 'u
 						'before_image_legend' => '',
 						'after_image_legend'  => '',
 						'after_image'         => '',
-						'image_size'          => 'crop-top-80x80',
+						'image_size'          => is_admin_page() ? 'crop-top-160x160' : 'crop-top-80x80',
 						'image_link_title'    => $edited_User->login,
 						'image_link_rel'      => 'lightbox[user_pictures]',
 					) );

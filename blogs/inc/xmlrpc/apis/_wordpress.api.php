@@ -11,7 +11,7 @@
  * @see http://codex.wordpress.org/XML-RPC_wp
  *
  * @package xmlsrv
- * @version $Id: _wordpress.api.php 6135 2014-03-08 07:54:05Z manuel $
+ * @version $Id: _wordpress.api.php 7482 2014-10-21 11:50:57Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -647,7 +647,7 @@ function wp_uploadfile($m)
 }
 
 
-$wordpressgetcats_sig =  array(array($xmlrpcStruct,$xmlrpcInt,$xmlrpcString,$xmlrpcString));
+$wordpressgetcats_sig =  array(array($xmlrpcStruct,$xmlrpcString,$xmlrpcString,$xmlrpcString));
 $wordpressgetcats_doc = 'Get categories of a post, MetaWeblog API-style';
 /**
  * wp.getCategories

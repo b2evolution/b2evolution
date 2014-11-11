@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE
  * @author fsaya: Fabrice SAYA-GASNIER / PROGIDISTRI
  *
- * @version $Id: _results.class.php 7221 2014-08-06 09:05:46Z yura $
+ * @version $Id: _results.class.php 7495 2014-10-22 10:30:38Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -505,15 +505,22 @@ class Results extends Table
 				$sql .= ' ORDER BY '.$orders.' ';
 			}
 			else
-			{	// try to insert the chosen order at an existing '*' point
+			{ // try to insert the chosen order at an existing '*' point
+				if( preg_match( '#[^\s]+\s(DESC|ASC)#i', $orders, $match_orders ) )
+				{ // Set an order direction for additional order field to the same value as it has first order field
+					// For example, this sql clause "ORDER BY *, hit_ID" should be changed to:
+					//    1) "ORDER BY *, hit_ID ASC"  if $orders == "hit_type ASC, hit_response_code DESC"
+					//    2) "ORDER BY *, hit_ID DESC" if $orders == "hit_type DESC, hit_response_code ASC"
+					$sql = preg_replace( '# \s ORDER \s+ BY .+ \*, \s+ ([a-z0-9\-_]+)$#xi', ' ORDER BY *, $1 '.$match_orders[1], $sql );
+				}
 				$inserted_sql = preg_replace( '# \s ORDER \s+ BY (.+) \* #xi', ' ORDER BY $1 '.$orders, $sql );
 
 				if( $inserted_sql != $sql )
-				{	// Insertion ok:
+				{ // Insertion ok:
 					$sql = $inserted_sql;
 				}
 				else
-				{	// No insert point found:
+				{ // No insert point found:
 					// the chosen order must be appended to an existing ORDER BY clause
 					$sql .= ', '.$orders;
 				}
@@ -1570,9 +1577,6 @@ class Results extends Table
 				}
 			}
 			$this->order_field_list = implode( ',', $orders );
-
-			#pre_dump( $this->order_field_list );
-			#pre_dump( $this->order_callbacks );
 		}
 		return $this->order_field_list;	// May be empty
 	}

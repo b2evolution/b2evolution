@@ -31,7 +31,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _hit.class.php 6479 2014-04-16 07:18:54Z yura $
+ * @version $Id: _hit.class.php 7452 2014-10-17 06:59:39Z yura $
  *
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -693,11 +693,11 @@ class Hit
 		$match = false;
 		foreach( $user_agents as $agent_ID => $lUserAgent )
 		{
-			if( $lUserAgent[0] == 'robot' && strpos( $this->user_agent, $lUserAgent[1] ) !== false )
+			if( strpos( $this->user_agent, $lUserAgent[1] ) !== false )
 			{
-				$Debuglog->add( 'Hit:detect_useragent(): robot', 'request' );
+				$Debuglog->add( 'Hit:detect_useragent(): '.$lUserAgent[0], 'request' );
 				$Debuglog->add( 'Hit:detect_useragent(): Agent ID: '.$agent_ID, 'request' );
-				$this->agent_type = 'robot';
+				$this->agent_type = ( $lUserAgent[0] == 'robot' ) ? 'robot' : 'browser';
 				$this->agent_ID = $agent_ID;
 				$match = true;
 				break;

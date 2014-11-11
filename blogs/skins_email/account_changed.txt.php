@@ -8,7 +8,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
- * @version $Id: account_changed.txt.php 7043 2014-07-02 08:35:45Z yura $
+ * @version $Id: account_changed.txt.php 7576 2014-11-05 11:28:50Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -52,23 +52,20 @@ echo $row_separator;
 echo "\n";
 
 $UserCache = & get_UserCache();
-$User = $UserCache->get_by_ID( $params['user_ID'], false, false );
-if( $User && $params['avatar_changed'] )
+if( $User = & $UserCache->get_by_ID( $params['user_ID'], false, false ) )
 {
-	echo T_('The main profile picture was changed.')."\n";
-}
-if( $params['new_avatar_upload'] )
-{ // Display that a new file was uploaded
-	echo T_('A new profile picture file was uploaded.')."\n";
-}
+	if( $params['avatar_changed'] )
+	{
+		echo T_('The main profile picture was changed.')."\n";
+	}
+	elseif( $params['new_avatar_upload'] )
+	{ // Display that a new file was uploaded
+		echo T_('A new profile picture file was uploaded.')."\n";
+	}
 
-// A count of user's pictures:
-$user_pictures_count = 0;
-if( $User )
-{
-	$user_pictures_count = count( $User->get_avatar_Links( false ) );
+	// A count of user's pictures:
+	echo sprintf( T_('The user has %s profile pictures.'), count( $User->get_avatar_Links( false ) ) )."\n\n";
 }
-echo sprintf( T_('The user has %s profile pictures.'), $user_pictures_count )."\n\n";
 
 // Buttons:
 echo T_('Edit user').': '.$admin_url.'?ctrl=user&user_tab=profile&user_ID='.$params['user_ID']."\n";

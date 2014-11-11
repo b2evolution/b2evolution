@@ -22,7 +22,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _blog_main.inc.php 7417 2014-10-13 11:58:41Z yura $
+ * @version $Id: _blog_main.inc.php 7431 2014-10-15 04:23:46Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -492,7 +492,7 @@ if( empty( $Item ) &&
 			! is_null( $catsel ) || // Filter by many categories
 			( $disp != 'edit' && ! is_null( $cat ) ) || // Filter by one category
 			! is_null( $tag ) || // Filter by tag
-			! is_null( $m ) // Filter by date like '201410' (urls from ?disp=arcdir)
+			! empty( $m ) // Filter by date like '201410' (urls from ?disp=arcdir)
 	) )
 {
 	$disp = 'posts';

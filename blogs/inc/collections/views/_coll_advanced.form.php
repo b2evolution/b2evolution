@@ -23,7 +23,7 @@
  * @package admin
  *
  *
- * @version $Id: _coll_advanced.form.php 6828 2014-06-02 11:53:41Z yura $
+ * @version $Id: _coll_advanced.form.php 7522 2014-10-27 10:18:40Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -151,6 +151,7 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 						type="text" class="form_text_input form-control" name="blog_media_fullpath" size="50" maxlength="255"
 						class="'.( param_has_error('blog_media_fullpath') ? 'field_error' : '' ).'"
 						value="'.$edited_Blog->dget( 'media_fullpath', 'formvalue' ).'" /></div>'
+					.'<div class="clear"></div>'
 					.'<div class="label control-label col-lg-2">'.T_('URL').':</div><div class="input controls col-xs-8"><input
 						type="text" class="form_text_input form-control" name="blog_media_url" size="50" maxlength="255"
 						class="'.( param_has_error('blog_media_url') ? 'field_error' : '' ).'"

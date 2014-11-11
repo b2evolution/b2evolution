@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _file.class.php 7215 2014-08-06 05:50:24Z attila $
+ * @version $Id: _file.class.php 7537 2014-10-28 08:33:05Z yura $
  *
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -1129,12 +1129,12 @@ class File extends DataObject
 
 			if( $image_desc == '#' )
 			{
-				$image_desc = $this->dget('desc');
+				$image_desc = $this->dget( 'desc' );
 			}
 			if( !empty( $image_desc ) && !is_null( $before_image_legend ) )
 			{
 				$r .= $before_image_legend
-							.$image_desc		// If this needs to be changed, please document.
+							.nl2br( $image_desc ) // If this needs to be changed, please document.
 							.$after_image_legend;
 			}
 			$r .= $after_image;

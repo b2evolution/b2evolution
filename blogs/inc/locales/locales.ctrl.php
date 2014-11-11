@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: locales.ctrl.php 6665 2014-05-12 12:37:03Z yura $
+ * @version $Id: locales.ctrl.php 7489 2014-10-22 06:54:36Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -200,11 +200,25 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
+		$enabled_locales = array();
+		if( is_array( $locales ) )
+		{
+			foreach( $locales as $del_locale_key => $del_locale )
+			{
+				if( ! empty( $del_locale['enabled'] ) )
+				{ // Don't delete a locale from DB if it is enabled
+					$enabled_locales[] = $del_locale_key;
+					$Messages->add( sprintf( T_('The locale %s cannot be restored because it is currently enabled.'), '<b>'.$del_locale_key.'</b>' ), 'error' );
+				}
+			}
+		}
+
 		// forget DB locales:
 		unset( $locales );
 
 		// delete everything from locales table
-		$q = $DB->query( 'DELETE FROM T_locales' );
+		$q = $DB->query( 'DELETE FROM T_locales'
+			.( empty( $enabled_locales ) ? '' : ' WHERE loc_locale NOT IN( '.$DB->quote( $enabled_locales ).' )' ) );
 
 		if( !isset( $locales[$current_locale] ) )
 		{ // activate default locale
@@ -247,7 +261,7 @@ switch( $action )
 		$current_User->check_perm( 'options', 'edit', true );
 
 		// Get PO file for that edit_locale:
-		$AdminUI->append_to_titlearea( 'Extracting language file for '.$edit_locale.'...' );
+		$AdminUI->append_to_titlearea( sprintf( T_('Extracting language file for %s...'), '<b>'.$edit_locale.'</b>' ) );
 
 		$po_file = $locales_path.$locales[$edit_locale]['messages'].'/LC_MESSAGES/messages.po';
 		if( ! is_file( $po_file ) )
@@ -259,7 +273,7 @@ switch( $action )
 		$outfile = $locales_path.$locales[$edit_locale]['messages'].'/_global.php';
 		if( file_exists( $outfile ) && ( !is_writable( $outfile ) ) )
 		{ // The '_global.php' file exists but it is not writable
-			$Messages->add( sprintf( 'The file &laquo;%s&raquo; is not writable.', $outfile ) );
+			$Messages->add( sprintf( T_('The file %s is not writable.'), '<b>'.$outfile.'</b>' ) );
 			break;
 		}
 
@@ -283,11 +297,18 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		// --- DELETE locale from DB
-		if( $DB->query( 'DELETE FROM T_locales
-											WHERE loc_locale = "'.$DB->escape( $edit_locale ).'"' ) )
-		{
-			$Messages->add( sprintf(T_('Deleted locale &laquo;%s&raquo; from database.'), $edit_locale), 'success' );
+		if( isset( $locales ) && isset( $locales[ $edit_locale ] ) &&
+		    ! empty( $locales[ $edit_locale ]['enabled'] ) )
+		{ // Don't delete the enabled locales
+			$Messages->add( sprintf( T_('The locale %s cannot be restored because it is currently enabled.'), '<b>'.$edit_locale.'</b>' ), 'error' );
+		}
+		else
+		{ // --- DELETE locale from DB
+			if( $DB->query( 'DELETE FROM T_locales
+												WHERE loc_locale = "'.$DB->escape( $edit_locale ).'"' ) )
+			{
+				$Messages->add( sprintf( T_('The locale %s has been reloaded.'), '<b>'.$edit_locale.'</b>' ), 'success' );
+			}
 		}
 
 		// Redirect so that a reload doesn't write to the DB twice:
@@ -309,6 +330,50 @@ switch( $action )
 		// load locales from DB into $locales array:
 		locale_overwritefromDB();
 		*/
+		break;
+
+
+	case 'delete':
+		// Delete a specific Locale from DB:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'locales' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		if( isset( $locales ) && isset( $locales[ $edit_locale ] ) &&
+		    ! empty( $locales[ $edit_locale ]['enabled'] ) )
+		{ // Don't delete the enabled locales
+			$Messages->add( sprintf( T_('The locale %s is currently enabled.'), '<b>'.$edit_locale.'</b>' ), 'error' );
+		}
+		elseif( $edit_locale == 'en-US' )
+		{ // The default locale cannot be deleted, because it is defined in the file "/conf/_locales.php"
+			$Messages->add( sprintf( T_('The locale %s cannot be deleted.'), '<b>'.$edit_locale.'</b>' ), 'error' );
+		}
+		else
+		{ // --- DELETE locale from DB
+			if( $DB->query( 'DELETE FROM T_locales
+												WHERE loc_locale = '.$DB->quote( $edit_locale ) ) )
+			{
+				$del_message = sprintf( T_('The locale %s has been deleted from database.'), '<b>'.$edit_locale.'</b>' );
+				$del_message_status = 'success';
+				if( isset( $locales[ $edit_locale ] ) )
+				{
+					$edit_locale_path = $locales_path.str_replace( '-', '_', $locales[ $edit_locale ]['messages'] ).'/'.$edit_locale.'.locale.php';
+					if( file_exists( $edit_locale_path ) )
+					{ // Inform user about existing locale file
+						$del_message .= ' '.sprintf( T_('To completely delete it, you should also delete the file %s from the server hard disk.'), '<b>'.$edit_locale_path.'</b>' );
+						$del_message_status = 'warning';
+					}
+				}
+				$Messages->add( $del_message, $del_message_status );
+			}
+		}
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=locales'.( $loc_transinfo ? '&loc_transinfo=1' : '' ), 303 ); // Will EXIT
+		// We have EXITed already at this point!!
 		break;
 
 

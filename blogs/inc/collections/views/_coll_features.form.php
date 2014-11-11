@@ -16,7 +16,7 @@
  *
  * @package admin
  *
- * @version $Id: _coll_features.form.php 6650 2014-05-09 09:22:38Z yura $
+ * @version $Id: _coll_features.form.php 7444 2014-10-17 04:12:27Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -67,8 +67,6 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Post options').get_manual_link('blog_features_settings') );
-	$Form->select_input_array( 'default_post_status', $edited_Blog->get_setting('default_post_status'), get_visibility_statuses('notes-string'), T_('Default status'), T_('Default status for new posts') );
-
 	$Form->radio( 'require_title', $edited_Blog->get_setting('require_title'),
 								array(  array( 'required', T_('Always'), T_('The blogger must provide a title') ),
 												array( 'optional', T_('Optional'), T_('The blogger can leave the title field empty') ),
@@ -127,8 +125,26 @@ $Form->begin_fieldset( T_('Post options').get_manual_link('blog_features_setting
 
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('Post moderation') . get_manual_link('post-moderation') );
+
+	$Form->select_input_array( 'default_post_status', $edited_Blog->get_setting('default_post_status'), get_visibility_statuses('notes-string'), T_('Default status'), T_('Default status for new posts') );
+
+	// Moderation statuses setting
+	$not_moderation_statuses = array_diff( get_visibility_statuses( 'keys', NULL ), get_visibility_statuses( 'moderation' ) );
+	// Get moderation statuses with status text
+	$moderation_statuses = get_visibility_statuses( '', $not_moderation_statuses );
+	$blog_moderation_statuses = $edited_Blog->get_setting( 'post_moderation_statuses' );
+	$checklist_options = array();
+	foreach( $moderation_statuses as $status => $status_text )
+	{ // Add a checklist option for each possible modeartion status
+		$is_checked = ( strpos( $blog_moderation_statuses, $status) !== false );
+		$checklist_options[] = array( 'post_notif_'.$status, 1, $status_text, $is_checked );
+	}
+	$Form->checklist( $checklist_options, 'post_moderation_statuses', T_('Post moderation reminder statuses'), false, false, array( 'note' => 'Posts with the selected statuses will be notified on the "Send reminders about posts awaiting moderation" scheduled job.' ) );
+
+$Form->end_fieldset();
+
 // display features settings provided by optional modules:
-// echo 'modules';
 modules_call_method( 'display_collection_features', array( 'Form' => & $Form, 'edited_Blog' => & $edited_Blog ) );
 
 $Form->begin_fieldset( T_('RSS/Atom feeds').get_manual_link('item-feeds-features') );

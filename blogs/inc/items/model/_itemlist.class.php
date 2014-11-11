@@ -26,7 +26,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _itemlist.class.php 7338 2014-09-29 15:20:01Z yura $
+ * @version $Id: _itemlist.class.php 7479 2014-10-21 07:06:03Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -237,9 +237,6 @@ class ItemList2 extends ItemListLight
 
 		// Trigger plugin event, allowing to manipulate or validate the item before it gets previewed
 		$Plugins->trigger_event( 'AppendItemPreviewTransact', array( 'Item' => & $Item ) );
-
-		// Check and clear inline files, to avoid to have placeholders without corresponding attachment
-		$Item->check_and_clear_inline_files();
 
 		if( $Messages->has_errors() )
 		{

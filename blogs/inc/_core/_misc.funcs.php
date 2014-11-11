@@ -30,7 +30,7 @@
  *
  * @package evocore
  *
- * @version $Id: _misc.funcs.php 7344 2014-09-30 11:45:19Z yura $
+ * @version $Id: _misc.funcs.php 7578 2014-11-06 10:48:01Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -2310,7 +2310,7 @@ function pre_dump( $var__var__var__var__ )
 	{
 		$orig_html_errors = ini_set('html_errors', 0); // e.g. xdebug would use fancy html, if this is on; we catch (and use) xdebug explicitly above, but just in case
 
-		echo "\n<pre style=\"padding:1ex;border:1px solid #00f;\">\n";
+		echo "\n<pre style=\"padding:1ex;border:1px solid #00f;overflow:auto\">\n";
 		foreach( func_get_args() as $lvar )
 		{
 			ob_start();
@@ -5796,33 +5796,40 @@ if ( !function_exists( 'json_encode' ) )
  */
 function evo_json_encode( $a = false )
 {
-	if( is_string($a) )
-	{	// Convert to UTF-8
-		$a = current_charset_to_utf8($a);
+	if( is_string( $a ) )
+	{ // Convert to UTF-8
+		$a = current_charset_to_utf8( $a );
 	}
-	elseif( is_array($a) )
-	{	// Recursively convert to UTF-8
+	elseif( is_array( $a ) )
+	{ // Recursively convert to UTF-8
 		array_walk_recursive( $a, 'current_charset_to_utf8' );
 	}
 
-	return json_encode($a);
+	$result = json_encode( $a );
+	if( $result === false )
+	{ // If json_encode returns FALSE because of some error we should set correct json empty value as '[]' instead of false
+		$result = '[]';
+	}
+
+	return $result;
 }
 
 
 /**
  * A helper function to conditionally convert a string from current charset to UTF-8
  *
- * @param mixed
- * @return mixed
+ * @param string
+ * @return string
  */
-function current_charset_to_utf8( $a )
+function current_charset_to_utf8( & $a )
 {
 	global $current_charset;
 
-	if( is_string($a) && $current_charset != '' && $current_charset != 'utf-8' )
-	{
-		return convert_charset( $a, 'utf-8', $current_charset );
+	if( is_string( $a ) && $current_charset != '' && $current_charset != 'utf-8' )
+	{ // Convert string to utf-8 if it has another charset
+		$a = convert_charset( $a, 'utf-8', $current_charset );
 	}
+
 	return $a;
 }
 
@@ -6304,7 +6311,12 @@ function get_file_permissions_message()
  */
 function evo_flush()
 {
-	@ob_end_flush(); // This function helps to turn off output buffering on PHP 5.4.x
+	$zlib_output_compression = ini_get( 'zlib.output_compression' );
+	if( empty( $zlib_output_compression ) || $zlib_output_compression == 'Off' )
+	{ // This function helps to turn off output buffering
+		// But do NOT use it when zlib.output_compression is ON, because it creates the die errors
+		@ob_end_flush();
+	}
 	flush();
 }
 

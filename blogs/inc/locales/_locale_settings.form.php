@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author blueyed: Daniel HAHLER.
  *
- * @version $Id: _locale_settings.form.php 6665 2014-05-12 12:37:03Z yura $
+ * @version $Id: _locale_settings.form.php 7489 2014-10-22 06:54:36Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -267,6 +267,7 @@ else
 		<th class="firstcol"><?php echo T_('Locale') ?></th>
 		<th><?php echo T_('Enabled') ?></th>
 		<th><?php echo T_('Name') ?></th>
+		<th><?php echo T_('Charset') ?></th>
 		<th><?php echo T_('Date fmt') ?></th>
 		<th><?php echo T_('Time fmt') ?></th>
 		<th title="<?php echo T_('Day at the start of the week: 0 for Sunday, 1 for Monday, 2 for Tuesday, etc');
@@ -293,26 +294,26 @@ else
 
 	<?php
 	$i = 0; // counter to distinguish POSTed locales later
-	foreach( $locales as $lkey => $lval )
+	foreach( $locales as $lkey => $locale_data )
 	{
 		$i++;
 
 		// Generate preview of date/time-format:
-		locale_temp_switch($lkey);
-		$datefmt_preview = date_i18n( $locales[$lkey]['datefmt'], $localtimenow );
-		$timefmt_preview = date_i18n( $locales[$lkey]['timefmt'], $localtimenow );
+		locale_temp_switch( $lkey );
+		$datefmt_preview = date_i18n( $locale_data['datefmt'], $localtimenow );
+		$timefmt_preview = date_i18n( $locale_data['timefmt'], $localtimenow );
 		locale_restore_previous();
 
 		?>
-		<tr class="<?php echo (($i%2 == 1) ? 'odd' : 'even') ?>">
-		<td class="firstcol left" title="<?php echo T_('Priority').': '.$locales[$lkey]['priority'].', '.T_('Charset').': '.$locales[$lkey]['charset'].', '.T_('Lang file').': '.$locales[$lkey]['messages'] ?>">
+		<tr class="<?php echo ( ( $i % 2 == 1 ) ? 'odd' : 'even' ) ?>">
+		<td class="firstcol left" title="<?php echo T_('Priority').': '.$locale_data['priority'].', '.T_('Charset').': '.$locale_data['charset'].', '.T_('Lang file').': '.$locale_data['messages'] ?>">
 			<?php
 			echo '<input type="hidden" name="loc_'.$i.'_locale" value="'.$lkey.'" />';
 
 			$transliteration_map = '';
-			if( isset($locales[$lkey]['transliteration_map']) && is_array($locales[$lkey]['transliteration_map']) )
+			if( isset( $locale_data['transliteration_map'] ) && is_array( $locale_data['transliteration_map'] ) )
 			{
-				$transliteration_map = base64_encode(serialize($locales[$lkey]['transliteration_map']));
+				$transliteration_map = base64_encode( serialize( $locale_data['transliteration_map'] ) );
 			}
 			echo '<input type="hidden" name="loc_'.$i.'_transliteration_map" value="'.$transliteration_map.'" />';
 
@@ -321,7 +322,7 @@ else
 			<strong>';
 			if( $current_User->check_perm( 'options', 'edit' ) )
 			{
-				echo '<a href="'.$pagenow.'?ctrl=locales&amp;action=edit&amp;edit_locale='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'" title="'.T_('Edit locale').'">';
+				echo '<a href="'.$pagenow.'?ctrl=locales&amp;action=edit&amp;edit_locale='.$lkey.( $loc_transinfo ? '&amp;loc_transinfo=1' : '' ).'" title="'.T_('Edit locale').'">';
 			}
 			echo $lkey;
 			if( $current_User->check_perm( 'options', 'edit' ) )
@@ -332,24 +333,27 @@ else
 			// TODO: Update title attribs for datefmt/timefmt onchange through AJAX  -- fp> all that complexity for an invisible tooltip... :/ Users should update the format on the detailed screen and get a dynamic preview there. Maybe the date and time should be editable on the list at all. There is no help here either. Users should be encouraged to go to the detailed screen )
 			echo '</strong></td>
 				<td class="center">
-					<input type="checkbox" name="loc_'.$i.'_enabled" value="1"'. ( $locales[$lkey]['enabled'] ? 'checked="checked"' : '' ).' />
+					<input type="checkbox" name="loc_'.$i.'_enabled" value="1"'. ( $locale_data['enabled'] ? 'checked="checked"' : '' ).' />
 				</td>
 				<td>
-					<input type="text" name="loc_'.$i.'_name" value="'.format_to_output( $locales[$lkey]['name'], 'formvalue' ).'" maxlength="40" size="17" class="form-control input-sm" />
+					<input type="text" name="loc_'.$i.'_name" value="'.format_to_output( $locale_data['name'], 'formvalue' ).'" maxlength="40" size="17" class="form-control input-sm" />
 				</td>
 				<td>
-					<input type="text" name="loc_'.$i.'_datefmt" value="'.format_to_output( $locales[$lkey]['datefmt'], 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $datefmt_preview ), 'formvalue' ).'" class="form-control input-sm" />
+					<input type="text" name="loc_'.$i.'_charset" value="'.format_to_output( $locale_data['charset'], 'formvalue' ).'" maxlength="20" size="6" class="form-control input-sm" />
 				</td>
 				<td>
-					<input type="text" name="loc_'.$i.'_timefmt" value="'.format_to_output( $locales[$lkey]['timefmt'], 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $timefmt_preview ), 'formvalue' ).'" class="form-control input-sm" />
+					<input type="text" name="loc_'.$i.'_datefmt" value="'.format_to_output( $locale_data['datefmt'], 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $datefmt_preview ), 'formvalue' ).'" class="form-control input-sm" />
+				</td>
+				<td>
+					<input type="text" name="loc_'.$i.'_timefmt" value="'.format_to_output( $locale_data['timefmt'], 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $timefmt_preview ), 'formvalue' ).'" class="form-control input-sm" />
 				</td>
 				<td>';
 			$Form->switch_layout( 'none' );
-			$Form->dayOfWeek( 'loc_'.$i.'_startofweek', $locales[$lkey]['startofweek'], '', '', 'input-sm' );
+			$Form->dayOfWeek( 'loc_'.$i.'_startofweek', $locale_data['startofweek'], '', '', 'input-sm' );
 			$Form->switch_layout( NULL ); // Restore layout
 			echo '</td>';
 
-		echo '<td class="right">'.$locales[$lkey]['priority'].'</td>';
+		echo '<td class="right">'.$locale_data['priority'].'</td>';
 
 
 		if( $current_User->check_perm( 'options', 'edit' ) )
@@ -365,7 +369,7 @@ else
 			if( $i > 1 )
 			{ // show "move prio up"
 				echo action_icon( T_('Move priority up'), 'move_up', '?ctrl=locales&amp;action=prioup&amp;edit_locale='
-								.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'&amp;'.url_crumb('locales') );
+								.$lkey.( $loc_transinfo ? '&amp;loc_transinfo=1' : '' ).'&amp;'.url_crumb( 'locales' ) );
 			}
 			else
 			{
@@ -375,36 +379,41 @@ else
 			if( $i < count($locales) )
 			{ // show "move prio down"
 				echo action_icon( T_('Move priority down'), 'move_down', '?ctrl=locales&amp;action=priodown&amp;edit_locale='
-								.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'&amp;'.url_crumb('locales') );
+								.$lkey.( $loc_transinfo ? '&amp;loc_transinfo=1' : '' ).'&amp;'.url_crumb( 'locales' ) );
 			}
 			else
 			{
 				echo get_icon( 'nomove' ).' ';
 			}
 
-			echo action_icon( T_('Copy locale'), 'copy', '?ctrl=locales&amp;action=edit&amp;edit_locale=_new_&amp;template='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '' ) );
+			echo action_icon( T_('Copy locale'), 'copy', '?ctrl=locales&amp;action=edit&amp;edit_locale=_new_&amp;template='.$lkey.( $loc_transinfo ? '&amp;loc_transinfo=1' : '' ) );
 
-			echo action_icon( T_('Edit locale'), 'edit', '?ctrl=locales&amp;action=edit&amp;edit_locale=_edit_&amp;template='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '' ) );
+			echo action_icon( T_('Edit locale'), 'edit', '?ctrl=locales&amp;action=edit&amp;edit_locale=_edit_&amp;template='.$lkey.( $loc_transinfo ? '&amp;loc_transinfo=1' : '' ) );
 
-			if( isset($lval[ 'fromdb' ]) )
+			if( isset( $locale_data['fromdb'] ) )
 			{ // allow to delete locales loaded from db
 				$l_atleastonefromdb = 1;
 				echo action_icon( T_('Restore default locale settings'), 'reload', '?ctrl=locales&amp;action=resetlocale&amp;edit_locale='
-								.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '' ).'&amp;'.url_crumb('locales') );
+								.$lkey.( $loc_transinfo ? '&amp;loc_transinfo=1' : '' ).'&amp;'.url_crumb( 'locales' ) );
+				if( ! $locale_data['enabled'] && $lkey != 'en-US' )
+				{ // Only not enabled locale can be deleted and if it is not default locale 'en-US'
+					echo action_icon( T_('Delete locale'), 'delete', '?ctrl=locales&amp;action=delete&amp;edit_locale='
+									.$lkey.( $loc_transinfo ? '&amp;loc_transinfo=1' : '' ).'&amp;'.url_crumb( 'locales' ) );
+				}
 			}
 			echo '</td>';
 		}
 
 		if( $loc_transinfo )
-		{	// Show translation info:
+		{ // Show translation info:
 			// Get PO file for that locale:
-			$po_file = $locales_path.$locales[$lkey]['messages'].'/LC_MESSAGES/messages.po';
+			$po_file = $locales_path.$locale_data['messages'].'/LC_MESSAGES/messages.po';
 			if( ! is_file( $po_file ) )
 			{
 				echo '<td class="lastcol center" colspan="'.(2 + (int)($current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction)).'"><a href="?ctrl=translation&edit_locale='.$lkey.'">'.T_('No language file...').'</a></td>';
 			}
 			else
-			{	// File exists:
+			{ // File exists:
 				$po_file_info = locale_file_po_info( $po_file, true );
 
 				// $all=$translated+$fuzzy+$untranslated;
@@ -413,15 +422,14 @@ else
 				$percent_done = $po_file_info['percent'];
 				$color = sprintf( '%02x%02x00', 255 - round( $percent_done * 2.55 ), round( $percent_done * 2.55 ) );
 				echo "\n\t<td class=\"center\" style=\"background-color:#". $color . "\"><a href=\"?ctrl=translation&edit_locale=".$lkey."\">". $percent_done ." %</a></td>";
-
 			}
 
-			if( $current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction  )
+			if( $current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction )
 			{ // Translator options:
 				if( is_file( $po_file ) )
 				{
 					echo "\n\t".'<td class="lastcol">[<a href="'.$pagenow.'?ctrl=locales&amp;action=extract&amp;edit_locale='.$lkey
-					.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'&amp;'.url_crumb('locales').'" title="'.T_('Extract .po file into b2evo-format').'">'.T_('Extract').'</a>]</td>';
+					.( $loc_transinfo ? '&amp;loc_transinfo=1' : '' ).'&amp;'.url_crumb( 'locales' ).'" title="'.T_('Extract .po file into b2evo-format').'">'.T_('Extract').'</a>]</td>';
 				}
 			}
 		} // show message file percentage/extraction
@@ -446,7 +454,7 @@ else
 
 	if( $current_User->check_perm( 'options', 'edit' ) )
 	{
-		$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) ) ;
+		$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 	}
 }
 

@@ -21,7 +21,7 @@
  *
  * @package admin
  *
- * @version $Id: _stats_view.funcs.php 6490 2014-04-16 12:58:52Z yura $
+ * @version $Id: _stats_view.funcs.php 7495 2014-10-22 10:30:38Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -75,14 +75,14 @@ function hits_results( & $Results, $params = array() )
 
 	$Results->cols[] = array(
 			'th' => T_('Session'),
-			'order' => 'hit_sess_ID, hit_ID',
+			'order' => 'hit_sess_ID',
 			'td_class' => 'right compact_data',
 			'td' => $session_link,
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('User'),
-			'order' => 'user_login, hit_ID',
+			'order' => 'user_login',
 			'td_class' => 'shrinkwrap compact_data',
 			'td' => '%stat_session_login( #user_login# )%',
 		);
@@ -97,7 +97,7 @@ function hits_results( & $Results, $params = array() )
 
 	$Results->cols[] = array(
 			'th' => T_('Agent'),
-			'order' => 'hit_agent_type, hit_ID',
+			'order' => 'hit_agent_type',
 			'td_class' => 'shrinkwrap compact_data',
 			'td' => '$hit_agent_type$',
 			'extra' => array ( 'style' => 'background-color: %hit_agent_type_color( "#hit_agent_type#" )%;',
@@ -106,7 +106,7 @@ function hits_results( & $Results, $params = array() )
 
 	$Results->cols[] = array(
 			'th' => T_('Device'),
-			'order' => 'sess_device, hit_ID',
+			'order' => 'sess_device',
 			'td_class' => 'shrinkwrap compact_data',
 			'td' => '$sess_device$',
 			'extra' => array ( 'style' => 'background-color: %hit_device_color( "#sess_device#" )%;', 'format_to_output' => false )
@@ -117,7 +117,7 @@ function hits_results( & $Results, $params = array() )
 		$Results->cols[] = array(
 				'th_group' => T_('Referer'),
 				'th' => T_('Type'),
-				'order' => 'hit_referer_type, hit_ID',
+				'order' => 'hit_referer_type',
 				'td_class' => 'shrinkwrap compact_data',
 				'td' => '$hit_referer_type$',
 				'extra' => array ( 'style' => 'background-color: %hit_referer_type_color( "#hit_referer_type#" )%;',
@@ -127,7 +127,7 @@ function hits_results( & $Results, $params = array() )
 		$Results->cols[] = array(
 				'th_group' => T_('Referer'),
 				'th' => T_('Domain'),
-				'order' => 'dom_name, hit_ID',
+				'order' => 'dom_name',
 				'td_class' => 'nowrap compact_data',
 				'td' => '<a href="$hit_referer$">$dom_name$</a>',
 			);
@@ -136,7 +136,7 @@ function hits_results( & $Results, $params = array() )
 	// Keywords:
 	$Results->cols[] = array(
 			'th' => T_('Search keywords'),
-			'order' => 'hit_keyphrase, hit_ID',
+			'order' => 'hit_keyphrase',
 			'td' => '%stats_search_keywords( #hit_keyphrase#, 45 )%',
 			'td_class' => 'compact_data'
 		);
@@ -145,14 +145,14 @@ function hits_results( & $Results, $params = array() )
 	$Results->cols[] = array(
 			'th' => T_('SR'),
 			'th_title' => T_('Serp rank'),
-			'order' => 'hit_serprank, hit_ID',
+			'order' => 'hit_serprank',
 			'td_class' => 'center compact_data',
 			'td' => '$hit_serprank$',
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('Goal'),
-			'order' => 'goal_name, hit_ID',
+			'order' => 'goal_name',
 			'default_dir' => 'D',
 			'td' => '$goal_name$',
 			'td_class' => 'compact_data'
@@ -160,13 +160,13 @@ function hits_results( & $Results, $params = array() )
 
 	$Results->cols[] = array(
 			'th' => T_('Blog'),
-			'order' => 'hit_coll_ID, hit_ID',
+			'order' => 'hit_coll_ID',
 			'td' => '$blog_shortname$',
 			'td_class' => 'compact_data'
 		);
 	$Results->cols[] = array(
 			'th' => T_('Hit type'),
-			'order' => 'hit_type, hit_ID',
+			'order' => 'hit_type',
 			'td_class' => 'shrinkwrap compact_data',
 			'td' => '$hit_type$',
 			'extra' => array (	'style'				=> 'background-color: %hit_type_color( "#hit_type#" )%',
@@ -175,20 +175,20 @@ function hits_results( & $Results, $params = array() )
 	// Requested URI (linked to blog's baseurlroot+URI):
 	$Results->cols[] = array(
 			'th' => T_('Requested URI'),
-			'order' => 'hit_uri, hit_ID',
+			'order' => 'hit_uri',
 			'td' => '%stats_format_req_URI( #hit_coll_ID#, #hit_uri#, 40, #hit_disp#, #hit_ctrl#, #hit_action# )%',
 			'td_class' => 'compact_data'
 		);
 	$Results->cols[] = array(
 			'th' => T_('HTTP resp'),
-			'order' => 'hit_response_code, hit_ID',
+			'order' => 'hit_response_code',
 			'td' => '$hit_response_code$',
 			'td_class' => '%hit_response_code_class( #hit_response_code# )% shrinkwrap compact_data'
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('Remote IP'),
-			'order' => 'hit_remote_addr, hit_ID',
+			'order' => 'hit_remote_addr',
 			'td' => '%disp_clickable_log_IP( #hit_remote_addr# )%',
 			'td_class' => 'compact_data'
 		);

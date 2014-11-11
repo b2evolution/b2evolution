@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _user.class.php 7347 2014-10-01 11:52:15Z yura $
+ * @version $Id: _user.class.php 7599 2014-11-10 08:22:25Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -527,63 +527,63 @@ class User extends DataObject
 			load_funcs( 'regional/model/_regional.funcs.php' );
 
 			if( user_country_visible() )
-			{	// Save country
+			{ // Save country
 				$country_ID = param( 'edited_user_ctry_ID', 'integer', true );
 				$country_is_required = ( $Settings->get( 'location_country' ) == 'required' && countries_exist() );
 				if( $country_is_required && $can_edit_users && $country_ID == 0 )
-				{	// Display a note message if user can edit all users
+				{ // Display a note message if user can edit all users
 					param_add_message_to_Log( 'edited_user_ctry_ID', T_('Please select a country.'), 'note' );
 				}
 				else
-				{	// Display an error message
+				{ // Display an error message
 					param_check_number( 'edited_user_ctry_ID', T_('Please select a country.'), $country_is_required );
 				}
-				$this->set_from_Request('ctry_ID', 'edited_user_ctry_ID', true);
+				$this->set_from_Request( 'ctry_ID', 'edited_user_ctry_ID', true );
 			}
 
-			if( user_region_visible() && isset( $country_ID ) && $country_ID > 0 )
-			{	// Save region
+			if( user_region_visible() )
+			{ // Save region
 				$region_ID = param( 'edited_user_rgn_ID', 'integer', true );
 				$region_is_required = ( $Settings->get( 'location_region' ) == 'required' && regions_exist( $country_ID ) );
 				if( $region_is_required && $can_edit_users && $region_ID == 0 )
-				{	// Display a note message if user can edit all users
+				{ // Display a note message if user can edit all users
 					param_add_message_to_Log( 'edited_user_rgn_ID', T_('Please select a region.'), 'note' );
 				}
 				else
-				{	// Display an error message
+				{ // Display an error message
 					param_check_number( 'edited_user_rgn_ID', T_('Please select a region'), $region_is_required );
 				}
-				$this->set_from_Request('rgn_ID', 'edited_user_rgn_ID', true);
+				$this->set_from_Request( 'rgn_ID', 'edited_user_rgn_ID', true );
 			}
 
-			if( user_subregion_visible() && isset( $region_ID ) && $region_ID > 0 )
-			{	// Save subregion
+			if( user_subregion_visible() )
+			{ // Save subregion
 				$subregion_ID = param( 'edited_user_subrg_ID', 'integer', true );
 				$subregion_is_required = ( $Settings->get( 'location_subregion' ) == 'required' && subregions_exist( $region_ID ) );
 				if( $subregion_is_required && $can_edit_users && $subregion_ID == 0 )
-				{	// Display a note message if user can edit all users
+				{ // Display a note message if user can edit all users
 					param_add_message_to_Log( 'edited_user_subrg_ID', T_('Please select a sub-region.'), 'note' );
 				}
 				else
-				{	// Display an error message
+				{ // Display an error message
 					param_check_number( 'edited_user_subrg_ID', T_('Please select a sub-region.'), $subregion_is_required );
 				}
-				$this->set_from_Request('subrg_ID', 'edited_user_subrg_ID', true);
+				$this->set_from_Request( 'subrg_ID', 'edited_user_subrg_ID', true );
 			}
 
-			if( user_city_visible() && isset( $region_ID ) && $region_ID > 0 )
-			{	// Save city
+			if( user_city_visible() )
+			{ // Save city
 				$city_ID = param( 'edited_user_city_ID', 'integer', true );
 				$city_is_required = ( $Settings->get( 'location_city' ) == 'required' && cities_exist( $country_ID, $region_ID, $subregion_ID ) );
 				if( $city_is_required && $can_edit_users && $city_ID == 0 )
-				{	// Display a note message if user can edit all users
+				{ // Display a note message if user can edit all users
 					param_add_message_to_Log( 'edited_user_city_ID', T_('Please select a city.'), 'note' );
 				}
 				else
-				{	// Display an error message
+				{ // Display an error message
 					param_check_number( 'edited_user_city_ID', T_('Please select a city.'), $city_is_required );
 				}
-				$this->set_from_Request('city_ID', 'edited_user_city_ID', true);
+				$this->set_from_Request( 'city_ID', 'edited_user_city_ID', true );
 			}
 			// ---- Locations / END ----
 
@@ -1890,7 +1890,7 @@ class User extends DataObject
 	 */
 	function set( $parname, $parvalue, $make_null = false )
 	{
-		if( isset( $this->$parname ) && ( ! isset( $this->significant_changed_values[ $parname ] ) ) && ( ( $old_value = $this->get( $parname ) ) != $parvalue )
+		if( ( ! isset( $this->significant_changed_values[ $parname ] ) ) && ( ( $old_value = $this->get( $parname ) ) != $parvalue )
 			&& in_array( $parname, array( 'login', 'group_ID', 'nickname', 'firstname', 'lastname', 'gender', 'ctry_ID', 'rgn_ID', 'subrg_ID', 'city_ID' ) ) )
 		{ // Save previous value of significant changes for later use in send_account_changed_notifications()
 			$this->significant_changed_values[ $parname ] = $old_value;
@@ -3004,11 +3004,6 @@ class User extends DataObject
 
 		$DB->commit();
 
-		if( $result === true && count( $this->significant_changed_values ) > 0 )
-		{ // Send notification email about the changes of user account
-			$this->send_account_changed_notification();
-		}
-
 		// BLOCK CACHE INVALIDATION:
 		// This User has been modified, cached content depending on it should be invalidated:
 		BlockCache::invalidate_key( 'user_ID', $this->ID );
@@ -4063,7 +4058,7 @@ class User extends DataObject
 			{
 				$user_field_url = $this->get_field_url( true );
 				if( $user_field_url != '' )
-				{	// Update url from extra user fields
+				{ // Update url from extra user fields
 					$this->set( 'url', $user_field_url );
 					$this->dbsave();
 				}
@@ -4073,6 +4068,11 @@ class User extends DataObject
 			else
 			{
 				$DB->rollback();
+			}
+
+			if( count( $this->significant_changed_values ) > 0 )
+			{ // Send notification email about the changes of user account
+				$this->send_account_changed_notification();
 			}
 		}
 		else
@@ -5031,7 +5031,7 @@ class User extends DataObject
 	 * @param array Params
 	 * @return string Result
 	 */
-	function get_reputation_helpful( $params = array() )
+	function get_reputation_comments_helpful( $params = array() )
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
@@ -5049,17 +5049,7 @@ class User extends DataObject
 		$comments_SQL->WHERE_and( 'cmvt_helpful = 1' );
 		$comments_SQL->GROUP_BY( 'user_ID' );
 
-		$links_SQL = new SQL( 'Get number of helpful votes on links for this user' );
-		$links_SQL->SELECT( 'lvot_user_ID AS user_ID, COUNT(*) AS cnt' );
-		$links_SQL->FROM( 'T_links' );
-		$links_SQL->FROM_add( 'INNER JOIN T_links__vote ON link_ID = lvot_link_ID' );
-		$links_SQL->WHERE( 'link_creator_user_ID = '.$this->ID );
-		$links_SQL->WHERE_and( 'lvot_like = 1' );
-		$links_SQL->GROUP_BY( 'user_ID' );
-
-		$votes = $DB->get_assoc( 'SELECT user_ID, SUM( cnt )
-			 FROM ('.$comments_SQL->get().' UNION ALL '.$links_SQL->get().') AS tbl
-			GROUP BY user_ID' );
+		$votes = $DB->get_assoc( $comments_SQL->get() );
 
 		// Calculate total votes from all users
 		$users_count = count( $votes );

@@ -17,7 +17,7 @@
  *
  * @todo add 5 plugin hooks. Will be widgetized later (same as SkinTag became Widgets)
  *
- * @version $Id: dashboard.ctrl.php 7283 2014-09-05 12:58:59Z yura $
+ * @version $Id: dashboard.ctrl.php 7434 2014-10-15 07:18:30Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -449,10 +449,9 @@ if( $blog )
 	/*
 	 * RECENT POSTS awaiting moderation
 	 */
-	// TODO: asimo> Make this configurable per blogs the same way as we have in case of comments
-	$default_moderation_statuses = get_visibility_statuses( 'moderation' );
+	$post_moderation_statuses = explode( ',', $Blog->get_setting( 'post_moderation_statuses' ) );
 	ob_start();
-	foreach( $default_moderation_statuses as $status )
+	foreach( $post_moderation_statuses as $status )
 	{ // go through all statuses
 		if( display_posts_awaiting_moderation( $status, $block_item_Widget ) )
 		{ // a block was dispalyed for this status

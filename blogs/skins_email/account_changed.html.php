@@ -8,7 +8,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
- * @version $Id: account_changed.html.php 7043 2014-07-02 08:35:45Z yura $
+ * @version $Id: account_changed.html.php 7585 2014-11-06 12:18:40Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -49,27 +49,25 @@ foreach( $params['fields'] as $field_key => $field_data )
 echo '</table>'."\n";
 
 $UserCache = & get_UserCache();
-$User = $UserCache->get_by_ID( $params['user_ID'], false, false );
-
-if( $User && $params['avatar_changed'] )
+if( $User = & $UserCache->get_by_ID( $params['user_ID'], false, false ) )
 {
-	echo '<p>'.T_('The main profile picture was changed to:').'</p>'."\n";
-	echo '<p>'.$User->get_avatar_File()->get_tag( '', '', '', '', 'crop-top-80x80' ).'</p>'."\n";
-}
-elseif( $params['new_avatar_upload'] )
-{ // Display the newly uploaded file only if it was not set as main profile picture
-	$FileCache = & get_FileCache();
-	$new_File = & $FileCache->get_by_ID( $params['new_avatar_upload'] );
-	echo '<p>'.T_('A new profile picture file was uploaded:').'</p>'."\n";
-	echo '<p>'.$new_File->get_tag( '', '', '', '', 'crop-top-80x80' ).'</p>'."\n";
-}
+	if( $params['avatar_changed'] )
+	{
+		echo '<p>'.T_('The main profile picture was changed to:').'</p>'."\n";
+		echo '<p>'.$User->get_avatar_File()->get_tag( '', '', '', '', 'fit-320x320' ).'</p>'."\n";
+	}
+	elseif( $params['new_avatar_upload'] )
+	{ // Display the newly uploaded file only if it was not set as main profile picture
+		$FileCache = & get_FileCache();
+		$new_File = & $FileCache->get_by_ID( $params['new_avatar_upload'] );
+		echo '<p>'.T_('A new profile picture file was uploaded:').'</p>'."\n";
+		echo '<p>'.$new_File->get_tag( '', '', '', '', 'fit-320x320' ).'</p>'."\n";
+	}
 
-// User's pictures:
-echo '<p>'.T_('The current profile pictures for this account are:').'</p>'."\n";
-$user_pictures = '';
+	// User's pictures:
+	echo '<p>'.T_('The current profile pictures for this account are:').'</p>'."\n";
+	$user_pictures = '';
 
-if( $User = $UserCache->get_by_ID( $params['user_ID'], false, false ) )
-{
 	$user_avatars = $User->get_avatar_Links( false );
 	foreach( $user_avatars as $user_Link )
 	{
@@ -78,11 +76,11 @@ if( $User = $UserCache->get_by_ID( $params['user_ID'], false, false ) )
 				'before_image_legend' => '',
 				'after_image_legend'  => '',
 				'after_image'         => ' ',
-				'image_size'          => 'crop-top-80x80',
+				'image_size'          => 'crop-top-160x160',
 			) );
 	}
+	echo empty( $user_pictures ) ? '<p><b>'.T_('No pictures.').'</b></p>' : $user_pictures;
 }
-echo empty( $user_pictures ) ? '<p><b>'.T_('No pictures.').'</b></p>' : $user_pictures;
 
 // Buttons:
 echo '<div class="buttons">'."\n";

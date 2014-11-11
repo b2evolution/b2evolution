@@ -3,7 +3,7 @@
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
- * @version $Id: functions.js 6976 2014-06-25 07:08:15Z yura $
+ * @version $Id: functions.js 7556 2014-10-31 07:07:44Z yura $
  */
 
 
@@ -326,7 +326,7 @@ jQuery( document ).ready( function()
 {
 	jQuery( '[data-func]' ).each( function()
 	{
-		var func_args = jQuery( this ).data( 'func' ).match( /([^\\\][^\|]|\\\|)+/g );
+		var func_args = jQuery( this ).data( 'func' ).match( /([^\|]|\\\|)+/g );
 		var func_name = func_args[0];
 		func_args.splice( 0, 1 );
 		for( var i = 0; i < func_args.length; i++ )

@@ -1,7 +1,7 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
- * @version $Id: backoffice.js 7127 2014-07-15 13:43:26Z yura $
+ * @version $Id: backoffice.js 7509 2014-10-24 07:31:38Z yura $
  */
 
 jQuery( document ).ready( function()
@@ -135,9 +135,13 @@ function evoFadeBg( selector, bgs, options )
 	var toEval = 'jQuery(selector).animate({ backgroundColor: ';
 	for( e in bgs )
 	{
+		if( typeof( bgs[e] ) != 'string' )
+		{ // Skip wrong color value
+			continue;
+		}
 		toEval += '"'+bgs[e]+'"'+'}, '+speed+' ).animate({ backgroundColor: ';
 	}
-	toEval += 'origBg }, '+speed+', "", function(){jQuery( this ).removeAttr( "style" );});';
+	toEval += 'origBg }, '+speed+', "", function(){jQuery( this ).css( "backgroundColor", "" );});';
 
 	eval(toEval);
 }

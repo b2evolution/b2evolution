@@ -7,7 +7,7 @@
  *
  * @package conf
  *
- * @version $Id: _advanced.php 7141 2014-07-17 08:15:03Z yura $
+ * @version $Id: _advanced.php 7585 2014-11-06 12:18:40Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -109,6 +109,7 @@ $thumbnail_sizes = array(
 			'crop-48x48' => array( 'crop', 48, 48, 85 ),
 			'crop-32x32' => array( 'crop', 32, 32, 85 ),
 			'crop-15x15' => array( 'crop', 15, 15, 85 ),
+			'crop-top-160x160' => array( 'crop-top', 160, 160, 85 ),
 			'crop-top-80x80' => array( 'crop-top', 80, 80, 85 ),
 			'crop-top-64x64' => array( 'crop-top', 64, 64, 85 ),
 			'crop-top-48x48' => array( 'crop-top', 48, 48, 85 ),

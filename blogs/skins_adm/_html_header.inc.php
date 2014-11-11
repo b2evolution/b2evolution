@@ -29,7 +29,7 @@
  * @author fplanque
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
- * @version $Id: _html_header.inc.php 7127 2014-07-15 13:43:26Z yura $
+ * @version $Id: _html_header.inc.php 7509 2014-10-24 07:31:38Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -70,6 +70,7 @@ require_js( 'ajax.js' );	// Functions to work with AJAX response data
 
 	require_js( 'extracats.js' );
 	require_js( 'dynamic_select.js' );
+	require_js( '#jqueryUI#' ); // Need to animate background, e.g. in function evoFadeBg()
 	require_js( 'backoffice.js' );
 
 

@@ -915,27 +915,8 @@ switch( $action )
 
 		load_funcs('_core/model/db/_upgrade.funcs.php');
 
-		echo '<h2>'.T_('Upgrading all tables in b2evolution MySQL database to UTF-8...').'</h2>';
-		evo_flush();
-
-		// Load db schema to be able to check the original charset definition
-		load_db_schema();
-
-		$db_tables = $DB->get_col( 'SHOW TABLES FROM `'.$db_config['name'].'` LIKE "'.$tableprefix.'%"' );
-		foreach( $db_tables as $table )
-		{ // Convert all tables charset to utf8
-			echo "Converting $table...";
-			evo_flush();
-			convert_table_to_utf8( $table );
-			echo " OK<br />\n";
-		}
-
-		echo "Changing default charset of DB...<br />\n";
-		evo_flush();
-		$DB->query( 'ALTER DATABASE `'.$db_config['name'].'` CHARACTER SET utf8 COLLATE utf8_general_ci' );
-
+		db_upgrade_to_utf8( true );
 		?>
-		<p><?php echo T_('Upgrading done!')?></p>
 		<p><a href="index.php?locale=<?php echo $default_locale ?>">&laquo; <?php echo T_('Back to install menu') ?></a></p>
 		<?php
 		break;

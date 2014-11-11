@@ -1,7 +1,7 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
- * @version $Id: colorpicker.js 7017 2014-06-30 09:14:20Z yura $
+ * @version $Id: colorpicker.js 7500 2014-10-23 09:08:43Z yura $
  */
 
 jQuery(document).ready( function()
@@ -16,8 +16,9 @@ jQuery(document).ready( function()
 
 		// Initialize bubbletip to display colorpicker inside
 		jQuery( this ).bubbletip( jQuery( '#' + colorpicker_ID ), {
-				bindShow: 'focus',
+				bindShow: 'focus click',
 				bindHide: 'blur',
+				bindClose: 'blur',
 				calculateOnShow: true,
 				deltaDirection: 'right',
 				deltaShift: 0,

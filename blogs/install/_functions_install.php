@@ -555,7 +555,6 @@ function install_basic_plugins( $old_db_version = 0 )
 	{
 		// Toolbars:
 		install_plugin( 'quicktags_plugin' );
-		install_plugin( 'shortcodes_plugin' );
 		// Renderers:
 		install_plugin( 'auto_p_plugin' );
 		install_plugin( 'autolinks_plugin' );
@@ -613,6 +612,11 @@ function install_basic_plugins( $old_db_version = 0 )
 		install_plugin( 'markdown_plugin' );
 		install_plugin( 'infodots_plugin', $test_install_all_features );
 		install_plugin( 'widescroll_plugin' );
+	}
+
+	if( $old_db_version < 11200 )
+	{ // Upgrade to 5.1.3-stable
+		install_plugin( 'shortcodes_plugin' );
 	}
 }
 

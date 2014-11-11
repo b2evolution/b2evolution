@@ -41,7 +41,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: files.ctrl.php 6334 2014-03-25 13:11:30Z yura $
+ * @version $Id: files.ctrl.php 7537 2014-10-28 08:33:05Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1037,7 +1037,7 @@ switch( $action )
 
 		$edited_File->set( 'title', param( 'title', 'string', '' ) );
 		$edited_File->set( 'alt', param( 'alt', 'string', '' ) );
-		$edited_File->set( 'desc', param( 'desc', 'string', '' ) );
+		$edited_File->set( 'desc', param( 'desc', 'text', '' ) );
 
 		// Store File object into DB:
 		if( $edited_File->dbsave() )

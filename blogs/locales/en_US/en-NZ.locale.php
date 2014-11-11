@@ -15,6 +15,6 @@ $locale_defs['en-NZ'] = array(
 		'datefmt' => 'd/m/y',
 		'timefmt' => 'h:i:s a',
 		'startofweek' => 1,
-		'messages' => 'en_NZ',
+		'messages' => 'en_US',
 	);
 ?>

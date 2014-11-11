@@ -335,6 +335,6 @@ foreach( $loaded_ids as $moderator_ID )
 	locale_restore_previous();
 }
 
-$result_message = sprintf( T_( '%d moderator have been notified!' ), $mail_sent );
+$result_message = sprintf( T_( '%d moderators have been notified!' ), $mail_sent );
 return 1; /*OK*/
 ?>
