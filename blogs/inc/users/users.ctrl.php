@@ -31,7 +31,7 @@
  *
  * @todo separate object inits and permission checks
  *
- * @version $Id$
+ * @version $Id: users.ctrl.php 6911 2014-06-17 15:35:37Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -350,8 +350,9 @@ if( !$Messages->has_errors() )
 	}
 }
 
-// require css for jQuery UI
-require_css( $rsc_url.'css/jquery/smoothness/jquery-ui.css' );
+// Used for autocomplete user fields in filter "Specific criteria" or to highlight user level cell on change
+require_js( '#jqueryUI#' );
+require_css( '#jqueryUI_css#' );
 
 // We might delegate to this action from above:
 /*if( $action == 'edit' )

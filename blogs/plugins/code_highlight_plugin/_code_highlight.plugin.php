@@ -27,7 +27,7 @@
  * @author Yabba: Paul Jones - {@link http://astonishme.co.uk/}
  * @author Stk: Scott Kimler - {@link http://astonishme.co.uk/}
  *
- * @version $Id$
+ * @version $Id: _code_highlight.plugin.php 7134 2014-07-16 12:01:07Z yura $
  */
 
 /**
@@ -123,8 +123,8 @@ class code_highlight_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->short_desc = T_( 'Display computer code in a post.' );
-		$this->long_desc = T_( 'Display computer code easily with syntax coloring and allowing for easy copy/paste.' );
+		$this->short_desc = T_( 'Display computer code in a post.' ).' '.T_( '(Plugin not available in WYSIWYG mode)' );
+		$this->long_desc = T_( 'Display computer code easily with syntax coloring and allowing for easy copy/paste.' ).' '.T_( '(Plugin not available in WYSIWYG mode)' );
 	}
 
 
@@ -271,20 +271,23 @@ class code_highlight_plugin extends Plugin
 		echo '<div class="edit_toolbar code_toolbar">';
 		// TODO: dh> make this optional.. just like with line numbers, this "Code" line is not feasible with oneliners.
 		echo T_('Code').': ';
-		echo '<input type="button" id="code_samp" title="'.T_('Insert &lt;samp&gt; tag').'" class="quicktags" onclick="code_tag(\'samp\');" value="'.T_('samp').'" />';
-		echo '<input type="button" id="code_kbd" title="'.T_('Insert &lt;kbd&gt; tag').'" class="quicktags" onclick="code_tag(\'kbd\');" value="'.T_('kbd').'" />';
-		echo '<input type="button" id="code_var" title="'.T_('Insert &lt;var&gt; tag').'" class="quicktags" onclick="code_tag(\'var\');" value="'.T_('var').'" />';
-		echo '<input type="button" id="code_code" title="'.T_('Insert &lt;code&gt; tag').'" class="quicktags" onclick="code_tag(\'code\');" value="'.T_('code').'" />';
+		echo '<input type="button" id="code_samp" title="'.T_('Insert &lt;samp&gt; tag').'" class="quicktags" data-func="code_tag|samp" value="'.T_('samp').'" />';
+		echo '<input type="button" id="code_kbd" title="'.T_('Insert &lt;kbd&gt; tag').'" class="quicktags" data-func="code_tag|kbd" value="'.T_('kbd').'" />';
+		echo '<input type="button" id="code_var" title="'.T_('Insert &lt;var&gt; tag').'" class="quicktags" data-func="code_tag|var" value="'.T_('var').'" />';
+		echo '<input type="button" id="code_code" title="'.T_('Insert &lt;code&gt; tag').'" class="quicktags" data-func="code_tag|code" value="'.T_('code').'" />';
 		/* space */
-		echo '<input type="button" id="codespan" title="'.T_('Insert codespan').'" style="margin-left:8px;" class="quicktags" onclick="codespan_tag(\'\');" value="'.T_('codespan').'" />';
+		echo '<input type="button" id="codespan" title="'.T_('Insert codespan').'" style="margin-left:8px;" class="quicktags" data-func="codespan_tag| " value="'.T_('codespan').'" />';
 		/* space */
-		echo '<input type="button" id="codeblock" title="'.T_('Insert codeblock').'" style="margin-left:8px;" class="quicktags" onclick="codeblock_tag(\'\');" value="'.T_('codeblock').'" />';
-		echo '<input type="button" id="codeblock_xml" title="'.T_('Insert XML codeblock').'" class="quicktags" onclick="codeblock_tag(\'xml\');" value="'.T_('XML').'" />';
-		echo '<input type="button" id="codeblock_html" title="'.T_('Insert HTML codeblock').'" class="quicktags" onclick="codeblock_tag(\'html\');" value="'.T_('HTML').'" />';
-		echo '<input type="button" id="codeblock_php" title="'.T_('Insert PHP codeblock').'" class="quicktags" onclick="codeblock_tag(\'php\');" value="'.T_('PHP').'" />';
-		echo '<input type="button" id="codeblock_css" title="'.T_('Insert CSS codeblock').'" class="quicktags" onclick="codeblock_tag(\'css\');" value="'.T_('CSS').'" />';
-		echo '<input type="button" id="codeblock_shell" title="'.T_('Insert Shell codeblock').'" class="quicktags" onclick="codeblock_tag(\'shell\');" value="'.T_('Shell').'" />';
+		echo '<input type="button" id="codeblock" title="'.T_('Insert codeblock').'" style="margin-left:8px;" class="quicktags" data-func="codeblock_tag| " value="'.T_('codeblock').'" />';
+		echo '<input type="button" id="codeblock_xml" title="'.T_('Insert XML codeblock').'" class="quicktags" data-func="codeblock_tag|xml" value="'.T_('XML').'" />';
+		echo '<input type="button" id="codeblock_html" title="'.T_('Insert HTML codeblock').'" class="quicktags" data-func="codeblock_tag|html" value="'.T_('HTML').'" />';
+		echo '<input type="button" id="codeblock_php" title="'.T_('Insert PHP codeblock').'" class="quicktags" data-func="codeblock_tag|php" value="'.T_('PHP').'" />';
+		echo '<input type="button" id="codeblock_css" title="'.T_('Insert CSS codeblock').'" class="quicktags" data-func="codeblock_tag|css" value="'.T_('CSS').'" />';
+		echo '<input type="button" id="codeblock_shell" title="'.T_('Insert Shell codeblock').'" class="quicktags" data-func="codeblock_tag|shell" value="'.T_('Shell').'" />';
 		echo '</div>';
+
+		// Load js to work with textarea
+		require_js( 'functions.js', 'blog', true, true );
 
 		?>
 		<script type="text/javascript">
@@ -426,26 +429,6 @@ class code_highlight_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		// Get a setting "Allow HTML" for:
-		if( ! empty( $params['Comment'] ) )
-		{ // Comment
-			$Comment = & $params['Comment'];
-			$comment_Item = & $Comment->get_Item();
-			$item_Blog = $comment_Item->get_Blog();
-			$this->allow_html = $item_Blog->get_setting( 'allow_html_comment' );
-		}
-		else if( ! empty( $params['Item'] ) )
-		{ // Item
-			$Item = & $params['Item'];
-			$item_Blog = $Item->get_Blog();
-			$this->allow_html = $item_Blog->get_setting( 'allow_html_post' );
-		}
-		else if( ! empty( $params['Message'] ) )
-		{ // Message
-			global $Settings;
-			$this->allow_html = $Settings->get( 'allow_html_message' );
-		}
-
 		// 2 - attribs : lang &| line
 		// 4 - codeblock
 		$content = preg_replace_callback( '#(\<p>)?\<!--\s*codeblock([^-]*?)\s*-->(\</p>)?\<pre[^>]*><code>([\s\S]+?)</code>\</pre>(\<p>)?\<!--\s*/codeblock\s*-->(\</p>)?#i',
@@ -551,7 +534,7 @@ class code_highlight_plugin extends Plugin
 	 */
 	function format_to_edit( $block )
 	{
-		return '[codeblock'.$block[1].']'.evo_html_entity_decode( $block[2] ).'[/codeblock]';
+		return '[codeblock'.$block[1].']'.$block[2].'[/codeblock]';
 	}
 
 
@@ -563,7 +546,7 @@ class code_highlight_plugin extends Plugin
 	 */
 	function format_span_to_edit( $span )
 	{
-		return '[codespan]'.evo_html_entity_decode( $span[1] ).'[/codespan]';
+		return '[codespan]'.$span[1].'[/codespan]';
 	}
 
 
@@ -574,11 +557,14 @@ class code_highlight_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead()
 	{
-		require_js( 'functions.js', 'blog' );
+		global $Blog;
 
-		add_css_headline( '/* AstonishMe code plugin styles */'
-			.'.amc0,.amc1,.amc2,.amc3,.amc4,.amc5,.amc6,.amc7,.amc8,.amc9 {'
-			.'background:url('.$this->get_plugin_url().'img/numbers.gif) no-repeat; }' );
+		if( ! isset( $Blog ) || (
+		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' && 
+		    $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) == 'never' ) )
+		{ // Don't load css/js files when plugin is not enabled
+			return;
+		}
 
 		require_css( $this->get_plugin_url().'amcode.css', true );
 	}
@@ -691,10 +677,6 @@ class code_highlight_plugin extends Plugin
 
 		if( $code = trim( $block[4] ) )
 		{ // we have a code block
-			if( $this->allow_html )
-			{ // If HTML is allowed in content we should disallow this for <code> content
-				$code = evo_htmlspecialchars( $code );
-			}
 			// is the relevant language highlighter already cached?
 			if( empty( $this->languageCache[ $language ] ) )
 			{ // lets attempt to load the language

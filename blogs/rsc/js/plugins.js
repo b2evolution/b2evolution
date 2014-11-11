@@ -1,12 +1,13 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
- * @version $Id$
+ * @version $Id: bubbletip.js 2362 2012-11-07 06:11:13Z yura $
  */
 
 jQuery( document ).ready(function()
 {
 	/** Init bubbletip for help icon of plugins **/
+	// fp>yura: is this backoffice only?
 
 	var plugin_number = 1;
 	jQuery( 'a.help_plugin_icon' ).mouseover( function()
@@ -37,7 +38,7 @@ jQuery( document ).ready(function()
 		jQuery( this ).bubbletip( tip, {
 				showOnInit: true,
 				deltaDirection: direction,
-				deltaShift: 3,
+				deltaShift: 0,
 			} );
 
 		// Add this class to avoid of the repeating of init bubbletip

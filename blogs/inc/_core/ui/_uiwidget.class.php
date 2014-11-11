@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id$
+ * @version $Id: _uiwidget.class.php 6972 2014-06-24 19:12:29Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -363,14 +363,6 @@ class Table extends Widget
 		{
 			$this->fadeout_array = $fadeout;
 		}
-
-		if( !empty( $this->fadeout_array ) )
-		{ // Initialize fadeout javascript:
-			global $rsc_url;
-			echo '<script type="text/javascript" src="'.$rsc_url.'js/fadeout.js"></script>';
-			echo '<script type="text/javascript">addEvent( window, "load", Fat.fade_all, false);</script>';
-		}
-
 	}
 
 

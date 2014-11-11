@@ -57,7 +57,7 @@
  * @author fplanque: Francois PLANQUE
  * @author Justin VINCENT
  *
- * @version $Id$
+ * @version $Id: _db.class.php 7292 2014-09-08 10:57:23Z yura $
  * @todo transaction support
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -328,7 +328,7 @@ class DB
 	 */
 	function DB( $params )
 	{
-		global $debug;
+		global $debug, $evo_charset;
 
 		// Mandatory parameters:
 		if( isset( $params['handle'] ) )
@@ -420,9 +420,13 @@ class DB
 			$this->select($this->dbname);
 		}
 
-		if( !empty($params['connection_charset']) )
-		{	// Specify which charset we are using on the client:
+		if( ! empty( $params['connection_charset'] ) )
+		{ // Specify which charset we are using on the client:
 			$this->set_connection_charset( $params['connection_charset'] );
+		}
+		elseif( ! empty( $evo_charset ) )
+		{ // Use the internal charset if it is defined
+			$this->set_connection_charset( DB::php_to_mysql_charmap( $evo_charset ) );
 		}
 
 		/*
@@ -1325,11 +1329,9 @@ class DB
 		$count_rows = 0;
 		$time_queries_profiled = 0;
 
-		// Javascript function to toggle DIVs (EXPLAIN, results, backtraces).
 		if( $html )
-		{
-			global $rsc_url;
-			echo '<script type="text/javascript" src="'.$rsc_url.'js/debug.js"></script>';
+		{ // Javascript function to toggle DIVs (EXPLAIN, results, backtraces).
+			require_js( 'debug.js', 'rsc_url', false, true );
 		}
 
 		foreach( $this->queries as $i => $query )

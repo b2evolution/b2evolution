@@ -344,8 +344,6 @@ switch( $action )
 		break;
 }
 
-// Require datapicker.css
-require_css( 'ui.datepicker.css' );
 // Require results.css to display attachments as a result table
 require_css( 'results.css' );
 

@@ -25,7 +25,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _comment.funcs.php 7246 2014-08-20 12:35:51Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1168,6 +1168,42 @@ function comments_delete_where( $sql_where, $comment_ids = NULL )
 		$DB->rollback();
 		return false;
 	}
+}
+
+
+/**
+ * Move all child comments to new post by parent comment ID
+ *
+ * @param integer/array Parent comment IDs
+ * @param integer Item ID
+ * @param boolean TRUE to convert a comment to root/top comment of the post
+ */
+function move_child_comments_to_item( $comment_IDs, $item_ID, $convert_to_root = true )
+{
+	global $DB;
+
+	$child_comments_SQL = new SQL();
+	$child_comments_SQL->SELECT( 'comment_ID' );
+	$child_comments_SQL->FROM( 'T_comments' );
+	$child_comments_SQL->WHERE( 'comment_in_reply_to_cmt_ID IN ( '.$DB->quote( $comment_IDs ).' )' );
+	$child_comments_IDs = $DB->get_col( $child_comments_SQL->get() );
+
+	if( empty( $child_comments_IDs ) )
+	{ // No child comments, Exit here
+		return;
+	}
+
+	// Move the child comments recursively
+	move_child_comments_to_item( $child_comments_IDs, $item_ID, false );
+
+	// Update item ID to new
+	if( $convert_to_root )
+	{ // Make these comments as root comments (remove their parent depending)
+		$update_sql = ', comment_in_reply_to_cmt_ID = NULL';
+	}
+	$DB->query( 'UPDATE T_comments
+		SET comment_item_ID = '.$DB->quote( $item_ID ).$update_sql.'
+		WHERE comment_in_reply_to_cmt_ID IN ( '.$DB->quote( $comment_IDs ).' )' );
 }
 
 

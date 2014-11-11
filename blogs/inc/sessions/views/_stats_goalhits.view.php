@@ -9,7 +9,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _stats_goalhits.view.php 7368 2014-10-06 11:16:43Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -24,22 +24,23 @@ require_once dirname(__FILE__).'/_stats_view.funcs.php';
 global $datestartinput, $datestart, $datestopinput, $datestop;
 
 if( param_date( 'datestartinput', T_('Invalid date'), false,  NULL ) !== NULL )
-{	// We have a user provided localized date:
-	memorize_param( 'datestart', 'string', NULL, trim(form_date($datestartinput)) );
+{ // We have a user provided localized date:
+	memorize_param( 'datestart', 'string', NULL, trim( form_date( $datestartinput ) ) );
+	memorize_param( 'datestartinput', 'string', NULL, empty( $datestartinput ) ? NULL : date( locale_datefmt(), strtotime( $datestartinput ) ) );
 }
 else
-{	// We may have an automated param transmission date:
+{ // We may have an automated param transmission date:
 	param( 'datestart', 'string', '', true );
 }
 if( param_date( 'datestopinput', T_('Invalid date'), false, NULL ) !== NULL )
-{	// We have a user provided localized date:
-	memorize_param( 'datestop', 'string', NULL, trim(form_date($datestopinput)) );
+{ // We have a user provided localized date:
+	memorize_param( 'datestop', 'string', NULL, trim( form_date( $datestopinput ) ) );
+	memorize_param( 'datestopinput', 'string', NULL, empty( $datestopinput ) ? NULL : date( locale_datefmt(), strtotime( $datestopinput ) ) );
 }
 else
-{	// We may have an automated param transmission date:
+{ // We may have an automated param transmission date:
 	param( 'datestop', 'string', '', true );
 }
-//pre_dump( $datestart, $datestop );
 
 $exclude = param( 'exclude', 'integer', 0, true );
 $sess_ID = param( 'sess_ID', 'integer', NULL, true );
@@ -138,8 +139,8 @@ $Results->filter_area = array(
 	'callback' => 'filter_goal_hits',
 	'url_ignore' => 'results_hits_page,exclude,sess_ID,goal_name,datestartinput,datestart,datestopinput,datestop',
 	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;blog=0' ),
-		'all_but_curr' => array( T_('All but current session'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;blog=0&amp;sess_ID='.$Session->ID.'&amp;exclude=1' ),
+		'all' => array( T_('All'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits' ),
+		'all_but_curr' => array( T_('All but current session'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;sess_ID='.$Session->ID.'&amp;exclude=1' ),
 		)
 	);
 

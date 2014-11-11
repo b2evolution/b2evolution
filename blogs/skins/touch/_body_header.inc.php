@@ -27,12 +27,12 @@ global $dummy_fields;
 </div>
 </noscript>
 
-<div style="display: none;" id="wptouch-menu" class="dropper">
-	<div id="wptouch-menu-inner">
+<div id="wptouch-menu" class="dropper">
+	<div class="wptouch-menu-inner" rel="blog">
 		<div id="menu-head">
 			<div id="tabnav">
 				<a class="selected" href="#head-nav"><?php echo T_('Navigation'); ?></a>
-				<a class="selected" href="#head-tools"><?php echo T_('Tools'); ?></a>
+				<a href="#head-tools"><?php echo T_('Tools'); ?></a>
 				<a href="#head-blogs"><?php echo T_('Other Blogs'); ?></a>
 			</div>
 
@@ -87,6 +87,22 @@ global $dummy_fields;
 			?>
 		</div>
 	</div>
+
+	<?php
+		if( is_logged_in() )
+		{ // Display user menu
+	?>
+	<div class="wptouch-menu-inner" rel="profile">
+		<ul id="head-account">
+			<li><a href="<?php echo get_user_profile_url(); ?>"><?php echo T_('Edit your profile'); ?></a></li>
+			<li><a href="<?php echo get_user_avatar_url(); ?>"><?php echo T_('Your profile picture'); ?></a></li>
+			<li><a href="<?php echo get_user_pwdchange_url(); ?>"><?php echo T_('Change password'); ?></a></li>
+			<li><a href="<?php echo get_user_preferences_url(); ?>"><?php echo T_('Preferences'); ?></a></li>
+			<li><a href="<?php echo get_user_subs_url(); ?>"><?php echo T_('Notifications'); ?></a></li>
+			<li><a href="<?php echo get_user_logout_url(); ?>"><?php echo T_('Logout'); ?></a></li>
+		</ul>
+	</div>
+	<?php } ?>
 </div>
 
 <div id="headerbar">
@@ -95,7 +111,13 @@ global $dummy_fields;
 		<a href="<?php echo $Blog->get( 'url', 'raw' ); ?>"><?php echo $Blog->dget( 'name', 'htmlbody' ); ?></a>
 	</div>
 	<div id="headerbar-menu">
-		<a href="javascript:return false;"><?php echo T_( 'Menu' ); ?></a>
+		<div rel="blog"><?php echo T_( 'Menu' ); ?></div>
+		<?php
+		if( is_logged_in() )
+		{ // Display user menu
+			echo '<div rel="profile">'.$current_User->get_avatar_imgtag( 'crop-top-15x15' ).'</div>';
+		}
+		?>
 	</div>
 </div>
 

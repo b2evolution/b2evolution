@@ -1,5 +1,5 @@
 /**
- * $Id$
+ * $Id: editor_plugin_src.js 6650 2014-05-09 09:22:38Z yura $
  *
  * @author Moxiecode
  * @author Francois Planque

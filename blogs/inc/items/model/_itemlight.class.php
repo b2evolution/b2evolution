@@ -28,7 +28,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _itemlight.class.php 7111 2014-07-14 05:23:46Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -700,7 +700,7 @@ class ItemLight extends DataObject
 					}
 				}
 
-				$message = sprintf( 'Item with ID <a %s>%s</a> has an invalid main category ID %s.',
+				$message = sprintf( 'Item with ID <a %s>%s</a> has an invalid main category ID %s.', /* Do NOT translate debug messages! */
 						'href="'.$url_to_edit_post.'"',
 						$this->ID,
 						$this->main_cat_ID
@@ -716,8 +716,16 @@ class ItemLight extends DataObject
 				}
 				else
 				{	// Main chapter is defined, we can show the page
-					global $Messages;
-					$Messages->add( $message );
+					global $Messages, $current_User;
+					if( is_logged_in() && $current_User->check_perm( 'blogs', 'editall' ) )
+					{ // User has permission to all blogs posts and comments, display a message as note in order to allow update it
+						$message_type = 'note';
+					}
+					else
+					{ // No permission, display this message as error. Such users cannot update this post.
+						$message_type = 'error';
+					}
+					$Messages->add( $message, $message_type );
 				}
 			}
 		}
@@ -1106,6 +1114,8 @@ class ItemLight extends DataObject
 		$params = array_merge( array(
 				'before'          => '',
 				'after'           => '',
+				'before_title'    => '',
+				'after_title'     => '',
 				'format'          => 'htmlbody',
 				'link_type'       => '#',
 				'link_class'      => '#',
@@ -1192,6 +1202,7 @@ class ItemLight extends DataObject
 		}
 
 		$r = $params['before'];
+		$title = $params['before_title'].$title.$params['after_title'];
 		if( !empty($url) )
 		{
 			$r .= '<a href="'.$url.'"'.$link_class.'>'.$title.'</a>';

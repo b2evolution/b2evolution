@@ -26,7 +26,7 @@
  * @author blueyed: Daniel HAHLER
  * @author Wordpress team
  *
- * @version $Id$
+ * @version $Id: _upgrade.funcs.php 7516 2014-10-27 05:56:16Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1727,6 +1727,7 @@ function convert_table_to_utf8( $table )
 
 	// Note: Text type columns must be updated before the table update to avoid type changes because of the charset modification
 	// This way we avoid the automatic modification of e.g. mediumtext colums to longtext
+	$col_definitions = array();
 	foreach( $text_columns as $text_column )
 	{ // Update each text column character set explicitly to utf8. Those columns which should not be updated were already removed from this array.
 		$col_definition = $text_column->Field.
@@ -1735,7 +1736,11 @@ function convert_table_to_utf8( $table )
 			( isset( $text_column->Default ) ? ' DEFAULT "'.$text_column->Default.'"' : '' ).
 			( isset( $text_column->Extra ) ? ' '.$text_column->Extra : '' ).
 			( isset( $text_column->Comment ) ? ' COMMENT "'.$text_column->Comment.'"' : '' );
-		$DB->query( 'ALTER TABLE `'.$table.'` MODIFY '.$col_definition );
+		$col_definitions[] = 'MODIFY '.$col_definition;
+	}
+	if( count( $col_definitions ) )
+	{
+		$DB->query( 'ALTER TABLE `'.$table.'` '.implode( ', ', $col_definitions ) );
 	}
 
 	if( empty( $columns_with_charset ) )
@@ -1751,4 +1756,37 @@ function convert_table_to_utf8( $table )
 	}
 }
 
+
+/**
+ * Upgrade DB to UTF-8
+ *
+ * @param boolean TRUE to load DB scheme(used on install screen)
+ */
+function db_upgrade_to_utf8( $load_db_schema = false )
+{
+	global $db_config, $tableprefix, $DB;
+
+	echo '<h2>'.T_('Upgrading all tables in b2evolution MySQL database to UTF-8...').'</h2>';
+	evo_flush();
+
+	if( $load_db_schema )
+	{ // Load db schema to be able to check the original charset definition
+		load_db_schema();
+	}
+
+	$db_tables = $DB->get_col( 'SHOW TABLES FROM `'.$db_config['name'].'` LIKE "'.$tableprefix.'%"' );
+	foreach( $db_tables as $table )
+	{ // Convert all tables charset to utf8
+		echo sprintf( T_('Converting %s...'), $table );
+		evo_flush();
+		convert_table_to_utf8( $table );
+		echo " OK<br />\n";
+	}
+
+	echo T_('Changing default charset of DB...').'<br />'."\n";
+	evo_flush();
+	$DB->query( 'ALTER DATABASE `'.$db_config['name'].'` CHARACTER SET utf8 COLLATE utf8_general_ci' );
+
+	echo '<p>'.T_('Upgrading done!').'</p>';
+}
 ?>

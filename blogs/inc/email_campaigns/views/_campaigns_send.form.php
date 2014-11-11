@@ -28,7 +28,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _campaigns_send.form.php 7475 2014-10-21 04:17:43Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -58,15 +58,17 @@ $Form->begin_fieldset( T_('Review and Send') );
 	$Form->info( T_('Date'), mysql2localedatetime_spans( $edited_EmailCampaign->get( 'date_ts' ), 'M-d' ) );
 	$Form->info( T_('Last sent date'), $edited_EmailCampaign->get( 'sent_ts' ) ? mysql2localedatetime_spans( $edited_EmailCampaign->get( 'sent_ts' ), 'M-d' ) : T_('No sent yet') );
 
+echo '<div style="display:table;width:100%;table-layout:fixed;">';
 	echo '<div class="floatleft" style="width:50%">';
 	echo '<p><b>'.T_('HTML message').':</b></p>';
-	echo mail_template( 'newsletter', 'html', array( 'message_html' => $edited_EmailCampaign->get( 'email_html' ) ), $current_User );
+	echo '<div style="overflow:auto">'.mail_template( 'newsletter', 'html', array( 'message_html' => $edited_EmailCampaign->get( 'email_html' ) ), $current_User ).'</div>';
 	echo '</div>';
 
-	echo '<div class="floatleft" style="width:50%">';
+	echo '<div class="floatright" style="width:49%">';
 	echo '<p><b>'.T_('Plain Text message').':</b></p>';
-	echo '<pre>'.mail_template( 'newsletter', 'text', array( 'message_text' => $edited_EmailCampaign->get( 'email_text' ) ), $current_User ).'</pre>';
+	echo '<div style="font-family:monospace;overflow:auto">'.nl2br( mail_template( 'newsletter', 'text', array( 'message_text' => $edited_EmailCampaign->get( 'email_text' ) ), $current_User ) ).'</div>';
 	echo '</div>';
+echo '</div>';
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Newsletter recipients') );

@@ -12,7 +12,7 @@
  *
  * @package evocore
  *
- * @version $Id$
+ * @version $Id: $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -75,11 +75,11 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 	if( ! isset( $GLOBALS[ 'files_Module' ] ) )
 		return;
 
-	$fieldset_title = T_( 'Images &amp; Attachments' ).get_manual_link( $LinkOwner->type.'_attachments_fieldset' );
+	$fieldset_title = T_( 'Images &amp; Attachments' );
 
 	if( $creating )
 	{	// Creating new Item
-		$fieldset_title .= ' - <a id="title_file_add" href="#" >'.get_icon( 'folder', 'imgtag' ).' '.T_('Add/Link files').'</a> <span class="note">(popup)</span>';
+		$fieldset_title .= ' '.get_manual_link('post-attachments-fieldset').' - <a id="title_file_add" href="#" >'.get_icon( 'folder', 'imgtag' ).' '.T_('Add/Link files').'</a> <span class="note">(popup)</span>';
 
 		$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_createlinks' ) );
 		$Form->hidden( 'is_attachments', 'false' );
@@ -101,7 +101,7 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 		$iframe_name = 'attach_'.generate_random_key( 16 );
 	}
 
-	$fieldset_title .= ' - '.action_icon( T_('Refresh'), 'refresh', $admin_url.'?ctrl=links&amp;action=edit_links&amp;link_type='.$LinkOwner->type.'&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;link_object_ID='.$LinkOwner->get_ID(), T_('Refresh'), 3, 4, array( 'target' => $iframe_name ) );
+	$fieldset_title .= ' '.get_manual_link('post-attachments-fieldset').' - '.action_icon( T_('Refresh'), 'refresh', $admin_url.'?ctrl=links&amp;action=edit_links&amp;link_type='.$LinkOwner->type.'&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;link_object_ID='.$LinkOwner->get_ID(), T_('Refresh'), 3, 4, array( 'target' => $iframe_name ) );
 
 	if( $current_User->check_perm( 'files', 'view', false, $Blog->ID )
 		&& $LinkOwner->check_perm( 'edit', false ) )

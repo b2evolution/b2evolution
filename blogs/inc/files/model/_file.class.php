@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _file.class.php 7537 2014-10-28 08:33:05Z yura $
  *
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -1129,12 +1129,12 @@ class File extends DataObject
 
 			if( $image_desc == '#' )
 			{
-				$image_desc = $this->dget('desc');
+				$image_desc = $this->dget( 'desc' );
 			}
 			if( !empty( $image_desc ) && !is_null( $before_image_legend ) )
 			{
 				$r .= $before_image_legend
-							.$image_desc		// If this needs to be changed, please document.
+							.nl2br( $image_desc ) // If this needs to be changed, please document.
 							.$after_image_legend;
 			}
 			$r .= $after_image;
@@ -2022,7 +2022,10 @@ class File extends DataObject
 				{	// The thumb IS already in cache! :)
 					// Let's point directly into the cache:
 					global $Settings;
-					$url = $this->_FileRoot->ads_url.dirname( $this->_rdfp_rel_path ).'/'.$Settings->get( 'evocache_foldername' ).'/'.$this->_name.'/'.$this->get_thumb_name( $size_name, $size_x ).'?mtime='.$this->get_lastmod_ts();
+					// Get the relative dirpath of this file to use in the url
+					$rdfp_dirname = dirname( $this->_rdfp_rel_path );
+					$rdfp_dirpath = ( $rdfp_dirname == '.' ) ? '' : $rdfp_dirname.'/';
+					$url = $this->_FileRoot->ads_url.$rdfp_dirpath.$Settings->get( 'evocache_foldername' ).'/'.$this->_name.'/'.$this->get_thumb_name( $size_name, $size_x ).'?mtime='.$this->get_lastmod_ts();
 					$url = str_replace( '\/', '', $url ); // Fix incorrect path
 					return $url;
 				}

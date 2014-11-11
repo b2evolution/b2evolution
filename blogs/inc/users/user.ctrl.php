@@ -754,7 +754,6 @@ if( $display_mode != 'js')
 	{
 		case 'profile':
 			$AdminUI->breadcrumbpath_add( T_('Profile'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
-			require_css( $rsc_url.'css/jquery/smoothness/jquery-ui.css' );
 			init_userfields_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
 			break;
 		case 'avatar':
@@ -777,15 +776,15 @@ if( $display_mode != 'js')
 			break;
 		case 'admin':
 			$AdminUI->breadcrumbpath_add( T_('Admin'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
-			load_funcs('tools/model/_email.funcs.php');
-			load_funcs('sessions/model/_hitlog.funcs.php');
+			load_funcs( 'tools/model/_email.funcs.php' );
+			load_funcs( 'sessions/model/_hitlog.funcs.php' );
 			break;
 		case 'sessions':
 			$AdminUI->breadcrumbpath_add( T_('Sessions'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 			break;
 		case 'activity':
 			$AdminUI->breadcrumbpath_add( $current_User->ID == $edited_User->ID ? T_('My Activity') : T_('User Activity'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
-			require_css( $rsc_url.'css/blog_base.css' ); // Default styles for the blog navigation
+			require_css( 'blog_base.css' ); // Default styles for the blog navigation
 			break;
 	}
 

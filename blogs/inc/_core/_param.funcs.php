@@ -38,7 +38,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _param.funcs.php 7396 2014-10-09 05:13:50Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -813,13 +813,16 @@ function check_is_login( $login )
 
 
 /**
- * @param string param name
- * @param string
+ * Check that a given param is a valid URL
+ *
+ * @param string name of the param that contains the URL to check
+ * @param string Context ("posting", "commenting", "download_src", "http-https")
+ * @param string Error message under field OR NULL to use default mesage
  * @return boolean true if OK
  */
 function param_check_url( $var, $context, $field_err_msg = NULL )
 {
-  /**
+	/**
 	 * @var User
 	 */
 	global $current_User;
@@ -2274,16 +2277,7 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 
 	if( $use_balanceTags )
 	{ // Auto close open tags:
-		if( strpos( $content, '<code' ) !== false || strpos( $content, '<pre' ) !== false || strpos( $content, '```' ) !== false )
-		{ // Call balance_tags() on everything outside code/pre:
-			$content = callback_on_non_matching_blocks( $content,
-					'~(<(code|pre)[^>]*>.*?</\2>|```.*?```)~is',
-					'balance_tags' );
-		}
-		else
-		{ // No code/pre blocks, call balance_tags() on the whole content
-			$content = balance_tags( $content );
-		}
+		$content = balance_tags( $content );
 	}
 
 	if( $xhtmlvalidation )

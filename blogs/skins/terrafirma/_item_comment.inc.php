@@ -57,7 +57,7 @@ $Comment = & $params['Comment'];
 							'nofollow'	=> true,
 						) );
 				}
-				$Comment->author( '', '', '', '#', 'htmlbody', true );
+				$Comment->author( '', '', '', '#', 'htmlbody', true, 'preferredname' );
 				$Comment->msgform_link( $Blog->get('msgformurl') );
 				break;
 
@@ -68,7 +68,7 @@ $Comment = & $params['Comment'];
 						'text' 	    => T_('Trackback: '),
 						'nofollow'	=> true,
 					) );
-				$Comment->author( '', '#', '', '#', 'htmlbody', true );
+				$Comment->author( '', '#', '', '#', 'htmlbody', true, 'preferredname' );
 				break;
 
 			case 'pingback': // Display a pingback:
@@ -78,7 +78,7 @@ $Comment = & $params['Comment'];
 						'text' 	    => T_('Pingback: '),
 						'nofollow'	=> true,
 					) );
-				$Comment->author( '', '#', '', '#', 'htmlbody', true );
+				$Comment->author( '', '#', '', '#', 'htmlbody', true, 'preferredname' );
 				break;
 		}
 	?>

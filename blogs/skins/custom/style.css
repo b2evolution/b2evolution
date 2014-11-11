@@ -28,8 +28,7 @@ a:hover {
 	text-decoration: underline;
 }
 
-div.pageHeader h1 a,
-div.pageHeader h1 a:visited {  /* IE6 */
+div.pageHeader h1 a {
 	color: #fff;
 	text-decoration: none;
 }

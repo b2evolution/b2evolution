@@ -3,7 +3,7 @@
 /*
  * http.php
  *
- * @(#) $Header$
+ * @(#) $Header: /home/mlemos/cvsroot/http/http.php,v 1.76 2008/03/18 07:59:05 mlemos Exp $
  *
  */
 
@@ -20,7 +20,7 @@ class http_class {
     var $socks_version = '5';
     var $protocol = "http";
     var $request_method = "GET";
-    var $user_agent = 'httpclient (http://www.phpclasses.org/httpclient $Revision$)';
+    var $user_agent = 'httpclient (http://www.phpclasses.org/httpclient $Revision: 1.76 $)';
     var $authentication_mechanism = "";
     var $user;
     var $password;

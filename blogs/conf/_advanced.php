@@ -7,7 +7,7 @@
  *
  * @package conf
  *
- * @version $Id$
+ * @version $Id: _advanced.php 7585 2014-11-06 12:18:40Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -109,6 +109,7 @@ $thumbnail_sizes = array(
 			'crop-48x48' => array( 'crop', 48, 48, 85 ),
 			'crop-32x32' => array( 'crop', 32, 32, 85 ),
 			'crop-15x15' => array( 'crop', 15, 15, 85 ),
+			'crop-top-160x160' => array( 'crop-top', 160, 160, 85 ),
 			'crop-top-80x80' => array( 'crop-top', 80, 80, 85 ),
 			'crop-top-64x64' => array( 'crop-top', 64, 64, 85 ),
 			'crop-top-48x48' => array( 'crop-top', 48, 48, 85 ),
@@ -806,14 +807,21 @@ $sendmail_additional_params = '-r $return-address$';
  * The first string is the production (minified URL), the second is the development URL (optional).
  */
 $library_cdn_urls = array(
-		'#jquery#' => array( '//code.jquery.com/jquery-1.7.1.min.js', '//code.jquery.com/jquery-1.7.1.js' ),
-		'#jqueryUI#' => array( '//code.jquery.com/ui/1.8.18/jquery-ui.min.js', '//code.jquery.com/ui/1.8.18/jquery-ui.js' ),
+		'#jquery#' => array( '//code.jquery.com/jquery-1.11.1.min.js', '//code.jquery.com/jquery-1.11.1.js' ),
+		//'#jqueryUI#' => array( '//code.jquery.com/ui/1.10.4/jquery-ui.min.js', '//code.jquery.com/ui/1.10.4/jquery-ui.js' ),
+		//'#jqueryUI_css#' => array( '//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.min.css', '//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css' ),
 		'#bootstrap#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js', '//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.js' ),
 		'#bootstrap_css#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css', '//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.css' ),
 		'#bootstrap_theme_css#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css', '//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.css' ),
+		// The following are other possible public shared CDNs we are aware of
+		// but it is not clear whether or not they are:
+		// - Future proof (will they continue to serve old versions of the library in the future?)
+		// - Secure (who guarantees the code is genuine?)
 		//'#bootstrap_typeahead#' => array( '//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.10.1/typeahead.bundle.min.js', '//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.10.1/typeahead.bundle.js' ),
 		//'#scrollto#' => array( '//cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/1.4.2/jquery.scrollTo.min.js' ),
 		//'#touchswipe#' => array( '//cdn.jsdelivr.net/jquery.touchswipe/1.6.5/jquery.touchSwipe.min.js', '//cdn.jsdelivr.net/jquery.touchswipe/1.6.5/jquery.touchSwipe.js' ),
+		//'#mediaelement#' => array( '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/js/mediaelement-and-player.min.js', '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/js/mediaelement-and-player.js' ),
+		//'#mediaelement_css#' => array( '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.min.css', '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.css' ),
 	);
 
 /**
@@ -824,13 +832,19 @@ $library_cdn_urls = array(
  */
 $library_local_urls = array(
 		'#jquery#' => array( 'jquery.min.js', 'jquery.js' ),
-		'#jqueryUI#' => array( 'jquery/jquery.ui.all.min.js', 'jquery/jquery.ui.all.js' ),
+		'#jqueryUI#' => array( 'jquery/jquery.ui.b2evo.min.js', 'jquery/jquery.ui.b2evo.js' ),
+		'#jqueryUI_css#' => array( 'jquery/smoothness/jquery-ui.b2evo.min.css', 'jquery/smoothness/jquery-ui.b2evo.css' ),
+# Uncomment the following lines if your plugins need more jQueryUI features than the ones loaded by b2evo:
+#		'#jqueryUI#' => array( 'jquery/jquery.ui.all.min.js', 'jquery/jquery.ui.all.js' ),
+#		'#jqueryUI_css#' => array( 'jquery/smoothness/jquery-ui.css' ),
 		'#bootstrap#' => array( 'bootstrap/bootstrap.min.js', 'bootstrap/bootstrap.js' ),
 		'#bootstrap_css#' => array( 'bootstrap/bootstrap.min.css', 'bootstrap/bootstrap.css' ),
 		'#bootstrap_theme_css#' => array( 'bootstrap/bootstrap-theme.min.css', 'bootstrap/bootstrap-theme.css' ),
 		'#bootstrap_typeahead#' => array( 'bootstrap/typeahead.bundle.min.js', 'bootstrap/typeahead.bundle.js' ),
-		'#scrollto#' => array( 'jquery/jquery.scrollto.js' ),
+		'#scrollto#' => array( 'jquery/jquery.scrollto.min.js', 'jquery/jquery.scrollto.js' ),
 		'#touchswipe#' => array( 'jquery/jquery.touchswipe.min.js', 'jquery/jquery.touchswipe.js' ),
+		'#mediaelement#' => array( 'mediaelement/mediaelement-and-player.min.js', 'mediaelement/mediaelement-and-player.js' ),
+		'#mediaelement_css#' => array( 'mediaelement/mediaelementplayer.min.css', 'mediaelement/mediaelementplayer.css' ),
 	);
 
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
@@ -841,4 +855,7 @@ $evonetsrv_uri = '/evonetsrv/xmlrpc.php';
 $antispamsrv_host = 'antispam.b2evo.net';
 $antispamsrv_port = 80;
 $antispamsrv_uri = '/evonetsrv/xmlrpc.php';
+
+// This is for plugins to add CS files to the TinyMCE editor window:
+$tinymce_content_css = array();
 ?>

@@ -573,13 +573,26 @@ switch( $action )
 				<label for="create_sample_contents"><?php echo T_('Also install sample blogs &amp; sample contents. The sample posts explain several features of b2evolution. This is highly recommended for new users.')?></label>
 				<br />
 				<?php
-					// Pre-check if current installation is local
-					$is_local = php_sapi_name() != 'cli' && // NOT php CLI mode
-						( $_SERVER['SERVER_ADDR'] == '127.0.0.1' ||
-							$_SERVER['SERVER_ADDR'] == '::1' || // IPv6 address of 127.0.0.1
-							$basehost == 'localhost' ||
-							$_SERVER['REMOTE_ADDR'] == '127.0.0.1' ||
-							$_SERVER['REMOTE_ADDR'] == '::1' );
+						// Pre-check if current installation is local
+						$is_local = php_sapi_name() != 'cli' && // NOT php CLI mode
+							( $basehost == 'localhost' ||
+								( isset( $_SERVER['SERVER_ADDR'] ) && (
+									$_SERVER['SERVER_ADDR'] == '127.0.0.1' ||
+									$_SERVER['SERVER_ADDR'] == '::1' ) // IPv6 address of 127.0.0.1
+								) ||
+								( isset( $_SERVER['REMOTE_ADDR'] ) && (
+									$_SERVER['REMOTE_ADDR'] == '127.0.0.1' ||
+									$_SERVER['REMOTE_ADDR'] == '::1' )
+								) ||
+								( isset( $_SERVER['HTTP_HOST'] ) && (
+									$_SERVER['HTTP_HOST'] == '127.0.0.1' ||
+									$_SERVER['HTTP_HOST'] == '::1' )
+								) ||
+								( isset( $_SERVER['SERVER_NAME'] ) && (
+									$_SERVER['SERVER_NAME'] == '127.0.0.1' ||
+									$_SERVER['SERVER_NAME'] == '::1' )
+								)
+							);
 				?>
 				<input type="checkbox" name="local_installation" id="local_installation" value="1"<?php echo $is_local ? ' checked="checked"' : ''; ?> />
 				<label for="local_installation"><?php echo T_('This is a local / test / intranet installation.')?></label>
@@ -902,27 +915,8 @@ switch( $action )
 
 		load_funcs('_core/model/db/_upgrade.funcs.php');
 
-		echo '<h2>'.T_('Upgrading all tables in b2evolution MySQL database to UTF-8...').'</h2>';
-		evo_flush();
-
-		// Load db schema to be able to check the original charset definition
-		load_db_schema();
-
-		$db_tables = $DB->get_col( 'SHOW TABLES FROM `'.$db_config['name'].'` LIKE "'.$tableprefix.'%"' );
-		foreach( $db_tables as $table )
-		{ // Convert all tables charset to utf8
-			echo "Converting $table...";
-			evo_flush();
-			convert_table_to_utf8( $table );
-			echo " OK<br />\n";
-		}
-
-		echo "Changing default charset of DB...<br />\n";
-		evo_flush();
-		$DB->query( 'ALTER DATABASE `'.$db_config['name'].'` CHARACTER SET utf8 COLLATE utf8_general_ci' );
-
+		db_upgrade_to_utf8( true );
 		?>
-		<p><?php echo T_('Upgrading done!')?></p>
 		<p><a href="index.php?locale=<?php echo $default_locale ?>">&laquo; <?php echo T_('Back to install menu') ?></a></p>
 		<?php
 		break;

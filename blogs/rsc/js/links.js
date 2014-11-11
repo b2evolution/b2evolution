@@ -20,7 +20,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author attila: Attila Simo
  *
- * @version $Id$
+ * @version $Id: $
  */
 
 function evo_display_position_onchange( selectInput, url, crumb )

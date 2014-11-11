@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _template.funcs.php 7233 2014-08-08 10:25:22Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -840,16 +840,19 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
  * Get library url of JS or CSS file by file name or alias
  *
  * @param string File or Alias name
- * @param boolean|string Is the file's path relative to the base path/url?
+ * @param boolean|string 'relative' or true (relative to <base>) or 'rsc_url' (relative to $rsc_url) or 'blog' (relative to current blog URL -- may be subdomain or custom domain)
  * @param string File type: 'js' or 'css'
  * @return string URL
+ * @param string version number to append at the end of requested url to avoid getting an old version from the cache
  */
-function get_require_url( $lib_file, $relative_to = 'rsc_url', $type = 'js' )
+function get_require_url( $lib_file, $relative_to = 'rsc_url', $type = 'js', $version = '#' )
 {
 	global $library_local_urls, $library_cdn_urls, $debug, $rsc_url;
+	global $Blog, $baseurl, $assets_baseurl;
 
+	// Check if we have a public CDN we want to use for this library file:
 	if( ! empty( $library_cdn_urls[ $lib_file ] ) )
-	{ // Rewrite local urls with CDN urls if they are defined in _advanced.php
+	{ // Rewrite local urls with public CDN urls if they are defined in _advanced.php
 		$library_local_urls[ $lib_file ] = $library_cdn_urls[ $lib_file ];
 	}
 
@@ -865,7 +868,7 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $type = 'js' )
 		}
 
 		if( $relative_to === 'relative' || $relative_to === true )
-		{ // Aliases cannot be relative, make it relative to $rsc_url
+		{ // Aliases cannot be relative to <base>, make it relative to $rsc_url
 			$relative_to = 'rsc_url';
 		}
 	}
@@ -875,28 +878,33 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $type = 'js' )
 		$lib_url = $lib_file;
 	}
 	elseif( preg_match('~^(https?:)?//~', $lib_file ) )
-	{ // It's an absolute url, keep it as is:
+	{ // It's already an absolute url, keep it as is:
 		$lib_url = $lib_file;
 	}
-	elseif( $relative_to === 'rsc_url' || $relative_to === false )
-	{ // Get the file from $rsc_url:
-		$lib_url = $rsc_url.$type.'/'.$lib_file;
-	}
-	elseif( $relative_to === 'blog' )
-	{ // Get the file from $rsc_url:
-		global $Blog;
-		if( !empty( $Blog ) )
-		{
-			$lib_url = $Blog->get_local_rsc_url().$type.'/'.$lib_file;
+	elseif( $relative_to === 'blog' && !empty($Blog))
+	{ // Get the file from $rsc_uri relative to the current blog's domain (may be a subdomain or a custom domain):
+		if( $assets_baseurl !== $baseurl )
+		{ // We are using a specific domain, don't try to load from blog specific domain
+			$lib_url = $rsc_url.$type.'/'.$lib_file;
 		}
 		else
 		{
-			$lib_url = $rsc_url.$type.'/'.$lib_file;
+			$lib_url = $Blog->get_local_rsc_url().$type.'/'.$lib_file;
 		}
 	}
 	else
-	{
-		debug_die( 'Unknown $relative to argument in get_require_url()' );
+	{ // Get the file from $rsc_url:
+		$lib_url = $rsc_url.$type.'/'.$lib_file;
+	}
+
+	if( ! empty( $version ) )
+	{ // Be sure to get a fresh copy of this CSS file after application upgrades:
+		if( $version == '#' )
+		{
+			global $app_version_long;
+			$version = $app_version_long;
+		}
+		$lib_url = url_add_param( $lib_url, 'v='.$version );
 	}
 
 	return $lib_url;
@@ -910,13 +918,13 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $type = 'js' )
  * If 'jquery' is used and $debug is set to true, the 'jquery_debug' is automatically swapped in.
  * Any javascript added to the page is also added to the $required_js array, which is then checked to prevent adding the same code twice
  *
- * @todo dh>merge with require_css()
  * @param string alias, url or filename (relative to rsc/js) for javascript file
  * @param boolean|string Is the file's path relative to the base path/url?
+ * @param boolean TRUE to add attribute "async" to load javascript asynchronously
+ * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
  */
-function require_js( $js_file, $relative_to = 'rsc_url' )
+function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output = false )
 {
-	global $app_version_long;
 	static $required_js;
 
 	if( is_admin_page() && ( $relative_to == 'blog' ) )
@@ -924,23 +932,41 @@ function require_js( $js_file, $relative_to = 'rsc_url' )
 		$relative_to = 'rsc_url';
 	}
 
-	if( in_array( $js_file, array( '#jqueryUI#', 'communication.js' ) ) )
+	if( in_array( $js_file, array( '#jqueryUI#', 'communication.js', 'functions.js' ) ) )
 	{ // Dependency : ensure jQuery is loaded
-		require_js( '#jquery#', $relative_to );
+		require_js( '#jquery#', $relative_to, $async, $output );
 	}
 
 	// Get library url of JS file by alias name
 	$js_url = get_require_url( $js_file, $relative_to, 'js' );
 
-	// Be sure to get a fresh copy of this JS file after application upgrades:
-	$js_url = url_add_param( $js_url, 'v='.$app_version_long );
-
 	// Add to headlines, if not done already:
 	if( empty( $required_js ) || ! in_array( strtolower( $js_url ), $required_js ) )
 	{
 		$required_js[] = strtolower( $js_url );
-		add_headline( '<script type="text/javascript" src="'.$js_url.'"></script>' );
+
+		$script_tag = '<script type="text/javascript"';
+		$script_tag .= $async ? ' async' : '';
+		$script_tag .= ' src="'.$js_url.'">';
+		$script_tag .= '</script>';
+
+		if( $output )
+		{ // Print script tag right here
+			echo $script_tag;
+		}
+		else
+		{ // Add script tag to <head>
+			add_headline( $script_tag );
+		}
 	}
+
+	/* Yura: Don't require this plugin when it is already concatenated in jquery.bundle.js
+	 * But we should don't forget it for CDN jQuery file and when js code uses deprecated things of jQuery
+	if( $js_file == '#jquery#' )
+	{ // Dependency : The plugin restores deprecated features and behaviors so that older code will still run properly on jQuery 1.9 and later
+		require_js( '#jquery_migrate#', $relative_to, $async, $output );
+	}
+	 */
 }
 
 
@@ -951,42 +977,48 @@ function require_js( $js_file, $relative_to = 'rsc_url' )
  * Accepts absolute urls, filenames relative to the rsc/css directory.
  * Set $relative_to_base to TRUE to prevent this function from adding on the rsc_path
  *
- * @todo dh>merge with require_js()
  * @param string alias, url or filename (relative to rsc/css) for CSS file
  * @param boolean|string Is the file's path relative to the base path/url?
  * @param string title.  The title for the link tag
  * @param string media.  ie, 'print'
  * @param string version number to append at the end of requested url to avoid getting an old version from the cache
+ * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
  */
-function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media = NULL, $version = '#' )
+function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media = NULL, $version = '#', $output = false )
 {
-	global $app_version_long;
 	static $required_css;
 
-	// Get library url of CSS file by alias name
-	$css_url = get_require_url( $css_file, $relative_to, 'css' );
-
-	if( ! empty( $version ) )
-	{ // Be sure to get a fresh copy of this CSS file after application upgrades:
-		if( $version == '#' )
-		{
-			$version = $app_version_long;
-		}
-		$css_url = url_add_param( $css_url, 'v='.$version );
+	// WHich subfolder do we want to use?
+	if( preg_match( '/\.(bundle|bmin)\.css$/', $css_file ) )
+	{
+		$subfolder = 'build';
+	}
+	else
+	{
+		$subfolder = 'css';
 	}
 
+	// Get library url of CSS file by alias name
+	$css_url = get_require_url( $css_file, $relative_to, $subfolder, $version );
+
 	// Add to headlines, if not done already:
-	// fp> TODO: check for url without version to avoid duplicate load due to lack of verison in @import statements
 	if( empty( $required_css ) || ! in_array( strtolower( $css_url ), $required_css ) )
 	{
 		$required_css[] = strtolower( $css_url );
 
-		$start_link_tag = '<link rel="stylesheet"';
-		$start_link_tag .= empty( $title ) ? '' : ' title="'.$title.'"';
-		$start_link_tag .= empty( $media ) ? '' : ' media="'.$media.'"';
-		$start_link_tag .= ' type="text/css" href="';
-		$end_link_tag = '" />';
-		add_headline( $start_link_tag.$css_url.$end_link_tag );
+		$stylesheet_tag = '<link type="text/css" rel="stylesheet"';
+		$stylesheet_tag .= empty( $title ) ? '' : ' title="'.$title.'"';
+		$stylesheet_tag .= empty( $media ) ? '' : ' media="'.$media.'"';
+		$stylesheet_tag .= ' href="'.$css_url.'" />';
+
+		if( $output )
+		{ // Print stylesheet tag right here
+			echo $stylesheet_tag;
+		}
+		else
+		{ // Add stylesheet tag to <head>
+			add_headline( $stylesheet_tag );
+		}
 	}
 }
 
@@ -1044,47 +1076,33 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 			case 'colorbox':
 				// Colorbox: a lightweight Lightbox alternative -- allows zooming on images and slideshows in groups of images
 				// Added by fplanque - (MIT License) - http://colorpowered.com/colorbox/
-				require_js( '#jqueryUI#', $relative_to );
-				require_js( 'voting.js', $relative_to );
-				require_js( '#touchswipe#', $relative_to );
-				require_js( 'colorbox/jquery.colorbox-min.js', $relative_to );
-				require_css( 'colorbox/colorbox.css', $relative_to );
+
+				// Initialize js variable b2evo_colorbox_params that is used in async loaded colorbox file
 				if( is_logged_in() )
-				{	// If user is logged in - display a voting panel
+				{ // If user is logged in - display a voting panel
+					global $b2evo_icons_type;
 					$colorbox_params = ',
-								displayVoting: true,
-								votingUrl: "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=link&'.url_crumb( 'voting' ).'",
-								minWidth: 345';
+						displayVoting: true,
+						votingUrl: "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=link&b2evo_icons_type='.$b2evo_icons_type.'&'.url_crumb( 'voting' ).'",
+						minWidth: 345';
 				}
 				else
-				{	// Set minimum width
+				{ // Set minimum width
 					$colorbox_params = ',
-								minWidth: 255';
+						minWidth: 255';
 				}
-				add_js_headline('jQuery( document ).ready( function()
-						{
-							jQuery( "a[rel^=\'lightbox\']" ).colorbox(
-							{
-								maxWidth: "95%",
-								maxHeight: "90%",
-								slideshow: true,
-								slideshowAuto: false'.
-								$colorbox_params.'
-							} );
+				add_js_headline( 'var b2evo_colorbox_params = {
+						maxWidth: "95%",
+						maxHeight: "90%",
+						slideshow: true,
+						slideshowAuto: false'.
+						$colorbox_params.'
+					}' );
+				// TODO: translation strings for colorbox buttons
 
-							jQuery( "#colorbox" ).swipe(
-							{
-								swipeLeft: function( event, direction, distance, duration, fingerCount )
-								{
-									jQuery.colorbox.next();
-								},
-								swipeRight: function( event, direction, distance, duration, fingerCount )
-								{
-									jQuery.colorbox.prev();
-								},
-							} );
-						} );' );
-				// TODO: translation strings
+				require_js( '#jquery#', $relative_to );
+				require_js( 'build/colorbox.bmin.js', $relative_to, true );
+				require_css( 'colorbox/colorbox.css', $relative_to );
 				break;
 		}
 		// add to list of loaded helpers
@@ -1223,20 +1241,20 @@ function init_bubbletip_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 		return;
 	}
 
+	require_js( '#jquery#', $relative_to );
+
 	switch( $library )
 	{
 		case 'popover':
 			// Use popover library of bootstrap
-			require_js( '#jquery#', $relative_to );
-			require_js( 'bootstrap/usernames.min.js', $relative_to );
+			require_js( 'build/popover.bmin.js', $relative_to, true );
 			break;
 
 		case 'bubbletip':
 		default:
 			// Use bubbletip plugin of jQuery
-			require_js( '#jquery#', $relative_to ); // dependency
 			require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
-			require_js( 'bubbletip.js', $relative_to );
+			require_js( 'build/bubbletip.bmin.js', $relative_to, true );
 			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
 			break;
 	}
@@ -1251,20 +1269,22 @@ function init_bubbletip_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
  */
 function init_userfields_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 {
+	// Load to autocomplete user fields with list type
+	require_js( '#jqueryUI#', $relative_to );
+	require_css( '#jqueryUI_css#', $relative_to );
+
 	switch( $library )
 	{
 		case 'popover':
 			// Use popover library of bootstrap
-			require_js( '#jquery#', $relative_to );
-			require_js( 'bootstrap/userfields.min.js', $relative_to );
+			require_js( 'build/popover.bmin.js', $relative_to, true );
 			break;
 
 		case 'bubbletip':
 		default:
 			// Use bubbletip plugin of jQuery
-			require_js( '#jquery#', $relative_to ); // dependency
 			require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
-			require_js( 'userfields.js', $relative_to );
+			require_js( 'build/bubbletip.bmin.js', $relative_to, true );
 			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
 			break;
 	}
@@ -1279,20 +1299,20 @@ function init_userfields_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
  */
 function init_plugins_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 {
+	require_js( '#jquery#', $relative_to );
+
 	switch( $library )
 	{
 		case 'popover':
 			// Use popover library of bootstrap
-			require_js( '#jquery#', $relative_to );
-			require_js( 'bootstrap/plugins.min.js', $relative_to );
+			require_js( 'build/popover.bmin.js', $relative_to, true );
 			break;
 
 		case 'bubbletip':
 		default:
 			// Use bubbletip plugin of jQuery
-			require_js( '#jquery#', $relative_to ); // dependency
 			require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
-			require_js( 'plugins.js', $relative_to );
+			require_js( 'build/bubbletip.bmin.js', $relative_to, true );
 			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
 			break;
 	}
@@ -1304,12 +1324,11 @@ function init_plugins_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
  */
 function init_datepicker_js( $relative_to = 'rsc_url' )
 {
-	require_js( '#jquery#', $relative_to );
 	require_js( '#jqueryUI#', $relative_to );
+	require_css( '#jqueryUI_css#', $relative_to );
 
 	$datefmt = locale_datefmt();
 	$datefmt = str_replace( array( 'd', 'j', 'm', 'Y' ), array( 'dd', 'd', 'mm', 'yy' ), $datefmt );
-	require_css( 'jquery/smoothness/jquery-ui.css' );
 	add_js_headline( 'jQuery(document).ready( function(){
 		var monthNames = ["'.T_('January').'","'.T_('February').'", "'.T_('March').'",
 						  "'.T_('April').'", "'.T_('May').'", "'.T_('June').'",
@@ -1330,18 +1349,6 @@ function init_datepicker_js( $relative_to = 'rsc_url' )
 			firstDay: '.locale_startofweek().'
 		})
 	})' );
-}
-
-
-/**
- * Registers headlines for initialization of scroll wide
- * JS plugin to horizontal scroll "div.wide_scroll" by yellow right/left panel arrows
- * You can create such div elements by TinyMCE toolbar by selecting "wide_scroll" style
- */
-function init_scrollwide_js( $relative_to = 'rsc_url' )
-{
-	require_js( '#jquery#', $relative_to ); // dependency
-	require_js( 'jquery/jquery.scrollwide.min.js', $relative_to );
 }
 
 
@@ -1371,7 +1378,7 @@ function init_results_js( $relative_to = 'rsc_url' )
  */
 function init_voting_comment_js( $relative_to = 'rsc_url' )
 {
-	global $Blog;
+	global $Blog, $b2evo_icons_type;
 
 	if( empty( $Blog ) || ! is_logged_in( false ) || ! $Blog->get_setting('allow_rating_comment_helpfulness') )
 	{	// If User is not logged OR Users cannot vote
@@ -1383,7 +1390,7 @@ function init_voting_comment_js( $relative_to = 'rsc_url' )
 	add_js_headline( '
 	jQuery( document ).ready( function()
 	{
-		var comment_voting_url = "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=comment&'.url_crumb( 'voting' ).'";
+		var comment_voting_url = "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=comment&b2evo_icons_type='.$b2evo_icons_type.'&'.url_crumb( 'voting' ).'";
 		jQuery( "span[id^=vote_helpful_]" ).each( function()
 		{
 			init_voting_bar( jQuery( this ), comment_voting_url, jQuery( this ).find( "#votingID" ).val(), false );
@@ -1414,73 +1421,10 @@ function init_colorpicker_js( $relative_to = 'rsc_url' )
 	}
 	init_bubbletip_js( $relative_to, $tooltip_plugin );
 
-	switch( $tooltip_plugin )
-	{
-		case 'popover':
-			// Use popover library of bootstrap
-			$init_tooltip_js = '
-			jQuery( this ).popover( {
-					trigger: "manual",
-					placement: "right",
-					html: true,
-					content: jQuery( "#" + colorpicker_ID ),
-				} );
-			jQuery( this ).focus( function()
-			{
-				var popover_obj = jQuery( this ).parent().find( ".popover" );
-				if( popover_obj.length == 0 )
-				{ // Initialize popover only first time
-					jQuery( "#" + colorpicker_ID ).show();
-					jQuery( this ).popover( "show" );
-				}
-				else
-				{ // Show popover
-					popover_obj.show();
-				}
-			} ).blur( function()
-			{
-				var popover_obj = jQuery( this ).parent().find( ".popover" );
-				if( popover_obj.length > 0 )
-				{ // Hide popover
-					popover_obj.hide();
-				}
-			} );';
-			// Hide each colopicker on load
-			$init_colorpicker_css = ' style=\"display:none\"';
-			break;
-
-		case 'bubbletip':
-		default:
-			// Use bubbletip plugin of jQuery
-			$init_tooltip_js = '
-			jQuery( this ).bubbletip( jQuery( "#" + colorpicker_ID ), {
-					bindShow: "focus",
-					bindHide: "blur",
-					calculateOnShow: true,
-					deltaDirection: "right",
-					deltaShift: 0,
-				} );';
-			$init_colorpicker_css = '';
-			break;
-	}
-
 	// Initialize farbastic colorpicker
 	require_js( '#jquery#', $relative_to );
 	require_js( 'jquery/jquery.farbtastic.min.js', $relative_to );
 	require_css( 'jquery/farbtastic/farbtastic.css', $relative_to );
-	add_js_headline( 'jQuery(document).ready( function()
-	{
-		var colorpicker_num = 1;
-		jQuery( ".form_color_input" ).each( function ()
-		{
-			var colorpicker_ID = "farbtastic_colorpicker_" + colorpicker_num;
-			jQuery( "body" ).append( "<div id=\"" + colorpicker_ID + "\"'.$init_colorpicker_css.'></div>" );
-			var farbtastic_colorpicker = jQuery.farbtastic( "#" + colorpicker_ID );
-			farbtastic_colorpicker.linkTo( this );
-			'.$init_tooltip_js.'
-			colorpicker_num++;
-		} );
-	} );' );
 }
 
 
@@ -2310,7 +2254,7 @@ function display_login_form( $params )
 	if( $params[ 'transmit_hashed_password' ] )
 	{ // Hash the password onsubmit and clear the original pwd field
 		// TODO: dh> it would be nice to disable the clicked/used submit button. That's how it has been when the submit was attached to the submit button(s)
-		echo 'addEvent( document.getElementById("login_form"), "submit", function(){'.
+		echo 'jQuery( "#login_form" ).bind( "submit", function(){'.
 				/* this.value = '.TS_('Please wait...').' */
 				'var form = document.getElementById("login_form");'.
 
@@ -2325,7 +2269,7 @@ function display_login_form( $params )
 					// (paddings to make it look like encryption on screen. When the string changes to just one more or one less *, it looks like the browser is changing the password on the fly)
 				'}
 				return true;
-			}, false );';
+			} );';
 	}
 	echo '</script>';
 }

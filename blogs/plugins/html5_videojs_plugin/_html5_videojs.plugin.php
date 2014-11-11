@@ -9,7 +9,7 @@
  * @author fplanque: Francois PLANQUE.
  *
  * @package plugins
- * @version $Id$
+ * @version $Id: _html5_videojs.plugin.php 198 2011-11-05 21:34:08Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class html5_videojs_plugin extends Plugin
 {
-	var $code = 'b2evH5V';
+	var $code = 'b2evH5VJSP';
 	var $name = 'HTML 5 VideoJS Player';
 	var $priority = 80;
 	var $version = '5.0.0';

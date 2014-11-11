@@ -119,6 +119,12 @@ table.grouped tr.even:hover,
 table.grouped tr.odd:hover {
 	background-color:#ccc;
 }
+table.grouped.nohover tr.even:hover {
+	background-color:#eee;
+}
+table.grouped.nohover tr.odd:hover {
+	background-color:#ddd;
+}
 
 /* Table headers/footers: */
 table.grouped th,

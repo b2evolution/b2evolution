@@ -120,14 +120,17 @@ class videoplug_plugin extends Plugin
 
 		echo '<div class="edit_toolbar" id="video_toolbar">';
 		echo T_('Video').': ';
-		echo '<input type="button" id="video_youtube" title="'.T_('Insert Youtube video').'" class="quicktags" onclick="videotag(\'youtube\');" value="YouTube" />';
-		echo '<input type="button" id="video_google" title="'.T_('Insert Google video').'" class="quicktags" onclick="videotag(\'google\');" value="Google video" />';
-		echo '<input type="button" id="video_dailymotion" title="'.T_('Insert DailyMotion video').'" class="quicktags" onclick="videotag(\'dailymotion\');" value="DailyMotion" />';
-		echo '<input type="button" id="video_livevideo" title="'.T_('Insert LiveVideo video').'" class="quicktags" onclick="videotag(\'livevideo\');" value="LiveVideo" />';
-		echo '<input type="button" id="video_ifilm" title="'.T_('Insert iFilm video').'" class="quicktags" onclick="videotag(\'ifilm\');" value="iFilm" />';
-		echo '<input type="button" id="video_vimeo" title="'.T_('Insert vimeo video').'" class="quicktags" onclick="videotag(\'vimeo\');" value="vimeo" />';
+		echo '<input type="button" id="video_youtube" title="'.T_('Insert Youtube video').'" class="quicktags" data-func="videotag|youtube" value="YouTube" />';
+		echo '<input type="button" id="video_google" title="'.T_('Insert Google video').'" class="quicktags" data-func="videotag|google" value="Google video" />';
+		echo '<input type="button" id="video_dailymotion" title="'.T_('Insert DailyMotion video').'" class="quicktags" data-func="videotag|dailymotion" value="DailyMotion" />';
+		echo '<input type="button" id="video_livevideo" title="'.T_('Insert LiveVideo video').'" class="quicktags" data-func="videotag|livevideo" value="LiveVideo" />';
+		echo '<input type="button" id="video_ifilm" title="'.T_('Insert iFilm video').'" class="quicktags" data-func="videotag|ifilm" value="iFilm" />';
+		echo '<input type="button" id="video_vimeo" title="'.T_('Insert vimeo video').'" class="quicktags" data-func="videotag|vimeo" value="vimeo" />';
 
 		echo '</div>';
+
+		// Load js to work with textarea
+		require_js( 'functions.js', 'blog', true, true );
 
 		?>
 		<script type="text/javascript">
@@ -191,15 +194,6 @@ class videoplug_plugin extends Plugin
 		<?php
 
 		return true;
-	}
-
-
-	/**
-	 * @see Plugin::SkinBeginHtmlHead()
-	 */
-	function SkinBeginHtmlHead()
-	{
-		require_js( 'functions.js', 'blog' );
 	}
 }
 

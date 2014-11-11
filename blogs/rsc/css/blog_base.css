@@ -623,27 +623,6 @@ div.item_location {
 	text-align: center
 }
 
-/* jQuery Wide Scroll plugin */
-div.wide_scroll {
-	overflow: auto;
-	display: block;
-}
-.wscontrol {
-	border: 1px solid #999;
-	background: #FFFFCC url(jquery/scrollwide/images/arrows.png) repeat-y 5px 10px;
-	text-align: center;
-	cursor: pointer;
-}
-.wscontrol:hover, .wscontrol.wsover {
-	background-color: #FFFF00;
-}
-.wscontrol.wsclick {
-	background-color: #FFFF00;
-}
-.wscontrol.wsleft {
-	background-position: -12px 10px;
-}
-
 /* jQuery Tokeninput plugin */
 #ffield_item_tags ul.token-input-list-facebook {
 	width: 100%;
@@ -723,7 +702,6 @@ div.wide_scroll {
 	-moz-transform: rotate(45deg);
 	-o-transform: rotate(45deg);
 	-ms-transform: rotate(45deg);
-	filter: progid:DXImageTransform.Microsoft.Matrix(sizingMethod='auto expand', M11=0.7071067811865476, M12=-0.7071067811865475, M21=0.7071067811865475, M22=0.7071067811865476); /* IE6,IE7 */
 	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(SizingMethod='auto expand', M11=0.7071067811865476, M12=-0.7071067811865475, M21=0.7071067811865475, M22=0.7071067811865476)"; /* IE8 */
 }
 

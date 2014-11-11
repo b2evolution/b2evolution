@@ -285,8 +285,11 @@ class markdown_plugin extends Plugin
 			$links_enabled = $this->get_coll_setting( 'links', $Blog );
 			$images_enabled = $this->get_coll_setting( 'images', $Blog );
 		}
-		?>
 
+		// Load js to work with textarea
+		require_js( 'functions.js', 'blog', true, true );
+
+		?>
 		<script type="text/javascript">
 		//<![CDATA[
 		var markdown_btns = new Array();
@@ -319,7 +322,7 @@ class markdown_plugin extends Plugin
 <?php
 	}
 
-	if( $images_enabled )
+	if( $links_enabled )
 	{ // Show this button only when plugin setting "Links" is enabled ?>
 		markdown_btns[markdown_btns.length] = new markdown_btn(
 				'mrkdwn_link', 'link','<?php echo TS_('Link') ?>',
@@ -329,7 +332,7 @@ class markdown_plugin extends Plugin
 <?php
 	}
 
-	if( $links_enabled )
+	if( $images_enabled )
 	{ // Show this button only when plugin setting "Images" is enabled ?>
 		markdown_btns[markdown_btns.length] = new markdown_btn(
 				'mrkdwn_img', 'img','<?php echo TS_('Image') ?>',
@@ -418,17 +421,17 @@ class markdown_plugin extends Plugin
 			if( button.id == 'mrkdwn_img' )
 			{ // Image
 				document.write('<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.title
-						+ '" style="' + button.style + '" class="quicktags" onclick="markdown_insert_lnkimg(b2evoCanvas,\'img\');" value="' + button.text + '" />');
+						+ '" style="' + button.style + '" class="quicktags" data-func="markdown_insert_lnkimg|b2evoCanvas|img" value="' + button.text + '" />');
 			}
 			else if( button.id == 'mrkdwn_link' )
 			{ // Link
 				document.write('<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.title
-						+ '" style="' + button.style + '" class="quicktags" onclick="markdown_insert_lnkimg(b2evoCanvas);" value="' + button.text + '" />');
+						+ '" style="' + button.style + '" class="quicktags" data-func="markdown_insert_lnkimg|b2evoCanvas" value="' + button.text + '" />');
 			}
 			else
 			{ // Normal buttons:
 				document.write('<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.title
-						+ '" style="' + button.style + '" class="quicktags" onclick="markdown_insert_tag(b2evoCanvas, ' + i + ');" value="' + button.text + '"  />');
+						+ '" style="' + button.style + '" class="quicktags" data-func="markdown_insert_tag|b2evoCanvas|'+i+'" value="' + button.text + '" />');
 			}
 		}
 
@@ -492,7 +495,7 @@ class markdown_plugin extends Plugin
 			{
 				markdown_show_btn( markdown_btns[i], i );
 			}
-			document.write( '<input type="button" id="mrkdwn_close" class="quicktags" onclick="markdown_close_all_tags();" title="<?php echo format_to_output( T_('Close all tags'), 'htmlattr' ); ?>" value="X" style="margin-left:8px;" />' );
+			document.write( '<input type="button" id="mrkdwn_close" class="quicktags" data-func="markdown_close_all_tags" title="<?php echo format_to_output( T_('Close all tags'), 'htmlattr' ); ?>" value="X" style="margin-left:8px;" />' );
 			document.write( '</div>' );
 		}
 
@@ -573,15 +576,6 @@ class markdown_plugin extends Plugin
 
 		<?php
 		return true;
-	}
-
-
-	/**
-	 * @see Plugin::SkinBeginHtmlHead()
-	 */
-	function SkinBeginHtmlHead()
-	{
-		require_js( 'functions.js', 'blog' );
 	}
 }
 

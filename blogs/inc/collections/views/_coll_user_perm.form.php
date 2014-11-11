@@ -10,7 +10,7 @@
  *
  * @todo move user rights queries to object (fplanque)
  *
- * @version $Id$
+ * @version $Id: _coll_user_perm.form.php 6894 2014-06-13 09:56:09Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -33,8 +33,8 @@ $permission_to_change_admin = $current_User->check_perm( 'blog_admin', 'edit', f
 
 // Javascript:
 echo '
-<script type="text/javascript">var htsrv_url = "'.$htsrv_url.'";</script>
-<script type="text/javascript" src="'.$rsc_url.'js/collectionperms.js"></script>';
+<script type="text/javascript">var htsrv_url = "'.$htsrv_url.'";</script>';
+require_js( 'collectionperms.js', 'rsc_url', false, true );
 
 $Form = new Form( NULL, 'blogperm_checkchanges', 'post', 'fieldset' );
 

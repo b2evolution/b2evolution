@@ -1,0 +1,21 @@
+/* jQuery Wide Scroll plugin */
+
+div.wide_scroll {
+	overflow: auto;
+	display: block;
+}
+.wscontrol {
+	border: 1px solid #999;
+	background: #FFFFCC url(arrows.png) repeat-y 5px 10px;
+	text-align: center;
+	cursor: pointer;
+}
+.wscontrol:hover, .wscontrol.wsover {
+	background-color: #FFFF00;
+}
+.wscontrol.wsclick {
+	background-color: #FFFF00;
+}
+.wscontrol.wsleft {
+	background-position: -12px 10px;
+}

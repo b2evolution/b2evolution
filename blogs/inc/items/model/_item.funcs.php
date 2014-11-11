@@ -32,7 +32,7 @@
  * @author tswicegood: Travis SWICEGOOD.
  * @author vegarg: Vegar BERG GULDAL.
  *
- * @version $Id$
+ * @version $Id: _item.funcs.php 7582 2014-11-06 11:52:51Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -65,7 +65,7 @@ function init_MainList( $items_nb_limit )
 					) );
 			}
 			elseif( $disp == 'search' )
-			{ // Exclude search from 'sidebar' type posts and from reserved type with ID 5000
+			{ // Exclude 'sidebar' and reserved post types from search
 				global $posttypes_perms;
 				$filter_post_types = isset( $posttypes_perms['sidebar'] ) ? $posttypes_perms['sidebar'] : array();
 				$filter_post_types = array_merge( $filter_post_types, array( 5000 ) );
@@ -1839,7 +1839,7 @@ function echo_autocomplete_tags( $tags = array() )
 	(function($){
 		jQuery(function() {
 			jQuery( '#item_tags' ).tokenInput(
-				'<?php echo $htsrv_url.'async.php?action=get_tags' ?>',
+				'<?php echo $htsrv_url.'anon_async.php?action=get_tags' ?>',
 				{
 					theme: 'facebook',
 					queryParam: 'term',

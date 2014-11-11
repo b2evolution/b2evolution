@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  * @author yabs {@link http://innervisions.org.uk/ }
- * @version $Id$
+ * @version $Id: helper.js 9 2011-10-24 22:32:00Z fplanque $
  */
 
 

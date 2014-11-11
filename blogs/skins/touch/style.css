@@ -214,22 +214,24 @@ h2 {
 	padding: 0;
 }
 
-#headerbar-menu a {
+#headerbar-menu div {
 	display: block;
-	margin: 0;
+	margin: 10px 10px 0 0;
 	padding: 5px 6px;
 	color: #fff;
 	font-size: 60%;
 	text-shadow: #000000 0 0 0;
-	position: absolute;
-	right: 8px;
-	top: 10px;
+	float: right;
 	background-color: rgba(0,0,0,.3);
 	border: 1px solid rgba(0,0,0,.8);
 	border-radius: 4px;
 	-webkit-box-shadow: rgba(255,255,255,.2) 0px 1px 0px, inset rgba(255,255,255,.2) 0px 1px 0px;
 	box-shadow: rgba(255,255,255,.2) 0px 1px 0px, inset rgba(255,255,255,.2) 0px 1px 0px;
 	font-weight: bold;
+	cursor: pointer;
+}
+#headerbar-menu div.profile {
+	padding-bottom: 4px;
 }
 
 #headerbar-menu .open {
@@ -361,25 +363,16 @@ h2 {
 /* @group Tab Menus */
 
 #wptouch-menu {
+	display: none;
 	position: absolute;
 	z-index: 2;
 	top: 45px;
 	-webkit-box-shadow: #333 -6px 6px 6px;
 	box-shadow: #333 -6px 6px 6px;
-	display: none;
 }
 
-#wptouch-menu-inner {
+.wptouch-menu-inner {
 	position: relative;
-}
-
-#wptouch-menu-inner img {
-	float: left;
-	position: relative;
-	bottom: 7px;
-	width: 28px;
-	padding-right: 10px;
-	right: 0;
 }
 
 #tabnav {
@@ -1431,7 +1424,7 @@ form.bComment label, form.bComment div.label {
 #headerbar-title, #headerbar-title a {
 	color: #eeeeee;
 }
-#wptouch-menu-inner a:hover {
+.wptouch-menu-inner a:hover {
 	color: #006bb3;
 }
 #catsmenu-inner a:hover {
@@ -1463,27 +1456,33 @@ color: #000;
 	text-align: center;
 }
 
-fieldset {
+fieldset,
+form.bComment fieldset {
 	border: none;
 }
-fieldset legend {
+fieldset legend,
+form.bComment fieldset legend {
 	color: #000;
 	font-size: 120%;
 }
-fieldset div.label {
+fieldset div.label,
+form.bComment fieldset div.label {
 	float: left;
 	padding-right: 5px;
 	min-width: 50px;
 	padding-top: 4px;
 }
-fieldset div.input {
+fieldset div.input,
+form.bComment fieldset div.input {
 	float: left;
 	margin: 0;
 }
-fieldset.info_full div.label {
+fieldset.info_full div.label,
+form.bComment fieldset.info_full div.label {
 	min-width: 0;
 }
-fieldset div.info {
+fieldset div.info,
+form.bComment fieldset div.info {
 	padding-top: 4px;
 }
 
@@ -1493,7 +1492,7 @@ div.post-actions {
 }
 
 /* Sidebar */
-#mobile_footer li, .powered_by {
+#mobile_footer li, .powered_by, .whitebox, #login_form, #register_form, #lostpass_form, .bComment {
 	background-color: #fff;
 	padding: 10px;
 	margin: 10px;
@@ -1516,7 +1515,7 @@ div.post-actions {
 	list-style: none;
 	background: url(img/arrow.png) no-repeat 0 -2px;
 }
-.powered_by {
+div.powered_by {
 	width: 150px;
 	margin: 0 auto;
 	margin-top: 10px;
@@ -1743,7 +1742,6 @@ fieldset#ffield_g textarea {
 	-moz-transform: rotate(45deg);
 	-o-transform: rotate(45deg);
 	-ms-transform: rotate(45deg);
-	filter: progid:DXImageTransform.Microsoft.Matrix(sizingMethod='auto expand', M11=0.7071067811865476, M12=-0.7071067811865475, M21=0.7071067811865475, M22=0.7071067811865476); /* IE6,IE7 */
 	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(SizingMethod='auto expand', M11=0.7071067811865476, M12=-0.7071067811865475, M21=0.7071067811865475, M22=0.7071067811865476)"; /* IE8 */
 }
 
@@ -1766,4 +1764,8 @@ div.section_requires_javascript p.ajax-loader {
 }
 span.loader_img.loader_ajax_form {
 	background-image: url(../../rsc/img/ajax-loader/aaa.gif);
+}
+
+#login_form #ffield_q span.notes {
+	display: block;
 }

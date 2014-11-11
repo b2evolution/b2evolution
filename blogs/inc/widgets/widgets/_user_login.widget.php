@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _coll_search_form.widget.php 9 2011-10-24 22:32:00Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -188,7 +188,7 @@ class user_login_Widget extends ComponentWidget
 		$transmit_hashed_password = (bool)$Settings->get('js_passwd_hashing') && !(bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
 		if( $transmit_hashed_password )
 		{ // Include JS for client-side password hashing:
-			require_js( 'sha1_md5.js', 'blog' );
+			require_js( 'build/sha1_md5.bmin.js', 'blog' );
 		}
 	}
 

@@ -1,5 +1,9 @@
 /* AstonishMe code plugin styles */
 
+.amc0,.amc1,.amc2,.amc3,.amc4,.amc5,.amc6,.amc7,.amc8,.amc9 {
+	background:url(img/numbers.gif) no-repeat;
+}
+
 .codeblock.amc_long {
 	height:24em;
 	overflow:auto;
@@ -71,6 +75,8 @@ kbd {
 	text-shadow: 0 1px 0 #fff;
 	line-height: 1.4;
 	white-space: nowrap;
+	position: relative;	
+	top: -.1em;
 }
 
 var {

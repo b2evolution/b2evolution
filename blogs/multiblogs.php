@@ -95,14 +95,13 @@ div.image_block img {
 	}
 }' );
 
-// Set this var to TRUE in order to use glyph icons, @see get_icon()
-$use_glyphicons = true;
+// Use glyph icons, @see get_icon()
+$b2evo_icons_type = 'glyphicons';
 
 add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
 
 // Functions to work with AJAX response data
 require_js( '#jquery#', 'rsc_url' );
-require_js( '#jqueryUI#', 'rsc_url' );
 require_js( 'ajax.js', 'rsc_url' );
 // Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
 require_js_helper( 'colorbox' );

@@ -21,7 +21,7 @@
  *
  * @package evocore
  *
- * @version $Id$
+ * @version $Id: anon_async.php 7582 2014-11-06 11:52:51Z yura $
  */
 
 
@@ -381,6 +381,8 @@ switch( $action )
 		param( 'vote_ID', 'string', 0 );
 		param( 'checked', 'integer', 0 );
 		param( 'redirect_to', 'url', '' );
+		// Use the glyph or font-awesome icons if requested by skin
+		param( 'b2evo_icons_type', 'string', '' );
 
 		$Ajaxlog->add( sprintf( 'vote action: %s', $vote_action ), 'note' );
 		$Ajaxlog->add( sprintf( 'vote type: %s', $vote_type ), 'note' );
@@ -528,8 +530,8 @@ switch( $action )
 			echo '[1]';
 		}
 
-		// Use the glyph icons if it is defined by skin
-		param( 'use_glyphicons', 'integer', 0 );
+		// Use the glyph or font-awesome icons if requested by skin
+		param( 'b2evo_icons_type', 'string', '' );
 
 		$Form = new Form();
 		$Form->fieldstart = '#fieldstart#';
@@ -608,8 +610,8 @@ switch( $action )
 	case 'get_userfields_criteria':
 		// Get fieldset for users filter by Specific criteria
 
-		// Use the glyph icons if it is defined by skin
-		param( 'use_glyphicons', 'integer', 0 );
+		// Use the glyph or font-awesome icons if requested by skin
+		param( 'b2evo_icons_type', 'string', '' );
 
 		$Form = new Form();
 		$Form->switch_layout( 'blockspan' );
@@ -724,8 +726,8 @@ switch( $action )
 		if( !empty( $field_info ) )
 		{ // Replace mask text (+) with img tag
 
-			// Use the glyph icons if it is defined by skin
-			param( 'use_glyphicons', 'integer', 0 );
+		// Use the glyph or font-awesome icons if requested by skin
+		param( 'b2evo_icons_type', 'string', '' );
 
 			echo str_replace( '(+)', get_icon( 'add' ), $field_info );
 		}
@@ -922,6 +924,37 @@ switch( $action )
 			}
 		}
 		break;
+
+	case 'get_tags':
+		// Get list of item tags, where $term is part of the tag name (sorted)
+		// To be used for Tag autocompletion
+
+		// Crumb check and permission check are not required because this won't modify anything and it returns public info
+
+		$term = param( 'term', 'string' );
+
+		$tags = $DB->get_results( '
+			SELECT tag_name AS id, tag_name AS title
+			  FROM T_items__tag
+			 WHERE tag_name LIKE '.$DB->quote('%'.$term.'%').'
+			 ORDER BY tag_name', ARRAY_A );
+
+		// Check if current term is not an existing tag
+		$term_is_new_tag = true;
+		foreach( $tags as $tag )
+		{
+			if( $tag['title'] == $term )
+			{ // Current term is an existing tag
+				$term_is_new_tag = false;
+			}
+		}
+		if( $term_is_new_tag )
+		{	// Add current term in the beginning of the tags list
+			array_unshift( $tags, array( 'id' => $term, 'title' => $term ) );
+		}
+
+		echo evo_json_encode( $tags );
+		exit(0);
 
 	default:
 		$Ajaxlog->add( T_('Incorrect action!'), 'error' );

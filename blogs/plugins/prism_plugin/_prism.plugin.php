@@ -30,8 +30,8 @@ class prism_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->short_desc = T_('Display computer code.');
-		$this->long_desc = T_('Display computer code rendered by JavaScript plugin Prism.');
+		$this->short_desc = T_( 'Display computer code.' ).' '.T_( '(Plugin not available in WYSIWYG mode)' );
+		$this->long_desc = T_( 'Display computer code rendered by JavaScript plugin Prism.' ).' '.T_( '(Plugin not available in WYSIWYG mode)' );
 	}
 
 
@@ -242,7 +242,15 @@ class prism_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead()
 	{
-		require_js( 'functions.js', 'blog' );
+		global $Blog;
+
+		if( ! isset( $Blog ) || (
+		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' && 
+		    $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) == 'never' ) )
+		{ // Don't load css/js files when plugin is not enabled
+			return;
+		}
+
 		require_js( $this->get_plugin_url().'/js/prism.min.js', true );
 		require_css( $this->get_plugin_url().'/css/prism.min.css', true );
 	}
@@ -327,19 +335,22 @@ class prism_plugin extends Plugin
 		echo '<div class="edit_toolbar prism_toolbar">';
 		// Codespan buttons:
 		echo T_('Codespan').': ';
-		echo '<input type="button" title="'.T_('Insert Markup codespan').'" onclick="prism_tag(\'markup\',\'span\');" value="'.format_to_output( T_('Markup'), 'htmlattr' ).'" />';
-		echo '<input type="button" title="'.T_('Insert CSS codespan').'" onclick="prism_tag(\'css\',\'span\');" value="'.format_to_output( T_('CSS'), 'htmlattr' ).'" />';
-		echo '<input type="button" title="'.T_('Insert JavaScript codespan').'" onclick="prism_tag(\'javascript\',\'span\');" value="'.format_to_output( T_('JS'), 'htmlattr' ).'" />';
-		echo '<input type="button" title="'.T_('Insert PHP codespan').'" onclick="prism_tag(\'php\',\'span\');" value="'.format_to_output( T_('PHP'), 'htmlattr' ).'" />';
-		echo '<input type="button" title="'.T_('Insert SQL codespan').'" onclick="prism_tag(\'sql\',\'span\');" value="'.format_to_output( T_('SQL'), 'htmlattr' ).'" />';
+		echo '<input type="button" title="'.T_('Insert Markup codespan').'" data-func="prism_tag|markup|span" value="'.format_to_output( T_('Markup'), 'htmlattr' ).'" />';
+		echo '<input type="button" title="'.T_('Insert CSS codespan').'" data-func="prism_tag|css|span" value="'.format_to_output( T_('CSS'), 'htmlattr' ).'" />';
+		echo '<input type="button" title="'.T_('Insert JavaScript codespan').'" data-func="prism_tag|javascript|span" value="'.format_to_output( T_('JS'), 'htmlattr' ).'" />';
+		echo '<input type="button" title="'.T_('Insert PHP codespan').'" data-func="prism_tag|php|span" value="'.format_to_output( T_('PHP'), 'htmlattr' ).'" />';
+		echo '<input type="button" title="'.T_('Insert SQL codespan').'" data-func="prism_tag|sql|span" value="'.format_to_output( T_('SQL'), 'htmlattr' ).'" />';
 		// Codeblock buttons:
 		echo ' '.T_('Codeblock').': ';
-		echo '<input type="button" title="'.T_('Insert Markup codeblock').'" onclick="prism_tag(\'markup\');" value="'.format_to_output( T_('Markup'), 'htmlattr' ).'" />';
-		echo '<input type="button" title="'.T_('Insert CSS codeblock').'" onclick="prism_tag(\'css\');" value="'.format_to_output( T_('CSS'), 'htmlattr' ).'" />';
-		echo '<input type="button" title="'.T_('Insert JavaScript codeblock').'" onclick="prism_tag(\'javascript\');" value="'.format_to_output( T_('JS'), 'htmlattr' ).'" />';
-		echo '<input type="button" title="'.T_('Insert PHP codeblock').'" onclick="prism_tag(\'php\');" value="'.format_to_output( T_('PHP'), 'htmlattr' ).'" />';
-		echo '<input type="button" title="'.T_('Insert SQL codeblock').'" onclick="prism_tag(\'sql\');" value="'.format_to_output( T_('SQL'), 'htmlattr' ).'" />';
+		echo '<input type="button" title="'.T_('Insert Markup codeblock').'" data-func="prism_tag|markup" value="'.format_to_output( T_('Markup'), 'htmlattr' ).'" />';
+		echo '<input type="button" title="'.T_('Insert CSS codeblock').'" data-func="prism_tag|css" value="'.format_to_output( T_('CSS'), 'htmlattr' ).'" />';
+		echo '<input type="button" title="'.T_('Insert JavaScript codeblock').'" data-func="prism_tag|javascript" value="'.format_to_output( T_('JS'), 'htmlattr' ).'" />';
+		echo '<input type="button" title="'.T_('Insert PHP codeblock').'" data-func="prism_tag|php" value="'.format_to_output( T_('PHP'), 'htmlattr' ).'" />';
+		echo '<input type="button" title="'.T_('Insert SQL codeblock').'" data-func="prism_tag|sql" value="'.format_to_output( T_('SQL'), 'htmlattr' ).'" />';
 		echo '</div>';
+
+		// Load js to work with textarea
+		require_js( 'functions.js', 'blog', true, true );
 
 		?>
 		<script type="text/javascript">

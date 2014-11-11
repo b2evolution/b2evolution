@@ -22,36 +22,28 @@ class SecurityChecksTestCase extends EvoUnitTestCase
 	 * These include files that properly initalize the config before doing anything (config proxies), thus making sure no
 	 * hazardous variables can be injected with register_globals = On.
 	 *
-	 * @var array A list of files, relative to $basepath, which do not need a "defined(EVO_MAIN_INIT)" check.
+	 * @var array A list of files which do not need a "defined(EVO_MAIN_INIT)" check.
 	 */
 	var $entry_points = array(
-		'conf/_config.php',						// okay because it is the config. Special case.
-		'cron/cron_exec.php',
-		'cron/getmail.php',
-		'cron/mms.php',
-		'htsrv/async.php',
-		'htsrv/call_plugin.php',
-		'htsrv/comment_post.php',
-		'htsrv/getfile.php',
-		'htsrv/login.php',
-		'htsrv/message_send.php',
-		'htsrv/profile_update.php',
-		'htsrv/register.php',
-		'htsrv/subs_update.php',
-		'htsrv/trackback.php',
-		'htsrv/viewfile.php',
-		'inc/_connect_db.inc.php',		// okay because it starts by loading the config; this is not normalized behaviour though! TODO.
-		'install/index.php',
-		'install/phpinfo.php',
-		'xmlsrv/atom.comments.php',
-		'xmlsrv/atom.php',
-		'xmlsrv/rdf.comments.php',
-		'xmlsrv/rdf.php',
-		'xmlsrv/rss.comments.php',
-		'xmlsrv/rss.php',
-		'xmlsrv/rss2.comments.php',
-		'xmlsrv/rss2.php',
-		'xmlsrv/xmlrpc.php',
+		'~cron/.+\.php~',
+		'~xmlsrv/.+\.php~',
+		'~conf/_config\.php~',				// okay because it is the config. Special case.
+		'~inc/_connect_db\.inc\.php~',		// okay because it starts by loading the config; this is not normalized behaviour though! TODO.
+		'~install/index\.php~',
+		'~install/phpinfo.php~',
+	);
+
+	/**
+	 * A list of files which we should ignore
+	 * @var array
+	 */
+	var $ignore_list = array(
+		'~/.+\.locale\.php~',
+		'~htsrv/.+\.php~',
+		'~conf/_overrides_TEST\.php~',
+		'~install/_version\.php~',
+		'~inc/sessions/views/_stats_useragents\.view\.php~',
+		'~tinymce_plugin/tiny_mce/.+\.php~',
 	);
 
 	/**
@@ -59,20 +51,15 @@ class SecurityChecksTestCase extends EvoUnitTestCase
 	 * @var array
 	 */
 	var $init_files = array(
-		'conf/_admin.php',
-		'conf/_advanced.php',
-		'conf/_application.php',
-		'conf/_basic_config.php',
-		'conf/_config_TEST.php',
-		'conf/_formatting.php',
-		'conf/_icons.php',
-		'conf/_locales.php',
-		'conf/_overrides_TEST.php',
-		'conf/_stats.php',
-		'conf/_upgrade.php',
+		'/_*.init.php',
+		'/_*.install.php',
+		'inc/_init_*.inc.php',
+		'conf/_*.php',
 		'inc/_blog_main.inc.php',
 		'inc/_main.inc.php',
 		'inc/locales/_locale.funcs.php',
+		'inc/sessions/model/_search_engines.php',
+		'inc/widgets/_widgets.funcs.php',
 	);
 
 	function __construct()
@@ -91,9 +78,12 @@ class SecurityChecksTestCase extends EvoUnitTestCase
 
 		$files = $this->get_files_without_symlinks($basepath);
 		$badfiles = array();
+		$badfiles_init = array();
+		$badfiles_main = array();
+
 		foreach( $files as $filename )
 		{
-			if( in_array( substr($filename, strlen($basepath)), $this->entry_points) )
+			if( preg_filter( $this->entry_points, 'whatever', $filename ) || preg_filter( $this->ignore_list, 'whatever', $filename ) )
 			{ // file is an entry point
 				continue;
 			}
@@ -106,30 +96,50 @@ class SecurityChecksTestCase extends EvoUnitTestCase
 				continue;
 			}
 
-			if( in_array( substr($filename, strlen($basepath)), $this->init_files) )
-			{ // file is an init file:
-				if( ! preg_match( '~^<\?php \s* /\* .*? \*/ \s* '.$search_init.'~isx', substr($buffer, $pos_phptag) ) )
-				{
-					$badfiles[] = $filename;
-				}
-			}
-			else
+			$phpfiles['name'][] = $filename;
+			$phpfiles['data'][] = $buffer;
+		}
+
+		$arr_init = array();
+		foreach( $this->init_files as $filters )
+		{
+			$arr_init += preg_grep( '~'.str_replace('\*', '.+', quotemeta($filters)).'~isx', $phpfiles['name'] );
+		}
+		$arr_main = array_diff( $phpfiles['name'], $arr_init );
+
+		foreach( $arr_init as $k=>$filename )
+		{
+			if( ! preg_match( '~'.$search_init.'~isx', $phpfiles['data'][$k] ) )
 			{
-				if( ! preg_match( '~^<\?php \s* /\* .*? \*/ \s* '.$search.'~isx', substr($buffer, $pos_phptag) ) )
-				{
-					$badfiles[] = $filename;
-				}
+				$badfiles_init[] = $filename;
 			}
 		}
 
-		if( ! empty($badfiles) )
+		foreach( $arr_main as $k=>$filename )
 		{
-			echo '<h2>Files which seem to miss the check for defined(EVO_MAIN_INIT/EVO_CONFIG_LOADED)</h2>';
+			if( ! preg_match( '~'.$search.'~isx', $phpfiles['data'][$k] ) )
+			{
+				$badfiles_main[] = $filename;
+			}
+		}
+
+		if( ! empty($badfiles_init) )
+		{
+			echo '<h2>Files which seem to miss the check for defined(EVO_CONFIG_LOADED)</h2>';
 			echo "\n<ul><li>\n";
-			echo implode( "\n</li><li>\n", $badfiles );
+			echo implode( "\n</li><li>\n", $badfiles_init );
 			echo "\n</li></ul>\n";
 		}
-		$this->assertFalse( $badfiles );
+
+		if( ! empty($badfiles_main) )
+		{
+			echo '<h2>Files which seem to miss the check for defined(EVO_MAIN_INIT)</h2>';
+			echo "\n<ul><li>\n";
+			echo implode( "\n</li><li>\n", $badfiles_main );
+			echo "\n</li></ul>\n";
+		}
+
+		$this->assertFalse( $badfiles_init + $badfiles_main );
 	}
 }
 

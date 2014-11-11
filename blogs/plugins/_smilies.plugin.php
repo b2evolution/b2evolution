@@ -243,10 +243,13 @@ XX(      graydead.gif
 
 				$grins .= $this->get_smiley_img_tag( $smiley, array(
 					'class' => 'top',
-					'onclick' => 'textarea_wrap_selection( b2evoCanvas, \''. str_replace("'", "\'", $smiley['code']). '\', \'\', 1 );' ) )
+					'data-func' => 'textarea_wrap_selection|b2evoCanvas|'.str_replace( array( "'", '|' ), array( "\'", '\|' ), $smiley['code'] ).'| |1' ) )
 					.' ';
 			}
 		}
+
+		// Load js to work with textarea
+		require_js( 'functions.js', 'blog', true, true );
 
 		echo '<div class="edit_toolbar" id="smiley_toolbar">'.$grins.'</div>' ;
 
@@ -439,15 +442,6 @@ XX(      graydead.gif
 	function get_smiley( $smiley_parts )
 	{
 		return ( ( isset( $smiley_parts[1] ) && isset( $smiley_parts[2] ) ) ? $smiley_parts[1].'<->'.$smiley_parts[2] : '' );
-	}
-
-
-	/**
-	 * @see Plugin::SkinBeginHtmlHead()
-	 */
-	function SkinBeginHtmlHead()
-	{
-		require_js( 'functions.js', 'blog' );
 	}
 }
 

@@ -1,7 +1,7 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
- * @version $Id$
+ * @version $Id: plugins.js 3901 2013-06-03 13:08:29Z yura $
  */
 
 jQuery( document ).ready(function()

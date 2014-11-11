@@ -63,8 +63,11 @@ class quicktags_plugin extends Plugin
 		{ // let's deactivate quicktags on Lynx, because they don't work there.
 			return false;
 		}
-		?>
 
+		// Load js to work with textarea
+		require_js( 'functions.js', 'blog', true, true );
+
+		?>
 		<script type="text/javascript">
 		//<![CDATA[
 		var b2evoButtons = new Array();
@@ -220,17 +223,17 @@ class quicktags_plugin extends Plugin
 			if( button.id == 'b2evo_img' )
 			{
 				document.write('<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.tit
-						+ '" style="' + button.style + '" class="quicktags" onclick="b2evoInsertImage(b2evoCanvas);" value="' + button.display + '" />');
+						+ '" style="' + button.style + '" class="quicktags" data-func="b2evoInsertImage|b2evoCanvas" value="' + button.display + '" />');
 			}
 			else if( button.id == 'b2evo_link' )
 			{
 				document.write('<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.tit
-						+ '" style="' + button.style + '" class="quicktags" onclick="b2evoInsertLink(b2evoCanvas, ' + i + ');" value="' + button.display + '" />');
+						+ '" style="' + button.style + '" class="quicktags" data-func="b2evoInsertLink|b2evoCanvas|'+i+'" value="' + button.display + '" />');
 			}
 			else
 			{	// Normal buttons:
 				document.write('<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.tit
-						+ '" style="' + button.style + '" class="quicktags" onclick="b2evoInsertTag(b2evoCanvas, ' + i + ');" value="' + button.display + '"  />');
+						+ '" style="' + button.style + '" class="quicktags" data-func="b2evoInsertTag|b2evoCanvas|'+i+'" value="' + button.display + '" />');
 			}
 		}
 
@@ -294,7 +297,7 @@ class quicktags_plugin extends Plugin
 			{
 				b2evoShowButton(b2evoButtons[i], i);
 			}
-			document.write('<input type="button" id="b2evo_close" class="quicktags" onclick="b2evoCloseAllTags();" title="<?php echo format_to_output( T_('Close all tags'), 'htmlattr' ); ?>" value="<?php echo ($simple ? 'close all tags' : 'X') ?>" style="margin-left:8px;" />');
+			document.write('<input type="button" id="b2evo_close" class="quicktags" data-func="b2evoCloseAllTags" title="<?php echo format_to_output( T_('Close all tags'), 'htmlattr' ); ?>" value="<?php echo ($simple ? 'close all tags' : 'X') ?>" style="margin-left:8px;" />');
 			document.write('</div>');
 		}
 
@@ -391,15 +394,6 @@ class quicktags_plugin extends Plugin
 
 		<?php
 		return true;
-	}
-
-
-	/**
-	 * @see Plugin::SkinBeginHtmlHead()
-	 */
-	function SkinBeginHtmlHead()
-	{
-		require_js( 'functions.js', 'blog' );
 	}
 }
 

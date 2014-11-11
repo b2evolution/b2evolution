@@ -58,8 +58,11 @@ class shortcodes_plugin extends Plugin
 		{ // let's deactivate quicktags on Lynx, because they don't work there.
 			return false;
 		}
-		?>
 
+		// Load js to work with textarea
+		require_js( 'functions.js', 'blog', true, true );
+
+		?>
 		<script type="text/javascript">
 		//<![CDATA[
 		var shortcodes_buttons = new Array();
@@ -89,7 +92,7 @@ class shortcodes_plugin extends Plugin
 			{
 				var button = shortcodes_buttons[i];
 				document.write( '<input type="button" id="' + button.id + '" title="' + button.title + '"'
-					+ ( typeof( button.style ) != 'undefined' ? ' style="' + button.style + '"' : '' ) + ' class="shortcodes" onclick="shortcodes_insert_tag(b2evoCanvas, ' + i + ');" value="' + button.text + '" />' );
+					+ ( typeof( button.style ) != 'undefined' ? ' style="' + button.style + '"' : '' ) + ' class="shortcodes" data-func="shortcodes_insert_tag|b2evoCanvas|'+i+'" value="' + button.text + '" />' );
 			}
 			document.write('</div>');
 		}
@@ -120,15 +123,6 @@ class shortcodes_plugin extends Plugin
 
 		<?php
 		return true;
-	}
-
-
-	/**
-	 * @see Plugin::SkinBeginHtmlHead()
-	 */
-	function SkinBeginHtmlHead()
-	{
-		require_js( 'functions.js', 'blog' );
 	}
 }
 

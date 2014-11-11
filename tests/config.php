@@ -53,7 +53,7 @@ require_once EVODIR.'blogs/conf/_config.php';
 
 require_once $inc_path.'_core/_class'.floor(PHP_VERSION).'.funcs.php';
 require_once $inc_path.'_core/_misc.funcs.php';
-
+require_once $inc_path.'locales/_locale.funcs.php';
 
 // Load vars, e.g. $is_cli
 // TODO: this should get done in EvoUnitTestCase::setup (clean state), but needs global massaging.

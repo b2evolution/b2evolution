@@ -232,20 +232,14 @@ class adsense_plugin extends Plugin
 			return false;
 		}
 
+		// Load js to work with textarea
+		require_js( 'functions.js', 'blog', true, true );
+
 		echo '<div class="edit_toolbar">AdSense: ';
-		echo '<input type="button" id="adsense_default" title="'.T_('Insert AdSense block').'" class="quicktags" onclick="textarea_wrap_selection( b2evoCanvas, \'[adsense:]\', \'\', 1 );" value="'.T_('AdSense').'" />';
+		echo '<input type="button" id="adsense_default" title="'.T_('Insert AdSense block').'" class="quicktags" data-func="textarea_wrap_selection|b2evoCanvas|[adsense:]| |1" value="'.T_('AdSense').'" />';
 		echo '</div>';
 
 		return true;
-	}
-
-
-	/**
-	 * @see Plugin::SkinBeginHtmlHead()
-	 */
-	function SkinBeginHtmlHead()
-	{
-		require_js( 'functions.js', 'blog' );
 	}
 }
 

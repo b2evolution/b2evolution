@@ -8,7 +8,7 @@
  * @package skins
  * @subpackage evocamp
  *
- * @version $Id$
+ * @version $Id: _skin.class.php 7069 2014-07-04 08:32:23Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -81,18 +81,7 @@ class evocamp_Skin extends Skin
 		// call parent:
 		parent::display_init();
 
-		// Add CSS:
-		require_css( 'basic_styles.css', 'blog' ); // the REAL basic styles
-		require_css( 'basic.css', 'blog' ); // Basic styles
-		require_css( 'blog_base.css', 'blog' ); // Default styles for the blog navigation
-		require_css( 'item_base.css', 'blog' ); // Default styles for the post CONTENT
 		require_css( 'item.css', 'relative' );
-
-		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
-		if($this->get_setting("colorbox")) 
-		{
-			require_js_helper( 'colorbox', 'blog' );
-		}
 	}
 
 }

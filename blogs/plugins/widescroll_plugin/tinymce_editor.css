@@ -1,0 +1,11 @@
+/* Styles for TinyMCE's iframe/editable area */
+
+div.wide_scroll {
+	border-left: 4px solid #FFFFFF;
+	border-right: 4px solid #FFFFFF;
+	overflow: auto;
+	box-shadow: 4px 0 #FFFF00, -4px 0 #FFFF00;
+	-moz-box-shadow: 4px 0 #FFFF00, -4px 0 #FFFF00;
+	-webkit-shadow: 4px 0 #FFFF00, -4px 0 #FFFF00;
+	margin: 0 4px;
+}

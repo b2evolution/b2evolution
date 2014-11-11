@@ -1,4 +1,17 @@
 <?php
+/**
+ * This is the main/default page template.
+ *
+ * For a quick explanation of b2evo 2.0 skins, please start here:
+ * {@link http://b2evolution.net/man/skin-structure}
+ *
+ * The main page template is used to display the blog when no specific page template is available
+ * to handle the request (based on $disp).
+ *
+ * @package colourise
+ * @subpackage colourise
+ */
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // This is the main template; it may be used to display very different things.
 // Do inits depending on current $disp:
@@ -29,7 +42,7 @@ skin_include( '_body_header.inc.php' );
 			) );
 			// --------------------------------- END OF MESSAGES ---------------------------------
 		?>
-	
+
 		<?php
 			// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
 			request_title( array(
@@ -45,6 +58,7 @@ skin_include( '_body_header.inc.php' );
 		<?php
 		// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
 		skin_include( '$disp$', array(
+				'author_link_text' => 'preferredname',
 			) );
 		// Note: you can customize any of the sub templates included here by
 		// copying the matching php file into your skin directory.
@@ -52,7 +66,7 @@ skin_include( '_body_header.inc.php' );
 		?>
 	</div>
 
-	
+
 		<?php
 		// ------------------------- SIDEBAR INCLUDED HERE --------------------------
 		skin_include( '_sidebar.inc.php' );
@@ -60,10 +74,10 @@ skin_include( '_body_header.inc.php' );
 		// _body_footer.inc.php file into the current skin folder.
 		// ----------------------------- END OF SIDEBAR -----------------------------
 		?>
-	
+
 </div>
 
-<?php 
+<?php
 // ------------------------- BODY FOOTER INCLUDED HERE --------------------------
 skin_include( '_body_footer.inc.php' );
 // Note: You can customize the default BODY footer by copying the

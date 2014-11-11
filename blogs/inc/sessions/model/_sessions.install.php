@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _sessions.install.php 6919 2014-06-18 06:53:52Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -44,13 +44,13 @@ $schema_queries['T_sessions'] = array(
 		'Creating table for active sessions',
 		"CREATE TABLE T_sessions (
 			sess_ID          INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-			sess_key         CHAR(32) COLLATE ascii_bin NULL,
+			sess_key         CHAR(32) COLLATE ascii_general_ci NULL,
 			sess_start_ts    TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			sess_lastseen_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00' COMMENT 'User last logged activation time. Value may be off by up to 60 seconds',
-			sess_ipaddress   VARCHAR(39) COLLATE ascii_bin NOT NULL DEFAULT '',
+			sess_ipaddress   VARCHAR(45) COLLATE ascii_general_ci NOT NULL DEFAULT '',"/* IPv4 mapped IPv6 addresses maximum length is 45 chars: ex. ABCD:ABCD:ABCD:ABCD:ABCD:ABCD:192.168.158.190 */."
 			sess_user_ID     INT(10) DEFAULT NULL,
 			sess_data        MEDIUMBLOB DEFAULT NULL,
-			sess_device      VARCHAR(8) COLLATE ascii_bin NOT NULL DEFAULT '',
+			sess_device      VARCHAR(8) COLLATE ascii_general_ci NOT NULL DEFAULT '',
 			PRIMARY KEY      ( sess_ID ),
 		  KEY sess_user_ID (sess_user_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
@@ -62,8 +62,8 @@ $schema_queries['T_basedomains'] = array(
 		"CREATE TABLE T_basedomains (
 			dom_ID     INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			dom_name   VARCHAR(250) NOT NULL DEFAULT '',
-			dom_status ENUM('unknown','trusted','suspect','blocked') COLLATE ascii_bin NOT NULL DEFAULT 'unknown',
-			dom_type   ENUM('unknown','normal','searcheng','aggregator','email') COLLATE ascii_bin NOT NULL DEFAULT 'unknown',
+			dom_status ENUM('unknown','trusted','suspect','blocked') COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown',
+			dom_type   ENUM('unknown','normal','searcheng','aggregator','email') COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown',
 			PRIMARY KEY     (dom_ID),
 			UNIQUE dom_type_name (dom_type, dom_name)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
@@ -88,18 +88,18 @@ $schema_queries['T_hitlog'] = array(
 			hit_datetime          TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			hit_uri               VARCHAR(250) DEFAULT NULL,
 			hit_disp              VARCHAR(30) DEFAULT NULL,
-			hit_ctrl              VARCHAR(30) COLLATE ascii_bin DEFAULT NULL,
+			hit_ctrl              VARCHAR(30) COLLATE ascii_general_ci DEFAULT NULL,
 			hit_action            VARCHAR(30) DEFAULT NULL,
-			hit_type              ENUM('standard','rss','admin','ajax', 'service') COLLATE ascii_bin DEFAULT 'standard' NOT NULL,
-			hit_referer_type      ENUM('search','special','spam','referer','direct','self') COLLATE ascii_bin NOT NULL,
+			hit_type              ENUM('standard','rss','admin','ajax', 'service') COLLATE ascii_general_ci DEFAULT 'standard' NOT NULL,
+			hit_referer_type      ENUM('search','special','spam','referer','direct','self') COLLATE ascii_general_ci NOT NULL,
 			hit_referer           VARCHAR(250) DEFAULT NULL,
 			hit_referer_dom_ID    INT UNSIGNED DEFAULT NULL,
 			hit_keyphrase_keyp_ID INT UNSIGNED DEFAULT NULL,
 			hit_keyphrase         VARCHAR(255) DEFAULT NULL,
 			hit_serprank          SMALLINT UNSIGNED DEFAULT NULL,
 			hit_coll_ID           INT(10) UNSIGNED NULL DEFAULT NULL,
-			hit_remote_addr       VARCHAR(40) COLLATE ascii_bin DEFAULT NULL,
-			hit_agent_type        ENUM('robot','browser','unknown') COLLATE ascii_bin DEFAULT 'unknown' NOT NULL,
+			hit_remote_addr       VARCHAR(45) COLLATE ascii_general_ci DEFAULT NULL,"/* IPv4 mapped IPv6 addresses maximum length is 45 chars: ex. ABCD:ABCD:ABCD:ABCD:ABCD:ABCD:192.168.158.190 */."
+			hit_agent_type        ENUM('robot','browser','unknown') COLLATE ascii_general_ci DEFAULT 'unknown' NOT NULL,
 			hit_agent_ID          SMALLINT UNSIGNED NULL DEFAULT NULL,
 			hit_response_code     SMALLINT DEFAULT NULL,
 			PRIMARY KEY              ( hit_ID ),
@@ -158,7 +158,7 @@ $schema_queries['T_track__goalcat'] = array(
 	"CREATE TABLE T_track__goalcat (
 		  gcat_ID     int(10) unsigned NOT NULL auto_increment,
 		  gcat_name   varchar(50) default NULL,
-		  gcat_color  char(7) COLLATE ascii_bin default NULL,
+		  gcat_color  char(7) COLLATE ascii_general_ci default NULL,
 		  PRIMARY KEY (gcat_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
 

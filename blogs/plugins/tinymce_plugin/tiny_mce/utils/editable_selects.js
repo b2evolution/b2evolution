@@ -1,5 +1,5 @@
 /**
- * $Id$
+ * $Id: editable_selects.js 829 2012-02-14 07:33:03Z attila $
  *
  * Makes select boxes editable.
  *

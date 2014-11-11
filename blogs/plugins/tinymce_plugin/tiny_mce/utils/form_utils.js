@@ -1,5 +1,5 @@
 /**
- * $Id$
+ * $Id: form_utils.js 829 2012-02-14 07:33:03Z attila $
  *
  * Various form utilitiy functions.
  *

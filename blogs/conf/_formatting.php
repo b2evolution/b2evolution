@@ -36,18 +36,6 @@ $use_balanceTags = 1;
  */
 $use_strict =  false;
 
-
-/**
- * Choose formatting options for comments
- * 'never'   : option will never be used
- * 'opt-in'  : option will be used only if user explicitly asks for it
- * 'opt-out' : option will be used by default, but user can refuse
- * 'always'  : option will always be used
- *
- * @todo fp> remove and let Auto-P handle the comment formatting.
- */
-$comments_use_autobr = 'opt-out';	// automatically change line breaks to <br />
-
 /**
  * Do we want to use XHTML validation for comments?
  *

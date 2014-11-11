@@ -1,7 +1,7 @@
 /**
  * This javascript gets included in debug mode.
  * b2evolution - http://b2evolution.net/
- * @version $Id$
+ * @version $Id: debug.js 2876 2013-01-30 12:47:47Z yura $
  */
 
 

@@ -42,7 +42,6 @@ div.innerwrap /* Main white content zone */
 	-webkit-border-radius: 8px;
 	-khtml-border-radius: 8px;
 	border-radius: 8px;
-	behavior: url(border-radius.htc);
 }
 div.pageHeader /* Title zone */
 {
@@ -201,7 +200,6 @@ div.bTitle {
 	-webkit-border-radius: 6px 6px 0 0;
 	-khtml-border-radius-topleft: 6px; -khtml-border-radius-topright: 6px;
 	border-radius: 6px 6px 0 0;
-	behavior: url(border-radius.htc);
 }
 h3.bTitle {
 	margin: 0 1ex;

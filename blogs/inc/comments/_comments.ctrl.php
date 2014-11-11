@@ -14,7 +14,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _comments.ctrl.php 7281 2014-09-05 12:22:20Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -195,7 +195,7 @@ switch( $tab3 )
 
 $AdminUI->set_path( 'items' );	// Sublevel may be attached below
 
-if( $action == 'edit' )
+if( in_array( $action, array( 'edit', 'elevate', 'update_publish', 'update', 'switch_view' ) ) )
 { // Page with comment edit form
 	// Set an url for manual page
 	$AdminUI->set_page_manual_link( 'editing-comments' );
@@ -574,14 +574,18 @@ switch( $action )
 		$new_Item->set( 'title', T_( 'Elevated from comment' ) );
 		$new_Item->set( 'content', $item_content );
 
-		if( !$new_Item->dbinsert() )
+		if( ! $new_Item->dbinsert() )
 		{
 			$Messages->add( T_( 'Unable to create the new post!' ), 'error' );
 			break;
 		}
 
+		// Deprecate the comment after elevating
 		$edited_Comment->set( 'status', 'deprecated' );
 		$edited_Comment->dbupdate();
+
+		// Move all child comments to new created post
+		move_child_comments_to_item( $edited_Comment->ID, $new_Item->ID );
 
 		header_redirect( url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&action=edit&p='.$new_Item->ID, '&' ) );
 		break;
@@ -668,9 +672,14 @@ switch( $action )
 
 $AdminUI->set_path( 'items', 'comments' );
 
-if( ( $action == 'edit' ) || ( $action == 'update_publish' ) || ( $action == 'update' ) || ( $action == 'elevate' ) )
-{ // load date picker style for _comment.form.php
-	require_css( 'ui.datepicker.css' );
+if( $tab3 == 'fullview' )
+{ // Load jquery UI to animate background color on change comment status and to transfer a comment to recycle bin
+	require_js( '#jqueryUI#' );
+}
+
+if( in_array( $action, array( 'edit', 'update_publish', 'update', 'elevate' ) ) )
+{ // Initialize date picker for _comment.form.php
+	init_datepicker_js();
 }
 
 require_css( 'rsc/css/blog_base.css', true ); // Default styles for the blog navigation

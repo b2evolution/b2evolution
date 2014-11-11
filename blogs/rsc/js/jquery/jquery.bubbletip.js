@@ -13,7 +13,6 @@
 */
 ; (function($) {
 	var bindIndex = 0;
-	var bubbletipZIndex = 1000;
 	$.fn.extend({
 		bubbletip: function(tip, options) {
 			// check to see if the tip is a descendant of 
@@ -59,9 +58,9 @@
 				delta: 0,
 				mouseTop: 0,
 				mouseLeft: 0,
-				bindShow: (_options.bindShow + ' ').replace(/ +/g, '.bubbletip' + _bindIndex),
-				bindHide: (_options.bindHide + ' ').replace(/ +/g, '.bubbletip' + _bindIndex),
-				bindClose: (_options.bindClose + ' ').replace(/ +/g, '.bubbletip' + _bindIndex)
+				bindShow: (_options.bindShow + ' ').replace(/ +/g, '.bubbletip' + _bindIndex + ' '),
+				bindHide: (_options.bindHide + ' ').replace(/ +/g, '.bubbletip' + _bindIndex + ' '),
+				bindClose: (_options.bindClose + ' ').replace(/ +/g, '.bubbletip' + _bindIndex + ' ')
 			};
 			_timeoutAnimate = null;
 			_timeoutRefresh = null;
@@ -226,10 +225,7 @@
 					}
 				}
 				_isHiding = false;
-				_this.css('z-index', bubbletipZIndex+1);
 				_this.css('position', 'relative');
-				_wrapper.css('z-index', bubbletipZIndex);
-				bubbletipZIndex++;
 				_wrapper.show();
 				animation = $.extend(animation, { 'opacity': 1 });
 				_wrapper.animate(animation, _options.animationDuration, _options.animationEasing, function() {

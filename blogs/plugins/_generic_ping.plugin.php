@@ -27,7 +27,7 @@
  *
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id$
+ * @version $Id: _generic_ping.plugin.php 7332 2014-09-29 11:31:08Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -43,7 +43,7 @@ class generic_ping_plugin extends Plugin
 	 * Variables below MUST be overriden by plugin implementations,
 	 * either in the subclass declaration or in the subclass constructor.
 	 */
-	var $code = '';
+	var $code = 'b2evGPing';
 	var $priority = 50;
 	var $version = '5.0.0';
 	var $author = 'The b2evo Group';

@@ -32,7 +32,7 @@
  *
  * @todo Allow applying / re-checking of the known data, not just after an update!
  *
- * @version $Id$
+ * @version $Id: antispam.ctrl.php 6911 2014-06-17 15:35:37Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -520,6 +520,8 @@ if( $display_mode != 'js' )
 			{
 				require_js( 'jquery/jquery.jeditable.js' );
 			}
+			// Load jquery UI to highlight cell on change domain type
+			require_js( '#jqueryUI#' );
 			// Used for edit form
 			$tab_from = 'antispam';
 			break;

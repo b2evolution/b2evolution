@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: items.ctrl.php 7338 2014-09-29 15:20:01Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -671,9 +671,6 @@ switch( $action )
 		// Set object params:
 		$edited_Item->load_from_Request( /* editing? */ ($action == 'create_edit'), /* creating? */ true );
 
-		// Check and clear inline images, to avoid to have placeholders without corresponding attachment
-		$edited_Item->check_and_clear_inline_images();
-
 		$Plugins->trigger_event ( 'AdminBeforeItemEditCreate', array ('Item' => & $edited_Item ) );
 
 		if( !empty( $mass_create ) )
@@ -825,9 +822,6 @@ switch( $action )
 
 		// Set object params:
 		$edited_Item->load_from_Request( false );
-
-		// Check and clear inline images, to avoid to have placeholders without corresponding attachment
-		$edited_Item->check_and_clear_inline_images();
 
 		$Plugins->trigger_event( 'AdminBeforeItemEditUpdate', array( 'Item' => & $edited_Item ) );
 
@@ -1432,14 +1426,14 @@ if( !empty($tab) )
 	{ // Init JS to autcomplete the user logins
 		init_autocomplete_login_js( 'rsc_url' );
 	}
+	if( in_array( $tab, array( 'expert', 'simple' ) ) )
+	{ // Initialize date picker for item edit form
+		init_datepicker_js();
+	}
 }
 
-// Load the date picker style for _item_simple.form.php and _item_expert.form.php
-require_css( 'ui.datepicker.css' );
 // Load the appropriate blog navigation styles (including calendar, comment forms...):
-require_css( $rsc_url.'css/blog_base.css' ); // Default styles for the blog navigation
-// Load jquery ui css for tag autocomplete
-require_css( $rsc_url.'css/jquery/smoothness/jquery-ui.css' );
+require_css( 'blog_base.css' ); // Default styles for the blog navigation
 require_js( 'communication.js' ); // auto requires jQuery
 init_plugins_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
 

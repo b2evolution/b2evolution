@@ -34,7 +34,7 @@ div.email_header {
 div.email_payload {
 	background-color: #fff;
 	border: 1px solid #ddd;
-	margin: 8px 2em;
+	margin: 8px 0;
 	padding: 1px 1em;
 	border-radius: 5px;
 }
@@ -45,7 +45,7 @@ div.email_ugc {
 	padding: 1px 1em;
 }
 div.email_footer {
-	margin: 12px 2em 1em;
+	margin: 12px 0 1em;
 	padding: 0 1em;
 	color: #999;
 	font-size: 78%;
@@ -113,28 +113,26 @@ div.buttons a {
 a.button_green {
 	color: #454;
 	border: 1px solid #4DB120;
-	background: linear-gradient(#77EB30, #50BE23);
-	background: -webkit-linear-gradient(#77EB30, #50BE23);
-	background: -moz-linear-gradient(#77EB30, #50BE23);
+	background: #50BE23 linear-gradient(#77EB30, #50BE23);
+	background: #50BE23 -webkit-linear-gradient(#77EB30, #50BE23);
+	background: #50BE23 -moz-linear-gradient(#77EB30, #50BE23);
 }
 a.button_yellow {
 	color: #554;
 	border: 1px solid #e8b463;
-	background: linear-gradient(#fff5bd, #ffcf09);
-	background: -webkit-linear-gradient(#fff5bd, #ffcf09);
-	background: -moz-linear-gradient(#fff5bd, #ffcf09);
+	background: #ffcf09 linear-gradient(#fff5bd, #ffcf09);
+	background: #ffcf09 -webkit-linear-gradient(#fff5bd, #ffcf09);
+	background: #ffcf09 -moz-linear-gradient(#fff5bd, #ffcf09);
 }
 a.button_gray {
 	color: #555;
 	border: 1px solid #ccc;
-	background: linear-gradient(#f9f9f9, #ebebeb);
-	background: -webkit-linear-gradient(#f9f9f9, #ebebeb);
-	background: -moz-linear-gradient(#f9f9f9, #ebebeb);
+	background: #ebebeb linear-gradient(#f9f9f9, #ebebeb);
+	background: #ebebeb -webkit-linear-gradient(#f9f9f9, #ebebeb);
+	background: #ebebeb -moz-linear-gradient(#f9f9f9, #ebebeb);
 }
 
-@media only screen
-and ( min-device-width: 320px ) 
-and ( max-device-width: 568px ) {
+@media (max-width: 640px) {
 	div.email_header, div.email_payload {
 		margin-left: 4px;
 		margin-right: 4px;
@@ -143,4 +141,8 @@ and ( max-device-width: 568px ) {
 		margin-left: 0;
 		margin-right: 0;
 	}
+}
+
+@-ms-viewport {
+	width: device-width;
 }

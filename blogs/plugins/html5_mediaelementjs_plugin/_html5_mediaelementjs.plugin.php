@@ -9,7 +9,7 @@
  * @author fplanque: Francois PLANQUE.
  *
  * @package plugins
- * @version $Id$
+ * @version $Id: _html5_mediaelementjs.plugin.php 198 2011-11-05 21:34:08Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class html5_mediaelementjs_plugin extends Plugin
 {
-	var $code = 'b2evH5M';
+	var $code = 'b2evH5MP';
 	var $name = 'HTML 5 MediaElement.js Video Player';
 	var $priority = 80;
 	var $version = '5.0.0';
@@ -42,9 +42,11 @@ class html5_mediaelementjs_plugin extends Plugin
 	{
 		global $Blog;
 
-		require_css( $this->get_plugin_url().'rsc/mediaelementplayer.min.css', 'relative' );
+		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
+
+		require_css( '#mediaelement_css#', $relative_to );
 		require_js( '#jquery#', 'blog' );
-		require_js( $this->get_plugin_url().'rsc/mediaelement-and-player.min.js', 'relative' );
+		require_js( '#mediaelement#', $relative_to );
 		$this->require_skin();
 
 		// Set a video size in css style, because option setting cannot sets correct size

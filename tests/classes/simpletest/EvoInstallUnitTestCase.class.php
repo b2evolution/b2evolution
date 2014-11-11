@@ -31,6 +31,8 @@ class EvoInstallUnitTestCase extends EvoDbUnitTestCase
 		'auto_p_plugin',
 		'autolinks_plugin',
 		'calendar_plugin',
+		'flowplayer_plugin',
+	//	'google_maps_plugin', // optional
 		'ping_b2evonet_plugin',
 		'ping_pingomatic_plugin',
 		'quicktags_plugin',
@@ -63,10 +65,7 @@ class EvoInstallUnitTestCase extends EvoDbUnitTestCase
 	{
 		// Test if item types (which get installed for Phoenix-Alpha) are present:
 		// fp> What is this test good for?
-		$this->assertEqual(
-			$this->test_DB->get_var( 'SELECT ptyp_name
-																	FROM T_items__type
-																 ORDER BY ptyp_ID' ), 'Post' );
+		$this->assertEqual( $this->test_DB->get_var( 'SELECT ptyp_name FROM T_items__type ORDER BY ptyp_ID' ), 'Post' );
 
 		// Check if all basic plugins have been installed.
 		$installed_plugins = $this->test_DB->get_col( 'SELECT plug_classname FROM T_plugins ORDER BY plug_classname ASC' );

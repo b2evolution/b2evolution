@@ -88,13 +88,10 @@ elseif( $comments_number > 25 )
 				}
 				if( empty( $cat ) )
 				{ // Excerpt:
-					$Item->excerpt( array(
-						'before' => '<div class="small">',
-						'after'  => '</div>',
-						) );
+					$Item->excerpt();
 				}
 			?></td>
-			<td class="row2 font10"><?php
+			<td class="row2"><?php
 				if( $comments_number == 0 && $Item->comment_status == 'disabled' )
 				{	// The comments are disabled
 					echo T_('n.a.');
@@ -104,7 +101,7 @@ elseif( $comments_number > 25 )
 					echo $comments_number;
 				}
 			?></td>
-			<td class="row3 font11"><?php $Item->author( array( 'link_text' => 'login' ) ); ?></td>
+			<td class="row3"><?php $Item->author( array( 'link_text' => 'login' ) ); ?></td>
 			<td class="row2 font10"><?php
 				if( $latest_Comment = & $Item->get_latest_Comment() )
 				{	// Display info about last comment

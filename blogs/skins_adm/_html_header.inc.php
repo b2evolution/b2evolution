@@ -29,7 +29,7 @@
  * @author fplanque
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
- * @version $Id$
+ * @version $Id: _html_header.inc.php 7509 2014-10-24 07:31:38Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -64,18 +64,14 @@ require_js( 'ajax.js' );	// Functions to work with AJAX response data
 
 	add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
 	init_bubbletip_js(); // Add jQuery bubbletip plugin
-	init_scrollwide_js(); // Add jQuery Wide Scroll JS plugin to horizontal scroll "div.wide_scroll" by yellow right/left panel arrows
 	init_results_js(); // Add functions to work with Results tables
-
-	require_js( '#jqueryUI#' );
-	// asimo> This was permanently removed, because we didn't find any usage of this.
-	// require_css( 'jquery/smoothness/jquery-ui.css' );
 
 	require_js( 'form_extensions.js'); // script allowing to check and uncheck all boxes in forms -- TODO: jQueryfy
 
 	require_js( 'extracats.js' );
 	require_js( 'dynamic_select.js' );
-	require_js( 'admin.js' );
+	require_js( '#jqueryUI#' ); // Need to animate background, e.g. in function evoFadeBg()
+	require_js( 'backoffice.js' );
 
 
 	global $UserSettings;
@@ -219,12 +215,6 @@ JS;
 		add_headline( $initcheckall_script );
 	}}}
 
-
-	// fp> TODO: ideally all this should only be included when the datepicker will be needed
-	// dh> The Datepicker could dynamically load this CSS in document.ready?!
-	// Afwas> Done. Keeping this conversation for reference. The performance may be an issue.
-	// require_css( 'ui.datepicker.css' );
-
 	// Add event to the item title field to update document title and init it (important when switching tabs/blogs):
 	global $js_doc_title_prefix;
 	if( isset($js_doc_title_prefix) )
@@ -240,30 +230,6 @@ JS;
 			jQuery(\'#post_title\').keyup(generateTitle)
 		})' );
 	}
-
-
-	$datefmt = locale_datefmt();
-	$datefmt = str_replace( array( 'd', 'j', 'm', 'Y' ), array( 'dd', 'd', 'mm', 'yy' ), $datefmt );
-	add_js_headline( 'jQuery(function(){
-		var monthNames = ["'.T_('January').'","'.T_('February').'", "'.T_('March').'",
-						  "'.T_('April').'", "'.T_('May').'", "'.T_('June').'",
-						  "'.T_('July').'", "'.T_('August').'", "'.T_('September').'",
-						  "'.T_('October').'", "'.T_('November').'", "'.T_('December').'"];
-
-		var dayNamesMin = ["'.T_('Sun').'", "'.T_('Mon').'", "'.T_('Tue').'",
-						  "'.T_('Wed').'", "'.T_('Thu').'", "'.T_('Fri').'", "'.T_('Sat').'"];
-
-		var docHead = document.getElementsByTagName("head")[0];
-		for (i=0;i<dayNamesMin.length;i++)
-			dayNamesMin[i] = dayNamesMin[i].substr(0, 2)
-
-		jQuery(".form_date_input").datepicker({
-			dateFormat: "'.$datefmt.'",
-			monthNames: monthNames,
-			dayNamesMin: dayNamesMin,
-			firstDay: '.locale_startofweek().'
-		})
-	  })' );
 
 	// CALL PLUGINS NOW:
 	global $Plugins;

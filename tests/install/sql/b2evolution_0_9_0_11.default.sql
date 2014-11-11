@@ -12,7 +12,7 @@ CREATE TABLE {{{EVO_TABLE_PREFIX}}}antispam (
   aspm_source enum('local','reported','central') NOT NULL default 'reported',
   PRIMARY KEY  (aspm_ID),
   UNIQUE KEY aspm_string (aspm_string)
-) TYPE=MyISAM AUTO_INCREMENT=19 ;
+) ENGINE=MyISAM AUTO_INCREMENT=19 ;
 
 #
 # Dumping data for table `{{{EVO_TABLE_PREFIX}}}antispam`
@@ -71,7 +71,7 @@ CREATE TABLE {{{EVO_TABLE_PREFIX}}}blogs (
   blog_UID varchar(20) default NULL,
   PRIMARY KEY  (blog_ID),
   UNIQUE KEY blog_stub (blog_stub)
-) TYPE=MyISAM AUTO_INCREMENT=5 ;
+) ENGINE=MyISAM AUTO_INCREMENT=5 ;
 
 #
 # Dumping data for table `{{{EVO_TABLE_PREFIX}}}blogs`
@@ -98,7 +98,7 @@ CREATE TABLE {{{EVO_TABLE_PREFIX}}}blogusers (
   bloguser_perm_cats tinyint(4) NOT NULL default '0',
   bloguser_perm_properties tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (bloguser_blog_ID,bloguser_user_ID)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 #
 # Dumping data for table `{{{EVO_TABLE_PREFIX}}}blogusers`
@@ -127,7 +127,7 @@ CREATE TABLE {{{EVO_TABLE_PREFIX}}}categories (
   PRIMARY KEY  (cat_ID),
   KEY cat_blog_ID (cat_blog_ID),
   KEY cat_parent_ID (cat_parent_ID)
-) TYPE=MyISAM AUTO_INCREMENT=14 ;
+) ENGINE=MyISAM AUTO_INCREMENT=14 ;
 
 #
 # Dumping data for table `{{{EVO_TABLE_PREFIX}}}categories`
@@ -170,7 +170,7 @@ CREATE TABLE {{{EVO_TABLE_PREFIX}}}comments (
   KEY comment_post_ID (comment_post_ID),
   KEY comment_date (comment_date),
   KEY comment_type (comment_type)
-) TYPE=MyISAM AUTO_INCREMENT=2 ;
+) ENGINE=MyISAM AUTO_INCREMENT=2 ;
 
 #
 # Dumping data for table `{{{EVO_TABLE_PREFIX}}}comments`
@@ -194,7 +194,7 @@ CREATE TABLE {{{EVO_TABLE_PREFIX}}}groups (
   grp_perm_users enum('none','view','edit') NOT NULL default 'none',
   grp_perm_templates tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (grp_ID)
-) TYPE=MyISAM AUTO_INCREMENT=5 ;
+) ENGINE=MyISAM AUTO_INCREMENT=5 ;
 
 #
 # Dumping data for table `{{{EVO_TABLE_PREFIX}}}groups`
@@ -213,7 +213,7 @@ INSERT INTO {{{EVO_TABLE_PREFIX}}}groups VALUES (4, 'Basic Users', 'user', 'none
 
 CREATE TABLE {{{EVO_TABLE_PREFIX}}}hitlog (
   visitID bigint(11) NOT NULL auto_increment,
-  visitTime timestamp(14) NOT NULL,
+  visitTime timestamp NOT NULL,
   visitURL varchar(250) default NULL,
   hit_ignore enum('no','invalid','badchar','blacklist','rss','robot','search') NOT NULL default 'no',
   referingURL varchar(250) default NULL,
@@ -226,7 +226,7 @@ CREATE TABLE {{{EVO_TABLE_PREFIX}}}hitlog (
   KEY baseDomain (baseDomain),
   KEY hit_blog_ID (hit_blog_ID),
   KEY hit_user_agent (hit_user_agent)
-) TYPE=MyISAM AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 
 #
 # Dumping data for table `{{{EVO_TABLE_PREFIX}}}hitlog`
@@ -249,7 +249,7 @@ CREATE TABLE {{{EVO_TABLE_PREFIX}}}locales (
   loc_priority tinyint(4) unsigned NOT NULL default '0',
   loc_enabled tinyint(4) NOT NULL default '1',
   PRIMARY KEY  (loc_locale)
-) TYPE=MyISAM COMMENT='saves available locales';
+) ENGINE=MyISAM COMMENT='saves available locales';
 
 #
 # Dumping data for table `{{{EVO_TABLE_PREFIX}}}locales`
@@ -266,7 +266,7 @@ CREATE TABLE {{{EVO_TABLE_PREFIX}}}postcats (
   postcat_post_ID int(11) NOT NULL default '0',
   postcat_cat_ID int(11) NOT NULL default '0',
   PRIMARY KEY  (postcat_post_ID,postcat_cat_ID)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 #
 # Dumping data for table `{{{EVO_TABLE_PREFIX}}}postcats`
@@ -332,7 +332,7 @@ CREATE TABLE {{{EVO_TABLE_PREFIX}}}posts (
   KEY post_category (post_category),
   KEY post_author (post_author),
   KEY post_status (post_status)
-) TYPE=MyISAM AUTO_INCREMENT=22 ;
+) ENGINE=MyISAM AUTO_INCREMENT=22 ;
 
 #
 # Dumping data for table `{{{EVO_TABLE_PREFIX}}}posts`
@@ -370,7 +370,7 @@ CREATE TABLE {{{EVO_TABLE_PREFIX}}}settings (
   set_name varchar(30) NOT NULL default '',
   set_value varchar(255) default NULL,
   PRIMARY KEY  (set_name)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 #
 # Dumping data for table `{{{EVO_TABLE_PREFIX}}}settings`
@@ -422,7 +422,7 @@ CREATE TABLE {{{EVO_TABLE_PREFIX}}}users (
   PRIMARY KEY  (ID),
   UNIQUE KEY user_login (user_login),
   KEY user_grp_ID (user_grp_ID)
-) TYPE=MyISAM AUTO_INCREMENT=3 ;
+) ENGINE=MyISAM AUTO_INCREMENT=3 ;
 
 #
 # Dumping data for table `{{{EVO_TABLE_PREFIX}}}users`
@@ -430,4 +430,3 @@ CREATE TABLE {{{EVO_TABLE_PREFIX}}}users (
 
 INSERT INTO {{{EVO_TABLE_PREFIX}}}users VALUES (1, 'admin', 'f89eb60b7545bcd1efa63094dee28829', '', '', 'admin', 0, 'postmaster@localhost', '', '127.0.0.1', 'localhost', '', '2005-02-18 20:33:17', 10, '', '', '', 'en-EU', 'login', 1, 1);
 INSERT INTO {{{EVO_TABLE_PREFIX}}}users VALUES (2, 'demouser', 'f89eb60b7545bcd1efa63094dee28829', '', '', 'Mr. Demo', 0, 'postmaster@localhost', '', '127.0.0.1', 'localhost', '', '2005-02-18 20:33:18', 0, '', '', '', 'en-EU', 'login', 1, 4);
-

@@ -176,7 +176,7 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 			'http://läu.de/foo bar',
 			) as $url )
 		{
-			$r = validate_url( $url, 'commenting' );
+			$r = validate_url( $url, 'commenting', false );
 			// True means validation ok
 			$this->assertFalse( $r, $url.' NOT allowed in comments' );
 		}
@@ -194,7 +194,7 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 			'#anchor',
 			) as $url )
 		{
-			$r = validate_url( $url, 'posting' );
+			$r = validate_url( $url, 'posting', false );
 			$this->assertFalse( $r, $url.' NOT allowed in posts' );
 		}
 
@@ -207,11 +207,11 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 			'foobar',
 			) as $url )
 		{
-			$r = validate_url( $url, 'commenting' );
+			$r = validate_url( $url, 'commenting', false );
 			// True means validation rejected
 			$this->assertTrue( $r, $url.' allowed in comments' );
 
-			$r = validate_url( $url, 'posting' );
+			$r = validate_url( $url, 'posting', false );
 			$this->assertTrue( $r, $url.' allowed in posts' );
 		}
 	}
@@ -262,7 +262,7 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( get_base_domain('hostname'), 'hostname' );
 		$this->assertEqual( get_base_domain('http://hostname'), 'hostname' );
 		$this->assertEqual( get_base_domain('www.example.com'), 'example.com' );
-		$this->assertEqual( get_base_domain('www2.example.com'), 'example.com' );
+		$this->assertEqual( get_base_domain('www2.example.com'), 'www2.example.com' );  // We no longer treat www2.ex.com equal to ex.com
 		$this->assertEqual( get_base_domain('subdom.example.com'), 'subdom.example.com' );
 		$this->assertEqual( get_base_domain('https://www.hello.example.com/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
 		$this->assertEqual( get_base_domain('https://www.sub1.hello.example.com/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
@@ -276,12 +276,12 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 
 		// "-" is a valid char:
 		$this->assertEqual( get_base_domain('host-name'), 'host-name' );
-		$this->assertEqual( get_base_domain('www-2.host-name.tld'), 'host-name.tld' );
+		$this->assertEqual( get_base_domain('www-2.host-name.tld'), 'www-2.host-name.tld' );
 
 		// IDN:
 		$this->assertEqual( get_base_domain('käse'), 'käse' );
 		$this->assertEqual( get_base_domain('öl.de'), 'öl.de' );
-		$this->assertEqual( get_base_domain('www-öl.käse-öl.de'), 'käse-öl.de' );
+		$this->assertEqual( get_base_domain('www-öl.käse-öl.de'), 'www-öl.käse-öl.de' );
 		$this->assertEqual( get_base_domain('sub1.sub2.pröhl.de'), 'sub2.pröhl.de' );
 
 		// Numerical, should be kept:
@@ -343,14 +343,14 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->change_global('evo_charset', 'latin1');
 
 		$this->assertEqual( format_to_output('<a href="">link</a>  text', 'text'), 'link text' );
-		$this->assertEqual( format_to_output('<b>éêè</b>', 'htmlbody'), '<b>&#233;&#234;&#232;</b>' );
-		$this->assertEqual( format_to_output('<b>éêè</b>', 'xml'), '&#233;&#234;&#232;' );
+		$this->assertEqual( format_to_output('<b>®µ¥¿-test</b>', 'htmlbody'), '<b>&#174;&#181;&#165;&#191;-test</b>' );
+		$this->assertEqual( format_to_output('<b>®µ¥¿-test</b>', 'xml'), '&#174;&#181;&#165;&#191;-test' );
 		$this->assertEqual( format_to_output( chr(128).'&#128;' ), '&#8364;&#8364;' ); // Euro sign, Windows style
 
 		$this->change_global('evo_charset', 'utf-8');
 		$this->assertEqual( format_to_output('<a href="">link</a>  text', 'text'), 'link text' );
-		$this->assertEqual( format_to_output('<b>Ã©ÃªÃ¨Ã«</b>', 'htmlbody'), '<b>Ã©ÃªÃ¨Ã«</b>' );
-		$this->assertEqual( format_to_output('<b>Ã©ÃªÃ¨Ã«</b>', 'xml'), 'Ã©ÃªÃ¨Ã«' );
+		$this->assertEqual( format_to_output('<b>®µ¥¿-test</b>', 'htmlbody'), '<b>®µ¥¿-test</b>' );
+		$this->assertEqual( format_to_output('<b>®µ¥¿-test</b>', 'xml'), '®µ¥¿-test' );
 
 		$this->assertEqual( format_to_output('2 > &1', 'htmlbody'), '2 > &amp;1' );
 	}

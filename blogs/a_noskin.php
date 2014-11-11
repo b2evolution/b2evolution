@@ -71,17 +71,19 @@ if( $disp == 'front' )
 skin_init( $disp );
 
 // Add CSS:
-require_css( 'basic_styles.css', 'rsc_url' ); // the REAL basic styles
-require_css( 'basic.css', 'rsc_url' ); // Basic styles
-require_css( 'blog_base.css', 'rsc_url' ); // Default styles for the blog navigation
-require_css( 'item_base.css', 'rsc_url' ); // Default styles for the post CONTENT
+// require_css( 'basic_styles.css', 'blog' ); // the REAL basic styles
+// require_css( 'basic.css', 'blog' ); // Basic styles
+// require_css( 'blog_base.css', 'blog' ); // Default styles for the blog navigation
+// require_css( 'item_base.css', 'blog' ); // Default styles for the post CONTENT
+// require_css( 'b2evo_base.bundle.css', 'blog' ); // Concatenation of the above
+require_css( 'b2evo_base.bmin.css', 'blog' ); // Concatenation + Minifaction of the above
+
 require_css( 'fp02.css', 'rsc_url' );
 
 add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
 
 // Functions to work with AJAX response data
 require_js( '#jquery#', 'rsc_url' );
-require_js( '#jqueryUI#', 'rsc_url' );
 require_js( 'ajax.js', 'rsc_url' );
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

@@ -139,15 +139,23 @@ class EvoUnitTestCase extends UnitTestCase
 		}
 		*/
 
-		// A dirty workaround for GeneralSettings::_construct
-		// where it checks $new_db_version against unexisting db_version because b2evo is not installed yet
-		$tmp = $GLOBALS['new_db_version'];
-		$GLOBALS['new_db_version'] = false;
+		// Check if settings table exists then DB is installed
+		$db_is_installed = (boolean) $DB->get_var( 'SHOW TABLES LIKE "T_settings"' );
+
+		if( ! $db_is_installed )
+		{ // A dirty workaround for GeneralSettings::_construct
+			// where it checks $new_db_version against unexisting db_version because b2evo is not installed yet
+			$tmp = $GLOBALS['new_db_version'];
+			$GLOBALS['new_db_version'] = false;
+		}
 
 		$Settings = new GeneralSettings();
 		$UserSettings = new UserSettings();
 
-		$GLOBALS['new_db_version'] = $tmp;
+		if( ! $db_is_installed )
+		{ // Revert $new_db_version to real value after dirty hack above
+			$GLOBALS['new_db_version'] = $tmp;
+		}
 
 		// Reload conf and vars.
 		require EVODIR.'blogs/conf/_config.php';

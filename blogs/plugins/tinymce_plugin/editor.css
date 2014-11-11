@@ -29,3 +29,6 @@ pre {
 	font: 12px/18px "Courier New", monospace;
 }
 
+.nowrap {
+	white-space: nowrap;
+}

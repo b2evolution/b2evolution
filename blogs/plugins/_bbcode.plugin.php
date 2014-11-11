@@ -472,8 +472,11 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 		{	// No buttons for toolbar
 			return false;
 		}
-		?>
 
+		// Load js to work with textarea
+		require_js( 'functions.js', 'blog', true, true );
+
+		?>
 		<script type="text/javascript">
 		//<![CDATA[
 		var bbButtons = new Array();
@@ -508,7 +511,7 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 		function bbGetButton(button, i)
 		{
 			return '<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.tit
-					+ '" style="' + button.style + '" class="quicktags" onclick="bbInsertTag(b2evoCanvas, ' + i + ');" value="' + button.display + '" />';
+					+ '" style="' + button.style + '" class="quicktags" data-func="bbInsertTag|b2evoCanvas|'+i+'" value="' + button.display + '" />';
 		}
 
 		// Memorize a new open tag
@@ -571,7 +574,7 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 			{
 				bbcode_toolbar += bbGetButton( bbButtons[i], i );
 			}
-			bbcode_toolbar += '<input type="button" id="bb_close" class="quicktags" onclick="bbCloseAllTags();" title="<?php echo T_('Close all tags') ?>" value="close all tags" style="margin-left:8px;" />'
+			bbcode_toolbar += '<input type="button" id="bb_close" class="quicktags" data-func="bbCloseAllTags" title="<?php echo T_('Close all tags') ?>" value="close all tags" style="margin-left:8px;" />'
 			bbcode_toolbar += '</div>';
 			jQuery( '#bbcode_toolbar' ).html( bbcode_toolbar );
 		}
@@ -705,15 +708,6 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 		}
 
 		return $search_list;
-	}
-
-
-	/**
-	 * @see Plugin::SkinBeginHtmlHead()
-	 */
-	function SkinBeginHtmlHead()
-	{
-		require_js( 'functions.js', 'blog' );
 	}
 }
 

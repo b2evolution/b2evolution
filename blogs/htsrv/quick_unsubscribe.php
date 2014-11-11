@@ -77,6 +77,12 @@ switch( $type )
 		$UserSettings->dbupdate();
 		break;
 
+	case 'pst_moderation_reminder':
+		// unsubscribe from post moderation reminder notifications
+		$UserSettings->set( 'send_pst_moderation_reminder', '0', $edited_User->ID );
+		$UserSettings->dbupdate();
+		break;
+
 	case 'post_moderator':
 		// unsubscribe from post moderation notifications
 		$UserSettings->set( 'notify_post_moderation', '0', $edited_User->ID );

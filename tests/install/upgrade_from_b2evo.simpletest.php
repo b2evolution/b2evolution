@@ -16,10 +16,12 @@ global $conf_path;
 global $oldtableposts, $oldtableusers, $oldtablesettings, $oldtablecategories, $oldtablecomments;
 global $fileupload_allowedtypes, $fileupload_maxk, $stats_autoprune;
 // for /conf/_upgrade.php:
-global $basepath, $baseurl;
+global $basepath, $baseurl, $current_charset;
 
 require_once $conf_path.'_upgrade.php';
 
+// Force UTF-8 charset for install/upgrade procedures
+$current_charset = 'utf-8';
 
 /**
  * Test upgrading to current scheme
@@ -66,6 +68,7 @@ class UpgradeToCurrentTestCase extends EvoInstallUnitTestCase
 	 */
 	function testUpgradeFrom0_9_0_11()
 	{
+		echo '<h2>Upgrading from v0.9.0.11</h2>';
 		$this->createTablesFor0_9_0_11();
 		$this->assertTrue( upgrade_b2evo_tables(), 'Upgrade from 0.9.0.11 successful!' );
 	}
@@ -76,6 +79,7 @@ class UpgradeToCurrentTestCase extends EvoInstallUnitTestCase
 	 */
 	function testUpgradeFrom1_6()
 	{
+		echo '<hr /><h2>Upgrading from v1.6</h2>';
 		$this->createTablesFor1_6();
 		$this->assertTrue( upgrade_b2evo_tables(), 'Upgrade from 1.6 successful!' );
 	}
@@ -86,6 +90,7 @@ class UpgradeToCurrentTestCase extends EvoInstallUnitTestCase
 	 */
 	function testUpgradeFrom1_6_strict()
 	{
+		echo '<hr /><h2>Upgrading from v1.6 (strict)</h2>';
 		$this->createTablesFor1_6();
 		$this->test_DB->query( 'SET sql_mode = "TRADITIONAL"' );
 		$this->assertTrue( upgrade_b2evo_tables(), 'Upgrade from 1.6 in strict mode successful!' );
@@ -97,6 +102,7 @@ class UpgradeToCurrentTestCase extends EvoInstallUnitTestCase
 	 */
 	function testUpgradeFrom1_8_strict()
 	{
+		echo '<hr /><h2>Upgrading from v1.8</h2>';
 		$this->createTablesFor1_8();
 		$this->test_DB->query( 'SET sql_mode = "TRADITIONAL"' );
 		$this->assertTrue( upgrade_b2evo_tables(), 'Upgrade from 1.8 in strict mode successful!' );
@@ -108,9 +114,46 @@ class UpgradeToCurrentTestCase extends EvoInstallUnitTestCase
 	 */
 	function testUpgradeFrom2_4_strict()
 	{
+		echo '<hr /><h2>Upgrading from v2.4</h2>';
 		$this->executeQueriesFromFile( TESTSDIR.'install/sql/b2evolution_v-2-4.welcome-slugs.sql' );
 		$this->test_DB->query( 'SET sql_mode = "TRADITIONAL"' );
 		$this->assertTrue( upgrade_b2evo_tables(), 'Upgrade from 2.4 in strict mode successful!' );
+	}
+
+
+	/**
+	 * Test upgrade from 3.3 ("strict" MySQL mode)
+	 */
+	function testUpgradeFrom3_3_strict()
+	{
+		echo '<h2>Upgrading from v3.3</h2>';
+		$this->executeQueriesFromFile( TESTSDIR.'install/sql/b2evolution_v3.3.sql' );
+		$this->test_DB->query( 'SET sql_mode = "TRADITIONAL"' );
+		$this->assertTrue( upgrade_b2evo_tables(), 'Upgrade from 3.3 in strict mode successful!' );
+	}
+
+
+	/**
+	 * Test upgrade from 4.0 ("strict" MySQL mode)
+	 */
+	function testUpgradeFrom4_0_strict()
+	{
+		echo '<h2>Upgrading from v4.0</h2>';
+		$this->executeQueriesFromFile( TESTSDIR.'install/sql/b2evolution_v4.0.sql' );
+		$this->test_DB->query( 'SET sql_mode = "TRADITIONAL"' );
+		$this->assertTrue( upgrade_b2evo_tables(), 'Upgrade from 4.0 in strict mode successful!' );
+	}
+
+
+	/**
+	 * Test upgrade from 4.1 ("strict" MySQL mode)
+	 */
+	function testUpgradeFrom4_1_strict()
+	{
+		echo '<h2>Upgrading from v4.1</h2>';
+		$this->executeQueriesFromFile( TESTSDIR.'install/sql/b2evolution_v4.1.sql' );
+		$this->test_DB->query( 'SET sql_mode = "TRADITIONAL"' );
+		$this->assertTrue( upgrade_b2evo_tables(), 'Upgrade from 4.1 in strict mode successful!' );
 	}
 
 }

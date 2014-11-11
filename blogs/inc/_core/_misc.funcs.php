@@ -30,7 +30,7 @@
  *
  * @package evocore
  *
- * @version $Id$
+ * @version $Id: _misc.funcs.php 7578 2014-11-06 10:48:01Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -395,7 +395,7 @@ function excerpt( $str, $maxlen = 200 )
 	$str = format_to_output( $str, 'text' );
 
 	// Ger rid of all new lines and Display the html tags as source text:
-	$str = trim( str_replace( array( "\r", "\n", "\t" ), ' ', $str ) );
+	$str = trim( preg_replace( '#[\r\n\t\s]+#', ' ', $str ) );
 
 	$str = strmaxlen( $str, $maxlen, NULL, 'raw', true );
 
@@ -885,21 +885,22 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
  * @param array|string Search list
  * @param array|string Replace list
  * @param string Source content
+ * @param string Type of callback function: 'preg' -> preg_replace(), 'str' -> str_replace() (@see replace_content())
  * @return string Replaced content
  */
-function replace_content_outcode( $search, $replace, $content, $replace_function_callback = 'replace_content' )
+function replace_content_outcode( $search, $replace, $content, $replace_function_callback = 'replace_content', $replace_function_type = 'preg' )
 {
-	if( !empty( $search ) && !empty( $replace ) )
+	if( !empty( $search ) )
 	{
 		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false )
-		{	// Call replace_content() on everything outside code/pre:
+		{ // Call replace_content() on everything outside code/pre:
 			$content = callback_on_non_matching_blocks( $content,
 				'~<(code|pre)[^>]*>.*?</\1>~is',
-				$replace_function_callback, array( $search, $replace ) );
+				$replace_function_callback, array( $search, $replace, $replace_function_type ) );
 		}
 		else
-		{	// No code/pre blocks, replace on the whole thing
-			$content = call_user_func( $replace_function_callback, $content, $search, $replace );
+		{ // No code/pre blocks, replace on the whole thing
+			$content = call_user_func( $replace_function_callback, $content, $search, $replace, $replace_function_type );
 		}
 	}
 
@@ -2309,7 +2310,7 @@ function pre_dump( $var__var__var__var__ )
 	{
 		$orig_html_errors = ini_set('html_errors', 0); // e.g. xdebug would use fancy html, if this is on; we catch (and use) xdebug explicitly above, but just in case
 
-		echo "\n<pre style=\"padding:1ex;border:1px solid #00f;\">\n";
+		echo "\n<pre style=\"padding:1ex;border:1px solid #00f;overflow:auto\">\n";
 		foreach( func_get_args() as $lvar )
 		{
 			ob_start();
@@ -2788,10 +2789,10 @@ function debug_info( $force = false, $force_clean = false )
 	{	// Display debug jslog once
 		global $rsc_url, $app_version_long;
 
-		echo '<script type="text/javascript" src="'.$rsc_url.'js/debug_jslog.js?v='.$app_version_long.'"></script>';
-		echo '<script type="text/javascript" src="'.$rsc_url.'js/jquery/jquery.cookie.min.js?v='.$app_version_long.'"></script>';
-		$jquery_ui_css_url = url_add_param( $rsc_url.'css/jquery/smoothness/jquery-ui.css', 'v='.$app_version_long );
-		echo '<link href="'.$jquery_ui_css_url.'" type="text/css" rel="stylesheet" />';
+		require_js( '#jqueryUI#', 'rsc_url', false, true );
+		require_css( '#jqueryUI_css#', 'rsc_url', NULL, NULL, '#', true );
+		require_js( 'debug_jslog.js', 'rsc_url', false, true );
+		require_js( 'jquery/jquery.cookie.min.js', 'rsc_url', false, true );
 
 		$jslog_style_cookies = param_cookie( 'jslog_style', 'string' );
 		$jslog_styles = array();
@@ -3025,9 +3026,8 @@ function debug_info( $force = false, $force_clean = false )
 			echo "\n</tbody></table>";
 
 			// add jquery.tablesorter to the "Debug info" table.
-			global $rsc_uri;
+			require_js( 'jquery/jquery.tablesorter.min.js', 'rsc_url', true, true );
 			echo '
-			<script type="text/javascript" src="'.$rsc_uri.'js/jquery/jquery.tablesorter.min.js"></script>
 			<script type="text/javascript">
 			(function($){
 				var clicked_once;
@@ -4029,10 +4029,10 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 		case 'rollover':
 			if( isset( $icon['rollover'] ) )
 			{ // Image has rollover available
-				global $use_glyphicons;
+				global $b2evo_icons_type;
 
-				if( ! empty( $use_glyphicons ) && ! empty( $icon['glyph'] ) )
-				{ // Glyph icons don't have rollover effect
+				if( isset( $b2evo_icons_type ) && ( ! empty( $icon['glyph'] ) || ! empty( $icon['fa'] ) ) )
+				{ // Glyph and font-awesome icons don't have rollover effect
 					return false;
 				}
 				return $icon['rollover'];
@@ -4139,17 +4139,37 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 
 
 		case 'imgtag':
-			global $use_glyphicons;
+			global $b2evo_icons_type;
 
-			if( ! empty( $use_glyphicons ) && ! empty( $icon['glyph'] ) )
+			if( isset( $b2evo_icons_type ) )
+			{ // Specific icons type is defined
+				switch( $b2evo_icons_type )
+				{
+					case 'glyphicons':
+						// Use glyph icons of bootstrap
+						$icon_class_prefix = 'glyphicon glyphicon-';
+						$icon_param_name = 'glyph';
+						$icon_content = '&nbsp;';
+						break;
+
+					case 'fontawesome':
+						// Use the icons from http://fortawesome.github.io/Font-Awesome/icons/
+						$icon_class_prefix = 'fa fa-';
+						$icon_param_name = 'fa';
+						$icon_content = '';
+						break;
+				}
+			}
+
+			if( isset( $icon_class_prefix ) && ! empty( $icon[ $icon_param_name ] ) )
 			{ // Use glyph icon if it is defined in icons config
 				if( isset( $params['class'] ) )
 				{ // Get class from params
-					$params['class'] = 'glyphicon glyphicon-'.$icon['glyph'].' '.$params['class'];
+					$params['class'] = $icon_class_prefix.$icon[ $icon_param_name ].' '.$params['class'];
 				}
 				else
 				{ // Set default class
-					$params['class'] = 'glyphicon glyphicon-'.$icon['glyph'];
+					$params['class'] = $icon_class_prefix.$icon[ $icon_param_name ];
 				}
 
 				if( isset( $icon['color'] ) )
@@ -4173,7 +4193,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 				// Add all the attributes:
 				$params = get_field_attribs_as_string( $params, false );
 
-				$r = '<span'.$params.'>&nbsp;</span>';
+				$r = '<span'.$params.'>'.$icon_content.'</span>';
 			}
 			elseif( ! isset( $icon['file'] ) )
 			{ // Use span tag with sprite instead of img
@@ -5776,33 +5796,40 @@ if ( !function_exists( 'json_encode' ) )
  */
 function evo_json_encode( $a = false )
 {
-	if( is_string($a) )
-	{	// Convert to UTF-8
-		$a = current_charset_to_utf8($a);
+	if( is_string( $a ) )
+	{ // Convert to UTF-8
+		$a = current_charset_to_utf8( $a );
 	}
-	elseif( is_array($a) )
-	{	// Recursively convert to UTF-8
+	elseif( is_array( $a ) )
+	{ // Recursively convert to UTF-8
 		array_walk_recursive( $a, 'current_charset_to_utf8' );
 	}
 
-	return json_encode($a);
+	$result = json_encode( $a );
+	if( $result === false )
+	{ // If json_encode returns FALSE because of some error we should set correct json empty value as '[]' instead of false
+		$result = '[]';
+	}
+
+	return $result;
 }
 
 
 /**
  * A helper function to conditionally convert a string from current charset to UTF-8
  *
- * @param mixed
- * @return mixed
+ * @param string
+ * @return string
  */
-function current_charset_to_utf8( $a )
+function current_charset_to_utf8( & $a )
 {
 	global $current_charset;
 
-	if( is_string($a) && $current_charset != '' && $current_charset != 'utf-8' )
-	{
-		return convert_charset( $a, 'utf-8', $current_charset );
+	if( is_string( $a ) && $current_charset != '' && $current_charset != 'utf-8' )
+	{ // Convert string to utf-8 if it has another charset
+		$a = convert_charset( $a, 'utf-8', $current_charset );
 	}
+
 	return $a;
 }
 
@@ -6284,7 +6311,12 @@ function get_file_permissions_message()
  */
 function evo_flush()
 {
-	@ob_end_flush(); // This function helps to turn off output buffering on PHP 5.4.x
+	$zlib_output_compression = ini_get( 'zlib.output_compression' );
+	if( empty( $zlib_output_compression ) || $zlib_output_compression == 'Off' )
+	{ // This function helps to turn off output buffering
+		// But do NOT use it when zlib.output_compression is ON, because it creates the die errors
+		@ob_end_flush();
+	}
 	flush();
 }
 
@@ -6318,6 +6350,19 @@ function apm_log_custom_metric( $name, $value )
 	}
 }
 
+/**
+ * Log a custom param
+ *
+ * @param mixed $name name of the custom param
+ * @param mixed $value of the custom param
+ */
+function apm_log_custom_param( $name, $value )
+{
+	if(extension_loaded('newrelic'))
+	{	// New Relic is installed on the server for monitoring.
+		newrelic_add_custom_parameter( $name, $value );
+	}
+}
 
 /**
  * Send a cookie (@see setcookie() for more details)

@@ -21,7 +21,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _stats_search_keywords.view.php 7032 2014-07-01 11:20:28Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -37,22 +37,23 @@ global $blog, $admin_url, $rsc_url, $goal_ID, $localtimenow;
 global $datestartinput, $datestart, $datestopinput, $datestop;
 
 if( param_date( 'datestartinput', T_('Invalid date'), false,  NULL ) !== NULL )
-{	// We have a user provided localized date:
-	memorize_param( 'datestart', 'string', NULL, trim(form_date($datestartinput)) );
+{ // We have a user provided localized date:
+	memorize_param( 'datestart', 'string', NULL, trim( form_date( $datestartinput ) ) );
+	memorize_param( 'datestartinput', 'string', NULL, empty( $datestartinput ) ? NULL : date( locale_datefmt(), strtotime( $datestartinput ) ) );
 }
 else
-{	// We may have an automated param transmission date:
+{ // We may have an automated param transmission date:
 	param( 'datestart', 'string', '', true );
 }
 if( param_date( 'datestopinput', T_('Invalid date'), false, NULL ) !== NULL )
-{	// We have a user provided localized date:
-	memorize_param( 'datestop', 'string', NULL, trim(form_date($datestopinput)) );
+{ // We have a user provided localized date:
+	memorize_param( 'datestop', 'string', NULL, trim( form_date( $datestopinput ) ) );
+	memorize_param( 'datestopinput', 'string', NULL, empty( $datestopinput ) ? NULL : date( locale_datefmt(), strtotime( $datestopinput ) ) );
 }
 else
-{	// We may have an automated param transmission date:
+{ // We may have an automated param transmission date:
 	param( 'datestop', 'string', '', true );
 }
-//pre_dump( $datestart, $datestop );
 
 if( $current_User->check_perm( 'stats', 'view' ) )
 {	// Permission to view stats for ALL blogs:

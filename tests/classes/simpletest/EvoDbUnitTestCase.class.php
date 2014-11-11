@@ -9,6 +9,7 @@
  * We use create_tables() in {@link create_current_tables()}.
  */
 require_once $basepath.$install_subdir.'_functions_create.php';
+require_once $basepath.$install_subdir.'_functions_delete.php';
 
 require_once $inc_path.'/_core/model/db/_db.class.php';
 

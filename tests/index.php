@@ -38,7 +38,7 @@ if( empty($action) )
 		<ul>
 		<li><a href="blogs/"><strong>All evoCore tests</strong></a></li>
 		<?php
-		$filenames = get_filenames( dirname(__FILE__).'/blogs', true, false, $flat = true );
+		$filenames = get_filenames( dirname(__FILE__).'/blogs', array('inc_dirs'=>false) );
 		sort($filenames);
 		foreach( $filenames as $filename )
 		{
@@ -57,7 +57,7 @@ if( empty($action) )
 		<ul>
 		<li><a href="install/"><strong>All install tests</strong></a></li>
 		<?php
-		$filenames = get_filenames( dirname(__FILE__).'/install', true, false, $flat = true );
+		$filenames = get_filenames( dirname(__FILE__).'/install', array('inc_dirs'=>false) );
 		sort($filenames);
 		foreach( $filenames as $filename )
 		{
@@ -76,7 +76,7 @@ if( empty($action) )
 		<ul>
 		<li><a href="general/"><strong>All general tests</strong></a></li>
 		<?php
-		$filenames = get_filenames( dirname(__FILE__).'/general', true, false, $flat = true );
+		$filenames = get_filenames( dirname(__FILE__).'/general', array('inc_dirs'=>false) );
 		sort($filenames);
 		foreach( $filenames as $filename )
 		{

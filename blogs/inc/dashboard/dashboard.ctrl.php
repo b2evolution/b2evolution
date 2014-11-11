@@ -17,7 +17,7 @@
  *
  * @todo add 5 plugin hooks. Will be widgetized later (same as SkinTag became Widgets)
  *
- * @version $Id$
+ * @version $Id: dashboard.ctrl.php 7434 2014-10-15 07:18:30Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -41,9 +41,12 @@ $AdminUI->set_coll_list_params( 'blog_ismember', 'view', array(), T_('Global'), 
 
 $AdminUI->set_path( 'dashboard' );
 
+// Load jquery UI to animate background color on change comment status and to transfer a comment to recycle bin
+require_js( '#jqueryUI#' );
+
 require_js( 'communication.js' ); // auto requires jQuery
 // Load the appropriate blog navigation styles (including calendar, comment forms...):
-require_css( $rsc_url.'css/blog_base.css' ); // Default styles for the blog navigation
+require_css( 'blog_base.css' ); // Default styles for the blog navigation
 // Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
 require_js_helper( 'colorbox' );
 
@@ -69,7 +72,7 @@ if( $blog )
 
 	echo '<h2>'.$Blog->dget( 'name' ).'</h2>';
 
-	echo '<table class="browse" cellspacing="0" cellpadding="0" border="0"><tr><td>';
+	echo '<div class="row browse"><div class="col-lg-9 col-xs-12 floatleft">';
 
 	load_class( 'items/model/_itemlist.class.php', 'ItemList' );
 
@@ -446,17 +449,23 @@ if( $blog )
 	/*
 	 * RECENT POSTS awaiting moderation
 	 */
-	// TODO: asimo> Make this configurable per blogs the same way as we have in case of comments
-	echo '<div id="styled_content_block" class="items_container">';
-	$default_moderation_statuses = get_visibility_statuses( 'moderation' );
-	foreach( $default_moderation_statuses as $status )
+	$post_moderation_statuses = explode( ',', $Blog->get_setting( 'post_moderation_statuses' ) );
+	ob_start();
+	foreach( $post_moderation_statuses as $status )
 	{ // go through all statuses
 		if( display_posts_awaiting_moderation( $status, $block_item_Widget ) )
 		{ // a block was dispalyed for this status
 			$nb_blocks_displayed++;
 		}
 	}
-	echo '</div>';
+	$posts_awaiting_moderation_content = ob_get_contents();
+	ob_clean();
+	if( ! empty( $posts_awaiting_moderation_content ) )
+	{
+		echo '<div id="styled_content_block" class="items_container">';
+		echo $posts_awaiting_moderation_content;
+		echo '</div>';
+	}
 
 	/*
 	 * RECENTLY EDITED
@@ -506,7 +515,8 @@ if( $blog )
 			$Item->edit_link( array( // Link to backoffice for editing
 					'before'    => ' ',
 					'after'     => ' ',
-					'class'     => 'ActionButton btn btn-default'
+					'class'     => 'ActionButton btn btn-default',
+					'text'      => get_icon( 'edit_button' ).' '.T_('Edit')
 				) );
 			echo '</div>';
 
@@ -569,13 +579,15 @@ if( $blog )
 	 */
 
 
-	echo '</td><td>';
+	echo '</div><div class="col-lg-3 col-xs-12 floatright">';
 
 	/*
 	 * RIGHT COL
 	 */
 
 	$side_item_Widget = new Widget( 'side_item' );
+
+	echo '<div class="row dashboard_sidebar_panels"><div class="col-lg-12 col-sm-6 col-xs-12">';
 
 	$side_item_Widget->title = T_('Manage your blog');
 	$side_item_Widget->disp_template_replaced( 'block_start' );
@@ -601,11 +613,13 @@ if( $blog )
 			echo '<li><a href="'.$dispatcher.'?ctrl=chapters&blog='.$Blog->ID.'">'.T_('Edit categories').' &raquo;</a></li>';
 		}
 
- 		echo '<li><a href="'.$Blog->get('url').'">'.T_('View this blog').'</a></li>';
+		echo '<li><a href="'.$Blog->get('url').'">'.T_('View this blog').'</a></li>';
 	echo '</ul>';
 	echo '</div>';
 
 	$side_item_Widget->disp_template_raw( 'block_end' );
+
+	echo '</div><div class="col-lg-12 col-sm-6 col-xs-12">';
 
 	if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 	{
@@ -627,13 +641,14 @@ if( $blog )
 		$side_item_Widget->disp_template_raw( 'block_end' );
 	}
 
+	echo '</div></div>';
 
 	/*
 	 * DashboardBlogSide to be added here (anyone?)
 	 */
 
 
- 	echo '</td></tr></table>';
+	echo '</div><div class="clear"></div></div>';
 
 
 	// End payload block:
@@ -672,7 +687,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	// Begin payload block:
 	$AdminUI->disp_payload_begin();
 
-	echo '<table class="browse" cellspacing="0" cellpadding="0" border="0"><tr><td>';
+	echo '<div class="row browse"><div class="col-lg-9 col-xs-12 floatleft">';
 
 	$block_item_Widget = new Widget( 'block_item' );
 
@@ -715,8 +730,6 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 		echo '<p>You will <b>NOT</b> be alerted if you are running an insecure configuration.</p>';
 	}
 
-	echo '</td><td>';
-
 	// Track just the first login into b2evolution to determine how many people installed manually vs automatic installs:
 	if( $current_User->ID == 1 && $UserSettings->get('first_login') == NULL )
 	{
@@ -727,6 +740,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 		$UserSettings->dbupdate();
 	}
 
+	echo '</div><div class="col-lg-3 col-xs-12 floatright">';
 
 	/*
 	 * RIGHT COL
@@ -736,16 +750,22 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	$side_item_Widget->title = T_('System stats');
 	$side_item_Widget->disp_template_replaced( 'block_start' );
 
+	$post_all_counter = intval( get_table_count( 'T_items__item' ) );
+	$post_through_admin = limit_number_by_interval( $global_Cache->get( 'post_through_admin' ), 0, $post_all_counter );
+	$post_through_xmlrpc = limit_number_by_interval( $global_Cache->get( 'post_through_xmlrpc' ), 0, $post_all_counter );
+	$post_through_email = limit_number_by_interval( $global_Cache->get( 'post_through_email' ), 0, $post_all_counter );
+	$post_through_unknown = limit_number_by_interval( ( $post_all_counter - $post_through_admin - $post_through_xmlrpc - $post_through_email ), 0, $post_all_counter );
+
 	echo '<div class="dashboard_sidebar">';
 	echo '<ul>';
 		echo '<li>'.sprintf( T_('%s Users'), get_table_count( 'T_users' ) ).'</li>';
 		echo '<li>'.sprintf( T_('%s Blogs'), get_table_count( 'T_blogs' ) ).'</li>';
-		echo '<li>'.sprintf( T_('%s Posts'), $post_all_counter = (int)get_table_count( 'T_items__item' ) ).'</li>';
+		echo '<li>'.sprintf( T_('%s Posts'), $post_all_counter ).'</li>';
 		echo '<ul>';
-			echo '<li>'.sprintf( T_('%s on web'), $post_through_admin = (int)$global_Cache->get( 'post_through_admin' ) ).'</li>';
-			echo '<li>'.sprintf( T_('%s by XMLRPC'), $post_through_xmlrpc = (int)$global_Cache->get( 'post_through_xmlrpc' ) ).'</li>';
-			echo '<li>'.sprintf( T_('%s by email'), $post_through_email = (int)$global_Cache->get( 'post_through_email' ) ).'</li>';
-			echo '<li>'.sprintf( T_('%s unknown'), $post_all_counter - $post_through_admin - $post_through_xmlrpc - $post_through_email ).'</li>';
+			echo '<li>'.sprintf( T_('%s on web'), $post_through_admin ).'</li>';
+			echo '<li>'.sprintf( T_('%s by XMLRPC'), $post_through_xmlrpc ).'</li>';
+			echo '<li>'.sprintf( T_('%s by email'), $post_through_email ).'</li>';
+			echo '<li>'.sprintf( T_('%s unknown'), $post_through_unknown ).'</li>';
 		echo '</ul>';
 		echo '<li>'.sprintf( T_('%s Slugs'), get_table_count( 'T_slug' ) ).'</li>';
 		echo '<li>'.sprintf( T_('%s Comments'), get_table_count( 'T_comments' ) ).'</li>';
@@ -761,7 +781,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	 * DashboardAdminSide to be added here (anyone?)
 	 */
 
-	echo '</td></tr></table>';
+	echo '</div><div class="clear"></div></div>';
 
 	// End payload block:
 	$AdminUI->disp_payload_end();

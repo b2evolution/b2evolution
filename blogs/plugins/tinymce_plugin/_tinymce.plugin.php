@@ -16,7 +16,7 @@
  * @author fplanque: Francois Planque
  * @author PhiBo: Philipp Seidel (since version 0.6)
  *
- * @version $Id$
+ * @version $Id: _tinymce.plugin.php 7124 2014-07-15 13:05:53Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -324,15 +324,16 @@ class tinymce_plugin extends Plugin
 					jQuery( '#tinymce_plugin_toggle_button' ).attr( 'value', 'HTML' );
 					jQuery( '[name="editor_code"]').attr('value', '<?php echo $this->code; ?>' );
 					// Hide the plugin toolbars that allow to insert html tags
-					jQuery( '.quicktags_toolbar, .code_toolbar, #block_renderer_evo_code, .prism_toolbar, #block_renderer_evo_prism' ).hide();
-					if( jQuery( 'input#renderer_evo_code' ).is( ':checked' ) )
+					jQuery( '.quicktags_toolbar, .code_toolbar, .prism_toolbar' ).hide();
+					jQuery( '#block_renderer_evo_code, #block_renderer_evo_prism' ).addClass( 'disabled' );
+					jQuery( 'input#renderer_evo_code, input#renderer_evo_prism' ).each( function()
 					{
-						jQuery( 'input#renderer_evo_code' ).removeAttr( 'checked' );
-					}
-					if( jQuery( 'input#renderer_evo_prism' ).is( ':checked' ) )
-					{
-						jQuery( 'input#renderer_evo_prism' ).removeAttr( 'checked' );
-					}
+						if( jQuery( this ).is( ':checked' ) )
+						{
+							jQuery( this ).addClass( 'checked' );
+						}
+						jQuery( this ).attr( 'disabled', 'disabled' ).removeAttr( 'checked' );
+					} );
 				}
 				else
 				{ // Hide the editor, Display only source HTML
@@ -342,14 +343,15 @@ class tinymce_plugin extends Plugin
 					jQuery( '[name="editor_code"]' ).attr( 'value', 'html' );
 					// Show the plugin toolbars that allow to insert html tags
 					jQuery( '.quicktags_toolbar, .code_toolbar, #block_renderer_evo_code, .prism_toolbar, #block_renderer_evo_prism' ).show();
-					if( jQuery( 'input#renderer_evo_code' ).is( ':checked' ) )
+					jQuery( '#block_renderer_evo_code, #block_renderer_evo_prism' ).removeClass( 'disabled' );
+					jQuery( 'input#renderer_evo_code, input#renderer_evo_prism' ).each( function()
 					{
-						jQuery( 'input#renderer_evo_code' ).attr( 'checked', 'checked' );
-					}
-					if( jQuery( 'input#renderer_evo_prism' ).is( ':checked' ) )
-					{
-						jQuery( 'input#renderer_evo_prism' ).attr( 'checked', 'checked' );
-					}
+						if( jQuery( this ).hasClass( 'checked' ) )
+						{
+							jQuery( this ).attr( 'checked', 'checked' ).removeClass( 'checked' );
+						}
+						jQuery( this ).removeAttr( 'disabled' );
+					} );
 				}
 				jQuery( '#tinymce_plugin_toggle_button' ).removeAttr( 'disabled' );
 			}
@@ -915,46 +917,31 @@ class tinymce_plugin extends Plugin
 		// TODO: we don't want all of basic.css here
 
 		// Load the appropriate ITEM/POST styles depending on the blog's skin:
-		// dh>This has to be the skins whole CSS to get real WYSIWYG handling.
-		// fp> we are not aiming for perfect wysiwyg (too heavy), just for a relevant look & feel.
-		// dh>We can/should use class_filter to only keep useful classes.
-		// fp> how???
-			$content_css = '';
-			$blog_skin_ID = $Blog->get_skin_ID();
-			if( ! empty( $blog_skin_ID ) )
-			{
-				$SkinCache = & get_SkinCache();
-				/**
-				 * @var Skin
-				 */
-				$Skin = $SkinCache->get_by_ID( $blog_skin_ID );
-				$item_css_url = $skins_url.$Skin->folder.'/item.css';
-				// else: $item_css_url = $rsc_url.'css/item_base.css';
-				$content_css .= ','.$item_css_url;		// fp> TODO: this needs to be a param... "of course" -- if none: else item_default.css ?
-			}
-			// else item_default.css -- is it still possible to have no skin ?
+		// Note: we are not aiming for perfect wysiwyg (too heavy), just for a relevant look & feel.
+		$content_css = '';
+		$blog_skin_ID = $Blog->get_skin_ID();
+		if( ! empty( $blog_skin_ID ) )
+		{
+			$SkinCache = & get_SkinCache();
+			/**
+			 * @var Skin
+			 */
+			$Skin = $SkinCache->get_by_ID( $blog_skin_ID );
+			$item_css_url = $skins_url.$Skin->folder.'/item.css';
+			// else: $item_css_url = $rsc_url.'css/item_base.css';
+			$content_css .= ','.$item_css_url;		// fp> TODO: this needs to be a param... "of course" -- if none: else item_default.css ?
+		}
+		// else item_default.css -- is it still possible to have no skin ?
+
+		// Load the content css files from 3rd party code, e.g. other plugins:
+		global $tinymce_content_css;
+		if( is_array( $tinymce_content_css ) && count( $tinymce_content_css ) )
+		{
+			$content_css .= ','.implode( ',', $tinymce_content_css );
+		}
 
 		$init_options[] = 'content_css : "'.$this->get_plugin_url().'editor.css?v='.( $debug ? $localtimenow : $this->version )
 									.$content_css.'"';
-
-/* fp> the following seems like something that filters classes but the way it's done doesn't make sense to me.
-   fp> the skin should provide a list of classes to include (with a default setting in the default skin class)
-		// Add callback which filters classes from content_css by classname and/or rule
-		// Another option would be to use theme_advanced_styles (http://wiki.moxiecode.com/index.php/TinyMCE:Configuration/theme_advanced_styles)
-		$init_options[] = 'class_filter : function(cls, rule) {
-			var m = rule.match(/^\.bPost (.*)/);
-			if( m ) {
-				return cls;
-			}
-
-			if( cls == "center" || cls == "right" || cls == "left" ) { // TODO: dh> could get translated
-				return cls;
-			}
-
-			// console.log(cls, rule);
-			return false;
-		}';
-*/
 
 		// Generated HTML code options:
 		// do not make the path relative to "document_base_url":

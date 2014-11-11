@@ -10,11 +10,12 @@
  *  - 'charset':  Character set of the locale's messages files.
  */
 $locale_defs['fr-CA'] = array(
-		'name' => NT_('French (CA) latin1'),
+		'name' => NT_('French (CA) utf-8'),
 		'messages' => 'fr_FR',
-		'charset' => 'iso-8859-1',
+		'charset' => 'utf-8',
 		'datefmt' => 'm/d/y',
 		'timefmt' => 'h:i:s a',
 		'startofweek' => 0,
+		'transliteration_map' => array(),
 	);
 ?>

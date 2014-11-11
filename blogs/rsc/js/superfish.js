@@ -1,3 +1,5 @@
+// Deprecated - used for evobar only - will be gone in future version
+
 /* This file is a concatenation of hoverintent.js and superfish.js */
 
 /* 
@@ -151,7 +153,7 @@
 
 		}).each(function() {
 			var menuClasses = [c.menuClass];
-			if (sf.op.dropShadows  && !($.browser.msie && $.browser.version < 7)) menuClasses.push(c.shadowClass);
+			if (sf.op.dropShadows) menuClasses.push(c.shadowClass);
 			$(this).addClass(menuClasses.join(' '));
 		});
 	};
@@ -161,7 +163,7 @@
 	sf.op = {};
 	sf.IE7fix = function(){
 		var o = sf.op;
-		if ($.browser.msie && $.browser.version > 6 && o.dropShadows && o.animation.opacity!=undefined)
+		if (o.dropShadows && o.animation.opacity!=undefined)
 			this.toggleClass(sf.c.shadowClass+'-off');
 		};
 	sf.c = {

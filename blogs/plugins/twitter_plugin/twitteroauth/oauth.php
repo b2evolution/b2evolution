@@ -1,8 +1,10 @@
 <?php
-// vim: foldmethod=marker
 
-/* Generic exception class
-*/
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+/*
+ * Generic exception class
+ */
 class OAuthException extends Exception {
   // pass
 }
@@ -656,7 +658,7 @@ class OAuthServer {
       throw new OAuthException(
         'Missing timestamp parameter. The parameter is required'
       );
-    
+
     // verify that timestamp is recentish
     $now = time();
     if (abs($now - $timestamp) > $this->timestamp_threshold) {

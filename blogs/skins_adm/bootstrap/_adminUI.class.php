@@ -22,7 +22,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id$
+ * @version $Id: _adminUI.class.php 6339 2014-03-26 10:10:38Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -78,9 +78,9 @@ class AdminUI extends AdminUI_general
 				'before_message' => '<button class="close" data-dismiss="alert">&times;</button>',
 			) );
 
-		// Set this var to TRUE in order to use glyph icons, @see get_icon()
-		global $use_glyphicons;
-		$use_glyphicons = true;
+		// Use glyph icons, @see get_icon()
+		global $b2evo_icons_type;
+		$b2evo_icons_type = 'glyphicons';
 	}
 
 

@@ -1,7 +1,7 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
- * @version $Id$
+ * @version $Id: userfields.js 3901 2013-06-03 13:08:29Z yura $
  */
 
 jQuery( document ).ready(function()
@@ -37,7 +37,7 @@ jQuery( document ).ready(function()
 				{ // Get field info
 					type: 'POST',
 					url: htsrv_url + 'anon_async.php',
-					data: 'action=get_field_bubbletip' + '&field_ID=' + field_ID + '&use_glyphicons=1',
+					data: 'action=get_field_bubbletip' + '&field_ID=' + field_ID + '&b2evo_icons_type=glyphicons',
 					success: function( result )
 					{ // If success request - fill div with field data, save same data to the cache, init popover
 						if( ajax_response_is_correct( result ) )

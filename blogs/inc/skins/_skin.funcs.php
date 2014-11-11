@@ -22,7 +22,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _skin.funcs.php 7127 2014-07-15 13:43:26Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -131,7 +131,10 @@ function skin_init( $disp )
 			init_ajax_forms( 'blog' ); // auto requires jQuery
 			init_ratings_js( 'blog' );
 			init_voting_comment_js( 'blog' );
-			init_scrollwide_js( 'blog' ); // Add jQuery Wide Scroll JS plugin to horizontal scroll "div.wide_scroll" by yellow right/left panel arrows
+			if( $Blog->get_setting( 'allow_rating_comment_helpfulness' ) )
+			{ // Load jquery UI to animate background color on change comment status or on vote
+				require_js( '#jqueryUI#', 'blog' );
+			}
 
 			if( $disp == 'single' )
 			{
@@ -237,7 +240,6 @@ function skin_init( $disp )
 			$GLOBALS['download_Item'] = & $Item;
 
 			init_ajax_forms( 'blog' ); // auto requires jQuery
-			init_scrollwide_js( 'blog' ); // Add jQuery Wide Scroll JS plugin to horizontal scroll "div.wide_scroll" by yellow right/left panel arrows
 
 			// Initialize JavaScript to download file after X seconds
 			add_js_headline( '
@@ -272,7 +274,6 @@ var downloadInterval = setInterval( function()
 
 		case 'posts':
 			init_ajax_forms( 'blog' ); // auto requires jQuery
-			init_scrollwide_js( 'blog' ); // Add jQuery Wide Scroll JS plugin to horizontal scroll "div.wide_scroll" by yellow right/left panel arrows
 			// fp> if we add this here, we have to exetnd the inner if()
 			// init_ratings_js( 'blog' );
 
@@ -496,7 +497,7 @@ var downloadInterval = setInterval( function()
 			$transmit_hashed_password = (bool)$Settings->get('js_passwd_hashing') && !(bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
 			if( $transmit_hashed_password )
 			{ // Include JS for client-side password hashing:
-				require_js( 'sha1_md5.js', 'blog' );
+				require_js( 'build/sha1_md5.bmin.js', 'blog' );
 			}
 			break;
 
@@ -521,8 +522,6 @@ var downloadInterval = setInterval( function()
 			break;
 
 		case 'profile':
-			global $rsc_url;
-			require_css( $rsc_url.'css/jquery/smoothness/jquery-ui.css' );
 			init_userfields_js( 'blog', $Skin->get_template( 'tooltip_plugin' ) );
 		case 'avatar':
 		case 'pwdchange':
@@ -541,8 +540,8 @@ var downloadInterval = setInterval( function()
 		case 'users':
 			$seo_page_type = 'Users list';
 			$robots_index = false;
-			global $rsc_url;
-			require_css( $rsc_url.'css/jquery/smoothness/jquery-ui.css' );
+			require_js( '#jqueryUI#', 'blog' );
+			require_css( '#jqueryUI_css#', 'blog' );
 			init_results_js( 'blog' ); // Add functions to work with Results tables
 			break;
 
@@ -598,15 +597,13 @@ var downloadInterval = setInterval( function()
 				header_redirect( $Blog->gen_blogurl(), 302 );
 			}
 
-			// Require datapicker.css
-			require_css( 'ui.datepicker.css' );
 			// Require results.css to display attachments as a result table
 			require_css( 'results.css' );
 
 			init_tokeninput_js( 'blog' );
 			init_datepicker_js( 'blog' );
 			init_plugins_js( 'blog', $Skin->get_template( 'tooltip_plugin' ) );
-			require_js( 'admin.js', 'blog' );
+			require_js( 'backoffice.js', 'blog' );
 			require_js( 'extracats.js', 'blog' );
 
 			init_inskin_editing();
@@ -672,8 +669,6 @@ var downloadInterval = setInterval( function()
 
 			$display_params = array();
 
-			// Require datapicker.css
-			require_css( 'ui.datepicker.css' );
 			// Require results.css to display attachments as a result table
 			require_css( 'results.css' );
 
@@ -822,8 +817,8 @@ var downloadInterval = setInterval( function()
 	}
 
 	global $Hit;
-	if( $Hit->is_IE( 7, '<' ) )
-	{ // IE < 7
+	if( $Hit->is_IE( 9, '<' ) )
+	{ // IE < 9
 		$Messages->add( T_('Your web browser is too old. For this site to work correctly, we recommend you use a more recent browser.'), 'note' );
 	}
 

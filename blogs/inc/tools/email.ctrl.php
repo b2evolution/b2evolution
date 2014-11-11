@@ -20,7 +20,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id$
+ * @version $Id: email.ctrl.php 368 2011-11-21 15:51:22Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -274,8 +274,8 @@ switch( $tab )
 
 		$emlog_ID = param( 'emlog_ID', 'integer', 0 );
 		if( empty( $emlog_ID ) )
-		{ // Init datepicker css on list page
-			require_css( 'ui.datepicker.css' );
+		{ // Initialize date picker on list page
+			init_datepicker_js();
 		}
 		else
 		{ // Require the styles for email content
@@ -286,9 +286,7 @@ switch( $tab )
 	case 'blocked':
 		$AdminUI->breadcrumbpath_add( T_('Addresses'), '?ctrl=email&amp;tab='.$tab );
 		if( !isset( $edited_EmailAddress ) )
-		{	// List page
-			// Init datepicker css
-			require_css( 'ui.datepicker.css' );
+		{ // List page with email addresses
 			// Init js to edit status field
 			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 		}
@@ -297,8 +295,8 @@ switch( $tab )
 	case 'return':
 		$AdminUI->breadcrumbpath_add( T_('Returned'), '?ctrl=email&amp;tab='.$tab );
 		if( empty( $emret_ID ) )
-		{	// Init datepicker css on list page
-			require_css( 'ui.datepicker.css' );
+		{ // Initialize date picker on list page
+			init_datepicker_js();
 		}
 		break;
 

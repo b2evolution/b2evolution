@@ -14,7 +14,7 @@
  *
  * @package install
  *
- * @version $Id$
+ * @version $Id: _functions_evoupgrade.php 7332 2014-09-29 11:31:08Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -3680,11 +3680,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_end();
 
 		task_begin( 'Upgrading users fields table...' );
+		// Drop index before increasing a size to avoid an error about "max key length is 767 bytes"
+		$DB->query( 'ALTER TABLE T_users__fields DROP INDEX uf_varchar' );
+		// Modify field size
 		$DB->query( 'ALTER TABLE T_users__fields CHANGE uf_varchar uf_varchar VARCHAR( 10000 ) NOT NULL' );
-		// Modify Indexes
-		$DB->query( 'ALTER TABLE T_users__fields
-						DROP INDEX uf_varchar,
-						ADD INDEX uf_varchar ( uf_varchar(255) )' );
+		// Add index again with limited size in 255 because of utf8 == 765
+		$DB->query( 'ALTER TABLE T_users__fields ADD INDEX uf_varchar ( uf_varchar(255) )' );
 		task_end();
 
 		task_begin( 'Upgrading cron tasks table...' );
@@ -4377,14 +4378,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$create_profile_picture_links = true;
 		task_end();
 
-		task_begin( 'Upgrading categories table...' );
-		$DB->query( "ALTER TABLE T_categories CHANGE COLUMN cat_urlname cat_urlname varchar(255) NOT NULL COLLATE ascii_bin" );
-		task_end();
-
-		task_begin( 'Upgrading items table...' );
-		$DB->query( "ALTER TABLE T_items__item CHANGE COLUMN post_urltitle post_urltitle VARCHAR(210) NOT NULL COLLATE ascii_bin" );
-		task_end();
-
 		task_begin( 'Upgrading custom item settings...' );
 		$DB->begin(); // Add names for custom fields
 		// Select all custom fields from all blogs, to create field names
@@ -4757,269 +4750,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		set_upgrade_checkpoint( '11220' );
 	}
 
-	if( $old_db_version < 11230 )
-	{ // part 16.b trunk aka fifth part of "i6"
-
-		// This upgrade block updates all char, enum and set colums collation to 'ascii_bin'.
-		// Also all varchar columns are updated which may contain only ascii characters.
-
-		task_begin( 'Updating groups table...' );
-		$DB->query( "ALTER TABLE T_groups
-			MODIFY grp_perm_blogs enum('user','viewall','editall') COLLATE ascii_bin NOT NULL default 'user',
-			MODIFY grp_perm_xhtmlvalidation VARCHAR(10) COLLATE ascii_bin NOT NULL default 'always',
-			MODIFY grp_perm_xhtmlvalidation_xmlrpc  VARCHAR(10) COLLATE ascii_bin NOT NULL default 'always',
-			MODIFY grp_perm_stats enum('none','user','view','edit') COLLATE ascii_bin NOT NULL default 'none'" );
-		task_end();
-
-		task_begin( 'Updating group settings table...' );
-		$DB->query( "ALTER TABLE T_groups__groupsettings MODIFY gset_name VARCHAR(30) COLLATE ascii_bin NOT NULL" );
-		task_end();
-
-		task_begin( 'Updating settings table...' );
-		$DB->query( "ALTER TABLE T_settings MODIFY set_name VARCHAR(30) COLLATE ascii_bin NOT NULL" );
-		task_end();
-
-		task_begin( 'Updating global cahce table...' );
-		$DB->query( "ALTER TABLE T_global__cache MODIFY cach_name VARCHAR(30) COLLATE ascii_bin NOT NULL" );
-		task_end();
-
-		task_begin( 'Updating users table...' );
-		$DB->query( "ALTER TABLE T_users
-			MODIFY user_email varchar(255) COLLATE ascii_bin NOT NULL,
-			MODIFY user_status enum( 'activated', 'autoactivated', 'closed', 'deactivated', 'emailchanged', 'failedactivation', 'new' ) COLLATE ascii_bin NOT NULL default 'new',
-			MODIFY user_pass CHAR(32) COLLATE ascii_bin NOT NULL,
-			MODIFY user_gender CHAR(1) COLLATE ascii_bin NULL,
-			MODIFY user_unsubscribe_key CHAR(32) COLLATE ascii_bin NOT NULL default '' COMMENT 'A specific key, it is used when a user wants to unsubscribe from a post comments without signing in'" );
-		task_end();
-
-		task_begin( 'Updating user field definitions table...' );
-		$DB->query( "ALTER TABLE T_users__fielddefs
-			MODIFY ufdf_type CHAR(8) COLLATE ascii_bin NOT NULL,
-			MODIFY ufdf_required enum('hidden','optional','recommended','require') COLLATE ascii_bin NOT NULL default 'optional',
-			MODIFY ufdf_duplicated enum('forbidden','allowed','list') COLLATE ascii_bin NOT NULL default 'allowed'" );
-		task_end();
-
-		task_begin( 'Updating user report table...' );
-		$DB->query( "ALTER TABLE T_users__reports
-			MODIFY urep_status enum('fake', 'guidelines', 'harass', 'spam', 'other') COLLATE ascii_bin" );
-		task_end();
-
-		task_begin( 'Updating locales table...' );
-		$DB->query( "ALTER TABLE T_locales
-			MODIFY loc_charset varchar(15) COLLATE ascii_bin NOT NULL default 'iso-8859-1',
-			MODIFY loc_datefmt varchar(20) COLLATE ascii_bin NOT NULL default 'y-m-d',
-			MODIFY loc_timefmt varchar(20) COLLATE ascii_bin NOT NULL default 'H:i:s'" );
-		task_end();
-
-		task_begin( 'Updating antispam keyword table...' );
-		$DB->query( "ALTER TABLE ".$tableprefix."antispam
-			MODIFY aspm_source enum( 'local','reported','central' ) COLLATE ascii_bin NOT NULL default 'reported'" );
-		task_end();
-
-		task_begin( 'Updating antispam iprange table...' );
-		$DB->query( "ALTER TABLE T_antispam__iprange
-			MODIFY aipr_status enum('trusted', 'suspect', 'blocked') COLLATE ascii_bin NULL DEFAULT NULL" );
-		task_end();
-
-		task_begin( 'Updating user settings table...' );
-		$DB->query( "ALTER TABLE T_users__usersettings MODIFY uset_name VARCHAR(30) COLLATE ascii_bin NOT NULL" );
-		task_end();
-
-		task_begin( 'Updating plugins table...' );
-		$DB->query( "ALTER TABLE T_plugins
-			MODIFY plug_classname VARCHAR(40) COLLATE ascii_bin NOT NULL default '',
-			MODIFY plug_code VARCHAR(32) COLLATE ascii_bin NULL,
-			MODIFY plug_version VARCHAR(42) COLLATE ascii_bin NOT NULL default '0',
-			MODIFY plug_status ENUM( 'enabled', 'disabled', 'needs_config', 'broken' ) COLLATE ascii_bin NOT NULL" );
-		task_end();
-
-		task_begin( 'Updating plugin settings table...' );
-		$DB->query( "ALTER TABLE T_pluginsettings MODIFY pset_name VARCHAR(30) COLLATE ascii_bin NOT NULL" );
-		task_end();
-
-		task_begin( 'Updating plugin user settings table...' );
-		$DB->query( "ALTER TABLE T_pluginusersettings MODIFY puset_name VARCHAR(30) COLLATE ascii_bin NOT NULL" );
-		task_end();
-
-		task_begin( 'Updating plugin events table...' );
-		$DB->query( "ALTER TABLE T_pluginevents MODIFY pevt_event VARCHAR(40) COLLATE ascii_bin NOT NULL" );
-		task_end();
-
-		task_begin( 'Updating cron tasks table...' );
-		$DB->query( "ALTER TABLE T_cron__task MODIFY ctsk_controller varchar(50) COLLATE ascii_bin not null" );
-		task_end();
-
-		task_begin( 'Updating cron logs table...' );
-		$DB->query( "ALTER TABLE T_cron__log
-			MODIFY clog_status enum('started','finished','error','timeout') COLLATE ascii_bin not null default 'started'" );
-		task_end();
-
-		task_begin( 'Updating regional tables...' );
-		$DB->query( "ALTER TABLE T_regional__country
-			MODIFY ctry_code CHAR(2) COLLATE ascii_bin NOT NULL,
-			MODIFY ctry_status enum('trusted', 'suspect', 'blocked') COLLATE ascii_bin NULL DEFAULT NULL" );
-		$DB->query( 'ALTER TABLE T_regional__region MODIFY rgn_code CHAR(6) COLLATE ascii_bin NOT NULL' );
-		$DB->query( 'ALTER TABLE T_regional__subregion MODIFY subrg_code CHAR(6) COLLATE ascii_bin NOT NULL' );
-		$DB->query( 'ALTER TABLE T_regional__city MODIFY city_postcode CHAR(12) COLLATE ascii_bin NOT NULL' );
-		$DB->query( 'ALTER TABLE T_regional__currency MODIFY curr_code CHAR(3) COLLATE ascii_bin NOT NULL' );
-		task_end();
-
-		task_begin( 'Updating slugs table...' );
-		$DB->query( "ALTER TABLE T_slug
-			MODIFY slug_title varchar(255) COLLATE ascii_bin NOT NULL,
-			MODIFY slug_type char(6) COLLATE ascii_bin NOT NULL DEFAULT 'item'" );
-		task_end();
-
-		task_begin( 'Updating email log table...' );
-		$DB->query( "ALTER TABLE T_email__log
-			MODIFY emlog_to VARCHAR(255) COLLATE ascii_bin DEFAULT NULL,
-			MODIFY emlog_result ENUM('ok', 'error', 'blocked') COLLATE ascii_bin NOT NULL DEFAULT 'ok'" );
-		task_end();
-
-		task_begin( 'Updating email returns table...' );
-		$DB->query( "ALTER TABLE T_email__returns
-			MODIFY emret_address VARCHAR(255) COLLATE ascii_bin DEFAULT NULL,
-			MODIFY emret_errtype CHAR(1) COLLATE ascii_bin NOT NULL DEFAULT 'U'" );
-		task_end();
-
-		task_begin( 'Updating email address table...' );
-		$DB->query( "ALTER TABLE T_email__address
-			MODIFY emadr_address VARCHAR(255) COLLATE ascii_bin DEFAULT NULL,
-			MODIFY emadr_status ENUM('unknown', 'redemption', 'warning', 'suspicious1', 'suspicious2', 'suspicious3', 'prmerror', 'spammer') COLLATE ascii_bin NOT NULL DEFAULT 'unknown'" );
-		task_end();
-
-		task_begin( 'Updating skins table...' );
-		$DB->query( "ALTER TABLE T_skins__skin
-			MODIFY skin_type enum('normal', 'feed', 'sitemap', 'mobile', 'tablet') COLLATE ascii_bin NOT NULL default 'normal'" );
-		task_end();
-
-		task_begin( 'Updating blogs table...' );
-		$DB->query( "ALTER TABLE T_blogs
-			MODIFY blog_access_type VARCHAR(10) COLLATE ascii_bin NOT NULL DEFAULT 'extrapath',
-			MODIFY blog_urlname VARCHAR(255) COLLATE ascii_bin NOT NULL DEFAULT 'urlname',
-			MODIFY blog_media_location ENUM( 'default', 'subdir', 'custom', 'none' ) COLLATE ascii_bin DEFAULT 'default' NOT NULL,
-			MODIFY blog_type ENUM( 'std', 'photo', 'group', 'forum', 'manual' ) COLLATE ascii_bin DEFAULT 'std' NOT NULL" );
-		task_end();
-
-		task_begin( 'Updating collection settings table...' );
-		$DB->query( "ALTER TABLE T_coll_settings MODIFY cset_name VARCHAR( 50 ) COLLATE ascii_bin NOT NULL" );
-		task_end();
-
-		task_begin( 'Updating components table...' );
-		$DB->query( "ALTER TABLE T_widget
-			MODIFY wi_type ENUM( 'core', 'plugin' ) COLLATE ascii_bin NOT NULL DEFAULT 'core',
-			MODIFY wi_code VARCHAR(32) COLLATE ascii_bin NOT NULL" );
-		task_end();
-
-		task_begin( 'Updating categories table...' );
-		$DB->query( "ALTER TABLE T_categories MODIFY cat_urlname varchar(255) COLLATE ascii_bin NOT NULL" );
-		task_end();
-
-		task_begin( 'Updating posts table...' );
-		$DB->query( "ALTER TABLE T_items__item
-			MODIFY post_status enum('published','community','deprecated','protected','private','review','draft','redirected') COLLATE ascii_bin NOT NULL default 'published',
-			MODIFY post_urltitle VARCHAR(210) COLLATE ascii_bin NOT NULL,
-			MODIFY post_notifications_status ENUM('noreq','todo','started','finished') COLLATE ascii_bin NOT NULL DEFAULT 'noreq',
-			MODIFY post_comment_status ENUM('disabled', 'open', 'closed') COLLATE ascii_bin NOT NULL DEFAULT 'open'" );
-		task_end();
-
-		task_begin( 'Updating comments table...' );
-		$DB->query( "ALTER TABLE T_comments
-			MODIFY comment_type ENUM('comment','linkback','trackback','pingback') COLLATE ascii_bin NOT NULL default 'comment',
-			MODIFY comment_status ENUM('published','community','deprecated','protected','private','review','draft','trash') COLLATE ascii_bin DEFAULT 'published' NOT NULL,
-			MODIFY comment_author_email VARCHAR(255) COLLATE ascii_bin NULL,
-			MODIFY comment_author_IP VARCHAR(23) COLLATE ascii_bin NOT NULL default '',
-			MODIFY comment_secret CHAR(32) COLLATE ascii_bin NULL default NULL,
-			MODIFY comment_notif_status ENUM('noreq','todo','started','finished') COLLATE ascii_bin NOT NULL DEFAULT 'noreq' COMMENT 'Have notifications been sent for this comment? How far are we in the process?'" );
-		task_end();
-
-		task_begin( 'Updating item prerendering cache table...' );
-		$DB->query( "ALTER TABLE T_items__prerendering
-			MODIFY itpr_format ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_bin NOT NULL" );
-		task_end();
-
-		task_begin( 'Updating comment prerendering cache table...' );
-		$DB->query( "ALTER TABLE T_comments__prerendering
-			MODIFY cmpr_format ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_bin NOT NULL" );
-		task_end();
-
-		task_begin( 'Updating item versions table...' );
-		$DB->query( "ALTER TABLE T_items__version
-			MODIFY iver_status ENUM('published','community','deprecated','protected','private','review','draft','redirected') COLLATE ascii_bin NULL" );
-		task_end();
-
-		task_begin( 'Updating item settings table...' );
-		$DB->query( "ALTER TABLE T_items__item_settings MODIFY iset_name varchar( 50 ) COLLATE ascii_bin NOT NULL" );
-		task_end();
-
-		task_begin( 'Updating blog-user permissions table...' );
-		$DB->query( "ALTER TABLE T_coll_user_perms
-			MODIFY bloguser_perm_poststatuses SET('review','draft','private','protected','deprecated','community','published','redirected') COLLATE ascii_bin NOT NULL default '',
-			MODIFY bloguser_perm_edit ENUM('no','own','lt','le','all','redirected') COLLATE ascii_bin NOT NULL default 'no',
-			MODIFY bloguser_perm_cmtstatuses SET('review','draft','private','protected','deprecated','community','published') COLLATE ascii_bin NOT NULL default '',
-			MODIFY bloguser_perm_edit_cmt ENUM('no','own','anon','lt','le','all') COLLATE ascii_bin NOT NULL default 'no'" );
-		task_end();
-
-		task_begin( 'Updating blog-group permissions table...' );
-		$DB->query( "ALTER TABLE T_coll_group_perms
-			MODIFY bloggroup_perm_poststatuses SET('review','draft','private','protected','deprecated','community','published','redirected') COLLATE ascii_bin NOT NULL default '',
-			MODIFY bloggroup_perm_edit ENUM('no','own','lt','le','all','redirected') COLLATE ascii_bin NOT NULL default 'no',
-			MODIFY bloggroup_perm_cmtstatuses SET('review','draft','private','protected','deprecated','community','published') COLLATE ascii_bin NOT NULL default '',
-			MODIFY bloggroup_perm_edit_cmt ENUM('no','own','anon','lt','le','all') COLLATE ascii_bin NOT NULL default 'no'" );
-		task_end();
-
-		task_begin( 'Updating links table...' );
-		$DB->query( "ALTER TABLE T_links MODIFY link_position varchar(10) COLLATE ascii_bin NOT NULL" );
-		task_end();
-
-		task_begin( 'Updating files table...' );
-		$DB->query( "ALTER TABLE T_files
-			MODIFY file_root_type enum('absolute','user','collection','shared','skins','import') COLLATE ascii_bin NOT NULL DEFAULT 'absolute'" );
-		task_end();
-
-		task_begin( 'Updating file types table...' );
-		$DB->query( "ALTER TABLE T_filetypes
-			MODIFY ftyp_extensions varchar(30) COLLATE ascii_bin NOT NULL,
-			MODIFY ftyp_viewtype varchar(10) COLLATE ascii_bin NOT NULL,
-			MODIFY ftyp_allowed enum('any','registered','admin') COLLATE ascii_bin NOT NULL default 'admin'" );
-		task_end();
-
-		set_upgrade_checkpoint( '11230' );
-	}
-
-	if( $old_db_version < 11235 )
-	{ // part 16.c trunk aka sixth part of "i6"
-
-		// A separate upgrade block was created to update collations in the sessions module, because the T_hitlog update may require long time.
-
-		task_begin( 'Updating sessions table...' );
-		$DB->query( "ALTER TABLE T_sessions
-			MODIFY sess_key CHAR(32) COLLATE ascii_bin NULL,
-			MODIFY sess_ipaddress VARCHAR(39) COLLATE ascii_bin NOT NULL DEFAULT '',
-			MODIFY sess_device VARCHAR(8) COLLATE ascii_bin NOT NULL DEFAULT ''" );
-		task_end();
-
-		task_begin( 'Updating base domains table...' );
-		$DB->query( "ALTER TABLE T_basedomains
-			MODIFY dom_status ENUM('unknown','trusted','suspect','blocked') COLLATE ascii_bin NOT NULL DEFAULT 'unknown',
-			MODIFY dom_type ENUM('unknown','normal','searcheng','aggregator','email') COLLATE ascii_bin NOT NULL DEFAULT 'unknown'" );
-		task_end();
-
-		task_begin( 'Updating hit logs table...' );
-		$DB->query( "ALTER TABLE T_hitlog
-			MODIFY hit_ctrl VARCHAR(30) COLLATE ascii_bin DEFAULT NULL,
-			MODIFY hit_type ENUM('standard','rss','admin','ajax', 'service') COLLATE ascii_bin DEFAULT 'standard' NOT NULL,
-			MODIFY hit_referer_type ENUM('search','special','spam','referer','direct','self') COLLATE ascii_bin NOT NULL,
-			MODIFY hit_remote_addr VARCHAR(40) COLLATE ascii_bin DEFAULT NULL,
-			MODIFY hit_agent_type ENUM('robot','browser','unknown') COLLATE ascii_bin DEFAULT 'unknown' NOT NULL" );
-		task_end();
-
-		task_begin( 'Updating goal categories table...' );
-		$DB->query( 'ALTER TABLE T_track__goalcat MODIFY gcat_color CHAR(7) COLLATE ascii_bin default NULL' );
-		task_end();
-		set_upgrade_checkpoint( '11235' );
-	}
-
 	if( $old_db_version < 11240 )
 	{ // part 16.d trunk aka seventh part of "i6"
 
@@ -5090,8 +4820,226 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		 * This part will be included in trunk and i6 branches
 		 */
 
-		// set_upgrade_checkpoint( '11255' );
+		set_upgrade_checkpoint( '11255' );
 	}
+
+	if( $old_db_version < 11260 )
+	{ // part 16.h trunk aka eleventh part of "i6"
+
+		// This upgrade block updates all field collations from 'ascii_bin' to 'ascii_general_ci' except of slugs table.
+
+		task_begin( 'Clean up comment emails...' );
+		$DB->query( "UPDATE T_comments
+						SET comment_author_email = CONVERT(comment_author_email USING ascii)" );
+		$DB->commit();
+		task_end();
+
+
+		task_begin( 'Convert the field collations from ascii_bin to ascii_general_ci... ' );
+		// fp> why would we need a transaction here?	$DB->begin();
+		$DB->query( "ALTER TABLE T_skins__skin
+			MODIFY skin_type enum('normal','feed','sitemap','mobile','tablet') COLLATE ascii_general_ci NOT NULL default 'normal'" );
+		$DB->query( "ALTER TABLE T_blogs
+			MODIFY blog_access_type    VARCHAR(10) COLLATE ascii_general_ci NOT NULL DEFAULT 'extrapath',
+			MODIFY blog_urlname        VARCHAR(255) COLLATE ascii_general_ci NOT NULL DEFAULT 'urlname',
+			MODIFY blog_media_location ENUM( 'default', 'subdir', 'custom', 'none' ) COLLATE ascii_general_ci DEFAULT 'default' NOT NULL,
+			MODIFY blog_type           ENUM( 'std', 'photo', 'group', 'forum', 'manual' ) COLLATE ascii_general_ci DEFAULT 'std' NOT NULL" );
+		$DB->query( 'ALTER TABLE T_coll_settings
+			MODIFY cset_name VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL' );
+		$DB->query( "ALTER TABLE {$tableprefix}widget
+			MODIFY wi_type ENUM( 'core', 'plugin' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'core',
+			MODIFY wi_code VARCHAR(32) COLLATE ascii_general_ci NOT NULL" );
+		$DB->query( "ALTER TABLE T_categories
+			MODIFY cat_urlname varchar(255) COLLATE ascii_general_ci NOT NULL" );
+		$DB->query( "ALTER TABLE T_items__item
+			MODIFY post_status               enum('published','community','deprecated','protected','private','review','draft','redirected') COLLATE ascii_general_ci NOT NULL default 'published',
+			MODIFY post_urltitle             VARCHAR(210) COLLATE ascii_general_ci NOT NULL,
+			MODIFY post_notifications_status ENUM('noreq','todo','started','finished') COLLATE ascii_general_ci NOT NULL DEFAULT 'noreq',
+			MODIFY post_comment_status       ENUM('disabled', 'open', 'closed') COLLATE ascii_general_ci NOT NULL DEFAULT 'open',
+			MODIFY post_renderers            TEXT COLLATE ascii_general_ci NOT NULL" );
+		$DB->query( "ALTER TABLE T_comments
+			MODIFY comment_type         enum('comment','linkback','trackback','pingback') COLLATE ascii_general_ci NOT NULL default 'comment',
+			MODIFY comment_status       ENUM('published','community','deprecated','protected','private','review','draft','trash') COLLATE ascii_general_ci DEFAULT 'published' NOT NULL,
+			MODIFY comment_author_email varchar(255) COLLATE ascii_general_ci NULL,
+			MODIFY comment_author_IP    varchar(23) COLLATE ascii_general_ci NOT NULL default '',
+			MODIFY comment_renderers    TEXT COLLATE ascii_general_ci NOT NULL,
+			MODIFY comment_secret       CHAR(32) COLLATE ascii_general_ci NULL default NULL,
+			MODIFY comment_notif_status ENUM('noreq','todo','started','finished') COLLATE ascii_general_ci NOT NULL DEFAULT 'noreq' COMMENT 'Have notifications been sent for this comment? How far are we in the process?'" );
+		$DB->query( "ALTER TABLE T_items__prerendering
+			MODIFY itpr_format    ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_general_ci NOT NULL,
+			MODIFY itpr_renderers TEXT COLLATE ascii_general_ci NOT NULL" );
+		$DB->query( "ALTER TABLE T_comments__prerendering
+			MODIFY cmpr_format    ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_general_ci NOT NULL,
+			MODIFY cmpr_renderers TEXT COLLATE ascii_general_ci NOT NULL" );
+		$DB->query( "ALTER TABLE T_items__version
+			MODIFY iver_status ENUM('published','community','deprecated','protected','private','review','draft','redirected') COLLATE ascii_general_ci NULL" );
+		$DB->query( "ALTER TABLE T_items__item_settings
+			MODIFY iset_name varchar( 50 ) COLLATE ascii_general_ci NOT NULL" );
+		$DB->query( "ALTER TABLE T_coll_user_perms
+			MODIFY bloguser_perm_poststatuses set('review','draft','private','protected','deprecated','community','published','redirected') COLLATE ascii_general_ci NOT NULL default '',
+			MODIFY bloguser_perm_edit         ENUM('no','own','lt','le','all','redirected') COLLATE ascii_general_ci NOT NULL default 'no',
+			MODIFY bloguser_perm_cmtstatuses  set('review','draft','private','protected','deprecated','community','published') COLLATE ascii_general_ci NOT NULL default '',
+			MODIFY bloguser_perm_edit_cmt     ENUM('no','own','anon','lt','le','all') COLLATE ascii_general_ci NOT NULL default 'no'" );
+		$DB->query( "ALTER TABLE T_coll_group_perms
+			MODIFY bloggroup_perm_poststatuses set('review','draft','private','protected','deprecated','community','published','redirected') COLLATE ascii_general_ci NOT NULL default '',
+			MODIFY bloggroup_perm_edit         ENUM('no','own','lt','le','all','redirected') COLLATE ascii_general_ci NOT NULL default 'no',
+			MODIFY bloggroup_perm_cmtstatuses  set('review','draft','private','protected','deprecated','community','published') COLLATE ascii_general_ci NOT NULL default '',
+			MODIFY bloggroup_perm_edit_cmt     ENUM('no','own','anon','lt','le','all') COLLATE ascii_general_ci NOT NULL default 'no'" );
+		$DB->query( "ALTER TABLE T_links
+			MODIFY link_position varchar(10) COLLATE ascii_general_ci NOT NULL" );
+		$DB->query( "ALTER TABLE T_files
+			MODIFY file_root_type enum('absolute','user','collection','shared','skins','import') COLLATE ascii_general_ci NOT NULL DEFAULT 'absolute'" );
+		$DB->query( "ALTER TABLE T_filetypes
+			MODIFY ftyp_extensions varchar(30) COLLATE ascii_general_ci NOT NULL,
+			MODIFY ftyp_viewtype   varchar(10) COLLATE ascii_general_ci NOT NULL,
+			MODIFY ftyp_allowed    enum('any','registered','admin') COLLATE ascii_general_ci NOT NULL default 'admin'" );
+		$DB->query( "ALTER TABLE T_sessions
+			MODIFY sess_key       CHAR(32) COLLATE ascii_general_ci NULL,
+			MODIFY sess_ipaddress VARCHAR(39) COLLATE ascii_general_ci NOT NULL DEFAULT '',
+			MODIFY sess_device    VARCHAR(8) COLLATE ascii_general_ci NOT NULL DEFAULT ''" );
+		$DB->query( "ALTER TABLE T_basedomains
+			MODIFY dom_status ENUM('unknown','trusted','suspect','blocked') COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown',
+			MODIFY dom_type   ENUM('unknown','normal','searcheng','aggregator','email') COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown'" );
+		$DB->query( "ALTER TABLE T_hitlog
+			MODIFY hit_ctrl         VARCHAR(30) COLLATE ascii_general_ci DEFAULT NULL,
+			MODIFY hit_type         ENUM('standard','rss','admin','ajax', 'service') COLLATE ascii_general_ci DEFAULT 'standard' NOT NULL,
+			MODIFY hit_referer_type ENUM('search','special','spam','referer','direct','self') COLLATE ascii_general_ci NOT NULL,
+			MODIFY hit_remote_addr  VARCHAR(40) COLLATE ascii_general_ci DEFAULT NULL,
+			MODIFY hit_agent_type   ENUM('robot','browser','unknown') COLLATE ascii_general_ci DEFAULT 'unknown' NOT NULL" );
+		$DB->query( "ALTER TABLE T_track__goalcat
+			MODIFY gcat_color  char(7) COLLATE ascii_general_ci default NULL" );
+		$DB->query( "ALTER TABLE T_groups
+			MODIFY grp_perm_blogs                  enum('user','viewall','editall') COLLATE ascii_general_ci NOT NULL default 'user',
+			MODIFY grp_perm_xhtmlvalidation        VARCHAR(10) COLLATE ascii_general_ci NOT NULL default 'always',
+			MODIFY grp_perm_xhtmlvalidation_xmlrpc VARCHAR(10) COLLATE ascii_general_ci NOT NULL default 'always',
+			MODIFY grp_perm_stats                  enum('none','user','view','edit') COLLATE ascii_general_ci NOT NULL default 'none'" );
+		$DB->query( "ALTER TABLE T_groups__groupsettings
+			MODIFY gset_name VARCHAR(30) COLLATE ascii_general_ci NOT NULL" );
+		$DB->query( "ALTER TABLE T_settings
+			MODIFY set_name VARCHAR(30) COLLATE ascii_general_ci NOT NULL" );
+		$DB->query( "ALTER TABLE T_global__cache
+			MODIFY cach_name VARCHAR(30) COLLATE ascii_general_ci NOT NULL" );
+		$DB->query( "ALTER TABLE T_users
+			MODIFY user_email           varchar(255) COLLATE ascii_general_ci NOT NULL,
+			MODIFY user_status          enum( 'activated', 'autoactivated', 'closed', 'deactivated', 'emailchanged', 'failedactivation', 'new' ) COLLATE ascii_general_ci NOT NULL default 'new',
+			MODIFY user_unsubscribe_key CHAR(32) COLLATE ascii_general_ci NOT NULL default '' COMMENT 'A specific key, it is used when a user wants to unsubscribe from a post comments without signing in',
+			MODIFY user_gender          char(1) COLLATE ascii_general_ci NULL" );
+		$DB->query( "ALTER TABLE T_users__fielddefs
+			MODIFY ufdf_type       char(8) COLLATE ascii_general_ci NOT NULL,
+			MODIFY ufdf_required   enum('hidden','optional','recommended','require') COLLATE ascii_general_ci NOT NULL default 'optional',
+			MODIFY ufdf_duplicated enum('forbidden','allowed','list') COLLATE ascii_general_ci NOT NULL default 'allowed'" );
+		$DB->query( "ALTER TABLE T_users__reports
+			MODIFY urep_status enum( 'fake', 'guidelines', 'harass', 'spam', 'other' ) COLLATE ascii_general_ci" );
+		$DB->query( "ALTER TABLE T_locales
+			MODIFY loc_charset varchar(15) COLLATE ascii_general_ci NOT NULL default 'iso-8859-1',
+			MODIFY loc_datefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'y-m-d',
+			MODIFY loc_timefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'H:i:s'" );
+		$DB->query( "ALTER TABLE {$tableprefix}antispam
+			MODIFY aspm_source enum( 'local','reported','central' ) COLLATE ascii_general_ci NOT NULL default 'reported'" );
+		$DB->query( "ALTER TABLE T_antispam__iprange
+			MODIFY aipr_status enum( 'trusted', 'suspect', 'blocked' ) COLLATE ascii_general_ci NULL DEFAULT NULL" );
+		$DB->query( "ALTER TABLE T_users__usersettings
+			MODIFY uset_name VARCHAR( 30 ) COLLATE ascii_general_ci NOT NULL" );
+		$DB->query( "ALTER TABLE T_plugins
+			MODIFY plug_classname VARCHAR(40) COLLATE ascii_general_ci NOT NULL default '',
+			MODIFY plug_code      VARCHAR(32) COLLATE ascii_general_ci NULL,
+			MODIFY plug_version   VARCHAR(42) COLLATE ascii_general_ci NOT NULL default '0',
+			MODIFY plug_status    ENUM( 'enabled', 'disabled', 'needs_config', 'broken' ) COLLATE ascii_general_ci NOT NULL" );
+		$DB->query( "ALTER TABLE T_pluginsettings
+			MODIFY pset_name VARCHAR( 30 ) COLLATE ascii_general_ci NOT NULL" );
+		$DB->query( "ALTER TABLE T_pluginusersettings
+			MODIFY puset_name VARCHAR( 30 ) COLLATE ascii_general_ci NOT NULL" );
+		$DB->query( "ALTER TABLE T_pluginevents
+			MODIFY pevt_event VARCHAR(40) COLLATE ascii_general_ci NOT NULL" );
+		$DB->query( "ALTER TABLE T_cron__log
+			MODIFY clog_status enum('started','finished','error','timeout') COLLATE ascii_general_ci not null default 'started'" );
+		$DB->query( "ALTER TABLE T_regional__country
+			MODIFY ctry_code   char(2) COLLATE ascii_general_ci NOT NULL,
+			MODIFY ctry_status enum( 'trusted', 'suspect', 'blocked' ) COLLATE ascii_general_ci NULL DEFAULT NULL" );
+		$DB->query( "ALTER TABLE T_regional__region
+			MODIFY rgn_code char(6) COLLATE ascii_general_ci NOT NULL" );
+		$DB->query( "ALTER TABLE T_regional__subregion
+			MODIFY subrg_code char(6) COLLATE ascii_general_ci NOT NULL" );
+		$DB->query( "ALTER TABLE T_regional__city
+			MODIFY city_postcode char(12) COLLATE ascii_general_ci NOT NULL" );
+		$DB->query( "ALTER TABLE T_regional__currency
+			MODIFY curr_code char(3) COLLATE ascii_general_ci NOT NULL" );
+		$DB->query( "ALTER TABLE T_email__log
+			MODIFY emlog_to     VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
+			MODIFY emlog_result ENUM( 'ok', 'error', 'blocked' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'ok'" );
+		$DB->query( "ALTER TABLE T_email__returns
+			MODIFY emret_address   VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
+			MODIFY emret_errtype   CHAR(1) COLLATE ascii_general_ci NOT NULL DEFAULT 'U'" );
+		$DB->query( "ALTER TABLE T_email__address
+			MODIFY emadr_address VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
+			MODIFY emadr_status  ENUM( 'unknown', 'redemption', 'warning', 'suspicious1', 'suspicious2', 'suspicious3', 'prmerror', 'spammer' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown'" );
+		//	$DB->commit();
+		task_end();
+
+		set_upgrade_checkpoint( '11260' );
+	}
+
+	if( $old_db_version < 11270 )
+	{ // part 16.i trunk aka 12th part of "i6"
+
+		// IPv4 mapped IPv6 addresses maximum length is 45 chars: ex. ABCD:ABCD:ABCD:ABCD:ABCD:ABCD:192.168.158.190
+		task_begin( 'Upgrading comments table...' );
+		$DB->query( "ALTER TABLE T_comments
+			MODIFY comment_author_IP varchar(45) COLLATE ascii_general_ci NOT NULL default ''" );
+		task_end();
+		task_begin( 'Upgrading sessions table...' );
+		$DB->query( "ALTER TABLE T_sessions
+			MODIFY sess_ipaddress VARCHAR(45) COLLATE ascii_general_ci NOT NULL DEFAULT ''" );
+		task_end();
+
+		set_upgrade_checkpoint( '11270' );
+	}
+
+	if( $old_db_version < 11280 )
+	{ // part 16.j trunk aka 12th part of "i6"
+
+		task_begin( 'Upgrading hit logs table...' );
+		$DB->query( "ALTER TABLE T_hitlog
+			MODIFY hit_remote_addr VARCHAR(45) COLLATE ascii_general_ci DEFAULT NULL" );
+		task_end();
+
+		task_begin( 'Upgrading blogs table...' );
+		db_drop_col( 'T_blogs', 'blog_UID' );
+		task_end();
+
+		set_upgrade_checkpoint( '11280' );
+	}
+
+	if( $old_db_version < 11285 )
+	{ // part 16.k trunk aka 13th part of "i6"
+
+		task_begin( 'Updating plugins table...' );
+		$DB->query( 'UPDATE T_plugins SET
+			plug_code = CASE
+				WHEN plug_classname = "generic_ping_plugin"         THEN "b2evGPing"
+				WHEN plug_classname = "basic_antispam_plugin"       THEN "b2evBAspm"
+				WHEN plug_classname = "flowplayer_plugin"           THEN "b2evFlwP"
+				WHEN plug_classname = "html5_mediaelementjs_plugin" THEN "b2evH5MP"
+				WHEN plug_classname = "html5_videojs_plugin"        THEN "b2evH5VJSP"
+				ELSE plug_code
+			END' );
+		task_end();
+
+		// set_upgrade_checkpoint( '11285' );
+	}
+
+	/*
+	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
+	 *
+	 * YOU MUST USE:
+	 * task_begin( 'Descriptive text about action...' );
+	 * task_end();
+	 *
+	 * ALL DB CHANGES MUST BE EXPLICITLY CARRIED OUT. DO NOT RELY ON SCHEMA UPDATES!
+	 * Schema updates do not survive after several incremental changes.
+	 *
+	 * NOTE: every change that gets done here, should bump {@link $new_db_version} (by 100).
+	 */
 
 	// Execute general upgrade tasks.
 	// These tasks needs to be called after every upgrade process, except if they were already executed but the upgrade was not finished because of the max execution time check.

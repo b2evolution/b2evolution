@@ -10,7 +10,7 @@
  * @author gorgeb: Bertrand GORGE / EPISTEMA
  *
  * @package plugins
- * @version $Id$
+ * @version $Id: _flowplayer.plugin.php 198 2011-11-05 21:34:08Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -20,7 +20,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class flowplayer_plugin extends Plugin
 {
-	var $code = 'b2evFlp';
+	var $code = 'b2evFlwP';
 	var $name = 'Flowplayer';
 	var $priority = 80;
 	var $version = '5.0.0';

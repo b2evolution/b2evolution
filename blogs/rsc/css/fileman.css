@@ -28,9 +28,6 @@ div.fileman_toolbars_bottom {
 	text-align: right;
 	padding: 2px 10px;
 }
-.toolbaritem form {
-	width: 20%; /* For IE7 */
-}
 
 #fm_browser {
 	clear: both;

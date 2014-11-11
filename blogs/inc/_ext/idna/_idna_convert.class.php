@@ -52,6 +52,8 @@
  * @version 0.6.2
  * @changelog since 0.5.1 class updated to PHP5/6 style should be compatible to PHP 4.3+
  */
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
 class idna_convert
 {
     // NP See below

@@ -21,7 +21,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _email_sent.view.php 349 2011-11-18 11:18:14Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -31,19 +31,21 @@ global $blog, $admin_url, $UserSettings;
 global $datestartinput, $datestart, $datestopinput, $datestop, $email;
 
 if( param_date( 'datestartinput', T_('Invalid date'), false,  NULL ) !== NULL )
-{	// We have a user provided localized date:
-	memorize_param( 'datestart', 'string', NULL, trim(form_date($datestartinput)) );
+{ // We have a user provided localized date:
+	memorize_param( 'datestart', 'string', NULL, trim( form_date( $datestartinput ) ) );
+	memorize_param( 'datestartinput', 'string', NULL, empty( $datestartinput ) ? NULL : date( locale_datefmt(), strtotime( $datestartinput ) ) );
 }
 else
-{	// We may have an automated param transmission date:
+{ // We may have an automated param transmission date:
 	param( 'datestart', 'string', '', true );
 }
 if( param_date( 'datestopinput', T_('Invalid date'), false, NULL ) !== NULL )
-{	// We have a user provided localized date:
-	memorize_param( 'datestop', 'string', NULL, trim(form_date($datestopinput)) );
+{ // We have a user provided localized date:
+	memorize_param( 'datestop', 'string', NULL, trim( form_date( $datestopinput ) ) );
+	memorize_param( 'datestopinput', 'string', NULL, empty( $datestopinput ) ? NULL : date( locale_datefmt(), strtotime( $datestopinput ) ) );
 }
 else
-{	// We may have an automated param transmission date:
+{ // We may have an automated param transmission date:
 	param( 'datestop', 'string', '', true );
 }
 param( 'email', 'string', '', true );
@@ -117,10 +119,14 @@ $Results->cols[] = array(
 		'td' => '%mysql2localedatetime_spans( #emret_timestamp#, "M-d" )%',
 	);
 
+function emret_address_col( $emret_address )
+{
+	return '<a href="'.regenerate_url( 'email,action,emret_ID', 'email='.$emret_address ).'">'.$emret_address.'</a>';
+}
 $Results->cols[] = array(
 		'th' => T_('Address'),
 		'order' => 'emret_address',
-		'td' => '<a href="'.regenerate_url( 'email,action,emret_ID', 'email=$emret_address$' ).'">$emret_address$</a>',
+		'td' => '%emret_address_col( #emret_address# )%',
 		'th_class' => 'shrinkwrap',
 	);
 

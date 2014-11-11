@@ -1,9 +1,5 @@
 /* Designed by François PLANQUE http://fplanque.net/ */
 
-@import url("basic.css");	/* Import basic styles */
-@import url("blog_base.css");	/* Default styles for the blog navigation */
-@import url("item_base.css");	/* Default styles for the post CONTENT */
-
 div.main {
 	clear: both;
 	margin-right: 0px;

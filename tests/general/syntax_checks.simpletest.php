@@ -31,18 +31,22 @@ class SyntaxTestCase extends EvoUnitTestCase
 		$badfiles = array();
 		foreach( $files as $filename )
 		{
-			exec('php -l '.escapeshellarg($filename), $output, $return_var);
+			$output = NULL;
+			exec('php -l '.escapeshellarg($filename).' 2>&1', $output, $return_var);
 			if( $return_var !== 0 )
 			{
-				$badfiles[] = $filename;
+				$badfiles[] = array($filename, $output);
 			}
 		}
 		if( ! empty($badfiles) )
 		{
 			echo '<h2>Files which have PHP syntax errors</h2>';
-			echo "\n<ul><li>\n";
-			echo implode( "\n</li><li>\n", $badfiles );
-			echo "\n</li></ul>\n";
+			echo "<ul>\n";
+			foreach( $badfiles as $bfile )
+			{
+				echo '<li>'.$bfile[0].'<br /><pre>'.var_export($bfile[1], true)."</pre></li>\n";
+			}
+			echo "</ul>";
 		}
 		$this->assertFalse( $badfiles );
 	}

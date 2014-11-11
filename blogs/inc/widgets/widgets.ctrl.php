@@ -14,7 +14,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: widgets.ctrl.php 7178 2014-07-23 08:11:33Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -91,6 +91,8 @@ switch( $action )
 		param( 'code', 'string', true );
 	case 'new':
 		param( 'container', 'string', true, true );	// memorize
+		// Change the symbols back to normal view as they are stored in DB
+		$container = str_replace( array( '_', '-' ), array( ' ', ':' ), $container );
 		break;
 
 	case 're-order' : // js request
@@ -99,7 +101,7 @@ switch( $action )
 		$containers = array();
 		foreach( $containers_list as $a_container )
 		{	// add each container and grab its widgets:
-			if( $container_name = trim( str_replace( array( 'container_', '_' ), array( '', ' ' ), $a_container ), ',' ) )
+			if( $container_name = trim( str_replace( array( 'container_', '_', '-' ), array( '', ' ', ':' ), $a_container ), ',' ) )
 			{
 				$containers[ $container_name ] = explode( ',', param( trim( $a_container, ',' ), 'string', true ) );
 			}
@@ -456,9 +458,6 @@ switch( $action )
 		 * @var Skin
 		 */
 		$edited_Skin = & $SkinCache->get_by_ID( $blog_normal_skin_ID );
-
-		// Look for containers in skin file:
-		$edited_Skin->discover_containers();
 
 		// Save to DB:
 		$edited_Skin->db_save_containers();

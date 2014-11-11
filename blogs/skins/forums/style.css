@@ -36,7 +36,6 @@ a.forumlink, a.postlink, a.topictitle {
 	text-decoration: none;
 }
 a.topictitle {
-	font-size: 11px;
 	line-height: 21px;
 }
 a.forumlink:hover, a.postlink:hover {
@@ -53,8 +52,7 @@ a.forumlink:hover, a.postlink:hover {
 	font-size: 11px !important;
 }
 
-div.pageHeader h1 a,
-div.pageHeader h1 a:visited {  /* IE6 */
+div.pageHeader h1 a {
 	text-decoration: none;
 }
 div.pageHeader h1 a:hover {
@@ -139,11 +137,11 @@ div#wrapper {
 	font: 11px Verdana, Arial, Helvetica, sans-serif;
 	width: 960px;
 	margin: 0 auto;
-	transition: width 1s;
-	-moz-transition: width 1s; /* Firefox 4 */
-	-webkit-transition: width 1s; /* Safari and Chrome */
-	-o-transition: width 1s; /* Opera */
-	-ms-transition: width 1s; /* IE */
+	transition: all 1s;
+	-moz-transition: all 1s; /* Firefox 4 */
+	-webkit-transition: all 1s; /* Safari and Chrome */
+	-o-transition: all 1s; /* Opera */
+	-ms-transition: all 1s; /* IE */
 }
 div.pageTop, div.pageHeader, div#pageFooter {
 	font: 84% Arial, Helvetica, sans-serif;
@@ -280,9 +278,11 @@ div.pageTop a.selected:hover {
 }
 .bForums td.row2{
 	background-color: #DEE3E7;
+	font-size: 12px;
 }
 .bForums td.row3{
 	background-color: #D1D7DC;
+	font-size: 12px;
 }
 .bForums td.row2 a, .bForums td.row3 a{
 	font-weight: normal;
@@ -679,7 +679,7 @@ table.bForums div.avatartag {
 }
 
 .navigation {
-	font-size: 10px;
+	font-size: 11px;
 	font-weight: bold;
 	text-align: right;
 	padding: 5px 2px;

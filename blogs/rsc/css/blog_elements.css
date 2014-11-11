@@ -1,8 +1,4 @@
 /**
  * This file is obsolete and the following stub is only provided for backward comaptibility with old skins.
  * blog_elements.css SHOULD NOT be referenced from anywhere.
- *
- * This has now been split into 2 different files:
  */
-@import url("blog_base.css");	/* Default styles for the blog navigation */
-@import url("item_base.css");	/* Default styles for the post CONTENT */

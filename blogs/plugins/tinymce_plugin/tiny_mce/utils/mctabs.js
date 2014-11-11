@@ -1,5 +1,5 @@
 /**
- * $Id$
+ * $Id: mctabs.js 829 2012-02-14 07:33:03Z attila $
  *
  * Moxiecode DHTML Tabs script.
  *

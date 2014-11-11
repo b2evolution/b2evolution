@@ -30,7 +30,7 @@
  *
  * @package evocore
  *
- * @version $Id$
+ * @version $Id: _blog.class.php 7434 2014-10-15 07:18:30Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -99,7 +99,6 @@ class Blog extends DataObject
 	var $allowblogcss = 0;
 	var $allowusercss = 0;
 	var $in_bloglist = 1;
-	var $UID;
 	var $media_location = 'default';
 	var $media_subdir = '';
 	var $media_fullpath = '';
@@ -187,7 +186,7 @@ class Blog extends DataObject
 		{
 			/**
 			 * NOTE: Check each new added or renamed field by function isset() below,
-			 *       Otherwise it will can create issue on upgrade process from old to new DB:
+			 *       Otherwise it may create issues during upgrade process from old to new DB:
 			 */
 			$this->ID = $db_row->blog_ID;
 			$this->shortname = $db_row->blog_shortname;
@@ -212,7 +211,6 @@ class Blog extends DataObject
 			$this->media_subdir = $db_row->blog_media_subdir;
 			$this->media_fullpath = $db_row->blog_media_fullpath;
 			$this->media_url = $db_row->blog_media_url;
-			$this->UID = $db_row->blog_UID;
 			$this->type = isset( $db_row->blog_type ) ? $db_row->blog_type : 'std';
 			$this->order = isset( $db_row->blog_order ) ? $db_row->blog_order : 0;
 			$this->favorite = isset( $db_row->blog_favorite ) ? $db_row->blog_favorite : 0;
@@ -627,6 +625,18 @@ class Blog extends DataObject
 
 			// call modules update_collection_features on this blog
 			modules_call_method( 'update_collection_features', array( 'edited_Blog' => & $this ) );
+
+			// load post moderation statuses
+			$moderation_statuses = get_visibility_statuses( 'moderation' );
+			$post_moderation_statuses = array();
+			foreach( $moderation_statuses as $status )
+			{
+				if( param( 'post_notif_'.$status, 'integer', 0 ) )
+				{
+					$post_moderation_statuses[] = $status;
+				}
+			}
+			$this->set_setting( 'post_moderation_statuses', implode( ',', $post_moderation_statuses ) );
 		}
 
 		if( in_array( 'comments', $groups ) )
@@ -2036,7 +2046,7 @@ class Blog extends DataObject
 		switch( $parname )
 		{
 			case 'normal_skin_ID':
-				if( $result == NULL )
+				if( $result === NULL )
 				{ // Try to get default from the global settings
 					$result = $Settings->get( 'def_'.$parname );
 				}
@@ -2044,7 +2054,7 @@ class Blog extends DataObject
 
 			case 'mobile_skin_ID':
 			case 'tablet_skin_ID':
-				if( $result == NULL )
+				if( $result === NULL )
 				{ // Try to get default from the global settings
 					$result = $Settings->get( 'def_'.$parname );
 				}
@@ -2055,7 +2065,8 @@ class Blog extends DataObject
 				break;
 
 			case 'moderation_statuses':
-				if( $result == NULL )
+			case 'post_moderation_statuses':
+				if( $result === NULL )
 				{ // moderation_statuses was not set yet, set the default value, which depends from the blog type
 					$default = 'review,draft';
 					$result = ( $this->type == 'forum' ) ? 'community,protected,'.$default : $default;
@@ -2064,7 +2075,7 @@ class Blog extends DataObject
 
 			case 'comment_inskin_statuses':
 			case 'post_inskin_statuses':
-				if( $result == NULL )
+				if( $result === NULL )
 				{ // inskin_statuses was not set yet, set the default value, which depends from the blog type
 					$default = 'published,community,protected,private,review';
 					$result = ( $this->type == 'forum' ) ? $default.',draft' : $default;
@@ -2073,7 +2084,7 @@ class Blog extends DataObject
 
 			case 'default_post_status':
 			case 'new_feedback_status':
-				if( $result == NULL )
+				if( $result === NULL )
 				{ // Default post/comment status was not set yet, use a default value corresponding to the blog type
 					$result = ( $this->type == 'forum' ) ? 'review' : 'draft';
 				}
@@ -2177,12 +2188,14 @@ class Blog extends DataObject
 
 		$DB->begin();
 
-		// Set an order as max value of previous order + 1
-		$SQL = new SQL();
-		$SQL->SELECT( 'MAX( blog_order )' );
-		$SQL->FROM( 'T_blogs' );
-		$max_order = intval( $DB->get_var( $SQL->get() ) );
-		$this->set( 'order', $max_order + 1 );
+		if( $this->get( 'order' ) == 0 )
+		{ // Set an order as max value of previous order + 1 if it is not defined yet
+			$SQL = new SQL();
+			$SQL->SELECT( 'MAX( blog_order )' );
+			$SQL->FROM( 'T_blogs' );
+			$max_order = intval( $DB->get_var( $SQL->get() ) );
+			$this->set( 'order', $max_order + 1 );
+		}
 
 		if( parent::dbinsert() )
 		{

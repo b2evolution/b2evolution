@@ -43,7 +43,7 @@
  * This will most probably cause problems, when nesting inputs. This should be refactored
  * to use a field_name-based member array. (blueyed)
  *
- * @version $Id$
+ * @version $Id: _form.class.php 6972 2014-06-24 19:12:29Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1668,13 +1668,13 @@ class Form extends Widget
 		$r .= '
 			<script type="text/javascript">
 				//<![CDATA[
-				if( typeof addEvent == "function" && typeof init_dynamicSelect == "function" )
+				if( typeof init_dynamicSelect == "function" )
 				{
-					addEvent( window, "load", init_dynamicSelect, false );
+					jQuery( document ).bind( "ready", init_dynamicSelect );
 					';
 					if( $this->check_all )
 					{ // Init check_all event on check_all links
-						$r .= 'addEvent( window, "load", init_check_all, false );';
+						$r .= 'jQuery( document ).bind( "ready", init_check_all );';
 					}
 					$r .= '
 				}

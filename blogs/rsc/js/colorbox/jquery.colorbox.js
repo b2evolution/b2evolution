@@ -73,11 +73,9 @@
 	event_cleanup = prefix + '_cleanup',
 	event_closed = prefix + '_closed',
 	event_purge = prefix + '_purge',
-	
+
 	// Special Handling for IE
-	isIE = $.browser.msie && !$.support.opacity, // Detects IE6,7,8.  IE9 supports opacity.  Feature detection alone gave a false positive on at least one phone browser and on some development versions of Chrome, hence the user-agent test.
-	isIE6 = isIE && $.browser.version < 7,
-	event_ie6 = prefix + '_IE6',
+	isIE = !$.support.opacity, // Detects IE6,7,8.  IE9 supports opacity.  Feature detection alone gave a false positive on at least one phone browser and on some development versions of Chrome, hence the user-agent test.
 
 	// Cached jQuery Object Variables
 	$overlay,
@@ -262,12 +260,6 @@
 				settings.w = setSize(settings.initialWidth, 'x');
 				settings.h = setSize(settings.initialHeight, 'y');
 				publicMethod.position();
-				
-				if (isIE6) {
-					$window.bind('resize.' + event_ie6 + ' scroll.' + event_ie6, function () {
-						$overlay.css({width: $window.width(), height: $window.height(), top: $window.scrollTop(), left: $window.scrollLeft()});
-					}).trigger('resize.' + event_ie6);
-				}
 
 				trigger(event_open, settings.onOpen);
 
@@ -322,8 +314,8 @@
 	publicMethod.init = function () {
 		// Create & Append jQuery Objects
 		$window = $(window);
-		$box = $div().attr({id: colorbox, 'class': isIE ? prefix + (isIE6 ? 'IE6' : 'IE') : ''});
-		$overlay = $div("Overlay", isIE6 ? 'position:absolute' : '').hide();
+		$box = $div().attr({id: colorbox, 'class': isIE ? prefix + 'IE' : ''});
+		$overlay = $div("Overlay").hide();
 		
 		$wrap = $div("Wrapper");
 		$content = $div("Content").append(
@@ -422,7 +414,7 @@
 		// remove the modal so that it doesn't influence the document width/height		
 		$box.hide();
 		
-		if (settings.fixed && !isIE6) {
+		if (settings.fixed) {
 			$box.css({position: 'fixed'});
 		} else {
 			top = $window.scrollTop();
@@ -557,18 +549,9 @@
 		
 		// floating the IMG removes the bottom line-height and fixed a problem where IE miscalculates the width of the parent element as 100% of the document width.
 		//$(photo).css({'float': 'none', marginLeft: 'auto', marginRight: 'auto'});
-		
+
 		$(photo).css({'float': 'none'});
-		
-		// Hides SELECT elements in IE6 because they would otherwise sit on top of the overlay.
-		if (isIE6) {
-			$('select').not($box.find('select')).filter(function () {
-				return this.style.visibility !== 'hidden';
-			}).css({'visibility': 'hidden'}).one(event_cleanup, function () {
-				this.style.visibility = 'inherit';
-			});
-		}
-		
+
 		callback = function () {
 			var prev, prevSrc, next, nextSrc, total = $related.length, iframe, complete;
 			
@@ -802,7 +785,11 @@
 					photo.style.marginTop = Math.max(settings.h - photo.height, 0) / 2 + 'px';
 				}
 				
-				if ($related[1] && (index < $related.length - 1 || settings.loop)) {
+				if ($related[1] && (index < $related.length - 1 || settings.loop))
+				{
+					// Clear classes from previous image
+					jQuery( photo ).removeClass( 'zoomin zoomout' );
+
 					var photo_is_zoomed = false;
 					var photo_width = 0;
 					var photo_height = 0;
@@ -817,8 +804,11 @@
 						{ // Photo is small - Use a click event to display next photo
 							publicMethod.next();
 						}
-						else
-						{ // Photo is big - Use a click event to zoom a photo
+					};
+					if( photo_is_big )
+					{ // Photo is big - Use a click event to zoom a photo
+						jQuery( photo ).bind( 'click dblclick', function( e )
+						{
 							if( photo_is_zoomed )
 							{ // Zoom out a photo to window size
 								photo.className = photo.className.replace( /zoomout/, '' );
@@ -844,8 +834,8 @@
 									.scrollTop( pecentY * ( this_parent.scrollHeight - this_parent.clientHeight ) );
 							}
 							photo_is_zoomed = photo_is_zoomed ? false : true;
-						}
-					};
+						} );
+					}
 				}
 				
 				if (isIE) {
@@ -894,7 +884,7 @@
 			
 			trigger(event_cleanup, settings.onCleanup);
 			
-			$window.unbind('.' + prefix + ' .' + event_ie6);
+			$window.unbind('.' + prefix);
 			
 			$overlay.fadeTo(200, 0);
 			
@@ -941,3 +931,38 @@
 	$(publicMethod.init);
 
 }(jQuery, document, this));
+
+// Rewrite double click event for double tap event on touch devices (in order to zoom big images)
+jQuery.event.special.dblclick = {
+	setup: function( data, namespaces )
+	{
+		var elem = this,
+			$elem = jQuery( elem );
+		$elem.bind( 'touchend.dblclick', jQuery.event.special.dblclick.handler );
+	},
+
+	teardown: function( namespaces )
+	{
+		var elem = this,
+			$elem = jQuery( elem );
+		$elem.unbind( 'touchend.dblclick' );
+	},
+
+	handler: function( event )
+	{
+		var elem = event.target,
+			$elem = jQuery( elem ),
+			lastTouch = $elem.data( 'lastTouch' ) || 0,
+			now = new Date().getTime();
+
+		var delta = now - lastTouch;
+		if( delta > 20 && delta < 500 )
+		{
+			$elem.data( 'lastTouch', 0 );
+			$elem.trigger( 'dblclick' );
+		} else
+		{
+			$elem.data( 'lastTouch', now );
+		}
+	}
+};

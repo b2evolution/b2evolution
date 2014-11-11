@@ -2,7 +2,7 @@
  * Server communication functions - Ajax without the pain
  * b2evolution - http://b2evolution.net/
  * @author yabs {@link http://innervisions.org.uk/ }
- * @version $Id$
+ * @version $Id: communication.js 1329 2012-05-02 17:37:41Z yura $
  */
 
 
