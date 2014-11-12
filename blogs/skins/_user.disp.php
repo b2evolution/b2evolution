@@ -17,7 +17,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _user.disp.php 7599 2014-11-10 08:22:25Z yura $
+ * @version $Id: _user.disp.php 7610 2014-11-12 07:26:34Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -313,9 +313,7 @@ $ProfileForm->begin_fieldset( T_( 'Reputation' ) );
 
 	$ProfileForm->info( T_('Number of posts'), $User->get_reputation_posts() );
 
-	$ProfileForm->info( T_('Number of comments'), $User->get_reputation_comments() );
-
-	$ProfileForm->info( T_('Number of helpful votes'), $User->get_reputation_comments_helpful() );
+	$ProfileForm->info( T_('Comments'), $User->get_reputation_comments() );
 
 	$ProfileForm->info( T_('Spam fighter score'), $User->get_reputation_spam() );
 

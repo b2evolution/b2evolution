@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author efy-asimo: Attila Simo
  *
- * @version $Id$
+ * @version $Id: _user_admin.form.php 7610 2014-11-12 07:26:34Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -267,7 +267,17 @@ $Form->begin_fieldset( T_('Usage info').get_manual_link('user-admin-usage') );
 	$edited_user_lastseen = $edited_User->get( 'lastseen_ts' );
 	$Form->info_field( T_('Last seen on'), ( empty( $edited_user_lastseen ) ? '' : mysql2localedatetime( $edited_user_lastseen ) ) );
 	$Form->info_field( T_('On IP'), $edited_User->get_last_session_param('ipaddress') );
-$Form->end_fieldset();
+$Form->end_fieldset(); // Usage info
+
+$Form->begin_fieldset( T_('Reputation').get_manual_link('user-admin-reputaion') );
+
+	$Form->info( T_('Number of posts'), $edited_User->get_reputation_posts() );
+
+	$Form->info( T_('Comments'), $edited_User->get_reputation_comments() );
+
+	$Form->info( T_('Spam fighter score'), $edited_User->get_reputation_spam() );
+
+$Form->end_fieldset(); // Reputation
 
 $from_country = '';
 if( !empty( $edited_User->reg_ctry_ID ) )

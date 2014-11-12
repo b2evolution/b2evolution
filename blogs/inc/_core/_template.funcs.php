@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _template.funcs.php 7233 2014-08-08 10:25:22Z yura $
+ * @version $Id: _template.funcs.php 7613 2014-11-12 08:19:20Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -854,6 +854,8 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $type = 'js', $ve
 	if( ! empty( $library_cdn_urls[ $lib_file ] ) )
 	{ // Rewrite local urls with public CDN urls if they are defined in _advanced.php
 		$library_local_urls[ $lib_file ] = $library_cdn_urls[ $lib_file ];
+		// Don't append version for global CDN urls
+		$version = NULL;
 	}
 
 	if( ! empty( $library_local_urls[ $lib_file ] ) )
@@ -881,7 +883,7 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $type = 'js', $ve
 	{ // It's already an absolute url, keep it as is:
 		$lib_url = $lib_file;
 	}
-	elseif( $relative_to === 'blog' && !empty($Blog))
+	elseif( $relative_to === 'blog' && ! empty( $Blog ) )
 	{ // Get the file from $rsc_uri relative to the current blog's domain (may be a subdomain or a custom domain):
 		if( $assets_baseurl !== $baseurl )
 		{ // We are using a specific domain, don't try to load from blog specific domain

@@ -542,6 +542,8 @@ label.radiooption {
 legend {
 	font-weight: bold;
 	font-size: 120%;
+	padding: 12px 0 8px;
+	color: #888;
 }
 
 

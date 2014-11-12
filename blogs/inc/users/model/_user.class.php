@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _user.class.php 7599 2014-11-10 08:22:25Z yura $
+ * @version $Id: _user.class.php 7610 2014-11-12 07:26:34Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -4989,7 +4989,7 @@ class User extends DataObject
 
 
 	/**
-	 * Get number of comments and percent of published comments by this user
+	 * Get number of comments and percent of published comments and number of helpful votes on comments by this user
 	 *
 	 * @param array Params
 	 * @return string Result
@@ -4998,7 +4998,7 @@ class User extends DataObject
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'text' => T_( '%s (%s%% are public)' ),
+				'text' => T_( '%s has posted %s comments (%s%% of which are public). %s of these comments have been found useful by %s different users.' ),
 			), $params );
 
 		$total_num_comments = $this->get_num_comments();
@@ -5021,26 +5021,9 @@ class User extends DataObject
 			$total_num_comments = '<b>'.$total_num_comments.'</b>';
 		}
 
-		return sprintf( $params['text'], $total_num_comments, $public_percent );
-	}
-
-
-	/**
-	 * Get number of helpful votes for this user
-	 *
-	 * @param array Params
-	 * @return string Result
-	 */
-	function get_reputation_comments_helpful( $params = array() )
-	{
-		// Make sure we are not missing any param:
-		$params = array_merge( array(
-				'text' => T_( '%s different users found %s posted %s helpful replies.' ),
-			), $params );
-
+		// Get number of helpful votes on comments for this user
 		global $DB;
-
-		$comments_SQL = new SQL( 'Get number of helpful votes on comments for this user' );
+		$comments_SQL = new SQL();
 		$comments_SQL->SELECT( 'cmvt_user_ID AS user_ID, COUNT(*) AS cnt' );
 		$comments_SQL->FROM( 'T_comments' );
 		$comments_SQL->FROM_add( 'INNER JOIN T_comments__votes ON comment_ID = cmvt_cmt_ID' );
@@ -5059,7 +5042,7 @@ class User extends DataObject
 			$votes_count += $user_votes;
 		}
 
-		return sprintf( $params['text'], '<b>'.$users_count.'</b>', $this->login, '<b>'.$votes_count.'</b>' );
+		return sprintf( $params['text'], $this->get_colored_login(), $total_num_comments, $public_percent, '<b>'.$votes_count.'</b>', '<b>'.$users_count.'</b>' );
 	}
 
 
