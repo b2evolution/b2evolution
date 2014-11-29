@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _user.class.php 7610 2014-11-12 07:26:34Z yura $
+ * @version $Id: _user.class.php 7633 2014-11-13 09:57:07Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -5042,7 +5042,7 @@ class User extends DataObject
 			$votes_count += $user_votes;
 		}
 
-		return sprintf( $params['text'], $this->get_colored_login(), $total_num_comments, $public_percent, '<b>'.$votes_count.'</b>', '<b>'.$users_count.'</b>' );
+		return sprintf( $params['text'], $this->login, $total_num_comments, $public_percent, '<b>'.$votes_count.'</b>', '<b>'.$users_count.'</b>' );
 	}
 
 

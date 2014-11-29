@@ -28,7 +28,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _regional.funcs.php 235 2011-11-08 12:50:06Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -303,12 +303,12 @@ function import_cities( $country_ID, $file_name )
 			continue;
 		}
 
-		$postcode = trim( $data[0] );
-		$name = trim( $data[1] );
+		$postcode = trim( $data[0], " \xA0" ); // \xA0 - ASCII Non-breaking space
+		$name = trim( $data[1], " \xA0" );
 		$subregion_code = '';
 		if( isset( $data[2] ) )
 		{	// Optional field
-			$subregion_code = trim( $data[2] );
+			$subregion_code = trim( $data[2], " \xA0" );
 		}
 
 		if( empty( $postcode ) && empty( $name ) )

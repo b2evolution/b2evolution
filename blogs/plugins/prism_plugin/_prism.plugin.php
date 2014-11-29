@@ -92,41 +92,7 @@ class prism_plugin extends Plugin
 	 */
 	function RenderItemAsHtml( & $params )
 	{
-		$content = & $params['data'];
-
-		$this->allow_html = false;
-		// Get a setting "Allow HTML" for:
-		if( ! empty( $params['Comment'] ) )
-		{ // Comment
-			$Comment = & $params['Comment'];
-			$comment_Item = & $Comment->get_Item();
-			$item_Blog = $comment_Item->get_Blog();
-			$this->allow_html = $item_Blog->get_setting( 'allow_html_comment' );
-		}
-		else if( ! empty( $params['Item'] ) )
-		{ // Item
-			$Item = & $params['Item'];
-			$item_Blog = $Item->get_Blog();
-			$this->allow_html = $item_Blog->get_setting( 'allow_html_post' );
-		}
-
-		if( $this->allow_html )
-		{ // If HTML is allowed in content we should disallow this for <code> content
-			$content = preg_replace_callback( '#(<code class="language-[a-z]+">)([\s\S]+?)(</code>)#i',
-				array( $this, 'encode_html_entities' ), $content );
-		}
-	}
-
-
-	/**
-	 * Encode HTML entities inside <code> blocks
-	 *
-	 * @param array Block
-	 * @return string
-	 */
-	function encode_html_entities( $block )
-	{
-		return $block[1].evo_htmlspecialchars( $block[2] ).$block[3];
+		/* Required a declaration of this method to identify this plugin as renderer */
 	}
 
 

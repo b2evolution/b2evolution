@@ -20,7 +20,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id$
+ * @version $Id: _contact_list.view.php 7698 2014-11-26 07:46:54Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -503,7 +503,7 @@ if( count( $Results->rows ) > 0 )
 ?>
 <script type="text/javascript">
 jQuery( '#send_selected_recipients' ).click( function()
-{	// Add selected users to this link
+{ // Add selected users to this link
 	var recipients_param = '';
 	var recipients = get_selected_users();
 	if( recipients.length > 0 )
@@ -524,14 +524,14 @@ function get_selected_users()
 	var users = '';
 	jQuery( 'input[name^=contacts]' ).each( function()
 	{
-		if( jQuery( this ).attr( 'checked' ) )
+		if( jQuery( this ).is( ':checked' ) )
 		{
 			users += jQuery( this ).val() + ',';
 		}
 	} );
 
 	if( users.length > 0 )
-	{	// Delete last comma
+	{ // Delete last comma
 		users = users.substr( 0, users.length-1 );
 	}
 

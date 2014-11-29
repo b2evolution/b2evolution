@@ -148,7 +148,7 @@ $Form->begin_fieldset( T_('Email') );
 
 	if( $action != 'view' )
 	{ // We can edit the values:
-		$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email address'), $email_fieldnote, array( 'maxlength' => 100, 'required' => true ) );
+		$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email address'), $email_fieldnote, array( 'maxlength' => 255, 'required' => true ) );
 		$disabled = false;
 	}
 	else

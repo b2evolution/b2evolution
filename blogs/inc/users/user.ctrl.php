@@ -37,7 +37,7 @@ if( $user_profile_only )
 
 	// Make sure the user only edits himself:
 	$user_ID = $current_User->ID;
-	if( ! in_array( $action, array( 'update', 'update_avatar', 'upload_avatar', 'edit', 'default_settings', 'redemption' ) ) )
+	if( ! in_array( $action, array( 'update', 'update_avatar', 'upload_avatar', 'remove_avatar', 'delete_avatar', 'rotate_avatar_90_left', 'rotate_avatar_180', 'rotate_avatar_90_right', 'edit', 'default_settings', 'redemption' ) ) )
 	{
 		$action = 'edit';
 	}

@@ -21,7 +21,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _stats_refdomains.view.php 7641 2014-11-14 05:37:51Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -53,7 +53,17 @@ if( !$dtyp_normal && !$dtyp_searcheng && !$dtyp_aggregator && !$dtyp_email && !$
 }
 
 
-echo '<h2>'.T_('Referring domains').'</h2>';
+if( empty( $blog ) )
+{ // Page title when we show domains for all blogs
+	$page_title = T_('All referring domains');
+}
+else
+{ // Page title for selected blog domains
+	global $Blog;
+	$page_title = sprintf( T_('Referring domains for collection %s'), $Blog->get( 'shortname' ) );
+}
+
+echo '<h2>'.$page_title.'</h2>';
 
 $SQL = new SQL();
 
@@ -74,7 +84,7 @@ if( ! empty( $dname ) )
 // TODO: fp>implement filter checkboxes, not a hardwired filter
 //$where_clause .= ' AND hit_referer_type NOT IN ( "self", "admin" )';
 
-if( !empty($blog) )
+if( ! empty( $blog ) )
 {
 	$SQL->WHERE_and( 'hit_coll_ID = '.$blog.' OR hit_coll_ID IS NULL' );
 }
@@ -120,7 +130,7 @@ function filter_basedomains( & $Form )
 {
 	global $blog, $dtyp_normal, $dtyp_searcheng, $dtyp_aggregator, $dtyp_email, $dtyp_unknown;
 
-	$Form->text_input( 'dname', get_param( 'dname' ), 20, T_('Domain name') );
+	$Form->text_input( 'dname', get_param( 'dname' ), 20, T_('Domain name'), '', array( 'maxlength' => 250 ) );
 	$Form->checkbox( 'dtyp_normal', $dtyp_normal, T_('Regular sites') );
 	$Form->checkbox( 'dtyp_searcheng', $dtyp_searcheng, T_('Search engines') );
 	$Form->checkbox( 'dtyp_aggregator', $dtyp_aggregator, T_('Feed aggregators') );
@@ -151,7 +161,7 @@ $Results->filter_area = array(
 	);
 
 
-$Results->title = T_('Referring domains').get_manual_link('referring-domains-tab');
+$Results->title = $page_title.get_manual_link('referring-domains-tab');
 
 $Results->cols[] = array(
 						'th' => T_('Domain name'),

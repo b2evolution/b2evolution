@@ -31,7 +31,7 @@
  * @author fplanque: Francois PLANQUE - {@link http://fplanque.net/}
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id$
+ * @version $Id: _plugins.class.php 7625 2014-11-13 06:42:39Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -2025,7 +2025,8 @@ class Plugins
 			$apply_rendering = $loop_RendererPlugin->get_coll_setting( $setting_name, $setting_Blog );
 
 			if( $apply_rendering == 'stealth'
-				|| $apply_rendering == 'never' )
+				|| $apply_rendering == 'never'
+				|| empty( $apply_rendering ) )
 			{ // This is not an option.
 				continue;
 			}

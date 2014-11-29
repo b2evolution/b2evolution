@@ -28,7 +28,7 @@
  * @author efy-sergey: Evo Factory / Sergey.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: item_types.ctrl.php 7650 2014-11-15 13:37:36Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -268,6 +268,8 @@ switch( $action )
 $AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Contents'), 'url' => '?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' ) );
 $AdminUI->breadcrumbpath_add( T_('Content settings'), '?ctrl=itemtypes&amp;blog=$blog$&amp;tab=settings' );
 $AdminUI->breadcrumbpath_add( T_('Post types'), '?ctrl=itemtypes&amp;blog=$blog$&amp;tab=settings&amp;tab3=types' );
+
+$AdminUI->set_page_manual_link( 'managing-item-types' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

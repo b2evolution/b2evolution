@@ -14,7 +14,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _comment.form.php 7281 2014-09-05 12:22:20Z yura $
+ * @version $Id: _comment.form.php 7644 2014-11-14 08:12:53Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -124,17 +124,17 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 		echo '<tr><td width="1%"><strong>'.T_('Author').':</strong></td>';
 		echo '<td class="input">';
-		$Form->text_input( 'newcomment_author', $edited_Comment->author, 20, '', '', array('maxlength'=>100, 'style'=>'width: 100%;' ) );
+		$Form->text_input( 'newcomment_author', $edited_Comment->author, 20, '', '', array( 'maxlength' => 100, 'style' => 'width: 100%;' ) );
 		echo '</td></tr>';
 
 		echo '<tr><td width="1%"><strong>'.T_('Email').':</strong></td>';
 		echo '<td class="input">';
-		$Form->text_input( 'newcomment_author_email', $edited_Comment->author_email, 20, '', '', array('maxlength'=>100, 'style'=>'width: 100%;') );
+		$Form->text_input( 'newcomment_author_email', $edited_Comment->author_email, 20, '', '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
 		echo '</td></tr>';
 
 		echo '<tr><td width="1%"><strong>'.T_('Website URL').':</strong></td>';
 		echo '<td class="input">';
-		$Form->text_input( 'newcomment_author_url', $edited_Comment->author_url, 20, '', '', array('maxlength'=>100, 'style'=>'width: 100%;') );
+		$Form->text_input( 'newcomment_author_url', $edited_Comment->author_url, 20, '', '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
 		echo '</td></tr>';
 
 		$Form->switch_layout( NULL );

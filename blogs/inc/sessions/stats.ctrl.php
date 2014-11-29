@@ -22,7 +22,7 @@
  * @author fplanque: Francois PLANQUE
  * @author vegarg: Vegar BERG GULDAL
  *
- * @version $Id: stats.ctrl.php 7414 2014-10-13 08:10:51Z yura $
+ * @version $Id: stats.ctrl.php 7654 2014-11-15 14:13:15Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -242,6 +242,7 @@ if( isset($collections_Module) && $tab_from != 'antispam' )
 }
 
 $AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Analytics'), 'url' => '?ctrl=stats&amp;blog=$blog$' ) );
+$AdminUI->set_page_manual_link( 'analytics-tab' );
 
 if( isset( $tab_real ) )
 { // Restore real tab value

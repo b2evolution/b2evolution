@@ -12,7 +12,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: goals.ctrl.php 7414 2014-10-13 08:10:51Z yura $
+ * @version $Id: goals.ctrl.php 7654 2014-11-15 14:13:15Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -402,6 +402,9 @@ switch( $action )
 $AdminUI->breadcrumbpath_init();
 $AdminUI->breadcrumbpath_add( T_('Analytics'), '?ctrl=stats' );
 $AdminUI->breadcrumbpath_add( T_('Goal tracking'), '?ctrl=goals' );
+
+$AdminUI->set_page_manual_link( 'analytics-tab' );
+
 switch( $tab3 )
 {
 	case 'goals':

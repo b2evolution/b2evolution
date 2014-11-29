@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _blog.funcs.php 7301 2014-09-09 09:36:51Z yura $
+ * @version $Id: _blog.funcs.php 7695 2014-11-24 07:41:59Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -542,8 +542,9 @@ function init_requested_blog()
 	}
 
 	// Still no blog requested, use default
-	$blog = $Settings->get('default_blog_ID');
-	if( (($Blog = & $BlogCache->get_by_ID( $blog, false, false )) !== false) )
+	$blog = $Settings->get( 'default_blog_ID' );
+	$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+	if( $Blog !== false && $Blog !== NULL )
 	{ // We found a matching blog:
 		$Debuglog->add( 'Using default blog '.$blog, 'detectblog' );
 		return true;

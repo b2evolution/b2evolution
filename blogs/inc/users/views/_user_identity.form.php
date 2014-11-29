@@ -29,7 +29,7 @@
  *
  * @package admin
  *
- * @version $Id: _user_identity.form.php 7036 2014-07-01 18:05:24Z yura $
+ * @version $Id: _user_identity.form.php 7692 2014-11-21 08:21:18Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -162,7 +162,7 @@ if( $new_user_creating )
 	$Form->text_input( 'edited_user_level', $edited_User->get('level'), 2, T_('User level'), $field_note, array( 'required' => true ) );
 
 	$email_fieldnote = '<a href="mailto:'.$edited_User->get('email').'">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
-	$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email'), $email_fieldnote, array( 'maxlength' => 100, 'required' => true ) );
+	$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email'), $email_fieldnote, array( 'maxlength' => 255, 'required' => true ) );
 	$Form->select_input_array( 'edited_user_status', $edited_User->get( 'status' ), get_user_statuses(), T_( 'Account status' ) );
 
 	$Form->end_fieldset();
@@ -469,8 +469,8 @@ $Form->end_fieldset();
 $Form->hidden( 'orig_user_ID', $user_id );
 
 $Plugins->trigger_event( 'DisplayProfileFormFieldset', array(
-			'Form' => & $ProfileForm,
-			'User' => & $User,
+			'Form' => & $Form,
+			'User' => & $edited_User,
 			'edit_layout' => 'private',
 			'is_admin_page' => $is_admin_page,
 		) );

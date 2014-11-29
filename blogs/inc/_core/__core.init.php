@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: __core.init.php 7685 2014-11-19 10:05:48Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -897,7 +897,9 @@ class _core_Module extends Module
 						'title' => T_('See the home page'),
 					),
 			);
-			if( $current_User->check_perm( 'blogs', 'create' ) )
+			if( $current_User->check_perm( 'blogs', 'view' ) ||
+			    $current_User->check_role( 'member' ) ||
+			    $current_User->check_perm( 'blogs', 'create' ) )
 			{
 				$entries[ 'blog' ] = array(
 					'text' => T_('Blog'),
@@ -1059,25 +1061,25 @@ class _core_Module extends Module
 							);
 						}
 				}
-			}
 
-			if( ! is_admin_page() )
-			{ // Display a menu to turn on/off the debug containers
-				global $ReqURI, $Session;
+				if( ! is_admin_page() )
+				{ // Display a menu to turn on/off the debug containers
+					global $ReqURI, $Session;
 
-				if( $Session->get( 'debug_containers_'.$Blog->ID ) == 1 )
-				{ // To hide the debug containers
-					$entries['blog']['entries']['containers'] = array(
-						'text' => T_('Hide containers'),
-						'href' => url_add_param( $ReqURI, 'debug_containers=hide' ),
-					);
-				}
-				else
-				{ // To show the debug containers
-					$entries['blog']['entries']['containers'] = array(
-						'text' => T_('Show containers'),
-						'href' => url_add_param( $ReqURI, 'debug_containers=show' ),
-					);
+					if( $Session->get( 'debug_containers_'.$Blog->ID ) == 1 )
+					{ // To hide the debug containers
+						$entries['blog']['entries']['containers'] = array(
+							'text' => T_('Hide containers'),
+							'href' => url_add_param( $ReqURI, 'debug_containers=hide' ),
+						);
+					}
+					else
+					{ // To show the debug containers
+						$entries['blog']['entries']['containers'] = array(
+							'text' => T_('Show containers'),
+							'href' => url_add_param( $ReqURI, 'debug_containers=show' ),
+						);
+					}
 				}
 			}
 		}

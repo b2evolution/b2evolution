@@ -30,7 +30,7 @@
  *
  * @package evocore
  *
- * @version $Id: _blog.class.php 7434 2014-10-15 07:18:30Z yura $
+ * @version $Id: _blog.class.php 7636 2014-11-13 10:55:48Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -260,6 +260,7 @@ class Blog extends DataObject
 				$this->set_setting( 'orderdir', 'DESC' );
 				$this->set_setting( 'enable_goto_blog', 'post' );
 				$this->set_setting( 'front_disp', 'front' );
+				$this->set_setting( 'allow_rating_comment_helpfulness', 1 );
 				break;
 
 			case 'manual':

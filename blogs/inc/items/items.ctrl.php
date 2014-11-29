@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: items.ctrl.php 7338 2014-09-29 15:20:01Z yura $
+ * @version $Id: items.ctrl.php 7650 2014-11-15 13:37:36Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1263,6 +1263,9 @@ function init_list_mode()
 					'orderby' => 'priority',
 					'order' => 'ASC' ) );
 			$AdminUI->breadcrumbpath_add( T_( 'Workflow view' ), '?ctrl=items&amp;blog=$blog$&amp;tab=tracker&amp;filter=restore' );
+
+			$AdminUI->set_page_manual_link( 'workflow-features' );
+			
 			// JS to edit priority of items from list view
 			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 			break;

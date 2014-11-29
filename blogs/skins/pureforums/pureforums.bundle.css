@@ -950,6 +950,25 @@ div.results div.filters {
   background: #FFF;
 }
 
+.vote_spam {
+  float: left;
+  padding: 1px 5px 0;
+  line-height: 19px;
+}
+
+.vote_spam a, .vote_spam span {
+  vertical-align: middle;
+  top: -1px;
+  display: inline-block;
+}
+
+.vote_helpful {
+  float: left;
+  display: block;
+  line-height: 21px;
+  padding-right: 5px;
+}
+
 /* The width switcher */
 .switched_width {
   transition: all 1s;

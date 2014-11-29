@@ -15,7 +15,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _stats_refdomains.form.php 7628 2014-11-13 08:07:09Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -39,7 +39,7 @@ $Form->begin_form( 'fform', $creating ?  T_('New Domain') : T_('Domain') );
 	$Form->hidden( 'tab_from', get_param( 'tab_from' ) );
 	$Form->hidden( 'tab3', get_param( 'tab3' ) );
 
-	$Form->text_input( 'dom_name', $edited_Domain->get( 'name' ), 50, T_('Name'), '', array( 'maxlength' => 15, 'required' => true ) );
+	$Form->text_input( 'dom_name', $edited_Domain->get( 'name' ), 50, T_('Name'), '', array( 'maxlength' => 250, 'required' => true ) );
 
 	$Form->select_input_array( 'dom_type', $edited_Domain->get( 'type' ), stats_dom_type_titles() , T_('Referrer type'), '', array( 'force_keys_as_values' => true, 'required' => true ) );
 

@@ -13,7 +13,7 @@
  *
  * @package evoskins
  *
- * @version $Id$
+ * @version $Id: _edit_comment.disp.php 7644 2014-11-14 08:12:53Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -83,9 +83,9 @@ $Form->begin_form( 'inskin', '', $display_params );
 	}
 	else
 	{
-		$Form->text_input( 'newcomment_author', $edited_Comment->author, 20, T_('Author'), '', array('maxlength'=>100, 'style'=>'width: 99%;' ) );
-		$Form->text_input( 'newcomment_author_email', $edited_Comment->author_email, 20, T_('Email'), '', array('maxlength'=>100, 'style'=>'width: 99%;') );
-		$Form->text_input( 'newcomment_author_url', $edited_Comment->author_url, 20, T_('Website URL'), '', array('maxlength'=>100, 'style'=>'width: 99%;') );
+		$Form->text_input( 'newcomment_author', $edited_Comment->author, 20, T_('Author'), '', array( 'maxlength' => 100, 'style' => 'width: 99%;' ) );
+		$Form->text_input( 'newcomment_author_email', $edited_Comment->author_email, 20, T_('Email'), '', array( 'maxlength' => 255, 'style' => 'width: 99%;' ) );
+		$Form->text_input( 'newcomment_author_url', $edited_Comment->author_url, 20, T_('Website URL'), '', array( 'maxlength' => 255, 'style' => 'width: 99%;' ) );
 	}
 
 	ob_start();

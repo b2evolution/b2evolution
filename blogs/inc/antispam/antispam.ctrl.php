@@ -32,7 +32,7 @@
  *
  * @todo Allow applying / re-checking of the known data, not just after an update!
  *
- * @version $Id: antispam.ctrl.php 6911 2014-06-17 15:35:37Z yura $
+ * @version $Id: antispam.ctrl.php 7628 2014-11-13 08:07:09Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -524,6 +524,7 @@ if( $display_mode != 'js' )
 			require_js( '#jqueryUI#' );
 			// Used for edit form
 			$tab_from = 'antispam';
+			$blog = 0; // Don't restrict domains by blog ID on this controller
 			break;
 	}
 

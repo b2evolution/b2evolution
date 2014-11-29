@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
- * @version $Id$
+ * @version $Id: item_statuses.ctrl.php 7650 2014-11-15 13:37:36Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -67,7 +67,7 @@ $AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Contents'), 'url' => '
 $AdminUI->breadcrumbpath_add( T_('Content settings'), '?ctrl=itemtypes&amp;blog=$blog$&amp;tab=settings&amp;tab3=statuses' );
 $AdminUI->breadcrumbpath_add( T_('Post statuses'), '?ctrl=itemtypes&amp;blog=$blog$&amp;tab=settings&amp;tab3=statuses' );
 
-
+$AdminUI->set_page_manual_link( 'managing-item-statuses' );
 
 $list_title = T_('Post statuses');
 $default_col_order = 'A';
