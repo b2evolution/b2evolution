@@ -26,12 +26,13 @@ class flowplayer_plugin extends Plugin
 	var $version = '5.0.0';
 	var $group = 'files';
 	var $number_of_installs = 1;
-	var $allow_ext = array( 'flv', 'swf', 'm4v', 'f4v', 'mov', 'mp4' );
+	var $allow_ext = array( 'flv', 'swf', 'mp4', 'ogv', 'webm', 'm3u8' );
 
 
 	function PluginInit( & $params )
 	{
-		$this->short_desc = sprintf( T_('Media player for the these file formats: %s.'), implode( ', ', $this->allow_ext ) );
+		$this->short_desc = sprintf( T_('Media player for the these file formats: %s. Note: iOS supports only: %s; Android supports only: %s.'),
+			implode( ', ', $this->allow_ext ), 'mp4', 'mp4, webm' );
 		$this->long_desc = $this->short_desc;
 	}
 

@@ -18,7 +18,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -49,7 +49,7 @@ param( 'iframe_name', 'string', '', true );
 
 $SQL = $LinkOwner->get_SQL();
 
-$Results = new Results( $SQL->get(), 'link_' );
+$Results = new Results( $SQL->get(), 'link_', '', 1000 );
 
 $Results->title = T_('Attachments');
 
@@ -132,7 +132,7 @@ if( $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
 	$Results->cols[] = array(
 							'th' => T_('Actions'),
 							'td_class' => 'shrinkwrap',
-							'td' => '%link_actions( #link_ID#, {CUR_IDX}, {TOTAL_ROWS} )%',
+							'td' => '%link_actions( #link_ID#, {ROW_IDX_TYPE} )%',
 						);
 }
 

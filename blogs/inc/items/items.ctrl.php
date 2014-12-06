@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: items.ctrl.php 7650 2014-11-15 13:37:36Z manuel $
+ * @version $Id: items.ctrl.php 7740 2014-12-03 12:12:05Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -455,6 +455,9 @@ switch( $action )
 		$item_ID = param( 'p', 'integer', true );
 		$ItemCache = &get_ItemCache();
 		$edited_Item = & $ItemCache->get_by_ID( $item_ID );
+
+		// Set ID of copied post to 0, because some functions can update current post, e.g. $edited_Item->get( 'excerpt' )
+		$edited_Item->ID = 0;
 
 		$edited_Item->load_Blog();
 		$item_status = $edited_Item->Blog->get_allowed_item_status();

@@ -194,11 +194,19 @@ div.action_messages {
 	-ms-transform:scale(1.06); /* IE 9 */
 	-webkit-transform:scale(1.06); /* Safari and Chrome */
 }
-.post_images .image_legend {
+div.mediajs_block, div.videojs_block, div.flowplayer_block {
+	margin-top: 0;
+	margin-bottom: 50px;
+}
+.post_images .image_legend, .mediajs_block .mediajs_text {
 	margin: 0;
 	font-weight: bold;
 	color: #f8f8f8;
 	float: left;
+}
+div.mediajs_block .mediajs_text, div.videojs_block .videojs_text {
+	float: none;
+	margin-bottom: 0;
 }
 .bDetails {
 	width: 80%;
@@ -540,6 +548,9 @@ div.tabs div.selected a {
 
 .flowplayer_block, .videojs_block, .mediajs_block {
 	width: 658px;
+}
+.flowplayer_block > div, .videojs_block > div, .mediajs_block > div {
+	margin: 0 auto;
 }
 .bCommentText .flowplayer_block, .bCommentText .videojs_block, .bCommentText .mediajs_block {
 	width: 100%;

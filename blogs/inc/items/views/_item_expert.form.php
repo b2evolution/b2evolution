@@ -11,7 +11,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _item_expert.form.php 7740 2014-12-03 12:12:05Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -72,14 +72,8 @@ $Form->begin_form( '', '', $params );
 	if( isset( $mode ) )   $Form->hidden( 'mode', $mode );	// used by bookmarklet
 	if( isset( $edited_Item ) )
 	{
-		if( $action == 'copy' )
-		{	// Copy post
-			$Form->hidden( 'post_ID', 0 );
-		}
-		else
-		{	// Edit post
-			$Form->hidden( 'post_ID', $edited_Item->ID );
-		}
+		// Item ID
+		$Form->hidden( 'post_ID', $edited_Item->ID );
 
 		// Here we add js code for attaching file popup window: (Yury)
 		if( !empty( $edited_Item->ID ) && ( $Session->get('create_edit_attachment') === true ) )

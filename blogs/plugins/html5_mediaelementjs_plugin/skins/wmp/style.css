@@ -17,6 +17,9 @@
 	border: solid 1px #ccc;
 	height: 3px;
 }
+.mejs-wmp .mejs-controls .mejs-time-rail .mejs-time-buffering {
+	height: 3px;
+}
 .mejs-wmp .mejs-controls .mejs-time-rail .mejs-time-loaded {
 	background-color: rgba(255,255,255,0.3);
 	width: 0;

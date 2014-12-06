@@ -27,7 +27,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _itemlistlight.class.php 7756 2014-12-05 09:42:11Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -621,10 +621,13 @@ class ItemListLight extends DataObjectList2
 		if( empty($order_by) )
 		{
 			$available_fields = array_keys( get_available_sort_options() );
+			// Extend general list to allow order posts by these fields as well for some special cases
 			$available_fields[] = 'creator_user_ID';
 			$available_fields[] = 'assigned_user_ID';
 			$available_fields[] = 'pst_ID';
 			$available_fields[] = 'datedeadline';
+			$available_fields[] = 'T_categories.cat_name';
+			$available_fields[] = 'T_categories.cat_order';
 			$order_by = gen_order_clause( $this->filters['orderby'], $this->filters['order'], $this->Cache->dbprefix, $this->Cache->dbIDname, $available_fields );
 		}
 

@@ -182,11 +182,15 @@ function display_attachments( & $LinkOwner, $params = array() )
 /**
  * Display link actions
  *
- * @param $link_ID
- * @param $cur_idx
- * @param $total_rows
+ * @param integer Link ID
+ * @param string Index type of current row:
+ *               'single' - when only one row in list
+ *               'first'  - Current row is first in whole list
+ *               'last'   - Current row is last in whole list
+ *               'middle' - Current row is not first and not last
+ * @return string
  */
-function link_actions( $link_ID, $cur_idx = 0, $total_rows = 2 )
+function link_actions( $link_ID, $row_idx_type = '' )
 {
 	/**
 	 * @var File
@@ -199,9 +203,9 @@ function link_actions( $link_ID, $cur_idx = 0, $total_rows = 2 )
 
 	// Change order.
 	if( $LinkOwner->check_perm( 'edit' ) )
-	{	// Check that we have permission to edit LinkOwner object:
-		if( $cur_idx > 0 )
-		{
+	{ // Check that we have permission to edit LinkOwner object:
+		if( $row_idx_type != 'first' && $row_idx_type != 'single' )
+		{ // Allow to move up all rows except of first
 			$r .= action_icon( T_('Move upwards'), 'move_up',
 				regenerate_url( 'ctrl,link_object_ID,action', 'ctrl=links&amp;link_ID='.$link_ID.'&amp;action=link_move_up&amp;'.url_crumb('link') ) );
 		}
@@ -210,8 +214,8 @@ function link_actions( $link_ID, $cur_idx = 0, $total_rows = 2 )
 			$r .= get_icon( 'nomove' ).' ';
 		}
 
-		if( $cur_idx < $total_rows-1 )
-		{
+		if( $row_idx_type != 'last' && $row_idx_type != 'single' )
+		{ // Allow to move down all rows except of last
 			$r .= action_icon( T_('Move down'), 'move_down',
 				regenerate_url( 'ctrl,p,itm_ID,action', 'ctrl=links&amp;link_ID='.$link_ID.'&amp;action=link_move_down&amp;'.url_crumb('link') ) );
 		}

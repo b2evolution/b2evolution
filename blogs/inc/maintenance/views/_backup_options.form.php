@@ -19,7 +19,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois Planque.
  *
- * @version $Id$
+ * @version $Id: _backup_options.form.php 7715 2014-12-01 07:50:41Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -56,7 +56,7 @@ foreach( $backup_paths as $name => $settings )
 			$note = get_affected_paths( $settings['path'] );
 		}
 
-		$Form->checkbox( 'bk_'.$name, 1/*$current_Backup->backup_paths[$name]*/, $settings['label'], $note );
+		$Form->checkbox( 'bk_'.$name, $current_Backup->backup_paths[$name], $settings['label'], $note );
 	}
 }
 
@@ -73,7 +73,7 @@ foreach( $backup_tables as $name => $settings )
 		$note = get_affected_tables( $settings['table'] );
 	}
 
-	$Form->checkbox( 'bk_'.$name, 1/*$current_Backup->backup_tables[$name]*/, $settings['label'], $note );
+	$Form->checkbox( 'bk_'.$name, $current_Backup->backup_tables[$name], $settings['label'], $note );
 }
 
 if( function_exists( 'gzopen' ) )

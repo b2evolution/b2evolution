@@ -32,7 +32,7 @@
  * @author jeffbearer: Jeff BEARER - {@link http://www.jeffbearer.com/}.
  * @author jupiterx: Jordan RUNNING.
  *
- * @version $Id: _user.funcs.php 7189 2014-07-31 06:58:37Z yura $
+ * @version $Id: _user.funcs.php 7717 2014-12-01 08:47:33Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -3649,13 +3649,11 @@ jQuery(document).keyup(function(e)
 function echo_user_report_js()
 {
 	global $rsc_url, $admin_url;
+
+	// Initialize JavaScript to build and open ajax window
+	echo_user_ajaxwindow_js();
 ?>
 <script type="text/javascript">
-<?php
-// Initialize JavaScript to build and open window
-echo_modalwindow_js();
-?>
-
 function user_report( user_ID, user_tab_from )
 {
 	userAjaxWindow( '<img src="<?php echo $rsc_url; ?>img/ajax-loader2.gif" alt="<?php echo T_('Loading...'); ?>" title="<?php echo T_('Loading...'); ?>" style="display:block;margin:auto;position:absolute;top:0;bottom:0;left:0;right:0;" />', '680px' );
@@ -3690,13 +3688,11 @@ function user_report( user_ID, user_tab_from )
 function echo_user_deldata_js()
 {
 	global $rsc_url, $admin_url;
+
+	// Initialize JavaScript to build and open ajax window
+	echo_user_ajaxwindow_js();
 ?>
 <script type="text/javascript">
-<?php
-// Initialize JavaScript to build and open window
-echo_modalwindow_js();
-?>
-
 function user_deldata( user_ID, user_tab_from )
 {
 	userAjaxWindow( '<img src="<?php echo $rsc_url; ?>img/ajax-loader2.gif" alt="<?php echo T_('Loading...'); ?>" title="<?php echo T_('Loading...'); ?>" style="display:block;margin:auto;position:absolute;top:0;bottom:0;left:0;right:0;" />', '680px' );

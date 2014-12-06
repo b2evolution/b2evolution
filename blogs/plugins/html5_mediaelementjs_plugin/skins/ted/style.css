@@ -17,6 +17,9 @@
 	background: url(controls-ted.png) repeat-x 0 -52px;
 	height: 6px;
 }
+.mejs-ted .mejs-controls .mejs-time-rail .mejs-time-buffering {
+	height: 6px;
+}
 .mejs-ted .mejs-controls .mejs-time-rail .mejs-time-loaded {
 	background-color: none;
 	background: url(controls-ted.png) repeat-x 0 -52px;

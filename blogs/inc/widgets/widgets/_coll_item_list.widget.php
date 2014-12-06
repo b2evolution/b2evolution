@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _coll_item_list.widget.php 7756 2014-12-05 09:42:11Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -247,7 +247,7 @@ class coll_item_list_Widget extends ComponentWidget
 		 */
 		global $MainList;
 		global $BlogCache, $Blog;
-		global $Item;
+		global $Item, $Settings;
 
 		$this->init_display( $params );
 
@@ -340,9 +340,17 @@ class coll_item_list_Widget extends ComponentWidget
 
 			compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $listBlog->ID );
 
+			$filters['cat_focus'] = 'main';
 			$filters['cat_array'] = $linkblog_cat_array;
 			$filters['cat_modifier'] = $linkblog_cat_modifier;
-			$filters['orderby'] = 'main_cat_ID '.$filters['orderby'];
+			if( $Settings->get( 'chapter_ordering' ) == 'alpha' )
+			{ // Sort categories by name
+				$filters['orderby'] = 'T_categories.cat_name '.$filters['orderby'];
+			}
+			else
+			{ // Sort categories by order field (But sort also by cat name in order to don't break list when all categories has NULL order)
+				$filters['orderby'] = 'T_categories.cat_order T_categories.cat_name '.$filters['orderby'];
+			}
 		}
 
 		$ItemList->set_filters( $filters, false ); // we don't want to memorize these params

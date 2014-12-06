@@ -30,7 +30,7 @@
  *
  * @package evocore
  *
- * @version $Id: _misc.funcs.php 7578 2014-11-06 10:48:01Z yura $
+ * @version $Id: _misc.funcs.php 7756 2014-12-05 09:42:11Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -5386,8 +5386,10 @@ function unset_from_mem_cache($key)
  */
 function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambiguation, $available_fields = NULL )
 {
-	$orderby = str_replace( ' ', ',', $order_by );
-	$orderby_array = explode( ',', $orderby );
+	$order_by = str_replace( ' ', ',', $order_by );
+	$orderby_array = explode( ',', $order_by );
+
+	$order_dir = explode( ',', str_replace( ' ', ',', $order_dir ) );
 
 	if( is_array( $available_fields ) )
 	{ // Exclude the incorrect fields from order clause
@@ -5401,10 +5403,14 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
 	}
 
 	// Format each order param with default column names:
-	$orderby_array = preg_replace( '#^(.+)$#', $dbprefix.'$1 '.$order_dir, $orderby_array );
+	foreach( $orderby_array as $i => $orderby_value )
+	{ // If the order_by field contains a '.' character which is a table separator we must not use the prefix ( E.g. temp_table.value )
+		$use_dbprefix = ( strpos( $orderby_value, '.' ) !== false ) ? '' : $dbprefix;
+		$orderby_array[ $i ] = $use_dbprefix.$orderby_value.' '.( isset( $order_dir[ $i ] ) ? $order_dir[ $i ] : $order_dir[0] );
+	}
 
 	// Add an ID parameter to make sure there is no ambiguity in ordering on similar items:
-	$orderby_array[] = $dbIDname_disambiguation.' '.$order_dir;
+	$orderby_array[] = $dbIDname_disambiguation.' '.$order_dir[0];
 
 	$order_by = implode( ', ', $orderby_array );
 

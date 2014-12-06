@@ -131,6 +131,20 @@ form#user_checkchanges.bComment {
 	border-radius: 5px;
 	margin-bottom: 10px;
 }
+.forums_table.fixed_layout {
+	table-layout: fixed;
+}
+.forums_table.fixed_layout tr.fixrow0 {
+	margin: 0;
+}
+.forums_table.fixed_layout tr.fixrow0 td {
+	padding-top: 0;
+	padding-bottom: 0;
+	border: none;
+}
+.bForums.fixed_layout .ft_avatar {
+	width: 80px;
+}
 .forums_table tr:first-child th:first-child,
 .forums_table tr:first-child td:first-child {
 	border-top-left-radius: 5px;

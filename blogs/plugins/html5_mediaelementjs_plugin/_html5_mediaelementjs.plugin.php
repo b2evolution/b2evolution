@@ -30,7 +30,8 @@ class html5_mediaelementjs_plugin extends Plugin
 
 	function PluginInit( & $params )
 	{
-		$this->short_desc = sprintf( T_('Media player for the these file formats: %s.'), implode( ', ', $this->allow_ext ) );
+		$this->short_desc = sprintf( T_('Media player for the these file formats: %s. Note: iOS supports only: %s; Android supports only: %s.'),
+			implode( ', ', $this->allow_ext ), 'mp4', 'mp4, webm' );
 		$this->long_desc = $this->short_desc;
 	}
 
@@ -147,13 +148,13 @@ class html5_mediaelementjs_plugin extends Plugin
 					),
 				'width' => array(
 					'label' => T_('Video width (px)'),
-					'defaultvalue' => 425,
+					'defaultvalue' => 460,
 					'note' => T_('100% width if left empty or 0'),
 					),
 				'height' => array(
 					'label' => T_('Video height (px)'),
 					'type' => 'integer',
-					'defaultvalue' => 300,
+					'defaultvalue' => 320,
 					'note' => '',
 					'valid_range' => array( 'min' => 1 ),
 					),
@@ -329,6 +330,7 @@ class html5_mediaelementjs_plugin extends Plugin
 		switch( $File->get_ext() )
 		{
 			case 'flv':
+			case 'f4v':
 				$mimetype = 'video/flv';
 				break;
 
@@ -344,7 +346,6 @@ class html5_mediaelementjs_plugin extends Plugin
 				$mimetype = 'video/webm';
 				break;
 
-			case 'f4v':
 			case 'mp4':
 			default:
 				$mimetype = 'video/mp4';

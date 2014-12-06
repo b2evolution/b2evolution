@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE
  * @author fsaya: Fabrice SAYA-GASNIER / PROGIDISTRI
  *
- * @version $Id: _results.class.php 7495 2014-10-22 10:30:38Z yura $
+ * @version $Id: _results.class.php 7725 2014-12-02 08:43:47Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1622,8 +1622,9 @@ class Results extends Table
 		// Make callback function move_icons for orderable lists // dh> what does it do?
 		$content = str_replace( '{move}', "'.\$this->move_icons().'", $content );
 
-		$content = str_replace( '{CUR_IDX}', $this->current_idx, $content );
-		$content = str_replace( '{TOTAL_ROWS}', $this->total_rows, $content );
+		$content = str_replace( array( '{CUR_IDX}', '{TOTAL_ROWS}', '{ROW_IDX_TYPE}' ),
+			array( $this->current_idx, $this->total_rows, $this->get_row_order_type() ),
+			$content );
 
 		return $content;
 	}
@@ -2232,6 +2233,34 @@ class Results extends Table
 		return false;
 	}
 
+
+	/**
+	 * Get an order type of the current row
+	 *
+	 * @return string 'single' - when only one row in list
+	 *                'first'  - Current row is first in whole list
+	 *                'last'   - Current row is last in whole list
+	 *                'middle' - Current row is not first and not last
+	 */
+	function get_row_order_type()
+	{
+		if( $this->total_rows == 1 )
+		{ // Only one row in list
+			return 'single';
+		}
+		elseif( $this->page == 1 && $this->current_idx == 0 )
+		{ // First row
+			return 'first';
+		}
+		elseif( ( $this->page == $this->total_pages ) && ( $this->current_idx == $this->total_rows - ( ( $this->total_pages - 1 )* $this->limit ) - 1 ) )
+		{ // Last row
+			return 'last';
+		}
+		else
+		{ // Middle row
+			return 'middle';
+		}
+	}
 }
 
 

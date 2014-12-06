@@ -12,7 +12,7 @@
  * @package evoskins
  * @subpackage pureforums
  *
- * @version $Id$
+ * @version $Id: _item_block.inc.php 7760 2014-12-05 13:39:20Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -50,7 +50,9 @@ $Skin->display_breadcrumbs( $cat );
 
 <a name="top"></a>
 <a name="p<?php echo $Item->ID; ?>"></a>
-<table id="styled_content_block" class="forums_table topics_table single_topic" cellspacing="0" cellpadding="0">
+<table id="styled_content_block" class="forums_table topics_table single_topic fixed_layout" cellspacing="0" cellpadding="0">
+	<?php /* This empty row is used to fix columns width, when table has css property "table-layout:fixed" */ ?>
+	<tr class="fixrow0"><td class="ft_avatar"></td><td></td></tr>
 	<tr class="table_title">
 		<th colspan="2">
 		<?php
