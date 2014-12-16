@@ -10,7 +10,7 @@ More info: http://b2evolution.net
 
 ## This is the i7 Branch !
 
-We maintain this GitHub repo ahead of public releases. This branch is synchronized with the internal i7 Branch. This will become b2evoltion version 6. For b2evolution version 5, please switch to the "i6" branch.
+We maintain this GitHub repo ahead of public releases. This branch is synchronized with the internal i7 Branch. This will become b2evolution version 6. For b2evolution version 5, please switch to the "i6" branch.
 
 Note we have moved the previous "master" branch to "old-master". The current "master" branch (this branch) includes an import on the CVS history from SoureForge as well as a sync to the latest developement version located on our developement SVN repository.
 
