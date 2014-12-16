@@ -29,7 +29,7 @@ $params = array_merge( array(
 		'form_submit_text'     => T_('Send comment'),
 		'form_params'          => array(), // Use to change a structre of form, i.e. fieldstart, fieldend and etc.
 		'policy_text'          => '',
-		'author_link_text'     => 'login',
+		'author_link_text'     => 'name',
 		'textarea_lines'       => 10,
 		'default_text'         => '',
 		'preview_block_start'  => '',
@@ -89,7 +89,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 						'comment_block_end'    => $Comment->email_is_detected ? '' : $params['preview_block_end'],
 						'author_link_text'     => $params['author_link_text'],
 					) );
-				// Note: You can customize the default item feedback by copying the generic
+				// Note: You can customize the default item comment by copying the generic
 				// /skins/_item_comment.inc.php file into the current skin folder.
 				// ---------------------- END OF PREVIEW COMMENT ---------------------
 			}
@@ -128,7 +128,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 			else
 			{ // Get params from $_COOKIE
 				$comment_author = param_cookie( $cookie_name, 'string', '' );
-				$comment_author_email = evo_strtolower( param_cookie( $cookie_email, 'string', '' ) );
+				$comment_author_email = utf8_strtolower( param_cookie( $cookie_email, 'string', '' ) );
 				$comment_author_url = param_cookie( $cookie_url, 'string', '' );
 			}
 			if( empty($comment_author_url) )
@@ -252,15 +252,25 @@ function validateCommentForm(form)
 		$Form->info_field( '', $params['policy_text'] );
 	}
 
+	ob_start();
 	echo '<div class="comment_toolbars">';
 	// CALL PLUGINS NOW:
 	$Plugins->trigger_event( 'DisplayCommentToolbar', array( 'Comment' => & $Comment, 'Item' => & $Item ) );
 	echo '</div>';
+	$comment_toolbar = ob_get_clean();
 
 	// Message field:
+	$form_inputstart = $Form->inputstart;
+	$Form->inputstart .= $comment_toolbar;
 	$note = '';
-	// $note = T_('Allowed XHTML tags').': '.evo_htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags));
-	$Form->textarea( $dummy_fields[ 'content' ], $comment_content, $params['textarea_lines'], $params['form_comment_text'], $note, 38, 'bComment' );
+	// $note = T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags));
+	$Form->textarea_input( $dummy_fields[ 'content' ], $comment_content, $params['textarea_lines'], $params['form_comment_text'], array(
+			'note' => $note,
+			'cols' => 38,
+			'class' => 'bComment autocomplete_usernames',
+			'display_fix_pixel' => false,
+		) );
+	$Form->inputstart = $form_inputstart;
 
 	// set b2evoCanvas for plugins
 	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';

@@ -42,7 +42,6 @@ $params = array_merge( array(
 					'link_text_one' => '1',
 					'link_text_more' => '%d',
 					'link_title' => '',
-					'use_popup' => false,
 				) );
 		}
 	?>

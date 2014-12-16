@@ -10,10 +10,11 @@
  *  - 'charset':  Character set of the locale's messages files.
  */
 $locale_defs['en-NZ'] = array(
-		'name' => NT_('English (NZ) latin1'), // New Zealand
-		'charset' => 'iso-8859-1',
+		'name' => NT_('English (NZ) utf-8'), // New Zealand
+		'charset' => 'utf-8',
 		'datefmt' => 'd/m/y',
 		'timefmt' => 'h:i:s a',
+		'shorttimefmt' => 'h:i a',
 		'startofweek' => 1,
 		'messages' => 'en_US',
 	);

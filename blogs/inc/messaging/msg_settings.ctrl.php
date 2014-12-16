@@ -19,7 +19,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author efy-asimo: Attila Simo.
  *
- * @version $Id$
+ * @version $Id: msg_settings.ctrl.php 7564 2014-11-03 13:12:45Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -44,21 +44,65 @@ switch ( $action )
 		$Session->assert_received_crumb( 'msgsettings' );
 
 		$Settings->set( 'messages_link_to', param( 'messages_link_to', 'string', true ) );
+		$Settings->set( 'allow_html_message', param( 'allow_html_message', 'integer', 0 ) );
 
-		// Check user login for existing
 		$UserCache = & get_UserCache();
+
+		// Welcome message after account activation
 		$User = $UserCache->get_by_login( param( 'welcomepm_from', 'string', true ) );
-		if( !$User )
-		{	// Use login of the current user if user login is incorrect
+		if( ! $User )
+		{ // Use login of the current user if user login is incorrect
 			$User = $current_User;
 		}
-
 		$Settings->set( 'welcomepm_enabled', param( 'welcomepm_enabled', 'integer', 0 ) );
 		$Settings->set( 'welcomepm_from', $User->login );
 		$Settings->set( 'welcomepm_title', param( 'welcomepm_title', 'string', true ) );
 		$Settings->set( 'welcomepm_message', param( 'welcomepm_message', 'text', true ) );
 
+		// Info message to reporters after account deletion
+		$User = $UserCache->get_by_login( param( 'reportpm_from', 'string', true ) );
+		if( ! $User )
+		{ // Use login of the current user if user login is incorrect
+			$User = $current_User;
+		}
+		$Settings->set( 'reportpm_enabled', param( 'reportpm_enabled', 'integer', 0 ) );
+		$Settings->set( 'reportpm_from', $User->login );
+		$Settings->set( 'reportpm_title', param( 'reportpm_title', 'string', true ) );
+		$Settings->set( 'reportpm_message', param( 'reportpm_message', 'text', true ) );
+
 		$Settings->dbupdate();
+
+		// Update Plugin params/Settings
+		load_funcs('plugins/_plugin.funcs.php');
+
+		$Plugins->restart();
+		while( $loop_Plugin = & $Plugins->get_next() )
+		{
+			$pluginsettings = $loop_Plugin->get_msg_setting_definitions( $tmp_params = array( 'for_editing' => true ) );
+			if( empty( $pluginsettings ) )
+			{
+				continue;
+			}
+
+			// Loop through settings for this plugin:
+			foreach( $pluginsettings as $set_name => $set_meta )
+			{
+				autoform_set_param_from_request( $set_name, $set_meta, $loop_Plugin, 'Settings' );
+			}
+
+			// Let the plugin handle custom fields:
+			// We use call_method to keep track of this call, although calling the plugins PluginSettingsUpdateAction method directly _might_ work, too.
+			$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginSettingsUpdateAction', $tmp_params = array() );
+
+			if( $ok_to_update === false )
+			{ // Rollback settings: the plugin has said they should not get updated.
+				$loop_Plugin->Settings->reset();
+			}
+			else
+			{ // Update message settings of the Plugin
+				$loop_Plugin->Settings->dbupdate();
+			}
+		}
 
 		$Messages->add( T_( 'Settings were updated.' ), 'success' );
 		break;

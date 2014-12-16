@@ -26,7 +26,6 @@ rss;;;webreference.fr/defintions/rss-atom-xml
 xml;;;www.tellmewhatis.com/xml
 
 ; b2evo stuff
-b2;;;b2evolution.net/
 b2evo;;;b2evolution.net/
 b2evolution;;;b2evolution.net/
 ccms;;;b2evolution.net/

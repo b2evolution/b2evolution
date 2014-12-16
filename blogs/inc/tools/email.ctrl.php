@@ -20,7 +20,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: email.ctrl.php 368 2011-11-21 15:51:22Z yura $
+ * @version $Id: email.ctrl.php 7616 2014-11-12 14:50:13Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -40,6 +40,7 @@ load_funcs('tools/model/_email.funcs.php');
 param_action();
 
 $tab = param( 'tab', 'string', 'blocked', true );
+$tab3 = param( 'tab3', 'string', '', true );
 
 param( 'action', 'string' );
 
@@ -66,89 +67,182 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'emails', 'edit', true );
 
-		/** Email notifications **/
+		switch( $tab3 )
+		{
+			case 'notifications':
+				/* Email service preferences: */
 
-		// Sender email address
-		$sender_email = param( 'notification_sender_email', 'string', '' );
-		param_check_email( 'notification_sender_email', true );
-		$Settings->set( 'notification_sender_email',  $sender_email );
+				if( $Settings->get( 'smtp_enabled' ) )
+				{ // Only when SMTP gateway is enabled
 
-		// Return path
-		$return_path = param( 'notification_return_path', 'string', '' );
-		param_check_email( 'notification_return_path', true );
-		$Settings->set( 'notification_return_path', $return_path );
+					// Preferred email service
+					$Settings->set( 'email_service', param( 'email_service', 'string', 'mail' ) );
 
-		// Sender name
-		$sender_name = param( 'notification_sender_name', 'string', '' );
-		param_check_not_empty( 'notification_sender_name' );
-		$Settings->set( 'notification_sender_name',  $sender_name );
+					// Force email sending
+					$Settings->set( 'force_email_sending', param( 'force_email_sending', 'integer', 0 ) );
+				}
 
-		// Site short name
-		$short_name = param( 'notification_short_name', 'string', '' );
-		param_check_not_empty( 'notification_short_name' );
-		$Settings->set( 'notification_short_name',  $short_name );
+				/* Email notifications: */
 
-		// Site long name
-		$Settings->set( 'notification_long_name',  param( 'notification_long_name', 'string', '' ) );
+				// Sender email address
+				$sender_email = param( 'notification_sender_email', 'string', '' );
+				param_check_email( 'notification_sender_email', true );
+				$Settings->set( 'notification_sender_email',  $sender_email );
 
-		// Site logo url
-		$Settings->set( 'notification_logo',  param( 'notification_logo', 'string', '' ) );
+				// Sender name
+				$sender_name = param( 'notification_sender_name', 'string', '' );
+				param_check_not_empty( 'notification_sender_name' );
+				$Settings->set( 'notification_sender_name',  $sender_name );
 
-		/** Settings to decode the returned emails **/
-		param( 'repath_enabled', 'boolean', 0 );
-		$Settings->set( 'repath_enabled', $repath_enabled );
+				// Return path
+				$return_path = param( 'notification_return_path', 'string', '' );
+				param_check_email( 'notification_return_path', true );
+				$Settings->set( 'notification_return_path', $return_path );
 
-		param( 'repath_method', 'string', true );
-		$Settings->set( 'repath_method', strtolower( $repath_method ) );
+				// Site short name
+				$short_name = param( 'notification_short_name', 'string', '' );
+				param_check_not_empty( 'notification_short_name' );
+				$Settings->set( 'notification_short_name',  $short_name );
 
-		param( 'repath_server_host', 'string', true );
-		$Settings->set( 'repath_server_host', evo_strtolower( $repath_server_host ) );
+				// Site long name
+				$Settings->set( 'notification_long_name',  param( 'notification_long_name', 'string', '' ) );
 
-		param( 'repath_server_port', 'integer', true );
-		$Settings->set( 'repath_server_port', $repath_server_port );
+				// Site logo url
+				$Settings->set( 'notification_logo',  param( 'notification_logo', 'string', '' ) );
+				break;
 
-		param( 'repath_encrypt', 'string', true );
-		$Settings->set( 'repath_encrypt', $repath_encrypt );
+			case 'returned':
+				// Settings to decode the returned emails:
+				param( 'repath_enabled', 'boolean', 0 );
+				$Settings->set( 'repath_enabled', $repath_enabled );
 
-		param( 'repath_novalidatecert', 'boolean', 0 );
-		$Settings->set( 'repath_novalidatecert', $repath_novalidatecert );
+				param( 'repath_method', 'string', true );
+				$Settings->set( 'repath_method', strtolower( $repath_method ) );
 
-		param( 'repath_username', 'string', true );
-		$Settings->set( 'repath_username', $repath_username );
+				param( 'repath_server_host', 'string', true );
+				$Settings->set( 'repath_server_host', utf8_strtolower( $repath_server_host ) );
 
-		param( 'repath_password', 'string', true );
-		$Settings->set( 'repath_password', $repath_password );
+				param( 'repath_server_port', 'integer', true );
+				$Settings->set( 'repath_server_port', $repath_server_port );
 
-		param( 'repath_delete_emails', 'boolean', 0 );
-		$Settings->set( 'repath_delete_emails', $repath_delete_emails );
+				param( 'repath_encrypt', 'string', true );
+				$Settings->set( 'repath_encrypt', $repath_encrypt );
 
-		param( 'repath_subject', 'text', true );
-		$Settings->set( 'repath_subject', $repath_subject );
+				param( 'repath_novalidatecert', 'boolean', 0 );
+				$Settings->set( 'repath_novalidatecert', $repath_novalidatecert );
 
-		param( 'repath_body_terminator', 'text', true );
-		$Settings->set( 'repath_body_terminator', $repath_body_terminator );
+				param( 'repath_username', 'string', true );
+				$Settings->set( 'repath_username', $repath_username );
 
-		param( 'repath_errtype', 'text', true );
-		if( strlen( $repath_errtype ) > 5000 )
-		{	// Crop the value by max available size
-			$Messages->add( T_('Maximum length of the field "Error message decoding configuration" is 5000 symbols, the big value will be cropped.'), 'note' );
-			$repath_errtype = substr( $repath_errtype, 0, 5000 );
+				param( 'repath_password', 'string', true );
+				$Settings->set( 'repath_password', $repath_password );
+
+				param( 'repath_delete_emails', 'boolean', 0 );
+				$Settings->set( 'repath_delete_emails', $repath_delete_emails );
+
+				param( 'repath_subject', 'text', true );
+				$Settings->set( 'repath_subject', $repath_subject );
+
+				param( 'repath_body_terminator', 'text', true );
+				$Settings->set( 'repath_body_terminator', $repath_body_terminator );
+
+				param( 'repath_errtype', 'text', true );
+				if( strlen( $repath_errtype ) > 5000 )
+				{	// Crop the value by max available size
+					$Messages->add( T_('Maximum length of the field "Error message decoding configuration" is 5000 symbols, the big value will be cropped.'), 'note' );
+					$repath_errtype = substr( $repath_errtype, 0, 5000 );
+				}
+				$Settings->set( 'repath_errtype', $repath_errtype );
+				break;
+
+			case 'smtp':
+				// SMTP gateway settings:
+
+				$old_smtp_enabled = $Settings->get( 'smtp_enabled' );
+
+				// Enabled
+				$Settings->set( 'smtp_enabled', param( 'smtp_enabled', 'boolean', 0 ) );
+
+				// SMTP Host
+				$Settings->set( 'smtp_server_host',  param( 'smtp_server_host', 'string', '' ) );
+
+				// Port Number
+				$Settings->set( 'smtp_server_port',  param( 'smtp_server_port', 'integer' ) );
+
+				// Encryption Method
+				$Settings->set( 'smtp_server_security',  param( 'smtp_server_security', 'string', '' ) );
+
+				// SMTP Username
+				$Settings->set( 'smtp_server_username',  param( 'smtp_server_username', 'string', '' ) );
+
+				// SMTP Password
+				$Settings->set( 'smtp_server_password',  param( 'smtp_server_password', 'string', '' ) );
+
+				// Check if we really can use SMTP mailer
+				if( $Settings->get( 'smtp_enabled' ) && ( $smtp_error = check_smtp_mailer() ) !== true )
+				{ // No available to use SMTP gateway
+					$Settings->set( 'smtp_enabled', 0 );
+					$Messages->add( $smtp_error, 'warning' );
+				}
+
+				// Save info about SMTP enabling/disabling
+				if( ! $old_smtp_enabled && $Settings->get( 'smtp_enabled' ) )
+				{ // Enabled
+					$syslog_message = T_( 'SMTP enabled.' );
+				}
+				elseif( $old_smtp_enabled && ! $Settings->get( 'smtp_enabled' ) )
+				{ // Disabled
+					$syslog_message = T_( 'SMTP disabled.' )
+						.( ! empty( $smtp_error ) && is_string( $smtp_error ) ? ' '.sprintf( T_( 'Reason: %s' ), $smtp_error ) : '' );
+				}
+				break;
+
+			default:
+				// Invalid tab3
+				break 2;
 		}
-		$Settings->set( 'repath_errtype', $repath_errtype );
 
 		if( ! $Messages->has_errors() )
-		{
-			$Settings->dbupdate();
-			$Messages->add( T_('Settings updated.'), 'success' );
-			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=email&tab=settings', 303 ); // Will EXIT
-			// We have EXITed already at this point!!
+		{  
+			if( $Settings->dbupdate() )
+			{
+				if( ! empty( $syslog_message ) )
+				{ // Log system info into DB
+					syslog_insert( $syslog_message, 'info', NULL );
+				}
+				$Messages->add( T_('Settings updated.'), 'success' );
+
+				if( $Settings->get( 'smtp_enabled' ) )
+				{ // Check if connection is available
+					global $smtp_connection_result;
+					// Test SMTP connection
+					$smtp_messages = smtp_connection_test();
+					// Init this var to display a result on the page
+					$smtp_test_output = is_array( $smtp_messages ) ? implode( "<br />\n", $smtp_messages ) : '';
+					if( $smtp_connection_result )
+					{ // Success
+						$Messages->add( T_('The connection with this SMTP server has been tested successfully.'), 'success' );
+					}
+					else
+					{ // Error
+						$Messages->add( T_('The connection with this SMTP server has failed.'), 'error' );
+					}
+					// Don't redirect here in order to display a result($smtp_test_output) of SMTP connection above settings form
+				}
+				else
+				{ // Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=email&tab=settings&tab3='.$tab3, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+				}
+			}
 		}
 		break;
 
 	case 'test_1':
 	case 'test_2':
 	case 'test_3':
+		// Test a tool that decodes the returned emails
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'emailsettings' );
 
@@ -211,6 +305,22 @@ switch( $action )
 		{	// We will display the output in a scrollable fieldset
 			$repath_test_output = implode( "<br />\n", $dre_messages );
 		}
+		break;
+
+	case 'test_smtp':
+		// Test connection to SMTP server by Swift Mailer
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'emailsettings' );
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
+
+		// Test SMTP connection
+		$smtp_messages = smtp_connection_test();
+
+		// Init this var to display a result on the page
+		$smtp_test_output = is_array( $smtp_messages ) ? implode( "<br />\n", $smtp_messages ) : '';
 		break;
 
 	case 'blocked_new':
@@ -277,10 +387,6 @@ switch( $tab )
 		{ // Initialize date picker on list page
 			init_datepicker_js();
 		}
-		else
-		{ // Require the styles for email content
-			require_css( $emailskins_url.'_email_style.css' );
-		}
 		break;
 
 	case 'blocked':
@@ -302,10 +408,30 @@ switch( $tab )
 
 	case 'settings':
 		$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=email&amp;tab='.$tab );
+
+		if( empty($tab3) )
+		{
+			$tab3 = 'notifications';
+		}
+		switch( $tab3 )
+		{
+			case 'notifications':
+				$AdminUI->breadcrumbpath_add( T_('Notifications'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+				break;
+
+			case 'returned':
+				$AdminUI->breadcrumbpath_add( T_('Returned emails'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+				break;
+
+			case 'smtp':
+				$AdminUI->breadcrumbpath_add( T_('SMTP gateway'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+				break;
+		}
+
 		break;
 }
 
-$AdminUI->set_path( 'email', $tab );
+$AdminUI->set_path( 'email', $tab, $tab3 );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -367,7 +493,21 @@ switch( $tab )
 		break;
 
 	case 'settings':
-		$AdminUI->disp_view( 'tools/views/_email_settings.form.php' );
+		switch( $tab3 )
+		{
+			case 'returned':
+				$AdminUI->disp_view( 'tools/views/_email_returned.form.php' );
+				break;
+
+			case 'smtp':
+				$AdminUI->disp_view( 'tools/views/_email_smtp.form.php' );
+				break;
+
+			case 'notifications':
+			default:
+				$AdminUI->disp_view( 'tools/views/_email_settings.form.php' );
+		}
+		
 		break;
 
 }

@@ -42,7 +42,7 @@
 		#cboxNext{position:absolute; bottom:0; left:27px; background:url(../../icons/icons_sprite.png) no-repeat -72px -272px; width:23px; height:23px; text-indent:-9999px;}
 		#cboxNext.hover{background-position:-72px -296px;}
 		#cboxLoadingOverlay{background:#FFF;}
-		#cboxLoadingGraphic{background:url(../../img/ajax-loader2.gif) no-repeat center center;}
+		#cboxLoadingGraphic{background:url(../../img/ajax-loader/fff.gif) no-repeat center center;}
 		#cboxClose{position:absolute; bottom:0; right:0; background:url(../../icons/icons_sprite.png) no-repeat -24px -272px; width:23px; height:23px; text-indent:-9999px;}
 		#cboxClose.hover{background-position:-24px -296px;}
 		#cboxVoting{position:absolute; bottom:25px; min-height:15px; width:100%; padding:5px 0; text-align:center; white-space:nowrap; -moz-border-radius:6px; -webkit-border-radius:6px; -khtml-border-radius:6px; border-radius:6px;}

@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author blueyed
  *
- * @version $Id$
+ * @version $Id: system.ctrl.php 7543 2014-10-29 08:48:17Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -37,6 +37,11 @@ load_funcs( 'tools/model/_system.funcs.php' );
 
 // Check minimum permission:
 $current_User->check_perm( 'options', 'view', true );
+
+if( $current_User->check_perm( 'options', 'edit' ) && system_check_charset_update() )
+{ // DB charset is required to update
+	$Messages->add( sprintf( T_("WARNING: Some of your tables have different charset than the expected %s. It is strongly recommended to upgrade your database charset by running the tool <a %s>Upgrade your DB to UTF-8</a>."), utf8_strtoupper( $evo_charset ), 'href="'.$admin_url.'?ctrl=tools&amp;action=utf8upgrade&amp;'.url_crumb( 'tools' ).'"' ) );
+}
 
 $AdminUI->set_path( 'options', 'system' );
 

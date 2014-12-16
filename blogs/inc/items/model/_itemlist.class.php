@@ -26,7 +26,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _itemlist.class.php 7480 2014-10-21 07:12:55Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -49,7 +49,7 @@ class ItemList2 extends ItemListLight
 
 	/**
 	 * Navigate through this target items
-	 * It can be an Chapter ID or a User ID, depends from the post_navigation coll settings
+	 * It can be an Chapter ID, a User ID or Tag name, depends from the post_navigation coll settings
 	 *
 	 * @var integer
 	 */
@@ -119,7 +119,7 @@ class ItemList2 extends ItemListLight
 		$post_excerpt = param( 'post_excerpt', 'string', true );
 		$post_url = param( 'post_url', 'string', '' );
 		check_categories_nosave( $post_category, $post_extracats );
-		$renderers = param( 'renderers', 'array/string', array('default') );
+		$renderers = param( 'renderers', 'array:string', array('default') );
 		if( ! is_array($renderers) )
 		{ // dh> workaround for param() bug. See rev 1.93 of /inc/_misc/_misc.funcs.php
 			$renderers = array('default');
@@ -220,8 +220,8 @@ class ItemList2 extends ItemListLight
 
 		// set Item settings
 		$Item->set_setting( 'hide_teaser', param( 'item_hideteaser', 'integer', 0 ) );
-		$Item->set_setting( 'post_metadesc', param( 'metadesc', 'string', true ) );
-		$Item->set_setting( 'post_custom_headers', param( 'custom_headers', 'string', true ) );
+		$Item->set_setting( 'metadesc', param( 'metadesc', 'string', true ) );
+		$Item->set_setting( 'metakeywords', param( 'metakeywords', 'string', true ) );
 
 		// set custom Item settings
 		foreach( array( 'double', 'varchar' ) as $type )
@@ -351,7 +351,10 @@ class ItemList2 extends ItemListLight
 			return $r;
 		}
 
-		//pre_dump( $Item );
+		if( $this->single_post && !empty( $Item ) )
+		{ // Update the read timestamp of the item by current user
+			$Item->update_read_date();
+		}
 
 		return $Item;
 	}
@@ -494,6 +497,23 @@ class ItemList2 extends ItemListLight
 				case 'same_author': // This doesn't require extra param because a post always has only one author
 					$this->filters['authors'] = $current_Item->creator_user_ID;
 					// reset cat filters because only the authors are important
+					$this->filters['cat_array'] = array();
+					break;
+
+				case 'same_tag': // sometimes requires the 'tag' param because a post may belong to multiple tags
+					if( empty( $this->nav_target ) )
+					{
+						$tags = $current_Item->get_tags();
+						if( count( $tags ) > 0 )
+						{
+							$this->nav_target = $tags[0];
+						}
+					}
+					if( !empty( $this->nav_target ) )
+					{
+						$this->filters['tags'] = $this->nav_target;
+					}
+					// reset cat filters because only the tags are important
 					$this->filters['cat_array'] = array();
 					break;
 
@@ -689,6 +709,7 @@ class ItemList2 extends ItemListLight
 		                                   $this->filters['ts_min'], $this->filters['ts_max'] );
 		$next_Query->where_visibility( $this->filters['visibility_array'] );
 		$next_Query->where_featured( $featured );
+		$next_Query->where_tags( $this->filters['tags'] );
 
 		/*
 		 * ORDER BY stuff:
@@ -822,7 +843,7 @@ class ItemList2 extends ItemListLight
 				break;
 
 			default:
-				echo 'WARNING: unhandled sorting: '.evo_htmlspecialchars( $orderby_array[0] );
+				echo 'WARNING: unhandled sorting: '.htmlspecialchars( $orderby_array[0] );
 		}
 
 		// GET DATA ROWS:
@@ -853,6 +874,26 @@ class ItemList2 extends ItemListLight
 
 		return $this->prevnext_Item[$direction][$post_navigation];
 
+	}
+
+
+	/**
+	 * Load posts and comments read statuses for current User in case of each post from this Item List current page
+	 */
+	function load_content_read_statuses()
+	{
+		if( !$this->Blog->get_setting( 'track_unread_content' ) )
+		{ // tracking unread content in this blog is turned off
+			return;
+		}
+
+		$page_post_ids = $this->get_page_ID_array();
+		if( empty( $page_post_ids ) )
+		{ // There are no items on this list
+			return;
+		}
+
+		load_user_read_statuses( $page_post_ids );
 	}
 }
 

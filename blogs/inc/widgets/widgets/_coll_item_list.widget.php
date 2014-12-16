@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _coll_item_list.widget.php 7756 2014-12-05 09:42:11Z yura $
+ * @version $Id: _coll_item_list.widget.php 7816 2014-12-15 13:05:21Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -200,9 +200,14 @@ class coll_item_list_Widget extends ComponentWidget
 					'defaultvalue' => 20,
 					'note' => T_( 'Max number of words for the teasers.' ),
 				),
-			), parent::get_param_definitions( $params )	);
+			), parent::get_param_definitions( $params ) );
 
-		// pre_dump( $r['item_type']['options'] );
+		if( isset( $r['allow_blockcache'] ) )
+		{ // Disable "allow blockcache" because this widget uses the selected items
+			$r['allow_blockcache']['defaultvalue'] = false;
+			$r['allow_blockcache']['disabled'] = 'disabled';
+			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
+		}
 
 		return $r;
 	}
@@ -534,8 +539,8 @@ class coll_item_list_Widget extends ComponentWidget
 		if( in_array( $this->disp_params[ 'attached_pics' ], array( 'first', 'all' ) ) )
 		{	// Display attached pictures
 			$picture_limit = $this->disp_params[ 'attached_pics' ] == 'first' ? 1 : 1000;
-			$LinkOnwer = new LinkItem( $disp_Item );
-			if( $FileList = $LinkOnwer->get_attachment_FileList( $picture_limit ) )
+			$LinkOwner = new LinkItem( $disp_Item );
+			if( $FileList = $LinkOwner->get_attachment_FileList( $picture_limit, NULL, 'image' ) )
 			{	// Get list of attached files
 				while( $File = & $FileList->get_next() )
 				{

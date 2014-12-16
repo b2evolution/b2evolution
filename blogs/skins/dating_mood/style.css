@@ -292,6 +292,9 @@ div.bCommentSmallPrint {
 	margin-top: 0px;
 	margin-bottom: 0px;
 }
+div.extended_search_form {
+	margin: 0 13px;
+}
 div.compact_search_form input.SearchField
 {
 	border: 1px solid #EB34C0;
@@ -419,4 +422,8 @@ div.tabs div a:hover {
 div.tabs div.selected a {
 	background-color: #F5EBF3;
 	border-bottom-color: #F5EBF3;
+}
+
+.search_title {
+	color: #E600B1;
 }

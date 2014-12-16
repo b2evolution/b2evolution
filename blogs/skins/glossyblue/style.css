@@ -629,6 +629,10 @@ div.input ul.token-input-list-facebook input[type="text"]:focus {
 	border-color: #C0C0C0;
 }
 
+#register_form input#u {
+	max-width: 310px;
+}
+
 /* Not published comments display */
 #styled_content_block .commentlist .status_draft,
 #styled_content_block .commentlist .status_review,
@@ -645,4 +649,8 @@ div.input ul.token-input-list-facebook input[type="text"]:focus {
 #styled_content_block .post-title .status_protected,
 #styled_content_block .post-title .status_private {
 	top: 27px;
+}
+
+.search_title {
+	color: #C60;
 }

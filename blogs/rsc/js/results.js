@@ -1,7 +1,7 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
- * @version $Id: results.js 674 2012-08-15 07:08:29Z yura $
+ * @version $Id: results.js 5093 2013-10-30 10:57:42Z yura $
  */
 
 jQuery( document ).ready(function()
@@ -90,13 +90,12 @@ function results_ajax_load( this_obj, link_href )
 	}
 
 	if( layout.find( '.results_ajax_loading' ).length == 0 )
-	{	// Set temporary content during ajax is loading
+	{ // Set temporary content during ajax is loading
 		var $ajax_loading = jQuery( '<div class="results_ajax_loading"><div>&nbsp;</div></div>' );
+		layout.css( 'position', 'relative' );
 		$ajax_loading.css( {
 				'width':  layout.width(),
 				'height': layout.height(),
-				'top':    layout.offset().top,
-				'left':   layout.offset().left,
 			} );
 		layout.append( $ajax_loading );
 	}

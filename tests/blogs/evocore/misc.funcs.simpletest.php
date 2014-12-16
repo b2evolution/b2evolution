@@ -228,7 +228,7 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 
 		$this->assertEqual(
 			callback_on_non_matching_blocks( ' foo bar ', '~\s~', array(&$this, 'helper_test_callback_on_non_matching_blocks') ),
-			'[[]] [[foo]] [[bar]] [[]]' );
+			' [[foo]] [[bar]] ' );
 
 		// Replace anything outside <pre></pre> and <code></code> that's not in a tag (smilies plugin):
 		$this->assertEqual(
@@ -236,7 +236,7 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 				'~<(code|pre)[^>]*>.*?</\1>~is',
 				'callback_on_non_matching_blocks',
 				array( '~<[^>]*>~', array(&$this, 'helper_test_callback_on_non_matching_blocks') ) ),
-			'[[foo ]]<code>FOOBAR</code>[[ bar ]]' );
+			'[[foo]] <code>FOOBAR</code> [[bar]] ' );
 	}
 
 
@@ -247,7 +247,7 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 	 */
 	function helper_test_callback_on_non_matching_blocks( $text )
 	{
-		return '[['.$text.']]';
+		return preg_replace( '/(foo|bar)/i', '[[$1]]', $text );
 	}
 
 

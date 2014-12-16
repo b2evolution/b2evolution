@@ -31,7 +31,7 @@
  * @author fplanque: Francois PLANQUE - {@link http://fplanque.net/}
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _plugins.class.php 7625 2014-11-13 06:42:39Z yura $
+ * @version $Id: _plugins.class.php 7626 2014-11-13 06:43:58Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -708,20 +708,29 @@ class Plugins
 		$defaults = $Plugin->$method( $params );
 		$Timer->pause( $Plugin->classname.'_(#'.$Plugin->ID.')' );
 
-		if( empty($defaults) )
-		{	// No settings, no need to instantiate.
+		if( $set_type == 'Settings' )
+		{ // If general settings are requested we should also append messages settings
+			if( empty( $defaults ) )
+			{
+				$defaults = array();
+			}
+			$defaults = array_merge( $defaults, $Plugin->get_msg_setting_definitions( $params ) );
+		}
+
+		if( empty( $defaults ) )
+		{ // No settings, no need to instantiate.
 			$Timer->pause( 'plugins_inst_'.$set_type );
 			return NULL;
 		}
 
 		if( ! is_array($defaults) )
-		{	// invalid data
+		{ // invalid data
 			$Debuglog->add( $Plugin->classname.'::GetDefault'.$set_type.'() did not return array!', array('plugins', 'error') );
 			return NULL; // fp> correct me if I'm wrong.
 		}
 
 		if( $set_type == 'UserSettings' )
-		{	// User specific settings:
+		{ // User specific settings:
 			load_class( 'plugins/model/_pluginusersettings.class.php', 'PluginUserSettings' );
 
 			$Plugin->UserSettings = new PluginUserSettings( $Plugin->ID );
@@ -729,7 +738,7 @@ class Plugins
 			$set_Obj = & $Plugin->UserSettings;
 		}
 		else
-		{	// Global settings:
+		{ // Global settings:
 			load_class( 'plugins/model/_pluginsettings.class.php', 'PluginSettings' );
 
 			$Plugin->Settings = new PluginSettings( $Plugin->ID );
@@ -1209,7 +1218,7 @@ class Plugins
 			{
 				$debug_params['pass_md5'] = '-hidden-';
 			}
-			$Debuglog->add( 'Calling '.$Plugin->classname.'(#'.$Plugin->ID.')->'.$method.'( '.evo_htmlspecialchars(var_export( $debug_params, true )).' )', 'plugins' );
+			$Debuglog->add( 'Calling '.$Plugin->classname.'(#'.$Plugin->ID.')->'.$method.'( '.htmlspecialchars(var_export( $debug_params, true )).' )', 'plugins' );
 			*/
 			$Debuglog->add( 'Calling '.$Plugin->classname.'(#'.$Plugin->ID.')->'.$method.'( )', 'plugins' );
 		}
@@ -1453,6 +1462,44 @@ class Plugins
 
 
 	/**
+	 * Load Plugin data from T_plugins by Class name
+	 *
+	 * This fills the needed indexes to lazy-instantiate a Plugin when requested.
+	 *
+	 * @param string Class name
+	 */
+	function load_plugin_by_classname( $classname )
+	{
+		global $Debuglog, $DB;
+
+		$Debuglog->add( sprintf( 'Loading plugin %s by class name.', $classname ), 'plugins' );
+
+		$SQL = new SQL();
+		$SQL->SELECT( 'plug_ID, plug_priority, plug_classname, plug_code, plug_name, plug_shortdesc, plug_status, plug_version, plug_spam_weight' );
+		$SQL->FROM( 'T_plugins' );
+		$SQL->WHERE( 'plug_classname = '.$DB->quote( $classname ) );
+		if( $plugin = $DB->get_row( $SQL->get(), ARRAY_A ) )
+		{
+			if( isset( $this->index_ID_rows[$plugin['plug_ID']] ) )
+			{ // Plugin already was loaded before
+				return;
+			}
+
+			$this->index_ID_rows[$plugin['plug_ID']] = $plugin; // remember the rows to instantiate the Plugin on request
+			if( ! empty( $plugin['plug_code'] ) )
+			{
+				$this->index_code_ID[$plugin['plug_code']] = $plugin['plug_ID'];
+			}
+
+			$this->sorted_IDs[] = $plugin['plug_ID'];
+
+			// Load the events of this plugin
+			$this->load_events_by_classname( $classname );
+		}
+	}
+
+
+	/**
 	 * Load rendering Plugins specific apply_rendering setting for the given Blog and setting_name
 	 *
 	 * @param String setting name ( 'coll_apply_rendering', 'coll_apply_comment_rendering' )
@@ -1460,7 +1507,16 @@ class Plugins
 	 */
 	function load_index_apply_rendering( $setting_name, & $Blog )
 	{
-		if( isset( $this->index_apply_rendering_codes[$Blog->ID][$setting_name] ) )
+		if( is_null( $Blog ) )
+		{ // Use general settings (e.g. for Messages)
+			$blog_ID = 0;
+		}
+		else
+		{ // Use collection settings (for Items and Comments)
+			$blog_ID = $Blog->ID;
+		}
+
+		if( isset( $this->index_apply_rendering_codes[$blog_ID][$setting_name] ) )
 		{ // This data is already loaded
 			return;
 		}
@@ -1476,9 +1532,15 @@ class Plugins
 			{ // This plugin doesn't belong to the rendering plugins group
 				continue;
 			}
-			// get and set the specific plugin collection setting
-			$rendering_value = $Plugin->get_coll_setting( $setting_name, $Blog );
-			$this->index_apply_rendering_codes[$Blog->ID][$setting_name][$rendering_value][] = $Plugin->code;
+			if( $blog_ID > 0 )
+			{ // get and set the specific plugin collection setting
+				$rendering_value = $Plugin->get_coll_setting( $setting_name, $Blog );
+			}
+			else
+			{ // get and set the specific plugin message setting
+				$rendering_value = $Plugin->get_msg_setting( $setting_name );
+			}
+			$this->index_apply_rendering_codes[$blog_ID][$setting_name][$rendering_value][] = $Plugin->code;
 		}
 	}
 
@@ -1769,6 +1831,27 @@ class Plugins
 
 
 	/**
+	 * (Re)load Plugin Events plugin by classname.
+	 *
+	 * @param string Class name
+	 */
+	function load_events_by_classname( $classname )
+	{
+		global $Debuglog, $DB;
+
+		$Debuglog->add( sprintf( 'Loading plugin events by classname "%s".', $classname ), 'plugins' );
+		foreach( $DB->get_results( '
+				SELECT pevt_plug_ID, pevt_event
+					FROM T_pluginevents INNER JOIN T_plugins ON pevt_plug_ID = plug_ID
+				 WHERE pevt_enabled > 0
+				   AND plug_classname = '.$DB->quote( $classname ), OBJECT, sprintf( 'Loading plugin events by classname "%s"', $classname ) ) as $l_row )
+		{
+			$this->index_event_IDs[$l_row->pevt_event][] = $l_row->pevt_plug_ID;
+		}
+	}
+
+
+	/**
 	 * Load an object from a Cache plugin or create a new one if we have a
 	 * cache miss or no caching plugins.
 	 *
@@ -1858,6 +1941,12 @@ class Plugins
 			$Blog = & $Item->get_Blog();
 			$setting_name = 'coll_apply_comment_rendering';
 		}
+		elseif( isset( $params['Message'] ) )
+		{ // Validate message renderers
+			$Message = & $params['Message'];
+			$Blog = NULL;
+			$setting_name = 'msg_apply_rendering';
+		}
 		elseif( isset( $params['Blog'] ) && isset( $params['setting_name'] ) )
 		{ // Validate the given rendering option in the give Blog
 			$Blog = & $params['Blog'];
@@ -1872,13 +1961,15 @@ class Plugins
 			return array();
 		}
 
+		$blog_ID = !is_null( $Blog ) ? $Blog->ID : 0;
+
 		// Make sure the requested apply_rendering settings are loaded
 		$this->load_index_apply_rendering( $setting_name, $Blog );
 
 		$validated_renderers = array();
 
 		// Get requested apply_rendering setting array
-		$index = & $this->index_apply_rendering_codes[$Blog->ID][$setting_name];
+		$index = & $this->index_apply_rendering_codes[$blog_ID][$setting_name];
 
 		if( isset( $index['stealth'] ) )
 		{
@@ -1975,7 +2066,11 @@ class Plugins
 
 		$atLeastOneRenderer = false;
 		$setting_Blog = NULL;
-		if( isset( $params['Comment'] ) && !empty( $params['Comment'] ) )
+		if( isset( $params['setting_name'] ) && $params['setting_name'] == 'msg_apply_rendering' )
+		{ // get Message apply_rendering setting
+			$setting_name = $params['setting_name'];
+		}
+		elseif( isset( $params['Comment'] ) && !empty( $params['Comment'] ) )
 		{ // get Comment apply_rendering setting
 			$Comment = & $params['Comment'];
 			$comment_Item = & $Comment->get_Item();
@@ -1998,13 +2093,23 @@ class Plugins
 			return '';
 		}
 
-		if( $setting_name == 'coll_apply_comment_rendering' )
-		{ // Get Comment renderer plugins
-			$RendererPlugins = $this->get_list_by_events( array('FilterCommentContent') );
-		}
-		else
-		{ // Get Item renderer plugins
-			$RendererPlugins = $this->get_list_by_events( array('RenderItemAsHtml', 'RenderItemAsXml', 'RenderItemAsText') );
+		switch( $setting_name )
+		{
+			case 'msg_apply_rendering':
+				// Get Message renderer plugins
+				$RendererPlugins = $this->get_list_by_events( array('FilterMsgContent') );
+				break;
+
+			case 'coll_apply_comment_rendering':
+				// Get Comment renderer plugins
+				$RendererPlugins = $this->get_list_by_events( array('FilterCommentContent') );
+				break;
+
+			case 'coll_apply_rendering':
+			default:
+				// Get Item renderer plugins
+				$RendererPlugins = $this->get_list_by_events( array('RenderItemAsHtml', 'RenderItemAsXml', 'RenderItemAsText') );
+				break;
 		}
 
 		$r = '<input type="hidden" name="renderers_displayed" value="1" />';
@@ -2016,13 +2121,19 @@ class Plugins
 			{ // No unique code!
 				continue;
 			}
-			if( empty( $setting_Blog ) )
-			{ // If $setting_Blog is not set we can't get apply_rendering options
+			if( empty( $setting_Blog ) && $setting_name != 'msg_apply_rendering' )
+			{ // If $setting_Blog is not set we can't get collection apply_rendering options
 				continue;
 			}
 
-			// get rendering setting from plugin coll settings
-			$apply_rendering = $loop_RendererPlugin->get_coll_setting( $setting_name, $setting_Blog );
+			if( $setting_name == 'msg_apply_rendering' )
+			{ // get rendering setting from plugin message settings
+				$apply_rendering = $loop_RendererPlugin->get_msg_setting( $setting_name );
+			}
+			else
+			{ // get rendering setting from plugin coll settings
+				$apply_rendering = $loop_RendererPlugin->get_coll_setting( $setting_name, $setting_Blog );
+			}
 
 			if( $apply_rendering == 'stealth'
 				|| $apply_rendering == 'never'

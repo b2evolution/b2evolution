@@ -10,7 +10,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _goal.class.php 7783 2014-12-09 07:16:04Z attila $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -48,13 +48,7 @@ class Goal extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_track__goal', 'goal_', 'goal_ID' );
 
-		$this->delete_restrictions = array(
-				array( 'table'=>'T_track__goalhit', 'fk'=>'ghit_goal_ID', 'msg'=>T_('%d related goal hits') ),
-			);
-
-		$this->delete_cascades = array();
-
- 		if( $db_row )
+		if( $db_row )
 		{
 			$this->ID             = $db_row->goal_ID;
 			$this->gcat_ID        = $db_row->goal_gcat_ID;
@@ -67,6 +61,19 @@ class Goal extends DataObject
 			$this->default_value  = $db_row->goal_default_value;
 			$this->notes          = $db_row->goal_notes;
 		}
+	}
+
+
+	/**
+	 * Get delete restriction settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_cascades()
+	{
+		return array(
+				array( 'table'=>'T_track__goalhit', 'fk'=>'ghit_goal_ID', 'msg'=>T_('%d related goal hits') ),
+			);
 	}
 
 
@@ -297,8 +304,8 @@ class Goal extends DataObject
 		$Hit->log();
 
 		// Insert a goal hit:
-		$DB->query( 'INSERT INTO T_track__goalhit( ghit_goal_ID, ghit_hit_ID, ghit_params )
-			VALUES( '.$this->ID.', '.$Hit->ID.', '.$DB->quote( $extra_params ).' )',
+		$DB->query( 'INSERT INTO T_track__goalhit ( ghit_goal_ID, ghit_hit_ID, ghit_params )
+			VALUES ( '.$this->ID.', '.$Hit->ID.', '.$DB->quote( $extra_params ).' )',
 			'Record goal hit' );
 	}
 }

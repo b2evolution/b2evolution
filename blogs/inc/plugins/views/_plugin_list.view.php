@@ -33,7 +33,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author blueyed: Daniel HAHLER.
  *
- * @version $Id$
+ * @version $Id: _plugin_list.view.php 6134 2014-03-08 07:48:07Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -91,7 +91,7 @@ if( count( $admin_Plugins->get_plugin_groups() ) )
 	 */
 	$Results->grp_cols[] = array(
 			'td_colspan' => 0,
-			'td' => '% {Obj}->group %',
+			'td' => '~conditional( {Obj}->group != "", {Obj}->group, "'.T_('Un-Classified').'" )~',
 		);
 }
 

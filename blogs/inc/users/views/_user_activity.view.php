@@ -8,7 +8,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _user_activity.view.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -29,8 +29,8 @@ global $user_tab, $user_ID;
 
 global $current_User, $UserSettings;
 
-if( !$current_User->check_perm( 'users', 'edit' ) )
-{	// Check permission:
+if( !$current_User->can_moderate_user( $edited_User->ID ) )
+{ // Check permission:
 	debug_die( T_( 'You have no permission to see this tab!' ) );
 }
 
@@ -93,8 +93,8 @@ threads_results_block( array(
 evo_flush();
 
 
-if( $current_User->ID != $edited_User->ID && $edited_User->ID != 1 )
-{	// User can NOT delete admin and own account
+if( $current_User->ID != $edited_User->ID && $edited_User->ID != 1 && $current_User->check_perm( 'users', 'edit' ) )
+{ // User can NOT delete admin and own account
 	echo '<div style="margin-top:25px;">'.action_icon( T_('Delete User and All his contributions'), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_userdata&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete User and All his contributions'), 3, 4 ).'</div>';
 }
 

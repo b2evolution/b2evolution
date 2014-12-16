@@ -9,7 +9,7 @@
  *
  * @package admin
  *
- * @version $Id: _stats_goalhits.view.php 7368 2014-10-06 11:16:43Z yura $
+ * @version $Id: _stats_goalhits.view.php 7384 2014-10-08 06:21:06Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -57,7 +57,7 @@ else
 	// Create result set:
 	$SQL = new SQL();
 	$SQL->SELECT( 'hit_ID, sess_ID, hit_datetime, hit_referer_type, hit_uri, hit_coll_ID, hit_referer, hit_remote_addr,
-									user_login, hit_agent_type, dom_name, goal_name, keyp_phrase, gcat_color' );
+									user_login, hit_agent_type, dom_name, goal_name, keyp_phrase, gcat_color, ghit_params' );
 	$SQL->FROM( 'T_track__goalhit LEFT JOIN T_hitlog ON ghit_hit_ID = hit_ID
 									LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
 									LEFT JOIN T_track__keyphrase ON hit_keyphrase_keyp_ID = keyp_ID
@@ -197,6 +197,13 @@ $Results->cols[] = array(
 		'default_dir' => 'D',
 		'td' => '$goal_name$',
 		'extra' => array( 'style' => 'color:#gcat_color#' )
+	);
+
+$Results->cols[] = array(
+		'th' => T_('Extra params'),
+		'order' => 'ghit_params',
+		'default_dir' => 'D',
+		'td' => '%stats_goal_hit_extra_params( #ghit_params# )%',
 	);
 
 // Display results:

@@ -20,7 +20,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author asimo: Evo Factory / Attila Simo
  *
- * @version $Id$
+ * @version $Id: _userquery.class.php 7789 2014-12-09 16:35:43Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -63,13 +63,13 @@ class UserQuery extends SQL
 				'grouped'      => false,
 			), $params );
 
-		$this->SELECT( 'user_ID, user_login, user_nickname, user_lastname, user_firstname, user_gender, user_source, user_created_datetime, user_profileupdate_date, user_lastseen_ts, user_level, user_status, user_avatar_file_ID, user_email, user_url, user_age_min, user_age_max, user_pass, user_locale, user_unsubscribe_key, user_reg_ctry_ID, user_ctry_ID, user_rgn_ID, user_subrg_ID, user_city_ID, user_grp_ID' );
+		$this->SELECT( 'user_ID, user_login, user_nickname, user_lastname, user_firstname, user_gender, user_source, user_created_datetime, user_profileupdate_date, user_lastseen_ts, user_level, user_status, user_avatar_file_ID, user_email, user_url, user_age_min, user_age_max, user_pass, user_salt, user_locale, user_unsubscribe_key, user_reg_ctry_ID, user_ctry_ID, user_rgn_ID, user_subrg_ID, user_city_ID, user_grp_ID' );
 		$this->SELECT_add( ', IF( user_avatar_file_ID IS NOT NULL, 1, 0 ) as has_picture' );
 		$this->FROM( $this->dbtablename );
 
 		if( $params['join_group'] )
 		{ // Join Group
-			$this->SELECT_add( ', grp_ID, grp_name' );
+			$this->SELECT_add( ', grp_ID, grp_name, grp_level' );
 			$this->FROM_add( 'LEFT JOIN T_groups ON user_grp_ID = grp_ID ' );
 		}
 
@@ -92,8 +92,14 @@ class UserQuery extends SQL
 			$this->FROM_add( 'LEFT JOIN T_regional__city ON user_city_ID = city_ID ' );
 		}
 
+		if( ! empty( $params['where_org_ID'] ) )
+		{ // Join Organization
+			$this->SELECT_add( ', uorg_org_ID, uorg_accepted' );
+			$this->FROM_add( 'LEFT JOIN T_users__user_org ON uorg_user_ID = user_ID ' );
+		}
+
 		if( isset( $collections_Module ) )
-		{	// We are handling blogs:
+		{ // We are handling blogs:
 			$this->SELECT_add( ', COUNT( DISTINCT blog_ID ) AS nb_blogs' );
 			$this->FROM_add( 'LEFT JOIN T_blogs on user_ID = blog_owner_user_ID ' );
 		}
@@ -113,6 +119,53 @@ class UserQuery extends SQL
 			$this->GROUP_BY( 'user_ID' );
 			$this->ORDER_BY( '*, user_profileupdate_date DESC, user_lastseen_ts DESC, user_ID ASC' );
 		}
+	}
+
+
+	/**
+	 * Restrict by members
+	 *
+	 * @param boolean TRUE to select only member of the current Blog
+	 */
+	function where_members( $members )
+	{
+		global $DB, $Blog;
+
+		if( empty( $members ) || is_admin_page() || empty( $Blog ) || $Blog->get_setting( 'allow_access' ) != 'members' )
+		{ // Don't restrict
+			return;
+		}
+
+		// Get blog owner
+		$blogowner_SQL = new SQL();
+		$blogowner_SQL->SELECT( 'user_ID' );
+		$blogowner_SQL->FROM( 'T_users' );
+		$blogowner_SQL->FROM_add( 'INNER JOIN T_blogs ON blog_owner_user_ID = user_ID' );
+		$blogowner_SQL->WHERE( 'blog_ID = '.$DB->quote( $Blog->ID ) );
+
+		// Calculate what users are members of the blog
+		$userperms_SQL = new SQL();
+		$userperms_SQL->SELECT( 'user_ID' );
+		$userperms_SQL->FROM( 'T_users' );
+		$userperms_SQL->FROM_add( 'INNER JOIN T_coll_user_perms ON ( bloguser_user_ID = user_ID AND bloguser_ismember = 1 )' );
+		$userperms_SQL->WHERE( 'bloguser_blog_ID = '.$DB->quote( $Blog->ID ) );
+
+		// Calculate what user groups are members of the blog
+		$usergroups_SQL = new SQL();
+		$usergroups_SQL->SELECT( 'user_ID' );
+		$usergroups_SQL->FROM( 'T_users' );
+		$usergroups_SQL->FROM_add( 'INNER JOIN T_groups ON grp_ID = user_grp_ID' );
+		$usergroups_SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON ( bloggroup_group_ID = grp_ID AND bloggroup_ismember = 1 )' );
+		$usergroups_SQL->WHERE( 'bloggroup_blog_ID = '.$DB->quote( $Blog->ID ) );
+
+		$members_count_sql = 'SELECT DISTINCT user_ID FROM ( '
+			.$blogowner_SQL->get()
+			.' UNION '
+			.$userperms_SQL->get()
+			.' UNION '
+			.$usergroups_SQL->get().' ) members';
+
+		$this->WHERE_and( 'user_ID IN ( '.$members_count_sql.' ) ');
 	}
 
 
@@ -356,6 +409,51 @@ class UserQuery extends SQL
 			$this->FROM_add( ' LEFT JOIN T_users__fields ON uf_user_ID = user_ID' );
 			$this->WHERE_and( ' ( ( '.implode( ' ) OR ( ', $criteria_where_clauses ).' ) ) ' );
 		}
+	}
+
+
+	/**
+	 * Restrict with user group level
+	 *
+	 * @param integer Minimum group level
+	 * @param integer Maximum group level
+	 */
+	function where_group_level( $group_level_min, $group_level_max )
+	{
+		global $DB;
+
+		if( $group_level_min < 0 )
+		{ // Min group level is 0
+			$group_level_min = 0;
+		}
+
+		if( $group_level_max > 10 )
+		{ // Max group level is 10
+			$group_level_max = 10;
+		}
+
+		$this->WHERE_and( 'grp_level >= '.$DB->quote( $group_level_min ) );
+		$this->WHERE_and( 'grp_level <= '.$DB->quote( $group_level_max ) );
+	}
+
+
+	/**
+	 * Select by organization ID
+	 *
+	 * @param integer Organization ID
+	 */
+	function where_organization( $org_ID )
+	{
+		global $DB;
+
+		$org_ID = intval( $org_ID );
+
+		if( empty( $org_ID ) )
+		{
+			return;
+		}
+
+		$this->WHERE_and( 'uorg_org_ID = '.$DB->quote( $org_ID ) );
 	}
 
 }

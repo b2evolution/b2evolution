@@ -21,7 +21,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _cronjob_list.view.php 6484 2014-04-16 09:50:09Z attila $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -36,12 +36,22 @@ if( !$ctst_pending && !$ctst_started && !$ctst_timeout && !$ctst_error && !$ctst
 	$ctst_error = 1;
 }
 
+// Create cron job names SELECT query from crong_jobs_config array
+$cron_job_name_query = cron_job_sql_query();
+
 /*
  * Create result set :
  */
 $SQL = new SQL();
-$SQL->SELECT( 'ctsk_ID, ctsk_start_datetime, ctsk_name, ctsk_controller, ctsk_repeat_after, IFNULL( clog_status, "pending" ) as status' );
+$SQL->SELECT( 'ctsk_ID, ctsk_start_datetime, ctsk_key, ctsk_name, ctsk_params, ctsk_repeat_after,
+  IFNULL( clog_status, "pending" ) as status,
+  IFNULL( ctsk_name, task_name ) as final_name' );
 $SQL->FROM( 'T_cron__task LEFT JOIN T_cron__log ON ctsk_ID = clog_ctsk_ID' );
+if( !empty( $cron_job_name_query ) )
+{ // left join with the predefined cron job names, to be able to order correctly after the after the localized Name fields
+	// Note: ctsk_key field always has ascii_bin encoding, so make sure we convert the temp table field to ascii also, to prevent illegal mix of collation issues
+	$SQL->FROM_add( 'LEFT JOIN ( '.$cron_job_name_query. ' ) AS temp ON ctsk_key = CONVERT( temp.task_key USING ascii )');
+}
 if( $ctst_pending )
 {
 	$SQL->WHERE_or( 'clog_status IS NULL' );
@@ -95,6 +105,7 @@ $Results->filter_area = array(
 	'url_ignore' => 'results_crontab_page,ctst_pending,ctst_started,ctst_timeout,ctst_error,ctst_finished',	// ignor epage param and checkboxes
 	'presets' => array(
 			'schedule' => array( T_('Schedule'), '?ctrl=crontab&amp;ctst_pending=1&amp;ctst_started=1&amp;ctst_timeout=1&amp;ctst_error=1' ),
+			'finished' => array( T_('Finished'), '?ctrl=crontab&amp;ctst_finished=1' ),
 			'attention' => array( T_('Attention'), '?ctrl=crontab&amp;ctst_timeout=1&amp;ctst_error=1' ),
 			'all' => array( T_('All'), '?ctrl=crontab&amp;ctst_pending=1&amp;ctst_started=1&amp;ctst_timeout=1&amp;ctst_error=1&amp;ctst_finished=1' ),
 		)
@@ -118,8 +129,8 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 						'th' => T_('Name'),
-						'order' => 'ctsk_name',
-						'td' => '<a href="%regenerate_url(\'action,cjob_ID\',\'action=view&amp;cjob_ID=$ctsk_ID$\')%">$ctsk_name$</a>%cron_job_manual_link( #ctsk_controller# )%',
+						'order' => 'final_name',
+						'td' => '<a href="%regenerate_url(\'action,cjob_ID\',\'action=view&amp;cjob_ID=$ctsk_ID$\')%">%cron_job_name( #ctsk_key#, #ctsk_name#, #ctsk_params# )%</a>%cron_job_manual_link( #ctsk_key# )%',
 					);
 
 $Results->cols[] = array(

@@ -8,7 +8,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
- * @version $Id$
+ * @version $Id: account_reported.html.php 7639 2014-11-13 15:07:37Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -28,15 +28,15 @@ $params = array_merge( array(
 		'reported_by'    => '', // Login of user who has reported this user account
 	), $params );
 
-echo '<p>'.sprintf( T_('A user account was reported by %s'), get_user_colored_login( $params['reported_by'] ) )."</p>\n";
+echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_('A user account was reported by %s'), get_user_colored_login_link( $params['reported_by'], array( 'use_style' => true ) ) )."</p>\n";
 
-echo '<p>'.T_('Login').": ".get_user_colored_login( $params['login'] )."</p>\n";
-echo '<p>'.T_('Email').": ".$params['email']."</p>\n";
-echo '<p>'.T_('Reported as').": ".$params['report_status']."</p>\n";
-echo '<p>'.T_('Extra info').": ".nl2br( $params['report_info'] )."</p>\n";
+echo '<p'.emailskin_style( '.p' ).'>'.T_('Login').": ".get_user_colored_login_link( $params['login'], array( 'use_style' => true ) )."</p>\n";
+echo '<p'.emailskin_style( '.p' ).'>'.T_('Email').": ".$params['email']."</p>\n";
+echo '<p'.emailskin_style( '.p' ).'>'.T_('Reported as').": ".$params['report_status']."</p>\n";
+echo '<p'.emailskin_style( '.p' ).'>'.T_('Extra info').": ".nl2br( $params['report_info'] )."</p>\n";
 
 // User's pictures:
-echo '<p>'.T_('The current profile pictures for this account are:').'</p>'."\n";
+echo '<p'.emailskin_style( '.p' ).'>'.T_('The current profile pictures for this account are:').'</p>'."\n";
 $user_pictures = '';
 $UserCache = & get_UserCache();
 if( $User = $UserCache->get_by_ID( $params['user_ID'], false, false ) )
@@ -53,16 +53,16 @@ if( $User = $UserCache->get_by_ID( $params['user_ID'], false, false ) )
 			) );
 	}
 }
-echo empty( $user_pictures ) ? '<p><b>'.T_('No pictures.').'</b></p>' : $user_pictures;
+echo empty( $user_pictures ) ? '<p'.emailskin_style( '.p' ).'><b>'.T_('No pictures.').'</b></p>' : $user_pictures;
 
 // Buttons:
-echo '<div class="buttons">'."\n";
-echo get_link_tag( $admin_url.'?ctrl=user&user_tab=admin&user_ID='.$params['user_ID'], T_( 'Edit User account' ), 'button_yellow' )."\n";
+echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
+echo get_link_tag( $admin_url.'?ctrl=user&user_tab=admin&user_ID='.$params['user_ID'], T_( 'Edit User account' ), 'div.buttons a+a.button_yellow' )."\n";
 echo "</div>\n";
 
 // Footer vars:
 $params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notification when an account was reported, click here:' )
-			.' <a href="'.$htsrv_url.'quick_unsubscribe.php?type=account_reported&user_ID=$user_ID$&key=$unsubscribe_key$">'
+			.' <a href="'.$htsrv_url.'quick_unsubscribe.php?type=account_reported&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
 			.T_('instant unsubscribe').'</a>.';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------

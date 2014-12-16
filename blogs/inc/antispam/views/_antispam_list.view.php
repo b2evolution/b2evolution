@@ -18,7 +18,7 @@
  *
  * @todo Allow applying / re-checking of the known data, not just after an update!
  *
- * @version $Id$
+ * @version $Id: _antispam_list.view.php 6134 2014-03-08 07:48:07Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -113,7 +113,7 @@ $Results->filter_area = array(
 $Results->cols[] = array(
 						'th' => T_('Keyword'),
 						'order' => 'aspm_string',
-						'td' => '%evo_htmlspecialchars(#aspm_string#)%',
+						'td' => '%htmlspecialchars(#aspm_string#)%',
 					);
 
 // Set columns:

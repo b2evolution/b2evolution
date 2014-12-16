@@ -60,7 +60,7 @@ $params = array_merge( array(
 switch( $disp )
 {
 	case 'threads':
-		if( $action == 'new' )
+		if( in_array( $action, array( 'new', 'preview', 'create' ) ) )
 		{
 			require $inc_path.'messaging/views/_thread.form.php';
 		}

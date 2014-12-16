@@ -91,10 +91,38 @@ div.status_icon {
 
 // Profile picture
 div.avatartag {
-	float: left;
+	display: inline-block;
+	vertical-align: top;
 	margin: 0 0.5em 0.5em 0;
 	a {
 		outline: none;
+	}
+	&.main {
+		display: block;
+		&>a {
+			float: left;
+		}
+		a:first-child {
+			margin-right: 25px;
+		}
+		.avatar_actions {
+			margin-right: 25px;
+		}
+	}
+}
+.avatar_main_frame {
+	>a:first-child {
+		margin-right: 25px;
+	}
+	.avatar_actions {
+		text-align: center;
+		padding: 0 25px 0 0;
+		float: none;
+		display: table-cell;
+		vertical-align: middle;
+	}
+	.duplicated_avatars {
+		margin: 10px 0;
 	}
 }
 
@@ -529,14 +557,14 @@ span.loader_img.loader_user_deldata {
 	background-image: url("../../../../rsc/img/ajax-loader/fff.gif");
 }
 
-.editable_comment_content textarea.form_textarea_input {
-	width: 90%;
-	margin-bottom: 10px;
-}
-
 div#upload_wrapper, div#import_wrapper {
 	border: none;
 	background: none;
+}
+
+// Fieldset folding
+div.fieldset_wrapper.folded .panel-body {
+	display: none;
 }
 
 // Dashboard

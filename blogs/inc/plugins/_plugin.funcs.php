@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id$
+ * @version $Id: _plugin.funcs.php 7268 2014-08-28 10:12:16Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -153,7 +153,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				if( ! isset($parmeta['value']) )
 				{
 					$parmeta['value'] = '<div class="error">HTML layout usage:<pre>'.
-							evo_htmlentities("'layout' => 'html',\n'value' => '<em>My HTML code</em>',").'</pre></div>';
+							htmlentities("'layout' => 'html',\n'value' => '<em>My HTML code</em>',").'</pre></div>';
 				}
 				echo $parmeta['value'];
 				break;
@@ -183,6 +183,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		{
 			case 'CollSettings':
 				$set_value = $Obj->get_coll_setting( $parname, $set_target );
+				$error_value = NULL;
+				break;
+
+			case 'MsgSettings':
+				$set_value = $Obj->get_msg_setting( $parname );
 				$error_value = NULL;
 				break;
 
@@ -270,8 +275,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 		case 'select_user':
 			$UserCache = & get_UserCache();
-			$UserCache->load_all();
-			if( ! isset($params['loop_object_method']) )
+			$UserCache->clear();
+			$users_SQL = $UserCache->get_SQL_object();
+			$users_SQL->LIMIT( isset( $parmeta['users_limit'] ) ? intval( $parmeta['users_limit'] ) : 20 );
+			$UserCache->load_by_sql( $users_SQL );
+			if( ! isset( $params['loop_object_method'] ) )
 			{
 				$params['loop_object_method'] = 'get_preferred_name';
 			}
@@ -938,7 +946,7 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 	// Check maxlength:
 	if( isset($meta['maxlength']) )
 	{
-		if( evo_strlen($value) > $meta['maxlength'] )
+		if( utf8_strlen($value) > $meta['maxlength'] )
 		{
 			param_error( $param_name, sprintf( T_('The value is too long.'), $value ) );
 		}

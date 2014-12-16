@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _file_browse_set.form.php 6134 2014-03-08 07:48:07Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -86,6 +86,6 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 	}
 }
 
-$Form->end_form( array( array( 'submit', 'actionArray[update_settings]', T_('Update !'), 'ActionButton') ) );
+$Form->end_form( array( array( 'submit', 'actionArray[update_settings]', T_('Save Changes!'), 'ActionButton') ) );
 
 ?>

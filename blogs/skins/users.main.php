@@ -8,7 +8,7 @@
  *
  * @package evoskins
  *
- * @version $Id$
+ * @version $Id: users.main.php 7818 2014-12-15 14:41:11Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -38,13 +38,7 @@ if( is_logged_in() && ( !check_user_status( 'can_view_users' ) ) )
 	// will have exited
 }
 
-// var bgxy_expand is used by toggle_filter_area() and toggle_clickopen()
-// var htsrv_url is used for AJAX callbacks
-add_js_headline( "// Paths used by JS functions:
-		var bgxy_expand = '".get_icon( 'expand', 'xy' )."';
-		var bgxy_collapse = '".get_icon( 'collapse', 'xy' )."';" );
-
-if( has_cross_country_restriction( 'users' ) && empty( $current_User->ctry_ID ) )
+if( has_cross_country_restriction( 'users', 'list' ) && empty( $current_User->ctry_ID ) )
 { // User may browse other users only from the same country
 	$Messages->add( T_('Please specify your country before attempting to contact other users.') );
 	header_redirect( get_user_profile_url() );

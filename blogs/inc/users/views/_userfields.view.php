@@ -27,7 +27,7 @@
  * @author evofactory-test
  * @author fplanque: Francois Planque.
  *
- * @version  $Id$
+ * @version  $Id: _userfields.view.php 6134 2014-03-08 07:48:07Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -144,9 +144,17 @@ $Results->ID_col = 'ufdf_ID';
  * Group columns:
  */
 $group_td_colspan = $current_User->check_perm( 'users', 'edit', false ) ? -2 : 0;
+if( $current_User->check_perm( 'users', 'edit' ) )
+{ // We have permission to modify:
+	$td_group_name = '<a href="?ctrl=userfieldsgroups&amp;action=edit&amp;ufgp_ID=$ufgp_ID$">$ufgp_name$</a>';
+}
+else
+{
+	$td_group_name = '$ufgp_name$';
+}
 $Results->grp_cols[] = array(
 						'td_colspan' => $group_td_colspan,
-						'td' => '<a href="?ctrl=userfieldsgroups&amp;action=edit&amp;ufgp_ID=$ufgp_ID$">$ufgp_name$</a>',
+						'td' => $td_group_name,
 					);
 if( $current_User->check_perm( 'users', 'edit', false ) )
 {	// We have permission to modify:
@@ -186,9 +194,17 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 /*
  * Data columns:
  */
+if( $current_User->check_perm( 'users', 'edit' ) )
+{ // We have permission to modify:
+	$td_field_name = '<a href="%regenerate_url( \'action\', \'ufdf_ID=$ufdf_ID$&amp;action=edit\' )%"><strong>%T_(#ufdf_name#)%</strong></a>';
+}
+else
+{
+	$td_field_name = '<strong>%T_(#ufdf_name#)%</strong>';
+}
 $Results->cols[] = array(
 		'th' => T_('Name'),
-		'td' => '<a href="%regenerate_url( \'action\', \'ufdf_ID=$ufdf_ID$&amp;action=edit\' )%"><strong>%T_(#ufdf_name#)%</strong></a>',
+		'td' => $td_field_name,
 	);
 
 $Results->cols[] = array(
@@ -208,7 +224,7 @@ $Results->cols[] = array(
 		'td_class' => 'center',
 	);
 
-if( $current_User->check_perm( 'users', 'edit', false ) )
+if( $current_User->check_perm( 'users', 'edit' ) )
 {	// We have permission to modify:
 	function order_actions( & $row )
 	{

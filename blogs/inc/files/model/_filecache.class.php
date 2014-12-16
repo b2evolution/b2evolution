@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _filecache.class.php 7189 2014-07-31 06:58:37Z yura $
+ * @version $Id: _filecache.class.php 7190 2014-07-31 07:04:24Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -50,6 +50,20 @@ class FileCache extends DataObjectCache
 	function FileCache()
 	{
 		parent::DataObjectCache( 'File', false, 'T_files', 'file_', 'file_ID' );
+	}
+
+
+	/**
+	 * Load the cache **extensively**
+	 */
+	function load_all()
+	{
+		if( $this->all_loaded )
+		{ // Already loaded
+			return false;
+		}
+
+		debug_die( 'Load all is not allowed for FileCache!' );
 	}
 
 

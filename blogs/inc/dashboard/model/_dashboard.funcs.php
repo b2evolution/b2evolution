@@ -15,7 +15,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _dashboard.funcs.php 7283 2014-09-05 12:58:59Z yura $
+ * @version $Id: _dashboard.funcs.php 7285 2014-09-05 13:08:48Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -271,12 +271,16 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		$CommentList->display_init();
 	}
 
+	$index = 0;
 	$new_comment_IDs = array();
 	while( $Comment = & $CommentList->get_next() )
 	{ // Loop through comments:
 		$new_comment_IDs[] = $Comment->ID;
+		$index = $index + 1;
+		// Only 5 commens should be visible, set hidden status for the rest
+		$hidden_status = ( $index > 5 ) ? ' hidden_comment' : '';
 
-		echo '<div id="comment_'.$Comment->ID.'" class="dashboard_post dashboard_post_'.($CommentList->current_idx % 2 ? 'even' : 'odd' ).'">';
+		echo '<div id="comment_'.$Comment->ID.'" class="dashboard_post dashboard_post_'.($CommentList->current_idx % 2 ? 'even' : 'odd' ).$hidden_status.'">';
 		echo '<div class="floatright"><span class="note status_'.$Comment->status.'"><span>';
 		$Comment->status();
 		echo '</span></span></div>';
@@ -346,12 +350,7 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		echo '</div>';
 
 		// Display Spam Voting system
-		$vote_spam_params = array();
-		if( ! $script )
-		{ // This is an async request, so javascript is enabled for sure and we may display voting
-			$vote_spam_params['display'] = true;
-		}
-		$Comment->vote_spam( '', '', '&amp;', true, true, $vote_spam_params );
+		$Comment->vote_spam( '', '', '&amp;', true, true );
 
 		echo '<div class="clear"></div>';
 		echo '</div>';
@@ -369,17 +368,27 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
  * Get a count of the records in the DB table
  *
  * @param string Table name
+ * @param string SQL WHERE
+ * @param string SQL FROM
  * @return integer A count of the records
  */
-function get_table_count( $table_name )
+function get_table_count( $table_name, $sql_where = '', $sql_from = '' )
 {
 	global $DB;
 
 	$SQL = new SQL();
 	$SQL->SELECT( 'COUNT( * )' );
 	$SQL->FROM( $table_name );
+	if( !empty( $sql_from ) )
+	{ // Additional sql for FROM clause
+		$SQL->FROM_add( $sql_from );
+	}
+	if( !empty( $sql_where ) )
+	{ // Additional sql for WHERE clause
+		$SQL->WHERE( $sql_where );
+	}
 
-	return $DB->get_var( $SQL->get() );
+	return intval( $DB->get_var( $SQL->get() ) );
 }
 
 
@@ -482,6 +491,115 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 	$block_item_Widget->disp_template_raw( 'block_end' );
 
 	return true;
+}
+
+
+/**
+ * Get percent by function log10()
+ *
+ * @param integer Value
+ * @return integer Percent
+ */
+function log10_percent( $value )
+{
+	$percent = log10( intval( $value ) ) * 2 * 10;
+	return intval( $percent > 100 ? 100 : $percent );
+}
+
+
+/**
+ * Display charts
+ *
+ * @param array Chart data
+ */
+function display_charts( $chart_data )
+{
+	if( empty( $chart_data ) )
+	{ // No data
+		return;
+	}
+
+	foreach( $chart_data as $chart_item )
+	{
+		if( $chart_item['type'] == 'number' )
+		{ // Calculate a percent with log10 where max value is 100000
+			$chart_percent = log10_percent( $chart_item['value'] );
+			// Set a color for value, from green(0%) to red(100%)
+			$chart_color = get_color_by_percent( '#0F0', '#FC0', '#F00', $chart_percent );
+		}
+		else
+		{ // Calculate a real percent
+			$chart_percent = empty( $chart_item['100%'] ) ? 0 : floor( intval( $chart_item['value'] ) / $chart_item['100%'] ) * 100;
+			$chart_item['value'] = $chart_percent.'%';
+			$chart_color = '#00F';
+		}
+		// Display chart
+		echo '<div class="chart">
+				<div class="'.$chart_item['type'].'" data-percent="'.$chart_percent.'"><b style="color:'.$chart_color.'">'.$chart_item['value'].'</b></div>
+				<div class="label">'.$chart_item['title'].'</div>
+			</div>';
+	}
+
+	echo '<div class="clear"></div>';
+}
+
+
+/**
+ * Convert color #FFFFFF to array( 'R' => 255, 'G' => 255, 'B' => 255 )
+ *
+ * @param string Color in hex format
+ * @return array Color in RGB format
+ */
+function color_hex2rgb( $color )
+{
+	$color = str_replace( '#', '', $color );
+	$color = str_split( $color, strlen( $color ) / 3 );
+	foreach( $color as $c => $hex )
+	{
+		$color[ $c ] = strlen( $hex ) == 1 ? $hex.$hex : $hex;
+	}
+	return array(
+			'R' => hexdec( $color[0] ),
+			'G' => hexdec( $color[1] ),
+			'B' => hexdec( $color[2] ),
+		);
+}
+
+
+/**
+ * Get color by percent between three colors
+ *
+ * @param string Start Color in hex format
+ * @param string Middle Color in hex format
+ * @param string End Color in hex format
+ * @param integer Percent
+ * @return string Result Color in hex format
+ */
+function get_color_by_percent( $color_from, $color_middle, $color_to, $percent )
+{
+	if( $percent < 50 )
+	{ // First 50 percents
+		$color_to = $color_middle;
+		$percent *= 2;
+	}
+	else
+	{ // Last 50 percents
+		$color_from = $color_middle;
+		$percent = ( $percent - 50 ) * 2;
+	}
+	$color_from = color_hex2rgb( $color_from );
+	$color_to = color_hex2rgb( $color_to );
+
+	$new_color = '#';
+	foreach( $color_from as $rgb_key => $rgb_color )
+	{
+		$rgb_percent = $color_from[ $rgb_key ] + round( ( $color_to[ $rgb_key ] - $color_from[ $rgb_key ] ) * ( $percent / 100 ) );
+		$rgb_percent = $rgb_percent > 255 ? 255 : ( $rgb_percent < 0 ? 0 : $rgb_percent );
+
+		$new_color .= str_pad( dechex( $rgb_percent ), 2, 0, STR_PAD_LEFT );
+	}
+
+	return $new_color;
 }
 
 

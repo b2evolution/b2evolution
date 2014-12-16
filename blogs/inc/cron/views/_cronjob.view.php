@@ -21,7 +21,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _cronjob.view.php 6134 2014-03-08 07:48:07Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -36,14 +36,14 @@ if( empty( $cjob_row->clog_status ) && $current_User->check_perm( 'options', 'ed
 
 $Form->global_icon( T_('Close sheet'), 'close', regenerate_url( 'action,cjob_ID' ) );
 
-$manual_link = cron_job_manual_link( $cjob_row->ctsk_controller );
+$manual_link = cron_job_manual_link( $cjob_row->ctsk_key );
 
 $Form->begin_form( 'fform', T_('Scheduled job') );
 
 	$Form->begin_fieldset( T_('Job details').$manual_link );
 
 		$Form->info( T_('Job #'), $cjob_row->ctsk_ID );
-		$Form->info( T_('Job name'), $cjob_row->ctsk_name.$manual_link );
+		$Form->info( T_('Job name'), cron_job_name( $cjob_row->ctsk_key, $cjob_row->ctsk_name, $cjob_row->ctsk_params ).$manual_link );
 		$Form->info( T_('Scheduled at'), mysql2localedatetime($cjob_row->ctsk_start_datetime) );
 		$cjob_repeat_after = '';
 		if( $cjob_repeat_after_days = floor( $cjob_row->ctsk_repeat_after / 86400 ) )

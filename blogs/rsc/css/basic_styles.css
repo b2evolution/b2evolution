@@ -48,6 +48,15 @@ code, samp {
 .indented {
 	margin-left: 3em;
 }
+.absolute_center {
+	display: block;
+	margin: auto;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
 
 .border {
 	border: 1px solid #000;
@@ -455,9 +464,25 @@ div.edit_toolbar input {
 div.edit_toolbar input:hover {
 	border-color: #00f;
 }
-div.comment_toolbars {
-	margin-top: 1em;
+div.comment_toolbars, div.message_toolbars {
 	text-align: center;
+}
+div.comment_toolbars div.edit_toolbar, div.message_toolbars div.edit_toolbar {
+	margin: 0;
+	width: 100%;
+	border-bottom: none;
+}
+
+/* Loader animation */
+span.loader_img {
+	display: inline-block;
+	width: 32px;
+	height: 32px;
+	background: url(../img/ajax-loader/fff.gif) no-repeat center;
+}
+span.loader_img.loader_user_report,
+span.loader_img.loader_user_deldata {
+	background-image: url(../img/ajax-loader/777.gif);
 }
 
 /* Meta categories */

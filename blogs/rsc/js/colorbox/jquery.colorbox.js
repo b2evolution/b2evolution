@@ -321,8 +321,8 @@
 		$content = $div("Content").append(
 			$loaded = $div("LoadedContent", 'width:0; height:0; overflow:hidden'),
 			$loadingOverlay = $div("LoadingOverlay").add($div("LoadingGraphic")),
-			$voting = $div("Voting"),
 			$title = $div("Title"),
+			$voting = $div("Voting"),
 			$current = $div("Current"),
 			$next = $div("Next"),
 			$prev = $div("Previous"),
@@ -336,7 +336,7 @@
 
 		$('body').prepend($overlay, $box.append($wrap, $loadingBay));
 
-		voting_positions_done = false;
+		$voting.data( 'voting_positions_done', 0 );
 		previous_title = '';
 
 		$content.children()
@@ -700,16 +700,22 @@
 		previous_title = settings.title;
 
 		if( settings.displayVoting && settings.votingUrl != '' && element.id != '' )
-		{	// Initialize the actions for the voting controls
-			if( !voting_positions_done )
-			{	// Fix positions of the control elements
-				$loaded.css( 'margin-bottom', parseInt( $loaded.css( 'margin-bottom' ) ) + $voting.outerHeight() );
-				loadedHeight = $loaded.outerHeight(true);
-				voting_positions_done = true;
+		{ // Initialize the actions for the voting controls
+			if( $voting.data( 'voting_positions_done' ) == 0 )
+			{ // Fix positions of the control elements
+				loadedHeight += $voting.outerHeight();
+				$voting.data( 'voting_positions_done', 1 );
 			}
+			$voting.show();
 
 			// Initialize the voting events
 			init_voting_bar( $voting, settings.votingUrl, element.id, true );
+		}
+		else if( $voting.html() != '' )
+		{ // Clear the voting panel if previous image displayed this
+			loadedHeight -= $voting.outerHeight();
+			$voting.html( '' ).hide();
+			$voting.data( 'voting_positions_done', 0 );
 		}
 
 		settings.h = settings.height ?

@@ -10,7 +10,7 @@
  * @package evoskins
  * @subpackage basic
  *
- * @version $Id$
+ * @version $Id: index.main.php 7115 2014-07-14 14:08:25Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -151,7 +151,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			?>
 
 			<h3>
-				<?php $Item->issue_time(); ?>
+				<?php $Item->issue_time( array( 'time_format' => '#short_time' ) ); ?>
 				<a href="<?php $Item->permanent_url() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" border="0" align="absmiddle" /></a>
 				<?php
 					$Item->title( array(
@@ -181,10 +181,10 @@ siteskin_include( '_site_body_header.inc.php' );
 				<?php
 					// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 					skin_include( '_item_content.inc.php', array(
-							'image_size'	=>	'fit-400x320',
+							'image_size' => 'fit-400x320',
 						) );
-					// Note: You can customize the default item feedback by copying the generic
-					// /skins/_item_feedback.inc.php file into the current skin folder.
+					// Note: You can customize the default item content by copying the generic
+					// /skins/_item_content.inc.php file into the current skin folder.
 					// -------------------------- END OF POST CONTENT -------------------------
 				?>
 
@@ -199,7 +199,6 @@ siteskin_include( '_site_body_header.inc.php' );
 										'link_text_one' => '#',
 										'link_text_more' => '#',
 										'link_title' => '#',
-										'use_popup' => false,
 									) );
 					?>
 

@@ -35,7 +35,7 @@ skin_include( '_html_header.inc.php' );
 // ------------------------- BODY HEADER INCLUDED HERE --------------------------
 skin_include( '_body_header.inc.php' );
 // Note: You can customize the default BODY header by copying the generic
-// /skins/_body_footer.inc.php file into the current skin folder.
+// /skins/_body_header.inc.php file into the current skin folder.
 // ------------------------------- END OF HEADER --------------------------------
 ?>
 
@@ -82,10 +82,10 @@ skin_include( '_body_header.inc.php' );
 				<?php
 					// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 					skin_include( '_item_content.inc.php', array(
-							'image_size'	=>	'fit-400x320',
+							'image_size' => 'fit-400x320',
 						) );
-					// Note: You can customize the default item feedback by copying the generic
-					// /skins/_item_feedback.inc.php file into the current skin folder.
+					// Note: You can customize the default item content by copying the generic
+					// /skins/_item_content.inc.php file into the current skin folder.
 					// -------------------------- END OF POST CONTENT -------------------------
 				?>
 		
@@ -93,14 +93,14 @@ skin_include( '_body_header.inc.php' );
 					<small>
 						<?php
 							$Item->author( array(
-									'link_text'    => 'avatar',
+									'link_text'    => 'only_avatar',
 									'link_rel'     => 'nofollow',
 									'thumb_size'   => 'crop-top-32x32',
 									'thumb_class'  => 'leftmargin',
 								) );
 						?>
 						<?php
-							if( $Skin->get_setting( 'display_post_date') )
+							if( $Skin->get_setting( 'display_post_date' ) )
 							{	// We want to display the post date:
 								$Item->issue_time( array(
 										'before'      => /* TRANS: date */ T_('This entry was posted on '),
@@ -108,10 +108,11 @@ skin_include( '_body_header.inc.php' );
 									) );
 								$Item->issue_time( array(
 										'before'      => /* TRANS: time */ T_('at '),
+										'time_format' => '#short_time',
 									) );
 								$Item->author( array(
 										'before'    => T_('by '),
-										'link_text' => 'login',
+										'link_text' => 'preferredname',
 									) );
 							}
 							else
@@ -141,14 +142,8 @@ skin_include( '_body_header.inc.php' );
 									'separator' =>      ', ',
 								) );
 						?>
-		
 						<!-- You can follow any responses to this entry through the RSS feed. -->
-						<?php
-							$Item->edit_link( array( // Link to backoffice for editing
-									'before'    => '<div class="edit_link">',
-									'after'     => '</div>',
-								) );
-						?>
+						<?php $Item->edit_link(); ?>
 					</small>
 				</p>
 		
@@ -178,8 +173,8 @@ skin_include( '_body_header.inc.php' );
 	<?php
 	// ------------------------- SIDEBAR INCLUDED HERE --------------------------
 	skin_include( '_sidebar.inc.php' );
-	// Note: You can customize the default BODY footer by copying the
-	// _body_footer.inc.php file into the current skin folder.
+	// Note: You can customize the sidebar by copying the
+	// _sidebar.inc.php file into the current skin folder.
 	// ----------------------------- END OF SIDEBAR -----------------------------
 	?>
 

@@ -8,7 +8,7 @@
  * 
  * @package admin
  * 
- * @version $Id$
+ * @version $Id: links.ctrl.php 7796 2014-12-10 13:45:51Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -105,14 +105,18 @@ switch( $action )
 		// Check permission:
 		$LinkOwner->check_perm( 'edit', true );
 
-		// Unlink File from Item:
+		if( $link_File = & $edited_Link->get_File() )
+		{
+			syslog_insert( sprintf( 'File %s was unlinked from %s with ID=%s', '<b>'.$link_File->get_name().'</b>', $LinkOwner->type, $LinkOwner->link_Object->ID ), 'info', 'file', $link_File->ID );
+		}
+		// Unlink File from Item/Comment:
 		$deleted_link_ID = $edited_Link->ID;
 		$edited_Link->dbdelete( true );
 		unset( $edited_Link );
 
 		$LinkOwner->after_unlink_action( $deleted_link_ID );
 
-		$Messages->add( $LinkOwner->translate( 'Link has been deleted from $ownerTitle$' ), 'success' );
+		$Messages->add( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'success' );
 
 		header_redirect( $redirect_to );
 		break;

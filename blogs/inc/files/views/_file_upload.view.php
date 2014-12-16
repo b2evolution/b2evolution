@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _file_upload.view.php 6134 2014-03-08 07:48:07Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -325,7 +325,7 @@ global $fm_FileRoot;
 			<p class="uploadfileinputs"><a href="#" onclick="addAnotherFileInput(); return false;" class="small"><?php echo T_('Add another file'); ?></a></p>
 
 			<div class="upload_foot">
-				<input type="submit" value="<?php echo format_to_output( T_('Upload to server now'), 'formvalue' ); ?>" class="ActionButton btn btn-default" >
+				<input type="submit" value="<?php echo format_to_output( T_('Upload to server now'), 'formvalue' ); ?>" class="ActionButton btn btn-primary" >
 
 				<p class="note">
 					<?php

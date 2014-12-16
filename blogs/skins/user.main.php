@@ -8,7 +8,7 @@
  *
  * @package evoskins
  *
- * @version $Id$
+ * @version $Id: user.main.php 7818 2014-12-15 14:41:11Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -19,11 +19,25 @@ param( 'user_ID', 'integer', '', true );
 // set where to redirect in case of error
 $error_redirect_to = ( empty( $Blog) ? $baseurl : $Blog->gen_blogurl() );
 
-if( !is_logged_in() && !$Settings->get( 'allow_anonymous_user_profiles' ) )
+if( !is_logged_in() )
 { // Redirect to the login page if not logged in and allow anonymous user setting is OFF
-	$Messages->add( T_('You must log in to view this user profile.') );
-	header_redirect( get_login_url('cannot see user'), 302 );
-	// will have exited
+	$user_available_by_group_level = true;
+	if( ! empty( $user_ID ) )
+	{
+		$UserCache = & get_UserCache();
+		if( $User = & $UserCache->get_by_ID( $user_ID, false ) )
+		{ // If user exists we can check if the anonymous users have an access to view the user by group level limitation
+			$User->get_Group();
+			$user_available_by_group_level = $User->Group->level >= $Settings->get('allow_anonymous_user_level_min') && $User->Group->level <= $Settings->get('allow_anonymous_user_level_max');
+		}
+	}
+
+	if( ! $Settings->get( 'allow_anonymous_user_profiles' ) || ! $user_available_by_group_level )
+	{ // If this user is not available for anonymous users
+		$Messages->add( T_('You must log in to view this user profile.') );
+		header_redirect( get_login_url('cannot see user'), 302 );
+		// will have exited
+	}
 }
 
 if( is_logged_in() && ( !check_user_status( 'can_view_user', $user_ID ) ) )
@@ -69,7 +83,7 @@ if( !empty($user_ID) )
 			// will have exited
 		}
 
-		if( has_cross_country_restriction( 'user' ) && ( $current_User->ctry_ID !== $User->ctry_ID ) )
+		if( has_cross_country_restriction( 'users', 'profile' ) && ( $current_User->ctry_ID !== $User->ctry_ID ) )
 		{ // Current user country is different then edited user country and cross country user browsing is not enabled.
 			$Messages->add( T_('You don\'t have permission to view this user profile.') );
 			header_redirect( url_add_param( $error_redirect_to, 'disp=403', '&' ) );

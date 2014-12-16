@@ -21,7 +21,7 @@
  * @author blueyed: Daniel HAHLER
  * @author Danny Ferguson
  *
- * @version $Id: _url.funcs.php 7396 2014-10-09 05:13:50Z yura $
+ * @version $Id: _url.funcs.php 7616 2014-11-12 14:50:13Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -73,7 +73,7 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 				$scheme = 'mailto:';
 				$Debuglog->add( 'URI scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
 				return $verbose
-					? sprintf( T_('URI scheme "%s" not allowed.'), evo_htmlspecialchars($scheme) )
+					? sprintf( T_('URI scheme "%s" not allowed.'), htmlspecialchars($scheme) )
 					: T_('URI scheme not allowed.');
 			}
 
@@ -81,13 +81,13 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 			if( ! $match )
 			{
 				return $verbose
-					? sprintf( T_('Invalid email link: %s.'), evo_htmlspecialchars($url) )
+					? sprintf( T_('Invalid email link: %s.'), htmlspecialchars($url) )
 					: T_('Invalid email link.');
 			}
 			elseif( ! is_email($match[2]) )
 			{
 				return $verbose
-					? sprintf( T_('Supplied email address (%s) is invalid.'), evo_htmlspecialchars($match[2]) )
+					? sprintf( T_('Supplied email address (%s) is invalid.'), htmlspecialchars($match[2]) )
 					: T_('Invalid email address.');
 			}
 		}
@@ -98,7 +98,7 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 				$scheme = 'clsid:';
 				$Debuglog->add( 'URI scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
 				return $verbose
-					? sprintf( T_('URI scheme "%s" not allowed.'), evo_htmlspecialchars($scheme) )
+					? sprintf( T_('URI scheme "%s" not allowed.'), htmlspecialchars($scheme) )
 					: T_('URI scheme not allowed.');
 			}
 
@@ -115,7 +115,7 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 				$scheme = 'javascript:';
 				$Debuglog->add( 'URI scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
 				return $verbose
-					? sprintf( T_('URI scheme "%s" not allowed.'), evo_htmlspecialchars($scheme) )
+					? sprintf( T_('URI scheme "%s" not allowed.'), htmlspecialchars($scheme) )
 					: T_('URI scheme not allowed.');
 			}
 
@@ -141,7 +141,7 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 			{ // Cannot validate URL structure
 				$Debuglog->add( 'URL &laquo;'.$url.'&raquo; does not match url pattern!', 'error' );
 				return $verbose
-					? sprintf( T_('Invalid URL format (%s).'), evo_htmlspecialchars($url) )
+					? sprintf( T_('Invalid URL format (%s).'), htmlspecialchars($url) )
 					: T_('Invalid URL format.');
 			}
 
@@ -150,7 +150,7 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 			{ // Scheme not allowed
 				$Debuglog->add( 'URI scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
 				return $verbose
-					? sprintf( T_('URI scheme "%s" not allowed.'), evo_htmlspecialchars($scheme) )
+					? sprintf( T_('URI scheme "%s" not allowed.'), htmlspecialchars($scheme) )
 					: T_('URI scheme not allowed.');
 			}
 		}
@@ -159,14 +159,14 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 	{ // URL is relative..
 		if( $context == 'commenting' || $context == 'download_src' || $context == 'http-https' )
 		{ // We do not allow relative URLs in comments and download urls
-			return $verbose ? sprintf( T_('URL "%s" must be absolute.'), evo_htmlspecialchars($url) ) : T_('URL must be absolute.');
+			return $verbose ? sprintf( T_('URL "%s" must be absolute.'), htmlspecialchars($url) ) : T_('URL must be absolute.');
 		}
 
 		$char = substr( $url, 0, 1 );
 		if( $char != '/' && $char != '#' )
 		{ // must start with a slash or hash (for HTML anchors to the same page)
 			return $verbose
-				? sprintf( T_('URL "%s" must be a full path starting with "/" or an anchor starting with "#".'), evo_htmlspecialchars($url) )
+				? sprintf( T_('URL "%s" must be a full path starting with "/" or an anchor starting with "#".'), htmlspecialchars($url) )
 				: T_('URL must be a full path starting with "/" or an anchor starting with "#".');
 		}
 	}
@@ -176,7 +176,7 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 		if( $block = antispam_check($url) )
 		{
 			return $verbose
-				? sprintf( T_('URL "%s" not allowed: blacklisted word "%s".'), evo_htmlspecialchars($url), $block )
+				? sprintf( T_('URL "%s" not allowed: blacklisted word "%s".'), htmlspecialchars($url), $block )
 				: T_('URL not allowed');
 		}
 	}
@@ -340,7 +340,7 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 		if ( ( $url_parsed = @parse_url( $url ) ) === false
 			 || ! isset( $url_parsed['host'] ) )
 		{
-			$info['error'] = 'Could not parse URL';
+			$info['error'] = NT_( 'Could not parse URL' );
 			return false;
 		}
 
@@ -386,7 +386,7 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 		$s = fgets( $fp );
 		if( ! preg_match( '~^HTTP/\d+\.\d+ (\d+)~', $s, $match ) )
 		{
-			$info['error'] = 'Invalid response.';
+			$info['error'] = NT_( 'Invalid response.' );
 			fclose( $fp );
 			return false;
 		}
@@ -396,7 +396,7 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 			$r .= fgets( $fp );
 			if( $max_size_kb && evo_bytes($r) >= $max_size_kb*1024 )
 			{
-				$info['error'] = sprintf('Maximum size of %d kB reached.', $max_size_kb);
+				$info['error'] = NT_( sprintf( 'Maximum size of %d kB reached.', $max_size_kb ) );
 				return false;
 			}
 		}
@@ -404,7 +404,7 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 
 		if ( ( $pos = strpos( $r, "\r\n\r\n" ) ) === false )
 		{
-			$info['error'] = 'Could not locate end of headers';
+			$info['error'] = NT_( 'Could not locate end of headers' );
 			return false;
 		}
 
@@ -424,19 +424,19 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 			if( isset( $http_response_header )
 			    && ( $code = _http_wrapper_last_status( $http_response_header ) ) !== false )
 			{	// fopen() returned false because it got a bad HTTP code:
-				$info['error'] = 'Invalid response';
+				$info['error'] = NT_( 'Invalid response' );
 				$info['status'] = $code;
 				return '';
 			}
 
-			$info['error'] = 'fopen() failed';
+			$info['error'] = NT_( 'fopen() failed' );
 			return false;
 		}
 		// Check just to be sure:
 		else if ( ! isset( $http_response_header )
 		          || ( $code = _http_wrapper_last_status( $http_response_header ) ) === false )
 		{
-			$info['error'] = 'Invalid response';
+			$info['error'] = NT_( 'Invalid response' );
 			return false;
 		}
 		else
@@ -451,7 +451,7 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 				$r .= fgets( $fp );
 				if( $max_size_kb && evo_bytes($r) >= $max_size_kb*1024 )
 				{
-					$info['error'] = sprintf('Maximum size of %d kB reached.', $max_size_kb);
+					$info['error'] = NT_( sprintf( 'Maximum size of %d kB reached.', $max_size_kb ) );
 					return false;
 				}
 			}
@@ -478,7 +478,7 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 	}
 
 	// All failed:
-	$info['error'] = 'No method available to access URL!';
+	$info['error'] = NT_( 'No method available to access URL!' );
 	return false;
 }
 
@@ -765,13 +765,13 @@ function make_rel_links_abs( $s, $host = NULL )
  */
 function disp_url( $url, $max_length = NULL )
 {
-	if( !empty($max_length) && evo_strlen($url) > $max_length )
+	if( !empty($max_length) && utf8_strlen($url) > $max_length )
 	{
-		$disp_url = evo_htmlspecialchars(substr( $url, 0, $max_length-1 )).'&hellip;';
+		$disp_url = htmlspecialchars(substr( $url, 0, $max_length-1 )).'&hellip;';
 	}
 	else
 	{
-		$disp_url = evo_htmlspecialchars($url);
+		$disp_url = htmlspecialchars($url);
 	}
 	echo '<a href="'.$url.'">'.$disp_url.'</a>';
 }
@@ -904,7 +904,7 @@ function get_dispctrl_url( $dispctrl, $params = '' )
  * @param integer Max length of url when url is used as link text
  * @return string HTML link tag
  */
-function get_link_tag( $url, $text = '', $class='', $max_url_length = 50 )
+function get_link_tag( $url, $text = '', $class = '', $max_url_length = 50 )
 {
 	if( empty( $text ) )
 	{ // Link text is empty, Use url
@@ -915,7 +915,21 @@ function get_link_tag( $url, $text = '', $class='', $max_url_length = 50 )
 		}
 	}
 
-	return '<a class="'.$class.'" href="'.str_replace('&amp;', '&', $url ).'">'.$text.'</a>';
+	$link_attrs = array( 'href' => $url );
+
+	if( ! empty( $class ) )
+	{
+		if( strpos( $class, '.' ) === false )
+		{ // Simple class name
+			$link_attrs['class'] = $class;
+		}
+		else
+		{ // This class name is used for email template
+			$link_attrs['style'] = emailskin_style( $class, false );
+		}
+	}
+
+	return '<a'.get_field_attribs_as_string( $link_attrs ).'>'.$text.'</a>';
 }
 
 

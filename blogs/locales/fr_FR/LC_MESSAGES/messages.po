@@ -8680,7 +8680,7 @@ msgstr "%d commentaires"
 
 #: ../../../inc/comments/model/_comment.funcs.php:291
 #: ../../../inc/files/views/_file_edit.form.php:51
-msgid "Save!"
+msgid "Save Changes!"
 msgstr "Enregistrer!"
 
 #: ../../../inc/comments/model/_comment.funcs.php:496
@@ -15192,7 +15192,7 @@ msgstr "Les autres utilisateurs impliqués dans cette conversation ont fermé le
 #: ../../../inc/messaging/views/_thread.form.php:115
 #: ../../../skins/_contact_msg.form.php:81
 msgid "Send message"
-msgstr "Envoyer le message"
+msgstr "Envoyer le message."
 
 #: ../../../inc/messaging/views/_message_list.view.php:411
 msgid "I want to leave this conversation now!"
@@ -20252,7 +20252,7 @@ msgstr "Cet utilisateur ne désire pas être contacté directement"
 #: ../../../inc/users/model/_user.class.php:3088
 #: ../../../inc/users/model/_user.funcs.php:2218
 msgid "Activate your account: $login$"
-msgstr "Activez votre compte: $login$"
+msgstr "Activez votre compte: %s"
 
 #: ../../../inc/users/model/_user.class.php:3148
 #: ../../../inc/users/model/_user.class.php:4053

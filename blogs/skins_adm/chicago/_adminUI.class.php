@@ -23,7 +23,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id$
+ * @version $Id: _adminUI.class.php 7498 2014-10-23 07:38:52Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -198,7 +198,7 @@ class AdminUI extends AdminUI_general
 							."</tr></table>\n"
 							.$pb_begin2,
 
-						'empty' => $pb_begin1.$pb_begin2,
+						'empty' => $pb_begin1.'<span style="float:right;margin-bottom:6px">$global_icons$</span>'.$pb_begin2,
 
 						'beforeEach' => '<td class="option">',
 						'afterEach'  => '</td>',
@@ -232,6 +232,9 @@ class AdminUI extends AdminUI_general
 														</div></div></div>'."\n",
 					'filters_start' => '<div class="filters">',
 					'filters_end' => '</div>',
+					'messages_start' => '<div class="messages">',
+					'messages_end' => '</div>',
+					'messages_separator' => '<br />',
 					'list_start' => '<div class="table_scroll">'."\n"
 					               .'<table class="grouped" cellspacing="0">'."\n",
 						'head_start' => '<thead>'."\n",

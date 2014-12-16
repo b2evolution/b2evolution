@@ -84,6 +84,7 @@ while( $Item = & mainlist_get_item() )
 					) );
 				$Item->issue_time( array(
 						'before'      => /* TRANS: time */ T_('at '),
+						'time_format' => '#short_time',
 					) );
 				$Item->author( array(
 						'before'    => ' > ',
@@ -102,7 +103,6 @@ while( $Item = & mainlist_get_item() )
 				'link_text_one' => '&darr; '.T_('Skip to comments'),
 				'link_text_more' => '&darr; '.T_('Skip to comments'),
 				'link_title' => '',
-				'use_popup' => false,
 				'show_in_single_mode' => true
 			) );
 	?>

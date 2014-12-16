@@ -8,7 +8,7 @@
  * @package skins
  * @subpackage forums
  *
- * @version $Id: _skin.class.php 13 2011-10-24 23:42:53Z fplanque $
+ * @version $Id: _skin.class.php 7423 2014-10-14 07:52:43Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -89,6 +89,24 @@ class forums_Skin extends Skin
 					'defaultvalue' => 1,
 					'type' => 'checkbox',
 				),
+				'colorbox_vote_post' => array(
+					'label' => T_('Voting on Post Images'),
+					'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
+					'defaultvalue' => 1,
+					'type' => 'checkbox',
+				),
+				'colorbox_vote_comment' => array(
+					'label' => T_('Voting on Comment Images'),
+					'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
+					'defaultvalue' => 1,
+					'type' => 'checkbox',
+				),
+				'colorbox_vote_user' => array(
+					'label' => T_('Voting on User Images'),
+					'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
+					'defaultvalue' => 1,
+					'type' => 'checkbox',
+				),
 				'gender_colored' => array(
 					'label' => T_('Display gender'),
 					'note' => T_('Use colored usernames to differentiate men & women.'),
@@ -101,13 +119,19 @@ class forums_Skin extends Skin
 					'defaultvalue' => 0,
 					'type' => 'checkbox',
 				),
+				'autocomplete_usernames' => array(
+					'label' => T_('Autocomplete usernames'),
+					'note' => T_('Check to enable autocomplete usernames after entered sign "@" in the comment form'),
+					'defaultvalue' => 1,
+					'type' => 'checkbox',
+				),
 				'banner_public' => array(
 					'label' => T_('"Public" banner'),
 					'note' => T_('Display banner for "Public" posts (posts & comments)'),
 					'defaultvalue' => 1,
 					'type' => 'checkbox',
 				),
-			), parent::get_param_definitions( $params )	);
+			), parent::get_param_definitions( $params ) );
 
 		return $r;
 	}
@@ -188,8 +212,8 @@ class forums_Skin extends Skin
 	 */
 	function display_breadcrumbs( $chapter_ID, $params = array() )
 	{
-		if( $chapter_ID <= 0 )
-		{ // No selected chapter, or an exlcude chapter filter is set
+		if( $chapter_ID == 0 )
+		{	// No selected chapter
 			return;
 		}
 

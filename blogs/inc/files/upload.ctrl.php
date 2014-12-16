@@ -27,7 +27,7 @@
  * @author fplanque: Francois PLANQUE.
  * (dh please re-add)
  *
- * @version $Id$
+ * @version $Id: upload.ctrl.php 7804 2014-12-11 15:11:50Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -96,7 +96,7 @@ $fm_FileRoot = NULL;
 
 $FileRootCache = & get_FileRootCache();
 
-$available_Roots = $FileRootCache->get_available_FileRoots();
+$available_Roots = $FileRootCache->get_available_FileRoots( get_param( 'root' ) );
 
 if( ! empty($root) )
 { // We have requested a root folder by string:
@@ -238,12 +238,12 @@ $failedFiles = array();
  * Remember renamed files (and the messages)
  * @var array
  */
-param( 'renamedFiles', 'array/array/string', array(), true );
+param( 'renamedFiles', 'array:array:string', array(), true );
 $renamedMessages = array();
 
 // Process files we want to get from an URL:
-param( 'uploadfile_url', 'array/string', array() );
-param( 'uploadfile_source', 'array/string', array() );
+param( 'uploadfile_url', 'array:string', array() );
+param( 'uploadfile_source', 'array:string', array() );
 if( ( $action != 'switchtab' ) && $uploadfile_url )
 {
 	// Check that this action request is not a CSRF hacked request:
@@ -358,13 +358,13 @@ if( ( $action != 'switchtab' ) && isset($_FILES) && count( $_FILES ) )
 				$img_tag = format_to_output( $uploadedFile->get_tag(), 'formvalue' );
 				if( $uploadedFile->is_image() )
 				{
-					$link_msg = $LinkOwner->translate( 'Link this image to your owner' );
+					$link_msg = $LinkOwner->translate( 'Link this image to your xxx' );
 					$link_note = T_('recommended - allows automatic resizing');
 				}
 				else
 				{
-					$link_msg = $LinkOwner->translate( 'Link this file to your owner' );
-					$link_note = $LinkOwner->translate( 'The file will be linked for download at the end of the owner' );
+					$link_msg = $LinkOwner->translate( 'Link this file to your xxx' );
+					$link_note = $LinkOwner->translate( 'The file will be linked for download at the end of the xxx' );
 				}
 				$success_msg .= '<ul>'
 						.'<li>'.action_icon( T_('Link this file!'), 'link',
@@ -375,7 +375,7 @@ if( ( $action != 'switchtab' ) && isset($_FILES) && count( $_FILES ) )
 						.'<li>'.T_('or').' <a href="#" onclick="if( window.focus && window.opener ){'
 						.'window.opener.focus(); textarea_wrap_selection( window.opener.document.getElementById(\''.$LinkOwner->type.'form_post_content\'), \''
 						.format_to_output( $uploadedFile->get_tag(), 'formvalue' ).'\', \'\', 1, window.opener.document ); } return false;">'
-						.$LinkOwner->translate( 'Insert the following code snippet into your owner' ).'</a> : <input type="text" value="'.$img_tag.'" size="60" /></li>'
+						.$LinkOwner->translate( 'Insert the following code snippet into your xxx' ).'</a> : <input type="text" value="'.$img_tag.'" size="60" /></li>'
 						// fp> TODO: it would be supacool to have an ajaxy "tumbnail size selector" here that generates a thumnail of requested size on server and then changes the code in the input above
 					.'</ul>';
 			}

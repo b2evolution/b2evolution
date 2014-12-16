@@ -22,7 +22,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _skin.funcs.php 7127 2014-07-15 13:43:26Z yura $
+ * @version $Id: _skin.funcs.php 7764 2014-12-06 08:43:36Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -81,6 +81,8 @@ function skin_init( $disp )
 
 	global $Session;
 
+	global $search_result_loaded;
+
 	$Timer->resume( 'skin_init' );
 
 	if( empty($disp_detail) )
@@ -88,7 +90,7 @@ function skin_init( $disp )
 		$disp_detail = $disp;
 	}
 
-	$Debuglog->add('skin_init: '.$disp, 'skins' );
+	$Debuglog->add('skin_init: $disp='.$disp, 'skins' );
 
 	// This is the main template; it may be used to display very different things.
 	// Do inits depending on current $disp:
@@ -100,7 +102,6 @@ function skin_init( $disp )
 		case 'page':
 		case 'download':
 		case 'feedback-popup':
-		case 'search':
 			// We need to load posts for this display:
 
 			// Note: even if we request the same post as $Item above, the following will do more restrictions (dates, etc.)
@@ -112,6 +113,25 @@ function skin_init( $disp )
 			if( empty( $post_navigation ) )
 			{
 				$post_navigation = $Blog->get_setting( 'post_navigation' );
+			}
+			break;
+
+		case 'search':
+			// Searching post, comments and categories
+			load_funcs( 'collections/_search.funcs.php' );
+
+			$search_keywords = param( 's', 'string', '', true );
+			$search_params = $Session->get( 'search_params' );
+			$search_result = $Session->get( 'search_result' );
+			$search_result_loaded = false;
+			if( empty( $search_params ) || ( $search_params['search_keywords'] != $search_keywords )
+				|| ( $search_params['search_blog'] != $Blog->ID ) || ( $search_result === NULL ) )
+			{ // this is a new search
+				$search_params = array( 'search_keywords' => $search_keywords, 'search_blog' => $Blog->ID );
+				$search_result = score_search_result( $search_keywords );
+				$Session->set( 'search_params', $search_params );
+				$Session->set( 'search_result', $search_result );
+				$search_result_loaded = true;
 			}
 			break;
 	}
@@ -131,6 +151,8 @@ function skin_init( $disp )
 			init_ajax_forms( 'blog' ); // auto requires jQuery
 			init_ratings_js( 'blog' );
 			init_voting_comment_js( 'blog' );
+			init_plugins_js( 'blog', $Skin->get_template( 'tooltip_plugin' ) );
+			init_autocomplete_usernames_js( 'blog' );
 			if( $Blog->get_setting( 'allow_rating_comment_helpfulness' ) )
 			{ // Load jquery UI to animate background color on change comment status or on vote
 				require_js( '#jqueryUI#', 'blog' );
@@ -143,6 +165,11 @@ function skin_init( $disp )
 			else
 			{
 				$seo_page_type = '"Page" page';
+			}
+
+			if( ! $preview )
+			{ // Check if item has a goal to insert a hit into DB
+				$Item->check_goal();
 			}
 
 			// Check if the post has 'redirected' status:
@@ -181,11 +208,26 @@ function skin_init( $disp )
 						if( ( $post_navigation == 'same_category' ) && ( isset( $cat_param[1] ) ) )
 						{ // navigatie through posts from the same category
 							$category_ids = postcats_get_byID( $Item->ID );
-							if( in_array($cat_param[1], $category_ids ) )
+							if( in_array( $cat_param[1], $category_ids ) )
 							{ // cat param is one of this Item categories
 								$extended_url = $Item->add_navigation_param( $canonical_url, $post_navigation, $cat_param[1], '&' );
 								// Set MainList navigation target to the requested category
 								$MainList->nav_target = $cat_param[1];
+							}
+						}
+						$url_resolved = is_same_url( $ReqURL, $extended_url );
+					}
+					if( preg_match( '|[&?]tag=([^&A-Z]+)|', $ReqURI, $tag_param ) )
+					{ // A tag post navigation param is set
+						$extended_url = '';
+						if( ( $post_navigation == 'same_tag' ) && ( isset( $tag_param[1] ) ) )
+						{ // navigatie through posts from the same tag
+							$tag_names = $Item->get_tags();
+							if( in_array( $tag_param[1], $tag_names ) )
+							{ // tag param is one of this Item tags
+								$extended_url = $Item->add_navigation_param( $canonical_url, $post_navigation, $tag_param[1], '&' );
+								// Set MainList navigation target to the requested tag
+								$MainList->nav_target = $tag_param[1];
 							}
 						}
 						$url_resolved = is_same_url( $ReqURL, $extended_url );
@@ -381,6 +423,12 @@ var downloadInterval = setInterval( function()
 							}
 						}
 					}
+
+					$tag = $MainList->get_active_filter('tags');
+					if( $post_navigation == 'same_tag' && !empty( $tag ) )
+					{ // Tag is set and post navigation should go through the same tag, set navigation target param
+						$MainList->nav_target = $tag;
+					}
 				}
 				elseif( array_diff( $active_filters, array( 'ymdhms', 'week', 'posts', 'page' ) ) == array() ) // fp> added 'posts' 2009-05-19; can't remember why it's not in there
 				{ // This is an archive page
@@ -509,6 +557,10 @@ var downloadInterval = setInterval( function()
 			}
 			$seo_page_type = 'Register form';
 			$robots_index = false;
+
+			// Check invitation code if it exists and registration is enabled
+			global $display_invitation;
+			$display_invitation = check_invitation_code();
 			break;
 
 		case 'lostpassword':
@@ -524,6 +576,22 @@ var downloadInterval = setInterval( function()
 		case 'profile':
 			init_userfields_js( 'blog', $Skin->get_template( 'tooltip_plugin' ) );
 		case 'avatar':
+			$action = param_action();
+			if( $action == 'crop' && is_logged_in() )
+			{ // Initialize data for crop action
+				global $current_User, $cropped_File;
+				$file_ID = param( 'file_ID', 'integer' );
+				if( $cropped_File = $current_User->get_File_by_ID( $file_ID ) )
+				{ // Current user can crops this file
+					require_js( '#jquery#', 'blog' );
+					require_js( '#jcrop#', 'blog' );
+					require_css( '#jcrop_css#', 'blog' );
+				}
+				else
+				{ // Wrong file for cropping
+					unset( $action );
+				}
+			}
 		case 'pwdchange':
 		case 'userprefs':
 		case 'subs':
@@ -605,6 +673,7 @@ var downloadInterval = setInterval( function()
 			init_plugins_js( 'blog', $Skin->get_template( 'tooltip_plugin' ) );
 			require_js( 'backoffice.js', 'blog' );
 			require_js( 'extracats.js', 'blog' );
+			init_autocomplete_usernames_js( 'blog' );
 
 			init_inskin_editing();
 			break;
@@ -675,6 +744,7 @@ var downloadInterval = setInterval( function()
 			init_ratings_js( 'blog' );
 			init_datepicker_js( 'blog' );
 			init_plugins_js( 'blog', $Skin->get_template( 'tooltip_plugin' ) );
+			init_autocomplete_usernames_js( 'blog' );
 			break;
 
 		case 'useritems':
@@ -1027,7 +1097,7 @@ function skin_include( $template_name, $params = array() )
 		if( !isset( $disp_handlers['disp_'.$disp] ) )
 		{
 			global $Messages;
-			$Messages->add( sprintf( 'Unhandled disp type [%s]', evo_htmlspecialchars( $disp ) ) );
+			$Messages->add( sprintf( 'Unhandled disp type [%s]', htmlspecialchars( $disp ) ) );
 			$Messages->display();
 			$Timer->pause( $timer_name );
 			$disp = '404';
@@ -1087,9 +1157,9 @@ function skin_include( $template_name, $params = array() )
 /**
  * Template tag.
  *
- * @param 
- * @param 
- * @param boolean force include even if sitewide header/footer not enabled 
+ * @param
+ * @param
+ * @param boolean force include even if sitewide header/footer not enabled
  */
 function siteskin_include( $template_name, $params = array(), $force = false )
 {
@@ -1268,7 +1338,7 @@ function skin_keywords_tag()
 			return;
 		}
 
-		$r = $Item->get_custom_headers();
+		$r = $Item->get_metakeywords();
 
 
 		if( empty( $r ) && $Blog->get_setting( 'tags_meta_keywords' ) )

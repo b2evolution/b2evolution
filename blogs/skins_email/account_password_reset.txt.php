@@ -8,7 +8,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
- * @version $Id$
+ * @version $Id: account_password_reset.txt.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -82,7 +82,7 @@ echo "\n-- \n";
 echo T_('Please note:').' '.$message_note;
 echo "\n\n";
 
-echo T_('If you did not request this password change, simply ignore this mail.');
+echo T_('If you did not request this password change, simply ignore this email.');
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.txt.php', $params );

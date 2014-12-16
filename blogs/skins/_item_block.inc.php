@@ -39,7 +39,7 @@ $Item->load_Blog();
 			) );
 	?>
 	<?php
-		$Item->issue_time(); // Post issue time
+		$Item->issue_time( array( 'time_format' => '#short_time' ) ); // Post issue time
 	?>
 	<?php
 		$Item->categories( array(
@@ -103,7 +103,6 @@ $Item->load_Blog();
 							'link_text_one' => '#',
 							'link_text_more' => '#',
 							'link_title' => '#',
-							'use_popup' => false,
 						) );
 		?>
 		<?php
@@ -116,7 +115,6 @@ $Item->load_Blog();
 							'link_text_one' => '#',
 							'link_text_more' => '#',
 							'link_title' => '#',
-							'use_popup' => false,
 						) );
 		?>
 

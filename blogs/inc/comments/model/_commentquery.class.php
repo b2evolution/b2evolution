@@ -20,7 +20,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author asimo: Evo Factory / Attila Simo
  *
- * @version $Id$
+ * @version $Id: _commentquery.class.php 6606 2014-05-05 07:20:39Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -543,12 +543,12 @@ class CommentQuery extends SQL
 
 		if( !$show_expired )
 		{
-			$this->FROM_add( 'LEFT JOIN T_items__item_settings as expiry_setting ON iset_item_ID = comment_item_ID AND iset_name = "post_expiry_delay"' );
+			$this->FROM_add( 'LEFT JOIN T_items__item_settings as expiry_setting ON iset_item_ID = comment_item_ID AND iset_name = "comment_expiry_delay"' );
 			$this->WHERE_and( 'expiry_setting.iset_value IS NULL OR expiry_setting.iset_value = "" OR TIMESTAMPDIFF(SECOND, comment_date, '.$DB->quote( date2mysql( $localtimenow ) ).') < expiry_setting.iset_value' );
 		}
 		elseif( !$show_active )
 		{
-			$this->FROM_add( 'LEFT JOIN T_items__item_settings as expiry_setting ON iset_item_ID = comment_item_ID AND iset_name = "post_expiry_delay"' );
+			$this->FROM_add( 'LEFT JOIN T_items__item_settings as expiry_setting ON iset_item_ID = comment_item_ID AND iset_name = "comment_expiry_delay"' );
 			$this->WHERE_and( 'expiry_setting.iset_value IS NOT NULL AND expiry_setting.iset_value <> "" AND TIMESTAMPDIFF(SECOND, comment_date, '.$DB->quote( date2mysql( $localtimenow ) ).') >= expiry_setting.iset_value' );
 		}
 	}

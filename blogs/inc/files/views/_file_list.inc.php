@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _file_list.inc.php 6618 2014-05-06 13:49:45Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -264,11 +264,13 @@ $Form->begin_form();
 				if( $error_filename = validate_filename( $lFile->get_name() ) )
 				{ // TODO: Warning icon with hint
 					echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => $error_filename ) );
+					syslog_insert( sprintf( 'The unrecognized extension is detected for file %s', '<b>'.$lFile->get_name().'</b>' ), 'warning', 'file', $lFile->ID );
 				}
 			}
 			elseif( $error_dirname = validate_dirname( $lFile->get_name() ) )
 			{ // TODO: Warning icon with hint
 				echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => $error_dirname ) );
+				syslog_insert( sprintf( 'Invalid name is detected for folder %s', '<b>'.$lFile->get_name().'</b>' ), 'warning', 'file', $lFile->ID );
 			}
 
 			/****  Open in a new window  (only directories)  ****/
@@ -299,6 +301,7 @@ $Form->begin_form();
 					if( $mode == 'upload' )
 					{	// We want the action to happen in the post attachments iframe:
 						$link_attribs['target'] = $iframe_name;
+						$link_attribs['class'] = 'action_icon link_file';
 						$link_action = 'link_inpost';
 					}
 					echo action_icon( T_('Link this file!'), 'link',
@@ -517,6 +520,7 @@ $Form->begin_form();
 				if( $mode == 'upload' )
 				{ // We want the action to happen in the post attachments iframe:
 					$link_attribs['target'] = $iframe_name;
+					$link_attribs['class'] = 'action_icon link_file';
 					$link_action = 'link_inpost';
 				}
 				$icon_to_link_files = action_icon( T_('Link this file!'), 'link',
@@ -603,7 +607,7 @@ $Form->begin_form();
 			 */
 			if( $fm_mode == 'link_object' && $mode != 'upload' )
 			{	// We are linking to an object...
-				$field_options['link'] = $LinkOwner->translate( 'Link files to current owner' );
+				$field_options['link'] = $LinkOwner->translate( 'Link files to current xxx' );
 			}
 
 			if( ( $fm_Filelist->get_root_type() == 'collection' || ( ! empty( $Blog )
@@ -751,16 +755,25 @@ $Form->begin_form();
 				else
 				{
 					// Remove last newline from snippet:
-					snippet = snippet.substring(0, snippet.length-1)
-					if (! (window.focus && window.opener))
+					snippet = snippet.substring(0, snippet.length-1);
+					if (! (window.focus && window.parent))
 					{
 						return true;
 					}
-					window.opener.focus();
-					textarea_wrap_selection( window.opener.document.getElementById("itemform_post_content"), snippet, '', 1, window.opener.document );
+					window.parent.focus();
+					textarea_wrap_selection( window.parent.document.getElementById("itemform_post_content"), snippet, '', 1, window.parent.document );
 					return true;
 				}
 			}
+
+			// Display a message to inform user after file was linked to object
+			jQuery( document ).ready( function()
+			{
+				jQuery( document ).on( 'click', 'a.link_file', function()
+				{
+					jQuery( this ).parent().append( '<div class="green"><?php echo TS_('The file has been linked.'); ?></div>' );
+				} );
+			} );
 			// -->
 		</script>
 		<?php

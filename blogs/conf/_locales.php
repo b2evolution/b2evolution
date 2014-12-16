@@ -48,7 +48,7 @@ $use_l10n = 1;
  *
  * This should be supported by {@link mb_list_encodings()}.
  */
-$evo_charset = '';
+$evo_charset = 'utf-8'; // Set utf-8 because we started to use utf-8 internally with the Portable UTF-8 library
 // Removed forcing of UTF-8 in PHP 5.4 because it created more problems than it solved. PHP 5.4 does NOT support UTF-8 more than PHP 5.3.
 /*if( version_compare( phpversion(), '5.4', '>=' ) )
 {	// PHP 5.4 uses utf-8 internally, we must match it to avoid problems
@@ -75,7 +75,7 @@ $evo_charset = '';
  *
  * @global string
  */
-$force_io_charset_if_accepted = '';
+$force_io_charset_if_accepted = 'utf-8'; // Temporary solution to force here the io-charset to utf-8
 
 
 /**
@@ -129,10 +129,11 @@ $default_locale = 'en-US';
  * @todo fp>Actually, the default locale setting should move to install and we should always use the database after that. What were we smoking when we did that? :P
  */
 $locales['en-US'] = array(
-		'name' => NT_('English (US) latin1'),
-		'charset' => 'iso-8859-1',
+		'name' => NT_('English (US) utf-8'),
+		'charset' => 'utf-8',
 		'datefmt' => 'm/d/y',
 		'timefmt' => 'h:i:s a',
+		'shorttimefmt' => 'h:i a',
 		'startofweek' => 0,
 		'messages' => 'en_US',
 		'enabled' => false,	// We need this line to prevent notices iin locales conf screen and user profile screen.

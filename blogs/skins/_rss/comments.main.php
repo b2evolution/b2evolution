@@ -10,7 +10,7 @@
  * @package evoskins
  * @subpackage rss
  *
- * @version $Id$
+ * @version $Id: comments.main.php 3156 2013-03-06 04:29:56Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -74,7 +74,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 		<description></description>
 		<language><?php $Blog->disp( 'locale', 'xml' ) ?></language>
 		<docs>http://backend.userland.com/rss092</docs>
-		<?php while( $Comment = & $CommentList->get_next() )
+		<?php while( $Comment = & $CommentList->get_next( false ) )
 		{ // Loop through comments:
 			// Load comment's Item:
 			$Comment->get_Item();

@@ -266,6 +266,9 @@ select.bComment		/* Used by the profile form */
 	color: #aaa;
 	font-size: 84%;
 }
+div.extended_search_form {
+	margin: 0 13px;
+}
 div.compact_search_form input.SearchField
 {
 	background-color: #E2F1F4;
@@ -367,4 +370,8 @@ div.input ul.token-input-list-facebook {
 #styled_content_block .bSmallHead .status_private {
 	top: -10px;
 	left: 5px;
+}
+
+.search_title {
+	color: #666;
 }

@@ -43,11 +43,12 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 				'text' => '#icon#',
 			) );
 
-		if( $Skin->get_setting( 'display_post_time') )
+		if( $Skin->get_setting( 'display_post_time' ) )
 		{	// We want to display the post time:
 			$Item->issue_time( array(
-					'before'    => ' ',
-					'after'     => ', ',
+					'before'      => ' ',
+					'after'       => ', ',
+					'time_format' => '#short_time',
 				) );
 		}
 
@@ -92,7 +93,7 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 	<?php
 		// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 		skin_include( '_item_content.inc.php', $params );
-		// Note: You can customize the default item feedback by copying the generic
+		// Note: You can customize the default item content by copying the generic
 		// /skins/_item_content.inc.php file into the current skin folder.
 		// -------------------------- END OF POST CONTENT -------------------------
 	?>
@@ -122,7 +123,6 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 							'link_text_one' => '#',
 							'link_text_more' => '#',
 							'link_title' => '#',
-							'use_popup' => false,
 						) );
 
 			// Link to comments, trackbacks, etc.:
@@ -134,7 +134,6 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 							'link_text_one' => '#',
 							'link_text_more' => '#',
 							'link_title' => '#',
-							'use_popup' => false,
 						) );
 
 			$Item->edit_link( array( // Link to backoffice for editing
@@ -160,9 +159,4 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 		locale_restore_previous();	// Restore previous locale (Blog locale)
 	?>
 </div>
-
-<?php
-
-echo '</div>'; // End of post display 
-
-?>
+<?php echo '</div>'; // End of post display ?>

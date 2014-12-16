@@ -227,11 +227,6 @@ class adsense_plugin extends Plugin
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
-		if( $params['edit_layout'] == 'simple' )
-		{	// This is too complex for simple mode, don't display it:
-			return false;
-		}
-
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
 

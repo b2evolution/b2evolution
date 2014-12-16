@@ -454,3 +454,7 @@ div.results table{
 #styled_content_block .evo_post_head .status_private {
 	top: -3px;
 }
+
+.search_title {
+	color: #AF2639;
+}

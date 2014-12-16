@@ -14,11 +14,12 @@
  *                           See /locales/ru_RU/ru-RU.locale.php for details.
  */
 $locale_defs['ru-RU'] = array(
-		'name' => NT_('Russian (RU) utf8'),
+		'name' => NT_('Russian (RU) utf-8'),
 		'messages' => 'ru_RU',
 		'charset' => 'utf-8',
 		'datefmt' => 'j.m.Y',
 		'timefmt' => 'H:i:s',
+		'shorttimefmt' => 'H:i',
 		'startofweek' => 1,
 		'transliteration_map' => array(
 			'А'=>'A', 'Б'=>'B', 'В'=>'V', 'Г'=>'G', 'Д'=>'D', 'Е'=>'E', 'Ё'=>'YO', 'Ж'=>'ZH', 'З'=>'Z', 'И'=>'I', 'Й'=>'J',

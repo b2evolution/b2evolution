@@ -11,7 +11,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author asimo: Evo Factory / Attila Simo
  *
- * @version $Id$
+ * @version $Id: _register.disp.php 7771 2014-12-08 08:24:11Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -21,17 +21,27 @@ global $Settings, $Plugins;
 
 global $Blog, $rsc_path, $rsc_url, $dummy_fields;
 
+global $display_invitation;
+
 if( is_logged_in() )
 { // if a user is already logged in don't allow to register
 	echo '<p>'.T_('You are already logged in').'</p>';
 	return;
 }
 
-if( ! $Settings->get('newusers_canregister') )
-{
+if( $display_invitation == 'deny' )
+{ // Registration is disabled
 	echo '<p>'.T_('User registration is currently not allowed.').'</p>';
 	return;
 }
+
+// Default params:
+$params = array_merge( array(
+		'register_page_before' => '',
+		'register_page_after'  => '',
+	), $params );
+
+echo $params['register_page_before'];
 
 // Save trigger page
 $session_registration_trigger_url = $Session->get( 'registration_trigger_url' );
@@ -41,7 +51,7 @@ if( empty( $session_registration_trigger_url/*$Session->get( 'registration_trigg
 }
 
 $login = param( $dummy_fields[ 'login' ], 'string', '' );
-$email = evo_strtolower( param( $dummy_fields[ 'email' ], 'string', '' ) );
+$email = utf8_strtolower( param( $dummy_fields[ 'email' ], 'string', '' ) );
 $firstname = param( 'firstname', 'string', '' );
 $gender = param( 'gender', 'string', false );
 $source = param( 'source', 'string', 'register form' );
@@ -75,13 +85,28 @@ $Form->hidden( 'action', 'register' );
 $Form->hidden( 'source', $source );
 $Form->hidden( 'redirect_to', $redirect_to );
 
-$Form->text_input( $dummy_fields[ 'login' ], $login, 22, T_('Login'), T_('Choose an username.'), array( 'maxlength' => 20, 'class' => 'input_text', 'required' => true, 'input_suffix' => ' <span id="login_status"></span>' ) );
+if( $display_invitation == 'input' )
+{ // Display an input field to enter invitation code manually or to change incorrect code
+	$invitation_field_params = array( 'maxlength' => 32, 'class' => 'input_text', 'style' => 'width:138px' );
+	if( $Settings->get( 'newusers_canregister' ) == 'invite' )
+	{ // Invitation code must be required when users can register ONLY with this code
+		$invitation_field_params['required'] = 'required';
+	}
+	$Form->text_input( 'invitation', get_param( 'invitation' ), 22, T_('Your invitation code'), '', $invitation_field_params );
+}
+elseif( $display_invitation == 'info' )
+{ // Display info field (when invitation code is correct)
+	$Form->info( T_('Your invitation code'), get_param( 'invitation' ) );
+	$Form->hidden( 'invitation', get_param( 'invitation' ) );
+}
 
-$Form->password_input( $dummy_fields[ 'pass1' ], '', 18, T_('Password'), array( 'note'=>T_('Choose a password.'), 'maxlength' => 70, 'class' => 'input_text', 'required'=>true, 'autocomplete' => 'off' ) );
-$Form->password_input( $dummy_fields[ 'pass2' ], '', 18, '', array( 'note'=>T_('Please type your password again.'), 'maxlength' => 70, 'class' => 'input_text', 'required'=>true, 'autocomplete' => 'off' ) );
+$Form->text_input( $dummy_fields[ 'login' ], $login, 22, T_('Login'), T_('Choose an username.'), array( 'maxlength' => 20, 'class' => 'input_text', 'required' => true, 'input_suffix' => ' <span id="login_status"></span>', 'style' => 'width:138px' ) );
+
+$Form->password_input( $dummy_fields[ 'pass1' ], '', 18, T_('Password'), array( 'note'=>T_('Choose a password.'), 'maxlength' => 70, 'class' => 'input_text', 'required'=>true, 'style' => 'width:138px', 'autocomplete' => 'off' ) );
+$Form->password_input( $dummy_fields[ 'pass2' ], '', 18, '', array( 'note'=>T_('Please type your password again.').'<span id="pass2_status" class="red"></span>', 'maxlength' => 70, 'class' => 'input_text', 'required'=>true, 'style' => 'width:138px', 'autocomplete' => 'off' ) );
 
 $Form->text_input( $dummy_fields[ 'email' ], $email, 50, T_('Email'), '<br />'.T_('We respect your privacy. Your email will remain strictly confidential.'),
-				array( 'maxlength'=>255, 'class'=>'input_text wide_input', 'required'=>true ) );
+				array( 'maxlength'=>255, 'class'=>'input_text wide_input', 'required'=>true, 'style' => 'width:250px' ) );
 
 $registration_require_country = (bool)$Settings->get('registration_require_country');
 
@@ -126,7 +151,11 @@ echo '</div>';
 
 $Form->end_form();
 
+echo '<div class="notes standard_login_link"><a href="'.$secure_htsrv_url.'register.php?source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'">'.T_( 'Use standard registration form instead').' &raquo;</a></div>';
+
 echo '<div class="form_footer_notes">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
+
+echo $params['register_page_after'];
 
 // Display javascript password strength indicator bar
 display_password_indicator();

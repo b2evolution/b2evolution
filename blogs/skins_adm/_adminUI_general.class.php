@@ -26,7 +26,7 @@
  *
  * @todo dh> Refactor to allow easier contributions!
  *
- * @version $Id$
+ * @version $Id: _adminUI_general.class.php 7498 2014-10-23 07:38:52Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -125,6 +125,7 @@ class AdminUI_general extends Menu
 	 * @var string
 	 */
 	var $coll_list_onclick = NULL;
+
 
 	/**
 	 * Bread crumb path
@@ -901,7 +902,7 @@ class AdminUI_general extends Menu
 							.'<span style="float:right">$global_icons$</span>'
 							."</div>\n</div>"
 							."\n".'<div class="tabbedpanelblock">',
-						'empty' => '<div class="panelblock">',
+						'empty' => '<div class="panelblock"><span style="float:right">$global_icons$</span>',
 						'beforeEach' => '<li>',
 						'afterEach'  => '</li>',
 						'beforeEachSel' => '<li class="current">',
@@ -960,6 +961,9 @@ class AdminUI_general extends Menu
 					'head_title' => '<div class="table_title"><span style="float:right">$global_icons$</span>$title$</div>'."\n",
 					'filters_start' => '<div class="filters">',
 					'filters_end' => '</div>',
+					'messages_start' => '<div class="messages">',
+					'messages_end' => '</div>',
+					'messages_separator' => '<br />',
 					'list_start' => '<div class="table_scroll">'."\n"
 					               .'<table class="grouped" cellspacing="0">'."\n",
 						'head_start' => "<thead>\n",
@@ -1145,8 +1149,8 @@ class AdminUI_general extends Menu
 					'title_fmt' => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
 					'no_title_fmt' => '<span style="float:right">$global_icons$</span>'."\n",
 					'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$>'."\n"
-															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
-					'fieldset_end' => '</fieldset></div>'."\n",
+															.'<legend $title_attribs$>$fieldset_title$</legend><div class="fieldset">'."\n",
+					'fieldset_end' => '</div></fieldset></div>'."\n",
 					'fieldstart' => '<fieldset $ID$>'."\n",
 					'labelclass' => '',
 					'labelstart' => '<div class="label">',
@@ -1554,7 +1558,7 @@ class AdminUI_general extends Menu
 
 	/**
 	 * Get show evobar setting. Default true for every admin skin.
-	 * @return boolean
+	 * @return boolean 
 	 */
 	function get_show_evobar()
 	{

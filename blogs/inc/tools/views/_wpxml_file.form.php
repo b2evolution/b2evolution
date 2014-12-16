@@ -15,7 +15,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _wpxml_file.form.php 7044 2014-07-02 08:55:10Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -180,10 +180,30 @@ jQuery( '.table_scroll td' ).click( function()
 <?php
 if( $import_perm_view )
 { // Current user must has access to the import dir
+
+	// Initialize JavaScript to build and open window
+	echo_modalwindow_js();
 ?>
+
 function import_files_window()
 {
-	return pop_up_window( '<?php echo $admin_url; ?>?ctrl=files&mode=import&ajax_request=1&root=import_0', '', '1100' );
+	openModalWindow( '<span class="loader_img absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
+		'90%', '80%', true, '<?php echo TS_('Add/Link files'); ?>', '' );
+	jQuery.ajax(
+	{
+		type: 'POST',
+		url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+		data:
+		{
+			'action': 'import_files',
+			'crumb_import': '<?php echo get_crumb( 'import' ); ?>',
+		},
+		success: function( result )
+		{
+			openModalWindow( result, '90%', '80%', true, '<?php echo TS_('Upload/Manage import files'); ?>', '' );
+		}
+	} );
+	return false;
 }
 <?php
 }

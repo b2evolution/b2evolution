@@ -38,7 +38,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _param.funcs.php 7396 2014-10-09 05:13:50Z yura $
+ * @version $Id: _param.funcs.php 7397 2014-10-09 05:15:13Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -64,10 +64,12 @@ $GLOBALS['debug_params'] = false;
  * - float, double
  * - string (strips (HTML-)Tags, trims whitespace)
  * - text like string but allows multiple lines
- * - array/integer (elements of array must be integer)
- * - array/string (strips (HTML-)Tags, trims whitespace of array's elements)
- * - array/array/integer (two dimensional array and the elements must be integers)
- * - array/array/string (strips (HTML-)Tags, trims whitespace of the two dimensional array's elements)
+ * - array (it may contains arbitrary array elements) NOTE: If there is one way to avoid and use some other array type then it should not be used
+ * - array:integer (elements of array must be integer)
+ * - array:string (strips (HTML-)Tags, trims whitespace of array's elements)
+ * - array:/regexp/ (elements of array must match to the given regular expression) e.g. 'array:/^[a-z]*$/'
+ * - array:array:integer (two dimensional array and the elements must be integers)
+ * - array:array:string (strips (HTML-)Tags, trims whitespace of the two dimensional array's elements)
  * - html (does nothing, for now)
  * - raw (does nothing)
  * - '' (does nothing) -- DEPRECATED, use "raw" instead
@@ -121,7 +123,7 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 		}
 		elseif( $use_default )
 		{	// We haven't set any value yet and we really want one: use default:
-			if( in_array( $type, array( 'array', 'array/integer', 'array/string', 'array/array/integer', 'array/array/string' ) ) && $default === '' )
+			if( in_array( $type, array( 'array', 'array:integer', 'array:string', 'array:array:integer', 'array:array:string' ) ) && $default === '' )
 			{ // Change default '' into array() (otherwise there would be a notice with settype() below)
 				$default = array();
 			}
@@ -147,6 +149,14 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 		$GLOBALS[$var] = convert_charset( $GLOBALS[$var], $evo_charset, $io_charset );
 	}
 
+	// Check if the type is the special array or regexp
+	if( substr( $type, 0, 7 ) == 'array:/' )
+	{ // It is an array type param which may contains elements mathcing to the given regular expression
+		$elements_regexp = substr( $type, 6 );
+		$elements_type = 'string';
+		$type = 'array:regexp';
+	}
+
 	/*
 	 * STEP 2: make sure the data fits the expected type
 	 *
@@ -164,6 +174,9 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 					debug_die( 'param(-): <strong>'.$var.'</strong> is not scalar!' );
 				}
 
+				// Clean utf8:
+				$GLOBALS[$var] = utf8_clean( $GLOBALS[$var] );
+
 				// do nothing
 				if( isset($Debuglog) ) $Debuglog->add( 'param(-): <strong>'.$var.'</strong> as RAW Unsecure HTML', 'params' );
 				break;
@@ -175,7 +188,7 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 				}
 
 				// convert all html to special characters:
-				$GLOBALS[$var] = trim( evo_htmlspecialchars( $GLOBALS[$var] ) );
+				$GLOBALS[$var] = utf8_trim( htmlspecialchars( $GLOBALS[$var], ENT_COMPAT, $evo_charset ) );
 				// cross-platform newlines:
 				$GLOBALS[$var] = preg_replace( "~(\r\n|\r)~", "\n", $GLOBALS[$var] );
 				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as text with html special chars', 'params' );
@@ -188,7 +201,7 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 				}
 
 				// strip out any html:
-				$GLOBALS[$var] = trim( strip_tags($GLOBALS[$var]) );
+				$GLOBALS[$var] = utf8_trim( utf8_strip_tags($GLOBALS[$var]) );
 				// cross-platform newlines:
 				$GLOBALS[$var] = preg_replace( "~(\r\n|\r)~", "\n", $GLOBALS[$var] );
 				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as text', 'params' );
@@ -203,8 +216,13 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 				// echo $var, '=', $GLOBALS[$var], '<br />';
 				// Make sure the string is a single line
 				$GLOBALS[$var] = preg_replace( '~\r|\n~', '', $GLOBALS[$var] );
+
 				// strip out any html:
-				$GLOBALS[$var] = trim( strip_tags($GLOBALS[$var]) );
+				$GLOBALS[$var] = utf8_strip_tags($GLOBALS[$var]);
+
+				// echo "param $var=".$GLOBALS[$var]."<br />\n";
+				$GLOBALS[$var] = utf8_trim($GLOBALS[$var]);
+				// echo "param $var=".$GLOBALS[$var]."<br />\n";
 
 				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as string', 'params' );
 				break;
@@ -218,11 +236,11 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 				// Make sure the string is a single line
 				$GLOBALS[$var] = preg_replace( '~\r|\n~', '', $GLOBALS[$var] );
 				// strip out any html:
-				$GLOBALS[$var] = trim( strip_tags( $GLOBALS[$var] ) );
+				$GLOBALS[$var] = utf8_trim( utf8_strip_tags( $GLOBALS[$var] ) );
 				// Decode url:
 				$GLOBALS[$var] = urldecode( $GLOBALS[$var] );
 
-				if( ( !empty( $GLOBALS[$var] ) ) && ( ( strpos( $GLOBALS[$var], '"' ) !== false ) || ( ! preg_match( '#^(/|\?|https?://)#i', $GLOBALS[$var] ) ) ) )
+				if( ( !empty( $GLOBALS[$var] ) ) && ( ( utf8_strpos( $GLOBALS[$var], '"' ) !== false ) || ( ! preg_match( '#^(/|\?|https?://)#i', $GLOBALS[$var] ) ) ) )
 				{ // We cannot accept this MISMATCH:
 					bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
 				}
@@ -230,11 +248,15 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as url', 'params' );
 				break;
 
+			case 'array:integer':
+			case 'array:array:integer':
+				// Set elements type to integer, and set the corresponding regular expression
+				$elements_type = 'integer';
+				$elements_regexp = '/^(\+|-)?[0-9]+$/';
 			case 'array':
-			case 'array/integer':
-			case 'array/string':
-			case 'array/array/integer':
-			case 'array/array/string':
+			case 'array:string':
+			case 'array:regexp':
+			case 'array:array:string':
 				if( ! is_array( $GLOBALS[$var] ) )
 				{ // This param must be array
 					debug_die( 'param(-): <strong>'.$var.'</strong> is not array!' );
@@ -243,9 +265,9 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 				// Store current array in temp var for checking and preparing
 				$globals_var = $GLOBALS[$var];
 				// Check if the given array type is one dimensional array
-				$one_dimensional = ( ( $type == 'array' ) || ( $type == 'array/integer' ) || ( $type == 'array/string' ) );
+				$one_dimensional = ( ( $type == 'array' ) || ( $type == 'array:integer' ) || ( $type == 'array:string' ) || ( $type == 'array:regexp' ) );
 				// Check if the given array type should contains string elements
-				$contains_strings = ( ( $type == 'array/string' ) || ( $type == 'array/array/string' ) );
+				$contains_strings = ( ( $type == 'array:string' ) || ( $type == 'array:array:string' ) );
 				if( $one_dimensional )
 				{ // Convert to a two dimensional array to handle one and two dimensional arrays the same way
 					$globals_var = array( $globals_var );
@@ -277,7 +299,21 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 							// Make sure the string is a single line
 							$var_value = preg_replace( '~\r|\n~', '', $var_value );
 							// strip out any html:
-							$globals_var[$i][$j] = trim( strip_tags( $var_value ) );
+							$globals_var[$i][$j] = utf8_trim( utf8_strip_tags( $var_value ) );
+							continue;
+						}
+
+						if( isset( $elements_regexp ) )
+						{ // Array contains elements which must match to the given regular expression
+							if( preg_match( $elements_regexp, $var_value ) )
+							{ // OK match, set the corresponding type
+								settype( $globals_var[$i][$j], $elements_type );
+							}
+							else
+							{ // No match, cannot accept this MISMATCH
+								// Note: In case of array:integer or array:regexp we always use strict typing for the array elements
+								bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
+							}
 						}
 					}
 				}
@@ -291,17 +327,14 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 
 				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as '.$type, 'params' );
 
-				if( $contains_strings || $type == 'array' )
-				{ // This is an array with string elements so it was processed. The array with integer elements must be checked with regexp, so we can't break in that case.
-					if( $GLOBALS[$var] === array() && ( $strict_typing === false ) && $use_default )
-					{ // We want to consider empty values as invalid and fall back to the default value:
-						$GLOBALS[$var] = $default;
-					}
-					break;
+				if( $GLOBALS[$var] === array() && ( $strict_typing === false ) && $use_default )
+				{ // We want to consider empty values as invalid and fall back to the default value:
+					$GLOBALS[$var] = $default;
 				}
+				break;
 
 			default:
-				if( substr( $type, 0, 1 ) == '/' )
+				if( utf8_substr( $type, 0, 1 ) == '/' )
 				{	// We want to match against a REGEXP:
 					if( ! is_scalar( $GLOBALS[$var] ) )
 					{ // This happens if someone uses "foo[]=x" where "foo" is expected as string
@@ -344,15 +377,6 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 						if( isset($Debuglog) ) $Debuglog->add( 'param(-): <strong>'.$var.'</strong> set to NULL', 'params' );
 					}
 				}
-				elseif( $GLOBALS[$var] === array() )
-				{
-					if( $strict_typing === false && $use_default )
-					{	// ADDED BY FP 2006-09-07
-						// We want to consider empty values as invalid and fall back to the default value:
-						$GLOBALS[$var] = $default;
-					}
-				}
-				// TODO: dh> if a var (e.g. from POST) comes in as '' but has type "array" it does not get "converted" to array type (nor gets the default used!)
 				else
 				{
 					if( $strict_typing )
@@ -364,9 +388,6 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 								$regexp = '/^(0|1|false|true)$/i';
 								break;
 
-							case 'array/integer':
-							case 'array/array/integer':
-								$type = 'array';
 							case 'integer':
 								$regexp = '/^(\+|-)?[0-9]+$/';
 								break;
@@ -376,7 +397,9 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 								$regexp = '/^(\+|-)?[0-9]+(.[0-9]+)?$/';
 								break;
 
-							// Note: other types are not tested here.
+							default:
+								// Note: other types are not tested and they are not allowed without testing.
+								debug_die( 'Invalid parameter type!' );
 						}
 						if( $strict_typing == 'allow_empty' && empty($GLOBALS[$var]) )
 						{ // We have an empty value and we accept it
@@ -384,34 +407,7 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 						}
 						elseif( !empty( $regexp ) )
 						{
-							if( $type == 'array' )
-							{ // Check format of array elements
-								$globals_var = $GLOBALS[$var];
-								if( $one_dimensional )
-								{ // Convert to a two dimensional array to handle one and two dimensional arrays the same way
-									$globals_var = array( $globals_var );
-								}
-								// Loop through the two dimensional array content and make sure each element is an integer and also set the type
-								foreach( $globals_var as $i => $var_array )
-								{
-									foreach( $var_array as $j => $var_value )
-									{
-										if( !is_scalar( $var_value ) || !preg_match( $regexp, $var_value ) )
-										{ // Value of array item does not match!
-											bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
-										}
-										// Set the type of the array elements to integer
-										settype( $globals_var[$i][$j], 'integer' );
-									}
-								}
-								if( $one_dimensional )
-								{ // Extract real array from temp array
-									$globals_var = $globals_var[0];
-								}
-								// Restore current array with prepared data
-								$GLOBALS[$var] = $globals_var;
-							}
-							elseif( ( $type == 'boolean' ) && ( strtolower( $GLOBALS[$var] ) == 'false' ) )
+							if( ( $type == 'boolean' ) && ( strtolower( $GLOBALS[$var] ) == 'false' ) )
 							{ // 'false' string must be interpreted as boolean false value
 								$GLOBALS[$var] = false;
 							}
@@ -428,7 +424,6 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 				}
 		}
 	}
-
 
 	/*
 	 * STEP 3: memorize the value for later url regeneration
@@ -540,16 +535,25 @@ function param_cookie($var, $type = '', $default = '', $memorize = false,
  */
 function param_duration( $var )
 {
-	$timeout_sessions_months = param( $var.'_months', 'integer', 0 );
-	$timeout_sessions_days = param( $var.'_days', 'integer', 0 );
-	$timeout_sessions_hours = param( $var.'_hours', 'integer', 0 );
-	$timeout_sessions_minutes = param( $var.'_minutes', 'integer', 0 );
-	$timeout_sessions_seconds = param( $var.'_seconds', 'integer', 0 );
+	$periods = array(
+			'second' => 1,        // 1 second
+			'minute' => 60,       // 60 seconds
+			'hour'   => 3600,     // 60 minutes
+			'day'    => 86400,    // 24 hours
+			'month'  => 2592000,  // 30 days
+			'year'   => 31536000, // 365 days
+		);
 
-	$timeout_sessions = ( ( ( $timeout_sessions_months*30 + $timeout_sessions_days )*24
-				+ $timeout_sessions_hours )*60 + $timeout_sessions_minutes )*60 + $timeout_sessions_seconds;
+	$value = param( $var.'_value', 'integer', 0 );
+	$name = param( $var.'_name', 'string', '' );
 
-	return $timeout_sessions;
+	$seconds = 0;
+	if( !empty( $periods[ $name ] ) && !empty( $value ) )
+	{	// Convert time period to seconds
+		$seconds = $periods[ $name ] * $value;
+	}
+
+	return $seconds;
 }
 
 
@@ -619,12 +623,12 @@ function param_check_interval( $var_min, $var_max, $err_msg_number, $err_msg_com
 
 	if( $result_min && $result_max )
 	{
-		if( empty( $GLOBALS[$var_min] ) && !empty( $GLOBALS[$var_max] ) )
-		{	// Get min value from max value
+		if( empty( $GLOBALS[$var_min] ) && $GLOBALS[$var_min] !== 0 && !empty( $GLOBALS[$var_max] ) )
+		{ // Get min value from max value
 			$GLOBALS[$var_min] = $GLOBALS[$var_max];
 		}
-		if( !empty( $GLOBALS[$var_min] ) && empty( $GLOBALS[$var_max] ) )
-		{	// Get max value from min value
+		if( !empty( $GLOBALS[$var_min] ) && empty( $GLOBALS[$var_max] ) && $GLOBALS[$var_max] !== 0 )
+		{ // Get max value from min value
 			$GLOBALS[$var_max] = $GLOBALS[$var_min];
 		}
 
@@ -885,6 +889,7 @@ function param_check_filename( $var, $err_msg )
 	if( $error_filename = validate_filename( $GLOBALS[$var] ) )
 	{
 		param_error( $var, $error_filename );
+		syslog_insert( sprintf( 'File %s is invalid or has an unrecognized extension', '<b>'.$GLOBALS[$var].'</b>' ), 'warning', 'file' );
 		return false;
 	}
 	return true;
@@ -1272,7 +1277,7 @@ function param_compile_cat_array( $restrict_to_blog = 0, $cat_default = NULL, $c
 	global $cat_array, $cat_modifier;
 
 	$cat = param( 'cat', '/^[*\-\|]?([0-9]+(,[0-9]+)*)?$/', $cat_default, true ); // List of cats to restrict to
-	$catsel = param( 'catsel', 'array/integer', $catsel_default, true );  // Array of cats to restrict to
+	$catsel = param( 'catsel', 'array:integer', $catsel_default, true );  // Array of cats to restrict to
 
 	$cat_array = array();
 	$cat_modifier = '';
@@ -1450,7 +1455,7 @@ function param_check_passwords( $var1, $var2, $required = false, $min_length = 6
 		return false;
 	}
 
-	if( evo_strlen($pass1) < $min_length )
+	if( utf8_strlen($pass1) < $min_length )
 	{
 		param_error_multiple( array( $var1, $var2 ), sprintf( $params['msg_pass_min'], $min_length ) );
 		return false;
@@ -2267,7 +2272,7 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 		{
 			$errmsg = ($context == 'commenting')
 				? T_('Illegal content found (spam?).')
-				: sprintf( T_('Illegal content found: blacklisted word &laquo;%s&raquo;.'), evo_htmlspecialchars($block) );
+				: sprintf( T_('Illegal content found: blacklisted word &laquo;%s&raquo;.'), htmlspecialchars($block) );
 		}
 
 		$Messages->add(	$errmsg, 'error' );
@@ -2275,8 +2280,9 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 
 	$content = trim( $content );
 
-	if( $use_balanceTags )
+	if( $use_balanceTags && ( $context != 'general_array_params' ) )
 	{ // Auto close open tags:
+		// Auto close only if the content is NOT from a general array param where open and closed html tags may appear separately
 		$content = balance_tags( $content );
 	}
 
@@ -2298,7 +2304,7 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 
 		if( $context == 'commenting' )
 		{	// DEPRECATED but still...
-			// echo 'allowed tags:',evo_htmlspecialchars($comment_allowed_tags);
+			// echo 'allowed tags:',htmlspecialchars($comment_allowed_tags);
 			$content = strip_tags( $content, $comment_allowed_tags );
 		}
 
@@ -2313,7 +2319,7 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 		$css_tweaks_error = ( ( ! $allow_css_tweaks ) && preg_match( '#\s((style|class|id)\s*=)#i', $check, $matches ) );
 		if( $css_tweaks_error && $verbose )
 		{
-			$Messages->add( T_('Illegal CSS markup found: ').evo_htmlspecialchars($matches[1]), 'error' );
+			$Messages->add( T_('Illegal CSS markup found: ').htmlspecialchars($matches[1]), 'error' );
 		}
 
 		// CHECK JAVASCRIPT:
@@ -2324,21 +2330,21 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 				|| preg_match( '#=["\'\s]*((javascript|vbscript|about):)#i', $check, $matches ) ) );
 		if( $javascript_error && $verbose )
 		{
-			$Messages->add( T_('Illegal javascript markup found: ').evo_htmlspecialchars($matches[1]), 'error' );
+			$Messages->add( T_('Illegal javascript markup found: ').htmlspecialchars($matches[1]), 'error' );
 		}
 
 		// CHECK IFRAMES:
 		$iframe_error = ( ( ! $allow_iframes ) && preg_match( '~( < \s* //? \s* (frame|iframe) )~xi', $check, $matches ) );
 		if( $iframe_error && $verbose )
 		{
-			$Messages->add( T_('Illegal frame markup found: ').evo_htmlspecialchars($matches[1]), 'error' );
+			$Messages->add( T_('Illegal frame markup found: ').htmlspecialchars($matches[1]), 'error' );
 		}
 
 		// CHECK OBJECTS:
 		$object_error = ( ( ! $allow_objects ) && preg_match( '~( < \s* //? \s* (applet|object|param|embed) )~xi', $check, $matches ) );
 		if( $object_error && $verbose )
 		{
-			$Messages->add( T_('Illegal object markup found: ').evo_htmlspecialchars($matches[1]), 'error' );
+			$Messages->add( T_('Illegal object markup found: ').htmlspecialchars($matches[1]), 'error' );
 		}
 
 		// Set the final error value based on all of the results

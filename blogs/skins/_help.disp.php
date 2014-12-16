@@ -20,6 +20,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 echo '<h2>'.T_('Content issues').'</h2>';
 
+echo '<p>'.T_('This is an independent website published solely under the reponsibility of its owner.').'</p>';
+
 echo '<p>'.sprintf( T_('In case of concerns with the contents of this blog/site, please <a %s>contact the owner of this blog</a>.'), 'href="'.$Blog->get_contact_url( true ).'"' ).'</p>';
 
 echo '<p><a href="'.get_manual_url( 'content-issues' ).'">'.T_('What to do if the owner doesn\'t respond').' &raquo;</a></p>';

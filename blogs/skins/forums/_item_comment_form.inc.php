@@ -125,7 +125,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 			else
 			{ // Try to get params from $_COOKIE through the param() function
 				$comment_author = param_cookie( $cookie_name, 'string', '' );
-				$comment_author_email = evo_strtolower( param_cookie( $cookie_email, 'string', '' ) );
+				$comment_author_email = utf8_strtolower( param_cookie( $cookie_email, 'string', '' ) );
 				$comment_author_url = param_cookie( $cookie_url, 'string', '' );
 			}
 			if( empty($comment_author_url) )
@@ -264,7 +264,7 @@ function validateCommentForm(form)
 
 	if( check_user_status( 'is_validated' ) )
 	{ // User is logged in and activated:
-		$Form->info_field( T_('User'), '<strong>'.$current_User->get_identity_link( array( 'link_text' => 'login' ) ).'</strong>'
+		$Form->info_field( T_('User'), '<strong>'.$current_User->get_identity_link( array( 'link_text' => 'name' ) ).'</strong>'
 			.' '.get_user_profile_link( ' [', ']', T_('Edit profile') ) );
 	}
 	else
@@ -310,8 +310,8 @@ function validateCommentForm(form)
 		) );
 	// Message field:
 	$note = '';
-	// $note = T_('Allowed XHTML tags').': '.evo_htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags));
-	$Form->textarea( $dummy_fields[ 'content' ], htmlspecialchars_decode( $comment_content ), $params['textarea_lines'], $params['form_comment_text'], $note, 38, 'bComment' );
+	// $note = T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags));
+	$Form->textarea( $dummy_fields[ 'content' ], htmlspecialchars_decode( $comment_content ), $params['textarea_lines'], $params['form_comment_text'], $note, 38, 'bComment autocomplete_usernames' );
 	$Form->switch_template_parts( $params['form_params'] );
 
 	// Display renderers

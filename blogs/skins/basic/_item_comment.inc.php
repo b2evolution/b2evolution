@@ -60,7 +60,7 @@ $Comment = & $params['Comment'];
 ?>
 </h5>
 <blockquote>
-	<small><?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?></small>
+	<small><?php $Comment->date() ?> @ <?php $Comment->time( '#short_time' ) ?></small>
 	<div><?php $Comment->content() ?></div>
 	<?php $Comment->reply_link(); /* Link for replying to the Comment */ ?>
 </blockquote>

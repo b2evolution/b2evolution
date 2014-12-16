@@ -12,7 +12,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author efy-asimo: Attila Simo.
  *
- * @version $Id$
+ * @version $Id: _linkcomment.class.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -37,16 +37,16 @@ class LinkComment extends LinkOwner
 		$this->Comment = & $this->link_Object;
 
 		$this->_trans = array(
-			'Link this image to your owner' => NT_( 'Link this image to your comment' ),
-			'Link this file to your owner' => NT_( 'Link this file to your comment'),
-			'The file will be linked for download at the end of the owner' => NT_( 'The file will be linked for download at the end of the comment.' ),
-			'Insert the following code snippet into your owner' => NT_( 'Insert the following code snippet into your comment.' ),
-			'View this owner...' => NT_( 'View this comment...' ),
-			'Edit this owner...' => NT_( 'Edit this comment...' ),
-			'Click on link %s icons below to link additional files to $ownerTitle$.' => NT_( 'Click on link %s icons below to link additional files to <strong>Comment</strong>.' ),
-			'Link files to current owner' => NT_( 'Link files to current comment' ),
-			'Selected files have been linked to owner.' => NT_( 'Selected files have been linked to comment.' ),
-			'Link has been deleted from $ownerTitle$.' => NT_( 'Link has been deleted from the &laquo;Comment&raquo;.' ),
+			'Link this image to your xxx' => NT_( 'Link this image to your comment' ),
+			'Link this file to your xxx' => NT_( 'Link this file to your comment'),
+			'The file will be linked for download at the end of the xxx' => NT_( 'The file will be linked for download at the end of the comment.' ),
+			'Insert the following code snippet into your xxx' => NT_( 'Insert the following code snippet into your comment.' ),
+			'View this xxx...' => NT_( 'View this comment...' ),
+			'Edit this xxx...' => NT_( 'Edit this comment...' ),
+			'Click on link %s icons below to link additional files to $xxx$.' => NT_( 'Click on link %s icons below to link additional files to <strong>Comment</strong>.' ),
+			'Link files to current xxx' => NT_( 'Link files to current comment' ),
+			'Selected files have been linked to xxx.' => NT_( 'Selected files have been linked to comment.' ),
+			'Link has been deleted from $xxx$.' => NT_( 'Link has been deleted from the &laquo;Comment&raquo;.' ),
 		);
 	}
 
@@ -96,18 +96,32 @@ class LinkComment extends LinkOwner
 	 * @param integer file ID
 	 * @param integer link position ( 'teaser', 'aftermore' )
 	 * @param int order of the link
+	 * @param boolean true to update owner last touched timestamp after link was created, false otherwise
+	 * @return integer|boolean Link ID on success, false otherwise
 	 */
-	function add_link( $file_ID, $position, $order )
+	function add_link( $file_ID, $position, $order, $update_owner = true )
 	{
 		$edited_Link = new Link();
 		$edited_Link->set( 'cmt_ID', $this->Comment->ID );
 		$edited_Link->set( 'file_ID', $file_ID );
 		$edited_Link->set( 'position', $position );
 		$edited_Link->set( 'order', $order );
-		$edited_Link->dbinsert();
+		if( $edited_Link->dbinsert() )
+		{
+			$FileCache = & get_FileCache();
+			$File = $FileCache->get_by_ID( $file_ID, false, false );
+			$file_name = empty( $File ) ? '' : $File->get_name();
+			syslog_insert( sprintf( 'File %s was linked to %s with ID=%s', '<b>'.$file_name.'</b>', $this->type, $this->link_Object->ID ), 'info', 'file', $file_ID );
 
-		// Update last touched date of the Comment & Item
-		$this->update_last_touched_date();
+			if( $update_owner )
+			{ // Update last touched date of the Comment & Item
+				$this->update_last_touched_date();
+			}
+
+			return $edited_Link->ID;
+		}
+
+		return false;
 	}
 
 	/**

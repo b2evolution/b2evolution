@@ -1040,12 +1040,12 @@ class _HWLDF_WordAccumulator {
 		if ( $this->_group !== '' ) {
 			if ( $this->_tag == 'ins' ) {
 				$this->_line .= '<ins class="diffchange diffchange-inline">' .
-						evo_htmlspecialchars( $this->_group ) . '</ins>';
+						htmlspecialchars( $this->_group ) . '</ins>';
 			} elseif ( $this->_tag == 'del' ) {
 				$this->_line .= '<del class="diffchange diffchange-inline">' .
-						evo_htmlspecialchars( $this->_group ) . '</del>';
+						htmlspecialchars( $this->_group ) . '</del>';
 			} else {
-				$this->_line .= evo_htmlspecialchars( $this->_group );
+				$this->_line .= htmlspecialchars( $this->_group );
 			}
 		}
 		$this->_group = '';
@@ -1230,14 +1230,14 @@ class TableDiffFormatter extends DiffFormatter {
 		foreach ( $lines as $line ) {
 			echo '<tr>' . $this->emptyLine() .
 			$this->addedLine( '<ins class="diffchange">' .
-			evo_htmlspecialchars( $line ) . '</ins>' ) . "</tr>\n";
+			htmlspecialchars( $line ) . '</ins>' ) . "</tr>\n";
 		}
 	}
 
 	function _deleted( $lines ) {
 		foreach ( $lines as $line ) {
 			echo '<tr>' . $this->deletedLine( '<del class="diffchange">' .
-			evo_htmlspecialchars( $line ) . '</del>' ) .
+			htmlspecialchars( $line ) . '</del>' ) .
 			$this->emptyLine() . "</tr>\n";
 		}
 	}
@@ -1245,8 +1245,8 @@ class TableDiffFormatter extends DiffFormatter {
 	function _context( $lines ) {
 		foreach ( $lines as $line ) {
 			echo '<tr>' .
-			$this->contextLine( evo_htmlspecialchars( $line ) ) .
-			$this->contextLine( evo_htmlspecialchars( $line ) ) . "</tr>\n";
+			$this->contextLine( htmlspecialchars( $line ) ) .
+			$this->contextLine( htmlspecialchars( $line ) ) . "</tr>\n";
 		}
 	}
 
@@ -1332,14 +1332,14 @@ class TitleDiffFormatter extends DiffFormatter {
 		foreach ( $lines as $line ) {
 			echo '<tr>' . $this->emptyLine() .
 			$this->addedLine( '<ins class="diffchange">' .
-			evo_htmlspecialchars( $line ) . '</ins>' ) . "</tr>\n";
+			htmlspecialchars( $line ) . '</ins>' ) . "</tr>\n";
 		}
 	}
 
 	function _deleted( $lines ) {
 		foreach ( $lines as $line ) {
 			echo '<tr>' . $this->deletedLine( '<del class="diffchange">' .
-			evo_htmlspecialchars( $line ) . '</del>' ) .
+			htmlspecialchars( $line ) . '</del>' ) .
 			$this->emptyLine() . "</tr>\n";
 		}
 	}
@@ -1347,8 +1347,8 @@ class TitleDiffFormatter extends DiffFormatter {
 	function _context( $lines ) {
 		foreach ( $lines as $line ) {
 			echo '<tr>' .
-			$this->contextLine( evo_htmlspecialchars( $line ) ) .
-			$this->contextLine( evo_htmlspecialchars( $line ) ) . "</tr>\n";
+			$this->contextLine( htmlspecialchars( $line ) ) .
+			$this->contextLine( htmlspecialchars( $line ) ) . "</tr>\n";
 		}
 	}
 

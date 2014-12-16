@@ -30,7 +30,7 @@
  * @author fplanque: Francois PLANQUE
  * @author fsaya: Fabrice SAYA-GASNIER / PROGIDISTRI
  *
- * @version $Id$
+ * @version $Id: _resultsel.class.php 6513 2014-04-18 06:18:18Z attila $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -397,7 +397,7 @@ function selection_action( $action, $selection_ID, $selection_name, $prefix, $pr
 
 	global $DB, $Messages, $confirm, $item_ID_list, $current_User;
 
-	$items = param( $prefix.'items', 'array/string', array(), false );	// do NOT memorize // ?????????????
+	$items = param( $prefix.'items', 'array:string', array(), false );	// do NOT memorize // ?????????????
 	param( 'item_ID_list', 'string', '', false );
 
 	$current_User->check_perm( 'selections', 'edit', true );

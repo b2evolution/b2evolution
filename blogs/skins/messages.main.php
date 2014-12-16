@@ -8,7 +8,7 @@
  *
  * @package evoskins
  *
- * @version $Id$
+ * @version $Id: messages.main.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -53,9 +53,17 @@ if( !empty( $thrd_ID ) )
 	mark_as_read_by_user( $thrd_ID, $current_User->ID );
 }
 
-add_js_headline( "// Paths used by JS functions:
-		var bgxy_expand = '".get_icon( 'expand', 'xy' )."';
-		var bgxy_collapse = '".get_icon( 'collapse', 'xy' )."';" );
+if( ( $unsaved_message_params = get_message_params_from_session() ) !== NULL )
+{ // set Message and Thread saved params from Session
+	global $edited_Message, $action;
+	load_class( 'messaging/model/_message.class.php', 'Message' );
+	$edited_Message = new Message();
+	$edited_Message->text = $unsaved_message_params[ 'message' ];
+	$edited_Message->original_text = $unsaved_message_params[ 'message_original' ];
+	$edited_Message->set_renderers( $unsaved_message_params[ 'renderers' ] );
+	$edited_Message->thread_ID = $thrd_ID;
+	$action = $unsaved_message_params[ 'action' ];
+}
 
 init_plugins_js( 'blog', $Skin->get_template( 'tooltip_plugin' ) );
 

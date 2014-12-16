@@ -22,7 +22,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _skin.class.php 7178 2014-07-23 08:11:33Z yura $
+ * @version $Id: _skin.class.php 7498 2014-10-23 07:38:52Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -65,17 +65,6 @@ class Skin extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_skins__skin', 'skin_', 'skin_ID' );
 
-		$this->delete_restrictions = array(
-				array( 'table'=>'T_coll_settings', 'fk'=>'cset_value', 'msg'=>T_('%d blogs using this skin'), 
-						'and_condition' => '( cset_name = "normal_skin_ID" OR cset_name = "mobile_skin_ID" OR cset_name = "tablet_skin_ID" )' ),
-				array( 'table'=>'T_settings', 'fk'=>'set_value', 'msg'=>T_('This skin is set as default skin.'), 
-						'and_condition' => '( set_name = "def_normal_skin_ID" OR set_name = "def_mobile_skin_ID" OR set_name = "def_tablet_skin_ID" )' ),
-			);
-
-		$this->delete_cascades = array(
-				array( 'table'=>'T_skins__container', 'fk'=>'sco_skin_ID', 'msg'=>T_('%d linked containers') ),
-			);
-
 		if( is_null($db_row) )
 		{	// We are creating an object here:
 			$this->set( 'folder', $skin_folder );
@@ -89,6 +78,35 @@ class Skin extends DataObject
 			$this->folder = $db_row->skin_folder;
 			$this->type = $db_row->skin_type;
 		}
+	}
+
+
+	/**
+	 * Get delete restriction settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_restrictions()
+	{
+		return array(
+				array( 'table'=>'T_coll_settings', 'fk'=>'cset_value', 'msg'=>T_('%d blogs using this skin'),
+						'and_condition' => '( cset_name = "normal_skin_ID" OR cset_name = "mobile_skin_ID" OR cset_name = "tablet_skin_ID" )' ),
+				array( 'table'=>'T_settings', 'fk'=>'set_value', 'msg'=>T_('This skin is set as default skin.'),
+						'and_condition' => '( set_name = "def_normal_skin_ID" OR set_name = "def_mobile_skin_ID" OR set_name = "def_tablet_skin_ID" )' ),
+			);
+	}
+
+
+	/**
+	 * Get delete cascade settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_cascades()
+	{
+		return array(
+				array( 'table'=>'T_skins__container', 'fk'=>'sco_skin_ID', 'msg'=>T_('%d linked containers') ),
+			);
 	}
 
 
@@ -614,7 +632,8 @@ class Skin extends DataObject
 	 *    - NULL - In this case the Blog post navigation setting will be used
 	 *    - 'same_category' - to always navigate through the same category in this skin
 	 *    - 'same_author' - to always navigate through the same authors in this skin
-	 * 
+	 *    - 'same_tag' - to always navigate through the same tags in this skin
+	 *
 	 * Set this to not NULL only if the same post navigation should be used in every Blog where this skin is used
 	 */
 	function get_post_navigation()
@@ -779,6 +798,9 @@ class Skin extends DataObject
 							            ."\n",
 					'filters_start' => '<div class="filters">',
 					'filters_end' => '</div>',
+					'messages_start' => '<div class="messages">',
+					'messages_end' => '</div>',
+					'messages_separator' => '<br />',
 					'list_start' => '<div class="table_scroll">'."\n"
 					               .'<table class="grouped" cellspacing="0">'."\n",
 						'head_start' => '<thead>'."\n",

@@ -52,7 +52,8 @@ $params = array_merge( array(
 				 * crop-15x15
 				 * See also the $thumbnail_sizes array in conf/_advanced.php.
 				 */
-				'restrict_to_image_position' => 'teaser',	// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
+				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'albumart'
+				'restrict_to_image_position' => 'teaser,teaserperm,teaserlink',
 			) );
 	?>
 
@@ -75,7 +76,6 @@ $params = array_merge( array(
 								'link_text_one' => get_icon( 'comments' ),
 								'link_text_more' => get_icon( 'comments' ),
 								'link_title' => '#',
-								'use_popup' => ( $Skin->get_setting( 'comments_display' ) == 'popup' ),
 							) );
 
 				$Item->permanent_link( array(
@@ -121,7 +121,8 @@ $params = array_merge( array(
 					'after_image' =>         '</div>',
 					'after' =>               '</div>',
 					'image_size' =>          'fit-520x390',
-					'restrict_to_image_position' => 'aftermore',	// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
+					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'albumart'
+					'restrict_to_image_position' => 'aftermore',
 				) );
 		?>
 
@@ -129,8 +130,8 @@ $params = array_merge( array(
 			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 			// Note: at the top of this file, we set: 'image_size' =>	'', // Do not display images in content block - Image is handled separately
 			skin_include( '_item_content.inc.php', $params );
-			// Note: You can customize the default item feedback by copying the generic
-			// /skins/_item_feedback.inc.php file into the current skin folder.
+			// Note: You can customize the default item content by copying the generic
+			// /skins/_item_content.inc.php file into the current skin folder.
 			// -------------------------- END OF POST CONTENT -------------------------
 		?>
 

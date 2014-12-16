@@ -15,14 +15,27 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-// --------------------------------- START OF POSTS -------------------------------------
-global $cat, $MainList;
+global $number_of_posts_in_cat, $cat;
 
 if( $cat > 0 )
-{ // One single category is set
+{
+	// Init MainList
+	$page = param( 'paged', 'integer', 1 );
+	$MainList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $Blog->get_setting('posts_per_page') );
+	$MainList->load_from_Request();
+	$MainList->set_filters( array(
+			'cat_array' => array( $cat ), // Limit only by selected cat (exclude posts from child categories)
+			'cat_modifier' => NULL,
+			'page' => $page
+		) );
+	$MainList->query();
+	$MainList->nav_target = $cat; // set navigation target, we are always navigating through category in this skin
+
+	// Load read statuses if required
+	$MainList->load_content_read_statuses();
+
 	// Breadcrumbs
 	$Skin->display_breadcrumbs( $cat );
-
 ?>
 <div class="post_panel">
 <?php
@@ -64,6 +77,7 @@ if( count( $chapters ) > 0 )
 			<th colspan="2"><?php echo isset( $category_name ) ? $category_name : T_('Forum'); ?></th>
 			<th width="70"><?php echo T_('Topics'); ?></th>
 			<th width="70"><?php echo T_('Replies'); ?></th>
+			<th width="160"><?php echo T_('Last change'); ?></th>
 		</tr>
 <?php
 	foreach( $chapters as $Chapter )
@@ -122,6 +136,7 @@ if( count( $chapters ) > 0 )
 			</td>
 			<td class="row2"><?php echo get_postcount_in_category( $Chapter->ID ); ?></td>
 			<td class="row2"><?php echo get_commentcount_in_category( $Chapter->ID ); ?></td>
+			<td class="row2 font10"><?php echo $Chapter->get_last_touched_date( 'D M j, Y H:i' ); ?></td>
 		</tr>
 <?php
 		}

@@ -18,7 +18,7 @@
  *
  * @todo Allow applying / re-checking of the known data, not just after an update!
  *
- * @version $Id$
+ * @version $Id: _antispam_ban.form.php 6697 2014-05-15 10:51:11Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -57,7 +57,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 	$res_affected_hits = $DB->get_results( $sql, ARRAY_A );
 	if( $DB->num_rows == 0 )
 	{ // No matching hits.
-		printf( '<p>'.T_('No <strong>log-hits</strong> match the keyword [%s].').'</p>', evo_htmlspecialchars($keyword) );
+		printf( '<p>'.T_('No <strong>log-hits</strong> match the keyword [%s].').'</p>', htmlspecialchars($keyword) );
 	}
 	else
 	{
@@ -104,7 +104,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 	$sql = 'SELECT *
 			  FROM T_comments
 			 WHERE comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
-			    OR comment_author_email LIKE '.$DB->quote('%'.evo_strtolower( $keyword ).'%').'
+			    OR comment_author_email LIKE '.$DB->quote('%'.utf8_strtolower( $keyword ).'%').'
 			    OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
 			    OR comment_content LIKE '.$DB->quote('%'.$keyword.'%').'
 			 ORDER BY comment_date ASC
@@ -112,7 +112,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 	$res_affected_comments = $DB->get_results( $sql, OBJECT, 'Find matching comments' );
 	if( $DB->num_rows == 0 )
 	{ // No matching hits.
-		printf( '<p>'.T_('No <strong>comments</strong> match the keyword [%s].').'</p>', evo_htmlspecialchars($keyword) );
+		printf( '<p>'.T_('No <strong>comments</strong> match the keyword [%s].').'</p>', htmlspecialchars($keyword) );
 	}
 	else
 	{ // create comment arrays
@@ -219,7 +219,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 	// Check if the string is already in the blacklist:
 	if( antispam_check($keyword) )
 	{ // Already there:
-		printf( '<p>'.T_('The keyword [%s] is <strong>already handled</strong> by the blacklist.').'</p>', evo_htmlspecialchars($keyword) );
+		printf( '<p>'.T_('The keyword [%s] is <strong>already handled</strong> by the blacklist.').'</p>', htmlspecialchars($keyword) );
 	}
 	else
 	{ // Not in blacklist
@@ -227,7 +227,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 		<p>
 		<input type="checkbox" name="blacklist_locally" id="blacklist_locally_cb" value="1" checked="checked" />
 		<label for="blacklist_locally_cb">
-			<?php printf ( T_('<strong>Blacklist</strong> the keyword [%s] locally.'), evo_htmlspecialchars($keyword) ) ?>
+			<?php printf ( T_('<strong>Blacklist</strong> the keyword [%s] locally.'), htmlspecialchars($keyword) ) ?>
 		</label>
 		</p>
 
@@ -238,7 +238,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 			<p>
 			<input type="checkbox" name="report" id="report_cb" value="1" checked="checked" />
 			<label for="report_cb">
-				<?php printf ( T_('<strong>Report</strong> the keyword [%s] as abuse to b2evolution.net.'), evo_htmlspecialchars($keyword) ) ?>
+				<?php printf ( T_('<strong>Report</strong> the keyword [%s] as abuse to b2evolution.net.'), htmlspecialchars($keyword) ) ?>
 			</label>
 			[<a href="http://b2evolution.net/about/terms.html"><?php echo T_('Terms of service') ?></a>]
 			</p>

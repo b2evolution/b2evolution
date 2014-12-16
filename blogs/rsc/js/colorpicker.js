@@ -1,7 +1,7 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
- * @version $Id: colorpicker.js 7500 2014-10-23 09:08:43Z yura $
+ * @version $Id: colorpicker.js 7501 2014-10-23 09:13:00Z yura $
  */
 
 jQuery(document).ready( function()

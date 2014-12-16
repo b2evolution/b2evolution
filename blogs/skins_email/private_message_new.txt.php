@@ -52,7 +52,7 @@ echo "\n\n";
 if( $recipient_User->check_perm( 'pm_notif', 'full' ) )
 {
 	echo T_( 'To read the full conversation, click here:' )."\n".$params['message_link']."\n";
-	echo T_( 'Message content:' ).' '.evo_htmlentities( $Message->get('text'), ENT_COMPAT, $evo_charset );
+	echo T_( 'Message content:' ).' '.htmlentities( $Message->get('text'), ENT_COMPAT, $evo_charset );
 }
 else
 {

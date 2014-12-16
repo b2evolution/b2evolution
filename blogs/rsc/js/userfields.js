@@ -1,7 +1,7 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
- * @version $Id: bubbletip.js 2362 2012-11-07 06:11:13Z yura $
+ * @version $Id: userfields.js 3008 2013-02-18 10:42:52Z attila $
  */
 
 jQuery( document ).ready(function()

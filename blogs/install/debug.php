@@ -21,6 +21,8 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 // Make the includes believe they are being called in the right place...
 define( 'EVO_MAIN_INIT', true );
 
+if( ! defined( 'EVO_MAIN_INIT' ) ) die( 'Please, do not access this page directly.' );
+
 if( ! $config_is_done )
 { // Base config is not done yet, try to guess some values needed for correct display:
 	$rsc_url = '../rsc/';
@@ -351,7 +353,7 @@ $display_errors_on_production = false;'
 						) );
 				?>
 					<div class="input">
-						<input type="submit" name="submit" value="<?php echo T_('Save Changes!') ?>" class="search" />
+						<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search" />
 					</div>
 			</fieldset>
 

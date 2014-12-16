@@ -86,6 +86,19 @@ class prism_plugin extends Plugin
 
 
 	/**
+	 * Event handler: Called before at the beginning, if a message of thread form gets sent (and received).
+	 */
+	function MessageThreadFormSent( & $params )
+	{
+		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
+		if( $this->is_renderer_enabled( $apply_rendering, $params['renderers'] ) )
+		{ // render code blocks in message
+			$this->FilterItemContents( $params );
+		}
+	}
+
+
+	/**
 	 * Perform rendering
 	 *
 	 * @see Plugin::RenderItemAsHtml()
@@ -93,6 +106,18 @@ class prism_plugin extends Plugin
 	function RenderItemAsHtml( & $params )
 	{
 		/* Required a declaration of this method to identify this plugin as renderer */
+	}
+
+
+	/**
+	 * Encode HTML entities inside <code> blocks
+	 *
+	 * @param array Block
+	 * @return string
+	 */
+	function encode_html_entities( $block )
+	{
+		return $block[1].htmlspecialchars( $block[2] ).$block[3];
 	}
 
 
@@ -250,6 +275,23 @@ class prism_plugin extends Plugin
 		}
 
 		$apply_rendering = $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
+		{
+			return $this->display_toolbar();
+		}
+		return false;
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for message.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayMessageToolbar( & $params )
+	{
+		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
 		{
 			return $this->display_toolbar();

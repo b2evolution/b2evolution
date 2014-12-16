@@ -184,6 +184,26 @@ If you need to manually put b2evolution out of maintenance mode, delete or renam
 
 
 /**
+ * Enable/disable maintenance lock
+ *
+ * @param boolean true if maintenance lock need to be enabled
+ * @return bollean true on success, false otherwise
+ */
+function switch_maintenance_lock( $enable )
+{
+	global $Settings;
+
+	if( $Settings->get( 'system_lock' ) != $enable )
+	{ // Enable system lock
+		$Settings->set( 'system_lock', $enable );
+		return $Settings->dbupdate();
+	}
+
+	return true;
+}
+
+
+/**
  * Prepare maintenance directory
  *
  * @param string directory path
@@ -314,7 +334,7 @@ function verify_overwrite( $src, $dest, $action = '', $overwrite = true, & $read
 
 	if( $dir === false )
 	{ // $dir is not a valid directory or it can not be opened due to permission restrictions
-		echo '<div class="red">The &laquo;'.evo_htmlspecialchars( $src ).'&raquo; is not a valid direcotry or the directory can not be opened due to permission restrictions or filesystem errors.</div>';
+		echo '<div class="red">The &laquo;'.htmlspecialchars( $src ).'&raquo; is not a valid direcotry or the directory can not be opened due to permission restrictions or filesystem errors.</div>';
 		return false;
 	}
 

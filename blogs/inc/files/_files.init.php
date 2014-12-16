@@ -6,7 +6,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _files.init.php 7804 2014-12-11 15:11:50Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -309,7 +309,7 @@ class files_Module extends Module
 				}
 		}
 
-		if( $perm && isset($permtarget) && ( is_a( $permtarget, 'FileRoot' ) ) )
+		if( $perm && isset( $permtarget ) && ( is_a( $permtarget, 'FileRoot' ) ) )
 		{
 			global $current_User;
 			switch( $permtarget->type )
@@ -319,7 +319,14 @@ class files_Module extends Module
 				case 'import':
 					return $current_User->check_perm( 'import_root', $permlevel );
 				case 'user':
-					return $permtarget->in_type_ID == $current_User->ID;
+					if( $current_User->check_perm( 'users', 'moderate' ) && $current_User->check_perm( 'files', 'all' ) )
+					{ // Current user can edits all files of other users
+						return true;
+					}
+					else
+					{ // Allow user to see only own file root
+						return $permtarget->in_type_ID == $current_User->ID;
+					}
 			}
 		}
 

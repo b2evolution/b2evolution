@@ -14,7 +14,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _comments.ctrl.php 7281 2014-09-05 12:22:20Z yura $
+ * @version $Id: _comments.ctrl.php 7423 2014-10-14 07:52:43Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -312,7 +312,7 @@ switch( $action )
 		if( param( 'renderers_displayed', 'integer', 0 ) )
 		{ // use "renderers" value only if it has been displayed (may be empty)
 			global $Plugins;
-			$renderers = $Plugins->validate_renderer_list( param( 'renderers', 'array/string', array() ), array( 'Comment' => & $edited_Comment ) );
+			$renderers = $Plugins->validate_renderer_list( param( 'renderers', 'array:string', array() ), array( 'Comment' => & $edited_Comment ) );
 			$edited_Comment->set_renderers( $renderers );
 		}
 
@@ -686,6 +686,11 @@ require_css( 'rsc/css/blog_base.css', true ); // Default styles for the blog nav
 require_js( 'communication.js' ); // auto requires jQuery
 // Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
 require_js_helper( 'colorbox' );
+
+if( $action == 'edit' )
+{ // Initialize js to autocomplete usernames in post/comment form
+	init_autocomplete_usernames_js();
+}
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

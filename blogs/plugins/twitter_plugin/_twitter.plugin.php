@@ -19,7 +19,7 @@
  *
  * @todo dh> use OAuth instead of username/password: http://apiwiki.twitter.com/Authentication
  *
- * @version $Id$
+ * @version $Id: _twitter.plugin.php 6697 2014-05-15 10:51:11Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -89,13 +89,13 @@ class twitter_plugin extends Plugin
 
 
 	/**
-	 * We require b2evo 3.2.0 or above.
+	 * We require b2evo 5.0 or above.
 	 */
 	function GetDependencies()
 	{
 		return array(
 				'requires' => array(
-					'app_min' => '3.2.0-beta',
+					'app_min' => '5.0',
 				),
 			);
 	}
@@ -566,33 +566,33 @@ class twitter_plugin extends Plugin
 		// Replace the title and exerpt, but before replacing decode the html entities
 		$msg = str_replace(
 				array( '$title$', '$excerpt$' ),
-				array( evo_html_entity_decode( $content['title'] ), evo_html_entity_decode( $content['excerpt'] ) ),
+				array( html_entity_decode( $content['title'] ), html_entity_decode( $content['excerpt'] ) ),
 				$oauth['msg_format']
 			);
 
-		$msg_len = evo_strlen($msg);
-		$full_url_len = evo_strlen( $content['url'] );
-		$base_url_len = evo_strlen( $Item->get_Blog()->get_baseurl_root() );
+		$msg_len = utf8_strlen($msg);
+		$full_url_len = utf8_strlen( $content['url'] );
+		$base_url_len = utf8_strlen( $Item->get_Blog()->get_baseurl_root() );
 
-		if( (evo_strpos($msg, '$url$') === 0) && ($base_url_len + $msg_len - 5) > $this->message_length_limit )
+		if( (utf8_strpos($msg, '$url$') === 0) && ($base_url_len + $msg_len - 5) > $this->message_length_limit )
 		{	// The message is too long and is starting with $url$
 			$max_len = $this->message_length_limit + $full_url_len - $base_url_len;
 			$msg = strmaxlen( str_replace( '$url$', $content['url'], $msg ), $max_len, '...' );
 		}
-		elseif( (evo_strpos(strrev($msg), 'p2b# $lru$') === 0) && ($base_url_len + $msg_len - 10) > $this->message_length_limit )
+		elseif( (utf8_strpos(strrev($msg), 'p2b# $lru$') === 0) && ($base_url_len + $msg_len - 10) > $this->message_length_limit )
 		{	// The message is too long and is ending on '$url$ #b2p'
 			// Strip $url$, crop the message, and add URL to the end
 			$max_len = $this->message_length_limit - $base_url_len -1; // save room for space character
 			$msg = strmaxlen( str_replace( '$url$ #b2p', '', $msg ), $max_len, '...' );
 			$msg .= ' '.$content['url'].' #b2p';
 		}
-		elseif( (evo_strpos(strrev($msg), '$lru$') === 0) && ($base_url_len + $msg_len - 5) > $this->message_length_limit )
+		elseif( (utf8_strpos(strrev($msg), '$lru$') === 0) && ($base_url_len + $msg_len - 5) > $this->message_length_limit )
 		{	// Same as above, but without '#b2p' suffix
 			$max_len = $this->message_length_limit - $base_url_len -1; // save room for space character
 			$msg = strmaxlen( str_replace( '$url$', '', $msg ), $max_len, '...' );
 			$msg .= ' '.$content['url'];
 		}
-		elseif( (evo_strpos($msg, '$url$') !== false) && ($base_url_len + $msg_len - 5) > $this->message_length_limit )
+		elseif( (utf8_strpos($msg, '$url$') !== false) && ($base_url_len + $msg_len - 5) > $this->message_length_limit )
 		{	// Message is too long and $url$ is somewhere in the middle
 			// We can't do much, it will be rejected by Twitter
 			// TODO: find a way to trim X chars before the URL and Y chars after
@@ -609,7 +609,7 @@ class twitter_plugin extends Plugin
 
 		if( empty($result) )
 		{
-			$xmlrpcresp = 'Unknown error while posting "'.evo_htmlspecialchars( $msg ).'" to account @'.$oauth['contact'];
+			$xmlrpcresp = 'Unknown error while posting "'.htmlspecialchars( $msg ).'" to account @'.$oauth['contact'];
 			return false;
 		}
 		elseif( !empty($result->error) )

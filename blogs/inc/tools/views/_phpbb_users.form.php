@@ -15,12 +15,14 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _phpbb_users.form.php 7044 2014-07-02 08:55:10Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $dispatcher, $flush_action;
+
+phpbb_display_steps( 3 );
 
 $Form = new Form();
 
@@ -53,13 +55,13 @@ $Form->begin_fieldset( T_('Report of users import') );
 	$group_default = phpbb_get_var( 'group_default' );
 	if( $Group = & $GroupCache->get_by_ID( $group_default, false ) )
 	{
-		$Form->info( T_('Default group'), $Group->get( 'name' ) );
+		$Form->info( T_('Default group'), $Group->get_name() );
 	}
 
 	$group_invalid = phpbb_get_var( 'group_invalid' );
 	if( !empty( $group_invalid ) && $Group = & $GroupCache->get_by_ID( $group_invalid, false ) )
 	{
-		$group_invalid_name = $Group->get( 'name' );
+		$group_invalid_name = $Group->get_name();
 	}
 	else
 	{

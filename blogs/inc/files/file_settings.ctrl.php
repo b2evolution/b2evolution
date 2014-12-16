@@ -35,7 +35,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
- * @version $Id$
+ * @version $Id: file_settings.ctrl.php 6513 2014-04-18 06:18:18Z attila $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -61,7 +61,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		param( 'submit', 'array/string', array() );
+		param( 'submit', 'array:string', array() );
 		if( isset($submit['restore_defaults']) )
 		{
 			$Settings->delete_array( array(

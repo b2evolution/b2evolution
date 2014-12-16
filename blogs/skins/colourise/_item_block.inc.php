@@ -50,7 +50,7 @@ echo '<div id="styled_content_block">'; // Beginning of posts display
 	<h2><?php $Item->title(); ?></h2>
 
 	<?php
-		if( (!$Item->is_intro()) && $Skin->get_setting( 'display_post_date') )
+		if( (!$Item->is_intro()) && $Skin->get_setting( 'display_post_date' ) )
 		{	// Display only if we're *not* displaying an intro post AND we want to see the date:
 			$Item->issue_time( array(
 					'before'      => '<small>',
@@ -85,7 +85,7 @@ echo '<div id="styled_content_block">'; // Beginning of posts display
 	<?php
 		// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 		skin_include( '_item_content.inc.php', $params );
-		// Note: You can customize the default item feedback by copying the generic
+		// Note: You can customize the default item content by copying the generic
 		// /skins/_item_content.inc.php file into the current skin folder.
 		// -------------------------- END OF POST CONTENT -------------------------
 	?>
@@ -130,12 +130,12 @@ echo '<div id="styled_content_block">'; // Beginning of posts display
 							'link_text_one' => '#',
 							'link_text_more' => '#',
 							'link_title' => '#',
-							'use_popup' => false,
 						) );
 						
 					$Item->issue_time( array(
-							'before'    => ' | ',
-							'after'     => ' ',
+							'before'      => ' | ',
+							'after'       => ' ',
+							'time_format' => '#short_time',
 						) );
 						
 				?>

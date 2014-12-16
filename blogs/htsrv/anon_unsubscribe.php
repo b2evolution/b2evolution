@@ -21,7 +21,7 @@
  *
  * @package evocore
  *
- * @version $Id$
+ * @version $Id: anon_unsubscribe.php 7044 2014-07-02 08:55:10Z yura $
  */
 
 /**
@@ -70,7 +70,7 @@ switch( $type )
 				.T_('Please note:')
 				.' '.T_('For security reasons the link is only valid for your current session (by means of your session cookie).')
 				."\n\n"
-				.T_('If it was not you that requested this, simply ignore this mail.');
+				.T_('If it was not you that requested this, simply ignore this email.');
 
 			if( send_mail( $anon_email, NULL, T_('Confirm opt-out for emails through message form'), $message ) )
 			{
@@ -98,7 +98,7 @@ switch( $type )
 			$DB->query( '
 				UPDATE T_comments
 				   SET comment_allow_msgform = 0
-				 WHERE comment_author_email = '.$DB->quote( evo_strtolower( $anon_email ) ) );
+				 WHERE comment_author_email = '.$DB->quote( utf8_strtolower( $anon_email ) ) );
 
 			$Messages->add( T_('All your comments have been marked not to allow emailing you through a message form.'), 'success' );
 

@@ -521,7 +521,11 @@ input.wide_input {
 	width: 305px;
 }
 
-
+/* Tracking unread post and comments class for this skin */
+.track_content {
+	float: left;
+	margin: 7px;
+}
 
 /*
  * Header / bloglist on top:
@@ -609,4 +613,8 @@ div.input ul.token-input-list-facebook {
 
 div.tabs {
 	padding-left: 10px;
+}
+
+.search_title {
+	color: #06C;
 }

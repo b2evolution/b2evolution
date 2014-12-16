@@ -9,7 +9,7 @@
  * @package admin
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: phpbbimport.ctrl.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -107,7 +107,7 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'phpbb' );
 
-		$phpbb_ranks = param( 'phpbb_ranks', 'array/integer', array() );
+		$phpbb_ranks = param( 'phpbb_ranks', 'array:integer', array() );
 		$phpbb_group_default = param( 'phpbb_group_default', 'integer' );
 		$phpbb_group_invalid = param( 'phpbb_group_invalid', 'integer' );
 
@@ -117,8 +117,8 @@ switch( $action )
 		phpbb_set_var( 'group_default', $phpbb_group_default );
 		phpbb_set_var( 'group_invalid', $phpbb_group_invalid );
 
-		$phpbb_categories = param( 'phpbb_categories', 'array/integer', array() );
-		$phpbb_forums = param( 'phpbb_forums', 'array/integer', array() );
+		$phpbb_categories = param( 'phpbb_categories', 'array:integer', array() );
+		$phpbb_forums = param( 'phpbb_forums', 'array:integer', array() );
 		phpbb_set_var( 'import_categories', $phpbb_categories );
 		phpbb_set_var( 'import_forums', $phpbb_forums );
 

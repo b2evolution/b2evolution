@@ -8,7 +8,7 @@
  *
  * @package evoskins
  *
- * @version $Id$
+ * @version $Id: msgform.main.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -138,13 +138,17 @@ if( $allow_msgform == NULL )
 { // should be Prevented by UI
 	if( !empty( $recipient_User ) )
 	{
-		$Messages->add( T_( 'The user does not want to get contacted through the message form.' ) );
+		$Messages->add( T_( 'The user does not want to get contacted through the message form.' ), 'error' );
 	}
 	elseif( !empty( $Comment ) )
 	{
-		$Messages->add( T_( 'This commentator does not want to get contacted through the message form.' ) );
+		$Messages->add( T_( 'This commentator does not want to get contacted through the message form.' ), 'error' );
 	}
-	header_redirect();
+
+	$blogurl = $Blog->gen_blogurl();
+	// If it was a front page request or the front page is set to 'msgform' then we must not redirect to the front page because it is forbidden for the current User
+	$redirect_to = ( is_front_page() || ( $Blog->get_setting( 'front_disp' ) == 'msgform' ) ) ? url_add_param( $blogurl, 'disp=403', '&' ) : $blogurl;
+	header_redirect( $redirect_to, 302 );
 	// exited here
 }
 

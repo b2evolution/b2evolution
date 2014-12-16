@@ -29,7 +29,7 @@
  *
  * @package admin
  *
- * @version $Id: _user_identity.form.php 7692 2014-11-21 08:21:18Z yura $
+ * @version $Id: _user_identity.form.php 7796 2014-12-10 13:45:51Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -188,7 +188,43 @@ if( $action != 'view' )
 
 	if( $action != 'new' )
 	{
-		$user_pictures = '<div class="avatartag">'.$edited_User->get_avatar_imgtag( 'crop-top-80x80', 'avatar', 'top', true, '', 'user' ).'</div>';
+		if( is_admin_page() && $edited_User->has_avatar() && ( $avatar_Link = & $edited_User->get_avatar_Link() ) )
+		{
+			$ctrl_param = '?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$edited_User->ID;
+
+			$forbid_link = '';
+			if( $current_User->can_moderate_user( $edited_User->ID ) )
+			{
+				$forbid_link = action_icon( T_('Forbid using as main profile picture'), 'move_down_orange', $ctrl_param.'&amp;action=forbid_avatar&amp;'.url_crumb( 'user' ), ' '.T_('Forbid using as main profile picture'), 3, 4 ).'<br />';
+			}
+
+			$user_pictures = '<div class="avatartag main">'
+					.$edited_User->get_avatar_imgtag( 'crop-top-160x160', 'avatar', 'top', true, '', 'user' )
+					.'<div class="avatar_actions">'
+						.action_icon( T_('Change &raquo;'), 'edit', get_user_settings_url( 'avatar', $edited_User->ID ), ' '.T_('Change &raquo;'), 3, 4 ).'<br />'
+						.action_icon( T_('No longer use this as main profile picture'), 'move_down', $ctrl_param.'&amp;action=remove_avatar&amp;'.url_crumb( 'user' ), ' '.T_('No longer use this as main profile picture'), 3, 4 ).'<br />'
+						.$forbid_link
+						.action_icon( T_('Delete this profile picture'), 'xross', $ctrl_param.'&amp;action=delete_avatar&amp;file_ID='.$edited_User->avatar_file_ID.'&amp;'.url_crumb( 'user' ), ' '.T_('Delete this profile picture'), 3, 4, array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to delete this picture?').'\');' ) ).'<br />'
+						.$edited_User->get_rotate_avatar_icons( $edited_User->avatar_file_ID, array(
+								'before'   => '',
+								'after'    => '<br />',
+								'text'     => ' '.T_('Rotate'),
+								'user_tab' => 'avatar',
+							) )
+						.$edited_User->get_crop_avatar_icon( $edited_User->avatar_file_ID, array(
+								'before'   => '',
+								'after'    => '',
+								'text'     => ' '.T_('Crop'),
+								'user_tab' => 'avatar',
+								'onclick'  => 'return user_crop_avatar( '.$edited_User->ID.', '.$edited_User->avatar_file_ID.', \'avatar\' )'
+							) )
+					.'</div><div class="clear"></div>'
+				.'</div>';
+		}
+		else
+		{
+			$user_pictures = '<div class="avatartag">'.$edited_User->get_avatar_imgtag( 'crop-top-80x80', 'avatar', 'top', true, '', 'user' ).'</div>';
+		}
 
 		// Get other pictures:
 		$user_avatars = $edited_User->get_avatar_Links();
@@ -206,12 +242,15 @@ if( $action != 'view' )
 		}
 
 		if( $edited_User->has_avatar() )
-		{	// Change an existing avatar
-			$user_pictures = $user_pictures.' <a href="'.get_user_settings_url( 'avatar', $edited_User->ID ).'" class="floatleft">'.T_('Change &raquo;').'</a>';
+		{ // Change an existing avatar
+			if( ! is_admin_page() )
+			{
+				$user_pictures = $user_pictures.' <a href="'.get_user_settings_url( 'avatar', $edited_User->ID ).'">'.T_('Change &raquo;').'</a>';
+			}
 		}
 		else
-		{	// Upload a new avatar
-			$user_pictures = $user_pictures.' <a href="'.get_user_settings_url( 'avatar', $edited_User->ID ).'" class="floatleft"> '.T_('Upload now &raquo;').'</a>';
+		{ // Upload a new avatar
+			$user_pictures = $user_pictures.' <a href="'.get_user_settings_url( 'avatar', $edited_User->ID ).'"> '.T_('Upload now &raquo;').'</a>';
 		}
 		$Form->info( T_('Profile picture'), $user_pictures );
 	}
@@ -301,6 +340,54 @@ if( $action != 'view' )
 	}
 
 	$Form->interval( 'edited_user_age_min', $edited_User->age_min, 'edited_user_age_max', $edited_User->age_max, 3, T_('My age group') );
+
+	// Organization select fields:
+	$OrganizationCache = & get_OrganizationCache();
+	$OrganizationCache->load_all();
+	$count_all_orgs = count( $OrganizationCache->cache );
+	$count_user_orgs = 0;
+	if( $count_all_orgs > 0 )
+	{ // Display an organization select box if at least one is defined
+		$user_orgs = $edited_User->get_organizations_data();
+		if( empty( $user_orgs ) )
+		{ // Set it for first(empty) organization select box
+			$user_orgs[0] = 0;
+		}
+
+		$count_user_orgs = count( $user_orgs );
+		$org_suffix = '';
+		if( $count_all_orgs > 1 && $count_all_orgs > $count_user_orgs )
+		{ // Display a button to add user in new organization only if the user is not in all organizations
+			$org_suffix = get_icon( 'add', 'imgtag', array( 'class' => 'add_org', 'style' => 'cursor:pointer' ) );
+		}
+
+		foreach( $user_orgs as $org_ID => $org_is_accepted )
+		{
+			$form_inputstart = $Form->inputstart;
+			if( $org_ID > 0 )
+			{ // User is assigned to this organization, Display the accepted status icon
+				if( $current_User->check_perm( 'users', 'edit' ) )
+				{ // Set the spec params for icon if user is admin
+					$accept_icon_params = array( 'style' => 'cursor: pointer;', 'rel' => 'org_status_'.( $org_is_accepted ? 'y' : 'n' ).'_'.$org_ID.'_'.$edited_User->ID );
+				}
+				else
+				{
+					$accept_icon_params = array();
+				}
+				if( $org_is_accepted )
+				{ // Organization is accepted by admin
+					$accept_icon = get_icon( 'allowback', 'imgtag', array_merge( array( 'title' => T_('Accepted') ), $accept_icon_params ) );
+				}
+				else
+				{ // Organization is not accepted by admin yet
+					$accept_icon = get_icon( 'bullet_red', 'imgtag', array_merge( array( 'title' => T_('Not accepted') ), $accept_icon_params ) );
+				}
+				$Form->inputstart = $Form->inputstart.$accept_icon;
+			}
+			$Form->select_input_object( 'organizations[]', $org_ID, $OrganizationCache, T_('Organization'), array( 'allow_none' => true, 'field_suffix' => $org_suffix ) );
+			$Form->inputstart = $form_inputstart;
+		}
+	}
 
 	if( $new_user_creating )
 	{
@@ -672,6 +759,44 @@ $Form->end_form();
 		}
 		input.blur();
 	} );
+
+<?php
+if( $count_all_orgs > 1 && $count_all_orgs > $count_user_orgs )
+{ // JS code to add new organization for user
+?>
+	var max_organizations = <?php echo $count_all_orgs - $count_user_orgs; ?>;
+	jQuery( document ).on( 'click', 'span.add_org', function()
+	{ // Add new organization select box
+		if( max_organizations == 0 )
+		{ // Exit here because the user already is in all organizations
+			return;
+		}
+		max_organizations--;
+
+		var this_obj = jQuery( this );
+		var params = '<?php
+			global $b2evo_icons_type;
+			echo empty( $b2evo_icons_type ) ? '' : '&b2evo_icons_type='.$b2evo_icons_type;
+		?>';
+
+		jQuery.ajax(
+		{
+			type: 'POST',
+			url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+			data: 'action=get_user_new_org&user_id=<?php echo $edited_User->ID; ?>' + params,
+			success: function( result )
+			{
+				result = replace_form_params( ajax_debug_clear( result ) );
+				var cur_fieldset_obj = this_obj.parent().parent();
+				cur_fieldset_obj.after( result );
+				if( max_organizations == 0 )
+				{ // It was last organization, Remove all buttons to add new
+					jQuery( 'span.add_org' ).remove();
+				}
+			}
+		} );
+	} );
+<?php } ?>
 </script>
 
 <script type="text/javascript">
@@ -693,6 +818,9 @@ function bind_autocomplete( field_objs )
 bind_autocomplete( jQuery( 'input[id^=uf_][autocomplete=on]' ) );
 </script>
 <?php
+// AJAX changing of an accept status of organizations for each user
+echo_user_organization_js();
+
 // Location
 echo_regional_js( 'edited_user', user_region_visible() );
 ?>

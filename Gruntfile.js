@@ -171,6 +171,15 @@ module.exports = function(grunt) {
 				src: ['blogs/rsc/js/bootstrap/usernames.js', 'blogs/rsc/js/bootstrap/plugins.js', 'blogs/rsc/js/bootstrap/userfields.js', 'blogs/rsc/js/bootstrap/colorpicker.js'],
 				dest: 'blogs/rsc/js/build/popover.bmin.js'
 			},
+			// Textcomplete plugin to suggest user names in textareas with '@username'
+			textcomplete: {
+				options: {
+					banner: '/* This includes 2 files: jquery.textcomplete.js, textcomplete.init.js */\n'
+				},
+				nonull: true, // Display missing files
+				src: ['blogs/rsc/js/jquery/jquery.textcomplete.js', 'blogs/rsc/js/textcomplete.init.js'],
+				dest: 'blogs/rsc/js/build/textcomplete.bmin.js'
+			},
 		},
 
 		// Configuration for the watch tasks:

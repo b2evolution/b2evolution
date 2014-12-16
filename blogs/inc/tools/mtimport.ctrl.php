@@ -35,7 +35,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id$
+ * @version $Id: mtimport.ctrl.php 6786 2014-05-28 03:53:26Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -322,8 +322,8 @@ param( 'import_mode', 'string', 'normal' );
 							<?php
 							foreach( $evousers as $user )
 							{
-								?><option value="<?php echo $user->user_ID ?>"<?php if( evo_strtolower($author) == evo_strtolower( $user->user_login ) ) echo ' selected="selected"';
-								echo '>'.format_to_output(evo_strtolower($user->user_login), 'formvalue').'</option>';
+								?><option value="<?php echo $user->user_ID ?>"<?php if( utf8_strtolower($author) == utf8_strtolower( $user->user_login ) ) echo ' selected="selected"';
+								echo '>'.format_to_output(utf8_strtolower($user->user_login), 'formvalue').'</option>';
 							}
 						?></select>
 						<input type="text" value="<?php echo format_to_output($author, 'formvalue') ?>" name="user_name[]" maxlength="30" class="input" />
@@ -741,7 +741,7 @@ param( 'import_mode', 'string', 'normal' );
 				if( !empty($excerpt) )
 				{
 					$message .=	'<li><span style="color:red">Excerpt discarded because of existing extended body:</span>
-					<blockquote>'.evo_htmlspecialchars($excerpt).'</blockquote></li>';
+					<blockquote>'.htmlspecialchars($excerpt).'</blockquote></li>';
 				}
 				$post_content = $body."\n[teaserbreak]\n".$extended;
 			}
@@ -898,7 +898,7 @@ param( 'import_mode', 'string', 'normal' );
 						if( ! $item_Author )
 						{
 							$item_Author = new User();
-							$item_Author->set('login', evo_strtolower($usersmapped[ $post_author ][1]));
+							$item_Author->set('login', utf8_strtolower($usersmapped[ $post_author ][1]));
 							$item_Author->set('nickname', $usersmapped[ $post_author ][1]);
 							$item_Author->set('pass', md5( $default_password ));
 							$item_Author->set('level', $default_userlevel);
@@ -1012,8 +1012,8 @@ param( 'import_mode', 'string', 'normal' );
 
 					if( $post_content != $old_content )
 					{
-						$message .= '<li><p style="color:darkblue;border:1px dashed orange;">'.evo_htmlspecialchars($old_content).'</p>
-						html-converted to: <p style="color:darkblue;border:1px dashed orange;">'.evo_htmlspecialchars($post_content).'</p></li>';
+						$message .= '<li><p style="color:darkblue;border:1px dashed orange;">'.htmlspecialchars($old_content).'</p>
+						html-converted to: <p style="color:darkblue;border:1px dashed orange;">'.htmlspecialchars($post_content).'</p></li>';
 					}
 				}
 
@@ -1026,8 +1026,8 @@ param( 'import_mode', 'string', 'normal' );
 					}
 					if( $post_content != $old_content )
 					{
-						echo '<p style="color:darkblue;border:1px dashed orange;">'.evo_htmlspecialchars($old_content).'</p>
-						converted img-links to: <p style="color:darkblue;border:1px dashed orange;">'.evo_htmlspecialchars($post_content).'</p>';
+						echo '<p style="color:darkblue;border:1px dashed orange;">'.htmlspecialchars($old_content).'</p>
+						converted img-links to: <p style="color:darkblue;border:1px dashed orange;">'.htmlspecialchars($post_content).'</p>';
 					}
 				}*/
 
@@ -1310,7 +1310,7 @@ function fieldset_cats()
 					echo ' checked="checked"';
 				echo ' />';
 			}
-			echo ' '.evo_htmlspecialchars(get_catname($cat_ID));
+			echo ' '.htmlspecialchars(get_catname($cat_ID));
 		}
 
 		function import_cat_select_after_each( $cat_ID, $level )

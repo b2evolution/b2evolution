@@ -355,8 +355,10 @@ form.search
 	margin-bottom: 0px;
 	margin: 1ex 0;
 }
-div.compact_search_form {
+
+div.extended_search_form {
 	height: 22px;
+	margin: 0 15px;
 }
 div.compact_search_form input.SearchField, div.extended_search_form input.SearchField
 {
@@ -490,4 +492,8 @@ div.input ul.token-input-list-facebook {
 #styled_content_block .bSmallHead .status_protected,
 #styled_content_block .bSmallHead .status_private {
 	top: 23px;
+}
+
+.search_title {
+	color: #26AAE8;
 }

@@ -193,6 +193,60 @@ class maintenance_Module extends Module
 							) );
 		}
 	}
+
+
+	/**
+	 * Get the maintenance module cron jobs
+	 *
+	 * @see Module::get_cron_jobs()
+	 */
+	function get_cron_jobs()
+	{
+		return array(
+			'test' => array(
+				'name'   => T_('Basic test job'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_test.job.php',
+				'params' => NULL,
+			),
+			'error-test' => array(
+				'name'   => T_('Error test job'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_error_test.job.php',
+				'params' => NULL,
+			),
+			'cleanup-scheduled-jobs' => array(
+				'name'   => T_('Clean up scheduled jobs older than a threshold'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_cleanup_jobs.job.php',
+				'params' => NULL,
+			),
+			'heavy-db-maintenance' => array(
+				'name'   => T_('Heavy DB maintenance (CHECK & OPTIMIZE)'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_heavy_db_maintenance.job.php',
+				'params' => NULL,
+			),
+			'light-db-maintenance' => array(
+				'name'   => T_('Light DB maintenance (ANALYZE)'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_light_db_maintenance.job.php',
+				'params' => NULL,
+			),
+			'prune-old-files-from-page-cache' => array(
+				'name'   => T_('Prune old files from page cache'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_prune_page_cache.job.php',
+				'params' => NULL,
+			),
+			'prune-recycled-comments' => array(
+				'name'   => T_('Prune recycled comments'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_prune_recycled_comments.job.php',
+				'params' => NULL,
+			),
+		);
+	}
 }
 
 $maintenance_Module = new maintenance_Module();

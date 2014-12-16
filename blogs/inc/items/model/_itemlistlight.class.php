@@ -27,7 +27,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _itemlistlight.class.php 7756 2014-12-05 09:42:11Z yura $
+ * @version $Id: _itemlistlight.class.php 7757 2014-12-05 09:51:26Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -497,7 +497,7 @@ class ItemListLight extends DataObjectList2
 		 * Restrict to the statuses we want to show:
 		 */
 		// Note: oftentimes, $show_statuses will have been preset to a more restrictive set of values
-		$this->filters['visibility_array'] = param( $this->param_prefix.'show_statuses', 'array/string', $this->default_filters['visibility_array']
+		$this->filters['visibility_array'] = param( $this->param_prefix.'show_statuses', 'array:string', $this->default_filters['visibility_array']
 						, true, false, true, false );	// Array of sharings to restrict to
 
 		/*
@@ -1030,7 +1030,7 @@ class ItemListLight extends DataObjectList2
 				{
 					if( $tmp_User = $UserCache->get_by_ID( $author_ID, false, false ) )
 					{
-						$author_names[] = $tmp_User->get_identity_link( array( 'link_text' => 'login' ) );
+						$author_names[] = $tmp_User->get_identity_link( array( 'link_text' => 'name' ) );
 					}
 				}
 			}
@@ -1068,7 +1068,7 @@ class ItemListLight extends DataObjectList2
 					{
 						if( $tmp_User = & $UserCache->get_by_ID( $user_ID, false, false ) )
 						{
-							$assignees_names[] = $tmp_User->get_identity_link( array( 'link_text' => 'login' ) );
+							$assignees_names[] = $tmp_User->get_identity_link( array( 'link_text' => 'name' ) );
 						}
 					}
 				}

@@ -28,7 +28,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _campaigns_send.form.php 7475 2014-10-21 04:17:43Z yura $
+ * @version $Id: _campaigns_send.form.php 7825 2014-12-16 16:32:09Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -55,8 +55,8 @@ if( !empty( $template_action ) && $template_action == 'send_campaign' )
 $Form->begin_fieldset( T_('Review and Send') );
 	$Form->info( T_('Name'), $edited_EmailCampaign->get( 'name' ) );
 	$Form->info( T_('Email title'), $edited_EmailCampaign->get( 'email_title' ) );
-	$Form->info( T_('Date'), mysql2localedatetime_spans( $edited_EmailCampaign->get( 'date_ts' ), 'M-d' ) );
-	$Form->info( T_('Last sent date'), $edited_EmailCampaign->get( 'sent_ts' ) ? mysql2localedatetime_spans( $edited_EmailCampaign->get( 'sent_ts' ), 'M-d' ) : T_('No sent yet') );
+	$Form->info( T_('Campaign created'), mysql2localedatetime_spans( $edited_EmailCampaign->get( 'date_ts' ), 'M-d' ) );
+	$Form->info( T_('Last sent'), $edited_EmailCampaign->get( 'sent_ts' ) ? mysql2localedatetime_spans( $edited_EmailCampaign->get( 'sent_ts' ), 'M-d' ) : T_('Not sent yet') );
 
 echo '<div style="display:table;width:100%;table-layout:fixed;">';
 	echo '<div class="floatleft" style="width:50%">';

@@ -18,7 +18,7 @@
  *
  * @package evocore
  *
- * @version $Id$
+ * @version $Id: _userlist.class.php 7818 2014-12-15 14:41:11Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -65,6 +65,7 @@ class UserList extends DataObjectList2
 	 *                    'join_city'    => true,
 	 *                    'keywords_fields'     - Fields of users table to search by keywords
 	 *                    'where_status_closed' - FALSE - to don't display closed users
+	 *                    'where_org_ID' - ID of organization
 	 */
 	function UserList(
 		$filterset_name = '', // Name to be used when saving the filterset (leave empty to use default)
@@ -88,7 +89,7 @@ class UserList extends DataObjectList2
 			$this->filterset_name = 'UserList_filters';
 		}
 
-		$this->order_param = $param_prefix.'order';
+		$this->order_param = 'results_'.$param_prefix.'order';
 		$this->page_param = $param_prefix.'paged';
 
 		// Initialize the default filter set:
@@ -98,6 +99,7 @@ class UserList extends DataObjectList2
 				'region'              => NULL,    // integer, Region ID
 				'subregion'           => NULL,    // integer, Subregion ID
 				'city'                => NULL,    // integer, City ID
+				'membersonly'         => false,   // boolean, Restrict by members
 				'keywords'            => NULL,    // string, Search words
 				'gender'              => NULL,    // string: 'M', 'F' or 'MF'
 				'status_activated'    => NULL,    // string: 'activated'
@@ -150,7 +152,7 @@ class UserList extends DataObjectList2
 		$this->page = param( $this->page_param, 'integer', 1 );
 
 		// Country
-		if( has_cross_country_restriction() )
+		if( has_cross_country_restriction( 'users', 'list' ) )
 		{ // In case of cross country restrionction we always have to set the ctry filter
 			// In this case we always have a logged in user
 			global $current_User;
@@ -169,6 +171,11 @@ class UserList extends DataObjectList2
 			 * Selected filter preset:
 			 */
 			memorize_param( 'filter_preset', 'string', $this->default_filters['filter_preset'], $this->filters['filter_preset'] );  // List of authors to restrict to
+
+			/*
+			 * Restrict by membersonly
+			 */
+			memorize_param( 'membersonly', 'integer', $this->default_filters['membersonly'], $this->filters['membersonly'] );
 
 			/*
 			 * Restrict by keywords
@@ -300,6 +307,11 @@ class UserList extends DataObjectList2
 		}
 
 		/*
+		 * Restrict by members
+		 */
+		$this->filters['membersonly'] = param( 'membersonly', 'boolean', $this->default_filters['membersonly'], true );
+
+		/*
 		 * Restrict by keywords
 		 */
 		$this->filters['keywords'] = param( 'keywords', 'string', $this->default_filters['keywords'], true );         // Search string
@@ -365,8 +377,8 @@ class UserList extends DataObjectList2
 		/*
 		 * Restrict by user fields
 		 */
-		$criteria_types = param( 'criteria_type', 'array/integer', array(), true );
-		$criteria_values = param( 'criteria_value', 'array/string', array(), true );
+		$criteria_types = param( 'criteria_type', 'array:integer', array(), true );
+		$criteria_values = param( 'criteria_value', 'array:string', array(), true );
 		$userfields = array();
 		foreach( $criteria_types as $c => $type )
 		{
@@ -422,17 +434,24 @@ class UserList extends DataObjectList2
 		// If group == -1 we shouldn't group list by user group
 		$this->query_params['grouped'] = ( $this->filters['group'] != -1 );
 		$this->UserQuery = new UserQuery( $this->Cache->dbtablename, $this->Cache->dbprefix, $this->Cache->dbIDname, $this->query_params );
+
 		if( isset( $this->query_params['keywords_fields'] ) )
 		{ // Change keywords_fields from query params
 			$this->UserQuery->keywords_fields = $this->query_params['keywords_fields'];
 		}
+
 		if( isset( $this->query_params['where_status_closed'] ) )
 		{ // Limit by closed users
 			$this->UserQuery->where_status( 'closed', $this->query_params['where_status_closed'] );
 		}
 
+		if( isset( $this->query_params['where_org_ID'] ) )
+		{ // Select by organization ID
+			$this->UserQuery->where_organization( $this->query_params['where_org_ID'] );
+		}
+
 		// If browse users from different countries is restricted, then always filter to the current User country
-		if( has_cross_country_restriction() )
+		if( has_cross_country_restriction( 'users', 'list' ) )
 		{ // Browse users from different countries is restricted, filter to current user country
 			$ctry_filter = $current_User->ctry_ID;
 			// if country filtering was changed the qurey must be refreshed
@@ -446,6 +465,7 @@ class UserList extends DataObjectList2
 		/*
 		 * filtering stuff:
 		 */
+		$this->UserQuery->where_members( $this->filters['membersonly'] );
 		$this->UserQuery->where_keywords( $this->filters['keywords'] );
 		$this->UserQuery->where_gender( $this->filters['gender'] );
 		$this->UserQuery->where_status( $this->filters['status_activated'] );
@@ -459,6 +479,11 @@ class UserList extends DataObjectList2
 		$this->UserQuery->where_location( 'city', $this->filters['city'] );
 		$this->UserQuery->where_age_group( $this->filters['age_min'], $this->filters['age_max'] );
 		$this->UserQuery->where_userfields( $this->filters['userfields'] );
+		if( ! is_logged_in() )
+		{ // Restrict users by group level for anonymous users
+			global $Settings;
+			$this->UserQuery->where_group_level( $Settings->get('allow_anonymous_user_level_min'), $Settings->get('allow_anonymous_user_level_max') );
+		}
 
 		if( $this->get_order_field_list() != '' )
 		{
@@ -622,7 +647,7 @@ class UserList extends DataObjectList2
 		 * @var User
 		 */
 		$prev_User = & $this->get_prevnext_User( $direction );
-		if( has_cross_country_restriction() )
+		if( has_cross_country_restriction( 'users', 'list' ) )
 		{ // If current user has cross country restriction, make sure we display only users from the same country
 			// Note: This may happen only if the user list filter was saved and the cross country restriction was changed after that
 			global $current_User;
@@ -636,7 +661,7 @@ class UserList extends DataObjectList2
 		{	// User exists in DB
 			$output = $before;
 			$identity_url = get_user_identity_url( $prev_User->ID, $user_tab );
-			$login = str_replace( '$login$', $prev_User->get_colored_login(), $text );
+			$login = str_replace( '$login$', $prev_User->get_colored_login( array( 'login_text' => 'name' ) ), $text );
 			if( !empty( $identity_url ) )
 			{	// User link is available
 				// Note: we don't want a bubble tip on navigation links

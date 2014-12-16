@@ -27,6 +27,7 @@ if( count( $chapters ) > 0 )
 			<th colspan="2"><?php echo isset( $category_name ) ? $category_name : T_('Forum'); ?></th>
 			<th width="70"><?php echo T_('Topics'); ?></th>
 			<th width="70"><?php echo T_('Replies'); ?></th>
+			<th width="160"><?php echo T_('Last change'); ?></th>
 		</tr>
 <?php
 	foreach( $chapters as $Chapter )
@@ -85,6 +86,7 @@ if( count( $chapters ) > 0 )
 			</td>
 			<td class="row2"><?php echo get_postcount_in_category( $Chapter->ID ); ?></td>
 			<td class="row2"><?php echo get_commentcount_in_category( $Chapter->ID ); ?></td>
+			<td class="row2 font10"><?php echo $Chapter->get_last_touched_date( 'D M j, Y H:i' ); ?></td>
 		</tr>
 <?php
 		}

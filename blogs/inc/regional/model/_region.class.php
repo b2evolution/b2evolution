@@ -27,7 +27,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id$
+ * @version $Id: _region.class.php 7044 2014-07-02 08:55:10Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -55,14 +55,6 @@ class Region extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_regional__region', 'rgn_', 'rgn_ID' );
 
-		$this->delete_restrictions = array(
-				array( 'table'=>'T_users', 'fk'=>'user_rgn_ID', 'msg'=>T_('%d related users') ),
-				array( 'table'=>'T_regional__subregion', 'fk'=>'subrg_rgn_ID', 'msg'=>T_('%d related sub-regions') ),
-				array( 'table'=>'T_regional__city', 'fk'=>'city_rgn_ID', 'msg'=>T_('%d related cities') ),
-			);
-
-		$this->delete_cascades = array();
-
 		if( $db_row )
 		{
 			$this->ID            = $db_row->rgn_ID;
@@ -72,6 +64,21 @@ class Region extends DataObject
 			$this->enabled       = $db_row->rgn_enabled;
 			$this->preferred     = $db_row->rgn_preferred;
 		}
+	}
+
+
+	/**
+	 * Get delete restriction settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_restrictions()
+	{
+		return array(
+				array( 'table'=>'T_users', 'fk'=>'user_rgn_ID', 'msg'=>T_('%d related users') ),
+				array( 'table'=>'T_regional__subregion', 'fk'=>'subrg_rgn_ID', 'msg'=>T_('%d related sub-regions') ),
+				array( 'table'=>'T_regional__city', 'fk'=>'city_rgn_ID', 'msg'=>T_('%d related cities') ),
+			);
 	}
 
 

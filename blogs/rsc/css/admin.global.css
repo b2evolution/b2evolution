@@ -30,6 +30,17 @@ div.browse > div.floatright {
 		padding-right: 0;
 	}
 }
+@media (min-width: 1170px) {
+	div.browse .row .col-lg-6 {
+		width: 50%;
+		float: left;
+		padding-left: 14px;
+		box-sizing: border-box;
+	}
+	div.browse .row .col-lg-6:first-child {
+		padding-left: 0;
+	}
+}
 @media (max-width: 500px) {
 	div.dashboard_sidebar_panels .col-sm-6 {
 		width: 100%;
@@ -98,58 +109,6 @@ div.dashboard_rating {
 
 .avatar {
 	vertical-align: top;
-}
-
-
-/*
- * Overlay screen (used for antispam on dashboard):
- */
-#screen_mask{
-	position:fixed;
-	top: 0;
-	left: 0;
-	background: #000;
-	height: 100%;
-	width: 100%;
-	display:none;
-	z-index:9998;
-}
-
-#overlay_page{
-	display:none;
-}
-
-#overlay_page.overlay_page_active, #overlay_page.overlay_page_active_transparent{
-	position:fixed;
-	top:40px;
-	bottom:5%;
-	right:5%;
-	left:5%;
-	overflow:auto;
-	z-index:9999;
-	background:#f1f6f8;
-	border:1px solid #ccc;
-	display:block;
-}
-#overlay_page.overlay_page_active_transparent{
-	background: transparent;
-	border: none;
-	margin: 0 auto;
-	top: 40%;
-	bottom: auto;
-}
-#overlay_page.overlay_page_active_transparent .fieldset{
-	margin: 0;
-}
-
-.overlay_page_active form{
-	padding:1em;
-}
-
-#overlay_postback{
-	position:absolute;
-	top:-1000em;
-	left:-1000em;
 }
 
 
@@ -605,16 +564,39 @@ ul.widget_list li {
     border: 2px solid red;
 }
 
+/* Comment moderation on dashboard */
+.hidden_comment {
+	display: none;
+}
+
 
 /*
  * Avatar selection:
  */
 div.avatartag {
-	float: left;
+	display: inline-block;
+	vertical-align: top;
 	margin: 0 0.5em 0.5em 0;
 }
 div.avatartag a {
 	outline: none;
+}
+div.avatartag.main {
+	display: block;
+}
+div.avatartag.main > a {
+	float: left;
+}
+.avatar_main_frame > a:first-child,
+div.avatartag.main a:first-child {
+	margin-right: 25px;
+}
+.avatar_main_frame .avatar_actions {
+	text-align: center;
+	padding-right: 25px;
+	float: none;
+	display: table-cell;
+	vertical-align: middle;
 }
 
 table.prevnext_user {
@@ -775,7 +757,7 @@ pre.email_log_scroll span {
 
 div.status_icon {
 	float: left;
-	padding: 5px 5px 0 0;
+	padding: 4px 5px 0 0;
 }
 
 /* Diff */

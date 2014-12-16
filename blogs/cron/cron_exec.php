@@ -6,7 +6,7 @@
  * >c:\php4\php cron_exec.php
  * >c:\php4\php-cli cron_exec.php
  *
- * @version $Id: cron_exec.php 7380 2014-10-07 11:19:23Z yura $
+ * @version $Id: cron_exec.php 7381 2014-10-07 11:23:50Z yura $
  */
 
 
@@ -140,7 +140,7 @@ if( empty( $task ) )
 else
 {
 	$ctsk_ID = $task->ctsk_ID;
-	$ctsk_name = $task->ctsk_name;
+	$ctsk_name = cron_job_name( $task->ctsk_key, $task->ctsk_name, $task->ctsk_params );
 
 	cron_log( 'Requesting lock on task #'.$ctsk_ID.' ['.$ctsk_name.']', 0 );
 
@@ -161,7 +161,7 @@ else
 		if( !empty( $task->ctsk_repeat_after ) )
 		{	// This task wants to be repeated:
 			// Note: we use the current time for 2 reasons: 1) prevent scheduling something in the past AND 2) introduce variety so that everyone doesn't run his repeated tasks at the same exact time, especially pings, pollings...
-			if( $task->ctsk_controller == 'cron/jobs/_antispam_poll.job.php' )
+			if( $task->ctsk_key == 'poll-antispam-blacklist' )
 			{	// THIS IS A HACK. Guess why we need that!? :P  Please do not override or you'll kill our server :(
 				$new_start_datetime = $localtimenow + rand( 43200, 86400 ); // 12 to 24 hours
 			}
@@ -169,9 +169,10 @@ else
 			{	// Normal
 				$new_start_datetime = $localtimenow + $task->ctsk_repeat_after;
 			}
-			$sql = 'INSERT INTO T_cron__task( ctsk_start_datetime, ctsk_repeat_after, ctsk_name, ctsk_controller, ctsk_params )
+			$ctsk_name_insert = empty( $task->ctsk_name ) ? 'NULL' : $DB->quote( $task->ctsk_name );
+			$sql = 'INSERT INTO T_cron__task( ctsk_start_datetime, ctsk_repeat_after, ctsk_name, ctsk_key, ctsk_params )
 							VALUES( '.$DB->quote(date2mysql($new_start_datetime)).', '.$DB->quote($task->ctsk_repeat_after).', '
-												.$DB->quote($ctsk_name).', '.$DB->quote($task->ctsk_controller).', '.$DB->quote($task->ctsk_params).' )';
+												.$ctsk_name_insert.', '.$DB->quote($task->ctsk_key).', '.$DB->quote($task->ctsk_params).' )';
 			$DB->query( $sql, 'Schedule repeated task.' );
 		}
 
@@ -192,7 +193,7 @@ else
 		$cron_params['ctsk_ID'] = $ctsk_ID;
 
 		// EXECUTE
-		$error_message = call_job( $task->ctsk_controller, $cron_params );
+		$error_message = call_job( $task->ctsk_key, $cron_params );
 		if( !empty( $error_message ) )
 		{
 			$error_task = array(

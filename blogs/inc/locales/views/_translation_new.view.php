@@ -12,7 +12,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _translation_new.view.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -39,7 +39,7 @@ $Results->title = sprintf( T_('Translation editor for locale "%s"'), $edit_local
 $Results->cols[] = array(
 		'th' => T_('Original string'),
 		'order' => 'iost_string',
-		'td' => '%evo_htmlspecialchars( #iost_string# )%',
+		'td' => '%htmlspecialchars( #iost_string# )%',
 	);
 
 function iost_td_actions( $translated_string_ID )

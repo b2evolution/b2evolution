@@ -42,7 +42,7 @@ class WikilinksPluginTestCase extends EvoPluginUnitTestCase
 									) as $lText => $lExpexted )
 		{
 			$params = array( 'data' => $lText, 'format' => 'htmlbody' );
-			$this->Plugin->RenderItemAsHtml( $params );
+			$this->Plugin->RenderMessageAsHtml( $params );
 			$this->assertEqual( $params['data'], $lExpexted );
 		}
 	}

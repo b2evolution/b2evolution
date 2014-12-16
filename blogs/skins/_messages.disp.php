@@ -39,31 +39,44 @@ if( !is_logged_in() )
 // Check minimum permission:
 $current_User->check_perm( 'perm_messaging', 'reply', true );
 
-if( !empty($thrd_ID) )
-{// Load thread from cache:
+$thread_is_missed = false;
+if( ! empty( $thrd_ID ) )
+{ // Load thread from cache:
 	$ThreadCache = & get_ThreadCache();
-	if( ($edited_Thread = & $ThreadCache->get_by_ID( $thrd_ID, false )) === false )
-	{	// Thread doesn't exists with this ID
+	if( ( $edited_Thread = & $ThreadCache->get_by_ID( $thrd_ID, false ) ) === false )
+	{ // Thread doesn't exists with this ID
 		unset( $edited_Thread );
 		forget_param( 'thrd_ID' );
 		$Messages->add( T_('The requested thread does not exist any longer.'), 'error' );
+		$thread_is_missed = true;
 	}
 	else if( ! $edited_Thread->check_thread_recipient( $current_User->ID ) )
-	{	// Current user is not recipient of this thread
+	{ // Current user is not recipient of this thread
 		unset( $edited_Thread );
 		forget_param( 'thrd_ID' );
 		$Messages->add( T_('You are not allowed to view this thread.'), 'error' );
 	}
 }
 
-if( ( empty( $thrd_ID ) ) || ( empty( $edited_Thread ) ) )
-{
+if( ! $Messages->has_errors() && ( empty( $thrd_ID ) || empty( $edited_Thread ) ) )
+{ // Display this error only when no error above
 	$Messages->add( T_('Can\'t show messages without thread!'), 'error' );
-	$Messages->display();
+	$thread_is_missed = true;
 }
 else
 {	// Preload users to show theirs avatars
 	load_messaging_thread_recipients( $thrd_ID );
+}
+
+$Messages->display();
+
+if( $thread_is_missed )
+{ // If thread is missed by some reeason we should inform user why it happens
+	echo '<div class="deleted_thread_explanation">'
+			.'<p>'.T_('It is likely that the message you are trying to access has been identified as a spam or scam message and therefore has been deleted by a moderator.').'</p>'
+			.'<p>'.T_('This may have happened in the time between you received a notification for this new message and the time you\'re now trying to read the message.').'</p>'
+			.'<p>'.T_('We are striving to keep this site free of inappropriate messages and misbehaving users. Despite our efforts, if you identify misbehaving users, please be sure to report them by using the \'Report this user\' feature that you will find on their profile.').'</p>'
+		.'</div>';
 }
 
 // init params
@@ -88,7 +101,7 @@ $params = array_merge( array(
 if( isset( $edited_Thread ) )
 {
 	global $action;
-	$action = 'create';
+	$action = !empty( $action ) ? $action : 'create';
 	require $inc_path.'messaging/views/_message_list.view.php';
 }
 

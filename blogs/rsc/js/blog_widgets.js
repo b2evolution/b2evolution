@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  * @author yabs - http://innervisions.org.uk/
- * @version $Id: blog_widgets.js 7157 2014-07-21 10:01:15Z yura $
+ * @version $Id: blog_widgets.js 7158 2014-07-21 10:07:51Z yura $
  */
 
 

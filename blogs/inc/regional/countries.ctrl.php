@@ -27,7 +27,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id$
+ * @version $Id: countries.ctrl.php 6134 2014-03-08 07:48:07Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -143,8 +143,8 @@ switch( $action )
 			$edited_Country->set( 'preferred', 1 );
 			$Messages->add( sprintf( T_('Added to preferred countries (%s, #%d).'), $edited_Country->name, $edited_Country->ID ), 'success' );
 
-			if( $edited_Country->get( 'status' ) == '' )
-			{ // If status was 'unknown' and country is became pref now, We should change country to trusted status
+			if( ! $edited_Country->get( 'status' ) )
+			{ // If the country status is empty ( which means 'unknown' ) and the coutnry was marked as prefrerred, than the status must be changed to 'trusted'
 				$edited_Country->set( 'status', 'trusted' );
 			}
 		}

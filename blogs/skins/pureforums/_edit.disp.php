@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage pureforums
  *
- * @version $Id$
+ * @version $Id: _edit.disp.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -129,8 +129,8 @@ $Form->begin_form( 'inskin', '', $params );
 	// These fields are required on preview mode
 	$Form->hidden( 'titletag', $edited_Item->get( 'titletag' ) );
 	$Form->hidden( 'post_excerpt', $edited_Item->get( 'excerpt' ) );
-	$Form->hidden( 'metadesc', $edited_Item->get_setting( 'post_metadesc' ) );
-	$Form->hidden( 'custom_headers', $edited_Item->get_setting( 'post_custom_headers' ) );
+	$Form->hidden( 'metadesc', $edited_Item->get_setting( 'metadesc' ) );
+	$Form->hidden( 'metakeywords', $edited_Item->get_setting( 'metakeywords' ) );
 
 	if( $edited_Item->get( 'urltitle' ) != '' )
 	{	// post_urltitle can be defined from request param
@@ -153,7 +153,8 @@ $Form->begin_form( 'inskin', '', $params );
 		}
 		$Form->hidden( 'trackback_url', $trackback_url );
 		$Form->hidden( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ) );
-		$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'post_expiry_delay' ) );
+		$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'comment_expiry_delay' ) );
+		$Form->hidden( 'goal_ID', $edited_Item->get_setting( 'goal_ID' ) );
 		$Form->hidden( 'item_order', $edited_Item->order );
 
 		$creator_User = $edited_Item->get_creator_User();

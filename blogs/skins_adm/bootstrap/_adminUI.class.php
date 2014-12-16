@@ -22,7 +22,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _adminUI.class.php 6339 2014-03-26 10:10:38Z manuel $
+ * @version $Id: _adminUI.class.php 7713 2014-12-01 06:35:17Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -247,6 +247,9 @@ class AdminUI extends AdminUI_general
 					'head_title' => '<div class="panel-heading fieldset_title">$title$<span class="pull-right">$global_icons$</span></div>'."\n",
 					'filters_start' => '<div class="filters panel-body form-inline">',
 					'filters_end' => '</div>',
+					'messages_start' => '<div class="messages form-inline">',
+					'messages_end' => '</div>',
+					'messages_separator' => '<br />',
 					'list_start' => '<div class="table_scroll">'."\n"
 					               .'<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0">'."\n",
 						'head_start' => "<thead>\n",
@@ -329,7 +332,7 @@ class AdminUI extends AdminUI_general
 					'title_fmt' => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
 					'no_title_fmt' => '<span style="float:right">$global_icons$</span>'."\n",
 					'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$><div class="panel panel-default">'."\n"
-															.'<legend class="panel-heading" $title_attribs$>$fieldset_title$</legend><div class="panel-body">'."\n",
+															.'<legend class="panel-heading" $title_attribs$>$fieldset_title$</legend><div class="panel-body $class$">'."\n",
 					'fieldset_end' => '</div></div></fieldset></div>'."\n",
 					'fieldstart' => '<div class="form-group" $ID$>'."\n",
 					'labelclass' => 'control-label col-xs-2',
@@ -446,7 +449,7 @@ function openModalWindow( body_html, width, height, transparent, title, button )
 
 	if( jQuery( '#modal_window' ).length == 0 )
 	{ // Build modal window
-		var modal_html = '<div id=\"modal_window\" class=\"modal fade' + css_classes + '\" style=\"width:' + width + style_height + '\"><div class=\"modal-dialog\"><div class=\"modal-content\">';
+		var modal_html = '<div id=\"modal_window\" class=\"modal fade' + css_classes + '\" style=\"width:' + width + style_height + '\"><div class=\"modal-dialog\" style=\"height:100%;display:table-cell;\"><div class=\"modal-content\">';
 		if( typeof title != 'undefined' && title != '' )
 		{
 			modal_html += '<div class=\"modal-header\">' +
@@ -517,6 +520,7 @@ function openModalWindow( body_html, width, height, transparent, title, button )
 		options = 'show';
 	}
 	jQuery( '#modal_window' ).modal( options );
+	jQuery( '#modal_window' ).css( 'display', 'table' )
 
 	jQuery( '#modal_window').on( 'hidden', function ()
 	{ // Remove modal window on hide event to draw new window in next time with new title and button

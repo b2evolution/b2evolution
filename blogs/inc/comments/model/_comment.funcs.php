@@ -25,7 +25,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _comment.funcs.php 7246 2014-08-20 12:35:51Z yura $
+ * @version $Id: _comment.funcs.php 7247 2014-08-20 12:36:46Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -66,7 +66,7 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 
 		if( !$count_expired )
 		{
-			$count_SQL->FROM_add( 'LEFT JOIN T_items__item_settings as expiry_setting ON comment_item_ID = iset_item_ID AND iset_name = "post_expiry_delay"' );
+			$count_SQL->FROM_add( 'LEFT JOIN T_items__item_settings as expiry_setting ON comment_item_ID = iset_item_ID AND iset_name = "comment_expiry_delay"' );
 			$count_SQL->WHERE_and( 'expiry_setting.iset_value IS NULL OR expiry_setting.iset_value = "" OR TIMESTAMPDIFF(SECOND, comment_date, '.$DB->quote( date2mysql( $servertimenow ) ).') < expiry_setting.iset_value' );
 		}
 	}
@@ -351,10 +351,10 @@ function add_jsban( $url )
 {
 	global $admin_url;
 
-	$url = rawurlencode( get_ban_domain( $url ) );
-	$ban_url = $admin_url.'?ctrl=antispam&amp;action=ban&amp;keyword='.$url.'&amp;'.url_crumb('antispam');
+	$ban_domain = get_ban_domain( $url );
+	$ban_url = $admin_url.'?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode( $ban_domain ).'&amp;'.url_crumb('antispam');
 
-	return '<a id="ban_url" href="'.$ban_url.'" onclick="ban_url(\''.$url.'\'); return false;">'.get_icon( 'ban' ).'</a>';
+	return '<a id="ban_url" href="'.$ban_url.'" onclick="ban_url(\''.$ban_domain.'\'); return false;">'.get_icon( 'ban' ).'</a>';
 }
 
 
@@ -367,11 +367,33 @@ function add_jsban( $url )
 function add_ban_icons( $content )
 {
 	global $current_User;
+
 	if( ! $current_User->check_perm( 'spamblacklist', 'edit' ) )
-	{
+	{ // Current user has no permission to edit the spam contents
 		return $content;
 	}
 
+	if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false )
+	{ // Add icons only outside <code> and <pre>
+		return callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]+class="codeblock"[^>]*>.*?</\1>~is',
+				'add_ban_icons_callback' );
+	}
+	else
+	{
+		return add_ban_icons_callback( $content );
+	}
+}
+
+
+/**
+ * Callback function to add a javascript ban action icon after each url in the given content
+ *
+ * @param string Comment content
+ * @return string the content with a ban icon after each url if the user has spamblacklist permission, the incoming content otherwise
+ */
+function add_ban_icons_callback( $content )
+{
 	$atags = get_atags( $content );
 	$imgtags = get_imgtags( $content );
 	$urls = get_urls( $content );
@@ -381,7 +403,24 @@ function add_ban_icons( $content )
 	$i = 0; // url counter
 	$j = 0; // "a" tag counter
 	$k = 0; // "img" tag counter
-	while( isset($urls[$i]) )
+
+	// Remove the duplicated <a> tags from array
+	$atags_fixed = array();
+	foreach( $atags as $atag )
+	{
+		if( preg_match( '#href="([^"]+)"#', $atag, $matches ) && ! isset( $atags_fixed[ $matches[1] ] ) )
+		{
+			$atags_fixed[ $matches[1] ] = $atag;
+		}
+	}
+	$atags = array();
+	foreach( $atags_fixed as $atag )
+	{
+		$atags[] = $atag;
+	}
+
+	$used_urls = array();
+	while( isset( $urls[$i] ) )
 	{ // there is unprocessed url
 		$url = $urls[$i];
 		if( validate_url( $url, 'posting', false ) )
@@ -389,13 +428,19 @@ function add_ban_icons( $content )
 			$i++;
 			continue;
 		}
+		if( in_array( $url, $used_urls ) )
+		{ // skip already passed url
+			$i++;
+			continue;
+		}
+		$used_urls[] = $url;
 		while( isset( $imgtags[$k] ) && ( strpos( $content, $imgtags[$k] ) < $from ) )
-		{ // skipp already passed img tags
+		{ // skip already passed img tags
 			$k++;
 		}
 
 		$pos = strpos( $content, $url, $from );
-		$length = evo_strlen($url);
+		$length = utf8_strlen($url);
 		$i++;
 
 		// check img tags
@@ -544,7 +589,7 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	// else -> user is logged in and account was activated
 
 	$register_link = '';
-	if( ( !$is_logged_in ) && ( $Settings->get( 'newusers_canregister' ) ) && ( $Settings->get( 'registration_is_public' ) ) )
+	if( ( !$is_logged_in ) && ( $Settings->get( 'newusers_canregister' ) == 'yes' ) && ( $Settings->get( 'registration_is_public' ) ) )
 	{
 		$register_link = '<p>'.sprintf( T_( 'If you have no account yet, you can <a href="%s">register now</a>...<br />(It only takes a few seconds!)' ), get_user_register_url( $item_url, 'reg to post comment' ) ).'</p>';
 	}
@@ -638,7 +683,7 @@ function display_comment_replies( $comment_ID, $params = array(), $level = 1 )
 			'comment_error_start' => '<div class="bComment" id="comment_error">',
 			'comment_error_end'   => '</div>',
 			'link_to'             => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
-			'author_link_text'    => 'login', // avatar | only_avatar | login | nickname | firstname | lastname | fullname | preferredname
+			'author_link_text'    => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 		), $params );
 
 	if( isset( $CommentReplies[ $comment_ID ] ) )
@@ -772,150 +817,8 @@ function echo_comment_moderate_js()
 	{
 		return false;
 	}
-?>
-<script type="text/javascript">
-/* <![CDATA[ */
-function fadeIn( selector, color )
-{
-	if( jQuery( selector ).length == 0 )
-	{
-		return;
-	}
-	if( jQuery( selector ).get(0).tagName == 'TR' )
-	{ // Fix selector, <tr> cannot have a css property background-color
-		selector = selector + ' td';
-	}
-	var bg_color = jQuery( selector ).css( 'backgroundColor' );
-	jQuery( selector ).animate( { backgroundColor: color }, 200 );
-	return bg_color;
-}
 
-function fadeInStatus( selector, status )
-{
-	switch( status )
-	{
-		case 'published':
-			return fadeIn( selector, '#99EE44' );
-		case 'community':
-			return fadeIn( selector, '#2E8BB9' );
-		case 'protected':
-			return fadeIn( selector, '#FF9C2A' );
-		case 'review':
-			return fadeIn( selector, '#CC0099' );
-	}
-}
-
-// Display voting tool when JS is enable
-jQuery( '.vote_spam' ).show();
-
-// Set comments vote
-function setCommentVote( id, type, vote )
-{
-	var row_selector = '#comment_' + id;
-	var highlight_class = '';
-	var color = '';
-	switch(vote)
-	{
-		case 'spam':
-			color = fadeIn( row_selector, '#ffc9c9' );
-			highlight_class = 'roundbutton_red';
-			break;
-		case 'notsure':
-			color = fadeIn( row_selector, '#bbbbbb' );
-			break;
-		case 'ok':
-			color = fadeIn( row_selector, '#bcffb5' );
-			highlight_class = 'roundbutton_green';
-			break;
-	}
-
-	if( highlight_class != '' )
-	{
-		jQuery( '#vote_'+type+'_'+id ).find( 'a.roundbutton, span.roundbutton' ).addClass( highlight_class );
-	}
-
-	jQuery.ajax({
-	type: "POST",
-	url: "<?php echo get_samedomain_htsrv_url(); ?>anon_async.php",
-	data:
-		{ "blogid": "<?php echo $Blog->ID; ?>",
-			"commentid": id,
-			"type": type,
-			"vote": vote,
-			"action": "set_comment_vote",
-			"crumb_comment": "<?php echo get_crumb('comment'); ?>",
-		},
-	success: function(result)
-		{
-			if( color != '' )
-			{ // Revert the color
-				fadeIn( row_selector, color );
-			}
-			jQuery("#vote_"+type+"_"+id).after( ajax_debug_clear( result ) );
-			jQuery("#vote_"+type+"_"+id).remove();
-		}
-	});
-}
-
-// Set comment status
-function setCommentStatus( id, status, redirect_to )
-{
-	var row_selector = '[id=comment_' + id + ']';
-	var color = fadeInStatus( row_selector, status );
-
-	jQuery.ajax({
-	type: 'POST',
-	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
-	data:
-		{ 'blogid': '<?php echo $Blog->ID; ?>',
-			'commentid': id,
-			'status': status,
-			'action': 'moderate_comment',
-			'redirect_to': redirect_to,
-			'crumb_comment': '<?php echo get_crumb('comment'); ?>',
-		},
-	success: function(result)
-		{
-			if( color != '' )
-			{ // Revert the color
-				fadeIn( row_selector, color );
-			}
-			var statuses = ajax_debug_clear( result ).split( ':' );
-			var new_status = statuses[0];
-			if( new_status == '' )
-			{ // Status was not changed
-				return;
-			}
-			var class_name = jQuery( row_selector ).attr( 'class' );
-			class_name = class_name.replace( /vs_([a-z]+)/g, 'vs_' + new_status );
-			jQuery( row_selector ).attr( 'class', class_name );
-			update_moderation_buttons( row_selector, statuses[1], statuses[2] );
-		}
-	});
-}
-
-// Add classes for first and last roundbuttons, because css pseudo-classes don't support to exclude hidden elements
-function update_moderation_buttons( selector, raise_status, lower_status )
-{
-	var parent_selector = '.roundbutton_group ';
-	if( typeof( selector ) != 'undefined' )
-	{
-		parent_selector = selector + ' ' + parent_selector;
-	}
-	selector = parent_selector + '.roundbutton_text';
-
-	// Clear previous classes of first and last visible buttons
-	jQuery( selector ).removeClass( 'first-child last-child btn_next_status' );
-	// Make the raise and lower button are visible
-	jQuery( selector + '.btn_raise_' + raise_status ).addClass( 'btn_next_status' );
-	jQuery( selector + '.btn_lower_' + lower_status ).addClass( 'btn_next_status' );
-	// Add classes for first and last buttons to fix round corners
-	jQuery( selector + ':visible:first' ).addClass( 'first-child' );
-	jQuery( selector + ':visible:last' ).addClass( 'last-child' );
-}
-/* ]]> */
-</script>
-<?php
+	load_funcs( 'comments/model/_comment_js.funcs.php' );
 }
 
 
@@ -1046,7 +949,7 @@ function comment_mass_delete_process( $mass_type, $deletable_comments_query )
 
 
 /**
- * Delete the comments by keyword
+ * Delete the comments by the given condition with all of it's cascade objects
  *
  * @param string SQL "where" clause
  * @param array comment ids to delete - it should be set when the ids are known instead of the "where" clause
@@ -1084,10 +987,10 @@ function comments_delete_where( $sql_where, $comment_ids = NULL )
 	$files_IDs = $DB->get_col( $files_SQL->get() );
 
 	// Delete the comment data from the related tables
-	$temp_Comment = new Comment();
-	if( ! empty( $temp_Comment->delete_cascades ) )
+	$comment_delete_cascades = Comment::get_delete_cascades();
+	if( ! empty( $comment_delete_cascades ) )
 	{
-		foreach( $temp_Comment->delete_cascades as $cascade )
+		foreach( $comment_delete_cascades as $cascade )
 		{
 			$DB->query( 'DELETE
 				 FROM '.$cascade['table'].'
@@ -1228,7 +1131,7 @@ function comments_results_block( $params = array() )
 	}
 
 	global $current_User;
-	if( !$current_User->check_perm( 'users', 'edit' ) )
+	if( !$current_User->check_perm( 'users', 'moderate' ) )
 	{	// Check minimum permission:
 		return;
 	}

@@ -39,6 +39,7 @@ if( param( 'thrd_ID', 'integer', '', true) )
 switch( $action )
 {
 	case 'create':
+	case 'preview':
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'messaging_threads' );
 		break;
@@ -58,7 +59,7 @@ switch( $action )
 switch( $action )
 {
 	case 'new':
-		if( has_cross_country_restriction() && empty( $current_User->ctry_ID ) )
+		if( has_cross_country_restriction( 'users' ) && empty( $current_User->ctry_ID ) )
 		{ // Cross country contact is restricted but user country is not set
 			$Messages->add( T_('Please specify your country before attempting to contact other users.') );
 			header_redirect( get_user_profile_url() );
@@ -103,6 +104,22 @@ switch( $action )
 			header_redirect( '?ctrl=threads', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
+
+		init_tokeninput_js();
+
+		break;
+
+	case 'preview': // Preview new thread
+		// Stop a request from the blocked IP addresses or Domains
+		antispam_block_request();
+
+		if( check_create_thread_limit() )
+		{ // max new threads limit reached, don't allow to create new thread
+			debug_die( 'Invalid request, new conversation limit already reached!' );
+		}
+
+		// Create required Thread and Message objects without inserting in DB
+		$creating_success = create_new_thread();
 
 		init_tokeninput_js();
 
@@ -158,6 +175,8 @@ switch( $action )
 		break;
 }
 
+init_plugins_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
+
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
 $AdminUI->breadcrumbpath_add( T_('Messages'), '?ctrl=threads' );
 $AdminUI->breadcrumbpath_add( T_('Conversations'), '?ctrl=threads' );
@@ -192,6 +211,7 @@ switch( $action )
 
 	case 'new':
 	case 'create':
+	case 'preview':
 		$AdminUI->disp_view( 'messaging/views/_thread.form.php' );
 		break;
 

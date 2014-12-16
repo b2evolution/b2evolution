@@ -10,7 +10,7 @@
  * @package evoskins
  * @subpackage photoalbum
  *
- * @version $Id: index.main.php 7160 2014-07-21 12:13:35Z yura $
+ * @version $Id: index.main.php 7789 2014-12-09 16:35:43Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -63,6 +63,18 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <div class="pageHeader">
 
+	<h1 id="pageTitle"><a href="<?php $Blog->disp( 'url', 'raw' ) ?>"><?php $Blog->disp( 'name', 'htmlbody' ) ?></a></h1>
+
+	<?php
+		skin_widget( array(
+			// CODE for the widget:
+			'widget' => 'member_count',
+			// Optional display params
+			'before' => '(',
+			'after'  => ')',
+		) );
+	?>
+
 	<div class="top_menu floatright">
 		<?php
 			// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
@@ -83,8 +95,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		?>
 	</div>
 
-	<h1 id="pageTitle"><a href="<?php $Blog->disp( 'url', 'raw' ) ?>"><?php $Blog->disp( 'name', 'htmlbody' ) ?></a></h1>
-
+	<div class="clear"></div>
 </div>
 
 <?php
@@ -140,7 +151,7 @@ if( $disp == 'single' )
 	}
 } // ------------------- END OF NAVIGATION BAR FOR ALBUM(POST) ------------------- ?>
 
-<div class="bPosts">
+<div class="bPosts<?php echo in_array( $disp, array( 'front', 'posts', 'single', 'page', 'mediaidx' ) ) ? ' full_width' : '' ?>">
 
 <!-- =================================== START OF MAIN AREA =================================== -->
 
@@ -218,10 +229,15 @@ if( $disp == 'single' )
 	<?php
 		// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
 		skin_include( '$disp$', array(
-				'disp_single' => '',		// We already handled this case above
-				'disp_page'   => '',		// We already handled this case above
-				'mediaidx_thumb_size' => $Skin->get_setting( 'mediaidx_thumb_size' ),
-				'author_link_text' => 'preferredname',
+				'disp_single' => '', // We already handled this case above
+				'disp_page'   => '', // We already handled this case above
+				'mediaidx_thumb_size'  => $Skin->get_setting( 'mediaidx_thumb_size' ),
+				'author_link_text'     => 'preferredname',
+				'login_page_before'    => '<div class="bPostContent login_block"><div class="bDetails">',
+				'login_page_after'     => '</div></div>',
+				'register_page_before' => '<div class="bPostContent login_block"><div class="bDetails">',
+				'register_page_after'  => '</div></div>',
+				'display_abort_link'   => ( $Blog->get_setting( 'allow_access' ) == 'public' ), // Display link to abort login only when it is really possible
 			) );
 		// Note: you can customize any of the sub templates included here by
 		// copying the matching php file into your skin directory.

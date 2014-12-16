@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _file.funcs.php 7808 2014-12-12 11:45:53Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -523,7 +523,7 @@ function process_filename( & $filename, $force_validation = false )
 	}
 
 	// check if the file name contains consecutive dots, and replace them with one dot without warning ( keep only one dot '.' instead of '...' )
-	$filename = preg_replace( '/\.(\.)+/', '.', evo_strtolower( $filename ) );
+	$filename = preg_replace( '/\.(\.)+/', '.', utf8_strtolower( $filename ) );
 
 	if( $error_filename = validate_filename( $filename ) )
 	{ // invalid file name
@@ -586,7 +586,7 @@ function validate_filename( $filename, $allow_locked_filetypes = NULL )
 			}
 			else
 			{	// Filename hasn't an allowed extension
-				return sprintf( T_('&laquo;%s&raquo; is a locked extension.'), evo_htmlentities($match[1]) );
+				return sprintf( T_('&laquo;%s&raquo; is a locked extension.'), htmlentities($match[1]) );
 			}
 		}
 		else
@@ -661,15 +661,18 @@ function check_rename( & $newname, $is_dir, $dir_path, $allow_locked_filetypes )
 	{
 		if( $error_dirname = validate_dirname( $newname ) )
 		{ // invalid directory name
+			syslog_insert( sprintf( 'Invalid name is detected for folder %s', '<b>'.$newname.'</b>' ), 'warning', 'file' );
 			return $error_dirname;
 		}
 		if( $dirpath_max_length < ( strlen( $dir_path ) + strlen( $newname ) ) )
 		{ // The new path length would be too long
+			syslog_insert( sprintf( 'The renamed file %s is too long for the folder', '<b>'.$newname.'</b>' ), 'warning', 'file' );
 			return T_('The new name is too long for this folder.');
 		}
 	}
 	elseif( $error_filename = validate_filename( $newname, $allow_locked_filetypes ) )
 	{ // Not a file name or not an allowed extension
+		syslog_insert( sprintf( 'The renamed file %s has an unrecognized extension', '<b>'.$newname.'</b>' ), 'warning', 'file' );
 		return $error_filename;
 	}
 
@@ -1137,6 +1140,9 @@ function file_controller_build_tabs()
 					'text' => T_('Moderation'),
 					'href' => '?ctrl=filemod',
 					'entries' => array(
+						'likes' => array(
+							'text' => T_('Likes'),
+							'href' => '?ctrl=filemod&amp;tab=likes' ),
 						'suspicious' => array(
 							'text' => T_('Suspicious'),
 							'href' => '?ctrl=filemod&amp;tab=suspicious' ),
@@ -1206,6 +1212,11 @@ function rename_cachefolders( $oldname, $newname )
 function delete_cachefolders( $Log = NULL )
 {
 	global $media_path, $Settings;
+
+	if( !isset( $Settings ) )
+	{	// This function can be called on install process before initialization of $Settings, Exit here
+		return false;
+	}
 
 	// Get this, just in case someone comes up with a different naming:
 	$evocache_foldername = $Settings->get( 'evocache_foldername' );
@@ -1329,10 +1340,10 @@ function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perm
 	}
 
 	// Get param arrays for all uploaded files:
-	$uploadfile_title = param( 'uploadfile_title', 'array/string', array() );
-	$uploadfile_alt = param( 'uploadfile_alt', 'array/string', array() );
-	$uploadfile_desc = param( 'uploadfile_desc', 'array/string', array() );
-	$uploadfile_name = param( 'uploadfile_name', 'array/string', array() );
+	$uploadfile_title = param( 'uploadfile_title', 'array:string', array() );
+	$uploadfile_alt = param( 'uploadfile_alt', 'array:string', array() );
+	$uploadfile_desc = param( 'uploadfile_desc', 'array:string', array() );
+	$uploadfile_name = param( 'uploadfile_name', 'array:string', array() );
 
 	// LOOP THROUGH ALL UPLOADED FILES AND PROCCESS EACH ONE:
 	foreach( $_FILES['uploadfile']['name'] as $lKey => $lName )
@@ -1429,6 +1440,7 @@ function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perm
 		if( $error_filename = process_filename( $newName, !$warn_invalid_filenames ) )
 		{ // Not a valid file name or not an allowed extension:
 			$failedFiles[$lKey] = $error_filename;
+			syslog_insert( sprintf( 'The uploaded file %s has an unrecognized extension', '<b>'.$newName.'</b>' ), 'warning', 'file' );
 			// Abort upload for this file:
 			continue;
 		}
@@ -1497,6 +1509,7 @@ function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perm
 		}
 		elseif( ! move_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey], $newFile->get_full_path() ) )
 		{
+			syslog_insert( sprintf( 'File %s could not be uploaded', '<b>'.$newFile->get_name().'</b>' ), 'warning', 'file', $newFile->ID );
 			$failedFiles[$lKey] = T_('An unknown error occurred when moving the uploaded file on the server.');
 			// Abort upload for this file:
 			continue;
@@ -1546,6 +1559,7 @@ function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perm
 
 		// Store File object into DB:
 		$newFile->dbsave();
+		syslog_insert( sprintf( 'File %s was uploaded', '<b>'.$newFile->get_name().'</b>' ), 'info', 'file', $newFile->ID );
 		$uploadedFiles[] = $newFile;
 	}
 
@@ -1777,6 +1791,7 @@ function check_file_exists( $fm_FileRoot, $path, $newName, $image_info = NULL )
 			$newName = fix_filename_length( $newName, strrpos( $newName, '-' ) );
 			if( $error_filename = process_filename( $newName, true ) )
 			{ // The file name is still not valid
+				syslog_insert( sprintf( 'Invalid file name %s has found during file exists check', '<b>'.$newName.'</b>' ), 'warning', 'file' );
 				debug_die( 'Invalid file name has found during file exists check: '.$error_filename );
 			}
 		}
@@ -1920,6 +1935,7 @@ function copy_file( $file_path, $root_ID, $path, $check_perms = true )
 	// validate file name
 	if( $error_filename = process_filename( $newName, true ) )
 	{	// Not a valid file name or not an allowed extension:
+		syslog_insert( sprintf( 'File %s is not valid or not an allowed extension', '<b>'.$newName.'</b>' ), 'warning', 'file' );
 		// Abort import for this file:
 		return NULL;
 	}
@@ -2039,6 +2055,7 @@ function create_profile_picture_links()
 					$fileName = $lFile->get_name();
 					if( process_filename( $fileName ) )
 					{ // The file has invalid file name, don't create in the database
+						syslog_insert( sprintf( 'Invalid file name %s has been found in a user folder', '<b>'.$fileName.'</b>' ), 'info', 'user', $iterator_User->ID );
 						// TODO: asimo> we should collect each invalid file name here, and send an email to the admin
 						continue;
 					}

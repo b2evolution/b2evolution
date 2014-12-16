@@ -26,7 +26,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  *
- * @version $Id$
+ * @version $Id: _file_create_posts.form.php 6513 2014-04-18 06:18:18Z attila $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -43,7 +43,7 @@ $Form = new Form( NULL, 'pre_post_publish' );
 $Form->begin_form( 'fform', T_('Posts preview') );
 $Form->hidden_ctrl();
 
-$images_list = param( 'fm_selected', 'array/string' );
+$images_list = param( 'fm_selected', 'array:string' );
 foreach( $images_list as $key => $item )
 {
 	$Form->hidden( 'fm_selected['.$key.']', $item );

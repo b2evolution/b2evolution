@@ -26,7 +26,7 @@
  * @author sakichan: Nobuo SAKIYAMA.
  * @author vegarg: Vegar BERG GULDAL.
  *
- * @version $Id$
+ * @version $Id: _trackback.funcs.php 6134 2014-03-08 07:48:07Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -71,7 +71,7 @@ function trackback(
 {
 	global $app_name, $app_version, $Blog, $Messages;
 
-	$trackback_message = T_('Sending trackback to:').' '.evo_htmlspecialchars($trackback_url).' ';
+	$trackback_message = T_('Sending trackback to:').' '.htmlspecialchars($trackback_url).' ';
 
 	$title = rawurlencode($title);
 	$excerpt = rawurlencode($excerpt);

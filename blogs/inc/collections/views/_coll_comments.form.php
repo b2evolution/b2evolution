@@ -16,7 +16,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _coll_comments.form.php 7423 2014-10-14 07:52:43Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -138,6 +138,9 @@ $Form->begin_fieldset( T_('Feedback options') . get_manual_link('comment-feedbac
 		$trackbacks_title = !$edited_Blog->get( 'allowtrackbacks' ) ? ' ['.T_('Admin').']' : '';
 		$Form->checkbox( 'blog_allowtrackbacks', $edited_Blog->get( 'allowtrackbacks' ), T_('Trackbacks').$trackbacks_title, $trackbacks_warning.T_('Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.') );
 	}
+
+	$Form->checkbox( 'autocomplete_usernames', $edited_Blog->get_setting( 'autocomplete_usernames' ),
+		T_( 'Autocomplete usernames in back-office' ), T_( 'Check to enable autocomplete usernames after entered sign "@" in the comment form' ) );
 
 	echo '</div>';
 

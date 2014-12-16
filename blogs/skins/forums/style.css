@@ -751,7 +751,7 @@ div.extended_search_form input.search_field {
 }
 div.extended_search_form input.search_field {
 	margin: 5px 10px 0 0;
-	width: 897px;
+	width: 90%;
 }
 div.extended_search_form .search_option {
 	float: left;
@@ -973,6 +973,10 @@ td.custom_content {
 td.custom_content p {
 	text-align: left;
 	margin: 2px 0;
+}
+
+.search_title {
+	color: #069;
 }
 
 /* Forum icons */

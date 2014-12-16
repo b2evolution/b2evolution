@@ -7,7 +7,7 @@
  *
  * @package conf
  *
- * @version $Id: _advanced.php 7585 2014-11-06 12:18:40Z yura $
+ * @version $Id: _advanced.php 7752 2014-12-04 12:44:33Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -567,9 +567,8 @@ $install_path = $basepath.$install_subdir;  // You should not need to change thi
  *
  * @global string $cache_subdir
  */
-$cache_subdir = 'cache/';                // Subdirectory relative to base
-$cache_path = $basepath.$cache_subdir;   // You should not need to change this
-
+$cache_subdir = '_cache/';             // Subdirectory relative to base
+$cache_path = $basepath.$cache_subdir; // You should not need to change this
 
 /**
  * Location of the root media folder.
@@ -745,6 +744,13 @@ $unread_message_reminder_delay = array(
 
 
 /**
+ * Cleanup scheduled jobs threshold given in days.
+ * The scheduled jobs older than x ( = threshold value ) days will be removed
+ */
+$cleanup_jobs_threshold = 45;
+
+
+/**
  * Enable a workaround to allow accessing posts with URL titles ending with
  * a dash (workaround for old bug).
  *
@@ -777,6 +783,12 @@ $tags_dash_fix = 0;
  */
 $use_hacks = false;
 
+
+/**
+ * If user tries to login 10 times during X seconds we refuse login (even if password is correct)
+ * If set to 0, then there is never a lockout
+ */
+$failed_logins_lockout = 600; // 10 minutes
 
 
 /**
@@ -818,8 +830,21 @@ $library_cdn_urls = array(
 		// - Future proof (will they continue to serve old versions of the library in the future?)
 		// - Secure (who guarantees the code is genuine?)
 		//'#bootstrap_typeahead#' => array( '//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.10.1/typeahead.bundle.min.js', '//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.10.1/typeahead.bundle.js' ),
+		//'#easypiechart#' => array( '//cdnjs.cloudflare.com/ajax/libs/easy-pie-chart/2.1.1/jquery.easypiechart.min.js', '//cdnjs.cloudflare.com/ajax/libs/easy-pie-chart/2.1.1/jquery.easypiechart.js' ),
 		//'#scrollto#' => array( '//cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/1.4.2/jquery.scrollTo.min.js' ),
 		//'#touchswipe#' => array( '//cdn.jsdelivr.net/jquery.touchswipe/1.6.5/jquery.touchSwipe.min.js', '//cdn.jsdelivr.net/jquery.touchswipe/1.6.5/jquery.touchSwipe.js' ),
+		/*'#jqplot#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/jquery.jqplot.min.js' ),
+			'#jqplot_barRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.barRenderer.min.js' ),
+			'#jqplot_canvasAxisTickRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.canvasAxisTickRenderer.min.js' ),
+			'#jqplot_canvasTextRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.canvasTextRenderer.min.js' ),
+			'#jqplot_categoryAxisRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.categoryAxisRenderer.min.js' ),
+			'#jqplot_enhancedLegendRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.enhancedLegendRenderer.min.js' ),
+			'#jqplot_highlighter#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.highlighter.min.js' ),
+			'#jqplot_canvasOverlay#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.canvasOverlay.min.js' ),
+			'#jqplot_donutRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.donutRenderer.min.js' ),
+			'#jqplot_css#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/jquery.jqplot.min.css' ),*/
+		//'#tinymce#' => array( '//tinymce.cachefly.net/4.1/tinymce.min.js' ),
+		//'#flowplayer#' => array( '//releases.flowplayer.org/5.4.4/flowplayer.min.js', '//releases.flowplayer.org/5.4.4/flowplayer.js' ),
 		//'#mediaelement#' => array( '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/js/mediaelement-and-player.min.js', '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/js/mediaelement-and-player.js' ),
 		//'#mediaelement_css#' => array( '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.min.css', '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.css' ),
 	);
@@ -841,10 +866,26 @@ $library_local_urls = array(
 		'#bootstrap_css#' => array( 'bootstrap/bootstrap.min.css', 'bootstrap/bootstrap.css' ),
 		'#bootstrap_theme_css#' => array( 'bootstrap/bootstrap-theme.min.css', 'bootstrap/bootstrap-theme.css' ),
 		'#bootstrap_typeahead#' => array( 'bootstrap/typeahead.bundle.min.js', 'bootstrap/typeahead.bundle.js' ),
+		'#easypiechart#' => array( 'jquery/jquery.easy-pie-chart.min.js', 'jquery/jquery.easy-pie-chart.js' ),
 		'#scrollto#' => array( 'jquery/jquery.scrollto.min.js', 'jquery/jquery.scrollto.js' ),
 		'#touchswipe#' => array( 'jquery/jquery.touchswipe.min.js', 'jquery/jquery.touchswipe.js' ),
+		'#jqplot#' => array( 'jquery/jqplot/jquery.jqplot.min.js' ),
+		'#jqplot_barRenderer#' => array( 'jquery/jqplot/jqplot.barRenderer.min.js' ),
+		'#jqplot_canvasAxisTickRenderer#' => array( 'jquery/jqplot/jqplot.canvasAxisTickRenderer.min.js' ),
+		'#jqplot_canvasTextRenderer#' => array( 'jquery/jqplot/jqplot.canvasTextRenderer.min.js' ),
+		'#jqplot_categoryAxisRenderer#' => array( 'jquery/jqplot/jqplot.categoryAxisRenderer.min.js' ),
+		'#jqplot_enhancedLegendRenderer#' => array( 'jquery/jqplot/jqplot.enhancedLegendRenderer.min.js' ),
+		'#jqplot_highlighter#' => array( 'jquery/jqplot/jqplot.highlighter.min.js' ),
+		'#jqplot_canvasOverlay#' => array( 'jquery/jqplot/jqplot.canvasOverlay.min.js' ),
+		'#jqplot_donutRenderer#' => array( 'jquery/jqplot/jqplot.donutRenderer.min.js' ),
+		'#jqplot_css#' => array( 'jquery/jquery.jqplot.min.css', 'jquery/jquery.jqplot.css' ),
+		'#tinymce#' => array( 'tiny_mce/tinymce.min.js' ),
+		'#tinymce_gzip#' => array( 'tiny_mce/tinymce.gzip.js' ),
+		'#flowplayer#' => array( 'flowplayer/flowplayer.min.js', 'flowplayer/flowplayer.js' ),
 		'#mediaelement#' => array( 'mediaelement/mediaelement-and-player.min.js', 'mediaelement/mediaelement-and-player.js' ),
 		'#mediaelement_css#' => array( 'mediaelement/mediaelementplayer.min.css', 'mediaelement/mediaelementplayer.css' ),
+		'#jcrop#' => array( 'jquery/jquery.jcrop.min.js', 'jquery/jquery.jcrop.js' ),
+		'#jcrop_css#' => array( 'jquery/jcrop/jquery.jcrop.min.css', 'jquery/jcrop/jquery.jcrop.css' ),
 	);
 
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----

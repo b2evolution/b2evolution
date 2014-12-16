@@ -57,9 +57,9 @@ $params = array_merge( array(
 						) );
 					echo '<br /> ';
 					echo ' Published on ';
-					$Item->issue_time(array('time_format' => 'F jS, Y',) );
+					$Item->issue_time( array( 'time_format' => 'F jS, Y' ) );
 					echo ' @ ';
-					$Item->issue_time();
+					$Item->issue_time( array( 'time_format' => '#short_time' ) );
 					echo ', using ';
 					$Item->wordcount();
 					echo ' '.T_('words');
@@ -82,6 +82,9 @@ $params = array_merge( array(
 	<?php
 		// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 		skin_include( '_item_content.inc.php', $params );
+		// Note: You can customize the default item content by copying the generic
+		// /skins/_item_content.inc.php file into the current skin folder.
+		// -------------------------- END OF POST CONTENT -------------------------
 	?>
 	<div class="bSmallPrint">
 		<?php
@@ -104,7 +107,6 @@ $params = array_merge( array(
 				'link_text_one'	=>	'#',
 				'link_text_more'=>	'#',
 				'link_title'	=>	'#',
-				'use_popup'	=>	false,
 				) );
 			$Item->feedback_link( array(
 				'type'		=>	'trackbacks',
@@ -114,7 +116,6 @@ $params = array_merge( array(
 				'link_text_one'	=>	'#',
 				'link_text_more'=>	'#',
 				'link_title'	=>	'#',
-				'use_popup'	=>	false,
 				) );
 			$Item->edit_link( array( // Link to backoffice for editing
 				'before'	=>	' &nbsp; ',

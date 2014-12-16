@@ -17,7 +17,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _user.disp.php 7610 2014-11-12 07:26:34Z yura $
+ * @version $Id: _user.disp.php 7609 2014-11-12 07:07:48Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -180,6 +180,25 @@ $ProfileForm->begin_fieldset( T_('Identity') );
 		$ProfileForm->info( T_( 'My age group' ), sprintf( T_('from %d to %d years old'), $User->get('age_min'), $User->get('age_max') ) );
 	}
 
+	$user_organizations = $User->get_organizations();
+	$count_organizations = count( $user_organizations );
+	if( $count_organizations > 0 )
+	{
+		$org_names = array();
+		foreach( $user_organizations as $org )
+		{
+			if( empty( $org->url ) )
+			{ // Display just a text
+				$org_names[] = $org->name;
+			}
+			else
+			{ // Make a link for organization
+				$org_names[] = '<a href="'.$org->url.'" rel="nofollow" target="_blank">'.$org->name.'</a>';
+			}
+		}
+		$ProfileForm->info( $count_organizations > 1 ? T_( 'Organizations' ) : T_( 'Organization' ), implode( '<br />', $org_names ) );
+	}
+
 	echo '</div>';
 
 	if( $is_logged_in && $current_User->check_status( 'can_view_user', $user_ID ) )
@@ -314,6 +333,12 @@ $ProfileForm->begin_fieldset( T_( 'Reputation' ) );
 	$ProfileForm->info( T_('Number of posts'), $User->get_reputation_posts() );
 
 	$ProfileForm->info( T_('Comments'), $User->get_reputation_comments() );
+
+	$ProfileForm->info( T_('Photos'), $User->get_reputation_files( array( 'file_type' => 'image' ) ) );
+
+	$ProfileForm->info( T_('Audio'), $User->get_reputation_files( array( 'file_type' => 'audio' ) ) );
+
+	$ProfileForm->info( T_('Other files'), $User->get_reputation_files( array( 'file_type' => 'other' ) ) );
 
 	$ProfileForm->info( T_('Spam fighter score'), $User->get_reputation_spam() );
 

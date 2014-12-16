@@ -82,7 +82,7 @@ $Comment = & $params['Comment'];
 				break;
 		}
 	?>
-	<em>on <?php $Comment->date() ?> at <?php $Comment->time( 'H:i' ) ?>
+	<em>on <?php $Comment->date() ?> at <?php $Comment->time( '#short_time' ) ?>
 
 	<?php
 		$comment_Item = & $Comment->get_Item();

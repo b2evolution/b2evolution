@@ -34,7 +34,7 @@
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  * @author efy-sergey: Evo Factory / Sergey.
  *
- * @version $Id$
+ * @version $Id: _itemtype.class.php 6428 2014-04-08 16:30:39Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -64,16 +64,26 @@ class ItemType extends DataObject
 		// Allow inseting specific IDs
 		$this->allow_ID_insert = true;
 
-		$this->delete_restrictions = array(
-				array( 'table'=>'T_items__item', 'fk'=>'post_ptyp_ID', 'msg'=>T_('%d related items') ), // "Lignes de visit reports"
-			);
-
- 		if( $db_row != NULL )
+		if( $db_row != NULL )
 		{
 			$this->ID      		 = $db_row->ptyp_ID 		;
 			$this->name  			 = $db_row->ptyp_name 	;
 		}
 	}
+
+
+	/**
+	 * Get delete restriction settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_restrictions()
+	{
+		return array(
+				array( 'table'=>'T_items__item', 'fk'=>'post_ptyp_ID', 'msg'=>T_('%d related items') ), // "Lignes de visit reports"
+			);
+	}
+
 
 	/**
 	 * Load data from Request form fields.

@@ -31,7 +31,7 @@
  *
  * @todo separate object inits and permission checks
  *
- * @version $Id: users.ctrl.php 6911 2014-06-17 15:35:37Z yura $
+ * @version $Id: users.ctrl.php 7564 2014-11-03 13:12:45Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -192,7 +192,7 @@ if( !$Messages->has_errors() )
 
 			if( param( 'deltype', 'string', '', true ) == 'spammer' )
 			{ // If we delete user as spammer we also should remove the comments and the messages
-				$edited_User->delete_cascades = array_merge( $edited_User->delete_cascades, array(
+				$edited_User->add_relations( 'cascades', array(
 						array( 'table'=>'T_comments', 'fk'=>'comment_author_user_ID', 'msg'=>T_('%d comments by this user') ),
 						array( 'table'=>'T_messaging__message', 'fk'=>'msg_author_user_ID', 'msg'=>T_('%d private messages sent by this user') ),
 					) );
@@ -210,11 +210,18 @@ if( !$Messages->has_errors() )
 					$msg = sprintf( T_('User &laquo;%s&raquo; deleted.'), $edited_User->dget( 'login' ) );
 				}
 
+				$send_reportpm = param( 'send_reportpm', 'integer' );
+				if( $send_reportpm )
+				{ // Get all user IDs who reported for the deleted user
+					$report_user_IDs = get_user_reported_user_IDs( $edited_User->ID );
+				}
+
 				$deleted_user_ID = $edited_User->ID;
 				$deleted_user_email = $edited_User->get( 'email' );
+				$deleted_user_login = $edited_User->get( 'login' );
 				$edited_User->dbdelete( $Messages );
-				unset($edited_User);
-				forget_param('user_ID');
+				unset( $edited_User );
+				forget_param( 'user_ID' );
 				$Messages->add( $msg, 'success' );
 
 				// Find other users with the same email address
@@ -222,6 +229,11 @@ if( !$Messages->has_errors() )
 				if( $message_same_email_users !== false )
 				{
 					$Messages->add( $message_same_email_users, 'note' );
+				}
+
+				if( $send_reportpm )
+				{ // Send an info message to users who reported this deleted user
+					user_send_report_message( $report_user_IDs, $deleted_user_login );
 				}
 
 				$action = 'list';
@@ -367,12 +379,14 @@ $AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
 if( $tab == 'stats' )
 {	// Users stats
 	$AdminUI->breadcrumbpath_add( T_('Stats'), '?ctrl=users&amp;tab=stats' );
+	// Init jqPlot charts
+	init_jqplot_js();
 }
 else
 {	// Users list
 	$AdminUI->breadcrumbpath_add( T_('List'), '?ctrl=users' );
 	$AdminUI->top_block = get_user_quick_search_form();
-	if( $current_User->check_perm( 'users', 'edit', false ) )
+	if( $current_User->check_perm( 'users', 'moderate', false ) )
 	{	// Include to edit user level
 		require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 	}
@@ -425,7 +439,21 @@ switch( $action )
 			$confirm_messages[] = array( $message_same_email_users, 'note' );
 		}
 
-		$edited_User->confirm_delete( $msg, 'user', $action, get_memorized( 'action' ), $confirm_messages );
+		// Add a checkbox on deletion form
+		$delete_form_params = array();
+		if( $Settings->get( 'reportpm_enabled' ) )
+		{ // If this feature is enabled
+			$user_count_reports = count( get_user_reported_user_IDs( $edited_User->ID ) );
+			if( $user_count_reports > 0 )
+			{ // If the user has been reported at least one time
+				$delete_form_params['before_submit_button'] = '<p><label>'
+						.'<input type="checkbox" id="send_reportpm" name="send_reportpm" value="1"'.( $deltype == 'spammer' ? ' checked="checked"' : '' ).' /> '
+						.sprintf( T_('Send an info message to %s users who reported this account.'), $user_count_reports )
+					.'</label></p>';
+			}
+		}
+
+		$edited_User->confirm_delete( $msg, 'user', $action, get_memorized( 'action' ), $confirm_messages, $delete_form_params );
 
 		// Display user identity form:
 		$AdminUI->disp_view( 'users/views/_user_identity.form.php' );

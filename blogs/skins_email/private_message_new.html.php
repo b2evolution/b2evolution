@@ -8,7 +8,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
- * @version $Id$
+ * @version $Id: private_message_new.html.php 7639 2014-11-13 15:07:37Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -36,7 +36,7 @@ $UserCache = & get_UserCache();
 $recipient_User = $UserCache->get_by_ID( $params['recipient_ID'] );
 $from_User = ( $params['from_User'] == NULL ) ? $current_User : $params['from_User'];
 
-echo '<p>';
+echo '<p'.emailskin_style( '.p' ).'>';
 if( $params['new_thread'] )
 {
 	echo sprintf( T_( '%s just sent you a message with the title %s.' ), $from_User->get_colored_login( array( 'mask' => '$avatar$ $login$' ) ), '<b>'.$Message->Thread->title.'</b>' );
@@ -53,26 +53,26 @@ echo "</p>\n";
 
 if( $recipient_User->check_perm( 'pm_notif', 'full' ) )
 {
-	echo '<div class="email_ugc">'."\n";
-	echo '<p>'.nl2br( evo_htmlentities( $Message->get('text'), ENT_COMPAT, $evo_charset ) ).'</p>';
+	echo '<div class="email_ugc"'.emailskin_style( 'div.email_ugc' ).'>'."\n";
+	echo '<p'.emailskin_style( '.p' ).'>'.nl2br( htmlentities( $Message->get('text'), ENT_COMPAT, $evo_charset ) ).'</p>';
 	echo "</div>\n";
 
 	// Buttons:
-	echo '<div class="buttons">'."\n";
-	echo get_link_tag( $params['message_link'], T_( 'Read full conversation' ), 'button_green' )."\n";
+	echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
+	echo get_link_tag( $params['message_link'], T_( 'Read full conversation' ), 'div.buttons a+a.button_green' )."\n";
 	echo "</div>\n";
 }
 else
 {
 	// Buttons:
-	echo '<div class="buttons">'."\n";
-	echo get_link_tag( $params['message_link'], T_( 'Read full message' ), 'button_green' )."\n";
+	echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
+	echo get_link_tag( $params['message_link'], T_( 'Read full message' ), 'div.buttons a+a.button_green' )."\n";
 	echo "</div>\n";
 }
 
 if( count( $params['other_unread_threads'] ) > 0 )
 { // Display other unread threads
-	echo '<p>'.T_( 'In addition to this new message, you also have unread messages in the following conversations' ).":</p>\n";
+	echo '<p'.emailskin_style( '.p' ).'>'.T_( 'In addition to this new message, you also have unread messages in the following conversations' ).":</p>\n";
 	echo '<ul>';
 	foreach( $params['other_unread_threads'] as $unread_thread )
 	{
@@ -83,7 +83,7 @@ if( count( $params['other_unread_threads'] ) > 0 )
 
 // Footer vars:
 $params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notifications about new private messages, click here:' )
-			.' <a href="'.$htsrv_url.'quick_unsubscribe.php?type=new_msg&user_ID=$user_ID$&key=$unsubscribe_key$">'
+			.' <a href="'.$htsrv_url.'quick_unsubscribe.php?type=new_msg&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
 			.T_('instant unsubscribe').'</a>.';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------

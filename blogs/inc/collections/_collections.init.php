@@ -761,11 +761,11 @@ class collections_Module extends Module
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog, ),
 							'features' => array(
 								'text' => T_('Features'),
-								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$blog,
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=home&amp;blog='.$blog,
 								'entries' => array(
 									'home' => array(
 										'text' => T_('Front page'),
-										'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=home&amp;blog='.$blog ),
+										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=home&amp;blog='.$blog ),
 									'features' => array(
 										'text' => T_('Posts'),
 										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$blog ),
@@ -861,10 +861,52 @@ class collections_Module extends Module
 								'text' => T_('Check for updates'),
 								'href' => $admin_url.'?ctrl=upgrade' ),
 							),
-				) ) );
+				) ), 'remotepublish' );
 
 		}
 
+	}
+
+
+	/**
+	 * Get the collections module cron jobs
+	 *
+	 * @see Module::get_cron_jobs()
+	 */
+	function get_cron_jobs()
+	{
+		return array(
+			'create-post-by-email' => array(
+				'name'   => T_('Create posts by email'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_post_by_email.job.php',
+				'params' => NULL,
+			),
+			'send-comment-notifications' => array( // not user schedulable
+				'name'   => T_('Send notifications about new comment on &laquo;%s&raquo;'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_comment_notifications.job.php',
+				'params' => NULL, // 'comment_ID', 'except_moderators'
+			),
+			'send-post-notifications' => array( // not user schedulable
+				'name'   => T_('Send notifications for &laquo;%s&raquo;'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_post_notifications.job.php',
+				'params' => NULL, // 'item_ID'
+			),
+			'send-unmoderated-comments-reminders' => array(
+				'name'   => T_('Send reminders about comments awaiting moderation'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_comment_moderation_reminder.job.php',
+				'params' => NULL,
+			),
+			'send-unmoderated-posts-reminders' => array(
+				'name'   => T_('Send reminders about posts awaiting moderation'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_post_moderation_reminder.job.php',
+				'params' => NULL,
+			),
+		);
 	}
 
 
@@ -923,7 +965,7 @@ class collections_Module extends Module
 
 					$LinkOwner->after_unlink_action( $deleted_link_ID );
 
-					$Messages->add( $LinkOwner->translate( 'Link has been deleted from $ownerTitle$.' ), 'success' );
+					$Messages->add( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'success' );
 
 					if( $current_User->check_perm( 'files', 'edit' ) )
 					{ // current User has permission to edit/delete files

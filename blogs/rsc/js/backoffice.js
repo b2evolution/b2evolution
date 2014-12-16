@@ -1,7 +1,7 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
- * @version $Id: backoffice.js 7509 2014-10-24 07:31:38Z yura $
+ * @version $Id: backoffice.js 7510 2014-10-24 07:34:51Z yura $
  */
 
 jQuery( document ).ready( function()

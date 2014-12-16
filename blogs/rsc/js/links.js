@@ -20,7 +20,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author attila: Attila Simo
  *
- * @version $Id: $
+ * @version $Id: links.js 7520 2014-10-27 09:29:11Z yura $
  */
 
 function evo_display_position_onchange( selectInput, url, crumb )
@@ -52,23 +52,24 @@ function evo_display_position_onchange( selectInput, url, crumb )
 
 
 /**
- * Insert an image tag into the post ( example: [image:123:caption text] )
+ * Insert inline tag into the post ( example: [image:123:caption text] | [file:123:caption text] )
  *
+ * @param strin Type: 'image', 'file'
  * @param integer File ID
  * @param string Caption text
  */
-function insert_image_link( link_ID, caption )
+function insert_inline_link( type, link_ID, caption )
 {
 	var b2evoCanvas = window.parent.document.getElementById('itemform_post_content');
 	if( b2evoCanvas != null )
-	{	// Canvas exists
-		var insert_tag = '[image:' + link_ID + ':' + caption + ']';
+	{ // Canvas exists
+		var insert_tag = '[' + type + ':' + link_ID + ':' + caption + ']';
 		// Insert an image tag
 		textarea_wrap_selection( b2evoCanvas, insert_tag, '', 0, window.parent.document );
 
 		var $position_selector = jQuery( '#display_position_' + link_ID );
 		if( $position_selector.length != 0 )
-		{	// Change the position to 'Inline'
+		{ // Change the position to 'Inline'
 			if( $position_selector.val() != 'inline' )
 			{
 				$position_selector.val( 'inline' ).change();
@@ -94,7 +95,7 @@ function item_unlink( link_ID )
 			return;
 		}
 		var content = textarea_obj.val();
-		var regexp = new RegExp( '\\\[image:' + link_ID + ':?[^\\\]]*\\\]', 'ig' );
+		var regexp = new RegExp( '\\\[(image|file|inline):' + link_ID + ':?[^\\\]]*\\\]', 'ig' );
 		textarea_obj.val( content.replace( regexp, '' ) );
 	}
 }

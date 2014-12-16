@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _coll_search_form.widget.php 9 2011-10-24 22:32:00Z fplanque $
+ * @version $Id: _user_login.widget.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -249,7 +249,7 @@ class user_login_Widget extends ComponentWidget
 
 			if( $this->get_param('greeting_show') )
 			{	// Display greeting text
-				$user_login = $current_User->get_identity_link( array( 'link_text' => 'login', 'display_bubbletip' => false ) );
+				$user_login = $current_User->get_identity_link( array( 'link_text' => 'name', 'display_bubbletip' => false ) );
 				echo ' <strong class="greeting">'.str_replace( '$login$', $user_login, $this->get_param('greeting_text') ).'</strong>';
 			}
 

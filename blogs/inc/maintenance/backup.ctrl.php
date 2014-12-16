@@ -22,7 +22,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id: backup.ctrl.php 7341 2014-09-30 09:47:23Z yura $
+ * @version $Id: backup.ctrl.php 7342 2014-09-30 09:48:12Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -97,13 +97,31 @@ switch( $action )
 
 		evo_flush();
 
+		// Lock b2evolution while backing up
 		$success = true;
-		if( $maintenance_mode = param( 'bk_maintenance_mode', 'boolean' ) )
-		{	// Enable maintenance mode
-			$success = switch_maintenance_mode( true, 'all', T_( 'System backup is in progress. Please reload this page in a few minutes.' ) );
+		$lock_type = param( 'bk_lock_type', 'string' );
+		switch( $lock_type )
+		{
+			case 'maintenance_lock':
+				// Enable maintenance lock
+				$success = switch_maintenance_lock( true );
+				// Make sure we disable the maintenance lock if PHP dies
+				register_shutdown_function( 'switch_maintenance_lock', false );
+				break;
 
-			// Make sure we exit the maintenance mode if PHP dies
-			register_shutdown_function( 'switch_maintenance_mode', false, '', true );
+			case 'maintenance_mode':
+				// Enable maintenance mode
+				$success = switch_maintenance_mode( true, 'all', T_( 'System backup is in progress. Please reload this page in a few minutes.' ) );
+				// Make sure we exit the maintenance mode if PHP dies
+				register_shutdown_function( 'switch_maintenance_mode', false, '', true );
+				break;
+
+			case 'open': // Don't lock the site
+				break;
+
+			default:
+				debug_die( 'Invalid system lock type received!' );
+				break;
 		}
 
 		if( $success )
@@ -112,9 +130,19 @@ switch( $action )
 			$current_Backup->start_backup();
 		}
 
-		if( $maintenance_mode )
-		{	// Disable maintenance mode
-			switch_maintenance_mode( false, 'all' );
+		// Unlock b2evolution
+		switch( $lock_type )
+		{
+			case 'maintenance_lock': // Disable maintenance lock
+				switch_maintenance_lock( false );
+				break;
+
+			case 'maintenance_mode': // Disable maintenance mode
+				switch_maintenance_mode( false, 'all' );
+				break;
+
+			default: // Nothing to do because the b2evoltuion was not locked
+				break;
 		}
 
 		$Form->end_form();

@@ -11,7 +11,7 @@
  * @package evoskins
  * @subpackage pureforums
  *
- * @version $Id: _item_comment_form.inc.php 7644 2014-11-14 08:12:53Z yura $
+ * @version $Id: _item_comment_form.inc.php 7645 2014-11-14 08:16:13Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -144,7 +144,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 			else
 			{ // Try to get params from $_COOKIE through the param() function
 				$comment_author = param_cookie( $cookie_name, 'string', '' );
-				$comment_author_email = evo_strtolower( param_cookie( $cookie_email, 'string', '' ) );
+				$comment_author_email = utf8_strtolower( param_cookie( $cookie_email, 'string', '' ) );
 				$comment_author_url = param_cookie( $cookie_url, 'string', '' );
 			}
 			if( empty($comment_author_url) )

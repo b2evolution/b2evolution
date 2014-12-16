@@ -33,7 +33,7 @@
  * @author sakichan: Nobuo SAKIYAMA.
  * @author Simon Willison.
  *
- * @version $Id$
+ * @version $Id: _xhtml_validator.class.php 6697 2014-05-15 10:51:11Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -233,7 +233,7 @@ class XHTML_Validator
 					break;
 			}
 			$pos = xml_get_current_byte_index($this->parser);
-			$xml_error_string .= ' near <code>'.evo_htmlspecialchars( evo_substr( $xhtml, $this->last_checked_pos, $pos-$this->last_checked_pos+20 ) ).'</code>';
+			$xml_error_string .= ' near <code>'.htmlspecialchars( utf8_substr( $xhtml, $this->last_checked_pos, $pos-$this->last_checked_pos+20 ) ).'</code>';
 
 			$this->html_error( T_('Parser error: ').$xml_error_string );
 		}

@@ -35,7 +35,7 @@
  * @author blueyed: Daniel HAHLER
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
- * @version $Id$
+ * @version $Id: _dataobject.class.php 7564 2014-11-03 13:12:45Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -78,12 +78,12 @@ class DataObject
 	/**
 	 * Relations that may restrict deletion.
 	 */
-	var $delete_restrictions = array();
+	var $delete_restrictions = NULL;
 
 	/**
 	 * Relations that will cascade deletion.
 	 */
-	var $delete_cascades = array();
+	var $delete_cascades = NULL;
 
 
 	/**
@@ -107,6 +107,109 @@ class DataObject
 		$this->datemodified_field = $datemodified_field;
 		$this->creator_field      = $creator_field;
 		$this->lasteditor_field   = $lasteditor_field;
+	}
+
+
+	/**
+	 * Initialize relations for restrict and cascade deletion.
+	 */
+	function init_relations()
+	{
+		if( ! is_null( $this->delete_cascades ) || ! is_null( $this->delete_restrictions ) )
+		{ // Initialize the relations only once
+			return;
+		}
+
+		$this->delete_restrictions = $this->get_delete_restrictions();
+		$this->delete_cascades = $this->get_delete_cascades();
+	}
+
+
+	/**
+	 * Get delete restriction settings
+	 *
+	 * Note: In some special cases the objects may require additional restriction values.
+	 * The extra restrictions must be added with the $this->add_relations() function.
+	 *
+	 * @return array
+	 */
+	static function get_delete_restrictions()
+	{
+		/* Examples of the delete restrictions:
+
+		return array(
+				array( 'table'=>'T_table_name', 'fk'=>'foreign_column_ID', 'msg'=>T_('%d rows'),
+					'and_condition' => 'foreign_column_name = "value"' ),
+			);
+
+		*/
+
+		return array();
+	}
+
+
+	/**
+	 * Get delete cascade settings
+	 *
+	 * Note: In some special cases ( E.g. in case of spammer user delete ) the objects may require additional cascade values.
+	 * The extra cascade options must be added with the $this->add_relations() function.
+	 *
+	 * @return array
+	 */
+	static function get_delete_cascades()
+	{
+		/* Examples of the delete cascades:
+
+		return array(
+				array( 'table'=>'T_table_name', 'fk'=>'foreign_column_ID', 'msg'=>T_('%d rows'),
+					'and_condition' => 'foreign_column_name = "value"' ),
+			);
+
+		*/
+
+		return array();
+	}
+
+
+	/**
+	 * Add additional relations for specific cases
+	 * E.g. On spammer user delete the user comments must be also deleted
+	 *
+	 * @param string relation type: restrictions, cascades
+	 * @param unknown_type $new_relations
+	 */
+	function add_relations( $type, $new_relations )
+	{
+		// Make sure relations was initialized
+		$this->init_relations();
+
+		switch( $type )
+		{
+			case 'restrictions':
+				if( is_null( $this->delete_restrictions ) )
+				{
+					$this->delete_restrictions = $new_relations;
+				}
+				else
+				{
+					$this->delete_restrictions = array_merge( $this->delete_restrictions, $new_relations );
+				}
+				break;
+
+			case 'cascades':
+				if( is_null( $this->delete_cascades ) )
+				{
+					$this->delete_cascades = $new_relations;
+				}
+				else
+				{
+					$this->delete_cascades = array_merge( $this->delete_cascades, $new_relations );
+				}
+				break;
+
+			default:
+				debug_die( 'Invalid realtion type received.' );
+		}
 	}
 
 
@@ -136,7 +239,10 @@ class DataObject
 	{
 		global $DB, $Plugins, $localtimenow, $current_User;
 
-		if( $this->ID == 0 ) { debug_die( 'New object cannot be updated!' ); }
+		if( $this->ID == 0 )
+		{
+			debug_die( 'New object cannot be updated!' );
+		}
 
 		if( count( $this->dbchanges ) == 0 )
 		{
@@ -339,7 +445,9 @@ class DataObject
 
 		if( $this->ID == 0 ) { debug_die( 'Non persistant object cannot be deleted!' ); }
 
-		if( count($this->delete_cascades) )
+		$this->init_relations();
+
+		if( ! empty( $this->delete_cascades ) )
 		{	// The are cascading deletes to be performed
 
 			// Start transaction:
@@ -365,6 +473,12 @@ class DataObject
 				if( isset( $restriction['and_condition'] ) )
 				{
 					$more_restriction .= ' AND ( '.$restriction['and_condition'].' )';
+				}
+
+				// Check if there is a 'delete where' callback fucntion to use it instead of simple db delete query
+				if( isset( $restriction['delete_where_callback'] ) && function_exists( $restriction['delete_where_callback'] ) )
+				{ // Delete objects with all of it's
+					call_user_func( $restriction['delete_where_callback'], $restriction['fk'].' = '.$this->ID.$more_restriction );
 				}
 
 				$DB->query( '
@@ -433,14 +547,21 @@ class DataObject
 	/**
 	 * Check relations for restrictions or cascades.
 	 * @todo dh> Add link to affected items, e.g. items when trying to delete an attachment, where it gets used.
-	 * 
+	 *
 	 * @return Messages object with the restriction messages
 	 */
 	function check_relations( $what, $ignore = array(), $addlink = false )
 	{
 		global $DB;
 
+		$this->init_relations();
+
 		$restriction_Messages = new Messages();
+
+		if( is_null( $this->$what ) )
+		{ // The relations are not defined
+			return $restriction_Messages;
+		}
 
 		foreach( $this->$what as $restriction )
 		{
@@ -514,10 +635,15 @@ class DataObject
 	 * @param string "action" param value to use (hidden field)
 	 * @param array Hidden keys (apart from "action")
 	 * @param array Additional messages for restriction messages, array( '0' - message text, '1' - message type )
+	 * @param array Params
 	 */
-	function confirm_delete( $confirm_title, $crumb_name, $delete_action, $hiddens, $additional_messages = array() )
+	function confirm_delete( $confirm_title, $crumb_name, $delete_action, $hiddens, $additional_messages = array(), $params = array() )
 	{
 		global $Messages;
+
+		$params = array_merge( array(
+				'before_submit_button' => '', // Additional text before button to submit a form
+			), $params );
 
 		$block_item_Widget = new Widget( 'block_item' );
 
@@ -553,6 +679,7 @@ class DataObject
 			$Form->hidden( 'action', $delete_action );
 			$Form->hidden( 'confirm', 1 );
 			$Form->hidden( 'redirect_to', $redirect_to );
+			echo $params['before_submit_button'];
 			$Form->button( array( 'submit', '', T_('I am sure!'), 'DeleteButton' ) );
 		$Form->end_form();
 

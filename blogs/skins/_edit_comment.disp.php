@@ -13,7 +13,7 @@
  *
  * @package evoskins
  *
- * @version $Id: _edit_comment.disp.php 7644 2014-11-14 08:12:53Z yura $
+ * @version $Id: _edit_comment.disp.php 7645 2014-11-14 08:16:13Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -61,6 +61,7 @@ $Form->begin_form( 'bComment' );
 		$Form->text_input( 'newcomment_author_url', $edited_Comment->author_url, 20, T_('Website URL'), '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
 	}
 
+	ob_start();
 	echo '<div class="comment_toolbars">';
 	// CALL PLUGINS NOW:
 	$Plugins->trigger_event( 'AdminDisplayToolbar', array(
@@ -69,8 +70,17 @@ $Form->begin_form( 'bComment' );
 			'Comment' => $edited_Comment,
 		) );
 	echo '</div>';
+	$comment_toolbar = ob_get_clean();
 
-	$Form->textarea_input( 'content', $comment_content, $display_params['textarea_lines'], $display_params['form_comment_text'], array( 'cols' => 38, 'class' => 'bComment', 'id' => $dummy_fields[ 'content' ] ) );
+	// Message field:
+	$form_inputstart = $Form->inputstart;
+	$Form->inputstart .= $comment_toolbar;
+	$Form->textarea_input( 'content', $comment_content, $display_params['textarea_lines'], $display_params['form_comment_text'], array(
+			'cols' => 38,
+			'class' => 'bComment autocomplete_usernames',
+			'id' => $dummy_fields[ 'content' ]
+		) );
+	$Form->inputstart = $form_inputstart;
 
 	// set b2evoCanvas for plugins
 	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';

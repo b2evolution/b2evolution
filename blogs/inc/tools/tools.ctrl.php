@@ -9,7 +9,7 @@
  * @package admin
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: tools.ctrl.php 7516 2014-10-27 05:56:16Z yura $
+ * @version $Id: tools.ctrl.php 7543 2014-10-29 08:48:17Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -17,9 +17,15 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_funcs('plugins/_plugin.funcs.php');
 load_funcs('tools/model/_dbmaintenance.funcs.php');
 load_funcs('tools/model/_tool.funcs.php');
+load_funcs( 'tools/model/_system.funcs.php' );
 
 // load item class
 load_class( 'items/model/_item.class.php', 'Item' );
+
+if( $current_User->check_perm( 'options', 'edit' ) && $action != 'utf8upgrade' && system_check_charset_update() )
+{ // DB charset is required to update
+	$Messages->add( sprintf( T_("WARNING: Some of your tables have different charset than the expected %s. It is strongly recommended to upgrade your database charset by running the tool <a %s>Upgrade your DB to UTF-8</a>."), utf8_strtoupper( $evo_charset ), 'href="'.$admin_url.'?ctrl=tools&amp;action=utf8upgrade&amp;'.url_crumb( 'tools' ).'"' ) );
+}
 
 param( 'tab', 'string', '', true );
 param( 'tab3', 'string', 'tools', true );
@@ -80,9 +86,12 @@ if( empty($tab) )
 
 		case 'del_commentprecache':
 			// Clear pre-renderered comment cache (DB)
-			$DB->query('DELETE FROM T_comments__prerendering WHERE 1=1');
+			dbm_delete_commentprecache();
+			break;
 
-			$Messages->add( sprintf( T_('Removed %d cached entries.'), $DB->rows_affected ), 'success' );
+		case 'del_messageprecache':
+			// Clear pre-renderered message cache (DB)
+			dbm_delete_messageprecache();
 			break;
 
 		case 'del_pagecache':

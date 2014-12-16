@@ -32,7 +32,7 @@
  *
  * @todo Allow applying / re-checking of the known data, not just after an update!
  *
- * @version $Id: antispam.ctrl.php 7628 2014-11-13 08:07:09Z yura $
+ * @version $Id: antispam.ctrl.php 7629 2014-11-13 08:09:08Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -53,7 +53,7 @@ param( 'confirm', 'string' );
 param( 'keyword', 'string', '', true );
 param( 'domain', 'string' );
 param( 'filteron', 'string', '', true );
-param( 'filter', 'array/string', array() );
+param( 'filter', 'array:string', array() );
 
 $tab = param( 'tab', 'string', '', true );
 $tab3 = param( 'tab3', 'string', '', true );
@@ -90,7 +90,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'spamblacklist', 'edit', true ); // TODO: This should become different for 'edit'/'add' perm level - check for 'add' here.
 
-		$keyword = evo_substr( $keyword, 0, 80 );
+		$keyword = utf8_substr( $keyword, 0, 80 );
 		param( 'delhits', 'integer', 0 );
 		$all_statuses = get_visibility_statuses( 'keys', array( 'trash', 'redirected' ) );
 		$delstatuses = array();
@@ -107,9 +107,9 @@ switch( $action )
 
 		// Check if the string is too short,
 		// it has to be a minimum of 5 characters to avoid being too generic
-		if( evo_strlen($keyword) < 5 )
+		if( utf8_strlen($keyword) < 5 )
 		{
-			$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; is too short, it has to be a minimum of 5 characters!'), evo_htmlspecialchars($keyword) ), 'error' );
+			$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; is too short, it has to be a minimum of 5 characters!'), htmlspecialchars($keyword) ), 'error' );
 			break;
 		}
 
@@ -119,14 +119,14 @@ switch( $action )
 												WHERE hit_referer LIKE '.$DB->quote('%'.$keyword.'%'),
 												'Delete all banned hit-log entries' );
 
-			$Messages->add( sprintf( T_('Deleted %d logged hits matching &laquo;%s&raquo;.'), $r, evo_htmlspecialchars($keyword) ), 'success' );
+			$Messages->add( sprintf( T_('Deleted %d logged hits matching &laquo;%s&raquo;.'), $r, htmlspecialchars($keyword) ), 'success' );
 		}
 
 		if( $delcomments )
 		{ // select banned comments
 			$del_condition = blog_restrict( $delstatuses );
 			$keyword_cond = '(comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
-							OR comment_author_email LIKE '.$DB->quote('%'.evo_strtolower( $keyword ).'%').'
+							OR comment_author_email LIKE '.$DB->quote('%'.utf8_strtolower( $keyword ).'%').'
 							OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
 							OR comment_content LIKE '.$DB->quote('%'.$keyword.'%').')';
 			// asimo> we don't need transaction here 
@@ -140,14 +140,14 @@ switch( $action )
 			// Delete all comments data from DB
 			$r = comments_delete_where( $keyword_cond.$del_condition );
 
-			$Messages->add( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, evo_htmlspecialchars($keyword) ), 'success' );
+			$Messages->add( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars($keyword) ), 'success' );
 		}
 
 		if( $blacklist_locally )
 		{ // Local blacklist:
 			if( antispam_create( $keyword ) )
 			{
-				$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; has been blacklisted locally.'), evo_htmlspecialchars($keyword) ), 'success' );
+				$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; has been blacklisted locally.'), htmlspecialchars($keyword) ), 'success' );
 				// Redirect so that a reload doesn't write to the DB twice:
 				if( $display_mode != 'js' )
 				{
@@ -248,7 +248,7 @@ switch( $action )
 		$Settings->set( 'antispam_report_to_central', $antispam_report_to_central );
 
 		$changed_weight = false;
-		param( 'antispam_plugin_spam_weight', 'array/integer', array() );
+		param( 'antispam_plugin_spam_weight', 'array:integer', array() );
 		foreach( $antispam_plugin_spam_weight as $l_plugin_ID => $l_weight )
 		{
 			if( ! is_numeric($l_weight) )
@@ -278,7 +278,7 @@ switch( $action )
 		$Settings->set( 'antispam_suspicious_group', param( 'antispam_suspicious_group', 'integer', 0 ) );
 
 		// Trust groups
-		$trust_groups = param( 'antispam_trust_groups', 'array/integer', array() );
+		$trust_groups = param( 'antispam_trust_groups', 'array:integer', array() );
 		$Settings->set( 'antispam_trust_groups', implode( ',', $trust_groups ) );
 
 		if( ! $Messages->has_errors() )
@@ -440,7 +440,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		$bankruptcy_blogs_IDs = param( 'bankruptcy_blogs', 'array/integer', array() );
+		$bankruptcy_blogs_IDs = param( 'bankruptcy_blogs', 'array:integer', array() );
 
 		if( empty( $bankruptcy_blogs ) )
 		{

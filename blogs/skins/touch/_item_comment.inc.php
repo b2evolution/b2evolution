@@ -55,7 +55,7 @@ $Comment = & $params['Comment'];
 		echo '</div>';
 	?>
 		<div class="comdater">
-			<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
+			<?php $Comment->date() ?> @ <?php $Comment->time( '#short_time' ) ?>
 		</div>
 	</div>
 	<div class="combody">

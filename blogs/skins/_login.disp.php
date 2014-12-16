@@ -11,7 +11,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author asimo: Evo Factory / Attila Simo
  *
- * @version $Id: _login.disp.php 7237 2014-08-15 15:30:04Z yura $
+ * @version $Id: _login.disp.php 7771 2014-12-08 08:24:11Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -25,17 +25,18 @@ if( is_logged_in() )
 
 // Default params:
 $params = array_merge( array(
-		'form_title_login'  => '',
-		'form_class_login'  => '',
-		'login_form_inskin' => true,
-		'login_page_before' => '',
-		'login_page_after'  => '',
-		'login_form_before' => '',
-		'login_form_after'  => '',
-		'login_form_class'  => 'bComment',
+		'form_title_login'   => '',
+		'form_class_login'   => '',
+		'login_form_inskin'  => true,
+		'login_page_before'  => '',
+		'login_page_after'   => '',
+		'login_form_before'  => '',
+		'login_form_after'   => '',
+		'login_form_class'   => 'bComment',
+		'display_abort_link' => true,
 	), $params );
 
-$login = evo_strtolower( param( $dummy_fields[ 'login' ], 'string', '' ) );
+$login = utf8_strtolower( param( $dummy_fields[ 'login' ], 'string', '' ) );
 $action = param( 'action', 'string', '' );
 $redirect_to = param( 'redirect_to', 'url', '' );
 $source = param( 'source', 'string', 'inskin login form' );
@@ -59,18 +60,18 @@ $login_form_params = array(
 	'transmit_hashed_password' => $transmit_hashed_password,
 	'inskin' => $params['login_form_inskin'],
 	'form_class' => $params['login_form_class'],
+	'display_abort_link' => $params['display_abort_link'],
 );
 
 echo str_replace( '$form_class$', $params['form_class_login'], $params['login_page_before'] );
 
 display_login_form( $login_form_params );
 
-echo $params['login_page_after'];
-
-echo '<div class="notes standard_login_link"><a href="'.$secure_htsrv_url.'login.php?source='.rawurlencode($source).'&redirect_to='.rawurlencode( $redirect_to ).'">'.T_( 'Use standard login form instead').' &raquo;</a></div>';
+echo '<div class="notes standard_login_link"><a href="'.$secure_htsrv_url.'login.php?source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'">'.T_( 'Use standard login form instead').' &raquo;</a></div>';
 
 echo '<div class="form_footer_notes">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
 
 echo '<div class="clear"></div>';
 
+echo $params['login_page_after'];
 ?>

@@ -27,7 +27,7 @@
  * @author efy-bogdan: Evo Factory / Bogdan.
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id$
+ * @version $Id: groups.ctrl.php 6134 2014-03-08 07:48:07Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -232,7 +232,7 @@ switch ( $action )
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
 $AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
-$AdminUI->breadcrumbpath_add( T_('User groups'), '?ctrl=groups' );
+$AdminUI->breadcrumbpath_add( T_('Groups'), '?ctrl=groups' );
 if( !empty( $edited_Group ) )
 {
 	if( $edited_Group->ID > 0 )
@@ -243,6 +243,10 @@ if( !empty( $edited_Group ) )
 	{	// New group
 		$AdminUI->breadcrumbpath_add( $edited_Group->dget('name'), '?ctrl=groups&amp;action=new' );
 	}
+}
+if( $action == 'list' && $current_User->check_perm( 'users', 'edit', false ) )
+{ // Include to edit group level
+	require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 }
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)

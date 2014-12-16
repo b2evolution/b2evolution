@@ -14,7 +14,7 @@
  *
  * @package install
  *
- * @version $Id: _functions_evoupgrade.php 7332 2014-09-29 11:31:08Z yura $
+ * @version $Id: _functions_evoupgrade.php 7752 2014-12-04 12:44:33Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -419,7 +419,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				continue;
 			}
 			// crop off the baseurl:
-			$blog_siteurl = evo_substr( $blog_siteurl.'/', evo_strlen($baseurl) );
+			$blog_siteurl = utf8_substr( $blog_siteurl.'/', utf8_strlen($baseurl) );
 			// echo ' -> ', $blog_siteurl,'<br />';
 
 			$query_update_blog = "UPDATE T_blogs SET blog_siteurl = '$blog_siteurl' WHERE blog_ID = $blog_ID";
@@ -5025,7 +5025,336 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			END' );
 		task_end();
 
-		// set_upgrade_checkpoint( '11285' );
+		set_upgrade_checkpoint( '11285' );
+	}
+
+	if( $old_db_version < 11300 )
+	{ // part 17 trunk aka "i7"
+
+		task_begin( 'Upgrading locales table...' );
+		db_add_col( 'T_locales', 'loc_shorttimefmt', 'varchar(20) COLLATE ascii_general_ci NOT NULL default "H:i" AFTER loc_timefmt' );
+		task_end();
+		task_begin( 'Creating message prerendering cache table... ' );
+		$DB->query( 'CREATE TABLE T_messaging__prerendering(
+				mspr_msg_ID              INT(11) UNSIGNED NOT NULL,
+				mspr_format              ENUM("htmlbody","entityencoded","xml","text") COLLATE ascii_general_ci NOT NULL,
+				mspr_renderers           TEXT NOT NULL,
+				mspr_content_prerendered MEDIUMTEXT NULL,
+				mspr_datemodified        TIMESTAMP NOT NULL,
+				PRIMARY KEY (mspr_msg_ID, mspr_format)
+			) ENGINE = innodb' );
+		db_add_col( 'T_messaging__message', 'msg_renderers', 'TEXT NOT NULL' );
+		$DB->query( 'UPDATE T_messaging__message SET msg_renderers = "default"' );
+		task_end();
+
+		task_begin( 'Upgrading categories table...' );
+		db_add_col( 'T_categories', 'cat_last_touched_ts', "TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00'" );
+		$DB->query( 'UPDATE T_categories SET cat_last_touched_ts = (
+			SELECT post_last_touched_ts
+			  FROM T_items__item
+			       INNER JOIN T_postcats ON postcat_post_ID = post_ID
+			 WHERE postcat_cat_ID = cat_ID
+			 ORDER BY post_last_touched_ts DESC
+			 LIMIT 1 )' );
+		task_end();
+
+		task_begin( 'Create table for User post read status... ' );
+		$DB->query( 'CREATE TABLE T_users__postreadstatus (
+			uprs_user_ID int(11) unsigned NOT NULL,
+			uprs_post_ID int(11) unsigned NOT NULL,
+			uprs_read_post_ts TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
+			uprs_read_comment_ts TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
+			PRIMARY KEY ( uprs_user_ID, uprs_post_ID )
+			) ENGINE = innodb' );
+		task_end();
+
+		task_begin( 'Create table for System log... ' );
+		$DB->query( "CREATE TABLE T_syslog (
+			slg_ID        INT NOT NULL AUTO_INCREMENT,
+			slg_timestamp TIMESTAMP NOT NULL,
+			slg_origin    ENUM('core', 'plugin') COLLATE ascii_general_ci,
+			slg_origin_ID INT UNSIGNED NULL,
+			slg_object    ENUM('comment', 'item', 'user') COLLATE ascii_general_ci,
+			slg_object_ID INT UNSIGNED NOT NULL,
+			slg_message   VARCHAR(255) NOT NULL,
+			PRIMARY KEY   (slg_ID),
+			INDEX         slg_object (slg_object, slg_object_ID)
+			) ENGINE = myisam" );
+		task_end();
+
+		/*
+		 * ADD UPGRADES FOR i7 BRANCH __ABOVE__ IN THIS BLOCK.
+		 *
+		 * This part will be included in trunk and i7 branches
+		 */
+
+		set_upgrade_checkpoint( '11300' );
+	}
+
+	if( $old_db_version < 11310 )
+	{ // part 18 trunk aka second part of "i7"
+
+		task_begin( 'Upgrading cron tasks table...' );
+		load_funcs( 'cron/_cron.funcs.php' );
+		$DB->begin();
+		$DB->query( 'ALTER TABLE T_cron__task
+			CHANGE COLUMN ctsk_controller ctsk_key varchar(50) COLLATE ascii_general_ci NOT NULL AFTER ctsk_repeat_after,
+			CHANGE COLUMN ctsk_name ctsk_name varchar(255) null COMMENT "Specific name of this task. This value is set only if this job name was modified by an admin user"' );
+		// Update keys from controllers
+		// Important: Cron job sql query result must be converted to ascii charset since the ctsk_key is already ascii( ascii_bin collation )
+		$DB->query( 'UPDATE T_cron__task
+			INNER JOIN ( '.cron_job_sql_query( 'key,ctrl' ).' ) AS temp
+			       ON ctsk_key = CONVERT( temp.task_ctrl USING ascii )
+			SET ctsk_key = temp.task_key' );
+		// Reset names to NULL if its are default
+		$DB->query( $sql = 'UPDATE T_cron__task
+			INNER JOIN ( '.cron_job_sql_query().' ) AS temp
+			        ON ctsk_key = CONVERT( temp.task_key USING ascii ) AND ctsk_name = CONVERT( temp.task_name USING '.$DB->connection_charset.' )
+			SET ctsk_name = NULL' );
+		$DB->commit();
+		task_end();
+
+		task_begin( 'Upgrade table system log... ' );
+		$DB->query( 'ALTER TABLE T_syslog
+			CHANGE COLUMN slg_object slg_object ENUM(\'comment\', \'item\', \'user\', \'file\') COLLATE ascii_general_ci,
+			CHANGE COLUMN slg_object_ID slg_object_ID INT UNSIGNED NULL,
+			ADD    COLUMN slg_user_ID INT UNSIGNED NULL AFTER slg_timestamp,
+			ADD    COLUMN slg_type ENUM(\'info\', \'warning\', \'error\', \'critical_error\') COLLATE ascii_general_ci NOT NULL DEFAULT \'info\' AFTER slg_user_ID' );
+		task_end();
+
+		task_begin( 'Upgrade groups table... ' );
+		db_add_col( 'T_groups', 'grp_level', 'int unsigned DEFAULT 0 NOT NULL AFTER grp_name' );
+		$default_groups_levels = array(
+				'Administrators' => 10,
+				'Moderators' => 8,
+				'Trusted Users' => 6,
+				'Normal Users' => 4,
+				'Misbehaving/Suspect Users' => 2,
+				'Spammers/Restricted Users' => 1
+			);
+		// Build sql query to update group level depending on name
+		$group_level_query = 'SELECT group_name, group_level FROM (';
+		$first_task = true;
+		foreach( $default_groups_levels as $def_group_name => $def_group_level )
+		{
+			if( $first_task )
+			{
+				$group_level_query .= 'SELECT '.$DB->quote( $def_group_name ).' AS group_name, '.$DB->quote( $def_group_level ).' AS group_level';
+				$first_task = false;
+			}
+			else
+			{
+				$group_level_query .= ' UNION SELECT '.$DB->quote( $def_group_name ).', '.$DB->quote( $def_group_level );
+			}
+		}
+		$group_level_query .= ') AS inner_temp';
+		// Set default levels depending on name
+		$DB->query( 'UPDATE T_groups
+			INNER JOIN ( '.$group_level_query.' ) AS temp
+			       ON grp_name = CONVERT( temp.group_name USING '.$DB->connection_charset.' )
+			  SET grp_level = temp.group_level' );
+		// Set default '4' level for all other groups
+		$DB->query( 'UPDATE T_groups
+			  SET grp_level = 4
+			WHERE grp_level = 0' );
+		// Set default user permissions for Moderators group
+		$DB->query( 'UPDATE T_groups__groupsettings
+			  SET gset_value = "moderate"
+			WHERE gset_name = "perm_users"
+			  AND gset_grp_ID = (SELECT grp_ID FROM T_groups WHERE grp_name = "Moderators")' );
+		task_end();
+
+		task_begin( 'Updating general settings...' );
+		$DB->query( 'UPDATE T_settings
+				SET set_value = '.$DB->quote( 'yes' ).'
+			WHERE set_name = '.$DB->quote( 'newusers_canregister' ).'
+				AND set_value = '.$DB->quote( '1' ) );
+		task_end();
+
+		task_begin( 'Creating table for User invitation codes... ' );
+		$DB->query( 'CREATE TABLE T_users__invitation_code (
+			ivc_ID        int(11) unsigned NOT NULL auto_increment,
+			ivc_code      varchar(32) COLLATE ascii_general_ci NOT NULL,
+			ivc_expire_ts TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
+			ivc_source    varchar(30) NULL,
+			ivc_grp_ID    int(4) NOT NULL,
+			PRIMARY KEY ( ivc_ID ),
+			UNIQUE ivc_code ( ivc_code )
+		) ENGINE = innodb' );
+		task_end();
+
+		task_begin( 'Creating table for User organizations... ' );
+		$DB->query( 'CREATE TABLE T_users__organization (
+			org_ID   INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			org_name VARCHAR(255) NOT NULL,
+			org_url  VARCHAR(2000) NULL,
+			PRIMARY KEY ( org_ID ),
+			UNIQUE org_name ( org_name )
+		) ENGINE = innodb' );
+		task_end();
+
+		task_begin( 'Creating table for relations users with organizations... ' );
+		$DB->query( 'CREATE TABLE T_users__user_org (
+			uorg_user_ID  INT(11) UNSIGNED NOT NULL,
+			uorg_org_ID   INT(11) UNSIGNED NOT NULL,
+			uorg_accepted TINYINT(1) DEFAULT 0,
+			PRIMARY KEY ( uorg_user_ID, uorg_org_ID )
+		) ENGINE = innodb' );
+		task_end();
+
+		// Rename item settings:
+		//   "post_custom_headers" to "metakeywords"
+		//   "post_metadesc" to "metadesc"
+		//   "post_expiry_delay" to "comment_expiry_delay"
+		task_begin( 'Upgrading Item Settings...' );
+		$DB->query( 'UPDATE T_items__item_settings
+				  SET iset_name = "metakeywords"
+				WHERE iset_name = "post_custom_headers"' );
+		$DB->query( 'UPDATE T_items__item_settings
+				  SET iset_name = "metadesc"
+				WHERE iset_name = "post_metadesc"' );
+		$DB->query( 'UPDATE T_items__item_settings
+				  SET iset_name = "comment_expiry_delay"
+				WHERE iset_name = "post_expiry_delay"' );
+		task_end();
+
+		task_begin( 'Upgrade table files... ' );
+		db_add_col( 'T_files', 'file_type', "enum('image', 'audio', 'other') COLLATE ascii_general_ci NULL DEFAULT NULL AFTER file_ID" );
+		task_end();
+
+		task_begin( 'Upgrade table posts... ' );
+		$DB->query( 'ALTER TABLE T_items__item
+			CHANGE post_title     post_title     VARCHAR(255) NOT NULL,
+			CHANGE post_renderers post_renderers VARCHAR(255) COLLATE ascii_general_ci NOT NULL' );
+		task_end();
+
+		task_begin( 'Upgrade table post prerendering cache... ' );
+		$DB->query( 'ALTER TABLE T_items__prerendering
+			CHANGE itpr_renderers itpr_renderers VARCHAR(255) COLLATE ascii_general_ci NOT NULL' );
+		task_end();
+
+		task_begin( 'Upgrade table post versions... ' );
+		$DB->query( 'ALTER TABLE T_items__version
+			CHANGE iver_title iver_title VARCHAR(255) NULL' );
+		task_end();
+
+		task_begin( 'Upgrade table comments... ' );
+		$DB->query( 'ALTER TABLE T_comments
+			CHANGE comment_renderers comment_renderers VARCHAR(255) COLLATE ascii_general_ci NOT NULL' );
+		task_end();
+
+		task_begin( 'Upgrade table comment prerendering cache... ' );
+		$DB->query( 'ALTER TABLE T_comments__prerendering
+			CHANGE cmpr_renderers cmpr_renderers VARCHAR(255) COLLATE ascii_general_ci NOT NULL' );
+		task_end();
+
+		task_begin( 'Upgrade table messages... ' );
+		$DB->query( 'ALTER TABLE T_messaging__message
+			CHANGE msg_renderers msg_renderers VARCHAR(255) COLLATE ascii_general_ci NOT NULL' );
+		task_end();
+
+		task_begin( 'Upgrade table message prerendering cache... ' );
+		$DB->query( 'ALTER TABLE T_messaging__prerendering
+			CHANGE mspr_renderers mspr_renderers VARCHAR(255) COLLATE ascii_general_ci NOT NULL' );
+		task_end();
+
+		task_begin( 'Upgrade table user field definitions... ' );
+		$DB->query( 'ALTER TABLE T_users__fielddefs
+			CHANGE ufdf_options ufdf_options VARCHAR(255) NULL DEFAULT NULL' );
+		// Change emtpy ufdf_options to NULL, since it must/may be defined only in case of the list ufdf_type
+		$DB->query( 'UPDATE T_users__fielddefs
+			SET ufdf_options = NULL
+			WHERE ufdf_options = "" AND ufdf_type != "list"');
+		task_end();
+
+		task_begin( 'Upgrade table cron tasks... ' );
+		$DB->query( 'ALTER TABLE T_cron__task
+			CHANGE ctsk_params ctsk_params varchar(255)' );
+		task_end();
+
+		task_begin( 'Upgrading users table...' );
+		db_add_col( 'T_users', 'user_salt', 'CHAR(8) NOT NULL default "" AFTER user_pass' );
+		task_end();
+
+		task_begin( 'Updating users pass storage...' );
+		$DB->query( 'ALTER TABLE T_users MODIFY COLUMN user_pass VARBINARY(32)' );
+		$DB->query( 'UPDATE T_users SET user_pass = UNHEX( user_pass )' );
+		$DB->query( 'ALTER TABLE T_users MODIFY COLUMN user_pass BINARY(16) NOT NULL' );
+		task_end();
+
+		/*
+		 * ADD UPGRADES FOR i7 BRANCH __ABOVE__ IN THIS BLOCK.
+		 *
+		 * This part will be included in trunk and i7 branches
+		 */
+
+		set_upgrade_checkpoint( '11310' );
+	}
+
+	if( $old_db_version < 11320 )
+	{ // part 18.a trunk aka third part of "i7"
+
+		task_begin( 'Update locales to utf-8 charset...' );
+		db_drop_col( 'T_locales', 'loc_charset' );
+		$DB->query( 'UPDATE T_locales
+			SET loc_name = REPLACE( loc_name, "latin1", "utf8" )
+			WHERE loc_locale IN ( "en-US", "en-AU", "en-CA", "en-GB", "en-IL", "en-NZ", "en-SG" )' );
+		$DB->query( 'UPDATE T_users SET user_locale = "en-US" WHERE user_locale = "en-US-utf8"' );
+		$DB->query( 'UPDATE T_blogs SET blog_locale = "en-US" WHERE blog_locale = "en-US-utf8"' );
+		$DB->query( 'UPDATE T_items__item SET post_locale = "en-US" WHERE post_locale = "en-US-utf8"' );
+		$DB->query( 'UPDATE T_settings SET set_value = "en-US" WHERE set_name = "default_locale" AND set_value = "en-US-utf8"' );
+		// Check if the 'en-US-utf8' locale is enabled
+		$en_us_utf8_enabled = $DB->get_var( 'SELECT loc_enabled FROM T_locales WHERE loc_locale = "en-US-utf8"' );
+		if( $en_us_utf8_enabled !== NULL )
+		{ // The 'en-US-utf8' was enabled we must enable the 'en-US' even if it was not enabled before because we merged the two locales into one
+			$en_us_enabled = $DB->get_var( 'SELECT loc_enabled FROM T_locales WHERE loc_locale = "en-US"' );
+			if( $en_us_enabled === NULL )
+			{ // Update "en-US-utf8" to "en-US"
+				$DB->query( 'UPDATE T_locales SET loc_locale = "en-US" WHERE loc_locale = "en-US-utf8"' );
+			}
+			elseif( $en_us_utf8_enabled && ( ! $en_us_enabled ) )
+			{ // Enable the "en-US" locale because it was not enabled but the "en-US-utf8" was
+				$DB->query( 'UPDATE T_locales SET loc_enabled = 1 WHERE loc_locale = "en-US"' );
+			}
+
+			if( $en_us_enabled !== NULL )
+			{ // Remove the "en-US-utf8" locale if the "en_US" locale is already in the database
+				$DB->query( 'DELETE FROM T_locales WHERE loc_locale = "en-US-utf8"' );
+			}
+		}
+		task_end();
+
+		task_begin( 'Upgrade table files... ' );
+		db_add_col( 'T_files', 'file_can_be_main_profile', 'TINYINT(1) NOT NULL DEFAULT 1' );
+		task_end();
+
+		task_begin( 'Add new video file types... ' );
+		$video_types = array(
+				'webm' => "( 'webm', 'WebM video file', 'video/webm', 'file_video', 'browser', 'registered' )",
+				'ogv'  => "( 'ogv', 'Ogg video file', 'video/ogg', 'file_video', 'browser', 'registered' )",
+				'm3u8' => "( 'm3u8', 'M3U8 video file', 'application/x-mpegurl', 'file_video', 'browser', 'registered' )"
+			);
+		$SQL = new SQL();
+		$SQL->SELECT( 'ftyp_extensions' );
+		$SQL->FROM( 'T_filetypes' );
+		$SQL->WHERE( 'ftyp_extensions LIKE "%'.implode( '%" OR ftyp_extensions LIKE "%', array_keys( $video_types ) ).'%"' );
+		$existing_video_types = $DB->get_col( $SQL->get() );
+		if( ! empty( $existing_video_types ) )
+		{ // Some video types arleady exist in DB, Exclude them from inserting
+			foreach( $existing_video_types as $vtype )
+			{
+				unset( $video_types[ $vtype ] );
+			}
+		}
+		if( count( $video_types ) )
+		{ // Insert new video file types
+			$DB->query( "INSERT INTO T_filetypes
+				( ftyp_extensions, ftyp_name, ftyp_mimetype, ftyp_icon, ftyp_viewtype, ftyp_allowed )
+				VALUES ".implode( ', ', $video_types ) );
+		}
+		task_end();
+
+		//set_upgrade_checkpoint( '11320' );
 	}
 
 	/*
@@ -5072,16 +5401,17 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		// Init Caches: (it should be possible to do this with each upgrade)
 		task_begin( '(Re-)Initializing caches...' );
 		load_funcs('tools/model/_system.funcs.php');
-		if( system_init_caches() )
+		if( system_init_caches( true ) )
 		{ // cache was initialized successfully
 			// Check all cache folders if exist and work properly. Try to repair cache folders if they aren't ready for operation.
 			system_check_caches();
+			// Display task end with 'OK' only in case of successfuly executed init caches process
+			task_end();
 		}
 		else
-		{
-			echo "<strong>".T_('The /cache folder could not be created/written to. b2evolution will still work but without caching, which will make it operate slower than optimal.')."</strong><br />\n";
+		{ // Caches could not be initialized successfully, an error message was displayed inside the init function
+			echo "<br />\n";
 		}
-		task_end();
 
 		// Check if profile picture links should be recreated. It won't be executed in each upgrade, but only in those cases when it is required.
 		// This requires an up to date database, and also $Plugins and $GeneralSettings objects must be initialized before this.

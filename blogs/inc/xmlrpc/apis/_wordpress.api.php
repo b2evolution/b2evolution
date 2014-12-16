@@ -11,7 +11,7 @@
  * @see http://codex.wordpress.org/XML-RPC_wp
  *
  * @package xmlsrv
- * @version $Id: _wordpress.api.php 7482 2014-10-21 11:50:57Z yura $
+ * @version $Id: _wordpress.api.php 7483 2014-10-21 11:55:47Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1345,7 +1345,7 @@ function wp_getoptions( $m )
 			'blog_tagline'			=> array( 'desc' => 'Site Tagline', 'value' => $Blog->get('tagline') ),
 			'date_format'			=> array( 'desc' => 'Date Format', 'value' => locale_datefmt() ),
 			'time_format'			=> array( 'desc' => 'Time Format', 'value' => locale_timefmt() ),
-			'users_can_register'	=> array( 'desc' => 'Allow new users to sign up', 'value' => $Settings->get('newusers_canregister') ),
+			'users_can_register'	=> array( 'desc' => 'Allow new users to sign up', 'value' => $Settings->get('newusers_canregister') == 'yes' ? '1' : '0' ),
 
 			// We are using default thumbnail sizes from config
 			'thumbnail_crop'		=> array( 'desc' => 'Crop thumbnail to exact dimensions', 'value' => false ),

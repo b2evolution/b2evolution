@@ -27,7 +27,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id$
+ * @version $Id: _currency.class.php 6134 2014-03-08 07:48:07Z manuel $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -54,13 +54,7 @@ class Currency extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_regional__currency', 'curr_', 'curr_ID' );
 
-		$this->delete_restrictions = array(
-				array( 'table'=>'T_regional__country', 'fk'=>'ctry_curr_ID', 'msg'=>T_('%d related countries') ),
-			);
-
-		$this->delete_cascades = array();
-
- 		if( $db_row )
+		if( $db_row )
 		{
 			$this->ID            = $db_row->curr_ID;
 			$this->code          = $db_row->curr_code;
@@ -68,6 +62,19 @@ class Currency extends DataObject
 			$this->name          = $db_row->curr_name;
 			$this->enabled       = $db_row->curr_enabled;
 		}
+	}
+
+
+	/**
+	 * Get delete restriction settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_restrictions()
+	{
+		return array(
+				array( 'table'=>'T_regional__country', 'fk'=>'ctry_curr_ID', 'msg'=>T_('%d related countries') ),
+			);
 	}
 
 
@@ -143,8 +150,8 @@ class Currency extends DataObject
 	/**
 	 * Get link to Countries, where this Currencie is used
 	 * Use when try to delete a currencie
-	 *  
-	 * @param array restriction array 
+	 *
+	 * @param array restriction array
 	 * @return string link to currency's countries
 	 */
 	function get_restriction_link( $restriction )

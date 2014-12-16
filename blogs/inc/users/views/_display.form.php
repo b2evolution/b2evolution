@@ -24,7 +24,7 @@
  * @package evocore
 
  *
- * @version $Id: _display.form.php 7172 2014-07-22 08:07:56Z yura $
+ * @version $Id: _display.form.php 7173 2014-07-22 08:09:05Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -82,9 +82,14 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Back-office display options').get_manual_link('user-backoffice-display-settings') );
+$Form->begin_fieldset( T_('Username display options').get_manual_link('user-username-display-options') );
 
-		$Form->checkbox_input( 'gender_colored', $Settings->get('gender_colored'), T_('Display gender'), array( 'note'=>T_('Use colored usernames to differentiate men & women.') ) );
+	$Form->radio( 'username_display', $Settings->get( 'username_display' ),
+		array( array( 'login', T_('Usernames/Logins'), T_('Secure options') ),
+					array( 'name', T_('Friendly names (Nickname or Firstname if available)'), T_('WARNING: this may allow users to fake their identity') ),
+		), T_('What to display'), true );
+
+		$Form->checkbox_input( 'gender_colored', $Settings->get('gender_colored'), T_('Display gender in back-office'), array( 'note'=>T_('Use colored usernames to differentiate men & women.') ) );
 
 $Form->end_fieldset();
 
@@ -151,6 +156,13 @@ $Form->begin_fieldset( T_('Other permissions for anonymous users').get_manual_li
 
 	$Form->checkbox_input( 'allow_anonymous_user_list', $Settings->get('allow_anonymous_user_list'), T_('Allow to see user list') );
 
+	$user_level_params = array( 'input_prefix' => T_('from').' ' );
+	if( ! $Settings->get('allow_anonymous_user_list') && ! $Settings->get('allow_anonymous_user_profiles') )
+	{ // Disable the user groups levels interval because the users pages are not available for anonymous users
+		$user_level_params['disabled'] = 'disabled';
+	}
+	$Form->interval( 'allow_anonymous_user_level_min', $Settings->get('allow_anonymous_user_level_min'), 'allow_anonymous_user_level_max', $Settings->get('allow_anonymous_user_level_max'), 2, T_('Show only User Groups Levels'), '', $user_level_params );
+
 $Form->end_fieldset();
 
 // --------------------------------------------
@@ -161,3 +173,18 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 }
 
 ?>
+<script type="text/javascript">
+jQuery( '#allow_anonymous_user_list, #allow_anonymous_user_profiles' ).click( function()
+{
+	if( ! jQuery( '#allow_anonymous_user_list' ).is( ':checked' ) && ! jQuery( '#allow_anonymous_user_profiles' ).is( ':checked' ) )
+	{ // Disable the user groups levels interval, If the users pages are not available for anonymous users
+		jQuery( '#allow_anonymous_user_level_min' ).attr( 'disabled', 'disabled' );
+		jQuery( '#allow_anonymous_user_level_max' ).attr( 'disabled', 'disabled' );
+	}
+	else
+	{ // Enable the user groups levels interval
+		jQuery( '#allow_anonymous_user_level_min' ).removeAttr( 'disabled' );
+		jQuery( '#allow_anonymous_user_level_max' ).removeAttr( 'disabled' );
+	}
+} );
+</script>

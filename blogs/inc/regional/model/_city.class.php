@@ -27,7 +27,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id$
+ * @version $Id: _city.class.php 7044 2014-07-02 08:55:10Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -57,12 +57,6 @@ class City extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_regional__city', 'city_', 'city_ID' );
 
-		$this->delete_restrictions = array(
-				array( 'table'=>'T_users', 'fk'=>'user_city_ID', 'msg'=>T_('%d related users') ),
-			);
-
-		$this->delete_cascades = array();
-
 		if( $db_row )
 		{
 			$this->ID            = $db_row->city_ID;
@@ -74,6 +68,19 @@ class City extends DataObject
 			$this->enabled       = $db_row->city_enabled;
 			$this->preferred     = $db_row->city_preferred;
 		}
+	}
+
+
+	/**
+	 * Get delete restriction settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_restrictions()
+	{
+		return array(
+				array( 'table'=>'T_users', 'fk'=>'user_city_ID', 'msg'=>T_('%d related users') ),
+			);
 	}
 
 

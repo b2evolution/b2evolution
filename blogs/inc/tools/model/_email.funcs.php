@@ -14,7 +14,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _email.funcs.php 7616 2014-11-12 14:50:13Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -278,7 +278,7 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result )
 		$user_ID = NULL;
 	}
 
-	$to = evo_strtolower( $to );
+	$to = utf8_strtolower( $to );
 
 	// Insert mail log
 	$DB->query( 'INSERT INTO T_email__log
@@ -287,7 +287,7 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result )
 		( '.$DB->quote( $user_ID ).',
 		  '.$DB->quote( $to ).',
 		  '.$DB->quote( $result ).',
-		  '.$DB->quote( evo_substr( $subject, 0, 255 ) ).',
+		  '.$DB->quote( utf8_substr( $subject, 0, 255 ) ).',
 		  '.$DB->quote( $message ).',
 		  '.$DB->quote( $headers ).' )' );
 
@@ -391,7 +391,7 @@ function mail_is_blocked( $email, $blocked_statuses = array() )
 		$SQL = new SQL();
 		$SQL->SELECT( 'emadr_ID' );
 		$SQL->FROM( 'T_email__address' );
-		$SQL->WHERE( 'emadr_address = '.$DB->quote( evo_strtolower( $email ) ) );
+		$SQL->WHERE( 'emadr_address = '.$DB->quote( utf8_strtolower( $email ) ) );
 		$SQL->WHERE_and( get_mail_blocked_condition( true, $blocked_statuses ) );
 		$cache_mail_is_blocked_status[ $status_filter_name ][ $email ] = (boolean) $DB->get_var( $SQL->get() );
 	}
@@ -494,17 +494,16 @@ function mail_log_parse_message( $headers, $message )
 		return false;
 	}
 
-	// Get only <body> content of html email message
-	$html_search_body = '#.+<body[^>]*>(.+)</body>.+#is';
-	$html_replace_body = '$1';
-
 	$data = array();
 
 	if( $header_matches[1] == 'text/html' )
 	{ // Message has one content in HTML format
 		$data['html'] = array(
-				'type' => $header_matches[0],
-				'content' => preg_replace( $html_search_body, $html_replace_body, $message ),
+				'type'       => $header_matches[0],
+				'content'    => mail_log_parse_html_data( 'content', $message ),
+				'head_style' => mail_log_parse_html_data( 'head_style', $message ),
+				'body_style' => mail_log_parse_html_data( 'body_style', $message ),
+				'body_class' => mail_log_parse_html_data( 'body_class', $message ),
 			);
 
 		return $data;
@@ -536,15 +535,18 @@ function mail_log_parse_message( $headers, $message )
 			case 'text/html':
 				// Get data of Plain Text content
 				$data['html'] = array(
-						'type' => $type_matches[1],
-						'content' => preg_replace( $html_search_body, $html_replace_body, $type_matches[4] ),
+						'type'       => $type_matches[1],
+						'content'    => mail_log_parse_html_data( 'content', $type_matches[4] ),
+						'head_style' => mail_log_parse_html_data( 'head_style', $type_matches[4] ),
+						'body_style' => mail_log_parse_html_data( 'body_style', $type_matches[4] ),
+						'body_class' => mail_log_parse_html_data( 'body_class', $type_matches[4] ),
 					);
 				break;
 
 			case 'text/plain':
 				// Get data of HTML content
 				$data['text'] = array(
-						'type' => $type_matches[1],
+						'type'    => $type_matches[1],
 						'content' => $type_matches[4],
 					);
 				break;
@@ -554,4 +556,388 @@ function mail_log_parse_message( $headers, $message )
 	return $data;
 }
 
+
+/**
+ * Extract the parts from html body message of mail
+ *
+ * @param string Data type: 'content', 'head_style', 'body_style', 'body_class'
+ * @param string Message
+ * @return string
+ */
+function mail_log_parse_html_data( $type, $message )
+{
+	switch( $type )
+	{
+		case 'content':
+			// Get <body> content of html email message
+			return preg_replace( '#.+<body[^>]*>(.+)</body>.+#is', '$1', $message );
+			break;
+
+		case 'head_style':
+			// Get <style> content of html email message
+			return preg_replace( '#.+<style[^>]*>(.+)</style>.+#is', '$1', $message );
+			break;
+
+		case 'body_style':
+		case 'body_class':
+			// Get class|style of <body> content of html email message
+			$regexp_attr = str_replace( 'body_', '', $type );
+			preg_match( '#.+<body[^>]*('.$regexp_attr.'="([^"]+)")[^>]*>.+#is', $message, $body_attrs_match );
+			return empty( $body_attrs_match[2] ) ? '' : $body_attrs_match[2];
+			break;
+	}
+}
+
+
+/**
+ * Check if SMTP Swift Mailer is available on this system
+ *
+ * @return boolean|string TRUE on success, Error message about why we cannot use SMTP
+ */
+function check_smtp_mailer()
+{
+	global $Settings;
+
+	if( ! $Settings->get( 'smtp_enabled' ) )
+	{ // Swift Mailer is not enabled
+		return T_( 'SMTP gateway is not enabled.' );
+	}
+
+	if( version_compare( phpversion(), '5.2', '<' ) )
+	{ // Swift Mailer works only with PHP 5.2 and higher
+		return T_( 'PHP version must be 5.2 or higher to enable SMTP gateway.' );
+	}
+
+	if( ! function_exists( 'proc_open' ) )
+	{ // Swift Mailer requires proc_* functions
+		return T_( 'The proc_* PHP functions are not available on this server.' );
+	}
+
+	$smtp_server_host = $Settings->get( 'smtp_server_host' );
+	$smtp_server_port = $Settings->get( 'smtp_server_port' );
+	if( empty( $smtp_server_host ) || empty( $smtp_server_port ) )
+	{ // These settings must be defined
+		return T_( 'SMTP Host and Port Number must be defined to enable SMTP gateway.' );
+	}
+
+	$smtp_server_security = $Settings->get( 'smtp_server_security' );
+	if( $smtp_server_security == 'ssl' || $smtp_server_security == 'tls' )
+	{ // Check if enabled encryption method is enabled in this system
+		$available_transports = stream_get_transports();
+		$method_is_available = false;
+		foreach( $available_transports as $available_transport )
+		{
+			if( preg_match( '#^'.$smtp_server_security.'#i', $available_transport ) )
+			{ // Check if first symbols are match, because transport can be "ssl", "sslv2" or "sslv3"
+				$method_is_available = true;
+				break;
+			}
+		}
+		if( ! $method_is_available )
+		{ // Stop the checking here because encryption method is not available
+			return sprintf( T_( 'Encryption Method %s must be available on this system in order to enable SMTP gateway.' ), '<b>'.strtoupper( $smtp_server_security ).'</b>' );
+		}
+	}
+
+	// SMTP can be used in this system
+	return true;
+}
+
+
+/**
+ * Test SMTP connection by Swift Transport
+ *
+ * @param object Swift Transport
+ * @return boolean|string TRUE on success OR Error message
+ */
+function test_smtp_transport( & $Swift_SmtpTransport )
+{
+	try
+	{ // Try to intialize a connection by SMTP transport
+		$Swift_SmtpTransport->start();
+		return true;
+	}
+	catch( Swift_TransportException $Swift_TransportException )
+	{ // Error connection
+		$message = $Swift_TransportException->getMessage();
+		// Replace invalid symbols with '?'
+		return preg_replace( '/[^\x20-\x7F]/', '?', $message );
+	}
+}
+
+
+/**
+ * Get SMTP Swift Transport
+ *
+ * @return object Swift_SmtpTransport object
+ */
+function & get_Swift_SmtpTransport()
+{
+	global $Settings;
+
+	// Load Swift Mailer functions
+	load_funcs( '_ext/swift/swift_required.php' );
+
+	$smtp_server_host = $Settings->get( 'smtp_server_host' );
+	$smtp_server_port = $Settings->get( 'smtp_server_port' );
+	$smtp_server_security = $Settings->get( 'smtp_server_security' );
+	$smtp_server_username = $Settings->get( 'smtp_server_username' );
+	$smtp_server_password = $Settings->get( 'smtp_server_password' );
+
+	// Create the Transport
+	$Swift_SmtpTransport = Swift_SmtpTransport::newInstance( $smtp_server_host, $smtp_server_port );
+	if( $smtp_server_security == 'ssl' || $smtp_server_security == 'tls' )
+	{ // Set encryption
+		$Swift_SmtpTransport->setEncryption( $smtp_server_security );
+	}
+	if( ! empty( $smtp_server_username ) )
+	{ // Set username if it is defined
+		$Swift_SmtpTransport->setUsername( $smtp_server_username );
+	}
+	if( ! empty( $smtp_server_password ) )
+	{ // Set password if it is defined
+		$Swift_SmtpTransport->setPassword( $smtp_server_password );
+	}
+
+	return $Swift_SmtpTransport;
+}
+
+
+/**
+ * Get SMTP Swift Mailer
+ *
+ * @return object Swift_Mailer object
+ */
+function & get_Swift_Mailer()
+{
+	// Create Transport
+	$Swift_SmtpTransport = & get_Swift_SmtpTransport();
+
+	// Test a connection
+	$connection_result = test_smtp_transport( $Swift_SmtpTransport );
+
+	if( $connection_result === true )
+	{ // Create the Mailer using the created Transport
+		$Swift_Mailer = Swift_Mailer::newInstance( $Swift_SmtpTransport );
+	}
+	else
+	{ // Some errors on SMTP connection
+		$Swift_Mailer = NULL;
+	}
+
+	return $Swift_Mailer;
+}
+
+
+/**
+ * Send mail by default mail() function or by SMTP Swift Mailer
+ *
+ * @param string Receiver, or receivers of the mail
+ * @param string Subject of the email
+ * @param string|array Message OR Array: 'full', 'html', 'text'
+ * @param array Email headers
+ * @param string Additional flags as command line options
+ */
+function evo_mail( $to, $subject, $message, $headers = array(), $additional_parameters = '' )
+{
+	global $Settings;
+
+	$message_data = $message;
+	if( is_array( $message_data ) && isset( $message_data['full'] ) )
+	{ // If content is multipart
+		$message = $message_data['full'];
+	}
+
+	switch( $Settings->get( 'email_service' ) )
+	{
+		case 'smtp':
+			// SMTP sending is preferred
+			$result = evo_mail_smtp( $to, $subject, $message_data, $headers, $additional_parameters );
+			if( ! $result && $Settings->get( 'force_email_sending' ) )
+			{ // SMTP sending was failed, Try to send email by php "mail" function
+				$result = @mail( $to, $subject, $message, get_mail_headers( $headers ), $additional_parameters );
+			}
+			break;
+
+		case 'mail':
+		default:
+			// PHP "mail" function is preferred
+			$result = @mail( $to, $subject, $message, get_mail_headers( $headers ), $additional_parameters );
+			if( ! $result && $Settings->get( 'force_email_sending' ) )
+			{ // "mail" function was failed, Try to send email by SMTP Swift Mailer
+				$result = evo_mail_smtp( $to, $subject, $message_data, $headers, $additional_parameters );
+			}
+			break;
+	}
+
+	return $result;
+}
+
+
+/**
+ * Send mail by SMTP Swift Mailer
+ *
+ * @param string Receiver, or receivers of the mail
+ * @param string Subject of the email
+ * @param string|array Message OR Array: 'charset', 'full', 'html', 'text'
+ * @param array Email headers
+ * @param string Additional flags as command line options
+ * @return boolean TRUE on success
+ */
+function evo_mail_smtp( $to, $subject, $message, $headers = array(), $additional_parameters = '' )
+{
+	$headers_string = get_mail_headers( $headers );
+
+	// Check if we can use SMTP Swift Mailer
+	if( check_smtp_mailer() === true && ( $Swift_Mailer = & get_Swift_Mailer() ) )
+	{ // Use Swift Mailer to send emails using SMTP
+
+		// Get charset from content type part
+		$charset = ( isset( $headers['Content-Type'] ) && preg_match( '#charset=(.+)$#i', $headers['Content-Type'], $charset ) ) ? $charset[1] : NULL;
+
+		// Create a Swift_Message object
+		$Swift_Message = Swift_Message::newInstance();
+		// Subject:
+		$Swift_Message->setSubject( $subject );
+		// To:
+		if( empty( $message['to_email'] ) )
+		{ // Use only email address
+			$Swift_Message->setTo( $to );
+		}
+		else
+		{ // Use address with name
+			$Swift_Message->setTo( $message['to_email'], $message['to_name'] );
+		}
+		// Body:
+		if( isset( $headers['Content-Type'] ) && preg_match( '#^[^;]+#i', $headers['Content-Type'], $content_type ) )
+		{
+			switch( $content_type[0] )
+			{
+				case 'multipart/mixed':
+					// MULTIPLE:
+					if( is_array( $message ) )
+					{ // Body is multiple
+						$Swift_Message->setBody( $message['html'], 'multipart/alternative', $message['charset'] );
+						$Swift_Message->addPart( $message['html'], 'text/html', $message['charset'] );
+						$Swift_Message->addPart( $message['text'], 'text/plain', $message['charset'] );
+						break;
+					}
+					else
+					{ // Unknown case, Send email with text/plain format
+						$content_type[0] = 'text/plain';
+					}
+
+				case 'text/html':
+					// HTML:
+				case 'text/plain':
+					// TEXT:
+					$Swift_Message->setBody( $message, $content_type, $charset );
+					break;
+
+				default:
+					// Unknown content type
+					$Swift_Message->setBody( $message, null, $charset );
+					break;
+			}
+		}
+		else
+		{ // Unknown content type
+			$Swift_Message->setBody( $message, null, $charset );
+		}
+		// From:
+		if( ! empty( $message['from_email'] ) )
+		{ // Use address with name
+			$Swift_Message->setFrom( $message['from_email'], $message['from_name'] );
+		}
+		elseif( ! empty( $headers['From'] ) )
+		{ // Use only email address
+			$Swift_Message->setFrom( $headers['From'] );
+		}
+		if( ! empty( $headers['Reply-To'] ) )
+		{ // Reply-To:
+			$Swift_Message->setReplyTo( $headers['Reply-To'] );
+		}
+		if( ! empty( $headers['Return-Path'] ) )
+		{ // Return-Path:
+			$Swift_Message->setReturnPath( $headers['Return-Path'] );
+		}
+		if( ! empty( $headers['Date'] ) )
+		{ // Date:
+			$Swift_Message->setDate( $headers['Date'] );
+		}
+
+		// Send the message
+		return $Swift_Mailer->send( $Swift_Message );
+	}
+
+	// No email was sent
+	return false;
+}
+
+
+/**
+ * Get headers string for mail functions
+ *
+ * @param array Headers array
+ * @return string Headers string
+ */
+function get_mail_headers( $headers, $nl = "\r\n" )
+{
+	// Convert headers array to string format:
+	$headers_string = '';
+	foreach( $headers as $h_key => $h_value )
+	{
+		$headers_string .= $h_key.': '.$h_value.$nl;
+	}
+
+	return $headers_string;
+}
+
+
+/**
+ * Test connection to SMTP server by Swift Mailer
+ *
+ * @return array Result messages
+ */
+function smtp_connection_test()
+{
+	global $smtp_connection_result;
+
+	$smtp_messages = array();
+	$smtp_connection_result = true;
+
+	// Check if Swift Mailer is enabled
+	$check_smtp_result = check_smtp_mailer();
+	$message = T_( 'Check SMTP settings... ' );
+	if( $check_smtp_result === true )
+	{ // Success
+		$smtp_messages[] = $message.'<span class="green">OK</span>';
+		syslog_insert( $message.'OK', 'info', NULL );
+	}
+	else
+	{ // Error
+		$smtp_messages[] = $message.'<span class="red">'.$check_smtp_result.'</span>';
+		syslog_insert( $message.$check_smtp_result, 'warning', NULL );
+		$smtp_connection_result = false;
+		return $smtp_messages;// EXIT
+	}
+
+	// Test a connection
+	$Swift_SmtpTransport = & get_Swift_SmtpTransport();
+	$connection_result = test_smtp_transport( $Swift_SmtpTransport );
+	$message = T_( 'Test SMTP connection... ' );
+	if( $connection_result === true )
+	{ // Success
+		$smtp_messages[] = $message.'<span class="green">OK</span>';
+		syslog_insert( $message.'OK', 'info', NULL );
+	}
+	else
+	{ // Error
+		$smtp_messages[] = $message.'<span class="red">'.$connection_result.'</span>';
+		syslog_insert( $message.$connection_result, 'warning', NULL );
+		$smtp_connection_result = false;
+	}
+
+	return $smtp_messages;
+}
 ?>

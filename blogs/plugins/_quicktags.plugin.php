@@ -57,7 +57,7 @@ class quicktags_plugin extends Plugin
 			}
 		}
 
-		$simple = ( $params['edit_layout'] == 'simple' || $params['edit_layout'] == 'inskin' );
+		$simple = ( $params['edit_layout'] == 'inskin' );
 
 		if( $Hit->is_lynx() )
 		{ // let's deactivate quicktags on Lynx, because they don't work there.

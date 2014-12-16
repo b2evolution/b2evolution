@@ -23,7 +23,7 @@
  *
  * @package evocore
  *
- * @version $Id: display.ctrl.php 7172 2014-07-22 08:07:56Z yura $
+ * @version $Id: display.ctrl.php 7173 2014-07-22 08:09:05Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -46,6 +46,7 @@ switch ( $action )
 		// UPDATE display settings:
 		param( 'use_gravatar', 'integer', 0 );
 		param( 'default_gravatar', 'string', 'b2evo' );
+		param( 'username_display', 'string', 'login' );
 		param( 'gender_colored', 'integer', 0 );
 		param( 'bubbletip', 'integer', 0 );
 		param( 'bubbletip_size_admin', 'string', '' );
@@ -58,9 +59,10 @@ switch ( $action )
 		param( 'user_url_loggedin', 'string', '' );
 		param( 'user_url_anonymous', 'string', '' );
 
-		$Settings->set_array( array(
+		$updated_settings = array(
 			array( 'use_gravatar', $use_gravatar ),
 			array( 'default_gravatar', $default_gravatar ),
+			array( 'username_display', $username_display ),
 			array( 'gender_colored', $gender_colored ),
 			array( 'bubbletip', $bubbletip ),
 			array( 'bubbletip_size_admin', $bubbletip_size_admin ),
@@ -71,7 +73,27 @@ switch ( $action )
 			array( 'allow_anonymous_user_list', $allow_anonymous_user_list ),
 			array( 'allow_anonymous_user_profiles', $allow_anonymous_user_profiles ),
 			array( 'user_url_loggedin', $user_url_loggedin ),
-			array( 'user_url_anonymous', $user_url_anonymous ) ) );
+			array( 'user_url_anonymous', $user_url_anonymous ) );
+
+		if( $allow_anonymous_user_list || $allow_anonymous_user_profiles )
+		{ // Update the user groups levels only if at least one users page is available for anonymous users
+			param( 'allow_anonymous_user_level_min', 'integer', 0 );
+			param( 'allow_anonymous_user_level_max', 'integer', 0 );
+			param_check_interval( 'allow_anonymous_user_level_min', 'allow_anonymous_user_level_max', T_('User group level must be a number.'), T_('The minimum user group level must be lower than (or equal to) the maximum.') );
+			if( ! param_has_error( 'allow_anonymous_user_level_min' ) && $allow_anonymous_user_level_min < 0 )
+			{ // Limit by min user group level
+				param_error( 'allow_anonymous_user_level_min', T_('Minimum user group level must be 0.') );
+			}
+			if( ! param_has_error( 'allow_anonymous_user_level_max' ) && $allow_anonymous_user_level_max > 10 )
+			{ // Limit by max user group level
+				param_error( 'allow_anonymous_user_level_max', T_('Maximum user group level must be 10.') );
+			}
+
+			$updated_settings[] = array( 'allow_anonymous_user_level_min', $allow_anonymous_user_level_min );
+			$updated_settings[] = array( 'allow_anonymous_user_level_max', $allow_anonymous_user_level_max );
+		}
+
+		$Settings->set_array( $updated_settings );
 
 		if( ! $Messages->has_errors() )
 		{

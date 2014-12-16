@@ -20,7 +20,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id$
+ * @version $Id: _messaging.install.php 6909 2014-06-17 12:01:08Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -53,7 +53,19 @@ $schema_queries['T_messaging__message'] = array(
 			msg_datetime datetime NOT NULL,
 			msg_thread_ID int(10) unsigned NOT NULL,
 			msg_text text,
+			msg_renderers VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			PRIMARY KEY msg_ID (msg_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" );
+
+$schema_queries['T_messaging__prerendering'] = array(
+		'Creating message prerendering cache table',
+		"CREATE TABLE T_messaging__prerendering(
+			mspr_msg_ID              INT(11) UNSIGNED NOT NULL,
+			mspr_format              ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_general_ci NOT NULL,
+			mspr_renderers           VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
+			mspr_content_prerendered MEDIUMTEXT NULL,
+			mspr_datemodified        TIMESTAMP NOT NULL,
+			PRIMARY KEY (mspr_msg_ID, mspr_format)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" );
 
 // index on tsta_user_ID field

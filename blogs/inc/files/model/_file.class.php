@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _file.class.php 7537 2014-10-28 08:33:05Z yura $
+ * @version $Id: _file.class.php 7808 2014-12-12 11:45:53Z yura $
  *
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -51,6 +51,12 @@ load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
  */
 class File extends DataObject
 {
+	/**
+	 * File type: 'image', 'audio', 'other', NULL
+	 * @var string
+	 */
+	var $type;
+
 	/**
 	 * Have we checked for meta data in the DB yet?
 	 * @var string
@@ -86,6 +92,12 @@ class File extends DataObject
 	 * @var string
 	 */
 	var $path_hash;
+
+	/**
+	 * Meta data: 1 - if this file can be used as main profile picture, 0 - if admin disabled this file for main picture
+	 * @var boolean
+	 */
+	var $can_be_main_profile;
 
 	/**
 	 * FileRoot of this file
@@ -202,22 +214,6 @@ class File extends DataObject
 	var $_fsgroup_name;
 
 	/**
-	 * Is the File an image? NULL if unknown
-	 * @var boolean
-	 * @see is_image()
-	 * @access protected
-	 */
-	var $_is_image;
-
-	/**
-	 * Is the File an audio file? NULL if unknown
-	 * @var boolean
-	 * @see is_audio()
-	 * @access protected
-	 */
-	var $_is_audio;
-
-	/**
 	 * Extension, Mime type, icon, viewtype and 'allowed extension' of the file
 	 * @access protected
 	 * @see File::get_Filetype
@@ -246,14 +242,6 @@ class File extends DataObject
 		// Call parent constructor
 		parent::DataObject( 'T_files', 'file_', 'file_ID', '', '', '', '' );
 
-		$this->delete_restrictions = array(
-				array( 'table'=>'T_links', 'fk'=>'link_file_ID', 'field' => 'link_itm_ID', 'msg'=>T_('%d linked items') ),
-				array( 'table'=>'T_links', 'fk'=>'link_file_ID', 'field' => 'link_cmt_ID', 'msg'=>T_('%d linked comments') ),
-				array( 'table'=>'T_users', 'fk'=>'user_avatar_file_ID', 'msg'=>T_('%d linked users (profile pictures)') ),
-			);
-
-		$this->delete_cascades = array();
-
 		// Memorize filepath:
 		$FileRootCache = & get_FileRootCache();
 		$this->_FileRoot = & $FileRootCache->get_by_type_and_ID( $root_type, $root_ID );
@@ -279,6 +267,21 @@ class File extends DataObject
 
 
 	/**
+	 * Get delete restriction settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_restrictions()
+	{
+		return array(
+				array( 'table' => 'T_links', 'fk' => 'link_file_ID', 'field' => 'link_itm_ID', 'msg' => T_('%d linked items') ),
+				array( 'table' => 'T_links', 'fk' => 'link_file_ID', 'field' => 'link_cmt_ID', 'msg' => T_('%d linked comments') ),
+				array( 'table' => 'T_links', 'fk' => 'link_file_ID', 'field' => 'link_usr_ID', 'msg' => T_('%d linked users (profile pictures)') ),
+			);
+	}
+
+
+	/**
 	 * Attempt to load meta data.
 	 *
 	 * Will attempt only once and cache the result.
@@ -293,7 +296,7 @@ class File extends DataObject
 
 		if( $this->meta == 'unknown' )
 		{ // We haven't tried loading yet:
-			if( is_null( $row )	)
+			if( is_null( $row ) )
 			{	// No DB data has been provided:
 				$row = $DB->get_row( "
 					SELECT * FROM T_files
@@ -307,6 +310,7 @@ class File extends DataObject
 				$Debuglog->add( "Loaded metadata for {$this->_FileRoot->ID}:{$this->_rdfp_rel_path}", 'files' );
 				$this->meta  = 'loaded';
 				$this->ID    = $row->file_ID;
+				$this->type  = $row->file_type;
 				$this->title = $row->file_title;
 				$this->alt   = $row->file_alt;
 				$this->desc  = $row->file_desc;
@@ -315,6 +319,7 @@ class File extends DataObject
 					$this->hash  = $row->file_hash;
 				}
 				$this->path_hash = $row->file_path_hash;
+				$this->can_be_main_profile = $row->file_can_be_main_profile;
 
 				// Store this in the FileCache:
 				$FileCache = & get_FileCache();
@@ -352,11 +357,17 @@ class File extends DataObject
 		{ // Create an empty directory:
 			$success = @mkdir( $this->_adfp_full_path );
 			$this->_is_dir = true; // used by chmod
+			$syslog_message = $success ?
+					'Folder %s was created' :
+					sprintf( 'Folder %s could not be created', '<b>'.$this->_adfp_full_path.'</b>' );
 		}
 		else
 		{ // Create an empty file:
 			$success = @touch( $this->_adfp_full_path );
 			$this->_is_dir = false; // used by chmod
+			$syslog_message = $success ?
+					'File %s was created' :
+					sprintf( 'File %s could not be created', '<b>'.$this->_adfp_full_path.'</b>' );
 		}
 		$this->chmod( $chmod ); // uses $Settings for NULL
 
@@ -380,6 +391,8 @@ class File extends DataObject
 			$this->dbsave();
 		}
 
+		syslog_insert( sprintf( $syslog_message, '<b>'.$this->get_name().'</b>' ), 'info', 'file', $this->ID );
+
 		return $success;
 	}
 
@@ -390,8 +403,6 @@ class File extends DataObject
 	function load_properties()
 	{
 		// Unset values that will be determined (and cached) upon request
-		$this->_is_image = NULL;
-		$this->_is_audio = NULL;
 		$this->_lastmod_ts = NULL;
 		$this->_exists = NULL;
 		$this->_perms = NULL;
@@ -444,12 +455,12 @@ class File extends DataObject
 	 */
 	function is_image()
 	{
-		if( is_null( $this->_is_image ) )
-		{	// We don't know yet
-			$this->_is_image = ( $this->get_image_size() !== false );
+		if( empty( $this->type ) )
+		{ // Detect and set file type
+			$this->set_file_type();
 		}
 
-		return $this->_is_image;
+		return ( $this->type == 'image' );
 	}
 
 	/**
@@ -461,11 +472,12 @@ class File extends DataObject
 	 */
 	function is_audio()
 	{
-		if ( is_null( $this->_is_audio ) )
-		{
-			$this->_is_audio = in_array($this->get_ext(), array('mp3', 'oga'));
+		if( empty( $this->type ) )
+		{ // Detect and set file type
+			$this->set_file_type();
 		}
-		return $this->_is_audio;
+
+		return ( $this->type == 'audio' );
 	}
 
 
@@ -958,10 +970,17 @@ class File extends DataObject
 	 * Looks at the file's extension.
 	 *
 	 * @uses get_icon()
+	 *
+	 * @param array Params
 	 * @return string img tag
 	 */
-	function get_icon()
+	function get_icon( $params = array() )
 	{
+		$params = array_merge( array(
+				'alt'   => '#',
+				'title' => '#',
+			), $params );
+
 		if( $this->is_dir() )
 		{ // Directory icon:
 			$icon = 'folder';
@@ -971,15 +990,19 @@ class File extends DataObject
 			$Filetype = & $this->get_Filetype();
 			if( isset( $Filetype->icon ) && $Filetype->icon )
 			{ // Return icon for known type of the file
-					return $Filetype->get_icon();
+				return $Filetype->get_icon( $params );
 			}
 			else
 			{ // Icon for unknown file type:
 				$icon = 'file_unknown';
 			}
 		}
+
 		// Return Icon for a directory or unknown type file:
-		return get_icon( $icon, 'imgtag', array( 'alt'=>$this->get_ext(), 'title'=>$this->get_type() ) );
+		return get_icon( $icon, 'imgtag', array(
+				'alt'   => $params['alt'] == '#' ? $this->get_ext() : $params['alt'],
+				'title' => $params['title'] == '#' ? $this->get_type() : $params['title']
+			) );
 	}
 
 
@@ -1073,6 +1096,11 @@ class File extends DataObject
 			{
 				$img_attribs = $this->get_img_attribs( $size_name, NULL, NULL, $x_size );
 
+				if( $this->check_image_sizes( $size_name, 64, $img_attribs ) )
+				{ // If image larger than 64x64 add class to display animated gif during loading
+					$image_class = trim( $image_class.' loadimg' );
+				}
+
 				$image_class_attr = $image_class;
 				if( $x_size > 1 )
 				{ // Add class to detect what image is resized for speacial ratio
@@ -1113,11 +1141,11 @@ class File extends DataObject
 
 				if( !empty($image_link_title) )
 				{
-					$a .= ' title="'.evo_htmlspecialchars($image_link_title).'"';
+					$a .= ' title="'.htmlspecialchars($image_link_title).'"';
 				}
 				if( !empty($image_link_rel) )
 				{
-					$a .= ' rel="'.evo_htmlspecialchars($image_link_rel).'"';
+					$a .= ' rel="'.htmlspecialchars($image_link_rel).'"';
 				}
 				if( !empty( $image_link_id ) )
 				{ // Set attribute "id" for link
@@ -1402,11 +1430,14 @@ class File extends DataObject
 	 */
 	function rename_to( $newname )
 	{
+		$old_file_name = $this->get_name();
+
 		// rename() will fail if newname already exists on windows
 		// if it doesn't work that way on linux we need the extra check below
 		// but then we have an integrity issue!! :(
 		if( file_exists($this->_dir.$newname) )
 		{
+			syslog_insert( sprintf( 'File %s could not be renamed to %s', '<b>'.$old_file_name.'</b>', '<b>'.$newname.'</b>' ), 'info', 'file', $this->ID );
 			return false;
 		}
 
@@ -1436,6 +1467,7 @@ class File extends DataObject
 
 		if( ! @rename( $this->_adfp_full_path, $this->_dir.$newname ) )
 		{ // Rename will fail if $newname already exists (at least on windows)
+			syslog_insert( sprintf( 'File %s could not be renamed to %s', '<b>'.$old_file_name.'</b>', '<b>'.$newname.'</b>' ), 'info', 'file', $this->ID );
 			$DB->rollback();
 			return false;
 		}
@@ -1471,9 +1503,11 @@ class File extends DataObject
 				if( ! @rename( $this->_adfp_full_path, $this->_dir.$oldname ) )
 				{ // rename failed
 					$DB->rollback();
+					syslog_insert( sprintf( 'File %s could not be renamed to %s', '<b>'.$old_file_name.'</b>', '<b>'.$newname.'</b>' ), 'info', 'file', $this->ID );
 					return false;
 				}
 				// Maybe needs a specific error message here, the db and the disk is out of sync
+				syslog_insert( sprintf( 'File %s could not be renamed to %s', '<b>'.$old_file_name.'</b>', '<b>'.$newname.'</b>' ), 'info', 'file', $this->ID );
 				return false;
 			}
 		}
@@ -1490,6 +1524,7 @@ class File extends DataObject
 
 		$DB->commit();
 
+		syslog_insert( sprintf( 'File %s was renamed to %s', '<b>'.$old_file_name.'</b>', '<b>'.$newname.'</b>' ), 'info', 'file', $this->ID );
 		return true;
 	}
 
@@ -1506,6 +1541,7 @@ class File extends DataObject
 	 */
 	function move_to( $root_type, $root_ID, $rdfp_rel_path )
 	{
+		$old_file_name = $this->get_name();
 		// echo "relpath= $rel_path ";
 
 		$rdfp_rel_path = str_replace( '\\', '/', $rdfp_rel_path );
@@ -1516,6 +1552,7 @@ class File extends DataObject
 
 		if( ! @rename( $this->_adfp_full_path, $adfp_posix_path ) )
 		{
+			syslog_insert( sprintf( 'File %s could not be moved to %s', '<b>'.$old_file_name.'</b>', '<b>'.$rdfp_rel_path.'</b>' ), 'info', 'file', $this->ID );
 			return false;
 		}
 
@@ -1554,6 +1591,7 @@ class File extends DataObject
 			$this->load_meta();
 		}
 
+		syslog_insert( sprintf( 'File %s was moved to %s', '<b>'.$old_file_name.'</b>', '<b>'.$rdfp_rel_path.'</b>' ), 'info', 'file', $this->ID );
 		return true;
 	}
 
@@ -1570,6 +1608,7 @@ class File extends DataObject
 	{
 		if( ! $this->exists() || $dest_File->exists() )
 		{
+			syslog_insert( sprintf( 'File %s could not be copied', '<b>'.$this->get_name().'</b>' ), 'info', 'file', $this->ID );
 			return false;
 		}
 
@@ -1579,6 +1618,7 @@ class File extends DataObject
 		if( ! @copy( $this->get_full_path(), $dest_File->get_full_path() ) )
 		{	// Note: unlike rename() (at least on Windows), copy() will not fail if destination already exists
 			// this is probably a permission problem
+			syslog_insert( sprintf( 'File %s could not be copied to %s', '<b>'.$this->get_name().'</b>', '<b>'.$dest_File->get_name().'</b>' ), 'info', 'file', $this->ID );
 			return false;
 		}
 
@@ -1600,6 +1640,7 @@ class File extends DataObject
 			$dest_File->dbsave();
 		}
 
+		syslog_insert( sprintf( 'File %s was copied to %s', '<b>'.$this->get_name().'</b>', '<b>'.$dest_File->get_name().'</b>' ), 'info', 'file', $this->ID );
 		return true;
 	}
 
@@ -1615,6 +1656,9 @@ class File extends DataObject
 	function unlink( $use_transactions = true )
 	{
 		global $DB;
+
+		$old_file_ID = $this->ID;
+		$old_file_name = $this->get_name();
 
 		if( $use_transactions )
 		{
@@ -1633,12 +1677,20 @@ class File extends DataObject
 		// Physically remove file from disk:
 		if( $this->is_dir() )
 		{
-			$unlinked =	@rmdir( $this->_adfp_full_path );
+			$unlinked = @rmdir( $this->_adfp_full_path );
+			$syslog_message = $unlinked ?
+					'Folder %s was deleted' :
+					'Folder %s could not be deleted';
 		}
 		else
 		{
-			$unlinked =	@unlink( $this->_adfp_full_path );
+			$unlinked = @unlink( $this->_adfp_full_path );
+			$syslog_message = $unlinked ?
+					'File %s was deleted' :
+					'File %s could not be deleted';
 		}
+
+		syslog_insert( sprintf( $syslog_message, '<b>'.$old_file_name.'</b>' ), 'info', 'file', $old_file_ID );
 
 		if( ! $unlinked )
 		{
@@ -1646,7 +1698,6 @@ class File extends DataObject
 			{
 				$DB->rollback();
 			}
-
 			return false;
 		}
 
@@ -1686,10 +1737,12 @@ class File extends DataObject
 			// update current entry
 			$this->_perms = fileperms( $this->_adfp_full_path );
 
+			syslog_insert( sprintf( 'The permissions of file %s were changed to %s', '<b>'.$this->get_name().'</b>', $chmod ), 'info', 'file', $this->ID );
 			return $this->_perms;
 		}
 		else
 		{
+			syslog_insert( sprintf( 'The permissions of file %s could not be changed to %s', '<b>'.$this->get_name().'</b>', $chmod ), 'info', 'file', $this->ID );
 			return false;
 		}
 	}
@@ -1973,22 +2026,22 @@ class File extends DataObject
 
 		if( $this->is_dir() )
 		{
-			$rdfp_path = $this->_rdfp_rel_path;
+			$rdfp_path = $this->get_rdfp_rel_path();
 		}
 		else
 		{
-			$rdfp_path = dirname( $this->_rdfp_rel_path );
+			$rdfp_path = dirname( $this->get_rdfp_rel_path() );
 		}
 
-		$url_params = 'root='.$this->_FileRoot->ID.'&amp;path='.$rdfp_path.'/';
+		$url_params = 'root='.$this->get_FileRoot()->ID.'&amp;path='.$rdfp_path.'/';
 
 		if( ! is_null($link_obj_ID) )
-		{	// We want to open the filemanager in link mode:
+		{ // We want to open the filemanager in link mode:
 			$url_params .= '&amp;fm_mode=link_object&amp;link_type='.$link_type.'&amp;link_object_ID='.$link_obj_ID;
 		}
 
 		// Add param to make the file list highlight this (via JS).
-		$url_params .= '&amp;fm_highlight='.rawurlencode($this->_name);
+		$url_params .= '&amp;fm_highlight='.rawurlencode( $this->get_name() );
 
 		$url = url_add_param( $actionurl, $url_params );
 
@@ -2068,8 +2121,12 @@ class File extends DataObject
 			return '';
 		}
 
-		$img_attribs = $this->get_img_attribs($size_name, $title);
-		// pre_dump( $img_attribs );
+		$img_attribs = $this->get_img_attribs( $size_name, $title );
+
+		if( $this->check_image_sizes( $size_name, 64, $img_attribs ) )
+		{ // If image larger than 64x64 add class to display animated gif during loading
+			$class = trim( $class.' loadimg' );
+		}
 
 		if( $class )
 		{ // add class
@@ -2153,7 +2210,14 @@ class File extends DataObject
 		if( $this->is_image() )
 		{	// Ok, it's an image:
 			$type = $this->get_type();
-			$img_attribs = $this->get_img_attribs( 'fit-80x80', $type, $type );
+			$size_name = 'fit-80x80';
+			$img_attribs = $this->get_img_attribs( $size_name, $type, $type );
+
+			if( $this->check_image_sizes( $size_name, 64, $img_attribs ) )
+			{ // If image larger than 64x64 add class to display animated gif during loading
+				$img_attribs['class'] = 'loadimg';
+			}
+
 			$img = '<img'.get_field_attribs_as_string( $img_attribs ).' />';
 
 			$cbox_params = array_merge( array(
@@ -2188,6 +2252,59 @@ class File extends DataObject
 		}
 
 		return '';
+	}
+
+
+	/**
+	 * Check if thumbnail of image has width & height more than $min_size param
+	 *
+	 * @param string Size name of thumbnail
+	 * @param integer Min size
+	 * @param array img attributes: 'width' 'height'
+	 * @return boolean TRUE
+	*/
+	function check_image_sizes( $thumb_size, $min_size = 64, $img_attribs = array() )
+	{
+		if( ! $this->is_image() )
+		{ // Only for images
+			return false;
+		}
+
+		if( isset( $img_attribs['width'], $img_attribs['height'] ) && ( $img_attribs['width'] > $min_size ) && ( $img_attribs['height'] > $min_size ) )
+		{ // If image larger than 64x64 add class to display animated gif during loading
+			return true;
+		}
+
+		global $thumbnail_sizes;
+
+		if( isset( $thumbnail_sizes[ $thumb_size ] ) )
+		{ // If thumb size name is defined we can calculate what sizes will be of the thumbnail image
+			$thumb_type = $thumbnail_sizes[ $thumb_size ][0];
+			$thumb_width = $thumbnail_sizes[ $thumb_size ][1];
+			$thumb_height = $thumbnail_sizes[ $thumb_size ][2];
+			if( $thumb_type == 'crop' || $thumb_type == 'crop-top' )
+			{ // When thumbnail has "crop" format - width and height have the same values
+				if( $thumb_width > $min_size && $thumb_height > $min_size )
+				{ // Only check if they are more than $min_size
+					return true;
+				}
+			}
+			elseif( $thumb_type == 'fit' )
+			{ // Calculate what height will be for the generated thumbnail image
+				$orig_sizes = $this->get_image_size( 'widthheight_assoc' );
+				if( isset( $orig_sizes['width'], $orig_sizes['height'] ) )
+				{
+					$ratio = $orig_sizes['width'] / $orig_sizes['height'];
+					$result_height = $thumb_height / $ratio;
+					if( $thumb_width > $min_size && $result_height > $min_size )
+					{ // Width & height of the generated thumbnail image will be more than $min_size
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
 	}
 
 
@@ -2376,6 +2493,7 @@ class File extends DataObject
 	 * @param object LinkOwner
 	 * @param integer Order
 	 * @param string Position
+	 * @return integer Link ID
 	 */
 	function link_to_Object( & $LinkOwner, $set_order = 1, $set_position = NULL )
 	{
@@ -2410,7 +2528,7 @@ class File extends DataObject
 		$DB->commit();
 
 		// Let's make the link!
-		$LinkOwner->add_link( $this->ID, $position, $order );
+		return $LinkOwner->add_link( $this->ID, $position, $order );
 	}
 
 
@@ -2432,46 +2550,39 @@ class File extends DataObject
 				switch( $restriction['field'] )
 				{
 					case 'link_itm_ID': // Items
-						$object_ID = 'post_ID';			// related table object ID
-						$object_name = 'post_title';	// related table object name
-
+						$object_table = 'T_items__item'; // related table
+						$object_ID = 'post_ID';          // related table object ID
+						$object_name = 'post_title';     // related table object name
 						// link to object
 						$link = '<a href="'.$admin_url.'?ctrl=items&action=edit&p=%d">%s</a>';
-						$object_query = 'SELECT post_ID, post_title FROM T_items__item'
-											.' WHERE post_ID IN'
-											.' (SELECT '.$restriction['field']
-											.' FROM '.$restriction['table']
-											.' WHERE '.$restriction['fk'].' = '.$this->ID.')';
 						break;
 
 					case 'link_cmt_ID': // Comments
-						$object_ID = 'comment_ID';			// related table object ID
-						$object_name = 'comment_ID';	// related table object name
-
+						$object_table = 'T_comments'; // related table
+						$object_ID = 'comment_ID';    // related table object ID
+						$object_name = 'comment_ID';  // related table object name
 						// link to object
 						$link = '<a href="'.$admin_url.'?ctrl=comments&action=edit&comment_ID=%d">'.T_('Comment ').'#%s</a>';
-						$object_query = 'SELECT comment_ID, comment_ID FROM T_comments'
-											.' WHERE comment_ID IN'
-											.' (SELECT '.$restriction['field']
-											.' FROM '.$restriction['table']
-											.' WHERE '.$restriction['fk'].' = '.$this->ID.')';
+						break;
+
+					case 'link_usr_ID': // Users
+						$object_table = 'T_users';   // related table
+						$object_ID = 'user_ID';      // related table object ID
+						$object_name = 'user_login'; // related table object name
+						// link to object
+						$link = '<a href="'.$admin_url.'?ctrl=user&user_tab=avatar&user_ID=%d">%s</a>';
 						break;
 
 					default:
 						// not defined restriction
 						debug_die ( 'unhandled restriction field:' . htmlspecialchars ( $restriction['table'].' - '.$restriction['field'] ) );
 				}
+				$object_query = 'SELECT '.$object_ID.', '.$object_name.' FROM '.$object_table
+									.' WHERE '.$object_ID.' IN'
+									.' (SELECT '.$restriction['field']
+									.' FROM '.$restriction['table']
+									.' WHERE '.$restriction['fk'].' = '.$this->ID.')';
 			break;
-
-			case 'T_users': // Users
-				$object_ID = 'user_ID';			// related table object ID
-				$object_name = 'user_login';	// related table object name
-
-				// link to object
-				$link = '<a href="'.$admin_url.'?ctrl=user&user_tab=avatar&user_ID=%d">%s</a>';
-				$object_query = 'SELECT user_ID, user_login FROM T_users'
-									.' WHERE '.$restriction['fk'].' = '.$this->ID;
-				break;
 
 			default:
 				// not defined restriction
@@ -2523,6 +2634,79 @@ class File extends DataObject
 
 
 	/**
+	 * Detect file type by extension and update 'file_type' in DB
+	 */
+	function set_file_type()
+	{
+		if( ! empty( $this->type ) )
+		{ // Don't detect file type if File type is already defined
+			return;
+		}
+
+		// AUDIO:
+		$file_extension = $this->get_ext();
+		if( ! empty( $file_extension ) )
+		{ // Set audio file type by extension:
+
+			// Load all audio file types in cache
+			$FiletypeCache = & get_FiletypeCache();
+			$FiletypeCache->load_where( 'ftyp_mimetype LIKE "audio/%"' );
+			if( count( $FiletypeCache->cache ) )
+			{
+				foreach( $FiletypeCache->cache as $Filetype )
+				{
+					
+					if( preg_match( '#^audio/#', $Filetype->mimetype ) &&
+					    in_array( $file_extension, $Filetype->get_extensions() ) )
+					{ // This is audio file
+						$this->update_file_type( 'audio' );
+						return;
+					}
+				}
+			}
+		}
+
+		// IMAGE:
+		// File type is still not defined, Try to detect image
+		if( $this->get_image_size() !== false )
+		{ // This is image file
+			$this->update_file_type( 'image' );
+			return;
+		}
+
+		// OTHER:
+		// File type is still not detected, Use this default
+		$this->update_file_type( 'other' );
+		return;
+	}
+
+
+	/**
+	 * Update file type in DB
+	 *
+	 * @param string File type
+	 */
+	function update_file_type( $file_type )
+	{
+		if( $file_type == $this->type )
+		{ // File type is already defined
+			return;
+		}
+
+		// Set new file type
+		$this->set( 'type', $file_type );
+
+		if( ! empty( $this->ID ) && ! empty( $file_type ) )
+		{ // Update file type in DB
+			global $DB;
+			$DB->query( 'UPDATE T_files
+					SET file_type = '.$DB->quote( $file_type ).'
+				WHERE file_ID = '.$DB->quote( $this->ID ) );
+		}
+	}
+
+
+	/**
 	 * Get thumbnail file name
 	 *
 	 * @param string Thumbnail size name
@@ -2545,6 +2729,181 @@ class File extends DataObject
 
 		// Unknown wrong thumbnail size name
 		return $size_name.'.'.$this->get_ext();
+	}
+
+
+	/**
+	 * Get the duplicated files of this file
+	 *
+	 * @param array Params
+	 * @return array Key = File ID, Value = File Root ID
+	 */
+	function get_duplicated_files( $params = array() )
+	{
+		$params = array_merge( array(
+			'file_type' => 'image',
+			'root_type' => 'user', // 'user', 'item', 'comment'
+			'root_ID'   => NULL,
+		), $params );
+
+		global $DB;
+
+		// Set link object ID filed name depending on root type
+		switch( $params['root_type'] )
+		{
+			case 'user':
+				$link_object_ID_field = 'link_usr_ID';
+				break;
+			case 'item':
+				$link_object_ID_field = 'link_itm_ID';
+				break;
+			case 'comment':
+				$link_object_ID_field = 'link_cmt_ID';
+				break;
+		}
+
+		// Find the duplicated files
+		$SQL = new SQL();
+		$SQL->SELECT( 'file_ID, file_root_ID' );
+		$SQL->FROM( 'T_files' );
+		$SQL->FROM_add( 'INNER JOIN T_links ON link_file_ID = file_ID' );
+		$SQL->WHERE( 'file_type = '.$DB->quote( $params['file_type'] ) );
+		$SQL->WHERE_and( 'file_root_type = '.$DB->quote( $params['root_type'] ) );
+		$SQL->WHERE_and( 'file_hash = '.$DB->quote( $this->get( 'hash' ) ) );
+		$SQL->WHERE_and( 'file_ID != '.$DB->quote( $this->ID ) );
+		if( ! empty( $link_object_ID_field ) )
+		{ // Check to object ID field is not NULL
+			$SQL->WHERE_and( $link_object_ID_field.' IS NOT NULL' );
+		}
+		if( $params['root_ID'] !== NULL )
+		{ // Restrict by root ID
+			$SQL->WHERE_and( 'file_root_ID = '.$DB->quote( $params['root_ID'] ) );
+		}
+
+		return $DB->get_assoc( $SQL->get() );
+	}
+
+
+	/**
+	 * Get message if the duplicates exist for this file
+	 *
+	 * @param array Params
+	 * @return string Message text
+	 */
+	function get_duplicated_files_message( $params = array() )
+	{
+		$params = array_merge( array(
+			'message'   => '%s',
+			'file_type' => 'image',
+			'root_type' => 'user',
+			'root_ID'   => NULL,
+			'link_to'   => 'user',
+			'use_style' => false, // Use style for gender colored user login
+		), $params );
+
+		// Find the duplicated files
+		$duplicated_file_IDs = $this->get_duplicated_files( $params );
+
+		if( empty( $duplicated_file_IDs ) )
+		{ // No duplicates
+			return false;
+		}
+
+		$FileCache = & get_FileCache();
+		$duplicated_files = array();
+		foreach( $duplicated_file_IDs as $file_ID => $file_root_ID )
+		{
+			if( ! ( $duplicated_File = & $FileCache->get_by_ID( $file_ID, false, false ) ) )
+			{ // Broken file object
+				continue;
+			}
+
+			if( $params['link_to'] == 'user' )
+			{ // Link to profile picture edit form
+				global $admin_url;
+				$UserCache = & get_UserCache();
+				$User = & $UserCache->get_by_ID( $file_root_ID, false, false );
+
+				$link_text = $User ? $User->get_colored_login( array( 'use_style' => $params['use_style'] ) ) : T_('Deleted user');
+				$link_class = $User ? $User->get_gender_class() : 'user';
+				$link_url = $admin_url.'?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$file_root_ID;
+
+				$duplicated_files[] = '<a href="'.$link_url.'" class="nowrap '.$link_class.'">'
+					.$duplicated_File->get_tag( '', '', '', '', 'crop-top-15x15', '', '', 'lightbox[d'.$this->ID.']', 'avatar_before_login' ).' '
+					.$link_text.'</a>';
+			}
+			else
+			{ // Default link
+				$duplicated_files[] = $duplicated_File->get_tag( '', '', '', '', 'crop-top-15x15', 'original', '', 'lightbox[d'.$this->ID.']' );
+			}
+		}
+
+		return sprintf( $params['message'], implode( ', ', $duplicated_files ) );
+	}
+
+
+	/**
+	 * Get a count of social votes
+	 *
+	 * @param string Type of votes: 'like', 'dislike', 'inappropriate', 'spam'
+	 * @param array Params
+	 * @return string
+	 */
+	function get_votes_count_info( $type, $params = array() )
+	{
+		$params = array_merge( array(
+				'message' => T_('%d times by %s'),
+			), $params );
+
+		if( empty( $this->ID ) )
+		{ // This file is not exists in DB
+			return '0';
+		}
+
+		if( ! isset( $this->votes_count ) )
+		{ // Get the votes count only first time from DB
+			global $DB;
+			$SQL = new SQL();
+			$SQL->SELECT( 'lvot_user_ID, lvot_like, lvot_inappropriate, lvot_spam' );
+			$SQL->FROM( 'T_links' );
+			$SQL->FROM_add( 'INNER JOIN T_links__vote ON lvot_link_ID = link_ID' );
+			$SQL->WHERE( 'link_file_ID = '.$DB->quote( $this->ID ) );
+			// Cache the results in this var
+			$this->votes_count = $DB->get_results( $SQL->get() );
+		}
+
+		if( empty( $this->votes_count ) )
+		{ // No votes yet
+			return '0';
+		}
+
+		$count = 0;
+		$users = array();
+		$UserCache = & get_UserCache();
+		foreach( $this->votes_count as $vote )
+		{
+			if( ( $type == 'like' && $vote->lvot_like == '1' ) ||
+			    ( $type == 'dislike' && $vote->lvot_like == '-1' ) ||
+			    ( $type == 'inappropriate' && $vote->lvot_inappropriate == '1' ) ||
+			    ( $type == 'spam' && $vote->lvot_spam == '1' ) )
+			{
+				$count++;
+				if( ! isset( $users[ $vote->lvot_user_ID ] ) )
+				{
+					if( $vote_User = & $UserCache->get_by_ID( $vote->lvot_user_ID, false, false ) )
+					{
+						$users[ $vote->lvot_user_ID ] = $vote_User->get_identity_link();
+					}
+				}
+			}
+		}
+
+		if( $count == 0 )
+		{ // No votes for the selected type yet
+			return '0';
+		}
+
+		return sprintf( $params['message'], $count, implode( ', ', $users ) );
 	}
 }
 

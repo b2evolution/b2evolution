@@ -10,10 +10,11 @@
  *  - 'charset':  Character set of the locale's messages files.
  */
 $locale_defs['en-AU'] = array(
-		'name' => NT_('English (AU) latin1'),
-		'charset' => 'iso-8859-1',
+		'name' => NT_('English (AU) utf-8'),
+		'charset' => 'utf-8',
 		'datefmt' => 'd/m/y',
 		'timefmt' => 'h:i:s a',
+		'shorttimefmt' => 'h:i a',
 		'startofweek' => 1,
 		'messages' => 'en_US',
 	);

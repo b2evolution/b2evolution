@@ -37,7 +37,7 @@ if( $user_profile_only )
 
 	// Make sure the user only edits himself:
 	$user_ID = $current_User->ID;
-	if( ! in_array( $action, array( 'update', 'update_avatar', 'upload_avatar', 'remove_avatar', 'delete_avatar', 'rotate_avatar_90_left', 'rotate_avatar_180', 'rotate_avatar_90_right', 'edit', 'default_settings', 'redemption' ) ) )
+	if( ! in_array( $action, array( 'update', 'update_avatar', 'upload_avatar', 'remove_avatar', 'delete_avatar', 'rotate_avatar_90_left', 'rotate_avatar_180', 'rotate_avatar_90_right', 'crop', 'edit', 'default_settings', 'redemption' ) ) )
 	{
 		$action = 'edit';
 	}
@@ -68,7 +68,7 @@ if( ! is_null($user_ID) )
 
 	if( $action != 'view' && $action != 'report_user' && $action != 'remove_report' )
 	{ // check edit permissions
-		if( ! $current_User->check_perm( 'users', 'edit' )
+		if( ! $current_User->can_moderate_user( $edited_User->ID )
 		    && $edited_User->ID != $current_User->ID )
 		{ // user is only allowed to _view_ other user's profiles
 			$Messages->add( T_('You have no permission to edit other users!'), 'error' );
@@ -117,32 +117,38 @@ if( !$Messages->has_errors() )
 			break;
 
 		case 'remove_avatar':
+			// Remove profile picture
+		case 'forbid_avatar':
+			// Forbid profile picture
+
 			// Check that this action request is not a CSRF hacked request:
 			$Session->assert_received_crumb( 'user' );
 
-			if( empty($edited_User) || !is_object($edited_User) )
+			if( empty( $edited_User ) || ! is_object( $edited_User ) )
 			{
 				$Messages->add( 'No user set!' ); // Needs no translation, should be prevented by UI.
 				$action = 'list';
 				break;
 			}
 
-			if( !$edited_User->remove_avatar() )
-			{ // could not remove the avatar
+			if( ! $edited_User->remove_avatar( ( $action == 'forbid_avatar' ) ) )
+			{ // could not remove/forbid the avatar
 				$action = 'view';
 				break;
 			}
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=user&user_tab=avatar&user_ID='.$edited_User->ID, 303 ); // Will EXIT
+			header_redirect( '?ctrl=user&user_tab='.$user_tab.'&user_ID='.$edited_User->ID, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 			break;
 
 		case 'delete_avatar':
+			// Delete profile picture
+
 			// Check that this action request is not a CSRF hacked request:
 			$Session->assert_received_crumb( 'user' );
 
-			if( empty($edited_User) || !is_object($edited_User) )
+			if( empty( $edited_User ) || ! is_object( $edited_User ) )
 			{
 				$Messages->add( 'No user set!' ); // Needs no translation, should be prevented by UI.
 				$action = 'list';
@@ -157,18 +163,20 @@ if( !$Messages->has_errors() )
 				break;
 			}
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=user&user_tab=avatar&user_ID='.$edited_User->ID, 303 ); // Will EXIT
+			header_redirect( '?ctrl=user&user_tab='.$user_tab.'&user_ID='.$edited_User->ID, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 			break;
 
 		case 'upload_avatar':
+			// Upload new profile picture
+
 			// Stop a request from the blocked IP addresses or Domains
 			antispam_block_request();
 
 			// Check that this action request is not a CSRF hacked request:
 			$Session->assert_received_crumb( 'user' );
 
-			if( empty($edited_User) || !is_object($edited_User) )
+			if( empty( $edited_User ) || ! is_object( $edited_User ) )
 			{
 				$Messages->add( 'No user set!' ); // Needs no translation, should be prevented by UI.
 				$action = 'list';
@@ -187,10 +195,14 @@ if( !$Messages->has_errors() )
 			break;
 
 		case 'update_avatar':
+			// Update profile picture
+		case 'restore_avatar':
+			// Restore profile picture
+
 			// Check that this action request is not a CSRF hacked request:
 			$Session->assert_received_crumb( 'user' );
 
-			if( empty($edited_User) || !is_object($edited_User) )
+			if( empty( $edited_User ) || ! is_object( $edited_User ) )
 			{
 				$Messages->add( 'No user set!' ); // Needs no translation, should be prevented by UI.
 				$action = 'list';
@@ -198,7 +210,8 @@ if( !$Messages->has_errors() )
 			}
 			$file_ID = param( 'file_ID', 'integer', NULL );
 
-			$result = $edited_User->update_avatar( $file_ID );
+			// Update/Restore profile picture
+			$result = $edited_User->update_avatar( $file_ID, ( $action == 'restore_avatar' ) );
 			if( $result !== true )
 			{
 				$action = $result;
@@ -212,6 +225,8 @@ if( !$Messages->has_errors() )
 		case 'rotate_avatar_90_left':
 		case 'rotate_avatar_180':
 		case 'rotate_avatar_90_right':
+			// Rotate profile picture
+
 			// Check that this action request is not a CSRF hacked request:
 			$Session->assert_received_crumb( 'user' );
 
@@ -255,7 +270,63 @@ if( !$Messages->has_errors() )
 				break;
 			}
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=user&user_tab=avatar&user_ID='.$edited_User->ID, 303 ); // Will EXIT
+			header_redirect( '?ctrl=user&user_tab='.$user_tab.'&user_ID='.$edited_User->ID, 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+			break;
+
+		case 'crop':
+			// Crop profile picture
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+
+			if( empty( $edited_User ) || ! is_object( $edited_User ) )
+			{
+				$Messages->add( 'No user set!' ); // Needs no translation, should be prevented by UI.
+				$action = 'list';
+				break;
+			}
+			$file_ID = param( 'file_ID', 'integer', NULL );
+
+			// Check data to crop
+			$image_crop_data = param( 'image_crop_data', 'string', '' );
+			$image_crop_data = empty( $image_crop_data ) ? array() : explode( ':', $image_crop_data );
+			foreach( $image_crop_data as $image_crop_value )
+			{
+				$image_crop_value = (float)$image_crop_value;
+				if( $image_crop_value < 0 || $image_crop_value > 100 )
+				{ // Wrong data to crop, This value is percent of real size, so restrict it from 0 and to 100
+					$action = 'view';
+					break 2;
+				}
+			}
+			if( count( $image_crop_data ) < 4 )
+			{ // Wrong data to crop
+				$action = 'view';
+				break;
+			}
+
+			$result = $edited_User->crop_avatar( $file_ID, $image_crop_data[0], $image_crop_data[1], $image_crop_data[2], $image_crop_data[3] );
+			if( $result !== true )
+			{
+				switch( $result )
+				{
+					case 'only_own_profile':
+						$action = 'view';
+						break;
+
+					case 'wrong_file':
+					case 'other_user':
+					case 'crop_error':
+					default:
+						$action = 'edit';
+						break;
+				}
+				break;
+			}
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=user&user_tab='.$user_tab.'&user_ID='.$edited_User->ID, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 			break;
 
@@ -457,7 +528,7 @@ if( !$Messages->has_errors() )
 			$Session->assert_received_crumb( 'user' );
 
 			// Check edit permissions:
-			$current_User->check_perm( 'users', 'edit', true );
+			$current_User->can_moderate_user( $edited_User->ID, true );
 
 			if( param( 'confirm', 'integer', 0 ) )
 			{	// confirmed
@@ -479,7 +550,7 @@ if( !$Messages->has_errors() )
 			$Session->assert_received_crumb( 'user' );
 
 			// Check edit permissions:
-			$current_User->check_perm( 'users', 'edit', true );
+			$current_User->can_moderate_user( $edited_User->ID, true );
 
 			if( param( 'confirm', 'integer', 0 ) )
 			{	// confirmed
@@ -501,7 +572,7 @@ if( !$Messages->has_errors() )
 			$Session->assert_received_crumb( 'user' );
 
 			// Check edit permissions:
-			$current_User->check_perm( 'users', 'edit', true );
+			$current_User->can_moderate_user( $edited_User->ID, true );
 
 			if( param( 'confirm', 'integer', 0 ) )
 			{	// confirmed
@@ -523,7 +594,7 @@ if( !$Messages->has_errors() )
 			$Session->assert_received_crumb( 'user' );
 
 			// Check edit permissions:
-			$current_User->check_perm( 'users', 'edit', true );
+			$current_User->can_moderate_user( $edited_User->ID, true );
 
 			if( param( 'confirm', 'integer', 0 ) )
 			{	// confirmed
@@ -545,7 +616,7 @@ if( !$Messages->has_errors() )
 			$Session->assert_received_crumb( 'user' );
 
 			// Check edit permissions:
-			$current_User->check_perm( 'users', 'edit', true );
+			$current_User->can_moderate_user( $edited_User->ID, true );
 
 			if( param( 'confirm', 'integer', 0 ) )
 			{	// confirmed
@@ -672,7 +743,7 @@ if( !$Messages->has_errors() )
 			$Session->assert_received_crumb( 'user' );
 
 			// Check edit permissions:
-			$current_User->check_perm( 'users', 'edit', true );
+			$current_User->can_moderate_user( $edited_User->ID, true );
 
 			if( param( 'delete_comments', 'integer', 0 ) )
 			{ // Delete the comments
@@ -747,7 +818,7 @@ if( $display_mode != 'js')
 	}
 	else
 	{
-		$AdminUI->breadcrumbpath_add( $edited_User->get_colored_login(), '?ctrl=user&amp;user_ID='.$edited_User->ID );
+		$AdminUI->breadcrumbpath_add( $edited_User->get_colored_login( array( 'login_text' => 'name' ) ), '?ctrl=user&amp;user_ID='.$edited_User->ID );
 	}
 
 	switch( $user_tab )
@@ -823,6 +894,10 @@ switch( $action )
 				// Display user identity form:
 				$AdminUI->disp_payload_begin();
 				$AdminUI->disp_view( 'users/views/_user_identity.form.php' );
+				if( $edited_User->has_avatar() )
+				{ // Init JS for form to crop pictures of user
+					echo_user_crop_avatar_window();
+				}
 				$AdminUI->disp_payload_end();
 				break;
 			case 'avatar':
@@ -831,6 +906,8 @@ switch( $action )
 				{
 					$AdminUI->disp_payload_begin();
 					$AdminUI->disp_view( 'users/views/_user_avatar.form.php' );
+					// Init JS for form to crop pictures of user
+					echo_user_crop_avatar_window();
 					$AdminUI->disp_payload_end();
 				}
 				break;
@@ -967,6 +1044,33 @@ switch( $action )
 				}
 				$user_tab = param( 'user_tab_from', 'string', 'profile' );
 				$AdminUI->disp_view( 'users/views/_user_deldata.form.php' );
+				if( $display_mode != 'js')
+				{
+					$AdminUI->disp_payload_end();
+				}
+				break;
+
+			case 'crop':
+				if( $display_mode == 'js')
+				{ // Do not append Debuglog & Debug JSlog to response!
+					$debug = false;
+					$debug_jslog = false;
+				}
+
+				$file_ID = param( 'file_ID', 'integer' );
+				$cropped_File = & $edited_User->get_File_by_ID( $file_ID );
+				if( ! $cropped_File )
+				{ // Wrong file for cropping
+					break;
+				}
+
+				require_js( '#jcrop#', 'rsc_url', false, true );
+				require_css( '#jcrop_css#', 'rsc_url', NULL, NULL, '#', true );
+				if( $display_mode != 'js')
+				{
+					$AdminUI->disp_payload_begin();
+				}
+				$AdminUI->disp_view( 'users/views/_user_crop.form.php' );
 				if( $display_mode != 'js')
 				{
 					$AdminUI->disp_payload_end();

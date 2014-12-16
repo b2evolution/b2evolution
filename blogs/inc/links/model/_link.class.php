@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _link.class.php 7262 2014-08-27 05:56:02Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -62,10 +62,6 @@ class Link extends DataObject
 		parent::DataObject( 'T_links', 'link_', 'link_ID',
 													'datecreated', 'datemodified', 'creator_user_ID', 'lastedit_user_ID' );
 
-		$this->delete_cascades = array(
-				array( 'table'=>'T_links__vote', 'fk'=>'lvot_link_ID', 'msg'=>T_('%d votes') ),
-			);
-
 		if( $db_row != NULL )
 		{
 			$this->ID       = $db_row->link_ID;
@@ -101,8 +97,21 @@ class Link extends DataObject
 
 
 	/**
+	 * Get delete cascade settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_cascades()
+	{
+		return array(
+				array( 'table'=>'T_links__vote', 'fk'=>'lvot_link_ID', 'msg'=>T_('%d votes') ),
+			);
+	}
+
+
+	/**
 	 * Get (@link LinkOwner) of the link
-	 * 
+	 *
 	 * @return LinkOwner
 	 */
 	function & get_LinkOwner()
@@ -249,6 +258,7 @@ class Link extends DataObject
 					// Get URL to froce download a file
 					if( $File->get_ext() == 'zip' )
 					{ // Provide direct url to ZIP files
+					  // NOTE: The same hardcoded place is in the file "htsrv/download.php", lines 56-60
 						return $File->get_url();
 					}
 					else

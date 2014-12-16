@@ -23,7 +23,7 @@
  * @package admin
  *
  *
- * @version $Id: _coll_advanced.form.php 7522 2014-10-27 10:18:40Z yura $
+ * @version $Id: _coll_advanced.form.php 7523 2014-10-27 10:19:17Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -47,9 +47,19 @@ $Form->hidden( 'tab', 'advanced' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
 
-$Form->begin_fieldset( T_('Multiple authors').get_manual_link('multiple_author_settings') );
-	$Form->checkbox( 'advanced_perms', $edited_Blog->get( 'advanced_perms' ), T_('Use advanced perms'), T_('This will turn on the advanced User and Group permissions tabs for this blog.') );
+$Form->begin_fieldset( T_('Workflow').get_manual_link('coll-workflow-settings') );
 	$Form->checkbox( 'blog_use_workflow', $edited_Blog->get_setting( 'use_workflow' ), T_('Use workflow'), T_('This will notably turn on the Tracker tab in the Posts view.') );
+$Form->end_fieldset();
+
+
+$Form->begin_fieldset( T_('Blog Permissions').get_manual_link('coll-permission-settings') );
+	$Form->checkbox( 'advanced_perms', $edited_Blog->get( 'advanced_perms' ), T_('Use advanced perms'), T_('This will turn on the advanced User and Group permissions tabs for this blog.') );
+	$Form->radio( 'blog_allow_access', $edited_Blog->get_setting( 'allow_access' ),
+			array(
+				array( 'public', T_('Everyone (Public Blog)') ),
+				array( 'users', T_('Logged in users') ),
+				array( 'members', T_('Members') ),
+		), T_('Allow access to'), true );
 $Form->end_fieldset();
 
 
@@ -226,6 +236,20 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveBut
 		{
 			jQuery( '#ajax_form_enabled' ).attr( "checked", true );
 			jQuery( '#ajax_form_loggedin_enabled' ).attr( "disabled", false );
+		}
+	} );
+	jQuery( '#advanced_perms' ).click( function()
+	{
+		if( ! jQuery( this ).is( ':checked' ) && jQuery( 'input[name=blog_allow_access][value=members]' ).is( ':checked' ) )
+		{
+			jQuery( 'input[name=blog_allow_access][value=users]' ).attr( 'checked', true );
+		}
+	} );
+	jQuery( 'input[name=blog_allow_access][value=members]' ).click( function()
+	{
+		if( jQuery( this ).is( ':checked' ) )
+		{
+			jQuery( '#advanced_perms' ).attr( 'checked', true );
 		}
 	} );
 </script>

@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _charset.funcs.php 6134 2014-03-08 07:48:07Z manuel $
  *
  * @todo dh> Move this to some other directory?
  */
@@ -115,7 +115,7 @@ function replace_special_chars( $str, $post_locale = NULL )
 
 	// Decode entities to be able to transliterate the associated chars:
 	// Tblue> TODO: Check if this could have side effects.
-	$str = evo_html_entity_decode( $str, ENT_NOQUOTES, $evo_charset );
+	$str = html_entity_decode( $str, ENT_NOQUOTES, $evo_charset );
 
 	$our_locale = $post_locale;
 	if( $our_locale === NULL )
@@ -142,7 +142,7 @@ function replace_special_chars( $str, $post_locale = NULL )
 
 	if( ( $newstr = evo_iconv_transliterate( $str, $post_locale ) ) !== false )
 	{	// iconv allows us to get nice URL titles by transliterating non-ASCII chars.
-		// Tblue> evo_htmlentities() does not know anything about ASCII?! ISO-8859-1 will work too, though.
+		// Tblue> htmlentities() does not know anything about ASCII?! ISO-8859-1 will work too, though.
 		$newstr_charset = 'ISO-8859-1';
 	}
 	// TODO: sam2kb> convert this to 'transliteration_map'
@@ -169,7 +169,7 @@ function replace_special_chars( $str, $post_locale = NULL )
 	}
 
 	// Replace HTML entities
-	$newstr = evo_htmlentities( $newstr, ENT_NOQUOTES, $newstr_charset );
+	$newstr = htmlentities( $newstr, ENT_NOQUOTES, $newstr_charset );
 
 	// Handle special entities (e.g., use "-" instead of "a" for "&"):
 	$newstr = str_replace(

@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _image.funcs.php 7702 2014-11-26 17:32:42Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -465,6 +465,56 @@ function rotate_image( $File, $degrees )
 
 	// Save image
 	save_image( $imh, $File->get_full_path(), $Filetype->mimetype );
+
+	// Remove the old thumbnails
+	$File->rm_cache();
+
+	return true;
+}
+
+
+/**
+ * Crop image
+ *
+ * @param object File
+ * @param integer X coordinate (in percents)
+ * @param integer Y coordinate (in percents)
+ * @param integer Width (in percents)
+ * @param integer Height (in percents)
+ * @return boolean TRUE if cropping is successful
+ */
+function crop_image( $File, $x, $y, $width, $height )
+{
+	$Filetype = & $File->get_Filetype();
+	if( ! $Filetype )
+	{ // Error
+		return false;
+	}
+
+	// Load image
+	list( $err, $src_imh ) = load_image( $File->get_full_path(), $Filetype->mimetype );
+	if( ! empty( $err ) )
+	{ // Error
+		return false;
+	}
+
+	$src_width = imagesx( $src_imh );
+	$src_height = imagesy( $src_imh );
+	$x = $src_width * ( $x / 100 );
+	$y = $src_height * ( $y / 100 );
+	$width = $src_width * ( $width / 100 );
+	$height = $src_height * ( $height / 100 );
+
+	$dst_imh = imagecreatetruecolor( $width, $height );
+
+	// Crop image
+	if( ! @imagecopyresampled( $dst_imh, $src_imh, 0, 0, $x, $y, $width, $height, $width, $height ) )
+	{ // If func imagecopyresampled is not defined for example:
+		return false;
+	}
+
+	// Save image
+	save_image( $dst_imh, $File->get_full_path(), $Filetype->mimetype );
 
 	// Remove the old thumbnails
 	$File->rm_cache();

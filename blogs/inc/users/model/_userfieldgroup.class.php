@@ -53,12 +53,6 @@ class UserfieldGroup extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_users__fieldgroups', 'ufgp_', 'ufgp_ID' );
 
-		$this->delete_restrictions = array(
-			array( 'table'=>'T_users__fielddefs', 'fk'=>'ufdf_ufgp_ID', 'msg'=>T_('%d user fields in this group') ),
-		);
-
-		$this->delete_cascades = array();
-
 		if( $db_row != NULL )
 		{
 			$this->ID   = $db_row->ufgp_ID;
@@ -69,6 +63,20 @@ class UserfieldGroup extends DataObject
 		{	// Create a new user field group:
 		}
 	}
+
+
+	/**
+	 * Get delete restriction settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_restrictions()
+	{
+		return array(
+				array( 'table'=>'T_users__fielddefs', 'fk'=>'ufdf_ufgp_ID', 'msg'=>T_('%d user fields in this group') ),
+			);
+	}
+
 
 	/**
 	 * Load data from Request form fields.

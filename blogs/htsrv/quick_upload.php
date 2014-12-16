@@ -14,7 +14,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author efy-asimo: Attila Simo.
  *
- * @version $Id$
+ * @version $Id: quick_upload.php 6335 2014-03-25 13:19:27Z yura $
  */
 
 
@@ -154,7 +154,7 @@ function out_echo( $message ,$specialchars )
 	if( $specialchars == 1 )
 	{
 		$message['specialchars'] = 1;
-		echo evo_htmlspecialchars(evo_json_encode(array('success'=>$message)));
+		echo htmlspecialchars(evo_json_encode(array('success'=>$message)));
 	}
 	else
 	{
@@ -254,6 +254,7 @@ if( $upload )
 		$message['text'] = '<span class="result_error"> '.$error_filename.'</span>';
 		$message['status'] = 'error';
 		out_echo($message, $specialchars);
+		syslog_insert( sprintf( 'The uploaded file %s has an unrecognized extension', '<b>'.$newName.'</b>' ), 'warning', 'file' );
 		exit();
 	}
 	// Process a name of old name

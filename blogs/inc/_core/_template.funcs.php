@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _template.funcs.php 7613 2014-11-12 08:19:20Z yura $
+ * @version $Id: _template.funcs.php 7771 2014-12-08 08:24:11Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -194,6 +194,7 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 		if( ( $host != null ) && ( $host !== $base_host ) && ( substr( $host, - ( strlen( $base_host ) + 1 ) ) != '.'.$base_host ) )
 		{ // The main domain of the redirect_to url and the base url doesn't match
 			$Messages->add( 'Tried to redirect to an external url!', 'error' );
+			syslog_insert( 'Tried to redirect to an external url: '.$redirect_to, 'error', NULL );
 			$redirect_to = $baseurl;
 		}
 	}
@@ -259,7 +260,7 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	if( headers_sent($filename, $line) )
 	{
 		debug_die( sprintf('Headers have already been sent in %s on line %d.', basename($filename), $line)
-						.'<br />Cannot <a href="'.evo_htmlspecialchars($redirect_to).'">redirect</a>.' );
+						.'<br />Cannot <a href="'.htmlspecialchars($redirect_to).'">redirect</a>.' );
 	}
 	header( 'Location: '.$redirect_to, true, $http_response_code ); // explictly setting the status is required for (fast)cgi
 	exit(0);
@@ -634,8 +635,9 @@ function get_request_title( $params = array() )
 		case 'edit':
 			$action = param_action(); // Edit post by switching into 'In skin' mode from Back-office
 			$p = param( 'p', 'integer', 0 ); // Edit post from Front-office
+			$post_ID = param ( 'post_ID', 'integer', 0 ); // Update the edited post( If user is redirected to edit form again with some error messages )
 			$cp = param( 'cp', 'integer', 0 ); // Copy post from Front-office
-			if( $action == 'edit_switchtab' || $p > 0 )
+			if( $action == 'edit_switchtab' || $p > 0 || $post_ID > 0 )
 			{	// Edit post
 				$title = $params['edit_text_update'];
 			}
@@ -928,6 +930,12 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $type = 'js', $ve
 function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output = false )
 {
 	static $required_js;
+	global $dequeued_headlines;
+
+	if( isset( $dequeued_headlines[ $js_file ] ) )
+	{ // Don't require this file if it was dequeued before this request
+		return;
+	}
 
 	if( is_admin_page() && ( $relative_to == 'blog' ) )
 	{ // Make sure we never use resource url relative to any blog url in case of an admin page ( important in case of multi-domain installations )
@@ -958,7 +966,7 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
 		}
 		else
 		{ // Add script tag to <head>
-			add_headline( $script_tag );
+			add_headline( $script_tag, $js_file );
 		}
 	}
 
@@ -989,6 +997,12 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
 function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media = NULL, $version = '#', $output = false )
 {
 	static $required_css;
+	global $dequeued_headlines;
+
+	if( isset( $dequeued_headlines[ $css_file ] ) )
+	{ // Don't require this file if it was dequeued before this request
+		return;
+	}
 
 	// WHich subfolder do we want to use?
 	if( preg_match( '/\.(bundle|bmin)\.css$/', $css_file ) )
@@ -1019,8 +1033,32 @@ function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media
 		}
 		else
 		{ // Add stylesheet tag to <head>
-			add_headline( $stylesheet_tag );
+			add_headline( $stylesheet_tag, $css_file );
 		}
+	}
+}
+
+
+/**
+ * Dequeue a file from $headlines array by file name or alias
+ *
+ * @param string alias, url or filename (relative to rsc/js) for javascript file
+ */
+function dequeue( $file_name )
+{
+	global $headlines, $dequeued_headlines;
+
+	if( ! is_array( $dequeued_headlines ) )
+	{ // Initialize array firs time
+		$dequeued_headlines = array();
+	}
+
+	// Store each dequeued file in order to don't require this next time
+	$dequeued_headlines[ $file_name ] = true;
+
+	if( isset( $headlines[ $file_name ] ) )
+	{ // Dequeue this file
+		unset( $headlines[ $file_name ] );
 	}
 }
 
@@ -1079,30 +1117,68 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				// Colorbox: a lightweight Lightbox alternative -- allows zooming on images and slideshows in groups of images
 				// Added by fplanque - (MIT License) - http://colorpowered.com/colorbox/
 
-				// Initialize js variable b2evo_colorbox_params that is used in async loaded colorbox file
+				global $b2evo_icons_type;
+				// Colorbox params to display a voting panel
+				$colorbox_voting_params = '{displayVoting: true,
+					votingUrl: "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=link&b2evo_icons_type='.$b2evo_icons_type.'&'.url_crumb( 'voting' ).'",
+					minWidth: 345}';
+				// Colorbox params without voting panel
+				$colorbox_no_voting_params = '{minWidth: 255}';
+
+				// Initialize js variables b2evo_colorbox_params* that are used in async loaded colorbox file
 				if( is_logged_in() )
-				{ // If user is logged in - display a voting panel
-					global $b2evo_icons_type;
-					$colorbox_params = ',
-						displayVoting: true,
-						votingUrl: "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=link&b2evo_icons_type='.$b2evo_icons_type.'&'.url_crumb( 'voting' ).'",
-						minWidth: 345';
+				{ // User is logged in
+					// All unknown images have a voting panel
+					$colorbox_params_other = 'var b2evo_colorbox_params_other = '.$colorbox_voting_params;
+					if( is_admin_page() )
+					{ // Display a voting panel for all images in backoffice
+						$colorbox_params_post = 'var b2evo_colorbox_params_post = '.$colorbox_voting_params;
+						$colorbox_params_cmnt = 'var b2evo_colorbox_params_cmnt = '.$colorbox_voting_params;
+						$colorbox_params_user = 'var b2evo_colorbox_params_user = '.$colorbox_voting_params;
+					}
+					else
+					{ // Display a voting panel depending on skin settings
+						global $Skin;
+						if( ! empty( $Skin ) )
+						{
+							$colorbox_params_post = 'var b2evo_colorbox_params_post = '.( $Skin->get_setting( 'colorbox_vote_post' ) ? $colorbox_voting_params : $colorbox_no_voting_params );
+							$colorbox_params_cmnt = 'var b2evo_colorbox_params_cmnt = '.( $Skin->get_setting( 'colorbox_vote_comment' ) ? $colorbox_voting_params : $colorbox_no_voting_params );
+							$colorbox_params_user = 'var b2evo_colorbox_params_user = '.( $Skin->get_setting( 'colorbox_vote_user' ) ? $colorbox_voting_params : $colorbox_no_voting_params );
+						}
+					}
 				}
-				else
-				{ // Set minimum width
-					$colorbox_params = ',
-						minWidth: 255';
+				if( ! isset( $colorbox_params_post ) )
+				{ // Don't display a voting panel for all images if user is NOT logged in OR for case when $Skin is not defined
+					$colorbox_params_other = 'var b2evo_colorbox_params_other = '.$colorbox_no_voting_params;
+					$colorbox_params_post = 'var b2evo_colorbox_params_post = '.$colorbox_no_voting_params;
+					$colorbox_params_cmnt = 'var b2evo_colorbox_params_cmnt = '.$colorbox_no_voting_params;
+					$colorbox_params_user = 'var b2evo_colorbox_params_user = '.$colorbox_no_voting_params;
 				}
-				add_js_headline( 'var b2evo_colorbox_params = {
+
+				require_js( '#jquery#', $relative_to );
+				// Initialize the colorbox settings:
+				add_js_headline(
+					// General settings:
+					'var b2evo_colorbox_params = {
 						maxWidth: "95%",
 						maxHeight: "90%",
 						slideshow: true,
-						slideshowAuto: false'.
-						$colorbox_params.'
-					}' );
+						slideshowAuto: false
+					};
+					'// For post images
+					.$colorbox_params_post.';
+					b2evo_colorbox_params_post = jQuery.extend( {}, b2evo_colorbox_params, b2evo_colorbox_params_post );
+					'// For comment images
+					.$colorbox_params_cmnt.';
+					b2evo_colorbox_params_cmnt = jQuery.extend( {}, b2evo_colorbox_params, b2evo_colorbox_params_cmnt );
+					'// For user images
+					.$colorbox_params_user.';
+					b2evo_colorbox_params_user = jQuery.extend( {}, b2evo_colorbox_params, b2evo_colorbox_params_user );
+					'// For all other images
+					.$colorbox_params_other.';
+					b2evo_colorbox_params = jQuery.extend( {}, b2evo_colorbox_params, b2evo_colorbox_params_other );' );
 				// TODO: translation strings for colorbox buttons
 
-				require_js( '#jquery#', $relative_to );
 				require_js( 'build/colorbox.bmin.js', $relative_to, true );
 				require_css( 'colorbox/colorbox.css', $relative_to );
 				break;
@@ -1135,12 +1211,27 @@ function add_js_translation( $string, $translation )
  * {@link require_css()} and {@link require_js()} instead.
  * This avoids duplicates and allows caching/concatenating those files
  * later (not implemented yet)
- * @param string
+ *
+ * @param string HTML tag like <script></script> or <link />
+ * @param string File name (used to index)
  */
-function add_headline($headline)
+function add_headline( $headline, $file_name = NULL )
 {
-	global $headlines;
-	$headlines[] = $headline;
+	global $headlines, $dequeued_headlines;
+
+	if( is_null( $file_name ) )
+	{ // Use auto index if file name is not defined
+		$headlines[] = $headline;
+	}
+	else
+	{ // Try to add headline with file name to array
+		if( isset( $dequeued_headlines[ $file_name ] ) )
+		{ // Don't require this file if it was dequeued before this request
+			return;
+		}
+		// Use file name as key index in $headline array
+		$headlines[ $file_name ] = $headline;
+	}
 }
 
 
@@ -1507,6 +1598,28 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 			} );' );
 			break;
 	}
+}
+
+
+/**
+ * Registers headlines required to jqPlot charts
+ *
+ * @param string alias, url or filename (relative to rsc/css, rsc/js) for JS/CSS files
+ */
+function init_jqplot_js( $relative_to = 'rsc_url' )
+{
+	require_js( '#jquery#', $relative_to ); // dependency
+	require_js( '#jqplot#', $relative_to );
+	require_js( '#jqplot_barRenderer#', $relative_to );
+	require_js( '#jqplot_canvasAxisTickRenderer#', $relative_to );
+	require_js( '#jqplot_canvasTextRenderer#', $relative_to );
+	require_js( '#jqplot_categoryAxisRenderer#', $relative_to );
+	require_js( '#jqplot_enhancedLegendRenderer#', $relative_to );
+	require_js( '#jqplot_highlighter#', $relative_to );
+	require_js( '#jqplot_canvasOverlay#', $relative_to );
+	require_js( '#jqplot_donutRenderer#', $relative_to );
+	require_css( '#jqplot_css#', $relative_to );
+	require_css( 'jquery/jquery.jqplot.b2evo.css', $relative_to );
 }
 
 
@@ -1954,7 +2067,7 @@ function is_recursive( /*array*/ & $array, /*array*/ & $alreadySeen = array() )
  */
 function display_ajax_form( $params )
 {
-	global $rsc_uri, $samedomain_htsrv_url, $ajax_form_number;
+	global $rsc_url, $samedomain_htsrv_url, $ajax_form_number;
 
 	if( is_recursive( $params ) )
 	{ // The params array contains recursion, don't try to encode, display error message instead
@@ -1964,7 +2077,7 @@ function display_ajax_form( $params )
 	}
 
 	if( empty( $ajax_form_number ) )
-	{	// Set number for ajax form to use unique ID for each new form
+	{ // Set number for ajax form to use unique ID for each new form
 		$ajax_form_number = 0;
 	}
 	$ajax_form_number++;
@@ -1973,11 +2086,11 @@ function display_ajax_form( $params )
 
 	// Needs json_encode function to create json type params
 	$json_params = evo_json_encode( $params );
-	$ajax_loader = "<p class='ajax-loader'><img src='".$rsc_uri."img/ajax-loader2.gif' /><br />".T_( 'Form is loading...' )."</p>";
+	$ajax_loader = '<p class="ajax-loader"><span class="loader_img loader_ajax_form" title="'.T_('Loading...').'"></span><br />'.T_( 'Form is loading...' ).'</p>';
 	?>
 	<script type="text/javascript">
 		// display loader gif until the ajax call returns
-		document.write( <?php echo '"'.$ajax_loader.'"'; ?> );
+		document.write( <?php echo "'".$ajax_loader."'"; ?> );
 
 		var ajax_form_offset_<?php echo $ajax_form_number; ?> = jQuery('#ajax_form_number_<?php echo $ajax_form_number; ?>').offset().top;
 		var request_sent_<?php echo $ajax_form_number; ?> = false;
@@ -2039,7 +2152,7 @@ function display_ajax_form( $params )
 function display_login_form( $params )
 {
 	global $Settings, $Plugins, $Session, $Blog, $blog, $dummy_fields;
-	global $secure_htsrv_url, $admin_url, $baseurl, $ReqHost;
+	global $secure_htsrv_url, $admin_url, $baseurl, $ReqHost, $redirect_to;
 
 	$params = array_merge( array(
 			'form_before' => '',
@@ -2060,6 +2173,7 @@ function display_login_form( $params )
 			'reqID' => '',
 			'sessID' => '',
 			'transmit_hashed_password' => false,
+			'display_abort_link' => true,
 		), $params );
 
 	$inskin = $params[ 'inskin' ];
@@ -2067,14 +2181,15 @@ function display_login_form( $params )
 	$redirect_to = $params[ 'redirect_to' ];
 	$links = array();
 
-	if( empty( $params[ 'login_required' ] )
+	if( $params['display_abort_link']
+		&& empty( $params[ 'login_required' ] )
 		&& $params[ 'action' ] != 'req_validatemail'
 		&& strpos($redirect_to, $admin_url) !== 0
 		&& strpos($ReqHost.$redirect_to, $admin_url ) !== 0 )
 	{ // No login required, allow to pass through
 		// TODO: dh> validate redirect_to param?!
 		// check if redirect_to url requires logged in user
-		if( require_login( $redirect_to, true ) )
+		if( empty( $redirect_to) || require_login( $redirect_to, true ) )
 		{ // logged in user require for redirect_to url
 			if( !empty( $blog ) )
 			{ // blog is set
@@ -2095,7 +2210,7 @@ function display_login_form( $params )
 		{ // logged in user isn't required for redirect_to url, set abort url to redirect_to
 			$abort_url = $redirect_to;
 		}
-		$links[] = '<a href="'.evo_htmlspecialchars( url_rel_to_same_host( $abort_url, $ReqHost ) ).'">'
+		$links[] = '<a href="'.htmlspecialchars( url_rel_to_same_host( $abort_url, $ReqHost ) ).'">'
 		./* Gets displayed as link to the location on the login form if no login is required */ T_('Abort login!').'</a>';
 	}
 
@@ -2159,7 +2274,8 @@ function display_login_form( $params )
 			$Session->dbsave(); // save now, in case there's an error later, and not saving it would prevent the user from logging in.
 		}
 		$Form->hidden( 'pwd_salt', $pwd_salt );
-		$Form->hidden( 'pwd_hashed', '' ); // gets filled by JS
+		// Add container for the hashed password hidden inputs
+		echo '<div id="pwd_hashed_container"></div>'; // gets filled by JS
 	}
 
 	if( $inskin )
@@ -2186,6 +2302,10 @@ function display_login_form( $params )
 	if( ! empty( $login ) )
 	{
 		$lost_password_url .= '&amp;'.$dummy_fields[ 'login' ].'='.rawurlencode($login);
+	}
+	if( ! empty( $redirect_to ) )
+	{
+		$lost_password_url .= '&amp;redirect_to='.rawurlencode( $redirect_to );
 	}
 	$pwd_note = '<a href="'.$lost_password_url.'">'.T_('Lost your password?').'</a>';
 
@@ -2225,7 +2345,7 @@ function display_login_form( $params )
 		// Passthrough REQUEST data (when login is required after having POSTed something)
 		// (Exclusion of 'login_action', 'login', and 'action' has been removed. This should get handled via detection in Form (included_input_field_names),
 		//  and "action" is protected via crumbs)
-		$Form->hiddens_by_key( remove_magic_quotes($_REQUEST) );
+		$Form->hiddens_by_key( remove_magic_quotes( $_REQUEST ), array( 'pwd_hashed' ) );
 	}
 
 	$Form->end_form();
@@ -2241,39 +2361,118 @@ function display_login_form( $params )
 		echo '</div>';
 	}
 
-	echo '<script type="text/javascript">';
-	// Autoselect login text input or pwd input, if there\'s a login already:
-	echo 'var login = document.getElementById("'.$dummy_fields[ 'login' ].'");
-		if( login.value.length > 0 )
-		{	// Focus on the password field:
-			document.getElementById("'.$dummy_fields[ 'pwd' ].'").focus();
-		}
-		else
-		{	// Focus on the login field:
-			login.focus();
-		}';
+	display_login_js_handler( $params );
+}
 
+
+/**
+ * Display the login form js part, to get the user salt and encrypt the password
+ *
+ * @param array params
+ */
+function display_login_js_handler( $params )
+{
+	global $Blog, $dummy_fields;
+
+	$params = array_merge( array( 'get_widget_login_hidden_fields' => false ), $params );
+
+?>
+	<script type="text/javascript">
+	var requestSent = false;
+	var login = document.getElementById("<?php echo $dummy_fields[ 'login' ]; ?>");
+	if( login.value.length > 0 )
+	{ // Focus on the password field:
+		document.getElementById("<?php echo $dummy_fields[ 'pwd' ]; ?>").focus();
+	}
+	else
+	{ // Focus on the login field:
+		login.focus();
+	}
+
+	var login_action = 'login_action[login]';
+	jQuery( "input[name='login_action[redirect_to_backoffice]']" ).click( function() {
+		login_action = 'login_action[redirect_to_backoffice]';
+	});
+
+	function processSubmit(e) {
+		if (e.preventDefault) e.preventDefault();
+		if( requestSent )
+		{ // A submit request was already sent, do not send another
+			return;
+		}
+
+		requestSent = true;
+		var form = document.getElementById("login_form");
+		var username = form.<?php echo $dummy_fields[ 'login' ]; ?>.value;
+		var get_widget_login_hidden_fields = <?php echo $params['get_widget_login_hidden_fields'] ? 'true' : 'false'; ?>;
+		var sessionid = '<?php echo $Session->ID; ?>';
+
+		if( !form.<?php echo $dummy_fields[ 'pwd' ]; ?> || !form.pwd_salt || typeof hex_sha1 == "undefined" && typeof hex_md5 == "undefined" ) {
+			return true;
+		}
+
+		jQuery.ajax({
+			type: 'POST',
+			url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+			data: {
+				'blogid': '<?php echo $Blog->ID; ?>',
+				'<?php echo $dummy_fields[ 'login' ]; ?>': username,
+				'action': 'get_user_salt',
+				'get_widget_login_hidden_fields': get_widget_login_hidden_fields,
+				'crumb_loginsalt': '<?php echo get_crumb('loginsalt'); ?>',
+			},
+			success: function(result) {
+				var pwd_container = jQuery('#pwd_hashed_container');
+				var parsed_result;
+
+				try {
+					parsed_result = JSON.parse(result);
+				} catch( e ) {
+					pwd_container.html( result );
+					return;
+				}
+
+				var raw_password = form.<?php echo $dummy_fields[ 'pwd' ]; ?>.value;
+				var salts = parsed_result['salts'];
+
+				if( get_widget_login_hidden_fields )
+				{
+					form.crumb_loginform.value = parsed_result['crumb'];
+					form.pwd_salt.value = parsed_result['pwd_salt'];
+					sessionid = parsed_result['session_id'];
+				}
+
+				for( var index in salts ) {
+					var pwd_hashed = hex_sha1( hex_md5( salts[index] + raw_password ) + form.pwd_salt.value );
+					pwd_container.append( '<input type="hidden" value="' + pwd_hashed + '" name="pwd_hashed[]">' );
+				}
+
+				form.<?php echo $dummy_fields[ 'pwd' ]; ?>.value = 'padding_padding_padding_padding_padding_padding_hashed_' + sessionid; /* to detect cookie problems */
+				// (paddings to make it look like encryption on screen. When the string changes to just one more or one less *, it looks like the browser is changing the password on the fly)
+
+				// Append the correct login action as hidden input field
+				pwd_container.append( '<input type="hidden" value="1" name="' + login_action + '">' );
+				form.submit();
+			}
+		});
+
+	    // You must return false to prevent the default form behavior
+	    return false;
+	}
+
+	<?php
 	if( $params[ 'transmit_hashed_password' ] )
 	{ // Hash the password onsubmit and clear the original pwd field
 		// TODO: dh> it would be nice to disable the clicked/used submit button. That's how it has been when the submit was attached to the submit button(s)
-		echo 'jQuery( "#login_form" ).bind( "submit", function(){'.
-				/* this.value = '.TS_('Please wait...').' */
-				'var form = document.getElementById("login_form");'.
-
-				// Calculate hashed password and set it in the form:
-				'if( form.pwd_hashed && form.'.$dummy_fields[ 'pwd' ].' && form.pwd_salt && typeof hex_sha1 != "undefined" && typeof hex_md5 != "undefined" )
-				{'.
-					// We first hash to md5, because that's how the passwords are stored in the database
-					// We then hash with the salt using SHA1 (fp> can't we do that with md5 again, in order to load 1 less Javascript library?)
-					// NOTE: MD5 is kind of "weak" and therefor we also use SHA1
-					'form.pwd_hashed.value = hex_sha1( hex_md5(form.'.$dummy_fields[ 'pwd' ].'.value) + form.pwd_salt.value );
-					form.'.$dummy_fields[ 'pwd' ].'.value = "padding_padding_padding_padding_padding_padding_hashed_'.$Session->ID.'";'. /* to detect cookie problems */
-					// (paddings to make it look like encryption on screen. When the string changes to just one more or one less *, it looks like the browser is changing the password on the fly)
-				'}
-				return true;
-			} );';
+		?>
+		// Set login form submit handler
+		jQuery( '#login_form' ).bind( 'submit', processSubmit );
+		<?php
 	}
-	echo '</script>';
+	?>
+
+	</script>
+<?php
 }
 
 
@@ -2286,7 +2485,7 @@ function display_login_form( $params )
  */
 function display_lostpassword_form( $login, $hidden_params, $params = array() )
 {
-	global $secure_htsrv_url, $dummy_fields;
+	global $secure_htsrv_url, $dummy_fields, $redirect_to;
 
 	$params = array_merge( array(
 			'form_before'   => '',
@@ -2346,6 +2545,10 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 	else
 	{
 		$login_url = $secure_htsrv_url.'login.php';
+	}
+	if( ! empty( $redirect_to ) )
+	{
+		$login_url = url_add_param( $login_url, 'redirect_to='.rawurlencode( $redirect_to ) );
 	}
 	$login_link = '<a href="'.$login_url.'" class="floatleft">'.'&laquo; '.T_('Back to login form').'</a>';
 
@@ -2525,44 +2728,50 @@ function display_password_indicator( $params = array() )
 			'blacklist'   => "'b2evo','b2evolution'", // Identify the password as "weak" if it includes any of these words
 		), $params );
 
-	$extra_bar_width = 2;
-	$container_left_margin = 0;
-	if( !empty($disp) )
-	{	// In skin password form
-		$extra_bar_width = 0;
-		$container_left_margin = '3px';
-	}
-
 	echo "<script type='text/javascript'>
 	// Load password strength estimation library
 	(function(){var a;a=function(){var a,b;b=document.createElement('script');b.src='".$rsc_url."js/zxcvbn.js';b.type='text/javascript';b.async=!0;a=document.getElementsByTagName('script')[0];return a.parentNode.insertBefore(b,a)};null!=window.attachEvent?window.attachEvent('onload',a):window.addEventListener('load',a,!1)}).call(this);
 
 	// Call 'passcheck' function when document is loaded
-	if( document.addEventListener ) { document.addEventListener('DOMContentLoaded', passcheck, false); } else { window.attachEvent('onload', passcheckpasscheck); }
+	if( document.addEventListener )
+	{
+		document.addEventListener( 'DOMContentLoaded', passcheck, false );
+	}
+	else
+	{
+		window.attachEvent( 'onload', passcheck );
+	}
 
 	function passcheck()
 	{
-		var pass1input = document.getElementById('".$params['pass1-id']."');
-		if( pass1input == null ) {
+		var pass1input = jQuery( 'input#".$params['pass1-id']."' );
+		if( pass1input.length == 0 ) {
 			return; // password field not found
 		}
 
-		var pass2input = document.getElementById('".$params['pass2-id']."');
-		if( pass2input != null ) {
-			pass2input.style.width = '".($params['field-width'] - 2)."px'; // Set fixed length
+		var pass2input = jQuery( 'input#".$params['pass2-id']."' );
+		if( pass2input.length != 0 ) {
+			pass2input.css( 'width', '".($params['field-width'] - 2)."px' ); // Set fixed length
 		}
 
 		// Prepair password field
-		pass1input.style.width = '".($params['field-width'] - 2)."px'; // Set fixed length
-		pass1input.setAttribute('onkeyup','return passinfo(this);'); // Add onkeyup attribute
-		pass1input.parentNode.innerHTML += \"<div id='p-container'><div id='p-result'></div><div id='p-status'></div><div id='p-time'></div></div>\";
+		pass1input.css( 'width', '".($params['field-width'] - 2)."px' ); // Set fixed length
+		pass1input.attr( 'onkeyup', 'return passinfo(this);' ); // Add onkeyup attribute
+		pass1input.parent().append( \"<div id='p-container'><div id='p-result'></div><div id='p-status'></div><div id='p-time'></div></div>\" );
 
-		var pstyle = document.createElement('style');
-		pstyle.innerHTML += '#p-container { position: relative; margin: 4px 0 0 ".$container_left_margin."; width:".($params['field-width']+$extra_bar_width)."px; height:5px; border: 1px solid #CCC; font-size: 84%; line-height:normal; color: #999 }';
-		pstyle.innerHTML += '#p-result { height:5px }';
-		pstyle.innerHTML += '#p-status { position:absolute; width: 100px; top:-7px; left:".($params['field-width']+8)."px }';
-		pstyle.innerHTML += '#p-time { position:absolute; width: 400px }';
-		document.body.appendChild(pstyle);
+		jQuery( 'head' ).append( '<style>' +
+				'#p-container { position: relative; margin-top: 4px; height:5px; border: 1px solid #CCC; font-size: 84%; line-height:normal; color: #999; background: #FFF } ' +
+				'#p-result { height:5px } ' +
+				'#p-status { position:absolute; width: 100px; top:-5px; left:".($params['field-width']+8)."px } ' +
+				'#p-time { position:absolute; width: 400px } ' +
+			'</style>'
+		);
+		jQuery( '#p-container' ).css( 'width', pass1input.outerWidth() - 2 );
+		var pass1input_marginleft = parseInt( pass1input.css( 'margin-left' ) );
+		if( pass1input_marginleft > 0 )
+		{
+			jQuery( '#p-container' ).css( 'margin-left', pass1input_marginleft + 'px' );
+		}
 	}
 
 	function passinfo(el)
@@ -2662,7 +2871,7 @@ function display_login_validator( $params = array() )
 	var login_text_available = \''.TS_('This username is available.').'\';
 	var login_text_exists = \''.TS_('This username is already in use. Please choose another one.').'\';
 
-	jQuery( "#register_form #'.$params[ 'login-id' ].'" ).change( function()
+	jQuery( "#register_form input#'.$params[ 'login-id' ].'" ).change( function()
 	{	// Validate if username is available
 		var note_Obj = jQuery( this ).next().next();
 		if( jQuery( this ).val() == "" )
@@ -2685,10 +2894,15 @@ function display_login_validator( $params = array() )
 						jQuery( "#login_status" ).html( login_icon_exists );
 						note_Obj.html( login_text_exists ).attr( "class", "notes red" );
 					}
-					else
+					else if( result == "available" )
 					{	// Login is available
 						jQuery( "#login_status" ).html( login_icon_available );
 						note_Obj.html( login_text_available ).attr( "class", "notes green" );
+					}
+					else
+					{	// Errors
+						jQuery( "#login_status" ).html( login_icon_exists );
+						note_Obj.html( result ).attr( "class", "notes red" );
 					}
 				}
 			} );
@@ -2781,6 +2995,38 @@ function init_field_editor_js( $params = array() )
 
 	return false;
 } );' );
+}
+
+
+/**
+ * Registers headlines for initialization of functions to autocomplete usernames in textarea
+ */
+function init_autocomplete_usernames_js( $relative_to = 'rsc_url' )
+{
+	if( is_admin_page() )
+	{ // Check to enable it in back-office
+		global $Blog;
+		if( empty( $Blog ) || ! $Blog->get_setting( 'autocomplete_usernames' ) )
+		{ // Blog setting doesn't allow to autocomplete usernames
+			return;
+		}
+	}
+	else
+	{ // Check to enable it in front-office
+		global $Item, $Skin, $disp;
+		if( ! empty( $Skin ) && ! $Skin->get_setting( 'autocomplete_usernames' ) )
+		{ // Skin disables to autocomplete usernames
+			return;
+		}
+		if( $disp != 'edit' && $disp != 'edit_comment' && ( empty( $Item ) || ! $Item->can_comment( NULL ) ) )
+		{ // It is not the edit post/comment form and No form to comment of this post
+			return;
+		}
+	}
+
+	require_js( '#jquery#', $relative_to );
+	require_js( 'build/textcomplete.bmin.js', $relative_to );
+	require_css( 'jquery/jquery.textcomplete.css', $relative_to );
 }
 
 

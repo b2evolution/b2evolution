@@ -8,7 +8,7 @@
  * @package skins
  * @subpackage bootstrap
  *
- * @version $Id: _skin.class.php 4679 2013-09-10 16:14:46Z yura $
+ * @version $Id: _skin.class.php 7498 2014-10-23 07:38:52Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -53,6 +53,24 @@ class bootstrap_Skin extends Skin
 					'defaultvalue' => 1,
 					'type' => 'checkbox',
 				),
+				'colorbox_vote_post' => array(
+					'label' => T_('Voting on Post Images'),
+					'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
+					'defaultvalue' => 1,
+					'type' => 'checkbox',
+				),
+				'colorbox_vote_comment' => array(
+					'label' => T_('Voting on Comment Images'),
+					'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
+					'defaultvalue' => 1,
+					'type' => 'checkbox',
+				),
+				'colorbox_vote_user' => array(
+					'label' => T_('Voting on User Images'),
+					'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
+					'defaultvalue' => 1,
+					'type' => 'checkbox',
+				),
 				'gender_colored' => array(
 					'label' => T_('Display gender'),
 					'note' => T_('Use colored usernames to differentiate men & women.'),
@@ -65,7 +83,13 @@ class bootstrap_Skin extends Skin
 					'defaultvalue' => 0,
 					'type' => 'checkbox',
 				),
-			), parent::get_param_definitions( $params )	);
+				'autocomplete_usernames' => array(
+					'label' => T_('Autocomplete usernames'),
+					'note' => T_('Check to enable autocomplete usernames after entered sign "@" in the comment form'),
+					'defaultvalue' => 1,
+					'type' => 'checkbox',
+				),
+			), parent::get_param_definitions( $params ) );
 
 		return $r;
 	}
@@ -127,6 +151,9 @@ class bootstrap_Skin extends Skin
 					'head_title' => '<div class="panel-heading">$title$<span class="pull-right">$global_icons$</span></div>'."\n",
 					'filters_start' => '<div class="panel-body form-inline">',
 					'filters_end' => '</div>',
+					'messages_start' => '<div class="messages form-inline">',
+					'messages_end' => '</div>',
+					'messages_separator' => '<br />',
 					'list_start' => '<div class="table_scroll">'."\n"
 					               .'<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0">'."\n",
 						'head_start' => "<thead>\n",

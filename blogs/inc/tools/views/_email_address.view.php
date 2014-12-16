@@ -21,14 +21,14 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _email_address.view.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $blog, $admin_url, $UserSettings, $email, $statuses;
 
 param( 'email', 'string', '', true );
-param( 'statuses', 'array/string', array( 'redemption', 'warning', 'suspicious3' ), true );
+param( 'statuses', 'array:string', array( 'redemption', 'warning', 'suspicious3' ), true );
 
 // Create result set:
 
@@ -47,7 +47,7 @@ $count_SQL->FROM( 'T_email__address' );
 
 if( !empty( $email ) )
 {	// Filter by email
-	$email = evo_strtolower( $email );
+	$email = utf8_strtolower( $email );
 	$SQL->WHERE_and( 'emadr_address LIKE '.$DB->quote( $email ) );
 	$count_SQL->WHERE_and( 'emadr_address LIKE '.$DB->quote( $email ) );
 }

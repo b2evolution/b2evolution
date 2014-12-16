@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _blog.funcs.php 7695 2014-11-24 07:41:59Z yura $
+ * @version $Id: _blog.funcs.php 7696 2014-11-24 07:44:18Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -347,7 +347,7 @@ function get_collection_kinds( $kind = NULL )
 			),
 		'photo' => array(
 				'name' => T_('Photoblog'),
-				'desc' => T_('A blog optimized to publishing photos.'),
+				'desc' => T_('A blog optimized for publishing photos.'),
 			),
 		'group' => array(
 				'name' => T_('Group blog'),
@@ -957,6 +957,19 @@ function get_visibility_statuses( $format = '', $exclude = array('trash'), $chec
 				);
 			break;
 
+		case 'button-titles':
+			$r = array(
+					'published'  => NT_('Save as Public!'),
+					'community'  => NT_('Save for Community!'),
+					'protected'  => NT_('Save for Members!'),
+					'review'     => NT_('Save for Review!'),
+					'private'    => NT_('Save as Private!'),
+					'draft'      => NT_('Save as Draft!'),
+					'deprecated' => NT_('Save as Deprecated!'),
+					'redirected' => NT_('Save as Redirected!'),
+				);
+			break;
+
 		case 'ordered-array': // indexed array, ordered from the lowest to the highest public level
 			$r = array(
 				0 => array( 'deprecated', '', T_('Deprecate!'), 'grey' ),
@@ -1151,7 +1164,7 @@ function blogs_user_results_block( $params = array() )
 	}
 
 	global $current_User;
-	if( !$current_User->check_perm( 'users', 'edit' ) || !$current_User->check_perm( 'blogs', 'view' ) )
+	if( !$current_User->check_perm( 'users', 'moderate' ) || !$current_User->check_perm( 'blogs', 'view' ) )
 	{	// Check minimum permission:
 		return;
 	}
@@ -1234,7 +1247,7 @@ function blogs_all_results_block( $params = array() )
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
 			'results_param_prefix' => 'blog_',
-			'results_title'        => T_('Blog list'),
+			'results_title'        => T_('Collection list').get_manual_link('collection-list'),
 			'results_no_text'      => T_('No blog has been created yet!'),
 			'results_no_perm_text' => T_('Sorry, you have no permission to edit/view any blog\'s properties.'),
 		), $params );
@@ -1304,7 +1317,7 @@ function blogs_all_results_block( $params = array() )
 	if( $current_User->check_perm( 'blogs', 'create' ) )
 	{
 		global $dispatcher;
-		$blogs_Results->global_icon( T_('New blog...'), 'new', url_add_param( $dispatcher, 'ctrl=collections&amp;action=new' ), T_('New blog...'), 3, 4 );
+		$blogs_Results->global_icon( T_('New collection...'), 'new', url_add_param( $dispatcher, 'ctrl=collections&amp;action=new' ), T_('New collection...'), 3, 4 );
 	}
 
 	// Initialize Results object
@@ -1411,6 +1424,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 	{ // Display P.List column
 		$blogs_Results->cols[] = array(
 				'th' => T_('P.List'),
+				'th_title' => T_('Public List'),
 				'order' => 'blog_in_bloglist',
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
@@ -1422,6 +1436,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 	{ // Display Favorite column
 		$blogs_Results->cols[] = array(
 				'th' => T_('Fav'),
+				'th_title' => T_('Favorite'),
 				'order' => 'blog_favorite',
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',

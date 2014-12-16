@@ -11,6 +11,9 @@
  * @subpackage intense
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+
+global $Hit;
 ?>
 
 		<div class="footer">

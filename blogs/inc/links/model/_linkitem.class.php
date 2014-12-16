@@ -12,7 +12,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author efy-asimo: Attila Simo.
  *
- * @version $Id$
+ * @version $Id: _linkitem.class.php 7752 2014-12-04 12:44:33Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -38,16 +38,16 @@ class LinkItem extends LinkOwner
 		$this->Item = & $this->link_Object;
 
 		$this->_trans = array(
-			'Link this image to your owner' => NT_( 'Link this image to your item.' ),
-			'Link this file to your owner' => NT_( 'Link this file to your item.'),
-			'The file will be linked for download at the end of the owner' => NT_( 'The file will be appended for linked at the end of the item.' ),
-			'Insert the following code snippet into your owner' => NT_( 'Insert the following code snippet into your item.' ),
-			'View this owner...' => NT_( 'View this item...' ),
-			'Edit this owner...' => NT_( 'Edit this item...' ),
-			'Click on link %s icons below to link additional files to $ownerTitle$.' => NT_( 'Click on link %s icons below to link additional files to <strong>item</strong>.' ),
-			'Link files to current owner' => NT_( 'Link files to current item' ),
-			'Selected files have been linked to owner.' => NT_( 'Selected files have been linked to item.' ),
-			'Link has been deleted from $ownerTitle$.' => NT_( 'Link has been deleted from &laquo;item&raquo;.' ),
+			'Link this image to your xxx' => NT_( 'Link this image to your item.' ),
+			'Link this file to your xxx' => NT_( 'Link this file to your item.'),
+			'The file will be linked for download at the end of the xxx' => NT_( 'The file will be appended for linked at the end of the item.' ),
+			'Insert the following code snippet into your xxx' => NT_( 'Insert the following code snippet into your item.' ),
+			'View this xxx...' => NT_( 'View this item...' ),
+			'Edit this xxx...' => NT_( 'Edit this item...' ),
+			'Click on link %s icons below to link additional files to $xxx$.' => NT_( 'Click on link %s icons below to link additional files to <strong>item</strong>.' ),
+			'Link files to current xxx' => NT_( 'Link files to current item' ),
+			'Selected files have been linked to xxx.' => NT_( 'Selected files have been linked to item.' ),
+			'Link has been deleted from $xxx$.' => NT_( 'Link has been deleted from &laquo;item&raquo;.' ),
 		);
 	}
 
@@ -84,9 +84,12 @@ class LinkItem extends LinkOwner
 		}
 
 		return array_merge( array(
-				'teaser'    => T_( 'Teaser' ),
-				'aftermore' => T_( 'After "more"' ),
-				'inline'    => T_( 'Inline' ),
+				'teaser'     => T_( 'Teaser' ),
+				'teaserperm' => T_( 'Teaser-Permalink' ),
+				'teaserlink' => T_( 'Teaser-Ext Link' ),
+				'aftermore'  => T_( 'After "more"' ),
+				'inline'     => T_( 'Inline' ),
+				'fallback'   => T_( 'Fallback' ),
 			), $additional_positions );
 	}
 
@@ -106,10 +109,12 @@ class LinkItem extends LinkOwner
 	 * Add new link to owner Item
 	 *
 	 * @param integer file ID
-	 * @param integer link position ( 'teaser', 'aftermore' )
+	 * @param integer link position ( 'teaser', 'teaserperm', 'teaserlink', 'aftermore', 'inline', 'fallback' )
 	 * @param int order of the link
+	 * @param boolean true to update owner last touched timestamp after link was created, false otherwise
+	 * @return integer|boolean Link ID on success, false otherwise
 	 */
-	function add_link( $file_ID, $position, $order = 1 )
+	function add_link( $file_ID, $position, $order = 1, $update_owner = true )
 	{
 		$edited_Link = new Link();
 		$edited_Link->set( 'itm_ID', $this->Item->ID );
@@ -121,14 +126,21 @@ class LinkItem extends LinkOwner
 			// New link was added to the item, invalidate blog's media BlockCache
 			BlockCache::invalidate_key( 'media_coll_ID', $this->Item->get_blog_ID() );
 
-			// Update last touched date of the Item
-			$this->update_last_touched_date();
+			$FileCache = & get_FileCache();
+			$File = $FileCache->get_by_ID( $file_ID, false, false );
+			$file_name = empty( $File ) ? '' : $File->get_name();
+			syslog_insert( sprintf( 'File %s was linked to %s with ID=%s', '<b>'.$file_name.'</b>', $this->type, $this->link_Object->ID ), 'info', 'file', $file_ID );
+
+			if( $update_owner )
+			{ // Update last touched date of the Item
+				$this->update_last_touched_date();
+			}
 
 			// Reset the Links
 			$this->Links = NULL;
 			$this->load_Links();
 
-			return true;
+			return $edited_Link->ID;
 		}
 
 		return false;
@@ -211,7 +223,7 @@ class LinkItem extends LinkOwner
 
 		if( ! empty( $link_ID ) )
 		{ // Find inline image placeholders if link ID is defined
-			preg_match_all( '/\[image:'.$link_ID.':?[^\]]*\]/i', $this->Item->content, $inline_images );
+			preg_match_all( '/\[(image|file|inline):'.$link_ID.':?[^\]]*\]/i', $this->Item->content, $inline_images );
 			if( ! empty( $inline_images[0] ) )
 			{ // There are inline image placeholders in the post content
 				$this->Item->set( 'content', str_replace( $inline_images[0], '', $this->Item->content ) );

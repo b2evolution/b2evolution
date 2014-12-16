@@ -12,7 +12,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _translation.view.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -56,13 +56,13 @@ $Results->global_icon( T_('Add new translated string...'), 'new', regenerate_url
 $Results->cols[] = array(
 		'th' => T_('Original string'),
 		'order' => 'iost_string',
-		'td' => '%evo_htmlspecialchars( #iost_string# )%',
+		'td' => '%htmlspecialchars( #iost_string# )%',
 	);
 
 $Results->cols[] = array(
 		'th' => T_('Translated string'),
 		'order' => 'itst_standard',
-		'td' => '%evo_htmlspecialchars( #itst_standard# )%',
+		'td' => '%htmlspecialchars( #itst_standard# )%',
 	);
 
 function iost_td_actions( $translated_string_ID )

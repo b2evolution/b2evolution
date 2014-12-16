@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id$
+ * @version $Id: _user_stats.view.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -136,6 +136,136 @@ $Results->display( array(
 	) );
 
 
+// ---- The data for donut chart: BEGIN ---- //
+global $user_gender_color;
+
+$donut_chart = array();
+
+// Canvas size:
+$donut_chart['width'] = 280;
+$donut_chart['height'] = 280;
+
+// Colors:
+$donut_chart['series_color'] = array();
+$donut_chart['series_color'][0] = array(); // Outer donut
+$donut_chart['series_color'][1] = $user_gender_color; // Middle donut
+$donut_chart['series_color'][2] = array(); // Inner donut
+$c = 0;
+foreach( $user_gender_color as $color )
+{
+	$donut_chart['series_color'][0][] = $color;
+	// Use white(transparent) color for users without photos
+	$donut_chart['series_color'][0][] = 'FFF';
+	if( $c % 3 == 0 )
+	{ // The inner donut uses only 3 main colors
+		$donut_chart['series_color'][2][] = $color;
+	}
+	$c++;
+}
+
+// Legend titles:
+$donut_chart['legend_numrows'] = 9;
+$donut_chart['legends'] = array(
+	T_('Women / Active / With Photo'),
+	T_('Women / Active / No Photo'),
+	T_('Women / Inactive / With Photo'),
+	T_('Women / Inactive / No Photo'),
+	T_('Women / Closed / With Photo'),
+	T_('Women / Closed / No Photo'),
+	T_('Men / Active / With Photo'),
+	T_('Men / Active / No Photo'),
+	T_('Men / Inactive / With Photo'),
+	T_('Men / Inactive / No Photo'),
+	T_('Men / Closed / With Photo'),
+	T_('Men / Closed / No Photo'),
+	T_('Unknown / Active / With Photo'),
+	T_('Unknown / Active / No Photo'),
+	T_('Unknown / Inactive / With Photo'),
+	T_('Unknown / Inactive / No Photo'),
+	T_('Unknown / Closed / With Photo'),
+	T_('Unknown / Closed / No Photo') );
+
+// Data:
+$donut_chart['data'] = array();
+$donut_chart['data'][0] = array();
+$donut_chart['data'][1] = array();
+$donut_chart['data'][2] = array();
+
+/* 
+ * Test data array:
+ *   F - Female, M - Male, G - No gender
+ *   a - Active, i - Inactive, c - closed
+ *   p - with photo, n - without photo
+ * 
+ *
+$donut_chart['data'][0] = array( 'Fap' => 1, 'Fan' => 4, 'Fip' => 1, 'Fin' => 2, 'Fcp' => 2, 'Fcn' => 1,
+	                               'Map' => 3, 'Man' => 1, 'Mip' => 2, 'Min' => 1, 'Mcp' => 0, 'Mcn' => 1,
+	                               'Gap' => 1, 'Gan' => 0, 'Gip' => 2, 'Gin' => 0, 'Gcp' => 1, 'Gcn' => 3 );
+$donut_chart['data'][1] = array( 'Fa' => 5, 'Fi' => 3, 'Fc' => 3,
+	                               'Ma' => 4, 'Mi' => 3, 'Mc' => 1,
+	                               'Ga' => 1, 'Gi' => 2, 'Gc' => 4 );
+$donut_chart['data'][2] = array( 'F' => 11, 'M' => 8, 'G' => 7 );*/
+
+// Get users data for donut charts from DB
+$donut_SQL = new SQL();
+$donut_SQL->SELECT( 'IF( user_gender IN ( "M", "F" ), user_gender, "G" ) AS gender, '
+	.'IF( user_status IN( "activated", "autoactivated" ), "a", IF( user_status = "closed", "c", "i" ) ) AS active, '
+	.'IF( user_avatar_file_ID IS NOT NULL, "p", "n" ) AS photo, '
+	.'COUNT( user_ID ) AS cnt' );
+$donut_SQL->FROM( 'T_users' );
+$donut_SQL->GROUP_BY( 'gender, active, photo' );
+$donut_data = $DB->get_results( $donut_SQL->get(), ARRAY_A );
+
+// Go through these shcemes to build/init a correct data for donut charts
+$scheme_gender = array( 'F', 'M', 'G' );
+$scheme_active = array( 'a', 'i', 'c' );
+$scheme_photos = array( 'p', 'n' );
+foreach( $scheme_gender as $gender )
+{ // Genders
+	$donut_chart['data'][2][ $gender ] = 0;
+	foreach( $scheme_active as $active )
+	{ // Actives
+		$donut_chart['data'][1][ $gender.$active ] = 0;
+		foreach( $scheme_photos as $photo )
+		{ // Photos
+			$donut_chart['data'][0][ $gender.$active.$photo ] = 0;
+		}
+	}
+}
+
+// Insert the data from DB to the donut chart data
+foreach( $donut_data as $donut_data_row )
+{
+	foreach( $donut_chart['data'][0] as $gap => $value )
+	{ // Gender + Active + Photo
+		if( $donut_data_row['gender'].$donut_data_row['active'].$donut_data_row['photo'] == $gap )
+		{
+			$donut_chart['data'][0][ $gap ] += $donut_data_row['cnt'];
+		}
+	}
+	foreach( $donut_chart['data'][1] as $ga => $value )
+	{ // Gender + Active
+		if( $donut_data_row['gender'].$donut_data_row['active'] == $ga )
+		{
+			$donut_chart['data'][1][ $ga ] += $donut_data_row['cnt'];
+		}
+	}
+	foreach( $donut_chart['data'][2] as $g => $value )
+	{ // Gender
+		if( $donut_data_row['gender'] == $g )
+		{
+			$donut_chart['data'][2][ $g ] += $donut_data_row['cnt'];
+		}
+	}
+}
+
+load_funcs('_ext/_canvascharts.php');
+echo '<div style="width:690px;margin:auto;">';
+CanvasDonutChart( $donut_chart );
+echo '</div>';
+// ---- The data for donut chart: END ---- //
+
+
 /*** Gender statistics ***/
 
 // Get total values
@@ -147,8 +277,12 @@ $SQL->WHERE( 'user_status IN( \'activated\', \'autoactivated\' )' );
 $total_cnt_active = $DB->get_var( $SQL->get() );
 
 // Not active users
-$SQL->WHERE( 'user_status NOT IN( \'activated\', \'autoactivated\' )' );
+$SQL->WHERE( 'user_status NOT IN( \'activated\', \'autoactivated\', \'closed\' )' );
 $total_cnt_notactive = $DB->get_var( $SQL->get() );
+
+// Closed users
+$SQL->WHERE( 'user_status = \'closed\'' );
+$total_cnt_closed = $DB->get_var( $SQL->get() );
 
 // Users with pictures
 $SQL->WHERE( 'user_avatar_file_ID IS NOT NULL' );
@@ -158,7 +292,8 @@ $total_cnt_pictured = $DB->get_var( $SQL->get() );
 $SQL = new SQL();
 $SQL->SELECT( 'IF( user_gender IN ( "M", "F" ), user_gender, "A" ) AS gender_sign,
 	COUNT( IF( user_status IN( \'activated\', \'autoactivated\' ), 1, NULL ) ) AS cnt_active,
-	COUNT( IF( user_status IN( \'activated\', \'autoactivated\' ), NULL, 1 ) ) AS cnt_notactive,
+	COUNT( IF( user_status IN( \'activated\', \'autoactivated\', \'closed\' ), NULL, 1 ) ) AS cnt_notactive,
+	COUNT( IF( user_status = \'closed\', 1, NULL ) ) AS cnt_closed,
 	COUNT( IF( user_avatar_file_ID IS NOT NULL, 1, NULL ) ) AS cnt_pictured' );
 $SQL->FROM( 'T_users' );
 $SQL->GROUP_BY( 'gender_sign' );
@@ -229,6 +364,14 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
+		'th' => T_('# Closed'),
+		'td' => '%stats_gender_value( #cnt_closed#, '.$total_cnt_closed.' )%',
+		'order' => 'cnt_closed',
+		'default_dir' => 'D',
+		'total' => $total_cnt_closed,
+	);
+
+$Results->cols[] = array(
 		'th' => T_('# With profile picture'),
 		'td' => '%stats_gender_value( #cnt_pictured#, '.$total_cnt_pictured.' )%',
 		'order' => 'cnt_pictured',
@@ -250,7 +393,7 @@ global $AdminUI, $user_gender_color;
 
 $SQL = new SQL();
 $SQL->SELECT( 'SQL_NO_CACHE COUNT(*) AS users,
-		CONCAT( IF( user_gender IN ( "M", "F" ), user_gender, "G" ), "_", IF( user_status IN ( "activated", "autoactivated" ), "active", "notactive" ) ) AS user_gender_status,
+		CONCAT( IF( user_gender IN ( "M", "F" ), user_gender, "G" ), "_", IF( user_status IN ( "activated", "autoactivated" ), "active", ( IF( user_status = "closed", "closed", "notactive" ) ) ) ) AS user_gender_status,
 		EXTRACT(YEAR FROM user_created_datetime) AS year,
 		EXTRACT(MONTH FROM user_created_datetime) AS month,
 		EXTRACT(DAY FROM user_created_datetime) AS day' );
@@ -268,29 +411,35 @@ if( count( $res_users ) )
 	$last_date = 0;
 
 /*
-ONE COLOR for user_gender = F AND status IN ( activated, autoactivated )
-ONE COLOR for user_gender = F AND status NOT IN ( activated, autoactivated )
-ONE COLOR for user_gender = M AND status IN ( activated, autoactivated )
-ONE COLOR for user_gender = M AND status NOT IN ( activated, autoactivated )
-ONE COLOR for user_gender = NULL AND status IN ( activated, autoactivated )
-ONE COLOR for user_gender = NULL AND status NOT IN ( activated, autoactivated )
+ONE COLOR for Active Female
+ONE COLOR for Inactive Female
+ONE COLOR for Closed Female
+ONE COLOR for Active Male
+ONE COLOR for Inactive Male
+ONE COLOR for Closed Male
+ONE COLOR for Active No gender
+ONE COLOR for Inactive No gender
+ONE COLOR for Closed No gender
 */
 	$col_mapping = array(
 			'F_active'    => 1,
 			'F_notactive' => 2,
-			'M_active'    => 3,
-			'M_notactive' => 4,
-			'G_active'    => 5,
-			'G_notactive' => 6,
+			'F_closed'    => 3,
+			'M_active'    => 4,
+			'M_notactive' => 5,
+			'M_closed'    => 6,
+			'G_active'    => 7,
+			'G_notactive' => 8,
+			'G_closed'    => 9,
 		);
 
-	$chart[ 'chart_data' ][ 0 ] = array();
-	$chart[ 'chart_data' ][ 1 ] = array();
-	$chart[ 'chart_data' ][ 2 ] = array();
-	$chart[ 'chart_data' ][ 3 ] = array();
-	$chart[ 'chart_data' ][ 4 ] = array();
-	$chart[ 'chart_data' ][ 5 ] = array();
-	$chart[ 'chart_data' ][ 6 ] = array();
+	for( $i = 0; $i <= 9; $i++ )
+	{
+		$chart[ 'chart_data' ][ $i ] = array();
+	}
+
+	$chart['dates'] = array();
+	$chart['legend_numrows'] = 3;
 
 	$count = 0;
 	foreach( $res_users as $row_stats )
@@ -298,15 +447,15 @@ ONE COLOR for user_gender = NULL AND status NOT IN ( activated, autoactivated )
 		$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
 		if( $last_date != $this_date )
 		{ // We just hit a new day, let's display the previous one:
-				$last_date = $this_date;	// that'll be the next one
-				$count ++;
-				array_unshift( $chart[ 'chart_data' ][ 0 ], date( locale_datefmt(), $last_date ) );
-				array_unshift( $chart[ 'chart_data' ][ 1 ], 0 );
-				array_unshift( $chart[ 'chart_data' ][ 2 ], 0 );
-				array_unshift( $chart[ 'chart_data' ][ 3 ], 0 );
-				array_unshift( $chart[ 'chart_data' ][ 4 ], 0 );
-				array_unshift( $chart[ 'chart_data' ][ 5 ], 0 );
-				array_unshift( $chart[ 'chart_data' ][ 6 ], 0 );
+			$last_date = $this_date;	// that'll be the next one
+			$count ++;
+			array_unshift( $chart[ 'chart_data' ][ 0 ], date( 'D '.locale_datefmt(), $last_date ) );
+			for( $i = 1; $i <= 9; $i++ )
+			{
+				array_unshift( $chart[ 'chart_data' ][ $i ], 0 );
+			}
+
+			array_unshift( $chart['dates'], $last_date );
 		}
 		if( ! empty ( $col_mapping[ $row_stats['user_gender_status'] ] ) )
 		{	// those users are calculated here
@@ -324,29 +473,22 @@ ONE COLOR for user_gender = NULL AND status IN ( activated, autoactivated )
 ONE COLOR for user_gender = NULL AND status NOT IN ( activated, autoactivated )
 */
 	array_unshift( $chart[ 'chart_data' ][ 0 ], '' );
-	array_unshift( $chart[ 'chart_data' ][ 1 ], 'Women (Active)' );
-	array_unshift( $chart[ 'chart_data' ][ 2 ], 'Women (Inactive)' );
-	array_unshift( $chart[ 'chart_data' ][ 3 ], 'Men (Active)' );
-	array_unshift( $chart[ 'chart_data' ][ 4 ], 'Men (Inactive)' );
-	array_unshift( $chart[ 'chart_data' ][ 5 ], 'Unknown (Active)' );
-	array_unshift( $chart[ 'chart_data' ][ 6 ], 'Unknown (Inactive)' );
+	array_unshift( $chart[ 'chart_data' ][ 1 ], T_('Women (Active)') );
+	array_unshift( $chart[ 'chart_data' ][ 2 ], T_('Women (Inactive)') );
+	array_unshift( $chart[ 'chart_data' ][ 3 ], T_('Women (Closed)') );
+	array_unshift( $chart[ 'chart_data' ][ 4 ], T_('Men (Active)') );
+	array_unshift( $chart[ 'chart_data' ][ 5 ], T_('Men (Inactive)') );
+	array_unshift( $chart[ 'chart_data' ][ 6 ], T_('Men (Closed)') );
+	array_unshift( $chart[ 'chart_data' ][ 7 ], T_('Unknown (Active)') );
+	array_unshift( $chart[ 'chart_data' ][ 8 ], T_('Unknown (Inactive)') );
+	array_unshift( $chart[ 'chart_data' ][ 9 ], T_('Unknown (Closed)') );
 
-	// Include common chart properties:
-	require dirname(__FILE__).'/inc/_bar_chart.inc.php';
+	$chart[ 'series_color' ] = $user_gender_color;
 
-	$chart[ 'series_color' ] = array (
-			$user_gender_color['women_active'],
-			$user_gender_color['women_notactive'],
-			$user_gender_color['men_active'],
-			$user_gender_color['men_notactive'],
-			$user_gender_color['nogender_active'],
-			$user_gender_color['nogender_notactive'],
-		);
+	$chart[ 'canvas_bg' ] = array( 'width'  => 780, 'height' => 355 );
 
-
-	echo '<div class="center">';
-	load_funcs('_ext/_swfcharts.php');
-	DrawChart( $chart );
+	echo '<div class="center" style="margin-bottom:70px">';
+	CanvasBarsChart( $chart );
 	echo '</div>';
 }
 

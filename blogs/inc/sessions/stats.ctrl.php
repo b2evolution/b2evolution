@@ -22,7 +22,7 @@
  * @author fplanque: Francois PLANQUE
  * @author vegarg: Vegar BERG GULDAL
  *
- * @version $Id: stats.ctrl.php 7654 2014-11-15 14:13:15Z manuel $
+ * @version $Id: stats.ctrl.php 7655 2014-11-15 14:13:31Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -276,6 +276,8 @@ switch( $tab )
 				$AdminUI->breadcrumbpath_add( T_('RSS/Atom'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
 				break;
 		}
+		// Init jqPlot charts
+		init_jqplot_js();
 		break;
 
 	case 'other':

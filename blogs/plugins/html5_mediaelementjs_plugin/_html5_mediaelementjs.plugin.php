@@ -9,7 +9,7 @@
  * @author fplanque: Francois PLANQUE.
  *
  * @package plugins
- * @version $Id: _html5_mediaelementjs.plugin.php 198 2011-11-05 21:34:08Z fplanque $
+ * @version $Id: _html5_mediaelementjs.plugin.php 7750 2014-12-04 11:34:18Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -32,7 +32,10 @@ class html5_mediaelementjs_plugin extends Plugin
 	{
 		$this->short_desc = sprintf( T_('Media player for the these file formats: %s. Note: iOS supports only: %s; Android supports only: %s.'),
 			implode( ', ', $this->allow_ext ), 'mp4', 'mp4, webm' );
-		$this->long_desc = $this->short_desc;
+
+		$this->long_desc = $this->short_desc.' '
+			.sprintf( T_('This player can display a placeholder image of the same name as the video file with the following extensions: %s.'),
+			'jpg, jpeg, png, gif' );
 	}
 
 
@@ -213,6 +216,15 @@ class html5_mediaelementjs_plugin extends Plugin
 			global $html5_mediaelementjs_number;
 			$html5_mediaelementjs_number++;
 
+			if( $placeholder_File = & $Item->get_placeholder_File( $File ) )
+			{ // Display placeholder/poster when image file is linked to the Item with same name as current video File
+				$video_placeholder_attr = ' poster="'.$placeholder_File->get_url().'"';
+			}
+			else
+			{ // No placeholder for current video File
+				$video_placeholder_attr = '';
+			}
+
 			if( $in_comments )
 			{
 				$params['data'] .= '<div style="clear: both; height: 0px; font-size: 0px"></div>';
@@ -220,7 +232,7 @@ class html5_mediaelementjs_plugin extends Plugin
 
 			$params['data'] .= '<div class="mediajs_block">';
 
-			$params['data'] .= '<video class="html5_mediaelementjs_video '.$this->get_skin_class().'" id="html5_mediaelementjs_'.$html5_mediaelementjs_number.'">'.
+			$params['data'] .= '<video class="html5_mediaelementjs_video '.$this->get_skin_class().'" id="html5_mediaelementjs_'.$html5_mediaelementjs_number.'"'.$video_placeholder_attr.'>'.
 				'<source src="'.$File->get_url().'" type="'.$this->get_video_mimetype( $File ).'" align="center" />'.
 			'</video>';
 

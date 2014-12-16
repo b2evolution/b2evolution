@@ -31,7 +31,7 @@
  *
  * @todo skin compliant header!
  *
- * @version $Id$
+ * @version $Id: viewfile.php 6134 2014-03-08 07:48:07Z manuel $
  */
 
 /**
@@ -290,7 +290,7 @@ switch( $viewtype )
 					{
 						echo ' '.str_pad($i+1, $linenr_width, ' ', STR_PAD_LEFT).' ';
 					}
-					echo '</span>'.evo_htmlspecialchars( str_replace( "\t", '  ', $buffer[$i] ) );  // TODO: customize tab-width
+					echo '</span>'.htmlspecialchars( str_replace( "\t", '  ', $buffer[$i] ) );  // TODO: customize tab-width
 				}
 
 	  		echo '</pre>';

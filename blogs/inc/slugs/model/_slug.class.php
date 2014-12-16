@@ -20,7 +20,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author asimo: Evo Factory / Attila Simo
  *
- * @version $Id$
+ * @version $Id: _slug.class.php 6134 2014-03-08 07:48:07Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -50,11 +50,6 @@ class Slug extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_slug', 'slug_', 'slug_ID' );
 
-		$this->delete_restrictions = array(
-				array( 'table'=>'T_items__item', 'fk'=>'post_canonical_slug_ID', 'fk_short'=>'canonical_slug_ID', 'msg'=>T_('%d related post') ),
-				array( 'table'=>'T_items__item', 'fk'=>'post_tiny_slug_ID', 'fk_short'=>'tiny_slug_ID', 'msg'=>T_('%d related post') ),
-			);
-
 		if( $db_row != NULL )
 		{
 			$this->ID = $db_row->slug_ID;
@@ -62,6 +57,20 @@ class Slug extends DataObject
 			$this->type = $db_row->slug_type;
 			$this->itm_ID = $db_row->slug_itm_ID;
 		}
+	}
+
+
+	/**
+	 * Get delete restriction settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_restrictions()
+	{
+		return array(
+				array( 'table'=>'T_items__item', 'fk'=>'post_canonical_slug_ID', 'fk_short'=>'canonical_slug_ID', 'msg'=>T_('%d related post') ),
+				array( 'table'=>'T_items__item', 'fk'=>'post_tiny_slug_ID', 'fk_short'=>'tiny_slug_ID', 'msg'=>T_('%d related post') ),
+			);
 	}
 
 
@@ -250,7 +259,7 @@ class Slug extends DataObject
 
 			default:
 				// not defined restriction
-				debug_die('Slug::get_object: Unhandled object type: '.evo_htmlspecialchars($this->type));
+				debug_die('Slug::get_object: Unhandled object type: '.htmlspecialchars($this->type));
 		}
 	}
 

@@ -10,7 +10,7 @@
  * @package evoskins
  * @subpackage nifty_corners
  *
- * @version $Id$
+ * @version $Id: index.main.php 6474 2014-04-15 11:34:20Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -18,6 +18,8 @@ if( version_compare( $app_version, '3.0' ) < 0 )
 { // Older skins (versions 2.x and above) should work on newer b2evo versions, but newer skins may not work on older b2evo versions.
 	die( 'This skin is designed for b2evolution 3.0 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
+
+global $Hit;
 
 // This is the main template; it may be used to display very different things.
 // Do inits depending on current $disp:

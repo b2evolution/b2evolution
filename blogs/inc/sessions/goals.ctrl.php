@@ -12,7 +12,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: goals.ctrl.php 7654 2014-11-15 14:13:15Z manuel $
+ * @version $Id: goals.ctrl.php 7655 2014-11-15 14:13:31Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -414,6 +414,8 @@ switch( $tab3 )
 	case 'stats':
 		$AdminUI->breadcrumbpath_add( T_('Goal hit stats'), '?ctrl=goals&amp;tab3=stats' );
 		$AdminUI->set_page_manual_link( 'goal-stats' );
+		// Init jqPlot charts
+		init_jqplot_js();
 		break;
 	case 'cats':
 		$AdminUI->breadcrumbpath_add( T_('Goal categories'), '?ctrl=goals&amp;tab3=cats' );

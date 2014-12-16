@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id$
+ * @version $Id: _usercache.class.php 6697 2014-05-15 10:51:11Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -66,6 +66,21 @@ class UserCache extends DataObjectCache
 			/* TRANS: "None" select option */ T_('No user') );
 	}
 
+
+	/**
+	 * Load the cache **extensively**
+	 */
+	function load_all()
+	{
+		if( $this->all_loaded )
+		{ // Already loaded
+			return false;
+		}
+
+		debug_die( 'Load all is not allowed for UserCache!' );
+	}
+
+
 	/* this is for debugging only:
 	function & get_by_ID( $req_ID, $halt_on_error = true )
 	{
@@ -91,7 +106,7 @@ class UserCache extends DataObjectCache
 	{
 		// Make sure we have a lowercase login:
 		// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes.
-		$login = evo_strtolower( $login );
+		$login = utf8_strtolower( $login );
 
 		if( !( $force_db_check || isset( $this->cache_login[$login] ) ) )
 		{ // force db check is false and this login is not set in the cache it means that user with the given login doesn't exists
@@ -136,7 +151,7 @@ class UserCache extends DataObjectCache
 
 		if( !$pass_is_md5 )
 		{
-			$pass = md5($pass);
+			$pass = md5( $User->salt.$pass );
 		}
 
 		if( $User->pass != $pass )
@@ -155,18 +170,18 @@ class UserCache extends DataObjectCache
 	 *  -accounts that were used more recently than others
 	 *
 	 * @param string email address
-	 * @param string md5 hashed password
-	 * @param string hashed password - If this is set, it means we need to check the hasshed password instead of the md5 password
-	 * @param string password salt
+	 * @param string password
+	 * @param array hashed password - If this is set, it means we need to check the hasshed password instead of the md5 password
+	 * @param string current session password salt
 	 * @return false|array false if user with this email not exists, array( $User, $exists_more ) pair otherwise
 	 */
-	function get_by_emailAndPwd( $email, $pass_md5, $pwd_hashed = NULL, $pwd_salt = NULL )
+	function get_by_emailAndPwd( $email, $pass, $pwd_hashed = NULL, $pwd_salt = NULL )
 	{
 		global $DB;
 
 		// Get all users with matching email address
 		$result = $DB->get_results('SELECT * FROM T_users
-					WHERE user_email = '.$DB->quote( evo_strtolower( $email ) ).'
+					WHERE user_email = '.$DB->quote( utf8_strtolower( $email ) ).'
 					ORDER BY user_lastseen_ts DESC, user_status ASC');
 
 		if( empty( $result ) )
@@ -184,14 +199,26 @@ class UserCache extends DataObjectCache
 			$index++;
 			if( empty( $pwd_hashed ) )
 			{
-				if( $row->user_pass != $pass_md5 )
+				if( $row->user_pass != md5( $row->user_salt.$pass ) )
 				{ // password doesn't match
 					continue;
 				}
 			}
-			elseif( sha1($row->user_pass.$pwd_salt) != $pwd_hashed )
-			{ // password doesn't match
-				continue;
+			else
+			{
+				$pwd_matched = false;
+				foreach( $pwd_hashed as $encrypted_password )
+				{
+					$pwd_matched = ( sha1($row->user_pass.$pwd_salt) == $encrypted_password );
+					if( $pwd_matched )
+					{ // The corresponding user was found
+						break;
+					}
+				}
+				if( ! $pwd_matched )
+				{ // If the user with matched login credentials was not fount continue with the next row
+					continue;
+				}
 			}
 			// a user with matched password was found
 			$first_matched_index = $index;
@@ -238,7 +265,7 @@ class UserCache extends DataObjectCache
 	{
 		if( parent::add( $Obj ) )
 		{
-			$this->cache_login[ evo_strtolower($Obj->login) ] = & $Obj;
+			$this->cache_login[ utf8_strtolower($Obj->login) ] = & $Obj;
 
 			return true;
 		}
@@ -384,7 +411,7 @@ class UserCache extends DataObjectCache
 		if( isset($this->cache[$req_ID]) )
 		{
 			$Obj = & $this->cache[$req_ID];
-			unset( $this->cache_login[ evo_strtolower($Obj->login) ] );
+			unset( $this->cache_login[ utf8_strtolower($Obj->login) ] );
 		}
 		parent::remove_by_ID($req_ID);
 	}

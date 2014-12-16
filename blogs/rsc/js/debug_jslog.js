@@ -1,7 +1,7 @@
 /**
  * This javascript gets included in debug jslog mode.
  * b2evolution - http://b2evolution.net/
- * @version $Id: debug_jslog.js 699 2012-01-18 15:26:36Z yura $
+ * @version $Id: debug_jslog.js 6934 2014-06-19 12:16:47Z yura $
  */
 
 

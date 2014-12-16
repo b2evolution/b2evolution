@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _coll_search_form.widget.php 7224 2014-08-06 10:02:17Z yura $
+ * @version $Id: _coll_search_form.widget.php 7225 2014-08-06 10:03:13Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -148,14 +148,17 @@ class coll_search_form_Widget extends ComponentWidget
 		echo $this->disp_params['block_body_start'];
 
 		form_formstart( $widget_Blog->gen_blogurl(), 'search', 'SearchForm' );
-		if( $this->disp_params[ 'disp_search_options' ] )
-		{
-			echo '<div class="extended_search_form">';
+
+		if( empty( $this->disp_params[ 'search_class' ] ) )
+		{ // Class name is not defined, Use class depend on serach options
+			$search_form_class = $this->disp_params[ 'disp_search_options' ] ? 'extended_search_form' : 'compact_search_form';
 		}
 		else
-		{
-			echo '<div class="compact_search_form">';
+		{ // Use class from params
+			$search_form_class = $this->disp_params[ 'search_class' ];
 		}
+
+		echo '<div class="'.$search_form_class.'">';
 
 		if( $this->disp_params[ 'disp_search_options' ] )
 		{
@@ -168,7 +171,7 @@ class coll_search_form_Widget extends ComponentWidget
 		}
 
 		$s = get_param( 's' );
-		echo '<input type="text" name="s" size="25" value="'.evo_htmlspecialchars($s).'" class="search_field SearchField form-control" title="'.format_to_output( T_('Enter text to search for'), 'htmlattr' ).'" />';
+		echo '<input type="text" name="s" size="25" value="'.htmlspecialchars($s).'" class="search_field SearchField form-control" title="'.format_to_output( T_('Enter text to search for'), 'htmlattr' ).'" />';
 
 		if( $this->disp_params[ 'use_search_disp' ] )
 		{

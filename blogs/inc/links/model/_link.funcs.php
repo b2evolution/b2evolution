@@ -12,7 +12,7 @@
  *
  * @package evocore
  *
- * @version $Id: $
+ * @version $Id: _link.funcs.php 7804 2014-12-11 15:11:50Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -66,8 +66,9 @@ function get_link_owner( $link_type, $object_ID )
  * @param object LinkOwner object
  * @param string iframe name
  * @param boolean true if creating new owner object, false otherwise
+ * @param boolean true to allow folding for this fieldset, false otherwise
  */
-function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creating = false )
+function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creating = false, $fold = false )
 {
 	global $admin_url, $dispatcher;
 	global $current_User;
@@ -81,7 +82,7 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 	{	// Creating new Item
 		$fieldset_title .= ' '.get_manual_link('post-attachments-fieldset').' - <a id="title_file_add" href="#" >'.get_icon( 'folder', 'imgtag' ).' '.T_('Add/Link files').'</a> <span class="note">(popup)</span>';
 
-		$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_createlinks' ) );
+		$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_createlinks', 'fold' => $fold ) );
 		$Form->hidden( 'is_attachments', 'false' );
 
 		echo '<table cellspacing="0" cellpadding="0"><tr><td>';
@@ -106,19 +107,57 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 	if( $current_User->check_perm( 'files', 'view', false, $Blog->ID )
 		&& $LinkOwner->check_perm( 'edit', false ) )
 	{	// Check that we have permission to edit owner:
-		$fieldset_title .= ' - <a href="'.$dispatcher.'?ctrl=links&amp;link_type='.$LinkOwner->type.'&amp;fm_mode=link_object&amp;link_object_ID='.$LinkOwner->get_ID()
-					.'" onclick="return pop_up_window( \''.$dispatcher.'?ctrl=files&amp;mode=upload&amp;ajax_request=1&amp;iframe_name='
-					.$iframe_name.'&amp;fm_mode=link_object&amp;link_type='.$LinkOwner->type.'&amp;link_object_ID='.$LinkOwner->get_ID().'\', \'fileman_upload\', 1000 )"'
-					.' class="action_icon">'
-					.get_icon( 'folder', 'imgtag' ).' '.T_('Add/Link files').'</a> <span class="note">(popup)</span>';
+		$fieldset_title .= ' - '
+			.action_icon( T_('Add/Link files'), 'folder',
+				$dispatcher.'?ctrl=links&amp;link_type='.$LinkOwner->type.'&amp;fm_mode=link_object&amp;link_object_ID='.$LinkOwner->get_ID(),
+				T_('Add/Link files'), 3, 4,
+				array( 'onclick' => 'return link_attachment_window( \''.$iframe_name.'\', \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\' )' )
+			)
+			.' <span class="note">(popup)</span>';
 	}
 
-	$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_links' ) );
+	$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_links', 'fold' => $fold ) );
 
 	echo '<iframe src="'.$admin_url.'?ctrl=links&amp;link_type='.$LinkOwner->type.'&amp;action=edit_links&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;link_object_ID='.$LinkOwner->get_ID()
 				.'" name="'.$iframe_name.'" width="100%" marginwidth="0" height="160" marginheight="0" align="top" scrolling="auto" frameborder="0" id="attachmentframe"></iframe>';
 
 	$Form->end_fieldset();
+
+?>
+<script type="text/javascript">
+<?php
+// Initialize JavaScript to build and open window
+echo_modalwindow_js();
+?>
+
+function link_attachment_window( iframe_name, link_owner_type, link_owner_ID, root, path, fm_highlight )
+{
+	openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
+		'90%', '80%', true, '<?php echo TS_('Add/Link files'); ?>', '' );
+	jQuery.ajax(
+	{
+		type: 'POST',
+		url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+		data:
+		{
+			'action': 'link_attachment',
+			'iframe_name': iframe_name,
+			'link_owner_type': link_owner_type,
+			'link_owner_ID': link_owner_ID,
+			'crumb_link': '<?php echo get_crumb( 'link' ); ?>',
+			'root': typeof( root ) == 'undefined' ? '' : root,
+			'path': typeof( path ) == 'undefined' ? '' : path,
+			'fm_highlight': typeof( fm_highlight ) == 'undefined' ? '' : fm_highlight
+		},
+		success: function(result)
+		{
+			openModalWindow( result, '90%', '80%', true, '<?php echo TS_('Add/Link files'); ?>', '' );
+		}
+	} );
+	return false;
+}
+</script>
+<?php
 }
 
 
@@ -227,14 +266,13 @@ function link_actions( $link_ID, $row_idx_type = '' )
 
 	if( $current_File && $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
 	{
-		if( $current_File->is_dir() )
-			$title = T_('Locate this directory!');
-		else
-			$title = T_('Locate this file!');
+		$title = $current_File->is_dir() ? T_('Locate this directory!') : T_('Locate this file!');
 		$url = $current_File->get_linkedit_url( $LinkOwner->type, $LinkOwner->get_ID() );
-		$r .= ' <a href="'.$url.'" onclick="return pop_up_window( \''
-					.url_add_param( $url, 'mode=upload&amp;iframe_name='.$iframe_name.'' ).'\', \'fileman_upload\', 1000 )" target="_parent" title="'.$title.'">'
-					.get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ).'</a> ';
+		$rdfp_path = ( $current_File->is_dir() ? $current_File->get_rdfp_rel_path() : dirname( $current_File->get_rdfp_rel_path() ) ).'/';
+
+		$r .= ' <a href="'.$url.'" onclick="return window.parent.link_attachment_window( \''.$iframe_name.'\', \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\', \''.$current_File->get_FileRoot()->ID.'\', \''.$rdfp_path.'\', \''.rawurlencode( $current_File->get_name() ).'\' )"'
+					.' target="_parent" title="'.$title.'">'
+					.get_icon( 'locate', 'imgtag', array( 'title' => $title ) ).'</a> ';
 	}
 
 	// Delete link.
@@ -245,11 +283,12 @@ function link_actions( $link_ID, $row_idx_type = '' )
 		                  array( 'onclick' => 'item_unlink('.$link_ID.')' ) );
 	}
 
-	if( $current_File && $current_File->is_image() )
+	if( $current_File )
 	{	// Display icon to insert image into post inline
+		$type = $current_File->is_image() ? 'image' : 'file';
 		$r .= ' '.get_icon( 'add', 'imgtag', array(
 				'title'   => T_('Insert image into the post'),
-				'onclick' => 'insert_image_link( '.$link_ID.', \''.format_to_output( addslashes( $current_File->get( 'desc' ) ), 'htmlspecialchars' ).'\' )',
+				'onclick' => 'insert_inline_link( \''.$type.'\', '.$link_ID.', \''.format_to_output( addslashes( $current_File->get( 'desc' ) ), 'htmlspecialchars' ).'\' )',
 				'style'   => 'cursor:default;'
 			) );
 	}
@@ -286,7 +325,7 @@ function display_link_position( & $row )
 	foreach($params as $param)
 	{
 		list($k, $v) = explode('=', $param);
-		$r .= '<input type="hidden" name="'.evo_htmlspecialchars($k).'" value="'.evo_htmlspecialchars($v).'" />';
+		$r .= '<input type="hidden" name="'.htmlspecialchars($k).'" value="'.htmlspecialchars($v).'" />';
 	}
 	$r .= '<input class="SaveButton" type="submit" value="&raquo;" />';
 	$r .= '</noscript>';
@@ -332,8 +371,10 @@ function get_file_links( $file_ID, $params = array() )
 		$ItemCache = & get_ItemCache();
 		$CommentCache = & get_CommentCache();
 		$UserCache = & get_UserCache();
+		$LinkCache = & get_LinkCache();
 		foreach( $links as $link )
 		{
+			$link_object_ID = 0;
 			$r = '';
 			if( $params['current_link_ID'] == $link->link_ID )
 			{
@@ -352,9 +393,10 @@ function get_file_links( $file_ID, $params = array() )
 					{ // No access to edit the linked post
 						$r .= $params['post_prefix'].$Item->get( 'title' );
 					}
+					$link_object_ID = $link->link_itm_ID;
 				}
 			}
-			if( !empty( $link->link_cmt_ID ) )
+			elseif( !empty( $link->link_cmt_ID ) )
 			{ // File is linked to a comment
 				if( $Comment = & $CommentCache->get_by_ID( $link->link_cmt_ID, false ) )
 				{
@@ -367,9 +409,10 @@ function get_file_links( $file_ID, $params = array() )
 					{ // No access to edit the linked Comment
 						$r .= $params['comment_prefix'].$Item->get( 'title' );
 					}
+					$link_object_ID = $link->link_cmt_ID;
 				}
 			}
-			if( !empty( $link->link_usr_ID ) )
+			elseif( !empty( $link->link_usr_ID ) )
 			{ // File is linked to user
 				if( $User = & $UserCache->get_by_ID( $link->link_usr_ID, false ) )
 				{
@@ -381,8 +424,22 @@ function get_file_links( $file_ID, $params = array() )
 					{ // Build a link to display a user in admin form
 						$r .= $params['user_prefix'].'<a href="?ctrl=user&amp;user_tab=profile&amp;user_ID='.$User->ID.'">'.$User->login.'</a>';
 					}
+					$link_object_ID = $link->link_usr_ID;
 				}
 			}
+
+			if( ! empty( $link_object_ID ) )
+			{ // Action icon to unlink file from object
+				if( ( $edited_Link = & $LinkCache->get_by_ID( $link->link_ID, false, false ) ) !== false &&
+				    ( $LinkOwner = & $edited_Link->get_LinkOwner() ) !== false && $LinkOwner->check_perm( 'edit', false ) )
+				{ // Allow to unlink only if current user has an permission
+					$r .= ' '.action_icon( T_('Delete this link!'), 'unlink',
+						$admin_url.'?ctrl=links&amp;link_ID='.$link->link_ID.'&amp;link_type=item&amp;link_object_ID='.$link->link_usr_ID.'&amp;action=unlink&amp;redirect_to='.rawurlencode( regenerate_url( 'blog', '', '', '&' ) ).'&amp;'.url_crumb( 'link' ),
+						NULL, NULL, NULL,
+						array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to unlink this file?').'\');' ) );
+				}
+			}
+
 			if( $params['current_link_ID'] == $link->link_ID )
 			{
 				$r .= $params['current_after'];

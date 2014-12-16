@@ -14,7 +14,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _comment.form.php 7644 2014-11-14 08:12:53Z yura $
+ * @version $Id: _comment.form.php 7645 2014-11-14 08:16:13Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -165,7 +165,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	$content = $comment_content;
 	$Form->fieldstart = '<div class="edit_area">';
 	$Form->fieldend = "</div>\n";
-	$Form->textarea_input( 'content', $content, 16, '', array( 'cols' => 40 , 'id' => 'commentform_post_content' ) );
+	$Form->textarea_input( 'content', $content, 16, '', array( 'cols' => 40 , 'id' => 'commentform_post_content', 'class' => 'autocomplete_usernames' ) );
 	$Form->fieldstart = '<div class="tile">';
 	$Form->fieldend = '</div>';
 	?>

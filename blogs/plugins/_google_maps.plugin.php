@@ -22,7 +22,7 @@
  *
  * @package plugins
  *
- * @version $Id$
+ * @version $Id: _google_maps.plugin.php 6844 2014-06-05 07:09:19Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -175,16 +175,18 @@ class google_maps_plugin extends Plugin
 	 */
 	function AdminDisplayItemFormFieldset( & $params )
 	{
-		global $Blog, $DB;
+		global $Blog, $DB, $admin_url;
 
 		// fp>vitaliy : make thhis title configurable per blog . default shoul dbe as below.
 		$plugin_title = $this->Settings->get( 'map_title_coll'.$Blog->ID );
 		$plugin_title = empty( $plugin_title ) ? T_( 'Google Maps plugin' ) : $plugin_title;
-		$params['Form']->begin_fieldset( $plugin_title );
+		$params['Form']->begin_fieldset( $plugin_title, array( 'id' => 'itemform_plugin_googlemap', 'fold' => ( $params['edit_layout'] == 'expert' ) ) );
 
 		if( !$Blog->get_setting( 'show_location_coordinates' ) )
 		{
-			echo T_('You must turn on the "Show location coordinates" setting in Blog settings Post Features tab so the Google Maps plugin can save its coordinates.');
+			$url = $admin_url.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$Blog->ID.'#ffield_show_location_coordinates';
+
+			echo sprintf( T_('You must turn on the <b>"Show location coordinates"</b> setting in Blog settings <a %s>Post Features</a> tab so the Google Maps plugin can save its coordinates.'), 'href="'.$url.'"' );
 			$params['Form']->end_fieldset();
 			return;
 		}

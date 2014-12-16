@@ -27,7 +27,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id$
+ * @version $Id: _country_list.view.php 6134 2014-03-08 07:48:07Z manuel $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -259,50 +259,14 @@ $Results->display();
 
 if( $current_User->check_perm( 'options', 'edit' ) )
 { // Check permission to edit Country:
-?>
-<script type="text/javascript">
-jQuery( document ).ready( function()
-{
-	jQuery( '.country_status_edit' ).editable( htsrv_url + 'async.php?action=country_status_edit&<?php echo url_crumb( 'country' ) ?>',
-	{
-	data : function( value, settings )
-		{
-			value = ajax_debug_clear( value );
-			var re =  /rel="(.*)"/;
-			var result = value.match(re);
-			return {
-				''         : '<?php echo ctry_status_title( '' ) ?>',
-				'trusted'  : '<?php echo ctry_status_title( 'trusted' ) ?>',
-				'suspect'  : '<?php echo ctry_status_title( 'suspect' ) ?>',
-				'blocked'  : '<?php echo ctry_status_title( 'blocked' ) ?>',
-				'selected' : result[1]
-			}
-		},
-	type     : 'select',
-	name     : 'new_status',
-	tooltip  : 'Click to edit',
-	event    : 'click',
-	callback : function( settings, original )
-		{
-			//evoFadeSuccess( this );
-			jQuery( this ).html( ajax_debug_clear( settings ) );
-			var link = jQuery( this ).find( 'a' );
-			jQuery( this ).css( 'background-color', link.attr( 'color' ) );
-			link.removeAttr( 'color' );
-		},
-	onsubmit: function( settings, original ) {
-	},
-	submitdata: function( value, settings ) {
-			var id = jQuery( this ).attr( 'id' );
-			console.log( id );
-			return { ctry_ID: id }
-		},
-	onerror : function( settings, original, xhr ) {
-			evoFadeFailure( original );
-		}
-	} );
-} );
-</script>
-<?php
+	// Print JS to edit a country status
+	echo_editable_column_js( array(
+		'column_selector' => '.country_status_edit',
+		'ajax_url'        => get_secure_htsrv_url().'async.php?action=country_status_edit&'.url_crumb( 'country' ),
+		'options'         => ctry_status_titles(),
+		'new_field_name'  => 'new_status',
+		'ID_value'        => 'jQuery( this ).attr( "id" )',
+		'ID_name'         => 'ctry_ID',
+		'colored_cells'   => true ) );
 }
 ?>

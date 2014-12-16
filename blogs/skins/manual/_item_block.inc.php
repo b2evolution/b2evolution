@@ -27,7 +27,6 @@ $params = array_merge( array(
 		'item_link_type'    => 'permalink',
 	), $params );
 
-echo '<div id="styled_content_block">'; // Beginning of post display
 if( ( $disp == 'single' ) && empty( $cat ) )
 { // Display breadcrumb, but only if it was not displayed yet. When category is set then breadcrumbs is already displayed.
 	$Skin->display_breadcrumbs( $Item->main_cat_ID );
@@ -82,7 +81,7 @@ if( ( $disp == 'single' ) && empty( $cat ) )
 
 		// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 		skin_include( '_item_content.inc.php', $params );
-		// Note: You can customize the default item feedback by copying the generic
+		// Note: You can customize the default item content by copying the generic
 		// /skins/_item_content.inc.php file into the current skin folder.
 		// -------------------------- END OF POST CONTENT -------------------------
 	?>
@@ -99,12 +98,12 @@ if( ( $disp == 'single' ) && empty( $cat ) )
 		$Item->author( array(
 				'before'    => T_('Created by '),
 				'after'     => ' &bull; ',
-				'link_text' => 'login',
+				'link_text' => 'name',
 			) );
 		$Item->lastedit_user( array(
 				'before'    => T_('Last edit by '),
 				'after'     => T_(' on ').$Item->get_mod_date( 'F jS, Y' ),
-				'link_text' => 'login',
+				'link_text' => 'name',
 			) );
 		'</p>';
 		echo $Item->get_history_link( array(
@@ -128,6 +127,3 @@ if( ( $disp == 'single' ) && empty( $cat ) )
 		locale_restore_previous();	// Restore previous locale (Blog locale)
 	?>
 </div>
-<?php 
-echo '</div>'; // End of post display
-?>

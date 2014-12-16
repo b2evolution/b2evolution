@@ -20,7 +20,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id$
+ * @version $Id: _messaging.funcs.php 6287 2014-03-21 08:40:25Z attila $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -149,7 +149,7 @@ function set_contact_blocked( $user_ID, $blocked )
  */
 function create_new_thread()
 {
-	global $Settings, $current_User, $Messages, $edited_Thread, $edited_Message;
+	global $Settings, $current_User, $Messages, $edited_Thread, $edited_Message, $action;
 
 	// Insert new thread:
 	$edited_Thread = new Thread();
@@ -171,25 +171,31 @@ function create_new_thread()
 	// Load data from request
 	if( $edited_Message->load_from_Request() )
 	{ // We could load data from form without errors:
-		// Insert in DB:
-		if( param( 'thrdtype', 'string', 'discussion' ) == 'discussion' )
-		{
-			$edited_Message->dbinsert_discussion();
-			// update author user last new thread setting
-			update_todays_thread_settings( 1 );
+		if( $action == 'preview' )
+		{ // Don't insert message in preview mode
+			$Messages->add( T_('This is a preview only! Do not forget to send your message!'), 'error' );
 		}
-		else
-		{
-			$edited_Message->dbinsert_individual();
-			// update author user last new thread setting
-			if( empty( $edited_Thread->recipients_list ) )
+		else//$action == 'create'
+		{ // Insert in DB:
+			if( param( 'thrdtype', 'string', 'discussion' ) == 'discussion' )
 			{
-				$edited_Thread->load_recipients();
+				$edited_Message->dbinsert_discussion();
+				// update author user last new thread setting
+				update_todays_thread_settings( 1 );
 			}
-			update_todays_thread_settings( count( $edited_Thread->recipients_list ) );
-		}
+			else
+			{
+				$edited_Message->dbinsert_individual();
+				// update author user last new thread setting
+				if( empty( $edited_Thread->recipients_list ) )
+				{
+					$edited_Thread->load_recipients();
+				}
+				update_todays_thread_settings( count( $edited_Thread->recipients_list ) );
+			}
 
-		$Messages->add( T_('Message sent.'), 'success' );
+			$Messages->add( T_('Message sent.'), 'success' );
+		}
 
 		return true;
 	}
@@ -205,7 +211,7 @@ function create_new_thread()
  */
 function create_new_message( $thrd_ID )
 {
-	global $Settings, $current_User, $Messages, $edited_Message;
+	global $Settings, $current_User, $Messages, $edited_Message, $action;
 
 	// Insert new message:
 	$edited_Message = new Message();
@@ -223,9 +229,15 @@ function create_new_message( $thrd_ID )
 	// Load data from request
 	if( $edited_Message->load_from_Request() )
 	{ // We could load data from form without errors:
-		// Insert in DB:
-		$edited_Message->dbinsert_message();
-		$Messages->add( T_('Message sent.'), 'success' );
+		if( $action == 'preview' )
+		{ // Don't insert message in preview mode
+			$Messages->add( T_('This is a preview only! Do not forget to send your message!'), 'error' );
+		}
+		else//$action == 'create'
+		{ // Insert in DB:
+			$edited_Message->dbinsert_message();
+			$Messages->add( T_('Message sent.'), 'success' );
+		}
 
 		return true;
 	}
@@ -1727,7 +1739,7 @@ function threads_results_block( $params = array() )
 	}
 
 	global $current_User;
-	if( !$current_User->check_perm( 'users', 'edit' ) || !$current_User->check_perm( 'perm_messaging', 'reply' ) )
+	if( !$current_User->check_perm( 'users', 'moderate' ) || !$current_User->check_perm( 'perm_messaging', 'reply' ) )
 	{	// Check minimum permission:
 		return;
 	}
@@ -2053,6 +2065,177 @@ function col_thread_delete_action( $thread_ID )
 	{
 		$redirect_to = get_dispctrl_url( 'threads' );
 		return action_icon( T_( 'Delete'), 'delete', $samedomain_htsrv_url.'action.php?mname=messaging&thrd_ID='.$thread_ID.'&action=delete&redirect_to='.$redirect_to.'&'.url_crumb( 'messaging_threads' ) );
+	}
+}
+
+/**
+ * Create author cell for message list table
+ *
+ * @param integer user ID
+ * @param string login
+ * @param string first name
+ * @param string last name
+ * @param integer avatar ID
+ * @param string datetime
+ */
+function col_msg_author( $user_ID, $datetime )
+{
+	$author = get_user_avatar_styled( $user_ID, array( 'size' => 'crop-top-80x80' ) );
+	return $author.'<div class="note black">'.mysql2date( locale_datefmt().'<\b\r />'.str_replace( ':s', '', locale_timefmt() ), $datetime ).'</div>';
+}
+
+
+/**
+ * Get formatted message text
+ *
+ * @param integer Message ID
+ * @param string Thread title
+ * @return string Formatted message text
+ */
+function col_msg_format_text( $msg_ID, $msg_text )
+{
+	$MessageCache = & get_MessageCache();
+	if( $Message = & $MessageCache->get_by_ID( $msg_ID, false, false ) )
+	{ // Get the prerendered content
+		$msg_text = $Message->get_content();
+	}
+
+	if( empty( $msg_text ) )
+	{
+		return format_to_output( $msg_text, 'htmlspecialchars' );
+	}
+
+	/**** yura> This below code is moved to the Plugins and to $Message->get_content() :
+
+	// WARNING: the messages may contain MALICIOUS HTML and javascript snippets. They must ALWAYS be ESCAPED prior to display!
+	$msg_text = htmlentities( $msg_text, ENT_COMPAT, $evo_charset );
+
+	$msg_text = make_clickable( $msg_text );
+	$msg_text = preg_replace( '#<a #i', '<a rel="nofollow" target="_blank"', $msg_text );
+	$msg_text = nl2br( $msg_text );
+
+	****/
+
+	return $msg_text;
+}
+
+
+/**
+ * Get authors list to display who already had read current message
+ *
+ * @param integer Message ID
+ * @return string Authors list with red/green bullet icons
+ */
+function col_msg_read_by( $message_ID )
+{
+	global $read_status_list, $leave_status_list, $Blog, $current_User, $perm_abuse_management;
+
+	$UserCache = & get_UserCache();
+
+	if( empty( $Blog ) )
+	{	// Set avatar size for a case when blog is not defined
+		$avatar_size = 'crop-top-32x32';
+	}
+	else
+	{	// Get avatar size from blog settings
+		$avatar_size = $Blog->get_setting('image_size_messaging');
+	}
+
+	$read_recipients = array();
+	$unread_recipients = array();
+	foreach( $read_status_list as $user_ID => $first_unread_msg_ID )
+	{
+		if( $user_ID == $current_User->ID )
+		{ // Current user status: current user should not be displayed except in case of abuse management
+			if( $perm_abuse_management )
+			{ // current user has seen all received messages for sure, set first unread msg to NULL
+				$first_unread_msg_ID = NULL;
+			}
+			else
+			{ // not abuse management
+				continue;
+			}
+		}
+
+		$recipient_User = $UserCache->get_by_ID( $user_ID, false );
+		if( !$recipient_User )
+		{ // user not exists
+			continue;
+		}
+
+		$leave_msg_ID = $leave_status_list[ $user_ID ];
+		if( !empty( $leave_msg_ID ) && ( $leave_msg_ID < $message_ID ) )
+		{ // user has left the conversation and didn't receive this message
+			$left_recipients[] = $recipient_User->login;
+		}
+		elseif( empty( $first_unread_msg_ID ) || ( $first_unread_msg_ID > $message_ID ) )
+		{ // user has read all message from this thread or at least this message
+			// user didn't leave the conversation before this message
+			$read_recipients[] = $recipient_User->login;
+		}
+		else
+		{ // User didn't read this message, but didn't leave the conversation either
+			$unread_recipients[] = $recipient_User->login;
+		}
+	}
+
+	$read_by = '';
+	if( !empty( $read_recipients ) )
+	{ // There are users who have read this message
+		asort( $read_recipients );
+		$read_by .= '<div>'.get_avatar_imgtags( $read_recipients, true, false, $avatar_size, '', '', true, false );
+		if( !empty ( $unread_recipients ) )
+		{
+			$read_by .= '<br />';
+		}
+		$read_by .= '</div>';
+	}
+
+	if( !empty ( $unread_recipients ) )
+	{ // There are users who didn't read this message
+		asort( $unread_recipients );
+		$read_by .= '<div>'.get_avatar_imgtags( $unread_recipients, true, false, $avatar_size, '', '', false, false ).'</div>';
+	}
+
+	if( !empty ( $left_recipients ) )
+	{ // There are users who left the conversation before this message
+		asort( $left_recipients );
+		$read_by .= '<div>'.get_avatar_imgtags( $left_recipients, true, false, $avatar_size, '', '', 'left_message', false ).'</div>';
+	}
+	return $read_by;
+}
+
+
+/**
+ *
+ *
+ * @param mixed $thrd_ID
+ * @param mixed $msg_ID
+ * @return string
+ */
+function col_msg_actions( $thrd_ID, $msg_ID )
+{
+	global $Blog, $samedomain_htsrv_url, $perm_abuse_management;
+
+	if( $msg_ID < 1 )
+	{ // Don't display actions in preview mode
+		return '&nbsp;';
+	}
+	else if( is_admin_page() )
+	{
+		$tab = '';
+		if( $perm_abuse_management )
+		{	// We are in Abuse Management
+			$tab = '&tab=abuse';
+		}
+		return action_icon( T_( 'Delete'), 'delete', regenerate_url( 'action', 'thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete'.$tab.'&'.url_crumb( 'messaging_messages' ) ) );
+	}
+	else
+	{
+		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=messages&thrd_ID='.$thrd_ID );
+		$action_url = $samedomain_htsrv_url.'action.php?mname=messaging&disp=messages&thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete';
+		$action_url = url_add_param( $action_url, 'redirect_to='.rawurlencode( $redirect_to ), '&' );
+		return action_icon( T_( 'Delete'), 'delete', $action_url.'&'.url_crumb( 'messaging_messages' ) );
 	}
 }
 

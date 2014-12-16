@@ -71,46 +71,14 @@ skin_include( '_body_header.inc.php' );
 			'block_start' => '<div style="margin: 1em 0">',
 			'block_end' => '</div>',
 			'block_display_title' => false,
-			'disp_search_options' => 1,
+			'disp_search_options' => 0,
+			'search_class' => 'extended_search_form',
 			'use_search_disp' => 1,
 		) );
 	// ---------------------------------- END OF COMMON LINKS ---------------------------------
 
-
-	// Display message if no post:
-	display_if_empty( array(
-					'before'      => '<p class="msg_nothing" style="margin: 2em 0">',
-					'after'       => '</p>',
-					'msg_empty'   => T_('Sorry, we could not find anything matching your request, please try to broaden your search.'),
-				) );
-
-	// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
-	mainlist_page_links( array(
-			'block_start' => '<div class="navigation">',
-			'block_end' => '</div>',
-   		'prev_text' => '&lt;&lt;',
-   		'next_text' => '&gt;&gt;',
-		) );
-	// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
-
-	while( $Item = & mainlist_get_item() )
-	{	// For each blog post:
-		// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
-		skin_include( '_item_block.inc.php', array(
-				'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
-				'image_size'	 =>	'fit-400x320',
-			) );
-		// ----------------------------END ITEM BLOCK  ----------------------------
-	}
-
-	// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
-	mainlist_page_links( array(
-			'block_start' => '<div class="navigation">',
-			'block_end' => '</div>',
-   		'prev_text' => '&lt;&lt;',
-   		'next_text' => '&gt;&gt;',
-		) );
-	// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
+	// Display the search result
+	search_result_block();
 ?>
 
 

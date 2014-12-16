@@ -31,7 +31,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id$
+ * @version $Id: _group.form.php 6134 2014-03-08 07:48:07Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -169,6 +169,8 @@ $perm_edit_option = array( 'edit', T_('Edit/delete all') );
 $Form->begin_fieldset( T_('General').get_manual_link('group_properties_general') );
 
 	$Form->text( 'edited_grp_name', $edited_Group->name, 50, T_('Name'), '', 50, 'large' );
+
+	$Form->text_input( 'edited_grp_level', $edited_Group->get('level'), 2, T_('Group level'), '[0 - 10]', array( 'required' => true ) );
 
 	display_pluggable_permissions( $Form, 'core_general' );
 

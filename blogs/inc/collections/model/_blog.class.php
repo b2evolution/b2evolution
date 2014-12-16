@@ -30,7 +30,7 @@
  *
  * @package evocore
  *
- * @version $Id: _blog.class.php 7636 2014-11-13 10:55:48Z yura $
+ * @version $Id: _blog.class.php 7754 2014-12-05 07:42:52Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -160,20 +160,6 @@ class Blog extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_blogs', 'blog_', 'blog_ID' );
 
-		$this->delete_restrictions = array(
-				array( 'table'=>'T_categories', 'fk'=>'cat_blog_ID', 'msg'=>T_('%d related categories') ),
-				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition' => 'file_root_type = "collection"', 'msg'=>T_('%d files in this blog file root') ),
-			);
-
-		$this->delete_cascades = array(
-				array( 'table'=>'T_coll_settings', 'fk'=>'cset_coll_ID', 'msg'=>T_('%d blog settings') ),
-				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_blog_ID', 'msg'=>T_('%d user permission definitions') ),
-				array( 'table'=>'T_coll_group_perms', 'fk'=>'bloggroup_blog_ID', 'msg'=>T_('%d group permission definitions') ),
-				array( 'table'=>'T_subscriptions', 'fk'=>'sub_coll_ID', 'msg'=>T_('%d subscriptions') ),
-				array( 'table'=>'T_widget', 'fk'=>'wi_coll_ID', 'msg'=>T_('%d widgets') ),
-				array( 'table'=>'T_hitlog', 'fk'=>'hit_coll_ID', 'msg'=>T_('%d hits') ),
-			);
-
 		if( $db_row == NULL )
 		{
 			global $default_locale;
@@ -221,6 +207,38 @@ class Blog extends DataObject
 
 
 	/**
+	 * Get delete restriction settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_restrictions()
+	{
+		return array(
+				array( 'table'=>'T_categories', 'fk'=>'cat_blog_ID', 'msg'=>T_('%d related categories') ),
+				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition' => 'file_root_type = "collection"', 'msg'=>T_('%d files in this blog file root') ),
+			);
+	}
+
+
+	/**
+	 * Get delete cascade settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_cascades()
+	{
+		return array(
+				array( 'table'=>'T_coll_settings', 'fk'=>'cset_coll_ID', 'msg'=>T_('%d blog settings') ),
+				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_blog_ID', 'msg'=>T_('%d user permission definitions') ),
+				array( 'table'=>'T_coll_group_perms', 'fk'=>'bloggroup_blog_ID', 'msg'=>T_('%d group permission definitions') ),
+				array( 'table'=>'T_subscriptions', 'fk'=>'sub_coll_ID', 'msg'=>T_('%d subscriptions') ),
+				array( 'table'=>'T_widget', 'fk'=>'wi_coll_ID', 'msg'=>T_('%d widgets') ),
+				array( 'table'=>'T_hitlog', 'fk'=>'hit_coll_ID', 'msg'=>T_('%d hits') ),
+			);
+	}
+
+
+	/**
 	 * @param string
 	 */
 	function init_by_kind( $kind, $name = NULL, $shortname = NULL, $urlname = NULL )
@@ -234,6 +252,7 @@ class Blog extends DataObject
 				$this->set( 'urlname', empty($urlname) ? 'photo' : $urlname );
 				$this->set_setting( 'posts_per_page', 12 );
 				$this->set_setting( 'archive_mode', 'postbypost' );
+				$this->set_setting( 'front_disp', 'front' );
 				break;
 
 			case 'group':
@@ -260,6 +279,7 @@ class Blog extends DataObject
 				$this->set_setting( 'orderdir', 'DESC' );
 				$this->set_setting( 'enable_goto_blog', 'post' );
 				$this->set_setting( 'front_disp', 'front' );
+				$this->set_setting( 'track_unread_content', 1 );
 				$this->set_setting( 'allow_rating_comment_helpfulness', 1 );
 				break;
 
@@ -532,15 +552,34 @@ class Blog extends DataObject
 
 		if( in_array( 'pings', $groups ) )
 		{ // we want to load the ping checkboxes:
-			$blog_ping_plugins = param( 'blog_ping_plugins', 'array/string', array() );
+			$blog_ping_plugins = param( 'blog_ping_plugins', 'array:string', array() );
 			$blog_ping_plugins = array_unique($blog_ping_plugins);
 			$this->set_setting('ping_plugins', implode(',', $blog_ping_plugins));
 		}
 
 		if( in_array( 'authors', $groups ) )
-		{ // we want to load the multiple authors params
-			$this->set( 'advanced_perms',  param( 'advanced_perms', 'integer', 0 ) );
+		{ // we want to load the workflow & permissions params
 			$this->set_setting( 'use_workflow',  param( 'blog_use_workflow', 'integer', 0 ) );
+
+			// Change blog permissions settings
+			$old_advanced_perms = $this->get( 'advanced_perms' );
+			$new_advanced_perms = param( 'advanced_perms', 'integer', 0 );
+
+			$old_allow_access = $this->get_setting( 'allow_access' );
+			$new_allow_access = param( 'blog_allow_access', 'string', '' );
+
+			if( $old_allow_access != 'members' && $new_allow_access == 'members' )
+			{ // If 'Allow access' is changed to 'Members' we should activate advanced perms automatically
+				$new_advanced_perms = 1;
+			}
+
+			if( $old_advanced_perms == 1 && $new_advanced_perms == 0 && $old_allow_access == 'members' )
+			{ // If advanced perms are deselected we should also change 'Allow access' back to 'Logged in users'
+				$new_allow_access = 'users';
+			}
+
+			$this->set( 'advanced_perms', $new_advanced_perms );
+			$this->set_setting( 'allow_access', $new_allow_access );
 		}
 
 		if( in_array( 'home', $groups ) )
@@ -668,7 +707,10 @@ class Blog extends DataObject
 			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
 
 			// Public blog list
-			$this->set( 'in_bloglist', param( 'blog_in_bloglist',   'integer', 0 ) );
+			$this->set( 'in_bloglist', param( 'blog_in_bloglist', 'integer', 0 ) );
+
+			// Tracking unread content
+			$this->set_setting( 'track_unread_content', param( 'track_unread_content', 'integer', 0 ) );
 
 			$this->set_setting( 'image_size_user_list', param( 'image_size_user_list', 'string' ) );
 			$this->set_setting( 'image_size_messaging', param( 'image_size_messaging', 'string' ) );
@@ -690,6 +732,7 @@ class Blog extends DataObject
 			$this->set_setting( 'allow_html_comment', param( 'allow_html_comment', 'string', '0' ) );
 			$this->set_setting( 'allow_attachments', param( 'allow_attachments', 'string', 'registered' ) );
 			$this->set_setting( 'max_attachments', param( 'max_attachments', 'integer', '' ) );
+			$this->set_setting( 'autocomplete_usernames', param( 'autocomplete_usernames', 'integer', '' ) );
 			$this->set_setting( 'allow_rating_items', param( 'allow_rating_items', 'string', 'never' ) );
 			$this->set_setting( 'rating_question', param( 'rating_question', 'text' ) );
 			$this->set_setting( 'allow_rating_comment_helpfulness', param( 'allow_rating_comment_helpfulness', 'string', '0' ) );
@@ -851,7 +894,7 @@ class Blog extends DataObject
 					else
 					{ // It is not valid absolute URL, don't update the blog 'siteurl' to avoid errors
 						$allow_new_access_type = false; // If site url is not updated do not allow access_type update either
-						$Messages->add( T_('Blog Folder URL').': '.sprintf( T_('%s is an invalid absolute URL'), '&laquo;'.evo_htmlspecialchars( $blog_siteurl ).'&raquo;' )
+						$Messages->add( T_('Blog Folder URL').': '.sprintf( T_('%s is an invalid absolute URL'), '&laquo;'.htmlspecialchars( $blog_siteurl ).'&raquo;' )
 							.' '.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>) and it must contain at least one \'/\' sign after the domain name!'), 'error' );
 					}
 				}
@@ -950,6 +993,7 @@ class Blog extends DataObject
 								if( $error = validate_dirname($subdir) )
 								{
 									param_error( 'blog_media_subdir', T_('Media dir location').': '.$error );
+									syslog_insert( sprintf( 'Invalid name is detected for folder %s', '<b>'.$subdir.'</b>' ), 'warning', 'file' );
 								}
 							}
 						}
@@ -2461,6 +2505,8 @@ class Blog extends DataObject
 											WHERE pst_ID IN ($post_list)" );
 				$DB->query( "DELETE FROM T_items__subscriptions
 											WHERE isub_item_ID IN ($post_list)" );
+				$DB->query( "DELETE FROM T_users__postreadstatus
+											WHERE uprs_post_ID IN ($post_list)" );
 				$DB->query( "DELETE FROM T_items__version
 											WHERE iver_itm_ID IN ($post_list)" );
 				$DB->query( "DELETE l, lv FROM T_links AS l
@@ -2881,7 +2927,7 @@ class Blog extends DataObject
 					  				INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID
 					  				INNER JOIN T_categories ON postcat_cat_ID = cat_ID
 						 WHERE cat_blog_ID = '.$this->ID.'
-						 	 AND tag_name = '.$DB->quote( evo_strtolower($tag) );
+						 	 AND tag_name = '.$DB->quote( utf8_strtolower($tag) );
 
 		return $DB->get_var( $sql );
 
@@ -3092,6 +3138,91 @@ class Blog extends DataObject
 	function city_visible()
 	{
 		return $this->get_setting( 'location_city' ) != 'hidden';
+	}
+
+
+	/**
+	 * Check if current user has access to this blog depending on settings
+	 *
+	 * @return boolean TRUE on success
+	 */
+	function check_access()
+	{
+		global $Messages, $skins_path, $ads_current_skin_path, $ReqURL, $disp;
+
+		$allow_access = $this->get_setting( 'allow_access' );
+
+		if( $allow_access == 'public' )
+		{ // Everyone has an access to this blog
+			return true;
+		}
+
+		if( in_array( $disp, array( 'login', 'lostpassword', 'register' ) ) )
+		{ // Don't restrict these pages
+			return true;
+		}
+
+		/**
+		 * $allow_access == 'users' || 'members'
+		 */
+		$has_access = true;
+		if( ! is_logged_in() )
+		{ // Only logged in users have an access to this blog
+			$error_message = NT_('You need to log in before you can access this collection.');
+			$template = 'access_requires_login.main.php';
+			$has_access = false;
+			// Don't use site skin if template doesn't exist, User will be redirect to standard login form instead
+			$use_site_skin = false;
+		}
+		elseif( $allow_access == 'members' )
+		{ // Check if current user is member of this blog
+			global $current_User;
+			$error_message = NT_('You are not a member of this collection, therefore you are not allowed to access it.');
+			$template = 'access_denied.main.php';
+			$has_access = $current_User->check_perm( 'blog_ismember', 'view', false, $this->ID );
+			// If skin template files don't exist - the template "/skins_site/access_denied.main.php" will be used
+			$use_site_skin = true;
+		}
+
+		if( ! $has_access )
+		{ // Current user has no access to current page
+			$Messages->add( T_( $error_message ), 'error' );
+
+			if( $this->get_setting( 'in_skin_login' ) )
+			{ // If blog has in-skin login form we should not display it
+			  // Use 'access_requires_login.main.php' or 'access_denied.main.php' instead
+				$blog_skin_ID = $this->get_skin_ID();
+				if( ! empty( $blog_skin_ID ) )
+				{
+					$SkinCache = & get_SkinCache();
+					$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
+					$ads_current_skin_path = $skins_path.$Skin->folder.'/';
+					$skin_template_name = $ads_current_skin_path.$template;
+					$global_template_name = $skins_path.$template;
+					if( file_exists( $skin_template_name ) )
+					{ // Display a special template of this skin
+						require $skin_template_name;
+						exit;
+					}
+					elseif( file_exists( $global_template_name ) )
+					{ // Display a special template for all skins
+						require $global_template_name;
+						exit;
+					}
+					elseif( $use_site_skin )
+					{ // Display a template from site skins
+						siteskin_include( $template );
+						exit;
+					}
+				}
+			}
+
+			// Redirect to standard login form
+			header_redirect( get_login_url( 'no access to blog', NULL, true ), 302 );
+			// will have exited
+		}
+
+		return true;
 	}
 
 

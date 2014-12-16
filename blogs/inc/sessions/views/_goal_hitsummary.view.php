@@ -9,11 +9,11 @@
  *
  * @package admin
  *
- * @version $Id: _goal_hitsummary.view.php 7368 2014-10-06 11:16:43Z yura $
+ * @version $Id: _goal_hitsummary.view.php 7369 2014-10-06 11:22:41Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url, $AdminUI;
+global $blog, $admin_url;
 
 $final = param( 'final', 'integer', 0, true );
 $goal_name = param( 'goal_name', 'string', NULL, true );
@@ -71,9 +71,11 @@ if( count( $goal_rows ) && count( $hitgroup_array ) )
 
 	// Column mapping and colors
 	$col_mapping = array();
+	$chart['series_color'] = array();
 	foreach( $goal_rows as $g => $goal_row )
 	{
 		$col_mapping[ $goal_row->goal_ID ] = $g+1;
+		$chart['series_color'][ $g ] = str_replace( '#', '', $goal_row->gcat_color );
 		$chart['chart_data'][ $g+1 ] = array();
 		$chart['link_data']['params'][ $g+1 ] = array( $goal_row->goal_name );
 	}
@@ -100,20 +102,13 @@ if( count( $goal_rows ) && count( $hitgroup_array ) )
 		array_unshift( $chart['chart_data'][ $g+1 ], $goal_row->goal_name );
 	}
 
-	// Include common chart properties:
-	require dirname(__FILE__).'/inc/_bar_chart.inc.php';
-
-	// Colors
-	$chart['series_color'] = array();
-	foreach( $goal_rows as $g => $goal_row )
-	{
-		$chart['series_color'][ $g ] = str_replace( '#', '', $goal_row->gcat_color );
-	}
+	// Chart params
+	$chart['canvas_bg'] = array( 'width' => 780, 'height' => 355 );
 
 	// Print out chart
 	echo '<div class="center">';
-	load_funcs('_ext/_swfcharts.php');
-	DrawChart( $chart );
+	load_funcs('_ext/_canvascharts.php');
+	CanvasBarsChart( $chart );
 	echo '</div>';
 }
 

@@ -15,7 +15,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _item_list_sidebar.view.php 6134 2014-03-08 07:48:07Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -130,7 +130,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 		echo '<legend>'.T_('Title / Text contains').'</legend>';
 
 		?>
-		<div><input type="text" name="<?php echo $pp ?>s" size="20" value="<?php echo evo_htmlspecialchars($s) ?>" class="SearchField" /></div>
+		<div class="tile"><input type="text" name="<?php echo $pp ?>s" size="20" value="<?php echo htmlspecialchars($s) ?>" class="SearchField form-control" /></div>
 		<?php
 		// echo T_('Words').' : ';
 		?>
@@ -194,8 +194,8 @@ echo $Widget->replace_vars( $template['block_start'] );
 					{
 						echo '<li><input type="radio" name="'.$pp.'assgn" value="'.$loop_User->ID.'" class="radio"';
 						if( $loop_User->ID == $assgn ) echo ' checked="checked"';
-						echo ' /> <a href="'.regenerate_url( $pp.'assgn', $pp.'assgn='.$loop_User->ID ).'" class="'.$loop_User->get_gender_class().'" rel="bubbletip_user_'.$loop_User->ID.'">';
-						$loop_User->login();
+						echo ' /> <a href="'.regenerate_url( $pp.'assgn', $pp.'assgn='.$loop_User->ID ).'" rel="bubbletip_user_'.$loop_User->ID.'">';
+						echo $loop_User->get_colored_login( array( 'login_text' => 'name' ) );
 						echo '</a></li>';
 					}
 				}
@@ -246,8 +246,8 @@ echo $Widget->replace_vars( $template['block_start'] );
 				{
 					echo '<li><input type="radio" name="'.$pp.'author" value="'.$loop_User->ID.'" class="radio"';
 					if( $loop_User->ID == $author ) echo ' checked="checked"';
-					echo ' /> <a href="'.regenerate_url( $pp.'author', $pp.'author='.$loop_User->ID ).'" class="'.$loop_User->get_gender_class().'" rel="bubbletip_user_'.$loop_User->ID.'">';
-					$loop_User->login();
+					echo ' /> <a href="'.regenerate_url( $pp.'author', $pp.'author='.$loop_User->ID ).'" rel="bubbletip_user_'.$loop_User->ID.'">';
+					echo $loop_User->get_colored_login( array( 'login_text' => 'name' ) );
 					echo '</a></li>';
 				}
 			}

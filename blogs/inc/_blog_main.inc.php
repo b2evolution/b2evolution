@@ -22,7 +22,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _blog_main.inc.php 7431 2014-10-15 04:23:46Z yura $
+ * @version $Id: _blog_main.inc.php 7432 2014-10-15 04:26:24Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -483,7 +483,7 @@ if( !empty( $tempskin ) )
 
 
 // Set $disp to 'posts' when filter by categories or tags or date
-param( 'catsel', 'array/integer', NULL );
+param( 'catsel', 'array:integer', NULL );
 param( 'cat', 'string', NULL );
 param( 'tag', 'string', NULL );
 param( 'm', 'string', NULL );
@@ -627,7 +627,7 @@ if( isset( $skin ) )
 	}
 	elseif( skin_exists( $skin ) && ! skin_installed( $skin ) )
 	{	// The requested skin is not a feed skin and exists in the file system, but isn't installed:
-		debug_die( sprintf( T_( 'The skin [%s] is not installed on this system.' ), evo_htmlspecialchars( $skin ) ) );
+		debug_die( sprintf( T_( 'The skin [%s] is not installed on this system.' ), htmlspecialchars( $skin ) ) );
 	}
 	elseif( ! empty( $tempskin ) )
 	{ // By definition, we want to see the temporary skin (if we don't use feedburner... )
@@ -647,7 +647,7 @@ if( !isset( $skin ) && !empty( $blog_skin_ID ) )	// Note: if $skin is set to '',
 if( !empty( $skin ) && !skin_exists( $skin ) )
 { // We want to use a skin, but it doesn't exist!
 	$err_msg = sprintf( T_('The skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file.'),
-		evo_htmlspecialchars($skin),
+		htmlspecialchars($skin),
 		$Blog->dget('shortname'),
 		'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$Blog->ID.'"' );
 	debug_die( $err_msg );
@@ -678,6 +678,10 @@ apm_name_transaction( $request_transaction_name );
 $Timer->pause( '_BLOG_MAIN.inc');
 // LOG with APM:
 $Timer->log_duration( '_BLOG_MAIN.inc' );
+
+
+// Check if current user has acces to this blog
+$Blog->check_access();
 
 
 /*

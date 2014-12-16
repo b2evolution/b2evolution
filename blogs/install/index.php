@@ -50,8 +50,13 @@ require_once $inc_path.'locales/_locale.funcs.php';
 
 load_class( '_core/model/_log.class.php', 'Log');
 $Debuglog = new Log();
-load_class( '_core/model/_messages.class.php', 'Messages');
+load_class( '_core/model/_messages.class.php', 'Messages' );
 $Messages = new Messages();
+
+/**
+ * System log
+ */
+load_class( 'tools/model/_syslog.class.php', 'Syslog' );
 
 /**
  * Load modules.
@@ -90,8 +95,16 @@ load_funcs('_core/_param.funcs.php');
 // Let the modules load/register what they need:
 modules_call_method( 'init' );
 
+// Init charset variables based on the $evo_charset value
+$current_charset = $evo_charset;
+init_charsets( $current_charset );
 
+// Init action param
+// echo "utf8_ltrim('abc')=".utf8_ltrim('abc')."<br>\n";
+// echo "utf8_substr('abc',0)=".utf8_substr('abc',0)."<br>\n";
 param( 'action', 'string', 'default' );
+// echo "action=*$action*<br>\n ";
+
 // check if we should try to connect to db if config is not done
 switch( $action )
 {
@@ -240,6 +253,14 @@ switch( $action )
 require_css( 'basic_styles.css', 'rsc_url' ); // the REAL basic styles
 require_css( 'basic.css', 'rsc_url' ); // Basic styles
 require_css( 'evo_distrib_2.css', 'rsc_url' );
+add_css_headline( '
+.install_options {
+	margin-left: 2em;
+}
+.install_options > span {
+	display: block;
+	margin: 6px 0;
+}' );
 
 header('Content-Type: text/html; charset='.$io_charset);
 header('Cache-Control: no-cache'); // no request to this page should get cached!
@@ -426,7 +447,7 @@ switch( $action )
 				<p><?php echo T_('This is how your _basic_config.php should look like:') ?></p>
 				<blockquote>
 				<pre><?php
-					echo evo_htmlspecialchars( $conf );
+					echo htmlspecialchars( $conf );
 				?></pre>
 				</blockquote>
 				<?php
@@ -549,6 +570,27 @@ switch( $action )
 
 		<?php
 			$old_db_version = get_db_version();
+			$require_charset_update = false;
+
+			if( ! is_null( $old_db_version ) )
+			{
+				$expected_connection_charset = $DB->php_to_mysql_charmap( $evo_charset );
+				if( $DB->connection_charset != $expected_connection_charset )
+				{
+					echo '<div class="error"><p class="error">'.sprintf( T_('In order to install b2evolution with the %s locale, your MySQL needs to support the %s connection charset.').' (SET NAMES %s)',
+						$current_locale, $evo_charset, $expected_connection_charset ).'</p></div>';
+					// sam2kb> TODO: If something is not supported we can display a message saying "do this and that, enable extension X etc. etc... or switch to a better hosting".
+					break;
+				}
+				else
+				{ // Check if some of the tables have different charset than what we expect
+					load_funcs( 'tools/model/_system.funcs.php' );
+					if( system_check_charset_update() )
+					{
+						echo '<div class="error"><p class="error">'.sprintf( T_("WARNING: Some of your tables have different charset than the expected %s. It is strongly recommended to upgrade your database charset by running the preselected task below:"), utf8_strtoupper( $evo_charset ) ).'</p></div>';
+					}
+				}
+			}
 		?>
 
 		<form action="index.php" method="get">
@@ -568,11 +610,45 @@ switch( $action )
 				?>
 				/>
 				<label for="newdb"><?php echo T_('<strong>New Install</strong>: Install b2evolution database tables.')?></label></p>
-			<p style="margin-left: 2em;">
-				<input type="checkbox" name="create_sample_contents" id="create_sample_contents" value="1" checked="checked" />
-				<label for="create_sample_contents"><?php echo T_('Also install sample blogs &amp; sample contents. The sample posts explain several features of b2evolution. This is highly recommended for new users.')?></label>
-				<br />
-				<?php
+			<p class="install_options">
+				<span>
+					<input type="checkbox" name="create_sample_contents" id="create_sample_contents" value="1" checked="checked" />
+					<label for="create_sample_contents"><?php echo T_('Also install sample blogs &amp; sample contents. The sample posts explain several features of b2evolution. This is highly recommended for new users.')?></label>
+					<br />
+					<?php echo T_('You can start adding your own content whenever you\'re ready. Until then, it may be handy to have some demo contents to play around with. You can easily delete these demo contents once you\'re done testing.'); ?>
+					<?php
+						// Display the collections to select which install
+						$collections = array(
+								'a'      => T_('Blog A'),
+								'b'      => T_('Blog B'),
+								'info'   => T_('Info'),
+								'photos' => T_('Photos'),
+								'forums' => T_('Forums'),
+								'manual' => T_('Manual'),
+							);
+
+						// Allow all modules to set what collections should be installed
+						$module_collections = modules_call_method( 'get_demo_collections' );
+						if( ! empty( $module_collections ) )
+						{
+							foreach( $module_collections as $module_key => $module_colls )
+							{
+								foreach( $module_colls as $module_coll_key => $module_coll_title )
+								{
+									$collections[ $module_key.'_'.$module_coll_key ] = $module_coll_title;
+								}
+							}
+						}
+
+						foreach( $collections as $coll_index => $coll_title )
+						{ // Display the checkboxes to select what demo collection to install
+					?>
+					<br /> &nbsp; &nbsp; <input type="checkbox" name="collections[]" id="collection_<?php echo $coll_index; ?>" value="<?php echo $coll_index; ?>" checked="checked" />
+					<label for="collection_<?php echo $coll_index; ?>"><?php echo $coll_title; ?></label>
+					<?php } ?>
+				</span>
+				<span>
+					<?php
 						// Pre-check if current installation is local
 						$is_local = php_sapi_name() != 'cli' && // NOT php CLI mode
 							( $basehost == 'localhost' ||
@@ -593,21 +669,23 @@ switch( $action )
 									$_SERVER['SERVER_NAME'] == '::1' )
 								)
 							);
-				?>
-				<input type="checkbox" name="local_installation" id="local_installation" value="1"<?php echo $is_local ? ' checked="checked"' : ''; ?> />
-				<label for="local_installation"><?php echo T_('This is a local / test / intranet installation.')?></label>
+					?>
+					<input type="checkbox" name="local_installation" id="local_installation" value="1"<?php echo $is_local ? ' checked="checked"' : ''; ?> />
+					<label for="local_installation"><?php echo T_('This is a local / test / intranet installation.')?></label>
+				</span>
 				<?php
 					if( $test_install_all_features )
-					{	// Checkbox to install all features
+					{ // Checkbox to install all features
 				?>
-				<br />
-				<input type="checkbox" name="install_all_features" id="install_all_features" value="1" />
-				<label for="install_all_features"><?php echo T_('Also install all test features.')?></label>
+				<span>
+					<input type="checkbox" name="install_all_features" id="install_all_features" value="1" />
+					<label for="install_all_features"><?php echo T_('Also install all test features.')?></label>
+				</span>
 				<?php } ?>
 			</p>
 
 			<p><input type="radio" name="action" id="evoupgrade" value="evoupgrade"
-				<?php if( !is_null($old_db_version) && $old_db_version < $new_db_version )
+				<?php if( !is_null($old_db_version) && ! $require_charset_update && $old_db_version < $new_db_version )
 					{
 						echo 'checked="checked"';
 					}
@@ -628,7 +706,13 @@ switch( $action )
 					<?php
 				}
 			?>
-					<p><input type="radio" name="action" id="utf8upgrade" value="utf8upgrade" />
+					<p><input type="radio" name="action" id="utf8upgrade" value="utf8upgrade"
+					<?php if( $require_charset_update )
+					{
+						echo 'checked="checked"';
+					}
+					?>
+					/>
 					<label for="utf8upgrade"><?php echo T_('<strong>Upgrade your DB to UTF-8</strong>: all the b2evolution tables in your b2evolution MySQL database will be converted to UTF-8 instead of their current charset.')?></label></p>
 			<?php
 
@@ -824,7 +908,7 @@ switch( $action )
 			?>
 			<p>
 			<?php
-			echo nl2br( evo_htmlspecialchars( sprintf( /* TRANS: %s gets replaced by app name, usually "b2evolution" */ T_( "Are you sure you want to delete your existing %s tables?\nDo you have a backup?" ), $app_name ) ) );
+			echo nl2br( htmlspecialchars( sprintf( /* TRANS: %s gets replaced by app name, usually "b2evolution" */ T_( "Are you sure you want to delete your existing %s tables?\nDo you have a backup?" ), $app_name ) ) );
 			?>
 			</p>
 			<p>

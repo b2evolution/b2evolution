@@ -112,9 +112,8 @@ class videoplug_plugin extends Plugin
 
 		$coll_setting_name = ( $params['target_type'] == 'Comment' ) ? 'coll_apply_comment_rendering' : 'coll_apply_rendering';
 		$apply_rendering = $this->get_coll_setting( $coll_setting_name, $Blog );
-		if( empty( $apply_rendering ) || $apply_rendering == 'never' ||
-		    $params['edit_layout'] == 'simple' || $params['edit_layout'] == 'inskin' )
-		{	// This is too complex for simple mode, don't display it:
+		if( empty( $apply_rendering ) || $apply_rendering == 'never' || $params['edit_layout'] == 'inskin' )
+		{ // This is too complex for inskin mode, don't display it:
 			return false;
 		}
 

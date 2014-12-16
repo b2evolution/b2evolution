@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage pureforums
  *
- * @version $Id: _posts.disp.php 7275 2014-09-05 07:42:30Z yura $
+ * @version $Id: _posts.disp.php 7276 2014-09-05 07:43:21Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -36,6 +36,9 @@ if( $cat > 0 )
 		) );
 	$MainList->query();
 	$MainList->nav_target = $cat; // set navigation target, we are always navigating through category in this skin
+
+	// Load read statuses if required
+	$MainList->load_content_read_statuses();
 
 	// Breadcrumbs
 	$Skin->display_breadcrumbs( $cat );
@@ -106,6 +109,7 @@ if( count( $chapters ) > 0 )
 			</td>
 			<td class="ft_count"><?php printf( T_('%s topics'), '<b>'.get_postcount_in_category( $Chapter->ID ).'</b>' ); ?></td>
 			<td class="ft_count"><?php printf( T_('%s replies'), '<b>'.get_commentcount_in_category( $Chapter->ID ).'</b>' ); ?></td>
+			<td class="ft_date"><?php echo $Chapter->get_last_touched_date( 'D M j, Y H:i' ); ?></td>
 		</tr>
 <?php
 		}

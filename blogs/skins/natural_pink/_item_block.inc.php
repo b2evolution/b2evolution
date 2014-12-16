@@ -43,8 +43,9 @@ $params = array_merge( array(
 			) );
 
 		$Item->issue_time( array(
-				'before'    => ' ',
-				'after'     => '',
+				'before'      => ' ',
+				'after'       => '',
+				'time_format' => '#short_time',
 			) );
 
 		$Item->author( array(
@@ -80,7 +81,7 @@ $params = array_merge( array(
 	<?php
 		// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 		skin_include( '_item_content.inc.php', $params );
-		// Note: You can customize the default item feedback by copying the generic
+		// Note: You can customize the default item content by copying the generic
 		// /skins/_item_content.inc.php file into the current skin folder.
 		// -------------------------- END OF POST CONTENT -------------------------
 	?>
@@ -98,7 +99,6 @@ $params = array_merge( array(
 							'link_text_one' => '#',
 							'link_text_more' => '#',
 							'link_title' => '#',
-							'use_popup' => false,
 						) );
 
 			// Link to comments, trackbacks, etc.:
@@ -110,7 +110,6 @@ $params = array_merge( array(
 							'link_text_one' => '#',
 							'link_text_more' => '#',
 							'link_title' => '#',
-							'use_popup' => false,
 						) );
 
 			$Item->edit_link( array( // Link to backoffice for editing

@@ -15,7 +15,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _system.funcs.php 7543 2014-10-29 08:48:17Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -162,18 +162,42 @@ function system_get_result( $check_dir_code, $before_msg = '' )
 
 
 /**
- * Create cache/ and  /cache/plugins/ folders
+ * Create _cache/ and  /_cache/plugins/ folders
  *
  * @return boolean false if cache/ folder not exists or has limited editing permission, true otherwise
  */
-function system_create_cache_folder()
+function system_create_cache_folder( $verbose = false )
 {
-	global $cache_path;
-	// create /cache folder
+	global $cache_path, $basepath;
+
+	if( $cache_path == $basepath.'_cache/' )
+	{ // Cache path is the default one
+		if( ! is_dir( $cache_path ) && is_dir( $basepath.'cache/' ) )
+		{ // The default cache folder doesn't exists yet, but the old default does exist
+			if( @rename( $basepath.'cache/', $cache_path ) )
+			{ // Successful rename
+				if( $verbose )
+				{ // Display successefully renamed message
+					echo '<strong>'.sprintf( T_('Your page cache folder was successfully renamed from "%s" to "%s".'), $basepath.'cache/', $cache_path ).'</strong>';
+				}
+				return true;
+			}
+			if( $verbose )
+			{ // Display error message
+				echo '<span class="error">'.sprintf( T_('You should rename your "%s" folder to "%s" for page caching to continue working without interruption.'), $basepath.'cache/', $cache_path )."</span>";
+			}
+			return false;
+		}
+	}
+	// create /_cache folder
 	mkdir_r( $cache_path );
 	// check /cache folder
 	if( system_check_dir( 'cache' ) > 0 )
 	{
+		if( $verbose )
+		{ // The cache folder is not readable/writable or doesn't exist
+			echo '<span class="error">'.T_('The /cache folder could not be created/written to. b2evolution will still work but without caching, which will make it operate slower than optimal.').'</span>';
+		}
 		return false;
 	}
 
@@ -307,13 +331,13 @@ function system_check_caches( $repair = true )
 /**
  * Initialize cache settings and folders (during install or upgrade)
  */
-function system_init_caches()
+function system_init_caches( $verbose = false )
 {
 	global $cache_path, $Settings, $DB;
 
-	// create /cache and /cache/plugins/ folders
-	if( !system_create_cache_folder() )
-	{
+	// create /_cache and /_cache/plugins/ folders
+	if( !system_create_cache_folder( $verbose ) )
+	{ // The error message were displayed
 		return false;
 	}
 
@@ -512,5 +536,33 @@ function get_php_bytes_size( $php_ini_value )
 
 	// Unknown format
 	return $php_ini_value;
+}
+
+
+/**
+ * Check if some of the tables have different charset than what we expect
+ *
+ * @return boolean TRUE if the update is required
+ */
+function system_check_charset_update()
+{
+	global $DB, $evo_charset, $db_config, $tableprefix;
+
+	$expected_connection_charset = DB::php_to_mysql_charmap( $evo_charset );
+
+	$curr_db_charset = $DB->get_var( 'SELECT default_character_set_name
+		FROM information_schema.SCHEMATA
+		WHERE schema_name = '.$DB->quote( $db_config['name'] ) );
+
+	$require_charset_update = ( $curr_db_charset != $expected_connection_charset ) ||
+		$DB->get_var( 'SELECT COUNT( T.table_name )
+			FROM information_schema.`TABLES` T,
+				information_schema.`COLLATION_CHARACTER_SET_APPLICABILITY` CCSA
+			WHERE CCSA.collation_name = T.table_collation
+				AND T.table_schema = '.$DB->quote( $db_config['name'] ).'
+				AND T.table_name LIKE "'.$tableprefix.'%"
+				AND CCSA.character_set_name != '.$DB->quote( $expected_connection_charset ) );
+
+	return $require_charset_update;
 }
 ?>

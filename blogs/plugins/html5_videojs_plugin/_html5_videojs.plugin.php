@@ -32,7 +32,10 @@ class html5_videojs_plugin extends Plugin
 	{
 		$this->short_desc = sprintf( T_('Media player for the these file formats: %s. Note: iOS supports only: %s; Android supports only: %s.'),
 			implode( ', ', $this->allow_ext ), 'mp4', 'mp4, webm' );
-		$this->long_desc = $this->short_desc;
+
+		$this->long_desc = $this->short_desc.' '
+			.sprintf( T_('This player can display a placeholder image of the same name as the video file with the following extensions: %s.'),
+			'jpg, jpeg, png, gif' );
 	}
 
 
@@ -172,9 +175,18 @@ class html5_videojs_plugin extends Plugin
 			$video_options['controls'] = true;
 			$video_options['preload'] = 'auto';
 
+			if( $placeholder_File = & $Item->get_placeholder_File( $File ) )
+			{ // Display placeholder/poster when image file is linked to the Item with same name as current video File
+				$video_placeholder_attr = ' poster="'.$placeholder_File->get_url().'"';
+			}
+			else
+			{ // No placeholder for current video File
+				$video_placeholder_attr = '';
+			}
+
 			$params['data'] .= '<div class="videojs_block">';
 
-			$params['data'] .= '<video id="html5_videojs_'.$html5_videojs_number.'" class="video-js '.$this->get_coll_setting( 'skin', $item_Blog ).'" data-setup=\''.evo_json_encode( $video_options ).'\'>'.
+			$params['data'] .= '<video id="html5_videojs_'.$html5_videojs_number.'" class="video-js '.$this->get_coll_setting( 'skin', $item_Blog ).'" data-setup=\''.evo_json_encode( $video_options ).'\''.$video_placeholder_attr.'>'.
 				'<source src="'.$File->get_url().'" type="'.$this->get_video_mimetype( $File ).'" />'.
 				'</video>';
 

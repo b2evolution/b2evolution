@@ -21,7 +21,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _user_list_short.view.php 7818 2014-12-15 14:41:11Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -39,6 +39,10 @@ global $Settings;
  * @var UserSettings
  */
 global $UserSettings;
+/**
+ * @var Blog
+ */
+global $Blog;
 
 if( !isset( $display_params ) )
 { // init display_params
@@ -46,7 +50,7 @@ if( !isset( $display_params ) )
 }
 
 $UserList = new UserList( '', $UserSettings->get('results_per_page'), 'u_', array(
-		'join_group'          => false,
+		'join_group'          => is_logged_in() ? false : true, /* Anonymous users have a limit by user group level */
 		'join_country'        => false,
 		'keywords_fields'     => 'user_login, user_firstname, user_lastname, user_nickname',
 		'where_status_closed' => false,
@@ -54,18 +58,18 @@ $UserList = new UserList( '', $UserSettings->get('results_per_page'), 'u_', arra
 
 $default_filters = array();
 
-if( is_logged_in() )
-{	// Set default filter by country
+if( is_logged_in() && has_cross_country_restriction( 'users', 'list' ) )
+{ // Set default filter by country
 	$default_filters['country'] = $current_User->ctry_ID;
 }
 
 
-if( $Settings->get('allow_avatars') )
-{	// Sort by picture
+if( $Settings->get( 'allow_avatars' ) )
+{ // Sort by picture
 	$default_filters['order'] = 'D';
 }
 else
-{	// Sort by login (if pictures are not allowed )
+{ // Sort by login (if pictures are not allowed )
 	$default_filters['order'] = 'A';
 }
 
@@ -74,7 +78,7 @@ else
  * Data columns:
  */
 
-if( $Settings->get('allow_avatars') )
+if( $Settings->get( 'allow_avatars' ) )
 {
 	function user_avatar( $user_ID )
 	{
@@ -101,7 +105,7 @@ if( $Settings->get('allow_avatars') )
 $UserList->cols[] = array(
 						'th' => T_('Login'),
 						'order' => 'user_login',
-						'td' => '%get_user_identity_link( #user_login#, #user_ID#, "profile", "text" )%',
+						'td' => '%get_user_identity_link( #user_login#, #user_ID#, "profile", "login" )%',
 					);
 
 $UserList->cols[] = array(
@@ -117,11 +121,14 @@ $UserList->load_from_Request();
 $UserList->query();
 
 
-$filter_presets = array(
-		'all' => array( T_('All users'), get_dispctrl_url( 'users&amp;filter=new' ) ),
-		'men' => array( T_('Men'), get_dispctrl_url( 'users', 'gender_men=1&amp;filter=new' ) ),
-		'women' => array( T_('Women'), get_dispctrl_url( 'users', 'gender_women=1&amp;filter=new' ) )
-	);
+$filter_presets = array();
+$filter_presets['all'] = array( T_('All users'), get_dispctrl_url( 'users&amp;filter=new' ) );
+if( ! is_admin_page() && ! empty( $Blog ) && $Blog->get_setting( 'allow_access' ) == 'members' )
+{ // Allow to filter by members when Blog has an access only for members
+	$filter_presets['members'] = array( T_('Members'), get_dispctrl_url( 'users', 'membersonly=1&amp;filter=new' ) );
+}
+$filter_presets['men'] = array( T_('Men'), get_dispctrl_url( 'users', 'gender_men=1&amp;filter=new' ) );
+$filter_presets['women'] = array( T_('Women'), get_dispctrl_url( 'users', 'gender_women=1&amp;filter=new' ) );
 
 if( is_admin_page() )
 { // Add show only activated users filter only on admin interface

@@ -12,7 +12,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _file_duplicates.view.php 7808 2014-12-12 11:45:53Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -144,7 +144,17 @@ function td_file_duplicates_path( $File, $file_root_type, $file_root_ID, $file_p
 {
 	if( is_object( $File ) )
 	{ // Check if File object is correct
-		return $File->get_view_link().' '.$File->get_target_icon();
+		global $current_User;
+		$r = $File->get_view_link().' '.$File->get_target_icon();
+		if( $current_User->check_perm( 'files', 'edit', false, $File->get_FileRoot() ) )
+		{ // Allow to delete a file only if current user has an access
+			global $admin_url;
+			$r .= action_icon( T_('Delete'), 'file_delete',
+				url_add_param( $File->get_linkedit_url(), 'action=delete&amp;confirmed=1&amp;fm_selected[]='.rawurlencode( $File->get_rdfp_rel_path() ).'&amp;redirect_to='.rawurlencode( regenerate_url( 'blog', '', '', '&' ) ).'&amp;'.url_crumb( 'file' ) ),
+				NULL, NULL, NULL,
+				array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to delete this file?').'\');' ) );
+		}
+		return $r;
 	}
 	else
 	{ // Broken File object
@@ -169,9 +179,21 @@ $Results->cols[] = array(
 		'td' => '%get_file_links( #file_ID# )%',
 	);
 
+function td_file_properties_link( $File, $link_text )
+{
+	global $current_User;
+	if( is_object( $File ) && $current_User->check_perm( 'files', 'edit', false, $File->get_FileRoot() ) )
+	{ // Check if File object is correct and current user has an access
+		return '<a href="'.url_add_param( $File->get_linkedit_url(), 'action=edit_properties&amp;fm_selected[]='.rawurlencode( $File->get_rdfp_rel_path() ).'&amp;'.url_crumb( 'file' ) ).'">'.$link_text.'</a>';
+	}
+	else
+	{
+		return $link_text;
+	}
+}
 $Results->cols[] = array(
 		'th' => /* TRANS: Header for # of times photo has been liked */ T_('Likes'),
-		'td' => '$total_like$',
+		'td' => '%td_file_properties_link( {Obj}, #total_like# )%',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'center',
 		'order' => 'total_like',
@@ -180,7 +202,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 		'th' => /* TRANS: Header for # of times photo has been votes inappropriate */ T_('Inappropriate'),
-		'td' => '$total_inappropriate$',
+		'td' => '%td_file_properties_link( {Obj}, #total_inappropriate# )%',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'center',
 		'order' => 'total_inappropriate',
@@ -189,7 +211,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 		'th' => T_('Spam'),
-		'td' => '$total_spam$',
+		'td' => '%td_file_properties_link( {Obj}, #total_spam# )%',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'center',
 		'order' => 'total_spam',

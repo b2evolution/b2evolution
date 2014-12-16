@@ -82,11 +82,18 @@ jQuery( document ).on( 'click', 'span[rel=add_criteria]', function()
 
 <?php
 global $current_User;
-if( is_admin_page() && is_logged_in() && $current_User->check_perm( 'users', 'edit', false ) )
+if( is_admin_page() && is_logged_in() && $current_User->check_perm( 'users', 'moderate', false ) )
 {	// If user can edit the users - Init js to edit user level by AJAX
 ?>
 jQuery(document).ready( function()
 {
+	jQuery('.user_level_edit').each( function()
+	{
+		if( jQuery( this ).find( 'a' ).length == 0 )
+		{
+			jQuery( this ).removeClass( 'user_level_edit' );
+		}
+	} );
 <?php
 	$user_levels = array();
 	for( $l = 0; $l <= 10; $l++ )

@@ -242,7 +242,7 @@ div.featured_post .title {
 
 #menu ul {
 	margin: 0;
-	padding: 68px 65px 0 0;
+	padding: 96px 65px 0 0;
 	list-style: none;
 	line-height: normal;
 }
@@ -430,4 +430,8 @@ div.messages_list {
 #styled_content_block .post .status_protected,
 #styled_content_block .post .status_private {
 	top: -20px;
+}
+
+.search_title {
+	color: #FF5A00;
 }

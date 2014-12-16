@@ -8,7 +8,7 @@
  *
  * @package evoskins
  *
- * @version $Id$
+ * @version $Id: contacts.main.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -245,13 +245,6 @@ switch( $action )
 }
 
 modules_call_method( 'switch_contacts_actions', array( 'action' => $action ) );
-
-
-// var bgxy_expand is used by toggle_filter_area() and toggle_clickopen()
-// var htsrv_url is used for AJAX callbacks
-add_js_headline( "// Paths used by JS functions:
-		var bgxy_expand = '".get_icon( 'expand', 'xy' )."';
-		var bgxy_collapse = '".get_icon( 'collapse', 'xy' )."';" );
 
 // Require results.css to display contact query results in a table
 require_css( 'results.css' ); // Results/tables styles

@@ -21,11 +21,11 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _stats_summary.view.php 6480 2014-04-16 07:33:09Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url, $AdminUI, $agent_type_color, $hit_type_color;
+global $blog, $admin_url, $AdminUI, $agent_type_color, $hit_type_color, $Hit;
 
 echo '<h2>'.T_('Global hits - Summary').get_manual_link('global_hits_summary').'</h2>';
 
@@ -77,24 +77,41 @@ if( count($res_hits) )
 	$chart[ 'chart_data' ][ 6 ] = array();
 	$chart[ 'chart_data' ][ 7 ] = array();
 
+	$chart['dates'] = array();
+
+	// Initialize the data to open an url by click on bar item
+	$chart['link_data'] = array();
+	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&hit_type=$param1$&agent_type=$param2$';
+	$chart['link_data']['params'] = array(
+			array( 'rss',      '' ),
+			array( 'standard', 'robot' ),
+			array( 'standard', 'browser' ),
+			array( 'ajax',     '' ),
+			array( 'service',  '' ),
+			array( 'admin',    '' ),
+			array( '',         'unknown' )
+		);
+
 	$count = 0;
 	foreach( $res_hits as $row_stats )
 	{
 		$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
 		if( $last_date != $this_date )
 		{ // We just hit a new day, let's display the previous one:
-				$last_date = $this_date;	// that'll be the next one
-				$count ++;
-				array_unshift( $chart[ 'chart_data' ][ 0 ], date( locale_datefmt(), $last_date ) );
-				array_unshift( $chart[ 'chart_data' ][ 1 ], 0 );
-				array_unshift( $chart[ 'chart_data' ][ 2 ], 0 );
-				array_unshift( $chart[ 'chart_data' ][ 3 ], 0 );
-				array_unshift( $chart[ 'chart_data' ][ 4 ], 0 );
-				array_unshift( $chart[ 'chart_data' ][ 5 ], 0 );
-				array_unshift( $chart[ 'chart_data' ][ 6 ], 0 );
-				array_unshift( $chart[ 'chart_data' ][ 7 ], 0 );
+			$last_date = $this_date;	// that'll be the next one
+			$count ++;
+			array_unshift( $chart[ 'chart_data' ][ 0 ], date( 'D '.locale_datefmt(), $last_date ) );
+			array_unshift( $chart[ 'chart_data' ][ 1 ], 0 );
+			array_unshift( $chart[ 'chart_data' ][ 2 ], 0 );
+			array_unshift( $chart[ 'chart_data' ][ 3 ], 0 );
+			array_unshift( $chart[ 'chart_data' ][ 4 ], 0 );
+			array_unshift( $chart[ 'chart_data' ][ 5 ], 0 );
+			array_unshift( $chart[ 'chart_data' ][ 6 ], 0 );
+			array_unshift( $chart[ 'chart_data' ][ 7 ], 0 );
 
+			array_unshift( $chart['dates'], $last_date );
 		}
+
 		if ($row_stats['hit_agent_type'] == 'unknown')
 		{	// only those hits are calculated which hit_agent_type = unknown
 			$col = $col_mapping[$row_stats['hit_agent_type']];
@@ -126,16 +143,13 @@ if( count($res_hits) )
 	ONE COLOR (grey) for hit_type = anything that is not above
 	*/
 	array_unshift( $chart[ 'chart_data' ][ 0 ], '' );
-	array_unshift( $chart[ 'chart_data' ][ 1 ], 'XML (RSS/Atom)' );
-	array_unshift( $chart[ 'chart_data' ][ 2 ], 'Standard/Robots' );
-	array_unshift( $chart[ 'chart_data' ][ 3 ], 'Standard/Browsers' );
-	array_unshift( $chart[ 'chart_data' ][ 4 ], 'Ajax' );
-	array_unshift( $chart[ 'chart_data' ][ 5 ], 'Service' );
-	array_unshift( $chart[ 'chart_data' ][ 6 ], 'Admin' );
-	array_unshift( $chart[ 'chart_data' ][ 7 ], 'Other' );
-
-	// Include common chart properties:
-	require dirname(__FILE__).'/inc/_bar_chart.inc.php';
+	array_unshift( $chart[ 'chart_data' ][ 1 ], T_('XML (RSS/Atom)') );
+	array_unshift( $chart[ 'chart_data' ][ 2 ], T_('Standard/Robots') );
+	array_unshift( $chart[ 'chart_data' ][ 3 ], T_('Standard/Browsers') );
+	array_unshift( $chart[ 'chart_data' ][ 4 ], T_('Ajax') );
+	array_unshift( $chart[ 'chart_data' ][ 5 ], T_('Service') );
+	array_unshift( $chart[ 'chart_data' ][ 6 ], T_('Admin') );
+	array_unshift( $chart[ 'chart_data' ][ 7 ], T_('Other') );
 
 	$chart[ 'series_color' ] = array (
 			$hit_type_color['rss'],
@@ -147,10 +161,11 @@ if( count($res_hits) )
 			$agent_type_color['unknown'],
 		);
 
+	$chart[ 'canvas_bg' ] = array( 'width'  => 780, 'height' => 355 );
 
 	echo '<div class="center">';
-	load_funcs('_ext/_swfcharts.php');
-	DrawChart( $chart );
+	load_funcs('_ext/_canvascharts.php');
+	CanvasBarsChart( $chart );
 	echo '</div>';
 
 
@@ -200,12 +215,13 @@ if( count($res_hits) )
 		{ // We just hit a new day, let's display the previous one:
 			?>
 			<tr class="<?php echo ( $count%2 == 1 ) ? 'odd' : 'even'; ?>">
-				<td class="firstcol"><?php if( $current_User->check_perm( 'stats', 'edit' ) )
+				<td class="firstcol right"><?php
+					echo date( 'D '.locale_datefmt(), $last_date );
+					if( $current_User->check_perm( 'stats', 'edit' ) )
 					{
 						echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary&amp;blog='.$blog.'&amp;'.url_crumb('stats') ) );
 					}
-					echo date( locale_datefmt(), $last_date ) ?>
-				</td>
+				?></td>
 
 				<td class="right"><a href="<?php echo $link_text.'&hit_type=rss'?>"><?php echo $hits['rss'] ?></a></td>
 				<td class="right"><a href="<?php echo $link_text.'&hit_type=standard&agent_type=robot'?>"><?php echo $hits['standard_robot'] ?></a></td>
@@ -258,12 +274,13 @@ if( count($res_hits) )
 		$link_text_total_day = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).'&blog='.$blog;
 		?>
 			<tr class="<?php echo ( $count%2 == 1 ) ? 'odd' : 'even'; ?>">
-			<td class="firstcol"><?php if( $current_User->check_perm( 'stats', 'edit' ) )
+			<td class="firstcol right"><?php
+				echo date( 'D '.locale_datefmt(), $this_date );
+				if( $current_User->check_perm( 'stats', 'edit' ) )
 				{
 					echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary&amp;blog='.$blog.'&amp;'.url_crumb('stats') ) );
 				}
-				echo date( locale_datefmt(), $this_date ) ?>
-			</td>
+			?></td>
 				<td class="right"><a href="<?php echo $link_text.'&hit_type=rss'?>"><?php echo $hits['rss'] ?></a></td>
 				<td class="right"><a href="<?php echo $link_text.'&hit_type=standard&agent_type=robot'?>"><?php echo $hits['standard_robot'] ?></a></td>
 				<td class="right"><a href="<?php echo $link_text.'&hit_type=standard&agent_type=browser'?>"><?php echo $hits['standard_browser'] ?></a></td>

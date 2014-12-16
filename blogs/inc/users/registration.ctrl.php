@@ -27,7 +27,7 @@
  * @author efy-bogdan: Evo Factory / Bogdan.
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: registration.ctrl.php 7408 2014-10-10 05:32:26Z yura $
+ * @version $Id: registration.ctrl.php 7409 2014-10-10 05:33:41Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -51,7 +51,7 @@ switch ( $action )
 		$old_newusers_canregister = $Settings->get( 'newusers_canregister' );
 
 		// UPDATE general settings:
-		param( 'newusers_canregister', 'integer', 0 );
+		param( 'newusers_canregister', 'string', 'no' );
 		param( 'registration_is_public', 'integer', 0 );
 		param( 'newusers_grp_ID', 'integer', true );
 

@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: __core.init.php 7685 2014-11-19 10:05:48Z yura $
+ * @version $Id: __core.init.php 7801 2014-12-11 10:27:12Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -77,14 +77,19 @@ $db_config['aliases'] = array(
 		'T_users__fielddefs'       => $tableprefix.'users__fielddefs',
 		'T_users__fieldgroups'     => $tableprefix.'users__fieldgroups',
 		'T_users__fields'          => $tableprefix.'users__fields',
+		'T_users__invitation_code' => $tableprefix.'users__invitation_code',
 		'T_users__reports'         => $tableprefix.'users__reports',
 		'T_users__usersettings'    => $tableprefix.'users__usersettings',
+		'T_users__postreadstatus'  => $tableprefix.'users__postreadstatus',
+		'T_users__organization'    => $tableprefix.'users__organization',
+		'T_users__user_org'        => $tableprefix.'users__user_org',
 		'T_slug'                   => $tableprefix.'slug',
 		'T_email__log'             => $tableprefix.'email__log',
 		'T_email__returns'         => $tableprefix.'email__returns',
 		'T_email__address'         => $tableprefix.'email__address',
 		'T_email__campaign'        => $tableprefix.'email__campaign',
 		'T_email__campaign_send'   => $tableprefix.'email__campaign_send',
+		'T_syslog'                 => $tableprefix.'syslog',
 	);
 
 
@@ -126,13 +131,16 @@ $ctrl_mappings = array(
 		'userfieldsgroups' => 'users/userfieldsgroups.ctrl.php',
 		'usersettings'     => 'users/settings.ctrl.php',
 		'registration'     => 'users/registration.ctrl.php',
+		'invitations'      => 'users/invitations.ctrl.php',
 		'display'          => 'users/display.ctrl.php',
 		'groups'           => 'users/groups.ctrl.php',
+		'organizations'    => 'users/organizations.ctrl.php',
 		'accountclose'     => 'users/account_close.ctrl.php',
 		'upload'           => 'files/upload.ctrl.php',
 		'slugs'            => 'slugs/slugs.ctrl.php',
 		'email'            => 'tools/email.ctrl.php',
 		'campaigns'        => 'email_campaigns/campaigns.ctrl.php',
+		'syslog'           => 'tools/syslog.ctrl.php',
 	);
 
 
@@ -253,7 +261,7 @@ function & get_GroupCache( $force_cache = false, $allow_none_text = NULL )
 		{ // Set default value for "None" option
 			$allow_none_text = T_('No group');
 		}
-		$Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', 'new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\', \'\', \''.str_replace( "'", "\'", $allow_none_text ).'\' )' );
+		$Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', 'new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\', \'grp_level DESC, grp_name ASC\', \''.str_replace( "'", "\'", $allow_none_text ).'\' )' );
 	}
 
 	return $GroupCache;
@@ -331,6 +339,44 @@ function & get_UserFieldGroupCache()
 	}
 
 	return $UserFieldGroupCache;
+}
+
+
+/**
+ * Get the InvitationCache
+ *
+ * @return InvitationCache
+ */
+function & get_InvitationCache()
+{
+	global $InvitationCache;
+
+	if( ! isset( $InvitationCache ) )
+	{ // Cache doesn't exist yet:
+		load_class( 'users/model/_invitation.class.php', 'Invitation' );
+		$InvitationCache = new DataObjectCache( 'Invitation', false, 'T_users__invitation_code', 'ivc_', 'ivc_ID', 'ivc_code', 'ivc_code' ); // COPY (FUNC)
+	}
+
+	return $InvitationCache;
+}
+
+
+/**
+ * Get the OrganizationCache
+ *
+ * @return OrganizationCache
+ */
+function & get_OrganizationCache()
+{
+	global $OrganizationCache;
+
+	if( ! isset( $OrganizationCache ) )
+	{ // Cache doesn't exist yet:
+		load_class( 'users/model/_organization.class.php', 'Organization' );
+		$OrganizationCache = new DataObjectCache( 'Organization', false, 'T_users__organization', 'org_', 'org_ID', 'org_name', 'org_name' ); // COPY (FUNC)
+	}
+
+	return $OrganizationCache;
 }
 
 
@@ -505,7 +551,7 @@ class _core_Module extends Module
 
 			case 2:		// Moderators (group ID 2) have permission by default:
 				$permadmin = 'normal';
-				$permusers = 'view';
+				$permusers = 'moderate';
 				$permoptions = 'view';
 				$permspam = 'edit';
 				$permslugs = 'none';
@@ -573,6 +619,7 @@ class _core_Module extends Module
 
 		$none_option = array( 'none', T_( 'No Access' ), '' );
 		$view_option = array( 'view', T_( 'View only' ), '' );
+		$moderate_option = array( 'moderate', T_( 'Moderate' ), '' );
 		$full_option = array( 'edit', T_( 'Full Access' ), '' );
 		$view_details = array( 'view', T_('View details') );
 		$edit_option = array( 'edit', T_('Edit/delete all') );
@@ -618,7 +665,7 @@ class _core_Module extends Module
 				'user_func'  => 'check_core_user_perm',
 				'group_func' => 'check_core_group_perm',
 				'perm_block' => 'core',
-				'options'  => array( $none_option, $view_details, $edit_option ),
+				'options'  => array( $none_option, $view_details, $moderate_option, $edit_option ),
 				'perm_type' => 'radiobox',
 				'field_lines' => false,
 			);
@@ -690,7 +737,7 @@ class _core_Module extends Module
 				'perm_type' => 'checkbox',
 				'note' => T_( 'Check to allow access to skin files.' ),
 				),
-			'pm_notif' => array_merge( 
+			'pm_notif' => array_merge(
 				array( 'label' => T_( 'New Private Message notifications' ) ), $notifications_array
 				),
 			'comment_subscription_notif' => array_merge(
@@ -706,7 +753,7 @@ class _core_Module extends Module
 				array( 'label' => T_( 'New Post moderation notifications' ) ), $notifications_array
 				),
 			'cross_country_allow_profiles' => array(
-				'label' => T_('Cross country'),
+				'label' => T_('Users'),
 				'user_func'  => 'check_cross_country_user_perm',
 				'group_func' => 'check_cross_country_group_perm',
 				'perm_block' => 'additional',
@@ -714,7 +761,7 @@ class _core_Module extends Module
 				'note' => T_('Allow to browse users from other countries').$cross_country_note,
 				),
 			'cross_country_allow_contact' => array(
-				'label' => '',
+				'label' => T_('Messages'),
 				'user_func'  => 'check_cross_country_user_perm',
 				'group_func' => 'check_cross_country_group_perm',
 				'perm_block' => 'additional',
@@ -791,6 +838,14 @@ class _core_Module extends Module
 			case 'edit':
 				// Users has edit perms
 				if( $permlevel == 'edit' )
+				{
+					$perm = true;
+					break;
+				}
+
+			case 'moderate':
+				// Users has moderate perms
+				if( $permlevel == 'moderate' )
 				{
 					$perm = true;
 					break;
@@ -1198,6 +1253,7 @@ class _core_Module extends Module
 						$entries['tools']['entries']['antispam']['entries']['ipranges'] = array(
 								'text' => T_('IP Ranges').'&hellip;',
 								'href' => $admin_url.'?ctrl=antispam&amp;tab3=ipranges' );
+
 						$entries['tools']['entries']['antispam']['entries']['countries'] = array(
 								'text' => T_('Countries').'&hellip;',
 								'href' => $admin_url.'?ctrl=antispam&amp;tab3=countries' );
@@ -1324,7 +1380,7 @@ class _core_Module extends Module
 
 		$entries = array(
 			'userprefs' => array(
-					'text' => $current_User->get_avatar_imgtag( 'crop-top-15x15', '', 'top' ).' <strong>'.$current_User->get_colored_login().'</strong>',
+					'text' => $current_User->get_avatar_imgtag( 'crop-top-15x15', '', 'top' ).' <strong>'.$current_User->get_colored_login( array( 'login_text' => 'name' ) ).'</strong>',
 					'href' => get_user_profile_url(),
 					'entries' => array(
 						'profile' => array(
@@ -1481,14 +1537,17 @@ class _core_Module extends Module
 					'users' => array(
 						'text' => T_('Users'),
 						'href' => '?ctrl=users' ),
+					'groups' => array(
+						'text' => T_('Groups'),
+						'href' => '?ctrl=groups' ),
+					'organizations' => array(
+						'text' => T_('Organizations'),
+						'href' => '?ctrl=organizations' ),
 					'stats' => array(
 						'text' => T_('Stats'),
 						'href' => '?ctrl=users&amp;tab=stats' ),
-					'groups' => array(
-						'text' => T_('User groups'),
-						'href' => '?ctrl=groups' ),
 					'usersettings' => array(
-						'text' => T_('User settings'),
+						'text' => T_('Settings'),
 						'href' => '?ctrl=usersettings',
 						'entries' => array(
 							'usersettings' => array(
@@ -1497,6 +1556,9 @@ class _core_Module extends Module
 							'registration' => array(
 								'text' => T_('Registration'),
 								'href' => '?ctrl=registration' ),
+							'invitations' => array(
+								'text' => T_('Invitations'),
+								'href' => '?ctrl=invitations' ),
 							'display' => array(
 								'text' => T_('Display'),
 								'href' => '?ctrl=display' ),
@@ -1535,8 +1597,18 @@ class _core_Module extends Module
 							'href' => '?ctrl=email&amp;tab=return' ),
 						'settings' => array(
 							'text' => T_('Settings'),
-							'href' => '?ctrl=email&amp;tab=settings' ),
-						) ) ) );
+							'href' => '?ctrl=email&amp;tab=settings',
+							'entries' => array(
+								'notifications' => array(
+									'text' => T_('Notifications'),
+									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=notifications' ),
+								'returned' => array(
+									'text' => T_('Returned emails'),
+									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=returned' ),
+								'smtp' => array(
+									'text' => T_('SMTP gateway'),
+									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=smtp' ),
+						) ) ) ) ) );
 		}
 
 		/**** System ****/
@@ -1581,6 +1653,7 @@ class _core_Module extends Module
 							'ipranges' => array(
 								'text' => T_('IP Ranges'),
 								'href' => '?ctrl=antispam&amp;tab3=ipranges' ) ) );
+
 						$AdminUI->add_menu_entries( array( 'options', 'antispam' ), array(
 							'countries' => array(
 								'text' => T_('Countries'),
@@ -1668,8 +1741,47 @@ class _core_Module extends Module
 							'href' => '?ctrl=remotepublish&amp;tab=xmlrpc' )
 					) ),
 			) );
+
+			if( $current_User->check_perm( 'options', 'edit' ) )
+			{
+				$AdminUI->add_menu_entries( 'options', array(
+						'syslog' => array(
+							'text' => T_('System log'),
+							'href' => '?ctrl=syslog' ),
+					) );
+			}
 		}
 
+	}
+
+
+	/**
+	 * Get the core module cron jobs
+	 *
+	 * @see Module::get_cron_jobs()
+	 */
+	function get_cron_jobs()
+	{
+		return array(
+			'poll-antispam-blacklist' => array(
+				'name'   => T_('Poll the antispam blacklist'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_antispam_poll.job.php',
+				'params' => NULL,
+			),
+			'process-return-path-inbox' => array(
+				'name'   => T_('Process the return path inbox'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_decode_returned_emails.job.php',
+				'params' => NULL,
+			),
+			'send-non-activated-account-reminders' => array(
+				'name'   => T_('Send reminders about non-activated accounts'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_activate_account_reminder.job.php',
+				'params' => NULL,
+			),
+		);
 	}
 }
 

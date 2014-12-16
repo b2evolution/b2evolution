@@ -1,0 +1,13 @@
+.wikitable {
+	background-color: #F9F9F9;
+	border-collapse: collapse;
+	margin: 5px 0;
+}
+.wikitable th, .wikitable td {
+	border: 1px solid #666666;
+	padding: 0.2em;
+}
+.wikitable th {
+	background-color: #F2F2F2;
+	text-align: center;
+}

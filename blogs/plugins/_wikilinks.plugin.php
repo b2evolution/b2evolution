@@ -101,6 +101,21 @@ class wikilinks_plugin extends Plugin
 
 
 	/**
+	 * Perform rendering of Message content
+	 *
+	 * NOTE: Use default coll settings of comments as messages settings
+	 *
+	 * @see Plugin::RenderMessageAsHtml()
+	 */
+	function RenderMessageAsHtml( & $params )
+	{
+		$content = & $params['data'];
+
+		return $this->render_content( $content, NULL, true );
+	}
+
+
+	/**
 	 * Render content of Item, Comment, Message
 	 *
 	 * @todo get rid of global $blog
@@ -176,7 +191,7 @@ class wikilinks_plugin extends Plugin
 					// Convert the WikiWord to an urltitle
 					$WikiWord = $match[0];
 					$Wiki_Word = preg_replace( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '$1-$2', $WikiWord );
-					$wiki_word = evo_strtolower( $Wiki_Word );
+					$wiki_word = utf8_strtolower( $Wiki_Word );
 					// echo '<br />Match: [', $WikiWord, '] -> [', $wiki_word, ']';
 					$wiki_word = replace_special_chars( $wiki_word );
 					$wikiwords[ $WikiWord ] = $wiki_word;
@@ -243,7 +258,7 @@ class wikilinks_plugin extends Plugin
 				else
 				{	// Convert WikiWord to slug format
 					$Wiki_Word = preg_replace( array( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '*([^0-9])([0-9])*'.$regexp_modifier ), '$1-$2', $WikiWord );
-					$wiki_word = evo_strtolower( $Wiki_Word );
+					$wiki_word = utf8_strtolower( $Wiki_Word );
 				}
 				// echo '<br />Match: [', $WikiWord, '] -> [', $wiki_word, ']';
 				$wiki_word = replace_special_chars( $wiki_word );

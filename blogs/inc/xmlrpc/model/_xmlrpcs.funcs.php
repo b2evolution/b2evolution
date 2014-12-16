@@ -175,6 +175,7 @@ function _wp_mw_newmediaobject($m)
 		if( $error = validate_dirname($filepath_part) )
 		{	// invalid relative path:
 			logIO( $error );
+			syslog_insert( sprintf( 'Invalid name is detected for folder %s', '<b>'.$filepath_part.'</b>' ), 'warning', 'file' );
 			return xmlrpcs_resperror( 6, $error );
 		}
 
@@ -674,7 +675,7 @@ function _wp_mw_getcategories( $m, $params = array() )
 	 * @var Blog
 	 */
 	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
-	{	// Login failed, return (last) error:
+	{	// Not found the selected blog, return (last) error:
 		return xmlrpcs_resperror();
 	}
 
@@ -1051,7 +1052,7 @@ function xmlrpcs_new_comment( $params = array(), & $commented_Item )
 		$User = NULL;
 
 		$author = trim($params['author']);
-		$email = evo_strtolower( trim($params['author_email']) );
+		$email = utf8_strtolower( trim($params['author_email']) );
 
 		if( $commented_Item->Blog->get_setting('allow_anon_url') )
 		{

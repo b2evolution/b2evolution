@@ -43,7 +43,7 @@
  * This will most probably cause problems, when nesting inputs. This should be refactored
  * to use a field_name-based member array. (blueyed)
  *
- * @version $Id: _form.class.php 6972 2014-06-24 19:12:29Z yura $
+ * @version $Id: _form.class.php 7825 2014-12-16 16:32:09Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -140,6 +140,14 @@ class Form extends Widget
 	 * @var boolean
 	 */
 	var $_form_ended = false;
+
+
+	/**
+	 * Force all checkboxes to inline style where checkbox element is displayed before label
+	 * (Example usage is in filterset forms of the Results class)
+	 * @var boolean
+	 */
+	var $force_checkboxes_to_inline;
 
 
 	/**
@@ -457,6 +465,8 @@ class Form extends Widget
 	 *    fieldend
 	 *    buttonsstart
 	 *    buttonsend
+	 *    customstart
+	 *    customend
 	 *    note_format
 	 *    formend
 	 */
@@ -596,12 +606,31 @@ class Form extends Widget
 	{
 		$field_params = array_merge( array(
 				'class' => 'fieldset',
+				'fold'  => false, // TRUE to enable folding for this fieldset
 			), $field_params );
+
+		if( $field_params['fold'] )
+		{ // Display icon to collapse/expand fildset
+			$folding_icon = get_fieldset_folding_icon( $field_params['id'] );
+			if( is_logged_in() )
+			{ // Only loggedin users can fold fieldset
+				global $UserSettings;
+				if( intval( $UserSettings->get( 'fold_'.$field_params['id'] ) ) === 1 )
+				{
+					$field_params['class'] = trim( $field_params['class'].' folded' );
+				}
+			}
+		}
+		else
+		{ // No folding icon
+			$folding_icon = '';
+		}
+		unset( $field_params['fold'] );
 
 		switch( $this->layout )
 		{
 			case 'table':
-				$r = '<tr'.get_field_attribs_as_string($field_params).'><th colspan="2">'."\n";
+				$r = '<tr'.get_field_attribs_as_string( $field_params ).'><th colspan="2">'."\n";
 				// NOTE: empty THs can be rendered and/or are DHTML scriptable
 
 				if( $title != '' )
@@ -613,28 +642,28 @@ class Form extends Widget
 				break;
 
 			default:
-				if( ! empty($field_params['legend_params']) )
-				{	// We have params specifically passed for the title
+				if( ! empty( $field_params['legend_params'] ) )
+				{ // We have params specifically passed for the title
 					$legend_params = $field_params['legend_params'];
 					unset( $field_params['legend_params'] );
 				}
 
-				$r = str_replace( '$fieldset_attribs$', get_field_attribs_as_string($field_params), $this->fieldset_begin );
+				$r = str_replace( '$fieldset_attribs$', get_field_attribs_as_string( $field_params ), $this->fieldset_begin );
 
-				$r = str_replace( '$fieldset_title$', $title, $r );
+				$r = str_replace( '$fieldset_title$', $folding_icon.$title, $r );
 				if( isset($field_params['id']) )
 				{
 					$r = str_replace( '$id$', $field_params['id'], $r );
 				}
 				$r = str_replace( '$class$', $field_params['class'], $r );
 
-				if( empty($legend_params) )
+				if( empty( $legend_params ) )
 				{ // there are no legend_params, remove the placeholder
 					$r = str_replace( '$title_attribs$', '', $r );
 				}
 				else
 				{
-					$r = str_replace( '$title_attribs$', get_field_attribs_as_string($legend_params), $r );
+					$r = str_replace( '$title_attribs$', get_field_attribs_as_string( $legend_params ), $r );
 				}
 
 				// Remove any empty legend tags: they cause a small gap in the fieldset border (FF 2.0.0.11)
@@ -1230,8 +1259,8 @@ class Form extends Widget
 	 * @param string the name of the input field
 	 * @param string initial value (seconds)
 	 * @param string label displayed in front of the field
-	 * @param string display from field: months, days, hours, minutes, seconds
-	 * @param string display to field: months, days, hours, minutes, seconds
+	 * @param string **** OLD PARAM **** display from field: months, days, hours, minutes, seconds
+	 * @param string **** OLD PARAM **** display to field: months, days, hours, minutes, seconds
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
 	 *              - minutes_step ( default = 15 );
 	 * @return mixed true (if output) or the generated HTML if not outputting
@@ -1240,82 +1269,71 @@ class Form extends Widget
 	{
 		$this->handle_common_params( $field_params, $field_prefix, $field_label );
 
+		$periods_values = array( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 50 );
+		$periods = array(
+			array( 'name' => 'second', 'title' => T_('second(s)'), 'seconds' => 1,        'size' => 1 ), // 1 seconds
+			array( 'name' => 'minute', 'title' => T_('minute(s)'), 'seconds' => 50,       'size' => 60 ), // 50 seconds
+			array( 'name' => 'hour',   'title' => T_('hour(s)'),   'seconds' => 3000,     'size' => 3600 ), // 50 minutes
+			array( 'name' => 'day',    'title' => T_('day(s)'),    'seconds' => 72000,    'size' => 86400 ), // 20 hours
+			array( 'name' => 'month',  'title' => T_('month(s)'),  'seconds' => 2160000,  'size' => 2592000 ), // 25 days
+			array( 'name' => 'year',   'title' => T_('year(s)'),   'seconds' => 25920000, 'size' => 31536000 ), // 10 months
+		);
+
 		$r = $this->begin_field();
 
-		switch( $from_subfield )
+		// Set the values for <select> lists below
+		$current_value = 0;
+		$current_period = '';
+		if( !empty( $duration ) )
 		{
-			case 'months':
-				// Display months field
-				$month_seconds = 2592000; // 1 month
-				$months = floor( $duration / $month_seconds );
-				$duration = $duration - $months * $month_seconds;
-				$r .= "\n".'<select name="'.$field_prefix.'_months" id="'.$this->get_valid_id($field_prefix).'_months">';
-				$r .= '<option value="0"'.( 0 == $months ? ' selected="selected"' : '' ).">---</option>\n";
-				for( $i = 1; $i <= 30; $i++ )
+			$periods_count = count( $periods );
+			for( $p = 0; $p <= $periods_count; $p++ )
+			{
+				$period = $periods[ $p < $periods_count ? $p : $periods_count - 1 ];
+				if( ( $p == 0 && $duration <= $period['seconds'] ) ||
+				    ( $p == $periods_count && $duration > $period['seconds'] ) ||
+				    ( $p > 0 && $duration > $periods[ $p - 1 ]['seconds'] && $duration <= $period['seconds'] ) )
 				{
-					$r .= '<option value="'.$i.'"'.( $i == $months ? ' selected="selected"' : '' ).'>'.$i."</option>\n";
+					$period = $periods[ $p > 0 ? $p - 1 : 0 ];
+					$duration_value = ceil( $duration / $period['size'] );
+					foreach( $periods_values as $v => $value )
+					{
+						if( $duration_value <= $value )
+						{
+							$current_value = $value;
+							break;
+						}
+					}
+					$current_period = $period['name'];
+					break;
 				}
-				$r .= '</select>'.T_('months')."\n";
-
-				if( $to_subfield == 'months' ) break;
-
-			case 'days':
-				// Display days field
-				$day_seconds = 86400; // 1 day
-				$days = floor( $duration / $day_seconds );
-				$duration = $duration - $days * $day_seconds;
-				$r .= "\n".'<select name="'.$field_prefix.'_days" id="'.$this->get_valid_id($field_prefix).'_days">';
-				$r .= '<option value="0"'.( 0 == $days ? ' selected="selected"' : '' ).">---</option>\n";
-				for( $i = 1; $i <= 30; $i++ )
-				{
-					$r .= '<option value="'.$i.'"'.( $i == $days ? ' selected="selected"' : '' ).'>'.$i."</option>\n";
-				}
-				$r .= '</select>'.T_('days')."\n";
-
-				if( $to_subfield == 'days' ) break;
-
-			case 'hours':
-				// Display hours field
-				$hour_seconds = 3600; // 1 hour
-				$hours = floor( $duration / $hour_seconds );
-				$duration = $duration - $hours * $hour_seconds;
-				$r .= "\n".'<select name="'.$field_prefix.'_hours" id="'.$this->get_valid_id($field_prefix).'_hours">';
-				$r .= '<option value="0"'.( 0 == $hours ? ' selected="selected"' : '' ).">---</option>\n";
-				for( $i = 1; $i <= 23; $i++ )
-				{
-					$r .= '<option value="'.$i.'"'.( $i == $hours ? ' selected="selected"' : '' ).'>'.$i."</option>\n";
-				}
-				$r .= '</select>'.T_('hours')."\n";
-
-				if( $to_subfield == 'hours' ) break;
-
-			case 'minutes':
-				// Display minutes field
-				$minute_seconds = 60; // 1 minute
-				$minutes = floor( $duration / $minute_seconds );
-				$duration = $duration - $minutes * $minute_seconds;
-				$minutes_step = ( empty($field_params['minutes_step']) ? 15 : $field_params['minutes_step'] );
-				$r .= "\n".'<select name="'.$field_prefix.'_minutes" id="'.$this->get_valid_id($field_prefix).'_minutes">';
-				for( $i = 0; $i <= 59 ; $i += $minutes_step )
-				{
-					$r .= '<option value="'.$i.'"'.( ($minutes>=$i && $minutes<($i+$minutes_step)) ? ' selected="selected"' : '' ).'>'
-								.($i == 0 ? '---' : substr('0'.$i,-2))."</option>\n";
-				}
-				$r .= '</select>'.T_('minutes')."\n";
-
-				if( $to_subfield == 'minutes' ) break;
-
-			case 'seconds':
-				// Display seconds field
-				$seconds = $duration;
-				$r .= "\n".'<select name="'.$field_prefix.'_seconds" id="'.$this->get_valid_id($field_prefix).'_seconds">';
-				$r .= '<option value="0"'.( 0 == $seconds ? ' selected="selected"' : '' ).">---</option>\n";
-				for( $i = 1; $i <= 59; $i++ )
-				{
-					$r .= '<option value="'.$i.'"'.( $i == $seconds ? ' selected="selected"' : '' ).'>'.$i."</option>\n";
-				}
-				$r .= '</select>'.T_('seconds')."\n";
+			}
 		}
+
+		$field_class = 'form-control';
+		if( param_has_error( $field_prefix ) )
+		{
+			$field_class .= ' field_error';
+		}
+		$field_class = ' class="'.$field_class.'"';
+
+		// Display <select> with periods values
+		$r .= "\n".'<select name="'.$field_prefix.'_value" id="'.$this->get_valid_id($field_prefix).'_value"'.$field_class.'>';
+		$r .= '<option value="0"'.( 0 == $current_value ? ' selected="selected"' : '' ).">---</option>\n";
+		foreach( $periods_values as $period_value )
+		{
+			$r .= '<option value="'.$period_value.'"'.( $current_value == $period_value ? ' selected="selected"' : '' ).'>'.$period_value."</option>\n";
+		}
+		$r .= '</select>'."\n";
+
+		// Display <select> with periods titles
+		$r .= "\n".'<select name="'.$field_prefix.'_name" id="'.$this->get_valid_id($field_prefix).'_name"'.$field_class.'>';
+		$r .= '<option value="0"'.( '' == $current_period ? ' selected="selected"' : '' ).">---</option>\n";
+		foreach( $periods as $period )
+		{
+			$r .= '<option value="'.$period['name'].'"'.( $current_period == $period['name'] ? ' selected="selected"' : '' ).'>'.$period['title']."</option>\n";
+		}
+		$r .= '</select>'."\n";
 
 		$r .= $this->end_field();
 
@@ -1410,6 +1428,12 @@ class Form extends Widget
 		if( $field_checked )
 		{
 			$field_params['checked'] = 'checked';
+		}
+
+		if( ! empty( $this->force_checkboxes_to_inline ) && ! isset( $field_params['inline'] ) )
+		{ // Force to display checkbox before label
+			$field_params['inline'] = true;
+			$field_params['label'] = '%s '.$field_params['label'];
 		}
 
 		return $this->input_field( $field_params );
@@ -2288,8 +2312,19 @@ class Form extends Widget
 			'note_format' => $this->note_format, // handled as common param
 			'format_value' => 'formvalue'
 		);
+
 		$format_value = $field_params['format_value'];
-		unset($field_params['format_value']); // no HTML attrib
+		unset( $field_params['format_value'] ); // no HTML attrib
+
+		if( isset( $field_params['input_prefix'] ) )
+		{ // Some text should be displayed before textarea element
+			$input_prefix = $field_params['input_prefix'];
+			unset( $field_params['input_prefix'] );
+		}
+		else
+		{ // Nothing before textarea element
+			$input_prefix = '';
+		}
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
@@ -2314,6 +2349,7 @@ class Form extends Widget
 		}
 
 		$r = $this->begin_field();
+		$r .= $input_prefix;
 		$r .= '<textarea'
 			.get_field_attribs_as_string( $field_params )
 			.' rows="'.$field_rows.'">'
@@ -3048,13 +3084,25 @@ class Form extends Widget
 		$this->switch_template_parts( array_fill_keys( array_keys( $save_params ), '' ) );
 		$this->output = false;
 
-		// Field "From"
+		if( isset( $field_params['input_prefix'] ) )
+		{ // Save an input prefix and append it only to input "From"
+			$input_prefix = $field_params['input_prefix'];
+			unset( $field_params['input_prefix'] );
+		}
+
+		// Field "To"
 		$field_params['input_suffix'] = T_(' to ').$this->text_input( $field_name_to, $field_value_to, $field_size, '', '', $field_params );
 
 		// return saved params
 		$this->output = $save_output;
 		$this->switch_template_parts( $save_params );
 
+		if( isset( $input_prefix ) )
+		{ // Display an input prefix before first input "From"
+			$field_params['input_prefix'] = $input_prefix;
+		}
+
+		// Field "From"
 		return $this->text_input( $field_name_from, $field_value_from, $field_size, $field_label, $field_note, $field_params );
 	}
 

@@ -9,7 +9,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _eblog.form.php 6456 2014-04-13 10:52:48Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -140,7 +140,7 @@ $Form->checkbox( 'eblog_html_enabled', $Settings->get('eblog_html_enabled'), T_(
 
 $Form->checkbox( 'eblog_html_tag_limit', $Settings->get('eblog_html_tag_limit'), T_('Limit allowed tags'),
 				T_('Check this if you want to limit allowed HTML tags to the following list:').
-				'<br /><b>'.evo_htmlspecialchars(str_replace( '>', '> ', $comment_allowed_tags )).'</b>' );
+				'<br /><b>'.htmlspecialchars(str_replace( '>', '> ', $comment_allowed_tags )).'</b>' );
 
 $Form->end_fieldset();
 

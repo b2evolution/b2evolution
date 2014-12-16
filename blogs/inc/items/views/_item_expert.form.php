@@ -11,7 +11,7 @@
  *
  * @package admin
  *
- * @version $Id: _item_expert.form.php 7740 2014-12-03 12:12:05Z yura $
+ * @version $Id: _item_expert.form.php 7741 2014-12-03 12:13:50Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -68,8 +68,10 @@ $Form->begin_form( '', '', $params );
 	$Form->add_crumb( 'item' );
 	$Form->hidden( 'ctrl', 'items' );
 	$Form->hidden( 'blog', $Blog->ID );
-	$Form->hidden( 'mode_editing', 'expert' ); // used by in-skin mode when we want back in a last editing mode
-	if( isset( $mode ) )   $Form->hidden( 'mode', $mode );	// used by bookmarklet
+	if( isset( $mode ) )
+	{ // used by bookmarklet
+		$Form->hidden( 'mode', $mode );
+	}
 	if( isset( $edited_Item ) )
 	{
 		// Item ID
@@ -100,7 +102,7 @@ $Form->begin_form( '', '', $params );
 
 	if( $Blog->get_setting( 'use_workflow' ) )
 	{	// We want to use workflow properties for this blog:
-		$Form->begin_fieldset( T_('Workflow properties'), array( 'id' => 'itemform_workflow_props' ) );
+		$Form->begin_fieldset( T_('Workflow properties'), array( 'id' => 'itemform_workflow_props', 'fold' => true ) );
 
 			echo '<div id="itemform_edit_workflow" class="edit_fieldgroup">';
 			$Form->switch_layout( 'linespan' );
@@ -143,7 +145,7 @@ $Form->begin_form( '', '', $params );
 
 	// ############################ POST CONTENTS #############################
 
-	$Form->begin_fieldset( T_('Post contents').get_manual_link('post_contents_fieldset') );
+	$Form->begin_fieldset( T_('Post contents').get_manual_link('post_contents_fieldset'), array( 'id' => 'itemform_content', 'fold' => true ) );
 
 	$Form->switch_layout( 'none' );
 
@@ -211,7 +213,7 @@ $Form->begin_form( '', '', $params );
 	// ---------------------------- TEXTAREA -------------------------------------
 	$Form->fieldstart = '<div class="edit_area">';
 	$Form->fieldend = "</div>\n";
-	$Form->textarea_input( 'content', $item_content, 16, '', array( 'cols' => 40 , 'id' => 'itemform_post_content' ) );
+	$Form->textarea_input( 'content', $item_content, 16, '', array( 'cols' => 40 , 'id' => 'itemform_post_content', 'class' => 'autocomplete_usernames' ) );
 	$Form->fieldstart = '<div class="tile">';
 	$Form->fieldend = '</div>';
 	?>
@@ -242,11 +244,11 @@ $Form->begin_form( '', '', $params );
 	{ // Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files
 		load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
 		$LinkOwner = new LinkItem( $edited_Item );
-		attachment_iframe( $Form, $LinkOwner, $iframe_name, $creating );
+		attachment_iframe( $Form, $LinkOwner, $iframe_name, $creating, true );
 	}
 	// ############################ ADVANCED #############################
 
-	$Form->begin_fieldset( T_('Advanced properties').get_manual_link('post_advanced_properties_fieldset'), array( 'id' => 'itemform_adv_props' ) );
+	$Form->begin_fieldset( T_('Advanced properties').get_manual_link('post_advanced_properties_fieldset'), array( 'id' => 'itemform_adv_props', 'fold' => true ) );
 
 	// CUSTOM FIELDS varchar
 	echo '<table cellspacing="0" class="compose_layout">';
@@ -295,12 +297,12 @@ $Form->begin_form( '', '', $params );
 
 	echo '<tr><td class="label"><label for="metadesc" title="&lt;meta name=&quot;description&quot;&gt;"><strong>'.T_('&lt;meta&gt; desc').':</strong></label></td>';
 	echo '<td class="input" width="97%">';
-	$Form->text_input( 'metadesc', $edited_Item->get_setting('post_metadesc'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
+	$Form->text_input( 'metadesc', $edited_Item->get_setting('metadesc'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
 	echo '</td></tr>';
 
-	echo '<tr><td class="label"><label for="custom_headers" title="&lt;meta name=&quot;keywords&quot;&gt;"><strong>'.T_('&lt;meta&gt; keywds').':</strong></label></td>';
+	echo '<tr><td class="label"><label for="metakeywords" title="&lt;meta name=&quot;keywords&quot;&gt;"><strong>'.T_('&lt;meta&gt; keywds').':</strong></label></td>';
 	echo '<td class="input" width="97%">';
-	$Form->text_input( 'custom_headers', $edited_Item->get_setting('post_custom_headers'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
+	$Form->text_input( 'metakeywords', $edited_Item->get_setting('metakeywords'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
 	echo '</td></tr>';
 
 	echo '<tr><td class="label"><label for="item_tags"><strong>'.T_('Tags').':</strong></label></td>';
@@ -322,7 +324,7 @@ $Form->begin_form( '', '', $params );
 	<div id="itemform_post_excerpt" class="edit_fieldgroup">
 		<label for="post_excerpt"><strong><?php echo T_('Excerpt') ?>:</strong>
 		<span class="notes"><?php echo T_('(for XML feeds)') ?></span></label><br />
-		<textarea name="post_excerpt" rows="2" cols="25" class="form-control form_textarea_input" id="post_excerpt"><?php echo evo_htmlspecialchars( $edited_Item_excerpt, NULL, $evo_charset ) ?></textarea>
+		<textarea name="post_excerpt" rows="2" cols="25" class="form-control form_textarea_input" id="post_excerpt"><?php echo htmlspecialchars( $edited_Item_excerpt, NULL, $evo_charset ) ?></textarea>
 	</div>
 
 	<?php
@@ -338,7 +340,7 @@ $Form->begin_form( '', '', $params );
 
 	if( isset( $Blog ) && $Blog->get('allowtrackbacks') )
 	{
-		$Form->begin_fieldset( T_('Additional actions'), array( 'id' => 'itemform_additional_actions' ) );
+		$Form->begin_fieldset( T_('Additional actions'), array( 'id' => 'itemform_additional_actions', 'fold' => true ) );
 
 		// --------------------------- TRACKBACK --------------------------------------
 		?>
@@ -366,18 +368,18 @@ $Form->begin_form( '', '', $params );
 	<?php
 	// ################### MODULES SPECIFIC ITEM SETTINGS ###################
 
-	modules_call_method( 'display_item_settings', array( 'Form' => & $Form, 'Blog' => & $Blog, 'edited_Item' => & $edited_Item ) );
+	modules_call_method( 'display_item_settings', array( 'Form' => & $Form, 'Blog' => & $Blog, 'edited_Item' => & $edited_Item, 'edit_layout' => 'expert', 'fold' => true ) );
 
 	// ################### CATEGORIES ###################
 
-	cat_select( $Form );
+	cat_select( $Form, true, true, array( 'fold' => true ) );
 
 	// ################### LOCATIONS ###################
-	echo_item_location_form( $Form, $edited_Item );
+	echo_item_location_form( $Form, $edited_Item, array( 'fold' => true ) );
 
 	// ################### PROPERTIES ###################
 
-	$Form->begin_fieldset( T_('Properties'), array( 'id' => 'itemform_extra' ) );
+	$Form->begin_fieldset( T_('Properties'), array( 'id' => 'itemform_extra', 'fold' => true ) );
 
 	$Form->switch_layout( 'linespan' );
 
@@ -439,7 +441,7 @@ $Form->begin_form( '', '', $params );
 
 	// ################### VISIBILITY / SHARING ###################
 
-	$Form->begin_fieldset( T_('Visibility / Sharing'), array( 'id' => 'itemform_visibility' ) );
+	$Form->begin_fieldset( T_('Visibility / Sharing'), array( 'id' => 'itemform_visibility', 'fold' => true ) );
 
 	$Form->switch_layout( 'linespan' );
 	visibility_select( $Form, $edited_Item->status );
@@ -450,10 +452,10 @@ $Form->begin_form( '', '', $params );
 
 	// ################### TEXT RENDERERS ###################
 
-	$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'itemform_renderers' ) );
+	$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'itemform_renderers', 'fold' => true ) );
 
 	// fp> TODO: there should be no param call here (shld be in controller)
-	$edited_Item->renderer_checkboxes( param('renderers', 'array/string', NULL) );
+	$edited_Item->renderer_checkboxes( param('renderers', 'array:string', NULL) );
 
 	$Form->end_fieldset();
 
@@ -462,7 +464,7 @@ $Form->begin_form( '', '', $params );
 
 	if( ( $Blog->get_setting( 'allow_comments' ) != 'never' ) && ( $Blog->get_setting( 'disable_comments_bypost' ) ) )
 	{
-		$Form->begin_fieldset( T_('Comments'), array( 'id' => 'itemform_comments' ) );
+		$Form->begin_fieldset( T_('Comments'), array( 'id' => 'itemform_comments', 'fold' => true ) );
 
 		?>
 			<label title="<?php echo T_('Visitors can leave comments on this post.') ?>"><input type="radio" name="post_comment_status" value="open" class="checkbox" <?php if( $post_comment_status == 'open' ) echo 'checked="checked"'; ?> />
@@ -476,12 +478,62 @@ $Form->begin_form( '', '', $params );
 		<?php
 
 		$Form->switch_layout( 'table' );
-		$Form->duration_input( 'expiry_delay',  $edited_Item->get_setting( 'post_expiry_delay' ), T_('Expiry delay'), 'months', 'hours',
+		$Form->duration_input( 'expiry_delay',  $edited_Item->get_setting( 'comment_expiry_delay' ), T_('Expiry delay'), 'months', 'hours',
 							array( 'minutes_step' => 1, 'required' => false, 'note' => T_( 'Older comments and ratings will no longer be displayed.' ) ) );
 		$Form->switch_layout( NULL );
 
 		$Form->end_fieldset();
 	}
+
+
+	// ################### GOAL TRACKING ###################
+
+	$Form->begin_fieldset( T_('Goal tracking').get_manual_link( 'track-item-as-goal' ).action_icon( T_('New goal'), 'new', $admin_url.'?ctrl=goals&amp;action=new', T_('New goal').' &raquo;', 3, 4, array( 'class' => 'action_icon floatright' ) ), array( 'id' => 'itemform_goals', 'fold' => true ) );
+
+	$Form->switch_layout( 'table' );
+	$Form->formstart = '<table id="item_locations" cellspacing="0" class="fform">'."\n";
+	$Form->labelstart = '<td class="right"><strong>';
+	$Form->labelend = '</strong></td>';
+
+	echo '<p class="note">'.T_( 'You can track a hit on a goal every time this page is displayed to a user.' ).'</p>';
+
+	echo $Form->formstart;
+
+	$goal_ID = $edited_Item->get_setting( 'goal_ID' );
+	$item_goal_cat_ID = 0;
+	$GoalCache = & get_GoalCache();
+	if( ! empty( $goal_ID ) && $item_Goal = $GoalCache->get_by_ID( $goal_ID, false, false ) )
+	{ // Get category ID of goal
+		$item_goal_cat_ID = $item_Goal->gcat_ID;
+	}
+
+	$GoalCategoryCache = & get_GoalCategoryCache( T_( 'No Category' ) );
+	$GoalCategoryCache->load_all();
+	$Form->select_input_object( 'goal_cat_ID', $item_goal_cat_ID, $GoalCategoryCache, T_('Category'), array( 'allow_none' => true ) );
+
+	// Get only the goals without a defined redirect url
+	$goals_where_sql = 'goal_redir_url IS NULL';
+	if( empty( $item_goal_cat_ID ) )
+	{ // Get the goals without category
+		$goals_where_sql .= ' AND goal_gcat_ID IS NULL';
+	}
+	else
+	{ // Get the goals by category ID
+		$goals_where_sql .= ' AND goal_gcat_ID = '.$DB->quote( $item_goal_cat_ID );
+	}
+	$GoalCache->load_where( $goals_where_sql );
+	$Form->select_input_object( 'goal_ID', $edited_Item->get_setting( 'goal_ID' ), $GoalCache,
+		get_icon( 'multi_action', 'imgtag', array( 'style' => 'margin:0 2px 0 14px;position:relative;top:-5px;') ).T_('Goal'),
+		array(
+			'allow_none' => true,
+			'note' => '<img src="'.$rsc_url.'img/ajax-loader.gif" alt="'.T_('Loading...').'" title="'.T_('Loading...').'" style="display:none;margin-left:5px" align="top" />'
+		) );
+
+	echo $Form->formend;
+
+	$Form->switch_layout( NULL );
+
+	$Form->end_fieldset();
 
 	?>
 
@@ -515,6 +567,10 @@ $edited_Item->load_Blog();
 echo_regional_js( 'item', $edited_Item->Blog->region_visible() );
 // Item type
 echo_onchange_item_type_js();
+// Goal
+echo_onchange_goal_cat();
+// Fieldset folding
+echo_fieldset_folding_js();
 
 // require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 

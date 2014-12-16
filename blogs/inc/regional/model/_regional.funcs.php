@@ -28,7 +28,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _regional.funcs.php 235 2011-11-08 12:50:06Z yura $
+ * @version $Id: _regional.funcs.php 7682 2014-11-18 13:34:17Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -745,7 +745,7 @@ function ctry_status_titles( $include_false_statuses = true )
 	$status_titles = array();
 	if( $include_false_statuses )
 	{ // Include Unknown status
-		$status_titles[''] = T_('Unknown ');
+		$status_titles[''] = T_('Unknown');
 	}
 	$status_titles['trusted'] = T_('Trusted');
 	$status_titles['suspect'] = T_('Suspect');

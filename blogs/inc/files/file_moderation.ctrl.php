@@ -12,7 +12,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: file_moderation.ctrl.php 7808 2014-12-12 11:45:53Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -24,7 +24,7 @@ $current_User->check_perm( 'options', 'edit', true );
 
 
 //param( 'action', 'string' );
-param( 'tab', 'string', 'suspicious', true );
+param( 'tab', 'string', 'likes', true );
 
 
 /**
@@ -43,6 +43,10 @@ $AdminUI->breadcrumbpath_add( T_('Files'), '?ctrl=files&amp;blog=$blog$' );
 $AdminUI->breadcrumbpath_add( T_('Moderation'), '?ctrl=filemod' );
 switch( $tab )
 {
+	case 'likes':
+		$AdminUI->breadcrumbpath_add( T_('Likes'), '?ctrl=filemod&amp;tab='.$tab );
+		break;
+
 	case 'suspicious':
 		$AdminUI->breadcrumbpath_add( T_('Suspicious'), '?ctrl=filemod&amp;tab='.$tab );
 		break;
@@ -73,8 +77,12 @@ switch( $tab )
 		break;
 
 	case 'suspicious':
-	default:
 		$AdminUI->disp_view( 'files/views/_file_suspicious.view.php' );
+		break;
+
+	case 'likes':
+	default:
+		$AdminUI->disp_view( 'files/views/_file_likes.view.php' );
 		break;
 }
 $AdminUI->disp_payload_end();

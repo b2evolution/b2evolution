@@ -9,7 +9,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: remotepublish.ctrl.php 6697 2014-05-15 10:51:11Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -52,7 +52,7 @@ switch( $action )
 				$Settings->set( 'eblog_novalidatecert', $eblog_novalidatecert );
 
 				param( 'eblog_server_host', 'string', true );
-				$Settings->set( 'eblog_server_host', evo_strtolower($eblog_server_host) );
+				$Settings->set( 'eblog_server_host', utf8_strtolower($eblog_server_host) );
 
 				param( 'eblog_server_port', 'integer', true );
 				$Settings->set( 'eblog_server_port', $eblog_server_port );
@@ -97,7 +97,7 @@ switch( $action )
 					$BlogCache = & get_BlogCache();
 					$setting_Blog = & $BlogCache->get_by_ID( $autoselect_blog );
 					$renderer_params = array( 'Blog' => & $setting_Blog, 'setting_name' => 'coll_apply_rendering' );
-					$renderers = $Plugins->validate_renderer_list( param( 'eblog_renderers', 'array/string', array() ), $renderer_params );
+					$renderers = $Plugins->validate_renderer_list( param( 'eblog_renderers', 'array:string', array() ), $renderer_params );
 					$Settings->set( 'eblog_renderers', $renderers );
 				}
 				break;

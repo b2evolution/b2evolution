@@ -10,7 +10,7 @@
  *
  * @todo move user rights queries to object (fplanque)
  *
- * @version $Id: _coll_user_perm.form.php 6894 2014-06-13 09:56:09Z yura $
+ * @version $Id: _coll_user_perm.form.php 6895 2014-06-13 10:05:46Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -45,7 +45,7 @@ $Form->hidden_ctrl();
 $Form->hidden( 'tab', 'perm' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
-$Form->begin_fieldset( T_('User permissions').get_manual_link('user_permissions') );
+$Form->begin_fieldset( T_('User permissions').get_manual_link('advanced-user-permissions') );
 
 
 /*
@@ -127,7 +127,7 @@ $Results->grp_cols[] = array(
 $Results->cols[] = array(
 						'th' => T_('Login'),
 						'order' => 'user_login',
-						'td' => '%get_user_identity_link( #user_login# )%',
+						'td' => '%get_user_identity_link( #user_login#, NULL, "profile", "avatar_login" )%',
 					);
 
 $Results->cols[] = array(

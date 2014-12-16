@@ -25,8 +25,8 @@ div.fieldset_wrapper {
 	margin: 1ex auto;
 }
 
-/* Table Filters: */
-table.grouped tr.filters td, div.filters {
+/* Table Filters & Messages: */
+table.grouped tr.filters td, div.filters, div.messages {
 	border: 1px solid #bbb;
 	border-bottom: none;
 	background-color: #ddd;
@@ -51,6 +51,12 @@ input.filter {
 	padding: 0;
 	margin: 0 0 1px .5ex;
 	float:right;
+}
+div.messages {
+	background-color: #fff0dd;
+	color: #f60;
+	padding: 5px;
+	line-height: 150%;
 }
 
 /* Table rows: */
@@ -231,6 +237,8 @@ background-color:#ddd;
 
 .results_ajax_loading {
 	position: absolute;
+	top: 0;
+	left: 0;
 	background: #000;
 	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	-moz-opacity: 0.5;
@@ -240,8 +248,8 @@ background-color:#ddd;
 .results_ajax_loading div {
 	text-align: center;
 	vertical-align: middle;
-	background: url(../img/ajax-loader-white.gif) no-repeat center center;
-	height: 20px;
+	background: url(../img/ajax-loader/333.gif) no-repeat center center;
+	height: 32px;
 	margin: auto;
 	position: absolute;
 	top: 0;

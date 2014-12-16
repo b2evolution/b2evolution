@@ -39,7 +39,7 @@ if( $Session->has_User() )
 			$redirect_to = $baseurl;
 		}
 		$Messages->add( sprintf( T_('Note: You are already logged in as %s!'), $tmp_User->get('login') )
-			.' <a href="'.evo_htmlspecialchars($redirect_to).'">'.T_('Continue').' &raquo;</a>', 'note' );
+			.' <a href="'.htmlspecialchars($redirect_to).'">'.T_('Continue').' &raquo;</a>', 'note' );
 	}
 	unset($tmp_User);
 }
@@ -88,7 +88,7 @@ $params = array(
 	'inskin' => false,
 	'inskin_urls' => false,
 	'redirect_to' => $redirect_to,
-	'login' => evo_strtolower( $login ),
+	'login' => utf8_strtolower( $login ),
 	'login_required' => $login_required,
 	'validate_required' => $validate_required,
 	'action' => $action,

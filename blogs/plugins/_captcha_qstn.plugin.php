@@ -26,7 +26,7 @@
  *
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id$
+ * @version $Id: _captcha_qstn.plugin.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -256,12 +256,16 @@ class captcha_qstn_plugin extends Plugin
 			return;
 		}
 
-		$posted_answer = evo_strtolower( param( 'captcha_qstn_'.$this->ID.'_answer', 'string', '' ) );
+		$posted_answer = utf8_strtolower( param( 'captcha_qstn_'.$this->ID.'_answer', 'string', '' ) );
 
 		if( empty( $posted_answer ) )
 		{
 			$this->debug_log( 'captcha_qstn_'.$this->ID.'_answer' );
 			$params['validate_error'] = $this->T_('Please enter the captcha answer.');
+			if( $form_type == 'comment' && ( $comment_Item = & $params['Comment']->get_Item() ) )
+			{
+				syslog_insert( 'Comment captcha answer is not entered', 'warning', 'item', $comment_Item->ID, 'plugin', $this->ID );
+			}
 			return false;
 		}
 
@@ -269,7 +273,7 @@ class captcha_qstn_plugin extends Plugin
 
 		$posted_answer_is_correct = false;
 
-		$answers = explode( '|', evo_strtolower( $question->cptq_answers ) );
+		$answers = explode( '|', utf8_strtolower( $question->cptq_answers ) );
 		foreach( $answers as $answer )
 		{
 			if( $posted_answer == $answer )
@@ -283,6 +287,10 @@ class captcha_qstn_plugin extends Plugin
 		{
 			$this->debug_log( 'Posted ('.$posted_answer.') and saved ('.$question->cptq_answers.') answer do not match!' );
 			$params['validate_error'] = $this->T_('The entered answer is incorrect.');
+			if( $form_type == 'comment' && ( $comment_Item = & $params['Comment']->get_Item() ) )
+			{
+				syslog_insert( 'Comment captcha answer is incorrect', 'warning', 'item', $comment_Item->ID, 'plugin', $this->ID );
+			}
 			return false;
 		}
 

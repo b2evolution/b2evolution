@@ -27,7 +27,7 @@
  * @author Yabba: Paul Jones - {@link http://astonishme.co.uk/}
  * @author Stk: Scott Kimler - {@link http://astonishme.co.uk/}
  *
- * @version $Id: _code_highlight.plugin.php 7134 2014-07-16 12:01:07Z yura $
+ * @version $Id: _code_highlight.plugin.php 7135 2014-07-16 12:02:05Z yura $
  */
 
 /**
@@ -112,7 +112,7 @@ class code_highlight_plugin extends Plugin
 
 	/**
 	 * TRUE when HTML tags are allowed for content of current rendered post/comment/message
-	 * In this case we should prepare a content with function evo_htmlspecialchars() to display a code as it is
+	 * In this case we should prepare a content with function htmlspecialchars() to display a code as it is
 	 *
 	 * @var boolean
 	 */
@@ -233,6 +233,25 @@ class code_highlight_plugin extends Plugin
 
 
 	/**
+	 * Event handler: Called when displaying editor toolbars for message.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayMessageToolbar( & $params )
+	{
+		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
+		if( !empty( $apply_rendering ) && $apply_rendering != 'never'
+		&& ( ( is_logged_in() && $this->UserSettings->get( 'display_toolbar' ) )
+			|| ( !is_logged_in() && $this->Settings->get( 'toolbar_default' ) ) ) )
+		{
+			return $this->DisplayCodeToolbar();
+		}
+		return false;
+	}
+
+
+	/**
 	 * Display a toolbar in admin
 	 *
 	 * @param array Associative array of parameters
@@ -257,9 +276,8 @@ class code_highlight_plugin extends Plugin
 
 		$coll_setting_name = ( $params['target_type'] == 'Comment' ) ? 'coll_apply_comment_rendering' : 'coll_apply_rendering';
 		$apply_rendering = $this->get_coll_setting( $coll_setting_name, $Blog );
-		if( empty( $apply_rendering ) || $apply_rendering == 'never' ||
-		    $params['edit_layout'] == 'simple' || !$this->UserSettings->get( 'display_toolbar' ) )
-		{	// This is too complex for simple mode, or user doesn't want the toolbar, don't display it:
+		if( empty( $apply_rendering ) || $apply_rendering == 'never' || ! $this->UserSettings->get( 'display_toolbar' ) )
+		{ // This plugin is disabled for this blog or user doesn't want the toolbar, don't display it:
 			return false;
 		}
 		$this->DisplayCodeToolbar();
@@ -407,6 +425,20 @@ class code_highlight_plugin extends Plugin
 	}
 
 
+	function MessageThreadFormSent( & $params )
+	{
+		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
+		if( $this->is_renderer_enabled( $apply_rendering, $params['renderers'] ) )
+		{ // render code blocks in message
+			$this->FilterItemContents( $params );
+			if( empty( $params['dont_remove_pre'] ) || !$params['dont_remove_pre'] )
+			{ // remove <pre>
+				$params['content'] = preg_replace( '#(<\!--\s*codeblock[^-]*?\s*-->)<pre[^>]*><code>(.+?)</code></pre>(<\!--\s+/codeblock\s*-->)#is', '$1<code>$2</code>$3', $params['content'] );
+			}
+		}
+	}
+
+
 	function BeforeCommentFormInsert( $params )
 	{
 		$Comment = & $params['Comment'];
@@ -519,7 +551,7 @@ class code_highlight_plugin extends Plugin
 	 */
 	function filter_codeblock_callback( $block )
 	{ // if code block exists then tidy everything up for the database, otherwise just remove the pointless tag
-		$attributes = str_replace( array( '"', '\'' ), '', evo_html_entity_decode( $block[2] ) );
+		$attributes = str_replace( array( '"', '\'' ), '', html_entity_decode( $block[2] ) );
 		return ( empty( $block[3] ) ||  !trim( $block[3] ) ? '' : '<!-- codeblock'.$attributes.' --><pre class="codeblock"><code>'
 						.$block[3]
 						.'</code></pre><!-- /codeblock -->' );
@@ -621,7 +653,7 @@ class code_highlight_plugin extends Plugin
 		foreach( $temp as $line )
 		{
 			$output .= '<tr class="amc_code_'.( ( $odd_line = !$odd_line ) ? 'odd' : 'even' ).'"><td class="amc_line">'
-									.$this->create_number( ++$count + $offset ).'</td><td><code>'.$line
+									.$this->create_number( ++$count + $offset ).'</td><td><code class="codeblock">'.$line
 									// add an &nbsp; to empty lines to stop them "collapsing"
 									.( empty( $line ) ? '&nbsp;' : '' )
 									.'</code></td></tr>';//."\n"; yura: I commented this because Auto-P plugin creates the tags <p></p> from this symbol

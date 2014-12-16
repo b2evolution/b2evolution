@@ -41,7 +41,7 @@ skin_include( '_html_header.inc.php' );
 // ------------------------- BODY HEADER INCLUDED HERE --------------------------
 skin_include( '_body_header.inc.php' );
 // Note: You can customize the default BODY header by copying the generic
-// /skins/_body_footer.inc.php file into the current skin folder.
+// /skins/_body_header.inc.php file into the current skin folder.
 // ------------------------------- END OF HEADER --------------------------------
 ?>
 
@@ -123,10 +123,10 @@ while( $Item = & mainlist_get_item() )
 		<?php
 			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 			skin_include( '_item_content.inc.php', array(
-					'image_size'	=>	'fit-400x320',
+					'image_size' => 'fit-400x320',
 				) );
-			// Note: You can customize the default item feedback by copying the generic
-			// /skins/_item_feedback.inc.php file into the current skin folder.
+			// Note: You can customize the default item content by copying the generic
+			// /skins/_item_content.inc.php file into the current skin folder.
 			// -------------------------- END OF POST CONTENT -------------------------
 		?>
 
@@ -169,7 +169,7 @@ while( $Item = & mainlist_get_item() )
 						) );
 				?>
 				<?php
-					if( $Skin->get_setting( 'display_post_date') )
+					if( $Skin->get_setting( 'display_post_date' ) )
 					{	// We want to display the post date:
 						$Item->issue_time( array(
 								'before'      => /* TRANS: date */ T_('This entry was posted on '),
@@ -177,6 +177,7 @@ while( $Item = & mainlist_get_item() )
 							) );
 						$Item->issue_time( array(
 								'before'      => /* TRANS: time */ T_('at '),
+								'time_format' => '#short_time',
 							) );
 						$Item->author( array(
 								'before'    => T_('by '),

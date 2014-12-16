@@ -15,7 +15,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _item_list_full.view.php 7046 2014-07-02 11:41:10Z yura $
+ * @version $Id: _item_list_full.view.php 7512 2014-10-24 10:31:53Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -161,11 +161,12 @@ while( $Item = & $ItemList->get_item() )
 
 				$Item->issue_time( array(
 						'before'      => ' @ <span class="bTime">',
-						'after'      => '</span>',
+						'after'       => '</span>',
+						'time_format' => '#short_time',
 					) );
 
 				// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
-				echo ' ', T_('by'), ' ', $Item->creator_User->get_identity_link( array( 'link_text' => 'text' ) );
+				echo ' ', T_('by'), ' ', $Item->creator_User->get_identity_link( array( 'link_text' => 'name' ) );
 
 				echo $Item->get_history_link( array( 'before' => ' ' ) );
 
@@ -215,7 +216,8 @@ while( $Item = & $ItemList->get_item() )
 						'after_image' =>         '</div>',
 						'after' =>               '</div>',
 						'image_size' =>          'fit-320x320',
-						'restrict_to_image_position' => 'teaser',	// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
+						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'albumart'
+						'restrict_to_image_position' => 'teaser,teaserperm,teaserlink',
 					) );
 			?>
 
@@ -284,10 +286,10 @@ while( $Item = & $ItemList->get_item() )
 			}
 			echo '</span>';
 
-			echo '<span class="'.button_class( 'group' ).'"> ';
+			echo '<span class="'.button_class( 'group' ).'">';
 			// Display edit button if current user has the rights:
 			$Item->edit_link( array( // Link to backoffice for editing
-					'before' => '',
+					'before' => ' ',
 					'after'  => '',
 					'class'  => button_class( 'text' ),
 					'text'   => get_icon( 'edit_button' ).' '.T_('Edit')
@@ -296,13 +298,13 @@ while( $Item = & $ItemList->get_item() )
 			// Display copy button if current user has the rights:
 			$Item->copy_link( array( // Link to backoffice for coping
 					'before' => '',
-					'after'  => '',
+					'after'  => ' ',
 					'text'   => '#icon#',
 					'class'  => button_class()
 				) );
 			echo '</span>';
 
-			echo '<span class="'.button_class( 'group' ).'"> ';
+			echo '<span class="'.button_class( 'group' ).'">';
 			// Display the moderate buttons if current user has the rights:
 			$status_link_params = array(
 					'class'       => button_class( 'text' ),
@@ -348,8 +350,9 @@ while( $Item = & $ItemList->get_item() )
 			}
 
 
-  		// ---------- comments ----------
+			// ---------- comments ----------
 
+			$currentpage = param( 'currentpage', 'integer', 1 );
 			$total_comments_number = generic_ctp_number( $Item->ID, 'total', 'total' );
 			$draft_comments_number = generic_ctp_number( $Item->ID, 'total', 'draft' );
 			// decide to show all comments, or only drafts
@@ -383,6 +386,7 @@ while( $Item = & $ItemList->get_item() )
 				'order' => 'ASC',
 				'post_ID' => $Item->ID,
 				'comments' => 20,
+				'page' => $currentpage,
 				'expiry_statuses' => $expiry_statuses,
 			) );
 			$CommentList->query();
@@ -391,7 +395,6 @@ while( $Item = & $ItemList->get_item() )
 			param( 'save_context', 'boolean', false );
 			param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$Item->ID, '&' ), false, true );
 			param( 'item_id', 'integer', $Item->ID );
-			param( 'currentpage', 'integer', 1 );
 			param( 'show_comments', 'string', $show_comments, false, true );
 
 			// display status filter
@@ -402,7 +405,7 @@ while( $Item = & $ItemList->get_item() )
 			<?php 
 				echo T_('Comments'), ', ', T_('Trackbacks'), ', ', T_('Pingbacks').' ('.generic_ctp_number( $Item->ID, 'feedbacks', 'total' ).')';
 				$opentrash_link = get_opentrash_link();
-				$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', 'javascript:startRefreshComments('.$Item->ID.')' ).'</span> ';
+				$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', url_add_param( $admin_url, 'ctrl=items&amp;blog='.$blog.'&amp;p='.$Item->ID.'#comments' ), NULL, NULL, NULL, array( 'onclick' => 'startRefreshComments( \''.request_from().'\', '.$Item->ID.' ); return false;' ) ).'</span> ';
 				echo $refresh_link.$opentrash_link;
 			?>:</h4>
 			<?php
@@ -429,7 +432,7 @@ while( $Item = & $ItemList->get_item() )
 				<label for="show_all"><?php echo T_('All comments') ?></label>
 			</div>
 			<?php
-			$expiry_delay = $Item->get_setting( 'post_expiry_delay' );
+			$expiry_delay = $Item->get_setting( 'comment_expiry_delay' );
 			if( ! empty( $expiry_delay ) )
 			{ // A filter to display even the expired comments
 			?>
@@ -474,9 +477,9 @@ while( $Item = & $ItemList->get_item() )
 			$Form->add_crumb( 'comment' );
 			$Form->hidden( 'comment_item_ID', $Item->ID );
 			$Form->hidden( 'redirect_to', $ReqURI );
-			
-			$Form->info( T_('User'), $current_User->get_identity_link( array( 'link_text' => 'text' ) ).' '.get_user_profile_link( ' [', ']', T_('Edit profile') )  );
-			$Form->textarea( $dummy_fields[ 'content' ], '', 12, T_('Comment text'), '', 40, 'bComment' );
+
+			$Form->info( T_('User'), $current_User->get_identity_link( array( 'link_text' => 'name' ) ).' '.get_user_profile_link( ' [', ']', T_('Edit profile') )  );
+			$Form->textarea( $dummy_fields[ 'content' ], '', 12, T_('Comment text'), '', 40, 'bComment autocomplete_usernames' );
 
 			global $Plugins;
 			$Form->info( T_('Text Renderers'), $Plugins->get_renderer_checkboxes( array( 'default') , array( 'Blog' => & $Blog, 'setting_name' => 'coll_apply_comment_rendering' ) ) );

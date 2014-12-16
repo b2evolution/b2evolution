@@ -25,7 +25,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id$
+ * @version $Id: _collsettings.class.php 7435 2014-10-15 07:21:31Z yura $
  *
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -71,9 +71,10 @@ class CollectionSettings extends AbstractSettings
 			'count_custom_double' => 0,
 			'count_custom_varchar' => 0,
 			'show_location_coordinates' => 0,
-			'tags_meta_keywords' => 1,
 			'slug_limit' => 5,
+			'tags_meta_keywords' => 1,
 			'tags_open_graph' => 1,
+			// 'post_moderation_statuses' => NULL,			// Possible values are a list of statuses from: 'community', 'protected', 'review', 'draft', but we don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
 
 		// Comment settings:
 			// 'new_feedback_status' => 'review',		// Default status for new anonymous comments: 'published', 'community', 'protected', 'private', 'review', 'draft' or 'deprecated'. We don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
@@ -97,6 +98,7 @@ class CollectionSettings extends AbstractSettings
 			'comments_detect_email' => 1,
 			'comments_register' => 1,
 			'comment_quick_moderation' => 'expire',		// Comment quick moderation can be 'never', 'expire' - Links expire on first edit action, and 'always'
+			'autocomplete_usernames' => 1,
 
 		// Archive settings:
 			'arcdir_noindex' => '1',					// META NOINDEX on Archive directory
@@ -177,11 +179,13 @@ class CollectionSettings extends AbstractSettings
 			'editing_goto_blog' => 'post', // 'no' - No redirect, 'blog' - Go to blog after editing post, 'post' - Redirect to permanent post url
 			// 'default_post_status' => 'draft',		// Default status for new posts ("published", "community", "protected", "private", "review", "draft", "deprecated", "redirected"). We don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
 			'post_categories' => 'main_extra_cat_post', // Post category setting
-			'post_navigation' => 'same_blog',           // Default post by post navigation should stay in the same blog, category or author
+			'post_navigation' => 'same_blog',           // Default post by post navigation should stay in the same blog, category, author or tag
 			'blog_head_includes' => '',
 			'blog_footer_includes' => '',
 			'allow_html_post' => 1, // Allow HTML in posts
 			'allow_html_comment' => 1, // Allow HTML in comments
+			'track_unread_content' => 0, // Should we track unread content on the specific blog. It can be modified on the Features/Other settings form.
+			'allow_access' => 'public', // Allow access to blog; Values: 'public' - Everyone (Public Blog), 'users' - Logged in users, 'members' - Members of the blog
 
 		// Other settings:
 			'image_size_user_list' => 'crop-top-32x32', // Used in disp = users
@@ -199,7 +203,7 @@ class CollectionSettings extends AbstractSettings
 			'location_region'    => 'hidden', // Editing mode of region for item:    "optional" | "required" | "hidden"
 			'location_subregion' => 'hidden', // Editing mode of subregion for item: "optional" | "required" | "hidden"
 			'location_city'      => 'hidden', // Editing mode of city for item:      "optional" | "required" | "hidden"
-		
+
 		// Download settings:
 			'download_delay' => 5,
 			'download_noindex' => 1,

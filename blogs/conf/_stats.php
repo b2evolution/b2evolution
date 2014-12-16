@@ -277,6 +277,7 @@ $referer_type_array = array (
 	);
 
 $referer_type_color = array(
+	'session' => '006699',
 	'search'  => '0099FF',
 	'special' => 'ff00ff',
 	'referer' => '00CCFF',
@@ -311,9 +312,9 @@ $hit_type_array = array (
 
 $hit_type_color = array(
 	'standard'         => 'FFBB00',
-	'service'          => '0072FF',
+	'service'          => '6699CC',
 	'rss'              => 'FF6600',
-	'ajax'             => '009900',
+	'ajax'             => '339966',
 	'admin'            => 'AAE0E0',
 	'standard_robot'   => 'FF9900',
 	'standard_browser' => 'FFCC00'
@@ -321,11 +322,14 @@ $hit_type_color = array(
 
 $user_gender_color = array(
 	'women_active'       => '990066',
-	'women_notactive'    => 'ff66cc',
+	'women_notactive'    => 'c72290',
+	'women_closed'       => 'ff66cc',
 	'men_active'         => '003399',
-	'men_notactive'      => '6699ff',
+	'men_notactive'      => '3268d4',
+	'men_closed'         => '6699ff',
 	'nogender_active'    => '666666',
-	'nogender_notactive' => 'cccccc'
+	'nogender_notactive' => '999999',
+	'nogender_closed'    => 'cccccc'
 );
 
 ?>

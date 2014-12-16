@@ -32,7 +32,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _profile.disp.php 7707 2014-11-28 12:44:38Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -115,7 +115,16 @@ switch( $disp )
 		require $inc_path.'users/views/_user_identity.form.php';
 		break;
 	case 'avatar':
-		require $inc_path.'users/views/_user_avatar.form.php';
+		if( $action == 'crop' )
+		{ // Form to crop picture
+			require $inc_path.'users/views/_user_crop.form.php';
+		}
+		else
+		{ // Form to view avatars
+			require $inc_path.'users/views/_user_avatar.form.php';
+			// Load javascript function to open popup window with crop picture tool
+			echo_user_crop_avatar_window();
+		}
 		break;
 	case 'pwdchange':
 		require $inc_path.'users/views/_user_password.form.php';

@@ -31,7 +31,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id$
+ * @version $Id: _user_deldata.form.php 7704 2014-11-27 13:16:05Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -91,7 +91,12 @@ $Form->hidden_ctrl();
 $Form->hidden( 'user_tab', $user_tab );
 $Form->hidden( 'user_ID', $edited_User->ID );
 
-$Form->begin_fieldset( T_('Delete user data').get_manual_link( 'delete-user-data' ), array( 'class'=>'fieldset clear' ) );
+$close_icon = '';
+if( $display_mode == 'js' )
+{ // Display a close link for popup window
+	$close_icon = action_icon( T_('Close this window'), 'close', '', '', 0, 0, array( 'id' => 'close_button', 'class' => 'floatright' ) );
+}
+$Form->begin_fieldset( T_('Delete user data').get_manual_link( 'delete-user-data' ).$close_icon, array( 'class' => 'fieldset clear' ) );
 
 	$posts_created = $edited_User->get_num_posts();
 	// Get the number of comments created by the edited user, but count recycled comments only if user has global editall blogs permission
@@ -117,10 +122,6 @@ $Form->begin_fieldset( T_('Delete user data').get_manual_link( 'delete-user-data
 	$Form->button( array( '', 'actionArray[delete_data]', T_('Delete selected data'), 'SaveButton' ) );
 	echo '</p>';
 
-if( $display_mode == 'js' )
-{ // Display a close link for popup window
-	echo '<div class="center">'.action_icon( T_('Close this window'), 'close', '', ' '.T_('Close this window'), 3, 4, array( 'id' => 'close_button', 'class' => 'small' ) ).'</div>';
-}
 $Form->end_fieldset();
 
 $Form->end_form();

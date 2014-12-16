@@ -55,7 +55,7 @@ $Comment = & $params['Comment'];
 
 				$commented_Item = & $Comment->get_Item();
 				echo ' '.T_('said on :').' <small class="commentmetadata">';
-				$Comment->date() ?> @ <?php $Comment->time( 'H:i' );
+				$Comment->date() ?> @ <?php $Comment->time( '#short_time' );
 				$Comment->edit_link( '', '', get_icon( 'edit' ), '#', '', '&amp;', true, rawurlencode( $Comment->get_permanent_url() ) );
 				$Comment->delete_link( '', '', get_icon( 'delete' ), '#', '', false, '&amp;', true, false, '#', rawurlencode( $commented_Item->get_permanent_url() ) );
 				echo '</small>';

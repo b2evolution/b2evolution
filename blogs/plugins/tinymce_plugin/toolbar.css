@@ -1,0 +1,15 @@
+.mce-btn button, .mce-menubtn span {
+	line-height: 16px !important;
+}
+.mce-i-morebreak:before {
+	content: "\e027";
+}
+.mce-i-morebreak:before {
+	font-weight: bold;
+}
+.mce-fullscreen {
+	z-index: 12000 !important;
+}
+.mce-menu {
+	min-width: 50px !important;
+}

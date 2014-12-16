@@ -21,7 +21,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _stats_robots.view.php 6134 2014-03-08 07:48:07Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -61,34 +61,43 @@ if( count($res_hits) )
 	$chart[ 'chart_data' ][ 0 ] = array();
 	$chart[ 'chart_data' ][ 1 ] = array();
 
+	$chart['dates'] = array();
+
+	// Initialize the data to open an url by click on bar item
+	$chart['link_data'] = array();
+	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&agent_type=$param1$';
+	$chart['link_data']['params'] = array(
+			array( 'robot' )
+		);
+
 	$count = 0;
 	foreach( $res_hits as $row_stats )
 	{
 		$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
 		if( $last_date != $this_date )
 		{ // We just hit a new day, let's display the previous one:
-				$last_date = $this_date;	// that'll be the next one
-				$count ++;
-				array_unshift( $chart[ 'chart_data' ][ 0 ], date( locale_datefmt(), $last_date ) );
-				array_unshift( $chart[ 'chart_data' ][ 1 ], 0 );
+			$last_date = $this_date;	// that'll be the next one
+			$count ++;
+			array_unshift( $chart[ 'chart_data' ][ 0 ], date( 'D '.locale_datefmt(), $last_date ) );
+			array_unshift( $chart[ 'chart_data' ][ 1 ], 0 );
+
+			array_unshift( $chart['dates'], $last_date );
 		}
 		$chart [ 'chart_data' ][1][0] = $row_stats['hits'];
 	}
 
 	array_unshift( $chart[ 'chart_data' ][ 0 ], '' );
-	array_unshift( $chart[ 'chart_data' ][ 1 ], 'Robot hits' );	// Translations need to be UTF-8
-
-	// Include common chart properties:
-	require dirname(__FILE__).'/inc/_bar_chart.inc.php';
+	array_unshift( $chart[ 'chart_data' ][ 1 ], T_('Robot hits') );	// Translations need to be UTF-8
 
 	$chart[ 'series_color' ] = array (
 			$agent_type_color['robot'],
 		);
 
+	$chart[ 'canvas_bg' ] = array( 'width'  => 780, 'height' => 355 );
 
 	echo '<div class="center">';
-	load_funcs('_ext/_swfcharts.php');
-	DrawChart( $chart );
+	load_funcs('_ext/_canvascharts.php');
+	CanvasBarsChart( $chart );
 	echo '</div>';
 
 }
@@ -126,20 +135,20 @@ function translate_user_agent( $agnt_signature )
 {
 	global $user_agents;
 
-	$html_signature = evo_htmlspecialchars( $agnt_signature );
+	$html_signature = htmlspecialchars( $agnt_signature );
 	$format = '<span title="'.$html_signature.'">%s</span>';
 
 	foreach ($user_agents as $curr_user_agent)
 	{
 		if( strpos($agnt_signature, $curr_user_agent[1]) !== false )
 		{
-			return sprintf( $format, evo_htmlspecialchars($curr_user_agent[2]) );
+			return sprintf( $format, htmlspecialchars($curr_user_agent[2]) );
 		}
 	}
 
 	if( ( $browscap = @get_browser( $agnt_signature ) ) && $browscap->browser != 'Default Browser' )
 	{
-		return sprintf( $format, evo_htmlspecialchars( $browscap->browser ) );
+		return sprintf( $format, htmlspecialchars( $browscap->browser ) );
 	}
 
 	return $html_signature;

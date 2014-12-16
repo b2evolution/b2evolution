@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _chapter_list.view.php 7657 2014-11-15 14:27:16Z manuel $
+ * @version $Id: _chapter_list.view.php 7658 2014-11-15 14:28:45Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 //____________________ Callbacks functions to display categories list _____________________
@@ -109,7 +109,7 @@ function cat_line( $Chapter, $level )
 
 	// URL "slug"
 	$edit_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=edit' );
-	$r .= '<td><a href="'.evo_htmlspecialchars($Chapter->get_permanent_url()).'">'.$Chapter->dget('urlname').'</a></td>';
+	$r .= '<td><a href="'.htmlspecialchars($Chapter->get_permanent_url()).'">'.$Chapter->dget('urlname').'</a></td>';
 
 	// Order
 	if( $Settings->get('chapter_ordering') == 'manual' )

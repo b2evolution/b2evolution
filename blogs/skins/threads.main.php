@@ -8,7 +8,7 @@
  *
  * @package evoskins
  *
- * @version $Id$
+ * @version $Id: threads.main.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -63,12 +63,6 @@ if( $action == 'new' )
 	}
 }
 
-// var bgxy_expand is used by toggle_filter_area() and toggle_clickopen()
-// var htsrv_url is used for AJAX callbacks
-add_js_headline( "// Paths used by JS functions:
-		var bgxy_expand = '".get_icon( 'expand', 'xy' )."';
-		var bgxy_collapse = '".get_icon( 'collapse', 'xy' )."';" );
-
 // Require results.css to display thread query results in a table
 require_css( 'results.css' ); // Results/tables styles
 
@@ -94,10 +88,15 @@ switch( $action )
 		if( ( $unsaved_message_params = get_message_params_from_session() ) !== NULL )
 		{ // set Message and Thread saved params from Session
 			$edited_Message->text = $unsaved_message_params[ 'message' ];
+			$edited_Message->original_text = $unsaved_message_params[ 'message_original' ];
+			$edited_Message->set_renderers( $unsaved_message_params[ 'renderers' ] );
 			$edited_Thread->title = $unsaved_message_params[ 'subject' ];
 			$edited_Thread->recipients = $unsaved_message_params[ 'thrd_recipients' ];
+			$edited_Message->Thread = $edited_Thread;
 			$thrd_recipients_array = $unsaved_message_params[ 'thrd_recipients_array' ];
 			$thrdtype = $unsaved_message_params[ 'thrdtype' ];
+			$action = $unsaved_message_params[ 'action' ];
+			$creating_success = !empty( $unsaved_message_params[ 'creating_success' ] ) ? $unsaved_message_params[ 'creating_success' ] : false;
 		}
 		else
 		{

@@ -27,30 +27,15 @@ skin_widget( array(
 		'block_start' => '',
 		'block_end' => '',
 		'block_display_title' => false,
-		'disp_search_options' => 1,
+		'disp_search_options' => 0,
+		'search_class' => 'extended_search_form',
 		'use_search_disp' => 1,
 	) );
 // ---------------------------------- END OF COMMON LINKS ---------------------------------
 
-// Display message if no post:
-display_if_empty( array(
-				'before'      => '<p class="msg_nothing" style="margin: 2em 0">',
-				'after'       => '</p>',
-				'msg_empty'   => T_('Sorry, we could not find anything matching your request, please try to broaden your search.'),
-			) );
-
-// --------------------------------- START OF POSTS -------------------------------------
-while( mainlist_get_item() )
-{	// For each blog post, do everything below up to the closing curly brace "}"
-
-	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
-	skin_include( '_item_block.inc.php', array(
-			'content_mode'   => 'auto', // 'auto' will auto select depending on $disp-detail
-			'image_size'     => 'fit-400x320',
-			'item_link_type' => 'permalink', // Use 'permalink' to display title of all posts as links (used especially for intro-cat posts)
-		) );
-	// ----------------------------END ITEM BLOCK  ----------------------------
-
-} // ---------------------------------- END OF POSTS ------------------------------------
+// Display the search result
+search_result_block( array(
+		'pagination' => $params['pagination']
+	) );
 
 ?>

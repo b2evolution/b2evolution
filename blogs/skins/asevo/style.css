@@ -341,6 +341,10 @@ input#thrd_title {
 	max-width: 270px;
 }
 
+#register_form input#u {
+	max-width: 260px;
+}
+
 /* Not published comments display */
 #styled_content_block .bComment .status_draft,
 #styled_content_block .bComment .status_review,
@@ -364,4 +368,8 @@ div.tabs {
 }
 div.tabs div a {
 	padding: 5px 4px;
+}
+
+.search_title {
+	color: #666;
 }

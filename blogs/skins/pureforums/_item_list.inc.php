@@ -12,14 +12,13 @@
  * @package evoskins
  * @subpackage pureforums
  *
- * @version $Id$
+ * @version $Id: _item_list.inc.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Default params:
 $params = array_merge( array(
 		'post_navigation' => 'same_category', // In this skin, it makes no sense to navigate in any different mode than "same category"
-		'item_link_type'  => '#',
 	), $params );
 
 global $Item, $cat;
@@ -78,9 +77,8 @@ elseif( $comments_number > 25 )
 				}
 				// Title:
 				$Item->title( array(
-						'link_class'      => 'topictitle',
+						'link_class'      => 'topictitle'.( $Item->get_read_status() != 'read' ? ' unread' : '' ),
 						'post_navigation' => $params['post_navigation'],
-						'link_type'       => $params['item_link_type'],
 					) );
 				if( $Skin->enabled_status_banner( $Item->status ) )
 				{ // Status:

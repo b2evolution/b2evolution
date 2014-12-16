@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _usersettings.class.php 7347 2014-10-01 11:52:15Z yura $
+ * @version $Id: _usersettings.class.php 7348 2014-10-01 11:56:15Z yura $
  *
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -61,7 +61,12 @@ class UserSettings extends AbstractSettings
 		'control_form_abortions' => 1,
 		'focus_on_first_input' => 0,			// TODO: fix sideeffect when pressing F5
 		'pref_browse_tab' => 'full',
-		'pref_edit_tab' => 'simple',
+
+		// Folding settings, 1 - Hide, 0 - Show
+		'fold_itemform_extra' => 1,
+		'fold_itemform_renderers' => 1,
+		'fold_itemform_comments' => 1,
+		'fold_itemform_adv_props' => 1,
 
 		'fm_imglistpreview' => 1,
 		'fm_showdate'       => 'compact',

@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: items.ctrl.php 7740 2014-12-03 12:12:05Z yura $
+ * @version $Id: items.ctrl.php 7741 2014-12-03 12:13:50Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -108,7 +108,7 @@ switch( $action )
 	case 'delete' :
 	// Note: we need to *not* use $p in the cases above or it will conflict with the list display
 	case 'edit_switchtab' : // this gets set as action by JS, when we switch tabs
-		if( $action != 'edit_switchtab' )
+		if( $action != 'edit_switchtab' && $action != 'edit_type' )
 		{ // Stop a request from the blocked IP addresses or Domains
 			antispam_block_request();
 		}
@@ -240,9 +240,9 @@ switch( $action )
 		load_class( 'items/model/_item.class.php', 'Item' );
 
 		$fileNum = 0;
-		$cat_Array = param( 'category', 'array/string' );
-		$title_Array = param( 'post_title', 'array/string' );
-		$new_categories = param( 'new_categories', 'array/string', array() );
+		$cat_Array = param( 'category', 'array:string' );
+		$title_Array = param( 'post_title', 'array:string' );
+		$new_categories = param( 'new_categories', 'array:string', array() );
 		while( $l_File = & $selected_Filelist->get_next() )
 		{
 			// Create a post:
@@ -349,7 +349,7 @@ switch( $action )
 
 
 	default:
-		debug_die( 'unhandled action 1:'.evo_htmlspecialchars($action) );
+		debug_die( 'unhandled action 1:'.htmlspecialchars($action) );
 }
 
 $AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Contents'), 'url' => '?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' ) );
@@ -407,7 +407,7 @@ switch( $action )
 		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing:
 			$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
 		}
-		$post_extracats = param( 'post_extracats', 'array/integer', $post_extracats );
+		$post_extracats = param( 'post_extracats', 'array:integer', $post_extracats );
 
 		param( 'item_tags', 'string', '' );
 
@@ -533,7 +533,7 @@ switch( $action )
 		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing:
 			$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
 		}
-		$post_extracats = param( 'post_extracats', 'array/integer', $post_extracats );
+		$post_extracats = param( 'post_extracats', 'array:integer', $post_extracats );
 
 		param( 'item_tags', 'string', '' );
 
@@ -661,6 +661,9 @@ switch( $action )
 		$current_User->check_perm( 'cats_post!'.$post_status, 'create', true, $post_extracats );
 		// Check permission on post type:
 		check_perm_posttype( $post_extracats );
+
+		// Update the folding positions for current user
+		save_fieldset_folding_values();
 
 		// CREATE NEW POST:
 		load_class( 'items/model/_item.class.php', 'Item' );
@@ -793,6 +796,9 @@ switch( $action )
 
 		// Check edit permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+
+		// Update the folding positions for current user
+		save_fieldset_folding_values();
 
 		// We need early decoding of these in order to check permissions:
 		param( 'post_status', 'string', 'published' );
@@ -1135,7 +1141,7 @@ switch( $action )
 		break;
 
 	default:
-		debug_die( 'unhandled action 2: '.evo_htmlspecialchars($action) );
+		debug_die( 'unhandled action 2: '.htmlspecialchars($action) );
 }
 
 
@@ -1327,10 +1333,6 @@ switch( $action )
 	case 'update_edit':
 	case 'update': // on error
 	case 'update_publish': // on error
-		// Get tab ("simple" or "expert") from Request or UserSettings:
-		$tab = $UserSettings->param_Request( 'tab', 'pref_edit_tab', 'string', NULL, true /* memorize */, true /* force */ );
-
-		$AdminUI->add_menu_entries( 'items', get_item_edit_modes( $blog, $action, $dispatcher, $tab_switch_params ) );
 
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'items', 'filter' => 'restore' ) );
@@ -1364,6 +1366,17 @@ switch( $action )
 						) );
 				}
 				break;
+		}
+
+		if( $Blog->get_setting( 'in_skin_editing' ) && ( $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID ) || get_param( 'p' ) > 0 ) )
+		{ // Show 'In skin' link if Blog setting 'In-skin editing' is ON and User has a permission to publish item in this blog
+			$mode_inskin_url = url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;'.$tab_switch_params );
+			$mode_inskin_action = get_samedomain_htsrv_url().'item_edit.php';
+			$AdminUI->global_icon( T_('In skin editing'), 'edit', $mode_inskin_url,
+					' '.T_('In skin editing'), 4, 3, array(
+					'style' => 'margin-right: 3ex',
+					'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$mode_inskin_action.'\' );'
+			) );
 		}
 
 		$AdminUI->global_icon( T_('Cancel editing!'), 'close', $redirect_to, T_('Cancel'), 4, 2 );
@@ -1427,15 +1440,13 @@ switch( $action )
 if( !empty($tab) )
 {
 	$AdminUI->append_path_level( $tab );
+}
 
-	if( in_array( $tab, array( 'expert', 'full', 'list', 'pages', 'intros', 'podcasts', 'links', 'ads', 'tracker' ) ) )
-	{ // Init JS to autcomplete the user logins
-		init_autocomplete_login_js( 'rsc_url' );
-	}
-	if( in_array( $tab, array( 'expert', 'simple' ) ) )
-	{ // Initialize date picker for item edit form
-		init_datepicker_js();
-	}
+if( ( isset( $tab ) && in_array( $tab, array( 'full', 'list', 'pages', 'intros', 'podcasts', 'links', 'ads', 'tracker' ) ) ) || strpos( $action, 'edit' ) === 0 )
+{ // Init JS to autcomplete the user logins
+	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+	// Initialize date picker for _item_expert.form.php
+	init_datepicker_js();
 }
 
 // Load the appropriate blog navigation styles (including calendar, comment forms...):
@@ -1461,6 +1472,11 @@ if( !empty( $Blog ) )
 		// else: $item_css_url = $rsc_url.'css/item_base.css';
 	}
 	// else item_default.css ? is it still possible to have no skin set?
+}
+
+if( $action == 'view' || strpos( $action, 'edit' ) !== false || strpos( $action, 'new' ) !== false )
+{ // Initialize js to autocomplete usernames in post/comment form
+	init_autocomplete_usernames_js();
 }
 
 
@@ -1512,17 +1528,8 @@ switch( $action )
 		$Plugins_admin->unfilter_contents( $item_title /* by ref */, $item_content /* by ref */, $edited_Item->get_renderers_validated(), $params );
 
 		// Display VIEW:
-		switch( $tab )
-		{
-			case 'simple':
-				$AdminUI->disp_view( 'items/views/_item_simple.form.php' );
-				break;
-
-			case 'expert':
-			default:
-				$AdminUI->disp_view( 'items/views/_item_expert.form.php' );
-				break;
-		}
+		// Form to edit item
+		$AdminUI->disp_view( 'items/views/_item_expert.form.php' );
 
 		// End payload block:
 		$AdminUI->disp_payload_end();

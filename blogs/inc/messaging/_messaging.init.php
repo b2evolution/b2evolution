@@ -20,7 +20,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id$
+ * @version $Id: _messaging.init.php 6422 2014-04-08 06:09:50Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -43,6 +43,7 @@ $required_mysql_version[ 'messaging' ] = '5.0.3';
  */
 $db_config['aliases']['T_messaging__thread'] = $tableprefix.'messaging__thread';
 $db_config['aliases']['T_messaging__message'] = $tableprefix.'messaging__message';
+$db_config['aliases']['T_messaging__prerendering'] = $tableprefix.'messaging__prerendering';
 $db_config['aliases']['T_messaging__threadstatus'] = $tableprefix.'messaging__threadstatus';
 $db_config['aliases']['T_messaging__contact'] = $tableprefix.'messaging__contact';
 $db_config['aliases']['T_messaging__contact_groups'] = $tableprefix.'messaging__contact_groups';
@@ -86,6 +87,24 @@ function & get_MessageCache()
 	}
 
 	return $MessageCache;
+}
+
+
+/**
+ * Get the MessagePrerenderingCache
+ *
+ * @return MessagePrerenderingCache
+ */
+function & get_MessagePrerenderingCache()
+{
+	global $MessagePrerenderingCache;
+
+	if( ! isset( $MessagePrerenderingCache ) )
+	{ // Cache doesn't exist yet:
+		$MessagePrerenderingCache = array();
+	}
+
+	return $MessagePrerenderingCache;
 }
 
 
@@ -376,6 +395,24 @@ class messaging_Module extends Module
 
 
 	/**
+	 * Get the messaging module cron jobs
+	 *
+	 * @see Module::get_cron_jobs()
+	 */
+	function get_cron_jobs()
+	{
+		return array(
+			'send-unread-messages-reminders' => array(
+				'name'   => T_('Send reminders about unread messages'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_unread_message_reminder.job.php',
+				'params' => NULL,
+			)
+		);
+	}
+
+
+	/**
 	 * Handle messaging module htsrv actions
 	 */
 	function handle_htsrv_action()
@@ -430,7 +467,7 @@ class messaging_Module extends Module
 		{
 			// threads action
 			case 'threads':
-				if( $action != 'create' )
+				if( $action != 'create' && $action != 'preview' )
 				{ // Make sure we got a thrd_ID:
 					param( 'thrd_ID', 'integer', true );
 				}
@@ -438,6 +475,7 @@ class messaging_Module extends Module
 				switch( $action )
 				{
 					case 'create': // create thread
+					case 'preview': // preview message
 						// Stop a request from the blocked IP addresses or Domains
 						antispam_block_request();
 
@@ -447,18 +485,23 @@ class messaging_Module extends Module
 							debug_die( 'Invalid request, new conversation limit already reached!' );
 						}
 
-						if( !create_new_thread() )
-						{ // unsuccessful new thread creation
+						$creating_success = create_new_thread();
+						if( !$creating_success || $action == 'preview' )
+						{ // unsuccessful new thread creation OR preview mode
 							global $edited_Thread, $edited_Message, $thrd_recipients, $thrd_recipients_array;
 
 							$redirect_to .= '&action=new';
 							// save new message and thread params into the Session to not lose the content
 							$unsaved_message_params = array();
+							$unsaved_message_params[ 'action' ] = $action;
 							$unsaved_message_params[ 'subject' ] = $edited_Thread->title;
 							$unsaved_message_params[ 'message' ] = $edited_Message->text;
+							$unsaved_message_params[ 'message_original' ] = $edited_Message->original_text;
+							$unsaved_message_params[ 'renderers' ] = $edited_Message->get_renderers_validated();
 							$unsaved_message_params[ 'thrdtype' ] = param( 'thrdtype', 'string', 'individual' );  // alternative: discussion
 							$unsaved_message_params[ 'thrd_recipients' ] = $thrd_recipients;
 							$unsaved_message_params[ 'thrd_recipients_array' ] = $thrd_recipients_array;
+							$unsaved_message_params[ 'creating_success' ] = $creating_success;
 							save_message_params_to_session( $unsaved_message_params );
 						}
 						break;
@@ -526,42 +569,62 @@ class messaging_Module extends Module
 
 			// messages action
 			case 'messages':
-				// Stop a request from the blocked IP addresses or Domains
-				antispam_block_request();
-
-				if( $action == 'create' )
-				{ // create new message
-					create_new_message( $thrd_ID );
-				}
-				elseif( $action == 'delete' )
+				switch( $action )
 				{
-					// Check permission:
-					$current_User->check_perm( 'perm_messaging', 'delete', true );
+					case 'create': // create new message
+						// Stop a request from the blocked IP addresses or Domains
+						antispam_block_request();
 
-					$msg_ID = param( 'msg_ID', 'integer', true );
-					$MessageCache = & get_MessageCache();
-					if( ($edited_Message = & $MessageCache->get_by_ID( $msg_ID, false )) === false )
-					{
-						$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Message') ), 'error' );
+						create_new_message( $thrd_ID );
 						break;
-					}
 
-					$confirmed = param( 'confirmed', 'integer', 0 );
-					if( $confirmed )
-					{ // delete message
-						$edited_Message->dbdelete();
-						unset( $edited_Message );
-						$Messages->add( T_('Message deleted.'), 'success' );
-					}
-					else
-					{
-						$delete_url = $samedomain_htsrv_url.'action.php?mname=messaging&disp=messages&thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete&confirmed=1';
-						$delete_url = url_add_param( $delete_url, 'redirect_to='.rawurlencode( $redirect_to ), '&' ).'&'.url_crumb( 'messaging_messages' );
-						$ok_button = '<span class="linkbutton"><a href="'.$delete_url.'">'.T_( 'I am sure!' ).'!</a></span>';
-						$cancel_button = '<span class="linkbutton"><a href="'.$redirect_to.'">CANCEL</a></span>';
-						$msg = T_('You are about to delete this message. ').'<br /> '.T_('This CANNOT be undone!').'<br />'.T_( 'Are you sure?' ).'<br /><br />'.$ok_button.$cancel_button;
-						$Messages->add( $msg, 'error' );
-					}
+					case 'preview': // create new message
+						// Stop a request from the blocked IP addresses or Domains
+						antispam_block_request();
+
+						global $edited_Message;
+
+						$creating_success = create_new_message( $thrd_ID, 'preview' );
+
+						// save new message and thread params into the Session to not lose the content
+						$unsaved_message_params = array();
+						$unsaved_message_params[ 'action' ] = $action;
+						$unsaved_message_params[ 'message' ] = $edited_Message->text;
+						$unsaved_message_params[ 'message_original' ] = $edited_Message->original_text;
+						$unsaved_message_params[ 'renderers' ] = $edited_Message->get_renderers_validated();
+						$unsaved_message_params[ 'creating_success' ] = $creating_success;
+						save_message_params_to_session( $unsaved_message_params );
+						break;
+
+					case 'delete': // delete message
+						// Check permission:
+						$current_User->check_perm( 'perm_messaging', 'delete', true );
+
+						$msg_ID = param( 'msg_ID', 'integer', true );
+						$MessageCache = & get_MessageCache();
+						if( ($edited_Message = & $MessageCache->get_by_ID( $msg_ID, false )) === false )
+						{
+							$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Message') ), 'error' );
+							break;
+						}
+
+						$confirmed = param( 'confirmed', 'integer', 0 );
+						if( $confirmed )
+						{ // delete message
+							$edited_Message->dbdelete();
+							unset( $edited_Message );
+							$Messages->add( T_('Message deleted.'), 'success' );
+						}
+						else
+						{
+							$delete_url = $samedomain_htsrv_url.'action.php?mname=messaging&disp=messages&thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete&confirmed=1';
+							$delete_url = url_add_param( $delete_url, 'redirect_to='.rawurlencode( $redirect_to ), '&' ).'&'.url_crumb( 'messaging_messages' );
+							$ok_button = '<span class="linkbutton"><a href="'.$delete_url.'">'.T_( 'I am sure!' ).'!</a></span>';
+							$cancel_button = '<span class="linkbutton"><a href="'.$redirect_to.'">CANCEL</a></span>';
+							$msg = T_('You are about to delete this message. ').'<br /> '.T_('This CANNOT be undone!').'<br />'.T_( 'Are you sure?' ).'<br /><br />'.$ok_button.$cancel_button;
+							$Messages->add( $msg, 'error' );
+						}
+						break;
 				}
 				break;
 		}

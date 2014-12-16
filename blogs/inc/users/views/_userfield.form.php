@@ -26,7 +26,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _userfield.form.php 6134 2014-03-08 07:48:07Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -63,7 +63,7 @@ $Form->begin_form( 'fform', $creating ?  T_('New user field') : T_('User field')
 
 	// Show this textarea only for field type with "Option list"
 	echo '<div id="div_ufdf_options"'. ( $edited_Userfield->type != 'list' ? ' style="display:none"' : '' ) .'>';
-	$Form->textarea_input( 'ufdf_options', $edited_Userfield->options, 10, T_('Options'), array( 'required' => true, 'note' => T_('Enter one option per line') ) );
+	$Form->textarea_input( 'ufdf_options', $edited_Userfield->options, 10, T_('Options'), array( 'required' => true, 'maxlength' => 255, 'note' => T_('Enter one option per line. Max length 255 symbols.') ) );
 	echo '</div>';
 
 	// Suggest values only for field type with "Single word"

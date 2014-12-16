@@ -11,7 +11,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _widget_list_available.view.php 7789 2014-12-09 16:35:43Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -55,6 +55,7 @@ $core_componentwidget_defs = array(
 			'user_login',
 			'user_avatars',
 			'online_users',
+			'member_count',
 			'mobile_skin_switcher',
 	);
 $i = 0;

@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage pureforums
  *
- * @version $Id: _edit_comment.disp.php 7644 2014-11-14 08:12:53Z yura $
+ * @version $Id: _edit_comment.disp.php 7645 2014-11-14 08:16:13Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -55,7 +55,7 @@ $disp_params = array_merge( array(
 $comment_Item = & $edited_Comment->get_Item();
 $main_Chapter = & $comment_Item->get_main_Chapter();
 $cat = $main_Chapter->ID;
-$Skin->display_breadcrumbs( $main_Chapter->ID );
+$Skin->display_breadcrumbs( $cat );
 
 $Form = new Form( $form_action, 'comment_edit', 'post' );
 

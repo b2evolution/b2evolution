@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _file_links.view.php 7725 2014-12-02 08:43:47Z yura $
+ * @version $Id: _file_links.view.php 7726 2014-12-02 08:45:36Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -50,13 +50,13 @@ if( $mode != 'upload' )
 
 	$Results = new Results( $SQL->get(), 'link_' );
 
-	$view_link_title = $LinkOwner->translate( 'View this owner...' );
+	$view_link_title = $LinkOwner->translate( 'View this xxx...' );
 	$Results->title = sprintf( T_('Files linked to &laquo;%s&raquo;'),
 					'<a href="'.$LinkOwner->get_view_url().'" title="'.$view_link_title.'">'.$LinkOwner->get( 'title' ).'</a>' );
 
 	if( $LinkOwner->check_perm( 'edit', false ) )
 	{
-		$Results->global_icon( $LinkOwner->translate( 'Edit this owner...' ), 'edit', $LinkOwner->get_edit_url(), T_('Edit') );
+		$Results->global_icon( $LinkOwner->translate( 'Edit this xxx...' ), 'edit', $LinkOwner->get_edit_url(), T_('Edit') );
 	}
 
 	// Close link mode and continue in File Manager (remember the Item_ID though):
@@ -138,7 +138,7 @@ if( $mode != 'upload' )
 
 if( $LinkOwner->check_perm( 'edit' ) )
 {	// Check that we have permission to edit item:
-	echo '<div class="center">', $LinkOwner->translate( 'Click on link %s icons below to link additional files to $ownerTitle$.',
+	echo '<div class="center">', $LinkOwner->translate( 'Click on link %s icons below to link additional files to $xxx$.',
 							get_icon( 'link', 'imgtag', array('class'=>'top') ) ), '</div>';
 }
 

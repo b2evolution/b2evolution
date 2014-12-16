@@ -9,7 +9,7 @@
  *
  * @package htsrv
  *
- * @version $Id$
+ * @version $Id: comment_review.php 6807 2014-05-29 12:13:03Z yura $
  */
 
 /**
@@ -22,17 +22,42 @@ param('cmt_ID', 'integer', '' );
 param('secret', 'string', '' );
 param_action();
 
-$to_dashboard = $admin_url.'?ctrl=dashboard';
 $to_comment_edit = $admin_url.'?ctrl=comments&action=edit&comment_ID='.$cmt_ID;
 
-if( $cmt_ID != null )
+if( $action == 'exit' )
+{	// Display messages and exit
+
+	headers_content_mightcache( 'text/html', 0 );  // Do NOT cache!
+
+	require_css( 'basic.css', 'rsc_url' ); // Basic styles
+	?>
+	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+	<html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
+	<html>
+	<head>
+		<title><?php echo T_('Comment moderation') ?></title>
+		<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
+	</head>
+	<body style="padding: 10px 20px">
+		<h1><?php echo T_('Comment moderation') ?></h1>
+		<?php $Messages->disp(); ?>
+		<div class="action_messages">
+			<p><a href="<?php echo $admin_url.'?ctrl=dashboard'; ?>"><?php echo T_('Go to the back-office...'); ?></a></p>
+		</div>
+	</body>
+	</html>
+	<?php
+
+	exit;
+}
+elseif( $cmt_ID != null )
 {
 	$posted_Comment = & Comment_get_by_ID( $cmt_ID );
 }
 else
 {
 	$Messages->add( 'Requested comment does not exist!' );
-	header_redirect( $to_dashboard );
+	header_redirect( regenerate_url('action', 'action=exit', '', '&') );
 }
 
 $comment_Item = & $posted_Comment->get_Item();
@@ -75,7 +100,7 @@ switch( $action )
 
 		$Messages->add( T_('Comment has been published.'), 'success' );
 
-		header_redirect( $to_dashboard );
+		header_redirect( regenerate_url('action', 'action=exit', '', '&') );
 		/* exited */
 		break;
 
@@ -88,7 +113,7 @@ switch( $action )
 
 		$Messages->add( T_('Comment has been deprecated.'), 'success' );
 
-		header_redirect( $to_dashboard );
+		header_redirect( regenerate_url('action', 'action=exit', '', '&') );
 		/* exited */
 		break;
 
@@ -98,7 +123,7 @@ switch( $action )
 
 		$Messages->add( T_('Comment has been deleted.'), 'success' );
 
-		header_redirect( $to_dashboard );
+		header_redirect( regenerate_url('action', 'action=exit', '', '&') );
 		break;
 
 	case 'recycle':
@@ -205,7 +230,7 @@ else
 	<div class="bSmallHead">
 		<span class="bDate"><?php $posted_Comment->date(); ?></span>
 		@
-		<span class="bTime"><?php $posted_Comment->time( 'H:i' ); ?></span>
+		<span class="bTime"><?php $posted_Comment->time( '#short_time' ); ?></span>
 		<?php
 				$posted_Comment->author_url( '', ' &middot; Url: <span class="bUrl">', '</span>' );
 				if( $posted_Comment->author_url != null )

@@ -111,10 +111,10 @@ function the_content()
 {
 	// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 	skin_include( '_item_content.inc.php', array(
-			'image_size'	=>	'fit-400x320',
+			'image_size' => 'fit-400x320',
 		) );
-	// Note: You can customize the default item feedback by copying the generic
-	// /skins/_item_feedback.inc.php file into the current skin folder.
+	// Note: You can customize the default item content by copying the generic
+	// /skins/_item_content.inc.php file into the current skin folder.
 	// -------------------------- END OF POST CONTENT -------------------------
 }
 
@@ -188,7 +188,6 @@ function comments_popup_link( $zero = '#', $one = '#', $more = '#' )
 									'link_text_one' => $one,
 									'link_text_more' => str_replace( '%', '%d', $more ),
 									'link_title' => '#',
-									'use_popup' => false,
 									'url' => '#',
 								) );
 }

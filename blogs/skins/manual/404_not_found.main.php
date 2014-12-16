@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage manual
  *
- * @version $Id$
+ * @version $Id: 404_not_found.main.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -23,7 +23,6 @@ if( version_compare( $app_version, '5.0' ) < 0 )
 	die( 'This skin is designed for b2evolution 5.0 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
 
-global $Skin;
 
 if( !empty( $requested_404_title ) )
 { // Initialize a prefilled search form
@@ -69,6 +68,18 @@ skin_include( '_left_navigation_bar.inc.php' );
 				'block_end'   => '</div>',
 			) );
 		// --------------------------------- END OF MESSAGES ---------------------------------
+	?>
+
+	<?php
+		// ------------------------ TITLE FOR THE CURRENT REQUEST ------------------------
+		request_title( array(
+				'title_before'      => '<h1 class="page_title">',
+				'title_after'       => '</h1>',
+				'title_single_disp' => false,
+				'title_page_disp'   => false,
+				'format'            => 'htmlbody',
+			) );
+		// ----------------------------- END OF REQUEST TITLE ----------------------------
 	?>
 
 	<?php
@@ -125,14 +136,12 @@ skin_include( '_left_navigation_bar.inc.php' );
 
 			echo '<p>'.T_('or you can browse the table of contents below:').'</p>';
 
-			// --------------------------------- START OF CONTENT HIERARCHY --------------------------------
 			echo '<h2 class="table_contents">'.T_('Table of contents').'</h2>';
 			$Skin->display_chapters( array(
 					'display_blog_title' => false,
 					'display_children'   => true,
 					'class_selected'     => ''
 				) );
-			// ---------------------------------- END OF CONTENT HIERARCHY ---------------------------------
 
 			echo '</div>';
 		}

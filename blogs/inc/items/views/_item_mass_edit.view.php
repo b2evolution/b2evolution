@@ -20,7 +20,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author asimo: Evo Factory / Attila Simo
  *
- * @version $Id$
+ * @version $Id: _item_mass_edit.view.php 6134 2014-03-08 07:48:07Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -79,7 +79,7 @@ while( $Item = & $ItemList->get_item() )
 
 	$Form->text( 'mass_title_'.$Item->ID , htmlspecialchars_decode( $Item->get( 'title' ) ), 70, T_('Title'), '', 255 );
 	$Form->text( 'mass_urltitle_'.$Item->ID, $Item->get_slugs(), 70, T_('URL slugs').$edit_slug_link, '', 255 );
-	$Form->text( 'mass_titletag_'.$Item->ID, $Item->get( 'titletag' ), 70, evo_htmlspecialchars( T_('<title> tag') ), '', 255 );
+	$Form->text( 'mass_titletag_'.$Item->ID, $Item->get( 'titletag' ), 70, htmlspecialchars( T_('<title> tag') ), '', 255 );
 
 	$Form->end_fieldset();
 }

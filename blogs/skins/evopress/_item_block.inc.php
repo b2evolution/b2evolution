@@ -43,11 +43,16 @@ $params = array_merge( array(
 		{
 			$Item->status( array( 'format' => 'styled' ) );
 		}
-	?>
 
-	<h2><?php $Item->title(); ?></h2>
+		echo "<h2>";
+		$Item->title();
+		$Item->load_Blog();
+		if( $Item->Blog->get_setting( 'track_unread_content' ) )
+		{
+			$Item->display_unread_status();
+		}
+		echo "</h2>";
 
-	<?php
 		if( (!$Item->is_intro()) && $Skin->get_setting( 'display_post_date') )
 		{	// Display only if we're *not* displaying an intro post AND we want to see the date:
 			$Item->issue_time( array(
@@ -61,7 +66,7 @@ $params = array_merge( array(
 	<?php
 		// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 		skin_include( '_item_content.inc.php', $params );
-		// Note: You can customize the default item feedback by copying the generic
+		// Note: You can customize the default item content by copying the generic
 		// /skins/_item_content.inc.php file into the current skin folder.
 		// -------------------------- END OF POST CONTENT -------------------------
 	?>
@@ -108,7 +113,6 @@ $params = array_merge( array(
 							'link_text_one' => '#',
 							'link_text_more' => '#',
 							'link_title' => '#',
-							'use_popup' => false,
 						) );
 				?>
 				</p>

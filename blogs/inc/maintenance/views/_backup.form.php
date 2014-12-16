@@ -20,7 +20,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id$
+ * @version $Id: _backup.form.php 6145 2014-03-10 14:42:23Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -95,9 +95,14 @@ foreach( $backup_tables as $name => $settings )
 $Form->end_fieldset();
 
 // Enable/Disable maintenance mode
-$Form->begin_fieldset( T_( 'General Options' ), array( 'class'=>'fieldset clear' ) );
+$Form->begin_fieldset( T_('General Options').get_manual_link( 'set-system-lock-during-backup' ), array( 'class'=>'fieldset clear' ) );
 
-$Form->checkbox( 'bk_maintenance_mode', true, T_( 'Maintenance mode' ), T_( 'Put b2evolution into Maintenance Mode while backing up - Recommended' ) );
+$Form->radio( 'bk_lock_type', 'maintenance_mode',
+		array(
+			array( 'maintenance_mode', T_('Maintenance mode').' ('.T_('Recommended').')', T_('check this to completely lock b2evolution' ) ),
+			array( 'maintenance_lock', T_('Maintenance lock'), T_('check this to prevent login (except for admins), sending comments/messages and receiving DB updates (other than logging)') ),
+			array( 'open', T_( 'Leave the site open for modifications during backup. (Not recommended).') )
+		), T_( 'Lock b2evolution while backing up' ), true );
 
 if( function_exists('gzopen') )
 {

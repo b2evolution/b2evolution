@@ -11,7 +11,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author asimo: Evo Factory / Attila Simo
  *
- * @version $Id: $
+ * @version $Id: _lostpassword.disp.php 7771 2014-12-08 08:24:11Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -36,6 +36,7 @@ $form_params = array(
 	'form_class'  => $params['login_form_class'],
 );
 
+$redirect_to = param( 'redirect_to', 'url', '' );
 $login = param( $dummy_fields[ 'login' ], 'string', '' );
 $params_hidden = array(
 	'inskin' => true,
@@ -47,6 +48,10 @@ echo str_replace( '$form_class$', $params['form_class_lostpass'], $params['login
 
 // display lost password form
 display_lostpassword_form( $login, $params_hidden, $form_params );
+
+echo '<div class="notes standard_login_link"><a href="'.$secure_htsrv_url.'login.php?action=lostpassword&amp;source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'">'.T_( 'Use standard password recovery form instead').' &raquo;</a></div>';
+
+echo '<div class="form_footer_notes">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
 
 echo $params['login_page_after'];
 

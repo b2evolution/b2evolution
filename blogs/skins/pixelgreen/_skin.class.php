@@ -8,7 +8,7 @@
  * @package skins
  * @subpackage pixelgreen
  *
- * @version $Id: _skin.class.php 7069 2014-07-04 08:32:23Z yura $
+ * @version $Id: _skin.class.php 7423 2014-10-14 07:52:43Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -53,6 +53,24 @@ class pixelgreen_Skin extends Skin
 					'defaultvalue' => 1,
 					'type' => 'checkbox',
 				),
+				'colorbox_vote_post' => array(
+					'label' => T_('Voting on Post Images'),
+					'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
+					'defaultvalue' => 1,
+					'type' => 'checkbox',
+				),
+				'colorbox_vote_comment' => array(
+					'label' => T_('Voting on Comment Images'),
+					'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
+					'defaultvalue' => 1,
+					'type' => 'checkbox',
+				),
+				'colorbox_vote_user' => array(
+					'label' => T_('Voting on User Images'),
+					'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
+					'defaultvalue' => 1,
+					'type' => 'checkbox',
+				),
 				'gender_colored' => array(
 					'label' => T_('Display gender'),
 					'note' => T_('Use colored usernames to differentiate men & women.'),
@@ -65,7 +83,13 @@ class pixelgreen_Skin extends Skin
 					'defaultvalue' => 0,
 					'type' => 'checkbox',
 				),
-			), parent::get_param_definitions( $params )	);
+				'autocomplete_usernames' => array(
+					'label' => T_('Autocomplete usernames'),
+					'note' => T_('Check to enable autocomplete usernames after entered sign "@" in the comment form'),
+					'defaultvalue' => 1,
+					'type' => 'checkbox',
+				),
+			), parent::get_param_definitions( $params ) );
 
 		return $r;
 	}

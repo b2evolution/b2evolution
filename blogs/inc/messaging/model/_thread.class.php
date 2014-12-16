@@ -20,7 +20,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id$
+ * @version $Id: _thread.class.php 6697 2014-05-15 10:51:11Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -58,9 +58,6 @@ class Thread extends DataObject
 	{
 		// Call parent constructor:
 		parent::DataObject( 'T_messaging__thread', 'thrd_', 'thrd_ID', 'datemodified' );
-
-		$this->delete_restrictions = array();
-		$this->delete_cascades = array();
 
 		if( $db_row != NULL )
 		{
@@ -232,7 +229,7 @@ class Thread extends DataObject
 				$login = trim($recipient);
 				if( ! empty( $login ) )
 				{
-					$recipients_list[] = evo_strtolower( $login );
+					$recipients_list[] = utf8_strtolower( $login );
 				}
 			}
 		}

@@ -6,7 +6,7 @@
  *
  * @package evocore
  *
- * @version $Id: _files.install.php 6907 2014-06-17 11:43:07Z yura $
+ * @version $Id: _files.install.php 7670 2014-11-17 17:52:57Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -25,15 +25,17 @@ global $db_storage_charset;
 $schema_queries['T_files'] = array(
 		'Creating table for File Meta Data',
 		"CREATE TABLE T_files (
-			file_ID        int(11) unsigned  not null AUTO_INCREMENT,
-			file_root_type enum('absolute','user','collection','shared','skins','import') COLLATE ascii_general_ci not null default 'absolute',
-			file_root_ID   int(11) unsigned not null default 0,
-			file_path      varchar(767) not null default '',
-			file_title     varchar(255),
-			file_alt       varchar(255),
-			file_desc      text,
-			file_hash      binary(16) default NULL,
-			file_path_hash binary(16) default NULL,
+			file_ID                  int(11) unsigned  not null AUTO_INCREMENT,
+			file_type                enum('image', 'audio', 'other') COLLATE ascii_general_ci NULL DEFAULT NULL,
+			file_root_type           enum('absolute','user','collection','shared','skins','import') COLLATE ascii_general_ci NOT NULL DEFAULT 'absolute',
+			file_root_ID             int(11) unsigned not null default 0,
+			file_path                varchar(767) not null default '',
+			file_title               varchar(255),
+			file_alt                 varchar(255),
+			file_desc                text,
+			file_hash                binary(16) default NULL,
+			file_path_hash           binary(16) default NULL,
+			file_can_be_main_profile TINYINT(1) NOT NULL DEFAULT 1,
 			primary key (file_ID),
 			unique file_path (file_path_hash)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" );

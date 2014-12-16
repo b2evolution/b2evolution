@@ -35,7 +35,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author vegarg: Vegar BERG GULDAL.
  *
- * @version $Id$
+ * @version $Id: _antispam.funcs.php 6697 2014-05-15 10:51:11Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -308,7 +308,7 @@ function get_ban_domain( $url )
 	// echo '<p>'.$url;
 
 	// Remove http:// part + everything after the last path element ( '/' alone is ignored on purpose )
-	$domain = preg_replace( '~^ ([a-z]+://)? ([^/#]+) (/ ([^/]*/)+ )? .* ~xi', '\\2\\3', $url );
+	$domain = preg_replace( '~^ ([a-z]+://)? ([^/#\?]+) (/ ([^/]*/)+ )? .* ~xi', '\\2\\3', $url );
 
 	// echo '<br>'.$domain;
 
@@ -325,7 +325,7 @@ function get_ban_domain( $url )
 		return false;
 	}
 
-	if( evo_strlen( $base_domain ) < evo_strlen( $domain ) )
+	if( utf8_strlen( $base_domain ) < utf8_strlen( $domain ) )
 	{	// The guy is spamming with subdomains (or www):
 		return '.'.$base_domain;
 	}
@@ -394,7 +394,7 @@ function echo_affected_comments( $affected_comments, $status, $keyword, $noperms
 	{
 		if( $noperms_count == 0 )
 		{ // There isn't any affected comment witch corresponding status
-			printf( '<p>'.T_('No %s comments match the keyword [%s].').'</p>', '<strong>'.$status.'</strong>', evo_htmlspecialchars($keyword) );
+			printf( '<p>'.T_('No %s comments match the keyword [%s].').'</p>', '<strong>'.$status.'</strong>', htmlspecialchars($keyword) );
 		}
 		else
 		{ // There are affected comment witch corresponding status, but current user has no permission
@@ -437,7 +437,7 @@ function echo_affected_comments( $affected_comments, $status, $keyword, $noperms
 		echo '<td>';
 		disp_url( $Comment->get_author_url(), 50 );
 		echo '</td>';
-		echo '<td>'.strmaxlen(strip_tags( $Comment->get_content( 'raw_text' ) ), 71).'</td>';
+		echo '<td>'.excerpt( $Comment->get_content( 'raw_text' ), 71 ).'</td>';
 		// no permission check, because affected_comments contains current user editable comments
 		echo '<td class="shrinkwrap">'.action_icon( T_('Edit...'), 'edit', '?ctrl=comments&amp;action=edit&amp;comment_ID='.$Comment->ID ).'</td>';
 		echo '</tr>';
@@ -505,8 +505,9 @@ function antispam_block_request()
 		    $Domain = & $DomainCache->get_by_name( $user_domain, false, false ) &&
 		    $Domain->get( 'status' ) == 'blocked' )
 		{ // The request from this domain must be blocked
-			debug_die( 'This request has been blocked.', array(
-				'debug_info' => sprintf( 'A request from \'%s\' domain was blocked because of this domain is blocked.', $user_domain ) ) );
+			$debug_message = sprintf( 'A request from \'%s\' domain was blocked because of this domain is blocked.', $user_domain );
+			syslog_insert( $debug_message, 'warning' );
+			debug_die( 'This request has been blocked.', array( 'debug_info' => $debug_message ) );
 		}
 
 		load_funcs('sessions/model/_hitlog.funcs.php');
@@ -515,8 +516,9 @@ function antispam_block_request()
 		    $Domain = & get_Domain_by_url( $initial_referer ) &&
 		    $Domain->get( 'status' ) == 'blocked' )
 		{ // The request from this domain must be blocked
-			debug_die( 'This request has been blocked.', array(
-				'debug_info' => sprintf( 'A request from \'%s\' initial referer was blocked because of a blocked domain.', $initial_referer ) ) );
+			$debug_message = sprintf( 'A request from \'%s\' initial referer was blocked because of a blocked domain.', $initial_referer );
+			syslog_insert( $debug_message, 'warning' );
+			debug_die( 'This request has been blocked.', array( 'debug_info' => $debug_message ) );
 		}
 	}
 
@@ -562,8 +564,9 @@ function antispam_block_by_ip()
 			SET aipr_block_count = aipr_block_count + 1
 			WHERE aipr_ID = '.$DB->quote( $ip_range_ID ) );
 
-		debug_die( 'This request has been blocked.', array(
-			'debug_info' => sprintf( 'A request with ( %s ) ip addresses was blocked because of a blocked IP range ID#%s.', implode( ', ', $request_ip_list ), $ip_range_ID ) ) );
+		$debug_message = sprintf( 'A request with ( %s ) ip addresses was blocked because of a blocked IP range ID#%s.', implode( ', ', $request_ip_list ), $ip_range_ID );
+		syslog_insert( $debug_message, 'warning' );
+		debug_die( 'This request has been blocked.', array( 'debug_info' => $debug_message ) );
 	}
 }
 
@@ -586,8 +589,9 @@ function antispam_block_by_country( $country_ID, $assert = true )
 	{ // The country exists in the database and has blocked status
 		if( $assert )
 		{ // block the request
-			debug_die( 'This request has been blocked.', array(
-				'debug_info' => sprintf( 'A request from \'%s\' was blocked because of this country is blocked.', $Country->get_name() ) ) );
+			$debug_message = sprintf( 'A request from \'%s\' was blocked because of this country is blocked.', $Country->get_name() );
+			syslog_insert( $debug_message, 'warning' );
+			debug_die( 'This request has been blocked.', array( 'debug_info' => $debug_message ) );
 		}
 		// Update the number of requests from blocked countries
 		$DB->query( 'UPDATE T_regional__country
@@ -604,9 +608,10 @@ function antispam_block_by_country( $country_ID, $assert = true )
  * Check if we can move current user to suspect group
  *
  * @param integer|NULL User ID, NULL = $current_User
+ * @param boolean TRUE to check if user is in trust group
  * @return boolean TRUE if current user can be moved
  */
-function antispam_suspect_check( $user_ID = NULL )
+function antispam_suspect_check( $user_ID = NULL, $check_trust_group = true )
 {
 	global $Settings;
 
@@ -638,13 +643,16 @@ function antispam_suspect_check( $user_ID = NULL )
 		return false;
 	}
 
-	$antispam_trust_groups = $Settings->get('antispam_trust_groups');
-	if( !empty( $antispam_trust_groups ) )
-	{
-		$antispam_trust_groups = explode( ',', $antispam_trust_groups );
-		if( in_array( $User->grp_ID, $antispam_trust_groups ) )
-		{ // Current User has group which cannot be moved to suspicious users
-			return false;
+	if( $check_trust_group )
+	{ // Check if user is in trust group
+		$antispam_trust_groups = $Settings->get('antispam_trust_groups');
+		if( !empty( $antispam_trust_groups ) )
+		{
+			$antispam_trust_groups = explode( ',', $antispam_trust_groups );
+			if( in_array( $User->grp_ID, $antispam_trust_groups ) )
+			{ // Current User has group which cannot be moved to suspicious users
+				return false;
+			}
 		}
 	}
 
@@ -657,12 +665,25 @@ function antispam_suspect_check( $user_ID = NULL )
  * Move user to suspect group by IP address
  *
  * @param string IP address
+ * @param integer|NULL User ID, NULL = $current_User
+ * @param boolean TRUE to check if user is in trust group
  */
-function antispam_suspect_user_by_IP( $IP_address = '' )
+function antispam_suspect_user_by_IP( $IP_address = '', $user_ID = NULL, $check_trust_group = true )
 {
-	global $DB, $Settings, $current_User;
+	global $DB, $Settings;
 
-	if( !antispam_suspect_check() )
+	if( empty( $user_ID ) )
+	{ // If user_ID was not set, use the current_User
+		global $current_User;
+		$User = $current_User;
+	}
+	else
+	{ // get User
+		$UserCache = & get_UserCache();
+		$User = $UserCache->get_by_ID( $user_ID, false, false );
+	}
+
+	if( !antispam_suspect_check( $user_ID, $check_trust_group ) )
 	{ // Current user cannot be moved to suspect group
 		return;
 	}
@@ -687,8 +708,8 @@ function antispam_suspect_user_by_IP( $IP_address = '' )
 		$GroupCache = & get_GroupCache();
 		if( $suspicious_Group = & $GroupCache->get_by_ID( (int)$Settings->get('antispam_suspicious_group'), false, false ) )
 		{ // Group exists in DB and we can change user's group
-			$current_User->set_Group( $suspicious_Group );
-			$current_User->dbupdate();
+			$User->set_Group( $suspicious_Group );
+			$User->dbupdate();
 		}
 	}
 }
@@ -699,12 +720,13 @@ function antispam_suspect_user_by_IP( $IP_address = '' )
  *
  * @param integer Country ID
  * @param integer|NULL User ID, NULL = $current_User
+ * @param boolean TRUE to check if user is in trust group
  */
-function antispam_suspect_user_by_country( $country_ID, $user_ID = NULL )
+function antispam_suspect_user_by_country( $country_ID, $user_ID = NULL, $check_trust_group = true )
 {
-	global $DB, $Settings, $current_User;
+	global $DB, $Settings;
 
-	if( !antispam_suspect_check( $user_ID ) )
+	if( !antispam_suspect_check( $user_ID, $check_trust_group ) )
 	{ // Current user cannot be moved to suspect group
 		return;
 	}

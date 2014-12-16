@@ -14,7 +14,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _tool.funcs.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -346,8 +346,8 @@ function tool_create_sample_messages( $num_loops, $num_messages, $num_words, $ma
 					}
 					$message_user_ID = $m % 2 == 0 ? $from_user_ID : $to_user_ID;
 					// Insert message
-					$DB->query( 'INSERT INTO T_messaging__message ( msg_author_user_ID , msg_datetime, msg_thread_ID, msg_text )
-						VALUES ( '.$DB->quote( $message_user_ID ).', '.$DB->quote( date( 'Y-m-d H:i:s' ) ).', '.$DB->quote( $thread_ID ).', '.$DB->quote( $msg_text ).' )' );
+					$DB->query( 'INSERT INTO T_messaging__message ( msg_author_user_ID , msg_datetime, msg_thread_ID, msg_text, msg_renderers )
+						VALUES ( '.$DB->quote( $message_user_ID ).', '.$DB->quote( date( 'Y-m-d H:i:s' ) ).', '.$DB->quote( $thread_ID ).', '.$DB->quote( $msg_text ).', \'default\' )' );
 					$count_messages++;
 
 					if( $count_messages % 100 == 0 )
@@ -382,8 +382,8 @@ function tool_create_sample_messages( $num_loops, $num_messages, $num_words, $ma
 				$msg_text .= generate_random_key( 8 ).' ';
 			}
 			// Insert message
-			$DB->query( 'INSERT INTO T_messaging__message ( msg_author_user_ID , msg_datetime, msg_thread_ID, msg_text )
-				VALUES ( '.$DB->quote( $users[ $user_number ] ).', '.$DB->quote( date( 'Y-m-d H:i:s' ) ).', '.$DB->quote( $thread_ID ).', '.$DB->quote( $msg_text ).' )' );
+			$DB->query( 'INSERT INTO T_messaging__message ( msg_author_user_ID , msg_datetime, msg_thread_ID, msg_text, msg_renderers )
+				VALUES ( '.$DB->quote( $users[ $user_number ] ).', '.$DB->quote( date( 'Y-m-d H:i:s' ) ).', '.$DB->quote( $thread_ID ).', '.$DB->quote( $msg_text ).', \'default\' )' );
 			$count_messages++;
 			$user_number++;
 			if( $user_number == count( $users ) || $user_number == $max_users - 1 )

@@ -21,7 +21,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _campaigns.view.php 7825 2014-12-16 16:32:09Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -40,7 +40,7 @@ $count_SQL->FROM( 'T_email__campaign' );
 
 $Results = new Results( $SQL->get(), 'emcmp_', 'D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 
-$Results->title = T_('Email campaigns');
+$Results->title = T_('Email campaigns').get_manual_link( 'email-campaigns' );
 
 if( $current_User->check_perm( 'emails', 'edit' ) )
 { // User must has a permission to edit emails
@@ -67,9 +67,9 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Name'),
 		'order' => 'ecmp_name',
-		'td' => '$ecmp_name$',
+		'td' => '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$ecmp_ID$"><b>$ecmp_name$</b></a>',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'shrinkwrap',
+		'td_class' => 'nowrap',
 	);
 
 $Results->cols[] = array(

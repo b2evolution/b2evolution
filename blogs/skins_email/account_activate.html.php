@@ -8,7 +8,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
- * @version $Id$
+ * @version $Id: account_activate.html.php 7639 2014-11-13 15:07:37Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -37,35 +37,35 @@ $params = array_merge( array(
 		'already_received_messages' => '',
 	), $params );
 
-$baseurl_link = '<a href="'.$baseurl.'">'.$Settings->get( 'notification_short_name' ).'</a>';
+$baseurl_link = '<a href="'.$baseurl.'"'.emailskin_style( '.a' ).'>'.$Settings->get( 'notification_short_name' ).'</a>';
 
 switch( $params['status'] )
 {
 	case 'new':
-		echo '<p>'.sprintf( T_( 'You have recently registered a new account on %s .' ), $baseurl_link ).'</p>';
-		echo '<p><b class="important">'.T_( 'You must activate this account by clicking below in order to be able to use all the site features.' ).'</b></p>';
+		echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( 'You have recently registered a new account on %s .' ), $baseurl_link ).'</p>';
+		echo '<p'.emailskin_style( '.p' ).'><b'.emailskin_style( '.important' ).'>'.T_( 'You must activate this account by clicking below in order to be able to use all the site features.' ).'</b></p>';
 		$activation_text = T_( 'Activate NOW' );
 		break;
 	case 'emailchanged':
-		echo '<p>'.sprintf( T_( 'You have recently changed the email address associated with your account on %s .' ), $baseurl_link ).'</p>';
-		echo '<p><b class="important">'.T_( 'You must reactivate this account by clicking below in order to continue to use all the site features.' ).'</b></p>';
+		echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( 'You have recently changed the email address associated with your account on %s .' ), $baseurl_link ).'</p>';
+		echo '<p'.emailskin_style( '.p' ).'><b'.emailskin_style( '.important' ).'>'.T_( 'You must reactivate this account by clicking below in order to continue to use all the site features.' ).'</b></p>';
 		$activation_text = T_( 'Reactivate NOW' );
 		break;
 	case 'deactivated':
-		echo '<p>'.sprintf( T_( 'Your account on %s needs to be reactivated.' ), $baseurl_link ).'</p>';
-		echo '<p><b class="important">'.T_( 'You must reactivate this account by clicking below in order to continue to use all the site features.' ).'</b></p>';
+		echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( 'Your account on %s needs to be reactivated.' ), $baseurl_link ).'</p>';
+		echo '<p'.emailskin_style( '.p' ).'><b'.emailskin_style( '.important' ).'>'.T_( 'You must reactivate this account by clicking below in order to continue to use all the site features.' ).'</b></p>';
 		$activation_text = T_( 'Reactivate NOW' );
 		break;
 	default:
-		echo '<p>'.sprintf( T_( 'Someone -- presumably you -- has registered an account on %s with your email address.' ), $baseurl_link ).'</p>';
-		echo '<p><b class="important">'.T_( 'You must activate this account by clicking below in order to be able to use all the site features.' ).'</b></p>';
+		echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( 'Someone -- presumably you -- has registered an account on %s with your email address.' ), $baseurl_link ).'</p>';
+		echo '<p'.emailskin_style( '.p' ).'><b'.emailskin_style( '.important' ).'>'.T_( 'You must activate this account by clicking below in order to be able to use all the site features.' ).'</b></p>';
 		$activation_text = T_( 'Activate NOW' );
 		break;
 }
 echo "\n";
 
-echo '<p>'.T_('Your login is: $login$')."</p>\n";
-echo '<p>'.T_('Your email is: $email$')."</p>\n";
+echo '<p'.emailskin_style( '.p' ).'>'.T_('Your login is: $login$')."</p>\n";
+echo '<p'.emailskin_style( '.p' ).'>'.T_('Your email is: $email$')."</p>\n";
 
 if( $Settings->get( 'validation_process' ) == 'easy' )
 { // ---- EASY activation ---- //
@@ -73,12 +73,12 @@ if( $Settings->get( 'validation_process' ) == 'easy' )
 		.'&userID=$user_ID$'
 		.'&reminderKey='.$params['reminder_key'];
 
-	echo '<div class="buttons">'."\n".get_link_tag( $activation_url, $activation_text, 'button_green' )."</div>\n";
+	echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n".get_link_tag( $activation_url, $activation_text, 'div.buttons a+a.button_green' )."</div>\n";
 
 	if( !empty( $params['already_received_messages'] ) )
 	{ // add already received message list to email body
-		echo '<p>'.T_( 'You have received private messages in the following conversations, but your account must be activated before you can read them:' )."</p>\n";
-		echo '<p>'.$params['already_received_messages']."</p>\n";
+		echo '<p'.emailskin_style( '.p' ).'>'.T_( 'You have received private messages in the following conversations, but your account must be activated before you can read them:' )."</p>\n";
+		echo '<p'.emailskin_style( '.p' ).'>'.$params['already_received_messages']."</p>\n";
 	}
 }
 else
@@ -88,18 +88,18 @@ else
 		.'&reqID='.$params['request_id']
 		.'&sessID='.$Session->ID; // used to detect cookie problems
 
-	echo '<div class="buttons">'."\n".get_link_tag( $activation_url, $activation_text, 'button_green' )."\n</div>\n";
+	echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n".get_link_tag( $activation_url, $activation_text, 'div.buttons a+a.button_green' )."\n</div>\n";
 
-	echo '<p>'.T_('If this does not work, please copy/paste that link into the address bar of your browser.')."</p>\n";
+	echo '<p'.emailskin_style( '.p' ).'>'.T_('If this does not work, please copy/paste that link into the address bar of your browser.')."</p>\n";
 
-	echo '<p>'.sprintf( T_('We also recommend that you add %s to your contacts in order to make sure you will receive future notifications, especially when someone sends you a private message.'), $Settings->get( 'notification_sender_email' ) )."</p>\n";
+	echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_('We also recommend that you add %s to your contacts in order to make sure you will receive future notifications, especially when someone sends you a private message.'), $Settings->get( 'notification_sender_email' ) )."</p>\n";
 
-	echo '<p class="note">'.T_('Please note:').' '.T_('For security reasons the link is only valid for your current session (by means of your session cookie).')."</p>\n";
+	echo '<p'.emailskin_style( '.p+.note' ).'>'.T_('Please note:').' '.T_('For security reasons the link is only valid for your current session (by means of your session cookie).')."</p>\n";
 }
 
 // Footer vars:
 $params['unsubscribe_text'] = T_( 'If you don\'t want to receive notifications to activate your account any more, click here:' )
-			.' <a href="'.$htsrv_url.'quick_unsubscribe.php?type=account_activation&user_ID=$user_ID$&key=$unsubscribe_key$">'
+			.' <a href="'.$htsrv_url.'quick_unsubscribe.php?type=account_activation&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
 			.T_('instant unsubscribe').'</a>.';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------

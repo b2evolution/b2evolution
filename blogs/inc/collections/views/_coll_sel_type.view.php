@@ -13,11 +13,11 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _coll_sel_type.view.php 6134 2014-03-08 07:48:07Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-echo '<h2>'.T_('What kind of blog would you like to create?').get_manual_link('collection-type').'</h2>';
+echo '<h2>'.T_('What kind of collection would you like to create?').get_manual_link('collection-type').'</h2>';
 
 echo '<table class="coll_kind">';
 
@@ -41,6 +41,6 @@ else
 
 echo '</table>';
 
-echo '<p>'.T_('Your selection here will pre-configure your blog in order to optimize it for a particular use. Nothing is final though. You can change all the settings at any time and any kind of blog can be transformed into any other at any time.').'</p>';
+echo '<p>'.T_('Your selection here will pre-configure your collection in order to optimize it for a particular use. Nothing is final though. You can change all the settings at any time and any kind of collection can be transformed into any other at any time.').'</p>';
 
 ?>

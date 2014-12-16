@@ -27,7 +27,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id$
+ * @version $Id: _translation.form.php 7044 2014-07-02 08:55:10Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -53,7 +53,7 @@ $Form->begin_form( 'fform', $creating ?  T_('Add new translated string') : T_('E
 	$Form->add_crumb( 'translation' );
 	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',itst_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 
-	$Form->info( T_('Original string'), evo_htmlspecialchars( $edited_String->iost_string ) );
+	$Form->info( T_('Original string'), htmlspecialchars( $edited_String->iost_string ) );
 
 	$Form->info( T_('Locale'), $edited_String->itst_locale );
 

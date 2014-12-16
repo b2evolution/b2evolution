@@ -27,6 +27,9 @@ a:hover {
 	color: #fff;
 	text-decoration: underline;
 }
+img.loadimg {
+	background-image: url(../../rsc/img/ajax-loader/555.gif);
+}
 
 .action_messages a {
 	color: #00F;
@@ -134,9 +137,12 @@ img.no_nav, span.no_nav
 	clear: both;
 }
 div.image_block img {
-	background: #fff;
+	background-color: #fff;
 	padding: 5px;
 	border: 1px solid #555;
+}
+div.image_block img.loadimg {
+	background-image: url(../../rsc/img/ajax-loader/fff.gif);
 }
 .bDetails {
 	width: 80%;
@@ -290,10 +296,18 @@ div.tabs div.selected a {
 	border-bottom-color: #666;
 }
 
+.search_title {
+	color: #EEE;
+}
+
 .form_add_contacts .controls {
 	padding-left: 0;
 }
 
 .bImages .flowplayer_block, .bImages .videojs_block, .bImages .mediajs_block {
 	padding: 0 12px;
+}
+
+span.loader_img.loader_ajax_form {
+	background-image: url(../../rsc/img/ajax-loader/666.gif);
 }

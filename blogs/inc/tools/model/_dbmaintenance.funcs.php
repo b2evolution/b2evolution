@@ -14,7 +14,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _dbmaintenance.funcs.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -27,6 +27,32 @@ function dbm_delete_itemprecache()
 	global $DB, $Messages;
 
 	$DB->query('DELETE FROM T_items__prerendering WHERE 1=1');
+
+	$Messages->add( sprintf( T_('Removed %d cached entries.'), $DB->rows_affected ), 'success' );
+}
+
+
+/**
+ * Clear pre-renderered comment cache (DB)
+ */
+function dbm_delete_commentprecache()
+{
+	global $DB, $Messages;
+
+	$DB->query('DELETE FROM T_comments__prerendering WHERE 1=1');
+
+	$Messages->add( sprintf( T_('Removed %d cached entries.'), $DB->rows_affected ), 'success' );
+}
+
+
+/**
+ * Clear pre-renderered message cache (DB)
+ */
+function dbm_delete_messageprecache()
+{
+	global $DB, $Messages;
+
+	$DB->query('DELETE FROM T_messaging__prerendering WHERE 1=1');
 
 	$Messages->add( sprintf( T_('Removed %d cached entries.'), $DB->rows_affected ), 'success' );
 }

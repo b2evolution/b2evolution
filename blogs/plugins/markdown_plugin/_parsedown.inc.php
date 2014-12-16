@@ -53,6 +53,7 @@ class Parsedown
 	public $parse_links = true;
 	public $parse_images = true;
 	public $parse_font_styles = true;
+	public $min_h_level = 1;
 	
 	# 
 	# Public Methods 
@@ -509,13 +510,21 @@ class Parsedown
 					break;
 
 				case 'h.':
-					
-					$text = $this->parse_inline_elements($element['text']);
-					
+					$text = $this->parse_inline_elements( $element['text'] );
+
+					if( $this->min_h_level > 1 && $this->min_h_level <= 6 )
+					{ // Restrict by minimum heading level
+						$element['level'] += $this->min_h_level - 1;
+						if( $element['level'] > 6 )
+						{ // Max level is 6
+							$element['level'] = 6;
+						}
+					}
+
 					$markup .= '<h'.$element['level'].'>'.$text.'</h'.$element['level'].'>'."\n";
-					
+
 					break;
-				
+
 				case 'hr':
 					
 					$markup .= '<hr />'."\n";

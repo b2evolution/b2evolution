@@ -10,7 +10,7 @@
  * @package evoskins
  * @subpackage photoblog
  *
- * @version $Id$
+ * @version $Id: index.main.php 7115 2014-07-14 14:08:25Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -22,8 +22,6 @@ if( version_compare( $app_version, '3.0' ) < 0 )
 // This is the main template; it may be used to display very different things.
 // Do inits depending on current $disp:
 skin_init( $disp );
-
-require_js( 'functions.js', 'blog' );	// for opening popup window (comments)
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php', array(

@@ -41,7 +41,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: files.ctrl.php 7537 2014-10-28 08:33:05Z yura $
+ * @version $Id: files.ctrl.php 7808 2014-12-12 11:45:53Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -70,7 +70,6 @@ $AdminUI->set_path( 'files', 'browse' );
 
 // 1 when AJAX request, E.g. when popup is used to link a file to item/comment
 param( 'ajax_request', 'integer', 0, true );
-
 
 // INIT params:
 if( param( 'root_and_path', 'string', '', false ) /* not memorized (default) */ && strpos( $root_and_path, '::' ) )
@@ -170,11 +169,11 @@ $fm_FileRoot = NULL;
 
 $FileRootCache = & get_FileRootCache();
 
-$available_Roots = $FileRootCache->get_available_FileRoots();
+$available_Roots = $FileRootCache->get_available_FileRoots( get_param( 'root' ) );
 
-if( ! empty($root) )
+if( ! empty( $root ) )
 { // We have requested a root folder by string:
-	$fm_FileRoot = & $FileRootCache->get_by_ID($root, true);
+	$fm_FileRoot = & $FileRootCache->get_by_ID( $root, true );
 
 	if( ! $fm_FileRoot || ! isset( $available_Roots[$fm_FileRoot->ID] ) || ! $current_User->check_perm( 'files', 'view', false, $fm_FileRoot ) )
 	{ // Root not found or not in list of available ones
@@ -300,6 +299,7 @@ if( $fm_FileRoot )
 	}
 }
 
+
 if( ! $ajax_request )
 { // Don't display tabs on AJAX request
 	file_controller_build_tabs();
@@ -337,7 +337,7 @@ $Debuglog->add( 'path: '.var_export( $path, true ), 'files' );
  *
  * @global array
  */
-$fm_selected = param( 'fm_selected', 'array/string', array(), true );
+$fm_selected = param( 'fm_selected', 'array:string', array(), true );
 $Debuglog->add( count($fm_selected).' selected files/directories', 'files' );
 /**
  * The selected files (must be within current fileroot)
@@ -416,6 +416,7 @@ switch( $action )
 		if( $error_dirname = validate_dirname( $create_name ) )
 		{ // Not valid dirname
 			$Messages->add( $error_dirname, 'error' );
+			syslog_insert( sprintf( 'Invalid name is detected for folder %s', '<b>'.$create_name.'</b>' ), 'warning', 'file' );
 			break;
 		}
 
@@ -477,6 +478,7 @@ switch( $action )
 		if( $error_filename = validate_filename( $create_name, $current_User->check_perm( 'files', 'all' ) ) )
 		{ // Not valid filename or extension
 			$Messages->add( $error_filename, 'error' );
+			syslog_insert( sprintf( 'The creating file %s has an unrecognized extension', '<b>'.$create_name.'</b>' ), 'warning', 'file' );
 			break;
 		}
 
@@ -715,7 +717,7 @@ switch( $action )
 		}
 
 		param( 'confirmed', 'integer', 0 );
-		param( 'new_names', 'array/string', array() );
+		param( 'new_names', 'array:string', array() );
 
 		// Check params for each file to rename:
 		while( $loop_src_File = & $selected_Filelist->get_next() )
@@ -804,9 +806,21 @@ switch( $action )
 
 		$selected_Filelist->restart();
 		if( $confirmed )
-		{ // Unlink files:
+		{ // Delete files, It is possible only file has no links:
+			$selected_Filelist->load_meta();
 			while( $l_File = & $selected_Filelist->get_next() )
 			{
+				// Check if there are delete restrictions on this file:
+				$restriction_Messages = $l_File->check_relations( 'delete_restrictions', array(), true );
+
+				if( $restriction_Messages->count() )
+				{ // There are restrictions:
+					$Messages->add( $l_File->get_prefixed_name().': '.T_('cannot be deleted because of the following relations')
+						.$restriction_Messages->display( NULL, NULL, false, false ) );
+					// Skip this file
+					continue;
+				}
+
 				if( $l_File->unlink() )
 				{
 					$Messages->add( sprintf( ( $l_File->is_dir() ? T_('The directory &laquo;%s&raquo; has been deleted.')
@@ -820,8 +834,9 @@ switch( $action )
 				}
 			}
 			$action = 'list';
+			$redirect_to = param( 'redirect_to', 'url', NULL );
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( regenerate_url( '', '', '', '&' ), 303 ); // Will EXIT
+			header_redirect( empty( $redirect_to ) ? regenerate_url( '', '', '', '&' ) : $redirect_to, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		else
@@ -1203,7 +1218,7 @@ switch( $action )
 		// Forget selected files
 		if( $files_count > 1 ) $fm_selected = NULL;
 
-		$Messages->add( $LinkOwner->translate( 'Selected files have been linked to owner.' ), 'success' );
+		$Messages->add( $LinkOwner->translate( 'Selected files have been linked to xxx.' ), 'success' );
 
 		// In case the mode had been closed, reopen it:
 		$fm_mode = 'link_object';
@@ -1211,7 +1226,7 @@ switch( $action )
 		// REDIRECT / EXIT
 		if( $action == 'link_inpost' )
 		{
-			header_redirect( $admin_url.'?ctrl=links&link_type='.$LinkOwner->type.'&action=edit_links&mode=iframe&link_object_ID='.$LinkOwner->get_ID() );
+			header_redirect( $admin_url.'?ctrl=links&link_type='.$LinkOwner->type.'&action=edit_links&mode=iframe&link_object_ID='.$LinkOwner->get_ID().'&iframe_name='.$iframe_name );
 		}
 		else
 		{
@@ -1242,9 +1257,9 @@ switch( $action )
 		}
 
 
-		param( 'perms', 'array/integer', array() );
+		param( 'perms', 'array:integer', array() );
 		param( 'edit_perms_default' ); // default value when multiple files are selected
-		param( 'use_default_perms', 'array/string', array() ); // array of file IDs that should be set to default
+		param( 'use_default_perms', 'array:string', array() ); // array of file IDs that should be set to default
 
 		if( count( $use_default_perms ) && $edit_perms_default === '' )
 		{
@@ -1356,7 +1371,7 @@ switch( $fm_mode )
 		}
 
 		// Get the source list
-		if( $fm_sources = param( 'fm_sources', 'array/string', array(), true ) )
+		if( $fm_sources = param( 'fm_sources', 'array:string', array(), true ) )
 		{
 			$fm_sources_root = param( 'fm_sources_root', 'string', '', true );
 
@@ -1401,8 +1416,8 @@ switch( $fm_mode )
 		}
 
 		param( 'confirm', 'integer', 0 );
-		param( 'new_names', 'array/string', array() );
-		param( 'overwrite', 'array/integer', array() );
+		param( 'new_names', 'array:string', array() );
+		param( 'overwrite', 'array:integer', array() );
 
 		// Check params for each file to rename:
 		while( $loop_src_File = & $fm_source_Filelist->get_next() )
@@ -1428,6 +1443,7 @@ switch( $fm_mode )
 				{ // Not a file name or not an allowed extension
 					$confirm = 0;
 					$Messages->add( $error_filename , 'error' );
+					syslog_insert( sprintf( 'The copied file %s has an unrecognized extension', '<b>'.$new_names[$loop_src_File->get_md5_ID()].'</b>' ), 'warning', 'file', $loop_src_File->ID );
 					continue;
 				}
 			}

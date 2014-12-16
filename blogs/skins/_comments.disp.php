@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // Default params:
 $params = array_merge( array(
-		'author_link_text' => 'login', // avatar | only_avatar | login | nickname | firstname | lastname | fullname | preferredname
+		'author_link_text' => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 		'display_comment_avatar' => true,
 	), $params );
 
@@ -89,7 +89,7 @@ while( $Comment = & $CommentList->get_next() )
 						'nofollow' => true,
 					) );
 			?>
-			<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
+			<?php $Comment->date() ?> @ <?php $Comment->time( '#short_time' ) ?>
 			<?php $Comment->edit_link( ' &middot; ' ) /* Link to backoffice for editing */ ?>
 			<?php $Comment->delete_link( ' &middot; ' ); /* Link to backoffice for deleting */ ?>
 		</div>

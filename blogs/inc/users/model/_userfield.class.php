@@ -48,12 +48,12 @@ class Userfield extends DataObject
 
 	var $type = '';
 	var $name = '';
-	var $options = NULL;
+	var $options;
 	var $required = 'optional';
 	var $duplicated = 'allowed';
 	var $order = '';
 	var $suggest = '1';
-	var $bubbletip = '';
+	var $bubbletip;
 
 	/**
 	 * Constructor
@@ -67,10 +67,6 @@ class Userfield extends DataObject
 
 		// Allow inseting specific IDs
 		$this->allow_ID_insert = true;
-
-		$this->delete_restrictions = array();
-
-		$this->delete_cascades = array();
 
 		if( $db_row != NULL )
 		{
@@ -198,17 +194,18 @@ class Userfield extends DataObject
 
 		// Options
 		if( param( 'ufdf_type', 'string' ) == 'list' )
-		{	// Save 'Options' only for Field type == 'Option list'
-			$ufdf_options = explode( "\n", param( 'ufdf_options', 'text' ) );
-			if( count( $ufdf_options ) < 2 )
-			{	// We don't want save an option list with one item
+		{ // Save 'Options' only for Field type == 'Option list'
+			$ufdf_options = param( 'ufdf_options', 'text' );
+			if( count( explode( "\n", $ufdf_options ) ) < 2 )
+			{ // We don't want save an option list with one item
 				param_error( 'ufdf_options', T_('Please enter at least 2 options on 2 different lines.') );
 			}
-			$this->set_from_Request( 'options' );
-		}
-		else
-		{ // The 'options' field must be set because it doesn't have a default value
-			$this->set( 'options', '' );
+			elseif( utf8_strlen( $ufdf_options ) > 255 )
+			{ // This may not happen in normal circumstances because the textarea max length is set to 255 chars
+				// This extra check is for the case if js is not enabled or someone would try to directly edit the html
+				param_error( 'ufdf_options', T_('"Options" field content can not be longer than 255 symbols.') );
+			}
+			$this->set( 'options', $ufdf_options );
 		}
 
 		// Required
@@ -234,7 +231,7 @@ class Userfield extends DataObject
 
 		// Bubbletip
 		param( 'ufdf_bubbletip', 'text', '' );
-		$this->set_from_Request( 'bubbletip' );
+		$this->set_from_Request( 'bubbletip', NULL, true );
 
 		return ! param_errors_detected();
 	}
@@ -247,8 +244,9 @@ class Userfield extends DataObject
 	 *
 	 * @param string parameter name
 	 * @param mixed parameter value
+	 * @param boolean true to set to NULL if empty string value
 	 */
-	function set( $parname, $parvalue )
+	function set( $parname, $parvalue, $make_null = false )
 	{
 		switch( $parname )
 		{
@@ -256,7 +254,7 @@ class Userfield extends DataObject
 			case 'name':
 			case 'required':
 			default:
-				$this->set_param( $parname, 'string', $parvalue );
+				$this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
 	}
 

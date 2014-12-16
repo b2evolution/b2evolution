@@ -79,6 +79,9 @@ form.fform fieldset {
 form.fform fieldset.fieldset fieldset {
 	border:transparent;
 }
+.fieldset_wrapper.folded div.fieldset {
+	display: none;
+}
 
 div.collection_select,
 div.collection_select form {
@@ -283,7 +286,7 @@ div.panelinfo p {
 	padding: 0;
 }
 div.panelblock {
-	border: 1px solid #ddd;
+	border: 1px solid #929292;
 	padding: 1ex;
 	margin: 1ex 1em;
 }

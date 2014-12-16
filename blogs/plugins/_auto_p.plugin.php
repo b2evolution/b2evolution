@@ -134,6 +134,20 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 
 
 	/**
+	 * Define here default message settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_msg_setting_definitions( & $params )
+	{
+		// set params to allow rendering for messages by default
+		$default_params = array_merge( $params, array( 'default_msg_rendering' => 'stealth' ) );
+		return parent::get_msg_setting_definitions( $default_params );
+	}
+
+
+	/**
 	 * - Split text into blocks, using $block_tags pattern.
 	 *
 	 * @param string Text

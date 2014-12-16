@@ -13,7 +13,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author efy-asimo: Attila Simo.
  *
- * @version $Id$
+ * @version $Id: _linkowner.class.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -71,7 +71,7 @@ class LinkOwner
 	 * function get_edit_url(); // get link owner edit url
 	 * function get_view_url(); // get link owner view url
 	 * function load_Links(); // load link owner all links
-	 * function add_link( $file_ID, $position, $order ); // add a new link to link owner
+	 * function add_link( $file_ID, $position, $order, $update_owner = true ); // add a new link to link owner
 	 * function load_Blog(); // set Link Owner Blog
 	 */
 
@@ -202,7 +202,7 @@ class LinkOwner
 		}
 
 		// Set links query. Note: Use inner join to make sure that result contains only existing files!
-		$SQL->SELECT( 'link_ID, link_ltype_ID, link_position, link_cmt_ID, link_itm_ID, file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash' );
+		$SQL->SELECT( 'link_ID, link_ltype_ID, link_position, link_cmt_ID, link_itm_ID, file_ID, file_type, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash' );
 		$SQL->FROM( 'T_links INNER JOIN T_files ON link_file_ID = file_ID' );
 		$SQL->WHERE( $this->get_where_condition() );
 		$SQL->ORDER_BY( $order_by );
@@ -288,15 +288,17 @@ class LinkOwner
 	 * @param string Restrict to files/images linked to a specific position.
 	 *               Position can be 'teaser'|'aftermore'|'inline'
 	 *               Use comma as separator
-	 * @param string order by
+	 * @param string File type: 'image', 'audio', 'other'; NULL - to select all
 	 * @return DataObjectList2 on success or NULL if no linked files found
 	 */
-	function get_attachment_FileList( $limit = 1000, $position = NULL, $order = 'link_ID' )
+	function get_attachment_FileList( $limit = 1000, $position = NULL, $file_type = NULL )
 	{
 		if( ! isset($GLOBALS['files_Module']) )
 		{
 			return NULL;
 		}
+
+		global $DB;
 
 		load_class( '_core/model/dataobjects/_dataobjectlist2.class.php', 'DataObjectList2' );
 
@@ -305,18 +307,21 @@ class LinkOwner
 		$FileList = new DataObjectList2( $FileCache ); // IN FUNC
 
 		$SQL = new SQL();
-		$SQL->SELECT( 'file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash, link_ID' );
+		$SQL->SELECT( 'file_ID, file_type, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash, link_ID' );
 		$SQL->FROM( 'T_links INNER JOIN T_files ON link_file_ID = file_ID' );
 		$SQL->WHERE( $this->get_where_condition() );
 		if( !empty($position) )
 		{
-			global $DB;
 			$position = explode( ',', $position );
 			$SQL->WHERE_and( 'link_position IN ( '.$DB->quote( $position ).' )' );
 		}
-		//$SQL->ORDER_BY( $order );
 		$SQL->ORDER_BY( 'link_order' );
 		$SQL->LIMIT( $limit );
+
+		if( ! is_null( $file_type ) )
+		{ // Restrict the Links by File type
+			$SQL->WHERE_and( 'file_type = '.$DB->quote( $file_type ).' OR file_type IS NULL' );
+		}
 
 		$FileList->sql = $SQL->get();
 

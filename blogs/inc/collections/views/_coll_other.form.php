@@ -16,7 +16,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _coll_other.form.php 6461 2014-04-14 11:13:25Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -52,6 +52,10 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('List of public blogs').get_manual_link( 'public-blogs-other' ) );
 	$Form->checkbox( 'blog_in_bloglist', $edited_Blog->get( 'in_bloglist' ), T_('Include in public blog list'), T_('Check this if you want this blog to be advertised in the list of all public blogs on this system.') );
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Tracking').get_manual_link( 'tracking-other' ) );
+	$Form->checkbox( 'track_unread_content', $edited_Blog->get_setting( 'track_unread_content' ), T_('Tracking of unread content'), T_('Check this if you want this blog to display special marks in case of unread posts and comments.') );
 $Form->end_fieldset();
 
 if( isset($GLOBALS['files_Module']) )

@@ -32,7 +32,7 @@
  * @author fplanque: Francois PLANQUE - {@link http://fplanque.net/}
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id$
+ * @version $Id: _test.plugin.php 7270 2014-09-04 06:05:10Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -158,13 +158,15 @@ class test_plugin extends Plugin
 			'single_user' => array(
 				'label' => 'A single user',
 				'type' => 'select_user',
+				'users_limit' => 5,
 				'allow_none' => true,
 				'default_value' => 0,
 				'note' => 'Allows chosing none or one user'
 			),
 			'sets' => array(
-				'type' => 'select_user',
 				'label' => 'Multiple users',
+				'type' => 'select_user',
+				'users_limit' => 10,
 				'min_count' => 0,
 				'max_count' => 3,
 				'multiple' => 'true',
@@ -379,10 +381,6 @@ class test_plugin extends Plugin
 	 */
 	function AdminDisplayEditorButton( & $params )
 	{
-		if( $params['edit_layout'] == 'simple' )
-		{ // this is the "simple" layout, we do nothing
-			return false;
-		}
 		?>
 		<input type="button" value="TEST" onclick="alert('Hi! This is the TEST plugin (AdminDisplayEditorButton)!');" />
 		<?php

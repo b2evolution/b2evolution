@@ -23,7 +23,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _coll_category_list.widget.php 7821 2014-12-16 10:17:27Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -129,6 +129,25 @@ class coll_category_list_Widget extends ComponentWidget
 					'label' => T_('Exclude categories'),
 					'note' => T_('A comma-separated list of category IDs that you want to exclude from the list.'),
 				),
+			'level' => array(
+					'type' => 'text',
+					'label' => T_('Recurse'),
+					'note' => T_('levels'),
+					'defaultvalue' => 5,
+					'size' => 2,
+				),
+			'mark_first_selected' => array(
+					'type' => 'checkbox',
+					'label' => T_('Show selected'),
+					'defaultvalue' => 1,
+					'note' => T_('Mark first selected cat (highest level selected cat)'),
+				),
+			'mark_children' => array(
+					'type' => 'checkbox',
+					'label' => '',
+					'defaultvalue' => 1,
+					'note' => T_('Mark descendants (children of first selected cat)'),
+				),
 
 			// Hidden, used by the item list sidebar in the backoffice.
 			'display_checkboxes' => array(
@@ -138,7 +157,28 @@ class coll_category_list_Widget extends ComponentWidget
 				),
 			), parent::get_param_definitions( $params ) );
 
+		if( isset( $r['allow_blockcache'] ) )
+		{ // Disable "allow blockcache" because this widget uses the selected items
+			$r['allow_blockcache']['defaultvalue'] = false;
+			$r['allow_blockcache']['disabled'] = 'disabled';
+			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
+		}
+
 		return $r;
+	}
+
+
+	/**
+	 * Prepare display params
+	 *
+	 * @param array MUST contain at least the basic display params
+	 */
+	function init_display( $params )
+	{
+		parent::init_display( $params );
+
+		// Disable "allow blockcache" because this widget uses the selected items
+		$this->disp_params['allow_blockcache'] = 0;
 	}
 
 
@@ -205,7 +245,7 @@ class coll_category_list_Widget extends ComponentWidget
 				$tmp_disp .= $this->disp_params['item_end'];
 			}
 
-			$r = $tmp_disp . $ChapterCache->recurse( $callbacks, $Blog->ID );
+			$r = $tmp_disp . $ChapterCache->recurse( $callbacks, $Blog->ID, NULL, 0, intval( $this->disp_params['level'] ) );
 
 			if( ! empty($r) )
 			{
@@ -337,19 +377,39 @@ class coll_category_list_Widget extends ComponentWidget
 	{
 		global $cat_array;
 
-		if( !isset($cat_array) )
+		if( ! isset( $cat_array ) )
 		{
 			$cat_array = array();
 		}
 
-		$exclude_cats = sanitize_id_list($this->disp_params['exclude_cats'], true);
+		$exclude_cats = sanitize_id_list( $this->disp_params['exclude_cats'], true );
 		if( in_array( $Chapter->ID, $exclude_cats ) )
 		{ // Cat ID is excluded, skip it
 			return;
 		}
 
-		if( in_array( $Chapter->ID, $cat_array ) )
-		{ // This category is in the current selection
+		// ID of the current selected category
+		$selected_cat = isset( $cat_array[0] ) ? $cat_array[0] : 0;
+
+		$first_parent_cat_ID = 0;
+		if( ! $this->disp_params['mark_children'] && // Don't find the first parent category because it is selected with children categories together
+		    $this->disp_params['mark_first_selected'] && $selected_cat )
+		{ // Try to find first/root parent category in order to select it because of widget setting is enabled
+			$ChapterCache = & get_ChapterCache();
+			$parent_Chapter = & $ChapterCache->get_by_ID( $selected_cat, false, false );
+			while( $parent_Chapter !== NULL )
+			{ // Go up to the first/root category
+				if( $parent_Chapter = & $parent_Chapter->get_parent_Chapter() )
+				{
+					$first_parent_cat_ID = $parent_Chapter->ID;
+				}
+			}
+		}
+
+		if( $Chapter->ID == $selected_cat || // Current category
+		    $Chapter->ID == $first_parent_cat_ID || // First parent category that should be selected because of widget setting
+		    ( $this->disp_params['mark_children'] && in_array( $Chapter->ID, $cat_array ) ) ) // Select all children of the current category because of widget setting
+		{ // This category should be selected
 			$start_tag = $this->disp_params['item_selected_start'];
 		}
 		else if( empty( $Chapter->children ) )

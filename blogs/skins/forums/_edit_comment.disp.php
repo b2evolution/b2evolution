@@ -13,7 +13,7 @@
  *
  * @package evoskins
  *
- * @version $Id: _edit_comment.disp.php 7644 2014-11-14 08:12:53Z yura $
+ * @version $Id: _edit_comment.disp.php 7645 2014-11-14 08:16:13Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -100,9 +100,14 @@ $Form->begin_form( 'inskin', '', $display_params );
 	$plugins_toolbar = ob_get_clean();
 
 	$Form->switch_template_parts( array(
-			'inputstart' => '<td class="row2 left">'.$plugins_toolbar,
+			'inputstart' => '<td class="row2 left comment_content">'.$plugins_toolbar,
 		) );
-	$Form->textarea_input( 'content', $comment_content, $disp_params['textarea_lines'], $disp_params['form_comment_text'], array( 'cols' => 60 , 'style' => 'width:99%', 'id' => $dummy_fields[ 'content' ] ) );
+	$Form->textarea_input( 'content', $comment_content, $disp_params['textarea_lines'], $disp_params['form_comment_text'], array(
+			'cols' => 60 ,
+			'style' => 'width:99%',
+			'class' => 'autocomplete_usernames',
+			'id' => $dummy_fields[ 'content' ]
+		) );
 
 	// set b2evoCanvas for plugins
 	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';

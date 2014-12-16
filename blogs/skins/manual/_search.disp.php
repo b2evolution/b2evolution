@@ -26,52 +26,13 @@ skin_widget( array(
 		'block_start' => '',
 		'block_end' => '',
 		'block_display_title' => false,
-		'disp_search_options' => 1,
+		'disp_search_options' => 0,
+		'search_class' => 'extended_search_form',
 		'use_search_disp' => 1,
 	) );
 // ---------------------------------- END OF COMMON LINKS ---------------------------------
 
-// Display message if no post:
-display_if_empty( array(
-				'before'      => '<p class="msg_nothing" style="margin: 2em 0">',
-				'after'       => '</p>',
-				'msg_empty'   => T_('Sorry, we could not find anything matching your request, please try to broaden your search.'),
-			) );
-
-
-// --------------------------------- START OF POSTS -------------------------------------
-if( isset( $MainList ) && $MainList->result_num_rows > 0 )
-{
-	// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
-	mainlist_page_links( array(
-			'block_start' => '<p class="center"><strong>',
-			'block_end' => '</strong></p>',
-			'prev_text' => '&lt;&lt;',
-			'next_text' => '&gt;&gt;',
-		) );
-	// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
-
-	echo '<ul class="posts_list" style="margin-top:1em">';
-	while( mainlist_get_item() )
-	{	// For each blog post, do everything below up to the closing curly brace "}"
-
-		// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
-		skin_include( '_item_list.inc.php', array(
-				'item_link_type' => 'permalink', // Use 'permalink' to display title of all posts as links (used especially for intro-cat posts)
-			) );
-		// ----------------------------END ITEM BLOCK  ----------------------------
-	}
-	echo '</ul>';
-
-	// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
-	mainlist_page_links( array(
-			'block_start' => '<p class="center"><strong>',
-			'block_end' => '</strong></p>',
-			'prev_text' => '&lt;&lt;',
-			'next_text' => '&gt;&gt;',
-		) );
-	// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
-
-} // ---------------------------------- END OF POSTS ------------------------------------
+// Display the search result
+search_result_block();
 
 ?>

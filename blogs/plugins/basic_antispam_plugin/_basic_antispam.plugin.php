@@ -27,7 +27,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER - {@link http://daniel.hahler.de/}
  *
- * @version $Id: _basic_antispam.plugin.php 7332 2014-09-29 11:31:08Z yura $
+ * @version $Id: _basic_antispam.plugin.php 7333 2014-09-29 11:33:05Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -184,6 +184,10 @@ class basic_antispam_plugin extends Plugin
 		if( $this->is_duplicate_comment( $params['Comment'] ) )
 		{
 			$this->msg( T_('The trackback seems to be a duplicate.'), 'error' );
+			if( $comment_Item = & $params['Comment']->get_Item() )
+			{
+				syslog_insert( 'The trackback seems to be a duplicate', 'info', 'item', $comment_Item->ID, 'plugin', $this->ID );
+			}
 		}
 	}
 
@@ -208,9 +212,15 @@ class basic_antispam_plugin extends Plugin
 	 */
 	function BeforeCommentFormInsert( & $params )
 	{
+		$comment_Item = & $params['Comment']->get_Item();
+
 		if( $this->is_duplicate_comment( $params['Comment'] ) )
 		{
 			$this->msg( T_('The comment seems to be a duplicate.'), 'error' );
+			if( $comment_Item )
+			{
+				syslog_insert( 'The comment seems to be a duplicate', 'info', 'item', $comment_Item->ID, 'plugin', $this->ID );
+			}
 		}
 
 		if( $this->Settings->get('block_common_spam') && preg_match_all( '~\[(link|url)=~', $params['Comment']->content, $m ) )
@@ -218,6 +228,10 @@ class basic_antispam_plugin extends Plugin
 			if( !empty($m[1]) && count($m[1]) > 1 )
 			{
 				$this->msg( T_('Your comment was rejected because it appeared to be spam.'), 'error' );
+				if( $comment_Item )
+				{
+					syslog_insert( 'The comment was rejected because it appeared to be spam', 'warning', 'item', $comment_Item->ID, 'plugin', $this->ID );
+				}
 			}
 		}
 	}

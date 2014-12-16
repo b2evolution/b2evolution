@@ -21,7 +21,7 @@
  *
  * @package admin
  *
- * @version $Id: _email_sent.view.php 349 2011-11-18 11:18:14Z yura $
+ * @version $Id: _email_return.view.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -72,7 +72,7 @@ if( !empty( $datestop ) )
 }
 if( !empty( $email ) )
 {	// Filter by email
-	$email = evo_strtolower( $email );
+	$email = utf8_strtolower( $email );
 	$SQL->WHERE_and( 'emret_address LIKE '.$DB->quote( $email ) );
 	$count_SQL->WHERE_and( 'emret_address LIKE '.$DB->quote( $email ) );
 }
@@ -141,7 +141,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Error'),
 		'order' => 'emret_errormsg',
-		'td' => '<a href="'.$admin_url.'?ctrl=email&amp;tab=return&amp;emret_ID=$emret_ID$">%evo_htmlspecialchars( #emret_errormsg# )%</a>',
+		'td' => '<a href="'.$admin_url.'?ctrl=email&amp;tab=return&amp;emret_ID=$emret_ID$">%htmlspecialchars( #emret_errormsg# )%</a>',
 	);
 
 $Results->cols[] = array(

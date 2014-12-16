@@ -15,12 +15,14 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _phpbb_replies.form.php 7044 2014-07-02 08:55:10Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $dispatcher, $flush_action;
+
+phpbb_display_steps( 6 );
 
 $Form = new Form();
 

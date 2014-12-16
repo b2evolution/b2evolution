@@ -28,7 +28,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _campaigns_text.form.php 7825 2014-12-16 16:32:09Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -46,9 +46,21 @@ $Form->hidden( 'ecmp_ID', $edited_EmailCampaign->ID );
 $Form->begin_fieldset( T_('Plain Text message') );
 	$Form->info( T_('Name'), $edited_EmailCampaign->get( 'name' ) );
 	$Form->info( T_('Email title'), $edited_EmailCampaign->get( 'email_title' ) );
-	$Form->info( T_('Date'), mysql2localedatetime_spans( $edited_EmailCampaign->get( 'date_ts' ), 'M-d' ) );
-	$Form->info( T_('Last sent date'), $edited_EmailCampaign->get( 'sent_ts' ) ? mysql2localedatetime_spans( $edited_EmailCampaign->get( 'sent_ts' ), 'M-d' ) : T_('No sent yet') );
-	$Form->textarea_input( 'ecmp_email_text', $edited_EmailCampaign->get( 'email_text' ), 20, T_('Plain Text Message'), array( 'required' => true ) );
+	$Form->info( T_('Campaign created'), mysql2localedatetime_spans( $edited_EmailCampaign->get( 'date_ts' ), 'M-d' ) );
+	$Form->info( T_('Last sent'), $edited_EmailCampaign->get( 'sent_ts' ) ? mysql2localedatetime_spans( $edited_EmailCampaign->get( 'sent_ts' ), 'M-d' ) : T_('Not sent yet') );
+
+	// Plain Text Message with button to extract text from html content
+	if( $current_User->check_perm( 'emails', 'edit' ) )
+	{ // User must has a permission to edit emails in order to extract text from html
+		$Form->output = false;
+		$button_to_extract = $Form->button( array( 'submit', 'actionArray[extract_html]', T_('Extract from HTML'), 'SaveButton' ) );
+		$Form->output = true;
+	}
+	else
+	{ // No permission
+		$button_to_extract = '';
+	}
+	$Form->textarea_input( 'ecmp_email_text', $edited_EmailCampaign->get( 'email_text' ), 20, T_('Plain Text Message'), array( 'required' => true, 'input_prefix' => $button_to_extract ) );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Newsletter recipients') );
@@ -60,7 +72,6 @@ $Form->end_fieldset();
 $buttons = array();
 if( $current_User->check_perm( 'emails', 'edit' ) )
 { // User must has a permission to edit emails
-	$buttons[] = array( 'submit', 'actionArray[extract_html]', T_('Extract from HTML'), 'SaveButton' );
 	$buttons[] = array( 'submit', 'actionArray[save]', T_('Save Plain Text message'), 'SaveButton' );
 }
 $Form->end_form( $buttons );

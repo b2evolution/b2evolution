@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _uiwidget.class.php 6972 2014-06-24 19:12:29Z yura $
+ * @version $Id: _uiwidget.class.php 7801 2014-12-11 10:27:12Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -398,13 +398,13 @@ class Table extends Widget
 		{
 			echo '<a class="filters_title" href="'.regenerate_url( 'action,target', 'action=expand_filter&target='.$option_name ).'"
 								onclick="return toggle_filter_area(\''.$option_name.'\');" >'
-						.get_icon( 'expand', 'imgtag', array( 'id' => 'clickimg_'.$option_name ) );
+						.get_icon( 'filters_show', 'imgtag', array( 'id' => 'clickimg_'.$option_name ) );
 		}
 		else
 		{
 			echo '<a class="filters_title" href="'.regenerate_url( 'action,target', 'action=collapse_filter&target='.$option_name ).'"
 								onclick="return toggle_filter_area(\''.$option_name.'\');" >'
-						.get_icon( 'collapse', 'imgtag', array( 'id' => 'clickimg_'.$option_name ) );
+						.get_icon( 'filters_hide', 'imgtag', array( 'id' => 'clickimg_'.$option_name ) );
 		}
 		echo $option_title.'</a>:';
 
@@ -479,11 +479,16 @@ class Table extends Widget
 			$submit_name = empty( $this->{$area_name}['submit'] ) ? 'colselect_submit' : $this->{$area_name}['submit'];
 			$this->Form->submit( array( $submit_name, $submit_title, 'filter' ) );
 
+			if( ! empty( $this->force_checkboxes_to_inline ) )
+			{ // Set this to TRUE in order to display all checkboxes before labels
+				$this->Form->force_checkboxes_to_inline = true;
+			}
+
 			$func = $this->{$area_name}['callback'];
 			$func( $this->Form );
 
 			if( $create_new_form )
-			{	// We do not already have a form surrounding the whole result list:
+			{ // We do not already have a form surrounding the whole result list:
 				$this->Form->end_form( '' );
 				unset( $this->Form );	// forget about this temporary form
 			}

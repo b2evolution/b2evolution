@@ -22,7 +22,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id$
+ * @version $Id: _adminUI.class.php 6134 2014-03-08 07:48:07Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -57,13 +57,13 @@ class AdminUI extends AdminUI_general
 		require_css( 'skins_adm/evo/rsc/css/style.css', true );
 
 		if ( $Hit->is_IE() )
-		{
+		{ // CSS for IE
 			require_css( 'admin_global_ie.css', 'rsc_url' );
 		}
-		// CSS for IE9
-		add_headline( '<!--[if IE 9 ]>' );
-		require_css( 'ie9.css', 'rsc_url' );
-		add_headline( '<![endif]-->' );
+		if( $Hit->is_IE( 9 ) )
+		{ // CSS for IE9
+			require_css( 'ie9.css', 'rsc_url' );
+		}
 
 		require_js( '#jquery#', 'rsc_url' );
 		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
@@ -78,17 +78,18 @@ class AdminUI extends AdminUI_general
 	 */
 	function get_body_top()
 	{
-		global $Messages;
+		global $Messages, $app_shortname, $app_version;
 
 		$r = '';
 
 		$r .= $this->get_page_head();
 
 		// Display MAIN menu:
-		$r .= $this->get_html_menu().'
-
-		<div id="panelbody" class="panelbody">
-		';
+		$r .= '<div id="mainmenu">'."\n".
+				$this->get_html_menu()."\n".
+				'<p class="center">'.$app_shortname.' v <strong>'.$app_version.'</strong></p>'."\n".
+			'</div>'."\n".
+			'<div id="panelbody" class="panelbody">'."\n";
 
 		$r .= '
 
@@ -131,10 +132,21 @@ class AdminUI extends AdminUI_general
 	 * @return string
 	 */
 	function get_page_head()
-    {
+	{
+		global $UserSettings, $current_User;
+
 		$r = '
 		<div id="header">
-			<h1>'.$this->get_title_for_titlearea().'</h1>
+			<h1>';
+		if( $UserSettings->get( 'show_breadcrumbs', $current_User->ID ) )
+		{
+			$r .= $this->breadcrumbpath_get_html( array( 'beforeText' => '' ) );
+		}
+		else
+		{
+			$r .= $this->get_title_for_titlearea();
+		}
+		$r .= '</h1>
 		</div>
 		';
 
@@ -153,10 +165,13 @@ class AdminUI extends AdminUI_general
 		{
 			case 'main':
 				// main level
-				global $app_shortname, $app_version;
-
 				$r = parent::get_template( $name, $depth );
-				$r['after'] = "</ul>\n<p class=\"center\">$app_shortname v <strong>$app_version</strong></p>\n</div>";
+				$r['before'] = '<ul>';
+				$r['after'] = '</ul>';
+				$r['_props'] = array(
+						'recurse'       => 'yes',
+						'recurse_level' => 2,
+					);
 				return $r;
 				break;
 
@@ -195,6 +210,22 @@ class AdminUI extends AdminUI_general
 				break;
 		}
 		debug_die( 'unknown color' );
+	}
+
+
+	/**
+	 * Display the start of a payload block
+	 *
+	 * Note: it is possible to display several payload blocks on a single page.
+	 *       The first block uses the "sub" template, the others "block".
+	 *
+	 * @see disp_payload_end()
+	 */
+	function disp_payload_begin( $params = array() )
+	{
+		parent::disp_payload_begin( array(
+				'display_menu2' => false,
+			) );
 	}
 
 

@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _itemcache.class.php 6134 2014-03-08 07:48:07Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -60,6 +60,20 @@ class ItemCache extends DataObjectCache
 	function ItemCache( $objType = 'Item', $dbtablename = 'T_items__item', $dbprefix = 'post_', $dbIDname = 'post_ID' )
 	{
 		parent::DataObjectCache( $objType, false, $dbtablename, $dbprefix, $dbIDname );
+	}
+
+
+	/**
+	 * Load the cache **extensively**
+	 */
+	function load_all()
+	{
+		if( $this->all_loaded )
+		{ // Already loaded
+			return false;
+		}
+
+		debug_die( 'Load all is not allowed for ItemCache!' );
 	}
 
 

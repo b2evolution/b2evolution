@@ -33,12 +33,21 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 {
 	global $DB, $test_install_all_features;
-	global $events_blog_ID;
+
+	// Handle all blog IDs which can go from function create_demo_contents()
+	global $blog_a_ID, $blog_b_ID, $blog_linkblog_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID;
+	$blog_a_ID = intval( $blog_a_ID );
+	$blog_b_ID = intval( $blog_b_ID );
+	$blog_linkblog_ID = intval( $blog_linkblog_ID );
+	$blog_photoblog_ID = intval( $blog_photoblog_ID );
+	$blog_forums_ID = intval( $blog_forums_ID );
+	$blog_manual_ID = intval( $blog_manual_ID );
+	$events_blog_ID = intval( $events_blog_ID );
 
 	$default_blog_param = 's:7:"blog_ID";s:0:"";';
-	if( $initial_install )
-	{	// In the case of initial install, we grab photos out of the photoblog (Blog #4)
-		$default_blog_param = 's:7:"blog_ID";s:1:"4";';
+	if( $initial_install && ! empty( $blog_photoblog_ID ) )
+	{ // In the case of initial install, we grab photos out of the photoblog (Blog #4)
+		$default_blog_param = 's:7:"blog_ID";s:1:"'.intval( $blog_photoblog_ID ).'";';
 	}
 
 	if( false )
@@ -132,7 +141,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		{ // Home page
 			$widgets_insert_sql_rows[] = '( '.$blog_id.', "Menu", 5, "core", "menu_link", "'.$DB->escape( serialize( array( 'link_type' => 'home' ) ) ).'" )';
 		}
-		if( $blog_id == 1 )
+		if( $blog_id == $blog_a_ID )
 		{ // Recent Posts
 			$widgets_insert_sql_rows[] = '( '.$blog_id.', "Menu", 10, "core", "menu_link", "'.$DB->escape( serialize( array( 'link_type' => 'recentposts', 'link_text' => T_('News') ) ) ).'" )';
 		}
@@ -172,7 +181,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		$DB->query( $widgets_insert_sql.implode( ', ', $widgets_insert_sql_rows ) );
 
 		/* Item Single */
-		if( ( $blog_id == 1 || ( !empty( $events_blog_ID ) && $blog_id == $events_blog_ID ) ) && $test_install_all_features )
+		if( ( $blog_id == $blog_a_ID || ( !empty( $events_blog_ID ) && $blog_id == $events_blog_ID ) ) && $test_install_all_features )
 		{
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code)
 								VALUES( '.$blog_id.', "Item Single", 1, "plugin", "evo_Gmaps")' );
@@ -206,12 +215,12 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 							VALUES( '.$blog_id.', "Sidebar", 10, "core", "user_login" )' );
 		}
-		if( ( !$initial_install || $blog_id != 5 ) && $kind != 'forum' )
+		if( ( !$initial_install || $blog_id != $blog_forums_ID ) && $kind != 'forum' )
 		{	// Don't install these Sidebar widgets for blog 'Forums'
 			$widgets_insert_sql = 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params ) VALUES
 				( '.$blog_id.', "Sidebar", 20, "core", "user_tools", "'.$DB->escape(serialize(array('title'=>''))).'" ),
 				( '.$blog_id.', "Sidebar", 30, "core", "coll_avatar", NULL )';
-			if( $blog_id > 1 )
+			if( $blog_id > $blog_a_ID )
 			{
 				$widgets_insert_sql .= ',
 				( '.$blog_id.', "Sidebar", 40, "plugin", "evo_Calr", NULL )';
@@ -224,7 +233,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 				( '.$blog_id.', "Sidebar", 90, "core", "coll_category_list", NULL )';
 			$DB->query( $widgets_insert_sql );
 
-			if( $blog_id == 3 )
+			if( $blog_id == $blog_linkblog_ID )
 			{ // Advertisements, Install only for blog #3 linkblog/infoblog
 				$advertisement_params = array(
 						'title' => 'Advertisement (Demo)',
@@ -242,15 +251,15 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 									VALUES( '.$blog_id.', "Sidebar", 100, "core", "coll_item_list", "'.$DB->escape( serialize( $advertisement_params ) ).'" )' );
 			}
 
-			if( $blog_id != 2 )
+			if( $blog_id != $blog_b_ID )
 			{
 				$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
 									VALUES( '.$blog_id.', "Sidebar", 110, "core", "coll_media_index", \'a:11:{s:5:"title";s:12:"Random photo";s:10:"thumb_size";s:11:"fit-160x120";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"1";s:8:"order_by";s:4:"RAND";s:9:"order_dir";s:3:"ASC";'.$default_blog_param.'s:11:"widget_name";s:12:"Random photo";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}\' )' );
 			}
-			if( $blog_id <= 2 )
+			if( ! empty( $blog_linkblog_ID ) && $blog_id <= $blog_b_ID )
 			{
 				$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
-									VALUES( '.$blog_id.', "Sidebar", 120, "core", "linkblog", "'.$DB->escape(serialize(array('blog_ID'=>3))).'" )' );
+									VALUES( '.$blog_id.', "Sidebar", 120, "core", "linkblog", "'.$DB->escape( serialize( array( 'blog_ID' => $blog_linkblog_ID ) ) ).'" )' );
 			}
 		}
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
@@ -261,7 +270,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		/* Sidebar 2 */
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 							VALUES( '.$blog_id.', "Sidebar 2", 1, "core", "coll_post_list" )' );
-		if( $blog_id == 2 )
+		if( $blog_id == $blog_b_ID )
 		{
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
 							VALUES( '.$blog_id.', "Sidebar 2", 5, "core", "coll_link_list", "'.$DB->escape( serialize( array( 'title'=>'Sidebar links', 'order_by'=>'RAND' ) ) ).'" )' );
@@ -297,7 +306,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 			( '.$blog_id.', "Mobile: Tools Menu", 30, "core", "msg_menu_link", "'.$DB->escape(serialize(array('link_type'=>'contacts', 'show_badge'=>0))).'" ),
 			( '.$blog_id.', "Mobile: Tools Menu", 50, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'logout'))).'" )';
 		if( $test_install_all_features )
-		{	// Add menu with User Directory
+		{ // Add menu with User Directory
 			$widgets_insert_sql .= ',
 			( '.$blog_id.', "Mobile: Tools Menu", 40, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'users'))).'" )';
 		}

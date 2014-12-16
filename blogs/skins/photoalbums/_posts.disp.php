@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage photoalbum
  *
- * @version $Id$
+ * @version $Id: _posts.disp.php 7733 2014-12-03 07:17:33Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -28,7 +28,7 @@ $params_no_content = array(
 if( ! is_logged_in() )
 { // fp> the following is kind of a hack. It's not really correct.
 	$url = get_login_url( 'no public ocntent' );
-	$params_no_content['msg_empty'] = '<p>This site has no public contents.</p><p><a href="'.$url.'">Log in now!</a></p>';
+	$params_no_content['msg_empty'] = '<p>'.T_('This site has no public contents.').'</p><p><a href="'.$url.'">'.T_('Log in now!').'</a></p>';
 }
 $list_is_empty = display_if_empty( $params_no_content );
 

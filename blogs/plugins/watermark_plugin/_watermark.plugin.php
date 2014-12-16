@@ -53,20 +53,21 @@ class watermark_plugin extends Plugin
 
 		return array(
 			'text' => array(
-					'label' => 'Image text',
+					'label' => T_('Image text'),
 					'size' => 70,
 					'defaultvalue' => '&copy; '.$ReqHost,
 					'note' => T_('The text to write on the image.'),
 				),
 			'font' => array(
-					'label' => 'Font file name',
-					'size' => 30,
+					'label' => T_('Font file name'),
+					'type' => 'select',
 					'defaultvalue' => '',
-					'note' => sprintf(T_('You can upload your own fonts to the plugin\'s font directory (%s), then use the filename here. By default "%s" is used.'),
-						rel_path_to_base($this->fonts_dir), rel_path_to_base($this->get_default_font())),
+					'options' => $this->get_font_files(),
+					'note' => sprintf( T_('You can upload your own fonts to the plugin\'s font directory (%s), then select the filename here. By default "%s" is used.'),
+						rel_path_to_base( $this->fonts_dir ), rel_path_to_base( $this->get_default_font() ) ),
 				),
 			'font_size' => array(
-					'label' => 'Font size',
+					'label' => T_('Font size'),
 					'type' => 'select',
 					'options' => array(6=>6,8=>8,10=>10,12=>12,14=>14,16=>16,18=>18,20=>20,22=>22,24=>24,
 							26=>26,28=>28,30=>30,32=>32,34=>34,36=>36,38=>38,40=>40,42=>42,44=>44,46=>46,
@@ -75,7 +76,7 @@ class watermark_plugin extends Plugin
 					'note' => '',
 				),
 			'min_dimension' => array(
-					'label' => 'Min dimension',
+					'label' => T_('Min dimension'),
 					'type' => 'integer',
 					'size' => 4,
 					'defaultvalue' => 400,
@@ -94,29 +95,30 @@ class watermark_plugin extends Plugin
 	{
 		$r = array(
 			'coll_text' => array(
-					'label' => 'Image text',
+					'label' => T_('Image text'),
 					'size' => 70,
-					'defaultvalue' => $this->Settings->get('text'),
+					'defaultvalue' => $this->Settings->get( 'text' ),
 					'note' => T_('The text to write on the image.'),
 				),
 			'coll_font' => array(
-					'label' => 'Font file name',
-					'size' => 30,
-					'defaultvalue' => $this->Settings->get('font'),
-					'note' => sprintf(T_('You can upload your own fonts to the plugin\'s font directory (%s), then use the filename here. By default "%s" is used.'),
-						rel_path_to_base($this->fonts_dir), rel_path_to_base($this->get_default_font())),
+					'label' => T_('Font file name'),
+					'type' => 'select',
+					'defaultvalue' => $this->Settings->get( 'font' ),
+					'options' => $this->get_font_files(),
+					'note' => sprintf( T_('You can upload your own fonts to the plugin\'s font directory (%s), then select the filename here. By default "%s" is used.'),
+						rel_path_to_base( $this->fonts_dir ), rel_path_to_base( $this->get_default_font() ) ),
 				),
 			'coll_font_size' => array(
-					'label' => 'Font size',
+					'label' => T_('Font size'),
 					'type' => 'select',
 					'options' => array(6=>6,8=>8,10=>10,12=>12,14=>14,16=>16,18=>18,20=>20,22=>22,24=>24,
 							26=>26,28=>28,30=>30,32=>32,34=>34,36=>36,38=>38,40=>40,42=>42,44=>44,46=>46,
 							48=>48,50=>50,52=>52,54=>54,56=>56,58=>58,60=>60,62=>62,64=>64,66=>66,68=>68),
-					'defaultvalue' => $this->Settings->get('font_size'),
+					'defaultvalue' => $this->Settings->get( 'font_size' ),
 					'note' => '',
 				),
 			'coll_min_dimension' => array(
-					'label' => 'Min dimension',
+					'label' => T_('Min dimension'),
 					'type' => 'integer',
 					'size' => 4,
 					'defaultvalue' => 400,
@@ -130,7 +132,7 @@ class watermark_plugin extends Plugin
 
 	function PluginSettingsUpdateAction()
 	{
-		$font = $this->Settings->get('font');
+		$font = $this->Settings->get( 'font' );
 
 		return $this->settings_update_action( $font );
 	}
@@ -140,7 +142,7 @@ class watermark_plugin extends Plugin
 	{
 		global $Blog;
 
-		$font = $this->get_coll_setting('coll_font', $Blog);
+		$font = $this->get_coll_setting( 'coll_font', $Blog );
 
 		return $this->settings_update_action( $font );
 	}
@@ -178,7 +180,7 @@ class watermark_plugin extends Plugin
 
 	function settings_update_action( $font = '' )
 	{
-		if( !empty($font) && !is_readable($this->fonts_dir.'/'.$font) )
+		if( ! empty( $font ) && ! is_readable( $this->fonts_dir.'/'.$font ) )
 		{
 			$this->msg( sprintf( T_('Unable to load font file: %s'), $this->fonts_dir.'/'.$font ), 'error' );
 			return false;
@@ -253,11 +255,11 @@ class watermark_plugin extends Plugin
 
 		if( !is_readable($font) )
 		{	// Font file not found
-			$this->debug_log( sprintf('Font file (%s) is not readable!', $font) );
+			$this->debug_log( sprintf( 'Font file (%s) is not readable!', $font ) );
 			return;
 		}
 
-		$text = evo_html_entity_decode( $text );
+		$text = html_entity_decode( $text );
 
 		// Text margins
 		$margin_left = 10;
@@ -306,6 +308,33 @@ class watermark_plugin extends Plugin
 	function AfterFileUpload( & $params )
 	{
 		return true;
+	}
+
+
+	/**
+	 * Get all font files from folder
+	 *
+	 * @return array Font files
+	 */
+	function get_font_files()
+	{
+		$fonts = array( '' => T_('Default') );
+
+		// Scan fonts folder
+		$files = scandir( $this->fonts_dir );
+
+		if( $files !== false )
+		{
+			foreach( $files as $file )
+			{
+				if( preg_match( '/\.ttf$/i', $file ) )
+				{ // Allow only ttf files
+					$fonts[ $file ] = $file;
+				}
+			}
+		}
+
+		return $fonts;
 	}
 }
 

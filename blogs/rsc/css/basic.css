@@ -35,6 +35,12 @@ img.flagtop {
 	vertical-align:top;
 	border:1px solid #000;
 }
+img.loadimg {
+	display: inline-block;
+	min-width: 64px;
+	min-height: 64px;
+	background: url(../img/ajax-loader/fff.gif) no-repeat center;
+}
 
 div.single_image_zone {
 	overflow: hidden;
@@ -127,8 +133,13 @@ img.avatar_above_login {
 	-webkit-border-radius: 2px 2px 0 0;
 	-khtml-border-radius-topleft: 2px; -khtml-border-radius-topright: 2px;
 	border-radius: 2px 2px 0 0;
+	margin-bottom: 2px;
 }
 
+.avatar_actions {
+	float: left;
+	line-height: 26px;
+}
 .avatar_main_frame {
 	background: #FFF;
 	border: 1px solid #CCC;
@@ -146,13 +157,47 @@ img.avatar_above_login {
 	-khtml-border-radius-topleft: 2px; -khtml-border-radius-bottomleft: 2px;
 	border-radius: 2px 0 0 2px;
 }
-.avatar_main_frame a.cboxElement {
-	display: table-cell;
+.avatar_main_frame > a:first-child {
+	float: left;
+	margin-right: 5px;
 }
-.avatar_main_frame div {
-	display: table-cell;
-	vertical-align: middle;
-	padding-left: 5px;
+.duplicated_avatars {
+	text-align: center;
+	max-width: 160px;
+}
+.avatar_main_frame .duplicated_avatars {
+	max-width: 320px;
+}
+.duplicated_avatars a.user img {
+	vertical-align: text-top;
+}
+#target_cropped_image {
+	float: left;
+	margin: 0 10px 10px 0;
+	box-shadow: 1px 1px 3px 0 rgba(0, 0, 0, 0.25);
+}
+.preview_cropped_images {
+	width: 128px;
+	text-align: center;
+}
+.preview_cropped_image {
+	display: inline-block;
+	overflow: hidden;
+	margin-bottom: 10px;
+	box-shadow: 1px 1px 3px 0 rgba(0, 0, 0, 0.25);
+}
+.preview_cropped_image.circle {
+	border-radius: 50%;
+}
+@media only screen and (max-width: 800px) {
+	.preview_cropped_images { display: none; }
+}
+.disp_avatar .preview_cropped_images {
+	width: auto;
+	text-align: left;
+}
+.disp_avatar .preview_cropped_image {
+	margin-right: 8px;
 }
 
 /*
@@ -360,22 +405,22 @@ ul.sf-menu li li li.sfHover ul {
 
 /*** arrows **/
 .sf-menu a.sf-with-ul {
-	padding-right: 	2.25em;
-	min-width:		1px; /* trigger IE7 hasLayout so spans position accurately */
+	padding-right: 2.25em;
+	min-width: 1px; /* trigger IE7 hasLayout so spans position accurately */
 }
 .sf-sub-indicator {
-	position:		absolute;
-	display:		block;
-	right:			.75em;
-	top:			4px;
-	width:			10px;
-	height:			10px;
-	text-indent: 	-999em;
-	overflow:		hidden;
-	background:		url('../img/superfish-arrows.png') no-repeat 0 -100px;
+	position: absolute;
+	display: block;
+	right: .75em;
+	top: 4px;
+	width: 10px;
+	height: 10px;
+	text-indent: -999em;
+	overflow: hidden;
+	background: url('../icons/icons_sprite.png') no-repeat -80px -256px;
 }
 li li a > .sf-sub-indicator {  /* give all except IE6 the correct values */
-	top:			6px;
+	top: 6px;
 }
 /* apply hovers to modern browsers */
 a:focus > .sf-sub-indicator,
@@ -383,30 +428,25 @@ a:hover > .sf-sub-indicator,
 a:active > .sf-sub-indicator,
 li:hover > a > .sf-sub-indicator,
 li.sfHover > a > .sf-sub-indicator {
-	background-position: -10px -100px; /* arrow hovers for modern browsers*/
+	background-position: -80px -256px; /* arrow hovers for modern browsers*/
 }
 
 /* point right for anchors in subs */
-.sf-menu ul .sf-sub-indicator { background-position:  -10px 0; }
-.sf-menu ul a > .sf-sub-indicator { background-position:  0 0; }
+.sf-menu ul .sf-sub-indicator { background-position:  -112px -256px; }
+.sf-menu ul a > .sf-sub-indicator { background-position:  -96px -256px; }
 /* apply hovers to modern browsers */
 .sf-menu ul a:focus > .sf-sub-indicator,
 .sf-menu ul a:hover > .sf-sub-indicator,
 .sf-menu ul a:active > .sf-sub-indicator,
 .sf-menu ul li:hover > a > .sf-sub-indicator,
 .sf-menu ul li.sfHover > a > .sf-sub-indicator {
-	background-position: -10px 0; /* arrow hovers for modern browsers*/
+	background-position: -112px -256px; /* arrow hovers for modern browsers*/
 }
 
 /*** shadows for all but IE6 ***/
 .sf-shadow ul {
-	background:	url('../img/superfish-shadow.png') no-repeat bottom right;
 	padding: 0;
-	-moz-border-radius-bottomleft: 17px;
-	-moz-border-radius-topright: 17px;
-	-webkit-border-top-right-radius: 17px;
-	-webkit-border-bottom-left-radius: 17px;
-	border-radius: 0 17px 0 17px;
+	box-shadow: 3px 4px 6px -2px rgba(0, 0, 0, 0.35);
 }
 .sf-shadow ul.sf-shadow-off {
 	background: transparent;
@@ -1008,6 +1048,105 @@ ul.jslog_error {
 	text-align: left;
 }
 
+/* b2evo alert window */
+.b2evo_alert {
+	width: 270px;
+	position: fixed;
+	right: 10px;
+	top: 40px;
+	background: #d64141;
+	border: 1px solid #FFF;
+	color: #FFF;
+	font-weight: bold;
+	padding: 5px;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-khtml-border-radius: 3px;
+	z-index: 11000;
+}
+
 .form-login-links {
 	padding: 0 1em;
+}
+
+/*
+ * Overlay screen (used for antispam on dashboard, for report/crop/delete user forms):
+ */
+#screen_mask{
+	position:fixed;
+	top: 0;
+	left: 0;
+	background: #000;
+	height: 100%;
+	width: 100%;
+	display:none;
+	z-index:9998;
+}
+#overlay_wrap{
+	position: fixed;
+	top: 27px;
+	left: 50%;
+	height: 95%;
+	z-index:9999;
+	visibility: hidden;
+}
+#overlay_layout{
+	position: relative;
+	left: -50%;
+	display: table;
+	width: 100%;
+	height: 100%;
+	visibility: hidden;
+}
+#overlay_page{
+	display:none;
+	visibility: visible;
+}
+#overlay_page.overlay_page_active, #overlay_page.overlay_page_active_transparent{
+	position:fixed;
+	top:40px;
+	bottom:5%;
+	right:5%;
+	left:5%;
+	overflow:auto;
+	background:#f1f6f8;
+	border:1px solid #ccc;
+	display:block;
+}
+#overlay_page.overlay_page_active_transparent{
+	background: transparent;
+	border: none;
+	margin: auto;
+	position: relative;
+	display: table-cell;
+	vertical-align: middle;
+	min-height: 32px;
+	top:auto;
+	bottom:auto;
+	right:auto;
+	left:auto;
+}
+#overlay_page form.bComment {
+	background: #FFF;
+	padding: 0 10px;
+}
+#overlay_page form.bComment legend {
+	width: 100%;
+	text-align: left;
+}
+#overlay_page.overlay_page_active_transparent .fieldset{
+	margin: 0;
+}
+.overlay_page_active form{
+	padding:1em;
+}
+#overlay_postback{
+	position:absolute;
+	top:-1000em;
+	left:-1000em;
+}
+#overlay_page .preview_cropped_images {
+	width: 128px;
+	text-align: center;
 }

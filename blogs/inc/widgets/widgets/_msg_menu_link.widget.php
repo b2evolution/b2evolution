@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author efy-asimo: Attila Simo
  *
- * @version $Id$
+ * @version $Id: _msg_menu_link.widget.php 7816 2014-12-15 13:05:21Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -107,23 +107,15 @@ class msg_menu_link_Widget extends ComponentWidget
 					'defaultvalue' => 'messages',
 					'onchange' => '
 						var curr_link_type = this.value;
-						var allow_blockcache = jQuery("[id$=\'_set_allow_blockcache\']");
 						var show_badge = jQuery("[id$=\'_set_show_badge\']");
-						var allow_blockcache_note = allow_blockcache.find(".notes");
 						if( curr_link_type == "messages" )
 						{
-							allow_blockcache.removeAttr(\'checked\');
-							allow_blockcache.attr( \'disabled\', \'disabled\' );
-							allow_blockcache_note.html("'.T_('The current configuration prevents caching this widget in the block cache.').'");
 							show_badge.removeAttr(\'disabled\');
 							show_badge.attr( \'checked\', \'checked\' );
 						}
 						else
 						{
-							allow_blockcache.removeAttr(\'disabled\');
 							show_badge.attr( \'disabled\', \'disabled\' );
-							allow_blockcache.attr( \'checked\', \'checked\' );
-							allow_blockcache_note.html("'.T_('Uncheck to prevent this widget from ever being cached in the block cache. (The whole page may still be cached.) This is only needed when a widget is poorly handling caching and cache keys.').'");
 							show_badge.removeAttr(\'checked\');
 						};'
 				),
@@ -169,16 +161,32 @@ class msg_menu_link_Widget extends ComponentWidget
 				$r['show_badge']['defaultvalue'] = false;
 				$r['show_badge']['disabled'] = 'disabled';
 			}
-			else
-			{
-				$r['allow_blockcache']['defaultvalue'] = false;
-				$r['allow_blockcache']['disabled'] = 'disabled';
-				$r['allow_blockcache']['note'] = T_('The current configuration prevents caching this widget in the block cache.');
-			}
+		}
+
+		if( isset( $r['allow_blockcache'] ) )
+		{ // Disable "allow blockcache" because this widget uses the selected items
+			$r['allow_blockcache']['defaultvalue'] = false;
+			$r['allow_blockcache']['disabled'] = 'disabled';
+			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
 		}
 
 		return $r;
 	}
+
+
+	/**
+	 * Prepare display params
+	 *
+	 * @param array MUST contain at least the basic display params
+	 */
+	function init_display( $params )
+	{
+		parent::init_display( $params );
+
+		// Disable "allow blockcache" because this widget uses the selected items
+		$this->disp_params['allow_blockcache'] = 0;
+	}
+
 
 	/**
 	 * Display the widget!
@@ -237,7 +245,7 @@ class msg_menu_link_Widget extends ComponentWidget
 				// set allow blockcache to 0, this way make sure block cache is never allowed for messages
 				$this->disp_params[ 'allow_blockcache' ] = 0;
 				// Is this the current display?
-				if( $disp == 'threads' )
+				if( $disp == 'threads' || $disp == 'messages' )
 				{ // The current page is currently displaying the messages:
 					// Let's display it as selected
 					$link_class = $this->disp_params['link_selected_class'];

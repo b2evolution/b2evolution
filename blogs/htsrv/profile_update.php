@@ -32,7 +32,7 @@
  *
  * @todo integrate it into the skins to avoid ugly die() on error and confusing redirect on success.
  *
- * @version $Id$
+ * @version $Id: profile_update.php 7707 2014-11-28 12:44:38Z yura $
  */
 
 /**
@@ -123,11 +123,40 @@ switch( $action )
 	case 'redemption':
 		// Change status of user email to 'redemption'
 		$EmailAddressCache = & get_EmailAddressCache();
-		if( $EmailAddress = & $EmailAddressCache->get_by_name( $current_User->get( 'email' ), false, false ) && 
+		if( $EmailAddress = & $EmailAddressCache->get_by_name( $current_User->get( 'email' ), false, false ) &&
 		    in_array( $EmailAddress->get( 'status' ), array( 'warning', 'suspicious1', 'suspicious2', 'suspicious3', 'prmerror' ) ) )
 		{ // Change to 'redemption' status only if status is 'warning', 'suspicious1', 'suspicious2', 'suspicious3' or 'prmerror'
 			$EmailAddress->set( 'status', 'redemption' );
 			$EmailAddress->dbupdate();
+		}
+		break;
+
+	case 'crop':
+		// crop profile picture
+		$file_ID = param( 'file_ID', 'integer', NULL );
+
+		// Check data to crop
+		$image_crop_data = param( 'image_crop_data', 'string', '' );
+		$image_crop_data = empty( $image_crop_data ) ? array() : explode( ':', $image_crop_data );
+		foreach( $image_crop_data as $image_crop_value )
+		{
+			$image_crop_value = (float)$image_crop_value;
+			if( $image_crop_value < 0 || $image_crop_value > 100 )
+			{ // Wrong data to crop, This value is percent of real size, so restrict it from 0 and to 100
+				$action = 'view';
+				break 2;
+			}
+		}
+		if( count( $image_crop_data ) < 4 )
+		{ // Wrong data to crop
+			$action = 'view';
+			break;
+		}
+
+		$result = $current_User->crop_avatar( $file_ID, $image_crop_data[0], $image_crop_data[1], $image_crop_data[2], $image_crop_data[3] );
+		if( $result !== true )
+		{ // If error on crop action then redirect to avatar profile page
+			header_redirect( $redirect_to );
 		}
 		break;
 }

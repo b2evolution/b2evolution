@@ -17,7 +17,7 @@
  *
  * @todo add 5 plugin hooks. Will be widgetized later (same as SkinTag became Widgets)
  *
- * @version $Id: dashboard.ctrl.php 7434 2014-10-15 07:18:30Z yura $
+ * @version $Id: dashboard.ctrl.php 7512 2014-10-24 10:31:53Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -49,6 +49,10 @@ require_js( 'communication.js' ); // auto requires jQuery
 require_css( 'blog_base.css' ); // Default styles for the blog navigation
 // Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
 require_js_helper( 'colorbox' );
+
+// Include files to work with charts
+require_js( '#easypiechart#' );
+require_css( 'jquery/jquery.easy-pie-chart.css' );
 
 $AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Dashboard'), 'url' => '?ctrl=dashboard' ) );
 
@@ -107,7 +111,7 @@ if( $blog )
 				'user_perm' => 'moderate',
 				'post_statuses' => array( 'published', 'community', 'protected' ),
 				'order' => 'DESC',
-				'comments' => 5,
+				'comments' => 30,
 			) );
 
 		// Set param prefix for URLs
@@ -124,304 +128,12 @@ if( $blog )
 	if( $user_perm_moderate_cmt && $CommentList->result_num_rows )
 	{	// We have comments awaiting moderation
 
-		global $htsrv_url;
-
-		?>
-
-		<script type="text/javascript">
-			<!--
-			// currently midified comments id and status. After update is done, the appropiate item will be removed.
-			var modifieds = new Array();
-
-			// Process result after publish/deprecate/delete action has been completed
-			function processResult(result, modifiedlist)
-			{
-				jQuery('#comments_container').html(result);
-				for(var id in modifiedlist)
-				{
-					switch(modifiedlist[id])
-					{
-						case 'published':
-							jQuery('#' + id).css( 'backgroundColor', '#339900' );
-							break;
-						case 'deprecated':
-							jQuery('#' + id).css( 'backgroundColor', '#656565' );
-							break;
-						case 'deleted':
-							jQuery('#' + id).css( 'backgroundColor', '#fcc' );
-							break;
-					}
-				}
-
-				var comments_number = jQuery('#new_badge').val();
-				if(comments_number == '0')
-				{
-					var options = {};
-					jQuery('#comments_block').effect('blind', options, 200);
-					jQuery('#comments_block').remove();
-				}
-				else
-				{
-					jQuery('#badge').text(comments_number);
-				}
-			}
-
-			// Set comments status
-			function setCommentStatus(id, status)
-			{
-				var divid = 'comment_' + id;
-				switch(status)
-				{
-					case 'published':
-						fadeIn(divid, '#339900');
-						break;
-					case 'deprecated':
-						fadeIn(divid, '#656565');
-						break;
-				};
-
-				modifieds[divid] = status;
-
-				jQuery.ajax({
-				type: 'POST',
-				url: '<?php echo $htsrv_url; ?>async.php',
-				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&status=' + status + '&action=set_comment_status&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
-				success: function(result)
-					{
-						// var divid = 'comment_' + id;
-						delete modifieds[divid];
-						processResult( ajax_debug_clear( result ), modifieds);
-					}
-				});
-			}
-
-			// Display voting tool when JS is enable
-			jQuery( 'document' ).ready( function() { jQuery( '.vote_spam' ).show(); } );
-			// Set comments vote
-			function setCommentVote(id, type, vote)
-			{
-				var divid = 'comment_' + id;
-				var highlight_class = '';
-				var color = '';
-				switch(vote)
-				{
-					case 'spam':
-						color = fadeIn(divid, '#ffc9c9');
-						highlight_class = 'roundbutton_red';
-						break;
-					case 'notsure':
-						color = fadeIn(divid, '#bbbbbb');
-						break;
-					case 'ok':
-						color = fadeIn(divid, '#bcffb5');
-						highlight_class = 'roundbutton_green';
-						break;
-				};
-
-				if( highlight_class != '' )
-				{
-					jQuery( '#vote_'+type+'_'+id ).find( 'a.roundbutton, span.roundbutton' ).addClass( highlight_class );
-				}
-
-				jQuery.ajax({
-				type: 'POST',
-				url: '<?php echo $htsrv_url; ?>anon_async.php',
-				data:
-					{ 'blogid': <?php echo '\''.$Blog->ID.'\''; ?>,
-						'commentid': id,
-						'type': type,
-						'vote': vote,
-						'action': 'set_comment_vote',
-						'crumb_comment': <?php echo '\''.get_crumb('comment').'\''; ?>,
-					},
-				success: function(result)
-					{
-						if( color != '' )
-						{ // Revert back color
-							fadeIn( divid, color );
-						}
-						jQuery('#vote_'+type+'_'+id).after( ajax_debug_clear( result ) );
-						jQuery('#vote_'+type+'_'+id).remove();
-					}
-				});
-			}
-
-			// Delete comment
-			function deleteComment(id)
-			{
-				var divid = 'comment_' + id;
-				fadeIn(divid, '#fcc');
-
-				modifieds[divid] = 'deleted';
-
-				jQuery.ajax({
-				type: 'POST',
-				url: '<?php echo $htsrv_url; ?>async.php',
-				data: 'action=get_opentrash_link&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
-				success: function(result)
-					{
-						var recycle_bin = jQuery('#recycle_bin');
-						if( recycle_bin.length )
-						{
-							recycle_bin.replaceWith( ajax_debug_clear( result ) );
-						}
-					}
-				});
-
-				jQuery.ajax({
-				type: 'POST',
-				url: '<?php echo $htsrv_url; ?>async.php',
-				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&action=delete_comment&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
-				success: function(result)
-					{
-						jQuery('#' + divid).effect('transfer', { to: jQuery('#recycle_bin') }, 700, function() {
-							delete modifieds[divid];
-							processResult( ajax_debug_clear( result ), modifieds);
-						});
-					}
-				});
-			}
-
-			// Fade in background color
-			function fadeIn(id, color)
-			{
-				var bg_color = jQuery('#' + id).css( 'backgroundColor' );
-				jQuery('#' + id).animate({ backgroundColor: color }, 200);
-				return bg_color;
-			}
-
-			// Delete comment author_url
-			function delete_comment_url(id)
-			{
-				var divid = 'commenturl_' + id;
-				fadeIn(divid, '#fcc');
-
-				jQuery.ajax({
-					type: 'POST',
-					url: '<?php echo $htsrv_url; ?>async.php',
-					data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&action=delete_comment_url' + '&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
-					success: function(result) { jQuery('#' + divid).remove(); }
-				});
-			}
-
-			// This is called when we get the response from the server:
-			function antispamSettings( the_html )
-			{
-				// add placeholder for antispam settings form:
-				jQuery( 'body' ).append( '<div id="screen_mask" onclick="closeAntispamSettings()"></div><div id="overlay_page"></div>' );
-				var evobar_height = jQuery( '#evo_toolbar' ).height();
-				jQuery( '#screen_mask' ).css({ top: evobar_height });
-				jQuery( '#screen_mask' ).fadeTo(1,0.5).fadeIn(200);
-				jQuery( '#overlay_page' ).html( the_html ).addClass( 'overlay_page_active' );
-				AttachServerRequest( 'antispam_ban' ); // send form via hidden iframe
-				jQuery( '#close_button' ).bind( 'click', closeAntispamSettings );
-				jQuery( '.SaveButton' ).bind( 'click', refresh_overlay );
-
-				// Close antispam popup if Escape key is pressed:
-				var keycode_esc = 27;
-				jQuery(document).keyup(function(e)
-				{
-					if( e.keyCode == keycode_esc )
-					{
-						closeAntispamSettings();
-					}
-				});
-			}
-
-			// This is called to close the antispam ban overlay page
-			function closeAntispamSettings()
-			{
-				jQuery( '#overlay_page' ).hide();
-				jQuery( '.action_messages').remove();
-				jQuery( '#server_messages' ).insertBefore( '.first_payload_block' );
-				jQuery( '#overlay_page' ).remove();
-				jQuery( '#screen_mask' ).remove();
-				return false;
-			}
-
-			// Ban comment url
-			function ban_url(authorurl)
-			{
-				<?php global $rsc_url; ?>
-				antispamSettings( '<img src="<?php echo $rsc_url; ?>img/ajax-loader2.gif" alt="<?php echo T_('Loading...'); ?>" title="<?php echo T_('Loading...'); ?>" style="display:block;margin:auto;position:absolute;top:0;bottom:0;left:0;right:0;" />' );
-				jQuery.ajax({
-					type: 'POST',
-					url: '<?php echo $admin_url; ?>',
-					data: 'ctrl=antispam&action=ban&display_mode=js&mode=iframe&request=checkban&keyword=' + authorurl +
-						  '&' + <?php echo '\''.url_crumb('antispam').'\''; ?>,
-					success: function(result)
-					{
-						antispamSettings( result );
-					}
-				});
-			}
-
-			// Refresh overlay page after Check&ban button click
-			function refresh_overlay()
-			{
-				var parameters = jQuery( '#antispam_add' ).serialize();
-
-				jQuery.ajax({
-					type: 'POST',
-					url: '<?php echo $admin_url; ?>',
-					data: 'action=ban&display_mode=js&mode=iframe&request=checkban&' + parameters,
-					success: function(result)
-					{
-						antispamSettings( result );
-					}
-				});
-				return false;
-			}
-
-			// Refresh comments on dashboard after ban url -> delete comment
-			function refreshAfterBan(deleted_ids)
-			{
-				var comment_ids = String(deleted_ids).split(',');
-				for( var i=0;i<comment_ids.length; ++i )
-				{
-					var divid = 'comment_' + comment_ids[i];
-					fadeIn(divid, '#fcc');
-				}
-
-				jQuery.ajax({
-					type: 'POST',
-					url: '<?php echo $htsrv_url; ?>async.php',
-					data: 'blogid=' + <?php echo $Blog->ID; ?> + '&action=refresh_comments&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
-					success: function(result)
-					{
-						processResult( ajax_debug_clear( result ), modifieds);
-					}
-				});
-			}
-
-			function startRefreshComments()
-			{
-				jQuery('#comments_container').slideUp('fast', refreshComments());
-			}
-
-			// Absolute refresh comment list
-			function refreshComments()
-			{
-				jQuery.ajax({
-					type: 'POST',
-					url: '<?php echo $htsrv_url; ?>async.php',
-					data: 'blogid=' + <?php echo $Blog->ID; ?> + '&action=refresh_comments&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
-					success: function(result)
-					{
-						processResult( ajax_debug_clear( result ), modifieds);
-						jQuery('#comments_container').slideDown('fast');
-					}
-				});
-			}
-
-			-->
-		</script>
-		<?php
+		load_funcs( 'comments/model/_comment_js.funcs.php' );
 
 		$nb_blocks_displayed++;
 
 		$opentrash_link = get_opentrash_link();
-		$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', 'javascript:startRefreshComments()' ).'</span> ';
+		$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', $admin_url.'?blog='.$blog, NULL, NULL, NULL, array( 'onclick' => 'startRefreshComments( \''.request_from().'\' ); return false;' ) ).'</span> ';
 
 		$show_statuses_param = $param_prefix.'show_statuses[]='.implode( '&amp;'.$param_prefix.'show_statuses[]=', $user_modeartion_statuses );
 		$block_item_Widget->title = $refresh_link.$opentrash_link.T_('Comments awaiting moderation').
@@ -538,10 +250,11 @@ if( $blog )
 					'after_image' =>         '',
 					'after' =>               '</div>',
 					'image_size' =>          'fit-80x80',
-					'restrict_to_image_position' => 'teaser',	// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
+					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'albumart'
+					'restrict_to_image_position' => 'teaser,teaserperm,teaserlink',
 				) );
 
-			echo '<span class="small">'.evo_htmlspecialchars( $Item->get_content_excerpt( 150 ), NULL, $evo_charset ).'</span>';
+			echo '<span class="small">'.htmlspecialchars( $Item->get_content_excerpt( 150 ), NULL, $evo_charset ).'</span>';
 
 			echo '<div style="clear:left;">'.get_icon('pixel').'</div>'; // IE crap
 			echo '</div>';
@@ -679,6 +392,8 @@ else
 if( $current_User->check_perm( 'options', 'edit' ) )
 {	// We have some serious admin privilege:
 
+	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
+
 	/**
 	 * @var AbstractSettings
 	 */
@@ -687,7 +402,210 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	// Begin payload block:
 	$AdminUI->disp_payload_begin();
 
-	echo '<div class="row browse"><div class="col-lg-9 col-xs-12 floatleft">';
+	echo '<div class="row browse"><div class="col-lg-12">';
+
+	//---- START OF - System & Collection stats ----//
+
+	// -- Collection stats -- //
+	if( ! empty( $blog ) )
+	{
+		$chart_data = array();
+
+		// Posts
+		$posts_sql_from = 'INNER JOIN T_categories ON cat_ID = post_main_cat_ID';
+		$posts_sql_where = 'cat_blog_ID = '.$DB->quote( $blog );
+		$chart_data[] = array(
+				'title' => T_('Posts'),
+				'value' => $post_all_counter = get_table_count( 'T_items__item', $posts_sql_where, $posts_sql_from ),
+				'type'  => 'number',
+			);
+		// Slugs
+		$slugs_sql_from = 'INNER JOIN T_items__item ON post_ID = slug_itm_ID '.$posts_sql_from;
+		$slugs_sql_where = 'slug_type = "item" AND '.$posts_sql_where;
+		$chart_data[] = array(
+				'title' => T_('Slugs'),
+				'value' => get_table_count( 'T_slug', $slugs_sql_where, $slugs_sql_from ),
+				'type'  => 'number',
+			);
+		// Comments
+		$comments_sql_from = 'INNER JOIN T_items__item ON post_ID = comment_item_ID '.$posts_sql_from;
+		$comments_sql_where = $posts_sql_where;
+		$chart_data[] = array(
+				'title' => T_('Comments'),
+				'value' => get_table_count( 'T_comments', $comments_sql_where, $comments_sql_from ),
+				'type'  => 'number',
+			);
+
+		echo '<div class="row"><div class="col-lg-6">';
+
+		// Display a block with charts
+		$stat_item_Widget = new Widget( 'block_item' );
+
+		$stat_item_Widget->title = T_('Collection stats');
+		$stat_item_Widget->disp_template_replaced( 'block_start' );
+
+		display_charts( $chart_data );
+
+		$stat_item_Widget->disp_template_raw( 'block_end' );
+
+		echo '</div>';
+	}
+
+	// -- System stats -- //
+
+	$chart_data = array();
+	// Users
+	$chart_data[] = array(
+			'title' => T_('Users'),
+			'value' => get_table_count( 'T_users' ),
+			'type'  => 'number',
+		);
+	// Blogs
+	$chart_data[] = array(
+			'title' => T_('Blogs'),
+			'value' => get_table_count( 'T_blogs' ),
+			'type'  => 'number',
+		);
+	$post_all_counter = get_table_count( 'T_items__item' );
+	if( empty( $blog ) )
+	{
+		// Posts
+		$chart_data[] = array(
+				'title' => T_('Posts'),
+				'value' => $post_all_counter,
+				'type'  => 'number',
+			);
+	}
+	// Web posts
+	$chart_data[] = array(
+			'title' => T_('Web posts'),
+			'value' => limit_number_by_interval( $global_Cache->get( 'post_through_admin' ), 0, $post_all_counter ),
+			'100%'  => $post_all_counter,
+			'type'  => 'percent',
+		);
+	// XMLRPC posts
+	$chart_data[] = array(
+			'title' => T_('XMLRPC posts'),
+			'value' => limit_number_by_interval( $global_Cache->get( 'post_through_xmlrpc' ), 0, $post_all_counter ),
+			'100%'  => $post_all_counter,
+			'type'  => 'percent',
+		);
+	// Email posts
+	$chart_data[] = array(
+			'title' => T_('Email posts'),
+			'value' => limit_number_by_interval( $global_Cache->get( 'post_through_email' ), 0, $post_all_counter ),
+			'100%'  => $post_all_counter,
+			'type'  => 'percent',
+		);
+	if( empty( $blog ) )
+	{
+		// Slugs
+		$chart_data[] = array(
+				'title' => T_('Slugs'),
+				'value' => get_table_count( 'T_slug' ),
+				'type'  => 'number',
+			);
+		// Comments
+		$chart_data[] = array(
+				'title' => T_('Comments'),
+				'value' => get_table_count( 'T_comments' ),
+				'type'  => 'number',
+			);
+	}
+	// Files
+	$chart_data[] = array(
+			'title' => T_('Files'),
+			'value' => get_table_count( 'T_files' ),
+			'type'  => 'number',
+		);
+	// Conversations
+	$chart_data[] = array(
+			'title' => T_('Conversations'),
+			'value' => get_table_count( 'T_messaging__thread' ),
+			'type'  => 'number',
+		);
+	// Messages
+	$chart_data[] = array(
+			'title' => T_('Messages'),
+			'value' => get_table_count( 'T_messaging__message' ),
+			'type'  => 'number',
+		);
+
+	if( ! empty( $blog ) )
+	{ // Open second column if first was opened above
+		echo '<div class="col-lg-6">';
+	}
+
+	$stat_item_Widget = new Widget( 'block_item' );
+
+	$stat_item_Widget->title = T_('System stats');
+	$stat_item_Widget->disp_template_replaced( 'block_start' );
+
+	display_charts( $chart_data );
+
+	$stat_item_Widget->disp_template_raw( 'block_end' );
+
+	if( ! empty( $blog ) )
+	{ // End of <div class="row"><div class="col-lg-6">
+		echo '</div><div class="clear"></div></div>';
+	}
+
+?>
+<script type="text/javascript">
+jQuery( 'document' ).ready( function()
+{
+	var chart_params = {
+		barColor: function(percent)
+		{
+			return get_color_by_percent( {r:0, g:255, b:0}, {r:255, g:204, b:0}, {r:255, g:0, b:0}, percent );
+		},
+		size: 75,
+		trackColor: '#eee',
+		scaleColor: false,
+		lineCap: 'round',
+		lineWidth: 6,
+		animate: 700
+	}
+	jQuery( '.chart .number' ).easyPieChart( chart_params );
+
+	chart_params['barColor'] = '#00F';
+	jQuery( '.chart .percent' ).easyPieChart( chart_params );
+} );
+
+function get_color_by_percent( color_from, color_middle, color_to, percent )
+{
+	function get_color_hex( start_color, end_color )
+	{
+		num = start_color + Math.round( ( end_color - start_color ) * ( percent / 100 ) );
+		num = Math.min( num, 255 ); // not more than 255
+		num = Math.max( num, 0 ); // not less than 0
+		var str = num.toString( 16 );
+		if( str.length < 2 )
+		{
+			str = "0" + str;
+		}
+		return str;
+	}
+
+	if( percent < 50 )
+	{
+		color_to = color_middle;
+		percent *= 2;
+	}
+	else
+	{
+		color_from = color_middle;
+		percent = ( percent - 50 ) * 2;
+	}
+
+	return "#" +
+		get_color_hex( color_from.r, color_to.r ) +
+		get_color_hex( color_from.g, color_to.g ) +
+		get_color_hex( color_from.b, color_to.b );
+}
+</script>
+<?php
+	//---- END OF - System & Collection stats ----//
 
 	$block_item_Widget = new Widget( 'block_item' );
 
@@ -697,7 +615,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 	// Note: hopefully, the updates will have been downloaded in the shutdown function of a previous page (including the login screen)
 	// However if we have outdated info, we will load updates here.
-	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
+
 	// Let's clear any remaining messages that should already have been displayed before...
 	$Messages->clear();
 
@@ -740,48 +658,12 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 		$UserSettings->dbupdate();
 	}
 
-	echo '</div><div class="col-lg-3 col-xs-12 floatright">';
-
-	/*
-	 * RIGHT COL
-	 */
-	$side_item_Widget = new Widget( 'side_item' );
-
-	$side_item_Widget->title = T_('System stats');
-	$side_item_Widget->disp_template_replaced( 'block_start' );
-
-	$post_all_counter = intval( get_table_count( 'T_items__item' ) );
-	$post_through_admin = limit_number_by_interval( $global_Cache->get( 'post_through_admin' ), 0, $post_all_counter );
-	$post_through_xmlrpc = limit_number_by_interval( $global_Cache->get( 'post_through_xmlrpc' ), 0, $post_all_counter );
-	$post_through_email = limit_number_by_interval( $global_Cache->get( 'post_through_email' ), 0, $post_all_counter );
-	$post_through_unknown = limit_number_by_interval( ( $post_all_counter - $post_through_admin - $post_through_xmlrpc - $post_through_email ), 0, $post_all_counter );
-
-	echo '<div class="dashboard_sidebar">';
-	echo '<ul>';
-		echo '<li>'.sprintf( T_('%s Users'), get_table_count( 'T_users' ) ).'</li>';
-		echo '<li>'.sprintf( T_('%s Blogs'), get_table_count( 'T_blogs' ) ).'</li>';
-		echo '<li>'.sprintf( T_('%s Posts'), $post_all_counter ).'</li>';
-		echo '<ul>';
-			echo '<li>'.sprintf( T_('%s on web'), $post_through_admin ).'</li>';
-			echo '<li>'.sprintf( T_('%s by XMLRPC'), $post_through_xmlrpc ).'</li>';
-			echo '<li>'.sprintf( T_('%s by email'), $post_through_email ).'</li>';
-			echo '<li>'.sprintf( T_('%s unknown'), $post_through_unknown ).'</li>';
-		echo '</ul>';
-		echo '<li>'.sprintf( T_('%s Slugs'), get_table_count( 'T_slug' ) ).'</li>';
-		echo '<li>'.sprintf( T_('%s Comments'), get_table_count( 'T_comments' ) ).'</li>';
-		echo '<li>'.sprintf( T_('%s Files'), get_table_count( 'T_files' ) ).'</li>';
-		echo '<li>'.sprintf( T_('%s Conversations'), get_table_count( 'T_messaging__thread' ) ).'</li>';
-		echo '<li>'.sprintf( T_('%s Messages'), get_table_count( 'T_messaging__message' ) ).'</li>';
-	echo '</ul>';
-	echo '</div>';
-
-	$side_item_Widget->disp_template_raw( 'block_end' );
 
 	/*
 	 * DashboardAdminSide to be added here (anyone?)
 	 */
 
-	echo '</div><div class="clear"></div></div>';
+	echo '</div></div>';
 
 	// End payload block:
 	$AdminUI->disp_payload_end();

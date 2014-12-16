@@ -109,62 +109,85 @@ if( empty( $avatar_tag ) )
 	}
 }
 
-if( $edited_User->has_avatar() )
+$can_moderate_user = $current_User->can_moderate_user( $edited_User->ID );
+if( $edited_User->has_avatar() && ( $avatar_Link = & $edited_User->get_avatar_Link() ) )
 {
-	if( is_admin_page() )
-	{
-		$remove_picture_url = $ctrl_param.'&amp;action=remove_avatar&amp;'.url_crumb('user');
-		$delete_picture_url = $ctrl_param.'&amp;action=delete_avatar&amp;file_ID='.$edited_User->avatar_file_ID.'&amp;'.url_crumb('user');
+	$action_picture_links = '';
+	if( ( $current_User->ID == $edited_User->ID ) || $can_moderate_user )
+	{ // Display actions only if current user can edit this user
+		if( is_admin_page() )
+		{
+			$remove_picture_url = $ctrl_param.'&amp;action=remove_avatar&amp;'.url_crumb('user');
+			$delete_picture_url = $ctrl_param.'&amp;action=delete_avatar&amp;file_ID='.$edited_User->avatar_file_ID.'&amp;'.url_crumb('user');
+		}
+		else
+		{
+			$remove_picture_url = get_secure_htsrv_url().'profile_update.php?user_tab=avatar&amp;blog='.$Blog->ID.'&amp;action=remove_avatar&amp;'.url_crumb('user');
+			$delete_picture_url = get_secure_htsrv_url().'profile_update.php?user_tab=avatar&amp;blog='.$Blog->ID.'&amp;action=delete_avatar&amp;file_ID='.$edited_User->avatar_file_ID.'&amp;'.url_crumb('user');
+		}
+
+		$rotate_icons = $edited_User->get_rotate_avatar_icons( $edited_User->avatar_file_ID, array(
+				'before' => '',
+				'after'  => '<br />',
+				'text'   => ' '.T_('Rotate'),
+			) );
+
+		$crop_icon = $edited_User->get_crop_avatar_icon( $edited_User->avatar_file_ID, array(
+				'before'  => '',
+				'after'   => '<br />',
+				'text'    => ' '.T_('Crop'),
+				'onclick' => 'return user_crop_avatar( '.$edited_User->ID.', '.$edited_User->avatar_file_ID.' )'
+			) );
+
+		$remove_picture_text = T_( 'No longer use this as main profile picture' );
+		$delete_picture_text = T_( 'Delete this profile picture' );
+
+		$forbid_link = '';
+		$duplicated_files_message = '';
+		if( is_admin_page() && $can_moderate_user )
+		{ // Only if current user can edit this user
+			// Allow to forbid main picture 
+			$forbid_picture_text = T_( 'Forbid using as main profile picture' );
+			$forbid_picture_url = $ctrl_param.'&amp;action=forbid_avatar&amp;'.url_crumb('user');
+			$forbid_link = action_icon( $forbid_picture_text, 'move_down_orange', $forbid_picture_url, ' '.$forbid_picture_text, 3, 4 ).'<br />';
+			// Display a message about the duplicated profile picture
+			$avatar_File = & $avatar_Link->get_File();
+			$duplicated_files_message = $avatar_File->get_duplicated_files_message( array(
+					'message' => '<p class="duplicated_avatars">'
+						.get_icon( 'warning_yellow', 'imgtag', array( 'style' => 'padding-left:16px') ).' '
+						.T_('Also used by: %s').'</p>'
+				) );
+		}
+
+		$action_picture_links = '<div class="avatar_actions">'.
+				action_icon( $remove_picture_text, 'move_down', $remove_picture_url, ' '.$remove_picture_text, 3, 4 ).'<br />'.
+				$forbid_link.
+				action_icon( $delete_picture_text, 'xross', $delete_picture_url, ' '.$delete_picture_text, 3, 4, array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to delete this picture?').'\');' ) ).'<br />'.
+				$rotate_icons.
+				$crop_icon.
+				$duplicated_files_message.
+			'</div><div class="clear"></div>';
 	}
-	else
-	{
-		$remove_picture_url = get_secure_htsrv_url().'profile_update.php?user_tab=avatar&amp;blog='.$Blog->ID.'&amp;action=remove_avatar&amp;'.url_crumb('user');
-		$delete_picture_url = get_secure_htsrv_url().'profile_update.php?user_tab=avatar&amp;blog='.$Blog->ID.'&amp;action=delete_avatar&amp;file_ID='.$edited_User->avatar_file_ID.'&amp;'.url_crumb('user');
-	}
 
-	$rotate_icons = $edited_User->get_rotate_avatar_icons( $edited_User->avatar_file_ID, array(
-			'before' => '<p class="center">',
-			'after'  => '</p>'
-		) );
-
-	$remove_picture_text = T_( 'No longer use this as main profile picture' );
-	$delete_picture_text = T_( 'Delete this profile picture' );
-
-	$action_picture_links = '<div>'.
-			'<p class="center">'.action_icon( $remove_picture_text, 'move_down', $remove_picture_url, $remove_picture_text, 3, 4, array( 'style' => 'display:block;text-indent:-16px;padding-left:16px' ), array( 'style' => 'margin-right:4px' ) ).'</p>'.
-			'<p class="center">'.action_icon( $delete_picture_text, 'xross', $delete_picture_url, $delete_picture_text, 3, 4, array( 'style' => 'display:block;text-indent:-16px;padding-left:16px', 'onclick' => 'return confirm(\''.TS_('Are you sure want to delete this picture?').'\');' ), array( 'style' => 'margin-right:4px' ) ).'</p>'.
-			$rotate_icons.
-		'</div>';
-
-	$avatar_tag = '<div class="avatar_main_frame">'.$avatar_tag.$action_picture_links.'<div class="clear"></div></div>';
+	$avatar_tag = '<div class="avatar_main_frame">'.$avatar_tag.$action_picture_links.'</div>';
 }
 
 $Form->info( T_( 'Current profile picture' ), $avatar_tag );
 
 // fp> TODO: a javascript REFRAME feature would ne neat here: selecting a square area of the img and saving it as a new avatar image
 
-if( ( $current_User->ID == $edited_User->ID ) || ( $current_User->check_perm( 'users', 'edit' ) ) )
+if( ( $current_User->ID == $edited_User->ID ) || $can_moderate_user )
 {
 	// Upload or select:
 	global $Settings;
 	if( $Settings->get('upload_enabled') && ( $Settings->get( 'fm_enable_roots_user' ) ) )
-	{	// Upload is enabled and we have permission to use it...
+	{ // Upload is enabled and we have permission to use it...
 		$user_avatars = $edited_User->get_avatar_Links();
 		if( count( $user_avatars ) > 0 )
 		{
 			$info_content = '';
 			foreach( $user_avatars as $user_Link )
 			{
-				if( is_admin_page() )
-				{
-					$url_update = regenerate_url( '', 'user_tab=avatar&user_ID='.$edited_User->ID.'&action=update_avatar&file_ID='.$user_Link->File->ID.'&'.url_crumb('user'), '', '&');
-					$url_delete = regenerate_url( '', 'user_tab=avatar&user_ID='.$edited_User->ID.'&action=delete_avatar&file_ID='.$user_Link->File->ID.'&'.url_crumb('user'), '', '&');
-				}
-				else
-				{
-					$url_update = get_secure_htsrv_url().'profile_update.php?user_tab=avatar&blog='.$Blog->ID.'&user_ID='.$edited_User->ID.'&action=update_avatar&file_ID='.$user_Link->File->ID.'&'.url_crumb('user');
-					$url_delete = get_secure_htsrv_url().'profile_update.php?user_tab=avatar&blog='.$Blog->ID.'&user_ID='.$edited_User->ID.'&action=delete_avatar&file_ID='.$user_Link->File->ID.'&'.url_crumb('user');
-				}
 				$info_content .= '<div class="avatartag avatar_rounded">';
 				$info_content .= $user_Link->get_tag( array(
 						'before_image'        => '',
@@ -175,9 +198,41 @@ if( ( $current_User->ID == $edited_User->ID ) || ( $current_User->check_perm( 'u
 						'image_link_title'    => $edited_User->login,
 						'image_link_rel'      => 'lightbox[user_pictures]',
 					) );
-				$info_content .= '<br />'.action_icon( T_('Use as main picture'), 'move_up', $url_update, T_('Main'), 3, 4, array(), array( 'style' => 'margin-right:4px' ) );
+				if( $user_Link->File->get( 'can_be_main_profile' ) )
+				{ // Link to set picture as Main
+					$url_update = is_admin_page() ?
+						regenerate_url( '', 'user_tab=avatar&user_ID='.$edited_User->ID.'&action=update_avatar&file_ID='.$user_Link->File->ID.'&'.url_crumb( 'user' ), '', '&') :
+						get_secure_htsrv_url().'profile_update.php?user_tab=avatar&blog='.$Blog->ID.'&user_ID='.$edited_User->ID.'&action=update_avatar&file_ID='.$user_Link->File->ID.'&'.url_crumb( 'user' );
+					$info_content .= '<br />'.action_icon( T_('Use as main picture'), 'move_up', $url_update, T_('Main'), 3, 4, array(), array( 'style' => 'margin-right:4px' ) );
+				}
+				elseif( is_admin_page() && $can_moderate_user )
+				{ // Link to Restore picture if it was forbidden (only for admins)
+					$url_restore = regenerate_url( '', 'user_tab=avatar&user_ID='.$edited_User->ID.'&action=restore_avatar&file_ID='.$user_Link->File->ID.'&'.url_crumb( 'user' ), '', '&');
+					$info_content .= '<br />'.action_icon( T_('Restore to use as main picture'), 'move_up', $url_restore, T_('Restore'), 3, 4, array(), array( 'style' => 'margin-right:4px' ) );
+				}
+				else
+				{ // Display empty line
+					$info_content .= '<br />';
+				}
+				// Link to Delete picture
+				$url_delete = is_admin_page() ?
+					regenerate_url( '', 'user_tab=avatar&user_ID='.$edited_User->ID.'&action=delete_avatar&file_ID='.$user_Link->File->ID.'&'.url_crumb( 'user' ), '', '&') :
+					get_secure_htsrv_url().'profile_update.php?user_tab=avatar&blog='.$Blog->ID.'&user_ID='.$edited_User->ID.'&action=delete_avatar&file_ID='.$user_Link->File->ID.'&'.url_crumb( 'user' );
 				$info_content .= '<br />'.action_icon( T_('Delete this picture'), 'xross', $url_delete, T_('Delete'), 3, 4, array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to delete this picture?').'\');' ), array( 'style' => 'margin-right:4px' ) );
+				// Links to rotate picture
 				$info_content .= $edited_User->get_rotate_avatar_icons( $user_Link->File->ID );
+				$info_content .= $edited_User->get_crop_avatar_icon( $user_Link->File->ID, array(
+						'onclick' => 'return user_crop_avatar( '.$edited_User->ID.', '.$user_Link->File->ID.' )'
+					) );
+				if( is_admin_page() && $can_moderate_user )
+				{ // Only if current user can edit this user
+					// Display a message about the duplicated profile picture
+					$info_content .= $user_Link->File->get_duplicated_files_message( array(
+							'message' => '<div class="duplicated_avatars">'
+								.get_icon( 'warning_yellow', 'imgtag', array( 'style' => 'padding-left:16px') ).' '
+								.T_('Also used by: %s').'</div>'
+						) );
+				}
 				$info_content .= '</div>';
 			}
 			$Form->info( T_('Other pictures'), $info_content );

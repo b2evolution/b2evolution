@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _sessions.init.php 7414 2014-10-13 08:10:51Z yura $
+ * @version $Id: _sessions.init.php 7415 2014-10-13 08:12:59Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -390,6 +390,30 @@ class sessions_Module extends Module
 				);
 			}
 		}
+	}
+
+
+	/**
+	 * Get the sessions module cron jobs
+	 *
+	 * @see Module::get_cron_jobs()
+	 */
+	function get_cron_jobs()
+	{
+		return array(
+			'process-hit-log' => array(
+				'name'   => T_('Extract info from hit log'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_process_hitlog.job.php',
+				'params' => NULL,
+			),
+			'prune-old-hits-and-sessions' => array(
+				'name'   => T_('Prune old hits & sessions (includes OPTIMIZE)'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_prune_hits_sessions.job.php',
+				'params' => NULL,
+			),
+		);
 	}
 }
 

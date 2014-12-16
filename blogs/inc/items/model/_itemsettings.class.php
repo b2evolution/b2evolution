@@ -25,7 +25,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author efy-asimo: Attila Simo
  *
- * @version $Id$
+ * @version $Id: _itemsettings.class.php 6134 2014-03-08 07:48:07Z manuel $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -45,11 +45,11 @@ class ItemSettings extends AbstractSettings
 	 * @access protected
 	 */
 	var $_defaults = array(
-		'editor_code'           => NULL, // Plugin code of the editor which was last used to edit this post
-		'hide_teaser'           => '0',  // Setting to show/hide teaser when displaying -- more --
-		'post_custom_headers'   => NULL, // Meta keywords for this post
-		'post_metadesc'         => NULL, // Meta Description tag for this post
-		'post_expiry_delay'     => NULL, // Post comments are not displayed and post ratings are not counted after they are older then this expiry delay value. If this value is null then comments will never expire.
+		'editor_code'          => NULL, // Plugin code of the editor which was last used to edit this post
+		'hide_teaser'          => '0',  // Setting to show/hide teaser when displaying -- more --
+		'metakeywords'         => NULL, // Meta keywords for this post
+		'metadesc'             => NULL, // Meta Description tag for this post
+		'comment_expiry_delay' => NULL, // Post comments are not displayed and post ratings are not counted after they are older then this expiry delay value. If this value is null then comments will never expire.
 
 		// Location & google map settings:
 		'latitude' => NULL,

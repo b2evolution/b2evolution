@@ -114,13 +114,14 @@ class autolinks_plugin extends Plugin
 	/**
 	 * Define here default collection/blog settings that are to be made available in the backoffice.
 	 *
+	 * @param array Associative array of parameters.
 	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
 	function get_coll_setting_definitions( & $params )
 	{
 		$default_values = array(
 				'autolink_defs_coll_db'              => '',
-				'autolink_username'                  => 0,
+				'autolink_username'                  => 1,
 				'autolink_post_nofollow_exist'       => 0,
 				'autolink_post_nofollow_explicit'    => 0,
 				'autolink_post_nofollow_auto'        => 0,
@@ -202,11 +203,26 @@ class autolinks_plugin extends Plugin
 
 
 	/**
+	 * Define here default message settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_msg_setting_definitions( & $params )
+	{
+		// set params to allow rendering for messages by default
+		$default_params = array_merge( $params, array( 'default_msg_rendering' => 'stealth' ) );
+		return parent::get_msg_setting_definitions( $default_params );
+	}
+
+
+	/**
 	 * Lazy load global definitions array
 	 *
-	 * @param Blog
+	 * @param object Blog
+	 * @param boolean Allow empty Blog
 	 */
-	function load_link_array( $Blog )
+	function load_link_array( $Blog, $allow_null_blog = false )
 	{
 		global $plugins_path;
 
@@ -230,11 +246,11 @@ class autolinks_plugin extends Plugin
 		}
 
 		// load defs for current blog:
-		$coll_ID = $Blog->ID;
+		$coll_ID = !empty( $Blog ) ? $Blog->ID : 0;
 		if( !isset($this->link_array[$coll_ID]) )
 		{	// This blog is not loaded yet:
 			$this->link_array[$coll_ID] = array();
-			$text = $this->get_coll_setting( 'autolink_defs_coll_db', $Blog );
+			$text = $this->get_coll_setting( 'autolink_defs_coll_db', $Blog, $allow_null_blog );
 			if( !empty($text) )
 			{	// Load local user defintions:
 				$this->read_textfield( $text, $coll_ID );
@@ -345,18 +361,52 @@ class autolinks_plugin extends Plugin
 			$this->setting_nofollow_auto = 'autolink_post_nofollow_auto';
 		}
 
+		return $this->render_content( $content, $item_Blog );
+	}
+
+
+	/**
+	 * Perform rendering of Message content
+	 *
+	 * NOTE: Use default coll settings of comments as messages settings
+	 *
+	 * @see Plugin::RenderMessageAsHtml()
+	 */
+	function RenderMessageAsHtml( & $params )
+	{
+		$content = & $params['data'];
+
+		// Message is rendering
+		$this->setting_nofollow_exist = 'autolink_comment_nofollow_exist';
+		$this->setting_nofollow_explicit = 'autolink_comment_nofollow_explicit';
+		$this->setting_nofollow_auto = 'autolink_comment_nofollow_auto';
+
+		return $this->render_content( $content, NULL, true );
+	}
+
+
+	/**
+	 * Render content of Item, Comment, Message
+	 *
+	 * @param string Content
+	 * @param object Blog
+	 * @param boolean Allow empty Blog
+	 * return boolean
+	 */
+	function render_content( & $content, $item_Blog = NULL, $allow_null_blog = false )
+	{
 		// Prepare existing links
-		$content = $this->prepare_existing_links( $content, $item_Blog );
+		$content = $this->prepare_existing_links( $content, $item_Blog, $allow_null_blog );
 
 		// reset already linked usernames
 		$this->already_linked_usernames = array();
-		if( !empty( $item_Blog ) && $this->get_coll_setting( 'autolink_username', $item_Blog ) )
+		if( ( !empty( $item_Blog ) || $allow_null_blog ) && $this->get_coll_setting( 'autolink_username', $item_Blog, $allow_null_blog ) )
 		{	// Replace @usernames with user identity link
 			$content = replace_content_outcode( '#@([A-Za-z0-9_.]+)#i', '@', $content, array( $this, 'replace_usernames' ) );
 		}
 
 		// load global defs
-		$this->load_link_array( $item_Blog );
+		$this->load_link_array( $item_Blog, $allow_null_blog );
 
 		// reset already linked:
 		$this->already_linked_array = array();
@@ -366,7 +416,7 @@ class autolinks_plugin extends Plugin
 		}
 
 		$link_attrs = '';
-		if( !empty( $item_Blog ) && $this->get_coll_setting( $this->setting_nofollow_explicit, $item_Blog ) )
+		if( ( !empty( $item_Blog ) || $allow_null_blog ) && $this->get_coll_setting( $this->setting_nofollow_explicit, $item_Blog, $allow_null_blog ) )
 		{	// Add attribute rel="nofollow" for auto-links
 			$link_attrs .= ' rel="nofollow"';
 		}
@@ -422,7 +472,7 @@ class autolinks_plugin extends Plugin
 		$this->previous_used = false;
 
 		// Optimization: Check if the text contains words from the replacement links strings, and call replace callback only if there is at least one word which needs to be replaced.
-		$text_words = explode( ' ', evo_strtolower( $text ) );
+		$text_words = explode( ' ', utf8_strtolower( $text ) );
 		foreach( $text_words as $text_word )
 		{ // Trim the signs [({/ from start and the signs ])}/.,:;!? from end of each word
 			$clear_word = preg_replace( '#^[\[\({/]?([@\p{L}0-9_\-\.]{3,})[\.,:;!\?\]\)}/]?$#i', '$1', $text_word );
@@ -471,7 +521,7 @@ class autolinks_plugin extends Plugin
 			$word = substr( $word, 0, -1 );
 			$after_word = '.'.$after_word;
 		}
-		$lword = evo_strtolower( $word );
+		$lword = utf8_strtolower( $word );
 		$r = $before_word.$word.$after_word;
 
 		if( isset( $this->replacement_link_array[ $lword ] ) )
@@ -533,11 +583,12 @@ class autolinks_plugin extends Plugin
 	 *
 	 * @param string Text
 	 * @param object Blog
+	 * @param boolean Allow empty Blog
 	 * @return string Prepared text
 	 */
-	function prepare_existing_links( $text, $Blog )
+	function prepare_existing_links( $text, $Blog = NULL, $allow_null_blog = false )
 	{
-		if( !empty( $Blog ) && $this->get_coll_setting( $this->setting_nofollow_exist, $Blog ) )
+		if( ( !empty( $Blog ) || $allow_null_blog ) && $this->get_coll_setting( $this->setting_nofollow_exist, $Blog, $allow_null_blog ) )
 		{	// Add attribute rel="nofollow" for preexisting links
 			// Remove all existing attributes "rel" from tag <a>
 			$text = preg_replace( '#<a([^>]*) rel="([^"]+?)"([^>]*)>#is', '<a$1$3>', $text );
@@ -578,6 +629,7 @@ class autolinks_plugin extends Plugin
 				$link_attr_rel .= ' nofollow';
 			}
 			$link_attrs = ' rel="'.$link_attr_rel.'"';
+			$link_attrs .= ' class="user"';
 
 			if( !empty( $user_matches[1] ) )
 			{

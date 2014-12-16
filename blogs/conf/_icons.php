@@ -1007,6 +1007,12 @@ function get_icon_info($name)
 			'xy' => array( 96, 224 ),
 			'fa' => 'rotate-right'
 		);
+		case 'crop': return array(
+			'alt'  => T_('Crop this picture'),
+			'size' => array( 16, 16 ),
+			'xy' => array( 0, 80 ),
+			'fa' => 'crop'
+		);
 
 		case 'notification': return array(
 			'alt'  => T_('Email notification'),

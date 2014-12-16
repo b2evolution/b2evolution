@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id$
+ * @version $Id: _file_properties.form.php 7808 2014-12-12 11:45:53Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -71,6 +71,13 @@ $Form->begin_form( 'fform', T_('File properties') );
 			$Form->info( T_('Alternative text'), $edited_File->dget('alt'), T_('This is useful for images') );
 			$Form->info( T_('Caption/Description'), $edited_File->dget('desc') );
 		}
+	$Form->end_fieldset();
+
+	$Form->begin_fieldset( T_('Social votes') );
+		$Form->info( T_('Liked'), $edited_File->get_votes_count_info( 'like' ) );
+		$Form->info( T_('Disliked'), $edited_File->get_votes_count_info( 'dislike' ) );
+		$Form->info( T_('Reported as inappropriate'), $edited_File->get_votes_count_info( 'inappropriate' ) );
+		$Form->info( T_('Reported as spam'), $edited_File->get_votes_count_info( 'spam' ) );
 	$Form->end_fieldset();
 
 if( $current_User->check_perm( 'files', 'edit', false, $blog ? $blog : NULL ) )

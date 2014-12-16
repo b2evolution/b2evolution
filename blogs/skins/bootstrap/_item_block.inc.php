@@ -12,7 +12,7 @@
  * @package evoskins
  * @subpackage bootstrap
  *
- * @version $Id$
+ * @version $Id: _item_block.inc.php 7115 2014-07-14 14:08:25Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -57,6 +57,7 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 		$Item->issue_time( array(
 				'before'      => T_('posted on '),
 				'after'       => ' ',
+				'time_format' => '#short_time',
 			) );
 
 		// Author
@@ -84,12 +85,14 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 		// Note: You can customize the default item content by copying the generic
 		// /skins/_item_content.inc.php file into the current skin folder.
 		// -------------------------- END OF POST CONTENT -------------------------
+	?>
 
+	<?php
 		// List all tags attached to this post:
 		$Item->tags( array(
-				'before'    => '<div class="bSmallPrint">'.T_('Tags').': ',
-				'after'     => '</div>',
-				'separator' => ', ',
+				'before' =>         '<div class="bSmallPrint">'.T_('Tags').': ',
+				'after' =>          '</div>',
+				'separator' =>      ', ',
 			) );
 	?>
 
@@ -109,7 +112,6 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 							'link_text_one' => '#',
 							'link_text_more' => '#',
 							'link_title' => '#',
-							'use_popup' => false,
 						) );
 
 			// Link to comments, trackbacks, etc.:
@@ -121,7 +123,6 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 							'link_text_one' => '#',
 							'link_text_more' => '#',
 							'link_title' => '#',
-							'use_popup' => false,
 						) );
 
 			$Item->edit_link( array( // Link to backoffice for editing

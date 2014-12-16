@@ -8,7 +8,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
- * @version $Id$
+ * @version $Id: account_password_reset.html.php 7639 2014-11-13 15:07:37Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -42,7 +42,7 @@ while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
 	{ // Several accounts with the given email address, display last used date for each
 		$message_content .= '<div style="margin: 1em 0; border: 1px solid #ccc; border-radius: 4px; padding: 1em 1em 1ex;">';
 
-		$message_content .= '<p>'.T_( 'Login:' ).' '.$iterator_User->get_colored_login( array( 'mask' => '$login$' ) )."</p>\n";
+		$message_content .= '<p'.emailskin_style( '.p' ).'>'.T_( 'Login:' ).' '.$iterator_User->get_colored_login( array( 'mask' => '$login$' ) )."</p>\n";
 		$user_lastseen_ts = $iterator_User->get( 'lastseen_ts' );
 		if( empty( $user_lastseen_ts ) )
 		{ // user has never logged in
@@ -55,7 +55,7 @@ while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
 	}
 	else
 	{
-		$message_content .= '<p>'.T_( 'Login:' ).' '.$iterator_User->get_colored_login( array( 'mask' => '$login$' ) )."</p>\n";
+		$message_content .= '<p'.emailskin_style( '.p' ).'>'.T_( 'Login:' ).' '.$iterator_User->get_colored_login( array( 'mask' => '$login$' ) )."</p>\n";
 	}
 
 	$url_change_password = $secure_htsrv_url.'login.php?action=changepwd'
@@ -68,8 +68,8 @@ while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
 	$url_change_password = '$secret_content_start$'.$url_change_password.'$secret_content_end$';
 
 	// Buttons:
-	$message_content .= '<div class="buttons">'."\n";
-	$message_content .= get_link_tag( $url_change_password, T_( 'Change your password NOW' ), 'button_yellow' )."\n";
+	$message_content .= '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
+	$message_content .= get_link_tag( $url_change_password, T_( 'Change your password NOW' ), 'div.buttons a+a.button_yellow' )."\n";
 	$message_content .= "</div>\n";
 
 	if( $params['user_count'] > 1 )
@@ -80,7 +80,7 @@ while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
 
 if( $params['user_count'] > 1 )
 { // exists more account with the given email address
-	$message_content = '<p>'.T_( 'It seems you have multiple accounts associated to this email address. Choose the one you want to use below:' ).'</p>'.$message_content;
+	$message_content = '<p'.emailskin_style( '.p' ).'>'.T_( 'It seems you have multiple accounts associated to this email address. Choose the one you want to use below:' ).'</p>'.$message_content;
 
 	$message_note = T_( 'For security reasons the links are only valid for your current session (by means of your session cookie).' );
 }
@@ -89,13 +89,13 @@ else
 	$message_note = T_( 'For security reasons the link is only valid for your current session (by means of your session cookie).' );
 }
 
-echo '<p>'.T_( 'Somebody (presumably you) has requested a password change for your account.' )."</p>\n";
+echo '<p'.emailskin_style( '.p' ).'>'.T_( 'Somebody (presumably you) has requested a password change for your account.' )."</p>\n";
 
 echo $message_content;
 
-echo '<p class="note">'.T_('Please note:').' '.$message_note."</p>\n";
+echo '<p'.emailskin_style( '.p+.note' ).'>'.T_('Please note:').' '.$message_note."</p>\n";
 
-echo '<p><i class="note">'.T_('If you did not request this password change, simply ignore this mail.').'</i></p>';
+echo '<p'.emailskin_style( '.p' ).'><i'.emailskin_style( '.note' ).'>'.T_('If you did not request this password change, simply ignore this email.').'</i></p>';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.html.php', $params );

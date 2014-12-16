@@ -20,7 +20,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _emailcampaign.class.php 7825 2014-12-16 16:32:09Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -64,10 +64,6 @@ class EmailCampaign extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_email__campaign', 'ecmp_', 'ecmp_ID', 'date_ts' );
 
-		$this->delete_cascades = array(
-				array( 'table'=>'T_email__campaign_send', 'fk'=>'csnd_camp_ID', 'msg'=>T_('%d links with users') ),
-			);
-
 		if( $db_row != NULL )
 		{
 			$this->ID = $db_row->ecmp_ID;
@@ -78,6 +74,19 @@ class EmailCampaign extends DataObject
 			$this->email_text = $db_row->ecmp_email_text;
 			$this->sent_ts = $db_row->ecmp_sent_ts;
 		}
+	}
+
+
+	/**
+	 * Get delete cascade settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_cascades()
+	{
+		return array(
+				array( 'table'=>'T_email__campaign_send', 'fk'=>'csnd_camp_ID', 'msg'=>T_('%d links with users') ),
+			);
 	}
 
 
@@ -288,9 +297,19 @@ class EmailCampaign extends DataObject
 				'message_text' => $this->get( 'email_text' ),
 			);
 
-		$email_template = $mode == 'test' ? 'newsletter_test' : 'newsletter';
+		if( $mode == 'test' )
+		{ // Send a test newsletter
+			$template_params['boundary'] = 'b2evo-'.md5( rand() );
+			$headers['Content-Type'] = 'multipart/mixed; boundary="'.$template_params['boundary'].'"';
+			$message = mail_template( 'newsletter', 'auto', $template_params );
+			$message = str_replace( '$login$', $email_address, $message );
 
-		return send_mail_to_User( $user_ID, $this->get( 'email_title' ), $email_template, $newsletter_params, false, array(), $email_address );
+			return send_mail( $email_address, NULL, $this->get( 'email_title' ), $message, NULL, NULL, $headers );
+		}
+		else
+		{ // Send a newsletter to real user
+			return send_mail_to_User( $user_ID, $this->get( 'email_title' ), 'newsletter', $newsletter_params, false, array(), $email_address );
+		}
 	}
 
 

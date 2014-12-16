@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
- * @version $Id$
+ * @version $Id: _genericelement.class.php 6134 2014-03-08 07:48:07Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -122,7 +122,7 @@ class GenericElement extends DataObject
 
 		if( ! $creating ) $Form->hidden( $this->dbIDname, $this->ID );
 
-		$Form->end_form( array( array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ) ) );
+		$Form->end_form( array( array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Update') ), 'SaveButton' ) ) );
 	}
 
 

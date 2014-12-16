@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage manual
  *
- * @version $Id$
+ * @version $Id: single.main.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -62,6 +62,11 @@ skin_include( '_left_navigation_bar.inc.php' );
 				'block_end'   => '</div>',
 			) );
 		// --------------------------------- END OF MESSAGES ---------------------------------
+
+		if( !empty( $cat ) )
+		{	// Display breadcrumbs if some category is selected
+			$Skin->display_breadcrumbs( $cat );
+		}
 	?>
 
 	<?php

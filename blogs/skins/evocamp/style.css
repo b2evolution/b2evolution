@@ -459,6 +459,9 @@ padding-right:16px;
 
 /* -------------------[ Search ]------------------- */
 
+div.extended_search_form {
+	margin: 10px 13px 0;
+}
 div.compact_search_form input.SearchField {
 font-size:8pt;
 width: 110px;
@@ -656,4 +659,8 @@ div.tabs div a {
 div.tabs div.selected a {
 	background-color: #F2ECCE;
 	border-bottom-color: #F2ECCE;
+}
+
+.search_title {
+	color: #960;
 }

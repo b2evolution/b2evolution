@@ -35,7 +35,7 @@ skin_include( '_html_header.inc.php' );
 // ------------------------- BODY HEADER INCLUDED HERE --------------------------
 skin_include( '_body_header.inc.php' );
 // Note: You can customize the default BODY header by copying the generic
-// /skins/_body_footer.inc.php file into the current skin folder.
+// /skins/_body_header.inc.php file into the current skin folder.
 // ------------------------------- END OF HEADER --------------------------------
 ?>
 
@@ -105,6 +105,9 @@ if( $Item = & get_featured_Item() )
 // Display message if no post:
 display_if_empty();
 
+// Load posts read statuses if required
+$MainList->load_content_read_statuses();
+
 echo '<div id="styled_content_block">'; // Beginning of posts display
 while( $Item = & mainlist_get_item() )
 {	// For each blog post:
@@ -136,8 +139,8 @@ echo '</div>'; // End of posts display
 <?php
 // ------------------------- SIDEBAR INCLUDED HERE --------------------------
 skin_include( '_sidebar.inc.php' );
-// Note: You can customize the default BODY footer by copying the
-// _body_footer.inc.php file into the current skin folder.
+// Note: You can customize the sidebar by copying the
+// _sidebar.inc.php file into the current skin folder.
 // ----------------------------- END OF SIDEBAR -----------------------------
 ?>
 

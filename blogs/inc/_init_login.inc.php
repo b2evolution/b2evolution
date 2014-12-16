@@ -33,7 +33,7 @@
  *
  * @package evocore
  *
- * @version $Id: _init_login.inc.php 7206 2014-08-04 07:57:37Z yura $
+ * @version $Id: _init_login.inc.php 7207 2014-08-04 07:58:23Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -126,7 +126,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 
 	// Note: login and password cannot include ' or " or > or <
 	// Note: login cannot include @
-	$login = evo_strtolower(strip_tags(remove_magic_quotes($login)));
+	$login = utf8_strtolower(strip_tags(remove_magic_quotes($login)));
 	$pass = strip_tags(remove_magic_quotes($pass));
 	$pass_md5 = md5( $pass );
 
@@ -143,11 +143,11 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 	$transmit_hashed_password = (bool)$Settings->get('js_passwd_hashing') && !(bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
 	if( $transmit_hashed_password )
 	{
-		param( 'pwd_hashed', 'string', '' );
+		param( 'pwd_hashed', 'array:string', array() );
 	}
 	else
 	{ // at least one plugin requests the password un-hashed:
-		$pwd_hashed = '';
+		$pwd_hashed = array();
 	}
 
 	// $Debuglog->add( 'Login: pwd_hashed: '.var_export($pwd_hashed, true).', pass: '.var_export($pass, true), '_init_login' );
@@ -176,7 +176,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 		if( is_email( $login ) )
 		{ // we have an email address instead of login name
 			// get user by email and password
-			list( $User, $exists_more ) = $UserCache->get_by_emailAndPwd( $login, $pass_md5, $pwd_hashed, $pwd_salt );
+			list( $User, $exists_more ) = $UserCache->get_by_emailAndPwd( $login, $pass, $pwd_hashed, $pwd_salt_sess );
 			if( $User )
 			{ // user was found
 				$email_login = $User->get( 'login' );
@@ -191,7 +191,21 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 			$User = false;
 		}
 
-		if( $User && ! $pass_ok )
+		if( $User )
+		{ // Check user login attempts
+			$login_attempts = $UserSettings->get( 'login_attempts', $User->ID );
+			$login_attempts = empty( $login_attempts ) ? array() : explode( ';', $login_attempts );
+			if( $failed_logins_lockout > 0 && count( $login_attempts ) == 9 )
+			{ // User already has a maximum value of the attempts
+				$first_attempt = explode( ':', $login_attempts[0] );
+				if( $localtimenow - $first_attempt[0] < $failed_logins_lockout )
+				{ // User has used 9 attempts during X minutes, Display error and Refuse login
+					$login_error = sprintf( T_('There have been too many failed login attempts. This account is temporarily locked. Try again in %s minutes.'), ceil( $failed_logins_lockout / 60 ) );
+				}
+			}
+		}
+
+		if( $User && ! $pass_ok && empty( $login_error ) )
 		{ // check the password, if no plugin has said "it's ok":
 			if( ! empty($pwd_hashed) )
 			{ // password hashed by JavaScript:
@@ -220,14 +234,21 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 				else
 				{ // compare the password, using the salt stored in the Session:
 					#pre_dump( sha1($User->pass.$pwd_salt), $pwd_hashed );
-					$pass_ok = sha1($User->pass.$pwd_salt) == $pwd_hashed;
+					foreach( $pwd_hashed as $encrypted_password )
+					{
+						$pass_ok = ( sha1( bin2hex( $User->pass ).$pwd_salt_sess ) == $encrypted_password );
+						if( $pass_ok )
+						{ // Break after the first matching password
+							break;
+						}
+					}
 					$Session->delete('core.pwd_salt');
 					$Debuglog->add( 'Login: Compared hashed passwords. Result: '.(int)$pass_ok, '_init_login' );
 				}
 			}
 			else
 			{
-				$pass_ok = ( $User->pass == $pass_md5 );
+				$pass_ok = ( $User->pass == md5( $User->salt.$pass, true ) );
 				$Debuglog->add( 'Login: Compared raw passwords. Result: '.(int)$pass_ok, '_init_login' );
 			}
 		}
@@ -257,6 +278,11 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 		{ // save the user for later hits
 			$Session->set_User( $current_User );
 
+			if( empty( $current_User->salt ) )
+			{
+				$Messages->add( sprintf( T_('For best security, we recommend you <a %s>change your password now</a>.'), 'href="'.get_user_pwdchange_url().'"' ), 'warning' );
+			}
+
 			$current_user_locale = $current_User->get( 'locale' );
 			if( ( ! isset( $locales[$current_user_locale] ) ) || ( ! $locales[$current_user_locale]['enabled'] ) )
 			{ // Current user locale doesn't exists or it is not enabled, update to the default locale if it is valid
@@ -275,11 +301,59 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 				$Messages->add( sprintf( T_('The site is currently locked for maintenance. Click <a %s>here</a> to access lock settings.'), $system_lock_url ), 'warning' );
 			}
 		}
+
+		if( ! empty( $login_attempts ) )
+		{ // Display all attempts on success login
+			$current_ip = array_key_exists( 'REMOTE_ADDR', $_SERVER ) ? $_SERVER['REMOTE_ADDR'] : '';
+			if( ! isset( $Plugins ) )
+			{
+				$Plugins = new Plugins();
+			}
+			// Initialize GeoIP plugin
+			$geoip_Plugin = & $Plugins->get_by_code( 'evo_GeoIP' );
+
+			foreach( $login_attempts as $attempt )
+			{
+				$attempt = explode( ':', $attempt );
+				$attempt_ip = $attempt[1];
+
+				$plugin_country_by_IP = '';
+				if( ! empty( $geoip_Plugin ) && $Country = & $geoip_Plugin->get_country_by_IP( $attempt_ip ) )
+				{ // Get country by IP if plugin is enabled
+					$plugin_country_by_IP = ' ('.$Country->get_name().')';
+				}
+
+				if( $attempt_ip != $current_ip )
+				{ // Get DNS by IP if current IP is different from attempt IP
+					$attempt_ip .= ' '.gethostbyaddr( $attempt_ip );
+				}
+
+				$Messages->add( sprintf( T_('Someone tried to log in to your account with a wrong password on %s from %s%s'),
+						date( locale_datefmt().' '.locale_timefmt(), $attempt[0] ),
+						$attempt_ip,
+						$plugin_country_by_IP
+					), 'error' );
+			}
+			// Clear the attempts list
+			$UserSettings->delete( 'login_attempts', $current_User->ID );
+			$UserSettings->dbupdate();
+		}
 	}
 	elseif( empty( $login_error ) )
 	{ // if the login_error wasn't set yet, add the default one:
 		// This will cause the login screen to "popup" (again)
 		$login_error = T_('Wrong login/password.');
+
+		if( isset( $login_attempts ) )
+		{ // Save new login attempt into DB
+			if( count( $login_attempts ) == 9 )
+			{ // Unset first attempt to clear a space for new attempt
+				unset( $login_attempts[0] );
+			}
+			$login_attempts[] = $localtimenow.':'.( array_key_exists( 'REMOTE_ADDR', $_SERVER ) ? $_SERVER['REMOTE_ADDR'] : '' );
+			$UserSettings->set( 'login_attempts', implode( ';', $login_attempts ), $User->ID );
+			$UserSettings->dbupdate();
+		}
 	}
 
 }

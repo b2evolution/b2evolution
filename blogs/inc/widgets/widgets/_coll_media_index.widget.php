@@ -22,7 +22,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author Yabba	- {@link http://www.astonishme.co.uk/}
  *
- * @version $Id$
+ * @version $Id: _coll_media_index.widget.php 6826 2014-06-02 05:53:26Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -179,7 +179,12 @@ class coll_media_index_Widget extends ComponentWidget
 
 		global $Blog;
 		$blog_ID = ( $this->disp_params[ 'blog_ID' ] ? $this->disp_params[ 'blog_ID' ] : $Blog->ID );
-		//pre_dump( $blog_ID );
+
+		$BlogCache = & get_BlogCache();
+		if( ! $BlogCache->get_by_ID( $blog_ID, false, false ) )
+		{ // No blog exists
+			return;
+		}
 
 		// Display photos:
 		// TODO: permissions, complete statuses...
@@ -194,19 +199,25 @@ class coll_media_index_Widget extends ComponentWidget
 		// Note: We use ItemQuery to get attachments from all posts which should be visible ( even in case of aggregate blogs )
 		$ItemQuery = new ItemQuery( $ItemCache->dbtablename, $ItemCache->dbprefix, $ItemCache->dbIDname );
 		$ItemQuery->SELECT( 'post_ID, post_datestart, post_datemodified, post_main_cat_ID, post_urltitle, post_canonical_slug_ID,
-									post_tiny_slug_ID, post_ptyp_ID, post_title, post_excerpt, post_url, file_ID,
+									post_tiny_slug_ID, post_ptyp_ID, post_title, post_excerpt, post_url, file_ID, file_type,
 									file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash' );
 		$ItemQuery->FROM_add( 'INNER JOIN T_links ON post_ID = link_itm_ID' );
 		$ItemQuery->FROM_add( 'INNER JOIN T_files ON link_file_ID = file_ID' );
 		$ItemQuery->where_chapter( $blog_ID );
 		$ItemQuery->where_visibility( NULL );
+		$ItemQuery->WHERE_and( '( file_type = "image" ) OR ( file_type IS NULL )' );
 		$ItemQuery->WHERE_and( 'post_datestart <= \''.remove_seconds( $localtimenow ).'\'' );
 		if( !empty( $this->disp_params[ 'item_type' ] ) )
 		{ // Get items only with specified type
 			$ItemQuery->WHERE_and( 'post_ptyp_ID = '.intval( $this->disp_params[ 'item_type' ] ) );
 		}
 		$ItemQuery->GROUP_BY( 'link_ID' );
-		$ItemQuery->LIMIT( intval( $this->disp_params[ 'limit' ] ) * 4 ); // fp> TODO: because no way of getting images only, we get 4 times more data than requested and hope that 25% at least will be images :/
+
+		// fp> TODO: because no way of getting images only, we get 4 times more data than requested and hope that 25% at least will be images :/
+		// asimo> This was updated and we get images and those files where we don't know the file type yet. Now we get 2 times more data than requested.
+		// Maybe it would be good to get only the requested amount of files, because after a very short period the file types will be set for all images.
+		$ItemQuery->LIMIT( intval( $this->disp_params[ 'limit' ] ) * 2 );
+
 		$ItemQuery->ORDER_BY(	gen_order_clause( $this->disp_params['order_by'], $this->disp_params['order_dir'],
 											'post_', 'post_ID '.$this->disp_params['order_dir'].', link_ID' ) );
 

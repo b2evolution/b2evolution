@@ -24,7 +24,7 @@
  *
  * @package evocore
  *
- * @version $Id: async.php 7582 2014-11-06 11:52:51Z yura $
+ * @version $Id: async.php 7713 2014-12-01 06:35:17Z yura $
  */
 
 
@@ -173,6 +173,9 @@ switch( $action )
 		// current user must have at least view permission to see users login
 		$current_User->check_perm( 'users', 'view', true );
 
+		// What data type return: 'json' or as multilines by default
+		$data_type = param( 'data_type', 'string', '' );
+
 		// What users return: 
 		$user_type = param( 'user_type', 'string', '' );
 
@@ -191,7 +194,7 @@ switch( $action )
 		if( preg_match( '~%u[0-9a-f]{3,4}~i', $text ) && version_compare(PHP_VERSION, '5', '>=') )
 		{	// Decode UTF-8 string (PHP 5 and up)
 			$text = preg_replace( '~%u([0-9a-f]{3,4})~i', '&#x\\1;', $text );
-			$text = evo_html_entity_decode( $text, ENT_COMPAT, 'UTF-8' );
+			$text = html_entity_decode( $text, ENT_COMPAT, 'UTF-8' );
 		}
 
 		if( !empty( $text ) )
@@ -243,7 +246,15 @@ switch( $action )
 
 			$user_logins = $DB->get_col( $users_sql );
 
-			echo implode( "\n", $user_logins );
+			if( $data_type == 'json' )
+			{ // Return data in JSON format
+				echo evo_json_encode( $user_logins );
+				exit(0); // Exit here to don't break JSON data by following debug data
+			}
+			else
+			{ // Return data as multilines
+				echo implode( "\n", $user_logins );
+			}
 		}
 
 		// don't show ajax response end comment, because the result will be processed with jquery hintbox
@@ -261,162 +272,63 @@ switch( $action )
 		echo get_opentrash_link( true, true );
 		break;
 
-	case 'set_comment_status':
-		// Used for quick moderation of comments in dashboard, item list full view and comment list screens
-
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'comment' );
-
-		// Check comment moderate permission below after we have the $edited_Comment object
-
-		$is_admin_page = true;
-		$blog = param( 'blogid', 'integer' );
-		$moderation = param( 'moderation', 'string', NULL );
-		$status = param( 'status', 'string' );
-		$expiry_status = param( 'expiry_status', 'string', 'active' );
-		$limit = param( 'limit', 'integer', 0 );
-		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ), false );
-		if( $edited_Comment !== false )
-		{	// The comment still exists
-			// Check permission:
-			$current_User->check_perm( 'comment!'.$status, 'moderate', true, $edited_Comment );
-
-			$redirect_to = param( 'redirect_to', 'url', NULL );
-
-			$edited_Comment->set( 'status', $status );
-			// Comment moderation is done, handle moderation "secret"
-			$edited_Comment->handle_qm_secret();
-			$edited_Comment->dbupdate();
-
-			if( $status == 'published' )
-			{
-				$edited_Comment->handle_notifications();
-			}
-
-			if( $moderation != NULL )
-			{
-				if( param( 'is_backoffice', 'integer', 0 ) )
-				{ // Set admin skin, used for buttons, @see button_class()
-					global $current_User, $UserSettings, $is_admin_page, $adminskins_path;
-					$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
-					$is_admin_page = true;
-					require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
-					$AdminUI = new AdminUI();
-				}
-
-				$statuses = param( 'statuses', 'string', NULL );
-				$item_ID = param( 'itemid', 'integer' );
-				$currentpage = param( 'currentpage', 'integer', 1 );
-
-				if( strlen($statuses) > 2 )
-				{
-					$statuses = substr( $statuses, 1, strlen($statuses) - 2 );
-				}
-				$status_list = explode( ',', $statuses );
-				if( $status_list == NULL )
-				{
-					$status_list = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
-				}
-
-				// In case of comments_fullview we must set a filterset name to be abble to restore filterset.
-				// If $moderation is not NULL, then this requests came from the comments_fullview
-				// TODO: asimo> This should be handled with a better solution
-				$filterset_name = ( $item_ID > 0 ) ? '' : 'fullview';
-				if( $limit == 0 )
-				{
-					$limit = $UserSettings->get( 'results_per_page' ); 
-				}
-				echo_item_comments( $blog, $item_ID, $status_list, $currentpage, $limit, array(), $filterset_name, $expiry_status );
-				break;
-			}
-		}
-
-		if( $moderation == NULL )
-		{
-			get_comments_awaiting_moderation( $blog );
-		}
-
-		break;
-
 	case 'delete_comment':
-		// Delete a comment from dashboard screen
+		// Delete a comment from the list on dashboard, on comments full text view screen or on a view item screen
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
+
+		$result_success = false;
 
 		// Check comment moderate permission below after we have the $edited_Comment objects
 
 		$is_admin_page = true;
 		$blog = param( 'blogid', 'integer' );
-		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ), false );
-		if( $edited_Comment !== false )
-		{	// The comment still exists
-			// Check permission:
-			$current_User->check_perm( 'comment!CURSTATUS', 'delete', true, $edited_Comment );
-
-			$edited_Comment->dbdelete();
-		}
-
-		get_comments_awaiting_moderation( $blog );
-		break;
-
-	case 'delete_comments':
-		// Delete the comments from the list on dashboard, on comments full text view screen or on a view item screen
-
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'comment' );
-
-		// Check comment moderate permission below after we have the $edited_Comment objects
-
-		$is_admin_page = true;
-		$blog = param( 'blogid', 'integer' );
-		$commentIds = param( 'commentIds', 'array' );
+		$comment_ID = param( 'commentid', 'integer' );
 		$statuses = param( 'statuses', 'string', NULL );
 		$expiry_status = param( 'expiry_status', 'string', 'active' );
 		$item_ID = param( 'itemid', 'integer' );
 		$currentpage = param( 'currentpage', 'integer', 1 );
 		$limit = param( 'limit', 'integer', 0 );
+		$request_from = param( 'request_from', 'string', NULL );
 
-		if( param( 'is_backoffice', 'integer', 0 ) )
-		{ // Set admin skin, used for buttons, @see button_class()
-			global $current_User, $UserSettings, $is_admin_page, $adminskins_path;
-			$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
-			$is_admin_page = true;
-			require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
-			$AdminUI = new AdminUI();
+		$edited_Comment = & Comment_get_by_ID( $comment_ID, false );
+		if( $edited_Comment !== false )
+		{ // The comment still exists
+			// Check permission:
+			$current_User->check_perm( 'comment!CURSTATUS', 'delete', true, $edited_Comment );
+
+			$result_success = $edited_Comment->dbdelete();
 		}
 
-		foreach( $commentIds as $commentID )
-		{
-			$edited_Comment = & Comment_get_by_ID( $commentID, false );
-			if( $edited_Comment !== false )
-			{ // The comment still exists
-				// Check permission:
-				$current_User->check_perm( 'comment!CURSTATUS', 'delete', true, $edited_Comment );
+		if( $result_success === false )
+		{ // Some errors on deleting of the comment, Exit here
+			header_http_response( '500 '.T_('Comment cannot be deleted!'), 500 );
+			exit(0);
+		}
 
-				$edited_Comment->dbdelete();
+		if( in_array( $request_from, array( 'items', 'comments' ) ) )
+		{ // AJAX request goes from backoffice and ctrl = items or comments
+			if( strlen($statuses) > 2 )
+			{
+				$statuses = substr( $statuses, 1, strlen($statuses) - 2 );
 			}
-		}
+			$status_list = explode( ',', $statuses );
+			if( $status_list == NULL )
+			{
+				$status_list = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
+			}
 
-		if( strlen($statuses) > 2 )
-		{
-			$statuses = substr( $statuses, 1, strlen($statuses) - 2 );
+			// In case of comments_fullview we must set a filterset name to be abble to restore filterset.
+			// If $item_ID is not valid, then this requests came from the comments_fullview
+			// TODO: asimo> This should be handled with a better solution
+			$filterset_name = /*'';*/( $item_ID > 0 ) ? '' : 'fullview';
+			if( $limit == 0 )
+			{
+				$limit = $UserSettings->get( 'results_per_page' ); 
+			}
+			echo_item_comments( $blog, $item_ID, $status_list, $currentpage, $limit, array(), $filterset_name, $expiry_status );
 		}
-		$status_list = explode( ',', $statuses );
-		if( $status_list == NULL )
-		{
-			$status_list = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
-		}
-
-		// In case of comments_fullview we must set a filterset name to be abble to restore filterset.
-		// If $item_ID is not valid, then this requests came from the comments_fullview
-		// TODO: asimo> This should be handled with a better solution
-		$filterset_name = /*'';*/( $item_ID > 0 ) ? '' : 'fullview';
-		if( $limit == 0 )
-		{
-			$limit = $UserSettings->get( 'results_per_page' ); 
-		}
-		echo_item_comments( $blog, $item_ID, $status_list, $currentpage, $limit, array(), $filterset_name, $expiry_status );
 		break;
 
 	case 'delete_comment_url':
@@ -442,26 +354,11 @@ switch( $action )
 
 	case 'refresh_comments':
 		// Refresh the comments list on dashboard by clicking on the refresh icon or after ban url
-
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'comment' );
-
-		$is_admin_page = true;
-		$blog = param( 'blogid', 'integer' );
-		// Check minimum permissions ( The comment specific permissions are checked when displaying the comments )
-		$current_User->check_perm( 'blog_ismember', 'view', true, $blog );
-
-		get_comments_awaiting_moderation( $blog );
-		break;
-
-	case 'refresh_item_comments':
 		// Refresh item comments on the item view screen, or refresh all blog comments on comments view, if param itemid = -1
 		// A refresh is used on the actions:
 		// 1) click on the refresh icon.
 		// 2) limit by selected status(radioboxes 'Draft', 'Published', 'All comments').
 		// 3) ban by url of a comment
-
-		load_funcs( 'items/model/_item.funcs.php' );
 
 		$is_admin_page = true;
 		$blog = param( 'blogid', 'integer' );
@@ -469,21 +366,29 @@ switch( $action )
 		$statuses = param( 'statuses', 'string', NULL );
 		$expiry_status = param( 'expiry_status', 'string', 'active' );
 		$currentpage = param( 'currentpage', 'string', 1 );
+		$request_from = param( 'request_from', 'string', 'items' );
 
 		// Check minimum permissions ( The comment specific permissions are checked when displaying the comments )
 		$current_User->check_perm( 'blog_ismember', 'view', true, $blog );
 
-		if( strlen($statuses) > 2 )
-		{
-			$statuses = substr( $statuses, 1, strlen($statuses) - 2 );
-		}
-		$status_list = explode( ',', $statuses );
-		if( $status_list == NULL )
-		{ // init statuses
-			$status_list = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
-		}
+		if( in_array( $request_from, array( 'items', 'comments' ) ) )
+		{ // AJAX request goes from backoffice and ctrl = items or comments
+			if( strlen($statuses) > 2 )
+			{
+				$statuses = substr( $statuses, 1, strlen($statuses) - 2 );
+			}
+			$status_list = explode( ',', $statuses );
+			if( $status_list == NULL )
+			{ // init statuses
+				$status_list = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
+			}
 
-		echo_item_comments( $blog, $item_ID, $status_list, $currentpage, 20, array(), '', $expiry_status );
+			echo_item_comments( $blog, $item_ID, $status_list, $currentpage, 20, array(), '', $expiry_status );
+		}
+		elseif( $request_from == 'dashboard' )
+		{ // AJAX request goes from backoffice dashboard
+			get_comments_awaiting_moderation( $blog );
+		}
 		break;
 
 	case 'dom_type_edit':
@@ -570,11 +475,11 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'userlevel' );
 
-		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
-
 		$user_level = param( 'new_user_level', 'integer' );
-		$user_ID = param( 'user_ID', 'string' );
+		$user_ID = param( 'user_ID', 'integer' );
+
+		// Check permission:
+		$current_User->can_moderate_user( $user_ID, true );
 
 		$UserCache = & get_UserCache();
 		if( $User = & $UserCache->get_by_ID( $user_ID, false ) )
@@ -582,6 +487,27 @@ switch( $action )
 			$User->set( 'level', $user_level );
 			$User->dbupdate();
 			echo '<a href="#" rel="'.$user_level.'">'.$user_level.'</a>';
+		}
+		break;
+
+	case 'group_level_edit':
+		// Update level of a group from list screen by clicking on the level column
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'grouplevel' );
+
+		// Check permission:
+		$current_User->check_perm( 'users', 'edit', true );
+
+		$group_level = param( 'new_group_level', 'integer' );
+		$group_ID = param( 'group_ID', 'integer' );
+
+		$GroupCache = & get_GroupCache();
+		if( $Group = & $GroupCache->get_by_ID( $group_ID, false, false ) )
+		{
+			$Group->set( 'level', $group_level );
+			$Group->dbupdate();
+			echo '<a href="#" rel="'.$group_level.'">'.$group_level.'</a>';
 		}
 		break;
 
@@ -685,6 +611,105 @@ switch( $action )
 		echo '<a href="#" rel="'.$new_value.'"'.$new_attrs.'>'.$new_title.'</a>';
 		break;
 
+	case 'get_goals':
+		// Get option list with goals by selected category
+		$blog = param( 'blogid', 'integer' );
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'itemgoal' );
+
+		// Check permission:
+		$current_User->check_perm( 'blog_post_statuses', 'edit', true, $blog );
+
+		$cat_ID = param( 'cat_id', 'integer', 0 );
+
+		$SQL = new SQL();
+		$SQL->SELECT( 'goal_ID, goal_name' );
+		$SQL->FROM( 'T_track__goal' );
+		$SQL->WHERE( 'goal_redir_url IS NULL' );
+		if( empty( $cat_ID ) )
+		{ // Select the goals without category
+			$SQL->WHERE_and( 'goal_gcat_ID IS NULL' );
+		}
+		else
+		{ // Get the goals from a selected category
+			$SQL->WHERE_and( 'goal_gcat_ID = '.$DB->quote( $cat_ID ) );
+		}
+		$goals = $DB->get_assoc( $SQL->get() );
+
+		echo '<option value="">'.T_('None').'</option>';
+
+		foreach( $goals as $goal_ID => $goal_name )
+		{
+			echo '<option value="'.$goal_ID.'">'.$goal_name.'</option>';
+		}
+
+		break;
+
+	case 'change_user_org_status':
+		// Used in the identity user form to change an accept status of organization by Admin users
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'userorg' );
+
+		// Check permission:
+		$current_User->check_perm( 'users', 'edit', true );
+
+		/**
+		 * This string is value of "rel" attibute of span icon element
+		 * The format of this string is: 'org_status_y_1_2' or 'org_status_n_1_2', where:
+		 *     'y' - organization was accepted by admin,
+		 *     'n' - not accepted
+		 *     '1' - this number is ID of organization - uorg_org_ID from the DB table T_users__user_org
+		 *     '2' - this number is ID of user - uorg_user_ID from the DB table T_users
+		 */
+		$status = explode( '_', param( 'status', 'string' ) );
+
+		// ID of organization
+		$org_ID = isset( $status[3] ) ? intval( $status[3] ) : 0;
+
+		// ID of organization
+		$user_ID = isset( $status[4] ) ? intval( $status[4] ) : 0;
+
+		if( count( $status ) != 5 || ( $status[2] != 'y' && $status[2] != 'n' ) || $org_ID == 0 )
+		{ // Incorrect format of status param
+			$Ajaxlog->add( T_('Incorrect request to accept organization!'), 'error' );
+			break;
+		}
+
+		// Use the glyph or font-awesome icons if it is defined by skin
+		param( 'b2evo_icons_type', 'string', '' );
+
+		if( $status[2] == 'y' )
+		{ // Status will be change to "Not accepted"
+			$org_is_accepted = false;
+		}
+		else
+		{ // Status will be change to "Accepted"
+			$org_is_accepted = true;
+		}
+
+		// Change an accept status of organization for edited user
+		$DB->query( 'UPDATE T_users__user_org
+			  SET uorg_accepted = '.$DB->quote( $org_is_accepted ? 1 : 0 ).'
+			WHERE uorg_user_ID = '.$DB->quote( $user_ID ).'
+			  AND uorg_org_ID = '.$DB->quote( $org_ID ) );
+
+		$accept_icon_params = array( 'style' => 'cursor: pointer;', 'rel' => 'org_status_'.( $org_is_accepted ? 'y' : 'n' ).'_'.$org_ID.'_'.$user_ID );
+		if( $org_is_accepted )
+		{ // Organization is accepted by admin
+			$accept_icon = get_icon( 'allowback', 'imgtag', array_merge( array( 'title' => T_('Accepted') ), $accept_icon_params ) );
+		}
+		else
+		{ // Organization is not accepted by admin yet
+			$accept_icon = get_icon( 'bullet_red', 'imgtag', array_merge( array( 'title' => T_('Not accepted') ), $accept_icon_params ) );
+		}
+
+		// Display icon with new status
+		echo $accept_icon;
+
+		break;
+
 	case 'conflict_files':
 		// Replace old file with new and set new name for old file
 
@@ -717,6 +742,57 @@ switch( $action )
 		echo evo_json_encode( $data );
 		exit(0);
 
+	case 'link_attachment':
+		// The content for popup window to link the files to the items/comments
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'link' );
+
+		// Check permission:
+		$current_User->check_perm( 'files', 'view' );
+
+		param( 'iframe_name', 'string', '' );
+		param( 'link_owner_type', 'string', true );
+		param( 'link_owner_ID', 'integer', true );
+		// Additional params, Used to highlight file/folder
+		param( 'root', 'string', '' );
+		param( 'path', 'string', '' );
+		param( 'fm_highlight', 'string', '' );
+
+		$additional_params = empty( $root ) ? '' : '&amp;root='.$root;
+		$additional_params .= empty( $path ) ? '' : '&amp;path='.$path;
+		$additional_params .= empty( $fm_highlight ) ? '' : '&amp;fm_highlight='.$fm_highlight;
+
+		echo '<div style="background:#FFF;height:80%">'
+				.'<span id="link_attachment_loader" class="loader_img absolute_center" title="'.T_('Loading...').'"></span>'
+				.'<iframe src="'.$admin_url.'?ctrl=files&amp;mode=upload&amp;ajax_request=1&amp;iframe_name='.$iframe_name.'&amp;fm_mode=link_object&amp;link_type='.$link_owner_type.'&amp;link_object_ID='.$link_owner_ID.$additional_params.'"'
+					.' width="100%" height="100%" marginwidth="0" marginheight="0" align="top" scrolling="auto" frameborder="0"'
+					.' onload="document.getElementById(\'link_attachment_loader\').style.display=\'none\'">loading</iframe>'
+			.'</div>';
+
+		break;
+
+	case 'import_files':
+		// The content for popup window to import the files for XML importer
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'import' );
+
+		$FileRootCache = & get_FileRootCache();
+		$FileRoot = & $FileRootCache->get_by_type_and_ID( 'import', '0', true );
+
+		// Check permission:
+		$current_User->check_perm( 'files', 'view', true, $FileRoot );
+
+		echo '<div style="background:#FFF;height:80%">'
+				.'<span id="import_files_loader" class="loader_img absolute_center" title="'.T_('Loading...').'"></span>'
+				.'<iframe src="'.$admin_url.'?ctrl=files&amp;mode=import&amp;ajax_request=1&amp;root=import_0"'
+					.' width="100%" height="100%" marginwidth="0" marginheight="0" align="top" scrolling="auto" frameborder="0"'
+					.' onload="document.getElementById(\'import_files_loader\').style.display=\'none\'">loading</iframe>'
+			.'</div>';
+
+		break;
+
 	default:
 		$incorrect_action = true;
 		break;
@@ -748,7 +824,7 @@ if( !$incorrect_action )
  */
 function get_comments_awaiting_moderation( $blog_ID )
 {
-	$limit = 5;
+	$limit = 30;
 
 	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
 	show_comments_awaiting_moderation( $blog_ID, NULL, $limit, array(), false );

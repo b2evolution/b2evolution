@@ -249,11 +249,11 @@ form.bComment fieldset div.label select {
 }
 
 /* bComment Avatar */
-form.bComment fieldset div.avatartag {
+form.bComment div.avatartag {
 	float: left;
 	margin: 0 0.5em 0.5em 0;
 }
-form.bComment fieldset div.avatartag a {
+form.bComment div.avatartag a {
 	outline: none;
 }
 
@@ -280,6 +280,7 @@ textarea.form_textarea_input {
 }
 .standard_login_link {
 	margin: 1em;
+	text-align: center;
 }
 
 
@@ -628,6 +629,68 @@ div.item_location {
 	width: 100%;
 }
 
+/* Registration form */
+#register_form input.form_text_input {
+	border: 1px solid #CCC;
+	padding: 2px 1px;
+	vertical-align: middle;
+}
+
+/* Messages list & form */
+.messages_list .messages_navigation {
+	padding: 5px;
+}
+.messages_list h2 {
+	margin: 0;
+}
+.messages_list > h2 {
+	border: 1px solid #BBB;
+	border-bottom: none;
+	background-color: #D4D4D4;
+	padding: 0 7px;
+}
+.messages_list form.bComment {
+	border: 1px solid #BBB;
+	background-color: #DDDDDD;
+	margin: 0;
+	padding-top: 5px;
+}
+.messages_list table.bForums {
+	border: none;
+}
+.messages_list table.bForums td {
+	background: none;
+	vertical-align: top;
+}
+.messages_list div.messages_list_actions {
+	text-align: center;
+	border-left: 1px solid #BBB;
+	border-right: 1px solid #BBB;
+	padding: 10px 0;
+}
+.messages_list div.messages_list_actions p {
+	margin: 0;
+	padding: 0;
+	text-align: center;
+}
+.messages_list div.messages_list_actions a {
+	margin-bottom: 1ex;
+	display: inline-block;
+}
+.messages_list div.messages_list_actions a:last-child {
+	margin-bottom: 0;
+}
+.messages_list div.results {
+	margin-top: 0;
+}
+.messages_list span.error {
+	border: 1px solid #BBB;
+	border-bottom: none;
+	padding: 10px;
+	text-align: center;
+	display: block;
+}
+
 /* Not published comments display */
 #styled_content_block .status_draft,
 #styled_content_block .status_review,
@@ -738,57 +801,21 @@ div.results .status_trash span {
 	}
 }
 
-/* Messages list & form */
-.messages_list .messages_navigation {
-	padding: 5px;
+.search_title {
+	font-size: 125%;
 }
-.messages_list h2 {
-	border: 1px solid #BBB;
-	border-bottom: none;
-	background-color: #D4D4D4;
-	padding: 0 7px;
-	margin: 0;
+.search_title a {
+	text-decoration: underline;
 }
-.messages_list form.bComment {
-	border: 1px solid #BBB;
-	background-color: #DDDDDD;
-	margin: 0;
-	padding-top: 5px;
+.search_result {
+	padding: 15px 15px 5px;
 }
-.messages_list table.bForums {
-	border: none;
+.search_info {
+	font-size: 8pt;
 }
-.messages_list table.bForums td {
-	background: none;
-	vertical-align: top;
-}
-.messages_list div.messages_list_actions {
-	text-align: center;
-	border-left: 1px solid #BBB;
-	border-right: 1px solid #BBB;
-	padding: 10px 0;
-}
-.messages_list div.messages_list_actions p {
-	margin: 0;
-	padding: 0;
-	text-align: center;
-}
-.messages_list div.messages_list_actions a {
-	margin-bottom: 1ex;
-	display: inline-block;
-}
-.messages_list div.messages_list_actions a:last-child {
-	margin-bottom: 0;
-}
-.messages_list div.results {
-	margin-top: 0;
-}
-.messages_list span.error {
-	border: 1px solid #BBB;
-	border-bottom: none;
-	padding: 10px;
-	text-align: center;
-	display: block;
+
+.track_content {
+	margin: 5px;
 }
 
 /* Visibility of status banners and buttons depending on comment status */

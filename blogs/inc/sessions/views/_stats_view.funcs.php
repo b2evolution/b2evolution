@@ -21,7 +21,7 @@
  *
  * @package admin
  *
- * @version $Id: _stats_view.funcs.php 7495 2014-10-22 10:30:38Z yura $
+ * @version $Id: _stats_view.funcs.php 7496 2014-10-22 10:34:59Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -287,15 +287,15 @@ function stats_format_req_URI( $hit_coll_ID, $hit_uri, $max_len = 40, $hit_disp 
 	}
 
 	$int_search_uri = urldecode($hit_uri);
-	if( ( evo_strpos( $int_search_uri , '?s=' ) !== false )
-	 || ( evo_strpos( $int_search_uri , '&s=' ) !== false ) )
+	if( ( utf8_strpos( $int_search_uri , '?s=' ) !== false )
+	 || ( utf8_strpos( $int_search_uri , '&s=' ) !== false ) )
 	{ // This is an internal search:
 		preg_match( '~[?&]s=([^&#]*)~', $int_search_uri, $res );
 		$hit_uri = sprintf( T_( 'Internal search: %s' ), $res[1] );
 	}
-	elseif( evo_strlen($hit_uri) > $max_len )
+	elseif( utf8_strlen($hit_uri) > $max_len )
 	{
-		$hit_uri = '...'.evo_substr( $hit_uri, -$max_len );
+		$hit_uri = '...'.utf8_substr( $hit_uri, -$max_len );
 	}
 
 	if( $hit_disp != NULL || $hit_ctrl != NULL || $hit_action != NULL)

@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: locales.ctrl.php 7489 2014-10-22 06:54:36Z yura $
+ * @version $Id: locales.ctrl.php 7596 2014-11-07 13:33:16Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -94,12 +94,12 @@ switch( $action )
 		param_check_regexp( 'newloc_locale', '/^[a-z]{2,3}-[A-Z]{2}.*$/', T_('Please use valid locale format.') );
 		param( 'newloc_enabled', 'integer', 0 );
 		param( 'newloc_name', 'string', true );
-		param( 'newloc_charset', 'string', true );
-		param_check_not_empty( 'newloc_charset', T_('Charset cannot be empty.') );
 		param( 'newloc_datefmt', 'string', true );
 		param_check_not_empty( 'newloc_datefmt', T_('Date format cannot be empty.') );
 		param( 'newloc_timefmt', 'string', true );
 		param_check_not_empty( 'newloc_timefmt', T_('Time format cannot be empty.') );
+		param( 'newloc_shorttimefmt', 'string', true );
+		param_check_not_empty( 'newloc_shorttimefmt', T_('Short time format cannot be empty.') );
 		param( 'newloc_startofweek', 'integer', 0 );
 		param( 'newloc_priority', 'integer', 1 );
 		param_check_range( 'newloc_priority', 1, 255, T_('Priority must be numeric (1-255).') );
@@ -138,10 +138,11 @@ switch( $action )
 				}
 
 				$query = "INSERT INTO T_locales
-									( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_startofweek, loc_name, loc_messages, loc_priority, loc_transliteration_map, loc_enabled )
+									( loc_locale, loc_datefmt, loc_timefmt, loc_shorttimefmt, loc_startofweek, loc_name, loc_messages, loc_priority, loc_transliteration_map, loc_enabled )
 									VALUES ( '$oldloc_locale',
-									'{$locales[$oldloc_locale]['charset']}', '{$locales[$oldloc_locale]['datefmt']}',
-									'{$locales[$oldloc_locale]['timefmt']}', '{$locales[$oldloc_locale]['startofweek']}',
+									'{$locales[$oldloc_locale]['datefmt']}',
+									'{$locales[$oldloc_locale]['timefmt']}', '{$locales[$oldloc_locale]['shorttimefmt']}',
+									'{$locales[$oldloc_locale]['startofweek']}',
 									'{$locales[$oldloc_locale]['name']}', '{$locales[$oldloc_locale]['messages']}',
 									'{$locales[$oldloc_locale]['priority']}', '$transliteration_map'";
 				if( $oldloc_locale != $newloc_locale )
@@ -159,9 +160,9 @@ switch( $action )
 		}
 
 		$query = 'REPLACE INTO T_locales
-							( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_startofweek, loc_name, loc_messages, loc_priority, loc_transliteration_map, loc_enabled )
-							VALUES ( '.$DB->quote( $newloc_locale ).', '.$DB->quote( $newloc_charset ).', '.$DB->quote( $newloc_datefmt ).', '
-								.$DB->quote( $newloc_timefmt ).', '.$DB->quote( $newloc_startofweek ).', '.$DB->quote( $newloc_name ).', '
+							( loc_locale, loc_datefmt, loc_timefmt, loc_shorttimefmt, loc_startofweek, loc_name, loc_messages, loc_priority, loc_transliteration_map, loc_enabled )
+							VALUES ( '.$DB->quote( $newloc_locale ).', '.$DB->quote( $newloc_datefmt ).', '
+								.$DB->quote( $newloc_timefmt ).', '.$DB->quote( $newloc_shorttimefmt ).', '.$DB->quote( $newloc_startofweek ).', '.$DB->quote( $newloc_name ).', '
 								.$DB->quote( $newloc_messages ).', '.$DB->quote( $newloc_priority ).', '.$DB->quote( $newloc_transliteration_map ).', '
 								.$DB->quote( $newloc_enabled ).' )';
 		$q = $DB->query( $query );
@@ -420,9 +421,9 @@ switch( $action )
 				$lswitchwith_transliteration_map = is_array($locales[ $lswitchwith ]['transliteration_map']) ? base64_encode(serialize($locales[ $lswitchwith ]['transliteration_map'])) : '';
 				$edit_transliteration_map = is_array($locales[ $edit_locale ]['transliteration_map']) ? base64_encode(serialize($locales[ $edit_locale ]['transliteration_map'])) : '';
 
-				$query = "REPLACE INTO T_locales ( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_priority, loc_transliteration_map, loc_enabled )	VALUES
-					( '$edit_locale', '{$locales[ $edit_locale ]['charset']}', '{$locales[ $edit_locale ]['datefmt']}', '{$locales[ $edit_locale ]['timefmt']}', '{$locales[ $edit_locale ]['name']}', '{$locales[ $edit_locale ]['messages']}', '{$locales[ $edit_locale ]['priority']}', '$edit_transliteration_map', '{$locales[ $edit_locale ]['enabled']}'),
-					( '$lswitchwith', '{$locales[ $lswitchwith ]['charset']}', '{$locales[ $lswitchwith ]['datefmt']}', '{$locales[ $lswitchwith ]['timefmt']}', '{$locales[ $lswitchwith ]['name']}', '{$locales[ $lswitchwith ]['messages']}', '{$locales[ $lswitchwith ]['priority']}', '$lswitchwith_transliteration_map', '{$locales[ $lswitchwith ]['enabled']}')";
+				$query = "REPLACE INTO T_locales ( loc_locale, loc_datefmt, loc_timefmt, loc_shorttimefmt, loc_name, loc_messages, loc_priority, loc_transliteration_map, loc_enabled ) VALUES
+					( '$edit_locale', '{$locales[ $edit_locale ]['datefmt']}', '{$locales[ $edit_locale ]['timefmt']}', '{$locales[ $edit_locale ]['shorttimefmt']}', '{$locales[ $edit_locale ]['name']}', '{$locales[ $edit_locale ]['messages']}', '{$locales[ $edit_locale ]['priority']}', '$edit_transliteration_map', '{$locales[ $edit_locale ]['enabled']}'),
+					( '$lswitchwith', '{$locales[ $lswitchwith ]['datefmt']}', '{$locales[ $lswitchwith ]['timefmt']}', '{$locales[ $lswitchwith ]['shorttimefmt']}', '{$locales[ $lswitchwith ]['name']}', '{$locales[ $lswitchwith ]['messages']}', '{$locales[ $lswitchwith ]['priority']}', '$lswitchwith_transliteration_map', '{$locales[ $lswitchwith ]['enabled']}')";
 				$q = $DB->query( $query );
 
 				$Messages->add( T_('Switched priorities.'), 'success' );

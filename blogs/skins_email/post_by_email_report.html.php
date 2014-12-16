@@ -8,7 +8,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
- * @version $Id$
+ * @version $Id: post_by_email_report.html.php 7639 2014-11-13 15:07:37Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -24,12 +24,12 @@ $params = array_merge( array(
 
 $Items = $params['Items'];
 
-echo '<p>'.T_('You just created the following posts:').'</p>';
+echo '<p'.emailskin_style( '.p' ).'>'.T_('You just created the following posts:').'</p>';
 
 foreach( $Items as $Item )
 {
 	echo format_to_output( $Item->title );
-	echo '<p>'.get_link_tag( $Item->get_permanent_url() ).'</p>';
+	echo '<p'.emailskin_style( '.p' ).'>'.get_link_tag( $Item->get_permanent_url(), '', '.a' ).'</p>';
 }
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------

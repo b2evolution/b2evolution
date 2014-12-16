@@ -8475,7 +8475,7 @@ msgstr ""
 
 #: ../../../inc/comments/model/_comment.funcs.php:288
 #: ../../../inc/files/views/_file_edit.form.php:51
-msgid "Save!"
+msgid "Save Changes!"
 msgstr ""
 
 #: ../../../inc/comments/model/_comment.funcs.php:493

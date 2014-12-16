@@ -29,7 +29,7 @@
  *
  * @package htsrv
  *
- * @version $Id$
+ * @version $Id: login.php 7606 2014-11-10 15:45:48Z yura $
  */
 
 /**
@@ -93,10 +93,11 @@ switch( $action )
 		{ // user account was closed successful
 			// Send notification email about closed account to users with edit users permission
 			$email_template_params = array(
-					'login'   => $current_User->login,
-					'email'   => $current_User->email,
-					'reason'  => trim( param( 'account_close_type', 'string', '' ).' '.param( 'account_close_reason', 'text', '' ) ),
-					'user_ID' => $current_User->ID,
+					'login'      => $current_User->login,
+					'email'      => $current_User->email,
+					'reason'     => trim( param( 'account_close_type', 'string', '' ).' '.param( 'account_close_reason', 'text', '' ) ),
+					'user_ID'    => $current_User->ID,
+					'days_count' => $current_User->get_days_count_close()
 				);
 			send_admin_notification( NT_('User account closed'), 'account_closed', $email_template_params );
 
@@ -134,7 +135,7 @@ switch( $action )
 		{ // user gave an email, get users by email
 			$only_activated = false;
 			// load all not closed users with this email address
-			$login = evo_strtolower( $login );
+			$login = utf8_strtolower( $login );
 			$UserCache->load_where( 'user_email = "'.$login.'" && user_status <> "closed"' );
 
 			$not_activated_Ids = array();
@@ -230,6 +231,8 @@ switch( $action )
 				$Session->dbsave(); // save immediately
 
 				$Messages->add( T_('If you correctly entered your login or email address, a link to change your password has been sent to your registered email address.' ), 'success' );
+
+				syslog_insert( 'User requested password reset', 'info', 'user', $forgetful_User->ID );
 			}
 		}
 
@@ -442,7 +445,7 @@ switch( $action )
 		}
 
 		param( 'req_validatemail_submit', 'integer', 0 ); // has the form been submitted
-		$email = evo_strtolower( param( $dummy_fields['email'], 'string', $current_User->email ) ); // the email address is editable
+		$email = utf8_strtolower( param( $dummy_fields['email'], 'string', $current_User->email ) ); // the email address is editable
 
 		if( $req_validatemail_submit )
 		{ // Form has been submitted

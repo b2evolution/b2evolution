@@ -8,7 +8,7 @@
  * @package skins
  * @subpackage pureforums
  *
- * @version $Id: _skin.class.php 7106 2014-07-11 11:58:53Z yura $
+ * @version $Id: _skin.class.php 7498 2014-10-23 07:38:52Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -66,6 +66,24 @@ class pureforums_Skin extends Skin
 				'colorbox' => array(
 					'label' => T_('Colorbox Image Zoom'),
 					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
+					'defaultvalue' => 1,
+					'type' => 'checkbox',
+				),
+				'colorbox_vote_post' => array(
+					'label' => T_('Voting on Post Images'),
+					'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
+					'defaultvalue' => 1,
+					'type' => 'checkbox',
+				),
+				'colorbox_vote_comment' => array(
+					'label' => T_('Voting on Comment Images'),
+					'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
+					'defaultvalue' => 1,
+					'type' => 'checkbox',
+				),
+				'colorbox_vote_user' => array(
+					'label' => T_('Voting on User Images'),
+					'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
 					'defaultvalue' => 1,
 					'type' => 'checkbox',
 				),
@@ -164,8 +182,8 @@ class pureforums_Skin extends Skin
 	 */
 	function display_breadcrumbs( $chapter_ID, $params = array() )
 	{
-		if( $chapter_ID <= 0 )
-		{ // No selected chapter, or an exlcude chapter filter is set
+		if( $chapter_ID == 0 )
+		{	// No selected chapter
 			return;
 		}
 
@@ -395,6 +413,9 @@ class pureforums_Skin extends Skin
 					'head_title' => '<div class="title">$title$<span class="floatright">$global_icons$</span></div>'."\n",
 					'filters_start' => '<div class="filters">',
 					'filters_end' => '</div>',
+					'messages_start' => '<div class="messages">',
+					'messages_end' => '</div>',
+					'messages_separator' => '<br />',
 					'list_start' => '<div class="table_scroll">'."\n"
 					               .'<table class="forums_table highlight" cellspacing="0" cellpadding="0">'."\n",
 						'head_start' => "<thead>\n",

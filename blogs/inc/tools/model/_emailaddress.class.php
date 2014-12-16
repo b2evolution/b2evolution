@@ -20,7 +20,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _emailaddress.class.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -106,7 +106,7 @@ class EmailAddress extends DataObject
 		// Address
 		global $emadr_address;
 		param_string_not_empty( 'emadr_address', T_('Please enter email address.') );
-		$emadr_address = evo_strtolower( get_param( 'emadr_address' ) );
+		$emadr_address = utf8_strtolower( get_param( 'emadr_address' ) );
 		param_check_email( 'emadr_address', true );
 		if( $existing_emadr_ID = $this->dbexists( 'emadr_address', get_param( 'emadr_address' ) ) )
 		{	// Check if a email address already exists with the same address

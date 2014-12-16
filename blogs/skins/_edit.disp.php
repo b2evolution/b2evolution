@@ -13,7 +13,7 @@
  *
  * @package evoskins
  *
- * @version $Id$
+ * @version $Id: _edit.disp.php 7423 2014-10-14 07:52:43Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -113,8 +113,8 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
 		$Form->hidden( 'post_excerpt', $edited_Item->get( 'excerpt' ) );
 		$Form->hidden( 'titletag', $edited_Item->get( 'titletag' ) );
-		$Form->hidden( 'metadesc', $edited_Item->get_setting( 'post_metadesc' ) );
-		$Form->hidden( 'custom_headers', $edited_Item->get_setting( 'post_custom_headers' ) );
+		$Form->hidden( 'metadesc', $edited_Item->get_setting( 'metadesc' ) );
+		$Form->hidden( 'metakeywords', $edited_Item->get_setting( 'metakeywords' ) );
 
 		if( $Blog->get_setting( 'use_workflow' ) )
 		{	// We want to use workflow properties for this blog:
@@ -126,7 +126,8 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->hidden( 'trackback_url', $trackback_url );
 		$Form->hidden( 'item_featured', $edited_Item->featured );
 		$Form->hidden( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ) );
-		$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'post_expiry_delay' ) );
+		$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'comment_expiry_delay' ) );
+		$Form->hidden( 'goal_ID', $edited_Item->get_setting( 'goal_ID' ) );
 		$Form->hidden( 'item_order', $edited_Item->order );
 
 		$creator_User = $edited_Item->get_creator_User();
@@ -194,7 +195,11 @@ $Form->begin_form( 'inskin', '', $form_params );
 	$Form->switch_layout( 'none' );
 	$Form->fieldstart = '<div class="edit_area">';
 	$Form->fieldend = "</div>\n";
-	$Form->textarea_input( 'content', $item_content, 16, NULL, array( 'cols' => 50 , 'id' => 'itemform_post_content' ) );
+	$Form->textarea_input( 'content', $item_content, 16, NULL, array(
+			'cols' => 50 ,
+			'id' => 'itemform_post_content',
+			'class' => 'autocomplete_usernames'
+		) );
 	$Form->switch_layout( NULL );
 	?>
 	<script type="text/javascript" language="JavaScript">

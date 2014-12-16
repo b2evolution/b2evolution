@@ -62,6 +62,21 @@ $Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $secure_htsrv_u
 
 $Form->begin_fieldset();
 
+	if( $display_invitation == 'input' )
+	{ // Display an input field to enter invitation code manually or to change incorrect code
+		$invitation_field_params = array( 'maxlength' => 32, 'class' => 'input_text', 'placeholder' => T_('Invitation code') );
+		if( $Settings->get( 'newusers_canregister' ) == 'invite' )
+		{ // Invitation code must be required when users can register ONLY with this code
+			$invitation_field_params['input_required'] = 'required';
+		}
+		$Form->text_input( 'invitation', get_param( 'invitation' ), 22, T_('Your invitation code'), '', $invitation_field_params );
+	}
+	elseif( $display_invitation == 'info' )
+	{ // Display info field (when invitation code is correct)
+		$Form->info( T_('Your invitation code'), get_param( 'invitation' ) );
+		$Form->hidden( 'invitation', get_param( 'invitation' ) );
+	}
+
 	$Form->text_input( $dummy_fields[ 'login' ], $login, 22, T_('Login'), '', array( 'placeholder' => T_('Choose an username'), 'maxlength' => 20, 'class' => 'input_text', 'required' => true, 'input_required' => 'required', 'input_suffix' => ' <span id="login_status"></span>', 'style' => 'width:250px' ) );
 
 	$Form->password_input( $dummy_fields[ 'pass1' ], '', 18, T_('Password'), array( 'placeholder' => T_('Choose a password'), 'maxlength' => 70, 'class' => 'input_text', 'required' => true, 'input_required' => 'required', 'style' => 'width:250px', 'autocomplete' => 'off' ) );

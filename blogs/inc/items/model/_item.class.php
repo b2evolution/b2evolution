@@ -31,7 +31,7 @@
  * @author gorgeb: Bertrand GORGE / EPISTEMA
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
- * @version $Id: _item.class.php 7506 2014-10-24 05:23:37Z yura $
+ * @version $Id: _item.class.php 7752 2014-12-04 12:44:33Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -213,16 +213,6 @@ class Item extends ItemLight
 	var $extra_cat_IDs = NULL;
 
 	/**
-	 * Array of tags (strings)
-	 *
-	 * Lazy loaded.
-	 * @see Item::get_tags()
-	 * @access protected
-	 * @var array
-	 */
-	var $tags = NULL;
-
-	/**
 	 * Has the publish date been explicitly set?
  	 *
 	 * @var integer
@@ -265,6 +255,14 @@ class Item extends ItemLight
 	 * @var ItemSettings
 	 */
 	var $ItemSettings;
+
+	/**
+	 * Current User read status on this post content ( Only about the post content and not about the post's comments ).
+	 * This value is not saved into the db. Lazy filled.
+	 *
+	 * @var string ( read, new, updated )
+	 */
+	var $content_read_status = NULL;
 
 	/**
 	 * Constructor
@@ -464,7 +462,7 @@ class Item extends ItemLight
 		$params = array_merge( array(
 				'before'         => ' ',
 				'after'          => ' ',
-				'link_text'      => 'preferredname', // avatar | only_avatar | login | nickname | firstname | lastname | fullname | preferredname
+				'link_text'      => 'preferredname', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 				'thumb_size'     => 'crop-top-32x32',
 				'thumb_class'    => '',
 				'thumb_zoomable' => false,
@@ -495,7 +493,7 @@ class Item extends ItemLight
 				'after'          => ' ',
 				'format'         => 'htmlbody',
 				'link_to'        => 'userpage',
-				'link_text'      => 'preferredname', // avatar | only_avatar | login | nickname | firstname | lastname | fullname | preferredname
+				'link_text'      => 'preferredname', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 				'link_rel'       => '',
 				'link_class'     => '',
 				'thumb_size'     => 'crop-top-32x32',
@@ -604,12 +602,12 @@ class Item extends ItemLight
 
 		// <meta> DESC:
 		if( param( 'metadesc', 'string', NULL ) !== NULL ) {
-			$this->set_setting( 'post_metadesc', get_param( 'metadesc' ) );
+			$this->set_setting( 'metadesc', get_param( 'metadesc' ) );
 		}
 
 		// <meta> KEYWORDS:
-		if( param( 'custom_headers', 'string', NULL ) !== NULL ) {
-			$this->set_setting( 'post_custom_headers', get_param( 'custom_headers' ) );
+		if( param( 'metakeywords', 'string', NULL ) !== NULL ) {
+			$this->set_setting( 'metakeywords', get_param( 'metakeywords' ) );
 		}
 
 		// TAGS:
@@ -637,6 +635,11 @@ class Item extends ItemLight
 
 		// HIDE TEASER checkbox:
 		$this->set_setting( 'hide_teaser', param( 'item_hideteaser', 'integer', 0 ) );
+		$goal_ID = param( 'goal_ID', 'integer', NULL );
+		if( $goal_ID !== NULL )
+		{ // Goal ID
+			$this->set_setting( 'goal_ID', $goal_ID, true );
+		}
 
 		// ORDER:
 		param( 'item_order', 'double', NULL );
@@ -699,7 +702,7 @@ class Item extends ItemLight
 		{ // Check if we have 'expiry_delay' param set as string from simple or mass form
 			$expiry_delay = param( 'expiry_delay', 'string', NULL );
 		}
-		$this->set_setting( 'post_expiry_delay', $expiry_delay, true );
+		$this->set_setting( 'comment_expiry_delay', $expiry_delay, true );
 
 		// EXTRA PARAMS FROM MODULES:
 		modules_call_method( 'update_item_settings', array( 'edited_Item' => $this ) );
@@ -708,7 +711,7 @@ class Item extends ItemLight
 		if( param( 'renderers_displayed', 'integer', 0 ) )
 		{ // use "renderers" value only if it has been displayed (may be empty)
 			global $Plugins;
-			$renderers = $Plugins->validate_renderer_list( param( 'renderers', 'array/string', array() ), array( 'Item' => & $this ) );
+			$renderers = $Plugins->validate_renderer_list( param( 'renderers', 'array:string', array() ), array( 'Item' => & $this ) );
 			$this->set( 'renderers', $renderers );
 		}
 		else
@@ -727,7 +730,7 @@ class Item extends ItemLight
 		}
 
 		$editor_code = param( 'editor_code', 'string', NULL );
-		if( !empty( $editor_code ) )
+		if( $editor_code )
 		{ // Update item editor code if it was explicitly set
 			$this->set_setting( 'editor_code', $editor_code );
 		}
@@ -772,12 +775,14 @@ class Item extends ItemLight
 
 		// LOCATION (COUNTRY -> CITY):
 		load_funcs( 'regional/model/_regional.funcs.php' );
+		// Check if this item has a special post type. Location is not required for special posts.
+		$not_special_post = ! $this->is_special();
 		if( $this->Blog->country_visible() )
 		{ // Save country
 			$country_ID = param( 'item_ctry_ID', 'integer', 0 );
 			$country_is_required = $this->Blog->get_setting( 'location_country' ) == 'required'
-					&& countries_exist()
-					&& ! $this->is_special();
+					&& $not_special_post
+					&& countries_exist();
 			param_check_number( 'item_ctry_ID', T_('Please select a country'), $country_is_required );
 			$this->set_from_Request( 'ctry_ID', 'item_ctry_ID', true );
 		}
@@ -786,8 +791,8 @@ class Item extends ItemLight
 		{ // Save region
 			$region_ID = param( 'item_rgn_ID', 'integer', 0 );
 			$region_is_required = $this->Blog->get_setting( 'location_region' ) == 'required'
-					&& regions_exist( $country_ID )
-					&& ! $this->is_special();
+					&& $not_special_post
+					&& regions_exist( $country_ID );
 			param_check_number( 'item_rgn_ID', T_('Please select a region'), $region_is_required );
 			$this->set_from_Request( 'rgn_ID', 'item_rgn_ID', true );
 		}
@@ -796,8 +801,8 @@ class Item extends ItemLight
 		{ // Save subregion
 			$subregion_ID = param( 'item_subrg_ID', 'integer', 0 );
 			$subregion_is_required = $this->Blog->get_setting( 'location_subregion' ) == 'required'
-					&& subregions_exist( $region_ID )
-					&& ! $this->is_special();
+					&& $not_special_post
+					&& subregions_exist( $region_ID );
 			param_check_number( 'item_subrg_ID', T_('Please select a sub-region'), $subregion_is_required );
 			$this->set_from_Request( 'subrg_ID', 'item_subrg_ID', true );
 		}
@@ -806,8 +811,8 @@ class Item extends ItemLight
 		{ // Save city
 			param( 'item_city_ID', 'integer', 0 );
 			$city_is_required = $this->Blog->get_setting( 'location_city' ) == 'required'
-					&& cities_exist( $country_ID, $region_ID, $subregion_ID )
-					&& ! $this->is_special();
+					&& $not_special_post
+					&& cities_exist( $country_ID, $region_ID, $subregion_ID );
 			param_check_number( 'item_city_ID', T_('Please select a city'), $city_is_required );
 			$this->set_from_Request( 'city_ID', 'item_city_ID', true );
 		}
@@ -862,7 +867,7 @@ class Item extends ItemLight
 			echo $before;
 			echo $this->assigned_User->get_identity_link( array(
 					'format'    => $format,
-					'link_text' => 'login',
+					'link_text' => 'name',
 				) );
 			echo $after;
 		}
@@ -982,7 +987,7 @@ class Item extends ItemLight
 			$redirect_to = $this->get_permanent_url().'#comments';
 			$login_link = '<a href="'.get_login_url( 'cannot see comments', $redirect_to ).'">'.T_( 'Log in now!' ).'</a>';
 			echo '<p>'.$display_text.' '.$login_link.'</p>';
-			if( $Settings->get( 'newusers_canregister' ) && $Settings->get( 'registration_is_public' ) )
+			if( $Settings->get( 'newusers_canregister' ) == 'yes' && $Settings->get( 'registration_is_public' ) )
 			{ // needs to display register link
 				echo '<p>'.sprintf( T_( 'If you have no account yet, you can <a href="%s">register now</a>...<br />(It only takes a few seconds!)' ),
 							get_user_register_url( $redirect_to, 'reg to see comments' ) ).'</p>';
@@ -1170,15 +1175,15 @@ class Item extends ItemLight
 
 
 	/**
-	 * Check if the post contains inline image placeholders without corresponding attachemnt file.
-	 * Removes the invalid inline image placeholders from the item content.
+	 * Check if the post contains inline file placeholders without corresponding attachemnt file.
+	 * Removes the invalid inline file placeholders from the item content.
 	 *
 	 * @param string Content
 	 * @return string Prepared content
 	 */
 	function check_and_clear_inline_files( $content )
 	{
-		preg_match_all( '/\[image:(\d+):?[^\]]*\]/i', $content, $inline_images );
+		preg_match_all( '/\[(image|file):(\d+):?[^\]]*\]/i', $content, $inline_images );
 
 		if( empty( $inline_images[1] ) )
 		{ // There are no inline image placeholders in the post content
@@ -1197,7 +1202,7 @@ class Item extends ItemLight
 			$inline_links_IDs = $DB->get_col( $links_SQL->get(), 0, 'Get item links IDs of the inline images' );
 
 			$unused_inline_images = array();
-			foreach( $inline_images[1] as $i => $inline_link_ID )
+			foreach( $inline_images[2] as $i => $inline_link_ID )
 			{
 				if( ! in_array( $inline_link_ID, $inline_links_IDs ) )
 				{ // This inline image must be removed from content
@@ -1216,7 +1221,7 @@ class Item extends ItemLight
 			global $Messages;
 			$unused_inline_images = array_unique( $unused_inline_images );
 			$content = replace_content_outcode( $unused_inline_images, '', $content, 'replace_content', 'str' );
-			$Messages->add( T_('Invalid inline image placeholders won\'t be displayed.'), 'note' );
+			$Messages->add( T_('Invalid inline file placeholders won\'t be displayed.'), 'note' );
 		}
 
 		return $content;
@@ -1703,9 +1708,9 @@ class Item extends ItemLight
 		$content_parts = $this->get_content_parts( $params );
 		$output = array_shift( $content_parts );
 
-		// Render Inline Images  [image:123:caption]  :
+		// Render Inline Images  [image:123:caption] or [file:123:caption] :
 		$params['check_code_block'] = true;
-		$output = $this->render_inline_images( $output, $params );
+		$output = $this->render_inline_files( $output, $params );
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
@@ -1813,7 +1818,7 @@ class Item extends ItemLight
 
 		// Don't rewrite these params from array $params, Use them from separate params of this function
 		$params = array_merge( $params, array(
-				'disppage' => $disppage, 
+				'disppage' => $disppage,
 				'format'   => $format
 			) );
 
@@ -1828,9 +1833,9 @@ class Item extends ItemLight
 		array_shift($content_parts);
 		$output = implode('', $content_parts);
 
-		// Render Inline Images  [image:123:caption]  :
+		// Render Inline Images  [image:123:caption] or [file:123:caption] :
 		$params['check_code_block'] = true;
-		$output = $this->render_inline_images( $output, $params );
+		$output = $this->render_inline_files( $output, $params );
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
@@ -2149,53 +2154,6 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get array of tags.
-	 *
-	 * Load from DB if necessary, prefetching any other tags from MainList/ItemList.
-	 *
-	 * @return array
-	 */
-	function & get_tags()
-	{
-		global $DB;
-
-		if( ! isset( $this->tags ) )
-		{
-			$ItemTagsCache = & get_ItemTagsCache();
-			if( ! isset($ItemTagsCache[$this->ID]) )
-			{
-				/* Only try to fetch tags for items that are not yet in
-				 * the cache. This will always give at least the ID of
-				 * this Item.
-				 */
-				$prefetch_item_IDs = array_diff( $this->get_prefetch_itemlist_IDs(), array_keys( $ItemTagsCache ) );
-				// Assume these items don't have any tags:
-				foreach( $prefetch_item_IDs as $item_ID )
-				{
-					$ItemTagsCache[$item_ID] = array();
-				}
-
-				// Now fetch the tags:
-				foreach( $DB->get_results('
-					SELECT itag_itm_ID, tag_name
-						FROM T_items__itemtag INNER JOIN T_items__tag ON itag_tag_ID = tag_ID
-					 WHERE itag_itm_ID IN ('.$DB->quote($prefetch_item_IDs).')
-					 ORDER BY tag_name', OBJECT, 'Get tags for items' ) as $row )
-				{
-					$ItemTagsCache[$row->itag_itm_ID][] = $row->tag_name;
-				}
-
-				//pre_dump( $ItemTagsCache );
-			}
-
-			$this->tags = $ItemTagsCache[$this->ID];
-		}
-
-		return $this->tags;
-	}
-
-
-	/**
 	 * Get the title for the <title> tag
 	 *
 	 * If it's not specifically entered, use the regular post title instead
@@ -2216,16 +2174,16 @@ class Item extends ItemLight
 	 */
 	function get_metadesc()
 	{
-		return $this->get_setting( 'post_metadesc' );
+		return $this->get_setting( 'metadesc' );
 	}
 
 	/**
 	 * Get the meta keyword tag
 	 *
 	 */
-	function get_custom_headers()
+	function get_metakeywords()
 	{
-		return $this->get_setting( 'post_custom_headers' );
+		return $this->get_setting( 'metakeywords' );
 	}
 
 
@@ -2242,7 +2200,7 @@ class Item extends ItemLight
 			return;
 		}
 		$this->tags = preg_split( '/\s*[;,]+\s*/', $tags, -1, PREG_SPLIT_NO_EMPTY );
-		array_walk( $this->tags, create_function( '& $tag', '$tag = evo_strtolower( $tag );' ) );
+		array_walk( $this->tags, create_function( '& $tag', '$tag = utf8_strtolower( $tag );' ) );
 		$this->tags = array_unique( $this->tags );
 		// pre_dump( $this->tags );
 	}
@@ -2483,9 +2441,42 @@ class Item extends ItemLight
 		// Make sure $link_to is set
 		$link_to = isset( $params['image_link_to'] ) ? $params['image_link_to'] : 'original';
 
-		if( $link_to == 'single' )
+		// Force url of image for link positions: 'teaserperm' & 'teaserlink'
+		switch( $Link->get( 'position' ) )
+		{
+			case 'teaserlink':
+				// Teaser-Ext Link
+				if( $this->get( 'url' ) != '' )
+				{ // Only when post field 'Link to url' is defined
+					$link_to = 'url';
+					break;
+				}
+				// If post url is empty then use this link position as 'teaserperm':
+
+			case 'teaserperm':
+				// Teaser-Permalink
+				global $disp;
+				if( isset( $disp ) && $disp == 'single' )
+				{ // Force link to image url and use colorbox only when we already on permalink page
+					$link_to = 'original';
+				}
+				else
+				{ // Force link to permalink of this post
+					$link_to = 'single';
+				}
+				break;
+		}
+
+		if( $link_to == 'single' || $link_to == 'url' )
 		{ // We're linking to the post (displayed on a single post page):
-			$link_to = $this->get_permanent_url( $link_to );
+			if( $link_to == 'url' && $this->get( 'url' ) != '' )
+			{ // Link to url from the post field 'Link to url'
+				$link_to = $this->get( 'url' );
+			}
+			else
+			{ // Link to permament url
+				$link_to = $this->get_permanent_url( $link_to );
+			}
 			$link_title = '#desc#';
 			$link_rel = isset( $params['image_link_rel'] ) ? $params['image_link_rel'] : '';
 		}
@@ -2546,7 +2537,7 @@ class Item extends ItemLight
 				'gallery_image_limit'        => 1000,
 				'gallery_colls'              => 5,
 				'gallery_order'              => '', // 'ASC', 'DESC', 'RAND'
-				'restrict_to_image_position' => 'teaser,aftermore', // 'teaser'|'aftermore'|'inline'|'albumart'
+				'restrict_to_image_position' => 'teaser,teaserperm,teaserlink,aftermore', // 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'albumart'
 				'data'                       =>  & $r,
 				'get_rendered_attachments'   => true,
 				'links_sql_select'           => '',
@@ -2671,7 +2662,7 @@ class Item extends ItemLight
 	 * Get a number of images linked to the current Item
 	 *
 	 * @param string Restrict to files/images linked to a specific position.
-	 *               Position can be 'teaser'|'aftermore'|'inline'
+	 *               Position can be 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'albumart'
 	 *               Use comma as separator
 	 * @param integer Number of images
 	 */
@@ -2721,8 +2712,9 @@ class Item extends ItemLight
 			// sam2kb> It's needed only for flexibility, in the meantime if user attaches 200 files he expects to see all of them in skin, I think.
 				'limit_attach' =>        1000, // Max # of files displayed
 				'limit' =>               1000,
-				'restrict_to_image_position' => '',	// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
-				'data'                       =>  '',
+				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'albumart'
+				'restrict_to_image_position' => 'teaser,teaserperm,teaserlink,aftermore',
+				'data'                       => '',
 				'attach_format'              => '$icon_link$ $file_link$ $file_size$', // $icon_link$ $icon$ $file_link$ $file_size$
 				'file_link_format'           => '$file_name$', // $icon$ $file_name$ $file_size$
 				'file_link_class'            => '',
@@ -2845,6 +2837,90 @@ class Item extends ItemLight
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Get array of the Files that are used as "Fallback" for the selected File
+	 *
+	 * @param object File
+	 * @return array Fallback Files
+	 */
+	function get_fallback_files( $File )
+	{
+		$fallback_files = array();
+
+		if( empty( $File ) )
+		{ // No File for fallbacks
+			return $fallback_files;
+		}
+
+		if( ! isset( $this->fallback_FileList ) )
+		{ // Get list of attached fallback files
+			$LinkOwner = new LinkItem( $this );
+			if( ! $this->fallback_FileList = $LinkOwner->get_attachment_FileList( 1000, 'fallback' ) )
+			{ // No fallback files
+				return $fallback_files;
+			}
+		}
+
+		// Get file name without extension
+		$file_name_without_ext = preg_replace( '#^(.+)\.[^\.]+$#', '$1', $File->get_name() );
+
+		// Rewind internal index to first position
+		$this->fallback_FileList->current_idx = 0;
+
+		while( $fallback_File = & $this->fallback_FileList->get_next() )
+		{
+			if( $File->get_name() != $fallback_File->get_name() &&
+			    preg_match( '#^'.$file_name_without_ext.'\.[^\.]+$#', $fallback_File->get_name() ) )
+			{ // Fallback is a file with same name but with different extension
+				$fallback_files[] = $fallback_File;
+			}
+		}
+
+		return $fallback_files;
+	}
+
+
+	/**
+	 * Get placeholder image File that has the same name as the current video File
+	 *
+	 * @param object File
+	 * @return object placeholder File
+	 */
+	function & get_placeholder_File( $video_File )
+	{
+		if( empty( $video_File ) )
+		{ // No File for placeholder
+			return NULL;
+		}
+
+		if( ! isset( $this->placeholder_FileList ) )
+		{ // Get list of attached fallback files
+			$LinkOwner = new LinkItem( $this );
+			if( ! $this->placeholder_FileList = & $LinkOwner->get_attachment_FileList( 1000 ) )
+			{ // No attached files
+				return NULL;
+			}
+		}
+
+		// Get file name without extension
+		$video_file_name_without_ext = preg_replace( '#^(.+)\.[^\.]+$#', '$1', $video_File->get_name() );
+
+		// Rewind internal index to first position
+		$this->placeholder_FileList->current_idx = 0;
+
+		while( $attached_File = & $this->placeholder_FileList->get_next() )
+		{
+			if( $video_File->get_name() != $attached_File->get_name() &&
+			    preg_match( '#^'.$video_file_name_without_ext.'\.(jpg|jpeg|png|gif)+$#', $attached_File->get_name() ) )
+			{ // It is a file with same name but with image extension
+				return $attached_File;
+			}
+		}
+
+		return NULL;
 	}
 
 
@@ -2979,7 +3055,6 @@ class Item extends ItemLight
 									'link_anchor_one' => '#',
 									'link_anchor_more' => '#',
 									'link_title' => '#',
-									'use_popup' => false,
 									'show_in_single_mode' => false,		// Do we want to show this link even if we are viewing the current post in single view mode
 									'url' => '#',
 								), $params );
@@ -3078,11 +3153,6 @@ class Item extends ItemLight
 		{
 			$r .= '<a href="'.$params['url'].$anchor.'" ';	// Position on feedback
 			$r .= 'title="'.$params['link_title'].'"';
-			if( $params['use_popup'] )
-			{ // Special URL if we can open a popup (i-e if JS is enabled):
-				$popup_url = url_add_param( $params['url'], 'disp=feedback-popup' );
-				$r .= ' onclick="return pop_up_window( \''.$popup_url.'\', \'evo_comments\' )"';
-			}
 			$r .= '>';
 			$r .= $link_text;
 			$r .= '</a>';
@@ -3268,7 +3338,7 @@ class Item extends ItemLight
 			'rating_summary_star_totals' => 'count' // Possible values: 'count', 'percent' and 'none'
 		), $params );
 
-		// get ratings and active ratings ( active ratings are younger then post_expiry_delay )
+		// get ratings and active ratings ( active ratings are younger then comment_expiry_delay )
 		list( $ratings, $active_ratings ) = $this->get_ratings();
 		$ratings_count = $ratings['all_ratings'];
 		$active_ratings_count = $active_ratings['all_ratings'];
@@ -3282,7 +3352,7 @@ class Item extends ItemLight
 
 		$result = '<table class="ratings_table" cellspacing="2">';
 		$result .= '<tr>';
-		$expiry_delay = $this->get_setting( 'post_expiry_delay' );
+		$expiry_delay = $this->get_setting( 'comment_expiry_delay' );
 		if( empty( $expiry_delay ) )
 		{
 			$all_ratings_title = T_('User ratings');
@@ -3334,7 +3404,6 @@ class Item extends ItemLight
 									'link_text_one' => '#',
 									'link_text_more' => '#',
 									'link_title' => '#',
-									'use_popup' => false,
 									'url' => '#',
 									'type' => 'feedbacks',
 								), $params );
@@ -4315,7 +4384,7 @@ class Item extends ItemLight
 				}
 				else
 				{
-					echo evo_htmlspecialchars( $tag, NULL, $evo_charset );
+					echo htmlspecialchars( $tag, NULL, $evo_charset );
 				}
 			}
 
@@ -4742,8 +4811,7 @@ class Item extends ItemLight
 			$Plugins->trigger_event( 'PrependItemInsertTransact', $params = array( 'Item' => & $this ) );
 		}
 
-		global $localtimenow;
-		$this->set_param( 'last_touched_ts', 'date', date('Y-m-d H:i:s',$localtimenow) );
+		$this->set_last_touched_ts();
 
 		$dbchanges = $this->dbchanges; // we'll save this for passing it to the plugin hook
 
@@ -4804,6 +4872,9 @@ class Item extends ItemLight
 					}
 				}
 			}
+
+			// Update last touched date of this Item and also all categories of this Item
+			$this->update_last_touched_date( false, false );
 		}
 
 		if( ! $result )
@@ -4959,8 +5030,7 @@ class Item extends ItemLight
 
 		if( $auto_track_modification && ( count( $dbchanges ) > 0 ) && ( !isset( $dbchanges['last_touched_ts'] ) ) )
 		{ // Update last_touched_ts field only if it wasn't updated yet and the datemodified will be updated for sure.
-			global $localtimenow;
-			$this->set_param( 'last_touched_ts', 'date', date('Y-m-d H:i:s',$localtimenow) );
+			$this->set_last_touched_ts();
 		}
 
 		if( $result = ( parent::dbupdate( $auto_track_modification ) !== false ) )
@@ -4993,6 +5063,9 @@ class Item extends ItemLight
 					$result = parent::dbupdate();
 				}
 			}
+
+			// Update last touched date of this Item and also all categories of this Item
+			$this->update_last_touched_date( false, false );
 		}
 
 		if( $result === false )
@@ -5149,15 +5222,17 @@ class Item extends ItemLight
 	 * @todo crop at word boundary, maybe even sentence boundary.
 	 *       This should get added to strmaxlen probably.
 	 *
-	 * @param integer Crop length
-	 * @param string Suffix, if cropped
+	 * @param int Maximum length
+	 * @param string Tail to use, when string gets cropped. Its length gets
+	 *               substracted from the total length (with HTML entities
+	 *               being decoded). Default is "&hellip;" (HTML entity)
 	 * @return boolean true if excerpt has been changed
 	 */
-	function update_excerpt( $crop_length = 254, $suffix = '&hellip;' )
+	function update_excerpt( $maxlen = 254, $tail = '&hellip;' )
 	{
 		if( empty($this->excerpt) || $this->excerpt_autogenerated )
-		{	// We want to regenrate the excerpt from the content:
-			$excerpt = $this->get_autogenerated_excerpt($crop_length, $suffix);
+		{	// We want to regenerate the excerpt from the content:
+			$excerpt = $this->get_autogenerated_excerpt( $maxlen, $tail );
 
 			if( !empty($excerpt) )
 			{	// We have something to act as an excerpt...
@@ -5174,22 +5249,22 @@ class Item extends ItemLight
 	/**
 	 * Get autogenerated excerpt, derived from {@link Item::$content}.
 	 *
-	 * @param integer Crop length
-	 * @param string Suffix, if cropped
+	 * @param int Maximum length
+	 * @param string Tail to use, when string gets cropped. Its length gets
+	 *               substracted from the total length (with HTML entities
+	 *               being decoded). Default is "&hellip;" (HTML entity)
 	 * @return string
 	 */
-	function get_autogenerated_excerpt( $crop_length = 254, $suffix = '&hellip;' )
+	function get_autogenerated_excerpt( $maxlen = 254, $tail = '&hellip;' )
 	{
-		// autogenerated excerpt should NEVER show anything after [teaserbreak] or after [pagebreak]
+		// Autogenerated excerpts should NEVER show anything after [teaserbreak] or after [pagebreak]
 		$content_parts = $this->get_content_parts( array( 'disppage' => 1 ) );
-		$excerpt_content = array_shift( $content_parts );
-		$r = str_replace( '<p>', ' <p>', $excerpt_content );
-		$r = str_replace( '<br', ' <br', $excerpt_content );
-		$r = trim(strip_tags($r));
-		// fp> this is borked: $r = preg_replace('~(\r?\n)+~', '\n', $r);
-		$r = trim($r);
-		$r = strmaxlen( $r, $crop_length, $suffix, 'raw', true );
-		return $r;
+		$content = array_shift( $content_parts );
+
+		// Remove inline images from excerpt // [image:123:caption:.class] [file:123:caption:.class] [inline:123:.class]
+		$content = preg_replace( '/\[(image|file|inline):\d+:?[^\]]*\]/i', '', $content );
+
+		return excerpt( $content, $maxlen, $tail );
 	}
 
 
@@ -5266,7 +5341,7 @@ class Item extends ItemLight
 									 WHERE tag_name IN ('.$DB->quote($this->tags).')';
 				$existing_tags = $DB->get_col( $query, 0, 'Find existing tags' );
 
-				$new_tags = array_diff( array_map('evo_strtolower', $this->tags), $existing_tags );
+				$new_tags = array_diff( array_map('utf8_strtolower', $this->tags), $existing_tags );
 
 				if( !empty( $new_tags ) )
 				{	// insert new tags:
@@ -5452,11 +5527,8 @@ class Item extends ItemLight
 
 			// no repeat.
 
-			// name:
-			$edited_Cronjob->set( 'name', sprintf( T_('Send notifications for &laquo;%s&raquo;'), strip_tags($this->title) ) );
-
-			// controller:
-			$edited_Cronjob->set( 'controller', 'cron/jobs/_post_notifications.job.php' );
+			// key:
+			$edited_Cronjob->set( 'key', 'send-post-notifications' );
 
 			// params: specify which post this job is supposed to send notifications for:
 			$edited_Cronjob->set( 'params', array( 'item_ID' => $this->ID ) );
@@ -5927,32 +5999,6 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get a list of item IDs from $MainList and $ItemList, if they are loaded.
-	 * This is used for prefetching item related data for the whole list(s).
-	 * This will at least return the item's ID itself.
-	 * @return array
-	 */
-	function get_prefetch_itemlist_IDs()
-	{
-		global $MainList, $ItemList;
-
-		// Add the current ID to the list to prefetch, if it's not in the MainList/ItemList (e.g. featured item).
-		$r = array($this->ID);
-
-		if( $MainList )
-		{
-			$r = array_merge($r, $MainList->get_page_ID_array());
-		}
-		if( $ItemList )
-		{
-			$r = array_merge($r, $ItemList->get_page_ID_array());
-		}
-
-		return array_unique( $r );
-	}
-
-
-	/**
 	 * Get the item tinyslug. If not exists -> create new
 	 *
 	 * @return string|boolean tinyslug on success, false otherwise
@@ -6213,7 +6259,7 @@ class Item extends ItemLight
 		$sql = 'SELECT comment_rating, count( comment_ID ) AS cnt,
 					IF( iset_value IS NULL OR iset_value = "" OR TIMESTAMPDIFF(SECOND, comment_date, '.$DB->quote( date2mysql( $localtimenow ) ).') < iset_value, "active", "expired" ) as expiry_status
 						FROM T_comments
-						LEFT JOIN T_items__item_settings ON iset_item_ID = comment_item_ID AND iset_name = "post_expiry_delay"
+						LEFT JOIN T_items__item_settings ON iset_item_ID = comment_item_ID AND iset_name = "comment_expiry_delay"
 						WHERE comment_item_ID = '.$this->ID.' AND comment_status = "published"
 						GROUP BY expiry_status, comment_rating
 						ORDER BY comment_rating DESC';
@@ -6572,20 +6618,20 @@ class Item extends ItemLight
 
 
 	/**
-	 * Convert inline image tags like [image:123:link title:.css_class_name] into HTML img tags
+	 * Convert inline file tags like [image|file:123:link title:.css_class_name] or [inline:123:.css_class_name] into HTML img tags
 	 *
 	 * @param string Source content
 	 * @param array Params
 	 * @return string Content
 	 */
-	function render_inline_images( $content, $params = array() )
+	function render_inline_files( $content, $params = array() )
 	{
 		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
-		{ // Call $this->render_inline_images() on everything outside code/pre:
+		{ // Call $this->render_inline_files() on everything outside code/pre:
 			$params['check_code_block'] = false;
 			$content = callback_on_non_matching_blocks( $content,
 				'~<(code|pre)[^>]*>.*?</\1>~is',
-				array( $this, 'render_inline_images' ), array( $params ) );
+				array( $this, 'render_inline_files' ), array( $params ) );
 			return $content;
 		}
 
@@ -6603,11 +6649,11 @@ class Item extends ItemLight
 				'limit'               => 1000, // Max # of images displayed
 			), $params );
 
-		// Find all matches with image inline tags
-		preg_match_all( '/\[image:(\d+)(:?)([^\]]*)\]/i', $content, $images );
+		// Find all matches with inline tags
+		preg_match_all( '/\[(image|file|inline):(\d+)(:?)([^\]]*)\]/i', $content, $inlines );
 
-		if( !empty( $images[0] ) )
-		{ // There are image inline tags in the content
+		if( !empty( $inlines[0] ) )
+		{ // There are inline tags in the content
 
 			if( !isset( $LinkList ) )
 			{ // Get list of attached Links only first time
@@ -6620,9 +6666,10 @@ class Item extends ItemLight
 				return $content;
 			}
 
-			foreach( $images[0] as $i => $current_link_tag )
+			foreach( $inlines[0] as $i => $current_link_tag )
 			{
-				$current_link_ID = (int)$images[1][$i];
+				$inline_type = $inlines[1][$i]; // image|file|inline
+				$current_link_ID = (int)$inlines[2][$i];
 				if( empty( $current_link_ID ) )
 				{ // Invalid link ID, Go to next match
 					continue;
@@ -6647,10 +6694,11 @@ class Item extends ItemLight
 				}
 
 				$current_image_params = $params;
-				if( ! empty( $images[2][$i] ) )
+				$current_file_params = array();
+				if( ! empty( $inlines[3][$i] ) )
 				{
-					// Get image inline params: caption and class
-					$inline_params = explode( ':.', $images[3][$i]);
+					// Get the inline params: caption and class
+					$inline_params = explode( ':.', $inlines[4][$i] );
 
 					if( ! empty( $inline_params[0] ) )
 					{ // Image caption is set, so overwrite the image link title
@@ -6665,31 +6713,64 @@ class Item extends ItemLight
 						}
 
 						$current_image_params['image_desc'] = $current_image_params['image_link_title'];
+						$current_file_params['title'] = $inline_params[0];
 					}
 
-					if( ! empty( $inline_params[1] ) )
-					{ // A class name is set for the image
-						$image_extraclass = strip_tags( trim( str_replace( '.', ' ', $inline_params[1] ) ) );
+					$class_index = ( $inline_type == 'inline' ) ? 0 : 1; // [inline] tag doesn't have a caption, so 0 index is for class param
+					if( ! empty( $inline_params[ $class_index ] ) )
+					{ // A class name is set for the inline tags
+						$image_extraclass = strip_tags( trim( str_replace( '.', ' ', $inline_params[ $class_index ] ) ) );
 						if( preg_match('#^[A-Za-z0-9\s\-_]+$#', $image_extraclass ) )
 						{ // Overwrite 'before_image' setting to add an extra class name
 							$current_image_params['before_image'] = '<div class="image_block '.$image_extraclass.'">';
 							// 'after_image' setting must be also defined, becuase it may be different than the default '</div>'
 							$current_image_params['after_image'] = '</div>';
+
+							// Set class for file inline tags
+							$current_file_params['class'] = $image_extraclass;
 						}
 					}
 				}
 
-				if( $File->is_image() )
+				if( $inline_type == 'image' && $File->is_image() )
 				{ // Generate the IMG tag with all the alt, title and desc if available
-					$image_tag = $this->get_attached_image_tag( $Link, $current_image_params );
-
-					// Replace inline image tag with HTML img tag
-					$content = str_replace( $current_link_tag, $image_tag, $content );
+					$link_tag = $this->get_attached_image_tag( $Link, $current_image_params );
+				}
+				elseif( $inline_type == 'inline' )
+				{ // Generate simple IMG tag with original image size
+					if( $File->is_image() )
+					{ // Only when file is really image file
+						$link_tag = '<img src="'.$File->get_url().'"'
+							.( empty( $current_file_params['class'] ) ? '' : ' class="'.$current_file_params['class'].'"' )
+							.' />';
+					}
+					else
+					{ // Display original inline tag when file is not image
+						$link_tag = $current_link_tag;
+					}
 				}
 				else
-				{ // Display error if file is not an image
-					$content = str_replace( $current_link_tag, '<div class="error">'.sprintf( T_('This file is not image: %s'), $current_link_tag ).'</div>', $content );
+				{ // Display icon+caption if file is not an image
+					if( empty( $current_file_params['title'] ) )
+					{ // Use real file name as title when it is not defined for inline tag
+						$file_title = $File->get( 'title' );
+						$current_file_params['title'] = ' '.( empty( $file_title ) ? $File->get_name() : $file_title );
+					}
+					elseif( $current_file_params['title'] == '-' )
+					{ // Don't display a title in this case, Only file icon will be displayed
+						$current_file_params['title'] = '';
+					}
+					else
+					{ // Add a space between file icon and title
+						$current_file_params['title'] = ' '.$current_file_params['title'];
+					}
+					$link_tag = '<a href="'.$File->get_url().'"'
+						.( empty( $current_file_params['class'] ) ? '' : ' class="'.$current_file_params['class'].'"' )
+						.'>'.$File->get_icon( $current_file_params ).$current_file_params['title'].'</a>';
 				}
+
+				// Replace inline image tag with HTML img tag
+				$content = str_replace( $current_link_tag, $link_tag, $content );
 			}
 		}
 
@@ -6697,15 +6778,302 @@ class Item extends ItemLight
 	}
 
 
+	function set_last_touched_ts()
+	{
+		global $localtimenow, $current_User;
+
+		if( is_logged_in() )
+		{
+			$this->load_content_read_status();
+		}
+		$this->set_param( 'last_touched_ts', 'date', date2mysql( $localtimenow ) );
+	}
+
+
 	/**
 	 * Update field last_touched_ts
+	 *
+	 * @param boolean Use transaction
+	 * @param boolean Use FALSE to update only the categories
 	 */
-	function update_last_touched_date()
+	function update_last_touched_date( $use_transaction = true, $update_item_date = true )
+	{
+		if( $use_transaction )
+		{
+			global $DB;
+			$DB->begin();
+		}
+
+		if( $update_item_date )
+		{
+			$this->set_last_touched_ts();
+			$this->dbupdate( false, false, false );
+		}
+
+		if( is_logged_in() && ( $this->content_read_status == 'read' ) )
+		{ // Update current user post read date because it was read before this modifications as well
+			$this->update_read_date( 'post' );
+		}
+
+		// Also update last touched date of all categories of this Item
+		$chapters = $this->get_Chapters();
+		if( count( $chapters ) > 0 )
+		{
+			foreach( $chapters as $Chapter )
+			{
+				$Chapter->update_last_touched_date();
+				while( $Chapter )
+				{ // Update all parent chapters recursively
+					$Chapter = $Chapter->get_parent_Chapter();
+					if( ! empty( $Chapter ) )
+					{
+						$Chapter->update_last_touched_date();
+					}
+				}
+			}
+		}
+
+		if( $use_transaction )
+		{
+			$DB->commit();
+		}
+	}
+
+
+	/**
+	 * Update field uprs_read_post_ts for current User
+	 *
+	 * @param string Type of date field: 'post' | 'comment'
+	 */
+	function update_read_date( $date_type = 'post' )
+	{
+		if( $this->ID == 0 )
+		{ // Item is not saved in DB
+			return;
+		}
+
+		if( !is_logged_in() )
+		{ // User is not logged in
+			return;
+		}
+
+		global $DB, $current_User, $localtimenow, $user_post_read_statuses;
+
+		$timestamp = date2mysql( $localtimenow );
+
+		$read_dates = $this->get_read_dates();
+
+		if( $timestamp == $read_dates[ $date_type ] )
+		{ // The read status is already updated, Don't repeat it
+			return;
+		}
+
+		// Set what date field we should update
+		$date_field_name = $date_type == 'post' ? 'uprs_read_post_ts' : 'uprs_read_comment_ts';
+
+		if( !empty( $read_dates[ 'post' ] ) || !empty( $read_dates[ 'comment' ] ) )
+		{ // Update the read status
+			$DB->query( 'UPDATE T_users__postreadstatus
+				  SET '.$date_field_name.' = '.$DB->quote( $timestamp ).'
+				WHERE uprs_user_ID = '.$DB->quote( $current_User->ID ).'
+				  AND uprs_post_ID = '.$DB->quote( $this->ID ) );
+		}
+		else
+		{ // Insert new read status
+			$DB->query( 'INSERT INTO T_users__postreadstatus ( uprs_user_ID, uprs_post_ID, '.$date_field_name.' )
+				VALUES ( '.$DB->quote( $current_User->ID ).', '.$DB->quote( $this->ID ).', '.$DB->quote( $timestamp ).' )' );
+		}
+
+		// Update the cached date
+		$user_post_read_statuses[ $this->ID ][ $date_type ] = $timestamp;
+	}
+
+
+	/**
+	 * Load timestamp when this post content was read by the current User
+	 */
+	function load_content_read_status()
 	{
 		global $localtimenow;
 
-		$this->set_param( 'last_touched_ts', 'date', date('Y-m-d H:i:s',$localtimenow) );
-		$this->dbupdate( false, false, false );
+		if( !is_logged_in() )
+		{
+			return;
+		}
+
+		if( !empty( $this->content_read_status ) )
+		{
+			return;
+		}
+
+		$read_dates = $this->get_read_dates();
+		if( $read_dates['post'] >= $this->last_touched_ts )
+		{
+			$this->content_read_status = 'read';
+		}
+	}
+
+
+	/**
+	 * Get the read status of this post and its comments for current User
+	 *
+	 * @return string 'read' - when current User already read this post
+	 *                'updated' - current user didn't read some new changes
+	 *                'new' - the post is new for current user
+	 */
+	function get_read_status()
+	{
+		if( $this->ID == 0 )
+		{ // Item is not saved in DB
+			return 'read';
+		}
+
+		if( !is_logged_in() )
+		{ // User is not logged in
+			return 'read';
+		}
+
+		global $DB, $current_User;
+
+		$read_dates = $this->get_read_dates();
+
+		if( empty( $read_dates['post'] ) )
+		{ // This post is recent for current user
+			return 'new';
+		}
+
+		// A post is read if the post was seen after the latest update and the last updated comment was also seen by this user.
+		if( $read_dates['post'] >= $this->last_touched_ts )
+		{ // This post was read by current user
+			$max_comment_last_touched = load_comments_last_touched( array( $this->ID ) );
+			if( empty( $max_comment_last_touched ) || $read_dates['comment'] >= $max_comment_last_touched[$this->ID] )
+			{ // Comments read ts is higher the the max last_touched_ts value between the available comments
+				return 'read';
+			}
+		}
+
+		// This post is Unread by current user
+		return 'updated';
+	}
+
+
+	/**
+	 * Get the read dates from DB or from Cached array of this post for current User
+	 *
+	 * @return array 'post' => the read date of post
+	 *               'comment' => the read date of comment
+	 */
+	function get_read_dates()
+	{
+		global $DB, $current_User, $user_post_read_statuses;
+
+		if( !is_array( $user_post_read_statuses ) )
+		{ // Init array first time
+			$user_post_read_statuses = array();
+		}
+
+		if( !isset( $user_post_read_statuses[ $this->ID ] ) )
+		{ // Get the read post date only one time from DB and store it in cache array
+			$SQL = new SQL();
+			$SQL->SELECT( 'uprs_read_post_ts AS `post`, uprs_read_comment_ts AS `comment`' );
+			$SQL->FROM( 'T_users__postreadstatus' );
+			$SQL->WHERE( 'uprs_user_ID = '.$DB->quote( $current_User->ID ) );
+			$SQL->WHERE_and( 'uprs_post_ID = '.$DB->quote( $this->ID ) );
+			$user_post_read_statuses[ $this->ID ] = $DB->get_row( $SQL->get(), ARRAY_A );
+		}
+
+		if( empty( $user_post_read_statuses[ $this->ID ] ) )
+		{ // Init empty array keys
+			$user_post_read_statuses[ $this->ID ] = array( 'post' => 0, 'comment' => 0 );
+		}
+
+		return $user_post_read_statuses[ $this->ID ];
+	}
+
+
+	/**
+	 * Display the icon if this post is unread by current User
+	 *
+	 * @param array Params
+	 */
+	function display_unread_status( $params = array() )
+	{
+		// Set titles by Blog type
+		$this->load_Blog();
+		if( $this->Blog->get( 'type' ) == 'forum' )
+		{
+			$title_new = T_('New topic');
+			$title_updated = T_('Updated topic');
+		}
+		else
+		{
+			$title_new = T_('New post');
+			$title_updated = T_('Updated post');
+		}
+
+		// Merge params
+		$params = array_merge( array(
+				'before'        => ' ',
+				'after'         => '',
+				'class'         => 'track_content',
+				'title_new'     => $title_new,
+				'title_updated' => $title_updated,
+			), $params );
+
+		switch( $this->get_read_status() )
+		{
+			case 'new':
+				// This post is new for the current User, it was never opened
+				echo $params['before'];
+				echo get_icon( 'bullet_orange', 'imgtag', array( 'title' => $params['title_new'], 'class' => $params['class'] ) );
+				echo $params['after'];
+				break;
+
+			case 'updated':
+				// The last updates of this post was not read by the current User
+				echo $params['before'];
+				echo get_icon( 'bullet_brown', 'imgtag', array( 'title' => $params['title_updated'], 'class' => $params['class'] ) );
+				echo $params['after'];
+				break;
+
+			case 'read':
+			default:
+				// Don't display status icons if user already have read this post
+				break;
+		}
+	}
+
+
+	/**
+	 * Check if item has a goal to insert a hit into DB
+	 *
+	 * @return boolean TRUE if goal hit was inser
+	 */
+	function check_goal()
+	{
+		$goal_ID = $this->get_setting( 'goal_ID' );
+
+		if( empty( $goal_ID ) )
+		{ // Item has no goal ID
+			return false;
+		}
+
+		$GoalCache = & get_GoalCache();
+		if( ( $Goal = $GoalCache->get_by_ID( $goal_ID, false, false ) ) === false )
+		{ // Goal ID is incorrect
+			return false;
+		}
+
+		global $Hit, $DB;
+
+		// We need to log the HIT now! Because we need the hit ID!
+		$Hit->log();
+
+		// Record a goal hit:
+		return $DB->query( 'INSERT INTO T_track__goalhit
+			       ( ghit_goal_ID, ghit_hit_ID, ghit_params )
+			VALUES ( '.$Goal->ID.', '.$Hit->ID.', '.$DB->quote( 'item_ID='.$this->ID ).' )',
+			'Record goal hit of item #'.$this->ID );
 	}
 }
 

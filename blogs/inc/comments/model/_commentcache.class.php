@@ -20,7 +20,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author asimo: Evo Factory / Attila Simo
  *
- * @version $Id$
+ * @version $Id: _commentcache.class.php 6134 2014-03-08 07:48:07Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -46,6 +46,20 @@ class CommentCache extends DataObjectCache
 	function CommentCache( $objType = 'Comment', $dbtablename = 'T_comments', $dbprefix = 'comment_', $dbIDname = 'comment_ID' )
 	{
 		parent::DataObjectCache( $objType, false, $dbtablename, $dbprefix, $dbIDname );
+	}
+
+
+	/**
+	 * Load the cache **extensively**
+	 */
+	function load_all()
+	{
+		if( $this->all_loaded )
+		{ // Already loaded
+			return false;
+		}
+
+		debug_die( 'Load all is not allowed for CommentCache!' );
 	}
 }
 

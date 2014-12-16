@@ -10,7 +10,7 @@
  * @author gorgeb: Bertrand GORGE / EPISTEMA
  *
  * @package plugins
- * @version $Id: _flowplayer.plugin.php 198 2011-11-05 21:34:08Z fplanque $
+ * @version $Id: _flowplayer.plugin.php 7752 2014-12-04 12:44:33Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -33,7 +33,10 @@ class flowplayer_plugin extends Plugin
 	{
 		$this->short_desc = sprintf( T_('Media player for the these file formats: %s. Note: iOS supports only: %s; Android supports only: %s.'),
 			implode( ', ', $this->allow_ext ), 'mp4', 'mp4, webm' );
-		$this->long_desc = $this->short_desc;
+
+		$this->long_desc = $this->short_desc.' '
+			.sprintf( T_('This player can display a placeholder image of the same name as the video file with the following extensions: %s.'),
+			'jpg, jpeg, png, gif' );
 	}
 
 
@@ -42,17 +45,19 @@ class flowplayer_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
-		require_js( $this->get_plugin_url( true ).'flowplayer.min.js', 'relative' );
-		require_js( $this->get_plugin_url( true ).'flowplayer_init.js', 'relative' );
-		add_js_headline( 'flowplayer_url = "'.$this->get_plugin_url( true ).'";' );
+		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
+		require_js( '#flowplayer#', $relative_to );
+		add_js_headline( 'flowplayer.conf.flashfit = true;' );
+		$this->require_skin();
 		add_css_headline( '.flowplayer_block {
-	margin: 0 auto 1em;
+	margin: 1em auto 0;
+	background: #000;
 }
 .flowplayer_block .flowplayer {
 	display: block;
 	margin: auto;
 }
-.flowplayer_block .flowplayer_text {
+.flowplayer_text {
 	font-size: 84%;
 	text-align: center;
 	margin: 4px 0;
@@ -79,6 +84,12 @@ class flowplayer_plugin extends Plugin
 	{
 		return array_merge( parent::get_coll_setting_definitions( $params ),
 			array(
+				'skin' => array(
+					'label' => T_('Skin'),
+					'type' => 'select',
+					'options' => $this->get_skins_list(),
+					'defaultvalue' => 'minimalist',
+					),
 				'width' => array(
 					'label' => T_('Video width (px)'),
 					'note' => T_('100% width if left empty or 0'),
@@ -130,7 +141,7 @@ class flowplayer_plugin extends Plugin
 		$File = $params['File'];
 
 		if( ! $this->is_flp_video( $File ) )
-		{
+		{ // This file cannot be played with this player
 			return false;
 		}
 
@@ -140,11 +151,11 @@ class flowplayer_plugin extends Plugin
 		$width = intval( $this->get_coll_setting( 'width', $item_Blog ) );
 		if( empty( $width ) )
 		{ // Set default width
-			$width = 'width:100%;';
+			$width = 'max-width:100%;';
 		}
 		else
 		{ // Set width from blog plugin setting
-			$width = 'width:'.$width.'px;';
+			$width = 'max-width:'.$width.'px;';
 		}
 
 		// Set height from blog plugin setting
@@ -157,21 +168,58 @@ class flowplayer_plugin extends Plugin
 			{
 				$params['data'] .= '<div style="clear: both; height: 0px; font-size: 0px"></div>';
 			}
-			$params['data'] .= '<div class="flowplayer_block">';
+			$params['data'] .= '<div class="flowplayer_block" style="'.$width.$height.'">';
 
-			$params['data'] .= '<a class="flowplayer" style="'.$width.$height.'" href="'.$File->get_url().'"></a>';
+			$source_files = array( $File );
+
+			if( ! isset( $params['Comment'] ) )
+			{ // Get the fallback files for Item's content
+				$source_files = array_merge(
+						$source_files,
+						$Item->get_fallback_files( $File )
+					);
+			}
+
+			$sources = array();
+			foreach( $source_files as $f => $source_File )
+			{
+				$sources[ $f ] = array(
+						'src' => $source_File->get_url(),
+					);
+
+				if( $Filetype = & $source_File->get_Filetype() && isset( $Filetype->mimetype ) )
+				{ // Get mime type of the video file
+					$sources[ $f ]['type'] = $Filetype->mimetype;
+				}
+			}
+
+			if( $placeholder_File = & $Item->get_placeholder_File( $File ) )
+			{ // Display placeholder/poster when image file is linked to the Item with same name as current video File
+				$video_placeholder_attr = ' poster="'.$placeholder_File->get_url().'"';
+			}
+			else
+			{ // No placeholder for current video File
+				$video_placeholder_attr = '';
+			}
+
+			$params['data'] .= '<div class="flowplayer '.$this->get_skin( $item_Blog ).'" style="'.$width.$height.'"><video'.$video_placeholder_attr.'>';
+			foreach( $sources as $source )
+			{
+				$params['data'] .= '<source'.get_field_attribs_as_string( $source, false ).' />'."\n";
+			}
+			$params['data'] .= '</video></div>'."\n";
 
 			if( $File->get( 'desc' ) != '' && $this->get_coll_setting( 'disp_caption', $item_Blog ) )
 			{ // Display caption
-				$params['data'] .= '<div class="flowplayer_text">'.$File->get( 'desc' ).'</div>';
+				$params['data'] .= '<div class="flowplayer_text">'.$File->get( 'desc' ).'</div>'."\n";
 			}
+
+			$params['data'] .= '</div>'."\n";
 
 			if( $this->get_coll_setting( 'allow_download', $item_Blog ) )
 			{ // Allow to download the video files
 				$params['data'] .= '<div class="flowplayer_text"><a href="'.$File->get_url().'">'.T_('Download this video').'</a></div>';
 			}
-
-			$params['data'] .= '</div>';
 
 			return true;
 		}
@@ -192,6 +240,57 @@ class flowplayer_plugin extends Plugin
 		$params['Item'] = & $Comment->get_Item();
 
 		return $this->RenderItemAttachment( $params, true );
+	}
+
+
+	/**
+	 * Get a list of the skins
+	 *
+	 * @return array Skins
+	 */
+	function get_skins_list()
+	{
+		return array(
+				'minimalist' => 'minimalist',
+				'functional' => 'functional',
+				'playful'    => 'playful',
+			);
+	}
+
+
+	/**
+	 * Get current skin
+	 *
+	 * @param object Blog
+	 * @return string Skin name
+	 */
+	function get_skin( $Blog = NULL )
+	{
+		if( empty( $Blog ) )
+		{ // Get current Blog if it is not defined
+			global $Blog;
+		}
+
+		// Get a skin name from blog plugin setting
+		return empty( $Blog ) ? '' : $skin = $this->get_coll_setting( 'skin', $Blog );
+	}
+
+	/**
+	 * Require css file of current skin
+	 */
+	function require_skin()
+	{
+		$skin = $this->get_skin();
+		if( empty( $skin ) )
+		{ // Include all skins
+			$skin = 'all-skins';
+		}
+
+		$skins_path = dirname( $this->classfile_path ).'/skin';
+		if( file_exists( $skins_path.'/'.$skin.'.css' ) )
+		{ // Require css file only if it exists
+			require_css( $this->get_plugin_url().'skin/'.$skin.'.css', 'relative' );
+		}
 	}
 
 }

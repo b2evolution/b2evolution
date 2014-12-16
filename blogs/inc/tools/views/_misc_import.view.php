@@ -16,7 +16,7 @@
  * @author blueyed: Daniel HAHLER
  * @author efy-asimo: Attila Simo.
  *
- * @version $Id$
+ * @version $Id: _misc_import.view.php 7044 2014-07-02 08:55:10Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -35,9 +35,11 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 $block_item_Widget->disp_template_raw( 'block_end' );
 
 
-$block_item_Widget->title = T_('WordPress XML Import');
+$block_item_Widget->title = T_('WordPress Import');
 $block_item_Widget->disp_template_replaced( 'block_start' );
-printf( '<p>'.T_('You can import contents from your WordPress XML file into your b2evolution database by using <a %s>Wordpress XML Importer</a>.').'</p>', ' href="?ctrl=wpimportxml"' );
+echo '<ul>';
+printf( '<li>'.T_('Use the <a %s>WordPress XML Importer</a> to import contents previously exported as a wordpress XML file.').'</li>', ' href="?ctrl=wpimportxml"' );
+echo '</ul>';
 $block_item_Widget->disp_template_raw( 'block_end' );
 
 

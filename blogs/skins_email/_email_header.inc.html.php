@@ -8,7 +8,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
- * @version $Id$
+ * @version $Id: _email_header.inc.html.php 7639 2014-11-13 15:07:37Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -26,12 +26,13 @@ if( file_exists( $emailskins_path.'_email_style.css' ) )
 </style>
 <?php } ?>
 </head>
-<body class="email">
+<body<?php echo emailskin_style( 'body.email' ); ?>>
+<div<?php echo emailskin_style( 'div.email_wrap' ); ?>>
 <?php
 if( $Settings->get( 'notification_logo' ) != '' || $Settings->get( 'notification_long_name' ) != '' )
 { // Display email header if logo or long site name are defined
 ?>
-<div class="email_header">
+<div<?php echo emailskin_style( 'div.email_header' ); ?>>
 <?php
 if( $Settings->get( 'notification_logo' ) != '' )
 { // Display site logo
@@ -40,11 +41,11 @@ if( $Settings->get( 'notification_logo' ) != '' )
 }
 else
 { // No logo, Display only long site name
-	echo '<p class="sitename">'.$Settings->get( 'notification_long_name' ).'</p>';
+	echo '<p'.emailskin_style( '.p+p.sitename' ).'>'.$Settings->get( 'notification_long_name' ).'</p>';
 }
 ?>
 </div>
 <?php } ?>
 
-<div class="email_payload">
-<p><?php echo T_( 'Hello $login$ !' ); ?></p>
+<div<?php echo emailskin_style( 'div.email_payload' ); ?>>
+<p<?php echo emailskin_style( '.p' ); ?>><?php echo T_( 'Hello $login$ !' ); ?></p>

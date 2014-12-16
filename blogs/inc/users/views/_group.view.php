@@ -21,7 +21,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _group.view.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -35,16 +35,16 @@ $usedgroups = $DB->get_col( 'SELECT grp_ID
 
 // Create result set:
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE grp_ID, grp_name' );
+$SQL->SELECT( 'SQL_NO_CACHE grp_ID, grp_name, grp_level' );
 $SQL->FROM( 'T_groups' );
 
 $count_SQL = new SQL();
 $count_SQL->SELECT( 'SQL_NO_CACHE COUNT(grp_ID)' );
 $count_SQL->FROM( 'T_groups' );
 
-$Results = new Results( $SQL->get(), 'grp_', 'A', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
+$Results = new Results( $SQL->get(), 'grp_', '--D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 
-$Results->title = T_('User groups');
+$Results->title = T_('Groups (for setting permissions)').get_manual_link( 'user-groups-tab' );
 
 /*
  * Table icons:
@@ -69,6 +69,15 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 			'order' => 'grp_name',
 			'td' => '<a href="'.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID=$grp_ID$"><b>$grp_name$</b></a>',
 		);
+
+	$Results->cols[] = array(
+			'th' => T_('Level'),
+			'th_class' => 'shrinkwrap small',
+			'td_class' => 'shrinkwrap group_level_edit small',
+			'order' => 'grp_level',
+			'default_dir' => 'D',
+			'td' => '<a href="#" rel="$grp_level$">$grp_level$</a>',
+		);
 }
 else
 {	// No permission to edit group
@@ -76,6 +85,15 @@ else
 			'th' => T_('Name'),
 			'order' => 'grp_name',
 			'td' => '$grp_name$',
+		);
+
+	$Results->cols[] = array(
+			'th' => T_('Level'),
+			'th_class' => 'shrinkwrap small',
+			'td_class' => 'shrinkwrap small',
+			'order' => 'grp_level',
+			'default_dir' => 'D',
+			'td' => '$grp_level$',
 		);
 }
 
@@ -111,4 +129,20 @@ $Results->cols[] = array(
 // Display results:
 $Results->display();
 
+if( $current_User->check_perm( 'users', 'edit', false ) )
+{ // If user can edit the users - Init js to edit group level by AJAX
+	$group_levels = array();
+	for( $l = 0; $l <= 10; $l++ )
+	{
+		$group_levels[ $l ] = $l;
+	}
+	// Print JS to edit a group level
+	echo_editable_column_js( array(
+		'column_selector' => '.group_level_edit',
+		'ajax_url'        => get_secure_htsrv_url().'async.php?action=group_level_edit&'.url_crumb( 'grouplevel' ),
+		'options'         => $group_levels,
+		'new_field_name'  => 'new_group_level',
+		'ID_value'        => 'jQuery( ":first", jQuery( this ).parent() ).text()',
+		'ID_name'         => 'group_ID' ) );
+}
 ?>

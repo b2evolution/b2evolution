@@ -11,7 +11,7 @@
  *
  * @package admin
  *
- * @version $Id: _widget_list.view.php 7157 2014-07-21 10:01:15Z yura $
+ * @version $Id: _widget_list.view.php 7158 2014-07-21 10:07:51Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -212,8 +212,6 @@ foreach( $container_Widget_array as $container=>$dummy )
 		display_container( $container, ' '.T_('[NOT INCLUDED IN SELECTED SKIN!]') );
 	}
 }
-
-global $rsc_url;
 
 echo '</fieldset>'."\n";
 

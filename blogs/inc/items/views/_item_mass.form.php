@@ -20,7 +20,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id$
+ * @version $Id: _item_mass.form.php 6513 2014-04-18 06:18:18Z attila $
  */
 
 
@@ -93,8 +93,8 @@ $Form->begin_form( '', '', $params );
 	$Form->hidden( 'post_excerpt', $edited_Item->get( 'excerpt' ) );
 	$Form->hidden( 'post_urltitle', $edited_Item->get( 'urltitle' ) );
 	$Form->hidden( 'titletag', $edited_Item->get( 'titletag' ) );
-	$Form->hidden( 'metadesc', $edited_Item->get_setting( 'post_metadesc' ) );
-	$Form->hidden( 'custom_headers', $edited_Item->get_setting( 'post_custom_headers' ) );
+	$Form->hidden( 'metadesc', $edited_Item->get_setting( 'metadesc' ) );
+	$Form->hidden( 'metakeywords', $edited_Item->get_setting( 'metakeywords' ) );
 
 	if( $Blog->get_setting( 'use_workflow' ) )
 	{	// We want to use workflow properties for this blog:
@@ -106,7 +106,8 @@ $Form->begin_form( '', '', $params );
 	$Form->hidden( 'trackback_url', $trackback_url );
 	$Form->hidden( 'item_featured', $edited_Item->featured );
 	$Form->hidden( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ) );
-	$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'post_expiry_delay' ) );
+	$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'comment_expiry_delay' ) );
+	$Form->hidden( 'goal_ID', $edited_Item->get_setting( 'goal_ID' ) );
 	$Form->hidden( 'item_order', $edited_Item->order );
 	// CUSTOM FIELDS
 	display_hidden_custom_fields( $Form, $edited_Item );
@@ -176,7 +177,7 @@ $Form->begin_form( '', '', $params );
 	$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'itemform_renderers' ) );
 
 	// fp> TODO: there should be no param call here (shld be in controller)
-	$edited_Item->renderer_checkboxes( param('renderers', 'array/string', NULL) );
+	$edited_Item->renderer_checkboxes( param('renderers', 'array:string', NULL) );
 
 	$Form->end_fieldset();
 

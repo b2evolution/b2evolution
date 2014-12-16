@@ -21,11 +21,11 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _cronjob.form.php 6134 2014-03-08 07:48:07Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $localtimenow, $cron_job_names, $edited_Cronjob;
+global $localtimenow, $edited_Cronjob;
 
 // Determine if we are creating or updating...
 global $action;
@@ -44,17 +44,23 @@ $Form->begin_form( 'fform', $creating ? T_('New scheduled job') : T_('Edit sched
 	$Form->begin_fieldset( T_('Job details').get_manual_link('scheduler_job_form') );
 
 		if( $creating && $action != 'copy' )
-		{	// New cronjob
-			$Form->select_input_array( 'cjob_type', get_param( 'cjob_type' ), $cron_job_names, T_('Job type') );
+		{ // New cronjob
+			$cron_jobs_names = get_cron_jobs_config( 'name' );
+			// Exclude these cron jobs from manual creating
+			unset( $cron_jobs_names['send-post-notifications'] );
+			unset( $cron_jobs_names['send-comment-notifications'] );
+			$Form->select_input_array( 'cjob_type', get_param( 'cjob_type' ), $cron_jobs_names, T_('Job type') );
 		}
 		else
-		{	// Edit cronjob
+		{ // Edit cronjob
 			if( $action == 'edit' )
 			{
 				$Form->info( T_('Job #'), $edited_Cronjob->ID );
 			}
 
-			$Form->text_input( 'cjob_name', $edited_Cronjob->name, 25, T_('Job name'), '', array( 'maxlength' => 255, 'required' => true ) );
+			$Form->info( T_('Default job name'), cron_job_name( $edited_Cronjob->key, '', $edited_Cronjob->params ) );
+
+			$Form->text_input( 'cjob_name', $edited_Cronjob->name, 50, T_('Job name'), '', array( 'maxlength' => 255 ) );
 		}
 
 		$Form->date_input( 'cjob_date', date2mysql( $edited_Cronjob->start_timestamp ), T_('Schedule date'), array(

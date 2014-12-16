@@ -104,7 +104,7 @@ else
 	$User = NULL;
 	// Note: we use funky field names to defeat the most basic guestbook spam bots and/or their most basic authors
 	$author = param( $dummy_fields[ 'name' ], 'string' );
-	$email = evo_strtolower( param( $dummy_fields[ 'email' ], 'string' ) );
+	$email = utf8_strtolower( param( $dummy_fields[ 'email' ], 'string' ) );
 	$url = param( $dummy_fields[ 'url' ], 'string' );
 
 	if( $url != '' && ! $commented_Item->Blog->get_setting( 'allow_anon_url' ) )
@@ -128,7 +128,7 @@ $now = date( 'Y-m-d H:i:s', $localtimenow );
 
 $original_comment = $comment;
 
-$comment_renderers = param( 'renderers', 'array/string', array() );
+$comment_renderers = param( 'renderers', 'array:string', array() );
 
 // Trigger event: a Plugin could add a $category="error" message here..
 // This must get triggered before any internal validation and must pass all relevant params.
@@ -433,7 +433,7 @@ if( $Messages->has_errors() && $action != 'preview' )
 
 if( $action == 'preview' )
 { // set the Comment into user's session and redirect.
-	$Comment->set( 'original_content', evo_html_entity_decode( $original_comment ) ); // used in the textarea input field again
+	$Comment->set( 'original_content', html_entity_decode( $original_comment ) ); // used in the textarea input field again
 	$Comment->set( 'preview_attachments', $preview_attachments ); // memorize attachments
 	$Comment->set( 'checked_attachments', $checked_attachments ); // memorize checked attachments
 	$Comment->set( 'email_is_detected', $comments_email_is_detected ); // used to change a style of the comment
@@ -449,7 +449,7 @@ if( $action == 'preview' )
 
 	if( $comments_email_is_detected )
 	{ // Comment contains an email address, We should show an error about this
-		if( $Settings->get( 'newusers_canregister' ) && $Settings->get( 'registration_is_public' ) )
+		if( $Settings->get( 'newusers_canregister' ) == 'yes' && $Settings->get( 'registration_is_public' ) )
 		{ // Users can register and we give them a links to log in and registration
 			if( is_null( $commented_Item ) )
 			{ // Initialize the commented Item object
@@ -506,7 +506,7 @@ if( $result && ( !empty( $preview_attachments ) ) )
 	$FileCache = & get_FileCache();
 	$attachments = explode( ',', $preview_attachments );
 	$final_attachments = explode( ',', $checked_attachments );
-	$LinkOnwer = new LinkComment( $Comment );
+	$LinkOwner = new LinkComment( $Comment );
 	$attachment_dir = NULL;
 
 	// No need transaction here, because if one file can't be attached, the rest should be still attached
@@ -514,7 +514,7 @@ if( $result && ( !empty( $preview_attachments ) ) )
 	{ // create links between comment and attached files
 		if( in_array( $file_ID, $final_attachments ) )
 		{ // attachment checkbox was checked, create the link
-			$LinkOnwer->add_link( $file_ID, 'aftermore', $order );
+			$LinkOwner->add_link( $file_ID, 'aftermore', $order, false );
 			$order++;
 		}
 		else
@@ -627,7 +627,7 @@ if( $Comment->ID )
 
 	if( !is_logged_in() )
 	{
-		if( $Settings->get( 'newusers_canregister' ) && $Settings->get( 'registration_is_public' ) && $Comment->Item->Blog->get_setting( 'comments_register' ) )
+		if( $Settings->get( 'newusers_canregister' ) == 'yes' && $Settings->get( 'registration_is_public' ) && $Comment->Item->Blog->get_setting( 'comments_register' ) )
 		{ // Redirect to the registration form
 			$Messages->add( T_('ATTENTION: Create a user account now so that other users can contact you after reading your comment.'), 'error' );
 

@@ -14,11 +14,9 @@
  * @package evoskins
  * @subpackage pureforums
  *
- * @version $Id$
+ * @version $Id: _search.disp.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
-
-global $MainList;
 
 echo '<table class="forums_table topics_table" cellspacing="0" cellpadding="0">';
 
@@ -27,69 +25,38 @@ skin_widget( array(
 		// CODE for the widget:
 		'widget' => 'coll_search_form',
 		// Optional display params
-		'block_start' => '<tr class="ft_search"><td colspan="4">',
+		'block_start' => '<tr class="ft_search"><td>',
 		'block_end' => '</td></tr>',
 		'block_display_title' => false,
 		'disp_search_options' => 0,
+		'search_class' => 'extended_search_form',
 		'use_search_disp' => 1,
 		'button' => T_('Search')
 	) );
 // ---------------------------------- END OF COMMON LINKS ---------------------------------
 
-// Display message if no post:
-display_if_empty( array(
-				'before'      => '<p class="msg_nothing" style="margin: 2em 0">',
-				'after'       => '</p>',
-				'msg_empty'   => T_('Sorry, we could not find anything matching your request, please try to broaden your search.'),
-			) );
-
-if( isset( $MainList ) && $MainList->result_num_rows > 0 )
-{
-
-// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
-mainlist_page_links( array(
-		'block_start' => '<tr class="panel white"><td colspan="4"><div class="navigation">',
-		'block_end' => '</div></td></tr>',
-		'page_current_template' => '<strong class="current_page">$page_num$</strong>',
-		'page_item_before'      => '',
-		'page_item_after'       => '',
-		'prev_text'             => T_('Previous'),
-		'next_text'             => T_('Next'),
-		'prev_class'            => 'prev',
-		'next_class'            => 'next',
+// Display the search result
+search_result_block( array(
+		'title_prefix_post'     => T_('Topic: '),
+		'title_prefix_comment'  => T_('Reply: '),
+		'title_prefix_category' => T_('Forum: '),
+		'title_prefix_tag'      => T_('Tag: '),
+		'block_start' => '',
+		'block_end'   => '',
+		'row_start'   => '<tr><td>',
+		'row_end'     => '</td></tr>',
+		'pagination'  => array(
+				'block_start' => '<tr class="panel white"><td><div class="navigation">',
+				'block_end' => '</div></td></tr>',
+				'page_current_template' => '<strong class="current_page">$page_num$</strong>',
+				'page_item_before'      => '',
+				'page_item_after'       => '',
+				'prev_text'             => T_('Previous'),
+				'next_text'             => T_('Next'),
+				'prev_class'            => 'prev',
+				'next_class'            => 'next',
+			)
 	) );
-// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
-
-// --------------------------------- START OF POSTS -------------------------------------
-while( mainlist_get_item() )
-{	// For each blog post, do everything below up to the closing curly brace "}"
-
-	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
-	skin_include( '_item_list.inc.php', array(
-			'content_mode'         => 'auto', // 'auto' will auto select depending on $disp-detail
-			'image_size'           => 'fit-400x320',
-			'display_column_forum' => true,
-			'item_link_type'       => 'permalink', // Use 'permalink' to display title of all posts as links (used especially for intro-cat posts)
-		) );
-	// ----------------------------END ITEM BLOCK  ----------------------------
-
-} // ---------------------------------- END OF POSTS ------------------------------------
-
-// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
-mainlist_page_links( array(
-		'block_start' => '<tr class="panel white"><td colspan="4"><div class="navigation">',
-		'block_end' => '</div></td></tr>',
-		'page_current_template' => '<strong class="current_page">$page_num$</strong>',
-		'page_item_before'      => '',
-		'page_item_after'       => '',
-		'prev_text'             => T_('Previous'),
-		'next_text'             => T_('Next'),
-		'prev_class'            => 'prev',
-		'next_class'            => 'next',
-	) );
-// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
-
-}
 
 echo '</table>';
 ?>

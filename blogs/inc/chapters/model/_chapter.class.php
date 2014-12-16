@@ -22,7 +22,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _chapter.class.php 6134 2014-03-08 07:48:07Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -60,6 +60,13 @@ class Chapter extends GenericCategory
 	var $parent_Chapter;
 
 	/**
+	 * Date when items or comments were added/edited/deleted for this Chapter last time (timestamp)
+	 * @see Chapter::update_last_touched_date()
+	 * @var integer
+	 */
+	var $last_touched_ts;
+
+	/**
 	 * Constructor
 	 *
 	 * @param table Database row
@@ -69,15 +76,6 @@ class Chapter extends GenericCategory
 	{
 		// Call parent constructor:
 		parent::GenericCategory( 'T_categories', 'cat_', 'cat_ID', $db_row );
-
-		/**
-		 * Delete restrictions
-		 */
-		$this->delete_restrictions = array(
-				array( 'table'=>'T_categories', 'fk'=>'cat_parent_ID', 'msg'=>T_('%d sub categories') ),
-				array( 'table'=>'T_items__item', 'fk'=>'post_main_cat_ID', 'msg'=>T_('%d posts within category through main cat') ),
-				array( 'table'=>'T_postcats', 'fk'=>'postcat_cat_ID', 'msg'=>T_('%d posts within category through extra cat') ),
-			);
 
 		if( is_null($db_row) )
 		{	// We are creating an object here:
@@ -91,7 +89,23 @@ class Chapter extends GenericCategory
 			$this->order = $db_row->cat_order;
 			$this->meta = $db_row->cat_meta;
 			$this->lock = $db_row->cat_lock;
+			$this->last_touched_ts = $db_row->cat_last_touched_ts;		// When Chapter received last visible change (edit, item, comment, etc.)
 		}
+	}
+
+
+	/**
+	 * Get delete restriction settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_restrictions()
+	{
+		return array(
+				array( 'table'=>'T_categories', 'fk'=>'cat_parent_ID', 'msg'=>T_('%d sub categories') ),
+				array( 'table'=>'T_items__item', 'fk'=>'post_main_cat_ID', 'msg'=>T_('%d posts within category through main cat') ),
+				array( 'table'=>'T_postcats', 'fk'=>'postcat_cat_ID', 'msg'=>T_('%d posts within category through extra cat') ),
+			);
 	}
 
 
@@ -291,7 +305,7 @@ class Chapter extends GenericCategory
 	 */
 	function dbinsert()
 	{
-		global $DB;
+		global $DB, $localtimenow;
 
 		load_funcs( 'items/model/_item.funcs.php' );
 
@@ -302,6 +316,8 @@ class Chapter extends GenericCategory
 
 		// validate url title / slug
 		$this->set( 'urlname', urltitle_validate( $this->urlname, $this->name, $this->ID, false, $this->dbprefix.'urlname', $this->dbIDname, $this->dbtablename) );
+
+		$this->set_param( 'last_touched_ts', 'date', date( 'Y-m-d H:i:s', $localtimenow ) );
 
 		if( parent::dbinsert() )
 		{ // The chapter was inserted successful
@@ -332,6 +348,12 @@ class Chapter extends GenericCategory
 			$this->set( 'urlname', urltitle_validate( $this->urlname, $this->name, $this->ID, false, $this->dbprefix.'urlname', $this->dbIDname, $this->dbtablename) );
 		}
 
+		if( count( $this->dbchanges ) > 0 && !isset( $this->dbchanges['last_touched_ts'] ) )
+		{ // Update last_touched_ts field only if it wasn't updated yet and the datemodified will be updated for sure.
+			global $localtimenow;
+			$this->set_param( 'last_touched_ts', 'date', date( 'Y-m-d H:i:s', $localtimenow ) );
+		}
+
 		if( parent::dbupdate() === false )
 		{ // The update was unsuccessful
 			$DB->rollback();
@@ -347,7 +369,7 @@ class Chapter extends GenericCategory
 	/**
 	 * Check if this category has at least one post
 	 *
-	 * @return boolean 
+	 * @return boolean
 	 */
 	function has_posts()
 	{
@@ -369,6 +391,35 @@ class Chapter extends GenericCategory
 		}
 
 		return ( $this->count_posts > 0 );
+	}
+
+
+	/**
+	 * Update field last_touched_ts
+	 */
+	function update_last_touched_date()
+	{
+		global $localtimenow;
+
+		$this->set_param( 'last_touched_ts', 'date', date( 'Y-m-d H:i:s', $localtimenow ) );
+		$this->dbupdate();
+	}
+
+
+	/**
+	 * Get last touched date (datetime) of Chapter
+	 *
+	 * @param string date/time format: leave empty to use locale default date format
+	 * @param boolean true if you want GMT
+	 */
+	function get_last_touched_date( $format = '', $useGM = false )
+	{
+		if( empty( $format ) )
+		{
+			return mysql2date( locale_datefmt(), $this->last_touched_ts, $useGM );
+		}
+
+		return mysql2date( $format, $this->last_touched_ts, $useGM );
 	}
 
 

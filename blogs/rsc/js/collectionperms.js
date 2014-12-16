@@ -1,7 +1,7 @@
 /**
  * Javascript for Blog permission forms (backoffice).
  * b2evolution - http://b2evolution.net/
- * @version $Id: collectionperms.js 5576 2014-01-07 07:04:34Z yura $
+ * @version $Id: collectionperms.js 5577 2014-01-07 07:05:41Z yura $
  */
 
 

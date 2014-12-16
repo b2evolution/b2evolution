@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _cron.funcs.php 7347 2014-10-01 11:52:15Z yura $
+ * @version $Id: _cron.funcs.php 6177 2014-03-13 09:17:58Z attila $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -59,13 +59,13 @@ function cron_log( $message, $level = 0 )
 /**
  * Call a cron job.
  *
- * @param string Name of the job
+ * @param string Key of the job
  * @param string Params for the job:
  *               'ctsk_ID'   - task ID
  *               'ctsk_name' - task name
  * @return string Error message
  */
-function call_job( $job_name, $job_params = array() )
+function call_job( $job_key, $job_params = array() )
 {
 	global $DB, $inc_path, $Plugins, $admin_url;
 
@@ -75,9 +75,9 @@ function call_job( $job_name, $job_params = array() )
 	$result_message = NULL;
 	$result_status = 'error';
 
-	apm_name_transaction( 'CRON/'.$job_name );
+	$job_ctrl = get_cron_jobs_config( 'ctrl', $job_key );
 
-	if( preg_match( '~^plugin_(\d+)_(.*)$~', $job_name, $match ) )
+	if( preg_match( '~^plugin_(\d+)_(.*)$~', $job_ctrl, $match ) )
 	{ // Cron job provided by a plugin:
 		if( ! is_object($Plugins) )
 		{
@@ -88,7 +88,7 @@ function call_job( $job_name, $job_params = array() )
 		$Plugin = & $Plugins->get_by_ID( $match[1] );
 		if( ! $Plugin )
 		{
-			$result_message = 'Plugin for controller ['.$job_name.'] could not get instantiated.';
+			$result_message = 'Plugin for controller ['.$job_ctrl.'] could not get instantiated.';
 			cron_log( $result_message, 2 );
 			return $result_message;
 		}
@@ -102,10 +102,10 @@ function call_job( $job_name, $job_params = array() )
 	}
 	else
 	{
-		$controller = $inc_path.$job_name;
+		$controller = $inc_path.$job_ctrl;
 		if( ! is_file( $controller ) )
 		{
-			$result_message = 'Controller ['.$job_name.'] does not exist.';
+			$result_message = 'Controller ['.$job_ctrl.'] does not exist.';
 			cron_log( $result_message, 2 );
 			return $result_message;
 		}
@@ -173,41 +173,84 @@ function cron_status_color( $status )
 
 
 /**
- * Get the manual page link for the requested cron job, given by the controller path
+ * Get the manual page link for the requested cron job, given by the key
  *
- * @param string job ctrl path
- * @return string NULL when the corresponding manual topic was not defined, the manual link otherwise
+ * @param string job key
+ * @return string Link to manual page of cron job task
  */
-function cron_job_manual_link( $job_ctrl )
+function cron_job_manual_link( $job_key )
 {
-	$manual_topics = array(
-		'cron/jobs/_activate_account_reminder.job.php' => 'task-send-non-activated-account-reminders',
-		'cron/jobs/_antispam_poll.job.php' => 'task-poll-antispam-blacklist',
-		'cron/jobs/_cleanup_jobs.job.php' => 'task-cleanup-scheduled-jobs',
-		'cron/jobs/_comment_moderation_reminder.job.php' => 'task-send-unmoderated-comments-reminders',
-		'cron/jobs/_post_moderation_reminder.job.php' => 'task-send-unmoderated-posts-reminders',
-		'cron/jobs/_comment_notifications.job.php' => 'task-send-comment-notifications',
-		'cron/jobs/_decode_returned_emails.job.php' => 'task-process-return-path-inbox',
-		'cron/jobs/_error_test.job.php' => 'task-error-test',
-		'cron/jobs/_heavy_db_maintenance.job.php' => 'task-heavy-db-maintenance',
-		'cron/jobs/_light_db_maintenance.job.php' => 'task-light-db-maintenance',
-		'cron/jobs/_post_by_email.job.php' => 'task-create-post-by-email',
-		'cron/jobs/_post_notifications.job.php' => 'task-send-post-notifications',
-		'cron/jobs/_process_hitlog.job.php' => 'task-process-hit-log',
-		'cron/jobs/_prune_hits_sessions.job.php' => 'task-prune-old-hits-and-sessions',
-		'cron/jobs/_prune_page_cache.job.php' => 'task-prune-old-files-from-page-cache',
-		'cron/jobs/_prune_recycled_comments.job.php' => 'task-prune-recycled-comments',
-		'cron/jobs/_test.job.php' => 'task-test',
-		'cron/jobs/_unread_message_reminder.job.php' => 'task-send-unread-messages-reminders',
-	);
+	$help_config = get_cron_jobs_config( 'help', $job_key );
 
-	if( isset( $manual_topics[$job_ctrl] ) )
-	{ // return the corresponding manual page topic
-		return get_manual_link( $manual_topics[$job_ctrl] );
+	if( empty( $help_config ) )
+	{ // There was no 'help' topic defined for this job
+		return '';
 	}
 
-	// The topic was not defined
-	return NULL;
+	if( $help_config == '#' )
+	{ // The 'help' topic is set to '#', use the default 'task-' + job_key
+		return get_manual_link( 'task-'.$job_key );
+	}
+
+	if( is_url( $help_config ) )
+	{ // This cron job help topic is an url
+		return action_icon( T_('Open relevant page in online manual'), 'manual', $help_config, T_('Manual'), 5, 1, array( 'target' => '_blank', 'style' => 'vertical-align:top' ) );
+	}
+
+	return get_manual_link( $help_config );
+}
+
+
+/**
+ * Get name of cron job
+ *
+ * @param string Job key
+ * @param string Job name
+ * @param string|array Job params
+ * @return string Default value of job name of Name from DB
+ */
+function cron_job_name( $job_key, $job_name = '', $job_params = '' )
+{
+	if( empty( $job_name ) )
+	{ // Get default name by key
+		$job_name = get_cron_jobs_config( 'name', $job_key );
+	}
+
+	$job_params = is_string( $job_params ) ? unserialize( $job_params ) : $job_params;
+	if( ! empty( $job_params ) )
+	{ // Prepare job name with the specified params
+		switch( $job_key )
+		{
+			case 'send-post-notifications':
+				// Add item title to job name
+				if( ! empty( $job_params['item_ID'] ) )
+				{
+					$ItemCache = & get_ItemCache();
+					if( $Item = $ItemCache->get_by_ID( $job_params['item_ID'], false, false ) )
+					{
+						$job_name = sprintf( $job_name, $Item->get( 'title' ) );
+					}
+				}
+				break;
+
+			case 'send-comment-notifications':
+				// Add item title of the comment to job name
+				if( ! empty( $job_params['comment_ID'] ) )
+				{
+					$CommentCache = & get_CommentCache();
+					if( $Comment = & $CommentCache->get_by_ID( $job_params['comment_ID'], false, false ) )
+					{
+						if( $Item = $Comment->get_Item() )
+						{
+							$job_name = sprintf( $job_name, $Item->get( 'title' ) );
+						}
+					}
+				}
+				break;
+		}
+	}
+
+	return $job_name;
 }
 
 
@@ -263,4 +306,161 @@ function detect_timeout_cron_jobs( $error_task = NULL )
 	}
 }
 
+
+/**
+ * Get config array with all available cron jobs
+ *
+ * @param string What param we should get from config: 'name', 'ctrl', 'params'
+ * @param string Get one cron job by specified key
+ * @return array|string Array of all cron jobs | Value of specified cron job
+ */
+function get_cron_jobs_config( $get_param = '', $get_by_key = '' )
+{
+	global $cron_jobs_config;
+
+	if( isset( $cron_jobs_config ) )
+	{ // Get config from global vaiable to don't initialize this var twice
+		if( !empty( $get_by_key ) )
+		{ // A specific job param(s) was requested
+			if( empty( $get_param ) )
+			{ // Return all params
+				return $cron_jobs_config[ $get_by_key ];
+			}
+			// Return the requested job param if it is set or NULL otherwise
+			return ( isset( $cron_jobs_config[ $get_by_key ][$get_param] ) ) ? $cron_jobs_config[ $get_by_key ][$get_param] : NULL;
+		}
+
+		if( empty( $get_param ) )
+		{ // No specific param or job key was requested, return the whole config list
+			return $cron_jobs_config;
+		}
+
+		// Get a specific config param for all jobs
+		$restricted_config = array();
+		foreach( $cron_jobs_config as $job_key => $job_config )
+		{
+			$restricted_config[ $job_key ] = isset( $job_config[ $get_param ] ) ? $job_config[ $get_param ] : NULL;
+		}
+		return $restricted_config;
+	}
+
+	// This array will contain the modules and the plugins cron jobs data
+	$cron_jobs_config = array();
+
+	// Get additional jobs from different modules and Plugins:
+	global $modules, $Plugins;
+
+	foreach( $modules as $module )
+	{
+		$Module = & $GLOBALS[$module.'_Module'];
+		// Note: cron jobs with the same key will ovverride previously defined cron jobs data
+		$cron_jobs_config = array_merge( $cron_jobs_config, $Module->get_cron_jobs() );
+	}
+
+	if( !empty( $Plugins ) )
+	{
+		foreach( $Plugins->trigger_collect( 'GetCronJobs' ) as $plug_ID => $jobs )
+		{
+			if( ! is_array($jobs) )
+			{
+				$Debuglog->add( sprintf('GetCronJobs() for plugin #%d did not return array. Ignoring its jobs.', $plug_ID), array('plugins', 'error') );
+				continue;
+			}
+			foreach( $jobs as $job )
+			{
+				// Validate params from plugin:
+				if( ! isset($job['params']) )
+				{
+					$job['params'] = NULL;
+				}
+				if( ! is_array($job) || ! isset($job['ctrl'], $job['name']) )
+				{
+					$Debuglog->add( sprintf('GetCronJobs() for plugin #%d did return invalid job. Ignoring.', $plug_ID), array('plugins', 'error') );
+					continue;
+				}
+				if( isset($job['params']) && ! is_array($job['params']) )
+				{
+					$Debuglog->add( sprintf('GetCronJobs() for plugin #%d did return invalid job params (not an array). Ignoring.', $plug_ID), array('plugins', 'error') );
+					continue;
+				}
+				$job['ctrl'] = 'plugin_'.$plug_ID.'_'.$job['ctrl'];
+
+				add_cron_jobs_config( str_replace( '_', '-', $job['ctrl'] ), $job, true );
+			}
+		}
+	}
+
+	return get_cron_jobs_config( $get_param, $get_by_key );
+}
+
+
+/**
+ * Add new cron job to config
+ *
+ * @param string Cron job key
+ * @param array Cron job data, array with keys: 'name', 'ctrl', 'params'
+ * @param boolean TRUE to rewrite previous key
+ */
+function add_cron_jobs_config( $key, $data, $force = false )
+{
+	global $cron_jobs_config;
+
+	if( ! $force && isset( $cron_jobs_config[ $key ] ))
+	{ // Add new cron job to config array
+		return;
+	}
+
+	$cron_jobs_config[ $key ] = $data;
+}
+
+
+/**
+ * Build cron job names SELECT query from crong_jobs_config array
+ *
+ * @param string What fields to get, separated by comma
+ * @return string SQL query
+ */
+function cron_job_sql_query( $fields = 'key,name' )
+{
+	global $DB;
+
+	$cron_jobs_config = get_cron_jobs_config();
+
+	// We need to set the collation explicitly if the current db connection charset is utf-8 in order to avoid "Illegal mix of collation" issue
+	// Basically this is a hack which should be reviewed when the charset issues are fixed generally.
+	// TODO: asimo>Review this temporary solution after the charset issues were fixed.
+	$default_collation = ( $DB->connection_charset == 'utf8' ) ? ' COLLATE utf8_general_ci' : '';
+
+	$name_query = '';
+	if( !empty( $cron_jobs_config ) )
+	{
+		$fields = explode( ',', $fields );
+
+		$name_query = 'SELECT task_'.implode( ', task_', $fields ).' FROM ('."\n";
+		$first_task = true;
+		foreach( $cron_jobs_config as $ctsk_key => $ctsk_data )
+		{
+			$field_values = '';
+			$field_separator = '';
+			foreach( $fields as $field )
+			{
+				$field_values .= $field_separator.$DB->quote( $field == 'key' ? $ctsk_key : $ctsk_data[ $field ] ).$default_collation.' AS task_'.$field;
+				$field_separator = ', ';
+			}
+
+			if( $first_task )
+			{
+				$name_query .= "\t".'SELECT '.$field_values."\n";
+				$first_task = false;
+			}
+			else
+			{
+				$name_query .= "\t".'UNION SELECT '.$field_values."\n";
+			}
+		}
+		$name_query .= ') AS inner_temp';
+	}
+
+	return $name_query;
+}
 ?>

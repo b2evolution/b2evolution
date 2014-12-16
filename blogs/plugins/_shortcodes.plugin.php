@@ -99,22 +99,12 @@ class shortcodes_plugin extends Plugin
 
 		function shortcodes_insert_tag( canvas_field, i )
 		{
-			var tag = shortcodes_buttons[i].tag;
 			if( typeof( tinyMCE ) != 'undefined' && typeof( tinyMCE.activeEditor ) != 'undefined' && tinyMCE.activeEditor )
-			{ // tinyMCE plugin is active now, we should insert separators by plugin buttons to render them
-				if( tag == '[teaserbreak]' && typeof( tinyMCE.activeEditor.execCommands.mceMore ) != 'undefined' )
-				{ // MorePlugin exists in tinyMCE
-					tinyMCE.execCommand( 'mceMore', false, tinyMCE.activeEditor.id );
-					return;
-				}
-				if( tag == '[pagebreak]' && typeof( tinyMCE.activeEditor.execCommands.mcePageBreak ) != 'undefined' )
-				{ // PageBreakPlugin exists in tinyMCE
-					tinyMCE.execCommand( 'mcePageBreak', false, tinyMCE.activeEditor.id );
-					return;
-				}
+			{ // tinyMCE plugin is active now, we should focus cursor to the edit area
+				tinyMCE.execCommand( 'mceFocus', false, tinyMCE.activeEditor.id );
 			}
-			// Insert plain text in simple textarea
-			textarea_wrap_selection( canvas_field, tag, '', 0 );
+			// Insert tag text in area
+			textarea_wrap_selection( canvas_field, shortcodes_buttons[i].tag, '', 0 );
 		}
 		//]]>
 		</script>

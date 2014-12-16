@@ -80,7 +80,7 @@ class PluginsTestCase extends EvoDbUnitTestCase
 	 */
 	function test_get_registered_events()
 	{
-		$c_Plugin = & $this->Plugins->register( 'simpletests_c_plugin', 0, -1, NULL, dirname( __FILE__ ).'/__simpletests_c.plugin.php' );
+		$c_Plugin = & $this->Plugins->register( 'simpletests_c_plugin', 0, -1, dirname( __FILE__ ).'/__simpletests_c.plugin.php' );
 		$this->assertEqual( $this->Plugins->get_registered_events( $c_Plugin ), array(
 			'AdminBeginPayload',
 			'AdminEndHtmlHead',

@@ -55,6 +55,10 @@ if( ! $PageCache->check() )
 {	// Cache miss, we have to generate:
 	// --------------------- PAGE LEVEL CACHING SUPPORT ---------------------
 
+if( $disp == 'front' )
+{ // Force $disp to 'posts' for all blogs on this template
+	$disp = 'posts';
+}
 
 // This is the main template; it may be used to display very different things.
 // Do inits depending on current $disp:

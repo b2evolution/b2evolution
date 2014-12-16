@@ -21,7 +21,7 @@
  *
  * @package admin
  *
- * @version $Id: _email_sent.view.php 349 2011-11-18 11:18:14Z yura $
+ * @version $Id: _email_sent.view.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -72,7 +72,7 @@ if( !empty( $datestop ) )
 }
 if( !empty( $email ) )
 {	// Filter by email
-	$email = evo_strtolower( $email );
+	$email = utf8_strtolower( $email );
 	$SQL->WHERE_and( 'emlog_to LIKE '.$DB->quote( $email ) );
 	$count_SQL->WHERE_and( 'emlog_to LIKE '.$DB->quote( $email ) );
 }
@@ -146,7 +146,7 @@ function emlog_to( $emlog_ID, $emlog_to, $emlog_user_ID )
 	if( empty( $to ) )
 	{	// User is not defined
 		global $admin_url;
-		$to = '<a href="'.$admin_url.'?ctrl=email&amp;tab=sent&amp;emlog_ID='.$emlog_ID.'">'.evo_htmlspecialchars( $emlog_to ).$deleted_user_note.'</a>';
+		$to = '<a href="'.$admin_url.'?ctrl=email&amp;tab=sent&amp;emlog_ID='.$emlog_ID.'">'.htmlspecialchars( $emlog_to ).$deleted_user_note.'</a>';
 	}
 
 	return $to;
@@ -160,7 +160,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Subject'),
 		'order' => 'emlog_subject',
-		'td' => '<a href="'.$admin_url.'?ctrl=email&amp;tab=sent&amp;emlog_ID=$emlog_ID$">%evo_htmlspecialchars(#emlog_subject#)%</a>',
+		'td' => '<a href="'.$admin_url.'?ctrl=email&amp;tab=sent&amp;emlog_ID=$emlog_ID$">%htmlspecialchars(#emlog_subject#)%</a>',
 	);
 
 

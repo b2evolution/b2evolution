@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _file_browse.view.php 7804 2014-12-11 15:11:50Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -86,21 +86,32 @@ if( isset( $edited_User ) )
 		$Widget->global_icon( /* TRANS: verb */ T_('Advanced Upload...'), '', regenerate_url( 'ctrl', 'ctrl=upload' ), /* TRANS: verb */ T_('Advanced Upload').' &raquo;', 1, 5 );
 	}
 
-	if( ! empty( $LinkOwner ) )
-	{ // Display a link to close file browser and return to post editing:
-		$close_link_params = array();
-		if( $ajax_request )
-		{ // Initialize JavaScript function to close popup window
-			echo '<script type="text/javascript">
-			function close_popup_window()
-			{
-				window.close();
-			}
-			</script>';
-			$close_link_params['onclick'] = 'return close_popup_window()';
-		}
+	$close_link_params = array();
+	if( $ajax_request )
+	{ // Initialize JavaScript functions to work with modal window
+		echo '<script type="text/javascript">';
+		echo_modalwindow_js();
+		echo '</script>';
+		$close_link_params['onclick'] = 'return closeModalWindow( window.parent.document )';
+	}
 
-		$Widget->global_icon( T_('Close file manager'), 'close', $LinkOwner->get_edit_url(), '', 3, 2, $close_link_params );
+	if( ! empty( $LinkOwner ) )
+	{ // Get an url to return to owner(post/comment) editing
+		$icon_close_url = $LinkOwner->get_edit_url();
+	}
+	elseif( get_param( 'mode' ) == 'import' )
+	{ // Get an url to return to WordPress Import page
+		global $admin_url;
+		$icon_close_url = $admin_url.'?ctrl=wpimportxml';
+	}
+	else
+	{ // Unknown case, leave empty url
+		$icon_close_url = '';
+	}
+
+	if( ! empty( $icon_close_url ) || ! empty( $close_link_params ) )
+	{ // Display a link to close file browser
+		$Widget->global_icon( T_('Close file manager'), 'close', $icon_close_url, '', 3, 2, $close_link_params );
 	}
 
 	$Widget->title = T_('File browser').get_manual_link('file_browser');
@@ -166,7 +177,7 @@ if( isset( $edited_User ) )
 				// $Form->hidden_ctrl();
 				$Form->hiddens_by_key( get_memorized() );
 
-				$rootlist = $FileRootCache->get_available_FileRoots();
+				$rootlist = $FileRootCache->get_available_FileRoots( get_param( 'root' ) );
 				if( count($rootlist) > 1 )
 				{ // provide list of roots to choose from
 					?>

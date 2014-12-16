@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _generalsettings.class.php 7172 2014-07-22 08:07:56Z yura $
+ * @version $Id: _generalsettings.class.php 7564 2014-11-03 13:12:45Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -69,6 +69,9 @@ class GeneralSettings extends AbstractSettings
 		'auto_prune_stats' => '15',         // days (T_hitlog and T_sessions)
 		'auto_empty_trash' => '15',         // days (How many days to keep recycled comments)
 
+		'email_service' => 'mail', // Preferred email service: 'mail', 'smtp'
+		'force_email_sending' => '0', // Force email sending
+
 		'outbound_notifications_mode' => 'immediate', // 'immediate' is the safest mode for average installs (may be "off", "immediate" or "cron")
 		'notification_sender_email' => '', // notification emails will be sent from this email. The real default value is set in the constructor.
 		'notification_return_path' => '', // erroneous emails will be sent to this email address. The real default value is set in the constructor.
@@ -97,7 +100,7 @@ class GeneralSettings extends AbstractSettings
 		'fm_resize_height' => '1800',
 		'fm_resize_quality' => '95',
 
-		'newusers_canregister' => '0',
+		'newusers_canregister' => 'no',
 		'registration_is_public' => '1',
 		'newusers_mustvalidate' => '1',
 		'newusers_revalidate_emailchg' => '1',
@@ -126,12 +129,19 @@ class GeneralSettings extends AbstractSettings
 		'allow_avatars' => 1,
 		'min_picture_size' => 160, // minimum profile picture dimensions in pixels (width and height)
 		'messages_link_to' => 'admin',		// message link on the notification email should link to the admin or to a blog
+		'allow_html_message' => 0, // Allow HTML in messages
 
 		// Welcome private message
 		'welcomepm_enabled' => 0,
 		'welcomepm_from'    => 'admin',	// User login
 		'welcomepm_title'   => 'Welcome to our community!',
 		'welcomepm_message' => '',
+
+		// Info message to reporters after account deletion
+		'reportpm_enabled' => 0,
+		'reportpm_from'    => 'admin',	// User login
+		'reportpm_title'   => 'The user account $reportedlogin$ that you have reported has just been deleted.',
+		'reportpm_message' => "You have reported the user account \$reportedlogin\$.\n\nThis is to inform you that we have just deleted this account.\n\nThank you for your help in keeping this site a friendly place!",
 
 		'regexp_filename' => '^[a-zA-Z0-9\-_. ]+$', // TODO: accept (spaces and) special chars / do full testing on this
 		'regexp_dirname' => '^[a-zA-Z0-9\-_]+$', // TODO: accept spaces and special chars / do full testing on this
@@ -287,6 +297,7 @@ C message size exceeds',
 	// Display options:
 		'use_gravatar' => 1, // Use gravatar if a user has not uploaded a profile picture
 		'default_gravatar' => 'b2evo', // Gravatar type: 'b2evo', '', 'identicon', 'monsterid', 'wavatar', 'retro'
+		'username_display' => 'login', // What to display as user name: 'login' - Usernames/Logins or 'name' - 'Friendly names'
 		'bubbletip' => 1, // Display bubletips in the Back-office
 		'bubbletip_size_admin' => 'fit-160x160', // Avatar size in the bubbletip in the Back-office
 		'bubbletip_size_front' => 'fit-160x160', // Avatar size in the bubbletip in the Front-office
@@ -295,6 +306,8 @@ C message size exceeds',
 		'bubbletip_overlay' => "Log in to\r\nsee this\r\nimage",// Overlay text on the profile image for anonymous users
 		'allow_anonymous_user_list' => 1, // Allow anonymous users to see user list (disp=users)
 		'allow_anonymous_user_profiles' => 0, // Allow anonymous users to see the user display ( disp=user )
+		'allow_anonymous_user_level_min' => 0, // Min value of user group level to display for anonymous users
+		'allow_anonymous_user_level_max' => 10, // Max value of user group level to display for anonymous users
 		'user_url_loggedin' => 'page', // Link an user url to 'page' or 'url' for logged-in users
 		'user_url_anonymous' => 'page', // Link an user url to 'page' or 'url' for anonymous users
 

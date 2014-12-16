@@ -319,6 +319,9 @@ input.preview:hover {
 	color: #aaa;
 	font-size: 84%;
 }
+div.extended_search_form {
+	margin: 0 13px;
+}
 div.compact_search_form input.SearchField
 {
 	background-color: #eee;
@@ -383,6 +386,10 @@ div.input ul.token-input-list-facebook {
 	width: 319px;
 }
 
+#register_form input#u {
+	max-width: 305px;
+}
+
 /* Not published comments display */
 #styled_content_block .bComment .status_draft,
 #styled_content_block .bComment .status_review,
@@ -404,4 +411,8 @@ div.input ul.token-input-list-facebook {
 
 div.tabs div a {
 	border-color: #999;
+}
+
+.search_title {
+	color: #569;
 }

@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id$
+ * @version $Id: register.php 7773 2014-12-08 10:56:37Z yura $
  */
 
 /**
@@ -67,7 +67,7 @@ $registration_require_gender = $Settings->get('registration_require_gender');
 $registration_ask_locale = $Settings->get('registration_ask_locale');
 
 $login = param( $dummy_fields[ 'login' ], 'string', '' );
-$email = evo_strtolower( param( $dummy_fields[ 'email' ], 'string', '' ) );
+$email = utf8_strtolower( param( $dummy_fields[ 'email' ], 'string', '' ) );
 param( 'action', 'string', '' );
 param( 'country', 'integer', '' );
 param( 'firstname', 'string', '' );
@@ -94,8 +94,11 @@ if( $inskin && !empty( $Blog ) )
 	locale_activate( $Blog->get('locale') );
 }
 
-if( ! $Settings->get('newusers_canregister') )
-{
+// Check invitation code if it exists and registration is enabled
+$display_invitation = check_invitation_code();
+
+if( $display_invitation == 'deny' )
+{ // Registration is disabled
 	$action = 'disabled';
 }
 
@@ -103,7 +106,7 @@ if( $register_user = $Session->get('core.register_user') )
 {	// Get an user data from predefined session (after adding of a comment)
 	$login = preg_replace( '/[^a-z0-9 ]/i', '', $register_user['name'] );
 	$login = str_replace( ' ', '_', $login );
-	$login = evo_substr( $login, 0, 20 );
+	$login = utf8_substr( $login, 0, 20 );
 	$email = $register_user['email'];
 
 	$Session->delete( 'core.register_user' );
@@ -164,11 +167,16 @@ switch( $action )
 			$paramsList['gender'] = $gender;
 		}
 
+		if( $Settings->get( 'newusers_canregister' ) == 'invite' )
+		{ // Invitation code must be not empty when user can register ONLY with this code
+			$paramsList['invitation'] = get_param( 'invitation' );
+		}
+
 		// Check profile params:
 		profile_check_params( $paramsList );
 
 		// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
-		$login = evo_strtolower( $login );
+		$login = utf8_strtolower( $login );
 
 		$UserCache = & get_UserCache();
 		if( $UserCache->get_by_login( $login ) )
@@ -185,7 +193,7 @@ switch( $action )
 
 		$new_User = new User();
 		$new_User->set( 'login', $login );
-		$new_User->set( 'pass', md5($pass1) ); // encrypted
+		$new_User->set_password( $pass1 );
 		$new_User->set( 'ctry_ID', $country );
 		$new_User->set( 'firstname', $firstname );
 		$new_User->set( 'gender', $gender );
@@ -197,7 +205,28 @@ switch( $action )
 			$new_User->set( 'locale', $locale );
 		}
 
-		$new_User->dbinsert();
+		if( ! empty( $invitation ) )
+		{ // Invitation code was entered on the form
+			$SQL = new SQL();
+			$SQL->SELECT( 'ivc_source, ivc_grp_ID' );
+			$SQL->FROM( 'T_users__invitation_code' );
+			$SQL->WHERE( 'ivc_code = '.$DB->quote( $invitation ) );
+			$SQL->WHERE_and( 'ivc_expire_ts > '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ) );
+			if( $invitation_code = $DB->get_row( $SQL->get() ) )
+			{ // Set source and group from invitation code
+				$new_User->set( 'source', $invitation_code->ivc_source );
+				$GroupCache = & get_GroupCache();
+				if( $new_user_Group = & $GroupCache->get_by_ID( $invitation_code->ivc_grp_ID, false, false ) )
+				{
+					$new_User->set_Group( $new_user_Group );
+				}
+			}
+		}
+
+		if( $new_User->dbinsert() )
+		{ // Insert system log about user's registration
+			syslog_insert( 'User registration', 'info', 'user', $new_User->ID );
+		}
 
 		$new_user_ID = $new_User->ID; // we need this to "rollback" user creation if there's no DB transaction support
 
@@ -244,7 +273,7 @@ switch( $action )
 				'firstname'   => $firstname,
 				'gender'      => $gender,
 				'locale'      => $locale,
-				'source'      => $source,
+				'source'      => $new_User->get( 'source' ),
 				'trigger_url' => $session_registration_trigger_url,
 				'initial_hit' => $initial_hit,
 				'login'       => $login,
@@ -254,7 +283,8 @@ switch( $action )
 		send_admin_notification( NT_('New user registration'), 'account_new', $email_template_params );
 
 		$Plugins->trigger_event( 'AfterUserRegistration', array( 'User' => & $new_User ) );
-
+		// Move user to suspect group by IP address. Make this move even if during the registration it was added to a trusted group.
+		antispam_suspect_user_by_IP( '', $new_User->ID, false );
 
 		if( $Settings->get('newusers_mustvalidate') )
 		{ // We want that the user validates his email address:

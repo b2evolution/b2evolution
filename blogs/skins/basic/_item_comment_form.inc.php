@@ -26,7 +26,7 @@ $comment_reply_ID = param( 'reply_ID', 'integer', 0 );
 	if( ( $Comment = get_comment_from_session() ) == NULL )
 	{
 		$comment_author = param_cookie( $cookie_name, 'string', '' );
-		$comment_author_email = evo_strtolower( param_cookie( $cookie_email, 'string', '' ) );
+		$comment_author_email = utf8_strtolower( param_cookie( $cookie_email, 'string', '' ) );
 		$comment_author_url = param_cookie( $cookie_url, 'string', '' );
 		$comment_text = '';
 	}
@@ -37,7 +37,7 @@ $comment_reply_ID = param( 'reply_ID', 'integer', 0 );
 		$comment_author_url = $Comment->author_url;
 		$comment_text = $Comment->content;
 	}
-	$redirect = evo_htmlspecialchars(url_rel_to_same_host(regenerate_url('','','','&'), $htsrv_url));
+	$redirect = htmlspecialchars(url_rel_to_same_host(regenerate_url('','','','&'), $htsrv_url));
 ?>
 
 <!-- form to add a comment -->
@@ -72,12 +72,12 @@ $comment_reply_ID = param( 'reply_ID', 'integer', 0 );
 		?>
 		<tr valign="top" bgcolor="#eeeeee">
 			<td align="right"><label for="author"><strong><?php echo T_('Name') ?>:</strong></label></td>
-			<td align="left"><input type="text" name="<?php echo $dummy_fields[ 'name' ] ?>" id="author" value="<?php echo evo_htmlspecialchars( $comment_author ) ?>" size="40" maxlength="100" tabindex="1" /></td>
+			<td align="left"><input type="text" name="<?php echo $dummy_fields[ 'name' ] ?>" id="author" value="<?php echo htmlspecialchars( $comment_author ) ?>" size="40" maxlength="100" tabindex="1" /></td>
 		</tr>
 
 		<tr valign="top" bgcolor="#eeeeee">
 			<td align="right"><label for="email"><strong><?php echo T_('Email') ?>:</strong></label></td>
-			<td align="left"><input type="text" name="<?php echo $dummy_fields[ 'email' ] ?>" id="email" value="<?php echo evo_htmlspecialchars( $comment_author_email ) ?>" size="40" maxlength="255" tabindex="2" /><br />
+			<td align="left"><input type="text" name="<?php echo $dummy_fields[ 'email' ] ?>" id="email" value="<?php echo htmlspecialchars( $comment_author_email ) ?>" size="40" maxlength="255" tabindex="2" /><br />
 				<small><?php echo T_('Your email address will <strong>not</strong> be displayed on this site.') ?></small>
 			</td>
 		</tr>
@@ -89,7 +89,7 @@ $comment_reply_ID = param( 'reply_ID', 'integer', 0 );
 		?>
 			<tr valign="top" bgcolor="#eeeeee">
 				<td align="right"><label for="url"><strong><?php echo T_('Site/Url') ?>:</strong></label></td>
-				<td align="left"><input type="text" name="<?php echo $dummy_fields[ 'url' ] ?>" id="url" value="<?php echo evo_htmlspecialchars( $comment_author_url ) ?>" size="40" maxlength="255" tabindex="3" /><br />
+				<td align="left"><input type="text" name="<?php echo $dummy_fields[ 'url' ] ?>" id="url" value="<?php echo htmlspecialchars( $comment_author_url ) ?>" size="40" maxlength="255" tabindex="3" /><br />
 					<small><?php echo T_('Your URL will be displayed.') ?></small>
 				</td>
 			</tr>
@@ -101,7 +101,7 @@ $comment_reply_ID = param( 'reply_ID', 'integer', 0 );
 	<tr valign="top" bgcolor="#eeeeee">
 		<td align="right"><label for="comment"><strong><?php echo T_('Comment text') ?>:</strong></label></td>
 		<td align="left" width="450"><textarea cols="50" rows="12" name="<?php echo $dummy_fields[ 'content' ] ?>" id="comment" tabindex="4"><?php echo $comment_text ?></textarea><br />
-			<small><?php echo T_('Allowed XHTML tags'), ': ', evo_htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)) ?></small>
+			<small><?php echo T_('Allowed XHTML tags'), ': ', htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)) ?></small>
 		</td>
 	</tr>
 

@@ -10,7 +10,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _goalcat.class.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -36,10 +36,6 @@ class GoalCategory extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_track__goalcat', 'gcat_', 'gcat_ID' );
 
-		$this->delete_restrictions = array(
-				array( 'table'=>'T_track__goal', 'fk'=>'goal_gcat_ID', 'msg'=>T_('%d related goals') ),
-			);
-
 		if( $db_row )
 		{
 			$this->ID            = $db_row->gcat_ID;
@@ -49,6 +45,19 @@ class GoalCategory extends DataObject
 		else
 		{ // Create a new goal category:
 		}
+	}
+
+
+	/**
+	 * Get delete restriction settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_restrictions()
+	{
+		return array(
+				array( 'table'=>'T_track__goal', 'fk'=>'goal_gcat_ID', 'msg'=>T_('%d related goals') ),
+			);
 	}
 
 

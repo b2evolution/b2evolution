@@ -19,7 +19,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _module.class.php 6596 2014-05-01 12:09:11Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -104,6 +104,19 @@ class Module
 	 * Upgrade the module's tables in b2evo database
 	 */
 	function upgrade_b2evo_tables()
+	{
+	}
+
+	/**
+	 * Get what demo collections are installed by the module
+	 *
+	 * @return array Collections, example:
+	 *                 array(
+	 *                   'blog_key' => T_('Blog title'),
+	 *                   'blog_other_key' => T_('Blog other title')
+	 *                 )
+	 */
+	function get_demo_collections()
 	{
 	}
 
@@ -285,6 +298,25 @@ class Module
 
 
 	/**
+	 * Get module specific cron jobs
+	 *
+	 * NOTE: keys starting with "plugin_" are reserved for jobs provided by Plugins
+	 *
+	 * @return array(
+	 *  job_key => array(
+	 *  	'name' => name_value,    // string - the display name of the cron job
+	 *  	'help' => help_config,   // string - The manual topic or a manual URL. Set '#' to use the default manual topic ( 'task-'+job_key ).
+	 *  	'ctrl' => ctrl_path,     // string - the path of the cronjob ctrl file
+	 *  	'params' => job_params ) // array/NULL - the cron job params if there is any or NULL otherwise
+	 *  )
+	 */
+	function get_cron_jobs()
+	{
+		return array();
+	}
+
+
+	/**
 	 * Switch actions for contacts
 	 *
 	 * @param array
@@ -296,7 +328,7 @@ class Module
 
 	/**
 	 * Check Minimum PHP version required for the module
-	 * 
+	 *
 	 * @param string module name/id
 	 */
 	function check_required_php_version( $module )

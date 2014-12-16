@@ -1,7 +1,7 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
- * @version $Id: results.js 674 2012-08-15 07:08:29Z yura $
+ * @version $Id: navigation.js 3008 2013-02-18 10:42:52Z attila $
  */
 
 jQuery( document ).ready( function()

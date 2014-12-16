@@ -27,7 +27,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id$
+ * @version $Id: _subregion.class.php 7044 2014-07-02 08:55:10Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -56,13 +56,6 @@ class Subregion extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_regional__subregion', 'subrg_', 'subrg_ID' );
 
-		$this->delete_restrictions = array(
-				array( 'table'=>'T_users', 'fk'=>'user_subrg_ID', 'msg'=>T_('%d related users') ),
-				array( 'table'=>'T_regional__city', 'fk'=>'city_subrg_ID', 'msg'=>T_('%d related cities') ),
-			);
-
-		$this->delete_cascades = array();
-
 		if( $db_row )
 		{
 			$this->ID            = $db_row->subrg_ID;
@@ -84,6 +77,20 @@ class Subregion extends DataObject
 				}
 			}
 		}
+	}
+
+
+	/**
+	 * Get delete restriction settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_restrictions()
+	{
+		return array(
+				array( 'table'=>'T_users', 'fk'=>'user_subrg_ID', 'msg'=>T_('%d related users') ),
+				array( 'table'=>'T_regional__city', 'fk'=>'city_subrg_ID', 'msg'=>T_('%d related cities') ),
+			);
 	}
 
 

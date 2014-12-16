@@ -31,7 +31,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id$
+ * @version $Id: _user_report.form.php 7704 2014-11-27 13:16:05Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -89,7 +89,12 @@ $Form->begin_form( $form_class, $form_title );
 $Form->hidden_ctrl();
 $Form->hidden( 'user_tab', $user_tab );
 
-$Form->begin_fieldset( T_('Report User'), array( 'class'=>'fieldset clear' ) );
+$close_icon = '';
+if( $display_mode == 'js' )
+{ // Display a close link for popup window
+	$close_icon = action_icon( T_('Close this window'), 'close', '', '', 0, 0, array( 'id' => 'close_button', 'class' => 'floatright' ) );
+}
+$Form->begin_fieldset( T_('Report User').$close_icon, array( 'class' => 'fieldset clear' ) );
 
 user_report_form( array(
 		'Form'       => $Form,
@@ -97,11 +102,6 @@ user_report_form( array(
 		'crumb_name' => 'user',
 		'cancel_url' => $admin_url.'?ctrl=user&amp;user_tab='.$user_tab.'&amp;action=remove_report&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb( 'user' ),
 	) );
-
-if( $display_mode == 'js' )
-{ // Display a close link for popup window
-	echo '<div class="center" style="margin-top:32px">'.action_icon( T_('Close this window'), 'close', '', ' '.T_('Close this window'), 3, 4, array( 'id' => 'close_button', 'class' => 'small' ) ).'</div>';
-}
 
 $Form->end_fieldset();
 

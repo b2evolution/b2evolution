@@ -21,7 +21,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _email_return_details.view.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -37,13 +37,13 @@ $Form->info( T_('Date'), mysql2localedatetime_spans( $MailReturn->emret_timestam
 
 $Form->info( T_('Error Type'), dre_decode_error_type( $MailReturn->emret_errtype ) );
 
-$Form->info( T_('Address'), '<pre class="email_log"><span>'.evo_htmlspecialchars($MailReturn->emret_address).'</span></pre>' );
+$Form->info( T_('Address'), '<pre class="email_log"><span>'.htmlspecialchars($MailReturn->emret_address).'</span></pre>' );
 
-$Form->info( T_('Error'), '<pre class="email_log"><span>'.evo_htmlspecialchars($MailReturn->emret_errormsg).'</span></pre>' );
+$Form->info( T_('Error'), '<pre class="email_log"><span>'.htmlspecialchars($MailReturn->emret_errormsg).'</span></pre>' );
 
-$Form->info( T_('Headers'), '<pre class="email_log_scroll"><span>'.evo_htmlspecialchars($MailReturn->emret_headers).'</span></pre>' );
+$Form->info( T_('Headers'), '<pre class="email_log_scroll"><span>'.htmlspecialchars($MailReturn->emret_headers).'</span></pre>' );
 
-$Form->info( T_('Message'), '<pre class="email_log_scroll"><span>'.evo_htmlspecialchars($MailReturn->emret_message).'</span></pre>' );
+$Form->info( T_('Message'), '<pre class="email_log_scroll"><span>'.htmlspecialchars($MailReturn->emret_message).'</span></pre>' );
 
 $Form->end_form();
 

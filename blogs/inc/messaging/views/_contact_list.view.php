@@ -20,7 +20,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id: _contact_list.view.php 7698 2014-11-26 07:46:54Z yura $
+ * @version $Id: _contact_list.view.php 7823 2014-12-16 10:48:13Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -278,7 +278,7 @@ if( in_array( 'login', $show_columns ) )
 		{
 			if( $link )
 			{
-				$login_text = get_user_identity_link( $User->login, $User->ID, 'user', 'text' );
+				$login_text = get_user_identity_link( $User->login, $User->ID, 'user', 'login' );
 				if( $User->check_status( 'is_closed' ) )
 				{ // add (closed account) note to corresponding contacts!
 					$login_text .= '<span class="note">('.T_( 'closed account' ).')</span>';

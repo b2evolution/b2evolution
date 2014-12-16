@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage manual
  *
- * @version $Id: posts.main.php 7091 2014-07-09 05:47:57Z yura $
+ * @version $Id: posts.main.php 7092 2014-07-09 05:49:26Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -23,7 +23,7 @@ if( version_compare( $app_version, '5.0' ) < 0 )
 	die( 'This skin is designed for b2evolution 5.0 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
 
-global $cat, $tag, $MainList, $Skin;
+global $cat, $tag, $MainList;
 
 // This is the main template; it may be used to display very different things.
 // Do inits depending on current $disp:
@@ -80,7 +80,7 @@ skin_include( '_left_navigation_bar.inc.php' );
 		// --------------------------------- END OF MESSAGES ---------------------------------
 
 		if( !empty( $cat ) )
-		{ // Display breadcrumbs if some category is selected
+		{	// Display breadcrumbs if some category is selected
 			$Skin->display_breadcrumbs( $cat );
 		}
 	?>

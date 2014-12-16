@@ -5996,7 +5996,7 @@ msgstr "SEO предустановки"
 
 #: ../../../inc/collections/views/_coll_seo.form.php:117
 #, php-format
-msgid "You can review the SEO settings recommended by <strong>%s</strong> below. Click the \"Save!\" button to apply these settings."
+msgid "You can review the SEO settings recommended by <strong>%s</strong> below. Click the \"Save Changes!\" button to apply these settings."
 msgstr "Вы можете изменить настройки SEO, рекомендованные <strong>%s</strong> ниже. Нажмите \"Сохранить\" когда закончите."
 
 #: ../../../inc/collections/views/_coll_seo.form.php:123
@@ -6916,7 +6916,7 @@ msgstr "%d комментариев"
 
 #: ../../../inc/comments/model/_comment.funcs.php:255
 #: ../../../inc/files/views/_file_edit.form.php:51
-msgid "Save!"
+msgid "Save Changes!"
 msgstr "Сохранить!"
 
 #: ../../../inc/comments/model/_comment.funcs.php:446

@@ -88,6 +88,22 @@ class escapecode_plugin extends Plugin
 
 
 	/**
+	 * Event handler: Called before at the beginning, if a message of thread form gets sent (and received).
+	 */
+	function MessageThreadFormSent( & $params )
+	{
+		global $Settings;
+
+		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
+		if( $Settings->get( 'allow_html_message' ) && $this->is_renderer_enabled( $apply_rendering, $params['renderers'] ) )
+		{ // Do escape html entities only when html is allowed for content and plugin is enabled
+			$content = & $params['content'];
+			$content = $this->escape_code( $content );
+		}
+	}
+
+
+	/**
 	 * Perform rendering
 	 *
 	 * @see Plugin::RenderItemAsHtml()

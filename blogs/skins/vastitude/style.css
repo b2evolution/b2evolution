@@ -13,6 +13,10 @@ textarea, input, select, option, optgroup, ul.ui-autocomplete, li.token-input-to
 	font: 12.38px Tahoma, "Lucida Sans", Arial, Verdana, Sans-Serif;
 }
 
+img.loadimg {
+	background-image: url(../../rsc/img/ajax-loader/777.gif);
+}
+
 li.widget_core_coll_title, li.widget_core_coll_longdesc, li.widget_plugin_evo_Calr, li.widget_core_coll_search_form, li.widget_core_linkblog, li.widget_core_coll_category_list, li.widget_core_coll_common_links, li.widget_core_coll_xml_feeds, li.widget_core_user_tools, li.widget_core_coll_xml_feeds ul li, li.prevnext {list-style:none;}
 table.prevnext_post {margin: 20px 0;}
 div#sidebar {margin-left:-10px;}
@@ -320,6 +324,11 @@ div.input ul.token-input-list-facebook {
 	background: #FFF;
 }
 
+#register_form input#u {
+	background: #FFF;
+	color: #000;
+}
+
 /* Not published comments display */
 #styled_content_block .bComment .status_draft,
 #styled_content_block .bComment .status_review,
@@ -354,6 +363,14 @@ div.tabs div.selected a {
 	border-bottom-color: #895c46;
 }
 
+.search_title {
+	color: #D8C19A;
+}
+
 .form_add_contacts {
 	text-align: left;
+}
+
+span.loader_img.loader_ajax_form {
+	background-image: url(../../rsc/img/ajax-loader/666.gif);
 }

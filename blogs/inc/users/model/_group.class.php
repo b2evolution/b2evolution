@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id$
+ * @version $Id: _group.class.php 6134 2014-03-08 07:48:07Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -49,6 +49,16 @@ class Group extends DataObject
 	 * @access protected
 	 */
 	var $name;
+
+	/**
+	 * Level of group
+	 *
+	 * Please use get/set functions to read or write this param
+	 *
+	 * @var integer
+	 * @access protected
+	 */
+	var $level;
 
 	/**
 	 * Blog posts statuses permissions
@@ -84,13 +94,6 @@ class Group extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_groups', 'grp_', 'grp_ID' );
 
-		$this->delete_restrictions = array(
-				array( 'table'=>'T_users', 'fk'=>'user_grp_ID', 'msg'=>T_('%d users in this group') ),
-			);
-
-		$this->delete_cascades = array(
-			);
-
 		if( $db_row == NULL )
 		{
 			// echo 'Creating blank group';
@@ -103,6 +106,7 @@ class Group extends DataObject
 			// echo 'Instanciating existing group';
 			$this->ID                           = $db_row->grp_ID;
 			$this->name                         = $db_row->grp_name;
+			$this->level                        = $db_row->grp_level;
 			$this->perm_blogs                   = $db_row->grp_perm_blogs;
 			$this->perm_bypass_antispam         = $db_row->grp_perm_bypass_antispam;
 			$this->perm_xhtmlvalidation         = $db_row->grp_perm_xhtmlvalidation;
@@ -114,6 +118,21 @@ class Group extends DataObject
 			$this->perm_stats                   = $db_row->grp_perm_stats;
 		}
 	}
+
+
+	/**
+	 * Get delete restriction settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_restrictions()
+	{
+		return array(
+				array( 'table'=>'T_users', 'fk'=>'user_grp_ID', 'msg'=>T_('%d users in this group') ),
+				array( 'table'=>'T_users__invitation_code', 'fk'=>'ivc_grp_ID', 'msg'=>T_('%d user invitation codes in this group') ),
+			);
+	}
+
 
 	/**
 	 * Load data from Request form fields.
@@ -128,6 +147,10 @@ class Group extends DataObject
 		param( 'edited_grp_name', 'string' );
 		param_check_not_empty( 'edited_grp_name', T_('You must provide a group name!') );
 		$this->set_from_Request('name', 'edited_grp_name', true);
+
+		// Edited Group Level
+		param_integer_range( 'edited_grp_level', 0, 10, T_('Group level must be between %d and %d.') );
+		$this->set_from_Request( 'level', 'edited_grp_level', true );
 
 		// Edited Group Permission Blogs
 		param( 'edited_grp_perm_blogs', 'string', true );
@@ -444,7 +467,7 @@ class Group extends DataObject
 	 */
 	function get_name()
 	{
-		return $this->name;
+		return $this->name.' ('.$this->level.')';
 	}
 
 

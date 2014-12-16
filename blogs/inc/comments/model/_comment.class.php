@@ -22,7 +22,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id$
+ * @version $Id: _comment.class.php 7752 2014-12-04 12:44:33Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -49,6 +49,11 @@ class Comment extends DataObject
 	 */
 	var $item_ID;
 	/**
+	 * Comment previous item ID. It will be set only if the comment item ID was changed.
+	 * @var string
+	 */
+	var $previous_item_ID;
+	/**
 	 * The comment's user, this is NULL for (anonymous) visitors (lazy-filled).
 	 * @see Comment::get_author_User()
 	 * @see Comment::set_author_User()
@@ -72,7 +77,7 @@ class Comment extends DataObject
 	 */
 	var $status;
 	/**
-	 * Comment previous visibility status. It will be set only if the comment satus was changed.
+	 * Comment previous visibility status. It will be set only if the comment status was changed.
 	 * @var string
 	 */
 	var $previous_status;
@@ -203,11 +208,6 @@ class Comment extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_comments', 'comment_', 'comment_ID' );
 
-		$this->delete_cascades = array(
-				array( 'table'=>'T_links', 'fk'=>'link_cmt_ID', 'msg'=>T_('%d links to destination comments') ),
-				array( 'table'=>'T_comments__votes', 'fk'=>'cmvt_cmt_ID', 'msg'=>T_('%d votes on comment') ),
-			);
-
 		if( $db_row == NULL )
 		{
 			// echo 'null comment';
@@ -239,6 +239,7 @@ class Comment extends DataObject
 			$this->author_IP = $db_row->comment_author_IP;
 			$this->IP_ctry_ID = $db_row->comment_IP_ctry_ID;
 			$this->date = $db_row->comment_date;
+			$this->last_touched_ts = $db_row->comment_last_touched_ts;
 			$this->content = $db_row->comment_content;
 			$this->renderers = $db_row->comment_renderers;
 			$this->rating = $db_row->comment_rating;
@@ -255,6 +256,20 @@ class Comment extends DataObject
 			$this->spam_addvotes = $db_row->comment_spam_addvotes;
 			$this->spam_countvotes = $db_row->comment_spam_countvotes;
 		}
+	}
+
+
+	/**
+	 * Get delete cascade settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_cascades()
+	{
+		return array(
+				array( 'table'=>'T_links', 'fk'=>'link_cmt_ID', 'msg'=>T_('%d links to destination comments') ),
+				array( 'table'=>'T_comments__votes', 'fk'=>'cmvt_cmt_ID', 'msg'=>T_('%d votes on comment') ),
+			);
 	}
 
 
@@ -337,7 +352,7 @@ class Comment extends DataObject
 				return $this->set_param( $parname, 'number', $parvalue, true );
 
 			case 'author_email':
-				return $this->set_param( $parname, 'string', evo_strtolower( $parvalue ), $make_null );
+				return $this->set_param( $parname, 'string', utf8_strtolower( $parvalue ), $make_null );
 
 			case 'status':
 				// Save previous status temporarily to make some changes on dbinsert(), dbupdate() & dbdelete()
@@ -355,6 +370,9 @@ class Comment extends DataObject
 	 */
 	function set_Item( & $Item )
 	{
+		// Save previous item ID temporarily to make some changes on dbupdate()
+		$this->previous_item_ID = $this->item_ID;
+
 		$this->Item = & $Item;
 		parent::set_param( 'item_ID', 'number', $Item->ID );
 	}
@@ -822,10 +840,10 @@ class Comment extends DataObject
 	 * @param string String to display after author name if he's a user
 	 * @param string Output format, see {@link format_to_output()}
 	 * @param boolean true for link, false if you want NO html link
-	 * @param string What show as user name: avatar | only_avatar | login | nickname | firstname | lastname | fullname | preferredname
+	 * @param string What show as user name: avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 	 */
 	function author( $before = '', $after = '#', $before_user = '', $after_user = '#',
-										$format = 'htmlbody', $makelink = false, $lint_text = 'login' )
+										$format = 'htmlbody', $makelink = false, $lint_text = 'name' )
 	{
 		echo $this->get_author( array(
 					'before'      => $before,
@@ -868,7 +886,7 @@ class Comment extends DataObject
 				'after_user'   => '#',
 				'format'       => 'htmlbody',
 				'link_to'      => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' 'userpage>userurl'
-				'link_text'    => 'preferredname', // avatar | only_avatar | login | nickname | firstname | lastname | fullname | preferredname
+				'link_text'    => 'preferredname', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 				'link_rel'     => '',
 				'link_class'   => '',
 				'thumb_size'   => 'crop-top-32x32',
@@ -893,7 +911,7 @@ class Comment extends DataObject
 
 		if( !$Blog->get_setting('comments_avatars') && $params['link_text'] == 'avatar' )
 		{ // If avatars are not allowed for this Blog
-			$params['link_text'] = 'login';
+			$params['link_text'] = 'name';
 		}
 
 		if( $this->get_author_User() )
@@ -908,7 +926,7 @@ class Comment extends DataObject
 		{ // Not a registered user, display info recorded at edit time:
 			if( $params['after'] == '#' ) $params['after'] = ' ['.T_('Visitor').']';
 
-			if( evo_strlen( $this->author_url ) <= 10 )
+			if( utf8_strlen( $this->author_url ) <= 10 )
 			{ // URL is too short anyways...
 				$params['link_to'] = '';
 			}
@@ -1072,7 +1090,7 @@ class Comment extends DataObject
 
 		$url = $this->get_author_url();
 
-		if( evo_strlen( $url ) < 10 )
+		if( utf8_strlen( $url ) < 10 )
 		{
 			return false;
 		}
@@ -1317,12 +1335,12 @@ class Comment extends DataObject
 		}
 
 		// TODO: really ban the base domain! - not by keyword
-		$authorurl = rawurlencode( get_ban_domain( $this->get_author_url() ) );
-		$ban_url = $admin_url.'?ctrl=antispam&amp;action=ban&amp;keyword='.$authorurl.$redirect_to.'&amp;'.url_crumb('antispam');
+		$ban_domain = get_ban_domain( $this->get_author_url() );
+		$ban_url = $admin_url.'?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode( $ban_domain ).$redirect_to.'&amp;'.url_crumb('antispam');
 
 		if( $ajax_button )
 		{
-			echo ' <a id="ban_url" href="'.$ban_url.'" onclick="ban_url(\''.$authorurl.'\'); return false;">'.get_icon( 'ban' ).'</a>';
+			echo ' <a id="ban_url" href="'.$ban_url.'" onclick="ban_url(\''.$ban_domain.'\'); return false;">'.get_icon( 'ban' ).'</a>';
 		}
 		else
 		{
@@ -1394,7 +1412,7 @@ class Comment extends DataObject
 		echo $before;
 		if( $ajax_button && ( $this->status != 'trash' ) )
 		{
-			echo '<a href="'.$url.'" onclick="deleteComment('.$this->ID.'); return false;" title="'.$title.'"';
+			echo '<a href="'.$url.'" onclick="deleteComment('.$this->ID.', \''.request_from().'\'); return false;" title="'.$title.'"';
 			if( !empty( $class ) ) echo ' class="'.$class.'"';
 			echo '>'.$text.'</a>';
 		}
@@ -1884,7 +1902,7 @@ class Comment extends DataObject
 			{
 				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
 			}
-			$r .= ' onclick="setCommentStatus('.$this->ID.', \''.$publish_status.'\', \''.$redirect_to.'\'); return false;"';
+			$r .= ' onclick="setCommentStatus('.$this->ID.', \''.$publish_status.'\', \''.request_from().'\', \''.$redirect_to.'\'); return false;"';
 		}
 
 		$r .= ' title="'.$title.'"';
@@ -1935,7 +1953,7 @@ class Comment extends DataObject
 			{
 				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
 			}
-			$r .= ' onclick="setCommentStatus('.$this->ID.', \''.$new_status.'\', \''.$redirect_to.'\'); return false;"';
+			$r .= ' onclick="setCommentStatus('.$this->ID.', \''.$new_status.'\', \''.request_from().'\', \''.$redirect_to.'\'); return false;"';
 		}
 
 		$status_title = get_visibility_statuses( 'moderation-titles' );
@@ -2288,7 +2306,7 @@ class Comment extends DataObject
 	 *
 	 * Note: If you only want the permalink URL, use Comment::get_permanent_url()
 	 *
-	 * @param string link text or special value: '#', '#icon#', '#text#'
+	 * @param string link text or special value: '#', '#icon#', '#text#', '#item#'
 	 * @param string link title
 	 * @param string class name
 	 * @param boolean TRUE - to use attr rel="nofollow"
@@ -2770,7 +2788,7 @@ class Comment extends DataObject
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
 				'author_format' => '%s',
-				'link_text'     => 'login', // avatar | only_avatar | login | nickname | firstname | lastname | fullname | preferredname
+				'link_text'     => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 				'thumb_size'    => 'crop-top-32x32' // author's avatar size
 			), $params );
 
@@ -2837,12 +2855,14 @@ class Comment extends DataObject
 	 * @param string date/time format: leave empty to use locale default date format
 	 * @param boolean true if you want GMT
 	 */
-	function date( $format='', $useGM = false )
+	function date( $format = '', $useGM = false )
 	{
-		if( empty($format) )
-			echo mysql2date( locale_datefmt(), $this->date, $useGM);
-		else
-			echo mysql2date( $format, $this->date, $useGM);
+		if( empty( $format ) )
+		{	// Get the current locale's default date format
+			$format = locale_datefmt();
+		}
+
+		echo mysql2date( $format, $this->date, $useGM );
 	}
 
 
@@ -2850,14 +2870,22 @@ class Comment extends DataObject
 	 * Template function: display time (datetime) of comment
 	 *
 	 * @param string date/time format: leave empty to use locale default time format
+	 *                                 '#short_time' - to use locale default short time format
 	 * @param boolean true if you want GMT
 	 */
-	function time( $format='', $useGM = false )
+	function time( $format = '', $useGM = false )
 	{
-		if( empty($format) )
-			echo mysql2date( locale_timefmt(), $this->date, $useGM );
-		else
-			echo mysql2date( $format, $this->date, $useGM );
+		if( empty( $format ) )
+		{	// Get the current locale's default time format
+			$format = locale_timefmt();
+		}
+
+		if( $format == '#short_time' )
+		{	// Use short time format of current locale
+			$format = locale_shorttimefmt();
+		}
+
+		echo mysql2date( $format, $this->date, $useGM );
 	}
 
 
@@ -3117,11 +3145,8 @@ class Comment extends DataObject
 			// start datetime. We do not want to ping before the post is effectively published:
 			$edited_Cronjob->set( 'start_datetime', $this->date );
 
-			// name:
-			$edited_Cronjob->set( 'name', sprintf( T_('Send notifications about new comment on &laquo;%s&raquo;'), strip_tags($edited_Item->get( 'title' ) ) ) );
-
-			// controller:
-			$edited_Cronjob->set( 'controller', 'cron/jobs/_comment_notifications.job.php' );
+			// key:
+			$edited_Cronjob->set( 'key', 'send-comment-notifications' );
 
 			// params: specify which post this job is supposed to send notifications for:
 			$edited_Cronjob->set( 'params', array( 'comment_ID' => $this->ID, 'except_moderators' => $just_posted, 'executed_by_userid' => $executed_by_userid ) );
@@ -3458,11 +3483,11 @@ class Comment extends DataObject
 		}
 
 		if( $previous_status_permvalue & $published_statuses_permvalue )
-		{ // srevious status was  public or limited public status, but current status is not
+		{ // previous status was public or limited public status, but current status is not
 			return true;
 		}
 
-		// This comment was not publsihed before and it is not published now either
+		// This comment was not published before and it is not published now either
 		return false;
 	}
 
@@ -3476,24 +3501,42 @@ class Comment extends DataObject
 	{
 		global $Plugins, $DB;
 
-		$this->set_last_touched_date();
-
 		$dbchanges = $this->dbchanges;
+
+		if( count( $dbchanges ) )
+		{
+			$this->set_last_touched_date();
+		}
 
 		$DB->begin();
 
 		if( ( $r = parent::dbupdate() ) !== false )
 		{
+			$update_item_last_touched_date = false;
 			if( isset( $dbchanges['comment_content'] ) || isset( $dbchanges['comment_renderers'] ) )
-			{
+			{ // Content is updated
 				$this->delete_prerendered_content();
+				$update_item_last_touched_date = true;
 			}
 
 			if( $this->check_publish_status_changed() )
-			{ // Update last touched date of item if comment is updated into/out some public status
-				$comment_Item = & $this->get_Item();
-				$comment_Item->update_last_touched_date();
+			{ // Comment is updated into/out some public status
+				$update_item_last_touched_date = true;
 			}
+
+			if( !empty( $this->previous_item_ID ) )
+			{ // Comment is moved from another post
+				$ItemCache = & get_ItemCache();
+				$ItemCache->clear();
+				if( $previous_Item = & $ItemCache->get_by_ID( $this->previous_item_ID, false, false ) )
+				{ // Update last touched date of previous item
+					$previous_Item->update_last_touched_date( false );
+				}
+				// Also update new post
+				$update_item_last_touched_date = true;
+			}
+
+			$this->update_last_touched_date( $update_item_last_touched_date );
 
 			$DB->commit();
 
@@ -3556,7 +3599,7 @@ class Comment extends DataObject
 		{
 			if( $this->is_published() )
 			{ // Update last touched date of item if comment is created in published status
-				$comment_Item->update_last_touched_date();
+				$this->update_last_touched_date();
 			}
 			$Plugins->trigger_event( 'AfterCommentInsert', $params = array( 'Comment' => & $this, 'dbchanges' => $dbchanges ) );
 		}
@@ -3737,6 +3780,57 @@ class Comment extends DataObject
 
 
 	/**
+	 * Set field last_touched_ts
+	 */
+	function set_last_touched_date()
+	{
+		global $localtimenow;
+		$this->set_param( 'last_touched_ts', 'date', date2mysql( $localtimenow ) );
+	}
+
+
+	/**
+	 * Update field last_touched_ts
+	 *
+	 * @param boolean update comment's post last touched ts as well or not
+	 */
+	function update_last_touched_date( $update_item_date = true )
+	{
+		global $localtimenow, $current_User;
+
+		$comment_Item = & $this->get_Item();
+
+		if( empty( $comment_Item ) )
+		{ // Don't execute the following code because this comment is broken
+			return;
+		}
+
+		$timestamp = date2mysql( $localtimenow );
+
+		if( $this->ID && ( $this->last_touched_ts !== $timestamp ) )
+		{ // If the comment was not deleted then update last touched date
+			$this->set_param( 'last_touched_ts', 'date', $timestamp );
+			$this->dbupdate();
+		}
+
+		if( is_logged_in() )
+		{
+			$max_comment_last_touched = load_comments_last_touched( array( $this->item_ID ), $this->ID );
+			$user_read_dates = $comment_Item->get_read_dates();
+			if( empty( $max_comment_last_touched[$this->item_ID] ) || ( ( $user_read_dates['comment'] < $timestamp ) && ( $user_read_dates['comment'] >= $max_comment_last_touched[$this->item_ID] ) ) )
+			{ // Update current user comments read date on this comment's post
+				$comment_Item->update_read_date( 'comment' );
+			}
+		}
+
+		if( $update_item_date )
+		{ // Update last touched data of the Item
+			$comment_Item->update_last_touched_date();
+		}
+	}
+
+
+	/**
 	 * Get a permalink link to the Item of this Comment
 	 *
 	 * @param array Params
@@ -3753,34 +3847,6 @@ class Comment extends DataObject
 			), $params );
 
 		return $this->get_permanent_link( $params['text'], $params['title'], $params['class'], $params['nofollow'], $params['restrict_status'] );
-	}
-
-
-	/**
-	 * Set field last_touched_ts
-	 */
-	function set_last_touched_date()
-	{
-		global $localtimenow;
-		$this->set_param( 'last_touched_ts', 'date', date( 'Y-m-d H:i:s', $localtimenow ) );
-	}
-
-
-	/**
-	 * Update field last_touched_ts
-	 */
-	function update_last_touched_date()
-	{
-		if( $comment_Item = & $this->get_Item() )
-		{ // Update last touched data of the Item
-			$comment_Item->update_last_touched_date();
-		}
-
-		if( $this->ID > 0 )
-		{ // If the comment was not deleted then update last touched date
-			$this->set_last_touched_date();
-			$this->dbupdate();
-		}
 	}
 }
 

@@ -29,7 +29,7 @@
  * @author fplanque
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
- * @version $Id: _html_header.inc.php 7509 2014-10-24 07:31:38Z yura $
+ * @version $Id: _html_header.inc.php 7510 2014-10-24 07:34:51Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -53,11 +53,8 @@ require_js( 'ajax.js' );	// Functions to work with AJAX response data
 
 	global $rsc_path, $rsc_url, $htsrv_url;
 
-	// var bgxy_expand is used by toggle_filter_area() and toggle_clickopen()
 	// var htsrv_url is used for AJAX callbacks
 	add_js_headline( "// Paths used by JS functions:
-		var bgxy_expand = '".get_icon( 'expand', 'xy' )."';
-		var bgxy_collapse = '".get_icon( 'collapse', 'xy' )."';
 		var htsrv_url = '$htsrv_url';
 		var blog_id = '".param( 'blog', 'integer' )."';
 		var is_backoffice = true;" );

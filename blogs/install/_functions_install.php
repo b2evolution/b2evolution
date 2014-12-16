@@ -392,7 +392,7 @@ function create_default_settings( $override = array() )
 {
 	global $DB, $new_db_version, $default_locale;
 	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users, $Group_Suspect, $Group_Spam;
-	global $test_install_all_features, $create_sample_contents, $local_installation;
+	global $test_install_all_features, $create_sample_contents, $install_site_color, $local_installation;
 
 	$defaults = array(
 		'db_version' => $new_db_version,
@@ -404,7 +404,7 @@ function create_default_settings( $override = array() )
 	if( $test_install_all_features )
 	{
 		$defaults['gender_colored'] = 1;
-		$defaults['newusers_canregister'] = 1;
+		$defaults['newusers_canregister'] = 'yes';
 		$defaults['registration_require_country'] = 1;
 		$defaults['registration_require_gender'] = 'required';
 		$defaults['location_country'] = 'required';
@@ -412,9 +412,9 @@ function create_default_settings( $override = array() )
 		$defaults['location_subregion'] = 'required';
 		$defaults['location_city'] = 'required';
 	}
-	if( $create_sample_contents )
-	{
-		$defaults['info_blog_ID'] = '3';
+	if( !empty( $install_site_color ) )
+	{ // Set default site color
+		$defaults['site_color'] = $install_site_color;
 	}
 	if( !empty( $Group_Suspect ) )
 	{ // Set default antispam suspicious group
@@ -603,15 +603,35 @@ function install_basic_plugins( $old_db_version = 0 )
 	}
 
 	if( $old_db_version < 11100 )
-	{ // Upgrade to 5.0.1-alpha-5
+	{ // Upgrade to 5.0.0-alpha-5
+		// antispam
+		install_plugin( 'basic_antispam_plugin' );
+		// files
+		install_plugin( 'html5_mediaelementjs_plugin' );
+		install_plugin( 'html5_videojs_plugin' );
+		install_plugin( 'watermark_plugin' );
+		// ping
+		install_plugin( 'generic_ping_plugin' );
+		// rendering
 		install_plugin( 'escapecode_plugin' );
+		install_plugin( 'adsense_plugin' );
 		install_plugin( 'bbcode_plugin', $test_install_all_features );
 		install_plugin( 'star_plugin', $test_install_all_features );
 		install_plugin( 'prism_plugin', $test_install_all_features );
 		install_plugin( 'code_highlight_plugin', $test_install_all_features );
+		install_plugin( 'gmcode_plugin' );
+		install_plugin( 'wacko_plugin' );
+		install_plugin( 'wikilinks_plugin', $test_install_all_features );
+		install_plugin( 'wikitables_plugin', $test_install_all_features );
 		install_plugin( 'markdown_plugin' );
 		install_plugin( 'infodots_plugin', $test_install_all_features );
 		install_plugin( 'widescroll_plugin' );
+		// widget
+		install_plugin( 'facebook_plugin' );
+		install_plugin( 'whosonline_plugin' );
+		// Un-Classified
+		install_plugin( 'bookmarklet_plugin' );
+		install_plugin( 'geoip_plugin' );
 	}
 
 	if( $old_db_version < 11200 )
@@ -988,7 +1008,7 @@ function do_install_htaccess( $upgrade = false )
 			{	// The .htaccess file has content that different from a sample file
 				$error_message = '<p class="red">'.T_('There is already a file called .htaccess at the blog root. If you don\'t specifically need this file, it is recommended that you delete it or rename it to old.htaccess before you continue. This will allow b2evolution to create a new .htaccess file that is optimized for best results.').'</p>';
 				$error_message .= T_('Here are the contents of the current .htaccess file:');
-				$error_message .= '<div style="overflow:auto"><pre>'.evo_htmlspecialchars( $content_htaccess ).'</pre></div><br />';
+				$error_message .= '<div style="overflow:auto"><pre>'.htmlspecialchars( $content_htaccess ).'</pre></div><br />';
 				$error_message .= sprintf( T_('Again, we recommend you remove this file before continuing. If you chose to keep it, b2evolution will probably still work, but for optimization you should follow <a %s>these instructions</a>.'), 'href="'.get_manual_url( 'htaccess-file' ).'" target="_blank"' );
 				return $error_message;
 			}

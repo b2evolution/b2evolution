@@ -27,7 +27,7 @@
  * @author efy-bogdan: Evo Factory / Bogdan.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _registration.form.php 7767 2014-12-07 08:03:58Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -58,16 +58,31 @@ $Form->begin_form( 'fform', '',
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Default user permissions').get_manual_link('default-user-permissions') );
+$Form->begin_fieldset( T_('Default user permissions').get_manual_link('default-user-permissions-settings') );
 
-	$Form->checkbox( 'newusers_canregister', $Settings->get('newusers_canregister'), T_('New users can register'), T_('Check to allow new users to register themselves.' ) );
+	$Form->radio( 'newusers_canregister', $Settings->get( 'newusers_canregister' ), array(
+					array( 'no', T_( 'No (Only admins can create new users)' ) ),
+					array( 'invite', T_( 'Users can register only with an Invitation code/link' ) ),
+					array( 'yes', T_( 'Users can register themselves freely' ) )
+				), T_( 'New users can register' ), true );
 
-	$Form->checkbox( 'registration_is_public', $Settings->get('registration_is_public'), T_('Registration links'), T_('Check to show self-registration links to the public.' ), '', 1, ! $Settings->get('newusers_canregister') );
+	$disabled_param_links = array();
+	if( $Settings->get( 'newusers_canregister' ) == 'no' )
+	{ // Disable the field below when registration is not allowed 
+		$disabled_param_links['disabled'] = 'disabled';
+	}
+	$Form->checkbox_input( 'registration_is_public', $Settings->get('registration_is_public'), T_('Registration links'), array_merge( array( 'note' => T_('Check to show self-registration links to the public.' ) ), $disabled_param_links ) );
+
+	$disabled_param_grouplevel = array();
+	if( $Settings->get( 'newusers_canregister' ) != 'yes' )
+	{ // Disable group and level fields below when registration is not allowed freely
+		$disabled_param_grouplevel['disabled'] = 'disabled';
+	}
 
 	$GroupCache = & get_GroupCache();
-	$Form->select_object( 'newusers_grp_ID', $Settings->get('newusers_grp_ID'), $GroupCache, T_('Group for new users'), T_('Groups determine user roles and permissions.') );
+	$Form->select_input_object( 'newusers_grp_ID', $Settings->get('newusers_grp_ID'), $GroupCache, T_('Group for new users'), array_merge( array( 'note' => T_('Groups determine user roles and permissions.') ), $disabled_param_grouplevel ) );
 
-	$Form->text_input( 'newusers_level', $Settings->get('newusers_level'), 1, T_('Level for new users'), T_('Levels determine hierarchy of users in blogs.' ), array( 'maxlength'=>1, 'required'=>true ) );
+	$Form->text_input( 'newusers_level', $Settings->get('newusers_level'), 1, T_('Level for new users'), T_('Levels determine hierarchy of users in blogs.' ), array_merge( array( 'maxlength' => 1, 'required' => true ), $disabled_param_grouplevel ) );
 
 $Form->end_fieldset();
 
@@ -198,15 +213,24 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 
 ?>
 <script type="text/javascript">
-jQuery( '#newusers_canregister' ).click( function()
+jQuery( 'input[name=newusers_canregister]' ).click( function()
 {
-	if( jQuery( this ).is( ':checked' ) )
+	if( jQuery( this ).val() == 'yes' )
 	{
-		jQuery( '#registration_is_public' ).removeAttr( 'disabled' );
+		jQuery( '#newusers_grp_ID, #newusers_level' ).removeAttr( 'disabled' );
 	}
 	else
 	{
+		jQuery( '#newusers_grp_ID, #newusers_level' ).attr( 'disabled', 'disabled' );
+	}
+
+	if( jQuery( this ).val() == 'no' )
+	{
 		jQuery( '#registration_is_public' ).attr( 'disabled', 'disabled' );
+	}
+	else
+	{
+		jQuery( '#registration_is_public' ).removeAttr( 'disabled' );
 	}
 } );
 </script>

@@ -772,18 +772,6 @@ div.feedback_feed_msg img {
 	display: none;
 }
 
-/*div.bPostpublished a img {
-	display: none;
-}*/
-
-div#skin_wrapper div.edit_link {
-	display: inline;
-}
-
-div#skin_wrapper div.edit_link img {
-	display: none;
-}
-
 div#skin_wrapper p.postmetadata small a img{
 	padding: 0px;
 }
@@ -903,4 +891,18 @@ div.tabs div.selected a, div.tabs div a:hover {
 div.tabs div.selected a {
 	border-bottom-color: #070707;
 	color: #FFF;
+}
+
+#main .search_title {
+	color: #006193;
+}
+#main .search_title a {
+	text-decoration: underline;
+}
+
+table.bubbletip td, table.bubbletip th, table.bubbletip table {
+	padding: 0;
+	margin: 0;
+	border: none;
+	vertical-align: top;
 }

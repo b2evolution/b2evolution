@@ -28,7 +28,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _itemlight.class.php 7111 2014-07-14 05:23:46Z yura $
+ * @version $Id: _itemlight.class.php 7112 2014-07-14 05:28:11Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -109,6 +109,16 @@ class ItemLight extends DataObject
 	 */
 	var $Blog;
 
+	/**
+	 * Array of tags (strings)
+	 *
+	 * Lazy loaded.
+	 * @see ItemLight::get_tags()
+	 * @access protected
+	 * @var array
+	 */
+	var $tags = NULL;
+
 
 	/**
 	 * Constructor
@@ -133,21 +143,6 @@ class ItemLight extends DataObject
 		parent::DataObject( $dbtable, $dbprefix, $dbIDname, $datecreated_field, $datemodified_field,
 												$creator_field, $lasteditor_field );
 
-		$this->delete_restrictions = array(
-				array( 'table'=>'T_items__item', 'fk'=>'post_parent_ID', 'msg'=>T_('%d links to child items') ),
-			);
-
-		$this->delete_cascades = array(
-				array( 'table'=>'T_links', 'fk'=>'link_itm_ID', 'msg'=>T_('%d links to destination items') ),
-				array( 'table'=>'T_postcats', 'fk'=>'postcat_post_ID', 'msg'=>T_('%d links to extra categories') ),
-				array( 'table'=>'T_comments', 'fk'=>'comment_item_ID', 'msg'=>T_('%d comments') ),
-				array( 'table'=>'T_items__version', 'fk'=>'iver_itm_ID', 'msg'=>T_('%d versions') ),
-				array( 'table'=>'T_slug', 'fk'=>'slug_itm_ID', 'msg'=>T_('%d slugs') ),
-				array( 'table'=>'T_items__itemtag', 'fk'=>'itag_itm_ID', 'msg'=>T_('%d links to tags') ),
-				array( 'table'=>'T_items__item_settings', 'fk'=>'iset_item_ID', 'msg'=>T_('%d items settings') ),
-				array( 'table'=>'T_items__subscriptions', 'fk'=>'isub_item_ID', 'msg'=>T_('%d items subscriptions') ),
-			);
-
 		$this->objtype = $objtype;
 
 		if( $db_row == NULL )
@@ -170,6 +165,40 @@ class ItemLight extends DataObject
 			$this->ptyp_ID = $db_row->post_ptyp_ID;
 			$this->url = $db_row->post_url;
 		}
+	}
+
+
+	/**
+	 * Get delete restriction settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_restrictions()
+	{
+		return array(
+				array( 'table'=>'T_items__item', 'fk'=>'post_parent_ID', 'msg'=>T_('%d links to child items') ),
+			);
+	}
+
+
+	/**
+	 * Get delete cascade settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_cascades()
+	{
+		return array(
+				array( 'table'=>'T_links', 'fk'=>'link_itm_ID', 'msg'=>T_('%d links to destination items') ),
+				array( 'table'=>'T_postcats', 'fk'=>'postcat_post_ID', 'msg'=>T_('%d links to extra categories') ),
+				array( 'table'=>'T_comments', 'fk'=>'comment_item_ID', 'msg'=>T_('%d comments'), 'delete_where_callback' => 'comments_delete_where' ),
+				array( 'table'=>'T_items__version', 'fk'=>'iver_itm_ID', 'msg'=>T_('%d versions') ),
+				array( 'table'=>'T_slug', 'fk'=>'slug_itm_ID', 'msg'=>T_('%d slugs') ),
+				array( 'table'=>'T_items__itemtag', 'fk'=>'itag_itm_ID', 'msg'=>T_('%d links to tags') ),
+				array( 'table'=>'T_items__item_settings', 'fk'=>'iset_item_ID', 'msg'=>T_('%d items settings') ),
+				array( 'table'=>'T_items__subscriptions', 'fk'=>'isub_item_ID', 'msg'=>T_('%d items subscriptions') ),
+				array( 'table'=>'T_users__postreadstatus', 'fk'=>'uprs_post_ID', 'msg'=>T_('%d user post read statuses') ),
+			);
 	}
 
 
@@ -443,7 +472,7 @@ class ItemLight extends DataObject
 			if( $params['link_categories'] )
 			{ // we want to display links
 				$lBlog = & $Chapter->get_Blog();
-				$cat_name = '<a href="'.$Chapter->get_permanent_url().'" title="'.evo_htmlspecialchars($params['link_title']).'">'.$cat_name.'</a>';
+				$cat_name = '<a href="'.$Chapter->get_permanent_url().'" title="'.htmlspecialchars($params['link_title']).'">'.$cat_name.'</a>';
 			}
 
 			if( $Chapter->ID == $this->main_cat_ID )
@@ -510,7 +539,13 @@ class ItemLight extends DataObject
 				}
 				break;
 
-			// 'same_tag' should be added here, with 'tag' param
+			case 'same_tag': // navigate through the selected tag
+				$tags = $this->get_tags();
+				if( count( $tags ) > 1 )
+				{
+					$url = url_add_param( $url, 'tag='.$nav_target, $glue );
+				}
+				break;
 
 			case 'same_author': // navigate through this item author's posts ( param not needed because a post always has only one author )
 			case 'same_blog': // by default don't add any param
@@ -574,7 +609,7 @@ class ItemLight extends DataObject
 		{	// Preview mode
 			global $extracats, $post_category;
 
-			$extracats = param( 'post_extracats', 'array/integer', array() );
+			$extracats = param( 'post_extracats', 'array:integer', array() );
 			if( ( ! empty( $post_category ) ) && ( ! in_array( $post_category, $extracats ) ) )
 			{
 				$extracats[] = $post_category;
@@ -789,7 +824,7 @@ class ItemLight extends DataObject
 	/**
 	 * Template function: display issue time (datetime) of Item
 	 * @param array
-	 *   - 'time_format': Time format
+	 *   - 'time_format': Time format ('#short_time' - to use short time)
 	 *   - ... see {@link get_issue_date()}
 	 * @see get_issue_date()
 	 */
@@ -797,7 +832,7 @@ class ItemLight extends DataObject
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'time_format' => '#',
+				'time_format'  => '#',
 			), $params );
 
 		if( !isset($params['date_format']) )
@@ -806,8 +841,13 @@ class ItemLight extends DataObject
 		}
 
 		if( $params['date_format'] == '#' )
-		{
+		{	// Use default time format of current locale
 			$params['date_format'] = locale_timefmt();
+		}
+
+		if( $params['date_format'] == '#short_time' )
+		{	// Use short time format of current locale
+			$params['date_format'] = locale_shorttimefmt();
 		}
 
 		echo $this->get_issue_date( $params );
@@ -1357,6 +1397,79 @@ class ItemLight extends DataObject
 			$BlogCache = & get_BlogCache();
 			$this->Blog = & $BlogCache->get_by_ID( $this->get_blog_ID() );
 		}
+	}
+
+
+	/**
+	 * Get array of tags.
+	 *
+	 * Load from DB if necessary, prefetching any other tags from MainList/ItemList.
+	 *
+	 * @return array
+	 */
+	function & get_tags()
+	{
+		global $DB;
+
+		if( ! isset( $this->tags ) )
+		{
+			$ItemTagsCache = & get_ItemTagsCache();
+			if( ! isset($ItemTagsCache[$this->ID]) )
+			{
+				/* Only try to fetch tags for items that are not yet in
+				 * the cache. This will always give at least the ID of
+				 * this Item.
+				 */
+				$prefetch_item_IDs = array_diff( $this->get_prefetch_itemlist_IDs(), array_keys( $ItemTagsCache ) );
+				// Assume these items don't have any tags:
+				foreach( $prefetch_item_IDs as $item_ID )
+				{
+					$ItemTagsCache[$item_ID] = array();
+				}
+
+				// Now fetch the tags:
+				foreach( $DB->get_results('
+					SELECT itag_itm_ID, tag_name
+						FROM T_items__itemtag INNER JOIN T_items__tag ON itag_tag_ID = tag_ID
+					 WHERE itag_itm_ID IN ('.$DB->quote($prefetch_item_IDs).')
+					 ORDER BY tag_name', OBJECT, 'Get tags for items' ) as $row )
+				{
+					$ItemTagsCache[$row->itag_itm_ID][] = $row->tag_name;
+				}
+
+				//pre_dump( $ItemTagsCache );
+			}
+
+			$this->tags = $ItemTagsCache[$this->ID];
+		}
+
+		return $this->tags;
+	}
+
+
+	/**
+	 * Get a list of item IDs from $MainList and $ItemList, if they are loaded.
+	 * This is used for prefetching item related data for the whole list(s).
+	 * This will at least return the item's ID itself.
+	 * @return array
+	 */
+	function get_prefetch_itemlist_IDs()
+	{
+		global $MainList, $ItemList;
+
+		// Add the current ID to the list to prefetch, if it's not in the MainList/ItemList (e.g. featured item).
+		$r = array($this->ID);
+
+		if( $MainList )
+		{
+			$r = array_merge($r, $MainList->get_page_ID_array());
+		}
+		if( $ItemList )
+		{
+			$r = array_merge($r, $ItemList->get_page_ID_array());
+		}
+
+		return array_unique( $r );
 	}
 
 

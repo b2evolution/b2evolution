@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _filerootcache.class.php 7804 2014-12-11 15:11:50Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -56,14 +56,22 @@ class FileRootCache
 	 *
 	 * @static
 	 *
+	 * @param string Special file root ID (Used e.g. to view file root of the special user)
 	 * @return array of FileRoots (key being the FileRoot's ID)
 	 */
-	function get_available_FileRoots()
+	function get_available_FileRoots( $special_root_ID = NULL )
 	{
 		global $current_User;
 		global $collections_Module;
 
 		$r = array();
+
+		if( ! empty( $special_root_ID ) &&
+		    ( $special_FileRoot = & $this->get_by_ID( $special_root_ID, true ) ) &&
+		    $current_User->check_perm( 'files', 'edit', false, $special_FileRoot ) )
+		{ // Try to add special file root if current user has an access
+			$r[ $special_FileRoot->ID ] = & $special_FileRoot;
+		}
 
 		// The user's blog (if available) is the default/first one:
 		$user_FileRoot = & $this->get_by_type_and_ID( 'user', $current_User->ID, true );

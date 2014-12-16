@@ -18,7 +18,7 @@ $params = array_merge( array(
 		'comment_start'        => '<div class="bComment">',
 		'comment_end'          => '</div>',
 		'link_to'              => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
-		'author_link_text'     => 'login', // avatar | only_avatar | login | nickname | firstname | lastname | fullname | preferredname
+		'author_link_text'     => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 		'before_image'         => '<div class="image_block">',
 		'before_image_legend'  => '<div class="image_legend">',
 		'after_image_legend'   => '</div>',
@@ -81,7 +81,7 @@ $Comment = & $params['Comment'];
 						'text' 			=> T_('Trackback'),
 						'nofollow'	=> true,
 					) );
-				$Comment->author( '', '#', '', '#', 'htmlbody', true );
+				$Comment->author( '', '#', '', '#', 'htmlbody', true, $params['author_link_text'] );
 				break;
 
 			case 'pingback': // Display a pingback:
@@ -91,7 +91,7 @@ $Comment = & $params['Comment'];
 						'text' 			=> T_('Pingback'),
 						'nofollow'	=> true,
 					) );
-				$Comment->author( '', '#', '', '#', 'htmlbody', true );
+				$Comment->author( '', '#', '', '#', 'htmlbody', true, $params['author_link_text'] );
 				break;
 		}
 	?>
@@ -112,7 +112,7 @@ $Comment = & $params['Comment'];
 			$Comment->delete_link( '', '', '#', '#', 'permalink_right', false, '&amp;', true, false, '#', rawurlencode( $commented_Item->get_permanent_url() ) ); /* Link to backoffice for deleting */
 		?>
 
-		<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
+		<?php $Comment->date() ?> @ <?php $Comment->time( '#short_time' ) ?>
 		<?php $Comment->reply_link(); /* Link for replying to the Comment */ ?>
 		<?php $Comment->vote_helpful( '', '', '&amp;', true, true );?>
 	</div>

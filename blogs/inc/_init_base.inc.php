@@ -39,7 +39,7 @@
  * @author mfollett: Matt FOLLETT
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
- * @version $Id$
+ * @version $Id: _init_base.inc.php 6134 2014-03-08 07:48:07Z manuel $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -148,6 +148,12 @@ else
 
 
 /**
+ * System log
+ */
+load_class( 'tools/model/_syslog.class.php', 'Syslog' );
+
+
+/**
  * Info & error message log for end user (initialized here)
  * @global Log $Messages
  */
@@ -161,6 +167,7 @@ $Messages = new Messages();
 load_class( '_core/model/_timer.class.php', 'Timer' );
 $Timer = new Timer('total');
 $Timer->resume( '_init_base' );
+$Timer->resume( 'first_flush' );
 $Timer->resume( '_MAIN.inc' );
 
 

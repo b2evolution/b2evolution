@@ -83,7 +83,7 @@ $Comment = & $params['Comment'];
 		}
 	?>
 	&#8212;
-	<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
+	<?php $Comment->date() ?> @ <?php $Comment->time( '#short_time' ) ?>
 </cite>
 
 <?php

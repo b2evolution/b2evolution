@@ -159,7 +159,8 @@ switch( $content_mode )
 					'gallery_image_limit' => $params['gallery_image_limit'],
 					'gallery_colls'       => $params['gallery_colls'],
 					'gallery_order'       => $params['gallery_order'],
-					'restrict_to_image_position' => 'teaser', // Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
+					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'albumart'
+					'restrict_to_image_position' => 'teaser,teaserperm,teaserlink',
 				) );
 		}
 
@@ -202,8 +203,8 @@ switch( $content_mode )
 					'gallery_image_limit' => $params['gallery_image_limit'],
 					'gallery_colls'       => $params['gallery_colls'],
 					'gallery_order'       => $params['gallery_order'],
-					// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
-					'restrict_to_image_position' => 'teaser',
+					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'albumart'
+					'restrict_to_image_position' => 'teaser,teaserperm,teaserlink',
 				) );
 		}
 
@@ -262,7 +263,7 @@ switch( $content_mode )
 						'gallery_image_limit' => $params['gallery_image_limit'],
 						'gallery_colls'       => $params['gallery_colls'],
 						'gallery_order'       => $params['gallery_order'],
-						// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
+						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'albumart'
 						'restrict_to_image_position' => 'aftermore',
 					) );
 			}

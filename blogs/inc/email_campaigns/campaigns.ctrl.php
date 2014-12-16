@@ -20,7 +20,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id$
+ * @version $Id: campaigns.ctrl.php 7825 2014-12-16 16:32:09Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -191,10 +191,11 @@ switch( $action )
 		$email_html = $edited_EmailCampaign->get( 'email_html' );
 
 		// Convert HTML to Plain Text
+		$email_text = preg_replace( '/<a[^>]+href="([^"]+)"[^>]*>[^<]*<\/a>/i', ' [ $1 ] ', $email_html );
 		$email_text = str_replace(
 			array( "\n", "\r", '</p><p>', '<p>',  '</p>', '<br>', '<br />', '<br/>' ),
 			array( '',   '',   "\n\n",    "\n\n", "\n\n", "\n",   "\n",     "\n" ),
-			$email_html );
+			$email_text );
 		$email_text = strip_tags( $email_text );
 
 		$edited_EmailCampaign->set( 'email_text', $email_text );
@@ -312,13 +313,13 @@ switch( $action )
 $AdminUI->breadcrumbpath_init( false );
 $AdminUI->breadcrumbpath_add( T_('Emails'), $admin_url.'?ctrl=campaigns' );
 $AdminUI->breadcrumbpath_add( T_('Campaigns'), $admin_url.'?ctrl=campaigns' );
+$AdminUI->set_page_manual_link( 'email-campaigns' );
 
 if( $action == 'edit' )
 { // Build special tabs in edit mode of the campaign
-	$AdminUI->set_path( 'email', $tab );
-	$AdminUI->clear_menu_entries( 'email' );
+	$AdminUI->set_path( 'email', 'campaigns', $tab );
 	$campaign_edit_modes = get_campaign_edit_modes( $ecmp_ID );
-	$AdminUI->add_menu_entries( 'email', $campaign_edit_modes );
+	$AdminUI->add_menu_entries( array( 'email', 'campaigns' ), $campaign_edit_modes );
 	$AdminUI->breadcrumbpath_add( T_('Edit campaign'), $admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID='.$ecmp_ID );
 
 	if( !empty( $campaign_edit_modes[ $tab ] ) )

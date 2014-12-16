@@ -46,7 +46,7 @@ $params = array_merge( array(
 		'comment_error_start'  => '<div class="bComment" id="comment_error">',
 		'comment_error_end'    => '</div>',
 		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
-		'author_link_text'     => 'login', // avatar | only_avatar | login | nickname | firstname | lastname | fullname | preferredname
+		'author_link_text'     => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 		'link_to'              => 'userurl>userpage',		    // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		'form_title_start'     => '<h3>',
 		'form_title_end'       => '</h3>',
@@ -287,7 +287,7 @@ if( $Item->can_see_comments( true ) )
 					'author_link_text' => $params['author_link_text'],
 					'comment_number'   => $comment_number,
 				) );
-			// Note: You can customize the default item feedback by copying the generic
+			// Note: You can customize the default item comment by copying the generic
 			// /skins/_item_comment.inc.php file into the current skin folder.
 			// ---------------------- END OF COMMENT ---------------------
 
@@ -352,7 +352,7 @@ if( $params['disp_comment_form'] )
 	{
 		skin_include( '_item_comment_form.inc.php', $params );
 	}
-	// Note: You can customize the default item feedback by copying the generic
+	// Note: You can customize the default item comment form by copying the generic
 	// /skins/_item_comment_form.inc.php file into the current skin folder.
 }
 // ---------------------- END OF COMMENT FORM ---------------------

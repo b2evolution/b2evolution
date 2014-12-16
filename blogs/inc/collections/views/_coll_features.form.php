@@ -16,7 +16,7 @@
  *
  * @package admin
  *
- * @version $Id: _coll_features.form.php 7444 2014-10-17 04:12:27Z yura $
+ * @version $Id: _coll_features.form.php 7445 2014-10-17 04:14:21Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -103,7 +103,8 @@ $Form->begin_fieldset( T_('Post options').get_manual_link('blog_features_setting
 	$Form->radio( 'post_navigation', $edited_Blog->get_setting('post_navigation'),
 		array( array( 'same_blog', T_('same blog') ),
 			array( 'same_category', T_('same category') ),
-			array( 'same_author', T_('same author') ) ),
+			array( 'same_author', T_('same author') ),
+			array( 'same_tag', T_('same tag') ) ),
 			T_('Default post by post navigation should stay in'), true, T_( 'Skins may override this setting!') );
 
 	$location_options = array(
@@ -264,7 +265,7 @@ echo_regional_required_js( 'location_' );
 
 	jQuery( '[id^="delete_custom_"]' ).click( function()
 	{
-		if( confirm( '<?php echo TS_('Are you sure want to delete this custom field?\nThe update will be performed when you will click on the \'Save changes!\' button.'); ?>' ) )
+		if( confirm( '<?php echo TS_('Are you sure want to delete this custom field?\nThe update will be performed when you will click on the \'Save Changes!\' button.'); ?>' ) )
 		{ // Delete custom field only from html form, This field will be removed after saving of changes
 			var delete_action_id = jQuery( this ).attr('id');
 			var field_parts = delete_action_id.split( '_' );

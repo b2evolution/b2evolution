@@ -72,7 +72,7 @@ activate_blog_locale( $blog );
 
 // Note: we use funky field names in order to defeat the most basic guestbook spam bots:
 $sender_name = param( $dummy_fields[ 'name' ], 'string', '' );
-$sender_address = evo_strtolower( param( $dummy_fields[ 'email' ], 'string', '' ) );
+$sender_address = utf8_strtolower( param( $dummy_fields[ 'email' ], 'string', '' ) );
 $subject = param( $dummy_fields[ 'subject' ], 'string', '' );
 $message = param( $dummy_fields[ 'content' ], 'html', '' );	// We accept html but we will NEVER display it
 // save the message original content

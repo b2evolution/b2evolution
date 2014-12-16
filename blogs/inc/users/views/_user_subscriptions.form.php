@@ -32,7 +32,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _user_subscriptions.form.php 1498 2012-07-09 09:10:04Z yura $
+ * @version $Id: _user_subscriptions.form.php 7645 2014-11-14 08:16:13Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -392,7 +392,7 @@ $Form->begin_fieldset( T_('Individual post subscriptions') );
 		global $admin_url;
 		$ItemCache = & get_ItemCache();
 
-		$Form->info_field( '', T_( 'You are subscribed to be notified on all updates on the following posts' ).':', array( 'class' => 'info_full' ) );
+		$Form->info_field( '', T_( 'You are subscribed to be notified of all new comments on the following posts' ).':', array( 'class' => 'info_full' ) );
 		$blog_name = NULL;
 		foreach( $individual_posts_subs as $row )
 		{
