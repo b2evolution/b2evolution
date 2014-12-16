@@ -8,15 +8,15 @@ b2evolution includes everything you need. Right out of the box. Plugins optional
 
 More info: http://b2evolution.net
 
-## Status of this Repository on GitHub
+## This is the i6 (b2evolution v5) Branch !
 
 We maintain this GitHub repo ahead of public releases.
 
 Note we have moved the previous "master" branch to "old-master".
 
-The current "master" branch (this branch) includes an import on the CVS history from SoureForge as well as a sync to the latest developement version located on our developement SVN repository.
+This 'i6' branch includes an import on the CVS history from SoureForge as well as a sync to the latest 5.x version from the "i6" branch on our developement SVN repository.
 
-We are planing to transition the SVN development branches to GitHub also but haven't decided on a branching model and workflow yet.
+Please switch to the "master" branch for the latest codebase available.
 
 ## Usage info
 
