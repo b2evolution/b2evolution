@@ -32,7 +32,7 @@
  * @author jeffbearer: Jeff BEARER - {@link http://www.jeffbearer.com/}.
  * @author jupiterx: Jordan RUNNING.
  *
- * @version $Id: _user.funcs.php 7717 2014-12-01 08:47:33Z yura $
+ * @version $Id: _user.funcs.php 7802 2014-12-11 10:41:39Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -2729,11 +2729,17 @@ function callback_filter_userlist( & $Form )
 
 	$location_filter_displayed = false;
 	if( user_country_visible() )
-	{	// Filter by country
+	{ // Filter by country
 		load_class( 'regional/model/_country.class.php', 'Country' );
 		load_funcs( 'regional/model/_regional.funcs.php' );
-		if( ! has_cross_country_restriction() )
-		{
+		if( has_cross_country_restriction( 'users' ) )
+		{ // User cannot browse other users from other country
+			global $current_User;
+			// Create a hidden country field to correct ajax request to load regions, subregions and cities
+			$Form->hidden( 'country', $current_User->ctry_ID, array( 'id' => 'country' ) );
+		}
+		else
+		{ // User can browse other users from other country
 			$CountryCache = & get_CountryCache( T_('All') );
 			$Form->select_country( 'country', get_param('country'), $CountryCache, T_('Country'), array( 'allow_none' => true ) );
 			$location_filter_displayed = true;
@@ -2863,7 +2869,12 @@ function load_subregions( region_ID )
 }
 
 function load_cities( country_ID, region_ID, subregion_ID )
-{	// Load option list with cities for seleted region or sub-region
+{ // Load option list with cities for seleted region or sub-region
+	if( typeof( country_ID ) == 'undefined' )
+	{
+		country_ID = 0;
+	}
+
 	jQuery.ajax( {
 	type: 'POST',
 	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',

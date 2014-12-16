@@ -8,7 +8,7 @@
  *
  * @package evoskins
  *
- * @version $Id$
+ * @version $Id: user.main.php 7802 2014-12-11 10:41:39Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -69,7 +69,7 @@ if( !empty($user_ID) )
 			// will have exited
 		}
 
-		if( has_cross_country_restriction( 'user' ) && ( $current_User->ctry_ID !== $User->ctry_ID ) )
+		if( has_cross_country_restriction( 'users' ) && ( $current_User->ctry_ID !== $User->ctry_ID ) )
 		{ // Current user country is different then edited user country and cross country user browsing is not enabled.
 			$Messages->add( T_('You don\'t have permission to view this user profile.') );
 			header_redirect( url_add_param( $error_redirect_to, 'disp=403', '&' ) );

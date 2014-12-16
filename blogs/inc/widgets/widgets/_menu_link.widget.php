@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _menu_link.widget.php 7086 2014-07-08 04:47:41Z yura $
+ * @version $Id: _menu_link.widget.php 7815 2014-12-15 13:03:31Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -139,22 +139,6 @@ class menu_link_Widget extends ComponentWidget
 					'type' => 'select',
 					'options' => $menu_link_widget_link_types,
 					'defaultvalue' => 'home',
-					'onchange' => '
-						var curr_link_type = this.value;
-						var allow_blockcache = jQuery("[id$=\'_set_allow_blockcache\']");
-						var allow_blockcache_note = allow_blockcache.find(".notes");
-						if( curr_link_type == "login" || curr_link_type == "register" )
-						{
-							allow_blockcache.removeAttr(\'checked\');
-							allow_blockcache.attr( \'disabled\', \'disabled\' );
-							allow_blockcache_note.html("'.T_('The current configuration prevents caching this widget in the block cache.').'");
-						}
-						else
-						{
-							allow_blockcache.removeAttr(\'disabled\');
-							allow_blockcache.attr( \'checked\', \'checked\' );
-							allow_blockcache_note.html("'.T_('Uncheck to prevent this widget from ever being cached in the block cache. (The whole page may still be cached.) This is only needed when a widget is poorly handling caching and cache keys.').'");
-						};'
 				),
 				'link_text' => array(
 					'label' => T_('Link text'),
@@ -185,22 +169,30 @@ class menu_link_Widget extends ComponentWidget
 					'size' => 30,
 					'defaultvalue' => '',
 				),
-			), parent::get_param_definitions( $params )	);
+			), parent::get_param_definitions( $params ) );
 
-		// Disable allow blockcache if the link type param is set to 'login' or 'register'
-		// Do not modify anything during update because the editing form contains all of the required modifications
-		if( !isset( $params['for_updating'] ) && ( ! empty( $this->params ) ) && ( ! isset( $params['infinite_loop'] ) ) )
-		{ // This is an already existing widget
-			$link_type = $this->get_param( 'link_type', true );
-			if( $link_type == 'login' || $link_type == 'register' )
-			{ // Disable allow blockcache
-				$r['allow_blockcache']['defaultvalue'] = false;
-				$r['allow_blockcache']['disabled'] = 'disabled';
-				$r['allow_blockcache']['note'] = T_('The current configuration prevents caching this widget in the block cache.');
-			}
+		if( isset( $r['allow_blockcache'] ) )
+		{ // Disable "allow blockcache" because this widget uses the selected items
+			$r['allow_blockcache']['defaultvalue'] = false;
+			$r['allow_blockcache']['disabled'] = 'disabled';
+			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Prepare display params
+	 *
+	 * @param array MUST contain at least the basic display params
+	 */
+	function init_display( $params )
+	{
+		parent::init_display( $params );
+
+		// Disable "allow blockcache" because this widget uses the selected items
+		$this->disp_params['allow_blockcache'] = 0;
 	}
 
 

@@ -616,6 +616,16 @@ div.avatartag {
 div.avatartag a {
 	outline: none;
 }
+.avatar_main_frame > a:first-child {
+	margin-right: 25px;
+}
+.avatar_main_frame .avatar_actions {
+	text-align: center;
+	padding-right: 25px;
+	float: none;
+	display: table-cell;
+	vertical-align: middle;
+}
 
 table.prevnext_user {
 	width: 100%;

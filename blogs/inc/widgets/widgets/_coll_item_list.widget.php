@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _coll_item_list.widget.php 7756 2014-12-05 09:42:11Z yura $
+ * @version $Id: _coll_item_list.widget.php 7815 2014-12-15 13:03:31Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -200,9 +200,14 @@ class coll_item_list_Widget extends ComponentWidget
 					'defaultvalue' => 20,
 					'note' => T_( 'Max number of words for the teasers.' ),
 				),
-			), parent::get_param_definitions( $params )	);
+			), parent::get_param_definitions( $params ) );
 
-		// pre_dump( $r['item_type']['options'] );
+		if( isset( $r['allow_blockcache'] ) )
+		{ // Disable "allow blockcache" because this widget uses the selected items
+			$r['allow_blockcache']['defaultvalue'] = false;
+			$r['allow_blockcache']['disabled'] = 'disabled';
+			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
+		}
 
 		return $r;
 	}

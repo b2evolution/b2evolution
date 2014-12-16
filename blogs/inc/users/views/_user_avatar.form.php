@@ -123,16 +123,16 @@ if( $edited_User->has_avatar() )
 	}
 
 	$rotate_icons = $edited_User->get_rotate_avatar_icons( $edited_User->avatar_file_ID, array(
-			'before' => '<p class="center">',
-			'after'  => '</p>'
+			'before' => '',
+			'after'  => '<br />'
 		) );
 
 	$remove_picture_text = T_( 'No longer use this as main profile picture' );
 	$delete_picture_text = T_( 'Delete this profile picture' );
 
-	$action_picture_links = '<div>'.
-			'<p class="center">'.action_icon( $remove_picture_text, 'move_down', $remove_picture_url, $remove_picture_text, 3, 4, array( 'style' => 'display:block;text-indent:-16px;padding-left:16px' ), array( 'style' => 'margin-right:4px' ) ).'</p>'.
-			'<p class="center">'.action_icon( $delete_picture_text, 'xross', $delete_picture_url, $delete_picture_text, 3, 4, array( 'style' => 'display:block;text-indent:-16px;padding-left:16px', 'onclick' => 'return confirm(\''.TS_('Are you sure want to delete this picture?').'\');' ), array( 'style' => 'margin-right:4px' ) ).'</p>'.
+	$action_picture_links = '<div class="avatar_actions">'.
+			action_icon( $remove_picture_text, 'move_down', $remove_picture_url, ' '.$remove_picture_text, 3, 4 ).'<br />'.
+			action_icon( $delete_picture_text, 'xross', $delete_picture_url, ' '.$delete_picture_text, 3, 4, array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to delete this picture?').'\');' ) ).'<br />'.
 			$rotate_icons.
 		'</div>';
 

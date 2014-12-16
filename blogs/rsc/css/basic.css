@@ -127,8 +127,13 @@ img.avatar_above_login {
 	-webkit-border-radius: 2px 2px 0 0;
 	-khtml-border-radius-topleft: 2px; -khtml-border-radius-topright: 2px;
 	border-radius: 2px 2px 0 0;
+	margin-bottom: 2px;
 }
 
+.avatar_actions {
+	float: left;
+	line-height: 26px;
+}
 .avatar_main_frame {
 	background: #FFF;
 	border: 1px solid #CCC;
@@ -146,13 +151,9 @@ img.avatar_above_login {
 	-khtml-border-radius-topleft: 2px; -khtml-border-radius-bottomleft: 2px;
 	border-radius: 2px 0 0 2px;
 }
-.avatar_main_frame a.cboxElement {
-	display: table-cell;
-}
-.avatar_main_frame div {
-	display: table-cell;
-	vertical-align: middle;
-	padding-left: 5px;
+.avatar_main_frame > a:first-child {
+	float: left;
+	margin-right: 5px;
 }
 
 /*
