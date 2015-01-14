@@ -18,6 +18,7 @@ $params = array_merge( array(
 	'auto_pilot'    => 'seo_title',
 	'html_tag'      => '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'."\n"
 	                  .'<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="'.locale_lang( false ).'" lang="'.locale_lang( false ).'">'."\n",
+	'viewport_tag'  => NULL,
 	'generator_tag' => '<meta name="generator" content="b2evolution '.$app_version.'" /> <!-- Please leave this for stats -->'."\n",
 	'body_class'    => NULL,
 ), $params );
@@ -39,6 +40,17 @@ add_headline( '<![endif]-->' );
 echo $params['html_tag'];
 ?>
 <head>
+	<?php
+	 	// Add viewport tag if provided:
+		if( $params['viewport_tag'] == '#responsive#' )
+		{	// We requested a responsive viewport:
+			echo '<meta name="viewport" content="width=device-width, initial-scale=1">'."\n";
+		}
+		else
+		{
+			echo $params['viewport_tag'];
+		}
+	?>
 	<?php skin_content_meta(); /* Charset for static pages */ ?>
 	<?php skin_base_tag(); /* Base URL for this skin. You need this to fix relative links! */ ?>
 	<?php $Plugins->trigger_event( 'SkinBeginHtmlHead' ); ?>

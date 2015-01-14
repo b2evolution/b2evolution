@@ -32,7 +32,7 @@
  *
  * @todo Allow applying / re-checking of the known data, not just after an update!
  *
- * @version $Id: antispam.ctrl.php 7628 2014-11-13 08:07:09Z yura $
+ * @version $Id: antispam.ctrl.php 7939 2015-01-10 22:42:16Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -499,7 +499,7 @@ if( $display_mode != 'js' )
 			}
 			elseif( ! $current_User->check_perm( 'spamblacklist', 'edit' ) )
 			{	// Check permission to create/edit IP range
-				$Messages->add( T_('You have no permission to edit IP range!'), 'error' );
+				$Messages->add( T_('You have no permission to edit this IP range!'), 'error' );
 				$action = '';
 			}
 			$AdminUI->breadcrumbpath_add( T_('IP Ranges'), '?ctrl=antispam&amp;tab3='.$tab3 );

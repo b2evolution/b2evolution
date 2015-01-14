@@ -29,7 +29,7 @@
  *
  * @package admin
  *
- * @version $Id: _user_identity.form.php 7692 2014-11-21 08:21:18Z yura $
+ * @version $Id: _user_identity.form.php 7878 2014-12-23 11:54:05Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -117,7 +117,8 @@ if( $is_admin )
 	}
 	else
 	{
-		$form_title = get_usertab_header( $edited_User, 'profile', T_( 'Edit profile' ) );
+		$form_text_title = T_( 'Edit profile' ); // used for js confirmation message on leave the changed form
+		$form_title = get_usertab_header( $edited_User, 'profile', $form_text_title );
 		$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
 	}
 	$form_class = 'fform';
@@ -128,7 +129,7 @@ else
 	$form_class = 'bComment';
 }
 
-	$Form->begin_form( $form_class, $form_title );
+	$Form->begin_form( $form_class, $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );
 
 	// We should print out this submit "update" before all other buttons (because form is submitted by first button)
 	// It gives to update a form when we press Enter key on the form element

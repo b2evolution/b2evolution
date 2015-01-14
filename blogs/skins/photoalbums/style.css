@@ -4,7 +4,7 @@ body {
 	padding: 0px;
 	margin: 0px;
 	color: #aaa;
-	font: 84% Arial, Helvetica, sans-serif;
+	font: 100% Arial, Helvetica, sans-serif;
 	background-color: #666;
 }
 
@@ -111,6 +111,10 @@ h2 {
 .bPosts {
 	padding: 0 10px 10px;
 	margin: 0 auto;
+	max-width: 960px;
+}
+.bPosts.full_width {
+	max-width: 100%;
 }
 .posts_list {
 	text-align: center;
@@ -224,19 +228,16 @@ h3.bTitle, h3.bTitle.linked a {
 	margin: 0;
 	padding: 0 12px;
 }
-.bSmallHead
-{
+.bSmallHead {
 	margin: 0;
 	padding: 12px 12px 6px 12px;
 }
-.bSmallPrint
-{
+.bSmallPrint {
 	margin: 0;
 	font-size: 84%;
 	padding: 6px 12px 12px 12px;
 }
-.action_right
-{
+.action_right {
 	font-size: 84%;
 	float: right;
 	margin: 0 0 0 1em;
@@ -295,6 +296,9 @@ table.grouped th a, table.grouped a {
 }
 .avatar_main_frame a {
 	color: #666;
+}
+img.avatar_before_login {
+	vertical-align: middle;
 }
 
 div.item_location {
@@ -554,4 +558,18 @@ div.tabs div.selected a {
 }
 .bCommentText .flowplayer_block, .bCommentText .videojs_block, .bCommentText .mediajs_block {
 	width: 100%;
+}
+
+div.edit_toolbar, form.inskin .edit_area textarea, input.bComment, textarea.bComment {
+	width: 100%;
+	box-sizing: border-box;
+}
+div.results, .messages_list h2 {
+	color: #222;
+}
+div.results .filters, div.edit_toolbar, .catselect, .messages_list label {
+	color: #666;
+}
+div.results .filters a, div.results .title a, .catselect a, .results_nav a {
+	color: #444;
 }

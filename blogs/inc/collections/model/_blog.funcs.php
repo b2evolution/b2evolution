@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _blog.funcs.php 7695 2014-11-24 07:41:59Z yura $
+ * @version $Id: _blog.funcs.php 7942 2015-01-11 00:28:14Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1532,15 +1532,15 @@ function blog_row_setting( $blog_ID, $setting_name, $setting_value )
 		case'plist':
 			// Blog in public list
 			$title = $setting_value ?
-					T_('The blog is in public blog list.') :
-					T_('The blog is not in public blog list.');
+					T_('The blog is on the public blog list.') :
+					T_('The blog is not on the public blog list.');
 			break;
 
 		case'fav':
 			// Favorite Blog
 			$title = $setting_value ?
-					T_('The blog is favorite.') :
-					T_('The blog is not favorite.');
+					T_('The blog is a favorite.') :
+					T_('The blog is not a favorite.');
 			break;
 
 		default:

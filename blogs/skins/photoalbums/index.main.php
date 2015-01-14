@@ -10,7 +10,7 @@
  * @package evoskins
  * @subpackage photoalbum
  *
- * @version $Id: index.main.php 7160 2014-07-21 12:13:35Z yura $
+ * @version $Id: index.main.php 7828 2014-12-17 07:45:33Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -140,7 +140,7 @@ if( $disp == 'single' )
 	}
 } // ------------------- END OF NAVIGATION BAR FOR ALBUM(POST) ------------------- ?>
 
-<div class="bPosts">
+<div class="bPosts<?php echo in_array( $disp, array( 'front', 'posts', 'single', 'page', 'mediaidx' ) ) ? ' full_width' : '' ?>">
 
 <!-- =================================== START OF MAIN AREA =================================== -->
 

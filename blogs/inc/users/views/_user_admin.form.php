@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author efy-asimo: Attila Simo
  *
- * @version $Id: _user_admin.form.php 7644 2014-11-14 08:12:53Z yura $
+ * @version $Id: _user_admin.form.php 7878 2014-12-23 11:54:05Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -60,7 +60,10 @@ $Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$<
 
 echo_user_actions( $Form, $edited_User, 'edit' );
 
-$Form->begin_form( 'fform', get_usertab_header( $edited_User, 'admin', T_( 'User admin settings' ) ) );
+$form_text_title = T_( 'User admin settings' ); // used for js confirmation message on leave the changed form
+$form_title = get_usertab_header( $edited_User, 'admin', T_( 'User admin settings' ) );
+
+$Form->begin_form( 'fform', $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );
 
 $Form->add_crumb( 'user' );
 $Form->hidden_ctrl();

@@ -88,13 +88,7 @@ function item_unlink( link_ID )
 	var b2evoCanvas = window.parent.document.getElementById( 'itemform_post_content' );
 	if( b2evoCanvas != null )
 	{ // Canvas exists
-		var textarea_obj = jQuery( '#itemform_post_content', window.parent.document );
-		if( textarea_obj.length == 0 )
-		{ // No found textarea
-			return;
-		}
-		var content = textarea_obj.val();
 		var regexp = new RegExp( '\\\[image:' + link_ID + ':?[^\\\]]*\\\]', 'ig' );
-		textarea_obj.val( content.replace( regexp, '' ) );
+		textarea_str_replace( b2evoCanvas, regexp, '', window.parent.document );
 	}
 }

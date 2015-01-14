@@ -312,7 +312,7 @@ XX(      graydead.gif
 		}
 		else
 		{ // No code/pre blocks, replace on the whole thing
-			$content = $this->ReplaceTagSafe($content);
+			$content = $this->ReplaceTagSafe( $content );
 		}
 
 		return true;
@@ -323,7 +323,7 @@ XX(      graydead.gif
 	 * @param array Smiley
 	 * @param array Override params, e.g. "class"
 	 */
-	function get_smiley_img_tag($smiley, $override_fields = array())
+	function get_smiley_img_tag( $smiley, $override_fields = array() )
 	{
 		$attribs = array(
 			'src' => $smiley['image'],
@@ -356,9 +356,19 @@ XX(      graydead.gif
 	 * Replace smilies in non-HTML-tag portions of the text.
 	 * @uses callback_on_non_matching_blocks()
 	 */
-	function ReplaceTagSafe($text)
+	function ReplaceTagSafe( $text )
 	{
-		return callback_on_non_matching_blocks( $text, '~<[^>]*>~', array(&$this, 'preg_insert_smilies_callback') );
+		return callback_on_non_matching_blocks( $text, '~<[^>]*>~', array( & $this, 'ReplaceInlinePlaceholderSafe' ) );
+	}
+
+
+	/**
+	 * Replace smilies in non inline placeholders portions of the text.
+	 * @uses callback_on_non_matching_blocks()
+	 */
+	function ReplaceInlinePlaceholderSafe( $text )
+	{
+		return callback_on_non_matching_blocks( $text, '~\[(image|file|inline):\d+:?[^\]]*\]~', array( & $this, 'preg_insert_smilies_callback' ) );
 	}
 
 

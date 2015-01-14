@@ -38,7 +38,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _param.funcs.php 7396 2014-10-09 05:13:50Z yura $
+ * @version $Id: _param.funcs.php 7948 2015-01-12 10:35:50Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1156,9 +1156,10 @@ function param_compact_date( $var, $default = '', $memorize = false, $err_msg, $
  * @param boolean Do we need to memorize this to regenerate the URL for this page?
  * @param boolean Override if variable already set
  * @param boolean Force setting of variable to default?
+ * @param boolean Allow to use empty value
  * @return mixed Final value of Variable, or false if we don't force setting and did not set
  */
-function param_time( $var, $default = '', $memorize = false,	$override = false, $forceset = true )
+function param_time( $var, $default = '', $memorize = false, $override = false, $forceset = true, $allow_empty = false )
 {
 	global $$var;
 
@@ -1182,7 +1183,11 @@ function param_time( $var, $default = '', $memorize = false,	$override = false, 
 		$got_time = true;
 	}
 
-	if( $got_time )
+	if( $allow_empty && empty( $$var ) )
+	{ // Allow to use empty time value
+		return $$var;
+	}
+	elseif( $got_time )
 	{ // We got a time...
 		// Check if ranges are correct:
 		if( $time_h >= 0 && $time_h <= 23

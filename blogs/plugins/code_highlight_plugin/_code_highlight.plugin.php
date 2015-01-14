@@ -27,7 +27,7 @@
  * @author Yabba: Paul Jones - {@link http://astonishme.co.uk/}
  * @author Stk: Scott Kimler - {@link http://astonishme.co.uk/}
  *
- * @version $Id: _code_highlight.plugin.php 7134 2014-07-16 12:01:07Z yura $
+ * @version $Id: _code_highlight.plugin.php 7922 2015-01-06 23:29:21Z fplanque $
  */
 
 /**
@@ -271,19 +271,19 @@ class code_highlight_plugin extends Plugin
 		echo '<div class="edit_toolbar code_toolbar">';
 		// TODO: dh> make this optional.. just like with line numbers, this "Code" line is not feasible with oneliners.
 		echo T_('Code').': ';
-		echo '<input type="button" id="code_samp" title="'.T_('Insert &lt;samp&gt; tag').'" class="quicktags" data-func="code_tag|samp" value="'.T_('samp').'" />';
-		echo '<input type="button" id="code_kbd" title="'.T_('Insert &lt;kbd&gt; tag').'" class="quicktags" data-func="code_tag|kbd" value="'.T_('kbd').'" />';
-		echo '<input type="button" id="code_var" title="'.T_('Insert &lt;var&gt; tag').'" class="quicktags" data-func="code_tag|var" value="'.T_('var').'" />';
-		echo '<input type="button" id="code_code" title="'.T_('Insert &lt;code&gt; tag').'" class="quicktags" data-func="code_tag|code" value="'.T_('code').'" />';
+		echo '<input type="button" id="code_samp" title="'.T_('Insert &lt;samp&gt; tag').'" class="quicktags" data-func="code_tag|samp" value="samp" />';
+		echo '<input type="button" id="code_kbd" title="'.T_('Insert &lt;kbd&gt; tag').'" class="quicktags" data-func="code_tag|kbd" value="kbd" />';
+		echo '<input type="button" id="code_var" title="'.T_('Insert &lt;var&gt; tag').'" class="quicktags" data-func="code_tag|var" value="var" />';
+		echo '<input type="button" id="code_code" title="'.T_('Insert &lt;code&gt; tag').'" class="quicktags" data-func="code_tag|code" value="code" />';
 		/* space */
-		echo '<input type="button" id="codespan" title="'.T_('Insert codespan').'" style="margin-left:8px;" class="quicktags" data-func="codespan_tag| " value="'.T_('codespan').'" />';
+		echo '<input type="button" id="codespan" title="'.T_('Insert codespan').'" style="margin-left:8px;" class="quicktags" data-func="codespan_tag| " value="codespan" />';
 		/* space */
-		echo '<input type="button" id="codeblock" title="'.T_('Insert codeblock').'" style="margin-left:8px;" class="quicktags" data-func="codeblock_tag| " value="'.T_('codeblock').'" />';
-		echo '<input type="button" id="codeblock_xml" title="'.T_('Insert XML codeblock').'" class="quicktags" data-func="codeblock_tag|xml" value="'.T_('XML').'" />';
-		echo '<input type="button" id="codeblock_html" title="'.T_('Insert HTML codeblock').'" class="quicktags" data-func="codeblock_tag|html" value="'.T_('HTML').'" />';
-		echo '<input type="button" id="codeblock_php" title="'.T_('Insert PHP codeblock').'" class="quicktags" data-func="codeblock_tag|php" value="'.T_('PHP').'" />';
-		echo '<input type="button" id="codeblock_css" title="'.T_('Insert CSS codeblock').'" class="quicktags" data-func="codeblock_tag|css" value="'.T_('CSS').'" />';
-		echo '<input type="button" id="codeblock_shell" title="'.T_('Insert Shell codeblock').'" class="quicktags" data-func="codeblock_tag|shell" value="'.T_('Shell').'" />';
+		echo '<input type="button" id="codeblock" title="'.T_('Insert codeblock').'" style="margin-left:8px;" class="quicktags" data-func="codeblock_tag| " value="codeblock" />';
+		echo '<input type="button" id="codeblock_xml" title="'.T_('Insert XML codeblock').'" class="quicktags" data-func="codeblock_tag|xml" value="XML" />';
+		echo '<input type="button" id="codeblock_html" title="'.T_('Insert HTML codeblock').'" class="quicktags" data-func="codeblock_tag|html" value="HTML" />';
+		echo '<input type="button" id="codeblock_php" title="'.T_('Insert PHP codeblock').'" class="quicktags" data-func="codeblock_tag|php" value="PHP" />';
+		echo '<input type="button" id="codeblock_css" title="'.T_('Insert CSS codeblock').'" class="quicktags" data-func="codeblock_tag|css" value="CSS" />';
+		echo '<input type="button" id="codeblock_shell" title="'.T_('Insert Shell codeblock').'" class="quicktags" data-func="codeblock_tag|shell" value="Shell" />';
 		echo '</div>';
 
 		// Load js to work with textarea

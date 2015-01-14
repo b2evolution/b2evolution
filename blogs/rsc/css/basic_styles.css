@@ -59,8 +59,15 @@ code, samp {
 	margin: 2ex;
 }
 
+.small92 {
+	font-size: 92%;
+}
+.small84,
 .small {
 	font-size: 84%;
+}
+.small80 {
+	font-size: 80%;
 }
 .small_details {
 	font-size: 84%;

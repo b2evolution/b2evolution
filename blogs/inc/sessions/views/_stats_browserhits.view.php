@@ -21,7 +21,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _stats_browserhits.view.php 7965 2015-01-14 03:02:25Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -124,7 +124,7 @@ if( count($res_hits) )
 	}
 
 	array_unshift( $chart[ 'chart_data' ][ 0 ], '' );
-	array_unshift( $chart[ 'chart_data' ][ 1 ], 'Refering searches' );
+	array_unshift( $chart[ 'chart_data' ][ 1 ], 'Referring searches' );
 	array_unshift( $chart[ 'chart_data' ][ 2 ], 'Referers' );
 	array_unshift( $chart[ 'chart_data' ][ 3 ], 'Direct accesses' );	// Translations need to be UTF-8
 	array_unshift( $chart[ 'chart_data' ][ 4 ], 'Self referred' );
@@ -176,7 +176,7 @@ if( count($res_hits) )
 	<table class="grouped table table-striped table-bordered table-hover table-condensed" cellspacing="0">
 		<tr>
 			<th class="firstcol"><?php echo T_('Date') ?></th>
-			<th style="background-color: #<?php echo $referer_type_color['search'] ?>"><?php echo T_('Refering searches') ?></th>
+			<th style="background-color: #<?php echo $referer_type_color['search'] ?>"><?php echo T_('Referring searches') ?></th>
 			<th style="background-color: #<?php echo $referer_type_color['referer'] ?>"><?php echo T_('Referers') ?></th>
 			<th style="background-color: #<?php echo $referer_type_color['direct'] ?>"><?php echo T_('Direct accesses') ?></th>
 			<th style="background-color: #<?php echo $referer_type_color['self'] ?>"><?php echo T_('Self referred') ?></th>

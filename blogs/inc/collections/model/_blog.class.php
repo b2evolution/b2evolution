@@ -30,7 +30,7 @@
  *
  * @package evocore
  *
- * @version $Id: _blog.class.php 7636 2014-11-13 10:55:48Z yura $
+ * @version $Id: _blog.class.php 7985 2015-01-14 18:41:51Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -3161,7 +3161,7 @@ class Blog extends DataObject
 						$other_media_dir = $other_Blog->get_media_dir( false );
 						if( ! empty( $other_media_dir ) && strpos( $new_media_dir, $other_media_dir ) === 0 )
 						{
-							$Messages->add( sprintf( T_('Please use another folder name, because %s cannot be folder or subfolder of other blog media location.'), '<b>'.$new_media_dir.'</b>' ), 'error' );
+							$Messages->add( sprintf( T_('Please use another folder name, because %s is already used for another media location.'), '<b>'.$new_media_dir.'</b>' ), 'error' );
 							return false;
 						}
 					}
@@ -3181,7 +3181,7 @@ class Blog extends DataObject
 				debug_die('Invalid media location setting received!');
 		}
 
-		$Messages->add( T_('The media directory was successfully moved to the new path, with all of its content.'), 'note' );
+		$Messages->add( T_('The media directory and all of its content were successfully moved to the new location.'), 'note' );
 		return true;
 	}
 }

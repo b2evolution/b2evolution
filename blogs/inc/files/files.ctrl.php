@@ -41,7 +41,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: files.ctrl.php 7537 2014-10-28 08:33:05Z yura $
+ * @version $Id: files.ctrl.php 7970 2015-01-14 07:21:36Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -594,7 +594,7 @@ $UserSettings->param_Request( 'fm_hide_dirtree', 'fm_hide_dirtree', 'integer', 0
 $fm_Filelist = new Filelist( $fm_FileRoot, $ads_list_path );
 $Debuglog->add( 'FM _rds_list_path: '.var_export( $fm_Filelist->_rds_list_path, true ), 'files' );
 
-param( 'fm_filter', '', NULL, true );
+param( 'fm_filter', 'string', NULL, true );
 param( 'fm_filter_regex', 'integer', 0, true );
 $fm_Filelist->set_Filter( $fm_filter, $fm_filter_regex );
 
@@ -607,7 +607,7 @@ if( $UserSettings->param_Request( 'fm_recursivedirsize', 'fm_recursivedirsize', 
 	$fm_Filelist->_use_recursive_dirsize = true;
 }
 check_showparams( $fm_Filelist );
-if( param( 'fm_flatmode', '', NULL, true ) )
+if( param( 'fm_flatmode', 'boolean', NULL, true ) )
 {
 	$fm_Filelist->flatmode = true;
 }
@@ -623,7 +623,7 @@ if( ! in_array( $fm_order, array( 'name', 'path', 'type', 'size', 'lastmod', 'pe
 {
 	$fm_order = NULL;
 }
-param( 'fm_orderasc', '', NULL, true );
+param( 'fm_orderasc', 'boolean', NULL, true );
 $fm_Filelist->sort( $fm_order, $fm_orderasc );
 
 

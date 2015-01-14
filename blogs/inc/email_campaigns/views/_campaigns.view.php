@@ -21,7 +21,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _campaigns.view.php 7922 2015-01-06 23:29:21Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -44,7 +44,7 @@ $Results->title = T_('Email campaigns');
 
 if( $current_User->check_perm( 'emails', 'edit' ) )
 { // User must has a permission to edit emails
-	$Results->global_icon( T_('Create new campaign...'), 'new', $admin_url.'?ctrl=campaigns&amp;action=new', T_('Create new campaign').' &raquo;', 3, 4 );
+	$Results->global_icon( T_('Create new campaign').'...', 'new', $admin_url.'?ctrl=campaigns&amp;action=new', T_('Create new campaign').' &raquo;', 3, 4 );
 }
 
 $Results->cols[] = array(

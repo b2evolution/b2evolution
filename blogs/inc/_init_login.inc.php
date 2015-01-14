@@ -33,7 +33,7 @@
  *
  * @package evocore
  *
- * @version $Id: _init_login.inc.php 7206 2014-08-04 07:57:37Z yura $
+ * @version $Id: _init_login.inc.php 7943 2015-01-11 00:41:53Z fplanque $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -265,7 +265,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 				{ // Update user locale to the default, and add warning message about the update
 					$current_User->set( 'locale', $def_locale );
 					$current_User->dbupdate();
-					$Messages->add( T_('Your locale was invalid, now it was automitcally updated to the default locale.'), 'warning' );
+					$Messages->add( T_('Your preferred language/locale is no longer available on this site. You are now using the default language/locale.'), 'warning' );
 				}
 			}
 

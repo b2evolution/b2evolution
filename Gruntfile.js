@@ -36,9 +36,10 @@ module.exports = function(grunt) {
 				files: {
 					// target.css file: source.less file
 					'blogs/rsc/build/testless.css': 'blogs/rsc/less/test.less',
-					// Custom CSS for bootstrap back-office
+					// Custom CSS for bootstrap
 					'blogs/skins_adm/bootstrap/rsc/css/style.css': 'blogs/skins_adm/bootstrap/rsc/css/style.less',
 					'blogs/rsc/css/bootstrap/b2evo.css': 'blogs/rsc/css/bootstrap/b2evo.less',
+					'blogs/skins/bootstrap/style.css': 'blogs/skins/bootstrap/style.less',
 				}
 			}
 		},

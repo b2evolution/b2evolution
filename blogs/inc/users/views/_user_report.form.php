@@ -31,7 +31,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id$
+ * @version $Id: _user_report.form.php 7878 2014-12-23 11:54:05Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -81,10 +81,11 @@ if( $display_mode != 'js' )
 		echo_user_actions( $Form, $edited_User, $action );
 	}
 
-	$form_title = get_usertab_header( $edited_User, '', T_( 'Report User' ) );
+	$form_text_title = T_( 'Report User' ); // used for js confirmation message on leave the changed form
+	$form_title = get_usertab_header( $edited_User, '', $form_text_title );
 }
 
-$Form->begin_form( $form_class, $form_title );
+$Form->begin_form( $form_class, $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );
 
 $Form->hidden_ctrl();
 $Form->hidden( 'user_tab', $user_tab );

@@ -16,7 +16,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _coll_other.form.php 7985 2015-01-14 18:41:51Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -88,7 +88,7 @@ $Form->begin_fieldset( T_('Archives').get_manual_link( 'archives-other' ) );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Download display').get_manual_link( 'download-display-other' ) );
+$Form->begin_fieldset( T_('Download pages').get_manual_link( 'download-display-other' ) );
 	$Form->text_input( 'download_delay', $edited_Blog->get_setting( 'download_delay' ), 2, T_('Download delay') );
 $Form->end_fieldset();
 

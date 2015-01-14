@@ -3,7 +3,7 @@
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
- * @version $Id: functions.js 7556 2014-10-31 07:07:44Z yura $
+ * @version $Id: functions.js 7913 2014-12-29 11:32:47Z yura $
  */
 
 
@@ -192,6 +192,70 @@ function textarea_wrap_selection( myField, before, after, replace, target_docume
 		myField.focus();
 	}
 }
+
+/**
+ * Replace substring in textarea.
+ *
+ * Used on FRONT-office (EDITING) and BACK-office in the following files:
+ *  - links.js: to remove inline tag like this [image:123:caption text]
+ *
+ * @var element
+ * @var text
+ * @var text
+ * @var document (needs only be passed from a popup window as window.opener.document)
+ */
+function textarea_str_replace( myField, search, replace, target_document )
+{
+	target_document = target_document || document;
+
+	var hook_params = {
+		'element': myField,
+		'search': search,
+		'replace': replace,
+		'target_document': target_document
+	};
+
+	// First try, if a JavaScript callback is registered to handle this.
+	// E.g. the tinymce_plugin uses registers "wrap_selection_for_itemform_post_content"
+	//      to replace the (non-)selection
+	if( b2evo_Callbacks.trigger_callback( 'str_replace_for_' + myField.id, hook_params ) )
+	{
+		return;
+	}
+
+	if( window.opener && ( typeof window.opener != 'undefined' ) )
+	{
+		try
+		{ // Try find object 'b2evo_Callbacks' on window.opener to avoid halt error when page was opened from other domain
+			if( window.opener.b2evo_Callbacks &&
+			    ( typeof window.opener.b2evo_Callbacks != 'undefined' ) &&
+			    window.opener.b2evo_Callbacks.trigger_callback( 'str_replace_for_' + myField.id, hook_params ) )
+			{ // callback in opener document (e.g. "Files" popup)
+				return;
+			}
+		}
+		catch( e )
+		{ // Catch an error of the cross-domain restriction
+			// Ignore this error because it dies when browser has no permission to access to other domain windows
+		}
+	}
+
+	if( window.parent &&
+	    ( typeof window.parent != 'undefined' ) &&
+	    window.parent.b2evo_Callbacks &&
+	    ( typeof window.parent.b2evo_Callbacks != 'undefined' ) )
+	{ // callback in parent document (e.g. "Links" iframe)
+		if( window.parent.b2evo_Callbacks.trigger_callback( 'str_replace_for_' + myField.id, hook_params ) )
+		{
+			return;
+		}
+	}
+
+	// Replace substring with new value
+	myField.value = myField.value.replace( search, replace );
+	myField.focus();
+}
+
 
 /**
  * Open or close a filter area (by use of CSS style).

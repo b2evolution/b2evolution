@@ -43,7 +43,7 @@
  * This will most probably cause problems, when nesting inputs. This should be refactored
  * to use a field_name-based member array. (blueyed)
  *
- * @version $Id: _form.class.php 6972 2014-06-24 19:12:29Z yura $
+ * @version $Id: _form.class.php 7878 2014-12-23 11:54:05Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1512,35 +1512,35 @@ class Form extends Widget
 
 		$this->handle_common_params( $form_params, NULL /* "name" attribute is deprecated in xhtml */ );
 
-		if( ! empty($this->form_name) )
+		if( ! empty( $this->form_name ) )
 		{
 			$form_params['id'] = $this->form_name;
 		}
 
 		// Set non-mandatory attributes if given in $form_params
-		if( !isset($form_params['enctype']) && !empty( $this->enctype ) )
+		if( ! isset( $form_params['enctype'] ) && ! empty( $this->enctype ) )
 		{
 			$form_params['enctype'] = $this->enctype;
 		}
 
-		if( !isset($form_params['class']) && !empty( $form_class ) )
+		if( ! isset( $form_params['class'] ) && ! empty( $form_class ) )
 		{
 			$form_params['class'] = $form_class;
 		}
 		// Append bootstrap class
 		$form_params['class'] = empty( $form_params['class'] ) ? 'form-horizontal' : $form_params['class'].' form-horizontal';
 
-		if( !isset($form_params['method']) )
+		if( ! isset($form_params['method']) )
 		{
 			$form_params['method'] = $this->form_method;
 		}
 
-		if( !isset($form_params['action']) )
+		if( ! isset( $form_params['action'] ) )
 		{
 			$form_params['action'] = $this->form_action;
 		}
 
-		if( !empty($form_params['bozo_start_modified']) )
+		if( ! empty( $form_params['bozo_start_modified'] ) )
 		{
 			$bozo_start_modified = true;
 			unset( $form_params['bozo_start_modified'] );
@@ -1549,7 +1549,13 @@ class Form extends Widget
 		unset( $form_params['edit_form_params'] );
 		unset( $form_params['skin_form_params'] );
 
-		$r = "\n\n<form".get_field_attribs_as_string($form_params).">\n";
+		if( isset( $form_params['title'] ) )
+		{ // Additional title when $form_title has html tags. It is used for js confirmation message on leave the changed form.
+			$clear_title = $form_params['title'];
+			unset( $form_params['title'] );
+		}
+
+		$r = "\n\n<form".get_field_attribs_as_string( $form_params ).">\n";
 
 		// $r .= '<div>'; // for XHTML (dh> removed 'style="display:inline"' because it's buggy with FireFox 1.0.x, at least at the "Write" admin page; see http://forums.b2evolution.net/viewtopic.php?t=10130)
 		// fp> inline was needed for inline forms like the DELETE confirmation.
@@ -1557,7 +1563,7 @@ class Form extends Widget
 
 		$r .= $this->formstart;
 
-		if( empty($form_title) )
+		if( empty( $form_title ) )
 		{
 			$r .= $this->replace_vars( $this->no_title_fmt );
 		}
@@ -1576,26 +1582,27 @@ class Form extends Widget
 						</script>';
 
 		global $UserSettings;
-		if( isset($UserSettings) && $UserSettings->get( 'control_form_abortions' )
+		if( isset( $UserSettings ) && $UserSettings->get( 'control_form_abortions' )
 			&& preg_match( '#^(.*)_checkchanges#', $this->form_name ) )
 		{ // This form will trigger the bozo validator, preset a localized bozo confirm message:
 
 			$r .= '<script type="text/javascript">
 					if( typeof bozo == "object" )
-					{	// If Bozo validator is active:
+					{ // If Bozo validator is active:
 						bozo.confirm_mess = \'';
-			if( empty( $this->title ) )
+			$js_form_title = trim( strip_tags( empty( $clear_title ) ? ( empty( $this->title ) ? '' : $this->title ) : $clear_title ) );
+			if( empty( $js_form_title ) )
 			{ // No form title:
 				$r .= TS_( 'You have modified this form but you haven\'t submitted it yet.\nYou are about to lose your edits.\nAre you sure?' );
 			}
 			else
 			{ // with form title:
-				$r .= sprintf( TS_( 'You have modified the form \"%s\"\nbut you haven\'t submitted it yet.\nYou are about to lose your edits.\nAre you sure?' ), $this->title );
+				$r .= sprintf( TS_( 'You have modified the form \"%s\"\nbut you haven\'t submitted it yet.\nYou are about to lose your edits.\nAre you sure?' ), $js_form_title );
 			}
 
 			$r .= '\';';
 
-			if(	!empty($bozo_start_modified) )
+			if( ! empty( $bozo_start_modified ) )
 			{
 				$r .= '
 					// Update number of changes for this form:

@@ -3,7 +3,7 @@
  * on a link which will result in potential data input loss
  * Tested on Firefox (XP & Mac OSX) , IE6 (XP), Safari (Mac OSX)
  * b2evolution - http://b2evolution.net/
- * @version $Id: bozo_validator.js 6972 2014-06-24 19:12:29Z yura $
+ * @version $Id: bozo_validator.js 7904 2014-12-26 07:50:08Z yura $
  */
 var bozo_confirm_mess;
 
@@ -116,30 +116,26 @@ var bozo = {
 
 
 
-	/*
-	 *	Called when the user close the window
-	 *	Ask confirmation to close page without saving changes if there have been changes on all form inputs
+	/**
+	 * Called when the user close the window
+	 * Ask confirmation to close page without saving changes if there have been changes on all form inputs
 	 */
 	validate_close: function( e )
 	{
 		if( bozo.nb_changes )
-		{	// there are input changes
-			if(window.event)
+		{ // there are input changes
+			if( window.event )
 			{ // For ie:
 				window.event.returnValue = bozo.confirm_mess;
 			}
-			else
-			{ // For firefox:
-				//e.preventDefault();
-				//alert('pjl');
-				return bozo.confirm_mess;
-			}
+			// For all other browsers:
+			return bozo.confirm_mess;
 		}
-  }
+	}
 
 }
 
 // Init Bozo validator when the window is loaded:
-jQuery( document ).bind( "ready", bozo.init );
+jQuery( document ).bind( 'ready', bozo.init );
 // Note: beforeunload is a "very special" event and cannot be added with addEvent:
 window.onbeforeunload = bozo.validate_close;
